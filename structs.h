@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.3  2004/11/20 04:43:17  w4dimenscor
+ * Added more combat messages and disabled aggro and kill all for the moment
+ *
  * Revision 1.2  2004/11/17 14:19:46  w4dimenscor
  * added Aggro mode to attack everything in sight and 'kill all' command
  *
@@ -103,7 +106,7 @@ extern int message_type;
 #define WEAPON_PRIM_NOAFF 2
 #define WEAPON_SECO_NOAFF 3
 
-
+#define KILL_ALL_ENABLED 0
 
 /* Room flags: used in room_data.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */

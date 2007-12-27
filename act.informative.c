@@ -1343,8 +1343,9 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   list_char_to_char(view_room->people, ch);
   new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
 
-  if ( PRF_FLAGGED(ch, PRF_AGGRO) )
+  if ( KILL_ALL_ENABLED && PRF_FLAGGED(ch, PRF_AGGRO) ) {
     command_interpreter(ch, "kill all");
+    }
 }
 
 
