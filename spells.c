@@ -53,6 +53,8 @@ const char *material_name(int type);
 void add_identifier(struct obj_data *obj, long id);
 void free_identifier(struct obj_data *obj);
 int has_identifier(struct obj_data *obj, long id);
+bool can_have_follower(Character *ch, mob_vnum mob_num);
+bool can_have_follower(Character *ch, Character *vict);
 /*
  * Special spells appear below.
  */
@@ -502,6 +504,8 @@ ASPELL(spell_charm) {
         ch->Send("Sorry, following in circles can not be allowed.\r\n");
     else if (mag_savingthrow(victim, SAVING_PARA, 0))
         ch->Send("Your victim resists!\r\n");
+    else if (!can_have_follower(ch, victim))
+        ch->Send("You could not control that many charmed followers!\r\n");
     else {
         if (victim->master)
             stop_follower(victim);

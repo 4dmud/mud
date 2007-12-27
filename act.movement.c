@@ -167,14 +167,14 @@ int move_cost(Character *ch, int dir) {
     if (AFF_FLAGGED(ch, AFF_FLY))
         need_movement -= FTOI((need_movement * 0.30));
 
-
+if (has_vehicle(ch))
+        return 0;
+        
     if (IS_CARRYING_W(ch) > CAN_CARRY_W(ch)) {
         ch->Send( "You drag your feet under that amount of weight!\r\n");
         need_movement += FTOI(GET_MAX_MOVE(ch) * 0.5);
     }
-    if (has_vehicle(ch))
-        return 0;
-    else
+    
         return need_movement;
 }
 
@@ -461,9 +461,13 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
 
     /* the player is either walking, or riding, but is not being ridden */
     if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT && !RIDDEN_BY(ch)) {
-        if (ch->MountHere())
+        if (ch->MountHere()) {
+        if (GET_MOVE(ch) < need_movement) {
+            ch->Send("You are too exhausted from riding so far, and need a break.\r\n");
+            return (0);
+        } else
             alter_move(ch, FTOI(need_movement - (need_movement * 0.3)));
-        else
+        } else
             alter_move(ch, need_movement);
     }
     /* now the mount of the player gets altered */

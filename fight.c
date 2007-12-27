@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.73  2007/06/17 10:44:53  w4dimenscor
+ * Fixed a bug in a mounted persons movepoints going below 0, fixed abuse of animate dead, fixed group spells to allow for inclusion of charmies, and set a limit on total charmies in a group.
+ *
  * Revision 1.72  2007/06/17 04:34:37  w4dimenscor
  * updated combat for charmies. Made it split the damage among the group better
  *
@@ -1824,11 +1827,17 @@ int followers_assisting(Character *ch) {
     Character *k;
     struct follow_type *f;
     int cnt = 0;
-
     k = (ch->master ? ch->master : ch);
+    
+    if (k != ch) {
+            if (HERE(k, ch) && (FIGHTING(k) != NULL))
+                if (FIGHTING(ch) == FIGHTING(k))
+                    cnt++;
+                    }
+    
     for (f = k->followers;f != NULL;f = f->next) {
         if (f->follower != ch) {
-            if (HERE(f->follower, ch) && (FIGHTING(ch) != NULL))
+            if (HERE(f->follower, ch) && (FIGHTING(f->follower) != NULL))
                 if (FIGHTING(ch) == FIGHTING(f->follower))
                     cnt++;
         }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.27  2007/06/17 10:44:53  w4dimenscor
+ * Fixed a bug in a mounted persons movepoints going below 0, fixed abuse of animate dead, fixed group spells to allow for inclusion of charmies, and set a limit on total charmies in a group.
+ *
  * Revision 1.26  2007/06/17 04:34:38  w4dimenscor
  * updated combat for charmies. Made it split the damage among the group better
  *
@@ -145,6 +148,8 @@ void set_race(Character *ch, int race);
 int has_class(Character *ch, int chclass);
 int tier_level(Character *ch, int chclass);
 void remove_corpse_from_list(OBJ_DATA *corpse);
+bool can_have_follower(Character *ch, mob_vnum mob_num);
+bool can_have_follower(Character *ch, Character *vict);
 
 ACMD(do_drop);
 ACMD(do_gen_door);
@@ -1168,6 +1173,10 @@ SPECIAL(pet_shops) {
         if (ch->Gold( 0, GOLD_HAND) < PET_PRICE(pet)) {
             *ch << "You don't have enough gold!\r\n";
             return (TRUE);
+        }
+        if (!can_have_follower(ch, pet)) {
+		  *ch << "You can't control that many charmed followers!\r\n";
+		  return TRUE;
         }
         ch->Gold( -PET_PRICE(pet), GOLD_HAND);
 

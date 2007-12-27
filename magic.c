@@ -52,7 +52,8 @@ int mag_savingthrow(Character *ch, int type, int modifier);
 int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum);
 int perform_mag_direction(int level, room_rnum room, Character *ch, Character *vict, int spellnum);
 void affect_update(void);
-
+bool can_have_follower(Character *ch, mob_vnum mob_num);
+bool can_have_follower(Character *ch, Character *vict);
 
 /*
  * Saving throws are now in class.c as of bpl13.
@@ -1465,20 +1466,19 @@ void mag_groups(int level, Character *ch, int spellnum,
     if (ch == NULL)
         return;
 
-    if (!AFF_FLAGGED(ch, AFF_GROUP))
-        return;
-    if (ch->master != NULL)
-        k = ch->master;
-    else
-        k = ch;
+    if (!ch->master && !ch->followers)
+    return;
+    
+        k = ch->master ? ch->master : ch;
+    
     for (f = k->followers; f; f = f_next) {
         f_next = f->next;
         tch = f->follower;
-        if (tch->in_room != ch->in_room)
+        if (!HERE(ch, tch))
             continue;
-        if (!AFF_FLAGGED(tch, AFF_GROUP))
+        if (GET_PERC(tch) == 0)
             continue;
-        if (ch == tch)
+        if (SELF(ch,tch))
             continue;
         perform_mag_groups(level, ch, tch, spellnum, savetype);
     }
@@ -1610,7 +1610,7 @@ void mag_areas(int level, Character *ch, int spellnum, int savetype) {
          */
         if (count++ >= rounds)
             break;
-        if (tch == ch)
+        if (SELF(tch,ch))
             continue;
         if (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_GOD)
             continue;
@@ -1713,7 +1713,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         break;
 
     case SPELL_ANIMATE_DEAD:
-        if (obj == NULL || !IS_CORPSE(obj)) {
+        if (obj == NULL || !IS_CORPSE(obj) || IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_NPC_CORPSE)) {
             act(mag_summon_fail_msgs[7], FALSE, ch, 0, 0, TO_CHAR);
             return;
         }
@@ -1730,6 +1730,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_EARTH_ELEM;
         pfail = 45 - GET_CHA(ch);
+        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_WATER_ELEMENTAL:
@@ -1738,6 +1739,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_WATER_ELEM;
         pfail = 25;
+        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_AIR_ELEMENTAL:
@@ -1746,6 +1748,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_AIR_ELEM;
         pfail = 25;
+        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_FIRE_ELEMENTAL:
@@ -1754,29 +1757,36 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_FIRE_ELEM;
         pfail = 25;
+        num += GET_CHA(ch)/60;
         break;
 
     default:
         return;
     }
 
+   
+
     if (AFF_FLAGGED(ch, AFF_CHARM)) {
-        send_to_char("You are too giddy to have any followers!\r\n", ch);
+        ch->Send("You are too giddy to have any followers!\r\n");
         return;
     }
+    if (!can_have_follower(ch, mob_num)) {
+  ch->Send("Sorry, but you can't have any more then a total of \r\n"
+           "160 levels between all of your charmed followers\r\n");
+  return;
+    }
     if (number(0, 101) < pfail) {
-        send_to_char(mag_summon_fail_msgs[fmsg], ch);
+        ch->Send("%s", mag_summon_fail_msgs[fmsg]);
         return;
     }
     for (i = 0; i < num; i++) {
         if (!(mob = read_mobile(mob_num))) {
-            send_to_char
-            ("You don't quite remember how to make that creature.\r\n",
-             ch);
+            ch->Send("You don't quite remember how to make that creature.\r\n");
             return;
         }
 
         char_to_room(mob, ch->in_room);
+        
         IS_CARRYING_W(mob) = 0;
         IS_CARRYING_N(mob) = 0;
         SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);

@@ -785,19 +785,13 @@ void parse_undead_commands(Character *ch) {
 
 void parse_elemental_actions(Character *ch) {
 
-    if (MOB_FLAGGED(ch, MOB_ELEM_EARTH)) {
-    }
-    if (MOB_FLAGGED(ch, MOB_ELEM_FIRE)) {
-    }
-    if (MOB_FLAGGED(ch, MOB_ELEM_AIR)) {
-    }
-    if (MOB_FLAGGED(ch, MOB_ELEM_WATER)) {
-    }
+    if (MOB_FLAGGED(ch, MOB_ELEM_EARTH)) {}
+    if (MOB_FLAGGED(ch, MOB_ELEM_FIRE)) {}
+    if (MOB_FLAGGED(ch, MOB_ELEM_AIR)) {}
+    if (MOB_FLAGGED(ch, MOB_ELEM_WATER)) {}
 }
 
-void parse_tasks(Character *ch) {
-
-}
+void parse_tasks(Character *ch) {}
 
 #define LEVELS_PER_CHA 4
 #define TCH f->follower
@@ -822,8 +816,7 @@ void check_group_control(Character *ch) {
             if (cha < 0) {
                 act("$N blinks and struggles from your control!", FALSE, ch, 0, TCH, TO_CHAR);
                 act("$N blinks and struggles from $n's control!", FALSE, ch, 0, TCH, TO_ROOM);
-                if (!number(0, 5)) {
-                }
+                if (!number(0, 5)) {}
             }
 
         }
@@ -889,114 +882,39 @@ void find_usable_weapon(Character *ch) {
 
 
 
-#if 0
-Character *load_familiar(Character *owner) {
+int sum_charmie_levels(Character *ch) {
+    Character *k;
+    struct follow_type *f;
+    int cnt = 0;
+    k = ch->master ? ch->master : ch;
+    if (IS_NPC(k) && AFF_FLAGGED(k, AFF_CHARM))
+        cnt += GET_LEVEL(k);
 
-    Character victim;
-    FILE *fam_f;
+    for (f = k->followers;f;f = f->next) {
+        if (IS_NPC(f->follower) && AFF_FLAGGED(f->follower, AFF_CHARM))
+            cnt += GET_LEVEL(f->follower);
+    }
+    return cnt;
 
-    CREATE(victim, Character, 1);
-    clear_char(victim);
-    CREATE(victim->player_specials, struct player_special_data, 1);
 }
+bool can_have_follower(Character *ch, mob_vnum mob_num) {
+int tot = sum_charmie_levels(ch);
+if (!MobProtoExists(mob_num))
+return FALSE;
+if (tot > 160)
+return FALSE;
+if ((tot + GET_LEVEL(GetMobProto(mob_num))) > 160)
+return FALSE;
 
-
-void parse_mobile(FILE * mob_f, int nr) {
-    void set_race(Character *ch, int race);
-
-    static int i = 0;
-    int j, t[10];
-    char line[256], *tmpptr, letter;
-    char f1[128], f2[128], f3[128], f4[128], f5[128], f6[128], f7[128],
-    f8[128];
-
-    mob_index[i].vnum = nr;
-    mob_index[i].number = 0;
-    mob_index[i].func = NULL;
-
-    clear_char(mob_proto + i);
-
-    /*
-     * Mobiles should NEVER use anything in the 'player_specials' structure.
-     * The only reason we have every mob in the game share this copy of the
-     * structure is to save newbie coders from themselves. -gg 2/25/98
-     */
-    mob_proto[i].player_specials = &dummy_mob;
-    sprintf(buf2, "mob vnum %d", nr);	/* sprintf: OK (for 'buf2 >= 19') */
-
-    /***** String data *****/
-    mob_proto[i].player.name = fread_string(mob_f, buf2);
-    tmpptr = mob_proto[i].player.short_descr = fread_string(mob_f, buf2);
-    if (tmpptr && *tmpptr)
-        if (!str_cmp(fname(tmpptr), "a") || !str_cmp(fname(tmpptr), "an")
-                || !str_cmp(fname(tmpptr), "the"))
-            *tmpptr = LOWER(*tmpptr);
-    mob_proto[i].player.long_descr = fread_string(mob_f, buf2);
-    mob_proto[i].player.description = fread_string(mob_f, buf2);
-    mob_proto[i].player.title = NULL;
-    mob_proto[i].player.race = 5;
-    //  set_race(mob_proto[i], mob_proto[i].player.race);
-
-    /* *** Numeric data *** */
-    if (!get_line(mob_f, line)) {
-        log("SYSERR: Format error after string section of mob #%d\n"
-            "...expecting line of form '# # # {S | E}', but file ended!",
-            nr);
-        exit(1);
-    }
-#ifdef CIRCLE_ACORN		/* Ugh. */
-    if (sscanf(line, "%s %s %d %s", f1, f2, t + 2, &letter) != 4) {
-#else
-    if (sscanf
-            (line, "%s %s %s %s %s %s %s %s %d %c", f1, f2, f3, f4, f5, f6, f7,
-             f8, t + 2, &letter) != 10) {
-#endif
-        log("SYSERR: Format error after string section of mob #%d\n"
-            "...expecting line of form '# # # {S | E}'", nr);
-        exit(1);
-    }
-    MOB_FLAGS(mob_proto + i)[0] = asciiflag_conv(f1);
-    MOB_FLAGS(mob_proto + i)[1] = asciiflag_conv(f2);
-    MOB_FLAGS(mob_proto + i)[2] = asciiflag_conv(f3);
-    MOB_FLAGS(mob_proto + i)[3] = asciiflag_conv(f4);
-    SET_BIT_AR(MOB_FLAGS(mob_proto + i), MOB_ISNPC);
-    AFF_FLAGS(mob_proto + i)[0] = asciiflag_conv(f5);
-    AFF_FLAGS(mob_proto + i)[1] = asciiflag_conv(f6);
-    AFF_FLAGS(mob_proto + i)[2] = asciiflag_conv(f7);
-    AFF_FLAGS(mob_proto + i)[3] = asciiflag_conv(f8);
-    GET_ALIGNMENT(mob_proto + i) = t[2];
-
-
-    switch (UPPER(letter)) {
-    case 'S':			/* Simple monsters */
-        parse_simple_mob(mob_f, i, nr);
-        break;
-    case 'E':			/* Circle3 Enhanced monsters */
-        parse_enhanced_mob(mob_f, i, nr);
-        break;
-        /* add new mob types here.. */
-    default:
-        log("SYSERR: Unsupported mob type '%c' in mob #%d", letter, nr);
-        exit(1);
-    }
-
-    /* DG triggers -- script info follows mob S/E section */
-    letter = fread_letter(mob_f);
-    ungetc(letter, mob_f);
-    while (letter == 'T') {
-        dg_read_trigger(mob_f, &mob_proto[i], MOB_TRIGGER);
-        letter = fread_letter(mob_f);
-        ungetc(letter, mob_f);
-    }
-
-    mob_proto[i].aff_abils = mob_proto[i].real_abils;
-
-    for (j = 0; j < NUM_WEARS; j++)
-        mob_proto[i].equipment[j] = NULL;
-
-    mob_proto[i].nr = i;
-    mob_proto[i].desc = NULL;
-
-    top_of_mobt = i++;
+return TRUE;
 }
-#endif
+bool can_have_follower(Character *ch, Character *vict) {
+int tot = sum_charmie_levels(ch);
+if (!vict)
+return FALSE;
+if (tot > 160)
+return FALSE;
+if ((tot + GET_LEVEL(vict)) > 160)
+return FALSE;
+
+return TRUE;}
