@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.20  2006/04/30 13:36:18  w4dimenscor
+ * stat on an imm no longer shows UNDEFINED instead of imm3, trust all adds the imm3 trust group too now and vstat uses pages.
+ *
  * Revision 1.19  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -1954,7 +1957,8 @@ const char *spell_wear_off_msg[] =
     "!Dispel Evil!",
     "!Earthquake!",
     "!Enchant Weapon!",
-    "!Energy Drain!",         /* 25 */
+    "The drained feeling goes away.", /*25 */
+//     "!Energy Drain!",         /* 25 */
     "!Fireball!",
     "!Harm!",
     "!Heal!",
@@ -2275,6 +2279,7 @@ const char *wiz_groups[] =
     "goto",
     "globalEdit",
     "hedit",
+    "Imm3",
     "\n"
   };
 

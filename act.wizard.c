@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.45  2006/04/30 13:36:18  w4dimenscor
+ * stat on an imm no longer shows UNDEFINED instead of imm3, trust all adds the imm3 trust group too now and vstat uses pages.
+ *
  * Revision 1.44  2006/04/21 12:46:44  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -591,6 +594,7 @@ int perform_trust(struct char_data *ch, struct char_data *vict, int mode,
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HOUSE_GRP)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM1_GRP)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM2_GRP)
+      SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM3_GRP)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMPL_GRP)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_KILL_GRP)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_LOAD_GRP)
@@ -2111,23 +2115,37 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     {
       struct trig_var_data *tv;
       char uname[MAX_INPUT_LENGTH];
-
-      new_send_to_char(ch, "Global Variables for %s:\r\n", GET_NAME(k));
+      char buffer[MAX_INPUT_LENGTH];
+          DYN_DEFINE;
+          DYN_CREATE;
+          *dynbuf=0;
+      snprintf(buffer,MAX_INPUT_LENGTH,"Global Variables for %s:\r\n", GET_NAME(k));
+      DYN_RESIZE(buffer);
+//        new_send_to_char(ch, "Global Variables for %s:\r\n", GET_NAME(k));
 
       /* currently, variable context for players is always 0, so it is */
       /* not displayed here. in the future, this might change */
+
       for (tv = k->script->global_vars; tv; tv = tv->next)
       {
         if (*(tv->value) == UID_CHAR)
         {
           find_uid_name(tv->value, uname, sizeof(uname));
-          new_send_to_char(ch, "    %40s:  [UID]: %20s\r\n", tv->name,
+          snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name,
                            uname);
+          DYN_RESIZE(buffer);
+//            new_send_to_char(ch, "    %40s:  [UID]: %20s\r\n", tv->name,
+//                             uname);
         }
-        else
-          new_send_to_char(ch, "    %40s:  %20s\r\n", tv->name,
-                           tv->value);
+        else {
+         snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name,
+                          tv->value);
+         DYN_RESIZE(buffer);
+//           new_send_to_char(ch, "    %40s:  %20s\r\n", tv->name,
+//                            tv->value);
+        }
       }
+      page_string(ch->desc, dynbuf, DYN_BUFFER);
     }
   }
 
