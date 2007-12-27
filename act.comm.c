@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.11  2005/03/17 11:39:52  w4dimenscor
+ * Fixed clan talk. they where ignoring everyone from there class.
+ *
  * Revision 1.10  2005/03/15 08:35:08  w4dimenscor
  * xml page update, and a few other bits
  *
@@ -1476,7 +1479,7 @@ ACMD(do_ctell)
       {
         if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
-          if (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
+          if (!is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
           {
             if (i->character->player_specials->saved.clan_rank >=minlev)
             {
