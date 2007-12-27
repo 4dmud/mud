@@ -1178,9 +1178,8 @@ void parse_room_name(room_rnum in_room, char *bufptr, size_t len)
 
 void parse_room_description(room_rnum in_room, char *bufptr, size_t len)
 {
-  if (!strcmp
-      (in_room->description,
-       "This description is yet unfinished...\r\n") || compares("wilderness", in_room->description))
+  if (!strncmp(in_room->description, "This description is yet unfinished...\r\n", 25) ||
+      compares("wilderness", in_room->description))
     switch (SECT(in_room))
     {
     case SECT_SPACE:
