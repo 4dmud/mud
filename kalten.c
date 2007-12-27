@@ -829,7 +829,7 @@ ACMD(do_finger) {
                      ch);
         return;
     }
-    if (!(id = pi.IdByName(arg))) {
+    if ((id = pi.IdByName(arg)) == -1) {
         send_to_char("There is no such player.\r\n", ch);
         return;
     }
