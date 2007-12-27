@@ -46,7 +46,7 @@ int move_fusion(CHAR_DATA *ch, int dir);
 int delete_pobj_file(char *name);
 void hit_death_trap(CHAR_DATA *ch);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA * vict);
-
+ACMD(do_drive);
 
 /* MatingMod Defines */
 #define NINE_MONTHS     6000  /* 6000 realtime minutes TO GO */
@@ -1289,9 +1289,26 @@ ACMD(do_move)
    * This is basically a mapping of cmd numbers to perform_move indices.
    * It cannot be done in perform_move because perform_move is called
    * by other functions which do not require the remapping.
+   *
+   * Update: This function is now also used for vehicle driving. -Thotter
    */
-  perform_move(ch, subcmd - 1, 0);
-}
+  if(GET_POS(ch)==POS_SITTING)
+   {
+     int is_vehicle=FALSE;
+     obj_data *vehicle_control;
+     for(vehicle_control=IN_ROOM(ch)->contents;vehicle_control;vehicle_control=vehicle_control->next_content)
+       if(GET_OBJ_TYPE(vehicle_control)==ITEM_V_CONTROLS){
+         is_vehicle=TRUE;
+         break;
+       }
+     if(is_vehicle)
+       do_drive(ch, (char *)(complete_cmd_info[cmd].command), cmd, 0);
+     else
+       send_to_char("Maybe you should get on your feet first?\r\n",ch);
+   }
+   else
+     perform_move(ch, subcmd - 1, 0);
+ }
 
 
 int find_door(struct char_data *ch, const char *type, char *dir,
@@ -1929,11 +1946,18 @@ ACMD(do_stand)
 
 ACMD(do_sit)
 {
-  struct obj_data *chair;
+  struct obj_data *chair, *vehicle_control;
   struct char_data *tempch;
-  int found;
+  int found,is_vehicle;
   char arg[MAX_INPUT_LENGTH];
+  char message[MAX_INPUT_LENGTH];
 
+  is_vehicle=FALSE;
+  for(vehicle_control=IN_ROOM(ch)->contents;vehicle_control;vehicle_control=vehicle_control->next_content)
+    if(GET_OBJ_TYPE(vehicle_control)==ITEM_V_CONTROLS){
+      is_vehicle=TRUE;
+      break;
+    }
   one_argument(argument, arg);
 
   if (!*arg)
@@ -1953,8 +1977,15 @@ ACMD(do_sit)
 
     if (found == 0)
     {
-      send_to_char("You sit down.\r\n", ch);
-      act("$n sits down.", FALSE, ch, 0, 0, TO_ROOM);
+      if(is_vehicle) {
+        new_send_to_char(ch, "You sit down at %s.\r\n",vehicle_control->short_description);
+        snprintf(message,sizeof(message),"$n sits down at %s.", vehicle_control->short_description);
+        act(message, FALSE, ch, 0, 0, TO_ROOM);
+      }
+      else {
+        send_to_char("You sit down.\r\n", ch);
+        act("$n sits down.", FALSE, ch, 0, 0, TO_ROOM);
+      }
       dismount_char(ch);
       GET_POS(ch) = POS_SITTING;
     }
@@ -1998,8 +2029,15 @@ ACMD(do_sit)
         NEXT_SITTING(ch) = NULL;
         GET_OBJ_VAL(chair, 1) += 1;
         GET_POS(ch) = POS_SITTING;
-        act("You sit down upon $p.", TRUE, ch, chair, 0, TO_CHAR);
-        act("$n sits down upon $p.", TRUE, ch, chair, 0, TO_ROOM);
+        if(is_vehicle){
+          new_send_to_char(ch, "You sit down upon %s and start using %s.\r\n", chair->short_description,vehicle_control->short_description);
+          snprintf(message,sizeof(message),"$n sits down upon $p and starts using %s.",vehicle_control->short_description);
+          act(message, TRUE, ch, chair, 0, TO_ROOM);
+        }
+        else {
+          act("You sit down upon $p.", TRUE, ch, chair, 0, TO_CHAR);
+          act("$n sits down upon $p.", TRUE, ch, chair, 0, TO_ROOM);
+        }
       }
     }
     break;

@@ -456,12 +456,12 @@ const struct command_info cmd_info[] =
     ,     /* this must be first -- for specprocs */
 
     /* directions must come before other commands but after RESERVED */
-    { "north"    , "n"    , POS_STANDING, do_move     , 0, SCMD_NORTH, 0 },
-    { "east"     , "e"   , POS_STANDING, do_move     , 0, SCMD_EAST, 0 },
-    { "south"    , "s"   , POS_STANDING, do_move     , 0, SCMD_SOUTH, 0 },
-    { "west"     , "w"   , POS_STANDING, do_move     , 0, SCMD_WEST, 0 },
-    { "up"       , "u"   , POS_STANDING, do_move     , 0, SCMD_UP, 0 },
-    { "down"     , "d"   , POS_STANDING, do_move     , 0, SCMD_DOWN, 0 },
+    { "north"    , "n"    , POS_SITTING, do_move     , 0, SCMD_NORTH, 0 },
+    { "east"     , "e"   , POS_SITTING, do_move     , 0, SCMD_EAST, 0 },
+    { "south"    , "s"   , POS_SITTING, do_move     , 0, SCMD_SOUTH, 0 },
+    { "west"     , "w"   , POS_SITTING, do_move     , 0, SCMD_WEST, 0 },
+    { "up"       , "u"   , POS_SITTING, do_move     , 0, SCMD_UP, 0 },
+    { "down"     , "d"   , POS_SITTING, do_move     , 0, SCMD_DOWN, 0 },
 
     /* now, the main list */
     { "--"      , "--"  , POS_DEAD    , do_clear_buffer  , 0, 0, 0 },

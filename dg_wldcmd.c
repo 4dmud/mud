@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/01 11:29:26 $
-*  $Revision: 1.8 $
+*  $Date: 2006/05/08 19:36:27 $
+*  $Revision: 1.9 $
 **************************************************************************/
 
 #include "conf.h"
@@ -423,7 +423,6 @@ WCMD(do_wteleport)
   room_rnum target, was_in;
   room_vnum nr;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-
   argument = two_arguments(argument, arg1, arg2);
   skip_spaces(&argument);
   if (!*arg1 || !*arg2)
@@ -453,6 +452,9 @@ WCMD(do_wteleport)
         continue;
       char_from_room(ch);
       char_to_room(ch, target);
+      entry_memory_mtrigger(ch);
+      greet_mtrigger(ch, -1);
+      greet_memory_mtrigger(ch);
       enter_wtrigger(IN_ROOM(ch), ch, -1);
     }
   }
@@ -466,6 +468,9 @@ WCMD(do_wteleport)
         was_in = IN_ROOM(ch);
         char_from_room(ch);
         char_to_room(ch, target);
+        entry_memory_mtrigger(ch);
+        greet_mtrigger(ch, -1);
+        greet_memory_mtrigger(ch);
         enter_wtrigger(IN_ROOM(ch), ch, -1);
         if (isname(argument, "followers"))
           followers_to_master(ch, was_in);

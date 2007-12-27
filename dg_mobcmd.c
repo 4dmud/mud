@@ -27,6 +27,10 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.14  2006/05/08 19:36:27  w4dimenscor
+ * Commiting some files that were out of the cvs because of the last backup fiasco, and there is also a bugfix for teleport in
+ * scripts.
+ *
  * Revision 1.13  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -1126,6 +1130,9 @@ ACMD(do_mteleport)
       {
         char_from_room(vict);
         char_to_room(vict, target);
+        entry_memory_mtrigger(ch);
+        greet_mtrigger(ch, -1);
+        greet_memory_mtrigger(ch);
         enter_wtrigger(IN_ROOM(ch), ch, -1);
       }
     }
@@ -1153,6 +1160,9 @@ ACMD(do_mteleport)
       was_in = IN_ROOM(vict);
       char_from_room(vict);
       char_to_room(vict, target);
+      entry_memory_mtrigger(ch);
+      greet_mtrigger(ch, -1);
+      greet_memory_mtrigger(ch);
       enter_wtrigger(IN_ROOM(vict), vict, -1);
       if (isname(argument, "followers"))
         followers_to_master(vict, was_in);

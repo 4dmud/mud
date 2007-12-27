@@ -9,6 +9,15 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.19  2006/05/08 19:36:27  w4dimenscor
+ * Commiting some files that were out of the cvs because of the last backup fiasco, and there is also a bugfix for teleport in
+ * scripts.
+ *
+ * Revision 1.19  2006/05/01 15:42:36  w4dimenscor
+ * Corrected a typo in hurdle jumping with mounts, fixed the bug which would put you in fighting mode, but without opponent if you used an offensive wand on yourself
+ * or a non-pk pc victim, changed movement so that you can now drive a vehicle by sitting down and using the ordinary movement commands and fixed socials. I think it
+ * now works completely as intended.
+ *
  * Revision 1.18  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -913,6 +922,8 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
     else
       call_magic(ch, tch, tobj, 0, GET_OBJ_VAL(obj, 3),
                  DEFAULT_WAND_LVL, CAST_WAND);
+    if(FIGHTING(ch) && (!FIGHTING(tch) || tch==ch))
+      stop_fighting(ch);
     check_potion_weight(obj);
     break;
   case ITEM_SCROLL:

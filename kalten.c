@@ -1321,7 +1321,7 @@ ACMD(do_jump)
             char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));	/* send the player/mob to the room */
             if (RIDING(ch))
             {
-              act("$n's horse refuses to jump and $s flies over its head, landing with a THUMP!", FALSE, ch, NULL, 0, TO_ROOM);
+              act("$n's horse refuses to jump and $e flies over its head, landing with a THUMP!", FALSE, ch, NULL, 0, TO_ROOM);
               act("You fly over your horse's head as it refuses to jump, landing with a THUMP!", FALSE, ch, NULL, RIDING(ch), TO_CHAR);
               damage(ch, ch, number(1, ((GET_HIT(ch)/3) - 1)),  TYPE_UNDEFINED);
             }

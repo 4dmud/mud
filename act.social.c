@@ -46,7 +46,7 @@ const char * afar_act(int afar, const char * string, char *buf, size_t len);
 
 ACMD(do_action)
 {
-  int act_nr,fnum,fnumbak;
+  int act_nr,fnum,fnumbak,chars_found=0,i;
   struct social_messg *action;
   struct char_data *vict;
   struct obj_data *targ;
@@ -96,15 +96,18 @@ ACMD(do_action)
   strncpy(arg1,arg,MAX_INPUT_LENGTH);
   fnumbak=fnum;
   if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(ch) > LVL_HERO)){
-    vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD);
-    if(!vict) {
-      fnum=fnumbak;
-      vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
+    vict=NULL;
+    for(i=1;i<=fnum;i++){
+      int j=i;
+      vict = get_char_vis(ch, arg1, &j, FIND_CHAR_WORLD);
+      if(!vict) break;
+      if(IS_NPC(vict) && IN_ROOM(ch)!=IN_ROOM(vict)) fnum++;
+      if(!IS_NPC(vict) || IN_ROOM(ch)==IN_ROOM(vict)) chars_found++;
     }
+    fnum=fnumbak-chars_found;
   }
   else
     vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
-
   if (!vict || (IS_NPC(vict) && IN_ROOM(vict) != IN_ROOM(ch)))
   {
     if (action->char_obj_found)
@@ -257,7 +260,7 @@ char *fread_action(FILE * fl, int nr)
 void boot_social_messages(void)
 {
   FILE *fl;
-  int nr = 0, hide = 0, min_char_pos = 0, min_pos = 0, min_lvl = 0, curr_soc = -1, retval = 0;
+  int nr = 0, hide = 0, min_char_pos = 0, min_pos = 0, min_lvl = 0, curr_soc = -1, retval = 0, teller;
   char next_soc[MAX_STRING_LENGTH], sorted[MAX_INPUT_LENGTH];
 
   strcpy(sorted, "");
@@ -299,9 +302,9 @@ void boot_social_messages(void)
   CREATE(soc_mess_list, struct social_messg, top_of_socialt + 1);
 
   /* now read 'em */
-  for (;;)
+  for (teller=0;;teller++)
   {
-
+    printf("%d: ",teller);
     fscanf(fl, " %s ", next_soc);
 
     if (*next_soc == '$') break;
@@ -316,6 +319,7 @@ void boot_social_messages(void)
 
     curr_soc++;
     soc_mess_list[curr_soc].command = str_dup(next_soc + 1);
+    printf("%s\n",soc_mess_list[curr_soc].command);
     soc_mess_list[curr_soc].sort_as = str_dup(sorted);
     soc_mess_list[curr_soc].hide = hide;
     soc_mess_list[curr_soc].min_char_position = min_char_pos;
