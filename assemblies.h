@@ -46,7 +46,6 @@ struct assembly_data
   long         lVnum;                  /* Vnum of the object assembled. */
   long         lNumComponents;         /* Number of components. */
   unsigned char        uchAssemblyType;        /* Type of assembly (ASSM_xxx).*/
-  int trigVnum; /* attach a trigger to the assembly */
   struct component_data *pComponents;          /* Array of component info. */
 };
 

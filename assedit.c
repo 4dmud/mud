@@ -145,7 +145,6 @@ void assedit_setup(Descriptor *d, int num)
     OLC_ASSEDIT(d)->lVnum = pOldAssembly->lVnum;
     OLC_ASSEDIT(d)->uchAssemblyType = pOldAssembly->uchAssemblyType;
     OLC_ASSEDIT(d)->lNumComponents = pOldAssembly->lNumComponents;
-    OLC_ASSEDIT(d)->trigVnum = pOldAssembly->trigVnum;
 
     if( OLC_ASSEDIT(d)->lNumComponents > 0 )
     {
@@ -194,14 +193,11 @@ void assedit_disp_menu(Descriptor *d)
                   "   Assembly Number:%s %ld %s\r\n"
                   "   Assembly Name  :%s %s %s \r\n"
                   "   ---------------------------\r\n"
-                  "%sT%s) Assembly Type  :%s %s %s\r\n"
-                  "%sS%s) Assembly Trig  :%s %d %s\r\n\r\n"
+                  "%sT%s) Assembly Type  :%s %s %s\r\n\r\n"
                   "Components:\r\n",
                   yel,  OLC_ASSEDIT(d)->lVnum, nrm,
                   yel,  obj_proto[ real_object(OLC_ASSEDIT(d)->lVnum) ].short_description, nrm,
-                  grn, nrm,yel,  szAssmType, nrm,
-                  grn, nrm,yel,  OLC_ASSEDIT(d)->trigVnum, nrm
-                 );
+                  grn, nrm,yel,  szAssmType, nrm);
 
   if(OLC_ASSEDIT(d)->lNumComponents <= 0)
     d->Output( "   < NONE > \r\n");
@@ -272,7 +268,6 @@ void assedit_parse(Descriptor *d, char *arg)
                              OLC_ASSEDIT(d)->pComponents[i].bInRoom
                             );
       }
-      assemblyAddTrigger(OLC_ASSEDIT(d)->lVnum,OLC_ASSEDIT(d)->trigVnum);
 
       d->Output( "\r\nSaving all assemblies\r\n");
       assemblySaveAssemblies();
@@ -352,18 +347,7 @@ void assedit_parse(Descriptor *d, char *arg)
       assedit_disp_menu(d);
 
     break;
-  case ASSEDIT_EDIT_TRIGGER:
-    if (isdigit(*arg))
-    {
-      pos = atoi(arg);
-      OLC_ASSEDIT(d)->trigVnum = pos;
-      assedit_disp_menu(d);
-      break;
-    }
-    else
-      assedit_disp_menu(d);
 
-    break;
   case ASSEDIT_ADD_COMPONENT:              /* add a new component */
     if (isdigit(*arg))
     {

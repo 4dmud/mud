@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/06/07 10:41:03 $
-*  $Revision: 1.16 $
+*  $Date: 2007/06/09 06:09:08 $
+*  $Revision: 1.17 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1136,10 +1136,7 @@ int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd) {
         log( "SYSERR: NULL assemble_otrigger(): Invalid 'lVnum' #%d.", lVnum );
         return (FALSE);
     }
-    if (pAssembly->trigVnum == -1) {
-        perform_assemble(lVnum, ch, subcmd, cmd);
-        return TRUE;
-    }
+   
 
 
     //ADD_UID_VAR(buf, t, ch, "actor", 0);

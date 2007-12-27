@@ -118,7 +118,6 @@ void assemblySaveAssemblies( void ) {
                      (pAssembly->pComponents[ j ].bExtract ? 1 : 0),
                      (pAssembly->pComponents[ j ].bInRoom ? 1 : 0) );
         }
-        fprintf( pFile, "Trigger             #%d\n",pAssembly->trigVnum);
 
         if( i < g_lNumAssemblies - 1 )
             fprintf( pFile, "\n" );
@@ -167,20 +166,10 @@ void assemblyListToChar( Character *pCharacter ) {
                                       (g_pAssemblyTable[ i ].pComponents[ j ].bInRoom  ? "Yes" : "No") );
                 }
             }
-            pCharacter->Send( "Script: %d", g_pAssemblyTable[ i ].trigVnum);
         }
     }
 }
-bool assemblyAddTrigger(long lVnum,int iTrig) {
-    ASSEMBLY     *pAssembly = NULL;
-    if( (pAssembly = assemblyGetAssemblyPtr( lVnum )) == NULL ) {
-        log( "SYSERR: assemblyAddComponent(): Invalid 'lVnum' #%ld.", lVnum );
-        return (FALSE);
-    }
-    pAssembly->trigVnum = iTrig;
-    return TRUE;
 
-}
 bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, bool bInRoom ) {
     ASSEMBLY     *pAssembly = NULL;
     COMPONENT    *pNewComponents = NULL;
@@ -340,7 +329,6 @@ bool assemblyCreate( long lVnum, int iAssembledType ) {
     g_pAssemblyTable[ lMiddle ].lNumComponents = 0;
     g_pAssemblyTable[ lMiddle ].lVnum = lVnum;
     g_pAssemblyTable[ lMiddle ].pComponents = NULL;
-    g_pAssemblyTable[ lMiddle ].trigVnum = -1;
     g_pAssemblyTable[ lMiddle ].uchAssemblyType = (unsigned char) iAssembledType;
     return (TRUE);
 }
