@@ -503,8 +503,7 @@ void gain_exp(struct char_data *ch, gold_int gain)
     if (is_altered && (GET_LEVEL(ch) < LVL_HERO))
     {
       new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
-                 GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s",
-                 GET_LEVEL(ch));
+                 GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
       GET_GROUP_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)) * 0.2);
 
       if (dexp)
@@ -608,20 +607,13 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
 
   if (!IS_NPC(ch))
   {
-    if ((GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_HERO))
+    if (GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_HERO)
       return;
   }
   else
     return;
 
-  if (gain > 0)
-  {
-
-    if (REMORTS(ch) == 0)
-    {
-
-      newb = 1;
-    }
+  if (gain > 0)  {    
     if (dexp)
       gain *=2;
 

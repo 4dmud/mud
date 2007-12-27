@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/09 09:23:44 $
-*  $Revision: 1.7 $
+*  $Date: 2005/02/16 07:36:25 $
+*  $Revision: 1.8 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.8  2005/02/16 07:36:25  w4dimenscor
+ * Added math.c and updated code
+ *
  * Revision 1.7  2005/02/09 09:23:44  w4dimenscor
  * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
  *
@@ -2928,7 +2931,7 @@ int process_return(trig_data *trig, char *cmd)
                   {
                     static int depth = 0;
                     int ret_val = 1;
-		    int brac = 0;
+                    int brac = 0;
                     struct cmdlist_element *cl;
                     char cmd[MAX_INPUT_LENGTH], *p;
                     struct script_data *sc = 0;
@@ -2942,7 +2945,7 @@ int process_return(trig_data *trig, char *cmd)
 
                     void obj_command_interpreter(obj_data * obj, char *argument);
                     void wld_command_interpreter(struct room_data *room, char *argument);
-		    int check_braces(char *str);
+                    int check_braces(char *str);
 
                     if (depth > MAX_SCRIPT_DEPTH)
                     {
@@ -3036,7 +3039,9 @@ int process_return(trig_data *trig, char *cmd)
                       if (*p == '*')		/* comment */
                         continue;
 
-                      if ((brac = check_braces(p)) != 0)
+                      if (( (brac = check_braces(p)) != 0) &&(!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4) || !strn_cmp("else if ", p, 8) || !strn_cmp(p, "if ", 3)
+                                                              || !strn_cmp("while ", p, 6) || !strn_cmp("switch ", p, 7) || !strn_cmp(cmd, "extract ", 8)
+                                                              || !strn_cmp("case", p, 4) || !strn_cmp(cmd, "eval ", 5) || !strn_cmp(cmd, "nop ", 4) || !strn_cmp(cmd, "set ", 4)))
                       {
                         script_log( "Unmatched %s bracket in trigger %d!", brac < 0 ? "right" : "left", GET_TRIG_VNUM(trig));
                       }

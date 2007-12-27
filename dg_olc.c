@@ -986,7 +986,10 @@ int format_script(struct descriptor_data *d)
   {
     line_num++;
     skip_spaces(&t);
-    if ((brac = check_braces(t)) != 0)
+    if (( (brac = check_braces(t)) != 0) &&(!strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4) || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3)
+                                            || !strn_cmp("while ", t, 6) || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8)
+                                            || !strn_cmp("case ", t, 5) || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4)))
+
     {
       write_to_output(d, "Unmatched %s bracket (line %d)!\r\n", brac < 0 ? "right" : "left", line_num);
       free(sc);
