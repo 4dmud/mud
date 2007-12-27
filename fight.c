@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.60  2007/04/19 10:04:35  w4dimenscor
+ * Updated subskills so they wouldn;t report a max over 100
+ *
  * Revision 1.59  2006/09/27 10:52:35  w4dimenscor
  * Changed the way trees check how old they are. Fixed zedit crash bug when updating objects
  *
@@ -2245,7 +2248,7 @@ int steal_affects(Character *ch, int dam, int w_type, Character *vict) {
     if (IS_NPC(ch) && (MOB_SUBSKILL(ch) == (SUB_DRAIN_BLOOD) || ((GET_CLASS(ch) == CLASS_UNDEAD) && GET_LEVEL(ch) > number(50, 300))))
         hp +=10;
     if (!IS_NPC(ch))
-        hp += GET_SUB(ch, SUB_DRAIN_BLOOD) * 0.05;
+        hp += GET_SUB(ch, SUB_DRAIN_BLOOD) * 0.04;
 
 
 
