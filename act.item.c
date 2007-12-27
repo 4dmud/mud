@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.13  2005/05/01 12:31:07  w4dimenscor
+ * added multi arg names to wear and remove
+ *
  * Revision 1.12  2005/03/19 15:02:55  w4dimenscor
  * gave centaurs the innate skill mount and riding at 100 % also adjusted
  * damage and speed a little.
@@ -3075,7 +3078,9 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
   }
   else
   {
-    where = search_block(arg, body, FALSE);
+  char arg1[MAX_INPUT_LENGTH];
+  one_argument(arg, arg1);
+    where = search_block(arg1, body, FALSE);
     if (!CAN_WEAR(obj, where_to_worn(where)))
       return -1;
     if (((where) < 0) || (*arg == '!'))
@@ -3092,12 +3097,14 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
 
 ACMD(do_wear)
 {
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
+  char arg1[MAX_INPUT_LENGTH]; /* item name */
+  char *arg2; /* location name */
   struct obj_data *obj, *next_obj;
   int where, dotmode, items_worn = 0;
 
-  two_arguments(argument, arg1, arg2);
+  skip_spaces(&argument);
+  arg2 = str_until(argument, "on", arg1, sizeof(arg1));
+  
 
   if (!*arg1)
   {
@@ -3173,6 +3180,8 @@ ACMD(do_wear)
       }
       else if (!*arg2)
         act("You can't wear $p.", FALSE, ch, obj, 0, TO_CHAR);
+      else
+       new_send_to_char(ch, "You can't wear that there!\r\n");
     }
   }
 }
@@ -3182,15 +3191,13 @@ ACMD(do_wear)
 ACMD(do_wield)
 {
   struct obj_data *obj;
-  char arg[MAX_INPUT_LENGTH];
+skip_spaces(&argument);
 
-  one_argument(argument, arg);
-
-  if (!*arg)
+  if (!*argument)
     send_to_char("Wield what?\r\n", ch);
-  else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
+  else if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying)))
   {
-    new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+    new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(argument), argument);
   }
   else
   {
@@ -3311,14 +3318,13 @@ int where_to_worn(int where)
 ACMD(do_grab)
 {
   struct obj_data *obj;
-  char arg[MAX_INPUT_LENGTH];
-  one_argument(argument, arg);
+  skip_spaces(&argument);
 
-  if (!*arg)
+  if (!*argument)
     send_to_char("Hold what?\r\n", ch);
-  else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
+  else if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying)))
   {
-    new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+    new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(argument), argument);
   }
   else
   {
@@ -3390,14 +3396,14 @@ ACMD(do_remove)
   int i, dotmode, found;
   char arg[MAX_INPUT_LENGTH];
 
-  one_argument(argument, arg);
+  skip_spaces(&argument);
 
-  if (!*arg)
+  if (!*argument)
   {
     send_to_char("Remove what?\r\n", ch);
     return;
   }
-  dotmode = find_all_dots(arg);
+  dotmode = find_all_dots(argument);
 
   if (dotmode == FIND_ALL)
   {
@@ -3420,7 +3426,7 @@ ACMD(do_remove)
       found = 0;
       for (i = 0; i < NUM_WEARS; i++)
         if (GET_EQ(ch, i) && CAN_SEE_OBJ(ch, GET_EQ(ch, i)) &&
-            isname(arg, GET_EQ(ch, i)->name))
+            isname_full(argument, GET_EQ(ch, i)->name))
         {
           perform_remove(ch, i);
           found = 1;
@@ -3435,9 +3441,9 @@ ACMD(do_remove)
   else
   {
     if ((i =
-           get_obj_pos_in_equip_vis(ch, arg, NULL, ch->equipment)) < 0)
+           get_obj_pos_in_equip_vis(ch, argument, NULL, ch->equipment)) < 0)
       new_send_to_char(ch, "You don't seem to be using %s %s.\r\n",
-                       AN(arg), arg);
+                       AN(argument), argument);
     else
       perform_remove(ch, i);
   }

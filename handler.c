@@ -148,7 +148,25 @@ free(lp);
   return cnt;
 }
 
-
+char * str_until(char *strlist, const char *key, char *newstr, size_t len) {
+char *p = strlist;
+char arg[MAX_INPUT_LENGTH];
+int loop = 0;
+  if (!strlist || !*strlist || len <= 0)
+    return 0;
+    *newstr = '\0';
+    for (p = any_one_arg(p, arg);p && arg && *arg;p = any_one_arg(p, arg)) {
+    if (!str_cmp(key, arg))
+    break;
+    loop++;
+    if (loop != 1)
+    strlcat(newstr, " ", len);
+    strlcat(newstr, arg, len);
+    }
+  
+  
+  return p;
+}
 
 /*
 int isname(const char *str, const char *namelist)
