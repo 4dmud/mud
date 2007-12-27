@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2006/02/23 16:32:51 $                                           * 
-*  $Revision: 1.19 $                                                    *
+*  $Date: 2006/02/24 20:21:47 $                                           * 
+*  $Revision: 1.20 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -1345,15 +1345,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             GET_SAVE(c, SAVING_SPELL) += addition;
           }
           snprintf(str, slen, "%d", GET_SAVE(c, SAVING_SPELL));
-        }
-        else if (!strcasecmp(field, "sethitp"))
-        {
-          if (subfield && *subfield)
-          {
-            int newhit = atoi(subfield);
-            GET_HIT(c) = newhit;
-//            if (GET_HIT(c) > GET_MAX_HIT(c)) GET_HIT(c) = GET_MAX_HIT(c);
-          }
         }
         break;
 
