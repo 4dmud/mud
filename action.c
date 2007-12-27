@@ -1010,15 +1010,15 @@ void reward_juggling(Character *ch, Character *vict, int diff)
       continue;
     if (AFF_FLAGGED(person, AFF_CHARM))
       continue;
-    if (char_gold(person, 0, GOLD_HAND) < 10)
+    if (person->Gold(0, GOLD_HAND) < 10)
       continue;
 
     if (IS_NPC(person) && (number(0, 70) > GET_LEVEL(person)))
     {
       act("{cY$N applauds your juggling and throws you some gold!{c0", FALSE, ch, 0, person, TO_CHAR);
       act("{cY$N applauds $n's juggling and throws $m some gold!{c0", FALSE, ch, 0, person, TO_ROOM);
-      amount += char_gold(person, 0, GOLD_HAND)/10;
-      char_gold(person, char_gold(person, 0, GOLD_HAND)/10, GOLD_HAND);
+      amount += person->Gold(0, GOLD_HAND)/10;
+      person->Gold(person->Gold(0, GOLD_HAND)/10, GOLD_HAND);
     }
     else
     {
@@ -1044,7 +1044,7 @@ void reward_juggling(Character *ch, Character *vict, int diff)
   if (amount)
   {
     ch->Send( "You gain a total of %lld gold coins!\r\n", amount);
-    char_gold(ch, amount, GOLD_HAND);
+    ch->Gold( amount, GOLD_HAND);
   }
   if (gain)
   {

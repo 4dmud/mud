@@ -52,7 +52,6 @@ void free_clan_lists(void);
 void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
 struct kill_data *load_killlist(char *name);
-void free_join_list(struct combine_data *list);
 void add_room_to_mine(room_rnum room);
 const char *get_dirname(char *filename, size_t len, char oname, int mode);
 void free_hunter_list(void);
@@ -70,6 +69,7 @@ struct config_data config_info; /* Game configuration list.  */
 void assign_mob_stats(void);
 void free_forests(struct forest_data *this_forest);
 int check_item_hack_invis(struct obj_data *obj, int fix);
+void free_join_list(struct combine_data *list);
 
 void assign_skills(void);
 void assign_subskills(void);
@@ -108,8 +108,6 @@ int top_of_socialt = -1;                        /* number of socials */
 
 Character *character_list = NULL;     /* global linked list of chars */
 extern enum subskill_list subskill;
-void subs_remove(Character *ch, struct sub_list *af);
-void skills_remove(Character *ch, struct skillspell_data *af);
 
 struct index_data **trig_index;    /* index table for triggers      */
 struct trig_data *trigger_list = NULL;  /* all attached triggers */
@@ -250,7 +248,6 @@ void set_race(Character *ch, int race);
 void name_to_drinkcon(struct obj_data *obj, int type);
 void paginate_string(char *str, Descriptor *d); //mord??
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
-void free_alias(struct alias_data *a);
 void load_messages(void);
 void weather_and_time(int mode);
 void mag_assign_spells(void);
@@ -798,7 +795,8 @@ void free_characters(Character *ch)
     return;
   if (ch->next)
     free_characters(ch->next);
-  free_char(ch);
+    
+  delete ch;
 }
 
 void free_zone_list(struct zone_list_data *z)
@@ -1123,14 +1121,18 @@ void boot_db(void)
 void reset_time(void)
 {
   time_t beginning_of_time = 0;
-  FILE *bgtime;
+  ifstream bgtime(TIME_FILE);
 
-  if ((bgtime = fopen(TIME_FILE, "r")) == NULL)
+  if (!bgtime.is_open())
     log("SYSERR: Can't read from '%s' time file.", TIME_FILE);
   else
   {
-    fscanf(bgtime, "%ld\n", &beginning_of_time);
-    fclose(bgtime);
+  stringstream ss;
+  ss << bgtime.rdbuf();
+  ss >> beginning_of_time;
+  bgtime.close();
+    //fscanf(bgtime, "%ld\n", &beginning_of_time);
+    //fclose(bgtime);
   }
 
   if (beginning_of_time == 0)
@@ -1171,14 +1173,16 @@ void free_extra_descriptions(struct extra_descr_data *edesc)
 /* Write the time in 'when' to the MUD-time file. */
 void save_mud_time(struct time_info_data *when)
 {
-  FILE *bgtime;
+  ofstream bgtime(TIME_FILE);
 
-  if ((bgtime = fopen(TIME_FILE, "w")) == NULL)
+  if (!bgtime.is_open())
     log("SYSERR: Can't write to '%s' time file.", TIME_FILE);
   else
   {
-    fprintf(bgtime, "%ld\n", mud_time_to_secs(when));
-    fclose(bgtime);
+  bgtime << mud_time_to_secs(when) << "\n";
+  bgtime.close();
+    //fprintf(bgtime, "%ld\n", mud_time_to_secs(when));
+    //fclose(bgtime);
   }
 }
 
@@ -1274,18 +1278,17 @@ void build_player_index(void)
     {
       if (!IS_SET(player_table[j].flags, PINDEX_DELETED) && !IS_SET(player_table[j].flags, PINDEX_SELFDELETE))
       {
-        CREATE(victim, Character, 1);
-        clear_char(victim);
+        victim = new Character();
         TEMP_LOAD_CHAR = TRUE;
 
         if (store_to_char((player_table + j)->name, victim) > -1)
         {
           player_table[j].clan = GET_CLAN(victim);
           player_table[j].rank = GET_CLAN_RANK(victim);
-          free_char(victim);
+          delete victim;
         }
         else
-          free(victim);
+          delete victim;
 
         TEMP_LOAD_CHAR = FALSE;
       }
@@ -2423,7 +2426,8 @@ void parse_simple_mob(FILE * mob_f, int i, int nr)
 
 void interpret_espec(const char *keyword, const char *value, int i, int nr)
 {
-  int num_arg = 0, matched = FALSE;
+  int num_arg = 0;
+  bool matched = FALSE;
 
   /*
    * If there isn't a colon, there is no value.  While Boolean options are
@@ -2500,6 +2504,11 @@ void interpret_espec(const char *keyword, const char *value, int i, int nr)
   CASE("Skin")
   {
     RANGE(-1, 999999);
+    mob_proto[i].mob_specials.skin = num_arg;
+  }
+  CASE("Owner")
+  {
+    RANGE(-1, (int)top_idnum);
     mob_proto[i].mob_specials.skin = num_arg;
   }
 
@@ -2817,7 +2826,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
   mob_index[i].number = 0;
   mob_index[i].func = NULL;
 
-  clear_char(mob_proto + i);
+  (mob_proto + i)->clear();
 
 
   /*
@@ -2825,6 +2834,9 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
    * The only reason we have every mob in the game share this copy of the
    * structure is to save newbie coders from themselves. -gg 2/25/98
    */
+  if (mob_proto[i].player_specials)
+  delete mob_proto[i].player_specials;
+  
   mob_proto[i].player_specials = &dummy_mob;
   snprintf(buf2, sizeof(buf2), "mob vnum %d", nr);     /* sprintf: OK (for 'buf2 >= 19') */
 
@@ -3813,10 +3825,8 @@ int vnum_object(char *searchname, Character *ch)
 /* create a character, and add it to the char list */
 Character *create_char(void)
 {
-  Character *ch;
-
-  CREATE(ch, Character, 1);
-  clear_char(ch);
+  Character *ch = new Character();
+  
   add_char_to_list(ch);
   //TODO: check this
   while (!valid_id_num(max_mob_id))
@@ -3849,8 +3859,9 @@ Character *read_mobile(mob_vnum nr, int type)
   else
     i = nr;
 
-  CREATE(mob, Character, 1);
-  clear_char(mob);
+   mob = new Character();
+   if (mob->player_specials)
+   delete mob->player_specials;
   *mob = mob_proto[i];
   add_char_to_list(mob);
   set_race(mob, mob_proto[i].player.race);
@@ -4870,117 +4881,6 @@ int load_char(char *name, Character *ch)
                         break;                    \
                     }
 
-void default_char(Character *ch)
-{
-  int i;
-  time_t tme = time(0);
-  if (!ch)
-    return;
-
-  ch->affected = NULL;
-  ch->subs = NULL; //yep subskills are a linked list. - mord
-  ch->skills = NULL; // and now skills and spells are a linked list
-  GET_SEX(ch) = SEX_MALE;
-  GET_CLASS(ch) = CLASS_WARRIOR;
-  GET_LEVEL(ch) = 0;
-  GET_HEIGHT(ch) = 100;
-  GET_WEIGHT(ch) = 100;
-  GET_ALIGNMENT(ch) = 0;
-  for (i = 0; i < 4; i++)
-  {
-    AFF_FLAGS(ch)[i] = 0;
-    PRF_FLAGS(ch)[i] = 0;
-    PLR_FLAGS(ch)[i] = 0;
-  }
-  for (i = 0; i < NUM_CLASSES; i++)
-    GET_MASTERY(ch, i) = 0;
-  for (i = 0; i < 5; i++)
-    GET_SAVE(ch, i) = 0;
-  GET_LOADROOM(ch) = NOWHERE;
-  GET_INVIS_LEV(ch) = 0;
-  GET_FREEZE_LEV(ch) = 0;
-  GET_WIMP_LEV(ch) = 5;
-  GET_COND(ch, FULL) = 48;
-  GET_COND(ch, THIRST) = 48;
-  GET_COND(ch, DRUNK) = 0;
-  GET_BAD_PWS(ch) = 0;
-  GET_PRACTICES(ch) = 0;
-  GET_GOLD(ch) = 0;
-  GET_BANK_GOLD(ch) = 0;
-  GET_EXP(ch) = 0;
-  GET_GROUP_EXP(ch) = 0;
-  GET_HITROLL(ch) = 0;
-  GET_DAMROLL(ch) = 0;
-  GET_AC(ch) = 100;
-  ch->real_abils.str = 0;
-  ch->real_abils.str_add = 0;
-  ch->real_abils.dex = 0;
-  ch->real_abils.intel = 0;
-  ch->real_abils.wis = 0;
-  ch->real_abils.con = 0;
-  ch->real_abils.cha = 0;
-  //GET_SPEED(ch) = 0;
-  GET_HIT(ch) = 25;
-  GET_MAX_HIT(ch) = 25;
-  GET_MANA(ch) = 100;
-  GET_MAX_MANA(ch) = 100;
-  GET_MOVE(ch) = 50;
-  GET_MAX_MOVE(ch) = 50;
-  GET_STAMINA(ch) = 100;
-  GET_MAX_STAMINA(ch) = 100;
-  if (ch->player_specials)
-    ch->player_specials->host = NULL;
-  AFF_SPEED(ch) = 0;
-  ch->player.time.last_logon = tme;
-  GET_PERC(ch) = 100;
-  AFK_MSG(ch) = NULL;
-  BUSY_MSG(ch) = NULL;
-  GET_PK_CNT(ch) = 0;
-  GET_PK_RIP(ch) = 0;
-  GET_PK_POINTS(ch) = 0;
-  GET_POSTS(ch) = 0;
-  GET_NAILS(ch)  = 0;
-  GET_WIRE(ch)   = 0;
-  GET_PERM_ACCURACY(ch)  = 0;
-  GET_PERM_EVASION(ch)   = 0;
-  GET_ORIG_LEV(ch) = 0;
-  PRETITLE(ch) = NULL;
-  IMMTITLE(ch) = NULL;
-  REMORTS(ch) = 0;
-
-  GET_REGEN_HIT(ch) = 0;
-  GET_REGEN_MANA(ch) = 0;
-  GET_REGEN_MOVE(ch) = 0;
-  GET_REGEN_STAMINA(ch) = 0;
-  GET_RP_GROUP(ch)  = 0;
-  GET_CONVERSIONS(ch) = 1;
-  SPECIALS(ch)->last_note = tme;
-  SPECIALS(ch)->last_idea = tme;
-  SPECIALS(ch)->last_penalty = tme;
-  SPECIALS(ch)->last_news = tme;
-  SPECIALS(ch)->last_changes = tme;
-  GET_LAST_DAM_D(ch) = 0;
-  GET_LAST_DAM_T(ch) = 0;
-  EXTRA_BODY(ch) = 0;
-
-  ch->pnote = NULL;
-  SPECIALS(ch)->last_reward = 0;
-  GET_REWARD(ch) = 0;
-  GET_AWARD(ch) = 0;
-  CONCEALMENT(ch) = 0;
-  PROMPT(ch)  = NULL;
-  BPROMPT(ch) = NULL;
-  PAGEWIDTH(ch) = 80;
-  PAGEHEIGHT(ch) = 25;
-  LOCKER_EXPIRE(ch) = 0;
-  LOCKER_LIMIT(ch) = 0;
-  GET_KILLS(ch) = NULL;
-  GET_LOGOUTMSG(ch) = NULL;
-  GET_LOGINMSG(ch) = NULL;
-  TRADEPOINTS(ch) = 0;
-  GET_CSNP_LVL(ch)=-2;
-
-}
 
 int store_to_char(char *name, Character *ch)
 {
@@ -5066,20 +4966,8 @@ int store_to_char(char *name, Character *ch)
       }
 
     }
-    if (ch->player_specials == NULL)
-      CREATE(ch->player_specials, struct player_special_data, 1);
+
   }
-
-  /*for (i = 0; i < MAX_AFFECT; i++)
-  {
-    tmp_aff[i].type = TYPE_UNDEFINED;
-    tmp_aff[i].expire = 0;
-    tmp_aff[i].modifier = 0;
-    tmp_aff[i].location = 0;
-    tmp_aff[i].bitvector = 0;
-  }*/
-
-  default_char(ch);
 
   while (get_line(fl, line))
   {
@@ -5407,6 +5295,8 @@ int store_to_char(char *name, Character *ch)
       case 't':
         if (!strcmp(tag, "Prtn"))
           PARTNER(ch) = num;
+        else if (!strcmp(tag, "PetM"))
+          ch->pet = num;
         break;
       case 'w':
         if (!strcmp(tag, "PgWd"))
@@ -5914,6 +5804,7 @@ void char_to_store(Character *ch)
     fprintf(fl, "Prtn: %ld\n", PARTNER(ch));
   }
   fprintf(fl, "Preg: %d\n", PREG(ch));
+  fprintf(fl, "PetM: %d\n", ch->pet);
   if (PRETITLE(ch))
     fprintf(fl, "PreT: %s\n", PRETITLE(ch));
   if (GET_CLAN(ch))
@@ -6285,157 +6176,6 @@ void free_mob_memory(memory_rec *k)
   free(k);
 }
 
-/* release memory allocated for a char struct */
-void free_char(Character *ch)
-{
-  void free_ignorelist(Character *ch);
-  int i;
-  struct alias_data *a;
-
-
-  if (ch == NULL)
-    return;
-
-  while (ch->affected)
-    affect_remove(ch, ch->affected);
-
-  for (i = 0; i < 4; i++)
-    if (GET_POINTS_EVENT(ch, i))
-    {
-      event_cancel(GET_POINTS_EVENT(ch, i));
-      GET_POINTS_EVENT(ch, i) = NULL;
-    }
-  /* cancel message updates */
-  if (GET_MESSAGE_EVENT(ch))
-  {
-    event_cancel(GET_MESSAGE_EVENT(ch));
-    GET_MESSAGE_EVENT(ch) = NULL;
-  }
-  if (GET_FIGHT_EVENT(ch))
-  {
-    event_cancel(GET_FIGHT_EVENT(ch));
-    GET_FIGHT_EVENT(ch) = NULL;
-  }
-
-  free_travel_points(TRAVEL_LIST(ch));
-  TRAVEL_LIST(ch) = NULL;
-  free_mob_memory(MEMORY(ch));
-  MEMORY(ch) = NULL;
-  free_followers(ch->followers);
-  ch->followers = NULL;
-  free_note(ch->pnote, -1);
-
-  while (ch->subs)
-    subs_remove(ch, ch->subs);
-  ch->subs = NULL;
-  while (ch->skills)
-    skills_remove(ch, ch->skills);
-  ch->skills = NULL;
-
-  free_ignorelist(ch);
-
-  if (ch->player_specials != NULL && ch->player_specials != &dummy_mob)
-  {
-    while ((a = GET_ALIASES(ch)) != NULL)
-    {
-      GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
-      free_alias(a);
-    }
-    free_string(&BPROMPT(ch));
-    if (PROMPT(ch));
-    free(PROMPT(ch));
-    if (ch->player_specials->poofin)
-      free(ch->player_specials->poofin);
-    if (ch->player_specials->poofout)
-      free(ch->player_specials->poofout);
-    if (ch->player_specials->afk_msg)
-      free(ch->player_specials->afk_msg);
-    if (ch->player_specials->busy_msg)
-      free(ch->player_specials->busy_msg);
-    if (ch->player_specials->host)
-      free(ch->player_specials->host);
-    if (ch->player_specials->pretitle)
-      free(ch->player_specials->pretitle);
-
-    if (GET_LOGOUTMSG(ch))
-      free(GET_LOGOUTMSG(ch));
-    if (GET_LOGINMSG(ch))
-      free(GET_LOGINMSG(ch));
-
-    if (GET_EMAIL(ch))
-      free(GET_EMAIL(ch));
-    if (IMMTITLE(ch))
-      free(IMMTITLE(ch));
-
-    extract_all_in_list(LOCKER(ch));
-    LOCKER(ch) = NULL;
-    free_killlist(ch);
-    if (ch->player_specials)
-      free(ch->player_specials);
-
-    if (IS_NPC(ch))
-      log("SYSERR: Mob %s (#%d) had player_specials allocated!", GET_NAME(ch), GET_MOB_VNUM(ch));
-  }
-  if (!IS_NPC(ch) || (IS_NPC(ch) && GET_MOB_RNUM(ch) == NOBODY))
-  {
-    /* if this is a player, or a non-prototyped non-player, free all */
-    if (GET_NAME(ch))
-      free(GET_NAME(ch));
-    free_string(&ch->player.title);
-    free_string(&ch->player.short_descr);
-    free_string(&ch->player.long_descr);
-    free_string(&ch->player.description);
-
-    /* free script proto list */
-    free_proto_script(ch, MOB_TRIGGER);
-
-    free_join_list(ch->mob_specials.join_list);
-    ch->mob_specials.join_list = NULL;
-
-  }
-  else if ((i = GET_MOB_RNUM(ch)) != NOBODY)
-  {
-    /* otherwise, free strings only if the string is not pointing at proto */
-    if (ch->player.name && ch->player.name != mob_proto[i].player.name)
-      free(ch->player.name);
-    if (ch->player.title
-        && ch->player.title != mob_proto[i].player.title)
-      free(ch->player.title);
-    if (ch->player.short_descr
-        && ch->player.short_descr != mob_proto[i].player.short_descr)
-      free(ch->player.short_descr);
-    if (ch->player.long_descr
-        && ch->player.long_descr != mob_proto[i].player.long_descr)
-      free(ch->player.long_descr);
-    if (ch->player.description
-        && ch->player.description != mob_proto[i].player.description)
-      free(ch->player.description);
-
-    /* free script proto list if it's not the prototype */
-    if (ch->proto_script && ch->proto_script != mob_proto[i].proto_script)
-      free_proto_script(ch, MOB_TRIGGER);
-
-    if (ch->mob_specials.join_list && ch->mob_specials.join_list != mob_proto[i].mob_specials.join_list)
-      free_join_list(ch->mob_specials.join_list);
-    ch->mob_specials.join_list = NULL;
-
-    damage_count_free(ch);
-
-  }
-
-  /* free any assigned scripts */
-  if (SCRIPT(ch))
-    extract_script(ch, MOB_TRIGGER);
-
-
-  if (ch->desc)
-    ch->desc->character = NULL;
-  /* find_char helper */
-  if (GET_ID(ch) > 0)
-    remove_from_lookup_table(GET_ID(ch));
-  free(ch);
-}
-
 // delayed version of free obj
 void obj_data_to_pool(struct obj_data *obj)
 {
@@ -6579,126 +6319,6 @@ int file_to_string(const char *name, char *buf, size_t b_len)
 
 
 
-/* clear some of the the working variables of a char */
-void reset_char(Character *ch)
-{
-  int i;
-
-  for (i = 0; i < NUM_WEARS; i++)
-    GET_EQ(ch, i) = NULL;
-  for (i = 0; i < TOP_FUSE_LOCATION; i++)
-    FUSE_LOC(ch, i) = NULL;
-  DIE_TIME(ch) = 0;
-  REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_DYING);
-  ATK_CHANCE(ch) = 3;
-  FUSED_TO(ch) = NULL;
-  GET_SKILLMULTI(ch) = 0.0;
-  ch->followers = NULL;
-  ch->master = NULL;
-  IN_ROOM(ch) = NULL;
-  ch->carrying = NULL;
-  ch->next = NULL;
-  ch->next_fighting = NULL;
-  ch->next_in_room = NULL;
-  SITTING(ch) = NULL;
-  NEXT_SITTING(ch) = NULL;
-  FIGHTING(ch) = NULL;
-  GET_POINTS_EVENT(ch,0) = NULL;
-  GET_POINTS_EVENT(ch, 1) = NULL;
-  GET_POINTS_EVENT(ch,2) = NULL;
-  GET_POINTS_EVENT(ch,3) = NULL;
-  GET_FIGHT_EVENT(ch)  = NULL;
-  GET_MESSAGE_EVENT(ch) = NULL;
-  GET_TASK(ch)  = NULL;
-  GET_MSG_RUN(ch) = 0;
-  ch->char_specials.position = POS_STANDING;
-  ch->mob_specials.default_pos = POS_STANDING;
-  ch->mob_specials.join_list = NULL;
-  ch->mob_specials.head_join = NULL;
-  ch->char_specials.carry_weight = 0;
-  ch->char_specials.carry_items = 0;
-  GET_SPELL_DIR(ch) = NOWHERE;
-  GET_PERC(ch) = 100.0;
-  ch->pnote = NULL;
-  LOCKER(ch) = NULL;
-  MINE_DIR(ch) = NOWHERE;
-  MINE_SPEED(ch) = 0;
-  MINE_STEALTH(ch) = 0;
-  MINE_BONUS(ch) = 0;
-  MINE_DAMAGE(ch) = 0;
-  HAS_MAIL(ch) = -1;
-  IS_SAVING(ch) = FALSE;
-  GET_IGNORELIST(ch) = NULL;
-  ch->hitched = NULL;
-
-  if (GET_HIT(ch) <= 0)
-    GET_HIT(ch) = 1;
-  if (GET_MOVE(ch) <= 0)
-    GET_MOVE(ch) = 1;
-  if (GET_MANA(ch) <= 0)
-    GET_MANA(ch) = 1;
-  if (GET_MAX_HIT(ch) <= 0)
-    GET_MAX_HIT(ch) = 1;
-  if (GET_MAX_MOVE(ch) <= 0)
-    GET_MAX_MOVE(ch) = 1;
-  if (GET_MAX_MANA(ch) <= 0)
-    GET_MAX_MANA(ch) = 1;
-  if (GET_MAX_STAMINA(ch) <= 0)
-    GET_MAX_STAMINA(ch) = 1;
-  check_regen_rates(ch); /* start regening points */
-  GET_LAST_TELL(ch) = NOBODY;
-
-
-}
-
-
-
-/* clear ALL the working variables of a char; do NOT free any space alloc'ed */
-void clear_char(Character *ch)
-{
-  memset((char *) ch, 0, sizeof(Character));
-
-  IN_ROOM(ch) = NULL;
-  TRAVEL_LIST(ch) = NULL;
-  GET_PFILEPOS(ch) = -1;
-  GET_IDNUM(ch) = 0;
-  GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
-  GET_NEXT_VICTIM(ch) = -1;
-  GET_MOB_RNUM(ch) = NOBODY;
-  GET_WAS_IN(ch) = NULL;
-  GET_POS(ch) = POS_STANDING;
-  ch->mob_specials.default_pos = POS_STANDING;
-  ch->loader = NOBODY;
-  GET_SPELL_DIR(ch) = NOWHERE;
-  ch->followers = NULL;
-  RIDING(ch) = NULL;
-  RIDDEN_BY(ch) = NULL;
-  HUNTING(ch) = NULL;
-  HUNT_COUNT(ch) = 0;
-  ch->hitched = NULL;
-  //ch->attack_type = NOTHING;
-  GET_ATTACK_POS(ch) = TYPE_UNDEFINED;
-  //ch->owner_id = -1;
-  //ch->familiar_name[0] = '\0';
-  ch->has_note[0] = -1;
-  ch->has_note[1] = -1;
-  ch->has_note[2] = -1;
-  ch->has_note[3] = -1;
-  ch->has_note[4] = -1;
-  GET_POINTS_EVENT(ch,0) = NULL;
-  GET_POINTS_EVENT(ch, 1) = NULL;
-  GET_POINTS_EVENT(ch,2) = NULL;
-  GET_POINTS_EVENT(ch,3) = NULL;
-  GET_FIGHT_EVENT(ch)  = NULL;
-  GET_MESSAGE_EVENT(ch) = NULL;
-  GET_TASK(ch)  = NULL;
-  GET_MSG_RUN(ch) = 0;
-  GET_AC(ch) = 100;
-  ch->points.max_mana = 100;
-
-  CMD_FLAGS2(ch) = 0;
-
-}
 
 
 void clear_object(struct obj_data *obj)
@@ -6725,171 +6345,9 @@ void clear_object(struct obj_data *obj)
   obj->hitched = NULL;
 }
 
-
-
-
-/*
- * Called during character creation after picking character class
- * (and then never again for that character).
- */
-/* initialize a new character only if class is set */
-void init_char(Character *ch)
-{
-  int i, taeller;
-
-  /* create a player_special structure */
-  if (ch->player_specials == NULL)
-    CREATE(ch->player_specials, struct player_special_data, 1);
-
-  /* *** if this is our first player --- he be God *** */
-
-  if (top_of_p_table == 0)
-  {
-
-    GET_LEVEL(ch) = LVL_IMPL;
-    GET_EXP(ch) = exp_needed(ch);
-
-
-
-    /* The implementor never goes through do_start(). */
-    GET_MAX_HIT(ch) = 1500;
-    GET_MAX_MANA(ch) = 1100;
-    GET_MAX_MOVE(ch) = 1100;
-    GET_MAX_STAMINA(ch) = 5000;
-    GET_HIT(ch) = GET_MAX_HIT(ch);
-    GET_MANA(ch) = GET_MAX_MANA(ch);
-    GET_MOVE(ch) = GET_MAX_MOVE(ch);
-    GET_STAMINA(ch) = GET_MAX_STAMINA(ch);
-  }
-  set_title(ch, NULL);
-
-  /* Romance Initialization, initialize to no partner and single */
-  ch->player.romance = 0;
-  ch->player.partner = 0;
-  GET_KILLS(ch) = NULL;
-  ch->player.short_descr = NULL;
-  ch->player.long_descr = NULL;
-  ch->player.description = NULL;
-
-
-  ch->player.time.birth = time(0);
-  ch->player.time.played = 0;
-  ch->player.time.logon = time(0);
-  REMORTS(ch) = 0;
-
-  LOCKER_EXPIRE(ch) = 0;
-  LOCKER_LIMIT(ch) = 0;
-
-
-  /* make favors for sex, including MatingMod additions */
-  if (ch->player.sex == SEX_MALE)
-  {
-    ch->player.weight = number(120, 180);
-    ch->player.height = number(160, 200);
-    PREG(ch) = MALE;
-  }
-  else
-  {
-    ch->player.weight = number(100, 160);
-    ch->player.height = number(150, 180);
-    PREG(ch) = NOT_PREG; // End of MatingMod Additions
-  }
-
-  ch->player.was_class = -1;
-  ch->player.was_class1 = -1;
-  ch->player.was_class2 = -1;
-
-  /*mordecai */
-  ch->player_specials->saved.tier = 1; // done in nanny
-  ch->player_specials->saved.tier1 = 0;
-  ch->player_specials->saved.tier2 = 0;
-  ch->player_specials->saved.tier3 = 0;
-
-
-
-  GET_MAX_MANA(ch) = 100;
-  GET_MANA(ch) = GET_MAX_MANA(ch);
-  GET_HIT(ch) = GET_MAX_HIT(ch);
-  GET_MAX_MOVE(ch) = 82;
-  GET_MOVE(ch) = GET_MAX_MOVE(ch);
-  ch->points.armor = 100;
-  ch->points.gold = 15000;
-  GET_STAMINA(ch) = 100;
-  GET_GROUP_EXP(ch) = 0;
-  GET_LOGOUTMSG(ch) = NULL;
-  GET_LOGINMSG(ch) = NULL;
-
-
-  //TODO: check this
-  if ((i = get_ptable_by_name(GET_NAME(ch))) != -1)
-  {
-    while (!valid_id_num(++top_idnum))
-      log("Error new id %ld being assigned to %s already exists!",top_idnum, GET_NAME(ch));
-    player_table[i].id = GET_IDNUM(ch) = GET_ID(ch) =  top_idnum;
-
-    player_table[i].account = GET_IDNUM(ch);
-    add_to_lookup_table(GET_ID(ch), (void *)ch);
-  }
-  else
-    log("SYSERR: init_char: Character '%s' not found in player table.",
-        GET_NAME(ch));
-
-
-
-  for (taeller = 0; taeller < AF_ARRAY_MAX; taeller++)
-    ch->char_specials.saved.affected_by[taeller] = 0;
-
-
-  for (i = 0; i < 5; i++)
-    GET_SAVE(ch, i) = 0;
-
-  if (GET_LEVEL(ch) > LVL_SEN)
-  {
-    ch->real_abils.intel = 25;
-    ch->real_abils.wis = 25;
-    ch->real_abils.dex = 25;
-    ch->real_abils.str = 25;
-    ch->real_abils.str_add = 100;
-    ch->real_abils.con = 25;
-    ch->real_abils.cha = 25;
-  }
-
-  for (i = 0; i < 2; i++)
-    GET_COND(ch, i) = (GET_LEVEL(ch) == LVL_IMPL ? -1 : 48);
-  GET_COND(ch, 2) = 0;
-
-  GET_LOADROOM(ch) = NOWHERE;
-  check_regen_rates(ch);
-
-
-}
-
-
-
 /* returns the real number of the room with given virtual number */
 room_rnum real_room(room_vnum vnum)
 {
-#if 0
-  room_rnum bot, top, mid;
-
-  bot = 0;
-  top = top_of_world;
-
-  /* perform binary search on world-table */
-  for (;;)
-  {
-    mid = (bot + top) / 2;
-
-    if ((world + mid)->number == vnum)
-      return (mid);
-    if (bot >= top)
-      return (NOWHERE);
-    if ((world + mid)->number > vnum)
-      top = mid - 1;
-    else
-      bot = mid + 1;
-  }
-#endif
   if (vnum >= 0 && vnum <= HIGHEST_VNUM)
     return world_vnum[vnum];
   else

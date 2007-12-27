@@ -275,13 +275,11 @@ ACMD(do_convey)
 	    return;
 	}
 
-	if (char_gold(ch, 0, GOLD_ALL) >= amount) {
+	if (ch->Gold( 0, GOLD_ALL) >= amount) {
 	log("INFO: %s conveyed %lld gold into %lld exp", GET_NAME(ch), amount, amount/4);
-	    ch->Send(
-		    "You convey %lld gold to %lld exp points.\r\n",
-		    amount, amount / 4);
+	    ch->Send("You convey %lld gold to %lld exp points.\r\n", amount, amount / 4);
 	    gain_exp(ch, amount / 4);
-	    char_gold(ch, -amount, GOLD_ALL);
+	    ch->Gold( -amount, GOLD_ALL);
 
 	    return;
 	    } else {
@@ -297,13 +295,13 @@ ACMD(do_convey)
 	}
 	
 
-	if (char_gold(ch, 0, GOLD_ALL) >= (amount*10000000)* GET_CONVERSIONS(ch)) {
+	if (ch->Gold( 0, GOLD_ALL) >= (amount*10000000)* GET_CONVERSIONS(ch)) {
 	log("INFO: %s conveyed %lld gold into %d maxmove", GET_NAME(ch), (gold_int) ((amount * 10000000) * GET_CONVERSIONS(ch)), (int)amount * 100);
 	    ch->Send(
 		    "You convey %lld gold to %d maxmove.\r\n",
 		    (gold_int)((amount * 10000000)* GET_CONVERSIONS(ch)), (int)amount * 100);
 	    GET_MAX_MOVE(ch) += (amount * 100);
-	    char_gold(ch, (-amount* 10000000)* GET_CONVERSIONS(ch), GOLD_ALL);
+	    ch->Gold( (-amount* 10000000)* GET_CONVERSIONS(ch), GOLD_ALL);
 	    GET_CONVERSIONS(ch)++;
 	    affect_total(ch);
 

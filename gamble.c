@@ -42,12 +42,12 @@ void play_slots(Character *ch)
 	"a beggar",		/* 10 */
     };
 
-    if (char_gold(ch, 0, GOLD_HAND) < 1) {
+    if (ch->Gold( 0, GOLD_HAND) < 1) {
 	send_to_char("You do not have enough money to play the slots!\r\n",
 		     ch);
 	return;
     } else
-	char_gold(ch, -1, GOLD_HAND);
+	ch->Gold( -1, GOLD_HAND);
 
     send_to_char("You pull the handle on the slot machine.\r\n", ch);
 
@@ -80,7 +80,7 @@ void play_slots(Character *ch)
 	ch->Send( "you win 1 gold piece!\r\n");
     else
 	ch->Send( "you lose.\r\n");
-    char_gold(ch,win, GOLD_ALL);
+    ch->Gold(win, GOLD_ALL);
 
     return;
 }
@@ -91,7 +91,7 @@ void play_high_dice(Character *ch, Character *dealer,
     int die1, die2, die3, die4;
     char buf[MAX_INPUT_LENGTH];
 
-    if (char_gold(ch, 0, GOLD_HAND) < bet) {
+    if (ch->Gold( 0, GOLD_HAND) < bet) {
 	act("$n says, 'I'm sorry sir but you don't have that much gold.'",
 	    FALSE, dealer, 0, ch, TO_VICT);
 	return;
@@ -103,7 +103,7 @@ void play_high_dice(Character *ch, Character *dealer,
 	    TO_VICT);
 	return;
     } else {
-	char_gold(ch, -bet, GOLD_HAND);
+	ch->Gold( -bet, GOLD_HAND);
 	act("$N places $S bet on the table.", FALSE, 0, 0, ch, TO_NOTVICT);
 	act("You place your bet on the table.", FALSE, ch, 0, 0, TO_CHAR);
     }
@@ -136,7 +136,7 @@ void play_high_dice(Character *ch, Character *dealer,
 	sprintf(buf, "$N wins %d gold coins!", bet * 2);
 	act(buf, FALSE, dealer, 0, ch, TO_NOTVICT);
 	ch->Send( "You win %d gold coins!\r\n", bet * 2);
-	char_gold(ch, (bet * 2), GOLD_ALL);
+	ch->Gold( (bet * 2), GOLD_ALL);
     }
     return;
 }
@@ -148,7 +148,7 @@ void play_triples(Character *ch, Character *dealer,
     int die1, die2, die3, total = 0;
     
     char buf[MAX_INPUT_LENGTH];
-    if (char_gold(ch, 0, GOLD_HAND) < bet) {
+    if (ch->Gold( 0, GOLD_HAND) < bet) {
 	act("$n says, 'I'm sorry sir but you don't have that much gold.'",
 	    FALSE, dealer, 0, ch, TO_VICT);
 	return;
@@ -160,7 +160,7 @@ void play_triples(Character *ch, Character *dealer,
 	    TO_VICT);
 	return;
     } else {
-	char_gold(ch, -bet, GOLD_HAND);
+	ch->Gold( -bet, GOLD_HAND);
 	act("$N places $S bet on the table.", FALSE, 0, 0, ch, TO_NOTVICT);
 	act("You place your bet on the table.", FALSE, ch, 0, 0, TO_CHAR);
     }
@@ -170,7 +170,7 @@ void play_triples(Character *ch, Character *dealer,
 	    FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands your bet back to you.", FALSE, dealer, 0, ch,
 	    TO_VICT);
-	char_gold(ch,bet, GOLD_HAND);
+	ch->Gold(bet, GOLD_HAND);
 	return;
     }
 
@@ -180,7 +180,7 @@ void play_triples(Character *ch, Character *dealer,
 	    FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands your bet back to you.", FALSE, dealer, 0, ch,
 	    TO_VICT);
-	char_gold(ch, bet, GOLD_HAND);
+	ch->Gold( bet, GOLD_HAND);
 	return;
     }
 
@@ -208,7 +208,7 @@ void play_triples(Character *ch, Character *dealer,
 	act(buf, FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands $N some gold pieces.", FALSE, dealer, 0, ch,
 	    TO_NOTVICT);
-	char_gold(ch, (bet * 3), GOLD_ALL);
+	ch->Gold( (bet * 3), GOLD_ALL);
     } else if ((total <= 9 && !strcmp(guess, "lower")) ||
 	       (total > 9 && !strcmp(guess, "upper"))) {
 	act("$n says, 'Congratulations $N, you win.'", FALSE, dealer, 0,
@@ -217,7 +217,7 @@ void play_triples(Character *ch, Character *dealer,
 	act(buf, FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands $N some gold pieces.", FALSE, dealer, 0, ch,
 	    TO_NOTVICT);
-	char_gold(ch,  (bet * 2), GOLD_ALL);
+	ch->Gold(  (bet * 2), GOLD_ALL);
     } else {
 	act("$n says, 'Sorry $N, better luck next time.'", FALSE, dealer,
 	    0, ch, TO_ROOM);
@@ -234,7 +234,7 @@ void play_seven(Character *ch, Character *dealer,
     
     char buf[MAX_INPUT_LENGTH];
 
-    if (char_gold(ch, 0, GOLD_HAND) < bet) {
+    if (ch->Gold( 0, GOLD_HAND) < bet) {
 	act("$n says, 'I'm sorry sir but you don't have that much gold.'",
 	    FALSE, dealer, 0, ch, TO_VICT);
 	return;
@@ -246,7 +246,7 @@ void play_seven(Character *ch, Character *dealer,
 	    TO_VICT);
 	return;
     } else {
-	char_gold(ch, -bet, GOLD_HAND);
+	ch->Gold( -bet, GOLD_HAND);
 	act("$N places $S bet on the table.", FALSE, 0, 0, ch, TO_NOTVICT);
 	act("You place your bet on the table.", FALSE, ch, 0, 0, TO_CHAR);
     }
@@ -256,7 +256,7 @@ void play_seven(Character *ch, Character *dealer,
 	    FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands your bet back to you.", FALSE, dealer, 0, ch,
 	    TO_VICT);
-	char_gold(ch, bet, GOLD_HAND);
+	ch->Gold( bet, GOLD_HAND);
 	return;
     }
     if (!(!strcmp(guess, "under") ||
@@ -265,7 +265,7 @@ void play_seven(Character *ch, Character *dealer,
 	    FALSE, dealer, 0, ch, TO_VICT);
 	act("$n hands your bet back to you.", FALSE, dealer, 0, ch,
 	    TO_VICT);
-	char_gold(ch, bet, GOLD_HAND);
+	ch->Gold( bet, GOLD_HAND);
 	return;
     }
 
@@ -291,7 +291,7 @@ void play_seven(Character *ch, Character *dealer,
 	    TO_NOTVICT);
 	sprintf(buf, "$n hands you %d gold pieces.", (bet * 2));
 	act(buf, FALSE, dealer, 0, ch, TO_VICT);
-	char_gold(ch, (bet * 2), GOLD_ALL);
+	ch->Gold( (bet * 2), GOLD_ALL);
     } else if (total == 7 && !strcmp(guess, "seven")) {
 	/* player wins 5x $s money */
 	act("$n says, 'Congratulations $N, you win!'", FALSE, dealer, 0,
@@ -300,7 +300,7 @@ void play_seven(Character *ch, Character *dealer,
 	    TO_NOTVICT);
 	sprintf(buf, "$n hands you %d gold pieces.", (bet * 5));
 	act(buf, FALSE, dealer, 0, ch, TO_VICT);
-	char_gold(ch,(bet * 5), GOLD_ALL);
+	ch->Gold((bet * 5), GOLD_ALL);
     } else {
 	/* player loses */
 	act("$n says, 'Sorry $N, you lose.'", FALSE, dealer, 0, ch,
@@ -320,7 +320,7 @@ void play_craps(Character *ch, Character *dealer, int bet)
     
     char buf[MAX_INPUT_LENGTH];
 
-    if (char_gold(ch, 0, GOLD_HAND) < bet) {
+    if (ch->Gold( 0, GOLD_HAND) < bet) {
 	act("$n says, 'I'm sorry sir but you don't have that much gold.'",
 	    FALSE, dealer, 0, ch, TO_VICT);
 	return;
@@ -332,7 +332,7 @@ void play_craps(Character *ch, Character *dealer, int bet)
 	    TO_VICT);
 	return;
     } else {
-	char_gold(ch, -bet, GOLD_HAND);
+	ch->Gold( -bet, GOLD_HAND);
 	act("$N places $S bet on the table.", FALSE, 0, 0, ch, TO_NOTVICT);
 	act("You place your bet on the table.", FALSE, ch, 0, 0, TO_CHAR);
     }
@@ -359,7 +359,7 @@ void play_craps(Character *ch, Character *dealer, int bet)
 		TO_NOTVICT);
 	    sprintf(buf, "$n hands you %d gold pieces.", (bet * 3));
 	    act(buf, FALSE, dealer, 0, ch, TO_VICT);
-	    char_gold(ch, (bet * 3), GOLD_ALL);
+	    ch->Gold( (bet * 3), GOLD_ALL);
 	    won = TRUE;
 	} else if (mark == 3 || mark == 12) {
 	    /* player loses on first roll */
@@ -378,7 +378,7 @@ void play_craps(Character *ch, Character *dealer, int bet)
 		TO_NOTVICT);
 	    sprintf(buf, "$n hands you %d gold pieces.", (bet * 2));
 	    act(buf, FALSE, dealer, 0, ch, TO_VICT);
-	    char_gold(ch, (bet * 2), GOLD_ALL);
+	    ch->Gold( (bet * 2), GOLD_ALL);
 	    won = TRUE;
 	} else {
 	    sprintf(buf, "$n says, '$N's mark is %d.  Roll 'em again $N!'",

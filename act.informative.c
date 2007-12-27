@@ -95,7 +95,7 @@ int boot_high = 0;
 int color_space = 0;
 
 /* extern functions */
-
+string mob_name_by_vnum(mob_vnum v);
 int highest_tier(Character *ch);
 const char *how_good(int percent);
 int grand_master(Character *ch);
@@ -1939,9 +1939,9 @@ ACMD(do_gold)
 {
   char goldhand[50], goldbank[50], goldtot[50];
 
-  commafmt(goldhand, sizeof(goldhand), char_gold(ch, 0, GOLD_HAND));
-  commafmt(goldbank, sizeof(goldbank), char_gold(ch, 0, GOLD_BANK));
-  commafmt(goldtot, sizeof(goldtot), char_gold(ch, 0, GOLD_HAND) + char_gold(ch, 0, GOLD_BANK));
+  commafmt(goldhand, sizeof(goldhand), ch->Gold(0, GOLD_HAND));
+  commafmt(goldbank, sizeof(goldbank), ch->Gold(0, GOLD_BANK));
+  commafmt(goldtot, sizeof(goldtot), ch->Gold(0, GOLD_HAND) + ch->Gold(0, GOLD_BANK));
 
 
   ch->Send("\r\n{cY        _       {cc            4 DIMENSIONS FINANCIAL SERVICES{c0\r\n");
@@ -2440,6 +2440,9 @@ if ((blocking = MIN(50, FTOI((AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5f*apply_ac
     struct obj_data *v = has_vehicle(ch);
     ch->Send( "Vehicle Fuel: [%d]\r\n", GET_FUEL(v) > 0 ? (GET_FUEL(v) * 100)/ GET_MAX_FUEL(v) : 0);
   }
+  if (ch->pet != -1)
+  *ch << "Pet: " << mob_name_by_vnum(ch->pet) << "\r\n";
+  
   /** End scooter info **/
   if (PRF_FLAGGED(ch, PRF_RP))
   {
@@ -3833,7 +3836,7 @@ ACMD(do_users)
     if (d->host && *d->host)
       snprintf(line + strlen(line), sizeof(line) - strlen(line), "[%s]\r\n", d->host);
     else
-      strcat(line, "[Hostname unknown]\r\n");
+      strlcat(line, "[Hostname unknown]\r\n", sizeof(line));
 
     if (STATE(d) != CON_PLAYING)
     {

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.30  2006/06/19 06:25:39  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.29  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -855,7 +858,7 @@ ACMD(do_split)
       *ch << "Sorry, you can't do that.\r\n";
       return;
     }
-    if (amount > char_gold(ch, 0, GOLD_HAND))
+    if (amount > ch->Gold(0, GOLD_HAND))
     {
       *ch << "You don't seem to have that much gold to split.\r\n";
       return;
@@ -884,7 +887,7 @@ ACMD(do_split)
       return;
     }
 
-    char_gold(ch, -(share * (num - 1)), GOLD_HAND);
+    ch->Gold(-(share * (num - 1)), GOLD_HAND);
 
     len += snprintf(buf + len, sizeof(buf) - len, "%s splits %lld coins; you receive %lld.\r\n",
                     GET_NAME(ch), amount, share);
@@ -898,7 +901,7 @@ ACMD(do_split)
     if (AFF_FLAGGED(k, AFF_GROUP) && (k->in_room == IN_ROOM(ch))
         && !(IS_NPC(k)) && k != ch)
     {
-      char_gold(k, share, GOLD_HAND);
+      k->Gold(share, GOLD_HAND);
       *k << buf;
     }
     for (f = k->followers; f; f = f->next)
@@ -908,7 +911,7 @@ ACMD(do_split)
           (f->follower->in_room == IN_ROOM(ch)) &&
           f->follower != ch)
       {
-        char_gold(f->follower, share, GOLD_HAND);
+        f->follower->Gold(share, GOLD_HAND);
         *f->follower << buf;
       }
     }
@@ -919,7 +922,7 @@ ACMD(do_split)
       {
         ch->Send("%lld coin%s%s not splitable, so you keep the money.\r\n", rest,(rest == 1) ? "" : "s", (rest == 1) ? " was" : " were");
         
-        char_gold(ch, rest, GOLD_HAND);
+        ch->Gold(rest, GOLD_HAND);
       }
     }
   }

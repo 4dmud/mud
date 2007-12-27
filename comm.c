@@ -694,9 +694,7 @@ void copyover_recover(void)
 
     /* Now, find the pfile */
 
-    CREATE(d->character, Character, 1);
-    CREATE(d->character->player_specials, struct player_special_data,        1);
-    clear_char(d->character);
+    d->character = new Character();
     d->character->desc = d;
 
     if ((player_i = load_char(name, d->character)) >= 0)

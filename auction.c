@@ -141,13 +141,13 @@ void auction_update(void)
     /* Make sure object exists */
     
     if ((auction->obj = check_obj(auction->seller, auction->obj))) {
-      if (char_gold(auction->bidder, 0, GOLD_HAND) < auction->bid) {
+      if (auction->bidder->Gold(0, GOLD_HAND) < auction->bid) {
         act("You cannot afford to buy the $p from $N. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_CHAR);
         act("$n cannot afford to buy the $p from you. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_VICT);
       } else {
       /* Swap gold */
-        char_gold(auction->bidder, -auction->bid, GOLD_HAND);
-        char_gold(auction->seller,  auction->bid, GOLD_HAND);
+        auction->bidder->Gold( -auction->bid, GOLD_HAND);
+        auction->seller->Gold(  auction->bid, GOLD_HAND);
       obj_from_char(auction->obj);
       obj_to_char(auction->obj, auction->bidder);
 
@@ -228,11 +228,11 @@ ACMD(do_bid)
        bid_stat = 1000;
      else
        bid_stat = (gold_int)(auc->bid * 0.1);
-     if (char_gold(ch, 0, GOLD_HAND) < bid_stat) {
+     if (ch->Gold( 0, GOLD_HAND) < bid_stat) {
        ch->Send( "You need at least %lld gold to stat that item.\r\n", bid_stat);
        return;
      }
-     char_gold(ch, -bid_stat, GOLD_HAND);
+     ch->Gold( -bid_stat, GOLD_HAND);
      identify_object(ch, auc->obj);
   }
   else if (ch == auc->bidder)
@@ -247,8 +247,8 @@ ACMD(do_bid)
   } else if ((bid < (auc->bid * 1.05) && auc->bidder) || bid == 0) {
     ch->Send( "Try bidding at least 5%% over the current bid of %ld. (%.0f coins).\r\n",
         auc->bid, auc->bid * 1.05 + 1);
-  } else if (char_gold(ch, 0, GOLD_HAND) < bid) {
-    ch->Send( "You have only %lld coins on hand.\r\n", char_gold(ch, 0, GOLD_HAND));
+  } else if (ch->Gold( 0, GOLD_HAND) < bid) {
+    ch->Send( "You have only %lld coins on hand.\r\n", ch->Gold( 0, GOLD_HAND));
   } else if (PLR_FLAGGED(ch, PLR_NOSHOUT))
     ch->Send( "You can't auction.\r\n");
   else if (mob == NULL)

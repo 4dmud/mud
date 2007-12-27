@@ -632,7 +632,7 @@ const char *HCONTROL_FORMAT =
   "       hcontrol save\r\n"
   "       hcontrol listrent <house vnum>\r\n"
   "       hcontrol calc <house vnum>\r\n"
-  "       hcontrol mount <house vnum> <mob vnum>\r\n"
+ // "       hcontrol mount <house vnum> <mob vnum>\r\n"
   "       hcontrol expand <house vnum> <number of gold tokens paid>\r\n";
 //"       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
 
@@ -647,10 +647,7 @@ void hcontrol_list_houses(Character *ch)
     send_to_char("No houses have been defined.\r\n", ch);
     return;
   }
-  ch->Send(
-                   "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items Mount\r\n");
-  ch->Send(
-                   "-------  ------  ----------  ------  ------------ ------------ ----- -----\r\n");
+*ch << "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items\r\n-------  ------  ----------  ------  ------------ ------------ -----\r\n";
 
   for (i = 0; i < num_of_houses; i++)
   {
@@ -679,10 +676,10 @@ void hcontrol_list_houses(Character *ch)
     /* Now we need a copy of the owner's name to capitalize. -gg 6/21/98 */
     strcpy(own_name, temp);
 
-    ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-5ld\r\n",
+    ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d\r\n",
                      house_control[i].vnum, house_control[i].atrium, built_on,
                      house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 125),
-                     house_item_count(house_control[i].vnum), house_control[i].mount);
+                     house_item_count(house_control[i].vnum)/*, house_control[i].mount*/);
 
     House_list_guests(ch, i, TRUE);
   }
@@ -929,12 +926,12 @@ ACMD(do_house)
     send_to_char("You must be in your house to set guests.\r\n", ch);
   else if ((i = find_house(GET_ROOM_VNUM(IN_ROOM(ch)))) == NOWHERE)
     send_to_char("Um.. this house seems to be screwed up.\r\n", ch);
-  else if (GET_IDNUM(ch) != house_control[i].owner && GET_LEVEL(ch) < LVL_IMPL)
-    send_to_char("Only the primary owner can set guests.\r\n", ch);
   else if (!*arg)
     House_list_guests(ch, i, FALSE);
   else if (!str_cmp(arg, "mount"))
     house_load_mount(ch, i);
+  else if (GET_IDNUM(ch) != house_control[i].owner && GET_LEVEL(ch) < LVL_IMPL)
+    send_to_char("Only the primary owner can set guests.\r\n", ch);
   else if (!str_cmp(arg, "expand"))
     house_expand_house(ch, i);
   else if ((id = get_id_by_name(arg)) < 0)
@@ -1158,13 +1155,13 @@ void house_load_mount(Character *ch, int i)
 {
   struct follow_type *f, *f_next;
   Character *pet, *next_ch, *tch;
-  mob_vnum mount = 0;
+  mob_vnum mount = ch->pet;
 
   if (i < 0)
     return;
-  if ((mount = house_control[i].mount) == 0)
+  if (mount <= 0)
   {
-    ch->Send( "You haven't brought a mount for this house.\r\n");
+    ch->Send( "You haven't brought a mount.\r\n");
     return;
   }
 

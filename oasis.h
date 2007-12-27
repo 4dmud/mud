@@ -72,35 +72,35 @@
 
  
  
-#define MAX_ROOM_NAME	75
-#define MAX_MOB_NAME	50
-#define MAX_OBJ_NAME	50
-#define MAX_ROOM_DESC	2048
-#define MAX_EXIT_DESC	256
-#define MAX_EXTRA_DESC  512
-#define MAX_MOB_DESC	1024
-#define MAX_OBJ_DESC	512
-#define MAX_DUPLICATES  2000  /* when loading in zedit */
+const int MAX_ROOM_NAME	= 75;
+const int MAX_MOB_NAME	= 50;
+const int MAX_OBJ_NAME	= 50;
+const int MAX_ROOM_DESC	= 2048;
+const int MAX_EXIT_DESC	= 256;
+const int MAX_EXTRA_DESC  = 512;
+const int MAX_MOB_DESC	= 1024;
+const int MAX_OBJ_DESC	= 512;
+const int MAX_DUPLICATES  = 2000;  /* when loading in zedit */
 
 /* arbitrary limits - roll your own */
 /* max weapon is 50d50 .. avg. 625 dam... */
-#define MAX_WEAPON_SDICE         50
-#define MAX_WEAPON_NDICE         50
+const int MAX_WEAPON_SDICE     =    50;
+const int MAX_WEAPON_NDICE     =    50;
 
-#define MAX_OBJ_WEIGHT      1000000
-#define MAX_OBJ_COST        2000000
-#define MAX_OBJ_RENT        2000000
-#define MAX_CONTAINER_SIZE    10000
+const int MAX_OBJ_WEIGHT    =  1000000;
+const int MAX_OBJ_COST      =  2000000;
+const int MAX_OBJ_RENT      =  2000000;
+const int MAX_CONTAINER_SIZE =   10000;
 
-#define MAX_MOB_GOLD        1000000 
-#define MAX_MOB_EXP         1500000
+const int MAX_MOB_GOLD       = 1000000;
+const int MAX_MOB_EXP        = 1500000;
 /* this is one mud year.. */
-#define MAX_OBJ_TIMER       1071000 
+const int MAX_OBJ_TIMER     =  1071000;
 
 /* this defines how much memory is alloacted for 'bit strings' when
  * saving in OLC. Remember to change it if you go for longer bitvectors.
  */
-#define BIT_STRING_LENGTH 128
+const int BIT_STRING_LENGTH =128;
 /*
  * The data types for miscellaneous functions.
  */
@@ -395,6 +395,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_DELETE_SEGMENT        38
 #define MEDIT_CHA			39
 #define MEDIT_SKIN		40
+#define MEDIT_OWNER		41
 
 /*
  * Submodes of SEDIT connectedness.

@@ -723,6 +723,7 @@ void make_wholist(void);
 #define MOB_TIER(ch)		((ch)->mob_specials.tier)
 #define MOB_SUBSKILL(ch)	((ch)->mob_specials.subskill)
 #define MOB_SKIN(ch)		((ch)->mob_specials.skin)
+#define MOB_OWNER(ch)		((ch)->mob_specials.owner)
 
 #define GET_DEFAULT_POS(ch)	((ch)->mob_specials.default_pos)
 #define MEMORY(ch)		((ch)->mob_specials.memory)
@@ -1055,7 +1056,6 @@ struct obj_data *revert_object(struct obj_data *obj);
 #define GOLD_BANK   0
 #define GOLD_HAND   1
 #define GOLD_ALL    2
-gold_int char_gold(Character *ch, gold_int amount, short type);
 float square_root(float num);
 int get_sub_status(Character *ch, int i);
 int toggle_sub_status(Character *ch, int i, int onoff);

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.45  2006/06/19 06:25:39  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.44  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -354,9 +357,9 @@ gold_int max_gold(Character * ch)
 int spill_gold_amount(Character *ch)
 {
   gold_int val;
-  if (char_gold(ch, 0, GOLD_HAND) > max_gold(ch))
+  if (ch->Gold(0, GOLD_HAND) > max_gold(ch))
   {
-    val = (char_gold(ch, 0, GOLD_HAND) - max_gold(ch));
+    val = (ch->Gold(0, GOLD_HAND) - max_gold(ch));
     return val;
   }
   return (-1);
@@ -845,7 +848,7 @@ void get_check_money(Character *ch, struct obj_data *obj)
   obj_from_char(obj);
   extract_obj(obj);
 
-  char_gold(ch, value, GOLD_HAND);
+  ch->Gold(value, GOLD_HAND);
   gold_data(TAKEN, value);
 
   if (value == 1)
@@ -962,9 +965,7 @@ int automeld(struct obj_data *obj)
     {
       if (player_table[i].id == GET_OBJ_VAL(obj, 0))
       {
-        CREATE(ch, Character, 1);
-        clear_char(ch);
-        CREATE(ch->player_specials, struct player_special_data, 1);
+        ch = new Character();
         if (player_table[i].id)
           ch->loader = player_table[i].id;
         if (load_char(player_table[i].name, ch) > -1)
@@ -972,7 +973,7 @@ int automeld(struct obj_data *obj)
           if (!ch)
           {
             new_mudlog( CMP, 51, TRUE, "AUTOMELD: %s (error)", player_table[i].name);
-            free_char(ch);
+            delete (ch);
             return 0;
           }
           new_mudlog( CMP, GET_LEVEL(ch), TRUE, "AUTOMELD: %s (offline)", GET_NAME(ch));
@@ -988,7 +989,7 @@ int automeld(struct obj_data *obj)
         }
         else
         {
-          free_char(ch);
+          delete (ch);
           return 1;
         }
       }
@@ -1495,7 +1496,7 @@ void perform_drop_gold(Character *ch, gold_int amount,
 
   if (amount <= 0)
     ch->Send("Heh heh heh.. we are jolly funny today, eh?\r\n");
-  else if (char_gold(ch, 0, GOLD_HAND) < amount)
+  else if (ch->Gold(0, GOLD_HAND) < amount)
     ch->Send("You don't have that many coins!\r\n");
   else if (amount > 2000000000)
     ch->Send("You can't drop more then 2 billion.\r\n");
@@ -1522,7 +1523,7 @@ void perform_drop_gold(Character *ch, gold_int amount,
         ch->Send("Your gold spills all over the ground!\r\n");
         snprintf(buf, sizeof(buf), "$n's gold spills all over the ground!");
         act(buf, TRUE, ch, 0, 0, TO_ROOM);
-        char_gold(ch,-amount, GOLD_HAND);
+        ch->Gold(-amount, GOLD_HAND);
         for (i = number(1, amount); amount > 0;
              i = number(1, amount))
         {
@@ -1567,7 +1568,7 @@ void perform_drop_gold(Character *ch, gold_int amount,
       }
       ch->Send("You drop some gold which disappears in a puff of smoke!\r\n");
     }
-    char_gold(ch,-amount, GOLD_HAND);
+    ch->Gold(-amount, GOLD_HAND);
   }
 }
 
@@ -1663,7 +1664,7 @@ int perform_drop(Character *ch, struct obj_data *obj,
     }
     value = MAX(1, MIN(200, GET_OBJ_COST(obj) / 16));
     extract_obj(obj);
-    char_gold(ch, value, GOLD_BANK);
+    ch->Gold(value, GOLD_BANK);
     return (value);
   default:
     log("SYSERR: Incorrect argument %d passed to perform_drop.", mode);
@@ -1834,7 +1835,7 @@ ACMD(do_drop)
     {
       act("$n has been rewarded by the gods!", TRUE, ch, 0, 0, TO_ROOM);
     }
-    char_gold(ch, amount, GOLD_HAND);
+    ch->Gold(amount, GOLD_HAND);
     gold_data(TAKEN, amount);
   }
 }
@@ -1932,7 +1933,7 @@ void perform_give_gold(Character *ch, Character *vict,
     return;
   }
 
-  if ((char_gold(ch,0, GOLD_HAND) < amount)
+  if ((ch->Gold(0, GOLD_HAND) < amount)
       && (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD)))
   {
     ch->Send("You don't have that many coins!\r\n");
@@ -1950,11 +1951,11 @@ void perform_give_gold(Character *ch, Character *vict,
   }
   if (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))
   {
-    char_gold(ch, -amount, GOLD_HAND);
+    ch->Gold(-amount, GOLD_HAND);
     gold_data(GOLD_GIVEN, amount);
   }
   gold_data(GOLD_RECEIVED, amount);
-  char_gold(vict, amount, GOLD_HAND);
+  vict->Gold(amount, GOLD_HAND);
 
   bribe_mtrigger(vict, ch, amount);
 }

@@ -82,15 +82,14 @@ int mail_recip_ok(const char *name)
 if (!get_id_by_name((char *)name)) 
 	return ret;
 
-  CREATE(victim, Character, 1);
-  clear_char(victim);
+victim = new Character();
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char((char *)name, victim) >= 0) {
     if (!PLR_FLAGGED(victim, PLR_DELETED))
       ret = TRUE;
-    free_char(victim);
+    delete victim;
   } else 
-    free(victim);
+    delete victim;
     TEMP_LOAD_CHAR = FALSE;
   return ret;
 }
@@ -591,7 +590,7 @@ void postmaster_send_mail(Character *ch, Character *mailman,
     act("$n tells you, 'If you want HIM to respond to you, best send a note instead.(type: note help)'", FALSE, mailman, 0, ch, TO_VICT);
     return;
     }
-    if (char_gold(ch, 0, GOLD_HAND) < STAMP_PRICE && GET_LEVEL(ch) < LVL_IMMORT) {
+    if (ch->Gold( 0, GOLD_HAND) < STAMP_PRICE && GET_LEVEL(ch) < LVL_IMMORT) {
 	sprintf(buf, "$n tells you, 'A stamp costs %d coins.'\r\n"
 		"$n tells you, '...which I see you can't afford.'",
 		STAMP_PRICE);
@@ -609,7 +608,7 @@ void postmaster_send_mail(Character *ch, Character *mailman,
 	    STAMP_PRICE);
 
     act(buf, FALSE, mailman, 0, ch, TO_VICT);
-    char_gold(ch, -STAMP_PRICE, GOLD_HAND);
+    ch->Gold( -STAMP_PRICE, GOLD_HAND);
     SET_BIT_AR(PLR_FLAGS(ch), PLR_MAILING);
 
     /* Start writing! */

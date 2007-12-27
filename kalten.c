@@ -453,19 +453,18 @@ ACMD(do_linkload)
 
   if (!*arg)
   {
-    send_to_char("Linkload who?\r\n", ch);
+    *ch << "Linkload who?\r\n";
     return;
   }
 
   if (get_player_vis(ch, arg, NULL, 0))
   {
-    send_to_char("They are already connected!\r\n", ch);
+    *ch << "They are already connected!\r\n";
     return;
   }
 
-  CREATE(victim, Character, 1);
-  clear_char(victim);
-  CREATE(victim->player_specials, struct player_special_data, 1);
+  victim = new Character();
+  
   if (GET_IDNUM(ch))
     victim->loader = GET_IDNUM(ch);
   if (load_char(arg, victim) > -1)
@@ -483,17 +482,15 @@ ACMD(do_linkload)
     }
     else
     {
-      send_to_char
-      ("Sorry, you aren't high enough to link-load that char.\r\n",
-       ch);
-      free_char(victim);
+      *ch << "Sorry, you aren't high enough to link-load that char.\r\n";
+      delete (victim);
     }
 
   }
   else
   {
-    send_to_char("No such player exists.\r\n", ch);
-    free_char(victim);
+    *ch << "No such player exists.\r\n";
+    delete (victim);
 
   }
 
@@ -529,13 +526,13 @@ ACMD(do_reload)
 
   if (!(weapon = GET_EQ(ch, WEAR_WIELD)))
   {
-    send_to_char("You aren't even wielding a weapon.\r\n", ch);
+    *ch << "You aren't even wielding a weapon.\r\n";
     return;
   }
 
   if (GET_OBJ_TYPE(weapon) != ITEM_GUN)
   {
-    send_to_char("You aren't wielding a reloadable weapon.\r\n", ch);
+    *ch << "You aren't wielding a reloadable weapon.\r\n";
     return;
   }
 
@@ -550,7 +547,7 @@ ACMD(do_reload)
 
   if (!ammo)
   {
-    send_to_char("You do not have ammo for this weapon.\r\n", ch);
+    *ch << "You do not have ammo for this weapon.\r\n";
     return;
   }
 
@@ -946,14 +943,13 @@ ACMD(do_finger)
   }
   if (!d)
   {
-    CREATE(vict, Character, 1);
-    clear_char(vict);
+    vict = new Character();
     TEMP_LOAD_CHAR = TRUE;
     if (store_to_char(arg, vict) == -1)
     {
       ch->Send( "Player doesn't exist.\r\n");
       TEMP_LOAD_CHAR = FALSE;
-      free(vict);
+      delete (vict);
       return;
     }
   }
@@ -962,7 +958,7 @@ ACMD(do_finger)
   {
     send_to_char("You don't seem to be able to gather info for that player.\r\n", ch);
     if (!d)
-      free_char(vict);
+      delete (vict);
     return;
   }
 
@@ -1017,7 +1013,7 @@ ACMD(do_finger)
                   );
 
   if (!d)
-    free_char(vict);
+    delete (vict);
   return;
 
 }

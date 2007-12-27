@@ -103,63 +103,6 @@ char *center_align(char *str, size_t width)
 
 }
 
-/* ch = player to change the gold values of
-   amount = the amount to add to their gold, or subtract
-   type = for a transaction type, taxed untaxted.. or whatever.
-   
-*/
-gold_int char_gold(Character *ch, gold_int amount, short type)
-{
-
-  gold_int temp = 0;
-
-  switch (type)
-  {
-  case GOLD_HAND:
-    GET_GOLD(ch) += amount;
-    return GET_GOLD(ch);
-    break;
-  case GOLD_BANK:
-    GET_BANK_GOLD(ch) += amount;
-    return GET_BANK_GOLD(ch);
-    break;
-  case GOLD_ALL:
-    if (amount < 0)
-    {
-      temp = (abs(amount));
-      if (temp <= (GET_GOLD(ch) + GET_BANK_GOLD(ch)))
-      { // No Transaction. This needs watching
-
-
-
-        if (temp > GET_GOLD(ch))
-        {
-          temp -= GET_GOLD(ch);
-          GET_GOLD(ch) = 0;
-          GET_BANK_GOLD(ch) -= temp;
-        }
-        else
-          GET_GOLD(ch) -= temp;
-
-      }
-      else //positive amount -- add to bank
-      {
-        GET_BANK_GOLD(ch) += amount;
-      }
-    }
-    else
-      GET_BANK_GOLD(ch) += amount;
-    return (GET_GOLD(ch) + GET_BANK_GOLD(ch));
-    break;
-  default:
-    new_mudlog(CMP, LVL_GOD, TRUE, "%s invalid transaction type #%d (amount: %lld)", GET_NAME(ch), type, amount);
-    break;
-    return 0;
-  }
-  return 0;
-
-}
-
 
 /*
  * Compares two strings, and returns TRUE
@@ -1729,16 +1672,11 @@ void wiz_read_file(void)
   for (i = 0; i <= top_of_p_table; i++)
     if (*player_table[i].name)
     {
-
-
-
-      CREATE(vict, Character, 1);
-      clear_char(vict);
+vict = new Character();
       TEMP_LOAD_CHAR = TRUE;
-      //CREATE(vict->player_specials, struct player_special_data, 1);
       if (store_to_char(player_table[i].name, vict) > -1)
       {
-        free_char(vict);
+        delete vict;
         TEMP_LOAD_CHAR = TRUE;
         continue;
       }
@@ -1754,7 +1692,7 @@ void wiz_read_file(void)
       }
       TEMP_LOAD_CHAR = TRUE;
 
-      free_char(vict);
+      delete (vict);
     }
 
 

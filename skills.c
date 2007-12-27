@@ -1123,12 +1123,11 @@ ASKILL(skill_steal)
       gold = MIN(1782, gold);
       if (gold > 0)
       {
-        char_gold(ch, gold, GOLD_HAND);
-        char_gold(vict, -gold, GOLD_HAND);
+        ch->Gold(gold, GOLD_HAND);
+        vict->Gold(-gold, GOLD_HAND);
         if (gold > 1)
         {
-          ch->Send( "Bingo!  You got %d gold coins.\r\n",
-                           gold);
+          ch->Send( "Bingo!  You got %d gold coins.\r\n", gold);
         }
         else
         {

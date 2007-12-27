@@ -378,9 +378,7 @@ void do_clan_destroy(Character *ch, char *arg)
     }
     else
     {
-      CREATE(cbuf, Character, 1);
-      CREATE(cbuf->player_specials, struct player_special_data, 1);
-      clear_char(cbuf);
+      cbuf = new Character();
       if (load_char((player_table + j)->name, cbuf) >= 0)
       {
         if (GET_CLAN(cbuf) == clan[i].id)
@@ -389,10 +387,10 @@ void do_clan_destroy(Character *ch, char *arg)
           GET_CLAN_RANK(cbuf) = 0;
           save_char(cbuf);
         }
-        free_char(victim);
+        delete (victim);
       }
       else
-        free(victim);
+        delete (victim);
     }
   }
 
@@ -934,13 +932,13 @@ void do_clan_apply(Character *ch, char *arg)
     return;
   }
 
-  if (char_gold(ch, 0, GOLD_ALL) < (clan[clan_num].app_fee))
+  if (ch->Gold( 0, GOLD_ALL) < (clan[clan_num].app_fee))
   {
     send_to_char("You cannot afford the application fee!\r\n", ch);
     return;
   }
 
-  char_gold(ch, -clan[clan_num].app_fee, GOLD_ALL) ;
+  ch->Gold( -clan[clan_num].app_fee, GOLD_ALL) ;
   clan[clan_num].treasure += clan[clan_num].app_fee;
   save_clans();
   GET_CLAN(ch) = clan[clan_num].id;
@@ -1407,35 +1405,6 @@ void init_clans()
   {
     if (IS_SET(player_table[j].flags, PINDEX_DELETED) || IS_SET(player_table[j].flags, PINDEX_SELFDELETE))
       continue;
-#if 0
-    {
-      Character *victim;
-      CREATE(victim, Character, 1);
-      clear_char(victim);
-      TEMP_LOAD_CHAR = TRUE;
-
-      if (store_to_char((player_table + j)->name, victim) > -1)
-      {
-        if ((i = find_clan_by_id(GET_CLAN(victim))) >= 0)
-        {
-          add_clan_member(GET_NAME(victim), GET_CLAN_RANK(victim), i);
-          clan[i].power += GET_LEVEL(victim);
-          clan[i].members++;
-
-          player_table[j].rank = GET_CLAN_RANK(victim);
-          player_table[j].clan = GET_CLAN(victim);
-        }
-        free_char(victim);
-
-      }
-      else
-        free(victim);
-
-      TEMP_LOAD_CHAR = FALSE;
-    }
-#else
-    
-    
     if (player_table[j].name && *player_table[j].name &&
         player_table[j].rank > 0 &&
         (i = find_clan_by_id(player_table[j].clan)) >= 0)
@@ -1444,8 +1413,6 @@ void init_clans()
       clan[i].power += player_table[j].level;
       clan[i].members++;
     }
-
-#endif
 
   }
   return;
@@ -1573,7 +1540,7 @@ void do_clan_bank(Character *ch, char *arg, int action)
     return;
   }
 
-  if (!immcom && action == CB_DEPOSIT && char_gold(ch, 0, GOLD_ALL) < amount)
+  if (!immcom && action == CB_DEPOSIT && ch->Gold( 0, GOLD_ALL) < amount)
   {
     send_to_char("You do not have that kind of money!\r\n", ch);
     return;
@@ -1606,13 +1573,13 @@ void do_clan_bank(Character *ch, char *arg, int action)
   switch (action)
   {
   case CB_WITHDRAW:
-    char_gold(ch, amount, GOLD_HAND);
+    ch->Gold( amount, GOLD_HAND);
     clan[clan_num].treasure -= amount;
     send_to_char("You withdraw from the clan's treasure.\r\n", ch);
     break;
   case CB_DEPOSIT:
     if (!immcom)
-      char_gold(ch, -amount, GOLD_ALL);
+      ch->Gold( -amount, GOLD_ALL);
     clan[clan_num].treasure += amount;
     send_to_char("You add to the clan's treasure.\r\n", ch);
     break;
@@ -1779,7 +1746,7 @@ void do_clan_ranks(Character *ch, char *arg)
     return;
   }
 
-  if (char_gold(ch, 0, GOLD_ALL) < 7500000 && !immcom)
+  if (ch->Gold( 0, GOLD_ALL) < 7500000 && !immcom)
   {
     send_to_char
     ("Changing the clan hierarchy requires 7,500,000 coins!\r\n",
@@ -1788,7 +1755,7 @@ void do_clan_ranks(Character *ch, char *arg)
   }
 
   if (!immcom)
-    char_gold(ch, -7500000, GOLD_ALL);
+    ch->Gold( -7500000, GOLD_ALL);
 
   for (j = 0; j <= top_of_p_table; j++)
   {
@@ -1806,9 +1773,7 @@ void do_clan_ranks(Character *ch, char *arg)
     }
     else
     {
-      CREATE(victim, Character, 1);
-      CREATE(victim->player_specials, struct player_special_data, 1);
-      clear_char(victim);
+      victim = new Character();
       if (load_char((player_table + j)->name, victim) >= 0)
       {
         if (GET_CLAN(victim) == clan[clan_num].id)
@@ -1820,10 +1785,10 @@ void do_clan_ranks(Character *ch, char *arg)
             GET_CLAN_RANK(victim) = new_ranks;
           save_char(victim);
         }
-        free_char(victim);
+        delete (victim);
       }
       else
-        free(victim);
+        delete (victim);
     }
   }
 

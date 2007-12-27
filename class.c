@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.13  2006/06/19 06:25:39  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.12  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -1020,7 +1023,7 @@ void advance_level(Character * ch)
     if (REMORTS(ch) < 2)
     {
       ch->Send( "{cYYou gain 50000 coins to your bank!{c0\r\n");
-      char_gold(ch, 50000, GOLD_BANK);
+      ch->Gold( 50000, GOLD_BANK);
     }
     break;
   case 10:
@@ -1031,35 +1034,35 @@ void advance_level(Character * ch)
                          "When you die from now on you will \r\n"
                          "need to retrieve your corpse.\r\n{c0");
       ch->Send( "{cYYou gain 100000 coins to your bank!{c0\r\n");
-      char_gold(ch, 100000, GOLD_BANK);
+      ch->Gold( 100000, GOLD_BANK);
     }
     break;
   case 15:
     if (REMORTS(ch) < 4)
     {
       ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
-      char_gold(ch, 500000, GOLD_BANK);
+      ch->Gold( 500000, GOLD_BANK);
     }
     break;
   case 20:
     if (REMORTS(ch) < 5)
     {
       ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
-      char_gold(ch, 500000, GOLD_BANK);
+      ch->Gold( 500000, GOLD_BANK);
     }
     break;
   case 30:
     if (REMORTS(ch) < 6)
     {
       ch->Send( "{cYYou gain 2000000 coins to your bank!{c0\r\n");
-      char_gold(ch, 2000000, GOLD_BANK);
+      ch->Gold( 2000000, GOLD_BANK);
     }
     break;
   case 45:
     if (REMORTS(ch) < 7)
     {
       ch->Send( "{cYYou gain 5000000 coins to your bank!{c0\r\n");
-      char_gold(ch, 5000000, GOLD_BANK);
+      ch->Gold( 5000000, GOLD_BANK);
     }
     break;
   }

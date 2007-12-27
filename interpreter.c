@@ -75,7 +75,6 @@ void load_locker(Character *ch);
 int count_locker(Character *ch);
 long get_acc_by_name(char *name);
 long get_acc_by_id(long id);
-void default_char(Character *ch);
 void read_ignorelist(Character *ch);
 void perform_wear(Character *ch, struct obj_data *obj, int where);
 void assemblies_parse(Descriptor *d, char *arg);
@@ -1916,7 +1915,7 @@ int perform_dupe_check(Descriptor *d)
 
   /* Okay, we've found a target.  Connect d to target. */
   lock_desc(d);
-  free_char(d->character); /* get rid of the old char */
+  delete d->character; /* get rid of the old char */
   d->character = target;
   d->character->desc = d;
   d->original = NULL;
@@ -2061,22 +2060,20 @@ int parse_accounts(Descriptor *d, char *arg)
     account_manage_menu(d);
     return 0;
   }
-  CREATE(member, Character, 1);
-  clear_char(member);
-
+  member =  new Character();
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char(name, member) == -1)
   {
     TEMP_LOAD_CHAR = FALSE;
     d->Output( "\r\n%s can't be read at this time, contact an immortal.\r\n", name);
     account_manage_menu(d);
-    free(member);
+    delete (member);
     return 0;
   }
   TEMP_LOAD_CHAR = FALSE;
 
   sprintf(real_pass, "%s", GET_PASSWD(member));
-  free_char(member);
+  delete (member);
   member = NULL;
 
   pass_pass = !strncmp(CRYPT(pass, real_pass), real_pass, MAX_PWD_LENGTH);
@@ -2146,11 +2143,11 @@ int enter_player_game(Descriptor *d)
   int load_result;
   void reset_default_status(Character *ch);
 
-  reset_char(ch);
+  ch->reset();
   read_aliases(ch);
   ch->next = NULL;  // -- kalten
 
-  if (!valid_id_num( GET_IDNUM(ch)))
+  if (!valid_id_num( GET_ID(ch)))
     log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
@@ -2395,7 +2392,7 @@ void nanny(Descriptor *d, char *arg)
 {
   char buf[128];
   int player_i, load_result;
-  char tmp_name[MAX_INPUT_LENGTH];
+  char tmp_name[MAX_INPUT_LENGTH] = "";
 
   /* OasisOLC states */
   struct
@@ -2442,10 +2439,7 @@ void nanny(Descriptor *d, char *arg)
 
     if (d->character == NULL)
     {
-      CREATE(d->character, Character, 1);
-      clear_char(d->character);
-      CREATE(d->character->player_specials, struct player_special_data, 1);
-
+      d->character = new Character();
       d->character->desc = d;
     }
     if (!*arg)
@@ -2496,13 +2490,10 @@ void nanny(Descriptor *d, char *arg)
             }
           remove_player(player_i);
           /* We get a false positive from the original deleted character. */
-          free_char(d->character);
+          delete d->character;
           /* Check for multiple creations... */
 
-          CREATE(d->character, Character, 1);
-          clear_char(d->character);
-          CREATE(d->character->player_specials,struct player_special_data, 1);
-
+          d->character = new Character();
           d->character->desc = d;
           CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
           strlcpy(d->character->player.name, CAP(tmp_name), strlen(tmp_name) + 1);
@@ -2534,9 +2525,6 @@ void nanny(Descriptor *d, char *arg)
           return;
         }
 
-        if (!d->character->player_specials)
-          CREATE(d->character->player_specials, struct player_special_data, 1);
-        default_char(d->character);
         CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
         strcpy(d->character->player.name, CAP(tmp_name));
         d->Output( "\r\n"
@@ -2875,10 +2863,9 @@ void nanny(Descriptor *d, char *arg)
       }
 
       /* add the change character stuff here */
-      free_char(d->character);
+      delete (d->character);
       d->character = NULL;
-      CREATE(d->character, Character, 1);
-      clear_char(d->character);
+      d->character = new Character();
 
       d->character->desc = d;
       if ((player_i = load_char(player_table[i].name, d->character)) == -1)
@@ -2892,7 +2879,7 @@ void nanny(Descriptor *d, char *arg)
 
 
         }
-        free(d->character);
+        delete (d->character);
         d->character = NULL;
         STATE(d) = CON_CLOSE;
         return;

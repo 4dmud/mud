@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/05/30 09:14:19 $                                           * 
-*  $Revision: 1.28 $                                                      *
+*  $Date: 2006/06/19 06:25:39 $                                           * 
+*  $Revision: 1.29 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -851,13 +851,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           if (subfield && *subfield)
           {
             gold_int addition = atoi(subfield);
-            char_gold(c, addition, GOLD_HAND);
+            c->Gold(addition, GOLD_HAND);
             if (addition > 0)
               gold_data(DG_GOLD_OUT, addition);
             else
               gold_data(DG_GOLD_IN, -addition);
           }
-          snprintf(str, slen, "%lld", char_gold(c, 0, GOLD_HAND));
+          snprintf(str, slen, "%lld", c->Gold(0, GOLD_HAND));
         }
 
         break;

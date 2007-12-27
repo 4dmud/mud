@@ -106,7 +106,7 @@ ACMD(do_bet)
       send_to_char("Bet some gold why dont you!\r\n", ch);
       return;
     }
-    if (newbet > char_gold(ch, 0, GOLD_ALL))
+    if (newbet > ch->Gold( 0, GOLD_ALL))
     {
       send_to_char("You don't have that much money!\r\n", ch);
       return;
@@ -118,7 +118,7 @@ ACMD(do_bet)
       return;
     }
 
-    char_gold(ch, -newbet, GOLD_ALL);   /* substract the gold */
+    ch->Gold( -newbet, GOLD_ALL);   /* substract the gold */
     arena_pot += (newbet / 2);
     bet_pot += (newbet / 2);
     GET_AMT_BET(ch) = newbet;
@@ -159,7 +159,7 @@ ACMD(do_arena)
     send_to_char("Sorry the killing fields are not open to you.\r\n",
                  ch);
   }
-  else if (char_gold(ch, 0, GOLD_ALL) < (unsigned) (cost_per_lev * GET_LEVEL(ch)))
+  else if (ch->Gold( 0, GOLD_ALL) < (unsigned) (cost_per_lev * GET_LEVEL(ch)))
   {
     ch->Send( "Sorry but you need %d coins to enter the arena.\r\n",
                      (cost_per_lev * GET_LEVEL(ch)));
@@ -180,7 +180,7 @@ ACMD(do_arena)
     send_to_char("You have been taken to the killing fields\r\n", ch);
     look_at_room(ch, 0);
     send_to_arena("%s has joined the blood bath.\r\n", GET_NAME(ch));
-    char_gold(ch, - (cost_per_lev * GET_LEVEL(ch)), GOLD_ALL);
+    ch->Gold( - (cost_per_lev * GET_LEVEL(ch)), GOLD_ALL);
     arena_pot += (cost_per_lev * GET_LEVEL(ch));
     ch->Send( "You pay %d coins to enter the arena\r\n",
                      (cost_per_lev * GET_LEVEL(ch)));
@@ -390,7 +390,7 @@ void find_game_winner(void)
             "After %d hours, %s is declared the winner.\r\n",
             game_length - time_left_in_game, GET_NAME(i));
         }
-        char_gold(i, arena_pot / 2, GOLD_ALL);
+        i->Gold(arena_pot / 2, GOLD_ALL);
         new_send_to_char(i,
                          "You have earned %ld coins for winning the arena.\r\n",
                          (arena_pot / 2));
@@ -629,7 +629,7 @@ void find_bet_winners(Character *winner)
       {
         new_send_to_char(i,  "You have won %d coins on your bet.\r\n",
                          GET_AMT_BET(i) * 2);
-        char_gold(i, GET_AMT_BET(i) * 2, GOLD_ALL);
+        i->Gold(GET_AMT_BET(i) * 2, GOLD_ALL);
         GET_BETTED_ON(i) = 0;
         GET_AMT_BET(i) = 0;
       }

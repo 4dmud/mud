@@ -328,7 +328,7 @@ Descriptor::~Descriptor() {
             new_mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, "Closing link to: %s.", GET_NAME(link_challenged));
         } else {
             new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(this->character) ? GET_NAME(this->character) : "<null>");
-            free_char(this->character);
+            delete character;
         }
     } else
         new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing descriptor without char.");

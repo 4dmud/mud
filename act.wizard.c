@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.54  2006/06/19 06:25:39  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.53  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -1967,7 +1970,7 @@ void do_stat_character(Character *ch, Character *k)
                      CCGRN(ch, C_NRM), GET_STAMINA(k), GET_MAX_STAMINA(k), stamina_gain(k), CCNRM(ch, C_NRM));
 
     ch->Send( "Coins: [%9lld], Bank: [%9lld] (Total: %lld)\r\n",
-                     char_gold(k, 0, GOLD_HAND), char_gold(k, 0, GOLD_BANK), char_gold(k, 0, GOLD_ALL));
+                     k->Gold(0, GOLD_HAND), k->Gold(0, GOLD_BANK), k->Gold(0, GOLD_ALL));
 
     ch->Send(
                      "AC: [%d%+d/10], Hitroll: [%3d], Damroll: [%3d], Saving throws: [%d/%d/%d/%d/%d]\r\n",
@@ -1989,6 +1992,9 @@ void do_stat_character(Character *ch, Character *k)
     }
     else
       ch->Send( "\r\n");
+
+      if (k->pet != -1)
+      ch->Send("Owns pet vnum: %d\r\n", k->pet);
 
     ch->Send( "Default position: ");
     sprinttype((k->mob_specials.default_pos), position_types, buf2, sizeof(buf2));
@@ -2252,26 +2258,25 @@ ACMD(do_stat)
     }
     else
     {
-      CREATE(victim, Character, 1);
-      clear_char(victim);
+      victim = new Character();
       TEMP_LOAD_CHAR = TRUE;
       if (store_to_char(buf2, victim) > -1)
       {
         if (GET_LEVEL(victim) > GET_LEVEL(ch))
         {
           ch->Send("Sorry, you can't do that.\r\n");
-          free_char(victim);
+          delete (victim);
           TEMP_LOAD_CHAR = FALSE;
           return;
         }
         else
           do_stat_character(ch, victim);
-        free_char(victim);
+        delete (victim);
       }
       else
       {
         ch->Send("There is no such player.\r\n");
-        free(victim);
+        delete (victim);
         TEMP_LOAD_CHAR = FALSE;
         return;
       }
@@ -3537,13 +3542,12 @@ ACMD(do_last)
     send_to_char("There is no such player.\r\n", ch);
     return;
   }
-  CREATE(vict, Character, 1);
-  clear_char(vict);
+  vict = new Character();
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char(arg, vict) < 0)
   {
     ch->Send( "There is no such player.\r\n");
-    free(vict);
+    delete vict;
     TEMP_LOAD_CHAR = FALSE;
     return;
   }
@@ -3552,7 +3556,7 @@ ACMD(do_last)
   if ((GET_LEVEL(vict) > GET_LEVEL(ch)) && (GET_LEVEL(ch) < LVL_IMPL))
   {
     ch->Send( "You are not sufficiently godly for that!\r\n");
-    free_char(vict);
+    delete vict;
     return;
   }
   ch->Send( "[%5ld] [%2d %s] %-12s \r\nHost:%-*s \r\nLast: %-20s\r\n",
@@ -3562,7 +3566,7 @@ ACMD(do_last)
                    && *vict->player_specials->host ? vict->player_specials->
                    host : "(NOHOST)", ctime(&vict->player.time.logon));
 
-  free_char(vict);
+  delete vict;
 }
 
 
@@ -4152,19 +4156,18 @@ ACMD(do_topgold)
   TEMP_LOAD_CHAR = TRUE;
   for (j = 0; j <= top_of_p_table; j++)
   {
-    CREATE(victim, Character, 1);
-    clear_char(victim);
-
+    victim = new Character();
+    
     if (store_to_char((player_table + j)->name, victim) > -1)
     {
       if (GET_LEVEL(victim) < LVL_HERO)
         player_gold[j].amount = ((GET_GOLD(victim)+GET_BANK_GOLD(victim))/1000000);
       player_gold[j].p_id = (player_table + j)->id;
-      free_char(victim);
+      delete (victim);
     }
     else
     {
-      free(victim);
+      delete (victim);
       continue;
     }
 
@@ -4201,18 +4204,17 @@ ACMD(do_hostfind)
   TEMP_LOAD_CHAR = TRUE;
   for (j = 0; j <= top_of_p_table; j++)
   {
-    CREATE(victim, Character, 1);
-    clear_char(victim);
+    victim = new Character();
 
     if (store_to_char((player_table + j)->name, victim) > -1)
     {
       if (stristr(victim->player_specials->host, argument) != NULL)
         ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
-      free_char(victim);
+      delete (victim);
     }
     else
     {
-      free(victim);
+      delete (victim);
       continue;
     }
   }
@@ -4437,13 +4439,12 @@ ACMD(do_show)
     }
 
 
-    CREATE(vict, Character, 1);
-    clear_char(vict);
+    vict = new Character();
     TEMP_LOAD_CHAR = TRUE;
     if (store_to_char(value, vict) < 0)
     {
       ch->Send("There is no such player.\r\n");
-      free(vict);
+      delete (vict);
       TEMP_LOAD_CHAR = FALSE;
       return;
     }
@@ -4459,7 +4460,7 @@ ACMD(do_show)
                        class_abbrevs[(int) GET_CLASS(vict)]);
       ch->Send(
                        "Au: %-8lld  Bal: %-8lld  Exp: %-8lld  Align: %-5d  Lessons: %-3d\r\n",
-                       char_gold(vict, 0, GOLD_HAND), char_gold(vict, 0, GOLD_BANK),
+                       vict->Gold(0, GOLD_HAND), vict->Gold(0, GOLD_BANK),
                        GET_EXP(vict), GET_ALIGNMENT(vict),
                        GET_PRACTICES(vict));
       ch->Send(
@@ -4469,7 +4470,7 @@ ACMD(do_show)
                        (int) (vict->player.time.played / 3600),
                        (int) (vict->player.time.played / 60 % 60));
     }
-    free_char(vict);
+    delete (vict);
     break;
   case 3:
     if (!*value)
@@ -4807,6 +4808,7 @@ set_fields[] = {
                  {"mastery", LVL_IMPL, PC, MISC}, /* 77 */
                  {"rpl", LVL_GOD, PC, BINARY},
                  {"tradepoints",LVL_GOD,PC,NUMBER},
+                 {"pet", LVL_SEN, PC, NUMBER},
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -4979,10 +4981,10 @@ int perform_set(Character *ch, Character *vict, int mode,
     affect_total(vict);
     break;
   case 19:
-    char_gold(vict, RANGE(0, 1000000000) - char_gold(vict, 0, GOLD_HAND) , GOLD_HAND);
+    vict->Gold(RANGE(0, 1000000000) - vict->Gold(0, GOLD_HAND), GOLD_HAND);
     break;
   case 20:
-    char_gold(vict,RANGE(0, 1000000000) - char_gold(vict, 0, GOLD_BANK), GOLD_BANK);
+    vict->Gold(RANGE(0, 1000000000) - vict->Gold(0, GOLD_BANK), GOLD_BANK);
     break;
   case 21:
     vict->points.exp = RANGE(0, 2000000000);
@@ -5424,7 +5426,6 @@ int perform_set(Character *ch, Character *vict, int mode,
       return 0;
     }
     free_string(&IMMTITLE(vict));
-    IMMTITLE(vict) = NULL;
     if (val_arg && *val_arg)
       IMMTITLE(vict) = strdup(val_arg);
     snprintf(buf, sizeof(buf), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
@@ -5448,7 +5449,19 @@ int perform_set(Character *ch, Character *vict, int mode,
          send_to_char("That is not a number.\r\n", ch);
        return 0;
     }
+    snprintf(buf, sizeof(buf), "TradeP of %s set to: %s",GET_NAME(vict), val_arg);
     TRADEPOINTS(vict)=atoi(val_arg);
+    break;
+    case 80:
+    if(!isdigit(*val_arg)){
+       if(*val_arg=='-' || is_abbrev(val_arg, "off"))
+         vict->pet = -1;
+       else
+         *ch << "That is not a number.\r\n";
+       return 0;
+    }
+    snprintf(buf, sizeof(buf), "Pet of %s set to: %s",GET_NAME(vict), val_arg);
+   vict->pet = atoi(val_arg);
     break;
   default:
     ch->Send( "Can't set that!\r\n");
@@ -5462,11 +5475,11 @@ int perform_set(Character *ch, Character *vict, int mode,
 ACMD(do_saveall)
 {
   if (GET_LEVEL(ch) < LVL_BUILDER)
-    new_send_to_char (ch, "You are not holy enough to use this privelege.\r\n");
+    *ch << "You are not holy enough to use this privelege.\r\n";
   else
   {
     save_all();
-    ch->Send( "World files saved.\r\n");
+    *ch << "World files saved.\r\n";
   }
 }
 
@@ -5558,24 +5571,21 @@ ACMD(do_set)
   }
   else if (is_file)
   {
-    //    ch->Send( "This has been disabled as it is more trouble then it is worth.\r\n");
-    //  return;
     /* try to load the player off disk */
-    CREATE(cbuf, Character, 1);
-    clear_char(cbuf);
+    cbuf = new Character();
     if ((player_i = load_char(name, cbuf)) > -1)
     {
       if (GET_LEVEL(cbuf) >= GET_LEVEL(ch))
       {
-        send_to_char("Sorry, you can't do that.\r\n", ch);
+        *ch << "Sorry, you can't do that.\r\n";
         return;
       }
       vict = cbuf;
     }
     else
     {
-      free_char(cbuf);
-      send_to_char("There is no such player.\r\n", ch);
+      delete (cbuf);
+      *ch << "There is no such player.\r\n";
       return;
     }
   }
@@ -5598,7 +5608,7 @@ ACMD(do_set)
     }
     if (is_file)
     {
-      send_to_char("Saved in file.\r\n", ch);
+      *ch << "Saved in file.\r\n";
     }
   }
 
@@ -5705,11 +5715,10 @@ ACMD(do_objconv)
      do it one at a time, thank you very much */
   for (counter = 0; counter <= top_of_p_table; counter++)
   {
-    CREATE(victim, Character, 1);
-    clear_char(victim);
+    victim = new Character();
     if (load_char((player_table + counter)->name, victim) > -1)
       out_rent(GET_NAME(victim));
-    free_char(victim);
+    delete (victim);
     percent = (float) ((float) counter / (float) top_of_p_table);
     if (percent > .25 && flag25 == 0)
     {
@@ -6821,10 +6830,10 @@ ACMD(do_namechange)
       ch->Send( "A player by that name doesn't exist here.\r\n");
       return;
     }
-    CREATE(tch, Character, 1);
+    tch = new Character();
     if (load_char(oldname, tch) <= 0)
     {
-      free(tch);
+      delete (tch);
       log("load char error in namechange");
       return;
     }
@@ -6833,7 +6842,7 @@ ACMD(do_namechange)
       ch->Send( "Ah, Bugger off!\r\n");
       return;
     }
-    reset_char(tch);
+    tch->reset();
     read_aliases(tch);
     GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
     add_to_lookup_table(GET_IDNUM(ch), (void *)ch);

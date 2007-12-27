@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.14  2006/06/19 06:25:40  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.13  2006/05/30 09:14:20  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -582,10 +585,8 @@ SPECIAL(guild)
 
   if (!*argument)
   {
-    send_to_char
-    ("Either type: \"practice skills\" or type \"practice spells\"\r\n",
-     ch);
-    send_to_char("Otherwise try: practice <skill/spell name>\r\n", ch);
+    *ch << "Either type: \"practice skills\" or type \"practice spells\"\r\n";
+    *ch << "Otherwise try: practice <skill/spell name>\r\n";
     return (1);
   }
 
@@ -607,8 +608,7 @@ SPECIAL(guild)
 
   if (GET_PRACTICES(ch) <= 0)
   {
-    send_to_char("You do not seem to be able to practice now.\r\n",
-                 ch);
+    *ch << "You do not seem to be able to practice now.\r\n";
     return (1);
   }
   learned = IRANGE(30, (20*(TIERNUM)), 80);
@@ -638,7 +638,7 @@ SPECIAL(guild)
   }
   if (GET_SKILL(ch, skill_num) >= learned)
   {
-    send_to_char("You can't memorize that skill any further for now, come back when you remort.\r\n", ch);
+    *ch << "You can't memorize that skill any further for now, come back when you remort.\r\n";
     return (1);
   }
 
@@ -652,7 +652,7 @@ SPECIAL(guild)
   GET_PRACTICES(ch)--;
 
   if (GET_SKILL(ch, skill_num) >= learned)
-    send_to_char("You are now learned in that area.\r\n", ch);
+    *ch << "You cannot train that any further here. \r\nAlthough it may improve through use.\r\n";
 
   return (1);
 }
@@ -688,13 +688,13 @@ SPECIAL(dump)
 
   if (value)
   {
-    send_to_char("You are awarded for outstanding performance.\r\n", ch);
+    *ch << "You are awarded for outstanding performance.\r\n";
     act("$n has been awarded for being a good citizen.", TRUE, ch, 0, 0, TO_ROOM);
 
     if (GET_LEVEL(ch) < 3)
       gain_exp(ch, value);
     else
-      char_gold(ch, value, GOLD_HAND);
+      ch->Gold( value, GOLD_HAND);
   }
   return (1);
 }
@@ -822,11 +822,11 @@ void npc_steal(Character *ch, Character *victim)
   else
   {
     /* Steal some gold coins */
-    gold =  ((char_gold(victim, 0, GOLD_HAND) * number(1, 10)) / 100);
+    gold =  ((victim->Gold(0, GOLD_HAND) * number(1, 10)) / 100);
     if (gold > 0)
     {
-      char_gold(ch, gold, GOLD_HAND);
-      char_gold(victim, -gold, GOLD_HAND);
+      ch->Gold(gold, GOLD_HAND);
+      victim->Gold(-gold, GOLD_HAND);
     }
   }
 }
@@ -993,8 +993,8 @@ SPECIAL(guild_guard)
 {
   int i;
   Character *guard = (Character *) me;
-  const char *buf = "The guard humiliates you, and blocks your way.\r\n";
-  const char *buf2 = "The guard humiliates $n, and blocks $s way.";
+  const char *buf = "$N blocks every attempt you make to get past.";
+  const char *buf2 = "$N blocks every attempt $n makes to get past.";
 
   if (!IS_MOVE(cmd) || AFF_FLAGGED(guard, AFF_BLIND))
     return (FALSE);
@@ -1008,8 +1008,8 @@ SPECIAL(guild_guard)
         GET_ROOM_VNUM(IN_ROOM(ch)) == guild_info[i][1] &&
         cmd == guild_info[i][2])
     {
-      send_to_char(buf, ch);
-      act(buf2, FALSE, ch, 0, 0, TO_ROOM);
+      act(buf, FALSE, ch, 0, guard, TO_ROOM);
+      act(buf2, FALSE, ch, 0, guard, TO_ROOM);
       return (TRUE);
     }
   }
@@ -1161,7 +1161,7 @@ SPECIAL(cityguard)
 
 SPECIAL(pet_shops)
 {
-  char buf[MAX_STRING_LENGTH], pet_name[256];
+  char buf[MAX_INPUT_LENGTH], pet_name[256];
   room_rnum pet_room;
   Character *pet, *k, *tch;
   int num_of_pets = 0;
@@ -1178,16 +1178,15 @@ const char *race_name(Character *ch);
 
   if (CMD_IS("list"))
   {
-    send_to_char("To buy a pet and name it, use: \r\n", ch);
-    send_to_char("buy <pet> <the name you give it>\r\n", ch);
-    send_to_char("Available pets are:\r\n", ch);
+    *ch << "To buy a pet and name it, use: \r\n";
+    *ch << "buy <pet> <the name you give it>\r\n";
+    *ch << "Available pets are:\r\n";
     for (pet = pet_room->people; pet; pet = pet->next_in_room)
     {
       if (IS_NPC(pet))
       {
-        sprintf(buf, "%8lld - %-20s (Class: %s, Race: %s)\r\n", PET_PRICE(pet),
+        ch->Send( "%8lld - %-20s (Class: %s, Race: %s)\r\n", PET_PRICE(pet),
                 GET_NAME(pet), simple_class_name(pet), race_name(pet) );
-        send_to_char(buf, ch);
       }
     }
     return (TRUE);
@@ -1197,7 +1196,7 @@ const char *race_name(Character *ch);
 
     if (IS_NPC(ch))
     {
-      send_to_char("You are a mob: No pets for you!", ch);
+      *ch << "You are a mob: No pets for you!";
       return (TRUE);
     }
 
@@ -1205,7 +1204,7 @@ const char *race_name(Character *ch);
 
     if (!(pet = get_char_room(buf, NULL, pet_room)))
     {
-      send_to_char("There is no such pet!\r\n", ch);
+      *ch << "There is no such pet!\r\n";
       return (TRUE);
     }
     if (ch->master != NULL)
@@ -1222,43 +1221,41 @@ const char *race_name(Character *ch);
     }
     if (num_of_pets > MAX_PETS)
     {
-      send_to_char
-      ("You already have the maximum number of that kind of pet.\r\n",
-       ch);
+      *ch << "You already have the maximum number of that kind of pet.\r\n";
       return (TRUE);
     }
-    if (char_gold(ch, 0, GOLD_HAND) < PET_PRICE(pet))
+    if (ch->Gold( 0, GOLD_HAND) < PET_PRICE(pet))
     {
-      send_to_char("You don't have enough gold!\r\n", ch);
+      *ch << "You don't have enough gold!\r\n";
       return (TRUE);
     }
-    char_gold(ch, -PET_PRICE(pet), GOLD_HAND);;
+    ch->Gold( -PET_PRICE(pet), GOLD_HAND);
 
     pet = read_mobile(GET_MOB_RNUM(pet), REAL);
     GET_EXP(pet) = 0;
     SET_BIT_AR(AFF_FLAGS(pet), AFF_CHARM);
-    char_gold(pet, -GET_GOLD(pet), GOLD_HAND);
+    pet->Gold(-GET_GOLD(pet), GOLD_HAND);
 
 
     if (*pet_name)
     {
-      sprintf(buf, "%s %s", pet->player.name, pet_name);
+      snprintf(buf, sizeof(buf), "%s %s", pet->player.name, pet_name);
       /* free(pet->player.name); don't free the prototype! */
       pet->player.name = str_dup(buf);
 
-      sprintf(buf,
+      snprintf(buf, sizeof(buf), 
               "%sA small sign on a chain around the neck says 'My name is %s.\r\n",
               pet->player.description, pet_name);
       /* free(pet->player.description); don't free the prototype! */
       pet->player.description = str_dup(buf);
 
-      sprintf(buf, "%s named %s owned by %s stands here.\r\n",
+      snprintf(buf, sizeof(buf), "%s named %s owned by %s stands here.\r\n",
               pet->player.short_descr, pet_name, GET_NAME(ch));
       pet->player.long_descr = str_dup(buf);
     }
     else
     {
-      sprintf(buf, "%s owned by %s stands here.\r\n",
+      snprintf(buf, sizeof(buf), "%s owned by %s stands here.\r\n",
               pet->player.short_descr, GET_NAME(ch));
       pet->player.long_descr = str_dup(buf);
     }
@@ -1271,7 +1268,7 @@ const char *race_name(Character *ch);
     GET_GOLD(pet) = 0;
     GET_EXP(pet) = 0;
 
-    send_to_char("May you enjoy your pet.\r\n", ch);
+    *ch << "May you enjoy your pet.\r\n";
     act("$n buys $N as a pet.", FALSE, ch, 0, pet, TO_ROOM);
 
     return (1);
@@ -1294,8 +1291,7 @@ SPECIAL(bank)
   if (CMD_IS("balance"))
   {
     if (GET_BANK_GOLD(ch) > 0)
-      ch->Send( "Your current balance is %lld coins.\r\n",
-                       GET_BANK_GOLD(ch));
+      ch->Send( "Your current balance is %lld coins.\r\n",GET_BANK_GOLD(ch));
     else
       ch->Send( "You currently have no money deposited.\r\n");
     return (1);
@@ -1306,7 +1302,7 @@ SPECIAL(bank)
     {
       if (atoll(argument) <= 0)
       {
-        send_to_char("How much do you want to deposit?\r\n", ch);
+        *ch << "How much do you want to deposit?\r\n";
         return (1);
 
       }
@@ -1314,17 +1310,17 @@ SPECIAL(bank)
         amount = atoll(argument);
     }
     else
-      amount = char_gold(ch, 0, GOLD_HAND);
+      amount = ch->Gold( 0, GOLD_HAND);
 
-    if (char_gold(ch, 0, GOLD_HAND) < amount)
+    if (ch->Gold( 0, GOLD_HAND) < amount)
     {
-      send_to_char("You don't have that many coins!\r\n", ch);
+      *ch << "You don't have that many coins!\r\n";
       return (1);
     }
-    if (char_gold(ch, 0, GOLD_BANK) + amount > 100000000)
+    if (ch->Gold( 0, GOLD_BANK) + amount > 100000000)
       ch->Send( "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawl. Thankyou.\r\n");
-    char_gold(ch, -amount, GOLD_HAND);
-    char_gold(ch, amount, GOLD_BANK);
+    ch->Gold( -amount, GOLD_HAND);
+    ch->Gold( amount, GOLD_BANK);
     ch->Send( "You deposit %lld coins.\r\n", amount);
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (1);
@@ -1335,31 +1331,30 @@ SPECIAL(bank)
     {
       if ((amount = atoll(argument)) <= 0)
       {
-        send_to_char("How much do you want to withdraw?\r\n", ch);
+        *ch << "How much do you want to withdraw?\r\n";
         return (1);
       }
     }
     else
-      amount = char_gold(ch, 0, GOLD_BANK);
-    if (char_gold(ch, 0, GOLD_BANK) < amount)
+      amount = ch->Gold( 0, GOLD_BANK);
+    if (ch->Gold( 0, GOLD_BANK) < amount)
     {
-      send_to_char("You don't have that many coins deposited!\r\n",
-                   ch);
+      *ch << "You don't have that many coins deposited!\r\n";
       return (1);
     }
-    if (char_gold(ch, 0, GOLD_BANK) > 100000000)
+    if (ch->Gold( 0, GOLD_BANK) > 100000000)
     {
       ch->Send( "Because of your huge bank investment, and the untimely withdraw,\r\n"
-                       "You are charged bank fees summing to 10 percent of the amount.\r\n");
-      if ((char_gold(ch, 0, GOLD_BANK)-(amount + 1)) < (amount/10))
+                "You are charged bank fees summing to 10 percent of the amount.\r\n");
+      if ((ch->Gold( 0, GOLD_BANK)-(amount + 1)) < (amount/10))
       {
-        ch->Send( "Which you cant afford. Please withdraw a smaller amount.\r\n");
+        ch->Send( "Which you can't afford. Please withdraw a smaller amount.\r\n");
         return (1);
       }
-      char_gold(ch, -((amount/10)+1), GOLD_BANK);
+      ch->Gold( -((amount/10)+1), GOLD_BANK);
     }
-    char_gold(ch, amount, GOLD_HAND);
-    char_gold(ch, -amount, GOLD_BANK);
+    ch->Gold( amount, GOLD_HAND);
+    ch->Gold( -amount, GOLD_BANK);
     ch->Send( "You withdraw %lld coins.\r\n", amount);
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (1);
@@ -1420,7 +1415,7 @@ SPECIAL(cleric)
       {
         if (is_abbrev(buf, prices[i].name))
         {
-          if (char_gold(ch, 0, GOLD_HAND) < prices[i].price)
+          if (ch->Gold( 0, GOLD_HAND) < prices[i].price)
           {
             act("$n tells you, 'You don't have enough gold for that spell!'", FALSE, (Character *) me, 0, ch, TO_VICT);
             return TRUE;
@@ -1430,8 +1425,8 @@ SPECIAL(cleric)
 
             act("$N gives $n some money.",  FALSE, (Character *) me, 0, ch, TO_NOTVICT);
             ch->Send( "You give %s %lld coins.\r\n", GET_NAME((Character *) me), prices[i].price);
-            char_gold(ch, -prices[i].price, GOLD_HAND);
-            char_gold((Character *) me, prices[i].price, GOLD_HAND);
+            ch->Gold( -prices[i].price, GOLD_HAND);
+            ((Character *) me)->Gold(prices[i].price, GOLD_HAND);
             cast_spell((Character *) me, ch, NULL, 0, prices[i].number);
             return TRUE;
 
@@ -1498,8 +1493,7 @@ SPECIAL(cleric)
     break;
   case 10:
     /* special wacky thing, your mileage may vary */
-    act("$n utters the words, 'energizer'.", TRUE, ch, 0, vict,
-        TO_ROOM);
+    act("$n utters the words, 'energizer'.", TRUE, ch, 0, vict, TO_ROOM);
     act("You feel invigorated!", FALSE, ch, 0, vict, TO_VICT);
     alter_move(ch,
                -MIN(GET_MAX_MOVE(vict),
@@ -1524,7 +1518,7 @@ ACMD(do_recover)
   /* check to see if the character is at the altar */
   if (IN_ROOM(ch)->number != 3083)
   {
-    send_to_char("You can not do that here!\r\n", ch);
+    *ch << "You can only recover in the crypt east and down from the Recall Point!\r\n";
     return;
   }
 
@@ -1537,9 +1531,9 @@ ACMD(do_recover)
 
   amt += REMORTS(ch) * 500000;
   /* charge the character */
-  if (char_gold(ch, 0, GOLD_BANK) < amt)
+  if (ch->Gold( 0, GOLD_BANK) < amt)
   {
-    send_to_char("Your bank account can not afford this service!\r\n", ch);
+    *ch << "Your bank account can not afford this service!\r\n";
     return;
   }
   /* search the world for the corpse, if it still exists */
@@ -1570,28 +1564,15 @@ ACMD(do_recover)
 
 
     perform_meld(ch, obj);
-    /*
-    // send the message out to the character
-       send_to_char("You recover your corpse!\r\n", ch);
-
-    // perform the move 
-    obj_from_room(obj);
-    obj_to_room(obj, IN_ROOM(ch));
-
-
-    // save the character 
-    save_char(ch, NOWHERE);
-    Crash_crashsave(ch);
-    */
   }
 
   if (!found)
-    send_to_char("Your corpse can not be found. Sorry!/r/n", ch);
+    *ch << "Your corpse can not be found. Sorry!\r\n";
   else
   {
 
     ch->Send( "You are charged %lld gold for the recovery.\r\n",amt);
-    char_gold(ch, -amt, GOLD_BANK);
+    ch->Gold( -amt, GOLD_BANK);
   }
 }
 
@@ -1636,7 +1617,7 @@ SPECIAL(guard_white)
 
   if (victim != NULL)
   {
-    sprintf(buf, "%s is a %s!  How DARE you come to the Temple!!!!",
+    snprintf(buf, sizeof(buf), "%s is a %s!  How DARE you come to the Temple!!!!",
             GET_NAME(victim), crime);
     do_say(ch, buf, 0, 0);
     start_fighting(ch, victim);
@@ -1695,7 +1676,7 @@ SPECIAL(guard_black)
 
   if (victim != NULL)
   {
-    sprintf(buf, "%s is a %s!  How DARE you come to the Temple!!!!",
+    snprintf(buf, sizeof(buf), "%s is a %s!  How DARE you come to the Temple!!!!",
             GET_NAME(victim), crime);
     do_say(ch, buf, 0, 0);
     start_fighting(ch, victim);
@@ -1916,7 +1897,7 @@ SPECIAL(triples)
 
     if (!*buf || !*buf2)
     {
-      send_to_char("bet <upper|lower|triple> <amt>.\r\n", ch);
+      *ch << "bet <upper|lower|triple> <amt>.\r\n";
       return TRUE;
     }
 
@@ -1952,7 +1933,7 @@ SPECIAL(high_dice)
 
     if (!*buf)
     {
-      send_to_char("bet <amt>.\r\n", ch);
+      *ch << "bet <amt>.\r\n";
       return TRUE;
     }
 
@@ -1977,7 +1958,7 @@ SPECIAL(seven)
 
     if (!*buf || !*buf2)
     {
-      send_to_char("bet <over|under|seven> <amt>.\r\n", ch);
+      *ch << "bet <over|under|seven> <amt>.\r\n";
       return TRUE;
     }
 
@@ -2001,7 +1982,7 @@ SPECIAL(craps)
 
     if (!*buf)
     {
-      send_to_char("bet <amt>.\r\n", ch);
+      *ch << "bet <amt>.\r\n";
       return TRUE;
     }
 
@@ -2197,7 +2178,7 @@ SPECIAL(fire)
   /* can they even fire that way */
   if ((dir = search_block(arg2, dirs, FALSE)) < 0)
   {
-    send_to_char("What direction?\r\n", ch);
+    *ch << "What direction?\r\n";
     IN_ROOM(ch) = was_in;
     return (1);
   }
@@ -2205,7 +2186,7 @@ SPECIAL(fire)
   /* can't go that way */
   if (!CAN_GO(ch, dir))
   {
-    send_to_char("Something blocks the way!\r\n", ch);
+    *ch << "Something blocks the way!\r\n";
     IN_ROOM(ch) = was_in;
     return (1);
   }
@@ -2305,7 +2286,7 @@ SPECIAL(fire)
       nextroom = NULL;
   }
 
-  send_to_char("Cant find your target!\r\n", ch);
+  *ch << "Cant find your target!\r\n";
   IN_ROOM(ch) = was_in;
   return (1);
 }
@@ -2334,7 +2315,7 @@ SPECIAL(radar)
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    send_to_char("You can't see anything, you're blind!", ch);
+    *ch << "You can't see anything, you're blind!";
     return (1);
   }
 
@@ -2361,7 +2342,7 @@ SPECIAL(radar)
     maxdis = 5;
 
   IN_ROOM(ch) = was_in;
-  send_to_char("You begin watching the radar screen and see:\r\n", ch);
+  *ch << "You begin watching the radar screen and see:\r\n";
   act("$n begins watching the radar screen.", TRUE, ch, 0, 0, TO_ROOM);
 
   for (dir = 0; dir < NUM_OF_DIRS; dir++)
@@ -2398,9 +2379,7 @@ SPECIAL(radar)
     }
   }
   if (found == 0)
-    send_to_char("Nobody anywhere near you.", ch);
-  IN_ROOM(ch) = is_in;
-
+    *ch << "Nobody anywhere near you.";
   IN_ROOM(ch) = was_in;
   return (1);
 }

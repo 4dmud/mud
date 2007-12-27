@@ -2183,7 +2183,7 @@ void extract_char_final(Character *ch)
 
   /* If there's a descriptor, they're in the menu now. */
   if (IS_NPC(ch) || !ch->desc)
-    free_char(ch);
+    delete ch;
 }
 #endif
 /*

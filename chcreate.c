@@ -250,7 +250,7 @@ void con_character_creation(Descriptor *d, char *arg)
     if (GET_PFILEPOS(d->character) < 0)
       GET_PFILEPOS(d->character) =
       create_entry(GET_PC_NAME(d->character));
-    init_char(d->character);
+    d->character->init();
     save_char(d->character);
     save_player_index();
     line_sep(d);
@@ -258,11 +258,8 @@ void con_character_creation(Descriptor *d, char *arg)
   d->Output("\r\n*** PRESS RETURN: ");
     STATE(d) = CON_RMOTD;
     
-    new_mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character),
-               d->host);
+    new_mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character), d->host);
     break;
-    
-    
   }
   
 }

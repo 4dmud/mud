@@ -466,6 +466,8 @@ int write_mobile_espec(mob_vnum mvnum, Character *mob, FILE *fd)
     fprintf(fd, "Subskill: %d\n", MOB_SUBSKILL(mob));
  if (MOB_SKIN(mob) != -1)
     fprintf(fd, "Skin: %d\n", MOB_SKIN(mob));
+    if (MOB_OWNER(mob) != -1)
+    fprintf(fd, "Owner: %ld\n", MOB_OWNER(mob));
   fputs("E\n", fd);
   return TRUE;
 }

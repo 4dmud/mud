@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.40  2006/06/19 06:25:40  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.39  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -1840,6 +1843,7 @@ struct mob_special_data {
     int due_date;        /* How long until it gives birth            */
     byte tier;
     int subskill;
+    long owner; /* the owner of this beast! */
     obj_vnum skin;
     struct combine_data *join_list;
     Character *head_join;
@@ -1958,12 +1962,19 @@ public:
     int body;                   /* body positions aquired */
     byte atk;
     long pulling;
+    mob_vnum pet;
     struct travel_point_data *travel_list;
     size_t Send(string i);
     size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
+    gold_int Gold(gold_int amount, int type);
     void send_char_pos(int dam);
     int get_skill(int i);
     void appear();
+    void clear();
+    void init();
+    void reset();
+    void freeself();
+    void default_char();
     template<typename T>
     Character & operator<< (const T & i)  {
         if (this != NULL && desc != NULL) {
@@ -1981,6 +1992,9 @@ public:
 	int compute_armor_class() {
 	return points.armor < -100 ? -100 : points.armor > 100 ? 100 : points.armor;  /* -100 is lowest */
 	};
+
+	Character();
+	~Character();
 
 };
 /* ====================================================================== */

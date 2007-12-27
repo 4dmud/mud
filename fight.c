@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.44  2006/06/19 06:25:39  w4dimenscor
+ * Changed the player saved mount feature so that all players can load mounts from houses
+ *
  * Revision 1.43  2006/06/16 10:54:51  w4dimenscor
  * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
  *
@@ -2453,11 +2456,11 @@ int fe_after_damage(Character* ch, Character* vict,
                 mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
                 bonus_gold = (int)(GET_GOLD(mob_proto + mrn) * 0.25);
 
-                char_gold(ch, bonus_gold, GOLD_HAND);
+                ch->Gold(bonus_gold, GOLD_HAND);
                 if (!number(0, 200))
                     improve_sub(ch, SUB_PILLAGE, 1);
             }
-            local_gold = char_gold(vict, 0, GOLD_HAND);
+            local_gold = vict->Gold(0, GOLD_HAND);
             snprintf(local_buf, sizeof(local_buf), "%lld", local_gold);
         }
 
@@ -2471,7 +2474,7 @@ int fe_after_damage(Character* ch, Character* vict,
 
 
         if (!IS_NPC(ch)) {
-            gold_int gld = char_gold(ch, 0, GOLD_HAND);
+            gold_int gld = ch->Gold( 0, GOLD_HAND);
 
             if (PRF_FLAGGED(ch, PRF_AUTOGOLD) && local_gold > 0)
                 do_get(ch, "coin corpse", 0, 0);
@@ -2488,7 +2491,7 @@ int fe_after_damage(Character* ch, Character* vict,
             if (IS_AFFECTED(ch, AFF_GROUP) && (ch->master || ch->followers) && local_gold > 0 &&
                     PRF_FLAGGED(ch, PRF_AUTOSPLIT) &&
                     (PRF_FLAGGED(ch, PRF_AUTOLOOT) || PRF_FLAGGED(ch, PRF_AUTOGOLD)) &&
-                    gld < char_gold(ch, 0, GOLD_HAND))
+                    gld < ch->Gold( 0, GOLD_HAND))
                 do_split(ch, local_buf, 0, 0);
         }
 
@@ -4362,15 +4365,15 @@ void make_corpse(Character *ch, Character *killer) {
             }
 
         /* transfer gold */
-        if (char_gold(ch, 0, GOLD_HAND) > 0) {
+        if (ch->Gold( 0, GOLD_HAND) > 0) {
             /* following 'if' clause added to fix gold duplication loophole */
             if (IS_NPC(ch) || (!IS_NPC(ch) && ch->desc)) {
                 spill_gold(ch);
-                money = create_money(char_gold(ch, 0, GOLD_HAND));
+                money = create_money(ch->Gold( 0, GOLD_HAND));
                 SET_BIT_AR(GET_OBJ_EXTRA(money), ITEM_UNIQUE_SAVE);
                 obj_to_obj(money, corpse);
             }
-            char_gold(ch, -char_gold(ch, 0, GOLD_HAND), GOLD_HAND);
+            ch->Gold( -ch->Gold( 0, GOLD_HAND), GOLD_HAND);
         }
 
         if (!IS_NPC(ch)) {

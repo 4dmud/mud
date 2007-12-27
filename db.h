@@ -196,15 +196,11 @@ void char_to_store(Character *ch);
 int store_to_char(char *name, Character *ch);
 int load_char(char *name, Character *ch);
 void save_char(Character *ch);
-void init_char(Character *ch);
 #if USE_CREATE_CHAR
 Character *create_char(void);
 #endif
 Character *read_mobile(mob_vnum nr, int type);
 int vnum_mobile(char *searchname, Character *ch);
-void clear_char(Character *ch);
-void reset_char(Character *ch);
-void free_char(Character *ch);
 void save_player_index(void);
 
 struct obj_data *create_obj(void);
