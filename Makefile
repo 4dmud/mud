@@ -4,7 +4,7 @@
 
 # C compiler to use
 #CC = insure
-CC = gcc
+CC = gcc-3.4
 
 # Path to cxref utility
 CXREF = cxref
