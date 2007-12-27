@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.28 $
+*  $Date: 2006/08/17 12:28:31 $
+*  $Revision: 1.29 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.29  2006/08/17 12:28:31  w4dimenscor
+ * Fixed a little bug concerning brackets
+ *
  * Revision 1.28  2006/08/13 06:26:51  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -3000,6 +3003,7 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
         if (*p == '*')		/* comment */
             continue;
 
+        var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
         if (( (brac = check_braces(p)) != 0) &&
                 (!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4) || !strn_cmp("else if ", p, 8) ||
                  !strn_cmp(p, "if ", 3) || !strn_cmp("while ", p, 6) || !strn_cmp("switch ", p, 7) ||
@@ -3087,7 +3091,7 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
 
         else {
 
-            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
+//            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
 
             /** dg_script functions **/
             if (!strn_cmp(cmd, "function ", 9)) {
