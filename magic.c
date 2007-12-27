@@ -208,7 +208,7 @@ int magic_distance(Character *ch, int spellnum, int dir,
     }
 
     if (room == vroom || (dir == NOWHERE))
-        return 0;       //victim is in same room.
+        return NOWHERE;       //victim is in same room.
 
 
     for (i = 0; i < maxdis && (nextroom != NULL); i++) {

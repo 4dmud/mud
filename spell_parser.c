@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.36  2007/05/02 19:08:48  w4dimenscor
+ * Spells won't think that they are directional when they are not
+ * anymore.
+ * -- Thotter
+ *
  * Revision 1.35  2007/02/05 21:42:25  w4dimenscor
  * Fixed typo in magic fizzling to the room saying Catis instead of
  * Cati's. Hal. 02/05/07
@@ -689,6 +694,9 @@ void mag_objectmagic(Character *ch, struct obj_data *obj,
     Character *tch = NULL;//, *next_tch;
     struct obj_data *tobj = NULL;
     char arg[MAX_INPUT_LENGTH];
+
+    //Make sure that there is no spell direction set
+    GET_SPELL_DIR(ch)=NOWHERE;
 
     one_argument(argument, arg);
 
