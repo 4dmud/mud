@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.57  2006/09/23 07:06:47  w4dimenscor
+ * Checked for null values being passed to can_fight
+ *
  * Revision 1.56  2006/09/22 22:41:00  w4dimenscor
  * Added a check for numm values to assist and joined mobs
  *
@@ -743,10 +746,10 @@ void start_fighting(Character* ch, Character* vict) {
     if (!ch || !vict)
         return;
     if (RIDDEN_BY(vict))
-	victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
-	else
-	victim = vict;
-	
+        victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
+    else
+        victim = vict;
+
     if ( !victim || DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
         return;
 
@@ -767,7 +770,7 @@ void start_fighting(Character* ch, Character* vict) {
 
     if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
         affect_from_char(victim, SPELL_SWEET_DREAMS);
-        
+
     if (!can_fight(ch, victim, FALSE))
         return;
 
@@ -779,7 +782,7 @@ void start_fighting(Character* ch, Character* vict) {
             long ch_id = GET_ID(ch);
             FIGHTING(ch) = victim;
             if (GET_POS(ch) > POS_STUNNED)
-            GET_POS(ch) = POS_FIGHTING;
+                GET_POS(ch) = POS_FIGHTING;
 
             if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0) {
                 if (find_char(ch_id)) {
@@ -797,7 +800,7 @@ void start_fighting(Character* ch, Character* vict) {
         while (temp) {
             tnext = temp->next;
             if (temp->joined)
-            start_fighting(temp->joined, victim);
+                start_fighting(temp->joined, victim);
             temp = tnext;
         }
     }
@@ -891,7 +894,7 @@ int next_round(Character* ch) {
     /* check to see if there is anyone in the room fighting you however! */
     if (!victim)
         victim = ch->NextFightingMe();
-    
+
     /*to stop recursion*/
     if (!victim || !can_fight(ch, victim, FALSE)) {
         stop_fighting(ch);
@@ -1028,9 +1031,9 @@ void skill_attack(Character *ch, Character *vict, int skill, int pass) {
             GET_NEXT_SKILL(ch) = skill;
             GET_NEXT_VICTIM(ch) = GET_ID(vict);
         }
-    } else 
+    } else
         fe_after_damage(ch, vict, 0, skill);
-    
+
 }
 
 
@@ -1545,7 +1548,7 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
     int shortwep = 0;
 
     if (vict && vict->RiderHere())
-      vict = RIDDEN_BY(vict);
+        vict = RIDDEN_BY(vict);
 
     if (!can_fight(ch, vict, FALSE))
         return -1;
@@ -1717,14 +1720,14 @@ perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 :
 
 
 int melee_type_dam(Character *ch, Character *vict, int attack_chance, int weps, int second) {
-	static int randomizer = 0;
+    static int randomizer = 0;
     int dam;
     /* at least have between 0 and 3 damage */
     dam = randomizer % 3;
     randomizer++;
     if (randomizer > 1000)
-    randomizer = 2;
-    
+        randomizer = 2;
+
     if (!IS_NPC(ch)) {
         dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
         if (second) { //hitting with secondary weapon
@@ -2095,9 +2098,9 @@ int fe_deal_damage(Character* ch, Character* vict,
             //start_fighting_delay(ch, RIDDEN_BY(vict));
             ///** return 0 so stop fighting isn't called again **/
             //return 0;
-        } else 
+        } else
             return fe_solo_damage(ch, vict, dam, w_type);
-        
+
     } else if (master) {
         if (HERE(master, vict)) { /* victim isnt the master! -- find the master and whack em! */
             //stop_fighting(ch);
@@ -5178,7 +5181,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                           the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;
@@ -5265,6 +5268,8 @@ void tick_grenade(void) {
 int can_fight(Character *ch, Character *vict, int silent) {
     int ret = 1;
 
+    if (!ch || !vict)
+        return 0;
     if (IN_ROOM(ch) == NULL || IN_ROOM(vict) == NULL)
         return 0;
     if (DEAD(ch) || DEAD(vict))
