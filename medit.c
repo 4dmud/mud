@@ -345,7 +345,9 @@ void medit_save_internally(Descriptor *d) {
     mob_vnum new_vnum = OLC_NUM(d);
     Character *mob, *pmob;
 
-   
+    //Copied from parse_simple_mob.
+    OLC_MOB(d)->points.max_hit = (dice(mob_stats[GET_LEVEL(OLC_MOB(d))].hp_dice, mob_stats[GET_LEVEL(OLC_MOB(d))].hp_sides) + mob_stats[GET_LEVEL(OLC_MOB(d))].hp_bonus);
+    OLC_MOB(d)->points.hit = OLC_MOB(d)->points.max_hit;
 
     add_mobile(OLC_MOB(d), new_vnum);
 

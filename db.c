@@ -2144,6 +2144,8 @@ void parse_simple_mob(FILE * mob_f, Character *mob, int nr) {
     mob->points.hitroll = mob_stats[k].hitroll;
     mob->points.armor = mob_stats[k].ac;
 
+    // For when we are going to change this, this stuff is also done after a medit, in medit_save_internally.
+    // if you change it here, change it there too.
     /* max hit = 0 is a flag that H, M, V is xdy+z */
     mob->points.max_hit = (dice(mob_stats[k].hp_dice, mob_stats[k].hp_sides) + mob_stats[k].hp_bonus);
     mob->points.hit = mob->points.max_hit;
