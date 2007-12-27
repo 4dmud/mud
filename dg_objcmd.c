@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/08/19 01:06:10 $
-*  $Revision: 1.18 $
+*  $Date: 2007/11/14 08:25:48 $
+*  $Revision: 1.19 $
 **************************************************************************/
 
 #include "conf.h"
@@ -484,14 +484,15 @@ OCMD(do_oteleport)
 	obj_log(obj, "oteleport target is an invalid room");
     else if (!str_cmp(arg1, "all")) {
 	rm = obj_room(obj);
-	if (target == rm)
-	    obj_log(obj, "oteleport target is itself");
+	if (target == rm) {
+	    obj_log(obj, "oteleport target room is itself");
+	    return;
+	}
 	for (ch = rm->people; ch; ch = next_ch) {
-		next_ch = ch->next_in_room;
+		next_ch = ch ? ch->next_in_room : NULL;
 	    if (!valid_dg_target(ch, TRUE))
 		continue;
-	    next_ch = ch->next_in_room;
-	    if (ROOM_FLAGGED(ch->in_room, ROOM_NORECALL)) {
+	    if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NORECALL)) {
 		ch->Send("The magic fizzles out leaving you stranded.\r\n");
 		break;
 	    }
