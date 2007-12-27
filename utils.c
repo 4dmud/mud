@@ -2025,3 +2025,33 @@ int fileExists (char * fileName)
 }
 
 
+// Replace a section of a string with another.
+void ReplaceSection ( char * string, int length, char * replace )
+{
+  int repLength = (replace == NULL ? 0: strlen(replace));
+  
+     // Something to move?
+  if ( length != repLength )
+  {
+          // Make room.
+    memmove ( &string[repLength],&string[length], strlen(&string[length]) + 1 );
+  }
+     // Is there something to replace.
+  if ( repLength > 0 )
+  {
+          // Copy it in.
+    memcpy ( string, replace, repLength );
+  }
+}
+
+// Replace all occurrences of a string with another.
+void ReplaceString ( char * string, char * search, char * replace )
+{
+  char *found;
+  // Replace all occurrences.
+  if (string != NULL && search != NULL && replace != NULL)
+    while ( ( found = strstr ( string, search ) ) != NULL )
+    {
+      ReplaceSection(found, strlen(search), replace );
+    }
+}

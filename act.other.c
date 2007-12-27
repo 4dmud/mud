@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.21  2006/04/30 08:14:59  w4dimenscor
+ * added a replace string function, using it to remove html formatting from lines in the 'file' command
+ *
  * Revision 1.20  2006/04/29 07:19:48  w4dimenscor
  * changed bugs and typos to be saved in tables
  *
@@ -120,7 +123,7 @@ void improve_skill(struct char_data *ch, int skill);
 void stop_auction(int type, struct char_data *ch);
 void add_follower(struct char_data *ch, struct char_data *leader);
 void raw_kill(struct char_data *ch, struct char_data *killer);
-
+void ReplaceString ( char * string, char * search, char * replace );
 
 
 /* local functions */
@@ -1598,8 +1601,15 @@ ACMD(do_file)
   while (!feof(req_file))
   {
     cur_line++;
-    if (cur_line > (num_lines - req_lines))
+    if (cur_line > (num_lines - req_lines)) {
+      ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc");
+      ReplaceString ( line, "</td><td class='date'>", " {cw- ");
+      ReplaceString ( line, "</td><td class='room'>", " - ");
+      ReplaceString ( line, "</td><td class='comment'>", " :{cg ");
+      ReplaceString ( line, "</td></tr></table>", " {c0");
+      
       len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", line);
+    }
 
     get_line(req_file, line);
   }
