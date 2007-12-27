@@ -374,7 +374,6 @@ ACMD(do_skills)
   else
   {
     char arg[MAX_STRING_LENGTH];
-
     /* Yup, we can. Start the command line parsing */
 
     one_argument(argument, arg);
@@ -396,9 +395,13 @@ ACMD(do_skills)
     }
     else
     {
-
+      int fnum;
+      char arg1[MAX_STRING_LENGTH],*arg2;
+      arg2=arg1;
+      strcpy(arg1,arg);
+      fnum=get_number(&arg2);
       if (IS_SET(SINFO.targets, TAR_OBJ_INV))
-        if ((obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) != NULL)
+        if ((obj = get_obj_in_list_vis(ch, arg1, &fnum, ch->carrying)) != NULL)
           target = TRUE;
 
       if (!target && IS_SET(SINFO.targets, TAR_OBJ_EQUIP))
@@ -407,30 +410,31 @@ ACMD(do_skills)
           if (HAS_BODY(ch, i) && GET_EQ(ch, i)
               && isname(arg, GET_EQ(ch, i)->name))
           {
-            obj = GET_EQ(ch, i);
-            target = TRUE;
+            if(--fnum==0){
+              obj = GET_EQ(ch, i);
+              target = TRUE;
+            }
           }
       }
 
       if (!target && IS_SET(SINFO.targets, TAR_OBJ_ROOM))
         if ((obj =
-               get_obj_in_list_vis(ch, arg, NULL,
+               get_obj_in_list_vis(ch, arg1, &fnum,
                                    IN_ROOM(ch)->contents)) != NULL)
           target = TRUE;
-
       if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
-        if ((obj = get_obj_vis(ch, arg, NULL)) != NULL)
+        if ((obj = get_obj_vis(ch, arg1, &fnum)) != NULL)
           target = TRUE;
 
       if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD)
-          && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
+          && !(vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD)))
       {
         new_send_to_char(ch, "Nobody is around by that name!\r\n");
         return;
       }
       else if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM)
                && !(vict =
-                      get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
+                      get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM)))
       {
         new_send_to_char(ch, "Nobody is here by that name!\r\n");
         return;
