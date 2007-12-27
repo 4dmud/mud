@@ -142,6 +142,7 @@
 
 #include <sys/types.h> 
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 #if     (defined (STDC_HEADERS) || defined (__GNU_LIBRARY__))
 #include <stdlib.h>

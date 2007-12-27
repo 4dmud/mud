@@ -96,7 +96,8 @@ struct board_info_type board_info[NUM_OF_BOARDS] =
     {12902, 0, 0, LVL_GOD, LIB_ETC "board.seekers", 0},
     {17101, 0, 0, LVL_GOD, LIB_ETC "board.house", 0},
     {17807, 0, 0, LVL_GOD, LIB_ETC "board.hero", 0},
-    {28705, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0}
+    {28705, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0},
+    {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0}
 
 
   };
@@ -569,6 +570,14 @@ void Board_load_board(int board_type)
   FILE *fl;
   int i, len1, len2;
   char *tmp1, *tmp2;
+  
+  if (!fileExists(FILENAME(board_type))) {
+  log("Board file %s doesn't exist, creating now.", FILENAME(board_type));
+  fl = fopen(FILENAME(board_type), "wb");
+  fprintf(fl, "%d\n", 0);
+  fclose(fl);
+  chmod(FILENAME(board_type), 666);
+  }
 
   if (!(fl = fopen(FILENAME(board_type), "rb")))
   {

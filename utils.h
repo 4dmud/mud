@@ -1121,3 +1121,5 @@ int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch);
 
 
 int valid_id_num(long id);
+int fileExists (char * fileName);
+

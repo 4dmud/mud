@@ -1946,5 +1946,16 @@ size_t strlcat(char *dest, const char *src, size_t copylen)
 
 #endif /* HAVE_STRLCAT */
 
+int fileExists (char * fileName)
+{
+   struct stat buf;
+   int i = stat ( fileName, &buf );
+     if ( i == 0 )
+     {
+       return 1;
+     }
+     return 0;
+       
+}
 
 
