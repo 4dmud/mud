@@ -17,7 +17,8 @@ MYFLAGS = -Wall -Wno-sign-compare -Wunused -combine -Wformat
 # -I/usr/src/lib/libcrypt/ 
 
 #flags for profiling (see hacker.doc for more information)
-PROFILE = -fprofile-arcs
+PROFILE = 
+#-fprofile-arcs
 #gprof for profiling -pg
 
 ##############################################################################

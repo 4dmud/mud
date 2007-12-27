@@ -218,12 +218,12 @@ public:
             throw (MudException("Index out of range in DeletedByIndex"));
         return IS_SET(player_table[idx].flags, PINDEX_DELETED) ||
                IS_SET(player_table[idx].flags, PINDEX_SELFDELETE) ||
-               player_table[idx].name[0] != '\0';
+               player_table[idx].name[0] == '\0';
     }
     bool DeletedByStruct(player_index_element *idx) {
         return IS_SET(idx->flags, PINDEX_DELETED) ||
                IS_SET(idx->flags, PINDEX_SELFDELETE) ||
-               idx->name[0] != '\0';
+               idx->name[0] == '\0';
     }
     bool ValidIndex(int &idx) {
         return (idx >= 0 || idx < player_table.size());

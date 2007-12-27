@@ -588,25 +588,43 @@ int main(int argc, char **argv) {
     if (!scheck) {
         log("Clearing other memory.");
         free_bufpool();             /* comm.c */
+	log("Buf pool freed.");
         free_all_notes();           /*note.c*/
+	log("Notes freed.");
         free_social_messages();     /* act.social.c */
+	log("Socials freed.");
         pi.FreeSelf(); /* db.c */
+	log("Playerindex freed.");
         free_messages();          /* fight.c */
-
+	log("Fight messages freed.");
         clear_free_list();        /* mail.c */
+	log("clear free list - mail.");
         free_mail_index();          /* mail.c */
+	log("clear mail index.");
         free_text_files();        /* db.c */
+	log("text files freed.");
         Board_clear_all();        /* boards.c */
+	log("boards freed.");
         free(cmd_sort_info); /* act.informative.c */
+	log("commands sort info freed.");
         free_command_list();        /* act.informative.c */
+	log("command list freed");
         the_free_help();          /* db.c */
+	log("help freed.");
         Free_Invalid_List(); /* ban.c */
+	log("invalid names list freed.");
         free_ban_list();          /* ban.c*/
+	log("ban list freed.");
         free_host_list();
+	log("host cache freed.");
         free_strings(&config_info, OASIS_CFG); /* oasis_delete.c */
+	log("config freed.");
         free_vehicles();
+	log("vehicles freed.");
         free_commlist(comlist);
+	log("communication chatter freed.");
         free_mine_shafts();
+	log("mines freed.");
         if (comfile)
             fclose(comfile);
 
