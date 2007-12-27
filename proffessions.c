@@ -185,7 +185,7 @@ void list_subs_in_prof(struct char_data *ch,int pro)
     }
   }
 }
-
+#if 0
 ACMD(do_skin)
 {
   extern void crumble_obj(CHAR_DATA *ch, OBJ_DATA *obj);
@@ -263,5 +263,5 @@ ACMD(do_skin)
   return;
 
 }
-
+#endif
 

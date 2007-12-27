@@ -260,6 +260,7 @@ ACMD(do_shoot);
 ACMD(do_shutdown);
 ACMD(do_sit);
 ACMD(do_skills);
+ACMD(do_skin);
 ACMD(do_skillset);
 ACMD(do_slay);
 ACMD(do_sleep);
@@ -756,6 +757,7 @@ const struct command_info cmd_info[] =
     { "score"    , "sco"	, POS_DEAD    , do_score    , 0, 0, 0 },
     { "search"   , "sea"  , POS_STANDING, do_search   , 0, 0, 0 },
     { "skills"   , "skills"  , POS_DEAD, do_prac_spells   , 0, 0, 0 },
+{ "skin"   , "skin"  , POS_STANDING, do_skin   , 0, 0, 0 },
     { "spells"   , "spells"  , POS_DEAD, do_prac_skills   , 0, 0, 0 },
     { "sell"     , "sel"	, POS_STANDING, do_not_here , 0, 0, 0 },
     { "send"     , "sen"	, POS_SLEEPING, do_send     , LVL_IMMORT, 0, WIZ_QUEST_GRP },

@@ -200,7 +200,7 @@ void assign_skills(void)
 
   skillo(SKILL_RETREAT, "retreat", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 2, 12);
 
-  skillo(SKILL_FILET, "filet", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, NO_TIER, 14);
+  skillo(SKILL_FILET, "filet", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 14);
 
   skillo(SKILL_SLIP, "slip", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND,3, 9);
 
@@ -2738,8 +2738,7 @@ ASKILL(skill_filet)
   if (prob > total_chance(ch, SKILL_FILET))
   {
     send_to_char
-    ("As you begin to filet the corpse, you make a mistake and destroy it.\r\n",
-     ch);
+    ("As you begin to filet the corpse, you make a mistake and destroy it.\r\n", ch);
     extract_obj(obj);
     return 0;
   }
@@ -2759,8 +2758,6 @@ ASKILL(skill_filet)
     new_send_to_char(ch, "Your hands turn numb and you fumble.\r\n");
   return 0;
 }
-
-
 
 ASKILL(skill_forage)
 {

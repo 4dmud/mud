@@ -2355,6 +2355,11 @@ void interpret_espec(const char *keyword, const char *value, int i, int nr)
     RANGE(-1, TOP_SUB_DEFINE);
     mob_proto[i].mob_specials.subskill = num_arg;
   }
+  CASE("Skin")
+  {
+    RANGE(-1, 999999);
+    mob_proto[i].mob_specials.skin = num_arg;
+  }
 
   if (!matched)
   {
@@ -2777,6 +2782,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
     ungetc(letter, mob_f);
   }
 
+ 
   mob_proto[i].aff_abils = mob_proto[i].real_abils;
 
   for (j = 0; j < NUM_WEARS; j++)
@@ -6500,6 +6506,7 @@ void clear_object(struct obj_data *obj)
   OBJ_SAT_IN_BY(obj) = NULL;
 obj->idents = NULL;
   obj->obj_flags.obj_innate = 0;
+  obj->skin = NOTHING;
 }
 
 

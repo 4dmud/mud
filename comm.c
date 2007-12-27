@@ -5252,8 +5252,9 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
   d->mxp = TRUE;  /* turn it on now */
   //mccp_off(d);
   write_to_output( d, "%s", start_mxp_str);
+write_to_output(d, "%s", MXPTAG("support"));
   write_to_output( d, "%s", MXPMODE(6) );   // permanent secure mode 
-
+  write_to_output( d, "%s", MXPTAG("FRAME Name=\"Map\" Left=\"-16c\" Top=\"0\" Width=\"16c\" Height=\"15c\")"));
   write_to_output( d, "%s", MXPTAG("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"   FLAG=RoomExit"));
   write_to_output( d, "%s", MXPTAG("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\"  FLAG=RoomExit"));
   write_to_output( d, "%s", MXPTAG("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "

@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.22  2005/09/24 07:11:51  w4dimenscor
+ * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
+ *
  * Revision 1.21  2005/09/16 10:20:10  w4dimenscor
  * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
  *
@@ -370,7 +373,7 @@ int spell_size_dice(struct char_data *ch)
   else if (AFF_FLAGGED(ch, AFF_MIND_WATER)) sdice += 2;
   else if (AFF_FLAGGED(ch, AFF_MIND_ICE))   sdice += 3;
 
-if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  sdice += 1;
+  if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  sdice += 1;
 
   if (IS_NPC(ch))
     return (GET_LEVEL(ch)/3) + sdice;
@@ -420,7 +423,7 @@ int spell_num_dice(struct char_data *ch)
   else if (AFF_FLAGGED(ch, AFF_MIND_WATER)) ndice += 2;
   else if (AFF_FLAGGED(ch, AFF_MIND_ICE))   ndice += 2;
 
-if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  ndice += 1;
+  if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  ndice += 1;
 
   if (IS_NPC(ch))
     return (GET_LEVEL(ch)/2) + ndice;
@@ -453,9 +456,9 @@ if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  ndice += 1;
     break;
 
   }
-      if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-      ndice += 2;
-    
+  if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
+    ndice += 2;
+
 
   return MAX(0, ((int)ndice));
 }
@@ -517,7 +520,7 @@ int size_dice_wep(struct char_data *ch, short dual)
     if (GET_CLASS(ch) == CLASS_WARRIOR || GET_CLASS(ch) == CLASS_HUNTER)
     {
       add += (GET_DEX(ch) >= 22);
-      
+
       add += (GET_ADD(ch) >  50);
     }
 
@@ -584,7 +587,7 @@ int num_dice_wep(struct char_data *ch, short dual)
     }
     add += (GET_DEX(ch) >= 22);
     add += (GET_CON(ch) >= 22);
-    
+
     add += (GET_DEX(ch) >= 18);
     add += (GET_STR(ch) >= 22);
     /*affects*/
@@ -899,9 +902,9 @@ EVENTFUNC(fight_event)
     if (event_obj)
       free(event_obj);
 
-    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch))) 
-  if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch))) 
-      FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch));
+    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch)))
+      if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)))
+        FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch));
 
     if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch), FALSE) && GET_POS(ch) > POS_STUNNED)
     {
@@ -975,11 +978,11 @@ int calc_fight_speed(struct char_data* ch)
   float to_ret =  (speed_update(ch));
   if (IS_NPC(ch))
     to_ret += (number(GET_LEVEL(ch), GET_LEVEL(ch) * 5));
-    else if (total_chance(ch, SKILL_MELEE) > number(0, 101))
-    {
-      if (!number(0, 10))
-        improve_skill(ch, SKILL_MELEE);
-    }
+  else if (total_chance(ch, SKILL_MELEE) > number(0, 101))
+  {
+    if (!number(0, 10))
+      improve_skill(ch, SKILL_MELEE);
+  }
   if (!IS_NPC(ch))
     return (int)IRANGE(-1000.0, to_ret, TOP_SPEED_VALUE);
   else
@@ -2292,7 +2295,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     {
       partial = ((dam * 3)/4);
       //if (damage(ch, RIDING(vict), partial, w_type) == -1)
-       // return -1;
+      // return -1;
     }
     else
       partial = dam;
@@ -4517,6 +4520,10 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
   {
     corpse = create_obj();
     corpse->name = strdup("corpse");
+    if (IS_NPC(ch))
+      corpse->skin = MOB_SKIN(ch);
+    else
+      corpse->skin = NOTHING;
 
     if (corpse_mod == 0)
       snprintf(buf2, sizeof(buf2), "The corpse of %s is lying here.", GET_NAME(ch));
@@ -5412,7 +5419,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                              				   the grenade */
+                                                                                                                                                                                                                                        				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {

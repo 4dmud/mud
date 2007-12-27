@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.20  2005/09/24 07:11:51  w4dimenscor
+ * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
+ *
  * Revision 1.19  2005/08/19 08:51:14  w4dimenscor
  * fixed the variables not working
  *
@@ -3556,7 +3559,7 @@ C_FUNC(pull_object)
   room_rnum rm;
   int dir = 0;
   obj = find_obj(d->character->loader);
-  d->character->loader = -1;
+  d->character->pulling = -1;
   if (!obj || !HERE(d->character, obj))
   {
     write_to_output(d, "It isn't here any longer.\r\n");
@@ -3659,7 +3662,7 @@ ACMD(do_pull)
     else
       new_send_to_char(ch, "\r\n");
     new_send_to_char(ch, "Please type a direction:");
-    ch->loader = GET_ID(obj);
+    ch->pulling = GET_ID(obj);
     line_input(ch->desc, argument, pull_object, NULL);
   }
   /* for now only pull pin will work and must be wielding a grenade */
@@ -4347,4 +4350,50 @@ int race_speed(struct char_data *ch)
     break;
   }
 
+}
+
+
+
+ACMD(do_skin)
+{
+  OBJ_DATA *skin = NULL, *obj = NULL;
+  char arg[MAX_INPUT_LENGTH];
+skip_spaces(&argument);
+
+  if (!*arg)
+  {
+    send_to_char("What do you want to filet?\r\n", ch);
+    return;
+  }
+
+  if (!(obj = get_obj_in_list_vis(ch, argument, NULL, IN_ROOM(ch)->contents)))
+  {
+    new_send_to_char(ch, "There is nothing like that here. Try again.\r\n");
+    return;
+  }
+
+  if (!IS_OBJ_STAT(obj, ITEM_NPC_CORPSE))
+  {
+    new_send_to_char(ch, "The skin from that would fall apart too fast.\r\n");
+return;
+  }
+  if (use_stamina( ch, 50) < 0)
+  {
+    new_send_to_char(ch, "You are far too exausted!");
+    return;
+  }
+  
+
+  /* we've got an obj that is a mob corpse and can be food */
+  if ((skin = read_object(obj->skin, VIRTUAL)) != NULL)
+  {
+    send_to_char
+    ("You skillfully slice the skin from the corpse and pick it up.\r\n",
+     ch);
+    act("$n skillfully slices the skin from from the corpse and picks it up.\r\n", FALSE, ch, 0, 0, TO_ROOM);
+    obj_to_char(skin, ch);
+    extract_obj(obj);
+  }
+  else
+    new_send_to_char(ch, "Your hands turn numb and you fumble.\r\n");
 }

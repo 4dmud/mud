@@ -41,7 +41,7 @@ void improve_skill(struct char_data *ch, int skill);
 void make_focus(struct char_data *ch, int type, struct obj_data *o);
 int set_task(struct char_data *ch, int task);
 
-    void weather_change(int zon);
+void weather_change(int zon);
 /*local*/
 
 
@@ -62,6 +62,8 @@ ACTION(thing_lumberjack)
   //const char *to_vict = NULL;
   const char *to_char = NULL;
   const char *to_room = NULL;
+  obj_vnum lognum = -1;
+int i;
 
   struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
 
@@ -149,18 +151,84 @@ ACTION(thing_lumberjack)
       to_room = "With a crackle of broken twigs and an earthshattering BOOM! The tree hits the ground.";
       to_char = "With a crackle of broken twigs and an earthshattering BOOM! The tree hits the ground.";
       *num = 0;
-      if ((object = read_object(22387, VIRTUAL)) == NULL)
+      /*
+       [52750] a heavy pine log                         
+       17. [52751] a heavy oak log                          
+       18. [52752] a heavy willow log                       
+       19. [52753] a dogwood log                            
+       20. [52754] a heavy Ironwood log                     
+       21. [52755] a heavy fir log                          
+       22. [52756] a heavy maple log                        
+       23. [52757] a heavy elder log                        
+       24. [52758] a heavy elm log                          
+       25. [52759] a heavy beech log                        
+       26. [52760] a heavy chestnut log                     
+       27. [52761] a heavy spindleberry log                 
+       28. [52762] a heavy ash log                          
+       29. [52763] a heavy cypress log                      
+       30. [52764] a heavy juniper log                      
+       31. [52765] a heavy larch log                        
+       32. [52766] a heavy yew log                          
+       33. [52767] a heavy aspen log                        
+       34. [52768] a heavy alder log                        
+       35. [52769] a heavy birch log                        
+       
+       81. [52730] the pine tree                            
+       82. [52731] the oak tree                             
+       83. [52732] the willow tree                          
+       84. [52733] the dogwood tree                         
+       85. [52734] the ironwood tree                        
+       86. [52735] the fir tree                             
+       87. [52736] the maple tree                           
+       88. [52737] the elder tree                           
+       89. [52738] the elm tree                             
+       90. [52739] the beech tree                           
+       91. [52740] the chestnut tree                        
+       92. [52741] the Spindleberry tree                    
+       93. [52742] the Ash                                  
+       94. [52743] the cypress tree                         
+       95. [52744] the juniper tree                         
+       96. [52745] the larch tree                           
+       97. [52746] the yew tree                             
+       98. [52747] the Aspen tree                           
+       99. [52748] the alder tree                           
+      100. [52749] the birch tree  
+      */
+      if (GET_OBJ_VAL(obj, 4) > 0 && real_object(GET_OBJ_VAL(obj, 4)) != NOTHING) {
+lognum = GET_OBJ_VAL(obj, 4);
+}
+      if (GET_OBJ_VNUM(obj) >= 52730 && GET_OBJ_VNUM(obj) <= 52749)
+      {
+        lognum = GET_OBJ_VNUM(obj) + 20;
+      }
+      else if (GET_OBJ_VNUM(obj) == NOTHING)
+      {
+        lognum = 52750 + GET_OBJ_VAL(obj, 2);
+      }
+      else
       {
         new_send_to_char(ch, "The tree disolves into sawdust.\r\n");
-
-      }
-      if (obj != NULL)
+        return time;
+      } 
+if (real_object(lognum) == NOTHING) {
+new_send_to_char(ch, "The tree disolves into sawdust.\r\n");
+        return time;
+}
+      
+      
+if (GET_OBJ_VAL(obj, 5) <= 0)
+i = 1;
+else
+i = GET_OBJ_VAL(obj, 5);
+for (;i>0;i--) 
+if ((object = read_object(lognum, VIRTUAL)) != NULL)
+      obj_to_room(object, IN_ROOM(ch));
+      
+if (obj != NULL)
       {
         extract_obj(obj);
         obj = NULL;
       }
-      obj_to_room(object, IN_ROOM(ch));
-
 
     }
   }
@@ -1286,7 +1354,7 @@ ASUB(sub_clown)
     return SUB_UNDEFINED;
   }
 
-  
+
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
     new_send_to_char(ch, "You stop juggling.\r\n");

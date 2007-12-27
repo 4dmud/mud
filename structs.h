@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.21  2005/09/24 07:11:51  w4dimenscor
+ * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
+ *
  * Revision 1.20  2005/09/16 10:20:10  w4dimenscor
  * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
  *
@@ -1347,6 +1350,7 @@ struct obj_data
   struct char_data *sitting_here;	/* Who is sitting in it (null if none)   */
   obj_vnum was_vnum;  /* object is child of object proto with that vnum */
   long owner;
+obj_vnum skin; /* for if it is a corpse */
   struct travel_point_data *travel_list;
   struct ident_list *idents;
 };
@@ -1430,6 +1434,12 @@ struct room_mine_data
   int tool;
 };
 
+struct room_ores {
+obj_vnum ore;
+int chance;
+struct room_ores *next;
+};
+
 /* ================== Memory Structure for room ======================= */
 struct room_data
 {
@@ -1458,6 +1468,7 @@ struct room_data
   struct char_data *people;	/* List of NPC / PC in room             */
 
   struct room_affected_type *affects;
+  struct room_ores *ores;
 };
 /* ==================================================================== */
 
@@ -1797,9 +1808,9 @@ struct mob_special_data
   int due_date;		/* How long until it gives birth            */
   byte tier;
   int subskill;
+  obj_vnum skin;
   struct combine_data *join_list;
   struct char_data *head_join;
-
 };
 
 
@@ -1913,6 +1924,7 @@ struct char_data
   int sweep_damage;
   int body;                   /* body positions aquired */
   byte atk;
+  long pulling;
   struct travel_point_data *travel_list;
 
 };

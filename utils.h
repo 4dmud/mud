@@ -712,6 +712,7 @@ void make_wholist(void);
 #define DUE_DATE(ch)		((ch)->mob_specials.due_date)
 #define MOB_TIER(ch)		((ch)->mob_specials.tier)
 #define MOB_SUBSKILL(ch)	((ch)->mob_specials.subskill)
+#define MOB_SKIN(ch)		((ch)->mob_specials.skin)
 
 #define GET_DEFAULT_POS(ch)	((ch)->mob_specials.default_pos)
 #define MEMORY(ch)		((ch)->mob_specials.memory)

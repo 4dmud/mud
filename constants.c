@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.12  2005/09/24 07:11:51  w4dimenscor
+ * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
+ *
  * Revision 1.11  2005/08/28 10:00:54  w4dimenscor
  * added RPL flag, RPL note group
  *
@@ -127,7 +130,8 @@ const char *potion_names[] =
     "cloudy blue",
     "glowing red",
     "sparkling white",
-    "incandescent blue"
+    "incandescent blue",
+"\n"
   };
 
 const char *tree_names[] =

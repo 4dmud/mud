@@ -53,7 +53,7 @@ void assign_mob_stats()
     //Damroll
     s[5] = MAX(1, (i*0.3) + (i*0.3));
     s[6] = MAX(2, (i*0.25) + (i*0.3));
-    s[7] = m_powf(i, (i*0.004)+1.32);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+    s[7] = m_powf(i, (i*0.004)+1.31);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
     s[8] =  (i * i * i * 15) + 200; /* exp */
     s[9] = (i * i * i * 1.4); /* gold */
@@ -464,6 +464,8 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "Tier: %d\n", MOB_TIER(mob));
   if (MOB_SUBSKILL(mob) != SUB_UNDEFINED)
     fprintf(fd, "Subskill: %d\n", MOB_SUBSKILL(mob));
+ if (MOB_SKIN(mob) != -1)
+    fprintf(fd, "Skin: %d\n", MOB_SKIN(mob));
   fputs("E\n", fd);
   return TRUE;
 }

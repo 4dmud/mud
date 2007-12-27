@@ -339,6 +339,7 @@ void init_mobile(struct char_data *mob)
   GET_CLASS(mob) = CLASS_NORMAL;
   MOB_TIER(mob) = 0;
   MOB_SUBSKILL(mob) = TYPE_UNDEFINED;
+  MOB_SKIN(mob) = TYPE_UNDEFINED;
 
 
   mob->real_abils.str = mob->real_abils.intel = mob->real_abils.wis = 11;
@@ -554,6 +555,15 @@ void medit_disp_mob_race(struct descriptor_data *d)
 
   write_to_output(d,"Enter race number : ");
 }
+void medit_disp_mob_skin(struct descriptor_data *d)
+{
+  obj_vnum skin = MOB_SKIN(OLC_MOB(d));
+
+  get_char_colors(d->character);
+  write_to_output(d, "When mob is skinned it will currently load: %d (%s)\r\n", skin ,  real_object(skin) != NOTHING ? "exists" : "doesn't exist yet");
+
+  write_to_output(d,"Enter skin vnum : ");
+}
 
 void medit_disp_mob_joins(struct descriptor_data *d)
 {
@@ -747,7 +757,7 @@ void medit_disp_menu(struct descriptor_data *d)
                   "%sN%s) Segments  : %s%s\r\n"
                   "%sR%s) Mob Race  : %s%-9s      %sV%s) Mob Class : %s%s\r\n"
                   "%sT%s) Tier      : %s%-9d      %sO%s) Subskill  : %s%s\r\n"
-                  "%sU%s) Charisma  : %s%-9d\r\n"
+                  "%sU%s) Charisma  : %s%-9d      %sO%s) Skin Vnum : %s%d\r\n"
 #if CONFIG_OASIS_MPROG
                   "%sP%s) Mob Progs : %s%s\r\n"
 #endif
@@ -765,6 +775,7 @@ void medit_disp_menu(struct descriptor_data *d)
                   grn, nrm, cyn, MOB_TIER(mob),
                   grn, nrm, cyn, sub_name(MOB_SUBSKILL(mob)),
                   grn, nrm, cyn, GET_CHA(mob),
+                  grn, nrm, cyn, MOB_SKIN(mob),
 #if CONFIG_OASIS_MPROG
                   grn, nrm, cyn, (OLC_MPROGL(d) ? "Set." : "Not Set."),
 #endif
@@ -964,6 +975,11 @@ void medit_parse(struct descriptor_data *d, char *arg)
       OLC_MODE(d) = MEDIT_SUBSKILL;
       medit_disp_mob_subskill(d);
       return;
+    case 'w':
+    case 'W':
+      OLC_MODE(d) = MEDIT_SKIN;
+      medit_disp_mob_skin(d);
+      return;
     case 't':
     case 'T':
       OLC_MODE(d) = MEDIT_TIER;
@@ -1071,29 +1087,33 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_NPC_FLAGS:
     if ((i = atoi(arg)) <= 0)
       break;
-    else if (i <= NUM_MOB_FLAGS) {
-    switch (i) {
-    case MOB_AGGRESSIVE:
-    if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGRESSIVE)) {
-    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
-    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);
-    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_GOOD);
-    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_EVIL);    
-    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_NEUTRAL);
-    }
-    break;
-    case MOB_QUEST:
-    if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_QUEST)) {
-    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
-    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);  
-    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_INFRAVISION);
-    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_DETECT_INVIS);
-    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_SENSE_LIFE);  
-    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_NOTRACK);  
-    }
-    }
-      TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), (i - 1));
+    else if (i <= NUM_MOB_FLAGS)
+    {
+      switch (i)
+      {
+      case MOB_AGGRESSIVE:
+        if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGRESSIVE))
+        {
+          SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
+          SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);
+          REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_GOOD);
+          REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_EVIL);
+          REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_NEUTRAL);
+        }
+        break;
+      case MOB_QUEST:
+        if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_QUEST))
+        {
+          SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
+          SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);
+          SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_INFRAVISION);
+          SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_DETECT_INVIS);
+          SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_SENSE_LIFE);
+          SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_NOTRACK);
+        }
       }
+      TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), (i - 1));
+    }
     medit_disp_mob_flags(d);
     return;
     /*-------------------------------------------------------------------*/
@@ -1261,10 +1281,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     break;
 
   case MEDIT_GOLD:
-  if (GET_MRACE(OLC_MOB(d)) == MOB_RACE_ANIMAL || GET_MRACE(OLC_MOB(d)) == MOB_RACE_EXOTIC)
+    if (GET_MRACE(OLC_MOB(d)) == MOB_RACE_ANIMAL || GET_MRACE(OLC_MOB(d)) == MOB_RACE_EXOTIC)
       GET_GOLD(OLC_MOB(d)) = 0;
-      else
-    GET_GOLD(OLC_MOB(d)) = LIMIT(i, 0, MAX_MOB_GOLD);
+    else
+      GET_GOLD(OLC_MOB(d)) = LIMIT(i, 0, MAX_MOB_GOLD);
     break;
 
   case MEDIT_POS:
@@ -1318,6 +1338,9 @@ void medit_parse(struct descriptor_data *d, char *arg)
     break;
   case MEDIT_SUBSKILL:
     MOB_SUBSKILL(OLC_MOB(d)) = IRANGE(-1, atoi(arg), TOP_SUB_DEFINE-1);
+    break;
+  case MEDIT_SKIN:
+    MOB_SKIN(OLC_MOB(d)) = IRANGE(-1, atoi(arg), 999999-1);
     break;
   case MEDIT_SEGMENTS:
     switch (*arg)

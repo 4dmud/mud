@@ -1304,6 +1304,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
 {
   char tbuf[MAX_STRING_LENGTH];
   struct room_data *rm, *view_room;
+void update_mxp_map(struct char_data *ch);
   *tbuf = '\0';
   char buf[MAX_INPUT_LENGTH];
   if (VEHICLE_ROOM == NULL)
@@ -1391,6 +1392,9 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
   list_char_to_char(view_room->people, ch);
   new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
+  
+if (ch->desc && ch->desc->mxp)
+update_mxp_map(ch);
 
   if ( KILL_ALL_ENABLED && PRF_FLAGGED(ch, PRF_AGGRO) )
   {

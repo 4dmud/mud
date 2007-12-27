@@ -35,6 +35,7 @@ extern struct board_info_type board_info[];
 
 /*------------------------------------------------------------------------*/
 extern zone_rnum real_zone_by_thing(room_vnum vznum);
+void oedit_disp_val5_menu(struct descriptor_data *d);
 /*
  * Handy macros.
  */
@@ -604,8 +605,11 @@ void oedit_disp_val1_menu(struct descriptor_data *d)
   case ITEM_LIGHTSABRE_HILT:
     oedit_disp_dubsing(d);
     break;
-    case ITEM_SPACEBIKE:
+  case ITEM_SPACEBIKE:
     oedit_disp_val3_menu(d);
+    break;
+  case ITEM_TREE:
+    oedit_disp_val5_menu(d);
     break;
   default:
     oedit_disp_menu(d);
@@ -725,7 +729,7 @@ void oedit_disp_val3_menu(struct descriptor_data *d)
   case ITEM_PORTAL_HURDLE:
     write_to_output(d, "Timer, -1 for infinite : ");
     break;
-    case ITEM_SPACEBIKE:
+  case ITEM_SPACEBIKE:
     write_to_output(d, "It costs 1 fuel per room in space to move.\r\nCurrent Fuel:");
     break;
   default:
@@ -777,18 +781,23 @@ void oedit_disp_val5_menu(struct descriptor_data *d)
   OLC_MODE(d) = OEDIT_VALUE_5;
   switch (GET_OBJ_TYPE(OLC_OBJ(d)))
   {
-  case ITEM_WEAPON:
-  case ITEM_LIGHTSABRE_HILT:
-    write_to_output(d,
-                    "Give a length in cm between 10 and 200\r\n"
-                    "Short is easyer to handle for anyone (about 30 for a knife)\r\n"
-                    "Long is more damage and harder to handle (about 150 for a long sword)\r\n"
-                    "\r\nEnter weapon length : ");
+  case ITEM_TREE:
+    write_to_output(d, "Give the VNUM of the log that this tree loads (or -1 for a default log): ");
     break;
-  case ITEM_DRINKCON:
-  case ITEM_FOUNTAIN:
-  case ITEM_FOOD:
-    oedit_disp_spells_menu(d);
+  default:
+    oedit_disp_menu(d);
+  }
+}
+/*
+ * Object value #6
+ */
+void oedit_disp_val6_menu(struct descriptor_data *d)
+{
+  OLC_MODE(d) = OEDIT_VALUE_6;
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
+  case ITEM_TREE:
+    write_to_output(d, "Give the number of logs this tree could produce : ");
     break;
   default:
     oedit_disp_menu(d);
@@ -1206,8 +1215,8 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     }
     return;			/*
-    				 * end of OEDIT_MAIN_MENU 
-    				 */
+        				 * end of OEDIT_MAIN_MENU 
+        				 */
   case OLC_SCRIPT_EDIT:
     if (dg_script_edit_parse(d, arg)) return;
     break;
@@ -1481,6 +1490,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     number = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d)))
     {
+case ITEM_TREE:
+
+      min_val = NOTHING;
+      max_val = 999999;
+break;
     case ITEM_DRINKCON:
     case ITEM_FOUNTAIN:
     case ITEM_FOOD:
@@ -1504,6 +1518,22 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 4) = LIMIT(number, min_val, max_val);
+    oedit_disp_val6_menu(d);
+    return;
+case OEDIT_VALUE_6:
+    number = atoi(arg);
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
+    case ITEM_TREE:
+      min_val = 1;
+      max_val = 5;
+      break;
+    default:
+      min_val = -32000;
+      max_val = 32000;
+      break;
+    }
+    GET_OBJ_VAL(OLC_OBJ(d), 5) = LIMIT(number, min_val, max_val);
     oedit_disp_menu(d);
     return;
   case OEDIT_PROMPT_APPLY:
