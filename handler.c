@@ -45,6 +45,8 @@ void update_char_objects(Character *ch);
 
 
 /* external functions */
+void unhitch_item(struct obj_data *obj);
+void unhitch_mob(Character *ch);
 void check_timer(obj_data *obj);
 OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj);
 void purge_qic(obj_rnum rnum);
@@ -1398,1221 +1400,1224 @@ void extract_pending_objects(void) {
     obj_extractions_pending = 0;
 }
 void extract_object_final(OBJ_DATA *obj) {
-#else
-/* Extract an object from the world */
-void extract_obj(struct obj_data *obj) {
-#endif
-    struct obj_data *temp;
-    Character *ch, *next = NULL;
-    struct obj_data *tobj, *onext, *tnext;
-    Character *tch;
-    int chance = 20;
-    room_rnum room = NULL, from, target;
+    #else
+    /* Extract an object from the world */
+    void extract_obj(struct obj_data *obj) {
+        #endif
+        struct obj_data *temp;
+        Character *ch, *next = NULL;
+        struct obj_data *tobj, *onext, *tnext;
+        Character *tch;
+        int chance = 20;
+        room_rnum room = NULL, from, target;
 
-    if (!obj) {
-    log("Null pointer given to extract object.");
-        return;
-    }
-    for (tobj = dead_obj; tobj; tobj = tobj->next) {
-    if (tobj == obj) {
-            log("Object %s atempted to be added to dead list twice!", obj->short_description);
+        if (!obj) {
+            log("Null pointer given to extract object.");
             return;
         }
-    }
-    if (GET_ID(obj) == 0) {
-    log("extracting object that hasn't been initilised");
-    }
-    if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE)) {
-    save_corpses();
-    }
-    if (obj->in_locker)
-    item_from_locker(obj->in_locker, obj);
-
-
-    /* Normal extract_obj code */
-    if (obj->worn_by != NULL)
-        if (unequip_char(obj->worn_by, obj->worn_on) != obj) {
-            log("SYSERR: Inconsistent worn_by and worn_on pointers!!");
+        for (tobj = dead_obj; tobj; tobj = tobj->next) {
+            if (tobj == obj) {
+                log("Object %s atempted to be added to dead list twice!", obj->short_description);
                 return;
             }
-    if ((room = IN_ROOM(obj)) != NULL)
-    obj_from_room(obj);
-            else if (obj->carried_by) {
-                obj_from_char(obj);
-                } else if (obj->in_obj)
-                obj_from_obj(obj);
+        }
+        if (GET_ID(obj) == 0) {
+            log("extracting object that hasn't been initilised");
+        }
+        if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE)) {
+            save_corpses();
+        }
+        if (obj->in_locker)
+            item_from_locker(obj->in_locker, obj);
 
-                if (GET_OBJ_RNUM(obj) != NOTHING)
-                    (obj_index[GET_OBJ_RNUM(obj)].number)--;
+        unhitch_item(obj);
+        
+        /* Normal extract_obj code */
+        if (obj->worn_by != NULL)
+            if (unequip_char(obj->worn_by, obj->worn_on) != obj) {
+                log("SYSERR: Inconsistent worn_by and worn_on pointers!!");
+                return;
+            }
+        if ((room = IN_ROOM(obj)) != NULL)
+            obj_from_room(obj);
+        else if (obj->carried_by) {
+            obj_from_char(obj);
+        } else if (obj->in_obj)
+            obj_from_obj(obj);
+
+        if (GET_OBJ_RNUM(obj) != NOTHING)
+            (obj_index[GET_OBJ_RNUM(obj)].number)--;
 
 
-                    /* Get rid of the contents of the object, as well. */
-                    for (tobj = obj->contains; tobj; tobj = onext) {
-                        onext = tobj->next_content;
-                        //obj_from_obj(tobj);
-                        extract_obj(tobj);
-                            //tobj->in_obj = NULL;
-                        }
+        /* Get rid of the contents of the object, as well. */
+        for (tobj = obj->contains; tobj; tobj = onext) {
+            onext = tobj->next_content;
+            //obj_from_obj(tobj);
+            extract_obj(tobj);
+            //tobj->in_obj = NULL;
+        }
 
-    /* Purge a vehicle and leave the contents in the room -- Kalten */
-    if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE && room != NULL) {
-    if (room->number != NOWHERE) {
-            if (GET_OBJ_VAL(obj, 0) == 0) {
-                new_mudlog(NRM, LVL_SEN, FALSE, "Vehicle %d has no room set.", GET_OBJ_VNUM(obj));
+        /* Purge a vehicle and leave the contents in the room -- Kalten */
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE && room != NULL) {
+            if (room->number != NOWHERE) {
+                if (GET_OBJ_VAL(obj, 0) == 0) {
+                    new_mudlog(NRM, LVL_SEN, FALSE, "Vehicle %d has no room set.", GET_OBJ_VNUM(obj));
 
-            } else {
-                target = room;   // the room the vehicle is in
-                from = real_room(GET_OBJ_VAL(obj, 0));    // the room where the mobs/objs are in
+                } else {
+                    target = room;   // the room the vehicle is in
+                    from = real_room(GET_OBJ_VAL(obj, 0));    // the room where the mobs/objs are in
 
-                // First, get all the people out of the room
-                if (from != NULL) {
-                    if(target == from)
-                        new_mudlog(NRM, LVL_GOD, FALSE, "Vehicle %d's inside room is the same as its outside room!", GET_OBJ_VNUM(obj));
-                    else {
-                        while (from->people != NULL) {
-                            tch = from->people;
-                            if (tch != NULL) {
-                                if (damage(tch, tch, dice(10, 20), TYPE_UNDEFINED) >= 0) {
-                                    move_char_to(tch, target);
+                    // First, get all the people out of the room
+                    if (from != NULL) {
+                        if(target == from)
+                            new_mudlog(NRM, LVL_GOD, FALSE, "Vehicle %d's inside room is the same as its outside room!", GET_OBJ_VNUM(obj));
+                        else {
+                            while (from->people != NULL) {
+                                tch = from->people;
+                                if (tch != NULL) {
+                                    if (damage(tch, tch, dice(10, 20), TYPE_UNDEFINED) >= 0) {
+                                        move_char_to(tch, target);
+                                    }
+                                }
+                            }
+
+                            // Now get all the objects from the room
+                            for (tobj = from->contents; tobj; tobj = tnext) {
+                                tnext = tobj->next_content;
+                                obj_from_room(tobj);
+                                if (GET_OBJ_TYPE(tobj) != ITEM_V_CONTROLS &&
+                                        GET_OBJ_TYPE(tobj) != ITEM_V_HATCH &&
+                                        GET_OBJ_TYPE(tobj) != ITEM_V_WINDOW) {
+                                    if (chance < number(1, 100)) {
+                                        obj_to_room(tobj, target);
+                                    } else {
+                                        extract_obj(tobj);
+                                    }
                                 }
                             }
                         }
-                        
-                        // Now get all the objects from the room
-                        for (tobj = from->contents; tobj; tobj = tnext) {
-                            tnext = tobj->next_content;
-                            obj_from_room(tobj);
-                            if (GET_OBJ_TYPE(tobj) != ITEM_V_CONTROLS &&
-                                    GET_OBJ_TYPE(tobj) != ITEM_V_HATCH &&
-                                    GET_OBJ_TYPE(tobj) != ITEM_V_WINDOW) {
-                                if (chance < number(1, 100)) {
-                                    obj_to_room(tobj, target);
-                                } else {
-                                    extract_obj(tobj);
-                                }
-                            }
-                        }
+                        send_to_room(target, "The ship bursts at the seams from the powerful strike.\r\n");
                     }
-                    send_to_room(target, "The ship bursts at the seams from the powerful strike.\r\n");
                 }
             }
         }
-    }
 
         /* cancel message updates */
-    if (GET_TIMER_EVENT(obj)) {
-        event_cancel(GET_TIMER_EVENT(obj));
-        GET_TIMER_EVENT(obj) = NULL;
-    }
+        if (GET_TIMER_EVENT(obj)) {
+            event_cancel(GET_TIMER_EVENT(obj));
+            GET_TIMER_EVENT(obj) = NULL;
+        }
 
-    free_travel_points(TRAVEL_LIST(obj));
-    TRAVEL_LIST(obj) = NULL;
+        free_travel_points(TRAVEL_LIST(obj));
+        TRAVEL_LIST(obj) = NULL;
 
 
-    for (ch = OBJ_SAT_IN_BY(obj); ch; ch = next) {
+        for (ch = OBJ_SAT_IN_BY(obj); ch; ch = next) {
 
-    if (ch) {
-            next = NEXT_SITTING(ch);
-            SITTING(ch) = NULL;
-            NEXT_SITTING(ch) = NULL;
-        } else
-            next = NULL;
-    }
-    OBJ_SAT_IN_BY(obj) = NULL;
+            if (ch) {
+                next = NEXT_SITTING(ch);
+                SITTING(ch) = NULL;
+                NEXT_SITTING(ch) = NULL;
+            } else
+                next = NULL;
+        }
+        OBJ_SAT_IN_BY(obj) = NULL;
 
-    if (SCRIPT(obj))
-    extract_script(obj, OBJ_TRIGGER);
+        if (SCRIPT(obj))
+            extract_script(obj, OBJ_TRIGGER);
 
-    if (GET_OBJ_RNUM(obj) == NOTHING || obj->proto_script != obj_proto[GET_OBJ_RNUM(obj)].proto_script)
-        free_proto_script(obj, OBJ_TRIGGER);
+        if (GET_OBJ_RNUM(obj) == NOTHING || obj->proto_script != obj_proto[GET_OBJ_RNUM(obj)].proto_script)
+            free_proto_script(obj, OBJ_TRIGGER);
 
         if ((GET_OBJ_TYPE(obj) == ITEM_TREE) && (GET_OBJ_VNUM(obj) == NOTHING)) {
             tree_total--;
         }
 
-    if (GET_OBJ_RNUM(obj) != NOTHING && obj_index[GET_OBJ_RNUM(obj)].qic) {
-    new_mudlog(CMP, LVL_SEN, FALSE, "%s purged", obj->short_description);
-        purge_qic(GET_OBJ_RNUM(obj));
+        if (GET_OBJ_RNUM(obj) != NOTHING && obj_index[GET_OBJ_RNUM(obj)].qic) {
+            new_mudlog(CMP, LVL_SEN, FALSE, "%s purged", obj->short_description);
+            purge_qic(GET_OBJ_RNUM(obj));
+        }
+        REMOVE_FROM_LIST(obj, object_list, next);
+        obj->next = NULL;
+        obj->carried_by = NULL;
+        obj->next_content = NULL;
+        #if 0
+
+        free_obj(obj, TRUE);
+        obj = NULL;
+        #else
+        /**
+        possibly change this and the extract char to reuse the memory
+        only if can be certain that nothing else points to it
+        - mord dec-04
+        **/
+        obj_data_to_pool(obj);
+        #endif
     }
-    REMOVE_FROM_LIST(obj, object_list, next);
-    obj->next = NULL;
-    obj->carried_by = NULL;
-    obj->next_content = NULL;
-    #if 0
 
-    free_obj(obj, TRUE);
-    obj = NULL;
-    #else
-    /**
-    possibly change this and the extract char to reuse the memory
-    only if can be certain that nothing else points to it
-    - mord dec-04
-    **/
-    obj_data_to_pool(obj);
-    #endif
-}
+    void crumble_obj(Character *ch, struct obj_data *obj) {
+        struct obj_data *loop;
+        int index;
 
-void crumble_obj(Character *ch, struct obj_data *obj) {
-    struct obj_data *loop;
-    int index;
+        if (IN_ROOM(obj) != NULL)
+            if (ROOM_FLAGGED(IN_ROOM(obj), ROOM_HOUSE))
+                SET_BIT_AR(IN_ROOM(obj)->room_flags, ROOM_HOUSE_CRASH);
 
-    if (IN_ROOM(obj) != NULL)
-        if (ROOM_FLAGGED(IN_ROOM(obj), ROOM_HOUSE))
-            SET_BIT_AR(IN_ROOM(obj)->room_flags, ROOM_HOUSE_CRASH);
+        if (GET_OBJ_TYPE(obj) == ITEM_PORTAL) {  /* If it is a portal */
+            if (obj->carried_by == NULL && IN_ROOM(obj) != NULL) {
+                act("A glowing portal fades from existence.",
+                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
+                act("A glowing portal fades from existence.",
+                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
+            } else if (obj->carried_by) {
+                obj_from_char(obj);
+            }
+            extract_obj(obj);
 
-    if (GET_OBJ_TYPE(obj) == ITEM_PORTAL) {  /* If it is a portal */
-        if (obj->carried_by == NULL && IN_ROOM(obj) != NULL) {
-            act("A glowing portal fades from existence.",
-                TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
-            act("A glowing portal fades from existence.",
-                TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
-        } else if (obj->carried_by) {
-            obj_from_char(obj);
+        } else if (IN_ROOM(obj) != NULL) {  /* In a room */
+            if (IN_ROOM(obj)->people) {
+                act("A quivering horde of maggots consumes $p.",
+                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
+                act("A quivering horde of maggots consumes $p.",
+                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
+            }
+            for (loop = obj->contains; loop; loop = obj->contains) {
+                obj_from_obj(loop);
+                obj_to_room(loop, IN_ROOM(obj));
+            }
+
+            obj_from_room(obj);
+
+        } else if (obj->in_locker) {
+            item_from_locker(obj->in_locker, obj);
+        } else if (!obj->in_obj && obj->carried_by) {  /* Worn or inventory */
+
+            for (loop = obj->contains; loop; loop = obj->contains) {
+                obj_from_obj(loop);
+                obj_to_char(loop, ch);
+            }
+            if (!obj->carried_by) {     /* Equipped */
+                for (index = 0; index < NUM_WEARS; index++)
+                    if (GET_EQ(ch, index) == obj) {
+                        obj = unequip_char(ch, index);
+                        act("$p decays in your hands.", FALSE, ch, obj, 0,              TO_CHAR);
+                        act("$p decays in $n's hands.", FALSE, ch, obj, 0,              TO_ROOM);
+                    }
+            } else {
+                act("$p crumbles into dust.", FALSE, (obj->carried_by), obj, 0, TO_CHAR);
+                obj_from_char(obj);
+            }
+        } else if (obj->in_obj) {            /* In an object */
+            for (loop = obj->contains; loop; loop = obj->contains) {
+                obj_from_obj(loop);
+                obj_to_obj(loop, obj->in_obj);
+            }
+            obj_from_obj(obj);
         }
         extract_obj(obj);
-
-    } else if (IN_ROOM(obj) != NULL) {  /* In a room */
-        if (IN_ROOM(obj)->people) {
-            act("A quivering horde of maggots consumes $p.",
-                TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
-            act("A quivering horde of maggots consumes $p.",
-                TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
-        }
-        for (loop = obj->contains; loop; loop = obj->contains) {
-            obj_from_obj(loop);
-            obj_to_room(loop, IN_ROOM(obj));
-        }
-
-        obj_from_room(obj);
-
-    } else if (obj->in_locker) {
-        item_from_locker(obj->in_locker, obj);
-    } else if (!obj->in_obj && obj->carried_by) {  /* Worn or inventory */
-
-        for (loop = obj->contains; loop; loop = obj->contains) {
-            obj_from_obj(loop);
-            obj_to_char(loop, ch);
-        }
-        if (!obj->carried_by) {     /* Equipped */
-            for (index = 0; index < NUM_WEARS; index++)
-                if (GET_EQ(ch, index) == obj) {
-                    obj = unequip_char(ch, index);
-                    act("$p decays in your hands.", FALSE, ch, obj, 0,              TO_CHAR);
-                    act("$p decays in $n's hands.", FALSE, ch, obj, 0,              TO_ROOM);
-                }
-        } else {
-            act("$p crumbles into dust.", FALSE, (obj->carried_by), obj, 0, TO_CHAR);
-            obj_from_char(obj);
-        }
-    } else if (obj->in_obj) {            /* In an object */
-        for (loop = obj->contains; loop; loop = obj->contains) {
-            obj_from_obj(loop);
-            obj_to_obj(loop, obj->in_obj);
-        }
-        obj_from_obj(obj);
     }
-    extract_obj(obj);
-}
 
 
-void update_object(Character *ch, struct obj_data *obj, int use, time_t timenow) {
+    void update_object(Character *ch, struct obj_data *obj, int use, time_t timenow) {
 
-    if (GET_OBJ_TIMER(obj) == -1)
-        return;
-    // log("(update_obj.1) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-    /* dont update objects with a timer trigger */
-
-    // log("(update_obj.2) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-    if (obj->next_content)
-        update_object(ch, obj->next_content, use, timenow);
-    // log("(update_obj.3) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-    if (obj->contains)
-        update_object(ch, obj->contains, use, timenow);
-    // log("(update_obj.4) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-
-    if (timenow <= GET_OBJ_EXPIRE(obj)) {
-        if (timer_otrigger(obj) == -1)
+        if (GET_OBJ_TIMER(obj) == -1)
             return;
+        // log("(update_obj.1) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
+        /* dont update objects with a timer trigger */
 
-        crumble_obj(ch, obj);
+        // log("(update_obj.2) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
+        if (obj->next_content)
+            update_object(ch, obj->next_content, use, timenow);
+        // log("(update_obj.3) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
+        if (obj->contains)
+            update_object(ch, obj->contains, use, timenow);
+        // log("(update_obj.4) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
+
+        if (timenow <= GET_OBJ_EXPIRE(obj)) {
+            if (timer_otrigger(obj) == -1)
+                return;
+
+            crumble_obj(ch, obj);
+        }
+        // log("(update_obj.6) obj: %s, timer: %d", obj->name, GET_OBJ_TIMER(obj));
     }
-    // log("(update_obj.6) obj: %s, timer: %d", obj->name, GET_OBJ_TIMER(obj));
-}
 
 
-void update_char_objects(Character *ch) {
-    int i;
+    void update_char_objects(Character *ch) {
+        int i;
 
-    if (IN_ROOM(ch) != NULL && GET_EQ(ch, WEAR_LIGHT) != NULL)
-        if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
-            if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2) > 0) {
-                i = --GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2);
-                if (i == 1) {
-                    send_to_char("Your light begins to flicker and fade.\r\n", ch);
-                    act("$n's light begins to flicker and fade.", FALSE,ch, 0, 0, TO_ROOM);
-                } else if (i == 0) {
-                    send_to_char("Your light sputters out and dies.\r\n", ch);
-                    act("$n's light sputters out and dies.", FALSE, ch, 0, 0, TO_ROOM);
-                    IN_ROOM(ch)->light--;
+        if (IN_ROOM(ch) != NULL && GET_EQ(ch, WEAR_LIGHT) != NULL)
+            if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
+                if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2) > 0) {
+                    i = --GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2);
+                    if (i == 1) {
+                        send_to_char("Your light begins to flicker and fade.\r\n", ch);
+                        act("$n's light begins to flicker and fade.", FALSE,ch, 0, 0, TO_ROOM);
+                    } else if (i == 0) {
+                        send_to_char("Your light sputters out and dies.\r\n", ch);
+                        act("$n's light sputters out and dies.", FALSE, ch, 0, 0, TO_ROOM);
+                        IN_ROOM(ch)->light--;
+                    }
                 }
-            }
-    #if 0
-    /* this is just doubling up the full object scan done in point update */
-    for (i = 0; i < NUM_WEARS; i++)
-        if (GET_EQ(ch, i))
-            update_object(ch, GET_EQ(ch, i), 1);
+        #if 0
+        /* this is just doubling up the full object scan done in point update */
+        for (i = 0; i < NUM_WEARS; i++)
+            if (GET_EQ(ch, i))
+                update_object(ch, GET_EQ(ch, i), 1);
 
-    if (ch->carrying)
-        update_object(ch, ch->carrying, 0);
-    #endif
-}
-
-void eq_to_room(Character *ch) {
-    OBJ_DATA *obj;
-    int i;
-    /* transfer objects to room, if any */
-    while (ch->carrying) {
-        obj = ch->carrying;
-        if (obj_from_char(obj) == 0)
-            extract_obj(obj);
-        if (IN_ROOM(ch) == NULL)
-            extract_obj(obj);
-        else
-            obj_to_room(obj, IN_ROOM(ch));
+        if (ch->carrying)
+            update_object(ch, ch->carrying, 0);
+        #endif
     }
 
-    /* transfer equipment to room, if any */
-    for (i = 0; i < NUM_WEARS; i++)
-        if (GET_EQ(ch, i)) {
-            obj = unequip_char(ch, i);
+    void eq_to_room(Character *ch) {
+        OBJ_DATA *obj;
+        int i;
+        /* transfer objects to room, if any */
+        while (ch->carrying) {
+            obj = ch->carrying;
+            if (obj_from_char(obj) == 0)
+                extract_obj(obj);
             if (IN_ROOM(ch) == NULL)
                 extract_obj(obj);
             else
                 obj_to_room(obj, IN_ROOM(ch));
         }
-}
 
-void death_room(Character *ch) {
-    struct hunter_data *hunt = NULL, *hnext;
-
-
-    if (IS_NPC(ch)) {
-        extract_char(ch);
-        return;
-    }
-
-    ch->Send("{cYAs your last breath passes, time rolls back to just before you died\r\n"
-             "and you find yourself transfered to a temple of healing.{c0\r\n");
-
-    GET_HIT(ch) = 3;
-
-    if (RIDING(ch) || RIDDEN_BY(ch))
-        dismount_char(ch);
-
-    stop_fusion(ch);
-
-    /** leave people grouped when they die **/
-    /*if (ch->followers || ch->master)
-     die_follower(ch);*/
-
-    /*ends fight event*/
-    if (FIGHTING(ch))
-        halt_fighting(ch);
-    if (SITTING(ch))
-        char_from_chair(ch);
-
-    if (ch->hitched)
-        unhitch_mob(ch);
-
-    /* cancel message updates */
-    if (GET_MESSAGE_EVENT(ch)) {
-        event_cancel(GET_MESSAGE_EVENT(ch));
-        GET_MESSAGE_EVENT(ch) = NULL;
-    }
-    GET_MSG_RUN(ch) = 0;
-    /* cancel the task */
-    stop_task(ch);
-    remove_hunter(ch);
-
-
-    /* remove any pending event for/from this character */
-    clean_events2(ch);
-
-    /* we can't forget the hunters either... */
-    for (hunt = hunter_list; hunt; hunt = hnext) {
-        hnext = hunt->next;
-        if (!hunt->hunter)
-            continue;
-        if (HUNTING(hunt->hunter) != ch)
-            continue;
-
-        forget(hunt->hunter, ch);
-        forget(ch, hunt->hunter);
-        remove_hunter(hunt->hunter);
-
-    }
-    move_char_to(ch, real_room(1205));
-    GET_WAIT_STATE(ch) = 2 RL_SEC;
-    ch->affect_total();
-    ch->check_regen_rates();
-    ch->save();
-    LOOK(ch);
-
-}
-void free_hunter_list(void) {
-
-    struct hunter_data *hunt, *hnext;
-    /* we can't forget the hunters either... */
-    for (hunt = hunter_list; hunt; hunt = hnext) {
-        hnext = hunt->next;
-
-        remove_hunter(hunt->hunter);
-    }
-    hunter_list = NULL;
-}
-
-#if 1
-/* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char_final(Character *ch) {
-
-    Descriptor *d = NULL;
-    struct hunter_data *hunt = NULL, *hnext;
-    int i;
-    if (!ch)
-        return;
-    if (IN_ROOM(ch) == NULL) {
-        log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
-        ALERT_1;
-        abort();
-    }
-
-    /* Forget snooping, if applicable */
-    if (ch->desc) {
-        if (ch->desc->snooping) {
-            ch->desc->snooping->snoop_by = NULL;
-            ch->desc->snooping = NULL;
-        }
-        if (ch->desc->snoop_by) {
-            ch->desc->snoop_by->Output("Your victim is no longer among us.\r\n");
-            ch->desc->snoop_by->snooping = NULL;
-            ch->desc->snoop_by = NULL;
-        }
-    }
-    /*
-     * We're booting the character of someone who has switched so first we
-     * need to stuff them back into their own body.  This will set ch->desc
-     * we're checking below this loop to the proper value.
-     */
-    if (!IS_NPC(ch) && !ch->desc) {
-        for (d = descriptor_list; d; d = d->next)
-            if (d->original == ch) {
-                do_return(d->character, NULL, 0, 0);
-                break;
+        /* transfer equipment to room, if any */
+        for (i = 0; i < NUM_WEARS; i++)
+            if (GET_EQ(ch, i)) {
+                obj = unequip_char(ch, i);
+                if (IN_ROOM(ch) == NULL)
+                    extract_obj(obj);
+                else
+                    obj_to_room(obj, IN_ROOM(ch));
             }
     }
 
-    if (ch->desc) {
+    void death_room(Character *ch) {
+        struct hunter_data *hunt = NULL, *hnext;
+
+
+        if (IS_NPC(ch)) {
+            extract_char(ch);
+            return;
+        }
+
+        ch->Send("{cYAs your last breath passes, time rolls back to just before you died\r\n"
+                 "and you find yourself transfered to a temple of healing.{c0\r\n");
+
+        GET_HIT(ch) = 3;
+
+        if (RIDING(ch) || RIDDEN_BY(ch))
+            dismount_char(ch);
+
+        stop_fusion(ch);
+
+        /** leave people grouped when they die **/
+        /*if (ch->followers || ch->master)
+         die_follower(ch);*/
+
+        /*ends fight event*/
+        if (FIGHTING(ch))
+            halt_fighting(ch);
+        if (SITTING(ch))
+            char_from_chair(ch);
+
+        if (ch->hitched)
+            unhitch_mob(ch);
+
+        /* cancel message updates */
+        if (GET_MESSAGE_EVENT(ch)) {
+            event_cancel(GET_MESSAGE_EVENT(ch));
+            GET_MESSAGE_EVENT(ch) = NULL;
+        }
+        GET_MSG_RUN(ch) = 0;
+        /* cancel the task */
+        stop_task(ch);
+        remove_hunter(ch);
+
+
+        /* remove any pending event for/from this character */
+        clean_events2(ch);
+
+        /* we can't forget the hunters either... */
+        for (hunt = hunter_list; hunt; hunt = hnext) {
+            hnext = hunt->next;
+            if (!hunt->hunter)
+                continue;
+            if (HUNTING(hunt->hunter) != ch)
+                continue;
+
+            forget(hunt->hunter, ch);
+            forget(ch, hunt->hunter);
+            remove_hunter(hunt->hunter);
+
+        }
+        move_char_to(ch, real_room(1205));
+        GET_WAIT_STATE(ch) = 2 RL_SEC;
+        ch->affect_total();
+        ch->check_regen_rates();
+        ch->save();
+        LOOK(ch);
+
+    }
+    void free_hunter_list(void) {
+
+        struct hunter_data *hunt, *hnext;
+        /* we can't forget the hunters either... */
+        for (hunt = hunter_list; hunt; hunt = hnext) {
+            hnext = hunt->next;
+
+            remove_hunter(hunt->hunter);
+        }
+        hunter_list = NULL;
+    }
+
+    #if 1
+    /* Extract a ch completely from the world, and leave his stuff behind */
+    void extract_char_final(Character *ch) {
+
+        Descriptor *d = NULL;
+        struct hunter_data *hunt = NULL, *hnext;
+        int i;
+        if (!ch)
+            return;
+        if (IN_ROOM(ch) == NULL) {
+            log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
+            ALERT_1;
+            abort();
+        }
+
+        /* Forget snooping, if applicable */
+        if (ch->desc) {
+            if (ch->desc->snooping) {
+                ch->desc->snooping->snoop_by = NULL;
+                ch->desc->snooping = NULL;
+            }
+            if (ch->desc->snoop_by) {
+                ch->desc->snoop_by->Output("Your victim is no longer among us.\r\n");
+                ch->desc->snoop_by->snooping = NULL;
+                ch->desc->snoop_by = NULL;
+            }
+        }
         /*
-         * This time we're extracting the body someone has switched into
-         * (not the body of someone switching as above) so we need to put
-         * the switcher back to their own body.
-         *
-         * If this body is not possessed, the owner won't have a
-         * body after the removal so dump them to the main menu.
+         * We're booting the character of someone who has switched so first we
+         * need to stuff them back into their own body.  This will set ch->desc
+         * we're checking below this loop to the proper value.
          */
-        if (ch->desc->original)
-            do_return(ch, NULL, 0, 0);
-        else {
+        if (!IS_NPC(ch) && !ch->desc) {
+            for (d = descriptor_list; d; d = d->next)
+                if (d->original == ch) {
+                    do_return(d->character, NULL, 0, 0);
+                    break;
+                }
+        }
+
+        if (ch->desc) {
             /*
-             * Now we boot anybody trying to log in with the same character, to
-             * help guard against duping.  CON_DISCONNECT is used to close a
-             * descriptor without extracting the d->character associated with it,
-             * for being link-dead, so we want CON_CLOSE to clean everything up.
-             * If we're here, we know it's a player so no IS_NPC check required.
+             * This time we're extracting the body someone has switched into
+             * (not the body of someone switching as above) so we need to put
+             * the switcher back to their own body.
+             *
+             * If this body is not possessed, the owner won't have a
+             * body after the removal so dump them to the main menu.
              */
-            for (d = descriptor_list; d; d = d->next) {
-                if (d == ch->desc)
-                    continue;
-                if (d->character  && GET_ACC(ch) == GET_ACC(d->character))
-                    STATE(d) = CON_CLOSE;
+            if (ch->desc->original)
+                do_return(ch, NULL, 0, 0);
+            else {
+                /*
+                 * Now we boot anybody trying to log in with the same character, to
+                 * help guard against duping.  CON_DISCONNECT is used to close a
+                 * descriptor without extracting the d->character associated with it,
+                 * for being link-dead, so we want CON_CLOSE to clean everything up.
+                 * If we're here, we know it's a player so no IS_NPC check required.
+                 */
+                for (d = descriptor_list; d; d = d->next) {
+                    if (d == ch->desc)
+                        continue;
+                    if (d->character  && GET_ACC(ch) == GET_ACC(d->character))
+                        STATE(d) = CON_CLOSE;
+                }
+                STATE(ch->desc) = CON_MENU;
+                ch->desc->Output("%s", MENU);
             }
-            STATE(ch->desc) = CON_MENU;
-            ch->desc->Output("%s", MENU);
         }
-    }
 
-    /*ends fight event*/
+        /*ends fight event*/
 
-    halt_fighting(ch);
-    if (SITTING(ch))
-        char_from_chair(ch);
+        halt_fighting(ch);
+        if (SITTING(ch))
+            char_from_chair(ch);
 
-    if (RIDING(ch) || RIDDEN_BY(ch))
-        dismount_char(ch);
+        if (RIDING(ch) || RIDDEN_BY(ch))
+            dismount_char(ch);
 
-    stop_fusion(ch);
-
-    die_link(ch);
-
-    if (ch->followers || ch->master)
-        die_follower(ch);
-
-    eq_to_room(ch);
-
-    /* remove the locker memory*/
-    extract_all_in_list(LOCKER(ch));
-    LOCKER(ch) = NULL;
-    if (GET_FIGHT_EVENT(ch)) {
-        event_cancel(GET_FIGHT_EVENT(ch));
-        GET_FIGHT_EVENT(ch) = NULL;
-    }
-    /* cancel point updates */
-    for (i = 0; i < 4; i++)
-        if (GET_POINTS_EVENT(ch, i)) {
-            event_cancel(GET_POINTS_EVENT(ch, i));
-            GET_POINTS_EVENT(ch, i) = NULL;
-        }
-    /* cancel message updates */
-    if (GET_MESSAGE_EVENT(ch)) {
-        event_cancel(GET_MESSAGE_EVENT(ch));
-        GET_MESSAGE_EVENT(ch) = NULL;
-    }
-    GET_MSG_RUN(ch) = 0;
-    /* cancel the task */
-    stop_task(ch);
-    if (SCRIPT(ch))
-        extract_script(ch, MOB_TRIGGER);
-    if (!IS_NPC(ch)) {
-        void free_alias(struct alias_data *a);
-        struct alias_data *a;
-        while ((a = GET_ALIASES(ch)) != NULL) {
-            GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
-            free_alias(a);
-        }
-    }
-    remove_hunter(ch);
-
-    if (ch->hitched)
         unhitch_mob(ch);
 
-    /* we can't forget the hunters either... */
-    for (hunt = hunter_list; hunt; hunt = hnext) {
-        hnext = hunt->next;
+        stop_fusion(ch);
 
-        if (!hunt->hunter)
-            continue;
-        if (HUNTING(hunt->hunter) != ch)
-            continue;
+        die_link(ch);
 
-        //
-        forget(hunt->hunter, ch);
-        forget(ch, hunt->hunter);
-        remove_hunter(hunt->hunter);
-        //    HUNTING(hunt->hunter) = NULL;
+        if (ch->followers || ch->master)
+            die_follower(ch);
 
-    }
+        eq_to_room(ch);
 
-    /* remove any pending event for/from this character */
-    clean_events2(ch);
-
-    char_from_room(ch);
-    if (IS_NPC(ch)) {
-        if (GET_MOB_VNUM(ch) != NOBODY && !ch->proto)    /* prototyped */
-            GetMobIndex(GET_MOB_VNUM(ch))->number--;
-        clearMemory(ch);
+        /* remove the locker memory*/
+        extract_all_in_list(LOCKER(ch));
+        LOCKER(ch) = NULL;
+        if (GET_FIGHT_EVENT(ch)) {
+            event_cancel(GET_FIGHT_EVENT(ch));
+            GET_FIGHT_EVENT(ch) = NULL;
+        }
+        /* cancel point updates */
+        for (i = 0; i < 4; i++)
+            if (GET_POINTS_EVENT(ch, i)) {
+                event_cancel(GET_POINTS_EVENT(ch, i));
+                GET_POINTS_EVENT(ch, i) = NULL;
+            }
+        /* cancel message updates */
+        if (GET_MESSAGE_EVENT(ch)) {
+            event_cancel(GET_MESSAGE_EVENT(ch));
+            GET_MESSAGE_EVENT(ch) = NULL;
+        }
+        GET_MSG_RUN(ch) = 0;
+        /* cancel the task */
+        stop_task(ch);
         if (SCRIPT(ch))
             extract_script(ch, MOB_TRIGGER);
-        //    if (ch->proto || !MobProtoExists(GET_MOB_VNUM(ch)) || ch->proto_script != GetMobProto(GET_MOB_VNUM(ch))->proto_script)
-        //     free_proto_script(ch, MOB_TRIGGER);
-        if (SCRIPT_MEM(ch))
-            extract_script_mem(SCRIPT_MEM(ch));
-    } else {
-        ch->save();
-    }
+        if (!IS_NPC(ch)) {
+            void free_alias(struct alias_data *a);
+            struct alias_data *a;
+            while ((a = GET_ALIASES(ch)) != NULL) {
+                GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
+                free_alias(a);
+            }
+        }
+        remove_hunter(ch);
 
-    /* If there's a descriptor, they're in the menu now. */
-    if (IS_NPC(ch) || !ch->desc)
-        delete ch;
-}
-#endif
-/*
- * Q: Why do we do this?
- * A: Because trying to iterate over the character
- *    list with 'ch = ch->next' does bad things if
- *    the current character happens to die. The
- *    trivial workaround of 'vict = next_vict'
- *    doesn't work if the _next_ person in the list
- *    gets killed, for example, by an area spell.
- *
- * Q: Why do we leave them on the character_list?
- * A: Because code doing 'vict = vict->next' would
- *    get really confused otherwise.
- 
- put all the files back 
- except the files from the world directory
- exept files taht already exist that are older then the ones in the tar
- 
- 
- */
-#if 1
-void extract_char(Character *ch) {
-    if (DEAD(ch)) {
-        if (IN_ROOM(ch))
-            log("Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM(ch), GET_NAME(ch), GET_ROOM_VNUM(IN_ROOM(ch)));
-        else
-            log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
-        return;
-    }
-    if (GET_ID(ch) > 0)
-        removeFromChLookupTable(GET_ID(ch));
-    if (IS_NPC(ch)) {
-        SET_BIT_AR(MOB_FLAGS(ch), MOB_NOTDEADYET);
-        extract_linked_mob(ch);
-    } else
-        SET_BIT_AR(PLR_FLAGS(ch), PLR_NOTDEADYET);
+        if (ch->hitched)
+            unhitch_mob(ch);
 
-    extractions_pending++;
-}
-#endif
+        /* we can't forget the hunters either... */
+        for (hunt = hunter_list; hunt; hunt = hnext) {
+            hnext = hunt->next;
 
-/*
- * I'm not particularly pleased with the MOB/PLR
- * hoops that have to be jumped through but it
- * hardly calls for a completely new variable.
- * Ideally it would be its own list, but that
- * would change the '->next' pointer, potentially
- * confusing some code. Ugh. -gg 3/15/2001
- *
- * NOTE: This doesn't handle recursive extractions.
- */
-void extract_pending_chars(void) {
-    Character *vict, *next_vict, *prev_vict;
+            if (!hunt->hunter)
+                continue;
+            if (HUNTING(hunt->hunter) != ch)
+                continue;
 
-    if (extractions_pending < 0)
-        log("SYSERR: Negative (%d) extractions pending.",
-            extractions_pending);
+            //
+            forget(hunt->hunter, ch);
+            forget(ch, hunt->hunter);
+            remove_hunter(hunt->hunter);
+            //    HUNTING(hunt->hunter) = NULL;
 
-    for (vict = character_list, prev_vict = NULL;
-            vict && extractions_pending; vict = next_vict) {
-        next_vict = vict->next;
-
-        if (MOB_FLAGGED(vict, MOB_NOTDEADYET))
-            REMOVE_BIT_AR(MOB_FLAGS(vict), MOB_NOTDEADYET);
-        else if (PLR_FLAGGED(vict, PLR_NOTDEADYET))
-            REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_NOTDEADYET);
-        else {
-            /* Last non-free'd character to continue chain from. */
-            prev_vict = vict;
-            continue;
         }
 
-        extract_char_final(vict);
-        extractions_pending--;
+        /* remove any pending event for/from this character */
+        clean_events2(ch);
 
-        if (prev_vict)
-            prev_vict->next = next_vict;
-        else
-            character_list = next_vict;
+        char_from_room(ch);
+        if (IS_NPC(ch)) {
+            if (GET_MOB_VNUM(ch) != NOBODY && !ch->proto)    /* prototyped */
+                GetMobIndex(GET_MOB_VNUM(ch))->number--;
+            clearMemory(ch);
+            if (SCRIPT(ch))
+                extract_script(ch, MOB_TRIGGER);
+            //    if (ch->proto || !MobProtoExists(GET_MOB_VNUM(ch)) || ch->proto_script != GetMobProto(GET_MOB_VNUM(ch))->proto_script)
+            //     free_proto_script(ch, MOB_TRIGGER);
+            if (SCRIPT_MEM(ch))
+                extract_script_mem(SCRIPT_MEM(ch));
+        } else {
+            ch->save();
+        }
+
+        /* If there's a descriptor, they're in the menu now. */
+        if (IS_NPC(ch) || !ch->desc)
+            delete ch;
     }
+    #endif
+    /*
+     * Q: Why do we do this?
+     * A: Because trying to iterate over the character
+     *    list with 'ch = ch->next' does bad things if
+     *    the current character happens to die. The
+     *    trivial workaround of 'vict = next_vict'
+     *    doesn't work if the _next_ person in the list
+     *    gets killed, for example, by an area spell.
+     *
+     * Q: Why do we leave them on the character_list?
+     * A: Because code doing 'vict = vict->next' would
+     *    get really confused otherwise.
+     
+     put all the files back 
+     except the files from the world directory
+     exept files taht already exist that are older then the ones in the tar
+     
+     
+     */
+    #if 1
+    void extract_char(Character *ch) {
+        if (DEAD(ch)) {
+            if (IN_ROOM(ch))
+                log("Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM(ch), GET_NAME(ch), GET_ROOM_VNUM(IN_ROOM(ch)));
+            else
+                log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
+            return;
+        }
+        if (GET_ID(ch) > 0)
+            removeFromChLookupTable(GET_ID(ch));
+        if (IS_NPC(ch)) {
+            SET_BIT_AR(MOB_FLAGS(ch), MOB_NOTDEADYET);
+            extract_linked_mob(ch);
+        } else
+            SET_BIT_AR(PLR_FLAGS(ch), PLR_NOTDEADYET);
 
-    if (extractions_pending > 0)
-        log("SYSERR: Couldn't find %d extractions as counted.",
-            extractions_pending);
-
-    extractions_pending = 0;
-}
-
-/* ***********************************************************************
-* Here follows high-level versions of some earlier routines, ie functions*
-* which incorporate the actual player-data                               *.
-*********************************************************************** */
-
-
-
-Character *get_player_vis(Character *ch, char *name,
-                          int *number, int inroom) {
-    Character *i;
-    Descriptor *d;
-    int num;
-
-    skip_spaces(&name);
-
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
+        extractions_pending++;
     }
-    if (*name == UID_CHAR) {
-        i = find_char(atoi(name + 1));
+    #endif
 
-        if (i && valid_dg_target(i, TRUE))
-            return i;
-    }
-    for (d = descriptor_list; d; d = d->next) {
-        if (!IS_PLAYING(d))
-            continue;
-        if (inroom == FIND_CHAR_ROOM && !HERE(d->character, ch))
-            continue;
-        if (!isname(name, d->character->player.name))
-            continue;
+    /*
+     * I'm not particularly pleased with the MOB/PLR
+     * hoops that have to be jumped through but it
+     * hardly calls for a completely new variable.
+     * Ideally it would be its own list, but that
+     * would change the '->next' pointer, potentially
+     * confusing some code. Ugh. -gg 3/15/2001
+     *
+     * NOTE: This doesn't handle recursive extractions.
+     */
+    void extract_pending_chars(void) {
+        Character *vict, *next_vict, *prev_vict;
 
-        if (!CAN_SEE(ch, d->character))
-            continue;
-        if (--(*number) != 0)
-            continue;
+        if (extractions_pending < 0)
+            log("SYSERR: Negative (%d) extractions pending.",
+                extractions_pending);
 
-        return (d->character);
+        for (vict = character_list, prev_vict = NULL;
+                vict && extractions_pending; vict = next_vict) {
+            next_vict = vict->next;
 
-    }
-    if(inroom!=FIND_CHAR_NOTINROOM)
-        for (i = character_list; i; i = i->next) {
-            if (inroom == FIND_CHAR_ROOM && !HERE(i, ch))
+            if (MOB_FLAGGED(vict, MOB_NOTDEADYET))
+                REMOVE_BIT_AR(MOB_FLAGS(vict), MOB_NOTDEADYET);
+            else if (PLR_FLAGGED(vict, PLR_NOTDEADYET))
+                REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_NOTDEADYET);
+            else {
+                /* Last non-free'd character to continue chain from. */
+                prev_vict = vict;
                 continue;
-            if (IS_NPC(i))
+            }
+
+            extract_char_final(vict);
+            extractions_pending--;
+
+            if (prev_vict)
+                prev_vict->next = next_vict;
+            else
+                character_list = next_vict;
+        }
+
+        if (extractions_pending > 0)
+            log("SYSERR: Couldn't find %d extractions as counted.",
+                extractions_pending);
+
+        extractions_pending = 0;
+    }
+
+    /* ***********************************************************************
+    * Here follows high-level versions of some earlier routines, ie functions*
+    * which incorporate the actual player-data                               *.
+    *********************************************************************** */
+
+
+
+    Character *get_player_vis(Character *ch, char *name,
+                              int *number, int inroom) {
+        Character *i;
+        Descriptor *d;
+        int num;
+
+        skip_spaces(&name);
+
+        if (!number) {
+            number = &num;
+            num = get_number(&name);
+        }
+        if (*name == UID_CHAR) {
+            i = find_char(atoi(name + 1));
+
+            if (i && valid_dg_target(i, TRUE))
+                return i;
+        }
+        for (d = descriptor_list; d; d = d->next) {
+            if (!IS_PLAYING(d))
                 continue;
-            if (inroom == FIND_CHAR_NOTINROOM && HERE(i, ch))
+            if (inroom == FIND_CHAR_ROOM && !HERE(d->character, ch))
+                continue;
+            if (!isname(name, d->character->player.name))
+                continue;
+
+            if (!CAN_SEE(ch, d->character))
+                continue;
+            if (--(*number) != 0)
+                continue;
+
+            return (d->character);
+
+        }
+        if(inroom!=FIND_CHAR_NOTINROOM)
+            for (i = character_list; i; i = i->next) {
+                if (inroom == FIND_CHAR_ROOM && !HERE(i, ch))
+                    continue;
+                if (IS_NPC(i))
+                    continue;
+                if (inroom == FIND_CHAR_NOTINROOM && HERE(i, ch))
+                    continue;
+                if (!isname_full(name, i->player.name))
+                    continue;
+
+                if (!CAN_SEE(ch, i))
+                    continue;
+                if (--(*number) != 0)
+                    continue;
+                return (i);
+            }
+
+        return (NULL);
+    }
+
+
+    Character *get_player_room(room_rnum room, char *name, int *number,
+                               int inroom) {
+        Descriptor *i;
+        Character *ch;
+        int num;
+
+        if (!number) {
+            number = &num;
+            num = get_number(&name);
+        }
+
+        for (i = descriptor_list; i; i = i->next) {
+            ch = i->character;
+            if (!IS_PLAYING(i))
+                continue;
+            if (inroom == FIND_CHAR_ROOM && IN_ROOM(ch) != room)
+                continue;
+            if (str_cmp(ch->player.name,name)) /* If not same, continue */
+                continue;
+            if (--(*number) != 0)
+                continue;
+            return (ch);
+        }
+
+        return (NULL);
+    }
+
+    //Default argument for ch is NULL, as defined in handler.h
+    Character *get_room_vis(room_rnum room, char *name, int *number,Character *ch) {
+        Character *i;
+        int num;
+
+        if (!number) {
+            number = &num;
+            num = get_number(&name);
+        }
+
+        if (room == NULL)
+            return NULL;
+
+        /* 0.<name> means PC with name */
+        if (*number == 0)
+            return (get_player_room(room, name, NULL, FIND_CHAR_ROOM));
+
+        for (i = room->people; i && *number; i = i->next_in_room)
+            if (isname_full(name, GET_NAME(i)) && (!ch || CAN_SEE(ch,i)))
+                if (--(*number) == 0)
+                    return (i);
+
+        return (NULL);
+    }
+
+    Character *get_char_room_vis(Character *ch, char *name,
+                                 int *number) {
+        Character *i;
+        int num = 1;
+
+        if (!number) {
+            number = &num;
+            if (name && *name)
+                num = get_number(&name);
+        }
+
+        if (!ch)
+            return NULL;
+
+        /* JE 7/18/94 :-) :-) */
+        if (!str_cmp(name, "self") || !str_cmp(name, "me"))
+            return (ch);
+
+        /* 0.<name> means PC with name */
+        if (*number == 0)
+            return (get_player_vis(ch, name, NULL, FIND_CHAR_ROOM));
+
+        for (i = IN_ROOM(ch)->people; i && *number; i = i->next_in_room)
+            if (isname_full(name, i->player.name))
+                if (CAN_SEE(ch, i))
+                    if (--(*number) == 0)
+                        return (i);
+
+        return (NULL);
+    }
+
+
+
+    Character *get_char_world_vis(Character *ch, char *name,
+                                  int *number) {
+        Character *i;
+        int num;
+
+        if (!ch)
+            return NULL;
+
+        if (!number) {
+            number = &num;
+            num = get_number(&name);
+        }
+
+        if ((i = get_char_room_vis(ch, name, number)) != NULL)
+            return (i);
+
+        if (*number == 0)
+            return get_player_vis(ch, name, NULL, 0);
+
+        for (i = character_list; i && *number; i = i->next) {
+            if (HERE(ch,i))
                 continue;
             if (!isname_full(name, i->player.name))
                 continue;
-
             if (!CAN_SEE(ch, i))
                 continue;
             if (--(*number) != 0)
                 continue;
+
             return (i);
         }
-
-    return (NULL);
-}
-
-
-Character *get_player_room(room_rnum room, char *name, int *number,
-                           int inroom) {
-    Descriptor *i;
-    Character *ch;
-    int num;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
+        return (NULL);
     }
 
-    for (i = descriptor_list; i; i = i->next) {
-        ch = i->character;
-        if (!IS_PLAYING(i))
-            continue;
-        if (inroom == FIND_CHAR_ROOM && IN_ROOM(ch) != room)
-            continue;
-        if (str_cmp(ch->player.name,name)) /* If not same, continue */
-            continue;
-        if (--(*number) != 0)
-            continue;
-        return (ch);
+
+    Character *get_char_vis(Character *ch, char *name,
+                            int *number, int where) {
+        if (where == FIND_CHAR_ROOM)
+            return get_char_room_vis(ch, name, number);
+        else if (where == FIND_CHAR_WORLD)
+            return get_char_world_vis(ch, name, number);
+        else
+            return (NULL);
     }
 
-    return (NULL);
-}
 
-//Default argument for ch is NULL, as defined in handler.h
-Character *get_room_vis(room_rnum room, char *name, int *number,Character *ch) {
-    Character *i;
-    int num;
 
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
-    }
+    struct obj_data *get_obj_in_list_vis(Character *ch, char *name,
+                                             int *number, struct obj_data *list) {
+        struct obj_data *i;
+        int num;
 
-    if (room == NULL)
-        return NULL;
-
-    /* 0.<name> means PC with name */
-    if (*number == 0)
-        return (get_player_room(room, name, NULL, FIND_CHAR_ROOM));
-
-    for (i = room->people; i && *number; i = i->next_in_room)
-        if (isname_full(name, GET_NAME(i)) && (!ch || CAN_SEE(ch,i)))
-            if (--(*number) == 0)
-                return (i);
-
-    return (NULL);
-}
-
-Character *get_char_room_vis(Character *ch, char *name,
-                             int *number) {
-    Character *i;
-    int num = 1;
-
-    if (!number) {
-        number = &num;
-        if (name && *name)
+        if (!number) {
+            number = &num;
             num = get_number(&name);
-    }
+        }
 
-    if (!ch)
-        return NULL;
+        if (*number == 0)
+            return (NULL);
 
-    /* JE 7/18/94 :-) :-) */
-    if (!str_cmp(name, "self") || !str_cmp(name, "me"))
-        return (ch);
+        for (i = list; i && *number; i = i->next_content)
+            if (isname_full(name, i->name))
+                if (CAN_SEE_OBJ(ch, i))
+                    if (--(*number) == 0)
+                        return (i);
 
-    /* 0.<name> means PC with name */
-    if (*number == 0)
-        return (get_player_vis(ch, name, NULL, FIND_CHAR_ROOM));
-
-    for (i = IN_ROOM(ch)->people; i && *number; i = i->next_in_room)
-        if (isname_full(name, i->player.name))
-            if (CAN_SEE(ch, i))
-                if (--(*number) == 0)
-                    return (i);
-
-    return (NULL);
-}
-
-
-
-Character *get_char_world_vis(Character *ch, char *name,
-                              int *number) {
-    Character *i;
-    int num;
-
-    if (!ch)
-        return NULL;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
-    }
-
-    if ((i = get_char_room_vis(ch, name, number)) != NULL)
-        return (i);
-
-    if (*number == 0)
-        return get_player_vis(ch, name, NULL, 0);
-
-    for (i = character_list; i && *number; i = i->next) {
-        if (HERE(ch,i))
-            continue;
-        if (!isname_full(name, i->player.name))
-            continue;
-        if (!CAN_SEE(ch, i))
-            continue;
-        if (--(*number) != 0)
-            continue;
-
-        return (i);
-    }
-    return (NULL);
-}
-
-
-Character *get_char_vis(Character *ch, char *name,
-                        int *number, int where) {
-    if (where == FIND_CHAR_ROOM)
-        return get_char_room_vis(ch, name, number);
-    else if (where == FIND_CHAR_WORLD)
-        return get_char_world_vis(ch, name, number);
-    else
-        return (NULL);
-}
-
-
-
-struct obj_data *get_obj_in_list_vis(Character *ch, char *name,
-                                         int *number, struct obj_data *list) {
-    struct obj_data *i;
-    int num;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
-    }
-
-    if (*number == 0)
-        return (NULL);
-
-    for (i = list; i && *number; i = i->next_content)
-        if (isname_full(name, i->name))
-            if (CAN_SEE_OBJ(ch, i))
-                if (--(*number) == 0)
-                    return (i);
-
-    return (NULL);
-}
-
-
-
-
-/* search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(Character *ch, char *name, int *number) {
-    struct obj_data *i;
-    int num;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&name);
-    }
-
-    if (*number == 0)
-        return (NULL);
-
-    /* scan items carried */
-    if ((i = get_obj_in_list_vis(ch, name, number, ch->carrying)) != NULL)
-        return (i);
-
-    /* scan room */
-    if ((i =
-                get_obj_in_list_vis(ch, name, number,
-                                    IN_ROOM(ch)->contents)) != NULL)
-        return (i);
-
-    /* ok.. no luck yet. scan the entire obj list   */
-    for (i = object_list; i && *number; i = i->next)
-        if (isname_full(name, i->name))
-            if (CAN_SEE_OBJ(ch, i))
-                if (--(*number) == 0)
-                    return (i);
-
-    return (NULL);
-}
-
-
-struct obj_data *get_obj_in_equip_vis(Character *ch, char *arg,
-                                                  int *number,
-                                          struct obj_data *equipment[]) {
-    int j, num;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&arg);
-    }
-
-    if (*number == 0)
-        return (NULL);
-
-    for (j = 0; j < NUM_WEARS; j++)
-        if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
-                && isname_full(arg, equipment[j]->name))
-            if (--(*number) == 0)
-                return (equipment[j]);
-
-    return (NULL);
-}
-int get_obj_pos_in_equip_vis(Character *ch, char *arg, int *number,
-                             struct obj_data *equipment[]) {
-    int j, num;
-
-    if (!number) {
-        number = &num;
-        num = get_number(&arg);
-    }
-
-    if (*number == 0)
-        return (-1);
-
-    for (j = 0; j < NUM_WEARS; j++)
-        if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
-                && isname_full(arg, equipment[j]->name))
-            if (--(*number) == 0)
-                return (j);
-
-    return (-1);
-}
-
-
-const char *money_desc(gold_int amount) {
-    gold_int cnt;
-    struct {
-        gold_int limit;
-        const char *description;
-    }
-    money_table[] = {
-                        {
-                            1, "a gold coin"}, {
-                            10, "a tiny pile of gold coins"}, {
-                            20, "a handful of gold coins"}, {
-                            75, "a little pile of gold coins"}, {
-                            200, "a small pile of gold coins"}, {
-                            1000, "a pile of gold coins"}, {
-                            5000, "a big pile of gold coins"}, {
-                            10000, "a large heap of gold coins"}, {
-                            20000, "a huge mound of gold coins"}, {
-                            75000, "an enormous mound of gold coins"}, {
-                            150000, "a small mountain of gold coins"}, {
-                            250000, "a mountain of gold coins"}, {
-                            500000, "a huge mountain of gold coins"}, {
-                            1000000, "an enormous mountain of gold coins"}, {
-                            0, NULL},};
-
-    if (amount <= 0) {
-        log("SYSERR: Try to create negative or 0 money (%lld).", amount);
         return (NULL);
     }
 
-    for (cnt = 0; money_table[cnt].limit; cnt++)
-        if (amount <= money_table[cnt].limit)
-            return (money_table[cnt].description);
-
-    return ("an absolutely colossal mountain of gold coins");
-}
 
 
-struct obj_data *create_money(gold_int gamount) {
-    int y;
-    struct obj_data *obj;
-    struct extra_descr_data *new_descr;
-    char buf[200];
-    int amount;
 
-    if (gamount > 2000000000)
-        amount = 2000000000;
-    else
-        amount = (int) gamount;
+    /* search the entire world for an object, and return a pointer  */
+    struct obj_data *get_obj_vis(Character *ch, char *name, int *number) {
+        struct obj_data *i;
+        int num;
 
-    if (amount <= 0 ) {
-        log("SYSERR: Try to create negative or 0 money, changing to 1(%lld)", gamount);
-        return (NULL);
-    }
-    obj = create_obj();
-    CREATE(new_descr, struct extra_descr_data, 1);
+        if (!number) {
+            number = &num;
+            num = get_number(&name);
+        }
 
-    if (amount == 1) {
-        obj->name = str_dup("coin gold");
-        obj->short_description = str_dup("a gold coin");
-        obj->description =
-            str_dup("One miserable gold coin is lying here.");
-        new_descr->keyword = str_dup("coin gold");
-        new_descr->description =
-            str_dup("It's just one miserable little gold coin.");
-    } else {
-        obj->name = str_dup("coins gold");
-        obj->short_description = str_dup(money_desc(amount));
-        sprintf(buf, "%s is lying here.", money_desc(amount));
-        obj->description = str_dup(CAP(buf));
+        if (*number == 0)
+            return (NULL);
 
-        new_descr->keyword = str_dup("coins gold");
-        if (amount < 10) {
-            sprintf(buf, "There are %d coins.", amount);
-            new_descr->description = str_dup(buf);
-        } else if (amount < 100) {
-            sprintf(buf, "There are about %d coins.",
-                    10 * (amount / 10));
-            new_descr->description = str_dup(buf);
-        } else if (amount < 1000) {
-            sprintf(buf, "It looks to be about %d coins.",
-                    100 * (amount / 100));
-            new_descr->description = str_dup(buf);
-        } else if (amount < 100000) {
-            sprintf(buf, "You guess there are, maybe, %d coins.",
-                    1000 * (((int) amount / 1000) +
-                            number(0, ((int) amount / 1000))));
-            new_descr->description = str_dup(buf);
-        } else
-            new_descr->description = str_dup("There are a LOT of coins.");
-    }
+        /* scan items carried */
+        if ((i = get_obj_in_list_vis(ch, name, number, ch->carrying)) != NULL)
+            return (i);
 
-    new_descr->next = NULL;
-    obj->ex_description = new_descr;
-
-    GET_OBJ_TYPE(obj) = ITEM_MONEY;
-    for (y = 0; y < TW_ARRAY_MAX; y++)
-        obj->obj_flags.wear_flags[y] = 0;
-    SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
-    GET_OBJ_VAL(obj, 0) = (int) amount;
-    GET_OBJ_COST(obj) = (int) amount;
-    obj->item_number = NOTHING;
-    if (GET_OBJ_RNUM(obj) != NOTHING) //this is because it has a negitive rnum.
-        obj_index[GET_OBJ_RNUM(obj)].qic = NULL;
-
-
-    return (obj);
-}
-
-
-/* Generic Find, designed to find any object/character
- *
- * Calling:
- *  *arg     is the pointer containing the string to be searched for.
- *           This string doesn't have to be a single word, the routine
- *           extracts the next word itself.
- *  bitv..   All those bits that you want to "search through".
- *           Bit found will be result of the function
- *  *ch      This is the person that is trying to "find"
- *  **tar_ch Will be NULL if no character was found, otherwise points
- * **tar_obj Will be NULL if no object was found, otherwise points
- *
- * The routine used to return a pointer to the next word in *arg (just
- * like the one_argument routine), but now it returns an integer that
- * describes what it filled in.
- */
-int generic_find(char *arg, bitvector_t bitvector, Character *ch,
-                 Character **tar_ch, struct obj_data **tar_obj) {
-    int i, found, number;
-    char name_val[MAX_INPUT_LENGTH];
-    char *name = name_val;
-
-    *tar_ch = NULL;
-    *tar_obj = NULL;
-
-    one_argument(arg, name);
-
-    if (!*name)
-        return (0);
-    if (!(number = get_number(&name)))
-        return (0);
-
-    if (IS_SET(bitvector, FIND_CHAR_ROOM)) {  /* Find person in room */
-        if ((*tar_ch = get_char_room_vis(ch, name, &number)) != NULL)
-            return (FIND_CHAR_ROOM);
-    }
-
-    if (IS_SET(bitvector, FIND_CHAR_WORLD)) {
-        if ((*tar_ch = get_char_world_vis(ch, name, &number)) != NULL)
-            return (FIND_CHAR_WORLD);
-    }
-
-    if (IS_SET(bitvector, FIND_OBJ_EQUIP)) {
-        for (found = FALSE, i = 0; i < NUM_WEARS && !found; i++)
-            if (GET_EQ(ch, i) && isname(name, GET_EQ(ch, i)->name)
-                    && --number == 0) {
-                *tar_obj = GET_EQ(ch, i);
-                found = TRUE;
-            }
-        if (found)
-            return (FIND_OBJ_EQUIP);
-    }
-
-    if (IS_SET(bitvector, FIND_OBJ_INV)) {
-        if ((*tar_obj =
-                    get_obj_in_list_vis(ch, name, &number, ch->carrying)) != NULL)
-            return (FIND_OBJ_INV);
-    }
-
-    if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
-        if ((*tar_obj =
-                    get_obj_in_list_vis(ch, name, &number,
+        /* scan room */
+        if ((i =
+                    get_obj_in_list_vis(ch, name, number,
                                         IN_ROOM(ch)->contents)) != NULL)
-            return (FIND_OBJ_ROOM);
+            return (i);
+
+        /* ok.. no luck yet. scan the entire obj list   */
+        for (i = object_list; i && *number; i = i->next)
+            if (isname_full(name, i->name))
+                if (CAN_SEE_OBJ(ch, i))
+                    if (--(*number) == 0)
+                        return (i);
+
+        return (NULL);
     }
 
-    if (IS_SET(bitvector, FIND_OBJ_WORLD)) {
-        if ((*tar_obj = get_obj_vis(ch, name, &number)))
-            return (FIND_OBJ_WORLD);
+
+    struct obj_data *get_obj_in_equip_vis(Character *ch, char *arg,
+                                                      int *number,
+                                              struct obj_data *equipment[]) {
+        int j, num;
+
+        if (!number) {
+            number = &num;
+            num = get_number(&arg);
+        }
+
+        if (*number == 0)
+            return (NULL);
+
+        for (j = 0; j < NUM_WEARS; j++)
+            if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
+                    && isname_full(arg, equipment[j]->name))
+                if (--(*number) == 0)
+                    return (equipment[j]);
+
+        return (NULL);
+    }
+    int get_obj_pos_in_equip_vis(Character *ch, char *arg, int *number,
+                                 struct obj_data *equipment[]) {
+        int j, num;
+
+        if (!number) {
+            number = &num;
+            num = get_number(&arg);
+        }
+
+        if (*number == 0)
+            return (-1);
+
+        for (j = 0; j < NUM_WEARS; j++)
+            if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
+                    && isname_full(arg, equipment[j]->name))
+                if (--(*number) == 0)
+                    return (j);
+
+        return (-1);
     }
 
-    return (0);
-}
 
+    const char *money_desc(gold_int amount) {
+        gold_int cnt;
+        struct {
+            gold_int limit;
+            const char *description;
+        }
+        money_table[] = {
+                            {
+                                1, "a gold coin"}, {
+                                10, "a tiny pile of gold coins"}, {
+                                20, "a handful of gold coins"}, {
+                                75, "a little pile of gold coins"}, {
+                                200, "a small pile of gold coins"}, {
+                                1000, "a pile of gold coins"}, {
+                                5000, "a big pile of gold coins"}, {
+                                10000, "a large heap of gold coins"}, {
+                                20000, "a huge mound of gold coins"}, {
+                                75000, "an enormous mound of gold coins"}, {
+                                150000, "a small mountain of gold coins"}, {
+                                250000, "a mountain of gold coins"}, {
+                                500000, "a huge mountain of gold coins"}, {
+                                1000000, "an enormous mountain of gold coins"}, {
+                                0, NULL},};
 
-/* a function to scan for "all" or "all.x" */
-int find_all_dots(char *arg) {
-    char *ppos;
-    int plen;
-    if (!arg || !*arg)
-        return (FIND_INDIV);
+        if (amount <= 0) {
+            log("SYSERR: Try to create negative or 0 money (%lld).", amount);
+            return (NULL);
+        }
 
-    if (!strcmp(arg, "all"))
-        return (FIND_ALL);
-    else if (!strncmp(arg, "all.", 4)) {
-        ppos = arg+4;
-        memmove(arg, ppos, (plen = strlen(ppos)));
-        *(arg + plen) = '\0';
-        /*strcpy(arg, arg + 4);*/
-        return (FIND_ALLDOT);
-    } else
-        return (FIND_INDIV);
-}
+        for (cnt = 0; money_table[cnt].limit; cnt++)
+            if (amount <= money_table[cnt].limit)
+                return (money_table[cnt].description);
 
-
-// dismount_char() / fr: Daniel Koepke (dkoepke@california.com)
-//   If a character is mounted on something, we dismount them.  If
-//   someone is mounting our character, then we dismount that someone.
-//   This is used for cleaning up after a mount is cancelled by
-//   something (either intentionally or by death, etc.)
-void dismount_char(Character *ch) {
-    if (RIDING(ch)) {
-        RIDDEN_BY(RIDING(ch)) = NULL;
-        RIDING(ch) = NULL;
+        return ("an absolutely colossal mountain of gold coins");
     }
 
-    if (RIDDEN_BY(ch)) {
-        RIDING(RIDDEN_BY(ch)) = NULL;
-        RIDDEN_BY(ch) = NULL;
+
+    struct obj_data *create_money(gold_int gamount) {
+        int y;
+        struct obj_data *obj;
+        struct extra_descr_data *new_descr;
+        char buf[200];
+        int amount;
+
+        if (gamount > 2000000000)
+            amount = 2000000000;
+        else
+            amount = (int) gamount;
+
+        if (amount <= 0 ) {
+            log("SYSERR: Try to create negative or 0 money, changing to 1(%lld)", gamount);
+            return (NULL);
+        }
+        obj = create_obj();
+        CREATE(new_descr, struct extra_descr_data, 1);
+
+        if (amount == 1) {
+            obj->name = str_dup("coin gold");
+            obj->short_description = str_dup("a gold coin");
+            obj->description =
+                str_dup("One miserable gold coin is lying here.");
+            new_descr->keyword = str_dup("coin gold");
+            new_descr->description =
+                str_dup("It's just one miserable little gold coin.");
+        } else {
+            obj->name = str_dup("coins gold");
+            obj->short_description = str_dup(money_desc(amount));
+            sprintf(buf, "%s is lying here.", money_desc(amount));
+            obj->description = str_dup(CAP(buf));
+
+            new_descr->keyword = str_dup("coins gold");
+            if (amount < 10) {
+                sprintf(buf, "There are %d coins.", amount);
+                new_descr->description = str_dup(buf);
+            } else if (amount < 100) {
+                sprintf(buf, "There are about %d coins.",
+                        10 * (amount / 10));
+                new_descr->description = str_dup(buf);
+            } else if (amount < 1000) {
+                sprintf(buf, "It looks to be about %d coins.",
+                        100 * (amount / 100));
+                new_descr->description = str_dup(buf);
+            } else if (amount < 100000) {
+                sprintf(buf, "You guess there are, maybe, %d coins.",
+                        1000 * (((int) amount / 1000) +
+                                number(0, ((int) amount / 1000))));
+                new_descr->description = str_dup(buf);
+            } else
+                new_descr->description = str_dup("There are a LOT of coins.");
+        }
+
+        new_descr->next = NULL;
+        obj->ex_description = new_descr;
+
+        GET_OBJ_TYPE(obj) = ITEM_MONEY;
+        for (y = 0; y < TW_ARRAY_MAX; y++)
+            obj->obj_flags.wear_flags[y] = 0;
+        SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+        GET_OBJ_VAL(obj, 0) = (int) amount;
+        GET_OBJ_COST(obj) = (int) amount;
+        obj->item_number = NOTHING;
+        if (GET_OBJ_RNUM(obj) != NOTHING) //this is because it has a negitive rnum.
+            obj_index[GET_OBJ_RNUM(obj)].qic = NULL;
+
+
+        return (obj);
     }
 
-    if (SITTING(ch))
-        char_from_chair(ch);
 
-}
+    /* Generic Find, designed to find any object/character
+     *
+     * Calling:
+     *  *arg     is the pointer containing the string to be searched for.
+     *           This string doesn't have to be a single word, the routine
+     *           extracts the next word itself.
+     *  bitv..   All those bits that you want to "search through".
+     *           Bit found will be result of the function
+     *  *ch      This is the person that is trying to "find"
+     *  **tar_ch Will be NULL if no character was found, otherwise points
+     * **tar_obj Will be NULL if no object was found, otherwise points
+     *
+     * The routine used to return a pointer to the next word in *arg (just
+     * like the one_argument routine), but now it returns an integer that
+     * describes what it filled in.
+     */
+    int generic_find(char *arg, bitvector_t bitvector, Character *ch,
+                     Character **tar_ch, struct obj_data **tar_obj) {
+        int i, found, number;
+        char name_val[MAX_INPUT_LENGTH];
+        char *name = name_val;
+
+        *tar_ch = NULL;
+        *tar_obj = NULL;
+
+        one_argument(arg, name);
+
+        if (!*name)
+            return (0);
+        if (!(number = get_number(&name)))
+            return (0);
+
+        if (IS_SET(bitvector, FIND_CHAR_ROOM)) {  /* Find person in room */
+            if ((*tar_ch = get_char_room_vis(ch, name, &number)) != NULL)
+                return (FIND_CHAR_ROOM);
+        }
+
+        if (IS_SET(bitvector, FIND_CHAR_WORLD)) {
+            if ((*tar_ch = get_char_world_vis(ch, name, &number)) != NULL)
+                return (FIND_CHAR_WORLD);
+        }
+
+        if (IS_SET(bitvector, FIND_OBJ_EQUIP)) {
+            for (found = FALSE, i = 0; i < NUM_WEARS && !found; i++)
+                if (GET_EQ(ch, i) && isname(name, GET_EQ(ch, i)->name)
+                        && --number == 0) {
+                    *tar_obj = GET_EQ(ch, i);
+                    found = TRUE;
+                }
+            if (found)
+                return (FIND_OBJ_EQUIP);
+        }
+
+        if (IS_SET(bitvector, FIND_OBJ_INV)) {
+            if ((*tar_obj =
+                        get_obj_in_list_vis(ch, name, &number, ch->carrying)) != NULL)
+                return (FIND_OBJ_INV);
+        }
+
+        if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
+            if ((*tar_obj =
+                        get_obj_in_list_vis(ch, name, &number,
+                                            IN_ROOM(ch)->contents)) != NULL)
+                return (FIND_OBJ_ROOM);
+        }
+
+        if (IS_SET(bitvector, FIND_OBJ_WORLD)) {
+            if ((*tar_obj = get_obj_vis(ch, name, &number)))
+                return (FIND_OBJ_WORLD);
+        }
+
+        return (0);
+    }
 
 
-// mount_char() / fr: Daniel Koepke (dkoepke@california.com)
-//   Sets _ch_ to mounting _mount_.  This does not make any checks
-//   what-so-ever to see if the _mount_ is mountable, etc.  That is
-//   left up to the calling function.  This does not present any
-//   messages, either.
-void mount_char(Character *ch, Character *mount) {
-    RIDING(ch) = mount;
-    RIDDEN_BY(mount) = ch;
-}
+    /* a function to scan for "all" or "all.x" */
+    int find_all_dots(char *arg) {
+        char *ppos;
+        int plen;
+        if (!arg || !*arg)
+            return (FIND_INDIV);
 
-/* Search the given list for an object type, and return a ptr to that obj */
-struct obj_data *get_obj_in_list_type(int type, struct obj_data *list) {
-    struct obj_data *i;
+        if (!strcmp(arg, "all"))
+            return (FIND_ALL);
+        else if (!strncmp(arg, "all.", 4)) {
+            ppos = arg+4;
+            memmove(arg, ppos, (plen = strlen(ppos)));
+            *(arg + plen) = '\0';
+            /*strcpy(arg, arg + 4);*/
+            return (FIND_ALLDOT);
+        } else
+            return (FIND_INDIV);
+    }
 
-    for (i = list; i; i = i->next_content)
-        if (GET_OBJ_TYPE(i) == type)
-            return i;
-    return NULL;
-}
 
-void add_hunter(Character *ch) {
-    struct hunter_data *temp, *hunt, *nhunt;
-    if (!ch)
-        return;
-    for (hunt = hunter_list; hunt; hunt = nhunt) {
-        nhunt = hunt->next;
-        if (hunt == NULL)
-            continue;
-        if (hunt->hunter == ch)
+    // dismount_char() / fr: Daniel Koepke (dkoepke@california.com)
+    //   If a character is mounted on something, we dismount them.  If
+    //   someone is mounting our character, then we dismount that someone.
+    //   This is used for cleaning up after a mount is cancelled by
+    //   something (either intentionally or by death, etc.)
+    void dismount_char(Character *ch) {
+        if (RIDING(ch)) {
+            RIDDEN_BY(RIDING(ch)) = NULL;
+            RIDING(ch) = NULL;
+        }
+
+        if (RIDDEN_BY(ch)) {
+            RIDING(RIDDEN_BY(ch)) = NULL;
+            RIDDEN_BY(ch) = NULL;
+        }
+
+        if (SITTING(ch))
+            char_from_chair(ch);
+
+    }
+
+
+    // mount_char() / fr: Daniel Koepke (dkoepke@california.com)
+    //   Sets _ch_ to mounting _mount_.  This does not make any checks
+    //   what-so-ever to see if the _mount_ is mountable, etc.  That is
+    //   left up to the calling function.  This does not present any
+    //   messages, either.
+    void mount_char(Character *ch, Character *mount) {
+        RIDING(ch) = mount;
+        RIDDEN_BY(mount) = ch;
+    }
+
+    /* Search the given list for an object type, and return a ptr to that obj */
+    struct obj_data *get_obj_in_list_type(int type, struct obj_data *list) {
+        struct obj_data *i;
+
+        for (i = list; i; i = i->next_content)
+            if (GET_OBJ_TYPE(i) == type)
+                return i;
+        return NULL;
+    }
+
+    void add_hunter(Character *ch) {
+        struct hunter_data *temp, *hunt, *nhunt;
+        if (!ch)
             return;
+        for (hunt = hunter_list; hunt; hunt = nhunt) {
+            nhunt = hunt->next;
+            if (hunt == NULL)
+                continue;
+            if (hunt->hunter == ch)
+                return;
+        }
+        CREATE(temp, struct hunter_data, 1);
+        temp->next = hunter_list;
+        hunter_list = temp;
+        temp->hunter = ch;
+        HUNT_COUNT(ch) = MAX_HUNTSTEPS(ch);
     }
-    CREATE(temp, struct hunter_data, 1);
-    temp->next = hunter_list;
-    hunter_list = temp;
-    temp->hunter = ch;
-    HUNT_COUNT(ch) = MAX_HUNTSTEPS(ch);
-}
 
-void remove_hunter(Character *ch) {
-    struct hunter_data *temp, *hunt, *nhunt = NULL;
-    if (!ch)
-        return;
+    void remove_hunter(Character *ch) {
+        struct hunter_data *temp, *hunt, *nhunt = NULL;
+        if (!ch)
+            return;
 
-    for (hunt = hunter_list; hunt; hunt = nhunt) {
-        nhunt = hunt->next;
-        if (hunt == NULL)
-            continue;
-        if (hunt->hunter == ch) {
-            HUNTING(hunt->hunter) = NULL;
-            HUNT_COUNT(hunt->hunter) = 0;
-            REMOVE_FROM_LIST(hunt, hunter_list, next);
-            free(hunt);
-            hunt = NULL;
-            //return;
+        for (hunt = hunter_list; hunt; hunt = nhunt) {
+            nhunt = hunt->next;
+            if (hunt == NULL)
+                continue;
+            if (hunt->hunter == ch) {
+                HUNTING(hunt->hunter) = NULL;
+                HUNT_COUNT(hunt->hunter) = 0;
+                REMOVE_FROM_LIST(hunt, hunter_list, next);
+                free(hunt);
+                hunt = NULL;
+                //return;
+            }
         }
     }
-}
 
-Character *check_ch(Character *ch) {
-    register Character *tch;
+    Character *check_ch(Character *ch) {
+        register Character *tch;
 
-    if (!ch)
+        if (!ch)
+            return NULL;
+
+        for (tch = character_list; tch; tch = tch->next)
+            if (ch == tch)
+                return tch;
+
         return NULL;
-
-    for (tch = character_list; tch; tch = tch->next)
-        if (ch == tch)
-            return tch;
-
-    return NULL;
-}
+    }
 
