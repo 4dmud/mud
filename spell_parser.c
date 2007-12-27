@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.26  2006/08/18 11:09:59  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.25  2006/08/17 10:53:49  w4dimenscor
  * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
  *
@@ -142,7 +145,7 @@
 #include "action.h"
 #include "descriptor.h"
 
-struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
+vector<spell_info_type> spell_info(TOP_SPELL_DEFINE + 1);
 
 extern int spell_sorted_info[];
 

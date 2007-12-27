@@ -55,4 +55,4 @@ struct clan_rec {
     obj_vnum board;
 };
 
-extern struct clan_rec clan[MAX_CLANS];
+extern vector<clan_rec> clan;

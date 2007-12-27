@@ -20,7 +20,7 @@
 #include "descriptor.h"
 
 int num_of_clans;
-struct clan_rec clan[MAX_CLANS];
+vector <clan_rec> clan(MAX_CLANS);
 void tag_argument(char *argument, char *tag);
 extern Descriptor *descriptor_list;
 void smash_tilde(char *str);
@@ -36,13 +36,14 @@ long get_ptable_by_name(const char *name);
 
 extern int TEMP_LOAD_CHAR;
 
-struct clan_list_data *clan_list[MAX_CLANS];
+vector<clan_list_data> clan_list[MAX_CLANS];
 
 
-char clan_privileges[NUM_CP + 1][20] = {
-                                         "setplan", "enroll", "expel", "promote", "demote", "setfees",
-                                         "withdraw", "setapplev"
-                                       };
+char clan_privileges[NUM_CP + 1][20] =
+			{
+				"setplan", "enroll", "expel", "promote",
+				"demote", "setfees","withdraw", "setapplev"
+			};
 
 void send_clan_format(Character *ch)
 {
@@ -393,13 +394,9 @@ void do_clan_destroy(Character *ch, char *arg)
     }
   }
 
-  memset(&clan[i], sizeof(struct clan_rec), 0);
-
-  for (j = i; j < num_of_clans - 1; j++)
-    clan[j] = clan[j + 1];
-
-  num_of_clans--;
-
+  vector<clan_rec>::iterator it;
+  
+  clan.erase((clan.begin()+i));
   send_to_char("Clan deleted.\r\n", ch);
   save_clans();
   return;
@@ -1365,12 +1362,13 @@ void init_clans()
 {
   FILE *fl;
   int i, j;
+  clan_rec tmp;
   extern int top_of_p_table;
   extern struct player_index_element *player_table;
 
   init_clan_index();
 
-  memset(clan, 0, sizeof(struct clan_rec) * MAX_CLANS);
+  //memset(clan, 0, sizeof(struct clan_rec) * MAX_CLANS);
   if (num_of_clans == 0)
   {
     i = 0;
@@ -1383,7 +1381,10 @@ void init_clans()
     }
 
     fread(&num_of_clans, sizeof(int), 1, fl);
-    fread(clan, sizeof(struct clan_rec), num_of_clans, fl);
+    for (int k = 0; k< num_of_clans;k++) {
+    fread(&tmp, sizeof(struct clan_rec), 1, fl);
+    clan.push_back(tmp);
+    }
     fclose(fl);
   }
   else
@@ -1397,7 +1398,6 @@ void init_clans()
   {
     clan[i].power = 0;
     clan[i].members = 0;
-    clan_list[i] = NULL;
   }
 
   for (j = 0; j <= top_of_p_table; j++)
@@ -1432,7 +1432,7 @@ void do_clan_list(Character *ch, char *arg)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct clan_list_data *temp;
+  vector<clan_list_data>::iterator temp;
 
   DYN_DEFINE;
   *buf = '\0';
@@ -1454,17 +1454,18 @@ void do_clan_list(Character *ch, char *arg)
     return;
   }
 
-  temp = clan_list[i];
-  while (temp)
+  temp = clan_list[i].begin();
+  while (temp != clan_list[i].end())
   {
-    if (temp->rank > 0) {
-    snprintf(buf, sizeof(buf), "%-20s -- Rank: %d.\r\n",
-             temp->name,
-             temp->rank);
+    if ((*temp).rank > 0) {
+    if (clan[i].ranks == (*temp).rank)
+    snprintf(buf, sizeof(buf), "{cW%-20s -- Rank: %d. (Leader){c0\r\n",(*temp).name, (*temp).rank);
+    else
+    snprintf(buf, sizeof(buf), "{cw%-20s -- Rank: %d.{c0\r\n",(*temp).name, (*temp).rank);
     DYN_RESIZE(buf);
     }
 
-    temp = temp->next;
+    temp++;
   }
 
 
@@ -2270,69 +2271,65 @@ ACMD(do_clan)
   }
   send_clan_format(ch);
 }
+bool operator< (const clan_list_data &a, const clan_list_data &b) {
+return (b.rank<a.rank);
+}
 
 void add_clan_member(const char * name, int rank, int cln)
 {
-  struct clan_list_data *temp;
+  struct clan_list_data temp;
 
   if ( (name == NULL) || !(*name))
     return;
 
-  CREATE(temp, struct clan_list_data, 1);
-  temp->name = strdup(name);
-  temp->rank = rank;
-  temp->next = clan_list[cln];
-  clan_list[cln] = temp;
+  temp.name = strdup(name);
+  temp.name[0] = toupper(temp.name[0]);
+  temp.rank = rank;
+  clan_list[cln].push_back(temp);
+  sort(clan_list[cln].begin(), clan_list[cln].end());
 }
 
 void remove_clan_member(const char * name, int cln)
 {
-  struct clan_list_data *temp, *find;
-  if (clan_list[cln] == NULL || !name || !*name)
+  vector<clan_list_data>::iterator find;
+  if (clan_list[cln].size() == 0 || !name || !*name)
     return;
-  find = clan_list[cln];
-  while (find)
+  find = clan_list[cln].begin();
+  while (find != clan_list[cln].end())
   {
-    if (!strcmp(find->name, name))
+    if (!str_cmp((*find).name, name))
     {
-      REMOVE_FROM_LIST(find, clan_list[cln], next);
-      free_string(&find->name);
-      free(find);
+      free((*find).name);
+      clan_list[cln].erase(find);
+      remove_clan_member(name, cln); /* recursive, to avoid missmatched iterators */
       return;
     }
-    find = find->next;
+    find++;
   }
 
 }
 
 void update_clan_member(const char * name, int rank, int cln)
 {
-  struct clan_list_data  *find;
-  if (clan_list[cln] == NULL || !name || !*name)
+ vector<clan_list_data>::iterator find;
+  if (clan_list[cln].size() == 0 || !name || !*name)
     return;
-  find = clan_list[cln];
-  while (find)
+  find = clan_list[cln].begin();
+  while (find != clan_list[cln].end())
   {
-    if (!str_cmp(find->name, name))
-    {
-      find->rank = rank;
-      return;
-    }
-    find = find->next;
+    if (!str_cmp((*find).name, name))
+      (*find).rank = rank;
+    find++;
   }
 
 }
 
-void free_clan_list(struct clan_list_data *find)
+void free_clan_list(vector<clan_list_data> &find)
 {
-
-  if (!find)
-    return;
-  if (find->next != NULL)
-    free_clan_list(find->next);
-
-  free_string(&find->name);
-  free(find);
+for (vector<clan_list_data>::iterator it = find.begin(); it != find.end(); it++) {
+     free((*it).name);
+     (*it).name = NULL;
+     }
 }
 
 void free_clan_lists(void)

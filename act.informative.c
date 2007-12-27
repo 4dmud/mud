@@ -56,9 +56,6 @@ extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
 
-extern struct clan_rec clan[];
-extern struct spell_info_type spell_info[];
-
 extern char *credits;
 extern char *news;
 extern char *info;

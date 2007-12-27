@@ -37,7 +37,6 @@ byte saving_throws(int class_num, int type, int level);     /* class.c */
 void clearMemory(Character *ch);
 void weight_change_object(struct obj_data *obj, int weight);
 void add_follower(Character *ch, Character *leader);
-extern struct spell_info_type spell_info[];
 int arena_ok(Character *ch, Character *victim);
 void change_alignment(Character *ch, Character *victim);
 void zap_char(Character *victim);

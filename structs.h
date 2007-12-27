@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.48  2006/08/18 11:09:59  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.47  2006/08/18 09:55:31  w4dimenscor
  * Fixed the wizlist so it didnt have a memory leak, ran fast, and actually worked
  *
@@ -2418,9 +2421,8 @@ struct corpse_list_data {
 };
 
 struct clan_list_data {
-    char * name;
+    char *name;
     int rank;
-    struct clan_list_data *next;
 };
 
 struct hunter_data {

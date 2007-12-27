@@ -32,7 +32,6 @@ ASKILL(skill_manipulate);
 /* extern variables */
 int has_weapon(Character *ch);
 void start_fighting_delay(Character *vict, Character *ch);
-extern struct spell_info_type spell_info[];
 int skill_cost(int h, int m, int v, Character *ch);
 int tier_level(Character *ch, int chclass);
 ASUB(sub_throttle);

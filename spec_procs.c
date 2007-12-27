@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.17  2006/08/18 11:09:59  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.16  2006/08/17 10:53:49  w4dimenscor
  * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
  *
@@ -85,7 +88,6 @@
 /*   external vars  */
 extern struct corpse_list_data *corpse_list;
 extern struct time_info_data time_info;
-extern struct spell_info_type spell_info[];
 extern int guild_info[][3];
 extern const char *cmd_door[];
 
@@ -385,7 +387,6 @@ void list_skills(Character *ch, int skillspell) {
 
 #else
 void list_skills(Character *ch, int skillspell) {
-    extern struct spell_info_type spell_info[];
     int i, sortpos, h = 0, imm, ending, sub;
     int count= 0;
     char buf[MAX_INPUT_LENGTH];

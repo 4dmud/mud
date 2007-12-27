@@ -31,7 +31,6 @@
  */
 
 extern struct attack_hit_type attack_hit_text[];
-extern struct spell_info_type spell_info[];
 extern struct board_info_type board_info[];
 
 /*------------------------------------------------------------------------*/

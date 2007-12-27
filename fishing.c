@@ -24,7 +24,6 @@
 #include "dg_event.h"
 
 extern struct time_info_data time_info;
-extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
 
 int in_fish_room(Character *ch) {

@@ -28,7 +28,6 @@
 
 void show_string(Descriptor *d, char *input);
 
-extern struct spell_info_type spell_info[];
 extern const char *unused_spellname;	/* spell_parser.c */
 
 /* local functions */

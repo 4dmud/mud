@@ -18,7 +18,6 @@
 
 
 /* external variables */
-extern struct spell_info_type spell_info[];
 extern const char *color_option_list[];
 extern int pt_allowed;
 SPECIAL(shop_keeper);

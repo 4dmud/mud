@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.18  2006/08/18 11:09:58  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.17  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -108,13 +111,6 @@ void run_task(Character *ch);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
 int save_forest(void);
-
-
-
-
-/* extern variables */
-extern struct spell_info_type spell_info[];
-
 
 /* extern procedures */
 int mag_manacost(Character *ch, int spellnum);

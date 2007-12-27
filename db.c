@@ -274,7 +274,6 @@ void strip_cr(char *);        //...
 void load_notes(void);
 
 /* external vars */
-extern struct spell_info_type spell_info[];
 extern const char *unused_spellname;
 extern const char *unused_spellmessage;
 extern int rev_dir[];

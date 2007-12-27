@@ -20,7 +20,6 @@
 #include "dg_event.h"
 
 extern struct time_info_data time_info;
-extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
 int mine_damage(Character *vict, int dam);
 void die(Character *ch, Character *killer);

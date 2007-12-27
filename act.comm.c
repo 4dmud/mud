@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.39  2006/08/18 11:09:58  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.38  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -1568,7 +1571,7 @@ ACMD(do_ctell)
        return;
     }
     c = atoi (argument);
-    if ((c < 0) || (c >= num_of_clans))
+    if ((c < 0) || (c >= clan.size()))
     {
         *ch << "There is no clan with that number.\r\n";
         return;

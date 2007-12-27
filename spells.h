@@ -11,6 +11,9 @@
  */
 /*
 * $Log: spells.h,v $
+* Revision 1.12  2006/08/18 11:09:59  w4dimenscor
+* updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+*
 * Revision 1.11  2006/08/17 10:53:49  w4dimenscor
 * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
 *
@@ -642,6 +645,6 @@ bool operator<(vector<skillspell_data>::iterator &a, vector<skillspell_data>::it
 bool operator<(vector<sub_list>::iterator &a, vector<sub_list>::iterator &b);
 bool operator<(const sub_list &a, const sub_list &b);
 bool operator<(const skillspell_data &a,const skillspell_data &b);
-extern struct spell_info_type spell_info[];
+extern vector<spell_info_type> spell_info;
 
 

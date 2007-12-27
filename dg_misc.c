@@ -25,9 +25,6 @@
 //#define SINFO spell_info[spellnum]
 
 /* external vars */
-
-extern struct spell_info_type spell_info[];
-
 void die(Character *ch, Character * killer);
 
 

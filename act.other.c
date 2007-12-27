@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.33  2006/08/18 11:09:58  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.32  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -141,7 +144,6 @@
 
 /* extern variables */
 extern Descriptor *descriptor_list;
-extern struct spell_info_type spell_info[];
 extern Character *ch_selling;
 extern char *class_abbrevs[];
 extern const int xap_objs;

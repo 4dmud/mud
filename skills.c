@@ -17,7 +17,6 @@
 #include "descriptor.h"
 
 /* external variables */
-extern struct spell_info_type spell_info[];
 SPECIAL(shop_keeper);
 extern int slipping;
 /* extern variables */
@@ -2811,7 +2810,6 @@ ASKILL(skill_circle)
 
 void improve_skill(Character *ch, int skill)
 {
-  extern struct spell_info_type spell_info[];
 
   int percent = GET_SKILL(ch, skill);
   int splevel = (spell_info[skill].min_level);

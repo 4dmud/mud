@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/17 12:28:31 $
-*  $Revision: 1.29 $
+*  $Date: 2006/08/18 11:09:58 $
+*  $Revision: 1.30 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.30  2006/08/18 11:09:58  w4dimenscor
+ * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
+ *
  * Revision 1.29  2006/08/17 12:28:31  w4dimenscor
  * Fixed a little bug concerning brackets
  *
@@ -131,7 +134,6 @@
 extern unsigned long pulse;
 
 /* other external vars */
-extern struct spell_info_type spell_info[];
 extern struct time_info_data time_info;
 
 /* external functions */
