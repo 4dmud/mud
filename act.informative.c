@@ -4917,7 +4917,7 @@ ACMD(do_worth)
                    "|%-32s{cy|#|    {cwLower Left Body Armor: {cL%%%-3d{cy        \r\n"
                    "|%-32s{cy|#|   {cwLower Right Body Armor: {cL%%%-3d{cy        \r\n"
                    "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
-                   "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw Reward Points: {cg%-3d{cy       \r\n"
+                   "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw      \r\n"
                    "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
                    "|%-32s{cy|#| {cw         Stamina: {cC%d/%d{cy\r\n"
                    "|%-32s{cy|#| {cw Elemental Weakness: {cr%s{cy\r\n"
@@ -4940,7 +4940,7 @@ ACMD(do_worth)
                    SUNNY ? sunnage[11] : moonage[11], chance_hit_part(ch, PART_LEFT_LEG),
                    SUNNY ? sunnage[12] : moonage[12], chance_hit_part(ch, PART_LEFT_LEG),
                    SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS(ch),
-                   SUNNY ? sunnage[14] : moonage[14], update_award(ch), update_reward(ch),
+                   SUNNY ? sunnage[14] : moonage[14], update_award(ch), 
                    SUNNY ? sunnage[14] : moonage[14], buf,
                    SUNNY ? sunnage[14] : moonage[14], GET_STAMINA(ch), GET_MAX_STAMINA(ch),
                    SUNNY ? sunnage[14] : moonage[14], print_elemental(GET_CLASS(ch), TRUE, buf1, sizeof(buf1)),

@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
- * Revision 1.1  2004/11/12 02:16:09  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/17 05:13:05  w4dimenscor
+ * updated pets so that they dont have weight problems, updated award points
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:09  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.38  2004/09/05 04:29:59  molly
  * fixed comparison function to sort correctly, made prompt show comma formated numbers
@@ -1116,7 +1119,7 @@ SPECIAL(cityguard)
 }
 
 
-#define PET_PRICE(pet) ((gold_int)(GET_LEVEL(pet) * GET_MAX_HIT(pet)))
+#define PET_PRICE(pet) ((gold_int)(GET_LEVEL(pet) * (GET_TIER(pet)+1) * GET_MAX_HIT(pet)))
 #define MAX_PETS 6
 
 SPECIAL(pet_shops)
@@ -1228,8 +1231,6 @@ SPECIAL(pet_shops)
     load_mtrigger(pet);
 
     /* Be certain that pets can't get/carry/use/wield/wear items */
-    IS_CARRYING_W(pet) = 10000;
-    IS_CARRYING_N(pet) = 1100;
     GET_GOLD(pet) = 0;
     GET_EXP(pet) = 0;
 

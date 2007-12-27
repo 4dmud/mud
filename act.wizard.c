@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
- * Revision 1.1  2004/11/12 02:15:40  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/17 05:13:05  w4dimenscor
+ * updated pets so that they dont have weight problems, updated award points
+ *
+ * Revision 1.1.1.1  2004/11/12 02:15:40  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.62  2004/09/18 10:47:02  molly
  * fixed up more memory errors, added normal help back in.
@@ -5951,7 +5954,6 @@ int update_award(struct char_data *ch)
 
 int update_reward(struct char_data *ch)
 {
-
   if (PLR_FLAGGED(ch, PLR_HERO) && (SPECIALS(ch)->last_reward) != (find_month()))
   {
     SPECIALS(ch)->last_reward = (find_month());
@@ -6006,7 +6008,8 @@ ACMD(do_reward)
   char arg2[MAX_INPUT_LENGTH];
   struct char_data *vict;
   int pts;
-
+new_send_to_char(ch, "Use AWARD please.\r\n");
+return;
   if (IS_NPC(ch))
     return;
 

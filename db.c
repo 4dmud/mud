@@ -5580,9 +5580,7 @@ void char_to_store(struct char_data *ch)
   fprintf(fl, "Lnew: %ld\n",SPECIALS(ch)->last_news);
   fprintf(fl, "Lcha: %ld\n",SPECIALS(ch)->last_changes);
   if (GET_AWARD(ch))
-    fprintf(fl, "Awrd: %d\n", GET_AWARD(ch));
-  if (GET_REWARD(ch))
-    fprintf(fl, "Rwrd: %d\n", GET_REWARD(ch));
+    fprintf(fl, "Awrd: %d\n", GET_AWARD(ch) + GET_REWARD(ch));
   if (SPECIALS(ch)->last_reward)
     fprintf(fl, "RwTm: %d\n", SPECIALS(ch)->last_reward);
   if (PROMPT(ch) && *PROMPT(ch))
