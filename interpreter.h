@@ -359,3 +359,17 @@ struct alias_data
 /*do_give*/
 #define SCMD_GIVE 0
 #define SCMD_SLIP 1
+
+/* * do_assemble * These constants *must* corespond with
+     the ASSM_xxx constants in * assemblies.h. */
+#define SCMD_ASSEMBLE  101
+#define SCMD_BAKE      102
+#define SCMD_BREW      103
+#define SCMD_CRAFT     104
+#define SCMD_FLETCH    105
+#define SCMD_KNIT      106
+#define SCMD_MAKE      107
+#define SCMD_MIX       108
+#define SCMD_THATCH    109
+#define SCMD_WEAVE     110
+#define SCMD_FORGE     111

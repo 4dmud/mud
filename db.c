@@ -38,6 +38,8 @@ int sunlight;
 #include "genmob.h"
 #include "genwld.h"
 #include "xmlhelp.h"
+
+#include "assemblies.h"
 #include "trees.h" 
 #include "htree.h"
 
@@ -994,6 +996,9 @@ htree_test();
     load_vehicles();
     //assign_vehicles();
   }
+
+  log("Booting assembled objects.");
+  assemblyBootAssemblies();
 
   log("Assigning spell and skill levels.");
   init_spell_levels();
