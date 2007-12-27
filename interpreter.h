@@ -283,6 +283,7 @@ struct alias_data
 /* do_echo */
 #define SCMD_ECHO	0
 #define SCMD_EMOTE	1
+#define SCMD_POSE	2
 
 /* do_gen_door */
 #define SCMD_OPEN       0

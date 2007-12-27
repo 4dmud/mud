@@ -61,7 +61,7 @@ void send_out_signals(struct descriptor_data *d);
 /* I/O functions */
 int	write_to_descriptor(socket_t desc, const char *txt, struct compr *comp);
 void write_to_q(const char *txt, struct txt_q *queue, int aliased);
-size_t	write_to_output(struct descriptor_data *d, const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
+size_t write_to_output(struct descriptor_data *d, const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
 size_t vwrite_to_output(struct descriptor_data *d, const char *format, va_list args);
 void page_string(struct descriptor_data *d, char *str, int keep_internal);
 void string_add(struct descriptor_data *d, char *str);

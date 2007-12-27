@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/04/23 12:18:13 $                                           * 
-*  $Revision: 1.13 $                                                    *
+*  $Date: 2005/06/14 11:29:36 $                                           * 
+*  $Revision: 1.14 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -625,10 +625,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           snprintf(str, slen, "%d", current_class_is_tier_num(c));
 
         else if (!strcasecmp(field, "clan"))
-          snprintf(str, slen, "%d", GET_CLAN(c));
+          snprintf(str, slen, "%d", IS_NPC(c) ? -1 : GET_CLAN(c));
 
         else if (!strcasecmp(field, "clanrank"))
-          snprintf(str, slen, "%d", GET_CLAN_RANK(c));
+          snprintf(str, slen, "%d", IS_NPC(c) ? -1 : GET_CLAN_RANK(c));
 
         else if (!strcasecmp(field, "clanname"))
           snprintf(str, slen, "%s", ((IS_NPC(c) || !GET_CLAN(c)) ? "" : clan[find_clan_by_id(GET_CLAN(c))].name));

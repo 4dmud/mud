@@ -684,6 +684,7 @@ const struct command_info cmd_info[] =
     { "poofin"   , "poofi", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFIN, WIZ_IMM1_GRP },
     { "poofout"  , "poofo", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFOUT, WIZ_IMM1_GRP },
     { "potionweight"    , "potionweight"	, POS_DEAD    , do_potionweight      , LVL_SEN, SCMD_OLC_OEDIT, WIZ_OLC_GRP},
+    { "pose"     , "pose" , POS_DEAD, do_echo     , 0, SCMD_POSE, 0 },
     { "pour"     , "pour" , POS_STANDING, do_pour     , 0, SCMD_POUR, 0 },
     { "powerplay", "pow"  , POS_DEAD    , do_powerplay, LVL_IMMORT, 0, 0},
     { "pretitle" , "pre"  , POS_DEAD    , do_pretitle, 0, 0, 0},

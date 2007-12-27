@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.25  2005/06/14 11:29:36  w4dimenscor
+ * new command added: pose
+ *
  * Revision 1.24  2005/06/02 09:52:49  w4dimenscor
  * fixed function namechange'
  *
@@ -634,7 +637,12 @@ ACMD(do_echo)
 
     if (subcmd == SCMD_EMOTE)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
+    else if (subcmd == SCMD_POSE) {
+    if (!str_str(GET_NAME(ch), argument))
+      snprintf(buf, sizeof(buf), "%s  (%s)", argument, "$n");
     else
+     strlcpy(buf, argument, sizeof(buf) );
+    } else
     {
       strlcpy(buf, argument, sizeof(buf) );
     }
@@ -1646,8 +1654,8 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     if (!IS_MOB(k))
       new_send_to_char(ch, "Title: %s\r\n",
                        (k->player.title ? k->player.title : "<None>"));
-		       
-		       
+
+
 
     if (IS_MOB(k))
     {
@@ -1682,16 +1690,17 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
     if (!IS_NPC(k))
     {
-    #if defined(HAVE_ZLIB)
-    if (ch->desc && ch->desc->comp) {
-    if (ch->desc->comp->state >= 2)
-    new_send_to_char(ch, "Compression: Enabled\r\n");
-    else
-    new_send_to_char(ch, "Compression: Disabled\r\n");
-    }
-    #endif
-    if (ch->desc)
-    new_send_to_char(ch, "Telopt Prompts: %d\r\n", ch->desc->eor);
+#if defined(HAVE_ZLIB)
+      if (ch->desc && ch->desc->comp)
+      {
+        if (ch->desc->comp->state >= 2)
+          new_send_to_char(ch, "Compression: Enabled\r\n");
+        else
+          new_send_to_char(ch, "Compression: Disabled\r\n");
+      }
+#endif
+      if (ch->desc)
+        new_send_to_char(ch, "Telopt Prompts: %d\r\n", ch->desc->eor);
       new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
@@ -1710,10 +1719,10 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
       new_send_to_char(ch, "\r\n");
 
       for (i = 0; i < NUM_CLASSES; i++)
-	if (GET_MASTERY(k, i))
-	  masteries_len += snprintf(masteries+masteries_len, sizeof(masteries) - masteries_len, "%c ", UPPER(*pc_class_types[i]));
+        if (GET_MASTERY(k, i))
+          masteries_len += snprintf(masteries+masteries_len, sizeof(masteries) - masteries_len, "%c ", UPPER(*pc_class_types[i]));
       new_send_to_char(ch, "MASTERED CLASSES: %s\r\n", (strcmp(masteries, "") == 0 ? "none" : masteries));
-      
+
       if (GET_EMAIL(k) && *GET_EMAIL(k))
         new_send_to_char(ch, "EMAIL: %s\r\n", GET_EMAIL(k));
       if (GET_NEWBIE_STATUS(k) != -1)
@@ -2570,7 +2579,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                                				 * or char */
+                                                    				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -2716,7 +2725,7 @@ ACMD(do_copyover)
     }
     else
     {
-    room_rnum rm = GET_WAS_IN(d->character) ? GET_WAS_IN(d->character) : IN_ROOM(d->character);
+      room_rnum rm = GET_WAS_IN(d->character) ? GET_WAS_IN(d->character) : IN_ROOM(d->character);
       fprintf(fp, "%d %s %s %d %d\n", d->descriptor, GET_NAME(och), d->host, rm->number, d->mxp);
 
       /* save och */
@@ -4623,7 +4632,7 @@ set_fields[] = {
                  {"rpgroup", LVL_SEN, PC, MISC},
                  { "olc",		LVL_IMPL,	PC,	MISC },
                  { "hero",		LVL_SEN,	PC,	BINARY }, /* 75 */
-                 {"immtitle", LVL_IMPL, PC, MISC},	
+                 {"immtitle", LVL_IMPL, PC, MISC},
                  {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
                  {   "\n", 0, BOTH, MISC}
                };
@@ -4986,35 +4995,41 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     check_regen_rates(vict);
     break;
   case 49:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
+    {
       send_to_char("Removing remort: ", ch);
       if ( REMORTS(vict) > 0 )
         REMORTS(vict)--;
-    } else if ( GET_REMORT(vict) == CLASS_UNDEFINED )
+    }
+    else if ( GET_REMORT(vict) == CLASS_UNDEFINED )
       REMORTS(vict)++;
-      
+
     GET_REMORT(vict) = i;
     check_regen_rates(vict);
     break;
   case 50:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
+    {
       send_to_char("Removing rtwo: ", ch);
       if ( REMORTS(vict) > 0 )
         REMORTS(vict)--;
-    } else if ( GET_REMORT_TWO(vict) == CLASS_UNDEFINED )
+    }
+    else if ( GET_REMORT_TWO(vict) == CLASS_UNDEFINED )
       REMORTS(vict)++;
-      
+
     GET_REMORT_TWO(vict) = i;
     check_regen_rates(vict);
     break;
   case 51:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
+    {
       send_to_char("Removing rthree: ", ch);
       if ( REMORTS(vict) > 0 )
         REMORTS(vict)--;
-    } else if ( GET_REMORT_THREE(vict) == CLASS_UNDEFINED )
+    }
+    else if ( GET_REMORT_THREE(vict) == CLASS_UNDEFINED )
       REMORTS(vict)++;
-      
+
     GET_REMORT_THREE(vict) = i;
     check_regen_rates(vict);
     break;
@@ -5242,7 +5257,8 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     snprintf(output, sizeof(output), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
     break;
   case 77:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
+    {
       send_to_char("That is not a class.\r\n", ch);
       return 0;
     }
@@ -5356,8 +5372,8 @@ ACMD(do_set)
   }
   else if (is_file)
   {
-//    new_send_to_char(ch, "This has been disabled as it is more trouble then it is worth.\r\n");
-  //  return;
+    //    new_send_to_char(ch, "This has been disabled as it is more trouble then it is worth.\r\n");
+    //  return;
     /* try to load the player off disk */
     CREATE(cbuf, struct char_data, 1);
     clear_char(cbuf);
@@ -6552,6 +6568,12 @@ ACMD(do_namechange)
   argument = two_arguments(argument, oldname, newname);
   one_argument(argument, passw);
 
+  if (GET_LEVEL(ch) < LVL_SEN)
+  {
+    new_send_to_char(ch, "Que?\r\n");
+    return;
+  }
+
   if ((!*oldname || !*newname || !*passw) )
   {
     new_send_to_char(ch, "namechange <oldname> <newname> <newpassword>\r\n");
@@ -6564,53 +6586,85 @@ ACMD(do_namechange)
     return;
   }
   newname[0] = UPPER(newname[0]);
-  
+
 
 
   for (d = descriptor_list; d; d = d->next)
   {
-    if (!IS_PLAYING(d)) {
-      if (compares(GET_NAME(d->character), oldname))
+    if (!IS_PLAYING(d))
     {
-    new_send_to_char(ch, "This player is in a state that can't be changed just yet.\r\n");
-    return;
-       }
-  } else if (compares(GET_NAME(d->character), oldname)) {
-  tch = d->character;
-  break;
+      if (compares(GET_NAME(d->character), oldname))
+      {
+        new_send_to_char(ch, "This player is in a state that can't be changed just yet.\r\n");
+        return;
+      }
+    }
+    else if (compares(GET_NAME(d->character), oldname))
+    {
+      tch = d->character;
+      if (GET_LEVEL(tch) >= GET_LEVEL(ch))
+      {
+        new_send_to_char(ch, "Ah, Bugger off!\r\n");
+        return;
+      }
+      break;
+    }
   }
-  }
-      if (!tch) {
-      if (get_id_by_name(oldname) == -1) {
+  if (!tch)
+  {
+    struct kill_data *load_killlist(char *name);
+    void load_locker(CHAR_DATA *ch);
+
+    if (get_id_by_name(oldname) == -1)
+    {
       new_send_to_char(ch, "A player by that name doesn't exist here.\r\n");
       return;
-      }
-      CREATE(tch, struct char_data, 1);
-      if (load_char(oldname, tch) <= 0) {
+    }
+    CREATE(tch, struct char_data, 1);
+    if (load_char(oldname, tch) <= 0)
+    {
       free(tch);
       log("load char error in namechange");
       return;
-      }
-      loaded = 1;
-      }
+    }
+    if (GET_LEVEL(tch) >= GET_LEVEL(ch))
+    {
+      new_send_to_char(ch, "Ah, Bugger off!\r\n");
+      return;
+    }
+    reset_char(tch);
+    read_aliases(tch);
+      GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
+  add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
   
-      free_string(&GET_PC_NAME(tch));
-      GET_PC_NAME(tch) = str_dup(newname);
-      newname[0] = LOWER(newname[0]);
-      //snprintf(passw,  "%s", CRYPT(GET_PC_NAME(tch), GET_PASSWD(tch)));
-      strncpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
-      *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
-      save_char(tch);
-      Crash_crashsave(tch);
-      write_aliases(tch);
+    char_to_room(tch, IN_ROOM(ch));
+    GET_KILLS(tch) = load_killlist(GET_NAME(tch));
+    load_locker(ch);
+      ch->next = character_list;
+  character_list = ch;
+    loaded = 1;
+  }
 
-      change_plrindex_name(GET_IDNUM(tch), newname);
-      new_send_to_char(ch, "%s's name changed to %s.\r\n", oldname, newname);
-    
-      if (loaded)
-      {
-      free_char(tch);
-      }
+  free_string(&tch->player.name);
+  tch->player.name = str_dup(newname);
+  newname[0] = LOWER(newname[0]);
+  strncpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
+  *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
+  save_char(tch);
+  if (!loaded)
+    Crash_crashsave(tch);
+  write_aliases(tch);
+
+  change_plrindex_name(GET_IDNUM(tch), newname);
+  new_send_to_char(ch, "%s's name changed to %s.\r\n", oldname, newname);
+  if (!loaded)
+    new_send_to_char(tch, "{cYYour name has been changed to %s. It's best if you quit and reenter to save.\r\n{c0", newname);
+
+  if (loaded)
+  {
+    Crash_rentsave(tch, 0);
+    extract_char(tch);
+  }
 }
 
 ACMD(do_decrypt)
