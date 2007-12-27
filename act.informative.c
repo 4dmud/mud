@@ -34,20 +34,20 @@ drop
 quaff
 drink
 kill
-
+ 
 for look/examine:
 Look <item/player/direction single word>
 Look at <item/Mobile <item multiple words>
 Look at <item multiple words> in <item multiple words>
 Look at <item multiple words> on <item multiple words>
 Look in <item/direction multiple words>
-
+ 
 get <item one word> <item one word>
 Get <item multiple words> from <item multiple words>
 Put <item multiple words> in <item multiple words>
-
-
-
+ 
+ 
+ 
 */
 
 /* extern variables */
@@ -936,16 +936,19 @@ void do_auto_exits(struct char_data *ch)
   int door, slen = 0;
   char tag_open[10], tag_close[10];
   struct room_data * view_room;
-  if (VEHICLE_ROOM == NULL) {
+  if (VEHICLE_ROOM == NULL)
+  {
     view_room = IN_ROOM(ch);
     strcpy(tag_open, "Ex");
-     strcpy(tag_close, "Ex");
-  } else {
+    strcpy(tag_close, "/Ex");
+  }
+  else
+  {
     view_room = VEHICLE_ROOM;
     strcpy(tag_open, "VEx");
-     strcpy(tag_close, "/VEx");
-    }
-    
+    strcpy(tag_close, "/VEx");
+  }
+
 
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
@@ -960,10 +963,10 @@ void do_auto_exits(struct char_data *ch)
       {
         if (GET_LEVEL(ch) > LVL_IMMORT)
         {
-	if (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN))
-	new_send_to_char(ch, "{cg{cu%c{c0 {cW", UPPER(*dirs[door]));
-	else
- new_send_to_char(ch, "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
+          if (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN))
+            new_send_to_char(ch, "{cg{cu%c{c0 {cW", UPPER(*dirs[door]));
+          else
+            new_send_to_char(ch, "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
           slen++;
         }
       }
@@ -1043,7 +1046,7 @@ ACMD(do_exits)
     if (GET_LEVEL(ch) >= LVL_IMMORT)
     {
 
-      new_send_to_char(ch, "%s%-5s%s - [%5d] %s",MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), 
+      new_send_to_char(ch, "%s%-5s%s - [%5d] %s",MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                        GET_ROOM_VNUM(EXIT(ch, door)->to_room),
                        EXIT(ch, door)->to_room->name);
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
@@ -1591,8 +1594,8 @@ void look_at_target(struct char_data *ch, char *arg)
 
   if (!ch->desc)
     return;
-    
-    skip_spaces(&arg);
+
+  skip_spaces(&arg);
 
   if (!*arg)
   {
@@ -1701,21 +1704,21 @@ ACMD(do_look)
     list_char_to_char(IN_ROOM(ch)->people, ch);	/* glowing red eyes */
   }
   else if (subcmd == SCMD_READ)
-    {
-    
-        skip_spaces(&argument);
-      if (!*argument)
-        send_to_char("Read what?\r\n", ch);
-      else 
-        look_at_target(ch, argument);
-	
-      return;
-    }
+  {
+
+    skip_spaces(&argument);
+    if (!*argument)
+      send_to_char("Read what?\r\n", ch);
+    else
+      look_at_target(ch, argument);
+
+    return;
+  }
   else
   {
     char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], sdir[MAX_INPUT_LENGTH];
     char *trail;
-    
+
     int look_at = 0;
     int look_in = 0;
     skip_spaces(&argument);
@@ -1723,16 +1726,16 @@ ACMD(do_look)
     //half_chop(argument, arg, arg2);
     argument = any_one_arg(argument, arg);
     skip_spaces(&argument);
-    
+
     if (!str_cmp(arg, "at"))
-    look_at = 1;
+      look_at = 1;
     if (!str_cmp(arg, "in"))
-    look_in = 1;
+      look_in = 1;
     else
-    argument = arg2;
+      argument = arg2;
     trail = any_one_arg(argument, sdir);
     skip_spaces(&trail);
-    
+
     examine_on = TRUE;
     if (!*arg)		/* "look" alone, without an argument at all */
       look_at_room(ch, 1);
@@ -1743,17 +1746,26 @@ ACMD(do_look)
       look_in_direction(ch, look_type);
     else if (look_at)
       look_at_target(ch, argument);
-    else if (is_abbrev(sdir, "above")) {
+    else if (is_abbrev(sdir, "above"))
+    {
       look_above_target(ch, trail);
-     } else if (is_abbrev(sdir, "behind")) {
+    }
+    else if (is_abbrev(sdir, "behind"))
+    {
       look_behind_target(ch, trail);
-    } else if (is_abbrev(sdir, "under")) {
+    }
+    else if (is_abbrev(sdir, "under"))
+    {
       look_under_target(ch, trail);
-    } else if (is_abbrev(sdir, "around")) {
+    }
+    else if (is_abbrev(sdir, "around"))
+    {
       look_around(ch);
-    } else {
+    }
+    else
+    {
       look_at_target(ch, argument);
-      }
+    }
     examine_on = FALSE;
   }
 }
@@ -2342,43 +2354,43 @@ ACMD(do_score)
                    GET_CLAN_RANK(ch),
                    (color_space ? "   " : ""), quatry_class(ch, blank));
 
-    new_send_to_char(ch,
-                     "{cg| |-------------------------------------------------------------------| |{cw\r\n");
+  new_send_to_char(ch,
+                   "{cg| |-------------------------------------------------------------------| |{cw\r\n");
 
-    new_send_to_char(ch,
-                     "{cg| | {cwHit  Points: [{cc%6d{cw][{cc%6d{cw]     Speed: [{cc%6d{cw]      AC: [{cc%4d{cw] {cg| |\r\n"
-                     "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
-                     "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]    Attack: [{cy%4d{cw]   Defence: [{cy%4d{cw] {cg| |{c0\r\n",
-                     GET_HIT(ch), GET_MAX_HIT(ch),speed_update(ch),compute_armor_class(ch),
-                     GET_MANA(ch), GET_MAX_MANA(ch), GET_HITROLL(ch),   class_damroll(ch) ,
-                     GET_MOVE(ch), GET_MAX_MOVE(ch), attack_tot(ch), defence_tot(ch));
+  new_send_to_char(ch,
+                   "{cg| | {cwHit  Points: [{cc%6d{cw][{cc%6d{cw]     Speed: [{cc%6d{cw]      AC: [{cc%4d{cw] {cg| |\r\n"
+                   "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
+                   "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]    Attack: [{cy%4d{cw]   Defence: [{cy%4d{cw] {cg| |{c0\r\n",
+                   GET_HIT(ch), GET_MAX_HIT(ch),speed_update(ch),compute_armor_class(ch),
+                   GET_MANA(ch), GET_MAX_MANA(ch), GET_HITROLL(ch),   class_damroll(ch) ,
+                   GET_MOVE(ch), GET_MAX_MOVE(ch), attack_tot(ch), defence_tot(ch));
 
-    new_send_to_char(ch,
-                     "{cg| |-------------------------------------------------------------------| |{cw\r\n");
-    if (IS_PK(ch))
-      new_send_to_char(ch, "{cg| | {cw   PKwin: [{cc%6d{cw]     PKloss: [{cc%6d{cw]     PK-Points:[{cc%6d{cw]    {cg| |\r\n",
-                       GET_PK_CNT(ch), GET_PK_RIP(ch), GET_PK_POINTS(ch));
+  new_send_to_char(ch,
+                   "{cg| |-------------------------------------------------------------------| |{cw\r\n");
+  if (IS_PK(ch))
+    new_send_to_char(ch, "{cg| | {cw   PKwin: [{cc%6d{cw]     PKloss: [{cc%6d{cw]     PK-Points:[{cc%6d{cw]    {cg| |\r\n",
+                     GET_PK_CNT(ch), GET_PK_RIP(ch), GET_PK_POINTS(ch));
 
+  new_send_to_char(ch,
+                   "{cg| | {cw   Kills: [{cc%6d{cw]     Deaths: [{cc%6d{cw]     Deathtraps: [{cc%4d{cw]    {cg| |\r\n",
+                   GET_KILL_CNT(ch), GET_RIP_CNT(ch), GET_DT_CNT(ch));
+  if (*webp || *webs)
+    new_send_to_char(ch, "{cg| |->{cC%-30s{cg<|>{cC%-30s{cg<-| |{cw\r\n", webp,  webs);
+  if ((staff || wep_num > 1) && GET_EQ(ch, WEAR_SHIELD) && *shld)
+    new_send_to_char(ch, "{cg| |->              {cC%30s{cg                   <-| |{cw\r\n", shld);
+  if (GET_EQ(ch, WEAR_WIELD) &&
+      (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_SHOVEL ||
+       GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_PICKAXE))
     new_send_to_char(ch,
-                     "{cg| | {cw   Kills: [{cc%6d{cw]     Deaths: [{cc%6d{cw]     Deathtraps: [{cc%4d{cw]    {cg| |\r\n",
-                     GET_KILL_CNT(ch), GET_RIP_CNT(ch), GET_DT_CNT(ch));
-    if (*webp || *webs)
-      new_send_to_char(ch, "{cg| |->{cC%-30s{cg<|>{cC%-30s{cg<-| |{cw\r\n", webp,  webs);
-    if ((staff || wep_num > 1) && GET_EQ(ch, WEAR_SHIELD) && *shld)
-      new_send_to_char(ch, "{cg| |->              {cC%30s{cg                   <-| |{cw\r\n", shld);
-    if (GET_EQ(ch, WEAR_WIELD) &&
-        (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_SHOVEL ||
-         GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_PICKAXE))
-      new_send_to_char(ch,
-                       "{cg| |{cC[Mining] {cwSpeed: {cc%3d{cw   Bonus: {cc%3d{cw   Protection: {cc%3d   {cwStealth: {cc%3d{cg  | |\r\n",
-                       MINE_SPEED(ch), MINE_BONUS(ch), MINE_DAMAGE(ch), MINE_STEALTH(ch));
+                     "{cg| |{cC[Mining] {cwSpeed: {cc%3d{cw   Bonus: {cc%3d{cw   Protection: {cc%3d   {cwStealth: {cc%3d{cg  | |\r\n",
+                     MINE_SPEED(ch), MINE_BONUS(ch), MINE_DAMAGE(ch), MINE_STEALTH(ch));
 
-    new_send_to_char(ch,
-                     "{cg| |-------------------------------------------------------------------| |\r\n"
-                     "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-2d{cg   | |\r\n",
-                     GET_STR(ch), GET_ADD(ch), GET_INT(ch), GET_WIS(ch),
-                     GET_CON(ch),GET_DEX(ch), GET_CHA(ch));
- 
+  new_send_to_char(ch,
+                   "{cg| |-------------------------------------------------------------------| |\r\n"
+                   "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-2d{cg   | |\r\n",
+                   GET_STR(ch), GET_ADD(ch), GET_INT(ch), GET_WIS(ch),
+                   GET_CON(ch),GET_DEX(ch), GET_CHA(ch));
+
   new_send_to_char(ch,
                    "{cg| |-------------------------------------------------------------------| |\r\n"
                    "{cg| |     Hunger: [{cy%3d%%{cg]      Thirst:[{cy%3d%%{cg]      Intoxication:[{cy%3d%%{cg]    | |\r\n",
@@ -2442,7 +2454,7 @@ ACMD(do_score)
   }
   if (PRF_FLAGGED(ch, PRF_RP))
   {
-      new_send_to_char(ch, "You are RolePlaying!\r\n");
+    new_send_to_char(ch, "You are RolePlaying!\r\n");
   }
   if (PRF_FLAGGED(ch, PRF_BUSY))
   {
@@ -2988,7 +3000,7 @@ void skill_spell_help(struct char_data *ch, int spell)
                    YESNO(IS_SET(spell_info[spell].routines, MAG_SUMMONS)),
                    YESNO(IS_SET(spell_info[spell].routines, MAG_CREATIONS))
                   );
-		    if (IS_SET(spell_info[spell].targets, TAR_SELF_ONLY))
+  if (IS_SET(spell_info[spell].targets, TAR_SELF_ONLY))
     new_send_to_char(ch, "This spell can only be cast upon yourself.\r\n");
   if (IS_SET(spell_info[spell].targets, TAR_NOT_SELF))
     new_send_to_char(ch, "This spell can not be cast on yourself.\r\n");
@@ -4043,7 +4055,7 @@ void perform_immort_where(struct char_data *ch, char *arg)
 
 ACMD(do_where)
 {
-//  char arg[MAX_STRING_LENGTH];
+  //  char arg[MAX_STRING_LENGTH];
   skip_spaces(&argument);
 
   if (GET_LEVEL(ch) > LVL_HERO && ((CMD_FLAGGED(ch, WIZ_IMM2_GRP))
@@ -4203,7 +4215,7 @@ ACMD(do_consider)
   struct char_data *victim;
   int highest_tier(struct char_data *ch);
   int diff, diff2, diff3;
-//  char buf[MAX_INPUT_LENGTH];
+  //  char buf[MAX_INPUT_LENGTH];
   skip_spaces(&argument);
 
 
@@ -4530,7 +4542,7 @@ ACMD(do_diagnose)
   if (*argument)
   {
     if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM)))
-            new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
     else
       diag_char_to_char(vict, ch);
   }
@@ -4654,7 +4666,7 @@ ACMD(do_toggle)
                    "       PageWrap: %-3s    "
                    "          Brags: %-3s\r\n"
                    "   Gate Protect: %-3s    "
-		   "      FishTally: %-3s\r\n",
+                   "      FishTally: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4699,7 +4711,7 @@ ACMD(do_toggle)
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE)),
-		   ONOFF(!PRF_FLAGGED(ch, PRF_FISHPROMPT))
+                   ONOFF(!PRF_FLAGGED(ch, PRF_FISHPROMPT))
                   );
 
 }
@@ -5193,7 +5205,7 @@ ACMD(set_perc)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
   int amount = 0, temp;
-/*TODO: change this to handle mutliple args for group members name */
+  /*TODO: change this to handle mutliple args for group members name */
 
   two_arguments(argument, buf, buf2);
   if (!*buf)
