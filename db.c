@@ -2584,7 +2584,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     char buf2[MAX_INPUT_LENGTH];
     Character *mob;
     mp_iter mit;
-    struct index_data mi;
+    struct index_data mi = index_data();
 
 
     //mi = new index_data();
@@ -3477,20 +3477,22 @@ struct help_index_element *add_to_help_index(struct help_index_element *perent,i
 
 
 int vnum_mobile(char *searchname, Character *ch) {
-    int nr, found = 0;
+    int nr = 0, found = 0;
     char buf[MAX_INPUT_LENGTH];
     DYN_DEFINE;
     *buf = 0;
     DYN_CREATE;
     *dynbuf = 0;
 
-    for (nr = 0; nr <= top_of_mobt; nr++) {
-        if (isname_full(searchname, mob_proto[nr]->player.name)) {
+    for (mp_iter mit = mob_proto.begin(); mit != mob_proto.end(); mit++) {
+    
+        if ((*mit) != NULL && isname_full(searchname, (*mit)->player.name)) {
             snprintf(buf, sizeof(buf), "%3d. [%5d] %-40s %s\r\n", ++found,
-                     mob_index[nr].vnum, mob_proto[nr]->player.short_descr,
-                     mob_proto[nr]->proto_script ? "[TRIG]" : "" );
+                     mob_index[nr].vnum, (*mit)->player.short_descr,
+                     (*mit)->proto_script ? "[TRIG]" : "" );
             DYN_RESIZE(buf);
         }
+        nr++;
     }
     if (found)
         page_string(ch->desc, dynbuf, DYN_BUFFER);
