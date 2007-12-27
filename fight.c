@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.71  2007/06/15 00:12:03  w4dimenscor
+ * Set timers on mob corpses too.
+ *
  * Revision 1.70  2007/06/12 04:46:21  w4dimenscor
  * Evasion was converting to 0 for mobs still. Bad Math
  *
@@ -352,7 +355,7 @@ int attack_group = 1;
 
 
 /*mord*/
-
+void check_timer(obj_data *obj);
 void perform_assist(Character *ch, Character *helpee);
 int speed_msg = 0;
 int ch_speed = 0;
@@ -4462,7 +4465,8 @@ void make_corpse(Character *ch, Character *killer) {
         if (!IS_NPC(ch)) {
             add_corpse_to_list(corpse);
             save_corpses();
-        }
+        } else
+        check_timer(corpse);
     }
 }
 
