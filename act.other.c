@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.38  2006/09/20 09:53:31  w4dimenscor
+ * Fixed issue where players starting combat with a spell would not attack, and visa versa
+ *
  * Revision 1.37  2006/09/15 08:01:11  w4dimenscor
  * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
  *
@@ -982,12 +985,12 @@ ACMD(do_use)
           (mag_item =
              get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
       {
-        *ch << "You don't seem to have " << AN(arg) << arg << "\r\n";
+        *ch << "You don't seem to have " << AN(arg) << " "  << arg << "\r\n";
         return;
       }
       break;
     case SCMD_USE:
-      *ch << "You don't seem to be holding " << AN(arg) << arg << "\r\n";
+      *ch << "You don't seem to be holding " << AN(arg) << " " << arg << "\r\n";
       return;
     default:
       log("SYSERR: Unknown subcmd %d passed to do_use.", subcmd);

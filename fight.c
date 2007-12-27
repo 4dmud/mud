@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.51  2006/09/20 09:53:32  w4dimenscor
+ * Fixed issue where players starting combat with a spell would not attack, and visa versa
+ *
  * Revision 1.50  2006/09/19 10:56:16  w4dimenscor
  * fixed crash bug on extracting mob links
  *
@@ -580,8 +583,7 @@ int is_short_wep(struct obj_data *obj) {
 
 int size_dice_wep(Character *ch, short dual) {
     struct obj_data *weapon;
-    int add
-        = 0, mnt = 0;
+    int d_add = 0, mnt = 0;
 
     if (dual == WEAPON_PRIM_AFF || dual == WEAPON_PRIM_NOAFF)
         weapon = GET_EQ(ch, WEAR_WIELD);
@@ -593,56 +595,41 @@ int size_dice_wep(Character *ch, short dual) {
 
     if (GET_OBJ_TYPE(weapon) != ITEM_WEAPON)
         return 1;
-    add
-        = GET_OBJ_VAL(weapon, 1);
+    d_add = GET_OBJ_VAL(weapon, 1);
 
     if (dual == WEAPON_PRIM_AFF || dual == WEAPON_SECO_AFF) {
 
-        add
-            += (GET_CON(ch) >  21);
-        add
-            += (GET_CON(ch) >  18);
-        add
-            += (GET_CON(ch) >  14);
-        add
-            += (GET_DEX(ch) >= 18);
+        d_add += (GET_CON(ch) >  21);
+        d_add += (GET_CON(ch) >  18);
+        d_add += (GET_CON(ch) >  14);
+        d_add += (GET_DEX(ch) >= 18);
         if (GET_CLASS(ch) == CLASS_WARRIOR || GET_CLASS(ch) == CLASS_HUNTER) {
-            add
-                += (GET_DEX(ch) >= 22);
+            d_add += (GET_DEX(ch) >= 22);
 
-            add
-                += (GET_ADD(ch) >  50);
+            d_add += (GET_ADD(ch) >  50);
         }
 
-        add
-            += (wep_hands(weapon) == 2 ? 2 : 0);
+        d_add += (wep_hands(weapon) == 2 ? 2 : 0);
 
         /*affects*/
         if (AFF_FLAGGED(ch, AFF_BLADEDANCE))
-            add
-                += 2;
+            d_add += 2;
         if (AFF_FLAGGED(ch, AFF_TRUE_STRIKING))
-            add
-                += 2;
+            d_add += 2;
         if (AFF_FLAGGED(ch, AFF_GRIP))
-            add
-                += 2;
+            d_add += 2;
         if ( AFF_FLAGGED(ch, AFF_BESERK))
-            add
-                += 2;
+            d_add += 2;
         if (GET_SPEED(ch) != 0)
-            add
-                += GET_SPEED(ch)/100;
+            d_add += GET_SPEED(ch)/100;
 
 
         if (RIDING(ch) && HERE(ch, RIDING(ch)))
-            add
-                += (mnt = GET_SKILL(ch, SKILL_MOUNTED_COMBAT)) > 0 ? mnt / 20 : 0;
+            d_add += (mnt = GET_SKILL(ch, SKILL_MOUNTED_COMBAT)) > 0 ? mnt / 20 : 0;
 
 
         if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-            add
-                += 3;
+            d_add += 3;
 
 
     }
@@ -651,18 +638,15 @@ int size_dice_wep(Character *ch, short dual) {
         case CLASS_MAGE:
         case CLASS_PRIEST:
         case CLASS_ESPER:
-            add
-                -= 5;
+            d_add -= 5;
         }
     }
-    return add
-               ;
+    return d_add;
 }
 
 int num_dice_wep(Character *ch, short dual) {
     struct obj_data *weapon;
-    int add
-        = 0;
+    int d_add = 0;
 
     if (dual == WEAPON_PRIM_AFF || dual == WEAPON_PRIM_NOAFF)
         weapon = GET_EQ(ch, WEAR_WIELD);
@@ -675,54 +659,40 @@ int num_dice_wep(Character *ch, short dual) {
     if (GET_OBJ_TYPE(weapon) != ITEM_WEAPON)
         return 1;
 
-    add
-        = GET_OBJ_VAL(weapon, 2);
+    d_add = GET_OBJ_VAL(weapon, 2);
 
 
     if (dual == WEAPON_PRIM_AFF || dual == WEAPON_SECO_AFF) {
-        add
-            += (wep_hands(weapon) == 3 ? 3 : 0);
+        d_add += (wep_hands(weapon) == 3 ? 3 : 0);
         if (GET_CLASS(ch) == CLASS_WARRIOR || GET_CLASS(ch) == CLASS_HUNTER) {
-            add
-                += (GET_ADD(ch) > 80);
-            add
-                += (GET_CON(ch) > 18);
+            d_add += (GET_ADD(ch) > 80);
+            d_add += (GET_CON(ch) > 18);
         }
-        add
-            += (GET_DEX(ch) >= 22);
-        add
-            += (GET_CON(ch) >= 22);
+        d_add += (GET_DEX(ch) >= 22);
+        d_add += (GET_CON(ch) >= 22);
 
-        add
-            += (GET_DEX(ch) >= 18);
-        add
-            += (GET_STR(ch) >= 22);
+        d_add += (GET_DEX(ch) >= 18);
+        d_add += (GET_STR(ch) >= 22);
         /*affects*/
         if (AFF_FLAGGED(ch, AFF_TRUE_STRIKING))
-            add
-                += 2;
+            d_add += 2;
         if (AFF_FLAGGED(ch,AFF_GRIP))
-            add
-                += 2;
+            d_add += 2;
         //Take more if attacker is a tier
-        add
-            += highest_tier(ch);
+        d_add += highest_tier(ch);
     }
     if (!IS_NPC(ch) ) {
         switch ((int) GET_CLASS(ch)) {
         case CLASS_MAGE:
         case CLASS_PRIEST:
         case CLASS_ESPER:
-            add
-                -= 3;
+            d_add -= 3;
         }
     }
     if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_LIGHTSABRE) && GET_SUB(ch, SUB_LIGHTSABER_PROF) > 0)
-        add
-            += GET_SUB(ch, SUB_LIGHTSABER_PROF) / 49;
+        d_add += GET_SUB(ch, SUB_LIGHTSABER_PROF) / 49;
 
-    return add
-               ;
+    return d_add;
 }
 
 
@@ -757,12 +727,12 @@ void start_fighting(Character* ch, Character* vict) {
     /*to stop recursion*/
     if (!ch || !vict)
         return;
-victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict : vict;
-    if (FIGHTING(ch) || DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
+	victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
+    if ( DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
         return;
 
     if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
-        send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
+        *ch << "This room just has such a peaceful, easy feeling...\r\n";
         return;
     }
 
@@ -778,30 +748,24 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
     if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
         affect_from_char(victim, SPELL_SWEET_DREAMS);
-
-    //GET_POS(victim) = POS_STANDING;
-
-
-
+        
     if (!can_fight(ch, victim, FALSE))
         return;
 
-
-
-    if (GET_POS(ch) > POS_STUNNED && FIGHTING(ch) == NULL) {
+    if (GET_POS(ch) > POS_STUNNED && GET_FIGHT_EVENT(ch) == NULL) {
 
         if (FIGHTING(victim))
             start_fighting_delay(ch, victim);
         else {
             long ch_id = GET_ID(ch);
             FIGHTING(ch) = victim;
+            if (GET_POS(ch) > POS_STUNNED)
             GET_POS(ch) = POS_FIGHTING;
 
-
             if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0) {
-                if (find_char(ch_id))
+                if (find_char(ch_id)) {
                     next_round(ch);
-                else
+                } else
                     return;
             }
         }
@@ -823,11 +787,9 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
                 perform_assist(f->follower, ch);
         }
     }
-
-
-
-
 }
+
+
 Character *find_random_victim(Character *ch) {
     Character *vict;
     for (vict = IN_ROOM(ch)->people; vict ; vict = vict->next_in_room) {
@@ -883,7 +845,6 @@ void start_fighting_delay(Character *ch, Character *vict) {
         *ch << "You slowly fade into existence.\r\n";
     }
 
-
     if (!can_fight(ch, victim, FALSE))
         return;
 
@@ -937,7 +898,6 @@ int next_round(Character* ch) {
 
         ch_event = new fight_event_obj(GET_ID(ch));
         GET_FIGHT_EVENT(ch) = event_create(fight_event, ch_event, time, EVENT_TYPE_FIGHT);
-
     } else {
         stop_fighting(ch);
     }
@@ -963,9 +923,6 @@ EVENTFUNC(fight_event) {
     struct fight_event_obj* fight = (struct fight_event_obj*) event_obj;
     long id = fight->id;
     Character *ch = find_char(id);
-
-
-
     if (ch) {
         /** debugging **/
         #if 0
@@ -1051,10 +1008,9 @@ void skill_attack(Character *ch, Character *vict, int skill, int pass) {
             GET_NEXT_SKILL(ch) = skill;
             GET_NEXT_VICTIM(ch) = GET_ID(vict);
         }
-    } else {
+    } else 
         fe_after_damage(ch, vict, 0, skill);
-    }
-
+    
 }
 
 
@@ -1587,18 +1543,22 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
         affect_from_char(vict, SPELL_SLEEP);
         act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
         act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
+        GET_POS(vict) = POS_STANDING;
+        update_pos(vict);
     }
 
     if (affected_by_spell(vict, SPELL_SWEET_DREAMS)) {
         affect_from_char(vict, SPELL_SWEET_DREAMS);
         act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
         act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
+        GET_POS(vict) = POS_STANDING;
+        update_pos(vict);
     }
 
-    if (!FIGHTING(vict) && HERE(vict, ch))
-        start_fighting_delay(vict, ch);
     if (!FIGHTING(ch) && HERE(vict, ch))
         start_fighting_delay(ch, vict);
+    if (!FIGHTING(vict) && HERE(vict, ch))
+        start_fighting_delay(vict, ch);
 
     if (IS_NPC(ch)) {
 
@@ -1734,10 +1694,16 @@ perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 :
 
 
 int melee_type_dam(Character *ch, Character *vict, int attack_chance, int weps, int second) {
-    int dam = 0;
+	static int randomizer = 0;
+    int dam;
+    /* at least have between 0 and 3 damage */
+    dam = randomizer % 3;
+    randomizer++;
+    if (randomizer > 1000)
+    randomizer = 2;
+    
     if (!IS_NPC(ch)) {
         dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-        dam += number(0,2);
         if (second) { //hitting with secondary weapon
             dam += dice(size_dice_wep(ch, WEAPON_SECO_AFF), num_dice_wep(ch, WEAPON_SECO_AFF));
             if (!number(0, 100))
@@ -1947,7 +1913,7 @@ int fe_solo_damage(Character* ch, Character* vict,
 
 /* When we're hitting a group of actual players, this gets
    called so that we break up the damage between them.
-   ch is hitting vict and all the people in his groupt that
+   ch is hitting vict and all the people in his group that
    are fighting ch for a total of damage amount with weapon
    type w_type.  After we get the percentage of the damage
    that should be hitting each player, we just call
@@ -1962,7 +1928,6 @@ int fe_group_damage(Character* ch, Character* vict,
     float total_perc  = 0;
     float temp_damage = 0;
     int   to_ret      = 0;
-    room_rnum   rm = IN_ROOM(ch);
     int i;
     /* this is probably a bad way to do it - FIXME */
     int hit_list[30];
@@ -1978,11 +1943,11 @@ int fe_group_damage(Character* ch, Character* vict,
         hit_list[i] = -1;
 
     /*find the head of the group you are hitting */
-    master = vict;//((vict->master == NULL)? vict->master : vict);
+    master = ((vict->master != NULL) ? vict->master : vict);
 
     /*check if the master is a valid target - and add the value of  */
     if (FIGHTING(master) == ch)
-        if (IN_ROOM(master) == rm)
+        if (HERE(master, ch))
             if (GET_LEVEL(master) < LVL_IMMORT && !IS_NPC(master) && !PLR_FLAGGED(master, PLR_DYING)) {
                 total_perc += GET_PERC(master);
                 hit_list[count++] = GET_ID(master);
@@ -1990,11 +1955,11 @@ int fe_group_damage(Character* ch, Character* vict,
 
     /*check the followers*/
     for (f = master->followers; f; f = f->next) {
-        if (IN_ROOM(f->follower)!=rm)
+        if (!HERE(f->follower, ch))
             continue;
         if (!IS_NPC(f->follower) && (PLR_FLAGGED(f->follower, PLR_DYING) || GET_LEVEL(f->follower) >= LVL_IMMORT))
             continue;
-        if (GET_PERC(f->follower)<=0)
+        if (GET_PERC(f->follower)<=5)
             continue;
         if (count >= 30)
             break;
@@ -2018,7 +1983,7 @@ int fe_group_damage(Character* ch, Character* vict,
         if ((list = find_char(hit_list[i])) == NULL)
             continue;
 
-        temp_damage = (GET_PERC(list)/total_perc)*((float)damage);
+        temp_damage = (((100*GET_PERC(list))/total_perc)*((float)damage))/100;
 
         temp_damage = IRANGE(1, temp_damage, MAX_MOB_DAM);
 
@@ -2107,9 +2072,9 @@ int fe_deal_damage(Character* ch, Character* vict,
             //start_fighting_delay(ch, RIDDEN_BY(vict));
             ///** return 0 so stop fighting isn't called again **/
             //return 0;
-        } else {
+        } else 
             return fe_solo_damage(ch, vict, dam, w_type);
-        }
+        
     } else if (master) {
         if (HERE(master, vict)) { /* victim isnt the master! -- find the master and whack em! */
             //stop_fighting(ch);
@@ -2517,6 +2482,9 @@ int fe_after_damage(Character* ch, Character* vict,
 
     if (!FIGHTING(vict) && !SELF(ch, vict) && HERE(ch, vict))
         start_fighting_delay(vict, ch);
+
+    if (!FIGHTING(ch) && !SELF(ch, vict) && HERE(ch, vict))
+        start_fighting_delay(ch, vict);
 
     return dam;
 }
@@ -4039,7 +4007,7 @@ void dam_message(int dam, Character *ch, Character *victim,
                      {"hurt", "hurts", ""},//7
                      {"abuse", "abuses", ""},//8
                      {"scathe", "scathes", ""},//9
-                     {"smash", "smashs", ""},//10
+                     {"smash", "smashes", ""},//10
                      {"injure", "injures", ""},//11
                      {"mangle", "mangles", ""},//12
                      {"damage", "damages", ""},//13

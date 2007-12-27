@@ -277,7 +277,7 @@ int mag_damage(int level, Character *ch, Character *victim,
     int good = 1;
     int evil = 1;
     int pass = TRUE;
-    Character *pvict = NULL;
+    long pvict = -1;
 
 
     if (ch) {
@@ -346,16 +346,18 @@ int mag_damage(int level, Character *ch, Character *victim,
 
     if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
         pass = FALSE;
-    /** if the player is fighting already, savethe person they are fighting with **/
-    if (FIGHTING(ch) != victim)
-        pvict = FIGHTING(ch);
-    /** Temporarily make this other person the FIGHTEE **/
-    FIGHTING(ch) = victim;
+    if (FIGHTING(ch) != NULL) {
+        /** if the player is fighting already, savethe person they are fighting with **/
+        if (FIGHTING(ch) != victim)
+            pvict = GET_ID(FIGHTING(ch));
+        /** Temporarily make this other person the FIGHTEE **/
+        FIGHTING(ch) = victim;
+    }
     /** attack them **/
     skill_attack(ch, victim, spellnum, pass);
     /** then switch back if nessercery **/
-    if (pvict != NULL)
-        FIGHTING(ch) = check_ch(pvict);
+    if (pvict != -1)
+        FIGHTING(ch) = find_char(pvict);
 
     if (DEAD(victim) || GET_POS(victim) == POS_DEAD)
         return -1;
@@ -1365,7 +1367,7 @@ int perform_mag_direction(int level, room_rnum room, Character *ch, Character *v
         break;
     }
 
-#define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
+    #define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
 
     if (room == IN_ROOM(ch)) {
         sprintf(format, "%s %s emerges from $N and strikes you!", CANA(skill_name(spellnum)),skill_name(spellnum));
