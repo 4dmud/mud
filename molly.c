@@ -20,11 +20,12 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 
 ACMD(do_smell)
 {
-  int bits, found = FALSE, j;
+  int bits, found = FALSE, j,fnum;
   struct char_data *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
-
+  char *arg1;
+  arg1=arg;
   if (!ch->desc)
     return;
 
@@ -35,7 +36,11 @@ ACMD(do_smell)
     new_send_to_char(ch, "%s", IN_ROOM(ch)->smell);
     return;
   }
-
+  if (!(fnum = get_number(&arg1)))
+  {
+    send_to_char("Smell what?\r\n", ch);
+    return;
+  }
   bits =
     generic_find(arg,
                  FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
@@ -63,8 +68,10 @@ ACMD(do_smell)
       if (isname(arg, GET_EQ(ch, j)->name))
         if (GET_EQ(ch, j)->smell != NULL)
         {
-          send_to_char(GET_EQ(ch, j)->smell, ch);
-          found = TRUE;
+          if(--fnum==0){
+            send_to_char(GET_EQ(ch, j)->smell, ch);
+            found = TRUE;
+          }
         }
 
   /* carried equipment */
@@ -74,8 +81,10 @@ ACMD(do_smell)
       if (isname(arg, (obj)->name))
         if (obj->smell != NULL)
         {
-          send_to_char((obj)->smell, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char((obj)->smell, ch);
+             found = TRUE;
+          }
         }
   }
 
@@ -86,8 +95,10 @@ ACMD(do_smell)
       if (isname(arg, obj->name))
         if (obj->smell != NULL)
         {
-          send_to_char(obj->smell, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char(obj->smell, ch);
+             found = TRUE;
+          }
         }
 
   if (!found)
@@ -96,11 +107,13 @@ ACMD(do_smell)
 
 ACMD(do_taste)
 {
-  int bits, found = FALSE, j;
+  int bits, found = FALSE, j,fnum;
   struct char_data *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
+  char *arg1;
 
+  arg1=arg;
   if (!ch->desc)
     return;
 
@@ -111,7 +124,11 @@ ACMD(do_taste)
     send_to_char("What do you want to taste?\r\n", ch);
     return;
   }
-
+  if (!(fnum = get_number(&arg1)))
+  {
+    send_to_char("Taste what?\r\n", ch);
+    return;
+  }
   bits =
     generic_find(arg,
                  FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
@@ -138,8 +155,10 @@ ACMD(do_taste)
       if (isname(arg, GET_EQ(ch, j)->name))
         if (GET_EQ(ch, j)->taste != NULL)
         {
-          send_to_char(GET_EQ(ch, j)->taste, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char(GET_EQ(ch, j)->taste, ch);
+             found = TRUE;
+          }
         }
 
   /* carried equipment */
@@ -149,8 +168,10 @@ ACMD(do_taste)
       if (isname(arg, (obj)->name))
         if (obj->taste != NULL)
         {
-          send_to_char((obj)->taste, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char((obj)->taste, ch);
+             found = TRUE;
+          }
         }
   }
 
@@ -161,8 +182,10 @@ ACMD(do_taste)
       if (isname(arg, obj->name))
         if (obj->taste != NULL)
         {
-          send_to_char(obj->taste, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char(obj->taste, ch);
+             found = TRUE;
+          }
         }
 
   if (!found)
@@ -171,11 +194,12 @@ ACMD(do_taste)
 
 ACMD(do_feel)
 {
-  int bits, found = FALSE, j;
+  int bits, found = FALSE, j, fnum;
   struct char_data *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
-
+  char *arg1;
+  arg1=arg;
   if (!ch->desc)
     return;
 
@@ -184,6 +208,12 @@ ACMD(do_feel)
   if (!*arg)
   {
     send_to_char("What do you want to feel?\r\n", ch);
+    return;
+  }
+
+  if (!(fnum = get_number(&arg1)))
+  {
+    send_to_char("Feel what?\r\n", ch);
     return;
   }
 
@@ -198,8 +228,10 @@ ACMD(do_feel)
       if (isname(arg, GET_EQ(ch, j)->name))
         if (GET_EQ(ch, j)->feel != NULL)
         {
-          send_to_char(GET_EQ(ch, j)->feel, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char(GET_EQ(ch, j)->feel, ch);
+             found = TRUE;
+          }
         }
 
   /* carried equipment */
@@ -209,8 +241,10 @@ ACMD(do_feel)
       if (isname(arg, (obj)->name))
         if (obj->feel != NULL)
         {
-          send_to_char((obj)->feel, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char((obj)->feel, ch);
+             found = TRUE;
+          }
         }
   }
 
@@ -221,8 +255,10 @@ ACMD(do_feel)
       if (isname(arg, obj->name))
         if (obj->feel != NULL)
         {
-          send_to_char(obj->feel, ch);
-          found = TRUE;
+          if(--fnum==0){
+             send_to_char(obj->feel, ch);
+             found = TRUE;
+          }
         }
 
   if (!found)
