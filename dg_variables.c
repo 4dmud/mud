@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/04/22 21:44:43 $                                           * 
-*  $Revision: 1.44 $                                                      *
+*  $Date: 2007/06/01 09:38:39 $                                           * 
+*  $Revision: 1.45 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -749,23 +749,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                         if (k)
                             snprintf(str, slen, "1");
                     }
-                } else if (!strcasecmp(field, "next_follower")) {
-                    struct follow_type *k;
-                    Character *h = NULL;
-                    snprintf(str, slen, "0");
-                    if (c->master) {
-                        for (k = c->master->followers; k; k = k->next) {
-                            if (c == k->follower) {
-                                if (k->next && k->next->follower)
-                                    h = k->next->follower;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (h)
-                        snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(h));
-                } else if (!strcasecmp(field, "fighting")) {
+                }  else if (!strcasecmp(field, "fighting")) {
                     if (FIGHTING(c))
                         snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(FIGHTING(c)));
                     else
@@ -1011,6 +995,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                                  GET_ID(c->next_in_room));
                     else
                         *str = '\0';
+                } else if (!strcasecmp(field, "next_follower")) {
+                    struct follow_type *k;
+                    Character *h = NULL;
+                    snprintf(str, slen, "0");
+                    if (c->master) {
+                        for (k = c->master->followers; k; k = k->next) {
+                            if (c == k->follower) {
+                                if (k->next && k->next->follower)
+                                    h = k->next->follower;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (h)
+                        snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(h));
                 } else if (!strcasecmp(field, "name")) {
                     if (GET_SHORT(c) != NULL)
                         snprintf(str, slen, "%s", GET_SHORT(c));
