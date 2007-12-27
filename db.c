@@ -298,13 +298,7 @@ extern int auto_pwipe;
 /*************************************************************************
 *  routines for booting the system                                       *
 *************************************************************************/
-struct DeleteObject {
-    template <typename T>
-    void operator() (const T* ptr) const {
-        if (ptr != NULL)
-            delete ptr;
-    };
-};
+
 
 static int taone(const struct dirent *a1) {
     if (!a1)
@@ -4932,14 +4926,15 @@ int store_to_char(const char *name, Character *ch) {
                     }
                 } while (num != 0);
             } else if (!strcmp(tag, "Subs")) {
-                struct sub_list s;
+            sub_list *s;
                 do {
                     get_line(fl, line);
                     if (sscanf(line, "%d %d %d", &num, &num2, &num3) == 3) {
                         if (num != 0) {
-                            s.subskill = (enum subskill_list)(num);
-                            s.status = (enum sub_status_toggle)num3;
-                            s.learn = num2;
+                            s = new sub_list();
+                            s->subskill = (enum subskill_list)(num);
+                            s->status = (enum sub_status_toggle)num3;
+                            s->learn = num2;
                             SAVED(ch).UpdateSub(s);
                         }
                     }
@@ -5075,7 +5070,7 @@ int id;
     }
 
     for (kill_map::iterator it = SPECIALS(this)->KillsBegin(); it != SPECIALS(this)->KillsEnd(); it++)
-        fprintf(fl, "%d %d %ld %ld\n",(it->second).vnum,  (it->second).count, (it->second).first, (it->second).last);
+        fprintf(fl, "%d %d %ld %ld\n",(it->second)->vnum,  (it->second)->count, (it->second)->first, (it->second)->last);
 
     fclose(fl);
     return;
@@ -5220,15 +5215,15 @@ void char_to_store(Character *ch) {
         fprintf(fl, "Skil:\n");
         for (skills_map::iterator it = SAVED(ch).SkillsBegin();
                 it != SAVED(ch).SkillsEnd();it++) {
-            if (knows_spell(ch, (it->second).skill) && (it->second).learn > 0)
-                fprintf(fl, "%d %d %d 0\n", (it->second).skill, (it->second).learn, (it->second).wait);
+            if (knows_spell(ch, (it->second)->skill) && (it->second)->learn > 0)
+                fprintf(fl, "%d %d %d 0\n", (it->second)->skill, (it->second)->learn, (it->second)->wait);
         }
         fprintf(fl, "0 0 0 0\n");
         fprintf(fl, "Subs:\n");
         for (subs_map::iterator it = SAVED(ch).SubsBegin();
                 it != SAVED(ch).SubsEnd(); it++) {
-            if ((it->second).learn > 0)
-                fprintf(fl, "%d %d %d\n", (it->second).subskill, (it->second).learn, (it->second).status);
+            if ((it->second)->learn > 0)
+                fprintf(fl, "%d %d %d\n", (it->second)->subskill, (it->second)->learn, (it->second)->status);
         }
         fprintf(fl, "0 0 0\n");
     }

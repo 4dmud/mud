@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.47  2006/08/25 06:39:43  w4dimenscor
+ * fixed the way skills would be deleted when you quit
+ *
  * Revision 1.46  2006/08/23 09:01:26  w4dimenscor
  * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
  *
@@ -989,7 +992,7 @@ EVENTFUNC(fight_event) {
                 } else
                     return 0;
             } else {
-                if (GET_SWEEP_DAM(ch)) {
+                if (!IS_NPC(ch) && GET_SWEEP_DAM(ch)) {
                     Character *victnext = find_random_victim(ch);
                     if (victnext) {
                         act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);

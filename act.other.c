@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.35  2006/08/25 06:39:43  w4dimenscor
+ * fixed the way skills would be deleted when you quit
+ *
  * Revision 1.34  2006/08/23 09:01:26  w4dimenscor
  * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
  *
@@ -424,18 +427,18 @@ void list_kills_to_char(Character *ch)
   DYN_CREATE;
   for (kill_map::iterator it = SPECIALS(ch)->KillsBegin();it != SPECIALS(ch)->KillsEnd();it++)
   {
-    if ((it->second).vnum == NOBODY)
+    if ((it->second)->vnum == NOBODY)
       continue;
 
-    if ((rnum = real_mobile((it->second).vnum)) != NOTHING)
+    if ((rnum = real_mobile((it->second)->vnum)) != NOTHING)
     {
-      first = asctime(localtime(&(it->second).first));
+      first = asctime(localtime(&(it->second)->first));
       first += 4;
       //*(first + strlen(first) - 2) = '\0';
-      last = asctime(localtime(&(it->second).last));
+      last = asctime(localtime(&(it->second)->last));
       last += 4;
       //*(last + 11 ) = '\0';
-      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", (it->second).count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
+      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", (it->second)->count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
       DYN_RESIZE(line);
       found++;
     }

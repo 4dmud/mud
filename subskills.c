@@ -1095,10 +1095,10 @@ ACMD(do_subdisplay) {
     *dynbuf = 0;
     for (it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) {
 
-        if ((it->second).subskill > 0 &&  (sub_info[(it->second).subskill].stat_type == STATUS_TYPE_ONOFF)) {
+        if ((it->second)->subskill > 0 &&  (sub_info[(it->second)->subskill].stat_type == STATUS_TYPE_ONOFF)) {
             i++;
             sprintf(buf, "{cc%22s: [{cy%3s{cc] (%11s)\r\n",
-                    sub_name((it->second).subskill), ONOFF((it->second).status), IS_SET(sub_info[(it->second).subskill].flags,SUB_TYPE_AUTO) ? "Uncontroled" : "Controled");
+                    sub_name((it->second)->subskill), ONOFF((it->second)->status), IS_SET(sub_info[(it->second)->subskill].flags,SUB_TYPE_AUTO) ? "Uncontroled" : "Controled");
 
             DYN_RESIZE(buf);
         }
@@ -1121,7 +1121,7 @@ int default_on(enum subskill_list &sub) {
 
 void reset_default_status(Character *ch) {
     for (subs_map::iterator it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) 
-        (it->second).status = (enum sub_status_toggle)default_on((it->second).subskill);
+        (it->second)->status = (enum sub_status_toggle)default_on((it->second)->subskill);
 }
 
 

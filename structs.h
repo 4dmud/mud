@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.54  2006/08/25 06:39:43  w4dimenscor
+ * fixed the way skills would be deleted when you quit
+ *
  * Revision 1.53  2006/08/23 11:37:33  w4dimenscor
  * Adjustments to the SkillsSpells Functions in char specials
  *
@@ -1324,6 +1327,14 @@ typedef int shop_rnum;
  */
 typedef unsigned long int bitvector_t;
 
+struct DeleteObject {
+    template <typename T>
+    void operator() (const T* ptr) const {
+        if (ptr != NULL)
+            delete ptr;
+    };
+};
+
 struct help_category_data {
     char *uri;
     char *brief;
@@ -1737,8 +1748,8 @@ struct skillspell_data {
 
     skillspell_data() : skill(-1), learn(0), wait(0) {}
 };
-typedef map<subskill_list, sub_list> subs_map;
-typedef map<int, skillspell_data> skills_map;
+typedef map<subskill_list,struct sub_list*> subs_map;
+typedef map<int,struct skillspell_data*> skills_map;
 
 class player_special_data_saved {
 public:
@@ -1789,22 +1800,20 @@ public:
     bool tier2;
     bool tier3;
 
-    void UpdateSub(sub_list s) {
-        subs[s.subskill] = s;
+    void UpdateSub(sub_list *s) {
+        subs[s->subskill] = s;
     }
-    void UpdateSkill(skillspell_data s) {
-        skills[s.skill] = s;
+    void UpdateSkill(skillspell_data *s) {
+        skills[s->skill] = s;
     }
     void DeleteSub(subskill_list ss) {
-        map<subskill_list, sub_list>::iterator s_it =
-            subs.find(ss);
+        subs_map::iterator s_it = subs.find(ss);
         if (s_it == subs.end())
             return;
         subs.erase(ss);
     }
     void DeleteSkill(int ss) {
-        skills_map::iterator s_it =
-            skills.find(ss);
+        skills_map::iterator s_it = skills.find(ss);
         if (s_it == skills.end())
             return;
         skills.erase(ss);
@@ -1817,8 +1826,8 @@ public:
     }
     void SkillWaitTick() {
        for (skills_map::iterator s_it = skills.begin();s_it != skills.end();s_it++)
-       	if (s_it->second.wait > 0)
-       		s_it->second.wait--;
+       	if (s_it->second->wait > 0)
+       		s_it->second->wait--;
     }
 	int CountSubs() {
 		return subs.size();
@@ -1827,20 +1836,20 @@ public:
         if (!HasSub(ss))
             return 0;
         else
-            return subs[ss].learn;
+            return subs[ss]->learn;
     }
     sub_status_toggle GetSubStatus(subskill_list ss) {
         if (!HasSub(ss))
             return STATUS_OFF;
         else
-            return subs[ss].status;
+            return subs[ss]->status;
     }
     sub_status_toggle SetSubStatus(subskill_list ss, sub_status_toggle t) {
         if (!HasSub(ss))
             return STATUS_OFF;
             
-	   subs[ss].status = t;
-        return subs[ss].status;
+	   subs[ss]->status = t;
+        return subs[ss]->status;
     }
     int SetSubLearn(subskill_list ss, int l) {
         if (l > 100)
@@ -1848,12 +1857,12 @@ public:
         else if (l < 0)
             l = 0;
         if (!HasSub(ss)) {
-            subs[ss] = sub_list();
-            subs[ss].learn = l;
+            subs[ss] = new sub_list();
+            subs[ss]->learn = l;
         } else {
-            subs[ss].learn = l;
+            subs[ss]->learn = l;
         }
-        return subs[ss].learn;
+        return subs[ss]->learn;
     }
     int UpdateSubLearn(subskill_list ss, int l) {
  if (l > 100)
@@ -1861,12 +1870,12 @@ public:
         else if (l < 0)
             l = 0;
         if (!HasSub(ss)) {
-            subs[ss] = sub_list();
-            subs[ss].learn = l;
+            subs[ss] = new sub_list();
+            subs[ss]->learn = l;
         } else {
-            subs[ss].learn += l;
+            subs[ss]->learn += l;
         }
-        return subs[ss].learn;
+        return subs[ss]->learn;
     }
     subs_map::iterator SubsBegin() {
     return subs.begin();
@@ -1885,23 +1894,21 @@ public:
     int GetSkillLearn(int ss) {
         if (!HasSkill(ss))
             return 0;
-        else {
-        
-            return skills[ss].learn;
-            }
+        else
+            return skills[ss]->learn;
     }
     int GetSkillWait(int ss) {
         if (!HasSkill(ss))
             return 0;
         else
-            return skills[ss].wait;
+            return skills[ss]->wait;
     }
     int SetSkillWait(int ss, int w) {
         if (!HasSkill(ss))
             return 0;
         
-        skills[ss].wait = w < 0 ? 0 : w;
-        return skills[ss].wait ;
+        skills[ss]->wait = w < 0 ? 0 : w;
+        return skills[ss]->wait ;
     }
     int CountSkills() {
 		return skills.size();
@@ -1912,12 +1919,12 @@ public:
         else if (l < 0)
             l = 0;
         if (!HasSkill(ss)) {
-        skills[ss] = skillspell_data();
-        skills[ss].learn = l;
+        skills[ss] = new skillspell_data();
+        skills[ss]->learn = l;
         } else 
-            skills[ss].learn = l;
+            skills[ss]->learn = l;
 
-        return skills[ss].learn;
+        return skills[ss]->learn;
     }
     int UpdateSkillLearn(int ss, int l) {
     if (l > 100)
@@ -1925,12 +1932,12 @@ public:
         else if (l < 0)
             l = 0;
         if (!HasSkill(ss)) {
-        skills[ss] = skillspell_data();
-        skills[ss].learn = l;
+        skills[ss] = new skillspell_data();
+        skills[ss]->learn = l;
         } else 
-            skills[ss].learn += l;
+            skills[ss]->learn += l;
 
-        return skills[ss].learn;
+        return skills[ss]->learn;
     }
 
 
@@ -2037,6 +2044,15 @@ public:
         ctellsnoop = 0;
     }
 
+    ~player_special_data_saved() {
+if (subs.size() > 0)
+for (subs_map::iterator s_it = subs.begin();s_it != subs.end();s_it++)
+if (s_it->second != NULL) delete s_it->second;
+if (skills.size() > 0)
+for (skills_map::iterator s_it = skills.begin();s_it != skills.end();s_it++)
+if (s_it->second != NULL) delete s_it->second;
+    }
+
 private:
 subs_map subs; /*list of subskills available to that person*/
 skills_map skills; /*list of skills and spells available to that person */
@@ -2048,6 +2064,12 @@ struct kill_data {
     int count;
     time_t last;
     time_t first;
+    kill_data() {
+    vnum = NOBODY;
+    count = 0;
+    last = time(0);
+    first = time(0);
+    }
 };
 
 
@@ -2058,7 +2080,7 @@ struct kill_data {
  * be changed freely; beware, though, that changing the contents of
  * player_special_data_saved will corrupt the playerfile.
  */
-typedef map<mob_vnum, kill_data> kill_map;
+typedef map<mob_vnum, struct kill_data*> kill_map;
  
 class player_special_data {
 public:
@@ -2138,9 +2160,9 @@ public:
         email  = NULL;
         newbie_status = 0;
         help  = NULL;
+        kills.clear();
 
     }
-    ~player_special_data() {}
     kill_map::iterator KillsBegin() {
     return kills.begin();
     }
@@ -2155,31 +2177,36 @@ public:
     }
     void SetKill(mob_vnum v, int count, time_t last, time_t first) {
     if (v > 0) {
-		kills[v].count = count;
-		kills[v].vnum = v;
-		kills[v].last = time(0);
-		kills[v].first = time(0);
+          kills[v] = new kill_data();
+		kills[v]->count = count;
+		kills[v]->vnum = v;
+		kills[v]->last = last;
+		kills[v]->first = first;
 		}
     }
 	void UpdateKill(mob_vnum &v) {
 	kill_map::iterator it = kills.find(v);
 	
 	if (it == kills.end()) {
-		struct kill_data temp;
-		kills[v] = temp;
-		kills[v].count = 1;
-		kills[v].vnum = v;
-		kills[v].last = time(0);
-		kills[v].first = time(0);
+          kills[v] = new kill_data();
+		kills[v]->count = 1;
+		kills[v]->vnum = v;
+		kills[v]->last = time(0);
+		kills[v]->first = time(0);
 		
 	} else {
-		kills[v].count++;
-		kills[v].last = time(0);
+		kills[v]->count++;
+		kills[v]->last = time(0);
 	}
 	
 	
 	}
-
+	
+    ~player_special_data() {
+	if (kills.size() > 0)
+for (kill_map::iterator s_it = kills.begin();s_it != kills.end();s_it++)
+if (s_it->second != NULL) delete s_it->second;
+}
     private:
     kill_map kills;
 }
