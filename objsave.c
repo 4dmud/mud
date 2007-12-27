@@ -1261,7 +1261,7 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
     fprintf(fl, "Idents:\n");
 
     for (iden = obj->idents;iden;iden=iden->next)
-      fprintf(fl, "%d\n", iden->id);
+      fprintf(fl, "%ld\n", iden->id);
 
     fprintf(fl, "%d\n", -1);
   }

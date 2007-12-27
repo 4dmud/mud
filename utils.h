@@ -454,6 +454,7 @@ void set_skill(struct char_data *ch, int skill, int amount);
 #define CMD_FLAGGED2(ch, flag) (IS_SET(CMD_FLAGS2(ch), (flag)))
 #define ROOM_FLAGGED(loc, flag) (IS_SET_AR(ROOM_FLAGS(loc), (flag)))
 #define ZONE_FLAGGED(loc, flag) (IS_SET(ZONE_FLAGS(loc), (flag)))
+#define SECTOR(loc) ((loc)->sector_type)
 int has_body(CHAR_DATA *ch, int flag);
 #define HAS_BODY(ch, flag) (has_body(ch, flag))
 #define EXIT_FLAGGED(exit, flag) (IS_SET((exit)->exit_info, (flag)))

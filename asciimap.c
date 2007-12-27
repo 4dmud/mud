@@ -60,6 +60,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "oasis.h"
+#include "mapper.h"
 
 #define MAX_MAP 72
 #define MAX_MAP_DIR 4
@@ -141,42 +142,9 @@ void ShowMap(struct char_data *ch, int min, int max)
     char mapdisp[MAX_STRING_LENGTH];
     size_t len = 0;
     
-static struct map_bit_data {
-    char bit[2];
-    char color[5];
-    char name[15];
-    } map_bit[] = {
-{"%", "{cW", "Inside"    },//SECT_INSIDE         
-{"#", "{cW", "City"      },//SECT_CITY           
-{"\"","{cG", "Field"     },//SECT_FIELD          
-{"@", "{cg", "Forest"    },//SECT_FOREST         
-{"^", "{cG", "Hills"     },//SECT_HILLS          
-{"^", "{cy", "Mountain"  },//SECT_MOUNTAIN       
-{":", "{cC", "Water-Swim"},//SECT_WATER_SWIM     
-{":", "{cB", "Water-Boat"},//SECT_WATER_NOSWIM   
-{"~", "{cb", "Underwater"},//SECT_UNDERWATER	    
-{"%", "{cC", "Flying"    },//SECT_FLYING         
-{"~", "{cY", "Desert"    },//SECT_DESERT         
-{".", "{cW", "Space"     },//SECT_SPACE	
-{"-", "{cY", "Road"      },//SECT_ROAD	
-{"@", "{cY", "Entrance"  },//SECT_ENTRANCE	
-{"@", "{cC", "Atmosphere"},//SECT_ATMOSPHERE 
-{"*", "{cY", "Sun"       },//SECT_SUN	
-{"O", "{cL", "Blackhole" },//SECT_BLACKHOLE	
-{"<", "{cM", "Vehicle"   },//SECT_VEHICLE	
-{"\"", "{cg", "Swamp"     },//SECT_SWAMP
-{";", "{cM", "Reef"      },//SECT_REEF  
-{"\"", "{cW", "Tundra"    },//SECT_TUNDRA
-{"o", "{cW", "Snow"      },//SECT_SNOW
-{":", "{cC", "Ice"       },//SECT_ICE
-{"\"", "{cy", "Praire"     },//SECT_PRAIRIE
-{"'", "{cr", "Badlands"       },//SECT_BADLANDS
-{"+", "{cy", "Rail"       },//SECT_RAIL
 
-{"X", "{cx", "Unknown"   } //NUM_ROOM_SECTORS
-    };
 sect = 0;
-#define MDIS(num)  ((sect + (num)) <= NUM_ROOM_SECTORS)
+
     /* every row */
     for (x = min; x < (min + 12); ++x) {
     len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   |   ", 
@@ -188,27 +156,28 @@ sect = 0;
 	/* every column */
 	for (y = min; y < max; ++y) {
 	    if ((y == min) || (map[x][y - 1] != map[x][y])) {
-		switch (map[x][y]) {
-		case NUM_ROOM_SECTORS:
-		case SECT_INSIDE:
-		case SECT_CITY:
-		case SECT_FIELD:
-		case SECT_FOREST:
-		case SECT_HILLS:
-		case SECT_MOUNTAIN:
-		case SECT_WATER_SWIM:
-		case SECT_WATER_NOSWIM:
-		case SECT_UNDERWATER:
-		case SECT_FLYING:
-		case SECT_DESERT:
-		case SECT_SPACE:
-		case SECT_ROAD:
-		case SECT_ENTRANCE:
-		case SECT_ATMOSPHERE:
-		case SECT_SUN:
-		case SECT_BLACKHOLE:
-		case SECT_VEHICLE:
-    case SECT_SWAMP:
+switch (map[x][y])
+{
+case NUM_ROOM_SECTORS:
+case SECT_INSIDE:
+case SECT_CITY:
+case SECT_FIELD:
+case SECT_FOREST:
+case SECT_HILLS:
+case SECT_MOUNTAIN:
+case SECT_WATER_SWIM:
+case SECT_WATER_NOSWIM:
+case SECT_UNDERWATER:
+case SECT_FLYING:
+case SECT_DESERT:
+case SECT_SPACE:
+case SECT_ROAD:
+case SECT_ENTRANCE:
+case SECT_ATMOSPHERE:
+case SECT_SUN:
+case SECT_BLACKHOLE:
+case SECT_VEHICLE:
+case SECT_SWAMP:
 case SECT_REEF:
 case SECT_TUNDRA:
 case SECT_SNOW:
@@ -216,8 +185,8 @@ case SECT_ICE:
 case SECT_PRAIRIE:
 case SECT_BADLANDS:
 case SECT_RAIL:
-		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[map[x][y]].color, map_bit[map[x][y]].bit);
-		    break;
+  len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[map[x][y]].color, map_bit[map[x][y]].bit);
+  break;
 		case (NUM_ROOM_SECTORS + 1):
 		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cM?");
 		    break;
@@ -308,6 +277,7 @@ void ShowRoom(struct char_data *ch, int min, int max)
 	    new_send_to_char(ch, "\r\n");
 	    
  ShowMap(ch, min, max);
+//draw_map(ch);
 	    
     return;
 }
@@ -365,7 +335,8 @@ ACMD(do_map)
 #if defined(MINI_MAP)
          mini_map(ch);
 #else
-	 display_map(ch);
+	 //display_map(ch);
+         draw_map(ch);
 #endif
 	    IN_ROOM(ch) = was_in;
 	    return;
@@ -386,8 +357,9 @@ ACMD(do_map)
     /* mortals not in city, enter or inside will always get a ShowRoom */
     if (GET_LEVEL(ch) >= LVL_GOD) {
 	if (arg1[0] == '\0') {
-	    ShowRoom(ch, min, max + 1);
-	    IN_ROOM(ch) = was_in;
+	    //ShowRoom(ch, min, max + 1);
+	    //IN_ROOM(ch) = was_in;
+
 	} else {
 	    ShowMap(ch, min, max + 1);
 	    IN_ROOM(ch) = was_in;
