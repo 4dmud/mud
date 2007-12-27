@@ -35,7 +35,7 @@ extern const char *zone_bits[];
  */
 #define MYCMD		(OLC_ZONE(d)->cmd[subcmd])
 #define OLC_CMD(d)	(OLC_ZONE(d)->cmd[OLC_VAL(d)])
-#define MAX_DUPLICATES 100
+#define MAX_DUPLICATES 2000
 
 /* Prototypes. */
 int start_change_command(struct descriptor_data *d, int pos);

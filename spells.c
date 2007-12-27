@@ -1176,8 +1176,12 @@ ASPELL(spell_control_weather)
      ch);
     return;
   }
+  if (!strarg || !*strarg) {
+  new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+  return;
+  }
 
-  if (GET_INT(ch) < number(1, 19) || !strarg || !strarg)
+  if (GET_INT(ch) < number(1, 19))
   {
     send_to_char("You fail.\r\n", ch);
     return;

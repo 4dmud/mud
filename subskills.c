@@ -330,7 +330,7 @@ void assign_subskills(void)
        10, POS_STANDING, TAR_CHAR_ROOM | TAR_IGNORE, PEAC,
        SK_NONE,STATUS_TYPE_ONOFF, SUB_TYPE_CMD | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_PERFORMER);
 
-  /* Physical humor n the form of a stuid player, make your audience laugh for exp and gold */
+  /* Physical humor in the form of a stuid player, make your audience laugh for exp and gold */
   subo(SUB_CLOWN, "Clown", STAT_SUB_MV, 100 ,
        10, POS_STANDING, TAR_CHAR_ROOM | TAR_IGNORE, PEAC,
        SK_NONE,STATUS_TYPE_ONOFF, SUB_TYPE_CMD | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_PERFORMER);
@@ -340,7 +340,7 @@ void assign_subskills(void)
        10, POS_STANDING, TAR_CHAR_ROOM | TAR_IGNORE, PEAC,
        SK_NONE,STATUS_TYPE_ONOFF, SUB_TYPE_CMD | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_PERFORMER);
 
-  /* perform feats of balance for gold and exp */
+  /* perform feats of balance to an audience, the more advanced you become at this the more you can get wow bonuses from your audience, for gold, tokens and exp */
   subo(SUB_BALANCE, "Balance", STAT_SUB_MV, 100 ,
        10, POS_STANDING, TAR_CHAR_ROOM | TAR_IGNORE, PEAC,
        SK_NONE,STATUS_TYPE_ONOFF, SUB_TYPE_CMD | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_PERFORMER);
@@ -502,7 +502,7 @@ void assign_subskills(void)
   subo(SUB_DOGFIGHTING, "Dogfighting", 0, 0,
        0, POS_SLEEPING, 0 , PEAC,
        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_PILOT);
-  /* ability to gamble in the streets - */
+  /* ability to gamble in the streets with other mobs and players to earn money, tokens and exp*/
   subo(SUB_COCKFIGHTING, "Cockfighting", 0, 0,
        0, POS_SLEEPING, 0 , PEAC,
        SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);

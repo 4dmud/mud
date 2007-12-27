@@ -1389,6 +1389,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       min_val = 0;
       max_val = NUM_ATTACK_TYPES - 1;
       break;
+    case ITEM_KEY:
+     min_val = 0;
+     max_val = 999999;
+     break;
     default:
       min_val = -32000;
       max_val = 32000;
