@@ -184,36 +184,68 @@ ACMD(do_convey) {
     }
     amount = atoll(arg1);
 
-    if (amount <= 0) {
+    if (amount <= 0 && !isname(arg1, "maxmove") && !isname(arg2, "gold")) {
         *ch << "Your usage is wrong.\r\n";
         return;
     }
 
     if(isname(arg2, "tokens")) {
-	if(amount < 5) {
-	    if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
-		ch->Send("You convey %lld brass tokens to %lld training session.\r\n",
-		     amount, amount);
-		GET_BRASS_TOKEN_COUNT(ch) -= amount;
-		GET_PRACTICES(ch) += amount;
-		return;
-	    } else {
-		ch->Send("You don't have that many brass tokens on your account.\r\n");
-		return;
-	    }
-        } else if (amount == 5) {
-	    if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
-		ch->Send("You convey 1 bronze token to %d training sessions.\r\n",10);
-		GET_BRONZE_TOKEN_COUNT(ch) -= 1;
-		GET_PRACTICES(ch) += 10;
-		return;
-	    } else {
-		ch->Send("You don't have a bronze token on your account.\r\n");
-		return;
-	    }
+	if(amount > 50) {
+		ch->Send("You can only convey 50 bronze tokens or less.\r\n");
 	} else {
-	    ch->Send("You can only convey between 1 and 5, or exactly 10 at a time.\r\n");
-	    return;
+		int silver_tokens = amount / 50;
+		int bronze_tokens = (amount - silver_tokens * 50) / 5;
+		int brass_tokens  = amount - silver_tokens * 50 - bronze_tokens * 5;
+		int new_gold_tokencount   = GET_GOLD_TOKEN_COUNT(ch);
+		int new_silver_tokencount = GET_SILVER_TOKEN_COUNT(ch) - silver_tokens;
+		int new_bronze_tokencount = GET_BRONZE_TOKEN_COUNT(ch) - bronze_tokens;
+		int new_brass_tokencount  = GET_BRASS_TOKEN_COUNT(ch)  - brass_tokens;
+	
+		if(new_brass_tokencount < 0) {
+			new_bronze_tokencount--;
+			new_brass_tokencount = 5 + new_brass_tokencount;
+		}
+		if(new_bronze_tokencount < 0) {
+			new_silver_tokencount--;
+			new_bronze_tokencount = 10 + new_bronze_tokencount;
+		}
+		if(new_silver_tokencount < 0) {
+			new_gold_tokencount--;
+			new_silver_tokencount = 10 + new_silver_tokencount;
+		}
+	
+		if(new_gold_tokencount < 0) {
+			ch->Send("You don't have that many tokens on your account.\r\n");
+		} else {
+			char buf[100];
+			char *bufpointer=buf;
+			int sessions=silver_tokens * 500 + bronze_tokens * 50 + brass_tokens * 5;
+			bufpointer+=snprintf(bufpointer, (size_t)(98 - (bufpointer - buf)), "You convey ");
+			if(silver_tokens > 0)
+				bufpointer += snprintf(bufpointer, (size_t)(98 - (bufpointer - buf)), "%d silver token%s",
+						silver_tokens, 
+						silver_tokens > 1 ? "s" : "");
+			if(bronze_tokens > 0)
+				bufpointer += snprintf(bufpointer, (size_t)(98 - (bufpointer - buf)), "%s%s%d bronze token%s",
+						silver_tokens > 0 && brass_tokens > 0  ? ", " : "",
+						silver_tokens > 0 && brass_tokens == 0 ? " and " : "",
+						bronze_tokens,
+						bronze_tokens > 1 ? "s" : "");
+			if(brass_tokens > 0)
+				bufpointer += snprintf(bufpointer, (size_t)(98 - (bufpointer - buf)), "%s%d brass token%s",
+						silver_tokens > 0 || bronze_tokens > 0 ? " and " : "",
+						brass_tokens,
+						brass_tokens > 1 ? "s" : "");
+			bufpointer += snprintf(bufpointer, (size_t)(98 - (bufpointer - buf)), " to %d training session%s.\r\n",
+					sessions,
+					sessions > 1 ? "s":"");
+			ch->Send(buf);
+			GET_GOLD_TOKEN_COUNT(ch)   = new_gold_tokencount;
+			GET_SILVER_TOKEN_COUNT(ch) = new_silver_tokencount;
+			GET_BRONZE_TOKEN_COUNT(ch) = new_bronze_tokencount;
+			GET_BRASS_TOKEN_COUNT(ch)  = new_brass_tokencount;
+			GET_PRACTICES(ch)         += sessions;
+		}
 	}
 
     } else if (isname(arg2, "sessions")) {
@@ -242,36 +274,37 @@ ACMD(do_convey) {
             return;
         }
     } else if (isname("gold", arg2)) {
-        if (!(amount >= 4)) {
-            ch->Send("The amount must be greater then 4.");
+	if (isname(arg1, "maxmove")) {
+
+	    if (ch->Gold( 0, GOLD_ALL) >= 10000000* GET_CONVERSIONS(ch)) {
+	        log("INFO: %s conveyed %lld gold into %d maxmove", GET_NAME(ch), (gold_int) (10000000 * GET_CONVERSIONS(ch)), 100);
+	        ch->Send("You convey %lld gold to %d maxmove.\r\n",
+	                 (gold_int)(10000000 * GET_CONVERSIONS(ch)), 100);
+	        GET_MAX_MOVE(ch) += 100;
+	        ch->Gold( -10000000 * GET_CONVERSIONS(ch), GOLD_ALL);
+	        GET_CONVERSIONS(ch)++;
+	        ch->affect_total();
+	
+	    } else {
+                ch->Send( "You cant afford to!\r\n");
+	    }
+	    return;
+        }
+
+	if (!(amount >= 4)) {
+            ch->Send("The amount must be greater then 4.\r\n");
             return;
         }
+	if(amount % 4 != 0) {
+	    ch->Send("The amount must be a multiple of 4.\r\n");
+	    return;
+	}
 
         if (ch->Gold( 0, GOLD_ALL) >= amount) {
             log("INFO: %s conveyed %lld gold into %lld exp", GET_NAME(ch), amount, amount/4);
             ch->Send("You convey %lld gold to %lld exp points.\r\n", amount, amount / 4);
             gain_exp(ch, amount / 4);
             ch->Gold( -amount, GOLD_ALL);
-
-            return;
-        } else {
-            ch->Send( "You cant afford to!\r\n");
-        }
-
-    }  else if (isname(arg2, "maxmove")) {
-        if (!(amount == 1)) {
-            ch->Send("The amount must be 1.");
-            return;
-        }
-
-        if (ch->Gold( 0, GOLD_ALL) >= (amount*10000000)* GET_CONVERSIONS(ch)) {
-            log("INFO: %s conveyed %lld gold into %d maxmove", GET_NAME(ch), (gold_int) ((amount * 10000000) * GET_CONVERSIONS(ch)), (int)amount * 100);
-            ch->Send("You convey %lld gold to %d maxmove.\r\n",
-                     (gold_int)((amount * 10000000)* GET_CONVERSIONS(ch)), (int)amount * 100);
-            GET_MAX_MOVE(ch) += (amount * 100);
-            ch->Gold( (-amount* 10000000)* GET_CONVERSIONS(ch), GOLD_ALL);
-            GET_CONVERSIONS(ch)++;
-            ch->affect_total();
 
             return;
         } else {
