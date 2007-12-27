@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.46  2006/04/30 15:32:01  w4dimenscor
+ * added the addtp command, so that senior imms can add and deduct points.
+ *
  * Revision 1.45  2006/04/30 13:36:18  w4dimenscor
  * stat on an imm no longer shows UNDEFINED instead of imm3, trust all adds the imm3 trust group too now and vstat uses pages.
  *
@@ -339,7 +342,7 @@ ACMD(do_ps_aux);
 ACMD(do_deleteplayer);
 ACMD(do_search_triggers);
 ACMD(do_ctellsnoop);
-
+ACMD(do_addtp);
 
 struct player_gold_info
 {
@@ -1870,8 +1873,8 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
                        GET_CLAN(k), find_clan_by_id(GET_CLAN(k)), GET_CLAN_RANK(k),
                        clan_name(find_clan_by_id(GET_CLAN(k))));
 
-      new_send_to_char(ch, "TOKENS: G:%-2d S:%-2d BN:%-2d BS:%-2d      AWARD POINTS: %-3d\r\n",
-                       GET_GOLD_TOKEN_COUNT(k), GET_SILVER_TOKEN_COUNT(k),GET_BRONZE_TOKEN_COUNT(k), GET_BRASS_TOKEN_COUNT(k), update_award(k));
+      new_send_to_char(ch, "TOKENS: G:%-2d S:%-2d BN:%-2d BS:%-2d      AWARD POINTS: %-3d      TRADE POINTS: %-3d\r\n",
+                       GET_GOLD_TOKEN_COUNT(k), GET_SILVER_TOKEN_COUNT(k),GET_BRONZE_TOKEN_COUNT(k), GET_BRASS_TOKEN_COUNT(k), update_award(k), TRADEPOINTS(k));
 
 
       strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
@@ -7201,4 +7204,42 @@ ACMD(do_ctellsnoop){
       else if(GET_CSNP_LVL(ch)>=0 && GET_CSNP_LVL(ch)<=num_of_clans) sprintf(buf3,clan[GET_CSNP_LVL(ch)].name);
       new_send_to_char(ch,"Usage: csnoop clannumber/none/all.\r\nCurrent setting: %s.\r\n",buf3);
    }
+}
+
+ACMD(do_addtp)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  char_data *vict;
+  int amount, orig_tp;
+  two_arguments(argument,arg1,arg2);
+  vict = get_player_vis(ch, arg1, NULL, FIND_CHAR_WORLD);
+  if(!vict)
+  {
+    new_send_to_char(ch,"There is no player around with that name.\r\n");
+    return;
+  }
+
+  if(!isdigit(*arg2) && !(*arg2=='-' && isdigit(*(arg2+sizeof(char)))))
+  {
+    new_send_to_char(ch,"That is not a number.\r\n");
+    return;
+  }
+  amount=atoi(arg2);
+  orig_tp=TRADEPOINTS(vict);
+  TRADEPOINTS(vict)+=amount;
+  if(TRADEPOINTS(vict)<orig_tp && *arg2!='-')
+  {
+    TRADEPOINTS(vict)=orig_tp;
+    new_send_to_char(ch,"The new amount of tradepoints would be too high, so it can't be done.\r\n");
+    return;
+  }
+  if(TRADEPOINTS(vict)<0 || (TRADEPOINTS(vict)>orig_tp && *arg2=='-'))
+  {
+    TRADEPOINTS(vict)=orig_tp;
+    new_send_to_char(ch,"%s doesn't have enough tradepoints for that!\r\n", GET_NAME(vict));
+    return;
+  }
+  new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "%s gives %s %d tradepoints.",  GET_NAME(ch), GET_NAME(vict), amount);
+  new_send_to_char(ch,"Amount of tradepoints is now %d (was: %d).\r\n",TRADEPOINTS(vict),orig_tp);
+  
 }

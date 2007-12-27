@@ -111,6 +111,7 @@ void con_disp_menu(DESCRIPTOR_DATA *d);
 
 /* prototypes for all do_x functions. */
 ACMD(do_action);
+ACMD(do_addtp);
 ACMD(do_advance);
 ACMD(do_aedit);
 ACMD(do_ahall);
@@ -468,6 +469,7 @@ const struct command_info cmd_info[] =
     { "afktell" , "afkt" , POS_DEAD    , do_gen_tog  , 0, SCMD_AFKTELL, 0 },
     { "at"       , "at"  , POS_DEAD    , do_at       , LVL_IMMORT, 0, WIZ_IMM1_GRP },
     { "atlev"    , "atlev", POS_DEAD    , do_atlvl    , LVL_IMMORT, 0, WIZ_IMM1_GRP },
+    { "addtp"	, "addt", POS_DEAD	, do_addtp	, LVL_SEN, 0, 0 },
     { "advance"  , "adv" , POS_DEAD    , do_advance  , LVL_IMPL, 0, WIZ_IMPL_GRP },
     { "aedit"    , "aed" , POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
     { "astat"    , "ast" , POS_DEAD    , do_astat      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
