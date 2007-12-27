@@ -67,7 +67,7 @@ Using
   Another function is provided to update regeneration on all three points
   types:
  
-      void check_regen_rates(Character *ch);
+      void Character::check_regen_rates();
  
   This will make sure that any point category below maximum has an event
   to regenerate it.  It also will recalculate the regeneration rate if
@@ -131,23 +131,7 @@ http://www.imaxx.net/~thrytis
 #include "comm.h"
 #include "db.h"
 #include "dg_event.h"		/* For modern (pl8+) DG_SCRIPTS packages */
-
-
-/* Player point types for events */
-#define REGEN_HIT      0
-#define REGEN_MANA     1
-#define REGEN_MOVE     2
-#define REGEN_STAMINA  3
-
-#define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
-
-
-/* event object structure for point regen */
-struct regen_event_obj
-{
-  Character *ch;	/* character regening */
-  int type;			/* HIT, MOVE, or MANA */
-};
+#include "regen.h"
 
 
 EVENTFUNC(points_event)
@@ -260,8 +244,8 @@ EVENTFUNC(points_event)
     GET_POINTS_EVENT(ch, type) = NULL;
 
 
-    if (event_obj)
-      free(event_obj);
+    if (regen)
+      delete regen;
   }
 
   return 0;
@@ -289,12 +273,10 @@ void alter_hit(Character *ch, int amount)
     struct regen_event_obj *regen = NULL;
     long t;
     int gain;
-    CREATE(regen, struct regen_event_obj, 1);
-    regen->ch = ch;
-    regen->type = REGEN_HIT;
+    regen = new regen_event_obj(ch, REGEN_HIT);
     gain = (hit_gain(ch));
     t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
-    GET_POINTS_EVENT(ch, REGEN_HIT) = event_create(points_event, regen, t);
+    GET_POINTS_EVENT(ch, REGEN_HIT) = event_create(points_event, regen, t, EVENT_TYPE_REGEN);
     if (amount >= 0)
     {
 
@@ -333,12 +315,10 @@ void alter_mana(Character *ch, int amount)
       struct regen_event_obj *regen = NULL;
       long t;
       int gain;
-      CREATE(regen, struct regen_event_obj, 1);
-      regen->ch = ch;
-      regen->type = REGEN_MANA;
+      regen = new regen_event_obj(ch, REGEN_MANA);
       gain = (mana_gain(ch));
       t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
-      GET_POINTS_EVENT(ch, REGEN_MANA) = event_create(points_event, regen, t);
+      GET_POINTS_EVENT(ch, REGEN_MANA) = event_create(points_event, regen, t, EVENT_TYPE_REGEN);
     }
   }
 }
@@ -368,14 +348,12 @@ void alter_move(Character *ch, int amount)
       struct regen_event_obj *regen = NULL;
       long t;
       int gain;
-      CREATE(regen, struct regen_event_obj, 1);
-      regen->ch = ch;
-      regen->type = REGEN_MOVE;
+      regen = new regen_event_obj(ch, REGEN_MOVE);
       gain = (move_gain(ch));
 
       t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
       GET_POINTS_EVENT(ch, REGEN_MOVE) =
-        event_create(points_event, regen, t);
+        event_create(points_event, regen, t, EVENT_TYPE_REGEN);
     }
   }
 }
@@ -404,14 +382,12 @@ void alter_stamina(Character *ch, int amount)
       struct regen_event_obj *regen = NULL;
       long t;
       int gain;
-      CREATE(regen, struct regen_event_obj, 1);
-      regen->ch = ch;
-      regen->type = REGEN_STAMINA;
+      regen = new regen_event_obj(ch, REGEN_STAMINA);
       gain = (stamina_gain(ch));
 
       t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
       GET_POINTS_EVENT(ch, REGEN_STAMINA) =
-        event_create(points_event, regen, t);
+        event_create(points_event, regen, t, EVENT_TYPE_REGEN);
     }
   }
   if (GET_STAMINA(ch) > (10 - GET_MAX_STAMINA(ch)))
@@ -420,65 +396,6 @@ void alter_stamina(Character *ch, int amount)
     {
       GET_POS(ch) = POS_STANDING;
       act("$n climbs happily to $s feet.", FALSE, ch, 0, 0, TO_ROOM);
-    }
-  }
-}
-
-/* updates regen rates.  Use when big regen rate changes are made */
-void check_regen_rates(Character *ch)
-{
-  struct regen_event_obj *regen;
-  int type, gain = 0;
-  long t;
-
-  if (ch == NULL || GET_HIT(ch) <= HIT_INCAP)
-    return;
-
-  for (type = REGEN_HIT; type <= REGEN_STAMINA; type++)
-  {
-
-    switch (type)
-    {
-    case REGEN_HIT:
-      if (GET_HIT(ch) >= GET_MAX_HIT(ch))
-        continue;
-      gain = hit_gain(ch);
-      break;
-
-    case REGEN_MANA:
-      if (GET_MANA(ch) >= GET_MAX_MANA(ch))
-        continue;
-      gain = mana_gain(ch);
-      break;
-
-    case REGEN_MOVE:
-      if (GET_MOVE(ch) >= GET_MAX_MOVE(ch))
-        continue;
-      gain = move_gain(ch);
-      break;
-    case REGEN_STAMINA:
-      if (GET_STAMINA(ch) >= GET_MAX_STAMINA(ch))
-        continue;
-      gain = stamina_gain(ch);
-      break;
-    }
-
-    t = PULSES_PER_MUD_HOUR / (gain > 0 ? gain : 1);
-
-    if (GET_POINTS_EVENT(ch, type) == NULL ||
-        (t < event_time(GET_POINTS_EVENT(ch, type))))
-    {
-
-      /* take off old event, create updated event */
-      if (GET_POINTS_EVENT(ch, type) != NULL)
-        event_cancel(GET_POINTS_EVENT(ch, type));
-      GET_POINTS_EVENT(ch, type) = NULL;
-
-      CREATE(regen, struct regen_event_obj, 1);
-      regen->ch = ch;
-      regen->type = type;
-      GET_POINTS_EVENT(ch, type) =
-        event_create(points_event, regen, t);
     }
   }
 }

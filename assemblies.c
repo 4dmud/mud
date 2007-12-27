@@ -25,12 +25,6 @@
 long           g_lNumAssemblies = 0;
 ASSEMBLY       *g_pAssemblyTable = NULL;
 
-
-/* External global variables. */
-extern struct obj_data *obj_proto;
-extern struct room_data *world;
-
-
 void assemblyBootAssemblies( void )
 {
   char         szLine[ MAX_STRING_LENGTH ] = { '\0' };

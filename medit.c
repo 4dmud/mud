@@ -110,7 +110,7 @@ ACMD(do_oasis_medit) {
             if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
                 number = NOWHERE;
             else
-                number = genolc_zone_bottom(zlok);
+                number = zone_table[zlok].Bot();
         }
 
         if (number == NOWHERE) {
@@ -214,7 +214,7 @@ ACMD(do_oasis_medit) {
     /** Display the OLC messages to the players in the same room as the        **/
     /** builder and also log it.                                               **/
     /****************************************************************************/
-    act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
+    act("$n starts using OLC.", TRUE, ch, 0, 0, TO_ROOM);
     SET_BIT_AR(PLR_FLAGS(ch), PLR_WRITING);
 
     new_mudlog(BRF, LVL_IMMORT, TRUE,"OLC: %s starts editing zone %d allowed zone %d",
@@ -231,7 +231,7 @@ void medit_setup_new(Descriptor *d) {
     /*
      * Allocate a scratch mobile structure.  
      */
-    CREATE(mob, Character, 1);
+    mob = new Character();
 
     init_mobile(mob);
 
@@ -263,14 +263,14 @@ void medit_setup_new(Descriptor *d) {
 /*-------------------------------------------------------------------*/
 
 void medit_setup_existing(Descriptor *d, int rmob_num) {
-    Character *mob;
+    Character *mob = new Character();
 
     /*
      * Allocate a scratch mobile structure. 
      */
-    CREATE(mob, Character, 1);
+    //CREATE(mob, Character, 1);
 
-    copy_mobile(mob, mob_proto + rmob_num);
+    copy_mobile(mob, mob_proto[rmob_num]);
 
 #if CONFIG_OASIS_MPROG
 
@@ -334,6 +334,8 @@ void init_mobile(Character *mob) {
     mob->aff_abils = mob->real_abils;
 
     SET_BIT_AR(MOB_FLAGS(mob), MOB_ISNPC);
+    if (mob->player_specials)
+        delete mob->player_specials;
     mob->player_specials = &dummy_mob;
 }
 
@@ -358,11 +360,11 @@ void medit_save_internally(Descriptor *d) {
 
     /* Update triggers */
     /* Free old proto list  */
-    if (mob_proto[new_rnum].proto_script &&
-            mob_proto[new_rnum].proto_script != OLC_SCRIPT(d))
-        free_proto_script(&mob_proto[new_rnum], MOB_TRIGGER);
+    if (mob_proto[new_rnum]->proto_script &&
+            mob_proto[new_rnum]->proto_script != OLC_SCRIPT(d))
+        free_proto_script(mob_proto[new_rnum], MOB_TRIGGER);
 
-    mob_proto[new_rnum].proto_script = OLC_SCRIPT(d);
+    mob_proto[new_rnum]->proto_script = OLC_SCRIPT(d);
 
     /* this takes care of the mobs currently in-game */
     for (mob = character_list; mob; mob = mob->next) {
@@ -374,7 +376,7 @@ void medit_save_internally(Descriptor *d) {
             extract_script(mob, MOB_TRIGGER);
 
         free_proto_script(mob, MOB_TRIGGER);
-        copy_proto_script(&mob_proto[new_rnum], mob, MOB_TRIGGER);
+        copy_proto_script(mob_proto[new_rnum], mob, MOB_TRIGGER);
         assign_triggers(mob, MOB_TRIGGER);
     }
     /* end trigger update */
@@ -566,7 +568,7 @@ void medit_disp_mob_joins(Descriptor *d) {
         while (temp) {
             i = real_mobile(temp->vnum);
             if (i != NOTHING)
-                d->Output( "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, mob_proto[i].player.short_descr);
+                d->Output( "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, mob_proto[i]->player.short_descr);
             temp = temp->next;
         }
     }
@@ -1007,28 +1009,25 @@ void medit_parse(Descriptor *d, char *arg) {
         /*-------------------------------------------------------------------*/
     case MEDIT_ALIAS:
         smash_tilde(arg);
-        if (GET_ALIAS(OLC_MOB(d)))
-            free(GET_ALIAS(OLC_MOB(d)));
+        free_string(&GET_ALIAS(OLC_MOB(d)));
         GET_ALIAS(OLC_MOB(d)) = str_udup(arg);
         break;
         /*-------------------------------------------------------------------*/
     case MEDIT_S_DESC:
         smash_tilde(arg);
-        if (GET_SDESC(OLC_MOB(d)))
-            free(GET_SDESC(OLC_MOB(d)));
+        free_string(&GET_SDESC(OLC_MOB(d)));
         GET_SDESC(OLC_MOB(d)) = str_udup(arg);
         break;
         /*-------------------------------------------------------------------*/
     case MEDIT_L_DESC:
         smash_tilde(arg);
-        if (GET_LDESC(OLC_MOB(d)))
-            free(GET_LDESC(OLC_MOB(d)));
         if (arg && *arg) {
-            char buf[MAX_INPUT_LENGTH];
-            snprintf(buf, sizeof(buf), "%s\r\n", arg);
-            GET_LDESC(OLC_MOB(d)) = strdup(buf);
+            char buff[MAX_INPUT_LENGTH];
+            strlcpy(buff, arg, sizeof(buff));
+            strlcat(buff, "\r\n", sizeof(buff));
+            GET_LDESC(OLC_MOB(d)) = strdup(buff);
         } else
-            GET_LDESC(OLC_MOB(d)) = strdup("undefined");
+            GET_LDESC(OLC_MOB(d)) = strdup("undefined\r\n");
 
         break;
         /*-------------------------------------------------------------------*/
@@ -1297,12 +1296,12 @@ void medit_parse(Descriptor *d, char *arg) {
         MOB_SKIN(OLC_MOB(d)) = IRANGE(-1, atoi(arg), 999999-1);
         break;
     case MEDIT_OWNER:
-    if (is_number(arg) || *arg == '-') {
-    i = atoi(arg);
-    MOB_OWNER(OLC_MOB(d)) = IRANGE(-1L, i, top_idnum);
-    } else 
-    MOB_OWNER(OLC_MOB(d)) = get_id_by_name(arg);
-        
+        if (is_number(arg) || *arg == '-') {
+            i = atoi(arg);
+            MOB_OWNER(OLC_MOB(d)) = IRANGE(-1L, i, top_idnum);
+        } else
+            MOB_OWNER(OLC_MOB(d)) = get_id_by_name(arg);
+
         break;
     case MEDIT_SEGMENTS:
         switch (*arg) {

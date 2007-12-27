@@ -12,7 +12,7 @@
 #include "dg_event.h"
 #include "constants.h"
 
-/* frees memory associated with var */
+/* frees memory associated with var 
 void free_var_el(struct trig_var_data *var)
 {
   if (var->name)
@@ -20,7 +20,7 @@ void free_var_el(struct trig_var_data *var)
   if (var->value)
     free(var->value);
   free(var);
-}
+} */
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd)
 {
@@ -30,7 +30,8 @@ void free_varlist(struct trig_var_data *vd)
   {
     j = i;
     i = i->next;
-    free_var_el(j);
+    delete j;
+    //free_var_el(j);
   }
 }
 
@@ -38,20 +39,20 @@ void free_varlist(struct trig_var_data *vd)
  * remove var name from var_list
  * returns 1 if found, else 0
  */
-int remove_var(struct trig_var_data **var_list, char *name)
+int remove_var(struct trig_var_data **var_list,const char *name)
 {
   struct trig_var_data *i, *j;
 
-  for (j = NULL, i = *var_list; i && str_cmp(name, i->name);
+  for (j = NULL, i = *var_list; i && i->name.compare(name);
        j = i, i = i->next);
 
   if (i) {
     if (j) {
       j->next = i->next;
-      free_var_el(i);
+      delete i;
     } else {
       *var_list = i->next;
-      free_var_el(i);
+      delete i;
     }
 
     return 1;      
@@ -116,7 +117,7 @@ void extract_script(void *thing, int type)
   struct trig_data *trig, *next_trig;
   Character *mob;
   obj_data *obj;
-  room_data *room;
+  Room *room;
 
   switch (type)
   {
@@ -131,7 +132,7 @@ void extract_script(void *thing, int type)
     SCRIPT(obj) = NULL;
     break;
   case WLD_TRIGGER:
-    room = (struct room_data *)thing;
+    room = (Room *)thing;
     sc = SCRIPT(room);
     SCRIPT(room) = NULL;
     break;
@@ -189,7 +190,7 @@ void free_proto_script(void *thing, int type)
   struct trig_proto_list *proto = NULL, *fproto;
   Character *mob;
   obj_data *obj;
-  room_data *room;
+  Room *room;
 
   switch (type)
   {
@@ -204,7 +205,7 @@ void free_proto_script(void *thing, int type)
     obj->proto_script = NULL;
     break;
   case WLD_TRIGGER:
-    room = (struct room_data *) thing;
+    room = (Room *) thing;
     proto = room->proto_script;
     room->proto_script = NULL;
     break;
@@ -281,7 +282,7 @@ void copy_proto_script(void *source, void *dest, int type)
     tp_src = ((obj_data *)source)->proto_script;
     break;
   case WLD_TRIGGER:
-    tp_src = ((room_data *)source)->proto_script;
+    tp_src = ((Room *)source)->proto_script;
     break;
   }
 
@@ -297,7 +298,7 @@ void copy_proto_script(void *source, void *dest, int type)
       ((obj_data *)dest)->proto_script = tp_dst;
       break;
     case WLD_TRIGGER:
-      ((room_data *)dest)->proto_script = tp_dst;
+      ((Room *)dest)->proto_script = tp_dst;
       break;
     }
 
@@ -324,7 +325,7 @@ void delete_variables(const char *charname)
     log("SYSERR: deleting variable file %s: %s", filename, strerror(errno));
 }
 
-void update_wait_events(struct room_data *to, struct room_data *from)
+void update_wait_events(Room *to, Room *from)
 {
   struct trig_data *trig;
 

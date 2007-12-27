@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.45  2006/08/13 06:26:51  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.44  2006/06/19 06:25:39  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -729,13 +732,6 @@ int average_damage(Character *ch) {
     return (int)dam;
 }
 
-/*move this to constants */
-struct fight_event_obj {
-    //Character *ch;
-    long id;
-};
-
-
 
 void start_fighting(Character* ch, Character* vict) {
     struct combine_data *temp, *tnext;
@@ -918,9 +914,8 @@ victim = RIDDEN_BY(victim) ? HERE(RIDDEN_BY(victim), victim) ? RIDDEN_BY(victim)
         int fe_t = find_fe_type(ch);
         long time = fight_timeout_calc(ch, fe_t, 0);
 
-        CREATE(ch_event, struct fight_event_obj, 1);
-        ch_event->id = GET_ID(ch);
-        GET_FIGHT_EVENT(ch) = event_create(fight_event, ch_event, time);
+        ch_event = new fight_event_obj(GET_ID(ch));
+        GET_FIGHT_EVENT(ch) = event_create(fight_event, ch_event, time, EVENT_TYPE_FIGHT);
 
     } else {
         stop_fighting(ch);
@@ -968,8 +963,8 @@ EVENTFUNC(fight_event) {
         }
 #endif
         GET_FIGHT_EVENT(ch) = NULL;
-        if (event_obj)
-            free(event_obj);
+        if (fight)
+            delete fight;
         /* removed because this part is where gdb would sometimes get segfaults - mord */
         //    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch)))
         // if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)))
@@ -2454,7 +2449,7 @@ int fe_after_damage(Character* ch, Character* vict,
         } else {
             if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
                 mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
-                bonus_gold = (int)(GET_GOLD(mob_proto + mrn) * 0.25);
+                bonus_gold = (int)(GET_GOLD(mob_proto[mrn]) * 0.25);
 
                 ch->Gold(bonus_gold, GOLD_HAND);
                 if (!number(0, 200))

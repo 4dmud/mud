@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.38  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.37  2006/06/11 10:10:11  w4dimenscor
  * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
  *
@@ -855,7 +858,7 @@ int is_tell_ok(Character *ch, Character *vict)
     if (!AFK_MSG(vict))
       act("$E is afk right now, try again later.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
-      ch->Send( "AFK %s: %s\r\n", GET_NAME(vict), AFK_MSG(vict));
+      *ch << "AFK " <<  GET_NAME(vict) << ": " << AFK_MSG(vict) << "\r\n";
     if (!PRF_FLAGGED(vict, PRF_AFKTELL))
       return (FALSE);
   }
@@ -864,7 +867,7 @@ int is_tell_ok(Character *ch, Character *vict)
     if (!BUSY_MSG(vict))
       act("$E is busy right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
-      ch->Send( "BUSY %s: %s\r\n", GET_NAME(vict), BUSY_MSG(vict));
+      *ch << "BUSY " <<  GET_NAME(vict) << ": " << BUSY_MSG(vict) << "\r\n";
   }
   else if (!IS_NPC(ch) && PRF_FLAGGED(vict, PRF_RP))
   {
@@ -979,7 +982,7 @@ ACMD(do_spec_comm)
     ch->Send( "%s", CONFIG_NOPERSON);
   else if (is_ignoring(vict, ch))
 {
-  ch->Send( "%s is ignoring you.\r\n", GET_NAME(vict));
+  *ch << GET_NAME(vict) << " is ignoring you.\r\n";
 }
   else if (vict == ch)
     ch->Send( "You can't get your mouth close enough to your ear...\r\n");
@@ -993,10 +996,9 @@ ACMD(do_spec_comm)
       act(buf, FALSE, ch, 0, vict, TO_VICT);
     }
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      ch->Send( "%s", CONFIG_OK);
+      *ch << CONFIG_OK;
     else
-      ch->Send( "You %s %s, '%s'\r\n", action_sing,
-                       GET_NAME(vict), buf2);
+      *ch << "You " << action_sing << GET_NAME(vict) << ", '" << buf2 << "'\r\n";
 
     act(action_others, FALSE, ch, 0, vict, TO_NOTVICT);
   }
@@ -1468,10 +1470,10 @@ ACMD(do_gen_comm)
         continue;
 
       if (COLOR_LEV(i->character) >= C_NRM)
-        send_to_char(color_on, i->character);
+        i->Output(color_on);
       act(buf, FALSE, ch, 0, i->character, TO_VICT | TO_SLEEP);
       if (COLOR_LEV(i->character) >= C_NRM)
-        send_to_char(KNRM, i->character);
+        i->Output(KNRM);
     }
   }
 }
@@ -1486,7 +1488,7 @@ ACMD(do_qcomm)
 
   if (!PRF_FLAGGED(ch, PRF_QUEST))
   {
-    send_to_char("You aren't even part of the quest!\r\n", ch);
+    *ch << "You aren't even part of the quest!\r\n";
     return;
   }
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -1502,9 +1504,9 @@ ACMD(do_qcomm)
     argument = fix_typos(argument, MAX_INPUT_LENGTH);
     
     if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
-      send_to_char("The walls seem to absorb your words.\r\n", ch);
+      *ch << "The walls seem to absorb your words.\r\n";
     else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      ch->Send( "%s", CONFIG_OK);
+      *ch << CONFIG_OK;
     else
     {
       if (subcmd == SCMD_QSAY)
@@ -1562,13 +1564,13 @@ ACMD(do_ctell)
   {
     c=-1;
     if(!isdigit(*argument) && !(*argument=='-')){
-       send_to_char ("Please specify the clannumber.\r\n",ch);
+       *ch << "Please specify the clannumber.\r\n";
        return;
     }
     c = atoi (argument);
     if ((c < 0) || (c >= num_of_clans))
     {
-        send_to_char ("There is no clan with that number.\r\n", ch);
+        *ch << "There is no clan with that number.\r\n";
         return;
     }
     else
@@ -1583,12 +1585,12 @@ ACMD(do_ctell)
 
     if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0)
     {
-      send_to_char("You're not part of a clan.\r\n", ch);
+      *ch << "You're not part of a clan.\r\n";
       return;
     }
   if (PRF_FLAGGED(ch, PRF_NOCTALK))
   {
-    ch->Send( "You can now hear you clan again.\r\n");
+    *ch << "You can now hear you clan again.\r\n";
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_NOCTALK);
   }
 
@@ -1596,7 +1598,7 @@ ACMD(do_ctell)
 
   if (!*argument)
   {
-    send_to_char("What do you want to tell your clan?\r\n", ch);
+    *ch << "What do you want to tell your clan?\r\n";
     return;
   }
   
@@ -1610,9 +1612,7 @@ ACMD(do_ctell)
     minlev = atoi(loc_a);
     if (minlev > clan[c].ranks)
     {
-      send_to_char
-      ("No one has a clan rank high enough to hear you!\r\n",
-       ch);
+      *ch << "No one has a clan rank high enough to hear you!\r\n";
       return;
     }
     /*while (*argument != ' ')
@@ -1625,23 +1625,22 @@ ACMD(do_ctell)
 
   if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
   {
-    ch->Send( "The walls seem to absorb your words.\r\n");
+    *ch << "The walls seem to absorb your words.\r\n";
     return;
   }
   else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-    ch->Send( "%s", CONFIG_OK);
+    *ch << CONFIG_OK;
   else
     if (GET_LEVEL(ch)<LVL_HERO || c==find_clan_by_id(GET_CLAN(ch))){
       if (level_string)
-        ch->Send( "You tell your clan%s, '%s'\r\n", level_string,argument);
+        *ch << "You tell your clan"<< level_string << ", '" << argument << "'\r\n";
       else
-        ch->Send( "You tell your clan, '%s'\r\n", argument);
-    }
-    else {
+        *ch << "You tell your clan, '" << argument << "'\r\n";
+    } else {
       if (level_string)
-        ch->Send( "You tell the %s%s, '%s'\r\n", clan[c].name,level_string,argument);
+        *ch << "You tell the " << clan[c].name << level_string << ", '" << argument << "'\r\n";
       else
-        ch->Send( "You tell the %s, '%s'\r\n", clan[c].name,argument);
+        *ch << "You tell the " <<  clan[c].name << ", '" <<  argument << "'\r\n";
    }   
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {

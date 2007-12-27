@@ -166,15 +166,19 @@ extern NOTE_DATA *news_list;
 extern NOTE_DATA *changes_list;
 
 extern int TEMP_LOAD_CHAR;
+
+long get_ptable_by_name(const char *name);
+long get_ptable_by_id(long id);
 /* public procedures in db.c */
 void boot_db(void);
 void destroy_db(void);
 //mord ? ?
-int create_entry(char *name);
+int create_entry(const char *name);
 void zone_update(void);
 room_rnum real_room(room_vnum vnum);
 char *fread_string(FILE * fl, const char *error);
-long get_id_by_name(char *name);
+string *fread_string_s(FILE *fl, const char *error);
+long get_id_by_name(const char *name);
 char *get_name_by_id(long id);
 void save_mud_time(struct time_info_data *when);
 //mord ? ?
@@ -193,9 +197,9 @@ obj_rnum real_object(obj_vnum vnum);
 //mord
 
 void char_to_store(Character *ch);
-int store_to_char(char *name, Character *ch);
-int load_char(char *name, Character *ch);
-void save_char(Character *ch);
+int store_to_char(const char *name, Character *ch);
+int load_char(const char *name, Character *ch);
+int save_killlist(int id, struct kill_data *kills);
 #if USE_CREATE_CHAR
 Character *create_char(void);
 #endif
@@ -229,63 +233,162 @@ int fread_number( FILE *fp );
 
 extern int sunlight;		/* What state the sun is at */
 
+extern int OBJ_INNATE;
+extern int OBJ_INNATE_MESSAGE;
+
 #define REAL 0
 #define VIRTUAL 1
 
 /* structure for the reset commands */
-struct reset_com
-{
-  char command;		/* current command                      */
+struct reset_com {
+    char command;		/* current command                      */
 
-  bool if_flag;		/* if TRUE: exe only if preceding exe'd */
-  int arg1;			/* */
-  int arg2;			/* Arguments to the command             */
-  int arg3;			/* */
-  int arg4;
-  int line;			/* line number this command appears on  */
-  char *sarg1;		/* string argument                      */
-  char *sarg2;		/* string argument                      */
+    bool if_flag;		/* if TRUE: exe only if preceding exe'd */
+    int arg1;			/* */
+    int arg2;			/* Arguments to the command             */
+    int arg3;			/* */
+    int arg4;
+    int line;			/* line number this command appears on  */
+    char *sarg1;		/* string argument                      */
+    char *sarg2;		/* string argument                      */
 
-  /*
-   * Commands:              * 'M': Read a mobile     * 'O': Read an
-   * object    * 'G': Give obj to mob   * 'P': Put obj in obj    * 'G':
-   * Obj to char       * 'E': Obj to char equip * 'D': Set state of
-   * door * 'T': Trigger command   *
-   */
+    /*
+     * Commands:              * 'M': Read a mobile     * 'O': Read an
+     * object    * 'G': Give obj to mob   * 'P': Put obj in obj    * 'G':
+     * Obj to char       * 'E': Obj to char equip * 'D': Set state of
+     * door * 'T': Trigger command   *
+     */
+    reset_com() :
+            command(0),
+            if_flag(0),
+            arg1(0),
+            arg2(0),
+            arg3(0),
+            arg4(0),
+            line(0),
+            sarg1(NULL),
+    sarg2(NULL) {}
+
+    ~reset_com() {
+        /* first see if any vars were defined in this zone */
+        if (command == 'V') {
+            if (sarg1)
+                free(sarg1);
+            if (sarg2)
+                free(sarg2);
+        }
+    }
 };
 
 
 
 /* zone definition structure. for the 'zone-table'   */
-struct zone_data
-{
-  char *name;			/* name of this zone                  */
-  int lifespan;		/* how long between resets (minutes)  */
-  int age;			/* current age of this zone (minutes) */
-  room_vnum bot;		/* starting room number for this zone */
-  room_vnum top;		/* upper limit for rooms in this zone */
-  int dimension;
+class Zone {
+public:
+    char *name;			/* name of this zone                  */
+    int lifespan;		/* how long between resets (minutes)  */
+    int age;			/* current age of this zone (minutes) */
+    room_vnum bot;		/* starting room number for this zone */
+    room_vnum top;		/* upper limit for rooms in this zone */
+    int dimension;
 
-  int reset_mode;		/* conditions for reset (see below)   */
-  zone_vnum number;		/* virtual number of this zone    */
-  struct reset_com *cmd;	/* command table for reset                */
-  int pressure;		/* How is the pressure (Mb)               */
-  int change;			/* How fast and what way does it change */
-  int sky;			/* How is the sky                         */
+    int reset_mode;		/* conditions for reset (see below)   */
+    zone_vnum number;		/* virtual number of this zone    */
+    struct reset_com *cmd;	/* command table for reset                */
+    int pressure;		/* How is the pressure (Mb)               */
+    int change;			/* How fast and what way does it change */
+    int sky;			/* How is the sky                         */
 
-  char *builders;		/* for OLC.  OBuild like extention,   *
-  				 * part of OLC+                       */
+    char *builders;		/* for OLC.  OBuild like extention,   *
+                  				 * part of OLC+                       */
 
-  long zone_flags;		/* Zone Flags                     */
-  int idle_time;		/* How long has it been idle      */
+    long zone_flags;		/* Zone Flags                     */
+    int idle_time;		/* How long has it been idle      */
+    int write_zone();
+    room_vnum Bot() {
+        return bot;
+    }
+    room_vnum Top() {
+        return top;
+    }
 
+    /*
+     * Reset mode:                              * 0: Don't reset, and
+     * don't update age.    * 1: Reset if no PC's are located in zone. *
+     * 2: Just reset.                           *
+     */
+    Zone() {
+        name =NULL;
+        lifespan = 30;
+        age = 0;
+        bot = 0;
+        top = 99;
+        dimension = D_ALL;
+        reset_mode = 2;
+        number = NOWHERE;
+        cmd = NULL;
+        pressure = 1021;
+        change = 1;
+        sky = SKY_CLOUDLESS;
+        builders = NULL;
+        zone_flags = 0;
+        idle_time = 0;
+    }
 
-  /*
-   * Reset mode:                              * 0: Don't reset, and
-   * don't update age.    * 1: Reset if no PC's are located in zone. *
-   * 2: Just reset.                           *
-   */
+    Zone(const char * n, zone_vnum vn, room_vnum b, room_vnum t) {
+        name =NULL;
+        lifespan = 30;
+        age = 0;
+        bot = 0;
+        top = 99;
+        dimension = D_ALL;
+        reset_mode = 2;
+        number = NOWHERE;
+        cmd = NULL;
+        pressure = 1021;
+        change = 1;
+        sky = SKY_CLOUDLESS;
+        builders = NULL;
+        zone_flags = 0;
+        idle_time = 0;
+        /* now set these */
+        bot=b;
+        top = t;
+        number = vn;
+        if (n)
+        name = strdup(n);
+        cmd = new reset_com[1];
+        cmd[0].command = 'S';
+    }
+
+    void Destroy() {
+ 	   if (this->cmd != NULL)
+            delete[] this->cmd;
+            this->cmd = NULL;
+        if (this->name != NULL)
+            free(this->name);
+            this->name = NULL;
+        if (this->builders != NULL)
+            free(this->builders);
+            this->builders = NULL;
+    }
+
+    ~Zone() {
+    }
 };
+/** genzon.c - at the bottom - Mord**/
+/** zone vector compare **/
+bool operator< (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
+bool operator> (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
+bool operator== (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
+/** Zone compare **/
+bool operator< (const Zone &a,const Zone &b);
+bool operator> (const Zone &a,const Zone &b);
+bool operator== (const Zone &a,const Zone &b);
+/** zone data to int compare **/
+bool operator< (const Zone &z,const zone_vnum b);
+bool operator> (const Zone &z,const zone_vnum b);
+bool operator== (const Zone &z,const zone_vnum b);
 
 
 /* Bitvector for 'zone flags' */
@@ -293,43 +396,73 @@ struct zone_data
 #define Z_SYSTEM	(1 <<  1)	/* A zone that should not be idled */
 
 /* for queueing zones for update   */
-struct reset_q_element
-{
-  zone_rnum zone_to_reset;	/* ref to zone_data */
-  struct reset_q_element *next;
-};
+struct reset_q_element {
+    zone_rnum zone_to_reset;	/* ref to Zone */
+    struct reset_q_element *next;
+
+    reset_q_element() {
+            zone_to_reset=0;
+            next=NULL;
+    }
+}
+;
 
 
 
 /* structure for the update queue     */
-struct reset_q_type
-{
-  struct reset_q_element *head;
-  struct reset_q_element *tail;
-};
+struct reset_q_type {
+    struct reset_q_element *head;
+    struct reset_q_element *tail;
+
+    reset_q_type() {
+            head=NULL;
+            tail = NULL;
+    }
+}
+;
 
 
 
-struct player_index_element
-{
-  char *name;
-  long id;
-  int level;
-  int flags;
-  time_t last;
-  long account;
-  short clan;
-  short rank;
-};
+struct player_index_element {
+    char *name;
+    long id;
+    int level;
+    int flags;
+    time_t last;
+    long account;
+    short clan;
+    short rank;
+
+    player_index_element() {
+            name=NULL;
+            id=0;
+            level=0;
+            flags=0;
+            last=0;
+            account=0;
+            clan=0;
+    		  rank=0;
+    }
+}
+;
 
 struct help_index_element {
-   char	*keywords;
-   char *entry;
-   int min_level;
-   int duplicate;
-   int id;
-   int entries; /* How many key words there are */
-};
+    char	*keywords;
+    char *entry;
+    int min_level;
+    int duplicate;
+    int id;
+    int entries; /* How many key words there are */
+
+    help_index_element() :
+            keywords(NULL),
+            entry(NULL),
+            min_level(0),
+            duplicate(0),
+            id(0),
+    entries(0) {}
+}
+;
 
 
 void the_free_help(void);
@@ -345,13 +478,12 @@ extern unsigned int top_of_helpt;
 #define BAN_NAME	4
 
 #define BANNED_SITE_LENGTH    50
-struct ban_list_element
-{
-  char site[BANNED_SITE_LENGTH + 1];
-  int type;
-  time_t date;
-  char name[MAX_NAME_LENGTH + 1];
-  struct ban_list_element *next;
+struct ban_list_element {
+    char site[BANNED_SITE_LENGTH + 1];
+    int type;
+    time_t date;
+    char name[MAX_NAME_LENGTH + 1];
+    struct ban_list_element *next;
 };
 
 
@@ -365,8 +497,8 @@ extern struct social_messg *soc_mess_list;
 extern int top_of_socialt;
 extern obj_rnum top_of_objt;
 extern mob_rnum top_of_mobt;
- extern zone_rnum top_of_zone_table;
-extern struct index_data *mob_index;
+extern zone_rnum top_of_zone_table;
+extern vector <index_data> mob_index;
 extern struct index_data *obj_index;
 extern struct shop_data *shop_index;
 extern int top_shop;
@@ -376,13 +508,14 @@ extern unsigned int top_of_trigt;
 extern long max_mob_id;
 extern long max_obj_id;
 extern int dg_owner_purged;
-extern struct room_data *world_vnum[];
-extern Character *mob_proto;
+extern vector <Room *> world_vnum;
+extern vector <Character *> mob_proto;
+typedef vector<Character *>::iterator mp_iter;
 extern struct obj_data *obj_proto;
-extern struct zone_data *zone_table;
+//extern Zone *zone_table;
+extern vector <Zone> zone_table;
 extern struct obj_data *object_list;
 extern struct obj_data *dead_obj;	/* delayed obj removal   */
-    extern int top_of_zone_table;
 #endif /* __DB_C__ */
 extern Descriptor *descriptor_list;
 extern Character *character_list;
@@ -400,4 +533,14 @@ void generate_weapon(OBJ_DATA *obj);
 void add_char_to_list(Character *ch);
 #define CUR_WORLD_VERSION 1
 #define CUR_ZONE_VERSION 3
-#define HIGHEST_VNUM  1280000
+#define HIGHEST_VNUM  99900
+#define MAX_WORLD 99900
+
+typedef list <Character*> CharacterList;
+typedef CharacterList::iterator CharacterListIterator;
+
+typedef list <Descriptor*> DescriptorList;
+typedef DescriptorList::iterator DescriptorListIterator;
+
+typedef vector <Character *>::iterator mp_iter;
+typedef vector <Room *>::iterator WorldIterator;

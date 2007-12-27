@@ -62,8 +62,8 @@ size_t write_to_output(Descriptor *d, const char *txt, ...) __attribute__ ((form
 size_t vwrite_to_output(Descriptor *d, const char *format, va_list args);
 void page_string(Descriptor *d, char *str, int keep_internal);
 void string_add(Descriptor *d, char *str);
-void string_write(Descriptor *d, char **txt, size_t len,
-		  long mailto, void *data);
+void string_write(Descriptor *d, char **txt, size_t len, long mailto, void *data);
+void string_write(Descriptor *d, string *writeto, size_t len, long mailto, void *data);
 int toggle_compression(Descriptor *t);
 
 
@@ -73,8 +73,8 @@ int toggle_compression(Descriptor *t);
    FALSE  Buffer is read only and will not be modifed so it does not
           need to be copied.
    TRUE   Buffer is re-usable and needs to be copied before use. */
-#define DYN_BUFFER 2		/* Buffer is dynamically allocated and does not need to be
-				   copied, but does need to be freed. */
+#define DYN_BUFFER 2		/* Buffer is dynamically allocated and does not need to be */
+						   /* copied, but does need to be freed. */
 
 #define SEND_TO_Q(messg, desc)  write_to_output(desc,"%s", (messg))
 

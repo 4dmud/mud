@@ -31,7 +31,7 @@ extern int syslogfd;
 #define PAGE_LENGTH     30
 #define PAGE_WIDTH      80
 
-#define GET_POINTS_EVENT(ch, i) ((ch)->points_event[i])
+#define GET_POINTS_EVENT(ch, i) ((ch)->pts_event[i])
 #define GET_FIGHT_EVENT(ch)   ((ch)->fight_event)
 #define GET_MESSAGE_EVENT(ch) ((ch)->message_event)
 #define GET_TASK(ch)    ((ch)->task)
@@ -48,6 +48,8 @@ long get_acc_by_id(long id);
 #define VALIDATE(data)          ((data)->valid = TRUE)
 #define INVALIDATE(data) 	((data)->valid = FALSE)
 #define UMAX(a, b)               ((a) > (b) ? (a) : (b))
+
+
 
 void free_string(char **pt);
 char *numlineas( char *string );
@@ -172,7 +174,7 @@ void sprintbitarray(int bitvector[], const char *name[], int maxar,
                     char *result, size_t r_len);
 time_t mud_time_to_secs(struct time_info_data *now);
 struct time_info_data *age(Character *ch);
-int num_pc_in_room(struct room_data *room);
+int num_pc_in_room(Room *room);
 void line_input(Descriptor *d, const char *prompt,
                 C_FUNC(*callback), void *info);
 void core_dump_real(const char *, int);
@@ -514,13 +516,28 @@ int has_body(Character *ch, int flag);
 #define GET_WAS_IN(ch)	((ch)->was_in_room)
 #define GET_AGE(ch)     (age(ch)->year)
 
+
 #define GET_PC_NAME(ch)	((ch)->player.name)
 #define GET_NAME(ch)    (IS_NPC(ch) ? \
 			 (ch)->player.short_descr : GET_PC_NAME(ch))
 #define GET_TITLE(ch)   ((ch)->player.title)
+
+#if 0
+#define GET_PC_NAME_S(ch)	(*(ch)->player.name)
+#define GET_PC_NAME_SP(ch)	((ch)->player.name)
+
+#define GET_NAME(ch)    (IS_NPC(ch) ? \
+			 *(ch)->player.short_descr : GET_PC_NAME_S(ch))
+#define GET_NAME_SP(ch)    (IS_NPC(ch) ? \
+			 (ch)->player.short_descr : GET_PC_NAME_SP(ch))
+
+#define GET_TITLE_S(ch)   (*(ch)->player.title)
+#define GET_TITLE_SP(ch)   ((ch)->player.title)
+#endif
+
 #define GET_LEVEL(ch)   ((ch)->player.level)
 #define GET_PASSWD(ch)	((ch)->player.passwd)
-#define GET_PFILEPOS(ch)((ch)->pfilepos)
+#define GET_PFILEPOS(ch) ((ch)->pfilepos)
 
 /*
  * I wonder if this definition of GET_REAL_LEVEL should be the definition
@@ -880,6 +897,7 @@ int current_class_is_tier_num(Character *ch);
     CAN_SEE_OBJ((ch),(obj)))
 const char * hidden_name(Character *ch);
 #define PERS(ch, vict)   (!CAN_SEE(vict, ch) ?  "someone" :  hidden_name(ch))
+#define PERS_S(ch, vict)   (!CAN_SEE(vict, ch) ?  string("someone") :  hidden_name(ch))
 
 
 #define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
@@ -1049,7 +1067,6 @@ typedef unsigned long int FLAG;	/* 32bit unsigned */
 void alter_hit(Character *ch, int amount);
 void alter_mana(Character *ch, int amount);
 void alter_move(Character *ch, int amount);
-void check_regen_rates(Character *ch);
 int sub_number(char *name);
 const char * color_option_name(int num);
 struct obj_data *revert_object(struct obj_data *obj);

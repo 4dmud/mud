@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.56  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.55  2006/06/21 09:28:58  w4dimenscor
  * Added the ability for Mortals of imms to listen to the wizchat. it is a
  * flag with the name wizmort, so set player wizmort on should do the
@@ -234,15 +237,12 @@
 #include "descriptor.h"
 
 /*   external vars  */
-extern struct index_data *obj_index;
-extern struct obj_data *obj_proto;
 extern int TEMP_LOAD_CHAR;
 extern struct time_data time_info;
 extern struct attack_hit_type attack_hit_text[];
 extern char *class_abbrevs[];
 extern char *race_abbrevs[];
 extern time_t boot_time;
-extern zone_rnum top_of_zone_table;
 extern int circle_shutdown, circle_reboot;
 extern int circle_restrict;
 extern int buf_switches, buf_largecount, buf_overflows;
@@ -271,7 +271,7 @@ extern const char *pc_race_types[];
 
 char *one_arg(char *arg, char *first_arg);
 void remove_player(int pfilepos);
-int find_name(char *name);
+int find_name(const char *name);
 void weight_to_object(struct obj_data *obj, int weight);
 char *getline( char *str, char *buf, size_t len );
 void write_aliases(Character *ch);
@@ -318,7 +318,7 @@ ACMD(do_gen_ps);
 int spell_price(struct obj_data *obj, int val);
 void show_door_errors(Character *ch);
 C_FUNC(delete_player);
-void perform_delete_player(char *charname);
+void perform_delete_player(const char *charname);
 const char *balance_display(int balance);
 ACMD(do_potionweight);
 int perform_set(Character *ch, Character *vict, int mode,
@@ -778,7 +778,7 @@ ACMD(do_trust)
   /* save the character if a change was made */
   if (retval)
   {
-    save_char(vict);
+    vict->save();
     // log("(do_trust)Saving %s in room %d.", GET_NAME(ch), IN_ROOM(ch));
     send_to_char("Command Group Activated.\r\n", ch);
   }
@@ -945,7 +945,7 @@ room_rnum find_target_room(Character *ch, char *rawroomstr)
   {
     Character *target_mob;
     struct obj_data *target_obj;
-    struct room_data *target_room;
+    Room *target_room;
     char *mobobjstr = rawroomstr;
     int num;
 
@@ -1041,7 +1041,7 @@ room_rnum find_target_room(Character *ch, char *rawroomstr)
 ACMD(do_at)
 {
   char command[MAX_INPUT_LENGTH];
-  struct room_data * location, *original_loc;
+  Room * location, *original_loc;
   char buf[MAX_INPUT_LENGTH];
 
   half_chop(argument, buf, command);
@@ -1303,7 +1303,7 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum)
       case 'M':
         ch->Send( "%sLoad %s [%s%d%s], Max : %d\r\n",
                          ZOCMD.if_flag ? " then " : "",
-                         mob_proto[ZOCMD.arg1].player.short_descr, cyn,
+                         mob_proto[ZOCMD.arg1]->player.short_descr, cyn,
                          mob_index[ZOCMD.arg1].vnum, yel, ZOCMD.arg2
                         );
         break;
@@ -1416,7 +1416,7 @@ ACMD(do_vnum)
 void do_stat_room(Character *ch)
 {
   struct extra_descr_data *desc;
-  struct room_data *rm = IN_ROOM(ch);
+  Room *rm = IN_ROOM(ch);
   int i, found, column;
   struct obj_data *j;
   Character *k;
@@ -2170,18 +2170,18 @@ void do_stat_character(Character *ch, Character *k)
 
       for (tv = k->script->global_vars; tv; tv = tv->next)
       {
-        if (*(tv->value) == UID_CHAR)
+        if (tv->value[0] == UID_CHAR)
         {
           find_uid_name(tv->value, uname, sizeof(uname));
-          snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name,
+          snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name.c_str(),
                            uname);
           DYN_RESIZE(buffer);
 //            ch->Send( "    %40s:  [UID]: %20s\r\n", tv->name,
 //                             uname);
         }
         else {
-         snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name,
-                          tv->value);
+         snprintf(buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name.c_str(),
+                          tv->value.c_str());
          DYN_RESIZE(buffer);
 //           ch->Send( "    %40s:  %20s\r\n", tv->name,
 //                            tv->value);
@@ -2266,7 +2266,7 @@ ACMD(do_stat)
     }
     else
     {
-      victim = new Character();
+      victim = new Character(FALSE);
       TEMP_LOAD_CHAR = TRUE;
       if (store_to_char(buf2, victim) > -1)
       {
@@ -2363,7 +2363,6 @@ ACMD(do_account)
 {
   char name[MAX_INPUT_LENGTH];
   int acc, pos, i = 0;
-  int find_name(char *name);
   extern struct player_index_element *player_table;
   one_argument(argument, name);
   if (!*name || GET_LEVEL(ch) < LVL_IMMORT)
@@ -2451,7 +2450,7 @@ ACMD(do_shutdown)
   for (d = descriptor_list; d; d = d->next)
   {
     if (d->character)
-      save_char(d->character);
+      d->character->save();
   }
   Crash_save_all();
 
@@ -2925,7 +2924,7 @@ ACMD(do_copyover)
         GET_LOADROOM(och) = GET_ROOM_VNUM(GET_WAS_IN(och) == NULL? IN_ROOM(och) : GET_WAS_IN(och));
 
       log("printing descriptor name and host of connected players");
-      save_char(och);
+      och->save();
       Crash_rentsave(och, 0);
 
       REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
@@ -3060,7 +3059,7 @@ ACMD(do_advance)
         GET_NAME(ch), GET_NAME(victim), newlevel, oldlevel);
 
   gain_exp_regardless(victim, level_exp(GET_CLASS(victim), newlevel, current_class_is_tier_num(victim), REMORTS(victim)) - GET_EXP(victim));
-  save_char(victim);
+  victim->save();
   // log("(do_advance)Saved %s in room %d", GET_NAME(victim), victim->in_room);
 }
 
@@ -3130,9 +3129,9 @@ ACMD(do_restore)
       }
     GET_POS(vict) = POS_STANDING;
     update_pos(vict);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     ch->Send("%s",CONFIG_OK);
-    save_char(vict);
+    vict->save();
     return;
   }
   else
@@ -3165,8 +3164,8 @@ ACMD(do_restore)
     }
     GET_POS(vict) = POS_STANDING;
     update_pos(vict);
-    check_regen_rates(vict);
-    save_char(vict);
+    vict->check_regen_rates();
+    vict->save();
     *ch << CONFIG_OK;
     act("You have been fully restored by $N!", FALSE, vict, 0, ch,
         TO_CHAR);
@@ -3550,7 +3549,7 @@ ACMD(do_last)
     send_to_char("There is no such player.\r\n", ch);
     return;
   }
-  vict = new Character();
+  vict = new Character(FALSE);
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char(arg, vict) < 0)
   {
@@ -3951,7 +3950,7 @@ ACMD(do_heroutil)
       log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
       break;
     }
-    save_char(vict);
+    vict->save();
 
   }
 }
@@ -4027,12 +4026,11 @@ ACMD(do_wizutil)
     case SCMD_UNAFFECT:
       if (vict->affected)
       {
-        while (vict->affected)
-          affect_remove(vict, vict->affected);
+      vict->remove_all_affects();
         vict->Send( "There is a brief flash of light!\r\n"
                          "You feel slightly different.\r\n");
         ch->Send( "All spells removed.\r\n");
-        check_regen_rates(vict);
+        vict->check_regen_rates();
       }
       else
       {
@@ -4044,7 +4042,7 @@ ACMD(do_wizutil)
       log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
       break;
     }
-    save_char(vict);
+    vict->save();
     // log("(do_wizutil)Saved %s in room %d.", GET_NAME(vict), vict->in_room);
   }
 }
@@ -4166,7 +4164,7 @@ ACMD(do_topgold)
   TEMP_LOAD_CHAR = TRUE;
   for (j = 0; j <= top_of_p_table; j++)
   {
-    victim = new Character();
+    victim = new Character(FALSE);
     
     if (store_to_char((player_table + j)->name, victim) > -1)
     {
@@ -4214,7 +4212,7 @@ ACMD(do_hostfind)
   TEMP_LOAD_CHAR = TRUE;
   for (j = 0; j <= top_of_p_table; j++)
   {
-    victim = new Character();
+    victim = new Character(FALSE);
 
     if (store_to_char((player_table + j)->name, victim) > -1)
     {
@@ -4449,7 +4447,7 @@ ACMD(do_show)
     }
 
 
-    vict = new Character();
+    vict = new Character(FALSE);
     TEMP_LOAD_CHAR = TRUE;
     if (store_to_char(value, vict) < 0)
     {
@@ -4906,31 +4904,31 @@ int perform_set(Character *ch, Character *vict, int mode,
     break;
   case 4:
     vict->points.max_hit = RANGE(1, 100000);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 5:
     vict->points.max_mana = RANGE(1, 100000);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 6:
     vict->points.max_move = RANGE(1, 100000);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 7:
     vict->points.hit = RANGE(-9, vict->points.max_hit);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 8:
     vict->points.mana = RANGE(0, vict->points.max_mana);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 9:
     vict->points.move = RANGE(0, vict->points.max_move);
-    affect_total(vict);  /* affect_total() handles regen updates */
+    vict->affect_total();  /* affect_total() handles regen updates */
     break;
   case 10:
     GET_ALIGNMENT(vict) = RANGE(-1000, 1000);
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 11:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4939,13 +4937,13 @@ int perform_set(Character *ch, Character *vict, int mode,
       RANGE(3, 18);
     vict->real_abils.str = value;
     vict->real_abils.str_add = 0;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 12:
     vict->real_abils.str_add = RANGE(0, 100);
     if (value > 0)
       vict->real_abils.str = 18;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 13:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4953,7 +4951,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     else
       RANGE(3, 18);
     vict->real_abils.intel = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 14:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4961,7 +4959,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     else
       RANGE(3, 18);
     vict->real_abils.wis = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 15:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4969,7 +4967,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     else
       RANGE(3, 18);
     vict->real_abils.dex = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 16:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4977,7 +4975,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     else
       RANGE(3, 18);
     vict->real_abils.con = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 17:
     if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
@@ -4985,11 +4983,11 @@ int perform_set(Character *ch, Character *vict, int mode,
     else
       RANGE(3, 100);
     vict->real_abils.cha = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 18:
     vict->points.armor = RANGE(-100, 100);
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 19:
     vict->Gold(RANGE(0, 1000000000) - vict->Gold(0, GOLD_HAND), GOLD_HAND);
@@ -5002,11 +5000,11 @@ int perform_set(Character *ch, Character *vict, int mode,
     break;
   case 22:
     vict->points.hitroll = RANGE(-20, 120);
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 23:
     vict->points.damroll = RANGE(-20, 120);
-    affect_total(vict);
+    vict->affect_total();
     break;
   case 24:
     if (GET_LEVEL(ch) < LVL_IMPL && ch != vict)
@@ -5058,7 +5056,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       ch->Send("Must be 'off' or a value from 0 to 24.\r\n");
       return (0);
     }
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 32:
     SET_OR_REMOVE(PLR_FLAGS(vict), PLR_KILLER);
@@ -5100,7 +5098,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       return (0);
     }
     GET_CLASS(vict) = i;
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 40:
     SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
@@ -5178,7 +5176,7 @@ int perform_set(Character *ch, Character *vict, int mode,
      */
     vict->player.time.birth =
       time(0) - (value - 17 * SECS_PER_MUD_YEAR);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 49:
     if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
@@ -5191,7 +5189,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       REMORTS(vict)++;
 
     GET_REMORT(vict) = i;
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 50:
     if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
@@ -5204,7 +5202,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       REMORTS(vict)++;
 
     GET_REMORT_TWO(vict) = i;
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 51:
     if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
@@ -5217,7 +5215,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       REMORTS(vict)++;
 
     GET_REMORT_THREE(vict) = i;
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 52:
     if ((i = parse_race(*val_arg)) == RACE_UNDEFINED)
@@ -5227,15 +5225,10 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     else
       set_race(vict, i);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
 
   case 53:
-    if (GET_SEX(vict) == SEX_MALE)
-    {
-      send_to_char("Only women get pregnant!\r\n", ch);
-      return 0;
-    }
 
     if ((value < -1) || (value >= 6600))
     {     /* Limits */
@@ -5265,7 +5258,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       act("$n makes a mystical, shamanistic gesture at $N's stomach.\r\nIt quickly bulges and expands!\r\n", TRUE, ch, 0, vict, TO_NOTVICT);
       PREG(vict) = value;
     }
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;               /* End Mating Mod Debug Code */
 
   case 54:
@@ -5311,12 +5304,12 @@ int perform_set(Character *ch, Character *vict, int mode,
 
   case 63:
     GET_HEIGHT(vict) = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
 
   case 64:
     GET_WEIGHT(vict) = value;
-    affect_total(vict);
+    vict->affect_total();
     break;
 
   case 65:
@@ -5350,7 +5343,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     else
       send_to_char("You Must Specify: spec or multi\r\n", ch);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 68:
     if (!str_cmp(val_arg, "on"))
@@ -5365,7 +5358,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     else
       send_to_char("You Must Specify: spec or multi\r\n", ch);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 69:
     if (!str_cmp(val_arg, "on"))
@@ -5380,7 +5373,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     else
       send_to_char("You Must Specify: spec or multi\r\n", ch);
-    check_regen_rates(vict);
+    vict->check_regen_rates();
     break;
   case 70:
     AFF_SPEED(vict) = value;
@@ -5526,7 +5519,7 @@ ACMD(do_password)
   strncpy(GET_PASSWD(ch), CRYPT(buf2, GET_NAME(ch)), MAX_PWD_LENGTH);
   *(GET_PASSWD(ch) + MAX_PWD_LENGTH) = '\0';
   ch->Send( "Password changed to '%s'.", buf2);
-  save_char(ch);
+  ch->save();
 
 }
 
@@ -5586,7 +5579,7 @@ ACMD(do_set)
   else if (is_file)
   {
     /* try to load the player off disk */
-    cbuf = new Character();
+    cbuf = new Character(FALSE);
     if ((player_i = load_char(name, cbuf)) > -1)
     {
       if (GET_LEVEL(cbuf) >= GET_LEVEL(ch))
@@ -5618,7 +5611,7 @@ ACMD(do_set)
   {
     if (!is_file && !IS_NPC(vict))
     {
-      save_char(vict);
+      vict->save();
     }
     if (is_file)
     {
@@ -5629,7 +5622,7 @@ ACMD(do_set)
 
 }
 
-void out_rent(char *name)
+void out_rent(const char *name)
 {
   FILE *fl, *fp;
   char ofname[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH],  fname2[MAX_INPUT_LENGTH];
@@ -5681,8 +5674,10 @@ void out_rent(char *name)
       {
         /* none of these will be unique items. just can't happen */
         obj = read_object(object.item_number, VIRTUAL);
+        if (obj){
         my_obj_save_to_disk(fp, obj, 0);
         extract_obj(obj);
+        }
       }
     }
   }
@@ -5729,7 +5724,7 @@ ACMD(do_objconv)
      do it one at a time, thank you very much */
   for (counter = 0; counter <= top_of_p_table; counter++)
   {
-    victim = new Character();
+    victim = new Character(FALSE);
     if (load_char((player_table + counter)->name, victim) > -1)
       out_rent(GET_NAME(victim));
     delete (victim);
@@ -5802,8 +5797,6 @@ ACMD(do_own)
 
 ACMD(do_hackinvis)
 {
-  extern struct index_data *obj_index;
-  extern struct obj_data *obj_proto;
   int nr, found = 0;
   int check_item_hack_invis(struct obj_data *obj, int fix);
   char buf[MAX_INPUT_LENGTH];
@@ -6165,7 +6158,7 @@ ACMD(do_innate)
     for (aff = victim->affected; aff; aff = aff->next)
     {
       if (is_abbrev(buf, skill_name(aff->type)))
-        affect_remove(victim, aff);
+        victim->affect_remove(aff);
     }
   ch->Send( "%s", CONFIG_OK);
 }
@@ -6836,7 +6829,7 @@ ACMD(do_namechange)
   }
   if (!tch)
   {
-    struct kill_data *load_killlist(char *name);
+    struct kill_data *load_killlist(const char *name);
     void load_locker(Character *ch);
 
     if (get_id_by_name(oldname) == -1)
@@ -6844,7 +6837,7 @@ ACMD(do_namechange)
       ch->Send( "A player by that name doesn't exist here.\r\n");
       return;
     }
-    tch = new Character();
+    tch = new Character(FALSE);
     if (load_char(oldname, tch) <= 0)
     {
       delete (tch);
@@ -6867,13 +6860,12 @@ ACMD(do_namechange)
     add_char_to_list(ch);
     loaded = 1;
   }
-
-  free_string(&tch->player.name);
-  tch->player.name = str_dup(newname);
+free_string(&tch->player.name);
+  tch->player.name = strdup(newname);
   newname[0] = LOWER(newname[0]);
   strlcpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
   change_plrindex_name(GET_IDNUM(tch), newname);
-  save_char(tch);
+  tch->save();
   if (!loaded)
     Crash_crashsave(tch);
   write_aliases(tch);
@@ -6962,9 +6954,8 @@ C_FUNC(delete_player)
   }
 }
 
-void perform_delete_player(char *charname)
+void perform_delete_player(const char *charname)
 {
-;
   int player_i;
   Crash_delete_file(charname);
   delete_pobj_file(charname);

@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/30 09:14:19 $
-*  $Revision: 1.10 $
+*  $Date: 2006/08/13 06:26:51 $
+*  $Revision: 1.11 $
 **************************************************************************/
 
 #include "conf.h"
@@ -27,9 +27,9 @@
 #include "constants.h"
 #include "oasis.h"
 #include "descriptor.h"
+#include "assemblies.h"
 
 extern struct index_data **trig_index;
-extern struct room_data *world_vnum[];
 extern const char *cmd_door[];
 
 #ifndef LVL_BUILDER
@@ -39,8 +39,6 @@ extern const char *cmd_door[];
 
 /* external functions */
 const char *skill_name(int num);
-void add_var(struct trig_var_data **var_list, char *name, char *value,
-             long id);
 char *matching_quote(char *p);
 char *str_str(char *cs, char *ct);
 extern struct time_info_data time_info;
@@ -1228,7 +1226,7 @@ int speech_otrigger(Character * actor, char *str)
   return (0);
 }
 
-int leave_otrigger(room_data *room, Character *actor, int dir)
+int leave_otrigger(Room *room, Character *actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1267,7 +1265,20 @@ int leave_otrigger(room_data *room, Character *actor, int dir)
 int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd) {
   //  trig_data *t;
   //char buf[MAX_INPUT_LENGTH];
+  ASSEMBLY     *pAssembly = NULL;
   int ret_val = 0;
+
+  if( (pAssembly = assemblyGetAssemblyPtr( lVnum )) == NULL )
+  {
+    log( "SYSERR: NULL assemble_otrigger(): Invalid 'lVnum' #%d.", lVnum );
+    return (FALSE);
+  }
+  if (pAssembly->trigVnum == -1) {
+  perform_assemble(lVnum, ch, subcmd, cmd);
+return TRUE;
+}
+  
+  
   //ADD_UID_VAR(buf, t, ch, "actor", 0);
   /*switch (cmd)
   {
@@ -1355,7 +1366,7 @@ void time_otrigger(obj_data *obj)
  *  world triggers
  */
 
-void reset_wtrigger(struct room_data *room)
+void reset_wtrigger(Room * room)
 {
   trig_data *t;
 
@@ -1375,7 +1386,7 @@ void reset_wtrigger(struct room_data *room)
   }
 }
 
-void random_wtrigger(struct room_data *room)
+void random_wtrigger(Room *room)
 {
   trig_data *t;
 
@@ -1396,7 +1407,7 @@ void random_wtrigger(struct room_data *room)
 }
 
 
-int enter_wtrigger(struct room_data *room, Character * actor, int dir)
+int enter_wtrigger(Room *room, Character * actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1428,7 +1439,7 @@ int enter_wtrigger(struct room_data *room, Character * actor, int dir)
 
 int command_wtrigger(Character * actor, char *cmd, char *argument)
 {
-  struct room_data *room;
+  Room *room;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   char *remove_percentage(char *string);
@@ -1476,7 +1487,7 @@ int command_wtrigger(Character * actor, char *cmd, char *argument)
 
 void speech_wtrigger(Character * actor, char *str)
 {
-  struct room_data *room;
+  Room *room;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   char *remove_percentage(char *string);
@@ -1515,7 +1526,7 @@ void speech_wtrigger(Character * actor, char *str)
 
 int drop_wtrigger(obj_data * obj, Character * actor)
 {
-  struct room_data *room;
+  Room *room;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   int ret_val;
@@ -1550,7 +1561,7 @@ int drop_wtrigger(obj_data * obj, Character * actor)
 int cast_wtrigger(Character * actor, Character * vict, obj_data * obj,
                   int spellnum)
 {
-  room_data *room;
+  Room *room;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
 
@@ -1583,7 +1594,7 @@ int cast_wtrigger(Character * actor, Character * vict, obj_data * obj,
 }
 
 
-int leave_wtrigger(struct room_data *room, Character * actor, int dir)
+int leave_wtrigger(Room *room, Character * actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1612,7 +1623,7 @@ int leave_wtrigger(struct room_data *room, Character * actor, int dir)
 
 int door_wtrigger(Character * actor, int subcmd, int dir)
 {
-  room_data *room;
+  Room *room;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
 
@@ -1642,7 +1653,7 @@ int door_wtrigger(Character * actor, int subcmd, int dir)
 }
 
 
-void time_wtrigger(struct room_data *room)
+void time_wtrigger(Room *room)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.32  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.31  2006/06/21 09:28:57  w4dimenscor
  * Added the ability for Mortals of imms to listen to the wizchat. it is a
  * flag with the name wizmort, so set player wizmort on should do the
@@ -137,10 +140,8 @@
 #include "descriptor.h"
 
 /* extern variables */
-extern struct room_data *world_vnum[];
 extern Descriptor *descriptor_list;
 extern struct spell_info_type spell_info[];
-extern struct index_data *mob_index;
 extern Character *ch_selling;
 extern char *class_abbrevs[];
 extern const int xap_objs;
@@ -394,7 +395,7 @@ ACMD(do_save)
   }
 
   write_aliases(ch);
-  save_char(ch);
+  ch->save();
   Crash_crashsave(ch);
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_HOUSE_CRASH))
     House_crashsave(GET_ROOM_VNUM(IN_ROOM(ch)));
@@ -405,7 +406,7 @@ void list_rprooms_to_char(Character *ch)
 void list_kills_to_char(Character *ch)
 {
   char line[MAX_INPUT_LENGTH];
-  char *name, *first, *last;
+  char *first, *last;
   mob_rnum rnum;
   struct kill_data *temp;
   DYN_DEFINE;
@@ -429,8 +430,7 @@ void list_kills_to_char(Character *ch)
       last = asctime(localtime(&temp->last));
       last += 4;
       //*(last + 11 ) = '\0';
-      name = mob_proto[rnum].player.short_descr;
-      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", temp->count, name, GET_LEVEL(mob_proto + rnum),  last);
+      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", temp->count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
       DYN_RESIZE(line);
       found++;
     }
@@ -2038,7 +2038,7 @@ ACMD(do_pageheight)
   }
   ch->Send( "You set your page height to %d, default is 25\r\n", num);
   PAGEHEIGHT(ch) = num;
-  save_char(ch);
+  ch->save();
 }
 ACMD(do_pagewidth)
 {
@@ -2052,5 +2052,5 @@ ACMD(do_pagewidth)
   }
   ch->Send( "You set your page width to %d, default is 80\r\n", num);
   PAGEWIDTH(ch) = num;
-  save_char(ch);
+  ch->save();
 }

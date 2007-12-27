@@ -119,6 +119,7 @@ ACMD(do_convert)
 	    GET_BRONZE_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < 5; counter++) {
 		obj = read_object(3300, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 	    return;
@@ -136,6 +137,7 @@ ACMD(do_convert)
 	    GET_SILVER_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < 10; counter++) {
 		obj = read_object(3301, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 
@@ -154,6 +156,7 @@ ACMD(do_convert)
 	    GET_GOLD_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < 10; counter++) {
 		obj = read_object(3302, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 
@@ -303,7 +306,7 @@ ACMD(do_convey)
 	    GET_MAX_MOVE(ch) += (amount * 100);
 	    ch->Gold( (-amount* 10000000)* GET_CONVERSIONS(ch), GOLD_ALL);
 	    GET_CONVERSIONS(ch)++;
-	    affect_total(ch);
+	    ch->affect_total();
 
 	    return;
 	    } else {

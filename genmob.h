@@ -7,7 +7,7 @@
 int delete_mobile(mob_rnum);
 int copy_mobile(Character *to, Character *from);
 int add_mobile(Character *, mob_vnum);
-int copy_mob_strings(Character *to, Character *from);
+//int copy_mob_strings(Character *to, Character *from);
 int free_mobile_strings(Character *mob);
 int free_mobile(Character *mob);
 int save_mobiles(zone_rnum rznum);

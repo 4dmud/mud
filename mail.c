@@ -34,8 +34,6 @@ void postmaster_receive_mail(Character *ch,
 			     char *arg);
 SPECIAL(postmaster);
 
-extern struct room_data *world_vnum[];
-extern struct index_data *mob_index;
 extern int no_mail;
 int find_name(char *name);
 
@@ -82,9 +80,9 @@ int mail_recip_ok(const char *name)
 if (!get_id_by_name((char *)name)) 
 	return ret;
 
-victim = new Character();
+victim = new Character(FALSE);
   TEMP_LOAD_CHAR = TRUE;
-  if (store_to_char((char *)name, victim) >= 0) {
+  if (store_to_char(name, victim) >= 0) {
     if (!PLR_FLAGGED(victim, PLR_DELETED))
       ret = TRUE;
     delete victim;

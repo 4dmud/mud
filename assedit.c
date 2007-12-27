@@ -23,9 +23,6 @@
 /*-------------------------------------------------------------------*
  * External data structures.
  *-------------------------------------------------------------------*/
-extern Descriptor *descriptor_list;
-extern struct obj_data *obj_proto;
-
 extern const char *AssemblyTypes[];
 
 /*-------------------------------------------------------------------*
@@ -167,13 +164,13 @@ void assedit_setup(Descriptor *d, int num)
 
   if ( (lRnum = real_object( OLC_ASSEDIT(d)->lVnum ) ) < 0)
   {
-    new_send_to_char(d->character, "Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
+    d->Output("Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
     cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
     return;
   }
 
   STATE(d) = CON_ASSEDIT;
-  act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
+  act("$n starts editing assemblies.", TRUE, d->character, 0, 0, TO_ROOM);
   SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
   assedit_disp_menu(d);
 

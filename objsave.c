@@ -44,7 +44,7 @@ void add_owner(int nr, long id);
 extern const int xap_objs;
 int save_new_style = 1;
 /* Extern functions */
-ACMD(do_action);
+//ACMD(do_action);
 ACMD(do_tell);
 SPECIAL(receptionist);
 SPECIAL(cryogenicist);
@@ -100,7 +100,7 @@ int has_identifier(struct obj_data *obj, long id);
 #define NEW_CORPSE_FILE LIB_MISC"new_corpse.save"
 
 extern struct corpse_list_data *corpse_list;
-
+#if 0
 /* skipped with xap objs */
 struct obj_data *Obj_from_store(struct obj_file_elem object, int *location)
 {
@@ -133,6 +133,7 @@ struct obj_data *Obj_from_store(struct obj_file_elem object, int *location)
   else
     return (NULL);
 }
+#endif
 
 
 int Obj_to_store_from(struct obj_data *obj, FILE * fl, int locate)
@@ -146,7 +147,7 @@ int Obj_to_store(struct obj_data *obj, FILE * fl, int location)
   return Obj_to_store_from(obj, fl, location);
 }
 
-int delete_pobj_file(char *name)
+int delete_pobj_file(const char *name)
 {
   char filename[MAX_INPUT_LENGTH];
   FILE *fl;
@@ -169,7 +170,7 @@ int delete_pobj_file(char *name)
   return (1);
 }
 
-int Crash_delete_file(char *name)
+int Crash_delete_file(const char *name)
 {
   char filename[MAX_INPUT_LENGTH];
   FILE *fl;
@@ -225,7 +226,7 @@ int Crash_delete_crashfile(Character *ch)
 }
 
 
-int Crash_clean_file(char *name)
+int Crash_clean_file(const char *name)
 {
   char fname[MAX_STRING_LENGTH], filetype[20];
   FILE *fl;
@@ -365,7 +366,7 @@ void update_obj_file(void)
 
 
 
-void Crash_listrent(Character *ch, char *name)
+void Crash_listrent(Character *ch,const char *name)
 {
   FILE *fl;
   char fname[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -426,10 +427,14 @@ void Crash_listrent(Character *ch, char *name)
       sscanf(line, "#%d", &nr);
       if (nr != NOTHING)
       {   /* then we can dispense with it easily */
+      
         obj = read_object(nr, VIRTUAL);
+        if (obj) {
         sprintf(buf, "%s[%5d] (%5dau) %-20s\r\n", buf,
                 nr, GET_OBJ_RENT(obj), obj->short_description);
         free_obj(obj, FALSE);
+        }
+        
       }
       else
       { char *di;
@@ -1092,7 +1097,7 @@ void Crash_save_all(void)
       if (PLR_FLAGGED(d->character, PLR_CRASH))
       {
         Crash_crashsave(d->character);
-        save_char(d->character);
+        d->character->save();
         write_aliases(d->character);
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
       }
@@ -1741,7 +1746,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
     {
     case 'a':
       if (!strcmp(tag, "ActionD"))
-      {
+      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->action_description = fread_string(fl, buf)) == NULL)
           temp->action_description = strdup("Undefined");
       }
@@ -1754,7 +1759,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       break;
     case 'd':
       if (!strcmp(tag, "Description"))
-      {
+      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->description = fread_string(fl, buf)) == NULL)
           temp->description = strdup("Undefined");
       }
@@ -1767,7 +1772,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       break;
     case 'f':
       if (!strcmp(tag, "Feel"))
-      {
+      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->feel = fread_string(fl, buf)) == NULL)
           temp->feel = strdup("Undefined");
       }
@@ -1816,11 +1821,13 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
     case 's':
       if (!strcmp(tag, "Short"))
       {
+      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->short_description = fread_string(fl, buf)) == NULL)
           temp->short_description = strdup("Undefined");
       }
       else if (!strcmp(tag, "Smell"))
       {
+      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->smell = fread_string(fl, buf)) == NULL)
           temp->smell = strdup("Undefined");
       }
@@ -1832,6 +1839,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         GET_OBJ_TYPE(temp) = atoi(line);
       else if (!strcmp(tag, "Taste"))
       {
+      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
         if ((temp->taste = fread_string(fl, buf)) == NULL)
           temp->taste = strdup("Undefined");
       }

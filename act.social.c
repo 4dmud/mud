@@ -23,7 +23,6 @@
 #include "strutil.h"
 
 /* extern variables */
-extern struct room_data *world_vnum[];
 extern Descriptor *descriptor_list;
 struct command_info *complete_cmd_info;
 

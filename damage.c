@@ -16,15 +16,7 @@
 #include "descriptor.h"
 
 
-struct aff_dam_event_obj
-{
-  Character* ch;
-  int damage;
-  int interval;
-  int recurse;
-  int (*event_fun)(int, Character*);
-  int id;
-};
+
 
 struct aff_dam_event_list
 {
@@ -211,7 +203,7 @@ void aff_damage(Character *ch, int dam, long interval, int recurse,
                 int (*event_fun)(int, Character*))
 {
   struct aff_dam_event_obj* new_event;
-  CREATE(new_event, struct aff_dam_event_obj, 1);
+  new_event = new aff_dam_event_obj();
   new_event->ch = ch;
   new_event->damage = dam;
   new_event->interval = interval;
@@ -229,13 +221,13 @@ EVENTFUNC(affdam_event)
   remove_affdam_event(ade_obj->id);
   if(ade_obj->recurse < 0)
   {
-    free(ade_obj);
+    delete (struct aff_dam_event_obj*) ade_obj;
     return 0;
   }
 
   if(ade_obj->event_fun(ade_obj->damage, ade_obj->ch))
   {
-    CREATE(new_event, struct aff_dam_event_obj, 1);
+    new_event = new aff_dam_event_obj();
     new_event->event_fun = ade_obj->event_fun;
     new_event->damage = ade_obj->damage;
     new_event->interval = ade_obj->interval;
@@ -245,7 +237,7 @@ EVENTFUNC(affdam_event)
     add_ade(new_event);
   }
 
-  free(ade_obj);
+  delete ade_obj;
   return 1;
 }
 
@@ -269,7 +261,7 @@ void add_ade(struct aff_dam_event_obj* new_ade_obj)
   new_elem->ch = new_ade_obj->ch;
   new_elem->id = new_ade_obj->id;
   t = new_ade_obj->interval RL_SEC;
-  new_elem->event = event_create(affdam_event, new_ade_obj, t);
+  new_elem->event = event_create(affdam_event, new_ade_obj, t, EVENT_TYPE_DAMAGE);
 }
 
 void cancel_affdam_events(Character* ch)

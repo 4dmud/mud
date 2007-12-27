@@ -235,7 +235,7 @@ int save_objects(zone_rnum zone_num)
   /*
    * Start running through all objects in this zone.
    */
-  for (counter = genolc_zone_bottom(zone_num); counter <= zone_table[zone_num].top; counter++) {
+  for (counter = zone_table[zone_num].Bot(); counter <= zone_table[zone_num].top; counter++) {
     if ((realcounter = real_object(counter)) != NOTHING) {
       if ((obj = &obj_proto[realcounter])->action_description) {
 	strncpy(buf, obj->action_description, sizeof(buf) - 1);

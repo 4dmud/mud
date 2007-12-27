@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/06/16 10:54:51 $
-*  $Revision: 1.12 $
+*  $Date: 2006/08/13 06:26:51 $
+*  $Revision: 1.13 $
 **************************************************************************/
 
 #include "conf.h"
@@ -29,11 +29,11 @@ zone_rnum real_zone_by_thing(room_vnum vznum);
 bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
-void (name)(room_data *room, char *argument, int cmd, int subcmd)
+void (name)(Room *room, char *argument, int cmd, int subcmd)
 
 int followers_to_master(Character *ch, room_rnum was_in);
-void wld_log(room_data *room, const char *format, ...);
-void act_to_room(char *str, room_data *room);
+void wld_log(Room *room, const char *format, ...);
+void act_to_room(char *str, Room *room);
 WCMD(do_wasound);
 WCMD(do_wecho);
 WCMD(do_wsend);
@@ -46,13 +46,13 @@ WCMD(do_wpurge);
 WCMD(do_wload);
 WCMD(do_wdamage);
 WCMD(do_wat);
-void wld_command_interpreter(room_data *room, char *argument);
+void wld_command_interpreter(Room *room, char *argument);
 
 struct wld_command_info
 {
   char *command;
   void (*command_pointer)
-  (room_data * room, char *argument, int cmd, int subcmd);
+  (Room * room, char *argument, int cmd, int subcmd);
   int subcmd;
 };
 
@@ -64,7 +64,7 @@ struct wld_command_info
 
 
 /* attaches room vnum to msg and sends it to script_log */
-void wld_log(room_data *room, const char *format, ...)
+void wld_log(Room *room, const char *format, ...)
 {
   va_list args;
   char buf[MAX_STRING_LENGTH];
@@ -77,7 +77,7 @@ void wld_log(room_data *room, const char *format, ...)
 }
 
 /* sends str to room */
-void act_to_room(char *str, room_data *room)
+void act_to_room(char *str, Room *room)
 {
   /* no one is in the room */
   if (!room->people)
@@ -316,7 +316,7 @@ WCMD(do_wdoor)
 {
   char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
   char field[MAX_INPUT_LENGTH], *value;
-  room_data *rm;
+  Room *rm;
   struct room_direction_data *ex;
   int dir, fd;
   room_rnum to_room;
@@ -788,7 +788,7 @@ const struct wld_command_info wld_cmd_info[] =
 /*
  *  This is the command interpreter used by rooms, called by script_driver.
  */
-void wld_command_interpreter(room_data * room, char *argument)
+void wld_command_interpreter(Room * room, char *argument)
 {
   int cmd, length;
   char *line, arg[MAX_INPUT_LENGTH];

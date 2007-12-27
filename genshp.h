@@ -6,14 +6,14 @@
 
 void copy_shop(struct shop_data *tshop, struct shop_data *fshop, int free_old_strings);
 void copy_list(int **tlist, int *flist);
-void copy_list2(struct room_data **tlist[], struct room_data *flist[]);
+void copy_list2(Room **tlist[], Room *flist[]);
 void copy_type_list(struct shop_buy_data **tlist, struct shop_buy_data *flist);
 void remove_from_type_list(struct shop_buy_data **list, int num);
 void remove_from_int_list(int **list, int num);
-void remove_from_int_list2(struct room_data **list[], room_rnum num);
+void remove_from_int_list2(Room **list[], room_rnum num);
 void add_to_type_list(struct shop_buy_data **list, struct shop_buy_data *newl);
 void add_to_int_list(int **tlist, int newi);
-void add_to_int_list2(struct room_data **list[], room_rnum newi);
+void add_to_int_list2(Room **list[], room_rnum newi);
 void free_shop_string(struct shop_data *shop);
 void free_type_list(struct shop_buy_data **list);
 void free_shop(struct shop_data *shop);

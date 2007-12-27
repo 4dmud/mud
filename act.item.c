@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.46  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.45  2006/06/19 06:25:39  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -266,7 +269,7 @@ int where_to_worn(int where);
 bool can_take_obj(Character *ch, struct obj_data *obj);
 bool perform_get_from_room(Character *ch, struct obj_data *obj);
 int perform_drop(Character *ch, struct obj_data *obj, byte mode,
-                 const char *sname, struct room_data * RDR);
+                 const char *sname, Room * RDR);
 int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 Character *give_find_vict(Character *ch, char *arg);
 void get_from_room(Character *ch, char *arg, int amount);
@@ -275,7 +278,7 @@ void perform_give_gold(Character *ch, Character *vict,
 void perform_give(Character *ch, Character *vict,
                   struct obj_data *obj);
 void perform_drop_gold(Character *ch, gold_int amount, byte mode,
-                       struct room_data *  RDR);
+                       Room *  RDR);
 void get_check_money(Character *ch, struct obj_data *obj);
 void weight_change_object(struct obj_data *obj, int weight);
 bool perform_put(Character *ch, struct obj_data *obj,
@@ -965,7 +968,7 @@ int automeld(struct obj_data *obj)
     {
       if (player_table[i].id == GET_OBJ_VAL(obj, 0))
       {
-        ch = new Character();
+        ch = new Character(FALSE);
         if (player_table[i].id)
           ch->loader = player_table[i].id;
         if (load_char(player_table[i].name, ch) > -1)
@@ -1489,7 +1492,7 @@ ACMD(do_get)
 
 
 void perform_drop_gold(Character *ch, gold_int amount,
-                       byte mode, struct room_data *  RDR)
+                       byte mode, Room *  RDR)
 {
   struct obj_data *obj;
   char buf[MAX_INPUT_LENGTH];
@@ -1577,7 +1580,7 @@ void perform_drop_gold(Character *ch, gold_int amount,
                 "  It vanishes in a puff of smoke!" : "")
 
 int perform_drop(Character *ch, struct obj_data *obj,
-                 byte mode, const char *sname, struct room_data *  RDR)
+                 byte mode, const char *sname, Room *  RDR)
 {
   int value;
   char buf[MAX_INPUT_LENGTH];
@@ -1679,7 +1682,7 @@ int perform_drop(Character *ch, struct obj_data *obj,
 ACMD(do_drop)
 {
   struct obj_data *obj, *next_obj;
-  struct room_data *  RDR = NULL;
+  Room *  RDR = NULL;
   byte mode = SCMD_DROP;
   int dotmode, amount = 0, multi, num_don_rooms;
   const char *sname;
@@ -1866,8 +1869,7 @@ void perform_give(Character *ch, Character *vict,
   }
   if (GET_OBJ_WEIGHT(obj) + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
-    act("$E can't carry that much weight.", FALSE, ch, 0, vict,
-        TO_CHAR);
+    act("$E can't carry that much weight.", FALSE, ch, 0, vict, TO_CHAR);
     if (!slipping)
       act("$n just tried to give you $p but you can't carry that much weight.", FALSE, ch, obj, vict, TO_VICT);
     return;
@@ -1899,17 +1901,17 @@ Character *give_find_vict(Character *ch, char *arg)
 
   if (!*arg)
   {
-    ch->Send("To who?\r\n");
+    *ch << "To who?\r\n";
     return (NULL);
   }
   else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
   {
-    ch->Send( "%s", CONFIG_NOPERSON);
+    *ch <<  CONFIG_NOPERSON;
     return (NULL);
   }
   else if (vict == ch)
   {
-    ch->Send("What's the point of that?\r\n");
+    *ch << "What's the point of that?\r\n";
     return (NULL);
   }
   else
@@ -1986,8 +1988,7 @@ ACMD(do_give)
     }
     else if (!*arg)
     {     /* Give multiple code. */
-      ch->Send( "What do you want to give %lld of?\r\n",
-                       amount);
+      ch->Send( "What do you want to give %lld of?\r\n", amount);
     }
     else if (!(vict = give_find_vict(ch, argument)))
     {
@@ -2646,7 +2647,10 @@ ACMD(do_pour)
         vialvnum=3044;
         extract_obj(from_obj);
         from_obj = read_object(vialvnum, VIRTUAL);
+        if (from_obj)
         obj_to_char(from_obj, ch);
+        else
+        return;
       }
       else
       {

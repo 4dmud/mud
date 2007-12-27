@@ -14,13 +14,9 @@
 #include "genshp.h"
 #include "genzon.h"
 
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 extern struct shop_data *shop_index;
-extern struct zone_data *zone_table;
 extern int top_shop;
-extern zone_rnum top_of_zone_table;
-void copy_list2(struct room_data **tlist[], struct room_data *flist[]);
+void copy_list2(Room **tlist[], Room *flist[]);
 
 /*
  * NOTE (gg): Didn't modify sedit much. Don't consider it as 'recent'
@@ -101,7 +97,7 @@ void copy_list(int **tlist, int *flist)
 }
 
 
-void copy_list2(struct room_data **tlist[], struct room_data *flist[])
+void copy_list2(Room **tlist[], Room *flist[])
 {
   int num_items, i;
 
@@ -246,10 +242,10 @@ void add_to_type_list(struct shop_buy_data **list, struct shop_buy_data *newl)
 
 /*-------------------------------------------------------------------*/
 
-void add_to_int_list2(struct room_data **list[], room_rnum newi)
+void add_to_int_list2(Room **list[], room_rnum newi)
 {
   int i, num_items;
-  struct room_data **nlist;
+  Room **nlist;
 
   /*
    * Count number of entries.
@@ -274,10 +270,10 @@ void add_to_int_list2(struct room_data **list[], room_rnum newi)
   *list = nlist;
 }
 
-void remove_from_int_list2(struct room_data **list[], room_rnum num)
+void remove_from_int_list2(Room **list[], room_rnum num)
 {
   sh_int i, num_items;
-  struct room_data **nlist;
+  Room **nlist;
 
   /*
    * Count number of entries.
@@ -543,7 +539,7 @@ int save_shops(zone_rnum zone_num)
   /*
    * Search database for shops in this zone.
    */
-  for (i = genolc_zone_bottom(zone_num); i <= zone_table[zone_num].top; i++) {
+  for (i = zone_table[zone_num].Bot(); i <= zone_table[zone_num].top; i++) {
     if ((rshop = real_shop(i)) != NOWHERE) {
       fprintf(shop_file, "#%d~\n", i);
       shop = shop_index + rshop;

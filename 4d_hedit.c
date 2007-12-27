@@ -302,11 +302,14 @@ void hedit_parse(Descriptor *d, char *arg)
     case '2':
       OLC_MODE(d) = HEDIT_ENTRY;
       d->Output("Enter help entry: (/s saves /h for help)\r\n\r\n");
+      if (d->backstr)
+      free(d->backstr);
       d->backstr = NULL;
+      
       if (OLC_HELP(d)->entry)
       {
         d->Output( "%s", OLC_HELP(d)->entry);
-        d->backstr = str_dup(OLC_HELP(d)->entry);
+        d->backstr = strdup(OLC_HELP(d)->entry);
       }
       d->str = &OLC_HELP(d)->entry;
       d->max_str = MAX_HELP_ENTRY;

@@ -50,7 +50,7 @@ extern char last_command[];
 /* external functions */
 void display_help(Character *ch, unsigned int i);
 void send_compress_offer(Descriptor *d);
-int delete_pobj_file(char *name);
+int delete_pobj_file(const char *name);
 void echo_on(Descriptor *d);
 void echo_off(Descriptor *d);
 void do_start(Character *ch);
@@ -89,12 +89,12 @@ void perform_complex_alias(struct txt_q *input_q, char *orig,
                            struct alias_data *a);
 int perform_alias(Descriptor *d, char *orig, size_t maxlen);
 int reserved_word(char *argument);
-int find_name(char *name);
+int find_name(const char *name);
 int _parse_name(char *arg, char *name);
 int get_account_num(int num, long acc);
 int has_note(Character *ch, int type);
 void con_character_creation(Descriptor *d, char *arg);
-struct kill_data *load_killlist(char *name);
+struct kill_data *load_killlist(const char *name);
 /* local global vars */
 
 int race_val = 0;
@@ -1763,7 +1763,7 @@ int special(Character *ch, int cmd, char *arg)
 
 
 /* locate entry in p_table with entry->name == name. -1 mrks failed search */
-int find_name(char *name)
+int find_name(const char *name)
 {
   int i;
 
@@ -2065,7 +2065,7 @@ int parse_accounts(Descriptor *d, char *arg)
     account_manage_menu(d);
     return 0;
   }
-  member =  new Character();
+  member =  new Character(FALSE);
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char(name, member) == -1)
   {
@@ -2319,7 +2319,7 @@ int enter_player_game(Descriptor *d)
       break;
     case CLASS_WARRIOR:
       //long sword
-      obj = read_object(3022, VIRTUAL);
+      if ((obj = read_object(3022, VIRTUAL)) != NULL);
       perform_wear(ch, obj, WEAR_WIELD);
       //cape
       if ((obj = read_object(3183, VIRTUAL)) != NULL)
@@ -2351,15 +2351,13 @@ int enter_player_game(Descriptor *d)
 
   GET_WAIT_STATE(ch) = 0;
   /*end new*/
-  check_regen_rates(ch);
+  ch->check_regen_rates();
   read_saved_vars(ch);
   return load_result;
 }
 
 void string_append( Character *ch, char **pString )
 {
-  void string_write(Descriptor *d, char **writeto, size_t len,
-                    long mailto, void *data);
 
   if (!ch) return;
   if (!ch->desc) return;
@@ -2376,13 +2374,9 @@ void string_append( Character *ch, char **pString )
   else
     ch->Send( "%s", numlineas(*pString));
 
-
   free_string(&ch->desc->backstr);
-  /*if (pString != NULL)
-  ch->desc->backstr = strdup(pString);
-  else 
-  ch->desc->backstr = NULL;*/
-  string_write(ch->desc, pString, MAX_STRING_LENGTH, 0, NULL);
+  
+  string_write(ch->desc, pString, MAX_STRING_LENGTH, 0, pString != NULL ? strdup(*pString) : NULL);
 
   act("$n begins editing a note.", TRUE, ch, 0, 0, TO_ROOM);
   /*STATE(ch->desc) = CON_TEXTED;*/
@@ -2444,7 +2438,7 @@ void nanny(Descriptor *d, char *arg)
 
     if (d->character == NULL)
     {
-      d->character = new Character();
+      d->character = new Character(FALSE);
       d->character->desc = d;
     }
     if (!*arg)
@@ -2498,10 +2492,10 @@ void nanny(Descriptor *d, char *arg)
           delete d->character;
           /* Check for multiple creations... */
 
-          d->character = new Character();
+          d->character = new Character(FALSE);
           d->character->desc = d;
-          CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
-          strlcpy(d->character->player.name, CAP(tmp_name), strlen(tmp_name) + 1);
+          //CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
+          d->character->player.name = strdup(CAP(tmp_name));
           GET_PFILEPOS(d->character) = player_i;
           d->Output("Did I get that right, %s (Y/N)? ",tmp_name);
           STATE(d) = CON_NAME_CNFRM;
@@ -2530,8 +2524,8 @@ void nanny(Descriptor *d, char *arg)
           return;
         }
 
-        CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
-        strcpy(d->character->player.name, CAP(tmp_name));
+        //CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
+        d->character->player.name = strdup(CAP(tmp_name));
         d->Output( "\r\n"
                         "This is a time travel mud, where there are 4 major dimensions\r\n"
                         "and many minor time zones. \r\n"
@@ -2583,8 +2577,7 @@ void nanny(Descriptor *d, char *arg)
     else if (*arg == 'n' || *arg == 'N')
     {
       d->Output("Okay, what IS it, then? ");
-      free(d->character->player.name);
-      d->character->player.name = NULL;
+      free_string(&d->character->player.name);
       STATE(d) = CON_GET_NAME;
     }
     else
@@ -2617,7 +2610,7 @@ void nanny(Descriptor *d, char *arg)
       {
         new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
         GET_BAD_PWS(d->character)++;
-        save_char(d->character);
+        d->character->save();
         // log("(nanny)Saved %s in room %d.", GET_NAME(d->character), NOWHERE);
         if (++(d->bad_pws) >= CONFIG_MAX_BAD_PWS)
         { /* 3 strikes and you're out. */
@@ -2740,7 +2733,7 @@ void nanny(Descriptor *d, char *arg)
     }
     else
     {
-      save_char(d->character);
+      d->character->save();
       // log("(nanny_chpwd_vrfy)Saved %s in room %d.", GET_NAME(d->character), NOWHERE);
       echo_on(d);
       d->Output("\r\nDone.\r\n");
@@ -2805,7 +2798,7 @@ void nanny(Descriptor *d, char *arg)
       break;
 
     case '4':
-      if (d->character->player.description)
+      if (d->character->player.description != NULL)
       {
         d->Output("Current description:\r\n%s", d->character->player.description);
         /*
@@ -2816,11 +2809,13 @@ void nanny(Descriptor *d, char *arg)
          * free(d->character->player.description);
          * d->character->player.description = NULL;
          */
-        d->backstr = str_dup(d->character->player.description);
+         if (d->backstr)
+         free(d->backstr);
+        d->backstr = strdup(d->character->player.description);
       }
       d->Output( "Enter the new text you'd like others to see when they look at you.\r\n");
       send_editor_help(d);
-      d->str = &d->character->player.description;
+      *d->str = d->character->player.description;
       d->max_str = EXDSCR_LENGTH;
       STATE(d) = CON_EXDESC;
       break;
@@ -2870,7 +2865,7 @@ void nanny(Descriptor *d, char *arg)
       /* add the change character stuff here */
       delete (d->character);
       d->character = NULL;
-      d->character = new Character();
+      d->character = new Character(FALSE);
 
       d->character->desc = d;
       if ((player_i = load_char(player_table[i].name, d->character)) == -1)
@@ -2948,7 +2943,7 @@ void nanny(Descriptor *d, char *arg)
       }
       if (GET_LEVEL(d->character) < LVL_GRGOD)
         SET_BIT_AR(PLR_FLAGS(d->character), PLR_DELETED);
-      save_char(d->character);
+      d->character->save();
       // log("(nanny_con_del)Saved %s in %d.", GET_NAME(d->character));
       Crash_delete_file(GET_NAME(d->character));
       delete_pobj_file(GET_NAME(d->character));

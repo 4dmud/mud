@@ -48,7 +48,6 @@ OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj);
 void purge_qic(obj_rnum rnum);
 void die_link(Character *mob);
 void extract_all_in_list(OBJ_DATA *obj);
-int delete_pobj_file(char *name);
 void stop_fusion(Character *ch);
 void remove_corpse_from_list(OBJ_DATA *corpse);
 int stop_task(Character *ch) ;
@@ -114,6 +113,25 @@ int isname(const char *str, const char *namelist)
       return 1;
     }
   //free(lp);
+  return 0;
+}
+int isname(const char *str, string &namelist)
+{
+  char *newlist;
+  register char *curtok;
+  static char newlistbuf[MAX_STRING_LENGTH];
+
+  if (!str || !*str)
+    return 0;
+  if (!namelist.compare(str)) /* the easy way */
+    return 1;
+
+  strlcpy(newlistbuf, namelist.c_str(), sizeof(newlistbuf));
+  newlist = newlistbuf;
+  for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
+    if (curtok && is_abbrev(str, curtok))
+      return 1;
+      
   return 0;
 }
 
@@ -544,76 +562,6 @@ void affect_modify(Character * ch, byte loc, sbyte mod,
 }
 */
 
-/* This updates a character by subtracting everything he is affected by */
-/* restoring original abilities, and then affecting all again           */
-void affect_total(Character *ch)
-{
-  struct affected_type *af;
-  int i, j;
-
-  for (i = 0; i < NUM_WEARS; i++)
-  {
-    if (GET_EQ(ch, i))
-      for (j = 0; j < MAX_OBJ_AFFECT; j++)
-        affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
-                         GET_EQ(ch, i)->affected[j].modifier,
-                         GET_EQ(ch, i)->obj_flags.bitvector,
-                         FALSE);
-  }
-
-
-
-  for (af = ch->affected; af; af = af->next)
-    affect_modify(ch, af->location, af->modifier, af->bitvector,
-                  FALSE);
-
-  ch->aff_abils = ch->real_abils;
-
-  for (i = 0; i < NUM_WEARS; i++)
-  {
-    if (GET_EQ(ch, i))
-      for (j = 0; j < MAX_OBJ_AFFECT; j++)
-        affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
-                         GET_EQ(ch, i)->affected[j].modifier,
-                         GET_EQ(ch, i)->obj_flags.bitvector, TRUE);
-  }
-
-
-
-
-  for (af = ch->affected; af; af = af->next)
-    affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-
-  /* Make certain values are between 0..25, not < 0 and not > 25! */
-
-  i = (IS_NPC(ch) || (!IS_NPC(ch) && GET_LEVEL(ch)>= LVL_IMMORT) ? MAX_IMM_BASE : MAX_MORTAL_BASE);
-
-  GET_DEX(ch) = IRANGE(0, GET_DEX(ch), i);
-  GET_INT(ch) = IRANGE(0, GET_INT(ch), i);
-  GET_WIS(ch) = IRANGE(0, GET_WIS(ch), i);
-  GET_CON(ch) = IRANGE(0, GET_CON(ch), i);
-  GET_CHA(ch) = IRANGE(0, GET_CHA(ch), 100);
-  GET_STR(ch) = MAX(0, (int)GET_STR(ch));
-
-
-  if (IS_NPC(ch))
-  {
-    GET_STR(ch) = MIN((int)GET_STR(ch), i);
-  }
-  else
-  {
-    if (GET_STR(ch) > i)
-    {
-      i = GET_ADD(ch) + ((GET_STR(ch) - i) * 10);
-      GET_ADD(ch) = MIN(i, 100);
-      GET_STR(ch) = MAX_MORTAL_BASE;
-    }
-  }
-
-
-  //check_regen_rates(ch);    /* update regen rates (for age) */
-
-}
 
 
 void affect_modify_ar(Character *ch, byte loc, sbyte mod,
@@ -658,34 +606,13 @@ void affect_to_char(Character *ch, struct affected_type *af)
   ch->affected = affected_alloc;
 
   affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-  affect_total(ch);
+  ch->affect_total();
   if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 }
 
 
 
-/*
- * Remove an affected_type structure from a char (called when duration
- * reaches zero). Pointer *af must never be NIL!  Frees mem and calls
- * affect_location_apply
- */
-void affect_remove(Character *ch, struct affected_type *af)
-{
-  struct affected_type *temp;
 
-  if (ch->affected == NULL)
-  {
-    core_dump();
-    return;
-  }
-
-  affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
-  REMOVE_FROM_LIST(af, ch->affected, next);
-  free(af);
-  af = NULL;
-  affect_total(ch);
-
-}
 
 void subs_remove(Character *ch, struct sub_list *af)
 {
@@ -740,7 +667,7 @@ void affect_from_char(Character *ch, int type)
       {
         REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_COVENTRY);
       }
-      affect_remove(ch, hjp);
+      ch->affect_remove(hjp);
     }
   }
 }
@@ -786,7 +713,7 @@ void affect_join(Character *ch, struct affected_type *af,
       if (avg_mod)
         af->modifier /= 2;
 
-      affect_remove(ch, hjp);
+      ch->affect_remove(hjp);
       affect_to_char(ch, af);
       found = TRUE;
     }
@@ -1190,8 +1117,7 @@ int equip_char(Character *ch, struct obj_data *obj, int pos)
     OBJ_INNATE = FALSE;
   }
 
-
-  affect_total(ch);
+  ch->affect_total();
   return 1;
 
 }
@@ -1250,10 +1176,10 @@ struct obj_data *unequip_char(Character *ch, int pos)
     {
       anext = aff->next;
       if (aff->type == obj->obj_flags.obj_innate)
-        affect_remove(ch, aff);
+        ch->affect_remove(aff);
     }
   }
-  affect_total(ch);
+  ch->affect_total();
 
   return (LS_REMOVE ? revert_object(obj) : obj);
 }
@@ -1268,7 +1194,7 @@ void remove_all_normal_affects(Character *ch)
       continue;
     if (ch->affected->bitvector == AFF_IMMFREEZE)
       continue;
-    affect_remove(ch, aff);
+    ch->affect_remove(aff);
   }
 }
 
@@ -1291,6 +1217,35 @@ int get_number(char **name)
     //strcpy(*name, ppos);    /* strcpy: OK (always smaller) */
     memmove(*name, ppos, (plen = strlen(ppos)));
     *((*name + (plen))) = '\0';
+
+    for (i = 0; *(number + i); i++)
+      if (!isdigit(*(number + i)))
+        return (0);
+
+    return (atoi(number));
+  }
+  return (1);
+}
+
+int get_number(const char **name)
+{
+  int i = 0, plen = 0;
+  char *ppos;
+  char number[MAX_INPUT_LENGTH] = "";
+
+  if (!*name || !**name)
+    return 1;
+
+    char nname[strlen(*name) + 1];
+    strcpy(nname, *name);
+
+  if ((ppos = strchr(nname, '.')) != NULL)
+  {
+    *ppos++ = '\0';
+    strlcpy(number, nname, sizeof(number));
+    //strcpy(*name, ppos);    /* strcpy: OK (always smaller) */
+    memmove(nname, ppos, (plen = strlen(ppos)));
+    *((name + (plen))) = '\0';
 
     for (i = 0; *(number + i); i++)
       if (!isdigit(*(number + i)))
@@ -1332,7 +1287,7 @@ struct obj_data *get_obj_num(obj_rnum nr)
 
 
 /* search a room for a char, and return a pointer if found..  */
-Character *get_char_room(char *name, int *number, room_rnum room)
+Character *get_char_room(const char *name, int *number, room_rnum room)
 {
   Character *i;
   int num;
@@ -1983,9 +1938,9 @@ void death_room(Character *ch)
   }
   move_char_to(ch, real_room(1205));
   GET_WAIT_STATE(ch) = 2 RL_SEC;
-  affect_total(ch);
-  check_regen_rates(ch);
-  save_char(ch);
+  ch->affect_total();
+    ch->check_regen_rates();
+  ch->save();
   LOOK(ch);
 
 }
@@ -2171,14 +2126,14 @@ void extract_char_final(Character *ch)
     clearMemory(ch);
     if (SCRIPT(ch))
       extract_script(ch, MOB_TRIGGER);
-    if (GET_MOB_RNUM(ch) == NOTHING || ch->proto_script != mob_proto[GET_MOB_RNUM(ch)].proto_script)
+    if (GET_MOB_RNUM(ch) == NOTHING || ch->proto_script != mob_proto[GET_MOB_RNUM(ch)]->proto_script)
       free_proto_script(ch, MOB_TRIGGER);
     if (SCRIPT_MEM(ch))
       extract_script_mem(SCRIPT_MEM(ch));
   }
   else
   {
-    save_char(ch);
+    ch->save();
   }
 
   /* If there's a descriptor, they're in the menu now. */
@@ -2368,7 +2323,7 @@ Character *get_player_room(room_rnum room, char *name, int *number,
       continue;
     if (inroom == FIND_CHAR_ROOM && IN_ROOM(ch) != room)
       continue;
-    if (str_cmp(ch->player.name, name)) /* If not same, continue */
+    if (str_cmp(ch->player.name,name)) /* If not same, continue */
       continue;
     if (--(*number) != 0)
       continue;

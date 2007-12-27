@@ -769,14 +769,10 @@ ASUB(sub_juggle)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = (ch);
-  msg->skill = SUB_JUGGLE;
-  msg->type = THING_SUB;
-  msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));
-  msg->id = (vict != NULL ? GET_ID(vict) : NOBODY);
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)), (vict != NULL ? GET_ID(vict) : NOBODY), "");
 
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC);
+
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;
 }
@@ -1144,14 +1140,8 @@ ASUB(sub_throttle)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_THROTTLE, STATUS_ON);
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = (ch);
-  msg->skill = SUB_THROTTLE;
-  msg->type = THING_SUB;
-  msg->msg_num = 18;
-  msg->id = GET_ID(vict);
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC);
+  msg = new message_event_obj(ch, SUB_THROTTLE, THING_SUB, 18, GET_ID(vict), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_THROTTLE;
 }
@@ -1335,14 +1325,8 @@ ASUB(sub_tumble)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = (ch);
-  msg->skill = SUB_JUGGLE;
-  msg->type = THING_SUB;
-  msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));
-  msg->id = (vict != NULL ? GET_ID(vict) : NOBODY);
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC);
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;
 }
@@ -1396,14 +1380,8 @@ ASUB(sub_clown)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = (ch);
-  msg->skill = SUB_JUGGLE;
-  msg->type = THING_SUB;
-  msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));
-  msg->id = (vict != NULL ? GET_ID(vict) : NOBODY);
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC);
+msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;
 }

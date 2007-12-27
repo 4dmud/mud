@@ -258,8 +258,8 @@ room_vnum frozen_start_room = 1202;
  * donation rooms.
  */
 room_vnum donation_room_1 = 3063;
-room_vnum donation_room_2 = NOWHERE;	/* unused - room for expansion */
-room_vnum donation_room_3 = NOWHERE;	/* unused - room for expansion */
+room_vnum donation_room_2 = 3063;	/* unused - room for expansion */
+room_vnum donation_room_3 = 3063;	/* unused - room for expansion */
 
 
 /****************************************************************************/

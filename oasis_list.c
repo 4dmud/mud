@@ -210,15 +210,15 @@ void list_mobiles(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
   "Index VNum    Mobile Name                                   Level\r\n"
   "----- ------- --------------------------------------------- -----\r\n");
   
-  for (i = 0; i <= top_of_mobt; i++) {
+  for (i = 0; i < mob_index.size(); i++) {
     if (mob_index[i].vnum >= bottom && mob_index[i].vnum <= top) {
       counter++;
       
       ch->Send( "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
         QGRN, counter, QNRM, QGRN, mob_index[i].vnum, QNRM,
-        QCYN, mob_proto[i].player.short_descr, 
-        QYEL, mob_proto[i].player.level, QNRM,
-        mob_proto[i].proto_script ? " [TRIG]" : ""
+        QCYN, mob_proto[i]->player.short_descr,
+        QYEL, mob_proto[i]->player.level, QNRM,
+        mob_proto[i]->proto_script ? " [TRIG]" : ""
         );
       
     }

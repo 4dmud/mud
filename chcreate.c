@@ -251,7 +251,7 @@ void con_character_creation(Descriptor *d, char *arg)
       GET_PFILEPOS(d->character) =
       create_entry(GET_PC_NAME(d->character));
     d->character->init();
-    save_char(d->character);
+    d->character->save();
     save_player_index();
     line_sep(d);
     d->Output("%s", motd);

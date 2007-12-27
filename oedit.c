@@ -87,7 +87,7 @@ ACMD(do_oasis_oedit)
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
         num = NOWHERE;
       else
-        num = genolc_zone_bottom(zlok);
+        num = zone_table[zlok].Bot();
     }
 
     if (num == NOWHERE)

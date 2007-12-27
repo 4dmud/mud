@@ -135,7 +135,7 @@ void script_save_to_disk(FILE *fp, void *item, int type)
   else if (type==OBJ_TRIGGER)
     t = ((struct obj_data *)item)->proto_script;
   else if (type==WLD_TRIGGER)
-    t = ((struct room_data *)item)->proto_script;
+    t = ((Room *)item)->proto_script;
   else
   {
     log("SYSERR: Invalid type passed to script_save_mobobj_to_disk()");
@@ -339,7 +339,11 @@ void trigedit_parse(Descriptor *d, char *arg)
     case '6':
       OLC_MODE(d) = TRIGEDIT_COMMANDS;
       d->Output( "Enter trigger commands: (/s saves /h for help)\r\n\r\n");
+      if (d->backstr) {
+      free(d->backstr);
       d->backstr = NULL;
+      }
+      //d->backstr.erase();
       if (OLC_STORAGE(d))
       {
         d->Output( "%s", OLC_STORAGE(d));
@@ -735,7 +739,8 @@ void dg_olc_script_copy(Descriptor *d)
     origscript = OLC_MOB(d)->proto_script;
   else if (OLC_ITEM_TYPE(d)==OBJ_TRIGGER)
     origscript = OLC_OBJ(d)->proto_script;
-  else origscript = OLC_ROOM(d)->proto_script;
+  else
+    origscript = OLC_ROOM(d)->proto_script;
 
   if (origscript)
   {

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/22 10:50:49 $
-*  $Revision: 1.9 $
+*  $Date: 2006/08/13 06:26:51 $
+*  $Revision: 1.10 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -16,6 +16,7 @@
 #define    MOB_TRIGGER   0
 #define    OBJ_TRIGGER   1
 #define    WLD_TRIGGER   2
+#define 	 ASS_TRIGGER	3
 
 
 /* unless you change this, Puff casts all your dg spells */
@@ -141,79 +142,92 @@
 
 
 /* one line of the trigger */
-struct cmdlist_element
-{
-  char *cmd;			/* one line of a trigger */
-  struct cmdlist_element *original;
-  struct cmdlist_element *next;
+struct cmdlist_element {
+    char *cmd;			/* one line of a trigger */
+    struct cmdlist_element *original;
+    struct cmdlist_element *next;
 };
 
-struct trig_var_data
-{
-  char *name;			/* name of variable  */
-  char *value;		/* value of variable */
-  long context;		/* 0: global context */
+struct trig_var_data {
+    //char *name;			/* name of variable  */
+    //char *value;		/* value of variable */
+    string name;
+    string value;
+    long context;		/* 0: global context */
 
-  struct trig_var_data *next;
+    struct trig_var_data *next;
+    trig_var_data() {
+        //name = NULL;
+        //value = NULL;
+        context = 0;
+    }
+    ~trig_var_data() {
+        //if (name)
+        //    delete[] name;
+        //if (value)
+        //   delete[] value;
+    }
 };
 
 /* structure for triggers */
-struct trig_data
-{
-  int nr;			/* trigger's rnum                  */
-  byte attach_type;		/* mob/obj/wld intentions          */
-  byte data_type;		/* type of game_data for trig      */
-  char *name;			/* name of trigger                 */
-  long trigger_type;		/* type of trigger (for bitvector) */
-  struct cmdlist_element *cmdlist;	/* top of command list             */
-  struct cmdlist_element *curr_state;	/* ptr to current line of trigger  */
-  int narg;			/* numerical argument              */
-  char *arglist;		/* argument list                   */
-  int depth;			/* depth into nest ifs/whiles/etc  */
-  int loops;			/* loop iteration counter          */
-  struct event *wait_event;	/* event to pause the trigger      */
-  ubyte purged;		/* trigger is set to be purged     */
-  struct trig_var_data *var_list;	/* list of local vars for trigger  */
-  /** for script functions **/
-  struct trig_data *parent; /* this is the trigger that is running this script */
-  /** end for script functions **/
-  struct trig_data *next;
-  struct trig_data *next_in_world;	/* next in the global trigger list */
+struct trig_data {
+    int nr;			/* trigger's rnum                  */
+    byte attach_type;		/* mob/obj/wld intentions          */
+    byte data_type;		/* type of game_data for trig      */
+    char *name;			/* name of trigger                 */
+    long trigger_type;		/* type of trigger (for bitvector) */
+    struct cmdlist_element *cmdlist;	/* top of command list             */
+    struct cmdlist_element *curr_state;	/* ptr to current line of trigger  */
+    int narg;			/* numerical argument              */
+    char *arglist;		/* argument list                   */
+    int depth;			/* depth into nest ifs/whiles/etc  */
+    int loops;			/* loop iteration counter          */
+    struct event *wait_event;	/* event to pause the trigger      */
+    ubyte purged;		/* trigger is set to be purged     */
+    struct trig_var_data *var_list;	/* list of local vars for trigger  */
+    /** for script functions **/
+    struct trig_data *parent; /* this is the trigger that is running this script */
+    /** end for script functions **/
+    struct trig_data *next;
+    struct trig_data *next_in_world;	/* next in the global trigger list */
 };
 
 
 /* a complete script (composed of several triggers) */
-struct script_data
-{
-  long types;			/* bitvector of trigger types */
-  struct trig_data *trig_list;	/* list of triggers           */
-  struct trig_var_data *global_vars;	/* list of global variables   */
-  ubyte purged;		/* script is set to be purged */
-  long context;		/* current context for statics */
+struct script_data {
+    long types;			/* bitvector of trigger types */
+    struct trig_data *trig_list;	/* list of triggers           */
+    struct trig_var_data *global_vars;	/* list of global variables   */
+    ubyte purged;		/* script is set to be purged */
+    long context;		/* current context for statics */
 
-  struct script_data *next;	/* used for purged_scripts    */
+    struct script_data *next;	/* used for purged_scripts    */
 };
 
 /* The event data for the wait command */
-struct wait_event_data
-{
-  struct trig_data *trigger;
-  void *go;
-  int type;
-};
+struct wait_event_data {
+    struct trig_data *trigger;
+    void *go;
+    int type;
+    wait_event_data(struct trig_data *tr, void *v, int ty) {
+        trigger = tr;
+        go = v;
+        type = ty;
+    }
+    ~wait_event_data() {}
+}
+;
 
 /* typedefs that the dg functions rely on */
 typedef struct index_data index_data;
-typedef struct room_data room_data;
 typedef struct obj_data obj_data;
 typedef struct trig_data trig_data;
 
 /* used for actor memory triggers */
-struct script_memory
-{
-  long id;			/* id of who to remember */
-  char *cmd;			/* command, or NULL for generic */
-  struct script_memory *next;
+struct script_memory {
+    long id;			/* id of who to remember */
+    char *cmd;			/* command, or NULL for generic */
+    struct script_memory *next;
 };
 /* from dg_objcmd.c */
 room_rnum obj_room(obj_data *obj);
@@ -225,12 +239,13 @@ int word_check(char *str, char *wordlist);
 
 void check_time_triggers(void);
 void find_uid_name(char *uid, char *name, size_t nlen);
+void find_uid_name(string &uid, char *name, size_t nlen);
 void do_sstat_room(Character * ch);
 void do_sstat_object(Character *ch, obj_data *j);
 void do_sstat_character(Character *ch, Character *k);
 void time_mtrigger(Character *ch);
 void time_otrigger(obj_data *obj);
-void time_wtrigger(room_data *room);
+void time_wtrigger(Room *room);
 void act_mtrigger(const Character *ch, char *str,
                   Character *actor, Character *victim, obj_data *object, obj_data *target, char *arg);
 void speech_mtrigger(Character *actor, char *str);
@@ -240,7 +255,7 @@ void greet_memory_mtrigger(Character *ch);
 int greet_mtrigger(Character *actor, int dir);
 int entry_mtrigger(Character *ch);
 void entry_memory_mtrigger(Character *ch);
-int enter_wtrigger(room_data *room, Character *actor, int dir);
+int enter_wtrigger(Room *room, Character *actor, int dir);
 int drop_otrigger(obj_data *obj, Character *actor);
 int timer_otrigger(obj_data *obj);
 int get_otrigger(obj_data *obj, Character *actor);
@@ -251,7 +266,6 @@ int receive_mtrigger(Character *ch, Character *actor,
                      obj_data *obj);
 void bribe_mtrigger(Character *ch, Character *actor,
                     int amount);
-void find_uid_name(char *uid, char *name, size_t nlen);
 
 
 int wear_otrigger(obj_data *obj, Character *actor, int where);
@@ -268,8 +282,8 @@ void hitprcnt_mtrigger(Character *ch);
 
 void random_mtrigger(Character *ch);
 void random_otrigger(obj_data *obj);
-void random_wtrigger(room_data *ch);
-void reset_wtrigger(room_data *ch);
+void random_wtrigger(Room *ch);
+void reset_wtrigger(Room *ch);
 
 int load_mtrigger(Character *ch);
 int load_otrigger(obj_data *obj);
@@ -279,8 +293,8 @@ int cast_otrigger(Character *actor, obj_data *obj, int spellnum);
 int cast_wtrigger(Character *actor, Character *vict, obj_data *obj, int spellnum);
 
 int leave_mtrigger(Character *actor, int dir);
-int leave_wtrigger(room_data *room, Character *actor, int dir);
-int leave_otrigger(room_data *room, Character *actor, int dir);
+int leave_wtrigger(Room *room, Character *actor, int dir);
+int leave_otrigger(Room *room, Character *actor, int dir);
 
 int door_mtrigger(Character *actor, int subcmd, int dir);
 int door_wtrigger(Character *actor, int subcmd, int dir);
@@ -290,27 +304,28 @@ int consume_otrigger(obj_data *obj, Character *actor, int cmd);
 /* function prototypes from dg_scripts.c */
 void script_damage(Character *vict, int dam);
 obj_data *find_obj(long n);
-room_data *find_room(long n);
+Room *find_room(long n);
 Character *find_char(long n);
 char *str_str(char *cs, char *ct);
 int find_eq_pos_script(char *arg);
 int can_wear_on_pos(struct obj_data *obj, int pos);
-Character *find_char(long n);
 Character *get_char(char *name);
+Character *get_char(const char *name);
 Character *get_char_near_obj(obj_data *obj, char *name);
-Character *get_char_in_room(room_data *room, char *name);
+Character *get_char_in_room(Room *room, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
-obj_data *get_obj(char *name);
-room_data *get_room(char *name);
-Character *get_char_by_obj(obj_data *obj, char *name);
-Character *get_char_by_room(room_data *room, char *name);
-obj_data *get_obj_by_obj(obj_data *obj, char *name);
-obj_data *get_obj_in_room(room_data *room, char *name);
-obj_data *get_obj_by_room(room_data *room, char *name);
+obj_data *get_obj(const char *name);
+Room *get_room(const char *name);
+Character *get_char_by_obj(obj_data *obj, const char *name);
+Character *get_char_by_room(Room *room,const char *name);
+obj_data *get_obj_by_obj(obj_data *obj,const char *name);
+obj_data *get_obj_in_room(Room *room, char *name);
+obj_data *get_obj_by_room(Room *room,const char *name);
 int trgvar_in_room(room_vnum vnum);
-obj_data *get_obj_in_list(char *name, obj_data *list);
+obj_data *get_obj_in_list(char *name, struct obj_data *list);
+obj_data *get_obj_in_list(const char *name, struct obj_data *list);
 obj_data *get_object_in_equip(Character * ch, char *name);
-void find_uid_name(char *uid, char *name, size_t nlen);
+obj_data *get_object_in_equip(Character * ch, const char *name);
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 
@@ -318,7 +333,7 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc);
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 char *matching_quote(char *p);
-struct room_data *dg_room_of_obj(struct obj_data *obj);
+Room *dg_room_of_obj(struct obj_data *obj);
 
 /* To maintain strict-aliasing we'll have to do this trick with a union */
 /* Thanks to Chris Gilbert for reminding me that there are other options. */
@@ -343,7 +358,8 @@ void assign_triggers(void *i, int type);
 
 
 /* From dg_variables.c */
-void add_var(struct trig_var_data **var_list, char *name, char *value, long id);
+void add_var(struct trig_var_data **var_list,const char *name,const char *value, long id);
+void add_var(struct trig_var_data **var_list, string name, string value, long id);
 int item_in_list(char *item, obj_data *list);
 char *skill_percent(Character *ch, char *skill);
 int char_has_item(char *item, Character *ch);
@@ -358,7 +374,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig,
 /* From dg_handler.c */
 void free_var_el(struct trig_var_data *var);
 void free_varlist(struct trig_var_data *vd);
-int remove_var(struct trig_var_data **var_list, char *name);
+int remove_var(struct trig_var_data **var_list,const char *name);
 void free_trigger(trig_data *trig);
 void extract_trigger(struct trig_data *trig);
 void extract_script(void *thing, int type);
@@ -369,7 +385,7 @@ void extract_value(struct script_data *sc, struct trig_data *trig, char *cmd);
 int trgvar_in_room(room_vnum vnum);
 int valid_dg_target(Character *ch, int allow_gods);
 void delete_variables(const char *charname);
-void update_wait_events(struct room_data *to, struct room_data *from);
+void update_wait_events(Room *to, Room *from);
 
 /* from dg_comm.c */
 char *any_one_name(char *argument, char *first_arg);
@@ -437,13 +453,9 @@ void function_script(void *go, struct script_data *sc, trig_data *perent, int ty
 
 /* dg_scripts.c*/
 
-obj_data *get_object_in_equip(Character *ch, char *name);
-obj_data *get_obj_by_obj(obj_data * obj, char *name);
-obj_data *get_obj_in_room(room_data * room, char *name);
-obj_data *get_obj_by_room(room_data *room, char *name);
+obj_data *get_obj_in_room(Room * room, char *name);
 Character *get_char_by_obj(obj_data * obj, char *name);
 obj_data *get_obj_near_obj(obj_data * obj, char *name);
-Character *get_char_in_room(room_data * room, char *name);
+Character *get_char_in_room(Room * room, char *name);
 Character *get_char_near_obj(obj_data * obj, char *name);
-Character *get_char_by_room(room_data * room, char *name);
 

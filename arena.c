@@ -670,7 +670,7 @@ void arena_kill(Character *ch)
   {
     GET_HIT(ch)  = GET_MAX_HIT(ch);
   }
-  check_regen_rates(ch);
+  ch->check_regen_rates();
 
   update_pos(ch);
 

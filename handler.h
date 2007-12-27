@@ -9,11 +9,9 @@
 ************************************************************************ */
 
 /* handling the affected-structures */
-void affect_total(Character *ch);
 void affect_modify(Character *ch, byte loc, int mod,
                    bitvector_t bitv, bool add);
 void affect_to_char(Character *ch, struct affected_type *af);
-void affect_remove(Character *ch, struct affected_type *af);
 void affect_from_char(Character *ch, int type);
 bool affected_by_spell(Character *ch, int type);
 void affect_join(Character *ch, struct affected_type *af,
@@ -28,6 +26,7 @@ int is_name(const char *str, const char *namelist);
 int isname_full(const char *strlist, const char *namelist);
 char *fname(const char *namelist);
 int get_number(char **name);
+int get_number(const char **name);
 char * str_until(char *strlist, const char *key, char *newstr, size_t len);
 int begins_with_number(char * str);
 
@@ -41,9 +40,8 @@ int equip_char(Character *ch, struct obj_data *obj, int pos);
 struct obj_data *unequip_char(Character *ch, int pos);
 int invalid_align(Character *ch, struct obj_data *obj);
 
-struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
+
 struct obj_data *get_obj_in_list_num(int num, struct obj_data *list);
-struct obj_data *get_obj(char *name);
 struct obj_data *get_obj_num(obj_rnum nr);
 
 void obj_to_room(struct obj_data *object, room_rnum room);
@@ -57,9 +55,10 @@ void extract_obj_q(struct obj_data *obj);
 
 /* ******* characters ********* */
 
-Character *get_char_room(char *name, int *number, room_rnum room);
+Character *get_char_room(const char *name, int *number, room_rnum room);
 Character *get_char_num(mob_rnum nr);
 Character *get_char(char *name);
+Character *get_char(const char *name);
 
 Character *get_player_room(room_rnum room, char *name, int *number,
                                         int inroom);
@@ -121,14 +120,14 @@ int generic_find(char *arg, bitvector_t bitvector, Character *ch,
 Character *check_ch(Character *ch);
 
 /* prototypes from crash save system */
-int delete_pobj_file(char *name);
+int delete_pobj_file(const char *name);
 void delete_aliases(const char *charname);
 void delete_variables(const char *charname);
-int Crash_get_filename(char *orig_name, char *filename);
-int Crash_delete_file(char *name);
+int Crash_get_filename(const char *orig_name, char *filename);
+int Crash_delete_file(const char *name);
 int Crash_delete_crashfile(Character *ch);
-int Crash_clean_file(char *name);
-void Crash_listrent(Character *ch, char *name);
+int Crash_clean_file(const char *name);
+void Crash_listrent(Character *ch,const char *name);
 int Crash_load(Character *ch);
 void Crash_crashsave(Character *ch);
 void Crash_idlesave(Character *ch);

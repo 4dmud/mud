@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.44  2006/08/13 06:26:55  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.43  2006/07/15 12:53:12  w4dimenscor
  * Tweaked mtransform further and it should work fine now.
  *
@@ -187,6 +190,7 @@ extern int message_type;
 class Character;
 class Descriptor;
 class cstring;
+class Room;
 
 /* preamble *************************************************************/
 
@@ -228,7 +232,7 @@ class cstring;
 #define TAFF_DIRE_HEAT         7
 #define TAFF_DEATHLY_HOT       8
 
-/* The cardinal directions: used as index to room_data.dir_option[] */
+/* The cardinal directions: used as index to Room.dir_option[] */
 #define NORTH          0
 #define EAST           1
 #define SOUTH          2
@@ -244,7 +248,7 @@ class cstring;
 
 #define KILL_ALL_ENABLED 1
 
-/* Room flags: used in room_data.room_flags */
+/* Room flags: used in Room.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define ROOM_DARK        0    /* Dark                             */
 #define ROOM_DEATH       1    /* Death trap                       */
@@ -317,7 +321,7 @@ class cstring;
 #define D_PRE_HIST 4
 
 
-/* Exit info: used in room_data.dir_option.exit_info */
+/* Exit info: used in Room.dir_option.exit_info */
 #define EX_ISDOOR        (1 << 0)  /* Exit is a door            */
 #define EX_CLOSED        (1 << 1)  /* The door is closed        */
 #define EX_LOCKED        (1 << 2)  /* The door is locked        */
@@ -330,7 +334,7 @@ class cstring;
 #define EX_FENCE_GATE_OPEN    (1 << 9)  /* This exit lets herd animals pass */
 
 
-/* Sector types: used in room_data.sector_type */
+/* Sector types: used in Room.sector_type */
 #define SECT_INSIDE            0   /* Indoors                         */
 #define SECT_CITY              1   /* In a city                       */
 #define SECT_FIELD             2   /* In a field                      */
@@ -1277,7 +1281,7 @@ typedef int zone_vnum;        /* A virtual zone number                */
 typedef int trig_vnum;
 typedef int shop_vnum;
 
-typedef struct room_data * room_rnum;        /* A room's real (internal) pointer type */
+typedef Room * room_rnum;        /* A room's real (internal) pointer type */
 typedef int obj_rnum;         /* An object's real (internal) num type */
 typedef int mob_rnum;         /* A mobile's real (internal) num type  */
 typedef int zone_rnum;        /* A real zone number                   */
@@ -1379,7 +1383,7 @@ struct obj_affected_type {
 /* ================== Memory Structure for Objects ================== */
 struct obj_data {
     obj_vnum item_number;     /* Where in data-base                 */
-    struct room_data * in_room;         /* In what room -1 when conta/carr    */
+    Room * in_room;         /* In what room -1 when conta/carr    */
     int vroom;           /* for corpse saving */
     struct obj_flag_data obj_flags;     /* Object information               */
     struct obj_affected_type affected[MAX_OBJ_AFFECT]; /* affects     */
@@ -1422,7 +1426,7 @@ struct obj_data {
 struct obj_file_elem {
     obj_vnum item_number;
     sh_int locate;       /* that's the (1+)wear-location (when equipped) or
-                                         (20+)index in obj file (if it's in a container) BK */
+                                                 (20+)index in obj file (if it's in a container) BK */
     int value[NUM_OBJ_VAL_POSITIONS];
     int extra_flags[EF_ARRAY_MAX];
     int weight;
@@ -1442,14 +1446,23 @@ struct rent_info {
     int nitems;
 };
 
-#define QIC_OWNERS  30   /* number of owners to store on each object */
+#define QIC_OWNERS	30  /* number of owners to store on each object */
 
 struct qic_data {
-    obj_vnum vnum;       /* vnum of QIC item */
-    int limit;           /* what the QIC limit is */
-    int items;           /* current number of items in the game */
-    long owners[QIC_OWNERS];  /* lists QIC_OWNERS of the item owners */
-};
+    obj_vnum  vnum;   /* vnum of QIC item */
+    int	    limit;  /* what the QIC limit is */
+    int      items;  /* current number of items in the game */
+    long     owners[QIC_OWNERS]; /* lists QIC_OWNERS of the item owners */
+    qic_data() {
+        vnum = NOTHING;
+        limit = 0;
+        items = 0;
+        for (unsigned int i = 0; i < QIC_OWNERS; i++)
+            owners[i] = -1;
+    }
+~qic_data() {}
+}
+;
 
 /* ======================================================================= */
 
@@ -1464,7 +1477,7 @@ struct room_direction_data {
 
     int /*bitvector_t */ exit_info;     /* Exit info                    */
     obj_vnum key;        /* Key's number (-1 for no key)         */
-    struct room_data * to_room;         /* Where direction leads (NOWHERE)      */
+    Room * to_room;         /* Where direction leads (NOWHERE)      */
     room_vnum to_room_tmp;
     int nosave;
 };
@@ -1485,6 +1498,11 @@ struct room_mine_data {
     int num;
     int dif;
     int tool;
+    room_mine_data() {
+    num = 0;
+    dif = 0;
+    tool = 0;
+    }
 };
 
 struct room_ores {
@@ -1494,7 +1512,8 @@ struct room_ores {
 };
 
 /* ================== Memory Structure for room ======================= */
-struct room_data {
+class Room {
+public:
     room_vnum number;         /* Rooms number (vnum)                  */
     zone_rnum zone;      /* Room zone (for resetting)            */
     int sector_type;          /* sector type (move/hide)              */
@@ -1521,6 +1540,14 @@ struct room_data {
 
     struct room_affected_type *affects;
     struct room_ores *ores;
+
+    /** methods **/
+    int free_room_strings();
+    int copy_room_strings(Room *source);
+    int copy_room(Room *from);
+    Room();
+    ~Room();
+    
 };
 /* ==================================================================== */
 
@@ -1684,14 +1711,6 @@ struct skillspell_data {
 };
 
 
-/*
- *  If you want to add new values to the playerfile, do it here.  DO NOT
- * ADD, DELETE OR MOVE ANY OF THE VARIABLES - doing so will change the
- * size of the structure and ruin the playerfile.  However, you can change
- * the names of the spares to something more meaningful, and then use them
- * in your new code.  They will automatically be transferred from the
- * playerfile into memory when players log in.
- */
 struct player_special_data_saved {
 
     int wimp_level;      /* Below this # of hit points, flee!    */
@@ -1827,6 +1846,49 @@ struct player_special_data {
     short newbie_status;
     struct help_index_element *help;
 
+    player_special_data() {
+    prompt = NULL;
+    immtitle = NULL;
+    poofin = NULL;        /* Description on arrival of a god.  */
+    poofout = NULL;       /* Description upon a god's exit.    */
+    aliases = NULL;    /* Character's aliases               */
+    last_tell = -1;      /* idnum of last tell from           */
+    last_olc_targ = NULL; /* olc control                       */
+    last_olc_mode = 0;        /* olc control                       */
+    ignorelist = NULL;
+    host = NULL;               /* player host                          */
+    afk_msg = NULL;
+    busy_msg = NULL;
+    pretitle  = NULL;
+
+    loginmsg  = NULL;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
+    logoutmsg  = NULL;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
+    remorts = 0;
+    conversions = 0;
+    last_note = 0;
+    last_idea = 0;
+    last_penalty = 0;
+    last_news = 0;
+    last_changes = 0;
+    awardpoints = 0;
+    rewardpoints = 0;
+    last_reward = 0;
+    pageheight = 0;
+    pagewidth = 0;
+    locker = NULL;
+    expire = 0;
+    limit = 0;
+    battle_prompt = 0;
+    dying = 0;
+    skillmulti = 0;
+    kills = NULL;
+    email  = NULL;
+    newbie_status = 0;
+    help  = NULL;
+
+    }
+    ~player_special_data() {}
+
 };
 
 struct combine_data {
@@ -1911,105 +1973,7 @@ struct note_data {
     struct note_data *next;
 };
 
-int number(int from, int to);
-float number(float from, float to);
-#define MAKE_STRING(msg) \
-   (((ostringstream&) (ostringstream() << boolalpha << msg)).str())
-class Character {
-public:
-    int pfilepos;        /* playerfile pos                */
-    mob_rnum nr;         /* Mob's rnum                    */
-    struct room_data * in_room;         /* Location (real room number)   */
-    struct room_data * was_in_room;     /* location for linkdead people  */
-    int wait;            /* wait for how many loops       */
 
-    struct char_player_data player;     /* Normal data                   */
-    struct char_ability_data real_abils;     /* Abilities without modifiers   */
-    struct char_ability_data aff_abils; /* Abils with spells/stones/etc  */
-    struct char_point_data points; /* Points                        */
-    struct char_special_data char_specials;  /* PC/NPC specials        */
-    struct player_special_data *player_specials;  /* PC specials            */
-    struct mob_special_data mob_specials;    /* NPC specials           */
-
-    struct combat_skill_data combatskill;
-
-    struct affected_type *affected;     /* affected by what spells       */
-    struct obj_data *equipment[NUM_WEARS];   /* Equipment array               */
-
-    struct obj_data *carrying;     /* Head of list                  */
-    Descriptor *desc;  /* NULL for mobiles              */
-
-    long id;             /* used by DG triggers             */
-    struct trig_proto_list *proto_script;    /* list of default triggers      */
-    struct script_data *script;    /* script info for the object      */
-    struct script_memory *memory;  /* for mob memory triggers         */
-
-    Character *next_in_room;  /* For room->people - list         */
-    Character *next;     /* For either monster or ppl-list  */
-    Character *next_fighting; /* For fighting list               */
-
-    struct follow_type *followers; /* List of chars followers       */
-    Character *master;   /* Who is char following?        */
-    long cmd2;           /* These wizcmds aren't saved     */
-    byte internal_flags; /* Flags used internally - not saved */
-    struct event *points_event[4]; /* events for regening H/M/V/S     */
-    struct event *fight_event;     /*events used for fighting/defending */
-    struct event *message_event; /* events used in skill/spell messages*/
-    struct sub_task_obj *task;   /* working on a task? This will look after you!*/
-    int spell_dir;       /*used for casting directional spells */
-    float interact;      /*used for the percentage they land hits and get hit and gain exp in battle */
-    int attack_location;
-    long loader;         /*id of player who linkloaded them */
-    struct sub_list *subs; /*list of subskills available to that person*/
-    struct skillspell_data *skills; /*list of skills and spells available to that person */
-    int msg_run;
-    int on_task;
-    struct note_data *pnote;
-    sh_int concealment;
-    int has_note[NUM_NOTE_TYPES];
-    Character *fuses[TOP_FUSE_LOCATION];
-    Character *fused_to;
-    struct obj_data *hitched;
-    time_t last_move;
-    int sweep_damage;
-    int body;                   /* body positions aquired */
-    byte atk;
-    long pulling;
-    mob_vnum pet;
-    struct travel_point_data *travel_list;
-    size_t Send(string i);
-    size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
-    gold_int Gold(gold_int amount, int type);
-    void send_char_pos(int dam);
-    int get_skill(int i);
-    void appear();
-    void clear();
-    void init();
-    void reset();
-    void freeself();
-    void default_char();
-    template<typename T>
-    Character & operator<< (const T & i)  {
-        if (this != NULL && desc != NULL) {
-			stringstream s;
-			s << i;
-			Send(s.str());
-        }
-        return *this;
-    };
-
-    int skill_roll(int skill_num) {
-    	return (get_skill(skill_num) > number(1, 101));
-	};
-
-	int compute_armor_class() {
-	return points.armor < -100 ? -100 : points.armor > 100 ? 100 : points.armor;  /* -100 is lowest */
-	};
-
-	Character();
-	~Character();
-
-};
 /* ====================================================================== */
 
 
@@ -2157,15 +2121,30 @@ struct weather_data {
 };
 
 
+
+
 /* element in monster and object index-tables   */
 struct index_data {
-    int vnum;            /* virtual number of this mob/obj               */
-    int number;               /* number of existing units of this mob/obj     */
-    struct qic_data *qic;     /*QIC info database                            */
+    int	vnum;	/* virtual number of this mob/obj		*/
+    int	number;		/* number of existing units of this mob/obj	*/
+    struct qic_data *qic; /*QIC info database                            */
     SPECIAL(*func);
 
-    char *farg;               /* string argument for special function          */
-    struct trig_data *proto;  /* for triggers... the trigger          */
+    char *farg;         /* string argument for special function          */
+    struct trig_data *proto;     /* for triggers... the trigger          */
+
+    index_data() {
+        vnum = NOTHING;
+        number = 0;
+        qic = NULL;
+        func = NULL;
+        farg = NULL;
+        proto = NULL;
+    }
+    ~index_data() {
+        if (qic)
+            delete qic;
+    }
 };
 
 /* linked list for mob/object prototype trigger lists */
@@ -2179,7 +2158,7 @@ struct social_messg {
     int act_nr;
     char *command;       /* holds copy of activating command */
     char *sort_as;       /* holds a copy of a similar command or
-                                       * abbreviation to sort by for the parser */
+                                               * abbreviation to sort by for the parser */
     int hide;            /* ? */
     int min_victim_position;  /* Position of victim */
     int min_char_position;    /* Position of char */
@@ -2213,7 +2192,6 @@ struct social_messg {
 
 typedef struct note_data NOTE_DATA;
 typedef struct obj_data OBJ_DATA;
-typedef struct room_data ROOM_DATA;
 
 /****  Event-driven engine structs  ******************************/
 
@@ -2278,7 +2256,22 @@ struct message_event_obj {
     int type; //0 = skill-spell : 1 = subskill
     int msg_num; // iterative number for what part of the skill it is in
     long id; // id number of target
-    char args[512];
+    char args[MAX_INPUT_LENGTH];
+
+    message_event_obj() {}
+   
+    message_event_obj(Character *c, int s, int t, int m, long i, char *a) {
+        ch = c;
+        skill = s;
+        type = t;
+        msg_num = m;
+        id = i;
+        strlcpy(args, a, sizeof(args));
+
+    }
+
+    ~message_event_obj() {}
+    
 };
 
 
@@ -2447,5 +2440,7 @@ struct stave_stat_table {
     int chance;
     int start;
 };
+
+#include "character.h"
 
 

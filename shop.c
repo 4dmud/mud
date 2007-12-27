@@ -28,8 +28,6 @@
 
 /* External variables */
 extern struct time_info_data time_info;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 
 /* Forward/External function declarations */
 ACMD(do_tell);
@@ -1156,7 +1154,7 @@ SPECIAL(shop_keeper)
     snprintf(argm, sizeof(argm), "$N shouts '%s'", MSG_NO_STEAL_HERE);
     act(argm, FALSE, ch, 0, keeper, TO_CHAR);
 
-    do_action(keeper, GET_NAME(ch), cmd_slap, 0);
+    do_action(keeper, (char *)GET_NAME(ch), cmd_slap, 0);
     return (TRUE);
   }
 
@@ -1208,7 +1206,7 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
       snprintf(buf, sizeof(buf), "%s %s", GET_NAME(ch), MSG_CANT_KILL_KEEPER);
       do_tell(victim, buf, cmd_tell, 0);
 
-      do_action(victim, GET_NAME(ch), cmd_slap, 0);
+      do_action(victim,(char *) GET_NAME(ch), cmd_slap, 0);
       return (FALSE);
     }
 
@@ -1618,7 +1616,7 @@ void list_detailed_shop(Character *ch, int shop_nr)
   if (SHOP_KEEPER(shop_nr) != NOBODY)
   {
     ch->Send( "%s (#%d), Special Function: %s\r\n",
-                     GET_NAME(&mob_proto[SHOP_KEEPER(shop_nr)]),
+                     GET_NAME(mob_proto[SHOP_KEEPER(shop_nr)]),
                      mob_index[SHOP_KEEPER(shop_nr)].vnum,
                      YESNO(SHOP_FUNC(shop_nr)));
 

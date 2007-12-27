@@ -69,7 +69,6 @@ struct obj_data *find_vehicle_by_vnum(int vnum);
 struct obj_data *get_obj_in_list_type(int type,
 					     struct obj_data *list);
 
-extern struct room_data *world_vnum[];
 void display_map(Character *ch);
 void parse_room_name(room_rnum in_room, char *bufptr, size_t len);
 

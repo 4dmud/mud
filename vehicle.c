@@ -25,7 +25,7 @@ void list_obj_to_char(struct obj_data *list, Character *ch,
 void list_char_to_char(Character *list, Character *ch);
 void ASSIGNOBJ(int obj, SPECIAL(fname));
 
-int enter_wtrigger(struct room_data *room, Character *actor,
+int enter_wtrigger(Room *room, Character *actor,
 		   int dir);
 
 ACMD(do_look);
@@ -103,7 +103,7 @@ ACMD(do_drive)
 	{SCMD_UP - 1, "up"},
 	{SCMD_DOWN - 1, "down"}
     };
-    struct obj_data *vehicle, *controls, *vehicle_in_out;
+    struct obj_data *vehicle, *controls;//, *vehicle_in_out; /* what is this for thotter? */
 
     controls = get_obj_in_list_type(ITEM_V_CONTROLS,
 				    IN_ROOM(ch)->contents);

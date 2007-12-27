@@ -186,6 +186,7 @@ ACMD(do_deduct)
 	    GET_BRASS_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < amount; counter++) {
 		obj = read_object(3300, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 
@@ -203,6 +204,7 @@ ACMD(do_deduct)
 	    GET_BRONZE_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < amount; counter++) {
 		obj = read_object(3301, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 
@@ -220,6 +222,7 @@ ACMD(do_deduct)
 	    GET_SILVER_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < amount; counter++) {
 		obj = read_object(3302, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 
@@ -237,6 +240,7 @@ ACMD(do_deduct)
 	    GET_GOLD_TOKEN_COUNT(ch) -= amount;
 	    for (counter = 0; counter < amount; counter++) {
 		obj = read_object(3303, VIRTUAL);
+		if (obj)
 		obj_to_char(obj, ch);
 	    }
 

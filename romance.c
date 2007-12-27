@@ -1196,9 +1196,8 @@ void symptoms(Character *ch)
     act("You are whisked away to a nearby hospital, and return moments later, carrying your new child!\r\n", TRUE, ch, 0, 0, TO_CHAR);
     act("$n is whisked away in an ambulance, and quickly returns, baby in hand.\r\n", TRUE, ch, 0, 0, TO_ROOM);
     
-    //        act("A cart labelled 'Adventurer's Academy' arrives, and two uniformed men take your child from you.\r\n", TRUE, ch, 0, 0, TO_CHAR);
-    //        act("A cart labelled 'Adventurer's Academy' arrives, and two uniformed men take $n's child.\r\n", TRUE, ch, 0, 0, TO_ROOM);
     obj = read_object(number(5, 6), VIRTUAL);
+    if (obj)
     obj_to_char(obj, ch);
     if (REWARD_ALLOWED == TRUE)
     {     /* Rewards? */
@@ -1209,7 +1208,7 @@ void symptoms(Character *ch)
       GET_DEX(ch) += DEX_REWARD;
       GET_WIS(ch) += WIS_REWARD;
       GET_INT(ch) += INT_REWARD;
-      affect_total(ch);
+      ch->affect_total();
     }
     damage(ch,ch, 100, TYPE_UNDEFINED);
   }

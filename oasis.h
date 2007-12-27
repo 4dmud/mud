@@ -141,9 +141,9 @@ struct oasis_olc_data {
   int value;                     /* mostly 'has changed' flag*/
   char *storage;                 /* used for 'tedit'         */
   Character *mob;         /* used for 'medit'         */
-  struct room_data *room;        /* used for 'redit'         */
+  Room *room;        /* used for 'redit'         */
   struct obj_data *obj;          /* used for 'oedit'         */
-  struct zone_data *zone;        /* used for 'zedit'         */
+  Zone *zone;        /* used for 'zedit'         */
   struct shop_data *shop;        /* used for 'sedit'         */
   struct config_data *config;    /* used for 'cedit'         */
   struct extra_descr_data *desc; /* used in '[r|o|m]edit'    */
@@ -612,7 +612,6 @@ void redit_disp_flag_menu(Descriptor *d);
 void redit_disp_sector_menu(Descriptor *d);
 void redit_disp_menu(Descriptor *d);
 void redit_parse(Descriptor *d, char *arg);
-void free_room(struct room_data *room);
 ACMD(do_oasis_redit);
 
 void sedit_setup_new(Descriptor *d);

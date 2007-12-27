@@ -14,3 +14,7 @@ static const string SPACES = " \t\r\n";           // what gets removed when we t
 // get rid of leading and trailing spaces from a string
 string Trim (const string & s, const string & t);
 string Trim (const string & s);
+string tolower (const string & s);
+string FindAndReplace
+  (const string& source, const string target, const string replacement);
+

@@ -53,7 +53,7 @@
 /* room-related defines *************************************************/
 
 
-/* The cardinal directions: used as index to room_data.dir_option[] */
+/* The cardinal directions: used as index to Room.dir_option[] */
 #define NORTH          0
 #define EAST           1
 #define SOUTH          2
@@ -62,7 +62,7 @@
 #define DOWN           5
 
 
-/* Room flags: used in room_data.room_flags */
+/* Room flags: used in Room.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define ROOM_DARK		0   /* Dark			        */
 #define ROOM_DEATH		1   /* Death trap		        */
@@ -114,7 +114,7 @@
 #define ZONE_NOSUMMON_IN	(1 <<  5)
 #define ZONE_NOTELEPORT_OUT	(1 <<  6)
 
-/* Exit info: used in room_data.dir_option.exit_info */
+/* Exit info: used in Room.dir_option.exit_info */
 #define EX_ISDOOR		(1 << 0)   /* Exit is a door		*/
 #define EX_CLOSED		(1 << 1)   /* The door is closed	*/
 #define EX_LOCKED		(1 << 2)   /* The door is locked	*/
@@ -122,7 +122,7 @@
 #define EX_HIDDEN		(1 << 4)   /* Exit is hidden 		*/
 
 
-/* Sector types: used in room_data.sector_type */
+/* Sector types: used in Room.sector_type */
 #define SECT_INSIDE         	 0   /* Indoors				*/
 #define SECT_CITY           	 1   /* In a city			*/
 #define SECT_FIELD          	 2   /* In a field			*/
@@ -971,7 +971,7 @@ struct room_direction_data {
 
 
 /* ================== Memory Structure for room ======================= */
-struct room_data {
+Room {
    room_vnum number;		/* Rooms number	(vnum)		        */
    zone_rnum zone;                 /* Room zone (for resetting)            */
    int	  sector_type;          /* sector type (move/hide)              */

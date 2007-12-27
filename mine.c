@@ -157,14 +157,8 @@ ASUB(sub_tunneling)
   MINE_DIR(ch) = dir;
   toggle_sub_status(ch, SUB_TUNNELING, STATUS_ON);
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = ch;
-  msg->skill = SUB_TUNNELING;
-  msg->type = THING_SUB;
-  msg->msg_num = density;
-  msg->id = (long) (rm->number + ROOM_ID_BASE);
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC));
+  msg = new message_event_obj(ch, SUB_TUNNELING, THING_SUB, density, (long) (rm->number + ROOM_ID_BASE), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
   return SUB_TUNNELING;
 }
 

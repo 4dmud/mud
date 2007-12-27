@@ -29,7 +29,6 @@
 
 /* external functs */
 void eq_to_room(Character *ch);
-int Crash_delete_file(char *name);
 void add_follower(Character *ch, Character *leader);
 void death_cry(Character *ch);
 void dismount_char(Character *ch);
@@ -44,7 +43,6 @@ int can_fly(Character *ch);
 ACMD(do_sac);
 int buildwalk(Character *ch, int dir);
 int move_fusion(Character *ch, int dir);
-int delete_pobj_file(char *name);
 void hit_death_trap(Character *ch);
 void raw_kill(Character *ch, Character * vict);
 ACMD(do_drive);
@@ -319,7 +317,7 @@ int move_cost(Character *ch, int dir)
 int do_simple_move(Character *ch, int dir, int need_specials_check)
 {
   int same_room = 0, riding = 0, ridden_by = 0;
-  struct room_data * was_in = IN_ROOM(ch);
+  Room * was_in = IN_ROOM(ch);
   int need_movement = 0, need_m_movement = 0;
   int vnum, chance, has_moved = FALSE;
   int stam = 0;
@@ -1735,8 +1733,8 @@ ACMD(do_enter)
   struct obj_data *obj = NULL;
   int door;
   char buf[MAX_INPUT_LENGTH];
-  struct room_data * was_in = IN_ROOM(ch);
-  struct room_data * dest_room = NULL;
+  Room * was_in = IN_ROOM(ch);
+  Room * dest_room = NULL;
   one_argument(argument, buf);
   const char *to_char = NULL;
   const char *to_room = NULL;
@@ -2233,8 +2231,8 @@ ACMD(do_leader)
     ch->Send( "That person isnt following you!\r\n");
   else
   {
-    ch->Send( "You make %s the leader.\r\n", GET_NAME(leader));
-    new_send_to_char(leader, "%s makes you the leader.\r\n", GET_NAME(ch));
+    *ch << "You make " << GET_NAME(leader) << " the leader.\r\n";
+    *leader << GET_NAME(leader) << " makes you the leader.\r\n";
 
 
     leader->master = NULL;
@@ -2249,7 +2247,7 @@ ACMD(do_leader)
       if (f->follower != leader)
       {
         f->follower->master = leader;
-        new_send_to_char(f->follower, "%s makes %s your leader.\r\n", GET_NAME(ch), GET_NAME(leader));
+        *f->follower << GET_NAME(ch) << " makes " << GET_NAME(leader) << " your leader.\r\n";
       }
       else
       {
@@ -2273,19 +2271,19 @@ ACMD(do_follow)
   {
     if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
-      ch->Send( "%s", CONFIG_NOPERSON);
+      *ch << CONFIG_NOPERSON;
       return;
     }
   }
   else
   {
-    send_to_char("Whom do you wish to follow?\r\n", ch);
+    *ch << "Whom do you wish to follow?\r\n";
     return;
   }
 
   if (ch->followers != NULL)
   {
-    ch->Send( "You cannot follow another person while you have your own followers.\r\n");
+    *ch << "You cannot follow another person while you have your own followers.\r\n";
     return;
   }
 
@@ -2294,15 +2292,13 @@ ACMD(do_follow)
 
   if (leader->master && (leader != ch))
   {
-    ch->Send( "%s's master is %s, so you ask to follow %s insead.\r\n",
-                     GET_NAME(leader), GET_NAME(leader->master), HMHR(leader->master));
+    *ch << GET_NAME(leader) << "'s master is "<< GET_NAME(leader->master) <<", so you ask to follow " << HMHR(leader->master) << " insead.\r\n";
     leader = leader->master;
   }
 
   if ((ch->master == leader))
   {
-    act("You are already following $M.", FALSE, ch, 0, leader,
-        TO_CHAR);
+    act("You are already following $M.", FALSE, ch, 0, leader, TO_CHAR);
     return;
   }
   else if ((ch->master != NULL) && leader != ch)
@@ -2313,8 +2309,7 @@ ACMD(do_follow)
 
   if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master))
   {
-    act("But you only feel like following $N!", FALSE, ch, 0,
-        ch->master, TO_CHAR);
+    act("But you only feel like following $N!", FALSE, ch, 0, ch->master, TO_CHAR);
   }
   else
   {            /* Not Charmed follow person */
@@ -2322,8 +2317,7 @@ ACMD(do_follow)
     {
       if (!ch->master)
       {
-        send_to_char("You are already following yourself.\r\n",
-                     ch);
+        *ch << "You are already following yourself.\r\n";
         return;
       }
       stop_follower(ch);
@@ -2332,15 +2326,12 @@ ACMD(do_follow)
     {
       if (circle_follow(ch, leader))
       {
-        send_to_char
-        ("Sorry, but following in loops is not allowed.\r\n",
-         ch);
+        *ch << "Sorry, but following in loops is not allowed.\r\n";
         return;
       }
       if (IS_NPC(leader) && !IS_NPC(ch))
       {
-        ch->Send( "You cant follow %s!!\r\n",
-                         PERS(leader, ch));
+        *ch << "You can't follow " << PERS_S(leader, ch) <<"!!\r\n";
         return;
       }
       /** Bypass the stuff below if the leader is set to autogroup, mob or no mob */
@@ -2367,13 +2358,13 @@ ACMD(do_follow)
                  || PLR_FLAGGED(leader, PLR_WRITING)))
         {
           snprintf(buf, sizeof(buf),"[%s wishes to join your group: Allow? (Type: Y | N )]", GET_NAME(ch));
-          ch->Send("You ask %s if you can join %s group.\r\n", GET_NAME(leader), HSHR(leader));
+          *ch << "You ask " << GET_NAME(leader) << " if you can join " << HSHR(leader) << " group.\r\n";
           leader->loader = GET_IDNUM(ch);
           line_input(leader->desc, buf, allow_follow, NULL);
         }
         else
         {
-          ch->Send("You cant follow %s just yet, %s is too busy to reply.\r\n", HSSH(leader), GET_NAME(leader));
+          *ch << "You cant follow " << HSSH(leader) << " just yet, " << GET_NAME(leader) << " is too busy to reply.\r\n";
         }
       }
       else

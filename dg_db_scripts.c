@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/21 11:02:26 $
-*  $Revision: 1.5 $
+*  $Date: 2006/08/13 06:26:51 $
+*  $Revision: 1.6 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -162,7 +162,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
   char junk[8];
   int vnum, rnum, count;
   Character *mob;
-  room_data *room;
+  Room *room;
   struct trig_proto_list *trg_proto, *new_trg;
 
   get_line(fp, line);
@@ -188,7 +188,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
     case WLD_TRIGGER:
       new_mudlog(BRF, LVL_BUILDER, TRUE,
                  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)",
-                 vnum, GET_ROOM_VNUM( ((room_data *)proto) ));
+                 vnum, GET_ROOM_VNUM( ((Room *)proto) ));
       break;
     default:
       new_mudlog(BRF, LVL_BUILDER, TRUE,
@@ -222,7 +222,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
     CREATE(new_trg, struct trig_proto_list, 1);
     new_trg->vnum = vnum;
     new_trg->next = NULL;
-    room = (room_data *)proto;
+    room = (Room *)proto;
     trg_proto = room->proto_script;
     if (!trg_proto)
     {
@@ -298,7 +298,7 @@ void assign_triggers(void *i, int type)
 {
   Character *mob = NULL;
   struct obj_data *obj = NULL;
-  struct room_data *room = NULL;
+  Room *room = NULL;
   int rnum;
   struct trig_proto_list *trg_proto;
 
@@ -314,7 +314,7 @@ void assign_triggers(void *i, int type)
       {
         new_mudlog(BRF, LVL_BUILDER, TRUE,
                    "SYSERR: trigger #%d non-existant, for mob #%d",
-                   trg_proto->vnum, mob_index[mob->nr].vnum);
+                   trg_proto->vnum, mob_index.size() <= mob->nr ? mob_index[mob->nr].vnum : -1);
       }
       else
       {
@@ -346,7 +346,7 @@ void assign_triggers(void *i, int type)
     }
     break;
   case WLD_TRIGGER:
-    room = (struct room_data *)i;
+    room = (Room *)i;
     trg_proto = room->proto_script;
     while (trg_proto)
     {

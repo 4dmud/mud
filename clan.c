@@ -28,11 +28,11 @@ void strip_cr(char *);
 void clan_to_store(int i);
 int store_to_clan(int i);
 char *clan_name(int idnum);
-void update_clan_member(char * name, int rank, int clan);
-void remove_clan_member(char * name, int clan);
-void add_clan_member(char * name, int rank, int clan);
+void update_clan_member(const char * name, int rank, int clan);
+void remove_clan_member(const char * name, int clan);
+void add_clan_member(const char * name, int rank, int clan);
 void free_clan_lists(void);
-long get_ptable_by_name(char *name);
+long get_ptable_by_name(const char *name);
 
 extern int TEMP_LOAD_CHAR;
 
@@ -114,7 +114,6 @@ void send_clan_format(Character *ch)
 
 /* clan code */
 Character *is_playing(char *vict_name)
-      //char *is_playing(char *vict_name)
 {
   extern Descriptor *descriptor_list;
   Descriptor *i, *next_i;
@@ -214,7 +213,7 @@ void do_clan_create(Character *ch, char *arg)
   send_to_char("Clan created\r\n", ch);
   GET_CLAN(leader) = clan[num_of_clans - 1].id;
   GET_CLAN_RANK(leader) = clan[num_of_clans - 1].ranks;
-  save_char(leader);
+  leader->save();
 
   return;
 }
@@ -373,19 +372,19 @@ void do_clan_destroy(Character *ch, char *arg)
       {
         GET_CLAN(victim) = 0;
         GET_CLAN_RANK(victim) = 0;
-        save_char(victim);
+        victim->save();
       }
     }
     else
     {
-      cbuf = new Character();
+      cbuf = new Character(FALSE);
       if (load_char((player_table + j)->name, cbuf) >= 0)
       {
         if (GET_CLAN(cbuf) == clan[i].id)
         {
           GET_CLAN(cbuf) = 0;
           GET_CLAN_RANK(cbuf) = 0;
-          save_char(cbuf);
+          cbuf->save();
         }
         delete (victim);
       }
@@ -485,7 +484,7 @@ void do_clan_enroll(Character *ch, char *arg)
   }
 
   GET_CLAN_RANK(vict)++;
-  save_char(vict);
+  vict->save();
   clan[clan_num].power += GET_LEVEL(vict);
   clan[clan_num].members++;
   send_to_char("You've been enrolled in the clan you chose!\r\n", vict);
@@ -570,7 +569,7 @@ void do_clan_expel(Character *ch, char *arg)
 
     GET_CLAN(vict) = 0;
     GET_CLAN_RANK(vict) = 0;
-    save_char(vict);
+    vict->save();
     clan[clan_num].members--;
     clan[clan_num].power -= GET_LEVEL(vict);
     remove_clan_member(GET_NAME(vict), clan_num);
@@ -746,7 +745,7 @@ void do_clan_demote(Character *ch, char *arg)
 
   GET_CLAN_RANK(vict)--;
   update_clan_member(GET_NAME(vict), GET_CLAN_RANK(vict), clan_num);
-  save_char(vict);
+  vict->save();
   send_to_char("You've demoted within your clan!\r\n", vict);
   send_to_char("Done.\r\n", ch);
   return;
@@ -831,7 +830,7 @@ void do_clan_promote(Character *ch, char *arg)
 
   GET_CLAN_RANK(vict)++;
   update_clan_member(GET_NAME(vict), GET_CLAN_RANK(vict), clan_num);
-  save_char(vict);
+  vict->save();
   send_to_char("You've been promoted within your clan!\r\n", vict);
   send_to_char("Done.\r\n", ch);
   return;
@@ -942,7 +941,7 @@ void do_clan_apply(Character *ch, char *arg)
   clan[clan_num].treasure += clan[clan_num].app_fee;
   save_clans();
   GET_CLAN(ch) = clan[clan_num].id;
-  save_char(ch);
+  ch->save();
   ch->Send( "You've applied to the %s!\r\n", clan[clan_num].name);
 
   return;
@@ -1587,7 +1586,7 @@ void do_clan_bank(Character *ch, char *arg, int action)
     send_to_char("Problem in command, please report.\r\n", ch);
     break;
   }
-  save_char(ch);
+  ch->save();
   save_clans();
   return;
 }
@@ -1768,12 +1767,12 @@ void do_clan_ranks(Character *ch, char *arg)
           GET_CLAN_RANK(victim) = 1;
         if (GET_CLAN_RANK(victim) == clan[clan_num].ranks)
           GET_CLAN_RANK(victim) = new_ranks;
-        save_char(victim);
+        victim->save();
       }
     }
     else
     {
-      victim = new Character();
+      victim = new Character(FALSE);
       if (load_char((player_table + j)->name, victim) >= 0)
       {
         if (GET_CLAN(victim) == clan[clan_num].id)
@@ -1783,7 +1782,7 @@ void do_clan_ranks(Character *ch, char *arg)
             GET_CLAN_RANK(victim) = 1;
           if (GET_CLAN_RANK(victim) == clan[clan_num].ranks)
             GET_CLAN_RANK(victim) = new_ranks;
-          save_char(victim);
+          victim->save();
         }
         delete (victim);
       }
@@ -2272,7 +2271,7 @@ ACMD(do_clan)
   send_clan_format(ch);
 }
 
-void add_clan_member(char * name, int rank, int cln)
+void add_clan_member(const char * name, int rank, int cln)
 {
   struct clan_list_data *temp;
 
@@ -2286,7 +2285,7 @@ void add_clan_member(char * name, int rank, int cln)
   clan_list[cln] = temp;
 }
 
-void remove_clan_member(char * name, int cln)
+void remove_clan_member(const char * name, int cln)
 {
   struct clan_list_data *temp, *find;
   if (clan_list[cln] == NULL || !name || !*name)
@@ -2306,7 +2305,7 @@ void remove_clan_member(char * name, int cln)
 
 }
 
-void update_clan_member(char * name, int rank, int cln)
+void update_clan_member(const char * name, int rank, int cln)
 {
   struct clan_list_data  *find;
   if (clan_list[cln] == NULL || !name || !*name)

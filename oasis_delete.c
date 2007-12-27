@@ -54,18 +54,18 @@ int free_strings(void *data, int type);
 \************************************************************************/
 int free_strings(void *data, int type)
 {
-  struct room_data *room;
+  Room *room;
   struct config_data *config;
   int i;
   
   switch (type) {
     case OASIS_WLD:
-      room = (struct room_data *) data;
+      room = (Room *) data;
       
       /* Free Descriptions */
-      return free_room_strings(room);    
+      return room->free_room_strings();
     case OASIS_EXI:
-      room = (struct room_data *) data;
+      room = (Room *) data;
       
       for (i = 0; i < NUM_OF_DIRS; i++) {
         if (room->dir_option[i]) {

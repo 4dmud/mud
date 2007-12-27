@@ -131,7 +131,7 @@ ACMD(do_rdig)
     CREATE(d->olc, struct oasis_olc_data, 1);
     OLC_ZNUM(d) = zone;
     OLC_NUM(d) = rvnum;
-    CREATE(OLC_ROOM(d), struct room_data, 1);
+    OLC_ROOM(d) = new Room();
     
     
     /* Copy the room's name. */
@@ -197,7 +197,7 @@ ACMD(do_rdig)
 
 ACMD(do_room_copy)
 {
-   struct room_data *room_src, *room_dst;
+   Room *room_src, *room_dst;
    int  j, buf_num;
    room_rnum room_num;
    zone_rnum dst_zone;
@@ -229,7 +229,7 @@ ACMD(do_room_copy)
    
    
    room_src = IN_ROOM(ch);
-   CREATE(room_dst, struct room_data, 1);
+   room_dst = new Room();
 
    room_dst->zone = dst_zone;
  
@@ -381,7 +381,7 @@ ACMD(do_room_copy)
 /* For buildwalk. Finds the next free vnum in the zone */
 room_vnum redit_find_new_vnum(zone_rnum zone)
 {
-  room_vnum vnum = genolc_zone_bottom(zone);
+  room_vnum vnum = zone_table[zone].Bot();
 
  for(;;) {
     if (vnum > zone_table[zone].top)
@@ -423,7 +423,7 @@ int buildwalk(Character *ch, int dir) {
       CREATE(d->olc, struct oasis_olc_data, 1);
       OLC_ZNUM(d) = IN_ROOM(ch)->zone;
       OLC_NUM(d) = vnum;
-      CREATE(OLC_ROOM(d), struct room_data, 1);
+      OLC_ROOM(d) = new Room();
 
       OLC_ROOM(d)->name = strdup("New BuildWalk Room");
       snprintf(buf, sizeof(buf), "This unfinished room was created by %s.\r\n", GET_NAME(ch));

@@ -73,7 +73,7 @@ GET_WIMP_LEV(ch) = GET_MAX_HIT(ch)/2;
     SET_BIT_AR(PLR_FLAGS(ch), PLR_SITEOK);
 
 
-  save_char(ch);
+  ch->save();
 }
 
 ACMD(do_remort)

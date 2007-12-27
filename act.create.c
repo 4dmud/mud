@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.17  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.16  2006/05/21 11:02:25  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -100,7 +103,7 @@ extern struct stave_stat_table stave_table[9];
 
 Character *find_char(long n);
 struct obj_data *find_obj(long n);
-struct room_data *find_room(long n);
+Room *find_room(long n);
 void run_task(Character *ch);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
@@ -815,15 +818,8 @@ ASKILL(skill_sing_wood)
 
   GET_MSG_RUN(ch) = 1;
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = ch;
-  msg->skill = SKILL_SING_WOOD;
-  msg->type = THING_SKILL;
-  msg->msg_num = 11;
-  msg->id = GET_ID(o);
-  *msg->args = '\0';
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC));
+  msg = new message_event_obj(ch, SKILL_SING_WOOD, THING_SKILL, 11, GET_ID(o), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
   return SKILL_SING_WOOD;
 
 
@@ -876,15 +872,8 @@ ASKILL(skill_manifest)
     return 0;
   }
   GET_MSG_RUN(ch) = 1;
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = ch;
-  msg->skill = SKILL_MANIFEST;
-  msg->type = THING_SKILL;
-  msg->msg_num = 8;
-  msg->id = GET_ID(obj);
-  *msg->args = '\0';
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0);
+  msg = new message_event_obj(ch, SKILL_MANIFEST, THING_SKILL, 8, GET_ID(obj), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE);
   return SKILL_MANIFEST;
 }
 
@@ -968,7 +957,7 @@ EVENTFUNC(message_event)
   struct message_event_obj *msg = (struct message_event_obj *) event_obj;
   Character *vict = NULL;
   struct obj_data *obj = NULL;
-  struct room_data *room = NULL;
+  Room *room = NULL;
   long time = 0;
 
   long uid = msg->id;
@@ -979,7 +968,7 @@ EVENTFUNC(message_event)
   if (ch == NULL )
   {
     log("Message event called with no character found!");
-    free(event_obj);
+    delete msg;
     return 0;
   }
 
@@ -987,7 +976,7 @@ EVENTFUNC(message_event)
   {
     log("Message event called with msg_num at 0!");
     GET_MESSAGE_EVENT(ch) = NULL;
-    free(event_obj);
+    delete msg;
     return 0;
   }
 
@@ -1057,7 +1046,7 @@ EVENTFUNC(message_event)
     {
       GET_MSG_RUN(ch) = 0;
       GET_MESSAGE_EVENT(ch) = NULL;
-      free(event_obj);
+      delete msg;
       if (type == THING_SUB) {
         toggle_sub_status(ch, skill, STATUS_OFF);
       run_task(ch);
@@ -1140,15 +1129,8 @@ ACMD(do_fell)
   ch->Send( "You flex your muscles and swing your axe.\r\n");
   GET_MSG_RUN(ch) = 1;
 
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = ch;
-  msg->skill = SUB_LUMBERJACK;
-  msg->type = THING_SUB;
-  msg->msg_num = 12;
-  msg->id = GET_ID(o);
-  *msg->args = '\0';
-
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC));
+  msg= new message_event_obj(ch, SUB_LUMBERJACK, THING_SUB, 12, GET_ID(o), "");
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
 
 
 }

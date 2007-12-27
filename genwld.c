@@ -19,16 +19,12 @@
 #include "dg_olc.h"
 #include "shop.h"
 
-extern struct room_data *world_vnum[];
-extern struct zone_data *zone_table;
-extern struct index_data *mob_index;
-extern zone_rnum top_of_zone_table;
-void update_wait_events(struct room_data *to, struct room_data *from);
+void update_wait_events(Room *to, Room *from);
 /*
  * This function will copy the strings so be sure you free your own
  * copies of the description, title, and such.
  */
-room_rnum add_room(struct room_data *room)
+room_rnum add_room(Room *room)
 {
   //  Character *tch;
   //  struct obj_data *tobj;
@@ -46,20 +42,18 @@ room_rnum add_room(struct room_data *room)
 
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
-    free_room_strings(world_vnum[i]);
+    world_vnum[i]->free_room_strings();
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
     *world_vnum[i] = *room;
-    world_vnum[i]->mine.tool = room->mine.tool;
-    world_vnum[i]->mine.dif = room->mine.dif;
-    world_vnum[i]->mine.num = room->mine.num;
-    copy_room_strings(world_vnum[i], room);
+    world_vnum[i]->mine = room->mine;
+    world_vnum[i]->copy_room_strings(room);
     add_to_save_list(zone_table[room->zone].number, SL_WLD);
     log("GenOLC: add_room: Updated existing room #%d.", i);
     return world_vnum[i];
   }
 
-  //  RECREATE(world, struct room_data, top_of_world + 2);
+  //  RECREATE(world, Room, top_of_world + 2);
   top_of_world = MAX(room->number, top_of_world);
 #if 0
 
@@ -158,20 +152,6 @@ room_rnum add_room(struct room_data *room)
   return world_vnum[room->number];
 }
 
-int copy_room(struct room_data *to, struct room_data *from)
-{
-  free_room_strings(to);
-  *to = *from;
-  copy_room_strings(to, from);
-
-  /* Don't put people and objects in two locations.
-     Am thinking this shouldn't be done here... */
-  //from->people = NULL;
-  //from->contents = NULL;
-
-  return TRUE;
-}
-
 /* -------------------------------------------------------------------------- */
 
 int delete_room(room_rnum rnum)
@@ -180,7 +160,7 @@ int delete_room(room_rnum rnum)
   int j;
   Character *ppl, *next_ppl;
   struct obj_data *obj, *next_obj;
-  struct room_data *room;
+  Room *room;
 
   if (rnum->number <= 0 || rnum->number > top_of_world)	/* Can't delete void yet. */
     return FALSE;
@@ -225,7 +205,7 @@ int delete_room(room_rnum rnum)
     char_to_room(ppl, 0);
   }
 
-  free_room_strings(room);
+  room->free_room_strings();
   if (SCRIPT(room))
     extract_script(room, WLD_TRIGGER);
   free_proto_script(room, WLD_TRIGGER);
@@ -336,7 +316,7 @@ int delete_room(room_rnum rnum)
   }
 
   top_of_world--;
-  RECREATE(world, struct room_data, top_of_world + 1);
+  RECREATE(world, Room, top_of_world + 1);
 #endif
 
   return TRUE;
@@ -346,7 +326,7 @@ int delete_room(room_rnum rnum)
 int save_rooms(zone_rnum rzone)
 {
   int i;
-  struct room_data *room;
+  Room *room;
   struct extra_descr_data *ex_desc = NULL;;
   FILE *sf;
   char filename[128];
@@ -367,7 +347,7 @@ int save_rooms(zone_rnum rzone)
   }
 
   log("GenOLC: save_rooms: Saving rooms in zone #%d (%d-%d).",
-      zone_table[rzone].number, genolc_zone_bottom(rzone), zone_table[rzone].top);
+      zone_table[rzone].number, zone_table[rzone].Bot(), zone_table[rzone].top);
 
   snprintf(filename, sizeof(filename), "%s/%d/%d.new", LIB_WORLD, zone_table[rzone].number, zone_table[rzone].number);
   if (!(sf = fopen(filename, "w")))
@@ -376,7 +356,7 @@ int save_rooms(zone_rnum rzone)
     return FALSE;
   }
 
-  for (i = genolc_zone_bottom(rzone); i <= zone_table[rzone].top; i++)
+  for (i = zone_table[rzone].Bot(); i <= zone_table[rzone].top; i++)
   {
     if ((room = real_room(i)) != NULL)
     {
@@ -553,7 +533,7 @@ room_rnum duplicate_room(room_vnum dest_vnum, room_rnum orig)
 {
   int znum;
   room_rnum new_rnum;
-  struct room_data nroom;
+  Room nroom;
 
 #if CIRCLE_UNSIGNED_INDEX
   if (orig->number == NOWHERE || orig->number > top_of_world)
@@ -592,101 +572,33 @@ room_rnum duplicate_room(room_vnum dest_vnum, room_rnum orig)
 }
 
 /* -------------------------------------------------------------------------- */
-
-/*
- * Copy strings over so bad things don't happen.  We do not free the
- * existing strings here because copy_room() did a shallow copy previously
- * and we'd be freeing the very strings we're copying.  If this function
- * is used elsewhere, be sure to free_room_strings() the 'dest' room first.
- */
-int copy_room_strings(struct room_data *dest, struct room_data *source)
-{
-  int i;
-
-  if (dest == NULL || source == NULL)
-  {
-    log("SYSERR: GenOLC: copy_room_strings: NULL values passed.");
-    return FALSE;
-  }
-
-  dest->description = str_udup(source->description);
-  dest->name = str_udup(source->name);
-
-  dest->smell = str_udup(source->smell);
-  dest->listen = str_udup(source->listen);
-
-  for (i = 0; i < NUM_OF_DIRS; i++)
-  {
-    if (!R_EXIT(source, i))
-      continue;
-
-    CREATE(R_EXIT(dest, i), struct room_direction_data, 1);
-    *R_EXIT(dest, i) = *R_EXIT(source, i);
-    if (R_EXIT(source, i)->general_description)
-      R_EXIT(dest, i)->general_description = strdup(R_EXIT(source, i)->general_description);
-    if (R_EXIT(source, i)->keyword)
-      R_EXIT(dest, i)->keyword = strdup(R_EXIT(source, i)->keyword);
-  }
-
-  if (source->ex_description)
-    copy_ex_descriptions(&dest->ex_description, source->ex_description);
-  if (source->look_under_description)
-    copy_ex_descriptions(&dest->look_under_description, source->look_under_description);
-  if (source->look_above_description)
-    copy_ex_descriptions(&dest->look_above_description, source->look_above_description);
-  if (source->look_behind_description)
-    copy_ex_descriptions(&dest->look_behind_description, source->look_behind_description);
-  return TRUE;
-}
-
-int free_room_strings(struct room_data *room)
-{
-  int i;
-
-  /* Free descriptions. */
-  if (room->name)
-  {
-    free(room->name);
-    room->name = NULL;
-  }
-  if (room->description)
-  {
-    free_string(&room->description);
-  }
-  if (room->smell)
-  {
-    free_string(&room->smell);
-  }
-  if (room->listen)
-  {
-    free_string(&room->listen);
-  }
-  if (room->ex_description)
-    free_ex_descriptions(room->ex_description);
-  room->ex_description = NULL;
-  if (room->look_under_description)
-    free_ex_descriptions(room->look_under_description);
-  room->look_under_description = NULL;
-  if (room->look_above_description)
-    free_ex_descriptions(room->look_above_description);
-  room->look_above_description = NULL;
-  if (room->look_behind_description)
-    free_ex_descriptions(room->look_behind_description);
-  room->look_behind_description = NULL;
-
-  /* Free exits. */
-  for (i = 0; i < NUM_OF_DIRS; i++)
-  {
-    if (R_EXIT(room, i))
-    {
-      if (R_EXIT(room, i)->general_description)
-        free_string(&R_EXIT(room, i)->general_description);
-      if (R_EXIT(room, i)->keyword)
-        free_string(&R_EXIT(room, i)->keyword);
-      free(R_EXIT(room, i));
-      R_EXIT(room, i) = NULL;
+/** room vector compare **/
+    bool operator< (const vector<Room *>::iterator &a,const vector<Room *>::iterator &b) {
+        return ((*a)->number < (*b)->number);
     }
-  }
-
-  return TRUE;
-}
+    bool operator> (const vector<Room *>::iterator &a,const vector<Room *>::iterator &b) {
+        return ((*a)->number > (*b)->number);
+    }
+    bool operator== (const vector<Room *>::iterator &a,const vector<Room *>::iterator &b) {
+        return ((*a)->number == (*b)->number);
+    }
+/** Room compare **/
+    bool operator< (const Room &a,const Room &b) {
+        return (a.number < b.number);
+    }
+    bool operator> (const Room &a,const Room &b) {
+        return (a.number > b.number);
+    }
+    bool operator== (const Room &a,const Room &b) {
+        return (a.number == b.number);
+    }
+/** Room to int compare **/
+    bool operator< (const Room &r,const room_vnum b) {
+        return (r.number < b);
+    }
+    bool operator> (const Room &r,const room_vnum b) {
+        return (r.number > b);
+    }
+    bool operator== (const Room &r,const room_vnum b) {
+        return (r.number == b);
+    }

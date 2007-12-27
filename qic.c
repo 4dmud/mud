@@ -48,7 +48,7 @@ void save_record(int j)
 
 void load_qic(void)
 {
-    int size, i, nr, j;
+    int size, i, nr;
     struct qic_data q;
 
     if (!(qic_fl = fopen(QIC_FILE, "r+b"))) {
@@ -87,16 +87,13 @@ void load_qic(void)
 	    log("Invalid vnum [%5d] in QIC database!", q.vnum);
 	} else {
 	if (obj_index[nr].qic == NULL)	
-	    CREATE(obj_index[nr].qic, struct qic_data, 1);
+	    obj_index[nr].qic = new qic_data();
 	    qic_vnums[i] = q.vnum;
 	    obj_index[nr].qic->vnum = i;
 	    i++;
 	    obj_index[nr].qic->limit = q.limit;
 	    obj_index[nr].qic->items = q.items;
 
-	    /* make sure it's reset to 0... hmm */
-	    for (j = 0; j < QIC_OWNERS; j++)
-		obj_index[nr].qic->owners[j] = 0;
 	}
     }
 
@@ -324,7 +321,7 @@ ACMD(do_setqic)
 	    send_to_char("No QIC record to remove.\r\n", ch);
 	    return;
 	}
-	free(obj_index[i].qic);	/* set QIC record to NULL */
+	delete obj_index[i].qic;	/* set QIC record to NULL */
 	obj_index[i].qic = NULL;
 	save_qic();		/* rewrite the whole QIC database (yuck!) */
 	load_qic();		/* and load it again .. pfffft */
@@ -335,8 +332,7 @@ ACMD(do_setqic)
     }
 
     if (obj_index[i].qic == NULL) {
-	CREATE(q, struct qic_data, 1);
-	obj_index[i].qic = q;
+	q = obj_index[i].qic = new qic_data();
 	q->vnum = qic_items;	/* rec in database file */
 	q->items = 0;		/* since it's a new QIC, no items loaded */
 	q->limit = j;		/* the QIC limit */

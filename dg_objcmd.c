@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/30 09:14:19 $
-*  $Revision: 1.11 $
+*  $Date: 2006/08/13 06:26:51 $
+*  $Revision: 1.12 $
 **************************************************************************/
 
 #include "conf.h"
@@ -712,7 +712,7 @@ OCMD(do_odoor)
 {
     char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
     char field[MAX_INPUT_LENGTH], *value;
-    room_data *rm;
+    Room *rm;
     struct room_direction_data *newexit;
     int dir, fd;
     room_rnum to_room;
@@ -885,6 +885,7 @@ OCMD(do_ocontains)
 	    extract_obj(object);
 	}
 	new_obj = read_object(atoi(arg3), VIRTUAL);
+	if (new_obj)
 	obj_to_obj(new_obj, obj);
     }
 

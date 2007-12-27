@@ -904,8 +904,6 @@ Character *load_familiar(Character *owner)
     Character victim;
     FILE *fam_f;
 
-
-
     CREATE(victim, Character, 1);
     clear_char(victim);
     CREATE(victim->player_specials, struct player_special_data, 1);

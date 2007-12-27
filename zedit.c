@@ -19,14 +19,6 @@
 #include "descriptor.h"
 
 /*-------------------------------------------------------------------*/
-
-extern struct zone_data *zone_table;
-extern zone_rnum top_of_zone_table;
-extern struct index_data *mob_index;
-extern Character *mob_proto;
-extern struct index_data *obj_index;
-extern struct obj_data *obj_proto;
-extern Descriptor *descriptor_list;
 extern struct index_data **trig_index;
 extern const char *zone_bits[];
 /*-------------------------------------------------------------------*/
@@ -83,7 +75,7 @@ ACMD(do_oasis_zedit)
         if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
           number = NOWHERE;
         else
-          number = genolc_zone_bottom(zlok);
+          number = zone_table[zlok].Bot();
       }
       
       if (number == NOWHERE) {
@@ -233,14 +225,14 @@ ACMD(do_oasis_zedit)
 
 void zedit_setup(Descriptor *d, room_rnum room_num)
 {
-  struct zone_data *zone;
+  Zone *zone;
   int subcmd = 0, count = 0;
   room_rnum cmd_room = NULL;
 
   /*
    * Allocate one scratch zone structure.  
    */
-  CREATE(zone, struct zone_data, 1);
+  zone = new Zone();
 
   /*
    * Copy all the zone header information over.
@@ -263,7 +255,7 @@ void zedit_setup(Descriptor *d, room_rnum room_num)
   /*
    * Start the reset command list with a terminator.
    */
-  CREATE(zone->cmd, struct reset_com, 1);
+  zone->cmd = new reset_com[1];
   zone->cmd[0].command = 'S';
 
   /*
@@ -531,7 +523,7 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
     case 'M':
       d->Output( "%sLoad %s [%s%d%s], Max : %d",
               MYCMD.if_flag ? " then " : "",
-              mob_proto[MYCMD.arg1].player.short_descr, cyn,
+              mob_proto[MYCMD.arg1]->player.short_descr, cyn,
               mob_index[MYCMD.arg1].vnum, yel, MYCMD.arg2
               );
       break;
@@ -1382,9 +1374,9 @@ void zedit_parse(Descriptor *d, char *arg)
      * Parse and add new top room in zone and return to main menu.
      */
     if (OLC_ZNUM(d) == top_of_zone_table)
-      OLC_ZONE(d)->top = LIMIT(atoi(arg), genolc_zonep_bottom(OLC_ZONE(d)), 99900);
+      OLC_ZONE(d)->top = LIMIT(atoi(arg), OLC_ZONE(d)->Bot(), HIGHEST_VNUM);
     else
-      OLC_ZONE(d)->top = LIMIT(atoi(arg), genolc_zonep_bottom(OLC_ZONE(d)), genolc_zone_bottom(OLC_ZNUM(d) + 1) - 1);
+      OLC_ZONE(d)->top = LIMIT(atoi(arg), OLC_ZONE(d)->Bot(), zone_table[OLC_ZNUM(d) + 1].Bot() - 1);
     OLC_ZONE(d)->number = 1;
     zedit_disp_menu(d);
     break;

@@ -1127,7 +1127,7 @@ void improve_sub(Character *ch, enum subskill_list  sub, int amount)
   }
   log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), amount, sub_name(sub));
 
-  save_char(ch);
+  ch->save();
 }
 
 

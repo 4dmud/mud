@@ -35,10 +35,6 @@
 
 struct vehicle_data *vehicles = NULL;
 
-extern struct obj_data *obj_proto;
-
-extern Descriptor *descriptor_list;
-
 void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
 
 int vehicle_count(void)

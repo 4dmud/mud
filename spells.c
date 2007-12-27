@@ -1094,17 +1094,8 @@ ASPELL(spell_control_weather)
     return;
   }
   GET_MSG_RUN(ch) = 1;
-  CREATE(msg, struct message_event_obj, 1);
-  msg->ch = ch;
-  msg->skill = SPELL_CONTROL_WEATHER;
-  msg->type = THING_SKILL;
-  msg->msg_num = 8;
-  if (GET_EQ(ch, WEAR_FOCUS))
-    msg->id = GET_ID(GET_EQ(ch, WEAR_FOCUS));
-  else
-    msg->id = -1;
-  strlcpy(msg->args, strarg, 512);
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0);
+  msg = new message_event_obj(ch, SPELL_CONTROL_WEATHER, THING_SKILL, 8,GET_EQ(ch, WEAR_FOCUS) ?  GET_ID(GET_EQ(ch, WEAR_FOCUS)) : -1, strarg );
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE);
   return;
 }
 

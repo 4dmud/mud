@@ -28,13 +28,9 @@
 /*
  * External data structures.
  */
-extern struct room_data *world_vnum[];
-extern struct obj_data *obj_proto;
-extern Character *mob_proto;
 extern const char *room_bits[];
 extern const char *sector_types[];
 extern const char *exit_bits[];
-extern struct zone_data *zone_table;
 extern Descriptor *descriptor_list;
 
 /*------------------------------------------------------------------------*/
@@ -76,7 +72,7 @@ ACMD(do_oasis_redit)
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
         num = NOWHERE;
       else
-        num = genolc_zone_bottom(zlok);
+        num = zone_table[zlok].Bot();
     }
 
     if (num == NOWHERE)
@@ -172,11 +168,11 @@ ACMD(do_oasis_redit)
 
 void redit_setup_new(Descriptor *d)
 {
-  CREATE(OLC_ROOM(d), struct room_data, 1);
+  OLC_ROOM(d) = new Room();
 
   OLC_ROOM(d)->name = strdup("An unfinished room");
   OLC_ROOM(d)->description = strdup("You are in an unfinished room.\r\n");
-  OLC_ROOM(d)->smell = strdup("You smell nothing of interest.\r\n");
+  OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
   OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   OLC_ROOM(d)->number = NOWHERE;
   OLC_ROOM(d)->mine.num = -1;
@@ -195,11 +191,11 @@ void redit_setup_existing(Descriptor *d, room_vnum v_num)
   /*
    * Build a copy of the room for editing.
    */
-  CREATE(OLC_ROOM(d), struct room_data, 1);
+  OLC_ROOM(d) = new Room();
 
   *OLC_ROOM(d) = *world_vnum[v_num];
 
-  copy_room_strings(OLC_ROOM(d), world_vnum[v_num]);
+  OLC_ROOM(d)->copy_room_strings(world_vnum[v_num]);
   /*
    * Attach copy of room to player's descriptor.
    */
@@ -208,9 +204,6 @@ void redit_setup_existing(Descriptor *d, room_vnum v_num)
   OLC_ROOM(d)->script = NULL;
   OLC_ROOM(d)->contents = NULL;
   OLC_ROOM(d)->people = NULL;
-  OLC_ROOM(d)->mine.tool = world_vnum[v_num]->mine.tool;
-  OLC_ROOM(d)->mine.dif = world_vnum[v_num]->mine.dif;
-  OLC_ROOM(d)->mine.num = world_vnum[v_num]->mine.num;
 
   dg_olc_script_copy(d);
   redit_disp_menu(d);
@@ -228,7 +221,7 @@ void redit_save_internally(Descriptor *d)
   {
     new_room = TRUE;
     OLC_ROOM(d)->number = OLC_NUM(d);
-    CREATE(world_vnum[OLC_ROOM(d)->number], struct room_data, 1);
+    world_vnum[OLC_ROOM(d)->number] = new Room();
   }
   /* FIXME: Why is this not set elsewhere? */
   OLC_ROOM(d)->zone = OLC_ZNUM(d);
@@ -296,18 +289,6 @@ void redit_save_to_disk(zone_vnum zone_num)
 
 /*------------------------------------------------------------------------*/
 
-void free_room(struct room_data *room)
-{
-  /* Free the strings (Mythran). */
-  free_strings(room, OASIS_WLD);
-
-  if (SCRIPT(room))
-    extract_script(room, WLD_TRIGGER);
-  free_proto_script(room, WLD_TRIGGER);
-  /* Free the room. */
-  free(room);	/* XXX ? */
-  room = NULL;
-}
 
 /**************************************************************************
  Menu functions 
@@ -511,7 +492,7 @@ void redit_disp_menu(Descriptor *d)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  struct room_data *room;
+  Room *room;
 
   get_char_colors(d->character);
   clear_screen(d);
@@ -628,7 +609,7 @@ void redit_parse(Descriptor *d, char *arg)
        * Do NOT free strings! Just the room structure. 
        */
       /* okay free strings now - mord */
-      free_room_strings(OLC_ROOM(d));
+      OLC_ROOM(d)->free_room_strings();
       cleanup_olc(d, CLEANUP_STRUCTS);
       break;
     case 'n':

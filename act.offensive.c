@@ -537,10 +537,6 @@ ACMD(do_shoot)
         if (GET_OBJ_TYPE(holding) != ITEM_AMMO)
           holding = NULL;
       }
-      else
-      {
-        holding = NULL;
-      }
     }
 
   }

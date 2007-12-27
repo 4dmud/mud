@@ -215,7 +215,7 @@ void Descriptor::init_descriptor(int desc) {
     descriptor = desc;
     bufspace = SMALL_BUFSIZE - 1;
     login_time = time(0);
-    output = string("");
+    output.erase();
     has_prompt = TRUE;  /* prompt is part of greetings */
 
     if (++last_desc == 1000)
@@ -243,6 +243,7 @@ Descriptor::Descriptor() {
     close_me = 0;
     host[0] = '\0';
     str = NULL;
+//    sstr = NULL;
     snoop_by = NULL;
     input.head = NULL;
     input.tail = NULL;
@@ -281,6 +282,7 @@ Descriptor::Descriptor() {
     comp = NULL;
     eor = FALSE;
     mxp = FALSE;
+    real_string = FALSE;
 
     for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
         history[cnt] = NULL;
@@ -295,6 +297,9 @@ Descriptor::~Descriptor() {
     REMOVE_FROM_LIST(this, descriptor_list, next);
     CLOSE_SOCKET(this->descriptor);
     this->flush_queues();
+
+//    if (sstr != NULL)
+//    delete sstr;
 
     /* Forget snooping */
     if (this->snooping)
@@ -317,7 +322,9 @@ Descriptor::~Descriptor() {
             free(this->str);
             this->str = NULL;
         } else if (this->backstr && !IS_NPC(this->character) && !PLR_FLAGGED(this->character, PLR_WRITING)) {
-            free(this->backstr);      /* editing description ... not olc */
+                 /* editing description ... not olc */
+                 
+            free(this->backstr);
             this->backstr = NULL;
         }
         if (IS_PLAYING(this) || STATE(this) == CON_DISCONNECT) {
@@ -447,7 +454,7 @@ void delete_descriptor_list() {
 }
 
 
-
+#if 0
 size_t Descriptor::Output(string i) {
 
     /* this should safely put all expanded MXP tags into the string */
@@ -466,5 +473,63 @@ size_t Descriptor::Output(string i) {
     output += cstring(stxt).c_str();
     return output.size();
 }
+#endif
 
+size_t Descriptor::Output(string &i) {
+
+    /* this should safely put all expanded MXP tags into the string */
+   stxt = convert_mxp_tags(mxp, i);
+
+    /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+    if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
+        size_t slen = stxt.size();
+        size_t wraplen = (((slen / PAGEWIDTH(character)) * 3) + slen + 3);
+        /* at max you will be adding 3 more characters per line
+         so this is just to make sure you have the room for this function. */
+
+        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
+
+    }
+    output += cstring(stxt).c_str();
+    return output.size();
+}
+
+size_t Descriptor::Output(string *i) {
+
+    /* this should safely put all expanded MXP tags into the string */
+   stxt = convert_mxp_tags(mxp, *i);
+
+    /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+    if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
+        size_t slen = stxt.size();
+        size_t wraplen = (((slen / PAGEWIDTH(character)) * 3) + slen + 3);
+        /* at max you will be adding 3 more characters per line
+         so this is just to make sure you have the room for this function. */
+
+        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
+
+    }
+    output += cstring(stxt).c_str();
+    return output.size();
+}
+
+size_t Descriptor::Output(stringstream &i) {
+
+    /* this should safely put all expanded MXP tags into the string */
+   stxt = convert_mxp_tags(mxp, i);
+
+    /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+    if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
+        size_t slen = stxt.size();
+        size_t wraplen = (((slen / PAGEWIDTH(character)) * 3) + slen + 3);
+        /* at max you will be adding 3 more characters per line
+         so this is just to make sure you have the room for this function. */
+
+        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
+
+    }
+    output += cstring(stxt).c_str();
+    return output.size();
+  
+}
 

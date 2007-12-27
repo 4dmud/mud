@@ -354,7 +354,7 @@ ACMD(do_locker)
     extract_all_in_list(LOCKER(ch));
     LOCKER(ch) = NULL;
     save_locker(ch);
-    save_char(ch);
+    ch->save();
     ch->Send( "Locker canceled and purged.\r\n");
     break;
   }
@@ -431,7 +431,7 @@ void rent_locker(Character *ch, int size,int months)
   GET_BRONZE_TOKEN_COUNT(ch) = payment;
 
   convert_tokens(ch);
-  save_char(ch);
+  ch->save();
 
 
 }

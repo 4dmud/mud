@@ -31,6 +31,7 @@ int in_save_list(zone_vnum, int type);
 void strip_cr(char *);
 void do_show_save_list(Character *);
 int save_all(void);
+string udup(const char *txt);
 char *str_udup(const char *);
 void copy_ex_descriptions(struct extra_descr_data **to, struct extra_descr_data *from);
 void free_ex_descriptions(struct extra_descr_data *head);
@@ -61,6 +62,3 @@ extern int top_shop_offset;
 #define ZCMD(zon, cmds)	zone_table[(zon)].cmd[(cmds)]
 
 #define LIMIT(var, low, high)	MIN(high, MAX(var, low))
-
-room_vnum genolc_zone_bottom(zone_rnum rznum);
-room_vnum genolc_zonep_bottom(struct zone_data *zone);

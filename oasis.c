@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "db.h"
 #include "shop.h"
+#include "handler.h"
 #include "genolc.h"
 #include "genmob.h"
 #include "genshp.h"
@@ -26,21 +27,6 @@
 #include "descriptor.h"
 
 const char *nrm, *grn, *cyn, *yel;
-
-/******************************************************************************/
-/** External Data Structures                                                 **/
-/******************************************************************************/
-extern struct obj_data *obj_proto;
-extern Character *mob_proto;
-extern struct room_data *world_vnum[];
-extern zone_rnum top_of_zone_table;
-extern struct zone_data *zone_table;
-extern Descriptor *descriptor_list;
-
-/******************************************************************************/
-/** External Functions                                                       **/
-/******************************************************************************/
-int is_name(const char *str, const char *namelist);
 
 /******************************************************************************/
 /** Internal Data Structures                                                 **/
@@ -227,11 +213,10 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
     {
     case CLEANUP_ALL:
       /* free(OLC_SCRIPT(d)) equivalent */
-      free_proto_script(OLC_ROOM(d), WLD_TRIGGER);
-      free_room(OLC_ROOM(d));
+      delete OLC_ROOM(d);
       break;
     case CLEANUP_STRUCTS:
-      free(OLC_ROOM(d));
+      delete OLC_ROOM(d);
       break;
     case CLEANUP_CONFIG:
       free_config(OLC_CONFIG(d));

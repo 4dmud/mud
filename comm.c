@@ -117,12 +117,9 @@ extern int id_serv_socket;
 
 extern int *cmd_sort_info;
 
-extern struct room_data *world_vnum[];  /* In db.c */
 extern struct time_info_data time_info; /* In db.c */
 extern char help[];
 
-extern int top_of_zone_table;
-extern struct zone_data *zone_table;
 extern const char *save_info_msg[];     /* In olc.c */
 extern char *race_abbrevs[];
 
@@ -203,7 +200,6 @@ int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 Descriptor *new_descriptor(socket_t s, int copyover);
 int get_max_players(void);
 int process_output(Descriptor *t);
-int process_input(Descriptor *t);
 int perform_alias(Descriptor *d, char *orig, size_t maxlen);
 int parse_ip(const char *addr, struct in_addr *inaddr);
 int set_sendbuf(socket_t s);
@@ -390,6 +386,7 @@ int main(int argc, char **argv)
   //ush_int port;
   int pos = 1;
   const char *dir;
+  Room *rm = NULL;
 
 #ifdef CIRCLE_UNIX
   if (!getuid())
@@ -436,14 +433,14 @@ int main(int argc, char **argv)
     }
     pos++;
   }
-  pos = 0;
-
-  /* i dunno why here but...*/
-  while (pos < HIGHEST_VNUM)
-    world_vnum[pos++] = NULL;
-
   pos = 1;
 
+	/** this is a dum place to have this, however the damn config
+         setup would need to be changed to handle not having the world array created yet
+         one day Mord!
+    **/
+         world_vnum.assign(HIGHEST_VNUM, rm);
+	
   if (!CONFIG_CONFFILE)
     CONFIG_CONFFILE = strdup(CONFIG_FILE);
 
@@ -694,7 +691,7 @@ void copyover_recover(void)
 
     /* Now, find the pfile */
 
-    d->character = new Character();
+    d->character = new Character(FALSE);
     d->character->desc = d;
 
     if ((player_i = load_char(name, d->character)) >= 0)
@@ -1231,7 +1228,7 @@ void game_loop(socket_t s_mother_desc)
       {
         next_d = d->next;
         if (FD_ISSET(d->descriptor, &input_set))
-          if (process_input(d) < 0)
+          if (d->process_input() < 0)
             delete d;
       }
 
@@ -2834,7 +2831,7 @@ int toggle_compression(Descriptor *t)
  * -gg 1/21/2000
  */
  /** this needs to be rewritten yet again, too much chance for a comparison of uninitialised data - mord*/
-int process_input(Descriptor *t)
+int Descriptor::process_input()
 {
   int buf_length, failed_subst;
   ssize_t bytes_read;
@@ -2848,11 +2845,12 @@ int process_input(Descriptor *t)
   const unsigned char do_ech[] = {IAC,DO,TELOPT_ECHO,0};
 #define  TELOPT_MXP        '\x5B'
 
-
+if (close_me)
+return 0;
 
   /* first, find the point where we left off reading data */
-  buf_length = strlen(t->inbuf);
-  read_point = t->inbuf + buf_length;
+  buf_length = strlen(inbuf);
+  read_point = inbuf + buf_length;
   space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
   do
@@ -2863,7 +2861,7 @@ int process_input(Descriptor *t)
       return (-1);
     }
 
-    bytes_read = perform_socket_read(t->descriptor, read_point, space_left);
+    bytes_read = perform_socket_read(descriptor, read_point, space_left);
 
     if (bytes_read < 0)  /* Error, disconnect them. */
       return (-1);
@@ -2909,61 +2907,61 @@ int process_input(Descriptor *t)
 
         if (memcmp (ptr, do_sig2, strlen ((const char *)do_sig2)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           //log("MCCP found on");
-          toggle_compression(t);
-          t->comp->state = 2;
-          t->comp->compression = 2;
+          toggle_compression(this);
+          comp->state = 2;
+          comp->compression = 2;
           memmove (ptr, &ptr [strlen (do_sig2)], strlen (&ptr [strlen (do_sig2)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, do_sig, strlen (do_sig)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           //log("MCCP found on");
-          toggle_compression(t);
-          t->comp->state = 2;
-          t->comp->compression = 1;
+          toggle_compression(this);
+          comp->state = 2;
+          comp->compression = 1;
           memmove (ptr, &ptr [strlen (do_sig)], strlen (&ptr [strlen (do_sig)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, dont_sig, strlen (dont_sig)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           //log("MCCP found off");
-          t->comp->state = 0;
-          t->comp->compression = 1;
+          comp->state = 0;
+          comp->compression = 1;
           memmove (ptr, &ptr [strlen (dont_sig)], strlen (&ptr [strlen (dont_sig)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, dont_sig2, strlen (dont_sig2)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           //log("MCCP found off");
-          t->comp->state = 0;
-          t->comp->compression = 2;
+          comp->state = 0;
+          comp->compression = 2;
           memmove (ptr, &ptr [strlen (dont_sig2)], strlen (&ptr [strlen (dont_sig2)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
 #endif
         if (memcmp (ptr, do_eor, strlen ((const char *)do_eor)) == 0)
         {
-          t->telnet_capable = 0;
-          t->eor = 1;
+          telnet_capable = 0;
+          eor = 1;
           //log("eor found");
           memmove (ptr, &ptr [strlen ((const char *)do_eor)], strlen (&ptr [strlen ((const char *)do_eor)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, do_ga, strlen ((const char *)do_ga)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           //log("eor found");
           memmove (ptr, &ptr [strlen ((const char *)do_ga)], strlen (&ptr [strlen ((const char *)do_ga)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, do_ech, strlen ((const char *)do_ech)) == 0)
         {
-          t->telnet_capable = 1;
+          telnet_capable = 1;
           /** wanna do something with this? **/
           //log("do echo found");
           memmove (ptr, &ptr [strlen ((const char *)do_ech)], strlen (&ptr [strlen ((const char *)do_ech)]) + 1);
@@ -2971,16 +2969,16 @@ int process_input(Descriptor *t)
         }
         if (memcmp (ptr, do_mxp_str, strlen ((const char *)do_mxp_str)) == 0)
         {
-          t->telnet_capable = 1;
-          t->turn_on_mxp ();
+          telnet_capable = 1;
+          turn_on_mxp ();
           /* remove string from input buffer */
           memmove (ptr, &ptr [strlen ((const char *)do_mxp_str)], strlen (&ptr [strlen ((const char *)do_mxp_str)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         } /* end of turning on MXP */
         else if (memcmp (ptr, dont_mxp_str, strlen ((const char *)dont_mxp_str)) == 0)
         {
-          t->telnet_capable = 1;
-          t->mxp = FALSE;
+          telnet_capable = 1;
+          mxp = FALSE;
           /* remove string from input buffer */
           memmove (ptr, &ptr [strlen ((const char *)dont_mxp_str)], strlen (&ptr [strlen ((const char *)dont_mxp_str)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
@@ -3035,7 +3033,7 @@ int process_input(Descriptor *t)
    * can copy the formatted data to a new array for further processing.
    */
 
-  read_point = t->inbuf;
+  read_point = inbuf;
 
   while (nl_pos != NULL)
   {
@@ -3077,30 +3075,30 @@ int process_input(Descriptor *t)
       char buffer[MAX_INPUT_LENGTH + 64];
 
       snprintf(buffer, sizeof(buffer), "Line too long.  Truncated to:\r\n%s\r\n", tmp);
-      if (write_to_descriptor(t->descriptor, buffer, t->comp) < 0)
+      if (write_to_descriptor(descriptor, buffer, comp) < 0)
         return (-1);
     }
-    if (t->snoop_by)
-      t->snoop_by->Output("%% %s\r\n", tmp);
+    if (snoop_by)
+      snoop_by->Output("%% %s\r\n", tmp);
     failed_subst = 0;
     if (*tmp == '-' && *(tmp + 1) == '-')
-      t->flush_queues();
+      flush_queues();
     else if (*tmp == '!' && !(*(tmp + 1)))   /* Redo last command. */
-      strcpy(tmp, t->last_input);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+      strcpy(tmp, last_input);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
     else if (*tmp == '!' && *(tmp + 1))
     {
       char *commandln = (tmp + 1);
-      int starting_pos = t->history_pos,
-                         cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
+      int starting_pos = history_pos,
+                         cnt = (history_pos == 0 ? HISTORY_SIZE - 1 : history_pos - 1);
 
       skip_spaces(&commandln);
       for (; cnt != starting_pos; cnt--)
       {
-        if (t->history[cnt] && is_abbrev(commandln, t->history[cnt]))
+        if (history[cnt] && is_abbrev(commandln, history[cnt]))
         {
-          strcpy(tmp, t->history[cnt]); /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-          strcpy(t->last_input, tmp);   /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-          t->Output( "%s\r\n", tmp);
+          strcpy(tmp, history[cnt]); /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+          strcpy(last_input, tmp);   /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+          Output( "%s\r\n", tmp);
           break;
         }
         if (cnt == 0)    /* At top, loop to bottom. */
@@ -3109,21 +3107,21 @@ int process_input(Descriptor *t)
     }
     else if (*tmp == '^')
     {
-      if (!(failed_subst = perform_subst(t, t->last_input, tmp)))
-        strcpy(t->last_input, tmp);     /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+      if (!(failed_subst = perform_subst(this, last_input, tmp)))
+        strcpy(last_input, tmp);     /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
     }
     else
     {
-      strcpy(t->last_input, tmp);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-      if (t->history[t->history_pos])
-        free(t->history[t->history_pos]);    /* Clear the old line. */
-      t->history[t->history_pos] = strdup(tmp);   /* Save the new. */
-      if (++t->history_pos >= HISTORY_SIZE)  /* Wrap to top. */
-        t->history_pos = 0;
+      strcpy(last_input, tmp);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+      if (history[history_pos])
+        free(history[history_pos]);    /* Clear the old line. */
+      history[history_pos] = strdup(tmp);   /* Save the new. */
+      if (++history_pos >= HISTORY_SIZE)  /* Wrap to top. */
+        history_pos = 0;
     }
 
     if (!failed_subst)
-      write_to_q(tmp, &t->input, 0);
+      write_to_q(tmp, &input, 0);
 
     /* find the end of this line */
     while (ISNEWL(*nl_pos))
@@ -3137,7 +3135,7 @@ int process_input(Descriptor *t)
   }
 
   /* now move the rest of the buffer up to the beginning for the next pass */
-  write_point = t->inbuf;
+  write_point = inbuf;
   while (*read_point)
     *(write_point++) = *(read_point++);
   *write_point = '\0';
@@ -3708,26 +3706,23 @@ void send_to_range(room_vnum start, room_vnum finish, const char *messg, ...)
 
 /* higher-level communication: the act() function */
 void perform_act(const char *orig, Character *ch,
-                 struct obj_data *obj, const void *vict_obj,
-                 const Character *to)
+                 struct obj_data *obj, const void *vict_obj, const Character *to)
 {
-  const char *i = NULL;
-  char lbuf[MAX_STRING_LENGTH], *buf, *j;
+  //const char *i = "";
+  string i = "";
+  char lbuf[MAX_STRING_LENGTH] = "";
   Character *dg_victim = NULL;
   struct obj_data *dg_target = NULL;
   char *dg_arg = NULL;
   bool uppercasenext = FALSE;
+  unsigned int k = 0, j = 0;
 
   if (!orig || !*orig)
   {
     log("No string passed to perform_act!");
     return;
   }
-
-
-
-  buf = lbuf;
-
+  
   for (;;)
   {
     if (*orig == '$')
@@ -3735,7 +3730,7 @@ void perform_act(const char *orig, Character *ch,
       switch (*(++orig))
       {
       case 'n':
-        i = PERS(ch, to);
+        i = PERS_S(ch, to);
         break;
       case 'N':
         CHECK_NULL(vict_obj, PERS((Character *) vict_obj, to));
@@ -3795,9 +3790,9 @@ void perform_act(const char *orig, Character *ch,
         break;
         /* uppercase previous word */
       case 'u':
-        for (j = buf; j > lbuf && !isspace((int) *(j - 1)); j--);
-        if (j != buf)
-          *j = UPPER(*j);
+      if (k > 0)
+        for (j = k; j > 0 && !isspace((int) lbuf[j-1]); j--);
+        if (j != lbuf[k]) lbuf[j] = UPPER(lbuf[j]);
         i = "";
         break;
         /* uppercase next word */
@@ -3814,30 +3809,35 @@ void perform_act(const char *orig, Character *ch,
         i = "";
         break;
       }
-      while ((*buf = *(i++)))
+      int pt = 0;
+      while (pt < i.length() && k < sizeof(lbuf))
       {
-        if (uppercasenext && !isspace((int) *buf))
+      lbuf[k] = i[pt];
+        if (uppercasenext && !isspace((int) lbuf[k]))
         {
-          *buf = UPPER(*buf);
+          lbuf[k] = UPPER(lbuf[k]);
           uppercasenext = FALSE;
         }
-        buf++;
+        k++;
+        pt++;
+        lbuf[k] = '\0';
       }
       orig++;
     }
-    else if (!(*(buf++) = *(orig++)))
+    else if (!(lbuf[k++] = *(orig++)))
     {
       break;
     }
-    else if (uppercasenext && !isspace((int) *(buf - 1)))
+    else if (k > 0 && uppercasenext && !isspace((int) lbuf[k - 1]))
     {
-      *(buf - 1) = UPPER(*(buf - 1));
+      lbuf[k - 1] = UPPER(lbuf[k - 1]);
       uppercasenext = FALSE;
     }
   }
-  *(--buf) = '\r';
-  *(++buf) = '\n';
-  *(++buf) = '\0';
+  if (k > 0)
+  lbuf[k - 1] = '\r';
+  lbuf[k] = '\n';
+  lbuf[k + 1] = '\0';
 
   if (to->desc)
     to->desc->Output("%s", CAP(lbuf));
@@ -3915,7 +3915,7 @@ void act(const char *str, int hide_invisible, Character *ch,
     }
     return;
   }
-  /* ASSUMPTION: at this point we know type must be TO_NOTVICT or TO_ROOM */
+  /** ASSUMPTION: at this point we know type must be TO_NOTVICT or TO_ROOM */
 
   if (ch && ch->in_room != NULL)
     to = ch->in_room->people;

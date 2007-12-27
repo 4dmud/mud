@@ -41,7 +41,6 @@ bool can_auction_item(Character * ch, struct obj_data * obj);
  * External global variables.
  */
 extern Character *character_list;
-extern struct room_data *world;
 
 void identify_object(Character *ch, OBJ_DATA *obj);
 /*

@@ -203,3 +203,7 @@ linkedlist.h
 ptrlist.cpp
 strutil.cpp
 strutil.h
+find.cpp
+character.h
+regen.h
+rooms.cpp

@@ -20,8 +20,6 @@
 #include "house.h"
 #include "constants.h"
 
-extern struct room_data *world_vnum[];
-extern struct index_data *obj_index;
 extern int load_qic_check(int rnum);
 extern const int xap_objs;
 extern int save_new_style;
@@ -163,6 +161,11 @@ int old_house_load(room_rnum rnum, FILE *fl)
         obj = read_object(nr, VIRTUAL);
         if (nr >= 999999 || !obj)
         {
+        log("Bad vnum in house %d, vnum %d", rnum->number, nr);
+        do {
+        get_line(fl, line);
+        } while (!feof(fl) && (*line != '#'));
+        
           continue;
         }
       }
@@ -500,10 +503,12 @@ void House_listrent(Character *ch, room_vnum vnum)
       if (real_object(object.item_number) > -1)
       {
         obj = read_object(object.item_number, VIRTUAL);
+        if (obj){
         ch->Send(  "[%5d] (%5dau) %s\r\n",
                          GET_OBJ_VNUM(obj), GET_OBJ_RENT(obj),
                          obj->short_description);
         free_obj(obj, FALSE);
+        }
       }
   }
 

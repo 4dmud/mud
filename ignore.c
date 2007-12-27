@@ -145,6 +145,8 @@ free_string(&i->ignore);
 free(i);
 }
 void free_ignorelist(Character *ch) {
+if (SPECIALS(ch)) {
 free_ignore(GET_IGNORELIST(ch));
 GET_IGNORELIST(ch) = NULL;
+}
 }

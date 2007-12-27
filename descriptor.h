@@ -32,6 +32,8 @@ public:
     int showstr_count;        /* number of pages to page through      */
     int showstr_page;         /* which page are we currently showing? */
     char **str;               /* for the modify-str system            */
+    bool real_string;
+    //string **sstr;
     char pagebuf[MAX_STRING_LENGTH];    /* personal buffer space                */
     char *backstr;       /* backup string for modify-str system  */
     size_t max_str;         /* maximum size of string in modify-str   */
@@ -73,15 +75,20 @@ public:
     Descriptor();
     ~Descriptor();
     size_t Output(const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
-    size_t Output(string i);
+    //size_t Output(string i);
+    size_t Output(string &i);
+    size_t Output(string *i);
+    size_t Output(stringstream &i);
     size_t vwrite_to_output(const char *format, va_list args);
-    string convert_mxp_tags (const int bMXP, string src);
+    string & convert_mxp_tags (const int bMXP, stringstream &ssrc);
+    string & convert_mxp_tags (const int bMXP, string &src);
     int count_mxp_tags (const int bMXP, const char *txt, int length);
     void turn_on_mxp ();
     char * send_mxp_status();
     bool pending_output();
     void close_socket();
     void flush_queues();
+    int process_input();
     template<typename T>
     Descriptor & operator<< (const T & i) {
         if (this) {

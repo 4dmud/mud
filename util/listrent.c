@@ -11,7 +11,7 @@
 
 #include "structs.h"
 
-void Crash_listrent(char *fname);
+void Crash_listrent(const char *fname);
 
 int main(int argc, char **argv)
 {
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 }
 
 
-void Crash_listrent(char *fname)
+void Crash_listrent(const char *fname)
 {
   FILE *fl;
   char buf[MAX_STRING_LENGTH];

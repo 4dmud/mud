@@ -15,7 +15,7 @@
 
 #define NOWHERE    -1		/* nil reference for room-database         */
 
-/* The cardinal directions: used as index to room_data.dir_option[] */
+/* The cardinal directions: used as index to Room.dir_option[] */
 #define NORTH          0
 #define EAST           1
 #define SOUTH          2
@@ -30,7 +30,7 @@
 		{ perror("malloc failure"); abort(); } } while(0)
 
 
-/* Exit info: used in room_data.dir_option.exit_info */
+/* Exit info: used in Room.dir_option.exit_info */
 #define EX_ISDOOR		(1 << 0)	/* Exit is a door          */
 #define EX_CLOSED		(1 << 1)	/* The door is closed      */
 #define EX_LOCKED		(1 << 2)	/* The door is locked      */
@@ -93,7 +93,7 @@ struct reset_com {
 
 
 
-struct zone_data {
+Zone {
   char *name;			/* name of this zone                  */
   int lifespan;			/* how long between resets (minutes)  */
   int age;			/* current age of this zone (minutes) */
@@ -111,7 +111,7 @@ struct zone_data {
 };
 
 /* ================== Memory Structure for room ======================= */
-struct room_data {
+Room {
   room_num number;		/* Rooms number (vnum)                */
   sh_int zone;			/* Room zone (for resetting)          */
   int sector_type;		/* sector type (move/hide)            */
@@ -131,7 +131,7 @@ struct room_data {
 *  declarations of most of the 'global' variables                         *
 ************************************************************************ */
 
-struct room_data *world_vnum[] = NULL;	/* array of rooms                */
+Room *world_vnum[] = NULL;	/* array of rooms                */
 int top_of_world = 0;		/* ref to top element of world   */
 
 
@@ -241,7 +241,7 @@ void index_boot(char *name)
     exit(1);
   }
   rec_count = count_hash_records(db_file);
-  CREATE(world, struct room_data, rec_count);
+  CREATE(world, Room, rec_count);
   rewind(db_file);
   discrete_load(db_file);
 }

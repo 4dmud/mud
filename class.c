@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.14  2006/08/13 06:26:50  w4dimenscor
+ * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
+ *
  * Revision 1.13  2006/06/19 06:25:39  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -936,7 +939,7 @@ void do_start(Character * ch)
   GET_COND(ch, FULL) = 24;
   GET_COND(ch, DRUNK) = -1;
 
-  check_regen_rates(ch);
+  ch->check_regen_rates();
 
   ch->player.time.played = 0;
   ch->player.time.logon = time(0);
@@ -1094,7 +1097,7 @@ void advance_level(Character * ch)
   GET_MOVE(ch) = (GET_MAX_MOVE(ch));
   GET_STAMINA(ch) = (GET_MAX_STAMINA(ch));
 
-  check_regen_rates(ch);
+  ch->check_regen_rates();
 
 }
 

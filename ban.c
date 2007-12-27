@@ -290,7 +290,7 @@ int Valid_Name(char *newname)
      * THIS SHOULD FIX THE 'invalid name' if disconnected from OLC-bug - WELCOR 9/00
      */
     for (dt = descriptor_list; dt; dt = dt->next)
-	if (dt->character && GET_NAME(dt->character)
+	if (dt->character && dt->character->player.name
 	    && !str_cmp(GET_NAME(dt->character), newname))
 	    if (GET_IDNUM(dt->character) == -1)
 		return (IS_PLAYING(dt));

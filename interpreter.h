@@ -14,7 +14,7 @@
 
 #define ACTION(name)  \
    long name(Character *ch, Character *vict, struct obj_data *obj, \
-   struct room_data *room, int *num)
+   Room *room, int *num)
 
 #define ASKILL(name)  \
    int name(Character *ch, Character *vict, \

@@ -24,12 +24,6 @@
  * External variable declarations.
  */
 extern struct shop_data *shop_index;
-extern Character *mob_proto;
-extern struct obj_data *obj_proto;
-extern struct room_data *world_vnum[];
-extern struct zone_data *zone_table;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 extern const char *trade_letters[];
 extern const char *shop_bits[];
 extern const char *item_types[];
@@ -92,7 +86,7 @@ ACMD(do_oasis_sedit)
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
         num = NOWHERE;
       else
-        num = genolc_zone_bottom(zlok);
+        num = zone_table[zlok].Bot();
     }
     
     if (num == NOWHERE) {
@@ -459,7 +453,7 @@ void sedit_disp_menu(Descriptor *d)
 
 	  cyn, OLC_NUM(d), nrm,
 	  grn, nrm, cyn, S_KEEPER(shop) == NOBODY ? -1 : mob_index[S_KEEPER(shop)].vnum,
-	  nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : mob_proto[S_KEEPER(shop)].player.short_descr,
+	  nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : mob_proto[S_KEEPER(shop)]->player.short_descr,
 	  grn, nrm, cyn, S_OPEN1(shop), nrm,
 	  grn, nrm, cyn, S_CLOSE1(shop),
 	  grn, nrm, cyn, S_OPEN2(shop), nrm,
