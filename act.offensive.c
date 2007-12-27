@@ -322,7 +322,7 @@ ACMD(do_hit)
           if (ch->master == vict)
             continue;
         }
-        continue;
+        //continue;
         if ((vict->master == ch) && AFF_FLAGGED(vict, AFF_CHARM))
           continue;
         if (!CAN_SEE(ch, vict))
@@ -333,7 +333,9 @@ ACMD(do_hit)
         {
           if (!IS_NPC(vict) && !IS_NPC(ch))
             continue;
-          
+        if (FIGHTING(vict))
+	    continue;
+	    
           send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
           new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
           if (!FIGHTING(ch))
@@ -346,8 +348,10 @@ ACMD(do_hit)
           }
         }
       }
+      /*
       if (!FIGHTING(ch))      
     send_to_char("They don't seem to be here.\r\n", ch);
+      */
       return;
     }
     #endif
