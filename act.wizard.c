@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.73  2007/06/10 08:18:13  w4dimenscor
+ * added new body parts CHEST and BACK
+ *
  * Revision 1.72  2007/06/10 06:59:18  w4dimenscor
  * added the ability for scripts to toggle body parts on and off, and imms to do so too
  *
@@ -5010,7 +5013,10 @@ int perform_set(Character *ch, Character *vict, int mode,
             snprintf(buf, sizeof(buf), "%s's body part %s is now %s", GET_NAME(vict),
                      val_arg, ONOFF(togglebody(vict, bodypartname(val_arg))));
         } else {
-            ch->Send("You can toggles these bits: \r\nthumb_r thumb_l saddle ear_tip\r\nshoulder_l shoulder_r crest thigh_l thigh_r \r\nknee_l knee_r floating\r\n");
+            ch->Send("You can toggle these bits: \r\n");
+			ch->Send("rthumb lthumb saddle eartip lshoulder\r\n");
+			ch->Send("rshoulder crest lthigh rthigh lknee\r\n");
+			ch->Send("rknee floating back chest\r\n");
         }
         break;
     default:

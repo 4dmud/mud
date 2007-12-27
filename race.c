@@ -79,34 +79,10 @@ int togglebody(Character *ch, int flag) {
 }
 
 int bodypartname(char *bpn) {
+int find_eq_pos_script(char *arg);
     if (!bpn && !*bpn)
-        return 0;
-    if (!str_cmp(bpn, "thumb_r"))
-        return BODY_THUMB_R;
-    if (!str_cmp(bpn, "thumb_l"))
-        return BODY_THUMB_L;
-    if (!str_cmp(bpn, "saddle"))
-        return BODY_SADDLE;
-    if (!str_cmp(bpn, "ear_tip"))
-        return BODY_EAR_TIP;
-    if (!str_cmp(bpn, "shoulder_l"))
-        return BODY_SHOULDER_L;
-    if (!str_cmp(bpn, "shoulder_r"))
-        return BODY_SHOULDER_R;
-    if (!str_cmp(bpn, "crest"))
-        return BODY_CREST;
-    if (!str_cmp(bpn, "thigh_l"))
-        return BODY_THIGH_L;
-    if (!str_cmp(bpn, "thigh_r"))
-        return BODY_THIGH_R;
-    if (!str_cmp(bpn, "knee_l"))
-        return BODY_KNEE_L;
-    if (!str_cmp(bpn, "knee_r"))
-        return BODY_KNEE_R;
-    if (!str_cmp(bpn, "floating"))
-        return BODY_FLOATING;
-
-    return 0;
+        return -1;
+    return find_eq_pos_script(bpn);
 }
 
 const char * race_name(Character *ch) {

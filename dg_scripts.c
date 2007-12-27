@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/04/12 13:08:18 $
-*  $Revision: 1.36 $
+*  $Date: 2007/06/10 08:18:13 $
+*  $Revision: 1.37 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.37  2007/06/10 08:18:13  w4dimenscor
+ * added new body parts CHEST and BACK
+ *
  * Revision 1.36  2007/04/12 13:08:18  w4dimenscor
  * Forgot to remove a little pie comment.
  * --Thotter
@@ -397,6 +400,8 @@ int find_eq_pos_script(char *arg) {
                    {"lknee", WEAR_KNEE_L},
                    {"rknee", WEAR_KNEE_R},
                    {"floating", WEAR_FLOATING},
+                   {"back", WEAR_BACK},
+                   {"chest", WEAR_CHEST},
                    {"none", -1}
                };
     if (is_number(arg) && (i = atoi(arg)) >= 0 && i < NUM_WEARS)
@@ -484,6 +489,10 @@ int can_wear_on_pos(struct obj_data *obj, int pos) {
         return CAN_WEAR(obj, ITEM_WEAR_KNEE);
     case WEAR_FLOATING:
         return CAN_WEAR(obj, ITEM_WEAR_FLOATING);
+        case WEAR_BACK:
+        return CAN_WEAR(obj, ITEM_WEAR_BACK);
+        case WEAR_CHEST:
+        return CAN_WEAR(obj, ITEM_WEAR_CHEST);
 
     default:
         return FALSE;

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.28  2007/06/10 08:18:13  w4dimenscor
+ * added new body parts CHEST and BACK
+ *
  * Revision 1.27  2007/06/10 04:48:03  w4dimenscor
  * Needed to add the new professions and pgrp to this so they
  * would show up in the "prof" command.
@@ -942,7 +945,7 @@ const char *where[] =
     "<focusing through>    ",
     "<on right thumb>      ",
     "<on left thumb>       ",
-    "<on over back>        ",
+    "<worn as saddle>      ",
     "<through ear tip>     ",
     "<on left shoulder>    ",
     "<on right shoulder>   ",
@@ -951,7 +954,9 @@ const char *where[] =
     "<on right thigh>      ",
     "<on left knee>        ",
     "<on right knee>       ",
-    "<floating around>     "
+    "<floating around>     ",
+    "<worn on back>        ",
+    "<worn on chest>       "
   };
 const char *body_pos[] =
   {
@@ -1214,8 +1219,10 @@ const int wear_order_index[NUM_WEARS] =
     WEAR_SHOULDER_R,
     WEAR_SHOULDER_L,
     WEAR_ABOUT,
+    WEAR_BACK,
     WEAR_BODY,
     WEAR_SADDLE,
+    WEAR_CHEST,
     WEAR_CREST,
     WEAR_ARMS,
     WEAR_WRIST_R,
@@ -1381,6 +1388,8 @@ const char *wear_bits[] =
     "THIGH",
     "KNEE",
     "FLOATING",
+    "BACK",
+    "CHEST",
     "\n"
   };
 

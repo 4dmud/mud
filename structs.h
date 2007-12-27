@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.60  2007/06/10 08:18:13  w4dimenscor
+ * added new body parts CHEST and BACK
+ *
  * Revision 1.59  2007/06/10 02:18:40  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -823,8 +826,10 @@ class Room;
 #define WEAR_KNEE_L     41
 #define WEAR_KNEE_R     42
 #define WEAR_FLOATING   43
+#define WEAR_BACK       44
+#define WEAR_CHEST      45
 
-#define NUM_WEARS      44     /* This must be the # of eq positions!! */
+#define NUM_WEARS      46     /* This must be the # of eq positions!! */
 
 //**  This controls which body part that a race has.. It does not
 //** control where an item can be worn, but rather if it can be
@@ -874,6 +879,8 @@ class Room;
 #define BODY_KNEE_L     (1 << 9)
 #define BODY_KNEE_R     (1 << 10)
 #define BODY_FLOATING   (1 << 11)
+#define BODY_BACK   (1 << 12)
+#define BODY_CHEST   (1 << 13)
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */
 #define ITEM_WEAR_TAKE        0    /* Item can be taken         */
@@ -905,6 +912,8 @@ class Room;
 #define ITEM_WEAR_THIGH              26
 #define ITEM_WEAR_KNEE               27
 #define ITEM_WEAR_FLOATING           28
+#define ITEM_WEAR_BACK           29
+#define ITEM_WEAR_CHEST           30
 /* object-related defines ********************************************/
 
 /* Item types: used by obj_data.obj_flags.type_flag */
