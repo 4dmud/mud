@@ -171,6 +171,7 @@ struct player_special_data dummy_mob;	/* dummy spec area for mobs     */
 struct reset_q_type reset_q;	/* queue of zones to be reset    */
 
 /* local functions */
+void free_zone_list(struct zone_list_data *z);
 int check_bitvector_names(bitvector_t bits, size_t namecount, const char *whatami, const char *whatbits);	//mord??
 int check_object_spell_number(struct obj_data *obj, int val, int nr);
 int check_object_level(struct obj_data *obj, int val, int nr);
@@ -406,16 +407,11 @@ static int zone_compare(const void *a, const void *b)
   aa = *(const struct zone_list_data **)a;
   bb = *(const struct zone_list_data **)b;
 
-  if (aa->num < bb->num)
-    return -1;
-  else if (aa->num > bb->num)
-    return 1;
-  else
-    return 0;
+  return bb->num - aa->num;
 }
 void sort_zone_list(int total)
 {
-  struct zone_list_data *temp_list[total + 1], *temp;
+  struct zone_list_data *temp_list[total + 1], *temp, *ztmp;
   int i;
   for (i = 0, temp = zone_list; i<total && temp; temp = temp->next, i++)
   {
@@ -429,11 +425,28 @@ void sort_zone_list(int total)
 #endif
   qsort(temp_list,total,sizeof(temp_list[0]),zone_compare);
 #if 1
+temp = zone_list;
+ztmp = zone_list;
+zone_list = NULL;
   for (i=0;i<total;i++)
   {
     log("After  - %d", temp_list[i]->num);
+    CREATE(temp, struct zone_list_data, 1);
+    temp->num = temp_list[i]->num;
+    strcpy(temp->zone, temp_list[i]->zone);
+    temp->next = zone_list;
+    zone_list = temp;
+    
   }
+  free_zone_list(ztmp);
 #endif
+
+  /*for (i = 0, temp = zone_list; i<total && temp; temp = temp->next, i++)
+  {
+    temp->num = temp_list[i]->num;
+    log("After2  - %d", temp_list[i]->num);
+    strcpy(temp->zone, temp_list[i]->zone);
+  }*/
 }
 
 
@@ -483,7 +496,7 @@ int create_zone_index(void)
   if (eps)
     free(eps);
   log(" -- sorting zones");
-  //sort_zone_list(total);
+  sort_zone_list(total);
   return 0;
 
 }
