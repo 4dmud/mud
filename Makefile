@@ -3,8 +3,9 @@
 #
 
 # C compiler to use
-#CC = insure
-CC = gcc-3.4
+# CC = insure
+CC = gcc
+
 
 # Path to cxref utility
 CXREF = cxref
@@ -68,6 +69,7 @@ CXREF_FILES = act.comm.c act.create.c act.informative.c act.item.c \
 SRC = *.c
 
 INC = *.h
+
 
 default: all
 
