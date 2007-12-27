@@ -304,10 +304,9 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3) {
     return (1);
 }
 void check_all_trees(void) {
-    //TODO: this, .. i don't think works right
     struct obj_data *obj, *tmp;
     time_t tm;
-    int ext = 0, added = 0;
+    int ext = 0, added = 0, created = 0;
     tm = time(0);
     log("TREES: Updating all trees...");
 
@@ -331,9 +330,10 @@ void check_all_trees(void) {
             /*tree check*/
         }
     }
+    created = TREE_MAX - tree_total;
 
-    save_forest();
-    log("TREES: Update complete. Created: %d Destroyed: %d", added, ext);
+    create_trees();
+    log("TREES: Update complete. Updated: %d Destroyed: %d, Created: %d", added, ext, created);
 
 }
 
