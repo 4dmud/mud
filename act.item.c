@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.60  2007/11/14 09:37:16  w4dimenscor
+ * Fixed unhitch failure to have a better message. Also fixed the donation room issue where the item would just dissapear
+ *
  * Revision 1.59  2007/11/14 09:20:41  w4dimenscor
  * Fixed crash bug with hitch. Fixed crash bug with finger nonexistant player. and adding new players to the management screen
  *
@@ -1578,7 +1581,7 @@ ACMD(do_drop) {
             RDR = donationrooms[2];
             break;
 	default:
-	    RDR == NULL;
+	    RDR = NULL;
 	    break;
         }
         if (RDR == NULL) {
@@ -3554,7 +3557,10 @@ ACMD(do_unhitch) {
         if (obj->hitched)
             vict = obj->hitched;
     }
-
+    if (!(obj && obj->hitched) || !(vict && vict->hitched)) {
+	    ch->Send("Sorry but that isn't hitched.\r\n");
+	    return;
+    }
     if (vict == ch) {
         act("You unhitch $p from yourself.", TRUE, ch, obj, vict, TO_CHAR);
         act("$n unhitches $p from $mself.", TRUE, ch, obj, vict, TO_ROOM);
