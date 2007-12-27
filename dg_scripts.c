@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 08:51:14 $
-*  $Revision: 1.14 $
+*  $Date: 2005/08/19 09:31:43 $
+*  $Revision: 1.15 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.15  2005/08/19 09:31:43  w4dimenscor
+ * fixed issue with FUNCTIONS not passing back vars, maybe.
+ *
  * Revision 1.14  2005/08/19 08:51:14  w4dimenscor
  * fixed the variables not working
  *
@@ -2495,6 +2498,7 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   trig_vnum vnum;
+  struct trig_var_data *vd = NULL;
   cmd = any_one_arg(cmd, buf); /* remove 'function ' */
   cmd = any_one_arg(cmd, buf); /* vnum in buf, cmd is rest. */
   skip_spaces(&cmd);
@@ -2543,7 +2547,9 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
 
   add_var(&GET_TRIG_VARS(parent), "args", cmd, 0);
 
-  GET_TRIG_VARS(t) = GET_TRIG_VARS(parent);
+ for (vd = GET_TRIG_VARS(parent); vd; vd = vd->next)
+     add_var(&GET_TRIG_VARS(trig), vd->name, vd->value, vd->context);
+
   t->parent = parent;
   script_driver(&go, t, type, TRIG_NEW);
 }
@@ -3341,7 +3347,12 @@ if (go) {
   }
 
   /** if you have a parent, let the parent continue on where you left off **/
-  if (!trig->parent && (sc))
+if (trig->parent && sc) {
+struct trig_var_data *vd = NULL;
+ for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next)
+     add_var(&GET_TRIG_VARS(trig->perent), vd->name, vd->value, vd->context);
+} 
+if (sc)
     free_varlist(GET_TRIG_VARS(trig));
   GET_TRIG_VARS(trig) = NULL;
   GET_TRIG_DEPTH(trig) = 0;
