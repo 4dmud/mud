@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/05 05:26:17 $
-*  $Revision: 1.6 $
+*  $Date: 2005/02/09 09:23:44 $
+*  $Revision: 1.7 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.7  2005/02/09 09:23:44  w4dimenscor
+ * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
+ *
  * Revision 1.6  2005/02/05 05:26:17  w4dimenscor
  * Added tsearch command to full text search triggers
  *
@@ -738,11 +741,12 @@ obj_data *get_obj_in_room(room_data * room, char *name)
 
   if (*name == UID_CHAR)
     return find_obj(atoi(name+1));
-if (room) {
-  for (obj = room->contents; obj; obj = obj->next_content)
-    if (isname(name, obj->name))
-      return obj;
-}
+  if (room)
+  {
+    for (obj = room->contents; obj; obj = obj->next_content)
+      if (isname(name, obj->name))
+        return obj;
+  }
 
   return NULL;
 }
@@ -1630,7 +1634,7 @@ int count_dots(char *str)
 #if 0
 int is_num(char *arg)
 {
-char *p = arg;
+  char *p = arg;
   if (*arg == '\0')
     return FALSE;
 
@@ -1646,10 +1650,11 @@ char *p = arg;
   return TRUE;
 }
 #else
-int is_num(char *num) {
-while (*num && (isdigit(*num) || *num == '-')) num++;
-if (!*num || isspace(*num)) return 1;
-return 0;
+int is_num(char *num)
+{
+  while (*num && (isdigit(*num) || *num == '-')) num++;
+  if (!*num || isspace(*num)) return 1;
+  return 0;
 }
 #endif
 
@@ -1990,7 +1995,7 @@ struct cmdlist_element *find_else_end(trig_data *trig,
     if (!strn_cmp("if ", p, 3))
       c = find_end(trig, c);
 
-    else if (!strn_cmp("elseif ", p, 7))
+    else if (!strn_cmp("elseif ", p, 7) || !strn_cmp("else if ", p, 8))
     {
       if (process_if(p + 7, go, sc, trig, type))
       {
@@ -2923,6 +2928,7 @@ int process_return(trig_data *trig, char *cmd)
                   {
                     static int depth = 0;
                     int ret_val = 1;
+		    int brac = 0;
                     struct cmdlist_element *cl;
                     char cmd[MAX_INPUT_LENGTH], *p;
                     struct script_data *sc = 0;
@@ -2936,6 +2942,7 @@ int process_return(trig_data *trig, char *cmd)
 
                     void obj_command_interpreter(obj_data * obj, char *argument);
                     void wld_command_interpreter(struct room_data *room, char *argument);
+		    int check_braces(char *str);
 
                     if (depth > MAX_SCRIPT_DEPTH)
                     {
@@ -3017,7 +3024,7 @@ int process_return(trig_data *trig, char *cmd)
                     {
 
 
-                      if (!strcmp(cl->cmd, ""))
+                      if (!cl || !cl->cmd || !strcmp(cl->cmd, ""))
                       {
                         script_log(
                           "Trigger: %s, VNum %d. has no command",
@@ -3029,6 +3036,11 @@ int process_return(trig_data *trig, char *cmd)
                       if (*p == '*')		/* comment */
                         continue;
 
+                      if ((brac = check_braces(p)) != 0)
+                      {
+                        script_log( "Unmatched %s bracket in trigger %d!", brac < 0 ? "right" : "left", GET_TRIG_VNUM(trig));
+                      }
+
                       else if (!strn_cmp(p, "if ", 3))
                       {
                         if (process_if(p + 3, go, sc, trig, type))
@@ -3037,7 +3049,7 @@ int process_return(trig_data *trig, char *cmd)
                           cl = find_else_end(trig, cl, go, sc, type);
                       }
 
-                      else if (!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4))
+                      else if (!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4) || !strn_cmp("else if ", p, 8))
                       {
                         /*
                          * if not in an if-block, ignore the extra 'else[if]' and warn about it
@@ -3627,15 +3639,16 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
       log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
       //return NULL;
     }
-    #if 1
+#if 1
     for (tch = character_list; tch; tch = tch->next)
-    if (GET_ID(tch) == GET_ID(ch))
-    if (tch != ch) {
-    log("ERROR: lookup table contains wrong character in it!");
-    ch = tch;
-    break;
-    }
-    #endif
+      if (GET_ID(tch) == GET_ID(ch))
+        if (tch != ch)
+        {
+          log("ERROR: lookup table contains wrong character in it!");
+          ch = tch;
+          break;
+        }
+#endif
     return ch;
   }
 

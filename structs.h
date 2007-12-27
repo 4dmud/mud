@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.9  2005/02/09 09:23:44  w4dimenscor
+ * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
+ *
  * Revision 1.8  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -1350,8 +1353,28 @@ struct room_direction_data
   obj_vnum key;		/* Key's number (-1 for no key)         */
   struct room_data * to_room;		/* Where direction leads (NOWHERE)      */
   room_vnum to_room_tmp;
+  int nosave;
+};
+struct mine_rooms
+  {
+    room_vnum room;
+    struct mine_rooms *next;
+  };
+struct mine_list
+{
+int size;
+int number;
+struct mine_rooms *rooms;
+struct mine_list *next;
 };
 
+#define TOOL_SHOVEL 0
+#define TOOL_PICKAXE 1
+struct room_mine_data {
+int num;
+int dif;
+int tool;
+};
 
 /* ================== Memory Structure for room ======================= */
 struct room_data
@@ -1369,6 +1392,7 @@ struct room_data
   struct extra_descr_data *look_under_description;	/* for look under   */
   struct room_direction_data *dir_option[NUM_OF_DIRS];	/* Directions   */
   int room_flags[RF_ARRAY_MAX];	/* DEATH,DARK ... etc           */
+  struct room_mine_data mine;
 
   byte light;			/* Number of lightsources in room       */
   SPECIAL(*func);

@@ -312,6 +312,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define REDIT_LOOK_UNDER_KEY            26
 #define REDIT_LOOK_UNDER_DESCRIPTION    27
 #define REDIT_DELETE			28
+#define REDIT_MINE_MENU			29
+#define REDIT_MINE_NUMBER			30
+#define REDIT_MINE_DIFFICULTY			31
+#define REDIT_MINE_TOOL			32
 
 /*
  * Submodes of ZEDIT connectedness.

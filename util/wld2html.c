@@ -391,6 +391,7 @@ void setup_dir(FILE * fl, int room, int dir)
 
   world[room].dir_option[dir]->key = t[1];
   world[room].dir_option[dir]->to_room = t[2];
+   world[room].dir_option[dir]->nosave = 0;
 }
 
 

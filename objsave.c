@@ -797,7 +797,6 @@ void Crash_crashsave(struct char_data *ch)
   {
 
     log("Saving %s eq when they are linkless", GET_NAME(ch));
-    Crash_crashsave(ch);
     return;
   }
   if (!IS_PLAYING(ch->desc))
@@ -906,7 +905,6 @@ void Crash_rentsave(struct char_data *ch, int cost)
   {
 
     log("Saving %s eq when they are linkless", GET_NAME(ch));
-    Crash_crashsave(ch);
     return;
   }
   if (!IS_PLAYING(ch->desc))

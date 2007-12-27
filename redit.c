@@ -178,6 +178,9 @@ void redit_setup_new(struct descriptor_data *d)
   OLC_ROOM(d)->smell = strdup("You smell nothing of interest.\r\n");
   OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   OLC_ROOM(d)->number = NOWHERE;
+  OLC_ROOM(d)->mine.num = -1;
+  OLC_ROOM(d)->mine.dif = -1;
+  OLC_ROOM(d)->mine.tool = 0;
   OLC_ITEM_TYPE(d) = WLD_TRIGGER;
   OLC_ROOM(d)->proto_script = OLC_SCRIPT(d) = NULL;
   redit_disp_menu(d);
@@ -194,7 +197,7 @@ void redit_setup_existing(struct descriptor_data *d, room_vnum v_num)
   CREATE(OLC_ROOM(d), struct room_data, 1);
 
   *OLC_ROOM(d) = *world_vnum[v_num];
-  
+
   copy_room_strings(OLC_ROOM(d), world_vnum[v_num]);
   /*
    * Attach copy of room to player's descriptor.
@@ -271,11 +274,11 @@ void redit_save_internally(struct descriptor_data *d)
           break;
         }
     }/* else if (STATE(dsc) == CON_REDIT) {
-          for (j = 0; j < NUM_OF_DIRS; j++)
-            if (OLC_ROOM(dsc)->dir_option[j])
-              if (OLC_ROOM(dsc)->dir_option[j]->to_room >= room_num)
-                OLC_ROOM(dsc)->dir_option[j]->to_room++;
-        }*/
+              for (j = 0; j < NUM_OF_DIRS; j++)
+                if (OLC_ROOM(dsc)->dir_option[j])
+                  if (OLC_ROOM(dsc)->dir_option[j]->to_room >= room_num)
+                    OLC_ROOM(dsc)->dir_option[j]->to_room++;
+            }*/
   }
 }
 
@@ -304,7 +307,21 @@ void free_room(struct room_data *room)
 /**************************************************************************
  Menu functions 
  **************************************************************************/
-
+void redit_disp_mine_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+                  "%s1%s) Mine Number     : %s%d\r\n"
+                  "%s2%s) Mine difficulty : %s%d\r\n"
+		  "%s3%s) Mine Tool Needed: %s%s%s\r\n",
+                  grn, nrm, yel, OLC_ROOM(d)->mine.num,
+                  grn, nrm, yel, OLC_ROOM(d)->mine.dif,
+		  grn, nrm, yel, OLC_ROOM(d)->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe",
+                  nrm
+                 );
+write_to_output(d, "(Setting Mine Number as -1 will remove room from a mine) \r\n");	 
+write_to_output(d, "Enter choice (0 to quit) : ");
+OLC_MODE(d) = REDIT_MINE_MENU;
+}
 /*
  * For extra descriptions.
  */
@@ -515,6 +532,7 @@ void redit_disp_menu(struct descriptor_data *d)
                   "%sG%s) Descriptions :%s Look above\r\n"
                   "%sH%s) Smell        :\r\n%s%s"
                   "%sI%s) Listen       :\r\n%s%s"
+		  "%sJ%s) Mine         : %sNum: %d Difficulty: %d Tool: %s\r\n"
 
                   /*---end-------------------------------------*/
                   "%sS%s) Script       : %s%s\r\n"
@@ -564,6 +582,7 @@ void redit_disp_menu(struct descriptor_data *d)
                   grn, nrm, cyn,/* above */
                   grn, nrm, cyn, room->smell,/* smell */
                   grn, nrm, cyn, room->listen,/* listen */
+		  grn, nrm, cyn, room->mine.num, room->mine.dif, room->mine.num == -1 ? "None" : room->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe",
                   grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
                   grn, nrm,/*delete*/
                   grn, nrm /*quit*/
@@ -776,6 +795,10 @@ void redit_parse(struct descriptor_data *d, char *arg)
       OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
       dg_script_menu(d);
       return;
+      case 'j':
+      case 'J':
+      redit_disp_mine_menu(d);
+      return;
     default:
       write_to_output(d, "Invalid choice!");
       redit_disp_menu(d);
@@ -783,7 +806,57 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
     return;
 
-
+  case REDIT_MINE_MENU:
+  switch (*arg) {
+  case '0':
+      break;
+    case '1':
+      OLC_MODE(d) = REDIT_MINE_NUMBER;
+      write_to_output(d, "Enter Mine Number : ");
+      return;
+    case '2':
+      OLC_MODE(d) = REDIT_MINE_DIFFICULTY;
+      write_to_output(d, "Enter Mine Difficulty :");
+      return;
+          case '3':
+      OLC_MODE(d) = REDIT_MINE_TOOL;
+      write_to_output(d, "0) Shovel\r\n1) Pickaxe\r\nEnter a number:");
+      return;
+      }
+      break;
+  case REDIT_MINE_NUMBER:
+  number = atoi(arg);
+  if (number < -1) {
+  write_to_output(d, "You can't choose a number below -1\r\n");
+  return;
+  } else if (number > 100) {
+  write_to_output(d, "You can't choose a number above 100\r\n");
+  return;
+  }
+  OLC_ROOM(d)->mine.num = number;
+  break;
+  case REDIT_MINE_DIFFICULTY:
+  number = atoi(arg);
+  if (number < 0) {
+  write_to_output(d, "You can't choose a number below 0\r\n");
+  return;
+  } else if (number > 5) {
+  write_to_output(d, "You can't choose a number above 5\r\n");
+  return;
+  }
+  OLC_ROOM(d)->mine.dif = number;
+  break;
+  case REDIT_MINE_TOOL:
+  number = atoi(arg);
+  if (number < 0) {
+  write_to_output(d, "You can't choose a number below 0\r\n");
+  return;
+  } else if (number > 1) {
+  write_to_output(d, "You can't choose a number above 1\r\n");
+  return;
+  }
+  OLC_ROOM(d)->mine.tool = number;
+  break;
 
   case OLC_SCRIPT_EDIT:
     if (dg_script_edit_parse(d, arg)) return;

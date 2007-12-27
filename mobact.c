@@ -122,8 +122,10 @@ void mobile_activity(void)
 	if (!FIGHTING(ch) && (MOB_FLAGGED(ch, MOB_AGGRESSIVE)
 	    || MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN))) {
 	    found = FALSE;
+	    CHAR_DATA *vnext;
 	    for (vict = IN_ROOM(ch)->people; vict && !found;
-		 vict = vict->next_in_room) {
+		 vict = vnext) {
+		 vnext = vict->next_in_room;
 		if (IS_NPC(vict) || !CAN_SEE(ch, vict)
 		    || PRF_FLAGGED(vict, PRF_NOHASSLE))
 		    continue;

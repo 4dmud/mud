@@ -417,7 +417,7 @@ int save_rooms(zone_rnum rzone)
        */
       for (j = 0; j < NUM_OF_DIRS; j++)
       {
-        if (R_EXIT(room, j))
+        if (R_EXIT(room, j) && !R_EXIT(room, j)->nosave)
         {
           int dflag;
           if (R_EXIT(room, j)->general_description)
@@ -504,10 +504,11 @@ int save_rooms(zone_rnum rzone)
                   "%s~\n", ex_desc->keyword, buf);
         }
       }
-      if (room->mine) {
+      if (room->mine.num != -1) {
       fprintf(sf,	"M\n"
                   "%d\n"
-                  "%d\n", room->mine->num, room->mine->difficulty);
+                  "%d\n"
+		  "%d\n", room->mine.num, room->mine.dif,room->mine.tool);
       }
 
       fprintf(sf, "S\n");

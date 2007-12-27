@@ -25,13 +25,12 @@ EVENTFUNC(message_event);
 void mine_damage(struct char_data *vict, int dam);
 void send_char_pos(struct char_data *ch, int dam);
 void die(struct char_data *ch, struct char_data *killer);
-
+struct mine_list *mine_shafts = NULL;
 
 
 ASUB(sub_tunneling)
 {
   room_rnum rm = IN_ROOM(ch);
-  room_vnum vrm = GET_ROOM_VNUM(rm);
   struct message_event_obj *msg = NULL;
   char direction[MAX_INPUT_LENGTH];
   int dir, pick = TRUE, hard = FALSE, soft = FALSE, density;
@@ -68,36 +67,24 @@ ASUB(sub_tunneling)
     return SUB_UNDEFINED;
   }
 
-  if ((hard = (str_str(rm->name, "rock") || str_str(rm->name, "hard") ||
-               str_str(rm->name, "mine") || str_str(rm->name, "cave"  )))
-      && pick == FALSE)
+  if ((hard = (rm->mine.tool == TOOL_PICKAXE)) && pick == FALSE)
   {
     new_send_to_char(ch, "Sorry but you need a pickaxe to tunnel there.\r\n");
     return SUB_UNDEFINED;
   }
 
-  if ((soft = (str_str(rm->name, "sand") || str_str(rm->name, "earth") ||
-               str_str(rm->name, "soft")) )
-      && pick == TRUE)
+  if ((soft =  (rm->mine.tool == TOOL_SHOVEL) ) && pick == TRUE)
   {
     new_send_to_char(ch, "Sorry but you need a shovel to tunnel there.\r\n");
     return SUB_UNDEFINED;
   }
 
-  if (!hard && !soft && (vrm > 55000 || vrm < 54000))
+  if (!hard && !soft && rm->mine.num == -1)
   {
     new_send_to_char(ch, "Sorry, this place cannot be tunneled.\r\n");
     return SUB_UNDEFINED;
   }
-  if (str_str(rm->name, "bridge") || str_str(rm->name, "moria") ||
-      str_str(rm->name, "abyss" ) || str_str(rm->name, "bat"  ) ||
-      str_str(rm->name, "heart" ) || str_str(rm->name, "stalactite") ||
-      str_str(rm->name, "cart"  ) || str_str(rm->name, "lake") ||
-      (vrm >= 54831 && vrm <= 54899))
-  {
-    new_send_to_char(ch, "Sorry, this place cannot be tunneled.\r\n");
-    return SUB_UNDEFINED;
-  }
+  
 
   one_argument(argument, direction);
 
@@ -131,7 +118,7 @@ ASUB(sub_tunneling)
     new_send_to_char(ch, "Invalid direction! Directions are: north south east west up down.\r\n");
     return SUB_UNDEFINED;
   }
-  if ((dir != DOWN && (vrm > 55000 || vrm < 54000)) || W_EXIT(rm, dir))
+  if ((dir != DOWN && (rm->mine.num == -1)) || W_EXIT(rm, dir))
   {
     new_send_to_char(ch, "There is no good mining area that direction.\r\n");
     return SUB_UNDEFINED;
@@ -254,90 +241,150 @@ void check_mine_traps(struct char_data *ch)
         end
 */
 
-void make_tunnel(struct char_data *ch)
-{
-  room_vnum vrm = GET_ROOM_VNUM(IN_ROOM(ch));
-  room_vnum newroom = NOWHERE;
-  room_rnum rnew = NULL;
-  int size = 0, pass = TRUE, level = 0;
-  char description[MAX_INPUT_LENGTH];
-  struct room_direction_data *exit;
-  struct mine_info
+void add_room_to_mine(room_rnum room) {
+room_vnum vrm;
+if (!room)
+return;
+vrm = GET_ROOM_VNUM(room);
+if (room->mine.num == -1 && (vrm < 54000 || vrm > 54999))
+return;
+if ((vrm >= 54000 || vrm <= 54999) && room->mine.num == -1) {
+if (str_str(room->name, "bridge") || str_str(room->name, "moria") ||
+      str_str(room->name, "abyss" ) || str_str(room->name, "bat"  ) ||
+      str_str(room->name, "heart" ) || str_str(room->name, "stalactite") ||
+      str_str(room->name, "cart"  ) || str_str(room->name, "lake") ||
+      (vrm >= 54831 && vrm <= 54899))
   {
-    int size;
-    room_vnum start;
+    return ;
   }
-  mine_shaft[] = {
-                   {0, 0},
-                   {200, 54000},
-                   {200, 54200},
-                   {200, 54400},
-                   {200, 54600},
-                   {100, 54800},
-                   {100, 54900}
-                 };
+room->mine.num = 0;
+if  (str_str(room->name, "sand") || str_str(room->name, "earth") || str_str(room->name, "soft"))
+room->mine.tool = TOOL_SHOVEL;
+else if (str_str(room->name, "rock") || str_str(room->name, "hard") ||
+               str_str(room->name, "mine") || str_str(room->name, "cave"))
+room->mine.tool = TOOL_PICKAXE;
+else
+room->mine.tool = TOOL_SHOVEL;
 
-  if (vrm > 55000 || vrm < 54000)
+if (vrm>=54000 && vrm<=54199) 
   {
-    level = 0;
-  }
-  else if (vrm>=54000 && vrm<=54199)
-  {
-    level = 1;
+    room->mine.dif = 0;
   }
   else if (vrm>=54200 && vrm<=54399)
   {
-    level = 2;
+    room->mine.dif = 1;
   }
   else if (vrm>=54400 && vrm<=54599)
   {
-    level = 3;
+    room->mine.dif = 2;
   }
   else if (vrm>=54600 && vrm<=54799)
   {
-    level = 4;
+    room->mine.dif = 3;
   }
   else if (vrm>=54800 && vrm<=54899)
   {
-    level = 5;
+    room->mine.dif = 4;
   }
   else if (vrm>=54900 && vrm<=54999)
   {
-    level = 6;
+    room->mine.dif = 5;
+  } 
+
+}
+
+/** add room to mine list along with all others in the same shaft **/
+{
+struct mine_list *shaft;
+struct mine_rooms *mr;
+for (shaft = mine_shafts; shaft; shaft = shaft->next) {
+if (shaft->number == room->mine.num) {
+shaft->size++;
+CREATE(mr, struct mine_rooms, 1);
+mr->room = vrm;
+mr->next = shaft->rooms;
+shaft->rooms = mr;
+return;
+}
+}
+
+CREATE(shaft, struct mine_list, 1);
+shaft->size=1;
+shaft->number = room->mine.num;
+shaft->rooms = NULL;
+shaft->next = mine_shafts;
+mine_shafts = shaft;
+CREATE(mr, struct mine_rooms, 1);
+mr->room = vrm;
+mr->next = shaft->rooms;
+shaft->rooms = mr;
+return;
+
+}
+
+}
+
+room_vnum find_mine_room(int num, int dif) {
+struct mine_list *shaft;
+struct mine_rooms *mr;
+for (shaft = mine_shafts; shaft; shaft = shaft->next) {
+if (shaft->number == num) {
+int rnd = number(1, shaft->size);
+for (mr = shaft->rooms;mr && rnd--;mr = mr->next);
+return mr->room;
+}
+}
+return -1;
+}
+
+void make_tunnel(struct char_data *ch)
+{
+  room_vnum newroom = NOWHERE;
+  room_rnum rnew = NULL;
+  int pass = TRUE, level = 0;
+  char description[MAX_INPUT_LENGTH];
+  struct room_direction_data *exit;
+  
+if (IN_ROOM(ch)->mine.num == -1) {
+  
+  } else {
+  if (IN_ROOM(ch)->mine.dif == -1)
+  level = 1;
+  else
+  level = IN_ROOM(ch)->mine.dif+1;
   }
 
-  if (level == 0 && MINE_DIR(ch) != DOWN)
+  if (level == 0 && MINE_DIR(ch) != DOWN) {
+  new_send_to_char(ch, "You can't mine there.\r\n");
     return;
-  else if (level == 1 && MINE_DIR(ch) == UP)
+  } else if (level == 1 && MINE_DIR(ch) == UP)
   {
     new_send_to_char(ch, "You can't seem to break through.\r\n");
+    return;
+  } else if (level == 6 && MINE_DIR(ch) == DOWN) {
+  new_send_to_char(ch, "You can't mine there.\r\n");
     return;
   }
 
   switch (MINE_DIR(ch))
   {
   case DOWN:
-    newroom = mine_shaft[level + (level == 6 ? 0 : 1)].start;
-    size = mine_shaft[level + (level == 6 ? 0 : 1)].size;
+    newroom = find_mine_room(IN_ROOM(ch)->mine.num, IN_ROOM(ch)->mine.dif + 1);
     break;
   case UP:
-    newroom = mine_shaft[level - 1].start;
-    size =  mine_shaft[level - 1].size;
+    newroom = find_mine_room(IN_ROOM(ch)->mine.num, IN_ROOM(ch)->mine.dif - 1);
     break;
   default:
-    newroom = mine_shaft[level].start;
-    size = mine_shaft[level].size;
+    newroom = find_mine_room(IN_ROOM(ch)->mine.num, IN_ROOM(ch)->mine.dif);
     break;
   }
-  newroom += number(0, size - (size/10));
-  if (number(0, 110) < MINE_BONUS(ch))
-    newroom += size/10;
 
-  if ((rnew = world_vnum[newroom]) == NULL)
+  if (newroom == -1 || (rnew = world_vnum[newroom]) == NULL)
     return;
 
   if (W_EXIT(rnew, rev_dir[MINE_DIR(ch)]))
     pass = FALSE;
+  /*
   else if (newroom >= 54831 && newroom <= 54899)
     pass = FALSE;
   else if (str_str(rnew->name, "Bridge") || str_str(rnew->name, "Moria") ||
@@ -345,6 +392,7 @@ void make_tunnel(struct char_data *ch)
            str_str(rnew->name, "Stalactite") || str_str(rnew->name, "Heart") ||
            str_str(rnew->name, "Lake") || str_str(rnew->name, "Cart"))
     pass = FALSE;
+    */
 
   CREATE(exit, struct room_direction_data, 1);
   (IN_ROOM(ch))->dir_option[MINE_DIR(ch)] = exit;
@@ -354,6 +402,7 @@ void make_tunnel(struct char_data *ch)
     exit->key = NOTHING;
     exit->exit_info = 0;
     exit->keyword = NULL;
+    exit->nosave = 1;
     snprintf(description, sizeof(description), "A cave-in made by %s.\r\n", GET_NAME(ch));
     exit->general_description = str_dup(description);
     new_send_to_char(ch, "As your last strike hits the %s wall it collapses in a cave-in.\r\n", dirs[MINE_DIR(ch)]);
@@ -365,6 +414,7 @@ void make_tunnel(struct char_data *ch)
     exit->key = NOTHING;
     exit->exit_info = 0;
     exit->keyword = NULL;
+    exit->nosave = 1;
     snprintf(description, sizeof(description), "A tunnel entrance made by %s.\r\n", GET_NAME(ch));
     exit->general_description = str_dup(description);
     CREATE(exit, struct room_direction_data, 1);

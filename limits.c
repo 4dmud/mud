@@ -759,6 +759,7 @@ void check_idling(struct char_data *ch)
     }
     else if (ch->char_specials.timer > CONFIG_IDLE_RENT_TIME)
     {
+    struct obj_data *obj, *onext;
       if (IN_ROOM(ch) != NULL)
         char_from_room(ch);
       char_to_room(ch, world_vnum[3]);
@@ -776,6 +777,12 @@ void check_idling(struct char_data *ch)
       Crash_rentsave(ch, 0);
       new_mudlog(CMP, LVL_GOD, TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
       extract_char(ch);
+      if (real_room(3)) {
+      for (obj = world_vnum[3]->contents; obj; obj = onext) {
+      onext = obj->next_content;
+      extract_obj(obj);
+      }
+      }
     }
   }
 }

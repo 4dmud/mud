@@ -618,10 +618,9 @@ ACMD(do_flee)
         if (was_fighting && !DEAD(was_fighting) && !IS_NPC(ch) && IS_NPC(was_fighting) &&
             !(GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0))
         {
-          loss = IRANGE(0, GET_EXP(was_fighting) * 0.3, CONFIG_MAX_EXP_LOSS);
+          loss = IRANGE(0, GET_EXP(was_fighting) * 0.3, CONFIG_MAX_EXP_LOSS * 5);
           new_send_to_char(ch, "[You lose %d exp]\r\n", loss);
           gain_exp(ch, -loss);
-          GET_EXP(was_fighting) += loss * 0.5;
         }
       }
       else

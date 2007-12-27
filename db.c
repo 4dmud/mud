@@ -51,6 +51,7 @@ void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
 struct kill_data *load_killlist(int id);
 void free_join_list(struct combine_data *list);
+void add_room_to_mine(room_rnum room);
 
 void prune_crlf(char *txt);
 int generate_wep_type(char *name);
@@ -1705,7 +1706,7 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
     exit(1);
   }
 
-  //log("Zone Load: %d - %d (%d)", zone, real_zone(zon), zon); 
+  //log("Zone Load: %d - %d (%d)", zone, real_zone(zon), zon);
   if ((zone = real_zone(zon)) == NOWHERE)
   {
     log("Real zone for zone %d - is nowhere", zon);
@@ -1745,6 +1746,8 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
   room_nr->proto_script = NULL;
   room_nr->script = NULL;
   room_nr->affects = NULL;
+  room_nr->mine.num = -1;
+  room_nr->mine.dif = -1;
   world_vnum[virtual_nr]=room_nr;
 
   if (!get_line(fl, line))
@@ -1878,6 +1881,11 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
       new_descr->next = room_nr->look_under_description;
       room_nr->look_under_description = new_descr;
       break;
+    case 'M':
+      room_nr->mine.num = fread_number(fl);
+      room_nr->mine.dif = fread_number(fl);
+      room_nr->mine.tool = fread_number(fl);
+      break;
     case 'S':		/* end of room */
       /* DG triggers -- script is defined after the end of the room */
       letter = fread_letter(fl);
@@ -1898,9 +1906,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
         forest = new_forest;
         forest_room++;
       }
+      add_room_to_mine(room_nr);
       return;
     default:
-      log("SYSERR: Format error in room #%d (expecting D/E/S)", virtual_nr);
+      log("SYSERR: Format error in room #%d (expecting D/E/S/B/U/A)", virtual_nr);
       exit(1);
     }
   }
@@ -1949,6 +1958,7 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
     free_string(room->dir_option[dir]->general_description);
     room->dir_option[dir]->general_description = fread_string(fl, buf2);
     room->dir_option[dir]->keyword = fread_string(fl, buf2);
+    room->dir_option[dir]->nosave = 0;
   }
 
   // log("%s, %s.", world[room].dir_option[dir]->general_description, world[room].dir_option[dir]->keyword);
@@ -2481,7 +2491,7 @@ void delete_one_join(CHAR_DATA *mob, int i)
 
   if (mob == NULL)
     return;
-    temp = mob->mob_specials.join_list;
+  temp = mob->mob_specials.join_list;
 
   while (temp)
   {
@@ -2668,8 +2678,8 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
     log("SYSERR: Mob #%d has reserved bit MOB_NOTDEADYET set.", nr);
     REMOVE_BIT_AR(MOB_FLAGS(mob_proto + i), MOB_NOTDEADYET);
   }
- 
-  
+
+
   //check_bitvector_names(MOB_FLAGS(mob_proto + i), action_bits_count, buf2, "mobile");
 
   AFF_FLAGS(mob_proto + i)[0] = asciiflag_conv(f5);
@@ -2737,12 +2747,14 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
 
   if (GET_CLASS(mob_proto + i) == CLASS_NORMAL)
     give_mob_class(mob_proto + i, nr);
-    
- if (MOB_FLAGGED(mob_proto + i, MOB_HEALER)) {
-  ASSIGNMOB(nr, cleric);
+
+  if (MOB_FLAGGED(mob_proto + i, MOB_HEALER))
+  {
+    ASSIGNMOB(nr, cleric);
   }
-  if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER)) {
-  ASSIGNMOB(nr, postmaster);
+  if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER))
+  {
+    ASSIGNMOB(nr, postmaster);
   }
   top_of_mobt = i++;
 }
@@ -3005,9 +3017,9 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
       exit(1);
     }
   }
-  
+
   if (GET_OBJ_TYPE(obj_proto + i) == ITEM_BANKBOOK)
-  ASSIGNOBJ(nr, bank);
+    ASSIGNOBJ(nr, bank);
 }
 
 
@@ -3283,9 +3295,10 @@ void renumber_zones()
 
 
 }
-void do_show_errors(CHAR_DATA *ch) {
-int i, j;
-int found = FALSE;
+void do_show_errors(CHAR_DATA *ch)
+{
+  int i, j;
+  int found = FALSE;
   for (j = 0; j < top_of_zone_table; j++)
   {
     for (i = 0; i < top_of_zone_table; i++)
@@ -3294,29 +3307,30 @@ int found = FALSE;
         continue;
       if (zone_table[j].number == zone_table[i].number)
       {
-      found = TRUE;
+        found = TRUE;
         new_send_to_char(ch,"ERROR: Virtual zone exists twice - [%s] and [%s]\r\n", zone_table[j].name, zone_table[i].name);
       }
       if (zone_table[j].bot <= zone_table[i].bot && zone_table[j].top >= zone_table[i].bot)
       {
-      found = TRUE;
+        found = TRUE;
         new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
-            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
-            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
+                         zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+                         zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
       }
       if (zone_table[j].bot <= zone_table[i].top && zone_table[j].top >= zone_table[i].top)
       {
-      found = TRUE;
+        found = TRUE;
         new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
-            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
-            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
+                         zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+                         zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
       }
     }
   }
-  if (!found) {
-  new_send_to_char(ch, "No zone overlaps found\r\n");
+  if (!found)
+  {
+    new_send_to_char(ch, "No zone overlaps found\r\n");
   }
 }
 
@@ -4174,7 +4188,11 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'R':		/* rem obj from room */
-      if ((obj = get_obj_in_list_num(ZCMD.arg2, world_vnum[ZCMD.arg1]->contents)) != NULL)
+    if (!world_vnum[ZCMD.arg1]) {
+    ZONE_ERROR("Zone room error");
+     log("room %d doesn't exist, and zedit needs it.",ZCMD.arg1);
+     }else
+      if ( (obj = get_obj_in_list_num(ZCMD.arg2, world_vnum[ZCMD.arg1]->contents)) != NULL)
       {
         extract_obj(obj);
         obj = NULL;
@@ -6898,7 +6916,7 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                                                                                                        						   special care */
+                                                                                                                                						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";

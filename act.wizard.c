@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.9  2005/02/09 09:23:43  w4dimenscor
+ * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
+ *
  * Revision 1.8  2005/02/05 05:26:17  w4dimenscor
  * Added tsearch command to full text search triggers
  *
@@ -2490,7 +2493,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                        				 * or char */
+                                            				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -6534,25 +6537,30 @@ buf   : the new string with the expression hilighted
 buflen: the size of the buf
 --Mordecai : Sat Feb 5th 2005
 **/
+/*underline */
+#define UND "\x1B[4m"
+/* remove underline */
+#define REM "\x1B[0m"
+#define GRN "\x1B[0;32m"
+#define YEL "\x1B[0;33m"
+#define CYN "\x1B[0;36m"
 int hilite(const char *regex, const char *str, char *buf, size_t buflen)
 {
   char *p, *s = (char *)str;
   int tmp = 0;
+  size_t u = strlen(UND);
   bool found = FALSE;
   int cnt = strlen(regex);
   if ((p = strstr(str, regex)) == NULL) return 0;
-
-
 
   while ( *s  && tmp < buflen)
   {
     if ( s == p )
     {
-      if (tmp + 3 < buflen)
+      if (tmp + u < buflen)
       {
-        buf[tmp++] = '{';
-        buf[tmp++] = 'c';
-        buf[tmp++] = 'u';
+        snprintf(buf + tmp, buflen - tmp, "%s", UND);
+        tmp += u;
         found = TRUE;
       }
     }
@@ -6560,12 +6568,10 @@ int hilite(const char *regex, const char *str, char *buf, size_t buflen)
     {
       if (!cnt--)
       {
-        if (tmp + 3 < buflen)
+        if (tmp + u < buflen)
         {
-          buf[tmp++] = '{';
-          buf[tmp++] = 'c';
-          buf[tmp++] = '0';
-
+          snprintf(buf + tmp, buflen - tmp, "%s", REM);
+          tmp += u;
           found = FALSE;
         }
 
@@ -6592,7 +6598,7 @@ int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, in
   size_t nlen = 0;
   int found = 0, count = 0;
   char strtmp2[MAX_STRING_LENGTH];
-  count = snprintf(buf + nlen, len - nlen, "\r\n{cgVnum: %-7d -- Name: %-50s\r\n{c0", vnum, trig->name);
+  count = snprintf(buf + nlen, len - nlen, "\r\n%sVnum: %-7d -- Name: %-50s%s\r\n",GRN, vnum, trig->name, REM);
   if (count > 0)
     nlen += count;
 
@@ -6600,7 +6606,7 @@ int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, in
   {
     if (hilite(phrase, (const char *)trig->name, strtmp2, sizeof(strtmp2)))
     {
-      count = snprintf(buf + nlen, len - nlen, "      {cc[NAME]{c0 %s{c0\r\n", strtmp2);
+      count = snprintf(buf + nlen, len - nlen, "      %s[NAME]%s %s%s\r\n",CYN, REM, strtmp2, REM);
       if (count >= 0)
         nlen += count;
       found++;
@@ -6611,7 +6617,7 @@ int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, in
   {
     if (hilite(phrase, (const char *)trig->arglist, strtmp2, sizeof(strtmp2)))
     {
-      count = snprintf(buf + nlen, len - nlen, "      {cM[ARGS]{c0 %s{c0\r\n", strtmp2);
+      count = snprintf(buf + nlen, len - nlen, "      %s[ARGS]%s %s%s\r\n",GRN, REM, strtmp2, REM);
       if (count >= 0)
         nlen += count;
       found++;
@@ -6627,7 +6633,7 @@ int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, in
       n++;
       if (hilite(phrase, c->cmd, strtmp2, sizeof(strtmp2)))
       {
-        count = snprintf(buf + nlen, len - nlen, "      {cy[BODY]{c0 Line %3d: %s{c0\r\n", n, strtmp2);
+        count = snprintf(buf + nlen, len - nlen, "      %s[BODY]%s Line %3d: %s%s\r\n",YEL, REM, n, strtmp2, REM);
         if (count >= 0)
           nlen += count;
         found++;
