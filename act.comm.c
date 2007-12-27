@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.13  2005/04/11 06:42:52  w4dimenscor
+ * changed the rp toggle to turn off open channels - silly idea imo
+ *
  * Revision 1.12  2005/03/23 15:23:13  w4dimenscor
  * Added toggle rp. roleplaying toggle is shown on:
  * - who list
@@ -738,9 +741,10 @@ int is_tell_ok(struct char_data *ch, struct char_data *vict)
       act("$E is busy right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
       new_send_to_char(ch, "BUSY %s: %s\r\n", GET_NAME(vict), BUSY_MSG(vict));
-  } else if (!IS_NPC(ch) && PRF_FLAGGED(vict, PRF_RP))
+  }
+  else if (!IS_NPC(ch) && PRF_FLAGGED(vict, PRF_RP))
   {
-      act("$E is roleplaying right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
+    act("$E is roleplaying right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
   }
 
   return (TRUE);
@@ -1188,15 +1192,18 @@ ACMD(do_gen_comm)
   }
   if (!PLR_FLAGGED(ch, PLR_ROLEPLAYER) && subcmd == SCMD_IC)
   {
-    send_to_char("This channel reserved for roleplay use only.\r\n",
-                 ch);
+    send_to_char("This channel reserved for roleplay use only.\r\n", ch);
+    return;
+  }
+  if (PRF_FLAGGED(ch, PRF_RP) && ( subcmd != SCMD_SHOUT))
+  {
+    send_to_char("You are roleplaying, please use the IC channel.\r\n", ch);
     return;
   }
   if (GET_LEVEL(ch) < LVL_HERO)
     if (!PLR_FLAGGED(ch, PLR_HERO) && subcmd == SCMD_HERO)
     {
-      send_to_char("This channel reserved for hero use only.\r\n",
-                   ch);
+      send_to_char("This channel reserved for hero use only.\r\n",                   ch);
       return;
     }
   /* level_can_shout defined in config.c */
@@ -1318,6 +1325,9 @@ ACMD(do_gen_comm)
       if (subcmd == SCMD_SHOUT &&
           ((ch->in_room->zone != i->character->in_room->zone)
            || !AWAKE(i->character)))
+        continue;
+
+      if (PRF_FLAGGED(i->character, PRF_RP) && ( subcmd != SCMD_SHOUT))
         continue;
 
       if (COLOR_LEV(i->character) >= C_NRM)
