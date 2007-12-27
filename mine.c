@@ -23,7 +23,6 @@ extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
 int mine_damage(struct char_data *vict, int dam);
-void send_char_pos(struct char_data *ch, int dam);
 void die(struct char_data *ch, struct char_data *killer);
 struct mine_list *mine_shafts = NULL;
 
@@ -484,31 +483,4 @@ void make_tunnel(struct char_data *ch)
     stop_task(ch);
 
 }
-int mine_damage(struct char_data *vict, int dam)
-{
-  if (!dam)
-    return 0;
-  if (GET_LEVEL(vict)>=LVL_IMMORT && (dam > 0))
-  {
-    new_send_to_char(vict, "Being the cool immortal you are, you sidestep a trap,\r\n"
-                     "obviously placed to kill you.\r\n");
-    return 0;
-  }
-
-  alter_hit(vict, dam);
-
-  update_pos(vict);
-  send_char_pos(vict, dam);
-
-  if (GET_POS(vict) == POS_DEAD)
-  {
-    if (!IS_NPC(vict))
-      new_mudlog( BRF, 0, TRUE, "%s killed by mining trap at %s [%d]",
-                  GET_NAME(vict), IN_ROOM(vict)->name, GET_ROOM_VNUM(IN_ROOM(vict)));
-    die(vict, NULL);
-    return -1;
-  }
-  return dam;
-}
-
 

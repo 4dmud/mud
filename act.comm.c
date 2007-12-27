@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.23  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.22  2005/10/09 01:54:08  w4dimenscor
  * Fixed the trigger type otrig-speech so it works as expected, make id num's save to the player index, fixed the trigger types
  *
@@ -1132,8 +1135,7 @@ ACMD(do_page)
           act(buf, FALSE, ch, 0, vict, TO_CHAR);
       }
       else
-        send_to_char("That person is in a soundproof room!\r\n",
-                     ch);
+        send_to_char("That person is in a soundproof room!\r\n", ch);
     }
     else
       send_to_char("That person is not in the game!\r\n", ch);
@@ -1293,6 +1295,7 @@ ACMD(do_gen_comm)
     return;
   }
   skip_spaces(&argument);
+  delete_doubledollar(argument); /* this was needed! - mord */
 
   /* make sure that there is something there to say! */
   if (!*argument)

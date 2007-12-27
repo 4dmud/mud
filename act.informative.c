@@ -160,7 +160,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch);
 void do_auto_exits(struct char_data *ch);
 ACMD(do_exits);
 void look_in_direction(struct char_data *ch, int dir);
-void look_in_obj(struct char_data *ch, char *arg);
+void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item);
 char *find_exdesc(char *word, struct extra_descr_data *list);
 void look_at_target(struct char_data *ch, char *arg);
 void look_above_target(struct char_data *ch, char *arg);
@@ -543,11 +543,9 @@ void look_at_char(struct char_data *i, struct char_data *ch)
     else
     {
       if (i == ch)
-        send_to_char("You see nothing special about yourself.\r\n",
-                     ch);
+        new_send_to_char(ch, "You see nothing special about yourself.\r\n");
       else
-        act("You see nothing special about $m.", FALSE, i, 0, ch,
-            TO_VICT);
+        act("You see nothing special about $m.", FALSE, i, 0, ch, TO_VICT);
     }
 
     if (AFK_MSG(i))
@@ -1510,25 +1508,21 @@ void look_in_direction(struct char_data *ch, int dir)
 
 
 
-void look_in_obj(struct char_data *ch, char *arg)
+void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
 {
-  struct obj_data *obj = NULL;
+  struct obj_data *obj = item;
   struct char_data *dummy = NULL;
-  int amt, bits;
+  int amt, bits = -100;
   char buf2[MAX_INPUT_LENGTH];
 
-  if (!*arg)
-    send_to_char("Look in what?\r\n", ch);
-  else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM |
-                                 FIND_OBJ_EQUIP, ch, &dummy, &obj)))
-  {
-    new_send_to_char(ch, "There doesn't seem to be %s %s here.\r\n",
-                     AN(arg), arg);
+  if (!obj && !arg && !*arg) {
+    new_send_to_char(ch, "Look in what?\r\n");
+    return;
   }
-  else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON)
-           && (GET_OBJ_TYPE(obj) != ITEM_FOUNTAIN)
-           && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
-    send_to_char("There's nothing inside that!\r\n", ch);
+  else if (!obj && !(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &dummy, &obj)))
+    new_send_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
+  else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_FOUNTAIN) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
+    new_send_to_char(ch, "There's nothing inside that!\r\n");
   else
   {
     if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
@@ -1538,6 +1532,17 @@ void look_in_obj(struct char_data *ch, char *arg)
       else
       {
         new_send_to_char(ch, "%s", obj->short_description);
+        if (bits == -100) {
+          if (obj->carried_by)
+            bits = FIND_OBJ_INV;
+          else if (obj->in_room)
+            bits = FIND_OBJ_ROOM;
+          else if (obj->worn_by)
+            bits = FIND_OBJ_EQUIP;
+          else
+            bits = FIND_OBJ_ROOM;
+        }
+        
         switch (bits)
         {
         case FIND_OBJ_INV:
@@ -1571,8 +1576,7 @@ void look_in_obj(struct char_data *ch, char *arg)
           container_disp(ch, obj);
           amt = (GET_OBJ_VAL(obj, 1) * 3) / GET_OBJ_VAL(obj, 0);
           sprinttype(GET_OBJ_VAL(obj, 2), color_liquid, buf2, sizeof(buf2));
-          new_send_to_char(ch, "It's %sfull of a %s liquid.\r\n",
-                           fullness[amt], buf2);
+          new_send_to_char(ch, "It's %sfull of a %s liquid.\r\n", fullness[amt], buf2);
         }
       }
     }
@@ -1756,7 +1760,7 @@ ACMD(do_look)
     if (!*arg)      /* "look" alone, without an argument at all */
       look_at_room(ch, 1);
     else if (look_in)
-      look_in_obj(ch, argument);
+      look_in_obj(ch, argument, NULL);
     /* did the char type 'look <direction>?' */
     else if ((look_type = search_block(sdir, dirs, FALSE)) >= 0)
       look_in_direction(ch, look_type);
@@ -1828,7 +1832,7 @@ ACMD(do_examine)
         (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER))
     {
       send_to_char("When you look inside, you see:\r\n", ch);
-      look_in_obj(ch, arg);
+      look_in_obj(ch, NULL, tmp_object);
     }
 
     if (has_identifier(tmp_object, GET_ID(ch)))
@@ -1843,6 +1847,8 @@ ACMD(do_examine)
 
     examine_on = FALSE;
     look_at_target(ch, tempsave);  /* strcpy: OK */
+  } else {
+    new_send_to_char(ch, "You can't see that here.\r\n");
   }
 }
 
@@ -4368,11 +4374,7 @@ ACMD(do_consider)
       else if (diff3 < 60)
         send_to_char("It won't hurt a bit.\r\n", ch);
       else if (diff > 60)
-        send_to_char
-        ("They will be honored by death if you fight them.\r\n",
-         ch);
-
-
+        send_to_char("They will be honored by death if you fight them.\r\n",  ch);
 
     }
     else

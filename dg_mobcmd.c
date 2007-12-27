@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.10  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.9  2005/08/19 08:51:14  w4dimenscor
  * fixed the variables not working
  *
@@ -72,6 +75,7 @@
 #include "comm.h"
 #include "spells.h"
 #include "constants.h"
+#include "fight.h"
 
 void raw_kill(struct char_data *ch, struct char_data *killer);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,

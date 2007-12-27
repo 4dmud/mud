@@ -14,6 +14,7 @@
 #include "oasis.h"
 #include "dg_scripts.h"
 #include "spells.h"
+#include "fight.h"
 
 int can_take_obj(struct char_data *ch, struct obj_data *obj);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
@@ -51,7 +52,6 @@ void parse_animal_commands(struct char_data *ch);
 void parse_undead_commands(struct char_data *ch);
 CHAR_DATA * parse_aggressive(struct char_data *ch);
 void parse_tasks(struct char_data *ch);
-int fe_solo_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
 
 #define CAST_THE_SPELL(ch, vict, i) call_magic((ch), (vict), NULL, NULL, (i), GET_LEVEL((ch)), CAST_BREATH)
 

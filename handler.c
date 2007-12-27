@@ -22,7 +22,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "trees.h"
-
+#include "damage.h"
 /* local vars */
 int extractions_pending = 0;
 int obj_extractions_pending = 0;

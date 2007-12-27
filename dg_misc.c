@@ -315,29 +315,6 @@ int valid_dg_target(struct char_data *ch, int allow_gods)
 	return FALSE;		/* The rest are gods with nohassle on... */
 }
 
-
-
-void script_damage(struct char_data *vict, int dam)
-{
-  if (!IS_NPC(vict) && GET_LEVEL(vict)>=LVL_IMMORT && (dam > 0)) {
-    new_send_to_char(vict, "Being the cool immortal you are, you sidestep a trap,\r\n"
-                       "obviously placed to kill you.\r\n");
-    return;
-  }
-
-  alter_hit(vict, dam);
-  
-  update_pos(vict);
-  send_char_pos(vict, dam);
-
-  if (GET_POS(vict) == POS_DEAD) {
-    if (!IS_NPC(vict))
-       new_mudlog( BRF, 0, TRUE, "%s killed by damage at %s [%d]", GET_NAME(vict), vict->in_room->name, vict->in_room->number);
-    die(vict, NULL);
-  }
-}
-
-
 /* Add or remove a destination for a mob or an object              *
  * to the end of their destination list.                           *
  * usage:  dg_dest (add/remove) <room vnum/all> <target>           *

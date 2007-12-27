@@ -256,20 +256,6 @@ void set_logoutmsg(struct char_data *ch, char *logoutmsg);    /* ^^^^^^^^^^^^*/
 void    circle_exit(int r);
 #define exit(r)  circle_exit(r)
 
-
-
-/* fight.c protos -mord */
-#define ATTACK_MAGIC 1
-#define ATTACK_SKILL 2
-#define ATTACK_MELEE 3
-int attack_type(char chclass);
-void start_fighting(struct char_data* ch, struct char_data* vict);
-
-int fe_melee_hit(struct char_data* ch, struct char_data* vict, int type, int melee);
-int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type);
-int fe_deal_damage(struct char_data* ch, struct char_data* vict, int dam, int w_type);
-void stop_fighting(struct char_data* ch);
-
 extern const struct race_data races[NUM_RACES];
 
 #define IS_PLAYING(d)   (STATE(d) == CON_TEDIT || STATE(d) == CON_REDIT ||      \
@@ -667,6 +653,11 @@ int check_mail(struct char_data *ch);
 #define CONCEALMENT(ch) 	((ch)->concealment)
 #define FUSE_LOC(ch, loc)       ((ch)->fuses[(loc)])
 #define FUSED_TO(ch)            ((ch)->fused_to)
+
+
+/** mob specials **/
+#define MOB_DAM_TAKEN(mob)    ((mob)->mob_specials.damage_taken)
+#define MOB_DAM_LIST(mob)     ((mob)->mob_specials.dam_list)
 
 /* Token machine defines */
 #define GET_BRASS_TOKEN_COUNT(ch)  (SPECIALS(ch)->saved.brass_tokens)

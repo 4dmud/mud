@@ -42,6 +42,7 @@ int sunlight;
 #include "assemblies.h"
 #include "trees.h" 
 #include "htree.h"
+#include "damage.h"
 
 int load_qic_check(int rnum);
 void qic_scan_rent(void);
@@ -2225,6 +2226,11 @@ void parse_simple_mob(FILE * mob_f, int i, int nr)
   mob_proto[i].points.damroll = mob_stats[k].dam_bonus;
   mob_proto[i].mob_specials.tier = 0;
   mob_proto[i].mob_specials.subskill = TYPE_UNDEFINED;
+  mob_proto[i].mob_specials.join_list = NULL;
+  mob_proto[i].mob_specials.head_join = NULL;
+  mob_proto[i].mob_specials.damage_taken = 0;
+  mob_proto[i].mob_specials.dam_list = NULL;
+  
 
   if (!get_line(mob_f, line))
   {
@@ -3713,12 +3719,14 @@ struct char_data *read_mobile(mob_vnum nr, int type)
     if (!number(0, 10) && MOB_TIER(mob)) MOB_TIER(mob)++;
     if (!number(0, 10) && MOB_TIER(mob)) MOB_TIER(mob)++;
   }
-
+  
+  GET_EXP(mob) = (GET_EXP(mob) * MAX(1, MOB_TIER(mob) + 1));
+  
   if (!mob->points.max_hit)
   {
     mob->points.max_hit = dice(mob->points.hit, mob->points.mana) + mob->points.move;
   }
-  mob->points.max_hit *= (mob_hitpoint_multi(GET_CLASS(mob)) * (1.0  + (MOB_TIER(mob) * 0.5))) ;
+  mob->points.max_hit *= (mob_hitpoint_multi(GET_CLASS(mob)) * (1.0  + (MOB_TIER(mob) * 0.75))) ;
   mob->points.hit = mob->points.max_hit;
   mob->points.mana = mob->points.max_mana;
   mob->points.move = mob->points.max_move;
@@ -6257,6 +6265,8 @@ void free_char(struct char_data *ch)
     if (ch->mob_specials.join_list && ch->mob_specials.join_list != mob_proto[i].mob_specials.join_list)
       free_join_list(ch->mob_specials.join_list);
     ch->mob_specials.join_list = NULL;
+
+    damage_count_free(ch);
 
   }
 

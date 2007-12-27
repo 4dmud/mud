@@ -33,7 +33,7 @@ OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	act.wizard.o action.o aedit.o alias.o arena.o asciimap.o assemblies.o \
 	assedit.o bsd-snprintf.o ban.o boards.o cali.o cedit.c clan.o \
 	class.o color.o comm.o config.o constants.o context_help.o corpse.o character.o \
-	db.o dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o \
+	damage.o db.o dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o \
 	dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o dg_variables.o dg_wldcmd.o \
 	dg_olc.o event.o familiar.o fight.o \
 	gamble.o graph.o genmob.o genobj.o genolc.o genshp.o genwld.o \
@@ -51,7 +51,7 @@ CXREF_FILES = act.comm.c act.create.c act.informative.c act.item.c \
 	act.wizard.c action.c aedit.c alias.c arena.c asciimap.c  assemblies.c \
 	assedit.c bsd-snprintf.c ban.c boards.c cali.c cedit.c clan.c \
 	class.c color.c comm.c config.c constants.c context_help.c corpse.c character.c \
-	db.c dg_comm.c dg_db_scripts.c dg_event.c dg_handler.c dg_misc.c \
+	damage.c db.c dg_comm.c dg_db_scripts.c dg_event.c dg_handler.c dg_misc.c \
 	dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c dg_variables.c dg_wldcmd.c \
 	dg_olc.c event.c familiar.c fight.c \
 	gamble.c graph.c genmob.c genobj.c genolc.c genshp.c genwld.c \

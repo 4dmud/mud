@@ -14,6 +14,8 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "trees.h"
+#include "damage.h"
+#include "fight.h"
 
 #define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
 #define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")

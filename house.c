@@ -413,7 +413,7 @@ void House_crashsave(room_vnum vnum)
   if (rename(tempname, filename) == -1)
   {
     new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) cant save file: %s", tempname);
-    core_dump();
+    //core_dump();
   }
 }
 void count_items_in_list(struct obj_data *obj)
@@ -630,7 +630,8 @@ const char *HCONTROL_FORMAT =
   "       hcontrol listrent <house vnum>\r\n"
   "       hcontrol calc <house vnum>\r\n"
   "       hcontrol mount <house vnum> <mob vnum>\r\n";
- // "       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
+  "       hcontrol expand <house vnum> <number of gold tokens paid>
+//"       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
 
 void hcontrol_list_houses(struct char_data *ch)
 {
@@ -644,7 +645,7 @@ void hcontrol_list_houses(struct char_data *ch)
     return;
   }
   new_send_to_char(ch,
-                   "Address  Atrium  Build Date  Guests  Owner        last payment items mount\r\n");
+                   "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items Mount\r\n");
   new_send_to_char(ch,
                    "-------  ------  ----------  ------  ------------ ------------ ----- -----\r\n");
 
@@ -675,9 +676,9 @@ void hcontrol_list_houses(struct char_data *ch)
     /* Now we need a copy of the owner's name to capitalize. -gg 6/21/98 */
     strcpy(own_name, temp);
 
-    new_send_to_char(ch,  "%7d %7d  %-10s    %2d    %-12s %-13s %-5d %-5ld\r\n",
+    new_send_to_char(ch,  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-5ld\r\n",
                      house_control[i].vnum, house_control[i].atrium, built_on,
-                     house_control[i].num_of_guests, CAP(own_name), last_pay,
+                     house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 125),
                      house_item_count(house_control[i].vnum), house_control[i].mount);
 
     House_list_guests(ch, i, TRUE);
@@ -770,6 +771,7 @@ void hcontrol_build_house(struct char_data *ch, char *arg)
   temp_house.owner = owner;
   temp_house.num_of_guests = 0;
   temp_house.mount = 0;
+  temp_house.expantions = 0;
 
   house_control[num_of_houses++] = temp_house;
 
@@ -895,6 +897,8 @@ ACMD(do_hcontrol)
     hcontrol_set_mount(ch, arg2);
   else if (is_abbrev(arg1, "show"))
     hcontrol_list_houses(ch);
+  else if (is_abbrev(arg1, "expand"))
+    hcontrol_expand_house(ch, arg2);
   else if (is_abbrev(arg1, "save"))
   {
     House_save_all();
@@ -928,6 +932,8 @@ ACMD(do_house)
     House_list_guests(ch, i, FALSE);
   else if (!str_cmp(arg, "mount"))
     house_load_mount(ch, i);
+  else if (!str_cmp(arg, "expand"))
+    house_expand_house(ch, i);
   else if ((id = get_id_by_name(arg)) < 0)
     send_to_char("No such player.\r\n", ch);
   else if (id == GET_IDNUM(ch))
@@ -1009,6 +1015,67 @@ int House_can_enter(struct char_data *ch, room_vnum house)
   return (0);
 }
 
+void house_expand_house(struct char_data *ch, int house) {
+
+}
+
+void hcontrol_expand_house(struct char_data *ch, char *argument)
+{
+
+  int i = 0, house = 0, amount = 0;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  
+  if (!argument || !*argument)
+  {
+  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+    return;
+  }
+  argument = two_arguments(argument, arg1, arg2);
+  
+  if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
+  {
+  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+                   "To remove expantions:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+    return;
+  }
+  
+  
+  if (!is_number(arg2))
+  {
+    
+  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+      return;
+    
+  }
+  
+  house = atoi(arg1);
+  amount = atoi(arg2);
+  
+  if (house <= 0 )
+  {
+    new_send_to_char(ch, "Positive numbers please.\r\n");
+    return;
+  }
+  
+  if ((i = find_house(house)) == NOWHERE)
+  {
+    new_send_to_char(ch, "That house doesn't seem to be in the house list.\r\n");
+    return;
+  }
+  
+
+    house_control[i].expantion += (long)amount;
+new_send_to_char(ch, "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, get_name_by_id(house_control[i].owner), house_capacity(i));
+
+  
+  House_save_control();
+}
+
+int house_capacity(int house) {
+  return 500 + (125 * house_control[house].expantion);
+}
 void hcontrol_set_mount(struct char_data *ch, char *argument)
 {
   mob_vnum mount = NOBODY;

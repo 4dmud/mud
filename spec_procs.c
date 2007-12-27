@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.9  2005/11/19 06:18:39  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.8  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -52,6 +55,8 @@
 #include "spells.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "damage.h"
+#include "fight.h"
 
 
 

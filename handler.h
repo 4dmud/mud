@@ -139,7 +139,6 @@ void stop_fighting(struct char_data *ch);
 void stop_follower(struct char_data *ch);
 void forget(struct char_data *ch, struct char_data *victim);
 void remember(struct char_data *ch, struct char_data *victim);
-int damage(struct char_data *ch, struct char_data *victim, int dam,int attacktype);
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,
 		  int attacktype);
 		

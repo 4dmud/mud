@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.12  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.11  2005/11/01 18:43:37  w4dimenscor
  * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
  *
@@ -64,6 +67,7 @@
 #include "dg_event.h"
 #include "genolc.h"
 #include "trees.h"
+#include "damage.h"
 
 
 #define TIER (current_class_is_tier_num(ch)+1)

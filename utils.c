@@ -1270,40 +1270,6 @@ void line_input(struct descriptor_data *d, const char *prompt,
 }
 
 
-int attack_type(char chclass)
-{
-  switch (chclass)
-  {
-  case CLASS_MAGE:
-    return ATTACK_MAGIC;
-    break;
-  case CLASS_PRIEST:
-    return ATTACK_MAGIC;
-    break;
-  case CLASS_ESPER:
-    return ATTACK_MAGIC;
-    break;
-  case CLASS_GYPSY:
-    return ATTACK_SKILL;
-    break;
-  case CLASS_THIEF:
-    return ATTACK_SKILL;
-    break;
-  case CLASS_RANGER:
-    return ATTACK_SKILL;
-    break;
-  case CLASS_HUNTER:
-    return ATTACK_MELEE;
-    break;
-  case CLASS_WARRIOR:
-    return ATTACK_MELEE;
-    break;
-  default:
-    return 0;
-    break;
-  }
-}
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

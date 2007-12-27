@@ -73,6 +73,9 @@ context_help.o: context_help.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h db.h interpreter.h oasis.h dg_olc.h dg_scripts.h
 corpse.o: corpse.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
   db.h interpreter.h utils.h spells.h
+damage.o: damage.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
+  interpreter.h handler.h db.h spells.h dg_event.h dg_scripts.h \
+  constants.h
 db.o: db.c conf.h sysdep.h structs.h subskills.h utils.h db.h comm.h \
   handler.h spells.h mail.h interpreter.h house.h constants.h oasis.h \
   dg_scripts.h dg_event.h clan.h genobj.h genmob.h genwld.h xmlhelp.h \
@@ -96,7 +99,8 @@ dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h constants.h
 dg_olc.o: dg_olc.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  db.h genolc.h interpreter.h oasis.h dg_olc.h dg_scripts.h dg_event.h
+  db.h genolc.h interpreter.h oasis.h dg_olc.h dg_scripts.h dg_event.h \
+  constants.h
 dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h subskills.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h dg_event.h db.h \
   screen.h constants.h spells.h oasis.h

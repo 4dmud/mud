@@ -4,6 +4,7 @@
 #define HOUSE_PRIVATE	0
 
 void add_follower(struct char_data *ch, struct char_data *leader);
+int house_capacity(int house);
 
 struct house_control_rec {
     room_vnum vnum;		/* vnum of this house           */
@@ -17,7 +18,7 @@ struct house_control_rec {
     time_t last_payment;	/* date of last house payment   */
     long mount;
     long size;
-    long spare2;
+    long expantions;
     long spare3;
     long spare4;
     long spare5;

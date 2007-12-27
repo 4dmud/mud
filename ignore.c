@@ -44,7 +44,7 @@ int is_ignoring(struct char_data *ch, struct char_data *vict)
 
   if (IS_NPC(ch) || IS_NPC(vict))
     return (0);
-
+  if (GET_LEVEL(ch) > LVL_SEN || GET_LEVEL(vict) > LVL_SEN)
   sprintf(buf, "%s", GET_NAME(ch));
   temp = GET_IGNORELIST(vict);
   while (temp != NULL)

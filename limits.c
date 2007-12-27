@@ -20,6 +20,7 @@
 #include "interpreter.h"
 #include "dg_scripts.h"
 #include "clan.h"
+#include "damage.h"
 
 /* local functions */
 int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,

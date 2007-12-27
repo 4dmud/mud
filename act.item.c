@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.27  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.26  2005/11/01 18:43:37  w4dimenscor
  * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
  *
@@ -839,14 +842,15 @@ void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
     obj_to_char(item, ch);
     get_check_money(ch, item);
   }
-  extract_obj(corpse);
-  if (REMORTS(ch))
+  
+  if (REMORTS(ch) && !HERE(corpse, ch))
   {
     if (REMORTS(ch) < 5)
       GET_WAIT_STATE(ch) = 5 RL_SEC;
     else
       GET_WAIT_STATE(ch) = REMORTS(ch) RL_SEC;
   }
+      extract_obj(corpse);
   save_corpses();
   Crash_crashsave(ch);
 }
@@ -1427,6 +1431,8 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
     new_send_to_char(ch,"Heh heh heh.. we are jolly funny today, eh?\r\n");
   else if (char_gold(ch, 0, GOLD_HAND) < amount)
     new_send_to_char(ch,"You don't have that many coins!\r\n");
+  else if (amount > 2000000000)
+    new_send_to_char(ch,"You can't drop more then 2 billion.\r\n");
   else
   {
     /*for the gold tally code */
@@ -1852,6 +1858,9 @@ void perform_give_gold(struct char_data *ch, struct char_data *vict,
   if (amount <= 0)
   {
     new_send_to_char(ch,"Heh heh heh ... we are jolly funny today, eh?\r\n");
+    return;
+  } else if (amount > 2000000000) {
+    new_send_to_char(ch,"You can't give more then 2 billion.\r\n");
     return;
   }
 

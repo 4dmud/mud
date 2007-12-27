@@ -22,26 +22,11 @@
 #include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "fight.h"
 
 /* extern variables */
 int can_fight(struct char_data *ch, struct char_data *vict, int silent);
-struct aff_dam_event_obj
-{
-  struct char_data* ch;
-  int damage;
-  int interval;
-  int recurse;
-  int (*event_fun)(int, struct char_data*);
-  int id;
-};
 
-struct aff_dam_event_list
-{
-  struct char_data* ch;
-  struct event* event;
-  struct aff_dam_event_list* next;
-  int id;
-};
 
 /* extern functions */
 void raw_kill(struct char_data *ch, struct char_data *killer);
@@ -66,16 +51,8 @@ int computer_armor_class(struct char_data *ch);
 int arena_ok(struct char_data *ch, struct char_data *victim);
 void improve_skill(struct char_data *ch, int skill);
 
-void aff_damage(struct char_data *ch, int dam, long interval, int recurse,
-                int (*event_fun)(int, struct char_data*));
-EVENTFUNC(affdam_event);
-void add_ade(struct aff_dam_event_obj* new_ade_obj);
-void cancel_affdam_events(struct char_data* ch);
-void remove_affdam_event(int idnum);
 
-struct aff_dam_event_list* ade_list = NULL;
-struct aff_dam_event_list* ade_list_end = NULL;
-int ade_counter = 0;
+
 
 /* local functions */
 ACMD(do_assist);
@@ -92,138 +69,7 @@ void send_not_to_spam(char *buf, struct char_data *ch,
                       struct char_data *victim, struct obj_data *weap,
                       int spam);
 
-void aff_damage(struct char_data *ch, int dam, long interval, int recurse,
-                int (*event_fun)(int, struct char_data*))
-{
-  struct aff_dam_event_obj* new_event;
-  CREATE(new_event, struct aff_dam_event_obj, 1);
-  new_event->ch = ch;
-  new_event->damage = dam;
-  new_event->interval = interval;
-  new_event->recurse = recurse;
-  new_event->event_fun = event_fun;
-  new_event->id = ade_counter++;
-  add_ade(new_event);
-}
 
-EVENTFUNC(affdam_event)
-{
-  struct aff_dam_event_obj* ade_obj = (struct aff_dam_event_obj*) event_obj;
-  struct aff_dam_event_obj* new_event;
-
-  remove_affdam_event(ade_obj->id);
-  if(ade_obj->recurse < 0)
-  {
-    free(ade_obj);
-    return 0;
-  }
-
-  if(ade_obj->event_fun(ade_obj->damage, ade_obj->ch))
-  {
-    CREATE(new_event, struct aff_dam_event_obj, 1);
-    new_event->event_fun = ade_obj->event_fun;
-    new_event->damage = ade_obj->damage;
-    new_event->interval = ade_obj->interval;
-    new_event->recurse = (ade_obj->recurse > 0 ? ade_obj->recurse - 1 : 0);
-    new_event->ch = ade_obj->ch;
-    new_event->id = ade_counter++;
-    add_ade(new_event);
-  }
-
-  free(ade_obj);
-  return 1;
-}
-
-void add_ade(struct aff_dam_event_obj* new_ade_obj)
-{
-  struct aff_dam_event_list* new_elem;
-  long time = 0;
-  CREATE(new_elem, struct aff_dam_event_list, 1);
-
-  if(ade_list_end)
-  {
-    ade_list_end->next = new_elem;
-    ade_list_end = new_elem;
-  }
-  else
-  {
-    ade_list_end = ade_list = new_elem;
-  }
-
-  new_elem->next = NULL;
-  new_elem->ch = new_ade_obj->ch;
-  new_elem->id = new_ade_obj->id;
-  time = new_ade_obj->interval RL_SEC;
-  new_elem->event = event_create(affdam_event, new_ade_obj, time);
-}
-
-void cancel_affdam_events(struct char_data* ch)
-{
-  struct aff_dam_event_list* current;
-  struct aff_dam_event_list* oneback;
-
-  current = ade_list;
-  while (current && current->ch == ch)
-  {
-    ade_list = current->next;
-    event_cancel(current->event);
-    free(current);
-    current = ade_list;
-  }
-
-  if(current)
-  {
-    oneback = current;
-    current = current->next;
-  }
-
-  while(current)
-  {
-    if(current->ch == ch)
-    {
-      oneback->next = current->next;
-      event_cancel(current->event);
-      free(current);
-      current = oneback->next;
-    }
-    else
-    {
-      oneback = current;
-      current = current->next;
-    }
-  }
-}
-
-void remove_affdam_event(int idnum)
-{
-  struct aff_dam_event_list* current;
-  struct aff_dam_event_list* oneback;
-
-  current = ade_list;
-  if(current && current->id == idnum)
-  {
-    ade_list = current->next;
-    free(current);
-    return;
-  }
-
-  oneback = current;
-  if(current) current = current->next;
-  while(current)
-  {
-    if(current->id == idnum)
-    {
-      oneback->next = current->next;
-      free(current);
-      break;
-    }
-    else
-    {
-      oneback = current;
-      current = current->next;
-    }
-  }
-}
 
 ACMD(do_assist)
 {

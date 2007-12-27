@@ -1528,24 +1528,22 @@ void do_clan_bank(struct char_data *ch, char *arg, int action)
     send_to_char("You do not have that kind of money!\r\n", ch);
     return;
   }
-/*
-  if ((((int)(clan[clan_num].treasure + amount)) > 2000000000 || ((int)(clan[clan_num].treasure + amount)) < 0)&& action == CB_DEPOSIT)
+
+  if (amount > 2000000000 && action == CB_DEPOSIT)
   {
-    send_to_char("Clan can't handle that much!\r\n", ch);
+    send_to_char("You can't deposit more then 2 billion coins at a time!\r\n", ch);
     return;
   }
-*/
+
 
   if (action == CB_WITHDRAW && clan[clan_num].treasure < amount)
   {
-    send_to_char("The clan is not wealthy enough for your needs!\r\n",
-                 ch);
+    send_to_char("The clan is not wealthy enough for your needs!\r\n",  ch);
     return;
   }
   if (clan[clan_num].treasure < 0)
   {
-    send_to_char("The clan's account has been frozen because of abuse!!\r\n",
-                 ch);
+    send_to_char("The clan's account has been frozen because of abuse!!\r\n",  ch);
     return;
   }
 

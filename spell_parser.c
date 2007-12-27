@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.10  2005/11/19 06:18:39  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.9  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining
  *
@@ -82,6 +85,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "fight.h"
 
 struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
 
@@ -1780,7 +1784,7 @@ void mag_assign_spells(void)
 
 
   spello(SPELL_GROUP_HEAL, "group heal", 80 , 40 , 5,
-         POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 0,
+         POS_FIGHTING, TAR_IGNORE, FALSE, MAG_GROUPS, 0,
          SPELL_HEAL, TYPE_UNDEFINED, 4, 3);
 
   spello(SPELL_GROUP_RECALL, "group recall", 90 , 30 , 2,
@@ -1796,7 +1800,7 @@ void mag_assign_spells(void)
          SPELL_CURE_CRITIC, TYPE_UNDEFINED, 3, 32);
 
   spello(SPELL_INFRAVISION, "infravision", 25 , 10 , 1,
-         POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+         POS_FIGHTING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
          0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3);
 
   spello(SPELL_INVISIBLE, "invisibility", 35 , 25 , 1,
@@ -1811,7 +1815,7 @@ void mag_assign_spells(void)
          POS_STANDING, TAR_OBJ_WORLD, FALSE, MAG_MANUAL, 0,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 6);
 
-  spello(SPELL_MAGIC_MISSILE, "magic missile", 25 , 10 , 3,
+  spello(SPELL_MAGIC_MISSILE, "magic missile", 70 , 30 , 4,
          POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
          0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20);
 
@@ -1948,11 +1952,11 @@ void mag_assign_spells(void)
          TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 48);
 
   spello(SPELL_HOLD_PERSON, "hold person", 70 , 40 , 2,
-         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
          300, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16);
 
   spello(SPELL_PARALYZE, "paralyze", 100 , 65 , 2,
-         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
          300, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 29);
 
   spello(SPELL_HOLY_WORD, "holy word", 25 , 15 , 3,
@@ -1964,7 +1968,7 @@ void mag_assign_spells(void)
          SPELL_HOLY_WORD, TYPE_UNDEFINED, 3, 13);
 
   spello(SPELL_HASTE, "haste", 50 , 35 , 1, POS_STANDING,
-         TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 70,
+         TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 70,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 16);
 
   spello(SPELL_SHIELD, "shield", 30 , 20 , 2, POS_STANDING,
@@ -1987,7 +1991,7 @@ void mag_assign_spells(void)
          MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35);
 
   spello(SPELL_KNOCK, "knock", 30 , 10 , 3, POS_FIGHTING,
-         TAR_IGNORE, TRUE, MAG_MANUAL, 0,
+         TAR_IGNORE | TAR_OBJ_INV | TAR_OBJ_ROOM, TRUE, MAG_MANUAL, 0,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 43);
 
   spello(SPELL_PROT_FIRE, "protection from fire", 20 , 10 ,

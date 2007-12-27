@@ -12,6 +12,8 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "fight.h"
+#include "damage.h"
 
 
 /* external variables */

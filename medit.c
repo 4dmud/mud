@@ -757,7 +757,7 @@ void medit_disp_menu(struct descriptor_data *d)
                   "%sN%s) Segments  : %s%s\r\n"
                   "%sR%s) Mob Race  : %s%-9s      %sV%s) Mob Class : %s%s\r\n"
                   "%sT%s) Tier      : %s%-9d      %sO%s) Subskill  : %s%s\r\n"
-                  "%sU%s) Charisma  : %s%-9d      %sO%s) Skin Vnum : %s%d\r\n"
+                  "%sU%s) Charisma  : %s%-9d      %sW%s) Skin Vnum : %s%d\r\n"
 #if CONFIG_OASIS_MPROG
                   "%sP%s) Mob Progs : %s%s\r\n"
 #endif

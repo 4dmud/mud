@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.25  2005/11/19 06:18:39  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.24  2005/11/01 18:43:38  w4dimenscor
  * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
  *
@@ -221,6 +224,8 @@ extern int message_type;
 #define ROOM_SPRING             40	/* Room has underground spring      */
 #define ROOM_PASTURE		41      /* Herd animals can graze here, and you can fence off exits in these rooms*/
 #define ROOM_DRAGONPORT		42
+#define ROOM_TIN_DEPOSIT      43
+#define ROOM_PLASTONIUM_DEPOSIT 44
 
 #define ZONE_OPEN		(1 <<  0)
 #define ZONE_CLOSED		(1 <<  1)
@@ -1807,6 +1812,12 @@ struct combine_data
 
 };
 
+struct dam_from_list {
+  long id;
+  int damage;
+  struct dam_from_list * next;
+};
+
 /* Specials used by NPCs, not PCs */
 struct mob_special_data
 {
@@ -1825,6 +1836,9 @@ struct mob_special_data
   obj_vnum skin;
   struct combine_data *join_list;
   struct char_data *head_join;
+  
+  int damage_taken; /* This is the total damage that this mob has taken before they died */
+  struct dam_from_list *dam_list; /* this is a list of the id nums of people who have attacked this mob */
 };
 
 

@@ -12,6 +12,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "damage.h"
 
 
 /* external functions */

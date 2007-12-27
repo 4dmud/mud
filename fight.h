@@ -141,4 +141,21 @@ extern struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES];
 /*
 "Standard" "Knife" "Dagger" "Shortsword" "Longsword" "Katana" "Rapier" "Cutlass" "Broadsword" "Half-Axe" "Double-Axe" "War-Hammer" "Mace" "Shortstaff" "Staff" "Whip" 
 */
+/* fight.c protos -mord */
+#define ATTACK_MAGIC 1
+#define ATTACK_SKILL 2
+#define ATTACK_MELEE 3
+int attack_type(char chclass);
+void start_fighting(struct char_data* ch, struct char_data* vict);
 
+int fe_solo_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
+int fe_melee_hit(struct char_data* ch, struct char_data* vict, int type, int melee);
+int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type);
+int fe_deal_damage(struct char_data* ch, struct char_data* vict, int dam, int w_type);
+void stop_fighting(struct char_data* ch);
+int attack_type(char chclass);
+
+void group_gain(struct char_data *ch, struct char_data *victim);
+void solo_gain(struct char_data *ch, struct char_data *victim,
+               bool missile);
+void die(struct char_data *ch, struct char_data *killer);

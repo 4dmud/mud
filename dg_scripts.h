@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/10/23 05:21:46 $
-*  $Revision: 1.6 $
+*  $Date: 2005/11/19 06:18:38 $
+*  $Revision: 1.7 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -391,6 +391,7 @@ void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
 
 char *sub_percent(char_data *ch, char *sub);
 void function_script(void *go, struct script_data *sc, trig_data *perent, int type, char *cmd);
+void send_char_pos(struct char_data *ch, int dam);
 
 /* Macros for scripts */
 

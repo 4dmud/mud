@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.16  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.15  2005/10/23 05:21:46  w4dimenscor
  * Altered assemblies, and fixed a few mem leaks
  *
@@ -422,6 +425,8 @@ const char *room_bits[] =
     "SPRING",
     "PASTURE",
     "DRAGONPORT",
+      "TIN DEPOSIT",
+      "PLASTONIUM DEPOSIT",
     "\n"
   };
 

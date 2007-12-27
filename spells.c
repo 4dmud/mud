@@ -23,7 +23,7 @@
 #include "dg_scripts.h"
 #include "fight.h"
 #include "dg_event.h"
-
+#include "damage.h"
 extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);
@@ -1399,6 +1399,7 @@ ASPELL(spell_recharge)
 ASPELL(spell_knock)
 {
   int cnt = 0, i;
+  if (!obj) {
 
   for (i = 0; i < NUM_OF_DIRS; i++)
   {
@@ -1429,8 +1430,8 @@ ASPELL(spell_knock)
     /** lets make it so they can only open doors that are on the inside **/
 
     cnt++;
-    send_to_room(IN_ROOM(ch), "The exit %s slams open under the force of some etherial hand.", dirs[i]);
-    send_to_room(EXIT(ch, i)->to_room, "The exit %s slams open under the force of some etherial hand.", dirs[rev_dir[i]]);
+    send_to_room(IN_ROOM(ch), "The exit %s burts open under the force of some etherial hand.", dirs[i]);
+    send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some etherial hand.", dirs[rev_dir[i]]);
     if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
       TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED);
     if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
@@ -1443,5 +1444,22 @@ ASPELL(spell_knock)
   {
     new_send_to_char(ch, "The room grows chilly, but nothing seems to happen.\r\n");
   }
+  } else {
+    if (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) {
+      new_send_to_char(ch, "You can't cast knock on %s\r\n", obj->short_description);
+    } else if (!OBJVAL_FLAGGED(obj, CONT_CLOSEABLE) || !OBJVAL_FLAGGED(obj, CONT_CLOSED)) {
+      new_send_to_char(ch, "%s is wide open!\r\n", obj->short_description);
+    } else if (!OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {
+      new_send_to_char(ch, "%s resists your magic.\r\n", obj->short_description);
+    } else if (GET_SKILL(ch, SPELL_KNOCK) > number(1, 130)) {
+      if (OBJVAL_FLAGGED(obj, CONT_LOCKED))
+    TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED))
+        TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_OPEN))
+        act("$p pops right open under the stress of your magic.", FALSE, ch, obj, NULL, TO_CHAR);
+      act("$p pops right open under the stress of $n's magic.", FALSE, ch, obj, NULL, TO_ROOM);
+    } else {
+      act("$p shivers and glows, but stays shut.", FALSE, ch, obj, NULL, TO_CHAR);
+      act("$p shivers and glows, but stays shut.", FALSE, ch, obj, NULL, TO_ROOM);
+    }
 
 }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.5  2005/11/19 06:18:38  w4dimenscor
+ * Fixed many bugs, and added features
+ *
  * Revision 1.4  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -158,12 +161,12 @@ int class_elem_strength(int chcl)
   switch (chcl)
   {
   case CLASS_MAGE:    return E_FIRE  | E_ICE;
-  case CLASS_PRIEST:  return E_LIGHT | E_SPIRIT;
+  case CLASS_PRIEST:  return E_ELEC  | E_SPIRIT;
   case CLASS_WARRIOR: return E_DEATH | E_AIR;
   case CLASS_THIEF:   return E_DARK  | E_DEATH;
   case CLASS_HUNTER:  return E_EARTH | E_ICE;
   case CLASS_RANGER:  return E_EARTH | E_AIR;
-  case CLASS_GYPSY:   return E_DEATH | E_FIRE;
+  case CLASS_GYPSY:   return E_DEATH | E_ELEC;
   case CLASS_ESPER:   return E_MIND  | E_SPIRIT;
   default:  return 0;
 

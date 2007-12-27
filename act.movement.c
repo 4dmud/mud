@@ -23,6 +23,8 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "kalten.h"
+#include "fight.h"
+#include "damage.h"
 
 /* external functs */
 void eq_to_room(CHAR_DATA *ch);

@@ -14,7 +14,7 @@
 #include "oasis.h"
 #include "dg_scripts.h"
 #include "clan.h"
-
+#include "damage.h"
 #include "event.h"
 #include "kalten.h"
 
@@ -2893,6 +2893,44 @@ EVENT2(find_nugget)
       if (keep_mineral < 65)
         REMOVE_BIT_AR(ROOM_FLAGS(IN_ROOM(CAUSER_CH)),
                       ROOM_CHROMIUM_DEPOSIT);
+      return;
+    }
+    else
+    {
+      send_to_char("Your efforts turn up nothing of value.\r\n",
+                   CAUSER_CH);
+      return;
+    }
+  }
+  if (CAN_MINE_TIN(CAUSER_CH))
+  {
+    if (value <= 35)
+    {
+      send_to_char("You found a tin nugget.\r\n", CAUSER_CH);
+      act("$n found something.", FALSE, CAUSER_CH, NULL, 0, TO_ROOM);
+      obj = read_object(46, VIRTUAL);
+      obj_to_room(obj, IN_ROOM(CAUSER_CH));
+      if (keep_mineral < 65)
+        REMOVE_BIT_AR(ROOM_FLAGS(IN_ROOM(CAUSER_CH)), ROOM_TIN_DEPOSIT);
+      return;
+    }
+    else
+    {
+      send_to_char("Your efforts turn up nothing of value.\r\n",
+                   CAUSER_CH);
+      return;
+    }
+  }
+  if (CAN_MINE_PLASTONIUM(CAUSER_CH))
+  {
+    if (value <= 35)
+    {
+      send_to_char("You found a plastonium nugget.\r\n", CAUSER_CH);
+      act("$n found something.", FALSE, CAUSER_CH, NULL, 0, TO_ROOM);
+      obj = read_object(47, VIRTUAL);
+      obj_to_room(obj, IN_ROOM(CAUSER_CH));
+      if (keep_mineral < 65)
+        REMOVE_BIT_AR(ROOM_FLAGS(IN_ROOM(CAUSER_CH)), ROOM_PLASTONIUM_DEPOSIT);
       return;
     }
     else
