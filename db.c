@@ -754,7 +754,7 @@ void free_zone_list(struct zone_list_data *z) {
 void destroy_db(void) {
 
     unsigned int cnt;
-    vector<Character>::iterator it;
+//    vector<Character>::iterator it;
 
     log("Free Hunter List");
     free_hunter_list();
