@@ -101,7 +101,6 @@ size_t proc_colour(char *inbuf, int colour_lvl, size_t len);
 ACMD(do_action);
 ACMD(do_insult);
 int average_damage(Character *ch);
-int can_fly(Character *ch);
 long find_class_bitvector(char arg);
 //long find_race_bitvector(char arg);
 char *title_male(int chclass, int level);
@@ -1240,7 +1239,7 @@ void look_at_room(Character *ch, int ignore_brief) {
             ch->Send( "%s", tbuf);
         } else {
             ch->Send( "%s", view_room->description);
-            //if (can_fly(ch))
+            //if (ch->Flying())
             //ch->Send( "You are flying a few feet up in the air.\r\n");
         }
 
@@ -1966,10 +1965,10 @@ ACMD(do_score) {
             primax =
                 size_dice_wep(ch, WEAPON_PRIM_AFF) + (size_dice_wep(ch, WEAPON_PRIM_AFF) * num_dice_wep(ch, WEAPON_PRIM_AFF));
 
-            if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD)))
-                shortmulti += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
-            else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD)))
-                shortmulti += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+            if (total_chance(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD)))
+                shortmulti += (LONG_WEP_MULTI * ((float)total_chance(ch, SKILL_LONGARM)))/100.0;
+            else if (total_chance(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD)))
+                shortmulti += (SHORT_WEP_MULTI_ROGUE * ((float)total_chance(ch, SKILL_SHORT_BLADE)))/100.0;
             else
                 shortmulti = 1.0f;
 
@@ -1994,10 +1993,10 @@ ACMD(do_score) {
             secmin = size_dice_wep(ch, WEAPON_SECO_AFF);
             secmax =
                 size_dice_wep(ch, WEAPON_SECO_AFF) + (size_dice_wep(ch, WEAPON_SECO_AFF) * num_dice_wep(ch, WEAPON_SECO_AFF));
-            if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
-                shortmulti += ((LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0);
-            else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
-                shortmulti += ((SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0);
+            if (total_chance(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
+                shortmulti += ((LONG_WEP_MULTI * ((float)total_chance(ch, SKILL_LONGARM)))/100.0);
+            else if (total_chance(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
+                shortmulti += ((SHORT_WEP_MULTI_ROGUE * ((float)total_chance(ch, SKILL_SHORT_BLADE)))/100.0);
             else
                 shortmulti = 1.0f;
             secmin += class_damroll(ch);

@@ -123,7 +123,7 @@ ASPELL(spell_midas_touch) {
     }
 
     /* charmed mobs not allowed to do this */
-    if ((!IS_NPC(ch) && (number(1, 201) < GET_SKILL(ch, SPELL_MIDAS_TOUCH)))) {
+    if ((!IS_NPC(ch) && (number(1, 201) < total_chance(ch, SPELL_MIDAS_TOUCH)))) {
         af.type = SPELL_MIDAS_TOUCH;
         af.expire = HOURS_TO_EXPIRE( 1 + ((GET_LEVEL(ch)) / 8));
         af.modifier = -200;
@@ -899,7 +899,7 @@ ASPELL(spell_detect_poison) {
 /* Remove Alignment by Thelonius for EnvyMud */
 ASPELL(spell_remove_alignment) {
     if (victim && !obj) {
-        if (number(0, 120) < GET_SKILL(ch, SPELL_REMOVE_ALIGNMENT)) {
+        if (number(0, 120) < total_chance(ch, SPELL_REMOVE_ALIGNMENT)) {
             GET_ALIGNMENT(victim) = 0;
             act("$N vibrates then becomes dull.", FALSE, ch, 0, victim, TO_ROOM);
             act("You vibrate then become dull.", FALSE, ch, 0, victim, TO_VICT);
@@ -917,7 +917,7 @@ ASPELL(spell_remove_alignment) {
         }
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-        if (number(0, 120) < GET_SKILL(ch, SPELL_REMOVE_ALIGNMENT)) {
+        if (number(0, 120) < total_chance(ch, SPELL_REMOVE_ALIGNMENT)) {
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_GOOD);
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_EVIL);
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_NEUTRAL);
@@ -951,7 +951,7 @@ ASPELL(spell_enchant_armor) {
 
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-    if (number(0, 120) < GET_SKILL(ch, SPELL_ENCHANT_ARMOR)) {
+    if (number(0, 120) < total_chance(ch, SPELL_ENCHANT_ARMOR)) {
         GET_OBJ_VAL(obj, 0) *= 2;
         act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL,
             TO_CHAR);
@@ -1326,7 +1326,7 @@ ASPELL(spell_knock) {
             ch->Send( "%s is wide open!\r\n", obj->short_description);
         } else if (!OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {
             ch->Send( "%s resists your magic.\r\n", obj->short_description);
-        } else if (GET_SKILL(ch, SPELL_KNOCK) > number(1, 130)) {
+        } else if (total_chance(ch, SPELL_KNOCK) > number(1, 130)) {
             if (OBJVAL_FLAGGED(obj, CONT_LOCKED))
                 TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED);
             TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_CLOSED);

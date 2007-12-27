@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.29  2007/06/26 10:48:05  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.28  2007/06/17 20:32:42  w4dimenscor
  * was deducting gold twice for practicing.
  *
@@ -638,7 +641,7 @@ SPECIAL(guild) {
     pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
     percent = GET_SKILL(ch, skill_num);
     /* Cost In Gold */
-    cig = (percent*5000 + (REMORTS(ch) * 1000) + (GET_LEVEL(ch) * 1000 * current_class_is_tier_num(ch)) + (spell_info[skill_num].min_level * 1000)) * pp;
+    cig = ((percent*4000) + (REMORTS(ch) * 1000) + (GET_LEVEL(ch) * 1000 * current_class_is_tier_num(ch)) + (spell_info[skill_num].min_level * 1000)) * pp;
     if (REMORTS(ch) > 2 && ch->Gold(0, GOLD_HAND) < cig) {
 		ch->Send(  "You need at least %lld gold coins to pay for practicing that.\r\n", cig);
 		return (1);

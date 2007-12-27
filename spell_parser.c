@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.41  2007/06/26 10:48:05  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.40  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -1237,7 +1240,7 @@ ACMD(do_cast) {
     }
 
     /* You throw the dice and take your chances.. 101% is total failure */
-    if (number(0, 101) > (GET_SKILL(ch, spellnum))) {
+    if (number(0, 101) > (total_chance(ch, spellnum))) {
 
         if (!tch || !skill_message(0, ch, tch, spellnum))
             GET_SPELL_DIR(ch) = NOWHERE;
@@ -1335,11 +1338,11 @@ int knows_spell(Character *ch, int spell) {
 
     }
     if (ret_val && spell_info[spell].first_prereq != TYPE_UNDEFINED)
-        if (!knows_spell(ch, spell_info[spell].first_prereq) || GET_SKILL(ch, spell_info[spell].first_prereq) == 0)
+        if (!knows_spell(ch, spell_info[spell].first_prereq) || total_chance(ch, spell_info[spell].first_prereq) == 0)
             return 0;
 
     if (ret_val && spell_info[spell].second_prereq != TYPE_UNDEFINED)
-        if (!knows_spell(ch, spell_info[spell].second_prereq) || GET_SKILL(ch, spell_info[spell].second_prereq) == 0)
+        if (!knows_spell(ch, spell_info[spell].second_prereq) || total_chance(ch, spell_info[spell].second_prereq) == 0)
             return 0;
 
     switch (spell) {

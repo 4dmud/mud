@@ -354,7 +354,7 @@ ACTION(thing_control_weather_worse)
     return 0;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
-  if (!(number(0, 105) < GET_SKILL(ch, SPELL_CONTROL_WEATHER)))
+  if (!(number(0, 105) < total_chance(ch, SPELL_CONTROL_WEATHER)))
   {
     to_char = "Your concentration falters. The magic stops.";
     to_room = "$n's concentration falters. The magic stops.";
@@ -450,7 +450,7 @@ ACTION(thing_control_weather_better)
     return 0;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
-  if (!(number(0, 105) < GET_SKILL(ch, SPELL_CONTROL_WEATHER)))
+  if (!(number(0, 105) < total_chance(ch, SPELL_CONTROL_WEATHER)))
   {
     to_char = "Your concentration falters. The magic stops.";
     to_room = "$n's concentration falters. The magic stops.";
@@ -1055,7 +1055,7 @@ ASKILL(skill_strangle)
   if (vict == ch)
     vict = NULL;
 
-  if (GET_SKILL(ch, SKILL_STRANGLE) <= 0)
+  if (total_chance(ch, SKILL_STRANGLE) <= 0)
   {
     ch->Send( "You have no idea how to use that command!\r\n");
     return TYPE_UNDEFINED;
@@ -1165,7 +1165,7 @@ ACTION(thing_throttle)
       GET_POS(vict) < POS_STANDING ||
       GET_POS(ch) < POS_STANDING ||
       has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD)  ||
-      ((number(0, 110) - GET_DEX(ch)) > GET_SKILL(ch, SKILL_STRANGLE)))
+      ((number(0, 110) - GET_DEX(ch)) > total_chance(ch, SKILL_STRANGLE)))
   {
     ch->Send( "You loose focus and stop strangling.\r\n");
     act("$n relaxes his grip.\r\n", FALSE, ch, 0, 0, TO_ROOM);
@@ -1403,7 +1403,7 @@ ACTION(thing_tumble)
   }
 
 
-  if (!IS_STUCK(vict) || !skill_cost(0, 0, 50, ch) ||  (number(0, 110) - GET_DEX(ch) > GET_SKILL(ch, SKILL_STRANGLE)))
+  if (!IS_STUCK(vict) || !skill_cost(0, 0, 50, ch) ||  (number(0, 110) - GET_DEX(ch) > total_chance(ch, SKILL_STRANGLE)))
   {
     ch->Send( "You loose focus and stop strangling!!\r\n");
     act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);

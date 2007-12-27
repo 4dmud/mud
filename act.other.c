@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.39  2007/06/26 10:48:05  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.38  2006/09/20 09:53:31  w4dimenscor
  * Fixed issue where players starting combat with a spell would not attack, and visa versa
  *
@@ -774,13 +777,13 @@ ACMD(do_ungroup)
     for (f = ch->followers; f; f = next_fol)
     {
       next_fol = f->next;
-      if (AFF_FLAGGED(f->follower, AFF_GROUP))
-      {
+      //if (AFF_FLAGGED(f->follower, AFF_GROUP))
+      //{
         REMOVE_BIT_AR(AFF_FLAGS(f->follower), AFF_GROUP);
         *f->follower << GET_NAME(ch) << " has disbanded the group.\r\n";
-        if (!AFF_FLAGGED(f->follower, AFF_CHARM))
+        //if (!AFF_FLAGGED(f->follower, AFF_CHARM))
           stop_follower(f->follower);
-      }
+      //}
     }
 
     REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_GROUP);

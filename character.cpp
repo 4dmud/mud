@@ -1185,6 +1185,12 @@ bool Character::Flying() {
     if (AFF_FLAGGED(this, AFF_FLY))
         return TRUE;
 
+    if (GET_POS(this) == POS_SITTING && char_specials.chair && GET_OBJ_TYPE(char_specials.chair) == ITEM_SPACEBIKE)
+        return TRUE;
+
+    if (MountHere() && RIDING(this)->Flying())
+        return TRUE;
+
     return FALSE;
 }
 

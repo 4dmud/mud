@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/11 08:33:12 $                                           * 
-*  $Revision: 1.54 $                                                      *
+*  $Date: 2007/06/26 10:48:05 $                                           * 
+*  $Revision: 1.55 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -60,30 +60,15 @@ void add_var(struct trig_var_data **var_list,const char *name,const char *value,
         ;
 
     if (vd && (!vd->context || vd->context==id)) {
-        //delete vd->value;
-        //free(vd->value);
-        //CREATE(vd->value, char, strlen(value) + 1);
-        //vd->value = new char(strlen(value) + 1);
         vd->value.erase();
     } else if (!vd) {
-        // if (vd)
-        //delete vd;
         vd = new trig_var_data();
-
-        //CREATE(vd->name, char, strlen(name) + 1);
-        //vd->name = new char(strlen(name)+1);
-        //strcpy(vd->name, name);                            /* strcpy: ok*/
         vd->name.assign(name);
-
-        //CREATE(vd->value, char, strlen(value) + 1);
-        //vd->value = new char(strlen(value) + 1);
-
         vd->next = *var_list;
         vd->context = id;
         *var_list = vd;
     }
     vd->value.assign(value);
-    //strcpy(vd->value, value);                            /* strcpy: ok*/
 }
 
 void add_var(struct trig_var_data **var_list, string name, string value, long id) {
@@ -97,10 +82,11 @@ void add_var(struct trig_var_data **var_list, string name, string value, long id
     for (vd = *var_list; vd && vd->name.compare(name); vd = vd->next)
         ;
 
-    if (!(vd && (!vd->context || vd->context==id))) {
+    if (vd && (!vd->context || vd->context==id)) {
+        vd->value.erase();
+    } else if (!vd) {
         vd = new trig_var_data();
         vd->name.assign(name);
-
         vd->next = *var_list;
         vd->context = id;
         *var_list = vd;
@@ -127,7 +113,6 @@ char *skill_percent(Character *ch, char *skill)
    and 0 if it doesnt exist, and greater then 0 if it does!
    Jamie Nelson (mordecai@timespace.co.nz)
    MUD -- 4dimensions.org:6000
-   
    Now also searches by vnum -- Welcor
    Now returns the number of matching objects -- Welcor 02/04
 */
@@ -299,8 +284,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
     /* some evil waitstates could crash the mud if sent here with sc==NULL*/
     if (!vd && sc)
         for (vd = sc->global_vars; vd; vd = vd->next)
-            if (!strcasecmp(vd->name.c_str(), var) &&
-                    (vd->context==0 || vd->context==sc->context))
+            if (!strcasecmp(vd->name.c_str(), var) && (vd->context==0 || vd->context==sc->context))
                 break;
 
 
@@ -363,7 +347,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         return;
     }  else {
-        
+
         if (vd) {
             name = vd->value.c_str();
 

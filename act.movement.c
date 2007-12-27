@@ -39,7 +39,6 @@ int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 int ok_damage_shopkeeper(Character *ch, Character *victim);
 int has_metal_detector(Character *ch);
 void spill_gold(Character *ch);
-int can_fly(Character *ch);
 ACMD(do_sac);
 int buildwalk(Character *ch, int dir);
 int move_fusion(Character *ch, int dir);
@@ -395,7 +394,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
     }
 
     if (ch->MountHere()
-            && GET_SKILL(ch, SKILL_RIDING) < number(1, GET_LEVEL(RIDING(ch)) * 2) - number(-4, need_movement)
+            && total_chance(ch, SKILL_RIDING) < number(1, GET_LEVEL(RIDING(ch)) * 2) - number(-4, need_movement)
             && !AFF_FLAGGED(RIDING(ch), AFF_TAMED)) {
         act("$N rears backwards, throwing you to the ground.", FALSE, ch,
             0, RIDING(ch), TO_CHAR);
@@ -992,7 +991,7 @@ int perform_move(Character *ch, int dir, int need_specials_check) {
                 return 0;
             }
             ch->Send( "You struggle ");
-            if (number(1, 101) < GET_SKILL(ch, SKILL_TRAP_AWARE)) {
+            if (number(1, 101) < total_chance(ch, SKILL_TRAP_AWARE)) {
                 ch->Send( "and manage to free yourself from the snare.\r\n");
                 affect_from_char(ch, SKILL_SNARE);
             } else {
@@ -1216,7 +1215,7 @@ int ok_pick(Character *ch, obj_vnum keynum, int pickproof, int scmd) {
                          ch);
         else if (pickproof)
             send_to_char("It resists your attempts to pick it.\r\n", ch);
-        else if (percent > GET_SKILL(ch, SKILL_PICK_LOCK))
+        else if (percent > total_chance(ch, SKILL_PICK_LOCK))
             send_to_char("You failed to pick the lock.\r\n", ch);
         else
             return (1);
@@ -2054,14 +2053,14 @@ ASKILL(skill_mount) {
     } else if ((GET_LEVEL(ch) < LVL_IMMORT && (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_MOUNTABLE)))) {
         send_to_char("You can't mount that!\r\n", ch);
         return 0;
-    } else if (!GET_SKILL(ch, SKILL_MOUNT)) {
+    } else if (!total_chance(ch, SKILL_MOUNT)) {
         send_to_char("First you need to learn *how* to mount.\r\n", ch);
         return 0;
 
     } else if (use_stamina(ch, 5) < 0) {
         ch->Send( "You are too exausted!");
         return 0;
-    } else if (GET_SKILL(ch, SKILL_MOUNT) <= number(1, 101)) {
+    } else if (total_chance(ch, SKILL_MOUNT) <= number(1, 101)) {
         act("You try to mount $N, but slip and fall off.", FALSE, ch, 0,
             vict, TO_CHAR);
         act("$n tries to mount you, but slips and falls off.", FALSE, ch,
@@ -2077,7 +2076,7 @@ ASKILL(skill_mount) {
     mount_char(ch, vict);
 
     if (IS_NPC(vict) && !AFF_FLAGGED(vict, AFF_TAMED)
-            && GET_SKILL(ch, SKILL_MOUNT) <= number(1, 101)) {
+            && total_chance(ch, SKILL_MOUNT) <= number(1, 101)) {
         act("$N suddenly bucks upwards, throwing you violently to the ground!", FALSE, ch, 0, vict, TO_CHAR);
         act("$n is thrown to the ground as $N violently bucks!", TRUE, ch,
             0, vict, TO_NOTVICT);
@@ -2193,7 +2192,7 @@ ASKILL(skill_snare) {
     /* charmed mobs not allowed to do this */
     if ((IS_NPC(ch) && !IS_AFFECTED(ch, AFF_CHARM))
             || (!IS_NPC(ch)
-                && (number(1, 101) < GET_SKILL(ch, SKILL_SNARE)))) {
+                && (number(1, 101) < total_chance(ch, SKILL_SNARE)))) {
         af.type = SKILL_SNARE;
         af.expire = HOURS_TO_EXPIRE(3);
         af.modifier = 0;
@@ -2248,7 +2247,7 @@ ASKILL(skill_blackjack) {
         ch->Send("They are moving about too much.\r\n");
         return 0;
     }
-    chance += GET_SKILL(ch, SKILL_BLACKJACK);
+    chance += total_chance(ch, SKILL_BLACKJACK);
     chance += (GET_LEVEL(ch) - (GET_LEVEL(vict)/2));
 
     if (!GET_EQ(ch, WEAR_HEAD))

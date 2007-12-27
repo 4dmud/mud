@@ -16,6 +16,8 @@
 #include "handler.h"
 #include "interpreter.h"
 /* #include "olc.h" */
+#include "genzon.h"
+#include "genshp.h"
 #include "oasis.h"
 #include "assemblies.h"
 #include "descriptor.h"
@@ -51,14 +53,19 @@ ACMD (do_assedit)
   Descriptor *d = ch->desc;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
+  int zr;
 
   *buf = '\0';  /* If I run into problems then take this sucker out */
   *buf2 = '\0';
 
   if (IS_NPC(ch))
     return;
-  if (GET_LEVEL(ch) < LVL_IMPL)
-    ch->Send( "You do not have permission to do that.\r\n");
+
+
+    /****************************************************************************/
+    /** Everyone but IMPLs can only edit zones they have been assigned.        **/
+    /****************************************************************************/
+
 
   for (d = descriptor_list; d; d = d->next)
   {
@@ -115,9 +122,23 @@ ACMD (do_assedit)
   else
     if (isdigit(*buf))
     {
+    zr = atoi(buf);
       d = ch->desc;
       CREATE (d->olc, struct oasis_olc_data, 1);
-      assedit_setup(d, atoi(buf));
+      
+      OLC_ZNUM(d) = real_zone_by_thing(zr);
+    if (OLC_ZNUM(d) == NOWHERE) {
+        ch->Send( "Sorry, there is no zone for that number!\r\n");
+        free(d->olc);
+        d->olc = NULL;
+        return;
+    }else if (!can_edit_zone(ch, OLC_ZNUM(d))) {
+        ch->Send( "You do not have permission to edit this zone.\r\n");
+        free(d->olc);
+        d->olc = NULL;
+        return;
+        }
+    assedit_setup(d, zr);
 
     }
   return;

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.56  2007/06/26 10:48:04  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.55  2007/06/14 23:55:39  w4dimenscor
  * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
  *
@@ -2009,7 +2012,7 @@ ACMD(do_drink) {
         }
 
     } else {
-        if ((GET_COND(ch, DRUNK) > (5+(GET_SKILL(ch, SKILL_DRUNK) / 4))) && (GET_COND(ch, THIRST) > 0)) {
+        if ((GET_COND(ch, DRUNK) > (5+(total_chance(ch, SKILL_DRUNK) / 4))) && (GET_COND(ch, THIRST) > 0)) {
             /* The pig is drunk */
             ch->Send("You can't seem to get close enough to your mouth.\r\n");
             act("$n tries to drink but misses $s mouth!", TRUE, ch, 0, 0,
@@ -2118,7 +2121,7 @@ ACMD(do_drink) {
         update_pos(ch);
     } else {
 
-        if ( drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK] && number(1, 100) < GET_SKILL(ch, SKILL_DRUNK)) {
+        if ( drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK] && number(1, 100) < total_chance(ch, SKILL_DRUNK)) {
             improve_skill(ch, SKILL_DRUNK);
             gain_condition(ch, DRUNK,  drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK]  * amount / 4);
         }
@@ -2925,14 +2928,14 @@ void perform_wear(Character *ch, struct obj_data *obj, int where) {
             return;
         }
         if ((wep_hands(obj) == 2 || (GET_EQ(ch, WEAR_WIELD) && wep_hands(GET_EQ(ch, WEAR_WIELD)) == 2)) &&
-                ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD)))))) {
+                ((GET_EQ(ch, WEAR_SHIELD) || (!total_chance(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD)))))) {
             *ch << "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n";
             return;
         }
-        if (GET_EQ(ch, where) && GET_SKILL(ch, SKILL_DUAL)
+        if (GET_EQ(ch, where) && total_chance(ch, SKILL_DUAL)
                 && !(GET_EQ(ch, WEAR_SHIELD)))
             where = WEAR_WIELD_2;
-        else if (GET_EQ(ch, where) && GET_SKILL(ch, SKILL_DUAL)
+        else if (GET_EQ(ch, where) && total_chance(ch, SKILL_DUAL)
                  && (GET_EQ(ch, WEAR_SHIELD) )) {
             *ch << "You can't wield a second weapon while wearing a shield.\r\n";
             return;
@@ -3626,17 +3629,17 @@ void compare_weapons(Character *ch,struct obj_data *item, struct obj_data *comp)
     int value1, value2;
     if (!item || !comp)
         return;
-    if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(item))
-        wep_multi[0] += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
-    else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(item))
-        wep_multi[0] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+    if (total_chance(ch, SKILL_LONGARM) > 0 && !is_short_wep(item))
+        wep_multi[0] += (LONG_WEP_MULTI * ((float)total_chance(ch, SKILL_LONGARM)))/100.0;
+    else if (total_chance(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(item))
+        wep_multi[0] += (SHORT_WEP_MULTI_ROGUE * ((float)total_chance(ch, SKILL_SHORT_BLADE)))/100.0;
     else
         wep_multi[0] = 1.0f;
 
     if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(comp))
-        wep_multi[1] += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+        wep_multi[1] += (LONG_WEP_MULTI * ((float)total_chance(ch, SKILL_LONGARM)))/100.0;
     else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(comp))
-        wep_multi[1] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+        wep_multi[1] += (SHORT_WEP_MULTI_ROGUE * ((float)total_chance(ch, SKILL_SHORT_BLADE)))/100.0;
     else
         wep_multi[1] = 1.0f;
 
@@ -3867,12 +3870,12 @@ int speed_update(Character *ch) {
     else { // start of player speed
 
 
-        if (0 < GET_SKILL(ch, SKILL_SECOND_ATTACK)) {
-            speed += GET_SKILL(ch, SKILL_SECOND_ATTACK)/2;
+        if (0 < total_chance(ch, SKILL_SECOND_ATTACK)) {
+            speed += total_chance(ch, SKILL_SECOND_ATTACK)/2;
 
         }
-        if (0 <GET_SKILL(ch, SKILL_THIRD_ATTACK)) {
-            speed += GET_SKILL(ch, SKILL_THIRD_ATTACK)/2;
+        if (0 <total_chance(ch, SKILL_THIRD_ATTACK)) {
+            speed += total_chance(ch, SKILL_THIRD_ATTACK)/2;
         }
 
         speed += class_speed(ch);
@@ -3896,7 +3899,7 @@ int speed_update(Character *ch) {
         speed += var;
 
 
-        if (RIDING(ch) && HERE(RIDING(ch), ch) && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
+        if (RIDING(ch) && HERE(RIDING(ch), ch) && total_chance(ch, SKILL_MOUNTED_COMBAT))
             speed += 25 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
         else if (GET_RACE(ch) == RACE_CENTAUR && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
             speed += 25 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);

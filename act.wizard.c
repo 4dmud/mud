@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.76  2007/06/26 10:48:05  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.75  2007/06/14 23:55:39  w4dimenscor
  * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
  *
@@ -1503,7 +1506,7 @@ void do_stat_room(Character *ch) {
 
     list_zone_commands_room(ch, rm->number);
     /* check the room for a script */
-    if (GET_LEVEL(ch) >= LVL_SEN)
+    //if (GET_LEVEL(ch) >= LVL_SEN)
         do_sstat_room(ch);
 }
 

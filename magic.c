@@ -1620,7 +1620,7 @@ void mag_areas(int level, Character *ch, int spellnum, int savetype) {
             continue;
 
         /* Doesn't matter if they die here so we don't check. -gg 6/24/98 */
-        if (number(0,170) < (level + GET_SKILL(ch, spellnum))) {
+        if (number(0,170) < (level + total_chance(ch, spellnum))) {
             GET_WAIT_STATE(ch) += 1 RL_SEC;
             mag_damage(level, ch, tch, spellnum, 1);
         } else {

@@ -368,7 +368,7 @@ ACMD(do_skills)
    ** I know there is redundancy in the messages of these checks*/
   if (IS_NPC(orig) && orig->desc)
     ch->Send( "You have no idea how to do that.\r\n");
-  else if (!IS_NPC(orig) && ((!knows_spell(orig, subcmd) || !GET_SKILL(ch, subcmd)) && GET_LEVEL(orig) < LVL_GOD))
+  else if (!IS_NPC(orig) && ((!knows_spell(orig, subcmd) || !total_chance(ch, subcmd)) && GET_LEVEL(orig) < LVL_GOD))
     ch->Send( "You have no idea how to do that.\r\n");
   else if (IS_SET(SINFO.flags, SK_VIOLENT) && ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
     ch->Send("This room just has such a peaceful, easy feeling...\r\n");
@@ -917,7 +917,7 @@ ASKILL(skill_sneak)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       *ch << "You stumble over your own feet\r\n";
       return 0;
@@ -1530,7 +1530,7 @@ ASKILL(skill_grip)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_GRIP) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_GRIP) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "Your hands cramp.\r\n");
       return 0;
@@ -1602,7 +1602,7 @@ ASKILL(skill_focus)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_FOCUS) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_FOCUS) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You can't seem to focus properly.\r\n");
       return 0;
@@ -1692,7 +1692,7 @@ ASKILL(skill_beserk)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_BESERK) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_BESERK) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You stumble over your own feet\r\n");
       return 0;
@@ -1726,7 +1726,7 @@ ASKILL(skill_meditate)
 
     percent = number(1, 101); /* 101% is a complete failure */
     if (percent >
-        GET_SKILL(ch, SKILL_MEDITATE) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_MEDITATE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You can not seem to clear your thoughts.\r\n");
       return 0;
@@ -1769,7 +1769,7 @@ ASKILL(skill_true_strike)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_TRUE_STRIKE) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_TRUE_STRIKE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You stutter and forget the battlesong.\r\n");
       return 0;
@@ -1817,7 +1817,7 @@ ASKILL(skill_fortify)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_FORTIFY) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_FORTIFY) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You can't seem to concentrate.\r\n");
       return 0;
@@ -1941,7 +1941,7 @@ ASKILL(skill_blade_dance)
     percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
-        GET_SKILL(ch, SKILL_BLADE_DANCE) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_BLADE_DANCE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You stumble over your own feet\r\n");
       return 0;
@@ -1977,7 +1977,7 @@ ASKILL(skill_cleave)
 
   /* Only appropriately skilled PCs and uncharmed mobs */
   corpse_mod = 2;
-  skill_attack(ch, vict, SKILL_CLEAVE, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_CLEAVE)) > number(0, 120));
+  skill_attack(ch, vict, SKILL_CLEAVE, (IS_NPC(ch) ? GET_LEVEL(ch) : total_chance(ch, SKILL_CLEAVE)) > number(0, 120));
   corpse_mod = 0;
   WAIT_STATE(ch, 2 RL_SEC);
   return SKILL_CLEAVE;
@@ -1999,7 +1999,7 @@ ASKILL(skill_behead)
   }
   /* Only appropriately skilled PCs and uncharmed mobs */
   corpse_mod = 1;
-  skill_attack(ch, vict, SKILL_BEHEAD, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_BEHEAD)) > number(0, 120));
+  skill_attack(ch, vict, SKILL_BEHEAD, (IS_NPC(ch) ? GET_LEVEL(ch) : total_chance(ch, SKILL_BEHEAD)) > number(0, 120));
   corpse_mod = 0;
   WAIT_STATE(ch, 2 RL_SEC);
   return SKILL_BEHEAD;
@@ -2029,7 +2029,7 @@ ASKILL(skill_martial_arts)
       return 0;
     }
     if (percent >
-        GET_SKILL(ch, SKILL_MARTIAL_ARTS) + dex_app_skill[GET_DEX(ch)].sneak)
+        total_chance(ch, SKILL_MARTIAL_ARTS) + dex_app_skill[GET_DEX(ch)].sneak)
     {
       ch->Send( "You stumble over your own feet\r\n");
       return 0;
@@ -2117,7 +2117,7 @@ ASKILL(skill_hyperactivity)
 
   percent = number(1, 101);   /* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_HYPERACTIVITY))
+  if (percent > total_chance(ch, SKILL_HYPERACTIVITY))
   {
     ch->Send( "You feel calm.\r\n");
     return 0;
@@ -2156,7 +2156,7 @@ ASKILL(skill_holy_strength)
 
   percent = number(1, 101);   /* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_HOLY_STRENGTH))
+  if (percent > total_chance(ch, SKILL_HOLY_STRENGTH))
   {
     ch->Send( "You still feel weak.\r\n");
     return 0;
@@ -2193,7 +2193,7 @@ ASKILL(skill_brace)
   }
   percent = number(1, 101);   /* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_BRACE))
+  if (percent > total_chance(ch, SKILL_BRACE))
   {
     *ch << "You didn't manage to brace yourself.\r\n";
     return 0;
@@ -2236,7 +2236,7 @@ ASKILL(skill_push)
   }
   else
   {
-    int stren = (GET_STR(ch) * GET_SKILL(ch, SKILL_PUSH))/100;
+    int stren = (GET_STR(ch) * total_chance(ch, SKILL_PUSH))/100;
     GET_WAIT_STATE(ch) += 3 RL_SEC;
     if (use_stamina( ch, 20) < 0)
     {
@@ -2353,7 +2353,7 @@ ASKILL(skill_scan)
   act("You quickly scan the area and see:", TRUE, ch, 0, 0, TO_CHAR);
   act("$n quickly scans the area.", FALSE, ch, 0, 0, TO_ROOM);
 
-  if (number(1, 100) > GET_SKILL(ch, SKILL_SCAN))
+  if (number(1, 100) > total_chance(ch, SKILL_SCAN))
   {
     *ch << "You squint, but your eyesight fails you.\r\n";
     return 0;
@@ -2540,7 +2540,7 @@ ASKILL(skill_poison_weapon)
 
   /* Check the skill percentage */
   if (!IS_NPC(ch)
-      && number(1, 101) > GET_SKILL(ch, SKILL_POISON_WEAPON))
+      && number(1, 101) > total_chance(ch, SKILL_POISON_WEAPON))
   {
     *ch << "You failed and spill some on yourself.  Ouch!\r\n";
     damage(ch, ch, GET_LEVEL(ch), -1);
@@ -2619,7 +2619,7 @@ ASKILL(skill_retreat)
     return 0;
   }
 
-  percent = GET_SKILL(ch, SKILL_RETREAT);
+  percent = total_chance(ch, SKILL_RETREAT);
   prob = number(0, 101);
 
   if (prob <= percent)
@@ -2737,7 +2737,7 @@ ASKILL(skill_forage)
   
   act("$n starts foraging the area.", FALSE, ch, 0, 0,  TO_ROOM);
   
-  if (IS_NPC(ch) || (number(1, 125) > GET_SKILL(ch, SKILL_FORAGE)))
+  if (IS_NPC(ch) || (number(1, 125) > total_chance(ch, SKILL_FORAGE)))
   {
     WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     ch->Send( "You have no luck finding anything.\r\n");
@@ -2755,7 +2755,7 @@ ASKILL(skill_forage)
 
     act("You have found $p!", FALSE, ch, item_found, 0, TO_CHAR);
 
-    if ((number(1, 125) > GET_SKILL(ch, SKILL_FORAGE)) && ((GET_OBJ_TYPE(item_found) == ITEM_DRINKCON) ||
+    if ((number(1, 125) > total_chance(ch, SKILL_FORAGE)) && ((GET_OBJ_TYPE(item_found) == ITEM_DRINKCON) ||
         (GET_OBJ_TYPE(item_found) == ITEM_FOUNTAIN) ||
         (GET_OBJ_TYPE(item_found) == ITEM_FOOD)) && GET_OBJ_VAL(item_found, 3))
     {

@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.74  2007/06/26 10:48:05  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.73  2007/06/17 10:44:53  w4dimenscor
  * Fixed a bug in a mounted persons movepoints going below 0, fixed abuse of animate dead, fixed group spells to allow for inclusion of charmies, and set a limit on total charmies in a group.
  *
@@ -692,8 +695,11 @@ int size_dice_wep(Character *ch, short dual) {
             d_add += GET_SPEED(ch)/100;
 
 
-        if (RIDING(ch) && HERE(ch, RIDING(ch)))
-            d_add += (mnt = GET_SKILL(ch, SKILL_MOUNTED_COMBAT)) > 0 ? mnt / 20 : 0;
+        if (RIDING(ch) && HERE(ch, RIDING(ch))) {
+        mnt = total_chance(ch, SKILL_MOUNTED_COMBAT);
+        if (mnt)
+        d_add += ((int)GET_PERC(RIDING(ch))/25)+(mnt/25);
+            }
 
 
         if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
@@ -706,7 +712,7 @@ int size_dice_wep(Character *ch, short dual) {
         case CLASS_MAGE:
         case CLASS_PRIEST:
         case CLASS_ESPER:
-            d_add -= 5;
+            d_add -= 7;
         }
     }
     return d_add;
@@ -870,6 +876,8 @@ void start_fighting(Character* ch, Character* vict) {
             if (!HERE(f->follower,victim))
                 continue;
             if (SELF(f->follower, ch))
+                continue;
+            if (GET_PERC(f->follower) == 0)
                 continue;
             if (IS_NPC(f->follower) && !AFF_FLAGGED(f->follower, AFF_CHARM))
                 continue;
@@ -1867,10 +1875,10 @@ int fe_melee_hit(Character* ch, Character* vict,
         if (!IS_NPC(ch)) {
             if (weps) {
                 w_type = GET_OBJ_VAL(wielded, 3) + TYPE_HIT;
-                if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(wielded))
-                    wep_multi = (1.0f + (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0);
-                else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(wielded))
-                    wep_multi = (1.0f + (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0);
+                if (total_chance(ch, SKILL_LONGARM) > 0 && !is_short_wep(wielded))
+                    wep_multi = (1.0f + (LONG_WEP_MULTI * ((float)total_chance(ch, SKILL_LONGARM)))/100.0);
+                else if (total_chance(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(wielded))
+                    wep_multi = (1.0f + (SHORT_WEP_MULTI_ROGUE * ((float)total_chance(ch, SKILL_SHORT_BLADE)))/100.0);
                 else
                     wep_multi = 1.0f;
             } else
@@ -2174,7 +2182,7 @@ int valid_perc(Character *ch) {
 
     struct follow_type* f = NULL;
     Character *vict = FIGHTING(ch);
-Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
+    Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
     room_rnum rm = IN_ROOM(ch);
     float total_perc = 0.0;
 
@@ -2182,13 +2190,11 @@ Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
        if you have 0 involvement and are alone you should get full attacks.
        */
 
-    if (!ch || PLR_FLAGGED(ch, PLR_DYING) || GET_POS(ch) == POS_DEAD || DEAD(ch))
+    if (!ch || GET_POS(ch) == POS_DEAD || DEAD(ch))
         return 0;
 
-
-    if (vict == NULL || (!ch->master && ch->followers == NULL))
+    if (vict == NULL || (!ch->master && master->followers == NULL))
         return FTOI((GET_PERC(ch) = 100));
-
 
     /*check if the master is a valid target - and add the value of  */
     if (SELF(master,ch) ||((FIGHTING(master) == vict) && (IN_ROOM(master) == rm) ))
@@ -2441,10 +2447,11 @@ int fe_after_damage(Character* ch, Character* vict,
 
     if (dam) {
 
-        if (RIDING(vict) && HERE(RIDING(vict), vict) && RIDING(vict) != ch) {
-            partial = ((dam * 3)/4);
-            if (damage(ch, RIDING(vict), partial, w_type) == -1)
-                return -1;
+       if (RIDING(vict) && HERE(RIDING(vict), vict) && RIDING(vict) != ch) {
+            partial = (((dam/3) * (250 - total_chance(vict, SKILL_MOUNTED_COMBAT)))/250);
+            damage(ch, RIDING(vict), partial, w_type);
+            partial *= 2;
+               // return -1;
         } else
             partial = dam;
 
@@ -2475,9 +2482,9 @@ int fe_after_damage(Character* ch, Character* vict,
             if (RIDING(ch) && HERE(ch, RIDING(ch))) {
                 int dam_exp = partial;
                 if (IS_NPC(vict) && !IS_NPC(RIDING(ch)) && partial > 2) {
-                    dam_exp /= 2;
+                    dam_exp /= 4;
                     damage_count(vict, IS_NPC(RIDING(ch)) ? -1 : GET_ID(RIDING(ch)), dam_exp);
-                    damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
+                    damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp * 3);
                 } else
                     damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
 
@@ -2847,7 +2854,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type) {
 
     if (IS_WEAPON(w_type) && has_weapon(ch) && ((parrychance = has_weapon(vict))!= 0) &&
             (number(1, 30) < GET_DEX(vict)) &&
-            (number(1, 300) < (GET_SKILL(vict, SKILL_PARRY) * parrychance))) {
+            (number(1, 300) < (total_chance(vict, SKILL_PARRY) * parrychance))) {
         if (number(1, 100) < GET_LEVEL(vict))
             improve_skill(ch, SKILL_PARRY);
         if (!IS_WEAPON(v_type)) {
@@ -2863,7 +2870,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type) {
                      PERS(ch, vict), attack_hit_text[v_type].singular);
         return 1;
     }
-    if (IS_WEAPON(w_type) && number(1, 30) < GET_DEX(vict) && AFF_FLAGGED(vict, AFF_DODGE)  && number(1, 200) < GET_SKILL(vict, SKILL_DODGE)) {
+    if (IS_WEAPON(w_type) && number(1, 30) < GET_DEX(vict) && AFF_FLAGGED(vict, AFF_DODGE)  && number(1, 200) < total_chance(vict, SKILL_DODGE)) {
         if (skill_cost(0, 2, 20, vict)) {
             ch->Send( "%s dodges your attack.\r\n", PERS(vict,ch));
             vict->Send(  "You dodge %s's attack.\r\n", PERS(ch, vict));
@@ -2879,7 +2886,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type) {
         return 1;
     }
 
-    if (AFF_FLAGGED(vict, AFF_PHASE) && number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && number(1, 300) < GET_SKILL(vict, SKILL_PHASE) ) {
+    if (AFF_FLAGGED(vict, AFF_PHASE) && number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && number(1, 300) < total_chance(vict, SKILL_PHASE) ) {
         if (skill_cost(0, 2, 20, vict)) {
             act("$N phases past your attack and strikes you!", FALSE, ch, 0, vict, TO_CHAR);
             act("You phase past $n's attack and strike $m.\r\n", FALSE, ch, 0, vict, TO_VICT);
@@ -3862,7 +3869,7 @@ char *fight_type_message(char *str, Character *attacker, Character *victim, int 
     sprintf(str, "%s", skill_name(run_type));
     return str;
     } */
-    if (RIDING(attacker) && HERE(attacker, RIDING(attacker)) && GET_SKILL(attacker, SKILL_MOUNTED_COMBAT)) {
+    if (RIDING(attacker) && HERE(attacker, RIDING(attacker)) && total_chance(attacker, SKILL_MOUNTED_COMBAT)) {
         switch (find_fe_type(RIDING(attacker))) {
         case FE_TYPE_MELEE:
         case FE_TYPE_SKILL:
@@ -5839,11 +5846,11 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
         break;
         /* skills */
     case SKILL_BACKSTAB:
-        return backstab_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_BACKSTAB)/100.0f);
+        return backstab_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_BACKSTAB)/100.0f);
     case SKILL_CLEAVE:
-        return cleave_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_CLEAVE)/100.0f);
+        return cleave_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_CLEAVE)/100.0f);
     case SKILL_BEHEAD:
-        return cleave_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_BEHEAD)/100.0f);
+        return cleave_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_BEHEAD)/100.0f);
     case SKILL_KICK: {
             float spd = GET_SPEED(ch) - GET_SPEED(vict);
             if (spd < 0)

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.22  2007/06/26 10:48:04  w4dimenscor
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ *
  * Revision 1.21  2007/01/28 21:18:18  w4dimenscor
  * Fixed item desc of Manifest item when it is looked it.
  * It is now more english. 01/28/2007 Hal.
@@ -725,7 +728,7 @@ void make_focus(Character *ch, int type, struct obj_data *o)
   new_descr->description = str_dup(buf2);
   new_descr->next = NULL;
   final_focus->ex_description = new_descr;
-  if (number(0, 400 - (GET_CHA(ch) + GET_SKILL(ch, SKILL_SING_WOOD))))
+  if (number(0, 400 - (GET_CHA(ch) + total_chance(ch, SKILL_SING_WOOD))))
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MINOR;
   else
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MAJOR;
@@ -939,11 +942,11 @@ void make_manifest(Character *ch,struct obj_data *obj)
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_TAKE);
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_FOCUS);
   }
-  GET_OBJ_VAL(final_focus, 0) = FTOI(1000 + ((((v1 * v2)+v1)/2.0)*(TIER - 0.60)*(GET_SKILL(ch, SKILL_MANIFEST)*0.01)));
+  GET_OBJ_VAL(final_focus, 0) = FTOI(1000 + ((((v1 * v2)+v1)/2.0)*(TIER - 0.60)*(total_chance(ch, SKILL_MANIFEST)*0.01)));
   GET_OBJ_VAL(final_focus, 1) = -1;
   GET_OBJ_VAL(final_focus, 2) = FOCUS_ORB;
   GET_OBJ_VAL(final_focus, 3) = GET_LEVEL(ch)*TIER*1000;
-  if (number(0, 800 - (GET_CHA(ch) +(2* GET_SKILL(ch, SKILL_MANIFEST)))))
+  if (number(0, 800 - (GET_CHA(ch) +(2* total_chance(ch, SKILL_MANIFEST)))))
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MINOR;
   else
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MAJOR;
@@ -1188,7 +1191,7 @@ ASKILL(skill_manipulate)
   SET_BIT_AR(GET_OBJ_EXTRA(o), ITEM_UNIQUE_SAVE);
   GET_OBJ_WEIGHT(o) += 10;
   obj_to_char(o, ch);
-  if (GET_SKILL(ch, SKILL_MANIPULATE) < number(0, 101))
+  if (total_chance(ch, SKILL_MANIPULATE) < number(0, 101))
   {
     GET_WEP_BALANCE(o) = number(0, 100);
 
