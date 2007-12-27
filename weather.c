@@ -18,6 +18,7 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "db.h"
+#include "descriptor.h"
 
 extern struct time_info_data time_info;
 

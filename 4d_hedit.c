@@ -18,6 +18,10 @@
 #include "screen.h"
 #include "constants.h"
 #include "genolc.h"
+#include "descriptor.h"
+
+
+
 /* function protos */
 
 

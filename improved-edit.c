@@ -13,6 +13,7 @@ improved-edit.c		Routines specific to the improved editor.
 #include "comm.h"
 #include "interpreter.h"
 #include "improved-edit.h"
+#include "descriptor.h"
 
 int format_script(Descriptor *d);
 

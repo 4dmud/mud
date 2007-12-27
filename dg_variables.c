@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/05/21 11:02:26 $                                           * 
-*  $Revision: 1.27 $                                                      *
+*  $Date: 2006/05/30 09:14:19 $                                           * 
+*  $Revision: 1.28 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -24,6 +24,7 @@
 #include "screen.h"
 #include "constants.h"
 #include "spells.h"
+#include "descriptor.h"
 
 
 /* External variables and functions */

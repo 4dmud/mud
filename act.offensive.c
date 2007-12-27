@@ -23,6 +23,7 @@
 #include "dg_scripts.h"
 #include "constants.h"
 #include "fight.h"
+#include "descriptor.h"
 
 /* extern variables */
 int can_fight(Character *ch, Character *vict, int silent);

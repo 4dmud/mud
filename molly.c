@@ -13,6 +13,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "damage.h"
+#include "descriptor.h"
 
 
 /* external functions */

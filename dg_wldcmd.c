@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/21 11:02:26 $
-*  $Revision: 1.10 $
+*  $Date: 2006/05/30 09:14:19 $
+*  $Revision: 1.11 $
 **************************************************************************/
 
 #include "conf.h"
@@ -67,12 +67,12 @@ struct wld_command_info
 void wld_log(room_data *room, const char *format, ...)
 {
   va_list args;
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
 
-  snprintf(output, sizeof(output), "Room %d :: %s", room->number, format);
+  snprintf(buf, sizeof(buf), "Room %d :: %s", room->number, format);
 
   va_start(args, format);
-  script_vlog(output, args);
+  script_vlog(buf, args);
   va_end(args);
 }
 

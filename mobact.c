@@ -21,6 +21,7 @@
 #include "spells.h"
 #include "constants.h"
 #include "fight.h"
+#include "descriptor.h"
 
 /* external structs */
 extern int no_specials;

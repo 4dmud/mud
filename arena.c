@@ -22,6 +22,7 @@
 #include "db.h"
 #include "arena.h"
 #include "fight.h"
+#include "descriptor.h"
 
 /*  external vars  */
 extern int restrict;

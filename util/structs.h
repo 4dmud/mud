@@ -1338,7 +1338,7 @@ Descriptor {
    char	inbuf[MAX_RAW_INPUT_LENGTH];  /* buffer for raw input		*/
    char	last_input[MAX_INPUT_LENGTH]; /* the last input			*/
    char small_outbuf[SMALL_BUFSIZE];  /* standard output buffer		*/
-   char *output;		/* ptr to the current output buffer	*/
+  //   char *output;		/* ptr to the current output buffer	*/
    char **history;		/* History of commands, for ! mostly.	*/
    int	history_pos;		/* Circular array position.		*/
    int  bufptr;			/* ptr to end of current output		*/

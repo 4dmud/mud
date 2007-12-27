@@ -1,54 +1,68 @@
+col_string.o: col_string.cpp
+cppstring.o: cppstring.cpp conf.h sysdep.h
+descriptor.o: descriptor.cpp conf.h sysdep.h structs.h subskills.h \
+  utils.h comm.h interpreter.h handler.h house.h dg_scripts.h screen.h \
+  arena.h mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h \
+  auction.h col_string.h descriptor.h
+mxp.o: mxp.cpp conf.h sysdep.h structs.h subskills.h utils.h comm.h \
+  interpreter.h handler.h house.h dg_scripts.h screen.h descriptor.h \
+  mxp.h
 4d_hedit.o: 4d_hedit.c conf.h sysdep.h structs.h subskills.h \
   interpreter.h handler.h comm.h utils.h db.h oasis.h screen.h \
-  constants.h genolc.h
+  constants.h genolc.h descriptor.h
 act.comm.o: act.comm.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h screen.h dg_scripts.h clan.h \
-  improved-edit.h auction.h
+  improved-edit.h auction.h descriptor.h
 act.create.o: act.create.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
   dg_event.h genolc.h trees.h damage.h action.h
 act.informative.o: act.informative.c conf.h sysdep.h structs.h \
   subskills.h utils.h comm.h interpreter.h handler.h db.h spells.h \
-  screen.h constants.h dg_scripts.h clan.h fight.h
+  screen.h constants.h dg_scripts.h clan.h fight.h descriptor.h
 action.o: action.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
   dg_event.h trees.h damage.h fight.h action.h
 act.item.o: act.item.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
-  screen.h fight.h assemblies.h
+  screen.h fight.h assemblies.h descriptor.h
 act.movement.o: act.movement.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h house.h \
-  constants.h dg_scripts.h kalten.h fight.h damage.h
+  constants.h dg_scripts.h kalten.h fight.h damage.h descriptor.h
 act.offensive.o: act.offensive.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h dg_event.h \
-  dg_scripts.h constants.h fight.h
+  dg_scripts.h constants.h fight.h descriptor.h
 act.other.o: act.other.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h screen.h house.h \
-  constants.h dg_scripts.h
+  constants.h dg_scripts.h descriptor.h
 act.social.o: act.social.c conf.h sysdep.h structs.h subskills.h utils.h \
-  comm.h interpreter.h handler.h db.h spells.h
+  comm.h interpreter.h handler.h db.h spells.h descriptor.h
 act.wizard.o: act.wizard.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h house.h screen.h \
-  constants.h dg_scripts.h arena.h clan.h oasis.h assemblies.h fight.h
+  constants.h dg_scripts.h arena.h clan.h oasis.h assemblies.h fight.h \
+  descriptor.h
 aedit.o: aedit.c conf.h sysdep.h structs.h subskills.h interpreter.h \
-  handler.h comm.h utils.h db.h oasis.h screen.h constants.h genolc.h
+  handler.h comm.h utils.h db.h oasis.h screen.h constants.h genolc.h \
+  descriptor.h
 alias.o: alias.c conf.h sysdep.h structs.h subskills.h utils.h \
-  interpreter.h db.h
+  interpreter.h db.h descriptor.h
 arena.o: arena.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  screen.h spells.h handler.h interpreter.h db.h arena.h fight.h
+  screen.h spells.h handler.h interpreter.h db.h arena.h fight.h \
+  descriptor.h
 asciimap.o: asciimap.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h house.h constants.h \
   dg_scripts.h oasis.h mapper.h
 assedit.o: assedit.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
-  comm.h handler.h interpreter.h oasis.h assemblies.h
+  comm.h handler.h interpreter.h oasis.h assemblies.h descriptor.h
 assemblies.o: assemblies.c conf.h sysdep.h structs.h subskills.h utils.h \
-  assemblies.h comm.h constants.h db.h handler.h interpreter.h
+  assemblies.h comm.h constants.h db.h handler.h interpreter.h \
+  descriptor.h
 auction.o: auction.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  interpreter.h handler.h db.h auction.h
+  interpreter.h handler.h db.h auction.h descriptor.h
 ban.o: ban.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  interpreter.h handler.h db.h
+  interpreter.h handler.h db.h descriptor.h
 boards.o: boards.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  db.h boards.h interpreter.h handler.h improved-edit.h clan.h
+  db.h boards.h interpreter.h handler.h improved-edit.h clan.h \
+  descriptor.h
 bsd-snprintf.o: bsd-snprintf.c conf.h sysdep.h
 calender.o: calender.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h calender.h db.h utils.h
@@ -56,40 +70,43 @@ cali.o: cali.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h house.h screen.h constants.h oasis.h \
   dg_scripts.h
 cedit.o: cedit.c conf.h sysdep.h structs.h subskills.h comm.h \
-  interpreter.h utils.h db.h constants.h genolc.h oasis.h improved-edit.h
+  interpreter.h utils.h db.h constants.h genolc.h oasis.h improved-edit.h \
+  descriptor.h
 character.o: character.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h house.h dg_scripts.h screen.h \
   arena.h mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h \
-  auction.h
+  auction.h descriptor.h
 chcreate.o: chcreate.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h db.h utils.h spells.h handler.h mail.h screen.h \
   dg_scripts.h clan.h constants.h genolc.h oasis.h tedit.h \
-  improved-edit.h
+  improved-edit.h descriptor.h
 clan.o: clan.c conf.h sysdep.h structs.h subskills.h utils.h comm.h db.h \
-  interpreter.h spells.h handler.h clan.h
+  interpreter.h spells.h handler.h clan.h descriptor.h
 class.o: class.c conf.h sysdep.h structs.h subskills.h db.h utils.h \
   spells.h comm.h interpreter.h constants.h genmob.h
 clientcolors.o: clientcolors.c
 color.o: color.c conf.h sysdep.h structs.h subskills.h utils.h
 comm.o: comm.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h house.h dg_scripts.h screen.h arena.h \
-  mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h auction.h
+  mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h auction.h \
+  mxp.h descriptor.h
 config.o: config.c conf.h sysdep.h structs.h subskills.h interpreter.h
 constants.o: constants.c conf.h sysdep.h structs.h subskills.h \
   interpreter.h house.h constants.h utils.h versionlist.h
 context_help.o: context_help.c conf.h sysdep.h structs.h subskills.h \
-  utils.h comm.h db.h interpreter.h oasis.h dg_olc.h dg_scripts.h
+  utils.h comm.h db.h interpreter.h oasis.h dg_olc.h dg_scripts.h \
+  descriptor.h
 corpse.o: corpse.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
   db.h interpreter.h utils.h spells.h
 damage.o: damage.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_event.h dg_scripts.h \
-  constants.h fight.h
+  constants.h fight.h descriptor.h
 db.o: db.c conf.h sysdep.h structs.h subskills.h utils.h db.h comm.h \
   handler.h spells.h mail.h interpreter.h house.h constants.h oasis.h \
   dg_scripts.h dg_event.h clan.h genobj.h genmob.h genwld.h xmlhelp.h \
-  assemblies.h trees.h htree.h damage.h
+  assemblies.h trees.h htree.h damage.h descriptor.h
 dg_comm.o: dg_comm.c conf.h sysdep.h structs.h subskills.h dg_scripts.h \
-  utils.h comm.h handler.h db.h constants.h
+  utils.h comm.h handler.h db.h constants.h descriptor.h
 dg_db_scripts.o: dg_db_scripts.c conf.h sysdep.h structs.h subskills.h \
   dg_scripts.h utils.h db.h handler.h dg_event.h comm.h constants.h \
   oasis.h
@@ -103,21 +120,21 @@ dg_misc.o: dg_misc.c conf.h sysdep.h structs.h subskills.h dg_scripts.h \
   spells.h constants.h
 dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h db.h utils.h handler.h interpreter.h comm.h spells.h \
-  constants.h fight.h
+  constants.h fight.h descriptor.h
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h constants.h
 dg_olc.o: dg_olc.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h genolc.h interpreter.h oasis.h dg_olc.h dg_scripts.h dg_event.h \
-  constants.h
+  constants.h descriptor.h
 dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h subskills.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h dg_event.h db.h \
-  screen.h constants.h spells.h oasis.h
+  screen.h constants.h spells.h oasis.h descriptor.h
 dg_triggers.o: dg_triggers.c conf.h sysdep.h structs.h subskills.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h constants.h \
-  oasis.h
+  oasis.h descriptor.h
 dg_variables.o: dg_variables.c conf.h sysdep.h structs.h subskills.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h clan.h dg_event.h \
-  db.h screen.h constants.h spells.h
+  db.h screen.h constants.h spells.h descriptor.h
 dg_wldcmd.o: dg_wldcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h constants.h
 dragon.o: dragon.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -130,7 +147,7 @@ familiar.o: familiar.c conf.h sysdep.h structs.h subskills.h utils.h \
   oasis.h dg_scripts.h spells.h fight.h
 fight.o: fight.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   handler.h interpreter.h db.h spells.h screen.h constants.h dg_scripts.h \
-  arena.h dg_event.h fight.h damage.h
+  arena.h dg_event.h fight.h damage.h descriptor.h
 fishing.o: fishing.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
   dg_event.h
@@ -159,7 +176,7 @@ group.o: group.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   dg_scripts.h clan.h
 handler.o: handler.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h handler.h interpreter.h spells.h dg_scripts.h dg_event.h trees.h \
-  fight.h damage.h
+  fight.h damage.h descriptor.h
 hedit.o: hedit.c conf.h sysdep.h structs.h subskills.h comm.h utils.h \
   db.h boards.h oasis.h handler.h
 house.o: house.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
@@ -167,21 +184,22 @@ house.o: house.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
 htree.o: htree.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   htree.h
 ident.o: ident.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
-  ident.h
+  ident.h descriptor.h
 ignore.o: ignore.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h comm.h handler.h
 improved-edit.o: improved-edit.c conf.h sysdep.h structs.h subskills.h \
-  utils.h db.h comm.h interpreter.h improved-edit.h
+  utils.h db.h comm.h interpreter.h improved-edit.h descriptor.h
 interpreter.o: interpreter.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h db.h utils.h spells.h handler.h mail.h screen.h \
   dg_scripts.h clan.h constants.h genolc.h oasis.h tedit.h \
-  improved-edit.h
+  improved-edit.h descriptor.h
 kalten.o: kalten.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h house.h screen.h constants.h \
-  oasis.h dg_scripts.h clan.h damage.h event.h fight.h kalten.h romance.h
+  oasis.h dg_scripts.h clan.h damage.h event.h fight.h kalten.h romance.h \
+  descriptor.h
 limits.o: limits.c conf.h sysdep.h structs.h subskills.h utils.h spells.h \
   comm.h db.h handler.h interpreter.h dg_scripts.h clan.h fight.h \
-  damage.h
+  damage.h descriptor.h
 lockers.o: lockers.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   screen.h spells.h handler.h interpreter.h db.h constants.h
 magic.o: magic.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -198,18 +216,19 @@ math.o: math.c
 medit.o: medit.c conf.h sysdep.h structs.h subskills.h interpreter.h \
   comm.h spells.h utils.h db.h shop.h genolc.h genmob.h genzon.h genshp.h \
   oasis.h handler.h constants.h improved-edit.h screen.h dg_olc.h \
-  dg_scripts.h fight.h
+  dg_scripts.h fight.h descriptor.h
 mine.o: mine.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
   dg_event.h
 mobact.o: mobact.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
-  comm.h interpreter.h handler.h spells.h constants.h fight.h
+  comm.h interpreter.h handler.h spells.h constants.h fight.h \
+  descriptor.h
 modify.o: modify.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h handler.h db.h comm.h spells.h mail.h boards.h \
-  improved-edit.h oasis.h tedit.h
+  improved-edit.h oasis.h tedit.h descriptor.h
 molly.o: molly.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h screen.h constants.h dg_scripts.h \
-  dg_event.h damage.h
+  dg_event.h damage.h descriptor.h
 mordecai.o: mordecai.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h house.h screen.h constants.h \
   oasis.h dg_scripts.h spells.h
@@ -217,13 +236,13 @@ mysql.o: mysql.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   interpreter.h
 note.o: note.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h house.h screen.h constants.h \
-  improved-edit.h dg_scripts.h spells.h clan.h
+  improved-edit.h dg_scripts.h spells.h clan.h descriptor.h
 oasis.o: oasis.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h comm.h db.h shop.h genolc.h genmob.h genshp.h genzon.h \
-  genwld.h genobj.h oasis.h screen.h dg_olc.h dg_scripts.h
+  genwld.h genobj.h oasis.h screen.h dg_olc.h dg_scripts.h descriptor.h
 oasis_copy.o: oasis_copy.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h genolc.h genzon.h genwld.h oasis.h \
-  improved-edit.h constants.h
+  improved-edit.h constants.h descriptor.h
 oasis_delete.o: oasis_delete.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h genolc.h oasis.h \
   improved-edit.h genwld.h
@@ -231,11 +250,11 @@ oasis_list.o: oasis_list.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h genolc.h oasis.h improved-edit.h \
   shop.h genshp.h screen.h constants.h dg_scripts.h
 objsave.o: objsave.c conf.h sysdep.h structs.h subskills.h comm.h \
-  handler.h db.h interpreter.h utils.h spells.h genolc.h
+  handler.h db.h interpreter.h utils.h spells.h genolc.h descriptor.h
 oedit.o: oedit.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h spells.h utils.h db.h boards.h constants.h shop.h \
   genolc.h genobj.h genzon.h oasis.h improved-edit.h dg_olc.h \
-  dg_scripts.h fight.h
+  dg_scripts.h fight.h descriptor.h
 pk.o: pk.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h fight.h
 proffessions.o: proffessions.c conf.h sysdep.h structs.h subskills.h \
@@ -248,7 +267,7 @@ race.o: race.c conf.h sysdep.h structs.h subskills.h db.h utils.h \
 random.o: random.c
 redit.o: redit.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h db.h boards.h genolc.h genwld.h genzon.h oasis.h \
-  improved-edit.h dg_olc.h dg_scripts.h constants.h
+  improved-edit.h dg_olc.h dg_scripts.h constants.h descriptor.h
 regen.o: regen.c conf.h sysdep.h structs.h subskills.h interpreter.h \
   utils.h spells.h handler.h comm.h db.h dg_event.h
 remort.o: remort.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -258,53 +277,55 @@ romance.o: romance.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h screen.h constants.h damage.h \
   event.h romance.h
 sedit.o: sedit.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  interpreter.h db.h shop.h genolc.h genshp.h genzon.h oasis.h
+  interpreter.h db.h shop.h genolc.h genshp.h genzon.h oasis.h \
+  descriptor.h
 shop.o: shop.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
-  db.h interpreter.h utils.h shop.h constants.h screen.h
+  db.h interpreter.h utils.h shop.h constants.h screen.h descriptor.h
 skills.o: skills.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h interpreter.h handler.h spells.h screen.h constants.h dg_scripts.h \
-  dg_event.h fight.h damage.h
+  dg_event.h fight.h damage.h descriptor.h
 spec_assign.o: spec_assign.c conf.h sysdep.h structs.h subskills.h db.h \
   interpreter.h utils.h
 spec_procs.o: spec_procs.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
-  damage.h fight.h
+  damage.h fight.h descriptor.h
 spelledit.o: spelledit.c conf.h sysdep.h structs.h subskills.h \
   interpreter.h handler.h comm.h utils.h db.h oasis.h screen.h
 spell_parser.o: spell_parser.c conf.h sysdep.h structs.h subskills.h \
   utils.h interpreter.h spells.h handler.h comm.h db.h dg_scripts.h \
-  constants.h fight.h action.h
+  constants.h fight.h action.h descriptor.h
 spells.o: spells.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   spells.h handler.h db.h constants.h interpreter.h dg_scripts.h fight.h \
-  dg_event.h damage.h
+  dg_event.h damage.h descriptor.h
 string.o: string.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h constants.h oasis.h
 subskills.o: subskills.c conf.h sysdep.h structs.h subskills.h utils.h \
-  interpreter.h spells.h handler.h comm.h db.h dg_scripts.h constants.h
+  interpreter.h spells.h handler.h comm.h db.h dg_scripts.h constants.h \
+  descriptor.h
 task.o: task.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
   dg_event.h
 tedit.o: tedit.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h comm.h db.h genolc.h handler.h oasis.h improved-edit.h \
-  tedit.h
+  tedit.h descriptor.h
 trees.o: trees.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
   dg_event.h genolc.h trees.h
 utils.o: utils.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
-  comm.h screen.h spells.h handler.h interpreter.h
+  comm.h screen.h spells.h handler.h interpreter.h descriptor.h
 vehicle.o: vehicle.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h screen.h house.h constants.h
 vehicle_edit.o: vehicle_edit.c conf.h sysdep.h structs.h subskills.h \
   comm.h interpreter.h db.h utils.h spells.h handler.h mail.h screen.h \
   dg_scripts.h clan.h constants.h genolc.h oasis.h tedit.h \
-  improved-edit.h
+  improved-edit.h descriptor.h
 weather.o: weather.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  handler.h interpreter.h db.h
+  handler.h interpreter.h db.h descriptor.h
 xmlhelp.o: xmlhelp.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   comm.h handler.h interpreter.h constants.h xmlhelp.h
 zedit.o: zedit.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h utils.h db.h constants.h genolc.h genzon.h oasis.h \
-  dg_scripts.h
+  dg_scripts.h descriptor.h
 zreload.o: zreload.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h house.h screen.h constants.h \
   dg_scripts.h arena.h clan.h oasis.h

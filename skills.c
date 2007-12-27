@@ -14,7 +14,7 @@
 #include "dg_event.h"
 #include "fight.h"
 #include "damage.h"
-
+#include "descriptor.h"
 
 /* external variables */
 extern struct spell_info_type spell_info[];

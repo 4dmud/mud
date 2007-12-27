@@ -14,6 +14,7 @@
 #include "handler.h"
 #include "db.h"
 #include "auction.h"
+#include "descriptor.h"
 
 /*
  * Local global variables.

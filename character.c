@@ -70,6 +70,7 @@
 #include "constants.h"
 #include "ident.h"
 #include "auction.h"
+#include "descriptor.h"
 
 #ifdef HAVE_ARPA_TELNET_H
 #include <arpa/telnet.h>

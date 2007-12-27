@@ -26,6 +26,7 @@
 #include "utils.h"
 #include "spells.h"
 #include "genolc.h"
+#include "descriptor.h"
 
 /* these factors should be unique integers */
 #define RENT_FACTOR      1

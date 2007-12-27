@@ -19,6 +19,7 @@
 #include "screen.h"
 #include "constants.h"
 #include "genolc.h"
+#include "descriptor.h"
 
 extern int top_of_socialt;
 extern struct social_messg *soc_mess_list;

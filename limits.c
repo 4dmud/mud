@@ -22,6 +22,7 @@
 #include "clan.h"
 #include "fight.h"
 #include "damage.h"
+#include "descriptor.h"
 
 /* local functions */
 int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,

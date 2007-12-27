@@ -20,7 +20,7 @@
 #include "oasis.h"
 #include "improved-edit.h"
 #include "constants.h"
-
+#include "descriptor.h"
 
 /******************************************************************************/
 /** Internal Functions                                                       **/

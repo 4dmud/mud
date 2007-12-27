@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "interpreter.h"
 #include "db.h"
+#include "descriptor.h"
 
 void write_aliases(Character *ch);
 void read_aliases(Character *ch);

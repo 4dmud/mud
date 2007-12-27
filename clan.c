@@ -17,6 +17,7 @@
 #include "spells.h"
 #include "handler.h"
 #include "clan.h"
+#include "descriptor.h"
 
 int num_of_clans;
 struct clan_rec clan[MAX_CLANS];

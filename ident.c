@@ -12,7 +12,7 @@
  *  Copyright (C) 1997 by Joachim Pileborg
  *  All rights reserved.
  *
- * $Id: ident.c,v 1.2 2006/05/22 10:50:49 w4dimenscor Exp $
+ * $Id: ident.c,v 1.3 2006/05/30 09:14:20 w4dimenscor Exp $
  */
 
 #include "conf.h"
@@ -27,6 +27,7 @@
 #include "utils.h"
 #include "db.h"
 #include "ident.h"
+#include "descriptor.h"
 
 /*******************************************************************/
 

@@ -30,6 +30,7 @@
 #include "oasis.h"
 #include "tedit.h"
 #include "improved-edit.h"
+#include "descriptor.h"
 
 extern const char *MENU;
 

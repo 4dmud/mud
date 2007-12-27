@@ -19,6 +19,7 @@
 #include "handler.h"
 #include "db.h"
 #include "spells.h"
+#include "descriptor.h"
 
 /* extern variables */
 extern struct room_data *world_vnum[];

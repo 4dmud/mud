@@ -20,6 +20,7 @@
 #include "dg_olc.h"
 #include "dg_event.h"
 #include "constants.h"
+#include "descriptor.h"
 
 /* prototype externally defined functions */
 //extern const char *trig_types[], *otrig_types[], *wtrig_types[];

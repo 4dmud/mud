@@ -93,6 +93,7 @@
 #include "ident.h"
 #include "auction.h"
 #include "mxp.h"
+#include "descriptor.h"
 
 
 #ifndef INVALID_SOCKET
@@ -679,10 +680,8 @@ void copyover_recover(void)
       continue;
 #else
     /* create a new descriptor */
-    CREATE(d, Descriptor, 1);
-    memset((char *) d, 0, sizeof(Descriptor));
-    init_descriptor(d, desc); /* set up various stuff */
-
+    d = new Descriptor();
+    d->init_descriptor(desc);
     d->next = descriptor_list;
     descriptor_list = d;
 #endif
@@ -1209,7 +1208,7 @@ void game_loop(socket_t s_mother_desc)
     }
     /* If there are new connections waiting, accept them. */
     if (FD_ISSET(s_mother_desc, &input_set))
-      new_descriptor(s_mother_desc, FALSE);
+      d = d->new_descriptor(s_mother_desc, FALSE);
 #if RUNNING_IDENT
     /* check for a reply from the ident process */
     if ((id_serv_socket > 0) && FD_ISSET(id_serv_socket, &input_set))
@@ -1300,7 +1299,7 @@ void game_loop(socket_t s_mother_desc)
       for (d = descriptor_list; d; d = next_d)
       {
         next_d = d->next;
-        if (*(d->output) && FD_ISSET(d->descriptor, &output_set))
+        if (d->pending_output() && FD_ISSET(d->descriptor, &output_set))
         {
         /* Output for this player is ready */
           if (process_output(d) < 0)
@@ -1912,10 +1911,8 @@ void init_descriptor(Descriptor *newd, int desc)
   newd->descriptor = desc;
   newd->character = NULL;
   newd->idle_tics = 0;
-  newd->output = newd->small_outbuf;
   newd->bufspace = SMALL_BUFSIZE - 1;
   newd->login_time = time(0);
-  *newd->output = '\0';
   newd->bufptr = 0;
   newd->has_prompt = TRUE;  /* prompt is part of greetings */
   /*
@@ -2253,7 +2250,7 @@ int check_for_ip(char *ip_add, char *host)
   return 0;
 }
 
-Descriptor *new_descriptor(socket_t s, int copyover)
+Descriptor * Descriptor::new_descriptor(socket_t s, int copyover)
 {
   socket_t desc = 0;
   int sockets_connected = 0;
@@ -2297,12 +2294,12 @@ Descriptor *new_descriptor(socket_t s, int copyover)
     }
   }
   /* create a new descriptor */
-  CREATE(newd, Descriptor, 1);
+  newd = new Descriptor();
   if (!copyover)
   {
     /* find the numeric site address */
-    strncpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH); /* strncpy: OK (n->host:HOST_LENGTH+1) */
-    *(newd->host_ip + HOST_LENGTH) = '\0';
+    strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
+
     /* find the sitename */
     if (!check_for_ip((char *)inet_ntoa(peer.sin_addr), newd->host))
     {
@@ -2313,13 +2310,13 @@ Descriptor *new_descriptor(socket_t s, int copyover)
         perror("SYSERR: gethostbyaddr");
 
         /* find the numeric site address */
-        strncpy(newd->host, newd->host_ip, HOST_LENGTH);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
-        *(newd->host + HOST_LENGTH) = '\0';
+        strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
+       
       }
       else
       {
-        strncpy(newd->host, from->h_name, HOST_LENGTH);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
-        *(newd->host + HOST_LENGTH) = '\0';
+        strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
+        
       }
       add_ip_to_host_list(newd->host_ip, newd->host, time(0));
       save_host_list();
@@ -2334,7 +2331,7 @@ Descriptor *new_descriptor(socket_t s, int copyover)
     {
       CLOSE_SOCKET(desc);
       new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host);
-      free(newd);
+      delete newd;
       return (NULL);
     }
   } /*copyover*/
@@ -2348,7 +2345,7 @@ Descriptor *new_descriptor(socket_t s, int copyover)
       return NULL;
     }
   }
-  init_descriptor(newd, desc);
+  newd->init_descriptor(desc);
 
   /* prepend to list */
   newd->next = descriptor_list;
@@ -2400,52 +2397,67 @@ void send_out_signals(Descriptor *d)
 
 int process_output(Descriptor *t)
 {
-  char i[MAX_SOCK_BUF], *osb = i + 2;
+  //string overflow;
+  string s, osb, prmpt, overflow;
   int result = 0;
   /* we may need this \r\n for later -- see below */
-  strlcpy(i, "\r\n", sizeof(i));   /* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
+  s = string("\r\n");
 
-  if (strlen(t->output)-1 > MAX_SOCK_BUF)
-  {
-    log("output bigger then sock buf");
-    strcpy(osb, "##OVERFLOW##\r\n");
-  }
-  else
     /* now, append the 'real' output */
-    strcpy(osb, t->output);     /* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
-
-
-  /* if we're in the overflow state, notify the user */
-  if (t->bufspace == 0)
-    strlcat(i, "**OVERFLOW**\r\n", sizeof(i));
+    osb = t->output;
 
   /* add the extra CRLF if the person isn't in compact mode */
   if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
-    strcat(osb, "\r\n");
-
+    osb += string("\r\n");
+ 
   /* add a prompt */
+#if 0
   if (t->mxp && t->character && IS_PLAYING(t))
     t->send_mxp_status();
-  strlcat(i, make_prompt(t), sizeof(i));
+#endif
+  prmpt = make_prompt(t);
 
-  /**TODO: need to in the future, check this against the fact that we don't
-  want to have tags cut off half way in any place, so like, no buffer overflows.
-  size should always be less then lenn - Mord**/
+  /* make sure there is room on the SOCK buf */
+  if ((osb.length() + prmpt.length()) < MAX_SOCK_BUF)
+  osb += prmpt;
 
-  /*
+   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
    */
+
   if (t->has_prompt)
   {
     t->has_prompt = 0;
-    result = write_to_descriptor(t->descriptor, i, t->comp);
-    if (result >= 2)
+    osb = s + osb;
+    do {
+      overflow = osb;
+    if (osb.size() > MAX_SOCK_BUF)
+      osb = osb.substr(0, MAX_SOCK_BUF);
+    result = write_to_descriptor(t->descriptor, osb.c_str(), t->comp);
+    if (result > 0 && result < osb.size()) {
+      osb = overflow.erase(0, MAX_SOCK_BUF);
+      //result = write_to_descriptor(t->descriptor, prmpt.c_str(), t->comp);
+    }
+      //osb = overflow;
+  } while (result > 0 && result < osb.size());
+      if (result >= 2)
       result -= 2;
+     
   }
   else
   {
-    result = write_to_descriptor(t->descriptor, osb, t->comp);
+    do {
+    overflow = osb;
+    if (osb.size() > MAX_SOCK_BUF)
+      osb = osb.substr(0, MAX_SOCK_BUF);
+    result = write_to_descriptor(t->descriptor, osb.c_str(), t->comp);
+    if (result > 0 && result < osb.size())
+    osb = overflow.erase(0, MAX_SOCK_BUF);
+      //osb = overflow;
+      
+    } while (result > 0 && result < osb.size());
+
   }
 
   if (result < 0)
@@ -2462,15 +2474,18 @@ int process_output(Descriptor *t)
 
   /* Handle snooping: prepend "% " and send to snooper. */
   if (t->snoop_by)
-    t->snoop_by->Output("%% %*s%%%%", result, t->output);
+    t->snoop_by->Output("%% %*s%%%%", result, t->output.c_str());
 
-  /**
+#if 0  
+/**
   This needs to not return the altered buffer size!
   **/
   /* The common case: all saved output was handed off to the kernel buffer. */
   if (result >= (int)t->bufptr )
   {
-    /*
+   
+
+/*
      * if we were using a large buffer, put the large buffer on the buffer pool
      * and switch back to the small one
      */
@@ -2491,15 +2506,19 @@ int process_output(Descriptor *t)
      * them. There will be enough space for them if this is true.  'result'
      * is effectively unsigned here anyway.
      */
-    if ((unsigned int)result < (strlen(osb)))
+#endif
+  
+  /*if (result < osb.size())
     {
-      size_t savetextlen = strlen(osb + result);
-
-      strcat(t->output, osb + result);
-      t->bufptr   -= savetextlen;
-      t->bufspace += savetextlen;
-    }
-
+      //size_t savetextlen = strlen(osb + result);
+if (result
+      t->output.erase(0, result);
+      //   t->bufptr   -= savetextlen;
+      // t->bufspace += savetextlen;
+    } else*/
+      
+      t->output.erase();
+#if 0
   }
   else
   {
@@ -2511,7 +2530,7 @@ int process_output(Descriptor *t)
     t->bufptr   -= result;
     t->bufspace += result;
   }
-
+#endif
   return (result);
 }
 
@@ -2871,6 +2890,7 @@ int toggle_compression(Descriptor *t)
  * character. (Do you really need 256 characters on a line?)
  * -gg 1/21/2000
  */
+ /** this needs to be rewritten yet again, too much chance for a comparison of uninitialised data - mord*/
 int process_input(Descriptor *t)
 {
   int buf_length, failed_subst;
@@ -3356,7 +3376,7 @@ void close_socket(Descriptor *d)
   if (d->comp)
     free(d->comp);
   if (d);
-  free(d);
+delete d;
 }
 
 
@@ -4372,10 +4392,10 @@ void make_wholist(void)
 
   if (port != 6000)
     return;
-  if ((fl = fopen("/var/www/html/images/wholist.xml", "w")) == 0)
+  if ((fl = fopen("/home/httpd/vhosts/4dimensions.org/httpdocs/wholist.xml", "w")) == 0)
   {
     if (++xml_log_trys < 4)
-      log("XML Who List unable to be opened (Try %d)", xml_log_trys);
+      log("XML Who List unable to be opened (Try %d) (Ignore if this isn't on mu-host)", xml_log_trys);
     else if (xml_log_trys == 4)
       log("XML Who List unable to be opened (Try 4) [Error will no longer be reported]");
 
@@ -4852,33 +4872,31 @@ char * parse_prompt(Character *ch, char *str, size_t lenn)
    Mordecai@xtra.co.nz
 */
 /** TODO: This needs to be changed to never put newlines inside MXP tags! **/
-char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen)
+string wordwrap(const char *cmd, size_t width, size_t maxlen)
 {
   size_t srcOS = 0;
   size_t dstOS = 0;
   size_t cntOS = 0;
   size_t skip = FALSE;
+  static char buf1[MAX_INPUT_LENGTH * 2];
+  char * buf;
+  bool overf = FALSE;
   if (!cmd || !*cmd)
-  {
-    *buf = '\0';
-    return cmd;
-  }
+       return cmd;
   /* no need to wrap the text if it is shorter then the width, just return */
   if (maxlen<=width)
-  {
-    strcpy(buf, cmd);
     return cmd;
-  }
 
   /* if for some reason width is 0 AND cmd has 0 characters in it. just return */
   if (maxlen <= 0)
-  {
-    strcpy(buf, cmd);
     return cmd;
+  overf = (maxlen >= MAX_INPUT_LENGTH * 2);
+  if (overf)
+    buf = new char[maxlen +1];
+  else {
+    buf = buf1;
+    *buf = '\0';
   }
-
-
-
   /*
    This switch block stops color from being split onto different lines.
    as well as if a line has a \r\n before the width of the line,
@@ -4972,7 +4990,9 @@ char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen)
   }
   /* safely(?) puts the new formatted text back into the
      original buffer given */
-  return cmd;
+  if (overf)
+    delete[] buf;
+  return string(cmd);
 }
 
 /* turn off mccp */

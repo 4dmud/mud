@@ -24,6 +24,7 @@
 #include "shop.h"
 #include "constants.h"
 #include "screen.h"
+#include "descriptor.h"
 
 /* External variables */
 extern struct time_info_data time_info;

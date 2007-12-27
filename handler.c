@@ -24,6 +24,7 @@
 #include "trees.h"
 #include "fight.h"
 #include "damage.h"
+#include "descriptor.h"
 /* local vars */
 int extractions_pending = 0;
 int obj_extractions_pending = 0;

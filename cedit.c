@@ -15,6 +15,7 @@
 #include "genolc.h"
 #include "oasis.h"
 #include "improved-edit.h"
+#include "descriptor.h"
 
 
 /******************************************************************************/

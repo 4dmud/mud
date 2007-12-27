@@ -23,6 +23,7 @@
 #include "oasis.h"
 #include "screen.h"
 #include "dg_olc.h"
+#include "descriptor.h"
 
 const char *nrm, *grn, *cyn, *yel;
 

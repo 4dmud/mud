@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.19  2006/05/30 09:14:19  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.18  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
  * struct descriptor_data has been converted to class Descriptor
@@ -105,6 +108,7 @@
 #include "spells.h"
 #include "constants.h"
 #include "fight.h"
+#include "descriptor.h"
 
 void raw_kill(Character *ch, Character *killer);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
@@ -150,13 +154,13 @@ ACMD(do_mrecho);
 void mob_log(Character *mob, const char *format, ...)
 {
   va_list args;
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
 
-  snprintf(output, sizeof(output), "Mob (%s, VNum %d):: %s",
+  snprintf(buf, sizeof(buf), "Mob (%s, VNum %d):: %s",
            GET_SHORT(mob), GET_MOB_VNUM(mob), format);
 
   va_start(args, format);
-  script_vlog(output, args);
+  script_vlog(buf, args);
   va_end(args);
 }
 

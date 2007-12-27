@@ -24,6 +24,9 @@
 #include "fight.h"
 #include "dg_event.h"
 #include "damage.h"
+#include "descriptor.h"
+
+
 extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);

@@ -13,6 +13,7 @@
 #include "interpreter.h"
 #include "oasis.h"
 #include "dg_olc.h"
+#include "descriptor.h"
 
 /* Extern functions */
 ACMD(do_help);

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.22  2006/05/30 09:14:20  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.21  2006/05/22 10:50:49  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
  * struct descriptor_data has been converted to class Descriptor
@@ -128,6 +131,7 @@
 #include "constants.h"
 #include "fight.h"
 #include "action.h"
+#include "descriptor.h"
 
 struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
 
@@ -930,7 +934,7 @@ void mag_objectmagic(Character *ch, struct obj_data *obj,
     else
       call_magic(ch, tch, tobj, 0, GET_OBJ_VAL(obj, 3),
                  DEFAULT_WAND_LVL, CAST_WAND);
-    if(FIGHTING(ch) && (!FIGHTING(tch) || tch==ch))
+    if(FIGHTING(ch) && tch && ( !FIGHTING(tch) || tch==ch))
       stop_fighting(ch);
     check_potion_weight(obj);
     break;

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.13  2006/05/30 09:14:20  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.12  2006/05/21 11:02:27  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -67,7 +70,7 @@
 #include "constants.h"
 #include "damage.h"
 #include "fight.h"
-
+#include "descriptor.h"
 
 
 /*   external vars  */

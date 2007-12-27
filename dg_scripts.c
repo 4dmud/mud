@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/22 10:50:48 $
-*  $Revision: 1.24 $
+*  $Date: 2006/05/30 09:14:19 $
+*  $Revision: 1.25 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.25  2006/05/30 09:14:19  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.24  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
  * struct descriptor_data has been converted to class Descriptor
@@ -106,6 +109,7 @@
 #include "constants.h"
 #include "spells.h"
 #include "oasis.h"
+#include "descriptor.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define NINE_MONTHS    6000	/* 6000 realtime minutes TO GO */
@@ -1630,17 +1634,17 @@ ACMD(do_detach)
  */
 void script_vlog(const char *format, va_list args)
 {
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
   Descriptor *i;
 
-  snprintf(output, sizeof(output), "SCRIPT ERR: %s", format);
+  snprintf(buf, sizeof(buf), "SCRIPT ERR: %s", format);
 
-  basic_mud_vlog(output, args);
+  basic_mud_vlog(buf, args);
 
   /* the rest is mostly a rip from basic_mud_log() */
-  strcpy(output, "[ ");            /* strcpy: OK */
-  vsnprintf(output + 2, sizeof(output) - 6, format, args);
-  strcat(output, " ]\r\n");        /* strcat: OK */
+  strcpy(buf, "[ ");            /* strcpy: OK */
+  vsnprintf(buf + 2, sizeof(buf) - 6, format, args);
+  strcat(buf, " ]\r\n");        /* strcat: OK */
 
   for (i = descriptor_list; i; i = i->next)
   {
@@ -1655,7 +1659,7 @@ void script_vlog(const char *format, va_list args)
     if (NRM > (PRF_FLAGGED(i->character, PRF_LOG1) ? 1 : 0) + (PRF_FLAGGED(i->character, PRF_LOG2) ? 2 : 0))
       continue;
 
-    new_send_to_char(i->character, "%s%s%s", CCGRN(i->character, C_NRM), output, CCNRM(i->character, C_NRM));
+    new_send_to_char(i->character, "%s%s%s", CCGRN(i->character, C_NRM), buf, CCNRM(i->character, C_NRM));
   }
 }
 

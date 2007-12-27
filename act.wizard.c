@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.51  2006/05/30 09:14:19  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.50  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
  * struct descriptor_data has been converted to class Descriptor
@@ -214,6 +217,7 @@
 #include "oasis.h"
 #include "assemblies.h"
 #include "fight.h"
+#include "descriptor.h"
 
 /*   external vars  */
 extern struct index_data *obj_index;
@@ -475,7 +479,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
                   char *toggle, char *value)
 {
   int on = 0, off = 0;
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
   int save = 0, nosave = 0;
 
   /* Find the value of the argument */
@@ -504,7 +508,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
       return 0;
     }
 
-    snprintf(output, sizeof(output), "(GC) %s %s for %s by %s (%s in file).",
+    snprintf(buf, sizeof(buf), "(GC) %s %s for %s by %s (%s in file).",
              trust_fields[mode].cmd,
              ONOFF(on), GET_NAME(vict), GET_NAME(ch), value);
 
@@ -682,7 +686,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
     return 0;
     break;
   }
-  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "%s", output);
+  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "%s", buf);
   return 1;
 }
 
@@ -4807,7 +4811,7 @@ int perform_set(Character *ch, Character *vict, int mode,
   int i, on = 0, off = 0, value = 0;
   room_rnum rnum;
   room_vnum rvnum;
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
   int parse_race(char arg);
   void set_race(Character *ch, int race);
 
@@ -4851,16 +4855,16 @@ int perform_set(Character *ch, Character *vict, int mode,
       ch->Send("Value must be 'on' or 'off'.\r\n");
       return (0);
     }
-    snprintf(output, sizeof(output), "%s %s for %s.", set_fields[mode].cmd, ONOFF(on), GET_NAME(vict));
+    snprintf(buf, sizeof(buf), "%s %s for %s.", set_fields[mode].cmd, ONOFF(on), GET_NAME(vict));
   }
   else if (set_fields[mode].type == NUMBER)
   {
     value = atoi(val_arg);
-    snprintf(output, sizeof(output), "%s's %s set to %d.", GET_NAME(vict), set_fields[mode].cmd, value);
+    snprintf(buf, sizeof(buf), "%s's %s set to %d.", GET_NAME(vict), set_fields[mode].cmd, value);
   }
   else
   {
-    snprintf(output, sizeof(output), "Okay.");    /* can't use OK macro here 'cause of \r\n */
+    snprintf(buf, sizeof(buf), "Okay.");    /* can't use OK macro here 'cause of \r\n */
   }
 
   switch (mode)
@@ -4873,12 +4877,12 @@ int perform_set(Character *ch, Character *vict, int mode,
     break;
   case 2:
     set_title(vict, val_arg);
-    snprintf(output, sizeof(output), "%s's title is now: %s", GET_NAME(vict),
+    snprintf(buf, sizeof(buf), "%s's title is now: %s", GET_NAME(vict),
              GET_TITLE(vict));
     break;
   case 3:
     SET_OR_REMOVE(PRF_FLAGS(vict), PRF_SUMMONABLE);
-    snprintf(output, sizeof(output), "Nosummon %s for %s.\r\n", ONOFF(!on),
+    snprintf(buf, sizeof(buf), "Nosummon %s for %s.\r\n", ONOFF(!on),
              GET_NAME(vict));
     break;
   case 4:
@@ -5019,7 +5023,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     if (!str_cmp(val_arg, "off"))
     {
       GET_COND(vict, (mode - 29)) = (char) -1;    /* warning: magic number here */
-      snprintf(output, sizeof(output), "%s's %s now off.", GET_NAME(vict),
+      snprintf(buf, sizeof(buf), "%s's %s now off.", GET_NAME(vict),
                set_fields[mode].cmd);
     }
     else if (is_number(val_arg))
@@ -5027,7 +5031,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       value = atoi(val_arg);
       RANGE(0, 24);
       GET_COND(vict, (mode - 29)) = (char) value; /* and here too */
-      snprintf(output, sizeof(output), "%s's %s set to %d.", GET_NAME(vict),
+      snprintf(buf, sizeof(buf), "%s's %s set to %d.", GET_NAME(vict),
                set_fields[mode].cmd, value);
     }
     else
@@ -5097,7 +5101,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       {
         SET_BIT_AR(PLR_FLAGS(vict), PLR_LOADROOM);
         GET_LOADROOM(vict) = rvnum;
-        snprintf(output, sizeof(output), "%s will enter at room #%d.",
+        snprintf(buf, sizeof(buf), "%s will enter at room #%d.",
                  GET_NAME(vict), GET_LOADROOM(vict));
       }
       else
@@ -5129,7 +5133,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     strncpy(GET_PASSWD(vict), CRYPT(val_arg, GET_NAME(vict)), MAX_PWD_LENGTH);
     *(GET_PASSWD(vict) + MAX_PWD_LENGTH) = '\0';
-    snprintf(output, sizeof(output), "Password changed to '%s'.", val_arg);
+    snprintf(buf, sizeof(buf), "Password changed to '%s'.", val_arg);
     break;
   case 46:
     SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NODELETE);
@@ -5417,7 +5421,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     IMMTITLE(vict) = NULL;
     if (val_arg && *val_arg)
       IMMTITLE(vict) = strdup(val_arg);
-    snprintf(output, sizeof(output), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
+    snprintf(buf, sizeof(buf), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
     break;
   case 77:
     if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
@@ -5445,7 +5449,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     return (0);
   }
 
-  ch->Send("%s\r\n", CAP(output));
+  ch->Send("%s\r\n", CAP(buf));
   return (1);
 }
 

@@ -25,6 +25,7 @@
 #include "kalten.h"
 #include "fight.h"
 #include "damage.h"
+#include "descriptor.h"
 
 /* external functs */
 void eq_to_room(Character *ch);

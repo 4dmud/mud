@@ -8,6 +8,7 @@
 #include "handler.h"
 #include "db.h"
 #include "constants.h"
+#include "descriptor.h"
 
 
 /* same as any_one_arg except that it stops at punctuation */

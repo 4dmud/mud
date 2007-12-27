@@ -16,6 +16,7 @@
 #include "genzon.h"
 #include "oasis.h"
 #include "dg_scripts.h"
+#include "descriptor.h"
 
 /*-------------------------------------------------------------------*/
 

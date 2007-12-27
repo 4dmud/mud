@@ -21,6 +21,7 @@
 #include "improved-edit.h"
 #include "dg_olc.h"
 #include "constants.h"
+#include "descriptor.h"
 
 /*------------------------------------------------------------------------*/
 

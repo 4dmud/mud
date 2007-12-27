@@ -11,9 +11,12 @@
       <part>kdevclassview</part>
       <part>kdevsnippet</part>
       <part>kdevctags2</part>
+      <part>kdevdebugger</part>
       <part>kdevdocumentation</part>
       <part>kdevdoxygen</part>
       <part>kdevdistpart</part>
+      <part>kdevregexptest</part>
+      <part>kdevsecurity</part>
     </ignoreparts>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
@@ -151,12 +154,20 @@
       <inlineGet>true</inlineGet>
       <inlineSet>true</inlineSet>
     </creategettersetter>
+    <references/>
   </kdevcppsupport>
   <ctagspart>
-    <customArguments></customArguments>
-    <customTagfilePath></customTagfilePath>
+    <customArguments/>
+    <customTagfilePath/>
   </ctagspart>
   <kdevfileview>
-    <groups/>
+    <groups>
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+      <hidenonlocation>false</hidenonlocation>
+    </groups>
+    <tree>
+      <hidepatterns>*.o,*.lo,CVS</hidepatterns>
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+    </tree>
   </kdevfileview>
 </kdevelop>

@@ -193,3 +193,8 @@ util/wld2html.c
 descriptor.cpp
 mxp.cpp
 mxp.h
+string.cpp
+col_string.cpp
+col_string.h
+color.h
+descriptor.h

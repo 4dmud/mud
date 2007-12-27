@@ -18,6 +18,7 @@
 /* #include "olc.h" */
 #include "oasis.h"
 #include "assemblies.h"
+#include "descriptor.h"
 
 /*-------------------------------------------------------------------*
  * External data structures.

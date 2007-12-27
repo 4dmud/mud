@@ -20,6 +20,7 @@
 #include "spells.h"
 #include "handler.h"
 #include "interpreter.h"
+#include "descriptor.h"
 
 extern Descriptor *descriptor_list;
 extern struct time_data time_info;

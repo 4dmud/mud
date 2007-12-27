@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/21 11:02:26 $
-*  $Revision: 1.9 $
+*  $Date: 2006/05/30 09:14:19 $
+*  $Revision: 1.10 $
 **************************************************************************/
 
 #include "conf.h"
@@ -26,6 +26,7 @@
 #include "db.h"
 #include "constants.h"
 #include "oasis.h"
+#include "descriptor.h"
 
 extern struct index_data **trig_index;
 extern struct room_data *world_vnum[];

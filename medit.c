@@ -25,6 +25,7 @@
 #include "screen.h"
 #include "constants.h"
 #include "fight.h"
+#include "descriptor.h"
 
 /*-------------------------------------------------------------------*/
 

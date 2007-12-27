@@ -17,6 +17,7 @@
 #include "oasis.h"
 #include "tedit.h"
 #include "improved-edit.h"
+#include "descriptor.h"
 
 /* local */
 void con_display_spec(Descriptor *d);

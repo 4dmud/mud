@@ -24,6 +24,7 @@
 #include "improved-edit.h"
 #include "oasis.h"
 #include "tedit.h"
+#include "descriptor.h"
 
 void show_string(Descriptor *d, char *input);
 

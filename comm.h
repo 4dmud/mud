@@ -22,7 +22,7 @@ void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void perform_to_all(const char *messg, Character *ch);
 void close_socket(Descriptor *d);
-char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen);
+string wordwrap(const char *cmd, size_t width, size_t maxlen);
 
 int is_ignoring(Character *ch, Character *vict);
 

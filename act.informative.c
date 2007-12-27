@@ -23,6 +23,7 @@
 #include "dg_scripts.h"
 #include "clan.h"
 #include "fight.h"
+#include "descriptor.h"
 
 
 /*

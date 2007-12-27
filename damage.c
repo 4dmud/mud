@@ -13,6 +13,7 @@
 #include "dg_scripts.h"
 #include "constants.h"
 #include "fight.h"
+#include "descriptor.h"
 
 
 struct aff_dam_event_obj

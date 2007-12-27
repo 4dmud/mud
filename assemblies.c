@@ -19,7 +19,7 @@
 #include "db.h"
 #include "handler.h"
 #include "interpreter.h"
-
+#include "descriptor.h"
 
 /* Local global variables. */
 long           g_lNumAssemblies = 0;

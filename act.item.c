@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.42  2006/05/30 09:14:19  w4dimenscor
+ * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ *
  * Revision 1.41  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
  * struct descriptor_data has been converted to class Descriptor
@@ -199,6 +202,7 @@
 #include "screen.h"
 #include "fight.h"
 #include "assemblies.h"
+#include "descriptor.h"
 
 /* extern variables */
 extern bool LS_REMOVE;

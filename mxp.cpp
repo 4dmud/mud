@@ -61,13 +61,13 @@
 #include "house.h"
 #include "dg_scripts.h"
 #include "screen.h"
-
+#include "descriptor.h"
 #include "mxp.h"
 
 
 int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
 {
-  char c;
+  char c = '\0';
   const char * p;
   int count = 0;
   int bInTag = FALSE;
@@ -142,7 +142,8 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
   return count;
 } /* end of count_mxp_tags */
 
-void Descriptor::convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn)
+/* size gets pre checked by count mxp tags */
+string Descriptor::convert_mxp_tags (const int bMXP, char *src, size_t lenn)
 {
   char c;
   const char * ps;
@@ -150,9 +151,10 @@ void Descriptor::convert_mxp_tags (const int bMXP,  char *dest, const char *src,
   int bInTag = FALSE;
   int bInEntity = FALSE;
   int srclen = lenn;
+  char dest[lenn];
   
   if (srclen == 0)
-    return;
+    return string("");
   
   
   for (ps = src, pd = dest; srclen > 0; ps++, srclen--)
@@ -244,6 +246,8 @@ void Descriptor::convert_mxp_tags (const int bMXP,  char *dest, const char *src,
     
   }   /* end of converting special characters */
   *pd = 0;
+
+  return string(dest);
 } /* end of convert_mxp_tags */
 
 

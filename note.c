@@ -52,6 +52,7 @@
 #include "dg_scripts.h"
 #include "spells.h"
 #include "clan.h"
+#include "descriptor.h"
 
 /* globals from db.c for load_notes */
 #if !defined(macintosh)

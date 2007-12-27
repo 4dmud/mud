@@ -57,6 +57,7 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
  #include "handler.h"
 #include "improved-edit.h"
 #include "clan.h"
+#include "descriptor.h"
 
 /* Board appearance order. */
 #define	NEWEST_AT_TOP	FALSE

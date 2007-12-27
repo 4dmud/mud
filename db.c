@@ -40,6 +40,7 @@
 #include "trees.h"
 #include "htree.h"
 #include "damage.h"
+#include "descriptor.h"
 
 int load_qic_check(int rnum);
 void qic_scan_rent(void);
@@ -484,7 +485,7 @@ void sort_zone_list(int total)
   {
     temp_list[i] = temp;
   }
-#if 1
+#if 0
   for (i=0;i<total;i++)
   {
     log("Before - %d", temp_list[i]->num);
@@ -497,7 +498,7 @@ void sort_zone_list(int total)
   zone_list = NULL;
   for (i=0;i<total;i++)
   {
-    log("After  - %d", temp_list[i]->num);
+    //    log("After  - %d", temp_list[i]->num);
     CREATE(temp, struct zone_list_data, 1);
     temp->num = temp_list[i]->num;
     strcpy(temp->zone, temp_list[i]->zone);

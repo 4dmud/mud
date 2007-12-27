@@ -13,6 +13,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "descriptor.h"
 
 
 

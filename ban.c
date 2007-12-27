@@ -18,6 +18,7 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
+#include "descriptor.h"
 
 struct ban_list_element *ban_list = NULL;
 

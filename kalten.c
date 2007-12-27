@@ -19,6 +19,7 @@
 #include "fight.h"
 #include "kalten.h"
 #include "romance.h"
+#include "descriptor.h"
 
 
 /*   external vars  */

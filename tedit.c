@@ -17,6 +17,7 @@
 #include "oasis.h"
 #include "improved-edit.h"
 #include "tedit.h"
+#include "descriptor.h"
 
 extern const char *credits;
 extern const char *news;

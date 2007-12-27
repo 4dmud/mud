@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/21 11:02:26 $
-*  $Revision: 1.10 $
+*  $Date: 2006/05/30 09:14:19 $
+*  $Revision: 1.11 $
 **************************************************************************/
 
 #include "conf.h"
@@ -70,12 +70,12 @@ struct obj_command_info {
 void obj_log(obj_data *obj, const char *format, ...)
 {
   va_list args;
-  char output[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
     
-  snprintf(output, sizeof(output), "Obj (%s, VNum %d):: %s", obj->short_description, GET_OBJ_VNUM(obj), format);
+  snprintf(buf, sizeof(buf), "Obj (%s, VNum %d):: %s", obj->short_description, GET_OBJ_VNUM(obj), format);
 
   va_start(args, format);
-  script_vlog(output, args);
+  script_vlog(buf, args);
   va_end(args);
 }
 
