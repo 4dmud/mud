@@ -199,6 +199,7 @@ struct alias_data
 #define SCMD_RP		47
 #define SCMD_FISHTALLY  48
 #define SCMD_NOTELEPORT 49
+#define SCMD_AUTOGROUP  50
 
 /* do_wizutil */
 #define SCMD_REROLL	0

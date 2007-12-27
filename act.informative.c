@@ -5268,10 +5268,10 @@ int even_group(struct char_data *ch)
 
   struct char_data *k;
   struct follow_type *f;
-  float share, max;
+  float share;
 
   k = (ch->master ? ch->master : ch);
-  rand = (1000.0 / group_size(k))/10.0;
+  share = (1000.0 / group_size(k))/10.0;
 
   for (f = k->followers; f; f = f->next)
     GET_PERC(f->follower) = share;
