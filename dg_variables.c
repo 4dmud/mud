@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/26 10:48:05 $                                           * 
-*  $Revision: 1.55 $                                                      *
+*  $Date: 2007/06/30 04:20:19 $                                           * 
+*  $Revision: 1.56 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1518,8 +1518,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 }
                 break;
             case 'h':
-
-                if (!strcasecmp(field, "has_in")) {
+		if (!strcasecmp(field, "has_pos")) {
+			if (subfield && *subfield) {
+			int where_to_worn(int where);
+			int where = search_block(subfield, body, FALSE);
+			        if (!CAN_WEAR(o, where_to_worn(where)))
+            				snprintf(str, slen, "0");
+				else
+					snprintf(str, slen, "1");
+			} else
+				snprintf(str, slen, "0");
+		} else if (!strcasecmp(field, "has_in")) {
                     struct obj_data *next_obj = NULL, *item = NULL;
                     bool found = FALSE;
                     snprintf(str, slen, "0");
