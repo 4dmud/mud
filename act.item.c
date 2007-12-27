@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.23  2005/10/23 05:21:46  w4dimenscor
+ * Altered assemblies, and fixed a few mem leaks
+ *
  * Revision 1.22  2005/10/02 03:37:16  w4dimenscor
  * Removed prompt ends from the output because I am not diagnosing the client well enough to stop a misdisplay on some, also artifacts will no longer be auto owned.
  *
@@ -326,13 +329,11 @@ break;
 }
 return ASSM_ASSEMBLE;
 }
-
+int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {return 1;}
 ACMD(do_assemble)
 {
   long         lVnum = NOTHING;
-  struct obj_data *pObject = NULL;
-  char buf[MAX_STRING_LENGTH];
-  int percent, type = getTypeFromSubskill(subcmd);
+  int type = getTypeFromSubskill(subcmd);
 
 
   skip_spaces(&argument);
@@ -351,37 +352,45 @@ ACMD(do_assemble)
   } else if (assemblyGetType(lVnum) != (type - 101)) {
     new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
     return;
-  } else if (!assemblyCheckComponents(lVnum, ch)) {
+  } else if (!assemblyCheckComponents(lVnum, ch, TRUE)) {
     new_send_to_char(ch, "You haven't got all the things you need.\r\n");
     return;
   }
 
-  percent = number(1, 101);
+  assemble_otrigger(lVnum, ch, subcmd, cmd);
+  
+}
 
-  if (percent < 5)
-   improve_sub(ch, (enum subskill_list ) subcmd,1);
 
-  if (percent > get_sub(ch, subcmd)) {
-    new_send_to_char(ch, "You attempt to create ends in failure!\r\n");
-    return;
-  } else {
-    /* Create the assembled object. */
-    if ((pObject = read_object(lVnum, VIRTUAL)) == NULL ) {
-      new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
-      return;
-    }
+int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {
+  int percent;
+  struct obj_data *pObject = NULL;
+/* Create the assembled object. */
+  if (!assemblyCheckComponents(lVnum, ch, FALSE)) {
+    new_send_to_char(ch, "You haven't got all the things you need.\r\n");
+    return 0;
   }
+  if ((pObject = read_object(lVnum, VIRTUAL)) == NULL ) {
+    new_send_to_char(ch, "You can't %s one of those.\r\n", CMD_NAME);
+    return 0;
+  }
+  percent = number(1, 101);
+  
+  if (percent < 5)
+    improve_sub(ch, (enum subskill_list ) subcmd,1);
 
   /* Now give the object to the character. */
   obj_to_char(pObject, ch);
-
+#if 0
   /* Tell the character they made something. */
   sprintf(buf, "You %s $p.", CMD_NAME);
   act(buf, FALSE, ch, pObject, NULL, TO_CHAR);
-
+  
   /* Tell the room the character made something. */
   sprintf(buf, "$n %ss $p.", CMD_NAME);
   act(buf, FALSE, ch, pObject, NULL, TO_ROOM);
+#endif
+  return 1;
 }
 
 

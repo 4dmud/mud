@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/10/09 01:54:08 $
-*  $Revision: 1.5 $
+*  $Date: 2005/10/23 05:21:46 $
+*  $Revision: 1.6 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -88,14 +88,13 @@
 #define OTRIG_DROP             (1 << 7)	/* character trys to drop obj */
 #define OTRIG_GIVE             (1 << 8)	/* character trys to give obj */
 #define OTRIG_WEAR             (1 << 9)	/* character trys to wear obj */
+#define OTRIG_ASSEMBLE         (1 << 10)/* attached to the assembly command group */
+#define OTRIG_REMOVE           (1 << 11)/* character trys to remove obj */
 
-#define OTRIG_REMOVE           (1 << 11)	/* character trys to remove obj */
-
-#define OTRIG_LOAD             (1 << 13)	/* the object is loaded       */
-#define OTRIG_TIME             (1 << 14)  /* time prog */
-#define OTRIG_CAST             (1 << 15)	/* object targetted by spell */
-#define OTRIG_LEAVE            (1 << 16)    /* someone leaves room seen    */
-
+#define OTRIG_LOAD             (1 << 13)/* the object is loaded       */
+#define OTRIG_TIME             (1 << 15)/* time prog */
+#define OTRIG_CAST             (1 << 16)/* object targetted by spell */
+#define OTRIG_LEAVE            (1 << 17)     /* someone leaves room seen    */
 #define OTRIG_CONSUME          (1 << 18)    /* char tries to eat/drink obj */
 #define OTRIG_FUNCTION         (1 << 19)
 

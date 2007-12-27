@@ -517,6 +517,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define ASSEDIT_EDIT_EXTRACT            5
 #define ASSEDIT_EDIT_INROOM             6
 #define ASSEDIT_EDIT_TYPES              7
+#define ASSEDIT_EDIT_TRIGGER            8
 
 #ifndef __GENOLC_C__
 

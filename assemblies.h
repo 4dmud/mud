@@ -44,8 +44,8 @@ struct assembly_data
 {
   long         lVnum;                  /* Vnum of the object assembled. */
   long         lNumComponents;         /* Number of components. */
-  unsigned char        uchAssemblyType;        /* Type of assembly (ASSM_xxx).
-  */
+  unsigned char        uchAssemblyType;        /* Type of assembly (ASSM_xxx).*/
+  int trigVnum; /* attach a trigger to the assembly */
   struct component_data *pComponents;          /* Array of component info. */
 };
 
@@ -69,7 +69,7 @@ void           assemblyListToChar( struct char_data *pCharacter );
 bool           assemblyAddComponent( long lVnum, long lComponentVnum,
                                      bool bExtract, bool bInRoom );
 bool           assemblyCheckComponents( long lVnum, struct char_data
-                                        *pCharacter );
+                                        *pCharacter , bool check_only);
 bool           assemblyCreate( long lVnum, int iAssembledType );
 bool           assemblyDestroy( long lVnum );
 bool           assemblyHasComponent( long lVnum, long lComponentVnum );
@@ -84,6 +84,7 @@ long           assemblyGetComponentIndex( ASSEMBLY *pAssembly, long lComponentVn
 
 ASSEMBLY*      assemblyGetAssemblyPtr( long lVnum );
 void           free_assemblies(void);
+bool           assemblyAddTrigger(long lVnum,int iTrig);
 
 /* ******************************************************************** */
 

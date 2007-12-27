@@ -824,6 +824,9 @@ htree_free(obj_htree);
   free(mob_index);
   htree_free(mob_htree);
 
+  htree_free(HTREE_NULL);
+  free(HTREE_NULL);
+
   /* Shops */
   destroy_shops();
 

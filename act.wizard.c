@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.36  2005/10/23 05:21:46  w4dimenscor
+ * Altered assemblies, and fixed a few mem leaks
+ *
  * Revision 1.35  2005/10/09 01:54:08  w4dimenscor
  * Fixed the trigger type otrig-speech so it works as expected, make id num's save to the player index, fixed the trigger types
  *
@@ -6794,9 +6797,7 @@ ACMD(do_deleteplayer)
     return;
   }
   new_send_to_char(ch, "{cYAre you ABSOLUTELY certain you want to delete {cR%s{cY?{c0\r\n\r\n{cgIf you are certain, type: 'yes I am' --:{c0", buf2);
-  line_input(ch->desc,
-             "",
-             delete_player, NULL);
+  line_input(ch->desc, "", delete_player, NULL);
 
 }
 

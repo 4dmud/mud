@@ -39,6 +39,7 @@ void assemblyBootAssemblies( void )
   int          iExtract = 0;
   int          iInRoom = 0;
   int          iType = 0;
+  int          iTrig = 0;
   long         lLineCount = 0;
   long         lPartVnum = NOTHING;
   long         lVnum = NOTHING;
@@ -61,8 +62,7 @@ void assemblyBootAssemblies( void )
 
     if( str_cmp( szTag, "Component" ) == 0 )
     {
-      if( sscanf( szLine, "#%ld %d %d", &lPartVnum, &iExtract, &iInRoom ) != 3
-        )
+      if( sscanf( szLine, "#%ld %d %d", &lPartVnum, &iExtract, &iInRoom ) != 3 )
       {
         log( "SYSERR: bootAssemblies(): Invalid format in file %s, line %ld: "
              "szTag=%s, szLine=%s.", ASSEMBLIES_FILE, lLineCount, szTag, szLine );
@@ -71,6 +71,20 @@ void assemblyBootAssemblies( void )
       {
         log( "SYSERR: bootAssemblies(): Could not add component #%ld to "
              "assembly #%ld.", lPartVnum, lVnum );
+      }
+    }
+    else if( str_cmp( szTag, "Trigger" ) == 0 && lVnum != NOTHING)
+    {
+      if( sscanf( szLine, "#%d", &iTrig ) != 1 )
+      {
+      log( "SYSERR: bootAssemblies(): Invalid format in file %s, "
+           "line %ld.", ASSEMBLIES_FILE, lLineCount );
+      }
+      else if( !assemblyAddTrigger( lVnum, iTrig) )
+      {
+      log( "SYSERR: bootAssemblies(): Could not add assembly message for vnum "
+           "#%ld, trigger %d.", lVnum, iTrig );
+        iTrig = -1;
       }
     }
     else if( str_cmp( szTag, "Vnum" ) == 0 )
@@ -94,6 +108,7 @@ void assemblyBootAssemblies( void )
         lVnum = NOTHING;
       }
     }
+
     else
     {
       log( "SYSERR: Invalid tag '%s' in file %s, line #%ld.", szTag,
@@ -135,6 +150,7 @@ void assemblySaveAssemblies( void )
                (pAssembly->pComponents[ j ].bExtract ? 1 : 0),
                (pAssembly->pComponents[ j ].bInRoom ? 1 : 0) );
     }
+    fprintf( pFile, "Trigger             #%d\n",pAssembly->trigVnum);
 
     if( i < g_lNumAssemblies - 1 )
       fprintf( pFile, "\n" );
@@ -189,17 +205,27 @@ void assemblyListToChar( struct char_data *pCharacter )
         }
         else
         {
-          sprintf( szBuffer, " %5ld: %-20.20s Extract=%-3.3s InRoom=%-3.3s\r\n",+           g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
+        new_send_to_char(pCharacter, " %5ld: %-20.20s Extract=%-3.3s InRoom=%-3.3s\r\n",+           g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
                    obj_proto[ lRnum ].short_description,
                    (g_pAssemblyTable[ i ].pComponents[ j ].bExtract ? "Yes" : "No"),
                    (g_pAssemblyTable[ i ].pComponents[ j ].bInRoom  ? "Yes" : "No") );
-          new_send_to_char(pCharacter, szBuffer);
         }
       }
+    new_send_to_char(pCharacter, "Script: %d", g_pAssemblyTable[ i ].trigVnum);
     }
   }
 }
-
+bool assemblyAddTrigger(long lVnum,int iTrig) {
+  ASSEMBLY     *pAssembly = NULL;
+  if( (pAssembly = assemblyGetAssemblyPtr( lVnum )) == NULL )
+  {
+  log( "SYSERR: assemblyAddComponent(): Invalid 'lVnum' #%ld.", lVnum );
+    return (FALSE);
+  }
+  pAssembly->trigVnum = iTrig;
+  return TRUE;
+  
+}
 bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, bool bInRoom )
 {
   ASSEMBLY     *pAssembly = NULL;
@@ -252,7 +278,7 @@ bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, bool 
   return (TRUE);
 }
 
-bool assemblyCheckComponents( long lVnum, struct char_data *pCharacter )
+bool assemblyCheckComponents( long lVnum, struct char_data *pCharacter , bool check_only)
 {
   bool         bOk = TRUE;
   long         i = 0;
@@ -308,7 +334,7 @@ bool assemblyCheckComponents( long lVnum, struct char_data *pCharacter )
     if( ppComponentObjects[ i ] == NULL )
       continue;
 
-    if( pAssembly->pComponents[ i ].bExtract && bOk )
+    if( pAssembly->pComponents[ i ].bExtract && bOk && !check_only)
       extract_obj( ppComponentObjects[ i ] );
     else if( pAssembly->pComponents[ i ].bInRoom )
       obj_to_room( ppComponentObjects[ i ], IN_ROOM( pCharacter ) );
@@ -375,6 +401,7 @@ bool assemblyCreate( long lVnum, int iAssembledType )
   g_pAssemblyTable[ lMiddle ].lNumComponents = 0;
   g_pAssemblyTable[ lMiddle ].lVnum = lVnum;
   g_pAssemblyTable[ lMiddle ].pComponents = NULL;
+  g_pAssemblyTable[ lMiddle ].trigVnum = -1;
   g_pAssemblyTable[ lMiddle ].uchAssemblyType = (unsigned char) iAssembledType;
   return (TRUE);
 }
@@ -577,7 +604,7 @@ ASSEMBLY* assemblyGetAssemblyPtr( long lVnum )
 
 void free_assemblies(void)
 {
-  int i, j;
+  int i;
   if( g_pAssemblyTable == NULL )
     return;
   for( i = 0; i < g_lNumAssemblies; i++ )

@@ -19,9 +19,10 @@
 #include "oasis.h"
 #include "dg_olc.h"
 #include "dg_event.h"
+#include "constants.h"
 
 /* prototype externally defined functions */
-extern const char *trig_types[], *otrig_types[], *wtrig_types[];
+//extern const char *trig_types[], *otrig_types[], *wtrig_types[];
 zone_rnum real_zone_by_thing(room_vnum vznum);
 /*locals*/
 void trigedit_disp_menu(struct descriptor_data *d);

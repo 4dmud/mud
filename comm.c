@@ -1217,7 +1217,7 @@ void game_loop(socket_t mother_desc)
         command_interpreter(d->character, comm);	/* Send it to interpreter */
       }
     }
-
+#if 0
     /* Send queued output out to the operating system (ultimately to user). */
     for (d = descriptor_list; d; d = next_d)
     {
@@ -1230,6 +1230,19 @@ void game_loop(socket_t mother_desc)
           d->has_prompt = TRUE;
       }
     }
+#else
+        /* Send queued output out to the operating system (ultimately to user). */
+    for (d = descriptor_list; d; d = next_d) {
+      next_d = d->next;
+      if (*(d->output) && FD_ISSET(d->descriptor, &output_set)) {
+     /* Output for this player is ready */
+        if (process_output(d) < 0)
+          close_socket(d);
+        else
+          d->has_prompt = 1;
+      }
+    }
+#endif
 
     /* Print prompts for other descriptors who had no other output */
     for (d = descriptor_list; d; d = d->next)
@@ -1571,8 +1584,8 @@ const char *end_prompt(struct descriptor_data *d)
   if (d->eor == 1)
     return eor_prompt;
 /** edited out for the moment - needs to check for compatability first - mord**/
- // else if (d->telnet_capable == 1)
- //   return ga_prompt;
+  else if (d->telnet_capable == 1)
+    return ga_prompt;
   else
     return "";
 }
@@ -3002,7 +3015,7 @@ int process_input(struct descriptor_data *t)
        */
       if (*(unsigned char *)ptr == IAC)
       {
-        t->telnet_capable = 1;
+        
         //log("IAC found");
         //if (*(unsigned char *)(ptr+1) == DO)
         //log("DO found");
@@ -3018,6 +3031,7 @@ int process_input(struct descriptor_data *t)
 
         if (memcmp (ptr, do_sig2, strlen (do_sig2)) == 0)
         {
+          t->telnet_capable = 1;
           //log("MCCP found on");
           toggle_compression(t);
           t->comp->state = 2;
@@ -3027,6 +3041,7 @@ int process_input(struct descriptor_data *t)
         }
         if (memcmp (ptr, do_sig, strlen (do_sig)) == 0)
         {
+          t->telnet_capable = 1;
           //log("MCCP found on");
           toggle_compression(t);
           t->comp->state = 2;
@@ -3036,6 +3051,7 @@ int process_input(struct descriptor_data *t)
         }
         if (memcmp (ptr, dont_sig, strlen (dont_sig)) == 0)
         {
+          t->telnet_capable = 1;
           //log("MCCP found off");
           t->comp->state = 0;
           t->comp->compression = 1;
@@ -3044,6 +3060,7 @@ int process_input(struct descriptor_data *t)
         }
         if (memcmp (ptr, dont_sig2, strlen (dont_sig2)) == 0)
         {
+          t->telnet_capable = 1;
           //log("MCCP found off");
           t->comp->state = 0;
           t->comp->compression = 2;
@@ -3053,6 +3070,7 @@ int process_input(struct descriptor_data *t)
 #endif
         if (memcmp (ptr, do_eor, strlen (do_eor)) == 0)
         {
+          t->telnet_capable = 1;
           t->eor = 1;
           //log("eor found");
           memmove (ptr, &ptr [strlen (do_eor)], strlen (&ptr [strlen (do_eor)]) + 1);
@@ -3060,19 +3078,20 @@ int process_input(struct descriptor_data *t)
         }
         if (memcmp (ptr, do_ga, strlen (do_ga)) == 0)
         {
+          t->telnet_capable = 1;
           //log("eor found");
           memmove (ptr, &ptr [strlen (do_ga)], strlen (&ptr [strlen (do_ga)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, do_ga, strlen (do_ech)) == 0)
-        {
+        {t->telnet_capable = 1;
           /** wanna do something with this? **/
           //log("do echo found");
           memmove (ptr, &ptr [strlen (do_ech)], strlen (&ptr [strlen (do_ech)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
         if (memcmp (ptr, do_mxp_str, strlen (do_mxp_str)) == 0)
-        {
+        {t->telnet_capable = 1;
           turn_on_mxp (t);
           /* remove string from input buffer */
           memmove (ptr, &ptr [strlen (do_mxp_str)], strlen (&ptr [strlen (do_mxp_str)]) + 1);
@@ -3080,6 +3099,7 @@ int process_input(struct descriptor_data *t)
         } /* end of turning on MXP */
         else  if (memcmp (ptr, dont_mxp_str, strlen (dont_mxp_str)) == 0)
         {
+          t->telnet_capable = 1;
           t->mxp = FALSE;
           /* remove string from input buffer */
           memmove (ptr, &ptr [strlen (dont_mxp_str)], strlen (&ptr [strlen (dont_mxp_str)]) + 1);
