@@ -178,6 +178,9 @@ int has_space_suit(struct char_data *ch)
   if (GET_LEVEL(ch) >= LVL_IMPL)
     return (1);
 
+  if (GET_RACE(ch) == RACE_MARTIAN)
+    return 1;
+
   for (i = 0; i < NUM_WEARS; i++)
     if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
         GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_SPACESUIT)
@@ -205,6 +208,9 @@ int can_breathe_underwater(struct char_data *ch)
 {
   sh_int i;
 
+  if (GET_RACE(ch) == RACE_MARTIAN)
+    return 1;
+  
   for (i = 0; i < NUM_WEARS; i++)
     if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
         GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_AQUALUNG)
