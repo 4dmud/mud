@@ -36,6 +36,7 @@ extern const char *zone_bits[];
 #define MYCMD		(OLC_ZONE(d)->cmd[subcmd])
 #define OLC_CMD(d)	(OLC_ZONE(d)->cmd[OLC_VAL(d)])
 
+
 /* Prototypes. */
 int start_change_command(struct descriptor_data *d, int pos);
 void zedit_disp_flag_menu(struct descriptor_data *d);

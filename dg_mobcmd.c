@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.7  2005/04/06 07:16:28  w4dimenscor
+ * added dg variables: is_roleplay, is_peaceful. Added the GATE, and RP to constants.c
+ *
  * Revision 1.6  2005/03/24 09:23:05  w4dimenscor
  * Added info about where a spell can be cast to spellinfo
  *
@@ -688,13 +691,38 @@ ACMD(do_mdamage)
       return;
     }
   }
+  else if (!str_cmp("all", name))
+  {
+    CHAR_DATA *tvict;
+    if (!IN_ROOM(ch))
+      return;
+    /**TODO: I hate this loop, because it is possable that on the extraction
+             of a mob or player after damage, it could wipe the next char.
+      **/
+    for (vict = IN_ROOM(ch)->people;vict;vict = tvict)
+    {
+
+      if (ch != vict)
+      {
+        if (!IS_NPC(vict))
+        {
+          script_damage(vict, dam);
+        }
+      }
+      if (!DEAD(vict))
+        tvict = vict->next_in_room;
+      else
+        tvict = NULL;
+    }
+    return;
+  }
   else if (!(vict = get_char_room_vis(ch, name, NULL)))
   {
     mob_log(ch, "mdamage: victim (%s) does not exist (in this room)", name);
     return;
   }
-
-  script_damage(vict, dam);
+  else
+    script_damage(vict, dam);
 }
 
 
@@ -1361,7 +1389,6 @@ ACMD(do_mtransform)
   mob_rnum this_rnum = GET_MOB_RNUM(ch);
   int keep_hp = 1;		/* new mob keeps the old mob's hp/max hp/exp */
   int pos;
-  long tmpid;
 
   if (!MOB_OR_IMPL(ch))
   {
@@ -1416,29 +1443,29 @@ ACMD(do_mtransform)
 
     /* put the mob in the same room as ch so extract will work */
     char_to_room(m, IN_ROOM(ch));
-        
-  char_from_chair(ch);
-  stop_fusion(ch);
-  
-  remove_hunter(ch);
 
-  /* we can't forget the hunters either... */
-  for (hunt = hunter_list; hunt; hunt = hnext)
-  {
-    hnext = hunt->next;
+    char_from_chair(ch);
+    stop_fusion(ch);
 
-    if (!hunt->hunter)
-      continue;
-    if (HUNTING(hunt->hunter) != ch)
-      continue;
+    remove_hunter(ch);
 
-    //
-    forget(hunt->hunter, ch);
-    forget(ch, hunt->hunter);
-    remove_hunter(hunt->hunter);
-    //    HUNTING(hunt->hunter) = NULL;
+    /* we can't forget the hunters either... */
+    for (hunt = hunter_list; hunt; hunt = hnext)
+    {
+      hnext = hunt->next;
 
-  }
+      if (!hunt->hunter)
+        continue;
+      if (HUNTING(hunt->hunter) != ch)
+        continue;
+
+      //
+      forget(hunt->hunter, ch);
+      forget(ch, hunt->hunter);
+      remove_hunter(hunt->hunter);
+      //    HUNTING(hunt->hunter) = NULL;
+
+    }
 
     memcpy(&tmpmob, m, sizeof(*m));
     //rryan: we need to copy the strings so we don't end up free'ing the prototypes later
@@ -1469,11 +1496,13 @@ ACMD(do_mtransform)
 
 
 
-     do {
+    do
+    {
       int i;
       for (i = 0; i < 4; i++)
         GET_POINTS_EVENT(&tmpmob, i) = GET_POINTS_EVENT(ch, i);
-    } while (0);
+    }
+    while (0);
 
     GET_WAS_IN(&tmpmob) = GET_WAS_IN(ch);
     if (keep_hp)
@@ -1500,11 +1529,13 @@ ACMD(do_mtransform)
     ch->nr = this_rnum;
     GET_FIGHT_EVENT(m) = NULL;
     GET_MESSAGE_EVENT(m) = NULL;
-    do {
+    do
+    {
       int i;
       for (i = 0; i < 4; i++)
         GET_POINTS_EVENT(m, i) = NULL;
-    } while (0);
+    }
+    while (0);
 
     extract_char(m);
   }

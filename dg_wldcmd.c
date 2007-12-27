@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/25 07:33:47 $
-*  $Revision: 1.5 $
+*  $Date: 2005/04/06 07:16:28 $
+*  $Revision: 1.6 $
 **************************************************************************/
 
 #include "conf.h"
@@ -694,6 +694,30 @@ WCMD(do_wdamage)
   }
 
   dam = atoi(amount);
+  
+  if (!str_cmp("all", name))
+  {
+    CHAR_DATA *tvict, *vict;
+    if ((room) == NULL)
+      return;
+    /**TODO: I hate this loop, because it is possable that on the extraction
+             of a mob or player after damage, it could wipe the next char.
+      **/
+    for (vict = room->people;vict;vict = tvict)
+    {
+
+        if (!IS_NPC(vict))
+        {
+          script_damage(vict, dam);
+        }
+      if (!DEAD(vict))
+        tvict = vict->next_in_room;
+      else
+        tvict = NULL;
+    }
+    return;
+  }
+  
   ch = get_char_by_room(room, name);
 
   if (!ch)

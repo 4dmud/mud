@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.5  2005/04/06 07:16:28  w4dimenscor
+ * added dg variables: is_roleplay, is_peaceful. Added the GATE, and RP to constants.c
+ *
  * Revision 1.4  2005/02/25 05:02:45  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -582,6 +585,8 @@ const char *preference_bits[] =
     "BUSY",
     "AGGRO",
     "!BRAG",
+    "GATE",
+    "RP",
     "\n"
   };
 
