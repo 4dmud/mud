@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.10  2005/02/22 15:38:23  w4dimenscor
+ * set kill_all_enabled to 1
+ *
  * Revision 1.9  2005/02/09 09:23:44  w4dimenscor
  * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
  *
@@ -124,7 +127,7 @@ extern int message_type;
 #define WEAPON_PRIM_NOAFF 2
 #define WEAPON_SECO_NOAFF 3
 
-#define KILL_ALL_ENABLED 0
+#define KILL_ALL_ENABLED 1
 
 /* Room flags: used in room_data.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
