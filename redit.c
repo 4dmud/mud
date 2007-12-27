@@ -541,7 +541,7 @@ void redit_disp_menu(Descriptor *d)
 
                   /*---end-------------------------------------*/
                   "%sS%s) Script       : %s%s\r\n"
-                  "%sD%s) Delete Room\r\n"
+//                "%sD%s) Delete Room\r\n"
                   "%sQ%s) Quit\r\n"
                   "Enter choice : ",
 
@@ -792,8 +792,10 @@ void redit_parse(Descriptor *d, char *arg)
     case 'd':
     case 'D':
       /* Delete the room, prompt first. */
-      d->Output( "Are you sure you want to delete this room? ");
-      OLC_MODE(d) = REDIT_DELETE;
+//      d->Output( "Are you sure you want to delete this room? ");
+//      OLC_MODE(d) = REDIT_DELETE;
+      d->Output( "Room deleting is disabled!\r\n");
+      redit_disp_menu(d);
       break;
     case 's':
     case 'S':
@@ -1350,6 +1352,8 @@ void redit_parse(Descriptor *d, char *arg)
     /*-----end-----*/
 
   case REDIT_DELETE:
+    d->Output("Room deleting is disabled!\r\n");
+    return;
     if (*arg == 'y' || *arg == 'Y')
     {
       if (delete_room(OLC_ROOM(d)))
