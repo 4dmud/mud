@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.46  2007/09/12 19:45:50  w4dimenscor
+ * Fixed the silly mutter typo.
+ * --Thotter
+ *
  * Revision 1.45  2007/09/03 06:00:11  w4dimenscor
  * Fixed page to not consider mobs.
  *
@@ -568,8 +572,8 @@ ACMD(do_sayto) {
                        argument[len - 2] == '.' &&
                        argument[len - 3] == '.') {
                 snprintf(to_char, sizeof(to_char), "You mutter to $N, '%s'", argument);
-                snprintf(to_room, sizeof(to_room), "$n mutters to you, '%s'", argument);
-                snprintf(to_vict, sizeof(to_vict), "$n mutters you, '%s'", argument);
+                snprintf(to_room, sizeof(to_room), "$n mutters to $N, '%s'", argument);
+                snprintf(to_vict, sizeof(to_vict), "$n mutters to you, '%s'", argument);
             } else if (argument[len - 1] == '.') {
                 snprintf(to_char, sizeof(to_char), "You state to $N, '%s'", argument);
                 snprintf(to_room, sizeof(to_room), "$n states to $N, '%s'", argument);
