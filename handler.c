@@ -92,22 +92,62 @@ int isname(const char *str, const char *namelist)
 {
   char *newlist;
   char *curtok;
+  char *lp;
 
   if (!str || !*str || !namelist || !*namelist)
     return 0;
-  if (!strcmp(str, namelist)) /* the easy way */
+  if (!str_cmp(str, namelist)) /* the easy way */
     return 1;
 
-  newlist = strdup(namelist);	/* make a copy since strtok 'modifies' strings */
-  for (curtok = strtok(newlist, WHITESPACE); curtok; curtok = strtok(NULL, WHITESPACE))
+  lp = newlist = strdup(namelist);	/* make a copy since strtok 'modifies' strings */
+  for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
     if (curtok && is_abbrev(str, curtok))
     {
-      free(newlist);
+      free(lp);
       return 1;
     }
-  free(newlist);
+  free(lp);
   return 0;
 }
+
+/* search through strlist for matches on namelist
+Return 1 for complete match of abbrev words
+return 0 if not.
+note: consider making it check for quote marks and exact phrases.
+*/
+int isname_full(const char *strlist, const char *namelist)
+{
+  char *newlist, *lp;
+  char *curtok;
+  int cnt;
+
+  if (!strlist || !*strlist || !namelist || !*namelist)
+    return 0;
+  if (!str_cmp(strlist, namelist)) /* the easy way */
+    return 1;
+
+  /* make a copy since strtok 'modifies' strings */
+
+    lp = newlist = strdup(strlist);
+    cnt = 0;
+    for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
+      if (curtok)
+      {
+        if (!isname(curtok, namelist)) {
+	free(lp);
+	return 0;
+	} 
+	else
+        {
+          cnt ++;
+        }
+      }
+
+free(lp);
+  
+  return cnt;
+}
+
 
 
 /*
@@ -1263,7 +1303,7 @@ struct char_data *get_char_room(char *name, int *number, room_rnum room)
     return (NULL);
 
   for (i = room->people; i && *number; i = i->next_in_room)
-    if (isname(name, i->player.name))
+    if (isname_full(name, i->player.name))
       if (--(*number) == 0)
         return (i);
 
@@ -2217,16 +2257,10 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
       continue;
     if (inroom == FIND_CHAR_ROOM && !HERE(d->character, ch))
       continue;
-    if (IS_NPC(ch))
-    {
-      if (str_cmp(d->character->player.name, name))	/* If not same, continue */
-        continue;
-    }
-    else
-    {
-      if (!isname(name, d->character->player.name))
-        continue;
-    }
+
+    if (!isname_full(name, d->character->player.name))
+      continue;
+
     if (!CAN_SEE(ch, d->character))
       continue;
     if (--(*number) != 0)
@@ -2242,16 +2276,10 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
       continue;
     if (IS_NPC(i))
       continue;
-    if (IS_NPC(ch))
-    {
-      if (str_cmp(i->player.name, name))	/* If not same, continue */
-        continue;
-    }
-    else
-    {
-      if (!isname(name, i->player.name))
-        continue;
-    }
+
+    if (!isname_full(name, i->player.name))
+      continue;
+
     if (!CAN_SEE(ch, i))
       continue;
     if (--(*number) != 0)
@@ -2312,7 +2340,7 @@ struct char_data *get_room_vis(room_rnum room, char *name, int *number)
     return (get_player_room(room, name, NULL, FIND_CHAR_ROOM));
 
   for (i = room->people; i && *number; i = i->next_in_room)
-    if (isname(name, GET_NAME(i)))
+    if (isname_full(name, GET_NAME(i)))
       if (--(*number) == 0)
         return (i);
 
@@ -2344,7 +2372,7 @@ struct char_data *get_char_room_vis(struct char_data *ch, char *name,
     return (get_player_vis(ch, name, NULL, FIND_CHAR_ROOM));
 
   for (i = IN_ROOM(ch)->people; i && *number; i = i->next_in_room)
-    if (isname(name, i->player.name))
+    if (isname_full(name, i->player.name))
       if (CAN_SEE(ch, i))
         if (--(*number) == 0)
           return (i);
@@ -2377,9 +2405,9 @@ struct char_data *get_char_world_vis(struct char_data *ch, char *name,
 
   for (i = character_list; i && *number; i = i->next)
   {
-    if (IN_ROOM(ch) == IN_ROOM(i))
+    if (HERE(ch,i))
       continue;
-    if (!isname(name, i->player.name))
+    if (!isname_full(name, i->player.name))
       continue;
     if (!CAN_SEE(ch, i))
       continue;
@@ -2421,7 +2449,7 @@ struct obj_data *get_obj_in_list_vis(struct char_data *ch, char *name,
     return (NULL);
 
   for (i = list; i && *number; i = i->next_content)
-    if (isname(name, i->name))
+    if (isname_full(name, i->name))
       if (CAN_SEE_OBJ(ch, i))
         if (--(*number) == 0)
           return (i);
@@ -2459,7 +2487,7 @@ struct obj_data *get_obj_vis(struct char_data *ch, char *name, int *number)
 
   /* ok.. no luck yet. scan the entire obj list   */
   for (i = object_list; i && *number; i = i->next)
-    if (isname(name, i->name))
+    if (isname_full(name, i->name))
       if (CAN_SEE_OBJ(ch, i))
         if (--(*number) == 0)
           return (i);
@@ -2485,7 +2513,7 @@ struct obj_data *get_obj_in_equip_vis(struct char_data *ch, char *arg,
 
   for (j = 0; j < NUM_WEARS; j++)
     if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
-        && isname(arg, equipment[j]->name))
+        && isname_full(arg, equipment[j]->name))
       if (--(*number) == 0)
         return (equipment[j]);
 
@@ -2507,7 +2535,7 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number,
 
   for (j = 0; j < NUM_WEARS; j++)
     if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j])
-        && isname(arg, equipment[j]->name))
+        && isname_full(arg, equipment[j]->name))
       if (--(*number) == 0)
         return (j);
 

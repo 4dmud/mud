@@ -1,37 +1,49 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="8" >
+ <DocsAndViews NumberOfDocuments="11" >
   <Doc0 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/db.c" >
-   <View0 line="7114" Type="Source" />
+   <View0 line="5832" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/oasis_list.c" >
-   <View0 line="212" Type="Source" />
+   <View0 Type="Source" />
   </Doc1>
   <Doc2 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/genwld.c" >
-   <View0 line="224" Type="Source" />
+   <View0 Type="Source" />
   </Doc2>
   <Doc3 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/redit.c" >
-   <View0 line="1350" Type="Source" />
+   <View0 Type="Source" />
   </Doc3>
   <Doc4 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.create.c" >
-   <View0 line="892" Type="Source" />
+   <View0 Type="Source" />
   </Doc4>
   <Doc5 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/fight.c" >
-   <View0 line="325" Type="Source" />
+   <View0 Type="Source" />
   </Doc5>
   <Doc6 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.comm.c" >
-   <View0 line="1318" Type="Source" />
+   <View0 Type="Source" />
   </Doc6>
   <Doc7 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
    <View0 line="2330" Type="Source" />
   </Doc7>
+  <Doc8 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/qic.c" >
+   <View0 line="286" Type="Source" />
+  </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/objsave.c" >
+   <View0 line="36" Type="Source" />
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/db.h" >
+   <View0 line="310" Type="Source" />
+  </Doc10>
  </DocsAndViews>
  <pluginList>
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.create.c" >
      <mark line="905" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/qic.c" >
+     <mark line="269" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>

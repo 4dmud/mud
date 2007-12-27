@@ -426,7 +426,6 @@ ASPELL(spell_gate)
 ASPELL(spell_locate_object)
 {
   struct obj_data *i;
-  char name[MAX_INPUT_LENGTH];
   int j;
   char buf[MAX_STRING_LENGTH];
   DYN_DEFINE;
@@ -440,15 +439,11 @@ ASPELL(spell_locate_object)
    */
   // strcpy(name, fname(obj->name));
   /* use the temporary object that do_cast created */
-  if (!obj->name)
+  if (!strarg)
   {
     send_to_char("What object would you like to find?\r\n", ch);
-    free(obj);
     return;
   }
-  strcpy(name, obj->name);
-  free(obj->name);
-  free(obj);
 
   j = (level / 2) * (TIERNUM+1);
 
@@ -457,7 +452,7 @@ ASPELL(spell_locate_object)
 
   for (i = object_list; i && (j > 0); i = i->next)
   {
-    if (!isname(name, i->name))
+    if (!isname_full(strarg, i->name))
       continue;
     if (GET_LEVEL(ch) < LVL_IMMORT && number(0, 1))
       continue;

@@ -1544,7 +1544,8 @@ char *one_word(char *argument, char *first_arg)
 }
 
 
-/* same as one_argument except that it doesn't ignore fill words */
+/* same as one_argument except that it doesn't ignore fill words 
+TODO: this is not length safe, make it so!*/
 char *any_one_arg(char *argument, char *first_arg)
 {
   skip_spaces(&argument);

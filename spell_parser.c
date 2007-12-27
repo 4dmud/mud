@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.6  2005/05/01 11:42:13  w4dimenscor
+ * started a change in the server so that multiple arguments can be used when referencing items: have done this for locate object, look, goto, at and a few other things, havent done it for: get, put, drink, wear and a few others
+ *
  * Revision 1.5  2005/03/19 15:02:55  w4dimenscor
  * gave centaurs the innate skill mount and riding at 100 % also adjusted
  * damage and speed a little.
@@ -1170,7 +1173,7 @@ ACMD(do_cast)
     char arg[MAX_INPUT_LENGTH];
 
     strlcpy(arg, t, sizeof(arg));
-    a = one_argument(arg, t);
+    a = one_argument(t, arg);
     skip_spaces(&t);
     skip_spaces(&a);
     if (*a || a)
@@ -1185,13 +1188,12 @@ ACMD(do_cast)
      * add the temp obj to the global list, avoiding the overhead of
      * adding and removing it.
      */
-    CREATE(tobj, struct obj_data, 1);
-    tobj->name = (t && *t ? str_dup(t) : NULL);
     /* could get fancy here and support multiple arguments, but the code in
      * spells.c would have to be updated too.  Anyone want to write it? :-)
      */
+     /**mord - done this **/
     target = TRUE;
-  }
+  } else
 
   /* the start of finding the target
    * If they typed a target, see if we can find them*/

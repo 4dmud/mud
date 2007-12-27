@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.20  2005/05/01 11:42:12  w4dimenscor
+ * started a change in the server so that multiple arguments can be used when referencing items: have done this for locate object, look, goto, at and a few other things, havent done it for: get, put, drink, wear and a few others
+ *
  * Revision 1.19  2005/03/16 18:47:03  w4dimenscor
  * updated some spacing and formatting
  *
@@ -701,6 +704,7 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
   room_rnum location = NULL;
   char roomstr[MAX_INPUT_LENGTH];
 
+  skip_spaces(&rawroomstr);
   one_argument(rawroomstr, roomstr);
 
   if (!*roomstr)
@@ -722,7 +726,7 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
     struct char_data *target_mob;
     struct obj_data *target_obj;
     struct room_data *target_room;
-    char *mobobjstr = roomstr;
+    char *mobobjstr = rawroomstr;
     int num;
 
     if (*roomstr == UID_CHAR)

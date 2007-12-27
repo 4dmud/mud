@@ -25,6 +25,31 @@
 #include "fight.h"
 
 
+/*
+New layout for commands
+Look/Examine
+Get
+wear
+drop
+quaff
+drink
+kill
+
+for look/examine:
+Look <item/player/direction single word>
+Look at <item/Mobile <item multiple words>
+Look at <item multiple words> in <item multiple words>
+Look at <item multiple words> on <item multiple words>
+Look in <item/direction multiple words>
+
+get <item one word> <item one word>
+Get <item multiple words> from <item multiple words>
+Put <item multiple words> in <item multiple words>
+
+
+
+*/
+
 /* extern variables */
 extern int top_of_helpt;
 extern struct help_index_element *help_table;
@@ -1532,7 +1557,7 @@ char *find_exdesc(char *word, struct extra_descr_data *list)
   struct extra_descr_data *i;
 
   for (i = list; i; i = i->next)
-    if (isname(word, i->keyword))
+    if (isname_full(word, i->keyword))
       return (i->description);
 
   return (NULL);
@@ -1663,39 +1688,56 @@ ACMD(do_look)
     send_to_char("It is pitch black...\r\n", ch);
     list_char_to_char(IN_ROOM(ch)->people, ch);	/* glowing red eyes */
   }
-  else
-  {
-    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-    half_chop(argument, arg, arg2);
-
-    if (subcmd == SCMD_READ)
+  else if (subcmd == SCMD_READ)
     {
-      if (!*arg)
+    
+        skip_spaces(&argument);
+      if (!*argument)
         send_to_char("Read what?\r\n", ch);
-      else
-        look_at_target(ch, arg);
+      else 
+        look_at_target(ch, argument);
+	
       return;
     }
+  else
+  {
+    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], sdir[MAX_INPUT_LENGTH];
+    
+    int look_at = 0;
+    int look_in = 0;
+    skip_spaces(&argument);
+    strlcpy(arg2,argument,sizeof(arg2));
+    //half_chop(argument, arg, arg2);
+    argument = any_one_arg(argument, arg);
+    
+    if (!str_cmp(arg, "at"))
+    look_at = 1;
+    if (!str_cmp(arg, "in"))
+    look_in = 1;
+    else
+    argument = arg2;
+    any_one_arg(argument, sdir);
+    
     examine_on = TRUE;
     if (!*arg)		/* "look" alone, without an argument at all */
       look_at_room(ch, 1);
-    else if (is_abbrev(arg, "in"))
-      look_in_obj(ch, arg2);
+    else if (look_in)
+      look_in_obj(ch, argument);
     /* did the char type 'look <direction>?' */
-    else if ((look_type = search_block(arg, dirs, FALSE)) >= 0)
+    else if ((look_type = search_block(sdir, dirs, FALSE)) >= 0)
       look_in_direction(ch, look_type);
-    else if (is_abbrev(arg, "at"))
-      look_at_target(ch, arg2);
-    else if (is_abbrev(arg, "above"))
+    else if (look_at)
+      look_at_target(ch, argument);
+    else if (is_abbrev(argument, "above"))
       look_above_target(ch, arg2);
-    else if (is_abbrev(arg, "behind"))
+    else if (is_abbrev(argument, "behind"))
       look_behind_target(ch, arg2);
-    else if (is_abbrev(arg, "under"))
+    else if (is_abbrev(argument, "under"))
       look_under_target(ch, arg2);
-    else if (is_abbrev(arg, "around"))
+    else if (is_abbrev(argument, "around"))
       look_around(ch);
     else
-      look_at_target(ch, arg);
+      look_at_target(ch, argument);
     examine_on = FALSE;
   }
 }
@@ -2785,7 +2827,7 @@ struct help_index_element *find_help(char *keyword)
     if (is_name(keyword, help_table[i].keywords))
       return (help_table + i);
   for (i = 0; i < top_of_helpt; i++)
-    if (isname(keyword, help_table[i].keywords))
+    if (isname_full(keyword, help_table[i].keywords))
       return (help_table + i);
 
   return NULL;
@@ -3828,7 +3870,7 @@ void perform_mortal_where(struct char_data *ch, char *arg)
       if (!CAN_SEE(ch, i)
           || i->in_room->zone != IN_ROOM(ch)->zone)
         continue;
-      if (!isname(arg, i->player.name))
+      if (!isname_full(arg, i->player.name))
         continue;
       new_send_to_char(ch, "{cg%-25s{cw - {cc%s{c0\r\n", GET_NAME(i),
                        IN_ROOM(i)->name);
@@ -3930,7 +3972,7 @@ void perform_immort_where(struct char_data *ch, char *arg)
     counter = 0;
     for (i = character_list; i; i = i->next)
       if (CAN_SEE(ch, i) && i->in_room != NULL
-          && isname(arg, i->player.name))
+          && isname_full(arg, i->player.name))
       {
         found = 1;
         snprintf(buf, sizeof(buf), "M%3d. [%5d] %-25s - [%5d] %-25s %s\r\n", ++num, GET_MOB_VNUM(i),
@@ -3943,7 +3985,7 @@ void perform_immort_where(struct char_data *ch, char *arg)
     counter = 0;
     for (num = 0, k = object_list; k; k = k->next)
     {
-      if (CAN_SEE_OBJ(ch, k) && isname(arg, k->name))
+      if (CAN_SEE_OBJ(ch, k) && isname_full(arg, k->name))
       {
         found = 1;
         print_object_location(++num, k, ch, TRUE, buf);
@@ -3956,7 +3998,7 @@ void perform_immort_where(struct char_data *ch, char *arg)
     for (j = 0; j < top_of_world; j++)
     {
       if ((rm = world_vnum[j]) == NULL) continue;
-      if (isname(arg, rm->name))
+      if (isname_full(arg, rm->name))
       {
         found = 1;
         snprintf(buf, sizeof(buf), "W%3d. [%6d][%-8s][%c:%c] {cy%-25s {cg-{cC %s{c0\r\n",
@@ -3986,14 +4028,14 @@ void perform_immort_where(struct char_data *ch, char *arg)
 
 ACMD(do_where)
 {
-  char arg[MAX_STRING_LENGTH];
-  one_argument(argument, arg);
+//  char arg[MAX_STRING_LENGTH];
+  skip_spaces(&argument);
 
   if (GET_LEVEL(ch) > LVL_HERO && ((CMD_FLAGGED(ch, WIZ_IMM2_GRP))
                                    || (CMD_FLAGGED2(ch, WIZ_IMM2_GRP))))
-    perform_immort_where(ch, arg);
+    perform_immort_where(ch, argument);
   else
-    perform_mortal_where(ch, arg);
+    perform_mortal_where(ch, argument);
 }
 
 
@@ -4146,11 +4188,11 @@ ACMD(do_consider)
   struct char_data *victim;
   int highest_tier(struct char_data *ch);
   int diff, diff2, diff3;
-  char buf[MAX_INPUT_LENGTH];
+//  char buf[MAX_INPUT_LENGTH];
+  skip_spaces(&argument);
 
-  one_argument(argument, buf);
 
-  if (!(victim = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
+  if (!(victim = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM)))
   {
     send_to_char("Consider killing who?\r\n", ch);
     return;
@@ -4468,14 +4510,12 @@ ACMD(do_fusion)
 ACMD(do_diagnose)
 {
   struct char_data *vict;
-  char buf[MAX_INPUT_LENGTH];
+  skip_spaces(&argument);
 
-  one_argument(argument, buf);
-
-  if (*buf)
+  if (*argument)
   {
-    if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
-      +      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM)))
+            new_send_to_char(ch, "%s", CONFIG_NOPERSON);
     else
       diag_char_to_char(vict, ch);
   }
@@ -4687,13 +4727,12 @@ ACMD(do_commands)
   int no, i, cmd_num;
   int wizhelp = 0, socials = 0;
   struct char_data *vict;
-  char arg[MAX_INPUT_LENGTH];
+  skip_spaces(&argument);
 
-  one_argument(argument, arg);
 
-  if (*arg)
+  if (*argument)
   {
-    if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict))
+    if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict))
     {
       send_to_char("Who is that?\r\n", ch);
       return;
@@ -5139,7 +5178,7 @@ ACMD(set_perc)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
   int amount = 0, temp;
-
+/*TODO: change this to handle mutliple args for group members name */
 
   two_arguments(argument, buf, buf2);
   if (!*buf)

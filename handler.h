@@ -25,6 +25,7 @@ const char *money_desc(gold_int amount);
 struct obj_data *create_money(gold_int amount);
 int isname(const char *str, const char *namelist);
 int is_name(const char *str, const char *namelist);
+int isname_full(const char *strlist, const char *namelist);
 char *fname(const char *namelist);
 int get_number(char **name);
 
