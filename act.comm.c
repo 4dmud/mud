@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.42  2007/02/02 16:33:30  w4dimenscor
+ * 02/02/07 Fixed space issue with whisper and ask. I hope! Hal.
+ *
  * Revision 1.41  2007/01/28 21:25:10  w4dimenscor
  * Fixed the space issue to the whisperer sayto -> say to
  * 01/28/07 Hal.
@@ -968,17 +971,17 @@ ACMD(do_spec_comm)
   switch (subcmd)
   {
   case SCMD_WHISPER:
-    action_sing = "whisper to ";
+    action_sing = "whisper to";
     action_plur = "whispers to";
     action_others = "$n whispers something to $N.";
     break;
   case SCMD_ASK:
-    action_sing = "ask ";
+    action_sing = "ask";
     action_plur = "asks";
     action_others = "$n asks $N a question.";
     break;
   default:
-    action_sing = "oops ";
+    action_sing = "oops";
     action_plur = "oopses";
     action_others = "$n is tongue-tied trying to speak with $N.";
     break;
@@ -1008,7 +1011,7 @@ ACMD(do_spec_comm)
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
       *ch << CONFIG_OK;
     else
-      *ch << "You " << action_sing << GET_NAME(vict) << ", '" << buf2 << "'\r\n";
+      *ch << "You " << action_sing << " " << GET_NAME(vict) << ", '" << buf2 << "'\r\n";
 
     act(action_others, FALSE, ch, 0, vict, TO_NOTVICT);
   }
