@@ -583,7 +583,7 @@ const struct command_info cmd_info[] =
     { "fill"     , "fil" , POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
     { "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
     { "fire"     , "fire" , POS_SITTING, do_not_here , 0, 0, 0 },
-    { "fixskills"   , "fixskills" , POS_SLEEPING, do_fixskills   , 0, 0, 0 },
+    { "fixskills"   , "fixskills" , POS_SLEEPING, do_fixskills   , LVL_SEN, 0, 0 },
     { "flee"     , "fl"  , POS_FIGHTING, do_flee     , 1, 0, 0 },
 
     { "fletch"   , "fletch"   , POS_SITTING , do_assemble , 0, SUB_FLETCH, 0 },
