@@ -2820,7 +2820,7 @@ ASKILL(skill_forage)
       act("$p steams briefly as you sterilize it.", FALSE, ch, item_found, 0, TO_CHAR);
     }
 
-    act("$n has found something in $S forage attempt.\r\n", FALSE, ch, 0, 0, TO_ROOM);
+    act("$n has found something in $s forage attempt.\r\n", FALSE, ch, 0, 0, TO_ROOM);
     return SKILL_FORAGE;
   }
 }
