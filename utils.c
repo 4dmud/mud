@@ -31,7 +31,6 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1);
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 void die_follower(struct char_data *ch);
 void add_follower(struct char_data *ch, struct char_data *leader);
-size_t strlcpy(char *dest, const char *src, size_t copylen);
 char *stripcr(char *dest, const char *src);
 void prune_crlf(char *txt);
 
@@ -278,40 +277,40 @@ char *str_dup(const char *source)
  * (Note that you may have _expected_ truncation because you only wanted
  * a few characters from the source string.)
  */
- #if 0
+#if 0
 size_t strlcpy(char *dest, const char *src, size_t copylen)
 {
   strncpy(dest, src, copylen - 1);	/* strncpy: OK (we must assume 'totalsize' is correct) */
   dest[copylen - 1] = '\0';
   return strlen(src);
 }
-#endif
-size_t strlcpy (char *dest,
-           const char *src,
-           size_t dest_size)
+#else
+size_t strlcpy(char *dest, const char *src, size_t copylen)
 {
   register char *d = dest;
   register const char *s = src;
-  register size_t n = dest_size;
+  register size_t n = copylen;
 
   if (dest == NULL || src == NULL)
-return 0;
+    return 0;
 
   /* Copy as many bytes as will fit */
-  if (n != 0 && --n != 0) {
+  if (n != 0 && --n != 0)
+  {
     register char c;
     do
-      {
-        c = *d++ = *s++;
-        if (c == '\0')
-          break;
-      }
+    {
+      c = *d++ = *s++;
+      if (c == '\0')
+        break;
+    }
     while (--n != 0);
   }
 
   /* If not enough room in dest, add NUL and traverse rest of src */
-  if (n == 0) {
-    if (dest_size != 0)
+  if (n == 0)
+  {
+    if (copylen != 0)
       *d = '\0';    /* NUL-terminate dst */
     while (*s++)
       ;
@@ -319,7 +318,7 @@ return 0;
 
   return s - src - 1;  /* count does not include NUL */
 }
-//#endif
+#endif
 
 /*
  * Strips \r\n from end of string.
@@ -659,7 +658,7 @@ void mudlog(const char *str, int type, int level, int file)
  * to cast a non-const array as const than to cast a const one as non-const.
  * Doesn't really matter since this function doesn't change the array though.
  */
-void sprintbit(bitvector_t bitvector, const char *names[], char *result)
+void sprintbit(bitvector_t bitvector, const char *names[], char *result, size_t r_len)
 {
   long nr;
 
@@ -671,23 +670,23 @@ void sprintbit(bitvector_t bitvector, const char *names[], char *result)
     {
       if (*names[nr] != '\n')
       {
-        strcat(result, names[nr]);
-        strcat(result, " ");
+        strlcat(result, names[nr], r_len);
+        strlcat(result, " ", r_len);
       }
       else
-        strcat(result, "UNDEFINED ");
+        strlcat(result, "UNDEFINED ", r_len);
     }
     if (*names[nr] != '\n')
       nr++;
   }
 
   if (!*result)
-    strcpy(result, "NOBITS ");
+    strlcpy(result, "NOBITS ", r_len);
 }
 
 
 void sprintbitarray(int bitvector[], const char *names[], int maxar,
-                    char *result)
+                    char *result, size_t r_len)
 {
   int nr, teller, found = FALSE;
 
@@ -702,13 +701,13 @@ void sprintbitarray(int bitvector[], const char *names[], int maxar,
         {
           if (*names[(teller * 32) + nr] != '\0')
           {
-            strcat(result, names[(teller * 32) + nr]);
-            strcat(result, " ");
+            strlcat(result, names[(teller * 32) + nr], r_len);
+            strlcat(result, " ", r_len);
           }
         }
         else
         {
-          strcat(result, "UNDEFINED ");
+          strlcat(result, "UNDEFINED ", r_len);
         }
         if (*names[(teller * 32) + nr] == '\n')
           found = TRUE;
@@ -716,10 +715,10 @@ void sprintbitarray(int bitvector[], const char *names[], int maxar,
     }
 
   if (!*result)
-    strcpy(result, "NOBITS ");
+    strlcpy(result, "NOBITS ", r_len);
 }
 
-void sprinttype(int type, const char *names[], char *result)
+void sprinttype(int type, const char *names[], char *result, size_t r_len)
 {
   int nr = 0;
 
@@ -730,9 +729,9 @@ void sprinttype(int type, const char *names[], char *result)
   }
 
   if (*names[nr] != '\n')
-    strcpy(result, names[nr]);
+    strlcpy(result, names[nr], r_len);
   else
-    strcpy(result, "UNDEFINED");
+    strlcpy(result, "UNDEFINED", r_len);
 }
 
 /*
@@ -743,21 +742,24 @@ void sprinttype(int type, const char *names[], char *result)
 size_t new_sprintbit(bitvector_t bitvector, const char *names[],
                      char *result, size_t reslen)
 {
-  size_t len = 0, nlen;
+  size_t len = 0; //, nlen;
   long nr;
 
   *result = '\0';
 
-  for (nr = 0; bitvector && len < reslen; bitvector >>= 1)
+  for (nr = 0; bitvector /* && len < reslen */; bitvector >>= 1)
   {
     if (IS_SET(bitvector, 1))
     {
+    strlcat(result, *names[nr] != '\n' ? names[nr] : "UNDEFINED", reslen);
+    /*
       nlen =
         snprintf(result + len, reslen - len, "%s ",
                  *names[nr] != '\n' ? names[nr] : "UNDEFINED");
       if (len + nlen >= reslen || nlen < 0)
         break;
       len += nlen;
+      */
     }
 
     if (*names[nr] != '\n')
@@ -902,26 +904,27 @@ void stop_follower(struct char_data *ch)
     k = ch->master->followers;
     ch->master->followers = k->next;
     free(k);
-    
+
   }
   else
   {			/* locate follower who is not head of list */
-  
- 
-    for (k = ch->master->followers; k && k->next ; k = (k ? k->next : NULL)) {
-    if (!k)
-    continue;
-    if (!k->next)
-    continue;
-    if (!k->next->follower)
-    continue;
-    if (k->next->follower != ch)
-    continue;
-    j = k->next;
-    k->next = j->next;
-    if (j)
-    free(j);
-    break;
+
+
+    for (k = ch->master->followers; k && k->next ; k = (k ? k->next : NULL))
+    {
+      if (!k)
+        continue;
+      if (!k->next)
+        continue;
+      if (!k->next->follower)
+        continue;
+      if (k->next->follower != ch)
+        continue;
+      j = k->next;
+      k->next = j->next;
+      if (j)
+        free(j);
+      break;
     }
   }
   if (!IS_NPC(ch) && (!IS_NPC(ch->master)) && ch->master)
@@ -1622,7 +1625,7 @@ void wiz_read_file(void)
       if (load_char(player_table[i].name, vict) < 0)
       {
         free_char(vict);
-	TEMP_LOAD_CHAR = TRUE;
+        TEMP_LOAD_CHAR = TRUE;
         continue;
       }
 
@@ -1729,7 +1732,7 @@ void write_wizlist(FILE * out, int minlev, int maxlev)
     curr_name = curr_level->names;
     while (curr_name)
     {
-      strcat(buf, curr_name->name);
+      strlcat(buf, curr_name->name, sizeof(buf));
       if (strlen(buf) > LINE_LEN)
       {
         if (curr_level->params->level <= COL_LEVEL)
@@ -1741,17 +1744,17 @@ void write_wizlist(FILE * out, int minlev, int maxlev)
             fputc(' ', out);
         }
         fprintf(out, "%s\n", buf);
-        strcpy(buf, "");
+        strlcpy(buf, "", sizeof(buf));
       }
       else
       {
         if (curr_level->params->level <= COL_LEVEL)
         {
           for (j = 1; j <= (IMM_NSIZE - strlen(curr_name->name)); j++)
-            strcat(buf, " ");
+            strlcat(buf, " ", sizeof(buf));
         }
         if (curr_level->params->level > COL_LEVEL)
-          strcat(buf, "   ");
+          strlcat(buf, "   ", sizeof(buf));
       }
       curr_name = curr_name->next;
     }
@@ -1857,6 +1860,90 @@ char *stristr(const char *String, const char *Pattern)
   }
   return NULL;
 }
+
+
+#if 0
+
+size_t strlcpy(char *dest, const char *src, size_t copylen)
+{
+  size_t len = strlen (src);
+
+  if (len < copylen)
+  {
+    memcpy (dest, src, len + 1);
+  }
+  else
+  {
+    if (copylen)
+    {
+      memcpy (dest, src, copylen - 1);
+
+      dest [copylen - 1] = 0;
+    }
+  }
+
+  return len;
+}
+#endif
+
+#ifndef HAVE_STRLCAT
+
+/* sometimes strlen() is faster than using pointers ..
+ * In this case, uncomment the following
+ */
+/*#define STRLEN_FASTER*/
+
+
+/* append src to dst, guaranteeing a null terminator.
+ * If dst+src is too big, truncate it.
+ * Return strlen(old dst)+dstrlen(src).
+ */
+size_t strlcat(char *dest, const char *src, size_t copylen)
+{
+  size_t n=0;
+
+  /* find the end of string in dst */
+#ifdef STRLEN_FASTER
+  if (!copylen)
+    return strlen(src);
+  n = strlen(dest);
+  dst += n;
+#else
+  while (n < copylen && *dest++)
+    ++n;
+
+  if (n >= copylen)
+    return copylen + strlen(src);
+  /* back up over the '\0' */
+  --dest;
+#endif
+
+  /* copy bytes from src to dst.
+   * If there's no space left, stop copying
+   * if we copy a '\0', stop copying
+   */
+  while (n < copylen)
+  {
+    if (!(*dest++ = *src++))
+      return n;
+    ++n;
+  }
+
+  if (n == copylen)
+  {
+    /* overflow, so truncate the string, and ... */
+    if (copylen)
+      dest[-1] = '\0';
+    /* ... work out what the length would have been had there been
+     * enough space in the buffer
+     */
+    n += strlen(dest);
+  }
+
+  return n;
+}
+
+#endif /* HAVE_STRLCAT */
 
 
 

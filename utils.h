@@ -76,10 +76,6 @@ int use_stamina(struct char_data *ch, int amount);
 #define IS_HERO(ch) (0)
 #define IS_ELEMENTAL(ch) ((MOB_FLAGGED(ch, MOB_ELEM_EARTH)|| (MOB_FLAGGED(ch, MOB_ELEM_AIR))||(MOB_FLAGGED(ch, MOB_ELEM_WATER))||(MOB_FLAGGED(ch, MOB_ELEM_FIRE))))
 
-size_t strlcpy (char *dest,
-           const char *src,
-           size_t dest_size);
-
 /*replace parts of strings*/
 char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
 /*string concat for multiple strings*/
@@ -134,12 +130,12 @@ size_t new_sprintbit(bitvector_t vektor, const char *names[], char *result,
                      size_t reslen);
 size_t new_sprinttype(int type, const char *names[], char *result,
                       size_t reslen);
-void sprintbit(bitvector_t vektor, const char *names[], char *result);
-void sprinttype(int type, const char *names[], char *result);
+void sprintbit(bitvector_t vektor, const char *names[], char *result, size_t r_len);
+void sprinttype(int type, const char *names[], char *result, size_t r_len);
 int get_line(FILE * fl, char *buf);
 int get_filename(const char *orig_name, char *filename, int mode);
 void sprintbitarray(int bitvector[], const char *name[], int maxar,
-                    char *result);
+                    char *result, size_t r_len);
 time_t mud_time_to_secs(struct time_info_data *now);
 struct time_info_data *age(struct char_data *ch);
 int num_pc_in_room(struct room_data *room);
@@ -1090,4 +1086,4 @@ int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch);
 #define CONFIG_MIN_WIZLIST_LEV  config_info.autowiz.min_wizlist_lev
 
 
-
+int valid_id_num(long id);

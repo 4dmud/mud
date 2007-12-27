@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/20 01:18:11 $
-*  $Revision: 1.9 $
+*  $Date: 2005/02/26 01:21:34 $
+*  $Revision: 1.10 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.10  2005/02/26 01:21:34  w4dimenscor
+ * Changed more of the code to be more buffer safe using strlcpy and strlcat
+ *
  * Revision 1.9  2005/02/20 01:18:11  w4dimenscor
  * added extra check to add to lookup table, and cleaned up freeing of characters and objects
  *
@@ -73,7 +76,7 @@ extern struct time_info_data time_info;
 /* external functions */
 void free_varlist(struct trig_var_data *vd);
 void extract_trigger(struct trig_data *trig);
-int eval_lhs_op_rhs(char *expr, char *result, void *go,
+int eval_lhs_op_rhs(char *expr, char *result, size_t r_len,void *go,
                     struct script_data *sc, trig_data * trig, int type);
 //int find_eq_pos_script(struct char_data *ch, char *arg);
 int find_skill_num(char *name);
@@ -85,8 +88,6 @@ int find_mob_in_room(room_vnum vnum,int mnum);
 int find_obj_in_room(room_vnum vnum, int onum);
 extern int top_of_zone_table;
 extern struct zone_data *zone_table;
-void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct script_data *sc, trig_data *trig);
-
 int can_edit_zone(struct char_data *ch, zone_rnum zone);
 zone_rnum real_zone_by_thing(room_vnum vznum);
 int genpreg();
@@ -104,12 +105,12 @@ void do_stat_trigger(struct char_data *ch, trig_data *trig);
 void script_stat (char_data *ch, struct script_data *sc);
 int remove_trigger(struct script_data *sc, char *name);
 int is_num(char *arg);
-void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
+void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *go,
              struct script_data *sc, trig_data *trig);
 char *matching_paren(char *p);
-void eval_expr(char *line, char *result, void *go, struct script_data *sc,
+void eval_expr(char *line, char *result, size_t r_len, void *go, struct script_data *sc,
                trig_data *trig, int type);
-int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc,
+int eval_lhs_op_rhs(char *expr, char *result, size_t r_len, void *go, struct script_data *sc,
                     trig_data *trig, int type);
 int process_if(char *cond, void *go, struct script_data *sc,
                trig_data *trig, int type);
@@ -1665,9 +1666,10 @@ int is_num(char *num)
 #endif
 
 
-
+#define E_FALSE strlcpy(result, "0", r_len)
+#define E_TRUE strlcpy(result, "1", r_len)
 /* evaluates 'lhs op rhs', and copies to result */
-void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
+void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *go,
              struct script_data *sc, trig_data *trig)
 {
   char *p = NULL;
@@ -1689,92 +1691,92 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
   if (!strcmp("||", op))
   {
     if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
-      strcpy(result, "0");
+      E_FALSE;
     else
-      strcpy(result, "1");
+      E_TRUE;
   }
 
   else if (!strcmp("&&", op))
   {
     if (!*lhs || (*lhs == '0') || !*rhs || (*rhs == '0'))
-      strcpy (result, "0");
+      E_FALSE;
     else
-      strcpy (result, "1");
+      E_TRUE;
   }
 
   else if (!strcmp("==", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) == atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) == atoi(rhs));
     else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
-      sprintf(result, "1");
+      E_TRUE;
     else
-      sprintf(result, "%d", !strcasecmp(lhs, rhs));
+      snprintf(result,r_len, "%d", !strcasecmp(lhs, rhs));
   }
 
   else if (!strcmp("!=", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) != atoi(rhs));
+     snprintf(result,r_len, "%d", atoi(lhs) != atoi(rhs));
     else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
-      sprintf(result, "0");
+      E_FALSE;
     else
-      sprintf(result, "%d", strcasecmp(lhs, rhs));
+      snprintf(result,r_len, "%d", strcasecmp(lhs, rhs));
   }
 
   else if (!strcmp("<=", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) <= atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) <= atoi(rhs));
     else
-      sprintf(result, "%d", strcmp(lhs, rhs) <= 0);
+      snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
   }
 
   else if (!strcmp(">=", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) >= atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) >= atoi(rhs));
     else
-      sprintf(result, "%d", strcmp(lhs, rhs) <= 0);
+      snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
   }
 
   else if (!strcmp("<", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) < atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) < atoi(rhs));
     else
-      sprintf(result, "%d", strcmp(lhs, rhs) < 0);
+      snprintf(result,r_len, "%d", strcmp(lhs, rhs) < 0);
   }
 
   else if (!strcmp(">", op))
   {
     if (is_num(lhs) && is_num(rhs))
-      sprintf(result, "%d", atoi(lhs) > atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) > atoi(rhs));
     else
-      sprintf(result, "%d", strcmp(lhs, rhs) > 0);
+      snprintf(result,r_len, "%d", strcmp(lhs, rhs) > 0);
   }
 
   else if (!strcmp("/=", op))
-    sprintf(result, "%c", str_str(lhs, rhs) ? '1' : '0');
+    snprintf(result,r_len, "%c", str_str(lhs, rhs) ? '1' : '0');
 
   else if (!strcmp("*", op))
-    sprintf(result, "%d", atoi(lhs) * atoi(rhs));
+    snprintf(result,r_len, "%d", atoi(lhs) * atoi(rhs));
 
   else if (!strcmp("/", op))
-    sprintf(result, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
+    snprintf(result,r_len, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
 
   else if (!strcmp("+", op))
-    sprintf(result, "%d", atoi(lhs) + atoi(rhs));
+    snprintf(result,r_len, "%d", atoi(lhs) + atoi(rhs));
 
   else if (!strcmp("-", op))
-    sprintf(result, "%d", atoi(lhs) - atoi(rhs));
+    snprintf(result,r_len, "%d", atoi(lhs) - atoi(rhs));
 
   else if (!strcmp("!", op))
   {
     if (is_num(rhs))
-      sprintf(result, "%d", !atoi(rhs));
+      snprintf(result,r_len, "%d", !atoi(rhs));
     else
-      sprintf(result, "%d", !*rhs);
+      snprintf(result,r_len, "%d", !*rhs);
   }
 }
 
@@ -1822,7 +1824,7 @@ char *matching_paren(char *p)
 
 
 /* evaluates line, and returns answer in result */
-void eval_expr(char *line, char *result, void *go, struct script_data *sc,
+void eval_expr(char *line, char *result, size_t r_len, void *go, struct script_data *sc,
                trig_data *trig, int type)
 {
   char expr[MAX_INPUT_LENGTH] = "", *p = NULL;
@@ -1839,18 +1841,18 @@ void eval_expr(char *line, char *result, void *go, struct script_data *sc,
   if (type);
 
 
-  if (eval_lhs_op_rhs(line, result, go, sc, trig, type));
+  if (eval_lhs_op_rhs(line, result, r_len, go, sc, trig, type));
 
   else if (*line == '(')
   {
     p = strcpy(expr, line);
     p = matching_paren(expr);
     *p = '\0';
-    eval_expr(expr + 1, result, go, sc, trig, type);
+    eval_expr(expr + 1, result, r_len, go, sc, trig, type);
   }
 
   else
-    var_subst(go, sc, trig, type, line, result);
+    var_subst(go, sc, trig, type, line, result, r_len);
 }
 
 
@@ -1858,7 +1860,7 @@ void eval_expr(char *line, char *result, void *go, struct script_data *sc,
  * evaluates expr if it is in the form lhs op rhs, and copies
  * answer in result.  returns 1 if expr is evaluated, else 0
  */
-int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc,
+int eval_lhs_op_rhs(char *expr, char *result, size_t r_len, void *go, struct script_data *sc,
                     trig_data *trig, int type)
 {
   char *p, *tokens[MAX_INPUT_LENGTH];
@@ -1913,9 +1915,9 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc,
         *tokens[j] = '\0';
         p = tokens[j] + strlen(ops[i]);
 
-        eval_expr(line, lhr, go, sc, trig, type);
-        eval_expr(p, rhr, go, sc, trig, type);
-        eval_op(ops[i], lhr, rhr, result, go, sc, trig);
+        eval_expr(line, lhr, sizeof(lhr), go, sc, trig, type);
+        eval_expr(p, rhr, sizeof(rhr), go, sc, trig, type);
+        eval_op(ops[i], lhr, rhr, result, r_len, go, sc, trig);
 
         return 1;
       }
@@ -1930,7 +1932,7 @@ int process_if(char *cond, void *go, struct script_data *sc,
                trig_data *trig, int type)
 {
   char result[MAX_INPUT_LENGTH] = "", *p;
-  eval_expr(cond, result, go, sc, trig, type);
+  eval_expr(cond, result, sizeof(result), go, sc, trig, type);
 
   p = result;
   skip_spaces(&p);
@@ -2122,7 +2124,8 @@ void process_eval(void *go, struct script_data *sc, trig_data *trig,
                   int type, char *cmd)
 {
   char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH] = "";
-  char result[MAX_INPUT_LENGTH] = "", *expr;
+  char result[MAX_INPUT_LENGTH], *expr;
+  *result = '\0';
 
   expr = one_argument(cmd, arg); /* cut off 'eval' */
   expr = one_argument(expr, name); /* cut off name */
@@ -2136,7 +2139,7 @@ void process_eval(void *go, struct script_data *sc, trig_data *trig,
     return;
   }
 
-  eval_expr(expr, result, go, sc, trig, type);
+  eval_expr(expr, result, sizeof(result), go, sc, trig, type);
   add_var(&GET_TRIG_VARS(trig), name, result, sc ? sc->context : 0);
 }
 
@@ -2172,7 +2175,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig,
   }
 
   /* parse and locate the id specified */
-  eval_expr(id_p, result, go, sc, trig, type);
+  eval_expr(id_p, result, sizeof(result), go, sc, trig, type);
   if (!(id = atoi(result)))
   {
     script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'",
@@ -2267,7 +2270,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig,
   }
 
   /* parse and locate the id specified */
-  eval_expr(id_p, result, go, sc, trig, type);
+  eval_expr(id_p, result, sizeof(result), go, sc, trig, type);
   if (!(id = atoi(result)))
   {
     script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'",
@@ -2387,7 +2390,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig,
   { /* easy, if you pass an id number */
     char result[MAX_INPUT_LENGTH];
 
-    eval_expr(arg, result, go, sc, trig, type);
+    eval_expr(arg, result, sizeof(result), go, sc, trig, type);
     snprintf(uid, sizeof(uid), "%c%s", UID_CHAR, result);
   }
   else
@@ -3158,7 +3161,7 @@ int process_return(trig_data *trig, char *cmd)
                       else
                       {
 
-                        var_subst(go, sc, trig, type, p, cmd);
+                        var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
 
                         if (!strn_cmp(cmd, "eval ", 5))
                           process_eval(go, sc, trig, type, cmd);
@@ -3426,7 +3429,7 @@ int process_return(trig_data *trig, char *cmd)
                     struct cmdlist_element *c;
                     char *p, *buf;
 
-                    eval_expr(cond, result, go, sc, trig, type);
+                    eval_expr(cond, result, sizeof(result), go, sc, trig, type);
 
                     if (!(cl->next))
                       return cl;
@@ -3443,9 +3446,9 @@ int process_return(trig_data *trig, char *cmd)
 #if 0				/* the original implementation */
                         sprintf(buf, "(%s) == (%s)", cond, p + 5);
                         if (process_if(buf, go, sc, trig, type))
-                        {
+                        { 
 #else				/* new! improved! bug fixed! */
-                        eval_op("==", result, p + 5, buf, go, sc, trig);
+                        eval_op("==", result, p + 5, buf, MAX_STRING_LENGTH - 1, go, sc, trig);
                         if (*buf && *buf != '0')
                         {
 #endif
@@ -3652,7 +3655,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
       if (GET_ID(tch) == GET_ID(ch))
         if (tch != ch)
         {
-          log("ERROR: lookup table contains wrong character in it!");
+          log("ERROR: lookup table contains wrong character's ID (%ld) (%s instead of %s)!",GET_ID(tch), GET_NAME(ch), GET_NAME(tch));
           ch = tch;
           break;
         }

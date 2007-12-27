@@ -273,23 +273,23 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
   sprintf(buf, "\r\nName: '%s'\n",
           ((j->short_description) ? j->short_description : "<None>"));
   fprintf(fp, buf);
-  sprinttype(GET_OBJ_TYPE(j), item_types, buf1);
+  sprinttype(GET_OBJ_TYPE(j), item_types, buf1, sizeof(buf1));
   sprintf(buf, "VNum: [%5d], Type: %s\n", vnum, buf1);
   fprintf(fp, buf);
 
   fprintf(fp, "Can be worn on: ");
-  sprintbitarray(j->obj_flags.wear_flags, wear_bits, TW_ARRAY_MAX, buf);
+  sprintbitarray(j->obj_flags.wear_flags, wear_bits, TW_ARRAY_MAX, buf, sizeof(buf1));
   strcat(buf, "\n");
   fprintf(fp, buf);
 
   fprintf(fp, "Set char bits : ");
   sprintbitarray(j->obj_flags.bitvector, affected_bits, AF_ARRAY_MAX,
-                 buf);
+                 buf, sizeof(buf1));
   strcat(buf, "\n");
   fprintf(fp, buf);
 
   fprintf(fp, "Extra flags   : ");
-  sprintbitarray(GET_OBJ_EXTRA(j), extra_bits, EF_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_EXTRA(j), extra_bits, EF_ARRAY_MAX, buf, sizeof(buf1));
   strcat(buf, "\n");
   fprintf(fp, buf);
 
@@ -298,9 +298,9 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
   {
   case ITEM_LIGHT:
     if (GET_OBJ_VAL(j, 2) == -1)
-      strcpy(buf, "Hours left: Infinite");
+      strlcpy(buf, "Hours left: Infinite", sizeof(buf));
     else
-      sprintf(buf, "Hours left: [%d]", GET_OBJ_VAL(j, 2));
+      snprintf(buf, sizeof(buf), "Hours left: [%d]", GET_OBJ_VAL(j, 2));
     break;
   case ITEM_SCROLL:
   case ITEM_POTION:
@@ -327,7 +327,7 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
             GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1));
     break;
   case ITEM_CONTAINER:
-    sprintbit(GET_OBJ_VAL(j, 1), container_bits, buf2);
+    sprintbit(GET_OBJ_VAL(j, 1), container_bits, buf2, sizeof(buf2));
     sprintf(buf,
             "Weight capacity: %d, Lock Type: %s, Key Num: %d, Corpse: %s",
             GET_OBJ_VAL(j, 0), buf2, GET_OBJ_VAL(j, 2),
@@ -335,7 +335,7 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
     break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
-    sprinttype(GET_OBJ_VAL(j, 2), drinks, buf2);
+    sprinttype(GET_OBJ_VAL(j, 2), drinks, buf2, sizeof(buf2));
     sprintf(buf,
             "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s",
             GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1),
@@ -367,7 +367,7 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
   for (i = 0; i < MAX_OBJ_AFFECT; i++)
     if (j->affected[i].modifier)
     {
-      sprinttype(j->affected[i].location, apply_types, buf2);
+      sprinttype(j->affected[i].location, apply_types, buf2, sizeof(buf2));
       sprintf(buf, "%s %+d to %s", found++ ? "," : "",
               j->affected[i].modifier, buf2);
       fprintf(fp, buf);
@@ -445,17 +445,17 @@ void script_stat_dump(char_data * ch, struct script_data *sc)
     if (t->attach_type == OBJ_TRIGGER)
     {
       fprintf(fp, "  Trigger Intended Assignment: Objects\n");
-      sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1);
+      sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, sizeof(buf1));
     }
     else if (t->attach_type == WLD_TRIGGER)
     {
       fprintf(fp, "  Trigger Intended Assignment: Rooms\n");
-      sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1);
+      sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, sizeof(buf1));
     }
     else
     {
       fprintf(fp, "  Trigger Intended Assignment: Mobiles\n");
-      sprintbit(GET_TRIG_TYPE(t), trig_types, buf1);
+      sprintbit(GET_TRIG_TYPE(t), trig_types, buf1, sizeof(buf1));
     }
 
     sprintf(buf, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\n",

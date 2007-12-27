@@ -214,16 +214,15 @@ ACMD(do_race)
   if (*arg)
   {
     r = parse_race(*arg);
-    sprintbit(races[r].body_bits, body, body_parts);
+    sprintbit(races[r].body_bits, body, body_parts, sizeof(body_parts));
     new_send_to_char(ch, "%s: %s\r\n", pc_race_types[r], body_parts);
   }
   else
   {
     for (r = 1; r < 8; r++)
     {
-      sprintbit(races[r].body_bits, body, body_parts);
-      new_send_to_char(ch, "%s: %s\r\n", pc_race_types[r],
-                       body_parts);
+      sprintbit(races[r].body_bits, body, body_parts, sizeof(body_parts));
+      new_send_to_char(ch, "%s: %s\r\n", pc_race_types[r], body_parts);
     }
   }
 

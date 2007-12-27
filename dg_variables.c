@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/02/20 01:18:11 $                                           * 
-*  $Revision: 1.7 $                                                    *
+*  $Date: 2005/02/26 01:21:34 $                                           * 
+*  $Revision: 1.8 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -2076,16 +2076,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
 /* substitutes any variables into line and returns it as buf */
 void var_subst(void *go, struct script_data *sc, trig_data *trig,
-               int type, char *line, char *buf)
+               int type, char *line, char *buf, size_t b_len)
 {
   char tmp[MAX_INPUT_LENGTH], repl_str[MAX_INPUT_LENGTH];
   char *var = NULL, *field = NULL, *p = NULL;
   char tmp2[MAX_INPUT_LENGTH];
   char *subfield_p, subfield[MAX_INPUT_LENGTH];
-  int left = MAX_INPUT_LENGTH - 1, len = 0;
+  int left, len = 0;
   int paren_count = 0;
   int dots = 0;
 
+  left = b_len-1;
   /* skip out if no %'s */
   if (!strchr(line, '%'))
   {
@@ -2177,12 +2178,13 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
 
       if (*subfield)
       {
-        var_subst(go, sc, trig, type, subfield, tmp2);
-        strcpy(subfield, tmp2);
+        var_subst(go, sc, trig, type, subfield, tmp2, sizeof(tmp2));
+        strlcpy(subfield, tmp2, sizeof(subfield));
       }
 
       find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
 
+      //strlcat(buf, repl_str, b_len);
       strncat(buf, repl_str, left);
       len = strlen(repl_str);
       buf += len;

@@ -312,7 +312,7 @@
 /* #undef NEED_STRICMP_PROTO */
 
 /* Check for a prototype to strlcpy. */
-/* #undef NEED_STRLCPY_PROTO */
+ #define NEED_STRLCPY_PROTO 
 
 /* Check for a prototype to strncasecmp. */
 /* #undef NEED_STRNCASECMP_PROTO */

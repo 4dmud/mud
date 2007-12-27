@@ -347,15 +347,25 @@ fprintf(zfile, "@Version: %d\n", 2);	//version is now 2 - mord
   for (subcmd = 0; ZCMD(zone_num, subcmd).command != 'S'; subcmd++) {
     switch (ZCMD(zone_num, subcmd).command) {
     case 'M':
+    if (real_room(ZCMD(zone_num, subcmd).arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg3);
+      exit(1);
+      }
       arg1 = mob_index[ZCMD(zone_num, subcmd).arg1].vnum;
       arg2 = ZCMD(zone_num, subcmd).arg2;
-      arg3 = world_vnum[ZCMD(zone_num, subcmd).arg3]->number;
+      arg3 = ZCMD(zone_num, subcmd).arg3;
       comment = mob_proto[ZCMD(zone_num, subcmd).arg1].player.short_descr;
       break;
     case 'O':
+    if (real_room(ZCMD(zone_num, subcmd).arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg3);
+      exit(1);
+      }
       arg1 = obj_index[ZCMD(zone_num, subcmd).arg1].vnum;
       arg2 = ZCMD(zone_num, subcmd).arg2;
-      arg3 = world_vnum[ZCMD(zone_num, subcmd).arg3]->number;
+      arg3 = ZCMD(zone_num, subcmd).arg3;
       comment = obj_proto[ZCMD(zone_num, subcmd).arg1].short_description;
       break;
     case 'G':
@@ -377,32 +387,57 @@ fprintf(zfile, "@Version: %d\n", 2);	//version is now 2 - mord
       comment = obj_proto[ZCMD(zone_num, subcmd).arg1].short_description;
       break;
     case 'D':
-      arg1 = world_vnum[ZCMD(zone_num, subcmd).arg1]->number;
+    if (real_room(ZCMD(zone_num, subcmd).arg1) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg1);
+      exit(1);
+      }
+      arg1 = ZCMD(zone_num, subcmd).arg1;
       arg2 = ZCMD(zone_num, subcmd).arg2;
       arg3 = ZCMD(zone_num, subcmd).arg3;
       comment = world_vnum[ZCMD(zone_num, subcmd).arg1]->name;
       break;
     case 'R':
-      arg1 = world_vnum[ZCMD(zone_num, subcmd).arg1]->number;
+    if (real_room(ZCMD(zone_num, subcmd).arg1) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg1);
+      exit(1);
+      }
+      arg1 = ZCMD(zone_num, subcmd).arg1;
       arg2 = obj_index[ZCMD(zone_num, subcmd).arg2].vnum;
       comment = obj_proto[ZCMD(zone_num, subcmd).arg2].short_description;
       arg3 = -1;
       break;
     case 'T':
+    if (real_room(ZCMD(zone_num, subcmd).arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg3);
+      exit(1);
+      }
       arg1 = ZCMD(zone_num, subcmd).arg1; /* trigger type */
       arg2 = trig_index[ZCMD(zone_num, subcmd).arg2]->vnum; /* trigger vnum */
-      arg3 = world_vnum[ZCMD(zone_num, subcmd).arg3]->number; /* room num */
+      arg3 = ZCMD(zone_num, subcmd).arg3; /* room num */
       comment = GET_TRIG_NAME(trig_index[real_trigger(arg2)]->proto); 
       break;
     case 'V':
+    if (real_room(ZCMD(zone_num, subcmd).arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg3);
+      exit(1);
+      }
       arg1 = ZCMD(zone_num, subcmd).arg1; /* trigger type */
       arg2 = ZCMD(zone_num, subcmd).arg2; /* context */
-      arg3 = world_vnum[ZCMD(zone_num, subcmd).arg3]->number;
+      arg3 = ZCMD(zone_num, subcmd).arg3;
       break;
     case 'B':
+    if (real_room(ZCMD(zone_num, subcmd).arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone_num].number,ZCMD(zone_num, subcmd).command, subcmd, ZCMD(zone_num, subcmd).arg3);
+      exit(1);
+      }
       arg1 = obj_index[ZCMD(zone_num, subcmd).arg1].vnum;
       arg2 = ZCMD(zone_num, subcmd).arg2;
-      arg3 = world_vnum[ZCMD(zone_num, subcmd).arg3]->number; 
+      arg3 = ZCMD(zone_num, subcmd).arg3; 
       comment = obj_proto[ZCMD(zone_num, subcmd).arg1].short_description;
       break;
     case 'Z':

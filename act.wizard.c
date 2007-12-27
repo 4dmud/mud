@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.14  2005/02/26 01:21:34  w4dimenscor
+ * Changed more of the code to be more buffer safe using strlcpy and strlcat
+ *
  * Revision 1.13  2005/02/25 07:33:47  w4dimenscor
  * reformatted some code, fixed up coventry to ignore socials
  *
@@ -597,7 +600,7 @@ ACMD(do_echo)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
     else
     {
-      strlcpy(buf, argument, sizeof(buf));
+      strlcpy(buf, argument, sizeof(buf) );
     }
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
@@ -1181,7 +1184,7 @@ void do_stat_room(struct char_data *ch)
   new_send_to_char(ch, "Room name: %s%s%s\r\n", CCCYN(ch, C_NRM),
                    rm->name, CCNRM(ch, C_NRM));
 
-  sprinttype(rm->sector_type, sector_types, buf2);
+  sprinttype(rm->sector_type, sector_types, buf2, sizeof(buf2));
   new_send_to_char(ch,
                    "VNum: [%s%5d%s], RNum: [%5d], IDNum: %ld, Type: %s\r\n",
                    CCGRN(ch, C_NRM),
@@ -1194,7 +1197,7 @@ void do_stat_room(struct char_data *ch)
   if (rm->mine.num != -1)
     new_send_to_char(ch, "{cy[MINE: %3d LEVEL: %d Tool: %s]{c0\r\n", rm->mine.num, rm->mine.dif, rm->mine.num == -1 ? "None" : rm->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe");
 
-  sprintbitarray(rm->room_flags, room_bits, RF_ARRAY_MAX, buf2);
+  sprintbitarray(rm->room_flags, room_bits, RF_ARRAY_MAX, buf2, sizeof(buf2));
   new_send_to_char(ch, "SpecProc: %s, Flags: %s\r\n",
                    (rm->func == NULL) ? "None" : "Exists", buf2);
 
@@ -1348,7 +1351,7 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
                    ((j->short_description) ? j->short_description : "<None>"),
                    CCNRM(ch, C_NRM), j->name);
 
-  sprinttype(GET_OBJ_TYPE(j), item_types, buf1);
+  sprinttype(GET_OBJ_TYPE(j), item_types, buf1, sizeof(buf1));
   new_send_to_char(ch,
                    "Material: [%s%10s%s] VNum: [%s%5d%s], RNum: [%5d], Type: %s, IDNum: %ld, SpecProc: %s\r\n",
                    CCGRN(ch, C_NRM), material_name(GET_OBJ_MATERIAL(j)),
@@ -1382,15 +1385,15 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
     new_send_to_char(ch, "%s\r\n", CCNRM(ch, C_NRM));
   }
   new_send_to_char(ch, "Can be worn on: ");
-  sprintbitarray(j->obj_flags.wear_flags, wear_bits, TW_ARRAY_MAX, buf);
+  sprintbitarray(j->obj_flags.wear_flags, wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
   new_send_to_char(ch, "%s\r\n", buf);
 
   new_send_to_char(ch, "Set char bits : ");
-  sprintbitarray(j->obj_flags.bitvector, affected_bits, AF_ARRAY_MAX, buf);
+  sprintbitarray(j->obj_flags.bitvector, affected_bits, AF_ARRAY_MAX, buf, sizeof(buf));
   new_send_to_char(ch, "%s\r\n",buf);
 
   new_send_to_char(ch, "Extra flags   : ");
-  sprintbitarray(GET_OBJ_EXTRA(j), extra_bits, EF_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_EXTRA(j), extra_bits, EF_ARRAY_MAX, buf, sizeof(buf));
   new_send_to_char(ch, "%s\r\n",buf);
 
   new_send_to_char(ch, "Weight: %d, Value: %d, Cost/day: %d, Timer: %d, Min level: %d\r\n",
@@ -1476,7 +1479,7 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
                      (int) GET_OBJ_VAL(j, 0), (int) GET_OBJ_VAL(j, 1), YESNO(TRAP_IS_SET(j)));
     break;
   case ITEM_CONTAINER:
-    sprintbit((int) GET_OBJ_VAL(j, 1), container_bits, buf2);
+    sprintbit((int) GET_OBJ_VAL(j, 1), container_bits, buf2, sizeof(buf2));
     new_send_to_char(ch,
                      "Weight capacity: %d, Lock Type: %s, Key Num: %d, Corpse: %s",
                      (int) GET_OBJ_VAL(j, 0), buf2, (int) GET_OBJ_VAL(j, 2),
@@ -1484,7 +1487,7 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
     break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
-    sprinttype((int) GET_OBJ_VAL(j, 2), drinks, buf2);
+    sprinttype((int) GET_OBJ_VAL(j, 2), drinks, buf2, sizeof(buf2));
     new_send_to_char(ch,
                      "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s, Casts: %s",
                      (int) GET_OBJ_VAL(j, 0), (int) GET_OBJ_VAL(j, 1),
@@ -1555,7 +1558,7 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
   for (i = 0; i < MAX_OBJ_AFFECT; i++)
     if (j->affected[i].modifier)
     {
-      sprinttype(j->affected[i].location, apply_types, buf2);
+      sprinttype(j->affected[i].location, apply_types, buf2, sizeof(buf2));
       new_send_to_char(ch, "%s %+d to %s", found++ ? "," : "",
                        j->affected[i].modifier, buf2);
     }
@@ -1590,7 +1593,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
   if (!show_vars)
   {
-    sprinttype(GET_SEX(k), genders, buf);
+    sprinttype(GET_SEX(k), genders, buf, sizeof(buf));
     new_send_to_char(ch, "Sex: %s  (%s) '%s'  IDNum: [%5ld], In room [%5d] \r\n",
                      buf, (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")),
                      GET_NAME(k),IS_NPC(k) ? GET_ID(k) : GET_IDNUM(k), GET_ROOM_VNUM(IN_ROOM(k)));
@@ -1739,7 +1742,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
                      k->points.damroll, GET_SAVE(k, 0), GET_SAVE(k, 1), GET_SAVE(k, 2),
                      GET_SAVE(k, 3), GET_SAVE(k, 4));
 
-    sprinttype(GET_POS(k), position_types, buf2);
+    sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2));
     new_send_to_char(ch, "Pos: %s, Fighting: %s", buf2,
                      (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
@@ -1748,14 +1751,14 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
     if (k->desc)
     {
-      sprinttype(STATE(k->desc), connected_types, buf2);
+      sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2));
       new_send_to_char(ch, ", Connected: %s\r\n", buf2);
     }
     else
       new_send_to_char(ch, "\r\n");
 
     new_send_to_char(ch, "Default position: ");
-    sprinttype((k->mob_specials.default_pos), position_types, buf2);
+    sprinttype((k->mob_specials.default_pos), position_types, buf2, sizeof(buf2));
     new_send_to_char(ch, "%s", buf2);
 
     new_send_to_char(ch, ", Idle Timer (in tics) [%d]\r\n",
@@ -1763,26 +1766,26 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
     if (IS_NPC(k))
     {
-      sprintbitarray(MOB_FLAGS(k), action_bits, PM_ARRAY_MAX, buf2);
+      sprintbitarray(MOB_FLAGS(k), action_bits, PM_ARRAY_MAX, buf2, sizeof(buf2));
       new_send_to_char(ch, "NPC flags: %s%s%s\r\n", CCCYN(ch, C_NRM), buf2,
                        CCNRM(ch, C_NRM));
     }
     else
     {
-      sprintbitarray(PLR_FLAGS(k), player_bits, PM_ARRAY_MAX, buf2);
+      sprintbitarray(PLR_FLAGS(k), player_bits, PM_ARRAY_MAX, buf2, sizeof(buf2));
       new_send_to_char(ch, "PLR: %s%s%s\r\n", CCCYN(ch, C_NRM), buf2, CCNRM(ch, C_NRM));
-      sprintbitarray(PRF_FLAGS(k), preference_bits, PM_ARRAY_MAX, buf2);
+      sprintbitarray(PRF_FLAGS(k), preference_bits, PM_ARRAY_MAX, buf2, sizeof(buf2));
       new_send_to_char(ch, "PRF: %s%s%s\r\n", CCGRN(ch, C_NRM), buf2, CCNRM(ch, C_NRM));
 
 
       if ((GET_LEVEL(k) >= LVL_GOD) && (GET_LEVEL(k) <= LVL_IMPL))
       {
 
-        sprintbit(CMD_FLAGS(k), wiz_groups, buf2);
+        sprintbit(CMD_FLAGS(k), wiz_groups, buf2, sizeof(buf2));
         new_send_to_char(ch, "WIZ-SAVE: %s%s%s\r\n", CCYEL(ch, C_NRM), buf2,
                          CCNRM(ch, C_NRM));
 
-        sprintbit(CMD_FLAGS2(k), wiz_groups, buf2);
+        sprintbit(CMD_FLAGS2(k), wiz_groups, buf2, sizeof(buf2));
         new_send_to_char(ch, "WIZ-NOSAVE: %s%s%s\r\n", CCYEL(ch, C_NRM), buf2,
                          CCNRM(ch, C_NRM));
       }
@@ -1831,7 +1834,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     new_send_to_char(ch, "\r\n");
 
     /* Showing the bitvector */
-    sprintbitarray(AFF_FLAGS(k), affected_bits, AF_ARRAY_MAX, buf2);
+    sprintbitarray(AFF_FLAGS(k), affected_bits, AF_ARRAY_MAX, buf2, sizeof(buf2));
     new_send_to_char(ch, "AFF: %s%s%s\r\n", CCYEL(ch, C_NRM), buf2,
                      CCNRM(ch, C_NRM));
 
@@ -3984,7 +3987,7 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
     int count_shops(shop_vnum low, shop_vnum high);
     char zflags[MAX_STRING_LENGTH];
 
-    sprintbit(zone_table[zone].zone_flags, zone_bits, zflags);
+    sprintbit(zone_table[zone].zone_flags, zone_bits, zflags, sizeof(zflags));
 
     tmp = snprintf(bufptr, left,
                    "%3d %-30.30s By: %-10.10s Age: %3d; Reset: %3d (%1d); Range: %5d-%5d\r\nZone Flags: %s\r\n",
@@ -6035,7 +6038,7 @@ ACMD(do_statlist)
                  obj_proto[object].short_description);
         DYN_RESIZE(buf);
         sprintbitarray(obj_proto[object].obj_flags.wear_flags,
-                       wear_bits, TW_ARRAY_MAX, buf);
+                       wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
         DYN_RESIZE(buf);
 
         snprintf(buf, sizeof(buf), "\r\n");
@@ -6137,7 +6140,7 @@ ACMD(do_osnoop)
         new_send_to_char(ch, "] %s - ",
                          obj_proto[object].short_description);
         sprintbitarray(obj_proto[object].obj_flags.wear_flags,
-                       wear_bits, TW_ARRAY_MAX, buf);
+                       wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
 
         new_send_to_char(ch, "%s\r\n", buf);
       }

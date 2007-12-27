@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/20 02:33:25 $
-*  $Revision: 1.2 $
+*  $Date: 2005/02/26 01:21:34 $
+*  $Revision: 1.3 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -340,7 +340,7 @@ int item_in_list(char *item, obj_data *list);
 char *skill_percent(struct char_data *ch, char *skill);
 int char_has_item(char *item, struct char_data *ch);
 void var_subst(void *go, struct script_data *sc, trig_data *trig,
-               int type, char *line, char *buf);
+               int type, char *line, char *buf, size_t b_len);
 int text_processed(char *field, char *subfield, struct trig_var_data *vd,
                    char *str, size_t slen);
 void find_replacement(void *go, struct script_data *sc, trig_data *trig,

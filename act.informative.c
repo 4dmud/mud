@@ -1277,7 +1277,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS))
   {
-    sprintbitarray(ROOM_FLAGS(view_room), room_bits, RF_ARRAY_MAX, buf);
+    sprintbitarray(ROOM_FLAGS(view_room), room_bits, RF_ARRAY_MAX, buf, sizeof(buf));
     if (ROOM_FLAGGED(view_room, ROOM_WILDERNESS))
     {
       parse_room_name(view_room, tbuf, sizeof(tbuf));
@@ -1293,7 +1293,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
                        CCCYN(ch, C_NRM), SCRIPT(rm) ? "[{cWTRIG{cC] " : "",
                        view_room->name,
                        CBWHT(ch, C_NRM), buf, CCCYN(ch, C_NRM));
-    sprinttype(rm->sector_type, sector_types, tbuf);
+    sprinttype(rm->sector_type, sector_types, tbuf, sizeof(tbuf));
     new_send_to_char(ch, " (%s)", tbuf);
   }
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_WILDERNESS))
@@ -1514,7 +1514,7 @@ void look_in_obj(struct char_data *ch, char *arg)
         {
           container_disp(ch, obj);
           amt = (GET_OBJ_VAL(obj, 1) * 3) / GET_OBJ_VAL(obj, 0);
-          sprinttype(GET_OBJ_VAL(obj, 2), color_liquid, buf2);
+          sprinttype(GET_OBJ_VAL(obj, 2), color_liquid, buf2, sizeof(buf2));
           new_send_to_char(ch, "It's %sfull of a %s liquid.\r\n",
                            fullness[amt], buf2);
         }

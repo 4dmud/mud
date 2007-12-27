@@ -9,6 +9,9 @@
  *****************************************************************************/
 /*
  * $Log: color.c,v $
+ * Revision 1.3  2005/02/26 01:21:34  w4dimenscor
+ * Changed more of the code to be more buffer safe using strlcpy and strlcat
+ *
  * Revision 1.2  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -42,7 +45,7 @@
 #include "conf.h"
 #include "sysdep.h"
 #include "structs.h"
-
+#include "utils.h"
 //#include "screen.h"
 
 
@@ -184,12 +187,13 @@ int count_chars(const char *txt, char character)
 }
 
 
-void strip_color(char *inbuf) {
+void strip_color(char *inbuf, size_t i_buf) {
 char *out_buf = NULL, insert_text[10];
    //int current_color = -1;
     register int inpos = 0, outpos = 0;
     int remaining, color = -2;
     register int i;
+    size_t b_len;
     
     
     if (*inbuf == '\0' || inbuf == NULL)
@@ -200,8 +204,8 @@ char *out_buf = NULL, insert_text[10];
     if (i <= 0) 
       return;
 
-
-   out_buf = (char *) alloca(i * 5 + strlen(inbuf) + 2);	/* no ansi-escape code is larger
+b_len = i * 5 + strlen(inbuf) + 2;
+   out_buf = (char *) alloca(b_len);	/* no ansi-escape code is larger
 								   than 5 bytes so a 5 * times
 								   the '{' appears + strlen(inbuf)
 								   + 1 character big buffer
@@ -371,8 +375,9 @@ char *out_buf = NULL, insert_text[10];
 		}		/* switch */
 
 		out_buf[outpos] = '\0';
-
-		if ((strlen(out_buf) + strlen(insert_text)) < BUFSIZE) {
+		outpos = strlcat(out_buf, insert_text, b_len);
+#if 0
+		if ((strlen(out_buf) + strlen(insert_text)) < b_len) {
 		    /* don't overfill buffer */
 		    if (insert_text != NULL) {
 			out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
@@ -380,10 +385,11 @@ char *out_buf = NULL, insert_text[10];
 			outpos = strlen(out_buf);
 		    }
 		}
+#endif
 
 	    } /* if char is '/' (START_CHAR) */
 	    else {
-		if (outpos < BUFSIZE) {
+		if (outpos < b_len) {
 		    out_buf[outpos] = inbuf[inpos];
 		    inpos++;
 		    outpos++;
@@ -392,7 +398,7 @@ char *out_buf = NULL, insert_text[10];
 
 	} /* if remaining > 2 */
 	else {
-	    if (outpos < BUFSIZE) {
+	    if (outpos < b_len) {
 		out_buf[outpos] = inbuf[inpos];
 		inpos++;
 		outpos++;
@@ -407,7 +413,7 @@ char *out_buf = NULL, insert_text[10];
 
     /* printf("outbuf: %s\n",out_buf); *//* for debugging */
 
-    strcpy(inbuf, out_buf);
+    strlcpy(inbuf, out_buf, i_buf);
 }
 size_t proc_color(char *inbuf, int color_lvl, size_t len)
 {
@@ -416,6 +422,7 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
     size_t inpos = 0, outpos = 0;
     int remaining, color = -2;
     int i;
+    size_t b_len;
 
     if ( inbuf == NULL || *inbuf == '\0' )
 	return 0;			/* if first char is null */
@@ -424,8 +431,8 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
       if (i <= 0)
       return (-i);
     
-
-    out_buf = (char *) alloca(i * 5 + strlen(inbuf) + 1);	/* no ansi-escape code is larger
+b_len = i * 5 + strlen(inbuf) + 1;
+    out_buf = (char *) alloca(b_len);	/* no ansi-escape code is larger
 								   than 5 bytes so a 5 * times
 								   the '{' appears + strlen(inbuf)
 								   + 1 character big buffer
@@ -599,7 +606,8 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
 
 		//if (color_lvl == 0)
 		    out_buf[outpos] = '\0';
-
+		    outpos = strlcat(out_buf, insert_text, b_len);
+#if 0
 		if ((strlen(out_buf) + strlen(insert_text)) < len - 1) {
 		    /* don't overfill buffer */
 		    if (*insert_text != '\0') {
@@ -608,6 +616,8 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
 			outpos = strlen(out_buf);
 		    }
 		}
+		#endif
+		
 
 	    } /* if char is '/' (START_CHAR) */
 	    else {
@@ -632,8 +642,7 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
 
 
     out_buf[outpos] = '\0';
-    strncpy(inbuf, out_buf, len - 1);
-    inbuf[len - 1] = '\0';
+    strlcpy(inbuf, out_buf, len);
     
     return outpos;
 }

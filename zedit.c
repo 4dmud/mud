@@ -456,7 +456,7 @@ void zedit_disp_flag_menu(struct descriptor_data *d)
 	write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
 		zone_bits[counter], !(++columns % 2) ? "\r\n" : "");
     }
-    sprintbit(OLC_ZONE(d)->zone_flags, zone_bits, buf1);
+    sprintbit(OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
     write_to_output(d, "\r\nZone flags: %s%s%s\r\n"
 	    "Enter zone flags, 0 to quit : ", cyn, buf1, nrm);
     OLC_MODE(d) = ZEDIT_ZONE_FLAGS;
@@ -486,7 +486,7 @@ void zedit_disp_menu(struct descriptor_data *d)
   clear_screen(d);
   room = real_room(OLC_NUM(d));
   
-sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1);
+sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
   /*
    * Menu header  
    */

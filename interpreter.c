@@ -2074,7 +2074,8 @@ int enter_player_game(struct descriptor_data *d)
   read_aliases(ch);
   ch->next = NULL;	// -- kalten
 
-
+if (!valid_id_num( GET_IDNUM(ch)))
+  log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch)); 
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
   

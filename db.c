@@ -83,6 +83,7 @@ void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
 SPECIAL(postmaster);
 SPECIAL(cleric);
 SPECIAL(bank);
+
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
 **************************************************************************/
@@ -95,7 +96,6 @@ struct help_category_data *help_categories;
 
 int TEMP_LOAD_CHAR = FALSE;
 
-size_t strlcpy(char *dest, const char *source, size_t totalsize);
 extern struct mob_stat_table mob_stats[];
 
 struct room_data *world_vnum[HIGHEST_VNUM];	/* array of rooms                */
@@ -192,7 +192,7 @@ void assign_the_shopkeepers(void);
 void build_player_index(void);
 int is_empty(zone_rnum zone_nr);
 void reset_zone(zone_rnum zone);
-int file_to_string(const char *name, char *buf);
+int file_to_string(const char *name, char *buf, size_t b_len);
 int file_to_string_alloc(const char *name, char **buf);
 void reboot_wizlists(void);
 ACMD(do_reboot);
@@ -2967,8 +2967,8 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
     obj_proto[i].affected[j].modifier = 0;
   }
 
-  strcat(buf2, ", after numeric constants\n"
-         "...expecting 'E', 'A', '$', or next object number");
+  strlcat(buf2, ", after numeric constants\n"
+         "...expecting 'E', 'A', '$', or next object number", sizeof(buf2));
   j = 0;
 
   obj_proto[i].ex_description = NULL;
@@ -3462,7 +3462,7 @@ void load_help(FILE *fl)
   get_one_line(fl, key);
   while (*key != '$')
   {
-    strcat(key, "\r\n");	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
+    strlcat(key, "\r\n", sizeof(key));	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
     entrylen = strlcpy(entry, key, sizeof(entry));
 
     /* read in the corresponding help entry */
@@ -3604,6 +3604,8 @@ struct char_data *create_char(void)
   ch->next = character_list;
   character_list = ch;
   //TODO: check this
+  if (!valid_id_num(max_mob_id+1))
+  log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1); 
   GET_ID(ch) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(ch), (void *)ch);
@@ -3661,6 +3663,8 @@ struct char_data *read_mobile(mob_vnum nr, int type)
     GET_GOLD(mob) = 0;
 
   mob_index[i].number++;
+  if (!valid_id_num(max_mob_id+1))
+  log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1); 
   GET_ID(mob) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(mob), (void *)mob);
@@ -3996,6 +4000,11 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'M':		/* read a mobile */
+        if (real_room(ZCMD.arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+      exit(1);
+      }
       if ((mob_index[ZCMD.arg1].number < ZCMD.arg2))
       {
         mob = read_mobile(ZCMD.arg1, REAL);
@@ -4018,6 +4027,11 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'O':		/* read an object */
+    if (real_room(ZCMD.arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+      exit(1);
+      }
       if (obj_index[ZCMD.arg1].number < ZCMD.arg2)
       {
         if (ZCMD.arg3 != NOWHERE)
@@ -4216,6 +4230,11 @@ void reset_zone(zone_rnum zone)
 
 
     case 'D':		/* set state of door */
+    if (real_room(ZCMD.arg1) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
+      exit(1);
+      }
       if (ZCMD.arg2 < 0 || ZCMD.arg2 >= NUM_OF_DIRS ||
           (world_vnum[ZCMD.arg1]->dir_option[ZCMD.arg2] == NULL))
       {
@@ -4274,6 +4293,11 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'T': /* trigger command */
+        if (real_room(ZCMD.arg1) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
+      exit(1);
+      }
       if (ZCMD.arg1==MOB_TRIGGER && tmob)
       {
         if (!SCRIPT(tmob))
@@ -4303,6 +4327,11 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'V':
+        if (real_room(ZCMD.arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+      exit(1);
+      }
       if (ZCMD.arg1==MOB_TRIGGER && tmob)
       {
         if (!SCRIPT(tmob))
@@ -4344,6 +4373,11 @@ void reset_zone(zone_rnum zone)
         }
       }
     case 'B':		/* read an object then bury it */
+    if (real_room(ZCMD.arg3) == NULL)
+      {
+      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+      exit(1);
+      }
       if ((obj_index[ZCMD.arg1].number < ZCMD.arg2))
       {
         if (ZCMD.arg3 >= 0)
@@ -4963,8 +4997,11 @@ int store_to_char(char *name, struct char_data *ch)
       break;
 
     case 'I':
-      if (!strcmp(tag, "Id  "))
+      if (!strcmp(tag, "Id  ")) {
+       if (!valid_id_num(num6))
+  log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch)); 
         GET_IDNUM(ch) = num6;
+	}
       else if (!strcmp(tag, "Int "))
         ch->real_abils.intel = num;
       else if (!strcmp(tag, "Invs"))
@@ -6191,7 +6228,7 @@ int file_to_string_alloc(const char *name, char **buf)
       return (-1);
 
   /* Lets not free() what used to be there unless we succeeded. */
-  if (file_to_string(name, temp) < 0)
+  if (file_to_string(name, temp, sizeof(temp)) < 0)
     return (-1);
 
   for (in_use = descriptor_list; in_use; in_use = in_use->next)
@@ -6215,7 +6252,7 @@ int file_to_string_alloc(const char *name, char **buf)
 
 
 /* read contents of a text file, and place in buf */
-int file_to_string(const char *name, char *buf)
+int file_to_string(const char *name, char *buf, size_t b_len)
 {
   FILE *fl;
   char tmp[READ_SIZE + 3];
@@ -6234,7 +6271,7 @@ int file_to_string(const char *name, char *buf)
       break;
     if ((len = strlen(tmp)) > 0)
       tmp[len - 1] = '\0';	/* take off the trailing \n */
-    strcat(tmp, "\r\n");	/* strcat: OK (tmp:READ_SIZE+3) */
+    strlcat(tmp, "\r\n", sizeof(tmp));	/* strcat: OK (tmp:READ_SIZE+3) */
 
     if (strlen(buf) + strlen(tmp) + 1 > MAX_STRING_LENGTH)
     {
@@ -6244,7 +6281,7 @@ int file_to_string(const char *name, char *buf)
       fclose(fl);
       return (-1);
     }
-    strcat(buf, tmp);	/* strcat: OK (size checked above) */
+    strlcat(buf, tmp, b_len);	/* strcat: OK (size checked above) */
   }
 
   fclose(fl);
@@ -6336,7 +6373,7 @@ void clear_char(struct char_data *ch)
   IN_ROOM(ch) = NULL;
   TRAVEL_LIST(ch) = NULL;
   GET_PFILEPOS(ch) = -1;
-  GET_IDNUM(ch) = -1;
+  GET_IDNUM(ch) = 0;
   GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
   GET_NEXT_VICTIM(ch) = -1;
   GET_MOB_RNUM(ch) = NOBODY;
@@ -6492,7 +6529,10 @@ void init_char(struct char_data *ch)
   //TODO: check this
   if ((i = get_ptable_by_name(GET_NAME(ch))) != -1)
   {
+  if (!valid_id_num(top_idnum+1))
+  log("Error new id %ld being assigned to %s already exists!",top_idnum+1, GET_NAME(ch)); 
     player_table[i].id = GET_IDNUM(ch) = GET_ID(ch) =  ++top_idnum;
+    
     player_table[i].account = GET_IDNUM(ch);
     add_to_lookup_table(GET_ID(ch), (void *)ch);
   }
@@ -6588,18 +6628,18 @@ int check_object(struct obj_data *obj, int nr)
     GET_OBJ_RENT(obj) = 0;
   }
 
-  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
   if (strstr(buf, "UNDEFINED") && (error = TRUE))
     log("SYSERR: Object #%d (%s) has unknown wear flags.",
         nr, obj->short_description);
 
-  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf, sizeof(buf));
   if (strstr(buf, "UNDEFINED") && (error = TRUE))
     log("SYSERR: Object #%d (%s) has unknown extra flags.",
         nr, obj->short_description);
 
   sprintbitarray(obj->obj_flags.bitvector, affected_bits, AF_ARRAY_MAX,
-                 buf);
+                 buf, sizeof(buf));
   if (strstr(buf, "UNDEFINED") && (error = TRUE))
     log("SYSERR: Object #%d (%s) has unknown affection flags.",
         nr, obj->short_description);
@@ -8023,4 +8063,10 @@ zone_rnum real_zone(zone_vnum vnum)
 #endif
 }
 
-
+int valid_id_num(long id) {
+CHAR_DATA *tch;
+    for (tch = character_list; tch; tch = tch->next)
+      if (GET_ID(tch) == id)
+      return 0;
+      return 1;
+}

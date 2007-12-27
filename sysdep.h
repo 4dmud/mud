@@ -564,8 +564,10 @@ extern void abort (), exit ();
 #endif
 
 #ifdef NEED_STRLCPY_PROTO
-   size_t strlcpy(char *dest, const char *src, size_t copylen);
+size_t strlcat(char *dest, const char *src, size_t copylen);
+size_t strlcpy(char *dest, const char *src, size_t copylen);
 #endif
+
 
 #ifdef NEED_SYSTEM_PROTO
    int system(const char *string);

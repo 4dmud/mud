@@ -664,7 +664,7 @@ void medit_disp_mob_flags(struct descriptor_data *d)
     write_to_output(d, "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, action_bits[i],
                     !(++columns % 2) ? "\r\n" : "");
   }
-  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits, PM_ARRAY_MAX, flags);
+  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits, PM_ARRAY_MAX, flags, sizeof(flags));
   write_to_output(d, "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ",
                   cyn, flags, nrm);
 }
@@ -686,7 +686,7 @@ void medit_disp_aff_flags(struct descriptor_data *d)
     write_to_output(d, "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, affected_bits[i],
                     !(++columns % 2) ? "\r\n" : "");
   }
-  sprintbitarray(AFF_FLAGS(OLC_MOB(d)), affected_bits, AF_ARRAY_MAX, flags);
+  sprintbitarray(AFF_FLAGS(OLC_MOB(d)), affected_bits, AF_ARRAY_MAX, flags, sizeof(flags));
   write_to_output(d, "\r\nCurrent flags   : %s%s%s\r\nEnter aff flags (0 to quit) : ",
                   cyn, flags, nrm);
 }
@@ -737,8 +737,8 @@ void medit_disp_menu(struct descriptor_data *d)
                   grn, nrm, cyn, GET_GOLD(mob), nrm
                  );
 
-  sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags);
-  sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2);
+  sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags, sizeof(flags));
+  sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2, sizeof(flag2));
   write_to_output(d,
                   "%sI%s) Position  : %s%-9s %sJ%s) Default   : %s%s\r\n"
                   "%sK%s) Attack    : %s%s\r\n"

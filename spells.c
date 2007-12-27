@@ -655,13 +655,13 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
    */
   new_send_to_char(ch,
                    "----------------------------------------------------------------------\r\n");
-  sprinttype(GET_OBJ_TYPE(obj), item_types, buf);
+  sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
   new_send_to_char(ch, "{cc%s{cy is a type of {cc%s{cy made from {cc%s{c0\r\n",
                    buf2, buf, material_name(GET_OBJ_MATERIAL(obj)));
   zone = real_zone(GET_OBJ_VNUM(obj));
   if (zone > 0 && dimension_types[zone_table[zone].dimension])
     new_send_to_char(ch, "{cyIt is from the dimension {cy%s{c0\r\n",dimension_types[zone_table[zone].dimension]);
-  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
   if (strncmp(buf, "NOBITS", 6))
   {
     if (str_str(buf, "TAKE"))
@@ -669,7 +669,7 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
     else
       new_send_to_char(ch, "{cyIt can and worn on {cc%s{c0\r\n", buf);
   }
-  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf);
+  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf, sizeof(buf));
   if (strncmp(buf, "NOBITS", 6))
     new_send_to_char(ch, "{cyIt is {cc%s{c0\r\n", buf);
 
@@ -695,7 +695,7 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
         new_send_to_char(ch, "{cyIf worn it will give you --{c0\r\n");
         found = TRUE;
       }
-      sprinttype(obj->affected[i].location, apply_types, buf2);
+      sprinttype(obj->affected[i].location, apply_types, buf2, sizeof(buf2));
       new_send_to_char(ch, "   {cC%3d{cy to your {cc%s{c0\r\n",
                        obj->affected[i].modifier,  buf2);
     }

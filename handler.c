@@ -52,7 +52,6 @@ void remove_corpse_from_list(OBJ_DATA *corpse);
 int stop_task(struct char_data *ch) ;
 extern struct char_data *ch_selling;
 void stop_auction(int type, struct char_data *ch);
-size_t strlcpy(char *dest, const char *source, size_t totalsize);
 int invalid_class(struct char_data *ch, struct obj_data *obj);
 int invalid_race(struct char_data *ch, struct obj_data *obj);
 void remove_follower(struct char_data *ch);
