@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.21  2007/01/28 21:18:18  w4dimenscor
+ * Fixed item desc of Manifest item when it is looked it.
+ * It is now more english. 01/28/2007 Hal.
+ *
  * Revision 1.20  2006/10/06 22:25:30  w4dimenscor
  * fixed staves crested from woodsing
  *
@@ -917,7 +921,7 @@ void make_manifest(Character *ch,struct obj_data *obj)
   /* extra description coolness! */
   CREATE(new_descr, struct extra_descr_data, 1);
   new_descr->keyword = str_dup(final_focus->name);
-  snprintf(buf2, sizeof(buf2), "It's a cool to the touch magical glass orb\r\n"
+  snprintf(buf2, sizeof(buf2), "It's cool to the touch. \r\n"
            "It appears to have a tiny %s inside.",obj->short_description);
   new_descr->description = str_dup(buf2);
   new_descr->next = NULL;
