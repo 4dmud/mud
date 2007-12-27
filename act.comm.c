@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.30  2006/05/11 06:20:02  w4dimenscor
+ * Altered the list of typos to fix in act.comm.c, added room vnum to the typo and bug mud log
+ *
  * Revision 1.29  2006/05/08 19:59:42  w4dimenscor
  * repatching the files sinc ethe backup wipe
  *
@@ -1648,12 +1651,12 @@ ACMD(do_ctell)
 char *fix_typos(char * str, size_t len) {
   ReplaceString(str, " i ", " I ", len);
   ReplaceString(str, " im ", " I'm ", len);
-  ReplaceString(str, "i'm", " I'm ", len);
-  ReplaceString(str, "Im", " I'm ", len);
+  ReplaceString(str, " i'm ", " I'm ", len);
+  ReplaceString(str, " Im ", " I'm ", len);
   ReplaceString(str, " ive ", " I've ", len);
   ReplaceString(str, " Ive ", " I've ", len);
   ReplaceString(str, "itll", "it'll", len);
-  ReplaceString(str, "teh", "the", len);
+  ReplaceString(str, " teh ", " the ", len);
   ReplaceString(str, "theres", "there's", len);
   ReplaceString(str, "wehn", "when", len);
   ReplaceString(str, " alot ", " a lot ", len);

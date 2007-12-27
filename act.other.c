@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.23  2006/05/11 06:20:02  w4dimenscor
+ * Altered the list of typos to fix in act.comm.c, added room vnum to the typo and bug mud log
+ *
  * Revision 1.22  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -1105,7 +1108,7 @@ ACMD(do_gen_write)
     send_to_char("That must be a mistake...\r\n", ch);
     return;
   }
-  new_mudlog(CMP, LVL_GOD, FALSE, "%s %s: %s", GET_NAME(ch), CMD_NAME, argument);
+new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_ROOM_VNUM(IN_ROOM(ch)), argument);
 
   if (stat(filename, &fbuf) < 0)
   {
