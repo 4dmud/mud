@@ -439,9 +439,9 @@ void aedit_parse(struct descriptor_data * d, char *arg) {
        case '2':
          write_to_output(d, "Enter the minimum position the Character has to be in to activate social:\r\n");
          {
-           int i;
-           for (i=POS_DEAD;i<=POS_STANDING;i++)
-             write_to_output(d, "   %d) %s\r\n", i, position_types[i]);
+           int k;
+           for (k=POS_DEAD;k<=POS_STANDING;i++)
+             write_to_output(d, "   %d) %s\r\n", k, position_types[i]);
            
            write_to_output(d, "Enter choice: ");
          }
@@ -450,9 +450,9 @@ void aedit_parse(struct descriptor_data * d, char *arg) {
        case '3':
          write_to_output(d, "Enter the minimum position the Victim has to be in to activate social:\r\n");
          {
-           int i;
-           for (i=POS_DEAD;i<=POS_STANDING;i++)
-             write_to_output(d, "   %d) %s\r\n", i, position_types[i]);
+           int k;
+           for (k=POS_DEAD;k<=POS_STANDING;i++)
+             write_to_output(d, "   %d) %s\r\n", k, position_types[i]);
            
            write_to_output(d, "Enter choice: ");
          }

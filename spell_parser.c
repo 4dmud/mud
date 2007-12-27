@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.18  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.17  2006/04/21 12:46:45  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -468,17 +471,17 @@ int get_skill_wait(struct char_data *ch, int skill)
 
 }
 
-void set_skill_wait(struct char_data *ch, int skill, int wait)
+void set_skill_wait(struct char_data *ch, int skill, int w)
 {
   struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
-  if (wait < 0)
-    wait = 0;
+  if (w < 0)
+    w = 0;
 
   while (temp)
   {
     if (temp->skill == (skill))
     {
-      temp->wait = wait;
+      temp->wait = w;
       return;
     }
     temp = temp->next;
@@ -1542,7 +1545,7 @@ void assign_class(int spell, int chclass)
 /* Assign the spells on boot up */
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
-            int routines, int wait, int first_prereq, int second_prereq, int tier, int level)
+            int routines, int w, int first_prereq, int second_prereq, int tier, int level)
 {
   spell_info[spl].mana_max = max_mana;
   spell_info[spl].mana_min = min_mana;
@@ -1552,7 +1555,7 @@ void spello(int spl, const char *name, int max_mana, int min_mana,
   spell_info[spl].violent = violent;
   spell_info[spl].routines = routines;
   spell_info[spl].name = name;
-  spell_info[spl].wait = wait;
+  spell_info[spl].wait = w;
   spell_info[spl].first_prereq = first_prereq;
   spell_info[spl].second_prereq = second_prereq;
   spell_info[spl].tier = tier;

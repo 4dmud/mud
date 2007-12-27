@@ -251,7 +251,7 @@ EVENTFUNC(affdam_event)
 void add_ade(struct aff_dam_event_obj* new_ade_obj)
 {
   struct aff_dam_event_list* new_elem;
-  long time = 0;
+  long t = 0;
   CREATE(new_elem, struct aff_dam_event_list, 1);
 
   if(ade_list_end)
@@ -267,8 +267,8 @@ void add_ade(struct aff_dam_event_obj* new_ade_obj)
   new_elem->next = NULL;
   new_elem->ch = new_ade_obj->ch;
   new_elem->id = new_ade_obj->id;
-  time = new_ade_obj->interval RL_SEC;
-  new_elem->event = event_create(affdam_event, new_ade_obj, time);
+  t = new_ade_obj->interval RL_SEC;
+  new_elem->event = event_create(affdam_event, new_ade_obj, t);
 }
 
 void cancel_affdam_events(struct char_data* ch)

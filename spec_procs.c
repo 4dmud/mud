@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.11  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.10  2006/02/23 18:41:50  w4dimenscor
  * added a few needed files to cvs
  *
@@ -698,7 +701,7 @@ SPECIAL(mayor)
     "W3a3003b33000c111d0d111CE333333CE22c222112212111a1S.";
 
   static const char *path = NULL;
-  static int index;
+  static int mindex;
   static bool move = FALSE;
 
   if (!move)
@@ -707,26 +710,26 @@ SPECIAL(mayor)
     {
       move = TRUE;
       path = open_path;
-      index = 0;
+      mindex = 0;
     }
     else if (time_info.hours == 20)
     {
       move = TRUE;
       path = close_path;
-      index = 0;
+      mindex = 0;
     }
   }
   if (cmd || !move || (GET_POS(ch) < POS_SLEEPING) ||
       (GET_POS(ch) == POS_FIGHTING))
     return (FALSE);
 
-  switch (path[index])
+  switch (path[mindex])
   {
   case '0':
   case '1':
   case '2':
   case '3':
-    perform_move(ch, path[index] - '0', 1);
+    perform_move(ch, path[mindex] - '0', 1);
     break;
 
   case 'W':
@@ -783,7 +786,7 @@ SPECIAL(mayor)
 
   }
 
-  index++;
+  mindex++;
   return (FALSE);
 }
 
@@ -2161,7 +2164,7 @@ SPECIAL(fire)
   int distance;
   room_rnum was_in;
   int range = 5;
-  int damage = 0, percent, chance = 100;
+  int dam = 0, percent, chance = 100;
   char arg1[MAX_INPUT_LENGTH];	/* target */
   char arg2[MAX_INPUT_LENGTH];	/* direction */
 
@@ -2229,10 +2232,10 @@ SPECIAL(fire)
       chance /= distance;
       if (percent < chance)
       {	/* the closer the ship is, the better chance of hitting it */
-        if ((damage = number(0, 2)) > 0)
+        if ((dam = number(0, 2)) > 0)
         {
           /* damage the vehicle */
-          GET_OBJ_VAL(target, 2) -= damage;
+          GET_OBJ_VAL(target, 2) -= dam;
           /* check to see if it should blow up now */
           if (GET_OBJ_VAL(target, 2) <= 0)
           {
@@ -2255,7 +2258,7 @@ SPECIAL(fire)
                 target, NULL, TO_ROOM);
             explosion_messages(real_room
                                (GET_OBJ_VAL(target, 0)),
-                               damage, target);
+                               dam, target);
             WAIT_STATE(ch, PULSE_VIOLENCE * 2);
             return (1);
           }
@@ -2268,7 +2271,7 @@ SPECIAL(fire)
           act("$n misses the $p.", TRUE, ch, target, NULL,
               TO_ROOM);
           explosion_messages(real_room(GET_OBJ_VAL(target, 0)),
-                             damage, target);
+                             dam, target);
           WAIT_STATE(ch, PULSE_VIOLENCE * 2);
           return (1);
         }
@@ -2280,7 +2283,7 @@ SPECIAL(fire)
             TO_CHAR);
         act("$n misses the $p.", TRUE, ch, target, NULL, TO_ROOM);
         explosion_messages(real_room(GET_OBJ_VAL(target, 0)),
-                           damage, target);
+                           dam, target);
         WAIT_STATE(ch, PULSE_VIOLENCE * 2);
         return (1);
       }

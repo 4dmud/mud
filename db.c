@@ -47,7 +47,7 @@ void purge_qic(obj_rnum rnum);
 void free_corpse_list(struct corpse_list_data *cor);
 void qic_load(int rnum);
 int allowed_pretitle(CHAR_DATA *ch);
-void free_clan_lists();
+void free_clan_lists(void); 
 void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
 struct kill_data *load_killlist(char *name);
@@ -62,7 +62,7 @@ int generate_wep_length(OBJ_DATA *wep);
 int OBJ_INNATE_MESSAGE = TRUE;
 
 int gen_wep_type_from_attack(OBJ_DATA *obj);
-void renumber_zones();
+void renumber_zones(void);
 extern int save_new_style;
 extern struct corpse_list_data *corpse_list;
 struct config_data config_info; /* Game configuration list.  */
@@ -1494,7 +1494,7 @@ int count_hash_records(FILE * fl)
 void index_boot(int mode)
 {
   const char *index_filename, *prefix = NULL;
-  FILE *index = NULL, *db_file = NULL;
+  FILE *findex = NULL, *db_file = NULL;
   int rec_count = 0, size[2];
   char buf2[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
@@ -1537,17 +1537,17 @@ void index_boot(int mode)
 
     snprintf(buf2, sizeof(buf2), "%s%s", prefix, index_filename);
 
-    if ((index = fopen(buf2, "ro")) == NULL)
+    if ((findex = fopen(buf2, "ro")) == NULL)
     {
       log("SYSERR: opening index file '%s': %s", buf2, strerror(errno));
       return;
     }
 
     /* first, count the number of records in the file so we can malloc */
-    if (fscanf(index, "%s\n", buf1) == -1)
+    if (fscanf(findex, "%s\n", buf1) == -1)
     {
       //      load_xml_help(prefix);
-      fclose(index);
+      fclose(findex);
       return;
     }
     while (*buf1 != '$')
@@ -1558,14 +1558,14 @@ void index_boot(int mode)
       {
         log("SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix,
             index_filename, strerror(errno));
-        fscanf(index, "%s\n", buf1);
+        fscanf(findex, "%s\n", buf1);
         continue;
       }
       else
         rec_count += count_alias_records(db_file);
 
       fclose(db_file);
-      fscanf(index, "%s\n", buf1);
+      fscanf(findex, "%s\n", buf1);
     }
     /* Exit if 0 records, unless this is shops */
     if (!rec_count)
@@ -1652,8 +1652,8 @@ void index_boot(int mode)
   }
   if (mode == DB_BOOT_HLP)
   {
-    rewind(index);
-    fscanf(index, "%s\n", buf1);
+    rewind(findex);
+    fscanf(findex, "%s\n", buf1);
     while (*buf1 != '$')
     {
       snprintf(buf2, sizeof(buf2), "%s%s", prefix, buf1);
@@ -1664,10 +1664,10 @@ void index_boot(int mode)
       }
       load_help(db_file);
       fclose(db_file);
-      fscanf(index, "%s\n", buf1);
+      fscanf(findex, "%s\n", buf1);
 
     }
-    fclose(index);
+    fclose(findex);
 
   }
   else
@@ -1793,7 +1793,7 @@ void discrete_load(FILE * fl, int mode, char *filename, zone_vnum zon)
 bitvector_t asciiflag_conv(char *flag)
 {
   bitvector_t flags = 0;
-  int is_number = TRUE;
+  int num_true = TRUE;
   register char *p;
 
   for (p = flag; *p; p++)
@@ -1804,10 +1804,10 @@ bitvector_t asciiflag_conv(char *flag)
       flags |= 1 << (26 + (*p - 'A'));
 
     if (!isdigit(*p))
-      is_number = FALSE;
+      num_true = FALSE;
   }
 
-  if (is_number)
+  if (num_true)
     flags = atol(flag);
 
   return (flags);
@@ -1968,13 +1968,13 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * -- Welcor 09/03 
        */
       {
-        char *t = strchr(new_descr->description, '\0');
-        if (t > new_descr->description && *(t-1) != '\n')
+        char *j = strchr(new_descr->description, '\0');
+        if (j > new_descr->description && *(j-1) != '\n')
         {
-          CREATE(t, char, strlen(new_descr->description)+3);
-          sprintf(t, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
+          CREATE(j, char, strlen(new_descr->description)+3);
+          sprintf(j, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
           free(new_descr->description);
-          new_descr->description = t;
+          new_descr->description = j;
         }
       }
       new_descr->next = room_nr->look_above_description;
@@ -1989,13 +1989,13 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * -- Welcor 09/03 
        */
       {
-        char *t = strchr(new_descr->description, '\0');
-        if (t > new_descr->description && *(t-1) != '\n')
+        char *j = strchr(new_descr->description, '\0');
+        if (j > new_descr->description && *(j-1) != '\n')
         {
-          CREATE(t, char, strlen(new_descr->description)+3);
-          sprintf(t, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
+          CREATE(j, char, strlen(new_descr->description)+3);
+          sprintf(j, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
           free(new_descr->description);
-          new_descr->description = t;
+          new_descr->description = j;
         }
       }
       new_descr->next = room_nr->look_behind_description;
@@ -2010,13 +2010,13 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * -- Welcor 09/03 
        */
       {
-        char *t = strchr(new_descr->description, '\0');
-        if (t > new_descr->description && *(t-1) != '\n')
+        char *j = strchr(new_descr->description, '\0');
+        if (j > new_descr->description && *(j-1) != '\n')
         {
-          CREATE(t, char, strlen(new_descr->description)+3);
-          sprintf(t, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
+          CREATE(j, char, strlen(new_descr->description)+3);
+          sprintf(j, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
           free(new_descr->description);
-          new_descr->description = t;
+          new_descr->description = j;
         }
       }
       new_descr->next = room_nr->look_under_description;
@@ -2523,25 +2523,25 @@ void parse_enhanced_mob(FILE * mob_f, int i, int nr)
 
 struct combine_data *add_base_link(int i, int vnum)
 {
-  struct combine_data *link = NULL;
-  CREATE(link, struct combine_data, 1);
-  link->vnum = vnum;
-  link->joined = NULL;
-  link->next = mob_proto[i].mob_specials.join_list;
-  mob_proto[i].mob_specials.join_list = link;
+  struct combine_data *blink = NULL;
+  CREATE(blink, struct combine_data, 1);
+  blink->vnum = vnum;
+  blink->joined = NULL;
+  blink->next = mob_proto[i].mob_specials.join_list;
+  mob_proto[i].mob_specials.join_list = blink;
 
-  return link;
+  return blink;
 
 }
 struct combine_data *add_base_link_mob(CHAR_DATA *mob, int vnum)
 {
-  struct combine_data *link = NULL;
-  CREATE(link, struct combine_data, 1);
-  link->vnum = vnum;
-  link->joined = NULL;
-  link->next = mob->mob_specials.join_list;
-  mob->mob_specials.join_list = link;
-  return link;
+  struct combine_data *blink = NULL;
+  CREATE(blink, struct combine_data, 1);
+  blink->vnum = vnum;
+  blink->joined = NULL;
+  blink->next = mob->mob_specials.join_list;
+  mob->mob_specials.join_list = blink;
+  return blink;
 
 }
 /* adds to current returns next
@@ -2621,25 +2621,25 @@ int move_link_room(CHAR_DATA *mob, room_rnum room)
 
 void die_link(CHAR_DATA *mob)
 {
-  struct combine_data *temp = NULL, *link = NULL;
+  struct combine_data *temp = NULL, *blink = NULL;
   CHAR_DATA *head;
   if (mob == NULL)
     return;
   if ((head = mob->mob_specials.head_join) == NULL)
     return;
-  link = head->mob_specials.join_list;
-  while (link)
+  blink = head->mob_specials.join_list;
+  while (blink)
   {
-    if (link->joined == mob)
+    if (blink->joined == mob)
       break;
-    link = link->next;
+    blink = blink->next;
   }
 
-  if (link != NULL)
+  if (blink != NULL)
   {
-    REMOVE_FROM_LIST(link, head->mob_specials.join_list, next);
+    REMOVE_FROM_LIST(blink, head->mob_specials.join_list, next);
     free(link);
-    link = NULL;
+    blink = NULL;
     mob->mob_specials.head_join = NULL;
     return;
   }
@@ -2726,16 +2726,16 @@ void extract_linked_mob(CHAR_DATA *mob)
   return;
 }
 
-void free_join_list(struct combine_data *list)
+void free_join_list(struct combine_data *blist)
 {
-  if (list == NULL)
+  if (blist == NULL)
     return;
 
-  if (list->next)
-    free_join_list(list->next);
+  if (blist->next)
+    free_join_list(blist->next);
 
-  free(list);
-  list = NULL;
+  free(blist);
+  blist = NULL;
 }
 
 void parse_jspec(char *buf, int i, int nr)
@@ -3431,7 +3431,7 @@ int int_compare(const void *aa, const void* bb)
 
   return a - b;
 }
-void renumber_zones()
+void renumber_zones(void)
 {
   int i, j;
   for (j = 0; j < top_of_zone_table; j++)
@@ -6153,10 +6153,10 @@ int create_entry(char *name)
 /* file read string */
 char *fread_string(FILE *fl, const char *error)
 {
-  char buf[MAX_STRING_LENGTH], tmp[513];
+  char buf[MAX_STRING_LENGTH], tmp[516];
   char *point;
   int done = 0;
-  size_t length = 0, templength, tlen;
+  size_t length = 0, templength, tlen = 0;
 
   *buf = '\0';
 
@@ -6167,10 +6167,11 @@ char *fread_string(FILE *fl, const char *error)
       log("SYSERR: fread_string: format error at or near %s", error);
       exit(1);
     }
+    tlen = strlen(tmp);
     /* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
     /* now only removes trailing ~'s -- Welcor */
     //point = strchr(tmp, '\0');
-    if ((tlen = strlen(tmp)) > 0)
+    if (tlen > 0)
     {
       point = (tmp + tlen - 1);
       for (; (*point=='\r' || *point=='\n'); point--);
@@ -7823,7 +7824,7 @@ int check_name_is_class_type(char *name)
  */
 int fread_number( FILE *fp )
 {
-  int number;
+  int num;
   bool sign;
   char c;
 
@@ -7833,7 +7834,7 @@ int fread_number( FILE *fp )
   }
   while ( isspace(c) );
 
-  number = 0;
+  num = 0;
 
   sign   = FALSE;
   if ( c == '+' )
@@ -7854,19 +7855,19 @@ int fread_number( FILE *fp )
 
   while ( isdigit(c) )
   {
-    number = number * 10 + c - '0';
+    num = num * 10 + c - '0';
     c      = getc( fp );
   }
 
   if ( sign )
-    number = 0 - number;
+    num = 0 - num;
 
   if ( c == '|' )
-    number += fread_number( fp );
+    num += fread_number( fp );
   else if ( c != ' ' )
     ungetc( c, fp );
 
-  return number;
+  return num;
 }
 
 /*

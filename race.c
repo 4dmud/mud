@@ -144,22 +144,22 @@ const struct race_data races[NUM_RACES] =
 //** to provide the easy ability to add things like poly
 void set_race(struct char_data *ch, int race)
 {
-  long long remove, r;
+  long long rem, r;
   struct obj_data *obj;
   extern const char *body[];
   void obj_to_char(struct obj_data *object, struct char_data *ch);
   struct obj_data *unequip_char(struct char_data *ch, int pos);
   char buf[MAX_STRING_LENGTH];
 
-  remove = GET_BODY(ch);
+  rem = GET_BODY(ch);
 
   GET_RACE(ch) = races[race].race;
   //GET_BODY(ch) = races[race].body_bits;
 
-  remove = remove - (remove & GET_BODY(ch));
+  rem = rem - (rem & GET_BODY(ch));
 
   for (r = 0; r < NUM_BODY_PARTS; r++)
-    if (IS_SET(remove, (1 << r)) && (obj = GET_EQ(ch, r)))
+    if (IS_SET(rem, (1 << r)) && (obj = GET_EQ(ch, r)))
     {
       snprintf(buf,sizeof(buf),
                "Your %s disappears and your $p falls to the ground!",

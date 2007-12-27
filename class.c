@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.8  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -685,13 +688,13 @@ int add_fib(int current, int to_add)
 }
 
 /* 1 if valid, 0 if invalid */
-int choose_real_abils(struct char_data *ch, char select, int amount)
+int choose_real_abils(struct char_data *ch, char selected, int amount)
 {
 
   if ((CREATE_POINTS(ch) - amount) < 0)
     return 0;
 
-  switch (LOWER(select))
+  switch (LOWER(selected))
   {
   case 's':
     if ((ch->real_abils.str + amount) < 0)
@@ -1409,15 +1412,15 @@ gold_int level_exp(int chclass, int level, int tier, int remorts)
   }
   else
   {
-float div = 0.5;
+float div_by = 0.5;
     amount = (multi*((mod+1)*(mod+1)));
 
     amount = (multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5));
     amount += ((remorts) * (amount*0.05));
 if (remorts == 0)
-amount *= div;
+amount *= div_by;
 else if (remorts < 5)
-    amount *= div + ((float)remorts * 0.1);
+    amount *= div_by + ((float)remorts * 0.1);
     return amount;
   }
 #undef mod

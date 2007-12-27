@@ -260,7 +260,7 @@ ACMD(do_chaos)
 }
 
 
-void start_arena()
+void start_arena(void)
 {
 
   if (time_to_start == 0)
@@ -283,7 +283,7 @@ void start_arena()
 }
 
 
-void show_jack_pot()
+void show_jack_pot(void)
 {
   send_to_arena("\007\007Lets get ready to RUMBLE!!!!!!!!\r\n"
                 "The jackpot for this arena is %ld coins.\r\n",
@@ -292,7 +292,7 @@ void show_jack_pot()
 }
 
 
-void start_game()
+void start_game(void)
 {
   register struct char_data *i;
   struct descriptor_data *d;
@@ -321,7 +321,7 @@ void start_game()
 }
 
 
-void do_game()
+void do_game(void)
 {
 
   if (num_in_arena() == 1)
@@ -355,7 +355,7 @@ void do_game()
 }
 
 
-void find_game_winner()
+void find_game_winner(void)
 {
   register struct char_data *i;
   struct descriptor_data *d;
@@ -410,7 +410,7 @@ void find_game_winner()
 }
 
 
-void silent_end()
+void silent_end(void)
 {
   in_arena = ARENA_OFF;
   start_time = 0;
@@ -424,7 +424,7 @@ void silent_end()
 }
 
 
-void do_end_game()
+void do_end_game(void)
 {
   register struct char_data *i;
   struct descriptor_data *d;
@@ -451,7 +451,7 @@ void do_end_game()
 }
 
 
-int num_in_arena()
+int num_in_arena(void)
 {
   register struct char_data *i;
   struct descriptor_data *d;

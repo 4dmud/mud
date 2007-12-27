@@ -60,7 +60,7 @@ void sedit_save_to_disk(int num)
 
 ACMD(do_oasis_sedit)
 {
-  int number = NOWHERE, save = 0;
+  int num = NOWHERE, save = 0;
   shop_rnum real_num;
   struct descriptor_data *d;
   char *buf3;
@@ -84,17 +84,17 @@ ACMD(do_oasis_sedit)
     save = TRUE;
     
     if (is_number(buf2))
-      number = atoi(buf2);
+      num = atoi(buf2);
     else if (GET_OLC_ZONE(ch) > 0) {
       zone_rnum zlok;
       
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
-        number = NOWHERE;
+        num = NOWHERE;
       else
-        number = genolc_zone_bottom(zlok);
+        num = genolc_zone_bottom(zlok);
     }
     
-    if (number == NOWHERE) {
+    if (num == NOWHERE) {
       new_send_to_char(ch, "Save which zone?\r\n");
       return;
     }
@@ -103,15 +103,15 @@ ACMD(do_oasis_sedit)
   /****************************************************************************/
   /** If a numeric argument was given, get it.                               **/
   /****************************************************************************/
-  if (number == NOWHERE)
-    number = atoi(buf1);
+  if (num == NOWHERE)
+    num = atoi(buf1);
   
   /****************************************************************************/
   /** Check that the shop isn't already being edited.                        **/
   /****************************************************************************/
   for (d = descriptor_list; d; d = d->next) {
     if (STATE(d) == CON_SEDIT) {
-      if (d->olc && OLC_NUM(d) == number) {
+      if (d->olc && OLC_NUM(d) == num) {
         new_send_to_char(ch, "That shop is currently being edited by %s.\r\n",
           PERS(d->character, ch));
         return;
@@ -138,7 +138,7 @@ ACMD(do_oasis_sedit)
   /****************************************************************************/
   /** Find the zone.                                                         **/
   /****************************************************************************/
-  OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
+  OLC_ZNUM(d) = save ? real_zone(num) : real_zone_by_thing(num);
   if (OLC_ZNUM(d) == NOWHERE) {
     new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
     free(d->olc);
@@ -180,9 +180,9 @@ ACMD(do_oasis_sedit)
     return;
   }
   
-  OLC_NUM(d) = number;
+  OLC_NUM(d) = num;
   
-  if ((real_num = real_shop(number)) != NOTHING)
+  if ((real_num = real_shop(num)) != NOTHING)
     sedit_setup_existing(d, real_num);
   else
     sedit_setup_new(d);

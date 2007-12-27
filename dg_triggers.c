@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/01/23 05:23:19 $
-*  $Revision: 1.7 $
+*  $Date: 2006/05/01 11:29:26 $
+*  $Revision: 1.8 $
 **************************************************************************/
 
 #include "conf.h"
@@ -956,7 +956,7 @@ int command_otrigger(char_data * actor, char *cmd, char *argument)
 }
 
 
-int wear_otrigger(obj_data * obj, char_data * actor, int where)
+int wear_otrigger(obj_data * obj, char_data * actor, int wh)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];

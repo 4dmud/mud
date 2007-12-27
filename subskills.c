@@ -997,12 +997,12 @@ struct obj_data * revert_object(struct obj_data *hilt)
 }
 
 
-void subo(enum subskill_list subcmd, const char *name, int stat, int cost,
+void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
           int percent, int minpos, int targets, byte violent, int routines,
           int stat_type, int flags, int cl_type, int perent)
 {
   SINFO.min_position = minpos;		/* Position for caster   */
-  SINFO.stat = stat;		/* uses hitp, mana, or move points */
+  SINFO.stat = sta;		/* uses hitp, mana, or move points */
   SINFO.cost = cost;		        /* the cost in units */
   SINFO.percentage = percent;		/* the cost in percentage */
   /*

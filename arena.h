@@ -36,14 +36,14 @@ struct hall_of_fame_element {
 };
 
 /* in arena.c */
-void start_arena();
-void show_jack_pot();
-void do_game();
-int num_in_arena();
-void find_game_winner();
-void do_end_game();
-void start_game();
-void silent_end();
+void start_arena(void);
+void show_jack_pot(void);
+void do_game(void);
+int num_in_arena(void);
+void find_game_winner(void);
+void do_end_game(void);
+void start_game(void);
+void silent_end(void);
 void write_fame_list(void);
 void write_one_fame_node(FILE * fp, struct hall_of_fame_element *node);
 void load_hall_of_fame(void);

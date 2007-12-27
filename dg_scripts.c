@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/04/06 14:00:57 $
-*  $Revision: 1.20 $
+*  $Date: 2006/05/01 11:29:26 $
+*  $Revision: 1.21 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.21  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.20  2006/04/06 14:00:57  w4dimenscor
  * fixed a memory bug in dg scripts
  *
@@ -120,7 +123,7 @@ extern int top_of_zone_table;
 extern struct zone_data *zone_table;
 int can_edit_zone(struct char_data *ch, zone_rnum zone);
 zone_rnum real_zone_by_thing(room_vnum vznum);
-int genpreg();
+int genpreg(void);
 
 int is_empty(zone_rnum zone_nr);
 room_rnum find_target_room(struct char_data *ch, char *rawroomstr);
@@ -426,7 +429,7 @@ int can_wear_on_pos(struct obj_data *obj, int pos)
 
 obj_data *get_object_in_equip(char_data * ch, char *name)
 {
-  int j, n = 0, number;
+  int j, n = 0, num;
   obj_data *obj;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp = tmpname;
@@ -452,13 +455,13 @@ obj_data *get_object_in_equip(char_data * ch, char *name)
   else
   {
     snprintf(tmpname, sizeof(tmpname), "%s", name);
-    if (!(number = get_number(&tmp)))
+    if (!(num = get_number(&tmp)))
       return NULL;
 
-    for (j = 0; (j < NUM_WEARS) && (n <= number); j++)
+    for (j = 0; (j < NUM_WEARS) && (n <= num); j++)
       if ((obj = GET_EQ(ch, j)))
         if (isname(tmp, obj->name))
-          if (++n == number)
+          if (++n == num)
             return (obj);
   }
 

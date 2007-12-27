@@ -12,8 +12,6 @@
 
 /* external declarations and prototypes **********************************/
 
-#define C_FUNC(name) void (name) (struct descriptor_data *d, char *arg, void *info)
-
 /* new define for quick check */
 #define DEAD(ch) (PLR_FLAGGED((ch), PLR_NOTDEADYET) || MOB_FLAGGED((ch), MOB_NOTDEADYET))
 
@@ -116,6 +114,7 @@ char *xstrcat(char *des, char *src, ...);
 const char *ordinal_text(int number);
 char *str_str(char *cs, char *ct);
 
+#if 0
 /*quicksort a linked list*/
 void    *sortl(void *list, void *(*getnext)(void *),
                void (*setnext)(void *, void *),
@@ -130,6 +129,7 @@ typedef struct list_struct
 list;
 
 list *lsort (list *p);
+#endif
 
 /*comma format a long*/
 size_t commafmt(char   *buf,            /* Buffer for formatted string  */

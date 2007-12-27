@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.22  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.21  2006/04/30 08:14:59  w4dimenscor
  * added a replace string function, using it to remove html formatting from lines in the 'file' command
  *
@@ -123,7 +126,7 @@ void improve_skill(struct char_data *ch, int skill);
 void stop_auction(int type, struct char_data *ch);
 void add_follower(struct char_data *ch, struct char_data *leader);
 void raw_kill(struct char_data *ch, struct char_data *killer);
-void ReplaceString ( char * string, char * search, char * replace );
+void ReplaceString ( char * string, char * search, char * replace , size_t len);
 
 
 /* local functions */
@@ -176,11 +179,11 @@ ACMD(do_quit)
 
     if (!GET_INVIS_LEV(ch))
     {
-             if (GET_LOGOUTMSG(ch)==NULL)                                             /*Thotter edit */
-                  act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);              /*Thotter edit*/
-             else 
-               send_to_room(IN_ROOM(ch), "%s\r\n",  GET_LOGOUTMSG(ch));
-              
+      if (GET_LOGOUTMSG(ch)==NULL)                                             /*Thotter edit */
+        act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);              /*Thotter edit*/
+      else
+        send_to_room(IN_ROOM(ch), "%s\r\n",  GET_LOGOUTMSG(ch));
+
     }
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
     new_send_to_char(ch,"Goodbye, %s.. Come back soon!\r\n", GET_NAME(ch));
@@ -197,7 +200,7 @@ ACMD(do_quit)
     if (!PLR_FLAGGED(ch, PLR_LOADROOM) && ROOM_FLAGGED(IN_ROOM(ch), ROOM_HOUSE))
       GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 
-    extract_char(ch);		/* Char is saved before extracting. */
+    extract_char(ch);         /* Char is saved before extracting. */
     make_wholist();
   }
 }
@@ -271,65 +274,69 @@ int allowed_loginmsg(CHAR_DATA *ch)
 {
   if (GET_LEVEL(ch) > LVL_HERO)
     return TRUE;
-  
+
   if (!PLR_FLAGGED(ch, PLR_ROLEPLAYER))
     return FALSE;
-  
+
   if (PLR_FLAGGED(ch, PLR_HERO))
     return TRUE;
   if (PLR_FLAGGED(ch, PLR_RP_LEADER))
     return TRUE;
-  
+
   if (GET_AWARD(ch) >= 250)
     return TRUE;
-  
+
   return FALSE;
-  
+
 }
 #define MAX_LOGINMSG_LENGTH 80
 #define MAX_LOGOUTMSG_LENGTH 80
- ACMD(do_loginmsg) {
-    skip_spaces(&argument);
-    delete_doubledollar(argument);
-   if (!allowed_loginmsg(ch))
-   {
-     new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
-     return;
-   }
-    if (strlen(argument) > MAX_LOGINMSG_LENGTH)
-      new_send_to_char(ch, "Sorry, but your login message can't be longer then %d characters.\r\n",
-        MAX_LOGINMSG_LENGTH);
-    else {
-       set_loginmsg(ch, argument);
-       if(GET_LOGINMSG(ch)==NULL)
-         new_send_to_char(ch, "Ok, you don't have a login message anymore.\r\n");
-       else
-         new_send_to_char(ch, "Your new loginmsg is: %s\r\n", GET_LOGINMSG(ch));
-    }
+ACMD(do_loginmsg)
+{
+  skip_spaces(&argument);
+  delete_doubledollar(argument);
+  if (!allowed_loginmsg(ch))
+  {
+    new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
     return;
- }
- 
- ACMD(do_logoutmsg) {
-    skip_spaces(&argument);
-    delete_doubledollar(argument);
-   if (!allowed_loginmsg(ch))
-   {
-     new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
-     return;
-   }
-    if (strlen(argument) > MAX_LOGOUTMSG_LENGTH)
-      new_send_to_char(ch, "Sorry, but your logout message can't be longer then %d characters.\r\n",
-        MAX_LOGOUTMSG_LENGTH);
-    else {
-       set_logoutmsg(ch, argument);
-       if(GET_LOGOUTMSG(ch)==NULL)
-         new_send_to_char(ch, "Ok, you don't have a logout message anymore.\r\n");
-       else
-         new_send_to_char(ch, "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG(ch));
-    }
+  }
+  if (strlen(argument) > MAX_LOGINMSG_LENGTH)
+    new_send_to_char(ch, "Sorry, but your login message can't be longer then %d characters.\r\n",
+                     MAX_LOGINMSG_LENGTH);
+  else
+  {
+    set_loginmsg(ch, argument);
+    if(GET_LOGINMSG(ch)==NULL)
+      new_send_to_char(ch, "Ok, you don't have a login message anymore.\r\n");
+    else
+      new_send_to_char(ch, "Your new loginmsg is: %s\r\n", GET_LOGINMSG(ch));
+  }
+  return;
+}
+
+ACMD(do_logoutmsg)
+{
+  skip_spaces(&argument);
+  delete_doubledollar(argument);
+  if (!allowed_loginmsg(ch))
+  {
+    new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
     return;
- }
- 
+  }
+  if (strlen(argument) > MAX_LOGOUTMSG_LENGTH)
+    new_send_to_char(ch, "Sorry, but your logout message can't be longer then %d characters.\r\n",
+                     MAX_LOGOUTMSG_LENGTH);
+  else
+  {
+    set_logoutmsg(ch, argument);
+    if(GET_LOGOUTMSG(ch)==NULL)
+      new_send_to_char(ch, "Ok, you don't have a logout message anymore.\r\n");
+    else
+      new_send_to_char(ch, "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG(ch));
+  }
+  return;
+}
+
 
 ACMD(do_save)
 {
@@ -1299,13 +1306,13 @@ ACMD(do_gen_tog)
       {"Nobrag on.\r\n",
        "Nobrag off.\r\n"},
       {"You may now be gated to by other players.\r\n",
-          "You are now safe from gating by other players.\r\n"    },
+       "You are now safe from gating by other players.\r\n"    },
       {"You are not roleplaying anymore.\r\n",
        "You are now roleplaying.\r\n"},
       {"You will no longer see a tally of how many fish you have caught.\r\n",
        "You will now see a tally of how many fish you have caught.\r\n"},
       {"You can now have the teleport spell cast on you.\r\n",
-          "You can now no longer have the teleport spell cast on you.\r\n"},
+       "You can now no longer have the teleport spell cast on you.\r\n"},
       {   "You will NOT automaticly agree to group people when they request to follow.\r\n",
           "You will automaticly agree to group people when they request to follow.\r\n"}
 
@@ -1449,7 +1456,7 @@ ACMD(do_gen_tog)
     break;
   case SCMD_NOTELEPORT:
     if (IS_PK(ch))
-    new_send_to_char(ch, "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
+      new_send_to_char(ch, "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
     result = PRF_TOG_CHK(ch, PRF_TELEPORTABLE);
     break;
   case SCMD_AUTOGROUP:
@@ -1524,21 +1531,21 @@ ACMD(do_file)
     char *file;
   }
   fields[] = {
-               {"none", 	55, 	"Does Nothing"		},
-               {"bug", 		54, 	BUG_FILE		},
-               {"typo", 	54, 	TYPO_FILE		},
-               {"ideas", 	55, 	IDEA_FILE		},
-               {"xnames", 	55, 	"../lib/misc/xnames"	},
-               {"levels", 	55, 	"../log/levels"		},
-               {"rip", 		55, 	"../log/rip"		},
-               {"dt", 		55, 	"../log/dts"		},
-               {"help", 	54, 	"../log/missing-help"	},
-               {"comlog", 	54, 	"../log/comlog"		},
-               {"errors", 	55, 	"../log/errors"		},
-               {"godcmds", 	55, 	"../log/godcmds"	},
-               {"syslog", 	55, 	"../log/syslog"		},
-               {"crash", 	55, 	"../syslog.CRASH"	},
-               {"\n", 		0, 	"\n"			}
+               {"none",  55,  "Does Nothing"      },
+               {"bug",        54,  BUG_FILE       },
+               {"typo",  54,  TYPO_FILE      },
+               {"ideas",      55,  IDEA_FILE      },
+               {"xnames",     55,  "../lib/misc/xnames"     },
+               {"levels",     55,  "../log/levels"          },
+               {"rip",        55,  "../log/rip"        },
+               {"dt",         55,  "../log/dts"        },
+               {"help",  54,  "../log/missing-help"    },
+               {"comlog",     54,  "../log/comlog"          },
+               {"errors",     55,  "../log/errors"          },
+               {"godcmds",    55,  "../log/godcmds"    },
+               {"syslog",     55,  "../log/syslog"          },
+               {"crash",      55,  "../syslog.CRASH"   },
+               {"\n",         0,   "\n"           }
              };
 
   skip_spaces(&argument);
@@ -1574,7 +1581,7 @@ ACMD(do_file)
   }
 
   if (!*value)
-    req_lines = 15;		/* default is the last 15 lines */
+    req_lines = 15;      /* default is the last 15 lines */
   else
     req_lines = atoi(value);
 
@@ -1601,13 +1608,14 @@ ACMD(do_file)
   while (!feof(req_file))
   {
     cur_line++;
-    if (cur_line > (num_lines - req_lines)) {
-      ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc");
-      ReplaceString ( line, "</td><td class='date'>", " {cw- ");
-      ReplaceString ( line, "</td><td class='room'>", " - ");
-      ReplaceString ( line, "</td><td class='comment'>", " :{cg ");
-      ReplaceString ( line, "</td></tr></table>", " {c0");
-      
+    if (cur_line > (num_lines - req_lines))
+    {
+      ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof(line));
+      ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof(line));
+      ReplaceString ( line, "</td><td class='room'>", " - ", sizeof(line));
+      ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof(line));
+      ReplaceString ( line, "</td></tr></table>", " {c0", sizeof(line));
+
       len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", line);
     }
 
@@ -1849,40 +1857,40 @@ const char *msgs[][2] =
 
 
 
-    //SECT_SPACE	    	11	/* In outer space                  */
+    //SECT_SPACE         11   /* In outer space                  */
     {"You can't dig in space!\r\n",
      NULL},
-    //SECT_ROAD		12	/* On a Road                       */
+    //SECT_ROAD          12   /* On a Road                       */
     {"You can't dig the road up!\r\n",
      NULL},
-    //SECT_ENTRANCE		13	/* Entrance to a zone              */
+    //SECT_ENTRANCE      13   /* Entrance to a zone              */
     {"You can't dig the entrance up!\r\n",
      NULL},
-    //SECT_ATMOSPHERE		14	/* Entrance to a planet            */
+    //SECT_ATMOSPHERE         14   /* Entrance to a planet            */
     {"You can' dig in atmosphere!\r\n",
      NULL},
-    //SECT_SUN		15	/* Into the Sun                    */
+    //SECT_SUN      15   /* Into the Sun                    */
     {"You can't dig on a sun!\r\n",
      NULL},
-    //SECT_BLACKHOLE		16	/* Into a Black Hole               */
+    //SECT_BLACKHOLE          16   /* Into a Black Hole               */
     {"You can't dig in a black hole!\r\n",
      NULL},
-    //SECT_VEHICLE		17	/* Internal use only               */
+    //SECT_VEHICLE       17   /* Internal use only               */
     {"You can't dig here!\r\n",
      NULL},
-    //SECT_SWAMP		18
+    //SECT_SWAMP         18
     {"You start moving reeds and flies out of the way.\r\n",
      "$n starts moving reeds and flies out of the way.\r\n"},
     //SECT_REEF               19
     {"You start moving coral and fish out of the way.\r\n",
      "$n starts moving coral and fish out of the way.\r\n"},
-    // SECT_TUNDRA	        20
+    // SECT_TUNDRA          20
     {"You start moving snow and dry grass out of the way.\r\n",
      "$n starts moving snow and dry grass out of the way.\r\n"},
-    //SECT_SNOW		21
+    //SECT_SNOW          21
     {"You start moving snow out of the way.\r\n",
      "$n starts moving snow out of the way.\r\n"},
-    //SECT_ICE		22
+    //SECT_ICE      22
     {"You start hacking ice out of the way.\r\n",
      "$n starts hacking out of the way.\r\n"},
     //SECT_PRAIRIE 23
@@ -1950,12 +1958,13 @@ ACMD(do_bury)
   SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BURIED);
   obj_to_room(obj, IN_ROOM(ch));
 };
-ACMD(do_delay) {
+ACMD(do_delay)
+{
   int n;
   skip_spaces(&argument);
   n = atoi(argument);
   if (n > 0 && n < 300)
-  WAIT_STATE(ch, n RL_SEC);
+    WAIT_STATE(ch, n RL_SEC);
 }
 
 ACMD(do_dig_ground)
@@ -1974,7 +1983,7 @@ ACMD(do_dig_ground)
     send_to_char(msgs[IN_ROOM(ch)->sector_type][0], ch);
 
   if (msgs[IN_ROOM(ch)->sector_type][1] != NULL)
-    act(msgs[IN_ROOM(ch)->sector_type][1], TRUE, ch, NULL,		NULL, TO_ROOM);
+    act(msgs[IN_ROOM(ch)->sector_type][1], TRUE, ch, NULL,       NULL, TO_ROOM);
   else
     return;
 

@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/04/18 14:32:50 $                                           * 
-*  $Revision: 1.24 $                                                      *
+*  $Date: 2006/05/01 11:29:26 $                                           * 
+*  $Revision: 1.25 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -29,7 +29,7 @@
 /* External variables and functions */
 
 long long gold_data(int type, long long amount);
-int genpreg();
+int genpreg(void);
 void hunt_victim(struct char_data *ch);
 extern const char *pc_class_types[];
 extern struct time_info_data time_info;
@@ -451,9 +451,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             else
             {
               int i = 0;
-              char_data *ch;
-              for (ch = rrnum->people; ch; ch = ch->next_in_room)
-                if (GET_MOB_VNUM(ch) == mvnum)
+              char_data *tch;
+              for (tch = rrnum->people; tch; tch = tch->next_in_room)
+                if (GET_MOB_VNUM(tch) == mvnum)
                   i++;
 
               snprintf(str, slen, "%d", i);
@@ -1385,16 +1385,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         if (!strcasecmp(field, "varexists"))
         {
-          struct trig_var_data *vd;
+          struct trig_var_data *vdt;
           snprintf(str, slen, "0");
           if (SCRIPT(c))
           {
-            for (vd = SCRIPT(c)->global_vars; vd; vd = vd->next)
+            for (vdt = SCRIPT(c)->global_vars; vdt; vdt = vdt->next)
             {
               if (!strcasecmp(vd->name, subfield))
                 break;
             }
-            if (vd)
+            if (vdt)
               snprintf(str, slen, "1");
             else
               snprintf(str, slen, "0");
@@ -1535,7 +1535,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         else if (!strcasecmp(field, "count"))
         {
-          int count = 0;
+          int cnt = 0;
           struct obj_data *next_obj = NULL, *item = NULL;
 
           if (GET_OBJ_TYPE(o) == ITEM_CONTAINER)
@@ -1546,15 +1546,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
               if (is_number(subfield))
               {
                 if (atoi(subfield) == GET_OBJ_VNUM(item))
-                  ++count;
+                  ++cnt;
               }
               else
               {
                 if (is_name(subfield, item->name))
-                  ++count;
+                  ++cnt;
               }
             }
-            snprintf(str, slen, "%d", count);
+            snprintf(str, slen, "%d", cnt);
           }
           else
             snprintf(str, slen, "0");

@@ -13,7 +13,7 @@ int in_event_handler = 0;
 struct event_info2 *pending_events = NULL;
 struct event_info2 *prev = NULL;
 
-void run_events2()
+void run_events2(void)
 {
     struct event_info2 *temp, *prox;
 

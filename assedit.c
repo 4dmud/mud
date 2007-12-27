@@ -53,175 +53,194 @@ ACMD (do_assedit)
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
- *buf = '\0';  /* If I run into problems then take this sucker out */
- *buf2 = '\0';
+  *buf = '\0';  /* If I run into problems then take this sucker out */
+  *buf2 = '\0';
 
- if (IS_NPC(ch))
+  if (IS_NPC(ch))
+    return;
+  if (GET_LEVEL(ch) < LVL_IMPL)
+    new_send_to_char(ch, "You do not have permission to do that.\r\n");
+
+  for (d = descriptor_list; d; d = d->next)
+  {
+    if (d->connected == CON_ASSEDIT)
+    {
+      new_send_to_char(ch, "Assemblies are already being editted by someone.\r\n");
       return;
- if (GET_LEVEL(ch) < LVL_IMPL)
-     new_send_to_char(ch, "You do not have permission to do that.\r\n");
+    }
+  }
 
- for (d = descriptor_list; d; d = d->next) {
-     if (d->connected == CON_ASSEDIT) {
-     new_send_to_char(ch, "Assemblies are already being editted by someone.\r\n");
-     return;
-     }
-   }
+  two_arguments(argument, buf, buf2);
 
- two_arguments(argument, buf, buf2);
+  d= ch->desc;
 
- d= ch->desc;
-
- if(!*buf) {
+  if(!*buf)
+  {
     nodigit(d);
     return;
-    }
+  }
 
- if (!isdigit(*buf)) {
-    if (strn_cmp("new", buf, 3) == 0) {
-         if(!isdigit(*buf2))
-            nodigit(d);
-         else {
-            assemblyCreate(atoi(buf2), 0);
-            new_send_to_char(d->character, "Assembly Created.\r\n");
-            assemblySaveAssemblies();
-            return;
-            }
-       }
-    else
-    if (strn_cmp("delete", buf, 6) == 0) {
-         if (!isdigit(*buf2))
-            nodigit(d);
-         else {
-             assemblyDestroy(atoi(buf2));
-             new_send_to_char(d->character, "Assembly Deleted.\r\n");
-             assemblySaveAssemblies();
-             return;
-             }
+  if (!isdigit(*buf))
+  {
+    if (strn_cmp("new", buf, 3) == 0)
+    {
+      if(!isdigit(*buf2))
+        nodigit(d);
+      else
+      {
+        assemblyCreate(atoi(buf2), 0);
+        new_send_to_char(d->character, "Assembly Created.\r\n");
+        assemblySaveAssemblies();
+        return;
       }
-    else {
-     nodigit(d);
-     return;
-     }
- } else
-   if (isdigit(*buf)) {
-     d = ch->desc;
-     CREATE (d->olc, struct oasis_olc_data, 1);
-     assedit_setup(d, atoi(buf));
+    }
+    else
+      if (strn_cmp("delete", buf, 6) == 0)
+      {
+        if (!isdigit(*buf2))
+          nodigit(d);
+        else
+        {
+          assemblyDestroy(atoi(buf2));
+          new_send_to_char(d->character, "Assembly Deleted.\r\n");
+          assemblySaveAssemblies();
+          return;
+        }
+      }
+      else
+      {
+        nodigit(d);
+        return;
+      }
+  }
+  else
+    if (isdigit(*buf))
+    {
+      d = ch->desc;
+      CREATE (d->olc, struct oasis_olc_data, 1);
+      assedit_setup(d, atoi(buf));
 
-     }
-return;
+    }
+  return;
 }
 
 /*-------------------------------------------------------------------*
  * Assedit Functions
  *-------------------------------------------------------------------*/
 
-void assedit_setup(struct descriptor_data *d, int number)
+void assedit_setup(struct descriptor_data *d, int num)
 {
 
-    ASSEMBLY    *pOldAssembly = NULL;
-    CREATE(OLC_ASSEDIT(d), ASSEMBLY, 1 );
+  ASSEMBLY    *pOldAssembly = NULL;
+  CREATE(OLC_ASSEDIT(d), ASSEMBLY, 1 );
 
 
-    if( (pOldAssembly = assemblyGetAssemblyPtr( number )) == NULL ) {
-      new_send_to_char(d->character, "That assembly does not exist\r\n");
-      cleanup_olc(d, CLEANUP_ALL);
-      return;
-    } else {
-        /* Copy the old assembly. */
-        OLC_ASSEDIT(d)->lVnum = pOldAssembly->lVnum;
-        OLC_ASSEDIT(d)->uchAssemblyType = pOldAssembly->uchAssemblyType;
-        OLC_ASSEDIT(d)->lNumComponents = pOldAssembly->lNumComponents;
-      OLC_ASSEDIT(d)->trigVnum = pOldAssembly->trigVnum;
+  if( (pOldAssembly = assemblyGetAssemblyPtr( num )) == NULL )
+  {
+    new_send_to_char(d->character, "That assembly does not exist\r\n");
+    cleanup_olc(d, CLEANUP_ALL);
+    return;
+  }
+  else
+  {
+    /* Copy the old assembly. */
+    OLC_ASSEDIT(d)->lVnum = pOldAssembly->lVnum;
+    OLC_ASSEDIT(d)->uchAssemblyType = pOldAssembly->uchAssemblyType;
+    OLC_ASSEDIT(d)->lNumComponents = pOldAssembly->lNumComponents;
+    OLC_ASSEDIT(d)->trigVnum = pOldAssembly->trigVnum;
 
-        if( OLC_ASSEDIT(d)->lNumComponents > 0 )  {
-            CREATE(OLC_ASSEDIT(d)->pComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents);
-            memmove(OLC_ASSEDIT(d)->pComponents, pOldAssembly->pComponents,
-            OLC_ASSEDIT(d)->lNumComponents * sizeof( COMPONENT ) );
-           }
-
+    if( OLC_ASSEDIT(d)->lNumComponents > 0 )
+    {
+      CREATE(OLC_ASSEDIT(d)->pComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents);
+      memmove(OLC_ASSEDIT(d)->pComponents, pOldAssembly->pComponents,
+              OLC_ASSEDIT(d)->lNumComponents * sizeof( COMPONENT ) );
     }
 
-    /*
-     * At this point, pNewAssembly is now the address of a freshly allocated copy of all
-     * the data contained in the original assembly structure.
-     */
+  }
+
+  /*
+   * At this point, pNewAssembly is now the address of a freshly allocated copy of all
+   * the data contained in the original assembly structure.
+   */
 
 
-    if ( (lRnum = real_object( OLC_ASSEDIT(d)->lVnum ) ) < 0)
-      {
-       new_send_to_char(d->character, "Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
-       cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
-       return;
-      }
+  if ( (lRnum = real_object( OLC_ASSEDIT(d)->lVnum ) ) < 0)
+  {
+    new_send_to_char(d->character, "Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
+    cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
+    return;
+  }
 
- STATE(d) = CON_ASSEDIT;
- act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
- SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
- assedit_disp_menu(d);
+  STATE(d) = CON_ASSEDIT;
+  act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
+  SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
+  assedit_disp_menu(d);
 
 }
 
 void assedit_disp_menu(struct descriptor_data *d)
 {
- int i = 0;
- extern const char *AssemblyTypes[];
- char szAssmType[MAX_INPUT_LENGTH] = { '\0' };
+  int i = 0;
+  extern const char *AssemblyTypes[];
+  char szAssmType[MAX_INPUT_LENGTH] = { '\0' };
 
- get_char_colors(d->character);
+  get_char_colors(d->character);
 
- sprinttype(OLC_ASSEDIT(d)->uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
+  sprinttype(OLC_ASSEDIT(d)->uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
 
 #if defined(CLEAR_SCREEN)
   write_to_output(d, "%c[H%c[J", 27, 27);
 #endif
 
   write_to_output(d,
-      "   Assembly Number:%s %ld %s\r\n"
-      "   Assembly Name  :%s %s %s \r\n"
+                  "   Assembly Number:%s %ld %s\r\n"
+                  "   Assembly Name  :%s %s %s \r\n"
                   "   ---------------------------\r\n"
                   "%sT%s) Assembly Type  :%s %s %s\r\n"
                   "%sS%s) Assembly Trig  :%s %d %s\r\n\r\n"
-      "Components:\r\n",
-        yel,  OLC_ASSEDIT(d)->lVnum, nrm,
-        yel,  obj_proto[ real_object(OLC_ASSEDIT(d)->lVnum) ].short_description, nrm,
+                  "Components:\r\n",
+                  yel,  OLC_ASSEDIT(d)->lVnum, nrm,
+                  yel,  obj_proto[ real_object(OLC_ASSEDIT(d)->lVnum) ].short_description, nrm,
                   grn, nrm,yel,  szAssmType, nrm,
                   grn, nrm,yel,  OLC_ASSEDIT(d)->trigVnum, nrm
-       );
+                 );
 
   if(OLC_ASSEDIT(d)->lNumComponents <= 0)
     write_to_output(d, "   < NONE > \r\n");
-  else {
-   for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++ ) {
-     if ( (lRnum = real_object(OLC_ASSEDIT(d)->pComponents[i].lVnum)) < 0)
-       {
-         write_to_output(d,
-          "%s %d%s) %s ERROR --- Contact an Implimentor %s\r\n ",
-           grn, i+1, nrm, yel, nrm
-            );
-       }  else   {
-         write_to_output(d,
-          "%s %d%s) [%5ld] %-20.20s  In room:%s %-3.3s %s   Extract:%s %-3.3s%s \r\n",
-           grn,  i+1, nrm,
-           OLC_ASSEDIT(d)->pComponents[i].lVnum,
-           obj_proto[ lRnum ].short_description,
-           yel, (OLC_ASSEDIT(d)->pComponents[ i ].bInRoom  ? "Yes" : "No"), nrm,
-           yel, (OLC_ASSEDIT(d)->pComponents[ i ].bExtract ? "Yes" : "No"), nrm           );
-       }
+  else
+  {
+    for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++ )
+    {
+      if ( (lRnum = real_object(OLC_ASSEDIT(d)->pComponents[i].lVnum)) < 0)
+      {
+        write_to_output(d,
+                        "%s %d%s) %s ERROR --- Contact an Implimentor %s\r\n ",
+                        grn, i+1, nrm, yel, nrm
+                       );
       }
-     }
+      else
+      {
+        write_to_output(d,
+                        "%s %d%s) [%5ld] %-20.20s  In room:%s %-3.3s %s   Extract:%s %-3.3s%s \r\n",
+                        grn,  i+1, nrm,
+                        OLC_ASSEDIT(d)->pComponents[i].lVnum,
+                        obj_proto[ lRnum ].short_description,
+                        yel, (OLC_ASSEDIT(d)->pComponents[ i ].bInRoom  ? "Yes" : "No"), nrm,
+                        yel, (OLC_ASSEDIT(d)->pComponents[ i ].bExtract ? "Yes" : "No"), nrm           );
+      }
+    }
+  }
   write_to_output(d,
-       "%sA%s) Add a new component.\r\n"
-       "%sE%s) Edit a component.\r\n"
-       "%sD%s) Delete a component.\r\n"
-       "%sQ%s) Quit.\r\n"
-       "\r\nEnter your choice : ",
+                  "%sA%s) Add a new component.\r\n"
+                  "%sE%s) Edit a component.\r\n"
+                  "%sD%s) Delete a component.\r\n"
+                  "%sQ%s) Quit.\r\n"
+                  "\r\nEnter your choice : ",
                   grn, nrm, grn, nrm, grn, nrm, grn, nrm
-         );
+                 );
   OLC_MODE(d) = ASSEDIT_MAIN_MENU;
 
-return;
+  return;
 }
 
 /***************************************************
@@ -230,264 +249,284 @@ return;
 
 void assedit_parse(struct descriptor_data *d, char *arg)
 {
- int pos = 0, i = 0,  counter, columns = 0;
+  int pos = 0, i = 0,  counter, columns = 0;
 
-   COMPONENT   *pTComponents = NULL;
+  COMPONENT   *pTComponents = NULL;
 
- switch (OLC_MODE(d)) {
+  switch (OLC_MODE(d))
+  {
 
-   case ASSEDIT_MAIN_MENU:
-     switch (*arg) {
-     case 'q':
-     case 'Q':                /* do the quit stuff */
-       /* Ok, Time to save it back to the original stuff and get out */
-       /* due to the infrequent use of this code and restricted use  */
-       /* I decided to copy over changes regardless.                 */
-       assemblyDestroy(OLC_ASSEDIT(d)->lVnum);
-       assemblyCreate(OLC_ASSEDIT(d)->lVnum, OLC_ASSEDIT(d)->uchAssemblyType);
-       for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++) {
-           assemblyAddComponent(OLC_ASSEDIT(d)->lVnum,
-                                OLC_ASSEDIT(d)->pComponents[i].lVnum,
-                                OLC_ASSEDIT(d)->pComponents[i].bExtract,
-                                OLC_ASSEDIT(d)->pComponents[i].bInRoom
-                                );
-            }
-       assemblyAddTrigger(OLC_ASSEDIT(d)->lVnum,OLC_ASSEDIT(d)->trigVnum);
-       
-       write_to_output(d, "\r\nSaving all assemblies\r\n");
-       assemblySaveAssemblies();
-       if (pTComponents)
-       free(pTComponents);
-       if (OLC_ASSEDIT(d)->pComponents)
-         free(OLC_ASSEDIT(d)->pComponents);
-       free(OLC_ASSEDIT(d));
-       OLC_ASSEDIT(d) = NULL;
+  case ASSEDIT_MAIN_MENU:
+    switch (*arg)
+    {
+    case 'q':
+    case 'Q':                /* do the quit stuff */
+      /* Ok, Time to save it back to the original stuff and get out */
+      /* due to the infrequent use of this code and restricted use  */
+      /* I decided to copy over changes regardless.                 */
+      assemblyDestroy(OLC_ASSEDIT(d)->lVnum);
+      assemblyCreate(OLC_ASSEDIT(d)->lVnum, OLC_ASSEDIT(d)->uchAssemblyType);
+      for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++)
+      {
+        assemblyAddComponent(OLC_ASSEDIT(d)->lVnum,
+                             OLC_ASSEDIT(d)->pComponents[i].lVnum,
+                             OLC_ASSEDIT(d)->pComponents[i].bExtract,
+                             OLC_ASSEDIT(d)->pComponents[i].bInRoom
+                            );
+      }
+      assemblyAddTrigger(OLC_ASSEDIT(d)->lVnum,OLC_ASSEDIT(d)->trigVnum);
 
-       cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
+      write_to_output(d, "\r\nSaving all assemblies\r\n");
+      assemblySaveAssemblies();
+      if (pTComponents)
+        free(pTComponents);
+      if (OLC_ASSEDIT(d)->pComponents)
+        free(OLC_ASSEDIT(d)->pComponents);
+      free(OLC_ASSEDIT(d));
+      OLC_ASSEDIT(d) = NULL;
+
+      cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
       break;
 
-     case 't':
-     case 'T':
-         get_char_colors(d->character);
+    case 't':
+    case 'T':
+      get_char_colors(d->character);
 #if defined(CLEAR_SCREEN)
-write_to_output(d, "%c[H%c[J", 27, 27);
+      write_to_output(d, "%c[H%c[J", 27, 27);
 #endif
-      for (counter = 0; counter < MAX_ASSM; counter++) {
+      for (counter = 0; counter < MAX_ASSM; counter++)
+      {
         write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
-                AssemblyTypes[counter], !(++columns % 2) ? "\r\n" : "");
-           }
-     write_to_output(d, "Enter the assembly type : ");
-     OLC_MODE(d) = ASSEDIT_EDIT_TYPES;
+                        AssemblyTypes[counter], !(++columns % 2) ? "\r\n" : "");
+      }
+      write_to_output(d, "Enter the assembly type : ");
+      OLC_MODE(d) = ASSEDIT_EDIT_TYPES;
 
-     break;
-     case 's':
-     case 'S':
-     write_to_output(d, "Enter the trigger vnum : ");
-       OLC_MODE(d) = ASSEDIT_EDIT_TRIGGER;
-       
-       break;
-     case 'a':
-     case 'A':                /* add a new component */
-       write_to_output(d,"\r\nWhat is the vnum of the new component?");
-       OLC_MODE(d) = ASSEDIT_ADD_COMPONENT;
+      break;
+    case 's':
+    case 'S':
+      write_to_output(d, "Enter the trigger vnum : ");
+      OLC_MODE(d) = ASSEDIT_EDIT_TRIGGER;
+
+      break;
+    case 'a':
+    case 'A':                /* add a new component */
+      write_to_output(d,"\r\nWhat is the vnum of the new component?");
+      OLC_MODE(d) = ASSEDIT_ADD_COMPONENT;
       break;
 
-     case 'e':
-     case 'E':                /* edit a component */
-       write_to_output(d, "\r\nEdit which component? ");
-       OLC_MODE(d) = ASSEDIT_EDIT_COMPONENT;
+    case 'e':
+    case 'E':                /* edit a component */
+      write_to_output(d, "\r\nEdit which component? ");
+      OLC_MODE(d) = ASSEDIT_EDIT_COMPONENT;
       break;
-     case 'd':
-     case 'D':                /* delete a component */
-       if ((pos < 0) || pos > OLC_ASSEDIT(d)->lNumComponents) {
-         write_to_output(d, "\r\nWhich component do you wish to remove?");
-           assedit_disp_menu(d);
-       } else {
-         write_to_output(d, "\r\nWhich component do you wish to remove?");
-           OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
-       }
+    case 'd':
+    case 'D':                /* delete a component */
+      if ((pos < 0) || pos > OLC_ASSEDIT(d)->lNumComponents)
+      {
+        write_to_output(d, "\r\nWhich component do you wish to remove?");
+        assedit_disp_menu(d);
+      }
+      else
+      {
+        write_to_output(d, "\r\nWhich component do you wish to remove?");
+        OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
+      }
       break;
 
-     default:
-       assedit_disp_menu(d);
+    default:
+      assedit_disp_menu(d);
     }
-   break;
+    break;
 
- case ASSEDIT_EDIT_TYPES:
-   if (isdigit(*arg)){
-    pos = atoi(arg) - 1;
-     if( (pos >= 0) || (pos < MAX_ASSM)) {
-           OLC_ASSEDIT(d)->uchAssemblyType = pos;
-     assedit_disp_menu(d);
-     break;
+  case ASSEDIT_EDIT_TYPES:
+    if (isdigit(*arg))
+    {
+      pos = atoi(arg) - 1;
+      if( (pos >= 0) || (pos < MAX_ASSM))
+      {
+        OLC_ASSEDIT(d)->uchAssemblyType = pos;
+        assedit_disp_menu(d);
+        break;
+      }
     }
-   }
-   else
-   assedit_disp_menu(d);
+    else
+      assedit_disp_menu(d);
 
- break;
- case ASSEDIT_EDIT_TRIGGER:
-   if (isdigit(*arg)){
-     pos = atoi(arg);
-       OLC_ASSEDIT(d)->trigVnum = pos;
-       assedit_disp_menu(d);
-       break;
-   }
-   else
-     assedit_disp_menu(d);
-   
-   break;
- case ASSEDIT_ADD_COMPONENT:              /* add a new component */
-   if (isdigit(*arg)){
+    break;
+  case ASSEDIT_EDIT_TRIGGER:
+    if (isdigit(*arg))
+    {
+      pos = atoi(arg);
+      OLC_ASSEDIT(d)->trigVnum = pos;
+      assedit_disp_menu(d);
+      break;
+    }
+    else
+      assedit_disp_menu(d);
+
+    break;
+  case ASSEDIT_ADD_COMPONENT:              /* add a new component */
+    if (isdigit(*arg))
+    {
       pos = atoi(arg);
 #if CIRCLE_UNSIGNED_INDEX
-     if ((real_object(pos)) == NOTHING)    /* does the object exist? */
-         break;
+      if ((real_object(pos)) == NOTHING)    /* does the object exist? */
+        break;
 #else
-     if ((real_object(pos)) <= NOTHING)    /* does the object exist? */
-         break;
+      if ((real_object(pos)) <= NOTHING)    /* does the object exist? */
+        break;
 #endif
 
-     for ( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++) {
+      for ( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++)
+      {
         if(OLC_ASSEDIT(d)->pComponents[i].lVnum == pos)
           break;
-       }
+      }
 
-     CREATE( pTComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents + 1);
+      CREATE( pTComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents + 1);
 
-     if(OLC_ASSEDIT(d)->pComponents != NULL) {          /* Copy from olc to temp */
+      if(OLC_ASSEDIT(d)->pComponents != NULL)
+      {          /* Copy from olc to temp */
         memmove(pTComponents, OLC_ASSEDIT(d)->pComponents,
-                  OLC_ASSEDIT(d)->lNumComponents * sizeof(COMPONENT) );
-/*        free(OLC_ASSEDIT(d)->pComponents); */
-       }
+                OLC_ASSEDIT(d)->lNumComponents * sizeof(COMPONENT) );
+        /*        free(OLC_ASSEDIT(d)->pComponents); */
+      }
 
-     OLC_ASSEDIT(d)->pComponents = pTComponents;
-     OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].lVnum = pos;
-     OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bExtract = YES;
-     OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bInRoom = NO;
-     OLC_ASSEDIT(d)->lNumComponents += 1;
+      OLC_ASSEDIT(d)->pComponents = pTComponents;
+      OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].lVnum = pos;
+      OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bExtract = YES;
+      OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bInRoom = NO;
+      OLC_ASSEDIT(d)->lNumComponents += 1;
 
-     assedit_disp_menu(d);
+      assedit_disp_menu(d);
 
-   } else {
-     new_send_to_char(d->character, "That object does not exist. Please try again\r\n");
-     assedit_disp_menu(d);
-     }
-  break;
+    }
+    else
+    {
+      new_send_to_char(d->character, "That object does not exist. Please try again\r\n");
+      assedit_disp_menu(d);
+    }
+    break;
 
- case ASSEDIT_EDIT_COMPONENT:
-   pos = atoi(arg);
-   if (isdigit(*arg)) {
+  case ASSEDIT_EDIT_COMPONENT:
+    pos = atoi(arg);
+    if (isdigit(*arg))
+    {
       pos--;
       OLC_VAL(d) = pos;
       assedit_edit_extract(d);
       break;
     }
-   else
+    else
       assedit_disp_menu(d);
-   break;
-
- case ASSEDIT_DELETE_COMPONENT:
-
-  if (isdigit(*arg)) {
-    pos = atoi(arg);
-    pos -= 1;
-
-    CREATE( pTComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents -1);
-
-    if( pos > 0 )
-      memmove( pTComponents, OLC_ASSEDIT(d)->pComponents, pos * sizeof( COMPONENT ) );
-
-    if( pos < OLC_ASSEDIT(d)->lNumComponents - 1 )
-       memmove( pTComponents + pos, OLC_ASSEDIT(d)->pComponents + pos + 1,
-            (OLC_ASSEDIT(d)->lNumComponents - pos - 1) * sizeof(COMPONENT) );
-
-    free(OLC_ASSEDIT(d)->pComponents );
-    OLC_ASSEDIT(d)->pComponents = pTComponents;
-    OLC_ASSEDIT(d)->lNumComponents -= 1;
-
-    assedit_disp_menu(d);
     break;
-  } else
-    assedit_disp_menu(d);
-  break;
 
- case ASSEDIT_EDIT_EXTRACT:
-  switch (*arg) {
+  case ASSEDIT_DELETE_COMPONENT:
+
+    if (isdigit(*arg))
+    {
+      pos = atoi(arg);
+      pos -= 1;
+
+      CREATE( pTComponents, COMPONENT, OLC_ASSEDIT(d)->lNumComponents -1);
+
+      if( pos > 0 )
+        memmove( pTComponents, OLC_ASSEDIT(d)->pComponents, pos * sizeof( COMPONENT ) );
+
+      if( pos < OLC_ASSEDIT(d)->lNumComponents - 1 )
+        memmove( pTComponents + pos, OLC_ASSEDIT(d)->pComponents + pos + 1,
+                 (OLC_ASSEDIT(d)->lNumComponents - pos - 1) * sizeof(COMPONENT) );
+
+      free(OLC_ASSEDIT(d)->pComponents );
+      OLC_ASSEDIT(d)->pComponents = pTComponents;
+      OLC_ASSEDIT(d)->lNumComponents -= 1;
+
+      assedit_disp_menu(d);
+      break;
+    }
+    else
+      assedit_disp_menu(d);
+    break;
+
+  case ASSEDIT_EDIT_EXTRACT:
+    switch (*arg)
+    {
     case 'y':
     case 'Y':
       OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bExtract = TRUE;
       assedit_edit_inroom(d);
-    break;
+      break;
 
     case 'n':
     case 'N':
       OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bExtract = FALSE;
       assedit_edit_inroom(d);
-    break;
+      break;
 
     default:
-    write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N)");
-    break;
+      write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N)");
+      break;
     }
-   break;
- case ASSEDIT_EDIT_INROOM:
-  switch (*arg) {
+    break;
+  case ASSEDIT_EDIT_INROOM:
+    switch (*arg)
+    {
     case 'y':
     case 'Y':
       OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = TRUE;
       assedit_disp_menu(d);
-    break;
+      break;
 
     case 'n':
     case 'N':
       OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = FALSE;
       assedit_disp_menu(d);
-    break;
+      break;
 
     default:
-  write_to_output(d, "Object in the room when assembly is created? (n =  in inventory):");
-    break;
+      write_to_output(d, "Object in the room when assembly is created? (n =  in inventory):");
+      break;
     }
- break;
+    break;
 
- default:                        /* default for whole assedit parse function */
-                                 /* we should never get here */
- new_mudlog(BRF, LVL_GOD, TRUE, "SYSERR: OLC assedit_parse(): Reached default case!");
-   write_to_output(d, "Opps...\r\n");
- STATE(d) = CON_PLAYING;
- break;
- }
+  default:                        /* default for whole assedit parse function */
+    /* we should never get here */
+    new_mudlog(BRF, LVL_GOD, TRUE, "SYSERR: OLC assedit_parse(): Reached default case!");
+    write_to_output(d, "Opps...\r\n");
+    STATE(d) = CON_PLAYING;
+    break;
+  }
 }
 /* End of Assedit Parse */
 
 void assedit_delete(struct descriptor_data *d)
 {
   write_to_output(d, "Which item number do you wish to delete from this assembly?");
- OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
- return;
+  OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
+  return;
 }
 
 
 void assedit_edit_extract(struct descriptor_data *d)
 {
-write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N):");
- OLC_MODE(d) = ASSEDIT_EDIT_EXTRACT;
- return;
+  write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N):");
+  OLC_MODE(d) = ASSEDIT_EDIT_EXTRACT;
+  return;
 }
 
 void assedit_edit_inroom(struct descriptor_data *d)
 {
   write_to_output(d, "Should the object be in the room when assembly is created (n = in inventory)?");
- OLC_MODE(d) = ASSEDIT_EDIT_INROOM;
- return;
+  OLC_MODE(d) = ASSEDIT_EDIT_INROOM;
+  return;
 }
 
 void nodigit(struct descriptor_data *d)
 {
-write_to_output(d, "Usage: assedit <vnum>\r\n");
-write_to_output(d, "     : assedit new <vnum>\r\n");
-write_to_output(d, "     : assedit delete <vnum>\r\n");
+  write_to_output(d, "Usage: assedit <vnum>\r\n");
+  write_to_output(d, "     : assedit new <vnum>\r\n");
+  write_to_output(d, "     : assedit delete <vnum>\r\n");
   return;
 }
 

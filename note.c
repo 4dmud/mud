@@ -77,7 +77,7 @@ void free_note_list(NOTE_DATA *note, int type);
 void free_char_note(NOTE_DATA *note);
 
 
-NOTE_DATA *new_note();
+NOTE_DATA *new_note(void);
 
 NOTE_DATA *note_list;
 NOTE_DATA *idea_list;
@@ -1323,7 +1323,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
 
 
 
-NOTE_DATA *new_note()
+NOTE_DATA *new_note(void)
 {
   NOTE_DATA *note;
 

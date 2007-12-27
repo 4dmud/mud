@@ -4807,19 +4807,19 @@ int sort_commands_helper(const void *a, const void *b)
 
 void sort_commands(void)
 {
-  int a, num_of_cmds = 0;
+  int a, cnum_of_cmds = 0;
 
-  while (complete_cmd_info[num_of_cmds].command[0] != '\n')
-    num_of_cmds++;
-  num_of_cmds++;         /* \n */
+  while (complete_cmd_info[cnum_of_cmds].command[0] != '\n')
+    cnum_of_cmds++;
+  cnum_of_cmds++;         /* \n */
 
-  CREATE(cmd_sort_info, int, num_of_cmds);
+  CREATE(cmd_sort_info, int, cnum_of_cmds);
 
-  for (a = 0; a < num_of_cmds; a++)
+  for (a = 0; a < cnum_of_cmds; a++)
     cmd_sort_info[a] = a;
 
   /* Don't sort the RESERVED or \n entries. */
-  qsort(cmd_sort_info + 1, num_of_cmds - 2, sizeof(int),  sort_commands_helper);
+  qsort(cmd_sort_info + 1, cnum_of_cmds - 2, sizeof(int),  sort_commands_helper);
 }
 
 

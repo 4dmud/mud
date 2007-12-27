@@ -220,19 +220,19 @@ void add_owner(int nr, long id)
 /* Scan a single rent database file for QIC's */
 void qic_scan_file(char *name, long id)
 {
-    char fname[MAX_STRING_LENGTH];
+    char qicfname[MAX_STRING_LENGTH];
     struct rent_info rent;
     int j, nr, objnum;
     FILE *fl;
     char line[MAX_INPUT_LENGTH];
     char buf1[MAX_INPUT_LENGTH];
 
-    if (!get_filename(name, fname, NEW_OBJ_FILES))
+    if (!get_filename(name, qicfname, NEW_OBJ_FILES))
 	return;
 
-    if (!(fl = fopen(fname, "r+b"))) {
+    if (!(fl = fopen(qicfname, "r+b"))) {
 	if (errno != ENOENT) {	/* if it fails, NOT because of no file */
-	    sprintf(buf1, "SYSERR: OPENING OBJECT FILE %s (4)", fname);
+	    sprintf(buf1, "SYSERR: OPENING OBJECT FILE %s (4)", qicfname);
 	    perror(buf1);
 	}
 	return;
@@ -444,7 +444,7 @@ ACMD(do_owners)
 ACMD(do_qload)
 {
     struct obj_data *obj;
-    int number, r_num;
+    int num, r_num;
     char buf[MAX_INPUT_LENGTH];
 
     one_argument(argument, buf);
@@ -453,12 +453,12 @@ ACMD(do_qload)
 	send_to_char("Usage: qload <virt num>\r\n", ch);
 	return;
     }
-    if ((number = atoi(buf)) < 0) {
+    if ((num = atoi(buf)) < 0) {
 	send_to_char("A NEGATIVE number??\r\n", ch);
 	return;
     }
 
-    if ((r_num = real_object(number)) < 0) {
+    if ((r_num = real_object(num)) < 0) {
 	send_to_char("There is no object with that number.\r\n", ch);
 	return;
     }

@@ -359,20 +359,20 @@ fubar:
 int Board_display_msg(int board_type, struct char_data *ch, char *arg,
                       struct obj_data *board)
 {
-  char number[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
+  char num[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   int msg, ind;
 
   if (BOARD_RNUM(board_type) == NOTHING)
     return 0;
 
-  one_argument(arg, number);
-  if (!*number)
+  one_argument(arg, num);
+  if (!*num)
     return (0);
-  if (isname(number, board->name))	/* so "read board" works */
+  if (isname(num, board->name))	/* so "read board" works */
     return (Board_show_board(board_type, ch, arg, board));
-  if (!is_number(number))	/* read 2.mail, look 2.sword */
+  if (!is_number(num))	/* read 2.mail, look 2.sword */
     return (0);
-  if (!(msg = atoi(number)))
+  if (!(msg = atoi(num)))
     return (0);
 
   if (GET_LEVEL(ch) < READ_LVL(board_type))
@@ -427,14 +427,14 @@ int Board_remove_msg(int board_type, struct char_data *ch, char *arg,
                      struct obj_data *board)
 {
   int ind, msg, slot_num, id;
-  char number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+  char num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   struct descriptor_data *d;
 
-  one_argument(arg, number);
+  one_argument(arg, num);
 
-  if (!*number || !is_number(number))
+  if (!*num || !is_number(num))
     return (0);
-  if (!(msg = atoi(number)))
+  if (!(msg = atoi(num)))
     return (0);
 
   if (!num_of_msgs[board_type])

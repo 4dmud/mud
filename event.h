@@ -6,5 +6,5 @@
 
 void add_event2(int delay, EVENT2(*func), void *causer, void *victim,
 		void *info);
-void run_events2();
+void run_events2(void);
 void clean_events2(void *pointer);

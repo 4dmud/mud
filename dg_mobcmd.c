@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.13  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.12  2006/04/09 05:15:44  w4dimenscor
  *
  * added the ability to script teleports to move followers:
@@ -308,7 +311,7 @@ ACMD(do_mlag)
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char_data *victim;
-  int wait = 0;
+  int w = 0;
 
   if (!MOB_OR_IMPL(ch))
   {
@@ -353,21 +356,21 @@ ACMD(do_mlag)
     return;
   }
 
-  if ((wait = atoi(arg2)) < 1)
+  if ((w = atoi(arg2)) < 1)
     return;
 
-  if (wait > 300)
+  if (w > 300)
   {
     mob_log(ch, "mlag: duration longer then 30 seconds outside range.");
     return;
   }
-  if (wait <= 0)
+  if (w <= 0)
     return;
 
 
-  wait = (wait RL_SEC)/10;
+  w = (w RL_SEC)/10;
 
-  WAIT_STATE(ch, wait);
+  WAIT_STATE(ch, w);
   return;
 }
 
@@ -624,7 +627,7 @@ ACMD(do_mzrecho)
 {
   int zone, lower_vnum, upper_vnum;
   char zone_name[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
-  char lower[MAX_INPUT_LENGTH], upper[MAX_INPUT_LENGTH];
+  char strlower[MAX_INPUT_LENGTH], strupper[MAX_INPUT_LENGTH];
 
   if (!MOB_OR_IMPL(ch))
   {
@@ -633,11 +636,11 @@ ACMD(do_mzrecho)
   }
 
   msg = any_one_arg(argument, zone_name);
-  msg = two_arguments(msg, lower, upper);
+  msg = two_arguments(msg, strlower, strupper);
 
   skip_spaces(&msg);
 
-  if (!*zone_name || !*msg || !*lower || !*upper)
+  if (!*zone_name || !*msg || !*strlower || !*strupper)
     mob_log(ch, "mzrecho called with too few args");
 
 
@@ -646,8 +649,8 @@ ACMD(do_mzrecho)
 
   else
   {
-    lower_vnum = atoi(lower);
-    upper_vnum = atoi(upper);
+    lower_vnum = atoi(strlower);
+    upper_vnum = atoi(strupper);
 
     sprintf(buf, "%s\r\n", msg);
     send_to_zone_range(buf, zone, lower_vnum, upper_vnum);
@@ -749,7 +752,7 @@ ACMD(do_mdamage)
 ACMD(do_mload)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  int number = 0;
+  int num = 0;
   char_data *mob;
   obj_data *object;
   char *target;
@@ -773,7 +776,7 @@ ACMD(do_mload)
 
   skip_spaces(&target);
 
-  if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0))
+  if (!*arg1 || !*arg2 || !is_number(arg2) || ((num = atoi(arg2)) < 0))
   {
     mob_log(ch, "mload: bad syntax");
     return;
@@ -789,11 +792,11 @@ ACMD(do_mload)
     {
       if (!isdigit(*target) || (rnum = real_room(atoi(target))) == NULL)
       {
-        mob_log(ch, "mload: room target vnum doesn't exist (loading mob vnum %d to room %s)", number, target);
+        mob_log(ch, "mload: room target vnum doesn't exist (loading mob vnum %d to room %s)", num, target);
         return;
       }
     }
-    if ((mob = read_mobile(number, VIRTUAL)) == NULL)
+    if ((mob = read_mobile(num, VIRTUAL)) == NULL)
     {
       mob_log(ch, "mload: bad mob vnum");
       return;
@@ -814,7 +817,7 @@ ACMD(do_mload)
 
   else if (is_abbrev(arg1, "obj"))
   {
-    if ((object = read_object(number, VIRTUAL)) == NULL)
+    if ((object = read_object(num, VIRTUAL)) == NULL)
     {
       mob_log(ch, "mload: bad object vnum");
       return;

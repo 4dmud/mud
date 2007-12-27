@@ -30,7 +30,7 @@ char *clan_name(int idnum);
 void update_clan_member(char * name, int rank, int clan);
 void remove_clan_member(char * name, int clan);
 void add_clan_member(char * name, int rank, int clan);
-void free_clan_lists();
+void free_clan_lists(void);
 long get_ptable_by_name(char *name);
 
 extern int TEMP_LOAD_CHAR;
@@ -599,13 +599,13 @@ void do_clan_expel(struct char_data *ch, char *arg)
   return;
 }
 
-int at_war(int clan, int war_clan)
+int at_war(int cln, int war_clan)
 {
 
   return 1;
 }
 
-void declare_war(int clan, int war_clan)
+void declare_war(int cln, int war_clan)
 {}
 
 void do_clan_war(struct char_data *ch, char *arg)
@@ -1090,7 +1090,7 @@ void save_clan_index(void)
   }
 }
 
-void save_clans()
+void save_clans(void)
 {
   int i;
   for (i = 0; i < num_of_clans; i++)
@@ -1099,7 +1099,7 @@ void save_clans()
   save_clan_index();
 }
 
-void new_init_clans()
+void new_init_clans(void)
 {
   int i;
   for (i = 0; i < num_of_clans; i++)
@@ -2300,7 +2300,7 @@ ACMD(do_clan)
   send_clan_format(ch);
 }
 
-void add_clan_member(char * name, int rank, int clan)
+void add_clan_member(char * name, int rank, int cln)
 {
   struct clan_list_data *temp;
 
@@ -2310,21 +2310,21 @@ void add_clan_member(char * name, int rank, int clan)
   CREATE(temp, struct clan_list_data, 1);
   temp->name = strdup(name);
   temp->rank = rank;
-  temp->next = clan_list[clan];
-  clan_list[clan] = temp;
+  temp->next = clan_list[cln];
+  clan_list[cln] = temp;
 }
 
-void remove_clan_member(char * name, int clan)
+void remove_clan_member(char * name, int cln)
 {
   struct clan_list_data *temp, *find;
-  if (clan_list[clan] == NULL || !name || !*name)
+  if (clan_list[cln] == NULL || !name || !*name)
     return;
-  find = clan_list[clan];
+  find = clan_list[cln];
   while (find)
   {
     if (!strcmp(find->name, name))
     {
-      REMOVE_FROM_LIST(find, clan_list[clan], next);
+      REMOVE_FROM_LIST(find, clan_list[cln], next);
       free_string(&find->name);
       free(find);
       return;
@@ -2334,12 +2334,12 @@ void remove_clan_member(char * name, int clan)
 
 }
 
-void update_clan_member(char * name, int rank, int clan)
+void update_clan_member(char * name, int rank, int cln)
 {
   struct clan_list_data  *find;
-  if (clan_list[clan] == NULL || !name || !*name)
+  if (clan_list[cln] == NULL || !name || !*name)
     return;
-  find = clan_list[clan];
+  find = clan_list[cln];
   while (find)
   {
     if (!str_cmp(find->name, name))
@@ -2364,7 +2364,7 @@ void free_clan_list(struct clan_list_data *find)
   free(find);
 }
 
-void free_clan_lists()
+void free_clan_lists(void)
 {
   int i;
   for (i = 0; i < num_of_clans; i++)

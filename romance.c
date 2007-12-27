@@ -26,7 +26,7 @@
 #include "romance.h"
 
 /* local functions */
-int genpreg();
+int genpreg(void);
 int crashcheck_alpha(struct char_data *ch, struct char_data *vict);
 
 
@@ -1119,14 +1119,13 @@ ACMD(do_deny)
 }
 
 /* Generates a pregnancy time */
-int genpreg()
+int genpreg(void)
 {
-  int time;
-  int rand_time;
-  time = (NINE_MONTHS);
+  int t, rand_time;
+  t = (NINE_MONTHS);
   rand_time = dice(6, 6);     /* Max = 36 (One more mudmonth) Min = 6 (Less than one MudWeek) */
-  time = time + rand_time + 2;
-  return time;
+  t = t + rand_time + 2;
+  return t;
 }
 
 /* Certain late-pregnancy symptoms.. */

@@ -28,9 +28,9 @@ extern struct htree_node *HTREE_NULL;
 extern int htree_total_nodes;
 extern int htree_depth_used;
 
-struct htree_node *htree_init();
+struct htree_node *htree_init(void);
 void htree_free(struct htree_node *root);
 void htree_add(struct htree_node *root, IDXTYPE index, IDXTYPE content);
 void htree_del(struct htree_node *root, IDXTYPE index);
 IDXTYPE htree_find(struct htree_node *root, IDXTYPE index);
-void htree_test();
+void htree_test(void);

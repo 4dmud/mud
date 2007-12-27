@@ -48,14 +48,14 @@ ACMD(do_oasis_redit)
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  int number = NOWHERE, save = 0;
+  int num = NOWHERE, save = 0;
   struct descriptor_data *d;
 
   /* Parse any arguments. */
   buf3 = two_arguments(argument, buf1, buf2);
 
   if (!*buf1)
-    number = GET_ROOM_VNUM(IN_ROOM(ch));
+    num = GET_ROOM_VNUM(IN_ROOM(ch));
   else if (!isdigit(*buf1))
   {
     if (str_cmp("save", buf1) != 0)
@@ -67,18 +67,18 @@ ACMD(do_oasis_redit)
     save = TRUE;
 
     if (is_number(buf2))
-      number = atoi(buf2);
+      num = atoi(buf2);
     else if (GET_OLC_ZONE(ch) >= 0)
     {
       zone_rnum zlok;
 
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
-        number = NOWHERE;
+        num = NOWHERE;
       else
-        number = genolc_zone_bottom(zlok);
+        num = genolc_zone_bottom(zlok);
     }
 
-    if (number == NOWHERE)
+    if (num == NOWHERE)
     {
       new_send_to_char(ch, "Save which zone?\r\n");
       return;
@@ -88,15 +88,15 @@ ACMD(do_oasis_redit)
   /*
    * If a numeric argument was given (like a room number), get it.
    */
-  if (number == NOWHERE)
-    number = atoi(buf1);
+  if (num == NOWHERE)
+    num = atoi(buf1);
 
   /* Check to make sure the room isn't already being edited. */
   for (d = descriptor_list; d; d = d->next)
   {
     if (STATE(d) == CON_REDIT)
     {
-      if (d->olc && OLC_NUM(d) == number)
+      if (d->olc && OLC_NUM(d) == num)
       {
         new_send_to_char(ch, "That room is currently being edited by %s.\r\n",
                          PERS(d->character, ch));
@@ -119,7 +119,7 @@ ACMD(do_oasis_redit)
   CREATE(d->olc, struct oasis_olc_data, 1);
 
   /* Find the zone. */
-  OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
+  OLC_ZNUM(d) = save ? real_zone(num) : real_zone_by_thing(num);
   if (OLC_ZNUM(d) == NOWHERE)
   {
     new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
@@ -154,10 +154,10 @@ ACMD(do_oasis_redit)
     return;
   }
 
-  OLC_NUM(d) = number;
+  OLC_NUM(d) = num;
 
-  if (world_vnum[number])
-    redit_setup_existing(d, number);
+  if (world_vnum[num])
+    redit_setup_existing(d, num);
   else
     redit_setup_new(d);
 
@@ -603,7 +603,7 @@ void redit_disp_menu(struct descriptor_data *d)
 
 void redit_parse(struct descriptor_data *d, char *arg)
 {
-  int number;
+  int num;
   char *oldtext = NULL;
 
   switch (OLC_MODE(d))
@@ -830,46 +830,46 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
     break;
   case REDIT_MINE_NUMBER:
-    number = atoi(arg);
-    if (number < -1)
+    num = atoi(arg);
+    if (num < -1)
     {
       write_to_output(d, "You can't choose a number below -1\r\n");
       return;
     }
-    else if (number > 100)
+    else if (num > 100)
     {
       write_to_output(d, "You can't choose a number above 100\r\n");
       return;
     }
-    OLC_ROOM(d)->mine.num = number;
+    OLC_ROOM(d)->mine.num = num;
     break;
   case REDIT_MINE_DIFFICULTY:
-    number = atoi(arg);
-    if (number < 0)
+    num = atoi(arg);
+    if (num < 0)
     {
       write_to_output(d, "You can't choose a number below 0\r\n");
       return;
     }
-    else if (number > 5)
+    else if (num > 5)
     {
       write_to_output(d, "You can't choose a number above 5\r\n");
       return;
     }
-    OLC_ROOM(d)->mine.dif = number;
+    OLC_ROOM(d)->mine.dif = num;
     break;
   case REDIT_MINE_TOOL:
-    number = atoi(arg);
-    if (number < 0)
+    num = atoi(arg);
+    if (num < 0)
     {
       write_to_output(d, "You can't choose a number below 0\r\n");
       return;
     }
-    else if (number > 1)
+    else if (num > 1)
     {
       write_to_output(d, "You can't choose a number above 1\r\n");
       return;
     }
-    OLC_ROOM(d)->mine.tool = number;
+    OLC_ROOM(d)->mine.tool = num;
     break;
 
   case OLC_SCRIPT_EDIT:
@@ -909,33 +909,33 @@ void redit_parse(struct descriptor_data *d, char *arg)
     write_to_output(d, "Oops, in REDIT_DESC.\r\n");
     break;
   case REDIT_FLAGS:
-    number = atoi(arg);
-    if (number < 0 || number > NUM_ROOM_FLAGS)
+    num = atoi(arg);
+    if (num < 0 || num > NUM_ROOM_FLAGS)
     {
       write_to_output(d, "That is not a valid choice!\r\n");
       redit_disp_flag_menu(d);
     }
-    else if (number == 0)
+    else if (num == 0)
       break;
     else
     {
       /*
        * Toggle the bit.
        */
-      TOGGLE_BIT_AR(OLC_ROOM(d)->room_flags, (number - 1));
+      TOGGLE_BIT_AR(OLC_ROOM(d)->room_flags, (num - 1));
       redit_disp_flag_menu(d);
     }
     return;
 
   case REDIT_SECTOR:
-    number = atoi(arg);
-    if (number < 0 || number >= NUM_ROOM_SECTORS)
+    num = atoi(arg);
+    if (num < 0 || num >= NUM_ROOM_SECTORS)
     {
       write_to_output(d, "Invalid choice!");
       redit_disp_sector_menu(d);
       return;
     }
-    OLC_ROOM(d)->sector_type = number;
+    OLC_ROOM(d)->sector_type = num;
     break;
 
   case REDIT_EXIT_MENU:
@@ -991,8 +991,8 @@ void redit_parse(struct descriptor_data *d, char *arg)
   case REDIT_EXIT_NUMBER:
     {
       room_rnum rm = NULL;
-      if ((number = atoi(arg)) != -1)
-        if ((rm = real_room(number)) == NULL)
+      if ((num = atoi(arg)) != -1)
+        if ((rm = real_room(num)) == NULL)
         {
           write_to_output(d, "That room does not exist, try again : ");
           return;
@@ -1018,17 +1018,17 @@ void redit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case REDIT_EXIT_KEY:
-    number = atoi(arg);
-    if (number < 0)
+    num = atoi(arg);
+    if (num < 0)
       OLC_EXIT(d)->key = NOTHING;
     else
-      OLC_EXIT(d)->key = number;
+      OLC_EXIT(d)->key = num;
     redit_disp_exit_menu(d);
     return;
 
   case REDIT_EXIT_DOORFLAGS:
-    number = atoi(arg);
-    if (number < 0 || number > 2)
+    num = atoi(arg);
+    if (num < 0 || num > 2)
     {
       write_to_output(d, "That's not a valid choice!\r\n");
       redit_disp_exit_flag_menu(d);
@@ -1038,9 +1038,9 @@ void redit_parse(struct descriptor_data *d, char *arg)
       /*
        * Doors are a bit idiotic, don't you think? :) -- I agree. -gg
        */
-      OLC_EXIT(d)->exit_info = (number == 0 ? 0 :
-                                (number == 1 ? EX_ISDOOR :
-                                 (number == 2 ? EX_ISDOOR | EX_PICKPROOF : 0)));
+      OLC_EXIT(d)->exit_info = (num == 0 ? 0 :
+                                (num == 1 ? EX_ISDOOR :
+                                 (num == 2 ? EX_ISDOOR | EX_PICKPROOF : 0)));
       /*
        * Jump back to the menu system.
        */
@@ -1059,7 +1059,7 @@ void redit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case REDIT_EXTRADESC_MENU:
-    switch ((number = atoi(arg)))
+    switch ((num = atoi(arg)))
     {
     case 0:
       /*
@@ -1134,7 +1134,7 @@ void redit_parse(struct descriptor_data *d, char *arg)
     redit_disp_look_under_menu(d);
     return;
   case REDIT_LOOK_UNDER_MENU:
-    switch ((number = atoi(arg)))
+    switch ((num = atoi(arg)))
     {
     case 0:
       /*
@@ -1207,7 +1207,7 @@ void redit_parse(struct descriptor_data *d, char *arg)
     redit_disp_look_behind_menu(d);
     return;
   case REDIT_LOOK_BEHIND_MENU:
-    switch ((number = atoi(arg)))
+    switch ((num = atoi(arg)))
     {
     case 0:
       /*
@@ -1283,7 +1283,7 @@ void redit_parse(struct descriptor_data *d, char *arg)
     redit_disp_look_above_menu(d);
     return;
   case REDIT_LOOK_ABOVE_MENU:
-    switch ((number = atoi(arg)))
+    switch ((num = atoi(arg)))
     {
     case 0:
       /*

@@ -287,14 +287,14 @@ void alter_hit(struct char_data *ch, int amount)
   if (GET_HIT(ch) < GET_MAX_HIT(ch) && GET_POINTS_EVENT(ch, REGEN_HIT) == NULL)
   {
     struct regen_event_obj *regen = NULL;
-    long time;
+    long t;
     int gain;
     CREATE(regen, struct regen_event_obj, 1);
     regen->ch = ch;
     regen->type = REGEN_HIT;
     gain = (hit_gain(ch));
-    time = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
-    GET_POINTS_EVENT(ch, REGEN_HIT) = event_create(points_event, regen, time);
+    t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
+    GET_POINTS_EVENT(ch, REGEN_HIT) = event_create(points_event, regen, t);
     if (amount >= 0)
     {
 
@@ -331,14 +331,14 @@ void alter_mana(struct char_data *ch, int amount)
     if (GET_POS(ch) >= POS_STUNNED)
     {
       struct regen_event_obj *regen = NULL;
-      long time;
+      long t;
       int gain;
       CREATE(regen, struct regen_event_obj, 1);
       regen->ch = ch;
       regen->type = REGEN_MANA;
       gain = (mana_gain(ch));
-      time = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
-      GET_POINTS_EVENT(ch, REGEN_MANA) = event_create(points_event, regen, time);
+      t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
+      GET_POINTS_EVENT(ch, REGEN_MANA) = event_create(points_event, regen, t);
     }
   }
 }
@@ -366,16 +366,16 @@ void alter_move(struct char_data *ch, int amount)
     if (GET_POS(ch) >= POS_STUNNED)
     {
       struct regen_event_obj *regen = NULL;
-      long time;
+      long t;
       int gain;
       CREATE(regen, struct regen_event_obj, 1);
       regen->ch = ch;
       regen->type = REGEN_MOVE;
       gain = (move_gain(ch));
 
-      time = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
+      t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
       GET_POINTS_EVENT(ch, REGEN_MOVE) =
-        event_create(points_event, regen, time);
+        event_create(points_event, regen, t);
     }
   }
 }
@@ -402,16 +402,16 @@ void alter_stamina(struct char_data *ch, int amount)
     if (GET_POS(ch) >= POS_STUNNED)
     {
       struct regen_event_obj *regen = NULL;
-      long time;
+      long t;
       int gain;
       CREATE(regen, struct regen_event_obj, 1);
       regen->ch = ch;
       regen->type = REGEN_STAMINA;
       gain = (stamina_gain(ch));
 
-      time = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
+      t = PULSES_PER_MUD_HOUR / (gain ? gain : 1);
       GET_POINTS_EVENT(ch, REGEN_STAMINA) =
-        event_create(points_event, regen, time);
+        event_create(points_event, regen, t);
     }
   }
   if (GET_STAMINA(ch) > (10 - GET_MAX_STAMINA(ch)))
@@ -429,7 +429,7 @@ void check_regen_rates(struct char_data *ch)
 {
   struct regen_event_obj *regen;
   int type, gain = 0;
-  long time;
+  long t;
 
   if (ch == NULL || GET_HIT(ch) <= HIT_INCAP)
     return;
@@ -463,10 +463,10 @@ void check_regen_rates(struct char_data *ch)
       break;
     }
 
-    time = PULSES_PER_MUD_HOUR / (gain > 0 ? gain : 1);
+    t = PULSES_PER_MUD_HOUR / (gain > 0 ? gain : 1);
 
     if (GET_POINTS_EVENT(ch, type) == NULL ||
-        (time < event_time(GET_POINTS_EVENT(ch, type))))
+        (t < event_time(GET_POINTS_EVENT(ch, type))))
     {
 
       /* take off old event, create updated event */
@@ -478,7 +478,7 @@ void check_regen_rates(struct char_data *ch)
       regen->ch = ch;
       regen->type = type;
       GET_POINTS_EVENT(ch, type) =
-        event_create(points_event, regen, time);
+        event_create(points_event, regen, t);
     }
   }
 }

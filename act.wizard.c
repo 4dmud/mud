@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.47  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.46  2006/04/30 15:32:01  w4dimenscor
  * added the addtp command, so that senior imms can add and deduct points.
  *
@@ -2076,11 +2079,11 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     new_send_to_char(ch, "To see global variables: type\r\nvstat player <name>\r\n");
     if (GET_LEVEL(ch) == LVL_IMPL && k->desc)
     {
-      int i, cnt = 0;
+      int m, cnt = 0;
       new_send_to_char(ch, "Last commands typed, oldest at top, newest at bottom:\r\n");
-      for (i = 0; i < HISTORY_SIZE;i++)
+      for (m = 0; m < HISTORY_SIZE;j++)
       {
-        if (k->desc->history[i])
+        if (k->desc->history[m])
           new_send_to_char(ch, "{cY%d:{cg %s{c0\r\n", cnt++, k->desc->history[i]);
 
       }
@@ -2288,29 +2291,29 @@ ACMD(do_stat)
   else
   {
     char *name = buf1;
-    int number = get_number(&name);
+    int num = get_number(&name);
 
     if ((object =
-           get_obj_in_equip_vis(ch, name, &number,
+           get_obj_in_equip_vis(ch, name, &num,
                                 ch->equipment)) != NULL)
       do_stat_object(ch, object);
     else if ((object =
-                get_obj_in_list_vis(ch, name, &number,
+                get_obj_in_list_vis(ch, name, &num,
                                     ch->carrying)) != NULL)
       do_stat_object(ch, object);
     else if ((victim =
-                get_char_vis(ch, name, &number, FIND_CHAR_ROOM)) != NULL)
+                get_char_vis(ch, name, &num, FIND_CHAR_ROOM)) != NULL)
       do_stat_character(ch, victim);
     else if ((object =
-                get_obj_in_list_vis(ch, name, &number,
+                get_obj_in_list_vis(ch, name, &num,
                                     IN_ROOM(ch)->contents)) !=
              NULL)
       do_stat_object(ch, object);
     else if ((victim =
-                get_char_vis(ch, name, &number,
+                get_char_vis(ch, name, &num,
                              FIND_CHAR_WORLD)) != NULL)
       do_stat_character(ch, victim);
-    else if ((object = get_obj_vis(ch, name, &number)) != NULL)
+    else if ((object = get_obj_vis(ch, name, &num)) != NULL)
       do_stat_object(ch, object);
     else
     {
@@ -2573,7 +2576,7 @@ ACMD(do_load)
   char timesb[MAX_STRING_LENGTH];
   char *times = timesb;
   int tnum = 0;
-  mob_vnum number;
+  mob_vnum num;
   mob_rnum r_num;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
@@ -2593,16 +2596,16 @@ ACMD(do_load)
     return;
   }
 
-  if ((number = atoi(buf2)) < 0)
+  if ((num = atoi(buf2)) < 0)
   {
     new_send_to_char(ch,"A NEGATIVE number??\r\n");
     return;
   }
   if (is_abbrev(buf, "mob"))
   {
-    if ((r_num = real_mobile(number)) < 0)
+    if ((r_num = real_mobile(num)) < 0)
     {
-      new_send_to_char(ch,"There is no monster with the number %d.\r\n", number);
+      new_send_to_char(ch,"There is no monster with the number %d.\r\n", num);
       return;
     }
     for ((tnum == 0 ? tnum = 1 : tnum) ;tnum>0; tnum--)
@@ -2618,9 +2621,9 @@ ACMD(do_load)
   }
   else if (is_abbrev(buf, "obj"))
   {
-    if ((r_num = real_object(number)) < 0)
+    if ((r_num = real_object(num)) < 0)
     {
-      new_send_to_char(ch, "There is no object with the number %d.\r\n",number);
+      new_send_to_char(ch, "There is no object with the number %d.\r\n",num);
       return;
     }
 
@@ -2662,7 +2665,7 @@ ACMD(do_vstat)
 {
   struct char_data *mob;
   struct obj_data *obj;
-  mob_vnum number;		/* or obj_vnum ... */
+  mob_vnum num;		/* or obj_vnum ... */
   mob_rnum r_num;		/* or obj_rnum ... */
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
@@ -2688,16 +2691,16 @@ ACMD(do_vstat)
       new_send_to_char(ch,"No such player around.\r\n");
     return;
   }
-  if ((number = atoi(buf2)) < 0)
+  if ((num = atoi(buf2)) < 0)
   {
     new_send_to_char(ch,"A NEGATIVE number??\r\n");
     return;
   }
   if (is_abbrev(buf, "mob"))
   {
-    if ((r_num = real_mobile(number)) < 0)
+    if ((r_num = real_mobile(num)) < 0)
     {
-      new_send_to_char(ch,"There is no monster with the number %d.\r\n", number);
+      new_send_to_char(ch,"There is no monster with the number %d.\r\n", num);
       return;
     }
     mob = read_mobile(r_num, REAL);
@@ -2707,9 +2710,9 @@ ACMD(do_vstat)
   }
   else if (is_abbrev(buf, "obj"))
   {
-    if ((r_num = real_object(number)) < 0)
+    if ((r_num = real_object(num)) < 0)
     {
-      new_send_to_char(ch,"There is no object with the number %d.\r\n", number);
+      new_send_to_char(ch,"There is no object with the number %d.\r\n", num);
       return;
     }
     obj = read_object(r_num, REAL);
@@ -5585,20 +5588,19 @@ ACMD(do_set)
 void out_rent(char *name)
 {
   FILE *fl, *fp;
-  char fname[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH],
-  fname2[MAX_INPUT_LENGTH];
+  char ofname[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH],  fname2[MAX_INPUT_LENGTH];
   struct obj_file_elem object;
   struct obj_data *obj;
   struct rent_info rent;
 
-  if (!get_filename(name, fname, CRASH_FILE))
+  if (!get_filename(name, ofname, CRASH_FILE))
     return;
-  if (!(fl = fopen(fname, "rb")))
+  if (!(fl = fopen(ofname, "rb")))
   {
     return;
   }
 
-  snprintf(buf, sizeof(buf), "%s\r\n", fname);
+  snprintf(buf, sizeof(buf), "%s\r\n", ofname);
   if (!feof(fl))
     fread(&rent, sizeof(struct rent_info), 1, fl);
 

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.28  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.27  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -128,12 +131,14 @@ extern int holler_move_cost;
 
 /* extern functions */
 extern struct time_info_data time_info;
+void ReplaceString ( char * string, char * search, char * replace , size_t len);
 
 /* local functions */
 void perform_tell(struct char_data *ch, struct char_data *vict, char *arg);
 int is_tell_ok(struct char_data *ch, struct char_data *vict);
 void add_to_comm(const char *type, const char *text);
 int is_ignoring(struct char_data *ch, struct char_data *vict);
+char *fix_grammar(char * str, size_t len);
 ACMD(do_say);
 ACMD(do_gsay);
 ACMD(do_tell);
@@ -309,7 +314,7 @@ ACMD(do_say)
       strcpy(argument, "roar");
     }
     else {}
-
+    argument = fix_grammar(argument, MAX_INPUT_LENGTH);
     argument = makedrunk(argument, ch);
 
 
@@ -549,7 +554,8 @@ ACMD(do_sayto)
     {
       strcpy(argument, "roar");
     }
-
+    
+    argument = fix_grammar(argument, MAX_INPUT_LENGTH);
     argument = makedrunk(argument, ch);
 
     len = strlen(argument);
@@ -717,6 +723,7 @@ ACMD(do_gsay)
       k = ch;
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {
+      argument = fix_grammar(argument, MAX_INPUT_LENGTH);
       argument = makedrunk(argument, ch);
       snprintf(buf, sizeof(buf), "$n tells the group, '%s'", argument);
 
@@ -741,6 +748,7 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
   
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
+    arg = fix_grammar(arg, MAX_INPUT_LENGTH);
     arg = makedrunk(arg, ch);
     if (IS_NPC(ch))
     snprintf(buf, sizeof(buf), "$n tells you, '%s%s%s'",
@@ -946,6 +954,7 @@ ACMD(do_spec_comm)
   {
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {
+      argument = fix_grammar(buf2, sizeof(buf2));
       argument = makedrunk(buf2, ch);
       snprintf(buf, sizeof(buf), "$n %s you, '%s'", action_plur, buf2);
       act(buf, FALSE, ch, 0, vict, TO_VICT);
@@ -1344,6 +1353,8 @@ ACMD(do_gen_comm)
   {
     strcpy(argument, "roar");
   }
+  
+  argument = fix_grammar(argument, MAX_INPUT_LENGTH);
   argument = makedrunk(argument, ch);
   if (subcmd == SCMD_HOLLER)
   {
@@ -1454,6 +1465,9 @@ ACMD(do_qcomm)
                      CMD_NAME, CMD_NAME);
   else
   {
+    
+    argument = fix_grammar(argument, MAX_INPUT_LENGTH);
+    
     if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
       send_to_char("The walls seem to absorb your words.\r\n", ch);
     else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
@@ -1552,7 +1566,9 @@ ACMD(do_ctell)
     send_to_char("What do you want to tell your clan?\r\n", ch);
     return;
   }
-
+  
+  argument = fix_grammar(argument, MAX_INPUT_LENGTH);
+  
   if (*argument == '#')
   {
     char loc_a[MAX_INPUT_LENGTH];
@@ -1621,6 +1637,35 @@ ACMD(do_ctell)
   }
 
   return;
+}
+
+char *fix_grammar(char * str, size_t len) {
+  ReplaceString(str, " i ", " I ", len);
+  ReplaceString(str, " im ", " I'm ", len);
+  ReplaceString(str, "i'm", " I'm ", len);
+  ReplaceString(str, "Im", " I'm ", len);
+  ReplaceString(str, " ive ", " I've ", len);
+  ReplaceString(str, " Ive ", " I've ", len);
+  ReplaceString(str, "itll", "it'll", len);
+  ReplaceString(str, "teh", "the", len);
+  ReplaceString(str, "theres", "there's", len);
+  ReplaceString(str, "wehn", "when", len);
+  ReplaceString(str, " alot ", " a lot ", len);
+  ReplaceString(str, " accross ", " across ", len);
+  ReplaceString(str, " acn ", " can ", len);
+  ReplaceString(str, " acnnot ", " cannot ", len);
+  ReplaceString(str, " adn ", " and ", len);
+  ReplaceString(str, "ahve", "have", len);
+  ReplaceString(str, "amke", "make", len);
+  ReplaceString(str, "arent", "aren't", len);
+  ReplaceString(str, "arn't", "aren't", len);
+  ReplaceString(str, " asthe ", " as the ", len);
+  ReplaceString(str, " atthe ", " at the ", len);
+  ReplaceString(str, " n;t ", " n't ", len);
+  ReplaceString(str, "havent", "haven't", len);
+  ReplaceString(str, "perhapes", "perhaps", len);
+
+  return str;
 }
 
 

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.33  2006/05/01 11:29:26  w4dimenscor
+ * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
+ *
  * Revision 1.32  2006/03/22 22:18:23  w4dimenscor
  * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
  *
@@ -162,7 +165,7 @@ extern int message_type;
    int (name)(struct char_data *ch, void *me, int cmd, char *argument)
 
 #define C_FUNC(name) \
-	void (name) (struct descriptor_data *d, char *arg, void *info)
+	void (name) (struct descriptor_data *d, char *arg, void *cinfo)
 
 /* misc editor defines **************************************************/
 

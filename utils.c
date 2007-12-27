@@ -218,15 +218,15 @@ int number(int from, int to)
 
 
 /* simulates dice roll */
-int dice(int number, int size)
+int dice(int num, int size)
 {
   int sum = 0;
 
 
-  if (size <= 0 || number <= 0)
+  if (size <= 0 || num <= 0)
     return (0);
 
-  while (number-- > 0)
+  while (num-- > 0)
     sum += ((circle_random() % size) + 1);
 
   return (sum);
@@ -1605,12 +1605,12 @@ size_t commafmt(char   *buf,            /* Buffer for formatted string  */
   return (size_t)len;
 }
 
-const char *ordinal_text(int number)
+const char *ordinal_text(int num)
 {
 const char *text[] = {"th", "st", "nd", "rd"};
-  if (((number %= 100) > 9 && number < 20) || (number %= 10) > 3)
-    number = 0;
-  return text[number];
+  if (((num %= 100) > 9 && num < 20) || (num %= 10) > 3)
+    num = 0;
+  return text[num];
 }
 
 /* wiz functions */
@@ -2026,7 +2026,7 @@ int fileExists (char * fileName)
 
 
 // Replace a section of a string with another.
-void ReplaceSection ( char * string, int length, char * replace )
+void ReplaceSection ( char * string, int length, char * replace , size_t len)
 {
   int repLength = (replace == NULL ? 0: strlen(replace));
   
@@ -2045,13 +2045,29 @@ void ReplaceSection ( char * string, int length, char * replace )
 }
 
 // Replace all occurrences of a string with another.
-void ReplaceString ( char * string, char * search, char * replace )
+void ReplaceString ( char * string, char * search, char * replace, size_t len )
 {
   char *found;
+  size_t repsize = strlen(replace);
+  int smaller = (repsize <= strlen(search));
+  
+
+  
+  if (!strcmp(search, replace))
+    return;
   // Replace all occurrences.
-  if (string != NULL && search != NULL && replace != NULL)
-    while ( ( found = strstr ( string, search ) ) != NULL )
-    {
-      ReplaceSection(found, strlen(search), replace );
-    }
+  if (string != NULL && search != NULL && replace != NULL) {
+    
+    found = strstr ( string, search );
+    do {
+      if (found == NULL)
+        break;
+      
+      if (smaller || ((strlen(string) + strlen(replace)) < len))
+        ReplaceSection(found, strlen(search), replace , len);
+      else
+        break;
+      found = strstr(found + repsize, search);
+    } while (found != NULL);
+  }
 }

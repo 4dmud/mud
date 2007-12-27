@@ -319,7 +319,7 @@ SPECIAL(vehicle_controls)
 
 SPECIAL(vehicle_hatch)
 {
-    struct obj_data *hatch, *vehicle;
+    struct obj_data *hatch, *v;
     if (CMD_IS("leave")) {
 	hatch =
 	    get_obj_in_list_type(ITEM_V_HATCH,
@@ -328,15 +328,15 @@ SPECIAL(vehicle_hatch)
 	    send_to_char("ERROR!  Hatch is there, yet it isn't!\r\n", ch);
 	    return (1);
 	}
-	vehicle = find_vehicle_by_vnum(GET_OBJ_VAL(hatch, 0));
-	if (!vehicle) {
+	v = find_vehicle_by_vnum(GET_OBJ_VAL(hatch, 0));
+	if (!v) {
 	    send_to_char("ERROR!  Vehicle has been lost somehow!\r\n", ch);
 	    return (1);
 	}
-	act("$n leaves $o.", TRUE, ch, vehicle, 0, TO_ROOM);
-	act("You climb out of $o.", TRUE, ch, vehicle, 0, TO_CHAR);
-	move_char_to(ch, vehicle->in_room);
-	act("$n climbs out of $o.", TRUE, ch, vehicle, 0, TO_ROOM);
+	act("$n leaves $o.", TRUE, ch, v, 0, TO_ROOM);
+	act("You climb out of $o.", TRUE, ch, v, 0, TO_CHAR);
+	move_char_to(ch, v->in_room);
+	act("$n climbs out of $o.", TRUE, ch, v, 0, TO_ROOM);
 
 	/* Now show them the room */
 	do_look(ch, "", 0, 0);
@@ -349,7 +349,7 @@ SPECIAL(vehicle_hatch)
 
 SPECIAL(vehicle_window)
 {
-    struct obj_data *viewport, *vehicle;
+    struct obj_data *viewport, *v;
     char arg[MAX_INPUT_LENGTH];
     if (CMD_IS("look")) {
 	one_argument(argument, arg);
@@ -362,13 +362,13 @@ SPECIAL(vehicle_window)
 		    ("ERROR!  Viewport present, yet not present!\r\n", ch);
 		return (1);
 	    }
-	    vehicle = find_vehicle_by_vnum(GET_OBJ_VAL(viewport, 0));
-	    if (!vehicle) {
+	    v = find_vehicle_by_vnum(GET_OBJ_VAL(viewport, 0));
+	    if (!v) {
 		send_to_char("ERROR!  Vehicle has been lost somehow!\r\n",
 			     ch);
 		return (1);
 	    }
-	    view_room_by_rnum(ch, vehicle->in_room);
+	    view_room_by_rnum(ch, v->in_room);
 	    return (1);
 	}
     }

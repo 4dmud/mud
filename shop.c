@@ -469,20 +469,20 @@ struct obj_data *get_slide_obj_vis(struct char_data *ch, char *name,
                                          struct obj_data *list)
 {
   struct obj_data *i, *last_match = NULL;
-  int j, number;
+  int j, num;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
 
   strlcpy(tmpname, name, sizeof(tmpname));
   tmp = tmpname;
-  if (!(number = get_number(&tmp)))
+  if (!(num = get_number(&tmp)))
     return (NULL);
 
-  for (i = list, j = 1; i && (j <= number); i = i->next_content)
+  for (i = list, j = 1; i && (j <= num); i = i->next_content)
     if (isname(tmp, i->name))
       if (CAN_SEE_OBJ(ch, i) && !same_obj(last_match, i))
       {
-        if (j == number)
+        if (j == num)
           return (i);
         last_match = i;
         j++;

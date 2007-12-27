@@ -34,7 +34,7 @@ int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd);
 float m_powf(float x, float y);
 struct mob_stat_table mob_stats[MAX_MOB_LEVELS];
 
-void assign_mob_stats()
+void assign_mob_stats(void)
 {
   int s[11] =     {0, 100, 1, 8, 0, 1, 1, 0, 100, 0, 0};
 

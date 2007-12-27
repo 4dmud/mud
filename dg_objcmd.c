@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/04/09 05:26:34 $
-*  $Revision: 1.8 $
+*  $Date: 2006/05/01 11:29:26 $
+*  $Revision: 1.9 $
 **************************************************************************/
 
 #include "conf.h"
@@ -205,7 +205,7 @@ OCMD(do_oforce)
 OCMD(do_olag)
 {
   char_data *victim;
-  int wait = 0;
+  int w = 0;
   //int room;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
@@ -241,10 +241,10 @@ OCMD(do_olag)
     return;
   }
 
-  if ((wait = atoi(arg2)) < 1)
+  if ((w = atoi(arg2)) < 1)
     return;
 
-  if (wait > 300)
+  if (w > 300)
   {
     obj_log(obj,"olag: duration longer then 30 seconds outside range.");
     return;
@@ -252,9 +252,9 @@ OCMD(do_olag)
 
 
 
-  wait = (wait RL_SEC)*0.1;
+  w = (w RL_SEC)*0.1;
 
-  WAIT_STATE(victim, wait);
+  WAIT_STATE(victim, w);
   return;
 }
 
@@ -529,7 +529,7 @@ OCMD(do_oteleport)
 OCMD(do_dgoload)
 {
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-    int number = 0;
+    int num = 0;
     room_rnum room;
     char_data *mob;
     obj_data *object;
@@ -543,7 +543,7 @@ OCMD(do_dgoload)
   skip_spaces(&target);
 
     if (!*arg1 || !*arg2 || !is_number(arg2)
-	|| ((number = atoi(arg2)) < 0)) {
+	|| ((num = atoi(arg2)) < 0)) {
 	obj_log(obj, "oload: bad syntax");
 	return;
     }
@@ -560,11 +560,11 @@ OCMD(do_dgoload)
 	rnum = room;
 	else {
 	if (!isdigit(*target) || (rnum = real_room(atoi(target))) == NULL) {
-	obj_log(obj, "oload: room target vnum doesn't exist (loading mob vnum %d to room %s)", number, target);
+	obj_log(obj, "oload: room target vnum doesn't exist (loading mob vnum %d to room %s)", num, target);
 	return;
 	}
 	}
-        if ((mob = read_mobile(number, VIRTUAL)) == NULL) {
+        if ((mob = read_mobile(num, VIRTUAL)) == NULL) {
             obj_log(obj, "oload: bad mob vnum");
             return;
 	   
@@ -579,7 +579,7 @@ OCMD(do_dgoload)
     }
 
     else if (is_abbrev(arg1, "obj")) {
-      if ((object = read_object(number, VIRTUAL)) == NULL) {
+      if ((object = read_object(num, VIRTUAL)) == NULL) {
 	    obj_log(obj, "oload: bad object vnum");
 	    return;
 	}
@@ -930,14 +930,14 @@ OCMD(do_ozrecho)
 {
     int zone, lower_vnum, upper_vnum;
     char zone_name[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
-    char lower[MAX_INPUT_LENGTH], upper[MAX_INPUT_LENGTH];
+    char strlower[MAX_INPUT_LENGTH], strupper[MAX_INPUT_LENGTH];
 
     msg = any_one_arg(argument, zone_name);
-    msg = two_arguments(msg, lower, upper);
+    msg = two_arguments(msg, strlower, strupper);
 
     skip_spaces(&msg);
 
-    if (!*zone_name || !*msg || !*lower || !*upper)
+    if (!*zone_name || !*msg || !*strlower || !*strupper)
 	obj_log(obj, "ozrecho called with too few args");
 
 
@@ -945,8 +945,8 @@ OCMD(do_ozrecho)
 	obj_log(obj, "ozrecho called for nonexistant zone");
 
     else {
-	lower_vnum = atoi(lower);
-	upper_vnum = atoi(upper);
+	lower_vnum = atoi(strlower);
+	upper_vnum = atoi(strupper);
 
 	sprintf(buf, "%s\r\n", msg);
 	send_to_zone_range(buf, zone, lower_vnum, upper_vnum);

@@ -21,7 +21,7 @@ struct htree_node *HTREE_NULL = NULL;
 int htree_total_nodes = 0;
 int htree_depth_used = 0;
 
-struct htree_node *htree_init()
+struct htree_node *htree_init(void)
 {
   struct htree_node *newnode;
   int i;
@@ -128,7 +128,7 @@ return NOTHING;
 
 
 
-void htree_test()
+void htree_test(void)
 {
   int i, n, l = 0;
   struct timeval start, finish;

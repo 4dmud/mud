@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/04/09 05:15:44 $
-*  $Revision: 1.7 $
+*  $Date: 2006/05/01 11:29:26 $
+*  $Revision: 1.8 $
 **************************************************************************/
 
 #include "conf.h"
@@ -112,17 +112,17 @@ WCMD(do_wasound)
 
   for (door = 0; door < NUM_OF_DIRS; door++)
   {
-    struct room_direction_data *exit;
+    struct room_direction_data *ex;
 
-    if ((exit = room->dir_option[door]) && (exit->to_room != NULL)
-        && room != exit->to_room)
-      act_to_room(argument, exit->to_room);
+    if ((ex = room->dir_option[door]) && (ex->to_room != NULL)
+        && room != ex->to_room)
+      act_to_room(argument, ex->to_room);
   }
 }
 WCMD(do_wlag)
 {
   char_data *victim;
-  int wait = 0;
+  int w = 0;
   //int room;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
@@ -158,10 +158,10 @@ WCMD(do_wlag)
     return;
   }
 
-  if ((wait = atoi(arg2)) < 1)
+  if ((w = atoi(arg2)) < 1)
     return;
 
-  if (wait > 300)
+  if (w > 300)
   {
     wld_log(room,"wlag: duration longer then 30 seconds outside range.");
     return;
@@ -169,9 +169,9 @@ WCMD(do_wlag)
 
 
 
-  wait = (wait RL_SEC)*0.1;
+  w = (w RL_SEC)*0.1;
 
-  WAIT_STATE(victim, wait);
+  WAIT_STATE(victim, w);
   return;
 }
 
@@ -272,14 +272,14 @@ WCMD(do_wzrecho)
 {
   int zone, lower_vnum, upper_vnum;
   char zone_name[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
-  char lower[MAX_INPUT_LENGTH], upper[MAX_INPUT_LENGTH];
+  char strlower[MAX_INPUT_LENGTH], strupper[MAX_INPUT_LENGTH];
 
   msg = any_one_arg(argument, zone_name);
-  msg = two_arguments(msg, lower, upper);
+  msg = two_arguments(msg, strlower, strupper);
 
   skip_spaces(&msg);
 
-  if (!*zone_name || !*msg || !*lower || !*upper)
+  if (!*zone_name || !*msg || !*strlower || !*strupper)
     wld_log(room, "wzrecho called with too few args");
 
 
@@ -288,8 +288,8 @@ WCMD(do_wzrecho)
 
   else
   {
-    lower_vnum = atoi(lower);
-    upper_vnum = atoi(upper);
+    lower_vnum = atoi(strlower);
+    upper_vnum = atoi(strupper);
 
     sprintf(buf, "%s\r\n", msg);
     send_to_zone_range(buf, zone, lower_vnum, upper_vnum);
@@ -317,7 +317,7 @@ WCMD(do_wdoor)
   char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
   char field[MAX_INPUT_LENGTH], *value;
   room_data *rm;
-  struct room_direction_data *exit;
+  struct room_direction_data *ex;
   int dir, fd;
   room_rnum to_room;
 
@@ -361,54 +361,54 @@ WCMD(do_wdoor)
     return;
   }
 
-  exit = rm->dir_option[dir];
+  ex = rm->dir_option[dir];
 
   /* purge exit */
   if (fd == 0)
   {
-    if (exit)
+    if (ex)
     {
-      if (exit->general_description)
-        free(exit->general_description);
-      if (exit->keyword)
-        free(exit->keyword);
-      free(exit);
+      if (ex->general_description)
+        free(ex->general_description);
+      if (ex->keyword)
+        free(ex->keyword);
+      free(ex);
       rm->dir_option[dir] = NULL;
     }
   }
 
   else
   {
-    if (!exit)
+    if (!ex)
     {
-      CREATE(exit, struct room_direction_data, 1);
-      rm->dir_option[dir] = exit;
+      CREATE(ex, struct room_direction_data, 1);
+      rm->dir_option[dir] = ex;
     }
 
     switch (fd)
     {
     case 1:		/* description */
-      if (exit->general_description)
-        free(exit->general_description);
-      CREATE(exit->general_description, char, strlen(value) + 3);
-      strcpy(exit->general_description, value);
-      strcat(exit->general_description, "\r\n");
+      if (ex->general_description)
+        free(ex->general_description);
+      CREATE(ex->general_description, char, strlen(value) + 3);
+      strcpy(ex->general_description, value);
+      strcat(ex->general_description, "\r\n");
       break;
     case 2:		/* flags       */
-      exit->exit_info = (sh_int) asciiflag_conv(value);
+      ex->exit_info = (sh_int) asciiflag_conv(value);
       break;
     case 3:		/* key         */
-      exit->key = atoi(value);
+      ex->key = atoi(value);
       break;
     case 4:		/* name        */
-      if (exit->keyword)
-        free(exit->keyword);
-      CREATE(exit->keyword, char, strlen(value) + 1);
-      strcpy(exit->keyword, value);
+      if (ex->keyword)
+        free(ex->keyword);
+      CREATE(ex->keyword, char, strlen(value) + 1);
+      strcpy(ex->keyword, value);
       break;
     case 5:		/* room        */
       if ((to_room = real_room(atoi(value))) != NULL)
-        exit->to_room = to_room;
+        ex->to_room = to_room;
       else
         wld_log(room, "wdoor: invalid door target");
       break;
@@ -578,7 +578,7 @@ WCMD(do_wpurge)
 WCMD(do_wload)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  int number = 0;
+  int num = 0;
   char_data *mob;
   obj_data *object;
   char *target;
@@ -591,7 +591,7 @@ WCMD(do_wload)
   skip_spaces(&target);
 
   if (!*arg1 || !*arg2 || !is_number(arg2)
-      || ((number = atoi(arg2)) < 0))
+      || ((num = atoi(arg2)) < 0))
   {
     wld_log(room, "wload: bad syntax");
     return;
@@ -610,9 +610,9 @@ WCMD(do_wload)
         return;
       }
     }
-    if ((mob = read_mobile(number, VIRTUAL)) == NULL)
+    if ((mob = read_mobile(num, VIRTUAL)) == NULL)
     {
-      wld_log(room, "mload: bad mob vnum");
+      wld_log(room, "wload: bad mob vnum");
       return;
 
     }
@@ -622,14 +622,14 @@ WCMD(do_wload)
     { // it _should_ have, but it might be detached.
       char buf[MAX_INPUT_LENGTH];
       sprintf(buf, "%c%ld", UID_CHAR, GET_ID(mob));
-      add_var(&(SCRIPT(room)->global_vars), "lastloaded", buf, 0);
+      add_var(&(SCRIPT(room)->global_vars), "loaded", buf, 0);
     }
   }
 
 
   else if (is_abbrev(arg1, "obj"))
   {
-    object = read_object(number, VIRTUAL);
+    object = read_object(num, VIRTUAL);
     if (object == NULL)
     {
       wld_log(room, "wload: bad object vnum");

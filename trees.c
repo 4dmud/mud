@@ -50,7 +50,7 @@ struct obj_data *make_tree(int v0, int v1, int v2)
 
   struct obj_data *final_tree;
 
-  int num = -1, age = 0, ran = number(0, 100);
+  int num = -1, t_age = 0, ran = number(0, 100);
 
   if (tree_total > TREE_MAX)
     return (NULL);
@@ -76,7 +76,7 @@ struct obj_data *make_tree(int v0, int v1, int v2)
   if (v1)           //age desc number (sapling, old, aging)
     GET_OBJ_VAL(final_tree, 1) = IRANGE(0, v1, 8);
   else
-    GET_OBJ_VAL(final_tree, 1) = age;
+    GET_OBJ_VAL(final_tree, 1) = t_age;
   if (v2)           //type desc number (oak, willow, pine)
     GET_OBJ_VAL(final_tree, 2) = IRANGE(0, v2, 8);
   else

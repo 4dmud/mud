@@ -344,7 +344,7 @@ void free_shaft_list(struct mine_rooms *mine)
     free_shaft_list(mine->next);
   free(mine);
 }
-void free_mine_shafts()
+void free_mine_shafts(void)
 {
   struct mine_list *shaft, *next;
   for (shaft = mine_shafts; shaft; shaft = next)

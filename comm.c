@@ -183,7 +183,7 @@ void echo_off(struct descriptor_data *d);
 void echo_on(struct descriptor_data *d);
 void circle_sleep(struct timeval *timeout);
 void signal_setup(void);
-void game_loop(socket_t mother_desc);
+void game_loop(socket_t s_mother_desc);
 void timediff(struct timeval *diff, struct timeval *a, struct timeval *b);
 void timeadd(struct timeval *sum, struct timeval *a, struct timeval *b);
 void flush_queues(struct descriptor_data *d);
@@ -239,7 +239,7 @@ void extract_pending_chars(void);
 #if 0
 void extract_pending_objects(void);
 #endif
-void free_mine_shafts();
+void free_mine_shafts(void);
 void clear_free_list(void);
 void reboot_wizlists(void);
 void boot_world(void);
@@ -262,8 +262,8 @@ void oedit_save_to_disk(int zone_num);
 void medit_save_to_disk(int zone_num);
 void sedit_save_to_disk(int zone_num);
 void zedit_save_to_disk(int zone_num);
-void start_arena();
-void run_events2();
+void start_arena(void);
+void run_events2(void);
 void extract_delayed_mobs(void);
 void extract_delayed_objs(void);
 void check_auction(void);
@@ -643,7 +643,7 @@ void circle_exit(int retval)
 
 
 /* Reload players after a copyover */
-void copyover_recover()
+void copyover_recover(void)
 {
   struct descriptor_data *d;
   FILE *fp;
@@ -753,7 +753,7 @@ void copyover_recover()
 }
 
 /* Init sockets, run game, and cleanup sockets */
-void init_game(ush_int port)
+void init_game(ush_int s_port)
 {
 
   /* We don't want to restart if we crash before we get up. */
@@ -767,7 +767,7 @@ void init_game(ush_int port)
   if (!fCopyOver)
   {       /* If copyover mother_desc is already set up */
     log("Opening mother connection.");
-    mother_desc = init_socket(port);
+    mother_desc = init_socket(s_port);
   }
   log("Initiating events.");
   event_init();
@@ -822,7 +822,7 @@ void init_game(ush_int port)
  * init_socket sets up the mother descriptor - creates the socket, sets
  * its options up, binds it, and listens.
  */
-socket_t init_socket(ush_int port)
+socket_t init_socket(ush_int s_port)
 {
   socket_t s;
   struct sockaddr_in sa;
@@ -906,7 +906,7 @@ socket_t init_socket(ush_int port)
   memset((char *) &sa, 0, sizeof(sa));
 
   sa.sin_family = AF_INET;
-  sa.sin_port = htons(port);
+  sa.sin_port = htons(s_port);
   sa.sin_addr = *(get_bind_addr());
 
   if (bind(s, (struct sockaddr *) &sa, sizeof(sa)) < 0)
@@ -1098,7 +1098,7 @@ void *process_io(void *loopstate)
  * output and sending it out to players, and calling "heartbeat" functions
  * such as mobile_activity().
  */
-void game_loop(socket_t mother_desc)
+void game_loop(socket_t s_mother_desc)
 {
   fd_set input_set, output_set, exc_set, null_set;
   struct timeval last_time, opt_time, process_time, temp_time;
@@ -1126,8 +1126,8 @@ void game_loop(socket_t mother_desc)
       log("No connections.  Going to sleep.");
       make_who2html();
       FD_ZERO(&input_set);
-      FD_SET(mother_desc, &input_set);
-      if (select(mother_desc + 1, &input_set, (fd_set *) 0, (fd_set *) 0, NULL) < 0)
+      FD_SET(s_mother_desc, &input_set);
+      if (select(s_mother_desc + 1, &input_set, (fd_set *) 0, (fd_set *) 0, NULL) < 0)
       {
         if (errno == EINTR)
           log("Waking up to process signal.");
@@ -1142,7 +1142,7 @@ void game_loop(socket_t mother_desc)
     FD_ZERO(&input_set);
     FD_ZERO(&output_set);
     FD_ZERO(&exc_set);
-    FD_SET(mother_desc, &input_set);
+    FD_SET(s_mother_desc, &input_set);
 
     maxdesc = mother_desc;
 
@@ -1216,8 +1216,8 @@ void game_loop(socket_t mother_desc)
       return;
     }
     /* If there are new connections waiting, accept them. */
-    if (FD_ISSET(mother_desc, &input_set))
-      new_descriptor(mother_desc, FALSE);
+    if (FD_ISSET(s_mother_desc, &input_set))
+      new_descriptor(s_mother_desc, FALSE);
 #if RUNNING_IDENT
     /* check for a reply from the ident process */
     if ((id_serv_socket > 0) && FD_ISSET(id_serv_socket, &input_set))
@@ -2510,7 +2510,7 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
 }
 char * send_mxp_status(struct descriptor_data *t)
 {
-  static char stat[MAX_MXP_STATUS];
+  static char mxpstat[MAX_MXP_STATUS];
   size_t len = 0;
   int hp = 0, mhp = 0;
   int mana = 0, mmana = 0;
@@ -2529,17 +2529,17 @@ char * send_mxp_status(struct descriptor_data *t)
     mstam = GET_MAX_STAMINA(t->character);
   }
 
-  len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
-  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
-  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);
-  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'>" "<!ENTITY xmove '%d'>",move,mmove);
-  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'>" "<!ENTITY xstam '%d'>",stam,mstam);
+  len = snprintf(mxpstat, sizeof(mxpstat), "%s", MXPMODE(6));
+  len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
+  len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);
+  len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY move '%d'>" "<!ENTITY xmove '%d'>",move,mmove);
+  len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY stam '%d'>" "<!ENTITY xstam '%d'>",stam,mstam);
   /*write_to_output(t,  "%s", MXPMODE(6));
   write_to_output(t, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
   write_to_output(t, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
   write_to_output(t, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
   write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
-  return stat;
+  return mxpstat;
 }
 void send_compress_offer(struct descriptor_data *d)
 {
@@ -3668,7 +3668,7 @@ RETSIGTYPE hupsig(int sig)
                                                        * substituted */
 }
 
-RETSIGTYPE chldsig()
+RETSIGTYPE chldsig(void)
 {
   struct rusage ru;
 
@@ -3677,7 +3677,7 @@ RETSIGTYPE chldsig()
   wait3(NULL, WNOHANG, &ru);
 }
 
-RETSIGTYPE core_dump_on_crash()
+RETSIGTYPE core_dump_on_crash(void)
 {
   log("Last command typed: %s", last_command);
   exit(0);
@@ -3705,16 +3705,16 @@ RETSIGTYPE core_dump_on_crash()
 #else
 sigfunc *my_signal(int signo, sigfunc * func)
 {
-  struct sigaction act, oact;
+  struct sigaction acti, oact;
 
-  act.sa_handler = func;
-  sigemptyset(&act.sa_mask);
-  act.sa_flags = 0;
+  acti.sa_handler = func;
+  sigemptyset(&acti.sa_mask);
+  acti.sa_flags = 0;
 #ifdef SA_INTERRUPT
-  act.sa_flags |= SA_INTERRUPT;    /* SunOS */
+  acti.sa_flags |= SA_INTERRUPT;    /* SunOS */
 #endif
 
-  if (sigaction(signo, &act, &oact) < 0)
+  if (sigaction(signo, &acti, &oact) < 0)
     return (SIG_ERR);
 
   return (oact.sa_handler);
@@ -4443,7 +4443,7 @@ void brag(struct char_data *ch, struct char_data *vict)
   struct descriptor_data *i;
   struct descriptor_data *next;
   char buf[MAX_STRING_LENGTH];
-  const char *brag[] =
+  const char *bragmsg[] =
     {
       "$N was just too easy a kill!", //0
       "Huh? Did you die $N? Sorry I was taking a nap!",
@@ -4508,7 +4508,7 @@ void brag(struct char_data *ch, struct char_data *vict)
   //  if (IS_NPC(ch))
   // snprintf(buf, sizeof(buf), "Someone brags, '%s'", brag[number(0, 53)]);
   // else
-  snprintf(buf, sizeof(buf), "%s brags, '%s'", GET_NAME(ch),  brag[number(0, 53)]);
+  snprintf(buf, sizeof(buf), "%s brags, '%s'", GET_NAME(ch),  bragmsg[number(0, 53)]);
 
   for (i = descriptor_list; i; i = next)
   {

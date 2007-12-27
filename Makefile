@@ -11,8 +11,8 @@ CC = gcc
 CXREF = cxref
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -pipe
-# -Wnested-externs
+MYFLAGS = -Wall -pipe -Wstrict-prototypes 
+# -Wnested-externs -Wshadow -m32
 # -I/usr/src/lib/libcrypt/ 
 
 #flags for profiling (see hacker.doc for more information)
@@ -27,8 +27,8 @@ BINDIR = ../bin
 CFLAGS = -O -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
-LIBS =  -lcrypt -lz -lmcheck -lm -lc
-#gprof for profiling
+LIBS =  -lcrypt -lz -lm -lc
+#gprof for profiling -pg
 
 OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	act.movement.o act.offensive.o act.other.o act.social.o \

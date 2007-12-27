@@ -48,9 +48,9 @@ int vehicle_count(void)
   return count;
 }
 
-int valid_vehicle_num(int number)
+int valid_vehicle_num(int num)
 {
-  return number > 0 && number <= vehicle_count();
+  return num > 0 && num <= vehicle_count();
 }
 
 struct vehicle_data *find_vehicle_by_num(int num)
@@ -266,7 +266,7 @@ ACMD(do_oasis_vedit)
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  int number = NOWHERE, add = FALSE, remove = FALSE;
+  int number = NOWHERE, add = FALSE, rem = FALSE;
   struct descriptor_data *d;
 
   /* Parse any arguments. */
@@ -287,7 +287,7 @@ ACMD(do_oasis_vedit)
     if (!str_cmp("new", buf1))
       add = TRUE;
     else if (!str_cmp("remove", buf1))
-      remove = TRUE;
+      rem = TRUE;
     else
     {
       new_send_to_char(ch,
@@ -302,7 +302,7 @@ ACMD(do_oasis_vedit)
     if (is_number(buf2))
     {
       number = atoi(buf2);
-      if (remove)
+      if (rem)
       {
         if (!valid_vehicle_num(number))
         {
@@ -353,7 +353,7 @@ ACMD(do_oasis_vedit)
     free(d->olc);
   }
 
-  if (remove)
+  if (rem)
   {
     remove_vehicle_num(number);
     new_send_to_char(ch, "Vehicle entry removed.\r\n");

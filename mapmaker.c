@@ -29,7 +29,7 @@ char *picType;
 int *pic;
 /** generate a map - mord**/
 //srand( (unsigned int)time( NULL ) );
-float randomer()
+float randomer(void)
 {
   return (float)number(0, 10000)/10000.0;
 }

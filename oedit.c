@@ -47,7 +47,7 @@ void oedit_disp_val5_menu(struct descriptor_data *d);
 
 ACMD(do_oasis_oedit)
 {
-  int number = NOWHERE, save = 0, real_num;
+  int num = NOWHERE, save = 0, real_num;
   struct descriptor_data *d;
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
@@ -78,18 +78,18 @@ ACMD(do_oasis_oedit)
     save = TRUE;
 
     if (is_number(buf2))
-      number = atoi(buf2);
+      num = atoi(buf2);
     else if (GET_OLC_ZONE(ch) > 0)
     {
       zone_rnum zlok;
 
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
-        number = NOWHERE;
+        num = NOWHERE;
       else
-        number = genolc_zone_bottom(zlok);
+        num = genolc_zone_bottom(zlok);
     }
 
-    if (number == NOWHERE)
+    if (num == NOWHERE)
     {
       new_send_to_char(ch, "Save which zone?\r\n");
       return;
@@ -99,8 +99,8 @@ ACMD(do_oasis_oedit)
   /****************************************************************************/
   /** If a numeric argument was given, get it.                               **/
   /****************************************************************************/
-  if (number == NOWHERE)
-    number = atoi(buf1);
+  if (num == NOWHERE)
+    num = atoi(buf1);
 
   /****************************************************************************/
   /** Check that whatever it is isn't already being edited.                  **/
@@ -109,7 +109,7 @@ ACMD(do_oasis_oedit)
   {
     if (STATE(d) == CON_OEDIT)
     {
-      if (d->olc && OLC_NUM(d) == number)
+      if (d->olc && OLC_NUM(d) == num)
       {
         new_send_to_char(ch, "That object is currently being edited by %s.\r\n",
                          PERS(d->character, ch));
@@ -138,7 +138,7 @@ ACMD(do_oasis_oedit)
   /****************************************************************************/
   /** Find the zone.                                                         **/
   /****************************************************************************/
-  OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
+  OLC_ZNUM(d) = save ? real_zone(num) : real_zone_by_thing(num);
   if (OLC_ZNUM(d) == NOWHERE)
   {
     new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
@@ -192,13 +192,13 @@ ACMD(do_oasis_oedit)
     return;
   }
 
-  OLC_NUM(d) = number;
+  OLC_NUM(d) = num;
 
   /****************************************************************************/
   /** If this is a new object, setup a new object, otherwise setup the       **/
   /** existing object.                                                       **/
   /****************************************************************************/
-  if ((real_num = real_object(number)) != NOTHING)
+  if ((real_num = real_object(num)) != NOTHING)
     oedit_setup_existing(d, real_num);
   else
     oedit_setup_new(d);
@@ -1004,7 +1004,7 @@ void oedit_disp_menu(struct descriptor_data *d)
 
 void oedit_parse(struct descriptor_data *d, char *arg)
 {
-  int number, max_val, min_val;
+  int num, max_val, min_val;
   char *oldtext = NULL;
 
   switch (OLC_MODE(d))
@@ -1248,14 +1248,14 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     break;
 
   case OEDIT_TYPE:
-    number = atoi(arg);
-    if ((number < 1) || (number >= NUM_ITEM_TYPES))
+    num = atoi(arg);
+    if ((num < 1) || (num >= NUM_ITEM_TYPES))
     {
       write_to_output(d, "Invalid choice, try again : ");
       return;
     }
     else
-      GET_OBJ_TYPE(OLC_OBJ(d)) = number;
+      GET_OBJ_TYPE(OLC_OBJ(d)) = num;
     /* what's the boundschecking worth if we don't do this ? -- Welcor */
     GET_OBJ_VAL(OLC_OBJ(d), 0) = GET_OBJ_VAL(OLC_OBJ(d), 1) =
                                    GET_OBJ_VAL(OLC_OBJ(d), 2) = GET_OBJ_VAL(OLC_OBJ(d), 3) =
@@ -1263,34 +1263,34 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     break;
 
   case OEDIT_EXTRAS:
-    number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_FLAGS))
+    num = atoi(arg);
+    if ((num < 0) || (num > NUM_ITEM_FLAGS))
     {
       oedit_disp_extra_menu(d);
       return;
     }
-    else if (number == 0)
+    else if (num == 0)
       break;
     else
     {
-      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (number - 1));
+      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (num - 1));
       oedit_disp_extra_menu(d);
       return;
     }
 
   case OEDIT_WEAR:
-    number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_WEARS))
+    num = atoi(arg);
+    if ((num < 0) || (num > NUM_ITEM_WEARS))
     {
       write_to_output(d, "That's not a valid choice!\r\n");
       oedit_disp_wear_menu(d);
       return;
     }
-    else if (number == 0)	/* Quit. */
+    else if (num == 0)	/* Quit. */
       break;
     else
     {
-      TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (number - 1));
+      TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (num - 1));
       oedit_disp_wear_menu(d);
       return;
     }
@@ -1324,10 +1324,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     break;
 
   case OEDIT_PERM:
-    if ((number = atoi(arg)) == 0)
+    if ((num = atoi(arg)) == 0)
       break;
-    if (number > 0 && number <= NUM_AFF_FLAGS)
-      TOGGLE_BIT_AR(GET_OBJ_PERM(OLC_OBJ(d)), (number - 1));
+    if (num > 0 && num <= NUM_AFF_FLAGS)
+      TOGGLE_BIT_AR(GET_OBJ_PERM(OLC_OBJ(d)), (num - 1));
     oedit_disp_perm_menu(d);
     return;
 
@@ -1360,7 +1360,7 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     /*
      * Here, I do need to check for out of range values.
      */
-    number = atoi(arg);
+    num = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d)))
     {
     case ITEM_SCROLL:
@@ -1368,10 +1368,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     case ITEM_ANTIDOTE_1:
     case ITEM_ANTIDOTE_2:
     case ITEM_ANTIDOTE_3:
-      if (number == 0 || number == -1)
+      if (num == 0 || num == -1)
         GET_OBJ_VAL(OLC_OBJ(d), 1) = -1;
       else
-        GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, NUM_SPELLS-1);
+        GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(num, 1, NUM_SPELLS-1);
 
       oedit_disp_val3_menu(d);
       break;
@@ -1380,11 +1380,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
        * Needs some special handling since we are dealing with flag values
        * here.
        */
-      if (number < 0 || number > 4)
+      if (num < 0 || num > 4)
         oedit_disp_container_flags_menu(d);
-      else if (number != 0)
+      else if (num != 0)
       {
-        TOGGLE_BIT(GET_OBJ_VAL(OLC_OBJ(d), 1), 1 << (number - 1));
+        TOGGLE_BIT(GET_OBJ_VAL(OLC_OBJ(d), 1), 1 << (num - 1));
         OLC_VAL(d) = 1;
         oedit_disp_val2_menu(d);
       }
@@ -1392,21 +1392,21 @@ void oedit_parse(struct descriptor_data *d, char *arg)
         oedit_disp_val3_menu(d);
       break;
     case ITEM_WEAPON:
-      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, MAX_WEAPON_NDICE);
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(num, 1, MAX_WEAPON_NDICE);
       oedit_disp_val3_menu(d);
       break;
     case ITEM_VEHICLE:
-      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 0, 1);
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(num, 0, 1);
       oedit_disp_val3_menu(d);
       break;
     default:
-      GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = num;
       oedit_disp_val3_menu(d);
     }
     return;
 
   case OEDIT_VALUE_3:
-    number = atoi(arg);
+    num = atoi(arg);
     /*
      * Quick'n'easy error checking.
      */
@@ -1414,7 +1414,7 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     {
     case ITEM_SCROLL:
     case ITEM_POTION:
-      if (number == 0 || number == -1)
+      if (num == 0 || num == -1)
       {
         GET_OBJ_VAL(OLC_OBJ(d), 2) = -1;
         oedit_disp_val4_menu(d);
@@ -1449,17 +1449,17 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       min_val = -32000;
       max_val = 32000;
     }
-    GET_OBJ_VAL(OLC_OBJ(d), 2) = LIMIT(number, min_val, max_val);
+    GET_OBJ_VAL(OLC_OBJ(d), 2) = LIMIT(num, min_val, max_val);
     oedit_disp_val4_menu(d);
     return;
 
   case OEDIT_VALUE_4:
-    number = atoi(arg);
+    num = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d)))
     {
     case ITEM_SCROLL:
     case ITEM_POTION:
-      if (number == 0 || number == -1)
+      if (num == 0 || num == -1)
       {
         GET_OBJ_VAL(OLC_OBJ(d), 3) = -1;
         oedit_disp_menu(d);
@@ -1486,11 +1486,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       max_val = 32000;
       break;
     }
-    GET_OBJ_VAL(OLC_OBJ(d), 3) = LIMIT(number, min_val, max_val);
+    GET_OBJ_VAL(OLC_OBJ(d), 3) = LIMIT(num, min_val, max_val);
     oedit_disp_val5_menu(d);
     return;
   case OEDIT_VALUE_5:
-    number = atoi(arg);
+    num = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d)))
     {
 case ITEM_TREE:
@@ -1501,7 +1501,7 @@ break;
     case ITEM_DRINKCON:
     case ITEM_FOUNTAIN:
     case ITEM_FOOD:
-      if (number == 0 || number == -1)
+      if (num == 0 || num == -1)
       {
         GET_OBJ_VAL(OLC_OBJ(d), 4) = -1;
         oedit_disp_menu(d);
@@ -1520,11 +1520,11 @@ break;
       max_val = 32000;
       break;
     }
-    GET_OBJ_VAL(OLC_OBJ(d), 4) = LIMIT(number, min_val, max_val);
+    GET_OBJ_VAL(OLC_OBJ(d), 4) = LIMIT(num, min_val, max_val);
     oedit_disp_val6_menu(d);
     return;
 case OEDIT_VALUE_6:
-    number = atoi(arg);
+    num = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d)))
     {
     case ITEM_TREE:
@@ -1536,30 +1536,30 @@ case OEDIT_VALUE_6:
       max_val = 32000;
       break;
     }
-    GET_OBJ_VAL(OLC_OBJ(d), 5) = LIMIT(number, min_val, max_val);
+    GET_OBJ_VAL(OLC_OBJ(d), 5) = LIMIT(num, min_val, max_val);
     oedit_disp_menu(d);
     return;
   case OEDIT_PROMPT_APPLY:
-    if ((number = atoi(arg)) == 0)
+    if ((num = atoi(arg)) == 0)
       break;
-    else if (number < 0 || number > MAX_OBJ_AFFECT)
+    else if (num < 0 || num > MAX_OBJ_AFFECT)
     {
       oedit_disp_prompt_apply_menu(d);
       return;
     }
-    OLC_VAL(d) = number - 1;
+    OLC_VAL(d) = num - 1;
     OLC_MODE(d) = OEDIT_APPLY;
     oedit_disp_apply_menu(d);
     return;
 
   case OEDIT_APPLY:
-    if ((number = atoi(arg)) == 0)
+    if ((num = atoi(arg)) == 0)
     {
       OLC_OBJ(d)->affected[OLC_VAL(d)].location = 0;
       OLC_OBJ(d)->affected[OLC_VAL(d)].modifier = 0;
       oedit_disp_prompt_apply_menu(d);
     }
-    else if (number < 0 || number >= NUM_APPLIES)
+    else if (num < 0 || num >= NUM_APPLIES)
       oedit_disp_apply_menu(d);
     else
     {
@@ -1570,7 +1570,7 @@ case OEDIT_VALUE_6:
       {
         for (counter = 0; counter < MAX_OBJ_AFFECT; counter++)
         {
-          if (OLC_OBJ(d)->affected[counter].location == number)
+          if (OLC_OBJ(d)->affected[counter].location == num)
           {
             write_to_output(d, "Object already has that apply.");
             return;
@@ -1578,7 +1578,7 @@ case OEDIT_VALUE_6:
         }
       }
 
-      OLC_OBJ(d)->affected[OLC_VAL(d)].location = number;
+      OLC_OBJ(d)->affected[OLC_VAL(d)].location = num;
       write_to_output(d, "Modifier : ");
       OLC_MODE(d) = OEDIT_APPLYMOD;
     }
@@ -1600,7 +1600,7 @@ case OEDIT_VALUE_6:
     return;
 
   case OEDIT_EXTRADESC_MENU:
-    switch ((number = atoi(arg)))
+    switch ((num = atoi(arg)))
     {
     case 0:
       if (!OLC_DESC(d)->keyword || !OLC_DESC(d)->description)
