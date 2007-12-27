@@ -52,7 +52,7 @@ struct obj_data *make_tree(int v0, int v1, int v2) {
 
     int num = -1, t_age = 0, ran = number(0, 100);
 
-    if (tree_total > TREE_MAX)
+    if (tree_total >= TREE_MAX)
         return (NULL);
 
     for (num=0;num<MAX_TREE_TYPES;num++) {
@@ -315,7 +315,7 @@ void check_all_trees(void) {
         /*tree check*/
         if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING) {
             if (GET_OBJ_VAL(obj, 0) > tm) {
-                if (GET_OBJ_VAL(obj, 1) <= MAX_TREE_AGE) {
+                if (GET_OBJ_VAL(obj, 1) < MAX_TREE_AGE) {
                     added++;
                     GET_OBJ_VAL(obj, 0) = time(0) + (5 * SECS_PER_REAL_DAY);
                     GET_OBJ_VAL(obj, 1)++;
