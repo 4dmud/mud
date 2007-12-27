@@ -86,7 +86,7 @@ long           assemblyGetComponentIndex( ASSEMBLY *pAssembly, long lComponentVn
 ASSEMBLY*      assemblyGetAssemblyPtr( long lVnum );
 void           free_assemblies(void);
 bool           assemblyAddTrigger(long lVnum,int iTrig);
-bool 		checkTypeAndAssemble(char *typeName, char *assName);
+int 		assemblyGetTypeByName( char * tname );
 
 int perform_assemble(obj_vnum lVnum, Character *ch, int subcmd, int cmd);
 int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd);

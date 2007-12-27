@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/07 10:30:50 $                                           * 
-*  $Revision: 1.46 $                                                      *
+*  $Date: 2007/06/07 10:52:52 $                                           * 
+*  $Revision: 1.47 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -559,7 +559,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                         if ((lVnum = assemblyFindAssembly(subfield)) < 0)
                             snprintf(str, slen, "0");
                         else {
-                            if (assemblyGetType(lVnum) != (type - 101)) {
+                            if (assemblyGetType(lVnum) != (assemblyGetTypeByName(field) - 101)) {
                                 snprintf(str, slen, "0");
                             } else {
                                 snprintf(str, slen, "1");
