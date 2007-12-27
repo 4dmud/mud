@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.62  2006/08/25 10:49:30  w4dimenscor
+ * added command to fix peoples skills back to the practiced amount they were at
+ *
  * Revision 1.61  2006/08/25 10:22:43  w4dimenscor
  * added command to fix peoples skills back to the practiced amount they were at
  *
@@ -6529,19 +6532,24 @@ ACMD(do_wizsplit) {
         do_gen_ps(ch, argument, cmd, SCMD_WIZLIST);
 }
 
-void fixskills(Character *ch) {
-    int learned = IRANGE(30, (20*(TIERNUM)), 80);
-    for (int i = 0;i < TOP_SPELL_DEFINE;i++)
-        if (knows_spell(ch, i))
-            SAVED(ch).SetSkillLearn(i, learned);
-}
+
 void fixskills(Character *ch, int lrn) {
     int learned = lrn;
     if (lrn <= 0)
     learned = IRANGE(30, (20*(TIERNUM)), 80);
+    
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
         if (knows_spell(ch, i))
             SAVED(ch).SetSkillLearn(i, learned);
+            /* twice over to get the pre-req's */
+    for (int i = 0;i < TOP_SPELL_DEFINE;i++)
+        if (knows_spell(ch, i))
+            SAVED(ch).SetSkillLearn(i, learned);
+
+}
+void fixskills(Character *ch) {
+    int learned = IRANGE(30, (20*(TIERNUM)), 80);
+    fixskills(ch, learned);
 }
 
 void offline_fixskills(Character *ch, char *arg)
