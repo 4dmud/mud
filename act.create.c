@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.20  2006/10/06 22:25:30  w4dimenscor
+ * fixed staves crested from woodsing
+ *
  * Revision 1.19  2006/09/15 08:01:11  w4dimenscor
  * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
  *
@@ -681,8 +684,8 @@ void make_focus(Character *ch, int type, struct obj_data *o)
      tree_names[GET_OBJ_VAL(o, 2)], o->short_description);
   act("$n sings a focus staff from $p!", FALSE, ch, o, 0, TO_ROOM);*/
   v0 = GET_OBJ_VAL(o, 0);
-  v1 = GET_OBJ_VAL(o, 1);
-  v2 = GET_OBJ_VAL(o, 2);
+  v1 = MIN(GET_OBJ_VAL(o, 1), 8);
+  v2 = MIN(GET_OBJ_VAL(o, 2), 8);
   v3 = GET_OBJ_VAL(o, 3);
   extract_obj(o);
   create_trees();

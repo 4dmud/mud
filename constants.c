@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.22  2006/10/06 22:25:30  w4dimenscor
+ * fixed staves crested from woodsing
+ *
  * Revision 1.21  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -172,7 +175,7 @@ const char *tree_names[] =
     "fir",
     "maple",
     "elder",
-    "elm",
+    "elm", //8
     "\n"
   };
 
@@ -354,7 +357,7 @@ const char *rp_group_names[] =
     "{cBJ{cCe{cGs{cYt{cPe{cRr{c0",
     "{crBitch{c0",
     "{cLRiddler{c0",
-    "{cbAsshole{c0",
+    "{cbMadman{c0",
     "{cYOrsini{c0",
     "{cpLolthite{c0",
     "\n"
