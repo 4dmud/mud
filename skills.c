@@ -59,6 +59,7 @@ int perform_grapple(CHAR_DATA *ch, int dir, int need_specials_check,
                     CHAR_DATA *attacker);
 int perform_charge(CHAR_DATA *ch, CHAR_DATA *vict);
 int skill_cost(int h, int m, int v, CHAR_DATA *ch);
+void view_room_by_rnum(struct char_data *ch, room_rnum is_in);
 
 
 #define TIER (ch ? current_class_is_tier_num(ch) : 1)
@@ -2342,8 +2343,7 @@ ASKILL(skill_scan)
   int  dir = 0, dis, maxdis, x, found = 0;
   room_rnum location = NULL, original_loc, is_in;
   char arg[MAX_STRING_LENGTH];
-  int is_aggro = PRF_FLAGGED(ch, PRF_AGGRO);
-
+//   int is_aggro = PRF_FLAGGED(ch, PRF_AGGRO);
   const dirParseStruct dirParse[6] =
     {
       {SCMD_NORTH - 1, "north"},
@@ -2438,6 +2438,7 @@ ASKILL(skill_scan)
         }
         else
           send_to_char("It seems to be closed.\r\n", ch);
+        return 0;
       }
 
 
@@ -2445,21 +2446,22 @@ ASKILL(skill_scan)
     /* a location has been found. */
     original_loc = IN_ROOM(ch);
     location = original_loc->dir_option[dir]->to_room;
-    char_from_room(ch);
-    if (is_aggro)
-      REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
-    char_to_room(ch, location);
-    LOOK(ch);
-    if (is_aggro)
-      SET_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
-
-    /* check if the char is still there */
-    if (IN_ROOM(ch) == location)
-    {
-      char_from_room(ch);
-      char_to_room(ch, original_loc);
-    }
-
+//     sitobj=SITTING(ch);
+//     char_from_room(ch);
+//     if (is_aggro)
+//       REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
+//     char_to_room(ch, location);
+//     LOOK(ch);
+//     if (is_aggro)
+//       SET_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
+// 
+//     /* check if the char is still there */
+//     if (IN_ROOM(ch) == location)
+//     {
+//       char_from_room(ch);
+//       char_to_room(ch, original_loc);
+//     }
+    view_room_by_rnum(ch, location);
     return SKILL_SCAN;
 
   }

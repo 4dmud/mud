@@ -608,6 +608,9 @@ void oedit_disp_val1_menu(struct descriptor_data *d)
   case ITEM_SPACEBIKE:
     oedit_disp_val3_menu(d);
     break;
+  case ITEM_GEM_CLUSTER:
+    write_to_output(d,"Amount of fuel: ");
+    break;
   case ITEM_TREE:
     oedit_disp_val5_menu(d);
     break;

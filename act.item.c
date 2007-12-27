@@ -10,6 +10,15 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.34  2006/04/18 21:48:54  w4dimenscor
+ * Added the "amount of fuel" property to gemclusters.
+ * Added a fuel command.
+ * Added a GET_GEM_FUEL(obj) macro to get the amount of fuel from a gemstone.
+ * Made the imm3 trust group and moved stat, syslog users and vstat there.
+ * Fixed scan so that it doesn't scan through closed doors and doesn't throw you
+ * off our spacebike.
+ * Fixed a typo in the slay command.
+ *
  * Revision 1.33  2006/02/24 20:09:02  w4dimenscor
  * * Fixed offline automeld so that if a player leaves their corpse and quits,
  *   it will still meld properly.
@@ -251,6 +260,7 @@ ACMD(do_pour);
 ACMD(do_wear);
 ACMD(do_wield);
 ACMD(do_grab);
+ACMD(do_fuel);
 
 gold_int max_gold(struct char_data *ch);
 int spill_gold_amount(struct char_data *ch);
@@ -4530,4 +4540,61 @@ ACMD(do_skin)
   }
   else
     new_send_to_char(ch, "Your hands turn numb and you fumble.\r\n");
+}
+
+ACMD(do_fuel){
+  obj_data *spacebike, *gemcluster;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  two_arguments(argument,arg1,arg2);
+  if(!*arg1)
+  {
+    new_send_to_char(ch, "Yes, fuelling, fine, fuelling we must, but WHAT???\r\n");
+    return;
+  }
+  if(!(spacebike=get_obj_in_list_vis(ch, arg1, NULL, IN_ROOM(ch)->contents)))
+  {
+    new_send_to_char(ch,"There is no %s here!\r\n", arg1);
+    return;
+  }
+  if(GET_OBJ_TYPE(spacebike)!=ITEM_SPACEBIKE){
+    new_send_to_char(ch,"That doesn't look like a spacebike!\r\n");
+    return;
+  }
+  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike)){
+    new_send_to_char(ch, "%s is already fueled to its maximum capacity!",OBJS(spacebike,ch));
+    return;
+  }
+  if(!*arg2)
+  {
+    new_send_to_char(ch, "Yes, fuelling, fine, fuelling we must, but with WHAT???\r\n");
+    return;
+  }
+
+  if(!(gemcluster=get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))){
+    new_send_to_char(ch,"There is no %s in your inventory!\r\n",arg2);
+    return;
+  }
+  if(GET_OBJ_TYPE(gemcluster)!=ITEM_GEM_CLUSTER){
+    new_send_to_char(ch,"That is not a gemcluster!\r\n");
+    return;
+  }
+  GET_FUEL(spacebike)+=GET_GEM_FUEL(gemcluster);
+  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike))
+  {
+    GET_FUEL(spacebike)=GET_MAX_FUEL(spacebike);
+    new_send_to_char(ch,"You fill up %s to its maximum capacity, using %s.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
+  }
+  else
+  {
+    int filled=GET_FUEL(spacebike)*100/GET_MAX_FUEL(spacebike);
+    if(filled <25) 
+      new_send_to_char(ch,"You fill up %s using %s, but it is still very empty.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
+    else if(filled<50)
+      new_send_to_char(ch,"You fill up %s using %s, filling it about quarter full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
+    else if(filled<75)
+      new_send_to_char(ch,"You fill up %s using %s, filling it about half full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
+    else if(filled<100)
+      new_send_to_char(ch,"You fill up %s using %s, filling it about three quarter full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
+  }
+  extract_obj(gemcluster);
 }

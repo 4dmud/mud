@@ -320,7 +320,7 @@ ACMD(do_slay)
     {
       act(
         "You gesture and a slavering demon appears.  With a horrible grin,\r\n"
-        "the foul creatre turns on $N, who screams in panic before being\r\n"
+        "the foul creature turns on $N, who screams in panic before being\r\n"
         "eaten alive.", FALSE, ch, NULL, vict, TO_CHAR);
       act("$n gestures and a slavering demon appears.  The foul creature\r\n"
           "turns on you with a horrible grin.  You scream in panic before\r\n"

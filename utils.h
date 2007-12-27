@@ -776,6 +776,7 @@ int current_class_is_tier_num(struct char_data *ch);
 #define GET_OBJ_VAL(obj, val)	((obj)->obj_flags.value[(val)])
 #define GET_FUEL(obj)           GET_OBJ_VAL(obj, 2)
 #define GET_MAX_FUEL(obj)       GET_OBJ_VAL(obj, 3)
+#define GET_GEM_FUEL(obj)	GET_OBJ_VAL(obj, 0)
 #define GET_OBJ_MATERIAL(obj)   GET_OBJ_VAL(obj, 9)
 #define GET_WEP_BALANCE(obj)    GET_OBJ_VAL(obj, 5)
 #define GET_WEP_TYPE(obj)       GET_OBJ_VAL(obj, 6)

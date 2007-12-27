@@ -10,6 +10,15 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.43  2006/04/18 21:48:54  w4dimenscor
+ * Added the "amount of fuel" property to gemclusters.
+ * Added a fuel command.
+ * Added a GET_GEM_FUEL(obj) macro to get the amount of fuel from a gemstone.
+ * Made the imm3 trust group and moved stat, syslog users and vstat there.
+ * Fixed scan so that it doesn't scan through closed doors and doesn't throw you
+ * off our spacebike.
+ * Fixed a typo in the slay command.
+ *
  * Revision 1.42  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -405,6 +414,8 @@ trust_fields[] = {
                    {
                      "hedit", LVL_IMPL, PC, BINARY},	/* 19 */
                    {
+                     "imm3", LVL_IMPL, PC, BINARY},     /* 20 */
+                   {
                      "\n", 0, PC, MISC}
                  };
 
@@ -608,6 +619,12 @@ int perform_trust(struct char_data *ch, struct char_data *vict, int mode,
       else
         SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HEDIT_GRP)
         break;
+  case 20:
+    if (save == 1)
+      SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM3_GRP)
+    else
+      SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM3_GRP)
+    break;
   default:
     send_to_char("That isn't a trust group!\r\n", ch);
     return 0;
@@ -640,7 +657,7 @@ ACMD(do_trust)
      ch);
     send_to_char("Valid trust groups:\r\n", ch);
     send_to_char
-    ("ban, dspln, edit, heal, house, imm1, imm2, impl, kill\r\nload, marry, olc, quest, sen, tele, trig, goto, global, hedit, all\r\n",
+    ("ban, dspln, edit, heal, house, imm1, imm2, imm3, impl, kill\r\nload, marry, olc, quest, sen, tele, trig, goto, global, hedit, all\r\n",
      ch);
     return;
   }

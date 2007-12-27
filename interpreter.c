@@ -177,6 +177,7 @@ ACMD(do_finger);
 ACMD(do_flee);
 ACMD(do_follow);
 ACMD(do_force);
+ACMD(do_fuel);
 ACMD(do_gecho);
 ACMD(do_gen_comm);
 ACMD(do_gen_door);
@@ -583,6 +584,7 @@ const struct command_info cmd_info[] =
     { "fletch"   , "fletch"   , POS_SITTING , do_assemble , 0, SUB_FLETCH, 0 },
     { "fly"      , "fly"  , POS_STANDING, do_drive    , 0, 0, 0 },
     { "follow"   , "fol" , POS_RESTING , do_follow   , 0, 0, 0 },
+    { "fuel"	 , "fue" , POS_RESTING , do_fuel   , 0, 0, 0 },
     { "fuse"     , "fuse"     , POS_RESTING , do_fuse   , 0, 0, 0 },
     { "fusion"   , "fusion"   , POS_RESTING , do_fusion   , 0, 0, 0 },
     { "freeze"   , "free" , POS_DEAD    , do_heroutil  , 0, SCMD_FREEZE, 0 },
@@ -830,14 +832,14 @@ const struct command_info cmd_info[] =
     { "spellinfo", "spell", POS_DEAD    , do_spellinfo    , 1, 0, 0 },
     { "split"    , "spl" , POS_SITTING , do_split    , 1, 0, 0 },
     { "stand"    , "st"  , POS_RESTING , do_stand    , 0, 0, 0 },
-    { "stat"     , "stat"     , POS_DEAD    , do_stat     , LVL_IMMORT, 0, WIZ_IMM2_GRP },
+    { "stat"     , "stat"     , POS_DEAD    , do_stat     , LVL_IMMORT, 0, WIZ_IMM3_GRP },
     { "statlist" , "statl", POS_DEAD    , do_statlist , LVL_IMPL, 0, WIZ_IMM2_GRP },
     { "statinnate"  , "statin" , POS_DEAD    , do_statinnate   , LVL_IMPL, 0, WIZ_IMPL_GRP },
     { "string"   , "str"  , POS_DEAD    , do_string   , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "struggle" , "stru" , POS_STANDING, do_struggle , 0, 0, 0 },
     { "swap"     , "swap" , POS_DEAD    , do_swap     , 0, 0, 0 },
     { "switch"   , "sw"  , POS_DEAD    , do_switch   , LVL_IMMORT, 0, WIZ_QUEST_GRP },
-    { "syslog"   , "sys" , POS_DEAD    , do_syslog   , LVL_IMMORT, 0, WIZ_IMM2_GRP },
+    { "syslog"   , "sys" , POS_DEAD    , do_syslog   , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
     { "task"    , "ta"   , POS_DEAD    , do_task    , 0, 0, 0 },
     { "tedit"    , "ted" , POS_DEAD    , do_tedit    , LVL_GRGOD, 0, WIZ_IMPL_GRP },
@@ -869,13 +871,13 @@ const struct command_info cmd_info[] =
 
     { "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
     { "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
-    { "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
+    { "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
     { "value"    , "val" , POS_STANDING, do_not_here , 0, 0, 0 },
     { "version"  , "ver" , POS_DEAD    , do_gen_ps   , 0, SCMD_VERSION, 0 },
     { "visible"  , "vis" , POS_RESTING , do_visible  , 1, 0, 0 },
     { "vnum"     , "vnum"     , POS_DEAD    , do_vnum     , LVL_IMMORT, 0, WIZ_IMM2_GRP },
-    { "vstat"    , "vsta"     , POS_DEAD    , do_vstat    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
+    { "vstat"    , "vsta"     , POS_DEAD    , do_vstat    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
     { "vedit"    , "vedit"   , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_VEDIT , WIZ_OLC_GRP},
     { "vlist"    , "vlist"   , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_VLIST , WIZ_OLC_GRP},
 

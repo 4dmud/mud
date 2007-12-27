@@ -46,7 +46,7 @@ const char * afar_act(int afar, const char * string, char *buf, size_t len);
 
 ACMD(do_action)
 {
-  int act_nr,fnum;
+  int act_nr,fnum,fnumbak;
   struct social_messg *action;
   struct char_data *vict;
   struct obj_data *targ;
@@ -94,10 +94,17 @@ ACMD(do_action)
   }
 
   strncpy(arg1,arg,MAX_INPUT_LENGTH);
-if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(ch) > LVL_HERO))	
-  vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD);
+  fnumbak=fnum;
+  if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(ch) > LVL_HERO)){
+    vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD);
+    if(!vict) {
+      fnum=fnumbak;
+      vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
+    }
+  }
   else
-  vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
+    vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
+
   if (!vict || (IS_NPC(vict) && IN_ROOM(vict) != IN_ROOM(ch)))
   {
     if (action->char_obj_found)
