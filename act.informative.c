@@ -1930,7 +1930,7 @@ void look_around(CHAR_DATA *ch)
   
   if (zone_table[IN_ROOM(ch)->zone].dimension)
     new_send_to_char(ch, "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
-  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zp);
+  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zonename);
   new_send_to_char(ch, "{cc%s{C0\r\n", scan_zone_mobs(IN_ROOM(ch)->zone, zonename, sizeof(zonename)));
 
 }
