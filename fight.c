@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.54  2006/09/21 08:37:50  w4dimenscor
+ * Fixed uninitialised value in start-fighting
+ *
  * Revision 1.53  2006/09/21 07:37:57  w4dimenscor
  * added a check for riders into combat
  *
@@ -735,6 +738,8 @@ void start_fighting(Character* ch, Character* vict) {
         return;
     if (RIDDEN_BY(vict))
 	victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
+	else
+	victim = vict;
 	
     if ( !victim || DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
         return;
