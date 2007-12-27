@@ -1159,6 +1159,8 @@ void build_player_index(void)
   top_of_p_file = top_of_p_table = i - 1;
 
 
+/** lets check for duplicate id nums soon**/
+
 
   if (save_index)
   {
@@ -3656,7 +3658,7 @@ int purge_zone(int zone)
   for (ob = object_list; ob; ob = next_ob)
   {
     next_ob = ob->next;
-    if (!ob->carried_by && !ob->in_obj && !ob->worn_by & !ob->contains
+    if (!ob->carried_by && !ob->in_obj && !ob->worn_by & !ob->contains & !ob->in_locker
         && (ob->in_room->zone == zone)
         //    && (!IS_SET_AR(world[ob->in_room].room_flags, ROOM_NODECAY))
         && (!IS_SET_AR(ob->in_room->room_flags, ROOM_HOUSE))
@@ -6014,7 +6016,7 @@ MEMORY(ch) = NULL;
 void free_obj_delayed(struct obj_data *obj)
 {
   struct obj_data *temp;
-  for (temp = dead_obj; temp; temp = temp->next)
+    for (temp = dead_obj; temp; temp = temp->next)
     if (temp == obj)
     {
       log("Object %s attepted to be added to dead list twice!", obj->short_description);

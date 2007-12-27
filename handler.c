@@ -42,6 +42,7 @@ void update_char_objects(struct char_data *ch);
 
 
 /* external functions */
+OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj);
 void purge_qic(obj_rnum rnum);
 void die_link(CHAR_DATA *mob);
 void extract_all_in_list(OBJ_DATA *obj);
@@ -1418,6 +1419,12 @@ void extract_obj(struct obj_data *obj)
     log("Null pointer given to extract object.");
     return;
   }
+    for (tobj = dead_obj; tobj; tobj = tobj->next)
+    if (tobj == obj)
+    {
+      log("Object %s atempted to be added to dead list twice!", obj->short_description);
+      return;
+    }
   if (GET_ID(obj) == 0) {
   log("extracting object that hasn't been initilised");
   }
@@ -1426,6 +1433,9 @@ void extract_obj(struct obj_data *obj)
 
     save_corpses();
   }
+  if (obj->in_locker) 
+ item_from_locker(obj->in_locker, obj);
+ 
 
   /* Normal extract_obj code */
   if (obj->worn_by != NULL)
@@ -1526,11 +1536,6 @@ void extract_obj(struct obj_data *obj)
   }
   OBJ_SAT_IN_BY(obj) = NULL;
 
-  REMOVE_FROM_LIST(obj, object_list, next);
-  obj->next = NULL;
-  obj->carried_by = NULL;
-  obj->next_content = NULL;
-
   if (SCRIPT(obj))
     extract_script(obj, OBJ_TRIGGER);
 
@@ -1543,10 +1548,19 @@ void extract_obj(struct obj_data *obj)
     new_mudlog(CMP, LVL_SEN, FALSE, "%s purged", obj->short_description);
     purge_qic(GET_OBJ_RNUM(obj));
   }
+  REMOVE_FROM_LIST(obj, object_list, next);
+  obj->next = NULL;
+  obj->carried_by = NULL;
+  obj->next_content = NULL;
 #if 0
   free_obj(obj);
   obj = NULL;
 #else
+/** 
+    possibly change this and the extract char to reuse the memory 
+    only if can be certain that nothing else points to it
+    - mord dec-04
+**/
   free_obj_delayed(obj);
 #endif
 }
@@ -1598,6 +1612,8 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
 
     obj_from_room(obj);
 
+  } else if (obj->in_locker) {
+  item_from_locker(obj->in_locker, obj);
   }
   else if (!obj->in_obj && obj->carried_by)
   {	/* Worn or inventory */
@@ -1637,14 +1653,15 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
 void check_all_trees(void)
 {
   //TODO: this, .. i don't think works right
-  struct obj_data *obj;
+  struct obj_data *obj, *tmp;
   time_t tm = time(0);
   int ext = 0, add = 0;
 
   log("TREES: Updating all trees...");
 
-  for (obj = object_list; obj; obj = obj->next)
+  for (obj = object_list; obj; obj = tmp)
   {
+  tmp = obj->next;
     /*tree check*/
     if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING)
     {

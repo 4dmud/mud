@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2004/11/23 06:12:20 $                                           * 
-*  $Revision: 1.2 $                                                    *
+*  $Date: 2004/12/04 07:42:36 $                                           * 
+*  $Revision: 1.3 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -434,7 +434,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
         }
       }
-      /* addition inspired by Jamie Nelson - mordecai@xtra.co.nz */
+      /* addition inspired by Jamie Nelson - mordecai@xtra.co.nz  7426mob 7409room*/
       else if (!strcasecmp(var, "findobj"))
       {
         if (!field || !*field || !subfield || !*subfield)
@@ -448,7 +448,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
           if (rrnum == NULL)
           {
-            script_log("findmob.vnum(ovnum): No room with vnum %d", atoi(field));
+            script_log("findobj.vnum(ovnum): No room with vnum %d", atoi(field));
             strcpy(str, "0");
           }
           else

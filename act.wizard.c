@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
+ * fixed the locker bug, and the format error in clan tells, and a few other cleanups
+ *
  * Revision 1.3  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -676,6 +679,8 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
           return IN_ROOM(target_obj->carried_by);
         else if (target_obj->worn_by && IN_ROOM(target_obj->worn_by) != NULL)
           return IN_ROOM(target_obj->worn_by);
+	  else if (target_obj->in_locker && IN_ROOM(target_obj->in_locker) != NULL)
+        return IN_ROOM(target_obj->in_locker);
       }
     }
 
@@ -697,6 +702,8 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
         location = IN_ROOM(target_obj->carried_by);
       else if (target_obj->worn_by && IN_ROOM(target_obj->worn_by) != NULL)
         location = IN_ROOM(target_obj->worn_by);
+      else if (target_obj->in_locker && IN_ROOM(target_obj->in_locker) != NULL)
+        location = IN_ROOM(target_obj->in_locker);
 
       if (location == NULL)
       {
@@ -1364,6 +1371,9 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
   new_send_to_char(ch, "%s",   j->carried_by ? GET_NAME(j->carried_by) : "Nobody");
   new_send_to_char(ch,", Worn by: ");
   new_send_to_char(ch, "%s\r\n",   j->worn_by ? GET_NAME(j->worn_by) : "Nobody");
+  new_send_to_char(ch,", In Locker: ");
+  new_send_to_char(ch, "%s\r\n",   j->in_locker ? GET_NAME(j->in_locker) : "Nobody");
+  
 
   switch (GET_OBJ_TYPE(j))
   {

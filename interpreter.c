@@ -1862,7 +1862,8 @@ int perform_dupe_check(struct descriptor_data *d)
   return (1);
 }
 
-/*
+/** 
+//This is psudo code for something i would like to impliment eventually
  body human interfaces living {
        breathe {
           if (not breathable(environment.air)) {
@@ -2054,6 +2055,7 @@ int enter_player_game(struct descriptor_data *d)
 
 
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
+  if (find_char(GET_IDNUM(ch)) == NULL)
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
 
 

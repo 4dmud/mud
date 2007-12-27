@@ -1445,6 +1445,7 @@ OBJ_DATA * load_objects_to_list(FILE *fl)
   {
     temp = NULL;
     temp = read_one_item(fl, temp, &locate);
+    
     if (temp)
     {
       temp->next_content = list;

@@ -2345,7 +2345,7 @@ ACMD(do_score)
                      "{cg| |-------------------------------------------------------------------| |\r\n"
                      "{cg| |   {cwExp. Total: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
                      exphave, exp_needed(ch) > 0 ? expneed : "No More");
-    if (GET_LEVEL(ch) >= 30)
+   if (GET_LEVEL(ch) >= 20)
     {
       commafmt(exphave, sizeof(exphave),GET_GROUP_EXP(ch));
       commafmt(expneed, sizeof(expneed),group_exp_needed(ch));
@@ -2460,7 +2460,8 @@ ACMD(do_score)
   if (AFF_FLAGGED(ch, AFF_SANCTUARY))
     new_send_to_char(ch, "You are protected by Sanctuary.\r\n");
 
-  if (AFF_FLAGGED(ch, AFF_POISON_1))
+if (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) ||
+      AFF_FLAGGED(ch, AFF_POISON_3) || AFF_FLAGGED(ch, AFF_POISON_4))
     new_send_to_char(ch, "You are poisoned!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_CHARM))
@@ -3850,6 +3851,10 @@ void print_object_location(int num, struct obj_data *obj,
   {
     sprintf(buffer + strlen(buffer), "worn by %s\r\n",
             PERS(obj->worn_by, ch));
+  }
+  else if (obj->in_locker) {
+  sprintf(buffer + strlen(buffer), "in locker of %s\r\n",
+            PERS(obj->in_locker, ch));
   }
   else if (obj->in_obj)
   {

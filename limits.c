@@ -465,7 +465,7 @@ int can_level(struct char_data *ch)
 {
   gold_int needed;
   if (GET_EXP(ch) >= (needed = level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)))||
-      ((GET_GROUP_EXP(ch) >= (needed * 0.2)) && GET_LEVEL(ch) >= 30))
+      ((GET_GROUP_EXP(ch) >= (needed * 0.2)) && GET_LEVEL(ch) >= 20))
     return 1;
   else
     return 0;
@@ -641,9 +641,6 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
       gain *=2;
 
     GET_GROUP_EXP(ch) += gain;
-
-    if (GET_LEVEL(ch) < 30)
-      return;
 
     while (!((GET_LEVEL(ch) + 1) >= LVL_HERO)&&can_level(ch))
     {
@@ -944,8 +941,8 @@ void point_update(void)
 
         if (j->in_obj)
           obj_to_obj(jj, j->in_obj);
-        else if (j->carried_by && j->carried_by->in_room != NULL)
-          obj_to_room(jj, j->carried_by->in_room);
+        else if (j->carried_by && IN_ROOM(j->carried_by) != NULL)
+          obj_to_room(jj, IN_ROOM(j->carried_by));
         else if (j->in_room != NULL)
         {
           obj_to_room(jj, j->in_room);

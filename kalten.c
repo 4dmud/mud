@@ -53,6 +53,8 @@ extern int circle_shutdown, circle_reboot;
 extern const char *pc_class_types[];
 
 /* external functions */
+
+void hit_death_trap(CHAR_DATA *ch);
 void do_objstat(struct char_data *ch, struct obj_data *j);
 void do_sstat_objdump(char_data * ch, obj_data * j);
 void script_stat_dump(char_data * ch, struct script_data *sc);
@@ -1887,6 +1889,22 @@ bool check_time(void)
     return FALSE;
 }
 
+const char *wing_color(int align) {
+if (align > 950)
+return "shimmering silky white";
+else if (align > 350)
+return "silky white";
+else if (align > 0)
+return "pale grey";
+else if (align >= -350)
+return "dark grey";
+else if (align >= 950)
+return "sooty black";
+else
+return "crackling hazy black";
+}
+
+
 #define TEST(x) new_send_to_char(ch, "%d\r\n", (x));
 
 int check_dam_affects(struct char_data *ch)
@@ -1897,31 +1915,31 @@ int check_dam_affects(struct char_data *ch)
 
   if (AFF_FLAGGED(ch, AFF_SUFFOCATING))
   {
-    if (damage(ch, ch, number(25, 50) + (GET_MAX_HIT(ch) * 0.01), SPELL_SUFFOCATE) == -1)
+    if (damage(ch, ch, number(25, 50) + (GET_MAX_HIT(ch) * 0.001), SPELL_SUFFOCATE) == -1)
       return -1;
   }
   if (!MOB_FLAGGED(ch, MOB_NOPOISON))
   {
     if (AFF_FLAGGED(ch, AFF_POISON_1))
     {
-      if (damage(ch, ch, 20 + (GET_MAX_HIT(ch) * 0.001), SPELL_POISON) == -1)
+      if (damage(ch, ch, 20 + (GET_MAX_HIT(ch) * 0.0001), SPELL_POISON) == -1)
       {
         return -1;
       }
-      alter_mana(ch, GET_MANA(ch)/12);
-      alter_move(ch, GET_MOVE(ch)/12);
+      alter_mana(ch, GET_MANA(ch)/25.0);
+      alter_move(ch, GET_MOVE(ch)/25.0);
 
     }
 
 
     if (AFF_FLAGGED(ch, AFF_POISON_2))
     {
-      if (damage(ch, ch, 75 + (GET_MAX_HIT(ch) * 0.002), SPELL_POISON) == -1)
+      if (damage(ch, ch, 75 + (GET_MAX_HIT(ch) * 0.0002), SPELL_POISON) == -1)
       {
         return -1;
       }
-      alter_mana(ch, GET_MANA(ch)/8);
-      alter_move(ch, GET_MOVE(ch)/8);
+      alter_mana(ch, GET_MANA(ch)/16.0);
+      alter_move(ch, GET_MOVE(ch)/16.0);
 
     }
 
@@ -1929,22 +1947,22 @@ int check_dam_affects(struct char_data *ch)
 
     if (AFF_FLAGGED(ch, AFF_POISON_3))
     {
-      if (damage(ch, ch, 150 + (GET_MAX_HIT(ch) * 0.003), SPELL_POISON) == -1)
+      if (damage(ch, ch, 150 + (GET_MAX_HIT(ch) * 0.0003), SPELL_POISON) == -1)
         return -1;
 
-      alter_mana(ch, GET_MANA(ch)/6);
-      alter_move(ch, GET_MOVE(ch)/6);
+      alter_mana(ch, GET_MANA(ch)/8.0);
+      alter_move(ch, GET_MOVE(ch)/8.0);
 
     }
 
 
     if (AFF_FLAGGED(ch, AFF_POISON_4))
     {
-      if (damage(ch, ch, 200 + (GET_MAX_HIT(ch) * 0.04), SPELL_POISON) == -1)
+      if (damage(ch, ch, 200 + (GET_MAX_HIT(ch) * 0.0004), SPELL_POISON) == -1)
         return -1;
 
-      alter_mana(ch, (GET_MANA(ch)/2)+2);
-      alter_move(ch, (GET_MOVE(ch)/2)+2);
+      alter_mana(ch, (GET_MANA(ch)/6.0)+2);
+      alter_move(ch, (GET_MOVE(ch)/6.0)+2);
 
     }
   }
@@ -1969,15 +1987,15 @@ int check_dam_affects(struct char_data *ch)
 
 
   if (AFF_FLAGGED(ch, AFF_ACIDED))
-    if (damage(ch, ch, number(15, 20), SPELL_ACID) == -1)
+    if (damage(ch, ch, 100, SPELL_ACID) == -1)
       return -1;
 
   if (AFF_FLAGGED(ch, AFF_FREEZING))
-    if (damage(ch, ch, number(10, 15), SPELL_FREEZE) == -1)
+    if (damage(ch, ch, 100, SPELL_FREEZE) == -1)
       return -1;
 
   if (AFF_FLAGGED(ch, AFF_BURNING))
-    if (damage(ch, ch, number(10, 15), SPELL_BURN) == -1)
+    if (damage(ch, ch, 100, SPELL_BURN) == -1)
       return -1;
 
 
@@ -1990,9 +2008,9 @@ int check_dam_affects(struct char_data *ch)
       {
         if (!IS_NPC(ch))
         {
-          snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", GET_ALIGNMENT(ch) > 0 ? "silky white" : "sooty black");
+          snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", wing_color(GET_ALIGNMENT(ch)));
           act(buf, FALSE, ch, 0, 0, TO_CHAR);
-          snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.", GET_ALIGNMENT(ch) > 0 ? "silky white" : "sooty black");
+          snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_color(GET_ALIGNMENT(ch)));
           act(buf, FALSE, ch, 0, 0, TO_ROOM);
         }
         else
@@ -2004,9 +2022,9 @@ int check_dam_affects(struct char_data *ch)
       {
         if (!IS_NPC(ch))
         {
-          snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.", GET_ALIGNMENT(ch) > 0 ? "silky white" : "sooty black");
+          snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
           act(buf, FALSE, ch, 0, 0, TO_CHAR);
-          snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.", GET_ALIGNMENT(ch) > 0 ? "silky white" : "sooty black");
+          snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
           act(buf, FALSE, ch, 0, 0, TO_ROOM);
         }
         else
@@ -2031,11 +2049,11 @@ void sector_update(void)
 
     if (check_dam_affects(i) == -1)
       continue;
-    if (IS_NPC(i))
+    if ((IS_NPC(i) && !i->master))
       continue;
     if (PLR_FLAGGED(i, PLR_DYING) || DEAD(i))
       continue;
-    if (GET_LEVEL(i) > LVL_IMMORT)
+    if (!IS_NPC(i) && GET_LEVEL(i) > LVL_IMMORT)
       continue;
     if (GET_POS(i) >= POS_STUNNED)
     {
@@ -2194,9 +2212,8 @@ int perform_push(struct char_data *ch, int dir, int need_specials_check,
   if (IS_SET_AR(ROOM_FLAGS(IN_ROOM(ch)), ROOM_DEATH) &&
       GET_LEVEL(ch) <= LVL_HERO)
   {
+  hit_death_trap(ch);
     log_push_to_death(ch, attacker);
-    death_cry(ch);
-    extract_char(ch);
     return 0;
   }
   return 1;

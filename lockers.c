@@ -21,6 +21,7 @@ int save_one_item( OBJ_DATA *obj, FILE *fl, int locate); /*objsave.c*/
 #define ITEMS_PER_BRONZE 15
 /*local functions */
 int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj);
+OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj);
 int remove_item_from_locker(CHAR_DATA *ch, int num);
 void save_locker(CHAR_DATA *ch);
 void list_locker_to_char(CHAR_DATA *ch);
@@ -67,20 +68,29 @@ int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj)
 
   obj_from_char(obj);
   obj->next_content = LOCKER(ch);
+  obj->in_locker = ch;
   LOCKER(ch) = obj;
   save_locker(ch);
   Crash_crashsave(ch);
   return 1;
 }
+OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj)
+{
+  OBJ_DATA *temp = NULL;
+  REMOVE_FROM_LIST(obj, LOCKER(ch), next_content);
+  obj->next_content = NULL;
+  obj->in_locker = NULL;
+  return obj;
+}
 
 int remove_item_from_locker(CHAR_DATA *ch, int num)
 {
-  OBJ_DATA *obj, *temp;
+  OBJ_DATA *obj;
   int count = 1, found = FALSE;
   if (!LOCKER_EXPIRE(ch))
   {
     new_send_to_char(ch, "{cRYour locker has expired, you have %d items in it.\r\n"
-                     "To regain access to these items, please purchase a new locker.\r\n", count_locker(ch));
+                     "To regain access to these items, please purchase a new locker.\r\n\r\n", count_locker(ch));
     send_policy(ch);
     return 0;
   }
@@ -88,10 +98,15 @@ int remove_item_from_locker(CHAR_DATA *ch, int num)
   {
     if (count == num)
     {
-      REMOVE_FROM_LIST(obj, LOCKER(ch), next_content);
-      obj->next_content = NULL;
-      found = TRUE;
-      break;
+      if (item_from_locker(ch, obj) != NULL)
+      {
+        found = TRUE;
+        break;
+      }
+      else
+      {
+        return 0;
+      }
     }
     count++;
   }
@@ -195,24 +210,25 @@ void list_locker_to_char(CHAR_DATA *ch)
     mins = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_MIN;
     new_send_to_char(ch, "You have %d mins left on this locker.\r\n", mins);
   }
-  if (LOCKER(ch)) {
-    DYN_CREATE;
-  *dynbuf = 0;
-  
-  for (obj = LOCKER(ch); obj; obj = obj->next_content)
+  if (LOCKER(ch))
   {
-    snprintf(buf, sizeof(buf), "{cy%-3d{cg) {cc[%-15s]{cg %s{c0  \r\n", ++count, item_types[(int)GET_OBJ_TYPE(obj)], obj->short_description);
-    DYN_RESIZE(buf);
-  }
+    DYN_CREATE;
+    *dynbuf = 0;
+
+    for (obj = LOCKER(ch); obj; obj = obj->next_content)
+    {
+      snprintf(buf, sizeof(buf), "{cy%-3d{cg) {cc[%-15s]{cg %s{c0  \r\n", ++count, item_types[(int)GET_OBJ_TYPE(obj)], obj->short_description);
+      DYN_RESIZE(buf);
+    }
 
 
-  new_send_to_char(ch, "You have %d items in your locker, with room for %d more.\r\n",count, LOCKER_LIMIT(ch) - count);
+    new_send_to_char(ch, "You have %d items in your locker, with room for %d more.\r\n",count, LOCKER_LIMIT(ch) - count);
 
-  
+
 
     new_send_to_char(ch, "No.     Type     Name\r\n"
                      "----------------------------------------------\r\n");
-		     
+
     page_string(ch->desc, dynbuf, DYN_BUFFER);
   }
   else

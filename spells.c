@@ -481,6 +481,8 @@ ASPELL(spell_locate_object)
     else if (i->worn_by)
       sprintf(buf, "%s is being worn by %s.\r\n",
               i->short_description, PERS(i->worn_by, ch));
+    else if (i->in_locker)
+      sprintf(buf, "%s is in someones locker.\r\n",i->short_description);
     else
       sprintf(buf, "%s's location is uncertain.\r\n",
               i->short_description);

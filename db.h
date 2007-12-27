@@ -377,6 +377,7 @@ extern struct char_data *mob_proto;
 extern struct obj_data *obj_proto;
 extern struct zone_data *zone_table;
 extern struct obj_data *object_list;
+extern struct obj_data *dead_obj;	/* delayed obj removal   */
     extern int top_of_zone_table;
 #endif /* __DB_C__ */
 extern struct descriptor_data *descriptor_list;

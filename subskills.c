@@ -835,6 +835,7 @@ ACMD(do_ignite)
 	tmpobj.in_room = IN_ROOM(hilt);
 	tmpobj.carried_by = hilt->carried_by;
 	tmpobj.worn_by = hilt->worn_by;
+	tmpobj.in_locker = hilt->in_locker;
 	tmpobj.worn_on = hilt->worn_on;
 	tmpobj.in_obj = hilt->in_obj;
 	tmpobj.contains = hilt->contains;
@@ -888,6 +889,7 @@ struct obj_data * revert_object(struct obj_data *hilt)
 	memcpy(&tmpobj, sabre, sizeof(*sabre));
 	tmpobj.in_room = IN_ROOM(hilt);
 	tmpobj.carried_by = hilt->carried_by;
+	tmpobj.in_locker = hilt->in_locker;
 	tmpobj.worn_by = hilt->worn_by;
 	tmpobj.worn_on = hilt->worn_on;
 	tmpobj.in_obj = hilt->in_obj;

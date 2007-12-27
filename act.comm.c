@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
+ * fixed the locker bug, and the format error in clan tells, and a few other cleanups
+ *
  * Revision 1.3  2004/11/27 22:34:58  w4dimenscor
  * fixed the skills attacks, added an extra multi to elemental spells for when they are affected by mind enhancements
  *
@@ -1421,7 +1424,7 @@ ACMD(do_ctell)
       argument++;
     while (*argument == ' ')
       argument++;*/
-    snprintf(level_string, sizeof(level_string), " (#%d) ", minlev);
+    snprintf(level_string, sizeof(level_string), " (to ranks > %d)", minlev);
   }
 
   if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))

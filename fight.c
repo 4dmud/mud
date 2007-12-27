@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.7  2004/12/04 07:42:36  w4dimenscor
+ * fixed the locker bug, and the format error in clan tells, and a few other cleanups
+ *
  * Revision 1.6  2004/11/27 22:34:58  w4dimenscor
  * fixed the skills attacks, added an extra multi to elemental spells for when they are affected by mind enhancements
  *
@@ -4653,7 +4656,7 @@ void perform_group_gain(struct char_data *ch, gold_int base,
 
   gold_int share = base;
 
-  if (IS_NPC(ch) || AFF_FLAGGED(ch, AFF_CHARM) || (IS_NPC(ch) && GET_LEVEL(ch) >= LVL_IMMORT))
+  if (IS_NPC(ch) || AFF_FLAGGED(ch, AFF_CHARM) || (GET_LEVEL(ch) >= LVL_IMMORT))
     return;
 
   /* Calculate level-difference bonus */
@@ -4722,7 +4725,7 @@ void group_gain(struct char_data *ch, struct char_data *victim)
   if (HERE(k, ch) && GET_PERC(k) > 0)
   {
     perform_group_gain(k, (gold_int)(tot_gain * ((GET_PERC(k) / tot_members))), victim);
-    if (!IS_NPC(k) && group_bonus)
+    if (!IS_NPC(k) && group_bonus &&  (GET_LEVEL(k) >= 20))
       gain_group_exp(k, (group_bonus / count) * 1.1);
   }
 

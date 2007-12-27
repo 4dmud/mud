@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/20 02:33:25 $
-*  $Revision: 1.2 $
+*  $Date: 2004/12/04 07:42:36 $
+*  $Revision: 1.3 $
 **************************************************************************/
 
 #include "conf.h"
@@ -379,6 +379,7 @@ OCMD(do_otransform)
 	memcpy(&tmpobj, o, sizeof(*o));
 	tmpobj.in_room = IN_ROOM(obj);
 	tmpobj.carried_by = obj->carried_by;
+	tmpobj.in_locker = obj->in_locker;
 	tmpobj.worn_by = obj->worn_by;
 	tmpobj.worn_on = obj->worn_on;
 	tmpobj.in_obj = obj->in_obj;

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
+ * fixed the locker bug, and the format error in clan tells, and a few other cleanups
+ *
  * Revision 1.3  2004/11/20 04:43:17  w4dimenscor
  * Added more combat messages and disabled aggro and kill all for the moment
  *
@@ -1250,7 +1253,8 @@ struct obj_data
   char *action_description;	/* What to write when used          */
   struct extra_descr_data *ex_description;	/* extra descriptions     */
   struct char_data *carried_by;	/* Carried by :NULL in room/conta   */
-  struct char_data *worn_by;	/* Worn by?                         */
+  struct char_data *worn_by;	/* Worn by?  */
+  struct char_data *in_locker;  /* lockered? */
   sh_int worn_on;		/* Worn where?                      */
 
   struct obj_data *in_obj;	/* In what object NULL when none    */
