@@ -2815,7 +2815,7 @@ void nanny(Descriptor *d, char *arg)
       }
       d->Output( "Enter the new text you'd like others to see when they look at you.\r\n");
       send_editor_help(d);
-      *d->str = d->character->player.description;
+      d->str = &d->character->player.description;
       d->max_str = EXDSCR_LENGTH;
       STATE(d) = CON_EXDESC;
       break;
