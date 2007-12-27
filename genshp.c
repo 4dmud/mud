@@ -400,6 +400,8 @@ void free_shop(struct shop_data *shop)
  */
 shop_rnum real_shop(shop_vnum vnum)
 {
+
+#if 0
   shop_rnum bot, top, mid;
 
   bot = 0;
@@ -418,6 +420,14 @@ shop_rnum real_shop(shop_vnum vnum)
     else
       bot = mid + 1;
   }
+  #else
+  int i;
+  for (i = 0;i < top_shop - top_shop_offset;i++) {
+  if (SHOP_NUM(i) == vnum)
+  return (shop_rnum)i;
+  }
+  return NOWHERE;
+  #endif
 }
 
 /*-------------------------------------------------------------------*/
