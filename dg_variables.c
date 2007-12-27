@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/11/11 21:16:52 $                                           * 
-*  $Revision: 1.39 $                                                      *
+*  $Date: 2007/01/26 16:49:57 $                                           * 
+*  $Revision: 1.40 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -189,7 +189,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd,
     //char tmpvar[MAX_STRING_LENGTH];
 
     if (!str_cmp(field, "strlen")) {                     /* strlen    */
-        snprintf(str, slen, "%d", vd->value.length());
+        snprintf(str, slen, "%d", (int)(vd->value.length()));
         return TRUE;
     } else if (!str_cmp(field, "trim")) {                /* trim      */
 #if 0

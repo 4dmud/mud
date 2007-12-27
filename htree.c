@@ -158,6 +158,6 @@ l = 0;//    l = real_room(world[n].number);
   }
   t2 = ((float)finish.tv_sec + ((float)finish.tv_usec) / 1000000) -
        ((float)start.tv_sec + ((float)start.tv_usec) / 1000000);
-  log("htree stats (global): %d nodes, %d bytes (depth %d/%d used/possible)", htree_total_nodes, htree_total_nodes * sizeof(struct htree_node), htree_depth_used, HTREE_MAX_DEPTH);
+  log("htree stats (global): %d nodes, %d bytes (depth %d/%d used/possible)", htree_total_nodes, (int)(htree_total_nodes * sizeof(struct htree_node)), htree_depth_used, (int)(HTREE_MAX_DEPTH));
   log("htree_test: htree speedup factor: %.0f%%", t1 * 100 / t2);
 }

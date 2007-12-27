@@ -28,7 +28,8 @@ room_rnum add_room(Room *room)
 {
   //  Character *tch;
   //  struct obj_data *tobj;
-  int i, found = FALSE;
+  int i; 
+  unsigned long found = FALSE;
   //  room_rnum i;
 
   if (room == NULL)
@@ -90,8 +91,8 @@ room_rnum add_room(Room *room)
   log("GenOLC: add_room: Added room %d at index #%d.", room->number, found);
 #endif
   world_vnum[room->number]=room;
-  found=(int)(room);
-  log("GenOLC: add_room: Added room %d at address %d.", room->number, found);
+  found=(unsigned long)(room);
+  log("GenOLC: add_room: Added room %d at address %lu.", room->number, found);
 
 
   /* found is equal to the array index where we added the room. */

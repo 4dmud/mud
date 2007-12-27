@@ -4030,7 +4030,7 @@ void reset_zone(zone_rnum zone) {
                 if (ZCMD.arg3 < 0 || ZCMD.arg3 >= NUM_WEARS) {
                     ZONE_ERROR("invalid equipment pos number");
                 } else {
-                    int ret;
+                    int ret=-1;
                     obj = read_object(ZCMD.arg1, REAL);
                     if (obj && load_qic_check(ZCMD.arg1)) {
                         IN_ROOM(obj) = IN_ROOM(mob);
@@ -6432,7 +6432,7 @@ int check_bitvector_names(bitvector_t bits, size_t namecount,
 
     for (flagnum = namecount; flagnum < sizeof(bitvector_t) * 8; flagnum++)
         if ((1 << flagnum) & bits) {
-            log("SYSERR: %s has unknown %s flag, bit %d (0 through %d known).", whatami, whatbits, flagnum, namecount - 1);
+            log("SYSERR: %s has unknown %s flag, bit %d (0 through %d known).", whatami, whatbits, flagnum, (int)(namecount - 1));
             error = TRUE;
         }
 
