@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.29  2006/03/06 09:38:28  w4dimenscor
+ * Changed it so that you can clan expel people who are offline and in another room
+ *
  * Revision 1.28  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -1677,7 +1680,7 @@ struct player_special_data_saved
      'sparen' to something meaningful, but don't change the order.  */
 
 
-  ubyte clan_rank;
+  int clan_rank;
   ubyte orig_race;
   int brass_tokens;
   int bronze_tokens;

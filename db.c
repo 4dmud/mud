@@ -5020,9 +5020,9 @@ int store_to_char(char *name, struct char_data *ch)
         ch->real_abils.con = num;
       else if (!strcmp(tag, "Clan"))
         GET_CLAN(ch) = num;
-      else if (!strcmp(tag, "ClRk"))
-        GET_CLAN_RANK(ch) = num;
-      else if (!strcmp(tag, "Clns"))
+      else if (!strcmp(tag, "ClRk")) {
+        GET_CLAN_RANK(ch) =  player_table[id].rank < 0 ? player_table[id].rank : num;
+      } else if (!strcmp(tag, "Clns"))
         GET_COOLNESS(ch) = num;
       else if (!strcmp(tag, "Conv"))
         GET_CONVERSIONS(ch) = num;

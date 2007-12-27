@@ -2208,8 +2208,12 @@ int enter_player_game(struct descriptor_data *d)
   if (LOCKER(ch))
     new_mudlog( NRM, GET_LEVEL(ch), TRUE, "  -- with %d items in locker", count_locker(ch));
 
-
-
+  if (GET_CLAN_RANK(ch) < 0) {
+    GET_CLAN_RANK(ch) = 0;
+    GET_CLAN(ch) = 0;
+  new_send_to_char(ch, "You have been removed from your clan.\r\n");
+  }
+ 
   /* Clear their load room if it's not persistant. */
   if (!PLR_FLAGGED(ch, PLR_LOADROOM))
     GET_LOADROOM(ch) = NOWHERE;

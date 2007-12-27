@@ -217,7 +217,7 @@ void do_clan_create(struct char_data *ch, char *arg)
 }
 void do_clan_recall(struct char_data *ch, char *arg)
 {
-obj_vnum brd;
+  obj_vnum brd;
   int clan_num = -1;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -229,18 +229,18 @@ obj_vnum brd;
   }
 
 
-    if (GET_LEVEL(ch) < LVL_CLAN_GOD)
-    {
-      send_to_char("You do not have that clan privilege.\r\n", ch);
-      return;
-    }
-    two_arguments(arg, arg1, arg2);
-    if (!arg2 && !*arg2 && (clan_num = find_clan(arg2)) < 0)
-    {
-      send_to_char("Unknown clan.\r\n", ch);
-      return;
-    }
-  
+  if (GET_LEVEL(ch) < LVL_CLAN_GOD)
+  {
+    send_to_char("You do not have that clan privilege.\r\n", ch);
+    return;
+  }
+  two_arguments(arg, arg1, arg2);
+  if (!arg2 && !*arg2 && (clan_num = find_clan(arg2)) < 0)
+  {
+    send_to_char("Unknown clan.\r\n", ch);
+    return;
+  }
+
 
   if (!(*arg1))
   {
@@ -263,7 +263,7 @@ obj_vnum brd;
   }
 
   clan[clan_num].recall = brd;
-  
+
   new_send_to_char(ch, "Done.\r\n");
 
   save_clans();
@@ -273,7 +273,7 @@ obj_vnum brd;
 }
 void do_clan_board(struct char_data *ch, char *arg)
 {
-obj_vnum brd;
+  obj_vnum brd;
   int clan_num = -1;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -285,23 +285,26 @@ obj_vnum brd;
   }
 
 
-    if (GET_LEVEL(ch) < LVL_CLAN_GOD)
-    {
-      send_to_char("You do not have that clan privilege.\r\n", ch);
-      return;
-    }
-    two_arguments(arg, arg1, arg2);
-    if (arg2 && *arg2) {
+  if (GET_LEVEL(ch) < LVL_CLAN_GOD)
+  {
+    send_to_char("You do not have that clan privilege.\r\n", ch);
+    return;
+  }
+  two_arguments(arg, arg1, arg2);
+  if (arg2 && *arg2)
+  {
     if ((clan_num = find_clan(arg2)) < 0)
     {
       send_to_char("Unknown clan.\r\n", ch);
       return;
-      }
-    } else {
+    }
+  }
+  else
+  {
     send_to_char("clan set board <VNUM> <clan>\r\n", ch);
     return;
-    }
-  
+  }
+
 
   if (!(*arg1))
   {
@@ -324,7 +327,7 @@ obj_vnum brd;
   }
 
   clan[clan_num].board = brd;
-  
+
   new_send_to_char(ch, "Done.\r\n");
 
   save_clans();
@@ -375,16 +378,18 @@ void do_clan_destroy(struct char_data *ch, char *arg)
       CREATE(cbuf, struct char_data, 1);
       CREATE(cbuf->player_specials, struct player_special_data, 1);
       clear_char(cbuf);
-      if (load_char((player_table + j)->name, cbuf) >= 0) {
-      if (GET_CLAN(cbuf) == clan[i].id)
+      if (load_char((player_table + j)->name, cbuf) >= 0)
       {
-        GET_CLAN(cbuf) = 0;
-        GET_CLAN_RANK(cbuf) = 0;
-        save_char(cbuf);
+        if (GET_CLAN(cbuf) == clan[i].id)
+        {
+          GET_CLAN(cbuf) = 0;
+          GET_CLAN_RANK(cbuf) = 0;
+          save_char(cbuf);
+        }
+        free_char(victim);
       }
-      free_char(victim);
-      } else
-      free(victim);
+      else
+        free(victim);
     }
   }
 
@@ -494,6 +499,7 @@ void do_clan_expel(struct char_data *ch, char *arg)
   int clan_num, immcom = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
+  long ids = -1;
 
   if (!(*arg))
   {
@@ -533,12 +539,15 @@ void do_clan_expel(struct char_data *ch, char *arg)
     return;
   }
 
-  if (!(vict = get_char_room_vis(ch, arg, NULL)))
+  if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
   {
-    send_to_char("Er, Who ??\r\n", ch);
-    return;
+    if ((ids = get_ptable_by_name(arg)) == -1)
+    {
+      send_to_char("Er, Who ??\r\n", ch);
+      return;
+    }
   }
-  else
+  if (ids == -1)
   {
     if (GET_CLAN(vict) != clan[clan_num].id)
     {
@@ -553,15 +562,31 @@ void do_clan_expel(struct char_data *ch, char *arg)
         return;
       }
     }
-  }
 
-  GET_CLAN(vict) = 0;
-  GET_CLAN_RANK(vict) = 0;
-  save_char(vict);
-  clan[clan_num].members--;
-  clan[clan_num].power -= GET_LEVEL(vict);
-  send_to_char("You've been kicked out of your clan!\r\n", vict);
-  send_to_char("Done.\r\n", ch);
+
+    GET_CLAN(vict) = 0;
+    GET_CLAN_RANK(vict) = 0;
+    save_char(vict);
+    clan[clan_num].members--;
+    clan[clan_num].power -= GET_LEVEL(vict);
+    send_to_char("You've been kicked out of your clan!\r\n", vict);
+    send_to_char("Done.\r\n", ch);
+
+  }
+  else
+  {
+    if (!immcom && ((player_table[ids].clan == GET_CLAN(ch)) && (player_table[ids].rank < GET_CLAN_RANK(ch))))
+    {
+      new_send_to_char("%s is kicked out of your clan!\r\n", ch);
+      player_table[ids].rank = -1;
+
+      clan[clan_num].members--;
+      clan[clan_num].power -= player_table[ids].level;
+      save_player_index();
+    } else {
+      new_send_to_char("%s cannot be kicked out.\r\n", ch);
+    }
+  }
 
   return;
 }
@@ -822,12 +847,13 @@ void do_clan_who(struct char_data *ch)
   {
     if (!IS_PLAYING(d))
       continue;
-    if ((tch = d->character)) {
-    if (CAN_SEE(ch, tch))
-      if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 )
-        new_send_to_char(ch, "%s\r\n", GET_NAME(tch));
-	
-	}
+    if ((tch = d->character))
+    {
+      if (CAN_SEE(ch, tch))
+        if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 )
+          new_send_to_char(ch, "%s\r\n", GET_NAME(tch));
+
+    }
 
   }
   return;
@@ -894,7 +920,7 @@ void do_clan_apply(struct char_data *ch, char *arg)
     return;
   }
   if (clan[clan_num].app_fee < 0)
-    {
+  {
     send_to_char("That clan is far to exclusive for you!!\r\n", ch);
     return;
   }
@@ -1388,8 +1414,10 @@ void init_clans()
       TEMP_LOAD_CHAR = FALSE;
     }
 #else
-    if (player_table[j].name &&
-        *player_table[j].name &&
+    if (!IS_SET(player_table[j].flags, PINDEX_DELETED) &&
+        !IS_SET(player_table[j].flags, PINDEX_SELFDELETE) &&
+        player_table[j].name &&
+        *player_table[j].name && player_table[j].rank > 0 &&
         (i = find_clan_by_id(player_table[j].clan)) >= 0)
     {
       add_clan_member(player_table[j].name, player_table[j].rank, i);
@@ -1497,7 +1525,7 @@ void do_clan_bank(struct char_data *ch, char *arg, int action)
   }
 
   if (( GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_WITHDRAW]
-                        && !immcom && action == CB_WITHDRAW) )
+        && !immcom && action == CB_WITHDRAW) )
   {
     send_to_char
     ("You're not influent enough in the clan to do that!\r\n", ch);
@@ -1756,22 +1784,24 @@ void do_clan_ranks(struct char_data *ch, char *arg)
     }
     else
     {
-      CREATE(victim, struct char_data, 1);      
+      CREATE(victim, struct char_data, 1);
       CREATE(victim->player_specials, struct player_special_data, 1);
       clear_char(victim);
-      if (load_char((player_table + j)->name, victim) >= 0) {
-      if (GET_CLAN(victim) == clan[clan_num].id)
+      if (load_char((player_table + j)->name, victim) >= 0)
       {
-        if (GET_CLAN_RANK(victim) < clan[clan_num].ranks
-            && GET_CLAN_RANK(victim) > 0)
-          GET_CLAN_RANK(victim) = 1;
-        if (GET_CLAN_RANK(victim) == clan[clan_num].ranks)
-          GET_CLAN_RANK(victim) = new_ranks;
-        save_char(victim);
+        if (GET_CLAN(victim) == clan[clan_num].id)
+        {
+          if (GET_CLAN_RANK(victim) < clan[clan_num].ranks
+              && GET_CLAN_RANK(victim) > 0)
+            GET_CLAN_RANK(victim) = 1;
+          if (GET_CLAN_RANK(victim) == clan[clan_num].ranks)
+            GET_CLAN_RANK(victim) = new_ranks;
+          save_char(victim);
+        }
+        free_char(victim);
       }
-      free_char(victim);
-      } else
-      free(victim);
+      else
+        free(victim);
     }
   }
 
@@ -2162,17 +2192,17 @@ void do_clan_set(struct char_data *ch, char *arg)
     do_clan_application(ch, arg2);
     return;
   }
-    if (is_abbrev(arg1, "recall"))
+  if (is_abbrev(arg1, "recall"))
   {
     do_clan_recall(ch, arg2);
     return;
   }
-    if (is_abbrev(arg1, "board"))
+  if (is_abbrev(arg1, "board"))
   {
     do_clan_board(ch, arg2);
     return;
   }
-  
+
   send_clan_format(ch);
 }
 

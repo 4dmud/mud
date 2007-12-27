@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.33  2006/03/06 09:38:28  w4dimenscor
+ * Changed it so that you can clan expel people who are offline and in another room
+ *
  * Revision 1.32  2006/02/26 00:33:42  w4dimenscor
  * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use color codes
  *
@@ -2429,12 +2432,15 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     {
       if (RIDING(ch) && HERE(ch, RIDING(ch)))
       {
-        int dam_exp = partial/2;
+        int dam_exp = partial;
         if (IS_NPC(vict) && !IS_NPC(RIDING(ch)) && partial > 2)
         {
+          dam_exp /= 2;
           damage_count(vict, IS_NPC(RIDING(ch)) ? -1 : GET_ID(RIDING(ch)), dam_exp);
           damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
-        }
+        } else
+          damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
+          
       }
       else
       {
