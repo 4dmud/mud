@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/01 11:29:26 $
-*  $Revision: 1.21 $
+*  $Date: 2006/05/13 01:31:29 $
+*  $Revision: 1.22 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.22  2006/05/13 01:31:29  w4dimenscor
+ * Added the changes to the fread_string function thotter. Also put the hash lookup table back in which speeds things up, but i have found that in the past it adds a little instability. I added code optimisations in to speed functions up, such as isname
+ *
  * Revision 1.21  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -3743,7 +3746,7 @@ struct lookup_table_t lookup_table[BUCKET_COUNT];
 
 void init_lookup_table(void)
 {
-#if 0
+#if 1
   int i;
   for (i = 0; i < BUCKET_COUNT; i++)
   {
@@ -3756,7 +3759,7 @@ void init_lookup_table(void)
 
 struct char_data *find_char_by_uid_in_lookup_table(long uid)
 {
-#if 1
+#if 0
   struct char_data *tch;
   for (tch = character_list; tch; tch = tch->next)
     if (GET_ID(tch) == uid)
@@ -3806,7 +3809,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
 
 struct obj_data *find_obj_by_uid_in_lookup_table(long uid)
 {
-#if 1
+#if 0
   struct obj_data *o;
   for (o = object_list;o;o = o->next)
     if (GET_ID(o) == uid)
@@ -3829,7 +3832,7 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid)
 
 void add_to_lookup_table(long uid, void *c)
 {
-#if 0
+#if 1
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -3857,7 +3860,7 @@ void add_to_lookup_table(long uid, void *c)
 void remove_from_lookup_table(long uid)
 {
 
-#if 0
+#if 1
 
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
@@ -3889,8 +3892,10 @@ void remove_from_lookup_table(long uid)
       }
     }
 
-
+#if DEBUG
   log("remove_from_lookup. UID %ld not found.", uid);
+#endif
+  
 #endif
 }
 /*

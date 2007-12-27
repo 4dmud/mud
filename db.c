@@ -6174,7 +6174,7 @@ char *fread_string(FILE *fl, const char *error)
     if (tlen > 0)
     {
       point = (tmp + tlen - 1);
-      for (; (*point=='\r' || *point=='\n'); point--);
+      for (; point>tmp && (*point=='\r' || *point=='\n'); point--);
       if (*point=='~')
       {
         *point='\0';
@@ -6183,9 +6183,12 @@ char *fread_string(FILE *fl, const char *error)
       else
       {
         /** but what if this ends up making it bigger then the buffer?**/
-        *(++point) = '\r';
-        *(++point) = '\n';
-        *(++point) = '\0';
+        if(point-tmp!=0) ++point;
+        *(point) = '\r';
+        if(point-tmp!=0) ++point;
+        *(point) = '\n';
+        if(point-tmp!=0) ++point;
+        *(point) = '\0';
       }
 
       templength = point - tmp;
@@ -8397,12 +8400,14 @@ int valid_id_num(long id)
 {
   CHAR_DATA *tch;
   DESCRIPTOR_DATA *d;
-  for (tch = character_list; tch; tch = tch->next)
-    if (GET_ID(tch) == id)
-      return 0;
   for (d = descriptor_list; d; d = d->next)
     if (d->character && GET_ID(d->character) == id)
       return 0;
+  
+  for (tch = character_list; tch; tch = tch->next)
+    if (GET_ID(tch) == id)
+      return 0;
+
   return 1;
 }
 int valid_to_save(char *name)

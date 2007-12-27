@@ -94,22 +94,25 @@ char *fname(const char *namelist)
 int isname(const char *str, const char *namelist)
 {
   char *newlist;
-  char *curtok;
-  char *lp;
+  register char *curtok;
+  //register char *lp;
+  static char newlistbuf[MAX_STRING_LENGTH];
 
   if (!str || !*str || !namelist || !*namelist)
     return 0;
-  if (!str_cmp(str, namelist)) /* the easy way */
+  if (!strcasecmp(str, namelist)) /* the easy way */
     return 1;
 
-  lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
+  //lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
+  strlcpy(newlistbuf, namelist, sizeof(newlistbuf));
+  newlist = newlistbuf;
   for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
     if (curtok && is_abbrev(str, curtok))
     {
-      free(lp);
+      //free(lp);
       return 1;
     }
-  free(lp);
+  //free(lp);
   return 0;
 }
 

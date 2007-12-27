@@ -1897,7 +1897,7 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 void look_around(CHAR_DATA *ch)
 {
 
-  char zonename[MAX_STRING_LENGTH], *zp;
+  char zonename[MAX_STRING_LENGTH], *zp = NULL;
 
   if (IN_ROOM(ch) == NULL)
   {
@@ -1923,9 +1923,10 @@ void look_around(CHAR_DATA *ch)
       break;
     }
   }
+  zp = zonename; /* Nulling this value to stop gcc warning - mord */
   if (zone_table[IN_ROOM(ch)->zone].dimension)
     new_send_to_char(ch, "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
-  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zonename);
+  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zp);
   new_send_to_char(ch, "{cc%s{C0\r\n", scan_zone_mobs(IN_ROOM(ch)->zone, zonename, sizeof(zonename)));
 
 }

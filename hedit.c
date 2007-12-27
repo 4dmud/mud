@@ -11,6 +11,7 @@
 #include "db.h"
 #include "boards.h"
 #include "oasis.h"
+#include "handler.h"
 
 
 
@@ -42,7 +43,6 @@ void hedit_save_to_disk(void);
 int  hedit_find_entry(char *keyword);
 void hedit_save_internally(struct descriptor_data *d);
 void free_help(struct help_index_element *help);
-int isname(char *str, char *namelist);
 
 
 /*------------------------------------------------------------------------*/

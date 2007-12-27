@@ -11,7 +11,7 @@ CC = gcc
 CXREF = cxref
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -pipe -Wstrict-prototypes 
+MYFLAGS = -Wall -pipe -Wstrict-prototypes -Wunused
 # -Wnested-externs -Wshadow -m32
 # -I/usr/src/lib/libcrypt/ 
 
@@ -24,7 +24,7 @@ PROFILE =
 ##############################################################################
 BINDIR = ../bin
 
-CFLAGS = -O -ggdb $(MYFLAGS) $(PROFILE)
+CFLAGS = -O2 -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
 LIBS =  -lcrypt -lz -lm -lc
@@ -73,14 +73,12 @@ INC = *.h
 
 default: all
 
-all: .accepted
+all: 
 	$(MAKE) $(BINDIR)/circle 
 #	$(MAKE) utils      # --  There's nothing in there...
 
-.accepted:
-	@./licheck less
 
-utils: .accepted
+utils: 
 	(cd util; $(MAKE) all)
 circle:
 	$(MAKE) $(BINDIR)/circle

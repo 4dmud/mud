@@ -70,7 +70,7 @@ char* print_gold(char* result, gold_int gold)
 char *center_align(char *str, int width)
 {
   static char retbuf[MAX_STRING_LENGTH];
-  char statbuf[MAX_STRING_LENGTH], *stptr, *eptr;
+  char statbuf[MAX_STRING_LENGTH], *stptr, *eptr = NULL;
   int len;
   if (!str)
     return NULL;
@@ -79,6 +79,8 @@ char *center_align(char *str, int width)
   stptr = statbuf;
   eptr = (statbuf + strlen(statbuf) - 1);
   for (;isspace(*eptr);*eptr--) *eptr = '\0';
+  eptr = NULL; /* nulling the value so that gcc doesn't give a warning - mord*/
+ 
   if (*stptr) skip_spaces(&stptr);
 
   len = strlen(stptr);
