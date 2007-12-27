@@ -27,6 +27,10 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.20  2006/06/18 12:42:21  w4dimenscor
+ * %damage% %actor% works again on mobs. The problem was that the damage function was never called if only %actor% was
+ * used (in stead of %actor.name%).
+ *
  * Revision 1.19  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -731,6 +735,7 @@ ACMD(do_mdamage)
       mob_log(ch, "mdamage: victim (%s) does not exist", name);
       return;
     }
+    script_damage(vict,dam);
   }
   else if (!str_cmp("all", name))
   {
