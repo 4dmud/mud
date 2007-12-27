@@ -714,9 +714,9 @@ void medit_disp_menu(Descriptor *d) {
         grn, nrm, cyn, GET_DAMROLL(mob), nrm,
         grn, nrm, cyn, GET_NDD(mob), nrm,
         grn, nrm, cyn, GET_SDD(mob), nrm,
-        grn, nrm, cyn, GET_HIT(mob), nrm,
-        grn, nrm, cyn, GET_MANA(mob), nrm,
-        grn, nrm, cyn, GET_MOVE(mob), nrm,
+        grn, nrm, cyn, mob_stats[GET_LEVEL(mob)].hp_dice, nrm,
+        grn, nrm, cyn, mob_stats[GET_LEVEL(mob)].hp_sides, nrm,
+        grn, nrm, cyn, mob_stats[GET_LEVEL(mob)].hp_bonus, nrm,
         grn, nrm, cyn, GET_AC(mob), nrm,
         grn, nrm, cyn, GET_EXP(mob), nrm,
         grn, nrm, cyn, GET_GOLD(mob), nrm
@@ -817,6 +817,15 @@ void medit_parse(Descriptor *d, char *arg) {
     case MEDIT_MAIN_MENU:
         i = 0;
         switch (*arg) {
+	case 'c':
+	case 'C':
+	case 'd':
+	case 'D':
+	case 'e':
+	case 'E':
+		d->Output( "This has been disabled for now.\r\n");
+		medit_disp_menu(d);
+		return;
         case 'q':
         case 'Q':
             if (OLC_VAL(d)) {	/* Anything been changed? */
@@ -878,6 +887,7 @@ void medit_parse(Descriptor *d, char *arg) {
             OLC_MODE(d) = MEDIT_SDD;
             i++;
             break;
+/* Disabled for now, until balancing isn't done at boot time.
         case 'c':
         case 'C':
             OLC_MODE(d) = MEDIT_NUM_HP_DICE;
@@ -893,6 +903,7 @@ void medit_parse(Descriptor *d, char *arg) {
             OLC_MODE(d) = MEDIT_ADD_HP;
             i++;
             break;
+*/
         case 'f':
         case 'F':
             OLC_MODE(d) = MEDIT_AC;
