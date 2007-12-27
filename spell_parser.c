@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.35  2007/02/05 21:42:25  w4dimenscor
+ * Fixed typo in magic fizzling to the room saying Catis instead of
+ * Cati's. Hal. 02/05/07
+ *
  * Revision 1.34  2006/09/19 10:56:17  w4dimenscor
  * fixed crash bug on extracting mob links
  *
@@ -529,7 +533,7 @@ int call_magic(Character *caster, Character *cvict,
             if (n > 0 && name[n-1] == 's')
                 act("$n' magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
             else
-                act("$ns magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
+                act("$n's magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
 
             caster->Send("Your magic fizzles out and dies.\r\n");
             GET_WAIT_STATE(caster) += ( 2 RL_SEC);
