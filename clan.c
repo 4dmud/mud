@@ -122,7 +122,7 @@ struct char_data *is_playing(char *vict_name)
   {
     next_i = i->next;
     if (IS_PLAYING(i)
-        && !strcmp(i->character->player.name, CAP(vict_name)))
+        && !str_cmp(i->character->player.name, vict_name))
       return i->character;
   }
   return NULL;
@@ -571,19 +571,22 @@ void do_clan_expel(struct char_data *ch, char *arg)
     save_char(vict);
     clan[clan_num].members--;
     clan[clan_num].power -= GET_LEVEL(vict);
+    remove_clan_member(GET_NAME(vict), clan_num);
     new_send_to_char(vict, "You've been kicked out of your clan!\r\n");
     new_send_to_char(ch, "Done.\r\n");
 
   }
   else
   {
-    if (!immcom && ((player_table[ids].clan == GET_CLAN(ch)) && (player_table[ids].rank < GET_CLAN_RANK(ch))))
+    if (immcom || ((player_table[ids].rank >= 0) && (player_table[ids].clan == GET_CLAN(ch)) && (player_table[ids].rank < GET_CLAN_RANK(ch))))
     {
       new_send_to_char(ch, "%s is kicked out of your clan!\r\n", player_table[ids].name);
+      
       player_table[ids].rank = -1;
-
       clan[clan_num].members--;
       clan[clan_num].power -= player_table[ids].level;
+      
+      remove_clan_member(player_table[ids].name, clan_num);
       save_player_index();
     } else {
       new_send_to_char(ch, "%s cannot be kicked out.\r\n", player_table[ids].name);
@@ -1418,8 +1421,8 @@ void init_clans()
 #else
     if (!IS_SET(player_table[j].flags, PINDEX_DELETED) &&
         !IS_SET(player_table[j].flags, PINDEX_SELFDELETE) &&
-        player_table[j].name &&
-        *player_table[j].name && player_table[j].rank > 0 &&
+        player_table[j].name && *player_table[j].name &&
+        player_table[j].rank > 0 &&
         (i = find_clan_by_id(player_table[j].clan)) >= 0)
     {
       add_clan_member(player_table[j].name, player_table[j].rank, i);
@@ -1473,10 +1476,12 @@ void do_clan_list(struct char_data *ch, char *arg)
   temp = clan_list[i];
   while (temp)
   {
+    if (temp->rank < 0) {
     snprintf(buf, sizeof(buf), "%-20s -- Rank: %d.\r\n",
              temp->name,
              temp->rank);
     DYN_RESIZE(buf);
+    }
 
     temp = temp->next;
   }
