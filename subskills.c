@@ -748,7 +748,7 @@ ASUB(sub_drain_blood) {
     }
 
     if (get_sub_status(ch, SUB_DRAIN_BLOOD) == STATUS_OFF ) {
-        if (GET_ALIGNMENT(ch) > -600) {
+        if (GET_ALIGNMENT(ch) < -350) {
             ch->Send( "You focus on draining blood.\r\n");
             toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_ON);
         } else {
