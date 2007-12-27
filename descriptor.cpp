@@ -127,7 +127,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
         //strlcpy(tmp, txt, len);
         //free( txt );
         //txt = tmp;
-        size = vsnprintf(txt, len -1, format, args);
+        size = vsnprintf(txt, len, format, args);
     }
 
     stxt = string( txt );
