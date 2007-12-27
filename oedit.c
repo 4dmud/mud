@@ -51,86 +51,97 @@ ACMD(do_oasis_oedit)
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  
+
   /****************************************************************************/
   /** Parse any arguments.                                                   **/
   /****************************************************************************/
   buf3 = two_arguments(argument, buf1, buf2);
-  
+
   /****************************************************************************/
   /** If there aren't any arguments...well...they can't modify nothing now   **/
   /** can they?                                                              **/
   /****************************************************************************/
-  if (!*buf1) {
+  if (!*buf1)
+  {
     new_send_to_char(ch, "Specify an object VNUM to edit.\r\n");
     return;
-  } else if (!isdigit(*buf1)) {
-    if (str_cmp("save", buf1) != 0) {
+  }
+  else if (!isdigit(*buf1))
+  {
+    if (str_cmp("save", buf1) != 0)
+    {
       new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
-    
+
     save = TRUE;
-    
+
     if (is_number(buf2))
       number = atoi(buf2);
-    else if (GET_OLC_ZONE(ch) > 0) {
+    else if (GET_OLC_ZONE(ch) > 0)
+    {
       zone_rnum zlok;
-      
+
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
         number = NOWHERE;
       else
         number = genolc_zone_bottom(zlok);
     }
-    
-    if (number == NOWHERE) {
+
+    if (number == NOWHERE)
+    {
       new_send_to_char(ch, "Save which zone?\r\n");
       return;
     }
   }
-  
+
   /****************************************************************************/
   /** If a numeric argument was given, get it.                               **/
   /****************************************************************************/
   if (number == NOWHERE)
     number = atoi(buf1);
-  
+
   /****************************************************************************/
   /** Check that whatever it is isn't already being edited.                  **/
   /****************************************************************************/
-  for (d = descriptor_list; d; d = d->next) {
-    if (STATE(d) == CON_OEDIT) {
-      if (d->olc && OLC_NUM(d) == number) {
+  for (d = descriptor_list; d; d = d->next)
+  {
+    if (STATE(d) == CON_OEDIT)
+    {
+      if (d->olc && OLC_NUM(d) == number)
+      {
         new_send_to_char(ch, "That object is currently being edited by %s.\r\n",
-          PERS(d->character, ch));
+                         PERS(d->character, ch));
         return;
       }
     }
   }
-  
+
   /****************************************************************************/
   /** Point d to the builder's descriptor (for easier typing later).         **/
   /****************************************************************************/
   d = ch->desc;
-  
+
   /****************************************************************************/
   /** Give the descriptor an OLC structure.                                  **/
   /****************************************************************************/
-  if (d->olc) {
+  if (d->olc)
+  {
     new_mudlog(BRF, LVL_IMMORT, TRUE,
-      "SYSERR: do_oasis: Player already had olc structure.");
+               "SYSERR: do_oasis: Player already had olc structure.");
     free(d->olc);
   }
-  
+
   CREATE(d->olc, struct oasis_olc_data, 1);
-  
+
   /****************************************************************************/
   /** Find the zone.                                                         **/
   /****************************************************************************/
-OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
-  if (OLC_ZNUM(d) == NOWHERE) {
+  OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
+  if (OLC_ZNUM(d) == NOWHERE)
+  {
     new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
-    
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -138,15 +149,16 @@ OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
     d->olc = NULL;
     return;
   }
-  
+
   /****************************************************************************/
   /** Everyone but IMPLs can only edit zones they have been assigned.        **/
   /****************************************************************************/
-  if (!can_edit_zone(ch, OLC_ZNUM(d))) {
+  if (!can_edit_zone(ch, OLC_ZNUM(d)))
+  {
     new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE, "OLC: %s tried to edit zone %d allowed zone %d",
-      GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
-    
+               GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -154,22 +166,23 @@ OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
     d->olc = NULL;
     return;
   }
-  
+
   /****************************************************************************/
   /** If we need to save, save the objects.                                  **/
   /****************************************************************************/
-  if (save) {
+  if (save)
+  {
     new_send_to_char(ch, "Saving all objects in zone %d.\r\n",
-      zone_table[OLC_ZNUM(d)].number);
+                     zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
-      "OLC: %s saves object info for zone %d.", GET_NAME(ch),
-      zone_table[OLC_ZNUM(d)].number);
-    
+               "OLC: %s saves object info for zone %d.", GET_NAME(ch),
+               zone_table[OLC_ZNUM(d)].number);
+
     /**************************************************************************/
     /** Save the objects in this zone.                                       **/
     /**************************************************************************/
     save_objects(OLC_ZNUM(d));
-    
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -177,9 +190,9 @@ OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
     d->olc = NULL;
     return;
   }
-  
+
   OLC_NUM(d) = number;
-  
+
   /****************************************************************************/
   /** If this is a new object, setup a new object, otherwise setup the       **/
   /** existing object.                                                       **/
@@ -188,20 +201,20 @@ OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
     oedit_setup_existing(d, real_num);
   else
     oedit_setup_new(d);
-    
+
   STATE(d) = CON_OEDIT;
-  
+
   /****************************************************************************/
   /** Send the OLC message to the players in the same room as the builder.   **/
   /****************************************************************************/
   act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
   SET_BIT_AR(PLR_FLAGS(ch), PLR_WRITING);
-  
+
   /****************************************************************************/
   /** Log the OLC message.                                                   **/
   /****************************************************************************/
   new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s starts editing zone %d allowed zone %d",
-    GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
+             GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
 
 void oedit_setup_new(struct descriptor_data *d)
@@ -265,24 +278,26 @@ void oedit_save_internally(struct descriptor_data *d)
 
   i = (real_object(OLC_NUM(d)) == NOTHING);
 
-  if ((robj_num = add_object(OLC_OBJ(d), OLC_NUM(d))) == NOTHING) {
+  if ((robj_num = add_object(OLC_OBJ(d), OLC_NUM(d))) == NOTHING)
+  {
     log("oedit_save_internally: add_object failed.");
     return;
   }
   /* Update triggers : */
   /* Free old proto list  */
   if (obj_proto[robj_num].proto_script &&
-      obj_proto[robj_num].proto_script != OLC_SCRIPT(d)) 
-    free_proto_script(&obj_proto[robj_num], OBJ_TRIGGER);   
+      obj_proto[robj_num].proto_script != OLC_SCRIPT(d))
+    free_proto_script(&obj_proto[robj_num], OBJ_TRIGGER);
   /* this will handle new instances of the object: */
   obj_proto[robj_num].proto_script = OLC_SCRIPT(d);
 
- /* this takes care of the objects currently in-game */
-  for (obj = object_list; obj; obj = obj->next) {
-   if (obj->item_number != robj_num)
+  /* this takes care of the objects currently in-game */
+  for (obj = object_list; obj; obj = obj->next)
+  {
+    if (obj->item_number != robj_num)
       continue;
     /* remove any old scripts */
-    if (SCRIPT(obj)) 
+    if (SCRIPT(obj))
       extract_script(obj, OBJ_TRIGGER);
 
     free_proto_script(obj, OBJ_TRIGGER);
@@ -300,27 +315,28 @@ void oedit_save_internally(struct descriptor_data *d)
   for (dsc = descriptor_list; dsc; dsc = dsc->next)
     if (STATE(dsc) == CON_SEDIT)
       for (i = 0; S_PRODUCT(OLC_SHOP(dsc), i) != NOTHING; i++)
-	if (S_PRODUCT(OLC_SHOP(dsc), i) >= robj_num)
-	  S_PRODUCT(OLC_SHOP(dsc), i)++;
+        if (S_PRODUCT(OLC_SHOP(dsc), i) >= robj_num)
+          S_PRODUCT(OLC_SHOP(dsc), i)++;
 
 
   /* Update other people in zedit too. From: C.Raehl 4/27/99 */
   for (dsc = descriptor_list; dsc; dsc = dsc->next)
     if (STATE(dsc) == CON_ZEDIT)
       for (i = 0; OLC_ZONE(dsc)->cmd[i].command != 'S'; i++)
-        switch (OLC_ZONE(dsc)->cmd[i].command) {
-          case 'P':
-            OLC_ZONE(dsc)->cmd[i].arg3 += (OLC_ZONE(dsc)->cmd[i].arg3 >= robj_num);
-            /* Fall through. */
-          case 'E':
-          case 'G':
-          case 'O':
-            OLC_ZONE(dsc)->cmd[i].arg1 += (OLC_ZONE(dsc)->cmd[i].arg1 >= robj_num);
-            break;
-          case 'R':
-            OLC_ZONE(dsc)->cmd[i].arg2 += (OLC_ZONE(dsc)->cmd[i].arg2 >= robj_num);
-            break;
-          default:
+        switch (OLC_ZONE(dsc)->cmd[i].command)
+        {
+        case 'P':
+          OLC_ZONE(dsc)->cmd[i].arg3 += (OLC_ZONE(dsc)->cmd[i].arg3 >= robj_num);
+          /* Fall through. */
+        case 'E':
+        case 'G':
+        case 'O':
+          OLC_ZONE(dsc)->cmd[i].arg1 += (OLC_ZONE(dsc)->cmd[i].arg1 >= robj_num);
+          break;
+        case 'R':
+          OLC_ZONE(dsc)->cmd[i].arg2 += (OLC_ZONE(dsc)->cmd[i].arg2 >= robj_num);
+          break;
+        default:
           break;
         }
 }
@@ -335,19 +351,22 @@ void oedit_save_to_disk(int zone_num)
 /**************************************************************************
  Menu functions 
  **************************************************************************/
-void oedit_disp_colors(struct descriptor_data *d) {
-int i;
-    get_char_colors(d->character);
-for (i = 0; i < MAX_COLOR_OPTIONS; i++) {
+void oedit_disp_colors(struct descriptor_data *d)
+{
+  int i;
+  get_char_colors(d->character);
+  for (i = 0; i < MAX_COLOR_OPTIONS; i++)
+  {
     write_to_output(d,"%s%3d%s) %s%-15s  %s%s", grn, i,nrm, cyn, color_option_name(i), (!(i%4) ? "\r\n" : " "), nrm);
-    }
+  }
 
-	    write_to_output(d,"Enter Color Number: ");
+  write_to_output(d,"Enter Color Number: ");
 }
 
-void oedit_disp_dubsing(struct descriptor_data *d) {
-	write_to_output(d,"1) Single Bladed\r\n2) Double Bladed\r\nEnter a number: ");
-} 
+void oedit_disp_dubsing(struct descriptor_data *d)
+{
+  write_to_output(d,"1) Single Bladed\r\n2) Double Bladed\r\nEnter a number: ");
+}
 /*
  * For container flags.
  */
@@ -358,14 +377,14 @@ void oedit_disp_container_flags_menu(struct descriptor_data *d)
   clear_screen(d);
 
   new_sprintbit(GET_OBJ_VAL(OLC_OBJ(d), 1), container_bits, bits, sizeof(bits));
-  write_to_output(d, 
-	  "%s1%s) CLOSEABLE\r\n"
-	  "%s2%s) PICKPROOF\r\n"
-	  "%s3%s) CLOSED\r\n"
-	  "%s4%s) LOCKED\r\n"
-	  "Container flags: %s%s%s\r\n"
-	  "Enter flag, 0 to quit : ",
-	  grn, nrm, grn, nrm, grn, nrm, grn, nrm, cyn, bits, nrm);
+  write_to_output(d,
+                  "%s1%s) CLOSEABLE\r\n"
+                  "%s2%s) PICKPROOF\r\n"
+                  "%s3%s) CLOSED\r\n"
+                  "%s4%s) LOCKED\r\n"
+                  "Container flags: %s%s%s\r\n"
+                  "Enter flag, 0 to quit : ",
+                  grn, nrm, grn, nrm, grn, nrm, grn, nrm, cyn, bits, nrm);
 }
 
 /*
@@ -378,16 +397,16 @@ void oedit_disp_extradesc_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
   write_to_output(d,
-	  "Extra desc menu\r\n"
-	  "%s1%s) Keyword: %s%s\r\n"
-	  "%s2%s) Description:\r\n%s%s\r\n"
-	  "%s3%s) Goto next description: %s\r\n"
-	  "%s0%s) Quit\r\n"
-	  "Enter choice : ",
+                  "Extra desc menu\r\n"
+                  "%s1%s) Keyword: %s%s\r\n"
+                  "%s2%s) Description:\r\n%s%s\r\n"
+                  "%s3%s) Goto next description: %s\r\n"
+                  "%s0%s) Quit\r\n"
+                  "Enter choice : ",
 
-     	  grn, nrm, yel, (extra_desc->keyword && *extra_desc->keyword) ? extra_desc->keyword : "<NONE>",
-	  grn, nrm, yel, (extra_desc->description && *extra_desc->description) ? extra_desc->description : "<NONE>",
-	  grn, nrm, !extra_desc->next ? "<Not set>\r\n" : "Set.", grn, nrm);
+                  grn, nrm, yel, (extra_desc->keyword && *extra_desc->keyword) ? extra_desc->keyword : "<NONE>",
+                  grn, nrm, yel, (extra_desc->description && *extra_desc->description) ? extra_desc->description : "<NONE>",
+                  grn, nrm, !extra_desc->next ? "<Not set>\r\n" : "Set.", grn, nrm);
   OLC_MODE(d) = OEDIT_EXTRADESC_MENU;
 }
 
@@ -402,12 +421,16 @@ void oedit_disp_prompt_apply_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < MAX_OBJ_AFFECT; counter++) {
-    if (OLC_OBJ(d)->affected[counter].modifier) {
+  for (counter = 0; counter < MAX_OBJ_AFFECT; counter++)
+  {
+    if (OLC_OBJ(d)->affected[counter].modifier)
+    {
       new_sprinttype(OLC_OBJ(d)->affected[counter].location, apply_types, apply_buf, sizeof(apply_buf));
       write_to_output(d, " %s%d%s) %+d to %s\r\n", grn, counter + 1, nrm,
-	      OLC_OBJ(d)->affected[counter].modifier, apply_buf);
-    } else {
+                      OLC_OBJ(d)->affected[counter].modifier, apply_buf);
+    }
+    else
+    {
       write_to_output(d, " %s%d%s) None.\r\n", grn, counter + 1, nrm);
     }
   }
@@ -425,9 +448,10 @@ void oedit_liquid_type(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_LIQ_TYPES; counter++) {
+  for (counter = 0; counter < NUM_LIQ_TYPES; counter++)
+  {
     write_to_output(d, " %s%2d%s) %s%-20.20s %s", grn, counter, nrm, yel,
-	    drinks[counter], !(++columns % 2) ? "\r\n" : "");
+                    drinks[counter], !(++columns % 2) ? "\r\n" : "");
   }
   write_to_output(d, "\r\n%sEnter drink type : ", nrm);
   OLC_MODE(d) = OEDIT_VALUE_3;
@@ -443,9 +467,10 @@ void oedit_disp_apply_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_APPLIES; counter++) {
+  for (counter = 0; counter < NUM_APPLIES; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter, nrm,
-		apply_types[counter], !(++columns % 2) ? "\r\n" : "");
+                    apply_types[counter], !(++columns % 2) ? "\r\n" : "");
   }
   write_to_output(d, "\r\nEnter apply type (0 is no apply) : ");
   OLC_MODE(d) = OEDIT_APPLY;
@@ -461,10 +486,11 @@ void oedit_disp_weapon_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_ATTACK_TYPES; counter++) {
+  for (counter = 0; counter < NUM_ATTACK_TYPES; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter, nrm,
-		attack_hit_text[counter].singular,
-		!(++columns % 2) ? "\r\n" : "");
+                    attack_hit_text[counter].singular,
+                    !(++columns % 2) ? "\r\n" : "");
   }
   write_to_output(d, "\r\nEnter weapon type : ");
 }
@@ -479,10 +505,11 @@ void oedit_disp_spells_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_SPELLS; counter++) {
-  if (strcmp(skill_name(counter), "!UNUSED!"))
-    write_to_output(d, "%s%2d%s) %s%-20.20s %s", grn, counter, nrm, yel,
-		skill_name(counter), !(++columns % 3) ? "\r\n" : "");
+  for (counter = 0; counter < NUM_SPELLS; counter++)
+  {
+    if (strcmp(skill_name(counter), "!UNUSED!"))
+      write_to_output(d, "%s%2d%s) %s%-20.20s %s", grn, counter, nrm, yel,
+                      skill_name(counter), !(++columns % 3) ? "\r\n" : "");
   }
   write_to_output(d, "\r\n%sEnter spell choice (-1 for none) : ", nrm);
 }
@@ -493,33 +520,34 @@ void oedit_disp_spells_menu(struct descriptor_data *d)
 void oedit_disp_val1_menu(struct descriptor_data *d)
 {
   OLC_MODE(d) = OEDIT_VALUE_1;
-  switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
   case ITEM_LIGHT:
     /*
      * values 0 and 1 are unused.. jump to 2 
      */
     oedit_disp_val3_menu(d);
     break;
-        case ITEM_BOW:
-    case ITEM_CROSSBOW:
-    case ITEM_SLING:
-    case ITEM_GUN:
-	send_to_char("Range (1 - 3) = ", d->character);
-	break;
-    case ITEM_ROCK:
-    case ITEM_BOLT:
-    case ITEM_ARROW:
-    case ITEM_THROW:
-    case ITEM_AMMO:
-	oedit_disp_val2_menu(d);
-	break;
+  case ITEM_BOW:
+  case ITEM_CROSSBOW:
+  case ITEM_SLING:
+  case ITEM_GUN:
+    write_to_output(d,"Range (1 - 3) = ");
+    break;
+  case ITEM_ROCK:
+  case ITEM_BOLT:
+  case ITEM_ARROW:
+  case ITEM_THROW:
+  case ITEM_AMMO:
+    oedit_disp_val2_menu(d);
+    break;
   case ITEM_SCROLL:
   case ITEM_WAND:
   case ITEM_STAFF:
   case ITEM_POTION:
-    case ITEM_ANTIDOTE_1:
-    case ITEM_ANTIDOTE_2:
-    case ITEM_ANTIDOTE_3:
+  case ITEM_ANTIDOTE_1:
+  case ITEM_ANTIDOTE_2:
+  case ITEM_ANTIDOTE_3:
     write_to_output(d, "Spell level : ");
     break;
   case ITEM_WEAPON:
@@ -549,33 +577,33 @@ void oedit_disp_val1_menu(struct descriptor_data *d)
      * This is supposed to be language, but it's unused.
      */
     break;
-    case ITEM_GRENADE:
-	send_to_char("Ticks to countdown to explosion : ", d->character);
-	break;
-    case ITEM_VEHICLE:
-	send_to_char("Vnum of vehicle room : ", d->character);
-	break;
-    case ITEM_V_WINDOW:
-    case ITEM_V_CONTROLS:
-    case ITEM_V_HATCH:
-	send_to_char("Obj number of vehicle : ", d->character);
-	break;
-    case ITEM_CLIMBABLE:
-    case ITEM_DESCENDABLE:
-    case ITEM_PORTAL:
-    case ITEM_PORTAL_BUSH:
-    case ITEM_PORTAL_WATER:
-    case ITEM_PORTAL_HOLE:
-    case ITEM_PORTAL_HURDLE:
-	GET_OBJ_VAL(OLC_OBJ(d), 0) = -1;
-	oedit_disp_val2_menu(d);
-	break;
-    case ITEM_FURNITURE:
-	send_to_char("Number of people that it can hold : ", d->character);
-	break;
-    case ITEM_LIGHTSABRE_HILT:
-        oedit_disp_dubsing(d);
-	break;
+  case ITEM_GRENADE:
+    write_to_output(d,"Ticks to countdown to explosion : ");
+    break;
+  case ITEM_VEHICLE:
+    write_to_output(d,"Vnum of vehicle room : ");
+    break;
+  case ITEM_V_WINDOW:
+  case ITEM_V_CONTROLS:
+  case ITEM_V_HATCH:
+    write_to_output(d,"Obj number of vehicle : ");
+    break;
+  case ITEM_CLIMBABLE:
+  case ITEM_DESCENDABLE:
+  case ITEM_PORTAL:
+  case ITEM_PORTAL_BUSH:
+  case ITEM_PORTAL_WATER:
+  case ITEM_PORTAL_HOLE:
+  case ITEM_PORTAL_HURDLE:
+    GET_OBJ_VAL(OLC_OBJ(d), 0) = -1;
+    oedit_disp_val2_menu(d);
+    break;
+  case ITEM_FURNITURE:
+    write_to_output(d,"Number of people that it can hold : ");
+    break;
+  case ITEM_LIGHTSABRE_HILT:
+    oedit_disp_dubsing(d);
+    break;
   default:
     oedit_disp_menu(d);
   }
@@ -587,31 +615,32 @@ void oedit_disp_val1_menu(struct descriptor_data *d)
 void oedit_disp_val2_menu(struct descriptor_data *d)
 {
   OLC_MODE(d) = OEDIT_VALUE_2;
-  switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
   case ITEM_SCROLL:
   case ITEM_POTION:
-    case ITEM_ANTIDOTE_1:
-    case ITEM_ANTIDOTE_2:
-    case ITEM_ANTIDOTE_3:
+  case ITEM_ANTIDOTE_1:
+  case ITEM_ANTIDOTE_2:
+  case ITEM_ANTIDOTE_3:
     oedit_disp_spells_menu(d);
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
     write_to_output(d, "Max number of charges : ");
     break;
- case ITEM_GUN:
-	write_to_output(d,"Max number of bullets : ");
-	break;
-    case ITEM_ROCK:
-    case ITEM_BOLT:
-    case ITEM_ARROW:
-    case ITEM_AMMO:
-    case ITEM_THROW:
-    case ITEM_GRENADE:
-    case ITEM_WEAPON:
-    case ITEM_LIGHTSABRE_HILT:
-	write_to_output(d,"Number of damage dice : ");
-	break;
+  case ITEM_GUN:
+    write_to_output(d,"Max number of bullets : ");
+    break;
+  case ITEM_ROCK:
+  case ITEM_BOLT:
+  case ITEM_ARROW:
+  case ITEM_AMMO:
+  case ITEM_THROW:
+  case ITEM_GRENADE:
+  case ITEM_WEAPON:
+  case ITEM_LIGHTSABRE_HILT:
+    write_to_output(d,"Number of damage dice : ");
+    break;
   case ITEM_FOOD:
     /*
      * Values 2 and 3 are unused, jump to 4...Odd.
@@ -628,18 +657,18 @@ void oedit_disp_val2_menu(struct descriptor_data *d)
   case ITEM_FOUNTAIN:
     write_to_output(d, "Initial drink units : ");
     break;
-    case ITEM_VEHICLE:
-	send_to_char("Can it fly? 0 = no, 1 = yes : ", d->character);
-	break;
-    case ITEM_CLIMBABLE:
-    case ITEM_DESCENDABLE:
-    case ITEM_PORTAL:
-    case ITEM_PORTAL_BUSH:
-    case ITEM_PORTAL_WATER:
-    case ITEM_PORTAL_HOLE:
-    case ITEM_PORTAL_HURDLE:
-	send_to_char("Vnum of room : ", d->character);
-	break;
+  case ITEM_VEHICLE:
+    write_to_output(d,"Can it fly? 0 = no, 1 = yes : ");
+    break;
+  case ITEM_CLIMBABLE:
+  case ITEM_DESCENDABLE:
+  case ITEM_PORTAL:
+  case ITEM_PORTAL_BUSH:
+  case ITEM_PORTAL_WATER:
+  case ITEM_PORTAL_HOLE:
+  case ITEM_PORTAL_HURDLE:
+    write_to_output(d, "Vnum of room : ");
+    break;
   default:
     oedit_disp_menu(d);
   }
@@ -651,7 +680,8 @@ void oedit_disp_val2_menu(struct descriptor_data *d)
 void oedit_disp_val3_menu(struct descriptor_data *d)
 {
   OLC_MODE(d) = OEDIT_VALUE_3;
-  switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
   case ITEM_LIGHT:
     write_to_output(d, "Number of hours (0 = burnt, -1 is infinite) : ");
     break;
@@ -663,14 +693,14 @@ void oedit_disp_val3_menu(struct descriptor_data *d)
   case ITEM_STAFF:
     write_to_output(d, "Number of charges remaining : ");
     break;
-    case ITEM_ROCK:
-    case ITEM_BOLT:
-    case ITEM_ARROW:
-    case ITEM_AMMO:
-    case ITEM_THROW:
-    case ITEM_GRENADE:
-    case ITEM_WEAPON:
-    case ITEM_LIGHTSABRE_HILT:
+  case ITEM_ROCK:
+  case ITEM_BOLT:
+  case ITEM_ARROW:
+  case ITEM_AMMO:
+  case ITEM_THROW:
+  case ITEM_GRENADE:
+  case ITEM_WEAPON:
+  case ITEM_LIGHTSABRE_HILT:
     write_to_output(d, "Size of damage dice : ");
     break;
   case ITEM_CONTAINER:
@@ -680,18 +710,18 @@ void oedit_disp_val3_menu(struct descriptor_data *d)
   case ITEM_FOUNTAIN:
     oedit_liquid_type(d);
     break;
-    case ITEM_VEHICLE:
-	write_to_output(d, "How many hits to destroy vehicle (1-5): ");
-	break;
-    case ITEM_CLIMBABLE:
-    case ITEM_DESCENDABLE:
-    case ITEM_PORTAL:
-    case ITEM_PORTAL_BUSH:
-    case ITEM_PORTAL_WATER:
-    case ITEM_PORTAL_HOLE:
-    case ITEM_PORTAL_HURDLE:
-	write_to_output(d, "Timer, -1 for infinite : ");
-	break;
+  case ITEM_VEHICLE:
+    write_to_output(d, "How many hits to destroy vehicle (1-5): ");
+    break;
+  case ITEM_CLIMBABLE:
+  case ITEM_DESCENDABLE:
+  case ITEM_PORTAL:
+  case ITEM_PORTAL_BUSH:
+  case ITEM_PORTAL_WATER:
+  case ITEM_PORTAL_HOLE:
+  case ITEM_PORTAL_HURDLE:
+    write_to_output(d, "Timer, -1 for infinite : ");
+    break;
   default:
     oedit_disp_menu(d);
   }
@@ -703,22 +733,23 @@ void oedit_disp_val3_menu(struct descriptor_data *d)
 void oedit_disp_val4_menu(struct descriptor_data *d)
 {
   OLC_MODE(d) = OEDIT_VALUE_4;
-  switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
   case ITEM_SCROLL:
   case ITEM_POTION:
   case ITEM_WAND:
   case ITEM_STAFF:
     oedit_disp_spells_menu(d);
     break;
-    case ITEM_GUN:
-	write_to_output(d, "Vnum of bullet : ");
-	break;
+  case ITEM_GUN:
+    write_to_output(d, "Vnum of bullet : ");
+    break;
   case ITEM_WEAPON:
     oedit_disp_weapon_menu(d);
     break;
-    case ITEM_LIGHTSABRE_HILT:
-        oedit_disp_colors(d);
-	break;
+  case ITEM_LIGHTSABRE_HILT:
+    oedit_disp_colors(d);
+    break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
   case ITEM_FOOD:
@@ -735,14 +766,15 @@ void oedit_disp_val4_menu(struct descriptor_data *d)
 void oedit_disp_val5_menu(struct descriptor_data *d)
 {
   OLC_MODE(d) = OEDIT_VALUE_5;
-  switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+  switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+  {
   case ITEM_WEAPON:
   case ITEM_LIGHTSABRE_HILT:
-    write_to_output(d, 
-    "Give a length in cm between 10 and 200\r\n"
-    "Short is easyer to handle for anyone (about 30 for a knife)\r\n"
-    "Long is more damage and harder to handle (about 150 for a long sword)\r\n"
-    "\r\nEnter weapon length : ");
+    write_to_output(d,
+                    "Give a length in cm between 10 and 200\r\n"
+                    "Short is easyer to handle for anyone (about 30 for a knife)\r\n"
+                    "Long is more damage and harder to handle (about 150 for a long sword)\r\n"
+                    "\r\nEnter weapon length : ");
     break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
@@ -756,15 +788,16 @@ void oedit_disp_val5_menu(struct descriptor_data *d)
 
 void oedit_disp_material_menu(struct descriptor_data *d)
 {
-int mat, col = 0;
+  int mat, col = 0;
   OLC_MODE(d) = OEDIT_VALUE_10;
-   get_char_colors(d->character);
-    // clear_screen(d);
-    for (mat = 1; mat < NUM_MATERIAL_TYPES; mat++) {
-	write_to_output(d, "%s%2d%s) %-20.20s %s", grn, mat, nrm,
-		material_name(mat), !(++col % 3) ? "\r\n" : "");
-    }
-    write_to_output(d, "\r\nEnter Material type : ");
+  get_char_colors(d->character);
+  // clear_screen(d);
+  for (mat = 1; mat < NUM_MATERIAL_TYPES; mat++)
+  {
+    write_to_output(d, "%s%2d%s) %-20.20s %s", grn, mat, nrm,
+                    material_name(mat), !(++col % 3) ? "\r\n" : "");
+  }
+  write_to_output(d, "\r\nEnter Material type : ");
 }
 
 /*
@@ -777,9 +810,10 @@ void oedit_disp_type_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_ITEM_TYPES; counter++) {
+  for (counter = 0; counter < NUM_ITEM_TYPES; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter, nrm,
-		item_types[counter], !(++columns % 2) ? "\r\n" : "");
+                    item_types[counter], !(++columns % 2) ? "\r\n" : "");
   }
   write_to_output(d, "\r\nEnter object type : ");
 }
@@ -795,14 +829,15 @@ void oedit_disp_extra_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_ITEM_FLAGS; counter++) {
+  for (counter = 0; counter < NUM_ITEM_FLAGS; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
-		extra_bits[counter], !(++columns % 2) ? "\r\n" : "");
+                    extra_bits[counter], !(++columns % 2) ? "\r\n" : "");
   }
   sprintbitarray(GET_OBJ_EXTRA(OLC_OBJ(d)), extra_bits, EF_ARRAY_MAX, bits, sizeof(bits));
   write_to_output(d, "\r\nObject flags: %s%s%s\r\n"
-	  "Enter object extra flag (0 to quit) : ",
-	  cyn, bits, nrm);
+                  "Enter object extra flag (0 to quit) : ",
+                  cyn, bits, nrm);
 }
 
 /*
@@ -816,12 +851,13 @@ void oedit_disp_perm_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_AFF_FLAGS; counter++) {
+  for (counter = 0; counter < NUM_AFF_FLAGS; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm, affected_bits[counter], !(++columns % 2) ? "\r\n" : "");
   }
   sprintbitarray(GET_OBJ_PERM(OLC_OBJ(d)), affected_bits, AF_ARRAY_MAX, bits, sizeof(bits));
   write_to_output(d, "\r\nObject permanent flags: %s%s%s\r\n"
-          "Enter object perm flag (0 to quit) : ", cyn, bits, nrm);
+                  "Enter object perm flag (0 to quit) : ", cyn, bits, nrm);
 }
 
 /*
@@ -835,13 +871,14 @@ void oedit_disp_wear_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 0; counter < NUM_ITEM_WEARS; counter++) {
+  for (counter = 0; counter < NUM_ITEM_WEARS; counter++)
+  {
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
-		wear_bits[counter], !(++columns % 2) ? "\r\n" : "");
+                    wear_bits[counter], !(++columns % 2) ? "\r\n" : "");
   }
   sprintbitarray(GET_OBJ_WEAR(OLC_OBJ(d)), wear_bits, TW_ARRAY_MAX, bits, sizeof(bits));
   write_to_output(d, "\r\nWear flags: %s%s%s\r\n"
-	  "Enter wear flag, 0 to quit : ", cyn, bits, nrm);
+                  "Enter wear flag, 0 to quit : ", cyn, bits, nrm);
 }
 
 /*
@@ -867,22 +904,22 @@ void oedit_disp_menu(struct descriptor_data *d)
    * Build first half of menu.
    */
   write_to_output(d,
-	  "-- Item number : [%s%d%s]\r\n"
-	  "%s1%s) Namelist : %s%s\r\n"
-	  "%s2%s) S-Desc   : %s%s\r\n"
-	  "%s3%s) L-Desc   :-\r\n%s%s\r\n"
-	  "%s4%s) A-Desc   :-\r\n%s%s"
-	  "%s5%s) Type        : %s%s\r\n"
-	  "%s6%s) Extra flags : %s%s\r\n",
+                  "-- Item number : [%s%d%s]\r\n"
+                  "%s1%s) Namelist : %s%s\r\n"
+                  "%s2%s) S-Desc   : %s%s\r\n"
+                  "%s3%s) L-Desc   :-\r\n%s%s\r\n"
+                  "%s4%s) A-Desc   :-\r\n%s%s"
+                  "%s5%s) Type        : %s%s\r\n"
+                  "%s6%s) Extra flags : %s%s\r\n",
 
-	  cyn, OLC_NUM(d), nrm,
-	  grn, nrm, yel, (obj->name && *obj->name) ? obj->name : "undefined",
-	  grn, nrm, yel, (obj->short_description && *obj->short_description) ? obj->short_description : "undefined",
-	  grn, nrm, yel, (obj->description && *obj->description) ? obj->description : "undefined",
-	  grn, nrm, yel, (obj->action_description && *obj->action_description) ? obj->action_description : "<not set>\r\n",
-	  grn, nrm, cyn, buf1,
-	  grn, nrm, cyn, buf2
-	  );
+                  cyn, OLC_NUM(d), nrm,
+                  grn, nrm, yel, (obj->name && *obj->name) ? obj->name : "undefined",
+                  grn, nrm, yel, (obj->short_description && *obj->short_description) ? obj->short_description : "undefined",
+                  grn, nrm, yel, (obj->description && *obj->description) ? obj->description : "undefined",
+                  grn, nrm, yel, (obj->action_description && *obj->action_description) ? obj->action_description : "<not set>\r\n",
+                  grn, nrm, cyn, buf1,
+                  grn, nrm, cyn, buf2
+                 );
   /*
    * Send first half.
    */
@@ -890,53 +927,53 @@ void oedit_disp_menu(struct descriptor_data *d)
   /*
    * Build second half of menu.
    */
-   sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf1, sizeof(buf1));
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf1, sizeof(buf1));
   // sprintbitarray(GET_OBJ_PERM(obj), affected_bits, AF_ARRAY_MAX, buf2);
 
   write_to_output(d,
-	  "%s7%s) Wear flags  : %s%s\r\n"
-	  "%s8%s) Weight      : %s%d\r\n"
-	  "%s9%s) Cost        : %s%d\r\n"
-	  "%sA%s) Cost/Day    : %s%d\r\n"
-	  "%sB%s) Timer       : %s%d\r\n"
-	  "%sC%s) Values      : %s%d %d %d %d %d %d\r\n"
-	  "%sD%s) Menu --->   : %sApplies\r\n"
-	  "%sE%s) Menu --->   : %sExtra Desc\r\n"
-	  "%sF%s) Innate      : %s(%d) %s%s\r\n"
-	  "%sG%s) Smell Desc  :\r\n%s%s\r\n"
-	  "%sH%s) Taste Desc  :\r\n%s%s\r\n"
-	  "%sI%s) Feel Desc   :\r\n%s%s\r\n"
-	  "%sJ%s) Material    : %s%s\r\n"
-          "%sM%s) Min Level   : %s%d\r\n"
-         // "%sP%s) Perm Affects: %s%s\r\n"
-	  "%sS%s) Script      : %s%s\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter choice : ",
+                  "%s7%s) Wear flags  : %s%s\r\n"
+                  "%s8%s) Weight      : %s%d\r\n"
+                  "%s9%s) Cost        : %s%d\r\n"
+                  "%sA%s) Cost/Day    : %s%d\r\n"
+                  "%sB%s) Timer       : %s%d\r\n"
+                  "%sC%s) Values      : %s%d %d %d %d %d %d\r\n"
+                  "%sD%s) Menu --->   : %sApplies\r\n"
+                  "%sE%s) Menu --->   : %sExtra Desc\r\n"
+                  "%sF%s) Innate      : %s(%d) %s%s\r\n"
+                  "%sG%s) Smell Desc  :\r\n%s%s\r\n"
+                  "%sH%s) Taste Desc  :\r\n%s%s\r\n"
+                  "%sI%s) Feel Desc   :\r\n%s%s\r\n"
+                  "%sJ%s) Material    : %s%s\r\n"
+                  "%sM%s) Min Level   : %s%d\r\n"
+                  // "%sP%s) Perm Affects: %s%s\r\n"
+                  "%sS%s) Script      : %s%s\r\n"
+                  "%sQ%s) Quit\r\n"
+                  "Enter choice : ",
 
-	  grn, nrm, cyn, buf1,
-	  grn, nrm, cyn, GET_OBJ_WEIGHT(obj),
-	  grn, nrm, cyn, GET_OBJ_COST(obj),
-	  grn, nrm, cyn, GET_OBJ_RENT(obj),
-	  grn, nrm, cyn, GET_OBJ_TIMER(obj),
-	  grn, nrm, cyn, 
-	  GET_OBJ_VAL(obj, 0),
-	  GET_OBJ_VAL(obj, 1),
-	  GET_OBJ_VAL(obj, 2),
-	  GET_OBJ_VAL(obj, 3),
-	  GET_OBJ_VAL(obj, 4),
-	  GET_OBJ_VAL(obj, 5),
-	  grn, nrm, cyn,
-	  grn, nrm, cyn,
-	  grn, nrm, cyn, GET_OBJ_INNATE(obj), skill_name(GET_OBJ_INNATE(obj)), nrm,
-	  grn, nrm, yel, (obj->smell && *obj->smell) ? obj->smell : "<not set>\r\n",
-	  grn, nrm, yel, (obj->taste && *obj->taste) ? obj->taste : "<not set>\r\n",
-	  grn, nrm, yel, (obj->feel  && *obj->feel ) ? obj->feel  : "<not set>\r\n",
-	  grn, nrm, cyn, material_name(GET_OBJ_VAL(obj, 9)),
-          grn, nrm, cyn, GET_OBJ_LEVEL(obj),
-         // grn, nrm, cyn, buf2,
-	  grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
-          grn, nrm
-  );
+                  grn, nrm, cyn, buf1,
+                  grn, nrm, cyn, GET_OBJ_WEIGHT(obj),
+                  grn, nrm, cyn, GET_OBJ_COST(obj),
+                  grn, nrm, cyn, GET_OBJ_RENT(obj),
+                  grn, nrm, cyn, GET_OBJ_TIMER(obj),
+                  grn, nrm, cyn,
+                  GET_OBJ_VAL(obj, 0),
+                  GET_OBJ_VAL(obj, 1),
+                  GET_OBJ_VAL(obj, 2),
+                  GET_OBJ_VAL(obj, 3),
+                  GET_OBJ_VAL(obj, 4),
+                  GET_OBJ_VAL(obj, 5),
+                  grn, nrm, cyn,
+                  grn, nrm, cyn,
+                  grn, nrm, cyn, GET_OBJ_INNATE(obj), skill_name(GET_OBJ_INNATE(obj)), nrm,
+                  grn, nrm, yel, (obj->smell && *obj->smell) ? obj->smell : "<not set>\r\n",
+                  grn, nrm, yel, (obj->taste && *obj->taste) ? obj->taste : "<not set>\r\n",
+                  grn, nrm, yel, (obj->feel  && *obj->feel ) ? obj->feel  : "<not set>\r\n",
+                  grn, nrm, cyn, material_name(GET_OBJ_VAL(obj, 9)),
+                  grn, nrm, cyn, GET_OBJ_LEVEL(obj),
+                  // grn, nrm, cyn, buf2,
+                  grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
+                  grn, nrm
+                 );
   OLC_MODE(d) = OEDIT_MAIN_MENU;
 }
 
@@ -949,19 +986,23 @@ void oedit_parse(struct descriptor_data *d, char *arg)
   int number, max_val, min_val;
   char *oldtext = NULL;
 
-  switch (OLC_MODE(d)) {
+  switch (OLC_MODE(d))
+  {
 
   case OEDIT_CONFIRM_SAVESTRING:
-    switch (*arg) {
+    switch (*arg)
+    {
     case 'y':
     case 'Y':
       oedit_save_internally(d);
       new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE,
-	"OLC: %s edits obj %d", GET_NAME(d->character), OLC_NUM(d));
-      if (CONFIG_OLC_SAVE) {
-	oedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
-	write_to_output(d, "Object saved to disk.\r\n");
-      } else
+                 "OLC: %s edits obj %d", GET_NAME(d->character), OLC_NUM(d));
+      if (CONFIG_OLC_SAVE)
+      {
+        oedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+        write_to_output(d, "Object saved to disk.\r\n");
+      }
+      else
         write_to_output(d, "Object saved to memory.\r\n");
       /* Fall through. */
     case 'n':
@@ -982,14 +1023,17 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     /*
      * Throw us out to whichever edit mode based on user input.
      */
-    switch (*arg) {
+    switch (*arg)
+    {
     case 'q':
     case 'Q':
-      if (OLC_VAL(d)) {	/* Something has been modified. */
+      if (OLC_VAL(d))
+      {	/* Something has been modified. */
         write_to_output(d, "Do you wish to save this object?(yes/no/abort)\r\n");
-	OLC_MODE(d) = OEDIT_CONFIRM_SAVESTRING;
-      } else
-	cleanup_olc(d, CLEANUP_ALL);
+        OLC_MODE(d) = OEDIT_CONFIRM_SAVESTRING;
+      }
+      else
+        cleanup_olc(d, CLEANUP_ALL);
       return;
     case '1':
       write_to_output(d, "Enter namelist : ");
@@ -1007,9 +1051,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       OLC_MODE(d) = OEDIT_ACTDESC;
       send_editor_help(d);
       write_to_output(d, "Enter action description:\r\n\r\n");
-      if (OLC_OBJ(d)->action_description) {
-	write_to_output(d, "%s", OLC_OBJ(d)->action_description);
-	oldtext = strdup(OLC_OBJ(d)->action_description);
+      if (OLC_OBJ(d)->action_description)
+      {
+        write_to_output(d, "%s", OLC_OBJ(d)->action_description);
+        oldtext = strdup(OLC_OBJ(d)->action_description);
       }
       string_write(d, &OLC_OBJ(d)->action_description, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
@@ -1067,63 +1112,69 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       /*
        * If extra descriptions don't exist.
        */
-      if (OLC_OBJ(d)->ex_description == NULL) {
-	CREATE(OLC_OBJ(d)->ex_description, struct extra_descr_data, 1);
-	OLC_OBJ(d)->ex_description->next = NULL;
+      if (OLC_OBJ(d)->ex_description == NULL)
+      {
+        CREATE(OLC_OBJ(d)->ex_description, struct extra_descr_data, 1);
+        OLC_OBJ(d)->ex_description->next = NULL;
       }
       OLC_DESC(d) = OLC_OBJ(d)->ex_description;
       oedit_disp_extradesc_menu(d);
       break;
-	case 'f':
-	case 'F':
-	    /* Object innate spell */
-	    if (GET_LEVEL(d->character) == LVL_IMPL) {
-	        oedit_disp_spells_menu(d);
-		write_to_output(d,"Enter spell # : ");
-		OLC_MODE(d) = OEDIT_INNATE;
-	    } else
-		write_to_output(d,"Only Implementors can use this.");
-	    break;
-	case 'g':
-	case 'G':
-	    OLC_MODE(d) = OEDIT_SMELL_DESCRIPTION;
-	    send_editor_help(d);
+    case 'f':
+    case 'F':
+      /* Object innate spell */
+      if (GET_LEVEL(d->character) == LVL_IMPL)
+      {
+        oedit_disp_spells_menu(d);
+        write_to_output(d,"Enter spell # : ");
+        OLC_MODE(d) = OEDIT_INNATE;
+      }
+      else
+        write_to_output(d,"Only Implementors can use this.");
+      break;
+    case 'g':
+    case 'G':
+      OLC_MODE(d) = OEDIT_SMELL_DESCRIPTION;
+      send_editor_help(d);
       write_to_output(d, "Enter smell description:\r\n\r\n");
-      if (OLC_OBJ(d)->smell) {
-	write_to_output(d, "%s", OLC_OBJ(d)->smell);
-	oldtext = strdup(OLC_OBJ(d)->smell);
+      if (OLC_OBJ(d)->smell)
+      {
+        write_to_output(d, "%s", OLC_OBJ(d)->smell);
+        oldtext = strdup(OLC_OBJ(d)->smell);
       }
       string_write(d, &OLC_OBJ(d)->smell, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
 
-	    break;
-	case 'h':
-	case 'H':
-	    OLC_MODE(d) = OEDIT_TASTE_DESCRIPTION;
-	    send_editor_help(d);
+      break;
+    case 'h':
+    case 'H':
+      OLC_MODE(d) = OEDIT_TASTE_DESCRIPTION;
+      send_editor_help(d);
       write_to_output(d, "Enter taste description:\r\n\r\n");
-      if (OLC_OBJ(d)->taste) {
-	write_to_output(d, "%s", OLC_OBJ(d)->taste);
-	oldtext = strdup(OLC_OBJ(d)->taste);
+      if (OLC_OBJ(d)->taste)
+      {
+        write_to_output(d, "%s", OLC_OBJ(d)->taste);
+        oldtext = strdup(OLC_OBJ(d)->taste);
       }
       string_write(d, &OLC_OBJ(d)->taste, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
       break;
-      	case 'i':
-	case 'I':
-	    OLC_MODE(d) = OEDIT_FEEL_DESCRIPTION;
-	    send_editor_help(d);
+    case 'i':
+    case 'I':
+      OLC_MODE(d) = OEDIT_FEEL_DESCRIPTION;
+      send_editor_help(d);
       write_to_output(d, "Enter feel description:\r\n\r\n");
-      if (OLC_OBJ(d)->feel) {
-	write_to_output(d, "%s", OLC_OBJ(d)->feel);
-	oldtext = strdup(OLC_OBJ(d)->feel);
+      if (OLC_OBJ(d)->feel)
+      {
+        write_to_output(d, "%s", OLC_OBJ(d)->feel);
+        oldtext = strdup(OLC_OBJ(d)->feel);
       }
       string_write(d, &OLC_OBJ(d)->feel, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
       break;
     case 'j':
     case 'J':
-    oedit_disp_material_menu(d);
+      oedit_disp_material_menu(d);
       OLC_MODE(d) = OEDIT_MATERIAL;
       break;
     case 'm':
@@ -1131,11 +1182,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "Enter new minimum level: ");
       OLC_MODE(d) = OEDIT_LEVEL;
       break;
-    /*case 'p':
-    case 'P':
-      oedit_disp_perm_menu(d);
-      OLC_MODE(d) = OEDIT_PERM;
-      break;*/
+      /*case 'p':
+      case 'P':
+        oedit_disp_perm_menu(d);
+        OLC_MODE(d) = OEDIT_PERM;
+        break;*/
     case 's':
     case 'S':
       OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
@@ -1146,8 +1197,8 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     }
     return;			/*
-				 * end of OEDIT_MAIN_MENU 
-				 */
+    				 * end of OEDIT_MAIN_MENU 
+    				 */
   case OLC_SCRIPT_EDIT:
     if (dg_script_edit_parse(d, arg)) return;
     break;
@@ -1177,25 +1228,30 @@ void oedit_parse(struct descriptor_data *d, char *arg)
 
   case OEDIT_TYPE:
     number = atoi(arg);
-    if ((number < 1) || (number >= NUM_ITEM_TYPES)) {
+    if ((number < 1) || (number >= NUM_ITEM_TYPES))
+    {
       write_to_output(d, "Invalid choice, try again : ");
       return;
-    } else
+    }
+    else
       GET_OBJ_TYPE(OLC_OBJ(d)) = number;
     /* what's the boundschecking worth if we don't do this ? -- Welcor */
     GET_OBJ_VAL(OLC_OBJ(d), 0) = GET_OBJ_VAL(OLC_OBJ(d), 1) =
-      GET_OBJ_VAL(OLC_OBJ(d), 2) = GET_OBJ_VAL(OLC_OBJ(d), 3) =
-      GET_OBJ_VAL(OLC_OBJ(d), 4) =GET_OBJ_VAL(OLC_OBJ(d), 5) = 0;
+                                   GET_OBJ_VAL(OLC_OBJ(d), 2) = GET_OBJ_VAL(OLC_OBJ(d), 3) =
+                                                                  GET_OBJ_VAL(OLC_OBJ(d), 4) =GET_OBJ_VAL(OLC_OBJ(d), 5) = 0;
     break;
 
   case OEDIT_EXTRAS:
     number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_FLAGS)) {
+    if ((number < 0) || (number > NUM_ITEM_FLAGS))
+    {
       oedit_disp_extra_menu(d);
       return;
-    } else if (number == 0)
+    }
+    else if (number == 0)
       break;
-    else {
+    else
+    {
       TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (number - 1));
       oedit_disp_extra_menu(d);
       return;
@@ -1203,13 +1259,16 @@ void oedit_parse(struct descriptor_data *d, char *arg)
 
   case OEDIT_WEAR:
     number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_WEARS)) {
+    if ((number < 0) || (number > NUM_ITEM_WEARS))
+    {
       write_to_output(d, "That's not a valid choice!\r\n");
       oedit_disp_wear_menu(d);
       return;
-    } else if (number == 0)	/* Quit. */
+    }
+    else if (number == 0)	/* Quit. */
       break;
-    else {
+    else
+    {
       TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (number - 1));
       oedit_disp_wear_menu(d);
       return;
@@ -1230,14 +1289,14 @@ void oedit_parse(struct descriptor_data *d, char *arg)
   case OEDIT_TIMER:
     GET_OBJ_TIMER(OLC_OBJ(d)) = LIMIT(atoi(arg), -1, MAX_OBJ_TIMER);
     break;
-  
+
   case OEDIT_MATERIAL:
     GET_OBJ_MATERIAL(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, NUM_MATERIAL_TYPES);
     break;
-  
+
   case OEDIT_INNATE:
-	GET_OBJ_INNATE(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, NUM_SPELLS);
-	break;
+    GET_OBJ_INNATE(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, NUM_SPELLS);
+    break;
 
   case OEDIT_LEVEL:
     GET_OBJ_LEVEL(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, LVL_IMPL);
@@ -1256,18 +1315,19 @@ void oedit_parse(struct descriptor_data *d, char *arg)
      * Lucky, I don't need to check any of these for out of range values.
      * Hmm, I'm not so sure - Rv  
      */
-    switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
     case ITEM_FURNITURE:
-		GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(atoi(arg), 0, MAX_PEOPLE_IN_CHAIR);
-		oedit_disp_val2_menu(d);
-	    break;
-      case ITEM_WEAPON:
-	GET_OBJ_VAL(OLC_OBJ(d), 0) = MIN(MAX(atoi(arg), -50), 50);
-	break;
-      case ITEM_CONTAINER:
-        GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(atoi(arg), 0, MAX_CONTAINER_SIZE); 
-        break;
-      default:
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(atoi(arg), 0, MAX_PEOPLE_IN_CHAIR);
+      oedit_disp_val2_menu(d);
+      break;
+    case ITEM_WEAPON:
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = MIN(MAX(atoi(arg), -50), 50);
+      break;
+    case ITEM_CONTAINER:
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(atoi(arg), 0, MAX_CONTAINER_SIZE);
+      break;
+    default:
       GET_OBJ_VAL(OLC_OBJ(d), 0) = atoi(arg);
     }
     /*
@@ -1280,17 +1340,18 @@ void oedit_parse(struct descriptor_data *d, char *arg)
      * Here, I do need to check for out of range values.
      */
     number = atoi(arg);
-    switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_ANTIDOTE_1:
-	case ITEM_ANTIDOTE_2:
-	case ITEM_ANTIDOTE_3:
+    case ITEM_ANTIDOTE_2:
+    case ITEM_ANTIDOTE_3:
       if (number == 0 || number == -1)
-	GET_OBJ_VAL(OLC_OBJ(d), 1) = -1;
+        GET_OBJ_VAL(OLC_OBJ(d), 1) = -1;
       else
-	GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, NUM_SPELLS-1);
-      
+        GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, NUM_SPELLS-1);
+
       oedit_disp_val3_menu(d);
       break;
     case ITEM_CONTAINER:
@@ -1299,22 +1360,24 @@ void oedit_parse(struct descriptor_data *d, char *arg)
        * here.
        */
       if (number < 0 || number > 4)
-	oedit_disp_container_flags_menu(d);
-      else if (number != 0) {
+        oedit_disp_container_flags_menu(d);
+      else if (number != 0)
+      {
         TOGGLE_BIT(GET_OBJ_VAL(OLC_OBJ(d), 1), 1 << (number - 1));
         OLC_VAL(d) = 1;
-	oedit_disp_val2_menu(d);
-      } else
-	oedit_disp_val3_menu(d);
+        oedit_disp_val2_menu(d);
+      }
+      else
+        oedit_disp_val3_menu(d);
       break;
     case ITEM_WEAPON:
-      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, MAX_WEAPON_NDICE); 
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, MAX_WEAPON_NDICE);
       oedit_disp_val3_menu(d);
       break;
-	case ITEM_VEHICLE:
-  	GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 0, 1);
-	    oedit_disp_val3_menu(d);
-	break;
+    case ITEM_VEHICLE:
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 0, 1);
+      oedit_disp_val3_menu(d);
+      break;
     default:
       GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
       oedit_disp_val3_menu(d);
@@ -1326,13 +1389,15 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     /*
      * Quick'n'easy error checking.
      */
-    switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
     case ITEM_SCROLL:
     case ITEM_POTION:
-      if (number == 0 || number == -1) {
-	GET_OBJ_VAL(OLC_OBJ(d), 2) = -1;
-	oedit_disp_val4_menu(d);
-	return;
+      if (number == 0 || number == -1)
+      {
+        GET_OBJ_VAL(OLC_OBJ(d), 2) = -1;
+        oedit_disp_val4_menu(d);
+        return;
       }
       min_val = 1;
       max_val = NUM_SPELLS - 1;
@@ -1356,9 +1421,9 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       max_val = 999999;
       break;
     case ITEM_VEHICLE:
-	    min_val = 1;
-	    max_val = 5;
-	    break;
+      min_val = 1;
+      max_val = 5;
+      break;
     default:
       min_val = -32000;
       max_val = 32000;
@@ -1369,13 +1434,15 @@ void oedit_parse(struct descriptor_data *d, char *arg)
 
   case OEDIT_VALUE_4:
     number = atoi(arg);
-    switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
     case ITEM_SCROLL:
     case ITEM_POTION:
-      if (number == 0 || number == -1) {
-	GET_OBJ_VAL(OLC_OBJ(d), 3) = -1;
+      if (number == 0 || number == -1)
+      {
+        GET_OBJ_VAL(OLC_OBJ(d), 3) = -1;
         oedit_disp_menu(d);
-	return;
+        return;
       }
       min_val = 1;
       max_val = NUM_SPELLS - 1;
@@ -1390,9 +1457,9 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       max_val = NUM_ATTACK_TYPES - 1;
       break;
     case ITEM_KEY:
-     min_val = 0;
-     max_val = 999999;
-     break;
+      min_val = 0;
+      max_val = 999999;
+      break;
     default:
       min_val = -32000;
       max_val = 32000;
@@ -1402,15 +1469,17 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     oedit_disp_val5_menu(d);
     return;
   case OEDIT_VALUE_5:
-  number = atoi(arg);
-    switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
-  case ITEM_DRINKCON:
-  case ITEM_FOUNTAIN:
-  case ITEM_FOOD:
-      if (number == 0 || number == -1) {
-	GET_OBJ_VAL(OLC_OBJ(d), 4) = -1;
+    number = atoi(arg);
+    switch (GET_OBJ_TYPE(OLC_OBJ(d)))
+    {
+    case ITEM_DRINKCON:
+    case ITEM_FOUNTAIN:
+    case ITEM_FOOD:
+      if (number == 0 || number == -1)
+      {
+        GET_OBJ_VAL(OLC_OBJ(d), 4) = -1;
         oedit_disp_menu(d);
-	return;
+        return;
       }
       min_val = 1;
       max_val = NUM_SPELLS - 1;
@@ -1426,12 +1495,13 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 4) = LIMIT(number, min_val, max_val);
-     oedit_disp_menu(d);
-return;
+    oedit_disp_menu(d);
+    return;
   case OEDIT_PROMPT_APPLY:
     if ((number = atoi(arg)) == 0)
       break;
-    else if (number < 0 || number > MAX_OBJ_AFFECT) {
+    else if (number < 0 || number > MAX_OBJ_AFFECT)
+    {
       oedit_disp_prompt_apply_menu(d);
       return;
     }
@@ -1441,19 +1511,25 @@ return;
     return;
 
   case OEDIT_APPLY:
-    if ((number = atoi(arg)) == 0) {
+    if ((number = atoi(arg)) == 0)
+    {
       OLC_OBJ(d)->affected[OLC_VAL(d)].location = 0;
       OLC_OBJ(d)->affected[OLC_VAL(d)].modifier = 0;
       oedit_disp_prompt_apply_menu(d);
-    } else if (number < 0 || number >= NUM_APPLIES)
+    }
+    else if (number < 0 || number >= NUM_APPLIES)
       oedit_disp_apply_menu(d);
-    else {
+    else
+    {
       int counter;
 
       /* add in check here if already applied.. deny builders another */
-      if (GET_LEVEL(d->character) < LVL_IMPL) {
-        for (counter = 0; counter < MAX_OBJ_AFFECT; counter++) {
-          if (OLC_OBJ(d)->affected[counter].location == number) {
+      if (GET_LEVEL(d->character) < LVL_IMPL)
+      {
+        for (counter = 0; counter < MAX_OBJ_AFFECT; counter++)
+        {
+          if (OLC_OBJ(d)->affected[counter].location == number)
+          {
             write_to_output(d, "Object already has that apply.");
             return;
           }
@@ -1472,7 +1548,8 @@ return;
     return;
 
   case OEDIT_EXTRADESC_KEY:
-    if (genolc_checkstring(d, arg)) {
+    if (genolc_checkstring(d, arg))
+    {
       if (OLC_DESC(d)->keyword)
         free(OLC_DESC(d)->keyword);
       OLC_DESC(d)->keyword = str_udup(arg);
@@ -1481,24 +1558,26 @@ return;
     return;
 
   case OEDIT_EXTRADESC_MENU:
-    switch ((number = atoi(arg))) {
+    switch ((number = atoi(arg)))
+    {
     case 0:
-      if (!OLC_DESC(d)->keyword || !OLC_DESC(d)->description) {
+      if (!OLC_DESC(d)->keyword || !OLC_DESC(d)->description)
+      {
         struct extra_descr_data *temp;
 
-	if (OLC_DESC(d)->keyword)
-	  free(OLC_DESC(d)->keyword);
-	if (OLC_DESC(d)->description)
-	  free(OLC_DESC(d)->description);
+        if (OLC_DESC(d)->keyword)
+          free(OLC_DESC(d)->keyword);
+        if (OLC_DESC(d)->description)
+          free(OLC_DESC(d)->description);
 
-	/*
-	 * Clean up pointers  
-	 */
-	REMOVE_FROM_LIST(OLC_DESC(d), OLC_OBJ(d)->ex_description, next);
-	free(OLC_DESC(d));
-	OLC_DESC(d) = NULL;
+        /*
+         * Clean up pointers  
+         */
+        REMOVE_FROM_LIST(OLC_DESC(d), OLC_OBJ(d)->ex_description, next);
+        free(OLC_DESC(d));
+        OLC_DESC(d) = NULL;
       }
-    break;
+      break;
 
     case 1:
       OLC_MODE(d) = OEDIT_EXTRADESC_KEY;
@@ -1509,9 +1588,10 @@ return;
       OLC_MODE(d) = OEDIT_EXTRADESC_DESCRIPTION;
       send_editor_help(d);
       write_to_output(d, "Enter the extra description:\r\n\r\n");
-      if (OLC_DESC(d)->description) {
-	write_to_output(d, "%s", OLC_DESC(d)->description);
-	oldtext = strdup(OLC_DESC(d)->description);
+      if (OLC_DESC(d)->description)
+      {
+        write_to_output(d, "%s", OLC_DESC(d)->description);
+        oldtext = strdup(OLC_DESC(d)->description);
       }
       string_write(d, &OLC_DESC(d)->description, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
@@ -1521,16 +1601,18 @@ return;
       /*
        * Only go to the next description if this one is finished.
        */
-      if (OLC_DESC(d)->keyword && OLC_DESC(d)->description) {
-	struct extra_descr_data *new_extra;
+      if (OLC_DESC(d)->keyword && OLC_DESC(d)->description)
+      {
+        struct extra_descr_data *new_extra;
 
-	if (OLC_DESC(d)->next)
-	  OLC_DESC(d) = OLC_DESC(d)->next;
-	else {	/* Make new extra description and attach at end. */
-	  CREATE(new_extra, struct extra_descr_data, 1);
-	  OLC_DESC(d)->next = new_extra;
-	  OLC_DESC(d) = OLC_DESC(d)->next;
-	}
+        if (OLC_DESC(d)->next)
+          OLC_DESC(d) = OLC_DESC(d)->next;
+        else
+        {	/* Make new extra description and attach at end. */
+          CREATE(new_extra, struct extra_descr_data, 1);
+          OLC_DESC(d)->next = new_extra;
+          OLC_DESC(d) = OLC_DESC(d)->next;
+        }
       }
       /*
        * No break - drop into default case.
@@ -1555,7 +1637,8 @@ return;
 
 void oedit_string_cleanup(struct descriptor_data *d, int terminator)
 {
-  switch (OLC_MODE(d)) {
+  switch (OLC_MODE(d))
+  {
   case OEDIT_FEEL_DESCRIPTION:
   case OEDIT_TASTE_DESCRIPTION:
   case OEDIT_SMELL_DESCRIPTION:

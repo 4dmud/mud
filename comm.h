@@ -85,3 +85,6 @@ int toggle_compression(struct descriptor_data *t);
 #define USING_LARGE(d)  ((d)->output == (d)->large_outbuf)
 
 typedef RETSIGTYPE sigfunc(int);
+
+extern struct char_data *char_posing;
+

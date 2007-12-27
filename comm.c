@@ -4142,8 +4142,12 @@ void perform_act(const char *orig, struct char_data *ch,
   if (lbuf == NULL || !*lbuf)
     return;
 
-  if (to->desc)
+  if (to->desc) {
+  if (char_posing && to != char_posing && !PLR_FLAGGED(to, PLR_ROLEPLAYER))
+  write_to_output(to->desc, "%s (%s)", CAP(lbuf), PERS(char_posing, to));
+  else
     write_to_output(to->desc, "%s", CAP(lbuf));
+    }
 
   if ((IS_NPC(to) && dg_act_check) && (to != ch))
     act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
@@ -5310,18 +5314,17 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
 {
   d->mxp = TRUE;  /* turn it on now */
   write_to_output( d, "%s", start_mxp_str);
-  write_to_output( d, "%s", MXPMODE (6) );   /* permanent secure mode */
+  write_to_output( d, "%s", MXPMODE(6) );   /* permanent secure mode */
   /* Exit tag */
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\" EXPIRE=\"Exits\"  FLAG=RoomExit"));
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" EXPIRE=\"Exits\" FLAG=RoomExit"));
-  write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
-                    "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;' "
-                    "'Send a message to &name;' prompt>\" "
+  write_to_output( d, "%s", MXPTAG("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\" EXPIRE=\"Exits\"  FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" EXPIRE=\"Exits\" FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
+                    "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;'  prompt>\" "
                     "ATT=\"name\""));
-  write_to_output(d, "%s", MXPTAG("!ELEMENT affect '<COLOR &col;><em>' ATT='col=whitesmoke'"));
+  write_to_output(d, "%s", MXPTAG("!ELEMENT affect '<COLOR &col;>' ATT='col=whitesmoke'"));
   write_to_output(d, "%s", MXPTAG("!ELEMENT LookAt '<send href=\"look at &at;\">'"));
   write_to_output(d, "%s", MXPTAG("!ELEMENT Read '<send href=\"read at &at;\">'"));
+  
 #if 0
   /* Room description tag */
   write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc '<p>' FLAG=RoomDesc"));
@@ -5365,11 +5368,12 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
   /* Player tag (for who lists, tells etc.) */
 
   /* List an item tag (for things in a shop) */
-  //write_to_output(d, "%s", MXPTAG("GAUGE 'hp' Max='xhp' Caption='Health' Color='red'"));
-  //write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
-  //write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
-  //write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE HP Max=XHP Caption='Hp:' Color='red'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE MANA Max=XMANA Caption='Mn:' Color='cyan'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE MOVE Max=XMOVE Caption='Mv:' Color='green'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE STAM Max=XSTAM Caption='St:' Color='white'"));
   //write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
+
 
 
 } /* end of turn_on_mxp */

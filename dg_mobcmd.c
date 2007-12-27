@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.8  2005/06/18 12:20:53  w4dimenscor
+ * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
+ *
  * Revision 1.7  2005/04/06 07:16:28  w4dimenscor
  * added dg variables: is_roleplay, is_peaceful. Added the GATE, and RP to constants.c
  *
@@ -141,13 +144,12 @@ ACMD(do_msteal)
   vict = get_char_room_vis(ch, vict_name, NULL);
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
   two_arguments(argument, obj_name, vict_name);
 
-  send_to_char("In Function\r\n", vict);
 
   if (!(vict))
   {
@@ -167,7 +169,6 @@ ACMD(do_msteal)
   }
   else
   {
-    send_to_char("Object found..about to steal\r\n", vict);
     if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch)))
     {
       if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <
@@ -195,7 +196,7 @@ ACMD(do_masound)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -296,7 +297,7 @@ ACMD(do_mlag)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -441,7 +442,7 @@ ACMD(do_mechoaround)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -492,7 +493,7 @@ ACMD(do_msend)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -556,7 +557,7 @@ ACMD(do_mecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -582,7 +583,7 @@ ACMD(do_mzecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -612,7 +613,7 @@ ACMD(do_mzrecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -645,7 +646,7 @@ ACMD(do_mrecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
   msg = two_arguments(argument, start, finish);
@@ -667,7 +668,7 @@ ACMD(do_mdamage)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -947,7 +948,7 @@ ACMD(do_mgoto)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -985,7 +986,7 @@ ACMD(do_mat)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1035,7 +1036,7 @@ ACMD(do_mteleport)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1117,7 +1118,7 @@ ACMD(do_mforce)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1195,7 +1196,7 @@ ACMD(do_mhunt)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1250,7 +1251,7 @@ ACMD(do_mremember)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1315,7 +1316,7 @@ ACMD(do_mforget)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1392,7 +1393,7 @@ ACMD(do_mtransform)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1401,9 +1402,7 @@ ACMD(do_mtransform)
 
   if (ch->desc)
   {
-    send_to_char
-    ("You've got no VNUM to return to, dummy! try 'switch'\r\n",
-     ch);
+    new_send_to_char(ch,"You've got no VNUM to return to, dummy! try 'switch'\r\n");
     return;
   }
 
@@ -1565,7 +1564,7 @@ ACMD(do_mdoor)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch,"Huh?!?\r\n");
     return;
   }
 
@@ -1662,7 +1661,7 @@ ACMD(do_mslay)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch,"Huh?!?\r\n");
     return;
   }
 
@@ -1670,19 +1669,19 @@ ACMD(do_mslay)
 
   if (!*arg)
   {
-    send_to_char("Kill who?\r\n", ch);
+    new_send_to_char(ch,"Kill who?\r\n");
     return;
   }
 
   if (!(vict = get_char_room_vis(ch, arg, NULL)))
   {
-    send_to_char("They aren't here.\r\n", ch);
+    new_send_to_char(ch,"They aren't here.\r\n");
     return;
   }
 
   if (ch == vict)
   {
-    send_to_char("Your mother would be so sad.. :(\r\n", ch);
+    new_send_to_char(ch,"Your mother would be so sad.. :(\r\n");
     return;
   }
 
@@ -1705,7 +1704,7 @@ ACMD(do_mcollision)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch, "Huh?!?\r\n");
     return;
   }
 
@@ -1764,7 +1763,7 @@ ACMD(do_mzreset)
 
   if (!MOB_OR_IMPL(ch))
   {
-    send_to_char("Huh?!?\r\n", ch);
+    new_send_to_char(ch,"Huh?!?\r\n");
     return;
   }
 
@@ -1777,5 +1776,5 @@ ACMD(do_mzreset)
                zone_table[i].name);
   }
   else
-    send_to_char("Invalid zone number.\r\n", ch);
+    new_send_to_char(ch,"Invalid zone number.\r\n");
 }

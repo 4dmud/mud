@@ -112,7 +112,7 @@ char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
 /*string concat for multiple strings*/
 char *xstrcat(char *des, char *src, ...);
 /* th, st, nd, rd - for numbers */
-char *ordinal_text(int number);
+const char *ordinal_text(int number);
 char *str_str(char *cs, char *ct);
 
 /*quicksort a linked list*/

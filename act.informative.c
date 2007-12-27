@@ -3390,7 +3390,7 @@ ACMD(do_who)
 
     if (GET_LEVEL(wch) >= LVL_HERO && (GET_SEX(wch) != SEX_FEMALE))
     {
-      snprintf(buf, sizeof(buf), "%s[%20s] %s%s%s %s",  CCYEL(ch, C_SPR),
+      snprintf(buf, sizeof(buf), "%s[%20s] %s%s" MXPTAG("B") "%s" MXPTAG("/B") " %s",  CCYEL(ch, C_SPR),
                center_align(IMMTITLE(wch) ? IMMTITLE(wch) : (char *)WizLevels_male[GET_LEVEL(wch) - LVL_HERO], 20),
                (PRETITLE(wch) == NULL ? "" : PRETITLE(wch)),
                (PRETITLE(wch) == NULL ? "" : " "),
@@ -3399,7 +3399,7 @@ ACMD(do_who)
     }
     else if (GET_LEVEL(wch) >= LVL_HERO)
     {
-      snprintf(buf, sizeof(buf), "%s[%20s] %s%s%s %s", CCYEL(ch, C_SPR),
+      snprintf(buf, sizeof(buf), "%s[%20s] %s%s" MXPTAG("B") "%s" MXPTAG("/B") " %s", CCYEL(ch, C_SPR),
                center_align(IMMTITLE(wch) ? IMMTITLE(wch) : (char *)WizLevels_female[GET_LEVEL(wch) - LVL_HERO], 20),
                (PRETITLE(wch) == NULL ? "" : PRETITLE(wch)),
                (PRETITLE(wch) == NULL ? "" : " "),
@@ -3411,29 +3411,29 @@ ACMD(do_who)
 
       if (AFF_FLAGGED(wch, AFF_POLY_TOAD))
       {
-        snprintf(buf, sizeof(buf), "[--------TOAD--------] A slimy toad looking vaguely like %s.",  GET_NAME(wch));
+        snprintf(buf, sizeof(buf), "[--------TOAD--------] A slimy toad looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
       else	if (AFF_FLAGGED(wch, AFF_POLY_WOLF))
       {
-        snprintf(buf, sizeof(buf), "[--------WOLF--------] A grey wolf looking vaguely like %s.", GET_NAME(wch));
+        snprintf(buf, sizeof(buf), "[--------WOLF--------] A grey wolf looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".", GET_NAME(wch));
       }
       else	if (AFF_FLAGGED(wch, AFF_POLY_BOAR))
       {
-        snprintf(buf, sizeof(buf), "[--------BOAR--------] A frisky boar looking vaguely like %s.", GET_NAME(wch));
+        snprintf(buf, sizeof(buf), "[--------BOAR--------] A frisky boar looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".", GET_NAME(wch));
       }
       else	if (AFF_FLAGGED(wch, AFF_POLY_BEAR))
       {
-        snprintf(buf, sizeof(buf), "[--------BEAR--------] A shaggy bear looking vaguely like %s.",  GET_NAME(wch));
+        snprintf(buf, sizeof(buf), "[--------BEAR--------] A shaggy bear looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
       else	if (AFF_FLAGGED(wch, AFF_POLY_LION))
       {
-        snprintf(buf, sizeof(buf), "[--------LION--------] A black lion looking vaguely like %s.",  GET_NAME(wch));
+        snprintf(buf, sizeof(buf), "[--------LION--------] A black lion looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
       else
       {
         if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
         {
-          snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0%s{cx %s",
+          snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0" MXPTAG("B") "%s" MXPTAG("/B") " %s",
                    TIER_COLOR_WHO(current_class_is_tier_num(wch)),
                    current_class_is_tier_num(wch), GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                    (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
@@ -3448,7 +3448,7 @@ ACMD(do_who)
         }
         else
         {
-          snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0%-20s{cx",
+          snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0" MXPTAG("B") "%-20s" MXPTAG("/B") ,
                    TIER_COLOR_WHO(current_class_is_tier_num(wch)),
                    current_class_is_tier_num(wch),GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                    (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
@@ -3466,7 +3466,7 @@ ACMD(do_who)
 
     if ((GET_LEVEL(wch) < LVL_HERO) && GET_CLAN(wch))
     {	/*added ' leader' to the clan name, gave it round brackets and light cyan color that wont bleed a imms title */
-      len += snprintf(buf + len, sizeof(buf) - len, " %s(%s%s%s%s)",
+      len += snprintf(buf + len, sizeof(buf) - len, " %s(" MXPTAG("em") "%s%s%s%s" MXPTAG("/em") ")",
                       (GET_LEVEL(wch) >= LVL_HERO ? CCYEL(ch, C_SPR):CCNRM(ch, C_NRM)), CCCYN(ch, C_NRM),
                       clan_name(find_clan_by_id(GET_CLAN(wch))),
                       ((clan[find_clan_by_id(GET_CLAN(wch))].ranks ==

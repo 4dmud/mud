@@ -90,7 +90,7 @@ ACMD(do_remort)
 
   if (IS_NPC(ch) || GET_LEVEL(ch) != 50)
   {
-    send_to_char("That is not a very good idea.\r\n", ch);
+    new_send_to_char(ch,"That is not a very good idea.\r\n");
     return;
   }
 
@@ -98,16 +98,14 @@ ACMD(do_remort)
 
   if (!argument)
   {
-    send_to_char
-    ("What class do you want to remort to?\r\nREMORT <class>\r\n",
-     ch);
+    new_send_to_char(ch,"What class do you want to remort to?\r\nREMORT <class>\r\n");
     return;
   }
 
   // did they supply a valid class
   if ((i = parse_class(*argument)) == CLASS_UNDEFINED)
   {
-    send_to_char("That is not a valid class.\r\n", ch);
+    new_send_to_char(ch, "That is not a valid class.\r\n");
     return;
   }
   // do they have the experience
@@ -157,7 +155,7 @@ ACMD(do_remort)
               simple_class_name(ch),
               (grand_master(ch) ? " Grand Master!" : "!"));
   log("REMORT: %s has just remorted to %s", GET_NAME(ch), simple_class_name(ch));
-  send_to_char("Enjoy your new class.\r\n", ch);
+  new_send_to_char(ch, "Enjoy being %s.\r\n", simple_class_name(ch));
 
   for (i = 0; i < NUM_WEARS; i++)
   {

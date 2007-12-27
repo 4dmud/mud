@@ -136,8 +136,8 @@ vict = parse_aggressive(ch);
  } else
  master = vict;
  
- if (number(0, 200) <= GET_LEVEL(ch)) {
-   switch (number(0, GET_LEVEL(ch)/4)) {
+ if (number(0, 300) <= GET_LEVEL(ch)) {
+   switch (number(0, GET_LEVEL(ch)/12)) {
 	case 0:
 		spl = (SPELL_MAGIC_MISSILE);
 	break;
@@ -202,7 +202,7 @@ vict = parse_aggressive(ch);
   if (number(0, 1000) <= GET_LEVEL(ch)) {
    if (GET_POS(ch) < POS_FIGHTING)
  return;
-   switch (number(0, GET_LEVEL(ch)/4)) {
+   switch (number(0, GET_LEVEL(ch)/12)) {
 	case 0:
 		spl = (SPELL_SANCTUARY);
 	break;
@@ -280,8 +280,8 @@ find_usable_weapon(ch);
  else
  master = FIGHTING(ch);
  
-  if (number(0, 80) <= GET_LEVEL(ch)) {
-   switch (number(0, GET_LEVEL(ch)/10)) {
+  if (number(0, 200) <= GET_LEVEL(ch)) {
+   switch (number(0, GET_LEVEL(ch)/20)) {
 	case 0:
 	act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
 	act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
@@ -311,7 +311,7 @@ find_usable_weapon(ch);
 if ((vict = parse_aggressive(ch)) != NULL) {
  if (GET_POS(ch) < POS_FIGHTING)
  return;
-   switch (number(0, GET_LEVEL(ch)/10)) {
+   switch (number(0, GET_LEVEL(ch)/20)) {
 	case 0:
 	act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
 	act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
@@ -357,7 +357,7 @@ do_wear(ch, "orb", 0, 0);
  master = FIGHTING(ch);
  
  if (number(0, 300) <= GET_LEVEL(ch)) {
-   switch (number(0, GET_LEVEL(ch)/10)) {
+   switch (number(0, GET_LEVEL(ch)/25)) {
 	case 0:
 		spl = (SPELL_MAGIC_MISSILE);
 	break;
@@ -885,7 +885,7 @@ onext = obj->next_content;
 }
 
 if (found == 1 && obj) {
-if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+if (GET_OBJ_WEIGHT(obj) <= str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
 perform_wear(ch, obj, WEAR_WIELD);
 }
 if (GET_CLASS(ch) != CLASS_CASTER && shield != GET_EQ(ch, WEAR_SHIELD)) {

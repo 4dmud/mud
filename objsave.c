@@ -378,8 +378,7 @@ void Crash_listrent(struct char_data *ch, char *name)
 
   if (!(fl = fopen(fname, "rb")))
   {
-    sprintf(buf, "%s has no rent file.\r\n", name);
-    send_to_char(buf, ch);
+    new_send_to_char(ch, "%s has no rent file.\r\n", name);
     return;
   }
   sprintf(buf, "%s\r\n", fname);
@@ -1820,10 +1819,9 @@ int Crash_load_xapobjs(struct char_data *ch)
     {	/* if it fails, NOT because of no file */
       new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
       log("SYSERR: READING OBJECT FILE %s (5)", fname1);
-      send_to_char
-      ("\r\n********************* NOTICE *********************\r\n"
+      new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
        "There was a problem loading your objects from disk.\r\n"
-       "Contact a God for assistance.\r\n", ch);
+       "Contact a God for assistance.\r\n");
     }
     if (!(fl = fopen(fname2, "r+b")))
     {
@@ -1832,10 +1830,9 @@ int Crash_load_xapobjs(struct char_data *ch)
 
         new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
         log("SYSERR: READING OBJECT FILE %s (5)", fname1);
-        send_to_char
-        ("\r\n********************* NOTICE *********************\r\n"
+        new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
          "There was a problem loading your objects from disk.\r\n"
-         "Contact a God for assistance.\r\n", ch);
+         "Contact a God for assistance.\r\n");
       }
 
     }

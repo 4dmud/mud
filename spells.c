@@ -59,9 +59,7 @@ ASPELL(spell_create_water)
 
   if (!obj)
   {
-    send_to_char
-    ("What are you trying to do? Flood the play. Specify a container.\r\n",
-     ch);
+    new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
     return;
   }
 
@@ -98,9 +96,7 @@ ASPELL(spell_water_to_wine)
 
   if (!obj)
   {
-    send_to_char
-    ("What are you trying to do? Flood the play. Specify a container.\r\n",
-     ch);
+   new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
     return;
   }
 
@@ -170,19 +166,19 @@ ASPELL(spell_recall)
 
   if (IS_IMM(victim))
   {
-    send_to_char("That isn't such a good idea.\r\n", ch);
+    new_send_to_char(ch,"That isn't such a good idea.\r\n");
     return;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NORECALL))
   {
-    send_to_char("You cannot recall from this room.\r\n", ch);
+    new_send_to_char(ch,"You cannot recall from this room.\r\n");
     return;
   }
 
   if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NORECALL))
   {
-    send_to_char("You cannot recall from this zone.\r\n", ch);
+    new_send_to_char(ch,"You cannot recall from this zone.\r\n");
     return;
   }
 
@@ -207,14 +203,14 @@ ASPELL(spell_teleport)
 
   if (IS_IMM(victim) || IS_NPC(victim))
   {
-    send_to_char("That's not such a good idea.\r\n", ch);
+    new_send_to_char(ch,"That's not such a good idea.\r\n");
     return;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOTELEPORT_OUT) ||
       ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOTELEPORT_OUT))
   {
-    send_to_char("A magical barrier prevents you from leaving.\r\n", ch);
+    new_send_to_char(ch,"A magical barrier prevents you from leaving.\r\n");
     return;
   }
   /*possible infinite loop here*/
@@ -225,7 +221,7 @@ ASPELL(spell_teleport)
     to_room = world_vnum[number(0, top_of_world)];
     if (cnt > top_of_world)
     {
-      log("Error with teleport, cant find destination room");
+      log("Error with teleport, can't find destination room");
       return;
     }
   }
@@ -257,7 +253,7 @@ ASPELL(spell_summon)
 
   if (GET_LEVEL(victim) > MIN(LVL_GOD - 1, level + 3))
   {
-    send_to_char(SUMMON_FAIL, ch);
+    new_send_to_char(ch, "%s", SUMMON_FAIL);
     return;
   }
 
@@ -327,7 +323,7 @@ ASPELL(spell_summon)
   if (MOB_FLAGGED(victim, MOB_NOSUMMON) ||
       (IS_NPC(victim) && mag_savingthrow(victim, SAVING_SPELL, 0)))
   {
-    send_to_char(SUMMON_FAIL, ch);
+    new_send_to_char(ch, "%s", SUMMON_FAIL);
     return;
   }
 
@@ -351,7 +347,7 @@ ASPELL(spell_gate)
 
   if (GET_LEVEL(victim) > MIN(LVL_GOD - 1, level + 3))
   {
-    send_to_char(SUMMON_FAIL, ch);
+    new_send_to_char(ch, "%s", SUMMON_FAIL);
     return;
   }
 
@@ -442,7 +438,7 @@ ASPELL(spell_locate_object)
   /* use the temporary object that do_cast created */
   if (!strarg)
   {
-    send_to_char("What object would you like to find?\r\n", ch);
+    new_send_to_char(ch,"What object would you like to find?\r\n");
     return;
   }
 
@@ -491,7 +487,7 @@ ASPELL(spell_locate_object)
   if (j == ((level / 2) * (TIERNUM+1)))
   {
     free_string(&dynbuf);
-    send_to_char("You sense nothing.\r\n", ch);
+    new_send_to_char(ch, "You sense nothing.\r\n");
   }
   else
     page_string(ch->desc, dynbuf, DYN_BUFFER);
@@ -507,25 +503,24 @@ ASPELL(spell_charm)
     return;
 
   if (victim == ch)
-    send_to_char("You like yourself even better!\r\n", ch);
+    new_send_to_char(ch,"You like yourself even better!\r\n");
   else if (!IS_NPC(victim) && !PRF_FLAGGED(victim, PRF_SUMMONABLE))
-    send_to_char("You fail because SUMMON protection is on!\r\n", ch);
+    new_send_to_char(ch,"You fail because SUMMON protection is on!\r\n");
   else if (AFF_FLAGGED(victim, AFF_SANCTUARY))
-    send_to_char("Your victim is protected by sanctuary!\r\n", ch);
+    new_send_to_char(ch,"Your victim is protected by sanctuary!\r\n");
   else if (MOB_FLAGGED(victim, MOB_NOCHARM))
-    send_to_char("Your victim resists!\r\n", ch);
+    new_send_to_char(ch,"Your victim resists!\r\n");
   else if (AFF_FLAGGED(ch, AFF_CHARM))
-    send_to_char("You can't have any followers of your own!\r\n", ch);
+    new_send_to_char(ch,"You can't have any followers of your own!\r\n");
   else if (AFF_FLAGGED(victim, AFF_CHARM) || level < GET_LEVEL(victim))
-    send_to_char("You fail.\r\n", ch);
+    new_send_to_char(ch,"You fail.\r\n");
   /* player charming another player - no legal reason for this */
   else if ((!CONFIG_PK_ALLOWED)  && !IS_NPC(victim))
-    send_to_char("You fail - shouldn't be doing it anyway.\r\n", ch);
+    new_send_to_char(ch,"You fail - shouldn't be doing it anyway.\r\n");
   else if (circle_follow(victim, ch))
-    send_to_char("Sorry, following in circles can not be allowed.\r\n",
-                 ch);
+    new_send_to_char(ch,"Sorry, following in circles can not be allowed.\r\n");
   else if (mag_savingthrow(victim, SAVING_PARA, 0))
-    send_to_char("Your victim resists!\r\n", ch);
+    new_send_to_char(ch,"Your victim resists!\r\n");
   else
   {
     if (victim->master)
@@ -569,7 +564,8 @@ ASPELL(spell_psi_panic)
     act("A look of fear crosses $n's face!", FALSE, victim, 0, 0, TO_CHAR);
     do_flee(victim, "", 0, 0);
     GET_WAIT_STATE(ch) += 2 RL_SEC;
-  }
+    GET_WAIT_STATE(victim) += 4 RL_SEC;
+      }
 }
 
 ASPELL(spell_polymorph)
@@ -577,9 +573,9 @@ ASPELL(spell_polymorph)
   struct affected_type af;
 
   if (affected_by_spell(victim, SPELL_POLYMORPH))
-    send_to_char("You fail.\r\n", ch);
+    new_send_to_char(ch,"You fail.\r\n");
   else if (mag_savingthrow(victim, SAVING_PARA, 0))
-    send_to_char("Your victim resists!\r\n", ch);
+    new_send_to_char(ch,"Your victim resists!\r\n");
   else
   {
 
@@ -870,9 +866,9 @@ ASPELL(spell_detect_poison)
     if (victim == ch)
     {
       if (AFF_FLAGGED(victim, AFF_POISON_1))
-        send_to_char("You can sense poison in your blood.\r\n",  ch);
+        new_send_to_char(ch,"You can sense poison in your blood.\r\n");
       else
-        send_to_char("You feel healthy.\r\n", ch);
+        new_send_to_char(ch,"You feel healthy.\r\n");
     }
     else
     {
@@ -900,136 +896,11 @@ ASPELL(spell_detect_poison)
             ch, obj, 0, TO_CHAR);
       break;
     default:
-      send_to_char("You sense that it should not be consumed.\r\n",
-                   ch);
+      new_send_to_char(ch,"You sense that it should not be consumed.\r\n");
     }
   }
 }
-#if 0
-#define PORTAL_OBJ  20		/* the vnum of the portal object */
 
-ASPELL(spell_gate)
-{
-  /* create a magic portal */
-  struct obj_data *tmp_obj, *tmp_obj2;
-  struct extra_descr_data *ed;
-  struct room_data *rp, *nrp;
-  struct char_data *tmp_ch = (struct char_data *) victim;
-  char buf[512];
-
-  assert(ch);
-  assert((level >= 0) && (level <= LVL_IMPL));
-
-  if (GET_LEVEL(ch) >= LVL_GOD && GET_LEVEL(ch) <= LVL_SEN)
-  {
-    send_to_char
-    ("Do not play with this spell. A message will be sent to the Imps.\r\n",
-     ch);
-    log("%s tried using the gate spell.", GET_NAME(ch));
-    return;
-  }
-
-  /*
-     check target room for legality.
-   */
-  rp = &world[IN_ROOM(ch)];
-  tmp_obj = read_object(PORTAL_OBJ, VIRTUAL);
-  if (!rp || !tmp_obj)
-  {
-    send_to_char("The magic fails.\r\n", ch);
-    extract_obj(tmp_obj);
-    return;
-  }
-
-  if (IS_SET_AR(rp->room_flags, ROOM_NOMAGIC))
-  {
-    send_to_char("Eldritch wizardry obstructs thee.\r\n", ch);
-    extract_obj(tmp_obj);
-    return;
-  }
-
-  if (IS_SET_AR(rp->room_flags, ROOM_TUNNEL))
-  {
-    send_to_char("There is no room in here to summon!\r\n", ch);
-    extract_obj(tmp_obj);
-    return;
-  }
-
-  if (!(nrp = &world[tmp_IN_ROOM(ch)]))
-  {
-    char str[180];
-    sprintf(str, "%s not in any room", GET_NAME(tmp_ch));
-    log(str);
-    send_to_char("The magic cannot locate the target.\r\n", ch);
-    extract_obj(tmp_obj);
-    return;
-  }
-
-  if (ROOM_FLAGGED(tmp_IN_ROOM(ch), ROOM_NOMAGIC))
-  {
-    send_to_char("Your target is protected against your magic.\r\n",
-                 ch);
-    extract_obj(tmp_obj);
-    return;
-  }
-
-  /*
-    if (!CAN_SUMMON(IN_ROOM(tmp_ch), IN_ROOM(ch))) {
-      send_to_char("Your magic is broken by the divine forces.\r\n", ch);
-      extract_obj(tmp_obj);
-      return;
-    }
-  */
-
-  sprintf(buf,
-          "Through the mists of the portal, you can faintly see %s.\r\n",
-          nrp->name);
-
-  CREATE(ed, struct extra_descr_data, 1);
-  ed->next = tmp_obj->ex_description;
-  tmp_obj->ex_description = ed;
-  CREATE(ed->keyword, char, strlen(tmp_obj->name) + 1);
-  strcpy(ed->keyword, tmp_obj->name);
-  ed->description = str_dup(buf);
-
-  tmp_obj->obj_flags.value[0] = -1;
-  tmp_obj->obj_flags.value[1] = world[tmp_IN_ROOM(ch)].number;
-  GET_OBJ_TIMER(tmp_obj) = 3;
-  obj_to_room(tmp_obj, IN_ROOM(ch));
-
-  act("$p suddenly appears.", TRUE, ch, tmp_obj, 0, TO_ROOM);
-  act("$p suddenly appears.", TRUE, ch, tmp_obj, 0, TO_CHAR);
-
-  /* Portal at other side */
-  rp = &world[IN_ROOM(ch)];
-  tmp_obj2 = read_object(PORTAL_OBJ, VIRTUAL);
-  if (!rp || !tmp_obj2)
-  {
-    send_to_char("The magic fails\n\r", ch);
-    extract_obj(tmp_obj2);
-    return;
-  }
-  sprintf(buf,
-          "Through the mists of the portal, you can faintly see %s",
-          rp->name);
-
-  CREATE(ed, struct extra_descr_data, 1);
-  ed->next = tmp_obj2->ex_description;
-  tmp_obj2->ex_description = ed;
-  CREATE(ed->keyword, char, strlen(tmp_obj2->name) + 1);
-  strcpy(ed->keyword, tmp_obj2->name);
-  ed->description = str_dup(buf);
-
-  tmp_obj2->obj_flags.value[0] = -1;
-  tmp_obj2->obj_flags.value[1] = IN_ROOM(ch)->number;
-  GET_OBJ_TIMER(tmp_obj2) = 3;
-
-  obj_to_room(tmp_obj2, tmp_IN_ROOM(ch));
-
-  act("$p suddenly appears.", TRUE, tmp_ch, tmp_obj2, 0, TO_ROOM);
-  act("$p suddenly appears.", TRUE, tmp_ch, tmp_obj2, 0, TO_CHAR);
-}
-#endif
 /* Remove Alignment by Thelonius for EnvyMud */
 ASPELL(spell_remove_alignment)
 {
@@ -1118,57 +989,13 @@ ASPELL(spell_enchant_armor)
 }
 
 
-#if 0
-ASPELL(spell_polymorph)
-{
-  struct affected_type af;
-
-  if (victim == NULL || ch == NULL)
-    return;
-
-  if (victim == ch)
-    send_to_char("Now why would you want to do that?\r\n", ch);
-  else if (AFF_FLAGGED(victim, AFF_SANCTUARY))
-    send_to_char("Your victim is protected by sanctuary!\r\n", ch);
-  else if (AFF_FLAGGED(victim, AFF_POLYMORPH))
-    send_to_char
-    ("Your victim is in bad shape already, leave them alone.\r\n",
-     ch);
-  else if ( /*AFF_FLAGGED(victim, AFF_CHARM) || */ level <
-      GET_LEVEL(victim))
-    send_to_char("You fail.\r\n", ch);
-  else if (mag_savingthrow(victim, SAVING_PARA, 0))
-    send_to_char("Your victim resists!\r\n", ch);
-  else
-  {
-
-    af.type = SPELL_POLYMORPH;
-    af.duration = GET_LEVEL(ch);
-    af.modifier = 0;
-    af.location = 0;
-    af.bitvector = AFF_POLYMORPH;
-
-    ch->player_specials->saved.orig_race = GET_RACE(victim);
-    affect_to_char(victim, &af);
-    act("$n suddenly changes shape.", TRUE, victim, 0, 0, TO_ROOM);
-    act("Your body begins to feel strange.", FALSE, ch, 0, victim,
-        TO_VICT);
-    set_race(victim, number(8, 12));
-
-  }
-
-}
-#endif
-
 ASPELL(spell_control_weather)
 {
   int i;
 struct message_event_obj *msg = NULL;
   if (!OUTSIDE(ch))
   {
-    send_to_char
-    ("You are unable to concentrate enough to take control over nature.\r\n",
-     ch);
+    new_send_to_char(ch, "You are unable to concentrate enough to take control over nature.\r\n");
     return;
   }
   if (!strarg || !*strarg) {
@@ -1178,7 +1005,7 @@ struct message_event_obj *msg = NULL;
 
   if (GET_INT(ch) < number(1, 19))
   {
-    send_to_char("You fail.\r\n", ch);
+    new_send_to_char(ch,"You fail.\r\n");
     return;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
@@ -1247,7 +1074,7 @@ ASPELL(spell_minor_identify)
 
   if (!obj)
   {
-    send_to_char("You can only cast this on objects.\r\n", ch);
+    new_send_to_char(ch,"You can only cast this on objects.\r\n");
     return;
   }
 
@@ -1406,13 +1233,13 @@ ASPELL(spell_chain_lightning)
 
     if (GET_LEVEL(victim) >= LVL_GOD)
     {
-      send_to_char("You fool...\r\n", ch);
+      new_send_to_char(ch,"You fool...\r\n");
       return;
     }
 
     if (!IS_NPC(ch) && !IS_NPC(victim) && !CONFIG_PK_ALLOWED)
     {
-      send_to_char("You rather shouldn't do this...\r\n", ch);
+      new_send_to_char(ch,"You rather shouldn't do this...\r\n");
       return;
     }
 
@@ -1463,7 +1290,6 @@ ASPELL(spell_chain_lightning)
 ASPELL(spell_recharge)
 {
   int restored_charges = 0, explode = 0;
-  char buf[MAX_INPUT_LENGTH];
 
   if (ch == NULL || obj == NULL)
     return;
@@ -1472,15 +1298,13 @@ ASPELL(spell_recharge)
   {
     if (GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1))
     {
-      send_to_char("You attempt to recharge the wand.\r\n", ch);
+      new_send_to_char(ch,"You attempt to recharge the wand.\r\n");
       restored_charges = number(1, 5);
       GET_OBJ_VAL(obj, 2) += restored_charges;
       if (GET_OBJ_VAL(obj, 2) > GET_OBJ_VAL(obj, 1))
       {
-        send_to_char("The wand is overcharged and explodes!\r\n", ch);
-        snprintf(buf, sizeof(buf), "%s overcharges %s and it explodes!\r\n",
-                 GET_NAME(ch), obj->name);
-        act(buf, TRUE, 0, 0, 0, TO_NOTVICT);
+        new_send_to_char(ch, "The wand is overcharged and explodes!\r\n");
+        act("$n overcharges $p and it explodes!", TRUE, ch, obj, 0, TO_ROOM);
         explode = dice(GET_OBJ_VAL(obj, 2), 2);
         extract_obj(obj);
         damage(ch, ch, explode, TYPE_UNDEFINED);
@@ -1488,15 +1312,14 @@ ASPELL(spell_recharge)
       }
       else
       {
-        sprintf(buf, "You restore %d charges to the wand.\r\n",
+        new_send_to_char(ch, "You restore %d charges to the wand.\r\n",
                 restored_charges);
-        send_to_char(buf, ch);
         return;
       }
     }
     else
     {
-      send_to_char("That item is already at full charges!\r\n", ch);
+      new_send_to_char(ch,"That item is already at full charges!\r\n");
       return;
     }
   }
@@ -1504,16 +1327,13 @@ ASPELL(spell_recharge)
   {
     if (GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1))
     {
-      send_to_char("You attempt to recharge the staff.\r\n", ch);
+      new_send_to_char(ch,"You attempt to recharge the staff.\r\n");
       restored_charges = number(1, 3);
       GET_OBJ_VAL(obj, 2) += restored_charges;
       if (GET_OBJ_VAL(obj, 2) > GET_OBJ_VAL(obj, 1))
       {
-        send_to_char("The staff is overcharged and explodes!\r\n",
-                     ch);
-        sprintf(buf, "%s overcharges %s and it explodes!\r\n",
-                GET_NAME(ch), obj->name);
-        act(buf, TRUE, 0, 0, 0, TO_NOTVICT);
+        new_send_to_char(ch, "The staff is overcharged and explodes!\r\n");
+        act("$n overcharges $p and it explodes!", TRUE, ch, obj, 0, TO_ROOM);
         explode = dice(GET_OBJ_VAL(obj, 2), 3);
         extract_obj(obj);
         damage(ch, ch, explode, TYPE_UNDEFINED);
@@ -1528,7 +1348,7 @@ ASPELL(spell_recharge)
     }
     else
     {
-      send_to_char("That item is already at full charges!\r\n", ch);
+      new_send_to_char(ch,"That item is already at full charges!\r\n");
       return;
     }
   }

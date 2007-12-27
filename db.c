@@ -638,7 +638,7 @@ ACMD(do_reboot)
   }
   else
   {
-    send_to_char("Unknown reload option.\r\n", ch);
+    new_send_to_char(ch, "Unknown reload option.\r\n");
     return;
   }
 

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.27  2005/06/18 12:20:52  w4dimenscor
+ * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
+ *
  * Revision 1.26  2005/06/14 11:38:48  w4dimenscor
  * fixed pose
  *
@@ -159,6 +162,7 @@ extern char *startup;
 extern char *handbook;
 extern const char *pc_class_types[];
 extern const char *pc_race_types[];
+struct char_data *char_posing = NULL;
 
 /* extern functions */
 void weight_to_object(struct obj_data *obj, int weight);
@@ -641,14 +645,12 @@ ACMD(do_echo)
     if (subcmd == SCMD_EMOTE)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
     else if (subcmd == SCMD_POSE) {
-    if (!str_str(argument, GET_NAME(ch)))
-      snprintf(buf, sizeof(buf), "%s  (%s)", argument, "$n");
-    else
-     strlcpy(buf, argument, sizeof(buf) );
-    } else
-    {
+    char_posing = ch;
+      snprintf(buf, sizeof(buf), "%s", argument);
+    
+     } else
       strlcpy(buf, argument, sizeof(buf) );
-    }
+    
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
 
@@ -656,6 +658,7 @@ ACMD(do_echo)
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
       act(buf, FALSE, ch, 0, 0, TO_CHAR);
+      char_posing = NULL;
   }
 }
 

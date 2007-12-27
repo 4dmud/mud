@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.10  2005/06/18 12:20:52  w4dimenscor
+ * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
+ *
  * Revision 1.9  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -177,16 +180,13 @@ void make_potion(struct char_data *ch, int potion,
 
   if (can_make == FALSE)
   {
-    send_to_char("That spell cannot be mixed into a"
-                 " potion.\r\n", ch);
+    new_send_to_char(ch, "That spell cannot be mixed into a potion.\r\n");
     return;
   }
   else if ((number(1, 3) == 3) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    send_to_char("As you begin mixing the potion, it violently"
-                 " explodes!\r\n", ch);
-    act("$n begins to mix a potion, but it suddenly explodes!",
-        FALSE, ch, 0, 0, TO_ROOM);
+    new_send_to_char(ch,"As you begin mixing the potion, it violently explodes!\r\n");
+    act("$n begins to mix a potion, but it suddenly explodes!",        FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(container);
     dam = number(15, mag_manacost(ch, potion) * 2);
     damage(ch, ch, dam, TYPE_UNDEFINED);
@@ -205,8 +205,7 @@ void make_potion(struct char_data *ch, int potion,
   }
   else
   {
-    send_to_char("You don't have enough mana to mix"
-                 " that potion!\r\n", ch);
+    new_send_to_char(ch,"You don't have enough mana to mix that potion!\r\n");
     return;
   }
 
@@ -259,8 +258,7 @@ ASKILL(skill_brew)
 
   if (!knows_spell(ch, SKILL_BREW))
   {
-    send_to_char("You are not schooled enough to brew anything!\r\n",
-                 ch);
+    new_send_to_char(ch,"You are not schooled enough to brew anything!\r\n");
     return 0;
   }
 
@@ -283,7 +281,7 @@ ASKILL(skill_brew)
 
   if (!*bottle_name || !*spell_name)
   {
-    send_to_char("What do you wish to mix in where?\r\n", ch);
+    new_send_to_char(ch,"What do you wish to mix in where?\r\n");
     return 0;
   }
 
@@ -301,7 +299,7 @@ ASKILL(skill_brew)
   }
   if (found != FALSE && (GET_OBJ_VNUM(container) != 3044))
   {
-    send_to_char("You don't have the proper container!\r\n", ch);
+    new_send_to_char(ch, "You don't have the proper container!\r\n");
     return 0;
   }
   if (found == FALSE)
@@ -313,8 +311,7 @@ ASKILL(skill_brew)
 
   if (!spell_name || !*spell_name)
   {
-    send_to_char("Spell names must be enclosed in single quotes!\r\n",
-                 ch);
+    new_send_to_char(ch,"Spell names must be enclosed in single quotes!\r\n");
     return 0;
   }
 
@@ -322,12 +319,12 @@ ASKILL(skill_brew)
 
   if ((potion < 1) || (potion > MAX_SPELLS))
   {
-    send_to_char("Mix what spell?!?\r\n", ch);
+    new_send_to_char(ch,"Mix what spell?!?\r\n");
     return 0;
   }
   if (!knows_spell(ch, potion))
   {
-    send_to_char("You do not know how to make that potion!\r\n", ch);
+    new_send_to_char(ch,"You do not know how to make that potion!\r\n");
     return 0;
   }
   if (GET_SKILL(ch, potion) == 0)
@@ -364,8 +361,7 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
   }
   else if ((number(1, 3) == 3) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    send_to_char("As you begin inscribing the final rune, the"
-                 " scroll violently explodes!\r\n", ch);
+    new_send_to_char(ch,"As you begin inscribing the final rune, the scroll violently explodes!\r\n");
     act("$n tries to scribe a spell, but it explodes!",  FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(paper);
     dam = number(15, mag_manacost(ch, scroll) * 2);
@@ -385,8 +381,7 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
   }
   else
   {
-    send_to_char("You don't have enough mana to scribe such"
-                 " a powerful spell!\r\n", ch);
+    new_send_to_char(ch,"You don't have enough mana to scribe such a powerful spell!\r\n");
     return;
   }
 
@@ -429,6 +424,9 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
   obj_to_char(final_scroll, ch);
 }
 
+int blank_scroll(struct obj_data *obj) {
+return GET_OBJ_VAL(obj, 0) > 0 || GET_OBJ_VAL(obj, 1) > 0 || GET_OBJ_VAL(obj, 2) > 0 ||GET_OBJ_VAL(obj, 3) > 0;
+}
 
 ASKILL(skill_scribe)
 {
@@ -443,8 +441,7 @@ ASKILL(skill_scribe)
 
   if (!knows_spell(ch, SKILL_SCRIBE))
   {
-    send_to_char("You are not schooled enough to scribe anything!\r\n",
-                 ch);
+    new_send_to_char(ch,"You are not schooled enough to scribe anything!\r\n");
     return 0;
   }
 
@@ -464,7 +461,7 @@ ASKILL(skill_scribe)
 
   if (!*paper_name || !*spell_name)
   {
-    send_to_char("What do you wish to scribe where?\r\n", ch);
+    new_send_to_char(ch, "What do you wish to scribe where?\r\n");
     return 0;
   }
 
@@ -479,9 +476,9 @@ ASKILL(skill_scribe)
     else
       found = TRUE;
   }
-  if (found && (GET_OBJ_VNUM(paper) != 3043))
+  if (found && GET_OBJ_TYPE(paper) == ITEM_SCROLL && blank_scroll(paper))
   {
-    send_to_char("You can't write on that!\r\n", ch);
+    new_send_to_char(ch,"You can't write on that!\r\n");
     return 0;
   }
   if (found == FALSE)
@@ -500,7 +497,7 @@ ASKILL(skill_scribe)
 
   if ((scroll < 1) || (scroll > MAX_SPELLS))
   {
-    send_to_char("Scribe what spell?!?\r\n", ch);
+    new_send_to_char(ch,"Scribe what spell?!?\r\n");
     return 0;
   }
   if (!knows_spell(ch, scroll))
@@ -534,13 +531,12 @@ ASKILL(skill_tinker)
 
   if (!knows_spell(ch, SKILL_TINKER))
   {
-    send_to_char("You are not schooled enough to tinker anything!\r\n",
-                 ch);
+    new_send_to_char(ch,"You are not schooled enough to tinker anything!\r\n");
     return 0;
   }
   if (!*weapon_name)
   {
-    send_to_char("What do you wish to tinker on?\r\n", ch);
+    new_send_to_char(ch,"What do you wish to tinker on?\r\n");
     return 0;
   }
 
@@ -621,7 +617,7 @@ ASKILL(skill_tinker)
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_MAGIC);
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_TINKERED);
 
-  send_to_char("You have forged new life into the weapon!\r\n", ch);
+  new_send_to_char(ch,"You have forged new life into the weapon!\r\n");
   act("$n vigorously pounds on a weapon!", FALSE, ch, 0, 0, TO_ROOM);
   return SKILL_TINKER;
 }
@@ -807,7 +803,7 @@ ASKILL(skill_manifest)
 
   if (!*buf)
   {
-    send_to_char("Usage: manifest <weapon>\r\n", ch);
+    new_send_to_char(ch,"Usage: manifest <weapon>\r\n");
     return 0;
   }
 

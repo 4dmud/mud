@@ -1072,10 +1072,10 @@ void zedit_parse(struct descriptor_data *d, char *arg)
 	if (isdigit(*arg) && start_change_command(d, pos)) {
 	    OLC_MODE(d) = ZEDIT_PROB2;
 	    OLC_ZONE(d)->age = 1;
-	    send_to_char("Chance of loading (0-100) : ", d->character);
+	    write_to_output(d,"Chance of loading (0-100) : ");
 	    break;
 	} else
-	    send_to_char("Invalid choice.\r\n", d->character);
+	    write_to_output(d,"Invalid choice.\r\n");
 	zedit_disp_menu(d);
 	break;
 /*-------------------------------------------------------------------*/

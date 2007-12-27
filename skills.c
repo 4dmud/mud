@@ -1625,6 +1625,11 @@ ASKILL(skill_grapple)
   //char name[100], todir[256];
   int to, fail = FALSE;
   //CHAR_DATA *victim = NULL;
+  
+  if (affected_by_spell(vict, SKILL_SNARE)) {
+  new_send_to_char(ch, "You can't throw someone who is snared!\r\n");
+  return 0;
+  }
   if (use_stamina( ch, 10) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");

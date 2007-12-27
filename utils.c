@@ -646,9 +646,9 @@ void mudlog(const char *str, int type, int level, int file)
     if (tp < type)
       continue;
 
-    send_to_char(CCGRN(i->character, C_NRM), i->character);
-    send_to_char(buf, i->character);
-    send_to_char(CCNRM(i->character, C_NRM), i->character);
+    write_to_output(i, "%s", CCGRN(i->character, C_NRM));
+    write_to_output(i, "%s", buf);
+    write_to_output(i, "%s", CCNRM(i->character, C_NRM));
   }
 
 }
@@ -1538,10 +1538,9 @@ size_t commafmt(char   *buf,            /* Buffer for formatted string  */
   return (size_t)len;
 }
 
-static const char *text[] = {"th", "st", "nd", "rd"};
-
-char *ordinal_text(int number)
+const char *ordinal_text(int number)
 {
+const char *text[] = {"th", "st", "nd", "rd"};
   if (((number %= 100) > 9 && number < 20) || (number %= 10) > 3)
     number = 0;
   return text[number];

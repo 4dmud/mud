@@ -1972,7 +1972,7 @@ int check_dam_affects(struct char_data *ch)
   {
     if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
     {
-      send_to_char("Your weapon becomes too heavy for you.\r\n", ch);
+      new_send_to_char(ch,"Your weapon becomes too heavy for you.\r\n");
       perform_remove(ch, WEAR_WIELD_2);
     }
   }
@@ -1980,7 +1980,7 @@ int check_dam_affects(struct char_data *ch)
   {
     if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
     {
-      send_to_char("Your weapon becomes too heavy for you.\r\n", ch);
+      new_send_to_char(ch, "Your weapon becomes too heavy for you.\r\n");
       perform_remove(ch, WEAR_WIELD);
     }
   }
