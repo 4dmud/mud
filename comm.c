@@ -3349,6 +3349,10 @@ RETSIGTYPE hupsig(int sig)
                                                        * substituted */
 }
 
+RETSIGTYPE deadpipe(int sig) {
+log("4D is trying to outputto a pipe that is not there, or a disconnected socket");
+}
+
 RETSIGTYPE chldsig(void)
 {
   struct rusage ru;
@@ -3437,7 +3441,7 @@ void signal_setup(void)
 #endif                   /* CIRCLE_MACINTOSH */
   my_signal(SIGINT, (sigfunc *)hupsig);
   my_signal(SIGTERM, (sigfunc *)hupsig);
-  my_signal(SIGPIPE, (sigfunc *)SIG_IGN);
+  my_signal(SIGPIPE, (sigfunc *)deadpipe);
   my_signal(SIGALRM, (sigfunc *)SIG_IGN);
 
 #ifdef SIGCLD  /* only on SYSV */
