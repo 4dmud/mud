@@ -274,7 +274,7 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
                 break;
             case 2: /* HOLD */
                 tobj = GET_EQ(pCharacter, WEAR_HOLD);
-                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) ) {
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) == NULL) {
                     new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s isn't holding needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
                 } else
@@ -282,7 +282,7 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
                 break;
             case 3: /*wield*/
                 tobj = GET_EQ(pCharacter, WEAR_WIELD);
-                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) ) {
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) == NULL ) {
                 new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s isn't wielding needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
                 } else
