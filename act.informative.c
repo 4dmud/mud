@@ -1902,7 +1902,7 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 void look_around(CHAR_DATA *ch)
 {
 
-  char zonename[MAX_INPUT_LENGTH], *zp = NULL;
+  char zonename[MAX_INPUT_LENGTH];
   size_t len, x;
 
   if (IN_ROOM(ch) == NULL)
