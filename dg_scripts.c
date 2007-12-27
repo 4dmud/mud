@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/06/14 23:55:39 $
-*  $Revision: 1.38 $
+*  $Date: 2007/07/01 14:34:03 $
+*  $Revision: 1.39 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.39  2007/07/01 14:34:03  w4dimenscor
+ * fixed a whitepace issue in globals
+ *
  * Revision 1.38  2007/06/14 23:55:39  w4dimenscor
  * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
  *
@@ -2757,25 +2760,25 @@ void process_global(struct script_data *sc, trig_data * trig, char *cmd,
                     long id) {
     struct trig_var_data *vd;
     char arg[MAX_INPUT_LENGTH], *var;
-
+    char arg1[MAX_INPUT_LENGTH];
     var = any_one_arg(cmd, arg);
 
-    skip_spaces(&var);
+    any_one_arg(var, arg1);
 
-    if (!*var) {
+    if (!*arg1) {
         script_log("Trigger: %s, VNum %d. global w/o an arg: '%s'",
                    GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
         return;
     }
 
     for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next)
-        if (!strcasecmp(vd->name.c_str(), var))
+        if (!strcasecmp(vd->name.c_str(), arg1))
             break;
 
     if (!vd) {
         script_log(
             "Trigger: %s, VNum %d. local var '%s' not found in global call",
-            GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), var);
+            GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1);
         return;
     }
 
