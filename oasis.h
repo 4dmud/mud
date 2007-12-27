@@ -54,7 +54,7 @@
 #define NUM_SHOP_FLAGS 		2
 #define NUM_TRADERS 		8
 
-#define MAX_PEOPLE_IN_CHAIR 	10	/* The maximum number of people you want 
+#define MAX_PEOPLE_IN_CHAIR 	10	/* The maximum number of people you want \
 					   to sit in a chair at the same time. */
 
 #if CONFIG_OASIS_MPROG

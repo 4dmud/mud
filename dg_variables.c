@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2004/11/20 02:35:25 $                                           * 
-*  $Revision: 1.1 $                                                    *
+*  $Date: 2004/11/23 06:12:20 $                                           * 
+*  $Revision: 1.2 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -332,11 +332,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       case MOB_TRIGGER:
         ch = (char_data *) go;
 
-        if ((o = get_object_in_equip(ch, name)));
+        if ((r = get_room(name)));
+        else if ((o = get_object_in_equip(ch, name)));
         else if ((o = get_obj_in_list(name, ch->carrying)));
         else if ((c = get_char_room(name, NULL, IN_ROOM(ch))));
         else if ((o = get_obj_in_list(name,IN_ROOM(ch)->contents)));
-        else if ((r = get_room(name)));
         else if ((c = get_char(name)));
       else if ((o = get_obj(name))) {}
 
@@ -344,17 +344,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       case OBJ_TRIGGER:
         obj = (obj_data *) go;
 
-        if ((c = get_char_by_obj(obj, name)));
-        else if ((o = get_obj_by_obj(obj, name)));
-      else if ((r = get_room(name))) {}
+        if ((r = get_room(name)));
+	else if ((c = get_char_by_obj(obj, name)));
+        else if ((o = get_obj_by_obj(obj, name))) {}
 
         break;
       case WLD_TRIGGER:
         room = (struct room_data *) go;
 
-        if ((c = get_char_by_room(room, name)));
-        else if ((o = get_obj_by_room(room, name)));
-      else if ((r = get_room(name))) {}
+	if ((r = get_room(name)));
+        else if ((c = get_char_by_room(room, name)));
+        else if ((o = get_obj_by_room(room, name))) {}
 
         break;
       }
@@ -2031,7 +2031,7 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
   char *var = NULL, *field = NULL, *p = NULL;
   char tmp2[MAX_INPUT_LENGTH];
   char *subfield_p, subfield[MAX_INPUT_LENGTH];
-  int left, len;
+  int left = MAX_INPUT_LENGTH - 1, len = 0;
   int paren_count = 0;
   int dots = 0;
 
@@ -2046,7 +2046,6 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
   p = strcpy(tmp, line);
   subfield_p = subfield;
   
-  left = MAX_INPUT_LENGTH - 1;
 
   while (*p && (left > 0)) {
 

@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/20 02:33:25 $
-*  $Revision: 1.2 $
+*  $Date: 2004/11/23 06:12:20 $
+*  $Revision: 1.3 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.3  2004/11/23 06:12:20  w4dimenscor
+ * fixed some mem leaks in lightsabers, discovered function is_num is fucked, reverted it
+ *
  * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -94,8 +97,8 @@ int process_if(char *cond, void *go, struct script_data *sc,
                trig_data *trig, int type);
 struct cmdlist_element *find_end(trig_data *trig, struct cmdlist_element *cl);
 struct cmdlist_element *find_else_end(trig_data *trig,
-                                      struct cmdlist_element *cl, void *go,
-                                      struct script_data *sc, int type);
+                                            struct cmdlist_element *cl, void *go,
+                                            struct script_data *sc, int type);
 void process_wait(void *go, trig_data *trig, int type, char *cmd,
                   struct cmdlist_element *cl);
 void process_set(struct script_data *sc, trig_data *trig, char *cmd);
@@ -114,8 +117,8 @@ void process_context(struct script_data *sc, trig_data *trig, char *cmd);
 
 void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd);
 struct cmdlist_element *
-find_case(struct trig_data *trig, struct cmdlist_element *cl,
-           void *go, struct script_data *sc, int type, char *cond);
+      find_case(struct trig_data *trig, struct cmdlist_element *cl,
+                void *go, struct script_data *sc, int type, char *cond);
 void extract_value(struct script_data *sc, trig_data * trig, char *cmd);
 struct cmdlist_element *find_done(struct cmdlist_element *cl);
 int fgetline(FILE *file, char *p);
@@ -726,11 +729,11 @@ obj_data *get_obj_in_room(room_data * room, char *name)
 
   if (*name == UID_CHAR)
     return find_obj(atoi(name+1));
-
+if (room) {
   for (obj = room->contents; obj; obj = obj->next_content)
     if (isname(name, obj->name))
       return obj;
-
+}
 
   return NULL;
 }
@@ -743,9 +746,12 @@ obj_data *get_obj_by_room(room_data *room, char *name)
   if (*name == UID_CHAR)
     return find_obj(atoi(name+1));
 
-  for (obj = room->contents; obj; obj = obj->next_content)
-    if (isname(name, obj->name))
-      return obj;
+  if (room)
+  {
+    for (obj = room->contents; obj; obj = obj->next_content)
+      if (isname(name, obj->name))
+        return obj;
+  }
 
   for (obj = object_list; obj; obj = obj->next)
     if (isname(name, obj->name))
@@ -1612,22 +1618,31 @@ int count_dots(char *str)
 }
 
 /* returns 1 if string is all digits, else 0 */
+#if 0
 int is_num(char *arg)
 {
-if (*arg == '\0') 
-      return FALSE; 
+char *p = arg;
+  if (*arg == '\0')
+    return FALSE;
 
-   if (*arg == '+' || *arg == '-') 
-      arg++; 
+  if (*arg == '+' || *arg == '-')
+    p++;
 
-   for (; *arg != '\0'; arg++) 
-   { 
-      if (!isdigit(*arg)) 
-         return FALSE; 
-   } 
+  for (; *p != '\0'; p++)
+  {
+    if (!isdigit(*p))
+      return FALSE;
+  }
 
-   return TRUE; 
-   }
+  return TRUE;
+}
+#else
+int is_num(char *num) {
+while (*num && (isdigit(*num) || *num == '-')) num++;
+if (!*num || isspace(*num)) return 1;
+return 0;
+}
+#endif
 
 
 
@@ -1671,6 +1686,8 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
   {
     if (is_num(lhs) && is_num(rhs))
       sprintf(result, "%d", atoi(lhs) == atoi(rhs));
+    else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
+      sprintf(result, "1");
     else
       sprintf(result, "%d", !strcasecmp(lhs, rhs));
   }
@@ -1679,6 +1696,8 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
   {
     if (is_num(lhs) && is_num(rhs))
       sprintf(result, "%d", atoi(lhs) != atoi(rhs));
+    else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
+      sprintf(result, "0");
     else
       sprintf(result, "%d", strcasecmp(lhs, rhs));
   }
@@ -2790,52 +2809,54 @@ int process_return(trig_data *trig, char *cmd)
 
                     sc->context = atol(var);
                   }
-/* 
-  Thanks to Jamie Nelson for 4 dimensions for this addition 
-  
-  Syntax : 
-    dg_letter <new varname> <letter position> <string to get from>
-    
-    ie: 
-    set string L337-String
-    dg_letter var1 4 %string%
-    dg_letter var2 11 %string%
-    
-    now %var1% == 7 and %var2% == g
-    
-    Note that the index starts at 1.
+                  /*
+                    Thanks to Jamie Nelson for 4 dimensions for this addition 
+                    
+                    Syntax : 
+                      dg_letter <new varname> <letter position> <string to get from>
+                      
+                      ie: 
+                      set string L337-String
+                      dg_letter var1 4 %string%
+                      dg_letter var2 11 %string%
+                      
+                      now %var1% == 7 and %var2% == g
+                      
+                      Note that the index starts at 1.
+                   
+                  */
 
-*/
+                  void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
+                  {
+                    //set the letter/number at position 'num' as the variable.
+                    char junk[MAX_INPUT_LENGTH];
+                    char varname[MAX_INPUT_LENGTH];
+                    char num_s[MAX_INPUT_LENGTH];
+                    char string[MAX_INPUT_LENGTH];
+                    int num;
 
-void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
-{
-  //set the letter/number at position 'num' as the variable.
-  char junk[MAX_INPUT_LENGTH];
-  char varname[MAX_INPUT_LENGTH];
-  char num_s[MAX_INPUT_LENGTH];
-  char string[MAX_INPUT_LENGTH];
-  int num;
+                    half_chop(cmd, junk, cmd);   /* "dg_letter" */
+                    half_chop(cmd, varname, cmd);
+                    half_chop(cmd, num_s, string);
 
-  half_chop(cmd, junk, cmd);   /* "dg_letter" */
-  half_chop(cmd, varname, cmd);
-  half_chop(cmd, num_s, string);
+                    num = atoi(num_s);
 
-  num = atoi(num_s);
+                    if (num < 1)
+                    {
+                      script_log("Trigger #%d : dg_letter number < 1!", GET_TRIG_VNUM(trig));
+                      return;
+                    }
 
-  if (num < 1) {
-    script_log("Trigger #%d : dg_letter number < 1!", GET_TRIG_VNUM(trig));
-    return;
-  }
+                    if (num > strlen(string))
+                    {
+                      script_log("Trigger #%d : dg_letter number > strlen!", GET_TRIG_VNUM(trig));
+                      return;
+                    }
 
-  if (num > strlen(string)) {
-    script_log("Trigger #%d : dg_letter number > strlen!", GET_TRIG_VNUM(trig));
-    return;
-  }
-    
-  *junk = string[num-1];
-  *(junk+1) = '\0';
-  add_var(&GET_TRIG_VARS(trig), varname, junk, sc->context);
-}
+                    *junk = string[num-1];
+                    *(junk+1) = '\0';
+                    add_var(&GET_TRIG_VARS(trig), varname, junk, sc->context);
+                  }
 
                   void extract_value(struct script_data *sc, trig_data * trig, char *cmd)
                   {
@@ -2869,22 +2890,22 @@ void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
 
 
                   /*  This is the core driver for scripts. */
-/*  Arguments:
-    void *go_adress   
-      A pointer to a pointer to the entity running the script.
-      The reason for this approcah is that we want to be able to see
-      from the calling function, if the entity has been free'd.
-      
-    trig_data *trig 
-      A pointer to the current running trigger.
-      
-    int type
-      MOB_TRIGGER, OBJ_TRIGGER or WLD_TRIGGER, respectively.
-      
-    int mode
-      TRIG_NEW     just started from dg_triggers.c
-      TRIG_RESTART restarted after a 'wait'
-*/
+                  /*  Arguments:
+                      void *go_adress   
+                        A pointer to a pointer to the entity running the script.
+                        The reason for this approcah is that we want to be able to see
+                        from the calling function, if the entity has been free'd.
+                        
+                      trig_data *trig 
+                        A pointer to the current running trigger.
+                        
+                      int type
+                        MOB_TRIGGER, OBJ_TRIGGER or WLD_TRIGGER, respectively.
+                        
+                      int mode
+                        TRIG_NEW     just started from dg_triggers.c
+                        TRIG_RESTART restarted after a 'wait'
+                  */
 #if DRIVER_USES_UNION
                   int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode)
 #else
@@ -2907,40 +2928,42 @@ void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
                     void obj_command_interpreter(obj_data * obj, char *argument);
                     void wld_command_interpreter(struct room_data *room, char *argument);
 
-  if (depth > MAX_SCRIPT_DEPTH) {
-    script_log("Trigger %d recursed beyond maximum allowed depth.", GET_TRIG_VNUM(trig));
-    switch (type) {
-      case MOB_TRIGGER:
-        script_log("It was attached to %s [%d]", 
-           GET_NAME((char_data *) go), GET_MOB_VNUM((char_data *) go));
-        break;
-      case OBJ_TRIGGER:
-        script_log("It was attached to %s [%d]", 
-           ((obj_data *) go)->short_description, GET_OBJ_VNUM((obj_data *) go));
-        break;
-      case WLD_TRIGGER:
-        script_log("It was attached to %s [%d]", 
-           ((room_data *) go)->name, ((room_data *) go)->number);
-        break;
-    }      
+                    if (depth > MAX_SCRIPT_DEPTH)
+                    {
+                      script_log("Trigger %d recursed beyond maximum allowed depth.", GET_TRIG_VNUM(trig));
+                      switch (type)
+                      {
+                      case MOB_TRIGGER:
+                        script_log("It was attached to %s [%d]",
+                                   GET_NAME((char_data *) go), GET_MOB_VNUM((char_data *) go));
+                        break;
+                      case OBJ_TRIGGER:
+                        script_log("It was attached to %s [%d]",
+                                   ((obj_data *) go)->short_description, GET_OBJ_VNUM((obj_data *) go));
+                        break;
+                      case WLD_TRIGGER:
+                        script_log("It was attached to %s [%d]",
+                                   ((room_data *) go)->name, ((room_data *) go)->number);
+                        break;
+                      }
 
-    extract_script(go, type);
+                      extract_script(go, type);
 
-    /* 
-       extract_script() works on rooms, but on mobiles and objects,
-       it will be called again if the 
-       caller is load_mtrigger or load_otrigger 
-       if it is one of these, we must make sure the script 
-       is not just reloaded on the next mob 
-       
-       We make the calling code decide how to handle it, so it doesn't
-       get totally removed unless it's a load_xtrigger(). 
-     */
-    
-    return SCRIPT_ERROR_CODE;
-  }
+                      /*
+                         extract_script() works on rooms, but on mobiles and objects,
+                         it will be called again if the 
+                         caller is load_mtrigger or load_otrigger 
+                         if it is one of these, we must make sure the script 
+                         is not just reloaded on the next mob 
+                         
+                         We make the calling code decide how to handle it, so it doesn't
+                         get totally removed unless it's a load_xtrigger(). 
+                       */
 
-  depth++;
+                      return SCRIPT_ERROR_CODE;
+                    }
+
+                    depth++;
 
 
                     switch (type)
@@ -3115,9 +3138,9 @@ void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
 
                         else if (!strn_cmp(cmd, "extract ", 8))
                           extract_value(sc, trig, cmd);
-			  
-      else if (!strn_cmp(cmd, "dg_letter ", 10))
-        dg_letter_value(sc, trig, cmd);
+
+                        else if (!strn_cmp(cmd, "dg_letter ", 10))
+                          dg_letter_value(sc, trig, cmd);
 
 
                         else if (!strn_cmp(cmd, "makeuid ", 8))
@@ -3318,8 +3341,8 @@ void dg_letter_value(struct script_data *sc, trig_data *trig, char *cmd)
                         return (NOTHING);
                       if (trig_index[mid]->vnum == vnum)
                         return (mid);
-    if (top == 0)
-      return (NOTHING);
+                      if (top == 0)
+                        return (NOTHING);
                       if (trig_index[mid]->vnum > vnum)
                         top = mid - 1;
                       else
@@ -3585,7 +3608,17 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
   for (;lt && lt->uid != uid ; lt = lt->next) ;
 
   if (lt)
-    return (struct char_data *)(lt->c);
+  {
+    char_data *ch = (struct char_data *)(lt->c);
+    if (!ch)
+      return NULL;
+    if (DEAD(ch))
+    {
+      log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
+      return NULL;
+    }
+    return ch;
+  }
 
   log("find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
 
@@ -3642,6 +3675,7 @@ void remove_from_lookup_table(long uid)
   */
   if (uid == 0)
   {
+    log("Removing id 0 from lookup table");
     return;
   }
 

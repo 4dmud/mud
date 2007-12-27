@@ -1418,6 +1418,9 @@ void extract_obj(struct obj_data *obj)
     log("Null pointer given to extract object.");
     return;
   }
+  if (GET_ID(obj) == 0) {
+  log("extracting object that hasn't been initilised");
+  }
   if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE))
   {
 
@@ -2749,7 +2752,7 @@ void remove_hunter(struct char_data *ch)
       REMOVE_FROM_LIST(hunt, hunter_list, next);
       free(hunt);
       hunt = NULL;
-      return;
+      //return;
     }
   }
 }

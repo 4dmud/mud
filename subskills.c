@@ -733,7 +733,7 @@ ASUB(sub_drain_blood)
 
 ACMD(do_ignite)
 {
-  struct obj_data *hilt = NULL;
+  struct obj_data *hilt = NULL, tmpobj;
   struct obj_data *sabre = NULL;
   char buf2[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -743,7 +743,7 @@ ACMD(do_ignite)
   if ((hilt = GET_EQ(ch, WEAR_WIELD)) != NULL && ( GET_OBJ_TYPE(hilt) == ITEM_LIGHTSABRE_HILT))
     pass = 1;
   if (pass == 0 && ((hilt = GET_EQ(ch, WEAR_WIELD_2)) != NULL && GET_OBJ_TYPE(hilt) == ITEM_LIGHTSABRE_HILT))
-    pass = 1;;
+    pass = 1;
 
   if (pass == 0)
   {
@@ -789,11 +789,7 @@ ACMD(do_ignite)
 
   snprintf(buf2,sizeof(buf2), "a %s bladed %s lightsaber lies here", GET_OBJ_VAL(hilt, 0)==1 ? "single" : "double", color_option_name((int) GET_OBJ_VAL(hilt, 3)));
   sabre->description = str_dup(buf2);
-
-
-
-  sabre->item_number = NOTHING;
-  sabre->in_room = NULL;
+  sabre->item_number = hilt->item_number;
   GET_OBJ_WAS(sabre) = GET_OBJ_VNUM(hilt);
   GET_OBJ_TYPE(sabre) = ITEM_WEAPON;
   SET_BIT_AR(GET_OBJ_EXTRA(sabre), ITEM_HUM);
@@ -817,11 +813,12 @@ ACMD(do_ignite)
       sabre->affected[counter].location = hilt->affected[counter].location;
       sabre->affected[counter].modifier = hilt->affected[counter].modifier;
     }
-  GET_OBJ_INNATE(sabre) = GET_OBJ_INNATE(hilt);
+  
   /*transfer script data? Could it be this easy?*/
+  /*
   remove_from_lookup_table(GET_ID(sabre));
   remove_from_lookup_table(GET_ID(hilt));
-  sabre->id = hilt->id;			/* used by DG triggers              */
+  sabre->id = hilt->id;			// used by DG triggers              
   add_to_lookup_table(GET_ID(sabre), (void *) sabre);
   hilt->id = 0;
   sabre->proto_script = hilt->proto_script;
@@ -832,45 +829,79 @@ ACMD(do_ignite)
 
 
   extract_obj(hilt);
-  equip_char(ch, sabre, pos);
+  */
+  	/* move new obj info over to old object and delete new obj */
+	memcpy(&tmpobj, sabre, sizeof(*sabre));
+	tmpobj.in_room = IN_ROOM(hilt);
+	tmpobj.carried_by = hilt->carried_by;
+	tmpobj.worn_by = hilt->worn_by;
+	tmpobj.worn_on = hilt->worn_on;
+	tmpobj.in_obj = hilt->in_obj;
+	tmpobj.contains = hilt->contains;
+	tmpobj.id = hilt->id;
+	tmpobj.proto_script = hilt->proto_script;
+	tmpobj.script = hilt->script;
+	tmpobj.next_content = hilt->next_content;
+	tmpobj.next = hilt->next;
+	memcpy(hilt, &tmpobj, sizeof(*hilt));
+	hilt->description = sabre->description;
+	hilt->short_description = sabre->short_description;
+	hilt->name = sabre->name;
+	sabre->description=NULL;
+	sabre->short_description=NULL;
+	sabre->name=NULL;
+	
+
+  equip_char(ch, hilt, pos);
+  extract_obj(sabre);
   return;
 
 }
 
-struct obj_data * revert_object(struct obj_data *obj)
+struct obj_data * revert_object(struct obj_data *hilt)
 {
   int i;
-  struct obj_data *new_obj, *temp;
-  temp = obj;
+  struct obj_data *sabre, tmpobj;
 
-  if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_LIGHTSABRE) )
-    return temp;
+  if (!IS_SET_AR(GET_OBJ_EXTRA(hilt), ITEM_LIGHTSABRE) )
+    return hilt;
 
-  i = (GET_OBJ_WAS(obj) == NOTHING ? GET_OBJ_VAL(obj, 0) : GET_OBJ_WAS(obj));
-  if ((new_obj = read_object(i, VIRTUAL)) == NULL)
+  i = (GET_OBJ_WAS(hilt) == NOTHING ? GET_OBJ_VAL(hilt, 0) : GET_OBJ_WAS(hilt));
+  if ((sabre = read_object(i, VIRTUAL)) == NULL)
   {
-    log("SYSERR: %s couldnt revert to %d because that vnum doesnt exist!", obj->short_description, i);
-    return temp;
+    log("SYSERR: %s couldn't revert to %d because that vnum doesn't exist!", hilt->short_description, i);
+    return hilt;
   }
-  if (GET_OBJ_TYPE(new_obj) != ITEM_LIGHTSABRE_HILT)
+  if (GET_OBJ_TYPE(sabre) != ITEM_LIGHTSABRE_HILT)
   {
-    extract_obj(new_obj);
-    return temp;
+    extract_obj(sabre);
+    return hilt;
   }
+    for (i = 0; i < MAX_OBJ_AFFECT; i++)
+    if (hilt->affected[i].modifier)
+    {
+      sabre->affected[i].location = hilt->affected[i].location;
+      sabre->affected[i].modifier = hilt->affected[i].modifier;
+    }
   //success!
-  remove_from_lookup_table(GET_ID(temp));
-  remove_from_lookup_table(GET_ID(new_obj));
-  new_obj->id = temp->id;			/* used by DG triggers              */
-  add_to_lookup_table(GET_ID(new_obj), (void *) new_obj);
-  /* used by DG triggers              */
-  temp->id = 0;
-  new_obj->proto_script = temp->proto_script;
-  new_obj->script = temp->script;
-  temp->proto_script = NULL;
-  temp->script = NULL;
+  /* move new obj info over to old object and delete new obj */
+	memcpy(&tmpobj, sabre, sizeof(*sabre));
+	tmpobj.in_room = IN_ROOM(hilt);
+	tmpobj.carried_by = hilt->carried_by;
+	tmpobj.worn_by = hilt->worn_by;
+	tmpobj.worn_on = hilt->worn_on;
+	tmpobj.in_obj = hilt->in_obj;
+	tmpobj.contains = hilt->contains;
+	tmpobj.id = hilt->id;
+	tmpobj.proto_script = hilt->proto_script;
+	tmpobj.script = hilt->script;
+	tmpobj.next_content = hilt->next_content;
+	tmpobj.next = hilt->next;
+	memcpy(hilt, &tmpobj, sizeof(*hilt));
 
-  extract_obj(obj);
-  return new_obj;
+
+  extract_obj(sabre);
+  return hilt;
 
 }
 
