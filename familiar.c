@@ -1,4 +1,4 @@
-
+//http://uo.stratics.com/content/reputation/pets.shtml
 #include "conf.h"
 #include "sysdep.h"
 

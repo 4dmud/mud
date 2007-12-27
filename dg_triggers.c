@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/11/01 18:43:37 $
-*  $Revision: 1.6 $
+*  $Date: 2006/01/23 05:23:19 $
+*  $Revision: 1.7 $
 **************************************************************************/
 
 #include "conf.h"
@@ -295,7 +295,9 @@ int greet_mtrigger(char_data * actor, int dir)
   }
   return final;
 }
+/**
 
+**/
 
 void entry_memory_mtrigger(char_data * ch)
 {

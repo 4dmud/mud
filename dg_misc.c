@@ -244,13 +244,12 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
   af.type = SPELL_DG_AFFECT;
   af.expire = sec_to_time(duration);
   af.modifier = value;
-
   if (type == APPLY_TYPE) {
-    af.location = i;
+    af.location = (i-1);
     af.bitvector = 0;
   } else {
     af.location = 0;
-    af.bitvector = (1<<i);
+    af.bitvector = (1<<(i-1));
   }
   
   affect_to_char(ch, &af);

@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.28  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.27  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -203,12 +206,11 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
 int fe_group_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
 int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
 int fe_solo_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
-int find_fe_type(struct char_data *ch);
-int has_weapon(struct char_data *ch);
+
+
 int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type);
 int one_hit_damage(struct char_data *ch, int type);
 int speed_update(struct char_data *ch);
-int can_fight(struct char_data *ch, struct char_data *vict, int silent);
 void kill_list(struct char_data *ch, struct char_data *vict);
 int attack_group = 1;
 
@@ -224,7 +226,6 @@ int speed_info(int input, int type);
 int attack_roll(struct char_data *attacker, struct char_data *vict, int type);
 int spell_size_dice(struct char_data *ch);
 int spell_num_dice(struct char_data *ch);
-int modify_dam(int dam, struct char_data *ch, struct char_data *vict, int w_type);
 int class_damroll(struct char_data *ch);
 void poison_wep_check(struct char_data *ch, struct char_data *vict,int w_type, int dam);
 void kill_points(struct char_data *ch, struct char_data *vict);
@@ -666,7 +667,7 @@ struct fight_event_obj
 void start_fighting(struct char_data* ch, struct char_data* vict)
 {
   struct combine_data *temp, *tnext;
-struct char_data *k = (ch->master ? ch->master : ch);
+  struct char_data *k = (ch->master ? ch->master : ch);
   struct follow_type *f;
   CHAR_DATA *victim;
 
@@ -697,7 +698,7 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
   if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
     affect_from_char(victim, SPELL_SWEET_DREAMS);
 
-  GET_POS(victim) = POS_STANDING;
+  //GET_POS(victim) = POS_STANDING;
 
 
 
@@ -740,16 +741,16 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
       temp = tnext;
     }
   }
-    for (f = k->followers; f; f = f->next)
+  for (f = k->followers; f; f = f->next)
+  {
+    if ( (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim))
     {
-      if ( (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim))
-      {
-        if (!IS_NPC(f->follower))
-          perform_assist(f->follower, ch);
-      }
+      if (!IS_NPC(f->follower))
+        perform_assist(f->follower, ch);
     }
-    
-  
+  }
+
+
 
 
 }
@@ -952,6 +953,17 @@ EVENTFUNC(fight_event)
       }
       else
       {
+        if (GET_SWEEP_DAM(ch)) {
+        struct char_data *victnext = find_random_victim(ch);
+        if (victnext) {
+          act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
+          act("$n sweeps around into you!", TRUE, ch, NULL, victnext, TO_VICT);
+          FIGHTING(ch) = victnext;
+          GET_POS(ch) = POS_FIGHTING;
+          fight_event_hit(ch, victnext, find_fe_type(ch), next_attack_type(ch));
+        } else
+          GET_SWEEP_DAM(ch) = 0;
+        }
         stop_fighting(ch);
         GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
       }
@@ -1052,19 +1064,18 @@ float race_dam_mod(int race, int magic)
 int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_type)
 {
   float damage = dam;
-  int rand = number(0, 101);
-  struct affected_type af;
   struct char_data *k = NULL;
   struct follow_type *f;
   int skill_cost(int h, int m, int v, struct char_data *ch);
   int wep = IS_WEAPON(w_type);
   //  struct char_data *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
 
-  if (!IS_NPC(vict)) {
+  if (!IS_NPC(vict))
+  {
     /** Oh god what was i thinking?? - mord **/
-    damage *= 0.1;
+    damage *= 0.6;
   }
-  //Take less if victim is a tier
+  /**Take less if victim is a tier**/
   switch (highest_tier(vict))
   {
   case 4:
@@ -1128,13 +1139,13 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
     damage -= damage/4;
 
 
-k = (vict->master ? vict->master : vict);
+  k = (vict->master ? vict->master : vict);
   for (f = k->followers; f; f = f->next)
     if ( !DEAD(vict) && HERE(f->follower,ch) && FIGHTING(f->follower) == vict)
-        damage -= damage/10;
-    
-  
-  
+      damage -= damage/10;
+
+
+
   /**TODO: this needs to be fixed up and finished (currently crashes us)**/
   /*
   if (immune_to(vict, elemental_type(w_type)))
@@ -1173,21 +1184,7 @@ k = (vict->master ? vict->master : vict);
   if (AFF_FLAGGED(vict, AFF_NUMB_MIND))
     damage += (damage/6); //16% addition
 
-  if (is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD))
-  {
-    if (rand > 80 && !AFF_FLAGGED(vict, AFF_FROZEN))
-    {
-      //SET_BIT_AR(AFF_FLAGS(vict), AFF_FROZEN);
-      act("You freeze as you touch $N's shield of ice.", FALSE, ch, 0 , vict, TO_CHAR);
-      act("$N is frozen as $E touches your shield of ice.", FALSE, ch, 0, vict, TO_CHAR);
-      af.location = APPLY_SPEED;
-      af.expire = HOURS_TO_EXPIRE(1);
-      af.modifier = -2 * (GET_LEVEL(vict)+1);
-      af.bitvector = AFF_FROZEN;
-      af.type = SPELL_DG_AFFECT;
-      affect_to_char(ch, &af);
-    }
-  }
+
 
 
 
@@ -1234,12 +1231,18 @@ int class_damroll(struct char_data *ch)
     {
     case CLASS_WARRIOR:
     case CLASS_HUNTER:
-      dam += ((int)GET_MASTERY(ch, CLASS_WARRIOR)+8)*GET_DAMROLL(ch);
+      if (GET_MASTERY(ch, CLASS_WARRIOR))
+        dam += (9*GET_DAMROLL(ch));
+      else
+        dam += (8*GET_DAMROLL(ch));
       break;
     case CLASS_RANGER:
     case CLASS_THIEF:
     case CLASS_GYPSY:
-      dam += ((int)GET_MASTERY(ch, CLASS_WARRIOR)+5)*GET_DAMROLL(ch);
+      if (GET_MASTERY(ch, CLASS_WARRIOR))
+        dam += (6*GET_DAMROLL(ch));
+      else
+        dam += (5*GET_DAMROLL(ch));
       break;
     case CLASS_ESPER:
     case CLASS_MAGE:
@@ -1284,6 +1287,9 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
     
      Thats about it, now the hard part is jugling all these numbers to give that answer 
   */
+  if (PLR_FLAGGED(attacker, PLR_FROZEN))
+    return (ATK_CHANCE(attacker) = 0);
+    
 
   /*gotta be a moron to not reeally fuck up a sleeping person*/
   if (!AWAKE(vict))
@@ -1354,7 +1360,7 @@ int defence_tot(struct char_data *vict)
   defense_roll = (IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_DEFENCE(vict));
 
   victim_ac = (200 - (100 + compute_armor_class(vict)));
-  defense_roll += (victim_ac); // between 0 and 66
+  defense_roll += (victim_ac*0.33); // between 0 and 66
   if ((part = GET_SUB(vict, SUB_LOYALDEFEND) )> 0)
     defense_roll += part * 0.5;
 
@@ -1448,11 +1454,12 @@ int attack_tot(struct char_data *attacker)
   attacker_roll += total_chance(attacker, SKILL_MELEE)/2;
   attacker_roll += total_chance(attacker, SKILL_SECOND_ATTACK);
   attacker_roll += total_chance(attacker, SKILL_THIRD_ATTACK);
-  if (FIGHTING(attacker)) {
-k = (FIGHTING(attacker)->master ? FIGHTING(attacker)->master : FIGHTING(attacker));
-  for (f = k->followers; f; f = f->next)
-    if ( !DEAD(FIGHTING(attacker)) && HERE(f->follower,attacker) && FIGHTING(f->follower) == attacker)
-      attacker_roll += 10;
+  if (FIGHTING(attacker))
+  {
+    k = (FIGHTING(attacker)->master ? FIGHTING(attacker)->master : FIGHTING(attacker));
+    for (f = k->followers; f; f = f->next)
+      if ( !DEAD(FIGHTING(attacker)) && HERE(f->follower,attacker) && FIGHTING(f->follower) == attacker)
+        attacker_roll += 10;
   }
 
 
@@ -1765,10 +1772,12 @@ int fe_melee_hit(struct char_data* ch, struct char_data* vict,
       if (weps)
       {
         w_type = GET_OBJ_VAL(wielded, 3) + TYPE_HIT;
-        if (melee)
-          wep_multi = (is_short_wep(wielded) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
+        if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(wielded))
+          wep_multi = (1.0f + (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0);
+        else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(wielded))
+          wep_multi = (1.0f + (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0);
         else
-          wep_multi = (is_short_wep(wielded) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
+          wep_multi = 1.0f;
       }
       else
         w_type = TYPE_HIT;
@@ -1926,13 +1935,6 @@ int fe_solo_damage(struct char_data* ch, struct char_data* vict,
 
 
   damage = modify_dam(damage, ch, vict, w_type);
-
-  if (damage > 0 && (GET_HIT(vict) - damage) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 200))
-  {
-    damage = GET_HIT(vict) - 200;
-    act("{cGYou concentrate your energy on the on coming killing blow!{c0", FALSE ,vict, 0,0,TO_CHAR);
-  }
-
 
   if (IS_NPC(vict))
     damage = IRANGE(0, damage, MAX_MOB_DAM);
@@ -2119,10 +2121,11 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   { /* solo artest or normal damage -- no master whack em! */
     if (RIDDEN_BY(vict) && HERE(RIDDEN_BY(vict), ch))
     {
-      stop_fighting(ch);
-      start_fighting_delay(ch, RIDDEN_BY(vict));
-      /** return 0 so stop fighting isn't called again **/
-      return 0;
+      FIGHTING(ch) = RIDDEN_BY(vict);
+      //stop_fighting(ch);
+      //start_fighting_delay(ch, RIDDEN_BY(vict));
+      ///** return 0 so stop fighting isn't called again **/
+      //return 0;
     }
     else
     {
@@ -2133,10 +2136,11 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   {
     if (HERE(master, vict))
     { /* victim isnt the master! -- find the master and whack em! */
-      stop_fighting(ch);
-      start_fighting_delay(ch, master);
+      //stop_fighting(ch);
+      //start_fighting_delay(ch, master);
       /** return 0 so stop fighting isn't called again **/
-      return 0;
+      //return 0;
+      FIGHTING(ch) = master;
     }
     else /* victim is not in the same room as their master -- whack em only */
       return fe_solo_damage(ch, vict, dam, w_type);
@@ -2313,6 +2317,11 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
   char local_buf[100] = "";
   int partial = 0;
   //int dam_exp = 0;
+  struct char_data *victnext;
+  int sweeping;
+
+  victnext = NULL;
+  sweeping = FALSE;
 
 
   if (!can_fight(ch, vict, FALSE))
@@ -2344,35 +2353,31 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     else
       partial = dam;
 
-    if (!IS_NPC(ch) && GET_SUB(ch, SUB_SWEEP_ATTACK) > 0 && dam > 0)
+    if (!IS_NPC(ch) && GET_SUB(ch, SUB_SWEEP_ATTACK) > 0 && partial > 0)
     {
       if (get_sub_status(ch, SUB_SWEEP_ATTACK) == STATUS_ON )
       {
         if (GET_SWEEP_DAM(ch))
         {
-          partial *= 0.6;
+          //partial *= 0.6;
           partial *= (GET_SUB(ch, SUB_SWEEP_ATTACK) * 0.01);
           partial += GET_SWEEP_DAM(ch);
         }
         if (GET_HIT(vict) < partial)
-        {
-          struct char_data *victnext = find_random_victim(ch);
           GET_SWEEP_DAM(ch) = GET_HIT(vict) - partial;
-          if (victnext)
-          {
-            act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
-            act("$n sweeps around into you!", TRUE, ch, NULL, victnext, TO_VICT);
-            start_fighting_delay(ch, victnext);
-          }
-          else
-            GET_SWEEP_DAM(ch) = 0;
-        }
         else
           GET_SWEEP_DAM(ch) = 0;
       }
     }
     else
       GET_SWEEP_DAM(ch) = 0;
+    
+    if (partial > 0 && (GET_HIT(vict) - partial) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 250))
+    {
+      act("{cGYou concentrate your energy on the on coming killing blow,\r\nand before it lands you move out of range of combat.{c0", FALSE ,vict, 0,0,TO_CHAR);
+      return -1;
+      
+    }
 
     alter_hit(vict, partial);
     update_pos(vict);
@@ -2421,9 +2426,32 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     if (partial)
     {
 
+      
       /* learn */
       if (!IS_NPC( ch ) )
       {
+        switch (has_weapon(ch)) {
+        case 2:
+          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD_2))) {
+            if (number(0, 1000) < 2)
+              improve_skill(ch, SKILL_LONGARM);
+          } else {
+            if (number(0, 1000) < 2)
+              improve_skill(ch, SKILL_SHORT_BLADE);
+          }
+        case 1:
+          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD))) {
+            if (number(0, 1000) < 2)
+              improve_skill(ch, SKILL_LONGARM);
+          } else {
+            if (number(0, 1000) < 2)
+              improve_skill(ch, SKILL_SHORT_BLADE);
+          }
+            
+          break;
+        }
+        
+        
         if ( number(1,100) > GET_PERM_OFFENCE(ch) && number(1, 1000) < 5)
         {
           GET_PERM_OFFENCE(ch)++;
@@ -2550,8 +2578,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
           gld < char_gold(ch, 0, GOLD_HAND))
         do_split(ch, local_buf, 0, 0);
     }
-
-
+ 
     return -1;
   }
 
@@ -2560,51 +2587,6 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
 
   return dam;
 }
-
-
-void kill_points(struct char_data *ch, struct char_data *vict)
-{
-
-  int points = 50;
-  int pk = 1;
-  int diff;
-
-  if (!IS_NPC(vict))
-    GET_RIP_CNT(vict) += 1;
-  else
-    pk = 0;
-
-
-  if (!IS_NPC(ch))
-    GET_KILL_CNT(ch) += 1;
-  else
-    pk = 0;
-
-
-  if (pk && IS_PK(vict) && IS_PK(ch))
-  {
-    if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
-      points = 25;
-    diff = ((current_class_is_tier_num(vict) * GET_LEVEL(vict)) - (current_class_is_tier_num(ch) * GET_LEVEL(ch)));
-
-    if (diff > -10)
-    {
-      GET_PK_POINTS(ch) += IRANGE(-5, diff, points);
-      GET_PK_POINTS(vict) -= IRANGE(1, diff, points);
-    }
-    else
-    {
-      GET_PK_POINTS(ch) -= IRANGE(1, abs(diff), points);
-    }
-
-    GET_PK_CNT(ch)++;
-    GET_PK_RIP(vict)++;
-  }
-  if (!IS_NPC(ch))
-    kill_list(ch, vict);
-
-}
-
 
 
 void poison_wep_check(struct char_data *ch, struct char_data *vict, int w_type, int dam)
@@ -2714,6 +2696,7 @@ void poison_wep_check(struct char_data *ch, struct char_data *vict, int w_type, 
 int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_type)
 {
   int success = FALSE;
+  struct affected_type af;
   int armor_rating = 0; //highest armor rating is 50
   int lev = GET_LEVEL(vict);
   int ded = (GET_POS(vict) <= POS_STUNNED);
@@ -2721,6 +2704,22 @@ int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_t
   global_dam = (ded? global_dam : global_dam * 0.2);
   if (!HERE(ch,vict))
     return 0;
+
+  if (is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD))
+  {
+    if (!number(0, 5) && !AFF_FLAGGED(vict, AFF_FROZEN))
+    {
+      //SET_BIT_AR(AFF_FLAGS(vict), AFF_FROZEN);
+      act("You freeze as you touch $N's shield of ice.", FALSE, ch, 0 , vict, TO_CHAR);
+      act("$N is frozen as $E touches your shield of ice.", FALSE, ch, 0, vict, TO_CHAR);
+      af.location = APPLY_SPEED;
+      af.expire = HOURS_TO_EXPIRE(1);
+      af.modifier = -2 * (GET_LEVEL(vict)+1);
+      af.bitvector = AFF_FROZEN;
+      af.type = SPELL_DG_AFFECT;
+      affect_to_char(ch, &af);
+    }
+  }
 
   switch (type)
   {
@@ -4454,7 +4453,7 @@ void check_killer(struct char_data *ch, struct char_data *vict)
     if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
       return;
 
-    if (IS_PK(ch) && IS_PK(vict))
+    if (both_pk(ch,vict))
       return;
 
     SET_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);
@@ -4725,13 +4724,14 @@ void make_half(struct char_data *ch)
 /* When ch kills victim */
 void change_alignment(struct char_data *ch, struct char_data *victim)
 {
-  if (ch && victim) {
-  /*
-   * new alignment change algorithm: if you kill a monster with alignment A,
-   * you move 1/16th of the way to having alignment -A.  Simple and fast.
-   */
-  if (ch != victim)
-  GET_ALIGNMENT(ch) += (-GET_ALIGNMENT(victim) - GET_ALIGNMENT(ch)) / 16;
+  if (ch && victim)
+  {
+    /*
+     * new alignment change algorithm: if you kill a monster with alignment A,
+     * you move 1/16th of the way to having alignment -A.  Simple and fast.
+     */
+    if (ch != victim)
+      GET_ALIGNMENT(ch) += (-GET_ALIGNMENT(victim) - GET_ALIGNMENT(ch)) / 16;
   }
 }
 
@@ -4833,7 +4833,7 @@ void die(struct char_data *ch, struct char_data *killer)
       idnum = GET_IDNUM(killer);
     else
       idnum = -1;
-    
+
     change_alignment(killer, ch);
 
     if (!IS_NPC(ch))
@@ -5489,7 +5489,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                       the grenade */
+                                                                                                                                                                                                                                                                                 the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -5626,7 +5626,7 @@ int can_fight(struct char_data *ch, struct char_data *vict, int silent)
 
   if (ret && !IS_NPC(ch) && !IS_NPC(vict))
   {
-    if (IS_PK(ch) && IS_PK(vict))
+    if (both_pk(ch,vict))
       ret = 1;
     else if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
     {

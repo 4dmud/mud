@@ -64,7 +64,7 @@ int skill_cost(int h, int m, int v, CHAR_DATA *ch);
 #define TIER (ch ? current_class_is_tier_num(ch) : 1)
 
 /* local variables */
-#define OBJ_VNUM_BLACK_POWDER 	21
+#define OBJ_VNUM_BLACK_POWDER      21
 /* Defines for the skill system */
 //#define skillo(skill, name, tar, violent) spello(skill, name, 0, 0, 0, 0, tar, violent, 0, NULL);
 #define skillo(skill, name, tar, violent, first, second, tier, level) spello(skill, name, 0, 0, 0, 0, tar, violent, 0, 0, first, second, tier, level);
@@ -302,7 +302,7 @@ void assign_skills(void)
          SK_NONE, NO_FIRST, NO_SECOND, 2, 40);
 
   skillo(SKILL_BLADE_DANCE, "bladedance",TAR_CHAR_ROOM |
-         TAR_SELF_ONLY,	   SK_NONE, NO_FIRST, NO_SECOND, 4, 29);
+         TAR_SELF_ONLY,     SK_NONE, NO_FIRST, NO_SECOND, 4, 29);
 
   skillo(SKILL_CLEAVE, "cleave",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
@@ -334,21 +334,21 @@ void assign_skills(void)
 
   skillo_static(SKILL_MELEE, "melee", NO_FIRST, NO_SECOND, 1, 1);
 
-  skillo_static(SKILL_SECOND_ATTACK, 	"advanced melee", SKILL_MELEE, NO_SECOND, 3, 10);
+  skillo_static(SKILL_SECOND_ATTACK,    "advanced melee", SKILL_MELEE, NO_SECOND, 3, 10);
 
-  skillo_static(SKILL_THIRD_ATTACK, 	"master melee",SKILL_SECOND_ATTACK,SKILL_MELEE, 4, 10);
+  skillo_static(SKILL_THIRD_ATTACK,     "master melee",SKILL_SECOND_ATTACK,SKILL_MELEE, 4, 10);
 
-  skillo_static(SKILL_HAMSTRING, 	"hamstring",SKILL_HANDTOHAND,NO_SECOND, 4, 10);
+  skillo_static(SKILL_HAMSTRING,"hamstring",SKILL_HANDTOHAND,NO_SECOND, 4, 10);
 
-  skillo_static(SKILL_FLURRY, 		"flurry",SKILL_HANDTOHAND,NO_SECOND, 3, 10);
+  skillo_static(SKILL_SHORT_BLADE,"short blade",SKILL_HANDTOHAND,NO_SECOND, 3, 10);
 
-  skillo_static(SKILL_LONGARM, 		"longarm", NO_FIRST, NO_SECOND, 2, 1);
+  skillo_static(SKILL_LONGARM, "longarm", NO_FIRST, NO_SECOND, 3, 10);
 
 
 }
 
 
-#define spellnum subcmd		/* lame define so SINFO macro works */
+#define spellnum subcmd       /* lame define so SINFO macro works */
 #define flags violent
 ACMD(do_skills)
 {
@@ -363,11 +363,11 @@ ACMD(do_skills)
   if (ch->desc && ch->desc->original)
     orig = ch->desc->original;
 
-  /** Can we even use this skill right here and right now? 
+  /** Can we even use this skill right here and right now?
    ** I know there is redundancy in the messages of these checks*/
-  if (IS_NPC(orig) && orig->desc)  
+  if (IS_NPC(orig) && orig->desc)
     new_send_to_char(ch, "You have no idea how to do that.\r\n");
-  else if (!IS_NPC(orig) && ((!knows_spell(orig, subcmd) || !GET_SKILL(ch, subcmd)) && GET_LEVEL(orig) < LVL_GOD))  
+  else if (!IS_NPC(orig) && ((!knows_spell(orig, subcmd) || !GET_SKILL(ch, subcmd)) && GET_LEVEL(orig) < LVL_GOD))
     new_send_to_char(ch, "You have no idea how to do that.\r\n");
   else if (IS_SET(SINFO.flags, SK_VIOLENT) && ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
     new_send_to_char(ch,"This room just has such a peaceful, easy feeling...\r\n");
@@ -421,8 +421,8 @@ ACMD(do_skills)
       if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
         if ((obj = get_obj_vis(ch, arg, NULL)) != NULL)
           target = TRUE;
-	  
-	if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD)
+
+      if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD)
           && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
       {
         new_send_to_char(ch, "Nobody is around by that name!\r\n");
@@ -682,7 +682,7 @@ ASKILL(skill_backstab)
     return 0;
   }
 
-  percent = number(1, 101);	/* 101% is a complete failure */
+  percent = number(1, 101);   /* 101% is a complete failure */
   prob = IS_NPC(ch) ? GET_LEVEL(ch) : total_chance(ch, SKILL_BACKSTAB);
 
   if (AWAKE(vict) && (percent > prob))
@@ -790,7 +790,7 @@ ASKILL(skill_bash)
     return 0;
   }
 
-  percent = number(1, 130);	/* 101% is a complete failure */
+  percent = number(1, 130);   /* 101% is a complete failure */
   prob = total_chance(ch, SKILL_BASH);
 
   if (MOB_FLAGGED(vict, MOB_NOBASH))
@@ -845,7 +845,7 @@ ASKILL(skill_rescue)
     act("But nobody is fighting $M!", FALSE, ch, 0, vict, TO_CHAR);
     return 0;
   }
-  percent = number(1, 101);	/* 101% is a complete failure */
+  percent = number(1, 101);   /* 101% is a complete failure */
   prob = total_chance(ch, SKILL_RESCUE);
 
   if (percent > prob)
@@ -912,7 +912,7 @@ ASKILL(skill_sneak)
     }
     send_to_char("Okay, you'll try to move silently for a while.\r\n", ch);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -951,7 +951,7 @@ ASKILL(skill_hide)
       return 0;
     }
     send_to_char("You attempt to hide yourself.\r\n", ch);
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         total_chance(ch, SKILL_HIDE) + dex_app_skill[GET_DEX(ch)].hide)
@@ -968,7 +968,8 @@ ASKILL(skill_steal)
   char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
   int percent, gold, eq_pos, pcsteal = 0, ohoh = 0;
 
-  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA)) {
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
+  {
     new_send_to_char(ch, "You can't steal here. Try outside of the Arena.\r\n");
     return 0 ;
   }
@@ -991,12 +992,11 @@ ASKILL(skill_steal)
     send_to_char("Come on now, that's rather stupid!\r\n", ch);
     return 0;
   }
-  
-  if (!IS_NPC(ch) && !IS_NPC(vict)) {
-  if (!(IS_PK(vict) && IS_PK(ch))) {
-  new_send_to_char(ch, "You can't steal from them!\r\n");
-  return 0;
-  }
+
+  if ((!IS_NPC(ch) && !IS_NPC(vict)) && !(both_pk(vict,ch)))
+  {
+    new_send_to_char(ch, "You can't steal from them!\r\n");
+    return 0;
   }
 
 
@@ -1004,18 +1004,18 @@ ASKILL(skill_steal)
   percent = number(1, 101) - dex_app_skill[GET_DEX(ch)].p_pocket;
 
   if (GET_POS(vict) < POS_SLEEPING)
-    percent = -1;		/* ALWAYS SUCCESS, unless heavy object. */
+    percent = -1;        /* ALWAYS SUCCESS, unless heavy object. */
 
   if (!IS_NPC(vict) && IS_PK(vict) && !IS_NPC(ch) && IS_PK(ch))
     pcsteal = 1;
 
-  if (!AWAKE(vict))		/* Easier to steal from sleeping people. */
+  if (!AWAKE(vict))      /* Easier to steal from sleeping people. */
     percent -= 50;
 
   /* NO NO With Imp's and Shopkeepers, and if player thieving is not allowed */
   if ((GET_LEVEL(vict) >= LVL_IMMORT && !IS_NPC(vict)) ||
       GET_MOB_SPEC(vict) == shop_keeper || MOB_FLAGGED(vict, MOB_AWARE))
-    percent = 101;		/* Failure */
+    percent = 101;       /* Failure */
 
   if (str_cmp(obj_name, "coins") && str_cmp(obj_name, "gold"))
   {
@@ -1040,7 +1040,7 @@ ASKILL(skill_steal)
         return 0;
       }
       else
-      {		/* It is equipment */
+      {        /* It is equipment */
         if ((GET_POS(vict) > POS_STUNNED))
         {
           send_to_char
@@ -1068,9 +1068,9 @@ ASKILL(skill_steal)
       }
     }
     else
-    {		/* obj found in inventory */
+    {          /* obj found in inventory */
 
-      percent += GET_OBJ_WEIGHT(obj);	/* Make heavy harder */
+      percent += GET_OBJ_WEIGHT(obj);   /* Make heavy harder */
 
       if (percent > total_chance(ch, SKILL_STEAL))
       {
@@ -1082,7 +1082,7 @@ ASKILL(skill_steal)
             vict, TO_NOTVICT);
       }
       else
-      {		/* Steal the item */
+      {        /* Steal the item */
         if (IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))
         {
           if (!give_otrigger(obj, vict, ch) ||
@@ -1105,7 +1105,7 @@ ASKILL(skill_steal)
     }
   }
   else
-  {			/* Steal some coins */
+  {            /* Steal some coins */
     if (AWAKE(vict) && (percent > total_chance(ch, SKILL_STEAL)))
     {
       ohoh = TRUE;
@@ -1195,7 +1195,7 @@ ASKILL(skill_track)
     new_send_to_char(ch,
                      "There are confusing tracks all around you.\r\n");
     break;
-  default:			/* Success! */
+  default:               /* Success! */
     new_send_to_char(ch,
                      "{cWYou notice some tracks leading %s from here!{c0\r\n",
                      dirs[dir]);
@@ -1292,7 +1292,7 @@ ASKILL(skill_smash)
     act("$N is not using a shield!", FALSE, ch, 0, vict, TO_CHAR);
   else if (MOB_FLAGGED(vict, MOB_NOBASH) ||
            (number(1, 101) > (!IS_NPC(ch) ?
-                  total_chance(ch, SKILL_SMASH) : number(0, 100))))
+                              total_chance(ch, SKILL_SMASH) : number(0, 100))))
   {
     act("You failed to smash $N!", FALSE, ch, 0, vict, TO_CHAR);
     damage(vict, ch, number(1, GET_LEVEL(vict)), TYPE_HIT);
@@ -1309,13 +1309,16 @@ ASKILL(skill_smash)
   else
   {
     // a possibility that NPSs destroy your shield could be added
-    if ( IS_NPC(ch) ) {
+    if ( IS_NPC(ch) )
+    {
       obj_to_char(unequip_char(vict, WEAR_SHIELD), vict);
       act("Your $p is smashed and you put it away to prevent further damage!", FALSE, vict, obj, 0,
           TO_CHAR);
       act("$n smashes $N forcing $m to put $s $p away to prevent further damage.", FALSE, ch, obj, vict,
           TO_NOTVICT);
-    } else {
+    }
+    else
+    {
       extract_obj(unequip_char(vict, WEAR_SHIELD));
       act("You smash your enemies shield in a thousand splinters!", FALSE, ch, 0, 0,
           TO_CHAR);
@@ -1536,7 +1539,7 @@ ASKILL(skill_grip)
 
 
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_GRIP) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -1608,7 +1611,7 @@ ASKILL(skill_focus)
     send_to_char("You block out the sounds around you and focus.\r\n", ch);
     act("$n gets a focused look on $s face.", FALSE, ch, 0, NULL, TO_ROOM);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_FOCUS) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -1632,10 +1635,11 @@ ASKILL(skill_grapple)
   //char name[100], todir[256];
   int to, fail = FALSE;
   //CHAR_DATA *victim = NULL;
-  
-  if (affected_by_spell(vict, SKILL_SNARE)) {
-  new_send_to_char(ch, "You can't throw someone who is snared!\r\n");
-  return 0;
+
+  if (affected_by_spell(vict, SKILL_SNARE))
+  {
+    new_send_to_char(ch, "You can't throw someone who is snared!\r\n");
+    return 0;
   }
   if (use_stamina( ch, 10) < 0)
   {
@@ -1697,7 +1701,7 @@ ASKILL(skill_beserk)
     send_to_char("Your eyes grow wide and a red hase blurs your vision.\r\n", ch);
     act("$n's eyes grow wide, and $e look out of control!", FALSE, ch, 0, NULL, TO_ROOM);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_BESERK) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -1732,7 +1736,7 @@ ASKILL(skill_meditate)
   {
     send_to_char("You clear your mind..\r\n", ch);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
     if (percent >
         GET_SKILL(ch, SKILL_MEDITATE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
@@ -1774,7 +1778,7 @@ ASKILL(skill_true_strike)
   {
     send_to_char("You chant battlesong to your weapons.\r\n", ch);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_TRUE_STRIKE) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -1822,7 +1826,7 @@ ASKILL(skill_fortify)
     }
     send_to_char("You clench your muscles and focus your energy.\r\n", ch);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_FORTIFY) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -1946,7 +1950,7 @@ ASKILL(skill_blade_dance)
     }
     send_to_char("You spin your weapons around in your fingers.\r\n", ch);
 
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
 
     if (percent >
         GET_SKILL(ch, SKILL_BLADE_DANCE) + dex_app_skill[GET_DEX(ch)].sneak)
@@ -2045,7 +2049,7 @@ ASKILL(skill_martial_arts)
   else
   {
     send_to_char("You stetch your arms and legs limbering up for a fight.\r\n", ch);
-    percent = number(1, 101);	/* 101% is a complete failure */
+    percent = number(1, 101); /* 101% is a complete failure */
     if (use_stamina( ch, 15) < 0)
     {
       new_send_to_char(ch, "You are far too exausted!");
@@ -2138,7 +2142,7 @@ ASKILL(skill_hyperactivity)
   send_to_char("Okay, you start to spin out!!\r\n", ch);
 
 
-  percent = number(1, 101);	/* 101% is a complete failure */
+  percent = number(1, 101);   /* 101% is a complete failure */
 
   if (percent > GET_SKILL(ch, SKILL_HYPERACTIVITY))
   {
@@ -2177,7 +2181,7 @@ ASKILL(skill_holy_strength)
   send_to_char("Your muscles bulge!!\r\n", ch);
 
 
-  percent = number(1, 101);	/* 101% is a complete failure */
+  percent = number(1, 101);   /* 101% is a complete failure */
 
   if (percent > GET_SKILL(ch, SKILL_HOLY_STRENGTH))
   {
@@ -2214,7 +2218,7 @@ ASKILL(skill_brace)
     new_send_to_char(ch, "You are far too exausted!");
     return 0;
   }
-  percent = number(1, 101);	/* 101% is a complete failure */
+  percent = number(1, 101);   /* 101% is a complete failure */
 
   if (percent > GET_SKILL(ch, SKILL_BRACE))
   {
@@ -2439,11 +2443,11 @@ ASKILL(skill_scan)
     location = original_loc->dir_option[dir]->to_room;
     char_from_room(ch);
     if (is_aggro)
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
+      REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
     char_to_room(ch, location);
     LOOK(ch);
     if (is_aggro)
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
+      SET_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
 
     /* check if the char is still there */
     if (IN_ROOM(ch) == location)
@@ -2769,7 +2773,7 @@ ASKILL(skill_filet)
 ASKILL(skill_forage)
 {
   OBJ_DATA *item_found = NULL;
-  int item_no = 51;		/* Initialize with first item poss. */
+  int item_no = 51;      /* Initialize with first item poss. */
 
 
 

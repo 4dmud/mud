@@ -129,6 +129,7 @@ ACMD(do_bid);
 ACMD(do_blowup);
 ACMD(do_buck);
 ACMD(do_bury);
+ACMD(do_calender);
 ACMD(do_cast);
 ACMD(do_chaos);
 ACMD(do_clan);
@@ -147,6 +148,7 @@ ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_deduct);
 ACMD(do_deleteplayer);
+ACMD(do_delay);
 ACMD(do_descend);
 ACMD(do_diagnose);
 ACMD(do_dig);
@@ -503,7 +505,9 @@ const struct command_info cmd_info[] =
     { "buy"      , "b"    , POS_STANDING, do_not_here , 0, 0, 0 },
     { "bug"      , "bug"  , POS_DEAD    , do_gen_write, 0, SCMD_BUG, 0 },
 
+    
     { "cast"     , "c"    , POS_SITTING , do_cast     , 1, 0, 0 },
+    { "calender"     , "cal"    , POS_DEAD , do_calender     , 1, 0, 0 },
     { "cedit"    , "cedit"   , POS_DEAD    , do_oasis    , LVL_IMPL, SCMD_OASIS_CEDIT, 0 },
     { "chaos"    , "chaos", POS_DEAD    , do_chaos    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
     { "check"    , "che"   , POS_STANDING, do_not_here , 1, 0, 0 },
@@ -535,6 +539,7 @@ const struct command_info cmd_info[] =
     { "dc"       , "dc"  , POS_DEAD    , do_dc       , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
     { "decrypt"       , "decrypt"  , POS_DEAD    , do_decrypt       , LVL_IMPL, 0, WIZ_DSPLN_GRP },
     { "deleteplayer"   , "deleteplayer"  , POS_RESTING , do_deleteplayer   , LVL_IMPL, 0, WIZ_DSPLN_GRP },
+    { "delay"   , "del"  , POS_RESTING , do_delay   , 1, 0, 0 },
     { "deduct"   , "ded"  , POS_RESTING , do_deduct   , 1, 0, 0 },
     { "descend"  , "desc" , POS_STANDING, do_descend  , 1, 0, 0 },
     { "deposit"  , "dep" , POS_STANDING, do_not_here , 1, 0, 0 },
@@ -664,7 +669,7 @@ const struct command_info cmd_info[] =
     { "news"     , "new" , POS_DEAD, do_news , 0, SCMD_NEWS, 0 },
     { "newbie"   , "newb"  , POS_SLEEPING, do_gen_comm , 0, SCMD_NEWBIE, 0 },
     { "noauction", "noa" , POS_DEAD    , do_gen_tog  , 0, SCMD_NOAUCTION, 0 },
-    { "nobattlespam" , "nob"  , POS_DEAD    , do_gen_tog  , 0, SCMD_BATTLESPAM, 0 },
+    { "nobattlespam" , "nobat"  , POS_DEAD    , do_gen_tog  , 0, SCMD_BATTLESPAM, 0 },
     { "nobrag" , "nobr"  , POS_DEAD    , do_gen_tog  , 0, SCMD_NOBRAG, 0 },
     { "noctalk" , "noct" , POS_DEAD    , do_gen_tog  , 0, SCMD_NOCTALK, 0 },
     { "nogossip" , "nogo"     , POS_DEAD    , do_gen_tog  , 0, SCMD_NOGOSSIP, 0 },
@@ -684,6 +689,7 @@ const struct command_info cmd_info[] =
     { "nonewbie"   , "nonew"  , POS_DEAD    , do_gen_tog  , 1, SCMD_NONEWBIE, 0 },
     { "notitle"  , "noti"     , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_NOTITLE, WIZ_DSPLN_GRP },
     { "nowiz"    , "now" , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOWIZ, WIZ_IMM1_GRP },
+    { "noteleport"    , "notele" , POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELEPORT, 0},
     { "namechange"    , "namechange"    , POS_DEAD    , do_namechange  , LVL_SEN, 0, WIZ_SEN_GRP },
 
     { "objdump"  , "objd" , POS_DEAD    , do_objdump  , LVL_IMPL, 0, WIZ_IMPL_GRP },
@@ -746,7 +752,7 @@ const struct command_info cmd_info[] =
     { "receive"  , "rece"     , POS_SITTING , do_not_here , 1, 0, 0 },
     { "recho"     , "recho" , POS_DEAD, do_echo     , 0, SCMD_RECHO, 0 },
     { "recover"  , "recov", POS_STANDING, do_recover  , 0, 0, 0 },
-    { "register" , "reg"  , POS_STANDING, do_register , 0, 0, 0 },
+    { "register" , "reg"  , POS_STANDING, do_register , 0, SCMD_REGISTER, 0 },
     { "reload"   , "rel"  , POS_RESTING , do_reload   , 0, 0, 0 },
     { "remove"   , "rem" , POS_RESTING , do_remove   , 0, 0, 0 },
     { "remort"   , "remor", POS_STANDING, do_remort   , 50,0, 0 },
@@ -845,6 +851,7 @@ const struct command_info cmd_info[] =
     { "ungroup"  , "ung" , POS_DEAD    , do_ungroup  , 0, 0, 0 },
     { "unban"    , "unb" , POS_DEAD    , do_unban    , LVL_IMMORT, 0, WIZ_BAN_GRP },
     { "unaffect" , "una" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_UNAFFECT, WIZ_HEAL_GRP },
+    { "unregister" , "unreg"  , POS_STANDING, do_register , 0, SCMD_UNREGISTER, 0 },
     { "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
     { "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
     { "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
@@ -2145,6 +2152,8 @@ int enter_player_game(struct descriptor_data *d)
 
   /*make sure all defaults are turned on for subskills */
   reset_default_status(ch);
+  /** give them clan crest body part **/
+  SET_BIT(EXTRA_BODY(ch), BODY_CREST);
 
   if (PLR_FLAGGED(ch, PLR_FROZEN))
     load_room = CONFIG_FROZEN_START;

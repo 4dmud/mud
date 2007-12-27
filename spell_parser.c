@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.13  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.12  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -584,9 +587,9 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
 
   if (!cast_wtrigger(caster, cvict, ovict, spellnum))
     return 0;
-  if (!cast_otrigger(caster, ovict, spellnum))
+  else if (ovict && !cast_otrigger(caster, ovict, spellnum))
     return 0;
-  if (!cast_mtrigger(caster, cvict, spellnum))
+  else if (cvict && !cast_mtrigger(caster, cvict, spellnum))
     return 0;
 
   if (cvict && AFF_FLAGGED(cvict, AFF_MAGIC_BUBBLE))

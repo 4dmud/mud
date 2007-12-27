@@ -2381,44 +2381,6 @@ ACMD(do_finger)
 
 }
 
-ACMD(do_register)
-{
-  if (IS_NPC(ch))
-    return;
-
-  if (GET_LEVEL(ch) >= LVL_HERO)
-  {
-    send_to_char("You cannot participate in PK'ing.\r\n", ch);
-    return;
-  }
-
-  if (PLR_FLAGGED(ch, PLR_PK))
-  {
-    send_to_char("You are already a pk'er.\r\n", ch);
-    return;
-  }
-
-  if (GET_ROOM_VNUM(IN_ROOM(ch)) != 3138)
-  {
-    send_to_char
-    ("You can only register at the Mayor's office in Olde Yorke.\r\n",
-     ch);
-    return;
-  }
-
-  if (GET_LEVEL(ch) < 10)
-  {
-    send_to_char("You must be level 10 or higher to be a PK'er.\r\n",
-                 ch);
-    return;
-  }
-
-  SET_BIT_AR(PLR_FLAGS(ch), PLR_PK);
-  send_to_char
-  ("Welcome to the World of PK'ers.  There is NO turning back.\r\n",
-   ch);
-  return;
-}
 
 ACMD(do_zlist)
 {

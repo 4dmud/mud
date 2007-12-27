@@ -211,10 +211,27 @@ ASPELL(spell_teleport)
     return;
   }
 
-  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOTELEPORT_OUT) ||
-      ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOTELEPORT_OUT))
+  if (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOTELEPORT_OUT) ||
+      ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOTELEPORT_OUT))
   {
-    new_send_to_char(ch,"A magical barrier prevents you from leaving.\r\n");
+    new_send_to_char(victim,"A magical barrier prevents you from leaving.\r\n");
+    return;
+  }
+  if (!SELF(ch, victim) && !IS_NPC(ch) && ((!PRF_FLAGGED(victim, PRF_TELEPORTABLE) &&
+                       !PLR_FLAGGED(victim, PLR_KILLER)) || both_pk(ch,victim)))
+  {
+  new_send_to_char(victim, "%s just tried to cast teleport on you but\r\n"
+                   "%s failed because you have teleport protection on.\r\n"
+                   "Type NOTELEPORT to allow the spell to work.\r\n",
+                   GET_NAME(ch), 
+                   HSSH(ch));
+    
+    new_send_to_char(ch, "You failed the teleport spell because %s has teleport protection on.\r\n",
+                     GET_NAME(victim));
+    
+    
+    new_mudlog( BRF, LVL_GOD, TRUE, "%s failed casting teleport on %s",
+                GET_NAME(ch), GET_NAME(victim));
     return;
   }
   /*possible infinite loop here*/
@@ -236,10 +253,19 @@ ASPELL(spell_teleport)
          ROOM_FLAGGED(to_room, ROOM_DEATH) ||
          ROOM_FLAGGED(to_room, ROOM_NOTELEPORT_IN) ||
          ZONE_FLAGGED(to_room->zone, ZONE_NOTELEPORT_IN));
-  act("$n slowly fades out of existence and is gone.",  FALSE, victim, 0, 0, TO_ROOM);
+  if (RIDING(victim) && HERE(RIDING(victim), victim)) {
+    act("$n and $N slowly fade out of existence and are gone.",  FALSE, victim, 0, RIDING(victim), TO_ROOM);
+    move_char_to(RIDING(victim), to_room);
+  } else {
+    act("$n slowly fades out of existence and is gone.",  FALSE, victim, 0, 0, TO_ROOM);
   dismount_char(victim);
+  }
   move_char_to(victim, to_room);
-  act("$n slowly fades into existence.", FALSE, victim, 0, 0, TO_ROOM);
+  if (RIDING(victim) && HERE(RIDING(victim), victim)) {
+    act("$n and $N slowly fade into existence.", FALSE, victim, 0, RIDING(victim), TO_ROOM);
+    look_at_room(RIDING(victim), 0);
+  } else
+    act("$n slowly fades into existence.", FALSE, victim, 0, 0, TO_ROOM);
   look_at_room(victim, 0);
   entry_memory_mtrigger(victim);
   greet_mtrigger(victim, -1);

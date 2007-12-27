@@ -2179,10 +2179,13 @@ ACMD(do_score)
       primin = size_dice_wep(ch, WEAPON_PRIM_AFF);
       primax =
         size_dice_wep(ch, WEAPON_PRIM_AFF) + (size_dice_wep(ch, WEAPON_PRIM_AFF) * num_dice_wep(ch, WEAPON_PRIM_AFF));
-      if (GET_CLASS(ch) == CLASS_HUNTER || GET_CLASS(ch) == CLASS_WARRIOR)
-        shortmulti = (is_short_wep(GET_EQ(ch, WEAR_WIELD)) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
+      
+      if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD)))
+        shortmulti += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+      else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD)))
+        shortmulti += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
       else
-        shortmulti = (is_short_wep(GET_EQ(ch, WEAR_WIELD)) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
+        shortmulti = 1.0f;
 
       primin += class_damroll(ch);
       primax += class_damroll(ch);
@@ -2191,17 +2194,15 @@ ACMD(do_score)
       primin *= shortmulti;
       primax *= shortmulti;
 
+      primin *= race_dam_mod(GET_RACE(ch), 0);
+      primax *= race_dam_mod(GET_RACE(ch), 0);
       primin += ((float)primin * (((float)REMORTS(ch) * 0.005f)));
       primax += ((float)primax * (((float)REMORTS(ch) * 0.005f)));
 
-      primin *= race_dam_mod(GET_RACE(ch), 0);
-      primax *= race_dam_mod(GET_RACE(ch), 0);
-
-
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
-        primin *= 1.2f;
-        primax *= 1.2f;
+        primin += primin/5;
+        primax += primax/5;
       }
     }
     if (wep_num == 2)
@@ -2209,26 +2210,25 @@ ACMD(do_score)
       secmin = size_dice_wep(ch, WEAPON_SECO_AFF);
       secmax =
         size_dice_wep(ch, WEAPON_SECO_AFF) + (size_dice_wep(ch, WEAPON_SECO_AFF) * num_dice_wep(ch, WEAPON_SECO_AFF));
-      if (GET_CLASS(ch) == CLASS_HUNTER || GET_CLASS(ch) == CLASS_WARRIOR)
-        shortmulti = (is_short_wep(GET_EQ(ch, WEAR_WIELD_2)) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
+      if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
+        shortmulti += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+      else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
+        shortmulti += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
       else
-        shortmulti = (is_short_wep(GET_EQ(ch, WEAR_WIELD_2)) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
+        shortmulti = 1.0f;
       secmin += class_damroll(ch);
       secmax += class_damroll(ch);
       secmin *= shortmulti;
       secmax *= shortmulti;
-
+      secmin *= race_dam_mod(GET_RACE(ch), 0);
+      secmax *= race_dam_mod(GET_RACE(ch), 0);
       secmin += ((float)secmin * (((float)REMORTS(ch) * 0.005f)));
       secmax += ((float)secmax * (((float)REMORTS(ch) * 0.005f)));
 
-      secmin *= race_dam_mod(GET_RACE(ch), 0);
-      secmax *= race_dam_mod(GET_RACE(ch), 0);
-
-
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
-        secmin *= 1.2f;
-        secmax *= 1.2f;
+        secmin += secmin/5;
+        secmax += secmin/5;
       }
     }
 
@@ -2525,6 +2525,8 @@ ACMD(do_score)
     new_send_to_char(ch, "You are summonable by other players.\r\n");
   if (PRF_FLAGGED(ch, PRF_GATEABLE))
     new_send_to_char(ch, "You are gateable by other players.\r\n");
+  if (PRF_FLAGGED(ch, PRF_GATEABLE))
+    new_send_to_char(ch, "You are teleportable.\r\n");
   if (AFF_FLAGGED(ch, AFF_PROT_FIRE))
     new_send_to_char(ch, "You are protected against fire.\r\n");
 
@@ -2839,13 +2841,23 @@ struct help_index_element *find_help(char *keyword)
 
 void display_help(struct char_data *ch, unsigned int i)
 {
-
-  new_send_to_char(ch,
+  DYN_DEFINE;
+  DYN_CREATE;
+  *dynbuf = '\0';
+  DYN_RESIZE("----------------------------------------------------------------------------\r\n");
+  DYN_RESIZE(help_table[i].keywords);
+  DYN_RESIZE("\r\n");
+  DYN_RESIZE("----------------------------------------------------------------------------\r\n");
+  DYN_RESIZE(help_table[i].entry);
+  page_string(ch->desc, dynbuf, DYN_BUFFER);
+/*
+new_send_to_char(ch,
                    "----------------------------------------------------------------------------\r\n"
                    "%s\r\n"
                    "----------------------------------------------------------------------------\r\n"
                    "%s\r\n",
                    help_table[i].keywords, help_table[i].entry);
+*/
 }
 
 void display_help_list(struct descriptor_data *d, char *keywords)
@@ -4407,9 +4419,8 @@ ACMD(do_consider)
   diff = IRANGE(0, diff2, 7);
   act(hitp_consider[diff], FALSE, ch, 0, victim, TO_CHAR);
 
-  new_send_to_char(ch, "You guess %s would probably do up to about %d damage to you per hit.\r\n",
-                   GET_NAME(victim),
-                   average_damage(victim));
+  new_send_to_char(ch, "You guess %s would probably do around %d damage to you per hit if you had no protection.\r\n",
+                   GET_NAME(victim), modify_dam(average_damage(victim), victim, ch, find_fe_type(victim)));
 
 }
 
@@ -4706,11 +4717,12 @@ ACMD(do_toggle)
                    "    Compression: %-3s    "
                    "     PageHeight: %-3d    "
                    "      PageWidth: %-3d\r\n"
-                   "     Aggro Mode: %-3s    "
+                   "          Aggro: %-3s    "
                    "       PageWrap: %-3s    "
                    "          Brags: %-3s\r\n"
-                   "   Gate Protect: %-3s    "
-                   "      FishTally: %-3s\r\n",
+                   "         NOGATE: %-3s    "
+                   "      FishTally: %-3s    "
+                   "     NOTELEPORT: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4755,7 +4767,8 @@ ACMD(do_toggle)
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE)),
-                   ONOFF(!PRF_FLAGGED(ch, PRF_FISHPROMPT))
+                   ONOFF(!PRF_FLAGGED(ch, PRF_FISHPROMPT)),
+                   ONOFF(!PRF_FLAGGED(ch, PRF_TELEPORTABLE))
                   );
 
 }

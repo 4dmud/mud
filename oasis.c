@@ -305,11 +305,9 @@ void cleanup_olc(struct descriptor_data *d, byte cleanup_type)
     {
     case CLEANUP_ALL:
       free_action(OLC_ACTION(d));
-      //free_help(OLC_HELP(d));
       break;
     case CLEANUP_STRUCTS:
       free(OLC_ACTION(d));
-      free(OLC_HELP(d));
       break;
     default:
       /* Caller has screwed up */
@@ -317,7 +315,21 @@ void cleanup_olc(struct descriptor_data *d, byte cleanup_type)
     }
   }
 
-
+  if (OLC_HELP(d))
+  {
+    switch(cleanup_type)
+    {
+    case CLEANUP_ALL:
+      free_help(OLC_HELP(d));
+      break;
+    case CLEANUP_STRUCTS:
+      free(OLC_HELP(d));
+      break;
+    default:
+      /* Caller has screwed up */
+      break;
+    }
+  }
   /* free storage if allocated (for tedit and aedit) */
   /* and Triggers */
   /*
@@ -464,7 +476,7 @@ int can_edit_zone(struct char_data *ch, zone_rnum rnum)
     return FALSE;
 
   /* always access if you're assigned to this zone */
-  if (real_zone(GET_OLC_ZONE(ch)) == rnum)
+  if (real_zone(GET_OLC_ZONE(ch)) == rnum && GET_OLC_ZONE(ch) != 0)
     return TRUE;
 
   return (FALSE);

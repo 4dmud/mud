@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.29  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.28  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -3840,20 +3843,24 @@ int get_obj_aff(struct obj_data *obj, int location)
 
 void compare_weapons(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
 {
-  float wep_multi[2] = { 1, 1};
+  float wep_multi[2] = { 1.0f, 1.0f};
   int value1, value2;
   if (!item || !comp)
     return;
-  if (IS_FIGHTER(GET_CLASS(ch)))
-    wep_multi[0] = (is_short_wep(item) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
-  else if (IS_ROGUE(GET_CLASS(ch)))
-    wep_multi[0] = (is_short_wep(item) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
-
-  if (IS_FIGHTER(GET_CLASS(ch)))
-    wep_multi[1] = (is_short_wep(comp) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
-  else if (IS_ROGUE(GET_CLASS(ch)))
-    wep_multi[1] = (is_short_wep(comp) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
-
+  if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(item))
+    wep_multi[0] += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+  else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(item))
+    wep_multi[0] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+  else
+    wep_multi[0] = 1.0f;
+  
+  if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(comp))
+    wep_multi[1] += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+  else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(comp))
+    wep_multi[1] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+  else
+    wep_multi[1] = 1.0f;
+  
   value1 = (((item->obj_flags.value[1]+1) * item->obj_flags.value[2] * wep_multi[0])/2);
   value2 = (((comp->obj_flags.value[1]+1) * comp->obj_flags.value[2] * wep_multi[1])/2);
 

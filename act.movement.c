@@ -552,8 +552,9 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         RIDING(ch), TO_VICT);
     act("$N rears backwards, throwing $n to the ground.", FALSE, ch, 0,
         RIDING(ch), TO_NOTVICT);
-    dismount_char(ch);
+    
     set_fighting(RIDING(ch), ch);
+    dismount_char(ch);
     return (0);
   }
   else
@@ -1491,11 +1492,15 @@ int followers_to_master(struct char_data *ch, room_rnum was_in)
   struct follow_type *k, *next;
   if (!ch->followers)
     return 0;
+  if (!IN_ROOM(ch))
+      return 0;
+      if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH))
+        return 0;
 
   for (k = ch->followers; k; k = next)
   {
     next = k->next;
-    if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING))
+    if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING) )
     {
       act("You follow $N.", FALSE, k->follower, 0, ch, TO_CHAR);
       if (move_char_to(k->follower, IN_ROOM(ch)))

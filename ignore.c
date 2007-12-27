@@ -137,7 +137,7 @@ void free_ignore(struct ignore *i) {
 if (!i)
 return;
 if (i->next)
-free_ignore(i);
+free_ignore(i->next);
 
 free_string(&i->ignore);
 free(i);

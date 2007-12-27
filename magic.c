@@ -22,6 +22,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "constants.h"
+#include "fight.h"
 
 
 int spell_size_dice(struct char_data *ch);
@@ -32,8 +33,7 @@ extern int mini_mud;
 
 void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass);
 void start_fighting_delay(struct char_data *vict, struct char_data *ch);
-int can_fight(struct char_data *ch, struct char_data *vict, int silent); //fight.c
-byte saving_throws(int class_num, int type, int level);	/* class.c */
+byte saving_throws(int class_num, int type, int level);     /* class.c */
 void clearMemory(struct char_data *ch);
 void weight_change_object(struct obj_data *obj, int weight);
 void add_follower(struct char_data *ch, struct char_data *leader);
@@ -104,7 +104,7 @@ void affect_update(void)
       next = af->next;
       if (af->expire > t) /* hasnt reached "time" yet.*/
         continue;
-      if (af->expire == -2)	/* No action */
+      if (af->expire == -2)   /* No action */
         continue;
       else
       {
@@ -221,17 +221,17 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
   if ((!CAN_GO2(room, dir)) || (dir == NOWHERE))
   {
     new_send_to_char(ch, "You can not cast magic that direction.\r\n");
-    return NOWHERE;		//cant send magic that way.
+    return NOWHERE;      //cant send magic that way.
   }
   if (ROOM_FLAGGED(room, ROOM_PEACEFUL)
       || ((vroom != NULL) && ROOM_FLAGGED(vroom, ROOM_PEACEFUL)))
   {
     if (SINFO.violent)
-      return NOWHERE;	//cant send magic there
+      return NOWHERE;    //cant send magic there
   }
 
   if (room == vroom || (dir == NOWHERE))
-    return 0;		//victim is in same room.
+    return 0;       //victim is in same room.
 
 
   for (i = 0; i < maxdis && (nextroom != NULL); i++)
@@ -373,16 +373,16 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     }
     break;
 
-  }				/* switch(spellnum) */
-  
+  }                 /* switch(spellnum) */
+
   if (AFF_FLAGGED(victim, AFF_SLEEP))
     affect_from_char(victim, SPELL_SLEEP);
 
   if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
     affect_from_char(victim, SPELL_SWEET_DREAMS);
-    
-if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
-pass = FALSE;
+
+  if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
+    pass = FALSE;
   skill_attack(ch, victim, spellnum, pass);
   if (DEAD(victim) || GET_POS(victim) == POS_DEAD)
     return -1;
@@ -1457,13 +1457,10 @@ int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struc
       continue;
     if (tch->master == ch)
       continue;
-    if (!IS_NPC(ch) && !IS_NPC(tch))
-    {
-      if (!(IS_PK(ch) && IS_PK(tch)))
-        continue;
-      else if (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA))
-        continue;
-    }
+    if (!both_pk(ch,tch))
+      continue;
+    else if (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA))
+      continue;
     act(format, FALSE, tch, 0, ch, TO_CHAR);
     act(format2, TRUE, tch, 0, ch, TO_ROOM);
     switch (spellnum)
@@ -1730,18 +1727,18 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
 const char *mag_summon_msgs[] =
   {
     "\r\n",
-    "$n makes a strange magical gesture; you feel a strong breeze!",	//1
-    "$n animates a corpse!",	// 2
-    "$N appears from a cloud of thick blue smoke!",	//3
-    "$N appears from a cloud of thick green smoke!",	//4
-    "$N appears from a cloud of thick red smoke!",	//5
-    "$N disappears in a thick black cloud!",	//6
-    "As $n makes a strange magical gesture, you feel a searing heat.",	//7
-    "As $n makes a strange magical gesture, you feel a strong breeze.",	//8
-    "As $n makes a strange magical gesture, you feel a sudden chill.",	//9
-    "As $n makes a strange magical gesture, you feel the ground tremble.",	//10
-    "$n magically divides!",	//11
-    "$n animates a corpse!"	//12
+    "$n makes a strange magical gesture; you feel a strong breeze!",  //1
+    "$n animates a corpse!",  // 2
+    "$N appears from a cloud of thick blue smoke!",    //3
+    "$N appears from a cloud of thick green smoke!",   //4
+    "$N appears from a cloud of thick red smoke!",     //5
+    "$N disappears in a thick black cloud!", //6
+    "As $n makes a strange magical gesture, you feel a searing heat.",     //7
+    "As $n makes a strange magical gesture, you feel a strong breeze.",    //8
+    "As $n makes a strange magical gesture, you feel a sudden chill.",     //9
+    "As $n makes a strange magical gesture, you feel the ground tremble.", //10
+    "$n magically divides!",  //11
+    "$n animates a corpse!"   //12
   };
 
 /*
@@ -1760,22 +1757,22 @@ const char *mag_summon_fail_msgs[] =
   };
 
 /* These mobiles do not exist. */
-#define MOB_MONSUM_I		130
-#define MOB_MONSUM_II		140
-#define MOB_MONSUM_III		150
-#define MOB_GATE_I		160
-#define MOB_GATE_II		170
-#define MOB_GATE_III		180
+#define MOB_MONSUM_I          130
+#define MOB_MONSUM_II         140
+#define MOB_MONSUM_III        150
+#define MOB_GATE_I       160
+#define MOB_GATE_II      170
+#define MOB_GATE_III          180
 
 /* Defined mobiles. */
-#define MOB_ELEMENTAL_BASE	20	/* Only one for now. */
-#define MOB_CLONE		10
-#define MOB_ZOMBIE		11
-#define MOB_AERIALSERVANT	19
-#define MOB_EARTH_ELEM		22
-#define MOB_WATER_ELEM		23
-#define MOB_AIR_ELEM		24
-#define MOB_FIRE_ELEM		25
+#define MOB_ELEMENTAL_BASE    20   /* Only one for now. */
+#define MOB_CLONE        10
+#define MOB_ZOMBIE       11
+#define MOB_AERIALSERVANT     19
+#define MOB_EARTH_ELEM        22
+#define MOB_WATER_ELEM        23
+#define MOB_AIR_ELEM          24
+#define MOB_FIRE_ELEM         25
 
 
 void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
@@ -1793,7 +1790,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
   {
   case SPELL_CLONE:
     msg = 10;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_CLONE;
     pfail = 50 - GET_CHA(ch);
     break;
@@ -1806,7 +1803,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
     }
     handle_corpse = TRUE;
     msg = 12;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_ZOMBIE;
     pfail = 30 - GET_CHA(ch);
     break;
@@ -1814,7 +1811,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
   case SPELL_EARTH_ELEMENTAL:
     handle_corpse = FALSE;
     msg = 10;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_EARTH_ELEM;
     pfail = 45 - GET_CHA(ch);
     break;
@@ -1822,7 +1819,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
   case SPELL_WATER_ELEMENTAL:
     handle_corpse = FALSE;
     msg = 9;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_WATER_ELEM;
     pfail = 25;
     break;
@@ -1830,7 +1827,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
   case SPELL_AIR_ELEMENTAL:
     handle_corpse = FALSE;
     msg = 8;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_AIR_ELEM;
     pfail = 25;
     break;
@@ -1838,7 +1835,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
   case SPELL_FIRE_ELEMENTAL:
     handle_corpse = FALSE;
     msg = 7;
-    fmsg = number(2, 6);	/* Random fail message. */
+    fmsg = number(2, 6); /* Random fail message. */
     mob_num = MOB_FIRE_ELEM;
     pfail = 25;
     break;
@@ -1873,7 +1870,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
     SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
     SET_BIT_AR(AFF_FLAGS(mob), AFF_GROUP);
     if (spellnum == SPELL_CLONE)
-    {	/* Don't mess up the proto with strcpy. */
+    {     /* Don't mess up the proto with strcpy. */
       mob->player.name = str_dup(GET_NAME(ch));
       mob->player.short_descr = str_dup(GET_NAME(ch));
     }
@@ -2046,7 +2043,7 @@ void mag_unaffects(int level, struct char_data *ch,
 
   if (!affected_by_spell(victim, spell))
   {
-    if (spellnum != SPELL_HEAL)	/* 'cure blindness' message. */
+    if (spellnum != SPELL_HEAL)    /* 'cure blindness' message. */
       new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
     return;
   }
@@ -2058,7 +2055,7 @@ void mag_unaffects(int level, struct char_data *ch,
     act(to_room, TRUE, victim, 0, ch, TO_ROOM);
 
   if (poisoned)
-    check_regen_rates(victim);	/* speed up regen rate immediately */
+    check_regen_rates(victim);     /* speed up regen rate immediately */
 
 }
 
@@ -2104,7 +2101,9 @@ void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
     {
       GET_OBJ_VAL(obj, 3) = 1;
       to_char = "$p steams briefly.";
-    } else {
+    }
+    else
+    {
       to_char = "$p cannot be poisoned, only food or drink can be.";
     }
     break;

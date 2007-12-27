@@ -54,6 +54,7 @@ void free_string(char **pt);
 char *numlineas( char *string );
 void string_append( CHAR_DATA *ch, char **pString );
 
+struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 const char *race_name(struct char_data *ch);
 int has_weapon(struct char_data *ch);
 float has_staff(struct char_data *ch);
@@ -726,7 +727,7 @@ int current_class_is_tier_num(struct char_data *ch);
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
 #define CAN_SEE_IN_DARK(ch) \
-   (AFF_FLAGGED(ch, AFF_INFRAVISION) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
+(AFF_FLAGGED(ch, AFF_INFRAVISION) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || GET_RACE(ch) == RACE_DWARF)))
 
 #define IS_GOOD(ch)    	(GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch)    	(GET_ALIGNMENT(ch) <= -350)

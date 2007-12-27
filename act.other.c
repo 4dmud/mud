@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.13  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining
  *
@@ -1281,7 +1284,9 @@ ACMD(do_gen_tog)
       {"You are not roleplaying anymore.\r\n",
        "You are now roleplaying.\r\n"},
       {"You will no longer see a tally of how many fish you have caught.\r\n",
-       "You will now see a tally of how many fish you have caught.\r\n"}
+       "You will now see a tally of how many fish you have caught.\r\n"},
+      {"You can now have the teleport spell cast on you.\r\n",
+          "You can now no longer have the teleport spell cast on you.\r\n"}
 
 
 
@@ -1420,6 +1425,11 @@ ACMD(do_gen_tog)
     break;
   case SCMD_NOGATE:
     result = PRF_TOG_CHK(ch, PRF_GATEABLE);
+    break;
+  case SCMD_NOTELEPORT:
+    if (IS_PK(ch))
+    new_send_to_char(ch, "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
+    result = PRF_TOG_CHK(ch, PRF_TELEPORTABLE);
     break;
   case SCMD_BUILDWALK:
     if (GET_LEVEL(ch) < LVL_BUILDER)
@@ -1909,7 +1919,13 @@ ACMD(do_bury)
   SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BURIED);
   obj_to_room(obj, IN_ROOM(ch));
 };
-
+ACMD(do_delay) {
+  int n;
+  skip_spaces(&argument);
+  n = atoi(argument);
+  if (n > 0 && n < 300)
+  WAIT_STATE(ch, n RL_SEC);
+}
 
 ACMD(do_dig_ground)
 {
@@ -1933,7 +1949,7 @@ ACMD(do_dig_ground)
 
   /* set a wait state */
 
-  WAIT_STATE(ch, 10 RL_SEC);
+  WAIT_STATE(ch, 4 RL_SEC);
 
 
   /*
@@ -1949,7 +1965,7 @@ ACMD(do_dig_ground)
 
       chance += (GET_INT(ch) >= 17);
 
-      if (CAN_SEE_OBJ(ch, obj) && (number(1, 6) <= chance))
+      if ((number(1, 6) <= chance))
       {
         /* Remove the buried bit so the player can see it. */
         REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BURIED);

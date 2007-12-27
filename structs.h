@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.27  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.26  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -498,6 +501,7 @@ extern int message_type;
 #define PRF_GATEABLE 	50
 #define PRF_RP	 	51	/* Player is roleplaying */
 #define PRF_FISHPROMPT  52
+#define PRF_TELEPORTABLE  53
 
 
 /* Descriptor flags */

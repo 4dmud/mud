@@ -28,15 +28,15 @@
 #include "genolc.h"
 
 /* these factors should be unique integers */
-#define RENT_FACTOR 	1
-#define CRYO_FACTOR 	4
+#define RENT_FACTOR      1
+#define CRYO_FACTOR      4
 
-#define LOC_INVENTORY	0
-#define MAX_BAG_ROWS	5
+#define LOC_INVENTORY    0
+#define MAX_BAG_ROWS     5
 
 extern struct player_index_element *player_table;
 extern int top_of_p_table;
-extern int qic_items;			/* Number of items in database */
+extern int qic_items;              /* Number of items in database */
 extern int qic_vnums[];
 void add_owner(int nr, long id);
 
@@ -155,7 +155,7 @@ int delete_pobj_file(char *name)
 
   if (!(fl = fopen(filename, "rb")))
   {
-    if (errno != ENOENT)	/* if it fails but NOT because of no file */
+    if (errno != ENOENT) /* if it fails but NOT because of no file */
       log("SYSERR: deleting crash file %s (1): %s", filename, strerror(errno));
     return (0);
   }
@@ -178,7 +178,7 @@ int Crash_delete_file(char *name)
 
   if (!(fl = fopen(filename, "rb")))
   {
-    if (errno != ENOENT)	/* if it fails but NOT because of no file */
+    if (errno != ENOENT) /* if it fails but NOT because of no file */
       log("SYSERR: deleting crash file %s (1): %s", filename, strerror(errno));
     return (0);
   }
@@ -208,7 +208,7 @@ int Crash_delete_crashfile(struct char_data *ch)
 
   if (!(fl = fopen(fname, "rb")))
   {
-    if (errno != ENOENT)	/* if it fails, NOT because of no file */
+    if (errno != ENOENT) /* if it fails, NOT because of no file */
       log("SYSERR: checking for crash file %s (3): %s", fname, strerror(errno));
     return (0);
   }
@@ -243,7 +243,7 @@ int Crash_clean_file(char *name)
    */
   if (!(fl = fopen(fname, "r+b")))
   {
-    if (errno != ENOENT)	/* if it fails, NOT because of no file */
+    if (errno != ENOENT) /* if it fails, NOT because of no file */
       log("SYSERR: OPENING OBJECT FILE %s (4): %s", fname, strerror(errno));
     return (0);
   }
@@ -421,25 +421,25 @@ void Crash_listrent(struct char_data *ch, char *name)
   {
     get_line(fl, line);
     if (*line == '#')
-    {	/* swell - its an item */
+    {     /* swell - its an item */
       sscanf(line, "#%d", &nr);
       if (nr != NOTHING)
-      {	/* then we can dispense with it easily */
+      {   /* then we can dispense with it easily */
         obj = read_object(nr, VIRTUAL);
         sprintf(buf, "%s[%5d] (%5dau) %-20s\r\n", buf,
                 nr, GET_OBJ_RENT(obj), obj->short_description);
         free_obj(obj, FALSE);
       }
       else
-      {	/* its nothing, and a unique item. bleh. partial parse. */
-        get_line(fl, line);	/* this is obj+val */
-        get_line(fl, line);	/* this is XAP */
+      {   /* its nothing, and a unique item. bleh. partial parse. */
+        get_line(fl, line);   /* this is obj+val */
+        get_line(fl, line);   /* this is XAP */
         sprintf(buf2, "xap objects in listrent");
-        fread_string(fl, buf2);	/* screw the name */
+        fread_string(fl, buf2);    /* screw the name */
         sdesc = fread_string(fl, buf2);
-        fread_string(fl, buf2);	/* screw the long desc */
-        fread_string(fl, buf2);	/* screw the action desc. */
-        get_line(fl, line);	/* this is an important line.rent.. */
+        fread_string(fl, buf2);    /* screw the long desc */
+        fread_string(fl, buf2);    /* screw the action desc. */
+        get_line(fl, line);   /* this is an important line.rent.. */
         sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3,
                t + 4);
         /* great we got it all, make the buf */
@@ -482,14 +482,16 @@ void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
   int j;
 
   if (locate > 0)
-  {		/* was worn */
+  {       /* was worn */
     switch (j = locate - 1)
     {
     case WEAR_LIGHT:
       break;
     case WEAR_FINGER_R:
     case WEAR_FINGER_L:
-      if (!CAN_WEAR(obj, ITEM_WEAR_FINGER))	/* not fitting :( */
+    case WEAR_THUMB_R:
+    case WEAR_THUMB_L:
+      if (!CAN_WEAR(obj, ITEM_WEAR_FINGER))  /* not fitting :( */
         locate = 0;
       break;
     case WEAR_NECK_1:
@@ -572,6 +574,7 @@ void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
       break;
     case WEAR_EAR_R:
     case WEAR_EAR_L:
+    case WEAR_EAR_TIP:
       if (!CAN_WEAR(obj, ITEM_WEAR_EAR))
         locate = 0;
       break;
@@ -596,6 +599,28 @@ void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
       if (!CAN_WEAR(obj, ITEM_WEAR_FOCUS))
         locate = 0;
       break;
+    case WEAR_SADDLE:
+      if (!CAN_WEAR(obj, ITEM_WEAR_ABOUT))
+        locate = 0;
+      break;
+    case WEAR_CREST:
+      if (!CAN_WEAR(obj, ITEM_WEAR_CREST))
+        locate = 0;
+      break;
+    case WEAR_THIGH_L:
+    case WEAR_THIGH_R:
+      if (!CAN_WEAR(obj, ITEM_WEAR_THIGH))
+        locate = 0;
+      break;
+    case WEAR_KNEE_L:
+    case WEAR_KNEE_R:
+      if (!CAN_WEAR(obj, ITEM_WEAR_KNEE))
+        locate = 0;
+      break;
+    case WEAR_FLOATING:
+      if (!CAN_WEAR(obj, ITEM_WEAR_FLOATING))
+        locate = 0;
+      break;
     default:
       locate = 0;
     }
@@ -613,7 +638,7 @@ void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
         else
           equip_char(ch, obj, j);
       }
-      else		/* oops - saved player with double equipment[j]? */
+      else          /* oops - saved player with double equipment[j]? */
         locate = 0;
     }
   }
@@ -988,7 +1013,7 @@ void Crash_rentsave(struct char_data *ch, int cost)
 
 
 /* ************************************************************************
-* Routines used for the receptionist					  *
+* Routines used for the receptionist                          *
 ************************************************************************* */
 
 void Crash_rent_deadline(struct char_data *ch, struct char_data *recep,
@@ -1091,10 +1116,10 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
    */
 
   if (locate > 0)
-  {	/* item equipped */
+  {  /* item equipped */
     for (j = MAX_BAG_ROW - 1; j > 0; j--)
       if (cont_row[j])
-      {	/* no container -> back to ch's inventory */
+      {   /* no container -> back to ch's inventory */
         for (; cont_row[j]; cont_row[j] = obj1)
         {
           obj1 = cont_row[j]->next_content;
@@ -1106,13 +1131,13 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
         cont_row[j] = NULL;
       }
     if (cont_row[0])
-    {	/* content list existing */
+    {     /* content list existing */
       if (GET_OBJ_TYPE(temp) == ITEM_CONTAINER)
       {
         /* rem item ; fill ; equip again */
         if (ch != NULL)
           temp = unequip_char(ch, locate - 1);
-        temp->contains = NULL;	/* should be empty - but who knows */
+        temp->contains = NULL;     /* should be empty - but who knows */
         for (; cont_row[0]; cont_row[0] = obj1)
         {
           obj1 = cont_row[0]->next_content;
@@ -1124,7 +1149,7 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
           obj_to_room(temp, rnum);
       }
       else
-      {	/* object isn't container -> empty content list */
+      {   /* object isn't container -> empty content list */
         for (; cont_row[0]; cont_row[0] = obj1)
         {
           obj1 = cont_row[0]->next_content;
@@ -1138,10 +1163,10 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
     }
   }
   else
-  {		/* locate <= 0 */
+  {       /* locate <= 0 */
     for (j = MAX_BAG_ROW - 1; j > -locate; j--)
       if (cont_row[j])
-      {	/* no container -> back to ch's inventory */
+      {   /* no container -> back to ch's inventory */
         for (; cont_row[j]; cont_row[j] = obj1)
         {
           obj1 = cont_row[j]->next_content;
@@ -1154,7 +1179,7 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
       }
 
     if (j == -locate && cont_row[j])
-    {	/* content list existing */
+    {     /* content list existing */
       if (GET_OBJ_TYPE(temp) == ITEM_CONTAINER)
       {
         /* take item ; fill ; give to char again */
@@ -1169,12 +1194,12 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
           obj_to_obj(cont_row[j], temp);
         }
         if (ch != NULL)
-          obj_to_char(temp, ch);	/* add to inv first ... */
+          obj_to_char(temp, ch);   /* add to inv first ... */
         else
           obj_to_room(temp, rnum);
       }
       else
-      {	/* object isn't container -> empty content list */
+      {   /* object isn't container -> empty content list */
         for (; cont_row[j]; cont_row[j] = obj1)
         {
           obj1 = cont_row[j]->next_content;
@@ -1205,7 +1230,7 @@ int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_
       else
         cont_row[-locate - 1] = temp;
     }
-  }			/* locate less than zero */
+  }            /* locate less than zero */
   return 1;
 }
 
@@ -1413,7 +1438,7 @@ int load_objects_to_room(room_rnum rnum, FILE *fl)
 
 
   for (j = 0; j < MAX_BAG_ROW; j++)
-    cont_row[j] = NULL;	/* empty the containers */
+    cont_row[j] = NULL;  /* empty the containers */
 
   while (!feof(fl))
   {
@@ -1458,19 +1483,19 @@ void new_load_corpses(void)
       num_objs++;
       /* Check if our object is a corpse */
       if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE))
-      {	/* scan our temp room for objects */
+      {   /* scan our temp room for objects */
         add_corpse_to_list(temp);
         for (obj = rnum->contents; obj; obj = next_obj)
         {
           next_obj = obj->next_content;
           if (obj && !IS_CORPSE(obj))
           {
-            obj_from_room(obj);	/* get those objs from that room */
-            obj_to_obj(obj, temp);	/* and put them in the corpse */
+            obj_from_room(obj);    /* get those objs from that room */
+            obj_to_obj(obj, temp); /* and put them in the corpse */
           }
-        }		/* exit the room scanning loop */
+        }      /* exit the room scanning loop */
         if (temp)
-        {	/* put the corpse in the right room */
+        { /* put the corpse in the right room */
           log("CORPSE: Corpse '%s' to room %d.",
               temp->short_description, GET_OBJ_VROOM(temp));
           obj_to_room(temp,
@@ -1527,7 +1552,7 @@ void scan_char_objects_qic(char *name, long id)
 
   if (!(fl = fopen(fname, "r+b")))
   {
-    if (errno != ENOENT) 	/* if it fails, NOT because of no file */
+    if (errno != ENOENT)      /* if it fails, NOT because of no file */
       log( "SYSERR: OPENING OBJECT FILE %s (4)", fname);
 
     return;
@@ -1586,7 +1611,7 @@ int load_char_objects_to_char(CHAR_DATA *ch, FILE * fl)
     return 1;
 
   for (j = 0; j < MAX_BAG_ROW; j++)
-    cont_row[j] = NULL;	/* empty all cont lists (you never know ...) */
+    cont_row[j] = NULL;  /* empty all cont lists (you never know ...) */
 
   while (!feof(fl))
   {
@@ -1634,9 +1659,9 @@ void tag_read(char *tag, char *buf)
     temp->(old) = strdup("Undefined"); }
 
 #define ADD_NEW(str, line) {if (temp->str != NULL && temp->str != obj_proto[nrr].str) \
-	 free(temp->str); \
-	 str = strdup(line); \
-	 }
+      free(temp->str); \
+      str = strdup(line); \
+      }
 
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
@@ -1665,7 +1690,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
   /* we have the number, check it, load obj. */
   if (nr == NOTHING)
-  {	/* then it is unique */
+  {  /* then it is unique */
     temp = create_obj();
     temp->item_number = NOTHING;
   }
@@ -1843,7 +1868,7 @@ int Crash_load_xapobjs(struct char_data *ch)
   if (!(fl = fopen(fname1, "r+b")))
   {
     if (errno != ENOENT)
-    {	/* if it fails, NOT because of no file */
+    {     /* if it fails, NOT because of no file */
       new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
       log("SYSERR: READING OBJECT FILE %s (5)", fname1);
       new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
@@ -1853,7 +1878,7 @@ int Crash_load_xapobjs(struct char_data *ch)
     if (!(fl = fopen(fname2, "r+b")))
     {
       if (errno != ENOENT)
-      {	/* if it fails, NOT because of no file */
+      {   /* if it fails, NOT because of no file */
 
         new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
         log("SYSERR: READING OBJECT FILE %s (5)", fname1);
@@ -1885,7 +1910,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
 {
 
   //FILE *fl;
-  int t[20], danger, zwei = 0;	//,num_of_days, cost;
+  int t[20], danger, zwei = 0;     //,num_of_days, cost;
   int orig_rent_code;
   char line[1024];
   OBJ_DATA *temp;
@@ -1930,7 +1955,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
   }
 
   for (j = 0; j < MAX_BAG_ROW; j++)
-    cont_row[j] = NULL;	/* empty all cont lists (you never know ...) */
+    cont_row[j] = NULL;  /* empty all cont lists (you never know ...) */
 
   if (!feof(fl))
     get_line(fl, line);
@@ -1946,7 +1971,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
       }
       /* we have the number, check it, load obj. */
       if (nr == NOTHING)
-      {	/* then it is unique */
+      {   /* then it is unique */
         temp = create_obj();
         temp->item_number = NOTHING;
       }
@@ -2011,8 +2036,8 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
       get_line(fl, line);
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
-      {	/* then this is a Xap Obj, requires
-                                                        						   special care */
+      {   /* then this is a Xap Obj, requires
+                                                                                             special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";
@@ -2035,14 +2060,14 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
           temp->action_description = 0;
         }
         /*
-        	if ((temp->smell = fread_string(fl, buf2)) == NULL)
-        	  temp->smell = 0;
+          if ((temp->smell = fread_string(fl, buf2)) == NULL)
+            temp->smell = 0;
          
-        	if ((temp->taste = fread_string(fl, buf2)) == NULL)
-        	  temp->taste = 0;
+          if ((temp->taste = fread_string(fl, buf2)) == NULL)
+            temp->taste = 0;
          
-        	if ((temp->feel = fread_string(fl, buf2)) == NULL)
-        	  temp->feel = 0;
+          if ((temp->feel = fread_string(fl, buf2)) == NULL)
+            temp->feel = 0;
         */
         if (!get_line(fl, line) ||
             (sscanf(line, "%d %d %d %d %d %d %d %d",
@@ -2114,8 +2139,8 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
             zwei = 1;
             break;
           }
-        }		/* exit our for loop */
-      }			/* exit our xap loop */
+        }      /* exit our for loop */
+      }             /* exit our xap loop */
 
       if (temp != NULL)
       {

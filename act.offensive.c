@@ -289,7 +289,7 @@ ACMD(do_slay)
     {
       act("You rip the flesh from $N and send $S soul to the fiery depths\r\n" "of hell.", FALSE, ch, 0, vict, TO_CHAR);
       act("Your flesh has been torn from your bones and your bodiless soul\r\n" "now watches your bones incinerate in the fires of hell.", FALSE, ch, 0, vict, TO_VICT);
-      act("$n rips the fless off of $N, releasing $S soul into the fiery\r\n" "depths of hell.", FALSE, ch, 0, vict, TO_NOTVICT);
+      act("$n rips the flesh off of $N, releasing $S soul into the fiery\r\n" "depths of hell.", FALSE, ch, 0, vict, TO_NOTVICT);
     }
     else if (!str_cmp(arg2, "xwife") && GET_LEVEL(ch) == LVL_IMPL)
     {
@@ -301,7 +301,7 @@ ACMD(do_slay)
     {
       act("You rip through $N's chest and pull out $S beating heart in\r\n" "your hand.", FALSE, ch, NULL, vict, TO_CHAR);
       act("You feel a sharp pain as $n rips into your chest and pulls\r\n" "out your still beating heart in $S hand.", FALSE, ch, NULL, vict, TO_VICT);
-      act("Specks of blood hit your face as $n rips through $N's chest\r\n" "pulling out $S's still beating heart.", FALSE, ch, NULL, vict, TO_NOTVICT);
+      act("Specks of blood hit your face as $n rips through $N's chest\r\n" "pulling out $S still beating heart.", FALSE, ch, NULL, vict, TO_NOTVICT);
     }
     else if (!str_cmp(arg2, "immolate"))
     {
@@ -330,8 +330,8 @@ ACMD(do_slay)
     }
     else if (!str_cmp(arg2, "pounce"))
     {
-      act("Leaping upon $N with bared fangs, you tear open $S's throat\r\n" 
-      "and toss $S corpse to the ground.", FALSE, ch, NULL, vict, TO_CHAR);
+      act("Leaping upon $N with bared fangs, you tear open $S throat\r\n"
+      "and toss the corpse to the ground.", FALSE, ch, NULL, vict, TO_CHAR);
       act("In a heartbead, $n rips $s fangs through your throat!\r\n"
           "Your blood sprays and pours to the ground as your life ends...",
           FALSE, ch, NULL, vict, TO_VICT);
@@ -340,10 +340,15 @@ ACMD(do_slay)
     }
     else if (!str_cmp(arg2, "slit"))
     {
-      act("You calmly slit $N's throat.", FALSE, ch, NULL, vict,
-          TO_CHAR);
+      act("You calmly slit $N's throat.", FALSE, ch, NULL, vict, TO_CHAR);
       act("$n reaches out with a clawed finger and calmly slits your throat.", FALSE, ch, NULL, vict, TO_VICT);
       act("A claw extends from $n's hand as $M clamly slits $N's throat.", FALSE, ch, NULL, vict, TO_NOTVICT);
+    }
+    else if (!str_cmp(arg2, "wax"))
+    {
+      act("You hold down $N and give them a bikini wax to die for.", FALSE, ch, NULL, vict, TO_CHAR);
+      act("$n holds you down and gives you a bikini wax to die for.", FALSE, ch, NULL, vict, TO_VICT);
+      act("$n holds $N down and gives $M a bikini wax to die for.", FALSE, ch, NULL, vict, TO_NOTVICT);
     }
     else
     {

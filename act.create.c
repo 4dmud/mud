@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.13  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -502,7 +505,7 @@ ASKILL(skill_scribe)
     else
       found = TRUE;
   }
-  if (found && GET_OBJ_TYPE(paper) == ITEM_SCROLL && blank_scroll(paper))
+  if (found && (GET_OBJ_TYPE(paper) != ITEM_SCROLL || !blank_scroll(paper)))
   {
     new_send_to_char(ch,"You can't write on that!\r\n");
     return 0;

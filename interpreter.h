@@ -198,6 +198,7 @@ struct alias_data
 #define SCMD_NOGATE     46
 #define SCMD_RP		47
 #define SCMD_FISHTALLY  48
+#define SCMD_NOTELEPORT 49
 
 /* do_wizutil */
 #define SCMD_REROLL	0
@@ -210,6 +211,10 @@ struct alias_data
 #define SCMD_ZDELETE	7
 
 #define SCMD_SILENCE    8
+
+/*do_register (for pk) */
+#define SCMD_REGISTER    0
+#define SCMD_UNREGISTER    1
 
 /* do_spec_com */
 #define SCMD_WHISPER	0

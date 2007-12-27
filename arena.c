@@ -21,6 +21,7 @@
 #include "interpreter.h"
 #include "db.h"
 #include "arena.h"
+#include "fight.h"
 
 /*  external vars  */
 extern int restrict;
@@ -116,7 +117,7 @@ ACMD(do_bet)
       return;
     }
 
-    char_gold(ch, -newbet, GOLD_ALL);	/* substract the gold */
+    char_gold(ch, -newbet, GOLD_ALL);   /* substract the gold */
     arena_pot += (newbet / 2);
     bet_pot += (newbet / 2);
     GET_AMT_BET(ch) = newbet;
@@ -265,7 +266,7 @@ void start_arena()
   if (time_to_start == 0)
   {
     show_jack_pot();
-    in_arena = ARENA_RUNNING;	/* start the blood shed */
+    in_arena = ARENA_RUNNING; /* start the blood shed */
     time_left_in_game = game_length;
     start_game();
   }
@@ -309,9 +310,9 @@ void start_game()
         ("\r\nThe floor opens, droping you in the arena.\r\n",
          i);
         move_char_to(i,
-                       real_room(number
-                                 (ARENA_START_ROOM,
-                                  ARENA_END_ROOM)));
+                     real_room(number
+                               (ARENA_START_ROOM,
+                                ARENA_END_ROOM)));
         look_at_room(i, 0);
       }
     }
@@ -438,7 +439,7 @@ void do_end_game()
         alter_hit(i, -GET_MAX_HIT(i));
         alter_mana(i, -GET_MAX_MANA(i));
         alter_move(i, -GET_MAX_MOVE(i));
-         remove_all_normal_affects(i);
+        remove_all_normal_affects(i);
         move_char_to(i, real_room(1205));
         look_at_room(i, 0);
         act("$n falls from the sky.", FALSE, i, 0, 0, TO_ROOM);
@@ -593,7 +594,7 @@ void write_fame_list(void)
     log("Error writing _hall_of_fame_list");
     return;
   }
-  write_one_fame_node(fl, fame_list);	/* recursively write from end to start */
+  write_one_fame_node(fl, fame_list);   /* recursively write from end to start */
   fclose(fl);
 
   return;
@@ -631,7 +632,7 @@ void find_bet_winners(struct char_data *winner)
         GET_BETTED_ON(i) = 0;
         GET_AMT_BET(i) = 0;
       }
-      else		/* they bet and did't win, or didn't bet at all */
+      else          /* they bet and did't win, or didn't bet at all */
         GET_AMT_BET(i) = 0;
     }
 }
@@ -642,7 +643,7 @@ int arena_ok(struct char_data *ch, struct char_data *victim)
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA) &&
       ROOM_FLAGGED(victim->in_room, ROOM_ARENA))
     return TRUE;
-  else if (IS_PK(ch) && IS_PK(victim))
+  else if (both_pk(ch,victim))
     return TRUE;
   else
     return FALSE;
@@ -655,7 +656,7 @@ void arena_kill(struct char_data *ch)
   if (FIGHTING(ch))
     stop_fighting(ch);
 
- remove_all_normal_affects(ch);
+  remove_all_normal_affects(ch);
   if (IN_ROOM(ch)->zone == ARENA_ZONE &&
       ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
   {
@@ -673,7 +674,7 @@ void arena_kill(struct char_data *ch)
   update_pos(ch);
 
   if (!move_char_to(ch, rm))
-  move_char_to(ch, CONFIG_MORTAL_START);
+    move_char_to(ch, CONFIG_MORTAL_START);
   look_at_room(ch, 0);
   act("$n is dropped from the sky.", FALSE, ch, 0, 0, TO_ROOM);
 }

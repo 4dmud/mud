@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.6  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -296,7 +299,7 @@ enum skill_list {
   SKILL_MELEE ,
   SKILL_THIRD_ATTACK,
   SKILL_HAMSTRING,
-  SKILL_FLURRY,//175
+  SKILL_SHORT_BLADE,//175
   SKILL_DODGE,
   SKILL_PHASE,
   SKILL_CHARGE,

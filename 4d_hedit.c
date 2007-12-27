@@ -425,13 +425,10 @@ void free_help(struct help_index_element *help)
 {
 
   free_string(&help->keywords);
-  if (help->entry && !help->duplicate)
-  {
-    free(help->entry);
-    help->entry = NULL;
-  }
+  free_string(&help->entry);
+  free(help);
 
-  memset(help, 0, (sizeof(struct help_index_element)));
+  //memset(help, 0, (sizeof(struct help_index_element)));
 
 }
 

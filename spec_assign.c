@@ -340,6 +340,7 @@ void assign_objects(void)
 #if !defined(WIN32)
     ASSIGNOBJ(590, gen_board);	/* board in mud school */
     ASSIGNOBJ(1315, gen_board);	/* board in sicilian hq */
+  ASSIGNOBJ(1360, gen_board);  /* board in sicilian hq 2*/
     ASSIGNOBJ(2917, gen_board);	/* board in viking head quarters */
     ASSIGNOBJ(2999, gen_board);	/* table round */
     ASSIGNOBJ(3079, gen_board);	/* board for rp */

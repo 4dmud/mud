@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/11/01 18:43:37 $                                           * 
-*  $Revision: 1.17 $                                                    *
+*  $Date: 2006/01/23 05:23:19 $                                           * 
+*  $Revision: 1.18 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -233,7 +233,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd,
     else
       snprintf(str, slen, "%s", complete_cmd_info[cmd].command);
     return TRUE;
-  }
+  } 
 
   return FALSE;
 }

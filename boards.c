@@ -71,6 +71,7 @@ struct board_info_type board_info[NUM_OF_BOARDS] =
   {
     {590, 0, 0, LVL_GOD, LIB_ETC "board.newbie", 0},
     {1315, 0, 0, LVL_GOD, LIB_ETC "board.sicilian", 0},
+    {1360, 0, 0, LVL_GOD, LIB_ETC "board.sicilian2", 0},
     {2914, 0, 0, LVL_GOD, LIB_ETC "board.table_round", 0},
     {2917, 0, 0, LVL_GOD, LIB_ETC "board.viking", 0},
     {2999, 0, 0, LVL_GOD, LIB_ETC "board.rt", 0},

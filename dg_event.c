@@ -21,7 +21,7 @@
 #include "constants.h"
 #include "comm.h"
 
-struct queue *event_q = NULL;		/* the event queue */
+struct queue *event_q = NULL;      /* the event queue */
 
 extern long pulse;
 
@@ -39,7 +39,7 @@ struct event *event_create(EVENTFUNC(*func), void *event_obj, long when)
 {
   struct event *new_event;
 
-  if (when < 1)		/* make sure its in the future */
+  if (when < 1)          /* make sure its in the future */
     when = 1;
 
   CREATE(new_event, struct event, 1);
@@ -177,10 +177,10 @@ struct q_element *queue_enq(struct queue *q, void *data, long key)
   qe->data = data;
   qe->key = key;
 
-  bucket = key % NUM_EVENT_QUEUES;	/* which queue does this go in */
+  bucket = key % NUM_EVENT_QUEUES; /* which queue does this go in */
 
   if (!q->head[bucket])
-  {	/* queue is empty */
+  {  /* queue is empty */
     q->head[bucket] = qe;
     q->tail[bucket] = qe;
   }
@@ -191,7 +191,7 @@ struct q_element *queue_enq(struct queue *q, void *data, long key)
     {
 
       if (i->key < key)
-      {	/* found insertion point */
+      {   /* found insertion point */
         if (i == q->tail[bucket])
           q->tail[bucket] = qe;
         else
@@ -207,7 +207,7 @@ struct q_element *queue_enq(struct queue *q, void *data, long key)
     }
 
     if (i == NULL)
-    {	/* insertion point is front of list */
+    {     /* insertion point is front of list */
       qe->next = q->head[bucket];
       q->head[bucket] = qe;
       qe->next->prev = qe;
@@ -237,7 +237,7 @@ void queue_deq(struct queue *q, struct q_element *qe)
     q->tail[i] = qe->prev;
   else if (qe->next)
     qe->next->prev = qe->prev;
-    else 
+  else
     log("ERROR: qe->next non existant!");
 
   free(qe);

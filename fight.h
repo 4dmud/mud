@@ -1,8 +1,13 @@
 
 extern struct attack_hit_type attack_hit_text[];
 int apply_ac(struct char_data *ch, int eq_pos);
-
+int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_type);
 int arena_ok(struct char_data *ch, struct char_data *victim);
+int find_fe_type(struct char_data *ch);
+int has_weapon(struct char_data *ch);
+int can_fight(struct char_data *ch, struct char_data *vict, int silent);
+int both_pk(struct char_data *a, struct char_data *b);
+void kill_list(struct char_data *ch, struct char_data *vict);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
 #define IS_SPELL_ATK(type) (((type) >= TYPE_ATK_ORB) && ((type) <= TYPE_ATK_TORPEDO))
@@ -38,7 +43,7 @@ int arena_ok(struct char_data *ch, struct char_data *victim);
 #define FE_TYPE_SPELL -3
 #define FE_TYPE_UNDEAD -4
 #define FE_TYPE_ANIMAL -5
-#define PULSES_PER_FIGHT (7*PASSES_PER_SEC)
+#define PULSES_PER_FIGHT (6.5*PASSES_PER_SEC)
 
 #define SHIELD_BLOCK     0
 #define SHIELD_REFLECT   1
@@ -52,10 +57,8 @@ int arena_ok(struct char_data *ch, struct char_data *victim);
 
 #define MAX_STAFF_MULTI 2.5f
 
-#define SHORT_WEP_MULTI 0.8f
-#define LONG_WEP_MULTI  1.1f
-#define SHORT_WEP_MULTI_ROGUE 1.1f
-#define LONG_WEP_MULTI_ROGUE  0.8f
+#define LONG_WEP_MULTI  0.2f
+#define SHORT_WEP_MULTI_ROGUE 0.2f
 #define SINGLE_WEP_BONUS 1.1f
 
 #define NO_WEP     0

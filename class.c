@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
+ * sorry self. another. _cant remember the changes_ entry
+ *
  * Revision 1.6  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -1332,7 +1335,7 @@ void init_spell_levels(void)
   assign_class(SKILL_PARRY,		ALL_FIGHTER);
   assign_class(SKILL_THIRD_ATTACK,      ALL_FIGHTER);
   assign_class(SKILL_HAMSTRING,     WAR | HUN);
-  assign_class(SKILL_FLURRY,      WAR);
+  assign_class(SKILL_SHORT_BLADE,      ALL_ROGUE);
   assign_class(SKILL_DODGE,		ALL_ROGUE);
   assign_class(SKILL_PHASE,		ESP | ALL_ROGUE);
   assign_class(SKILL_CHARGE,		WAR);
@@ -1419,7 +1422,12 @@ else if (remorts < 5)
   }
 #undef mod
 }
+/*
 
+amount = (10 * (((3350) * (167500) - 3240)/2) = 2805608800
+amount += 100 * (amount * 0.05)
+
+*/
 
 /*
  * Default titles of male characters.

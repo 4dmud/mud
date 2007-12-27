@@ -2124,7 +2124,17 @@ void extract_char_final(struct char_data *ch)
   GET_MSG_RUN(ch) = 0;
   /* cancel the task */
   stop_task(ch);
-
+  if (SCRIPT(ch))
+    extract_script(ch, MOB_TRIGGER);
+  if (!IS_NPC(ch)) {
+    void free_alias(struct alias_data *a);
+    struct alias_data *a;
+  while ((a = GET_ALIASES(ch)) != NULL)
+  {
+    GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
+    free_alias(a);
+  }
+  }
   remove_hunter(ch);
 
   /* we can't forget the hunters either... */

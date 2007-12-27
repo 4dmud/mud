@@ -2594,7 +2594,7 @@ struct combine_data *extract_all_links(struct combine_data *proto)
   if (proto == NULL)
     return NULL;
 
-  if (proto->next != NULL)
+  if (proto->next)
     extract_all_links(proto->next);
 
   if (proto->joined)
@@ -2641,7 +2641,7 @@ void free_join_list(struct combine_data *list)
   if (list == NULL)
     return;
 
-  if (list->next != NULL)
+  if (list->next)
     free_join_list(list->next);
 
   free(list);
