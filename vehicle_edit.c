@@ -360,12 +360,15 @@ ACMD(do_oasis_vedit)
 
   /* Create the OLC structure. */
   CREATE(d->olc, struct oasis_olc_data, 1);
-  OLC_NUM(d) = number + add;
 
-  if (!add)
+  if (!add) {
+    OLC_NUM(d) = number;
     vedit_setup_existing(d, number);
-  else
+  }
+  else {
+    OLC_NUM(d) = vehicle_count() + 1;
     vedit_setup_new(d);
+  }
 
   STATE(d) = CON_VEDIT;
   act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
