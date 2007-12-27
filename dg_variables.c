@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/08/21 10:23:10 $                                           * 
-*  $Revision: 1.34 $                                                      *
+*  $Date: 2006/08/30 20:40:47 $                                           * 
+*  $Revision: 1.35 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -857,6 +857,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     snprintf(str, slen, "%d", PLR_FLAGGED(c, PLR_HERO));
                 else if (!strcasecmp(field, "is_roleplay"))
                     snprintf(str, slen, "%d", PLR_FLAGGED(c, PLR_ROLEPLAYER));
+		else if (!strcasecmp(field, "is_rpl"))
+		    snprintf(str, slen, "%d", PLR_FLAGGED(c, PLR_RP_LEADER));
                 else if (!strcasecmp(field, "id"))
                     snprintf(str, slen, "%ld", GET_ID(c));
                 else if (!strcasecmp(field, "int")) {
