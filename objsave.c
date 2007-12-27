@@ -351,12 +351,10 @@ int Crash_clean_qic(FILE * fl, char *name)
 
 void update_obj_file(void)
 {
-  for (int i = 0; i < player_table.size(); i++)
+  for (int i = 0; i < pi.Size(); i++)
   {
-    //    sprintf(buf, "Cleaning objfile for %s.", (player_table+i)->name);
-    //    log(buf);
-    if (*player_table[i].name)
-      Crash_clean_file(player_table[i].name);
+    if (*pi.NameByIndex(i))
+      Crash_clean_file(pi.NameByIndex(i));
   }
   return;
 }

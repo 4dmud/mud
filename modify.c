@@ -205,7 +205,7 @@ void string_add(Descriptor *d, char *str) {
         case CON_TRIGEDIT:
             free(*d->str);
             if (d->backstr)
-            *d->str = strdup(d->backstr);
+					  *d->str = strdup(d->backstr);
             else
             *d->str = NULL;
             free_string(&d->backstr);

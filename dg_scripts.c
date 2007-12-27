@@ -4,11 +4,21 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/07/01 14:34:03 $
-*  $Revision: 1.39 $
+*  $Date: 2007/08/19 01:06:10 $
+*  $Revision: 1.40 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.40  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.39  2007/07/01 14:34:03  w4dimenscor
  * fixed a whitepace issue in globals
  *
@@ -495,9 +505,9 @@ int can_wear_on_pos(struct obj_data *obj, int pos) {
         return CAN_WEAR(obj, ITEM_WEAR_KNEE);
     case WEAR_FLOATING:
         return CAN_WEAR(obj, ITEM_WEAR_FLOATING);
-        case WEAR_BACK:
+    case WEAR_BACK:
         return CAN_WEAR(obj, ITEM_WEAR_BACK);
-        case WEAR_CHEST:
+    case WEAR_CHEST:
         return CAN_WEAR(obj, ITEM_WEAR_CHEST);
 
     default:
@@ -754,18 +764,34 @@ obj_data *get_obj_near_obj(obj_data * obj, char *name) {
 
 /* returns the object in the world with name name, or NULL if not found */
 struct obj_data *get_obj(const char *name) {
-    obj_data *obj;
     if (*name == UID_CHAR)
         return find_obj(atoi(name + 1));
     else {
-        for (obj = object_list; obj; obj = obj->next)
-            if (isname(name, obj->name))
-                return obj;
+	    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) 
+		    if (isname((ob->second)->name, name))
+			    return ob->second;
     }
 
     return NULL;
 }
-
+/**
+switch (obj->Names.size()) {
+	case 0:
+                break;
+	case 1:
+                if (is_abbrev(name, obj->Names[0].c_str()))
+                    return obj;
+                break;
+	default:
+                for (vector<string>::iterator i = obj->Names.begin();
+                        i != obj->Names.end();
+                        i++)
+                        if (is_abbrev((*i).c_str(), name)
+                           )
+                            return obj;
+                //if (isname(name, obj->name))
+                // return obj;
+}**/
 
 /* finds room by id or vnum.  returns NULL if not found */
 room_rnum get_room(const char *name) {
@@ -803,6 +829,11 @@ Character *get_char_by_obj(obj_data * obj,const char *name) {
                 valid_dg_target(obj->worn_by, TRUE))
             return obj->worn_by;
 
+        if (IN_ROOM(obj))
+            for (ch = IN_ROOM(obj)->people; ch; ch = ch->next_in_room)
+                if (isname(name, ch->player.name) && valid_dg_target(ch, TRUE))
+                    return ch;
+
         for (ch = character_list; ch; ch = ch->next)
             if (isname(name, ch->player.name) && valid_dg_target(ch, TRUE))
                 return ch;
@@ -829,6 +860,11 @@ Character *get_char_by_obj(obj_data * obj,char *name) {
                 isname(name, obj->worn_by->player.name) &&
                 valid_dg_target(obj->worn_by, TRUE))
             return obj->worn_by;
+
+        if (IN_ROOM(obj))
+            for (ch = IN_ROOM(obj)->people; ch; ch = ch->next_in_room)
+                if (isname(name, ch->player.name) && valid_dg_target(ch, TRUE))
+                    return ch;
 
         for (ch = character_list; ch; ch = ch->next)
             if (isname(name, ch->player.name) && valid_dg_target(ch, TRUE))
@@ -897,7 +933,7 @@ obj_data *get_obj_by_obj(obj_data * obj,const char *name) {
             (i = get_obj_in_list(name, rm->contents)))
         return i;
 
-    return get_obj(name);
+    return NULL;
 }
 
 
@@ -925,12 +961,7 @@ obj_data *get_obj_by_room(Room *room, const char *name) {
                 return obj;
     }
 
-    for (obj = object_list; obj; obj = obj->next)
-        if (isname(name, obj->name))
-            return obj;
-
-
-    return NULL;
+    return get_obj(name);
 }
 
 void check_time_triggers(void) {
@@ -951,7 +982,8 @@ void check_time_triggers(void) {
         }
     }
 
-    for (obj = object_list; obj; obj = obj->next) {
+    for (obj_list_type::iterator i = object_list.begin(); i != object_list.end(); i++) {
+	    obj = (i->second);
         if (SCRIPT(obj)) {
             sc = SCRIPT(obj);
 
@@ -992,7 +1024,8 @@ void script_trigger_check(void) {
         }
     }
 
-    for (obj = object_list; obj; obj = obj->next) {
+    for (obj_list_type::iterator i = object_list.begin(); i != object_list.end(); i++) {
+	    obj = (i->second);
         if (SCRIPT(obj)) {
             sc = SCRIPT(obj);
 
@@ -1769,26 +1802,22 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *g
             snprintf(result,r_len, "%d", atoi(lhs) <= atoi(rhs));
         else
             snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
-    }
-    else if (!strcmp(">=", op)) {
+    } else if (!strcmp(">=", op)) {
         if (is_num(lhs) && is_num(rhs))
             snprintf(result,r_len, "%d", atoi(lhs) >= atoi(rhs));
         else
             snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
-    }
-    else if (!strcmp("<", op)) {
+    } else if (!strcmp("<", op)) {
         if (is_num(lhs) && is_num(rhs))
             snprintf(result,r_len, "%d", atoi(lhs) < atoi(rhs));
         else
             snprintf(result,r_len, "%d", strcmp(lhs, rhs) < 0);
-    }
-    else if (!strcmp(">", op)) {
+    } else if (!strcmp(">", op)) {
         if (is_num(lhs) && is_num(rhs))
             snprintf(result,r_len, "%d", atoi(lhs) > atoi(rhs));
         else
             snprintf(result,r_len, "%d", strcmp(lhs, rhs) > 0);
-    }
-    else if (!strcmp("/=", op))
+    } else if (!strcmp("/=", op))
         snprintf(result,r_len, "%c", str_str(lhs, rhs) ? '1' : '0');
 
     else if (!strcmp("*", op))
@@ -3097,8 +3126,7 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
             cl = find_done(cl);
         } else if (!strn_cmp("case", p, 4)) {
             /* Do nothing, this allows multiple cases to a single instance */
-        }
-        else {
+        } else {
 
             //            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
 
@@ -3274,8 +3302,8 @@ ACMD(do_tlist) {
     *dynbuf = 0;
     /** Store the header for the room listing. **/
     ch->Send(
-                      "Index VNum    Trigger Name                        Type\r\n"
-                      "----- ------- -------------------------------------------------------\r\n");
+        "Index VNum    Trigger Name                        Type\r\n"
+        "----- ------- -------------------------------------------------------\r\n");
     /** Loop through the world and find each room. **/
     for (i = 0; i < top_of_trigt; i++) {
         /** Check to see if this room is one of the ones needed to be listed.    **/
@@ -3559,15 +3587,16 @@ struct lookup_table_t {
     //struct lookup_table_t *next;
     lookup_table_t() : uid(-1), c(NULL) {}
     lookup_table_t(long u, void * v) : uid(u), c(v) {}
-    bool operator==(const long i) {return (uid == i);}
-    
+    bool operator==(const long i) {
+        return (uid == i);
+    }
+
 }
 ;
 vector<lookup_table_t> lookup_table[BUCKET_COUNT];
-bool operator<(const lookup_table_t &a, const lookup_table_t &b)
-     {
-          return a.uid < b.uid;
-     }
+bool operator<(const lookup_table_t &a, const lookup_table_t &b) {
+    return a.uid < b.uid;
+}
 
 void init_lookup_table(void) {
 #if 0
@@ -3612,13 +3641,14 @@ Character *find_char_by_uid_in_lookup_table(long uid) {
 
     return NULL;
 #else
-ch_map::iterator ch = ch_lookup_table.find(uid);
+
+    ch_map::iterator ch = ch_lookup_table.find(uid);
     if (ch != ch_lookup_table.end()) {
-    if (ch->second == NULL)
-    return NULL;
-        if (DEAD((ch->second))) 
+        if (ch->second == NULL)
+            return NULL;
+        if (DEAD((ch->second)))
             log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
-        
+
 
         return (ch->second);
     }
@@ -3644,40 +3674,41 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid) {
 
     lt = find(lookup_table[bucket].begin(), lookup_table[bucket].end(), uid);
     if (lt != lookup_table[bucket].end())
-            return (struct obj_data *)((*lt).c);
+        return (struct obj_data *)((*lt).c);
 
     log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
     return NULL;
 #else
-obj_map::iterator o = obj_lookup_table.find(uid);
-if (o == obj_lookup_table.end()) {
-    log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
-    return NULL;
-} else
-    return (o->second);
+
+    obj_map::iterator o = obj_lookup_table.find(uid);
+    if (o == obj_lookup_table.end()) {
+        log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
+        return NULL;
+    } else
+        return (o->second);
 #endif
 }
 
 void addChToLookupTable(long uid, Character * c) {
-ch_map::iterator ch = ch_lookup_table.find(uid);
-if (ch == ch_lookup_table.end())
-ch_lookup_table[uid] = c;
-else {
-if ((ch->second) != c) {
-log("Adding %s to lookup table when %s already exists there.", GET_NAME(c), GET_NAME((ch->second)));
-}
-}
+    ch_map::iterator ch = ch_lookup_table.find(uid);
+    if (ch == ch_lookup_table.end())
+        ch_lookup_table[uid] = c;
+    else {
+        if ((ch->second) != c) {
+            log("Adding %s to lookup table when %s already exists there.", GET_NAME(c), GET_NAME((ch->second)));
+        }
+    }
 }
 
 void addObjToLookupTable(long uid, obj_data * o) {
-obj_map::iterator obj = obj_lookup_table.find(uid);
-if (obj == obj_lookup_table.end())
-obj_lookup_table[uid] = o;
-else {
-if ((obj->second) != o) {
-log("Adding %d to lookup table when %d already exists there.", o->item_number, obj->second->item_number);
-}
-}
+    obj_map::iterator obj = obj_lookup_table.find(uid);
+    if (obj == obj_lookup_table.end())
+        obj_lookup_table[uid] = o;
+    else {
+        if ((obj->second) != o) {
+            log("Adding %d to lookup table when %d already exists there.", o->item_number, obj->second->item_number);
+        }
+    }
 }
 void add_to_lookup_tablex(long uid, void *c) {
 #if 0
@@ -3709,14 +3740,14 @@ void add_to_lookup_tablex(long uid, void *c) {
 }
 
 void removeFromChLookupTable(long uid) {
-ch_map::iterator ch = ch_lookup_table.find(uid);
-if (ch != ch_lookup_table.end())
-ch_lookup_table.erase(uid);
+    ch_map::iterator ch = ch_lookup_table.find(uid);
+    if (ch != ch_lookup_table.end())
+        ch_lookup_table.erase(uid);
 }
 void removeFromObjLookupTable(long uid) {
-obj_map::iterator obj = obj_lookup_table.find(uid);
-if (obj != obj_lookup_table.end())
-obj_lookup_table.erase(uid);
+    obj_map::iterator obj = obj_lookup_table.find(uid);
+    if (obj != obj_lookup_table.end())
+        obj_lookup_table.erase(uid);
 }
 
 void remove_from_lookup_tablex(long uid) {
@@ -3756,7 +3787,7 @@ bool valid_id_num(long id) {
         if (d->character && GET_ID(d->character) == id)
             return FALSE;
     if (ch_lookup_table.find(id) != ch_lookup_table.end())
-            return FALSE;
+        return FALSE;
 
     return TRUE;
 }

@@ -846,6 +846,7 @@ int get_line(FILE *fl, char *buf) {
     strcpy(buf, temp); /* strcpy: OK, if buf >= READ_SIZE (256) */
     return (lines);
 }
+
 const char *get_dirname(char *filename, size_t len, char oname, int mode) {
     const char *prefix, *middle, *suffix;
 
@@ -1476,19 +1477,15 @@ if (levels.size() == 0 )
 void wiz_read_file(void) {
     void wiz_add_name(byte level,const char *name);
     int i;
-    extern int top_of_p_table;
     
     vector<level_rec>::iterator curr_level;
     for ( curr_level = levels.begin();curr_level != levels.end();curr_level++)
     (*curr_level).names.clear();
-
-    for (i = 0; i <= top_of_p_table; i++)
-        if (*player_table[i].name) {
-            if ( player_table[i].level >= MIN_LEVEL &&
-                    !IS_SET(player_table[i].flags, PINDEX_DELETED) &&
-                    !IS_SET(player_table[i].flags, PINDEX_SELFDELETE)) {
-                //log("Update Wizlist: %d - %s", player_table[i].level, player_table[i].name);
-                wiz_add_name(player_table[i].level, player_table[i].name);
+    /** change this to use a PlayerIndex function - mord **/
+    for (i = 0; i <= pi.TopOfTable(); i++)
+        if (*pi.NameByIndex(i)) {
+	    if ( pi.LevelByIndex(i) >= MIN_LEVEL && !pi.DeletedByIndex(i)) {
+		    wiz_add_name(pi.LevelByIndex(i), pi.NameByIndex(i));
             }
         }
 

@@ -10,6 +10,16 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.75  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.74  2007/06/26 10:48:05  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -5332,7 +5342,8 @@ void tick_grenade(void) {
        one of the extra flag bits. After the pin is pulled the grenade
        starts counting down. once it reaches zero, it explodes. */
 
-    for (i = object_list; i != NULL; i = i->next) {
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+	    i = (ob->second);
         if (i != NULL) {
             if (IS_SET_AR(GET_OBJ_EXTRA(i), ITEM_LIVE_GRENADE)) {
                 /* update ticks */
@@ -5344,8 +5355,7 @@ void tick_grenade(void) {
                     /* blow it up */
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
-                    s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
+                    s = 0;    /* we'll jump out after 5 containers deep and just delete the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;

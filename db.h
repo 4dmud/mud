@@ -169,27 +169,20 @@ extern NOTE_DATA *news_list;
 extern NOTE_DATA *changes_list;
 
 extern int TEMP_LOAD_CHAR;
-
-long get_ptable_by_name(const char *name);
-long get_ptable_by_id(long id);
 /* public procedures in db.c */
 void boot_db(void);
 void destroy_db(void);
 //mord ? ?
-int create_entry(const char *name);
 void zone_update(void);
 room_rnum real_room(room_vnum vnum);
 char *fread_string(FILE * fl, const char *error);
 string *fread_string_s(FILE *fl, const char *error);
-long get_id_by_name(const char *name);
-char *get_name_by_id(long id);
 void save_mud_time(struct time_info_data *when);
 //mord ? ?
 void free_extra_descriptions(struct extra_descr_data *edesc);
 //mord ? ?
 void free_text_files(void);
 //mord ? ?
-void free_player_index(void);
 zone_rnum real_zone(zone_vnum vnum);
 //mord
 room_rnum real_room(room_vnum vnum);
@@ -199,17 +192,16 @@ mob_rnum real_mobile(mob_vnum vnum);
 obj_rnum real_object(obj_vnum vnum);
 //mord
 
+bitvector_t asciiflag_conv(char *flag);
+void sprintbits(int data, char *dest);
+void half_chop(char *string, char *arg1, char *arg2);
 void char_to_store(Character *ch);
 int store_to_char(const char *name, Character *ch);
-int load_char(const char *name, Character *ch);
-int save_killlist(int id, struct kill_data *kills);
 #if USE_CREATE_CHAR
 Character *create_char(void);
 #endif
 Character *read_mobile(mob_vnum nr);
 int vnum_mobile(char *searchname, Character *ch);
-void save_player_index(void);
-
 struct obj_data *create_obj(void);
 void clear_object(struct obj_data *obj);
 void free_obj(struct obj_data *obj, int extracted);
@@ -303,7 +295,7 @@ public:
     int sky;			/* How is the sky                         */
 
     char *builders;		/* for OLC.  OBuild like extention,   *
-                  				 * part of OLC+                       */
+                      				 * part of OLC+                       */
 
     long zone_flags;		/* Zone Flags                     */
     int idle_time;		/* How long has it been idle      */
@@ -358,7 +350,7 @@ public:
         top = t;
         number = vn;
         if (n)
-        name = strdup(n);
+            name = strdup(n);
         reset_com rc = reset_com();
         rc.command = 'S';
         cmd.push_back(rc);
@@ -368,15 +360,15 @@ public:
     void Destroy() {
         if (this->name != NULL)
             free(this->name);
-            this->name = NULL;
+        this->name = NULL;
         if (this->builders != NULL)
             free(this->builders);
-            this->builders = NULL;
+        this->builders = NULL;
     }
 
-    ~Zone() {
-    }
-};
+~Zone() {}
+}
+;
 /** genzon.c - at the bottom - Mord**/
 /** zone vector compare **/
 bool operator< (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
@@ -402,8 +394,8 @@ struct reset_q_element {
     struct reset_q_element *next;
 
     reset_q_element() {
-            zone_to_reset=0;
-            next=NULL;
+        zone_to_reset=0;
+        next=NULL;
     }
 }
 ;
@@ -416,44 +408,13 @@ struct reset_q_type {
     struct reset_q_element *tail;
 
     reset_q_type() {
-            head=NULL;
-            tail = NULL;
+        head=NULL;
+        tail = NULL;
     }
 }
 ;
 
 
-
-struct player_index_element {
-    char *name;
-    long id;
-    int level;
-    int flags;
-    time_t last;
-    long account;
-    short clan;
-    short rank;
-    bool repair;
-    gold_int gc_amount;
-    short gt_amount;
-
-    player_index_element() {
-            name=NULL;
-            id=0;
-            level=0;
-            flags=0;
-            last=0;
-            account=0;
-            clan=0;
-    		  rank=0;
-    		  repair = (bool)0;
-    		  gc_amount = 0;
-    		  gt_amount = 0;
-    }
-}
-;
-typedef vector<player_index_element>::iterator plrindex_it;
-void remove_player(plrindex_it pfilepos);
 
 struct help_index_element {
     char	*keywords;
@@ -511,7 +472,7 @@ extern map<mob_vnum, struct index_data*> mob_index;
 extern struct index_data *obj_index;
 extern struct shop_data *shop_index;
 extern int top_shop;
-extern struct index_data **trig_index;
+extern index_data **trig_index;
 extern struct trig_data *trigger_list;
 extern unsigned int top_of_trigt;
 extern long max_mob_id;
@@ -522,15 +483,13 @@ extern vector <Room *> world_vnum;
 extern struct obj_data *obj_proto;
 //extern Zone *zone_table;
 extern vector <Zone> zone_table;
-extern struct obj_data *object_list;
-extern struct obj_data *dead_obj;	/* delayed obj removal   */
+
+extern map<long, obj_data *> object_list;
+extern map<long, obj_data *> dead_obj;  /* delayed obj removal   */
 #endif /* __DB_C__ */
 extern Descriptor *descriptor_list;
 extern Character *character_list;
-extern vector<player_index_element> player_table;
-extern int top_of_p_table;
-
-
+typedef map<long, obj_data *> obj_list_type;
 //extern struct htree_node *mob_htree;
 //extern struct htree_node *obj_htree;
 extern map<obj_vnum,obj_rnum> obj_vTor;
@@ -567,3 +526,6 @@ struct index_data * GetMobIndex(mob_vnum vn);
 void SetMobIndex(mob_vnum vn, struct index_data *c);
 int GetMobIndexCount();
 mob_vnum DeleteMobIndex(mob_vnum vn);
+
+#include "playerindex.h"
+

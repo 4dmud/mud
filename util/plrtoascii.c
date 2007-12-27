@@ -5,7 +5,7 @@
 #include "../utils.h"
 #include "../db.h"
 
-void sprintbits(long vektor, char* outstring);
+//void sprintbits(long vektor, char* outstring);
 
 void convert(char* filename)
 {

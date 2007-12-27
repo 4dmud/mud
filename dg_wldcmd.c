@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/31 10:39:16 $
-*  $Revision: 1.14 $
+*  $Date: 2007/08/19 01:06:10 $
+*  $Revision: 1.15 $
 **************************************************************************/
 
 #include "conf.h"
@@ -26,7 +26,6 @@
 
 void die(Character *ch, Character *killer);
 zone_rnum real_zone_by_thing(room_vnum vznum);
-bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
 void (name)(Room *room, char *argument, int cmd, int subcmd)

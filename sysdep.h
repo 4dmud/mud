@@ -157,9 +157,17 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <ios>
 #include <iterator>
 
+#if __STDC_VERSION__ < 199901L
+# if __GNUC__ >= 2
+#  define __func__ __FUNCTION__
+# else
+#  define __func__ "<unknown>"
+# endif
+#endif
 
 #if     (defined (STDC_HEADERS) || defined (__GNU_LIBRARY__))
 #include <stdlib.h>
@@ -716,6 +724,14 @@ size_t strlcpy(char *dest, const char *src, size_t copylen);
 
 #endif /* __COMM_C__ */
 
+#include "dlib/dir_nav.h"
+#include "dlib/queue.h"
+#include "dlib/static_set.h"
 
 using namespace std;
+using namespace dlib;
+typedef queue<directory>::kernel_2a queue_of_dirs;
+typedef queue<file>::kernel_2a queue_of_files;
+typedef static_set<file>::kernel_1a set_of_files;
+typedef static_set<directory>::kernel_1a set_of_dirs;
 #endif /* NO_LIBRARY_PROTOTYPES */

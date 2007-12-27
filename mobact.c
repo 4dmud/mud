@@ -47,8 +47,8 @@ void mobile_activity(void) {
     int door, found, max;
     memory_rec *names;
 
-    for (obj = object_list; obj; obj = best_obj) {
-        best_obj = obj->next;
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+	    obj = (ob->second);
         hunt_location(&obj, STRUCT_IS_OBJ);
     }
 

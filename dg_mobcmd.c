@@ -27,6 +27,16 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.26  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.25  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -133,7 +143,6 @@ void raw_kill(Character *ch, Character *killer);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
                         int upper_vnum);
 void reset_zone(zone_rnum zone);
-bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
 void die(Character *ch, Character *killer);
 int valid_dg_target(Character *ch, int allow_gods);

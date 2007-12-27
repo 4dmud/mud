@@ -163,20 +163,26 @@ room_rnum find_forest_rand(void) {
 }
 
 ACMD(forest_find) {
-    OBJ_DATA *tree, *next_tree;
+    OBJ_DATA *tree;
     skip_spaces(&argument);
     if (!*argument) {
         room_rnum ffr = find_forest_rand();
         if (ffr)
             ch->Send( "A forest room is [%d] (Total Trees [%d])\r\n", ffr->number, tree_total);
     } else if (!strcmp(argument, "clear")) {
-        for (tree = object_list; tree; tree = next_tree) {
-            next_tree = tree->next;
-            if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING)) {
-                
-                extract_obj(tree);
-            }
-        }
+	    vector<long> ex_list;
+	/** Find all items that need extracting **/
+	for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+		tree = (ob->second);
+		/*tree check*/
+		if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING))
+					ex_list.push_back(GET_ID(tree));
+				
+			}
+	
+	/** extract them now **/
+	for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++)
+		extract_obj(object_list[(*v)]);
         save_forest();
         ch->Send( "Cleared and saved. Total trees [%d]\r\n", tree_total);
     } else if (!strcmp(argument, "check")) {
@@ -225,7 +231,8 @@ int save_forest(void) {
         log("SYSERR: Can't write to '%s' forest file.", FOREST_FILE);
         return -1;
     }
-    for (k = object_list; k; k = k->next) {
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+	    k = (ob->second);
         if (k->in_room && GET_OBJ_TYPE(k) == ITEM_TREE && GET_OBJ_VNUM(k) == NOTHING) {
             /** lets clean this up **/
             count++;
@@ -304,32 +311,41 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3) {
     return (1);
 }
 void check_all_trees(void) {
-    struct obj_data *obj, *tmp;
+    struct obj_data *obj;
     time_t tm;
     int ext = 0, added = 0, created = 0;
     tm = time(0);
+    vector<long> ex_list;
     log("TREES: Updating all trees...");
 
-    for (obj = object_list; obj; obj = tmp) {
-        tmp = obj->next;
-        /*tree check*/
-        if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING) {
-            if (GET_OBJ_VAL(obj, 0) > tm) {
-                if (GET_OBJ_VAL(obj, 1) < MAX_TREE_AGE) {
-                    added++;
-                    GET_OBJ_VAL(obj, 0) = time(0) + (5 * SECS_PER_REAL_DAY);
-                    GET_OBJ_VAL(obj, 1)++;
-                    parse_tree_name(obj);
-                } else {
-                    ext++;
-                    if (IN_ROOM(obj) != NULL)
-                        send_to_room(IN_ROOM(obj), "With a sigh and a whisper %s collapses to the forest floor.\r\n", obj->short_description);
-                    extract_obj(obj);
-                }
-            }
-            /*tree check*/
-        }
+   
+    /** Find all items that need extracting **/
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+	    obj = (ob->second);
+	    /*tree check*/
+	    if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING) {
+		    if (GET_OBJ_VAL(obj, 0) > tm) {
+			    if (GET_OBJ_VAL(obj, 1) < MAX_TREE_AGE) {
+				    added++;
+				    GET_OBJ_VAL(obj, 0) = time(0) + (5 * SECS_PER_REAL_DAY);
+				    GET_OBJ_VAL(obj, 1)++;
+				    parse_tree_name(obj);
+			    } else {
+				    ext++;
+				    if (IN_ROOM(obj) != NULL)
+					    send_to_room(IN_ROOM(obj), "With a sigh and a whisper %s collapses to the forest floor.\r\n", obj->short_description);
+				    ex_list.push_back(GET_ID((ob->second)));
+			    }
+		    }
+		    /*tree check*/
+	    }
+		    
+	    
     }
+    /** extract them now **/
+    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++)
+	    extract_obj(object_list[(*v)]);
+    
     created = TREE_MAX - tree_total;
 
     create_trees();

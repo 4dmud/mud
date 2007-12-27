@@ -434,7 +434,8 @@ ASPELL(spell_locate_object) {
     DYN_CREATE;
     *dynbuf = 0;
 
-    for (i = object_list; i && (j > 0); i = i->next) {
+	    for (obj_list_type::iterator ob = object_list.begin();(j > 0) && ob != object_list.end(); ob++) {
+		    i = (ob->second);
         if (!isname_full(strarg, i->name))
             continue;
         if (GET_LEVEL(ch) < LVL_IMMORT && number(0, 1))

@@ -440,7 +440,7 @@ ACMD(do_linkload) {
 
     if (GET_IDNUM(ch))
         victim->loader = GET_IDNUM(ch);
-    if (load_char(arg, victim) > -1) {
+    if (pi.LoadChar(arg, victim) > -1) {
         if (GET_LEVEL(victim) < GET_LEVEL(ch)) {
             new_mudlog( BRF, GET_LEVEL(ch) + 1, TRUE, "(GC) %s has link-loaded %s.", GET_NAME(ch), GET_NAME(victim));
             add_char_to_list(victim);
@@ -829,7 +829,7 @@ ACMD(do_finger) {
                      ch);
         return;
     }
-    if (!(id = get_id_by_name(arg))) {
+    if (!(id = pi.IdByName(arg))) {
         send_to_char("There is no such player.\r\n", ch);
         return;
     }
@@ -894,7 +894,7 @@ ACMD(do_finger) {
         GET_KILL_CNT(vict), GET_RIP_CNT(vict), GET_PK_CNT(vict),
         GET_AGE(vict), GET_HEIGHT(vict), GET_WEIGHT(vict),
         ((!GET_CLAN(vict)) ? "<none>" : clan[find_clan_by_id(GET_CLAN(vict))].name),
-        romance_status(vict), PARTNER(vict) <= 0 ? "<none>" : get_name_by_id(PARTNER(vict)),
+        romance_status(vict), PARTNER(vict) <= 0 ? "<none>" : pi.NameById(PARTNER(vict)),
         baby_status(vict, buf, sizeof(buf)),
         vict->player.description ? vict->player.description: "They are unremarkable",
         ctime(&vict->player.time.logon),

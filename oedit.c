@@ -24,6 +24,7 @@
 #include "dg_olc.h"
 #include "fight.h"
 #include "descriptor.h"
+#include "strutil.h"
 /*------------------------------------------------------------------------*/
 
 /*
@@ -276,7 +277,8 @@ void oedit_save_internally(Descriptor *d) {
     OLC_SCRIPT(d) = NULL;
 
     /* this takes care of the objects currently in-game */
-    for (obj = object_list; obj; obj = obj->next) {
+    for (obj_list_type::iterator ij = object_list.begin(); ij != object_list.end(); ij++) {
+	    obj = (ij->second);
         if (obj->item_number != robj_num)
             continue;
         /* remove any old scripts */
@@ -1153,7 +1155,8 @@ void oedit_parse(Descriptor *d, char *arg) {
             break;
         if (OLC_OBJ(d)->name)
             free(OLC_OBJ(d)->name);
-        OLC_OBJ(d)->name = str_udup(arg);
+	OLC_OBJ(d)->name = ChToLower(str_udup(arg)); /** object names should always be in lower case **/
+	
         break;
 
     case OEDIT_SHORTDESC:

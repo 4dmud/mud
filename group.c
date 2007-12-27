@@ -44,7 +44,7 @@ void display_group(Character *ch)
     sort_group(tch->group);
     for (i = 0; (i < MAX_GROUP) && (GET_GROUP(tch, i) != NOBODY); i++) {
 	ch->Send( "%2d: %12s %3.2f %s", i,
-			 get_name_by_id(GET_GROUP(tch, i)),
+			 pi.NameById(GET_GROUP(tch, i)),
 			 GET_PERC(GET_GROUP(tch, i)),
 			 i % 2 ? "\r\n" : "    ");
     }

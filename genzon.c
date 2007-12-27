@@ -320,8 +320,8 @@ int Zone::write_zone() {
      * P (Put)     Obj-Vnum   Wld-Max   Target-Obj-Vnum
      * D (Door)    Room-Vnum  Door-Dir  Door-State
      * R (Remove)  Room-Vnum  Obj-Vnum  Unused
-            * T (Trigger) Trig-type  Trig-Vnum Room-Vnum
-            * V (var)     Trig-type  Context   Room-Vnum Varname Value
+     * T (Trigger) Trig-type  Trig-Vnum Room-Vnum
+     * V (var)     Trig-type  Context   Room-Vnum Varname Value
      * -------------------------------------------------
      */
 #define ZPCMD(cmds) (this->cmd[(cmds)])

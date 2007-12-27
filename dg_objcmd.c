@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/06/14 23:55:39 $
-*  $Revision: 1.17 $
+*  $Date: 2007/08/19 01:06:10 $
+*  $Revision: 1.18 $
 **************************************************************************/
 
 #include "conf.h"
@@ -25,7 +25,6 @@
 
 
 void die(Character *ch, Character *killer);
-bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
 zone_rnum real_zone_by_thing(room_vnum vznum);
 #define OCMD(name)  \

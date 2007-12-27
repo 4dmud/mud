@@ -10,6 +10,16 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.57  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.56  2007/06/26 10:48:04  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -249,8 +259,6 @@
 
 /* extern variables */
 extern bool LS_REMOVE;
-
-extern int top_of_p_table;
 
 /* External functions */
 void remove_corpse_from_list(OBJ_DATA *corpse);
@@ -914,15 +922,15 @@ int automeld(struct obj_data *obj) {
       }
     }
     */
-    for (i = 0; i <= top_of_p_table; i++) {
-        if (*player_table[i].name) {
-            if (player_table[i].id == GET_OBJ_VAL(obj, 0)) {
+    for (i = 0; i <= pi.TopOfTable(); i++) {
+	    if (*pi.NameByIndex(i)) {
+		    if (pi.IdByIndex(i) == GET_OBJ_VAL(obj, 0)) {
                 ch = new Character(FALSE);
-                if (player_table[i].id)
-                    ch->loader = player_table[i].id;
-                if (load_char(player_table[i].name, ch) > -1) {
+		if (pi.IdByIndex(i))
+			ch->loader = pi.IdByIndex(i);
+		if (pi.LoadChar(pi.NameByIndex(i), ch) > -1) {
                     if (!ch) {
-                        new_mudlog( CMP, 51, TRUE, "AUTOMELD: %s (error)", player_table[i].name);
+			    new_mudlog( CMP, 51, TRUE, "AUTOMELD: %s (error)", pi.NameByIndex(i));
                         delete (ch);
                         return 0;
                     }
@@ -2884,7 +2892,7 @@ void perform_wear(Character *ch, struct obj_data *obj, int where) {
     }
     */
     if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner) {
-        ch->Send( "You can't wear that! It is owned by %s\r\n", get_name_by_id(obj->owner));
+        ch->Send( "You can't wear that! It is owned by %s\r\n", pi.NameById(obj->owner));
         return;
     }
 
@@ -3497,11 +3505,10 @@ void unhitch_item(struct obj_data *obj) {
     }
 }
 void unhitch_mob(Character *ch) {
-    struct obj_data *tmp;
     if (ch && ch->hitched) {
-        for (tmp = object_list;tmp;tmp = tmp->next) {
-            if (ch->hitched == tmp) {
-                tmp->hitched = NULL;
+	    for (obj_list_type::iterator i = object_list.begin(); i != object_list.end(); i++) {
+		    if (ch->hitched == (i->second)) {
+			    (i->second)->hitched = NULL;
                 break;
             }
         }
@@ -4129,7 +4136,6 @@ void check_timer(obj_data *obj) {
 
     if (GET_TIMER_EVENT(obj) == NULL ||
             (t < event_time(GET_TIMER_EVENT(obj)))) {
-     struct timer_event_data *tmr;
 
         /* take off old event, create updated event */
         if (GET_TIMER_EVENT(obj) != NULL)
@@ -4137,10 +4143,22 @@ void check_timer(obj_data *obj) {
         else
             GET_TIMER_EVENT(obj) = NULL;
 
-        tmr = new timer_event_data(obj);
-        GET_TIMER_EVENT(obj) = event_create(timer_event, tmr, t, EVENT_TYPE_TIMER);
+	GET_TIMER_EVENT(obj) = event_create(timer_event, new timer_event_data(obj), t, EVENT_TYPE_TIMER);
     }
 }
+/*
+ void FillNames() {
+	 if (name && *name) {
+		 char newlistbuf[strlen(name)+1], *newlist, *curtok;
+		 strlcpy(newlistbuf, name, sizeof(newlistbuf));
+		 newlist = newlistbuf;
+		 Names.clear();
+		 for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
+			 if (curtok)
+				 Names.push_back(curtok);
+		 sort(Names.begin(), Names.end());
+	 }
+}*/
 
 EVENTFUNC(timer_event) {
     struct timer_event_data *timer_event_obj = (struct timer_event_data *)event_obj;

@@ -207,3 +207,7 @@ find.cpp
 character.h
 regen.h
 rooms.cpp
+playerindex.cpp
+playerindex.h
+compresser.cpp
+compressor.h

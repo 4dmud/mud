@@ -9,6 +9,16 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.40  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.39  2007/06/26 10:48:05  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -596,14 +606,14 @@ C_FUNC(allow_follow)
   Character *tch = find_char(d->character->loader);
   if (!tch)
   {
-    d->Output("%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
+    d->Output("%s isn't in the game any longer.\r\n", pi.NameById(d->character->loader));
     return;
   }
   if ('Y' == toupper(*arg))
     perform_group(d->character, tch);
   else
   {
-    d->Output("You disallow %s to join your group.\r\n", get_name_by_id(d->character->loader));
+    d->Output("You disallow %s to join your group.\r\n", pi.NameById(d->character->loader));
     *tch << GET_NAME(d->character) << " disallows you to join " << HSHR(d->character) << " group.\r\n";
   }
   d->character->loader = -1;

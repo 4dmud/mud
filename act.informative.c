@@ -24,6 +24,7 @@
 #include "clan.h"
 #include "fight.h"
 #include "descriptor.h"
+#include "compressor.h"
 
 
 /*
@@ -514,27 +515,27 @@ void look_at_char(Character *i, Character *ch) {
             if (ROMANCE(i) == 2) {
                 /* Char is engaged */
                 if (i == ch)
-                    ch->Send( "You have an engagement ring from %s.\r\n", get_name_by_id(PARTNER(i)));
+                    ch->Send( "You have an engagement ring from %s.\r\n", pi.NameById(PARTNER(i)));
                 else
                     ch->Send( "%s has an engagement ring from %s.\r\n",
-                              GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
+                              GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : pi.NameById(PARTNER(i)));
 
             } else if (ROMANCE(i) == 3) {
                 /* Char is married */
                 if (i == ch)
-                    ch->Send( "You have a wedding ring from %s.", get_name_by_id(PARTNER(i)));
+                    ch->Send( "You have a wedding ring from %s.", pi.NameById(PARTNER(i)));
                 else
                     ch->Send( "%s has a wedding ring from %s.",
-                              GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
+                              GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : pi.NameById(PARTNER(i)));
 
 
             } else if (ROMANCE(i) == 1) {
                 /* Char is dating */
                 if (i == ch)
-                    ch->Send(  "You are dating %s.\r\n", get_name_by_id(PARTNER(i)));
+                    ch->Send(  "You are dating %s.\r\n", pi.NameById(PARTNER(i)));
                 else
                     ch->Send( "%s is dating %s.\r\n", GET_NAME(i),
-                              ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
+                              ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : pi.NameById(PARTNER(i)));
 
 
             } else if (ROMANCE(i) == 0) {
@@ -1050,8 +1051,8 @@ void parse_room_name(room_rnum in_room, char *bufptr, size_t len) {
 }
 
 void parse_room_description(room_rnum in_room, char *bufptr, size_t len) {
-    if (!strncmp(in_room->description, "This description is yet unfinished...\r\n", 25) ||
-            compares("wilderness", in_room->description))
+	if (!strncmp(in_room->GetDescription(), "This description is yet unfinished...\r\n", 25) ||
+		    compares("wilderness", in_room->GetDescription()))
         switch (SECT(in_room)) {
         case SECT_SPACE:
             snprintf(bufptr, len,
@@ -1172,7 +1173,7 @@ void parse_room_description(room_rnum in_room, char *bufptr, size_t len) {
             break;
         }
     else
-        snprintf(bufptr, len,  "%s", in_room->description);
+	    snprintf(bufptr, len,  "%s", in_room->GetDescription());
 
 }
 
@@ -1238,7 +1239,7 @@ void look_at_room(Character *ch, int ignore_brief) {
             parse_room_description(view_room, tbuf, sizeof(tbuf));
             ch->Send( "%s", tbuf);
         } else {
-            ch->Send( "%s", view_room->description);
+		ch->Send( "%s", view_room->GetDescription());
             //if (ch->Flying())
             //ch->Send( "You are flying a few feet up in the air.\r\n");
         }
@@ -2326,19 +2327,19 @@ ACMD(do_score) {
         ch->Send( "You are single.\r\n");
         break;
     case 1:
-        ch->Send( "You are dating %s.\r\n", get_name_by_id(PARTNER(ch)));
+        ch->Send( "You are dating %s.\r\n", pi.NameById(PARTNER(ch)));
         break;
     case 2:
-        ch->Send( "You are engaged to %s.\r\n", get_name_by_id(PARTNER(ch)));
+        ch->Send( "You are engaged to %s.\r\n", pi.NameById(PARTNER(ch)));
         break;
     case 3:
-        ch->Send( "You are married to %s.\r\n", get_name_by_id(PARTNER(ch)));
+        ch->Send( "You are married to %s.\r\n", pi.NameById(PARTNER(ch)));
         break;
     case 4:
-        ch->Send( "You are asking %s out.\r\n", get_name_by_id(PARTNER(ch)));
+        ch->Send( "You are asking %s out.\r\n", pi.NameById(PARTNER(ch)));
         break;
     case 5:
-        ch->Send( "You are proposing to %s.\r\n", get_name_by_id(PARTNER(ch)));
+        ch->Send( "You are proposing to %s.\r\n", pi.NameById(PARTNER(ch)));
         break;
     }
     /* MatingMod Additions */
@@ -3582,8 +3583,7 @@ void print_object_location(int num, struct obj_data *obj,
         sprintf(buffer + strlen(buffer), "[Trig]");
 
     if (obj->owner != 0)
-        sprintf(buffer + strlen(buffer), " Ownr:%s ", get_name_by_id(obj->owner));
-
+        sprintf(buffer + strlen(buffer), " Ownr:%s ", pi.NameById(obj->owner));
 
     if (obj->in_room != NULL) {
         sprintf(buffer + strlen(buffer), "[%5d] %s\r\n",
@@ -3657,7 +3657,8 @@ void perform_immort_where(Character *ch, char *arg) {
 
             }
         counter = 0;
-        for (num = 0, k = object_list; k; k = k->next) {
+	for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+		k = (ob->second);
             if (CAN_SEE_OBJ(ch, k) && isname_full(arg, k->name)) {
                 found = 1;
                 print_object_location(++num, k, ch, TRUE, buf);
@@ -4977,4 +4978,17 @@ void container_disp(Character *ch,OBJ_DATA * obj) {
         ch->Send( "[%s] - max %d\r\n", how_good(percent), max);
     }
 
+}
+
+ACMD(do_compresstest) {
+	long id;
+	char *ret;
+	char *test = "The C++ strings library provides the definitions of the basic_string class,\r\n which is a class template specifically designed to manipulate strings of characters\r\n of any character type. It also include two specific instantiations:\r\n string and wstring, which respectively use char and wchar_t as character types.\r\n";
+	ch->Send("Start: ");
+	ch->Send(test);
+	id = compressor.CompressToId(test);
+	ret = compressor.InflateFromId(id);
+	ch->Send("End: ");
+	ch->Send(ret);
+	free(ret);
 }

@@ -59,7 +59,8 @@ int update_objects(struct obj_data *refobj)
   struct obj_data *obj, swap;
   int count = 0;
 
-  for (obj = object_list; obj; obj = obj->next) {
+  for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+	  obj = (ob->second);
     if (obj->item_number != refobj->item_number)
       continue;
 
@@ -94,7 +95,6 @@ int update_objects(struct obj_data *refobj)
 obj_rnum adjust_objects(obj_rnum refpt)
 {
   int shop, i, zone, cmd_no;
-  struct obj_data *obj;
 
 #if CIRCLE_UNSIGNED_INDEX
   if (refpt == NOTHING || refpt > top_of_objt)
@@ -106,8 +106,8 @@ obj_rnum adjust_objects(obj_rnum refpt)
   /*
    * Renumber live objects.
    */
-  for (obj = object_list; obj; obj = obj->next)
-    GET_OBJ_RNUM(obj) += (GET_OBJ_RNUM(obj) >= refpt);
+  for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+	  GET_OBJ_RNUM((ob->second)) += (GET_OBJ_RNUM((ob->second)) >= refpt);
 
   /*
    * Renumber zone table.

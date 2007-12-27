@@ -273,15 +273,13 @@ void qic_scan_rent(void) {
             //          log("%5d, %3d.", obj_index[i].vnum, obj_index[i].qic->items);
         }
 
-    for (i = 0; i < player_table.size(); i++) {
-        if (!IS_SET(player_table[i].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[i].flags, PINDEX_SELFDELETE) &&
-                (!player_table[i].name || !*player_table[i].name))
+    for (i = 0; i < pi.Size(); i++) {
+	    if (pi.DeletedByIndex(i))
             continue;
         timeout = 120;
         timeout *= SECS_PER_REAL_DAY;
-        if ((tm - player_table[i].last) < timeout)
-            scan_char_objects_qic(player_table[i].name, player_table[i].id); //objsave.c
+	if ((tm - pi.LastByIndex(i)) < timeout)
+            scan_char_objects_qic(pi.NameByIndex(i), pi.IdByIndex(i)); //objsave.c
     }
 }
 
@@ -409,9 +407,9 @@ ACMD(do_owners) {
         if (obj_index[i].qic->owners[j] < 1)
             break;
         ch->Send( "%20.20s  %20.20s\r\n",
-                  get_name_by_id(obj_index[i].qic->owners[j]),
+                  pi.NameById(obj_index[i].qic->owners[j]),
                   obj_index[i].qic->owners[j +
-                                           1] ? get_name_by_id(obj_index[i].
+                                           1] ? pi.NameById(obj_index[i].
                                                                qic->
                                                                owners[j +
                                                                       1]) :

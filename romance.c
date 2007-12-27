@@ -350,7 +350,7 @@ ACMD(do_propose)
     return;
   case 3:
     ch->Send(
-                     "But you're married already! %s wouldn't approve!\r\n", get_name_by_id(PARTNER(ch)));
+                     "But you're married already! %s wouldn't approve!\r\n", pi.NameById(PARTNER(ch)));
     return;
   case 4:
     ch->Send( "But you're being asked out! That would be rude!\r\n");
@@ -397,14 +397,14 @@ ACMD(do_propose)
     else if (ROMANCE(victim) == 2)
     {     /* Are they already engaged? */
       ch->Send( "But they're already engaged to %s!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if (ROMANCE(victim) == 3)
     {     /* Are they already married? */
       ch->Send(
                        "But they're married already! %s wouldn't approve!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if (ROMANCE(victim) == 4)
@@ -472,7 +472,7 @@ ACMD(do_breakup)
   {
     ch->Send(
                      "But you're already married! You have to DIVORCE %s!\r\n",
-                     get_name_by_id(PARTNER(ch)));
+                     pi.NameById(PARTNER(ch)));
     return;
   }
   else
@@ -508,21 +508,21 @@ ACMD(do_breakup)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send( "But they're dating %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 2)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send( "But they're engaged to %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send( "But they're married to %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
@@ -530,7 +530,7 @@ ACMD(do_breakup)
     {
       ch->Send(
                        "They're already married to you! You have to DIVORCE %s!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if (PARTNER(victim) != GET_IDNUM(ch))
@@ -670,8 +670,8 @@ void marry_them(Character *ch, Character *victim,
     {
       /* Regular Marriage */
       /* They're engaged to each other, now perform the marriage. */
-      ch->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(ch)));
-      victim->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(victim)));
+      ch->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), pi.NameById(PARTNER(ch)));
+      victim->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), pi.NameById(PARTNER(victim)));
       imm->Send( "You declare %s and %s man and wife!\r\n",   GET_NAME(ch),GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s man and wife!\r\n",
                GET_NAME(imm), GET_NAME(ch), GET_NAME(victim));
@@ -680,9 +680,9 @@ void marry_them(Character *ch, Character *victim,
     else
     {          /* Same-sex Marriage */
       ch->Send( "%s declares you married to %s!\r\n",
-                       GET_NAME(imm), get_name_by_id(PARTNER(ch)));
+                       GET_NAME(imm), pi.NameById(PARTNER(ch)));
       victim->Send( "%s declares you married to %s!\r\n",
-                       GET_NAME(imm), get_name_by_id(PARTNER(victim)));
+                       GET_NAME(imm), pi.NameById(PARTNER(victim)));
       imm->Send("You declare %s and %s married!\r\n",
                        GET_NAME(ch), GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s married!\r\n",
@@ -802,21 +802,21 @@ ACMD(do_divorce)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send( "But they're dating %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 2)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send("But they're engaged to %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
       ch->Send( "But they're married to %s, not you!\r\n",
-                       get_name_by_id(PARTNER(victim)));
+                       pi.NameById(PARTNER(victim)));
       return;
     }
     else if (PARTNER(victim) != GET_IDNUM(ch))

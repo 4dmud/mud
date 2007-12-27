@@ -37,8 +37,7 @@ extern int syslogfd;
 #define GET_TASK(ch)    ((ch)->task)
 #define GET_MSG_RUN(ch) 	((ch)->msg_run)
 #define GET_TASK_NUM(ch)	((ch)->on_task)
-long get_acc_by_id(long id);
-#define GET_ACC(ch)  (get_acc_by_id(GET_IDNUM((ch))))
+#define GET_ACC(ch)  (pi.GetAccById(GET_IDNUM((ch))))
 
 #define IS_ROGUE(chclass) (chclass == CLASS_THIEF || chclass == CLASS_GYPSY || chclass == CLASS_RANGER)
 #define IS_FIGHTER(chclass) (chclass == CLASS_WARRIOR || chclass == CLASS_HUNTER)
@@ -103,11 +102,11 @@ int use_stamina(Character *ch, int amount);
 /* flags for show_list_to_char */
 
 enum {
-  eItemNothing,   /* item is not readily accessible */
-  eItemGet,     /* item on ground */
-  eItemDrop,    /* item in inventory */
-  eItemBid     /* auction item */
-  };
+    eItemNothing,   /* item is not readily accessible */
+    eItemGet,     /* item on ground */
+    eItemDrop,    /* item in inventory */
+    eItemBid     /* auction item */
+};
 
 /*replace parts of strings*/
 char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
@@ -123,11 +122,10 @@ void    *sortl(void *list, void *(*getnext)(void *),
                void (*setnext)(void *, void *),
                int (*compare)(void *, void *));          /* Ll_Qsort.C     */
 
-typedef struct list_struct
-{
-  struct list_struct *next;
-  char *key;
-  /* other stuff */
+typedef struct list_struct {
+    struct list_struct *next;
+    char *key;
+    /* other stuff */
 }
 list;
 
@@ -169,6 +167,7 @@ size_t new_sprinttype(int type, const char *names[], char *result,
 void sprintbit(bitvector_t vektor, const char *names[], char *result, size_t r_len);
 void sprinttype(int type, const char *names[], char *result, size_t r_len);
 int get_line(FILE * fl, char *buf);
+int get_line(ifstream &fl, char *buf);
 int get_filename(const char *orig_name, char *filename, int mode);
 void sprintbitarray(int bitvector[], const char *name[], int maxar,
                     char *result, size_t r_len);
@@ -217,18 +216,42 @@ unsigned long circle_random(void);
 #undef MIN
 #endif
 
-inline gold_int MIN(gold_int a, gold_int b) {return (a < b ? a : b);}
-inline gold_int MAX(gold_int a, gold_int b) {return (a > b ? a : b);}
-inline int MIN(int a, int b) {return (a < b ? a : b);}
-inline int MAX(int a, int b) {return (a > b ? a : b);}
-inline float MIN(float a, float b) {return (a < b ? a : b);}
-inline float MAX(float a, float b) {return (a > b ? a : b);}
-inline double MIN(double a, double b) {return (a < b ? a : b);}
-inline double MAX(double a, double b) {return (a > b ? a : b);}
-inline unsigned int MIN(unsigned int a, unsigned int b) {return (a < b ? a : b);}
-inline unsigned int MAX(unsigned int a, unsigned int b) {return (a > b ? a : b);}
-inline long MIN(long a, long b) {return (a < b ? a : b);}
-inline long MAX(long a, long b) {return (a > b ? a : b);}
+inline gold_int MIN(gold_int a, gold_int b) {
+    return (a < b ? a : b);
+}
+inline gold_int MAX(gold_int a, gold_int b) {
+    return (a > b ? a : b);
+}
+inline int MIN(int a, int b) {
+    return (a < b ? a : b);
+}
+inline int MAX(int a, int b) {
+    return (a > b ? a : b);
+}
+inline float MIN(float a, float b) {
+    return (a < b ? a : b);
+}
+inline float MAX(float a, float b) {
+    return (a > b ? a : b);
+}
+inline double MIN(double a, double b) {
+    return (a < b ? a : b);
+}
+inline double MAX(double a, double b) {
+    return (a > b ? a : b);
+}
+inline unsigned int MIN(unsigned int a, unsigned int b) {
+    return (a < b ? a : b);
+}
+inline unsigned int MAX(unsigned int a, unsigned int b) {
+    return (a > b ? a : b);
+}
+inline long MIN(long a, long b) {
+    return (a < b ? a : b);
+}
+inline long MAX(long a, long b) {
+    return (a > b ? a : b);
+}
 
 
 
@@ -329,8 +352,9 @@ extern const struct race_data races[NUM_RACES];
 
 #define YESNO(a) ((a) ? "YES" : "NO")
 #define ONOFF(a) ((a) ? "ON" : "OFF")
-
+#if !defined(LOWER)
 #define LOWER(c)   (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
+#endif
 #define UPPER(c)   (((c)>='a'  && (c) <= 'z') ? ((c)+('A'-'a')) : (c) )
 
 #define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r')
@@ -420,10 +444,18 @@ void set_skill(Character *ch, int skill, int amount);
 #define TOGGLE_BIT_AR(var, bit)   ((var)[Q_FIELD(bit)] ^= Q_BIT(bit))
 
 
+#if !defined(IS_SET)
 #define IS_SET(flag,bit)  ((flag) & (bit))
+#endif
+#if !defined(SET_BIT)
 #define SET_BIT(var,bit)  ((var) |= (bit))
+#endif
+#if !defined(REMOVE_BIT)
 #define REMOVE_BIT(var,bit)  ((var) &= ~(bit))
+#endif
+#if !defined(TOGGLE_BIT)
 #define TOGGLE_BIT(var,bit) ((var) ^= (bit))
+#endif
 
 /*
  * Accessing player specific data structures on a mobile is a very bad thing
@@ -549,7 +581,6 @@ int has_body(Character *ch, int flag);
 
 #define GET_LEVEL(ch)   ((ch)->player.level)
 #define GET_PASSWD(ch)	((ch)->player.passwd)
-#define GET_PFILEPOS(ch) ((ch)->pfilepos)
 
 /*
  * I wonder if this definition of GET_REAL_LEVEL should be the definition
@@ -1178,5 +1209,3 @@ bool valid_id_num(long id);
 int fileExists (char * fileName);
 
 #define FTOI(f) ((int)((f)))
-
-

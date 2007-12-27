@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/05/19 18:06:12 $
-*  $Revision: 1.15 $
+*  $Date: 2007/08/19 01:06:10 $
+*  $Revision: 1.16 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -221,9 +221,9 @@ struct wait_event_data {
 ;
 
 /* typedefs that the dg functions rely on */
-typedef struct index_data index_data;
-typedef struct obj_data obj_data;
-typedef struct trig_data trig_data;
+//typedef struct index_data index_data;
+//typedef struct obj_data obj_data;
+//typedef struct trig_data trig_data;
 
 /* used for actor memory triggers */
 struct script_memory {

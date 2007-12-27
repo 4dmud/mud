@@ -41,6 +41,7 @@ int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
 void nanny(Descriptor *d, char *arg);
 int is_abbrev(const char *arg1, const char *arg2);
+int is_abbrev(const string &arg_s, const char *arg2);
 int is_number(const char *str);
 int find_command(const char *command);
 void skip_spaces(char **string);
@@ -61,15 +62,14 @@ void delete_aliases(const char *charname);
 #define argument_interpreter(a, b, c) two_arguments(a, b, c)
 
 
-struct command_info
-{
-  const char *command;
-  const char *sort_as;
-  byte minimum_position;
-  void (*command_pointer) (Character * ch, char *argument, int cmd, int subcmd);
-  sh_int minimum_level;
-  int subcmd;
-  long cmd_bits;
+struct command_info {
+    const char *command;
+    const char *sort_as;
+    byte minimum_position;
+    void (*command_pointer) (Character * ch, char *argument, int cmd, int subcmd);
+    sh_int minimum_level;
+    int subcmd;
+    long cmd_bits;
 };
 
 /*
@@ -84,12 +84,11 @@ extern const struct command_info cmd_info[];
  * because a Windows 95 compiler gives a warning about it having similiar
  * named member.
  */
-struct alias_data
-{
-  char *alias;
-  char *replacement;
-  int type;
-  struct alias_data *next;
+struct alias_data {
+    char *alias;
+    char *replacement;
+    int type;
+    struct alias_data *next;
 };
 
 #define ALIAS_SIMPLE	0
@@ -113,9 +112,9 @@ struct alias_data
 
 /* prompts */
 //Normal Prompt
-#define SCMD_PROMPT  1 
+#define SCMD_PROMPT  1
 //Battle Prompt
-#define SCMD_BPROMPT 2 
+#define SCMD_BPROMPT 2
 
 /* directions */
 #define SCMD_NORTH	1
@@ -375,3 +374,36 @@ struct alias_data
 #define SCMD_THATCH    109
 #define SCMD_WEAVE     110
 #define SCMD_FORGE     111
+
+#if !defined(LOWER)
+#define LOWER(c)   (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
+#endif
+/*
+ * determine if a given string is an abbreviation of another
+ * (now works symmetrically -- JE 7/25/94)
+ *
+ * that was dumb.  it shouldn't be symmetrical.  JE 5/1/95
+ * 
+ * returnss 1 if arg1 is an abbreviation of arg2
+ */
+inline int is_abbrev(const char *arg1, const char *arg2) {
+    register int c;
+    if (!*arg1)
+        return (0);
+    if (LOWER(*arg1) != LOWER(*arg2))
+        return (0);
+    if (strlen(arg1) > strlen(arg2))
+	    return 0;
+
+    if (!strncasecmp(arg1+1, arg2+1, strlen(arg2+1)))
+        return 1;
+
+    for (c = 0; *arg1 && *arg2; arg1++, arg2++, c++)
+        if (LOWER(*arg1) != LOWER(*arg2))
+            return (0);
+
+    if (!*arg1 && c > 1)
+        return (1);
+    else
+        return (0);
+}

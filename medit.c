@@ -35,7 +35,6 @@
 extern struct attack_hit_type attack_hit_text[];
 extern struct shop_data *shop_index;
 extern const char *mob_races[];
-extern long top_idnum;
 #if CONFIG_OASIS_MPROG
 extern const char *mobprog_types[];
 #endif
@@ -553,7 +552,7 @@ void medit_disp_mob_skin(Descriptor *d) {
 void medit_disp_mob_owner(Descriptor *d) {
     long id = OLC_MOB(d)->mob_specials.owner;
 
-    d->Output("Mobs current owner: %ld (%s)\r\n", id,  get_name_by_id(id));
+    d->Output("Mobs current owner: %ld (%s)\r\n", id,  pi.NameById(id));
     d->Output("Enter new owner name or id : ");
 }
 
@@ -755,7 +754,7 @@ void medit_disp_menu(Descriptor *d) {
         grn, nrm, cyn, (OLC_MPROGL(d) ? "Set." : "Not Set."),
 #endif
         grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
-        grn, nrm, cyn, get_name_by_id(MOB_OWNER(mob)),
+        grn, nrm, cyn, pi.NameById(MOB_OWNER(mob)),
         grn, nrm
     );
 
@@ -1310,9 +1309,9 @@ void medit_parse(Descriptor *d, char *arg) {
     case MEDIT_OWNER:
         if (is_number(arg) || *arg == '-') {
             i = atoi(arg);
-            MOB_OWNER(OLC_MOB(d)) = IRANGE(-1L, i, top_idnum);
+            MOB_OWNER(OLC_MOB(d)) = IRANGE(-1L, i, pi.TopIdNum);
         } else
-            MOB_OWNER(OLC_MOB(d)) = get_id_by_name(arg);
+            MOB_OWNER(OLC_MOB(d)) = pi.IdByName(arg);
 
         break;
     case MEDIT_SEGMENTS:

@@ -35,7 +35,6 @@ void postmaster_receive_mail(Character *ch,
 SPECIAL(postmaster);
 
 extern int no_mail;
-int find_name(char *name);
 
 mail_index_type *mail_index = NULL;	/* list of recs in the mail file  */
 position_list_type *free_list = NULL;	/* list of free positions in file */
@@ -77,7 +76,7 @@ int mail_recip_ok(const char *name)
 {
   Character *victim;
   int ret = FALSE;
-if (!get_id_by_name((char *)name)) 
+if (!pi.IdByName(name)) 
 	return ret;
 
 victim = new Character(FALSE);
@@ -167,7 +166,7 @@ mail_index_type *find_char_in_index(long searchee)
 	 tmp = tmp->next)
 	/* if (tmp->recipient == searchee) mails++;
 	 if (mails > 20)
-	 log("INFO: %s has %d mails.", get_name_by_id(searchee), mails);*/;
+	 log("INFO: %s has %d mails.", pi.NameById(searchee), mails);*/;
 
     return (tmp);
 }
@@ -492,8 +491,8 @@ char *read_delete(long recipient)
     tmstr = asctime(localtime(&header.header_data.mail_time));
     *(tmstr + strlen(tmstr) - 1) = '\0';
 
-    from = get_name_by_id(header.header_data.from);
-    to = get_name_by_id(recipient);
+    from = pi.NameById(header.header_data.from);
+    to = pi.NameById(recipient);
 
     sprintf(buf, " * * * * 4 Dimensions Mail System * * * *\r\n"
 	    "Date: %s\r\n"
@@ -595,7 +594,7 @@ void postmaster_send_mail(Character *ch, Character *mailman,
 	act(buf, FALSE, mailman, 0, ch, TO_VICT);
 	return;
     }
-    if ((recipient = get_id_by_name(buf)) < 0) {
+    if ((recipient = pi.IdByName(buf)) < 0) {
 	act("$n tells you, 'No one by that name is registered here!'",
 	    FALSE, mailman, 0, ch, TO_VICT);
 	return;

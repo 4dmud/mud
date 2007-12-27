@@ -63,7 +63,7 @@ ACTION(thing_lumberjack)
   const char *to_char = NULL;
   const char *to_room = NULL;
   obj_vnum lognum = -1;
-int i;
+  int i;
 
   struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
 
@@ -194,9 +194,10 @@ int i;
        99. [52748] the alder tree                           
       100. [52749] the birch tree  
       */
-      if (GET_OBJ_VAL(obj, 4) > 0 && real_object(GET_OBJ_VAL(obj, 4)) != NOTHING) {
-lognum = GET_OBJ_VAL(obj, 4);
-}
+      if (GET_OBJ_VAL(obj, 4) > 0 && real_object(GET_OBJ_VAL(obj, 4)) != NOTHING)
+      {
+        lognum = GET_OBJ_VAL(obj, 4);
+      }
       if (GET_OBJ_VNUM(obj) >= 52730 && GET_OBJ_VNUM(obj) <= 52749)
       {
         lognum = GET_OBJ_VNUM(obj) + 20;
@@ -209,22 +210,23 @@ lognum = GET_OBJ_VAL(obj, 4);
       {
         ch->Send( "The tree disolves into sawdust.\r\n");
         return time;
-      } 
-if (real_object(lognum) == NOTHING) {
-ch->Send( "The tree disolves into sawdust.\r\n");
+      }
+      if (real_object(lognum) == NOTHING)
+      {
+        ch->Send( "The tree disolves into sawdust.\r\n");
         return time;
-}
-      
-      
-if (GET_OBJ_VAL(obj, 5) <= 0)
-i = 1;
-else
-i = GET_OBJ_VAL(obj, 5);
-for (;i>0;i--) 
-if ((object = read_object(lognum, VIRTUAL)) != NULL)
-      obj_to_room(object, IN_ROOM(ch));
-      
-if (obj != NULL)
+      }
+
+
+      if (GET_OBJ_VAL(obj, 5) <= 0)
+        i = 1;
+      else
+        i = GET_OBJ_VAL(obj, 5);
+      for (;i>0;i--)
+        if ((object = read_object(lognum, VIRTUAL)) != NULL)
+          obj_to_room(object, IN_ROOM(ch));
+
+      if (obj != NULL)
       {
         extract_obj(obj);
         obj = NULL;
@@ -1378,7 +1380,7 @@ ASUB(sub_clown)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;

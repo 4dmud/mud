@@ -10,6 +10,16 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.77  2007/08/19 01:06:10  w4dimenscor
+ * - Changed the playerindex to be a c++ object with search functions.
+ * - changed the room descriptions to be searched from a MAP index, and
+ * added Get and Set methods for room descriptions.
+ * - changed the zone reset so that it doesnt search the entire object list
+ * to find the object to PUT things into.
+ * - rewrote other parts of the zone reset function, to make it give correct errors.
+ * - rewrote the parts of the code to do with loading and searching for directorys and files.
+ * - added a new dlib library.
+ *
  * Revision 1.76  2007/06/26 10:48:05  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -296,6 +306,7 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "strutil.h"
+#include "dlib/threads.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -333,7 +344,6 @@ int togglebody(Character *ch, int flag);
 int has_body(Character *ch, int flag);
 int bodypartname(char *bpn);
 char *one_arg(char *arg, char *first_arg);
-int find_name(const char *name);
 void weight_to_object(struct obj_data *obj, int weight);
 char *getline( char *str, char *buf, size_t len );
 void write_aliases(Character *ch);
@@ -1272,6 +1282,7 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
         case 'O':
         case 'T':
         case 'V':
+        case 'B':
             cmd_room = world_vnum[ZOCMD.arg3];
             break;
         case 'D':
@@ -1292,6 +1303,7 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
                           ZOCMD.arg1, yel, ZOCMD.arg2
                         );
                 break;
+
             case 'G':
                 ch->Send( "%sGive it %s [%s%d%s], Max : %d\r\n",
                           ZOCMD.if_flag ? " then " : "",
@@ -1302,6 +1314,14 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
                 break;
             case 'O':
                 ch->Send( "%sLoad %s [%s%d%s], Max : %d\r\n",
+                          ZOCMD.if_flag ? " then " : "",
+                          obj_proto[ZOCMD.arg1].short_description,
+                          cyn, obj_index[ZOCMD.arg1].vnum, yel,
+                          ZOCMD.arg2
+                        );
+                break;
+            case 'B':
+                ch->Send( "%sBury %s [%s%d%s], Max : %d\r\n",
                           ZOCMD.if_flag ? " then " : "",
                           obj_proto[ZOCMD.arg1].short_description,
                           cyn, obj_index[ZOCMD.arg1].vnum, yel,
@@ -1338,8 +1358,8 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
                 ch->Send( "%sSet door %s as %s.\r\n",
                           ZOCMD.if_flag ? " then " : "",
                           dirs[ZOCMD.arg2],
-          ZOCMD.arg3 ? ((ZOCMD.arg3 == 1) ? "closed" : "locked") : "open"
-                        );
+                          ZOCMD.arg3 ? ((ZOCMD.arg3 == 1) ? "closed" : "locked") : "open"
+                                );
                 break;
             case 'T':
                 ch->Send( "%sAttach trigger %s%s%s [%s%d%s] to %s\r\n",
@@ -1427,7 +1447,7 @@ void do_stat_room(Character *ch) {
               (rm->func == NULL) ? "None" : "Exists", buf2);
 
     ch->Send( "Description:\r\n%s",
-              rm->description ? rm->description : "  None.\r\n");
+	      rm->HasDesc() ? rm->GetDescription() : "  None.\r\n");
 
     if (rm->ex_description) {
         ch->Send( "Extra descs:%s", CCCYN(ch, C_NRM));
@@ -1507,7 +1527,7 @@ void do_stat_room(Character *ch) {
     list_zone_commands_room(ch, rm->number);
     /* check the room for a script */
     //if (GET_LEVEL(ch) >= LVL_SEN)
-        do_sstat_room(ch);
+    do_sstat_room(ch);
 }
 
 const char *balance_display(int balance) {
@@ -1545,7 +1565,7 @@ void do_stat_object(Character *ch, struct obj_data *j) {
         CCGRN(ch, C_NRM), material_name(GET_OBJ_MATERIAL(j)),
         CCNRM(ch, C_NRM), CCGRN(ch, C_NRM), vnum, CCNRM(ch, C_NRM), GET_OBJ_RNUM(j),
         buf1, GET_ID(j)  ,
-    (GET_OBJ_RNUM(j) != NOTHING ? (obj_index[GET_OBJ_RNUM(j)].func ? "Exists" : "None") : "None"));
+        (GET_OBJ_RNUM(j) != NOTHING ? (obj_index[GET_OBJ_RNUM(j)].func ? "Exists" : "None") : "None"));
 
     if (GET_OBJ_RNUM(j) != NOTHING && obj_index[GET_OBJ_RNUM(j)].qic != NULL && (GET_LEVEL(ch) >= LVL_SEN)) {
         ch->Send(" QIC: %d(%d)\r\n",obj_index[GET_OBJ_RNUM(j)].qic->items ,
@@ -1570,7 +1590,7 @@ void do_stat_object(Character *ch, struct obj_data *j) {
 
     }
     if (j->owner != 0)
-        ch->Send( "Object owned by: {cW%s{c0\r\n", get_name_by_id(j->owner));
+        ch->Send( "Object owned by: {cW%s{c0\r\n", pi.NameById(j->owner));
     ch->Send( "L-Des: %s\r\n",
               ((j->description) ? j->description : "None"));
 
@@ -1833,14 +1853,14 @@ void do_stat_character(Character *ch, Character *k) {
                   GET_ALIGNMENT(k), speed_update(k));
 
         if (!IS_NPC(k)) {
-            #if defined(HAVE_ZLIB)
+#if defined(HAVE_ZLIB)
             if (k->desc && k->desc->comp) {
                 if (k->desc->comp->state >= 2)
                     ch->Send( "Compression: Enabled    ");
                 else
                     ch->Send( "Compression: Disabled    ");
             }
-            #endif
+#endif
             if (k->desc) {
                 ch->Send( "Telopt Prompts: %d    ", k->desc->eor);
                 ch->Send( "MXP: %d    ", k->desc->mxp);
@@ -2178,7 +2198,7 @@ ACMD(do_stat) {
         if (!*buf2) {
             ch->Send("Stats on which player?\r\n");
             return;
-        } else if (!get_id_by_name(buf1)) {
+        } else if (!pi.IdByName(buf1)) {
             send_to_char("There is no such player.\r\n", ch);
             return;
         } else {
@@ -2261,22 +2281,26 @@ ACMD(do_account) {
     int acc, pos, i = 0;
     one_argument(argument, name);
     if (!*name || GET_LEVEL(ch) < LVL_IMMORT) {
-        if ((pos = find_name(GET_NAME(ch))) == -1)
+        try {
+            pos = pi.TableIndexByName(GET_NAME(ch));
+        } catch (MudException &e) {
+            ch->Send("%s%s", e.Message(), "\r\n");
             return;
+        }
     } else {
-        if ((pos = find_name(name)) == -1) {
-            ch->Send( "No one by that name found.\r\n" );
+        try {
+            pos = pi.TableIndexByName(name);
+        } catch (MudException &e) {
+            ch->Send("%s%s", e.Message(), "\r\n");
             return;
         }
     }
-    acc = player_table[pos].account;
+    acc = pi.AccByIndex(pos);
 
-    for (pos = 0; pos <= top_of_p_table; pos++) {
-        if (!IS_SET(player_table[pos].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[pos].flags, PINDEX_SELFDELETE) &&
-                player_table[pos].name[0] != '\0' && player_table[pos].account == acc) {
+    for (pos = 0; pos <= pi.TopOfTable(); pos++) {
+        if (!pi.DeletedByIndex(pos) && pi.AccByIndex(pos) == acc) {
             ch->Send( "{cy%2d{cg) %-15s%s{c0",
-                      i, player_table[pos].name, ((i+1)%2) == 0 ? "\r\n" : "   ");
+                      i, pi.NameByIndex(pos), ((i+1)%2) == 0 ? "\r\n" : "   ");
             i++;
         }
     }
@@ -2606,7 +2630,7 @@ ACMD(do_purge) {
     one_argument(argument, buf);
 
     if (*buf) {            /* argument supplied. destroy single object
-                                                                                                                                 * or char */
+                                                                                                                                                                 * or char */
         if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
             if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict))) {
                 ch->Send("Fuuuuuuuuu!\r\n");
@@ -2742,15 +2766,15 @@ ACMD(do_copyover) {
 
             write_aliases(och);
             snprintf(buf, sizeof(buf), "Colors drain away and the world slowly grinds to a halt...\r\n");
-            #ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB_H
 
             if (d->comp->state == 2) {
                 d->comp->state = 3; /* Code to use Z_FINISH for deflate */
             }
-            #endif /* HAVE_ZLIB_H */
+#endif /* HAVE_ZLIB_H */
             write_to_descriptor (d->descriptor, buf, d->comp);
             d->comp->state = 0;
-            #ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB_H
 
             if (d->comp->stream) {
                 deflateEnd(d->comp->stream);
@@ -2758,7 +2782,7 @@ ACMD(do_copyover) {
                 free(d->comp->buff_out);
                 free(d->comp->buff_in);
             }
-            #endif /* HAVE_ZLIB_H */
+#endif /* HAVE_ZLIB_H */
 
         }
     }
@@ -3300,7 +3324,7 @@ ACMD(do_last) {
     if (!*arg) {
         ch->Send( "For whom do you wish to search?\r\n");
         return;
-    } else if (!get_id_by_name(arg)) {
+    } else if (!pi.IdByName(arg)) {
         send_to_char("There is no such player.\r\n", ch);
         return;
     }
@@ -3811,20 +3835,11 @@ int silence_affect(Character *ch, Character *vict, char *argument) {
     affect_to_char(vict, &af);
     return 1;
 }
-struct goldSort {
-    bool operator()(const player_index_element &a, const player_index_element &b) {
-        return a.gc_amount > b.gc_amount;
-    }
-};
-struct tokenSort {
-    bool operator()(const player_index_element &a, const player_index_element &b) {
-        return a.gt_amount > b.gt_amount;
-    }
-};
+
 
 ACMD(do_topgold) {
     int i,j = 20;
-    vector<player_index_element> pindex(player_table);
+    plrindx pindex(*pi.PlayerTable());
     skip_spaces(&argument);
     if (*argument)
         j = atoi(argument);
@@ -3847,7 +3862,60 @@ ACMD(do_topgold) {
 
 }
 
+class hosts_lookup : public threaded_object {
+public:
+    hosts_lookup(string fn, Character *c) {
+        _findname = fn;
+        _ch = c;
+        // Start our thread going in the thread() function
+        start();
+    }
+
+    ~hosts_lookup() {
+        // Tell the thread() function to stop.  This will cause should_stop() to
+        // return true so the thread knows what to do.
+        stop();
+
+        // Wait for the thread to stop before letting this object destruct itself.
+        // Also note, you are *required* to wait for the thread to end before
+        // letting this object destruct itself.
+        wait();
+    }
+
+private:
+    string _findname;
+    Character *_ch;
+    void thread() {
+        int j;
+        Character *victim = NULL, *ch = NULL;
+        string findname = _findname;
+        ch = _ch;
+
+        TEMP_LOAD_CHAR = TRUE;
+        for (j = 0; j < pi.Size(); j++) {
+            victim = new Character(FALSE);
+
+            if (!pi.DeletedByIndex(j) && store_to_char(pi.NameByIndex(j), victim) > -1)
+                if (stristr(victim->player_specials->host, findname.c_str()) != NULL)
+                    ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
+
+            delete (victim);
+        }
+        TEMP_LOAD_CHAR = FALSE;
+    }
+};
+
 ACMD(do_hostfind) {
+    skip_spaces(&argument);
+    if (!argument || !*argument) {
+        ch->Send( "Needs an argument. Part of a host name.\r\n");
+        return;
+    }
+    ch->Send("Searching for hosts now, we will get back to you with results shortly.\r\n");
+    hosts_lookup hl(argument, ch);
+    return;
+}
+ACMD(do_hostfindr) {
     int j;
     Character *victim = NULL;
     skip_spaces(&argument);
@@ -3856,10 +3924,10 @@ ACMD(do_hostfind) {
         return;
     }
     TEMP_LOAD_CHAR = TRUE;
-    for (j = 0; j < player_table.size(); j++) {
+    for (j = 0; j < pi.Size(); j++) {
         victim = new Character(FALSE);
 
-        if (store_to_char(player_table[j].name, victim) > -1)
+        if (store_to_char(pi.NameByIndex(j), victim) > -1)
             if (stristr(victim->player_specials->host, argument) != NULL)
                 ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
 
@@ -3932,17 +4000,15 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
 
 void show_last_logons(Character *ch, int days, bool fix) {
     time_t tm = time(0) - (days * SECS_PER_REAL_DAY);
-    for (int tp = 0; tp < player_table.size(); tp++) {
-        if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
-                (!player_table[tp].name || !*player_table[tp].name))
+    for (int tp = 0; tp < pi.Size(); tp++) {
+        if (pi.DeletedByIndex(tp))
             continue;
-        if (player_table[tp].last > tm) {
+        if (pi.LastByIndex(tp) > tm) {
             if (fix) {
-                SET_BIT(player_table[tp].flags, PINDEX_FIXSKILLS);
+                pi.SetFlags(tp, PINDEX_FIXSKILLS);
             }
-            *ch << player_table[tp].name;
-            if (IS_SET(player_table[tp].flags, PINDEX_FIXSKILLS))
+            *ch << pi.NameByIndex(tp);
+            if (pi.IsSet(tp, PINDEX_FIXSKILLS))
                 *ch << "- Skills Flagged to be fixed";
 
             *ch << "\r\n";
@@ -3950,7 +4016,7 @@ void show_last_logons(Character *ch, int days, bool fix) {
         }
     }
     if (fix)
-        save_player_index();
+        pi.Save();
 }
 
 
@@ -3961,7 +4027,6 @@ ACMD(do_show) {
     zone_vnum zvn = NOWHERE;
     byte self = FALSE;
     Character *vict = NULL;
-    struct obj_data *obj;
     Descriptor *d;
     char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH];
     char tbuf[MAX_STRING_LENGTH];
@@ -4084,7 +4149,7 @@ ACMD(do_show) {
         if (!*value) {
             ch->Send("A name would help.\r\n");
             return;
-        } else if (!get_id_by_name(value)) {
+        } else if (!pi.IdByName(value)) {
             send_to_char("There is no such player.\r\n", ch);
             return;
         }
@@ -4142,8 +4207,7 @@ ACMD(do_show) {
                     con++;
             }
         }
-        for (obj = object_list; obj; obj = obj->next)
-            k++;
+        k = object_list.size();
         ch->Send(
             "Current stats:\r\n"
             "  %5d players in game  %5d connected\r\n"
@@ -4160,7 +4224,7 @@ ACMD(do_show) {
             "  %5d command trigger commands parsed\r\n"
             "  %5d triggers written\r\n",
             i, con,
-            top_of_p_table + 1,
+            pi.TopOfTable() + 1,
             j, GetMobProtoCount(),
             k, top_of_objt + 1,
             top_of_world + 1, top_of_zone_table + 1,
@@ -5130,7 +5194,7 @@ ACMD(do_set) {
     } else if (is_file) {
         /* try to load the player off disk */
         cbuf = new Character(FALSE);
-        if ((player_i = load_char(name, cbuf)) > -1) {
+        if ((player_i = pi.LoadChar(name, cbuf)) > -1) {
             if (GET_LEVEL(cbuf) >= GET_LEVEL(ch)) {
                 *ch << "Sorry, you can't do that.\r\n";
                 return;
@@ -5253,12 +5317,12 @@ ACMD(do_objconv) {
     }
     /* okay, this is where we load every char, apparently.. but we'll
        do it one at a time, thank you very much */
-    for (counter = 0; counter < player_table.size(); counter++) {
+    for (counter = 0; counter < pi.Size(); counter++) {
         victim = new Character(FALSE);
-        if (load_char(player_table[counter].name, victim) > -1)
+        if (pi.LoadChar(pi.NameByIndex(counter), victim) > -1)
             out_rent(GET_NAME(victim));
         delete (victim);
-        percent = (float) ((float) counter / (float) top_of_p_table);
+        percent = (float) ((float) counter / (float) pi.TopOfTable());
         if (percent > .25 && flag25 == 0) {
             send_to_char("25%...", ch);
             flag25 = 1;
@@ -5310,7 +5374,7 @@ ACMD(do_own) {
         return;
     }
 
-    ch->Send( "Setting %s's owner to %s.\r\n", obj->short_description, get_name_by_id(idnum));
+    ch->Send( "Setting %s's owner to %s.\r\n", obj->short_description, pi.NameById(idnum));
     obj->owner = idnum;
 
 
@@ -6179,22 +6243,7 @@ ACMD(do_get_free_mem) {
 
 }
 
-void change_plrindex_name(long id, char *change) {
-    int tp;
 
-    if (!change)
-        return;
-    for (tp = 0; tp < player_table.size(); tp++) {
-        if (player_table[tp].id == id) {
-            if (player_table[tp].name)
-                delete[] player_table[tp].name;
-            player_table[tp].name = new char[strlen(change) +1];
-            strcpy(player_table[tp].name, change);
-            save_player_index();
-            return;
-        }
-    }
-}
 
 ACMD(do_namechange) {
     Descriptor *d;
@@ -6242,15 +6291,15 @@ ACMD(do_namechange) {
         }
     }
     if (!tch) {
-        struct kill_data *load_killlist(const char *name);
+
         void load_locker(Character *ch);
 
-        if (get_id_by_name(oldname) == -1) {
+        if (pi.IdByName(oldname) == -1) {
             ch->Send( "A player by that name doesn't exist here.\r\n");
             return;
         }
         tch = new Character(FALSE);
-        if (load_char(oldname, tch) <= 0) {
+        if (pi.LoadChar(oldname, tch) <= 0) {
             delete (tch);
             log("load char error in namechange");
             return;
@@ -6262,7 +6311,7 @@ ACMD(do_namechange) {
         }
         tch->reset();
         read_aliases(tch);
-        GET_ID(tch) = GET_IDNUM(tch);// = player_table[id].id;
+        GET_ID(tch) = GET_IDNUM(tch);
         addChToLookupTable(GET_IDNUM(ch), tch);
         tch->LoadKillList();
         read_ignorelist(tch);
@@ -6277,7 +6326,7 @@ ACMD(do_namechange) {
 
     strncpy(GET_PASSWD(tch), CRYPT(passw, tch->player.name), MAX_PWD_LENGTH);
     *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
-    change_plrindex_name(GET_IDNUM(tch), newname);
+    pi.change_plrindex_name(GET_IDNUM(tch), newname);
     tch->save();
     if (!loaded)
         Crash_crashsave(tch);
@@ -6328,7 +6377,7 @@ ACMD(do_deleteplayer) {
     if (!*buf2) {
         ch->Send("Delete which player?\r\n");
         return;
-    } else if (!(ch->loader = get_id_by_name(buf2))) {
+    } else if (!(ch->loader = pi.IdByName(buf2))) {
         send_to_char("There is no such player.\r\n", ch);
         return;
     }
@@ -6343,7 +6392,7 @@ C_FUNC(delete_player) {
 
     if (!tch)
         return;
-    charname = get_name_by_id(tch->loader);
+    charname = pi.NameById(tch->loader);
 
     if (arg && *arg && !strcmp(arg, "yes I am")) {
         d->Output( "Deleting...\r\n");
@@ -6360,9 +6409,13 @@ void perform_delete_player(const char *charname) {
     delete_pobj_file(charname);
     delete_aliases(charname);
     delete_variables(charname);
-    if ((player_i = find_name(charname)) >= 0) {
-        SET_BIT(player_table[player_i].flags, PINDEX_SELFDELETE);
-        remove_player(player_table.begin() + player_i);
+    try {
+        player_i = pi.TableIndexByName(charname);
+        pi.SetFlags(player_i, PINDEX_SELFDELETE);
+        pi.RemovePlayer(pi.Begin() + player_i);
+    } catch (MudException &e) {
+        log("Cannot delete: %s%s", e.Message(), "\r\n");
+        return;
     }
 
 }
@@ -6672,14 +6725,15 @@ void offline_fixskills(Character *ch, char *arg) {
     string str = string(arg);
     str = tolower(str);
     int idx = 0;
-    if ((idx = get_ptable_by_name(str.c_str())) == -1) {
-        *ch << "Can't find anyone by that name!\r\n";
+    try {
+        idx = pi.TableIndexByName(str.c_str());
+    } catch (MudException &e) {
+        ch->Send("%s%s", e.Message(), "\r\n");
         return;
     }
-
-    SET_BIT(player_table[idx].flags, PINDEX_FIXSKILLS);
-    save_player_index();
-    *ch << player_table[idx].name << " will be fixed when they log in next!\r\n";
+    pi.SetFlags(idx, PINDEX_FIXSKILLS);
+    pi.Save();
+    *ch << pi.NameByIndex(idx) << " will be fixed when they log in next!\r\n";
 
 }
 

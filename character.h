@@ -11,12 +11,12 @@
 //
 int number(int from, int to);
 float number(float from, float to);
+void free_join_list(struct combine_data *list);
 #define MAKE_STRING(msg) \
    (((ostringstream&) (ostringstream() << boolalpha << msg)).str())
    
 class Character {
 public:
-    int pfilepos;        /* playerfile pos                */
     //mob_rnum nr;         /* Mob's rnum                    */
     mob_vnum vnum;
     bool proto;
@@ -96,6 +96,7 @@ public:
     void init_char_strings();
     void free_char_strings();
     void free_non_proto_strings();
+    
 
     void affect_total();
     void default_char();

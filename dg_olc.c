@@ -395,21 +395,7 @@ void trigedit_parse(Descriptor *d, char *arg) {
     trigedit_disp_menu(d);
 }
 
-/*
-** print out the letter codes pertaining to the bits set in 'data'
-*/
-void new_sprintbits(int data, char *dest) {
-    int i;
-    char *p = dest;
 
-    for (i=0; i<32; i++) {
-        if (data & (1<<i)) {
-            *p = ((i<=25)?('a'+i):('A'+i));
-            p++;
-        }
-    }
-    *p = '\0';
-}
 
 
 /* save the zone's triggers to internal memory and to disk */
@@ -423,6 +409,7 @@ void trigedit_save(Descriptor *d) {
     trig_data *live_trig;
     struct cmdlist_element *cmd, *next_cmd;
     struct index_data **new_index;
+    
     Descriptor *dsc;
     FILE *trig_file;
     int zone;
@@ -632,7 +619,7 @@ void trigedit_save(Descriptor *d) {
                 fclose(trig_file);
                 return;
             }
-            new_sprintbits(GET_TRIG_TYPE(trig), bitBuf);
+            sprintbits(GET_TRIG_TYPE(trig), bitBuf);
             fprintf(trig_file,      "%s%c\n"
                     "%d %s %d\n"
                     "%s%c\n",

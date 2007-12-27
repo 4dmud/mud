@@ -365,7 +365,7 @@ int save_rooms(zone_rnum rzone)
       /*
        * Copy the description and strip off trailing newlines.
        */
-      strncpy(buf, room->description ? room->description : "Empty room.", sizeof(buf)-1 );
+      strncpy(buf, room->HasDesc() ? room->GetDescription() : "Empty room.", sizeof(buf)-1 );
       strip_cr(buf);
 
       /*

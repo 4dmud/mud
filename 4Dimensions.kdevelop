@@ -2,49 +2,47 @@
 <kdevelop>
   <general>
     <author>Jamie Nelson</author>
-    <email>mordecai@xtra.co.nz</email>
+    <email>mordecai4d@gmail.com</email>
     <version>$VERSION$</version>
     <projectmanagement>KDevCustomProject</projectmanagement>
     <primarylanguage>C++</primarylanguage>
     <ignoreparts>
       <part>kdevabbrev</part>
-      <part>kdevclassview</part>
       <part>kdevsnippet</part>
       <part>kdevctags2</part>
-      <part>kdevdebugger</part>
       <part>kdevdocumentation</part>
       <part>kdevdoxygen</part>
       <part>kdevdistpart</part>
       <part>kdevregexptest</part>
       <part>kdevsecurity</part>
     </ignoreparts>
-    <projectdirectory>.</projectdirectory>
-    <absoluteprojectpath>false</absoluteprojectpath>
-    <description/>
+    <projectdirectory>/home/mordecai/Desktop/MudRelated/game-oasis/src</projectdirectory>
+    <absoluteprojectpath>true</absoluteprojectpath>
+    <description></description>
     <versioncontrol>kdevcvsservice</versioncontrol>
   </general>
   <kdevcustomproject>
     <run>
-      <mainprogram>4Dimensions</mainprogram>
-      <directoryradio>executable</directoryradio>
-      <customdirectory>/</customdirectory>
-      <programargs/>
+      <mainprogram>/home/mordecai/Desktop/MudRelated/game-oasis/bin/circle</mainprogram>
+      <directoryradio>custom</directoryradio>
+      <customdirectory>/home/mordecai/Desktop/MudRelated/game-oasis/</customdirectory>
+      <programargs> 6000</programargs>
       <terminal>false</terminal>
       <autocompile>true</autocompile>
       <envvars/>
     </run>
     <build>
       <buildtool>make</buildtool>
-      <builddir/>
+      <builddir></builddir>
     </build>
     <make>
       <abortonerror>false</abortonerror>
       <numberofjobs>3</numberofjobs>
       <prio>0</prio>
       <dontact>false</dontact>
-      <makebin/>
-      <defaulttarget/>
-      <makeoptions/>
+      <makebin></makebin>
+      <defaulttarget></defaulttarget>
+      <makeoptions></makeoptions>
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default/>
@@ -53,12 +51,12 @@
   </kdevcustomproject>
   <kdevdebugger>
     <general>
-      <dbgshell/>
-      <programargs/>
-      <gdbpath/>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <dbgshell></dbgshell>
+      <programargs></programargs>
+      <gdbpath></gdbpath>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
@@ -148,7 +146,7 @@
       <headerCompletionDelay>250</headerCompletionDelay>
     </codecompletion>
     <creategettersetter>
-      <prefixGet/>
+      <prefixGet></prefixGet>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>

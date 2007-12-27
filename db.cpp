@@ -51,7 +51,6 @@ int allowed_pretitle(Character *ch);
 void free_clan_lists(void);
 void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
-struct kill_data *load_killlist(const char *name);
 void add_room_to_mine(room_rnum room);
 const char *get_dirname(char *filename, size_t len, char oname, int mode);
 void free_hunter_list(void);
@@ -73,9 +72,8 @@ void free_join_list(struct combine_data *list);
 
 void assign_skills(void);
 void assign_subskills(void);
-void sprintbits(long vektor, char *outstring);
+//void sprintbits(long vektor, char *outstring);
 void tag_argument(char *argument, char *tag);
-void clean_pfiles(void);
 int is_aggro(Character *ch);
 void generate_weapon(OBJ_DATA *obj);
 
@@ -99,8 +97,6 @@ struct help_category_data *help_categories;
 int TEMP_LOAD_CHAR = FALSE;
 
 extern struct mob_stat_table mob_stats[];
-extern map<long, obj_data *> obj_lookup_table;
-map <obj_vnum,obj_rnum> obj_vTor;
 
 vector <Room *> world_vnum; /* index table for room file   */
 
@@ -114,6 +110,8 @@ Character *character_list = NULL;     /* global linked list of chars */
 extern enum subskill_list subskill;
 
 struct index_data **trig_index;    /* index table for triggers      */
+//extern map<trig_rnum, index_data*> trig_index;
+//extern map<trig_vnum, trig_rnum> trig_v_index;
 struct trig_data *trigger_list = NULL;  /* all attached triggers */
 unsigned int top_of_trigt = 0;         /* top of trigger index table    */
 //struct htree_node *mob_htree = NULL;    /* hash tree for fast mob lookup */
@@ -127,8 +125,12 @@ map<mob_vnum, struct index_data *> mob_index; /* index table for mobile file   *
 map<mob_vnum, Character *> mob_proto;  /* prototypes for mobs           */
 //mob_rnum top_of_mobt = 0;     /* top of mobile index table     */
 
-struct obj_data *object_list = NULL;    /* global linked list of objs    */
-struct obj_data *dead_obj = NULL;  /* delayed obj removal   */
+//struct obj_data *object_list = NULL;    /* global linked list of objs    */
+
+extern map<long, obj_data *> obj_lookup_table;
+map <obj_vnum,obj_rnum> obj_vTor;
+map<long, obj_data *>  object_list;
+map<long, obj_data *>  dead_obj;  /* delayed obj removal   */
 struct index_data *obj_index; /* index table for object file   */
 struct obj_data *obj_proto;   /* prototypes for objs           */
 obj_rnum top_of_objt = 0;     /* top of object index table     */
@@ -139,11 +141,7 @@ vector <Zone> zone_table;
 zone_rnum top_of_zone_table = 0;   /* top element of zone tab       */
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages     */
 
-vector<player_index_element> player_table; /* index to plr file     */
-FILE *player_fl = NULL;       /* file desc of player file      */
-int top_of_p_table = 0;       /* ref to top of table           */
-int top_of_p_file = 0;        /* ref of size of p file         */
-long top_idnum = 0;      /* highest idnum in use          */
+PlayerIndex pi;
 
 int no_mail = 0;         /* mail disabled?                */
 int mini_mud = 0;        /* mini-mud mode?                */
@@ -200,7 +198,6 @@ void assign_mobiles(void);
 void assign_objects(void);
 void assign_rooms(void);
 void assign_the_shopkeepers(void);
-void build_player_index(void);
 int is_empty(zone_rnum zone_nr);
 void reset_zone(zone_rnum zone);
 int file_to_string(const char *name, char *buf, size_t b_len);
@@ -210,7 +207,6 @@ ACMD(do_reboot);
 void boot_world(void);
 int count_alias_records(FILE * fl);
 int count_hash_records(FILE * fl);
-bitvector_t asciiflag_conv(char *flag);
 void parse_simple_mob(FILE * mob_f, Character *mob, int nr);
 void interpret_espec(const char *keyword, const char *value, int i,
                      int nr);
@@ -236,12 +232,6 @@ void free_followers(struct follow_type *k);
 void load_default_config( void );
 void load_config( void );
 
-
-
-
-
-
-
 // kalten
 //void assign_vehicles(void);
 void load_vehicles(void); //mord
@@ -265,7 +255,6 @@ void sort_spells(void);
 void load_banned(void);
 void Read_Invalid_List(void);
 void boot_the_shops(FILE * shop_f, char *filename, int rec_count);
-int find_name(const char *name);
 void init_clans(void);
 int find_first_step(room_rnum src, room_rnum target);
 void load_corpses(void);
@@ -274,18 +263,12 @@ void save_char_vars(Character *ch);
 void destroy_shops(void);     //mord??
 void strip_cr(char *);        //...
 void load_notes(void);
+void free_identifier(struct obj_data *obj);
 
 /* external vars */
 extern const char *unused_spellname;
 extern const char *unused_spellmessage;
 extern int rev_dir[];
-
-/* external ascii pfile vars */
-extern int pfile_backup_minlevel;
-extern int backup_wiped_pfiles;
-extern struct pclean_criteria_data pclean_criteria[];
-extern int selfdelete_fastwipe;
-extern int auto_pwipe;
 
 
 #define READ_SIZE 256
@@ -373,10 +356,68 @@ int check_dir(char *dirname) {
     return 0;
 }
 
+int check_dir(const string &dirname) {
+    int zon, trg, mob, obj, shp, wld;
+    string ftag, errmsg;
+    zon = trg =  mob = obj = shp = wld = 0;
+    if (dirname.size() == 0)
+        return 0;
+    try {
+        directory tdir(dirname);
+        queue_of_files files;
+        set_of_files sorted_files;
+        tdir.get_files(files);
+        sorted_files.load(files);
+        //isdigit(sorted_files.element().name()[0]) &&
+        while (sorted_files.move_next()) {
+            if (isdigit(sorted_files.element().name()[0]) && sorted_files.element().name().size() > 4) {
+                ftag = sorted_files.element().name().substr(sorted_files.element().name().size()-4, sorted_files.element().name().size());
+                if (ftag == ".zon")
+                    zon = TRUE;
+                else if (ftag == ".trg")
+                    trg = TRUE;
+                else if (ftag == ".mob")
+                    mob = TRUE;
+                else if (ftag == ".obj")
+                    obj = TRUE;
+                else if (ftag == ".shp")
+                    shp = TRUE;
+                else if (ftag == ".wld")
+                    wld = TRUE;
+            }
+        }
+
+        if (!zon)
+            log("Directory %s is missing its .zon file", dirname.c_str());
+        if (!trg)
+            log("Directory %s is missing its .trg file", dirname.c_str());
+        if (!mob)
+            log("Directory %s is missing its .mob file", dirname.c_str());
+        if (!obj)
+            log("Directory %s is missing its .obj file", dirname.c_str());
+        if (!shp)
+            log("Directory %s is missing its .shp file", dirname.c_str());
+        if (!wld)
+            log("Directory %s is missing its .wld file", dirname.c_str());
+
+        if ((zon + trg + mob + obj + shp + wld) == 6)
+            return 1;
+        else {
+            exit(1);
+            return 0;
+        }
+    } catch (file::file_not_found e) {
+        log("check_dir: file not found or accessable: %s", e.info.c_str());
+    } catch (directory::dir_not_found e) {
+        log("check_dir: dir not found or accessable: %s", e.info.c_str());
+    } catch (directory::listing_error e) {
+        log("check_dir: listing error: %s",  e.info.c_str());
+    }
+    return 0;
+}
+
 int numsort(const void *a, const void *b) {
     const struct dirent *a1 = NULL, *b1 = NULL;
-
-
 
     if (!a || !b)
         return -1;
@@ -398,54 +439,9 @@ int numsort(const void *a, const void *b) {
 }
 
 
-
-static int valid_file(const struct dirent *a1) {
-    if (!a1)
-        return 0;
-    else if (!a1->d_name)
-        return 0;
-    else if (!*a1->d_name) //no blank filenames
-        return 0;
-
-    return 1;
-}
-
-int clean_dir(char *dirname) {
-    struct dirent **eps = NULL;
-    int n, tp;
-    int found = FALSE;
-    char filename[2048];
-    n = scandir(dirname, &eps, valid_file, alphasort);
-    if (n >= 0) {
-        int cnt;
-        for (cnt = 0; cnt < n; ++cnt) {
-            if (eps[cnt]->d_type == DT_REG ) {
-                found = FALSE;
-                for (tp = 0; tp < player_table.size(); tp++) {
-                    if (*player_table[tp].name == *eps[cnt]->d_name) {
-                        /*if (0 && str_str(eps[cnt]->d_name, player_table[tp].name))
-                          log("Checking: %s, to see if it is a substring of %s, %d", player_table[tp].name, eps[cnt]->d_name, strncmp(player_table[tp].name, eps[cnt]->d_name, strlen(player_table[tp].name)));*/
-
-                        if (strncmp(player_table[tp].name, eps[cnt]->d_name, strlen(player_table[tp].name)) == 0
-                                /** && !isalpha(eps[cnt]->d_name[strlen(player_table[tp].name)+1])**/) {
-                            found = TRUE;
-                            break;
-                        }
-                    }
-                }
-                if (found == FALSE) {
-                    snprintf(filename, sizeof(filename)-1, "%s%s", dirname, eps[cnt]->d_name);
-                    log("REMOVING: %s - %s", filename, remove
-                            (filename) == 0 ? "SUCCESS" : "FAILED");
-                }
-
-            }
-            free(eps[cnt]);
-        }
-    }
-    return 0;
-}
-
+/**
+ 
+**/
 
 static int zone_compare(const void *a, const void *b) {
     const struct zone_list_data *aa, *bb;
@@ -494,35 +490,32 @@ void sort_zone_list(int total) {
     }*/
 }
 
-
+#if 0
 int create_zone_index(void) {
     struct zone_list_data *temp;
-
     struct dirent **eps = NULL;
     char dname[256];
-    int n;
-    int total = 0;
+    int n, total = 0;
 
     n = scandir(LIB_WORLD, &eps, taone, numsort);
     if (n > 0) {
-        int cnt;
-        for (cnt = n-1; cnt >= 0; cnt--) {
-            if (eps[cnt]->d_type == DT_DIR && isdigit(*eps[cnt]->d_name)) {
-                snprintf(dname, sizeof(dname), "%s%s/", LIB_WORLD, eps[cnt]->d_name);
+        while (n--) {
+            if (eps[n]->d_type == DT_DIR && isdigit(*eps[n]->d_name)) {
+                snprintf(dname, sizeof(dname), "%s%s/", LIB_WORLD, eps[n]->d_name);
                 if (check_dir(dname)) {
                     zone_count++;
                     CREATE(temp, struct zone_list_data, 1);
                     strcpy(temp->zone, dname);
-                    temp->num = atoi(eps[cnt]->d_name);
+                    temp->num = atoi(eps[n]->d_name);
                     temp->next = zone_list;
                     zone_list = temp;
                     total++;
                     //log("zone: %d", temp->num);
                 }
             }
-            if (eps[cnt]) {
-                free(eps[cnt]);
-                eps[cnt] = NULL;
+            if (eps[n]) {
+                free(eps[n]);
+                eps[n] = NULL;
             }
         }
     } else {
@@ -538,6 +531,54 @@ int create_zone_index(void) {
     return 0;
 
 }
+#else
+int create_zone_index(void) {
+    struct zone_list_data *temp;
+    int total = 0;
+    string dname, errmsg;
+    try {
+        directory tdir(LIB_WORLD);
+        queue_of_dirs dirs;
+        set_of_dirs sorted_dirs;
+
+        // get all directories
+        tdir.get_dirs(dirs);
+        // load the dirs and files into static_sets.  This
+        // seems weird but a static_set can be enumerated in sorted order
+        // so this way we can print everything in sorted order.  This
+        // static_set also uses a median of three quick sort so the sorting
+        // should be very fast.
+        sorted_dirs.load(dirs);
+
+        while (sorted_dirs.move_next())
+            if (isdigit(sorted_dirs.element().name()[0]) && check_dir(sorted_dirs.element().full_name())) {
+                zone_count++;
+                CREATE(temp, struct zone_list_data, 1);
+                strcpy(temp->zone, sorted_dirs.element().full_name().c_str());
+                temp->num = atoi(sorted_dirs.element().name().c_str());
+                temp->next = zone_list;
+                zone_list = temp;
+                total++;
+            }
+        log(" %d zones loaded to index", total);
+        if (total == 0) {
+            log("No zones found. Aborting Mud Boot.");
+            exit(1);
+        }
+        log(" -- sorting zones");
+        sort_zone_list(total);
+        return 0;
+    } catch (file::file_not_found e) {
+        log("Create_zone_index: file not found or accessable: %s", e.info.c_str());
+    } catch (directory::dir_not_found e) {
+        log("Create_zone_index: dir not found or accessable: %s",e.info.c_str());
+    } catch (directory::listing_error e) {
+        log("Create_zone_index: listing error: %s", e.info.c_str());
+    }
+    exit (1);
+    return 1;
+}
+#endif
 /* this is necessary for the autowiz system */
 void reboot_wizlists(void) {
     file_to_string_alloc(WIZLIST_FILE, &wizlist);
@@ -710,21 +751,37 @@ void boot_world(void) {
 
 }
 
-void free_objects(OBJ_DATA *obj) {
-    if (!obj)
+void free_objects() {
+    vector<long> ex_list;
+    if (object_list.empty())
         return;
-    if (obj->next)
-        free_objects(obj->next);
-    free_obj(obj, FALSE);
-    obj=NULL;
+    /** Find all items that need extracting **/
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+        ex_list.push_back(GET_ID((ob->second)));
+    /** extract them now **/
+    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++) {
+        if (object_list.find(*v) != object_list.end())
+            free_obj(object_list[(*v)], TRUE);
+        if (dead_obj.find(*v) != dead_obj.end())
+            dead_obj.erase(*v);
+    }
+
+    object_list.clear();
 }
-void free_pending_objects(OBJ_DATA *obj) {
-    if (!obj)
+void free_pending_objects() {
+    vector<long> ex_list;
+    if (dead_obj.empty())
         return;
-    if (obj->next)
-        free_objects(obj->next);
-    free_obj(obj, TRUE);
-    obj=NULL;
+    for (obj_list_type::iterator o = dead_obj.begin();o != dead_obj.end();o++)
+        ex_list.push_back(GET_ID((o->second)));
+    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++) {
+        if (dead_obj.find(*v) != dead_obj.end())
+            free_obj(dead_obj[(*v)], TRUE);
+        if (object_list.find(*v) != object_list.end())
+            object_list.erase(*v);
+    }
+
+    dead_obj.clear();
 }
 
 void free_characters(Character *ch) {
@@ -761,8 +818,8 @@ void destroy_db(void) {
 
     /* Active Objects */
     log("Freeing Objects.");
-    free_objects(object_list);
-    free_pending_objects(dead_obj);
+    free_objects();
+    free_pending_objects();
 
     log("Freeing forests.");
     free_forests(forest);
@@ -806,28 +863,28 @@ void destroy_db(void) {
 
     free(obj_proto);
     free(obj_index);
-//    htree_free(obj_htree);
+    //    htree_free(obj_htree);
 
     /* Mobiles */
 
     for (map<mob_vnum, Character *>::iterator it = mob_proto.begin(); it != mob_proto.end(); it++) {
-    if (it->second != NULL) {
-        (it->second)->free_proto_mob();
-        delete (it->second);
+        if (it->second != NULL) {
+            (it->second)->free_proto_mob();
+            delete (it->second);
         }
     }
 
     for (map<mob_vnum, struct index_data *>::iterator it = mob_index.begin(); it != mob_index.end(); it++)
-    if (it->second != NULL)
-        delete (it->second);
-   
+        if (it->second != NULL)
+            delete (it->second);
+
 
     //delete mob_proto;
     //free(mob_index);
     //htree_free();
 
-//    htree_free(HTREE_NULL);
-//    free(HTREE_NULL);
+    //    htree_free(HTREE_NULL);
+    //    free(HTREE_NULL);
 
     /* Shops */
     destroy_shops();
@@ -955,7 +1012,7 @@ void boot_db(void) {
 
     log("Booting World.");
     boot_world();
-//    htree_test();
+    //    htree_test();
 
     log("Loading help entries.");
     index_boot(DB_BOOT_HLP);
@@ -964,7 +1021,7 @@ void boot_db(void) {
     boot_context_help();
 
     log("Generating player index.");
-    build_player_index();
+    pi.Build();
 
     log("Booting clans.");
     init_clans();
@@ -1020,7 +1077,7 @@ void boot_db(void) {
     if (!no_rent_check) {
         log("Deleting timed-out crash and rent files:");
         update_obj_file();
-        clean_pfiles();
+        pi.CleanPFiles();
         log("   Done.");
     }
 
@@ -1113,207 +1170,7 @@ void save_mud_time(struct time_info_data *when) {
     }
 }
 
-void free_player_index(void) {
-    for (int tp = 0; tp < player_table.size(); tp++)
-        if (player_table[tp].name)
-            delete[] player_table[tp].name;
-    player_table.clear();
-    top_of_p_table = -1;
-}
 
-
-/* new version to build the player index for the ascii pfiles
- * generate index table for the player file
- */
-void build_player_index(void) {
-    int rec_count = 0, i, retval;
-    FILE *plr_index;
-    char index_name[80], line[READ_SIZE], bits[64];
-    char arg2[80];
-    int save_index = FALSE;
-
-    snprintf(index_name, sizeof(index_name), "%s", PLR_INDEX_FILE);
-    if (!(plr_index = fopen(index_name, "r"))) {
-        top_of_p_table = -1;
-        log("No player index file!  First new char will be IMP!");
-        return;
-    }
-
-    /* count the number of players in the index */
-    while (get_line(plr_index, line))
-        if (*line != '~')
-            rec_count++;
-    rewind(plr_index);
-
-    if (rec_count == 0) {
-        top_of_p_file = top_of_p_table = -1;
-        return;
-    }
-    log("   %d players in database.", rec_count);
-
-    //CREATE(player_table, struct player_index_element, rec_count);
-    player_index_element pte = player_index_element();
-    int id_zero = 0;
-    for (i = 0; i < rec_count; i++) {
-        get_line(plr_index, line);
-        if ((retval = sscanf(line, "%ld %s %d %s %ld %ld %hd %hd %lld %hd", &pte.id, arg2,
-                             &pte.level, bits,  &pte.last, &pte.account,
-                             &pte.clan, &pte.rank, &pte.gc_amount, &pte.gt_amount)) < 10) {
-            if (pte.id <= 0)
-                id_zero++;
-            if (id_zero >= 1)
-                pte.repair = TRUE;
-            if (retval == 5) {
-                pte.account = pte.id;
-                save_index = TRUE;
-            } else if (retval < 10)
-                save_index = TRUE;
-            else {
-                log("Player Index Error! Line %d.", i);
-                exit(1);
-            }
-        }
-        pte.name = new char[strlen(arg2) + 1];
-        //CREATE(player_table[i].name, char, strlen(arg2) + 1);
-        strcpy(pte.name, arg2);
-        *pte.name = LOWER(*pte.name);
-        pte.flags = asciiflag_conv(bits);
-        top_idnum = MAX(top_idnum, pte.id);
-        player_table.push_back(pte);
-    }
-    fclose(plr_index);
-    top_of_p_file = top_of_p_table = i - 1;
-
-
-
-
-    if (save_index) {
-        plrindex_it ptv;
-        Character *victim;
-        log("    fixing index fields: clans");
-
-        TEMP_LOAD_CHAR = TRUE;
-        for (ptv = player_table.begin(); ptv != player_table.end(); ptv++) {
-            if (!IS_SET((*ptv).flags, PINDEX_DELETED) && !IS_SET((*ptv).flags, PINDEX_SELFDELETE)) {
-                victim = new Character(FALSE);
-
-                if (store_to_char((*ptv).name, victim) > -1) {
-                    (*ptv).clan = GET_CLAN(victim);
-                    (*ptv).rank = GET_CLAN_RANK(victim);
-                    (*ptv).gc_amount = GET_GOLD(victim) + GET_BANK_GOLD(victim);
-                    (*ptv).gt_amount = GET_GOLD_TOKEN_COUNT(victim);
-                    delete victim;
-                } else
-                    delete victim;
-
-            }
-        }
-
-        TEMP_LOAD_CHAR = FALSE;
-        save_player_index();
-    }
-}
-
-void save_player_index(void) {
-    int cnt = 0;
-    char bits[64];
-    FILE *index_file;
-    char tempname[MAX_STRING_LENGTH];
-    snprintf(tempname, sizeof(tempname), "%s%s", PLR_INDEX_FILE, ".tmp");
-    if (!(index_file = fopen(tempname, "w"))) {
-        log("SYSERR:  Could not write player index file");
-        ALERT_2;
-        return;
-    }
-
-    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
-        cnt = 0;
-        if (*(*ptvi).name &&
-                !IS_SET((*ptvi).flags, PINDEX_DELETED) &&
-                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE)) {
-            for (plrindex_it ptvj = player_table.begin(); ptvj != player_table.end(); ptvj++) {
-                if (cnt == 0 &&
-                        *(*ptvi).name == *(*ptvj).name &&
-                        !strcmp((*ptvi).name, (*ptvj).name) &&
-                        !IS_SET((*ptvi).flags, PINDEX_DELETED) &&
-                        !IS_SET((*ptvi).flags, PINDEX_SELFDELETE)) {
-                    cnt++;
-                    sprintbits((*ptvi).flags, bits);
-                    *(*ptvi).name = LOWER(*(*ptvi).name);
-                    fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd %lld %hd\n",
-                            (*ptvi).id, (*ptvi).name,
-                            (*ptvi).level, *bits ? bits : "0",
-                            (*ptvi).last, (*ptvi).account,
-                            (*ptvi).clan, (*ptvi).rank, (*ptvi).gc_amount, (*ptvi).gt_amount);
-                }
-            }
-        }
-    }
-    int i = fprintf(index_file, "~\n");
-    fclose(index_file);
-    if (i < 0)
-        remove
-            (tempname);
-    else
-        rename(tempname, PLR_INDEX_FILE);
-}
-
-void remove_player(plrindex_it ptvi) {
-    char backup_name[128], pfile_name[128];
-    FILE *backup_file;
-
-    if (!*(*ptvi).name)
-        return;
-
-    if ((*ptvi).level >= pfile_backup_minlevel
-            && backup_wiped_pfiles && (!selfdelete_fastwipe ||
-                                       !IS_SET((*ptvi).flags,
-                                               PINDEX_SELFDELETE))) {
-        snprintf(backup_name, sizeof(backup_name), "%s/%s.%d", BACKUP_PREFIX,
-                 (*ptvi).name, (int) time(0));
-        if (!(backup_file = fopen(backup_name, "w"))) {
-            log( "PCLEAN: Unable to open backup file %s.",
-                 backup_name);
-            return;
-        }
-
-        fprintf(backup_file, "**\n** PFILE: %s\n**\n",
-                (*ptvi).name);
-        snprintf(pfile_name, sizeof(pfile_name), "%s/%c/%s%s", PLR_PREFIX,
-                 *(*ptvi).name,
-                 (*ptvi).name, PLR_SUFFIX);
-        //      if(!fcat(pfile_name, backup_file))
-        //              fprintf(backup_file, "** (NO FILE)\n");
-        fclose(backup_file);
-
-        remove
-            (pfile_name);
-    }
-    log( "PCLEAN: %s Lev: %d Last: %s",
-         (*ptvi).name, (*ptvi).level,
-         asctime(localtime(&(*ptvi).last)));
-    (*ptvi).name[0] = '\0';
-    save_player_index();
-}
-
-void clean_pfiles(void) {
-    int timeout = 0;
-    time_t tm = time(0);
-
-    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
-        if (IS_SET((*ptvi).flags, PINDEX_NODELETE))
-            continue;
-        timeout = -1;
-
-        if ((IS_SET((*ptvi).flags, PINDEX_DELETED)) || ((*ptvi).level < 40 && (*ptvi).clan == 12)) {
-            timeout = 90;
-
-            timeout *= SECS_PER_REAL_DAY;
-            if ((tm - (*ptvi).last) > timeout)
-                remove_player(ptvi);
-        }
-    }
-}
 
 ACMD(do_pclean) {
     int i, j;
@@ -1321,16 +1178,13 @@ ACMD(do_pclean) {
     for (j = CRASH_FILE; j < LOCKER_FILES;j++)
         for (i = 'a';i < 'z';i++) {
             if (get_dirname(dir_name, sizeof(dir_name), i, j) != NULL) {
-                clean_dir(dir_name);
+                pi.clean_dir(dir_name);
             }
         }
 
     for (i = 'a';i < 'z';i++) {
-
         snprintf(dir_name, sizeof(dir_name), "%s/%c/", PLR_PREFIX, i);
-
-        clean_dir(dir_name);
-
+        pi.clean_dir(dir_name);
     }
 }
 
@@ -1380,7 +1234,26 @@ ackeof:
     exit(1);               /* Some day we hope to handle these things better... */
     return (-1);
 }
+float bytesToSize(int by) {
+    float b = by;
+    if (b < 1024)
+        return b;
+    b /= 1024;
+    if (b < 1024)
+        return b;
+    b /= 1024;
+    return b;
 
+}
+const char *bytesToUnit(int b) {
+    if (b < 1024)
+        return "bytes";
+    b /= 1024;
+    if (b < 1024)
+        return "kilobytes";
+    b /= 1024;
+    return "megabytes";
+}
 /* function to count how many hash-mark delimited records exist in a file */
 int count_hash_records(FILE * fl) {
     char buf[128];
@@ -1470,7 +1343,7 @@ void index_boot(int mode) {
     } else {
         struct zone_list_data *temp;
         for (temp = zone_list;temp;temp = temp->next) {
-            snprintf(buf2, sizeof(buf2), "%s%d%s", temp->zone, temp->num, prefix);
+            snprintf(buf2, sizeof(buf2), "%s/%d%s", temp->zone, temp->num, prefix);
             if (!(db_file = fopen(buf2, "r+"))) {
                 log("SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix,
                     index_filename, strerror(errno));
@@ -1502,12 +1375,12 @@ void index_boot(int mode) {
     case DB_BOOT_TRG:
         CREATE(trig_index, struct index_data *, rec_count);
         size[0] = sizeof(struct index_data) * rec_count;
-        log("   %d triggers, %d bytes.", rec_count, size[0]);
+	log("   %d triggers, %.2f %s.", rec_count, bytesToSize(size[0]), bytesToUnit(size[0]));
         break;
     case DB_BOOT_WLD:
         //CREATE(world, Room, rec_count);
         size[0] = sizeof(Room) * rec_count;
-        log("   %d rooms, %d bytes.", rec_count, size[0]);
+	log("   %d rooms, %.2f %s.", rec_count, bytesToSize(size[0]), bytesToUnit(size[0]));
         break;
     case DB_BOOT_MOB:
         //mob_proto.assign(rec_count, *(new Character()));
@@ -1515,16 +1388,16 @@ void index_boot(int mode) {
         //        CREATE(mob_index, struct index_data, rec_count);
         size[0] = sizeof(struct index_data) * rec_count;
         size[1] = sizeof(Character) * rec_count;
-        log("   %d mobs, %d bytes in index, %d bytes in prototypes.",
-            rec_count, size[0], size[1]);
+	log("   %d mobs, %.2f %s in index, %.2f %s in prototypes.",
+	    rec_count, bytesToSize(size[0]), bytesToUnit(size[0]), bytesToSize(size[1]), bytesToUnit(size[1]));
         break;
     case DB_BOOT_OBJ:
         CREATE(obj_proto, struct obj_data, rec_count);
         CREATE(obj_index, struct index_data, rec_count);
         size[0] = sizeof(struct index_data) * rec_count;
         size[1] = sizeof(struct obj_data) * rec_count;
-        log("   %d objs, %d bytes in index, %d bytes in prototypes.",
-            rec_count, size[0], size[1]);
+	log("   %d objs, %.2f %s in index, %.2f %s in prototypes.",
+	    rec_count, bytesToSize(size[0]), bytesToUnit(size[0]), bytesToSize(size[1]), bytesToUnit(size[1]));
         break;
     case DB_BOOT_ZON:
         //CREATE(zone_table, Zone, rec_count);
@@ -1532,12 +1405,12 @@ void index_boot(int mode) {
         zone_table.assign(rec_count, *zd);
         delete zd;
         size[0] = sizeof(Zone) * rec_count;
-        log("   %d zones, %d bytes.", rec_count, size[0]);
+	log("   %d zones,  %.2f %s.", rec_count, bytesToSize(size[0]), bytesToUnit(size[0]));
         break;
     case DB_BOOT_HLP:
         CREATE(help_table, struct help_index_element, rec_count);
         size[0] = sizeof(struct help_index_element) * rec_count;
-        log("   %d entries, %d bytes.", rec_count, size[0]);
+	log("   %d entries, %.2f %s.", rec_count, bytesToSize(size[0]), bytesToUnit(size[0]));
         break;
     }
     if (mode == DB_BOOT_HLP) {
@@ -1560,7 +1433,7 @@ void index_boot(int mode) {
         struct zone_list_data *temp;
         //start
         for (temp=zone_list;temp;temp = temp->next) {
-            snprintf(buf2, sizeof(buf2), "%s%d%s", temp->zone, temp->num, prefix);
+            snprintf(buf2, sizeof(buf2), "%s/%d%s", temp->zone, temp->num, prefix);
             if (!(db_file = fopen(buf2, "r"))) {
                 log("SYSERR: %s: %s", buf2, strerror(errno));
                 exit(1);
@@ -1733,8 +1606,11 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon) {
     room_nr->number = virtual_nr;
     if ((room_nr->name = fread_string(fl, buf2)) == NULL)
         room_nr->name = strdup("Undefined");
-    if ((room_nr->description = fread_string(fl, buf2)) == NULL)
-        room_nr->description = strdup("Undefined");
+    if ((room_nr->t_description = fread_string(fl, buf2)) == NULL)
+        room_nr->SetDescription("Undefined");
+    else
+        room_nr->AssignTempDesc();
+
     if ((room_nr->smell = fread_string(fl, buf2)) == NULL)
         room_nr->smell  = strdup("Undefined");
     if ((room_nr->listen = fread_string(fl, buf2)) == NULL)
@@ -2307,7 +2183,7 @@ void interpret_espec(const char *keyword, const char *value, Character *mob, int
         mob->mob_specials.skin = num_arg;
     }
     CASE("Owner") {
-        RANGE(-1, (int)top_idnum);
+        RANGE(-1, (int)pi.TopIdNum);
         mob->mob_specials.skin = num_arg;
     }
 
@@ -2590,9 +2466,9 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     mob = new Character();
     mob->clear();
     mob->vnum = nr;
-    
-   SetMobProto(nr, mob);
-   SetMobIndex(nr, mi);
+
+    SetMobProto(nr, mob);
+    SetMobIndex(nr, mi);
     //mob = mob_proto[i];
     /*
      * Mobiles should NEVER use anything in the 'player_specials' structure.
@@ -2736,11 +2612,11 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
 
     if (MOB_FLAGGED(mob, MOB_POSTMASTER))
         ASSIGNMOB(nr, postmaster);
-   /// if (! mob_htree)
-   ///     mob_htree = htree_init();
-   /// htree_add(mob_htree, nr, i);
-   /// top_of_mobt = mob_proto.size();
-   ///i++;
+    /// if (! mob_htree)
+    ///     mob_htree = htree_init();
+    /// htree_add(mob_htree, nr, i);
+    /// top_of_mobt = mob_proto.size();
+    ///i++;
 
 }
 
@@ -2763,16 +2639,16 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon) {
     char f1[READ_SIZE], f2[READ_SIZE];
     char f3[READ_SIZE], f4[READ_SIZE];
     struct extra_descr_data *new_descr;
-    char buf2[MAX_INPUT_LENGTH];
+    char buf2[MAX_INPUT_LENGTH], *tmp;
 
     obj_index[i].vnum = nr;
     obj_index[i].number = 0;
     obj_index[i].func = NULL;
     obj_index[i].qic = NULL; // memory leak hopefully fixed - mord
 
-//    if (! obj_htree)
-//        obj_htree = htree_init();
-//    htree_add(obj_htree, nr, i);
+    //    if (! obj_htree)
+    //        obj_htree = htree_init();
+    //    htree_add(obj_htree, nr, i);
     obj_vTor[nr]=i;
 
     clear_object(obj_proto + i);
@@ -2790,10 +2666,14 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon) {
     obj_proto[i].taste = NULL;
 
     /* *** string data *** */
-    if ((obj_proto[i].name = fread_string(obj_f, buf2)) == NULL) {
+    if ((tmp = fread_string(obj_f, buf2)) == NULL) {
         log("SYSERR: Null obj name or format error at or near %s", buf2);
         exit(1);
     }
+
+    /** Convert it all to lower case **/
+    obj_proto[i].name = ChToLower(tmp);
+    //    obj_proto[i].FillNames();
 
     if ((obj_proto[i].short_description = tmpptr = fread_string(obj_f, buf2)) == NULL)
         tmpptr = obj_proto[i].short_description = strdup("Undefined");
@@ -3593,7 +3473,7 @@ Character *read_mobile(mob_vnum nr) {
     /* find_char helper */
     addChToLookupTable(GET_ID(mob), mob);
 
-//    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
+    //    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
     assign_triggers(mob, MOB_TRIGGER);
     mob->mob_specials.join_list = copy_proto_link(GetMobProto(nr)->mob_specials.join_list);
     load_links(mob);
@@ -3608,8 +3488,9 @@ struct obj_data *create_obj(void) {
 
     CREATE(obj, struct obj_data, 1);
     clear_object(obj);
-    obj->next = object_list;
-    object_list = obj;
+    /** Testing that we don't need these - Mord **/
+    //obj->next = object_list;
+    //object_list = obj;
 
     obj->name = NULL;
     obj->action_description = NULL;
@@ -3622,6 +3503,7 @@ struct obj_data *create_obj(void) {
 
     GET_ID(obj) = max_obj_id++;
     /* find_obj helper */
+    object_list[GET_ID(obj)] = obj;
     addObjToLookupTable(GET_ID(obj), obj);
 
 
@@ -3644,8 +3526,9 @@ struct obj_data *read_object(obj_vnum nr, int type) {                   /* and o
     CREATE(obj, struct obj_data, 1);
     clear_object(obj);
     *obj = obj_proto[i];
-    obj->next = object_list;
-    object_list = obj;
+    /** Testing that we don't need these - mord */
+    //obj->next = object_list;
+    //object_list = obj;
 
     if (obj_index[i].qic)
         log("%s created", obj->short_description);
@@ -3653,6 +3536,7 @@ struct obj_data *read_object(obj_vnum nr, int type) {                   /* and o
     obj_index[i].number++;
 
     GET_ID(obj) = max_obj_id++;
+    object_list[GET_ID(obj)] = obj;
     /* find_obj helper */
     addObjToLookupTable(GET_ID(obj), obj);
     generate_weapon(obj);
@@ -3662,9 +3546,23 @@ struct obj_data *read_object(obj_vnum nr, int type) {                   /* and o
     return (obj);
 }
 
+bool ZonePurgeObject(obj_list_type::iterator ob, int zone) {
+    obj_data *obj = ob->second;
+    if (!(obj))
+        return false;
+
+    if (!(obj)->carried_by && !(obj)->in_obj && !(obj)->worn_by & !(obj)->contains & !(obj)->in_locker
+            && ((obj)->in_room->zone == zone)
+            && (!IS_SET_AR((obj)->in_room->room_flags, ROOM_HOUSE))
+            && (!IS_SET_AR((obj)->in_room->room_flags, ROOM_HOUSE_CRASH))
+            && (!IS_OBJ_STAT((obj), ITEM_PC_CORPSE)))
+        return true;
+    else
+        return false;
+}
 int purge_zone(int zone) {
     Character *ch, *next_ch;
-    struct obj_data *ob, *next_ob;
+    vector<long> ex_list;
 
     for (ch = character_list; ch; ch = next_ch) {
         next_ch = ch->next;
@@ -3673,17 +3571,14 @@ int purge_zone(int zone) {
             extract_char(ch);
     }
 
-    for (ob = object_list; ob; ob = next_ob) {
-        next_ob = ob->next;
-        if (!ob->carried_by && !ob->in_obj && !ob->worn_by & !ob->contains & !ob->in_locker
-                && (ob->in_room->zone == zone)
-                //    && (!IS_SET_AR(world[ob->in_room].room_flags, ROOM_NODECAY))
-                && (!IS_SET_AR(ob->in_room->room_flags, ROOM_HOUSE))
-                &&
-                (!IS_SET_AR(ob->in_room->room_flags, ROOM_HOUSE_CRASH))
-                && (!IS_OBJ_STAT(ob, ITEM_PC_CORPSE)))
-            extract_obj(ob);
-    }
+    /** Find all items that need extracting **/
+    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+        if (ZonePurgeObject(ob, zone))
+            ex_list.push_back(GET_ID((ob->second)));
+    /** extract them now **/
+    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++)
+        extract_obj(object_list[(*v)]);
+
     return 0;
 }
 
@@ -3755,7 +3650,7 @@ void zone_update(void) {
             if (update_u == reset_q.head)
                 reset_q.head = reset_q.head->next;
             else {
-                for (temp = reset_q.head; temp->next != update_u;
+                for (temp = reset_q.head;temp && temp->next != update_u;
                         temp = temp->next)
                     ;
 
@@ -3876,26 +3771,63 @@ void make_maze(int zone) {
 
 #define ZONE_ERROR(message) \
      { log_zone_error(zone, cmd_no, message); last_cmd = 0; }
+typedef  multimap<room_vnum, long> objs_in_room;
+typedef  objs_in_room::iterator    obj_rit;
+typedef  pair<room_vnum, long>     obj_rid;
+typedef  pair<obj_rit, obj_rit>    oir_range;
+
+obj_data *put_in_to(room_vnum rvn, obj_vnum ovn, objs_in_room &mm) {
+    obj_list_type::iterator olit;
+    oir_range oirr = mm.equal_range(rvn);
+
+    for (objs_in_room::iterator it = oirr.first;it!=oirr.second;it++) {
+        olit = object_list.find(it->second);
+        if (olit != object_list.end())
+            if (GET_OBJ_RNUM(olit->second) == ovn)
+                return olit->second;
+        //else log("Obj vnum wanted %d, in room %d, got %d",ovn, rvn, GET_OBJ_VNUM(olit->second));
+    }
+    return NULL;
+}
 
 /* execute the reset command table of a given zone */
 void reset_zone(zone_rnum zone) {
-    int cmd_no, last_cmd = 0;
+    int cmd_no;
+    bool last_cmd = false;
     Character *mob = NULL;
     struct obj_data *obj, *obj_to;
     Character *tmob = NULL;   /* for trigger assignment */
     struct obj_data *tobj = NULL;    /* for trigger assignment */
+    objs_in_room oir; /* objects in rooms */
+
     room_rnum rm;
-    room_vnum vrm;
+    room_vnum vrm, cmd_room = 0;
+    char er_msg[MAX_INPUT_LENGTH];
 
     for (cmd_no = 0; ZCMD.command != 'S'; cmd_no++) {
+
+        switch (ZCMD.command) {
+        case 'M':
+        case 'O':
+        case 'T':
+        case 'V':
+        case 'B':
+            cmd_room = ZCMD.arg3;
+            break;
+        case 'D':
+        case 'R':
+            cmd_room = ZCMD.arg1;
+            break;
+        default:
+            break;
+        }
 
         if (ZCMD.if_flag && !last_cmd)
             continue;
 
-
         switch (ZCMD.command) {
         case '*':       /* ignore command */
-            last_cmd = 0;
+            last_cmd = false;
             tobj = NULL;
             break;
 
@@ -3909,14 +3841,14 @@ void reset_zone(zone_rnum zone) {
                 char_to_room(mob, world_vnum[ZCMD.arg3]);
                 if (load_mtrigger(mob) != -1) {
                     tmob = mob;
-                    last_cmd = 1;
+                    last_cmd = true;
                 } else {
                     mob = NULL;
                     tmob = mob;
-                    last_cmd = 0;
+                    last_cmd = false;
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tobj = NULL;
             break;
 
@@ -3934,7 +3866,7 @@ void reset_zone(zone_rnum zone) {
                             if (load_otrigger(obj) == -1)
                                 obj = NULL;
                             tobj = obj;
-                            last_cmd = obj ? 1 : 0;
+                            last_cmd = obj ? true : false;
                         } else {
                             if (obj) {
                                 purge_qic(ZCMD.arg1);
@@ -3943,41 +3875,42 @@ void reset_zone(zone_rnum zone) {
                             }
 
                             tobj = obj;
-                            last_cmd = 0;
+                            last_cmd = false;
                         }
 
                     } else
-                        last_cmd = 0;
+                        last_cmd = false;
                 } else {
                     obj = read_object(ZCMD.arg1, REAL);
                     if (obj)
                         IN_ROOM(obj) = NULL;
                     tobj = obj;
-                    last_cmd = 1;
+                    last_cmd = true;
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tmob = NULL;
+            if (last_cmd && tobj)
+                oir.insert(obj_rid(cmd_room,GET_ID(tobj)));
 
             break;
 
         case 'P':       /* object to object */
-            if ((obj_index[ZCMD.arg1].number < ZCMD.arg2) ) {
-                obj = read_object(ZCMD.arg1, REAL);
-                if (!(obj_to = get_obj_num(ZCMD.arg3))) {
-                    ZONE_ERROR("target obj not found, command disabled");
-                    ZCMD.command = '*';
-                    if (obj)
-                        extract_obj(obj);
+            if ((obj_index[ZCMD.arg1].number < ZCMD.arg2) && cmd_room) {
+                if (!(obj_to = put_in_to(cmd_room, ZCMD.arg3, oir))) { /* get_obj_in_list_num(ZCMD.arg3, cmd_room->contents) */
+                    snprintf(er_msg, sizeof(er_msg), "Put: target object vnum %d not found in room vnum %d", obj_index[ZCMD.arg3].vnum, cmd_room);
+                    ZONE_ERROR(er_msg);
+                    //ZCMD.command = '*';
                     break;
                 }
+                obj = read_object(ZCMD.arg1, REAL);
                 if (obj && load_qic_check(ZCMD.arg1)) {
                     obj_to_obj(obj, obj_to);
                     if (load_otrigger(obj) == -1)
                         obj = NULL;
                     tobj = obj;
 
-                    last_cmd = obj ? 1 : 0;
+                    last_cmd = obj ? true : false;
                 } else {
                     if (obj) {
                         purge_qic(ZCMD.arg1);
@@ -3986,11 +3919,13 @@ void reset_zone(zone_rnum zone) {
                     }
 
                     tobj = obj;
-                    last_cmd = 0;
+                    last_cmd = false;
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tmob = NULL;
+            if (last_cmd && tobj)
+                oir.insert(obj_rid(cmd_room,GET_ID(tobj)));
             break;
 
         case 'G':       /* obj_to_char ### */
@@ -4009,7 +3944,7 @@ void reset_zone(zone_rnum zone) {
 
                     tobj = obj;
 
-                    last_cmd = obj ? 1 : 0;
+                    last_cmd = obj ? true : false;
                 } else {
                     if (obj) {
                         purge_qic(ZCMD.arg1);
@@ -4017,18 +3952,20 @@ void reset_zone(zone_rnum zone) {
                         obj = NULL;
                     }
                     tobj = obj;
-                    last_cmd = 0;
+                    last_cmd = false;
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tmob = NULL;
+            if (last_cmd && tobj)
+                oir.insert(obj_rid(cmd_room,GET_ID(tobj)));
             break;
-
         case 'E':       /* object to equipment list ### */
             if (!mob) {
                 ZONE_ERROR
                 ("trying to equip non-existant mob, command disabled");
                 ZCMD.command = '*';
+                last_cmd = false;
                 break;
             }
             if ((obj_index[ZCMD.arg1].number < ZCMD.arg2)) {
@@ -4043,14 +3980,23 @@ void reset_zone(zone_rnum zone) {
                             obj = NULL;
                         if (obj && (ret = wear_otrigger(obj, mob, ZCMD.arg3)) > 0) {
                             IN_ROOM(obj) = NULL;
-                            equip_char(mob, obj, ZCMD.arg3);
+                            if (equip_char(mob, obj, ZCMD.arg3)) {
+                                last_cmd = true;
+                                tobj = obj;
+                            } else {
+                                if (obj) {
+                                    purge_qic(ZCMD.arg1);
+                                    extract_obj(obj);
+                                    obj = NULL;
+                                }
+                            }
                         } else if (obj && ret == 0) {
                             obj_to_char(obj, mob);
                             tobj = obj;
-                            last_cmd = 1;
+                            last_cmd = true;
                         } else {
                             obj = NULL;
-                            last_cmd = 0;
+                            last_cmd = false;
                             tobj = NULL;
                         }
                     } else {
@@ -4059,24 +4005,31 @@ void reset_zone(zone_rnum zone) {
                             extract_obj(obj);
                             obj = NULL;
                         }
-                        last_cmd = 0;
+                        last_cmd = false;
                     }
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tmob = NULL;
+            if (last_cmd && tobj)
+                oir.insert(obj_rid(cmd_room,GET_ID(tobj)));
             break;
-
         case 'R':       /* rem obj from room */
             if (!world_vnum[ZCMD.arg1]) {
                 ZONE_ERROR("Zone room error");
                 log("room %d doesn't exist, and zedit needs it.",ZCMD.arg1);
             } else
                 if ( (obj = get_obj_in_list_num(ZCMD.arg2, world_vnum[ZCMD.arg1]->contents)) != NULL) {
+                    for (multimap<room_vnum, long>::iterator it = oir.begin(); it!=oir.end();it++) {
+                        if (it->second == GET_ID(obj)) {
+                            oir.erase(it);
+                            break;
+                        }
+                    }
                     extract_obj(obj);
                     obj = NULL;
                 }
-            last_cmd = 1;
+            last_cmd = true;
             tmob = NULL;
             tobj = NULL;
             break;
@@ -4136,7 +4089,7 @@ void reset_zone(zone_rnum zone) {
                             exit_info, EX_HIDDEN);
                     break;
                 }
-            last_cmd = 1;
+            last_cmd = true;
             tmob = NULL;
             tobj = NULL;
             break;
@@ -4150,12 +4103,12 @@ void reset_zone(zone_rnum zone) {
                 if (!SCRIPT(tmob))
                     CREATE(SCRIPT(tmob), struct script_data, 1);
                 add_trigger(SCRIPT(tmob), read_trigger(ZCMD.arg2), -1);
-                last_cmd = 1;
+                last_cmd = true;
             } else if (ZCMD.arg1==OBJ_TRIGGER && tobj) {
                 if (!SCRIPT(tobj))
                     CREATE(SCRIPT(tobj), struct script_data, 1);
                 add_trigger(SCRIPT(tobj), read_trigger(ZCMD.arg2), -1);
-                last_cmd = 1;
+                last_cmd = true;
             } else if (ZCMD.arg1==WLD_TRIGGER) {
                 if (ZCMD.arg3 == NOWHERE || ZCMD.arg3>top_of_world) {
                     ZONE_ERROR("Invalid room number in trigger assignment");
@@ -4163,7 +4116,7 @@ void reset_zone(zone_rnum zone) {
                 if (!world_vnum[ZCMD.arg3]->script)
                     CREATE(world_vnum[ZCMD.arg3]->script, struct script_data, 1);
                 add_trigger(world_vnum[ZCMD.arg3]->script, read_trigger(ZCMD.arg2), -1);
-                last_cmd = 1;
+                last_cmd = true;
             }
 
             break;
@@ -4179,14 +4132,14 @@ void reset_zone(zone_rnum zone) {
                 } else
                     add_var(&(SCRIPT(tmob)->global_vars), ZCMD.sarg1, ZCMD.sarg2,
                             ZCMD.arg3);
-                last_cmd = 1;
+                last_cmd = true;
             } else if (ZCMD.arg1==OBJ_TRIGGER && tobj) {
                 if (!SCRIPT(tobj)) {
                     ZONE_ERROR("Attempt to give variable to scriptless object");
                 } else
                     add_var(&(SCRIPT(tobj)->global_vars), ZCMD.sarg1, ZCMD.sarg2,
                             ZCMD.arg3);
-                last_cmd = 1;
+                last_cmd = true;
             } else if (ZCMD.arg1==WLD_TRIGGER) {
                 if (ZCMD.arg3 == NOWHERE || ZCMD.arg3>top_of_world) {
                     ZONE_ERROR("Invalid room number in variable assignment");
@@ -4196,7 +4149,7 @@ void reset_zone(zone_rnum zone) {
                     } else
                         add_var(&(world_vnum[ZCMD.arg3]->script->global_vars),
                                 ZCMD.sarg1, ZCMD.sarg2, ZCMD.arg2);
-                    last_cmd = 1;
+                    last_cmd = true;
                 }
             }
         case 'B':       /* read an object then bury it */
@@ -4217,7 +4170,7 @@ void reset_zone(zone_rnum zone) {
                             if (obj)
                                 SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BURIED);
 
-                            last_cmd = obj ? 1 : 0;
+                            last_cmd = obj ? true : false;
                         } else {
                             if (obj) {
                                 //        purge_qic(ZCMD.arg1);
@@ -4225,10 +4178,10 @@ void reset_zone(zone_rnum zone) {
                                 obj = NULL;
                                 tobj = obj;
                             }
-                            last_cmd = 0;
+                            last_cmd = false;
                         }
                     } else
-                        last_cmd = 0;
+                        last_cmd = false;
 
                 } else {
                     obj = read_object(ZCMD.arg1, REAL);
@@ -4237,11 +4190,13 @@ void reset_zone(zone_rnum zone) {
                         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BURIED);
                     }
                     tobj = obj;
-                    last_cmd = 1;
+                    last_cmd = true;
                 }
             } else
-                last_cmd = 0;
+                last_cmd = false;
             tmob = NULL;
+            if (last_cmd && tobj)
+                oir.insert(obj_rid(cmd_room,GET_ID(tobj)));
             break;
 
         case 'Z':
@@ -4257,12 +4212,10 @@ void reset_zone(zone_rnum zone) {
     zone_table[zone].age = 0;
 
     /* handle reset_wtrigger's */
-    vrm = zone_table[zone].bot;
-    while (vrm <= zone_table[zone].top) {
+    for (vrm = zone_table[zone].bot;vrm <= zone_table[zone].top;vrm++) {
         rm = world_vnum[vrm];
         if (rm != NULL)
             reset_wtrigger(rm);
-        vrm++;
     }
 }
 
@@ -4300,109 +4253,7 @@ int is_empty(zone_rnum zone_nr) {
 
 
 
-/*************************************************************************
-*  stuff related to the save/load player system                   *
-*************************************************************************/
 
-long get_ptable_by_name(const char *name) {
-    for (int i = 0; i < player_table.size(); i++)
-        if (!str_cmp(player_table[i].name, name))
-            return (i);
-    return (-1);
-}
-
-
-long get_ptable_by_id(long id) {
-    for (int i = 0; i < player_table.size(); i++)
-        if (player_table[i].id == id)
-            return (i);
-
-    return (-1);
-}
-
-long get_id_by_name(const char *name) {
-    for (int i = 0; i < player_table.size(); i++)
-        if (!str_cmp(player_table[i].name, name))
-            return (player_table[i].id);
-
-    return (-1);
-}
-
-long get_acc_by_name(const char *name) {
-    for (int i = 0; i < player_table.size(); i++)
-        if (!str_cmp(player_table[i].name, name))
-            return (player_table[i].account);
-
-    return (-1);
-}
-
-long get_acc_by_id(long id) {
-    for (int i = 0; i < player_table.size(); i++)
-        if (player_table[i].id == id)
-            return (player_table[i].account);
-
-    return (-1);
-}
-
-//returns index of player num for account acc
-int get_account_num(int num, long acc) {
-    int i = 0, n = 0;
-    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++, i++)
-        if (!IS_SET((*ptvi).flags, PINDEX_DELETED) &&
-                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE) &&
-                (*ptvi).name[0] != '\0' && (*ptvi).account == acc && n++ == num)
-            return (i);
-
-    return (-1);
-}
-
-
-char *get_name_by_id(long id) {
-    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++)
-        if ((*ptvi).id == id)
-            return ((*ptvi).name);
-
-    return (NULL);
-}
-
-
-int load_char(const char *name, Character *ch) {
-    Character *tch;
-    int ret_val = 0;
-    string chname;
-
-    if (ch == NULL) {
-        new_mudlog(NRM, LVL_GOD, TRUE,"SYSERR: load_char recieved null ch!");
-        return -1;
-    }
-
-    if (player_table.size() == 0)
-        return -1;
-
-    for (tch = character_list;tch;tch = tch->next) {
-        if (!IS_NPC(tch) && !strcmp(GET_NAME(tch), name)) {
-            log("load_char loading a character (%s) that is already in the game!", name);
-        }
-    }
-    //for (k = 0; (*(name + k) = LOWER(*(name + k))); k++);
-    chname = tolower(string(name));
-
-    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
-        if (!IS_SET((*ptvi).flags, PINDEX_DELETED) &&
-                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE) &&
-                (!(*ptvi).name || !*(*ptvi).name))
-            continue;
-        if (*(*ptvi).name == chname[0] && !strcmp((*ptvi).name, chname.c_str())) {
-            ret_val = store_to_char(chname.c_str(), ch);
-            if (ret_val != -1)
-                return ((*ptvi).id);
-            else
-                return -2;
-        }
-    }
-    log("NAME: '%s' not found in player index. Create new...", chname.c_str());
-    return -1;
-}
 
 #if defined(KEY)
 #undef KEY
@@ -4453,11 +4304,11 @@ int store_to_char(const char *name, Character *ch) {
         return -1;
     }
 
-    if ((id = find_name(name)) < 0) {
+    if ((id = pi.TableIndexByName(name)) < 0) {
         log("Name: '%s' unfound in player index", name);
         return -1;
     } else {
-        pvti = player_table.begin() + id;
+        pvti = pi.Begin() + id;
 
         snprintf(filename, sizeof(filename), "%s/%c/%s",
                  PLR_PREFIX, *(*pvti).name, (*pvti).name);
@@ -4818,7 +4669,7 @@ int store_to_char(const char *name, Character *ch) {
                 break;
             case 'r':
                 if (!strcmp(tag, "Part"))
-                    PARTNER(ch) = get_id_by_name(line);
+                    PARTNER(ch) = pi.IdByName(line);
                 break;
             case 's':
                 if (!strcmp(tag, "Pass"))
@@ -5016,10 +4867,10 @@ int store_to_char(const char *name, Character *ch) {
             affect_to_char(ch, &tmp_aff[i]);
     }
 
-    if (!TEMP_LOAD_CHAR && IS_SET(player_table[id].flags, PINDEX_FIXSKILLS)) {
+    if (!TEMP_LOAD_CHAR && pi.IsSet(id, PINDEX_FIXSKILLS)) {
         fixskills(ch);
-        REMOVE_BIT(player_table[id].flags, PINDEX_FIXSKILLS);
-        save_player_index();
+        pi.UnsetFlags(id, PINDEX_FIXSKILLS);
+        pi.Save();
     }
 
     if (GET_LEVEL(ch) >= LVL_IMMORT) {
@@ -5042,18 +4893,18 @@ void Character::LoadKillList() {
 
     return;//disabled for the moment!
 
-    if ((id = get_id_by_name(GET_NAME(this)))<=0) {
+    if ((id = pi.TableIndexById(GET_IDNUM(this)))<=0) {
         log("bad index passed to load_killlist");
         return;
     }
-    if (id < 0 || id >= player_table.size())
+    if (id < 0 || id >= pi.Size())
         return;
     if (SPECIALS(this) == NULL || SPECIALS(this) == &dummy_mob)
         return;
 
 
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
-             PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
+             PLR_PREFIX, *pi.NameByIndex(id), pi.NameByIndex(id), ".kills");
     if (!(fl = fopen(filename, "r")))
         return;
     log("Loading Kill List %s", filename);
@@ -5071,11 +4922,11 @@ void Character::SaveKillList() {
     char filename[MAX_INPUT_LENGTH];
     return;
     FILE *fl;
-    id = get_ptable_by_id(GET_IDNUM(this));
-    if (!SPECIALS(this) || SPECIALS(this)->KillsCount() == 0 || id < 0 || id >= player_table.size())
+    id = pi.TableIndexById(GET_IDNUM(this));
+    if (!SPECIALS(this) || SPECIALS(this)->KillsCount() == 0 || id < 0 || id >= pi.Size())
         return;
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
-             PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
+             PLR_PREFIX, *pi.NameByIndex(id), pi.NameByIndex(id), ".kills");
     if (!(fl = fopen(filename, "w"))) {
         log("Can't open file %s for writing", filename);
         return;
@@ -5290,7 +5141,7 @@ void char_to_store(Character *ch) {
     }
     fprintf(fl, "Preg: %d\n", PREG(ch));
     if (ch->pet != NOBODY)
-    fprintf(fl, "PetM: %d\n", ch->pet);
+        fprintf(fl, "PetM: %d\n", ch->pet);
     if (PRETITLE(ch))
         fprintf(fl, "PreT: %s\n", PRETITLE(ch));
     if (GET_CLAN(ch)) {
@@ -5443,54 +5294,54 @@ void char_to_store(Character *ch) {
         }
     }
 
-    if (GET_IDNUM(ch) <= 0 || GET_IDNUM(ch) > top_idnum) {
-        GET_IDNUM(ch) = GET_ID(ch) =  top_idnum++;
+    if (GET_IDNUM(ch) <= 0 || GET_IDNUM(ch) > pi.TopIdNum) {
+        GET_IDNUM(ch) = GET_ID(ch) =  pi.TopIdNum++;
         addChToLookupTable(GET_ID(ch), ch);
     }
 
-    if ((id = find_name(GET_NAME(ch))) < 0)
+    if ((id = pi.TableIndexByName(GET_NAME(ch))) < 0)
         return;
-    if (player_table[id].clan != GET_CLAN(ch)) {
+    if (pi.ClanByIndex(id) != GET_CLAN(ch)) {
         save_index = TRUE;
-        player_table[id].clan = GET_CLAN(ch);
+        pi.SetClan(id, GET_CLAN(ch));
     }
-    if (player_table[id].rank != GET_CLAN_RANK(ch)) {
+    if (pi.RankByIndex(id) != GET_CLAN_RANK(ch)) {
         save_index = TRUE;
-        player_table[id].rank = GET_CLAN_RANK(ch);
+        pi.SetRank(id, GET_CLAN_RANK(ch));
     }
-    if (player_table[id].level != GET_LEVEL(ch)) {
+    if (pi.LevelByIndex(id) != GET_LEVEL(ch)) {
         save_index = TRUE;
-        player_table[id].level = GET_LEVEL(ch);
+        pi.SetLevel(id, GET_LEVEL(ch));
     }
-    if (player_table[id].last != ch->player.time.logon) {
+    if (pi.LastByIndex(id) != ch->player.time.logon) {
         save_index = TRUE;
-        player_table[id].last = ch->player.time.logon;
+        pi.SetLast(id, ch->player.time.logon);
     }
-    if (player_table[id].id != GET_IDNUM(ch)) {
+    if (pi.IdByIndex(id) != GET_IDNUM(ch)) {
         save_index = TRUE;
-        player_table[id].id = GET_IDNUM(ch);
-        player_table[id].account = GET_IDNUM(ch);
+        pi.SetId(id, GET_IDNUM(ch));
+        pi.SetAcc(id, GET_IDNUM(ch));
     }
-    if (player_table[id].gc_amount != GET_GOLD(ch) + GET_BANK_GOLD(ch)) {
+    if (pi.GoldByIndex(id) != ch->Gold(0, GOLD_ALL)) {
         save_index = TRUE;
-        player_table[id].gc_amount = GET_GOLD(ch) + GET_BANK_GOLD(ch);
+        pi.SetGold(id, ch->Gold(0, GOLD_ALL));
     }
-    if (player_table[id].gt_amount != GET_GOLD_TOKEN_COUNT(ch)) {
+    if (pi.TokensByIndex(id) != GET_GOLD_TOKEN_COUNT(ch)) {
         save_index = TRUE;
-        player_table[id].gt_amount = GET_GOLD_TOKEN_COUNT(ch);
+        pi.SetTokens(id, GET_GOLD_TOKEN_COUNT(ch));
     }
 
-    i = player_table[id].flags;
+    i = pi.FlagsByIndex(id);
     if (PLR_FLAGGED(ch, PLR_DELETED))
-        SET_BIT(player_table[id].flags, PINDEX_DELETED);
+        pi.SetFlags(id, PINDEX_DELETED);
     else
-        REMOVE_BIT(player_table[id].flags, PINDEX_DELETED);
+        pi.UnsetFlags(id, PINDEX_DELETED);
     if (PLR_FLAGGED(ch, PLR_NODELETE) || PLR_FLAGGED(ch, PLR_CRYO))
-        SET_BIT(player_table[id].flags, PINDEX_NODELETE);
+        pi.SetFlags(id, PINDEX_NODELETE);
     else
-        REMOVE_BIT(player_table[id].flags, PINDEX_NODELETE);
-    if (player_table[id].flags != i || save_index)
-        save_player_index();
+        pi.UnsetFlags(id, PINDEX_NODELETE);
+    if (pi.FlagsByIndex(id) != i || save_index)
+        pi.Save();
 }
 
 
@@ -5509,12 +5360,12 @@ void tag_argument(char *argument, char *tag) {
         *(wrt++) = *(tmp++);
     *wrt = '\0';
 }
-
+/*
 void sprintbits(long vektor, char *outstring) {
     int i;
     char flags[53] =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
+ 
     strcpy(outstring, "");
     for (i = 0; i < 32; i++) {
         if (vektor & 1) {
@@ -5524,6 +5375,21 @@ void sprintbits(long vektor, char *outstring) {
         vektor >>= 1;
     }
     *outstring = 0;
+}*/
+/*
+** print out the letter codes pertaining to the bits set in 'data'
+*/
+void sprintbits(int data, char *dest) {
+    int i;
+    char *p = dest;
+
+    for (i=0; i<32; i++) {
+        if (data & (1<<i)) {
+            *p = ((i<=25)?('a'+i):('A'+i));
+            p++;
+        }
+    }
+    *p = '\0';
 }
 
 void save_etext(Character *ch) {
@@ -5532,43 +5398,7 @@ void save_etext(Character *ch) {
 }
 
 
-/*
- * Create a new entry in the in-memory index table for the player file.
- * If the name already exists, by overwriting a deleted character, then
- * we re-use the old position.
- */
-int create_entry(const char *name) {
-    int pos = 0;
-    bool new_entry = FALSE;
-    player_index_element pie = player_index_element();
 
-    if (top_of_p_table == -1) {  /* no table */
-        new_entry = TRUE;
-    } else if ((pos = get_ptable_by_name(name)) == -1) {  /* new name */
-        pos = top_of_p_table;
-        new_entry = TRUE;
-    }
-
-    pie.name = new char[strlen(name) + 1];
-
-    if (!new_entry) {
-        if (player_table[pos].name)
-            delete[] player_table[pos].name;
-        player_table[pos] = pie;
-    } else {
-        pos = player_table.size();
-        top_of_p_table++;
-        player_table.push_back(pie);
-    }
-
-    /* copy lowercase equivalent of name to table field */
-    for (int i = 0; (player_table[pos].name[i] = LOWER(name[i])); i++)
-        /* Nothing */
-        ;
-
-
-    return (pos);
-}
 
 
 void clearAllZones() {
@@ -5714,19 +5544,20 @@ void free_mob_memory(memory_rec *k) {
 
 // delayed version of free obj
 void obj_data_to_pool(struct obj_data *obj) {
-    struct obj_data *temp;
-    for (temp = dead_obj; temp; temp = temp->next)
-        if (temp == obj) {
-            log("Object %s attempted to be added to dead list twice!", obj->short_description);
-            return;
-        }
-    obj->next = dead_obj;
-    dead_obj = obj;
+    if (!obj)
+        return;
+    if (dead_obj.find(GET_ID(obj)) != dead_obj.end()) {
+        log("Object %s attempted to be added to dead list twice!", obj->short_description);
+        return;
+    }
+
+    dead_obj[GET_ID(obj)] = obj;
 }
 
 /* release memory allocated for an obj struct */
 void free_obj(struct obj_data *obj, int extracted) {
-    void free_identifier(struct obj_data *obj);
+
+    Character *next;
     //log("Freeing object: %d: %s", GET_OBJ_VNUM(obj), obj->short_description);
     if (GET_OBJ_RNUM(obj) == NOWHERE) {
         free_object_strings(obj);
@@ -5738,21 +5569,40 @@ void free_obj(struct obj_data *obj, int extracted) {
             free_proto_script(obj, OBJ_TRIGGER);
     }
 
-    free_travel_points(TRAVEL_LIST(obj));
-    TRAVEL_LIST(obj) = NULL;
+    /* cancel message updates */
+    if (GET_TIMER_EVENT(obj)) {
+        event_cancel(GET_TIMER_EVENT(obj));
+        GET_TIMER_EVENT(obj) = NULL;
+    }
+    if (TRAVEL_LIST(obj) != NULL) {
+        free_travel_points(TRAVEL_LIST(obj));
+        TRAVEL_LIST(obj) = NULL;
+    }
+
+    for (Character *ch = OBJ_SAT_IN_BY(obj); ch; ch = next) {
+
+        if (ch) {
+            next = NEXT_SITTING(ch);
+            SITTING(ch) = NULL;
+            NEXT_SITTING(ch) = NULL;
+        } else
+            next = NULL;
+    }
+    OBJ_SAT_IN_BY(obj) = NULL;
     free_identifier(obj);
 
     /* free any assigned scripts */
     if (SCRIPT(obj))
         extract_script(obj, OBJ_TRIGGER);
 
-    removeFromObjLookupTable(GET_ID(obj));
+
     if (!extracted && GET_OBJ_RNUM(obj) >= 0) {
         purge_qic(GET_OBJ_RNUM(obj));
         obj_index[obj->item_number].number--;
 
     }
-
+    removeFromObjLookupTable(GET_ID(obj));
+    object_list.erase(GET_ID(obj));
     free(obj);
     obj = NULL;
 }
@@ -6211,7 +6061,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
             get_line(fl, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {   /* then this is a Xap Obj, requires
-                                                                                                                                                                                                                                                                                                                                                                                                                                                       special care */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       special care */
                 if ((temp->name = fread_string(fl, buf2)) == NULL) {
                     temp->name = "undefined";
                 }
@@ -6389,14 +6239,15 @@ obj_rnum real_object(obj_vnum vnum) {
     return -1;
 #else
 
-//    obj_rnum bot, top, mid, i, last_top;
+    //    obj_rnum bot, top, mid, i, last_top;
 
-//    i = htree_find(obj_htree, vnum);
+    //    i = htree_find(obj_htree, vnum);
     if(obj_vTor.find(vnum)!=obj_vTor.end())
-	    return obj_vTor[vnum];
-    else 
-	    return NOTHING;
+        return obj_vTor[vnum];
+    else
+        return NOTHING;
 #if 0
+
     if (i != NOWHERE && obj_index[i].vnum == vnum)
         return i;
     else {
@@ -6408,11 +6259,11 @@ obj_rnum real_object(obj_vnum vnum) {
             last_top = top;
             mid = (bot + top) / 2;
 
-//            if ((obj_index + mid)->vnum == vnum) {
-//                log("obj_htree sync fix: %d: %d -> %d", vnum, i, mid);
-//                htree_add(obj_htree, vnum, mid);
-//                return (mid);
-//            }
+            //            if ((obj_index + mid)->vnum == vnum) {
+            //                log("obj_htree sync fix: %d: %d -> %d", vnum, i, mid);
+            //                htree_add(obj_htree, vnum, mid);
+            //                return (mid);
+            //            }
             if (bot >= top)
                 return (NOTHING);
             if ((obj_index + mid)->vnum > vnum)
@@ -7388,12 +7239,10 @@ zone_rnum real_zone(zone_vnum vnum) {
 
 
 int valid_to_save(const char *name) {
-    for (int tp = 0; tp < player_table.size(); tp++) {
-        if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
-                (!player_table[tp].name || !*player_table[tp].name))
+    for (int tp = 0; tp < pi.Size(); tp++) {
+        if (pi.DeletedByIndex(tp))
             continue;
-        if (*player_table[tp].name == *name && !strcmp(player_table[tp].name, name)) {
+        if (*pi.NameByIndex(tp) == LOWER(*name) && !str_cmp(pi.NameByIndex(tp), name)) {
             return 1;
         }
     }
@@ -7444,7 +7293,7 @@ mob_vnum DeleteMobProto(mob_vnum vn) {
 }
 
 int GetMobProtoCount() {
-return mob_proto.size();
+    return mob_proto.size();
 }
 /** Mob Index Functions **/
 bool MobIndexExists(mob_vnum vn) {

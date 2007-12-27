@@ -141,7 +141,7 @@ ACMD(do_rdig)
      OLC_ROOM(d)->name = strdup("An unfinished room");
     
     /* Copy the room's description.*/
-    OLC_ROOM(d)->description = strdup("You are in an unfinished room.\r\n");
+    OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
     OLC_ROOM(d)->zone = OLC_ZNUM(d);
     OLC_ROOM(d)->number = NOWHERE;
     
@@ -239,7 +239,7 @@ ACMD(do_room_copy)
    ch->Send( "Cloning room....\r\n");
    
    room_dst->name = str_udup(IN_ROOM(ch)->name);
-   room_dst->description = str_udup(IN_ROOM(ch)->description);
+   room_dst->SetDescription(IN_ROOM(ch)->GetDescription());
    room_dst->smell = strdup(IN_ROOM(ch)->smell);
    room_dst->listen = strdup(IN_ROOM(ch)->listen);
    room_dst->number = buf_num;
@@ -427,7 +427,7 @@ int buildwalk(Character *ch, int dir) {
 
       OLC_ROOM(d)->name = strdup("New BuildWalk Room");
       snprintf(buf, sizeof(buf), "This unfinished room was created by %s.\r\n", GET_NAME(ch));
-      OLC_ROOM(d)->description = strdup(buf);
+      OLC_ROOM(d)->SetDescription(buf);
       OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
       OLC_ROOM(d)->listen = strdup("You hear nothing that attracts your attention.\r\n");
       OLC_ROOM(d)->zone = OLC_ZNUM(d);

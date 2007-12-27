@@ -171,7 +171,7 @@ void redit_setup_new(Descriptor *d)
   OLC_ROOM(d) = new Room();
 
   OLC_ROOM(d)->name = strdup("An unfinished room");
-  OLC_ROOM(d)->description = strdup("You are in an unfinished room.\r\n");
+  OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
   OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
   OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   OLC_ROOM(d)->number = NOWHERE;
@@ -531,7 +531,7 @@ void redit_disp_menu(Descriptor *d)
                   cyn, OLC_NUM(d), nrm,
                   cyn, zone_table[OLC_ZNUM(d)].number, nrm,
                   grn, nrm, yel, room->name,
-                  grn, nrm, yel, room->description,
+		  grn, nrm, yel, room->GetDescription(),
                   grn, nrm, cyn, buf1,
                   grn, nrm, cyn, buf2,
                   grn, nrm, cyn,
@@ -650,12 +650,15 @@ void redit_parse(Descriptor *d, char *arg)
       send_editor_help(d);
       d->Output( "Enter room description:\r\n\r\n");
 
-      if (OLC_ROOM(d)->description)
+      if (OLC_ROOM(d)->HasDesc())
       {
-        d->Output( "%s", OLC_ROOM(d)->description);
-        oldtext = strdup(OLC_ROOM(d)->description);
+	      d->Output( "%s", OLC_ROOM(d)->GetDescription());
+	      oldtext = strdup(OLC_ROOM(d)->GetDescription());
       }
-      string_write(d, &OLC_ROOM(d)->description, MAX_ROOM_DESC, 0, oldtext);
+      if (OLC_ROOM(d)->t_description)
+	      free(OLC_ROOM(d)->t_description);
+      OLC_ROOM(d)->t_description = strdup(OLC_ROOM(d)->GetDescription());
+      string_write(d, &OLC_ROOM(d)->t_description, MAX_ROOM_DESC, 0, oldtext);
       OLC_VAL(d) = 1;
       break;
     case '3':
@@ -1378,8 +1381,16 @@ void redit_string_cleanup(Descriptor *d, int terminator)
   {
   case REDIT_SMELL:
   case REDIT_LISTEN:
+	  redit_disp_menu(d);
+	  break;
   case REDIT_DESC:
-    redit_disp_menu(d);
+	  if (STRINGADD_SAVE == terminator) {
+		  OLC_ROOM(d)->SetDescription(OLC_ROOM(d)->t_description);
+		  if (OLC_ROOM(d)->t_description)
+		  free(OLC_ROOM(d)->t_description);
+	  }
+		  
+	  redit_disp_menu(d);
     break;
   case REDIT_EXIT_DESCRIPTION:
     redit_disp_exit_menu(d);

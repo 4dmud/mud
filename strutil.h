@@ -19,3 +19,4 @@ string tocapitals (const string & s);
 string FindAndReplace
   (const string& source, const string target, const string replacement);
 
+char *ChToLower(char *c);

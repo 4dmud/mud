@@ -53,14 +53,14 @@ struct event {
 /* number of queues to use (reduces enqueue cost) */
 #define NUM_EVENT_QUEUES    10
 
-struct queue {
+struct dgqueue {
     struct q_element *head[NUM_EVENT_QUEUES], *tail[NUM_EVENT_QUEUES];
 
-    queue() {
+    dgqueue() {
         for (unsigned int i = 0; i < NUM_EVENT_QUEUES;i++)
             head[i] = tail[i] = NULL;
     };
-    ~queue() {
+    ~dgqueue() {
         //this gets cleaned up in another function - mord
     };
 
@@ -116,10 +116,10 @@ unsigned long event_time(struct event *event);
 void event_free_all(void);
 
 /* - queues - function protos need by other modules */
-struct q_element *queue_enq(struct queue *q, void *data, long key);
-void queue_deq(struct queue *q, struct q_element *qe);
-void *queue_head(struct queue *q);
-long queue_key(struct queue *q);
+struct q_element *queue_enq(struct dgqueue *q, void *data, long key);
+void queue_deq(struct dgqueue *q, struct q_element *qe);
+void *queue_head(struct dgqueue *q);
+long queue_key(struct dgqueue *q);
 long queue_elmt_key(struct q_element *qe);
-void queue_free(struct queue *q);
+void queue_free(struct dgqueue *q);
 bool event_is_queued(struct event *event);

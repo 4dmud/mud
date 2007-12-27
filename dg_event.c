@@ -23,13 +23,14 @@
 #include "comm.h"
 #include "regen.h"
 
-struct queue *event_q = NULL;      /* the event queue */
+struct dgqueue *event_q = NULL;      /* the event queue */
 
 extern unsigned long pulse;
 
+
 /* initializes the event queue */
 void event_init(void) {
-    event_q = new queue();
+    event_q = new dgqueue();
 }
 
 /*
@@ -185,7 +186,7 @@ bool event_is_queued(struct event *event) {
 ************************************************************************ */
 
 /* add data into the priority queue q with key */
-struct q_element *queue_enq(struct queue *q, void *data, long key) {
+struct q_element *queue_enq(struct dgqueue *q, void *data, long key) {
     struct q_element *qe, *i;
     int bucket;
 
@@ -226,7 +227,7 @@ struct q_element *queue_enq(struct queue *q, void *data, long key) {
 
 
 /* remove queue element qe from the priority queue q */
-void queue_deq(struct queue *q, struct q_element *qe) {
+void queue_deq(struct dgqueue *q, struct q_element *qe) {
     int i;
 
     assert(qe);
@@ -256,7 +257,7 @@ void queue_deq(struct queue *q, struct q_element *qe) {
  * removes and returns the data of the
  * first element of the priority queue q
  */
-void *queue_head(struct queue *q) {
+void *queue_head(struct dgqueue *q) {
     void *data;
     int i;
 
@@ -275,7 +276,7 @@ void *queue_head(struct queue *q) {
  * returns the key of the head element of the priority queue
  * if q is NULL, then return the largest unsigned number
  */
-long queue_key(struct queue *q) {
+long queue_key(struct dgqueue *q) {
     int i;
 
     i = pulse % NUM_EVENT_QUEUES;
@@ -294,7 +295,7 @@ long queue_elmt_key(struct q_element *qe) {
 
 
 /* free q and contents */
-void queue_free(struct queue *q) {
+void queue_free(struct dgqueue *q) {
     int i;
     struct q_element *qe, *next_qe;
 

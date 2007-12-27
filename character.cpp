@@ -36,23 +36,23 @@
     # include <mmsystem.h>
     #endif                   /* CIRCLE_WINDOWS */
 
-    #ifdef CIRCLE_AMIGA      /* Includes for the Amiga */
+#ifdef CIRCLE_AMIGA      /* Includes for the Amiga */
     # include <sys/ioctl.h>
     # include <clib/socket_protos.h>
     #endif                   /* CIRCLE_AMIGA */
 
-    #ifdef CIRCLE_ACORN      /* Includes for the Acorn (RiscOS) */
+#ifdef CIRCLE_ACORN      /* Includes for the Acorn (RiscOS) */
     # include <socklib.h>
     # include <inetlib.h>
     # include <sys/ioctl.h>
     #endif
 
-    /*
-     * Note, most includes for all platforms are in sysdep.h.  The list of
-     * files that is included is controlled by conf.h for that platform.
-     */
+/*
+ * Note, most includes for all platforms are in sysdep.h.  The list of
+ * files that is included is controlled by conf.h for that platform.
+ */
 
-    #include "structs.h"
+#include "structs.h"
     #include "utils.h"
     #include "comm.h"
     #include "interpreter.h"
@@ -74,16 +74,14 @@
     #include "spells.h"
     #include "regen.h"
 
-    #ifdef HAVE_ARPA_TELNET_H
+#ifdef HAVE_ARPA_TELNET_H
     #include <arpa/telnet.h>
     #else
     #include "telnet.h"
     #endif
 
 
-    void free_join_list(struct combine_data *list);
-void free_killlist(Character *ch);
-long get_ptable_by_name(const char *name);
+
 
 void free_note(NOTE_DATA *note, int type);
 void free_mob_memory(memory_rec *k);
@@ -95,7 +93,6 @@ void free_alias(struct alias_data *a);
 void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add
                          );
 int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
-extern long top_idnum;
 
 int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 
@@ -346,7 +343,6 @@ void Character::freeself() {
 void Character::clear() {
     IN_ROOM(this) = NULL;
     TRAVEL_LIST(this) = NULL;
-    GET_PFILEPOS(this) = -1;
     GET_IDNUM(this) = -1;
     FIGHTING(this) = NULL;
     GET_NEXT_SKILL(this) = TYPE_UNDEFINED;
@@ -461,7 +457,7 @@ void Character::reset() {
  */
 /* initialize a new character only if class is set */
 void Character::init() {
-    int i, taeller;
+    int i = 0, taeller;
 
     /* create a player_special structure */
     if (player_specials == NULL) {
@@ -471,7 +467,7 @@ void Character::init() {
 
     /* *** if this is our first player --- he be God *** */
 
-    if (player_table.size() == 0 || (player_table.size() == 1 && !strcasecmp(player_table[0].name,player.name))) {
+    if (pi.Size() == 0 || (pi.Size() == 1 && !strcasecmp(pi.NameByIndex(i),player.name))) {
 
         GET_LEVEL(this) = LVL_IMPL;
         GET_EXP(this) = exp_needed(this);
@@ -540,11 +536,17 @@ void Character::init() {
 
 
     //TODO: check this
-    if ((i = get_ptable_by_name(player.name)) != -1)
-        while (valid_id_num(++top_idnum) == FALSE)
-            log("Error new id %ld being assigned to %s already exists!",top_idnum, player.name);
+    try {
+        i = pi.TableIndexByName(player.name);
+        while (valid_id_num(++pi.TopIdNum) == FALSE)
+            log("Error new id %ld being assigned to %s already exists!",pi.TopIdNum, player.name);
+    } catch (MudException &e) {
+        log(e.Message());
+    }
 
-    player_table[i].account = player_table[i].id = GET_IDNUM(this) = GET_ID(this) = top_idnum;
+    pi.SetAcc(i, pi.TopIdNum);
+    pi.SetId(i, pi.TopIdNum);
+    GET_IDNUM(this) = GET_ID(this) = pi.TopIdNum;
     addChToLookupTable(GET_ID(this), this);
 
 
@@ -916,7 +918,6 @@ Character *Character::assign (Character *b) {
     chch = GetMobProto(vnum);
     /** free non proto strings so they can share the new mob proto's strings */
     free_non_proto_strings();
-    pfilepos = b->pfilepos;
     in_room = b->in_room;         /* Location (real room number)   */
     was_in_room = b->was_in_room;     /* location for linkdead people  */
     wait = b->wait;            /* wait for how many loops       */
@@ -950,7 +951,7 @@ Character *Character::assign (Character *b) {
     else
         player.title = NULL;
 
-    #if 0
+#if 0
 
     if (mp != NULL) {
         if (b->player.name && b->player.name != mp->player.name)
@@ -968,7 +969,7 @@ Character *Character::assign (Character *b) {
         if (b->player.title && b->player.title != mp->player.title)
             player.title = strdup(b->player.title);
     }
-    #endif
+#endif
     real_abils = b->real_abils;     /* Abilities without modifiers   */
     aff_abils = b->aff_abils; /* Abils with spells/stones/etc  */
     points = b->points; /* Points                        */
@@ -993,7 +994,7 @@ Character *Character::assign (Character *b) {
             hjp = hjp->next;
         }
         **/
-    #if 0
+#if 0
 
     affected = b->affected;
     b->affected = NULL;
@@ -1031,7 +1032,7 @@ Character *Character::assign (Character *b) {
     //Character *next_fighting; /* For fighting list               */
     /** Do not assign followers, this can be done in the calling function **/
     //struct follow_type *followers; /* List of chars followers       */
-    #endif
+#endif
     //master;   /* Who is char following?        */
     cmd2 = b->cmd2;
     //long cmd2;           /* These wizcmds aren't saved     */

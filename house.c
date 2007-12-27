@@ -580,7 +580,7 @@ void House_boot(void)
     if (feof(fl))
       break;
 
-    if (get_name_by_id(temp_house.owner) == NULL)
+    if (pi.NameById(temp_house.owner) == NULL)
       continue;		/* owner no longer exists -- skip */
 
     log("Reading house: %d.", temp_house.vnum);
@@ -611,7 +611,7 @@ void House_boot(void)
     House_load(temp_house.vnum);
     for (k = 0; k < house_control[num_of_houses - 1].num_of_guests; k++)
     {
-      if ((get_name_by_id(house_control[num_of_houses - 1].guests[k])) == NULL)
+      if ((pi.NameById(house_control[num_of_houses - 1].guests[k])) == NULL)
       {
         for (; k < house_control[num_of_houses - 1].num_of_guests; k++)
           house_control[num_of_houses - 1].guests[k] =
@@ -659,7 +659,7 @@ void hcontrol_list_houses(Character *ch)
   for (i = 0; i < num_of_houses; i++)
   {
     /* Avoid seeing <UNDEF> entries from self-deleted people. -gg 6/21/98 */
-    if ((temp = get_name_by_id(house_control[i].owner)) == NULL)
+    if ((temp = pi.NameById(house_control[i].owner)) == NULL)
       continue;
 
     if (house_control[i].built_on)
@@ -763,7 +763,7 @@ void hcontrol_build_house(Character *ch, char *arg)
     send_to_char(HCONTROL_FORMAT, ch);
     return;
   }
-  if ((owner = get_id_by_name(arg1)) < 0)
+  if ((owner = pi.IdByName(arg1)) < 0)
   {
     ch->Send(  "Unknown player '%s'.\r\n", arg1);
     return;
@@ -941,7 +941,7 @@ ACMD(do_house)
     send_to_char("Only the primary owner can set guests.\r\n", ch);
   else if (!str_cmp(arg, "expand"))
     house_expand_house(ch, i);
-  else if ((id = get_id_by_name(arg)) < 0)
+  else if ((id = pi.IdByName(arg)) < 0)
     send_to_char("No such player.\r\n", ch);
   else if (id == GET_IDNUM(ch))
     send_to_char("It's your house!\r\n", ch);
@@ -960,7 +960,7 @@ ACMD(do_house)
       }
     for (k = 0; k < house_control[i].num_of_guests; k++)
     {
-      if ((get_name_by_id(house_control[i].guests[k])) == NULL)
+      if ((pi.NameById(house_control[i].guests[k])) == NULL)
       {
         for (; k < house_control[i].num_of_guests; k++)
           house_control[i].guests[k] =
@@ -1074,7 +1074,7 @@ void hcontrol_expand_house(Character *ch, char *argument)
   
 
     house_control[i].expantions += (long)amount;
-ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, get_name_by_id(house_control[i].owner), house_capacity(i));
+ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, pi.NameById(house_control[i].owner), house_capacity(i));
 
   
   House_save_control();
@@ -1141,7 +1141,7 @@ void hcontrol_set_stable(Character *ch, char *argument)
   else
   {
     house_control[i].stable = TRUE;
-    ch->Send( "Stable added to house %d (owner: %s)\r\n", house, get_name_by_id(house_control[i].owner));
+    ch->Send( "Stable added to house %d (owner: %s)\r\n", house, pi.NameById(house_control[i].owner));
   }
 
   House_save_control();
@@ -1238,7 +1238,7 @@ void House_list_guests(Character *ch, int i, int quiet)
   /* Avoid <UNDEF>. -gg 6/21/98 */
   for (j = 0; j < house_control[i].num_of_guests; j++)
   {
-    if ((temp = get_name_by_id(house_control[i].guests[j])) == NULL)
+    if ((temp = pi.NameById(house_control[i].guests[j])) == NULL)
     {
       continue;
     }
