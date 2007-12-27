@@ -10,6 +10,10 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.61  2007/05/20 21:01:46  w4dimenscor
+ * Fixed the spamcast bug.
+ * -- Thotter
+ *
  * Revision 1.60  2007/04/19 10:04:35  w4dimenscor
  * Updated subskills so they wouldn;t report a max over 100
  *
@@ -6141,7 +6145,12 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
             dam += 0.25;
         break;
     }
-    GET_WAIT_STATE(vict) += 1 RL_SEC;
+    //I have no idea why the below was in, but it has been here since before
+    //I started coding here. It is pretty nasty, since it allows a player to
+    //spamcast an offensive spell at a mob, and the mob won't be able to fight
+    //back, because its wait state isn't less then or equal to 0. --Thotter
+    //
+    //GET_WAIT_STATE(vict) += 1 RL_SEC;
     return dam;
 
 }
