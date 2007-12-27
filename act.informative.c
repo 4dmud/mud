@@ -4815,13 +4815,13 @@ ACMD(set_perc) {
         return;
     }
 
-    if (is_number(buf2))
-        amount = atoi(buf2);
-    else if (isname(buf2, "even split auto")) {
+    if (isname(buf, "even split auto")) {
         even_group(ch);
         ch->Send( "You split the involvement evenly.\r\n");
         return;
-    } else {
+    }else if (is_number(buf2))
+        amount = atoi(buf2);
+    else {
         ch->Send("involve <groupmember> <amount (1 to %3d)>\r\n", 90 - group_size(ch));
         return;
     }
