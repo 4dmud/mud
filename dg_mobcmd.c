@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.22  2006/07/15 12:53:12  w4dimenscor
+ * Tweaked mtransform further and it should work fine now.
+ *
  * Revision 1.21  2006/07/14 19:06:09  w4dimenscor
  * Fixed mtransform!
  *
@@ -1566,6 +1569,18 @@ ACMD(do_mtransform)
       tmpmob.player.long_descr = strdup(m->player.long_descr);
     if(m->player.description)
       tmpmob.player.description = strdup(m->player.description);
+    if(IS_SET(INTERNAL(ch), INT_ISMTRANSFORM)){
+      if(ch->player.name)
+        free(ch->player.name);
+      if(ch->player.title)
+        free(ch->player.title);
+      if(ch->player.short_descr)
+        free(ch->player.short_descr);
+      if(ch->player.long_descr)
+        free(ch->player.long_descr);
+      if(ch->player.description)
+        free(ch->player.description);
+    }
     tmpmob.id = ch->id;
     tmpmob.affected = ch->affected;
     tmpmob.carrying = ch->carrying;
@@ -1624,7 +1639,8 @@ ACMD(do_mtransform)
     }
     while (0);
     extract_char(m);
-    tmpmob.is_mtransformed=1;
+    SET_BIT(INTERNAL(&tmpmob),INT_MTRANSFORMED);
+    SET_BIT(INTERNAL(ch),INT_ISMTRANSFORM);
   }
 }
 

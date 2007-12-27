@@ -206,10 +206,9 @@ void Character::freeself() {
     int i;
     struct alias_data *a;
 
-  if(is_mtransformed) {
-    clear();
-    return;
-  }
+    if(IS_SET(INTERNAL(this),INT_MTRANSFORMED))
+      return;
+
     if (this == NULL)
         return;
 
@@ -716,7 +715,8 @@ GET_POINTS_EVENT(this, 3) = NULL;
     mob_specials.head_join = NULL;
     mob_specials.dam_list = NULL;
     player.description = NULL;
-    is_mtransformed=0;
+    REMOVE_BIT(INTERNAL(this), INT_MTRANSFORMED);
+    REMOVE_BIT(INTERNAL(this), INT_ISMTRANSFORM);
 
 }
 

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.43  2006/07/15 12:53:12  w4dimenscor
+ * Tweaked mtransform further and it should work fine now.
+ *
  * Revision 1.42  2006/07/14 19:06:09  w4dimenscor
  * Fixed mtransform!
  *
@@ -1137,6 +1140,8 @@ class cstring;
 
 /* Character.internal_flags (INT_XXX) ************************************/
 #define INT_MARK    (1 <<  0)
+#define INT_MTRANSFORMED (1 << 1)
+#define INT_ISMTRANSFORM (1 << 2)
 
 #define NEWB_NONE   0
 #define NEWB_NEW    1
@@ -2003,7 +2008,6 @@ public:
 
 	Character();
 	~Character();
-        int is_mtransformed;
 
 };
 /* ====================================================================== */
