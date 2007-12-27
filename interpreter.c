@@ -1953,7 +1953,9 @@ int perform_dupe_check(struct descriptor_data *d)
 
 void list_current_accounts_menu(DESCRIPTOR_DATA *d)
 {
-  int i = 0, index, acc = get_acc_by_id(d->character->id);
+  int i = 0, index, acc = -1;
+  if (d->character)
+    acc = get_acc_by_id(GET_IDNUM(d->character));
   write_to_output(d, "\r\n{cC-=- Select a character to play (! denotes account owner) -=-{c0\r\n\r\n");
   for (index = 0; index <= top_of_p_table; index++)
   {
@@ -2175,7 +2177,7 @@ int enter_player_game(struct descriptor_data *d)
     for (i = 1; i <= MAX_SKILLS; i++)
       SET_SKILL(ch, i, 100);
   }
-
+  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "[lev: %d] %s entering the game in room #%d, %s", GET_LEVEL(ch), GET_NAME(ch), load_room->number, load_room->name);
   if(GET_LOGINMSG(d->character)==NULL)
     act("$n has entered the game.", TRUE, ch, 0, 0, TO_ROOM);
   else
@@ -2183,7 +2185,7 @@ int enter_player_game(struct descriptor_data *d)
   load_result = Crash_load(ch);
   read_ignorelist(ch);
   load_locker(ch);
-  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "[lev: %d] %s entering the game in room #%d, %s", GET_LEVEL(ch), GET_NAME(ch), load_room->number, load_room->name);
+  
   if (LOCKER(ch))
     new_mudlog( NRM, GET_LEVEL(ch), TRUE, "  -- with %d items in locker", count_locker(ch));
 
@@ -2492,7 +2494,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
         if (!d->character->player_specials)
           CREATE(d->character->player_specials, struct player_special_data, 1);
-
+        default_char(d->character);
         CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
         strcpy(d->character->player.name, CAP(tmp_name));
         write_to_output(d, "\r\n"
@@ -2837,7 +2839,7 @@ void nanny(struct descriptor_data *d, char *arg)
       clear_char(d->character);
 
       d->character->desc = d;
-      if ((player_i = load_char(player_table[i].name, d->character)) != -1)
+      if ((player_i = load_char(player_table[i].name, d->character)) == -1)
       {
         if (player_i == -2)
         {
@@ -2848,7 +2850,8 @@ void nanny(struct descriptor_data *d, char *arg)
 
 
         }
-
+        free(d->character);
+        d->character = NULL;
         STATE(d) = CON_CLOSE;
         return;
       }

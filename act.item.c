@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.26  2005/11/01 18:43:37  w4dimenscor
+ * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
+ *
  * Revision 1.25  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining
  *
@@ -3843,8 +3846,8 @@ void compare_weapons(struct char_data *ch,struct obj_data *item, struct obj_data
   value1 = (((item->obj_flags.value[1]+1) * item->obj_flags.value[2] * wep_multi[0])/2);
   value2 = (((comp->obj_flags.value[1]+1) * comp->obj_flags.value[2] * wep_multi[1])/2);
 
-  new_send_to_char(ch, "      {cgYou would do %s damage with ({cRB{cg) then ({cGA{cg).{c0\r\n",
-                   value2 > value1 ? "more" : "less");
+  new_send_to_char(ch, "      {cgYou would do %s damage with ({cRB{cg) %s ({cGA{cg).{c0\r\n",
+                   value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "and" : "then");
 }
 void compare_staves(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
 {
@@ -3853,7 +3856,10 @@ void compare_staves(struct char_data *ch,struct obj_data *item, struct obj_data 
     return;
   if (staff_multi(ch, comp) > staff_multi(ch, item)) {
     new_send_to_char(ch, "      {cgYou would get a higher multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  } else {
+  }else if (staff_multi(ch, comp) == staff_multi(ch, item)){
+    new_send_to_char(ch, "      {cgYou would get the same multiplyer from ({cRB{cg) and ({cGA{cg).{c0\r\n");
+  }
+  else {
     new_send_to_char(ch, "      {cgYou would get a lower multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
   }
 }
@@ -3865,9 +3871,23 @@ void compare_armor(struct char_data *ch,struct obj_data *item, struct obj_data *
   if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0)) {
     new_send_to_char(ch, "      {cgYou would get more armor from ({cRB{cg) then ({cGA{cg).{c0\r\n");
   } else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0)) {
-    new_send_to_char(ch, "      {cgYou would get less armor from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+    new_send_to_char(ch, "      {cgYou would get the same from ({cRB{cg) then ({cGA{cg).{c0\r\n");
   } else {
-    new_send_to_char(ch, "      {cgYou would get the same armor from ({cRB{cg) and ({cGA{cg).{c0\r\n");
+    new_send_to_char(ch, "      {cgYou would get less armor from ({cRB{cg) and ({cGA{cg).{c0\r\n");
+  }
+  
+}
+void compare_food(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
+{
+  if (!item || !comp)
+    return;
+  
+  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0)) {
+    new_send_to_char(ch, "      {cgYou would get more food from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  } else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0)) {
+    new_send_to_char(ch, "      {cgYou would get the same food from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  } else {
+    new_send_to_char(ch, "      {cgYou would get less food from ({cRB{cg) and ({cGA{cg).{c0\r\n");
   }
   
 }
@@ -3919,8 +3939,8 @@ void compare_affects(struct char_data *ch, struct obj_data *item, struct obj_dat
       break;
     }
 
-  new_send_to_char(ch, "      {cg({cRB{cg) has %s beneficial affects then ({cGA{cg) with a difference score of %d.{c0\r\n",
-                    points > 0 ? "more" : "less",  points);
+  new_send_to_char(ch, "      {cg({cRB{cg) has %s beneficial affects %s ({cGA{cg) with a difference score of %d.{c0\r\n",
+                   points > 0 ? "more" : points ==  0 ? "the same" : "less",  points ==  0 ? "and" : "then", points);
 
 }
 
@@ -3959,7 +3979,7 @@ ACMD(do_compare)
     {
       if (obj1 == obj2)
         continue;
-      if (!same_location(obj1, obj2))
+      if (same_location(obj1, obj2))
         continue;
       if (CAN_SEE_OBJ(ch, obj2) && GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1) && CAN_GET_OBJ(ch, obj2)) {
         new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
@@ -3970,6 +3990,9 @@ ACMD(do_compare)
           break;
         case ITEM_ARMOR:
           compare_armor(ch, obj1, obj2);
+          break;
+        case ITEM_FOOD:
+          compare_food(ch, obj1, obj2);
           break;
         case ITEM_FOCUS_MAJOR:
         case ITEM_FOCUS_MINOR:
@@ -3994,6 +4017,9 @@ ACMD(do_compare)
         break;
       case ITEM_ARMOR:
         compare_armor(ch, obj1, obj2);
+        break;
+      case ITEM_FOOD:
+        compare_food(ch, obj1, obj2);
         break;
       case ITEM_FOCUS_MAJOR:
       case ITEM_FOCUS_MINOR:
@@ -4030,6 +4056,9 @@ ACMD(do_compare)
         break;
       case ITEM_ARMOR:
         compare_armor(ch, obj1, obj2);
+        break;
+      case ITEM_FOOD:
+        compare_food(ch, obj1, obj2);
         break;
       case ITEM_FOCUS_MAJOR:
       case ITEM_FOCUS_MINOR:

@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/08/19 08:51:14 $                                           * 
-*  $Revision: 1.16 $                                                    *
+*  $Date: 2005/11/01 18:43:37 $                                           * 
+*  $Revision: 1.17 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -1336,6 +1336,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             GET_TITLE(c) = strdup(subfield);
           }
           snprintf(str, slen, "%s", GET_TITLE(c));
+        } else if (!strcasecmp(field, "trade"))
+        {
+          if (subfield && *subfield && is_number(subfield))
+          {
+            int addition = atoi(subfield);
+            TRADEPOINTS(c) += addition;
+          }
+          snprintf(str, slen, "%d", TRADEPOINTS(c));
         }
         break;
       case 'v':

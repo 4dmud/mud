@@ -384,6 +384,7 @@ void assign_objects(void)
     ASSIGNOBJ(13057, bank);
     ASSIGNOBJ(17416, bank);	/* bank in Palpatines area */
     ASSIGNOBJ(21615, bank);
+  ASSIGNOBJ(9436, bank); //chaos
 
     ASSIGNOBJ(284, radar);
     ASSIGNOBJ(8282, radar);

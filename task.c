@@ -52,7 +52,7 @@ if (DEAD(ch))
 return;
 if (GET_TASK_NUM(ch) == SUB_UNDEFINED)
 return;
-GET_TASK_NUM(ch) = SUB_UNDEFINED;
+  //GET_TASK_NUM(ch) = SUB_UNDEFINED;
 if (GET_TASK(ch) == NULL)
 return;
 if (!(GET_TASK(ch)->arg != NULL && *GET_TASK(ch)->arg)) {
@@ -60,8 +60,13 @@ stop_task(ch);
 return;
 }
 
-do_subskill(ch, GET_TASK(ch)->arg, 0, GET_TASK(ch)->sub);
-
+  switch (GET_TASK(ch)->sub) {
+  default:
+     /* this needs to work like an alias, where you can seperate commands via a colon
+     or preprogram the logic for it here in the switch blocks - mordecai */
+     do_subskill(ch, GET_TASK(ch)->arg, 0, GET_TASK(ch)->sub);
+    break;
+  }
 
 }
 

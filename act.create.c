@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.11  2005/11/01 18:43:37  w4dimenscor
+ * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
+ *
  * Revision 1.10  2005/06/18 12:20:52  w4dimenscor
  * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
  *
@@ -932,30 +935,29 @@ EVENTFUNC(message_event)
   struct obj_data *obj = NULL;
   struct room_data *room = NULL;
   long time = 0;
-  
 
   long uid = msg->id;
   struct char_data *ch = msg->ch;
   short type = msg->type;
   int skill = msg->skill;
 
-
-
   if (ch == NULL )
   {
+    log("Message event called with no character found!");
     free(event_obj);
     return 0;
   }
 
-
-
   if (msg->msg_num == 0)
   {
+    log("Message event called with msg_num at 0!");
     GET_MESSAGE_EVENT(ch) = NULL;
     free(event_obj);
     return 0;
   }
 
+  GET_MESSAGE_EVENT(ch) = NULL;
+  
   if (uid == NOBODY)
   {
     vict = ch;
@@ -977,7 +979,7 @@ EVENTFUNC(message_event)
       time = THING(thing_manifest);
       break;
     case SPELL_CONTROL_WEATHER:
-    if (*msg->args && is_abbrev(msg->args, "worse"))
+     if (*msg->args && is_abbrev(msg->args, "worse"))
       time = THING(thing_control_weather_worse);
      else if (*msg->args && is_abbrev(msg->args, "better"))
      time = THING(thing_control_weather_better);
@@ -986,8 +988,6 @@ EVENTFUNC(message_event)
       time = 0;
       new_send_to_char(ch, "You need to specify, 'better' or 'worse'.\r\n");
       }
-    
-
     case SKILL_PICK_LOCK:
       break;
     default:
@@ -1010,10 +1010,7 @@ EVENTFUNC(message_event)
     case SUB_TUNNELING:
       time = THING(thing_tunneling);
       break;
-
     }
-
-
   }
   else
   {
@@ -1026,19 +1023,22 @@ EVENTFUNC(message_event)
       GET_MSG_RUN(ch) = 0;
       GET_MESSAGE_EVENT(ch) = NULL;
       free(event_obj);
-    }
-
-    if (ch)
-    {
-      if (type == THING_SUB)
+      if (type == THING_SUB) {
         toggle_sub_status(ch, skill, STATUS_OFF);
       run_task(ch);
+      }
     }
 
     return 0;
+  } else if (time == -1) {
+    /* this means player died while doing action */
+    /* and so event_obj was already freed */
+    return 0;
   }
-  else
+  else {
+    GET_MESSAGE_EVENT(ch) = event_obj;
     return time;
+  }
 }
 
 ACMD(do_fell)

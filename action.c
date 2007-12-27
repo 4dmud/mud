@@ -248,7 +248,7 @@ ACTION(thing_tunneling)
   const char *to_char = NULL;
   const char *to_room = NULL;
   struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
-  void check_mine_traps(struct char_data *ch);
+  int check_mine_traps(struct char_data *ch);
   void make_tunnel(struct char_data *ch);
 
   if (!object)
@@ -330,7 +330,8 @@ ACTION(thing_tunneling)
   if (to_char!=NULL)
     act(to_char, FALSE, ch, object, vict, TO_CHAR);
 
-  check_mine_traps(ch);
+  if (check_mine_traps(ch) == -1)
+    return -1;
 
   return time;
 

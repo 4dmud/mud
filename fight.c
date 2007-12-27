@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.24  2005/11/01 18:43:37  w4dimenscor
+ * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
+ *
  * Revision 1.23  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining
  *
@@ -1257,6 +1260,8 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
     return (ATK_CHANCE(attacker) = 3);
 
   defense_roll = defence_tot(vict);
+  if (!CAN_SEE(vict, attacker) && defense_roll)
+    defense_roll /= 2;
   attacker_roll = attack_tot(attacker);
 
   totalchance = (( defense_roll * 100.0)/(attacker_roll + defense_roll));
@@ -1884,9 +1889,9 @@ int fe_solo_damage(struct char_data* ch, struct char_data* vict,
 
   damage = modify_dam(damage, ch, vict, w_type);
 
-  if (damage > 0 && (GET_HIT(vict) - damage) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 500))
+  if (damage > 0 && (GET_HIT(vict) - damage) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 200))
   {
-    damage = GET_HIT(vict) -1;
+    damage = GET_HIT(vict) - 200;
     act("You concentrate your energy on the on coming killing blow!", FALSE ,vict, 0,0,TO_CHAR);
   }
 

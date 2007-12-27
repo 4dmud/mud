@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.24  2005/11/01 18:43:38  w4dimenscor
+ * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
+ *
  * Revision 1.23  2005/10/23 13:53:30  w4dimenscor
  * Added thotters login/logout message concept
  *
@@ -1729,6 +1732,7 @@ struct player_special_data_saved
   int mine_speed;
 
   int has_mail;
+  int tradepoints;
 
 
 

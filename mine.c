@@ -22,7 +22,7 @@
 extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
-void mine_damage(struct char_data *vict, int dam);
+int mine_damage(struct char_data *vict, int dam);
 void send_char_pos(struct char_data *ch, int dam);
 void die(struct char_data *ch, struct char_data *killer);
 struct mine_list *mine_shafts = NULL;
@@ -169,19 +169,19 @@ ASUB(sub_tunneling)
   return SUB_TUNNELING;
 }
 
-void check_mine_traps(struct char_data *ch)
+int check_mine_traps(struct char_data *ch)
 {
   int hit = GET_HIT(ch), mhit = GET_MAX_HIT(ch);
   int dam = 0;
   if (number(0, 100))
-    return;
+    return 0;
 
   act("You dig into and inspect a cunning trap.", FALSE, ch, 0, 0, TO_CHAR);
   act("$n digs into and inspects a cunning trap.", FALSE, ch, 0, 0, TO_ROOM);
   if (number(0, 110) < MINE_STEALTH(ch))
   {
     act("You are relieved with a twanging sound as you disarm the trap.", FALSE, ch, 0, 0, TO_CHAR);
-    return;
+    return 0;
   }
 
   switch (number(1, 9))
@@ -226,7 +226,8 @@ void check_mine_traps(struct char_data *ch)
   if (dam)
     dam *= ((float)(100.0 - MAX(0, MINE_DAMAGE(ch)))/100.0);
 
-  mine_damage(ch, dam);
+  return mine_damage(ch, dam);
+  
 }
 /*
   newroom = 54000+number(1,180);
@@ -483,15 +484,15 @@ void make_tunnel(struct char_data *ch)
     stop_task(ch);
 
 }
-void mine_damage(struct char_data *vict, int dam)
+int mine_damage(struct char_data *vict, int dam)
 {
   if (!dam)
-    return;
+    return 0;
   if (GET_LEVEL(vict)>=LVL_IMMORT && (dam > 0))
   {
     new_send_to_char(vict, "Being the cool immortal you are, you sidestep a trap,\r\n"
                      "obviously placed to kill you.\r\n");
-    return;
+    return 0;
   }
 
   alter_hit(vict, dam);
@@ -505,7 +506,9 @@ void mine_damage(struct char_data *vict, int dam)
       new_mudlog( BRF, 0, TRUE, "%s killed by mining trap at %s [%d]",
                   GET_NAME(vict), IN_ROOM(vict)->name, GET_ROOM_VNUM(IN_ROOM(vict)));
     die(vict, NULL);
+    return -1;
   }
+  return dam;
 }
 
 

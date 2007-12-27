@@ -4721,6 +4721,7 @@ int load_char(char *name, struct char_data *ch)
 void default_char(struct char_data *ch)
 {
   int i;
+  time_t tme = time(0);
   if (!ch)
     return;
 
@@ -4747,8 +4748,8 @@ void default_char(struct char_data *ch)
   GET_INVIS_LEV(ch) = 0;
   GET_FREEZE_LEV(ch) = 0;
   GET_WIMP_LEV(ch) = 5;
-  GET_COND(ch, FULL) = 0;
-  GET_COND(ch, THIRST) = 0;
+  GET_COND(ch, FULL) = 48;
+  GET_COND(ch, THIRST) = 48;
   GET_COND(ch, DRUNK) = 0;
   GET_BAD_PWS(ch) = 0;
   GET_PRACTICES(ch) = 0;
@@ -4775,9 +4776,10 @@ void default_char(struct char_data *ch)
   GET_MAX_MOVE(ch) = 50;
   GET_STAMINA(ch) = 100;
   GET_MAX_STAMINA(ch) = 100;
+  if (ch->player_specials)
   ch->player_specials->host = NULL;
   AFF_SPEED(ch) = 0;
-  ch->player.time.last_logon = time(0);
+  ch->player.time.last_logon = tme;
   GET_PERC(ch) = 100;
   AFK_MSG(ch) = NULL;
   BUSY_MSG(ch) = NULL;
@@ -4800,11 +4802,11 @@ void default_char(struct char_data *ch)
   GET_REGEN_STAMINA(ch) = 0;
   GET_RP_GROUP(ch)  = 0;
   GET_CONVERSIONS(ch) = 1;
-  SPECIALS(ch)->last_note = time(0);
-  SPECIALS(ch)->last_idea = time(0);
-  SPECIALS(ch)->last_penalty = time(0);
-  SPECIALS(ch)->last_news = time(0);
-  SPECIALS(ch)->last_changes = time(0);
+  SPECIALS(ch)->last_note = tme;
+  SPECIALS(ch)->last_idea = tme;
+  SPECIALS(ch)->last_penalty = tme;
+  SPECIALS(ch)->last_news = tme;
+  SPECIALS(ch)->last_changes = tme;
   GET_LAST_DAM_D(ch) = 0;
   GET_LAST_DAM_T(ch) = 0;
   EXTRA_BODY(ch) = 0;
@@ -4823,6 +4825,7 @@ void default_char(struct char_data *ch)
   GET_KILLS(ch) = NULL;
   GET_LOGOUTMSG(ch) = NULL;
   GET_LOGINMSG(ch) = NULL;
+  TRADEPOINTS(ch) = 0;
 
 }
 
@@ -5402,6 +5405,8 @@ int store_to_char(char *name, struct char_data *ch)
         GET_REMORT_TWO_TIER(ch) = num;
       else if (!strcmp(tag, "Tir4"))
         GET_REMORT_THREE_TIER(ch) = num;
+      else if (!strcmp(tag, "Trad"))
+        TRADEPOINTS(ch) = num;
       break;
 
     case 'W':
@@ -5781,6 +5786,8 @@ void char_to_store(struct char_data *ch)
     fprintf(fl, "Tir3: %d\n", (int) GET_REMORT_TWO_TIER(ch));
   if (GET_REMORT_THREE_TIER(ch))
     fprintf(fl, "Tir4: %d\n", (int) GET_REMORT_THREE_TIER(ch));
+  if (TRADEPOINTS(ch))
+    fprintf(fl, "Trad: %d\n", (int) TRADEPOINTS(ch));
   if (AFF_SPEED(ch))
     fprintf(fl, "Sped: %d\n", AFF_SPEED(ch));
   if (GET_COOLNESS(ch))
@@ -6188,6 +6195,11 @@ void free_char(struct char_data *ch)
       free(ch->player_specials->host);
     if (ch->player_specials->pretitle)
       free(ch->player_specials->pretitle);
+    
+    if (GET_LOGOUTMSG(ch))
+      free(GET_LOGOUTMSG(ch));
+    if (GET_LOGINMSG(ch))
+      free(GET_LOGINMSG(ch));
 
     if (GET_EMAIL(ch))
       free(GET_EMAIL(ch));

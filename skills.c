@@ -1967,9 +1967,9 @@ ASKILL(skill_cleave)
   OBJ_DATA *wep = GET_EQ(ch, WEAR_WIELD);
 
 
-  if (GET_OBJ_VAL(wep, 3) != TYPE_GORE - TYPE_HIT)
+  if (GET_OBJ_VAL(wep, 3) != TYPE_GORE - TYPE_HIT && GET_OBJ_VAL(wep, 3) != TYPE_SLASH - TYPE_HIT)
   {
-    send_to_char("You need to wield a goring weapon to cleave.\r\n",  ch);
+    send_to_char("You need to wield a goring or slashing weapon to cleave.\r\n",  ch);
     return 0;
   }
   if (use_stamina( ch, 25) < 0)
@@ -1997,9 +1997,9 @@ ASKILL(skill_behead)
   OBJ_DATA *wep = GET_EQ(ch, WEAR_WIELD);
 
 
-  if (GET_OBJ_VAL(wep, 3) != TYPE_SLASH - TYPE_HIT)
+  if (GET_OBJ_VAL(wep, 3) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL(wep, 3) != TYPE_BITE - TYPE_HIT)
   {
-    send_to_char("You need to wield a slashing weapon to behead.\r\n",  ch);
+    send_to_char("You need to wield a slashing or biting weapon to behead.\r\n",  ch);
     return 0;
   }
   if (use_stamina( ch, 25) < 0)
