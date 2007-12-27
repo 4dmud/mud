@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.58  2006/09/24 08:24:22  w4dimenscor
+ * Fixed combat in groups
+ *
  * Revision 1.57  2006/09/23 07:06:47  w4dimenscor
  * Checked for null values being passed to can_fight
  *
@@ -738,9 +741,10 @@ int average_damage(Character *ch) {
 
 void start_fighting(Character* ch, Character* vict) {
     struct combine_data *temp, *tnext;
-    Character *k = (ch->master ? ch->master : ch);
-    struct follow_type *f;
+    Character *k;
+    struct follow_type *f, *fnext;
     Character *victim;
+    long vict_id = -1;
 
     /*to stop recursion*/
     if (!ch || !vict)
@@ -763,8 +767,6 @@ void start_fighting(Character* ch, Character* vict) {
         *ch << "You slowly fade into existence.\r\n";
     }
 
-
-
     if (AFF_FLAGGED(victim, AFF_SLEEP))
         affect_from_char(victim, SPELL_SLEEP);
 
@@ -773,6 +775,8 @@ void start_fighting(Character* ch, Character* vict) {
 
     if (!can_fight(ch, victim, FALSE))
         return;
+
+    vict_id = GET_ID(victim);
 
     if (GET_POS(ch) > POS_STUNNED && GET_FIGHT_EVENT(ch) == NULL) {
 
@@ -785,29 +789,45 @@ void start_fighting(Character* ch, Character* vict) {
                 GET_POS(ch) = POS_FIGHTING;
 
             if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0) {
-                if (find_char(ch_id)) {
+                if ((ch = find_char(ch_id))) {
                     next_round(ch);
                 } else
                     return;
             }
         }
     }
-    if (IS_NPC(ch) && !DEAD(ch) && victim) {
-        if (ch->mob_specials.head_join)
-            temp = ch->mob_specials.head_join->mob_specials.join_list;
-        else
-            temp = ch->mob_specials.join_list;
-        while (temp) {
-            tnext = temp->next;
-            if (temp->joined)
-                start_fighting(temp->joined, victim);
-            temp = tnext;
+    if ((victim = find_char(vict_id))) {
+        if (IS_NPC(ch) && !DEAD(ch) && victim) {
+            if (ch->mob_specials.head_join)
+                temp = ch->mob_specials.head_join->mob_specials.join_list;
+            else
+                temp = ch->mob_specials.join_list;
+            while (temp) {
+                tnext = temp->next;
+                if (temp->joined)
+                    start_fighting_delay(temp->joined, victim);
+                temp = tnext;
+            }
         }
     }
-    for (f = k->followers; f; f = f->next) {
-        if (victim && f->follower && ch && (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim)) {
-            if (!IS_NPC(f->follower))
-                perform_assist(f->follower, ch);
+    if (FIGHTING(ch)) {
+        k = (ch->master ? ch->master : ch);
+        for (f = k->followers; f; f = fnext) {
+            fnext = f->next;
+            if (!f->follower)
+                continue;
+            if (!FIGHTING(ch))
+                break;
+            if (DEAD(FIGHTING(ch)))
+                break;
+            if (!HERE(f->follower,victim))
+                continue;
+            if (SELF(f->follower, ch))
+                continue;
+            if (IS_NPC(f->follower))
+                continue;
+
+            perform_assist(f->follower, ch);
         }
     }
 }
@@ -5181,7 +5201,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                                           the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;

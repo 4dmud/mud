@@ -87,12 +87,11 @@ ACMD(do_assist)
   one_argument(argument, arg);
 
   if (!*arg)
-    send_to_char("Whom do you wish to assist?\r\n", ch);
+    ch->Send("Whom do you wish to assist?\r\n");
   else if (!(helpee = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
     ch->Send( "%s", CONFIG_NOPERSON);
   else if (helpee == ch)
-    send_to_char("You can't help yourself any more than this!\r\n",
-                 ch);
+    ch->Send("You can't help yourself any more than this!\r\n");
   else
     perform_assist(ch, helpee);
 }
@@ -113,28 +112,23 @@ void perform_assist(Character *ch, Character *helpee)
          opponent = opponent->next_in_room);
 
   if (!opponent)
-    act("But nobody is fighting $M!", FALSE, ch, 0, helpee,
-        TO_CHAR);
+    act("But nobody is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR);
   else if (!CAN_SEE(ch, opponent))
-    act("You can't see who is fighting $M!", FALSE, ch, 0, helpee,
-        TO_CHAR);
-  else if (!CONFIG_PK_ALLOWED && !IS_NPC(opponent)
-           && !arena_ok(ch, opponent))
+    act("You can't see who is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR);
+  else if (!CONFIG_PK_ALLOWED && !IS_NPC(opponent) && !arena_ok(ch, opponent))
     /* prevent accidental pkill */
-    act("Use 'murder' if you really want to attack $N.", FALSE,
-        ch, 0, opponent, TO_CHAR);
+    act("Use 'murder' if you really want to attack $N.", FALSE, ch, 0, opponent, TO_CHAR);
   else
   {
-    if (ch->vnum != DG_CASTER_PROXY &&
-        ch != opponent &&
-        ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
-    {
-      send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
+  if (ch == opponent)
+  return;
+    if (ch->vnum != DG_CASTER_PROXY &&  ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
+    {ch->Send("This room just has such a peaceful, easy feeling...\r\n");
       return;
     }
     if (!can_fight(ch, opponent, FALSE))
       return;
-    send_to_char("You join the fight!\r\n", ch);
+    ch->Send("You join the fight!\r\n");
     act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
     act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, opponent, TO_ROOM);
     start_fighting(ch, opponent);
