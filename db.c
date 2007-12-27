@@ -6192,9 +6192,8 @@ int create_entry(char *name)
 char *fread_string(FILE *fl, const char *error)
 {
   char buf[MAX_STRING_LENGTH], tmp[516];
-  char *point;
   int done = 0;
-  size_t length = 0, templength, tlen = 0;
+  size_t length = 0, tlen = 0, x;
 
   *buf = '\0';
 
@@ -6205,33 +6204,29 @@ char *fread_string(FILE *fl, const char *error)
       log("SYSERR: fread_string: format error at or near %s", error);
       exit(1);
     }
-    tlen = strlen(tmp);
+    x = tlen = strlen(tmp);
     /* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
     /* now only removes trailing ~'s -- Welcor */
-    //point = strchr(tmp, '\0');
+    
     if (tlen > 0)
     {
-      point = (tmp + tlen - 1);
-      for (; point>=tmp && (*point=='\r' || *point=='\n'); point--);
-      if (*point=='~')
+      for (x = tlen - 1; x && (tmp[x]=='\r' || tmp[x]=='\n'); x--);
+      
+      if (tmp[x]=='~')
       {
-        *point='\0';
+        tmp[x]='\0';
         done = 1;
       }
       else
       {
-        /** but what if this ends up making it bigger then the buffer?**/
-        if(point-tmp!=0) ++point;
-        *(point) = '\r';
-        if(point-tmp!=0) ++point;
-        *(point) = '\n';
-        if(point-tmp!=0) ++point;
-        *(point) = '\0';
+        
+        if((x > 0 && x < tlen-4) || (tmp[x]!='\r' && tmp[x]!='\n')) ++x;
+        tmp[x] = '\r';
+        tmp[x++] = '\n';
+        tmp[x++] = '\0';
       }
 
-      templength = point - tmp;
-
-      if (length + templength >= MAX_STRING_LENGTH)
+      if (length + x >= MAX_STRING_LENGTH)
       {
         log("SYSERR: fread_string: string too large (db.c)");
         log("%s", error);
@@ -6239,8 +6234,8 @@ char *fread_string(FILE *fl, const char *error)
       }
       else
       {
-        strcat(buf + length, tmp); /* strcat: OK (size checked above) */
-        length += templength;
+        strlcat(buf, tmp, sizeof(buf)); /* strcat: OK (size checked above) */
+        length += x;
       }
     }
   }

@@ -24,7 +24,7 @@ PROFILE =
 ##############################################################################
 BINDIR = ../bin
 
-CFLAGS = -O2 -ggdb $(MYFLAGS) $(PROFILE)
+CFLAGS = -O -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
 LIBS =  -lcrypt -lz -lm -lc
