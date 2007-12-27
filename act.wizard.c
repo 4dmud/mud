@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.26  2005/06/14 11:38:48  w4dimenscor
+ * fixed pose
+ *
  * Revision 1.25  2005/06/14 11:29:36  w4dimenscor
  * new command added: pose
  *
@@ -638,7 +641,7 @@ ACMD(do_echo)
     if (subcmd == SCMD_EMOTE)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
     else if (subcmd == SCMD_POSE) {
-    if (!str_str(GET_NAME(ch), argument))
+    if (!str_str(argument, GET_NAME(ch)))
       snprintf(buf, sizeof(buf), "%s  (%s)", argument, "$n");
     else
      strlcpy(buf, argument, sizeof(buf) );
