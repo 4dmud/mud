@@ -17,6 +17,8 @@ void forget(Character *ch, Character *victim);
 void remember(Character *ch, Character *victim);
 int skill_message(int dam, Character *ch, Character *vict,
                   int attacktype);
+                  
+void start_fighting_delay(Character *vict, Character *ch);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
 #define IS_SPELL_ATK(type) (((type) >= TYPE_ATK_ORB) && ((type) <= TYPE_ATK_TORPEDO))

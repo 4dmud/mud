@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.50  2006/09/19 10:56:16  w4dimenscor
+ * fixed crash bug on extracting mob links
+ *
  * Revision 1.49  2006/09/14 08:05:42  w4dimenscor
  * added convey tradepoints, and fixed iceshield
  *
@@ -863,7 +866,8 @@ void start_fighting_delay(Character *ch, Character *vict) {
         return;
     if (DEAD(ch) || DEAD(vict))
         return;
-victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict : vict;
+
+    victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
 
     if (!HERE(ch, victim) || SELF(ch, victim))
         return;
@@ -901,10 +905,14 @@ int next_round(Character* ch) {
     if (DEAD(ch))
         return 0;
     if ((victim = FIGHTING(ch)) != NULL)
-victim = RIDDEN_BY(victim) ? HERE(RIDDEN_BY(victim), victim) ? RIDDEN_BY(victim) : victim : victim;
+        victim = victim->RiderHere() ? RIDDEN_BY(victim) : victim;
 
+    /* check to see if there is anyone in the room fighting you however! */
+    if (!victim) 
+        victim = ch->NextFightingMe();
+    
     /*to stop recursion*/
-    if (!victim || !can_fight(ch, victim, FALSE) || (RIDDEN_BY(ch) && HERE(ch, RIDDEN_BY(ch)))) {
+    if (!victim || !can_fight(ch, victim, FALSE)) {
         stop_fighting(ch);
         return 0;
     }
@@ -916,6 +924,7 @@ victim = RIDDEN_BY(victim) ? HERE(RIDDEN_BY(victim), victim) ? RIDDEN_BY(victim)
     }
 
     if (GET_FIGHT_EVENT(ch) != NULL) {
+        log("%s has %ld more time left till fight event", GET_NAME(ch), event_time((struct event *)GET_FIGHT_EVENT(ch)));
         return 0;
     }
 
@@ -959,21 +968,21 @@ EVENTFUNC(fight_event) {
 
     if (ch) {
         /** debugging **/
-#if 0
+        #if 0
         {
             int found = FALSE;
             Character *tch;
             for (tch = character_list;tch&&!found;tch = tch->next) {
-                /** Assume Unique **/
-                if (tch == ch)
+            /** Assume Unique **/
+            if (tch == ch)
                     found = TRUE;
             }
             if (!found) {
-                log("Character not found for combat!\r\n");
+            log("Character not found for combat!\r\n");
                 return 0;
             }
         }
-#endif
+        #endif
         GET_FIGHT_EVENT(ch) = NULL;
         if (fight)
             delete fight;
@@ -1068,27 +1077,27 @@ float race_dam_mod(int race, int magic) {
 
     switch (race) {
     case (RACE_SPACE_WOLF):
-                    if (!magic)
-                        damage = 1.15f;
-            else
-                damage = 0.80f;
+        if (!magic)
+            damage = 1.15f;
+        else
+            damage = 0.80f;
         break;
     case (RACE_DWARF):
-                    damage = 0.9f;
+        damage = 0.9f;
         break;
     case (RACE_ELF):
-                    if (!magic)
-                        damage = 0.9f;
-            else
-                damage = 1.1f;
+        if (!magic)
+            damage = 0.9f;
+        else
+            damage = 1.1f;
         break;
     case (RACE_MARTIAN):
-                    if (magic)
-                        damage = 1.05f;
+        if (magic)
+            damage = 1.05f;
         break;
     case (RACE_CENTAUR):
-                    if (!magic)
-                        damage = 1.10f;
+        if (!magic)
+            damage = 1.10f;
         break;
     }
 
@@ -1648,7 +1657,7 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
             if (fols > 0) {
                 shortwep = is_short_wep(GET_EQ(ch, WEAR_WIELD));
                 perc = valid_perc(ch) * 3;
-                perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 : 0) ) : 0);
+perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 : 0) ) : 0);
                 perc += (IS_SPELL_ATK(num) ? 20 : 0);
                 perc += (IS_SPELL_CAST(num) ? 25 : 0);
                 perc += (IS_SKILL(num) ? 20 : 0);
@@ -2029,7 +2038,7 @@ int valid_perc(Character *ch) {
 
     struct follow_type* f = NULL;
     Character *vict = FIGHTING(ch);
-    Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
+Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
     room_rnum rm = IN_ROOM(ch);
     float total_perc = 0.0;
 
@@ -2462,7 +2471,7 @@ int fe_after_damage(Character* ch, Character* vict,
             if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
                 //mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
                 if (MobProtoExists(GET_MOB_VNUM(vict)))
-                bonus_gold = (int)(GET_GOLD(GetMobProto(GET_MOB_VNUM(vict))) * 0.25);
+                    bonus_gold = (int)(GET_GOLD(GetMobProto(GET_MOB_VNUM(vict))) * 0.25);
 
                 ch->Gold(bonus_gold, GOLD_HAND);
                 if (!number(0, 200))
@@ -2895,7 +2904,7 @@ void skip_to_msg(std::ifstream &fl, string & chk) {
     char buf[READ_SIZE];
     if (chk == "M")
         return;
-        
+
     do {
         if (fl.eof())
             break;
@@ -2927,10 +2936,10 @@ void load_messages(void) {
     while (!fl.eof() && chk.length() > 0 &&  chk == "M") {
         int type = -1;
         std::getline(fl, chk); /* read the line into a string*/
-        
+
         if (fl.eof() || chk.length() == 0)
             break;
-            
+
         strlcpy(buf, Trim(chk).c_str(), 128);
         type = atol(buf);
 
@@ -2938,22 +2947,22 @@ void load_messages(void) {
             log("SYSERR: Error reading combat message file (type: %d ) %s: %s", type, MESS_FILE, strerror(errno));
             exit(1);
         }
-        
+
         for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type)
                 && (fight_messages[i].a_type); i++)
             ;
-            
+
         if (i >= MAX_MESSAGES) {
             log("SYSERR: Too many combat messages.  Increase MAX_MESSAGES and recompile.");
             exit(1);
         }
-        
+
         messages = new struct message_type();
         fight_messages[i].number_of_attacks++;
         fight_messages[i].a_type = type;
         messages->next = fight_messages[i].msg;
         fight_messages[i].msg = messages;
-        
+
         messages->die_msg.attacker_msg = fread_fight_action(fl, i, chk);
         messages->die_msg.victim_msg = fread_fight_action(fl, i, chk);
         messages->die_msg.room_msg = fread_fight_action(fl, i, chk);
@@ -5069,11 +5078,11 @@ void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
             }
 
             /*its a gun, has ammo inside it, create the item */
-#if 0
+            #if 0
             if (GET_OBJ_TYPE(missile) == ITEM_GUN)
                 if (!((r_num = real_object(252)) < 0))
                     missile = read_object(r_num, REAL);
-#endif
+            #endif
 
             switch (GET_OBJ_TYPE(missile)) {
             case ITEM_THROW:
@@ -5178,7 +5187,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                               the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;
@@ -6122,7 +6131,7 @@ void kill_list(Character *ch, Character *vict) {
     if (vnum == NOBODY)
         return;
 
-        SPECIALS(ch)->UpdateKill(vnum);
+    SPECIALS(ch)->UpdateKill(vnum);
 }
 
 

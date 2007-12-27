@@ -92,7 +92,8 @@ void free_followers(struct follow_type *k);
 void damage_count_free(Character *vict);
 void extract_all_in_list(OBJ_DATA *obj);
 void free_alias(struct alias_data *a);
-void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add );
+void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add
+                         );
 int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 extern long top_idnum;
 
@@ -215,13 +216,13 @@ Character::Character(bool is_mob) {
     default_char();
     if (!is_mob) {
         GET_BRASS_TOKEN_COUNT(this) = 0;
-    GET_BRONZE_TOKEN_COUNT(this) = 0;
-    GET_SILVER_TOKEN_COUNT(this) = 0;
-    GET_GOLD_TOKEN_COUNT(this) = 0;
-    GET_COOLNESS(this) 		= 0;
-    GET_PK_CNT(this) 		= 0;
-    GET_PK_RIP(this)		= 0;
-    GET_PK_POINTS(this) 		= 0;
+        GET_BRONZE_TOKEN_COUNT(this) = 0;
+        GET_SILVER_TOKEN_COUNT(this) = 0;
+        GET_GOLD_TOKEN_COUNT(this) = 0;
+        GET_COOLNESS(this) 		= 0;
+        GET_PK_CNT(this) 		= 0;
+        GET_PK_RIP(this)		= 0;
+        GET_PK_POINTS(this) 		= 0;
     }
     init_char_strings();
     clear();
@@ -266,7 +267,7 @@ void Character::freeself() {
     followers = NULL;
     free_note(pnote, -1);
 
-	GET_IGNORELIST(this).clear();
+    GET_IGNORELIST(this).clear();
     //free_ignore(SPECIALS(this)->ignorelist);
 
     if (player_specials != NULL && player_specials != &dummy_mob) {
@@ -304,7 +305,7 @@ void Character::freeself() {
         /* free script proto list */
         free_proto_script(this, MOB_TRIGGER);
 
-//        free_join_list(mob_specials.join_list);
+        //        free_join_list(mob_specials.join_list);
         mob_specials.join_list = NULL;
         free_char_strings();
     } else if (!proto) {
@@ -312,7 +313,7 @@ void Character::freeself() {
 
         /* free script proto list if it's not the prototype */
         if (proto_script && proto_script != GetMobProto(vnum)->proto_script)
-           free_proto_script(this, MOB_TRIGGER);
+            free_proto_script(this, MOB_TRIGGER);
 
         if (mob_specials.join_list && mob_specials.join_list != GetMobProto(vnum)->mob_specials.join_list)
             free_join_list(mob_specials.join_list);
@@ -534,11 +535,11 @@ void Character::init() {
 
     //TODO: check this
     if ((i = get_ptable_by_name(player.name)) != -1)
-		while (valid_id_num(++top_idnum) == FALSE)
-			log("Error new id %ld being assigned to %s already exists!",top_idnum, player.name);
-			
-        player_table[i].account = player_table[i].id = GET_IDNUM(this) = GET_ID(this) = top_idnum;
-        addChToLookupTable(GET_ID(this), this);
+        while (valid_id_num(++top_idnum) == FALSE)
+            log("Error new id %ld being assigned to %s already exists!",top_idnum, player.name);
+
+    player_table[i].account = player_table[i].id = GET_IDNUM(this) = GET_ID(this) = top_idnum;
+    addChToLookupTable(GET_ID(this), this);
 
 
     for (taeller = 0; taeller < AF_ARRAY_MAX; taeller++)
@@ -728,8 +729,8 @@ void Character::default_char() {
 }
 
 char * mob_name_by_vnum(mob_vnum &v) {
-if (MobProtoExists(v))
-            return GetMobProto(v)->player.short_descr;
+    if (MobProtoExists(v))
+        return GetMobProto(v)->player.short_descr;
 
     return "";
 }
@@ -1060,7 +1061,7 @@ Character *Character::assign (Character *b) {
     pet = b->pet;
 
 
-//    nr = b->nr;         /* Mob's rnum                    */
+    //    nr = b->nr;         /* Mob's rnum                    */
     //struct travel_point_data *travel_list;
     if (mp && chch)
         log("mob names: %s, and %s", mp->player.name, chch->player.name);
@@ -1124,10 +1125,10 @@ void Character::init_char_strings() {
     player.title = NULL;         /* PC / NPC's title                     */
 }
 bool Character::zone_empty() {
-if (in_room == NULL)
-return TRUE;
+    if (in_room == NULL)
+        return TRUE;
 
-return zone_table[GET_ROOM_ZONE(in_room)].num_players > 0;
+    return zone_table[GET_ROOM_ZONE(in_room)].num_players > 0;
 }
 bool Character::CanMove() {
     if (AFF_FLAGGED(this, AFF_STUCK))
@@ -1223,4 +1224,14 @@ bool Character::WaterBreathing() {
     return FALSE;
 }
 
+Character * Character::NextFightingMe() {
+    if (!in_room)
+        return NULL;
 
+    for (Character *v = in_room->people;v;v = v->next_in_room) {
+        if (v == this)
+            continue;
+        if (FIGHTING(v) == this)
+            return v;
+    }
+}

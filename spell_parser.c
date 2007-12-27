@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.34  2006/09/19 10:56:17  w4dimenscor
+ * fixed crash bug on extracting mob links
+ *
  * Revision 1.33  2006/09/19 09:32:37  w4dimenscor
  * Have changed the movement code, and made some new functions for it.
  * Made it so that if your mount is sitting you can't move.
@@ -1219,7 +1222,7 @@ ACMD(do_cast) {
             alter_mana(ch, mana / 2);
             
         if (SINFO.violent && tch && IS_NPC(tch) && HERE(tch, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
-            start_fighting(tch, ch);
+            start_fighting_delay(tch, ch);
             
     } else {            /* cast spell returns 1 on success; subtract mana & set waitstate */
         if (cast_spell(ch, tch, tobj, t, spellnum)) {
@@ -1234,7 +1237,7 @@ ACMD(do_cast) {
                     alter_mana(ch, mana);
             }
         } else if (SINFO.violent && tch && IS_NPC(tch) && HERE(tch, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
-            start_fighting(tch, ch);
+            start_fighting_delay(tch, ch);
     }
 }
 int grand_master(Character *ch) {

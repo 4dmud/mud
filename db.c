@@ -2452,7 +2452,7 @@ void die_link(Character *mob) {
 
     if (blink != NULL) {
         REMOVE_FROM_LIST(blink, head->mob_specials.join_list, next);
-        free((void *)link);
+        free((void *)blink);
         blink = NULL;
         mob->mob_specials.head_join = NULL;
         return;

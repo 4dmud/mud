@@ -1872,7 +1872,7 @@ ACMD(do_leader) {
         ch->Send( "That person isnt following you!\r\n");
     else {
         *ch << "You make " << GET_NAME(leader) << " the leader.\r\n";
-        *leader << GET_NAME(leader) << " makes you the leader.\r\n";
+        *leader << GET_NAME(ch) << " makes you the leader.\r\n";
 
 
         leader->master = NULL;
