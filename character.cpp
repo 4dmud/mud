@@ -1234,4 +1234,5 @@ Character * Character::NextFightingMe() {
         if (FIGHTING(v) == this)
             return v;
     }
+    return NULL;
 }
