@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/01/27 13:38:20 $                                           * 
-*  $Revision: 1.41 $                                                      *
+*  $Date: 2007/01/27 13:50:15 $                                           * 
+*  $Revision: 1.42 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -881,7 +881,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     }
                     snprintf(str, slen, "%d", GET_INT(c));
 		} else if (!strcasecmp(field, "is_flying")) {
-		    if(AFF_FLAGGED(c, AFF_FLY))
+		    if(c->Flying())
 			snprintf(str, slen, "1");
 		    else
 			snprintf(str, slen, "0");
