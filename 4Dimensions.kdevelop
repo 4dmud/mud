@@ -1,23 +1,23 @@
 <?xml version = '1.0'?>
 <kdevelop>
   <general>
-    <author>Jamie Nelson</author>
+    <author>Ayhan Kondoz</author>
     <email>mordecai@xtra.co.nz</email>
     <version>3.8</version>
     <projectmanagement>KDevCustomProject</projectmanagement>
     <primarylanguage>C</primarylanguage>
     <ignoreparts/>
-    <projectdirectory>/home/mordecai/Desktop/game-oasis</projectdirectory>
+    <projectdirectory>/home/ayhan/projects/game/</projectdirectory>
     <absoluteprojectpath>true</absoluteprojectpath>
     <description/>
     <secondaryLanguages/>
   </general>
   <kdevcustomproject>
     <run>
-      <mainprogram>/home/molly/Desktop/game-oasis/bin/circle</mainprogram>
+      <mainprogram>/home/ayhan/projects/game/bin/circle</mainprogram>
       <directoryradio>custom</directoryradio>
-      <customdirectory>/home/molly/Desktop/game-oasis/</customdirectory>
-      <programargs>6003</programargs>
+      <customdirectory>/home/ayhan/projects/game/</customdirectory>
+      <programargs>6000</programargs>
       <terminal>false</terminal>
       <autocompile>true</autocompile>
       <envvars/>
