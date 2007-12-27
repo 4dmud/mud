@@ -295,7 +295,8 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
     return;
   }//end of switch
 
-  show_obj_modifiers(obj, ch);
+  if(!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || GET_LEVEL(ch) > LVL_IMMORT)
+    show_obj_modifiers(obj, ch);
   if (mode == SHOW_OBJ_LONG)
   {
     if (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || (GET_LEVEL(ch) > LVL_IMMORT))
@@ -372,7 +373,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
 
     if (CAN_SEE_OBJ(ch, i))
     {
-      if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (num != 1))
+      if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (num != 1) && !OBJ_FLAGGED(i, ITEM_NODISPLAY))
       {
         new_send_to_char(ch, "(%2i) ", num);
       }
