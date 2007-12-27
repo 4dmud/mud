@@ -3465,6 +3465,8 @@ ACMD(do_who)
 
     if (PLR_FLAGGED(wch, PLR_NEWBIE_HLPR))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sHelper%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
+if (PLR_FLAGGED(wch, PLR_RP_LEADER))
+      len += snprintf(buf + len, sizeof(buf) - len, " (%sRPL%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
     if (GET_INVIS_LEV(wch))
       len += snprintf(buf + len, sizeof(buf) - len, " (i%d)", GET_INVIS_LEV(wch));
     if (IS_AFFECTED(wch, AFF_INVISIBLE))

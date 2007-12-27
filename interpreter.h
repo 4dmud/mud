@@ -290,6 +290,7 @@ struct alias_data
 #define SCMD_ECHO	0
 #define SCMD_EMOTE	1
 #define SCMD_POSE	2
+#define SCMD_RECHO	3
 
 /* do_gen_door */
 #define SCMD_OPEN       0

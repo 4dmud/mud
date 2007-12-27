@@ -425,7 +425,9 @@ bool is_note_to( CHAR_DATA *ch, NOTE_DATA *pnote )
   if (GET_CLAN(ch) && isname(clan_name(find_clan_by_id(GET_CLAN(ch))),pnote->to_list))
     return TRUE;
 
-  if (PLR_FLAGGED(ch, PLR_HERO) && isname("hero", pnote->to_list))
+  if (PLR_FLAGGED(ch, PLR_HERO) && (isname("hero", pnote->to_list) || isname("heros", pnote->to_list)))
+    return TRUE;
+  if (PLR_FLAGGED(ch, PLR_RP_LEADER) && isname("rpl", pnote->to_list))
     return TRUE;
 
   if (PLR_FLAGGED(ch, PLR_ROLEPLAYER) && isname("rp", pnote->to_list))

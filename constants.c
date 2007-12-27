@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.11  2005/08/28 10:00:54  w4dimenscor
+ * added RPL flag, RPL note group
+ *
  * Revision 1.10  2005/08/19 08:51:14  w4dimenscor
  * fixed the variables not working
  *
@@ -492,6 +495,7 @@ const char *player_bits[] =
     "LOYAL",
     "HERO",
     "DYING",
+    "RPL",
     "\n"
   };
 

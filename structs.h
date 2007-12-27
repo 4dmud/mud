@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.19  2005/08/28 10:00:54  w4dimenscor
+ * added RPL flag, RPL note group
+ *
  * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
  * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
  *
@@ -365,6 +368,7 @@ extern int message_type;
 #define PLR_LOYAL	23      /* player has selected a loyalty reward */
 #define PLR_HERO        24      /* player is a hero type */
 #define PLR_DYING       25      /* player is in the state of dying */
+#define PLR_RP_LEADER   26      /* player has echo, and award commands */
 
 
 #define MOB_RACE_HUMANOID 0	/* Mob carries money                    */
@@ -471,6 +475,7 @@ extern int message_type;
 #define PRF_GATEABLE 	50
 #define PRF_RP	 	51	/* Player is roleplaying */
 #define PRF_FISHPROMPT  52
+
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */

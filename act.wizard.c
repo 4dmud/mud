@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.32  2005/08/28 10:00:53  w4dimenscor
+ * added RPL flag, RPL note group
+ *
  * Revision 1.31  2005/08/28 02:59:21  w4dimenscor
  * fixed a memory leak situation that could appear with overlapping rooms, adjusted the ignore save to not save certain words, adjusted the mobs to it a little softer
  *
@@ -671,7 +674,13 @@ ACMD(do_echo)
       snprintf(buf, sizeof(buf), "[$n]\r\n%s", argument);
 
     }
-    else
+    else if (subcmd == SCMD_RECHO) {
+if (!PLR_FLAGGED(ch, PLR_RP_LEADER)) {
+new_send_to_char(ch, "You can't do that!\r\n");
+return;
+}
+strlcpy(buf, argument, sizeof(buf) );
+} else
       strlcpy(buf, argument, sizeof(buf) );
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
@@ -4684,6 +4693,7 @@ set_fields[] = {
                  { "hero",		LVL_SEN,	PC,	BINARY }, /* 75 */
                  {"immtitle", LVL_IMPL, PC, MISC},
                  {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
+		 {"rpl", LVL_GOD, PC, MISC},
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -5313,6 +5323,9 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
       return 0;
     }
     GET_MASTERY(vict, i) = !GET_MASTERY(vict, i);
+    break;
+case 78:
+    SET_OR_REMOVE(PLR_FLAGS(vict), PLR_RP_LEADER);
     break;
   default:
     send_to_char("Can't set that!\r\n", ch);
@@ -6291,7 +6304,7 @@ ACMD(do_osnoop)
 int update_award(struct char_data *ch)
 {
 
-  if (PLR_FLAGGED(ch, PLR_HERO) && (SPECIALS(ch)->last_reward) != (find_month()))
+  if ((PLR_FLAGGED(ch, PLR_RP_LEADER) || PLR_FLAGGED(ch, PLR_HERO) )&& (SPECIALS(ch)->last_reward) != (find_month()))
   {
     SPECIALS(ch)->last_reward = (find_month());
     GET_REWARD(ch) = 15;
@@ -6477,7 +6490,7 @@ ACMD(do_award)
   if (IS_NPC(ch))
     return;
 
-  if (PLR_FLAGGED(ch, PLR_HERO) ||  (GET_LEVEL(ch) > LVL_IMMORT))
+  if (PLR_FLAGGED(ch, PLR_HERO) ||  (GET_LEVEL(ch) > LVL_IMMORT) || PLR_FLAGGED(ch, PLR_RP_LEADER))
   {
 
     if (update_award(ch) == 0)
