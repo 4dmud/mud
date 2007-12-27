@@ -1946,7 +1946,7 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * - e-descs are assumed to end with a \r\n
        * -- Welcor 09/03 
        */
-      {
+      if (new_descr->description) {
         char *end = strchr(new_descr->description, '\0');
         if (end > new_descr->description && *(end-1) != '\n')
         {
@@ -1955,6 +1955,13 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
           free(new_descr->description);
           new_descr->description = end;
         }
+      } else {
+        if (new_descr->keyword)
+          log("SYSERR: Format error in description '%s', room %d", new_descr->keyword, virtual_nr);
+        else
+          log("SYSERR: Format error in description room %d", virtual_nr);
+        
+        new_descr->description = strdup("Blank\r\n");
       }
       new_descr->next = room_nr->ex_description;
       room_nr->ex_description = new_descr;
