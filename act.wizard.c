@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.72  2007/06/10 06:59:18  w4dimenscor
+ * added the ability for scripts to toggle body parts on and off, and imms to do so too
+ *
  * Revision 1.71  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -314,7 +317,9 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
-
+int togglebody(Character *ch, int flag);
+int has_body(Character *ch, int flag);
+int bodypartname(char *bpn);
 char *one_arg(char *arg, char *first_arg);
 int find_name(const char *name);
 void weight_to_object(struct obj_data *obj, int weight);
@@ -2577,7 +2582,7 @@ ACMD(do_purge) {
     one_argument(argument, buf);
 
     if (*buf) {            /* argument supplied. destroy single object
-                                                                                                                 * or char */
+                                                                                                                         * or char */
         if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
             if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict))) {
                 ch->Send("Fuuuuuuuuu!\r\n");
@@ -4417,6 +4422,7 @@ set_fields[] = {
                    {"tradepoints",LVL_GOD,PC,NUMBER},
                    {"pet", LVL_SEN, PC, NUMBER},
                    {"wizmort", LVL_SEN, PC, BINARY},
+                   {"body", LVL_SEN, PC, MISC},
                    {   "\n", 0, BOTH, MISC}
                };
 
@@ -4998,6 +5004,14 @@ int perform_set(Character *ch, Character *vict, int mode,
         break;
     case 81:
         SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_IMM_MORT);
+        break;
+    case 82:
+        if (bodypartname(val_arg)) {
+            snprintf(buf, sizeof(buf), "%s's body part %s is now %s", GET_NAME(vict),
+                     val_arg, ONOFF(togglebody(vict, bodypartname(val_arg))));
+        } else {
+            ch->Send("You can toggles these bits: \r\nthumb_r thumb_l saddle ear_tip\r\nshoulder_l shoulder_r crest thigh_l thigh_r \r\nknee_l knee_r floating\r\n");
+        }
         break;
     default:
         ch->Send( "Can't set that!\r\n");
@@ -6696,7 +6710,7 @@ void list_obj_resets(obj_data *obj, Character *ch) {
             case 'E':
             case 'P':
                 if (obj_index[ZCMD.arg1].vnum == vnum)
-                	ch->Send("Will reset in %d\r\n", ZCMD.arg3);
+                    ch->Send("Will reset in %d\r\n", ZCMD.arg3);
                 break;
             }
         }

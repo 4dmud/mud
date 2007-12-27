@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.67  2007/06/10 06:59:18  w4dimenscor
+ * added the ability for scripts to toggle body parts on and off, and imms to do so too
+ *
  * Revision 1.66  2007/06/10 04:51:20  w4dimenscor
  * Changed it so that mobs can assist in fights - still beta testing this, but safe to put in the game
  *
@@ -2514,7 +2517,7 @@ int fe_after_damage(Character* ch, Character* vict,
             //            if (MOB_FLAGGED(ch, MOB_MEMORY))
             forget(ch, vict);
         } else {
-            if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
+            if (IS_NPC(vict) && HERE(vict, ch) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
                 //mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
                 if (MobProtoExists(GET_MOB_VNUM(vict)))
                     bonus_gold = (int)(GET_GOLD(GetMobProto(GET_MOB_VNUM(vict))) * 0.25);

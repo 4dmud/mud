@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/08 10:28:23 $                                           * 
-*  $Revision: 1.52 $                                                      *
+*  $Date: 2007/06/10 06:59:18 $                                           * 
+*  $Revision: 1.53 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -37,6 +37,9 @@ void hunt_victim(Character *ch);
 extern const char *pc_class_types[];
 extern struct time_info_data time_info;
 void die(Character *ch, Character *killer);
+int togglebody(Character *ch, int flag);
+int has_body(Character *ch, int flag);
+int bodypartname(char *bpn);
 
 /* Utility functions */
 
@@ -305,14 +308,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         if (vd)
             snprintf(str, slen, "%s", vd->value.c_str());
         else {
-if (!strcasecmp(var, "realday")) {
-snprintf(str, slen, "%d", SECS_PER_REAL_DAY);
-} else if (!strcasecmp(var, "realhour")) {
-snprintf(str, slen, "%d", SECS_PER_REAL_HOUR);
-} else if (!strcasecmp(var, "now")) {
-snprintf(str, slen, "%ld", time(0));
-} 
-            else if (!strcasecmp(var, "self")) {
+            if (!strcasecmp(var, "realday")) {
+                snprintf(str, slen, "%d", SECS_PER_REAL_DAY);
+            } else if (!strcasecmp(var, "realhour")) {
+                snprintf(str, slen, "%d", SECS_PER_REAL_HOUR);
+            } else if (!strcasecmp(var, "now")) {
+                snprintf(str, slen, "%ld", time(0));
+            } else if (!strcasecmp(var, "self")) {
                 switch (type) {
                 case MOB_TRIGGER:
                     snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID((Character *) go));
@@ -644,6 +646,27 @@ snprintf(str, slen, "%ld", time(0));
                             obj_to_char(pObject, c);
                             snprintf(str, slen, "%c%ld", UID_CHAR,                                     GET_ID(pObject));
                         }
+                    }
+                }
+                break;
+            case 'b':
+                if (!strcasecmp(field, "bodycheck")) {
+                    if (subfield && *subfield) {
+                        int bpn = bodypartname(subfield);
+                        if (bpn)
+                            snprintf(str, slen, "%d", has_body(c, bpn));
+                        else
+                            snprintf(str, slen, "0");
+                    }
+                } else if (!strcasecmp(field, "body")) {
+                    if (subfield && *subfield) {
+                        int bpn = bodypartname(subfield);
+                        if (bpn)
+                            snprintf(str, slen, "%d", togglebody(c, bpn));
+                        else
+                            snprintf(str, slen, "0");
+                    } else {
+                        snprintf(str, slen, "0"); /*FIXME: Change this to be a list of the body parts */
                     }
                 }
                 break;
