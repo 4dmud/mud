@@ -15,7 +15,7 @@
 #define HTREE_NODE_SUBS (1 << HTREE_NODE_BITS)
 #define HTREE_NODE_MASK (HTREE_NODE_SUBS - 1)
 #define HTREE_MAX_DEPTH (((sizeof(IDXTYPE) * 8) / HTREE_NODE_BITS) + 1)
-#define IDXTYPE int
+#define IDXTYPE unsigned long
 /* End of magic constants */
 
 struct htree_node {
