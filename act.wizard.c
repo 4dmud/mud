@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.59  2006/08/20 12:17:47  w4dimenscor
+ * fixed  an uninitialised vale, and and removed an unused value fromthe code
+ *
  * Revision 1.58  2006/08/20 12:12:32  w4dimenscor
  * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
  *
@@ -4150,7 +4153,6 @@ struct tokenSort
 ACMD(do_topgold)
 {
   int i,j = 20;
- plrindex_it piei;
  vector<player_index_element> pindex(player_table);
  skip_spaces(&argument);
  if (*argument)

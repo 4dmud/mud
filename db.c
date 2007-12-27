@@ -5534,7 +5534,7 @@ void save_etext(Character *ch) {
  * we re-use the old position.
  */
 int create_entry(const char *name) {
-    int pos;
+    int pos = 0;
     bool new_entry = FALSE;
     player_index_element pie = player_index_element();
 
