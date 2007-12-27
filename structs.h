@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.32  2006/03/22 22:18:23  w4dimenscor
+ * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
+ *
  * Revision 1.31  2006/03/22 20:27:20  w4dimenscor
  * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
  * Completed the autogroup toggle to work as expected (still untested though)
@@ -517,7 +520,6 @@ extern int message_type;
 #define PRF_FISHPROMPT  52
 #define PRF_TELEPORTABLE  53
 #define PRF_AUTOGROUP   54
-
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */
@@ -1745,6 +1747,9 @@ struct player_special_data_saved
 
   int has_mail;
   int tradepoints;
+
+  /*Thotts: ctell snoop flags */
+  int ctellsnoop;
 
 
 

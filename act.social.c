@@ -46,13 +46,13 @@ const char * afar_act(int afar, const char * string, char *buf, size_t len);
 
 ACMD(do_action)
 {
-  int act_nr;
+  int act_nr,fnum;
   struct social_messg *action;
   struct char_data *vict;
   struct obj_data *targ;
   char arg[MAX_INPUT_LENGTH], part[MAX_INPUT_LENGTH];
-
-
+  char arg1[MAX_INPUT_LENGTH],*arg2;
+  arg2=arg;
   if ((act_nr = find_action(cmd)) < 0)
   {
     send_to_char("That action is not supported.\r\n", ch);
@@ -68,8 +68,8 @@ ACMD(do_action)
     return;
   }
 
-  two_arguments(argument, arg, part);
 
+  two_arguments(argument, arg, part);
 
   if ((!action->char_body_found) && (*part))
   {
@@ -84,20 +84,31 @@ ACMD(do_action)
     one_argument(argument, arg);
   else
     *arg = '\0';
-if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(ch) > LVL_HERO))
-  vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD);
+  if (!(fnum = get_number(&arg2)))
+  {
+    if (action->not_found)
+      new_send_to_char(ch, "%s\r\n", action->not_found);
+    else
+      new_send_to_char(ch, "I don't see anything by that name here.\r\n");
+    return;
+  }
+
+  strncpy(arg1,arg,MAX_INPUT_LENGTH);
+if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(ch) > LVL_HERO))	
+  vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD);
   else
-  vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM);
+  vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM);
   if (!vict || (IS_NPC(vict) && IN_ROOM(vict) != IN_ROOM(ch)))
   {
     if (action->char_obj_found)
     {
-      targ = get_obj_in_list_vis(ch, arg, NULL, ch->carrying);
-      if (!targ) targ = get_obj_in_list_vis(ch, arg, NULL, ch->in_room->contents);
+
+      targ = get_obj_in_list_vis(ch, arg, &fnum, ch->carrying);
+      if (!targ) targ = get_obj_in_list_vis(ch, arg, &fnum, ch->in_room->contents);
       if (targ)
       {
         act(action->char_obj_found, action->hide, ch, targ, 0, TO_CHAR);
-	if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
+        if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
         act(action->others_obj_found, action->hide, ch, targ, 0, TO_ROOM);
         return;
       }

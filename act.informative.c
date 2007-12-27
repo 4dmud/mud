@@ -4673,11 +4673,18 @@ ACMD(do_toggle)
 
   if (GET_LEVEL(ch) >= LVL_GOD)
   {
+    char buf3[50];
+    if(GET_CSNP_LVL(ch)==-2) snprintf(buf3,50,"None");
+    else if(GET_CSNP_LVL(ch)==-1) snprintf(buf3,50,"All");
+    else if(GET_CSNP_LVL(ch)>=0 && GET_CSNP_LVL(ch)<=num_of_clans) sprintf(buf3,clan[GET_CSNP_LVL(ch)].name);
+
     new_send_to_char(ch,
                      "      Buildwalk: %-3s    "
-                     "Clear Screen in OLC: %-3s\r\n",
+                     "Clear Screen in OLC: %-3s"
+                     "    Ctell snoop: %-3s\r\n",
                      ONOFF(PRF_FLAGGED(ch, PRF_BUILDWALK)),
-                     ONOFF(PRF_FLAGGED(ch, PRF_CLS))
+                     ONOFF(PRF_FLAGGED(ch, PRF_CLS)),
+                     buf3
                     );
 
 
@@ -5270,8 +5277,10 @@ int even_group(struct char_data *ch)
   struct follow_type *f;
   float share;
 
+
   k = (ch->master ? ch->master : ch);
   share = (1000.0 / group_size(k))/10.0;
+
 
   for (f = k->followers; f; f = f->next)
     GET_PERC(f->follower) = share;
@@ -5357,6 +5366,7 @@ ACMD(set_perc)
                    GET_NAME(ch), GET_PERC(tch));
 
 }
+
 /*
 molly:$1$XmCBLRQX$ut53Cto7qi/4bs.KIWhMy/
 */

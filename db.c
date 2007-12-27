@@ -4834,6 +4834,7 @@ void default_char(struct char_data *ch)
   GET_LOGOUTMSG(ch) = NULL;
   GET_LOGINMSG(ch) = NULL;
   TRADEPOINTS(ch) = 0;
+  GET_CSNP_LVL(ch)=-2;
 
 }
 
@@ -5028,6 +5029,8 @@ int store_to_char(char *name, struct char_data *ch)
         GET_CONVERSIONS(ch) = num;
       else if (!strcmp(tag, "CrPt"))
         CREATE_POINTS(ch) = num;
+      else if (!strcmp(tag, "Csnp"))
+        GET_CSNP_LVL(ch) = num;
       break;
 
     case 'D':
@@ -5852,6 +5855,10 @@ void char_to_store(struct char_data *ch)
      if(GET_LOGOUTMSG(ch))
        fprintf(fl, "Lgom: %s\n", GET_LOGOUTMSG(ch));
   /*end :P */
+  /* here some more :P */
+  if(GET_CSNP_LVL(ch))
+    fprintf(fl, "Csnp: %d\n", GET_CSNP_LVL(ch));
+  /* the end! *bows to the massive cheering from the audience* Read 1984! */
   if (CREATE_POINTS(ch))
     fprintf(fl, "CrPt: %d\n", CREATE_POINTS(ch));
   {

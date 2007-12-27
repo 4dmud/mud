@@ -1,3 +1,4 @@
+
 /**************************************************************************
 *   File: interpreter.c                                 Part of CircleMUD *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
@@ -144,6 +145,7 @@ ACMD(do_convert);
 ACMD(do_convey);
 ACMD(do_credits);
 ACMD(do_ctell);
+ACMD(do_ctellsnoop);
 ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_deduct);
@@ -535,7 +537,9 @@ const struct command_info cmd_info[] =
     { "copyover" , "copyo", POS_DEAD    , do_copyover , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "credits"  , "cre" , POS_DEAD    , do_gen_ps   , 0, SCMD_CREDITS, 0 },
     { "craft"    , "craft"    , POS_SITTING , do_assemble , 0, SUB_CRAFT, 0 },
+    { "csnoop"    , "csn"   , POS_DEAD, do_ctellsnoop    , LVL_IMPL, 0, 0 },
     { "ctell"    , "ct"   , POS_SLEEPING, do_ctell    , 0, 0, 0 },
+
 
     { "date"     , "da"  , POS_DEAD    , do_date     , 0, SCMD_DATE, 0 },
     { "damdice"  , "dam" , POS_DEAD    , do_dam_dice , 0, 0, 0 },

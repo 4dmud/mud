@@ -1,3 +1,4 @@
+
 /* ************************************************************************
 *   File: act.wizard.c                                  Part of CircleMUD *
 *  Usage: Player-level god commands and other goodies                     *
@@ -9,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.41  2006/03/22 22:18:23  w4dimenscor
+ * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
+ *
  * Revision 1.40  2006/03/22 20:27:20  w4dimenscor
  * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
  * Completed the autogroup toggle to work as expected (still untested though)
@@ -316,6 +320,7 @@ ACMD(do_saveall);
 ACMD(do_ps_aux);
 ACMD(do_deleteplayer);
 ACMD(do_search_triggers);
+ACMD(do_ctellsnoop);
 
 
 struct player_gold_info
@@ -4735,6 +4740,7 @@ set_fields[] = {
                  {"immtitle", LVL_IMPL, PC, MISC},
                  {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
                  {"rpl", LVL_GOD, PC, BINARY},
+                 {"tradepoints",LVL_GOD,PC,NUMBER},
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -5367,6 +5373,16 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     break;
   case 78:
     SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_RP_LEADER);
+    break;
+  case 79:
+    if(!isdigit(*val_arg)){
+       if(*val_arg=='-')
+         send_to_char("Please specify only positive numbers.\r\n",ch);
+       else
+         send_to_char("That is not a number.\r\n", ch);
+       return 0;
+    }
+    TRADEPOINTS(vict)=atoi(val_arg);
     break;
   default:
     new_send_to_char(ch, "Can't set that!\r\n");
@@ -7112,4 +7128,37 @@ ACMD(do_search_triggers)
     sprintf(buf, "%d triggers found!\r\n", found);
   DYN_RESIZE(buf);
   page_string(ch->desc, dynbuf, DYN_BUFFER);
+}
+
+ACMD(do_ctellsnoop){
+   char arg[MAX_STRING_LENGTH];
+   int num;
+   if(GET_LEVEL(ch)!=LVL_IMPL) {
+      new_send_to_char(ch,"Only imps are allowed to use this command!\r\n");
+      return;
+   }
+   one_argument(argument,arg);
+   if(isdigit(*arg) || *arg=='-'){
+      if((num=atoi(arg))<0 || num>=num_of_clans){
+         new_send_to_char(ch,"That is not a valid clannumber.\r\n");
+         return;
+      }
+      GET_CSNP_LVL(ch)=num;
+      new_send_to_char(ch,"Okay, you are now listening to the %s ctell.\r\n",clan[num].name);
+   }
+   else if(!strcmp(arg,"none")) {
+      GET_CSNP_LVL(ch)=-2;
+      new_send_to_char(ch,"Okay, you aren't snooping the ctells anymore.\r\n");
+   }
+   else if(!strcmp(arg,"all")){
+      GET_CSNP_LVL(ch)=-1;
+      new_send_to_char(ch,"Okay, you are now listening to all the ctells.\r\n");
+   }
+   else {
+      char buf3[50];
+      if(GET_CSNP_LVL(ch)==-2) snprintf(buf3,50,"None");
+      else if(GET_CSNP_LVL(ch)==-1) snprintf(buf3,50,"All");
+      else if(GET_CSNP_LVL(ch)>=0 && GET_CSNP_LVL(ch)<=num_of_clans) sprintf(buf3,clan[GET_CSNP_LVL(ch)].name);
+      new_send_to_char(ch,"Usage: ctellsnoop clannumber/none/all.\r\nCurrent setting: %s.\r\n",buf3);
+   }
 }

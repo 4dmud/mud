@@ -654,7 +654,8 @@ int check_mail(struct char_data *ch);
 #define CONCEALMENT(ch) 	((ch)->concealment)
 #define FUSE_LOC(ch, loc)       ((ch)->fuses[(loc)])
 #define FUSED_TO(ch)            ((ch)->fused_to)
-
+//Thotts
+#define GET_CSNP_LVL(ch)	(SPECIALS(ch)->saved.ctellsnoop)
 
 /** mob specials **/
 #define MOB_DAM_TAKEN(mob)    ((mob)->mob_specials.damage_taken)

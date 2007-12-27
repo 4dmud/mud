@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.26  2006/03/22 22:18:23  w4dimenscor
+ * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
+ *
  * Revision 1.25  2006/02/26 00:33:42  w4dimenscor
  * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use color codes
  *
@@ -1501,14 +1504,16 @@ ACMD(do_ctell)
    */
   if (GET_LEVEL(ch) >= LVL_GOD)
   {
+    c=-1;
+    if(!isdigit(*argument) && !(*argument=='-')){
+       send_to_char ("Please specify the clannumber.\r\n",ch);
+       return;
+    }
     c = atoi (argument);
-    if ((c <= 0) || (c > num_of_clans))
+    if ((c < 0) || (c >= num_of_clans))
     {
-      if ((c = find_clan_by_id(GET_CLAN(ch))) == -1)
-      {
         send_to_char ("There is no clan with that number.\r\n", ch);
         return;
-      }
     }
     else
     {
@@ -1517,7 +1522,6 @@ ACMD(do_ctell)
       while (*argument == ' ') argument++;
     }
 
-    c = find_clan_by_id(c);
   }
   else
 
@@ -1569,25 +1573,36 @@ ACMD(do_ctell)
   else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
     new_send_to_char(ch, "%s", CONFIG_OK);
   else
-    if (level_string)
-      new_send_to_char(ch, "You tell your clan%s, '%s'\r\n", level_string, argument);
-    else
-      new_send_to_char(ch, "You tell your clan, '%s'\r\n", argument);
+    if (GET_LEVEL(ch)<LVL_HERO || c==find_clan_by_id(GET_CLAN(ch))){
+      if (level_string)
+        new_send_to_char(ch, "You tell your clan%s, '%s'\r\n", level_string,argument);
+      else
+        new_send_to_char(ch, "You tell your clan, '%s'\r\n", argument);
+    }
+    else {
+      if (level_string)
+        new_send_to_char(ch, "You tell the %s%s, '%s'\r\n", clan[c].name,level_string,argument);
+      else
+        new_send_to_char(ch, "You tell the %s, '%s'\r\n", clan[c].name,argument);    
+   }   
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
     for (i = descriptor_list; i; i = i->next)
     {
       if (IS_PLAYING(i) && i->character && !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
       {
-        if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
+        if ((GET_CLAN(i->character) != -1 || GET_LEVEL(i->character) == LVL_IMPL) && ((find_clan_by_id(GET_CLAN(i->character)) == c || (GET_LEVEL(i->character) ==LVL_IMPL && (GET_CSNP_LVL(i->character)==-1 || GET_CSNP_LVL(i->character)==c)))) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)))
         {
-          if (!is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
+          if (!is_ignoring(ch, i->character) || (GET_LEVEL(ch) == LVL_IMPL))
           {
-            if (i->character->player_specials->saved.clan_rank >=minlev)
+            if (i->character->player_specials->saved.clan_rank >=minlev || GET_LEVEL(i->character) == LVL_IMPL)
             {
               if ((i->character) != ch)
               {
-                write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
+                if(GET_LEVEL(i->character)<LVL_HERO || c==find_clan_by_id(GET_CLAN(i->character)))
+                   write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
+                else
+                   write_to_output(i, "%s tells the %s%s, '%s'\r\n", PERS(ch, i->character),clan[c].name, level_string, argument);
               }
             }
           }
