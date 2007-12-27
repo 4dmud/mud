@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.31  2006/05/13 06:21:29  w4dimenscor
+ * put in a few more typo fixes that molly suggested
+ *
  * Revision 1.30  2006/05/11 06:20:02  w4dimenscor
  * Altered the list of typos to fix in act.comm.c, added room vnum to the typo and bug mud log
  *
@@ -1673,6 +1676,8 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, " n;t ", " n't ", len);
   ReplaceString(str, "havent", "haven't", len);
   ReplaceString(str, "perhapes", "perhaps", len);
+  ReplaceString(str, "yopu", "you", len);
+  ReplaceString(str, "dont", "don't", len);
 
   return str;
 }
