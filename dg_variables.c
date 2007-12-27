@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/04/06 07:16:28 $                                           * 
-*  $Revision: 1.11 $                                                    *
+*  $Date: 2005/04/10 08:24:45 $                                           * 
+*  $Revision: 1.12 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -779,9 +779,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             snprintf(str, slen, "0");
             if (!(!subfield || !*subfield))
             {
+              mob_vnum mvn = atoi(subfield);
               for (k = c->followers; k; k = k->next)
               {
-                if (!strcasecmp(GET_NAME(k->follower), subfield))
+                if (mvn == GET_MOB_VNUM(k->follower))
+                  break;
+                else if (!strcasecmp(GET_NAME(k->follower), subfield))
                   break;
               }
               if (k)
@@ -807,6 +810,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             if (k)
               snprintf(str, slen, "1");
           }
+        }
+        else if (!strcasecmp(field, "next_follower"))
+        {
+          struct follow_type *k;
+          struct char_data *h = NULL;
+          snprintf(str, slen, "0");
+          if (c->master)
+          {
+            for (k = c->master->followers; k; k = k->next)
+            {
+              if (c == k->follower)
+              {
+                if (k->next && k->next->follower)
+                  h = k->next->follower;
+                break;
+              }
+            }
+          }
+	  
+            if (h)
+              snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(h));
         }
 
         else if (!strcasecmp(field, "fighting"))
@@ -1448,7 +1472,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                   return;
                 }
               }
-              else 
+              else
               {
                 if (isname(subfield, item->name))
                 {
@@ -1847,13 +1871,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           else
             *str = '\0';
 
-        } else if (!strcasecmp(field, "is_peaceful"))
+        }
+        else if (!strcasecmp(field, "is_peaceful"))
         {
-	if (ROOM_FLAGGED(r, ROOM_PEACEFUL))
-	snprintf(str, slen, "1");
-	else
-	snprintf(str, slen, "0");
-	}
+          if (ROOM_FLAGGED(r, ROOM_PEACEFUL))
+            snprintf(str, slen, "1");
+          else
+            snprintf(str, slen, "0");
+        }
         break;
       case 'n':
         if (!strcasecmp(field, "name"))
