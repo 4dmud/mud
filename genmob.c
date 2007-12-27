@@ -29,16 +29,6 @@ int copy_mobile_strings(struct char_data *t, struct char_data *f);
 int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd);
 #endif
 
-extern int top_shop;
-extern mob_rnum top_of_mobt;
-extern zone_rnum top_of_zone_table;
-extern struct zone_data *zone_table;
-extern struct shop_data *shop_index;
-extern struct char_data *character_list;
-extern struct char_data *mob_proto;
-extern struct index_data *mob_index;
-
-
 
 struct mob_stat_table mob_stats[MAX_MOB_LEVELS];
 

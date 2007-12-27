@@ -359,19 +359,34 @@ extern int top_of_world;
 extern struct player_special_data dummy_mob;
 extern struct social_messg *soc_mess_list;
 extern int top_of_socialt;
+extern obj_rnum top_of_objt;
+extern mob_rnum top_of_mobt;
+ extern zone_rnum top_of_zone_table;
+extern struct index_data *mob_index;
+extern struct index_data *obj_index;
+extern struct shop_data *shop_index;
+extern int top_shop;
+extern struct index_data **trig_index;
+extern struct trig_data *trigger_list;
+extern int top_of_trigt;
+extern long max_mob_id;
+extern long max_obj_id;
+extern int dg_owner_purged;
 extern struct room_data *world_vnum[];
 extern struct char_data *mob_proto;
 extern struct obj_data *obj_proto;
 extern struct zone_data *zone_table;
+extern struct obj_data *object_list;
+    extern int top_of_zone_table;
 #endif /* __DB_C__ */
 extern struct descriptor_data *descriptor_list;
+extern struct char_data *character_list;
+extern struct player_index_element *player_table;
+extern int top_of_p_table;
 void strip_string(char *buffer);
 int read_xap_objects(FILE * fl, struct char_data *ch);
-extern mob_rnum top_of_mobt;
-extern obj_rnum top_of_objt;
 float mob_hitpoint_multi(int chclass);
 void generate_weapon(OBJ_DATA *obj);
-
 
 #define CUR_WORLD_VERSION 1
 #define CUR_ZONE_VERSION 3

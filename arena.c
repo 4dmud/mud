@@ -23,19 +23,7 @@
 #include "arena.h"
 
 /*  external vars  */
-extern struct room_data *world_vnum[];
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
-extern int top_of_zone_table;
 extern int restrict;
-extern int top_of_world;
-extern int top_of_mobt;
-extern int top_of_objt;
-extern int top_of_p_table;
 
 int in_arena = ARENA_OFF;
 int start_time;

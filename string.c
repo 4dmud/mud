@@ -8,7 +8,7 @@
 #include "handler.h"
 #include "db.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 //TODO: this string function has a memory leak if reused on a strung object
 ACMD(do_string)
 {

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/12 02:15:43 $
-*  $Revision: 1.1 $
+*  $Date: 2004/11/20 02:33:25 $
+*  $Revision: 1.2 $
 **************************************************************************/
 
 #include "conf.h"
@@ -23,28 +23,28 @@
 #include "db.h"
 #include "constants.h"
 
-extern struct room_data *world_vnum[];
-extern const char *dirs[];
-extern struct zone_data *zone_table;
-extern int top_of_zone_table;
 
-void send_char_pos(struct char_data *ch, int dam);
 void die(struct char_data *ch, struct char_data *killer);
-void sub_write(char *arg, char_data * ch, byte find_invis, int targets);
-void send_to_zone(char *messg, int zone_rnum);
-void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
-                        int upper_vnum);
-bitvector_t asciiflag_conv(char *flag);
-char_data *get_char_by_room(room_data * room, char *name);
-room_data *get_room(char *name);
-obj_data *get_obj_by_room(room_data * room, char *name);
-char_data *get_char_in_room(room_data *room, char *name);
-obj_data *get_obj_in_room(room_data *room, char *name);
-void wld_command_interpreter(room_data * room, char *argument);
+ zone_rnum real_zone_by_thing(room_vnum vznum);
+ bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
     void (name)(room_data *room, char *argument, int cmd, int subcmd)
-
+void wld_log(room_data *room, const char *format, ...);
+void act_to_room(char *str, room_data *room);
+WCMD(do_wasound);
+WCMD(do_wecho);
+WCMD(do_wsend);
+WCMD(do_wzoneecho);
+WCMD(do_wrecho);
+WCMD(do_wdoor);
+WCMD(do_wteleport);
+WCMD(do_wforce);
+WCMD(do_wpurge);
+WCMD(do_wload);
+WCMD(do_wdamage);
+WCMD(do_wat);
+void wld_command_interpreter(room_data *room, char *argument);
 
 struct wld_command_info
 {
@@ -164,7 +164,7 @@ WCMD(do_wsend)
       }
       else
       {
-        mob_log(ch, "calling mechoaround when %s is in nowhere", GET_NAME(ch));
+        wld_log(room, "calling wechoaround when %s is in nowhere", GET_NAME(ch));
       }
     }
 
@@ -559,18 +559,18 @@ WCMD(do_wload)
     }
     char_to_room(mob, rnum);
     load_mtrigger(mob);
-    if (SCRIPT(room))
-    { // it _should_ have, but it might be detached.
-      char buf[MAX_INPUT_LENGTH];
-      sprintf(buf, "%c%ld", UID_CHAR, GET_ID(mob));
-      add_var(&(SCRIPT(room)->global_vars), "loaded", buf, 0);
-    }
+        if (SCRIPT(room)) { // it _should_ have, but it might be detached.
+          char buf[MAX_INPUT_LENGTH];
+          sprintf(buf, "%c%ld", UID_CHAR, GET_ID(mob));
+          add_var(&(SCRIPT(room)->global_vars), "lastloaded", buf, 0);
+        }
   }
 
 
   else if (is_abbrev(arg1, "obj"))
   {
-    if ((object = read_object(number, VIRTUAL)) == NULL)
+  object = read_object(number, VIRTUAL);
+    if (object == NULL)
     {
       wld_log(room, "wload: bad object vnum");
       return;
@@ -687,6 +687,7 @@ const struct wld_command_info wld_cmd_info[] =
     {"wsend ", do_wsend, SCMD_WSEND},
     {"wteleport ", do_wteleport, 0},
     {"wzecho ", do_wzecho, 0},
+    { "wrecho "     , do_wrecho    , 0 },
     {"wzrecho ", do_wzrecho, 0},
     {"wdamage ", do_wdamage, 0},
     {"wat ", do_wat, 0},

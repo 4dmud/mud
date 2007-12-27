@@ -149,9 +149,6 @@ void weather_change(void)
 {
     int diff, change, i;
     struct descriptor_data *j;
-    extern int top_of_zone_table;
-    extern struct zone_data *zone_table;
-    extern struct descriptor_data *descriptor_list;
     char buf[MAX_STRING_LENGTH];
 
     for (i = 0; i <= top_of_zone_table; i++) {

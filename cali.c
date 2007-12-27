@@ -10,11 +10,10 @@
 #include "house.h"
 #include "screen.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 #include "dg_scripts.h"
 
 /* external variables */
-extern struct index_data *obj_index;
 /*
 if %actor.clanname% != saints
 %send% %actor% Only saints can use this item.

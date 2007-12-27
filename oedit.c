@@ -29,17 +29,9 @@
  * External variable declarations.
  */
 
-extern struct obj_data *obj_proto;
-extern struct index_data *obj_index;
-extern struct obj_data *object_list;
-extern obj_rnum top_of_objt;
-extern struct zone_data *zone_table;
-extern zone_rnum top_of_zone_table;
-extern struct shop_data *shop_index;
 extern struct attack_hit_type attack_hit_text[];
 extern struct spell_info_type spell_info[];
 extern struct board_info_type board_info[];
-extern struct descriptor_data *descriptor_list;
 
 /*------------------------------------------------------------------------*/
 extern zone_rnum real_zone_by_thing(room_vnum vznum);

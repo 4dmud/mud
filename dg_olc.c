@@ -20,26 +20,16 @@
 #include "dg_olc.h"
 #include "dg_event.h"
 
-
-/* declare externally defined globals */
-extern struct index_data **trig_index;
-extern const char *trig_types[], *otrig_types[], *wtrig_types[];
-extern struct descriptor_data *descriptor_list;
-extern struct trig_data *trigger_list;
-extern int top_of_trigt;
-extern struct zone_data *zone_table;
-
-
 /* prototype externally defined functions */
-void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void free_varlist(struct trig_var_data *vd);
-void smash_tilde(char *str);
+extern const char *trig_types[], *otrig_types[], *wtrig_types[];
 zone_rnum real_zone_by_thing(room_vnum vznum);
-
+/*locals*/
 void trigedit_disp_menu(struct descriptor_data *d);
+void trigedit_disp_types(struct descriptor_data *d);
 void trigedit_save(struct descriptor_data *d);
 void trigedit_create_index(int znum, char *type);
 void trigedit_string_cleanup(struct descriptor_data *d, int terminator);
+int format_script(struct descriptor_data *d);
 
 /* ***********************************************************************
  * trigedit 
@@ -429,7 +419,8 @@ void new_sprintbits(int data, char *dest)
 /* save the zone's triggers to internal memory and to disk */
 void trigedit_save(struct descriptor_data *d)
 {
-  int trig_rnum, i;
+  int i;
+  trig_rnum rnum;
   int found = 0;
   char *s;
   trig_data *proto;
@@ -444,8 +435,8 @@ void trigedit_save(struct descriptor_data *d)
   char bitBuf[MAX_INPUT_LENGTH];
   char fname[MAX_INPUT_LENGTH];
   
-  if ((trig_rnum = real_trigger(OLC_NUM(d))) != NOTHING) {
-    proto = trig_index[trig_rnum]->proto;
+  if ((rnum = real_trigger(OLC_NUM(d))) != NOTHING) {
+    proto = trig_index[rnum]->proto;
     for (cmd = proto->cmdlist; cmd; cmd = next_cmd) { 
       next_cmd = cmd->next;
       if (cmd->cmd)
@@ -483,7 +474,7 @@ void trigedit_save(struct descriptor_data *d)
     live_trig = trigger_list;
     while (live_trig)
     {
-      if (GET_TRIG_RNUM(live_trig) == trig_rnum) {
+      if (GET_TRIG_RNUM(live_trig) == rnum) {
         if (live_trig->arglist) {
           free(live_trig->arglist);
           live_trig->arglist = NULL;
@@ -546,15 +537,15 @@ void trigedit_save(struct descriptor_data *d)
       if (!found) {
         if (trig_index[i]->vnum > OLC_NUM(d)) {
           found = TRUE;
-          trig_rnum = i;
+          rnum = i;
                         
-          CREATE(new_index[trig_rnum], struct index_data, 1);
-          GET_TRIG_RNUM(OLC_TRIG(d)) = trig_rnum;
-          new_index[trig_rnum]->vnum = OLC_NUM(d);
-          new_index[trig_rnum]->number = 0; 
-          new_index[trig_rnum]->func = NULL;
+          CREATE(new_index[rnum], struct index_data, 1);
+          GET_TRIG_RNUM(OLC_TRIG(d)) = rnum;
+          new_index[rnum]->vnum = OLC_NUM(d);
+          new_index[rnum]->number = 0; 
+          new_index[rnum]->func = NULL;
           CREATE(proto, struct trig_data, 1);
-          new_index[trig_rnum]->proto = proto;
+          new_index[rnum]->proto = proto;
           trig_data_copy(proto, trig);
 
           if (trig->name)
@@ -562,10 +553,10 @@ void trigedit_save(struct descriptor_data *d)
           if (trig->arglist)
             proto->arglist = strdup(trig->arglist);  
 
-          new_index[trig_rnum + 1] = trig_index[trig_rnum];
+          new_index[rnum + 1] = trig_index[rnum];
 
-          proto = trig_index[trig_rnum]->proto;
-          proto->nr = trig_rnum + 1;
+          proto = trig_index[rnum]->proto;
+          proto->nr = rnum + 1;
         } else {
           new_index[i] = trig_index[i];
         }
@@ -577,15 +568,15 @@ void trigedit_save(struct descriptor_data *d)
     }
 
     if (!found) {
-      trig_rnum = i;
-      CREATE(new_index[trig_rnum], struct index_data, 1);
-      GET_TRIG_RNUM(OLC_TRIG(d)) = trig_rnum;  
-      new_index[trig_rnum]->vnum = OLC_NUM(d);
-      new_index[trig_rnum]->number = 0;
-      new_index[trig_rnum]->func = NULL;
+      rnum = i;
+      CREATE(new_index[rnum], struct index_data, 1);
+      GET_TRIG_RNUM(OLC_TRIG(d)) = rnum;  
+      new_index[rnum]->vnum = OLC_NUM(d);
+      new_index[rnum]->number = 0;
+      new_index[rnum]->func = NULL;
                         
       CREATE(proto, struct trig_data, 1);
-      new_index[trig_rnum]->proto = proto;
+      new_index[rnum]->proto = proto;
       trig_data_copy(proto, trig);
 
       if (trig->name)
@@ -601,14 +592,14 @@ void trigedit_save(struct descriptor_data *d)
 
     /* HERE IT HAS TO GO THROUGH AND FIX ALL SCRIPTS/TRIGS OF HIGHER RNUM */
     for (live_trig = trigger_list; live_trig; live_trig = live_trig->next_in_world)
-      GET_TRIG_RNUM(live_trig) += (GET_TRIG_RNUM(live_trig) > trig_rnum);
+      GET_TRIG_RNUM(live_trig) += (GET_TRIG_RNUM(live_trig) > rnum);
         
     /*
      * Update other trigs being edited.
      */
      for (dsc = descriptor_list; dsc; dsc = dsc->next)
        if (STATE(dsc) == CON_TRIGEDIT)
-         if (GET_TRIG_RNUM(OLC_TRIG(dsc)) >= trig_rnum)
+         if (GET_TRIG_RNUM(OLC_TRIG(dsc)) >= rnum)
            GET_TRIG_RNUM(OLC_TRIG(dsc))++;
 
   }
@@ -636,8 +627,8 @@ void trigedit_save(struct descriptor_data *d)
   }
         
   for (i = zone_table[OLC_ZNUM(d)].bot; i <= top; i++) {
-    if ((trig_rnum = real_trigger(i)) != NOTHING) {
-      trig = trig_index[trig_rnum]->proto;
+    if ((rnum = real_trigger(i)) != NOTHING) {
+      trig = trig_index[rnum]->proto;
 
       if (fprintf(trig_file, "#%d\n", i) < 0) {
         new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(d->character)), TRUE,

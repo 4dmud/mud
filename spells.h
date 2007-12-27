@@ -11,8 +11,11 @@
  */
  /*
  * $Log: spells.h,v $
- * Revision 1.1  2004/11/12 02:16:55  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:55  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.38  2004/09/04 03:46:51  molly
  * made it so only one cost for recovering corpses, and skillist is sorted
@@ -425,7 +428,6 @@ enum skill_list {
 #define TAR_AREA_ZONE   (1 << 14) /*spell affects everything in the zone */
 extern struct spell_info_type spell_info[];
 int magic_distance(struct char_data *ch, int spellnum, int dir, struct char_data *victim);
-int current_class_is_tier_num(struct char_data *ch);
 #define TIERNUM current_class_is_tier_num(ch)
 
 

@@ -69,6 +69,9 @@
 /*
  * Limit information.
  */
+
+ 
+ 
 #define MAX_ROOM_NAME	75
 #define MAX_MOB_NAME	50
 #define MAX_OBJ_NAME	50
@@ -119,7 +122,7 @@ extern int top_of_socialt;
 void cleanup_olc(struct descriptor_data *d, byte cleanup_type);
 void get_char_colors(struct char_data *ch);
 void split_argument(char *argument, char *tag);
-
+int can_edit_zone(struct char_data *ch, zone_rnum rnum);
 /*
  * OLC structures.
  */
@@ -509,6 +512,7 @@ extern const char *nrm, *grn, *cyn, *yel;
    void name(struct char_data *ch, char *argument, int cmd, int subcmd)
 #endif
 void clear_screen(struct descriptor_data *);
+int can_edit_zone(struct char_data *ch, zone_rnum rnum);
 ACMD(do_oasis);
 ACMD(do_oasis_list);
 ACMD(do_oasis_links);
@@ -635,15 +639,18 @@ void aedit_save_to_disk(struct descriptor_data *d);
 void aedit_save_internally(struct descriptor_data *d);
 void free_action(struct social_messg *mess);
 ACMD(do_oasis_aedit);
-
+/* oasis_delete.c */
 int free_strings(void *data, int type);
+/* oasis_list.c */
+ACMD(do_oasis_list);
+ACMD(do_oasis_links);
+void list_triggers(struct char_data *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax);
 void list_rooms(struct char_data *ch  , zone_rnum rnum, room_vnum vmin, room_vnum vmax);
 void list_mobiles(struct char_data *ch, zone_rnum rnum, mob_vnum vmin , mob_vnum vmax );
 void list_objects(struct char_data *ch, zone_rnum rnum, obj_vnum vmin , obj_vnum vmax );
 void list_shops(struct char_data *ch  , zone_rnum rnum, shop_vnum vmin, shop_vnum vmax);
-void list_zones(struct char_data *ch);
-void print_zone(struct char_data *ch, zone_vnum vnum);
-int can_edit_zone(struct char_data *ch, zone_rnum rnum);
+void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax);
+void print_zone(struct char_data *ch, zone_rnum rnum);
 
 ACMD(do_oasis_vedit);
 void vedit_setup_new(struct descriptor_data *d);

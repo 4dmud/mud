@@ -30,13 +30,6 @@ extern int top_of_helpt;
 extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern const char *pc_class_types[];
 
 extern const int wear_order_index[NUM_WEARS];	/* RG 6/28/98 */
 extern struct clan_rec clan[MAX_CLANS];
@@ -89,7 +82,6 @@ long find_class_bitvector(char arg);
 //long find_race_bitvector(char arg);
 char *title_male(int chclass, int level);
 char *title_female(int chclass, int level);
-int current_class_is_tier_num(struct char_data *ch);
 int speed_update(struct char_data *ch);
 int tier_level(struct char_data *ch, int chclass);
 int parse_class(char arg);

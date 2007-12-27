@@ -30,14 +30,8 @@
 /*
  * External variable declarations.
  */
-extern struct index_data *mob_index;
-extern struct char_data *mob_proto;
-extern struct char_data *character_list;
-extern mob_rnum top_of_mobt;
-extern struct zone_data *zone_table;
 extern struct attack_hit_type attack_hit_text[];
 extern struct shop_data *shop_index;
-extern struct descriptor_data *descriptor_list;
 extern const char *mob_races[];
 #if CONFIG_OASIS_MPROG
 extern const char *mobprog_types[];

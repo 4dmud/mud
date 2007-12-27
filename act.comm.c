@@ -10,8 +10,11 @@
 
 /*
  * $Log: act.comm.c,v $
- * Revision 1.1  2004/11/12 02:16:11  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:11  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.32  2004/09/18 10:47:02  molly
  * fixed up more memory errors, added normal help back in.
@@ -41,9 +44,6 @@
 /* extern variables */
 extern int level_can_shout;
 extern int holler_move_cost;
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-extern struct char_data *character_list;
 
 void strip_color(char *inbuf);
 /* extern functions */

@@ -23,13 +23,6 @@
 #include "dg_scripts.h"
 #include "fight.h"
 
-extern struct room_data *world_vnum[];
-extern struct obj_data *object_list;
-extern struct char_data *character_list;
-extern struct index_data *obj_index;
-extern struct descriptor_data *descriptor_list;
-extern struct zone_data *zone_table;
-
 extern int mini_mud;
 ACMD(do_flee);
 

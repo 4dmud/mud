@@ -19,14 +19,11 @@
 #include "handler.h"
 #include "db.h"
 #include "spells.h"
+#include "constants.h"
 
 
 /* Externals */
 ACMD(do_say);
-extern struct char_data *character_list;
-extern const char *dirs[];
-extern struct room_data *world_vnum[];
-
 /* External functions */
 void improve_skill(struct char_data *ch, int skill);
 

@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/12 02:17:11 $
-*  $Revision: 1.1 $
+*  $Date: 2004/11/20 02:33:25 $
+*  $Revision: 1.2 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -24,18 +24,9 @@
 #include "dg_event.h"
 #include "comm.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 
-void trig_data_copy(trig_data * this_data, const trig_data * trg);
-void free_trigger(struct trig_data *trig);
 
-extern struct index_data **trig_index;
-extern int top_of_trigt;
-extern struct trig_data *trigger_list;
-extern struct room_data *world_vnum[];
-
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 
 extern void half_chop(char *string, char *arg1, char *arg2);
 extern bitvector_t asciiflag_conv(char *flag);

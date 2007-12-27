@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.3  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
  * Revision 1.2  2004/11/17 05:13:05  w4dimenscor
  * updated pets so that they dont have weight problems, updated award points
  *
@@ -38,12 +41,7 @@
 
 
 /*   external vars  */
-extern struct room_data *world_vnum[];
 extern struct corpse_list_data *corpse_list;
-extern struct char_data *character_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 extern int guild_info[][3];
@@ -52,7 +50,6 @@ extern const char *cmd_door[];
 /* extern functions */
 int mag_manacost(struct char_data *ch, int spellnum);
 void add_follower(struct char_data *ch, struct char_data *leader);
-extern struct obj_data *object_list;
 int get_pidx_from_name(struct char_data *ch);
 int find_door(struct char_data *ch, const char *type, char *dir,
               const char *cmdname);
@@ -1119,7 +1116,7 @@ SPECIAL(cityguard)
 }
 
 
-#define PET_PRICE(pet) ((gold_int)(GET_LEVEL(pet) * (GET_TIER(pet)+1) * GET_MAX_HIT(pet)))
+#define PET_PRICE(pet) ((gold_int)(GET_LEVEL(pet) * (MOB_TIER(pet)+1) * GET_MAX_HIT(pet)))
 #define MAX_PETS 6
 
 SPECIAL(pet_shops)

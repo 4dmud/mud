@@ -24,31 +24,6 @@
 #include "dg_scripts.h"
 
 /******************************************************************************/
-/** External Variables                                                       **/
-/******************************************************************************/
-extern struct shop_data *shop_index;
-extern int top_shop;
-extern struct index_data **trig_index;
-extern int top_of_trigt;
-extern struct index_data *mob_index;
-extern int top_of_mobt;
-extern struct index_data *obj_index;
-extern int top_of_objt;
-extern int top_of_zone_table;
-
-/******************************************************************************/
-/** Internal Functions                                                       **/
-/******************************************************************************/
-void list_rooms(struct char_data *ch  , zone_rnum rnum, room_vnum vmin, room_vnum vmax);
-void list_mobiles(struct char_data *ch, zone_rnum rnum, mob_vnum vmin , mob_vnum vmax );
-void list_objects(struct char_data *ch, zone_rnum rnum, obj_vnum vmin , obj_vnum vmax );
-void list_shops(struct char_data *ch  , zone_rnum rnum, shop_vnum vmin, shop_vnum vmax);
-void list_triggers(struct char_data *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax);
-void list_zones(struct char_data *ch);
-void print_zone(struct char_data *ch, zone_vnum vnum);
-
-
-/******************************************************************************/
 /** Ingame Commands                                                          **/
 /******************************************************************************/
 ACMD(do_oasis_list)
@@ -61,13 +36,7 @@ ACMD(do_oasis_list)
 
   two_arguments(argument, smin, smax);
 
-  if (subcmd == SCMD_OASIS_ZLIST) { /* special case */
-    if (smin && *smin && is_number(smin))
-      print_zone(ch, atoi(smin));
-    else
-      list_zones(ch);
-    return;
-  }else if (subcmd == SCMD_OASIS_VLIST) {
+  if (subcmd == SCMD_OASIS_VLIST) {
    list_vehicles(ch);
    return;
   }
@@ -99,6 +68,7 @@ ACMD(do_oasis_list)
     case SCMD_OASIS_RLIST: list_rooms(ch, rzone, vmin, vmax); break;
     case SCMD_OASIS_TLIST: list_triggers(ch, rzone, vmin, vmax); break;
     case SCMD_OASIS_SLIST: list_shops(ch, rzone, vmin, vmax); break;
+    case SCMD_OASIS_ZLIST: list_zones(ch, rzone, vmin, vmax); break;
     default:
       new_send_to_char(ch, "You can't list that!\r\n");
       new_mudlog(BRF, LVL_IMMORT, TRUE,
@@ -111,7 +81,8 @@ ACMD(do_oasis_links)
   zone_rnum zrnum;
   zone_vnum zvnum;
   room_rnum  to_room;
-  int first, last, j, nr;
+  room_vnum first, last;
+  int j, nr;
   char arg[MAX_INPUT_LENGTH];
 
   skip_spaces(&argument);
@@ -166,7 +137,10 @@ ACMD(do_oasis_links)
  */                                                                           
 void list_rooms(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
-  int i, j, bottom, top, counter = 0;
+  room_vnum i;
+  room_vnum bottom, top;
+  int j, counter = 0;
+
   /*
    * Expect a minimum / maximum number if the rnum for the zone is NOWHERE. 
    */
@@ -220,7 +194,9 @@ void list_rooms(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
  */                                                                           
 void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
-  int i, bottom, top, counter = 0;
+  mob_rnum i;
+  mob_vnum bottom, top;
+  int counter = 0;
   
   if (rnum != NOWHERE) {
     bottom = zone_table[rnum].bot;
@@ -257,7 +233,9 @@ void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnu
  */                                                                           
 void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnum vmax)
 {
-  int i, bottom, top, counter = 0;
+  shop_rnum i;
+  shop_vnum bottom, top;
+  int counter = 0;
   
   if (rnum != NOWHERE) {
     bottom = zone_table[rnum].bot;
@@ -295,7 +273,9 @@ void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnu
  */                                                                           
 void list_shops(struct char_data *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax)
 {
-  int i, j, bottom, top, counter = 0;
+  shop_rnum i;
+  shop_vnum bottom, top;
+  int j, counter = 0;
   struct shop_data *shop;
   
   if (rnum != NOWHERE) {
@@ -341,18 +321,36 @@ void list_shops(struct char_data *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum 
 /*
  * List all zones in the world (sort of like 'show zones').                              
  */                                                                           
-void list_zones(struct char_data *ch)
+void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
-  int i;
+  int counter = 0;
+  zone_rnum i;
+  zone_vnum bottom, top;
+  
+  if (rnum != NOWHERE) {
+    /* Only one parameter was supplied - just list that zone */
+    print_zone(ch, rnum);
+   return;
+  } else {
+    bottom = vmin;
+    top    = vmax;
+  }
   
   new_send_to_char(ch,
   "VNum  Zone Name                      Builder(s)\r\n"
   "----- ------------------------------ --------------------------------------\r\n");
-  
-  for (i = 0; i <= top_of_zone_table; i++)
+ for (i = 0; i <= top_of_zone_table; i++) {
+    if (zone_table[i].number >= bottom && zone_table[i].number <= top) {
     new_send_to_char(ch, "[%s%3d%s] %s%-30.30s %s%-1s%s\r\n",
       QGRN, zone_table[i].number, QNRM, QCYN, zone_table[i].name,
       QYEL, zone_table[i].builders ? zone_table[i].builders : "None.", QNRM);
+      
+      counter++;
+    }
+  }
+  
+  if (!counter)
+    new_send_to_char(ch, "  None found within those parameters.\r\n");
 }
 
 
@@ -360,17 +358,11 @@ void list_zones(struct char_data *ch)
 /*
  * Prints all of the zone information for the selected zone.
  */
-void print_zone(struct char_data *ch, zone_vnum vnum)
+void print_zone(struct char_data *ch, zone_rnum rnum)
 {
-  zone_rnum rnum;
   int size_rooms, size_objects, size_mobiles, i;
   room_vnum top, bottom;
   int largest_table;
-  
-  if ((rnum = real_zone(vnum)) == NOWHERE) {
-    new_send_to_char(ch, "Zone #%d does not exist in the database.\r\n", vnum);
-    return;
-  }
   
   /****************************************************************************/
   /** Locate the largest of the three, top_of_world, top_of_mobt, or         **/

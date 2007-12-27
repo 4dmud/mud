@@ -12,13 +12,15 @@
 #include "dg_event.h"
 #include "constants.h"
 
-extern struct index_data **trig_index;
-extern struct trig_data *trigger_list;
-
-extern struct room_data *world;
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-
+/* frees memory associated with var */
+void free_var_el(struct trig_var_data *var)
+{
+  if (var->name)
+    free(var->name);
+  if (var->value)
+    free(var->value);
+  free(var);
+}
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd)
 {
@@ -28,15 +30,37 @@ void free_varlist(struct trig_var_data *vd)
   {
     j = i;
     i = i->next;
-    if (j->name)
-      free(j->name);
-    if (j->value)
-      free(j->value);
-    free(j);
+    free_var_el(j);
   }
 }
 
 /*
+ * remove var name from var_list
+ * returns 1 if found, else 0
+ */
+int remove_var(struct trig_var_data **var_list, char *name)
+{
+  struct trig_var_data *i, *j;
+
+  for (j = NULL, i = *var_list; i && str_cmp(name, i->name);
+       j = i, i = i->next);
+
+  if (i) {
+    if (j) {
+      j->next = i->next;
+      free_var_el(i);
+    } else {
+      *var_list = i->next;
+      free_var_el(i);
+    }
+
+    return 1;      
+  }
+  
+  return 0;
+}
+
+/* 
  * Return memory used by a trigger
  * The command list is free'd when changed and when
  * shutting down.

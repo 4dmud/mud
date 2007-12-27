@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
- * Revision 1.1  2004/11/12 02:16:52  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:52  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.37  2004/08/15 01:12:23  molly
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
@@ -57,7 +60,6 @@ extern struct room_data *find_room(long n);
 void run_task(struct char_data *ch);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
-extern struct obj_data *object_list;	/* global linked list of objs    */
 int save_forest(void);
 
 /* struct for syls */

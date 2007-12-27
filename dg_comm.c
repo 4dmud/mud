@@ -9,12 +9,6 @@
 #include "db.h"
 #include "constants.h"
 
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-/* external functions */
-struct obj_data *get_obj_in_equip_vis(struct char_data *ch, char *arg, int *number, struct obj_data *equipment[]);
-char_data *get_char_in_room(room_data *room, char *name);
-obj_data *get_obj_in_room(room_data *room, char *name);
 
 /* same as any_one_arg except that it stops at punctuation */
 char *any_one_name(char *argument, char *first_arg)

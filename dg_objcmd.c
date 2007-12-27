@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/12 02:16:36 $
-*  $Revision: 1.1 $
+*  $Date: 2004/11/20 02:33:25 $
+*  $Revision: 1.2 $
 **************************************************************************/
 
 #include "conf.h"
@@ -23,33 +23,32 @@
 #include "db.h"
 #include "constants.h"
 
-extern struct room_data *world_vnum[];
-extern struct index_data *obj_index;
-extern const char *dirs[];
-extern int dg_owner_purged;
-extern struct char_data *find_char(long n);
-extern struct obj_data *find_obj(long n);
-extern struct room_data *find_room(long n);
 
-int valid_dg_target(struct char_data *ch, int allow_gods);
-void send_char_pos(struct char_data *ch, int dam);
-char_data *get_char_by_obj(obj_data * obj, char *name);
-obj_data *get_obj_by_obj(obj_data * obj, char *name);
-void sub_write(char *arg, char_data * ch, byte find_invis, int targets);
-void send_to_zone(char *messg, int zone_rnum);
-void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
-			int upper_vnum);
 void die(struct char_data *ch, struct char_data *killer);
-room_data *get_room(char *name);
 bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
 zone_rnum real_zone_by_thing(room_vnum vznum);
-void send_to_zone(char *messg, zone_rnum zone);
-void obj_command_interpreter(obj_data *obj, char *argument);
-
 #define OCMD(name)  \
    void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
 
+void obj_log(obj_data *obj, const char *format, ...);
+room_rnum find_obj_target_room(obj_data *obj, char *rawroomstr);
+OCMD(do_oecho);
+OCMD(do_oforce);
+OCMD(do_ozoneecho);
+OCMD(do_osend);
+OCMD(do_orecho);
+OCMD(do_otimer);
+OCMD(do_otransform);
+OCMD(do_opurge);
+OCMD(do_oteleport);
+OCMD(do_dgoload);
+OCMD(do_odamage);
+OCMD(do_oasound);
+OCMD(do_odoor);
+OCMD(do_osetval);
+OCMD(do_oat);
+void obj_command_interpreter(obj_data *obj, char *argument);
 
 struct obj_command_info {
     char *command;
@@ -300,7 +299,7 @@ OCMD(do_osend)
 	 if (IN_ROOM(ch) != NULL) {
     sub_write(msg, ch, TRUE, TO_ROOM);
     } else {
-    mob_log(ch, "calling mechoaround when %s is in nowhere", GET_NAME(ch));
+    obj_log(obj, "calling oechoaround when %s is in nowhere", GET_NAME(ch));
     }
 	    }
     }
@@ -610,6 +609,34 @@ OCMD(do_dgoload)
 	obj_log(obj, "oload: bad type");
 
 }
+ 
+OCMD(do_oasound)
+{
+  room_rnum room;
+  int door;
+
+  skip_spaces(&argument);
+
+  if (!*argument) {
+    obj_log(obj, "oasound called with no args");
+    return;
+  }
+  
+  if ((room = obj_room(obj)) == NULL) {
+    obj_log(obj, "oecho called by object in NOWHERE");
+    return;
+  }
+
+  for (door = 0; door < NUM_OF_DIRS; door++) {
+    if (room->dir_option[door] != NULL &&
+       room->dir_option[door]->to_room != NULL &&
+       room->dir_option[door]->to_room != room &&
+        room->dir_option[door]->to_room->people)
+          sub_write(argument, room->dir_option[door]->to_room->people, TRUE, TO_ROOM | TO_CHAR);
+  }
+}
+
+
 
 OCMD(do_odamage)
 {
@@ -891,12 +918,12 @@ OCMD(do_ozrecho)
 
 const struct obj_command_info obj_cmd_info[] = {
     {"RESERVED", 0, 0},		/* this must be first -- for specprocs */
+    { "oasound "    , do_oasound  , 0 },
     { "oat "        , do_oat      , 0 },
     { "odoor "      , do_odoor    , 0 },
     { "odamage "    , do_odamage,   0 },
     {"oecho ", do_oecho, 0},
     {"oechoaround ", do_osend, SCMD_OECHOAROUND},
-    {"oexp ", do_oexp, 0},
     {"oforce ", do_oforce, 0},
     {"olag ", do_olag, 0},
     {"oload ", do_dgoload, 0},

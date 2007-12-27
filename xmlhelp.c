@@ -1,8 +1,11 @@
 /*
 Mordecai's XML help file system.
 $Log: xmlhelp.c,v $
-Revision 1.1  2004/11/12 02:17:12  w4dimenscor
-Initial revision
+Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+updated and cleaned up the script system
+
+Revision 1.1.1.1  2004/11/12 02:17:12  w4dimenscor
+Initial clean submission of 4Dimensions src code
 
 Revision 1.1  2004/08/22 00:50:49  molly
 removed all the origional help code, added the start of the xml reader.
@@ -27,10 +30,10 @@ approved
 */
 
 
-#include <libxml/parser.h>
-#include <libxml/xinclude.h>
-#include <libxml/tree.h>
-#include <libxml/xmlIO.h>
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/xinclude.h>
+#include <libxml2/libxml/tree.h>
+#include <libxml2/libxml/xmlIO.h>
 
 #include "conf.h"
 #include "sysdep.h"

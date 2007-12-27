@@ -10,8 +10,11 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
- * Revision 1.1  2004/11/12 02:15:35  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:15:35  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.122  2004/09/24 11:34:53  molly
  * fixed automeld
@@ -50,18 +53,12 @@
 
 
 /* External structures */
-extern struct index_data *mob_index;
-extern struct room_data *world_vnum[];
 extern struct message_list fight_messages[MAX_MESSAGES];
-extern struct char_data *character_list;
 
-extern struct obj_data *object_list;
 int corpse_mod = 0;
 float skillmulti = 0;
 
 /* Daniel Houghton's revision */
-extern int rev_dir[];
-extern struct index_data *obj_index;
 extern int skill_roll(struct char_data *ch, int skill_num);
 ACMD(do_sac);
 
@@ -87,7 +84,6 @@ void brag(struct char_data *ch, struct char_data *victim);
 int get_pidx_from_name(struct char_data *ch);
 void arena_kill(struct char_data *ch);
 void diag_char_to_char(struct char_data *i, struct char_data *ch);
-int current_class_is_tier_num(struct char_data *ch);
 
 /* local functions */
 void delay_die(struct char_data *ch, struct char_data *killer);
@@ -138,7 +134,6 @@ int one_hit_damage(struct char_data *ch, int type);
 int speed_update(struct char_data *ch);
 int can_fight(struct char_data *ch, struct char_data *vict);
 void kill_list(struct char_data *ch, struct char_data *vict);
-struct char_data *find_char(long n);
 int attack_group = 1;
 
 
@@ -2570,7 +2565,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
   int skill_cost(int h, int m, int v, struct char_data *ch);
   int parrychance = 0;
   int v_type = w_type;
-  if (GET_POS(vict) < POS_FIGHTING)
+  if ((!ch || !vict) || GET_POS(vict) < POS_FIGHTING)
     return 0;
 
 
@@ -2580,8 +2575,13 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
   {
     if (number(1, 100) < GET_LEVEL(vict))
       improve_skill(ch, SKILL_PARRY);
+      if (!IS_WEAPON(v_type)) {
+      log("COMBAT: player %s, attacked with a weapon type of %d", GET_NAME(vict), v_type);
+      return 0;
+      }
     if ((v_type) >= TYPE_HIT)
       v_type -= TYPE_HIT;
+     
     new_send_to_char(ch, "%s parries your attack with a swift %s.\r\n",
                      PERS(vict,ch), attack_hit_text[v_type].singular);
     new_send_to_char(vict,  "You parry %s's attack with a swift %s.\r\n",

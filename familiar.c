@@ -11,11 +11,10 @@
 #include "house.h"
 #include "screen.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 #include "dg_scripts.h"
 #include "spells.h"
 
-extern struct room_data *world_vnum[];
 int can_take_obj(struct char_data *ch, struct obj_data *obj);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 int perform_get_from_room(struct char_data *ch, struct obj_data *obj);

@@ -14,6 +14,8 @@ improved-edit.c		Routines specific to the improved editor.
 #include "interpreter.h"
 #include "improved-edit.h"
 
+int format_script(struct descriptor_data *d);
+
 void send_editor_help(struct descriptor_data *d)
 {
   if (using_improved_editor)
@@ -123,7 +125,6 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     break;
   case PARSE_FORMAT:
     if (STATE(d) == CON_TRIGEDIT) {
-      int format_script(struct descriptor_data *d);
       write_to_output(d, "Script %sformatted.\r\n", format_script(d) ? "": "not ");
       return;
     }
@@ -534,10 +535,27 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, unsigne
 	cap_next_next = TRUE;
 	flow++;
       }
+      
+      /* special case: if we're at the end of the last line, and the last 
+         character is a delimiter, the flow++ above will have *flow pointing
+         to the \r (or \n) character after the delimiter. Thus *flow will
+         be non-null, and an extra (blank) line might be added erroneously.
+         We fix it by skipping the newline characters in between.
+         
+         Welcor 04/04
+       */
+
+      if (strchr("\n\r", *flow)) {
+        *flow = '\0';  /* terminate 'start' string */
+        flow++;        /* we know this is safe     */
+        while (*flow && strchr("\n\r", *flow)) 
+          flow++;      /* skip to next non-delimiter */
+        temp = *flow;  /* save this char             */
+      } else {
 	 
       temp = *flow;
       *flow = '\0';
-
+}
       if (line_chars + strlen(start) + 1 > PAGE_WIDTH) {
 	strcat(formatted, "\r\n");
 	line_chars = 0;

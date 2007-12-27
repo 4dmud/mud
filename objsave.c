@@ -34,10 +34,6 @@
 #define LOC_INVENTORY	0
 #define MAX_BAG_ROWS	5
 
-extern struct room_data *world;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern struct descriptor_data *descriptor_list;
 extern struct player_index_element *player_table;
 extern int top_of_p_table;
 extern int qic_items;			/* Number of items in database */

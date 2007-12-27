@@ -22,10 +22,6 @@
 #include "constants.h"
 
 /* external structs */
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-extern struct index_data *mob_index;
-extern struct room_data *world_vnum[];
 extern int no_specials;
 
 ACMD(do_get);

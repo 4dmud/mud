@@ -21,12 +21,9 @@
 #include "spells.h"
 #include "dg_event.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /* extern variables */
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-extern const char *dirs[];
-extern int rev_dir[];
 int can_fight(struct char_data *ch, struct char_data *vict);
 struct aff_dam_event_obj
 {

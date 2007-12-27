@@ -11,7 +11,7 @@
 #include "house.h"
 #include "screen.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "clan.h"

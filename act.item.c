@@ -10,8 +10,11 @@
 
 /*
  * $Log: act.item.c,v $
- * Revision 1.1  2004/11/12 02:16:46  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:46  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.56  2004/09/24 11:34:52  molly
  * fixed automeld
@@ -58,12 +61,6 @@
 /* extern variables */
 extern bool LS_REMOVE;
 
-
-extern struct obj_data *obj_proto;
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-extern struct char_data *character_list;
-extern struct player_index_element *player_table;
 extern int top_of_p_table;
 
 /* External functions */
@@ -72,7 +69,6 @@ void save_corpses(void);
 void House_crashsave(room_vnum vnum);
 int house_item_count(room_vnum vnum);
 void improve_skill(struct char_data *ch, int skill);
-int current_class_is_tier_num(struct char_data *ch);
 int has_weapon(struct char_data *ch);
 int get_weapon_speed(OBJ_DATA *wep);
 int wep_hands(OBJ_DATA *wep);

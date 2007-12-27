@@ -18,16 +18,11 @@
 
 /* external variables */
 extern struct spell_info_type spell_info[];
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
-extern struct room_data *world_vnum[];
 extern int pt_allowed;
 SPECIAL(shop_keeper);
 /* extern variables */
 extern struct descriptor_data *descriptor_list;
 extern int pk_allowed;
-extern const char *dirs[];
-extern int rev_dir[];
 
 /* external functions */
 extern int arena_ok(struct char_data *ch, struct char_data *victim);

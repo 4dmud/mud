@@ -21,15 +21,7 @@
 static int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object);
 void purge_qic(int rnum);
 
-extern struct obj_data *obj_proto;
-extern struct obj_data *object_list;
-extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
 extern struct board_info_type board_info[];
-extern struct shop_data *shop_index;
-extern zone_rnum top_of_zone_table;
-extern obj_rnum top_of_objt;
-extern int top_shop;
 
 obj_rnum add_object(struct obj_data *newobj, obj_vnum ovnum)
 {
@@ -355,7 +347,6 @@ GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(
 void free_object_strings(struct obj_data *obj)
 {
 #if 0 /* Debugging, do not enable. */
-  extern struct obj_data *object_list;
   struct obj_data *t;
   int i = 0;
 

@@ -8,15 +8,11 @@
 #include "handler.h"
 #include "db.h"
 #include "spells.h"
-// #include "house.h"
 #include "screen.h"
 #include "constants.h"
-// #include "olc.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
 
-/* external variables */
-extern struct room_data *world_vnum[];
 
 /* external functions */
 char *find_exdesc(char *word, struct extra_descr_data *list);

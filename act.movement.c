@@ -24,13 +24,6 @@
 #include "dg_scripts.h"
 #include "kalten.h"
 
-/* external vars  */
-extern struct room_data *world_vnum[];
-extern struct char_data *character_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
-
 /* external functs */
 void eq_to_room(CHAR_DATA *ch);
 int Crash_delete_file(char *name);

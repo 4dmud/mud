@@ -232,6 +232,11 @@ void free_object_strings(struct obj_data *obj);
 void free_object_strings_proto(struct obj_data *obj);
 void boot_context_help(void);
 void free_context_help(void);
+char fread_letter(FILE *fp);
+void free_followers(struct follow_type *k);
+void load_default_config( void );
+void load_config( void );
+ 
 
 
 
@@ -1803,13 +1808,12 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * -- Welcor 09/03 
        */
       {
-        char *t = strchr(new_descr->description, '\0');
-        if (t > new_descr->description && *(t-1) != '\n')
-        {
-          CREATE(t, char, strlen(new_descr->description)+3);
-          sprintf(t, "%s\r\n", new_descr->description); /* sprintf ok : size checked above*/
+      	char *end = strchr(new_descr->description, '\0');
+      	if (end > new_descr->description && *(end-1) != '\n') {
+      	  CREATE(end, char, strlen(new_descr->description)+3);
+      	  sprintf(end, "%s\r\n", new_descr->description); /* snprintf ok : size checked above*/
           free(new_descr->description);
-          new_descr->description = t;
+          new_descr->description = end;
         }
       }
       new_descr->next = room_nr->ex_description;

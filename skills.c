@@ -16,15 +16,9 @@
 
 /* external variables */
 extern struct spell_info_type spell_info[];
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
-extern struct room_data *world_vnum[];
 SPECIAL(shop_keeper);
 extern int slipping;
 /* extern variables */
-extern struct descriptor_data *descriptor_list;
-extern const char *dirs[];
-extern int rev_dir[];
 extern int corpse_mod;
 
 /* external functions */
@@ -1554,7 +1548,6 @@ ASKILL(skill_grapple)
   //char name[100], todir[256];
   int to, fail = FALSE;
   //CHAR_DATA *victim = NULL;
-  //extern const char *dirs[];
   if (use_stamina( ch, 10) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");
@@ -2154,7 +2147,6 @@ ASKILL(skill_push)
   char name[100], todir[256];
   int to;
   CHAR_DATA *victim = NULL;
-  extern const char *dirs[];
   char buf[MAX_STRING_LENGTH];
 
   half_chop(argument, name, todir);
@@ -2885,7 +2877,6 @@ int total_chance(CHAR_DATA *ch, int skill)
 int perform_grapple(CHAR_DATA *ch, int dir, int need_specials_check,
                     CHAR_DATA *attacker)
 {
-  //extern const char *dirs[];
   room_rnum was_in;
   int House_can_enter(CHAR_DATA *ch, room_vnum house);
   void death_cry(CHAR_DATA *ch);

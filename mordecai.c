@@ -64,13 +64,10 @@ O======================================================================O
 #include "house.h"
 #include "screen.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 #include "dg_scripts.h"
 #include "spells.h"
 
-
-/* external variables */
-extern struct index_data *obj_index;
 
 /* external functions */
 void convert_tokens(struct char_data *ch);

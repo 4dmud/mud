@@ -16,7 +16,7 @@
 #include "comm.h"
 #include "utils.h"
 #include "db.h"
-#include "olc.h"
+#include "oasis.h"
 #include "screen.h"
 
 /* external functions */

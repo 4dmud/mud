@@ -30,16 +30,6 @@ bool LS_REMOVE = 0;
 
 /* external vars */
 extern const char *MENU;
-extern struct char_data *combat_list;
-extern struct room_data *world_vnum[];
-extern struct obj_data *object_list;
-extern struct char_data *character_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern struct descriptor_data *descriptor_list;
-extern struct zone_data *zone_table;
-extern struct obj_data *obj_proto;
-
 struct hunter_data *hunter_list = NULL;
 
 /* local functions */
@@ -2051,7 +2041,7 @@ void extract_char(struct char_data *ch)
   if (DEAD(ch))
   {
     if (IN_ROOM(ch))
-      log("Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM(ch), GET_NAME(ch));
+      log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
     return;
   }
   if (IS_NPC(ch))

@@ -11,7 +11,7 @@
 #include "house.h"
 #include "screen.h"
 #include "constants.h"
-#include "olc.h"
+#include "oasis.h"
 #include "dg_scripts.h"
 #include "clan.h"
 
@@ -43,27 +43,16 @@
 #define MONTH_1         666
 
 /*   external vars  */
-extern struct obj_data *object_list;
-extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
 extern struct attack_hit_type attack_hit_text[];
 extern char *class_abbrevs[];
 extern char *race_abbrevs[];
-extern obj_rnum top_of_objt;
-extern struct index_data **trig_index;
-extern const char *trig_types[], *otrig_types[], *wtrig_types[];
-extern struct char_data *character_list;
-extern struct room_data *world_vnum[];
-extern int top_of_world;
 extern struct time_info_data time_info;
-extern int top_of_zone_table;
 extern int circle_shutdown, circle_reboot;
 
 /* for chars */
 extern const char *pc_class_types[];
 
 /* external functions */
-void find_uid_name(char *uid, char *name);
 void do_objstat(struct char_data *ch, struct obj_data *j);
 void do_sstat_objdump(char_data * ch, obj_data * j);
 void script_stat_dump(char_data * ch, struct script_data *sc);
@@ -435,7 +424,7 @@ void script_stat_dump(char_data * ch, struct script_data *sc)
     sprintf(namebuf, "%s:%ld", tv->name, tv->context);
     if (*(tv->value) == UID_CHAR)
     {
-      find_uid_name(tv->value, name);
+      find_uid_name(tv->value, name, sizeof(name));
       sprintf(buf, "    %20s:  %20s\n",
               tv->context ? namebuf : tv->name, name);
     }
@@ -2149,7 +2138,6 @@ void log_push_to_death(struct char_data *ch, struct char_data *attacker)
 int perform_push(struct char_data *ch, int dir, int need_specials_check,
                  struct char_data *attacker)
 {
-  extern const char *dirs[];
   room_rnum was_in;
   int House_can_enter(struct char_data *ch, room_vnum house);
   void death_cry(struct char_data *ch);

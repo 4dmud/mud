@@ -28,13 +28,6 @@ int spell_size_dice(struct char_data *ch);
 int spell_num_dice(struct char_data *ch);
 #define S_SDICE (spell_size_dice(ch))
 #define S_NDICE (spell_num_dice(ch))
-extern struct obj_data *object_list;
-extern struct char_data *character_list;
-extern struct index_data *obj_index;
-
-extern struct descriptor_data *descriptor_list;
-extern struct zone_data *zone_table;
-
 extern int mini_mud;
 
 void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass);

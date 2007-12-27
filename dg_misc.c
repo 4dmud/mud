@@ -25,12 +25,8 @@
 //#define SINFO spell_info[spellnum]
 
 /* external vars */
-extern struct index_data **trig_index;
-extern struct room_data *world_vnum[];
-extern const char *item_types[];
+
 extern struct spell_info_type spell_info[];
-extern const char *apply_types[];
-extern const char *affected_bits[];
 
 void die(struct char_data *ch, struct char_data * killer);
 
@@ -270,7 +266,7 @@ void send_char_pos(struct char_data *ch, int dam)
 	act("$n is incapacitated and will slowly die, if not aided.", TRUE,
 	    ch, 0, 0, TO_ROOM);
 	new_send_to_char
-	    (ch, "You are incapacitated an will slowly die, if not aided.\r\n");
+	    (ch, "You are incapacitated and will slowly die, if not aided.\r\n");
 	break;
     case POS_STUNNED:
 	act("$n is stunned, but will probably regain consciousness again.",

@@ -27,8 +27,11 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
- * Revision 1.1  2004/11/12 02:16:48  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:48  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.23  2004/08/15 01:12:26  molly
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
@@ -49,35 +52,43 @@
 #include "spells.h"
 #include "constants.h"
 
-//extern struct str_app_type str_app[];
-
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *mob_index;
-extern struct room_data *world_vnum[];
-extern struct zone_data *zone_table;
-extern int dg_owner_purged;
-extern room_rnum find_target_room(char_data * ch, char *rawroomstr);
-extern int top_of_zone_table;
-extern const char *dirs[];
-
 void raw_kill(struct char_data *ch, struct char_data *killer);
-void sub_write(char *arg, char_data * ch, byte find_invis, int targets);
-void send_to_zone(char *messg, int zone_rnum);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
                         int upper_vnum);
 void reset_zone(zone_rnum zone);
 bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
-void send_to_zone(char *messg, zone_rnum zone);
 void die(struct char_data *ch, struct char_data *killer);
 int valid_dg_target(struct char_data *ch, int allow_gods);
-void send_char_pos(struct char_data *ch, int dam);
+room_rnum find_target_room(struct char_data *ch, char *rawroomstr);
 
 room_data *get_room(char *name);
 
 /*
  * Local functions.
  */
+void mob_log(char_data *mob, const char *format, ...);
+ACMD(do_masound);
+ACMD(do_mkill);
+ACMD(do_mjunk);
+ACMD(do_mechoaround);
+ACMD(do_msend);
+ACMD(do_mecho);
+ACMD(do_mzoneecho);
+ACMD(do_mload);
+ACMD(do_mpurge);
+ACMD(do_mgoto);
+ACMD(do_mat);
+ACMD(do_mteleport);
+ACMD(do_mdamage);
+ACMD(do_mforce);
+ACMD(do_mhunt);
+ACMD(do_mremember);
+ACMD(do_mforget);
+ACMD(do_mtransform);
+ACMD(do_mdoor);
+ACMD(do_mfollow);
+ACMD(do_mrecho);
 
 /* attaches mob's name and vnum to msg and sends it to script_log */
 void mob_log(char_data *mob, const char *format, ...)

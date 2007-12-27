@@ -31,9 +31,6 @@ struct corpse_list_data *corpse_list = NULL;
 extern const char *dirs[];
 
 /* External Structures / Variables */
-extern struct obj_data *object_list;
-extern struct room_data *world;
-extern struct index_data *obj_index;	/* index table for object file   */
 extern room_vnum frozen_start_room;
 extern int save_new_style;
 

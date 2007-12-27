@@ -21,14 +21,6 @@
 #include "dg_scripts.h"
 #include "clan.h"
 
-
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-extern struct room_data *world_vnum[];
-
-extern struct index_data *obj_index;
-
-
 /* local functions */
 int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,
          int p6);
@@ -47,7 +39,6 @@ char *title_male(int chclass, int level);
 char *title_female(int chclass, int level);
 int has_space_suit(struct char_data *ch);
 int can_breathe_underwater(struct char_data *ch);
-int current_class_is_tier_num(struct char_data *ch);
 void send_not_to_spam(char *buf, struct char_data *ch,
                       struct char_data *victim, struct obj_data *weap,
                       int spam);

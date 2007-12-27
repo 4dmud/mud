@@ -10,14 +10,8 @@
 #include "db.h"
 #include "screen.h"
 #include "house.h"
+#include "constants.h"
 
-extern struct room_data *world;
-extern struct char_data *character_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *obj_index;
-extern int rev_dir[];
-extern char *dirs[];
-extern const char *room_bits[];
 extern struct obj_data *get_obj_in_list_type(int type,
 					     struct obj_data *list);
 
@@ -52,7 +46,6 @@ typedef struct {
 
 struct obj_data *find_vehicle_by_vnum(int vnum)
 {
-    extern struct obj_data *object_list;
     struct obj_data *i;
     for (i = object_list; i; i = i->next)
 	if (GET_OBJ_TYPE(i) == ITEM_VEHICLE)

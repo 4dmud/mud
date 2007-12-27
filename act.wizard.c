@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.3  2004/11/20 02:33:25  w4dimenscor
+ * updated and cleaned up the script system
+ *
  * Revision 1.2  2004/11/17 05:13:05  w4dimenscor
  * updated pets so that they dont have weight problems, updated award points
  *
@@ -53,16 +56,6 @@
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
 extern struct time_data time_info;
-extern struct char_data *mob_proto;
-
-extern struct obj_data *obj_proto;
-extern struct room_data *world_vnum[];
-extern struct char_data *character_list;
-extern struct obj_data *object_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
 extern struct attack_hit_type attack_hit_text[];
 extern char *class_abbrevs[];
 extern char *race_abbrevs[];
@@ -71,9 +64,6 @@ extern zone_rnum top_of_zone_table;
 extern int circle_shutdown, circle_reboot;
 extern int circle_restrict;
 extern int buf_switches, buf_largecount, buf_overflows;
-extern mob_rnum top_of_mobt;
-extern obj_rnum top_of_objt;
-extern int top_of_p_table;
 extern const char *save_info_msg[];	/* In olc.c */
 extern int forget_num_obj;
 extern const char *wiz_groups[];
@@ -117,7 +107,6 @@ void check_autowiz(struct char_data *ch);
 int zone_number(void *what, int type);
 int can_edit_zone(struct char_data *ch, int number);
 int real_zone(int number);
-int current_class_is_tier_num(struct char_data *ch);
 long long gold_data(int type, long long amount);
 void olc_list_flags(struct char_data *ch, const char *apply_stuff[]);
 
@@ -1868,7 +1857,6 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     {
       struct trig_var_data *tv;
       char uname[MAX_INPUT_LENGTH];
-      void find_uid_name(char *uid, char *name);
 
       new_send_to_char(ch, "Global Variables for %s:\r\n", GET_NAME(k));
 
@@ -1878,7 +1866,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
       {
         if (*(tv->value) == UID_CHAR)
         {
-          find_uid_name(tv->value, uname);
+          find_uid_name(tv->value, uname, sizeof(uname));
           new_send_to_char(ch, "    %40s:  [UID]: %20s\r\n", tv->name,
                            uname);
         }
@@ -6232,7 +6220,7 @@ ACMD(do_get_free_mem)
 void change_plrindex_name(long id, char *change)
 {
   int tp;
-  extern struct player_index_element *player_table;
+  
   if (!change)
     return;
   for (tp = 0; tp <= top_of_p_table; tp++)

@@ -21,13 +21,6 @@
 #include "handler.h"
 
 /* External Structures */
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *obj_index;
-extern struct obj_data *object_list;
-extern struct obj_data *obj_proto;
-extern struct player_index_element *player_table;
-extern int top_of_objt;
-extern int top_of_p_table;
 extern const int xap_objs;
 extern int Crash_clean_qic(FILE * fl, char *name);
 void scan_char_objects_qic(char *name, long id);

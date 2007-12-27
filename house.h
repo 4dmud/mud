@@ -3,9 +3,6 @@
 
 #define HOUSE_PRIVATE	0
 
-extern struct char_data *character_list;
-extern struct index_data *mob_index;
-
 void add_follower(struct char_data *ch, struct char_data *leader);
 
 struct house_control_rec {

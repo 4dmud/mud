@@ -19,13 +19,6 @@
 #include "constants.h"
 #include "dg_event.h"
 
-
-extern struct room_data *world_vnum[];
-extern struct corpse_list_data *corpse_list;
-extern struct char_data *character_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);

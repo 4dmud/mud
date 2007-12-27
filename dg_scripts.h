@@ -5,13 +5,13 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/12 02:16:36 $
-*  $Revision: 1.1 $
+*  $Date: 2004/11/20 02:33:25 $
+*  $Revision: 1.2 $
 **************************************************************************/
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.13"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
 
-
+#define SCRIPT_ERROR_CODE     -9999999   /* this shouldn't happen too often */
 
 #define    MOB_TRIGGER   0
 #define    OBJ_TRIGGER   1
@@ -135,7 +135,7 @@
 #define PULSE_DG_SCRIPT         (13 RL_SEC)
 
 
-#define MAX_SCRIPT_DEPTH      10	/* maximum depth triggers can
+#define MAX_SCRIPT_DEPTH      10	/* maximum depth triggers can \
 					   recurse into each other */
 
 
@@ -207,10 +207,19 @@ struct script_memory {
     char *cmd;			/* command, or NULL for generic */
     struct script_memory *next;
 };
+/* from dg_objcmd.c */
+room_rnum obj_room(obj_data *obj);
 
+/* function prototypes from dg_triggers.c */
+char *one_phrase(char *arg, char *first_arg);
+int is_substring(char *sub, char *string);
+int word_check(char *str, char *wordlist);
 
-/* function prototypes from triggers.c (and others) */
 void check_time_triggers(void);
+void find_uid_name(char *uid, char *name, size_t nlen); 
+void do_sstat_room(struct char_data * ch);
+void do_sstat_object(char_data *ch, obj_data *j);
+void do_sstat_character(char_data *ch, char_data *k);
 void time_mtrigger(char_data *ch);
 void time_otrigger(obj_data *obj);
 void time_wtrigger(room_data *room);
@@ -234,10 +243,14 @@ int receive_mtrigger(char_data *ch, char_data *actor,
          obj_data *obj);
 void bribe_mtrigger(char_data *ch, char_data *actor,
           int amount);
+	  void find_uid_name(char *uid, char *name, size_t nlen);
 	  
 
 int wear_otrigger(obj_data *obj, char_data *actor, int where);
 int remove_otrigger(obj_data *obj, char_data *actor);
+
+int cmd_otrig(obj_data *obj, char_data *actor, char *cmd,
+              char *argument, int type);
 int command_mtrigger(char_data *actor, char *cmd, char *argument);
 int command_otrigger(char_data *actor, char *cmd, char *argument);
 int command_wtrigger(char_data *actor, char *cmd, char *argument);
@@ -266,44 +279,100 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
 
-/* function prototypes from scripts.c */
+/* function prototypes from dg_scripts.c */
+void script_damage(char_data *vict, int dam);
+obj_data *find_obj(long n);
+room_data *find_room(long n);
+char_data *find_char(long n);
+char *str_str(char *cs, char *ct); 
+int find_eq_pos_script(char *arg);
+int can_wear_on_pos(struct obj_data *obj, int pos);
+struct char_data *find_char(long n); 
+char_data *get_char(char *name);
+char_data *get_char_near_obj(obj_data *obj, char *name);
+char_data *get_char_in_room(room_data *room, char *name); 
+obj_data *get_obj_near_obj(obj_data *obj, char *name);
+obj_data *get_obj(char *name);
+room_data *get_room(char *name); 
+char_data *get_char_by_obj(obj_data *obj, char *name);
+char_data *get_char_by_room(room_data *room, char *name);
+obj_data *get_obj_by_obj(obj_data *obj, char *name);
+obj_data *get_obj_in_room(room_data *room, char *name); 
+obj_data *get_obj_by_room(room_data *room, char *name); 
+int trgvar_in_room(room_vnum vnum);
+obj_data *get_obj_in_list(char *name, obj_data *list);
+obj_data *get_object_in_equip(char_data * ch, char *name);
+void find_uid_name(char *uid, char *name, size_t nlen); 
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
-char_data *get_char(char *name);
-char_data *get_char_by_obj(obj_data *obj, char *name);
-obj_data *get_obj(char *name);
 
-void do_stat_trigger(char_data *ch, trig_data *trig);
-void do_sstat_room(char_data * ch);
-void do_sstat_object(char_data * ch, obj_data * j);
-void do_sstat_character(char_data * ch, char_data * k);
 
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
-void mob_log(char_data *mob, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void dg_read_trigger(FILE * fp, void *i, int type);
-void dg_obj_trigger(char *line, obj_data *obj);
-void assign_triggers(void *i, int type);
+char *matching_quote(char *p); 
+struct room_data *dg_room_of_obj(struct obj_data *obj);
+
+/* To maintain strict-aliasing we'll have to do this trick with a union */
+/* Thanks to Chris Gilbert for reminding me that there are other options. */
+int script_driver(void *go_adress, trig_data *trig, int type, int mode);
+trig_rnum real_trigger(trig_vnum vnum);
+void process_eval(void *go, struct script_data *sc, trig_data *trig,
+                 int type, char *cmd);
+void read_saved_vars(struct char_data *ch); 
+void save_char_vars(struct char_data *ch); 
+void init_lookup_table(void);
+void add_to_lookup_table(long uid, void *c);
+void remove_from_lookup_table(long uid);
+
+/* from dg_db_scripts.c */
 void parse_trigger(FILE * trig_f, int nr, zone_vnum zon);
-int real_trigger(int vnum);
+trig_data *read_trigger(int nr);
+void trig_data_init(trig_data *this_data);
+void trig_data_copy(trig_data *this_data, const trig_data *trg);
+void dg_read_trigger(FILE *fp, void *proto, int type);
+void dg_obj_trigger(char *line, struct obj_data *obj);
+void assign_triggers(void *i, int type);
+
+
+/* From dg_variables.c */
+void add_var(struct trig_var_data **var_list, char *name, char *value, long id);
+int item_in_list(char *item, obj_data *list);
+char *skill_percent(struct char_data *ch, char *skill);
+int char_has_item(char *item, struct char_data *ch);
+void var_subst(void *go, struct script_data *sc, trig_data *trig,
+               int type, char *line, char *buf);
+int text_processed(char *field, char *subfield, struct trig_var_data *vd,
+                   char *str, size_t slen);
+void find_replacement(void *go, struct script_data *sc, trig_data *trig,
+                int type, char *var, char *field, char *subfield, char *str, size_t slen);
+
+
+/* From dg_handler.c */
+void free_var_el(struct trig_var_data *var);
+void free_varlist(struct trig_var_data *vd);
+int remove_var(struct trig_var_data **var_list, char *name);
+void free_trigger(trig_data *trig);
+void extract_trigger(struct trig_data *trig);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
 void free_proto_script(void *thing, int type);
-void free_script(void *thing, int type);
-void free_trigger(trig_data *trig);
 void copy_proto_script(void *source, void *dest, int type);
-void copy_script(void *source, void *dest, int type);
-void trig_data_copy(trig_data *this_data, const struct trig_data *trg);
  void extract_value(struct script_data *sc, struct trig_data *trig, char *cmd);
 int trgvar_in_room(room_vnum vnum);
 int valid_dg_target(char_data *ch, int allow_gods);
 void delete_variables(const char *charname);
+void update_wait_events(struct room_data *to, struct room_data *from);
 
-trig_data *read_trigger(int nr);
-void add_var(struct trig_var_data **var_list, char *name, char *value, long id);
-room_data *dg_room_of_obj(obj_data *obj);
+/* from dg_comm.c */
+char *any_one_name(char *argument, char *first_arg);
+void sub_write_to_char(char_data *ch, char *tokens[],
+		       void *otokens[], char type[]);
+void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
+void send_to_zone(char *messg, zone_rnum zone);
+void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
+			int upper_vnum);
+
+/* from dg_misc.c */
 void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
 		int type, char *cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
@@ -312,17 +381,6 @@ void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
       int type, char *cmd);
 
 char *sub_percent(char_data *ch, char *sub);
-void script_damage(char_data *vict, int dam);
-
-int trgvar_in_room(room_vnum vnum);
- struct cmdlist_element *find_done(struct cmdlist_element *cl);
-int find_eq_pos_script(char *arg);
-char_data *get_char_near_obj(obj_data *obj, char *name);
-obj_data *get_obj_near_obj(obj_data *obj, char *name);
-char_data *find_char(long n);
-obj_data *find_obj(long n);
-room_data *find_room(long n);
-
 
 /* Macros for scripts */
 
@@ -367,33 +425,9 @@ room_data *find_room(long n);
                          add_var(&GET_TRIG_VARS(trig), name, buf, context); }   while (0)
 
 #define DRIVER_USES_UNION 0                         
-#if DRIVER_USES_UNION
-/* To maintain strict-aliasing we'll have to do this trick with a union */
-union script_driver_data_u {
-  struct char_data *c;
-  struct room_data *r;
-  struct obj_data  *o;
-};
-int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
-#else
-/* Thanks to Chris Gilbert for reminding me that there are other options. */
-int script_driver(void *go_adress, trig_data *trig, int type, int mode);
-#endif
-
-/* needed for new %load% handling */
-int can_wear_on_pos(obj_data *obj, int pos);
-
-/* find_char helpers */
-void init_lookup_table(void);
-char_data *find_char_by_uid_in_lookup_table(long uid);
-obj_data *find_obj_by_uid_in_lookup_table(long uid);
-void add_to_lookup_table(long uid, void *c);
-void remove_from_lookup_table(long uid);
 
 /* dg_scripts.c*/
-char_data *find_char(long n);
-obj_data *find_obj(long n);
-room_data *find_room(long n);
+
 obj_data *get_object_in_equip(struct char_data *ch, char *name);
 obj_data *get_obj_by_obj(obj_data * obj, char *name);
 obj_data *get_obj_in_room(room_data * room, char *name);

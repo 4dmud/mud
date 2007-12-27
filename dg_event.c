@@ -31,7 +31,6 @@ void event_init(void)
     event_q = queue_init();
 }
 
-
 /*
 ** Add an event to the current list
 */
