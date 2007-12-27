@@ -3025,13 +3025,24 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
 
 
   if ((obj_proto[i].action_description = fread_string(obj_f, buf2)) == NULL)
-    obj_proto[i].action_description = strdup("Undefined");
+    obj_proto[i].action_description = NULL;
+    else if (!strncmp( obj_proto[i].action_description , "Undefined", 9)) 
+      free_string(&obj_proto[i].action_description);
+
   if ((obj_proto[i].smell = fread_string(obj_f, buf2)) == NULL)
-    obj_proto[i].smell = strdup("Undefined");
+    obj_proto[i].smell = NULL;
+     else if (!strncmp( obj_proto[i].smell , "Undefined", 9))
+      free_string(&obj_proto[i].smell);
+      
   if ((obj_proto[i].taste = fread_string(obj_f, buf2)) == NULL)
-    obj_proto[i].taste = strdup("Undefined");
+    obj_proto[i].taste = NULL;
+     else if (!strncmp( obj_proto[i].taste , "Undefined", 9))
+      free_string(&obj_proto[i].taste);
+      
   if ((obj_proto[i].feel = fread_string(obj_f, buf2)) == NULL)
-    obj_proto[i].feel = strdup("Undefined");
+    obj_proto[i].feel = NULL;
+     else if (!strncmp( obj_proto[i].feel , "Undefined", 9))
+      free_string(&obj_proto[i].feel);
 
   /* *** numeric data *** */
   if (!get_line(obj_f, line))
