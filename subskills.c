@@ -1098,7 +1098,7 @@ ACMD(do_subdisplay) {
         if ((it->second)->subskill > 0 &&  (sub_info[(it->second)->subskill].stat_type == STATUS_TYPE_ONOFF)) {
             i++;
             sprintf(buf, "{cc%22s: [{cy%3s{cc] (%11s)\r\n",
-                    sub_name((it->second)->subskill), ONOFF((it->second)->status), IS_SET(sub_info[(it->second)->subskill].flags,SUB_TYPE_AUTO) ? "Uncontroled" : "Controled");
+                    sub_name((it->second)->subskill), ONOFF((it->second)->status), IS_SET(sub_info[(it->second)->subskill].flags,SUB_TYPE_AUTO) ? "Uncontrolled" : "Controlled");
 
             DYN_RESIZE(buf);
         }
