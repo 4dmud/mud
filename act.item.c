@@ -10,6 +10,15 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.33  2006/02/24 20:09:02  w4dimenscor
+ * * Fixed offline automeld so that if a player leaves their corpse and quits,
+ *   it will still meld properly.
+ * * Added the ability to see the stats of the object you are bidding on for 10pc
+ *   of the current bid.
+ * * Changed auction to check if people have enough money to complete the auction.
+ * * Changed auction code to use the modular character gold commands.
+ * * Fixed a bug in gold commands that returned the wrong value.
+ *
  * Revision 1.32  2006/02/24 09:25:15  w4dimenscor
  * fixed bug in pouring that allowed you to create negative empty potions. Potions now change into object 3044 (empty vial), usable for brewing.
  *
@@ -159,6 +168,7 @@ extern int top_of_p_table;
 void remove_corpse_from_list(OBJ_DATA *corpse);
 void save_corpses(void);
 void House_crashsave(room_vnum vnum);
+void Crash_rentsave(struct char_data *ch, int cost);
 int house_item_count(room_vnum vnum);
 void improve_skill(struct char_data *ch, int skill);
 int has_weapon(struct char_data *ch);
@@ -856,8 +866,8 @@ void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
 
 int automeld(struct obj_data *obj)
 {
-  struct char_data *ch = NULL, *j;
-  struct descriptor_data *d;
+  struct char_data *ch = NULL;//, *j;
+  /*  struct descriptor_data *d;*/
   int i;
   if (!obj)
     return 0;
@@ -870,6 +880,8 @@ int automeld(struct obj_data *obj)
     new_mudlog( CMP, GET_LEVEL(ch), TRUE, "AUTOMELD: %s (online - fast link)", GET_NAME(ch));
     return 1;
   }
+  /**this is redundant it happens above in find_char **/
+  /*
   for (d = descriptor_list; d; d = d->next)
   {
     if (d->character && GET_ID(d->character) == GET_OBJ_VAL(obj, 0))
@@ -880,6 +892,7 @@ int automeld(struct obj_data *obj)
       return 1;
     }
   }
+  
 
   for (j = character_list; j; j = j->next)
   {
@@ -890,6 +903,7 @@ int automeld(struct obj_data *obj)
       return 1;
     }
   }
+  */
   for (i = 0; i <= top_of_p_table; i++)
   {
     if (*player_table[i].name)
@@ -899,8 +913,8 @@ int automeld(struct obj_data *obj)
         CREATE(ch, struct char_data, 1);
         clear_char(ch);
         CREATE(ch->player_specials, struct player_special_data, 1);
-        if (GET_IDNUM(ch))
-          ch->loader = GET_IDNUM(ch);
+        if (player_table[i].id)
+          ch->loader = player_table[i].id;
         if (load_char(player_table[i].name, ch) > -1)
         {
           if (!ch)
@@ -915,6 +929,7 @@ int automeld(struct obj_data *obj)
           char_to_room(ch, world_vnum[1200]);
           Crash_load(ch);
           perform_meld(ch, obj);
+          Crash_rentsave(ch, 0);
           ch->loader = NOBODY;
           extract_char(ch);
           return 1;

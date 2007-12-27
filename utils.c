@@ -113,13 +113,11 @@ gold_int char_gold(struct char_data *ch, gold_int amount, short type)
   {
   case GOLD_HAND:
     GET_GOLD(ch) += amount;
-    temp = (GET_GOLD(ch) + (amount));
-    return temp;
+    return GET_GOLD(ch);
     break;
   case GOLD_BANK:
     GET_BANK_GOLD(ch) += amount;
-    temp = (GET_BANK_GOLD(ch) + (amount));
-    return temp;
+    return GET_BANK_GOLD(ch);
     break;
   case GOLD_ALL:
     if (amount < 0)

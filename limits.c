@@ -923,9 +923,15 @@ void point_update(void)
   {
     next_thing = j->next;	/* Next in object list */
 
+    
+    /** This only checks items that have timers,
+    if you want to check every item, put it above this point **/
+    
     if (GET_OBJ_TIMER(j) == -1)
       continue;
-    else if (GET_OBJ_TIMER(j) > 0)
+    /** This is the timer countdown, if the item is in a house,
+    make sure the item's new timer value is saved */
+    if (GET_OBJ_TIMER(j) > 0)
     {
       GET_OBJ_TIMER(j)--;
       if (IN_ROOM(j) != NULL)
@@ -933,8 +939,10 @@ void point_update(void)
           SET_BIT_AR(IN_ROOM(j)->room_flags, ROOM_HOUSE_CRASH);
       continue;
     }
+    /** timer has run out on the item, lets check it it was a corpse that can be automelded  - mord*/
     if (automeld(j))
       continue;
+    
     if (timer_otrigger(j) != -1) /* j was purged if == -1*/
     {
       for (jj = j->contains; jj; jj = next_thing2)

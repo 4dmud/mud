@@ -821,17 +821,20 @@ void Crash_crashsave(struct char_data *ch)
 
   if (IS_NPC(ch))
     return;
-  if (!ch->desc)
-  {
+  if (ch->loader != GET_IDNUM(ch))
+  { /** they are not in the automeld state - mord*/
+    if (!ch->desc)
+    {
 
-    log("Saving %s eq when they are linkless", GET_NAME(ch));
-    return;
-  }
-  if (!IS_PLAYING(ch->desc))
-  {
-    log("Saving %s eq when they aren't state playing", GET_NAME(ch));
-    //don't save because they might be naked in the menu
-    return;
+      log("Saving %s eq when they are linkless", GET_NAME(ch));
+      return;
+    }
+    if (!IS_PLAYING(ch->desc))
+    {
+      log("Saving %s eq when they aren't state playing", GET_NAME(ch));
+      //don't save because they might be naked in the menu
+      return;
+    }
   }
   if (IS_SAVING(ch))
   {
@@ -930,20 +933,21 @@ void Crash_rentsave(struct char_data *ch, int cost)
     log("Attempt made to rentsave %s's equipment when it is currently being saved!", GET_NAME(ch));
     return;
   }
-
-  if (!ch->desc)
-  {
-
-    log("Saving %s eq when they are linkless", GET_NAME(ch));
-    return;
+  if (ch->loader != GET_IDNUM(ch))
+  { /** they are not in the automeld state - mord*/
+    if (!ch->desc)
+    {
+  
+      log("Saving %s eq when they are linkless", GET_NAME(ch));
+      return;
+    }
+    if (!IS_PLAYING(ch->desc))
+    {
+      log("Saving %s eq when they aren't state playing", GET_NAME(ch));
+      //don't save because they might be naked in the menu
+      return;
+    }
   }
-  if (!IS_PLAYING(ch->desc))
-  {
-    log("Saving %s eq when they aren't state playing", GET_NAME(ch));
-    //don't save because they might be naked in the menu
-    return;
-  }
-
 
   if (!get_filename(GET_NAME(ch), filename, (save_new_style) ? ASCII_OBJ_FILES : NEW_OBJ_FILES))
     return;
@@ -2039,7 +2043,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {   /* then this is a Xap Obj, requires
-                                                                                             special care */
+                                                                                                     special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";

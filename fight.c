@@ -10,6 +10,15 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.30  2006/02/24 20:09:02  w4dimenscor
+ * * Fixed offline automeld so that if a player leaves their corpse and quits,
+ *   it will still meld properly.
+ * * Added the ability to see the stats of the object you are bidding on for 10pc
+ *   of the current bid.
+ * * Changed auction to check if people have enough money to complete the auction.
+ * * Changed auction code to use the modular character gold commands.
+ * * Fixed a bug in gold commands that returned the wrong value.
+ *
  * Revision 1.29  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -4587,7 +4596,10 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
       GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(IN_ROOM(ch));
       GET_OBJ_VAL(corpse, 0) = MAX(1, get_pidx_from_name(ch));
       GET_OBJ_VAL(corpse, 6) = (killer && (!IS_NPC(ch) && !IS_NPC(killer)) && IS_PK(ch) && IS_PK(killer) && GET_LEVEL(killer) < LVL_IMMORT);
-      GET_OBJ_TIMER(corpse) = 30 + (REMORTS(ch) * 4);
+      if (GET_LEVEL(ch) > LVL_IMMORT)
+        GET_OBJ_TIMER(corpse) = 1;
+      else
+        GET_OBJ_TIMER(corpse) = IRANGE(10, 10 + (REMORTS(ch) * 4), 60);
     }
 
     /* transfer character's inventory to the corpse */

@@ -42,10 +42,11 @@ bool can_auction_item(struct char_data * ch, struct obj_data * obj);
 extern struct char_data *character_list;
 extern struct room_data *world;
 
+void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
 /*
  * User tweakables.
  */
-#define AUC_MOB         "Puff"
+#define AUC_MOB         "auctioneer"
 #define AUC_LIMIT  10
 
 /* -------------------------------------------------------------------------- */
@@ -137,10 +138,15 @@ void auction_update(void)
       do_gen_comm(mob, buf2, 0, SCMD_AUCTION);
 
     /* Make sure object exists */
+    
     if ((auction->obj = check_obj(auction->seller, auction->obj))) {
+      if (char_gold(auction->bidder, 0, GOLD_HAND) < auction->bid) {
+        act("You cannot afford to buy the $p from $N. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_CHAR);
+        act("$n cannot afford to buy the $p from you. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_VICT);
+      } else {
       /* Swap gold */
-      GET_GOLD(auction->bidder) -= auction->bid;
-      GET_GOLD(auction->seller) += auction->bid;
+        char_gold(auction->bidder, -auction->bid, GOLD_HAND);
+        char_gold(auction->seller,  auction->bid, GOLD_HAND);
       obj_from_char(auction->obj);
       obj_to_char(auction->obj, auction->bidder);
 
@@ -160,6 +166,7 @@ void auction_update(void)
         act("A small daemon pops in, takes some gold and gives $p to $n, and leaves.",
          FALSE, auction->bidder, auction->obj, auction->bidder,
          TO_ROOM);
+      }
       }
     } else
       auction_forfeit(mob);
@@ -214,7 +221,20 @@ ACMD(do_bid)
   if (!*buf) {
   new_send_to_char(ch, "Current bid: %ld coin%s\r\n", auc->bid,
         auc->bid != 1 ? "s." : ".");
-  } else if (ch == auc->bidder)
+   } else if (isname(buf, "stat")) {
+     gold_int bid_stat = 0;
+     if (auc->bid < 1000)
+       bid_stat = 1000;
+     else
+       bid_stat = auc->bid * 0.1;
+     if (char_gold(ch, 0, GOLD_HAND) < bid_stat) {
+       new_send_to_char(ch, "You need at least %lld gold to stat that item.\r\n", bid_stat);
+       return;
+     }
+     char_gold(ch, -bid_stat, GOLD_HAND);
+     identify_object(ch, auc->obj);
+  }
+  else if (ch == auc->bidder)
     new_send_to_char(ch, "You're trying to outbid yourself.\r\n");
   else if (ch == auc->seller)
     new_send_to_char(ch, "You can't bid on your own item.\r\n");
@@ -226,8 +246,8 @@ ACMD(do_bid)
   } else if ((bid < (auc->bid * 1.05) && auc->bidder) || bid == 0) {
     new_send_to_char(ch, "Try bidding at least 5%% over the current bid of %ld. (%.0f coins).\r\n",
         auc->bid, auc->bid * 1.05 + 1);
-  } else if (GET_GOLD(ch) < bid) {
-    new_send_to_char(ch, "You have only %lld coins on hand.\r\n", GET_GOLD(ch));
+  } else if (char_gold(ch, 0, GOLD_HAND) < bid) {
+    new_send_to_char(ch, "You have only %lld coins on hand.\r\n", char_gold(ch, 0, GOLD_HAND));
   } else if (PLR_FLAGGED(ch, PLR_NOSHOUT))
     new_send_to_char(ch, "You can't auction.\r\n");
   else if (mob == NULL)
@@ -270,6 +290,7 @@ ACMD(do_auction)
     new_send_to_char(ch, "Auction what for what minimum?\r\n");
   } else if (isname(buf1, "list status"))
     show_auction_status(ch);
+
   else if (GET_LEVEL(ch) >= LVL_GOD && is_abbrev(buf1, "stop"))
     auction_reset();
   else if ((obj = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)) == NULL) {
