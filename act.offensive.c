@@ -98,6 +98,8 @@ void perform_assist(Character *ch, Character *helpee) {
     Character  *opponent;
 
 
+    if(FIGHTING(ch))
+	    return;
     /*
      * Hit the same enemy the person you're helping is.
      */
