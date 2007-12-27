@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2006/02/24 20:52:58 $                                           * 
-*  $Revision: 1.21 $                                                    *
+*  $Date: 2006/02/24 20:57:17 $                                           * 
+*  $Revision: 1.22 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -1346,6 +1346,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
           snprintf(str, slen, "%d", GET_SAVE(c, SAVING_SPELL));
         }
+        break;
+
         break;
       case 't':
 
