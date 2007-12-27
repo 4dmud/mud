@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/09/10 09:11:14 $                                           * 
-*  $Revision: 1.36 $                                                      *
+*  $Date: 2006/11/11 16:07:04 $                                           * 
+*  $Revision: 1.37 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -958,6 +958,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     snprintf(str, slen, "%d", GET_MAX_MANA(c));
                 else if (!strcasecmp(field, "maxmove"))
                     snprintf(str, slen, "%d", GET_MAX_MOVE(c));
+		else if (!strcasecmp(field, "maxstamina"))
+		    snprintf(str, slen, "%d", GET_MAX_STAMINA(c));
                 else if (!strcasecmp(field, "mana")) {
                     if (subfield && *subfield) {
                         int newmana = atoi(subfield);
@@ -1169,6 +1171,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                         }
                     }
                     strcpy(str, ""); /* so the parser know we recognize 'skillset' as a field */
+                } else if (!strcasecmp(field, "stamina")) {
+                    if (subfield && *subfield) {
+                        int newstamina = atoi(subfield);
+                        if(newstamina >= 0)
+                            GET_STAMINA(c) = newstamina;
+                        else {
+                            GET_STAMINA(c)=0;
+                            script_log("Trigger: %s, VNum %d. attempt to set movepoints to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+                        }
+                    }
+                    snprintf(str, slen, "%d", GET_STAMINA(c));
                 } else if (!strcasecmp(field, "subskill"))
                     snprintf(str, slen, sub_percent(c, subfield));
                 else if (!strcasecmp(field, "subincrease")) {
