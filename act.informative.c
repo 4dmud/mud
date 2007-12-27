@@ -1643,7 +1643,7 @@ ACMD(do_examine) {
         }
 
         if (has_identifier(tmp_object, GET_ID(ch))) {
-            *ch << "You remember the time you identified " << tmp_object->short_description << "\r\n";
+            *ch << "You remember the time you identified " << tmp_object->short_description << ":" << "\r\n";
             identify_object(ch, tmp_object);
         }
     } else if (tmp_char) {
