@@ -4,11 +4,15 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/09/15 08:01:12 $
-*  $Revision: 1.34 $
+*  $Date: 2007/04/12 12:50:51 $
+*  $Revision: 1.35 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.35  2007/04/12 12:50:51  w4dimenscor
+ * fixed a crashbug in script log. The argument list was used twice.
+ * -- Thotter
+ *
  * Revision 1.34  2006/09/15 08:01:12  w4dimenscor
  * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
  *
@@ -1611,15 +1615,19 @@ ACMD(do_detach) {
  */
 void script_vlog(const char *format, va_list args) {
     char buf[MAX_STRING_LENGTH];
+    va_list argsbackup;
+    va_copy(argsbackup,args);
     Descriptor *i;
 
     snprintf(buf, sizeof(buf), "SCRIPT ERR: %s", format);
 
     basic_mud_vlog(buf, args);
+    va_copy(args,argsbackup);
 
     /* the rest is mostly a rip from basic_mud_log() */
     strcpy(buf, "[ ");            /* strcpy: OK */
     vsnprintf(buf + 2, sizeof(buf) - 6, format, args);
+    //snprintf(buf+2, sizeof(buf) - 6, "Pie is %s!", "good");
     strcat(buf, " ]\r\n");        /* strcat: OK */
 
     for (i = descriptor_list; i; i = i->next) {
