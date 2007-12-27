@@ -352,6 +352,7 @@ void assign_objects(void)
     ASSIGNOBJ(8403, gen_board);	/* rp */
     ASSIGNOBJ(8449, gen_board);	/* rp */
     ASSIGNOBJ(8470, gen_board); /* bitches*/
+    ASSIGNOBJ(8477, gen_board); /* roleplay leaders */
     ASSIGNOBJ(9421, gen_board);	/* board in chaos hq */
     ASSIGNOBJ(9435, gen_board);	/* board 2 in chaos hq */
     ASSIGNOBJ(10026, gen_board);	/* dragon hq */
