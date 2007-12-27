@@ -157,6 +157,7 @@ ACMD(do_edit);		/* Mainly intended as a test function. */
 ACMD(do_enter);
 ACMD(do_equipment);
 ACMD(do_examine);
+ACMD(do_energize);
 ACMD(do_exit);
 ACMD(do_exits);
 ACMD(do_feel);
@@ -537,6 +538,7 @@ const struct command_info cmd_info[] =
     { "emote"    , "em"	, POS_RESTING , do_echo     , 1, SCMD_EMOTE, 0 },
     { ":"        , ":"	, POS_RESTING, do_echo      , 1, SCMD_EMOTE, 0 },
     { "enter"    , "en"	, POS_STANDING, do_enter    , 0, 0, 0 },
+    { "energize"    , "en"	, POS_STANDING, do_energize    , 0, 0, 0 },
     { "equipment", "eq"	, POS_RESTING, do_equipment, 0, 0, 0 },
     { "exits"    , "exi"	, POS_RESTING , do_exits    , 0, 0, 0 },
     { "examine"  , "exa"	, POS_SITTING , do_examine  , 0, 0, 0 },
@@ -2081,7 +2083,6 @@ if (!valid_id_num( GET_IDNUM(ch)))
   
   
 
-
   if (PLR_FLAGGED(ch, PLR_INVSTART))
     GET_INVIS_LEV(ch) = GET_LEVEL(ch);
 
@@ -2372,6 +2373,11 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
       log("Player name %s entered.", tmp_name);
+      /** check if player is in the game already, lets not load the character yet **/
+      
+      
+      
+      
       if ((player_i = load_char(tmp_name, d->character)) != -1)
       {
         if (player_i == -2)
@@ -2408,10 +2414,9 @@ void nanny(struct descriptor_data *d, char *arg)
 
           d->character->desc = d;
           CREATE(d->character->player.name, char, strlen(tmp_name) + 1);
-          strcpy(d->character->player.name, CAP(tmp_name));
+          strlcpy(d->character->player.name, CAP(tmp_name), strlen(tmp_name) + 1);
           GET_PFILEPOS(d->character) = player_i;
-          write_to_output(d,"Did I get that right, %s (Y/N)? ",
-                          tmp_name);
+          write_to_output(d,"Did I get that right, %s (Y/N)? ",tmp_name);
           STATE(d) = CON_NAME_CNFRM;
         }
         else
@@ -2526,8 +2531,7 @@ void nanny(struct descriptor_data *d, char *arg)
           (CRYPT(arg, GET_PASSWD(d->character)),
            GET_PASSWD(d->character), MAX_PWD_LENGTH))
       {
-        new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character),
-                   d->host);
+        new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
         GET_BAD_PWS(d->character)++;
         save_char(d->character);
         // log("(nanny)Saved %s in room %d.", GET_NAME(d->character), NOWHERE);
@@ -2781,8 +2785,6 @@ void nanny(struct descriptor_data *d, char *arg)
       d->character = NULL;
       CREATE(d->character, struct char_data, 1);
       clear_char(d->character);
-      CREATE(d->character->player_specials, struct player_special_data, 1);
-
 
       d->character->desc = d;
       if ((player_i = load_char(player_table[i].name, d->character)) != -1)
@@ -2793,9 +2795,12 @@ void nanny(struct descriptor_data *d, char *arg)
                           "To avoid destroying it further. Please do not try and log in with this name.\r\n"
                           "Please email Mordecai@xtra.co.nz with the name of this char.\r\n");
           log("Bad Jelly -- please check %s pfile.", player_table[i].name);
-          STATE(d) = CON_CLOSE;
-          return;
+          
+          
         }
+	
+	STATE(d) = CON_CLOSE;
+	return;
       }
       GET_PFILEPOS(d->character) = player_i;
       write_to_output(d, "You change to character %s.\r\n", player_table[i].name);

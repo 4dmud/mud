@@ -25,6 +25,8 @@ void perform_to_all(const char *messg, struct char_data *ch);
 void close_socket(struct descriptor_data *d);
 char *wordwrap(char *cmd, size_t width, size_t maxlen);
 
+int is_ignoring(struct char_data *ch, struct char_data *vict);
+
 void perform_act(const char *orig, struct char_data *ch,
 		 struct obj_data *obj, const void *vict_obj,
 		 const struct char_data *to);

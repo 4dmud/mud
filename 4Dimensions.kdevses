@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="23" >
+ <DocsAndViews NumberOfDocuments="26" >
   <Doc0 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/handler.c" >
    <View0 Type="Source" />
   </Doc0>
@@ -69,14 +69,23 @@
    <View0 Type="Source" />
   </Doc21>
   <Doc22 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.item.c" >
-   <View0 line="649" Type="Source" />
+   <View0 line="643" Type="Source" />
   </Doc22>
+  <Doc23 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/dg_event.c" >
+   <View0 line="122" Type="Source" />
+  </Doc23>
+  <Doc24 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/comm.h" >
+   <View0 line="45" Type="Source" />
+  </Doc24>
+  <Doc25 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/comm.c" >
+   <View0 line="1834" Type="Source" />
+  </Doc25>
  </DocsAndViews>
  <pluginList>
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/comm.c" >
-     <mark line="1885" />
+     <mark line="1887" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.comm.c" >
      <mark line="867" />

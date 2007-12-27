@@ -1622,7 +1622,7 @@ void wiz_read_file(void)
       clear_char(vict);
       TEMP_LOAD_CHAR = TRUE;
       //CREATE(vict->player_specials, struct player_special_data, 1);
-      if (load_char(player_table[i].name, vict) < 0)
+      if (store_to_char(player_table[i].name, vict) > -1)
       {
         free_char(vict);
         TEMP_LOAD_CHAR = TRUE;

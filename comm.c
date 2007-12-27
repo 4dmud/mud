@@ -312,6 +312,8 @@ static void get_lookup_reply(void);
  */
 #define TELOPT_COMPRESS        85
 #define TELOPT_COMPRESS2       86
+#define COMPRESS        85
+#define COMPRESS2       86
 
 /* first compression neg. string */
 const char compress_offer[] =
@@ -665,9 +667,9 @@ void copyover_recover()
 
     /* Now, find the pfile */
 
-    CREATE(d->character, struct char_data, 1);
-    clear_char(d->character);
+    CREATE(d->character, struct char_data, 1);    
     CREATE(d->character->player_specials, struct player_special_data,        1);
+    clear_char(d->character);
     d->character->desc = d;
 
     if ((player_i = load_char(name, d->character)) >= 0)
@@ -682,7 +684,7 @@ void copyover_recover()
       else
         fOld = FALSE;
     }
-    else
+    else 
       fOld = FALSE;
 
     if (!fOld)
@@ -1807,13 +1809,15 @@ void flush_queues(struct descriptor_data *d)
   }
 }
 /* Add a new string to a player's output queue. For outside use. */
-size_t write_to_output(struct descriptor_data *t, const char *txt, ...)
+size_t write_to_output(struct descriptor_data *d, const char *txt, ...)
 {
   va_list args;
   size_t left;
+  if (!d)
+  return 0;
 
   va_start(args, txt);
-  left = vwrite_to_output(t, txt, args);
+  left = vwrite_to_output(d, txt, args);
   va_end(args);
 
   return left;
@@ -3937,8 +3941,10 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
   if (type == TO_VICT)
   {
     if ((to = (const struct char_data *) vict_obj)
-        && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check))
+        && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check)) {
+	if (!is_ignoring(ch, (struct char_data *)to))
       perform_act(str, ch, obj, vict_obj, to);
+      }
     return;
   }
   /* ASSUMPTION: at this point we know type must be TO_NOTVICT or TO_ROOM */
@@ -3963,6 +3969,7 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
       continue;
     if (!restrict_check((const struct char_data *)to))
       continue;
+    if (!is_ignoring(ch, (struct char_data *)to))
     perform_act(str, ch, obj, vict_obj, to);
   }
 }
@@ -4260,7 +4267,8 @@ void make_wholist(void)
     return;			/* or log it ? *shrug* */
   }
 
-  fprintf(fl, "<?xml version=\"1.0\"?>\n" );
+  fprintf(fl, "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n" );
+fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.org/who.xsl\"?>\n");
   fprintf(fl, "<wholist>\n" );
 
   fprintf(fl, "<info>\n"

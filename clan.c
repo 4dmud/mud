@@ -370,9 +370,9 @@ void do_clan_destroy(struct char_data *ch, char *arg)
     else
     {
       CREATE(cbuf, struct char_data, 1);
-      clear_char(cbuf);
       CREATE(cbuf->player_specials, struct player_special_data, 1);
-      load_char((player_table + j)->name, cbuf);
+      clear_char(cbuf);
+      if (load_char((player_table + j)->name, cbuf) >= 0) {
       if (GET_CLAN(cbuf) == clan[i].id)
       {
         GET_CLAN(cbuf) = 0;
@@ -380,6 +380,8 @@ void do_clan_destroy(struct char_data *ch, char *arg)
         save_char(cbuf);
       }
       free_char(victim);
+      } else
+      free(victim);
     }
   }
 
@@ -1750,10 +1752,10 @@ void do_clan_ranks(struct char_data *ch, char *arg)
     }
     else
     {
-      CREATE(victim, struct char_data, 1);
-      clear_char(victim);
+      CREATE(victim, struct char_data, 1);      
       CREATE(victim->player_specials, struct player_special_data, 1);
-      load_char((player_table + j)->name, victim);
+      clear_char(victim);
+      if (load_char((player_table + j)->name, victim) >= 0) {
       if (GET_CLAN(victim) == clan[clan_num].id)
       {
         if (GET_CLAN_RANK(victim) < clan[clan_num].ranks
@@ -1764,6 +1766,8 @@ void do_clan_ranks(struct char_data *ch, char *arg)
         save_char(victim);
       }
       free_char(victim);
+      } else
+      free(victim);
     }
   }
 

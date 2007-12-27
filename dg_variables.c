@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/02/26 01:21:34 $                                           * 
-*  $Revision: 1.8 $                                                    *
+*  $Date: 2005/03/15 08:35:09 $                                           * 
+*  $Revision: 1.9 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -2078,7 +2078,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 void var_subst(void *go, struct script_data *sc, trig_data *trig,
                int type, char *line, char *buf, size_t b_len)
 {
-  char tmp[MAX_INPUT_LENGTH], repl_str[MAX_INPUT_LENGTH];
+  char tmp[MAX_INPUT_LENGTH], repl_str[MAX_INPUT_LENGTH] = "";
   char *var = NULL, *field = NULL, *p = NULL;
   char tmp2[MAX_INPUT_LENGTH];
   char *subfield_p, subfield[MAX_INPUT_LENGTH];
@@ -2086,17 +2086,18 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
   int paren_count = 0;
   int dots = 0;
 
-  left = b_len-1;
   /* skip out if no %'s */
   if (!strchr(line, '%'))
   {
-    strcpy(buf, line);
+    strlcpy(buf, line, b_len);
     return;
   }
   /*lets just empty these to start with*/
   *repl_str = *tmp = *tmp2 = '\0';
+  left = b_len-1;
 
-  p = strcpy(tmp, line);
+  strlcpy(tmp, line, sizeof(tmp));
+  p = tmp;
   subfield_p = subfield;
 
 
@@ -2144,7 +2145,7 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
             {
               snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
               process_eval(go, sc, trig, type, tmp2);
-              strcpy(var, "tmpvr");
+              var = "tmpvr";
               field = p;
               dots = 0;
               continue;

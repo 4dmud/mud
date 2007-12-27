@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.10  2005/03/15 08:35:08  w4dimenscor
+ * xml page update, and a few other bits
+ *
  * Revision 1.9  2005/02/25 07:33:47  w4dimenscor
  * reformatted some code, fixed up coventry to ignore socials
  *
@@ -68,7 +71,6 @@ extern int holler_move_cost;
 
 void strip_color(char *inbuf);
 /* extern functions */
-int is_ignoring(struct char_data *ch, struct char_data *vict);
 extern struct time_info_data time_info;
 
 /* local functions */
@@ -1285,7 +1287,7 @@ ACMD(do_gen_comm)
   /* now send all the strings out */
   for (i = descriptor_list; i; i = i->next)
   {
-    if (STATE(i) == CON_PLAYING && i != ch->desc && i->character &&
+    if (IS_PLAYING(i) && i != ch->desc && i->character &&
         !PRF_FLAGGED(i->character, channels[subcmd]) &&
         !PLR_FLAGGED(i->character, PLR_WRITING) &&
         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
@@ -1295,6 +1297,8 @@ ACMD(do_gen_comm)
         continue;
 
       if (GET_LEVEL(i->character) < LVL_HERO && (subcmd == SCMD_HERO && !PLR_FLAGGED(i->character, PLR_HERO)))
+        continue;
+      else if (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
         continue;
 
       if (subcmd == SCMD_SHOUT &&
@@ -1363,7 +1367,8 @@ ACMD(do_qcomm)
       for (i = descriptor_list; i; i = i->next)
         if (STATE(i) == CON_PLAYING && i != ch->desc &&
             PRF_FLAGGED(i->character, PRF_QUEST) &&
-            !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
+            !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF) &&
+            (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD)))
           act(buf, 0, ch, 0, i->character, TO_VICT | TO_SLEEP);
 
     }
@@ -1406,7 +1411,7 @@ ACMD(do_ctell)
         argument++;
       while (*argument == ' ') argument++;
     }
-    
+
     c = find_clan_by_id(c);
   }
   else
@@ -1471,11 +1476,14 @@ ACMD(do_ctell)
       {
         if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
-          if (i->character->player_specials->saved.clan_rank >=minlev)
+          if (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
           {
-            if ((i->character) != ch)
+            if (i->character->player_specials->saved.clan_rank >=minlev)
             {
-              write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
+              if ((i->character) != ch)
+              {
+                write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
+              }
             }
           }
         }

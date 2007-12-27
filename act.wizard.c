@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.15  2005/03/15 08:35:09  w4dimenscor
+ * xml page update, and a few other bits
+ *
  * Revision 1.14  2005/02/26 01:21:34  w4dimenscor
  * Changed more of the code to be more buffer safe using strlcpy and strlcat
  *
@@ -3583,7 +3586,7 @@ ACMD(do_heroutil)
   struct char_data *vict;
   char arg[MAX_INPUT_LENGTH];
 
-  if (GET_LEVEL(ch) < LVL_HERO && PLR_FLAGGED(ch, PLR_HERO))
+  if (GET_LEVEL(ch) < LVL_HERO && !PLR_FLAGGED(ch, PLR_HERO))
   {
     new_send_to_char(ch, "Huh?\r\n");
     return;

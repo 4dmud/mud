@@ -709,6 +709,7 @@ ASKILL(skill_charge)
     {
       act("$N dodges to the side and you charge straight past!", FALSE, ch, 0, temp, TO_CHAR);
       act("you dodge $n's charge and $e rushes right past you!", FALSE, ch, 0, temp, TO_VICT);
+      return SKILL_UNDEFINED;
     }
     else if (ret == -1)
       break;
@@ -789,7 +790,7 @@ ASKILL(skill_bash)
   {
     skill_attack(ch, vict, SKILL_BASH, FALSE);
     GET_POS(ch) = POS_SITTING;
-    GET_WAIT_STATE(ch) += 1 RL_SEC;
+    GET_WAIT_STATE(ch) = 1 RL_SEC;
     return 0;
   }
   else

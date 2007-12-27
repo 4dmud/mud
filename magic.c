@@ -374,7 +374,14 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   }				/* switch(spellnum) */
-if (MOB_FLAGGED(victim, MOB_NOPUSH) && GET_SPELL_DIR(ch) != NOWHERE)
+  
+  if (AFF_FLAGGED(victim, AFF_SLEEP))
+    affect_from_char(victim, SPELL_SLEEP);
+
+  if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
+    affect_from_char(victim, SPELL_SWEET_DREAMS);
+    
+if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
 pass = FALSE;
   skill_attack(ch, victim, spellnum, pass);
   if (DEAD(victim) || GET_POS(victim) == POS_DEAD)

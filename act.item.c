@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.10  2005/03/15 08:35:08  w4dimenscor
+ * xml page update, and a few other bits
+ *
  * Revision 1.9  2005/02/25 05:02:45  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -641,7 +644,7 @@ ACMD(do_meld)
 void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
 {
   OBJ_DATA *item;
-  new_send_to_char(ch, "You meld with your corpse in a sudden flash of light.\r\n");
+  new_send_to_char(ch, "You meld with your corpse in a sudden flash of light.\r\nYou are dazed.\r\n");
   act("$n melds with $s corpse in a sudden flash of light!", FALSE, ch, 0, 0, TO_ROOM);
   while ((item = corpse->contains))
   {
@@ -2419,7 +2422,7 @@ ACMD(do_pour)
           break;
         }
       }
-      if (amount == 0 || type == VIAL_NONE)
+      if (amount == 0 && type == VIAL_NONE)
       {
         act("That potion does not have the properties needed to fill $p.", FALSE, ch, to_obj, 0, TO_CHAR);
         return;
@@ -2605,16 +2608,16 @@ ACMD(do_energize)
     return;
     break;
   case VIAL_HITP:
-    alter_hit(ch, amount);
+    alter_hit(ch, -amount);
     break;
   case VIAL_MANA:
-    alter_mana(ch, amount);
+    alter_mana(ch, -amount);
     break;
   case VIAL_MOVE:
-    alter_move(ch, amount);
+    alter_move(ch, -amount);
     break;
   case VIAL_STAM:
-    alter_stamina(ch, amount);
+    alter_stamina(ch, -amount);
     break;
   }
 

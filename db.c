@@ -730,7 +730,7 @@ void destroy_db(void)
 {
   ssize_t cnt, itr;
   log("Free Hunter List");
-      free_hunter_list();
+  free_hunter_list();
   log("Freeing the memory of the database.");
   /* Active Mobiles & Players */
   log("Freeing Characters and mobs");
@@ -1165,7 +1165,6 @@ void build_player_index(void)
   top_of_p_file = top_of_p_table = i - 1;
 
 
-  /** lets check for duplicate id nums soon**/
 
 
   if (save_index)
@@ -2968,7 +2967,7 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
   }
 
   strlcat(buf2, ", after numeric constants\n"
-         "...expecting 'E', 'A', '$', or next object number", sizeof(buf2));
+          "...expecting 'E', 'A', '$', or next object number", sizeof(buf2));
   j = 0;
 
   obj_proto[i].ex_description = NULL;
@@ -3605,7 +3604,7 @@ struct char_data *create_char(void)
   character_list = ch;
   //TODO: check this
   if (!valid_id_num(max_mob_id+1))
-  log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1); 
+    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1);
   GET_ID(ch) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(ch), (void *)ch);
@@ -3664,7 +3663,7 @@ struct char_data *read_mobile(mob_vnum nr, int type)
 
   mob_index[i].number++;
   if (!valid_id_num(max_mob_id+1))
-  log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1); 
+    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1);
   GET_ID(mob) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(mob), (void *)mob);
@@ -4000,10 +3999,10 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'M':		/* read a mobile */
-        if (real_room(ZCMD.arg3) == NULL)
+      if (real_room(ZCMD.arg3) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+        exit(1);
       }
       if ((mob_index[ZCMD.arg1].number < ZCMD.arg2))
       {
@@ -4027,10 +4026,10 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'O':		/* read an object */
-    if (real_room(ZCMD.arg3) == NULL)
+      if (real_room(ZCMD.arg3) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+        exit(1);
       }
       if (obj_index[ZCMD.arg1].number < ZCMD.arg2)
       {
@@ -4214,15 +4213,17 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'R':		/* rem obj from room */
-    if (!world_vnum[ZCMD.arg1]) {
-    ZONE_ERROR("Zone room error");
-     log("room %d doesn't exist, and zedit needs it.",ZCMD.arg1);
-     }else
-      if ( (obj = get_obj_in_list_num(ZCMD.arg2, world_vnum[ZCMD.arg1]->contents)) != NULL)
+      if (!world_vnum[ZCMD.arg1])
       {
-        extract_obj(obj);
-        obj = NULL;
+        ZONE_ERROR("Zone room error");
+        log("room %d doesn't exist, and zedit needs it.",ZCMD.arg1);
       }
+      else
+        if ( (obj = get_obj_in_list_num(ZCMD.arg2, world_vnum[ZCMD.arg1]->contents)) != NULL)
+        {
+          extract_obj(obj);
+          obj = NULL;
+        }
       last_cmd = 1;
       tmob = NULL;
       tobj = NULL;
@@ -4230,10 +4231,10 @@ void reset_zone(zone_rnum zone)
 
 
     case 'D':		/* set state of door */
-    if (real_room(ZCMD.arg1) == NULL)
+      if (real_room(ZCMD.arg1) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
+        exit(1);
       }
       if (ZCMD.arg2 < 0 || ZCMD.arg2 >= NUM_OF_DIRS ||
           (world_vnum[ZCMD.arg1]->dir_option[ZCMD.arg2] == NULL))
@@ -4293,10 +4294,10 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'T': /* trigger command */
-        if (real_room(ZCMD.arg1) == NULL)
+      if (real_room(ZCMD.arg1) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg1);
+        exit(1);
       }
       if (ZCMD.arg1==MOB_TRIGGER && tmob)
       {
@@ -4327,10 +4328,10 @@ void reset_zone(zone_rnum zone)
       break;
 
     case 'V':
-        if (real_room(ZCMD.arg3) == NULL)
+      if (real_room(ZCMD.arg3) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+        exit(1);
       }
       if (ZCMD.arg1==MOB_TRIGGER && tmob)
       {
@@ -4373,10 +4374,10 @@ void reset_zone(zone_rnum zone)
         }
       }
     case 'B':		/* read an object then bury it */
-    if (real_room(ZCMD.arg3) == NULL)
+      if (real_room(ZCMD.arg3) == NULL)
       {
-      log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
-      exit(1);
+        log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
+        exit(1);
       }
       if ((obj_index[ZCMD.arg1].number < ZCMD.arg2))
       {
@@ -4574,7 +4575,7 @@ char *get_name_by_id(long id)
 
 int load_char(char *name, struct char_data *ch)
 {
-  FILE *plr_index;
+  CHAR_DATA *tch;
   int ret_val = 0;
   int tp, k;
 
@@ -4586,6 +4587,14 @@ int load_char(char *name, struct char_data *ch)
 
   if (player_table == NULL)
     return -1;
+
+  for (tch = character_list;tch;tch = tch->next)
+  {
+    if (!IS_NPC(tch) && !strcmp(GET_NAME(tch), name))
+    {
+      log("load_char loading a character (%s) that is already in the game!", name);
+    }
+  }
   for (k = 0; (*(name + k) = LOWER(*(name + k))); k++);
 
   for (tp = 0; tp <= top_of_p_table; tp++)
@@ -4599,7 +4608,7 @@ int load_char(char *name, struct char_data *ch)
       ret_val = store_to_char(name, ch);
       if (ret_val != -1)
       {
-        
+
         return (player_table[tp].id);
       }
       else
@@ -4608,7 +4617,6 @@ int load_char(char *name, struct char_data *ch)
   }
   log("NAME: '%s' not found in player index. Create new...", name);
   return -1;
-  fclose(plr_index);
 }
 
 #if defined(KEY)
@@ -4997,11 +5005,11 @@ int store_to_char(char *name, struct char_data *ch)
       break;
 
     case 'I':
-      if (!strcmp(tag, "Id  ")) {
-       if (!valid_id_num(num6))
-  log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch)); 
+      if (!strcmp(tag, "Id  "))
+      {
+        
         GET_IDNUM(ch) = num6;
-	}
+      }
       else if (!strcmp(tag, "Int "))
         ch->real_abils.intel = num;
       else if (!strcmp(tag, "Invs"))
@@ -5326,7 +5334,7 @@ int store_to_char(char *name, struct char_data *ch)
       log( "SYSERR: Unknown tag %s in pfile %s", tag, name);
     }
   }
-  
+
   fclose(fl);
 
 
@@ -5338,19 +5346,12 @@ int store_to_char(char *name, struct char_data *ch)
 
   //ch->real_abils = ch->aff_abils;
 
-  if (!TEMP_LOAD_CHAR)
-  {
-
-
-
     for (i = 0; i < MAX_AFFECT && tmp_aff[i].type != 0; i++)
     {
       if (tmp_aff[i].type)
         affect_to_char(ch, &tmp_aff[i]);
     }
 
-
-  }
   if (GET_LEVEL(ch) >= LVL_IMMORT)
   {
     for (i = 1; i <= MAX_SKILLS; i++)
@@ -6192,10 +6193,11 @@ void free_obj(struct obj_data *obj, int extracted)
     extract_script(obj, OBJ_TRIGGER);
 
   remove_from_lookup_table(GET_ID(obj));
-  if (!extracted && GET_OBJ_RNUM(obj) >= 0) {
-  purge_qic(GET_OBJ_RNUM(obj));
-  obj_index[obj->item_number].number--;
-  
+  if (!extracted && GET_OBJ_RNUM(obj) >= 0)
+  {
+    purge_qic(GET_OBJ_RNUM(obj));
+    obj_index[obj->item_number].number--;
+
   }
 
   free(obj);
@@ -6529,10 +6531,10 @@ void init_char(struct char_data *ch)
   //TODO: check this
   if ((i = get_ptable_by_name(GET_NAME(ch))) != -1)
   {
-  if (!valid_id_num(top_idnum+1))
-  log("Error new id %ld being assigned to %s already exists!",top_idnum+1, GET_NAME(ch)); 
+    if (!valid_id_num(top_idnum+1))
+      log("Error new id %ld being assigned to %s already exists!",top_idnum+1, GET_NAME(ch));
     player_table[i].id = GET_IDNUM(ch) = GET_ID(ch) =  ++top_idnum;
-    
+
     player_table[i].account = GET_IDNUM(ch);
     add_to_lookup_table(GET_ID(ch), (void *)ch);
   }
@@ -6974,7 +6976,7 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                                                                                                                						   special care */
+                                                                                                                                        						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";
@@ -8063,10 +8065,11 @@ zone_rnum real_zone(zone_vnum vnum)
 #endif
 }
 
-int valid_id_num(long id) {
-CHAR_DATA *tch;
-    for (tch = character_list; tch; tch = tch->next)
-      if (GET_ID(tch) == id)
+int valid_id_num(long id)
+{
+  CHAR_DATA *tch;
+  for (tch = character_list; tch; tch = tch->next)
+    if (GET_ID(tch) == id)
       return 0;
-      return 1;
+  return 1;
 }
