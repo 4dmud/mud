@@ -59,15 +59,6 @@ void assemblyBootAssemblies( void ) {
                 log( "SYSERR: bootAssemblies(): Could not add component #%ld to "
                      "assembly #%ld.", lPartVnum, lVnum );
             }
-        } else if( str_cmp( szTag, "Trigger" ) == 0 && lVnum != NOTHING) {
-            if( sscanf( szLine, "#%d", &iTrig ) != 1 ) {
-                log( "SYSERR: bootAssemblies(): Invalid format in file %s, "
-                     "line %ld.", ASSEMBLIES_FILE, lLineCount );
-            } else if( !assemblyAddTrigger( lVnum, iTrig) ) {
-                log( "SYSERR: bootAssemblies(): Could not add assembly message for vnum "
-                     "#%ld, trigger %d.", lVnum, iTrig );
-                iTrig = -1;
-            }
         } else if( str_cmp( szTag, "Vnum" ) == 0 ) {
             if( sscanf( szLine, "#%ld %s", &lVnum, szType ) != 2 ) {
                 log( "SYSERR: bootAssemblies(): Invalid format in file %s, "
