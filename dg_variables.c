@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/11/11 16:07:04 $                                           * 
-*  $Revision: 1.37 $                                                      *
+*  $Date: 2006/11/11 20:42:25 $                                           * 
+*  $Revision: 1.38 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -809,7 +809,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     if (subfield && *subfield) {
                         int newhit = atoi(subfield);
                         GET_HIT(c) = newhit;
-                        update_pos(c);
+			alter_hit(c,0);
                     }
                     snprintf(str, slen, "%d", GET_HIT(c));
                 } else if (!strcasecmp(field, "has_item")) {
@@ -969,6 +969,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                             GET_MANA(c) = 0;
                             script_log("Trigger: %s, VNum %d. attempt to set mana to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
                         }
+			alter_mana(c,0);
 
                     }
                     snprintf(str, slen, "%d", GET_MANA(c));
@@ -981,6 +982,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                             GET_MOVE(c)=0;
                             script_log("Trigger: %s, VNum %d. attempt to set movepoints to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
                         }
+			alter_move(c, 0);
                     }
                     snprintf(str, slen, "%d", GET_MOVE(c));
                 } else if (!strcasecmp(field, "master")) {
@@ -1180,6 +1182,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                             GET_STAMINA(c)=0;
                             script_log("Trigger: %s, VNum %d. attempt to set movepoints to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
                         }
+			alter_stamina(c,0);
                     }
                     snprintf(str, slen, "%d", GET_STAMINA(c));
                 } else if (!strcasecmp(field, "subskill"))
