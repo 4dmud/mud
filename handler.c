@@ -2083,7 +2083,7 @@ void extract_char_final(struct char_data *ch)
   }
 
   /*ends fight event*/
-  if (FIGHTING(ch))
+  
     halt_fighting(ch);
   if (SITTING(ch))
     char_from_chair(ch);

@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.16  2006/05/20 09:33:12  w4dimenscor
+ * fixed the bug where if a mob was purged while fighting the people who were fighting it would stay fighting nothing
+ *
  * Revision 1.15  2006/05/08 20:55:12  w4dimenscor
  * Whoops, made a little mistake in the trigger firing. All set now.
  *
@@ -842,11 +845,11 @@ ACMD(do_mload)
     {
       if (CAN_WEAR(object, ITEM_WEAR_TAKE))
       {
-if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s loads %s in %d",  GET_NAME(ch), object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+        {
+          if (IN_ROOM(ch))
+            mob_log(ch, "[TOKEN] %s loads %s in %d",  GET_NAME(ch), object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+        }
         obj_to_char(object, ch);
       }
       else
@@ -869,11 +872,11 @@ if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
         load_otrigger(object);
         return;
       }
-if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description,GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+      if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+      {
+        if (IN_ROOM(ch))
+          mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description,GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(ch)));
+      }
       obj_to_char(object, tch);
       load_otrigger(object);
       return;
@@ -881,21 +884,21 @@ if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
     cnt = (arg1 && *arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
     if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER)
     {
-if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description, cnt->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+      if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+      {
+        if (IN_ROOM(ch))
+          mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description, cnt->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+      }
       obj_to_obj(object, cnt);
       load_otrigger(object);
       return;
     }
     /* neither char nor container found - just dump it in room */
-if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s loads %s to room %d",  GET_NAME(ch), object->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+    if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+    {
+      if (IN_ROOM(ch))
+        mob_log(ch, "[TOKEN] %s loads %s to room %d",  GET_NAME(ch), object->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
+    }
     obj_to_room(object, IN_ROOM(ch));
     load_otrigger(object);
     return;
@@ -944,11 +947,11 @@ ACMD(do_mpurge)
 
     for (obj = IN_ROOM(ch)->contents; obj; obj = obj_next)
     {
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s purges %s in room %d",  GET_NAME(ch), obj->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+      if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+      {
+        if (IN_ROOM(ch))
+          mob_log(ch, "[TOKEN] %s purges %s in room %d",  GET_NAME(ch), obj->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
+      }
       obj_next = obj->next_content;
       extract_obj(obj);
     }
@@ -969,11 +972,11 @@ if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
 
     if (obj)
     {
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      mob_log(ch, "[TOKEN] %s purges %s",  GET_NAME(ch), obj->short_description);
-  }
+      if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+      {
+        if (IN_ROOM(ch))
+          mob_log(ch, "[TOKEN] %s purges %s",  GET_NAME(ch), obj->short_description);
+      }
       extract_obj(obj);
       obj = NULL;
     }
@@ -1452,7 +1455,7 @@ ACMD(do_mtransform)
   obj_data *obj[NUM_WEARS];
   struct hunter_data *hunt = NULL, *hnext;
   mob_rnum this_rnum = GET_MOB_RNUM(ch);
-  int keep_hp = 1;		/* new mob keeps the old mob's hp/max hp/exp */
+  int keep_hp = 1;       /* new mob keeps the old mob's hp/max hp/exp */
   int pos;
 
   if (!MOB_OR_IMPL(ch))
@@ -1689,26 +1692,26 @@ ACMD(do_mdoor)
 
     switch (fd)
     {
-    case 1:		/* description */
+    case 1:         /* description */
       if (newexit->general_description)
         free(newexit->general_description);
       CREATE(newexit->general_description, char, strlen(value) + 3);
       strcpy(newexit->general_description, value);
       strcat(newexit->general_description, "\r\n");
       break;
-    case 2:		/* flags       */
+    case 2:         /* flags       */
       newexit->exit_info = (sh_int) asciiflag_conv(value);
       break;
-    case 3:		/* key         */
+    case 3:         /* key         */
       newexit->key = atoi(value);
       break;
-    case 4:		/* name        */
+    case 4:         /* name        */
       if (newexit->keyword)
         free(newexit->keyword);
       CREATE(newexit->keyword, char, strlen(value) + 1);
       strcpy(newexit->keyword, value);
       break;
-    case 5:		/* room        */
+    case 5:         /* room        */
       if ((to_room = real_room(atoi(value))) != NULL)
         newexit->to_room = to_room;
       else
@@ -1799,7 +1802,7 @@ ACMD(do_mcollision)
       IN_ROOM(ch) = real_room(GET_OBJ_VAL(obj, 0));
       GET_OBJ_VAL(obj, 2) -= damage;
       if (GET_OBJ_VAL(obj, 2) <= 0)
-      {	// blow it up
+      {   // blow it up
         //act("As the $p collides with $n, it explodes.",
         //    FALSE, ch, obj, NULL, TO_ROOM);
         IN_ROOM(ch) = was_in;

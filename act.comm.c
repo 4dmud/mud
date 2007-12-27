@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.33  2006/05/20 09:33:12  w4dimenscor
+ * fixed the bug where if a mob was purged while fighting the people who were fighting it would stay fighting nothing
+ *
  * Revision 1.32  2006/05/17 06:09:43  w4dimenscor
  * requesting help on the top helpfile + 1 should no longer crash the game
  *
@@ -1663,6 +1666,8 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, " Ive ", " I've ", len);
   ReplaceString(str, "itll", "it'll", len);
   ReplaceString(str, " teh ", " the ", len);
+  ReplaceString(str, " tyhe ", " the ", len);
+  ReplaceString(str, " yuopu ", " you ", len);
   ReplaceString(str, "theres", "there's", len);
   ReplaceString(str, "wehn", "when", len);
   ReplaceString(str, " alot ", " a lot ", len);
@@ -1681,7 +1686,8 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, "perhapes", "perhaps", len);
   ReplaceString(str, "yopu", "you", len);
   ReplaceString(str, "dont", "don't", len);
-
+  ReplaceString(str, "anotyher", "another", len);
+  
   return str;
 }
 
