@@ -1130,6 +1130,6 @@ struct obj_data *has_vehicle(Character *ch);
 int valid_id_num(long id);
 int fileExists (char * fileName);
 
-#define FTOI(f) ((int)((f) + 0.5))
+#define FTOI(f) ((int)((f)))
 
 
