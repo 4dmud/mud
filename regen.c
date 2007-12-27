@@ -160,7 +160,7 @@ EVENTFUNC(points_event)
 
 	if (ch != NULL && !DEAD(ch) && GET_POS(ch) >= POS_STUNNED && IN_ROOM(ch) != NULL) {
 	    /** no help for the dying */
-#if 1
+#if 0
     {
       int found = FALSE;
       struct char_data *tch;
@@ -194,6 +194,7 @@ EVENTFUNC(points_event)
 		if (GET_HIT(ch) < GET_MAX_HIT(ch)) {
 		    /* reenqueue the event */
 		    gain = (hit_gain(ch));
+		    gain = (int)((gain > 3) ? ((float)gain/3.0) : 1);
 		    return IRANGE(1, (PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
@@ -204,6 +205,7 @@ EVENTFUNC(points_event)
 		if (GET_MANA(ch) < GET_MAX_MANA(ch)) {
 		    /* reenqueue the event */
 		    gain = (mana_gain(ch));
+		    gain = (int)((gain > 3) ? ((float)gain/3.0) : 1);
 		    return IRANGE(1,(PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
@@ -214,11 +216,12 @@ EVENTFUNC(points_event)
 		if (GET_MOVE(ch) < GET_MAX_MOVE(ch)) {
 		    /* reenqueue the event */
 		    gain = (move_gain(ch));
+		    gain = (int)((gain > 3) ? ((float)gain/3.0) : 1);
 		    return IRANGE(1,(PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
            case REGEN_STAMINA:
-		GET_STAMINA(ch) = MIN(GET_STAMINA(ch) + 1, GET_MAX_STAMINA(ch));
+		GET_STAMINA(ch) = MIN(GET_STAMINA(ch) + 3, GET_MAX_STAMINA(ch));
 		
 		if (GET_STAMINA(ch) < GET_MAX_STAMINA(ch)) {
 		if (ch->desc && GET_STAMINA(ch) * 20 < GET_MAX_STAMINA(ch))
@@ -226,6 +229,7 @@ EVENTFUNC(points_event)
 		
 		    /* reenqueue the event */
 		    gain = stamina_gain(ch);
+		    gain = (int)((gain > 3) ? ((float)gain/3.0) : 1);
 		    return IRANGE(1, (PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		} else {
 		if (IS_NPC(ch) && GET_POS(ch) == POS_RESTING) {
@@ -240,8 +244,10 @@ EVENTFUNC(points_event)
 	}
     
     /** kill this event **/
-    if (ch) 
+    if (ch && GET_POINTS_EVENT(ch, type)) {
+    GET_POINTS_EVENT(ch, type)->event_obj = NULL;
     GET_POINTS_EVENT(ch, type) = NULL;
+    }
     
     if (event_obj) 
     free(event_obj);
@@ -361,7 +367,7 @@ void alter_move(struct char_data *ch, int amount)
  */
 void alter_stamina(struct char_data *ch, int amount)
 {
-;
+
 
     GET_STAMINA(ch) = MIN(GET_STAMINA(ch) - amount, GET_MAX_STAMINA(ch));
     

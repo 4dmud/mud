@@ -478,8 +478,8 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (use_stamina(RIDING(ch),  MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1)) < 0)
       {
-        act("Your mount collapses in exaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
-        act("$n falls over in exaustion, panting.", FALSE, RIDING(ch), 0, 0, TO_ROOM);
+        act("Your mount collapses in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
+        act("$n falls over in exhaustion, panting.", FALSE, RIDING(ch), 0, 0, TO_ROOM);
 
         GET_POS(RIDING(ch)) = POS_RESTING;
         dismount_char(ch);
@@ -494,8 +494,8 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
     if (stam < 0)
     {
-      act("You fall over in exaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
-      act("$n falls over in exaustion, panting.", FALSE, ch, 0, 0, TO_ROOM);
+      act("You fall over in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
+      act("$n falls over in exhaustion, panting.", FALSE, ch, 0, 0, TO_ROOM);
       GET_POS(ch) = POS_RESTING;
       dismount_char(ch);
       return 0;

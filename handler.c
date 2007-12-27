@@ -1957,7 +1957,11 @@ void extract_char_final(struct char_data *ch)
   extract_all_in_list(LOCKER(ch));
   LOCKER(ch) = NULL;
   char_from_room(ch);
-
+   if (GET_FIGHT_EVENT(ch))
+    {
+      event_cancel(GET_FIGHT_EVENT(ch));
+      GET_FIGHT_EVENT(ch) = NULL;
+    }
   /* cancel point updates */
   for (i = 0; i < 4; i++)
     if (GET_POINTS_EVENT(ch, i))
@@ -2044,6 +2048,8 @@ void extract_char(struct char_data *ch)
   if (DEAD(ch))
   {
     if (IN_ROOM(ch))
+      log("Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM(ch), GET_NAME(ch), GET_ROOM_VNUM(IN_ROOM(ch)));
+      else
       log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
     return;
   }

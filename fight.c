@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.5  2004/11/27 20:16:46  w4dimenscor
+ * fixed bug in 'get all all.corpse' that caused infinite loop, fixed up bug in combat where event wern't being canceled properly
+ *
  * Revision 1.4  2004/11/26 23:02:45  w4dimenscor
  * Added more notes into fight code, and more debugging checks, made combat reuse the event
  *
@@ -547,7 +550,8 @@ int average_damage(struct char_data *ch)
 /*move this to constants */
 struct fight_event_obj
 {
-  struct char_data *ch;
+  //struct char_data *ch;
+  long id;
 };
 
 
@@ -686,6 +690,7 @@ int next_round(struct char_data* ch)
 
   if (GET_FIGHT_EVENT(ch) != NULL)
   {
+  return 0;
     if (GET_FIGHT_EVENT(ch) != NULL)
       event_cancel(GET_FIGHT_EVENT(ch));
     GET_FIGHT_EVENT(ch) = NULL;
@@ -695,16 +700,17 @@ int next_round(struct char_data* ch)
 
   if (GET_POS(ch) > POS_STUNNED)
   {
-    long time = 0;
-    int fe_t = 0;
+  
     struct fight_event_obj *ch_event = NULL;
-    fe_t = find_fe_type(ch);
-    time = fight_timeout_calc(ch, fe_t, 0);
+    int fe_t = find_fe_type(ch);
+    long time = fight_timeout_calc(ch, fe_t, 0);
 
     CREATE(ch_event, struct fight_event_obj, 1);
-    ch_event->ch = ch;
+    ch_event->id = GET_ID(ch);
     GET_FIGHT_EVENT(ch) = event_create(fight_event, ch_event, time);
 
+  } else {
+  stop_fighting(ch);
   }
   if (IS_NPC(ch))
   {
@@ -729,69 +735,52 @@ int next_round(struct char_data* ch)
 EVENTFUNC(fight_event)
 {
   struct fight_event_obj* fight = (struct fight_event_obj*) event_obj;
-  struct char_data* ch = fight->ch;
+  long id = fight->id;
+  struct char_data *ch = find_char(id);
 
+if (event_obj) 
+    free(event_obj);
 
-
-  if (ch && !DEAD(ch))
+  if (ch)
   {
     /** debugging **/
-#if 1
+#if 0
     {
       int found = FALSE;
       struct char_data *tch;
       for (tch = character_list;tch&&!found;tch = tch->next)
       {
         /** Assume Unique **/
-        if (tch == fight->ch)
+        if (tch == ch)
           found = TRUE;
       }
       if (!found)
       {
-        if (event_obj)
-          free(event_obj);
         log("Character not found for combat!\r\n");
         return 0;
       }
     }
 #endif
+      GET_FIGHT_EVENT(ch)->event_obj = NULL;
+      GET_FIGHT_EVENT(ch) = NULL; 
 
-
-    if (FIGHTING(ch))
+    if (!DEAD(ch) && FIGHTING(ch))
       FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch)) ? HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)) ? RIDDEN_BY(FIGHTING(ch)) : FIGHTING(ch) : FIGHTING(ch);
+      
     if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch)) && GET_POS(ch) > POS_STUNNED)
     {
-      long time = 0;
       int fe_t = 0;
       int a_t = 0;
       fe_t = find_fe_type(ch);
-      a_t = next_attack_type(ch);
-      time = fight_timeout_calc(ch, fe_t, a_t );
+      a_t = next_attack_type(ch);           
+	
       if (fight_event_hit(ch, FIGHTING(ch), fe_t, a_t) >= 0)
       {
-
-        /**still valid to fight? 
-	TODO: Character may have died, need to check for this somehow - mord**/
-        if (FIGHTING(ch))
-          return time;
-        //next_round(ch);
-      }
-    }
-    // else
-    //  stop_fighting(ch);
-
-
-  }
-
-  if (ch)
-  {
-    GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
-    if (GET_FIGHT_EVENT(ch))
-    {
-      GET_FIGHT_EVENT(ch) = NULL;
-
-      if (event_obj)
-        free(event_obj);
+      if ((ch = find_char(id)) != NULL) {
+        GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
+        next_round(ch);
+	} else return 0;
+      } else stop_fighting(ch); 
     }
   }
   return 0;
@@ -1438,8 +1427,8 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   else
   {
 
-    /*if (GET_WAIT_STATE(ch) > 0)
-    	    return 0;*/
+    if (GET_WAIT_STATE(ch) > 0)
+    	    return 0;
 
 
     if (GET_POS(ch) == POS_SITTING)
@@ -1583,7 +1572,7 @@ int fe_melee_hit(struct char_data* ch, struct char_data* vict,
   int w_type = type;
   int attack_chance;
   int dam = 0;
-  int damage_ret = 0;
+  int damage_ret = -1;
   bool wield_2 = 0;
   float wep_multi = 1.0f;
   int weps = has_weapon(ch);
@@ -1850,6 +1839,9 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
 
   if (total_perc == 0)
     to_ret = fe_solo_damage(ch, vict, damage, w_type);
+    
+    if (to_ret == -1)
+    return to_ret;
 
   /* so now we have our list of targets, and their percentage total.
   lets run through that list, find them and deal the damage!
@@ -1864,10 +1856,12 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
 
     temp_damage = IRANGE(1, temp_damage, MAX_MOB_DAM);
 
-    if (list == vict)
+    if (list == vict) {
       to_ret = fe_solo_damage(ch, list, (int) temp_damage, w_type);
-    else
-      fe_solo_damage(ch, list, (int) temp_damage, w_type);
+      if (to_ret == -1)
+    return to_ret;
+   } else if (fe_solo_damage(ch, list, (int) temp_damage, w_type) == -1)
+   return -1;
 
   }
 
@@ -1932,13 +1926,12 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   CHAR_DATA *master = NULL;
   if (!vict)
   {
-    //stop_fighting(ch);
-    return 0;
+    return -1;
   }
   if (!FIGHTING(ch))
   {
     start_fighting_delay(ch, vict);
-    return 0;
+    return -1;
   }
   master = vict->master;
 
@@ -1950,8 +1943,9 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   { /* solo artest or normal damage -- no master whack em! */
     if (RIDDEN_BY(vict) && HERE(RIDDEN_BY(vict), ch))
     {
-      //stop_fighting(ch);
+      stop_fighting(ch);
       start_fighting_delay(ch, RIDDEN_BY(vict));
+      /** return 0 so stop fighting isn't called again **/
       return 0;
     }
     else
@@ -1963,8 +1957,9 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   {
     if (HERE(master, vict))
     { /* victim isnt the master! -- find the master and whack em! */
-      //stop_fighting(ch);
+      stop_fighting(ch);
       start_fighting_delay(ch, master);
+      /** return 0 so stop fighting isn't called again **/
       return 0;
     }
     else /* victim is not in the same room as their master -- whack em only */
@@ -2169,7 +2164,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     {
       partial = dam * 0.5;
       if (damage(ch, RIDING(vict), partial, w_type) == -1)
-        return 0;
+        return -1;
     }
     else
       partial = dam;
@@ -2179,7 +2174,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     if (!SELF(ch, vict))
     {
       if (partial > 5 && steal_affects(ch, partial, w_type, vict) == -1)
-        return 0;
+        return -1;
       if (!IS_NPC(vict))
         GET_LAST_DAM_T(vict) = partial;
       if (!IS_NPC(ch))
@@ -2240,7 +2235,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
       if (shield_check(ch, vict, SHIELD_REFLECT, w_type) == -1)
       {
         //stop_fighting(vict);
-        return 0;
+        return -1;
       }
       poison_wep_check(ch, vict, w_type, partial);
     }
@@ -2282,14 +2277,14 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     GET_WAS_IN(vict) = IN_ROOM(vict);
     move_char_to(vict, world_vnum[0]);
 
-    return 0;
+    return -1;
   }
 
   if (GET_POS(vict) == POS_DEAD)
   {
 
     //stop_fighting(ch);
-    //halt_fighting(vict);
+    halt_fighting(vict);
 
     if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
       group_gain(ch, vict);
@@ -4306,14 +4301,16 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 
 void stop_fighting(struct char_data* ch)
 {
-  if (GET_FIGHT_EVENT(ch))
+ /* if (GET_FIGHT_EVENT(ch))
   {
     event_cancel(GET_FIGHT_EVENT(ch));
     GET_FIGHT_EVENT(ch) = NULL;
-  }
+  }*/
 
   FIGHTING(ch) = NULL;
   GET_POS(ch) = POS_STANDING;
+  GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
+  
   update_pos(ch);
 
   return;

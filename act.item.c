@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.4  2004/11/27 20:16:46  w4dimenscor
+ * fixed bug in 'get all all.corpse' that caused infinite loop, fixed up bug in combat where event wern't being canceled properly
+ *
  * Revision 1.3  2004/11/20 20:16:51  w4dimenscor
  * removing olc.c and olc.h
  *
@@ -668,15 +671,14 @@ bool perform_get_from_container(struct char_data *ch, struct obj_data *obj,
 
   if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE))
   {
-  if ((long)GET_OBJ_VAL(cont, 0) == GET_IDNUM(ch))
-    perform_meld(ch, cont);
-  
-    if (IS_NPC(ch) || GET_OBJ_VAL(cont, 6) == 0 || !IS_PK(ch)) {
-    new_send_to_char(ch, "You can't take things from that players corpse.\r\n");
-    return FALSE;
+
+    if (IS_NPC(ch) || GET_OBJ_VAL(cont, 6) == 0 || !IS_PK(ch))
+    {
+      new_send_to_char(ch, "You can't take things from that players corpse.\r\n");
+      return FALSE;
     }
   }
-  
+
 
   if (mode != FIND_OBJ_INV && !can_take_obj(ch, obj))
   {
@@ -722,7 +724,12 @@ void get_from_container(struct char_data *ch, struct obj_data *cont,
     act("$p is closed.", FALSE, ch, cont, 0, TO_CHAR);
     return;
   }
-
+  if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE))
+    if ((long)GET_OBJ_VAL(cont, 0) == GET_IDNUM(ch)) {
+      perform_meld(ch, cont);
+      return;
+      }
+      
   if (obj_dotmode == FIND_INDIV)
   {
     if (!(obj = get_obj_in_list_vis(ch, obj_desc, NULL, cont->contains)))
@@ -1210,9 +1217,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                          	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
-                                                          	    return (0);
-                                                          	}*/
+                                                              	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
+                                                              	    return (0);
+                                                              	}*/
   }
 
 
