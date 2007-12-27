@@ -232,7 +232,7 @@ ACMD(do_convey) {
         if (GET_PRACTICES(ch) >= amount) {
             ch->Send("You convey %lld practice sessions to %lld brass tokens.\r\n",
                      amount, amount / 20);
-            GET_BRASS_TOKEN_COUNT(ch) += amount / 20;
+            GET_BRONZE_TOKEN_COUNT(ch) += amount / 20;
             GET_PRACTICES(ch) -= amount;
             convert_tokens(ch);
 
