@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.28  2007/06/17 20:32:42  w4dimenscor
+ * was deducting gold twice for practicing.
+ *
  * Revision 1.27  2007/06/17 10:44:53  w4dimenscor
  * Fixed a bug in a mounted persons movepoints going below 0, fixed abuse of animate dead, fixed group spells to allow for inclusion of charmies, and set a limit on total charmies in a group.
  *
@@ -647,7 +650,6 @@ SPECIAL(guild) {
     if (REMORTS(ch) > 2) {
 		ch->Gold(-cig, GOLD_HAND);
     		ch->Send( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL(ch,skill_num));
-    		ch->Gold(-cig, GOLD_HAND);
     } else {
 		ch->Send( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL(ch,skill_num));
     }
