@@ -2427,8 +2427,10 @@ mstam = GET_MAX_STAMINA(t->character);
 }
 
 len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
-len = snprintf(stat + len, sizeof(stat) - len, "<variable name=hitp>%d</variable><variable name=maxhitp>%d</variable>",hp,mhp);
-len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE hitp Max=maxhitp Caption=\"Health (%d)\" Color=red>",   hp);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'><!ENTITY xhp '%d'>",hp,mhp);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'><!ENTITY xmana '%d'>",mana,mmana);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'><!ENTITY xmove '%d'>",move,mmove);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'><!ENTITY xstam '%d'>",stam,mstam);
 //len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE mana Max=%d Caption=\"Mana (%d)\" Color=blue>%d</GAUGE>", mmana,mana,  mana);
 //len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE move Max=%d Caption=\"Move (%d)\" Color=green>%d</GAUGE>",mmove, move,  move);
 //len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE stam Max=%d Caption=\"Stamina (%d)\" Color=yellow>%d</GAUGE>",  mstam,stam, stam);
@@ -2484,8 +2486,8 @@ int process_output(struct descriptor_data *t)
     strcat(osb, "\r\n");
 
   /* add a prompt */
-//if (t->mxp)
- // strlcat(i, send_mxp_status(t), sizeof(i));
+if (t->mxp)
+ strlcat(i, send_mxp_status(t), sizeof(i));
   strlcat(i, make_prompt(t), sizeof(i));
 
   /**TODO: need to in the future, check this against the fact that we don't
@@ -4649,11 +4651,14 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
   char out_buf[MAX_STRING_LENGTH + 1] = "";
   char ptemp[MAX_PROMPT_LENGTH * 5] = "";
   register int inpos = 0, outpos = 0;
+  struct descriptor_data *d = NULL;
   time_t ct = time(0);
   bool def = FALSE;
   int count = 0, mhp= 0;
   gold_int expe;
   size_t len = 0, psize;
+  if (ch && ch->desc)
+  d = ch->desc;
 
 
   if (PROMPT(ch) && *PROMPT(ch))
@@ -4840,21 +4845,38 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
             snprintf(insert_text, sizeof(insert_text), "%d",(GET_STAMINA(ch) * 100) / GET_MAX_STAMINA(ch));
             break;
           case 'H':
+	  /*if (d && d->mxp)
+	  snprintf(insert_text, sizeof(insert_text), "<hp>%d</hp>", GET_MAX_HIT(ch));
+	  else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MAX_HIT(ch));
             break;
           case 'h':
-            snprintf(insert_text, sizeof(insert_text), "%s%d%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");
+	  /*if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "%s<xhp>%d</xhp>%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");*/
+	    snprintf(insert_text, sizeof(insert_text), "%s%d%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");
             break;
           case 'M':
-            snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MANA(ch));
+	 /* if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "<xmana>%d</xmana>",GET_MAX_MANA(ch));
+	    else*/
+	    snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MANA(ch));
             break;
           case 'm':
+	  /*if (d && d->mxp)
+	  snprintf(insert_text, sizeof(insert_text), "<mana>%d</mana>", GET_MANA(ch));
+	  else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MANA(ch));
             break;
           case 'V':
+	  /*if (d && d->mxp)
+	  snprintf(insert_text, sizeof(insert_text), "<xmove>%d</xmove>", GET_MAX_MOVE(ch));
+	  else*/
             snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MOVE(ch));
             break;
           case 'v':
+	  /*if (d && d->mxp)
+	  snprintf(insert_text, sizeof(insert_text), "<move>%d</move>", GET_MOVE(ch));
+	  else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MOVE(ch));
             break;
           case 'G':
@@ -5281,56 +5303,60 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
   write_to_output( d, "%s", start_mxp_str);
   write_to_output( d, "%s", MXPMODE (6) );   /* permanent secure mode */
   /* Exit tag */
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"  FLAG=RoomExit"));
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\" EXPIRE=\"Exits\"  FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" EXPIRE=\"Exits\" FLAG=RoomExit"));
   /* Room description tag */
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc \'<p>\' FLAG=RoomDesc"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc '<p>' FLAG=RoomDesc"));
   /* Get an item tag (for things on the ground) */
   write_to_output( d, "%s", 
-              MXPTAG("!ELEMENT GroundItem \"<send href=\'"
+              MXPTAG("!ELEMENT GroundItem \"<send href='"
                     "get &name;|"
                     "examine &name;|"
                     "drink &name;" 
-                    "\' "
-                    "hint=\'RH mouse click to use this object|"
+                    "' "
+                    "hint='RH mouse click to use this object|"
                     "Get &desc;|"
                     "Examine &desc;|"
                     "Drink from &desc;"
-                    "\'>\" ATT=\'name desc\'"));
+                    "'>\" ATT='name desc'"));
   /* Drop an item tag (for things in the inventory) */
   write_to_output( d, "%s",  MXPTAG
-                   ("!ELEMENT InvenItem \"<send href=\'"
+                   ("!ELEMENT InvenItem \"<send href='"
                     "drop &name;|"
                     "examine &name;|"
                     "wear &name;|"
                     "eat &name;|"
                     "drink &name;"
-                    "\' "
-                    "hint=\'RH mouse click to use this object|"
+                    "' "
+                    "hint='RH mouse click to use this object|"
                     "Drop &desc;|"
                     "Examine &desc;|"
                     "Wear &desc;|"
                     "Eat &desc;|"
                     "Drink &desc;"
-                    "'>\" ATT=\'name desc\'"));
+                    "'>\" ATT='name desc'"));
   /* Bid an item tag (for things in the auction) */
   write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT Bid \"<send href=\'bid &name;\' "
-                    "hint=\'Bid for &desc;\'>\" "
-                    "ATT=\'name desc\'"));
+                   ("!ELEMENT Bid \"<send href='bid &name;' "
+                    "hint='Bid for &desc;'>\" "
+                    "ATT='name desc'"));
   /* List an item tag (for things in a shop) */
- 
+ write_to_output(d, "%s", MXPTAG("GAUGE 'hp' Max='xhp' Caption='Health' Color='red'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
+ write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
   write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT List \"<send href=\'"
+                   ("!ELEMENT List \"<send href='"
                     "buy &name;| "
                     "id &name;"
-                    "\' "
-                    "hint=\'Buy &desc;|Id &desc;\'>\" "
-                    "ATT=\'name desc\'"));
+                    "' "
+                    "hint='Buy &desc;|Id &desc;'>\" "
+                    "ATT='name desc'"));
   /* Player tag (for who lists, tells etc.) */
   write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT Player \"<send href=\'tell &name; |ignore &name;\' "
-		   "hint=\'Tell &name; something or ignore them|Tell &name; |Ignore &name;\' "
-                    "\'Send a message to &name;\' prompt>\" "
+                   ("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
+		   "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;' "
+                    "'Send a message to &name;' prompt>\" "
                     "ATT=\"name\""));
 } /* end of turn_on_mxp */

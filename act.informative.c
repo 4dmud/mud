@@ -949,7 +949,7 @@ void do_auto_exits(struct char_data *ch)
     strcpy(tag_close, "/VEx");
   }
 
-
+new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
 

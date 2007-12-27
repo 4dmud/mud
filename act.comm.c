@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.17  2005/05/29 11:16:02  w4dimenscor
+ * set exits to expire, set tells not to be mxp when from mobs, and made gauges
+ *
  * Revision 1.16  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -676,12 +679,16 @@ ACMD(do_gsay)
 void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
 {
   char buf[MAX_INPUT_LENGTH];
+  
+  
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
     arg = makedrunk(arg, ch);
-    snprintf(buf, sizeof(buf), MXPTAG ("Player $n") 
-            "$n" 
-            MXPTAG ("/Player")
+    if (IS_NPC(vict))
+    snprintf(buf, sizeof(buf), "$n tells you, '%s%s%s'",
+             CBWHT(vict, C_CMP), arg, CCNRM(vict, C_CMP));
+	     else
+    snprintf(buf, sizeof(buf), MXPTAG ("Player $n") "$n" MXPTAG ("/Player")
 	    " tells you, '%s%s%s'",
              CBWHT(vict, C_CMP), arg, CCNRM(vict, C_CMP));
     act(buf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP);
@@ -690,13 +697,15 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
     new_send_to_char(ch, "%s", CONFIG_OK);
   else
   {
+  if (IS_NPC(vict))
+  snprintf(buf, sizeof(buf),"You tell $N, '%s%s%s'", CBWHT(ch, C_CMP), arg, CCNRM(ch, C_CMP));
+	     else
     snprintf(buf, sizeof(buf), 
     "You tell "
     MXPTAG ("Player $N")
     "$N"
     MXPTAG ("/Player")
-    ", '%s%s%s'",
-             CBWHT(ch, C_CMP), arg, CCNRM(ch, C_CMP));
+    ", '%s%s%s'", CBWHT(ch, C_CMP), arg, CCNRM(ch, C_CMP));
     act(buf, FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
   }
 
