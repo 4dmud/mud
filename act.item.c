@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.35  2006/04/19 08:08:07  w4dimenscor
+ * Added an \r\n that was missing in the fuel function.
+ *
  * Revision 1.34  2006/04/18 21:48:54  w4dimenscor
  * Added the "amount of fuel" property to gemclusters.
  * Added a fuel command.
@@ -4561,7 +4564,7 @@ ACMD(do_fuel){
     return;
   }
   if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike)){
-    new_send_to_char(ch, "%s is already fueled to its maximum capacity!",OBJS(spacebike,ch));
+    new_send_to_char(ch, "%s is already fueled to its maximum capacity!\r\n",OBJS(spacebike,ch));
     return;
   }
   if(!*arg2)
