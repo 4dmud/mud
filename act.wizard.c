@@ -9,6 +9,14 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.17  2005/03/16 14:20:14  w4dimenscor
+ * added / changed:
+ * set [char] mastery [class] : toggles the mastery of that class
+ * set [char] remort  : removes the first remorted class and decreases the # of remorts
+ * set [char] rtwo  : removes the second remorted class and decreases the # of remorts
+ * set [char] rthree  : removes the third remorted class and decreases the # of remorts
+ * stat [char] : added display of # of remorts and mastered classes
+ *
  * Revision 1.16  2005/03/15 09:55:49  w4dimenscor
  * fixed error with mtransform and linked mobs
  *
@@ -1594,6 +1602,8 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
   char buf2[MAX_INPUT_LENGTH];
   int len = 0;
   int zone;
+  char masteries[40] = "";
+  size_t masteries_len = 0;
 
   new_mudlog(CMP, (GET_LEVEL(ch) == LVL_IMPL ? GET_LEVEL(ch) : GET_LEVEL(ch)+1), TRUE, "(GC) %s statted %s [%d].", GET_NAME(ch),  GET_NAME(k), GET_MOB_VNUM(k));
 
@@ -1645,6 +1655,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
     if (!IS_NPC(k))
     {
+      new_send_to_char(ch, "# of Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
         new_send_to_char(ch, "  Remort: %s", pc_class_types[(int)GET_REMORT(k)]);
@@ -1659,9 +1670,13 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
       {
         new_send_to_char(ch, "  Remort3: %s",pc_class_types[(int)GET_REMORT_THREE(k)]);
       }
-      if (REMORTS(k))
-        new_send_to_char(ch, "\r\n");
+      new_send_to_char(ch, "\r\n");
 
+      for (i = 0; i < NUM_CLASSES; i++)
+	if (GET_MASTERY(k, i))
+	  masteries_len += snprintf(masteries+masteries_len, sizeof(masteries) - masteries_len, "%c ", UPPER(*pc_class_types[i]));
+      new_send_to_char(ch, "MASTERED CLASSES: %s\r\n", (strcmp(masteries, "") == 0 ? "none" : masteries));
+      
       if (GET_EMAIL(k) && *GET_EMAIL(k))
         new_send_to_char(ch, "EMAIL: %s\r\n", GET_EMAIL(k));
       if (GET_NEWBIE_STATUS(k) != -1)
@@ -4570,8 +4585,9 @@ set_fields[] = {
                  {"pretitle", LVL_SEN, PC, MISC},
                  {"rpgroup", LVL_SEN, PC, MISC},
                  { "olc",		LVL_IMPL,	PC,	MISC },
-                 { "hero",		LVL_SEN,	PC,	BINARY },
-                 {"immtitle", LVL_IMPL, PC, MISC},
+                 { "hero",		LVL_SEN,	PC,	BINARY }, /* 75 */
+                 {"immtitle", LVL_IMPL, PC, MISC},	
+                 {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -4933,33 +4949,36 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     check_regen_rates(vict);
     break;
   case 49:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
-    {
-      send_to_char("That is not a class.\r\n", ch);
-      return 0;
-    }
-    else
-      GET_REMORT(vict) = i;
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+      send_to_char("Removing remort: ", ch);
+      if ( REMORTS(vict) > 0 )
+        REMORTS(vict)--;
+    } else if ( GET_REMORT(vict) == CLASS_UNDEFINED )
+      REMORTS(vict)++;
+      
+    GET_REMORT(vict) = i;
     check_regen_rates(vict);
     break;
   case 50:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
-    {
-      send_to_char("That is not a class.\r\n", ch);
-      return 0;
-    }
-    else
-      GET_REMORT_TWO(vict) = i;
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+      send_to_char("Removing rtwo: ", ch);
+      if ( REMORTS(vict) > 0 )
+        REMORTS(vict)--;
+    } else if ( GET_REMORT_TWO(vict) == CLASS_UNDEFINED )
+      REMORTS(vict)++;
+      
+    GET_REMORT_TWO(vict) = i;
     check_regen_rates(vict);
     break;
   case 51:
-    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED)
-    {
-      send_to_char("That is not a class.\r\n", ch);
-      return 0;
-    }
-    else
-      GET_REMORT_THREE(vict) = i;
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+      send_to_char("Removing rthree: ", ch);
+      if ( REMORTS(vict) > 0 )
+        REMORTS(vict)--;
+    } else if ( GET_REMORT_THREE(vict) == CLASS_UNDEFINED )
+      REMORTS(vict)++;
+      
+    GET_REMORT_THREE(vict) = i;
     check_regen_rates(vict);
     break;
   case 52:
@@ -5184,6 +5203,13 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     if (val_arg && *val_arg)
       IMMTITLE(vict) = strdup(val_arg);
     snprintf(output, sizeof(output), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
+    break;
+  case 77:
+    if ((i = parse_class(*val_arg)) == CLASS_UNDEFINED) {
+      send_to_char("That is not a class.\r\n", ch);
+      return 0;
+    }
+    GET_MASTERY(vict, i) = !GET_MASTERY(vict, i);
     break;
   default:
     send_to_char("Can't set that!\r\n", ch);
