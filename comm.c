@@ -2489,6 +2489,7 @@ int process_output(struct descriptor_data *t)
     strcat(osb, "\r\n");
 
   /* add a prompt */
+  if (t->mxp && t->character && IS_PLAYING(t))
   send_mxp_status(t);
   strlcat(i, make_prompt(t), sizeof(i));
 
