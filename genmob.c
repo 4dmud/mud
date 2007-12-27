@@ -164,7 +164,7 @@ SetMobProto(vnum, nmob);
 }
 
 int copy_mobile(Character *to, Character *from) {
-    //  free_mobile_strings(to);
+    to->free_char_strings();
     *to = *from;
     check_mobile_strings(from);
     copy_mobile_strings(to, from);
@@ -229,7 +229,6 @@ if (!MobProtoExists(refpt)) {
 }
 
 int copy_mobile_strings(Character *t, Character *f) {
-	t->free_non_proto_strings();
     if (f->player.name)
         t->player.name = strdup(f->player.name);
     if (f->player.title)

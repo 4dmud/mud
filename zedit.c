@@ -524,7 +524,7 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
     case 'M':
       d->Output( "%sLoad %s [%s%d%s], Max : %d",
               MYCMD.if_flag ? " then " : "",
-              GetMobProto(MYCMD.arg1)->player.short_descr, cyn,
+              MobProtoExists(MYCMD.arg1) ? GetMobProto(MYCMD.arg1)->player.short_descr : "<Mob Doesn't exist>", cyn,
               MYCMD.arg1, yel, MYCMD.arg2
               );
       break;

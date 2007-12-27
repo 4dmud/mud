@@ -577,7 +577,6 @@ void Character::default_char() {
     proto = TRUE;
     master 			= NULL;
     desc 				= NULL;
-//    proto_script 		= NULL;
     next 				= NULL;
     script 			= NULL;
     affected 			= NULL;
@@ -725,11 +724,7 @@ void Character::default_char() {
     pulling = NOBODY;
     on_task = 0;
     fused_to = 0;
-    
-
-    
-
-
+    init_char_strings();
 }
 
 char * mob_name_by_vnum(mob_vnum &v) {

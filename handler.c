@@ -2095,8 +2095,8 @@ void extract_char_final(Character *ch)
     clearMemory(ch);
     if (SCRIPT(ch))
       extract_script(ch, MOB_TRIGGER);
-    if (ch->proto || !MobProtoExists(GET_MOB_VNUM(ch)) || ch->proto_script != GetMobProto(GET_MOB_VNUM(ch))->proto_script)
-      free_proto_script(ch, MOB_TRIGGER);
+//    if (ch->proto || !MobProtoExists(GET_MOB_VNUM(ch)) || ch->proto_script != GetMobProto(GET_MOB_VNUM(ch))->proto_script)
+ //     free_proto_script(ch, MOB_TRIGGER);
     if (SCRIPT_MEM(ch))
       extract_script_mem(SCRIPT_MEM(ch));
   }

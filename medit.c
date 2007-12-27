@@ -374,8 +374,9 @@ void medit_save_internally(Descriptor *d) {
         if (SCRIPT(mob))
             extract_script(mob, MOB_TRIGGER);
 
-        free_proto_script(mob, MOB_TRIGGER);
-        copy_proto_script(pmob, mob, MOB_TRIGGER);
+        //free_proto_script(mob, MOB_TRIGGER);
+        
+        //copy_proto_script(pmob, mob, MOB_TRIGGER);
         assign_triggers(mob, MOB_TRIGGER);
     }
     /* end trigger update */

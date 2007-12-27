@@ -180,7 +180,7 @@ void free_proto_script(void *thing, int type) {
     switch (type) {
     case MOB_TRIGGER:
         mob = (Character *) thing;
-        if (mob->proto_script)
+        if (mob->proto_script == NULL)
             return;
         proto = mob->proto_script;
         mob->proto_script = NULL;

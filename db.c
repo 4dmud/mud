@@ -2709,8 +2709,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     letter = fread_letter(mob_f);
     ungetc(letter, mob_f);
     while (letter == 'T') {
-        dg_read_trigger(mob_f, mob, MOB_TRIGGER)
-        ;
+        dg_read_trigger(mob_f, mob, MOB_TRIGGER);
         letter = fread_letter(mob_f);
         ungetc(letter, mob_f);
     }
@@ -3589,7 +3588,7 @@ Character *read_mobile(mob_vnum nr) {
     /* find_char helper */
     addChToLookupTable(GET_ID(mob), mob);
 
-    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
+//    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
     assign_triggers(mob, MOB_TRIGGER);
     mob->mob_specials.join_list = copy_proto_link(GetMobProto(nr)->mob_specials.join_list);
     load_links(mob);

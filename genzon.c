@@ -336,7 +336,11 @@ int Zone::write_zone() {
             arg1 = ZPCMD(subcmd).arg1;
             arg2 = ZPCMD(subcmd).arg2;
             arg3 = ZPCMD(subcmd).arg3;
-            comment = GetMobProto(ZPCMD(subcmd).arg1)->player.short_descr;
+            if (!MobProtoExists(arg1)) {
+            log("Mob Vnum %d is not found in proto list, will not be saved (room %d)", arg1, arg3);
+            comment = "<Mob didn't exist at time of saving>";
+            } else
+            comment = GetMobProto(arg1)->player.short_descr;
             break;
         case 'O':
             if (real_room(ZPCMD(subcmd).arg3) == NULL) {
@@ -346,7 +350,7 @@ int Zone::write_zone() {
             arg1 = obj_index[ZPCMD(subcmd).arg1].vnum;
             arg2 = ZPCMD(subcmd).arg2;
             arg3 = ZPCMD(subcmd).arg3;
-            comment = obj_proto[ZPCMD(subcmd).arg1].short_description;
+            comment = obj_proto[arg1].short_description;
             break;
         case 'G':
             arg1 = obj_index[ZPCMD(subcmd).arg1].vnum;
