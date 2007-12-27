@@ -57,7 +57,6 @@ int is_ignoring(struct char_data *ch, struct char_data *vict)
 }
 void print_ignorelist(struct char_data *ch, struct char_data *vict)
 {
-  char buf[127];
   struct ignore *temp;
 
   if (!ch || !vict)
@@ -69,8 +68,7 @@ void print_ignorelist(struct char_data *ch, struct char_data *vict)
   temp = GET_IGNORELIST(ch);
   while (temp != NULL)
   {
-    sprintf(buf, "%s\r\n", temp->ignore);
-    send_to_char(buf, vict);
+    new_send_to_char(vict, "%s\r\n", temp->ignore);
     temp = temp->next;
   }
   return;
@@ -109,12 +107,12 @@ void read_ignorelist(struct char_data *ch)
   struct ignore *ignoretemp;
   char buf[127];
   size_t ignorelength;
-
+GET_IGNORELIST(ch) = NULL;
   get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
   file = fopen(ignoref, "r");
   if (!file)
     return;
-    GET_IGNORELIST(ch) = NULL;
+    
   
   do
   {

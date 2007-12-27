@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.33  2005/09/16 10:20:10  w4dimenscor
+ * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
+ *
  * Revision 1.32  2005/08/28 10:00:53  w4dimenscor
  * added RPL flag, RPL note group
  *
@@ -289,8 +292,16 @@ struct player_gold_info
 };
 
 #define PC   1
-#define BINARY 1
-#define MISC 0
+#define NPC 2
+#define BOTH 3
+
+#define MISC	0
+#define BINARY	1
+#define NUMBER	2
+
+#define SET_OR_REMOVE(flagset, flags) { \
+	if (on) SET_BIT_AR(flagset, flags); \
+	else if (off) REMOVE_BIT_AR(flagset, flags); }
 
 #define SET_OR_REMOVE_TRUST(flagset, flags) { \
         if (on) SET_BIT(flagset, flags); \
@@ -301,6 +312,7 @@ struct player_gold_info
         else if (off) REMOVE_BIT_AR(flagset, flags); }
 
 #define RANGE(low, high) (value = MAX((low), MIN((high), (value))))
+
 /* mccp defines */
 
 struct trust_struct
@@ -349,7 +361,7 @@ trust_fields[] = {
                      "goto", LVL_IMPL, PC, BINARY},	/* 17 */
                    {
                      "global", LVL_IMPL, PC, BINARY},	/* 18 */
-		   {
+                   {
                      "hedit", LVL_IMPL, PC, BINARY},	/* 19 */
                    {
                      "\n", 0, PC, MISC}
@@ -549,7 +561,7 @@ int perform_trust(struct char_data *ch, struct char_data *vict, int mode,
       else
         SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GLOBAL_GRP)
         break;
-	  case 19:
+  case 19:
     if (save == 1)
       SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HEDIT_GRP)
       else
@@ -670,22 +682,25 @@ ACMD(do_echo)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
     else if (subcmd == SCMD_POSE)
     {
-      
+
       snprintf(buf, sizeof(buf), "[$n]\r\n%s", argument);
 
     }
-    else if (subcmd == SCMD_RECHO) {
-if (!PLR_FLAGGED(ch, PLR_RP_LEADER)) {
-new_send_to_char(ch, "You can't do that!\r\n");
-return;
-}
-strlcpy(buf, argument, sizeof(buf) );
-} else
+    else if (subcmd == SCMD_RECHO)
+    {
+      if (!PLR_FLAGGED(ch, PLR_RP_LEADER))
+      {
+        new_send_to_char(ch, "You can't do that!\r\n");
+        return;
+      }
+      strlcpy(buf, argument, sizeof(buf) );
+    }
+    else
       strlcpy(buf, argument, sizeof(buf) );
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
-      
+
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
       new_send_to_char(ch, "%s", CONFIG_OK);
@@ -723,30 +738,32 @@ ACMD(do_send)
 ACMD(do_prompt_new)
 {
   char **msg;
-   
-   if (subcmd == SCMD_PROMPT)
-   msg = &(PROMPT(ch));
-   else
-   msg = &(BPROMPT(ch));
+
+  if (subcmd == SCMD_PROMPT)
+    msg = &(PROMPT(ch));
+  else
+    msg = &(BPROMPT(ch));
 
   skip_spaces(&argument);
 
   if (!argument || !*argument)
   {
-  if (subcmd == SCMD_PROMPT)
-    new_send_to_char(ch, "Your prompt: %s\r\nFor a default prompt type: prompt default\r\nFor no prompt type: prompt none\r\n", PROMPT(ch));
+    if (subcmd == SCMD_PROMPT)
+      new_send_to_char(ch, "Your prompt: %s\r\nFor a default prompt type: prompt default\r\nFor no prompt type: prompt none\r\n", PROMPT(ch));
     else
-    new_send_to_char(ch, "Your battle prompt: %s\r\nFor a default battle prompt type: bprompt default\r\nFor no battle prompt type: bprompt none\r\n", BPROMPT(ch));
+      new_send_to_char(ch, "Your battle prompt: %s\r\nFor a default battle prompt type: bprompt default\r\nFor no battle prompt type: bprompt none\r\n", BPROMPT(ch));
     return;
   }
 
   if (!strcmp(argument, "default") || !strcmp(argument, "all"))
   {
-  if (subcmd == SCMD_PROMPT)
-    strcpy(argument, "{cg%h{cwH {cc%m{cwM {cy%v{cwV {cW(%S) {cC%E{cyTNL{c0>");
+    if (subcmd == SCMD_PROMPT)
+      strcpy(argument, "{cg%h{cwH {cc%m{cwM {cy%v{cwV {cW(%S) {cC%E{cyTNL{c0>");
     else if (subcmd == SCMD_BPROMPT)
-    strcpy(argument, "{cg%h{cwH {cc%m{cwM {cW(%S) {cC%E{cyTNL {cwVictHp:{cM%f%%{c0 >");
-  } else if ((subcmd == SCMD_BPROMPT) && !strcmp(argument, "copy")) {
+      strcpy(argument, "{cg%h{cwH {cc%m{cwM {cW(%S) {cC%E{cyTNL {cwVictHp:{cM%f%%{c0 >");
+  }
+  else if ((subcmd == SCMD_BPROMPT) && !strcmp(argument, "copy"))
+  {
     strcpy(argument, PROMPT(ch));
   }
 
@@ -1614,9 +1631,9 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
     }
     break;
   case ITEM_SPACEBIKE:
-  new_send_to_char(ch, "FUEL: %d MAX: %d SITTING IN BIKE: %s\r\n",
+    new_send_to_char(ch, "FUEL: %d MAX: %d SITTING IN BIKE: %s\r\n",
                      GET_FUEL(j), GET_MAX_FUEL(j), OBJ_SAT_IN_BY(j) ? GET_NAME(OBJ_SAT_IN_BY(j)) : "Nobody");
-  break;
+    break;
   case ITEM_LIGHTSABRE_HILT:
     new_send_to_char(ch, "Num Sabers: %d Number dam dice: %d Size dam dice: %d\r\nSaber Color: %s ",
                      (int) GET_OBJ_VAL(j, 0),(int) GET_OBJ_VAL(j, 1), (int) GET_OBJ_VAL(j, 2),
@@ -1754,13 +1771,14 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
           new_send_to_char(ch, "Compression: Disabled    ");
       }
 #endif
-      if (k->desc) {
+      if (k->desc)
+      {
         new_send_to_char(ch, "Telopt Prompts: %d    ", k->desc->eor);
-	new_send_to_char(ch, "MXP: %d    ", k->desc->mxp);
-	 
-	new_send_to_char(ch, "Wordwrap: %s - %d\r\n", ONOFF(PRF_FLAGGED(k->desc->character, PRF_PAGEWRAP)), PAGEWIDTH(k->desc->character));
-}      
-new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
+        new_send_to_char(ch, "MXP: %d    ", k->desc->mxp);
+
+        new_send_to_char(ch, "Wordwrap: %s - %d\r\n", ONOFF(PRF_FLAGGED(k->desc->character, PRF_PAGEWRAP)), PAGEWIDTH(k->desc->character));
+      }
+      new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
         new_send_to_char(ch, "  Remort: %s", pc_class_types[(int)GET_REMORT(k)]);
@@ -2638,7 +2656,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                                        				 * or char */
+                                                            				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -4574,19 +4592,7 @@ ACMD(do_show)
 
 /***************** The do_set function ***********************************/
 
-#define PC   1
-#define NPC  2
-#define BOTH 3
 
-#define MISC	0
-#define BINARY	1
-#define NUMBER	2
-
-#define SET_OR_REMOVE(flagset, flags) { \
-	if (on) SET_BIT_AR(flagset, flags); \
-	else if (off) REMOVE_BIT_AR(flagset, flags); }
-
-#define RANGE(low, high) (value = MAX((low), MIN((high), (value))))
 
 
 /* The set options available */
@@ -4693,7 +4699,7 @@ set_fields[] = {
                  { "hero",		LVL_SEN,	PC,	BINARY }, /* 75 */
                  {"immtitle", LVL_IMPL, PC, MISC},
                  {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
-		 {"rpl", LVL_GOD, PC, MISC},
+                 {"rpl", LVL_GOD, PC, BINARY},
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -5260,7 +5266,7 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     AFF_SPEED(vict) = value;
     break;
   case 71:
-    SET_OR_REMOVE(PLR_FLAGS(vict), PLR_COVENTRY);
+    SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_COVENTRY);
     break;
   case 72:
     send_to_char("unfinished\r\n", ch);
@@ -5297,7 +5303,7 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
       GET_OLC_ZONE(vict) = atoi(val_arg);
     break;
   case 75:
-    SET_OR_REMOVE(PLR_FLAGS(vict), PLR_HERO);
+    SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_HERO);
     break;
   case 76:
     if (strlen(val_arg) > 20)
@@ -5324,11 +5330,11 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     }
     GET_MASTERY(vict, i) = !GET_MASTERY(vict, i);
     break;
-case 78:
-    SET_OR_REMOVE(PLR_FLAGS(vict), PLR_RP_LEADER);
+  case 78:
+    SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_RP_LEADER);
     break;
   default:
-    send_to_char("Can't set that!\r\n", ch);
+    new_send_to_char(ch, "Can't set that!\r\n");
     return (0);
   }
 

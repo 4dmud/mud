@@ -207,6 +207,10 @@ void redit_setup_existing(struct descriptor_data *d, room_vnum v_num)
   OLC_ROOM(d)->script = NULL;
   OLC_ROOM(d)->contents = NULL;
   OLC_ROOM(d)->people = NULL;
+  OLC_ROOM(d)->mine.tool = world_vnum[v_num]->mine.tool;
+  OLC_ROOM(d)->mine.dif = world_vnum[v_num]->mine.dif;
+  OLC_ROOM(d)->mine.num = world_vnum[v_num]->mine.num;
+
   dg_olc_script_copy(d);
   redit_disp_menu(d);
 }
@@ -241,7 +245,7 @@ void redit_save_internally(struct descriptor_data *d)
 
   room_num->proto_script = OLC_SCRIPT(d);
   assign_triggers(room_num, WLD_TRIGGER);
-OLC_SCRIPT(d) = NULL;
+  OLC_SCRIPT(d) = NULL;
   /* end trigger update */
 
 
@@ -274,11 +278,11 @@ OLC_SCRIPT(d) = NULL;
           break;
         }
     }/* else if (STATE(dsc) == CON_REDIT) {
-                  for (j = 0; j < NUM_OF_DIRS; j++)
-                    if (OLC_ROOM(dsc)->dir_option[j])
-                      if (OLC_ROOM(dsc)->dir_option[j]->to_room >= room_num)
-                        OLC_ROOM(dsc)->dir_option[j]->to_room++;
-                }*/
+                      for (j = 0; j < NUM_OF_DIRS; j++)
+                        if (OLC_ROOM(dsc)->dir_option[j])
+                          if (OLC_ROOM(dsc)->dir_option[j]->to_room >= room_num)
+                            OLC_ROOM(dsc)->dir_option[j]->to_room++;
+                    }*/
   }
 }
 

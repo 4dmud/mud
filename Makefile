@@ -37,7 +37,7 @@ OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o dg_variables.o dg_wldcmd.o \
 	dg_olc.o event.o familiar.o fight.o \
 	gamble.o graph.o genmob.o genobj.o genolc.o genshp.o genwld.o \
-	genzon.o handler.o house.o improved-edit.o \
+	genzon.o handler.o house.o htree.o improved-edit.o \
 	ignore.o interpreter.o ident.o kalten.o limits.o lockers.o \
 	mapmaker.o mine.o magic.o mail.o  \
 	math.o mobact.o modify.o molly.o mordecai.o medit.o note.o objsave.o oedit.o \
@@ -55,7 +55,7 @@ CXREF_FILES = act.comm.c act.create.c act.informative.c act.item.c \
 	dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c dg_variables.c dg_wldcmd.c \
 	dg_olc.c event.c familiar.c fight.c \
 	gamble.c graph.c genmob.c genobj.c genolc.c genshp.c genwld.c \
-	genzon.c handler.c house.c  improved-edit.c\
+	genzon.c handler.c house.c htree.c improved-edit.c\
 	ignore.c interpreter.c ident.c kalten.c limits.c lockers.o \
 	mapmaker.c mine.c magic.c mail.c  \
 	math.c mobact.c modify.c molly.c mordecai.c medit.c note.c objsave.c oedit.c \

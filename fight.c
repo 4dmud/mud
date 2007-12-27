@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.21  2005/09/16 10:20:10  w4dimenscor
+ * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
+ *
  * Revision 1.20  2005/08/28 09:04:08  w4dimenscor
  * fixed redit to stop it removing existing scripts
  *
@@ -292,26 +295,26 @@ struct hit_chance_type chance_message[] =
 struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
   {
     {ONE_HANDED,  0,   0,  0,   0,  0,   0, 25, "Standard"},
-    {ONE_HANDED, 30, -130,  0, 0, 20, -80, 65, "Knife"},
-    {ONE_HANDED, 20, -90,  5, -20, 20, -80, 60, "Dagger"},
-    {ONE_HANDED, 15, -70, 10, -30, 25, -90, 50, "Shortsword"},
-    {TWO_HANDED, 30, -130, 40, -90, 60,  -160, 45, "Longsword"},
-    {TWO_HANDED, 50, -130, 60, -90, 60,  -160, 45, "Lightsaber"},
-    {ONE_HANDED, 40, -60, 45, -100, 50, -140, 45, "Katana"},
-    {ONE_HANDED, 15, -70, 10, -30, 20, -80, 40, "Rapier"},
-    {ONE_HANDED, 15, -70, 20, -50, 15, -70, 60, "Cutlass"},
-    {TWO_HANDED, 30, -130, 55, -120, 70, -180, 60, "Broadsword"},
-    {ONE_HANDED, 20, -90,  5, -20, 20, -80, 120, "HalfAxe"},
-    {TWO_HANDED, 25, -110, 35, -80, 40, -100, 125, "Axe"},
-    {ONE_HANDED, 15, -70,  5, -20, 20, -80, 125, "WarHammer"},
-    {ONE_HANDED, 20, -60,  5, -20, 25, -80, 130, "Mace"},
-    {TWO_HANDED,50, -210, 50, -110, 40, -90, 50, "Shortstaff"},
-    {TWO_HANDED,50, -210, 60, -130, 60, -160, 80, "Staff"},
-    {ONE_HANDED,  0,   0,  0,   0,  0,   -30,  30, "Whip"},
-    {ONE_HANDED, 15, -70, 10, -30, 20, -80, 130, "Club"},
-    {ONE_HANDED, 15, -70, 10, -30, 20, -80, 80, "Teeth"},
-    {ONE_HANDED, 15, -70, 10, -30, 20, -80, 70, "Claws"},
-    {ONE_HANDED, 15, -70, 10, -30, 20, -80, 80, "Projectile"}
+    {ONE_HANDED, 30, -130,  0, 0, 40, -80, 25, "Knife"},
+    {ONE_HANDED, 20, -90,  5, -20, 40, -80, 30, "Dagger"},
+    {ONE_HANDED, 15, -70, 10, -30, 45, -90, 20, "Shortsword"},
+    {TWO_HANDED, 30, -130, 40, -90, 120,  -160, 25, "Longsword"},
+    {TWO_HANDED, 50, -130, 60, -90, 120,  -160, 25, "Lightsaber"},
+    {ONE_HANDED, 40, -60, 45, -100, 100, -140, 25, "Katana"},
+    {ONE_HANDED, 15, -70, 10, -30, 40, -80, 20, "Rapier"},
+    {ONE_HANDED, 15, -70, 20, -50, 35, -70, 30, "Cutlass"},
+    {TWO_HANDED, 30, -130, 55, -120, 140, -180, 45, "Broadsword"},
+    {ONE_HANDED, 20, -90,  5, -20, 40, -80, 60, "HalfAxe"},
+    {TWO_HANDED, 25, -110, 35, -80, 80, -100, 60, "Axe"},
+    {ONE_HANDED, 15, -70,  5, -20, 40, -80, 60, "WarHammer"},
+    {ONE_HANDED, 20, -60,  5, -20, 45, -80, 65, "Mace"},
+    {TWO_HANDED,50, -210, 50, -110, 80, -90, 25, "Shortstaff"},
+    {TWO_HANDED,50, -210, 60, -130, 120, -160, 40, "Staff"},
+    {ONE_HANDED,  0,   0,  0,   0,  0,   -30, 15, "Whip"},
+    {ONE_HANDED, 15, -70, 10, -30, 40, -80, 65, "Club"},
+    {ONE_HANDED, 15, -70, 10, -30, 40, -80, 40, "Teeth"},
+    {ONE_HANDED, 15, -70, 10, -30, 40, -80, 35, "Claws"},
+    {ONE_HANDED, 15, -70, 10, -30, 40, -80, 40, "Projectile"}
   };
 
 float has_staff(struct char_data *ch)
@@ -367,6 +370,8 @@ int spell_size_dice(struct char_data *ch)
   else if (AFF_FLAGGED(ch, AFF_MIND_WATER)) sdice += 2;
   else if (AFF_FLAGGED(ch, AFF_MIND_ICE))   sdice += 3;
 
+if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  sdice += 1;
+
   if (IS_NPC(ch))
     return (GET_LEVEL(ch)/3) + sdice;
 
@@ -414,6 +419,8 @@ int spell_num_dice(struct char_data *ch)
   else if (AFF_FLAGGED(ch, AFF_MIND_FIRE))  ndice += 3;
   else if (AFF_FLAGGED(ch, AFF_MIND_WATER)) ndice += 2;
   else if (AFF_FLAGGED(ch, AFF_MIND_ICE))   ndice += 2;
+
+if (AFF_FLAGGED(ch, AFF_BATTLE_RAGE))  ndice += 1;
 
   if (IS_NPC(ch))
     return (GET_LEVEL(ch)/2) + ndice;
@@ -892,8 +899,9 @@ EVENTFUNC(fight_event)
     if (event_obj)
       free(event_obj);
 
-    if (!DEAD(ch) && FIGHTING(ch))
-      FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch)) ? HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)) ? RIDDEN_BY(FIGHTING(ch)) : FIGHTING(ch) : FIGHTING(ch);
+    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch))) 
+  if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch))) 
+      FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch));
 
     if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch), FALSE) && GET_POS(ch) > POS_STUNNED)
     {

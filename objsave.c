@@ -92,6 +92,9 @@ int load_qic_check(int rnum);
 void new_load_corpses(void);
 void add_corpse_to_list(OBJ_DATA *corpse);
 void remove_corpse_from_list(OBJ_DATA *corpse);
+void add_identifier(struct obj_data *obj, long id);
+void free_identifier(struct obj_data *obj);
+int has_identifier(struct obj_data *obj, long id);
 
 #define NEW_CORPSE_FILE LIB_MISC"new_corpse.save"
 
@@ -1248,9 +1251,19 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
     fprintf(fl, "Innate: %d\n", GET_OBJ_INNATE(obj));
     fprintf(fl, "Level: %d\n", GET_OBJ_LEVEL(obj));
     fprintf(fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3]);
-    fprintf(fl, "Affects:\r\n");
+    fprintf(fl, "Affects:\n");
     if (write_object_affects(fl, obj) < 0)
       return -1;
+  }
+  if (obj->idents)
+  {
+    struct ident_list *iden;
+    fprintf(fl, "Idents:\n");
+
+    for (iden = obj->idents;iden;iden=iden->next)
+      fprintf(fl, "%d\n", iden->id);
+
+    fprintf(fl, "%d\n", -1);
   }
   fprintf(fl, "Location: %d\n", locate);
   fprintf(fl, "Values:\n");
@@ -1720,6 +1733,19 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
     case 'i':
       if (!strcmp(tag, "Innate"))
         GET_OBJ_INNATE(temp) = atoi(line);
+      if (!strcmp(tag, "Idents"))
+      {
+        do
+        {
+          get_line(fl, line);
+          if (sscanf(line, "%d", t) != 1)
+            break;
+          if (t[0] == -1)
+            break;
+          add_identifier(temp, t[0]);
+        }
+        while (*line != '-');
+      }
       break;
     case 'l':
       if (!strcmp(tag, "Level"))
@@ -1820,8 +1846,8 @@ int Crash_load_xapobjs(struct char_data *ch)
       new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
       log("SYSERR: READING OBJECT FILE %s (5)", fname1);
       new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
-       "There was a problem loading your objects from disk.\r\n"
-       "Contact a God for assistance.\r\n");
+                       "There was a problem loading your objects from disk.\r\n"
+                       "Contact a God for assistance.\r\n");
     }
     if (!(fl = fopen(fname2, "r+b")))
     {
@@ -1831,8 +1857,8 @@ int Crash_load_xapobjs(struct char_data *ch)
         new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
         log("SYSERR: READING OBJECT FILE %s (5)", fname1);
         new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
-         "There was a problem loading your objects from disk.\r\n"
-         "Contact a God for assistance.\r\n");
+                         "There was a problem loading your objects from disk.\r\n"
+                         "Contact a God for assistance.\r\n");
       }
 
     }
@@ -1985,7 +2011,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                        						   special care */
+                                                        						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";

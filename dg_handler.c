@@ -232,7 +232,6 @@ void free_proto_script(void *thing, int type)
     fproto = proto;
     proto = proto->next;
     free(fproto);
-    fproto = NULL;
   }
   proto=NULL;
 }

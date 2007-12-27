@@ -16,6 +16,8 @@
 #include "genmob.h"
 #include "genzon.h"
 #include "dg_olc.h"
+#include "htree.h"
+
 
 int update_mobile_strings(struct char_data *t, struct char_data *f);
 void check_mobile_strings(struct char_data *mob);
@@ -51,11 +53,11 @@ void assign_mob_stats()
     //Damroll
     s[5] = MAX(1, (i*0.3) + (i*0.3));
     s[6] = MAX(2, (i*0.25) + (i*0.3));
-    s[7] = m_powf(i, (i*0.004)+1.333);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+    s[7] = m_powf(i, (i*0.004)+1.32);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
     s[8] =  (i * i * i * 15) + 200; /* exp */
     s[9] = (i * i * i * 1.4); /* gold */
-    s[10] = i * (1.0 + (i * 0.015)); /* hitroll */
+    s[10] = i * (1.0 + (i * 0.01)); /* hitroll */
 
     /*-------put it back together--------*/
     mob_stats[i].level 		= s[0];
@@ -125,6 +127,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     mob_index[i] = mob_index[i - 1];
     mob_proto[i] = mob_proto[i - 1];
     mob_proto[i].nr++;
+htree_add(mob_htree, mob_index[i].vnum, i);
   }
   if (!found)
   {
@@ -134,6 +137,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     mob_index[0].vnum = vnum;
     mob_index[0].number = 0;
     mob_index[0].func = 0;
+htree_add(mob_htree, mob_index[0].vnum, 0);
   }
 
   log("GenOLC: add_mobile: Added mobile %d at index #%d.", vnum, found);

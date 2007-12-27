@@ -390,6 +390,11 @@ extern struct descriptor_data *descriptor_list;
 extern struct char_data *character_list;
 extern struct player_index_element *player_table;
 extern int top_of_p_table;
+
+
+extern struct htree_node *mob_htree;
+extern struct htree_node *obj_htree;
+
 void strip_string(char *buffer);
 int read_xap_objects(FILE * fl, struct char_data *ch);
 float mob_hitpoint_multi(int chclass);

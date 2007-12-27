@@ -38,7 +38,8 @@ int sunlight;
 #include "genmob.h"
 #include "genwld.h"
 #include "xmlhelp.h"
-#include "trees.h"
+#include "trees.h" 
+#include "htree.h"
 
 int load_qic_check(int rnum);
 void qic_scan_rent(void);
@@ -103,6 +104,7 @@ room_vnum top_of_world = 0;	/* ref to top element of world   */
 struct social_messg *soc_mess_list = NULL;      /* list of socials */
 int top_of_socialt = -1;                        /* number of socials */
 
+
 struct char_data *character_list = NULL;	/* global linked list of chars */
 extern enum subskill_list subskill;
 void subs_remove(struct char_data *ch, struct sub_list *af);
@@ -111,9 +113,12 @@ void skills_remove(struct char_data *ch, struct skillspell_data *af);
 struct index_data **trig_index;	/* index table for triggers      */
 struct trig_data *trigger_list = NULL;	/* all attached triggers */
 int top_of_trigt = 0;		/* top of trigger index table    */
+struct htree_node *mob_htree = NULL;	/* hash tree for fast mob lookup */
+
 long max_mob_id = MOB_ID_BASE;	/* for unique mob id's       */
 long max_obj_id = OBJ_ID_BASE;	/* for unique obj id's       */
 int dg_owner_purged;		/* For control of scripts */
+struct htree_node *obj_htree = NULL;	/* hash tree for fast obj lookup */
 
 struct index_data *mob_index;	/* index table for mobile file   */
 struct char_data *mob_proto;	/* prototypes for mobs           */
@@ -798,6 +803,7 @@ void destroy_db(void)
 
   free(obj_proto);
   free(obj_index);
+htree_free(obj_htree);
 
   /* Mobiles */
   for (cnt = 0; cnt <= top_of_mobt; cnt++)
@@ -812,6 +818,7 @@ void destroy_db(void)
   }
   free(mob_proto);
   free(mob_index);
+  htree_free(mob_htree);
 
   /* Shops */
   destroy_shops();
@@ -944,6 +951,7 @@ void boot_db(void)
 
   log("Booting World.");
   boot_world();
+htree_test();
 
   log("Loading help entries.");
   index_boot(DB_BOOT_HLP);
@@ -2785,7 +2793,9 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
 
   if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER))
     ASSIGNMOB(nr, postmaster);
-
+    if (! mob_htree)
+      mob_htree = htree_init();
+    htree_add(mob_htree, nr, i);
   top_of_mobt = i++;
 }
 
@@ -2816,6 +2826,10 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
   obj_index[i].number = 0;
   obj_index[i].func = NULL;
   obj_index[i].qic = NULL; // memory leak hopefully fixed - mord
+
+  if (! obj_htree)
+    obj_htree = htree_init();
+  htree_add(obj_htree, nr, i);
 
   clear_object(obj_proto + i);
   obj_proto[i].in_room = NULL;
@@ -6221,6 +6235,7 @@ void obj_data_to_pool(struct obj_data *obj)
 /* release memory allocated for an obj struct */
 void free_obj(struct obj_data *obj, int extracted)
 {
+void free_identifier(struct obj_data *obj);
   //log("Freeing object: %d: %s", GET_OBJ_VNUM(obj), obj->short_description);
   if (GET_OBJ_RNUM(obj) == NOWHERE)
   {
@@ -6237,6 +6252,7 @@ void free_obj(struct obj_data *obj, int extracted)
 
   free_travel_points(TRAVEL_LIST(obj));
   TRAVEL_LIST(obj) = NULL;
+  free_identifier(obj);
 
   /* free any assigned scripts */
   if (SCRIPT(obj))
@@ -6393,6 +6409,7 @@ void reset_char(struct char_data *ch)
   MINE_DAMAGE(ch) = 0;
   HAS_MAIL(ch) = -1;
   IS_SAVING(ch) = FALSE;
+  GET_IGNORELIST(ch) = NULL;
 
   if (GET_HIT(ch) <= 0)
     GET_HIT(ch) = 1;
@@ -6481,6 +6498,7 @@ void clear_object(struct obj_data *obj)
     GET_OBJ_VAL(obj, i) = 0;
   GET_OBJ_LEVEL(obj) = 0;
   OBJ_SAT_IN_BY(obj) = NULL;
+obj->idents = NULL;
   obj->obj_flags.obj_innate = 0;
 }
 
@@ -7170,7 +7188,7 @@ mob_rnum real_mobile(mob_vnum vnum)
     else
       bot = mid + 1;
   }
-#else
+#elseif (0)
   int i;
   for (i = 0; i <= top_of_mobt; i++)
   {
@@ -7178,6 +7196,39 @@ mob_rnum real_mobile(mob_vnum vnum)
       return i;
   }
   return -1;
+#else
+ mob_rnum bot, top, mid, i, last_top;
+
+  i = htree_find(mob_htree, vnum);
+
+  if (i != NOBODY && mob_index[i].vnum == vnum)
+    return i;
+  else {
+  bot = 0;
+  top = top_of_mobt;
+
+  /* perform binary search on mob-table */
+  for (;;) {
+    last_top = top;
+    mid = (bot + top) / 2;
+
+      if ((mob_index + mid)->vnum == vnum) {
+        log("mob_htree sync fix: %d: %d -> %d", vnum, i, mid);
+        htree_add(mob_htree, vnum, mid);
+      return (mid);
+      }
+    if (bot >= top)
+      return (NOBODY);
+    if ((mob_index + mid)->vnum > vnum)
+      top = mid - 1;
+    else
+      bot = mid + 1;
+
+    if (top > last_top)
+      return NOWHERE;
+  }
+  }
+
 #endif
 }
 
@@ -7209,7 +7260,7 @@ obj_rnum real_object(obj_vnum vnum)
     else
       bot = mid + 1;
   }
-#else
+#elseif (0)
   int i;
   for (i = 0; i <= top_of_objt; i++)
   {
@@ -7217,6 +7268,38 @@ obj_rnum real_object(obj_vnum vnum)
       return i;
   }
   return -1;
+#else
+ obj_rnum bot, top, mid, i, last_top;
+
+  i = htree_find(obj_htree, vnum);
+
+  if (i != NOWHERE && obj_index[i].vnum == vnum)
+    return i;
+  else {
+  bot = 0;
+  top = top_of_objt;
+
+  /* perform binary search on obj-table */
+  for (;;) {
+    last_top = top; 
+    mid = (bot + top) / 2;
+
+      if ((obj_index + mid)->vnum == vnum) {
+        log("obj_htree sync fix: %d: %d -> %d", vnum, i, mid);
+        htree_add(obj_htree, vnum, mid);
+      return (mid);
+      }
+    if (bot >= top)
+      return (NOTHING);
+    if ((obj_index + mid)->vnum > vnum)
+      top = mid - 1;
+    else
+      bot = mid + 1;
+
+    if (top > last_top)
+      return NOWHERE;
+  }
+  }
 #endif
 }
 

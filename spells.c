@@ -28,6 +28,7 @@ extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);
 
+int wep_hands(OBJ_DATA *wep);
 void dismount_char(struct char_data *ch);
 char *balance_display(int balance);
 int weapon_type_mod(int w_type, int area);
@@ -45,6 +46,9 @@ int curr_balance(OBJ_DATA *wep);
 int fuzzy_balance(OBJ_DATA *wep);
 const char *weapon_type_name(OBJ_DATA *wep);
 const char *material_name(int type);
+void add_identifier(struct obj_data *obj, long id);
+void free_identifier(struct obj_data *obj);
+int has_identifier(struct obj_data *obj, long id);
 /*
  * Special spells appear below.
  */
@@ -96,7 +100,7 @@ ASPELL(spell_water_to_wine)
 
   if (!obj)
   {
-   new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
+    new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
     return;
   }
 
@@ -565,7 +569,7 @@ ASPELL(spell_psi_panic)
     do_flee(victim, "", 0, 0);
     GET_WAIT_STATE(ch) += 2 RL_SEC;
     GET_WAIT_STATE(victim) += 4 RL_SEC;
-      }
+  }
 }
 
 ASPELL(spell_polymorph)
@@ -618,6 +622,41 @@ ASPELL(spell_polymorph)
     }
   }
 }
+int has_identifier(struct obj_data *obj, long id)
+{
+  struct ident_list *n;
+  if (!obj->idents)
+    return FALSE;
+
+  for (n = obj->idents;n;n = n->next)
+    if (n->id == id)
+      return TRUE;
+
+  return FALSE;
+}
+void add_identifier(struct obj_data *obj, long id)
+{
+  struct ident_list *te;
+  if (!obj) return;
+  if (has_identifier(obj, id))
+    return;
+  CREATE(te, struct ident_list, 1);
+  te->id = id;
+  te->next = obj->idents;
+  obj->idents = te;
+}
+void free_all_identifier(struct ident_list *iden)
+{
+  if (!iden) return;
+  if (iden->next) free_all_identifier(iden->next);
+  free(iden);
+}
+void free_identifier(struct obj_data *obj)
+{
+  free_all_identifier(obj->idents);
+  obj->idents = NULL;
+}
+
 
 void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
 {
@@ -734,8 +773,8 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
                      get_weapon_defence(obj));
 
     w_type = GET_OBJ_VAL(obj, 3);
-    new_send_to_char(ch, "{cyThe weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
-                     GET_WEP_LENGTH(obj), weapon_type_name(obj),
+    new_send_to_char(ch, "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
+                     wep_hands(obj) == 2 ? "two" : "one",GET_WEP_LENGTH(obj), weapon_type_name(obj),
                      attack_hit_text[w_type].singular, GET_OBJ_VAL(obj, 1),  GET_OBJ_VAL(obj, 2));
     w_type += TYPE_HIT;
     att[0] = weapon_type_mod(w_type, PART_TOP_CENTER);
@@ -810,10 +849,14 @@ ASPELL(spell_identify)
 {
 
   if (obj)
+  {
     identify_object(ch, obj);
+    add_identifier(obj, GET_ID(ch));
+  }
   else if (victim)
     identify_character(ch, victim);
 }
+
 
 
 
@@ -992,15 +1035,16 @@ ASPELL(spell_enchant_armor)
 ASPELL(spell_control_weather)
 {
   int i;
-struct message_event_obj *msg = NULL;
+  struct message_event_obj *msg = NULL;
   if (!OUTSIDE(ch))
   {
     new_send_to_char(ch, "You are unable to concentrate enough to take control over nature.\r\n");
     return;
   }
-  if (!strarg || !*strarg) {
-  new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
-  return;
+  if (!strarg || !*strarg)
+  {
+    new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+    return;
   }
 
   if (GET_INT(ch) < number(1, 19))
@@ -1011,27 +1055,25 @@ struct message_event_obj *msg = NULL;
   i = GET_ROOM_ZONE(IN_ROOM(ch));
   if (!str_cmp(strarg, "better"))
   {
-    
   }
   else if (!str_cmp(strarg, "worse"))
   {
-    
   }
   else
   {
-  new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
-  return;
+    new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+    return;
   }
-GET_MSG_RUN(ch) = 1;
+  GET_MSG_RUN(ch) = 1;
   CREATE(msg, struct message_event_obj, 1);
   msg->ch = ch;
   msg->skill = SPELL_CONTROL_WEATHER;
   msg->type = THING_SKILL;
   msg->msg_num = 8;
   if (GET_EQ(ch, WEAR_FOCUS))
-  msg->id = GET_ID(GET_EQ(ch, WEAR_FOCUS));
+    msg->id = GET_ID(GET_EQ(ch, WEAR_FOCUS));
   else
-  msg->id = -1;
+    msg->id = -1;
   strlcpy(msg->args, strarg, 512);
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0);
   return;
@@ -1313,7 +1355,7 @@ ASPELL(spell_recharge)
       else
       {
         new_send_to_char(ch, "You restore %d charges to the wand.\r\n",
-                restored_charges);
+                         restored_charges);
         return;
       }
     }

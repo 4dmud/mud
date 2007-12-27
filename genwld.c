@@ -50,6 +50,9 @@ room_rnum add_room(struct room_data *room)
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
     *world_vnum[i] = *room;
+    world_vnum[i]->mine.tool = room->mine.tool;
+    world_vnum[i]->mine.dif = room->mine.dif;
+    world_vnum[i]->mine.num = room->mine.num;
     copy_room_strings(world_vnum[i], room);
     add_to_save_list(zone_table[room->zone].number, SL_WLD);
     log("GenOLC: add_room: Updated existing room #%d.", i);
@@ -236,7 +239,7 @@ int delete_room(room_rnum rnum)
   {
     i--;
     if (world_vnum[i] == NULL)
-    continue;
+      continue;
     for (j = 0; j < NUM_OF_DIRS; j++)
       if (W_EXIT(world_vnum[i], j) == NULL)
         continue;
@@ -297,7 +300,8 @@ int delete_room(room_rnum rnum)
   /*
    * Remove this room from all shop lists.
    */
- do {
+  do
+  {
     extern int top_shop;
     for (i = 0;i < top_shop;i++)
     {
@@ -307,11 +311,13 @@ int delete_room(room_rnum rnum)
           SHOP_ROOM(i, j) = world_vnum[0]; /* set to the void */
       }
     }
-  } while (0);
-  
-  if (room) {
-  world_vnum[room->number] = NULL;
-  free(room);
+  }
+  while (0);
+
+  if (room)
+  {
+    world_vnum[room->number] = NULL;
+    free(room);
   }
   /*
    * Now we actually move the rooms down.
@@ -401,7 +407,7 @@ int save_rooms(zone_rnum rzone)
        * Save the numeric and string section of the file.
        */
 
-      fprintf(sf, 	
+      fprintf(sf,
               "#%d\n"
               "%s%c\n"
               "%s%c\n"
@@ -455,7 +461,7 @@ int save_rooms(zone_rnum rzone)
            * Now write the exit to the file.
            */
           fprintf(sf,
-	  	  "D%d\n"
+                  "D%d\n"
                   "%s~\n"
                   "%s~\n"
                   "%d %d %d\n", j, buf, buf1, dflag,
@@ -509,11 +515,12 @@ int save_rooms(zone_rnum rzone)
                   "%s~\n", ex_desc->keyword, buf);
         }
       }
-      if (room->mine.num != -1) {
-      fprintf(sf,	"M\n"
-                  "%d\n"
-                  "%d\n"
-		  "%d\n", room->mine.num, room->mine.dif,room->mine.tool);
+      if (room->mine.num != -1)
+      {
+        fprintf(sf,	"M\n"
+                "%d\n"
+                "%d\n"
+                "%d\n", room->mine.num, room->mine.dif,room->mine.tool);
       }
 
       fprintf(sf, "S\n");
@@ -637,31 +644,35 @@ int free_room_strings(struct room_data *room)
   int i;
 
   /* Free descriptions. */
-  if (room->name) {
-  free(room->name);
-  room->name = NULL;
+  if (room->name)
+  {
+    free(room->name);
+    room->name = NULL;
   }
-  if (room->description) {
-  free_string(&room->description);
+  if (room->description)
+  {
+    free_string(&room->description);
   }
-  if (room->smell) {
-  free_string(&room->smell);
+  if (room->smell)
+  {
+    free_string(&room->smell);
   }
-  if (room->listen) {
-  free_string(&room->listen);
+  if (room->listen)
+  {
+    free_string(&room->listen);
   }
   if (room->ex_description)
     free_ex_descriptions(room->ex_description);
-    room->ex_description = NULL;
+  room->ex_description = NULL;
   if (room->look_under_description)
     free_ex_descriptions(room->look_under_description);
-    room->look_under_description = NULL;
+  room->look_under_description = NULL;
   if (room->look_above_description)
     free_ex_descriptions(room->look_above_description);
-    room->look_above_description = NULL;
+  room->look_above_description = NULL;
   if (room->look_behind_description)
     free_ex_descriptions(room->look_behind_description);
-    room->look_behind_description = NULL;
+  room->look_behind_description = NULL;
 
   /* Free exits. */
   for (i = 0; i < NUM_OF_DIRS; i++)

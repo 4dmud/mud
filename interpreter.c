@@ -1013,6 +1013,9 @@ void command_interpreter(struct char_data *ch, char *argument)
   int cmd, length;
   char *line;
   char arg[MAX_INPUT_LENGTH];
+if ( !argument || !*argument || !ch)
+return;
+
   if (argument && *argument)
     strcpy(last_command, argument);
   else
@@ -2681,7 +2684,7 @@ void nanny(struct descriptor_data *d, char *arg)
     break;
   case CON_RMOTD:		/* read CR after printing motd   */
 #ifdef HAVE_ZLIB_H
-    if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
+    if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS) && !d->mxp)
     {
       d->comp->state = 1;	/* waiting for response to offer */
 send_compress_offer(d);

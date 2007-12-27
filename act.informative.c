@@ -241,7 +241,7 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
         else
           new_send_to_char(ch, "You are mounted upon %s.", obj->short_description);
       }
-      
+
 
     }
 
@@ -355,7 +355,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
 
     if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (j != i))
       continue;
-      
+
 
     for (j = i; j; j = j->next_content)
       if (j->item_number == NOTHING || IS_SET_AR(GET_OBJ_EXTRA(j), ITEM_UNIQUE_SAVE))
@@ -1809,6 +1809,8 @@ ACMD(do_examine)
 
   if (tmp_object)
   {
+int has_identifier(struct obj_data *obj, long id);
+void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
     new_send_to_char(ch, "You examine %s:\r\n", tmp_object->short_description);
 
     examine_on = FALSE;
@@ -1824,6 +1826,11 @@ ACMD(do_examine)
       send_to_char("When you look inside, you see:\r\n", ch);
       look_in_obj(ch, arg);
     }
+
+if (has_identifier(tmp_object, GET_ID(ch))) {
+new_send_to_char(ch, "You remember the time you identified %s\r\n", tmp_object->short_description);
+identify_object(ch, tmp_object);
+}
   }
   else if (tmp_char)
   {
@@ -2111,7 +2118,7 @@ ACMD(do_score)
   int len, wep_num = 0;
   float staff = 0.0;
   float shortmulti = 1.0;
-//  float damspeed = (DAM_SPEED_MULTI(ch));
+  //  float damspeed = (DAM_SPEED_MULTI(ch));
   float blocking = 0.0;
 
   gld = goldy;
@@ -2256,7 +2263,7 @@ ACMD(do_score)
     primin *= race_dam_mod(GET_RACE(ch), TRUE);
     primax *= race_dam_mod(GET_RACE(ch), TRUE);
     primin += (primin * ( (REMORTS(ch) * 0.005)));
-    primax += (primax * ( (REMORTS(ch) * 0.005)));    
+    primax += (primax * ( (REMORTS(ch) * 0.005)));
     /*
     primin *= damspeed;
     primax *= damspeed;
@@ -2821,7 +2828,7 @@ void display_help(struct char_data *ch, unsigned int i)
                    "----------------------------------------------------------------------------\r\n"
                    "%s\r\n"
                    "----------------------------------------------------------------------------\r\n"
-                   "%s",
+                   "%s\r\n",
                    help_table[i].keywords, help_table[i].entry);
 }
 
@@ -2834,18 +2841,31 @@ void display_help_list(struct descriptor_data *d, char *keywords)
   strcpy(buf, "  Help files simmilar\r\n---------------------------------------\r\n");
   len = strlen(buf);
   for (i=0;i<=top_of_helpt;i++)
-    if (isname_full(keywords, help_table[i].keywords))
+  {
+    if (is_number(keywords) && i == atoi(keywords))
     {
       snprintf(buf1, sizeof(buf1), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords);
       strlcat(buf, buf1, sizeof(buf));
       cnt++;
     }
+    else if (isname_full(keywords, help_table[i].keywords))
+    {
+      snprintf(buf1, sizeof(buf1), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords);
+      strlcat(buf, buf1, sizeof(buf));
+      cnt++;
+    }
+  }
 
   if (cnt == 1)
   {
     for (i=0;i<=top_of_helpt;i++)
     {
-      if (isname_full(keywords, help_table[i].keywords))
+      if (is_number(keywords) && i == atoi(keywords))
+      {
+        display_help(d->character, i);
+        return;
+      }
+      else if (isname_full(keywords, help_table[i].keywords))
       {
         display_help(d->character, i);
         return;
@@ -2902,7 +2922,7 @@ ACMD(do_help)
     if (bot > top)
     {
       //TODO: add in random examples
-      new_send_to_char(ch, "There is no help on that word.\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
+      new_send_to_char(ch, "There is no help on that (yet).\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
       log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(ch), argument);
       return;
     }
@@ -3465,7 +3485,7 @@ ACMD(do_who)
 
     if (PLR_FLAGGED(wch, PLR_NEWBIE_HLPR))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sHelper%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
-if (PLR_FLAGGED(wch, PLR_RP_LEADER))
+    if (PLR_FLAGGED(wch, PLR_RP_LEADER))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sRPL%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
     if (GET_INVIS_LEV(wch))
       len += snprintf(buf + len, sizeof(buf) - len, " (i%d)", GET_INVIS_LEV(wch));

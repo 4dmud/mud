@@ -130,7 +130,7 @@ struct meta_host_data *host_list = NULL;
 int message_type = NOTHING;
 void string_format(BYTE * cmd, LWORD space);
 struct descriptor_data *descriptor_list = NULL;	/* master desc list */
-struct txt_block *bufpool = 0;	/* pool of large output buffers */
+struct txt_block *bufpool = NULL;	/* pool of large output buffers */
 int buf_largecount = 0;		/* # of large buffers which exist */
 int buf_overflows = 0;		/* # of overflows of output */
 int buf_switches = 0;		/* # of switches from small to large buf */
@@ -732,7 +732,7 @@ void copyover_recover()
 
       write_to_descriptor (desc, "\n\rColor floods back into the world.\r\n", NULL);
 #ifdef HAVE_ZLIB_H
-      if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
+      if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS) && !d->mxp)
       {
         d->comp->state = 1; /* indicates waiting for comp negotiation */
         send_compress_offer(d);
@@ -1261,12 +1261,12 @@ void game_loop(socket_t mother_desc)
       missed_pulses = 1;
     }
 
-    /* If we missed more than 30 seconds worth of pulses, just do 30 secs */
-    if (missed_pulses > (30 RL_SEC))
+    /* If we missed more than 5 seconds worth of pulses, just do 5 secs */
+    if (missed_pulses > (10 RL_SEC))
     {
       log("SYSERR: Missed %d seconds worth of pulses.",
           missed_pulses / PASSES_PER_SEC);
-      missed_pulses = 30 RL_SEC;
+      missed_pulses = 5 RL_SEC;
     }
 
     /* Now execute the  functions */
@@ -2013,7 +2013,7 @@ void free_bufpool_recu(struct txt_block *k)
   if (!k)
     return;
 
-  if (k->next)
+  if (k->next && k->next != k)
     free_bufpool_recu(k->next);
 
   if (k->text)
@@ -2483,7 +2483,7 @@ int process_output(struct descriptor_data *t)
   if (strlen(t->output)-1 > MAX_SOCK_BUF)
     log("output bigger then sock buf");
   /* now, append the 'real' output */
-  strlcat(i, t->output, sizeof(i));	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
+  strcpy(osb, t->output);	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
 
 
   /* if we're in the overflow state, notify the user */
@@ -2586,98 +2586,6 @@ int process_output(struct descriptor_data *t)
   return (result);
 }
 
-#if 0
-/*
- * Send all of the output that we've accumulated for a player out to
- * the player's descriptor.
-// * FIXME - This will be rewritten before 3.1, this code is dumb.
- */
-int process_output(struct descriptor_data *t)
-{
-  char i[MAX_SOCK_BUF];
-  int written = 0, offset, result;
-
-  int clvl = 0;
-  if (t->character)
-    clvl = IRANGE(0, COLOR_LEV(t->character), 3);
-
-  /* we may need this \r\n for later -- see below */
-  strcpy(i, "\r\n");
-
-  /* now, append the 'real' output */
-  strcpy(i + 2, t->output);
-
-  /* if we're in the overflow state, notify the user */
-  if (t->bufptr < 0)
-  {
-    strcat(i, "**OVERFLOW**\r\n");
-    STATE(t) = CON_DISCONNECT;	/* disconnect user instead of crashing */
-  }
-
-  /* add the extra CRLF if the person isn't in compact mode */
-  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character)
-      && !PRF_FLAGGED(t->character, PRF_COMPACT))
-    strcat(i + 2, "\r\n");
-
-  /* add a prompt */
-  strncat(i + 2, make_prompt(t), MAX_PROMPT_LENGTH);
-
-  /*
-   * now, send the output.  If this is an 'interruption', use the prepended
-   * CRLF, otherwise send the straight output sans CRLF.
-   */
-  proc_color(i, clvl);
-
-  if (t->has_prompt)		/* && !t->connected) */
-    // result = write_to_descriptor(t->descriptor, i, t->descriptor->comp);
-    offset = 0;
-  else
-    // result = write_to_descriptor(t->descriptor,i, t->descriptor->comp);
-    offset = 2;
-
-  result = write_to_descriptor(t->descriptor, i + offset, t->descriptor->comp);
-  written = result >= 0 ? result : -result;
-
-  /* handle snooping: prepend "% " and send to snooper */
-  if (t->snoop_by)
-  {
-    SEND_TO_Q("%% ", t->snoop_by);
-    SEND_TO_Q(t->output, t->snoop_by);
-    SEND_TO_Q("%%%%", t->snoop_by);
-  }
-  /*
-   * if we were using a large buffer, put the large buffer on the buffer pool
-   * and switch back to the small one
-   */
-  if (t->large_outbuf)
-  {
-    t->large_outbuf->next = bufpool;
-    bufpool = t->large_outbuf;
-    t->large_outbuf = NULL;
-    t->output = t->small_outbuf;
-  }
-  /* reset total bufspace back to that of a small buffer */
-  t->bufspace = SMALL_BUFSIZE - 1;
-  t->bufptr = 0;
-  *(t->output) = '\0';
-
-  /* Error, cut off. */
-  if (result == 0)
-    return (-1);
-
-  /* Normal case, wrote ok. */
-  if (result > 0)
-    return (1);
-
-  /*
-   * We blocked, restore the unwritten output. Known
-   * bug in that the snooping immortal will see it twice
-   * but details ...
-   */
-  write_to_output(i + written + offset, t);
-  return (0);
-}
-#endif
 
 /*
  * perform_socket_write: takes a descriptor, a pointer to text, and a
@@ -5127,6 +5035,28 @@ char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen)
      original buffer given */
   return cmd;
 }
+
+/* turn off mccp */
+void mccp_off(struct descriptor_data *d) {
+#ifdef HAVE_ZLIB_H
+      if (d->comp->state == 2)
+      {
+        d->comp->state = 3; /* Code to use Z_FINISH for deflate */
+      }
+#endif /* HAVE_ZLIB_H */
+      write_to_descriptor (d->descriptor, " ", d->comp);
+      d->comp->state = 0;
+#ifdef HAVE_ZLIB_H
+      if (d->comp->stream)
+      {
+        deflateEnd(d->comp->stream);
+        free(d->comp->stream);
+        free(d->comp->buff_out);
+        free(d->comp->buff_in);
+      }
+#endif /* HAVE_ZLIB_H */
+}
+
 /*
 * Count number of mxp tags need converting
 *    ie. < becomes &lt;
@@ -5169,6 +5099,8 @@ int count_mxp_tags (const int bMXP, const char *txt, int length)
         bInTag = TRUE;
         if (!bMXP)
           count--;     /* not output if not MXP */
+        else
+          count += 4;  /* allow for ESC [1z */
         break;
 
       case MXP_ENDc:   /* shouldn't get this case */
@@ -5251,8 +5183,11 @@ void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn
       {
       case MXP_BEGc:
         bInTag = TRUE;
-        if (bMXP)
+        if (bMXP) {
+	   memcpy (pd, MXPMODE (1), 4);
+           pd += 4;
           *pd++ = '<';
+	}
         break;
 
       case MXP_ENDc:    /* shouldn't get this case */
@@ -5315,8 +5250,9 @@ void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn
 void turn_on_mxp (DESCRIPTOR_DATA *d)
 {
   d->mxp = TRUE;  /* turn it on now */
+  //mccp_off(d);
   write_to_output( d, "%s", start_mxp_str);
- write_to_output( d, "%s", MXPMODE(6) );   // permanent secure mode 
+  write_to_output( d, "%s", MXPMODE(6) );   // permanent secure mode 
 
   write_to_output( d, "%s", MXPTAG("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"   FLAG=RoomExit"));
   write_to_output( d, "%s", MXPTAG("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\"  FLAG=RoomExit"));

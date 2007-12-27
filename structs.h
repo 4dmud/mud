@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.20  2005/09/16 10:20:10  w4dimenscor
+ * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
+ *
  * Revision 1.19  2005/08/28 10:00:54  w4dimenscor
  * added RPL flag, RPL note group
  *
@@ -1274,6 +1277,11 @@ struct race_data
   unsigned long long body_bits;
 };
 
+struct ident_list {
+long id;
+struct ident_list *next;
+};
+
 
 
 /* object-related structures ******************************************/
@@ -1340,6 +1348,7 @@ struct obj_data
   obj_vnum was_vnum;  /* object is child of object proto with that vnum */
   long owner;
   struct travel_point_data *travel_list;
+  struct ident_list *idents;
 };
 /* ======================================================================= */
 
