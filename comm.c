@@ -4852,9 +4852,3 @@ void mccp_off(Descriptor *d)
 #endif /* HAVE_ZLIB_H */
 }
 
-/*
-* Count number of mxp tags need converting
-*    ie. < becomes &lt;
-*        > becomes &gt;
-*        & becomes &amp;
-*/

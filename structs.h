@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.37  2006/06/11 10:10:11  w4dimenscor
+ * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
+ *
  * Revision 1.36  2006/05/30 09:14:20  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -163,6 +166,7 @@ extern int message_type;
 
 class Character;
 class Descriptor;
+class cstring;
 
 /* preamble *************************************************************/
 
@@ -1396,7 +1400,7 @@ struct obj_data {
 struct obj_file_elem {
     obj_vnum item_number;
     sh_int locate;       /* that's the (1+)wear-location (when equipped) or
-                                 (20+)index in obj file (if it's in a container) BK */
+                                         (20+)index in obj file (if it's in a container) BK */
     int value[NUM_OBJ_VAL_POSITIONS];
     int extra_flags[EF_ARRAY_MAX];
     int weight;
@@ -1885,80 +1889,87 @@ struct note_data {
 };
 
 
+#define MAKE_STRING(msg) \
+   (((ostringstream&) (ostringstream() << boolalpha << msg)).str())
 class Character {
 public:
-  int pfilepos;        /* playerfile pos                */
-  mob_rnum nr;         /* Mob's rnum                    */
-  struct room_data * in_room;         /* Location (real room number)   */
-  struct room_data * was_in_room;     /* location for linkdead people  */
-  int wait;            /* wait for how many loops       */
-  
-  struct char_player_data player;     /* Normal data                   */
-  struct char_ability_data real_abils;     /* Abilities without modifiers   */
-  struct char_ability_data aff_abils; /* Abils with spells/stones/etc  */
-  struct char_point_data points; /* Points                        */
-  struct char_special_data char_specials;  /* PC/NPC specials        */
-  struct player_special_data *player_specials;  /* PC specials            */
-  struct mob_special_data mob_specials;    /* NPC specials           */
-  
-  struct combat_skill_data combatskill;
-  
-  struct affected_type *affected;     /* affected by what spells       */
-  struct obj_data *equipment[NUM_WEARS];   /* Equipment array               */
-  
-  struct obj_data *carrying;     /* Head of list                  */
-  Descriptor *desc;  /* NULL for mobiles              */
-  
-  long id;             /* used by DG triggers             */
-  struct trig_proto_list *proto_script;    /* list of default triggers      */
-  struct script_data *script;    /* script info for the object      */
-  struct script_memory *memory;  /* for mob memory triggers         */
-  
-  Character *next_in_room;  /* For room->people - list         */
-  Character *next;     /* For either monster or ppl-list  */
-  Character *next_fighting; /* For fighting list               */
-  
-  struct follow_type *followers; /* List of chars followers       */
-  Character *master;   /* Who is char following?        */
-  long cmd2;           /* These wizcmds aren't saved     */
-  byte internal_flags; /* Flags used internally - not saved */
-  struct event *points_event[4]; /* events for regening H/M/V/S     */
-  struct event *fight_event;     /*events used for fighting/defending */
-  struct event *message_event; /* events used in skill/spell messages*/
-  struct sub_task_obj *task;   /* working on a task? This will look after you!*/
-  int spell_dir;       /*used for casting directional spells */
-  float interact;      /*used for the percentage they land hits and get hit and gain exp in battle */
-  int attack_location;
-  long loader;         /*id of player who linkloaded them */
-  struct sub_list *subs; /*list of subskills available to that person*/
-  struct skillspell_data *skills; /*list of skills and spells available to that person */
-  int msg_run;
-  int on_task;
-  struct note_data *pnote;
-  sh_int concealment;
-  int has_note[NUM_NOTE_TYPES];
-  Character *fuses[TOP_FUSE_LOCATION];
-  Character *fused_to;
-  struct obj_data *hitched;
-  time_t last_move;
-  int sweep_damage;
-  int body;                   /* body positions aquired */
-  byte atk;
-  long pulling;
-  struct travel_point_data *travel_list;
-  
-  size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
-  void send_char_pos(int dam);
+    int pfilepos;        /* playerfile pos                */
+    mob_rnum nr;         /* Mob's rnum                    */
+    struct room_data * in_room;         /* Location (real room number)   */
+    struct room_data * was_in_room;     /* location for linkdead people  */
+    int wait;            /* wait for how many loops       */
 
-  
-  
+    struct char_player_data player;     /* Normal data                   */
+    struct char_ability_data real_abils;     /* Abilities without modifiers   */
+    struct char_ability_data aff_abils; /* Abils with spells/stones/etc  */
+    struct char_point_data points; /* Points                        */
+    struct char_special_data char_specials;  /* PC/NPC specials        */
+    struct player_special_data *player_specials;  /* PC specials            */
+    struct mob_special_data mob_specials;    /* NPC specials           */
+
+    struct combat_skill_data combatskill;
+
+    struct affected_type *affected;     /* affected by what spells       */
+    struct obj_data *equipment[NUM_WEARS];   /* Equipment array               */
+
+    struct obj_data *carrying;     /* Head of list                  */
+    Descriptor *desc;  /* NULL for mobiles              */
+
+    long id;             /* used by DG triggers             */
+    struct trig_proto_list *proto_script;    /* list of default triggers      */
+    struct script_data *script;    /* script info for the object      */
+    struct script_memory *memory;  /* for mob memory triggers         */
+
+    Character *next_in_room;  /* For room->people - list         */
+    Character *next;     /* For either monster or ppl-list  */
+    Character *next_fighting; /* For fighting list               */
+
+    struct follow_type *followers; /* List of chars followers       */
+    Character *master;   /* Who is char following?        */
+    long cmd2;           /* These wizcmds aren't saved     */
+    byte internal_flags; /* Flags used internally - not saved */
+    struct event *points_event[4]; /* events for regening H/M/V/S     */
+    struct event *fight_event;     /*events used for fighting/defending */
+    struct event *message_event; /* events used in skill/spell messages*/
+    struct sub_task_obj *task;   /* working on a task? This will look after you!*/
+    int spell_dir;       /*used for casting directional spells */
+    float interact;      /*used for the percentage they land hits and get hit and gain exp in battle */
+    int attack_location;
+    long loader;         /*id of player who linkloaded them */
+    struct sub_list *subs; /*list of subskills available to that person*/
+    struct skillspell_data *skills; /*list of skills and spells available to that person */
+    int msg_run;
+    int on_task;
+    struct note_data *pnote;
+    sh_int concealment;
+    int has_note[NUM_NOTE_TYPES];
+    Character *fuses[TOP_FUSE_LOCATION];
+    Character *fused_to;
+    struct obj_data *hitched;
+    time_t last_move;
+    int sweep_damage;
+    int body;                   /* body positions aquired */
+    byte atk;
+    long pulling;
+    struct travel_point_data *travel_list;
+    size_t Send(string i);
+    size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
+    void send_char_pos(int dam);
+    template<typename T>
+    Character & operator<< (const T & i)  {
+        if (this != NULL && desc != NULL) {
+stringstream s;
+s << i;
+Send(s.str());
+        }
+        return *this;
+    };
+
 };
 /* ====================================================================== */
 
 
 /* descriptor-related structures ******************************************/
-
-
 struct txt_block {
     char *text;
     int aliased;
@@ -2124,7 +2135,7 @@ struct social_messg {
     int act_nr;
     char *command;       /* holds copy of activating command */
     char *sort_as;       /* holds a copy of a similar command or
-                               * abbreviation to sort by for the parser */
+                                       * abbreviation to sort by for the parser */
     int hide;            /* ? */
     int min_victim_position;  /* Position of victim */
     int min_char_position;    /* Position of char */

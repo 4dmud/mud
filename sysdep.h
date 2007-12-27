@@ -149,6 +149,18 @@
 #include <string>
 #include <sstream>
 
+#include <list>
+
+//#include <map>
+#include <set>
+#include <vector>
+#include <stdexcept>
+#include <fstream>
+#include <iostream>
+#include <ios>
+#include <iterator>
+
+
 #if     (defined (STDC_HEADERS) || defined (__GNU_LIBRARY__))
 #include <stdlib.h>
 

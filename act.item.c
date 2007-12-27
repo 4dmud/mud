@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.43  2006/06/11 10:10:11  w4dimenscor
+ * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
+ *
  * Revision 1.42  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -3278,7 +3281,7 @@ void perform_wear(Character *ch, struct obj_data *obj, int where)
     if ((wep_hands(obj) == 2 || (GET_EQ(ch, WEAR_WIELD) && wep_hands(GET_EQ(ch, WEAR_WIELD)) == 2)) &&
         ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD))))))
     {
-      ch->Send( "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n");
+      *ch << "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n";
       return;
     }
     if (GET_EQ(ch, where) && GET_SKILL(ch, SKILL_DUAL)
@@ -3287,22 +3290,19 @@ void perform_wear(Character *ch, struct obj_data *obj, int where)
     else if (GET_EQ(ch, where) && GET_SKILL(ch, SKILL_DUAL)
              && (GET_EQ(ch, WEAR_SHIELD) ))
     {
-      new_send_to_char
-      (ch, "You can't wield a second weapon while wearing a shield.\r\n");
+      *ch << "You can't wield a second weapon while wearing a shield.\r\n";
       return;
     }
     else if ((GET_EQ(ch, WEAR_WIELD))&& wep_hands(GET_EQ(ch, WEAR_WIELD)))
     {
-      new_send_to_char
-      (ch, "You can't wield a second weapon while wielding a two handed weapon.\r\n");
+      *ch << "You can't wield a second weapon while wielding a two handed weapon.\r\n";
       return;
     }
   }
 
   if ((where == WEAR_SHIELD) && ((GET_EQ(ch, WEAR_WIELD_2))))
   {
-    new_send_to_char
-    (ch, "You can't wear a shield while wielding two weapons.\r\n");
+    *ch << "You can't wear a shield while wielding two weapons.\r\n";
     return;
   }
 
@@ -3318,7 +3318,7 @@ void perform_wear(Character *ch, struct obj_data *obj, int where)
     }
     else
     {
-      ch->Send( "%s", already_wearing[where]);   //mord
+      *ch << already_wearing[where];   //mord
       return;
     }
   }
@@ -3428,14 +3428,14 @@ ACMD(do_wear)
 
   if (!*arg1)
   {
-    ch->Send("Wear what?\r\n");
+    *ch << "Wear what?\r\n";
     return;
   }
   dotmode = find_all_dots(arg1);
 
   if (arg2 && *arg2 && (dotmode != FIND_INDIV))
   {
-    ch->Send("You can't specify the same body location for more than one item!\r\n");
+    *ch << "You can't specify the same body location for more than one item!\r\n";
     return;
   }
   if (dotmode == FIND_ALL)
@@ -3453,13 +3453,13 @@ ACMD(do_wear)
     }
     wearall = 0;
     if (!items_worn)
-      ch->Send("You don't seem to have anything wearable.\r\n");
+      *ch << "You don't seem to have anything wearable.\r\n";
   }
   else if (dotmode == FIND_ALLDOT)
   {
     if (!*arg1)
     {
-      ch->Send("Wear all of what?\r\n");
+      *ch << "Wear all of what?\r\n";
       return;
     }
     if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
@@ -4545,29 +4545,29 @@ ACMD(do_skin)
 
   if (!*argument)
   {
-    send_to_char("What do you want to skin?\r\n", ch);
+    *ch << "What do you want to skin?\r\n";
     return;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, argument, NULL, IN_ROOM(ch)->contents)))
   {
-    ch->Send( "There is nothing like that here. Try again.\r\n");
+    *ch << "There is nothing like that here. Try again.\r\n";
     return;
   }
 
   if (!IS_OBJ_STAT(obj, ITEM_NPC_CORPSE))
   {
-    ch->Send( "The skin from that would fall apart too fast.\r\n");
+    *ch << "The skin from that would fall apart too fast.\r\n";
     return;
   }
   if (use_stamina( ch, 50) < 0)
   {
-    ch->Send( "You are far too exausted!");
+    *ch << "You are far too exausted!";
     return;
   }
   if (obj->skin <= 0)
   {
-    ch->Send( "You don't seem to be able to remove the skin from the corpse.\r\n");
+    *ch << "You don't seem to be able to remove the skin from the corpse.\r\n";
     return;
   }
 
@@ -4575,13 +4575,13 @@ ACMD(do_skin)
   /* we've got an obj that is a mob corpse and can be skinned */
   if ((skin = read_object(obj->skin, VIRTUAL)) != NULL)
   {
-    ch->Send( "You skillfully slice the skin from the corpse and pick it up.\r\n");
+    *ch << "You skillfully slice the skin from the corpse and pick it up.\r\n";
     act("$n skillfully slices the skin from from the corpse and picks it up.\r\n", FALSE, ch, 0, 0, TO_ROOM);
     obj_to_char(skin, ch);
     extract_obj(obj);
   }
   else
-    ch->Send( "Your hands turn numb and you fumble.\r\n");
+    *ch << "Your hands turn numb and you fumble.\r\n";
 }
 
 ACMD(do_fuel)

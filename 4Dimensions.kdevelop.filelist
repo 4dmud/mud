@@ -201,3 +201,4 @@ descriptor.h
 linkedlist.cpp
 linkedlist.h
 ptrlist.cpp
+strutil.cpp

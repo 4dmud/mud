@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.28  2006/06/11 10:10:11  w4dimenscor
+ * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
+ *
  * Revision 1.27  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -567,15 +570,15 @@ C_FUNC(allow_follow)
   Character *tch = find_char(d->character->loader);
   if (!tch)
   {
-    new_send_to_char(d->character, "%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
+    d->Output("%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
     return;
   }
   if ('Y' == toupper(*arg))
     perform_group(d->character, tch);
   else
   {
-    new_send_to_char(d->character,"You disallow %s to join your group.\r\n",get_name_by_id(d->character->loader));
-    new_send_to_char(tch,"%s disallows you to join %s group.\r\n",GET_NAME(d->character), HSHR(d->character));
+    d->Output("You disallow %s to join your group.\r\n", get_name_by_id(d->character->loader));
+    *tch << GET_NAME(d->character) << " disallows you to join " << HSHR(d->character) << " group.\r\n";
   }
   d->character->loader = -1;
 }
@@ -698,14 +701,12 @@ ACMD(do_group)
         found += perform_group(ch, f->follower);
     }
     if (!found)
-      send_to_char
-      ("Everyone following you is already in your group.\r\n",
-       ch);
+      *ch << "Everyone following you is already in your group.\r\n";
     return;
   }
 
   if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
-    ch->Send( "%s", CONFIG_NOPERSON);
+    *ch << CONFIG_NOPERSON;
   else if ((vict->master != ch) && (vict != ch))
     act("$N must follow you to enter your group.", FALSE, ch, 0, vict,
         TO_CHAR);
@@ -744,7 +745,7 @@ ACMD(do_ungroup)
   {
     if (ch->master || !(AFF_FLAGGED(ch, AFF_GROUP)))
     {
-      send_to_char("But you lead no group!\r\n", ch);
+      *ch << "But you lead no group!\r\n";
       return;
     }
     for (f = ch->followers; f; f = next_fol)
@@ -753,30 +754,30 @@ ACMD(do_ungroup)
       if (AFF_FLAGGED(f->follower, AFF_GROUP))
       {
         REMOVE_BIT_AR(AFF_FLAGS(f->follower), AFF_GROUP);
-        new_send_to_char( f->follower,"%s has disbanded the group.\r\n", GET_NAME(ch));
+        *f->follower << GET_NAME(ch) << " has disbanded the group.\r\n";
         if (!AFF_FLAGGED(f->follower, AFF_CHARM))
           stop_follower(f->follower);
       }
     }
 
     REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_GROUP);
-    send_to_char("You disband the group.\r\n", ch);
+    *ch << "You disband the group.\r\n";
     return;
   }
   if (!(tch = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
   {
-    send_to_char("There is no such person!\r\n", ch);
+    *ch << "There is no such person!\r\n";
     return;
   }
   if (tch->master != ch)
   {
-    send_to_char("That person is not following you!\r\n", ch);
+    *ch << "That person is not following you!\r\n";
     return;
   }
 
   if (!AFF_FLAGGED(tch, AFF_GROUP))
   {
-    send_to_char("That person isn't in your group.\r\n", ch);
+    *ch << "That person isn't in your group.\r\n";
     return;
   }
 
@@ -829,7 +830,7 @@ ACMD(do_report)
     if (k != ch)*/
 
   act(buf, FALSE, ch, 0, 0, TO_ROOM );
-  send_to_char("You report to the room.\r\n", ch);
+  *ch << "You report to the room.\r\n";
 }
 
 
@@ -854,14 +855,12 @@ ACMD(do_split)
     amount = atol(buf);
     if (amount <= 0)
     {
-      send_to_char("Sorry, you can't do that.\r\n", ch);
+      *ch << "Sorry, you can't do that.\r\n";
       return;
     }
     if (amount > char_gold(ch, 0, GOLD_HAND))
     {
-      send_to_char
-      ("You don't seem to have that much gold to split.\r\n",
-       ch);
+      *ch << "You don't seem to have that much gold to split.\r\n";
       return;
     }
     k = (ch->master ? ch->master : ch);
@@ -884,8 +883,7 @@ ACMD(do_split)
     }
     else
     {
-      send_to_char("With whom do you wish to share your gold?\r\n",
-                   ch);
+      *ch << "With whom do you wish to share your gold?\r\n";
       return;
     }
 
@@ -904,7 +902,7 @@ ACMD(do_split)
         && !(IS_NPC(k)) && k != ch)
     {
       char_gold(k, share, GOLD_HAND);
-      send_to_char(buf, k);
+      *k << buf;
     }
     for (f = k->followers; f; f = f->next)
     {
@@ -914,29 +912,23 @@ ACMD(do_split)
           f->follower != ch)
       {
         char_gold(f->follower, share, GOLD_HAND);
-        send_to_char(buf, f->follower);
+        *f->follower << buf;
       }
     }
     if (num)
     {
-      ch->Send(
-                       "You split %lld coins among %lld members -- %lld coins each.\r\n",
-                       amount, num, share);
+      *ch << "You split " << amount << " coins among " << num << " members -- " << share << " coins each.\r\n";
       if (rest)
       {
-        ch->Send(
-                         "%lld coin%s %s not splitable, so you keep "
-                         "the money.\r\n", rest,
-                         (rest == 1) ? "" : "s",
-                         (rest == 1) ? "was" : "were");
+        ch->Send("%lld coin%s%s not splitable, so you keep the money.\r\n", rest,(rest == 1) ? "" : "s", (rest == 1) ? " was" : " were");
+        
         char_gold(ch, rest, GOLD_HAND);
       }
     }
   }
   else
   {
-    ch->Send(
-                     "How many coins do you wish to split with your group?\r\n");
+    *ch << "How many coins do you wish to split with your group?\r\n";
     return;
   }
 
@@ -955,7 +947,7 @@ ACMD(do_use)
   half_chop(argument, arg, buf);
   if (!*arg)
   {
-    ch->Send( "What do you want to %s?\r\n", CMD_NAME);
+    *ch << "What do you want to " << CMD_NAME << "?\r\n";
     return;
   }
   mag_item = GET_EQ(ch, WEAR_HOLD);
@@ -970,13 +962,12 @@ ACMD(do_use)
           (mag_item =
              get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
       {
-        ch->Send( "You don't seem to have %s %s.\r\n", AN(arg),arg);
+        *ch << "You don't seem to have " << AN(arg) << arg << "\r\n";
         return;
       }
       break;
     case SCMD_USE:
-      ch->Send( "You don't seem to be holding %s %s.\r\n",
-                       AN(arg), arg);
+      *ch << "You don't seem to be holding " << AN(arg) << arg << "\r\n";
       return;
     default:
       log("SYSERR: Unknown subcmd %d passed to do_use.", subcmd);
@@ -991,14 +982,14 @@ ACMD(do_use)
         GET_OBJ_TYPE(mag_item) != ITEM_ANTIDOTE_2 &&
         GET_OBJ_TYPE(mag_item) != ITEM_ANTIDOTE_3)
     {
-      send_to_char("You can only quaff potions.\r\n", ch);
+      *ch << "You can only quaff potions.\r\n";
       return;
     }
     break;
   case SCMD_RECITE:
     if (GET_OBJ_TYPE(mag_item) != ITEM_SCROLL)
     {
-      send_to_char("You can only recite scrolls.\r\n", ch);
+      *ch << "You can only recite scrolls.\r\n";
       return;
     }
     break;
@@ -1006,8 +997,7 @@ ACMD(do_use)
     if ((GET_OBJ_TYPE(mag_item) != ITEM_WAND) &&
         (GET_OBJ_TYPE(mag_item) != ITEM_STAFF))
     {
-      send_to_char("You can't seem to figure out how to use it.\r\n",
-                   ch);
+      *ch << "You can't seem to figure out how to use it.\r\n";
       return;
     }
     break;
@@ -1033,15 +1023,12 @@ ACMD(do_wimpy)
   {
     if (GET_WIMP_LEV(ch))
     {
-      ch->Send( "Your current wimp level is %d hit points.\r\n",
-                       GET_WIMP_LEV(ch));
+      *ch << "Your current wimp level is " << GET_WIMP_LEV(ch) << " hit points.\r\n";
       return;
     }
     else
     {
-      send_to_char
-      ("At the moment, you're not a wimp.  (sure, sure...)\r\n",
-       ch);
+      *ch << "At the moment, you're not a wimp.  (sure, sure...)\r\n";
       return;
     }
   }
@@ -1050,16 +1037,11 @@ ACMD(do_wimpy)
     if ((wimp_lev = atoi(arg)) != 0)
     {
       if (wimp_lev < 0)
-        send_to_char
-        ("Heh, heh, heh.. we are jolly funny today, eh?\r\n",
-         ch);
+        *ch << "Heh, heh, heh.. we are jolly funny today, eh?\r\n";
       else if (wimp_lev > GET_MAX_HIT(ch))
-        send_to_char
-        ("That doesn't make much sense, now does it?\r\n", ch);
+        *ch << "That doesn't make much sense, now does it?\r\n";
       else if (wimp_lev > (GET_MAX_HIT(ch) / 2))
-        send_to_char
-        ("You can't set your wimp level above half your hit points.\r\n",
-         ch);
+        *ch << "You can't set your wimp level above half your hit points.\r\n";
       else
       {
         ch->Send(
@@ -1070,16 +1052,12 @@ ACMD(do_wimpy)
     }
     else
     {
-      send_to_char
-      ("Okay, you'll now tough out fights to the bitter end.\r\n",
-       ch);
+      *ch << "Okay, you'll now tough out fights to the bitter end.\r\n";
       GET_WIMP_LEV(ch) = 0;
     }
   }
   else
-    send_to_char
-    ("Specify at how many hit points you want to wimp out at.  (0 to disable)\r\n",
-     ch);
+    *ch << "Specify at how many hit points you want to wimp out at.  (0 to disable)\r\n";
 }
 
 
@@ -1111,7 +1089,7 @@ ACMD(do_gen_write)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters can't have ideas - Go away.\r\n", ch);
+    *ch << "Monsters can't have ideas - Go away.\r\n";
     return;
   }
 
@@ -1120,7 +1098,7 @@ ACMD(do_gen_write)
 
   if (!*argument)
   {
-    send_to_char("That must be a mistake...\r\n", ch);
+    *ch << "That must be a mistake...\r\n";
     return;
   }
 new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_ROOM_VNUM(IN_ROOM(ch)), argument);
@@ -1132,15 +1110,13 @@ new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_RO
   }
   if (fbuf.st_size >= CONFIG_MAX_FILESIZE)
   {
-    send_to_char
-    ("Sorry, the file is full right now.. try again later.\r\n",
-     ch);
+    *ch << "Sorry, the file is full right now.. try again later.\r\n";
     return;
   }
   if (!(fl = fopen(filename, "a")))
   {
     perror("SYSERR: do_gen_write");
-    send_to_char("Could not open the file.  Sorry.\r\n", ch);
+    *ch << "Could not open the file.  Sorry.\r\n";
     return;
   }
   fprintf(fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
@@ -1501,7 +1477,7 @@ ACMD(do_gen_tog)
 #else
   case SCMD_COMPRESS:
   case SCMD_AUTOZLIB:
-    send_to_char("Compression not supported.\r\n", ch);
+    *ch << "Compression not supported.\r\n";
     return;
 #endif
   case SCMD_NOOOC:
@@ -1587,14 +1563,13 @@ ACMD(do_file)
 
   if (*(fields[l].cmd) == '\n')
   {
-    send_to_char("That is not a valid option!\r\n", ch);
+    *ch << "That is not a valid option!\r\n";
     return;
   }
 
   if (GET_LEVEL(ch) < fields[l].level)
   {
-    send_to_char("You are not godly enough to view that file!\r\n",
-                 ch);
+    *ch << "You are not godly enough to view that file!\r\n";
     return;
   }
 
@@ -1657,7 +1632,7 @@ ACMD(do_sac)
   // at the end of a function, lets get the wrongness out of the way :)
   if (!*arg)
   {
-    send_to_char("OK, but what do you want to sacrifice?\r\n", ch);
+    *ch << "OK, but what do you want to sacrifice?\r\n";
     return;
   }
   // if it's not in the room, we ain't gonna sac it
@@ -1666,14 +1641,13 @@ ACMD(do_sac)
          get_obj_in_list_vis(ch, arg, NULL,
                              IN_ROOM(ch)->contents)))
   {
-    send_to_char("There is nothing like that here. Try again.\r\n",
-                 ch);
+    *ch << "There is nothing like that here. Try again.\r\n";
     return;
   }
   // nifty, got the object in the room, now check its flags
   if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || IS_OBJ_STAT(obj, ITEM_PC_CORPSE))
   {
-    send_to_char("You can't sacrifice that.\r\n", ch);
+    *ch << "You can't sacrifice that.\r\n";
     return;
   }
   // seems as if everything checks out eh? ok now do it
@@ -1956,7 +1930,7 @@ ACMD(do_bury)
   /* display the messages if available */
 
   if (msgs[IN_ROOM(ch)->sector_type][0] != NULL)
-    send_to_char(msgs[IN_ROOM(ch)->sector_type][0], ch);
+    *ch << msgs[IN_ROOM(ch)->sector_type][0];
 
   if (msgs[IN_ROOM(ch)->sector_type][1] != NULL)
     act(msgs[IN_ROOM(ch)->sector_type][1], TRUE, ch, NULL,NULL, TO_ROOM);
@@ -1998,7 +1972,7 @@ ACMD(do_dig_ground)
   /* display the messages if available */
 
   if (msgs[IN_ROOM(ch)->sector_type][0] != NULL)
-    send_to_char(msgs[IN_ROOM(ch)->sector_type][0], ch);
+    *ch << msgs[IN_ROOM(ch)->sector_type][0];
 
   if (msgs[IN_ROOM(ch)->sector_type][1] != NULL)
     act(msgs[IN_ROOM(ch)->sector_type][1], TRUE, ch, NULL,       NULL, TO_ROOM);
@@ -2040,7 +2014,7 @@ ACMD(do_dig_ground)
     obj = obj->next;
   }
   /* if the player didn't find anything */
-  send_to_char("Sorry! You didn't find anything.\r\n", ch);
+  *ch << "Sorry! You didn't find anything.\r\n";
 }
 
 ACMD(do_pageheight)

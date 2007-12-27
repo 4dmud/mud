@@ -112,7 +112,6 @@ void smash_tilde(char *str)
  */
 void string_write(Descriptor *d, char **writeto, size_t len, long mailto, void *data)
 {
-  lock_desc(d);
   if (d->character && !IS_NPC(d->character))
     SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
 
@@ -123,7 +122,6 @@ void string_write(Descriptor *d, char **writeto, size_t len, long mailto, void *
   d->str = writeto;
   d->max_str = len;
   d->mail_to = mailto;
-  unlock_desc(d);
 }
 
 /*
@@ -154,7 +152,7 @@ void string_add(Descriptor *d, char *str)
   {
     if (strlen(str) + 3 > d->max_str)
     { /* \r\n\0 */
-      new_send_to_char(d->character, "String too long - Truncated.\r\n");
+      d->Output("String too long - Truncated.\r\n");
       strcpy(&str[d->max_str - 3], "\r\n");	/* strcpy: OK (size checked) */
       CREATE(*d->str, char, d->max_str);
       strcpy(*d->str, str);	/* strcpy: OK (size checked) */
@@ -171,7 +169,7 @@ void string_add(Descriptor *d, char *str)
   {
     if (strlen(str) + strlen(*d->str) + 3 > d->max_str)
     { /* \r\n\0 */
-      new_send_to_char(d->character, "String too long.  Last line skipped.\r\n");
+      d->Output("String too long.  Last line skipped.\r\n");
       if (!using_improved_editor)
         action = STRINGADD_SAVE;
       else if (action == STRINGADD_OK)
@@ -463,12 +461,12 @@ ACMD(do_subskillset)
   /* If there is no chars in argument */
   if (!*argument)
   {
-    send_to_char("SubSkill name expected.\r\n", ch);
+    ch->Send("SubSkill name expected.\r\n");
     return;
   }
   if (*argument != '\'')
   {
-    send_to_char("SubSkill must be enclosed in: ''\r\n", ch);
+    ch->Send("SubSkill must be enclosed in: ''\r\n");
     return;
   }
   /* Locate the last quote and lowercase the magic words (if any) */
@@ -478,14 +476,14 @@ ACMD(do_subskillset)
 
   if (argument[qend] != '\'')
   {
-    send_to_char("Skill must be enclosed in: ''\r\n", ch);
+    ch->Send("Skill must be enclosed in: ''\r\n");
     return;
   }
   strcpy(help, (argument + 1));
   help[qend - 1] = '\0';
   if ((skill = sub_number(help)) <= 0)
   {
-    send_to_char("Unrecognized subskill.\r\n", ch);
+    ch->Send("Unrecognized subskill.\r\n");
     return;
   }
   argument += qend + 1;	/* skip to next parameter */
@@ -604,7 +602,6 @@ if (!d) {
 log("Paginate_string passed null descriptor!");
 return;
 }
-  lock_desc(d);
   if (d->character)
   {
     length = PAGEHEIGHT(d->character);
@@ -621,7 +618,6 @@ return;
     str = d->showstr_vector[i] = next_page(str, length, width);
 
   d->showstr_page = 0;
-  unlock_desc(d);
 }
 
 
@@ -677,7 +673,6 @@ void show_string(Descriptor *d, char *input)
   int diff;
 
   any_one_arg(input, buf);
-  lock_desc(d);
   /* Q is for quit. :) */
   if (LOWER(*buf) == 'q')
   {
@@ -690,7 +685,6 @@ void show_string(Descriptor *d, char *input)
       free(d->showstr_head);
       d->showstr_head = NULL;
     }
-    unlock_desc(d);
     return;
   }
   /* R is for refresh, so back up one page internally so we can display
@@ -713,8 +707,7 @@ void show_string(Descriptor *d, char *input)
 
   else if (*buf)
   {
-    unlock_desc(d);
-    new_send_to_char(d->character, "Valid commands while paging are RETURN, Q, R, B, or a numeric value.\r\n");
+    d->Output( "Valid commands while paging are RETURN, Q, R, B, or a numeric value.\r\n");
     return;
   }
   /* If we're displaying the last page, just send it to the character, and
@@ -722,7 +715,7 @@ void show_string(Descriptor *d, char *input)
    */
   if (d->showstr_page + 1 >= d->showstr_count)
   {
-    new_send_to_char(d->character, "%s", d->showstr_vector[d->showstr_page]);
+    d->Output( "%s", d->showstr_vector[d->showstr_page]);
     free(d->showstr_vector);
     d->showstr_vector = NULL;
     d->showstr_count = 0;
@@ -754,10 +747,8 @@ void show_string(Descriptor *d, char *input)
     else
       /* Tack \r\n onto the end to fix bug with prompt overwriting last line. */
       strcpy(buffer + diff, "\r\n");	/* strcpy: OK (size checked) */
-    unlock_desc(d);
-    new_send_to_char(d->character, "%s", buffer);
-    lock_desc(d);
+   
+    d->Output("%s", buffer);
     d->showstr_page++;
-    unlock_desc(d);
   }
 }

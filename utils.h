@@ -17,6 +17,7 @@
 
 #define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
 #define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
+// make a string on-the-fly
 
 extern FILE *logfile;
 extern FILE *comfile;

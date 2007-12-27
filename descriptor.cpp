@@ -64,9 +64,9 @@
 #include "constants.h"
 #include "ident.h"
 #include "auction.h"
-#include "col_string.h"
 #include "descriptor.h"
 #include "linkedlist.h"
+
 
 extern struct txt_block *bufpool;  /* pool of large output buffers */
 extern int buf_largecount;       /* # of large buffers which exist */
@@ -94,7 +94,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     //  const int maxSize = 1024 * 64; /* max size 60 KB */
     char *txt;//, *tmp;
     size_t size, len = MAX_INPUT_LENGTH * 3, slen, wraplen;
-//    int size_mxp;
+    //    int size_mxp;
     //   bool overf = FALSE;
     /* if we're in the overflow state already, ignore this new output */
     if (bufspace == 0)
@@ -120,8 +120,8 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
         size = vsnprintf(txt, len, format, args);
     }
 
-stxt = string( txt );
-free( txt );
+    stxt = string( txt );
+    free( txt );
     /* work out how much we need to expand/contract it */
     /*size_mxp = count_mxp_tags(mxp, txt, size);
     if (size_mxp < 0)
@@ -130,7 +130,7 @@ free( txt );
     /* this should safely put all expanded MXP tags into the string */
     stxt = convert_mxp_tags(mxp, stxt);
 
-    
+
 
     /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
     if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
@@ -203,6 +203,8 @@ free( txt );
 #endif
 }
 
+
+
 /* Initialize a descriptor */
 void Descriptor::init_descriptor(int desc) {
     static int last_desc = 0;   /* last descriptor number */
@@ -249,215 +251,219 @@ Descriptor::Descriptor() {
     output.erase();
     /** --- **/
     bad_pws = 0;
-  idle_tics = 0;
-  connected = 0;
-  orig_connected = 0;
-  sub_state = 0;
-  desc_num = 0;
-  login_time = 0;
-  showstr_head = NULL;
-  showstr_vector = NULL;
-  showstr_page = 0;
-  pagebuf[0] = '\0';
-  backstr = NULL;
-  max_str = 0;
-  mail_to = 0;
-  has_prompt = 0;
-  wait = 0;
-  bufptr = 0;
-  bufspace = 0;
-  large_outbuf = NULL;
-  character = NULL;     /* linked to char                       */
-  original = NULL;
-  next = NULL;
-  olc = NULL;   /* OLC info                            */
-  acc = NULL;
-  callback_depth = 0;
-  c_data = NULL;
-  options = 0;
-  comp = NULL;
-  eor = FALSE;
-  mxp = FALSE;
+    idle_tics = 0;
+    connected = 0;
+    orig_connected = 0;
+    sub_state = 0;
+    desc_num = 0;
+    login_time = 0;
+    showstr_head = NULL;
+    showstr_vector = NULL;
+    showstr_page = 0;
+    pagebuf[0] = '\0';
+    backstr = NULL;
+    max_str = 0;
+    mail_to = 0;
+    has_prompt = 0;
+    wait = 0;
+    bufptr = 0;
+    bufspace = 0;
+    large_outbuf = NULL;
+    character = NULL;     /* linked to char                       */
+    original = NULL;
+    next = NULL;
+    olc = NULL;   /* OLC info                            */
+    acc = NULL;
+    callback_depth = 0;
+    c_data = NULL;
+    options = 0;
+    comp = NULL;
+    eor = FALSE;
+    mxp = FALSE;
 
     for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
-      history[cnt] = NULL;
-  
+        history[cnt] = NULL;
+
 }
 
 
 //void Descriptor::close_socket()
-Descriptor::~Descriptor() 
-{
-  Descriptor *temp;
+Descriptor::~Descriptor() {
+    Descriptor *temp;
 
-  REMOVE_FROM_LIST(this, descriptor_list, next);
-  CLOSE_SOCKET(this->descriptor);
-  this->flush_queues();
+    REMOVE_FROM_LIST(this, descriptor_list, next);
+    CLOSE_SOCKET(this->descriptor);
+    this->flush_queues();
 
-  /* Forget snooping */
-  if (this->snooping)
-    this->snooping->snoop_by = NULL;
+    /* Forget snooping */
+    if (this->snooping)
+        this->snooping->snoop_by = NULL;
 
-  if (this->snoop_by)
-  {
-    this->snoop_by->Output("Your victim is no longer among us.\r\n");
-    this->snoop_by->snooping = NULL;
-    this->snoop_by = NULL;
-  }
-
-  if (this->character)
-  {
-    /* If we're switched, this resets the mobile taken. */
-    this->character->desc = NULL;
-
-    /* Plug memory leak, from Eric Green. */
-    if (!IS_NPC(this->character) && PLR_FLAGGED(this->character, PLR_MAILING) && this->str)
-    {
-      if (*(this->str))
-        free(*(this->str));
-      free(this->str);
-      this->str = NULL;
+    if (this->snoop_by) {
+        this->snoop_by->Output("Your victim is no longer among us.\r\n");
+        this->snoop_by->snooping = NULL;
+        this->snoop_by = NULL;
     }
-    else if (this->backstr && !IS_NPC(this->character) && !PLR_FLAGGED(this->character, PLR_WRITING))
-    {
-      free(this->backstr);      /* editing description ... not olc */
-      this->backstr = NULL;
+
+    if (this->character) {
+        /* If we're switched, this resets the mobile taken. */
+        this->character->desc = NULL;
+
+        /* Plug memory leak, from Eric Green. */
+        if (!IS_NPC(this->character) && PLR_FLAGGED(this->character, PLR_MAILING) && this->str) {
+            if (*(this->str))
+                free(*(this->str));
+            free(this->str);
+            this->str = NULL;
+        } else if (this->backstr && !IS_NPC(this->character) && !PLR_FLAGGED(this->character, PLR_WRITING)) {
+            free(this->backstr);      /* editing description ... not olc */
+            this->backstr = NULL;
+        }
+        if (IS_PLAYING(this) || STATE(this) == CON_DISCONNECT) {
+            Character *link_challenged = this->original ? this->original : this->character;
+
+            /* We are guaranteed to have a person. */
+            act("$n has lost $s link.", TRUE, link_challenged, 0, 0, TO_ROOM);
+            //save_char(link_challenged);
+            new_mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, "Closing link to: %s.", GET_NAME(link_challenged));
+        } else {
+            new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(this->character) ? GET_NAME(this->character) : "<null>");
+            free_char(this->character);
+        }
+    } else
+        new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing descriptor without char.");
+
+    /* JE 2/22/95 -- part of my unending quest to make switch stable */
+    if (this->original && this->original->desc)
+        this->original->desc = NULL;
+
+    /* Clear the command history. */
+    if (this->history) {
+        for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
+            if (this->history[cnt])
+                free(this->history[cnt]);
     }
-    if (IS_PLAYING(this) || STATE(this) == CON_DISCONNECT)
-    {
-      Character *link_challenged = this->original ? this->original : this->character;
 
-      /* We are guaranteed to have a person. */
-      act("$n has lost $s link.", TRUE, link_challenged, 0, 0, TO_ROOM);
-      //save_char(link_challenged);
-      new_mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, "Closing link to: %s.", GET_NAME(link_challenged));
+    if (this->showstr_head)
+        free(this->showstr_head);
+    if (this->showstr_count)
+        free(this->showstr_vector);
+
+    /*. Kill any OLC stuff .*/
+    switch (this->connected) {
+    case CON_OEDIT:
+    case CON_REDIT:
+    case CON_ZEDIT:
+    case CON_MEDIT:
+    case CON_SEDIT:
+    case CON_TEDIT:
+    case CON_AEDIT:
+    case CON_TRIGEDIT:
+        cleanup_olc(this, CLEANUP_ALL);
+        break;
+    default:
+        break;
     }
-    else
-    {
-      new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(this->character) ? GET_NAME(this->character) : "<null>");
-      free_char(this->character);
-    }
-  }
-  else
-    new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing descriptor without char.");
 
-  /* JE 2/22/95 -- part of my unending quest to make switch stable */
-  if (this->original && this->original->desc)
-    this->original->desc = NULL;
-
-  /* Clear the command history. */
-  if (this->history)
-  {
-    for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
-      if (this->history[cnt])
-        free(this->history[cnt]);
-  }
-
-  if (this->showstr_head)
-    free(this->showstr_head);
-  if (this->showstr_count)
-    free(this->showstr_vector);
-
-  /*. Kill any OLC stuff .*/
-  switch (this->connected)
-  {
-  case CON_OEDIT:
-  case CON_REDIT:
-  case CON_ZEDIT:
-  case CON_MEDIT:
-  case CON_SEDIT:
-  case CON_TEDIT:
-  case CON_AEDIT:
-  case CON_TRIGEDIT:
-    cleanup_olc(this, CLEANUP_ALL);
-    break;
-  default:
-    break;
-  }
-
-  /* free compression structures */
+    /* free compression structures */
 #ifdef HAVE_ZLIB_H
-  if (this->comp->stream)
-  {
-    deflateEnd(this->comp->stream);
-    free(this->comp->stream);
-    free(this->comp->buff_out);
-    free(this->comp->buff_in);
+    if (this->comp->stream) {
+        deflateEnd(this->comp->stream);
+        free(this->comp->stream);
+        free(this->comp->buff_out);
+        free(this->comp->buff_in);
 
-  }
+    }
 #endif /* HAVE_ZLIB_H */
-  /* d->comp was still created even if there is no zlib, for comp->state) */
-  if (this->comp)
-    free(this->comp);
+    /* d->comp was still created even if there is no zlib, for comp->state) */
+    if (this->comp)
+        free(this->comp);
 }
 
 
 /* Empty the queues before closing connection */
-void Descriptor::flush_queues()
-{
-  if (large_outbuf)
-  {
-    large_outbuf->next = bufpool;
-    bufpool = large_outbuf;
-  }
-  while (input.head)
-  {
-    struct txt_block *tmp = input.head;
-    input.head = input.head->next;
-    free(tmp->text);
-    free(tmp);
-  }
+void Descriptor::flush_queues() {
+    if (large_outbuf) {
+        large_outbuf->next = bufpool;
+        bufpool = large_outbuf;
+    }
+    while (input.head) {
+        struct txt_block *tmp = input.head;
+        input.head = input.head->next;
+        free(tmp->text);
+        free(tmp);
+    }
 }
 
 
-int lock_desc(Descriptor *d)
-{
-  if (!d)
-    return -1;
+int lock_desc(Descriptor *d) {
+    if (!d)
+        return -1;
 
-  if (d->locked)
-    log("Descriptor is being locked when it is already in a locked state.");
+    if (d->locked)
+        log("Descriptor is being locked when it is already in a locked state.");
 
-  d->locked = TRUE;
+    d->locked = TRUE;
 
-  return TRUE;
-}
-
-int unlock_desc(Descriptor *d)
-{
-  if (!d)
-    return -1;
-
-  if (!d->locked)
-    log("Descriptor is being unlocked when it is already in a unlocked state.");
-
-  d->locked = FALSE;
-
-  return TRUE;
-}
-
-
-int is_locked(Descriptor *d)
-{
-  if (!d)
-    return -1;
-
-  if (d->locked)
     return TRUE;
-  else
-    return FALSE;
+}
+
+int unlock_desc(Descriptor *d) {
+    if (!d)
+        return -1;
+
+    if (!d->locked)
+        log("Descriptor is being unlocked when it is already in an unlocked state.");
+
+    d->locked = FALSE;
+
+    return TRUE;
+}
+
+
+int is_locked(Descriptor *d) {
+    if (!d)
+        return -1;
+
+    if (d->locked)
+        return TRUE;
+    else
+        return FALSE;
 }
 
 void delete_descriptor_list_node(Descriptor *d) {
-if (!d)
-return;
+    if (!d)
+        return;
 
-if (d->next)
-delete_descriptor_list_node(d->next);
+    if (d->next)
+        delete_descriptor_list_node(d->next);
 
-delete d;
+    delete d;
 }
 void delete_descriptor_list() {
-delete_descriptor_list_node(descriptor_list);
-descriptor_list = NULL;
+    delete_descriptor_list_node(descriptor_list);
+    descriptor_list = NULL;
 }
+
+
+
+size_t Descriptor::Output(string i) {
+
+    /* this should safely put all expanded MXP tags into the string */
+   stxt = convert_mxp_tags(mxp, i);
+
+    /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+    if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
+        size_t slen = stxt.size();
+        size_t wraplen = (((slen / PAGEWIDTH(character)) * 3) + slen + 3);
+        /* at max you will be adding 3 more characters per line
+         so this is just to make sure you have the room for this function. */
+
+        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
+
+    }
+    output += cstring(stxt).c_str();
+    return output.size();
+}
+
+

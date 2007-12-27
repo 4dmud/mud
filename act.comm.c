@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.37  2006/06/11 10:10:11  w4dimenscor
+ * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
+ *
  * Revision 1.36  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -1699,6 +1702,7 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, "yopu", "you", len);
   ReplaceString(str, "dont", "don't", len);
   ReplaceString(str, "anotyher", "another", len);
+  ReplaceString(str, "liek", "like", len);
   
   return str;
 }
