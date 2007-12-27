@@ -793,7 +793,7 @@ void Crash_crashsave(struct char_data *ch)
 
   if (IS_NPC(ch))
     return;
-      if (!ch->desc)
+  if (!ch->desc)
   {
 
     log("Saving %s eq when they are linkless", GET_NAME(ch));
@@ -805,17 +805,18 @@ void Crash_crashsave(struct char_data *ch)
     //don't save because they might be naked in the menu
     return;
   }
-    if (IS_SAVING(ch)) {
+  if (IS_SAVING(ch))
+  {
     log("Attempt made to crashsave %s's equipment when it is currently being saved!", GET_NAME(ch));
     return;
-    }
-    
-    
+  }
+
+
 
   if (!get_filename(GET_NAME(ch), filename, (save_new_style) ? ASCII_OBJ_FILES : NEW_OBJ_FILES))
     return;
-    
-    IS_SAVING(ch) = TRUE;
+
+  IS_SAVING(ch) = TRUE;
   snprintf(tempname, sizeof(tempname), "%s%s", filename, ".tmp");
   if (!(fp = fopen(tempname, "wb")))
   {
@@ -847,7 +848,7 @@ void Crash_crashsave(struct char_data *ch)
           new_mudlog(NRM, LVL_GOD, TRUE, "unable to remove temp file: %s", tempname);
           log("unable to remove temp file: %s", tempname);
         }
-	IS_SAVING(ch) = FALSE;
+        IS_SAVING(ch) = FALSE;
         return;
       }
       Crash_restore_weight(GET_EQ(ch, j));
@@ -896,10 +897,11 @@ void Crash_rentsave(struct char_data *ch, int cost)
 
   if (IS_NPC(ch))
     return;
-        if (IS_SAVING(ch)) {
+  if (IS_SAVING(ch))
+  {
     log("Attempt made to rentsave %s's equipment when it is currently being saved!", GET_NAME(ch));
     return;
-    }
+  }
 
   if (!ch->desc)
   {
@@ -917,8 +919,8 @@ void Crash_rentsave(struct char_data *ch, int cost)
 
   if (!get_filename(GET_NAME(ch), filename, (save_new_style) ? ASCII_OBJ_FILES : NEW_OBJ_FILES))
     return;
-    /* this should not be made true again since it will be reset when they reenter the game */
-    IS_SAVING(ch) = TRUE;
+  /* this should not be made true again since it will be reset when they reenter the game */
+  IS_SAVING(ch) = TRUE;
   snprintf(tempname, sizeof(tempname), "%s%s", filename, ".tmp");
   if (!(fp = fopen(tempname, "wb")))
   {
@@ -953,7 +955,7 @@ void Crash_rentsave(struct char_data *ch, int cost)
           new_mudlog(NRM, LVL_GOD, TRUE, "unable to remove temp file: %s", tempname);
           log("unable to remove temp file: %s", tempname);
         }
-	IS_SAVING(ch) = FALSE;
+        IS_SAVING(ch) = FALSE;
         return;
       }
       Crash_restore_weight(GET_EQ(ch, j));
@@ -1986,7 +1988,7 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                						   special care */
+                                        						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";

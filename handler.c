@@ -1172,16 +1172,18 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   return (LS_REMOVE ? revert_object(obj) : obj);
 }
 
-void remove_all_normal_affects(struct char_data *ch) {
-struct affected_type *aff = NULL, *anext;
-for (aff = ch->affected;aff;aff=anext) {
-anext = aff->next;
-        if (ch->affected->bitvector == AFF_SILENCED)
-	continue;
-	if (ch->affected->bitvector == AFF_IMMFREEZE)
-	continue;
-          affect_remove(ch, aff);
-	  }
+void remove_all_normal_affects(struct char_data *ch)
+{
+  struct affected_type *aff = NULL, *anext;
+  for (aff = ch->affected;aff;aff=anext)
+  {
+    anext = aff->next;
+    if (ch->affected->bitvector == AFF_SILENCED)
+      continue;
+    if (ch->affected->bitvector == AFF_IMMFREEZE)
+      continue;
+    affect_remove(ch, aff);
+  }
 }
 
 int get_number(char **name)

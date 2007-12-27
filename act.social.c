@@ -97,6 +97,7 @@ if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(
       if (targ)
       {
         act(action->char_obj_found, action->hide, ch, targ, 0, TO_CHAR);
+	if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
         act(action->others_obj_found, action->hide, ch, targ, 0, TO_ROOM);
         return;
       }
@@ -124,13 +125,17 @@ if ((PLR_FLAGGED(ch, PLR_HERO) || PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) || GET_LEVEL(
     if (*part)
     {
       act(afar_act(!HERE(vict, ch), action->char_body_found, buf, sizeof(buf)), 0, ch, (struct obj_data *)part, vict, TO_CHAR | TO_SLEEP);
+      if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
       act(afar_act(!HERE(vict, ch), action->others_body_found, buf, sizeof(buf)), action->hide, ch, (struct obj_data *)part, vict, TO_NOTVICT);
+      if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
       act(afar_act(!HERE(vict, ch), action->vict_body_found, buf, sizeof(buf)), action->hide, ch, (struct obj_data *)part, vict, TO_VICT);
     }
     else
     {
       act(afar_act(!HERE(vict, ch), action->char_found, buf, sizeof(buf)), 0, ch, 0, vict,   TO_CHAR | TO_SLEEP);
+      if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
       act(afar_act(!HERE(vict, ch), action->others_found, buf, sizeof(buf)), action->hide, ch, 0, vict,   TO_NOTVICT);
+      if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
       act(afar_act(!HERE(vict, ch), action->vict_found, buf, sizeof(buf)), action->hide, ch, 0, vict,  TO_VICT);
     }
   }
@@ -184,15 +189,17 @@ ACMD(do_insult)
           }
           break;
         case 1:
+	if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
           act("$n calls your mother a bitch!", FALSE, ch, 0,
               victim, TO_VICT);
           break;
         default:
+if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
           act("$n tells you to get lost!", FALSE, ch, 0, victim,
               TO_VICT);
           break;
         }		/* end switch */
-
+if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
         act("$n insults $N.", TRUE, ch, 0, victim, TO_NOTVICT);
       }
       else

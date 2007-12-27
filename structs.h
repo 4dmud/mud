@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.12  2005/02/25 07:33:47  w4dimenscor
+ * reformatted some code, fixed up coventry to ignore socials
+ *
  * Revision 1.11  2005/02/25 05:02:46  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -1184,7 +1187,8 @@ typedef int shop_rnum;
  */
 typedef unsigned long int bitvector_t;
 
-struct help_category_data {
+struct help_category_data
+{
   char *uri;
   char *brief;
   time_t created;
@@ -1193,7 +1197,7 @@ struct help_category_data {
   int level;
   int approved;
   int last_edited_by;
-  
+
   struct help_index_element *items; /* if this is a category, this this will have children */
   struct help_category_data *next;
 };
@@ -1208,8 +1212,8 @@ struct help_entry_data
   int level;
   int approved;
   int last_edited_by;
-  
-    struct help_category_data *category; /* its perent category */
+
+  struct help_category_data *category; /* its perent category */
   struct help_index_element *next; /* next in list */
 };
 
@@ -1313,7 +1317,7 @@ struct obj_file_elem
 {
   obj_vnum item_number;
   sh_int locate;		/* that's the (1+)wear-location (when equipped) or
-    				   (20+)index in obj file (if it's in a container) BK */
+      				   (20+)index in obj file (if it's in a container) BK */
   int value[NUM_OBJ_VAL_POSITIONS];
   int extra_flags[EF_ARRAY_MAX];
   int weight;
@@ -1363,24 +1367,25 @@ struct room_direction_data
   int nosave;
 };
 struct mine_rooms
-  {
-    room_vnum room;
-    struct mine_rooms *next;
-  };
+{
+  room_vnum room;
+  struct mine_rooms *next;
+};
 struct mine_list
 {
-int size;
-int number;
-struct mine_rooms *rooms;
-struct mine_list *next;
+  int size;
+  int number;
+  struct mine_rooms *rooms;
+  struct mine_list *next;
 };
 
 #define TOOL_SHOVEL 0
 #define TOOL_PICKAXE 1
-struct room_mine_data {
-int num;
-int dif;
-int tool;
+struct room_mine_data
+{
+  int num;
+  int dif;
+  int tool;
 };
 
 /* ================== Memory Structure for room ======================= */
@@ -1723,7 +1728,7 @@ struct player_special_data
   struct kill_data *kills;
   char *email;
   short newbie_status;
-struct help_index_element *help;  
+  struct help_index_element *help;
 
 };
 
@@ -1895,19 +1900,20 @@ struct account_data
   struct account_data *next;
 };
 
-struct compr {
-    int state; /* 0 - off. 1 - waiting for response. 2 - compress2 on */
+struct compr
+{
+  int state; /* 0 - off. 1 - waiting for response. 2 - compress2 on */
 
 #ifdef HAVE_ZLIB_H
-    Bytef *buff_out;
-    int total_out; /* size of input buffer */
-    int size_out; /* size of data in output buffer */
+  Bytef *buff_out;
+  int total_out; /* size of input buffer */
+  int size_out; /* size of data in output buffer */
 
-    Bytef *buff_in;
-    int total_in; /* size of input buffer */
-    int size_in; /* size of data in input buffer */
+  Bytef *buff_in;
+  int total_in; /* size of input buffer */
+  int size_in; /* size of data in input buffer */
 
-    z_streamp stream;
+  z_streamp stream;
 #endif /* HAVE_ZLIB_H */
 };
 
@@ -1952,7 +1958,7 @@ struct descriptor_data
   int callback_depth;		// Call back "psuedo-recursiveness" depth
   void *c_data;		// Storage for the Callback function
   int  options;		 /* descriptor flags			*/
-   struct compr *comp;                /* compression info */
+  struct compr *comp;                /* compression info */
 
   struct sockaddr_in saddr;
   char               host_ip[HOST_LENGTH + 1];
@@ -2104,7 +2110,7 @@ struct social_messg
   int act_nr;
   char *command;		/* holds copy of activating command */
   char *sort_as;		/* holds a copy of a similar command or
-    				 * abbreviation to sort by for the parser */
+      				 * abbreviation to sort by for the parser */
   int hide;			/* ? */
   int min_victim_position;	/* Position of victim */
   int min_char_position;	/* Position of char */

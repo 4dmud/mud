@@ -2472,7 +2472,7 @@ ACMD(do_score)
 
   if (PRF_FLAGGED(ch, PRF_SUMMONABLE))
     new_send_to_char(ch, "You are summonable by other players.\r\n");
-if (PRF_FLAGGED(ch, PRF_GATEABLE))
+  if (PRF_FLAGGED(ch, PRF_GATEABLE))
     new_send_to_char(ch, "You are gateable by other players.\r\n");
   if (AFF_FLAGGED(ch, AFF_PROT_FIRE))
     new_send_to_char(ch, "You are protected against fire.\r\n");
@@ -3401,8 +3401,8 @@ ACMD(do_who)
 
     if ((GET_LEVEL(wch) < LVL_HERO) && PLR_FLAGGED(wch, PLR_HERO))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sHERO%s)", CCYEL(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
-if (affected_by_spell(wch, SPELL_SILENCED) && (GET_LEVEL(ch) > LVL_HERO || PLR_FLAGGED(ch, PLR_HERO)))
-len += snprintf(buf + len, sizeof(buf) - len, " (S)");
+    if (affected_by_spell(wch, SPELL_SILENCED) && (GET_LEVEL(ch) > LVL_HERO || PLR_FLAGGED(ch, PLR_HERO)))
+      len += snprintf(buf + len, sizeof(buf) - len, " (S)");
 
     if (GET_RP_GROUP(wch))
       len += snprintf(buf + len, sizeof(buf) - len, " (%s%s)", rp_group_names[GET_RP_GROUP(wch)], GET_LEVEL(wch) > 50 ? "{cy" : "{c0");
@@ -4586,7 +4586,7 @@ ACMD(do_toggle)
                    "     Aggro Mode: %-3s    "
                    "       PageWrap: %-3s    "
                    "          Brags: %-3s\r\n"
-		   "   Gate Protect: %-3s\r\n",
+                   "   Gate Protect: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4630,7 +4630,7 @@ ACMD(do_toggle)
                    ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG)),
-		   ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE))
+                   ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE))
                   );
 
 }

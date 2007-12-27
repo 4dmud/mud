@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.13  2005/02/25 07:33:47  w4dimenscor
+ * reformatted some code, fixed up coventry to ignore socials
+ *
  * Revision 1.12  2005/02/25 05:02:45  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -629,14 +632,15 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
       long ch_id = GET_ID(ch);
       FIGHTING(ch) = victim;
       GET_POS(ch) = POS_FIGHTING;
-      
 
-      if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0) {
-      if (find_char(ch_id))
-        next_round(ch);
-	else
-	return;
-	}
+
+      if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0)
+      {
+        if (find_char(ch_id))
+          next_round(ch);
+        else
+          return;
+      }
     }
   }
   if (IS_NPC(ch))
@@ -659,11 +663,11 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 void start_fighting_delay(struct char_data *ch, struct char_data *vict)
 {
-CHAR_DATA *victim;
+  CHAR_DATA *victim;
   /*to stop recursion*/
   if (!ch || !vict)
     return;
-    if (DEAD(ch) || DEAD(vict))
+  if (DEAD(ch) || DEAD(vict))
     return;
 victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict : vict;
 
@@ -810,10 +814,10 @@ EVENTFUNC(fight_event)
       {
         if ((tch = find_char(id)) != NULL)
         {
-	if (tch == ch && !DEAD(ch))
-          next_round(ch);
-	  else
-	  return 0;
+          if (tch == ch && !DEAD(ch))
+            next_round(ch);
+          else
+            return 0;
         }
         else return 0;
       }
@@ -1105,7 +1109,7 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
   {
     int v, dist = magic_distance(ch, w_type, GET_SPELL_DIR(ch), vict);
     for (v = 0; v < dist; v++)
-    dam *= 0.5;
+      dam *= 0.5;
   }
 
   /* P v P combat, lower damage */
@@ -1442,18 +1446,20 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   if (RIDDEN_BY(ch) && RIDDEN_BY(ch) == vict)
     dismount_char(vict);
 
-if (affected_by_spell(vict, SPELL_SLEEP)) {
+  if (affected_by_spell(vict, SPELL_SLEEP))
+  {
     affect_from_char(vict, SPELL_SLEEP);
     act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
     act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
-    }
+  }
 
-  if (affected_by_spell(vict, SPELL_SWEET_DREAMS)) {
+  if (affected_by_spell(vict, SPELL_SWEET_DREAMS))
+  {
     affect_from_char(vict, SPELL_SWEET_DREAMS);
     act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
     act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
-    }
-  
+  }
+
   if (!FIGHTING(vict))
     start_fighting_delay(vict, ch);
   if (!FIGHTING(ch))
@@ -4495,8 +4501,8 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
     obj_to_room(corpse, IN_ROOM(ch));
     if (!IS_NPC(ch))
     {
-    add_corpse_to_list(corpse);
-    save_corpses();
+      add_corpse_to_list(corpse);
+      save_corpses();
     }
   }
 }
@@ -4710,7 +4716,7 @@ void perform_group_gain(struct char_data *ch, gold_int base,
     return;
 
   /* Calculate level-difference bonus */
-  share = IRANGE((base * 0.2),base  * (1.0 + ( (GET_LEVEL(victim) - GET_LEVEL(ch))/35.0)), (base  * 3.0));
+  share = IRANGE((base * 0.2),base  * (1.0 + ( (GET_LEVEL(victim) - GET_LEVEL(ch))/35.0)), (base));
 
   share = MAX(1, base);
   if (!PRF_FLAGGED(ch, PRF_BATTLESPAM))
@@ -5305,7 +5311,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                                    				   the grenade */
+                                                                                                                                              				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -5411,9 +5417,10 @@ int can_fight(struct char_data *ch, struct char_data *vict)
     return 0;
   if (PLR_FLAGGED(vict, PLR_DYING) || PLR_FLAGGED(ch, PLR_DYING))
     return 0;
-    if (!IS_NPC(ch) && !ch->desc) {
+  if (!IS_NPC(ch) && !ch->desc)
+  {
     return 0;
-    }
+  }
 
 
 

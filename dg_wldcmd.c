@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/25 05:02:45 $
-*  $Revision: 1.4 $
+*  $Date: 2005/02/25 07:33:47 $
+*  $Revision: 1.5 $
 **************************************************************************/
 
 #include "conf.h"
@@ -25,8 +25,8 @@
 
 
 void die(struct char_data *ch, struct char_data *killer);
- zone_rnum real_zone_by_thing(room_vnum vznum);
- bitvector_t asciiflag_conv(char *flag);
+zone_rnum real_zone_by_thing(room_vnum vznum);
+bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
     void (name)(room_data *room, char *argument, int cmd, int subcmd)
@@ -613,17 +613,18 @@ WCMD(do_wload)
     }
     char_to_room(mob, rnum);
     load_mtrigger(mob);
-        if (SCRIPT(room)) { // it _should_ have, but it might be detached.
-          char buf[MAX_INPUT_LENGTH];
-          sprintf(buf, "%c%ld", UID_CHAR, GET_ID(mob));
-          add_var(&(SCRIPT(room)->global_vars), "lastloaded", buf, 0);
-        }
+    if (SCRIPT(room))
+    { // it _should_ have, but it might be detached.
+      char buf[MAX_INPUT_LENGTH];
+      sprintf(buf, "%c%ld", UID_CHAR, GET_ID(mob));
+      add_var(&(SCRIPT(room)->global_vars), "lastloaded", buf, 0);
+    }
   }
 
 
   else if (is_abbrev(arg1, "obj"))
   {
-  object = read_object(number, VIRTUAL);
+    object = read_object(number, VIRTUAL);
     if (object == NULL)
     {
       wld_log(room, "wload: bad object vnum");

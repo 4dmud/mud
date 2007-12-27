@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.13  2005/02/25 07:33:47  w4dimenscor
+ * reformatted some code, fixed up coventry to ignore socials
+ *
  * Revision 1.12  2005/02/25 05:02:45  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -1188,8 +1191,8 @@ void do_stat_room(struct char_data *ch)
                    zone_table[rm->zone].number,
                    zone_table[rm->zone].name,
                    zone_table[rm->zone].builders);
-		   if (rm->mine.num != -1)
-		   new_send_to_char(ch, "{cy[MINE: %3d LEVEL: %d Tool: %s]{c0\r\n", rm->mine.num, rm->mine.dif, rm->mine.num == -1 ? "None" : rm->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe");
+  if (rm->mine.num != -1)
+    new_send_to_char(ch, "{cy[MINE: %3d LEVEL: %d Tool: %s]{c0\r\n", rm->mine.num, rm->mine.dif, rm->mine.num == -1 ? "None" : rm->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe");
 
   sprintbitarray(rm->room_flags, room_bits, RF_ARRAY_MAX, buf2);
   new_send_to_char(ch, "SpecProc: %s, Flags: %s\r\n",
@@ -2506,7 +2509,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                            				 * or char */
+                                                				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -3570,18 +3573,20 @@ ACMD(do_zreset)
     send_to_char("Invalid zone number.\r\n", ch);
 }
 
-ACMD(do_heroutil) {
-int immfreeze_affect(struct char_data *ch, struct char_data *vict, char *argument);
-int silence_affect(struct char_data *ch, struct char_data *vict, char *argument);
-struct char_data *vict;
+ACMD(do_heroutil)
+{
+  int immfreeze_affect(struct char_data *ch, struct char_data *vict, char *argument);
+  int silence_affect(struct char_data *ch, struct char_data *vict, char *argument);
+  struct char_data *vict;
   char arg[MAX_INPUT_LENGTH];
-  
-if (GET_LEVEL(ch) < LVL_HERO && PLR_FLAGGED(ch, PLR_HERO)) {
-new_send_to_char(ch, "Huh?\r\n");
-return;
-}
+
+  if (GET_LEVEL(ch) < LVL_HERO && PLR_FLAGGED(ch, PLR_HERO))
+  {
+    new_send_to_char(ch, "Huh?\r\n");
+    return;
+  }
   argument = one_argument(argument, arg);
-  
+
   if (!*arg)
     new_send_to_char(ch, "Yes, but for whom?!?\r\n");
   else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
@@ -3595,31 +3600,35 @@ return;
     switch (subcmd)
     {
     case SCMD_FREEZE:
-    if (ch == vict)
+      if (ch == vict)
       {
         new_send_to_char(ch, "Oh, yeah, THAT'S real smart...\r\n");
         return;
       }
-      if (GET_LEVEL(vict) > LVL_HERO) {
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be frozen by %s.", GET_NAME(vict), GET_NAME(ch));
-      new_send_to_char(ch, "Sorry, that attempt was logged. I would say goodbye to your hero.\r\n");
-      return;
+      if (GET_LEVEL(vict) > LVL_HERO)
+      {
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+        new_send_to_char(ch, "Sorry, that attempt was logged. I would say goodbye to your hero.\r\n");
+        return;
       }
       if (PLR_FLAGGED(vict, PLR_FROZEN))
       {
         new_send_to_char(ch,"Your victim is already pretty cold.\r\n");
         return;
       }
-      if (immfreeze_affect(ch, vict, argument)) {
-      SET_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
-      GET_FREEZE_LEV(vict) = GET_LEVEL(ch);
-      new_send_to_char(vict,"A bitter wind suddenly rises and drains every ounce of heat from your body!\r\nYou feel frozen!\r\n");
-      new_send_to_char(ch, "Frozen.\r\n");
-      act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
-      } else {
-      new_send_to_char(ch, "Freeze failed.\r\n");
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+      if (immfreeze_affect(ch, vict, argument))
+      {
+        SET_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
+        GET_FREEZE_LEV(vict) = GET_LEVEL(ch);
+        new_send_to_char(vict,"A bitter wind suddenly rises and drains every ounce of heat from your body!\r\nYou feel frozen!\r\n");
+        new_send_to_char(ch, "Frozen.\r\n");
+        act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+      }
+      else
+      {
+        new_send_to_char(ch, "Freeze failed.\r\n");
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be frozen by %s.", GET_NAME(vict), GET_NAME(ch));
       }
       break;
     case SCMD_THAW:
@@ -3645,37 +3654,41 @@ return;
       act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
       break;
     case SCMD_SILENCE:
-    if (ch == vict)
+      if (ch == vict)
       {
         new_send_to_char(ch, "Oh, yeah, THAT'S real smart...\r\n");
         return;
       }
-      if (GET_LEVEL(vict) > LVL_HERO) {
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be silenced by %s.", GET_NAME(vict), GET_NAME(ch));
-      new_send_to_char(ch, "Sorry, that attempt was logged. I would say goodbye to your hero.\r\n");
-      return;
+      if (GET_LEVEL(vict) > LVL_HERO)
+      {
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be silenced by %s.", GET_NAME(vict), GET_NAME(ch));
+        new_send_to_char(ch, "Sorry, that attempt was logged. I would say goodbye to your hero.\r\n");
+        return;
       }
       if (PLR_FLAGGED(vict, PLR_COVENTRY))
       {
         new_send_to_char(ch,"Your victim is already pretty quiet.\r\n");
         return;
       }
-      if (silence_affect(ch, vict, argument)) {
-      act("A yellow light centers around $n's voicebox - $e has been silenced!", FALSE, vict, 0, 0, TO_ROOM);
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s Silenced by %s.", GET_NAME(vict), GET_NAME(ch));
-      } else {
-      new_send_to_char(ch, "Silence failed.\r\n");
-      new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be silenced by %s.", GET_NAME(vict), GET_NAME(ch));
+      if (silence_affect(ch, vict, argument))
+      {
+        act("A yellow light centers around $n's voicebox - $e has been silenced!", FALSE, vict, 0, 0, TO_ROOM);
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s Silenced by %s.", GET_NAME(vict), GET_NAME(ch));
+      }
+      else
+      {
+        new_send_to_char(ch, "Silence failed.\r\n");
+        new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s attempted to be silenced by %s.", GET_NAME(vict), GET_NAME(ch));
       }
       break;
-    break;
+      break;
     default:
       log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
       break;
     }
     save_char(vict);
-    
-    }
+
+  }
 }
 /*
  *  General fn for wizcommands of the sort: cmd <player>
@@ -3686,7 +3699,7 @@ ACMD(do_wizutil)
   struct char_data *vict;
   long result;
   char arg[MAX_INPUT_LENGTH];
-  
+
 
   argument = one_argument(argument, arg);
 
@@ -3846,7 +3859,7 @@ int silence_affect(struct char_data *ch, struct char_data *vict, char *argument)
                      "SILENCE <player> <time> (Days|Hours)\r\n");
     return 0;
   }
-SET_BIT_AR(PLR_FLAGS(vict), PLR_COVENTRY);
+  SET_BIT_AR(PLR_FLAGS(vict), PLR_COVENTRY);
   /* add the affect */
   af.type = SPELL_SILENCED;
   af.expire = sec_to_time(duration * multi);
@@ -3854,7 +3867,7 @@ SET_BIT_AR(PLR_FLAGS(vict), PLR_COVENTRY);
   af.location = 0;
   af.bitvector = AFF_SILENCED;
 
-new_send_to_char(vict,"You have been silenced - You will be heard again in %s %s\r\n", duration_p, time_size);
+  new_send_to_char(vict,"You have been silenced - You will be heard again in %s %s\r\n", duration_p, time_size);
   affect_to_char(vict, &af);
   return 1;
 }

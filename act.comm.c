@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.9  2005/02/25 07:33:47  w4dimenscor
+ * reformatted some code, fixed up coventry to ignore socials
+ *
  * Revision 1.8  2005/02/05 05:26:17  w4dimenscor
  * Added tsearch command to full text search triggers
  *
@@ -1403,6 +1406,8 @@ ACMD(do_ctell)
         argument++;
       while (*argument == ' ') argument++;
     }
+    
+    c = find_clan_by_id(c);
   }
   else
 
