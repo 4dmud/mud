@@ -492,7 +492,7 @@ void House_listrent(struct char_data *ch, room_vnum vnum)
           sprintf(buf + strlen(buf), " [%5d] (%5dau) %s\r\n",
     	      GET_OBJ_VNUM(obj), GET_OBJ_RENT(obj),
     	      obj->short_description);
-          free_obj(obj);
+          free_obj(obj, FALSE);
         }
     */
     if (!feof(fl))
@@ -502,7 +502,7 @@ void House_listrent(struct char_data *ch, room_vnum vnum)
         new_send_to_char(ch,  "[%5d] (%5dau) %s\r\n",
                          GET_OBJ_VNUM(obj), GET_OBJ_RENT(obj),
                          obj->short_description);
-        free_obj(obj);
+        free_obj(obj, FALSE);
       }
   }
 

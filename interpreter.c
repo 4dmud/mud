@@ -88,7 +88,7 @@ int _parse_name(char *arg, char *name);
 int get_account_num(int num, long acc);
 int has_note(CHAR_DATA *ch, int type);
 void con_character_creation(DESCRIPTOR_DATA *d, char *arg);
-
+struct kill_data *load_killlist(char *name);
 /* local global vars */
 
 int race_val = 0;
@@ -1985,7 +1985,6 @@ int parse_accounts(DESCRIPTOR_DATA *d, char *arg)
   }
   CREATE(member, CHAR_DATA, 1);
   clear_char(member);
-  CREATE(member->player_specials, struct player_special_data, 1);
 
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char(name, member) == -1)
@@ -1993,12 +1992,14 @@ int parse_accounts(DESCRIPTOR_DATA *d, char *arg)
     TEMP_LOAD_CHAR = FALSE;
     write_to_output(d, "\r\n%s can't be read at this time, contact an immortal.\r\n", name);
     account_manage_menu(d);
+    free(member);
     return 0;
   }
   TEMP_LOAD_CHAR = FALSE;
 
   sprintf(real_pass, "%s", GET_PASSWD(member));
   free_char(member);
+  member = NULL;
 
   pass_pass = !strncmp(CRYPT(pass, real_pass), real_pass, MAX_PWD_LENGTH);
 
@@ -2074,6 +2075,8 @@ int enter_player_game(struct descriptor_data *d)
 
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
+  
+  
 
 
   if (PLR_FLAGGED(ch, PLR_INVSTART))
@@ -2110,6 +2113,8 @@ int enter_player_game(struct descriptor_data *d)
   character_list = ch;
   if (GET_LEVEL(ch) == 0)
     load_room = real_room(3081);
+    else
+    GET_KILLS(ch) = load_killlist(GET_NAME(ch));
   char_to_room(ch, load_room);
   make_wholist();
   if (GET_LEVEL(ch) >= LVL_GOD)

@@ -1595,9 +1595,8 @@ void extract_obj(struct obj_data *obj)
     next = NEXT_SITTING(ch);
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
-    } else {
-    break;
-    }
+    } else
+    next = NULL;
   }
   OBJ_SAT_IN_BY(obj) = NULL;
 
@@ -1618,7 +1617,7 @@ void extract_obj(struct obj_data *obj)
   obj->carried_by = NULL;
   obj->next_content = NULL;
 #if 0
-  free_obj(obj);
+  free_obj(obj, TRUE);
   obj = NULL;
 #else
 /** 
@@ -1626,7 +1625,7 @@ void extract_obj(struct obj_data *obj)
     only if can be certain that nothing else points to it
     - mord dec-04
 **/
-  free_obj_delayed(obj);
+  obj_data_to_pool(obj);
 #endif
 }
 

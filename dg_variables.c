@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/02/20 00:20:48 $                                           * 
-*  $Revision: 1.6 $                                                    *
+*  $Date: 2005/02/20 01:18:11 $                                           * 
+*  $Revision: 1.7 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -408,8 +408,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           break;
         }
       }
-      
-      
+
+
       /**
 
         %findobj.<room vnum X>(<object vnum/id/name>)%
@@ -563,7 +563,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
     if (c)
     {
-    if (DEAD(c)) return; //dead - please dont screw anything up!
+      if (DEAD(c)) return; //dead - please dont screw anything up!
       if (text_processed(field, subfield, vd, str, slen)) return;
 
 

@@ -49,7 +49,7 @@ int allowed_pretitle(CHAR_DATA *ch);
 void free_clan_lists();
 void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
-struct kill_data *load_killlist(int id);
+struct kill_data *load_killlist(char *name);
 void free_join_list(struct combine_data *list);
 void add_room_to_mine(room_rnum room);
 
@@ -693,7 +693,7 @@ void free_objects(OBJ_DATA *obj)
     return;
   if (obj->next)
     free_objects(obj->next);
-  free_obj(obj);
+  free_obj(obj, FALSE);
   obj=NULL;
 }
 
@@ -3702,7 +3702,7 @@ struct obj_data *read_object(obj_vnum nr, int type)
     log("Object (%c) %d does not exist in database.", type == VIRTUAL ? 'V' : 'R', nr);
     return (NULL);
   }
-  qic_load(i);
+  qic_load(i); //remove in free obj
 
   CREATE(obj, struct obj_data, 1);
   clear_object(obj);
@@ -4553,7 +4553,7 @@ int load_char(char *name, struct char_data *ch)
       ret_val = store_to_char(name, ch);
       if (ret_val != -1)
       {
-        GET_KILLS(ch) = load_killlist(tp);
+        
         return (player_table[tp].id);
       }
       else
@@ -5277,7 +5277,7 @@ int store_to_char(char *name, struct char_data *ch)
       log( "SYSERR: Unknown tag %s in pfile %s", tag, name);
     }
   }
-  affect_total(ch);
+  
   fclose(fl);
 
 
@@ -5310,23 +5310,24 @@ int store_to_char(char *name, struct char_data *ch)
     GET_COND(ch, THIRST) = -1;
     GET_COND(ch, DRUNK) = -1;
   }
+  affect_total(ch);
   return 1;
 }
 
-struct kill_data *load_killlist(int id)
+struct kill_data *load_killlist(char *name)
 {
   char filename[MAX_INPUT_LENGTH], line[READ_SIZE];
   FILE *fl;
   int t[2];
   long tl[2];
   struct kill_data *temp = NULL, *top = NULL;
-  if (id < 0 || id > top_of_p_table)
+  if (!get_id_by_name(name))
   {
     log("bad index passed to load_killlist");
     return top;
   }
   snprintf(filename, sizeof(filename), "%s/%c/%s%s",
-           PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
+           PLR_PREFIX, *name, name, ".kills");
   if (!(fl = fopen(filename, "r")))
     return top;
   while (get_line(fl, line))
@@ -6104,7 +6105,7 @@ void free_char(struct char_data *ch)
 }
 
 // delayed version of free obj
-void free_obj_delayed(struct obj_data *obj)
+void obj_data_to_pool(struct obj_data *obj)
 {
   struct obj_data *temp;
   for (temp = dead_obj; temp; temp = temp->next)
@@ -6118,7 +6119,7 @@ void free_obj_delayed(struct obj_data *obj)
 }
 
 /* release memory allocated for an obj struct */
-void free_obj(struct obj_data *obj)
+void free_obj(struct obj_data *obj, int extracted)
 {
   //log("Freeing object: %d: %s", GET_OBJ_VNUM(obj), obj->short_description);
   if (GET_OBJ_RNUM(obj) == NOWHERE)
@@ -6142,6 +6143,11 @@ void free_obj(struct obj_data *obj)
     extract_script(obj, OBJ_TRIGGER);
 
   remove_from_lookup_table(GET_ID(obj));
+  if (!extracted) {
+  if (GET_OBJ_RNUM(obj) >= 0)
+  purge_qic(GET_OBJ_RNUM(obj));
+  obj_index[GET_OBJ_RNUM(obj)].number--;
+  }
 
   free(obj);
   obj = NULL;

@@ -257,7 +257,7 @@ void qic_scan_file(char *name, long id)
 			}
 		    }
 		}
-		// free_obj(obj);
+		// free_obj(obj, FALSE);
 	    }
 	}
     }

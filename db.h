@@ -203,8 +203,8 @@ void save_player_index(void);
 
 struct obj_data *create_obj(void);
 void clear_object(struct obj_data *obj);
-void free_obj(struct obj_data *obj);
-void free_obj_delayed(struct obj_data *obj);
+void free_obj(struct obj_data *obj, int extracted);
+void obj_data_to_pool(struct obj_data *obj);
 void free_obj_q(struct obj_data *obj);
 void free_obj_q_delayed(struct obj_data *obj);
 void free_obj_forget(struct obj_data *obj);

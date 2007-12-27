@@ -603,7 +603,6 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
-  int newb = 0;
 
   if (!IS_NPC(ch))
   {

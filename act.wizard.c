@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.11  2005/02/20 01:18:11  w4dimenscor
+ * added extra check to add to lookup table, and cleaned up freeing of characters and objects
+ *
  * Revision 1.10  2005/02/16 13:06:13  w4dimenscor
  * fixed update_award and update_reward to give immortals initial 30 points
  * to hand out. otherwise immortals can't award points without at least being
@@ -4066,7 +4069,7 @@ ACMD(do_show)
     if (store_to_char(value, vict) < 0)
     {
       new_send_to_char(ch,"There is no such player.\r\n");
-      free_char(vict);
+      free(vict);
       TEMP_LOAD_CHAR = FALSE;
       return;
     }

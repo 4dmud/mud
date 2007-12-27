@@ -426,7 +426,7 @@ void Crash_listrent(struct char_data *ch, char *name)
         obj = read_object(nr, VIRTUAL);
         sprintf(buf, "%s[%5d] (%5dau) %-20s\r\n", buf,
                 nr, GET_OBJ_RENT(obj), obj->short_description);
-        free_obj(obj);
+        free_obj(obj, FALSE);
       }
       else
       {	/* its nothing, and a unique item. bleh. partial parse. */

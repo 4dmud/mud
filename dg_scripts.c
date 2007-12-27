@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/16 07:36:25 $
-*  $Revision: 1.8 $
+*  $Date: 2005/02/20 01:18:11 $
+*  $Revision: 1.9 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.9  2005/02/20 01:18:11  w4dimenscor
+ * added extra check to add to lookup table, and cleaned up freeing of characters and objects
+ *
  * Revision 1.8  2005/02/16 07:36:25  w4dimenscor
  * Added math.c and updated code
  *
@@ -3684,10 +3687,15 @@ void add_to_lookup_table(long uid, void *c)
 
   for (;lt->next; lt = lt->next)
   {
-    if (lt->c == c && lt->uid == uid)
+    if (lt->uid == uid)
     {
-      log("Add_to_lookup failed. Already there. (uid = %ld)", uid);
+      log("Add_to_lookup failed. ID - Already there. (uid = %ld)", uid);
       return;
+      if (lt->c == c )
+      {
+        log("Add_to_lookup failed. ID and CHAR Already there. (uid = %ld)", uid);
+        return;
+      }
     }
   }
 

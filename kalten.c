@@ -536,8 +536,9 @@ ACMD(do_find)
     {
       new_send_to_char(ch, "QIC Flag on %s, vnum: %d.\r\n",
                        obj->short_description, GET_OBJ_VNUM(obj));
-      free_obj(obj);
+      
     }
+    if (obj) free_obj(obj, FALSE);
   }
 }
 
