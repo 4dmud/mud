@@ -582,7 +582,7 @@ void affect_to_char(struct char_data *ch, struct affected_type *af)
 
   affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
   affect_total(ch);
-    if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+  if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 }
 
 
@@ -653,13 +653,18 @@ void affect_from_char(struct char_data *ch, int type)
   for (hjp = ch->affected; hjp; hjp = next)
   {
     next = hjp->next;
-    if (hjp->type == type) {
-    if (type == SPELL_IMMFREEZE)
+    if (hjp->type == type)
+    {
+      if (type == SPELL_IMMFREEZE)
       {
-      REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_FROZEN);
+        REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_FROZEN);
+      }
+      if (type == SPELL_SILENCED)
+      {
+        REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_COVENTRY);
       }
       affect_remove(ch, hjp);
-      }
+    }
   }
 }
 
@@ -726,7 +731,7 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
   if (cur != NULL)
     char_from_room(ch);
-    char_from_chair(ch);
+  char_from_chair(ch);
 
   if (cur == IN_ROOM(ch))
     return 0;
@@ -1167,6 +1172,17 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   return (LS_REMOVE ? revert_object(obj) : obj);
 }
 
+void remove_all_normal_affects(struct char_data *ch) {
+struct affected_type *aff = NULL, *anext;
+for (aff = ch->affected;aff;aff=anext) {
+anext = aff->next;
+        if (ch->affected->bitvector == AFF_SILENCED)
+	continue;
+	if (ch->affected->bitvector == AFF_IMMFREEZE)
+	continue;
+          affect_remove(ch, aff);
+	  }
+}
 
 int get_number(char **name)
 {
@@ -1478,24 +1494,26 @@ void extract_obj(struct obj_data *obj)
     log("Null pointer given to extract object.");
     return;
   }
-    for (tobj = dead_obj; tobj; tobj = tobj->next) {
+  for (tobj = dead_obj; tobj; tobj = tobj->next)
+  {
     if (tobj == obj)
     {
       log("Object %s atempted to be added to dead list twice!", obj->short_description);
       return;
     }
-    }
-  if (GET_ID(obj) == 0) {
-  log("extracting object that hasn't been initilised");
+  }
+  if (GET_ID(obj) == 0)
+  {
+    log("extracting object that hasn't been initilised");
   }
   if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE))
   {
 
     save_corpses();
   }
-  if (obj->in_locker) 
- item_from_locker(obj->in_locker, obj);
- 
+  if (obj->in_locker)
+    item_from_locker(obj->in_locker, obj);
+
 
   /* Normal extract_obj code */
   if (obj->worn_by != NULL)
@@ -1590,13 +1608,15 @@ void extract_obj(struct obj_data *obj)
 
   for (ch = OBJ_SAT_IN_BY(obj); ch; ch = next)
   {
-    
-    if (ch) {
-    next = NEXT_SITTING(ch);
-    SITTING(ch) = NULL;
-    NEXT_SITTING(ch) = NULL;
-    } else
-    next = NULL;
+
+    if (ch)
+    {
+      next = NEXT_SITTING(ch);
+      SITTING(ch) = NULL;
+      NEXT_SITTING(ch) = NULL;
+    }
+    else
+      next = NULL;
   }
   OBJ_SAT_IN_BY(obj) = NULL;
 
@@ -1620,11 +1640,11 @@ void extract_obj(struct obj_data *obj)
   free_obj(obj, TRUE);
   obj = NULL;
 #else
-/** 
-    possibly change this and the extract char to reuse the memory 
-    only if can be certain that nothing else points to it
-    - mord dec-04
-**/
+  /**
+  possibly change this and the extract char to reuse the memory
+  only if can be certain that nothing else points to it
+  - mord dec-04
+  **/
   obj_data_to_pool(obj);
 #endif
 }
@@ -1676,8 +1696,10 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
 
     obj_from_room(obj);
 
-  } else if (obj->in_locker) {
-  item_from_locker(obj->in_locker, obj);
+  }
+  else if (obj->in_locker)
+  {
+    item_from_locker(obj->in_locker, obj);
   }
   else if (!obj->in_obj && obj->carried_by)
   {	/* Worn or inventory */
@@ -1809,7 +1831,7 @@ void eq_to_room(CHAR_DATA *ch)
 void death_room(struct char_data *ch)
 {
   struct hunter_data *hunt = NULL, *hnext;
- 
+
 
   if (IS_NPC(ch))
   {
@@ -1819,7 +1841,7 @@ void death_room(struct char_data *ch)
 
   write_to_output(ch->desc, "{cYAs your last breath passes, time rolls back to just before you died\r\n"
                   "and you find yourself transfered to a temple of healing.{c0\r\n");
-alter_hit(ch, GET_HIT(ch) -3);
+  alter_hit(ch, GET_HIT(ch) -3);
 
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);
@@ -1835,18 +1857,18 @@ alter_hit(ch, GET_HIT(ch) -3);
   char_from_chair(ch);
 
   /* cancel point updates */
- /** no need to cancel regen!**/
- /* 
- {
-  int i;
-  for (i = 0; i < 4; i++)
-    if (GET_POINTS_EVENT(ch, i))
-    {
-      event_cancel(GET_POINTS_EVENT(ch, i));
-      GET_POINTS_EVENT(ch, i) = NULL;
-    }
-    }
-    */
+  /** no need to cancel regen!**/
+  /*
+  {
+   int i;
+   for (i = 0; i < 4; i++)
+     if (GET_POINTS_EVENT(ch, i))
+     {
+       event_cancel(GET_POINTS_EVENT(ch, i));
+       GET_POINTS_EVENT(ch, i) = NULL;
+     }
+     }
+     */
   /* cancel message updates */
   if (GET_MESSAGE_EVENT(ch))
   {
@@ -1857,8 +1879,8 @@ alter_hit(ch, GET_HIT(ch) -3);
   /* cancel the task */
   stop_task(ch);
   remove_hunter(ch);
-  
-  
+
+
   /* remove any pending event for/from this character */
   clean_events2(ch);
 
@@ -1892,6 +1914,7 @@ void free_hunter_list(void)
   for (hunt = hunter_list; hunt; hunt = hnext)
   {
     hnext = hunt->next;
+
     remove_hunter(hunt->hunter);
   }
   hunter_list = NULL;
@@ -1984,7 +2007,7 @@ void extract_char_final(struct char_data *ch)
   /*ends fight event*/
   halt_fighting(ch);
   char_from_chair(ch);
-  
+
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);
 
@@ -2001,11 +2024,11 @@ void extract_char_final(struct char_data *ch)
   extract_all_in_list(LOCKER(ch));
   LOCKER(ch) = NULL;
   char_from_room(ch);
-   if (GET_FIGHT_EVENT(ch))
-    {
-      event_cancel(GET_FIGHT_EVENT(ch));
-      GET_FIGHT_EVENT(ch) = NULL;
-    }
+  if (GET_FIGHT_EVENT(ch))
+  {
+    event_cancel(GET_FIGHT_EVENT(ch));
+    GET_FIGHT_EVENT(ch) = NULL;
+  }
   /* cancel point updates */
   for (i = 0; i < 4; i++)
     if (GET_POINTS_EVENT(ch, i))
@@ -2039,7 +2062,7 @@ void extract_char_final(struct char_data *ch)
     forget(hunt->hunter, ch);
     forget(ch, hunt->hunter);
     remove_hunter(hunt->hunter);
-//    HUNTING(hunt->hunter) = NULL;
+    //    HUNTING(hunt->hunter) = NULL;
 
   }
 
@@ -2064,7 +2087,7 @@ void extract_char_final(struct char_data *ch)
   }
 
   /* If there's a descriptor, they're in the menu now. */
-   if (IS_NPC(ch) || !ch->desc)
+  if (IS_NPC(ch) || !ch->desc)
     free_char(ch);
 }
 #endif
@@ -2094,7 +2117,7 @@ void extract_char(struct char_data *ch)
   {
     if (IN_ROOM(ch))
       log("Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM(ch), GET_NAME(ch), GET_ROOM_VNUM(IN_ROOM(ch)));
-      else
+    else
       log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
     return;
   }

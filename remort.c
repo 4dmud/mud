@@ -132,8 +132,7 @@ ACMD(do_remort)
     else
       char_eq[k] = NULL;
   }
-  while (ch->affected)
-    affect_remove(ch, ch->affected);
+      remove_all_normal_affects(ch);
 
   /* lets make am a master of the class ifthey have done t4 already */
   if (current_class_is_tier_num(ch) == 4)    GET_MASTERY(ch, (int) GET_CLASS(ch)) = TRUE;

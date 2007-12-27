@@ -185,10 +185,7 @@ ACMD(do_arena)
     alter_hit(ch, -GET_MAX_HIT(ch));
     alter_mana(ch, -GET_MAX_MANA(ch));
     alter_move(ch, -GET_MAX_MOVE(ch));
-    if (ch->affected)
-      while (ch->affected)
-        if (ch->affected->bitvector != AFF_POISON_4)
-          affect_remove(ch, ch->affected);
+    remove_all_normal_affects(ch);
   }
 }
 
@@ -375,9 +372,7 @@ void find_game_winner()
         alter_hit(i, -GET_MAX_HIT(i));
         alter_mana(i, -GET_MAX_MANA(i));
         alter_move(i, -GET_MAX_MOVE(i));
-        if (i->affected)
-          while (i->affected)
-            affect_remove(i, i->affected);
+        remove_all_normal_affects(i);
         move_char_to(i, real_room(3001));
         look_at_room(i, 0);
         act("$n falls from the sky.", FALSE, i, 0, 0, TO_ROOM);
@@ -443,8 +438,7 @@ void do_end_game()
         alter_hit(i, -GET_MAX_HIT(i));
         alter_mana(i, -GET_MAX_MANA(i));
         alter_move(i, -GET_MAX_MOVE(i));
-        while (i->affected)
-          affect_remove(i, i->affected);
+         remove_all_normal_affects(i);
         move_char_to(i, real_room(1205));
         look_at_room(i, 0);
         act("$n falls from the sky.", FALSE, i, 0, 0, TO_ROOM);
@@ -661,9 +655,7 @@ void arena_kill(struct char_data *ch)
   if (FIGHTING(ch))
     stop_fighting(ch);
 
-  while (ch->affected)
-    affect_remove(ch, ch->affected);
-
+ remove_all_normal_affects(ch);
   if (IN_ROOM(ch)->zone == ARENA_ZONE &&
       ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
   {

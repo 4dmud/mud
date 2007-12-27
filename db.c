@@ -53,6 +53,7 @@ struct kill_data *load_killlist(char *name);
 void free_join_list(struct combine_data *list);
 void add_room_to_mine(room_rnum room);
 
+void free_hunter_list(void);
 void prune_crlf(char *txt);
 int generate_wep_type(char *name);
 int fuzzy_balance(OBJ_DATA *wep);
@@ -696,6 +697,15 @@ void free_objects(OBJ_DATA *obj)
   free_obj(obj, FALSE);
   obj=NULL;
 }
+void free_pending_objects(OBJ_DATA *obj)
+{
+  if (!obj)
+    return;
+  if (obj->next)
+    free_objects(obj->next);
+  free_obj(obj, TRUE);
+  obj=NULL;
+}
 
 void free_characters(CHAR_DATA *ch)
 {
@@ -719,6 +729,8 @@ void free_zone_list(struct zone_list_data *z)
 void destroy_db(void)
 {
   ssize_t cnt, itr;
+  log("Free Hunter List");
+      free_hunter_list();
   log("Freeing the memory of the database.");
   /* Active Mobiles & Players */
   log("Freeing Characters and mobs");
@@ -729,7 +741,7 @@ void destroy_db(void)
   /* Active Objects */
   log("Freeing Objects.");
   free_objects(object_list);
-  free_objects(dead_obj);
+  free_pending_objects(dead_obj);
 
   log("Freeing forests.");
   free_forests(forest);
@@ -5327,7 +5339,7 @@ struct kill_data *load_killlist(char *name)
     return top;
   }
   snprintf(filename, sizeof(filename), "%s/%c/%s%s",
-           PLR_PREFIX, *name, name, ".kills");
+           PLR_PREFIX, LOWER(*name), name, ".kills");
   if (!(fl = fopen(filename, "r")))
     return top;
   while (get_line(fl, line))
@@ -6143,10 +6155,10 @@ void free_obj(struct obj_data *obj, int extracted)
     extract_script(obj, OBJ_TRIGGER);
 
   remove_from_lookup_table(GET_ID(obj));
-  if (!extracted) {
-  if (GET_OBJ_RNUM(obj) >= 0)
+  if (!extracted && GET_OBJ_RNUM(obj) >= 0) {
   purge_qic(GET_OBJ_RNUM(obj));
-  obj_index[GET_OBJ_RNUM(obj)].number--;
+  obj_index[obj->item_number].number--;
+  
   }
 
   free(obj);

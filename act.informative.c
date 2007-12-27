@@ -1327,7 +1327,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
     {
       new_send_to_char(ch, "%s", view_room->description);
       //if (can_fly(ch))
-        //new_send_to_char(ch, "You are flying a few feet up in the air.\r\n");
+      //new_send_to_char(ch, "You are flying a few feet up in the air.\r\n");
     }
 
     new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
@@ -1787,7 +1787,7 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 
 void look_around(CHAR_DATA *ch)
 {
-  
+
   char zonename[MAX_STRING_LENGTH], *zp;
 
   if (IN_ROOM(ch) == NULL)
@@ -2472,7 +2472,8 @@ ACMD(do_score)
 
   if (PRF_FLAGGED(ch, PRF_SUMMONABLE))
     new_send_to_char(ch, "You are summonable by other players.\r\n");
-
+if (PRF_FLAGGED(ch, PRF_GATEABLE))
+    new_send_to_char(ch, "You are gateable by other players.\r\n");
   if (AFF_FLAGGED(ch, AFF_PROT_FIRE))
     new_send_to_char(ch, "You are protected against fire.\r\n");
 
@@ -2839,7 +2840,7 @@ ACMD(do_help)
 
     if (bot > top)
     {
-    //TODO: add in random examples
+      //TODO: add in random examples
       new_send_to_char(ch, "There is no help on that word.\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
       log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(ch), argument);
       return;
@@ -3302,8 +3303,8 @@ ACMD(do_who)
       mb = 1;
       DYN_RESIZE(Mort_buf);
     }
-    
-  
+
+
 
     if (GET_LEVEL(wch) >= LVL_HERO && (GET_SEX(wch) != SEX_FEMALE))
     {
@@ -3400,7 +3401,8 @@ ACMD(do_who)
 
     if ((GET_LEVEL(wch) < LVL_HERO) && PLR_FLAGGED(wch, PLR_HERO))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sHERO%s)", CCYEL(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
-
+if (affected_by_spell(wch, SPELL_SILENCED) && (GET_LEVEL(ch) > LVL_HERO || PLR_FLAGGED(ch, PLR_HERO)))
+len += snprintf(buf + len, sizeof(buf) - len, " (S)");
 
     if (GET_RP_GROUP(wch))
       len += snprintf(buf + len, sizeof(buf) - len, " (%s%s)", rp_group_names[GET_RP_GROUP(wch)], GET_LEVEL(wch) > 50 ? "{cy" : "{c0");
@@ -3430,7 +3432,8 @@ ACMD(do_who)
       len += snprintf(buf + len, sizeof(buf) - len, " (AFK)");
     if (PRF_FLAGGED(wch, PRF_BUSY))
       len += snprintf(buf + len, sizeof(buf) - len, " (BUSY)");
-        if (wch->char_specials.timer > 15 && !GET_INVIS_LEV(wch)) {    
+    if (wch->char_specials.timer > 15 && !GET_INVIS_LEV(wch))
+    {
       len += snprintf(buf + len, sizeof(buf) - len, " (idle)");
     }
 
@@ -3654,7 +3657,7 @@ ACMD(do_users)
                  RACE_ABBR(d->character), CLASS_ABBR(d->character));
     }
     else
-      strcpy(classname, "     -     ");
+      strcpy(classname, "     -      ");
 
     timeptr = asctime(localtime(&d->login_time));
     timeptr += 11;
@@ -4582,7 +4585,8 @@ ACMD(do_toggle)
                    "      PageWidth: %-3d\r\n"
                    "     Aggro Mode: %-3s    "
                    "       PageWrap: %-3s    "
-		   "          Brags: %-3s\r\n",
+                   "          Brags: %-3s\r\n"
+		   "   Gate Protect: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4625,7 +4629,8 @@ ACMD(do_toggle)
                    PAGEWIDTH(ch),
                    ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
-		   ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG))
+                   ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG)),
+		   ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE))
                   );
 
 }
@@ -4793,7 +4798,7 @@ ACMD(do_prereq)
   {
     skill_num = find_skill_num(argument);
     if (skill_num == NOTHING)
-    return;
+      return;
 
 
     sprintf(msg1, "Pre-requisites for %s :-\r\n",
@@ -4957,7 +4962,8 @@ ACMD(do_worth)
 
 }
 
-int frozen_time(struct char_data *ch) {
+int frozen_time(struct char_data *ch)
+{
   struct affected_type *aff;
   if (ch->affected)
   {
@@ -4965,10 +4971,10 @@ int frozen_time(struct char_data *ch) {
     {
       if (aff->type == SPELL_IMMFREEZE)
         return time_to_sec(aff->expire + 1);
-      
-      } 
-      }
-       return -1;
+
+    }
+  }
+  return -1;
 }
 
 ACMD(do_affects)
@@ -4987,14 +4993,14 @@ ACMD(do_affects)
     for (aff = ch->affected; aff; aff = aff->next)
     {
       if (aff->expire == -2)
-        new_send_to_char(ch, "SPL: ({cPinnate{c0) %s%-21s%s ",
+        new_send_to_char(ch, "SPL: (  {cPinnate{c0  ) %s%-21s%s ",
                          CCCYN(ch, C_NRM), skill_name(aff->type),
                          CCNRM(ch, C_NRM));
       else
       {
         if ((minsec = time_to_sec(aff->expire + 1)) <= 0)
           continue;
-        new_send_to_char(ch, "SPL: ({cy%-6d{c0%s)  %s%-21s%s ",
+        new_send_to_char(ch, "SPL: ({cy%-6d{c0 %s)  %s%-21s%s ",
                          (minsec > 60 ? minsec/60 : minsec),
                          (minsec/60 ?   "min"   : "sec" ),
                          CCCYN(ch, C_NRM), skill_name(aff->type), CCNRM(ch, C_NRM));
@@ -5212,9 +5218,10 @@ void do_auto_exits(struct char_data *ch)
     new_send_to_char(ch, "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
 }
 */
-void fill_exit_list(room_rnum list[], struct char_data *ch) {
-int door;
-for (door = 0; door < NUM_OF_DIRS; door++)
+void fill_exit_list(room_rnum list[], struct char_data *ch)
+{
+  int door;
+  for (door = 0; door < NUM_OF_DIRS; door++)
   {
     if (EXIT(ch, door) && EXIT(ch, door)->to_room != NULL &&
         !(EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN)) &&
@@ -5228,7 +5235,7 @@ for (door = 0; door < NUM_OF_DIRS; door++)
 void display_map(struct char_data *ch)
 {
   room_rnum rmv[6];
-  
+
 
   fill_exit_list(rmv, ch);
 
@@ -5248,9 +5255,9 @@ void display_map(struct char_data *ch)
         |[D] |    |
           --[S]--
              |
-	     
-	     **/
-	     
+      
+      **/
+
 
   new_send_to_char(ch,
                    "\r\n{cC     %3s {cc%3s   {c0\r\n",

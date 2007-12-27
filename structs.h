@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.11  2005/02/25 05:02:46  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.10  2005/02/22 15:38:23  w4dimenscor
  * set kill_all_enabled to 1
  *
@@ -439,7 +442,7 @@ extern int message_type;
 #define PRF_BUSY	47	/* Player is busy                             */
 #define PRF_AGGRO	48	/* Player is aggro                            */
 #define PRF_NOBRAG      49
-#define PRF_NOGATE 	50
+#define PRF_GATEABLE 	50
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */
@@ -537,8 +540,9 @@ extern int message_type;
 #define AFF_POLY_BOAR	      86
 #define AFF_POLY_TOAD	      87
 #define AFF_IMMFREEZE	      88
+#define AFF_SILENCED	      89
 
-#define MAX_AFF_APPLY         89
+#define MAX_AFF_APPLY         90
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \

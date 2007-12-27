@@ -387,12 +387,12 @@ ASPELL(spell_gate)
     return;
   }
 
-  if (!PRF_FLAGGED(victim, PRF_SUMMONABLE) &&
+  if (!PRF_FLAGGED(victim, PRF_GATEABLE) &&
       !PLR_FLAGGED(victim, PLR_KILLER))
   {
     new_send_to_char(victim, "%s just tried to gate to you: %s.\r\n"
-                     "%s failed because you have summon protection on.\r\n"
-                     "Type NOSUMMON to allow other players to gate to you.\r\n",
+                     "%s failed because you have gate protection on.\r\n"
+                     "Type NOGATE to allow other players to gate to you.\r\n",
                      GET_NAME(ch), IN_ROOM(victim)->name,
                      HSSH(ch));
 

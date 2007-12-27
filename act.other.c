@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.6  2005/02/25 05:02:45  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.5  2005/02/20 00:20:48  w4dimenscor
  * now extracting chars are removed from chairs, and throttling checks for victim
  *
@@ -120,7 +123,7 @@ ACMD(do_quit)
       SET_BIT_AR(PLR_FLAGS(ch), PLR_LOADROOM);
       GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
     }
-    
+
     if (!GET_INVIS_LEV(ch))
       act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
@@ -145,31 +148,36 @@ ACMD(do_quit)
 
 ACMD(do_ground)
 {
-int landed = FALSE, i;
-struct obj_data *obj;
-if (affected_by_spell(ch, SPELL_FLIGHT)) {
-affect_from_char(ch, SPELL_FLIGHT);
-landed = TRUE;
-} 
+  int landed = FALSE, i;
+  struct obj_data *obj;
+  if (affected_by_spell(ch, SPELL_FLIGHT))
+  {
+    affect_from_char(ch, SPELL_FLIGHT);
+    landed = TRUE;
+  }
 
-for (i = 0; i < NUM_WEARS; i++)
+  for (i = 0; i < NUM_WEARS; i++)
   {
     if (HAS_BODY(ch, i) && (GET_EQ(ch, i)) &&
-        (GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_WINGS)) {
+        (GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_WINGS))
+    {
       obj = unequip_char(ch, i);
       obj_to_char(obj, ch);
       act("$n detaches $p from $s body.", FALSE, ch, obj, NULL, TO_ROOM);
       act("You detach $p from your body.", FALSE, ch, obj, NULL, TO_CHAR);
       landed = TRUE;
-      }
+    }
   }
 
-if (landed == TRUE) {
-act("You find yourself grounded firmly again.", FALSE, ch, NULL, NULL, TO_CHAR);
-act("$n kisses the ground seeming happy to be back on it.", FALSE, ch, NULL, NULL, TO_ROOM);
-} else {
-act("You seem to be on the ground already!", FALSE, ch, NULL, NULL, TO_CHAR);
-}
+  if (landed == TRUE)
+  {
+    act("You find yourself grounded firmly again.", FALSE, ch, NULL, NULL, TO_CHAR);
+    act("$n kisses the ground seeming happy to be back on it.", FALSE, ch, NULL, NULL, TO_ROOM);
+  }
+  else
+  {
+    act("You seem to be on the ground already!", FALSE, ch, NULL, NULL, TO_CHAR);
+  }
 }
 
 ACMD(do_die)
@@ -234,8 +242,7 @@ ACMD(do_save)
 }
 
 void list_rprooms_to_char(struct char_data *ch)
-{
-}
+{}
 void list_kills_to_char(struct char_data *ch)
 {
   char line[MAX_INPUT_LENGTH];
@@ -412,11 +419,12 @@ int perform_group(struct char_data *ch, struct char_data *vict)
 
 C_FUNC(allow_follow)
 {
-struct char_data *tch = find_char(d->character->loader);
-if (!tch) {
-new_send_to_char(d->character, "%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
-return;
-}
+  struct char_data *tch = find_char(d->character->loader);
+  if (!tch)
+  {
+    new_send_to_char(d->character, "%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
+    return;
+  }
   if ('Y' == toupper(*arg))
     perform_group(d->character, tch);
   else
@@ -1054,10 +1062,10 @@ ACMD(do_gen_write)
   }
   fprintf(fl, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
-	  
+
   fclose(fl);
-        new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
-          GET_ROOM_VNUM(IN_ROOM(ch)), argument);
+  new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
+             GET_ROOM_VNUM(IN_ROOM(ch)), argument);
   send_to_char("Okay.  Thanks!\r\n", ch);
 }
 
@@ -1086,7 +1094,7 @@ void parse_afk(struct char_data *ch, char *argument)
   }
   else
   {
-  if (*msg)
+    if (*msg)
       free(*msg);
     *msg = NULL;
     act("$n has come back from AFK.", TRUE, ch, 0, 0, TO_ROOM);
@@ -1120,7 +1128,7 @@ void parse_busy(struct char_data *ch, char *argument)
   }
   else
   {
-  if (*msg)
+    if (*msg)
       free(*msg);
     *msg = NULL;
     act("$n has come back from being BUSY.", TRUE, ch, 0, 0, TO_ROOM);
@@ -1140,7 +1148,8 @@ ACMD(do_gen_tog)
   const char *tog_messages[][2] =
     {
       {"You are now safe from summoning by other players.\r\n",
-       "You may now be summoned by other players.\r\n"},
+       "You may now be summoned by other players.\r\n"
+      },
       {"Nohassle disabled.\r\n",
        "Nohassle enabled.\r\n"},
       {"Brief mode off.\r\n",
@@ -1229,8 +1238,10 @@ ACMD(do_gen_tog)
        "BUSY flag is now on.\r\n"},
       {"Aggro mode disabled.\r\n",
        "Aggro mode enabled.\r\n"},
-       {"Nobrag on.\r\n",
+      {"Nobrag on.\r\n",
        "Nobrag off.\r\n"},
+      {"You are now safe from gating by other players.\r\n",
+       "You may now be gated to by other players.\r\n"}
 
 
 
@@ -1364,6 +1375,9 @@ ACMD(do_gen_tog)
   case SCMD_CLS:
     result = PRF_TOG_CHK(ch, PRF_CLS);
     break;
+  case SCMD_NOGATE:
+    result = PRF_TOG_CHK(ch, PRF_SUMMONABLE);
+    break;
   case SCMD_BUILDWALK:
     if (GET_LEVEL(ch) < LVL_BUILDER)
     {
@@ -1397,9 +1411,9 @@ ACMD(do_gen_tog)
   case SCMD_REPLYLOCK:
     result = PRF_TOG_CHK(ch, PRF_REPLYLOCK);
     break;
-      case SCMD_NOBRAG:
+  case SCMD_NOBRAG:
     result = PRF_TOG_CHK(ch, PRF_NOBRAG);
- break;
+    break;
   default:
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);
     return;
@@ -1430,25 +1444,21 @@ ACMD(do_file)
     char *file;
   }
   fields[] = {
-               {
-                 "none", 55, "Does Nothing"}, {
-                 "bug", 54, BUG_FILE}, {
-                 "typo", 54, TYPO_FILE}, {
-                 "ideas", 55, IDEA_FILE}, {
-                 "xnames", 55, "../lib/misc/xnames"}, {
-                 "levels", 55, "../log/levels"}, {
-                 "rip", 55, "../log/rip"},
-		 {"dt", 55, "../log/dts"},
-		 {"help", 54, "../log/missing-help"},
-		 {"comlog", 54, "../log/comlog"},
-               //{ "players",        55,    "../log/newplayers" },
-               //{ "rentgone",       55,    "../log/rentgone" },
-               {
-                 "errors", 55, "../log/errors"}, {
-                 "godcmds", 55, "../log/godcmds"}, {
-                 "syslog", 55, "../log/syslog"}, {
-                 "crash", 55, "../syslog.CRASH"}, {
-                 "\n", 0, "\n"}
+               {"none", 	55, 	"Does Nothing"		},
+               {"bug", 		54, 	BUG_FILE		},
+               {"typo", 	54, 	TYPO_FILE		},
+               {"ideas", 	55, 	IDEA_FILE		},
+               {"xnames", 	55, 	"../lib/misc/xnames"	},
+               {"levels", 	55, 	"../log/levels"		},
+               {"rip", 		55, 	"../log/rip"		},
+               {"dt", 		55, 	"../log/dts"		},
+               {"help", 	54, 	"../log/missing-help"	},
+               {"comlog", 	54, 	"../log/comlog"		},
+               {"errors", 	55, 	"../log/errors"		},
+               {"godcmds", 	55, 	"../log/godcmds"	},
+               {"syslog", 	55, 	"../log/syslog"		},
+               {"crash", 	55, 	"../syslog.CRASH"	},
+               {"\n", 		0, 	"\n"			}
              };
 
   skip_spaces(&argument);

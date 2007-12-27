@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.4  2005/02/25 05:02:46  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -334,6 +337,7 @@ enum skill_list {
 #define SPELL_FREEZE			208
 #define SPELL_ACID			209
 
+#define SPELL_SILENCED               293
 #define SPELL_IMMFREEZE              294
 #define SPELL_DG_AFFECT              295	/* to make an affect induced \
 * by dg_affect look correct \

@@ -189,6 +189,7 @@ struct alias_data
 #define SCMD_BUSY	43
 #define SCMD_AGGRO	44
 #define SCMD_NOBRAG	45
+#define SCMD_NOGATE     46
 
 /* do_wizutil */
 #define SCMD_REROLL	0
@@ -199,6 +200,8 @@ struct alias_data
 #define SCMD_THAW	5
 #define SCMD_UNAFFECT	6
 #define SCMD_ZDELETE	7
+
+#define SCMD_SILENCE    8
 
 /* do_spec_com */
 #define SCMD_WHISPER	0

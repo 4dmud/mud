@@ -224,7 +224,7 @@ void free_social_messages(void);
 void free_mail_index(void);
 void Free_Invalid_List(void);
 extern struct obj_data *dead_obj;
-void free_objects(OBJ_DATA *obj);
+void free_pending_objects(OBJ_DATA *obj);
 void free_command_list(void);
 //void free_help(struct help_index_element *help);
 
@@ -234,6 +234,7 @@ void extract_pending_chars(void);
 #if 0
 void extract_pending_objects(void);
 #endif
+void free_mine_shafts();
 void clear_free_list(void);
 void reboot_wizlists(void);
 void boot_world(void);
@@ -270,7 +271,6 @@ void Board_clear_all(void);
 int has_note(CHAR_DATA *ch, int type);
 void thefree_social_messages(void);
 void free_ban_list(void);
-void free_hunter_list(void);
 void free_vehicles(void);
 int enter_player_game(struct descriptor_data *d);
 #if RUNNING_IDENT
@@ -568,7 +568,7 @@ int main(int argc, char **argv)
     free_social_messages();     /* act.social.c */
     free_player_index();	/* db.c */
     free_messages();		/* fight.c */
-    free_hunter_list();
+
     clear_free_list();		/* mail.c */
     free_mail_index();          /* mail.c */
     free_text_files();		/* db.c */
@@ -582,6 +582,7 @@ int main(int argc, char **argv)
     free_strings(&config_info, OASIS_CFG); /* oasis_delete.c */
     free_vehicles();
     free_commlist(comlist);
+    free_mine_shafts();
     if (comfile)
       fclose(comfile);
 
@@ -1341,7 +1342,7 @@ void heartbeat(int heart_pulse)
 #if 0
   extract_pending_objects();
 #else
-  free_objects(dead_obj);
+  free_pending_objects(dead_obj);
   dead_obj = NULL;
 #endif
 }

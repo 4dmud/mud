@@ -84,7 +84,7 @@ ASUB(sub_tunneling)
     new_send_to_char(ch, "Sorry, this place cannot be tunneled.\r\n");
     return SUB_UNDEFINED;
   }
-  
+
 
   one_argument(argument, direction);
 
@@ -141,7 +141,7 @@ ASUB(sub_tunneling)
     return SUB_UNDEFINED;
   }
 
-  density = 1;
+  density = 2;
   density += (hard ? 3 + number(1, 3) : 0);
   density += (soft ? 1 + number(1, 2) : 0);
 
@@ -241,100 +241,126 @@ void check_mine_traps(struct char_data *ch)
         end
 */
 
-void add_room_to_mine(room_rnum room) {
-room_vnum vrm;
-if (!room)
-return;
-vrm = GET_ROOM_VNUM(room);
-if (room->mine.num == -1 && (vrm < 54000 || vrm > 54999))
-return;
-if ((vrm >= 54000 || vrm <= 54999) && room->mine.num == -1) {
-if (str_str(room->name, "bridge") || str_str(room->name, "moria") ||
-      str_str(room->name, "abyss" ) || str_str(room->name, "bat"  ) ||
-      str_str(room->name, "heart" ) || str_str(room->name, "stalactite") ||
-      str_str(room->name, "cart"  ) || str_str(room->name, "lake") ||
-      (vrm >= 54831 && vrm <= 54899))
-  {
-    return ;
-  }
-room->mine.num = 0;
-if  (str_str(room->name, "sand") || str_str(room->name, "earth") || str_str(room->name, "soft"))
-room->mine.tool = TOOL_SHOVEL;
-else if (str_str(room->name, "rock") || str_str(room->name, "hard") ||
-               str_str(room->name, "mine") || str_str(room->name, "cave"))
-room->mine.tool = TOOL_PICKAXE;
-else
-room->mine.tool = TOOL_SHOVEL;
-
-if (vrm>=54000 && vrm<=54199) 
-  {
-    room->mine.dif = 0;
-  }
-  else if (vrm>=54200 && vrm<=54399)
-  {
-    room->mine.dif = 1;
-  }
-  else if (vrm>=54400 && vrm<=54599)
-  {
-    room->mine.dif = 2;
-  }
-  else if (vrm>=54600 && vrm<=54799)
-  {
-    room->mine.dif = 3;
-  }
-  else if (vrm>=54800 && vrm<=54899)
-  {
-    room->mine.dif = 4;
-  }
-  else if (vrm>=54900 && vrm<=54999)
-  {
-    room->mine.dif = 5;
-  } 
-
-}
-
-/** add room to mine list along with all others in the same shaft **/
+void add_room_to_mine(room_rnum room)
 {
-struct mine_list *shaft;
-struct mine_rooms *mr;
-for (shaft = mine_shafts; shaft; shaft = shaft->next) {
-if (shaft->number == room->mine.num) {
-shaft->size++;
-CREATE(mr, struct mine_rooms, 1);
-mr->room = vrm;
-mr->next = shaft->rooms;
-shaft->rooms = mr;
-return;
+  room_vnum vrm;
+  if (!room)
+    return;
+  vrm = GET_ROOM_VNUM(room);
+  if (room->mine.num == -1 && (vrm < 54000 || vrm > 54999))
+    return;
+  if ((vrm >= 54000 || vrm <= 54999) && room->mine.num == -1)
+  {
+    if (str_str(room->name, "bridge") || str_str(room->name, "moria") ||
+        str_str(room->name, "abyss" ) || str_str(room->name, "bat"  ) ||
+        str_str(room->name, "heart" ) || str_str(room->name, "stalactite") ||
+        str_str(room->name, "cart"  ) || str_str(room->name, "lake") ||
+        (vrm >= 54831 && vrm <= 54899))
+    {
+      return ;
+    }
+    room->mine.num = 0;
+    if  (str_str(room->name, "sand") || str_str(room->name, "earth") || str_str(room->name, "soft"))
+      room->mine.tool = TOOL_SHOVEL;
+    else if (str_str(room->name, "rock") || str_str(room->name, "hard") ||
+             str_str(room->name, "mine") || str_str(room->name, "cave"))
+      room->mine.tool = TOOL_PICKAXE;
+    else
+      room->mine.tool = TOOL_SHOVEL;
 }
+    if (vrm>=54000 && vrm<=54199)
+    {
+      room->mine.dif = 0;
+    }
+    else if (vrm>=54200 && vrm<=54399)
+    {
+      room->mine.dif = 1;
+    }
+    else if (vrm>=54400 && vrm<=54599)
+    {
+      room->mine.dif = 2;
+    }
+    else if (vrm>=54600 && vrm<=54799)
+    {
+      room->mine.dif = 3;
+    }
+    else if (vrm>=54800 && vrm<=54899)
+    {
+      room->mine.dif = 4;
+    }
+    else if (vrm>=54900 && vrm<=54999)
+    {
+      room->mine.dif = 5;
+    }
+
+  
+  
+
+  /** add room to mine list along with all others in the same shaft **/
+  {
+    struct mine_list *shaft;
+    struct mine_rooms *mr;
+    for (shaft = mine_shafts; shaft; shaft = shaft->next)
+    {
+      if (shaft->number == room->mine.num)
+      {
+        shaft->size++;
+        CREATE(mr, struct mine_rooms, 1);
+        mr->room = vrm;
+        mr->next = shaft->rooms;
+        shaft->rooms = mr;
+        return;
+      }
+    }
+
+    CREATE(shaft, struct mine_list, 1);
+    shaft->size=1;
+    shaft->number = room->mine.num;
+    shaft->rooms = NULL;
+    shaft->next = mine_shafts;
+    mine_shafts = shaft;
+    CREATE(mr, struct mine_rooms, 1);
+    mr->room = vrm;
+    mr->next = shaft->rooms;
+    shaft->rooms = mr;
+    return;
+
+  }
+
+}
+void free_shaft_list(struct mine_rooms *mine)
+{
+  if (!mine)
+    return;
+  if (mine->next)
+    free_shaft_list(mine->next);
+  free(mine);
+}
+void free_mine_shafts()
+{
+  struct mine_list *shaft, *next;
+  for (shaft = mine_shafts; shaft; shaft = next)
+  {
+    next = shaft->next;
+    free_shaft_list(shaft->rooms);
+    free(shaft);
+  }
 }
 
-CREATE(shaft, struct mine_list, 1);
-shaft->size=1;
-shaft->number = room->mine.num;
-shaft->rooms = NULL;
-shaft->next = mine_shafts;
-mine_shafts = shaft;
-CREATE(mr, struct mine_rooms, 1);
-mr->room = vrm;
-mr->next = shaft->rooms;
-shaft->rooms = mr;
-return;
-
-}
-
-}
-
-room_vnum find_mine_room(int num, int dif) {
-struct mine_list *shaft;
-struct mine_rooms *mr;
-for (shaft = mine_shafts; shaft; shaft = shaft->next) {
-if (shaft->number == num) {
-int rnd = number(1, shaft->size);
-for (mr = shaft->rooms;mr && rnd--;mr = mr->next);
-return mr->room;
-}
-}
-return -1;
+room_vnum find_mine_room(int num, int dif)
+{
+  struct mine_list *shaft;
+  struct mine_rooms *mr;
+  for (shaft = mine_shafts; shaft; shaft = shaft->next)
+  {
+    if (shaft->number == num)
+    {
+      int rnd = number(1, shaft->size);
+      for (mr = shaft->rooms;mr && rnd--;mr = mr->next);
+      return mr->room;
+    }
+  }
+  return -1;
 }
 
 void make_tunnel(struct char_data *ch)
@@ -344,25 +370,31 @@ void make_tunnel(struct char_data *ch)
   int pass = TRUE, level = 0;
   char description[MAX_INPUT_LENGTH];
   struct room_direction_data *exit;
-  
-if (IN_ROOM(ch)->mine.num == -1) {
-  
-  } else {
-  if (IN_ROOM(ch)->mine.dif == -1)
-  level = 1;
+
+  if (IN_ROOM(ch)->mine.num == -1)
+  {
+  }
   else
-  level = IN_ROOM(ch)->mine.dif+1;
+  {
+    if (IN_ROOM(ch)->mine.dif == -1)
+      level = 1;
+    else
+      level = IN_ROOM(ch)->mine.dif+1;
   }
 
-  if (level == 0 && MINE_DIR(ch) != DOWN) {
-  new_send_to_char(ch, "You can't mine there.\r\n");
+  if (level == 0 && MINE_DIR(ch) != DOWN)
+  {
+    new_send_to_char(ch, "You can't mine there.\r\n");
     return;
-  } else if (level == 1 && MINE_DIR(ch) == UP)
+  }
+  else if (level == 1 && MINE_DIR(ch) == UP)
   {
     new_send_to_char(ch, "You can't seem to break through.\r\n");
     return;
-  } else if (level == 6 && MINE_DIR(ch) == DOWN) {
-  new_send_to_char(ch, "You can't mine there.\r\n");
+  }
+  else if (level == 6 && MINE_DIR(ch) == DOWN)
+  {
+    new_send_to_char(ch, "You can't mine there.\r\n");
     return;
   }
 

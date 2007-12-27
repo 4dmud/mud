@@ -311,7 +311,7 @@ void redit_disp_mine_menu(struct descriptor_data *d)
 {
   write_to_output(d,
                   "%s1%s) Mine Number     : %s%d\r\n"
-                  "%s2%s) Mine difficulty : %s%d\r\n"
+                  "%s2%s) Mine Level      : %s%d\r\n"
 		  "%s3%s) Mine Tool Needed: %s%s%s\r\n",
                   grn, nrm, yel, OLC_ROOM(d)->mine.num,
                   grn, nrm, yel, OLC_ROOM(d)->mine.dif,
@@ -532,7 +532,7 @@ void redit_disp_menu(struct descriptor_data *d)
                   "%sG%s) Descriptions :%s Look above\r\n"
                   "%sH%s) Smell        :\r\n%s%s"
                   "%sI%s) Listen       :\r\n%s%s"
-		  "%sJ%s) Mine         : %sNum: %d Difficulty: %d Tool: %s\r\n"
+		  "%sJ%s) Mine         : %sNum: %d Level: %d Tool: %s\r\n"
 
                   /*---end-------------------------------------*/
                   "%sS%s) Script       : %s%s\r\n"

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.4  2005/02/25 05:02:45  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -675,6 +678,7 @@ const char *affected_bits[] =
     "POLY_BOAR",
     "POLY_TOAD",
     "IMMFREEZE",
+    "SILENCED",
     "\n"
   };
 

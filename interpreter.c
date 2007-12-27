@@ -182,6 +182,7 @@ ACMD(do_gsay);
 ACMD(do_hcontrol);
 ACMD(do_heal);
 ACMD(do_help);
+ACMD(do_heroutil);
 ACMD(do_hit);
 ACMD(do_house);
 ACMD(do_ignore);
@@ -551,7 +552,7 @@ const struct command_info cmd_info[] =
     { "follow"   , "fol"	, POS_RESTING , do_follow   , 0, 0, 0 },
     { "fuse"     , "fuse"	, POS_RESTING , do_fuse   , 0, 0, 0 },
     { "fusion"   , "fusion"	, POS_RESTING , do_fusion   , 0, 0, 0 },
-    { "freeze"   , "free" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_FREEZE, WIZ_DSPLN_GRP },
+    { "freeze"   , "free" , POS_DEAD    , do_heroutil  , 0, SCMD_FREEZE, 0 },
     { "forest"   , "forest" , POS_DEAD    , forest_find  , LVL_IMMORT, 0, 0 },
     { "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 
@@ -649,7 +650,9 @@ const struct command_info cmd_info[] =
     { "norepeat" , "nor"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOREPEAT, 0 },
     { "noshout"  , "nosh"	, POS_SLEEPING, do_gen_tog  , 1, SCMD_DEAF, 0 },
     { "nosummon" , "nosu"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOSUMMON, 0 },
-    { "note"    , "nit"   , POS_DEAD, do_note , 1, 0, 0 },
+    { "nogate" , "noga"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOGATE, 0 },
+    { "note"    , "note"   , POS_DEAD, do_note , 1, 0, 0 },
+    { "notell"   , "notell"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELL, 0 },
     { "nohero"   , "nohe"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOHERO, 0 },
     { "nonewbie"   , "nonew"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NONEWBIE, 0 },
     { "notitle"  , "noti"	, POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_NOTITLE, WIZ_DSPLN_GRP },
@@ -658,7 +661,7 @@ const struct command_info cmd_info[] =
 
     { "objdump"  , "objd" , POS_DEAD    , do_objdump  , LVL_IMPL, 0, WIZ_IMPL_GRP },
 
-    { "offtell"   , "offnote"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELL, 0 },
+    { "offtell"   , "offtell"	, POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELL, 0 },
     { "order"    , "ord"	, POS_RESTING , do_order    , 1, 0, 0 },
     { "own"   , "own"  , POS_DEAD    , do_own   , LVL_SEN, 0, WIZ_SEN_GRP},
     { "owners"   , "owne"  , POS_DEAD    , do_owners   , LVL_IMPL, 0, WIZ_IMPL_GRP},
@@ -753,8 +756,7 @@ const struct command_info cmd_info[] =
     { "settime"  , "settime", POS_STANDING, do_settime, LVL_IMMORT, 0, WIZ_OLC_GRP },
     { "sedit"    , "sedi"	, POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_SEDIT, WIZ_OLC_GRP },
     { "shout"    , "sho"	, POS_RESTING , do_gen_comm , 0, SCMD_SHOUT, 0 },
-    { "shake"    , "sha"	, POS_RESTING , do_action   , 0, 0, 0 },
-    { "shiver"   , "shiv"	, POS_RESTING , do_action   , 0, 0, 0 },
+    { "silence", "sil" ,          POS_DEAD    , do_heroutil , 0, SCMD_SILENCE, 0 },
     { "shoot"    , "shoot", POS_STANDING, do_shoot    , 0, 0, 0 },
     { "show"     , "sho"	, POS_DEAD    , do_show     , LVL_IMMORT, 0, WIZ_IMM2_GRP },
     { "shutdow"  , "shutdow", POS_DEAD    , do_shutdown  , LVL_IMMORT, 0, WIZ_IMPL_GRP },
@@ -793,7 +795,7 @@ const struct command_info cmd_info[] =
     { "take"     , "ta"	, POS_RESTING , do_get      , 0, 0, 0 },
     { "taste"    , "tas"  , POS_RESTING , do_taste    , 0, 0, 0 },
     { "teleport" , "tel"	, POS_DEAD    , do_teleport , LVL_IMMORT, 0, WIZ_TELE_GRP },
-    { "thaw"     , "thaw"	, POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_THAW, WIZ_DSPLN_GRP },
+    { "thaw"     , "thaw"	, POS_DEAD    , do_heroutil  , 0, SCMD_THAW, 0 },
     { "throw"    , "thr"  , POS_STANDING, do_throw    , 0, 0, 0 },
     { "title"    , "tit"	, POS_DEAD    , do_title    , 0, 0, 0 },
     { "time"     , "tim"	, POS_DEAD    , do_time     , 0, 0, 0 },
@@ -2160,6 +2162,7 @@ int enter_player_game(struct descriptor_data *d)
     PAGEHEIGHT(ch) = 40;
     GET_MAX_STAMINA(ch) = 100;
     SET_BIT_AR(AFF_FLAGS(ch), AFF_GROUP);
+    SET_BIT_AR(PRF_FLAGS(ch), PRF_NOGOSS);
 
     LOOK(ch);
 

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.9  2005/02/25 05:02:45  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.8  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -550,7 +553,7 @@ int count_magic_items(CHAR_DATA *ch)
 
 bool can_take_obj(struct char_data *ch, struct obj_data *obj)
 {
-int i;
+  int i;
   if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
   {
     act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
@@ -568,10 +571,10 @@ int i;
   }
   else if (is_magic(obj) && (i=count_magic_items(ch)) >= MAX_MAGIC_ITEMS)
   {
-  if (i == MAX_MAGIC_ITEMS)
-    act("$p: you have 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
+    if (i == MAX_MAGIC_ITEMS)
+      act("$p: you have 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
     else
-    act("$p: you have more then 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
+      act("$p: you have more then 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }
   return TRUE;
@@ -647,8 +650,13 @@ void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
     get_check_money(ch, item);
   }
   extract_obj(corpse);
-  GET_WAIT_STATE(ch) = 5 RL_SEC;
-
+  if (REMORTS(ch))
+  {
+    if (REMORTS(ch) < 5)
+      GET_WAIT_STATE(ch) = 5 RL_SEC;
+    else
+      GET_WAIT_STATE(ch) = REMORTS(ch) RL_SEC;
+  }
   save_corpses();
   Crash_crashsave(ch);
 }
@@ -1283,9 +1291,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                            	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
-                                                                            	    return (0);
-                                                                            	}*/
+                                                                                	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
+                                                                                	    return (0);
+                                                                                	}*/
   }
 
 
@@ -2933,8 +2941,8 @@ void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
                        "You can't wield anything while focusing on something.\r\n");
       return;
     }
-    if ((wep_hands(obj) == 2 || (GET_EQ(ch, WEAR_WIELD) && wep_hands(GET_EQ(ch, WEAR_WIELD)) == 2)) && 
-    ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD))))))
+    if ((wep_hands(obj) == 2 || (GET_EQ(ch, WEAR_WIELD) && wep_hands(GET_EQ(ch, WEAR_WIELD)) == 2)) &&
+        ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD))))))
     {
       new_send_to_char(ch, "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n");
       return;

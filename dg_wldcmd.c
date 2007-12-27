@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/04 20:46:11 $
-*  $Revision: 1.3 $
+*  $Date: 2005/02/25 05:02:45 $
+*  $Revision: 1.4 $
 **************************************************************************/
 
 #include "conf.h"
@@ -745,6 +745,7 @@ const struct wld_command_info wld_cmd_info[] =
     {"wzrecho ", do_wzrecho, 0},
     {"wdamage ", do_wdamage, 0},
     {"wat ", do_wat, 0},
+    {"wlag", do_wlag, 0},
     {"\n", 0, 0}		/* this must be last */
   };
 

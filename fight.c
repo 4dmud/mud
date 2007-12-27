@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.12  2005/02/25 05:02:45  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.11  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -4631,9 +4634,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer)
   if (!ch || DEAD(ch))
     return;
 
-  while (ch->affected)
-    affect_remove(ch, ch->affected);
-
+  remove_all_normal_affects(ch);
   /* To make ordinary commands work in scripts.  welcor */
   GET_POS(ch) = POS_STANDING;
 

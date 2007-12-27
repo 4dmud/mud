@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.4  2005/02/25 05:02:45  w4dimenscor
+ * added new commands and a few little changes - i forget what eek
+ *
  * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -2126,6 +2129,8 @@ void mag_assign_spells(void)
   spello(SPELL_DG_AFFECT, "Malactation", 0, 0, 0, POS_SITTING,
          TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
   spello(SPELL_IMMFREEZE, "Imm Freeze", 0, 0, 0, POS_SITTING,
+         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
+  spello(SPELL_SILENCED, "Silenced", 0, 0, 0, POS_SITTING,
          TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
 
   /*

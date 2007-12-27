@@ -19,7 +19,7 @@ bool affected_by_spell(struct char_data *ch, int type);
 void affect_join(struct char_data *ch, struct affected_type *af,
 		 bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
 
-
+void remove_all_normal_affects(struct char_data *ch);
 /* utility */
 const char *money_desc(gold_int amount);
 struct obj_data *create_money(gold_int amount);
