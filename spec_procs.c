@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.21  2007/02/02 15:32:19  w4dimenscor
+ * Fixed the guild guards. --Thotter
+ *
  * Revision 1.20  2006/08/31 10:39:17  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -946,7 +949,7 @@ SPECIAL(guild_guard) {
         if ((IS_NPC(ch) || GET_CLASS(ch) != guild_info[i][0]) &&
                 GET_ROOM_VNUM(IN_ROOM(ch)) == guild_info[i][1] &&
                 cmd == guild_info[i][2]) {
-            act(buf, FALSE, ch, 0, guard, TO_ROOM);
+            act(buf, FALSE, ch, 0, guard, TO_CHAR);
             act(buf2, FALSE, ch, 0, guard, TO_ROOM);
             return (TRUE);
         }
