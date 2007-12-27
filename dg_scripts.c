@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/26 01:21:34 $
-*  $Revision: 1.10 $
+*  $Date: 2005/04/23 12:18:12 $
+*  $Revision: 1.11 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.11  2005/04/23 12:18:12  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.10  2005/02/26 01:21:34  w4dimenscor
  * Changed more of the code to be more buffer safe using strlcpy and strlcat
  *
@@ -1717,7 +1720,7 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *g
   else if (!strcmp("!=", op))
   {
     if (is_num(lhs) && is_num(rhs))
-     snprintf(result,r_len, "%d", atoi(lhs) != atoi(rhs));
+      snprintf(result,r_len, "%d", atoi(lhs) != atoi(rhs));
     else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
       E_FALSE;
     else
@@ -2929,7 +2932,7 @@ int process_return(trig_data *trig, char *cmd)
                         TRIG_NEW     just started from dg_triggers.c
                         TRIG_RESTART restarted after a 'wait'
                   */
-#if DRIVER_USES_UNION
+#if 0
                   int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode)
 #else
                   int script_driver(void *go_adress, trig_data *trig, int type, int mode)
@@ -3359,8 +3362,12 @@ int process_return(trig_data *trig, char *cmd)
                   }
 
                   /* returns the real number of the trigger with given virtual number */
+		  /** TODO: This function should be a binary search but when it runs the binary search
+		  the results are bad. So sequential for now. Need to find out where the list stops being sorted.
+		  **/
                   trig_rnum real_trigger(int vnum)
                   {
+		  /*
                     int bot = 0, mid;
                     int top = top_of_trigt - 1;
 
@@ -3368,7 +3375,7 @@ int process_return(trig_data *trig, char *cmd)
                     for (;;)
                     {
                       mid = (bot + top) / 2;
-                      /* Thanks to Derek Fisk for fixing this loop */
+                      // Thanks to Derek Fisk for fixing this loop 
                       if (bot > top)
                         return (NOTHING);
                       if (trig_index[mid]->vnum == vnum)
@@ -3382,8 +3389,8 @@ int process_return(trig_data *trig, char *cmd)
                     }
                   }
 
-                  /*
-                   
+                  */
+                   int rnum;
                     for (rnum=0; rnum < top_of_trigt; rnum++)
                     {
                       if (trig_index[rnum]->vnum==vnum) break;
@@ -3391,7 +3398,7 @@ int process_return(trig_data *trig, char *cmd)
                    
                     if (rnum==top_of_trigt) rnum = -1;
                     return (rnum);
-                  }*/
+                  }
 
                   ACMD(do_tstat)
                   {
@@ -3446,7 +3453,7 @@ int process_return(trig_data *trig, char *cmd)
 #if 0				/* the original implementation */
                         sprintf(buf, "(%s) == (%s)", cond, p + 5);
                         if (process_if(buf, go, sc, trig, type))
-                        { 
+                        {
 #else				/* new! improved! bug fixed! */
                         eval_op("==", result, p + 5, buf, MAX_STRING_LENGTH - 1, go, sc, trig);
                         if (*buf && *buf != '0')

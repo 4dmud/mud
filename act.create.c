@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.7  2005/04/23 12:18:12  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.6  2005/02/05 05:26:17  w4dimenscor
  * Added tsearch command to full text search triggers
  *
@@ -31,7 +34,7 @@
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
  *
  */
- 
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -339,10 +342,10 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
 
   /* Modify this list to suit which spells you
    * want to be able to mix. */
-   if (IS_SET(class_elem_strength(GET_CLASS(ch)), (1 << elemental_type(scroll))))
-   can_make = TRUE;
-   else 
-   can_make = FALSE;
+  if (IS_SET(class_elem_strength(GET_CLASS(ch)), (1 << elemental_type(scroll))))
+    can_make = TRUE;
+  else
+    can_make = FALSE;
 
   if (can_make == FALSE)
   {
@@ -945,11 +948,11 @@ EVENTFUNC(message_event)
     return 0;
   }
 
-  
+
 
   if (msg->msg_num == 0)
   {
-  GET_MESSAGE_EVENT(ch) = NULL;
+    GET_MESSAGE_EVENT(ch) = NULL;
     free(event_obj);
     return 0;
   }
@@ -1008,11 +1011,12 @@ EVENTFUNC(message_event)
   }
   if (time == 0 || msg->msg_num == 0 || (--msg->msg_num) <= 0 || (ch && GET_MSG_RUN(ch) == 0))
   {
-    if (ch) {
+    if (ch)
+    {
       GET_MSG_RUN(ch) = 0;
-  GET_MESSAGE_EVENT(ch) = NULL;
-  }
-    free(event_obj);
+      GET_MESSAGE_EVENT(ch) = NULL;
+      free(event_obj);
+    }
 
     if (ch)
     {
@@ -1034,8 +1038,8 @@ ACMD(do_fell)
   char *temp1;
   int found = FALSE;
   struct message_event_obj *msg = NULL;
-  
- struct obj_data *axe = GET_EQ(ch, WEAR_WIELD);
+
+  struct obj_data *axe = GET_EQ(ch, WEAR_WIELD);
 
   if (GET_SUB(ch, SUB_LUMBERJACK) <= 0)
   {
@@ -1043,10 +1047,11 @@ ACMD(do_fell)
     return;
   }
 
-  
-  if (!axe || GET_OBJ_TYPE(axe) != ITEM_AXE) {
-  new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
-  return;
+
+  if (!axe || GET_OBJ_TYPE(axe) != ITEM_AXE)
+  {
+    new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+    return;
   }
   skip_spaces(&argument);
   temp1 = one_argument(argument, tree_name);

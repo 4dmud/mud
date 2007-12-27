@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.13  2005/02/25 07:33:47  w4dimenscor
  * reformatted some code, fixed up coventry to ignore socials
  *
@@ -774,8 +777,7 @@ EVENTFUNC(fight_event)
   long id = fight->id;
   struct char_data *ch = find_char(id);
 
-  if (event_obj)
-    free(event_obj);
+
 
   if (ch)
   {
@@ -798,6 +800,8 @@ EVENTFUNC(fight_event)
     }
 #endif
     GET_FIGHT_EVENT(ch) = NULL;
+    if (event_obj)
+      free(event_obj);
 
     if (!DEAD(ch) && FIGHTING(ch))
       FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch)) ? HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)) ? RIDDEN_BY(FIGHTING(ch)) : FIGHTING(ch) : FIGHTING(ch);
@@ -5311,7 +5315,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                                              				   the grenade */
+                                                                                                                                                        				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {

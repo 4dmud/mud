@@ -26,7 +26,7 @@ BINDIR = ../bin
 CFLAGS = -O -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
-LIBS =  -lcrypt -lz -lmcheck -lm -lc
+LIBS =  -lcrypt -lz -lmcheck -lm -lc -L/usr/lib/mysql -lmysqlclient
 #gprof for profiling
 
 OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \

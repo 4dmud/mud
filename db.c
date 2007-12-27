@@ -5938,12 +5938,13 @@ int create_entry(char *name)
 
 
 
-
+/* file read string */
 char *fread_string(FILE *fl, const char *error)
 {
   char buf[MAX_STRING_LENGTH], tmp[513];
   char *point;
-  int done = 0, length = 0, templength;
+  int done = 0;
+  size_t length = 0, templength, tlen;
 
   *buf = '\0';
 
@@ -5956,15 +5957,18 @@ char *fread_string(FILE *fl, const char *error)
     }
     /* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
     /* now only removes trailing ~'s -- Welcor */
-    point = strchr(tmp, '\0');
-    for (point-- ; (*point=='\r' || *point=='\n'); point--);
+    //point = strchr(tmp, '\0');
+    if ((tlen = strlen(tmp)) > 0) {
+    point = (tmp + tlen - 1);
+    for (; (*point=='\r' || *point=='\n'); point--);
     if (*point=='~')
     {
       *point='\0';
       done = 1;
     }
-    else
+    else 
     {
+    /** but what if this ends up making it bigger then the buffer?**/
       *(++point) = '\r';
       *(++point) = '\n';
       *(++point) = '\0';
@@ -5982,6 +5986,7 @@ char *fread_string(FILE *fl, const char *error)
     {
       strcat(buf + length, tmp);	/* strcat: OK (size checked above) */
       length += templength;
+    }
     }
   }
   while (!done);

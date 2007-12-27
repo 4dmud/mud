@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.6  2005/04/23 12:18:12  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.5  2005/04/06 07:16:28  w4dimenscor
  * added dg variables: is_roleplay, is_peaceful. Added the GATE, and RP to constants.c
  *
@@ -587,6 +590,7 @@ const char *preference_bits[] =
     "!BRAG",
     "GATE",
     "RP",
+    "FISHTALLY",
     "\n"
   };
 

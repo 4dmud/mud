@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.13  2005/03/23 15:23:13  w4dimenscor
  * Added toggle rp. roleplaying toggle is shown on:
  * - who list
@@ -455,6 +458,7 @@ extern int message_type;
 #define PRF_NOBRAG      49
 #define PRF_GATEABLE 	50
 #define PRF_RP	 	51	/* Player is roleplaying */
+#define PRF_FISHPROMPT  52
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */
@@ -1581,7 +1585,7 @@ struct char_special_data
   struct char_data *ridden_by;	// Who is riding them? (DAK)
   byte position;		/* Standing, fighting, sleeping, etc.   */
   int hunt_count;
-
+  int tally[3];
   int carry_weight;		/* Carried weight                       */
   int carry_items;		/* Number of items carried              */
   int timer;			/* Timer for update                     */

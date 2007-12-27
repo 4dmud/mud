@@ -191,6 +191,7 @@ struct alias_data
 #define SCMD_NOBRAG	45
 #define SCMD_NOGATE     46
 #define SCMD_RP		47
+#define SCMD_FISHTALLY  48
 
 /* do_wizutil */
 #define SCMD_REROLL	0

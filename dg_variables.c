@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/04/10 08:24:45 $                                           * 
-*  $Revision: 1.12 $                                                    *
+*  $Date: 2005/04/23 12:18:13 $                                           * 
+*  $Revision: 1.13 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -801,9 +801,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           snprintf(str, slen, "0");
           if (c->followers)
           {
+	  mob_vnum mvn = atoi(subfield);
             for (k = c->followers; k; k = k->next)
             {
-              if (!strcasecmp(GET_NAME(k->follower), subfield))
+              if ((!strcasecmp(GET_NAME(k->follower), subfield) || (mvn == GET_MOB_VNUM(k->follower))))
                 if (IN_ROOM(c) == IN_ROOM(k->follower))
                   break;
             }

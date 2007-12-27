@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.10  2005/04/23 12:18:12  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.9  2005/03/23 15:23:13  w4dimenscor
  * Added toggle rp. roleplaying toggle is shown on:
  * - who list
@@ -1257,7 +1260,9 @@ ACMD(do_gen_tog)
       {"You are now safe from gating by other players.\r\n",
        "You may now be gated to by other players.\r\n"},
       {"You are not roleplaying anymore.\r\n",
-       "You are now roleplaying.\r\n"}
+       "You are now roleplaying.\r\n"},
+       {"You will no longer see a tally of how many fish you have caught.\r\n",
+       "You will now see a tally of how many fish you have caught.\r\n"}
 
 
 
@@ -1432,6 +1437,9 @@ ACMD(do_gen_tog)
     break;
   case SCMD_NOBRAG:
     result = PRF_TOG_CHK(ch, PRF_NOBRAG);
+    break;
+    case SCMD_FISHTALLY:
+    result = PRF_TOG_CHK(ch, PRF_FISHPROMPT);
     break;
   default:
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);

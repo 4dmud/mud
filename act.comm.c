@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.14  2005/04/23 12:18:12  w4dimenscor
+ * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
+ *
  * Revision 1.13  2005/04/11 06:42:52  w4dimenscor
  * changed the rp toggle to turn off open channels - silly idea imo
  *
@@ -1171,7 +1174,7 @@ ACMD(do_gen_comm)
        "{cg"},
 
       {"You cannot use the ooc channel!\r\n",
-       "{ccOOC{c0",
+       "OOC",
        "You aren't even on the channel!\r\n",
        "{cw"}
 
@@ -1277,7 +1280,6 @@ ACMD(do_gen_comm)
       new_send_to_char(ch, "%s%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
-
       snprintf(buf, sizeof(buf), "%s%s: %s", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
     else
       return;
@@ -1289,7 +1291,7 @@ ACMD(do_gen_comm)
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "%s%sYou %s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument, CCNRM(ch, C_CMP));
+      new_send_to_char(ch, "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], color_on, argument, CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {

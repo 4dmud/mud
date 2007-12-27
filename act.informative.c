@@ -4598,7 +4598,8 @@ ACMD(do_toggle)
                    "     Aggro Mode: %-3s    "
                    "       PageWrap: %-3s    "
                    "          Brags: %-3s\r\n"
-                   "   Gate Protect: %-3s\r\n",
+                   "   Gate Protect: %-3s    "
+		   "      FishTally: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4642,7 +4643,8 @@ ACMD(do_toggle)
                    ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG)),
-                   ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE))
+                   ONOFF(!PRF_FLAGGED(ch, PRF_GATEABLE)),
+		   ONOFF(!PRF_FLAGGED(ch, PRF_FISHPROMPT))
                   );
 
 }

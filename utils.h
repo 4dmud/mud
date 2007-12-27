@@ -555,6 +555,9 @@ int has_body(CHAR_DATA *ch, int flag);
 #define RIDDEN_BY(ch)	  ((ch)->char_specials.ridden_by)	// (DAK)
 #define GET_SAVE(ch, i)	  ((ch)->char_specials.saved.apply_saving_throw[i])
 #define GET_ALIGNMENT(ch) ((ch)->char_specials.saved.alignment)
+#define TALLY_FISH(ch)	  ((ch)->char_specials.tally[0])
+#define TALLY_FOBJ(ch)	  ((ch)->char_specials.tally[1])
+#define TALLY_DEBRIS(ch)  ((ch)->char_specials.tally[2])
 
 #define SPECIALS(ch)            ((ch)->player_specials)
 #define GET_COND(ch, i)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.conditions[(i)]))

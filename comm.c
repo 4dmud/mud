@@ -3258,7 +3258,7 @@ void close_socket(struct descriptor_data *d)
   /* d->comp was still created even if there is no zlib, for comp->state) */
   if (d->comp)
     free(d->comp);
-
+if (d);
   free(d);
 }
 
