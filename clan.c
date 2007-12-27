@@ -291,12 +291,15 @@ obj_vnum brd;
       return;
     }
     two_arguments(arg, arg1, arg2);
-    if (!arg2 && !*arg2) {
+    if (arg2 && *arg2) {
     if ((clan_num = find_clan(arg2)) < 0)
     {
       send_to_char("Unknown clan.\r\n", ch);
       return;
       }
+    } else {
+    send_to_char("clan set board <VNUM> <clan>\r\n", ch);
+    return;
     }
   
 

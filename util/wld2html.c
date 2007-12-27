@@ -131,7 +131,7 @@ struct room_data {
 *  declarations of most of the 'global' variables                         *
 ************************************************************************ */
 
-struct room_data *world = NULL;	/* array of rooms                */
+struct room_data *world_vnum[] = NULL;	/* array of rooms                */
 int top_of_world = 0;		/* ref to top element of world   */
 
 

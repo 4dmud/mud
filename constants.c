@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.9  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.8  2005/06/26 04:37:00  w4dimenscor
  * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
  *
@@ -1223,6 +1226,7 @@ const char *item_types[] =
     "garotte",
     "vial",
     "bankbook",
+    "spacebike",
     "\n"
   };
 

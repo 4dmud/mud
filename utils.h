@@ -608,6 +608,7 @@ int has_body(CHAR_DATA *ch, int flag);
 #define IMMTITLE(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->immtitle))
 #define POOFOUT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->poofout))
 #define PROMPT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->prompt))
+#define BPROMPT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->battle_prompt))
 #define GET_OLC_ZONE(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.olc_zone))
 #define GET_LAST_OLC_TARG(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->last_olc_targ))
 #define GET_LAST_OLC_MODE(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->last_olc_mode))
@@ -638,7 +639,6 @@ int check_mail(struct char_data *ch);
 #define PAGEHEIGHT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->pageheight))
 #define PAGEWIDTH(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->pagewidth))
 #define LOCKER(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->locker))
-#define GET_LAST_PROMPT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->last_prompt))
 #define LOCKER_EXPIRE(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->expire))
 #define LOCKER_LIMIT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->limit))
 #define DIE_TIME(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->dying))
@@ -749,6 +749,7 @@ int current_class_is_tier_num(struct char_data *ch);
 
 /* Hrm, not many.  We should make more. -gg 3/4/99 */
 #define STATE(d)	((d)->connected)
+#define ORIG_STATE(d)   ((d)->orig_connected)
 #define SUB_STATE(d)    ((d)->sub_state)
 
 /* object utils **********************************************************/
@@ -772,6 +773,8 @@ int current_class_is_tier_num(struct char_data *ch);
 #define GET_OBJ_EXTRA_AR(obj, i)   ((obj)->obj_flags.extra_flags[(i)])
 #define GET_OBJ_WEAR(obj)	((obj)->obj_flags.wear_flags)
 #define GET_OBJ_VAL(obj, val)	((obj)->obj_flags.value[(val)])
+#define GET_FUEL(obj)           GET_OBJ_VAL(obj, 2)
+#define GET_MAX_FUEL(obj)       GET_OBJ_VAL(obj, 3)
 #define GET_OBJ_MATERIAL(obj)   GET_OBJ_VAL(obj, 9)
 #define GET_WEP_BALANCE(obj)    GET_OBJ_VAL(obj, 5)
 #define GET_WEP_TYPE(obj)       GET_OBJ_VAL(obj, 6)
@@ -860,8 +863,9 @@ int current_class_is_tier_num(struct char_data *ch);
 #define CAN_GET_OBJ(ch, obj)   \
    (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && \
     CAN_SEE_OBJ((ch),(obj)))
+const char * hidden_name(struct char_data *ch);
+#define PERS(ch, vict)   (!CAN_SEE(vict, ch) ?  "someone" :  hidden_name(ch))
 
-#define PERS(ch, vict)   (CAN_SEE(vict, ch) ? GET_NAME(ch) : "someone")
 
 #define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
 	(obj)->short_description  : "something")
@@ -1056,6 +1060,7 @@ void free_travel_points(struct travel_point_data *t);
 
 int do_simple_obj_move(struct obj_data *obj, int dir, struct char_data *ch);
 int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch);
+struct obj_data *has_vehicle(struct char_data *ch);
 
 
 /*******************  Config macros *********************/

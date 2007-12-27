@@ -30,6 +30,8 @@ int enter_wtrigger(struct room_data *room, struct char_data *actor,
 
 ACMD(do_look);
 
+
+
 struct obj_data *find_vehicle(int roomNum);
 
 typedef struct {
@@ -55,6 +57,11 @@ struct obj_data *find_vehicle_by_vnum(int vnum)
     return (0);
 }
 
+struct obj_data *has_vehicle(struct char_data *ch) {
+if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
+return SITTING(ch);
+return NULL;
+}
 
 void auto_exits_by_rnum(struct char_data *ch, room_rnum is_in)
 {

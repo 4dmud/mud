@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.16  2005/06/21 08:53:40  w4dimenscor
  * added in better help finder and help editor, a la mordecai
  *
@@ -845,6 +848,7 @@ extern int message_type;
 #define ITEM_GAROTTE            82
 #define ITEM_VIAL		83
 #define ITEM_BANKBOOK		84
+#define ITEM_SPACEBIKE          85
 
 #define VIAL_NONE      -1
 #define VIAL_HITP 	0
@@ -920,6 +924,7 @@ extern int message_type;
 #define ITEM_NOTDEADYET         62
 #define ITEM_SHIFTABLE          63
 #define ITEM_KEYSTAY		64
+#define ITEM_PULLABLE 		65
 
 
 
@@ -1743,7 +1748,7 @@ struct player_special_data
   struct obj_data *locker;
   time_t expire;
   int limit;
-  char *last_prompt;
+  char *battle_prompt;
   time_t dying;
   float skillmulti;
   struct kill_data *kills;
@@ -1946,6 +1951,7 @@ struct descriptor_data
   byte bad_pws;		/* number of bad pw attemps this login  */
   byte idle_tics;		/* tics idle at password prompt         */
   int connected;		/* mode of 'connectedness'              */
+  int orig_connected;
   int sub_state;
   int desc_num;		/* unique num assigned to desc          */
   time_t login_time;		/* when the person connected            */

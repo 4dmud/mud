@@ -355,8 +355,17 @@ room_vnum find_mine_room(int num, int dif)
   {
     if (shaft->number == num)
     {
-      int rnd = number(1, shaft->size);
-      for (mr = shaft->rooms;mr && rnd--;mr = mr->next);
+      int rnd = 0;
+      
+      for (mr = shaft->rooms;mr;mr = mr->next)
+        if (dif == world_vnum[mr->room]->mine.dif)
+	rnd++;
+	
+	rnd = number(1, rnd);
+	for (mr = shaft->rooms;mr && rnd;mr = mr->next)
+        if (dif == world_vnum[mr->room]->mine.dif)
+	rnd--;
+	
       return mr->room;
     }
   }

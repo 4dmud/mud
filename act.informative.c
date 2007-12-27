@@ -218,7 +218,13 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
     if (GET_OBJ_VAL(obj, 1) == 0 || !OBJ_SAT_IN_BY(obj))
     {
       if (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || (GET_LEVEL(ch) > LVL_IMMORT))
-        new_send_to_char(ch, "%s", obj->description);
+      {
+        if (GET_OBJ_TYPE(obj) == ITEM_SPACEBIKE)
+          new_send_to_char(ch, "%s [FUEL: %d%%]",obj->description, GET_FUEL(obj) > 0 ? (GET_FUEL(obj) * 100)/ GET_MAX_FUEL(obj) : 0);
+        else
+          new_send_to_char(ch, "%s", obj->description);
+
+      }
     }
     else
     {
@@ -228,11 +234,15 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
           found = TRUE;
       }
       if (found == TRUE)
-        new_send_to_char(ch, "You are %s upon %s.",
-                         GET_POS(ch) == POS_SITTING ? "sitting" : "resting",
-                         obj->short_description);
-      else if (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || (GET_LEVEL(ch) > LVL_IMMORT))
-        new_send_to_char(ch, "%s",  obj->description);
+      {
+        if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE)
+          new_send_to_char(ch, "You are %s upon %s.",
+                           GET_POS(ch) == POS_SITTING ? "sitting" : "resting", obj->short_description);
+        else
+          new_send_to_char(ch, "You are mounted upon %s.", obj->short_description);
+      }
+      
+
     }
 
     break;
@@ -292,6 +302,7 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
 
 
 }
+
 #define TIER_COLOR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cc|" : (tier == 3 ? "{cB|" : "{cr|"))))
 #define TIER_COLOR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cc" : (tier == 3 ? "{cB" : "{cr"))))
 
@@ -334,21 +345,20 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
     num = 0;
 
     for (j = list; j != i; j = j->next_content)
-      if (j->item_number == NOTHING
-          || IS_SET_AR(GET_OBJ_EXTRA(j), ITEM_UNIQUE_SAVE))
+      if (j->item_number == NOTHING || IS_SET_AR(GET_OBJ_EXTRA(j), ITEM_UNIQUE_SAVE))
       {
-        if (strcmp(j->short_description, i->short_description) ==
-            0)
+        if (strcmp(j->short_description, i->short_description) == 0)
           break;
       }
       else if (j->item_number == i->item_number)
         break;
 
-    if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (j != i))
+    if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (j != i))
       continue;
+      
 
     for (j = i; j; j = j->next_content)
-      if (j->item_number == NOTHING)
+      if (j->item_number == NOTHING || IS_SET_AR(GET_OBJ_EXTRA(j), ITEM_UNIQUE_SAVE))
       {
         if (strcmp(j->short_description, i->short_description) == 0)
           num++;
@@ -358,7 +368,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
 
     if (CAN_SEE_OBJ(ch, i))
     {
-      if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (num != 1))
+      if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (num != 1))
       {
         new_send_to_char(ch, "(%2i) ", num);
       }
@@ -948,7 +958,7 @@ void do_auto_exits(struct char_data *ch)
     strcpy(tag_close, "/VEx");
   }
 
-//  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
+  //  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
 
@@ -2101,7 +2111,7 @@ ACMD(do_score)
   int len, wep_num = 0;
   float staff = 0.0;
   float shortmulti = 1.0;
-  float damspeed = (DAM_SPEED_MULTI(ch));
+//  float damspeed = (DAM_SPEED_MULTI(ch));
   float blocking = 0.0;
 
   gld = goldy;
@@ -2163,40 +2173,12 @@ ACMD(do_score)
       primin *= shortmulti;
       primax *= shortmulti;
 
-      primin *= (1.0 + (highest_tier(ch) * 0.25));
-      primax *= (1.0 + (highest_tier(ch) * 0.25));
-      if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
-      {
-        primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-      }
-
-      if  (total_chance(ch, SKILL_MOUNTED_COMBAT) && RIDING(ch))
-      {
-        primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        primin += average_damage(RIDING(ch));
-        primax += average_damage(RIDING(ch));
-
-      }
-
       primin += (primin * ((REMORTS(ch) * 0.005)));
       primax += (primax * ((REMORTS(ch) * 0.005)));
 
       primin *= race_dam_mod(GET_RACE(ch), 0);
       primax *= race_dam_mod(GET_RACE(ch), 0);
-      if ( AFF_FLAGGED(ch, AFF_BESERK))
-      {
-        primin *= 1.25;
-        primax *= 1.25;
-      }
-      primin *= damspeed;
-      primax *= damspeed;
-      if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-      {
-        primax *= (1.15f);
-        primin *= (1.15f);
-      }
+
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
@@ -2218,40 +2200,12 @@ ACMD(do_score)
       secmin *= shortmulti;
       secmax *= shortmulti;
 
-      secmin *= (1.0 + (highest_tier(ch) * 0.25));
-      secmax *= (1.0 + (highest_tier(ch) * 0.25));
-      if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
-      {
-        secmin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        secmax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-      }
-
-      if  (total_chance(ch, SKILL_MOUNTED_COMBAT) && RIDING(ch))
-      {
-        secmin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        secmax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
-        secmin += average_damage(RIDING(ch));
-        secmax += average_damage(RIDING(ch));
-
-      }
-
       secmin += (secmin * ((REMORTS(ch) * 0.005)));
       secmax += (secmax * ((REMORTS(ch) * 0.005)));
 
       secmin *= race_dam_mod(GET_RACE(ch), 0);
       secmax *= race_dam_mod(GET_RACE(ch), 0);
-      if ( AFF_FLAGGED(ch, AFF_BESERK))
-      {
-        secmin *= 1.25;
-        secmax *= 1.25;
-      }
-      secmin *= damspeed;
-      secmax *= damspeed;
-      if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-      {
-        secmax *= (1.15f);
-        secmin *= (1.15f);
-      }
+
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
@@ -2281,14 +2235,9 @@ ACMD(do_score)
     primin += class_damroll(ch);
     primax = (spell_size_dice(ch) + (spell_size_dice(ch)*spell_num_dice(ch)));
     primax += class_damroll(ch);
-    if ( AFF_FLAGGED(ch, AFF_BESERK))
-      primin *= 1.25;
-    if ( AFF_FLAGGED(ch, AFF_BESERK))
-      primax *= 1.25;
     primin *= (staff ? staff : 1.0);
     primax *= (staff ? staff : 1.0);
-    primin *= (1.0 + (highest_tier(ch) * 0.25));
-    primax *= (1.0 + (highest_tier(ch) * 0.25));
+    /*
     if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
     {
       primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
@@ -2303,22 +2252,17 @@ ACMD(do_score)
       primin += average_damage(RIDING(ch));
       primax += average_damage(RIDING(ch));
     }
+    */
     primin *= race_dam_mod(GET_RACE(ch), TRUE);
     primax *= race_dam_mod(GET_RACE(ch), TRUE);
     primin += (primin * ( (REMORTS(ch) * 0.005)));
-    primax += (primax * ( (REMORTS(ch) * 0.005)));
-
-    primin *= race_dam_mod(GET_RACE(ch), 1);
-    primax *= race_dam_mod(GET_RACE(ch), 1);
-
+    primax += (primax * ( (REMORTS(ch) * 0.005)));    
+    /*
     primin *= damspeed;
     primax *= damspeed;
+    */
 
-    if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-    {
-      primax *= (1.15f);
-      primin *= (1.15f);
-    }
+
     if (GET_MASTERY(ch, CLASS_MAGE))
     {
       primax *= (1.20f);
@@ -2454,6 +2398,13 @@ ACMD(do_score)
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
+  /** Display info about your scooter **/
+  if (has_vehicle(ch))
+  {
+    struct obj_data *v = has_vehicle(ch);
+    new_send_to_char(ch, "Vehicle Fuel: [%d]\r\n", GET_FUEL(v) > 0 ? (GET_FUEL(v) * 100)/ GET_MAX_FUEL(v) : 0);
+  }
+  /** End scooter info **/
   if (PRF_FLAGGED(ch, PRF_RP))
   {
     new_send_to_char(ch, "You are RolePlaying!\r\n");
@@ -2852,10 +2803,10 @@ struct help_index_element *find_help(char *keyword)
 {
   int i;
 
-  for (i = 0; i < top_of_helpt; i++)
+  for (i = 0; i <= top_of_helpt; i++)
     if (is_name(keyword, help_table[i].keywords))
       return (help_table + i);
-  for (i = 0; i < top_of_helpt; i++)
+  for (i = 0; i <= top_of_helpt; i++)
     if (isname_full(keyword, help_table[i].keywords))
       return (help_table + i);
 
@@ -2896,7 +2847,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
     {
       if (isname_full(keywords, help_table[i].keywords))
       {
-        display_help(d->character, i); //TODO: Write this function, nerd
+        display_help(d->character, i);
         return;
       }
     }
@@ -2911,6 +2862,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
            "\r\n\r\nPlease type the number of the help file to view it\r\nOr type anything else to cancel\r\nWhich Help file: ");
   strlcat(buf, buf1, sizeof(buf));
   page_string(d, buf, 0);
+  ORIG_STATE(d) = STATE(d);
   STATE(d) = CON_FIND_HELP;
 
 
@@ -3454,6 +3406,18 @@ ACMD(do_who)
       {
         snprintf(buf, sizeof(buf), "[--------LION--------] A black lion looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
+      else	if (get_sub_status(wch, SUB_SHADOWCLOAK))
+      {
+        snprintf(buf, sizeof(buf), "[-------SHADOWS------] A swirling tower of shadows.");
+      }
+      else	if (get_sub_status(wch, SUB_CLOAK))
+      {
+        snprintf(buf, sizeof(buf), "[-------CLOAKED------] A cloaked figure.");
+      }
+      else	if (get_sub_status(wch, SUB_MASK))
+      {
+        snprintf(buf, sizeof(buf), "[-------MASKED-------] A masked figure.");
+      }
       else
       {
         if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
@@ -3912,6 +3876,12 @@ void perform_mortal_where(struct char_data *ch, char *arg)
         continue;
       if (IN_ROOM(ch)->zone != IN_ROOM(i)->zone)
         continue;
+      if (get_sub_status(i, SUB_SHADOWCLOAK))
+        continue;
+      if (get_sub_status(i, SUB_CLOAK))
+        continue;
+      if (get_sub_status(i, SUB_MASK))
+        continue;
       new_send_to_char(ch, "{cg%-20s{cw - {cc%s{c0\r\n", GET_NAME(i),
                        IN_ROOM(i)->name);
     }
@@ -3933,6 +3903,18 @@ void perform_mortal_where(struct char_data *ch, char *arg)
     }
     send_to_char("No-one around by that name.\r\n", ch);
   }
+}
+
+const char * hidden_name(struct char_data *ch)
+{
+  if (get_sub_status(ch, SUB_SHADOWCLOAK))
+    return "a shadowy figure";
+  if (get_sub_status(ch, SUB_CLOAK))
+    return "a cloaked figure";
+  if (get_sub_status(ch, SUB_MASK))
+    return "a masked figure";
+
+  return (const char *) GET_NAME(ch);
 }
 
 

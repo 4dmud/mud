@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.21  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.20  2005/06/26 04:37:00  w4dimenscor
  * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
  *
@@ -418,35 +421,21 @@ ACMD(do_say)
       snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
                argument);
     }
-    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
+    else if ((LOWER(argument[strlen(argument) - 1]) == 'p'
              && argument[strlen(argument) - 2] == '-'
              && argument[strlen(argument) - 3] == ':'
-             && argument[strlen(argument) - 4] == ' ')
+             && argument[strlen(argument) - 4] == ' ') || 
+	     (LOWER(argument[strlen(argument) - 1]) == 'p'
+             && argument[strlen(argument) - 2] == ';'
+             && argument[strlen(argument) - 3] == ' ') ||
+	     (LOWER(argument[strlen(argument) - 1]) == 'p'
+             && argument[strlen(argument) - 2] == ':'
+             && argument[strlen(argument) - 3] == ' '))
     {
-      argument[strlen(argument) - 4] = '\0';
+      argument[strlen(argument) - 3] = '\0';
       snprintf(buf, sizeof(buf), "You make a face and say, '%s'",
                argument);
       snprintf(buf2, sizeof(buf2), "$n makes a face and says, '%s'",
-               argument);
-    }
-    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
-             && argument[strlen(argument) - 2] == ';'
-             && argument[strlen(argument) - 3] == ' ')
-    {
-      argument[strlen(argument) - 3] = '\0';
-      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-               argument);
-      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
-               argument);
-    }
-    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
-             && argument[strlen(argument) - 2] == ':'
-             && argument[strlen(argument) - 3] == ' ')
-    {
-      argument[strlen(argument) - 3] = '\0';
-      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-               argument);
-      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
                argument);
     }
     else

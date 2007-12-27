@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.11  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.10  2005/04/23 12:18:12  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -955,68 +958,6 @@ ACMD(do_wimpy)
 }
 
 
-ACMD(do_display)
-{
-  size_t i;
-
-  if (IS_NPC(ch))
-  {
-    send_to_char("Mosters don't need displays.  Go away.\r\n", ch);
-    return;
-  }
-  skip_spaces(&argument);
-
-  if (!*argument)
-  {
-    send_to_char("Usage: prompt {{ {{ H | M | V | T} | all | none }\r\n",
-                 ch);
-    return;
-  }
-  if (!str_cmp(argument, "on") || !str_cmp(argument, "all"))
-  {
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_TIME);
-  }
-  else
-  {
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_TIME);
-
-    for (i = 0; i < strlen(argument); i++)
-    {
-      switch (LOWER(argument[i]))
-      {
-      case 'h':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-        break;
-      case 'm':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-        break;
-      case 'v':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-        break;
-      case 't':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_TIME);
-        break;
-      default:
-        if (!str_cmp(argument, "none"))
-          send_to_char
-          ("No prompt.\r\n",
-           ch);
-        return;
-      }
-    }
-  }
-
-  new_send_to_char(ch, "%s", CONFIG_OK);
-}
-
-
-
 ACMD(do_gen_write)
 {
   FILE *fl;
@@ -1081,8 +1022,7 @@ ACMD(do_gen_write)
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
 
   fclose(fl);
-  new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
-             GET_ROOM_VNUM(IN_ROOM(ch)), argument);
+  new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);
   send_to_char("Okay.  Thanks!\r\n", ch);
 }
 
@@ -1261,7 +1201,7 @@ ACMD(do_gen_tog)
        "You may now be gated to by other players.\r\n"},
       {"You are not roleplaying anymore.\r\n",
        "You are now roleplaying.\r\n"},
-       {"You will no longer see a tally of how many fish you have caught.\r\n",
+      {"You will no longer see a tally of how many fish you have caught.\r\n",
        "You will now see a tally of how many fish you have caught.\r\n"}
 
 
@@ -1438,7 +1378,7 @@ ACMD(do_gen_tog)
   case SCMD_NOBRAG:
     result = PRF_TOG_CHK(ch, PRF_NOBRAG);
     break;
-    case SCMD_FISHTALLY:
+  case SCMD_FISHTALLY:
     result = PRF_TOG_CHK(ch, PRF_FISHPROMPT);
     break;
   default:
@@ -1978,4 +1918,3 @@ ACMD(do_pagewidth)
   PAGEWIDTH(ch) = num;
   save_char(ch);
 }
-

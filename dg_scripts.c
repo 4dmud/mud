@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/04/23 12:18:12 $
-*  $Revision: 1.11 $
+*  $Date: 2005/08/07 04:12:39 $
+*  $Revision: 1.12 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.12  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.11  2005/04/23 12:18:12  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -3630,6 +3633,7 @@ struct lookup_table_t lookup_table[BUCKET_COUNT];
 
 void init_lookup_table(void)
 {
+#if 0
   int i;
   for (i = 0; i < BUCKET_COUNT; i++)
   {
@@ -3637,10 +3641,20 @@ void init_lookup_table(void)
     lookup_table[i].c    = NULL;
     lookup_table[i].next = NULL;
   }
+  #endif
 }
 
 struct char_data *find_char_by_uid_in_lookup_table(long uid)
 {
+#if 1
+struct char_data *tch;
+for (tch = character_list; tch; tch = tch->next)
+      if (GET_ID(tch) == uid)
+         return tch;
+      
+return NULL;  
+	
+#else
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -3649,7 +3663,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
   if (lt)
   {
     char_data *ch = (struct char_data *)(lt->c);
-    char_data *tch;
+
     if (!ch)
       return NULL;
     if (DEAD(ch))
@@ -3657,7 +3671,9 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
       log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
       //return NULL;
     }
-#if 1
+#if 0
+if (character_list) {
+   struct char_data *tch;
     for (tch = character_list; tch; tch = tch->next)
       if (GET_ID(tch) == GET_ID(ch))
         if (tch != ch)
@@ -3666,6 +3682,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
           ch = tch;
           break;
         }
+	}
 #endif
     return ch;
   }
@@ -3673,10 +3690,19 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
   log("find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
 
   return NULL;
+  #endif
 }
 
 struct obj_data *find_obj_by_uid_in_lookup_table(long uid)
 {
+#if 1
+struct obj_data *o;
+for (o = object_list;o;o = o->next)
+if (GET_ID(o) == uid)
+return o;
+
+return NULL;
+#else
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -3687,11 +3713,12 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid)
 
   log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
   return NULL;
+  #endif
 }
 
 void add_to_lookup_table(long uid, void *c)
 {
-
+#if 0
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -3712,12 +3739,14 @@ void add_to_lookup_table(long uid, void *c)
   CREATE(lt->next, struct lookup_table_t, 1);
   lt->next->uid = uid;
   lt->next->c = c;
+  #endif
 }
 
 
 void remove_from_lookup_table(long uid)
 {
 
+#if 0
 
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
@@ -3751,5 +3780,6 @@ void remove_from_lookup_table(long uid)
 
 
   log("remove_from_lookup. UID %ld not found.", uid);
+  #endif
 }
 

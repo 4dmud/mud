@@ -2,7 +2,7 @@
 *   File: comm.c                                        Part of CircleMUD *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
-*  All rights reserved.  See license.doc for complete information.        *4d
+*  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
@@ -4038,7 +4038,7 @@ void perform_act(const char *orig, struct char_data *ch,
         i = PERS(ch, to);
         break;
       case 'N':
-        CHECK_NULL(vict_obj, PERS((const struct char_data *) vict_obj, to));
+        CHECK_NULL(vict_obj, PERS((struct char_data *) vict_obj, to));
         dg_victim = (struct char_data *) vict_obj;
         break;
       case 'm':
@@ -4664,11 +4664,16 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
   size_t len = 0, psize;
   if (ch && ch->desc)
     d = ch->desc;
+  char **msg;
+   
+   if (!FIGHTING(ch))
+   msg = &(PROMPT(ch));
+   else
+   msg = &(BPROMPT(ch));
 
-
-  if (PROMPT(ch) && *PROMPT(ch))
+  if (*msg && **msg)
   {
-    strcpy(ptemp, PROMPT(ch));
+    strcpy(ptemp, *msg);
     proc_color(ptemp, IRANGE(0, COLOR_LEV(ch), 3), sizeof(ptemp));
     ptemp[MAX_PROMPT_LENGTH-1] = '\0';
   }
@@ -4792,6 +4797,9 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
           case '3':
             snprintf(insert_text, sizeof(insert_text), "%s", (IS_HOT(IN_ROOM(ch)) ? "Hot" : (IS_COLD(IN_ROOM(ch)) ? "Cold" : "Warm")));
             break;
+	  case '4':
+            snprintf(insert_text, sizeof(insert_text), "%d", MASTER(ch) && !DEAD(MASTER(ch)) ? (GET_MOVE(MASTER(ch))*100)/GET_MAX_MOVE(MASTER(ch)) : 0);
+            break;
           case 'f':
             snprintf(insert_text, sizeof(insert_text), "%d", FIGHTING(ch) && !DEAD(FIGHTING(ch)) ? (GET_HIT(FIGHTING(ch))*100)/GET_MAX_HIT(FIGHTING(ch)) : 0);
             break;
@@ -4826,7 +4834,7 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
             snprintf(insert_text, sizeof(insert_text), "%d",GET_PK_RIP(ch));
             break;
           case 'k':
-            commafmt(insert_text, sizeof(insert_text), (gold_int)GET_KILL_CNT(ch));
+            commafmt(insert_text, sizeof(insert_text), GET_KILL_CNT(ch));
             break;
           case 'K':
             snprintf(insert_text, sizeof(insert_text), "%d",GET_PK_CNT(ch));

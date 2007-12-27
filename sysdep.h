@@ -131,6 +131,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
+//#include <sqlite3.h>
 
 #ifdef HAVE_STRING_H
 #include <string.h>

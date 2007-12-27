@@ -73,7 +73,7 @@ ACMD(do_oasis_hedit)
   OLC_NUM(d) = 0;
   OLC_STORAGE(d) = strdup(argument);
 
- 
+
   for (OLC_ZNUM(d) = 0;OLC_ZNUM(d) <= top_of_helpt;OLC_ZNUM(d)++)
     if (isname_full(OLC_STORAGE(d), help_table[OLC_ZNUM(d)].keywords))
       break;
@@ -101,8 +101,9 @@ ACMD(do_oasis_hedit)
 void hedit_setup_new(struct descriptor_data *d)
 {
   CREATE(OLC_HELP(d), struct help_index_element, 1);
-  OLC_HELP(d)->keywords     = strdup(OLC_STORAGE(d));
-  OLC_HELP(d)->entry        = strdup("This is an unfinished help entry.\r\n");
+  OLC_HELP(d)->keywords     = str_dup(OLC_STORAGE(d));
+  OLC_HELP(d)->entry        = str_dup("This is an unfinished help entry.\r\n");
+  OLC_HELP(d)->min_level = 0;
   hedit_disp_menu(d);
   OLC_VAL(d) = 0;
 }
@@ -111,16 +112,13 @@ void hedit_setup_new(struct descriptor_data *d)
 
 void hedit_setup_existing(struct descriptor_data *d, int real_num)
 {
-  char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
   CREATE(OLC_HELP(d), struct help_index_element, 1);
-
-
   *OLC_HELP(d) = help_table[real_num];
   OLC_HELP(d)->entries = 0;
   /*
    * Allocate space for all strings.
    */
+   
 
   OLC_HELP(d)->keywords = strdup(help_table[real_num].keywords ?
                                  help_table[real_num].keywords : "UNDEFINED");
@@ -138,23 +136,31 @@ void hedit_save_internally(struct descriptor_data *d)
 {
   unsigned int i;
   struct help_index_element *new_help_table;
- 
+
   if (OLC_ZNUM(d) > top_of_helpt)
   {
-   unsigned int j = 0;
-    CREATE(new_help_table, struct help_index_element, top_of_helpt + 1);
-      for (i = 0; i <= top_of_helpt; i++)
-  {
-    if (help_table[i].id != OLC_HELP(d)->id)
-      new_help_table[j++] = help_table[i];
+    CREATE(new_help_table, struct help_index_element, top_of_helpt + 2);
+    for (i = 0; i <= top_of_helpt; i++)
+      new_help_table[i] = help_table[i];
+
+    top_of_helpt = i;
+    if (i != OLC_ZNUM(d))
+    log("Znum is dif from rnum in help");
+    free(help_table);
+    help_table = new_help_table;
+  } else {
+  if (help_table[OLC_ZNUM(d)].entry && *help_table[OLC_ZNUM(d)].entry)
+  free(help_table[OLC_ZNUM(d)].entry);
+  if (help_table[OLC_ZNUM(d)].keywords && *help_table[OLC_ZNUM(d)].keywords)
+  free(help_table[OLC_ZNUM(d)].keywords);
   }
-  top_of_helpt++;
-  free(help_table);
-  help_table = new_help_table;
-  }
- help_table[OLC_ZNUM(d)] = *OLC_HELP(d);
- help_table[OLC_ZNUM(d)].entry = str_dup(OLC_HELP(d)->entry);
- help_table[OLC_ZNUM(d)].keywords = str_dup(OLC_HELP(d)->keywords);
+
+  help_table[OLC_ZNUM(d)].min_level = OLC_HELP(d)->min_level;
+  help_table[OLC_ZNUM(d)].duplicate = 0;
+  help_table[OLC_ZNUM(d)].id = OLC_ZNUM(d);
+  help_table[OLC_ZNUM(d)].entries = 0; /* How many key words there are */  
+  help_table[OLC_ZNUM(d)].entry = (OLC_HELP(d)->entry);  
+  help_table[OLC_ZNUM(d)].keywords = (OLC_HELP(d)->keywords);
 
 
   add_to_save_list(HEDIT_PERMISSION, SL_HELP);
@@ -174,13 +180,13 @@ void hedit_save_to_disk(struct descriptor_data *d)
   snprintf(buf, sizeof(buf), "%s/%s", HLP_PREFIX, HELP_FILE);
   if (!(fp = fopen(buf, "w+")))
   {
-  new_mudlog(NRM, GET_LEVEL(d->character), TRUE, "Can't open help file '%s'", buf);
+    new_mudlog(NRM, GET_LEVEL(d->character), TRUE, "Can't open help file '%s'", buf);
     char error[MAX_STRING_LENGTH];
     snprintf(error, sizeof(error), "Can't open help file '%s'", buf);
     perror(error);
     exit(1);
   }
-log("Saving help to %s", buf);
+  log("Saving help to %s", buf);
   for (i = 0; i <= top_of_helpt; i++)
   {
 
@@ -189,11 +195,11 @@ log("Saving help to %s", buf);
             help->keywords && *help->keywords ? help->keywords : "UNDEFINED",
             help->entry && *help->entry ? help->entry : "Empty",
             help->min_level);
-	    log("%d - %s", i, help->keywords);
+    log("%d - %s", i, help->keywords);
   }
- /*
-  * Write final line and close.
-  */
+  /*
+   * Write final line and close.
+   */
   fprintf(fp, "$~\n");
   fclose(fp);
 
@@ -319,11 +325,11 @@ void hedit_parse(struct descriptor_data *d, char *arg)
   case 'y': case 'Y':
       hedit_setup_existing(d, OLC_ZNUM(d));
       break;
-      case 'n': case 'N':
+  case 'n': case 'N':
   case 'q': case 'Q':
       cleanup_olc(d, CLEANUP_ALL);
       break;
-  
+
       /*
       //OLC_ZNUM(d)++;
       //for (;(OLC_ZNUM(d) <= top_of_helpt); OLC_ZNUM(d)++)
@@ -356,7 +362,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
       break;
     }
     return;
-    
+
   case HEDIT_CONFIRM_ADD:
     switch (*arg)
     {
@@ -442,7 +448,7 @@ int hsort(const void *a, const void *b)
 
 void sort_help(void)
 {
-return;
+  return;
   //qsort(help_table, top_of_helpt, sizeof(struct help_index_element),        hsort);
   //top_of_helpt--;
 }

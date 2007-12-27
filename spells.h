@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.6  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.5  2005/03/17 12:42:13  w4dimenscor
  * Added skill smash
  *
@@ -292,8 +295,8 @@ enum skill_list {
   SKILL_HANDTOHAND,
   SKILL_MELEE ,
   SKILL_THIRD_ATTACK,
-  SKILL_FOURTH_ATTACK,
-  SKILL_FIFTH_ATTACK,//175
+  SKILL_HAMSTRING,
+  SKILL_FLURRY,//175
   SKILL_DODGE,
   SKILL_PHASE,
   SKILL_CHARGE,

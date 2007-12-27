@@ -63,10 +63,11 @@ void remort_char(struct char_data *ch)
     GET_CLAN(ch) = 0;
     GET_CLAN_RANK(ch) = 0;
   }
+  
 
 
   advance_level(ch);
-
+GET_WIMP_LEV(ch) = GET_MAX_HIT(ch)/2;
 
   if (siteok_everyone)
     SET_BIT_AR(PLR_FLAGS(ch), PLR_SITEOK);

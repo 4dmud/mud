@@ -310,8 +310,10 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   struct room_data * was_in = IN_ROOM(ch);
   int need_movement = 0, need_m_movement = 0;
   int vnum, chance, has_moved = FALSE;
+  int stam = 0;
   char local_buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
+  struct obj_data *bike = NULL;
   /*    struct char_data *herd, *next;
       bool FOUND = FALSE;*/
 
@@ -350,8 +352,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   // charmed?
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && HERE(ch, ch->master))
   {
-    send_to_char
-    ("The thought of leaving your master makes you weep.\r\n", ch);
+    new_send_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
     return (0);
   }
   if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_STAY_SECTOR) && (SECT(IN_ROOM(ch)) != SECT(EXIT(ch, dir)->to_room)))
@@ -364,7 +365,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   {
     if ((ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)))
     {
-      send_to_char("That area isn't open yet. Try back later.\r\n", ch);
+      new_send_to_char(ch, "That area isn't open yet. Try back later.\r\n");
       return (0);
     }
     /* if this room or the one we're going to needs a boat, check for one */
@@ -416,6 +417,40 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
       }
     }
   }//is imm
+  
+  
+    if (SECT(EXIT(ch, dir)->to_room) == SECT_SPACE)
+    {
+      struct obj_data *v;
+      if ((v = has_vehicle(ch)) == NULL)
+      {
+        need_movement = 1000;
+	stam = use_stamina(ch, 100);
+      }
+      else
+      {
+        if (GET_FUEL(v) == 0)
+        {
+          act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
+          return 0;
+        }
+        GET_FUEL(v)--;
+
+      }
+    }
+    else
+    {
+      struct obj_data *v;
+      if ((v = has_vehicle(ch)) != NULL)
+      {
+        if (GET_FUEL(v) == 0)
+        {
+          act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
+          return 0;
+        }
+        GET_FUEL(v)--;
+      }
+    }
 
   /*
    * if this room or the one we're going to is in space, 
@@ -442,6 +477,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
    }
    }
    */
+   if (!need_movement)
   need_movement = move_cost(ch, dir);
   if (need_movement == -1) //giving birth
     return 0;
@@ -470,9 +506,9 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     }
   }
   {
-    int stam = 0;
+    
     if (!IS_NPC(ch) && GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
-      stam = use_stamina(ch, 1);
+      stam += use_stamina(ch, 1);
     else if (RIDING(ch) && HERE(RIDING(ch), ch))
     {
       if (use_stamina(RIDING(ch),  MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1)) < 0)
@@ -484,10 +520,10 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         dismount_char(ch);
         return 0;
       }
-      stam = use_stamina(ch, 1);
+      stam += use_stamina(ch, 1);
     }
     else
-      stam = use_stamina(ch,  MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1));
+      stam += use_stamina(ch,  MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1));
 
 
 
@@ -749,7 +785,35 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   act("The entire herd follows the leader.", TRUE, ch, 0, 0,
    TO_ROOM);*/
   was_in = IN_ROOM(ch);
+  if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
+    bike = SITTING(ch);
+  
+
   move_char_to(ch, was_in->dir_option[dir]->to_room);
+   if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
+    look_at_room(ch, 0);
+
+  if (bike)
+  {
+    struct char_data *tempch;
+
+    obj_from_room(bike);
+    obj_to_room(bike, IN_ROOM(ch));
+
+    if (OBJ_SAT_IN_BY(bike) == NULL)
+      OBJ_SAT_IN_BY(bike) = ch;
+    for (tempch = OBJ_SAT_IN_BY(bike);tempch != ch;tempch = NEXT_SITTING(tempch))
+    {
+      if (NEXT_SITTING(tempch))
+        continue;
+      NEXT_SITTING(tempch) = ch;
+    }
+
+    SITTING(ch) = bike;
+    NEXT_SITTING(ch) = NULL;
+    GET_OBJ_VAL(bike, 1) += 1;
+    
+  }
 
   if (RIDING(ch) && IN_ROOM(RIDING(ch)) == was_in && IN_ROOM(RIDING(ch)) != IN_ROOM(ch))
   {
@@ -762,7 +826,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)))
       has_moved = TRUE;
   }
-  else
+  else if (!bike)
   {
     dismount_char(ch);
     riding = 0;
@@ -818,8 +882,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   NULL, TO_ROOM);
   } */
 
-  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
-    look_at_room(ch, 0);
+ 
 
   /* end the message restriction */
   message_type = NOTHING;
@@ -1460,7 +1523,7 @@ ACMD(do_enter)
 
   if (*buf)
   {			/* an argument was supplied, search for door
-                                    				 * keyword */
+                                        				 * keyword */
     if ((obj = get_obj_in_list_vis(ch, buf, NULL, IN_ROOM(ch)->contents)))
     {
       if (CAN_SEE_OBJ(ch, obj))
@@ -1726,12 +1789,13 @@ ACMD(do_sit)
             continue;
           NEXT_SITTING(tempch) = ch;
         }
-        act("You sit down upon $p.", TRUE, ch, chair, 0, TO_CHAR);
-        act("$n sits down upon $p.", TRUE, ch, chair, 0, TO_ROOM);
+
         SITTING(ch) = chair;
         NEXT_SITTING(ch) = NULL;
         GET_OBJ_VAL(chair, 1) += 1;
         GET_POS(ch) = POS_SITTING;
+        act("You sit down upon $p.", TRUE, ch, chair, 0, TO_CHAR);
+        act("$n sits down upon $p.", TRUE, ch, chair, 0, TO_ROOM);
       }
     }
     break;
@@ -2076,10 +2140,57 @@ ACMD(do_follow)
 // Mounts (DAK)
 ASKILL(skill_mount)
 {
-  char arg[MAX_INPUT_LENGTH];
+  if (obj)
+  {
+    struct char_data *tempch;
+    if (GET_OBJ_TYPE(obj) == ITEM_SPACEBIKE)
+    {
+      if (RIDING(ch) || RIDDEN_BY(ch))
+      {
+        new_send_to_char(ch, "You are already mounted.\r\n");
+        return 0;
+      }
+      if (OBJ_SAT_IN_BY(obj))
+      {
+        new_send_to_char(ch, "It is already mounted.\r\n");
+        return 0;
+      }
+      if (SITTING(ch))
+      {
+        new_send_to_char(ch, "You are sitting on something already.\r\n");
+        return 0;
+      }
 
-  one_argument(argument, arg);
 
+      OBJ_SAT_IN_BY(obj) = ch;
+      for (tempch = OBJ_SAT_IN_BY(obj); tempch != ch;
+           tempch = NEXT_SITTING(tempch))
+      {
+        if (NEXT_SITTING(tempch))
+          continue;
+        NEXT_SITTING(tempch) = ch;
+      }
+
+      SITTING(ch) = obj;
+      NEXT_SITTING(ch) = NULL;
+      GET_OBJ_VAL(obj, 1) += 1;
+
+      act("You mount $p", TRUE, ch, obj, NULL, TO_CHAR);
+      act("$n mounts $p", TRUE, ch, obj, NULL, TO_ROOM);
+      return 0;
+    }
+    if (!vict) {
+  act("You can't mount $p!", FALSE, ch, obj, NULL, TO_CHAR);
+  return 0;
+  }
+
+  }
+  else if (!vict) {
+  act("You can't mount that!", FALSE, ch, NULL, NULL, TO_CHAR);
+  return 0;
+  }
+  
+  
   if ((GET_RACE(ch) == RACE_CENTAUR && GET_LEVEL(ch) < LVL_IMMORT) || (!IS_NPC(vict) && GET_RACE(vict) != RACE_CENTAUR))
   {
     send_to_char("Ehh... no.\r\n", ch);
@@ -2151,20 +2262,26 @@ ASKILL(skill_mount)
 
 ACMD(do_dismount)
 {
-  if (!RIDING(ch))
+
+  if (RIDING(ch))
   {
-    send_to_char("You aren't even riding anything.\r\n", ch);
-    return;
-  }
-  else if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch))
+    
+  if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch))
   {
-    send_to_char("Yah, right, and then drown...\r\n", ch);
+    new_send_to_char(ch,"Yah, right, and then drown...\r\n");
     return;
   }
 
   act("You dismount $N.", FALSE, ch, 0, RIDING(ch), TO_CHAR);
   act("$n dismounts from you.", FALSE, ch, 0, RIDING(ch), TO_VICT);
   act("$n dismounts $N.", TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
+  } else if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE) {
+  act("You dismount $p.", FALSE, ch, SITTING(ch), NULL, TO_CHAR);
+  act("$n dismounts $p.", TRUE, ch, SITTING(ch), NULL, TO_ROOM);
+  } else {
+  new_send_to_char(ch, "You aren't even riding anything.\r\n");
+    return;
+    }
   dismount_char(ch);
 }
 

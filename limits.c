@@ -498,7 +498,7 @@ void gain_exp(struct char_data *ch, gold_int gain)
     }
 
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch,"You receive %s%lld experience points.\r\n", dexp ? "a massive double " : "", dexp ? (gold_int)(0.5 * gain) : gain);
+      new_send_to_char(ch,"You receive %s%lld experience points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
 
     if (is_altered && (GET_LEVEL(ch) < LVL_HERO))
     {
@@ -627,7 +627,7 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
     }
 
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch,"You receive %s%lld grouping points.\r\n", dexp ? "a massive double " : "", dexp ? (gold_int)(0.5 * gain) : gain);
+      new_send_to_char(ch,"You receive %s%lld grouping points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
 
     if (is_altered && (GET_LEVEL(ch) < LVL_HERO))
     {
@@ -820,7 +820,7 @@ void point_update(void)
     if (!IS_NPC(i))
     {
       /* MatingMod - Extra Hunger/Thirst */
-      if (GET_LEVEL(i) > 5)
+      if (GET_LEVEL(i) > 5 && number(0, 2))
       {
         if (PREG(i) > -1)
         {
@@ -830,7 +830,11 @@ void point_update(void)
         }
         else
         {
+	if (GET_STAMINA(i) != GET_MAX_STAMINA(i))
           gain_condition(i, FULL, -1);
+	  else
+	  gain_condition(i, FULL, -3);
+	  
           gain_condition(i, DRUNK, -1);
           gain_condition(i, THIRST, -1);
         }			/* End MatingMod modifications */

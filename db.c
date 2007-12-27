@@ -425,9 +425,9 @@ void sort_zone_list(int total)
 #endif
   qsort(temp_list,total,sizeof(temp_list[0]),zone_compare);
 #if 1
-temp = zone_list;
-ztmp = zone_list;
-zone_list = NULL;
+  temp = zone_list;
+  ztmp = zone_list;
+  zone_list = NULL;
   for (i=0;i<total;i++)
   {
     log("After  - %d", temp_list[i]->num);
@@ -436,7 +436,7 @@ zone_list = NULL;
     strcpy(temp->zone, temp_list[i]->zone);
     temp->next = zone_list;
     zone_list = temp;
-    
+
   }
   free_zone_list(ztmp);
 #endif
@@ -480,10 +480,11 @@ int create_zone_index(void)
           //log("zone: %d", temp->num);
         }
       }
-      if (eps[cnt]) {
-          free(eps[cnt]);
-	  eps[cnt] = NULL;
-	  }
+      if (eps[cnt])
+      {
+        free(eps[cnt]);
+        eps[cnt] = NULL;
+      }
     }
   }
   else
@@ -1297,10 +1298,10 @@ void clean_pfiles(void)
       continue;
     timeout = -1;
 
-      if ((IS_SET(player_table[i].flags, PINDEX_DELETED)) || (player_table[i].level < 40 &&player_table[i].clan == 12))
-      {
-        timeout = 90;
-       
+    if ((IS_SET(player_table[i].flags, PINDEX_DELETED)) || (player_table[i].level < 40 &&player_table[i].clan == 12))
+    {
+      timeout = 90;
+
       timeout *= SECS_PER_REAL_DAY;
       if ((tm - player_table[i].last) > timeout)
         remove_player(i);
@@ -1814,8 +1815,9 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
     switch (*line)
     {
     case 'D':
-      // log("INFO: Reading room: %d.", virtual_nr);
+
       setup_dir(fl, room_nr, atoi(line + 1));
+
       break;
     case 'E':
       CREATE(new_descr, struct extra_descr_data, 1);
@@ -1956,7 +1958,7 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
   sprintf(buf2,"room #%d, direction D%d",room->number,dir);
   if (dir < 0 || dir >= NUM_OF_DIRS)
   {
-  char *di;
+    char *di;
     log("Doors are only in the range of 0 to %d, this door isn't: %s\r\n(gulping door)", NUM_OF_DIRS, buf2);
     di = fread_string(fl, buf2);
     free_string(&di);
@@ -1976,9 +1978,11 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
       CREATE(room->dir_option[dir], struct room_direction_data, 1);
       room->dir_option[dir]->general_description = NULL;
       room->dir_option[dir]->keyword = NULL;
-    } else {
-    free_string(&room->dir_option[dir]->keyword);
-    free_string(&room->dir_option[dir]->general_description);
+    }
+    else
+    {
+      free_string(&room->dir_option[dir]->keyword);
+      free_string(&room->dir_option[dir]->general_description);
     }
     room->dir_option[dir]->general_description = fread_string(fl, buf2);
     room->dir_option[dir]->keyword = fread_string(fl, buf2);
@@ -2774,19 +2778,19 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
 
   if (MOB_FLAGGED(mob_proto + i, MOB_HEALER))
     ASSIGNMOB(nr, cleric);
-  
+
   if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER))
     ASSIGNMOB(nr, postmaster);
-  
+
   top_of_mobt = i++;
 }
 
 int is_aggro(CHAR_DATA *ch)
 {
   if ( MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
-      (MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
-       MOB_FLAGGED(ch, MOB_AGGR_EVIL) || 
-       MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL)))
+       (MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
+        MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
+        MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL)))
     return 1;
   return 0;
 }
@@ -3475,7 +3479,7 @@ void load_help(FILE *fl)
   {
     //strlcat(key, "\r\n", sizeof(key));	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
     //entrylen = strlcpy(entry, key, sizeof(entry));
-entrylen = 0;
+    entrylen = 0;
     /* read in the corresponding help entry */
     get_one_line(fl, line);
     while (*line != '#' && entrylen < sizeof(entry) - 1)
@@ -3514,8 +3518,8 @@ entrylen = 0;
     prune_crlf(key);
     el.keywords = str_dup(key);
     el.duplicate = 0; //redundant call
-      help_table[top_of_helpt++] = el;
-      
+    help_table[top_of_helpt++] = el;
+
 
     /* get next keyword line (or $) */
     get_one_line(fl, key);
@@ -3602,7 +3606,7 @@ int vnum_object(char *searchname, struct char_data *ch)
   return (found);
 }
 
-
+#if USE_CREATE_CHAR
 /* create a character, and add it to the char list */
 struct char_data *create_char(void)
 {
@@ -3613,13 +3617,17 @@ struct char_data *create_char(void)
   ch->next = character_list;
   character_list = ch;
   //TODO: check this
-  if (!valid_id_num(max_mob_id+1))
-    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1);
+  while (!valid_id_num(max_mob_id))
+  {
+    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id);
+    max_mob_id++;
+  }
   GET_ID(ch) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(ch), (void *)ch);
   return (ch);
 }
+#endif
 
 
 /* create a new mobile from a prototype */
@@ -3672,8 +3680,11 @@ struct char_data *read_mobile(mob_vnum nr, int type)
     GET_GOLD(mob) = 0;
 
   mob_index[i].number++;
-  if (!valid_id_num(max_mob_id+1))
-    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id+1);
+  while (!valid_id_num(max_mob_id))
+  {
+    log("Error new id being assigned to mob already exists(%ld)!", max_mob_id);
+    max_mob_id++;
+  }
   GET_ID(mob) = max_mob_id++;
   /* find_char helper */
   add_to_lookup_table(GET_ID(mob), (void *)mob);
@@ -4752,6 +4763,7 @@ void default_char(struct char_data *ch)
   GET_AWARD(ch) = 0;
   CONCEALMENT(ch) = 0;
   PROMPT(ch)  = NULL;
+  BPROMPT(ch) = NULL;
   PAGEWIDTH(ch) = 80;
   PAGEHEIGHT(ch) = 25;
   LOCKER_EXPIRE(ch) = 0;
@@ -4927,6 +4939,12 @@ int store_to_char(char *name, struct char_data *ch)
         GET_BETTED_ON(ch) = num;
       else if (!strcmp(tag, "Body"))
         EXTRA_BODY(ch) = num;
+      else if (!strcmp(tag, "Bpmt"))
+        {
+          if (BPROMPT(ch))
+            free(BPROMPT(ch));
+          BPROMPT(ch) = str_dup(line);
+        }
       break;
 
     case 'C':
@@ -5017,7 +5035,7 @@ int store_to_char(char *name, struct char_data *ch)
     case 'I':
       if (!strcmp(tag, "Id  "))
       {
-        
+
         GET_IDNUM(ch) = num6;
       }
       else if (!strcmp(tag, "Int "))
@@ -5356,11 +5374,11 @@ int store_to_char(char *name, struct char_data *ch)
 
   //ch->real_abils = ch->aff_abils;
 
-    for (i = 0; i < MAX_AFFECT && tmp_aff[i].type != 0; i++)
-    {
-      if (tmp_aff[i].type)
-        affect_to_char(ch, &tmp_aff[i]);
-    }
+  for (i = 0; i < MAX_AFFECT && tmp_aff[i].type != 0; i++)
+  {
+    if (tmp_aff[i].type)
+      affect_to_char(ch, &tmp_aff[i]);
+  }
 
   if (GET_LEVEL(ch) >= LVL_IMMORT)
   {
@@ -5498,7 +5516,7 @@ void char_to_store(struct char_data *ch)
     return;
   }
   //if (!ch->desc)
-    //return;
+  //return;
 
   for (i = 0; (*(bits + i) = LOWER(*(GET_NAME(ch) + i))); i++);
 
@@ -5742,6 +5760,8 @@ void char_to_store(struct char_data *ch)
     fprintf(fl, "RwTm: %d\n", SPECIALS(ch)->last_reward);
   if (PROMPT(ch) && *PROMPT(ch))
     fprintf(fl, "Prmp: %s\n", PROMPT(ch));
+  if (BPROMPT(ch) && *BPROMPT(ch))
+    fprintf(fl, "Bpmt: %s\n", BPROMPT(ch));
   if (EXTRA_BODY(ch))
     fprintf(fl, "Body: %d\n", EXTRA_BODY(ch));
   fprintf(fl, "PgWd: %d\n", PAGEWIDTH(ch));
@@ -5968,35 +5988,36 @@ char *fread_string(FILE *fl, const char *error)
     /* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
     /* now only removes trailing ~'s -- Welcor */
     //point = strchr(tmp, '\0');
-    if ((tlen = strlen(tmp)) > 0) {
-    point = (tmp + tlen - 1);
-    for (; (*point=='\r' || *point=='\n'); point--);
-    if (*point=='~')
+    if ((tlen = strlen(tmp)) > 0)
     {
-      *point='\0';
-      done = 1;
-    }
-    else 
-    {
-    /** but what if this ends up making it bigger then the buffer?**/
-      *(++point) = '\r';
-      *(++point) = '\n';
-      *(++point) = '\0';
-    }
+      point = (tmp + tlen - 1);
+      for (; (*point=='\r' || *point=='\n'); point--);
+      if (*point=='~')
+      {
+        *point='\0';
+        done = 1;
+      }
+      else
+      {
+        /** but what if this ends up making it bigger then the buffer?**/
+        *(++point) = '\r';
+        *(++point) = '\n';
+        *(++point) = '\0';
+      }
 
-    templength = point - tmp;
+      templength = point - tmp;
 
-    if (length + templength >= MAX_STRING_LENGTH)
-    {
-      log("SYSERR: fread_string: string too large (db.c)");
-      log("%s", error);
-      exit(1);
-    }
-    else
-    {
-      strcat(buf + length, tmp);	/* strcat: OK (size checked above) */
-      length += templength;
-    }
+      if (length + templength >= MAX_STRING_LENGTH)
+      {
+        log("SYSERR: fread_string: string too large (db.c)");
+        log("%s", error);
+        exit(1);
+      }
+      else
+      {
+        strcat(buf + length, tmp);	/* strcat: OK (size checked above) */
+        length += templength;
+      }
     }
   }
   while (!done);
@@ -6031,6 +6052,7 @@ void free_mob_memory(memory_rec *k)
 /* release memory allocated for a char struct */
 void free_char(struct char_data *ch)
 {
+  void free_ignorelist(struct char_data *ch);
   int i;
   struct alias_data *a;
 
@@ -6074,6 +6096,8 @@ void free_char(struct char_data *ch)
     skills_remove(ch, ch->skills);
   ch->skills = NULL;
 
+  free_ignorelist(ch);
+
   if (ch->player_specials != NULL && ch->player_specials != &dummy_mob)
   {
     while ((a = GET_ALIASES(ch)) != NULL)
@@ -6081,7 +6105,7 @@ void free_char(struct char_data *ch)
       GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
       free_alias(a);
     }
-    free_string(&GET_LAST_PROMPT(ch));
+    free_string(&BPROMPT(ch));
     if (PROMPT(ch));
     free(PROMPT(ch));
     if (ch->player_specials->poofin)
@@ -6323,7 +6347,6 @@ void reset_char(struct char_data *ch)
   ATK_CHANCE(ch) = 3;
   FUSED_TO(ch) = NULL;
   GET_SKILLMULTI(ch) = 0.0;
-  GET_LAST_PROMPT(ch) = NULL;
   ch->followers = NULL;
   ch->master = NULL;
   IN_ROOM(ch) = NULL;
@@ -6546,9 +6569,9 @@ void init_char(struct char_data *ch)
   //TODO: check this
   if ((i = get_ptable_by_name(GET_NAME(ch))) != -1)
   {
-    if (!valid_id_num(top_idnum+1))
-      log("Error new id %ld being assigned to %s already exists!",top_idnum+1, GET_NAME(ch));
-    player_table[i].id = GET_IDNUM(ch) = GET_ID(ch) =  ++top_idnum;
+    while (!valid_id_num(++top_idnum))
+      log("Error new id %ld being assigned to %s already exists!",top_idnum, GET_NAME(ch));
+    player_table[i].id = GET_IDNUM(ch) = GET_ID(ch) =  top_idnum;
 
     player_table[i].account = GET_IDNUM(ch);
     add_to_lookup_table(GET_ID(ch), (void *)ch);
@@ -6991,7 +7014,7 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                                                                                                                        						   special care */
+                                                                                                                                                						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";
@@ -7136,14 +7159,15 @@ mob_rnum real_mobile(mob_vnum vnum)
     else
       bot = mid + 1;
   }
-  #else
+#else
   int i;
-    for (i = 0; i <= top_of_mobt; i++) {
+  for (i = 0; i <= top_of_mobt; i++)
+  {
     if (mob_index[i].vnum == vnum)
-    return i;
-    }
-    return -1;
-    #endif
+      return i;
+  }
+  return -1;
+#endif
 }
 
 
@@ -7174,14 +7198,15 @@ obj_rnum real_object(obj_vnum vnum)
     else
       bot = mid + 1;
   }
-  #else
+#else
   int i;
-  for (i = 0; i <= top_of_objt; i++) {
+  for (i = 0; i <= top_of_objt; i++)
+  {
     if (obj_index[i].vnum == vnum)
-    return i;
-    }
-    return -1;
-  #endif
+      return i;
+  }
+  return -1;
+#endif
 }
 
 
@@ -7214,7 +7239,8 @@ void generate_weapon(OBJ_DATA *obj)
 
   if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
     return;
-else  {
+  else
+  {
     char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], *point;
 
 
@@ -8098,8 +8124,12 @@ zone_rnum real_zone(zone_vnum vnum)
 int valid_id_num(long id)
 {
   CHAR_DATA *tch;
+  DESCRIPTOR_DATA *d;
   for (tch = character_list; tch; tch = tch->next)
     if (GET_ID(tch) == id)
+      return 0;
+  for (d = descriptor_list; d; d = d->next)
+    if (d->character && GET_ID(d->character) == id)
       return 0;
   return 1;
 }

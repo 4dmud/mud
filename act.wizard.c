@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.30  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.29  2005/06/26 04:37:00  w4dimenscor
  * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
  *
@@ -707,25 +710,38 @@ ACMD(do_send)
 
 ACMD(do_prompt_new)
 {
-  char **msg = &(PROMPT(ch));
+  char **msg;
+   
+   if (subcmd == SCMD_PROMPT)
+   msg = &(PROMPT(ch));
+   else
+   msg = &(BPROMPT(ch));
 
   skip_spaces(&argument);
 
   if (!argument || !*argument)
   {
-    new_send_to_char(ch, "Your prompt: %s\r\nFor default prompt type: prompt default\r\nFor no prompt type: prompt none\r\n", PROMPT(ch));
+  if (subcmd == SCMD_PROMPT)
+    new_send_to_char(ch, "Your prompt: %s\r\nFor a default prompt type: prompt default\r\nFor no prompt type: prompt none\r\n", PROMPT(ch));
+    else
+    new_send_to_char(ch, "Your battle prompt: %s\r\nFor a default battle prompt type: bprompt default\r\nFor no battle prompt type: bprompt none\r\n", BPROMPT(ch));
     return;
   }
 
   if (!strcmp(argument, "default") || !strcmp(argument, "all"))
   {
+  if (subcmd == SCMD_PROMPT)
     strcpy(argument, "{cg%h{cwH {cc%m{cwM {cy%v{cwV {cW(%S) {cC%E{cyTNL{c0>");
+    else if (subcmd == SCMD_BPROMPT)
+    strcpy(argument, "{cg%h{cwH {cc%m{cwM {cW(%S) {cC%E{cyTNL {cwVictHp:{cM%f%%{c0 >");
+  } else if ((subcmd == SCMD_BPROMPT) && !strcmp(argument, "copy")) {
+    strcpy(argument, PROMPT(ch));
   }
 
   if (strlen(argument) > MAX_PROMPT_LENGTH - 30)
   {
     new_send_to_char
-    (ch, "You prompt must be shorter than %d characters.\r\n",
+    (ch, "Your prompt must be shorter than %d characters.\r\n",
      MAX_PROMPT_LENGTH - 30);
     return;
   }
@@ -1585,6 +1601,10 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
       new_send_to_char(ch, "%s ", GET_NAME(tempch));
     }
     break;
+  case ITEM_SPACEBIKE:
+  new_send_to_char(ch, "FUEL: %d MAX: %d SITTING IN BIKE: %s\r\n",
+                     GET_FUEL(j), GET_MAX_FUEL(j), OBJ_SAT_IN_BY(j) ? GET_NAME(OBJ_SAT_IN_BY(j)) : "Nobody");
+  break;
   case ITEM_LIGHTSABRE_HILT:
     new_send_to_char(ch, "Num Sabers: %d Number dam dice: %d Size dam dice: %d\r\nSaber Color: %s ",
                      (int) GET_OBJ_VAL(j, 0),(int) GET_OBJ_VAL(j, 1), (int) GET_OBJ_VAL(j, 2),

@@ -28,7 +28,7 @@
 
 extern struct zone_data *zone_table;
 extern zone_rnum top_of_zone_table;
-extern struct room_data *world;
+extern struct room_data *world_vnum[];
 extern struct char_data *mob_proto;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;

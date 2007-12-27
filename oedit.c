@@ -604,6 +604,9 @@ void oedit_disp_val1_menu(struct descriptor_data *d)
   case ITEM_LIGHTSABRE_HILT:
     oedit_disp_dubsing(d);
     break;
+    case ITEM_SPACEBIKE:
+    oedit_disp_val3_menu(d);
+    break;
   default:
     oedit_disp_menu(d);
   }
@@ -722,6 +725,9 @@ void oedit_disp_val3_menu(struct descriptor_data *d)
   case ITEM_PORTAL_HURDLE:
     write_to_output(d, "Timer, -1 for infinite : ");
     break;
+    case ITEM_SPACEBIKE:
+    write_to_output(d, "It costs 1 fuel per room in space to move.\r\nCurrent Fuel:");
+    break;
   default:
     oedit_disp_menu(d);
   }
@@ -754,6 +760,9 @@ void oedit_disp_val4_menu(struct descriptor_data *d)
   case ITEM_FOUNTAIN:
   case ITEM_FOOD:
     write_to_output(d, "Poisoned (0 = not poison) : ");
+    break;
+  case ITEM_SPACEBIKE:
+    write_to_output(d, "It costs 1 fuel per room in space to move.\r\nMax Fuel:");
     break;
   default:
     oedit_disp_menu(d);

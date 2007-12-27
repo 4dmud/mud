@@ -170,7 +170,7 @@ void assign_subskills(void)
 
   /* gives a chance of avoiding sanctuary */
   subo(SUB_SWEEP_ATTACK, "SweepAttack", 0, 0,
-       0, POS_FIGHTING, 0 , PEAC,
+       0, POS_FIGHTING, TAR_IGNORE , PEAC,
        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_COMBATANT);
 
   /* gives a chance of avoiding sanctuary */
@@ -733,7 +733,25 @@ ASUB(sub_drain_blood)
 {
   /** make this a starting attack, the victims hp and adds it to yours **/
   /** You do as much damage as you are damaged **/
-return FALSE;
+ if (GET_SUB(ch, SUB_DRAIN_BLOOD) <= 0)
+  {
+    new_send_to_char(ch, "You haven't got that ability!\r\n");
+    return SUB_UNDEFINED;
+  }
+  
+  if (get_sub_status(ch, SUB_DRAIN_BLOOD) == STATUS_OFF ) {
+  if (GET_ALIGNMENT(ch) > -600) {
+  new_send_to_char(ch, "You focus on draining blood.\r\n");
+  toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_ON);
+  } else {
+  new_send_to_char(ch, "You aren't evil enough drain blood.\r\n");
+  }
+  } else {
+  new_send_to_char(ch, "You focus on normal attacks.\r\n");
+  toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_OFF);
+  }
+  return TRUE;
+  
 
 
 }

@@ -38,36 +38,36 @@ void assign_mob_stats()
 
   int i;
 
-  for (i = 0; i < MAX_MOB_LEVELS; i++ )
+  for (i = 1; i < MAX_MOB_LEVELS; i++ )
   {
 
     s[0] = i;
     /* ac needs to drop from 100 at level <1 to -100 at level > 50  */
     s[1] = ((i > 50) ? -100 : (100 - ((i< 1?1:i)*4)));
     //Hp
-    s[2] = (i == 0 ? 1 : (i < 10 ? (i%3) : (i%6)))+1;
-    s[3] = (i == 0 ? 1 : (i < 13 ? (i%5) : (i%13)))+1;
-    s[4] = MAX(40, (i * i * i * 0.22)) + 400;
+    s[2] = i;
+    s[3] = i;
+    s[4] = MAX(40, (i * i * i)/35) + 150;
     //Damroll
-    s[5] = MAX(1, (i*0.4) + (i * 0.4));
-    s[6] = MAX(1, (i*0.4) + (i * 0.4));
-    s[7] = m_powf(i, (i*0.004)+1.356);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+    s[5] = MAX(1, (i*0.3) + (i*0.3));
+    s[6] = MAX(2, (i*0.35) + (i*0.3));
+    s[7] = m_powf(i, (i*0.004)+1.335);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
-    s[8] =  (i * i * i * 10) + 200; /* exp */
+    s[8] =  (i * i * i * 15) + 200; /* exp */
     s[9] = (i * i * i * 1.4); /* gold */
-    s[10] = i * (1.0 + (i * 0.035)); /* hitroll */
+    s[10] = i * (1.0 + (i * 0.02)); /* hitroll */
 
     /*-------put it back together--------*/
-    mob_stats[i].level 	= s[0];
-    mob_stats[i].ac 	= s[1];
+    mob_stats[i].level 		= s[0];
+    mob_stats[i].ac 		= s[1];
     mob_stats[i].hp_dice 	= s[2];
     mob_stats[i].hp_sides 	= s[3];
     mob_stats[i].hp_bonus 	= s[4];
     mob_stats[i].dam_dice 	= s[5];
     mob_stats[i].dam_sides 	= s[6];
     mob_stats[i].dam_bonus 	= s[7];
-    mob_stats[i].exp 	= s[8];
-    mob_stats[i].gold 	= s[9];
+    mob_stats[i].exp 		= s[8];
+    mob_stats[i].gold 		= s[9];
     mob_stats[i].hitroll 	= s[10];
     log("LEV:%-2d -- HP:%-6d Avg Dam:%-4d X:%-7d G:%-d",
         s[0],(int)((s[2] * s[3]) * 0.5) + s[3] + s[4],(int)((s[5] * s[6]) * 0.5) + s[6] + s[7],s[8], s[9]);

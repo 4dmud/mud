@@ -132,3 +132,17 @@ void read_ignorelist(struct char_data *ch)
   while (!feof(file));
   fclose(file);
 }
+
+void free_ignore(struct ignore *i) {
+if (!i)
+return;
+if (i->next)
+free_ignore(i);
+
+free_string(&i->ignore);
+free(i);
+}
+void free_ignorelist(struct char_data *ch) {
+free_ignore(GET_IGNORELIST(ch));
+GET_IGNORELIST(ch) = NULL;
+}

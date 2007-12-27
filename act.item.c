@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.16  2005/06/18 12:20:52  w4dimenscor
  * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
  *
@@ -121,6 +124,7 @@ int can_wear_on_pos(struct obj_data *obj, int pos);
 void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse);
 int count_magic(struct obj_data *obj, CHAR_DATA *ch);
 int is_magic(OBJ_DATA *obj);
+C_FUNC(push_object);
 
 /* Local Variables */
 int slipping = FALSE;
@@ -152,11 +156,11 @@ int where_to_worn(int where);
 char *auctioneer[AUC_BID + 1] = {
 
                                   "The auctioneer auctions, '$n puts $p up for sale at %d coins.'",
-                                  "The auctioneer auctions, '$p at %d coins going once!.'",
-                                  "The auctioneer auctions, '$p at %d coins going twice!.'",
+                                  "The auctioneer auctions, '$p at %d coins going once!'",
+                                  "The auctioneer auctions, '$p at %d coins going twice!'",
                                   "The auctioneer auctions, 'Last call: $p going to $N for %d coins.'",
                                   "The auctioneer auctions, 'Unfortunately $p is unsold, returning it to $n.'",
-                                  "The auctioneer auctions, 'SOLD! $p to $n for %d coins!.'",
+                                  "The auctioneer auctions, 'SOLD! $p to $n for %d coins!'",
                                   "The auctioneer auctions, 'Sorry, $n has cancelled the auction.'",
                                   "The auctioneer auctions, 'Sorry, $n has left us, the auction can't go on.'",
                                   "The auctioneer auctions, 'Sorry, $p has been confiscated, shame on you $n.'",
@@ -344,7 +348,7 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
   // no obj name defined
   if (!*obj_desc)
   {
-   new_send_to_char(ch,"Put what in what?\r\n");
+    new_send_to_char(ch,"Put what in what?\r\n");
     return FALSE;
   }
 
@@ -359,7 +363,7 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
   // multiple (all.xxxx) container name used
   if (cont_dotmode != FIND_INDIV)
   {
-   new_send_to_char(ch,"You can only put things into one container at a time.\r\n");
+    new_send_to_char(ch,"You can only put things into one container at a time.\r\n");
     return FALSE;
   }
 
@@ -382,7 +386,7 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
   // container is closed
   if (OBJVAL_FLAGGED(*cont_data, CONT_CLOSED))
   {
-   new_send_to_char(ch,"You'd better open it first!\r\n");
+    new_send_to_char(ch,"You'd better open it first!\r\n");
     return FALSE;
   }
 
@@ -397,7 +401,7 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
 
     if (obj_data == cont_data)
     {
-     new_send_to_char(ch,"You attempt to fold it into itself, but fail.\r\n");
+      new_send_to_char(ch,"You attempt to fold it into itself, but fail.\r\n");
       return FALSE;
     }
   }
@@ -423,34 +427,41 @@ ACMD(do_put)
   struct obj_data *next_obj_data, *obj_data, *cont_data;
   int obj_dotmode, cont_dotmode, howmany = 1, processed_put_counter = 0, failed_put_counter = 0;
   char *obj_desc, *cont_desc;
-  
+
   skip_spaces(&argument);
-  
-  if (strncasecmp(argument, "all ", 4)) {
-  /** put all of the stuff that can fit, from inventory to container.
-      all the rest of argument is container description. **/
-  argument = any_one_arg(argument, arg1);
-  skip_spaces(&argument);
-  cont_desc = argument;
-  obj_desc = arg1;
-  } else {
-  if (begins_with_number(argument)) {
-  argument = any_one_arg(argument, arg1);
-  howmany = atoi(arg1);
+
+  if (strncasecmp(argument, "all ", 4))
+  {
+    /** put all of the stuff that can fit, from inventory to container.
+        all the rest of argument is container description. **/
+    argument = any_one_arg(argument, arg1);
+    skip_spaces(&argument);
+    cont_desc = argument;
+    obj_desc = arg1;
   }
-  
-  if (!str_str(argument, " in ")) {
-  /** single argument mode **/ 
-  two_arguments(argument, arg1, arg2);
-  obj_desc = arg1;
-  cont_desc = arg2;
-  } else {
-  /** dual argument mode **/
-  obj_desc = str_until(argument, "in", arg1, sizeof(arg1));
-  cont_desc = arg1;
+  else
+  {
+    if (begins_with_number(argument))
+    {
+      argument = any_one_arg(argument, arg1);
+      howmany = atoi(arg1);
+    }
+
+    if (!str_str(argument, " in "))
+    {
+      /** single argument mode **/
+      two_arguments(argument, arg1, arg2);
+      obj_desc = arg1;
+      cont_desc = arg2;
+    }
+    else
+    {
+      /** dual argument mode **/
+      obj_desc = str_until(argument, "in", arg1, sizeof(arg1));
+      cont_desc = arg1;
+    }
   }
-  }
-  
+
   obj_dotmode = find_all_dots(obj_desc);
   cont_dotmode = find_all_dots(cont_desc);
 
@@ -464,7 +475,7 @@ ACMD(do_put)
   {
     if (howmany > 1)
       wearall = 1;
-      /** this loop could end in tears if any trigger purges inventory on the perform_put -- mord**/
+    /** this loop could end in tears if any trigger purges inventory on the perform_put -- mord**/
     while (obj_data && howmany )
     {
       next_obj_data = obj_data->next_content;
@@ -508,7 +519,7 @@ ACMD(do_put)
     {
       if (obj_dotmode == FIND_ALL)
       {
-       new_send_to_char(ch,"You don't seem to have anything to put in it.\r\n");
+        new_send_to_char(ch,"You don't seem to have anything to put in it.\r\n");
       }
       else
       {
@@ -632,7 +643,7 @@ void get_check_money(struct char_data *ch, struct obj_data *obj)
   gold_data(TAKEN, value);
 
   if (value == 1)
-   new_send_to_char(ch,"There was 1 coin.\r\n");
+    new_send_to_char(ch,"There was 1 coin.\r\n");
   else
   {
     new_send_to_char(ch, "There were %lld coins.\r\n", value);
@@ -651,7 +662,7 @@ ACMD(do_meld)
 
   if (!*arg)
   {
-   new_send_to_char(ch,"Meld what?\r\n");
+    new_send_to_char(ch,"Meld what?\r\n");
     return;
   }
 
@@ -876,7 +887,7 @@ void get_from_container(struct char_data *ch, struct obj_data *cont,
   {
     if (obj_dotmode == FIND_ALLDOT && !*obj_desc)
     {
-     new_send_to_char(ch,"Get all of what?\r\n");
+      new_send_to_char(ch,"Get all of what?\r\n");
       return;
     }
     wearall = 1;
@@ -934,10 +945,10 @@ void perform_get(struct char_data *ch, char *num, char *arg2, char *arg3)
   char *obj_desc, *cont_desc;
 
 
-    amount = atoi(num);
-    obj_desc = arg2;
-    cont_desc = arg3;
-  
+  amount = atoi(num);
+  obj_desc = arg2;
+  cont_desc = arg3;
+
 
   cont_dotmode = find_all_dots(cont_desc);
   obj_dotmode = find_all_dots(obj_desc);
@@ -964,7 +975,7 @@ void perform_get(struct char_data *ch, char *num, char *arg2, char *arg3)
   }
   else if (cont_dotmode == FIND_ALLDOT && !*cont_desc)
   {
-   new_send_to_char(ch,"Get from all of what?\r\n");
+    new_send_to_char(ch,"Get from all of what?\r\n");
     return;
   }
 
@@ -1015,7 +1026,7 @@ void perform_get(struct char_data *ch, char *num, char *arg2, char *arg3)
     if (!found)
     {
       if (cont_dotmode == FIND_ALL)
-       new_send_to_char(ch,"You can't seem to find any containers.\r\n");
+        new_send_to_char(ch,"You can't seem to find any containers.\r\n");
       else
       {
         new_send_to_char(ch, "You can't seem to find any %ss here.\r\n", cont_desc);
@@ -1101,7 +1112,7 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
   {
     if (dotmode == FIND_ALLDOT && !*obj_desc)
     {
-     new_send_to_char(ch,"Get all of what?\r\n");
+      new_send_to_char(ch,"Get all of what?\r\n");
       return;
     }
 
@@ -1127,7 +1138,7 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
         return;
       }
       if (dotmode == FIND_ALL)
-       new_send_to_char(ch,"There doesn't seem to be anything here.\r\n");
+        new_send_to_char(ch,"There doesn't seem to be anything here.\r\n");
       else
       {
         new_send_to_char(ch, "You don't see any %ss here.\r\n", obj_desc);
@@ -1160,22 +1171,23 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
   }
 }
 
-int is_two_words(char * str) {
-char buf[MAX_INPUT_LENGTH];
+int is_two_words(char * str)
+{
+  char buf[MAX_INPUT_LENGTH];
 
-if (!str || !*str)
-return 0;
-str = any_one_arg(str, buf);
-skip_spaces(&str);
-if (!*str)
-return 0;
-str = any_one_arg(str, buf);
-skip_spaces(&str);
+  if (!str || !*str)
+    return 0;
+  str = any_one_arg(str, buf);
+  skip_spaces(&str);
+  if (!*str)
+    return 0;
+  str = any_one_arg(str, buf);
+  skip_spaces(&str);
 
-if (*buf && !*str)
-return 1;
-else
-return 0;
+  if (*buf && !*str)
+    return 1;
+  else
+    return 0;
 }
 
 
@@ -1188,34 +1200,38 @@ ACMD(do_get)
 
   skip_spaces(&argument);
   if (begins_with_number(argument))
-  argument = any_one_arg(argument, num);
+    argument = any_one_arg(argument, num);
   from = str_until(argument, "from", arg1, sizeof(arg1));
   skip_spaces(&from);
-  if (from && *from) {
-  strlcpy(arg3, from, sizeof(arg3));
-  
-  } else {
-  /**check if it is only 2 arguments, meaning it wants to get something from the room **/
-  if (is_two_words(argument)) {
-  argument = any_one_arg(argument, arg1);
-  argument = any_one_arg(argument, arg3);
+  if (from && *from)
+  {
+    strlcpy(arg3, from, sizeof(arg3));
+
   }
+  else
+  {
+    /**check if it is only 2 arguments, meaning it wants to get something from the room **/
+    if (is_two_words(argument))
+    {
+      argument = any_one_arg(argument, arg1);
+      argument = any_one_arg(argument, arg3);
+    }
   }
   //one_argument(two_arguments(argument, arg1, arg2), arg3);
-  
-  
-  
+
+
+
 
   if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
   {
-   new_send_to_char(ch,"Your arms are already full!\r\n");
+    new_send_to_char(ch,"Your arms are already full!\r\n");
     return;
   }
 
   // get
   if (!*arg1)
   {
-   new_send_to_char(ch,"Get what?\r\n");
+    new_send_to_char(ch,"Get what?\r\n");
     return;
   }
 
@@ -1251,7 +1267,7 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
   char buf[MAX_INPUT_LENGTH];
 
   if (amount <= 0)
-   new_send_to_char(ch,"Heh heh heh.. we are jolly funny today, eh?\r\n");
+    new_send_to_char(ch,"Heh heh heh.. we are jolly funny today, eh?\r\n");
   else if (char_gold(ch, 0, GOLD_HAND) < amount)
     new_send_to_char(ch,"You don't have that many coins!\r\n");
   else
@@ -1302,7 +1318,7 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
         case  0: extract_obj(obj); return;
         case -1: return;
         }
-       new_send_to_char(ch,"You drop some gold.\r\n");
+        new_send_to_char(ch,"You drop some gold.\r\n");
         if (!slipping)
         {
           snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount));
@@ -1353,9 +1369,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                	    return (0);
-                                                                                	}*/
+                                                                                    	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                    	    return (0);
+                                                                                    	}*/
   }
 
 
@@ -1451,7 +1467,7 @@ ACMD(do_drop)
     }
     if (RDR == NULL)
     {
-     new_send_to_char(ch,"Sorry, you can't donate anything right now.\r\n");
+      new_send_to_char(ch,"Sorry, you can't donate anything right now.\r\n");
       return;
     }
     break;
@@ -1474,7 +1490,7 @@ ACMD(do_drop)
     if (!str_cmp("coins", arg) || !str_cmp("coin", arg))
       perform_drop_gold(ch, multi, mode, RDR);
     else if (multi <= 0)
-     new_send_to_char(ch,"Yeah, that makes sense.\r\n");
+      new_send_to_char(ch,"Yeah, that makes sense.\r\n");
     else if (!*arg)
     {
       new_send_to_char(ch, "What do you want to %s %d of?\r\n", sname,
@@ -1506,7 +1522,7 @@ ACMD(do_drop)
         && (subcmd == SCMD_JUNK || subcmd == SCMD_DONATE))
     {
       if (subcmd == SCMD_JUNK)
-       new_send_to_char(ch,"Go to the dump if you want to junk EVERYTHING!\r\n");
+        new_send_to_char(ch,"Go to the dump if you want to junk EVERYTHING!\r\n");
       else
         new_send_to_char(ch,"Go do the donation room if you want to donate EVERYTHING!\r\n");
       return;
@@ -1514,7 +1530,7 @@ ACMD(do_drop)
     if (dotmode == FIND_ALL)
     {
       if (!ch->carrying)
-       new_send_to_char(ch,"You don't seem to be carrying anything.\r\n");
+        new_send_to_char(ch,"You don't seem to be carrying anything.\r\n");
       else
         for (obj = ch->carrying; obj; obj = next_obj)
         {
@@ -1568,7 +1584,7 @@ ACMD(do_drop)
 
   if (amount && (subcmd == SCMD_JUNK))
   {
-   new_send_to_char(ch,"You have been rewarded by the gods!\r\n");
+    new_send_to_char(ch,"You have been rewarded by the gods!\r\n");
     if (!slipping)
     {
       act("$n has been rewarded by the gods!", TRUE, ch, 0, 0, TO_ROOM);
@@ -1632,7 +1648,7 @@ struct char_data *give_find_vict(struct char_data *ch, char *arg)
 
   if (!*arg)
   {
-   new_send_to_char(ch,"To who?\r\n");
+    new_send_to_char(ch,"To who?\r\n");
     return (NULL);
   }
   else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
@@ -1642,7 +1658,7 @@ struct char_data *give_find_vict(struct char_data *ch, char *arg)
   }
   else if (vict == ch)
   {
-   new_send_to_char(ch,"What's the point of that?\r\n");
+    new_send_to_char(ch,"What's the point of that?\r\n");
     return (NULL);
   }
   else
@@ -1657,7 +1673,7 @@ void perform_give_gold(struct char_data *ch, struct char_data *vict,
 
   if (amount <= 0)
   {
-   new_send_to_char(ch,"Heh heh heh ... we are jolly funny today, eh?\r\n");
+    new_send_to_char(ch,"Heh heh heh ... we are jolly funny today, eh?\r\n");
     return;
   }
 
@@ -1700,7 +1716,7 @@ ACMD(do_give)
   argument = one_argument(argument, arg);
 
   if (!*arg)
-   new_send_to_char(ch,"Give what to who?\r\n");
+    new_send_to_char(ch,"Give what to who?\r\n");
   else if (is_number(arg))
   {
     amount = atol(arg);
@@ -1758,11 +1774,11 @@ ACMD(do_give)
     {
       if (dotmode == FIND_ALLDOT && !*arg)
       {
-       new_send_to_char(ch,"All of what?\r\n");
+        new_send_to_char(ch,"All of what?\r\n");
         return;
       }
       if (!ch->carrying)
-       new_send_to_char(ch,"You don't seem to be holding anything.\r\n");
+        new_send_to_char(ch,"You don't seem to be holding anything.\r\n");
       else
         for (obj = ch->carrying; obj; obj = next_obj)
         {
@@ -1935,7 +1951,7 @@ ACMD(do_drink)
 
   if (!*arg)
   {
-   new_send_to_char(ch,"Drink from what?\r\n");
+    new_send_to_char(ch,"Drink from what?\r\n");
     return;
   }
   if (!(temp = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
@@ -1945,7 +1961,7 @@ ACMD(do_drink)
            get_obj_in_list_vis(ch, arg, NULL,
                                IN_ROOM(ch)->contents)))
     {
-     new_send_to_char(ch,"You can't find it!\r\n");
+      new_send_to_char(ch,"You can't find it!\r\n");
       return;
     }
     else
@@ -1955,12 +1971,12 @@ ACMD(do_drink)
       (GET_OBJ_TYPE(temp) != ITEM_FOUNTAIN) &&
       (GET_OBJ_TYPE(temp) != ITEM_VIAL))
   {
-   new_send_to_char(ch,"You can't drink from that!\r\n");
+    new_send_to_char(ch,"You can't drink from that!\r\n");
     return;
   }
   if (on_ground && (GET_OBJ_TYPE(temp) != ITEM_FOUNTAIN))
   {
-   new_send_to_char(ch,"You have to be holding that to drink from it.\r\n");
+    new_send_to_char(ch,"You have to be holding that to drink from it.\r\n");
     return;
   }
 
@@ -2016,13 +2032,13 @@ ACMD(do_drink)
     }
     if ((GET_COND(ch, FULL) > 23) && (GET_COND(ch, THIRST) > 0))
     {
-     new_send_to_char(ch,"Your stomach can't contain anymore!\r\n");
+      new_send_to_char(ch,"Your stomach can't contain anymore!\r\n");
       return;
     }
   }
   if (!GET_OBJ_VAL(temp, 1))
   {
-   new_send_to_char(ch,"It's empty.\r\n");
+    new_send_to_char(ch,"It's empty.\r\n");
     return;
   }
 
@@ -2143,17 +2159,17 @@ ACMD(do_drink)
     gain_condition(ch, THIRST, drink_aff[GET_OBJ_VAL(temp, 2)][THIRST] * amount / 4);
 
     if (GET_COND(ch, DRUNK) > 10)
-     new_send_to_char(ch,"You feel drunk.\r\n");
+      new_send_to_char(ch,"You feel drunk.\r\n");
 
     if (GET_COND(ch, THIRST) > 23)
-     new_send_to_char(ch,"You don't feel thirsty any more.\r\n");
+      new_send_to_char(ch,"You don't feel thirsty any more.\r\n");
 
     if (GET_COND(ch, FULL) > 23)
-     new_send_to_char(ch,"You are full.\r\n");
+      new_send_to_char(ch,"You are full.\r\n");
 
     if (GET_OBJ_VAL(temp, 3))
     {	/* The shit was poisoned ! */
-     new_send_to_char(ch,"Oops, it tasted rather strange!\r\n");
+      new_send_to_char(ch,"Oops, it tasted rather strange!\r\n");
       act("$n chokes and utters some strange sounds.", TRUE, ch, 0, 0,
           TO_ROOM);
 
@@ -2200,7 +2216,7 @@ ACMD(do_eat)
 
   if (!*arg)
   {
-   new_send_to_char(ch,"Eat what?\r\n");
+    new_send_to_char(ch,"Eat what?\r\n");
     return;
   }
   if (!(food = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
@@ -2216,7 +2232,7 @@ ACMD(do_eat)
   }
   if ((GET_OBJ_TYPE(food) != ITEM_FOOD) && (GET_LEVEL(ch) < LVL_GOD))
   {
-   new_send_to_char(ch,"You can't eat THAT!\r\n");
+    new_send_to_char(ch,"You can't eat THAT!\r\n");
     return;
   }
   if (GET_COND(ch, FULL) > 20)
@@ -2244,12 +2260,12 @@ ACMD(do_eat)
   gain_condition(ch, FULL, amount);
 
   if (GET_COND(ch, FULL) > 20)
-   new_send_to_char(ch,"You are full.\r\n");
+    new_send_to_char(ch,"You are full.\r\n");
 
   if (GET_OBJ_VAL(food, 3) && (GET_LEVEL(ch) < LVL_GOD))
   {
     /* The shit was poisoned ! */
-   new_send_to_char(ch,"Oops, that tasted rather strange!\r\n");
+    new_send_to_char(ch,"Oops, that tasted rather strange!\r\n");
     act("$n coughs and utters some strange sounds.", FALSE, ch, 0, 0,
         TO_ROOM);
 
@@ -2266,7 +2282,7 @@ ACMD(do_eat)
   {
     if (!(--GET_OBJ_VAL(food, 0)))
     {
-     new_send_to_char(ch,"There's nothing left now.\r\n");
+      new_send_to_char(ch,"There's nothing left now.\r\n");
       extract_obj(food);
     }
   }
@@ -2286,19 +2302,19 @@ ACMD(do_pour)
   {
     if (!*arg1)
     {		/* No arguments */
-     new_send_to_char(ch,"From what do you want to pour?\r\n");
+      new_send_to_char(ch,"From what do you want to pour?\r\n");
       return;
     }
     if (!
         (from_obj =
            get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
     {
-     new_send_to_char(ch,"You can't find it!\r\n");
+      new_send_to_char(ch,"You can't find it!\r\n");
       return;
     }
     if (GET_OBJ_TYPE(from_obj) != ITEM_DRINKCON && GET_OBJ_TYPE(from_obj) != ITEM_VIAL && GET_OBJ_TYPE(from_obj) != ITEM_POTION)
     {
-     new_send_to_char(ch,"You can't pour from that!\r\n");
+      new_send_to_char(ch,"You can't pour from that!\r\n");
       return;
     }
   }
@@ -2311,7 +2327,7 @@ ACMD(do_pour)
     }
     if (!(to_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
     {
-     new_send_to_char(ch,"You can't find it!");
+      new_send_to_char(ch,"You can't find it!");
       return;
     }
     if (GET_OBJ_TYPE(to_obj) != ITEM_DRINKCON)
@@ -2350,7 +2366,7 @@ ACMD(do_pour)
   {	/* pour */
     if (!*arg2)
     {
-     new_send_to_char(ch,"Where do you want it?  Out or in what?\r\n");
+      new_send_to_char(ch,"Where do you want it?  Out or in what?\r\n");
       return;
     }
     if (!str_cmp(arg2, "out"))
@@ -2376,20 +2392,20 @@ ACMD(do_pour)
     }
     if (!(to_obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying)))
     {
-     new_send_to_char(ch,"You can't find it!\r\n");
+      new_send_to_char(ch,"You can't find it!\r\n");
       return;
     }
     if ((GET_OBJ_TYPE(to_obj) != ITEM_DRINKCON) &&
         (GET_OBJ_TYPE(to_obj) != ITEM_FOUNTAIN) &&
         (GET_OBJ_TYPE(to_obj) != ITEM_VIAL))
     {
-     new_send_to_char(ch,"You can't pour anything into that.\r\n");
+      new_send_to_char(ch,"You can't pour anything into that.\r\n");
       return;
     }
   }
   if (to_obj == from_obj)
   {
-   new_send_to_char(ch,"A most unproductive effort.\r\n");
+    new_send_to_char(ch,"A most unproductive effort.\r\n");
     return;
   }
   if ((GET_OBJ_TYPE(to_obj) != ITEM_VIAL))
@@ -2397,13 +2413,13 @@ ACMD(do_pour)
     if ((GET_OBJ_VAL(to_obj, 1) != 0) &&
         (GET_OBJ_VAL(to_obj, 2) != GET_OBJ_VAL(from_obj, 2)))
     {
-     new_send_to_char(ch,"There is already another liquid in it!\r\n");
+      new_send_to_char(ch,"There is already another liquid in it!\r\n");
       return;
     }
 
     if (!(GET_OBJ_VAL(to_obj, 1) < GET_OBJ_VAL(to_obj, 0)))
     {
-     new_send_to_char(ch,"There is no room for more.\r\n");
+      new_send_to_char(ch,"There is no room for more.\r\n");
       return;
     }
   }
@@ -2924,7 +2940,7 @@ void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 
   if (!HAS_BODY(ch, where))
   {
-   new_send_to_char(ch,"You do not have that body position.\r\n");
+    new_send_to_char(ch,"You do not have that body position.\r\n");
     return;
   }
 
@@ -3116,8 +3132,8 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
   }
   else
   {
-  char arg1[MAX_INPUT_LENGTH];
-  one_argument(arg, arg1);
+    char arg1[MAX_INPUT_LENGTH];
+    one_argument(arg, arg1);
     where = search_block(arg1, body, FALSE);
     if (!CAN_WEAR(obj, where_to_worn(where)))
       return -1;
@@ -3142,16 +3158,16 @@ ACMD(do_wear)
 
   skip_spaces(&argument);
   arg2 = str_until(argument, "on", arg1, sizeof(arg1));
-  
+
 
   if (!*arg1)
   {
-   new_send_to_char(ch,"Wear what?\r\n");
+    new_send_to_char(ch,"Wear what?\r\n");
     return;
   }
   dotmode = find_all_dots(arg1);
 
-  if (*arg2 && (dotmode != FIND_INDIV))
+  if (arg2 && *arg2 && (dotmode != FIND_INDIV))
   {
     new_send_to_char(ch,"You can't specify the same body location for more than one item!\r\n");
     return;
@@ -3171,13 +3187,13 @@ ACMD(do_wear)
     }
     wearall = 0;
     if (!items_worn)
-     new_send_to_char(ch,"You don't seem to have anything wearable.\r\n");
+      new_send_to_char(ch,"You don't seem to have anything wearable.\r\n");
   }
   else if (dotmode == FIND_ALLDOT)
   {
     if (!*arg1)
     {
-     new_send_to_char(ch,"Wear all of what?\r\n");
+      new_send_to_char(ch,"Wear all of what?\r\n");
       return;
     }
     if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
@@ -3216,7 +3232,7 @@ ACMD(do_wear)
       else if (!*arg2)
         act("You can't wear $p.", FALSE, ch, obj, 0, TO_CHAR);
       else
-       new_send_to_char(ch, "You can't wear that there!\r\n");
+        new_send_to_char(ch, "You can't wear that there!\r\n");
     }
   }
 }
@@ -3226,7 +3242,7 @@ ACMD(do_wear)
 ACMD(do_wield)
 {
   struct obj_data *obj;
-skip_spaces(&argument);
+  skip_spaces(&argument);
 
   if (!*argument)
     new_send_to_char(ch,"Wield what?\r\n");
@@ -3483,21 +3499,109 @@ ACMD(do_remove)
       perform_remove(ch, i);
   }
 }
-
+C_FUNC(pull_object)
+{
+  struct obj_data *obj;
+  int dir = 0;
+  obj = find_obj(d->character->loader);
+  d->character->loader = -1;
+  if (!obj || !HERE(d->character, obj))
+  {
+    write_to_output(d, "It isn't here any longer.\r\n");
+    return;
+  }
+  if (!arg || !*arg) {
+  write_to_output(d, "That isn't a valid direction.\r\n");
+  return;
+  }
+  switch (LOWER(*arg)) {
+  case 'n':
+  dir = NORTH;
+  break;
+  case 's':
+  dir = SOUTH;
+  break;
+  case 'e':
+  dir = EAST;
+  break;
+  case 'w':
+  dir = WEST;
+  break;
+  case 'u':
+  dir = UP;
+  break;
+  case 'd':
+  dir = DOWN;
+  break;
+  default:
+  write_to_output(d, "That isn't a valid direction.\r\n");
+  return;
+  break;
+  }
+  
+  if (!EXIT(d->character, dir)) {
+  write_to_output(d, "No exit that way.\r\n");
+  return;
+  }
+         if (IS_SET(EXIT(d->character, dir)->exit_info, EX_CLOSED)) {
+	 write_to_output(d, "You need to open the door first.\r\n");
+	 return;
+	 }
+      if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE)) {
+      write_to_output(d, "It doesnt look like you can pull it that direction.\r\n");
+      return;
+      }
+      
+      
+  obj_from_room(obj);
+    write_to_output(d,"You pull %s %s.\r\n", obj->short_description, dirs[dir]);
+  
+  
+}
 ACMD(do_pull)
 {
-  char arg[MAX_INPUT_LENGTH];
-  one_argument(argument, arg);
+//  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
+  int cnt=0,i;
+  skip_spaces(&argument);
 
-  if (!*arg)
+  if (!*argument)
   {
     new_send_to_char(ch,"Pull what?\r\n");
     return;
   }
-  new_send_to_char(ch,"You can't pull that.\r\n");
-  return;
+
+  if (NULL != (obj = get_obj_in_list_vis(ch, argument, NULL, IN_ROOM(ch)->contents)))
+  {
+    if (!OBJ_FLAGGED(obj, ITEM_PULLABLE))
+    {
+      new_send_to_char(ch, "That isn't pullable!\r\n");
+      return;
+    }
+    /* check each direction to see if it can be pulled into. */
+    new_send_to_char(ch, "You can pull %s: ",obj->short_description );
+    for (i = 0;i < NUM_OF_DIRS;i++)
+    {
+      if (!EXIT(ch, i))
+        continue;
+      if (IS_SET(EXIT(ch, i)->exit_info, EX_CLOSED))
+        continue;
+      if (!IS_SET_AR(ROOM_FLAGS(EXIT(ch, i)->to_room), ROOM_VEHICLE))
+        continue;
+      cnt ++;
+      new_send_to_char(ch, "%s ", dirs[i]);
+    }
+    if (!cnt) {
+      new_send_to_char(ch, "Nowhere\r\n");
+    return;
+    } else
+      new_send_to_char(ch, "\r\n");
+      new_send_to_char(ch, "Please type a direction:");
+      ch->loader = GET_ID(obj);
+      line_input(ch->desc, argument, pull_object, NULL);
+  }
   /* for now only pull pin will work and must be wielding a grenade */
-  if (!str_cmp(arg, "pin"))
+  else if (!str_cmp(argument, "pin"))
   {
 
     if (GET_EQ(ch, WEAR_WIELD))
@@ -3514,8 +3618,7 @@ ACMD(do_pull)
     else
       new_send_to_char(ch,"You aren't wielding anything!\r\n");
   }
-  else
-    return;
+else {new_send_to_char(ch, "Pull what?\r\n");}
 
   /* put other 'pull' options here later */
   return;
@@ -4029,6 +4132,16 @@ int speed_update(struct char_data *ch)
   { // start of player speed
 
 
+    if (0 < GET_SKILL(ch, SKILL_SECOND_ATTACK))
+    {
+      speed += GET_SKILL(ch, SKILL_SECOND_ATTACK)/2;
+
+    }
+    if (0 <GET_SKILL(ch, SKILL_THIRD_ATTACK))
+    {
+      speed += GET_SKILL(ch, SKILL_THIRD_ATTACK)/2;
+    }
+
     speed += class_speed(ch);
     speed += race_speed(ch);
     speed += GET_ADD(ch);
@@ -4053,9 +4166,9 @@ int speed_update(struct char_data *ch)
 
 
     if (RIDING(ch) && HERE(RIDING(ch), ch) && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
+      speed += 50 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
     else if (GET_RACE(ch) == RACE_CENTAUR && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0020);
+      speed += 50 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
     // end of player speed
   }
   if (weps)
@@ -4108,7 +4221,7 @@ int class_speed(struct char_data *ch)
   case CLASS_RANGER:
   case CLASS_GYPSY:
   case CLASS_THIEF:
-    speed = 70;
+    speed = 130;
     armorcost = 1;
     break;
   case CLASS_WARRIOR:

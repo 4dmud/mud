@@ -117,6 +117,12 @@ struct alias_data
 #define SCMD_FENCE 	1
 #define SCMD_GATE  	2
 
+/* prompts */
+//Normal Prompt
+#define SCMD_PROMPT  1 
+//Battle Prompt
+#define SCMD_BPROMPT 2 
+
 /* directions */
 #define SCMD_NORTH	1
 #define SCMD_EAST	2

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.4  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.3  2005/03/17 12:42:13  w4dimenscor
  * Added skill smash
  *
@@ -938,9 +941,9 @@ void advance_level(struct char_data * ch)
 
 
   add_hp += (con_app[GET_CON(ch)].hitp * current_class_is_tier_num(ch));
-  add_hp += REMORTS(ch);
-  add_mana = REMORTS(ch);
-  add_move = REMORTS(ch) * 0.5;
+  add_hp += MIN(REMORTS(ch), 25);
+  add_mana = MIN(REMORTS(ch), 25);
+  add_move = MIN(REMORTS(ch), 25) * 0.5;
 
   switch (GET_CLASS(ch))
   {
@@ -1073,11 +1076,11 @@ void advance_level(struct char_data * ch)
  */
 int backstab_mult(int level, int tier)
 {
-  return IRANGE(1, (level)/(14 - tier), 5);
+  return IRANGE(2, (level)/(12 - tier), 5);
 }
 int cleave_mult(int level, int tier)
 {
-  return IRANGE(1, (level)/(15 - tier), 5);
+  return IRANGE(1, (level)/(16 - tier), 4);
 }
 
 ACMD(do_dam_dice)
@@ -1296,8 +1299,8 @@ void init_spell_levels(void)
   assign_class(SKILL_RETREAT,		WAR | RAN);
   assign_class(SKILL_PARRY,		ALL_FIGHTER);
   assign_class(SKILL_THIRD_ATTACK,      ALL_FIGHTER);
-  assign_class(SKILL_FOURTH_ATTACK,     WAR | HUN);
-  assign_class(SKILL_FIFTH_ATTACK,      WAR);
+  assign_class(SKILL_HAMSTRING,     WAR | HUN);
+  assign_class(SKILL_FLURRY,      WAR);
   assign_class(SKILL_DODGE,		ALL_ROGUE);
   assign_class(SKILL_PHASE,		ESP | ALL_ROGUE);
   assign_class(SKILL_CHARGE,		WAR);
@@ -1311,7 +1314,7 @@ void init_spell_levels(void)
   assign_class(SKILL_FORTIFY,		ALL_FIGHTER);
   assign_class(SKILL_SCALP,		GYP | RAN | HUN);
   assign_class(SKILL_BLADE_DANCE,	GYP | THI | HUN);
-  assign_class(SKILL_LONGARM,		 ALL_FIGHTER);
+  assign_class(SKILL_LONGARM,		 ALL_FIGHTER | RAN);
   assign_class(SKILL_CLEAVE,		WAR);
   assign_class(SKILL_BEHEAD,		HUN);
   assign_class(SKILL_BRACE,		ALL_FIGHTER);

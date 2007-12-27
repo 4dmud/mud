@@ -155,6 +155,8 @@
 #define DG_ALLOW_GODS TRUE
 //#define R_EXIT(r, rdir)		 ((r)->dir_option[(rdir)])
 
+#define USE_CREATE_CHAR 0
+
 extern NOTE_DATA *note_list;
 extern NOTE_DATA *idea_list;
 extern NOTE_DATA *penalty_list;
@@ -193,7 +195,9 @@ int store_to_char(char *name, struct char_data *ch);
 int load_char(char *name, struct char_data *ch);
 void save_char(struct char_data *ch);
 void init_char(struct char_data *ch);
+#if USE_CREATE_CHAR
 struct char_data *create_char(void);
+#endif
 struct char_data *read_mobile(mob_vnum nr, int type);
 int vnum_mobile(char *searchname, struct char_data *ch);
 void clear_char(struct char_data *ch);

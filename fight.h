@@ -62,7 +62,7 @@ int arena_ok(struct char_data *ch, struct char_data *victim);
 #define SINGLE_WEP 1
 #define DUAL_WEP   2
 
-#define DAM_SPEED_MULTI(ch)    (1.0+(GET_SPEED(ch) > TOP_SPEED_VALUE ? (((float)GET_SPEED(ch)-TOP_SPEED_VALUE)/200.0f) : 0))
+#define DAM_SPEED_MULTI(ch)    (1.0+(GET_SPEED(ch) > TOP_SPEED_VALUE ? (((float)GET_SPEED(ch)-TOP_SPEED_VALUE)/100.0f) : 0))
 
 int is_short_wep(struct obj_data *obj);
 #define IS_SHORT_WEP(obj) (is_short_wep(obj))

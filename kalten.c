@@ -2063,7 +2063,7 @@ void sector_update(void)
         if (damage(i, i, number(10, 25), TYPE_UNDERWATER) == -1)
           continue;
       if (SECT(i->in_room) == SECT_SPACE && !has_space_suit(i))
-        if (damage(i, i, number(25, 50), TYPE_SUFFERING) == -1)
+        if (damage(i, i, number(25, 500), TYPE_SUFFERING) == -1)
           continue;
       if (SECT(i->in_room) == SECT_DESERT &&
           check_time() && !has_sun_protection(i))

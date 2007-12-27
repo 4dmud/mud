@@ -23,7 +23,7 @@
 
 extern struct descriptor_data *descriptor_list;
 extern struct time_data time_info;
-extern struct room_data *world;
+extern struct room_data *world_vnum[];
 
 
 /* local functions */
@@ -1264,6 +1264,7 @@ void line_input(struct descriptor_data *d, const char *prompt,
   d->callback = callback;
   d->callback_depth++;	// Increase depth of possible recursiveness.
   d->c_data = (char *) info;
+  ORIG_STATE(d) = STATE(d);
   STATE(d) = CON_LINE_INPUT;
   SEND_TO_Q(prompt, d);
 }

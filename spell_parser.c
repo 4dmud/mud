@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.8  2005/08/07 04:12:39  w4dimenscor
+ * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+ *
  * Revision 1.7  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -1596,7 +1599,7 @@ void mag_assign_spells(void)
 
   spello(SPELL_VITALIZE, "vitalize", 60 , 30 , 2,
          POS_STANDING, TAR_CHAR_ROOM | TAR_AREA_DIR, FALSE, MAG_POINTS, 1,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30);
 
   spello(SPELL_ABSOLVE, "absolve", 60 , 30 , 2,
          POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 100,
@@ -1803,7 +1806,7 @@ void mag_assign_spells(void)
 
   spello(SPELL_LOCATE_OBJECT, "locate object", 25 , 20 , 1,
          POS_STANDING, TAR_OBJ_WORLD, FALSE, MAG_MANUAL, 0,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 24);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 6);
 
   spello(SPELL_MAGIC_MISSILE, "magic missile", 25 , 10 , 3,
          POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
@@ -1843,7 +1846,7 @@ void mag_assign_spells(void)
 
   spello(SPELL_SANCTUARY, "sanctuary", 110 , 50 , 5,
          POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 20,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 10);
 
   spello(SPELL_SHOCKING_GRASP, "shocking grasp", 30 , 15 ,
          3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
@@ -1870,16 +1873,16 @@ void mag_assign_spells(void)
 
   spello(SPELL_MIND_FIRE, "mind fire", 80 , 20 , 2,
          POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 400,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 4);
   spello(SPELL_MIND_ELEC, "mind electricity", 80 , 20 , 2,
          POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 500,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 8);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8);
   spello(SPELL_MIND_WATER, "mind water", 80 , 20 , 2,
          POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 300,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 8);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8);
   spello(SPELL_MIND_ICE, "mind ice", 80 , 20 , 2,
          POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 500,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 12);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 12);
 
   spello(SPELL_WORD_OF_RECALL, "word of recall", 20 , 10 , 2,
          POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, 0,

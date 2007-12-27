@@ -155,19 +155,19 @@ ACMD(do_skills);
 void assign_skills(void)
 {
 
-  skillo(SKILL_MOUNT, "mount", TAR_CHAR_ROOM | TAR_NOT_SELF,
-         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 2);
+  skillo(SKILL_MOUNT, "mount", TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_NOT_SELF,
+         SK_NONE, NO_FIRST, NO_SECOND, 1, 2);
 
   skillo(SKILL_TAME, "tame", TAR_CHAR_ROOM | TAR_NOT_SELF,
-         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 24);
+         SK_NONE, NO_FIRST, NO_SECOND, 1, 24);
 
   skillo(SKILL_SNARE, "snare",
          TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, SK_VIOLENT,
-         NO_FIRST, NO_SECOND, NO_TIER, 47);
+         NO_FIRST, NO_SECOND, 1, 47);
 
   skillo(SKILL_CIRCLE, "encircle",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_BACKSTAB, SKILL_MELEE, 2, 32);
+         SK_VIOLENT | SK_NEED_WEAPON, SKILL_BACKSTAB, SKILL_MELEE, 4, 10);
 
   skillo(SKILL_BLACKJACK, "blackjack",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
@@ -179,13 +179,13 @@ void assign_skills(void)
 
   skillo(SKILL_PUSH, "push", TAR_CHAR_ROOM | TAR_NOT_SELF,   SK_NONE, SKILL_HANDTOHAND, NO_SECOND, NO_TIER, 12);
 
-  skillo(SKILL_SCAN, "scan", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 31);
+  skillo(SKILL_SCAN, "scan", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 1, 31);
 
   skillo(SKILL_BREW, "brew", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 0, 29);
 
   skillo(SKILL_SING_WOOD, "woodsing", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 4, 25);
 
-  skillo(SKILL_MANIFEST, "manifest", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 0, 1);
+  skillo(SKILL_MANIFEST, "manifest", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 1);
 
   skillo(SKILL_MANIPULATE, "manipulate", TAR_IGNORE, SK_NONE,
          NO_FIRST, NO_SECOND, 3, 49);
@@ -193,7 +193,7 @@ void assign_skills(void)
   skillo(SKILL_SCRIBE, "scribe", TAR_IGNORE, SK_NONE, NO_FIRST,
          NO_SECOND, NO_TIER, 39);
 
-  skillo(SKILL_TINKER, "tinker", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 30);
+  skillo(SKILL_TINKER, "tinker", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 3, 3);
 
   skillo(SKILL_POISON_WEAPON, "poison weapon", TAR_IGNORE,
          SK_NONE, NO_FIRST, NO_SECOND, 3, 5);
@@ -208,7 +208,7 @@ void assign_skills(void)
          NO_SECOND, NO_TIER, 28);
 
   skillo(SKILL_BACKSTAB, "backstab", TAR_CHAR_ROOM | TAR_NOT_SELF,
-         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, NO_TIER,16);
+         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 1,1);
 
   skillo(SKILL_DISARM, "disarm", TAR_CHAR_ROOM | TAR_NOT_SELF |
          TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, SKILL_MELEE, NO_SECOND, 2,9);
@@ -218,14 +218,14 @@ void assign_skills(void)
 
   skillo(SKILL_BASH, "bash",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, NO_TIER, 45);
+         SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 45);
 
   skillo(SKILL_HIDE, "hide", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 8);
+         SK_NONE, NO_FIRST, NO_SECOND, 1, 8);
 
   skillo(SKILL_KICK, "kick",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT, NO_FIRST, NO_SECOND, NO_TIER, 2);
+         SK_VIOLENT, NO_FIRST, NO_SECOND, 1, 2);
 
   skillo(SKILL_TRAMPLE, "trample",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
@@ -246,7 +246,7 @@ void assign_skills(void)
   skillo(SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, NO_TIER, 4);
 
   skillo(SKILL_TRACK, "track", TAR_CHAR_WORLD | TAR_NOT_SELF,
-         SK_NONE, NO_FIRST, NO_SECOND, 0, 27);
+         SK_NONE, NO_FIRST, NO_SECOND, 1, 27);
 
   skillo(SKILL_GRAPPLE, "grapple",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
@@ -328,19 +328,19 @@ void assign_skills(void)
   /*mord */
   skillo_static(SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, NO_TIER,NO_LEVEL);
   skillo_static(SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14);
-  skillo_static(SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,0, 25);
+  skillo_static(SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,1, 5);
 
-  skillo_static(SKILL_MELEE, "melee", NO_FIRST, NO_SECOND, 0, 10);
+  skillo_static(SKILL_MELEE, "melee", NO_FIRST, NO_SECOND, 1, 1);
 
-  skillo_static(SKILL_SECOND_ATTACK, "second attack",     SKILL_MELEE, NO_SECOND, 1, 10);
+  skillo_static(SKILL_SECOND_ATTACK, 	"advanced melee", SKILL_MELEE, NO_SECOND, 3, 10);
 
-  skillo_static(SKILL_THIRD_ATTACK, "third attack",SKILL_SECOND_ATTACK,SKILL_MELEE, 2, 10);
+  skillo_static(SKILL_THIRD_ATTACK, 	"master melee",SKILL_SECOND_ATTACK,SKILL_MELEE, 4, 10);
 
-  skillo_static(SKILL_FOURTH_ATTACK, "fourth attack",SKILL_THIRD_ATTACK,SKILL_MELEE, 3, 10);
+  skillo_static(SKILL_HAMSTRING, 	"hamstring",SKILL_HANDTOHAND,NO_SECOND, 4, 10);
 
-  skillo_static(SKILL_FIFTH_ATTACK, "fifth attack",SKILL_FOURTH_ATTACK,SKILL_MELEE, 4, 10);
+  skillo_static(SKILL_FLURRY, 		"flurry",SKILL_HANDTOHAND,NO_SECOND, 3, 10);
 
-  skillo_static(SKILL_LONGARM, "longarm", NO_FIRST, NO_SECOND, 2, 1);
+  skillo_static(SKILL_LONGARM, 		"longarm", NO_FIRST, NO_SECOND, 2, 1);
 
 
 }
@@ -394,19 +394,7 @@ ACMD(do_skills)
     }
     else
     {
-      if (IS_SET(SINFO.targets, TAR_CHAR_WORLD)
-          && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
-      {
-        send_to_char("Nobody is around by that name!\r\n", ch);
-        return;
-      }
-      else if (IS_SET(SINFO.targets, TAR_CHAR_ROOM)
-               && !(vict =
-                      get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
-      {
-        send_to_char("Nobody is here by that name!\r\n", ch);
-        return;
-      }
+
       if (IS_SET(SINFO.targets, TAR_OBJ_INV))
         if ((obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) != NULL)
           target = TRUE;
@@ -431,6 +419,20 @@ ACMD(do_skills)
       if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
         if ((obj = get_obj_vis(ch, arg, NULL)) != NULL)
           target = TRUE;
+	  
+	if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD)
+          && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
+      {
+        new_send_to_char(ch, "Nobody is around by that name!\r\n");
+        return;
+      }
+      else if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM)
+               && !(vict =
+                      get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
+      {
+        new_send_to_char(ch, "Nobody is here by that name!\r\n");
+        return;
+      }
     }
 
     if (SINFO.targets != TAR_IGNORE && !vict && !target)
@@ -1965,9 +1967,9 @@ ASKILL(skill_cleave)
   OBJ_DATA *wep = GET_EQ(ch, WEAR_WIELD);
 
 
-  if (GET_OBJ_VAL(wep, 3) != TYPE_SLASH - TYPE_HIT)
+  if (GET_OBJ_VAL(wep, 3) != TYPE_GORE - TYPE_HIT)
   {
-    send_to_char("You need to wield a slashing weapon to cleave.\r\n",  ch);
+    send_to_char("You need to wield a goring weapon to cleave.\r\n",  ch);
     return 0;
   }
   if (use_stamina( ch, 25) < 0)

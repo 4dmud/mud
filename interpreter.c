@@ -201,6 +201,7 @@ ACMD(do_levels);
 ACMD(do_linkload);
 ACMD(do_listen);
 ACMD(do_load);
+ACMD(do_landscape);
 ACMD(do_look);
 ACMD(do_map);
 ACMD(do_mine);
@@ -482,6 +483,7 @@ const struct command_info cmd_info[] =
     { "bet"      , "bet"  , POS_DEAD    , do_not_here , 1, 0, 0 },
     { "bid"      , "bid"  , POS_RESTING , do_bid      , 1, 0, 0 },
     { "blowup"   , "blow" , POS_STANDING, do_blowup   , LVL_IMPL, 0, WIZ_IMPL_GRP},
+        { "bprompt"   , "bpromp", POS_DEAD    , /*do_display*/ do_prompt_new  , 0, SCMD_BPROMPT, 0 },
     { "brief"    , "br"   , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF, 0 },
     { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog,   LVL_IMMORT, SCMD_BUILDWALK, WIZ_OLC_GRP },
     { "buck"     , "buck" , POS_STANDING, do_buck     , 0, 0, 0 },
@@ -527,7 +529,6 @@ const struct command_info cmd_info[] =
     { "diagnose" , "dia"	, POS_RESTING , do_diagnose , 0, 0, 0 },
     { "dig"      , "dig"  , POS_STANDING, do_dig_ground      , 0, 0, 0 },
     { "dismount" , "dism" , POS_STANDING, do_dismount , 0, 0, 0 },
-    { "display"  , "dis"	, POS_DEAD    , /*do_display */ do_prompt_new , 0, 0, 0 },
     { "donate"   , "don"	, POS_RESTING , do_drop     , 0, SCMD_DONATE, 0 },
     { "drink"    , "dr"	, POS_RESTING , do_drink    , 0, SCMD_DRINK, 0 },
     { "drive"    , "drive", POS_RESTING , do_drive    , 0, 0, 0 },
@@ -624,6 +625,7 @@ const struct command_info cmd_info[] =
     { "lock"     , "loc"	, POS_SITTING , do_gen_door , 0, SCMD_LOCK, 0 },
     { "locker"   , "locker"  , POS_RESTING , do_locker   , 0, 0, 0 },
     { "load"     , "loa"	, POS_DEAD    , do_load     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
+    { "landscape"     , "landscape"	, POS_DEAD    , do_landscape     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
 
     { "medit"    , "med"	, POS_DEAD    , do_oasis      , LVL_BUILDER, SCMD_OASIS_MEDIT, WIZ_OLC_GRP },
     { "movemsg" , "mov"	, POS_DEAD    , do_gen_tog  , 0, SCMD_MOVEMSG, 0 },
@@ -689,7 +691,7 @@ const struct command_info cmd_info[] =
     { "pour"     , "pour" , POS_STANDING, do_pour     , 0, SCMD_POUR, 0 },
     { "powerplay", "pow"  , POS_DEAD    , do_powerplay, LVL_IMMORT, 0, 0},
     { "pretitle" , "pre"  , POS_DEAD    , do_pretitle, 0, 0, 0},
-    { "prompt"   , "promp", POS_DEAD    , /*do_display*/ do_prompt_new  , 0, 0, 0 },
+    { "prompt"   , "promp", POS_DEAD    , /*do_display*/ do_prompt_new  , 0, SCMD_PROMPT, 0 },
     { "professions"   , "prof", POS_DEAD    , do_professions  , 0, 0, 0 },
     { "practice" , "pra"  , POS_SLEEPING, do_practice , 1, 0, 0 },
     { "prereq"   , "pre"  , POS_SLEEPING, do_prereq   , 0, 0, 0 },
@@ -913,6 +915,7 @@ const struct command_info cmd_info[] =
     /* subskills listed below */
     { "furyattack" , "fury"  , POS_FIGHTING, do_subskill    , 0, SUB_FURY_ATTACKS, 0 },
     { "drainblood" , "drain" , POS_STANDING, do_subskill    , 0, SUB_DRAIN_BLOOD, 0 },
+    { "sweepattack" , "sweep" , POS_STANDING, do_subskill    , 0, SUB_SWEEP_ATTACK, 0 },
     { "juggle" , "jug" , POS_STANDING, do_subskill    , 0, SUB_JUGGLE, 0 },
     { "tunnel" , "tun" , POS_STANDING, do_subskill    , 0, SUB_TUNNELING, 0 },
     { "fell" , "fell" , POS_STANDING, do_fell    , 0, 0, 0 }, // for skill LUMBERJACK
@@ -2116,6 +2119,8 @@ if (!valid_id_num( GET_IDNUM(ch)))
 
   if (PROMPT(ch) == NULL)
     PROMPT(ch) = str_dup("{cg%h{cwH {cc%m{cwM {cy%v{cwV {cW(%S) {cC%E{cyTNL{c0>");
+      if (BPROMPT(ch) == NULL)
+    BPROMPT(ch) = str_dup("{cg%h{cwH {cc%m{cwM {cW(%S) {cC%E{cyTNL {cwVictHp:{cM%f%%{c0 >");
 
   new_send_to_char(ch, "%s", CONFIG_WELC_MESSG);
   //save_char(ch, NOWHERE);
@@ -2910,17 +2915,18 @@ send_compress_offer(d);
   case CON_FIND_HELP:
   {
   int i;
+  
   if (!arg || !*arg)
-  STATE(d) = CON_PLAYING;
+  STATE(d) = ORIG_STATE(d);
   else if (!is_number(arg))
-  STATE(d) = CON_PLAYING;
+  STATE(d) = ORIG_STATE(d);
   else if ((i = atoi(arg)) < 0)
-  STATE(d) = CON_PLAYING;
+  STATE(d) = ORIG_STATE(d);
   else if (i > top_of_helpt)
-  STATE(d) = CON_PLAYING;
+  STATE(d) = ORIG_STATE(d);
   else
   display_help(d->character, i);
-  STATE(d) = CON_PLAYING;
+  STATE(d) = ORIG_STATE(d);
   }
   break;
   case CON_LINE_INPUT:
@@ -2933,13 +2939,13 @@ send_compress_offer(d);
           d->callback = NULL;	// if the function wasn't chained, clean up
           d->callback_depth = 0;	// AND wasn't recursive
           d->c_data = NULL;
-          STATE(d) = CON_PLAYING;
+          STATE(d) = ORIG_STATE(d);
         }
       }
       else
       {
         log("SYSERR: No callback function specified for state CON_LINE_INPUT");
-        STATE(d) = CON_PLAYING;
+        STATE(d) = ORIG_STATE(d);
       }
     }
     break;

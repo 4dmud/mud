@@ -797,6 +797,7 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
   if (cur != NULL)
     char_from_room(ch);
+    if (SITTING(ch))
   char_from_chair(ch);
 
   if (cur == IN_ROOM(ch))
@@ -829,7 +830,7 @@ void char_from_chair(struct char_data *ch)
 
   if (!ch || !SITTING(ch))
     return;
-
+    
   if (!(chair = SITTING(ch)))
   {
     log("SYSERR: ACK, no chair for char in char from chair");
@@ -895,6 +896,7 @@ void char_from_room(struct char_data *ch)
     return;
   }
 
+  if (SITTING(ch))
   char_from_chair(ch);
 
   if (FIGHTING(ch) != NULL)
@@ -974,6 +976,9 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
     /* set flag for crash-save system, but not on mobs! */
     if (!IS_NPC(ch))
       SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+      
+      if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s to character %s", object->short_description, GET_NAME(ch));
 
     if (GET_OBJ_RNUM(object) != NOTHING && obj_index[GET_OBJ_RNUM(object)].qic)
     {
@@ -982,6 +987,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
         new_send_to_char(ch, "%s binds itself to you.\r\n", object->short_description);
         object->owner = GET_IDNUM(ch);
       }
+      
       new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "%s to character %s (Owner: %s)",
                  object->short_description, GET_NAME(ch), object->owner == 0 ? "nobody" : get_name_by_id(object->owner));
 
@@ -1921,7 +1927,9 @@ void death_room(struct char_data *ch)
    die_follower(ch);*/
 
   /*ends fight event*/
+  if (FIGHTING(ch))
   halt_fighting(ch);
+  if (SITTING(ch))
   char_from_chair(ch);
 
   /* cancel point updates */
@@ -2073,7 +2081,9 @@ void extract_char_final(struct char_data *ch)
   }
 
   /*ends fight event*/
+  if (FIGHTING(ch))
   halt_fighting(ch);
+  if (SITTING(ch))
   char_from_chair(ch);
 
   if (RIDING(ch) || RIDDEN_BY(ch))
@@ -2189,6 +2199,8 @@ void extract_char(struct char_data *ch)
       log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
     return;
   }
+    if (GET_ID(ch) > 0)
+    remove_from_lookup_table(GET_ID(ch));
   if (IS_NPC(ch))
   {
     SET_BIT_AR(MOB_FLAGS(ch), MOB_NOTDEADYET);
@@ -2821,6 +2833,10 @@ void dismount_char(struct char_data *ch)
     RIDING(RIDDEN_BY(ch)) = NULL;
     RIDDEN_BY(ch) = NULL;
   }
+  
+  if (SITTING(ch))
+  char_from_chair(ch);
+  
 }
 
 
