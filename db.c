@@ -59,7 +59,6 @@ int generate_wep_type(char *name);
 int fuzzy_balance(OBJ_DATA *wep);
 int generate_wep_length(OBJ_DATA *wep);
 int OBJ_INNATE_MESSAGE = TRUE;
-void strip_color(char *inbuf);
 
 int gen_wep_type_from_attack(OBJ_DATA *obj);
 void renumber_zones();
@@ -91,7 +90,7 @@ SPECIAL(bank);
 /* help structures */
 
 struct help_index_element *help_table = 0;	/* the help table	 */
-int top_of_helpt = 0;		/* top of help index table	 */
+unsigned int top_of_helpt = 0;		/* top of help index table	 */
 struct help_category_data *help_categories;
 
 int TEMP_LOAD_CHAR = FALSE;
@@ -3500,7 +3499,7 @@ void load_help(FILE *fl)
       el.min_level = atoi((line + 1));
     /* now, add the entry to the index with each keyword on the keyword line */
     el.duplicate = 0;
-    el.entry = strdup(entry);
+    el.entry = str_dup(entry);
     scan = one_word(key, next_key);
     while (*next_key)
     {
@@ -3556,7 +3555,7 @@ int vnum_mobile(char *searchname, struct char_data *ch)
 
   for (nr = 0; nr <= top_of_mobt; nr++)
   {
-    if (isname(searchname, mob_proto[nr].player.name))
+    if (isname_full(searchname, mob_proto[nr].player.name))
     {
       snprintf(buf, sizeof(buf), "%3d. [%5d] %-40s %s\r\n", ++found,
                mob_index[nr].vnum, mob_proto[nr].player.short_descr,
@@ -3582,7 +3581,7 @@ int vnum_object(char *searchname, struct char_data *ch)
 
   for (nr = 0; nr <= top_of_objt; nr++)
   {
-    if (isname(searchname, obj_proto[nr].name))
+    if (isname_full(searchname, obj_proto[nr].name))
     {
       snprintf(buf, sizeof(buf), "%3d. [%5d] %-40s %s\r\n", ++found,
                obj_index[nr].vnum,
@@ -7207,15 +7206,12 @@ void generate_weapon(OBJ_DATA *obj)
 
   if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
     return;
-
-
-
-  {
+else  {
     char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], *point;
 
 
     strcpy(buf, obj->short_description);
-    strip_color(buf);
+    strip_color(buf, sizeof(buf));
     point = buf;
 
     do

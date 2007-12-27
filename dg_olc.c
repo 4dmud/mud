@@ -479,13 +479,13 @@ void trigedit_save(struct descriptor_data *d)
     CREATE(trig->cmdlist, struct cmdlist_element, 1);
     if (s)
     {
-      char *t = strtok(s, "\n\r"); /* strtok returns NULL if s is "\r\n" */
+      char *t = strtok(s, "\r\n"); /* strtok returns NULL if s is "\r\n" */
       if (t)
         trig->cmdlist->cmd = strdup(t);
       else
         trig->cmdlist->cmd = strdup("* No script");
       cmd = trig->cmdlist;
-      while ((s = strtok(NULL, "\n\r")))
+      while ((s = strtok(NULL, "\r\n")))
       {
         CREATE(cmd->next, struct cmdlist_element, 1);
         cmd = cmd->next;
@@ -557,11 +557,11 @@ void trigedit_save(struct descriptor_data *d)
     if (s)
     {
       /* strtok returns NULL if s is "\r\n" */
-      char *t = strtok(s, "\n\r");
+      char *t = strtok(s, "\r\n");
       trig->cmdlist->cmd = strdup(t ? t : "* No script");
       cmd = trig->cmdlist;
 
-      while ((s = strtok(NULL, "\n\r")))
+      while ((s = strtok(NULL, "\r\n")))
       {
         CREATE(cmd->next, struct cmdlist_element, 1);
         cmd = cmd->next;
@@ -979,7 +979,7 @@ int format_script(struct descriptor_data *d)
     return FALSE;
 
   sc = strdup(*d->str); /* we work on a copy, because of strtok() */
-  t = strtok(sc, "\n\r");
+  t = strtok(sc, "\r\n");
   *nsc = '\0';
 
   while (t)
@@ -1074,7 +1074,7 @@ int format_script(struct descriptor_data *d)
       indent++;
       indent_next = FALSE;
     }
-    t = strtok(NULL, "\n\r");
+    t = strtok(NULL, "\r\n");
   }
 
   if (indent)

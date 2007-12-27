@@ -375,7 +375,7 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
   if (!found)
     fprintf(fp, " None");
 
-  fprintf(fp, "\n\r");
+  fprintf(fp, "\r\n");
 
   fclose(fp);
 
@@ -574,7 +574,7 @@ ACMD(do_reload)
 
   if (!ammo)
   {
-    send_to_char("You do not have ammo for this weapon.\n\r", ch);
+    send_to_char("You do not have ammo for this weapon.\r\n", ch);
     return;
   }
 
@@ -2356,7 +2356,7 @@ ACMD(do_finger)
                    "     {ccClan: {cg%-15s\r\n"
                    "  {ccPartner:{cg %s - %-15s \r\n"
                    "  {cg%s"
-                   " {cyO-----------------------------------------------------------O{c0\r\n\n\r"
+                   " {cyO-----------------------------------------------------------O{c0\r\n\r\n"
                    " {cW%s\r\n"
                    " {cyO-----------------------------------------------------------O{c0\r\n"
                    " {ccLast Logged In: {cg%s "
@@ -2446,13 +2446,13 @@ ACMD(do_zlist)
 
   if ((first < 0) || (first > 99999) || (last < 0) || (last > 99999))
   {
-    send_to_char("Values must be between 0 and 99999.\n\r", ch);
+    send_to_char("Values must be between 0 and 99999.\r\n", ch);
     return;
   }
 
   if (first >= last)
   {
-    send_to_char("Second value must be greater than first.\n\r", ch);
+    send_to_char("Second value must be greater than first.\r\n", ch);
     return;
   }
 
@@ -2464,7 +2464,7 @@ ACMD(do_zlist)
   }
 
   if (!found)
-    send_to_char("No mobiles were found in those parameters.\n\r", ch);
+    send_to_char("No mobiles were found in those parameters.\r\n", ch);
 }
 
 void zap_char(struct char_data *victim)
@@ -2517,25 +2517,25 @@ ACMD(do_smite)
 
   if (arg[0] == '\0')
   {
-    send_to_char("Smite whom?\n\r", ch);
+    send_to_char("Smite whom?\r\n", ch);
     return;
   }
 
   if ((victim = get_char_room_vis(ch, arg, NULL)) == NULL)
   {
-    send_to_char("That person is not here.\n\r", ch);
+    send_to_char("That person is not here.\r\n", ch);
     return;
   }
 
   if (victim == ch)
   {
-    send_to_char("Take it somewhere else, Jack.\n\r", ch);
+    send_to_char("Take it somewhere else, Jack.\r\n", ch);
     return;
   }
 
   if (!IS_NPC(victim) && GET_LEVEL(victim) > GET_LEVEL(ch))
   {
-    send_to_char("You failed.\n\r", ch);
+    send_to_char("You failed.\r\n", ch);
     act("$n tried to smite you.", FALSE, ch, NULL, victim, TO_VICT);
     return;
   }
@@ -2544,12 +2544,12 @@ ACMD(do_smite)
     stop_fighting(victim);
 
   sprintf(buf,
-          "       *     W     W   H  H   AA    M   M   !!     *       \n\r");
+          "       *     W     W   H  H   AA    M   M   !!     *       \r\n");
   strcat(buf,
-         "     *****    W W W    HHHH  AAAA   M M M   !!   *****     \n\r");
+         "     *****    W W W    HHHH  AAAA   M M M   !!   *****     \r\n");
   strcat(buf,
-         "       *      W   W    H  H  A  A  M     M  !!     *       \n\r");
-  strcat(buf, "\n\r");
+         "       *      W   W    H  H  A  A  M     M  !!     *       \r\n");
+  strcat(buf, "\r\n");
   send_to_char(buf, victim);
 
   act("$n raises $s hand and smites you!", FALSE, ch, NULL, victim,
@@ -2585,7 +2585,7 @@ ACMD(do_smite)
     obj_to_char(unequip_char(victim, WEAR_FEET), victim);
     obj_from_char(obj);
     send_to_char
-    ("You are blown out of your shoes and right onto your ass!\n\r",
+    ("You are blown out of your shoes and right onto your ass!\r\n",
      victim);
     act("$N is blown out of $S shoes and right onto $S ass!", FALSE,
         ch, NULL, victim, TO_NOTVICT);
@@ -2595,7 +2595,7 @@ ACMD(do_smite)
   }
   else
   {
-    send_to_char("You are knocked on your ass!\n\r", victim);
+    send_to_char("You are knocked on your ass!\r\n", victim);
     act("$N is knocked on his ass!", FALSE, ch, NULL, victim,
         TO_NOTVICT);
     act("$N is knocked on his ass!", FALSE, ch, NULL, victim, TO_CHAR);
@@ -2987,7 +2987,7 @@ ACMD(do_mpdelayed)
   /*
     if (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM))
       {
-        send_to_char("Huh?\n\r", ch);
+        send_to_char("Huh?\r\n", ch);
         return;
       }
   */

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.7  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.6  2005/05/01 11:42:13  w4dimenscor
  * started a change in the server so that multiple arguments can be used when referencing items: have done this for locate object, look, goto, at and a few other things, havent done it for: get, put, drink, wear and a few others
  *
@@ -56,7 +59,7 @@
  * I personally like the idea of the first one better, it can be used
  * in more places, like having default counter attacks, and starting and 
  * finishing moves, depending on your defaults. :) 
- * Mordecai@timespace.co.nz
+ * Mordecai@xtra.co.nz
  ***************************************************************************/
 
 
@@ -351,7 +354,7 @@ int get_skill(struct char_data *ch, int i)
 {
   struct skillspell_data *temp = ch->skills;
 
-  if (GET_RACE(ch) == RACE_CENTAUR && 
+  if (GET_RACE(ch) == RACE_CENTAUR &&
       (i == 141 || i == 142) )
     return 100;
 
@@ -1191,129 +1194,130 @@ ACMD(do_cast)
     /* could get fancy here and support multiple arguments, but the code in
      * spells.c would have to be updated too.  Anyone want to write it? :-)
      */
-     /**mord - done this **/
+    /**mord - done this **/
     target = TRUE;
-  } else
-
-  /* the start of finding the target
-   * If they typed a target, see if we can find them*/
-
-  if (IS_SET(SINFO.targets, TAR_IGNORE) && !IS_SET(SINFO.targets, TAR_AREA_DIR))
-  {
-    /* if no target wanted */
-    target = TRUE;
-  }
-  else if (IS_SET(SINFO.targets, TAR_SELF_ONLY))
-  {
-    tch = ch;
-    target = TRUE;
-
-  }
-  else if (t != NULL && *t)
-  {
-
-
-    /* if target needed and a target was surplied */
-
-    if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM)))
-      if ((tch = get_char_vis(ch, t, NULL, FIND_CHAR_ROOM)) != NULL)
-        target = TRUE;
-
-    if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD))
-      if ((tch = get_char_vis(ch, t, NULL, FIND_CHAR_WORLD)) != NULL)
-        target = TRUE;
-
-    if (!target && IS_SET(SINFO.targets, TAR_OBJ_INV))
-      if ((tobj =
-             get_obj_in_list_vis(ch, t, NULL, ch->carrying)) != NULL)
-        target = TRUE;
-
-    if (!target && IS_SET(SINFO.targets, TAR_OBJ_EQUIP))
-    {
-      for (i = 0; !target && i < NUM_WEARS; i++)
-        if (HAS_BODY(ch, i) && GET_EQ(ch, i)
-            && isname(t, GET_EQ(ch, i)->name))
-        {
-          tobj = GET_EQ(ch, i);
-          target = TRUE;
-        }
-    }
-
-    if (!target && IS_SET(SINFO.targets, TAR_OBJ_ROOM))
-      if ((tobj =
-             get_obj_in_list_vis(ch, t, NULL,
-                                 IN_ROOM(ch)->contents)) != NULL)
-        target = TRUE;
-
-    if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
-      if ((tobj = get_obj_vis(ch, t, NULL)) != NULL)
-        target = TRUE;
-
-    /*New case: TAR_AREA_DIR targets someone, in a direction, or just a direction.
-       can be used for door spells. Can be used for far sight spells.
-       can be used for missile spells. Or even movement. */
-    //new_send_to_char(ch, "target is %d\r\n", target);
-    if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR))
-    {
-      if (((tch = find_in_dir(IN_ROOM(ch), t, dir)) != NULL) &&
-          ((distance = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
-      {
-        target = TRUE;
-        GET_SPELL_DIR(ch) = dir;
-      }
-      else if (((dir = search_block(t, dirs, FALSE)) != NOWHERE) &&
-               ((distance = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
-               IS_SET(SINFO.targets, TAR_IGNORE))
-      {
-        tch = NULL;
-        GET_SPELL_DIR(ch) = dir;
-        target = TRUE;
-
-      }
-    }
-    //new_send_to_char(ch, "target is %d\r\n", target);
-    /*New case: TAR_AREA_ROOM targets the casters room but cycles through everyone in the room */
-
-    if (!target && IS_SET(SINFO.targets, TAR_AREA_ROOM))
-    {
-      //tch = IN_ROOM(ch)->people;
-      tch = ch;
-      target = TRUE;
-    }
-
   }
   else
-  {			/* if target string is empty */
-    if (!target && IS_SET(SINFO.targets, TAR_FIGHT_SELF))
-      if (FIGHTING(ch) != NULL)
+
+    /* the start of finding the target
+     * If they typed a target, see if we can find them*/
+
+    if (IS_SET(SINFO.targets, TAR_IGNORE) && !IS_SET(SINFO.targets, TAR_AREA_DIR))
+    {
+      /* if no target wanted */
+      target = TRUE;
+    }
+    else if (IS_SET(SINFO.targets, TAR_SELF_ONLY))
+    {
+      tch = ch;
+      target = TRUE;
+
+    }
+    else if (t != NULL && *t)
+    {
+
+
+      /* if target needed and a target was surplied */
+
+      if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM)))
+        if ((tch = get_char_vis(ch, t, NULL, FIND_CHAR_ROOM)) != NULL)
+          target = TRUE;
+
+      if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD))
+        if ((tch = get_char_vis(ch, t, NULL, FIND_CHAR_WORLD)) != NULL)
+          target = TRUE;
+
+      if (!target && IS_SET(SINFO.targets, TAR_OBJ_INV))
+        if ((tobj =
+               get_obj_in_list_vis(ch, t, NULL, ch->carrying)) != NULL)
+          target = TRUE;
+
+      if (!target && IS_SET(SINFO.targets, TAR_OBJ_EQUIP))
+      {
+        for (i = 0; !target && i < NUM_WEARS; i++)
+          if (HAS_BODY(ch, i) && GET_EQ(ch, i)
+              && isname(t, GET_EQ(ch, i)->name))
+          {
+            tobj = GET_EQ(ch, i);
+            target = TRUE;
+          }
+      }
+
+      if (!target && IS_SET(SINFO.targets, TAR_OBJ_ROOM))
+        if ((tobj =
+               get_obj_in_list_vis(ch, t, NULL,
+                                   IN_ROOM(ch)->contents)) != NULL)
+          target = TRUE;
+
+      if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
+        if ((tobj = get_obj_vis(ch, t, NULL)) != NULL)
+          target = TRUE;
+
+      /*New case: TAR_AREA_DIR targets someone, in a direction, or just a direction.
+         can be used for door spells. Can be used for far sight spells.
+         can be used for missile spells. Or even movement. */
+      //new_send_to_char(ch, "target is %d\r\n", target);
+      if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR))
+      {
+        if (((tch = find_in_dir(IN_ROOM(ch), t, dir)) != NULL) &&
+            ((distance = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
+        {
+          target = TRUE;
+          GET_SPELL_DIR(ch) = dir;
+        }
+        else if (((dir = search_block(t, dirs, FALSE)) != NOWHERE) &&
+                 ((distance = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
+                 IS_SET(SINFO.targets, TAR_IGNORE))
+        {
+          tch = NULL;
+          GET_SPELL_DIR(ch) = dir;
+          target = TRUE;
+
+        }
+      }
+      //new_send_to_char(ch, "target is %d\r\n", target);
+      /*New case: TAR_AREA_ROOM targets the casters room but cycles through everyone in the room */
+
+      if (!target && IS_SET(SINFO.targets, TAR_AREA_ROOM))
+      {
+        //tch = IN_ROOM(ch)->people;
+        tch = ch;
+        target = TRUE;
+      }
+
+    }
+    else
+    {			/* if target string is empty */
+      if (!target && IS_SET(SINFO.targets, TAR_FIGHT_SELF))
+        if (FIGHTING(ch) != NULL)
+        {
+          tch = ch;
+          target = TRUE;
+        }
+      if (!target && IS_SET(SINFO.targets, TAR_FIGHT_VICT))
+        if (FIGHTING(ch) != NULL)
+        {
+          tch = FIGHTING(ch);
+          target = TRUE;
+        }
+      /* if no target specified, and the spell isn't violent, default to self */
+      if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM) &&
+          !SINFO.violent)
       {
         tch = ch;
         target = TRUE;
       }
-    if (!target && IS_SET(SINFO.targets, TAR_FIGHT_VICT))
-      if (FIGHTING(ch) != NULL)
-      {
-        tch = FIGHTING(ch);
-        target = TRUE;
-      }
-    /* if no target specified, and the spell isn't violent, default to self */
-    if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM) &&
-        !SINFO.violent)
-    {
-      tch = ch;
-      target = TRUE;
-    }
 
-    if (!target)
-    {
-      new_send_to_char(ch, "Upon %s should the spell be cast?\r\n",
-                       IS_SET(SINFO.targets,
-                              TAR_OBJ_ROOM | TAR_OBJ_INV |
-                              TAR_OBJ_WORLD | TAR_OBJ_EQUIP) ? "what"
-                       : "who");
-      return;
+      if (!target)
+      {
+        new_send_to_char(ch, "Upon %s should the spell be cast?\r\n",
+                         IS_SET(SINFO.targets,
+                                TAR_OBJ_ROOM | TAR_OBJ_INV |
+                                TAR_OBJ_WORLD | TAR_OBJ_EQUIP) ? "what"
+                         : "who");
+        return;
+      }
     }
-  }
 
   if (target && (tch == ch) && SINFO.violent)
   {

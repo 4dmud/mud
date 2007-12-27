@@ -103,7 +103,7 @@ ACMD(do_oasis_links)
   }
     
   if (zrnum == NOWHERE || zvnum == NOWHERE) {
-    new_send_to_char(ch, "No zone was found with that number.\n\r");
+    new_send_to_char(ch, "No zone was found with that number.\r\n");
     return;
   }
 

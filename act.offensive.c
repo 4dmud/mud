@@ -24,7 +24,7 @@
 #include "constants.h"
 
 /* extern variables */
-int can_fight(struct char_data *ch, struct char_data *vict);
+int can_fight(struct char_data *ch, struct char_data *vict, int silent);
 struct aff_dam_event_obj
 {
   struct char_data* ch;
@@ -277,7 +277,7 @@ ACMD(do_assist)
         send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
         return;
       }
-      if (!can_fight(ch, opponent))
+      if (!can_fight(ch, opponent, FALSE))
         return;
       send_to_char("You join the fight!\r\n", ch);
       act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
@@ -302,7 +302,6 @@ ACMD(do_hit)
   }
   if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
   {
-  /**Disabled for the moment**/
   #if KILL_ALL_ENABLED
     if ( !strcmp(arg, "all") )
     {
@@ -327,7 +326,7 @@ ACMD(do_hit)
           continue;
         if (!CAN_SEE(ch, vict))
           continue;
-        if (!can_fight(ch, vict))
+        if (!can_fight(ch, vict, TRUE))
           continue;
         if (!CONFIG_PK_ALLOWED && !arena_ok(ch, vict))
         {
@@ -374,7 +373,7 @@ ACMD(do_hit)
     send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
     return;
   }
-  if (!can_fight(ch, vict))
+  if (!can_fight(ch, vict, FALSE))
   {
     return;
   }

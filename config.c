@@ -99,7 +99,7 @@ int holler_move_cost = 20;
 
 /* exp change limits */
 int max_exp_gain = 850000;	/* max gainable per kill */
-int max_exp_loss = 1000000;	/* max losable per death */
+int max_exp_loss = 100000000;	/* max losable per death */
 
 /* number of tics (usually 75 seconds) before PC/NPC corpses decompose */
 int max_npc_corpse_time = 10;

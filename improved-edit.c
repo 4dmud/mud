@@ -545,10 +545,10 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, unsigne
          Welcor 04/04
        */
 
-      if (strchr("\n\r", *flow)) {
+      if (strchr("\r\n", *flow)) {
         *flow = '\0';  /* terminate 'start' string */
         flow++;        /* we know this is safe     */
-        while (*flow && strchr("\n\r", *flow)) 
+        while (*flow && strchr("\r\n", *flow)) 
           flow++;      /* skip to next non-delimiter */
         temp = *flow;  /* save this char             */
       } else {

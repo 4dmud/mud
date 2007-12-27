@@ -113,36 +113,36 @@ void do_unread(CHAR_DATA *ch)
   if ((count = count_spool(ch,news_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch, "There %s %d new news article%s waiting.\n\r",
+    new_send_to_char(ch, "There %s %d new news article%s waiting.\r\n",
             count > 1 ? "are" : "is",count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,changes_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"There %s %d change%s waiting to be read.\n\r",
+    new_send_to_char(ch,"There %s %d change%s waiting to be read.\r\n",
             count > 1 ? "are" : "is", count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,note_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"You have %d new note%s waiting.\n\r",
+    new_send_to_char(ch,"You have %d new note%s waiting.\r\n",
             count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,idea_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"You have %d unread idea%s to peruse.\n\r",
+    new_send_to_char(ch,"You have %d unread idea%s to peruse.\r\n",
             count, count > 1 ? "s" : "");
   }
   if (IS_TRUSTED(ch,ANGEL) && (count = count_spool(ch,penalty_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"%d %s been added.\n\r",
+    new_send_to_char(ch,"%d %s been added.\r\n",
             count, count > 1 ? "penalties have" : "penalty has");
   }
 
   if (!found)
-    new_send_to_char(ch,"You have no unread notes.\n\r");
+    new_send_to_char(ch,"You have no unread notes.\r\n");
 }
 
 ACMD(do_note)
@@ -733,9 +733,9 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           new_send_to_char(ch,
                            "{cyNote Number: {cc%3d{c0\r\n"
                            "{cy       From: {cc%-s{c0\r\n"
-                           "{cy    Subject: {cg%-s{c0\n\r"
-                           "{cy     Posted: {cc%-s{c0\n\r"
-                           "{cy         To: {cw%-s{c0\n\r"
+                           "{cy    Subject: {cg%-s{c0\r\n"
+                           "{cy     Posted: {cc%-s{c0\r\n"
+                           "{cy         To: {cw%-s{c0\r\n"
                            "=================================================\r\n",
                            vnum,
                            pnote->sender,
@@ -752,7 +752,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         else if (is_note_to(ch,pnote))
           vnum++;
       }
-      new_send_to_char(ch,"[%s] You have none unread.\n\r",list_name);
+      new_send_to_char(ch,"[%s] You have none unread.\r\n",list_name);
       ch->has_note[type] = (FALSE);
       return;
     }
@@ -764,7 +764,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     }
     else
     {
-      send_to_char( "Read which number?\n\r", ch );
+      send_to_char( "Read which number?\r\n", ch );
       return;
     }
 
@@ -776,9 +776,9 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         new_send_to_char(ch,
                          "{cyNote Number: {cc%3d{c0\r\n"
                          "{cy       From: {cc%-s{c0\r\n"
-                         "{cy    Subject: {cg%-s{c0\n\r"
-                         "{cy     Posted: {cc%-s{c0\n\r"
-                         "{cy         To: {cw%-s{c0\n\r"
+                         "{cy    Subject: {cg%-s{c0\r\n"
+                         "{cy     Posted: {cc%-s{c0\r\n"
+                         "{cy         To: {cw%-s{c0\r\n"
                          "=================================================\r\n",
                          vnum - 1,
                          pnote->sender,
@@ -794,7 +794,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       }
     }
 
-    sprintf(buf,"There aren't that many %ss.\n\r",list_name);
+    sprintf(buf,"There aren't that many %ss.\r\n",list_name);
     send_to_char(buf,ch);
     return;
   }
@@ -806,7 +806,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     {
       if ( is_note_to( ch, pnote ) )
       {
-        new_send_to_char(ch, "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\n\r",
+        new_send_to_char(ch, "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\r\n",
                          vnum, hide_note(ch,pnote) ? " " : "N",
                          pnote->sender, pnote->subject );
         vnum++;
@@ -817,23 +817,23 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       switch(type)
       {
       case NOTE_NOTE:
-        send_to_char("There are no notes for you.\n\r",ch);
+        send_to_char("There are no notes for you.\r\n",ch);
         ch->has_note[NOTE_NOTE] = (FALSE);
         break;
       case NOTE_IDEA:
-        send_to_char("There are no ideas for you.\n\r",ch);
+        send_to_char("There are no ideas for you.\r\n",ch);
         ch->has_note[NOTE_IDEA] = (FALSE);
         break;
       case NOTE_PENALTY:
-        send_to_char("There are no penalties for you.\n\r",ch);
+        send_to_char("There are no penalties for you.\r\n",ch);
         ch->has_note[NOTE_PENALTY] = (FALSE);
         break;
       case NOTE_NEWS:
-        send_to_char("There is no news for you.\n\r",ch);
+        send_to_char("There is no news for you.\r\n",ch);
         ch->has_note[NOTE_NEWS] = (FALSE);
         break;
       case NOTE_CHANGES:
-        send_to_char("There are no changes for you.\n\r",ch);
+        send_to_char("There are no changes for you.\r\n",ch);
         ch->has_note[NOTE_CHANGES] = (FALSE);
         break;
       }
@@ -845,7 +845,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   {
     if ( !is_number( argument ) )
     {
-      send_to_char( "Note remove which number?\n\r", ch );
+      send_to_char( "Note remove which number?\r\n", ch );
       return;
     }
 
@@ -856,7 +856,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       if ( is_note_to( ch, pnote ) && vnum++ == anum )
       {
         note_remove( ch, pnote, FALSE );
-        send_to_char( "Ok.\n\r", ch );
+        send_to_char( "Ok.\r\n", ch );
         return;
       }
     }
@@ -869,7 +869,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   {
     if ( !is_number( argument ) )
     {
-      send_to_char( "Note delete which number?\n\r", ch );
+      send_to_char( "Note delete which number?\r\n", ch );
       return;
     }
 
@@ -880,7 +880,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       if ( is_note_to( ch, pnote ) && vnum++ == anum )
       {
         note_remove( ch, pnote,TRUE );
-        send_to_char( "Ok.\n\r", ch );
+        send_to_char( "Ok.\r\n", ch );
         return;
       }
     }
@@ -927,13 +927,13 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     if (ch->pnote->type != type)
     {
       send_to_char(
-        "You already have a different note in progress.\n\r",ch);
+        "You already have a different note in progress.\r\n",ch);
       return;
     }
 
     if (strlen(ch->pnote->text)+strlen(argument) >= 4096)
     {
-      send_to_char( "Note too long.\n\r", ch );
+      send_to_char( "Note too long.\r\n", ch );
       return;
     }
 
@@ -941,10 +941,10 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
 
     strcpy(buffer, ch->pnote->text);
     strcat(buffer,argument);
-    strcat(buffer,"\n\r");
+    strcat(buffer,"\r\n");
     free_string(&ch->pnote->text );
     ch->pnote->text = strdup( buffer );
-    send_to_char( "Ok.\n\r", ch );
+    send_to_char( "Ok.\r\n", ch );
     return;
   }
 
@@ -957,13 +957,13 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     if (ch->pnote->type != type)
     {
       send_to_char(
-        "You already have a different note in progress.\n\r",ch);
+        "You already have a different note in progress.\r\n",ch);
       return;
     }
 
     if (ch->pnote->text == NULL || ch->pnote->text[0] == '\0')
     {
-      send_to_char("No lines left to remove.\n\r",ch);
+      send_to_char("No lines left to remove.\r\n",ch);
       return;
     }
 
@@ -1008,13 +1008,13 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     if (ch->pnote->type != type)
     {
       send_to_char(
-        "You already have a different note in progress.\n\r",ch);
+        "You already have a different note in progress.\r\n",ch);
       return;
     }
 
     free_string( &ch->pnote->subject );
     ch->pnote->subject = str_dup( argument );
-    send_to_char( "Ok.\n\r", ch );
+    send_to_char( "Ok.\r\n", ch );
     return;
   }
 
@@ -1030,12 +1030,12 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     if (ch->pnote->type != type)
     {
       send_to_char(
-        "You already have a different note in progress.\n\r",ch);
+        "You already have a different note in progress.\r\n",ch);
       return;
     }
     free_string( &ch->pnote->to_list );
     ch->pnote->to_list = str_dup( argument );
-    send_to_char( "Ok.\n\r", ch );
+    send_to_char( "Ok.\r\n", ch );
     return;
   }
 
@@ -1047,7 +1047,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       ch->pnote = NULL;
     }
 
-    send_to_char( "Ok.\n\r", ch );
+    send_to_char( "Ok.\r\n", ch );
     return;
   }
 
@@ -1055,21 +1055,21 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   {
     if ( ch->pnote == NULL )
     {
-      send_to_char( "You have no note in progress.\n\r", ch );
+      send_to_char( "You have no note in progress.\r\n", ch );
       return;
     }
 
     if (ch->pnote->type != type)
     {
-      send_to_char("You aren't working on that kind of note.\n\r",ch);
+      send_to_char("You aren't working on that kind of note.\r\n",ch);
       return;
     }
 
 
     new_send_to_char(ch,
                      "\r\n{cy   From: {cc%-s{c0\r\n"
-                     "{cySubject: {cg%-s{c0\n\r"
-                     "{cy     To: {cw%-s{c0\n\r"
+                     "{cySubject: {cg%-s{c0\r\n"
+                     "{cy     To: {cw%-s{c0\r\n"
                      "=================================================\r\n",
                      ch->pnote->sender,
                      ch->pnote->subject,
@@ -1085,27 +1085,27 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
 
     if ( ch->pnote == NULL )
     {
-      send_to_char( "You have no note in progress.\n\r", ch );
+      send_to_char( "You have no note in progress.\r\n", ch );
       return;
     }
 
     if (ch->pnote->type != type)
     {
-      send_to_char("You aren't working on that kind of note.\n\r",ch);
+      send_to_char("You aren't working on that kind of note.\r\n",ch);
       return;
     }
 
     if (!str_cmp(ch->pnote->to_list,""))
     {
       send_to_char(
-        "You need to provide a recipient (name, all, or immortal, clan name, admin, hero).\n\r",
+        "You need to provide a recipient (name, all, or immortal, clan name, admin, hero).\r\n",
         ch);
       return;
     }
 
     if (!str_cmp(ch->pnote->subject,""))
     {
-      send_to_char("You need to provide a subject.\n\r",ch);
+      send_to_char("You need to provide a subject.\r\n",ch);
       return;
     }
 
@@ -1129,7 +1129,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           d->character != ch                  &&
           ch->pnote->type == NOTE_NOTE )
       {
-        act("$N has just posted a new Note for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+        act("$N has just posted a new Note for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
         d->character->has_note[ch->pnote->type] = (TRUE);
       }
 
@@ -1138,7 +1138,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           d->character != ch                   &&
           ch->pnote->type == NOTE_NEWS )
       {
-        act("$N has just posted a new News Item for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+        act("$N has just posted a new News Item for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
         d->character->has_note[ch->pnote->type] = (TRUE);
       }
 
@@ -1147,7 +1147,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           d->character != ch                   &&
           ch->pnote->type == NOTE_CHANGES )
       {
-        act("$N has just posted a new Change for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+        act("$N has just posted a new Change for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
         d->character->has_note[ch->pnote->type] = (TRUE);
       }
 
@@ -1156,7 +1156,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           d->character != ch                   &&
           ch->pnote->type == NOTE_IDEA )
       {
-        act("$N has just posted a new Idea for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+        act("$N has just posted a new Idea for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
         d->character->has_note[ch->pnote->type] = (TRUE);
       }
 
@@ -1166,7 +1166,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
           d->character != ch                   &&
           ch->pnote->type == NOTE_PENALTY )
       {
-        act("$N has just posted a new Penalty for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+        act("$N has just posted a new Penalty for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
         d->character->has_note[ch->pnote->type] = (TRUE);
       }
     }
@@ -1183,13 +1183,13 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     note_attach( ch,type );
     if (ch->pnote->type != type)
     {
-      send_to_char("You already have a different note in progress.\n\r",ch);
+      send_to_char("You already have a different note in progress.\r\n",ch);
       return;
     }
 
     if ( !is_number( argument2 ) || *argument == '\0' )
     {
-      send_to_char( "note forward <note number> <recipient(s)>\n\r", ch );
+      send_to_char( "note forward <note number> <recipient(s)>\r\n", ch );
       return;
     }
 
@@ -1213,7 +1213,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         if (!str_cmp(ch->pnote->to_list,""))
         {
           send_to_char(
-            "You need to provide a recipient (name(s), all, clan name, admin or immortal).\n\r",
+            "You need to provide a recipient (name(s), all, clan name, admin or immortal).\r\n",
             ch);
           return;
         }
@@ -1234,7 +1234,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
               d->character != ch                  &&
               ch->pnote->type == NOTE_NOTE )
           {
-            act("$N has just posted a new Note for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+            act("$N has just posted a new Note for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
             d->character->has_note[ch->pnote->type] = (TRUE);
           }
 
@@ -1243,7 +1243,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
               d->character != ch                   &&
               ch->pnote->type == NOTE_NEWS )
           {
-            act("$N has just posted a new News Item for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+            act("$N has just posted a new News Item for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
             d->character->has_note[ch->pnote->type] = (TRUE);
           }
 
@@ -1252,7 +1252,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
               d->character != ch                   &&
               ch->pnote->type == NOTE_CHANGES )
           {
-            act("$N has just posted a new Change for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+            act("$N has just posted a new Change for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
             d->character->has_note[ch->pnote->type] = (TRUE);
           }
 
@@ -1261,7 +1261,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
               d->character != ch                   &&
               ch->pnote->type == NOTE_IDEA )
           {
-            act("$N has just posted a new Idea for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+            act("$N has just posted a new Idea for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
             d->character->has_note[ch->pnote->type] = (TRUE);
           }
 
@@ -1271,7 +1271,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
               d->character != ch                   &&
               ch->pnote->type == NOTE_PENALTY )
           {
-            act("$N has just posted a new Penalty for you to read.\n\r", FALSE, d->character, NULL, ch, TO_CHAR);
+            act("$N has just posted a new Penalty for you to read.\r\n", FALSE, d->character, NULL, ch, TO_CHAR);
             d->character->has_note[ch->pnote->type] = (TRUE);
           }
         }
@@ -1279,8 +1279,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         return;
       }
     }
-    sprintf(buf,"There aren't that many %s.\n\r",list_name);
-    send_to_char(buf,ch);
+    new_send_to_char(ch,"There aren't that many %s.\r\n",list_name);
     return;
   }
 

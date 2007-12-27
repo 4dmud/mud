@@ -232,8 +232,8 @@ ACMD(do_listen)
 {
   if (!ch->desc)
     return;
-
-  send_to_char(IN_ROOM(ch)->listen, ch);
+  if (IN_ROOM(ch)->listen)
+    new_send_to_char(ch, "%s", IN_ROOM(ch)->listen);
   return;
 }
 

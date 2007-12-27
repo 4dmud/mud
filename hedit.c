@@ -350,7 +350,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
 
 int hedit_find_entry(char *keyword)
 {
-    extern int top_of_helpt;
+    extern unsigned int top_of_helpt;
     int i;
 
     for (i = 0; i < top_of_helpt; i++)

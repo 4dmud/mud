@@ -2,6 +2,8 @@
 extern struct attack_hit_type attack_hit_text[];
 int apply_ac(struct char_data *ch, int eq_pos);
 
+int arena_ok(struct char_data *ch, struct char_data *victim);
+
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
 #define IS_SPELL_ATK(type) (((type) >= TYPE_ATK_ORB) && ((type) <= TYPE_ATK_TORPEDO))
 #define IS_SPELL_CAST(type) (((type) > 0) && ((type) < MAX_SPELLS))
@@ -112,7 +114,7 @@ PART_AREA_MAX
 #define WEP_CLAWS       18
 #define WEP_PROJECTILE  19
 
-#define MAX_WEAPON_TYPES 20
+#define MAX_WEAPON_TYPES 21
 
 #define ONE_HANDED 1
 #define TWO_HANDED 2

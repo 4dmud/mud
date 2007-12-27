@@ -35,7 +35,6 @@ void improve_skill(struct char_data *ch, int skill);
 int special(struct char_data *ch, int cmd, char *arg);
 int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg);
 int ok_damage_shopkeeper(struct char_data *ch, struct char_data *victim);
-int arena_ok(struct char_data *ch, struct char_data *victim);
 int has_metal_detector(struct char_data *ch);
 void spill_gold(struct char_data *ch);
 int can_fly(struct char_data *ch);
@@ -2310,19 +2309,19 @@ ASKILL(skill_blackjack)
   if (affected_by_spell(vict, SKILL_BLACKJACK))
   {
     send_to_char
-    ("They are guarding their head too well right now.\n\r", ch);
+    ("They are guarding their head too well right now.\r\n", ch);
     return 0;
   }
 
   if (GET_POS(vict) == POS_SLEEPING)
   {
-    send_to_char("But that person is already asleep!\n\r", ch);
+    send_to_char("But that person is already asleep!\r\n", ch);
     return 0;
   }
 
   if (GET_POS(vict) == POS_FIGHTING)
   {
-    send_to_char("They are moving about too much.\n\r", ch);
+    send_to_char("They are moving about too much.\r\n", ch);
     return 0;
   }
 
@@ -2338,7 +2337,7 @@ ASKILL(skill_blackjack)
     act("$n whacks $N over the head with a heavy looking sack. Ouch.",
         FALSE, ch, 0, vict, TO_NOTVICT);
     send_to_char
-    ("You feel a sudden pain erupt through the back of your skull.\n\r",
+    ("You feel a sudden pain erupt through the back of your skull.\r\n",
      vict);
 
     af.location = 0;

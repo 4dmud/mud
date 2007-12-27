@@ -271,7 +271,7 @@ case SECT_RAIL:
        }
        }
        
-	len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cx\n\r");
+	len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cx\r\n");
     }
     
     len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cx\r\n");
@@ -372,7 +372,7 @@ ACMD(do_map)
 	}
 	if (IS_DARK(IN_ROOM(ch)) && !CAN_SEE_IN_DARK(ch)) {
 	    send_to_char
-		("{cbThe wilderness is pitch black at night... {cx\n\r",
+		("{cbThe wilderness is pitch black at night... {cx\r\n",
 		 ch);
 	    IN_ROOM(ch) = was_in;
 	    return;
@@ -395,7 +395,7 @@ ACMD(do_map)
 	return;
     }
 
-    send_to_char("What??\n\r", ch);
+    send_to_char("What??\r\n", ch);
     IN_ROOM(ch) = was_in;
     return;
 }

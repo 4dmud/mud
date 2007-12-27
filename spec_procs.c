@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.8  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.7  2005/02/05 05:26:17  w4dimenscor
  * Added tsearch command to full text search triggers
  *
@@ -1563,7 +1566,7 @@ ACMD(do_recover)
   }
 
   if (!found)
-    send_to_char("Your corpse can not be found. Sorry!\n\r", ch);
+    send_to_char("Your corpse can not be found. Sorry!/r/n", ch);
   else
   {
 

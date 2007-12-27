@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.15  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.14  2005/05/03 10:21:25  w4dimenscor
  * changed the free_string function to take a pointer to a pointer so it can nullk the string off properly now. Also, fixed a door loading error, that assumed that all door rooms existed when loading, and now it checks for existstance. Also, fixed the multi arg for 'get' command
  *
@@ -401,36 +404,50 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
 
 /* The following put modes are supported by the code below:
  
-	1) put <object> <container>
+	1) put <object one word> <container one word>
 	2) put all.<object> <container>
 	3) put all <container>
+	4) put <number> <object> <container>
  
 	<container> must be in inventory or on ground.
 	all objects to be put into container must be in inventory.
 */
 ACMD(do_put)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  char arg1[MAX_INPUT_LENGTH] = "";
   char arg2[MAX_INPUT_LENGTH];
-  char arg3[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   struct obj_data *next_obj_data, *obj_data, *cont_data;
   int obj_dotmode, cont_dotmode, howmany = 1, processed_put_counter = 0, failed_put_counter = 0;
   char *obj_desc, *cont_desc;
-
-  one_argument(two_arguments(argument, arg1, arg2), arg3);
-
-  if (*arg3 && is_number(arg1))
-  {
-    howmany = atoi(arg1);
-    obj_desc = arg2;
-    cont_desc = arg3;
+  
+  skip_spaces(&argument);
+  
+  if (strncasecmp(argument, "all ", 4)) {
+  /** put all of the stuff that can fit, from inventory to container.
+      all the rest of argument is container description. **/
+  argument = any_one_arg(argument, arg1);
+  skip_spaces(&argument);
+  cont_desc = argument;
+  obj_desc = arg1;
+  } else {
+  if (begins_with_number(argument)) {
+  argument = any_one_arg(argument, arg1);
+  howmany = atoi(arg1);
   }
-  else
-  {
-    obj_desc = arg1;
-    cont_desc = arg2;
+  
+  if (!str_str(argument, " in ")) {
+  /** single argument mode **/ 
+  two_arguments(argument, arg1, arg2);
+  obj_desc = arg1;
+  cont_desc = arg2;
+  } else {
+  /** dual argument mode **/
+  obj_desc = str_until(argument, "in", arg1, sizeof(arg1));
+  cont_desc = arg1;
   }
+  }
+  
   obj_dotmode = find_all_dots(obj_desc);
   cont_dotmode = find_all_dots(cont_desc);
 
@@ -444,6 +461,7 @@ ACMD(do_put)
   {
     if (howmany > 1)
       wearall = 1;
+      /** this loop could end in tears if any trigger purges inventory on the perform_put -- mord**/
     while (obj_data && howmany )
     {
       next_obj_data = obj_data->next_content;
@@ -1139,6 +1157,23 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
   }
 }
 
+int is_two_words(char * str) {
+char buf[MAX_INPUT_LENGTH];
+
+if (!str || !*str)
+return 0;
+str = any_one_arg(str, buf);
+skip_spaces(&str);
+if (!*str)
+return 0;
+str = any_one_arg(str, buf);
+skip_spaces(&str);
+
+if (*buf && !*str)
+return 1;
+else
+return 0;
+}
 
 
 ACMD(do_get)
@@ -1146,16 +1181,26 @@ ACMD(do_get)
   char arg1[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH] = "";
   char num[MAX_INPUT_LENGTH] = "1";
-  char *from;
+  char *from = NULL;
 
   skip_spaces(&argument);
   if (begins_with_number(argument))
   argument = any_one_arg(argument, num);
   from = str_until(argument, "from", arg1, sizeof(arg1));
   skip_spaces(&from);
-  if (*from)
+  if (from && *from) {
   strlcpy(arg3, from, sizeof(arg3));
+  
+  } else {
+  /**check if it is only 2 arguments, meaning it wants to get something from the room **/
+  if (is_two_words(argument)) {
+  argument = any_one_arg(argument, arg1);
+  argument = any_one_arg(argument, arg3);
+  }
+  }
   //one_argument(two_arguments(argument, arg1, arg2), arg3);
+  
+  
   
 
   if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
@@ -1174,14 +1219,14 @@ ACMD(do_get)
   if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
   // get <item>
-  if (!*from)
+  if (!*arg3 || !str_cmp(arg3, "room"))
   {
     get_from_room(ch, arg1, 1);
     return;
   }
 
   // get <number> <item>
-  if (*num && !*from)
+  if (*num && !*arg3)
   {
     get_from_room(ch, arg3, atoi(num));
     return;
@@ -3508,13 +3553,13 @@ ACMD(do_compare)
 
   if (arg1[0] == '\0')
   {
-    send_to_char("Compare what to what?\n\r", ch);
+    send_to_char("Compare what to what?\r\n", ch);
     return;
   }
 
   if (!(obj1 = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
   {
-    send_to_char("You do not have that item.\n\r", ch);
+    send_to_char("You do not have that item.\r\n", ch);
     return;
   }
 
@@ -3534,7 +3579,7 @@ ACMD(do_compare)
 
     if (!obj2)
     {
-      send_to_char("You aren't wearing anything comparable.\n\r",
+      send_to_char("You aren't wearing anything comparable.\r\n",
                    ch);
       return;
     }
@@ -3543,7 +3588,7 @@ ACMD(do_compare)
   {
     if (!(obj2 = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying)))
     {
-      send_to_char("You do not have that item.\n\r", ch);
+      send_to_char("You do not have that item.\r\n", ch);
       return;
     }
   }

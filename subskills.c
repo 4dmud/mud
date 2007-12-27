@@ -76,6 +76,7 @@ ASUB(sub_drain_blood);
 ASUB(sub_juggle);
 ASUB(sub_throttle);
 ASUB(sub_tunneling);
+ASUB(sub_sweep_attack);
 
 const char *unused_subname = "<UNUSED SUB>";	/* So we can get &unused_subname */
 
@@ -167,17 +168,20 @@ void assign_subskills(void)
   for (i = (int)SUB_UNDEFINED; ((enum subskill_list) i) < TOP_SUB_DEFINE; i++)
     unused_sub((enum subskill_list)i);
 
-
+  /* gives a chance of avoiding sanctuary */
+  subo(SUB_SWEEP_ATTACK, "SweepAttack", 0, 0,
+       0, POS_FIGHTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_COMBATANT);
 
   /* gives a chance of avoiding sanctuary */
   subo(SUB_REPEL_SANC, "RepelSanctuary", 0, 0,
        0, POS_FIGHTING, 0 , PEAC,
-       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, TYPE_UNDEFINED);
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, PROF_COMBATANT);
 
   /* gives a chance of not dying when killed - allowing healing */
   subo(SUB_UNDYING, "Undying", 0, 0,
        0, POS_FIGHTING, 0 , PEAC,
-       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, TYPE_UNDEFINED);
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, PROF_COMBATANT);
 
   /* your ability to control living animals */
   subo(SUB_BRICKMAKING, "BrickMaking", 0, 0,
@@ -703,6 +707,9 @@ ACMD(do_subskill)
       case SUB_TUNNELING:
         CALL_SUB(sub_tunneling);
         break;
+      case SUB_SWEEP_ATTACK:
+       CALL_SUB(sub_sweep_attack);
+       break;
       default:
         new_send_to_char(ch, "I don't know that subskill.\r\n");
         return;
@@ -724,9 +731,40 @@ ASUB(sub_fury_attacks)
 
 ASUB(sub_drain_blood)
 {
-  new_send_to_char(ch, "This subskill is unfinished!\r\n");
-  return FALSE;
+  /** make this a starting attack, the victims hp and adds it to yours **/
+  /** You do as much damage as you are damaged **/
+return FALSE;
 
+
+}
+
+ASUB(sub_sweep_attack)
+{
+/** carry the leftover damage from the attack onto the next
+    available mob in the room 
+    Your skill level in this defines how much new damage you
+    add to the attack.
+**/
+
+ if (GET_SUB(ch, SUB_SWEEP_ATTACK) <= 0)
+  {
+    new_send_to_char(ch, "You haven't got that ability!\r\n");
+    return SUB_UNDEFINED;
+  }
+  
+  if (get_sub_status(ch, SUB_SWEEP_ATTACK) == STATUS_OFF ) {
+  if (speed_update(ch) > 500) {
+  new_send_to_char(ch, "You focus on sweeping attacks.\r\n");
+  toggle_sub_status(ch, SUB_SWEEP_ATTACK, STATUS_ON);
+  } else {
+  new_send_to_char(ch, "You aren't speedy enough to focus on sweeping attacks.\r\n");
+  }
+  } else {
+  new_send_to_char(ch, "You focus on normal attacks.\r\n");
+  toggle_sub_status(ch, SUB_SWEEP_ATTACK, STATUS_OFF);
+  }
+  return TRUE;
+  
 
 
 }
@@ -735,8 +773,8 @@ ACMD(do_ignite)
 {
   struct obj_data *hilt = NULL, tmpobj;
   struct obj_data *sabre = NULL;
-  char buf2[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  char buf2[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
   int counter = 0, pos = NOWHERE;
   int pass = 0;
 
@@ -1095,7 +1133,7 @@ int toggle_sub_status(struct char_data *ch, int i, int onoff)
   {
     if (temp->subskill == (i))
     {
-      return (temp->status = (enum sub_status_types)onoff);
+      return (temp->status = (enum sub_status_toggle)onoff);
     }
     temp = temp->next;
   }

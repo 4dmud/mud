@@ -2264,6 +2264,8 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
   struct char_data *i;
   DESCRIPTOR_DATA *d;
   int num;
+  
+  skip_spaces(&name);
 
   if (!number)
   {
@@ -2285,7 +2287,7 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
     if (inroom == FIND_CHAR_ROOM && !HERE(d->character, ch))
       continue;
 
-    if (!isname_full(name, d->character->player.name))
+    if (!isname(name, d->character->player.name))
       continue;
 
     if (!CAN_SEE(ch, d->character))

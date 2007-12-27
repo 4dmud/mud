@@ -165,7 +165,11 @@ ush_int port = 0;
 char last_command[MAX_STRING_LENGTH] = "Empty";
 
 /* functions in this file */
-char * parse_prompt(CHAR_DATA *ch);
+void send_out_signals(struct descriptor_data *d);
+void turn_on_mxp (DESCRIPTOR_DATA *d);
+int count_mxp_tags (const int bMXP, const char *txt, int length);
+void convert_mxp_tags (const int bMXP, char * dest, const char *src, size_t lenn);
+char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn);
 void clear_char_q(struct descriptor_data *t);
 RETSIGTYPE reread_wizlists(int sig);
 RETSIGTYPE unrestrict_game(int sig);
@@ -276,7 +280,7 @@ int enter_player_game(struct descriptor_data *d);
 #if RUNNING_IDENT
 static void get_lookup_reply(void);
 #endif
-
+void send_compress_offer(struct descriptor_data *d);
 
 #ifdef HAVE_ZLIB_H
 /* zlib helper functions */
@@ -330,7 +334,7 @@ void z_free(void *opaque, void *address)
 #define COMPRESS2       86
 
 /* first compression neg. string */
-const char compress_offer[] =
+static const char compress_offer[] =
   {
     (char) IAC,
     (char) WILL,
@@ -338,8 +342,24 @@ const char compress_offer[] =
     (char) 0,
   };
 
+static const char will_sig[] = { IAC, WILL, TELOPT_COMPRESS, 0 };
+static const char do_sig[] = { IAC, DO, TELOPT_COMPRESS, 0 };
+static const char dont_sig[] = { IAC, DONT, TELOPT_COMPRESS, 0 };
+static const char on_sig[] = { IAC, SB, TELOPT_COMPRESS, WILL, SE, 0 };
+static const char will_sig2[] = { IAC, WILL, TELOPT_COMPRESS2, 0 };
+static const char do_sig2[] = { IAC, DO, TELOPT_COMPRESS2, 0 };
+static const char dont_sig2[] = { IAC, DONT, TELOPT_COMPRESS2, 0 };
+static const char on_sig2[] = { IAC, SB, TELOPT_COMPRESS2, IAC, SE, 0 };
 
 #endif
+#define  TELOPT_MXP        '\x5B'
+static const unsigned char will_mxp_str  [] = { IAC, WILL, TELOPT_MXP, 0};
+static const unsigned char start_mxp_str [] = { IAC, SB,   TELOPT_MXP, IAC, SE, 0 };
+static const unsigned char do_mxp_str    [] = { IAC, DO,   TELOPT_MXP, 0 };
+static const unsigned char dont_mxp_str  [] = { IAC, DONT, TELOPT_MXP, 0 };
+static const unsigned char eor_offer     [] = { IAC, WILL, EOR,0};
+static const unsigned char ga_offer      [] = { IAC, WILL, GA,0};
+
 
 /***********************************************************************
 *  main game loop and related stuff                                    *
@@ -627,7 +647,7 @@ void copyover_recover()
   struct descriptor_data *d;
   FILE *fp;
   char host[1024];
-  int desc, player_i;
+  int desc, player_i, mxpon;
   bool fOld;
   char name[MAX_INPUT_LENGTH];
 
@@ -640,7 +660,7 @@ void copyover_recover()
   if (!fp)
   {			/* there are some descriptors open which will hang forever then ? */
     perror("copyover_recover:fopen");
-    log("Copyover file not found. Exitting.\n\r");
+    log("Copyover file not found. Exitting.\r\n");
     exit(1);
   }
 
@@ -649,14 +669,14 @@ void copyover_recover()
   for (;;)
   {
     fOld = TRUE;
-    varcnt = fscanf(fp, "%d %s %s %d\n", &desc, name, host, &saved_loadroom);
+    varcnt = fscanf(fp, "%d %s %s %d %d\n", &desc, name, host, &saved_loadroom, &mxpon);
     if (desc == -1)
       break;
-      if (varcnt !=4)
+    if (varcnt !=5)
       continue;
 
     /* Write something, and check if it goes error-free */
-    if (write_to_descriptor(desc,"\n\r...the hourglass turns over and the sand starts flowing again...\n\r", NULL) == 0)
+    if (write_to_descriptor(desc,"\n\r...the hourglass turns over and the sand starts flowing again...\r\n", NULL) == 0)
     {
       close(desc);	/* nope */
       continue;
@@ -673,7 +693,7 @@ void copyover_recover()
     d->next = descriptor_list;
     descriptor_list = d;
 #endif
-
+    d->mxp = mxpon;
     strcpy(d->host, host);
 
 
@@ -681,7 +701,7 @@ void copyover_recover()
 
     /* Now, find the pfile */
 
-    CREATE(d->character, struct char_data, 1);    
+    CREATE(d->character, struct char_data, 1);
     CREATE(d->character->player_specials, struct player_special_data,        1);
     clear_char(d->character);
     d->character->desc = d;
@@ -698,28 +718,30 @@ void copyover_recover()
       else
         fOld = FALSE;
     }
-    else 
+    else
       fOld = FALSE;
 
     if (!fOld)
     {		/* Player file not found?! */
-      write_to_descriptor(desc,"\n\rSomehow, your character was lost in the copyover. Sorry.\n\r", NULL);
+      write_to_descriptor(desc,"\n\rSomehow, your character was lost in the copyover. Sorry.\r\n", NULL);
       close_socket(d);
     }
     else
     {		/* ok! */
 
-      write_to_descriptor (desc, "\n\rColor floods back into the world.\n\r", NULL);
+      write_to_descriptor (desc, "\n\rColor floods back into the world.\r\n", NULL);
 #ifdef HAVE_ZLIB_H
       if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
       {
         d->comp->state = 1; /* indicates waiting for comp negotiation */
-        write_to_output(d, "%s", compress_offer);
+        send_compress_offer(d);
       }
 #endif /* HAVE_ZLIB_H */
+      send_out_signals(d);
       d->connected = CON_PLAYING;
       GET_LOADROOM(d->character) = saved_loadroom;
       enter_player_game(d);
+
 
 
     }
@@ -1529,14 +1551,34 @@ void echo_on(struct descriptor_data *d)
   write_to_output(d, "%s", on_string);
 }
 
+const char *end_prompt(struct descriptor_data *d)
+{
+  static const char eor_prompt[] = {
+                               (char) IAC,
+                               (char) EOR,
+                               (char) 0
+                             };
+  static const char ga_prompt[] = {
+                              (char) IAC,
+                              (char) GA,
+                              (char) 0
+                            };
+  if (!d)
+    return "";
+  if (d->eor == 1)
+    return eor_prompt;
+  else if (d->telnet_capable == 1)
+    return ga_prompt;
+  else
+    return "";
+}
 
 char *make_prompt(struct descriptor_data *d)
 {
-  static char prompt[MAX_PROMPT_LENGTH + 1];
-
-
-  /* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h ) */
-
+  static char prompt[MAX_PROMPT_LENGTH + 1] = "";
+  /* Note, prompt is truncated at MAX_PROMPT_LENGTH chars (structs.h )
+     (This is no longer true, prompt has expanding buffer when called from process_output)*/
+  strcpy(prompt, "");
   if (d->showstr_count)
     snprintf(prompt, sizeof(prompt),
              "[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]",
@@ -1544,17 +1586,12 @@ char *make_prompt(struct descriptor_data *d)
   else if (d->str)
     strcpy(prompt, "] ");	/* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && !IS_NPC(d->character))
-
-
-
 #if 1
-    return parse_prompt(d->character);
-
+    return parse_prompt(d->character, prompt, sizeof(prompt));
 #else
   {
     int count = 0;
     size_t len = 0;
-    *prompt = '\0';
     int percent;
 
 
@@ -1724,6 +1761,8 @@ char *make_prompt(struct descriptor_data *d)
   else
     *prompt = '\0';
 
+  strlcat(prompt, end_prompt(d), sizeof(prompt));
+
   return (prompt);
 }
 
@@ -1780,6 +1819,7 @@ void init_descriptor(struct descriptor_data *newd, int desc)
   static int last_desc = 0;	/* last descriptor number */
 
   /* initialize descriptor data */
+
   *newd->small_outbuf = 0;
   newd->large_outbuf = NULL;
   newd->descriptor = desc;
@@ -1808,6 +1848,8 @@ void init_descriptor(struct descriptor_data *newd, int desc)
 #ifdef HAVE_ZLIB_H
   newd->comp->stream = NULL;
 #endif /* HAVE_ZLIB_H */
+  newd->eor = 0;
+  newd->mxp = FALSE;
 
 }
 
@@ -1834,7 +1876,7 @@ size_t write_to_output(struct descriptor_data *d, const char *txt, ...)
   va_list args;
   size_t left;
   if (!d)
-  return 0;
+    return 0;
 
   va_start(args, txt);
   left = vwrite_to_output(d, txt, args);
@@ -1844,26 +1886,60 @@ size_t write_to_output(struct descriptor_data *d, const char *txt, ...)
 }
 
 /* Add a new string to a player's output queue. */
-size_t vwrite_to_output(struct descriptor_data *t, const char *format,
-                        va_list args)
+size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list args)
 {
   const char *text_overflow = "\r\nOVERFLOW\r\n";
   char txt[MAX_STRING_LENGTH];
-  size_t wantsize;
-  int size;
+  size_t size;
+  int size_mxp;
 
 
   /* if we're in the overflow state already, ignore this new output */
   if (t->bufspace == 0)
     return (0);
 
-  wantsize = size = vsnprintf(txt, sizeof(txt), format, args);
+  size = vsnprintf(txt, sizeof(txt), format, args);
   if (t->character)
-    wantsize = size = proc_color(txt, (clr(t->character, C_NRM)), sizeof(txt));
+    size = proc_color(txt, (clr(t->character, C_NRM)), sizeof(txt));
 
 
+  /* work out how much we need to expand/contract it */
+  size_mxp = count_mxp_tags(t->mxp, txt, strlen(txt));
+ if (size_mxp < 0)
+ size_mxp = 0;
+  //size = size_mxp + strlen(txt);
+
+  do   
+  {
+    char dest[size + size_mxp + 20];
+    int mxpon = t->mxp;
+    if (size > sizeof(txt))
+      mxpon = 0;
+    convert_mxp_tags(mxpon, dest, txt, size);
+
+    if (size + size_mxp > sizeof(txt))
+    log("Mxp cut off");
+    strlcpy(txt, dest, sizeof(txt));
+  } while(0);
+
+
+/** dont wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+  if (t->character && !t->mxp && PRF_FLAGGED(t->character, PRF_PAGEWRAP) && PAGEWIDTH(t->character) > 0)
+  {
+    int len = strlen(txt);
+    /* at max you will be adding 3 more characters per line
+     so this is just to make sure you have the room for this function. */
+
+    char dest[(((len / PAGEWIDTH(t->character)) * 3) + len + 3)];
+    wordwrap(txt, dest, PAGEWIDTH(t->character), len); //size checked above
+
+    strlcpy(txt, dest, sizeof(txt));
+    
+
+  }
+size = strlen(txt);
   /* If exceeding the size of the buffer, truncate it for the overflow message */
-  if (size < 0 || wantsize >= sizeof(txt))
+  if (size >= sizeof(txt))
   {
     size = sizeof(txt) - 1;
     strcpy(txt + size - strlen(text_overflow), text_overflow);	/* strcpy: OK */
@@ -1876,6 +1952,7 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format,
    */
   if (size + t->bufptr + 1 > LARGE_BUFSIZE)
   {
+  log("too big for buffer");
     size = LARGE_BUFSIZE - t->bufptr - 1;
     txt[size] = '\0';
     buf_overflows++;
@@ -1887,6 +1964,7 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format,
    */
   if (t->bufspace > size)
   {
+  
     strcpy(t->output + t->bufptr, txt);	/* strcpy: OK (size checked above) */
     //memmove(t->output + t->bufptr, txt, sizeof(txt));
     //*((t->output + t->bufptr) + sizeof(txt)) = '\0';
@@ -2074,7 +2152,7 @@ int set_sendbuf(socket_t s)
 static void get_lookup_reply(void)
 {
   register struct descriptor_data *d;
-  struct message                   msg;
+  struct message msg;
 
   /* get the reply */
   read(id_serv_socket, &msg, sizeof(msg));
@@ -2301,9 +2379,9 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
       free(newd);
       return (NULL);
     }/*
-                         
-                         
-                          */
+                                                 
+                                                 
+                                                  */
   } //copyover
 
   init_descriptor(newd, desc);
@@ -2313,8 +2391,8 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
   descriptor_list = newd;
   if (!copyover)
   {
-    write_to_output(newd, "%s", GREETINGS);
-    write_to_output(newd,"\r\nBy what name do you wish to be known? ");
+
+    write_to_output(newd, "%s%s%s", GREETINGS, "\r\nBy what name do you wish to be known? ", end_prompt(newd));
   }
   STATE(newd) = CON_GET_NAME;
   if (!copyover)
@@ -2330,6 +2408,47 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
   }
   return (newd);
 }
+char * send_mxp_status(struct descriptor_data *t) {
+static char stat[MAX_MXP_STATUS];
+size_t len = 0;
+int hp = 0, mhp = 0;
+int mana = 0, mmana = 0;
+int move = 0, mmove = 0;
+int stam = 0, mstam = 0;
+if (t->character) {
+hp = GET_HIT(t->character);
+mana = GET_MANA(t->character);
+move = GET_MOVE(t->character);
+stam = GET_STAMINA(t->character);
+mhp = GET_MAX_HIT(t->character);
+mmana = GET_MAX_MANA(t->character);
+mmove = GET_MAX_MOVE(t->character);
+mstam = GET_MAX_STAMINA(t->character);
+}
+
+len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
+len = snprintf(stat + len, sizeof(stat) - len, "<variable name=hitp>%d</variable><variable name=maxhitp>%d</variable>",hp,mhp);
+len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE hitp Max=maxhitp Caption=\"Health (%d)\" Color=red>",   hp);
+//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE mana Max=%d Caption=\"Mana (%d)\" Color=blue>%d</GAUGE>", mmana,mana,  mana);
+//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE move Max=%d Caption=\"Move (%d)\" Color=green>%d</GAUGE>",mmove, move,  move);
+//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE stam Max=%d Caption=\"Stamina (%d)\" Color=yellow>%d</GAUGE>",  mstam,stam, stam);
+//len = snprintf(stat + len, sizeof(stat) - len, "%s", MXPMODE());
+return stat;
+}
+void send_compress_offer(struct descriptor_data *d)
+{
+#ifdef HAVE_ZLIB_H
+  write_to_output(d, "%s", will_sig);
+  write_to_output(d, "%s", will_sig2);
+#endif
+  return;
+}
+void send_out_signals(struct descriptor_data *d)
+{
+  write_to_output(d, "%s", eor_offer);
+  write_to_output(d, "%s", ga_offer);
+  write_to_output(d, "%s", will_mxp_str);
+}
 
 /*
  * Send all of the output that we've accumulated for a player out to
@@ -2341,36 +2460,37 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
  *	 2 bytes: extra \r\n for non-comapct
  *      14 bytes: unused
  */
-/*
-if (t->character && PRF_FLAGGED(t->character, PRF_PAGEWRAP))
-     wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
-*/
 
 
 int process_output(struct descriptor_data *t)
 {
   char i[MAX_SOCK_BUF], *osb = i + 2;
-  int result;
-
+  int result = 0;
   /* we may need this \r\n for later -- see below */
-  strcpy(i, "\r\n");	/* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
+  strlcpy(i, "\r\n", sizeof(i));	/* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
 
+  if (strlen(t->output)-1 > MAX_SOCK_BUF)
+    log("output bigger then sock buf");
   /* now, append the 'real' output */
-  strcpy(osb, t->output);	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
+  strlcat(i, t->output, sizeof(i));	/* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
+
 
   /* if we're in the overflow state, notify the user */
   if (t->bufspace == 0)
-    strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    strlcat(i, "**OVERFLOW**\r\n", sizeof(i));
 
   /* add the extra CRLF if the person isn't in compact mode */
   if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
-    strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    strcat(osb, "\r\n");
 
   /* add a prompt */
-  strcat(i, make_prompt(t));	/* strcpy: OK (i:MAX_SOCK_BUF reserves space) */
+//if (t->mxp)
+ // strlcat(i, send_mxp_status(t), sizeof(i));
+  strlcat(i, make_prompt(t), sizeof(i));
 
-  if (t->character && PRF_FLAGGED(t->character, PRF_PAGEWRAP))
-    wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
+  /**TODO: need to in the future, check this against the fact that we don't
+  want to have tags cut off half way in any place, so like, no buffer overflows.
+  size should always be less then lenn - Mord**/
 
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
@@ -2378,25 +2498,35 @@ int process_output(struct descriptor_data *t)
    */
   if (t->has_prompt)
   {
-    t->has_prompt = FALSE;
+    t->has_prompt = 0;
     result = write_to_descriptor(t->descriptor, i, t->comp);
     if (result >= 2)
       result -= 2;
   }
   else
+  {
     result = write_to_descriptor(t->descriptor, osb, t->comp);
+  }
 
   if (result < 0)
   {	/* Oops, fatal error. Bye! */
     close_socket(t);
+
     return (-1);
   }
-  else if (result == 0)	/* Socket buffer full. Try later. */
+  else if (result == 0)
+  {	/* Socket buffer full. Try later. */
+
     return (0);
+  }
 
   /* Handle snooping: prepend "% " and send to snooper. */
   if (t->snoop_by)
     write_to_output(t->snoop_by, "%% %*s%%%%", result, t->output);
+
+  /**
+  This needs to not return the altered buffer size!
+  **/
   /* The common case: all saved output was handed off to the kernel buffer. */
   if (result >= t->bufptr )
   {
@@ -2417,11 +2547,11 @@ int process_output(struct descriptor_data *t)
     *(t->output) = '\0';
 
     /*
-     * If the overflow message or prompt were partially written, try to save
+     * If the overflow message or prompt or mxp or wordwrapping were partially written, try to save
      * them. There will be enough space for them if this is true.  'result'
      * is effectively unsigned here anyway.
      */
-    if ((unsigned int)result < strlen(osb))
+    if ((unsigned int)result < (strlen(osb)))
     {
       size_t savetextlen = strlen(osb + result);
 
@@ -2434,8 +2564,10 @@ int process_output(struct descriptor_data *t)
   else
   {
     /* Not all data in buffer sent.  result < output buffersize. */
-
-    strcpy(t->output, t->output + result);	/* strcpy: OK (overlap) */
+    //size_t outlen = strlen(t->output) - result;
+   // if (outlen > 0)
+    //  memmove(t->output, t->output + result, outlen);
+        strcpy(t->output, t->output + result);
     t->bufptr   -= result;
     t->bufspace += result;
   }
@@ -2597,6 +2729,8 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length, stru
   ssize_t result = 0;
 
 #ifdef HAVE_ZLIB_H
+
+
   int compr_result, tmp, cnt, bytes_copied;
 
   /* MCCP! this is where the zlib compression is handled */
@@ -2605,13 +2739,13 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length, stru
     /* copy data to input buffer */
     /* first check that overflow won't happen */
     /* if it will, we only copy over so much text */
-    if (comp->size_in + length > comp->total_in)
+    if ((size_t)comp->size_in + length > (size_t)comp->total_in)
       bytes_copied = comp->total_in - comp->size_in;
     else
-      bytes_copied = length;
+      bytes_copied = (int)length;
 
-    /* now copy what will fit into the buffer */
-    strncpy(comp->buff_in + comp->size_in, txt, bytes_copied);
+    // now copy what will fit into the buffer
+    strncpy((char *)comp->buff_in + comp->size_in, txt, bytes_copied);
     comp->size_in += bytes_copied;
 
     /* set up stream input */
@@ -2835,6 +2969,46 @@ ssize_t perform_socket_read(socket_t desc, char *read_point,
   perror("SYSERR: perform_socket_read: about to lose connection");
   return (-1);
 }
+int toggle_compression(struct descriptor_data *t)
+{
+#if defined(HAVE_ZLIB)
+  int derr;
+  if (!t->comp)
+    return 0;
+
+
+  /* Notify client. */
+  switch(t->comp->compression)
+  {
+  case 1:
+    write_to_descriptor(t->descriptor, on_sig, NULL);
+    break;
+  case 2:
+    write_to_descriptor(t->descriptor, on_sig2, NULL);
+    break;
+  }
+
+  CREATE(t->comp->stream, z_stream, 1);
+  t->comp->stream->zalloc = z_alloc;
+  t->comp->stream->zfree = z_free;
+  t->comp->stream->opaque = Z_NULL;
+  if ((derr = deflateInit(t->comp->stream, Z_DEFAULT_COMPRESSION)) != 0)
+    log("SYSERR: deflateEnd returned %d.", derr);
+
+  /* init the state structure */
+  /* first the output component */
+  CREATE(t->comp->buff_out, Bytef, SMALL_BUFSIZE);
+  t->comp->total_out = SMALL_BUFSIZE;
+  t->comp->size_out = 0;
+  /* now the input component */
+  CREATE(t->comp->buff_in, Bytef, SMALL_BUFSIZE);
+  t->comp->total_in = SMALL_BUFSIZE;
+  t->comp->size_in = 0;
+
+#endif
+  return 0;
+}
+
 
 /*
  * ASSUMPTION: There will be no newlines in the raw input buffer when this
@@ -2854,20 +3028,16 @@ int process_input(struct descriptor_data *t)
   int buf_length, failed_subst;
   ssize_t bytes_read;
   size_t space_left;
-  char *ptr, *read_point, *write_point, *nl_pos = NULL;
+  char  *read_point, *write_point, *nl_pos = NULL;
   char tmp[MAX_INPUT_LENGTH];
+  char *ptr;
 
-#ifdef HAVE_ZLIB_H
-  const char compress_start[] =
-    {
-      (char) IAC,
-      (char) SB,
-      (char) COMPRESS2,
-      (char) IAC,
-      (char) SE,
-      (char) 0
-    };
-#endif /* HAVE_ZLIB_H */
+  const unsigned char do_eor[] = {IAC,DO,EOR,0};
+  const unsigned char do_ga[] = {IAC,DO,GA,0};
+  const unsigned char do_ech[] = {IAC,DO,TELOPT_ECHO,0};
+#define  TELOPT_MXP        '\x5B'
+
+
 
   /* first, find the point where we left off reading data */
   buf_length = strlen(t->inbuf);
@@ -2893,57 +3063,127 @@ int process_input(struct descriptor_data *t)
     /* note: this will bork if the user is giving lots of input when he first connects */
     /* he shouldn't be doing this, and for the sake of efficiency, the read buffer isn't searched */
     /* (ie. it assumes that read_point[0] will be IAC, etc.) */
-    if (t->comp->state == 1)
-    {
-#ifdef HAVE_ZLIB_H
-      if (*read_point == (char)IAC && *(read_point + 1) == (char)DO && *(read_point + 2) == (char)COMPRESS2)
-      {
-        /* compression just turned on */
-        /* first send plaintext start of the compression stream */
-        write_to_descriptor(t->descriptor, compress_start, NULL);
-
-        /* init the compression stream */
-        CREATE(t->comp->stream, z_stream, 1);
-        t->comp->stream->zalloc = z_alloc;
-        t->comp->stream->zfree = z_free;
-        t->comp->stream->opaque = Z_NULL;
-        deflateInit(t->comp->stream, Z_DEFAULT_COMPRESSION);
-
-        /* init the state structure */
-        /* first the output component */
-        CREATE(t->comp->buff_out, Bytef, SMALL_BUFSIZE);
-        t->comp->total_out = SMALL_BUFSIZE;
-        t->comp->size_out = 0;
-        /* now the input component */
-        CREATE(t->comp->buff_in, Bytef, SMALL_BUFSIZE);
-        t->comp->total_in = SMALL_BUFSIZE;
-        t->comp->size_in = 0;
-
-        /* finally, turn compression on */
-        t->comp->state = 2;
-
-        bytes_read = 0; /* ignore the compression string - don't process it further */
-      }
-      else if (*read_point == (char)IAC && *(read_point + 1) == (char)DONT && *(read_point + 2) == (char)COMPRESS2)
-      {
-        t->comp->state = 0;
-
-        bytes_read = 0; /* ignore the compression string - don't process it further */
-      }
-#else /* HAVE_ZLIB_H */
-      t->comp->state = 0; /* We can't compress without zlib...turn it off */
-#endif /* HAVE_ZLIB_H */
-
-    }
     /* at this point, we know we got some data from the read */
 
-    *(read_point + bytes_read) = '\0';	/* terminate the string */
+    read_point[bytes_read] = '\0';	/* terminate the string */
 
-    /* search for a newline in the data we just read */
+    /* search for a newline in the data we just read
     for (ptr = read_point; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr))
         nl_pos = ptr;
+    */
 
+    for (ptr = read_point, nl_pos = NULL; *ptr && !nl_pos; ptr++)
+    {
+      /*
+       * Search for an "Interpret As Command" marker. Note that we still
+       * have an ostrich attitude to all other IAC markers.  At least now
+       * they won't show up in the users' input streams. -gg 2/28/99
+       */
+      if (*(unsigned char *)ptr == IAC)
+      {
+        t->telnet_capable = 1;
+        //log("IAC found");
+        //if (*(unsigned char *)(ptr+1) == DO)
+        //log("DO found");
+        //else if (*(unsigned char *)(ptr+1) == DONT)
+        //log("DONT found");
+
+        //if (*(unsigned char *)(ptr+2) == COMPRESS2)
+        //log("COMPRESS found");
+        //else if (*(unsigned char *)(ptr+2) == EOR)
+        //log("END-OF-RECORD found");
+
+#if defined(HAVE_ZLIB)
+
+        if (memcmp (ptr, do_sig2, strlen (do_sig2)) == 0)
+        {
+          //log("MCCP found on");
+          toggle_compression(t);
+          t->comp->state = 2;
+          t->comp->compression = 2;
+          memmove (ptr, &ptr [strlen (do_sig2)], strlen (&ptr [strlen (do_sig2)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, do_sig, strlen (do_sig)) == 0)
+        {
+          //log("MCCP found on");
+          toggle_compression(t);
+          t->comp->state = 2;
+          t->comp->compression = 1;
+          memmove (ptr, &ptr [strlen (do_sig)], strlen (&ptr [strlen (do_sig)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, dont_sig, strlen (dont_sig)) == 0)
+        {
+          //log("MCCP found off");
+          t->comp->state = 0;
+          t->comp->compression = 1;
+          memmove (ptr, &ptr [strlen (dont_sig)], strlen (&ptr [strlen (dont_sig)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, dont_sig2, strlen (dont_sig2)) == 0)
+        {
+          //log("MCCP found off");
+          t->comp->state = 0;
+          t->comp->compression = 2;
+          memmove (ptr, &ptr [strlen (dont_sig2)], strlen (&ptr [strlen (dont_sig2)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+#endif
+        if (memcmp (ptr, do_eor, strlen (do_eor)) == 0)
+        {
+          t->eor = 1;
+          //log("eor found");
+          memmove (ptr, &ptr [strlen (do_eor)], strlen (&ptr [strlen (do_eor)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, do_ga, strlen (do_ga)) == 0)
+        {
+          //log("eor found");
+          memmove (ptr, &ptr [strlen (do_ga)], strlen (&ptr [strlen (do_ga)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, do_ga, strlen (do_ech)) == 0)
+        {
+          /** wanna do something with this? **/
+          //log("do echo found");
+          memmove (ptr, &ptr [strlen (do_ech)], strlen (&ptr [strlen (do_ech)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        }
+        if (memcmp (ptr, do_mxp_str, strlen (do_mxp_str)) == 0)
+        {
+          turn_on_mxp (t);
+          /* remove string from input buffer */
+          memmove (ptr, &ptr [strlen (do_mxp_str)], strlen (&ptr [strlen (do_mxp_str)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        } /* end of turning on MXP */
+        else  if (memcmp (ptr, dont_mxp_str, strlen (dont_mxp_str)) == 0)
+        {
+          t->mxp = FALSE;
+          /* remove string from input buffer */
+          memmove (ptr, &ptr [strlen (dont_mxp_str)], strlen (&ptr [strlen (dont_mxp_str)]) + 1);
+          ptr--; /* adjust to allow for discarded bytes */
+        } /* end of turning off MXP */
+
+
+
+        /*
+         * Convert the IAC string so that it is filtered out. This
+         * should, in theory, leave the 'U' from the compression
+         * handshake but in my testing it didn't show up... -gg 3/21/99
+         *
+        while (*ptr < 0)
+          *ptr++ = '\0';
+
+         //If this was everything, pretend we had nothing. 
+        if (ISNEWL(*ptr))
+          *ptr++ = '\0';
+        */
+      }
+      else if (ISNEWL(*ptr))
+        nl_pos = ptr;
+    }
     read_point += bytes_read;
     space_left -= bytes_read;
 
@@ -3258,7 +3498,7 @@ void close_socket(struct descriptor_data *d)
   /* d->comp was still created even if there is no zlib, for comp->state) */
   if (d->comp)
     free(d->comp);
-if (d);
+  if (d);
   free(d);
 }
 
@@ -3398,7 +3638,7 @@ RETSIGTYPE hupsig(int sig)
 {
   log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...");
   exit(0);			/* perhaps something more elegant should
-                  				 * substituted */
+                              				 * substituted */
 }
 
 RETSIGTYPE chldsig()
@@ -3961,10 +4201,11 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
   if (type == TO_VICT)
   {
     if ((to = (const struct char_data *) vict_obj)
-        && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check)) {
-	if (!is_ignoring(ch, (struct char_data *)to))
-      perform_act(str, ch, obj, vict_obj, to);
-      }
+        && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check))
+    {
+      if (!is_ignoring(ch, (struct char_data *)to))
+        perform_act(str, ch, obj, vict_obj, to);
+    }
     return;
   }
   /* ASSUMPTION: at this point we know type must be TO_NOTVICT or TO_ROOM */
@@ -3990,7 +4231,7 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
     if (!restrict_check((const struct char_data *)to))
       continue;
     if (!is_ignoring(ch, (struct char_data *)to))
-    perform_act(str, ch, obj, vict_obj, to);
+      perform_act(str, ch, obj, vict_obj, to);
   }
 }
 
@@ -4223,7 +4464,7 @@ void brag(struct char_data *ch, struct char_data *vict)
       "$N was all hype, no substance!",
       "Note to $N: Don't fight when you suck!",
       "$N was a tasty dinner, now who's for desert? Muhaha!",
-      "Bahaha! $N should stick to Odif's!",
+      "Bahaha! $N should sit at recall!",
       "$N is now in need of some exp...Muhaha!",
       "$N needs a hospital now. Muhaha!",
       "$N's mother is a slut! Muhaha!",
@@ -4288,7 +4529,7 @@ void make_wholist(void)
   }
 
   fprintf(fl, "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n" );
-fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.org/who.xsl\"?>\n");
+  //fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.org/who.xsl\"?>\n");
   fprintf(fl, "<wholist>\n" );
 
   fprintf(fl, "<info>\n"
@@ -4399,13 +4640,13 @@ void make_who2html(void)
   fclose(opf);
 }
 #define PROMPT_CHAR '%'
-char * parse_prompt(CHAR_DATA *ch)
+char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
 {
-  char *out_buf = NULL;
+
   char insert_text[MAX_INPUT_LENGTH] = "";
   char *inbuf;
-  static char prompt[MAX_STRING_LENGTH + 1] = "";
-  char temp[MAX_STRING_LENGTH + 1] = "";
+  //static char prompt[MAX_STRING_LENGTH + 1] = "";
+  char out_buf[MAX_STRING_LENGTH + 1] = "";
   char ptemp[MAX_PROMPT_LENGTH * 5] = "";
   register int inpos = 0, outpos = 0;
   time_t ct = time(0);
@@ -4424,18 +4665,18 @@ char * parse_prompt(CHAR_DATA *ch)
   else
     strcpy(ptemp, "");
 
-  psize = sizeof(prompt);
+  psize = sizeof(out_buf);
 
   inbuf = ptemp;
   if (PRF_FLAGGED(ch, PRF_AFK)&& len < psize)
   {
-    count = snprintf(prompt + len, psize - len, "\x1B[32m[AFK]\x1B[0m ");
+    count = snprintf(out_buf + len, psize - len, "\x1B[32m[AFK]\x1B[0m ");
     if (count >= 0)
       len += count;
   }
   if (PRF_FLAGGED(ch, PRF_RP)&& len < psize)
   {
-    count = snprintf(prompt + len, psize - len, "\x1B[32m[RP]\x1B[0m ");
+    count = snprintf(out_buf + len, psize - len, "\x1B[32m[RP]\x1B[0m ");
     if (count >= 0)
       len += count;
   }
@@ -4444,7 +4685,7 @@ char * parse_prompt(CHAR_DATA *ch)
   if ((check_mail(ch) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
   {
-    count = snprintf(prompt + len, psize - len, "[MAIL] ");
+    count = snprintf(out_buf + len, psize - len, "[MAIL] ");
     if (count >= 0)
       len += count;
   }
@@ -4452,28 +4693,28 @@ char * parse_prompt(CHAR_DATA *ch)
   if ((has_note(ch, NOTE_NOTE) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
   {
-    count = snprintf(prompt + len, psize - len, "[NOTE] ");
+    count = snprintf(out_buf + len, psize - len, "[NOTE] ");
     if (count >= 0)
       len += count;
   }
   if ((has_note(ch, NOTE_NEWS) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
   {
-    count = snprintf(prompt + len, psize - len, "[NEWS] ");
+    count = snprintf(out_buf + len, psize - len, "[NEWS] ");
     if (count >= 0)
       len += count;
   }
   if ((has_note(ch, NOTE_CHANGES) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
   {
-    count = snprintf(prompt + len, psize - len, "[CHANGES] ");
+    count = snprintf(out_buf + len, psize - len, "[CHANGES] ");
     if (count >= 0)
       len += count;
   }
   if ((has_note(ch, NOTE_IDEA) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
   {
-    count = snprintf(prompt + len, psize - len, "[IDEA] ");
+    count = snprintf(out_buf + len, psize - len, "[IDEA] ");
     if (count >= 0)
       len += count;
   }
@@ -4482,14 +4723,14 @@ char * parse_prompt(CHAR_DATA *ch)
 
   if (PLR_FLAGGED(ch, PLR_KILLER)&& len < psize)
   {
-    count = snprintf(prompt + len, psize - len, "[\x1B[1;31mKILLER\x1B[0;0m] ");
+    count = snprintf(out_buf + len, psize - len, "[\x1B[1;31mKILLER\x1B[0;0m] ");
     if (count >= 0)
       len += count;
   }
 
   if (GET_INVIS_LEV(ch)&& len < psize)
   {
-    count = snprintf(prompt + len, psize - len, "(i%d) ", GET_INVIS_LEV(ch));
+    count = snprintf(out_buf + len, psize - len, "(i%d) ", GET_INVIS_LEV(ch));
     if (count >= 0)
       len += count;
   }
@@ -4497,15 +4738,13 @@ char * parse_prompt(CHAR_DATA *ch)
 
   if (PRF_FLAGGED(ch, PRF_BUILDWALK) && len < psize)
   {
-    count = snprintf(prompt + len, psize - len, "BUILDWALKING ");
+    count = snprintf(out_buf + len, psize - len, "BUILDWALKING ");
     if (count >= 0)
       len += count;
   }
 
 
-  out_buf = temp;
-
-
+  outpos = len;
 
   if ((inbuf && *inbuf))
   {
@@ -4666,7 +4905,7 @@ char * parse_prompt(CHAR_DATA *ch)
                        level_exp((int)GET_CLASS(ch), GET_LEVEL(ch)    ,  current_class_is_tier_num(ch), REMORTS(ch))    )));
             break;
           case '!':
-            snprintf(insert_text, sizeof(insert_text), "%s", "\n\r");
+            snprintf(insert_text, sizeof(insert_text), "%s", "\r\n");
             break;
 
           }
@@ -4674,33 +4913,27 @@ char * parse_prompt(CHAR_DATA *ch)
           inpos += ((int)!def)*2;
 
           /* switch */
+          if (outpos < (sizeof(out_buf)))
+            out_buf[outpos] = '\0';
 
-          out_buf[outpos] = '\0';
-
-          if ((strlen(out_buf) + strlen(insert_text)) < MAX_PROMPT_LENGTH)
+          /* don't overfill buffer */
+          if (insert_text != NULL && (outpos < (sizeof(out_buf))))
           {
-            /* don't overfill buffer */
-            if (insert_text != NULL)
-            {
-              out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
-              strcat(out_buf, insert_text);
-              outpos = strlen(out_buf);
-            }
+            out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
+            strlcat(out_buf, insert_text, sizeof(out_buf));
+            outpos = strlen(out_buf);
           }
-          else
-            break;
+
 
         } /* if char is '/' (PROMPT_CHAR) */
         else
         {
-          if (outpos < MAX_PROMPT_LENGTH)
-          {
+          if (outpos < (sizeof(out_buf)))
             out_buf[outpos] = inbuf[inpos];
-            inpos++;
-            outpos++;
-          }
-          else
-            break;
+
+          inpos++;
+          outpos++;
+
         }
 
         //} /* if remaining > 2 */
@@ -4717,24 +4950,11 @@ char * parse_prompt(CHAR_DATA *ch)
     } /* none */
   } /* if inbuf */
 
-
+  outpos = sizeof(out_buf);
   out_buf[outpos] = '\0';
-  snprintf(prompt + len, psize - len, "%s", out_buf);
-#if 0
-  if (!PRF_FLAGGED(ch, PRF_BATTLESPAM))
-  {
-    if (GET_LAST_PROMPT(ch) && !strcmp(GET_LAST_PROMPT(ch), prompt))
-    {
-      strcpy(prompt, "");
-      return prompt;
-    }
-  }
-#endif
-  free_string(&GET_LAST_PROMPT(ch));
-  GET_LAST_PROMPT(ch) = strdup(prompt);
-
-
-  return prompt;
+  strlcat(str, out_buf, lenn);
+  strlcat(str, end_prompt(ch->desc), lenn);
+  return str;
 }
 
 /* This function takes a block of text that may already have formatting in it,
@@ -4748,35 +4968,40 @@ char * parse_prompt(CHAR_DATA *ch)
    By Jamie Nelson
    Mordecai@xtra.co.nz
 */
-
-char *wordwrap(char *cmd, size_t width, size_t maxlen)
+/** TODO: This needs to be changed to never put newlines inside MXP tags! **/
+char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen)
 {
-  char *buf;
   size_t srcOS = 0;
   size_t dstOS = 0;
   size_t cntOS = 0;
   size_t skip = FALSE;
-  size_t len;
-
-  /* no need to wrap the text if it is shorter then the width, just return */
-  if ((len = strlen(cmd))<=width)
+  if (!cmd || !*cmd)
+  {
+    *buf = '\0';
     return cmd;
+  }
+  /* no need to wrap the text if it is shorter then the width, just return */
+  if (maxlen<=width)
+  {
+    strcpy(buf, cmd);
+    return cmd;
+  }
 
   /* if for some reason width is 0 AND cmd has 0 characters in it. just return */
-  if (len <= 0)
+  if (maxlen <= 0)
+  {
+    strcpy(buf, cmd);
     return cmd;
+  }
 
-  /* at max you will be adding 3 more characters per line
-     so this is just to make sure you have the room for this function.
-  */
-  buf = (char *) alloca( ((len / width) * 3) + len);
+
 
   /*
    This switch block stops color from being split onto different lines.
    as well as if a line has a \r\n before the width of the line,
    just stop there and start on the next line.
   */
-  while (cmd[srcOS])
+  while (cmd[srcOS] && srcOS < maxlen)
   {
 
     buf[cntOS] = cmd[srcOS];
@@ -4862,10 +5087,250 @@ char *wordwrap(char *cmd, size_t width, size_t maxlen)
     buf[cntOS] = '\0';
 
   }
-
   /* safely(?) puts the new formatted text back into the
      original buffer given */
-  strncpy(cmd, buf, maxlen - 1);
-  cmd[maxlen - 1] = '\0';
   return cmd;
 }
+/*
+* Count number of mxp tags need converting
+*    ie. < becomes &lt;
+*        > becomes &gt;
+*        & becomes &amp;
+*/
+
+int count_mxp_tags (const int bMXP, const char *txt, int length)
+{
+  char c;
+  const char * p;
+  int count = 0;
+  int bInTag = FALSE;
+  int bInEntity = FALSE;
+
+  for (p = txt, count = 0;
+       length > 0;
+       p++, length--)
+  {
+    c = *p;
+
+    if (bInTag)  /* in a tag, eg. <send> */
+    {
+      if (!bMXP)
+        count--;     /* not output if not MXP */
+      if (c == MXP_ENDc)
+        bInTag = FALSE;
+    } /* end of being inside a tag */
+    else if (bInEntity)  /* in a tag, eg. <send> */
+    {
+      if (!bMXP)
+        count--;     /* not output if not MXP */
+      if (c == ';')
+        bInEntity = FALSE;
+    } /* end of being inside a tag */
+    else switch (c)
+      {
+
+      case MXP_BEGc:
+        bInTag = TRUE;
+        if (!bMXP)
+          count--;     /* not output if not MXP */
+        break;
+
+      case MXP_ENDc:   /* shouldn't get this case */
+        if (!bMXP)
+          count--;     /* not output if not MXP */
+        break;
+
+      case MXP_AMPc:
+        bInEntity = TRUE;
+        if (!bMXP)
+          count--;     /* not output if not MXP */
+        break;
+
+      default:
+        if (bMXP)
+        {
+          switch (c)
+          {
+          case '<':       /* < becomes &lt; */
+          case '>':       /* > becomes &gt; */
+            count += 3;
+            break;
+
+          case '&':
+            count += 4;    /* & becomes &amp; */
+            break;
+
+          case '"':        /* " becomes &quot; */
+            count += 5;
+            break;
+
+          } /* end of inner switch */
+        }   /* end of MXP enabled */
+      } /* end of switch on character */
+
+  }   /* end of counting special characters */
+
+  return count;
+} /* end of count_mxp_tags */
+
+void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn)
+{
+  char c;
+  const char * ps;
+  char * pd;
+  int bInTag = FALSE;
+  int bInEntity = FALSE;
+  int srclen = lenn;
+
+  if (srclen == 0)
+    return;
+
+
+  for (ps = src, pd = dest; srclen > 0; ps++, srclen--)
+  {
+    c = *ps;
+    if (bInTag)  /* in a tag, eg. <send> */
+    {
+      if (c == MXP_ENDc)
+      {
+        bInTag = FALSE;
+        if (bMXP)
+          *pd++ = '>';
+      }
+      else if (bMXP)
+        *pd++ = c;  /* copy tag only in MXP mode */
+      else
+        *pd = '\0';
+    } /* end of being inside a tag */
+    else if (bInEntity)  /* in a tag, eg. <send> */
+    {
+      if (bMXP)
+        *pd++ = c;  /* copy tag only in MXP mode */
+      if (c == ';')
+        bInEntity = FALSE;
+    } /* end of being inside a tag */
+    else {
+    switch (c)
+      {
+      case MXP_BEGc:
+        bInTag = TRUE;
+        if (bMXP)
+          *pd++ = '<';
+        break;
+
+      case MXP_ENDc:    /* shouldn't get this case */
+        if (bMXP)
+          *pd++ = '>';
+        break;
+
+      case MXP_AMPc:
+        bInEntity = TRUE;
+        if (bMXP)
+          *pd++ = '&';
+        break;
+
+      default:
+        if (bMXP)
+        {
+          switch (c)
+          {
+          case '<':
+            memcpy (pd, "&lt;", 4);
+            pd += 4;
+            break;
+
+          case '>':
+            memcpy (pd, "&gt;", 4);
+            pd += 4;
+            break;
+
+          case '&':
+            memcpy (pd, "&amp;", 5);
+            pd += 5;
+            break;
+
+          case '"':
+            memcpy (pd, "&quot;", 6);
+            pd += 6;
+            break;
+
+          default:
+            *pd++ = c;
+            break;  /* end of default */
+
+          } /* end of inner switch */
+	  
+        }
+        else
+          *pd++ = c;  /* not MXP - just copy character */
+        break;
+
+      } /* end of switch on character */
+      } /*end of else */
+
+  }   /* end of converting special characters */
+  *pd = 0;
+} /* end of convert_mxp_tags */
+
+
+
+/* set up MXP */
+void turn_on_mxp (DESCRIPTOR_DATA *d)
+{
+  d->mxp = TRUE;  /* turn it on now */
+  write_to_output( d, "%s", start_mxp_str);
+  write_to_output( d, "%s", MXPMODE (6) );   /* permanent secure mode */
+  /* Exit tag */
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"  FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" FLAG=RoomExit"));
+  /* Room description tag */
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc \'<p>\' FLAG=RoomDesc"));
+  /* Get an item tag (for things on the ground) */
+  write_to_output( d, "%s", 
+              MXPTAG("!ELEMENT GroundItem \"<send href=\'"
+                    "get &name;|"
+                    "examine &name;|"
+                    "drink &name;" 
+                    "\' "
+                    "hint=\'RH mouse click to use this object|"
+                    "Get &desc;|"
+                    "Examine &desc;|"
+                    "Drink from &desc;"
+                    "\'>\" ATT=\'name desc\'"));
+  /* Drop an item tag (for things in the inventory) */
+  write_to_output( d, "%s",  MXPTAG
+                   ("!ELEMENT InvenItem \"<send href=\'"
+                    "drop &name;|"
+                    "examine &name;|"
+                    "wear &name;|"
+                    "eat &name;|"
+                    "drink &name;"
+                    "\' "
+                    "hint=\'RH mouse click to use this object|"
+                    "Drop &desc;|"
+                    "Examine &desc;|"
+                    "Wear &desc;|"
+                    "Eat &desc;|"
+                    "Drink &desc;"
+                    "'>\" ATT=\'name desc\'"));
+  /* Bid an item tag (for things in the auction) */
+  write_to_output( d, "%s", MXPTAG
+                   ("!ELEMENT Bid \"<send href=\'bid &name;\' "
+                    "hint=\'Bid for &desc;\'>\" "
+                    "ATT=\'name desc\'"));
+  /* List an item tag (for things in a shop) */
+ 
+  write_to_output( d, "%s", MXPTAG
+                   ("!ELEMENT List \"<send href=\'"
+                    "buy &name;| "
+                    "id &name;"
+                    "\' "
+                    "hint=\'Buy &desc;|Id &desc;\'>\" "
+                    "ATT=\'name desc\'"));
+  /* Player tag (for who lists, tells etc.) */
+  write_to_output( d, "%s", MXPTAG
+                   ("!ELEMENT Player \"<send href=\'tell &name; |ignore &name;\' "
+		   "hint=\'Tell &name; something or ignore them|Tell &name; |Ignore &name;\' "
+                    "\'Send a message to &name;\' prompt>\" "
+                    "ATT=\"name\""));
+} /* end of turn_on_mxp */

@@ -934,11 +934,18 @@ void list_char_to_char(struct char_data *list, struct char_data *ch)
 void do_auto_exits(struct char_data *ch)
 {
   int door, slen = 0;
+  char tag_open[10], tag_close[10];
   struct room_data * view_room;
-  if (VEHICLE_ROOM == NULL)
+  if (VEHICLE_ROOM == NULL) {
     view_room = IN_ROOM(ch);
-  else
+    strcpy(tag_open, "Ex");
+     strcpy(tag_close, "Ex");
+  } else {
     view_room = VEHICLE_ROOM;
+    strcpy(tag_open, "VEx");
+     strcpy(tag_close, "/VEx");
+    }
+    
 
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
@@ -953,13 +960,16 @@ void do_auto_exits(struct char_data *ch)
       {
         if (GET_LEVEL(ch) > LVL_IMMORT)
         {
-          new_send_to_char(ch, "{cg%s%c%s {cW", (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN) ? "{cu" : ""), UPPER(*dirs[door]), (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN) ? "{c0" : ""));
+	if (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN))
+	new_send_to_char(ch, "{cg{cu%c{c0 {cW", UPPER(*dirs[door]));
+	else
+ new_send_to_char(ch, "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
           slen++;
         }
       }
       else
       {
-        new_send_to_char(ch, "%c ", LOWER(*dirs[door]));
+        new_send_to_char(ch, "%s%s %s%s%c%s%s%s ", MXP_BEG, tag_open, dirs[door], MXP_END, LOWER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
         slen++;
       }
 
@@ -994,7 +1004,7 @@ ACMD(do_search)
         if (GET_DEX(ch) >= 17)
           chance += 1;
 
-        if (number(1, 6) <= chance)
+        if (number(1, 6) <= chance || GET_LEVEL(ch) > LVL_IMMORT)
         {
           new_send_to_char(ch, "\r\n{cWYou have found a secret door %s{cx.\r\n", dirs[door]);
           REMOVE_BIT(EXIT(ch, door)->exit_info, EX_HIDDEN);
@@ -1033,13 +1043,13 @@ ACMD(do_exits)
     if (GET_LEVEL(ch) >= LVL_IMMORT)
     {
 
-      new_send_to_char(ch, "%-5s - [%5d] %s", CAP(dirname),
+      new_send_to_char(ch, "%s%-5s%s - [%5d] %s",MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), 
                        GET_ROOM_VNUM(EXIT(ch, door)->to_room),
                        EXIT(ch, door)->to_room->name);
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, " (closed)");
+        new_send_to_char(ch, " (Closed)");
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
-        new_send_to_char(ch, " (hidden)");
+        new_send_to_char(ch, " (Hidden)");
       new_send_to_char(ch, "\r\n");
     }
     else
@@ -1047,9 +1057,9 @@ ACMD(do_exits)
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
         continue;
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, "%-5s - (Closed)", CAP(dirname));
+        new_send_to_char(ch, "%s%-5s%s - (Closed)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"));
       else
-        new_send_to_char(ch, "%-5s - %s", CAP(dirname),
+        new_send_to_char(ch, "%s%-5s%s - %s", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                          IS_DARK(EXIT(ch, door)->to_room)
                          && !CAN_SEE_IN_DARK(ch) ? "Too dark to tell."
                          : EXIT(ch, door)->to_room->name);
@@ -1557,7 +1567,7 @@ char *find_exdesc(char *word, struct extra_descr_data *list)
   struct extra_descr_data *i;
 
   for (i = list; i; i = i->next)
-    if (isname_full(word, i->keyword))
+    if (isname(word, i->keyword))
       return (i->description);
 
   return (NULL);
@@ -1581,6 +1591,8 @@ void look_at_target(struct char_data *ch, char *arg)
 
   if (!ch->desc)
     return;
+    
+    skip_spaces(&arg);
 
   if (!*arg)
   {
@@ -1702,6 +1714,7 @@ ACMD(do_look)
   else
   {
     char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], sdir[MAX_INPUT_LENGTH];
+    char *trail;
     
     int look_at = 0;
     int look_in = 0;
@@ -1709,6 +1722,7 @@ ACMD(do_look)
     strlcpy(arg2,argument,sizeof(arg2));
     //half_chop(argument, arg, arg2);
     argument = any_one_arg(argument, arg);
+    skip_spaces(&argument);
     
     if (!str_cmp(arg, "at"))
     look_at = 1;
@@ -1716,7 +1730,8 @@ ACMD(do_look)
     look_in = 1;
     else
     argument = arg2;
-    any_one_arg(argument, sdir);
+    trail = any_one_arg(argument, sdir);
+    skip_spaces(&trail);
     
     examine_on = TRUE;
     if (!*arg)		/* "look" alone, without an argument at all */
@@ -1728,16 +1743,17 @@ ACMD(do_look)
       look_in_direction(ch, look_type);
     else if (look_at)
       look_at_target(ch, argument);
-    else if (is_abbrev(argument, "above"))
-      look_above_target(ch, arg2);
-    else if (is_abbrev(argument, "behind"))
-      look_behind_target(ch, arg2);
-    else if (is_abbrev(argument, "under"))
-      look_under_target(ch, arg2);
-    else if (is_abbrev(argument, "around"))
+    else if (is_abbrev(sdir, "above")) {
+      look_above_target(ch, trail);
+     } else if (is_abbrev(sdir, "behind")) {
+      look_behind_target(ch, trail);
+    } else if (is_abbrev(sdir, "under")) {
+      look_under_target(ch, trail);
+    } else if (is_abbrev(sdir, "around")) {
       look_around(ch);
-    else
+    } else {
       look_at_target(ch, argument);
+      }
     examine_on = FALSE;
   }
 }
@@ -2325,8 +2341,7 @@ ACMD(do_score)
                    ((!GET_CLAN(ch)) ? "<none>" : clan[find_clan_by_id(GET_CLAN(ch))].name),
                    GET_CLAN_RANK(ch),
                    (color_space ? "   " : ""), quatry_class(ch, blank));
-  if (!IS_HERO(ch))
-  {
+
     new_send_to_char(ch,
                      "{cg| |-------------------------------------------------------------------| |{cw\r\n");
 
@@ -2363,7 +2378,7 @@ ACMD(do_score)
                      "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-2d{cg   | |\r\n",
                      GET_STR(ch), GET_ADD(ch), GET_INT(ch), GET_WIS(ch),
                      GET_CON(ch),GET_DEX(ch), GET_CHA(ch));
-  }
+ 
   new_send_to_char(ch,
                    "{cg| |-------------------------------------------------------------------| |\r\n"
                    "{cg| |     Hunger: [{cy%3d%%{cg]      Thirst:[{cy%3d%%{cg]      Intoxication:[{cy%3d%%{cg]    | |\r\n",

@@ -106,7 +106,7 @@ ACMD(do_bet)
     }
     if (newbet > char_gold(ch, 0, GOLD_ALL))
     {
-      send_to_char("You don't have that much money!\n\r", ch);
+      send_to_char("You don't have that much money!\r\n", ch);
       return;
     }
     if (newbet > MAX_BET * 10)

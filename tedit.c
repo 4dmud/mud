@@ -70,7 +70,7 @@ ACMD(do_tedit)
   char *backstr = NULL;
    
   struct {
-    char *cmd;
+    const char *cmd;
     char level;
     const char **buffer;
     int  size;

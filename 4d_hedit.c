@@ -27,6 +27,7 @@
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
 extern struct descriptor_data *descriptor_list;
+int hsort(const void *a, const void *b);
 
 /*------------------------------------------------------------------------*\
   Utils and exported functions.

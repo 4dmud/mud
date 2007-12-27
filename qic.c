@@ -369,7 +369,6 @@ ACMD(do_qicinfo)
     int i;
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
-    extern void strip_color(char *inbuf);
 DYN_DEFINE;
     *buf = '\0';
 
@@ -382,7 +381,7 @@ DYN_DEFINE;
     for (i = 0; i <= top_of_objt; i++) {
 	if (obj_index[i].qic != NULL) {
 	   strcpy(buf2, obj_proto[i].short_description);
-	   strip_color(buf2);
+	   strip_color(buf2, sizeof(buf2));
 	    sprintf(buf,
 		    "%s[%s%5d%s]%s %-50s %-2sIn:%s %2d%s, Lim: %s%2d%s\r\n",
 		    CBBLU(ch, C_NRM), CBWHT(ch, C_NRM), obj_index[i].vnum,

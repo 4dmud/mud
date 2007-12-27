@@ -23,7 +23,7 @@
 EVENTFUNC(message_event);
 ASKILL(skill_manifest);
 ACMD(do_flee);
-int can_fight(struct char_data *ch, struct char_data *vict);
+int can_fight(struct char_data *ch, struct char_data *vict, int silent);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
 /* extern variables */
@@ -41,6 +41,7 @@ void improve_skill(struct char_data *ch, int skill);
 void make_focus(struct char_data *ch, int type, struct obj_data *o);
 int set_task(struct char_data *ch, int task);
 
+    void weather_change(int zon);
 /*local*/
 
 
@@ -61,13 +62,14 @@ ACTION(thing_lumberjack)
   //const char *to_vict = NULL;
   const char *to_char = NULL;
   const char *to_room = NULL;
-  
+
   struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
-  
-  if (!object || GET_OBJ_TYPE(object) != ITEM_AXE) {
-  new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
-  *num = 0;
-  time = 0;
+
+  if (!object || GET_OBJ_TYPE(object) != ITEM_AXE)
+  {
+    new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+    *num = 0;
+    time = 0;
   }
 
   if (!*num)
@@ -266,6 +268,196 @@ ACTION(thing_tunneling)
 
 }
 
+ACTION(thing_control_weather_worse)
+{
+  long time = 0;
+  //const char *to_vict = NULL;
+  const char *to_char = NULL;
+  const char *to_room = NULL;
+  int i;
+
+  if (!*num)
+  {
+    if (ch)
+      new_send_to_char(ch, "Broken for some reason!??\r\n");
+    return 0;
+  }
+  i = GET_ROOM_ZONE(IN_ROOM(ch));
+  if (!(number(0, 105) < GET_SKILL(ch, SPELL_CONTROL_WEATHER)))
+  {
+    to_char = "Your concentration falters. The magic stops.";
+    to_room = "$n's concentration falters. The magic stops.";
+    *num = 0;
+  }
+  else
+  {
+    switch (*num)
+    {
+    case 8:
+      if (obj)
+      {
+        to_char = "You hold $p out infront of you.";
+        to_room = "$n hold $s hands out infront of $mself.";
+      }
+      else
+      {
+        to_char = "You hold your hands out infront of you.";
+        to_room = "$n holds $s hands out infront of $mself.";
+      }
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (4 RL_SEC);
+      break;
+    case 7:
+      to_char = "A slow pressure works its way along your spine as a gust of wind blows past, chilling exposed skin.";
+      to_room = "A slow pressure works its way along $ns spine as a gust of wind blows past, chilling exposed skin..";
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 6:
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 5:
+      to_char = "The pressure drops further, sounds become muffled.";
+      to_room = "The pressure drops further, sounds become muffled.";
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (4 RL_SEC);
+      break;
+    case 4:
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (2 RL_SEC);
+      break;
+    case 3:
+      to_char = "A boom of thunder shakes the ground.";
+      to_room = "A boom of thunder shakes the ground.";
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (4 RL_SEC);
+      break;
+    case 2:
+      to_char = "The sky opens up and a torrent of rain pours down.";
+      to_room = "The sky opens up and a torrent of rain pours down.";
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 1:
+      to_char = "You lower your arms.";
+      to_room = "$n lowers $s arms.";
+      *num = 0;
+      zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      break;
+    }
+  }
+  if (to_room!=NULL)
+    act(to_room, FALSE, ch, obj, vict, TO_ROOM);
+
+
+  if (to_char!=NULL)
+    act(to_char, FALSE, ch, obj, vict, TO_CHAR);
+  return time;
+
+}
+ACTION(thing_control_weather_better)
+{
+  long time = 0;
+  //const char *to_vict = NULL;
+  const char *to_char = NULL;
+  const char *to_room = NULL;
+  int i;
+
+  if (!*num)
+  {
+    if (ch)
+      new_send_to_char(ch, "Broken for some reason!??\r\n");
+    return 0;
+  }
+  i = GET_ROOM_ZONE(IN_ROOM(ch));
+  if (!(number(0, 105) < GET_SKILL(ch, SPELL_CONTROL_WEATHER)))
+  {
+    to_char = "Your concentration falters. The magic stops.";
+    to_room = "$n's concentration falters. The magic stops.";
+    *num = 0;
+  }
+  else
+  {
+    switch (*num)
+    {
+    case 8:
+      if (obj)
+      {
+        to_char = "You hold $p out infront of you.";
+        to_room = "$n hold $s hands out infront of $mself.";
+      }
+      else
+      {
+        to_char = "You hold your hands out infront of you.";
+        to_room = "$n holds $s hands out infront of $mself.";
+      }
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 7:
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (2 RL_SEC);
+      break;
+    case 6:
+      to_char = "You concentrate and the air around your body starts to expand.";
+      to_room = "$n concentrates and the air around $s body starts to expand.";
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (2 RL_SEC);
+      break;
+    case 5:
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (2 RL_SEC);
+      break;
+    case 4:
+      to_char = "A warm breeze circles around your body.";
+      to_room = "A warm breeze circles around $n's body.";
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 3:
+      to_char = "The air becomes drier, clothing becomes crisper.";
+      to_room = "The air becomes drier, clothing becomes crisper.";
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (3 RL_SEC);
+      break;
+    case 2:
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      time = (4 RL_SEC);
+      break;
+    case 1:
+      to_char = "You lower your arms.";
+      to_room = "$n lowers $s arms.";
+      *num = 0;
+      zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
+      weather_change(i);
+      break;
+    }
+  }
+  if (to_room!=NULL)
+    act(to_room, FALSE, ch, obj, vict, TO_ROOM);
+
+
+  if (to_char!=NULL)
+    act(to_char, FALSE, ch, obj, vict, TO_CHAR);
+  return time;
+
+}
 
 ACTION(thing_manifest)
 {
@@ -824,7 +1016,7 @@ ASKILL(skill_strangle)
     return TYPE_UNDEFINED;
   }
 
-  if (!can_fight(ch, vict))
+  if (!can_fight(ch, vict, TRUE))
   {
     new_send_to_char(ch, "You can't strangle %s!\r\n", GET_NAME(vict));
     return TYPE_UNDEFINED;
@@ -1033,11 +1225,6 @@ ASUB(sub_tumble)
     return SUB_UNDEFINED;
   }
 
-  if (IS_HERO(ch))
-  {
-    new_send_to_char(ch, "Sorry, heros can't juggle.\r\n");
-    return SUB_UNDEFINED;
-  }
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
     new_send_to_char(ch, "You stop juggling.\r\n");
@@ -1099,11 +1286,7 @@ ASUB(sub_clown)
     return SUB_UNDEFINED;
   }
 
-  if (IS_HERO(ch))
-  {
-    new_send_to_char(ch, "Sorry, heros can't juggle.\r\n");
-    return SUB_UNDEFINED;
-  }
+  
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
     new_send_to_char(ch, "You stop juggling.\r\n");

@@ -30,7 +30,7 @@ int class_damroll(struct char_data *ch);
 void start_fighting_delay(struct char_data *ch, struct char_data *vict);
 void halt_fighting(struct char_data *ch);
 void dismount_char(struct char_data *ch);
-int can_fight(CHAR_DATA *ch, CHAR_DATA *vict);
+int can_fight(CHAR_DATA *ch, CHAR_DATA *vict, int silent);
 void perform_give(CHAR_DATA *ch, CHAR_DATA *vict,
                   OBJ_DATA *obj);
 int arena_ok(CHAR_DATA *ch, CHAR_DATA *victim);
@@ -449,7 +449,7 @@ ACMD(do_skills)
     {
       if (vict && IS_SET(SINFO.flags, SK_VIOLENT) )
       {
-        if (!can_fight(ch, vict))
+        if (!can_fight(ch, vict, TRUE))
         {
           new_send_to_char(ch, "You can't do that to them!\r\n");
           return;
@@ -734,7 +734,7 @@ int perform_charge(CHAR_DATA *ch, CHAR_DATA *vict)
     return 0;
   if (GET_POS(vict) < POS_FIGHTING)
     return 0;
-  if (!can_fight(ch, vict))
+  if (!can_fight(ch, vict, FALSE))
     return 0;
 
   prob = total_chance(ch, SKILL_CHARGE);
@@ -984,7 +984,13 @@ ASKILL(skill_steal)
     send_to_char("Come on now, that's rather stupid!\r\n", ch);
     return 0;
   }
-
+  
+  if (!IS_NPC(ch) && !IS_NPC(vict)) {
+  if (!(IS_PK(vict) && IS_PK(ch))) {
+  new_send_to_char(ch, "You can't steal from them!\r\n");
+  return 0;
+  }
+  }
 
 
   /* 101% is a complete failure */
@@ -1326,7 +1332,7 @@ ASKILL(skill_trample)
   if (!(RIDING(ch) || GET_RACE(ch) == RACE_CENTAUR))
   {
     send_to_char
-    ("You aren't a centaur and you arent riding anything.\n\r",
+    ("You aren't a centaur and you arent riding anything.\r\n",
      ch);
     return 0;
   }
@@ -1386,7 +1392,7 @@ ASKILL(skill_joust)
 
   if (!(RIDING(ch) || GET_RACE(ch) == RACE_CENTAUR))
   {
-    new_send_to_char(ch, "You aren't a centaur and you arent riding anything.\n\r");
+    new_send_to_char(ch, "You aren't a centaur and you arent riding anything.\r\n");
     return 0;
   }
   if (use_stamina( ch, 10) < 0)
@@ -2095,7 +2101,7 @@ ASKILL(skill_slip)
     fail = TRUE;
   }
   slipping = FALSE;
-  return ((fail || number(0, 60))? TYPE_UNDEFINED :SKILL_SLIP );
+  return ((fail || number(0, 60))? (int)TYPE_UNDEFINED : (int)SKILL_SLIP );
 }
 
 ASKILL(skill_hyperactivity)
@@ -2492,18 +2498,18 @@ ASKILL(skill_poison_weapon)
 
   if (arg[0] == '\0')
   {
-    send_to_char("What are you trying to poison?\n\r", ch);
+    send_to_char("What are you trying to poison?\r\n", ch);
     return 0;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
   {
-    send_to_char("You do not have that weapon.\n\r", ch);
+    send_to_char("You do not have that weapon.\r\n", ch);
     return 0;
   }
   if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
   {
-    send_to_char("That item is not a weapon.\n\r", ch);
+    send_to_char("That item is not a weapon.\r\n", ch);
     return 0;
   }
   if (IS_OBJ_STAT(obj, ITEM_POISONED_1) ||
@@ -2511,7 +2517,7 @@ ASKILL(skill_poison_weapon)
       IS_OBJ_STAT(obj, ITEM_POISONED_3) ||
       IS_OBJ_STAT(obj, ITEM_POISONED_4))
   {
-    send_to_char("That weapon is already poisoned.\n\r", ch);
+    send_to_char("That weapon is already poisoned.\r\n", ch);
     return 0;
   }
   if (!skill_cost(0, 10, 150, ch))
@@ -2530,7 +2536,7 @@ ASKILL(skill_poison_weapon)
   }
   if (!pobj)
   {
-    send_to_char("You do not have the poison.\n\r", ch);
+    send_to_char("You do not have the poison.\r\n", ch);
     return 0;
   }
 
@@ -2543,14 +2549,14 @@ ASKILL(skill_poison_weapon)
   }
   if (!wobj)
   {
-    send_to_char("You have no water to mix with the powder.\n\r", ch);
+    send_to_char("You have no water to mix with the powder.\r\n", ch);
     return 0;
   }
 
   /* Great, we have the ingredients...but is the thief smart enough? */
   if (!IS_NPC(ch) && GET_WIS(ch) < 16)
   {
-    send_to_char("You can't quite remember what to do...\n\r", ch);
+    send_to_char("You can't quite remember what to do...\r\n", ch);
     return 0;
   }
   /* And does the thief have steady enough hands? */
@@ -2558,7 +2564,7 @@ ASKILL(skill_poison_weapon)
       && (GET_DEX(ch) < 17 || GET_COND(ch, DRUNK) > 0))
   {
     send_to_char
-    ("Your hands aren't steady enough to properly mix the poison.\n\r",
+    ("Your hands aren't steady enough to properly mix the poison.\r\n",
      ch);
     return 0;
   }
@@ -2569,7 +2575,7 @@ ASKILL(skill_poison_weapon)
   if (!IS_NPC(ch)
       && number(1, 101) > GET_SKILL(ch, SKILL_POISON_WEAPON))
   {
-    send_to_char("You failed and spill some on yourself.  Ouch!\n\r",
+    send_to_char("You failed and spill some on yourself.  Ouch!\r\n",
                  ch);
     damage(ch, ch, GET_LEVEL(ch), -1);
     act("$n spills the poison all over!", FALSE, ch, NULL, NULL,

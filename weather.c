@@ -23,7 +23,7 @@ extern struct time_info_data time_info;
 
 void weather_and_time(int mode);
 void another_hour(int mode);
-void weather_change(void);
+void weather_change(int zon);
 int find_month(void);
 int get_temperature(room_rnum room);
 /*
@@ -95,7 +95,7 @@ void weather_and_time(int mode)
 {
     another_hour(mode);
     if (mode)
-	weather_change();
+	weather_change(-1);
 }
 
 int find_month(void) {
@@ -145,14 +145,17 @@ void another_hour(int mode)
 }
 
 
-void weather_change(void)
+void weather_change(int zon)
 {
     int diff, change, i;
     struct descriptor_data *j;
     char buf[MAX_STRING_LENGTH];
 
+    
     for (i = 0; i <= top_of_zone_table; i++) {
-
+if (zon != -1)
+if (i != zon)
+continue;
 	if ((time_info.month >= 9) && (time_info.month <= 16))
 	    diff = (zone_table[i].pressure > 985 ? -2 : 2);
 	else
@@ -253,10 +256,13 @@ void weather_change(void)
 		if (!j->connected && j->character && AWAKE(j->character) &&
 		    OUTSIDE(j->character) &&
 		    (zone_table[j->character->in_room->zone].number == i))
-		    SEND_TO_Q(buf, j);
+		    write_to_output(j, "%s", buf);
 	}
 
     }
+}
+void check_sky(void) {
+
 }
 
 char *print_weather(room_rnum room, char *buf, size_t len) {

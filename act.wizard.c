@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.22  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.21  2005/05/03 10:21:25  w4dimenscor
  * changed the free_string function to take a pointer to a pointer so it can nullk the string off properly now. Also, fixed a door loading error, that assumed that all door rooms existed when loading, and now it checks for existstance. Also, fixed the multi arg for 'get' command
  *
@@ -147,6 +150,7 @@ extern const char *pc_race_types[];
 
 /* extern functions */
 void weight_to_object(struct obj_data *obj, int weight);
+
 void write_aliases(struct char_data *ch);
 void do_show_corpses(CHAR_DATA *ch);
 void do_show_errors(CHAR_DATA *ch);
@@ -1178,7 +1182,9 @@ ACMD(do_vnum)
 {
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
-  half_chop(argument, buf, buf2);
+  argument = any_one_arg(argument, buf);
+  skip_spaces(&argument);
+  strlcpy(buf2, argument, sizeof(buf2));
 
   if (!*buf || !*buf2
       || (!is_abbrev(buf, "mob") && !is_abbrev(buf, "obj")))
@@ -1634,6 +1640,8 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     if (!IS_MOB(k))
       new_send_to_char(ch, "Title: %s\r\n",
                        (k->player.title ? k->player.title : "<None>"));
+		       
+		       
 
     if (IS_MOB(k))
     {
@@ -1668,7 +1676,17 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
 
     if (!IS_NPC(k))
     {
-      new_send_to_char(ch, "# of Remorts: %d", REMORTS(k));
+    #if defined(HAVE_ZLIB)
+    if (ch->desc && ch->desc->comp) {
+    if (ch->desc->comp->state >= 2)
+    new_send_to_char(ch, "Compression: Enabled\r\n");
+    else
+    new_send_to_char(ch, "Compression: Disabled\r\n");
+    }
+    #endif
+    if (ch->desc)
+    new_send_to_char(ch, "Telopt Prompts: %d\r\n", ch->desc->eor);
+      new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
         new_send_to_char(ch, "  Remort: %s", pc_class_types[(int)GET_REMORT(k)]);
@@ -2673,7 +2691,7 @@ ACMD(do_copyover)
 
   if (!fp)
   {
-    new_send_to_char(ch,"Copyover file not writeable, aborted.\n\r");
+    new_send_to_char(ch,"Copyover file not writeable, aborted.\r\n");
     return;
   }
 
@@ -2687,12 +2705,13 @@ ACMD(do_copyover)
 
     if (!d->character || !IS_PLAYING(d))
     {
-      write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\n\r", d->comp);
+      write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\r\n", d->comp);
       close_socket(d);	/* throw'em out */
     }
     else
     {
-      fprintf(fp, "%d %s %s %d\n", d->descriptor, GET_NAME(och), d->host, IN_ROOM(d->character)->number);
+    room_rnum rm = GET_WAS_IN(d->character) ? GET_WAS_IN(d->character) : IN_ROOM(d->character);
+      fprintf(fp, "%d %s %s %d %d\n", d->descriptor, GET_NAME(och), d->host, rm->number, d->mxp);
 
       /* save och */
       if (!IS_IMM(och))
@@ -2742,7 +2761,7 @@ ACMD(do_copyover)
   /* Failed - sucessful exec will not return */
   perror("do_copyover: execl");
 
-  new_send_to_char (ch, "Copyover FAILED!\n\r");
+  new_send_to_char (ch, "Copyover FAILED!\r\n");
   exit(1);			/* too much trouble to try to recover! */
 }
 
@@ -3086,7 +3105,6 @@ int allowed_pretitle(CHAR_DATA *ch)
 ACMD(do_pretitle)
 {
   char **msg;
-  void strip_color(char *inbuf);
 
   if (!allowed_pretitle(ch))
   {
@@ -3096,7 +3114,7 @@ ACMD(do_pretitle)
 
   msg = &(PRETITLE(ch));
 
-  strip_color(argument);
+  strip_color(argument, strlen(argument));
   skip_spaces(&argument);
 
   if (strlen(argument) > 14)
@@ -5236,11 +5254,11 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
 ACMD(do_saveall)
 {
   if (GET_LEVEL(ch) < LVL_BUILDER)
-    new_send_to_char (ch, "You are not holy enough to use this privelege.\n\r");
+    new_send_to_char (ch, "You are not holy enough to use this privelege.\r\n");
   else
   {
     save_all();
-    new_send_to_char(ch, "World files saved.\n\r");
+    new_send_to_char(ch, "World files saved.\r\n");
   }
 }
 
@@ -5576,7 +5594,7 @@ ACMD(do_hackinvis)
   }
 
   if (!found)
-    send_to_char("No objects were found in those parameters.\n\r", ch);
+    send_to_char("No objects were found in those parameters.\r\n", ch);
   else
     page_string(ch->desc, dynbuf, DYN_BUFFER);
 
@@ -5627,7 +5645,7 @@ ACMD(do_potionweight)
   }
 
   if (!found)
-    send_to_char("No objects were found in those parameters.\n\r", ch);
+    send_to_char("No objects were found in those parameters.\r\n", ch);
   else
     page_string(ch->desc, dynbuf, DYN_BUFFER);
 
@@ -6739,7 +6757,7 @@ buflen: the size of the buf
 int hilite(const char *regex, const char *str, char *buf, size_t buflen)
 {
   char *p, *s = (char *)str;
-  int tmp = 0;
+  size_t tmp = 0;
   size_t u = strlen(UND);
   bool found = FALSE;
   int cnt = strlen(regex);

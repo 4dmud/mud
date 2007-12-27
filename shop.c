@@ -38,8 +38,6 @@ ACMD(do_say);
 bool can_take_obj(struct char_data *ch, struct obj_data *obj);
 void sort_keeper_objs(struct char_data *keeper, int shop_nr);
 long long gold_data(int type, long long amount);
-void strip_color(char *inbuf);
-size_t proc_color(char *inbuf, int color_lvl, size_t len);
 int count_magic(struct obj_data *obj, CHAR_DATA *ch);
 int count_magic_items(CHAR_DATA *ch);
 int is_magic(OBJ_DATA *obj);
@@ -1031,7 +1029,7 @@ char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr, struct
     break;
   }
   CAP(itemname);
-  strip_color(itemname);
+  strip_color(itemname, sizeof(itemname));
   snprintf(result, sizeof(result), " {cy%2d{cg)  {cy%9s{cc   %-48s {cG%6lld{c0\r\n",
            aindex, quantity, itemname, buy_price(obj, shop_nr, keeper, ch));
   proc_color(result, IRANGE(0, COLOR_LEV(ch), 3), sizeof(result));

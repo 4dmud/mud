@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.9  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.8  2005/04/26 10:15:18  w4dimenscor
  * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
  *
@@ -68,6 +71,8 @@ EVENTFUNC(message_event);
 ASKILL(skill_manifest);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
+ASPELL(spell_control_weather);
+
 
 struct char_data *find_char(long n);
 struct obj_data *find_obj(long n);
@@ -98,6 +103,8 @@ ACTION(thing_singwood);
 ACTION(thing_juggle);
 ACTION(thing_throttle);
 ACTION(thing_tunneling);
+ACTION(thing_control_weather_better);
+ACTION(thing_control_weather_worse);
 
 char *get_spell_name(char *argument)
 {
@@ -724,11 +731,7 @@ ASKILL(skill_sing_wood)
     new_send_to_char(ch, "What do you wish to sing to?\r\n");
     return 0;
   }
-  if (IS_HERO(ch))
-  {
-    new_send_to_char(ch, "Sorry, heros can't sing wood.\r\n");
-    return 0;
-  }
+
   /*
       for (obj = ch->carrying; obj && (!found); obj = next_obj) {
   	next_obj = obj->next_content;
@@ -784,6 +787,7 @@ ASKILL(skill_sing_wood)
   msg->type = THING_SKILL;
   msg->msg_num = 11;
   msg->id = GET_ID(o);
+  *msg->args = '\0';
 
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC));
   return SKILL_SING_WOOD;
@@ -844,6 +848,7 @@ ASKILL(skill_manifest)
   msg->type = THING_SKILL;
   msg->msg_num = 8;
   msg->id = GET_ID(obj);
+  *msg->args = '\0';
 
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0);
   return SKILL_MANIFEST;
@@ -931,6 +936,7 @@ EVENTFUNC(message_event)
   struct obj_data *obj = NULL;
   struct room_data *room = NULL;
   long time = 0;
+  
 
   long uid = msg->id;
   struct char_data *ch = msg->ch;
@@ -974,6 +980,17 @@ EVENTFUNC(message_event)
     case SKILL_MANIFEST:
       time = THING(thing_manifest);
       break;
+    case SPELL_CONTROL_WEATHER:
+    if (*msg->args && is_abbrev(msg->args, "worse"))
+      time = THING(thing_control_weather_worse);
+     else if (*msg->args && is_abbrev(msg->args, "better"))
+     time = THING(thing_control_weather_better);
+     else
+      {
+      time = 0;
+      new_send_to_char(ch, "You need to specify, 'better' or 'worse'.\r\n");
+      }
+    
 
     case SKILL_PICK_LOCK:
       break;
@@ -1098,6 +1115,7 @@ ACMD(do_fell)
   msg->type = THING_SUB;
   msg->msg_num = 12;
   msg->id = GET_ID(o);
+  *msg->args = '\0';
 
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC));
 

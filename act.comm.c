@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.16  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.15  2005/04/26 10:15:18  w4dimenscor
  * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
  *
@@ -89,7 +92,6 @@
 extern int level_can_shout;
 extern int holler_move_cost;
 
-void strip_color(char *inbuf);
 /* extern functions */
 extern struct time_info_data time_info;
 
@@ -677,7 +679,10 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
     arg = makedrunk(arg, ch);
-    snprintf(buf, sizeof(buf), "$n tells you, '%s%s%s'",
+    snprintf(buf, sizeof(buf), MXPTAG ("Player $n") 
+            "$n" 
+            MXPTAG ("/Player")
+	    " tells you, '%s%s%s'",
              CBWHT(vict, C_CMP), arg, CCNRM(vict, C_CMP));
     act(buf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP);
   }
@@ -685,7 +690,12 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
     new_send_to_char(ch, "%s", CONFIG_OK);
   else
   {
-    snprintf(buf, sizeof(buf), "You tell $N, '%s%s%s'",
+    snprintf(buf, sizeof(buf), 
+    "You tell "
+    MXPTAG ("Player $N")
+    "$N"
+    MXPTAG ("/Player")
+    ", '%s%s%s'",
              CBWHT(ch, C_CMP), arg, CCNRM(ch, C_CMP));
     act(buf, FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
   }
@@ -1008,14 +1018,15 @@ ACMD(do_comm)
     new_send_to_char(ch, "\"<channel>\r\n");
     return;
   }
-  if (is_prefix(argument, "hero") && !(PLR_FLAGGED(ch, PLR_HERO) || GET_LEVEL(ch) > LVL_HERO))
+  if (is_abbrev(argument, "hero gossip") && !(PLR_FLAGGED(ch, PLR_HERO) || GET_LEVEL(ch) > LVL_HERO))
   {
     new_send_to_char(ch, "Sorry, but you aren't heroic enough!");
     return;
   }
-  for (com = comlist, i = 0; com && i < 15; com = com->next)
-    if (is_prefix(argument, com->type))
+  for (com = comlist, i = 0; com && i < 15; com = com->next) {
+    if (is_abbrev(argument, com->type))
       new_send_to_char(ch, "%2d: %s\r\n",i++, com->text);
+      }
 
   if (i == 0)
     new_send_to_char(ch, "None.\r\n");

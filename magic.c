@@ -32,7 +32,7 @@ extern int mini_mud;
 
 void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass);
 void start_fighting_delay(struct char_data *vict, struct char_data *ch);
-int can_fight(struct char_data *ch, struct char_data *vict); //fight.c
+int can_fight(struct char_data *ch, struct char_data *vict, int silent); //fight.c
 byte saving_throws(int class_num, int type, int level);	/* class.c */
 void clearMemory(struct char_data *ch);
 void weight_change_object(struct obj_data *obj, int weight);
@@ -768,7 +768,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_SLEEP:
-    if (!can_fight(ch, victim))
+    if (!can_fight(ch, victim, FALSE))
       return;
     if (MOB_FLAGGED(victim, MOB_NOSLEEP))
       return;
@@ -1693,7 +1693,7 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
       continue;
     if (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_GOD)
       continue;
-    if (!can_fight(ch, tch))
+    if (!can_fight(ch, tch, FALSE))
       continue;
     if (!IS_NPC(ch) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
       continue;

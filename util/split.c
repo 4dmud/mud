@@ -48,7 +48,7 @@ int main(void)
       fputs(line, outfile);
   }
 
-  fputs("$\n\r", index);
+  fputs("$\r\n", index);
   fclose(index);
   if (outfile)
     fclose(outfile);

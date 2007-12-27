@@ -152,7 +152,7 @@ ACMD(do_drive)
 	    return;
 	}
 
-	send_to_room(IN_ROOM(vehicle), "%s enters %s.\n\r", vehicle->short_description,
+	send_to_room(IN_ROOM(vehicle), "%s enters %s.\r\n", vehicle->short_description,
 		vehicle_in_out->short_description);
 
 	was_in = vehicle->in_room;
@@ -234,7 +234,7 @@ ACMD(do_drive)
 		    /* But nothing!  Let's go that way! */
 		    room_rnum was_in, is_in;
 
-		    send_to_room(IN_ROOM(vehicle), "%s leaves %s.\n\r",
+		    send_to_room(IN_ROOM(vehicle), "%s leaves %s.\r\n",
 			    vehicle->short_description, dirs[dir]);
 
 		    was_in = IN_ROOM(vehicle);

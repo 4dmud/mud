@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.16  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.15  2005/04/26 10:15:18  w4dimenscor
  * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
  *
@@ -178,7 +181,7 @@ int has_weapon(struct char_data *ch);
 int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type);
 int one_hit_damage(struct char_data *ch, int type);
 int speed_update(struct char_data *ch);
-int can_fight(struct char_data *ch, struct char_data *vict);
+int can_fight(struct char_data *ch, struct char_data *vict, int silent);
 void kill_list(struct char_data *ch, struct char_data *vict);
 int attack_group = 1;
 
@@ -281,6 +284,7 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
     {ONE_HANDED, 40, -90,  5, -20, 20, -50, 30, "Dagger"},
     {ONE_HANDED, 30, -70, 10, -30, 25, -60, 20, "Shortsword"},
     {TWO_HANDED, 60, -130, 40, -90, 60,  -130, 15, "Longsword"},
+    {TWO_HANDED, 100, -130, 60, -90, 60,  -130, 15, "Lightsaber"},
     {ONE_HANDED, 80, -60, 45, -100, 50, -110, 15, "Katana"},
     {ONE_HANDED, 30, -70, 10, -30, 20, -50, 10, "Rapier"},
     {ONE_HANDED, 30, -70, 20, -50, 15, -40, 20, "Cutlass"},
@@ -319,7 +323,7 @@ float has_staff(struct char_data *ch)
     case FOCUS_ORB:
       multi += ((float)GET_OBJ_VAL(staff, 0));
       if (multi > 3000 && GET_OBJ_TIMER(staff) > 1)
-      GET_OBJ_TIMER(staff) = 1;
+        GET_OBJ_TIMER(staff) = 1;
       multi = IRANGE(1.05, (multi/1000.0), 3.0);
       break;
     case FOCUS_ORBSTAFF:
@@ -478,8 +482,6 @@ int size_dice_wep(struct char_data *ch, short dual)
       add += (GET_ADD(ch) >  50);
     }
 
-    add += (GET_LEVEL(ch) * 0.05);
-
     add += (wep_hands(weapon) == 2 ? 2 : 0);
 
     /*affects*/
@@ -487,8 +489,10 @@ int size_dice_wep(struct char_data *ch, short dual)
       add += 1;
     if (AFF_FLAGGED(ch, AFF_TRUE_STRIKING))
       add += 1;
-    if (AFF_FLAGGED(ch,AFF_GRIP))
+    if (AFF_FLAGGED(ch, AFF_GRIP))
       add += 1;
+
+
   }
   if (!IS_NPC(ch) )
   {
@@ -532,7 +536,6 @@ int num_dice_wep(struct char_data *ch, short dual)
     }
     add += (GET_DEX(ch) >= 22);
     add += (GET_CON(ch) >= 22);
-    add += (GET_LEVEL(ch) * 0.05);
     /*affects*/
     if (AFF_FLAGGED(ch, AFF_TRUE_STRIKING))
       add +=1;
@@ -549,6 +552,8 @@ int num_dice_wep(struct char_data *ch, short dual)
       add -= 3;
     }
   }
+  if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_LIGHTSABRE))
+    add += GET_SUB(ch, SUB_LIGHTSABER_PROF) * 0.045;
 
   return add;
 }
@@ -625,7 +630,7 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 
 
-  if (!can_fight(ch, victim))
+  if (!can_fight(ch, victim, FALSE))
     return;
 
 
@@ -667,7 +672,40 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 
 }
+struct char_data *find_random_victim(struct char_data *ch)
+{
+  struct char_data *vict;
+  for (vict = IN_ROOM(ch)->people; vict ; vict = vict->next_in_room)
+  {
+    if (SELF(ch, vict))
+      continue;
+    if (AFF_FLAGGED(ch, AFF_CHARM))
+    {
+      if (!IS_NPC(ch->master) && !IS_NPC(vict))
+        continue;
+      if (ch->master == vict)
+        continue;
+    }
+    //continue;
+    if (vict->master == ch)
+      continue;
+    if (ch->master == vict)
+      if (!CAN_SEE(ch, vict))
+        continue;
+    if (!can_fight(ch, vict, TRUE))
+      continue;
+    if (!CONFIG_PK_ALLOWED && !arena_ok(ch, vict))
+    {
+      if (!IS_NPC(vict) && !IS_NPC(ch))
+        continue;
+    }
+    if (FIGHTING(ch) != vict)
+      return vict;
+    
+  }
 
+  return NULL;
+}
 
 void start_fighting_delay(struct char_data *ch, struct char_data *vict)
 {
@@ -695,7 +733,7 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
   }
 
 
-  if (!can_fight(ch, victim))
+  if (!can_fight(ch, victim, FALSE))
     return;
 
   if (GET_POS(ch) > POS_STUNNED)
@@ -721,7 +759,7 @@ int next_round(struct char_data* ch)
   victim = RIDDEN_BY(victim) ? HERE(RIDDEN_BY(victim), victim) ? RIDDEN_BY(victim) : victim : victim;
 
   /*to stop recursion*/
-  if (!victim || !can_fight(ch, victim) || (RIDDEN_BY(ch) && HERE(ch, RIDDEN_BY(ch))))
+  if (!victim || !can_fight(ch, victim, FALSE) || (RIDDEN_BY(ch) && HERE(ch, RIDDEN_BY(ch))))
   {
     stop_fighting(ch);
     return 0;
@@ -811,7 +849,7 @@ EVENTFUNC(fight_event)
     if (!DEAD(ch) && FIGHTING(ch))
       FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch)) ? HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)) ? RIDDEN_BY(FIGHTING(ch)) : FIGHTING(ch) : FIGHTING(ch);
 
-    if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch)) && GET_POS(ch) > POS_STUNNED)
+    if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch), FALSE) && GET_POS(ch) > POS_STUNNED)
     {
       int fe_t = 0;
       int a_t = 0;
@@ -1439,7 +1477,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   int perc = 0;
   int shortwep = 0;
 
-  if (!can_fight(ch, vict))
+  if (!can_fight(ch, vict, FALSE))
     return -1;
 
 
@@ -2215,7 +2253,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
   int dam_exp = 0;
 
 
-  if (!can_fight(ch, vict))
+  if (!can_fight(ch, vict, FALSE))
   {
     //stop_fighting(ch);
     return -1;
@@ -2245,6 +2283,34 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     else
       partial = dam;
 
+    if (GET_SUB(ch, SUB_SWEEP_ATTACK) > 0)
+    {
+      if ( get_sub_status(ch, SUB_SWEEP_ATTACK) == STATUS_ON)
+      {
+        if (GET_SWEEP_DAM(ch))
+        {
+          partial *= 0.6;
+          partial *= (GET_SUB(ch, SUB_SWEEP_ATTACK) * 0.01);
+          partial += GET_SWEEP_DAM(ch);
+        }
+        if (GET_HIT(vict) < partial)
+        {
+          struct char_data *victnext = find_random_victim(ch);
+          GET_SWEEP_DAM(ch) = GET_HIT(vict) - partial;
+          if (victnext)
+          {
+            act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
+            act("$n sweeps around into you!", TRUE, ch, NULL, victnext, TO_VICT);
+            start_fighting_delay(ch, victnext);
+          }
+          else
+            GET_SWEEP_DAM(ch) = 0;
+        }
+      }
+      GET_SWEEP_DAM(ch) = 0;
+    }
+    else
+      GET_SWEEP_DAM(ch) = 0;
     alter_hit(vict, partial);
 
     if (!SELF(ch, vict))
@@ -5320,7 +5386,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                        				   the grenade */
+                                                                                                                                                                            				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -5359,7 +5425,7 @@ void tick_grenade(void)
             if (ROOM_FLAGGED(t, ROOM_PEACEFUL))
             {
               send_to_room(t,
-                           "You hear %s explode harmlessly, with a loud POP!\n\r",
+                           "You hear %s explode harmlessly, with a loud POP!\r\n",
                            i->short_description);
 
               extract_obj(i);
@@ -5416,7 +5482,7 @@ void tick_grenade(void)
 
 }
 
-int can_fight(struct char_data *ch, struct char_data *vict)
+int can_fight(struct char_data *ch, struct char_data *vict, int silent)
 {
   int ret = 1;
 
@@ -5435,7 +5501,8 @@ int can_fight(struct char_data *ch, struct char_data *vict)
 
   if (ch->master && ch->master == vict)
   {
-    new_send_to_char(ch, "You can't fight your leader!\r\n");
+    if (!silent)
+      new_send_to_char(ch, "You can't fight your leader!\r\n");
     return 0;
   }
 
@@ -5460,7 +5527,8 @@ int can_fight(struct char_data *ch, struct char_data *vict)
       ret = 1;
     else if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
     {
-      new_send_to_char(ch, "You can't attack %s.\r\n", GET_NAME(vict));
+      if (!silent)
+        new_send_to_char(ch, "You can't attack %s.\r\n", GET_NAME(vict));
       ret = 0;
     }
   }

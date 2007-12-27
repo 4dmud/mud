@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.15  2005/05/28 05:52:14  w4dimenscor
+ * Fixed some errors in copyover, added MXP
+ *
  * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -1102,10 +1105,11 @@ extern int message_type;
 /* Variables for the output buffering system */
 #define MAX_SOCK_BUF            (13 * 1024)	/* Size of kernel's sock buf   */
 #define MAX_PROMPT_LENGTH       256	/* Max length of prompt        */
+#define MAX_MXP_STATUS          1024
 #define GARBAGE_SPACE		32	/* Space for **OVERFLOW** etc  */
 #define SMALL_BUFSIZE		1024	/* Static output buffer size   */
 /* Max amount of output that can be buffered */
-#define LARGE_BUFSIZE	   (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
+#define LARGE_BUFSIZE	   (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH - MAX_MXP_STATUS)
 
 #define HISTORY_SIZE		5	/* Keep last 5 commands. */
 #define MAX_STRING_LENGTH	16384
@@ -1881,7 +1885,7 @@ struct char_data
   struct char_data *fused_to;
 
   time_t last_move;
-
+  int sweep_damage;
   int body;                   /* body positions aquired */
   byte atk;
   struct travel_point_data *travel_list;
@@ -1916,6 +1920,7 @@ struct account_data
 struct compr
 {
   int state; /* 0 - off. 1 - waiting for response. 2 - compress2 on */
+  int compression; /* 0 - none, 1 mccp1, 2 mccp2 */
 
 #ifdef HAVE_ZLIB_H
   Bytef *buff_out;
@@ -1972,6 +1977,9 @@ struct descriptor_data
   void *c_data;		// Storage for the Callback function
   int  options;		 /* descriptor flags			*/
   struct compr *comp;                /* compression info */
+  int eor; /* End Of Record - for prompts - telnet proticol - mord*/
+  int mxp;
+  int telnet_capable; /* if any of the protocols are processed then set this flag */
 
   struct sockaddr_in saddr;
   char               host_ip[HOST_LENGTH + 1];
@@ -2232,6 +2240,7 @@ struct message_event_obj
   int type; //0 = skill-spell : 1 = subskill
   int msg_num; // iterative number for what part of the skill it is in
   long id; // id number of target
+  char args[512];
 };
 
 

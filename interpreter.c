@@ -44,9 +44,9 @@ extern int backup_wiped_pfiles;
 extern int selfdelete_fastwipe;
 extern int TEMP_LOAD_CHAR;
 extern char last_command[];
-extern const char compress_offer[];
 
 /* external functions */
+void send_compress_offer(struct descriptor_data *d);
 int delete_pobj_file(char *name);
 void echo_on(struct descriptor_data *d);
 void echo_off(struct descriptor_data *d);
@@ -1405,6 +1405,7 @@ int is_number(const char *str)
  */
 void skip_spaces(char **string)
 {
+  if (string && *string)
   for (; **string && isspace(**string); (*string)++);
 }
 
@@ -2278,10 +2279,10 @@ void string_append( CHAR_DATA *ch, char **pString )
   if (!ch) return;
   if (!ch->desc) return;
 
-  send_to_char( "-=======- Entering APPEND Mode -========-\n\r", ch );
-  send_to_char( "    Type /h on a new line for help\n\r", ch );
-  send_to_char( " Terminate|save with a /s on a blank line.\n\r", ch );
-  send_to_char( "-=======================================-\n\r", ch );
+  send_to_char( "-=======- Entering APPEND Mode -========-\r\n", ch );
+  send_to_char( "    Type /h on a new line for help\r\n", ch );
+  send_to_char( " Terminate|save with a /s on a blank line.\r\n", ch );
+  send_to_char( "-=======================================-\r\n", ch );
 
   if ( *pString == NULL )
   {
@@ -2672,9 +2673,10 @@ void nanny(struct descriptor_data *d, char *arg)
     if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
     {
       d->comp->state = 1;	/* waiting for response to offer */
-      write_to_output(d, "%s", compress_offer);
+send_compress_offer(d);
     }
 #endif /* HAVE_ZLIB_H */
+send_out_signals(d);
     line_sep(d);
     con_disp_menu(d);
     break;

@@ -11,7 +11,6 @@
 #define NUM_RESERVED_DESCS	8
 
 #define COPYOVER_FILE "copyover.dat"
-
 /* comm.c */
 size_t new_send_to_char(struct char_data *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
 size_t send_to_fusion(struct char_data *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
@@ -23,7 +22,7 @@ void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void perform_to_all(const char *messg, struct char_data *ch);
 void close_socket(struct descriptor_data *d);
-char *wordwrap(char *cmd, size_t width, size_t maxlen);
+char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen);
 
 int is_ignoring(struct char_data *ch, struct char_data *vict);
 
@@ -39,6 +38,7 @@ void brag(struct char_data *ch, struct char_data *victim);
 extern struct comm_data * comlist;
 
 void free_commlist(struct comm_data *c);
+void send_out_signals(struct descriptor_data *d);
 
 #define ALERT_1 send_to_all("{cRALERT: 4Dimensions has had an internal error and is shutting down now.\r\n" \
 "Please Reconnect in 20 seconds.\r\n{c0");
@@ -67,7 +67,7 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal);
 void string_add(struct descriptor_data *d, char *str);
 void string_write(struct descriptor_data *d, char **txt, size_t len,
 		  long mailto, void *data);
-int	toggle_compression(struct descriptor_data *d);
+int toggle_compression(struct descriptor_data *t);
 
 
 #define SEND_TO_SOCKET(messg, desc)	write_to_descriptor((desc), (messg), strlen(messg))

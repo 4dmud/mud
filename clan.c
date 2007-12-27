@@ -45,7 +45,7 @@ void send_clan_format(struct char_data *ch)
 {
   int c, r;
 
-  send_to_char("Clan commands available to you:\n\r"
+  send_to_char("Clan commands available to you:\r\n"
                "   clan who\r\n"
                "   clan status\r\n"
                "   clan list\r\n" "   clan info <clan>\r\n", ch);
@@ -1493,7 +1493,7 @@ void do_clan_bank(struct char_data *ch, char *arg, int action)
     }
   }
 
-  if ((IS_HERO(ch)) ||( GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_WITHDRAW]
+  if (( GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_WITHDRAW]
                         && !immcom && action == CB_WITHDRAW) )
   {
     send_to_char

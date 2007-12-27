@@ -389,7 +389,7 @@ ACMD(do_suicide)
 
      if ( argument[0] == '\0' || str_cmp(argument, "yes"))
      {
-       send_to_char( "If you mean it, type suicide 'yes'.\n\r", ch );
+       send_to_char( "If you mean it, type suicide 'yes'.\r\n", ch );
        return;
      }
 

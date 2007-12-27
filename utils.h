@@ -62,6 +62,8 @@ int size_dice_wep(struct char_data *ch, short dual);
 int highest_tier(struct char_data *ch);
 float race_dam_mod(int race, int magic);
 
+void strip_color(char *inbuf, size_t i_buf);
+size_t proc_color(char *inbuf, int color_lvl, size_t len);
 extern int sub_success;
 int total_chance(CHAR_DATA *ch, int skill);
 gold_int exp_needed(CHAR_DATA *ch);
@@ -73,8 +75,37 @@ int use_stamina(struct char_data *ch, int amount);
 #define mult_2(a)     (a<<1)
 
 #define IS_UNIQUE(obj) (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-#define IS_HERO(ch) (0)
+
 #define IS_ELEMENTAL(ch) ((MOB_FLAGGED(ch, MOB_ELEM_EARTH)|| (MOB_FLAGGED(ch, MOB_ELEM_AIR))||(MOB_FLAGGED(ch, MOB_ELEM_WATER))||(MOB_FLAGGED(ch, MOB_ELEM_FIRE))))
+
+/* strings */
+
+#define MXP_BEG "\x03"    /* becomes < */
+#define MXP_END "\x04"    /* becomes > */
+#define MXP_AMP "\x05"    /* becomes & */
+
+/* characters */
+
+#define MXP_BEGc '\x03'    /* becomes < */
+#define MXP_ENDc '\x04'    /* becomes > */
+#define MXP_AMPc '\x05'    /* becomes & */
+
+/* constructs an MXP tag with < and > around it */
+
+#define MXPTAG(arg) MXP_BEG arg MXP_END
+
+#define ESC "\x1B"  /* esc character */
+
+#define MXPMODE(arg) ESC "[" #arg "z"
+
+/* flags for show_list_to_char */
+
+enum {
+  eItemNothing,   /* item is not readily accessible */
+  eItemGet,     /* item on ground */
+  eItemDrop,    /* item in inventory */
+  eItemBid     /* auction item */
+  };
 
 /*replace parts of strings*/
 char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
@@ -475,7 +506,7 @@ int has_body(CHAR_DATA *ch, int flag);
 
 #define GET_NEXT_SKILL(ch) ((ch)->combatskill.w_type)
 #define GET_NEXT_VICTIM(ch) ((ch)->combatskill.vict_id)
-
+#define GET_SWEEP_DAM(ch) ((ch)->sweep_damage)
 #define IN_ROOM(ch)	((ch)->in_room)
 #define GET_WAS_IN(ch)	((ch)->was_in_room)
 #define GET_AGE(ch)     (age(ch)->year)

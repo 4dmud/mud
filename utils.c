@@ -1494,8 +1494,9 @@ size_t commafmt(char   *buf,            /* Buffer for formatted string  */
                 int     bufsize,        /* Size of buffer               */
                 gold_int    N)              /* Number to convert            */
 {
-  int len = 1, posn = 1, sign = 1;
+  int posn = 1, sign = 1;
   char *ptr = buf + bufsize - 1;
+  size_t len = 1;
 
   if (2 > bufsize)
   {
@@ -1537,7 +1538,7 @@ size_t commafmt(char   *buf,            /* Buffer for formatted string  */
   return (size_t)len;
 }
 
-static char *text[] = {"th", "st", "nd", "rd"};
+static const char *text[] = {"th", "st", "nd", "rd"};
 
 char *ordinal_text(int number)
 {

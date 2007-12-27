@@ -22,9 +22,11 @@
 #include "interpreter.h"
 #include "dg_scripts.h"
 #include "fight.h"
+#include "dg_event.h"
 
 extern int mini_mud;
 ACMD(do_flee);
+EVENTFUNC(message_event);
 
 void dismount_char(struct char_data *ch);
 char *balance_display(int balance);
@@ -36,7 +38,6 @@ int mag_savingthrow(struct char_data *ch, int type, int modifier);
 void name_to_drinkcon(struct obj_data *obj, int type);
 void name_from_drinkcon(struct obj_data *obj);
 void set_race(struct char_data *ch, int race);
-void weather_change(void);
 int compute_armor_class(struct char_data *ch);
 struct char_data *FindNext(struct char_data *ch, struct char_data *v[]);
 int perf_balance(int weapon_type);
@@ -629,7 +630,6 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
   float att[6], total = 0;
   int w_type;
   int form = 0;
-  extern void strip_color(char *inbuf);
   int get_weapon_speed(OBJ_DATA *wep);
   int get_weapon_attack(OBJ_DATA *wep);
   int get_weapon_defence(OBJ_DATA *wep);
@@ -638,7 +638,7 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
   zone_rnum zone;
 
   strcpy(buf2, obj->short_description);
-  strip_color(buf2);
+  strip_color(buf2, sizeof(buf2));
   /*
       'a Kruesraker' is a type of 'weapon' made from 'unknown'
   It is glowing humming magic cursed
@@ -659,7 +659,7 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
   sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
   if (strncmp(buf, "NOBITS", 6))
   {
-    if (str_str(buf, "TAKE"))
+    if (str_str(buf, (char *)"TAKE"))
       new_send_to_char(ch, "{cyIt can be taken and worn on {cc%s{c0\r\n", buf);
     else
       new_send_to_char(ch, "{cyIt can and worn on {cc%s{c0\r\n", buf);
@@ -1163,7 +1163,7 @@ ASPELL(spell_polymorph)
 ASPELL(spell_control_weather)
 {
   int i;
-
+struct message_event_obj *msg = NULL;
   if (!OUTSIDE(ch))
   {
     send_to_char
@@ -1184,19 +1184,30 @@ ASPELL(spell_control_weather)
   i = GET_ROOM_ZONE(IN_ROOM(ch));
   if (!str_cmp(strarg, "better"))
   {
-    zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
-    weather_change();
+    
   }
   else if (!str_cmp(strarg, "worse"))
   {
-    zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
-    weather_change();
+    
   }
   else
   {
-    send_to_char("You feel yourself very powerful.\r\n", ch);
-    return;
+  new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+  return;
   }
+GET_MSG_RUN(ch) = 1;
+  CREATE(msg, struct message_event_obj, 1);
+  msg->ch = ch;
+  msg->skill = SPELL_CONTROL_WEATHER;
+  msg->type = THING_SKILL;
+  msg->msg_num = 8;
+  if (GET_EQ(ch, WEAR_FOCUS))
+  msg->id = GET_ID(GET_EQ(ch, WEAR_FOCUS));
+  else
+  msg->id = -1;
+  strlcpy(msg->args, strarg, 512);
+  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0);
+  return;
 }
 
 ASPELL(spell_minor_identify)
