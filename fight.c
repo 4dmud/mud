@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.36  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.35  2006/03/22 20:27:20  w4dimenscor
  * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
  * Completed the autogroup toggle to work as expected (still untested though)
@@ -1324,7 +1327,7 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
 
   if (IS_SKILL(type) || IS_SPELL_CAST(type))
     return (ATK_CHANCE(attacker) = 3);
-  
+
   /*gotta be a moron to not reeally fuck up a sleeping person*/
   if (!AWAKE(vict))
     return (ATK_CHANCE(attacker) = 3);
@@ -1423,7 +1426,7 @@ int evasion_tot(struct char_data *vict)
   }
 
   evasion_roll += ((GET_LEVEL(vict)/4) * highest_tier(vict));
-  
+
   if (AWAKE(vict))
     evasion_roll += (12 - (6 + dex_app[GET_DEX(vict)].defensive)) * 10;
   if (GET_MASTERY(vict, CLASS_HUNTER))
@@ -2448,9 +2451,10 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
           dam_exp /= 2;
           damage_count(vict, IS_NPC(RIDING(ch)) ? -1 : GET_ID(RIDING(ch)), dam_exp);
           damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
-        } else
+        }
+        else
           damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
-          
+
       }
       else
       {
@@ -5559,7 +5563,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                     the grenade */
+                                                                                                                                                                                                                                                                                                               the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {

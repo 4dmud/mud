@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.42  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.41  2006/03/22 22:18:23  w4dimenscor
  * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
  *
@@ -7159,6 +7162,6 @@ ACMD(do_ctellsnoop){
       if(GET_CSNP_LVL(ch)==-2) snprintf(buf3,50,"None");
       else if(GET_CSNP_LVL(ch)==-1) snprintf(buf3,50,"All");
       else if(GET_CSNP_LVL(ch)>=0 && GET_CSNP_LVL(ch)<=num_of_clans) sprintf(buf3,clan[GET_CSNP_LVL(ch)].name);
-      new_send_to_char(ch,"Usage: ctellsnoop clannumber/none/all.\r\nCurrent setting: %s.\r\n",buf3);
+      new_send_to_char(ch,"Usage: csnoop clannumber/none/all.\r\nCurrent setting: %s.\r\n",buf3);
    }
 }

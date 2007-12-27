@@ -1015,7 +1015,101 @@ int get_line(FILE *fl, char *buf)
   strcpy(buf, temp); /* strcpy: OK, if buf >= READ_SIZE (256) */
   return (lines);
 }
-
+const char *get_dirname(char *filename, size_t len, char oname, int mode)
+{
+  const char *prefix, *middle, *suffix;
+  
+  if (oname == '\0')
+   return NULL;
+  
+  switch (mode)
+  {
+  case CRASH_FILE:
+    prefix = LIB_PLROBJS;
+    suffix = SUF_OBJS;
+    break;
+  case ETEXT_FILE:
+    prefix = LIB_PLRTEXT;
+    suffix = SUF_TEXT;
+    break;
+  case ALIAS_FILE:
+    prefix = LIB_PLRALIAS;
+    suffix = SUF_ALIAS;
+    break;
+  case POOF_FILE:
+    prefix = LIB_PLRPOOFS;
+    suffix = SUF_POOFS;
+    break;
+  case NEW_OBJ_FILES:
+    prefix = LIB_PLROBJS;
+    suffix = "new";
+    break;
+  case SCRIPT_VARS_FILE:
+    prefix = LIB_PLRVARS;
+    suffix = SUF_MEM;
+    break;
+  case ASCII_OBJ_FILES:
+    prefix = LIB_PLROBJS;
+    suffix = "anew";
+    break;
+  case LOCKER_FILES:
+    prefix = LIB_PLROBJS;
+    suffix = "locker";
+    break;
+  case IGNORE_FILE:
+    prefix = LIB_PLRALIAS;
+    suffix = "ignore";
+    break;
+  default:
+    return NULL;
+  }
+  
+  switch (oname)
+  {
+  case 'a':
+  case 'b':
+  case 'c':
+  case 'd':
+  case 'e':
+    middle = "A-E";
+    break;
+  case 'f':
+  case 'g':
+  case 'h':
+  case 'i':
+  case 'j':
+    middle = "F-J";
+    break;
+  case 'k':
+  case 'l':
+  case 'm':
+  case 'n':
+  case 'o':
+    middle = "K-O";
+    break;
+  case 'p':
+  case 'q':
+  case 'r':
+  case 's':
+  case 't':
+    middle = "P-T";
+    break;
+  case 'u':
+  case 'v':
+  case 'w':
+  case 'x':
+  case 'y':
+  case 'z':
+    middle = "U-Z";
+    break;
+  default:
+    middle = "ZZZ";
+    break;
+  }
+  
+  snprintf(filename, len,  "%s%s" SLASH, prefix, middle);
+  return filename;
+}
 int get_filename(const char *orig_name, char *filename, int mode)
 {
   const char *prefix, *middle, *suffix;

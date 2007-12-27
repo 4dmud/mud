@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.17  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.16  2006/03/13 19:07:40  w4dimenscor
  * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
@@ -1293,8 +1296,8 @@ ACMD(do_gen_tog)
        "You will now see a tally of how many fish you have caught.\r\n"},
       {"You can now have the teleport spell cast on you.\r\n",
           "You can now no longer have the teleport spell cast on you.\r\n"},
-      {"You will automaticly agree to group people when they request to follow.\r\n",
-          "You will NOT automaticly agree to group people when they request to follow.\r\n"}
+      {   "You will NOT automaticly agree to group people when they request to follow.\r\n",
+          "You will automaticly agree to group people when they request to follow.\r\n"}
 
 
 

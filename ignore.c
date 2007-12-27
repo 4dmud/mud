@@ -33,7 +33,10 @@ struct ignore *find_ignore(struct ignore *ignore_list, char *str)
   }
   return NULL;
 }
-
+/**
+If ch is ignoring vict then this function returns 1
+otherwise it returns 0
+*/
 int is_ignoring(struct char_data *ch, struct char_data *vict)
 {
   struct ignore *temp;
@@ -44,9 +47,8 @@ int is_ignoring(struct char_data *ch, struct char_data *vict)
 
   if (IS_NPC(ch) || IS_NPC(vict))
     return (0);
-  if (GET_LEVEL(ch) > LVL_SEN || GET_LEVEL(vict) > LVL_SEN)
-  sprintf(buf, "%s", GET_NAME(ch));
-  temp = GET_IGNORELIST(vict);
+  
+  temp = GET_IGNORELIST(ch);
   while (temp != NULL)
   {
     if (!str_cmp(buf, temp->ignore))

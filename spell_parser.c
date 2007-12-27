@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.16  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.15  2006/02/25 23:42:45  w4dimenscor
  * Directional spells work now, BUT mana blast doesn't
  *
@@ -187,8 +190,8 @@ struct syllable syls[] =
   };
 
 
-const char *unused_spellname = "!UNUSED!";	/* So we can get &unused_spellname */
-//const char *unused_spellmessage = "You summon the energy to change spells.";	/* So we can get &unused_spellmessage */
+const char *unused_spellname = "!UNUSED!";   /* So we can get &unused_spellname */
+//const char *unused_spellmessage = "You summon the energy to change spells.";  /* So we can get &unused_spellmessage */
 
 int mag_manacost(struct char_data *ch, int spellnum)
 {
@@ -205,7 +208,7 @@ void say_spell(struct char_data *ch, int spellnum, struct char_data *tch,
                struct obj_data *tobj)
 {
   struct obj_data *focus = GET_EQ(ch, WEAR_FOCUS);
-  char lbuf[256], buf[256], buf1[256], buf2[256];	/* FIXME */
+  char lbuf[256], buf[256], buf1[256], buf2[256]; /* FIXME */
   const char *format;
 
   struct char_data *i;
@@ -220,7 +223,7 @@ void say_spell(struct char_data *ch, int spellnum, struct char_data *tch,
     {
       if (!strncmp(syls[j].org, lbuf + ofs, strlen(syls[j].org)))
       {
-        strcat(buf, syls[j].news);	/* strcat: BAD */
+        strcat(buf, syls[j].news); /* strcat: BAD */
         ofs += strlen(syls[j].org);
         break;
       }
@@ -353,22 +356,22 @@ int find_skill_num(char *name)
     break;
  
     for (; skindex <= TOP_SPELL_DEFINE; skindex++) {
-	if (is_abbrev(name, spell_info[spell_sorted_info[skindex]].name))
-	    return (spell_sorted_info[skindex]);
+     if (is_abbrev(name, spell_info[spell_sorted_info[skindex]].name))
+         return (spell_sorted_info[skindex]);
  
-	ok = TRUE;
-	strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf));	
-	temp = any_one_arg(tempbuf, first);
-	temp2 = any_one_arg(name, first2);
-	while (*first && *first2 && ok) {
-	    if (!is_abbrev(first2, first))
-		ok = FALSE;
-	    temp = any_one_arg(temp, first);
-	    temp2 = any_one_arg(temp2, first2);
-	}
+     ok = TRUE;
+     strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf)); 
+     temp = any_one_arg(tempbuf, first);
+     temp2 = any_one_arg(name, first2);
+     while (*first && *first2 && ok) {
+         if (!is_abbrev(first2, first))
+          ok = FALSE;
+         temp = any_one_arg(temp, first);
+         temp2 = any_one_arg(temp2, first2);
+     }
  
-	if (ok && !*first2)
-	    return (spell_sorted_info[skindex]);
+     if (ok && !*first2)
+         return (spell_sorted_info[skindex]);
     }
  
     return (-1);
@@ -395,8 +398,8 @@ int get_skill(struct char_data *ch, int i)
 
 void set_skill(struct char_data *ch, int skill, int amount)
 {
-  struct skillspell_data *temp 	= (IS_NPC(ch) ? NULL : ch->skills);
-  struct skillspell_data *temp2 	= NULL;
+  struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
+  struct skillspell_data *temp2    = NULL;
 
   if (IS_NPC(ch))
   {
@@ -451,7 +454,7 @@ void set_skill(struct char_data *ch, int skill, int amount)
 
 int get_skill_wait(struct char_data *ch, int skill)
 {
-  struct skillspell_data *temp 	= (IS_NPC(ch) ? NULL : ch->skills);
+  struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
 
   while (temp)
   {
@@ -467,7 +470,7 @@ int get_skill_wait(struct char_data *ch, int skill)
 
 void set_skill_wait(struct char_data *ch, int skill, int wait)
 {
-  struct skillspell_data *temp 	= (IS_NPC(ch) ? NULL : ch->skills);
+  struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
   if (wait < 0)
     wait = 0;
 
@@ -557,7 +560,7 @@ int find_skill_num(char *name)
    return (spell_sorted_info[skindex]);
 
   ok = TRUE;
-  strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf));	
+  strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf));    
   temp = any_one_arg(tempbuf, first);
   temp2 = any_one_arg(name, first2);
   while (*first && *first2 && ok) {
@@ -657,7 +660,7 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
 
   if (IS_SET(SINFO.routines, MAG_DAMAGE))
     if (mag_damage(level, caster, cvict, spellnum, savetype) == -1)
-      return (-1);	/* Successful and target died, don't cast again. */
+      return (-1);  /* Successful and target died, don't cast again. */
 
   if (IS_SET(SINFO.routines, MAG_AFFECTS))
     mag_affects(level, caster, cvict, spellnum, savetype);
@@ -762,10 +765,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
  * only be called by the 'quaff', 'use', 'recite', etc. routines.
  *
  * For reference, object values 0-3:
- * staff  - [0]	level	[1] max charges	[2] num charges	[3] spell num
- * wand   - [0]	level	[1] max charges	[2] num charges	[3] spell num
- * scroll - [0]	level	[1] spell num	[2] spell num	[3] spell num
- * potion - [0] level	[1] spell num	[2] spell num	[3] spell num
+ * staff  - [0]     level     [1] max charges     [2] num charges     [3] spell num
+ * wand   - [0]     level     [1] max charges     [2] num charges     [3] spell num
+ * scroll - [0]     level     [1] spell num  [2] spell num  [3] spell num
+ * potion - [0] level    [1] spell num  [2] spell num  [3] spell num
  *
  * Staves and wands will default to level 14 if the level is not specified;
  * the DikuMUD format did not specify staff and wand levels in the world
@@ -949,7 +952,8 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
 
     if (!consume_otrigger(obj, ch, OCMD_QUAFF))  /* check trigger */
       return;
-    if (GET_OBJ_VAL(obj, 1) < 0 && GET_OBJ_VAL(obj, 2) < 0 && GET_OBJ_VAL(obj, 3) < 0) {
+    if (GET_OBJ_VAL(obj, 1) < 0 && GET_OBJ_VAL(obj, 2) < 0 && GET_OBJ_VAL(obj, 3) < 0)
+    {
       act("You quaff a little bit of air from $p then burp.", FALSE, ch, obj, NULL, TO_CHAR);
       act("$n quaffs a little bit of air from $p then burps.", FALSE, ch, obj, NULL, TO_ROOM);
       extract_obj(obj);
@@ -1317,7 +1321,7 @@ ACMD(do_cast)
 
     }
     else
-    {			/* if target string is empty */
+    {               /* if target string is empty */
       if (!target && IS_SET(SINFO.targets, TAR_FIGHT_SELF))
         if (FIGHTING(ch) != NULL)
         {
@@ -1402,7 +1406,7 @@ ACMD(do_cast)
       start_fighting(tch, ch);
   }
   else
-  {			/* cast spell returns 1 on success; subtract mana & set waitstate */
+  {            /* cast spell returns 1 on success; subtract mana & set waitstate */
     if (cast_spell(ch, tch, tobj, t, spellnum))
     {
       GET_SPELL_DIR(ch) = NOWHERE;

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.19  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.18  2006/03/13 19:07:40  w4dimenscor
  * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
@@ -88,7 +91,7 @@
 #include "sysdep.h"
 
 #include "structs.h"
-#include "interpreter.h"	/* alias_data */
+#include "interpreter.h" /* alias_data */
 #include "house.h"
 #include "constants.h"
 #include "utils.h"
@@ -149,16 +152,16 @@ const char *potion_names[] =
     "glowing red",
     "sparkling white",
     "incandescent blue",
-"\n"
+    "\n"
   };
 
 const char *tree_names[] =
   {
-    "pine",			//0
+    "pine",              //0
     "oak",
     "willow",
     "dogwood",
-    "ironwood",			//4
+    "ironwood",               //4
     "fir",
     "maple",
     "elder",
@@ -168,7 +171,7 @@ const char *tree_names[] =
 
 const char *age_desc_tree[] =
   {
-    "seedling",			//0
+    "seedling",               //0
     "sapling",
     "young",
     "yearling",
@@ -176,13 +179,13 @@ const char *age_desc_tree[] =
     "old",
     "aging",
     "ancient",
-    "petrified",		//8
+    "petrified",         //8
     "\n"
   };
 
 const char *age_desc_staff[] =
   {
-    "very green",		//0
+    "very green",        //0
     "green",
     "supple",
     "thick",
@@ -190,14 +193,14 @@ const char *age_desc_staff[] =
     "worn",
     "aged",
     "gnarled",
-    "glassy",			//8
+    "glassy",            //8
     "\n"
   };
 
 
 const  char *random_desc[] =
   {
-    "slick",			//0
+    "slick",             //0
     "slimy",
     "greasy",
     "smooth",
@@ -213,7 +216,7 @@ const  char *random_desc[] =
     "geocentric",
     "unctous",
     "transfinite",
-    "phantasmagorical",		//16
+    "phantasmagorical",       //16
     "\n"
   };
 
@@ -240,38 +243,38 @@ const char *material_names[] =
     "wool",
     "wood",
     "magic-wood",
-   "bone",
-   "ceramic",
-   "mithril",
-   "obsidian",
-   "steel",
-   "stone",
-   "glass",
-   "organic",
-   "currency",
-   "paper",
-   "cotton",
-   "satin",
-   "silk",
-   "burlap",
-   "velvet",
-   "platinum",
-   "adamantite",
-   "onyx",
-   "ivory",
-   "brass",
-   "marble",
-   "bronze",
-   "pewter",
-   "ruby",
-   "sapphire",
-   "emerald",
-   "gemstone",
-   "granite",
-   "energy",
-   "hemp",
-   "crystal",
-   "earth",
+    "bone",
+    "ceramic",
+    "mithril",
+    "obsidian",
+    "steel",
+    "stone",
+    "glass",
+    "organic",
+    "currency",
+    "paper",
+    "cotton",
+    "satin",
+    "silk",
+    "burlap",
+    "velvet",
+    "platinum",
+    "adamantite",
+    "onyx",
+    "ivory",
+    "brass",
+    "marble",
+    "bronze",
+    "pewter",
+    "ruby",
+    "sapphire",
+    "emerald",
+    "gemstone",
+    "granite",
+    "energy",
+    "hemp",
+    "crystal",
+    "earth",
     "\n"
   };
 
@@ -403,7 +406,7 @@ const char *room_bits[] =
     "HCRSH",
     "ATRIUM",
     "OLC",
-    "*",			/* BFS MARK */
+    "*",            /* BFS MARK */
     "VEHICLE",
     "!RECALL",
     "ARENA",
@@ -431,8 +434,8 @@ const char *room_bits[] =
     "SPRING",
     "PASTURE",
     "DRAGONPORT",
-      "TIN DEPOSIT",
-      "PLASTONIUM DEPOSIT",
+    "TIN DEPOSIT",
+    "PLASTONIUM DEPOSIT",
     "\n"
   };
 
@@ -672,7 +675,7 @@ const char *preference_bits[] =
 /* AFF_x */
 const char *affected_bits[] =
   {
-    "DONOTUSE",			/* REQUIRED BY 128 BIT */
+    "DONOTUSE",               /* REQUIRED BY 128 BIT */
     "BLIND",
     "INVIS",
     "DET-ALIGN",
@@ -789,7 +792,7 @@ const char *connected_types[] =
     "Self-Delete 1",
     "Self-Delete 2",
     "Disconnecting",
-  
+
     "Object edit",
     "Room edit",
     "Zone edit",
@@ -804,7 +807,7 @@ const char *connected_types[] =
     "Confirm Race",
     "Confirm Class",
     "Confirm Stats",
-    "Line Input",		// CON_LINE_INPUT (
+    "Line Input",        // CON_LINE_INPUT (
     "Specialize",
     "Loyal",
     "Note Edit",
@@ -820,7 +823,7 @@ const char *connected_types[] =
     "Create Character",
     "Vehicle Editor",
     "Help Selection",
-"Assembly Edit",
+    "Assembly Edit",
     "\n"
   };
 
@@ -1208,82 +1211,82 @@ const int wear_order_index[NUM_WEARS] =
 /* ITEM_x (ordinal object types) */
 const char *item_types[] =
   {
-    "UNDEFINED",		//0
+    "UNDEFINED",         //0
     "light",
     "scroll",
     "wand",
     "staff",
-    "weapon",			//5
+    "weapon",            //5
     "<NOT USED>",
     "<NOT USED>",
     "treasure",
     "armor",
-    "potion",			//10
+    "potion",            //10
     "worn",
     "other",
     "trash",
     "trap",
-    "container",		//15
+    "container",         //15
     "note",
     "liquid container",
     "key",
     "food",
-    "money",			//20
+    "money",             //20
     "pen",
     "boat",
     "fountain",
     "throw",
-    "grenade",			//25
+    "grenade",           //25
     "bow",
     "sling",
     "crossbow",
     "bolt",
-    "arrow",			//30
+    "arrow",             //30
     "rock",
     "vehicle",
     "vehicle control",
     "vehicle exit",
-    "vehicle window",		//35
+    "vehicle window",         //35
     "room portal",
     "gun",
     "ammo",
     "wings",
-    "spacesuit",		//40
+    "spacesuit",         //40
     "aqualung",
     "climable",
     "level 1 poison",
     "level 2 poison",
-    "level 3 poison",			//45
+    "level 3 poison",              //45
     "level 4 poison",
     "level 1 antidote",
     "level 2 antidote",
     "level 3 antidote",
-    "descendable",		//50
+    "descendable",       //50
     "bush portal",
     "water portal",
     "hole portal",
     "meat",
-    "nugget",			//55
+    "nugget",            //55
     "metal detector",
     "tree",
     "bark",
     "anvil",
-    "hammer",			//60
+    "hammer",            //60
     "grindstone",
     "oil",
     "ore",
     "axe",
-    "gem cluster",			//65
+    "gem cluster",            //65
     "element",
     "shovel",
     "wood",
     "machine",
-    "pickaxe",			//70
+    "pickaxe",           //70
     "nut",
     "skin",
     "furniture",
     "portal hurdle",
-    "thermal protection",		//75
+    "thermal protection",          //75
     "radio",
     "minor focus",
     "major focus",
@@ -1720,37 +1723,37 @@ const char *fullness[] =
 cpp_extern const struct str_app_type str_app[] =
   {
     {-5, -4, 0,  0 }
-    ,		/* str = 0 */
-    {-5, -4, 3,  1 },		/* str = 1 */
+    ,          /* str = 0 */
+    {-5, -4, 3,  1 },         /* str = 1 */
     {-3, -2, 3,  2 },
     {-3, -1, 10, 3 },
     {-2, -1, 25, 4 },
-    {-2, -1, 55, 5 },		/* str = 5 */
+    {-2, -1, 55, 5 },         /* str = 5 */
     {-1, 0, 80,  6 },
     {-1, 0, 90,  7 },
     {0, 0, 100,  8 },
     {0, 0, 100,  9 },
-    {0, 0, 115,  10},		/* str = 10 */
+    {0, 0, 115,  10},         /* str = 10 */
     {0, 0, 115,  11},
     {0, 0, 140,  12},
     {0, 0, 140,  13},
     {0, 0, 170,  14},
-    {0, 0, 170,  15},		/* str = 15 */
+    {0, 0, 170,  15},         /* str = 15 */
     {0, 1, 195,  16},
     {1, 1, 220,  18},
-    {1, 2, 255,  20},		/* str = 18 */
+    {1, 2, 255,  20},         /* str = 18 */
     {3, 7, 300,  22},
-    {3, 8, 340,  24},		/* str = 20 */
+    {3, 8, 340,  24},         /* str = 20 */
     {4, 9, 400,  26},
     {4, 10, 460, 28}, //22
     {5, 11, 1130,30}, //23
     {6, 12, 1440,40},
-    {7, 14, 1750,40},		/* str = 25 */
-    {5, 11, 500, 30},		/* str = 18/0 - 18-50 */
-    {6, 13, 560, 33},		/* str = 18/51 - 18-75 */
-    {7, 16, 600, 34},		/* str = 18/76 - 18-90 */
-    {8, 18, 660, 39},		/* str = 18/91 - 18-99 */
-    {9, 22, 700, 45}		/* str = 18/100 */
+    {7, 14, 1750,40},         /* str = 25 */
+    {5, 11, 500, 30},         /* str = 18/0 - 18-50 */
+    {6, 13, 560, 33},         /* str = 18/51 - 18-75 */
+    {7, 16, 600, 34},         /* str = 18/76 - 18-90 */
+    {8, 18, 660, 39},         /* str = 18/91 - 18-99 */
+    {9, 22, 700, 45}          /* str = 18/100 */
   };
 
 
@@ -1759,32 +1762,32 @@ cpp_extern const struct str_app_type str_app[] =
 cpp_extern const struct dex_skill_type dex_app_skill[] =
   {
     {-99, -99, -90, -99, -60}
-    ,	/* dex = 0 */
-    {-90, -90, -60, -90, -50},	/* dex = 1 */
+    ,     /* dex = 0 */
+    {-90, -90, -60, -90, -50},     /* dex = 1 */
     {-80, -80, -40, -80, -45},
     {-70, -70, -30, -70, -40},
     {-60, -60, -30, -60, -35},
-    {-50, -50, -20, -50, -30},	/* dex = 5 */
+    {-50, -50, -20, -50, -30},     /* dex = 5 */
     {-40, -40, -20, -40, -25},
     {-30, -30, -15, -30, -20},
     {-20, -20, -15, -20, -15},
     {-15, -10, -10, -20, -10},
-    {-10, -5, -10, -15, -5},	/* dex = 10 */
+    {-10, -5, -10, -15, -5},  /* dex = 10 */
     {-5, 0, -5, -10, 0},
     {0, 0, 0, -5, 0},
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0},		/* dex = 15 */
+    {0, 0, 0, 0, 0},          /* dex = 15 */
     {0, 5, 0, 0, 0},
     {5, 10, 0, 5, 5},
-    {10, 15, 5, 10, 10},	/* dex = 18 */
+    {10, 15, 5, 10, 10}, /* dex = 18 */
     {15, 20, 10, 15, 15},
-    {15, 20, 10, 15, 15},	/* dex = 20 */
+    {15, 20, 10, 15, 15},     /* dex = 20 */
     {20, 25, 10, 15, 20},
     {20, 25, 15, 20, 20},
     {25, 25, 15, 20, 20},
     {25, 30, 15, 25, 25},
-    {25, 30, 15, 25, 25}	/* dex = 25 */
+    {25, 30, 15, 25, 25} /* dex = 25 */
   };
 
 
@@ -1793,32 +1796,32 @@ cpp_extern const struct dex_skill_type dex_app_skill[] =
 cpp_extern const struct dex_app_type dex_app[] =
   {
     {-7, -7, 6}
-    ,		/* dex = 0 */
-    {-6, -6, 5},		/* dex = 1 */
+    ,          /* dex = 0 */
+    {-6, -6, 5},         /* dex = 1 */
     {-4, -4, 5},
     {-3, -3, 4},
     {-2, -2, 3},
-    {-1, -1, 2},		/* dex = 5 */
+    {-1, -1, 2},         /* dex = 5 */
     {0, 0, 1},
     {0, 0, 0},
     {0, 0, 0},
     {0, 0, 0},
-    {0, 0, 0},			/* dex = 10 */
+    {0, 0, 0},           /* dex = 10 */
     {0, 0, 0},
     {0, 0, 0},
     {0, 0, 0},
     {0, 0, 0},
-    {0, 1, -1},			/* dex = 15 */
+    {0, 1, -1},               /* dex = 15 */
     {1, 1, -2},
     {2, 2, -3},
-    {3, 3, -5},			/* dex = 18 */
+    {3, 3, -5},               /* dex = 18 */
     {3, 3, -5},
-    {3, 3, -5},			/* dex = 20 */
+    {3, 3, -5},               /* dex = 20 */
     {4, 4, -5},
     {4, 4, -5},
     {4, 4, -5},
     {5, 5, -6},
-    {5, 5, -6}			/* dex = 25 */
+    {5, 5, -6}           /* dex = 25 */
   };
 
 
@@ -1827,32 +1830,32 @@ cpp_extern const struct dex_app_type dex_app[] =
 cpp_extern const struct con_app_type con_app[] =
   {
     {-4, 20}
-    ,			/* con = 0 */
-    {-3, 25},			/* con = 1 */
+    ,               /* con = 0 */
+    {-3, 25},            /* con = 1 */
     {-2, 30},
     {-2, 35},
     {-1, 40},
-    {-1, 45},			/* con = 5 */
+    {-1, 45},            /* con = 5 */
     {-1, 50},
     {-1, 55},
     {-1, 60},
     {-1, 65},
-    { 0, 70},			/* con = 10 */
+    { 0, 70},            /* con = 10 */
     { 0, 75},
     { 0, 80},
     { 0, 85},
     { 0, 88},
-    { 1, 90},			/* con = 15 */
+    { 1, 90},            /* con = 15 */
     { 2, 95},
     { 2, 97},
-    { 4, 99},			/* con = 18 */
+    { 4, 99},            /* con = 18 */
     { 3, 99},
-    { 4, 99},			/* con = 20 */
+    { 4, 99},            /* con = 20 */
     { 5, 99},
     { 6, 99},
     { 7, 99},
     { 8, 99},
-    { 9, 99}			/* con = 25 */
+    { 9, 99}             /* con = 25 */
   };
 
 
@@ -1861,32 +1864,32 @@ cpp_extern const struct con_app_type con_app[] =
 cpp_extern const struct int_app_type int_app[] =
   {
     {3}
-    ,			/* int = 0 */
-    {5},			/* int = 1 */
+    ,               /* int = 0 */
+    {5},            /* int = 1 */
     {7},
     {8},
     {9},
-    {10},			/* int = 5 */
+    {10},           /* int = 5 */
     {11},
     {12},
     {13},
     {15},
-    {17},			/* int = 10 */
+    {17},           /* int = 10 */
     {19},
     {22},
     {25},
     {30},
-    {38},			/* int = 15 */
+    {38},           /* int = 15 */
     {48},
     {51},
-    {58},			/* int = 18 */
+    {58},           /* int = 18 */
     {59},
-    {60},			/* int = 20 */
+    {60},           /* int = 20 */
     {61},
     {62},
     {63},
     {64},
-    {65}			/* int = 25 */
+    {65}            /* int = 25 */
   };
 
 
@@ -1894,119 +1897,119 @@ cpp_extern const struct int_app_type int_app[] =
 cpp_extern const struct wis_app_type wis_app[] =
   {
     {0}
-    ,			/* wis = 0 */
-    {0},			/* wis = 1 */
+    ,               /* wis = 0 */
+    {0},            /* wis = 1 */
     {0},
     {0},
     {0},
-    {0},			/* wis = 5 */
+    {0},            /* wis = 5 */
     {0},
     {0},
     {0},
     {0},
-    {0},			/* wis = 10 */
+    {0},            /* wis = 10 */
     {0},
     {2},
     {2},
     {3},
-    {3},			/* wis = 15 */
+    {3},            /* wis = 15 */
     {4},
     {5},
-    {6},			/* wis = 18 */
+    {6},            /* wis = 18 */
     {6},
-    {6},			/* wis = 20 */
+    {6},            /* wis = 20 */
     {6},
     {6},
     {7},
     {7},
-    {7}				/* wis = 25 */
+    {7}                  /* wis = 25 */
   };
 
 
 
 const char *spell_wear_off_msg[] =
   {
-    "RESERVED DB.C",		/* 0 */
-    "You feel less protected.",	/* 1 */
+    "RESERVED DB.C",          /* 0 */
+    "You feel less protected.",    /* 1 */
     "!Teleport!",
     "You feel less righteous.",
     "You feel a cloak of blindness disolve.",
-    "!Burning Hands!",		/* 5 */
+    "!Burning Hands!",        /* 5 */
     "!Call Lightning",
     "You feel more self-confident.",
     "You feel your strength return.",
     "!Clone!",
-    "!Color Spray!",		/* 10 */
+    "!Color Spray!",          /* 10 */
     "!Control Weather!",
     "!Create Food!",
     "!Create Water!",
     "!Cure Blind!",
-    "!Cure Critic!",		/* 15 */
+    "!Cure Critic!",          /* 15 */
     "!Cure Light!",
     "You feel more optimistic.",
     "You feel less aware.",
     "Your eyes stop tingling.",
-    "The detect magic wears off.",	/* 20 */
+    "The detect magic wears off.", /* 20 */
     "The detect poison wears off.",
     "!Dispel Evil!",
     "!Earthquake!",
     "!Enchant Weapon!",
-    "!Energy Drain!",		/* 25 */
+    "!Energy Drain!",         /* 25 */
     "!Fireball!",
     "!Harm!",
     "!Heal!",
     "You feel yourself exposed.",
-    "!Lightning Bolt!",		/* 30 */
+    "!Lightning Bolt!",       /* 30 */
     "!Locate object!",
     "!Magic Missile!",
     "You feel less sick.",
     "You feel less protected.",
-    "!Remove Curse!",		/* 35 */
+    "!Remove Curse!",         /* 35 */
     "The glowing white aura around your body fades.",
     "!Shocking Grasp!",
     "You feel less tired.",
     "You feel weaker.",
-    "!Summon!",			/* 40 */
+    "!Summon!",               /* 40 */
     "You gasp and feel fresh air flood into your lungs!",
     "!Word of Recall!",
     "!Remove Poison!",
     "You feel less aware of your surroundings.",
-    "!Animate Dead!",		/* 45 */
+    "!Animate Dead!",         /* 45 */
     "!Dispel Good!",
     "!Group Armor!",
     "!Group Heal!",
     "!Group Recall!",
-    "Your night vision seems to fade.",	/* 50 */
+    "Your night vision seems to fade.", /* 50 */
     "Your feet seem less boyant.",
     "!Gate!",
     "!Identify!",
     "!Remove Alignment!",
-    "You return to your natural form.",	/* 55 */
+    "You return to your natural form.", /* 55 */
     "You feel less sick!",
     "You feel less sick!",
     "!POISON_4!",
     "You feel less sick!",
-    "You feel less sick!",	/* 60 */
+    "You feel less sick!",    /* 60 */
     "!Evil Eye!",
     "!Absolve!",
     "!Chain Lightning!",
     "!Recharge!",
-    "!Meteor Shower!",		/* 65 */
+    "!Meteor Shower!",        /* 65 */
     "Your skin of rock crumbles.",
     "Your skin of steel becomes more supple.",
     "You are freed of your binds!",
     "You aren't paralyzed anymore.",
-    "!Holy Word!",		/* 70 */
+    "!Holy Word!",       /* 70 */
     "!Holy Shout!",
     "You feel sluggish again.",
     "You feel your force shield dwindle off!",
     "!Group Shield!",
-    "Your skin stops stinging!",		/* 75 */
+    "Your skin stops stinging!",        /* 75 */
     "Your skin stops frying!",
     "You feel warm again.",
     "!Knock!",
     "You feel less insulated.",
-    "You feel your shell of warmth dissipate.",	/* 80 */
+    "You feel your shell of warmth dissipate.",   /* 80 */
     "The earth elemental disapears.",
     "!Water Elemental!",
     "!Air Elemental!",
@@ -2104,32 +2107,32 @@ const char *mobprog_types[] =
 #endif
 
 int movement_loss[] = {
-                        1,				/* Inside       */
-                        1,				/* City         */
-                        2,				/* Field        */
-                        3,				/* Forest       */
-                        6,				/* Hills        */
-                        10,				/* Mountains    */
-                        7,				/* Swimming     */
-                        2,				/* Unswimable   */
-                        5,				/* Flying       */
-                        6,				/* Underwater   */
-                        10,				/* Desert       */
-                        50,				/* Space        */
-                        2,				/* Road         */
-                        2,				/* Entrance     */
-                        50,				/* Atmosphere   */
-                        50,				/* Sun          */
-                        2,				/* Black Hole   */
-                        1,				/*Vehicle*/
-                        6,				/*swamp*/
-                        5,				/*reef*/
-                        5,				/*tundra*/
-                        8,				/*snow*/
-                        4,				/*ice*/
-                        5,				/*praierie*/
-                        25,				/*badlands*/
-                        70,				/*rail*/
+                        1,                   /* Inside       */
+                        1,                   /* City         */
+                        2,                   /* Field        */
+                        3,                   /* Forest       */
+                        6,                   /* Hills        */
+                        10,                  /* Mountains    */
+                        7,                   /* Swimming     */
+                        2,                   /* Unswimable   */
+                        5,                   /* Flying       */
+                        6,                   /* Underwater   */
+                        10,                  /* Desert       */
+                        50,                  /* Space        */
+                        2,                   /* Road         */
+                        2,                   /* Entrance     */
+                        50,                  /* Atmosphere   */
+                        50,                  /* Sun          */
+                        2,                   /* Black Hole   */
+                        1,                   /*Vehicle*/
+                        6,                   /*swamp*/
+                        5,                   /*reef*/
+                        5,                   /*tundra*/
+                        8,                   /*snow*/
+                        4,                   /*ice*/
+                        5,                   /*praierie*/
+                        25,                  /*badlands*/
+                        70,                  /*rail*/
                         0
 
                       };
@@ -2150,7 +2153,7 @@ const char *weekdays[] =
 /* Not used in sprinttype(). */
 const char *month_name[] =
   {
-    "Month of Winter",		/* 0 */
+    "Month of Winter",        /* 0 */
     "Month of the Winter Wolf",
     "Month of the Frost Giant",
     "Month of the Old Forces",
@@ -2213,7 +2216,7 @@ const char *otrig_types[] =
     "Assemble",
     "Remove",
     "UNUSED",
-      "Load", /* 13 */
+    "Load", /* 13 */
     "UNUSED",
     "Time",
     "Cast",
@@ -2446,19 +2449,20 @@ const char *tunnel_msgs[] =
 
 
 /* Constants for Assemblies    *****************************************/
-const char *AssemblyTypes[] = {
-  "assemble",
-  "bake",
-  "brew",
-  "craft",
-  "fletch",
-  "knit",
-  "make",
-  "mix",
-  "thatch",
-  "weave",
-  "forge",
-  "\n"
-};
+const char *AssemblyTypes[] =
+  {
+    "assemble",
+    "bake",
+    "brew",
+    "craft",
+    "fletch",
+    "knit",
+    "make",
+    "mix",
+    "thatch",
+    "weave",
+    "forge",
+    "\n"
+  };
 
 

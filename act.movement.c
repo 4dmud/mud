@@ -210,7 +210,7 @@ int can_breathe_underwater(struct char_data *ch)
 
   if (GET_RACE(ch) == RACE_MARTIAN)
     return 1;
-  
+
   for (i = 0; i < NUM_WEARS; i++)
     if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
         GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_AQUALUNG)
@@ -834,11 +834,17 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
     bike = SITTING(ch);
 
+  /** Move the ch now from their current room to the new room */
+  if (move_char_to(ch, was_in->dir_option[dir]->to_room) == 0) {
+    new_send_to_char(ch, "You can't go there.\r\n");
+    return 0;
+  }
 
-  move_char_to(ch, was_in->dir_option[dir]->to_room);
-  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1))){
+
+  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
+  {
     look_at_room(ch, 0);
-   }
+  }
   if (bike)
   {
     struct char_data *tempch;
@@ -861,20 +867,20 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
   }
 
+  /** this needs to be changed so that ot also moves any items the mount is hitched to. Maybe make it recursive. */
   if (ch->hitched)
   {
     obj_from_room(ch->hitched);
     obj_to_room(ch->hitched, IN_ROOM(ch));
   }
-  if (RIDING(ch) && IN_ROOM(RIDING(ch)) == was_in && IN_ROOM(RIDING(ch)) != IN_ROOM(ch))
+  if (RIDING(ch) && IN_ROOM(RIDING(ch)) == was_in)
   {
-      has_moved = TRUE;
+    has_moved = TRUE;
   }
-  else if (RIDDEN_BY(ch) && IN_ROOM(RIDDEN_BY(ch)) == was_in
-           && IN_ROOM(RIDDEN_BY(ch)) != IN_ROOM(ch))
+  else if (RIDDEN_BY(ch) && IN_ROOM(RIDDEN_BY(ch)) == was_in)
   {
 
-      has_moved = TRUE;
+    has_moved = TRUE;
   }
   else if (!bike)
   {
@@ -900,12 +906,20 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
-      if (has_moved){
+      
+      if (has_moved)
+      {
+
         act(buf2, TRUE, ch, RIDING(ch)->hitched, RIDING(ch), TO_ROOM);
-      if (move_char_to(RIDING(ch), IN_ROOM(ch)))
-      snprintf(buf2, sizeof(buf2), "You are ridden %s by $N.",dirs[dir]);
-      act(buf2,TRUE,RIDING(ch),RIDING(ch)->hitched,ch,TO_CHAR);
-      look_at_room(RIDING(ch),0);
+
+        /** move the mount to the char, make sure they don't get dismounted yet!
+         ** then if it is a centaur player, let them know!*/
+        if (move_char_to(RIDING(ch), IN_ROOM(ch)) && !IS_NPC(RIDING(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "You are ridden %s by $N.",dirs[dir]);
+          act(buf2,TRUE,RIDING(ch),NULL,ch,TO_CHAR);
+        }
+        LOOK(RIDING(ch));
 
       }
     }
@@ -922,12 +936,19 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
-      if (has_moved){
-           act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
-               if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)))
-      snprintf(buf2, sizeof(buf2), "$N rides you %s.",dirs[dir]);
-      act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
-      look_at_room(RIDDEN_BY(ch),0);
+      
+      if (has_moved)
+      {
+        act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
+        
+        /** move the mount to the char, make sure they don't get dismounted yet!
+         ** then if it is a centaur player, let them know!*/
+        if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)) && !IS_NPC(RIDDEN_BY(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "$N rides you %s.",dirs[dir]);
+          act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
+        }
+        LOOK(RIDDEN_BY(ch));
       }
     }
     else if (!riding || (riding && !same_room))
@@ -1609,7 +1630,7 @@ ACMD(do_enter)
 
   if (*buf)
   {            /* an argument was supplied, search for door
-                                                             * keyword */
+                                                                 * keyword */
     if ((obj = get_obj_in_list_vis(ch, buf, NULL, IN_ROOM(ch)->contents)))
     {
       if (CAN_SEE_OBJ(ch, obj))
@@ -2187,7 +2208,8 @@ ACMD(do_follow)
         return;
       }
       /** Bypass the stuff below if the leader is set to autogroup, mob or no mob */
-      if (PRF_FLAGGED(leader, PRF_AUTOGROUP)) {
+      if (PRF_FLAGGED(leader, PRF_AUTOGROUP))
+      {
         if (ch->master)
           stop_follower(ch);
         GET_PERC(ch) = 0;
@@ -2195,7 +2217,7 @@ ACMD(do_follow)
         add_follower(ch, leader);
         return;
       }
-      
+
       if (!IS_NPC(ch))
       {
         /*diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));

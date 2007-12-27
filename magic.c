@@ -393,8 +393,8 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   skill_attack(ch, victim, spellnum, pass);
   /** then switch back if nessercery **/
   if (pvict != NULL)
-  FIGHTING(ch) = check_ch(pvict);
-  
+    FIGHTING(ch) = check_ch(pvict);
+
   if (DEAD(victim) || GET_POS(victim) == POS_DEAD)
     return -1;
   else

@@ -96,48 +96,49 @@ ACMD(do_assist)
     perform_assist(ch, helpee);
 }
 
-void perform_assist(struct char_data *ch, struct char_data *helpee) {
+void perform_assist(struct char_data *ch, struct char_data *helpee)
+{
   struct char_data  *opponent;
-  
 
-    /*
-     * Hit the same enemy the person you're helping is.
-     */
-    if (FIGHTING(helpee))
-      opponent = FIGHTING(helpee);
-    else
-      for (opponent = ch->in_room->people;
-           opponent && (FIGHTING(opponent) != helpee);
-           opponent = opponent->next_in_room);
-    
-    if (!opponent)
-      act("But nobody is fighting $M!", FALSE, ch, 0, helpee,
-          TO_CHAR);
-    else if (!CAN_SEE(ch, opponent))
-      act("You can't see who is fighting $M!", FALSE, ch, 0, helpee,
-          TO_CHAR);
-    else if (!CONFIG_PK_ALLOWED && !IS_NPC(opponent)
-             && !arena_ok(ch, opponent))
-      /* prevent accidental pkill */
-      act("Use 'murder' if you really want to attack $N.", FALSE,
-          ch, 0, opponent, TO_CHAR);
-    else
+
+  /*
+   * Hit the same enemy the person you're helping is.
+   */
+  if (FIGHTING(helpee))
+    opponent = FIGHTING(helpee);
+  else
+    for (opponent = ch->in_room->people;
+         opponent && (FIGHTING(opponent) != helpee);
+         opponent = opponent->next_in_room);
+
+  if (!opponent)
+    act("But nobody is fighting $M!", FALSE, ch, 0, helpee,
+        TO_CHAR);
+  else if (!CAN_SEE(ch, opponent))
+    act("You can't see who is fighting $M!", FALSE, ch, 0, helpee,
+        TO_CHAR);
+  else if (!CONFIG_PK_ALLOWED && !IS_NPC(opponent)
+           && !arena_ok(ch, opponent))
+    /* prevent accidental pkill */
+    act("Use 'murder' if you really want to attack $N.", FALSE,
+        ch, 0, opponent, TO_CHAR);
+  else
+  {
+    if (ch->nr != real_mobile(DG_CASTER_PROXY) &&
+        ch != opponent &&
+        ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
     {
-      if (ch->nr != real_mobile(DG_CASTER_PROXY) &&
-          ch != opponent &&
-          ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
-      {
-        send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
-        return;
-      }
-      if (!can_fight(ch, opponent, FALSE))
-        return;
-      send_to_char("You join the fight!\r\n", ch);
-      act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
-      act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, opponent, TO_ROOM);
-      start_fighting(ch, opponent);
+      send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
+      return;
     }
-  
+    if (!can_fight(ch, opponent, FALSE))
+      return;
+    send_to_char("You join the fight!\r\n", ch);
+    act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
+    act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, opponent, TO_ROOM);
+    start_fighting(ch, opponent);
+  }
+
 }
 
 ACMD(do_hit)
@@ -154,7 +155,7 @@ ACMD(do_hit)
   }
   if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
   {
-  #if KILL_ALL_ENABLED
+#if KILL_ALL_ENABLED
     if ( !strcmp(arg, "all") )
     {
       if ( ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL) )
@@ -184,9 +185,9 @@ ACMD(do_hit)
         {
           if (!IS_NPC(vict) && !IS_NPC(ch))
             continue;
-        if (FIGHTING(vict))
-	    continue;
-	    
+          if (FIGHTING(vict))
+            continue;
+
           act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, vict, TO_ROOM);
           new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
           if (!FIGHTING(ch))
@@ -201,11 +202,11 @@ ACMD(do_hit)
       }
       /*
       if (FIGHTING(ch))
-    send_to_char("They don't seem to be here.\r\n", ch);
+      send_to_char("They don't seem to be here.\r\n", ch);
       */
       return;
     }
-    #endif
+#endif
     send_to_char("They don't seem to be here.\r\n", ch);
     return;
   }
@@ -246,7 +247,7 @@ ACMD(do_hit)
     }
     if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master)
         && !IS_NPC(vict))
-      return;		/* you can't order a charmed pet to attack a player */
+      return;       /* you can't order a charmed pet to attack a player */
   }
 
   //if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
@@ -318,25 +319,25 @@ ACMD(do_slay)
     else if (!str_cmp(arg2, "demon"))
     {
       act(
-      "You gesture and a slavering demon appears.  With a horrible grin,\r\n" 
-      "the foul creatre turns on $N, who screams in panic before being\r\n" 
-      "eaten alive.", FALSE, ch, NULL, vict, TO_CHAR);
-      act("$n gestures and a slavering demon appears.  The foul creature\r\n" 
-      "turns on you with a horrible grin.  You scream in panic before\r\n" 
-      "being eaten alive.", FALSE, ch, NULL, vict, TO_VICT);
-      act("$n gestures and a slavering demon appears.  With a horrible grin,\r\n" 
-      "the foul creature turn on $N, who screams in panic before being\r\n" 
-      "eaten alive.", FALSE, ch, NULL, vict, TO_NOTVICT);
+        "You gesture and a slavering demon appears.  With a horrible grin,\r\n"
+        "the foul creatre turns on $N, who screams in panic before being\r\n"
+        "eaten alive.", FALSE, ch, NULL, vict, TO_CHAR);
+      act("$n gestures and a slavering demon appears.  The foul creature\r\n"
+          "turns on you with a horrible grin.  You scream in panic before\r\n"
+          "being eaten alive.", FALSE, ch, NULL, vict, TO_VICT);
+      act("$n gestures and a slavering demon appears.  With a horrible grin,\r\n"
+          "the foul creature turn on $N, who screams in panic before being\r\n"
+          "eaten alive.", FALSE, ch, NULL, vict, TO_NOTVICT);
     }
     else if (!str_cmp(arg2, "pounce"))
     {
       act("Leaping upon $N with bared fangs, you tear open $S throat\r\n"
-      "and toss the corpse to the ground.", FALSE, ch, NULL, vict, TO_CHAR);
+          "and toss the corpse to the ground.", FALSE, ch, NULL, vict, TO_CHAR);
       act("In a heartbead, $n rips $s fangs through your throat!\r\n"
           "Your blood sprays and pours to the ground as your life ends...",
           FALSE, ch, NULL, vict, TO_VICT);
-      act("Leaping suddenly, $n sinks $s fangs into $N's throat.  As blood\r\n" 
-      "sprays and gushes, $n tosses $N's dying body away", FALSE, ch, NULL, vict, TO_NOTVICT);
+      act("Leaping suddenly, $n sinks $s fangs into $N's throat.  As blood\r\n"
+          "sprays and gushes, $n tosses $N's dying body away", FALSE, ch, NULL, vict, TO_NOTVICT);
     }
     else if (!str_cmp(arg2, "slit"))
     {
@@ -408,7 +409,7 @@ ACMD(do_order)
       }
     }
     else
-    {		/* This is order "followers" */
+    {          /* This is order "followers" */
       snprintf(buf, sizeof(buf), "$n issues the order '%s'.", message);
       act(buf, FALSE, ch, 0, vict, TO_ROOM);
 
@@ -457,7 +458,7 @@ ACMD(do_flee)
 
   for (i = 0; i < 6; i++)
   {
-    attempt = number(0, NUM_OF_DIRS - 1);	/* Select a random direction */
+    attempt = number(0, NUM_OF_DIRS - 1);    /* Select a random direction */
     if (CAN_GO(ch, attempt) &&
         !ROOM_FLAGGED(EXIT(ch, attempt)->to_room, ROOM_DEATH))
     {
@@ -579,7 +580,7 @@ ACMD(do_shoot)
     return;
   }
 
-  if ((GET_OBJ_TYPE(wielding) == ITEM_GUN) &&	//gonna add auto reload to this.- mord
+  if ((GET_OBJ_TYPE(wielding) == ITEM_GUN) &&     //gonna add auto reload to this.- mord
       wielding->obj_flags.value[2] <= 0)
   {
     send_to_char("Your weapon is out of ammo.\r\n", ch);
@@ -709,7 +710,8 @@ ACMD(do_ignore)
     new_send_to_char(ch, "SYNTAX: ignore <victim>\r\n");
     new_send_to_char(ch, "Currently on your list:\r\n");
     print_ignorelist(ch, ch);
-  }  else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
+  }
+  else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
   {
     REMOVE_FROM_LIST(a, GET_IGNORELIST(ch), next);
     new_send_to_char(ch, "You no longer ignore them.\r\n");
@@ -736,51 +738,51 @@ ACMD(do_ignore)
 }
 
 /*
-	    gain = 0;
+         gain = 0;
  
-	    	    if (AFF_FLAGGED(ch, AFF_BURNING) &&
-		SECT(IN_ROOM(ch)) == SECT_UNDERWATER) {
-		REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_BURNING);
-	    }
-	    if (AFF_FLAGGED(ch, AFF_ACIDED) &&
-		SECT(IN_ROOM(ch)) == SECT_UNDERWATER) {
-		REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_ACIDED);
-	    }
-	    if (AFF_FLAGGED(ch, AFF_FREEZING) &&
-		SECT(IN_ROOM(ch)) == SECT_DESERT) {
-		REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_FREEZING);
-	    }
-	    if (AFF_FLAGGED(ch, AFF_BURNING)
-		&& !(AFF_FLAGGED(ch, AFF_PROT_FIRE))) {
-		gain += BURN_DAMAGE*3;
-		if (!IS_NPC(ch))
-		new_send_to_char(ch, "{crYour skin burns!{c0\r\n");
-		}
-		
-	    if (AFF_FLAGGED(ch, AFF_FREEZING)
-		&& !(AFF_FLAGGED(ch, AFF_PROT_COLD))) {
-		gain += BURN_DAMAGE*3;
-		if (!IS_NPC(ch))
-		new_send_to_char(ch, "{cCYou shiver with cold!{c0\r\n");
-		}
-	    if (AFF_FLAGGED(ch, AFF_ACIDED)
-		&& !(AFF_FLAGGED(ch, AFF_STONESKIN))) {
-		gain += BURN_DAMAGE*3;
-		if (!IS_NPC(ch))
-		new_send_to_char(ch, "{cgYou skin bubbles with concentrated acid!{c0\r\n");
-		}
-	    
+              if (AFF_FLAGGED(ch, AFF_BURNING) &&
+          SECT(IN_ROOM(ch)) == SECT_UNDERWATER) {
+          REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_BURNING);
+         }
+         if (AFF_FLAGGED(ch, AFF_ACIDED) &&
+          SECT(IN_ROOM(ch)) == SECT_UNDERWATER) {
+          REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_ACIDED);
+         }
+         if (AFF_FLAGGED(ch, AFF_FREEZING) &&
+          SECT(IN_ROOM(ch)) == SECT_DESERT) {
+          REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_FREEZING);
+         }
+         if (AFF_FLAGGED(ch, AFF_BURNING)
+          && !(AFF_FLAGGED(ch, AFF_PROT_FIRE))) {
+          gain += BURN_DAMAGE*3;
+          if (!IS_NPC(ch))
+          new_send_to_char(ch, "{crYour skin burns!{c0\r\n");
+          }
+          
+         if (AFF_FLAGGED(ch, AFF_FREEZING)
+          && !(AFF_FLAGGED(ch, AFF_PROT_COLD))) {
+          gain += BURN_DAMAGE*3;
+          if (!IS_NPC(ch))
+          new_send_to_char(ch, "{cCYou shiver with cold!{c0\r\n");
+          }
+         if (AFF_FLAGGED(ch, AFF_ACIDED)
+          && !(AFF_FLAGGED(ch, AFF_STONESKIN))) {
+          gain += BURN_DAMAGE*3;
+          if (!IS_NPC(ch))
+          new_send_to_char(ch, "{cgYou skin bubbles with concentrated acid!{c0\r\n");
+          }
+         
     if (AFF_FLAGGED(ch, AFF_POISON_1))
-	gain += (GET_MANA(ch) / 7);
+     gain += (GET_MANA(ch) / 7);
  
     if (AFF_FLAGGED(ch, AFF_POISON_2))
-	gain += (GET_MANA(ch) / 5);
+     gain += (GET_MANA(ch) / 5);
  
     if (AFF_FLAGGED(ch, AFF_POISON_3))
-	gain += (GET_MANA(ch) / 3);
+     gain += (GET_MANA(ch) / 3);
  
     if (AFF_FLAGGED(ch, AFF_POISON_4))
-	gain += (GET_MANA(ch) / 2);
+     gain += (GET_MANA(ch) / 2);
    }
 */
 

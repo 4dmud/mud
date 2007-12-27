@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.27  2006/04/03 23:31:35  w4dimenscor
+ * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
+ *
  * Revision 1.26  2006/03/22 22:18:23  w4dimenscor
  * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
  *
@@ -130,6 +133,7 @@ extern struct time_info_data time_info;
 void perform_tell(struct char_data *ch, struct char_data *vict, char *arg);
 int is_tell_ok(struct char_data *ch, struct char_data *vict);
 void add_to_comm(const char *type, const char *text);
+int is_ignoring(struct char_data *ch, struct char_data *vict);
 ACMD(do_say);
 ACMD(do_gsay);
 ACMD(do_tell);
@@ -847,7 +851,7 @@ ACMD(do_tell)
     new_send_to_char(ch, "%s", CONFIG_NOPERSON);
   else if (PRF_FLAGGED(ch, PRF_AFK))
     send_to_char("Impossible...you are afk.\r\n", ch);
-  else if (is_ignoring(ch, vict) && (GET_LEVEL(ch) <= LVL_GOD))
+  else if (is_ignoring(vict, ch) && (GET_LEVEL(ch) <= LVL_GOD))
     act("$E's ignoring you.", FALSE, ch, 0, vict, TO_CHAR);
   else if (is_tell_ok(ch, vict))
     perform_tell(ch, vict, buf2);
@@ -887,7 +891,7 @@ ACMD(do_reply)
 
     if (tch == NULL)
       send_to_char("They are no longer playing.\r\n", ch);
-    else if (is_ignoring(ch, tch) && (GET_LEVEL(ch) <= LVL_GOD))
+    else if (is_ignoring(tch, ch) && (GET_LEVEL(ch) <= LVL_GOD))
       act("$E's ignoring you.", FALSE, ch, 0, tch, TO_CHAR);
     else if (is_tell_ok(ch, tch))
     {
@@ -932,6 +936,10 @@ ACMD(do_spec_comm)
     new_send_to_char(ch,  "Whom do you want to %s.. and what??\r\n", action_sing);
   else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+  else if (is_ignoring(vict, ch))
+{
+  new_send_to_char(ch, "%s is ignoring you.\r\n", GET_NAME(vict));
+}
   else if (vict == ch)
     new_send_to_char(ch, "You can't get your mouth close enough to your ear...\r\n");
   else
@@ -1129,7 +1137,7 @@ ACMD(do_page)
     }
     if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)) != NULL)
     {
-      if (IS_NPC(vict) || (is_ignoring(ch, vict) && GET_LEVEL(ch) <= LVL_GOD))
+      if (IS_NPC(vict) || (is_ignoring(vict, ch) && GET_LEVEL(ch) <= LVL_GOD))
       {
         act("$E's ignoring you.", FALSE, ch, 0, vict, TO_CHAR);
         return;
@@ -1403,7 +1411,8 @@ ACMD(do_gen_comm)
 
       if (GET_LEVEL(i->character) < LVL_HERO && (subcmd == SCMD_HERO && !PLR_FLAGGED(i->character, PLR_HERO)))
         continue;
-      else if (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD))
+      
+      if (is_ignoring(i->character, ch) && (GET_LEVEL(ch) <= LVL_GOD))
         continue;
 
       if (subcmd == SCMD_SHOUT &&

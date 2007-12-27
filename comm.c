@@ -4227,7 +4227,7 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
     if ((to = (const struct char_data *) vict_obj)
         && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check))
     {
-      if (!is_ignoring(ch, (struct char_data *)to))
+      if (!is_ignoring((struct char_data *)to, ch))
         perform_act(str, ch, obj, vict_obj, to);
     }
     return;
@@ -4254,7 +4254,7 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
       continue;
     if (!restrict_check((const struct char_data *)to))
       continue;
-    if (!is_ignoring(ch, (struct char_data *)to))
+    if (!is_ignoring((struct char_data *)to, ch))
       perform_act(str, ch, obj, vict_obj, to);
   }
 }

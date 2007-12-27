@@ -509,6 +509,9 @@ void do_clan_expel(struct char_data *ch, char *arg)
     return;
   }
 
+  //new_send_to_char(ch, "Sorry, this command is disabled for a few days! Sorry! Mordecai\r\n");
+  //return;
+
   if (GET_LEVEL(ch) < LVL_GOD)
   {
     if ((clan_num = find_clan_by_id(GET_CLAN(ch))) < 0)
@@ -980,12 +983,13 @@ void do_clan_info(struct char_data *ch, char *arg)
                    "   O-----------------------------------------------O\r\n",
                    clan[i].name, clan[i].ranks, clan[i].power,
                    clan[i].members, clan[i].treasure);
-
+  if (0) {
   new_send_to_char(ch,
                    "   |         Points          |      Tokens         |\r\n"
                    "   |   Quartz 0  Amethyst 0  |  Brass 0 Bronze 0   |\r\n"
                    "   | Sapphire 0      Ruby 0  | Silver 0   Gold 0   |\r\n"
                    "   O-----------------------------------------------O\r\n");
+  }
 
   new_send_to_char(ch,
                    "   |    Enroll   : %-3d  |    Expel       : %-3d     |\r\n"
@@ -1048,7 +1052,6 @@ sh_int find_clan(char *name)
   int i;
   for (i = 0; i < num_of_clans; i++)
     if (is_abbrev(name, clan[i].name))
-      //if(strcmp(CAP(name), CAP(clan[i].name))==0)
       return i;
   return -1;
 }
@@ -1395,6 +1398,8 @@ void init_clans()
 
   for (j = 0; j <= top_of_p_table; j++)
   {
+    if (IS_SET(player_table[j].flags, PINDEX_DELETED) || IS_SET(player_table[j].flags, PINDEX_SELFDELETE))
+      continue;
 #if 0
     {
       struct char_data *victim;
@@ -1409,6 +1414,9 @@ void init_clans()
           add_clan_member(GET_NAME(victim), GET_CLAN_RANK(victim), i);
           clan[i].power += GET_LEVEL(victim);
           clan[i].members++;
+
+          player_table[j].rank = GET_CLAN_RANK(victim);
+          player_table[j].clan = GET_CLAN(victim);
         }
         free_char(victim);
 
@@ -1419,9 +1427,9 @@ void init_clans()
       TEMP_LOAD_CHAR = FALSE;
     }
 #else
-    if (!IS_SET(player_table[j].flags, PINDEX_DELETED) &&
-        !IS_SET(player_table[j].flags, PINDEX_SELFDELETE) &&
-        player_table[j].name && *player_table[j].name &&
+    
+    
+    if (player_table[j].name && *player_table[j].name &&
         player_table[j].rank > 0 &&
         (i = find_clan_by_id(player_table[j].clan)) >= 0)
     {
@@ -1476,7 +1484,7 @@ void do_clan_list(struct char_data *ch, char *arg)
   temp = clan_list[i];
   while (temp)
   {
-    if (temp->rank < 0) {
+    if (temp->rank > 0) {
     snprintf(buf, sizeof(buf), "%-20s -- Rank: %d.\r\n",
              temp->name,
              temp->rank);
@@ -2334,7 +2342,7 @@ void update_clan_member(char * name, int rank, int clan)
   find = clan_list[clan];
   while (find)
   {
-    if (!strcmp(find->name, name))
+    if (!str_cmp(find->name, name))
     {
       find->rank = rank;
       return;

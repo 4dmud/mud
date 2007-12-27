@@ -78,6 +78,8 @@ void default_char(struct char_data *ch);
 void read_ignorelist(struct char_data *ch);
 void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
 void assemblies_parse(struct descriptor_data *d, char *arg);
+
+int frozen_time(struct char_data *ch);
 extern void assedit_parse(struct descriptor_data *d, char *arg);
 /* local functions */
 int perform_dupe_check(struct descriptor_data *d);
@@ -226,6 +228,7 @@ ACMD(do_olist);
 ACMD(do_order);
 ACMD(do_owners);
 ACMD(do_page);
+ACMD(do_pclean);
 ACMD(do_peace);
 ACMD(do_poofset);
 ACMD(do_pour);
@@ -510,7 +513,7 @@ const struct command_info cmd_info[] =
     { "buy"      , "b"    , POS_STANDING, do_not_here , 0, 0, 0 },
     { "bug"      , "bug"  , POS_DEAD    , do_gen_write, 0, SCMD_BUG, 0 },
 
-    
+
     { "cast"     , "c"    , POS_SITTING , do_cast     , 1, 0, 0 },
     { "calender"     , "cal"    , POS_DEAD , do_calender     , 1, 0, 0 },
     { "cedit"    , "cedit"   , POS_DEAD    , do_oasis    , LVL_IMPL, SCMD_OASIS_CEDIT, 0 },
@@ -718,6 +721,8 @@ const struct command_info cmd_info[] =
     { "page"     , "pag" , POS_SLEEPING    , do_page     , 0, 0, 0 },
     { "pardon"   , "par" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_PARDON, WIZ_DSPLN_GRP },
     { "password" , "pass"     , POS_DEAD    , do_password     , 0, 0, 0 },
+      
+    { "pclean"    , "pclean"  , POS_DEAD    , do_pclean    , LVL_IMPL, 0, WIZ_KILL_GRP },
     { "peace"    , "pea"  , POS_DEAD    , do_peace    , LVL_IMMORT, 0, WIZ_KILL_GRP },
     { "policy"   , "pol" , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES, 0 },
     { "poofin"   , "poofi", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFIN, WIZ_IMM1_GRP },
@@ -861,7 +866,7 @@ const struct command_info cmd_info[] =
     { "unaffect" , "una" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_UNAFFECT, WIZ_HEAL_GRP },
     { "unhitch"      , "unhitch"   , POS_STANDING, do_unhitch      , 0, 0, 0 },
     { "unregister" , "unreg"  , POS_STANDING, do_register , 0, SCMD_UNREGISTER, 0 },
-      
+
     { "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
     { "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
     { "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
@@ -1055,6 +1060,7 @@ void command_interpreter(struct char_data *ch, char *argument)
   int cmd, length;
   char *line;
   char arg[MAX_INPUT_LENGTH];
+  
   if ( !argument || !*argument || !ch)
     return;
 
@@ -1122,9 +1128,8 @@ void command_interpreter(struct char_data *ch, char *argument)
 
   if (*complete_cmd_info[cmd].command == '\n')
     new_send_to_char(ch, "Huh?!?\r\n");
-  else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL)
+  else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL && frozen_time(ch) > 0)
   {
-    int frozen_time(struct char_data *ch);
     new_send_to_char(ch, "Unfrozen in %d seconds.\r\n", frozen_time(ch));
     new_send_to_char(ch, "You try, but the mind-numbing cold prevents you...\r\n");
 
@@ -1433,7 +1438,7 @@ int search_block(char *arg, const char **list, int exact)
   {
     if (!l)
       l = 1;        /* Avoid "" to match the first available
-                                                        * string */
+                                                            * string */
     for (i = 0; **(list + i) != '\n'; i++)
       if (!strncmp(arg, *(list + i), l))
         return (i);
@@ -2209,16 +2214,17 @@ int enter_player_game(struct descriptor_data *d)
   load_result = Crash_load(ch);
   read_ignorelist(ch);
   load_locker(ch);
-  
+
   if (LOCKER(ch))
     new_mudlog( NRM, GET_LEVEL(ch), TRUE, "  -- with %d items in locker", count_locker(ch));
 
-  if (GET_CLAN_RANK(ch) < 0) {
+  if (GET_CLAN_RANK(ch) < 0)
+  {
     GET_CLAN_RANK(ch) = 0;
     GET_CLAN(ch) = 0;
-  new_send_to_char(ch, "You have been removed from your clan.\r\n");
+    new_send_to_char(ch, "You have been removed from your clan.\r\n");
   }
- 
+
   /* Clear their load room if it's not persistant. */
   if (!PLR_FLAGGED(ch, PLR_LOADROOM))
     GET_LOADROOM(ch) = NOWHERE;
@@ -2437,10 +2443,12 @@ void nanny(struct descriptor_data *d, char *arg)
 
       d->character->desc = d;
     }
-    if (!*arg) {
+    if (!*arg)
+    {
       STATE(d) = CON_CLOSE;
       d->close_me = TRUE;
-    } else
+    }
+    else
     {
       if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 ||
           strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name)
