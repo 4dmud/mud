@@ -425,7 +425,7 @@ bool can_auction_item(struct char_data * ch, struct obj_data * obj)
       || GET_OBJ_TYPE(obj) == ITEM_TRAP || GET_OBJ_TYPE(obj) == ITEM_NOTE
       || GET_OBJ_TYPE(obj) == ITEM_KEY || GET_OBJ_TYPE(obj) == ITEM_FOOD
       || GET_OBJ_TYPE(obj) == ITEM_MONEY || GET_OBJ_TYPE(obj) == ITEM_PEN
-      || GET_OBJ_TYPE(obj) == ITEM_BOAT
+      || GET_OBJ_TYPE(obj) == ITEM_BOAT || GET_OBJ_TYPE(obj) == ITEM_TREASURE
       || GET_OBJ_TYPE(obj) == ITEM_FOUNTAIN
       || GET_OBJ_TYPE(obj) == ITEM_WEAPON
       || GET_OBJ_TYPE(obj) == ITEM_ARMOR || GET_OBJ_TYPE(obj) == ITEM_FOCUS_MAJOR
