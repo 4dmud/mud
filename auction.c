@@ -280,6 +280,9 @@ ACMD(do_auction)
     new_send_to_char(ch, "You can't auction that item.\r\n");
   else if (mob == NULL)
     new_send_to_char(ch, "The auctioneer seems to be dead.\r\n");
+  else if((atoi(buf2) != 0 ? atoi(buf2) : 1)<0){
+    new_send_to_char(ch, "Try a positive amount instead.\r\n");
+  }
   else {
     struct auction_data *n_auc;
     for (n_auc = auction; n_auc && n_auc->next; n_auc = n_auc->next, i++);
