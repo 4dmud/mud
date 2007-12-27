@@ -589,7 +589,7 @@ void redit_disp_menu(Descriptor *d)
                   grn, nrm, cyn, room->listen,/* listen */
                   grn, nrm, cyn, room->mine.num, room->mine.dif, room->mine.num == -1 ? "None" : room->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe",
                   grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
-                  grn, nrm,/*delete*/
+//                  grn, nrm,/*delete*/
                   grn, nrm /*quit*/
 
 
