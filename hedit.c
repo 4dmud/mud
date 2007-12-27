@@ -205,7 +205,7 @@ void hedit_disp_menu(Descriptor *d)
     get_char_cols(d->character);
     help = OLC_HELP(d);
 
-    new_send_to_char((d->character),
+    d->Output(
 #if defined(CLEAR_SCREEN)
 	    "[H[J"
 #endif
@@ -242,7 +242,7 @@ void hedit_parse(Descriptor *d, char *arg)
 	     * Do NOT free strings! Just the help structure. 
 	     */
 	    cleanup_olc(d, CLEANUP_STRUCTS);
-	    send_to_char("Help entry saved to memory.\r\n", d->character);
+	    d->Output("Help entry saved to memory.\r\n");
 	    break;
 	case 'n':
 	case 'N':
@@ -252,9 +252,7 @@ void hedit_parse(Descriptor *d, char *arg)
 	    cleanup_olc(d, CLEANUP_ALL);
 	    break;
 	default:
-	    send_to_char
-		("Invalid choice!\r\nDo you wish to save this help entry internally? : ",
-		 d->character);
+	    d->Output("Invalid choice!\r\nDo you wish to save this help entry internally? : ");
 	    break;
 	}
 	return;
@@ -264,27 +262,25 @@ void hedit_parse(Descriptor *d, char *arg)
 	case 'q':
 	case 'Q':
 	    if (OLC_VAL(d)) {	/* Something has been modified. */
-		send_to_char
-		    ("Do you wish to save this help entry internally? : ",
-		     d->character);
+		d->Output("Do you wish to save this help entry internally? : ");
 		OLC_MODE(d) = HEDIT_CONFIRM_SAVESTRING;
 	    } else
 		cleanup_olc(d, CLEANUP_ALL);
 	    send_to_char("\r\n", d->character);
 	    return;
 	case '1':
-	    send_to_char("Enter keywords:-\r\n] ", d->character);
+	    d->Output("Enter keywords:-\r\n] ");
 	    OLC_MODE(d) = HEDIT_KEYWORDS;
 	    break;
 	case '2':
 	    OLC_MODE(d) = HEDIT_ENTRY;
 #if defined(CLEAR_SCREEN)
-	    SEND_TO_Q("\x1B[H\x1B[J", d);
+	    d->Output("\x1B[H\x1B[J");
 #endif
-	    SEND_TO_Q("Enter help entry: (/s saves /h for help)\r\n\r\n",   d);
+	    d->Output("Enter help entry: (/s saves /h for help)\r\n\r\n");
 	    d->backstr = NULL;
 	    if (OLC_HELP(d)->entry) {
-		SEND_TO_Q(OLC_HELP(d)->entry, d);
+		d->Output(OLC_HELP(d)->entry);
 		d->backstr = str_dup(OLC_HELP(d)->entry);
 	    }
 	    d->str = &OLC_HELP(d)->entry;
@@ -293,11 +289,11 @@ void hedit_parse(Descriptor *d, char *arg)
 	    OLC_VAL(d) = 1;
 	    break;
 	case '3':
-	    send_to_char("Enter min level:-\r\n] ", d->character);
+	    d->Output("Enter min level:-\r\n] ");
 	    OLC_MODE(d) = HEDIT_MIN_LEVEL;
 	    break;
 	default:
-	    send_to_char("Invalid choice!\r\n", d->character);
+	    d->Output("Invalid choice!\r\n");
 	    hedit_disp_menu(d);
 	    break;
 	}
@@ -322,9 +318,7 @@ void hedit_parse(Descriptor *d, char *arg)
     case HEDIT_MIN_LEVEL:
 	number = atoi(arg);
 	if ((number < 0) || (number > LVL_IMPL))
-	    send_to_char
-		("That is not a valid choice!\r\nEnter min level:-\r\n] ",
-		 d->character);
+	    d->Output("That is not a valid choice!\r\nEnter min level:-\r\n] ");
 	else {
 	    OLC_HELP(d)->min_level = number;
 	    break;

@@ -898,9 +898,9 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         if (ch->master && ch->master != ch)
             if (IN_ROOM(ch->master) == IN_ROOM(ch)) {
                 if (ch->hitched)
-                    new_send_to_char(ch->master, "%s sneaks in after you pulling %s.\r\n", PERS(ch, ch->master), ch->hitched->short_description);
+                    ch->master->Send("%s sneaks in after you pulling %s.\r\n", PERS(ch, ch->master), ch->hitched->short_description);
                 else
-                    new_send_to_char(ch->master, "%s sneaks in after you.\r\n", PERS(ch, ch->master));
+                    ch->master->Send("%s sneaks in after you.\r\n", PERS(ch, ch->master));
 
             }
 
@@ -2325,18 +2325,17 @@ ASKILL(skill_blackjack) {
 
 
     if (affected_by_spell(vict, SKILL_BLACKJACK)) {
-        new_send_to_char
-        (ch, "They are guarding their head too well right now.\r\n");
+        ch->Send("They are guarding their head too well right now.\r\n");
         return 0;
     }
 
     if (GET_POS(vict) == POS_SLEEPING) {
-        send_to_char("But that person is already asleep!\r\n", ch);
+        ch->Send("But that person is already asleep!\r\n");
         return 0;
     }
 
     if (GET_POS(vict) == POS_FIGHTING) {
-        send_to_char("They are moving about too much.\r\n", ch);
+        ch->Send("They are moving about too much.\r\n");
         return 0;
     }
     chance += GET_SKILL(ch, SKILL_BLACKJACK);

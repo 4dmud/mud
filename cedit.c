@@ -1162,8 +1162,7 @@ void cedit_parse(Descriptor *d, char *arg)
          case 'j':
          case 'J':
            TOGGLE_VAR(OLC_CONFIG(d)->operation.use_new_socials);
-           new_send_to_char(d->character, 
-              "Please note that using the stock social file will disable AEDIT.\r\n");
+           d->character->Send("Please note that using the stock social file will disable AEDIT.\r\n");
            break;
 
          case 'k':

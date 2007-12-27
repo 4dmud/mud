@@ -316,12 +316,12 @@ ACTION(thing_tunneling)
         to_char = tunnel_msgs[number(0, 36)];
 
       time = (long)((11 RL_SEC) * ((100.0 - IRANGE(0, MINE_SPEED(ch), 99))/100.0));
-      log("%ld next tunnel hit is that many seconds.", time);
-      new_send_to_char(ch ,"Next tunnel hit in %ld seconds.\r\n", time);
+      //log("%ld next tunnel hit is that many seconds.", time);
+      //ch->Send("Next tunnel hit in %ld seconds.\r\n", time);
       break;
     case 1:
       *num = 0;
-      log("Ending_tunneling start make_tunnel");
+      //log("Ending_tunneling start make_tunnel");
       make_tunnel(ch);
       return 0;
     }

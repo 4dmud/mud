@@ -87,7 +87,7 @@ ACMD (do_assedit)
       else
       {
         assemblyCreate(atoi(buf2), 0);
-        new_send_to_char(d->character, "Assembly Created.\r\n");
+        d->Output("Assembly Created.\r\n");
         assemblySaveAssemblies();
         return;
       }
@@ -100,7 +100,7 @@ ACMD (do_assedit)
         else
         {
           assemblyDestroy(atoi(buf2));
-          new_send_to_char(d->character, "Assembly Deleted.\r\n");
+          d->Output("Assembly Deleted.\r\n");
           assemblySaveAssemblies();
           return;
         }
@@ -135,7 +135,7 @@ void assedit_setup(Descriptor *d, int num)
 
   if( (pOldAssembly = assemblyGetAssemblyPtr( num )) == NULL )
   {
-    new_send_to_char(d->character, "That assembly does not exist\r\n");
+    d->Output("That assembly does not exist\r\n");
     cleanup_olc(d, CLEANUP_ALL);
     return;
   }
@@ -402,7 +402,7 @@ void assedit_parse(Descriptor *d, char *arg)
     }
     else
     {
-      new_send_to_char(d->character, "That object does not exist. Please try again\r\n");
+      d->Output("That object does not exist. Please try again\r\n");
       assedit_disp_menu(d);
     }
     break;

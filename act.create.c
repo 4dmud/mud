@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.19  2006/09/15 08:01:11  w4dimenscor
+ * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
+ *
  * Revision 1.18  2006/08/18 11:09:58  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -600,8 +603,7 @@ ASKILL(skill_tinker)
 
   if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_TINKERED) || IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_MAGIC))
   {
-    new_send_to_char
-    (ch,"The weapon is imbued with magical powers beyond your grasp.\r\n"
+    ch->Send("The weapon is imbued with magical powers beyond your grasp.\r\n"
      "You can not further affect its form.\r\n");
     return 0;
   }

@@ -391,12 +391,8 @@ void find_game_winner(void)
             game_length - time_left_in_game, GET_NAME(i));
         }
         i->Gold(arena_pot / 2, GOLD_ALL);
-        new_send_to_char(i,
-                         "You have earned %ld coins for winning the arena.\r\n",
-                         (arena_pot / 2));
-        send_to_arena(
-          "%s has been awarded %ld coins for winning arena.\r\n",
-          GET_NAME(i), (arena_pot / 2));
+        i->Send("You have earned %ld coins for winning the arena.\r\n", (arena_pot / 2));
+        send_to_arena("%s has been awarded %ld coins for winning arena.\r\n", GET_NAME(i), (arena_pot / 2));
         CREATE(fame_node, struct hall_of_fame_element, 1);
         strncpy(fame_node->name, GET_NAME(i), MAX_NAME_LENGTH);
         fame_node->name[MAX_NAME_LENGTH] = '\0';
@@ -627,8 +623,7 @@ void find_bet_winners(Character *winner)
           (GET_BETTED_ON(i) == GET_IDNUM(winner))
           && GET_AMT_BET(i) > 0)
       {
-        new_send_to_char(i,  "You have won %d coins on your bet.\r\n",
-                         GET_AMT_BET(i) * 2);
+        i->Send("You have won %d coins on your bet.\r\n", GET_AMT_BET(i) * 2);
         i->Gold(GET_AMT_BET(i) * 2, GOLD_ALL);
         GET_BETTED_ON(i) = 0;
         GET_AMT_BET(i) = 0;

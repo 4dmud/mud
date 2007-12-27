@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/25 10:22:43 $
-*  $Revision: 1.33 $
+*  $Date: 2006/09/15 08:01:12 $
+*  $Revision: 1.34 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.34  2006/09/15 08:01:12  w4dimenscor
+ * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
+ *
  * Revision 1.33  2006/08/25 10:22:43  w4dimenscor
  * added command to fix peoples skills back to the practiced amount they were at
  *
@@ -1631,7 +1634,7 @@ void script_vlog(const char *format, va_list args) {
         if (NRM > (PRF_FLAGGED(i->character, PRF_LOG1) ? 1 : 0) + (PRF_FLAGGED(i->character, PRF_LOG2) ? 2 : 0))
             continue;
 
-        new_send_to_char(i->character, "%s%s%s", CCGRN(i->character, C_NRM), buf, CCNRM(i->character, C_NRM));
+        i->Output( "%s%s%s", CCGRN(i->character, C_NRM), buf, CCNRM(i->character, C_NRM));
     }
 }
 
@@ -3244,7 +3247,7 @@ ACMD(do_tlist) {
     DYN_CREATE;
     *dynbuf = 0;
     /** Store the header for the room listing. **/
-    new_send_to_char (ch,
+    ch->Send(
                       "Index VNum    Trigger Name                        Type\r\n"
                       "----- ------- -------------------------------------------------------\r\n");
     /** Loop through the world and find each room. **/

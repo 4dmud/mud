@@ -108,19 +108,18 @@ ACMD(do_drive)
     controls = get_obj_in_list_type(ITEM_V_CONTROLS,
 				    IN_ROOM(ch)->contents);
     if (!controls) {
-	send_to_char
-	    ("ERROR!  Vehicle controls present yet not present!\r\n", ch);
+	ch->Send("ERROR!  Vehicle controls present yet not present!\r\n");
 	return;
     }
     vehicle = find_vehicle_by_vnum(GET_OBJ_VAL(controls, 0));
     if (!vehicle) {
-	send_to_char("ERROR!  Vehicle has been lost somehow!\r\n", ch);
+	ch->Send("ERROR!  Vehicle has been lost somehow!\r\n");
 	return;
     }
 
     if (IS_AFFECTED(ch, AFF_BLIND)) {
 	/* Blind characters can't drive! */
-	send_to_char("You can't see the controls!\r\n", ch);
+	ch->Send("You can't see the controls!\r\n");
 	return;
     }
 
@@ -220,7 +219,7 @@ ACMD(do_drive)
 		    return;
 		else if (!EXIT(vehicle, dir) || EXIT(vehicle, dir)->to_room == NULL) {
 		    /* But there is no exit that way */
-		    send_to_char("Alas, you cannot go that way...\r\n", ch);
+		    ch->Send("Alas, you cannot go that way...\r\n");
 		    return;
 		} else
 		    if (IS_SET(EXIT(vehicle, dir)->exit_info, EX_CLOSED)) {
@@ -229,15 +228,14 @@ ACMD(do_drive)
 			ch->Send( "The %s seems to be closed.\r\n",
 				fname(EXIT(vehicle, dir)->keyword));
 		    } else
-			send_to_char("It seems to be closed.\r\n", ch);
+			ch->Send("It seems to be closed.\r\n");
 		    return;
 		} else
 		    if (!IS_SET_AR
 			(ROOM_FLAGS(EXIT(vehicle, dir)->to_room),
 			 ROOM_VEHICLE)) {
 		    /* But the vehicle can't go that way */
-		    send_to_char
-			("The vehicle can't manage that terrain.\r\n", ch);
+		    ch->Send("The vehicle can't manage that terrain.\r\n");
 		    return;
 		} else {
 		    /* But nothing!  Let's go that way! */
@@ -268,7 +266,7 @@ ACMD(do_drive)
 		    return;
 		}
 	    }
-    send_to_char("Thats not a valid direction.\r\n", ch);
+    ch->Send("Thats not a valid direction.\r\n");
     return;
 }
 
@@ -290,7 +288,7 @@ SPECIAL(vehicle)
 				IN_ROOM(ch)->contents);
 
 	if (!obj) {
-	    send_to_char("Nothing by that name is here to enter!\r\n", ch);
+	    ch->Send("Nothing by that name is here to enter!\r\n");
 	    return (1);
 	} else if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE) {
 	    
@@ -327,12 +325,12 @@ SPECIAL(vehicle_hatch)
 	    get_obj_in_list_type(ITEM_V_HATCH,
 				 IN_ROOM(ch)->contents);
 	if (!hatch) {
-	    send_to_char("ERROR!  Hatch is there, yet it isn't!\r\n", ch);
+	    ch->Send("ERROR!  Hatch is there, yet it isn't!\r\n");
 	    return (1);
 	}
 	v = find_vehicle_by_vnum(GET_OBJ_VAL(hatch, 0));
 	if (!v) {
-	    send_to_char("ERROR!  Vehicle has been lost somehow!\r\n", ch);
+	    ch->Send("ERROR!  Vehicle has been lost somehow!\r\n");
 	    return (1);
 	}
 	act("$n leaves $o.", TRUE, ch, v, 0, TO_ROOM);
@@ -360,14 +358,12 @@ SPECIAL(vehicle_window)
 		get_obj_in_list_type(ITEM_V_WINDOW,
 				     IN_ROOM(ch)->contents);
 	    if (!viewport) {
-		send_to_char
-		    ("ERROR!  Viewport present, yet not present!\r\n", ch);
+		ch->Send("ERROR!  Viewport present, yet not present!\r\n");
 		return (1);
 	    }
 	    v = find_vehicle_by_vnum(GET_OBJ_VAL(viewport, 0));
 	    if (!v) {
-		send_to_char("ERROR!  Vehicle has been lost somehow!\r\n",
-			     ch);
+		ch->Send("ERROR!  Vehicle has been lost somehow!\r\n");
 		return (1);
 	    }
 	    view_room_by_rnum(ch, v->in_room);

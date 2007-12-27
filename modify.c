@@ -272,7 +272,7 @@ void playing_string_cleanup(Descriptor *d, int action) {
             d->Output( "Message sent!\r\n");
             if ((to = find_char(d->mail_to)) != NULL) {
                 HAS_MAIL(to) = -1;
-                new_send_to_char(to, "You have a new mud-mail in your inbox.\r\n");
+                to->Send("You have a new mud-mail in your inbox.\r\n");
             }
 
         } else
@@ -464,16 +464,16 @@ ACMD(do_subskillset) {
     argument = one_argument(argument, buf);
 
     if (!*buf) {
-        send_to_char("Learned value expected.\r\n", ch);
+        ch->Send("Learned value expected.\r\n");
         return;
     }
     value = atoi(buf);
     if (value < 0) {
-        send_to_char("Minimum value for learned is 0.\r\n", ch);
+        ch->Send("Minimum value for learned is 0.\r\n");
         return;
     }
     if (value > 100) {
-        send_to_char("Max value for learned is 100.\r\n", ch);
+        ch->Send("Max value for learned is 100.\r\n");
         return;
     }
 

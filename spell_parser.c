@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.32  2006/09/15 08:01:12  w4dimenscor
+ * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
+ *
  * Revision 1.31  2006/08/31 10:39:17  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -520,7 +523,7 @@ int call_magic(Character *caster, Character *cvict,
             else
                 act("$ns magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
 
-            new_send_to_char(caster, "Your magic fizzles out and dies.\r\n");
+            caster->Send("Your magic fizzles out and dies.\r\n");
             GET_WAIT_STATE(caster) += ( 2 RL_SEC);
             return (0);
         }

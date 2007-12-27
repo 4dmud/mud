@@ -152,7 +152,7 @@ void list_rooms(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
     top    = vmax;
   }
   
-  new_send_to_char (ch,
+  ch->Send(
   "Index VNum    Room Name                                Exits\r\n"
   "----- ------- ---------------------------------------- -----\r\n");
   
@@ -289,7 +289,7 @@ void list_shops(Character *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax)
     top    = vmax;
   }
   
-  new_send_to_char (ch,
+  ch->Send(
   "Index VNum    RNum    Keeper  Shop Room(s)\r\n"
   "----- ------- ------- ------- -----------------------------------------\r\n");
   
@@ -449,7 +449,7 @@ void list_triggers(Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax
 
 
   /** Store the header for the room listing. **/
-  new_send_to_char (ch,
+  ch->Send(
   "Index VNum    Trigger Name                        Type\r\n"
   "----- ------- -------------------------------------------------------\r\n");
 

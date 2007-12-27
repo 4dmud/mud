@@ -541,7 +541,7 @@ void new_mudlog(int type, int level, int file, const char *str, ...) {
         if (type > (PRF_FLAGGED(i->character, PRF_LOG1) ? 1 : 0) + (PRF_FLAGGED(i->character, PRF_LOG2) ? 2 : 0))
             continue;
 
-        new_send_to_char(i->character, "%s%s%s", CCGRN(i->character, C_NRM), buf, CCNRM(i->character, C_NRM));
+        i->character->Send("%s%s%s", CCGRN(i->character, C_NRM), buf, CCNRM(i->character, C_NRM));
     }
 }
 

@@ -354,7 +354,7 @@ void list_obj_to_char(struct obj_data *list, Character *ch,
         }
     }
     if (!found && show)
-        send_to_char(" Nothing.\r\n", ch);
+        ch->Send(" Nothing.\r\n");
 }
 
 
@@ -624,10 +624,10 @@ void look_at_char(Character *i, Character *ch) {
                 if (GET_EQ(i, wear_order_index[j])
                         && CAN_SEE_OBJ(ch, GET_EQ(i, wear_order_index[j]))) {
                     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                        send_to_char("\x1B[33m", ch);
+                        ch->Send("\x1B[33m");
                     send_to_char(disp_where(wear_order_index[j], i), ch);
                     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                        send_to_char("\x1B[0m", ch);
+                        ch->Send("\x1B[0m");
                     show_obj_to_char(GET_EQ(i, wear_order_index[j]), ch,  SHOW_OBJ_SHORT);
                 }
         } else
@@ -893,7 +893,7 @@ ACMD(do_search) {
     int door, chance = 1;
 
     if (IS_AFFECTED(ch, AFF_BLIND)) {
-        send_to_char("You're blind, you can't see a damned thing!", ch);
+        ch->Send("You're blind, you can't see a damned thing!");
         return;
     }
 
@@ -929,8 +929,7 @@ ACMD(do_exits) {
     //ch->Send( MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
 
     if (AFF_FLAGGED(ch, AFF_BLIND)) {
-        send_to_char("You can't see a damned thing, you're blind!\r\n",
-                     ch);
+        ch->Send("You can't see a damned thing, you're blind!\r\n");
         return;
     }
     ch->Send( "Obvious exits:\r\n");
@@ -1223,7 +1222,7 @@ void look_at_room(Character *ch, int ignore_brief) {
         ch->Send( " (%s)", tbuf);
     } else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_WILDERNESS)) {
         parse_room_name(IN_ROOM(ch), tbuf, sizeof(tbuf));
-        send_to_char(tbuf, ch);
+        ch->Send(tbuf);
     } else if (ROOM_FLAGGED(view_room, ROOM_ARENA)) {
         ch->Send( "%s (%sARENA%s)", view_room->name,
                   CBWHT(ch, C_NRM), CCCYN(ch, C_NRM));
@@ -1357,7 +1356,7 @@ void look_in_direction(Character *ch, int dir) {
         }
 
     } else
-        send_to_char("Nothing special there...\r\n", ch);
+        ch->Send("Nothing special there...\r\n");
 }
 
 
@@ -2412,16 +2411,16 @@ ACMD(do_equipment) {
     }
     if (isname("all", argument))
         all = TRUE;
-    send_to_char("You are using:\r\n", ch);
+    ch->Send("You are using:\r\n");
     for (i = 0; i < NUM_WEARS; i++) {
         if (!HAS_BODY(ch, wear_order_index[i]))
             continue;
         if (all) {
             if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                send_to_char("\x1B[33m", ch);
+                ch->Send("\x1B[33m");
             ch->Send( "%s ", disp_where(wear_order_index[i], ch));
             if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                send_to_char("\x1B[0m", ch);
+                ch->Send("\x1B[0m");
             found = TRUE;
         }
         if (GET_EQ(ch, wear_order_index[i])) {
@@ -2429,10 +2428,10 @@ ACMD(do_equipment) {
             if (CAN_SEE_OBJ(ch, GET_EQ(ch, wear_order_index[i]))) {
                 if (!all) {
                     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                        send_to_char("\x1B[33m", ch);
+                        ch->Send("\x1B[33m");
                     ch->Send( "%s ", disp_where(wear_order_index[i], ch));
                     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-                        send_to_char("\x1B[0m", ch);
+                        ch->Send("\x1B[0m");
                 }
                 show_obj_to_char(GET_EQ(ch, wear_order_index[i]), ch, 1);
                 found = TRUE;
@@ -2461,7 +2460,7 @@ ACMD(do_settime) {
 
     time = atoi(argument);
     time_info.hours = time;
-    send_to_char("Time has been set.\r\n", ch);
+    ch->Send("Time has been set.\r\n");
     return;
 }
 
@@ -2527,8 +2526,7 @@ ACMD(do_weather) {
                    "you feel a warm wind from the south" :
                    "your foot tells you bad weather is due"));
     } else
-        send_to_char("You have no feeling about the weather at all.\r\n",
-                     ch);
+        ch->Send("You have no feeling about the weather at all.\r\n");
 
     if (GET_LEVEL(ch) >= LVL_GOD) {
         ch->Send( "Pressure: {cC%d{cx, Change: {cC%d{cx\r\n",
@@ -3345,12 +3343,12 @@ ACMD(do_users) {
                         break;
                 */
             default:
-                send_to_char(USERS_FORMAT, ch);
+                ch->Send(USERS_FORMAT);
                 return;
             }             /* end of switch */
 
         } else {          /* endif */
-            send_to_char(USERS_FORMAT, ch);
+            ch->Send(USERS_FORMAT);
             return;
         }
     }                 /* end while (parser) */
@@ -3494,13 +3492,13 @@ ACMD(do_gen_ps) {
         page_string(ch->desc, imotd, 0);
         break;
     case SCMD_CLEAR:
-        send_to_char("\033[H\033[J", ch);
+        ch->Send("\033[H\033[J");
         break;
     case SCMD_VERSION:
         ch->Send( "%s\r\n", fourdimensions_version);
         ch->Send( "%s\r\n", oasisolc_version);
         ch->Send( "%s\r\n", circlemud_version);
-        new_send_to_char(ch ,"%s\r\n", DG_SCRIPT_VERSION);
+        ch->Send( "%s\r\n", DG_SCRIPT_VERSION);
         break;
     case SCMD_WHOAMI:
         ch->Send( "%s\r\n", GET_NAME(ch));
@@ -3517,8 +3515,7 @@ void perform_mortal_where(Character *ch, char *arg) {
     register Descriptor *d;
 
     if (!*arg) {
-        send_to_char("Players in your Zone\r\n--------------------\r\n",
-                     ch);
+        ch->Send("Players in your Zone\r\n--------------------\r\n");
         for (d = descriptor_list; d; d = d->next) {
             if (STATE(d) != CON_PLAYING || d->character == ch)
                 continue;
@@ -3550,7 +3547,7 @@ void perform_mortal_where(Character *ch, char *arg) {
                       IN_ROOM(i)->name);
             return;
         }
-        send_to_char("No-one around by that name.\r\n", ch);
+        ch->Send("No-one around by that name.\r\n");
     }
 }
 
@@ -3619,7 +3616,7 @@ void perform_immort_where(Character *ch, char *arg) {
     *dynbuf = 0;
 
     if (!*arg) {
-        send_to_char("Players\r\n-------\r\n", ch);
+        ch->Send("Players\r\n-------\r\n");
         for (d = descriptor_list; d; d = d->next) {
             lock_desc(d);
             if (STATE(d) == CON_PLAYING) {
@@ -3684,7 +3681,7 @@ void perform_immort_where(Character *ch, char *arg) {
             if (dynbuf)
                 ;
             free(dynbuf);
-            send_to_char("Couldn't find any such thing.\r\n", ch);
+            ch->Send("Couldn't find any such thing.\r\n");
         } else
             page_string(ch->desc, dynbuf, DYN_BUFFER);
     }
@@ -3711,7 +3708,7 @@ ACMD(do_levels) {
     size_t len = 0;
 
     if (IS_NPC(ch)) {
-        send_to_char("You ain't nothin' but a hound-dog.\r\n", ch);
+        ch->Send("You ain't nothin' but a hound-dog.\r\n");
         return;
     }
 
@@ -3735,7 +3732,7 @@ ACMD(do_levels) {
             len += snprintf(buf + len, sizeof(buf) - len, "%s", title_female(GET_CLASS(ch), i));
             break;
         default:
-            send_to_char("Oh dear.  You seem to be sexless.\r\n", ch);
+            ch->Send("Oh dear.  You seem to be sexless.\r\n");
             break;
         }
         len += snprintf(buf + len, sizeof(buf) - len, "%s", "\r\n");
@@ -3848,11 +3845,11 @@ ACMD(do_consider) {
 
 
     if (!(victim = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM))) {
-        send_to_char("Consider killing who?\r\n", ch);
+        ch->Send("Consider killing who?\r\n");
         return;
     }
     if (victim == ch) {
-        send_to_char("Easy!  Very easy indeed!\r\n", ch);
+        ch->Send("Easy!  Very easy indeed!\r\n");
         return;
     }
     ch->Send( "%s is a tier %d %s\r\n", GET_NAME(victim), current_class_is_tier_num(victim), simple_class_name(victim));
@@ -3861,100 +3858,73 @@ ACMD(do_consider) {
         if ((PLR_FLAGGED(ch, PLR_PK) && PLR_FLAGGED(victim, PLR_PK))
                 || (PLR_FLAGGED(victim, PLR_KILLER))
                 || (arena_ok(ch, victim))) {
-            send_to_char("You get considered by somebody.\r\n", victim);
+           victim->Send("You get considered by somebody.\r\n");
             diff = (GET_MAX_HIT(ch) - GET_MAX_HIT(victim));
             diff2 = (GET_MAX_MANA(ch) - GET_MAX_MANA(victim));
             diff3 = (GET_DAMROLL(ch) - GET_DAMROLL(victim));
             if (diff <= -400)
-                send_to_char("They are WAY tougher then you, uh ohh.\r\n",
-                             ch);
+                ch->Send("They are WAY tougher then you, uh ohh.\r\n");
             else if (diff <= -200)
-                send_to_char
-                ("They are quite reasonably tougher then you.\r\n",
-                 ch);
+                ch->Send("They are quite reasonably tougher then you.\r\n");
             else if (diff <= -100)
-                send_to_char("They are moderately tougher then you.\r\n",
-                             ch);
+                ch->Send("They are moderately tougher then you.\r\n");
             else if (diff < -10)
-                send_to_char("They are a bit tougher then you.\r\n", ch);
+                ch->Send("They are a bit tougher then you.\r\n");
             else if (diff >= (-10) && diff <= 10)
-                send_to_char("They are as tough as you!\r\n", ch);
+                ch->Send("They are as tough as you!\r\n");
             else if (diff <= (100))
-                send_to_char("They are not nearly as tough as you.\r\n",
-                             ch);
+                ch->Send("They are not nearly as tough as you.\r\n");
             else if (diff <= (200))
-                send_to_char
-                ("They are tough but not up to your standard.\r\n",
-                 ch);
+                ch->Send("They are tough but not up to your standard.\r\n");
             else if (diff <= (400))
-                send_to_char("You are way tougher then they are.\r\n", ch);
+                ch->Send("You are way tougher then they are.\r\n");
             else if (diff > 400)
-                send_to_char("Is it even worth fighting for?\r\n", ch);
+                ch->Send("Is it even worth fighting for?\r\n");
 
             if (diff2 <= -5000)
-                send_to_char
-                ("Comparing your magical energy is like comparing a match to a super nova.\r\n",
-                 ch);
+                ch->Send("Comparing your magical energy is like comparing a match to a super nova.\r\n");
             else if (diff2 <= -2500)
-                send_to_char
-                ("They have more magical ability in one finger then you have in your entire being.\r\n",
-                 ch);
+                ch->Send("They have more magical ability in one finger then you have in your entire being.\r\n");
             else if (diff2 <= -1000)
-                send_to_char
-                ("They have enchanting energy like you could only dream of.\r\n",
-                 ch);
+                ch->Send("They have enchanting energy like you could only dream of.\r\n");
             else if (diff2 < -500)
-                send_to_char("They have magical energy to spare!\r\n", ch);
+                ch->Send("They have magical energy to spare!\r\n");
             else if (diff2 < -100)
-                send_to_char("They are what wishes are made of.\r\n", ch);
+                ch->Send("They are what wishes are made of.\r\n");
             else if (diff2 > -100 && diff2 < 100)
-                send_to_char
-                ("Your magical energys are about the same.\r\n", ch);
+                ch->Send("Your magical energys are about the same.\r\n");
             else if (diff2 < 500)
-                send_to_char
-                ("They have lower magical energy then you.\r\n", ch);
+                ch->Send("They have lower magical energy then you.\r\n");
             else if (diff2 < 1000)
-                send_to_char
-                ("They have much lower magical energy then you.\r\n", ch);
+                ch->Send("They have much lower magical energy then you.\r\n");
             else if (diff2 < 2500)
-                send_to_char
-                ("They have magical energy that almost reaches the knees of your magical energy.\r\n",
-                 ch);
+                ch->Send("They have magical energy that almost reaches the knees of your magical energy.\r\n");
             else if (diff2 <= 5000)
-                send_to_char
-                ("You have substantially more magical energy.\r\n",
-                 ch);
+                ch->Send("You have substantially more magical energy.\r\n");
             else if (diff2 > 5000)
-                send_to_char
-                ("You have the most magical energy by far.\r\n", ch);
+                ch->Send("You have the most magical energy by far.\r\n");
 
             if (diff3 < -60)
-                send_to_char("EPITAPH: Here Lies One Stupid Player.\r\n",
-                             ch);
+                ch->Send("EPITAPH: Here Lies One Stupid Player.\r\n");
             else if (diff3 < -40)
-                send_to_char("You have more chance in a Deathtrap\r\n",
-                             ch);
+                ch->Send("You have more chance in a Deathtrap\r\n");
             else if (diff3 < -20)
-                send_to_char
-                ("They probably eat fools like you for breakfast.\r\n",
-                 ch);
+                ch->Send("They probably eat fools like you for breakfast.\r\n");
             else if (diff3 < -10)
-                send_to_char("They gonna hurt you bad.\r\n", ch);
+                ch->Send("They gonna hurt you bad.\r\n");
             else if (diff3 >= -10 && diff3 <= 10)
-                send_to_char("You are about the same damage.\r\n", ch);
+                ch->Send("You are about the same damage.\r\n");
             else if (diff3 < 20)
-                send_to_char("You are gonna hurt them more.\r\n", ch);
+                ch->Send("You are gonna hurt them more.\r\n");
             else if (diff3 < 40)
-                send_to_char("You eat puppys like this for breakfast.\r\n",
-                             ch);
+                ch->Send("You eat puppys like this for breakfast.\r\n");
             else if (diff3 < 60)
-                send_to_char("It won't hurt a bit.\r\n", ch);
+                ch->Send("It won't hurt a bit.\r\n");
             else if (diff > 60)
-                send_to_char("They will be honored by death if you fight them.\r\n",  ch);
+                ch->Send("They will be honored by death if you fight them.\r\n");
 
         } else {
-            send_to_char
-            ("Would you like to borrow a cross and a shovel?\r\n", ch);
+            ch->Send("Would you like to borrow a cross and a shovel?\r\n");
             return;
         }
     }
@@ -4033,7 +4003,7 @@ ACMD(do_fuse) {
         add_fusion(ch, ch, i++);
         f = ch->followers;
         do {
-            new_send_to_char(f->follower, "You fuse and form the %s", fusion_locations[i]);
+            f->follower->Send("You fuse and form the %s", fusion_locations[i]);
             add_fusion(ch, f->follower, i++);
             f = f->next;
         } while (f != NULL);
@@ -4148,7 +4118,7 @@ ACMD(do_diagnose) {
         if (FIGHTING(ch))
             diag_char_to_char(FIGHTING(ch), ch);
         else
-            send_to_char("Diagnose who?\r\n", ch);
+            ch->Send("Diagnose who?\r\n");
     }
 }
 
@@ -4173,8 +4143,7 @@ ACMD(do_color) {
         return;
     }
     if (((tp = search_block(arg, ctypes, FALSE)) == -1)) {
-        send_to_char
-        ("Usage: color {{ Off | Sparse | Normal | Complete }\r\n", ch);
+        ch->Send("Usage: color {{ Off | Sparse | Normal | Complete }\r\n");
         return;
     }
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
@@ -4411,11 +4380,11 @@ ACMD(do_commands) {
 
     if (*argument) {
         if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
-            send_to_char("Who is that?\r\n", ch);
+            ch->Send("Who is that?\r\n");
             return;
         }
         if (GET_LEVEL(ch) < GET_LEVEL(vict)) {
-            send_to_char("You can't see the commands of people above your level.\r\n", ch);
+            ch->Send("You can't see the commands of people above your level.\r\n");
             return;
         }
     } else
@@ -4517,9 +4486,8 @@ ACMD(do_prereq) {
             return;
 
 
-        sprintf(msg1, "Pre-requisites for %s :-\r\n",
+        ch->Send( "Pre-requisites for %s :-\r\n",
                 spell_info[skill_num].name);
-        send_to_char(msg1, ch);
 
         if (spell_info[skill_num].first_prereq !=   TYPE_UNDEFINED) {
             len += snprintf(msg1 + len, sizeof(msg1) - len,  "    %s",
@@ -4528,11 +4496,11 @@ ACMD(do_prereq) {
                 len += snprintf(msg1 + len, sizeof(msg1) - len,  "   %s",
                                 spell_info[spell_info[skill_num].second_prereq].name);
             }
-            send_to_char(msg1, ch);
+            ch->Send(msg1);
         } else {
-            send_to_char("     None.", ch);
+            ch->Send("     None.");
         }
-        send_to_char("\r\n", ch);
+        ch->Send("\r\n");
     }
 
 }
@@ -4854,26 +4822,23 @@ ACMD(set_perc) {
         ch->Send( "You split the involvement evenly.\r\n");
         return;
     } else {
-        ch->Send(
-            "involve <groupmember> <amount (1 to %3d)>\r\n",
-            90 - group_size(ch));
+        ch->Send("involve <groupmember> <amount (1 to %3d)>\r\n", 90 - group_size(ch));
         return;
     }
 
     if (amount < 0 || amount > (90 - group_size(ch))) {
-        ch->Send( "%d is not a valid involvement amount.\r\n",
-                  amount);
+        ch->Send( "%d is not a valid involvement amount.\r\n", amount);
         return;
     }
 
 
 
     if (!(tch = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
-        send_to_char("There is no such person!\r\n", ch);
+        ch->Send("There is no such person!\r\n");
         return;
     }
     if (tch->master != ch) {
-        send_to_char("That person is not following you!\r\n", ch);
+        ch->Send("That person is not following you!\r\n");
         return;
     }
 
@@ -4889,11 +4854,9 @@ ACMD(set_perc) {
     GET_PERC(ch) -= (float) amount;
     total_perc(ch);
 
-    ch->Send(
-        "You set %s's involvement to %4.1f%%, your involvement is now %4.1f%%.\r\n",
+    ch->Send("You set %s's involvement to %4.1f%%, your involvement is now %4.1f%%.\r\n",
         GET_NAME(tch), GET_PERC(tch), GET_PERC(ch));
-    new_send_to_char(tch, "%s sets your involvement to %4.1f%%.\r\n",
-                     GET_NAME(ch), GET_PERC(tch));
+    tch->Send( "%s sets your involvement to %4.1f%%.\r\n", GET_NAME(ch), GET_PERC(tch));
 
 }
 

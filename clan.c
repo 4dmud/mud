@@ -614,7 +614,7 @@ void do_clan_war(Character *ch, char *arg)
   {
     if ((clan_num = find_clan_by_id(GET_CLAN(ch))) < 0)
     {
-      send_to_char("You don't belong to any clan!\r\n", ch);
+      ch->Send("You don't belong to any clan!\r\n");
       return;
     }
   }
@@ -622,7 +622,7 @@ void do_clan_war(Character *ch, char *arg)
   {
     if (GET_LEVEL(ch) < LVL_CLAN_GOD)
     {
-      send_to_char("You do not have clan privileges.\r\n", ch);
+      ch->Send("You do not have clan privileges.\r\n");
       return;
     }
     immcom = 1;
@@ -630,30 +630,28 @@ void do_clan_war(Character *ch, char *arg)
     strcpy(arg, arg1);
     if ((clan_num = find_clan(arg2)) < 0)
     {
-      send_to_char("Unknown clan.\r\n", ch);
+      ch->Send("Unknown clan.\r\n");
       return;
     }
   }
 
   if (GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_SET_WAR] && !immcom)
   {
-    send_to_char
-    ("You're not influent enough in the clan to do that!\r\n", ch);
+    ch->Send("You're not influent enough in the clan to do that!\r\n");
     return;
   }
 
   war_num = find_clan(arg);
   if (at_war(clan_num, war_num))
   {
-    new_send_to_char
-    (ch, "You're already AT WAR with %s!\r\n", clan[war_num].name);
+    ch->Send("You're already AT WAR with %s!\r\n", clan[war_num].name);
     return;
   }
 
   declare_war(clan_num, war_num);
 
   send_to_all("{cRThe %s have declared war on the %s!{c0",clan[clan_num].name,clan[war_num].name );
-  send_to_char("Done.\r\n", ch);
+  ch->Send("Done.\r\n");
 
   return;
 }

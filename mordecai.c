@@ -75,47 +75,39 @@ void convert_tokens(Character *ch);
 
 ACMD(do_convert) {
     char arg2[MAX_INPUT_LENGTH];
-    char buffer[MAX_STRING_LENGTH];
     int counter, amount = 1;
     struct obj_data *obj;
 
     if (IS_NPC(ch)) {
-        send_to_char("Silly mob, you don't collect tokens.\r\n", ch);
+        ch->Send("Silly mob, you don't collect tokens.\r\n");
         return;
     }
 
     one_argument(argument, arg2);
 
     if (!*arg2) {
-        send_to_char("Usage: convert <tokentype>.\r\n", ch);
+        ch->Send("Usage: convert <tokentype>.\r\n");
         return;
     }
 
 
     if (amount < 0) {
-        send_to_char
-        ("Your attempt at cheating has been logged.  The Imms will be notified.\r\n",
-         ch);
+        ch->Send("Your attempt at cheating has been logged.  The Imms will be notified.\r\n");
         return;
     }
 
     if (isname("brass", arg2)) {
         if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
-            sprintf(buffer,
-                    "You cant split a brass token. If you want to Deduct say so.\r\n");
-            send_to_char(buffer, ch);
+            ch->Send("You cant split a brass token. If you want to Deduct say so.\r\n");
             return;
         } else {
-            send_to_char("You don't have that many tokens on account.\r\n",
-                         ch);
+            ch->Send("You don't have that many tokens on account.\r\n");
             return;
         }
     } else if (isname("bronze", arg2)) {
         if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
-            sprintf(buffer,
-                    "%d tokens were deducted from your account and split to brass.\r\n",
+            ch->Send("%d tokens were deducted from your account and split to brass.\r\n",
                     amount);
-            send_to_char(buffer, ch);
             GET_BRONZE_TOKEN_COUNT(ch) -= amount;
             for (counter = 0; counter < 5; counter++) {
                 obj = read_object(3300, VIRTUAL);
@@ -124,16 +116,13 @@ ACMD(do_convert) {
             }
             return;
         } else {
-            send_to_char("You don't have that many tokens on account.\r\n",
-                         ch);
+            ch->Send("You don't have that many tokens on account.\r\n");
             return;
         }
     } else if (isname("silver", arg2)) {
         if (GET_SILVER_TOKEN_COUNT(ch) >= amount) {
-            sprintf(buffer,
-                    "%d tokens were deducted from your account and split to bronze.\r\n",
+            ch->Send("%d tokens were deducted from your account and split to bronze.\r\n",
                     amount);
-            send_to_char(buffer, ch);
             GET_SILVER_TOKEN_COUNT(ch) -= amount;
             for (counter = 0; counter < 10; counter++) {
                 obj = read_object(3301, VIRTUAL);
@@ -143,16 +132,12 @@ ACMD(do_convert) {
 
             return;
         } else {
-            send_to_char("You don't have that many tokens on account.\r\n",
-                         ch);
+            ch->Send("You don't have that many tokens on account.\r\n");
             return;
         }
     } else if (isname("gold", arg2)) {
         if (GET_GOLD_TOKEN_COUNT(ch) >= amount) {
-            sprintf(buffer,
-                    "%d tokens were deducted from your account and split.\r\n",
-                    amount);
-            send_to_char(buffer, ch);
+            ch->Send("%d tokens were deducted from your account and split.\r\n", amount);
             GET_GOLD_TOKEN_COUNT(ch) -= amount;
             for (counter = 0; counter < 10; counter++) {
                 obj = read_object(3302, VIRTUAL);
@@ -162,13 +147,11 @@ ACMD(do_convert) {
 
             return;
         } else {
-            send_to_char("You don't have enough tokens on account.\r\n",
-                         ch);
+            ch->Send("You don't have enough tokens on account.\r\n");
             return;
         }
     } else {
-        send_to_char("You can only deduct tokens from your account.\r\n",
-                     ch);
+        ch->Send("You can only deduct tokens from your account.\r\n");
         return;
     }
     return;
@@ -180,7 +163,7 @@ ACMD(do_convey) {
     gold_int amount = 0;
 
     if (IS_NPC(ch)) {
-        send_to_char("Silly mob, you don't collect tokens.\r\n", ch);
+        ch->Send("Silly mob, you don't collect tokens.\r\n");
         return;
     }
 
@@ -345,14 +328,14 @@ ACMD(do_swap) {
                                               GET_EQ(ch, WEAR_WIELD_2);
 
 if (thing1 == NULL || thing2 == NULL) {
-        send_to_char("You are not dual wielding weapons!\r\n", ch);
+        ch->Send("You are not dual wielding weapons!\r\n");
         return;
     }
 
 
     if (((GET_OBJ_TYPE(thing1) != ITEM_WEAPON)
             || (GET_OBJ_TYPE(thing2) != ITEM_WEAPON))) {
-        send_to_char("You are not dual wielding WEAPONS.\r\n", ch);
+        ch->Send("You are not dual wielding WEAPONS.\r\n");
         return;
     }
 

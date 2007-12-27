@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.37  2006/09/15 08:01:11  w4dimenscor
+ * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
+ *
  * Revision 1.36  2006/08/31 10:39:16  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -205,12 +208,12 @@ ACMD(do_quit)
     return;
 
   if (subcmd != SCMD_QUIT && GET_LEVEL(ch) < LVL_HERO)
-    send_to_char("You have to type quit--no less, to quit!\r\n", ch);
+    ch->Send("You have to type quit--no less, to quit!\r\n");
   else if (GET_POS(ch) == POS_FIGHTING)
-    send_to_char("No way!  You're fighting for your life!\r\n", ch);
+    ch->Send("No way!  You're fighting for your life!\r\n");
   else if (GET_POS(ch) < POS_STUNNED)
   {
-    send_to_char("You die before your time...\r\n", ch);
+    ch->Send("You die before your time...\r\n");
     die(ch, NULL);
   }
   else
@@ -399,7 +402,7 @@ ACMD(do_save)
      */
     if ((CONFIG_AUTO_SAVE) && GET_LEVEL(ch) < LVL_IMMORT)
     {
-      send_to_char("Saving aliases.\r\n", ch);
+      ch->Send("Saving aliases.\r\n");
       return;
     }
     ch->Send( "Saving %s and aliases.\r\n", GET_NAME(ch));
@@ -459,7 +462,7 @@ ACMD(do_killlist)
    special procedures - i.e., shop commands, mail commands, etc. */
 ACMD(do_not_here)
 {
-  send_to_char("Sorry, but you cannot do that here!\r\n", ch);
+  ch->Send("Sorry, but you cannot do that here!\r\n");
 }
 
 ACMD(do_prac_skills)
@@ -608,10 +611,10 @@ void print_group(Character *ch)
   char buf[MAX_INPUT_LENGTH];
 
   if (!AFF_FLAGGED(ch, AFF_GROUP))
-    send_to_char("But you are not the member of a group!\r\n", ch);
+    ch->Send("But you are not the member of a group!\r\n");
   else
   {
-    send_to_char("Your group consists of:\r\n", ch);
+    ch->Send("Your group consists of:\r\n");
 
     k = (ch->master ? ch->master : ch);
 

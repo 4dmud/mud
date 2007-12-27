@@ -771,19 +771,18 @@ int perform_push(Character *ch, int dir, int need_specials_check,
             IN_ROOM(ch) == ch->master->in_room) {
         ch->Send(
             "The thought of leaving your master makes you weep.\r\n");
-        new_send_to_char(attacker, "You cant push charmies!\r\n");
+        attacker->Send("You cant push charmies!\r\n");
         return 0;
     }
     if (!enter_wtrigger(EXIT(ch, dir)->to_room, ch, dir)) {
         ch->Send( "You slam into an invisible barrier!\r\n");
-        new_send_to_char(attacker, "You push, but can't get them into that room.\r\n");
+        attacker->Send("You push, but can't get them into that room.\r\n");
         return 0;
     }
 
     if (IS_SET_AR(ROOM_FLAGS(IN_ROOM(ch)), ROOM_ATRIUM)) {
         if (!House_can_enter(ch, EXIT(ch, dir)->to_room->number)) {
-            ch->Send(
-                "You are pushed, but you can't tresspass!\r\n");
+            ch->Send("You are pushed, but you can't tresspass!\r\n");
             return 0;
         }
     }

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/31 10:39:16 $
-*  $Revision: 1.13 $
+*  $Date: 2006/09/15 08:01:12 $
+*  $Revision: 1.14 $
 **************************************************************************/
 
 #include "conf.h"
@@ -490,9 +490,7 @@ OCMD(do_oteleport)
 		continue;
 	    next_ch = ch->next_in_room;
 	    if (ROOM_FLAGGED(ch->in_room, ROOM_NORECALL)) {
-		send_to_char
-		    ("The magic fizzles out leaving you stranded.\r\n",
-		     ch);
+		ch->Send("The magic fizzles out leaving you stranded.\r\n");
 		break;
 	    }
 	    char_from_room(ch);
@@ -507,9 +505,7 @@ OCMD(do_oteleport)
      was_in = IN_ROOM(ch);  
 	    if (valid_dg_target(ch, TRUE)) {
 		if (ROOM_FLAGGED(ch->in_room, ROOM_NORECALL)) {
-		    send_to_char
-			("The magic fizzles out leaving you stranded.\r\n",
-			 ch);
+		    ch->Send("The magic fizzles out leaving you stranded.\r\n");
 		    return;
 		}
 		char_from_room(ch);

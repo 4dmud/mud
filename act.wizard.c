@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.67  2006/09/15 08:01:11  w4dimenscor
+ * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
+ *
  * Revision 1.66  2006/08/31 10:39:16  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -3448,12 +3451,12 @@ ACMD(do_wiznet) {
                         || !PLR_FLAGGED(d->character, PLR_WRITING))
                     && (d != ch->desc
                         || !(PRF_FLAGGED(d->character, PRF_NOREPEAT)))) {
-                new_send_to_char(d->character, "%s", CCCYN(d->character, C_NRM));
+                d->Output( "%s", CCCYN(d->character, C_NRM));
                 if (CAN_SEE(d->character, ch))
-                    new_send_to_char(d->character, "%s", buf1);
+                    d->Output( "%s", buf1);
                 else
-                    new_send_to_char(d->character, "%s", buf2);
-                new_send_to_char(d->character, "%s", CCNRM(d->character, C_NRM));
+                    d->Output( "%s", buf2);
+                d->Output( "%s", CCNRM(d->character, C_NRM));
             }
         }
 
@@ -6124,7 +6127,7 @@ void change_plrindex_name(long id, char *change) {
     for (tp = 0; tp < player_table.size(); tp++) {
         if (player_table[tp].id == id) {
             if (player_table[tp].name)
-                delete(player_table[tp].name);
+                delete[] player_table[tp].name;
             player_table[tp].name = new char[strlen(change) +1];
             strcpy(player_table[tp].name, change);
             save_player_index();
@@ -6157,7 +6160,11 @@ ACMD(do_namechange) {
         return;
     }
     newname[0] = UPPER(newname[0]);
-
+if (!str_cmp(newname, passw))
+    {
+      ch->Send("\r\nIllegal password.\r\n");
+      return;
+    }
 
 
     for (d = descriptor_list; d; d = d->next) {
@@ -6191,24 +6198,27 @@ ACMD(do_namechange) {
         }
         if (GET_LEVEL(tch) >= GET_LEVEL(ch)) {
             ch->Send( "Ah, Bugger off!\r\n");
+            delete tch;
             return;
         }
         tch->reset();
         read_aliases(tch);
-        GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
-        addChToLookupTable(GET_IDNUM(ch), ch);
+        GET_ID(tch) = GET_IDNUM(tch);// = player_table[id].id;
+        addChToLookupTable(GET_IDNUM(ch), tch);
 
         char_to_room(tch, IN_ROOM(ch));
         tch->LoadKillList();
-
-        load_locker(ch);
-        add_char_to_list(ch);
+	   read_ignorelist(tch);
+        load_locker(tch);
+        add_char_to_list(tch);
         loaded = 1;
     }
     free_string(&tch->player.name);
-    tch->player.name = strdup(newname);
+    tch->player.name = strdup(strdup(CAP(newname)));
     newname[0] = LOWER(newname[0]);
-    strlcpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
+
+    strncpy(GET_PASSWD(tch), CRYPT(passw, tch->player.name), MAX_PWD_LENGTH);
+    *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
     change_plrindex_name(GET_IDNUM(tch), newname);
     tch->save();
     if (!loaded)
@@ -6216,9 +6226,9 @@ ACMD(do_namechange) {
     write_aliases(tch);
     write_ignorelist(tch);
 
-    ch->Send( "%s's name changed to %s.\r\n", oldname, newname);
+    ch->Send( "%s's name changed to %s. Password: %s\r\n", oldname, newname, passw);
     if (!loaded)
-        new_send_to_char(tch, "{cYYour name has been changed to %s. It's best if you quit and reenter to save.\r\n{c0", newname);
+        tch->Send("{cYYour name has been changed to %s. It's best if you quit and reenter to save.\r\n{c0", newname);
 
     if (loaded) {
         Crash_rentsave(tch, 0);

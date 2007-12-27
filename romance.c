@@ -637,13 +637,13 @@ void marry_them(Character *ch, Character *victim,
   if (ROMANCE(ch) != 2)
   {
     /* Groom isn't engaged */
-    new_send_to_char(imm,"But %s isn't engaged!\r\n", GET_NAME(ch));
+    imm->Send("But %s isn't engaged!\r\n", GET_NAME(ch));
     return;
   }
   else if (ROMANCE(victim) != 2)
   {
     /* Bride isn't engaged */
-    new_send_to_char(imm, "But %s isn't engaged!\r\n", GET_NAME(victim));
+    imm->Send( "But %s isn't engaged!\r\n", GET_NAME(victim));
     return;
   }
   else if (PARTNER(ch) != GET_IDNUM(victim))
@@ -672,7 +672,7 @@ void marry_them(Character *ch, Character *victim,
       /* They're engaged to each other, now perform the marriage. */
       ch->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(ch)));
       victim->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(victim)));
-      new_send_to_char(imm, "You declare %s and %s man and wife!\r\n",   GET_NAME(ch),GET_NAME(victim));
+      imm->Send( "You declare %s and %s man and wife!\r\n",   GET_NAME(ch),GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s man and wife!\r\n",
                GET_NAME(imm), GET_NAME(ch), GET_NAME(victim));
       act(buf, TRUE, 0, 0, 0, TO_ROOM);
@@ -683,7 +683,7 @@ void marry_them(Character *ch, Character *victim,
                        GET_NAME(imm), get_name_by_id(PARTNER(ch)));
       victim->Send( "%s declares you married to %s!\r\n",
                        GET_NAME(imm), get_name_by_id(PARTNER(victim)));
-      new_send_to_char(imm, "You declare %s and %s married!\r\n",
+      imm->Send("You declare %s and %s married!\r\n",
                        GET_NAME(ch), GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s married!\r\n",
                GET_NAME(imm), GET_NAME(ch), GET_NAME(victim));

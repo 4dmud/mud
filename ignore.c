@@ -76,7 +76,7 @@ void read_ignorelist(Character *ch) {
     FILE *file;
     char ignoref[127];
     char buf[127];
-    size_t ignorelength;
+    size_t ignorelength = 0;
     get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
     file = fopen(ignoref, "r");
     if (!file)

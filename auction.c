@@ -254,7 +254,7 @@ ACMD(do_bid)
     ch->Send( "The auctioneer seems to be dead.\r\n");
   else {
     if (auc->bidder) {
-      new_send_to_char(auc->bidder, "%s has placed a %ld bid over your %ld bid for %s.\r\n",
+    auc->bidder->Send("%s has placed a %ld bid over your %ld bid for %s.\r\n",
     GET_NAME(ch), bid, auc->bid, auc->obj->short_description);
     }
     auc->bid = bid;
@@ -360,7 +360,7 @@ void auction_forfeit(Character *mob)
     snprintf(buf2, sizeof(buf2), "%s no longer holds object, auction is forfeit.", GET_NAME(auction->seller));
     do_gen_comm(mob, buf2, 0, SCMD_AUCTION);
   }
-  new_send_to_char(auction->seller, "A small daemon pops in, takes some gold, and taunts you.\r\n" );
+  auction->seller->Send("A small daemon pops in, takes some gold, and taunts you.\r\n" );
   act("A small daemon pops in, takes some gold from $n, and sticks its tongue out at $m.",
     FALSE, auction->seller, auction->obj, 0, TO_ROOM);
   GET_GOLD(auction->seller) -= auction->bid;

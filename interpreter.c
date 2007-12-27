@@ -1141,50 +1141,43 @@ void command_interpreter(Character *ch, char *argument)
     ch->Send( "Huh?!?\r\n");
   else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL && frozen_time(ch) > 0)
   {
-    ch->Send( "Unfrozen in %d seconds.\r\n", frozen_time(ch));
-    ch->Send( "You try, but the mind-numbing cold prevents you...\r\n");
+    ch->Send("Unfrozen in %d seconds.\r\n", frozen_time(ch));
+    ch->Send("You try, but the mind-numbing cold prevents you...\r\n");
 
   }
   else if (complete_cmd_info[cmd].command_pointer == NULL)
-    ch->Send( "Sorry, that command hasn't been implemented yet.\r\n");
+    ch->Send("Sorry, that command hasn't been implemented yet.\r\n");
   else if ((complete_cmd_info[cmd].cmd_bits > 0)
            && (((!CMD_FLAGGED(ch, complete_cmd_info[cmd].cmd_bits))
                 && (!CMD_FLAGGED2(ch, complete_cmd_info[cmd].cmd_bits))
                 && (GET_LEVEL(ch) < LVL_IMPL)) || IS_NPC(ch)))
-    send_to_char("You do not have that Immortal privilege.\r\n", ch);
+    ch->Send("You do not have that Immortal privilege.\r\n");
   else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level > LVL_IMMORT)
     ch->Send( "You can't use immortal commands while switched.\r\n");
   else if (GET_POS(ch) < complete_cmd_info[cmd].minimum_position)
     switch (GET_POS(ch))
     {
     case POS_DEAD:
-      ch->Send( "Lie still; you are DEAD!!! :-(\r\n");
+      ch->Send("Lie still; you are DEAD!!! :-(\r\n");
       break;
     case POS_INCAP:
     case POS_MORTALLYW:
-      send_to_char
-      ("You are in a pretty bad shape, unable to do anything!\r\n",
-       ch);
+      ch->Send("You are in a pretty bad shape, unable to do anything!\r\n");
       break;
     case POS_STUNNED:
-      send_to_char
-      ("All you can do right now is think about the stars!\r\n",
-       ch);
+      ch->Send("All you can do right now is think about the stars!\r\n");
       break;
     case POS_SLEEPING:
-      send_to_char("In your dreams, or what?\r\n", ch);
+      ch->Send("In your dreams, or what?\r\n");
       break;
     case POS_RESTING:
-      send_to_char("Nah... You feel too relaxed to do that..\r\n",
-                   ch);
+      ch->Send("Nah... You feel too relaxed to do that..\r\n");
       break;
     case POS_SITTING:
-      send_to_char("Maybe you should get on your feet first?\r\n",
-                   ch);
+      ch->Send("Maybe you should get on your feet first?\r\n");
       break;
     case POS_FIGHTING:
-      send_to_char("No way!  You're fighting for your life!\r\n",
-                   ch);
+      ch->Send("No way!  You're fighting for your life!\r\n");
       break;
     }
   else if (no_specials || !special(ch, cmd, line))
@@ -1244,9 +1237,9 @@ ACMD(do_alias)
 
   if (!*arg)
   {       /* no argument specified -- list currently defined aliases */
-    send_to_char("Currently defined aliases:\r\n", ch);
+    ch->Send("Currently defined aliases:\r\n");
     if ((a = GET_ALIASES(ch)) == NULL)
-      send_to_char(" None.\r\n", ch);
+      ch->Send(" None.\r\n");
     else
     {
       DYN_CREATE;
@@ -1272,15 +1265,15 @@ ACMD(do_alias)
     if (!*repl)
     {
       if (a == NULL)
-        send_to_char("No such alias.\r\n", ch);
+        ch->Send("No such alias.\r\n");
       else
-        send_to_char("Alias deleted.\r\n", ch);
+        ch->Send("Alias deleted.\r\n");
     }
     else
     {          /* otherwise, either add or redefine an alias */
       if (!str_cmp(arg, "alias"))
       {
-        send_to_char("You can't alias 'alias'.\r\n", ch);
+        ch->Send("You can't alias 'alias'.\r\n");
         return;
       }
       CREATE(a, struct alias_data, 1);
@@ -1294,7 +1287,7 @@ ACMD(do_alias)
         a->type = ALIAS_SIMPLE;
       a->next = GET_ALIASES(ch);
       GET_ALIASES(ch) = a;
-      send_to_char("Alias added.\r\n", ch);
+      ch->Send("Alias added.\r\n");
     }
   }
 }
@@ -2148,7 +2141,6 @@ int enter_player_game(Descriptor *d)
 
   ch->reset();
   read_aliases(ch);
-  ch->next = NULL;  // -- kalten
 
 // if (!valid_id_num( GET_ID(ch)))
 //    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
@@ -2359,10 +2351,11 @@ void string_append( Character *ch, char **pString )
   if (!ch) return;
   if (!ch->desc) return;
 
-  send_to_char( "-=======- Entering APPEND Mode -========-\r\n", ch );
-  send_to_char( "    Type /h on a new line for help\r\n", ch );
-  send_to_char( " Terminate|save with a /s on a blank line.\r\n", ch );
-  send_to_char( "-=======================================-\r\n", ch );
+  ch->Send(
+  "-=======- Entering APPEND Mode -========-\r\n"
+  "    Type /h on a new line for help\r\n"
+  " Terminate|save with a /s on a blank line.\r\n"
+  "-=======================================-\r\n");
 
   if ( *pString == NULL )
   {
@@ -2601,8 +2594,7 @@ void nanny(Descriptor *d, char *arg)
       STATE(d) = CON_CLOSE;
     else
     {
-      if (strncmp
-          (CRYPT(arg, GET_PASSWD(d->character)),
+      if (strncmp(CRYPT(arg, GET_PASSWD(d->character)),
            GET_PASSWD(d->character), MAX_PWD_LENGTH))
       {
         new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
