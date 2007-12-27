@@ -580,6 +580,8 @@ void Character::default_char() {
     if (!this)
         return;
 desc = NULL;
+proto_script = NULL;
+script = NULL;
     affected = NULL;
     subs = NULL; //yep subskills are a linked list. - mord
     skills = NULL; // and now skills and spells are a linked list
