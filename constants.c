@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.27  2007/06/10 04:48:03  w4dimenscor
+ * Needed to add the new professions and pgrp to this so they
+ * would show up in the "prof" command.
+ * Prometheus
+ *
  * Revision 1.26  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -349,6 +354,13 @@ const char * profession_names[] =
     "mason",
     "mirrormaker",
     "contractor",
+    "artisan",
+    "glasswork",
+    "leatherwork",
+    "metalwork",
+    "stonework",
+    "textilework",
+    "woodwork",
     "\n"
 
   };
@@ -361,6 +373,9 @@ const char * profession_group_names[] =
     "textileworker",
     "woodworker",
     "stoneworker",
+    "artist",
+    "brewery",
+    "glassworker",
     "\n"
 
   };
