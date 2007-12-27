@@ -7080,10 +7080,8 @@ void load_config( void ) {
             break;
 	
 	case 'g':
-	    if (!strcmp(tag, "gladiator_death_room")) {
-		    printf("loading gladiator death room!!! %d\n", num);
+	    if (!strcmp(tag, "gladiator_death_room"))
 		config_info.room_nums.gladiator_death_room = num;
-	    }
 	    break;
 
         case 'h':
