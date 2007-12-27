@@ -17,7 +17,7 @@
 #include "genzon.h"
 #include "dg_olc.h"
 #include "constants.h"
-#include "htree.h"
+//#include "htree.h"
 
 static int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object);
 void purge_qic(int rnum);
@@ -177,7 +177,8 @@ obj_rnum insert_object(struct obj_data *obj, obj_vnum ovnum)
     obj_proto[i] = obj_proto[i - 1];
     obj_proto[i].item_number = i;
 
-    htree_add(obj_htree, obj_index[i].vnum, i);
+//    htree_add(obj_htree, obj_index[i].vnum, i);
+    obj_vTor[obj_index[i].vnum]=i;
   }
 
   /* Not found, place at 0. */
@@ -202,7 +203,8 @@ obj_rnum index_object(struct obj_data *obj, obj_vnum ovnum, obj_rnum ornum)
 
   copy_object_preserve(&obj_proto[ornum], obj);
   obj_proto[ornum].in_room = NULL;
-  htree_add(obj_htree, obj_index[ornum].vnum, ornum);
+//  htree_add(obj_htree, obj_index[ornum].vnum, ornum);
+  obj_vTor[ornum]=ovnum;
 
   return ornum;
 }

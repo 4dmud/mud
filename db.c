@@ -37,7 +37,7 @@
 #include "xmlhelp.h"
 #include "assemblies.h"
 #include "trees.h"
-#include "htree.h"
+//#include "htree.h"
 #include "damage.h"
 #include "descriptor.h"
 #include "strutil.h"
@@ -99,6 +99,8 @@ struct help_category_data *help_categories;
 int TEMP_LOAD_CHAR = FALSE;
 
 extern struct mob_stat_table mob_stats[];
+extern map<long, obj_data *> obj_lookup_table;
+map <obj_vnum,obj_rnum> obj_vTor;
 
 vector <Room *> world_vnum; /* index table for room file   */
 
@@ -119,7 +121,7 @@ unsigned int top_of_trigt = 0;         /* top of trigger index table    */
 long max_mob_id = MOB_ID_BASE;     /* for unique mob id's       */
 long max_obj_id = OBJ_ID_BASE;     /* for unique obj id's       */
 int dg_owner_purged;          /* For control of scripts */
-struct htree_node *obj_htree = NULL;    /* hash tree for fast obj lookup */
+//struct htree_node *obj_htree = NULL;    /* hash tree for fast obj lookup */
 
 map<mob_vnum, struct index_data *> mob_index; /* index table for mobile file   */
 map<mob_vnum, Character *> mob_proto;  /* prototypes for mobs           */
@@ -804,7 +806,7 @@ void destroy_db(void) {
 
     free(obj_proto);
     free(obj_index);
-    htree_free(obj_htree);
+//    htree_free(obj_htree);
 
     /* Mobiles */
 
@@ -824,8 +826,8 @@ void destroy_db(void) {
     //free(mob_index);
     //htree_free();
 
-    htree_free(HTREE_NULL);
-    free(HTREE_NULL);
+//    htree_free(HTREE_NULL);
+//    free(HTREE_NULL);
 
     /* Shops */
     destroy_shops();
@@ -953,7 +955,7 @@ void boot_db(void) {
 
     log("Booting World.");
     boot_world();
-    htree_test();
+//    htree_test();
 
     log("Loading help entries.");
     index_boot(DB_BOOT_HLP);
@@ -2766,9 +2768,10 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon) {
     obj_index[i].func = NULL;
     obj_index[i].qic = NULL; // memory leak hopefully fixed - mord
 
-    if (! obj_htree)
-        obj_htree = htree_init();
-    htree_add(obj_htree, nr, i);
+//    if (! obj_htree)
+//        obj_htree = htree_init();
+//    htree_add(obj_htree, nr, i);
+    obj_vTor[nr]=i;
 
     clear_object(obj_proto + i);
     obj_proto[i].in_room = NULL;
@@ -6382,10 +6385,11 @@ obj_rnum real_object(obj_vnum vnum) {
     return -1;
 #else
 
-    obj_rnum bot, top, mid, i, last_top;
+//    obj_rnum bot, top, mid, i, last_top;
 
-    i = htree_find(obj_htree, vnum);
-
+//    i = htree_find(obj_htree, vnum);
+    return obj_vTor[vnum];
+#if 0
     if (i != NOWHERE && obj_index[i].vnum == vnum)
         return i;
     else {
@@ -6397,11 +6401,11 @@ obj_rnum real_object(obj_vnum vnum) {
             last_top = top;
             mid = (bot + top) / 2;
 
-            if ((obj_index + mid)->vnum == vnum) {
-                log("obj_htree sync fix: %d: %d -> %d", vnum, i, mid);
-                htree_add(obj_htree, vnum, mid);
-                return (mid);
-            }
+//            if ((obj_index + mid)->vnum == vnum) {
+//                log("obj_htree sync fix: %d: %d -> %d", vnum, i, mid);
+//                htree_add(obj_htree, vnum, mid);
+//                return (mid);
+//            }
             if (bot >= top)
                 return (NOTHING);
             if ((obj_index + mid)->vnum > vnum)
@@ -6414,7 +6418,7 @@ obj_rnum real_object(obj_vnum vnum) {
         }
     }
 #endif
-
+#endif
 }
 
 

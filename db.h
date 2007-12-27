@@ -531,8 +531,9 @@ extern vector<player_index_element> player_table;
 extern int top_of_p_table;
 
 
-extern struct htree_node *mob_htree;
-extern struct htree_node *obj_htree;
+//extern struct htree_node *mob_htree;
+//extern struct htree_node *obj_htree;
+extern map<obj_vnum,obj_rnum> obj_vTor;
 
 void strip_string(char *buffer);
 int read_xap_objects(FILE * fl, Character *ch);
