@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.5  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
  * fixed the locker bug, and the format error in clan tells, and a few other cleanups
  *
@@ -1089,6 +1092,7 @@ extern int message_type;
 #define NUM_MATERIAL_TYPES 21
 #define NUM_ELEM_TYPES 12
 #define MAX_HELPS 10000
+#define MAX_MAGIC_ITEMS 30
 
 
 

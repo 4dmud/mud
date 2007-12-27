@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.4  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.3  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -206,7 +209,7 @@ void sort_sub_data(void)
   for (a = 1; a < TOP_SUB_DEFINE; a++)
     sub_sort_data[a] = a;
 
-  qsort(&sub_sort_data[1], TOP_SUB_DEFINE, sizeof(int), compare_sub);
+  qsort(&sub_sort_data[0], TOP_SUB_DEFINE, sizeof(int), compare_sub);
 }
 void sort_spell_data(void)
 {
@@ -216,17 +219,17 @@ void sort_spell_data(void)
   for (a = 1; a <= MAX_SPELLS; a++)
     spell_sort_data[a] = a;
 
-  qsort(&spell_sort_data[1], MAX_SPELLS, sizeof(int), compare_spells);
+  qsort(&spell_sort_data[0], MAX_SPELLS, sizeof(int), compare_spells);
 }
 void sort_skill_data(void)
 {
-  int a, b = 1;
+  int a, b = 0;
 
   /* initialize array, avoiding reserved. */
   for (a = MAX_SPELLS + 1; a <= MAX_SKILLS; a++)
-    skill_sort_data[b++] = a;
+    skill_sort_data[++b] = a;
 
-  qsort(&skill_sort_data[1], b, sizeof(int), compare_spells);
+  qsort(&skill_sort_data[0], b, sizeof(int), compare_spells);
 }
 
 
@@ -246,7 +249,7 @@ void sort_spells(void)
   for (; a <= MAX_SKILLS; a++)
     spell_sort_info[a] = skill_sort_data[b++];
 
-  for (b = 1; a <= (TOP_SUB_DEFINE + MAX_SKILLS); a++)
+  for (b = 0; a <= (TOP_SUB_DEFINE + MAX_SKILLS); a++)
     spell_sort_info[a] = sub_sort_data[b++];
 
 

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.3  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.2  2004/11/17 14:19:46  w4dimenscor
  * added Aggro mode to attack everything in sight and 'kill all' command
  *
@@ -1395,6 +1398,9 @@ ACMD(do_file)
                  "xnames", 55, "../lib/misc/xnames"}, {
                  "levels", 55, "../log/levels"}, {
                  "rip", 55, "../log/rip"},
+		 {"dt", 55, "../log/dts"},
+		 {"help", 54, "../log/missing-help"},
+		 {"comlog", 54, "../log/comlog"},
                //{ "players",        55,    "../log/newplayers" },
                //{ "rentgone",       55,    "../log/rentgone" },
                {

@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.8  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.7  2004/12/04 07:42:36  w4dimenscor
  * fixed the locker bug, and the format error in clan tells, and a few other cleanups
  *
@@ -1437,8 +1440,9 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   else
   {
 
-    if (GET_WAIT_STATE(ch) > 0)
-      return 0;
+/** I want this to happen but the skills still need to pass through **/
+   // if (GET_WAIT_STATE(ch) > 0)
+   //   return 0;
 
 
     if (GET_POS(ch) == POS_SITTING)

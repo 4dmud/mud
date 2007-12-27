@@ -35,10 +35,13 @@ ACMD(do_tell);
 ACMD(do_action);
 ACMD(do_echo);
 ACMD(do_say);
+bool can_take_obj(struct char_data *ch, struct obj_data *obj);
 void sort_keeper_objs(struct char_data *keeper, int shop_nr);
 long long gold_data(int type, long long amount);
 void strip_color(char *inbuf);
 size_t proc_color(char *inbuf, int color_lvl, size_t len);
+int count_magic(struct obj_data *obj, CHAR_DATA *ch);
+int is_magic(OBJ_DATA *obj);
 
 /* Local variables */
 struct shop_data *shop_index = NULL;
@@ -597,6 +600,8 @@ void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int
   char tempstr[MAX_INPUT_LENGTH], tempbuf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
+  int mcnt = 0;
+  
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
@@ -643,6 +648,17 @@ void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int
       return;
     }
   }
+  if (!can_take_obj(ch, obj))
+  return;
+  
+  if (is_magic(obj)) {
+  mcnt = count_magic_items(ch);
+  buynum = MAX_MAGIC_ITEMS - mcnt;
+  if (buynum < 0)
+  buynum = 0;
+  }
+  
+  /*
   if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
   {
     new_send_to_char(ch, "%s: You can't carry any more items.\r\n", fname(obj->name));
@@ -652,14 +668,14 @@ void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int
   {
     new_send_to_char(ch, "%s: You can't carry that much weight.\r\n", fname(obj->name));
     return;
-  }
+  }*/
   while (obj && (GET_GOLD(ch) >= buy_price(obj, shop_nr, keeper, ch) || IS_GOD(ch))
          && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
          && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch))
   {
     int charged;
-
     bought++;
+     
     /* Test if producing shop ! */
     if (shop_producing(obj, shop_nr))
       obj = read_object(GET_OBJ_RNUM(obj), REAL);

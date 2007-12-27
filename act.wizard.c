@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.5  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
  * fixed the locker bug, and the format error in clan tells, and a few other cleanups
  *
@@ -2015,7 +2018,8 @@ ACMD(do_stat)
     }
     else
     {
-      print_zone(ch, atoi(buf2));
+      zone_rnum rn = real_zone(atoi(buf2));
+      print_zone(ch, rn);
       return;
     }
   }
@@ -5382,7 +5386,6 @@ int check_potion_weight(struct obj_data *obj)
   {
   case ITEM_POTION:
   case ITEM_SCROLL:
-    weight += GET_OBJ_VAL(obj, 0)/10;
     weight += spell_weight(obj, 1);
     weight += spell_weight(obj, 2);
     weight += spell_weight(obj, 3);
@@ -5391,7 +5394,6 @@ int check_potion_weight(struct obj_data *obj)
     break;
     case ITEM_WAND:
     case ITEM_STAFF:
-    weight += GET_OBJ_VAL(obj, 0)/10;
     weight += spell_weight(obj, 3) * GET_OBJ_VAL(obj, 2);
     weight_to_object(obj,weight);
     return 1;
@@ -5414,19 +5416,17 @@ int check_potion_price(struct obj_data *obj)
   {
   case ITEM_POTION:
   case ITEM_SCROLL:
-    weight += GET_OBJ_VAL(obj, 0)/20;
     weight += spell_price(obj, 1);
     weight += spell_price(obj, 2);
     weight += spell_price(obj, 3);
-    weight *= 1000;
+    weight *= 2000;
     GET_OBJ_COST(obj) = weight;
     return 1;    
     break;
         case ITEM_WAND:
     case ITEM_STAFF:
-    weight += GET_OBJ_VAL(obj, 0)/20;
     weight += spell_price(obj, 3) * GET_OBJ_VAL(obj, 2);
-    weight *= 1000;
+    weight *= 2000;
     GET_OBJ_COST(obj) = weight;
     return 1;
     break;
@@ -5442,14 +5442,14 @@ int check_potion_price(struct obj_data *obj)
 int spell_weight(struct obj_data *obj, int val)
 {
   if (GET_OBJ_VAL(obj, val) == -1)	/* i.e.: no spell */
-    return 1;
+    return 0;
 
   /*
    * Check for negative spells, spells beyond the top define, and any
    * spell which is actually a skill.
    */
-  if (GET_OBJ_VAL(obj, val) < 0)
-    return 1;
+  if (GET_OBJ_VAL(obj, val) <= 0)
+    return 0;
   if (GET_OBJ_VAL(obj, val) > TOP_SPELL_DEFINE)
     return 1;
   if (GET_OBJ_VAL(obj, val) > MAX_SPELLS
@@ -5459,16 +5459,16 @@ int spell_weight(struct obj_data *obj, int val)
   switch (GET_OBJ_VAL(obj, val))
   {
   case SPELL_GROUP_HEAL:
-    return 7;
-    break;
-  case SPELL_HEAL:
     return 5;
     break;
-  case SPELL_CURE_CRITIC:
+  case SPELL_HEAL:
     return 4;
     break;
-  default:
+  case SPELL_CURE_CRITIC:
     return 3;
+    break;
+  default:
+    return 2;
     break;
   }
 
@@ -5496,6 +5496,9 @@ int spell_price(struct obj_data *obj, int val)
 
   switch (GET_OBJ_VAL(obj, val))
   {
+  case SPELL_GROUP_HEAL:
+    return 7;
+    break;
   case SPELL_HEAL:
     return 5;
     break;

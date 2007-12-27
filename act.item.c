@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.5  2004/12/05 09:46:51  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.4  2004/11/27 20:16:46  w4dimenscor
  * fixed bug in 'get all all.corpse' that caused infinite loop, fixed up bug in combat where event wern't being canceled properly
  *
@@ -82,7 +85,8 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 
 int can_wear_on_pos(struct obj_data *obj, int pos);
 void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse);
-
+int count_magic(struct obj_data *obj, CHAR_DATA *ch);
+int is_magic(OBJ_DATA *obj);
 
 /* Local Variables */
 int slipping = FALSE;
@@ -488,25 +492,79 @@ ACMD(do_put)
   }
 }
 
+int is_magic(OBJ_DATA *obj)
+{
+  switch (GET_OBJ_TYPE(obj))
+  {
+  case ITEM_SCROLL:
+  case ITEM_POTION:
+  case ITEM_WAND:
+  case ITEM_STAFF:
+    return TRUE;
+    break;
+  default:
+    return FALSE;
+    break;
+  }
+}
+int count_magic(struct obj_data *obj, CHAR_DATA *ch)
+{
+  if (obj)
+  {
+    int i = 0;
+    if (obj->contains)
+      i += count_magic(obj->contains, ch);
+    if (obj->next_content)
+      i += count_magic(obj->next_content, ch);
 
+    if (is_magic(obj))
+      return i + 1;
+  }
+  return 0;
+}
+
+int count_magic_items(CHAR_DATA *ch)
+{
+  int total = 0;
+  int k;
+  for (k = 0;k < NUM_WEARS; k++)
+  {
+    if (GET_EQ(ch, k))
+    {
+      total += count_magic(GET_EQ(ch, k), ch);
+    }
+  }
+  if (ch->carrying)
+  {
+    total += count_magic(ch->carrying, ch);
+  }
+  return total;
+}
 
 bool can_take_obj(struct char_data *ch, struct obj_data *obj)
 {
+int i;
   if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
   {
-    act("$p: you can't carry that many items.", FALSE, ch, obj, 0,
-        TO_CHAR);
+    act("$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }
   else if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch))
   {
-    act("$p: you can't carry that much weight.", FALSE, ch, obj, 0,
-        TO_CHAR);
+    act("$p: you can't carry that much weight.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }
   else if (!(CAN_WEAR(obj, ITEM_WEAR_TAKE)))
   {
     act("$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR);
+    return FALSE;
+  }
+  else if (is_magic(obj) && (i=count_magic_items(ch)) >= MAX_MAGIC_ITEMS)
+  {
+  if (i == MAX_MAGIC_ITEMS)
+    act("$p: you have 30 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
+    else
+    act("$p: you have more then 30 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }
   return TRUE;
@@ -725,11 +783,12 @@ void get_from_container(struct char_data *ch, struct obj_data *cont,
     return;
   }
   if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE))
-    if ((long)GET_OBJ_VAL(cont, 0) == GET_IDNUM(ch)) {
+    if ((long)GET_OBJ_VAL(cont, 0) == GET_IDNUM(ch))
+    {
       perform_meld(ch, cont);
       return;
-      }
-      
+    }
+
   if (obj_dotmode == FIND_INDIV)
   {
     if (!(obj = get_obj_in_list_vis(ch, obj_desc, NULL, cont->contains)))
@@ -1217,9 +1276,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                              	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
-                                                              	    return (0);
-                                                              	}*/
+                                                                            	    send_to_char("Sorry, but you drop containers here.\r\n", ch);
+                                                                            	    return (0);
+                                                                            	}*/
   }
 
 

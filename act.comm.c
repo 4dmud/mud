@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.5  2004/12/05 09:46:51  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
  * fixed the locker bug, and the format error in clan tells, and a few other cleanups
  *
@@ -1366,7 +1369,7 @@ ACMD(do_ctell)
 {
   struct descriptor_data *i;
   int minlev = 1, c = 0;
-  char level_string[10];
+  char level_string[128] = "";
 
   skip_spaces(&argument);
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -1388,7 +1391,7 @@ ACMD(do_ctell)
    }
    else
    */
-  if ((c = GET_CLAN(ch)) == 0 || GET_CLAN_RANK(ch) == 0)
+  if ((c = find_clan_by_id(GET_CLAN(ch))) == 0 || GET_CLAN_RANK(ch) == 0)
   {
     send_to_char("You're not part of a clan.\r\n", ch);
     return;
@@ -1424,6 +1427,7 @@ ACMD(do_ctell)
       argument++;
     while (*argument == ' ')
       argument++;*/
+      skip_spaces(&argument);
     snprintf(level_string, sizeof(level_string), " (to ranks > %d)", minlev);
   }
 
@@ -1446,7 +1450,7 @@ ACMD(do_ctell)
       if (STATE(i) == CON_PLAYING && i->character &&
           !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
       {
-        if (i->character->player_specials->saved.clan == c && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
+        if (GET_CLAN(i->character) == GET_CLAN(ch) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
           if (i->character->player_specials->saved.clan_rank >=minlev)
           {

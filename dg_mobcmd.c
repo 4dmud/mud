@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.3  2004/12/05 09:46:52  w4dimenscor
+ * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
+ *
  * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -1424,6 +1427,13 @@ ACMD(do_mtransform)
     tmpmob.next_fighting = ch->next_fighting;
     tmpmob.followers = ch->followers;
     tmpmob.master = ch->master;
+    GET_FIGHT_EVENT(&tmpmob) = GET_FIGHT_EVENT(ch);
+
+    {
+      int i;
+      for (i = 0; i < 4; i++)
+        GET_POINTS_EVENT(&tmpmob, i) = GET_POINTS_EVENT(ch, i);
+    }
 
     GET_WAS_IN(&tmpmob) = GET_WAS_IN(ch);
     if (keep_hp)
@@ -1437,9 +1447,7 @@ ACMD(do_mtransform)
     IS_CARRYING_W(&tmpmob) = IS_CARRYING_W(ch);
     IS_CARRYING_N(&tmpmob) = IS_CARRYING_N(ch);
     FIGHTING(&tmpmob) = FIGHTING(ch);
-    remove_hunter(ch);
-    if ((HUNTING(&tmpmob) = HUNTING(ch)) != NULL)
-      add_hunter(&tmpmob);
+    HUNTING(&tmpmob) = HUNTING(ch);
     RIDING(&tmpmob) = RIDING(ch);
     RIDDEN_BY(&tmpmob) = RIDDEN_BY(ch);
     MOB_TIER(&tmpmob) = MOB_TIER(ch);

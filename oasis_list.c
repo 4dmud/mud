@@ -364,6 +364,8 @@ void print_zone(struct char_data *ch, zone_rnum rnum)
   room_vnum top, bottom;
   int largest_table;
   
+  
+  
   /****************************************************************************/
   /** Locate the largest of the three, top_of_world, top_of_mobt, or         **/
   /** top_of_objt.                                                           **/
