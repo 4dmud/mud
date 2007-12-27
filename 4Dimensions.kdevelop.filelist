@@ -198,3 +198,6 @@ col_string.cpp
 col_string.h
 color.h
 descriptor.h
+linkedlist.cpp
+linkedlist.h
+ptrlist.cpp

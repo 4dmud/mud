@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.52  2006/06/06 10:50:42  w4dimenscor
+ * Working on the Descriptor class, have removed the close_socked and new_descriptor functions in favor of constructors and destructors in the class
+ *
  * Revision 1.51  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -2894,7 +2897,7 @@ ACMD(do_copyover)
     if (!d->character || !IS_PLAYING(d))
     {
       write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\r\n", d->comp);
-      close_socket(d);   /* throw'em out */
+      delete d;   /* throw'em out */
     }
     else
     {

@@ -8,7 +8,10 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 //
-//
+
+
+extern Descriptor *descriptor_list;
+
 class Descriptor {
 public:
   socket_t descriptor; /* file descriptor for socket           */
@@ -35,7 +38,7 @@ public:
   char inbuf[MAX_RAW_INPUT_LENGTH];   /* buffer for raw input           */
   char last_input[MAX_INPUT_LENGTH];  /* the last input                 */
   char small_outbuf[SMALL_BUFSIZE];   /* standard output buffer         */
-  char **history;      /* History of commands, for ! mostly.   */
+  char *history[HISTORY_SIZE];      /* History of commands, for ! mostly.   */
   int history_pos;          /* Circular array position.             */
   unsigned int bufptr;           /* ptr to end of current output         */
   unsigned int bufspace;         /* space left in the output buffer      */
@@ -73,7 +76,10 @@ public:
   void turn_on_mxp ();
   char * send_mxp_status();
   bool pending_output();
-  
+  void close_socket();
+  void flush_queues();
 /*private:*/
   string output;
+  string cstr;
+  string stxt;
 };

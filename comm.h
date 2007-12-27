@@ -21,7 +21,6 @@ void	send_to_range(room_vnum start, room_vnum finish, const char *messg, ...) __
 void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format (printf, 2, 3)));
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void perform_to_all(const char *messg, Character *ch);
-void close_socket(Descriptor *d);
 string wordwrap(const char *cmd, size_t width, size_t maxlen);
 
 int is_ignoring(Character *ch, Character *vict);

@@ -100,6 +100,8 @@
 #define INVALID_SOCKET -1
 #endif
 
+void delete_descriptor_list();
+
 /* externs */
 extern struct ban_list_element *ban_list;
 extern int num_invalid;
@@ -185,7 +187,6 @@ void signal_setup(void);
 void game_loop(socket_t s_mother_desc);
 void timediff(struct timeval *diff, struct timeval *a, struct timeval *b);
 void timeadd(struct timeval *sum, struct timeval *a, struct timeval *b);
-void flush_queues(Descriptor *d);
 void nonblock(socket_t s);
 int perform_subst(Descriptor *t, char *orig, char *subst);
 void record_usage(void);
@@ -716,7 +717,7 @@ void copyover_recover(void)
     if (!fOld)
     {          /* Player file not found?! */
       write_to_descriptor(desc,"\n\rSomehow, your character was lost in the copyover. Sorry.\r\n", NULL);
-      close_socket(d);
+      delete d;
     }
     else
     {          /* ok! */
@@ -786,8 +787,7 @@ void init_game(ush_int s_port)
   Crash_save_all();
 
   log("Closing all sockets.");
-  while (descriptor_list)
-    close_socket(descriptor_list);
+    delete_descriptor_list();
 
   CLOSE_SOCKET(mother_desc);
   CLOSE_SOCKET(intermud_desc);
@@ -1221,11 +1221,11 @@ void game_loop(socket_t s_mother_desc)
       next_d = d->next;
       if (d->close_me || STATE(d) == CON_CLOSE || FD_ISSET(d->descriptor, &exc_set))
       {
-        {
+        
           FD_CLR(d->descriptor, &input_set);
           FD_CLR(d->descriptor, &output_set);
-          close_socket(d);
-        }
+          delete d;
+        
       }
 
       /* Process descriptors with input pending */
@@ -1234,7 +1234,7 @@ void game_loop(socket_t s_mother_desc)
         next_d = d->next;
         if (FD_ISSET(d->descriptor, &input_set))
           if (process_input(d) < 0)
-            close_socket(d);
+            delete d;
       }
 
       
@@ -1303,7 +1303,7 @@ void game_loop(socket_t s_mother_desc)
         {
         /* Output for this player is ready */
           if (process_output(d) < 0)
-            close_socket(d);
+            delete d;
           else
             d->has_prompt = 1;
         }
@@ -1324,7 +1324,7 @@ void game_loop(socket_t s_mother_desc)
       {
         next_d = d->next;
         if (STATE(d) == CON_CLOSE || STATE(d) == CON_DISCONNECT)
-          close_socket(d);
+          delete d;
       }
       
 
@@ -1899,61 +1899,6 @@ int get_from_q(struct txt_q *queue, char *dest, int *aliased)
   return (1);
 }
 
-/* Initialize a descriptor */
-void init_descriptor(Descriptor *newd, int desc)
-{
-  static int last_desc = 0;   /* last descriptor number */
-
-  /* initialize descriptor data */
-
-  *newd->small_outbuf = 0;
-  newd->large_outbuf = NULL;
-  newd->descriptor = desc;
-  newd->character = NULL;
-  newd->idle_tics = 0;
-  newd->bufspace = SMALL_BUFSIZE - 1;
-  newd->login_time = time(0);
-  newd->bufptr = 0;
-  newd->has_prompt = TRUE;  /* prompt is part of greetings */
-  /*
-   * This isn't exactly optimal but allows us to make a design choice.
-   * Do we embed the history in descriptor_data or keep it dynamically
-   * allocated and allow a user defined history size?
-   */
-  CREATE(newd->history, char *, HISTORY_SIZE);
-
-  if (++last_desc == 1000)
-    last_desc = 1;
-  newd->desc_num = last_desc;
-
-
-  CREATE(newd->comp, struct compr, 1);
-  newd->comp->state = 0; /* we start in normal mode */
-#ifdef HAVE_ZLIB_H
-  newd->comp->stream = NULL;
-#endif /* HAVE_ZLIB_H */
-  newd->eor = 0;
-  newd->mxp = FALSE;
-
-}
-
-
-/* Empty the queues before closing connection */
-void flush_queues(Descriptor *d)
-{
-  if (d->large_outbuf)
-  {
-    d->large_outbuf->next = bufpool;
-    bufpool = d->large_outbuf;
-  }
-  while (d->input.head)
-  {
-    struct txt_block *tmp = d->input.head;
-    d->input.head = d->input.head->next;
-    free(tmp->text);
-    free(tmp);
-  }
-}
 
 
 
@@ -2462,7 +2407,7 @@ int process_output(Descriptor *t)
 
   if (result < 0)
   {  /* Oops, fatal error. Bye! */
-    close_socket(t);
+    delete t;
 
     return (-1);
   }
@@ -3141,7 +3086,7 @@ int process_input(Descriptor *t)
       t->snoop_by->Output("%% %s\r\n", tmp);
     failed_subst = 0;
     if (*tmp == '-' && *(tmp + 1) == '-')
-      flush_queues(t);
+      t->flush_queues();
     else if (*tmp == '!' && !(*(tmp + 1)))   /* Redo last command. */
       strcpy(tmp, t->last_input);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
     else if (*tmp == '!' && *(tmp + 1))
@@ -3211,7 +3156,7 @@ ACMD(do_clear_buffer)
 void clear_char_q(Descriptor *t)
 {
 
-  flush_queues(t);
+  t->flush_queues();
 
 }
 
@@ -3268,116 +3213,6 @@ int perform_subst(Descriptor *t, char *orig, char *subst)
   return (0);
 }
 
-
-void close_socket(Descriptor *d)
-{
-  Descriptor *temp;
-
-  REMOVE_FROM_LIST(d, descriptor_list, next);
-  CLOSE_SOCKET(d->descriptor);
-  flush_queues(d);
-
-  /* Forget snooping */
-  if (d->snooping)
-    d->snooping->snoop_by = NULL;
-
-  if (d->snoop_by)
-  {
-    d->snoop_by->Output("Your victim is no longer among us.\r\n");
-    d->snoop_by->snooping = NULL;
-    d->snoop_by = NULL;
-  }
-
-  if (d->character)
-  {
-    /* If we're switched, this resets the mobile taken. */
-    d->character->desc = NULL;
-
-    /* Plug memory leak, from Eric Green. */
-    if (!IS_NPC(d->character) && PLR_FLAGGED(d->character, PLR_MAILING) && d->str)
-    {
-      if (*(d->str))
-        free(*(d->str));
-      free(d->str);
-      d->str = NULL;
-    }
-    else if (d->backstr && !IS_NPC(d->character) && !PLR_FLAGGED(d->character, PLR_WRITING))
-    {
-      free(d->backstr);      /* editing description ... not olc */
-      d->backstr = NULL;
-    }
-    if (IS_PLAYING(d) || STATE(d) == CON_DISCONNECT)
-    {
-      Character *link_challenged = d->original ? d->original : d->character;
-
-      /* We are guaranteed to have a person. */
-      act("$n has lost $s link.", TRUE, link_challenged, 0, 0, TO_ROOM);
-      //save_char(link_challenged);
-      new_mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, "Closing link to: %s.", GET_NAME(link_challenged));
-    }
-    else
-    {
-      new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-      free_char(d->character);
-    }
-  }
-  else
-    new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing descriptor without char.");
-
-  /* JE 2/22/95 -- part of my unending quest to make switch stable */
-  if (d->original && d->original->desc)
-    d->original->desc = NULL;
-
-  /* Clear the command history. */
-  if (d->history)
-  {
-    int cnt;
-    for (cnt = 0; cnt < HISTORY_SIZE; cnt++)
-      if (d->history[cnt])
-        free(d->history[cnt]);
-    free(d->history);
-    d->history = NULL;
-  }
-
-  if (d->showstr_head)
-    free(d->showstr_head);
-  if (d->showstr_count)
-    free(d->showstr_vector);
-
-  /*. Kill any OLC stuff .*/
-  switch (d->connected)
-  {
-  case CON_OEDIT:
-  case CON_REDIT:
-  case CON_ZEDIT:
-  case CON_MEDIT:
-  case CON_SEDIT:
-  case CON_TEDIT:
-  case CON_AEDIT:
-  case CON_TRIGEDIT:
-    cleanup_olc(d, CLEANUP_ALL);
-    break;
-  default:
-    break;
-  }
-
-  /* free compression structures */
-#ifdef HAVE_ZLIB_H
-  if (d->comp->stream)
-  {
-    deflateEnd(d->comp->stream);
-    free(d->comp->stream);
-    free(d->comp->buff_out);
-    free(d->comp->buff_in);
-
-  }
-#endif /* HAVE_ZLIB_H */
-  /* d->comp was still created even if there is no zlib, for comp->state) */
-  if (d->comp)
-    free(d->comp);
-  if (d);
-delete d;
-}
 
 
 

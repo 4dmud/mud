@@ -146,8 +146,6 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
 string Descriptor::convert_mxp_tags (const int bMXP, string src)
 {
   char c;
-  //const char * ps;
-  //char * pd;
   int bInTag = FALSE;
   int bInEntity = FALSE;
   int srclen = src.size();
