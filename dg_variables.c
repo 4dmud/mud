@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2006/01/23 05:23:19 $                                           * 
-*  $Revision: 1.18 $                                                    *
+*  $Date: 2006/02/23 16:32:51 $                                           * 
+*  $Revision: 1.19 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -670,6 +670,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
           snprintf(str, slen, "%d", GET_COOLNESS(c));
         }
+        
 
         break;
       case 'd':
@@ -882,7 +883,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           snprintf(str, slen, "%s", HMHR(c));
 
         else if (!strcasecmp(field, "hitp"))
+        {
+          if (subfield && *subfield)
+          {
+            int newhit = atoi(subfield);
+            GET_HIT(c) = newhit;
+          }
           snprintf(str, slen, "%d", GET_HIT(c));
+        }
         else if (!strcasecmp(field, "has_item"))
         {
           if (!(subfield && *subfield))
@@ -899,7 +907,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           else
             *str = '\0';
         }
-        break;
+
+
+
       case 'i':
 
         if (!strcasecmp(field, "inventory"))
@@ -1057,10 +1067,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           snprintf(str, slen, "%d", GET_MAX_MANA(c));
         else if (!strcasecmp(field, "maxmove"))
           snprintf(str, slen, "%d", GET_MAX_MOVE(c));
-        else if (!strcasecmp(field, "mana"))
+        else if (!strcasecmp(field, "mana")) {
+          if (subfield && *subfield)
+          {
+            int newmana = atoi(subfield);
+            GET_MANA(c) = newmana;
+          }
           snprintf(str, slen, "%d", GET_MANA(c));
-        else if (!strcasecmp(field, "move"))
+        }
+        else if (!strcasecmp(field, "move")) {
+          if (subfield && *subfield)
+          {
+            int newmove = atoi(subfield);
+            GET_MOVE(c) = newmove;
+          }
           snprintf(str, slen, "%d", GET_MOVE(c));
+        }
         else if (!strcasecmp(field, "master"))
         {
           if (!c->master)
@@ -1324,6 +1346,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
           snprintf(str, slen, "%d", GET_SAVE(c, SAVING_SPELL));
         }
+        else if (!strcasecmp(field, "sethitp"))
+        {
+          if (subfield && *subfield)
+          {
+            int newhit = atoi(subfield);
+            GET_HIT(c) = newhit;
+//            if (GET_HIT(c) > GET_MAX_HIT(c)) GET_HIT(c) = GET_MAX_HIT(c);
+          }
+        }
+        break;
 
         break;
       case 't':
