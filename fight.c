@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.55  2006/09/21 13:51:57  w4dimenscor
+ * After the last change, which prevented riding sleeping/sitting mounts, mounted players couldn't flee anymore. apparently charmed mounts were assisting their master in the fight! The reason for this was fight_event_hit, which apparently made all charmies assist (recent code change?). I changed it so that charmies that have someone mounted on them won't assist.
+ *
  * Revision 1.54  2006/09/21 08:37:50  w4dimenscor
  * Fixed uninitialised value in start-fighting
  *
@@ -882,7 +885,7 @@ int next_round(Character* ch) {
         victim = victim->RiderHere() ? RIDDEN_BY(victim) : victim;
 
     /* check to see if there is anyone in the room fighting you however! */
-    if (!victim) 
+    if (!victim)
         victim = ch->NextFightingMe();
     
     /*to stop recursion*/
@@ -1665,7 +1668,7 @@ perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 :
                     continue; /* Skip if any of these are true */
                 if (FIGHTING(f->follower))
                     continue;
-                if (((AFF_FLAGGED(f->follower, AFF_CHARM)) || PRF_FLAGGED(f->follower, PRF_AUTOASSIST))&& HERE(f->follower,vict)) {
+                if (((AFF_FLAGGED(f->follower, AFF_CHARM) && !RIDDEN_BY(f->follower)) || PRF_FLAGGED(f->follower, PRF_AUTOASSIST))&& HERE(f->follower,vict)) {
                     start_fighting_delay(f->follower, vict);
                 }
             }
