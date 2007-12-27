@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/03/01 23:19:41 $
-*  $Revision: 1.12 $
+*  $Date: 2007/03/01 23:48:55 $
+*  $Revision: 1.13 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1362,7 +1362,7 @@ void time_otrigger(obj_data *obj)
   }
 }
 
-int put_in_otrigger(obj_data *container, obj_data *obj)
+int put_in_otrigger(obj_data *container, obj_data *obj, Character *actor)
 {
 	trig_data *t;
 	int ret_val;
@@ -1375,6 +1375,7 @@ int put_in_otrigger(obj_data *container, obj_data *obj)
 	{
 		if(TRIGGER_CHECK(t, OTRIG_PUT_IN)){
       			ADD_UID_VAR(buf, t, obj, "object", 0);
+      			ADD_UID_VAR(buf, t, actor, "actor", 0);
       			ret_val = script_driver(&container, t, OBJ_TRIGGER, TRIG_NEW);
 
 			      /* don't allow a put to take place, if

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/03/01 23:19:41 $
-*  $Revision: 1.12 $
+*  $Date: 2007/03/01 23:48:55 $
+*  $Revision: 1.13 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -302,7 +302,7 @@ int door_mtrigger(Character *actor, int subcmd, int dir);
 int door_wtrigger(Character *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, Character *actor, int cmd);
-int put_in_otrigger(obj_data *cont, obj_data *obj);
+int put_in_otrigger(obj_data *cont, obj_data *obj, Character *actor);
 
 /* function prototypes from dg_scripts.c */
 void script_damage(Character *vict, int dam);
