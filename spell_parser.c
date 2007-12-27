@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.39  2007/06/07 22:28:53  w4dimenscor
+ * fixed a crash bug in the code where it checked for if a target of a directional was able to hunt the victim
+ *
  * Revision 1.38  2007/05/24 20:29:16  w4dimenscor
  * Last few fixes to hunting and directionals.
  * --Thotter
@@ -925,45 +928,41 @@ int cast_spell(Character *ch, Character *tch,
     if (GET_POS(ch) < SINFO.min_position) {
         switch (GET_POS(ch)) {
         case POS_SLEEPING:
-            send_to_char("You dream about great magical powers.\r\n", ch);
+            ch->Send("You dream about great magical powers.\r\n");
             break;
         case POS_RESTING:
-            send_to_char("You can not concentrate while resting.\r\n", ch);
+            ch->Send("You can not concentrate while resting.\r\n");
             break;
         case POS_SITTING:
-            send_to_char("You can not do this sitting!\r\n", ch);
+            ch->Send("You can not do this sitting!\r\n");
             break;
         case POS_FIGHTING:
-            send_to_char("Impossible!  You can not concentrate enough!\r\n", ch);
+            ch->Send("Impossible!  You can not concentrate enough!\r\n");
             break;
         default:
-            send_to_char("You can not do much of anything like this!\r\n",
-                         ch);
+            ch->Send("You can not do much of anything like this!\r\n");
             break;
         }
         return (0);
     }
     if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == tch)) {
-        send_to_char("You are afraid you might hurt your master!\r\n", ch);
+        ch->Send("You are afraid you might hurt your master!\r\n");
         return (0);
     }
-    if ((tch != ch) && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
-        send_to_char("You can only cast this spell upon yourself!\r\n",
-                     ch);
+    if ((tch && tch != ch) && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
+        ch->Send("You can only cast this spell upon yourself!\r\n");
         return (0);
     }
     if ((tch == ch) && IS_SET(SINFO.targets, TAR_NOT_SELF)) {
-        send_to_char("You can not cast this spell upon yourself!\r\n", ch);
+        ch->Send("You can not cast this spell upon yourself!\r\n");
         return (0);
     }
-    if (IS_SET(SINFO.routines, MAG_GROUPS) && !AFF_FLAGGED(ch, AFF_GROUP)) {
-        send_to_char
-        ("You can not cast this spell if you are not in a group!\r\n",
-         ch);
+    if (IS_SET(SINFO.routines, MAG_GROUPS) && (!ch->master || !ch->followers)) {
+        ch->Send("You can not cast this spell if you are not in a group!\r\n");
         return (0);
     }
-    if(GET_SPELL_DIR(ch) != NOWHERE && SINFO.violent && CAN_HUNT(tch) && !tch->canHuntChar(ch)) {
-	    *ch << "You can't get a clear shot.\n";
+    if(GET_SPELL_DIR(ch) != NOWHERE && SINFO.violent && tch!=NULL && CAN_HUNT(tch) && !tch->canHuntChar(ch)) {
+	    ch->Send("You can't get a clear shot.\r\n");
 	    return (0);
     }
 
@@ -971,8 +970,7 @@ int cast_spell(Character *ch, Character *tch,
         if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
             ch->Send( "%s", CONFIG_OK);
         } else if (GET_SPELL_DIR(ch) != NOWHERE) {
-            ch->Send(
-                "You concentrate your energy and send the runes of %s %s.\r\n",
+            ch->Send("You concentrate your energy and send the runes of %s %s.\r\n",
                 skill_name(spellnum),
                 dirs[GET_SPELL_DIR(ch)]);
         } else if ( IS_SET(SINFO.routines, MAG_DAMAGE)) {
