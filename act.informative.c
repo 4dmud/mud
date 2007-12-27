@@ -3925,7 +3925,7 @@ ACMD(do_consider) {
             else if (diff3 < 20)
                 ch->Send("You are gonna hurt them more.\r\n");
             else if (diff3 < 40)
-                ch->Send("You eat puppys like this for breakfast.\r\n");
+                ch->Send("You eat puppies like this for breakfast.\r\n");
             else if (diff3 < 60)
                 ch->Send("It won't hurt a bit.\r\n");
             else if (diff > 60)

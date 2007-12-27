@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.29  2007/11/18 13:56:25  w4dimenscor
+ * Two typo fixes from Hal.
+ *
  * Revision 1.28  2007/06/10 08:18:13  w4dimenscor
  * added new body parts CHEST and BACK
  *
@@ -1299,7 +1302,7 @@ const char *item_types[] =
     "wings",
     "spacesuit",         //40
     "aqualung",
-    "climable",
+    "climbable",
     "level 1 poison",
     "level 2 poison",
     "level 3 poison",              //45
