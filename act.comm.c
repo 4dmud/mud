@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.45  2007/09/03 06:00:11  w4dimenscor
+ * Fixed page to not consider mobs.
+ *
  * Revision 1.44  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -1045,7 +1048,7 @@ ACMD(do_page) {
                 send_to_char("You will never be godly enough to do that!\r\n", ch);
             return;
         }
-        if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)) != NULL) {
+        if ((vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD)) != NULL) {
             if (IS_NPC(vict) || (is_ignoring(vict, ch) && GET_LEVEL(ch) <= LVL_GOD)) {
                 act("$E's ignoring you.", FALSE, ch, 0, vict, TO_CHAR);
                 return;
