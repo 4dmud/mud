@@ -1266,8 +1266,8 @@ Character *get_char_room(const char *name, int *number, room_rnum room)
 
   if (!number)
   {
-    number = &num;
     num = get_number(&name);
+    number = &num;
   }
 
   if (*number == 0 || !room)
