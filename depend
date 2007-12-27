@@ -174,7 +174,7 @@ interpreter.o: interpreter.c conf.h sysdep.h structs.h subskills.h comm.h \
   improved-edit.h
 kalten.o: kalten.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h house.h screen.h constants.h \
-  oasis.h dg_scripts.h clan.h damage.h event.h fight.h kalten.h
+  oasis.h dg_scripts.h clan.h damage.h event.h fight.h kalten.h romance.h
 limits.o: limits.c conf.h sysdep.h structs.h subskills.h utils.h spells.h \
   comm.h db.h handler.h interpreter.h dg_scripts.h clan.h fight.h \
   damage.h
@@ -250,6 +250,9 @@ regen.o: regen.c conf.h sysdep.h structs.h subskills.h interpreter.h \
 remort.o: remort.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h house.h screen.h constants.h \
   oasis.h dg_scripts.h dg_event.h clan.h
+romance.o: romance.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
+  interpreter.h handler.h db.h spells.h screen.h constants.h damage.h \
+  event.h romance.h
 sedit.o: sedit.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h db.h shop.h genolc.h genshp.h genzon.h oasis.h
 shop.o: shop.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \

@@ -7,3 +7,5 @@ auction.h
 zreload.c
 pfileclean.c
 action.h
+romance.c
+romance.h
