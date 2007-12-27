@@ -479,7 +479,7 @@ ACMD(do_flee)
         if (was_fighting && !DEAD(was_fighting) && !IS_NPC(ch) && IS_NPC(was_fighting) &&
             !(GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0))
         {
-          loss = FTOI(IRANGE(0, GET_EXP(was_fighting) * 0.3, CONFIG_MAX_EXP_LOSS * 5));
+          loss = FTOI(IRANGE(0, GET_EXP(was_fighting) * 0.15, CONFIG_MAX_EXP_LOSS * 5));
           ch->Send( "[You lose %d exp]\r\n", loss);
           gain_exp(ch, -loss);
         }
