@@ -160,6 +160,8 @@
 
 #define USE_CREATE_CHAR 0
 
+#define MAX_HELPENTRY_LENGTH 32384
+
 extern NOTE_DATA *note_list;
 extern NOTE_DATA *idea_list;
 extern NOTE_DATA *penalty_list;

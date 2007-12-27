@@ -178,11 +178,25 @@ void hedit_save_to_disk(Descriptor *d) {
     }
     log("Saving help to %s", buf);
     for (i = 0; i <= top_of_helpt; i++) {
-
+	char entry[MAX_HELPENTRY_LENGTH];
+	char *hptr,*carpointer;
+	int lengthleft=MAX_HELPENTRY_LENGTH;
         help = (help_table + i);
+	hptr=help->entry;
+	*entry='\0';
+	if(hptr && *hptr){
+		while((carpointer=strchr(hptr,'\r'))!=NULL){
+			strncat(entry,hptr,(carpointer-hptr<lengthleft-1)?carpointer-hptr:lengthleft);
+			strcat(entry,"\n");
+			lengthleft-=carpointer-hptr+1;
+			hptr=carpointer;
+			while(*hptr=='\r' || *hptr=='\n') hptr++;
+		}
+		strncat(entry,hptr,(strlen(hptr)<lengthleft)?strlen(hptr):lengthleft);
+	}
         fprintf(fp, "%s\n%s\n#%d\n",
                 help->keywords && *help->keywords ? help->keywords : "UNDEFINED",
-                help->entry && *help->entry ? help->entry : "Empty",
+                help->entry && *help->entry ? entry : "Empty",
                 help->min_level);
         //log("%d - %s", i, help->keywords);
     }

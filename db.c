@@ -3375,10 +3375,10 @@ void load_help(FILE * fl) {
 #endif
 void load_help(FILE *fl) {
 #if defined(CIRCLE_MACINTOSH)
-    static char key[READ_SIZE + 1],  entry[32384]; /* too big for stack? */
+    static char key[READ_SIZE + 1],  entry[MAX_HELPENTRY_LENGTH]; /* too big for stack? */
 #else
 
-    char key[READ_SIZE + 1], entry[32384];
+    char key[READ_SIZE + 1], entry[MAX_HELPENTRY_LENGTH];
 #endif
 
     size_t entrylen = 0;
