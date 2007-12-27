@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.9  2004/12/07 09:31:26  w4dimenscor
+ * Trees modularized, fix added to message event
+ *
  * Revision 1.8  2004/12/05 09:46:52  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -2038,11 +2041,11 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
     if (staff)
     {
       if (OBJ_FLAGGED(staff, ITEM_LIFESTEAL))
-        hp += 6;
+        hp += 2;
       if (OBJ_FLAGGED(staff, ITEM_MANASTEAL))
-        ma += 6;
+        ma += 2;
       if (OBJ_FLAGGED(staff, ITEM_MOVESTEAL))
-        mv += 6;
+        mv += 2;
 
     }
   }
@@ -2054,7 +2057,7 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
     if (wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)
     {
       if (OBJ_FLAGGED(wielded, ITEM_LIFESTEAL))
-        hp += 2;
+        hp += 1;
       if (OBJ_FLAGGED(wielded, ITEM_MANASTEAL))
         ma += 2;
       if (OBJ_FLAGGED(wielded, ITEM_MOVESTEAL))
@@ -2064,7 +2067,7 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
     if (wielded_2 && GET_OBJ_TYPE(wielded_2) == ITEM_WEAPON)
     {
       if (OBJ_FLAGGED(wielded_2, ITEM_LIFESTEAL))
-        hp += 2;
+        hp += 1;
       if (OBJ_FLAGGED(wielded_2, ITEM_MANASTEAL))
         ma += 2;
       if (OBJ_FLAGGED(wielded_2, ITEM_MOVESTEAL))
@@ -2075,7 +2078,7 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
   if (shield && GET_OBJ_TYPE(shield) == ITEM_ARMOR)
   {
     if (OBJ_FLAGGED(shield, ITEM_LIFESTEAL))
-      hp += 3;
+      hp += 1;
     if (OBJ_FLAGGED(shield, ITEM_MANASTEAL))
       ma += 3;
     if (OBJ_FLAGGED(shield, ITEM_MOVESTEAL))
@@ -2085,26 +2088,26 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
   if (GET_EQ(ch, WEAR_FINGER_L) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_FINGER_L)) == ITEM_ARMOR)
   {
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_L), ITEM_LIFESTEAL))
-      hp += 3;
+      hp += 1;
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_L), ITEM_MANASTEAL))
       ma += 3;
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_L), ITEM_MOVESTEAL))
-      mv += 3;
+      mv += 2;
   }
   if (GET_EQ(ch, WEAR_FINGER_R) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_FINGER_R)) == ITEM_ARMOR)
   {
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_R), ITEM_LIFESTEAL))
-      hp += 3;
+      hp += 1;
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_R), ITEM_MANASTEAL))
-      ma += 3;
+      ma += 2;
     if (OBJ_FLAGGED(GET_EQ(ch, WEAR_FINGER_R), ITEM_MOVESTEAL))
-      mv += 3;
+      mv += 1;
   }
 
-  if (IS_NPC(ch) && MOB_SUBSKILL(ch) == ( SUB_DRAIN_BLOOD))
+  if (IS_NPC(ch) && (MOB_SUBSKILL(ch) == (SUB_DRAIN_BLOOD) || GET_LEVEL(ch) > number(50, 300)))
     hp +=15;
   if (!IS_NPC(ch))
-    hp += GET_SUB(ch, SUB_DRAIN_BLOOD) * 0.2;
+    hp += GET_SUB(ch, SUB_DRAIN_BLOOD) * 0.05;
 
 
 

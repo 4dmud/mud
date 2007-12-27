@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.3  2004/12/07 09:31:26  w4dimenscor
+ * Trees modularized, fix added to message event
+ *
  * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -36,6 +39,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "genolc.h"
+#include "trees.h"
 
 
 #define TIER (current_class_is_tier_num(ch)+1)
@@ -49,11 +53,7 @@ EVENTFUNC(message_event);
 ASKILL(skill_manifest);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
-struct obj_data *make_tree(void);
-room_rnum find_forest_rand(void);
-void load_trees(void);
-void parse_tree_name(struct obj_data *tree);
-void create_trees(void);
+
 extern struct char_data *find_char(long n);
 extern struct obj_data *find_obj(long n);
 extern struct room_data *find_room(long n);
@@ -68,7 +68,6 @@ struct syllable
   char *org;
   char *current;
 };
-
 
 
 /* extern variables */
@@ -99,11 +98,6 @@ char *get_spell_name(char *argument)
 
   return s;
 }
-
-
-#define MAX_TREE_TYPES 9
-
-
 
 void make_potion(struct char_data *ch, int potion,
                  struct obj_data *container)
@@ -635,136 +629,6 @@ ASKILL(skill_tinker)
   return SKILL_TINKER;
 }
 
-struct obj_data *make_tree(void)
-{
-
-  struct obj_data *final_tree;
-
-  int num = 0, age = 0;
-
-  if (tree_total > TREE_MAX)
-    return (NULL);
-
-  num = number(0, MAX_TREE_TYPES - 1);
-  final_tree = create_obj();
-
-  final_tree->item_number = NOTHING;
-  final_tree->in_room = NULL;
-
-  GET_OBJ_TYPE(final_tree) = ITEM_TREE;
-  SET_BIT_AR(GET_OBJ_EXTRA(final_tree), ITEM_GLOW);
-  //SET_BIT_AR(GET_OBJ_EXTRA(final_tree), ITEM_UNIQUE_SAVE);
-  GET_OBJ_VAL(final_tree, 0) = (int) time(0);
-  GET_OBJ_VAL(final_tree, 1) = age;
-  GET_OBJ_VAL(final_tree, 2) = num;
-  GET_OBJ_VAL(final_tree, 3) = 0;
-  GET_OBJ_COST(final_tree) = 500;
-  GET_OBJ_WEIGHT(final_tree) = 1;
-  GET_OBJ_RENT(final_tree) = 0;
-  GET_OBJ_TIMER(final_tree) = -1;
-  parse_tree_name(final_tree);
-
-  return (final_tree);
-}
-
-
-void parse_tree_name(struct obj_data *tree)
-{
-  struct extra_descr_data *new_descr = NULL;
-  char buf2[MAX_INPUT_LENGTH];
-
-  free_string(tree->name);
-  free_string(tree->description);
-  free_string(tree->short_description);
-  free_string(tree->smell);
-  free_string(tree->feel);
-
-  tree->smell = strdup("It smells good!\r\n");
-  tree->feel = strdup("It feels alive.\r\n");
-
-  if (tree->ex_description)
-    free_ex_descriptions(tree->ex_description);
-
-  snprintf(buf2, sizeof(buf2), "%s %s tree magictree",
-           age_desc_tree[GET_OBJ_VAL(tree, 1)],
-           tree_names[IRANGE(0, GET_OBJ_VAL(tree, 2), 8)]);
-  tree->name = str_dup(buf2);
-
-
-  snprintf(buf2, sizeof(buf2), "%s %s %s tree grows here.",
-           CANA(age_desc_tree[GET_OBJ_VAL(tree, 1)]),
-           age_desc_tree[GET_OBJ_VAL(tree, 1)],
-           tree_names[IRANGE(0, GET_OBJ_VAL(tree, 2), 8)]);
-  tree->description = str_dup(buf2);
-
-  snprintf(buf2, sizeof(buf2), "%s %s %s tree",
-           LANA(age_desc_tree[GET_OBJ_VAL(tree, 1)]),
-           age_desc_tree[GET_OBJ_VAL(tree, 1)],
-           tree_names[IRANGE(0, GET_OBJ_VAL(tree, 2), 8)]);
-  tree->short_description = str_dup(buf2);
-
-  /* extra description coolness! */
-  CREATE(new_descr, struct extra_descr_data, 1);
-  new_descr->keyword = str_dup(buf2);
-  snprintf(buf2, sizeof(buf2), "It appears to be %s %s %s tree.",
-           LANA(age_desc_tree[GET_OBJ_VAL(tree, 1)]),
-           age_desc_tree[GET_OBJ_VAL(tree, 1)],
-           tree_names[IRANGE(0, GET_OBJ_VAL(tree, 2), 8)]);
-  new_descr->description = str_dup(buf2);
-  new_descr->next = NULL;
-  tree->ex_description = new_descr;
-}
-
-room_rnum find_forest_rand(void)
-{
-
-  int i = 0, r = number(0, forest_room);
-  struct forest_data *temp;
-
-  if (forest == NULL)
-  {
-    log("ERROR: forest rooms not initialized");
-    return NULL;
-  }
-
-  temp = forest;
-  while (i < r)
-  {
-    i++;
-    if (i == r)
-      break;
-    temp = temp->next;
-  }
-  return (temp->room);
-}
-
-ACMD(forest_find)
-{
-  OBJ_DATA *tree, *next_tree;
-  skip_spaces(&argument);
-  if (!*argument)
-  {
-    room_rnum ffr = find_forest_rand();
-    if (ffr)
-      new_send_to_char(ch, "A forest room is [%d]\r\n", ffr->number);
-  }
-  else if (!strcmp(argument, "clear"))
-  {
-    for (tree = object_list; tree; tree = next_tree)
-    {
-      next_tree = tree->next;
-      if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING))
-        extract_obj(tree);
-    }
-    save_forest();
-    new_send_to_char(ch, "Cleared and saved.\r\n");
-  }
-  else
-  {
-    new_send_to_char(ch, "Either forest, or forest clear\r\n");
-  }
-}
-
 void make_focus(struct char_data *ch, int type, struct obj_data *o)
 {
   struct obj_data *final_focus;
@@ -1097,10 +961,12 @@ EVENTFUNC(message_event)
     return 0;
   }
 
-  GET_MESSAGE_EVENT(ch) = NULL;
+  
 
   if (msg->msg_num == 0)
   {
+  GET_MESSAGE_EVENT(ch)->event_obj = NULL;
+  GET_MESSAGE_EVENT(ch) = NULL;
     free(event_obj);
     return 0;
   }
@@ -1157,10 +1023,13 @@ EVENTFUNC(message_event)
   {
     log("SYSERR: unknown type passed to message event");
   }
-  if (msg->msg_num == 0 || (--msg->msg_num) <= 0 || (ch && GET_MSG_RUN(ch) == 0))
+  if (time == 0 || msg->msg_num == 0 || (--msg->msg_num) <= 0 || (ch && GET_MSG_RUN(ch) == 0))
   {
-    if (ch)
+    if (ch) {
       GET_MSG_RUN(ch) = 0;
+      GET_MESSAGE_EVENT(ch)->event_obj = NULL;
+  GET_MESSAGE_EVENT(ch) = NULL;
+  }
     free(event_obj);
 
     if (ch)
@@ -1190,11 +1059,6 @@ ACMD(do_fell)
     return;
   }
 
-  if (IS_HERO(ch))
-  {
-    new_send_to_char(ch, "Sorry, heros can't fell.\r\n");
-    return;
-  }
 
   skip_spaces(&argument);
   temp1 = one_argument(argument, tree_name);
@@ -1314,6 +1178,3 @@ ASKILL(skill_manipulate)
   return SKILL_MANIPULATE;
 }
 
-
-void load_trees(void)
-{}

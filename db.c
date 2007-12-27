@@ -38,6 +38,7 @@ int sunlight;
 #include "genmob.h"
 #include "genwld.h"
 #include "xmlhelp.h"
+#include "trees.h"
 
 int load_qic_check(int rnum);
 void qic_scan_rent(void);
@@ -164,19 +165,6 @@ char *policies = NULL;		/* policies page                 */
 char *startup = NULL;		/* startup screen                */
 
 
-/*Forest stuff*/
-int tree_total = 0;
-struct forest_data *forest = NULL;
-int forest_room;
-int save_forest(void);
-int load_forest(void);
-void init_trees(int num);
-void create_trees(void);
-int load_tree(room_rnum room, int v0, int v1, int v2, int v3);
-room_rnum find_forest_rand(void);
-extern struct obj_data *make_tree(void);
-void parse_tree_name(struct obj_data *tree);
-
 struct time_info_data time_info;	/* the infomation about the time    */
 struct player_special_data dummy_mob;	/* dummy spec area for mobs     */
 struct reset_q_type reset_q;	/* queue of zones to be reset    */
@@ -274,7 +262,6 @@ void new_load_corpses(void);
 void save_char_vars(struct char_data *ch);
 void destroy_shops(void);	//mord??
 void strip_cr(char *);		//...
-void load_trees(void);
 void load_notes(void);
 
 /* external vars */
@@ -6019,7 +6006,7 @@ void free_obj_delayed(struct obj_data *obj)
     for (temp = dead_obj; temp; temp = temp->next)
     if (temp == obj)
     {
-      log("Object %s attepted to be added to dead list twice!", obj->short_description);
+      log("Object %s attempted to be added to dead list twice!", obj->short_description);
       return;
     }
   obj->next = dead_obj;
@@ -7023,132 +7010,6 @@ int check_bitvector_names(bitvector_t bits, size_t namecount,
   return (error);
 }
 
-
-int load_forest(void)
-{
-  char line[MAX_INPUT_LENGTH];
-  FILE *fl;
-  int v0 = 0, v1 = 0, v2 = 0, v3 = 0, v4 = 0;
-  int num = 0;
-
-  if (!(fl = fopen(FOREST_FILE, "r")))
-  {
-    log("SYSERR: Couldn't open forest file %s",FOREST_FILE);
-    return -1;
-  }
-
-  while (get_line(fl, line))
-  {
-    sscanf(line, "%d %d %d %d %d", &v4, &v0, &v1, &v2, &v3);
-    load_tree(real_room(v4), v0, v1, v2, v3);
-    num++;
-  }
-  fclose(fl);
-  if (num)
-    return (num);
-  else
-    return (-1);
-
-}
-
-
-
-int save_forest(void)
-{
-  FILE *fl;
-
-  struct obj_data *k = NULL;
-
-
-
-  if ((fl = fopen(FOREST_FILE, "w")) == NULL)
-  {
-    log("SYSERR: Can't write to '%s' forest file.", FOREST_FILE);
-    return -1;
-  }
-
-  for (k = object_list; k; k = k->next)
-  {
-    if (k->in_room && GET_OBJ_TYPE(k) == ITEM_TREE)
-    {
-      fprintf(fl, "%d %d %d %d %d\n",
-              k->in_room->number, GET_OBJ_VAL(k, 0),
-              GET_OBJ_VAL(k, 1), GET_OBJ_VAL(k, 2), GET_OBJ_VAL(k,3));
-    }
-
-  }
-  fclose(fl);
-  return 1;
-}
-
-void init_trees(int num)
-{
-  int i;
-  for (i = num; i < TREE_MAX; i++)
-    load_tree(NULL, 0, 0, 0, 0);
-  save_forest();
-}
-
-void create_trees(void)
-{
-  int i;
-  for (i = tree_total; i < TREE_MAX; i++)
-    load_tree(NULL, 0, 0, 0, 0);
-  save_forest();
-}
-
-int load_tree(room_rnum room, int v0, int v1, int v2, int v3)
-{
-
-  struct obj_data *tree;
-  room_rnum rm = room;
-
-  //room is the VNUM
-
-  //make tree creates a tree prototype
-  tree = make_tree();
-
-  if (tree == NULL)
-    return (0);
-
-  if (rm == NULL)
-    rm = find_forest_rand();
-
-  if (rm == NULL)
-  {
-    extract_obj(tree);
-    return 0;
-  }
-
-  if (SECT(rm) != SECT_FOREST)
-  {
-    extract_obj(tree);
-    return (0);
-  }
-
-
-  if (v0)			//time of creation
-    GET_OBJ_VAL(tree, 0) = v0;
-
-  if (v1)			//age desc number (sapling, old, aging)
-    GET_OBJ_VAL(tree, 1) = IRANGE(0, v1, 8);
-
-  if (v2)			//type desc number (oak, willow, pine)
-    GET_OBJ_VAL(tree, 2) = IRANGE(0, v2, 8);
-
-  GET_OBJ_VAL(tree, 3) = rm == NULL ? NOWHERE : rm->number;
-
-  if ((time(0) - GET_OBJ_VAL(tree, 0))/ (7 * SECS_PER_REAL_DAY) > GET_OBJ_VAL(tree, 1))
-    if (GET_OBJ_VAL(tree, 1) < MAX_TREE_AGE)
-      GET_OBJ_VAL(tree, 1)++;
-
-
-  parse_tree_name(tree);
-
-  tree_total++;
-  obj_to_room(tree, rm);
-  return (1);
-}
 
 void generate_weapon(OBJ_DATA *obj)
 {

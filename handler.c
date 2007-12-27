@@ -21,7 +21,7 @@
 #include "spells.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
-
+#include "trees.h"
 
 /* local vars */
 int extractions_pending = 0;
@@ -52,8 +52,6 @@ void remove_corpse_from_list(OBJ_DATA *corpse);
 int stop_task(struct char_data *ch) ;
 extern struct char_data *ch_selling;
 void stop_auction(int type, struct char_data *ch);
-void parse_tree_name(struct obj_data *tree);
-int save_forest(void);
 size_t strlcpy(char *dest, const char *source, size_t totalsize);
 int invalid_class(struct char_data *ch, struct obj_data *obj);
 int invalid_race(struct char_data *ch, struct obj_data *obj);
@@ -1419,11 +1417,12 @@ void extract_obj(struct obj_data *obj)
     log("Null pointer given to extract object.");
     return;
   }
-    for (tobj = dead_obj; tobj; tobj = tobj->next)
+    for (tobj = dead_obj; tobj; tobj = tobj->next) {
     if (tobj == obj)
     {
       log("Object %s atempted to be added to dead list twice!", obj->short_description);
       return;
+    }
     }
   if (GET_ID(obj) == 0) {
   log("extracting object that hasn't been initilised");
@@ -1650,46 +1649,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
   }
   extract_obj(obj);
 }
-void check_all_trees(void)
-{
-  //TODO: this, .. i don't think works right
-  struct obj_data *obj, *tmp;
-  time_t tm = time(0);
-  int ext = 0, add = 0;
 
-  log("TREES: Updating all trees...");
-
-  for (obj = object_list; obj; obj = tmp)
-  {
-  tmp = obj->next;
-    /*tree check*/
-    if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING)
-    {
-      if ((tm - GET_OBJ_VAL(obj, 0)) > (7 * SECS_PER_REAL_DAY))
-      {
-        if (GET_OBJ_VAL(obj, 1) <= MAX_TREE_AGE)
-        {
-          add++;
-          GET_OBJ_VAL(obj, 0) = (int) time(0);
-          GET_OBJ_VAL(obj, 1)++;
-          parse_tree_name(obj);
-        }
-        else
-        {
-          ext++;
-          if (IN_ROOM(obj) != NULL)
-            send_to_room(IN_ROOM(obj), "With a sigh and a whisper %s collapses to the forest floor.\r\n", obj->short_description);
-          extract_obj(obj);
-        }
-      }
-      /*tree check*/
-    }
-  }
-
-  save_forest();
-  log("TREES: Update complete. Created: %d Destroyed: %d", add, ext);
-
-}
 
 void update_object(struct char_data *ch, struct obj_data *obj, int use)
 {

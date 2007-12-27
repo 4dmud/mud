@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.6  2004/12/07 09:31:26  w4dimenscor
+ * Trees modularized, fix added to message event
+ *
  * Revision 1.5  2004/12/05 09:46:51  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -502,10 +505,8 @@ int is_magic(OBJ_DATA *obj)
   case ITEM_STAFF:
     return TRUE;
     break;
-  default:
-    return FALSE;
-    break;
   }
+  return count_magic(obj->contains, NULL);
 }
 int count_magic(struct obj_data *obj, CHAR_DATA *ch)
 {
@@ -562,9 +563,9 @@ int i;
   else if (is_magic(obj) && (i=count_magic_items(ch)) >= MAX_MAGIC_ITEMS)
   {
   if (i == MAX_MAGIC_ITEMS)
-    act("$p: you have 30 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
+    act("$p: you have 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
     else
-    act("$p: you have more then 30 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
+    act("$p: you have more then 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }
   return TRUE;

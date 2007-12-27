@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.5  2004/12/07 09:31:26  w4dimenscor
+ * Trees modularized, fix added to message event
+ *
  * Revision 1.4  2004/12/05 09:46:52  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -1996,7 +1999,7 @@ SPECIAL(dragon_fire)
    * equal to a fireball in all cases.
    */
   /* call_magic(ch, NULL, NULL, SPELL_FIRE_BREATH, 0, CAST_BREATH); */
-  damage(dragon, FIGHTING(dragon), dice(5, GET_LEVEL(dragon)),SPELL_FIRE_BREATH);
+  damage(dragon, FIGHTING(dragon), dice(GET_LEVEL(dragon), GET_LEVEL(dragon)),SPELL_FIRE_BREATH);
 
   /* If you use the damage call, you don't need the spell, but if you use
    * the spell, you should add the no_magic room information below.
@@ -2025,7 +2028,7 @@ SPECIAL(dragon_gas)
    * equal to a fireball in all cases.
    */
   /* call_magic(ch, NULL, NULL, SPELL_GAS_BREATH, 0, CAST_BREATH); */
-  damage(dragon, FIGHTING(dragon), dice(5, GET_LEVEL(dragon)),
+  damage(dragon, FIGHTING(dragon), dice(GET_LEVEL(dragon), GET_LEVEL(dragon)),
          SPELL_GAS_BREATH);
 
   /* If you use the damage call, you don't need the spell, but if you use
@@ -2056,7 +2059,7 @@ SPECIAL(dragon_frost)
    * equal to a fireball in all cases.
    */
   /* call_magic(ch, NULL, NULL, SPELL_FROST_BREATH, 0, CAST_BREATH); */
-  damage(dragon, FIGHTING(dragon), dice(5, GET_LEVEL(dragon)),
+  damage(dragon, FIGHTING(dragon), dice(GET_LEVEL(dragon), GET_LEVEL(dragon)),
          SPELL_FROST_BREATH);
   /* If you use the damage call, you don't need the spell, but if you use
    * the spell, you should add the no_magic room information below.
@@ -2087,7 +2090,7 @@ SPECIAL(dragon_acid)
    * equal to a fireball in all cases.
    */
   /* call_magic(ch, NULL, NULL, SPELL_ACID_BREATH, 0, CAST_BREATH); */
-  damage(dragon, FIGHTING(dragon), dice(5, GET_LEVEL(dragon)),
+  damage(dragon, FIGHTING(dragon), dice(GET_LEVEL(dragon), GET_LEVEL(dragon)),
          SPELL_ACID_BREATH);
 
   /* If you use the damage call, you don't need the spell, but if you use
@@ -2115,7 +2118,7 @@ SPECIAL(dragon_lightning)
    * equal to a fireball in all cases.
    */
   /* call_magic(ch, NULL, NULL, SPELL_LIGHTNING_BREATH, 0, CAST_BREATH); */
-  damage(dragon, FIGHTING(dragon), dice(5, GET_LEVEL(dragon)),
+  damage(dragon, FIGHTING(dragon), dice(GET_LEVEL(dragon), GET_LEVEL(dragon)),
          SPELL_LIGHTNING_BREATH);
 
   /* If you use the damage call, you don't need the spell, but if you use

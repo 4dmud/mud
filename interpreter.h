@@ -11,7 +11,7 @@
 
 #define ACMD(name)  \
    void name(struct char_data *ch, char *argument, int cmd, int subcmd)
-   
+
 #define ACTION(name)  \
    long name(struct char_data *ch, struct char_data *vict, struct obj_data *obj, \
    struct room_data *room, int *num)
@@ -19,7 +19,7 @@
 #define ASKILL(name)  \
    int name(struct char_data *ch, struct char_data *vict, \
    struct obj_data *obj, char *argument)
-   
+
 #define ASUB(name)  \
    int name(struct char_data *ch, struct char_data *vict, \
    struct obj_data *obj, char *argument)
@@ -61,19 +61,21 @@ void delete_aliases(const char *charname);
 #define argument_interpreter(a, b, c) two_arguments(a, b, c)
 
 
-struct command_info {
-    const char *command;
-    const char *sort_as;
-    byte minimum_position;
-    void (*command_pointer) (struct char_data * ch, char *argument, int cmd, int subcmd);
-    sh_int minimum_level;
-    int subcmd;
-    long cmd_bits;
+struct command_info
+{
+  const char *command;
+  const char *sort_as;
+  byte minimum_position;
+  void (*command_pointer) (struct char_data * ch, char *argument, int cmd, int subcmd);
+  sh_int minimum_level;
+  int subcmd;
+  long cmd_bits;
 };
 
-struct ignore {
-    char *ignore;
-    struct ignore *next;
+struct ignore
+{
+  char *ignore;
+  struct ignore *next;
 };
 
 /*
@@ -89,11 +91,12 @@ extern struct command_info *complete_cmd_info;
  * because a Windows 95 compiler gives a warning about it having similiar
  * named member.
  */
-struct alias_data {
-    char *alias;
-    char *replacement;
-    int type;
-    struct alias_data *next;
+struct alias_data
+{
+  char *alias;
+  char *replacement;
+  int type;
+  struct alias_data *next;
 };
 
 #define ALIAS_SIMPLE	0
@@ -108,7 +111,7 @@ struct alias_data {
  *   You can define these however you want to, and the definitions of the
  *   subcommands are independent from function to function.
  */
- 
+
 #define SCMD_WAKE 1
 #define SCMD_ROUSE 2
 /* fencing */

@@ -722,7 +722,7 @@ ASKILL(skill_charge)
 
 int perform_charge(CHAR_DATA *ch, CHAR_DATA *vict)
 {
-  int prob, percent = number(0, 100);
+  int prob, percent = number(0, 150);
   if (MOB_FLAGGED(vict, MOB_NOBASH))
     return 0;
   if (GET_POS(vict) < POS_FIGHTING)
@@ -768,18 +768,18 @@ ASKILL(skill_bash)
     GET_WAIT_STATE(ch) += 2 RL_SEC;
     return 0;
   }
-  if (use_stamina( ch, 10) < 0)
+  if (use_stamina( ch, 25) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");
     return 0;
   }
-  if (!skill_cost(0, 0, 20, ch))
+  if (!skill_cost(0, 0, 25, ch))
   {
     new_send_to_char(ch, "You are far too exausted!");
     return 0;
   }
 
-  percent = number(1, 110);	/* 101% is a complete failure */
+  percent = number(1, 130);	/* 101% is a complete failure */
   prob = total_chance(ch, SKILL_BASH);
 
   if (MOB_FLAGGED(vict, MOB_NOBASH))

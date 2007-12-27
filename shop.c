@@ -41,6 +41,7 @@ long long gold_data(int type, long long amount);
 void strip_color(char *inbuf);
 size_t proc_color(char *inbuf, int color_lvl, size_t len);
 int count_magic(struct obj_data *obj, CHAR_DATA *ch);
+int count_magic_items(CHAR_DATA *ch);
 int is_magic(OBJ_DATA *obj);
 
 /* Local variables */
@@ -652,8 +653,13 @@ void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int
   return;
   
   if (is_magic(obj)) {
+  int inum = 0;
   mcnt = count_magic_items(ch);
-  buynum = MAX_MAGIC_ITEMS - mcnt;
+
+inum = MAX_MAGIC_ITEMS - mcnt;
+if (buynum > inum)
+buynum = inum;
+
   if (buynum < 0)
   buynum = 0;
   }
