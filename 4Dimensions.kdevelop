@@ -1,22 +1,22 @@
 <?xml version = '1.0'?>
 <kdevelop>
   <general>
-    <author>Ayhan Kondoz</author>
+    <author>Jamie Nelson</author>
     <email>mordecai@xtra.co.nz</email>
-    <version>3.8</version>
+    <version>3.8.1</version>
     <projectmanagement>KDevCustomProject</projectmanagement>
     <primarylanguage>C</primarylanguage>
     <ignoreparts/>
-    <projectdirectory>/home/ayhan/projects/game/</projectdirectory>
+    <projectdirectory>/home/mordecai/Desktop/game-oasis/</projectdirectory>
     <absoluteprojectpath>true</absoluteprojectpath>
-    <description/>
+    <description></description>
     <secondaryLanguages/>
   </general>
   <kdevcustomproject>
     <run>
-      <mainprogram>/home/ayhan/projects/game/bin/circle</mainprogram>
+      <mainprogram>/home/mordecai/Desktop/game-oasis/bin/circle</mainprogram>
       <directoryradio>custom</directoryradio>
-      <customdirectory>/home/ayhan/projects/game/</customdirectory>
+      <customdirectory>/home/mordecai/Desktop/game-oasis/</customdirectory>
       <programargs>6000</programargs>
       <terminal>false</terminal>
       <autocompile>true</autocompile>
@@ -30,23 +30,23 @@
       <abortonerror>true</abortonerror>
       <numberofjobs>8</numberofjobs>
       <dontact>false</dontact>
-      <makebin/>
+      <makebin></makebin>
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default/>
       </environments>
       <prio>0</prio>
-      <makeoptions/>
+      <makeoptions></makeoptions>
     </make>
   </kdevcustomproject>
   <kdevdebugger>
     <general>
-      <dbgshell/>
+      <dbgshell></dbgshell>
       <programargs>6003</programargs>
-      <gdbpath/>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <gdbpath>/usr/bin/</gdbpath>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
@@ -116,9 +116,9 @@
   </kdevcvsservice>
   <kdevdocumentation>
     <projectdoc>
-      <docsystem/>
-      <docurl/>
-      <usermanualurl/>
+      <docsystem></docsystem>
+      <docurl></docurl>
+      <usermanualurl></usermanualurl>
     </projectdoc>
   </kdevdocumentation>
 </kdevelop>

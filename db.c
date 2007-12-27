@@ -448,10 +448,10 @@ int create_zone_index(void)
   int total = 0;
 
   n = scandir(LIB_WORLD, &eps, taone, numsort);
-  if (n >= 0)
+  if (n > 0)
   {
     int cnt;
-    for (cnt = n - 1; cnt >= 0; --cnt)
+    for (cnt = n-1; cnt >= 0; cnt--)
     {
       if (eps[cnt]->d_type == DT_DIR && isdigit(*eps[cnt]->d_name))
       {
@@ -464,17 +464,21 @@ int create_zone_index(void)
           temp->num = atoi(eps[cnt]->d_name);
           temp->next = zone_list;
           zone_list = temp;
-          free(eps[cnt]);
           total++;
           //log("zone: %d", temp->num);
         }
       }
+      if (eps[cnt]) {
+          free(eps[cnt]);
+	  eps[cnt] = NULL;
+	  }
     }
   }
   else
   {
     log("Couldn't open the directory: %s", LIB_WORLD);
     free(eps);
+    eps=NULL;
     exit(1);
   }
   if (eps)
@@ -7103,6 +7107,7 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
 /* returns the real number of the monster with given virtual number */
 mob_rnum real_mobile(mob_vnum vnum)
 {
+#if 0
   mob_rnum bot, top, mid;
 
   if (vnum == NOTHING)
@@ -7125,6 +7130,14 @@ mob_rnum real_mobile(mob_vnum vnum)
     else
       bot = mid + 1;
   }
+  #else
+  int i;
+    for (i = 0; i <= top_of_mobt; i++) {
+    if (mob_index[i].vnum == vnum)
+    return i;
+    }
+    return -1;
+    #endif
 }
 
 
@@ -7132,6 +7145,7 @@ mob_rnum real_mobile(mob_vnum vnum)
 /* returns the real number of the object with given virtual number */
 obj_rnum real_object(obj_vnum vnum)
 {
+#if 0
   obj_rnum bot, top, mid;
 
   if (vnum == NOTHING)
@@ -7154,6 +7168,14 @@ obj_rnum real_object(obj_vnum vnum)
     else
       bot = mid + 1;
   }
+  #else
+  int i;
+  for (i = 0; i <= top_of_objt; i++) {
+    if (obj_index[i].vnum == vnum)
+    return i;
+    }
+    return -1;
+  #endif
 }
 
 
