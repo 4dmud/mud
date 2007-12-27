@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.24  2005/06/02 09:52:49  w4dimenscor
+ * fixed function namechange'
+ *
  * Revision 1.23  2005/06/02 08:21:03  w4dimenscor
  * update to save file
  *
@@ -6542,7 +6545,7 @@ void change_plrindex_name(long id, char *change)
 ACMD(do_namechange)
 {
   DESCRIPTOR_DATA *d;
-  struct char_data *ch = NULL;
+  struct char_data *tch = NULL;
   int loaded = 0;
   char newname[MAX_INPUT_LENGTH], oldname[MAX_INPUT_LENGTH], passw[MAX_INPUT_LENGTH];
 
@@ -6569,39 +6572,45 @@ ACMD(do_namechange)
     if (!IS_PLAYING(d)) {
       if (compares(GET_NAME(d->character), oldname))
     {
-    new_send_to_char(ch, "This player is in a state that cant be changed just yet.\r\n");
+    new_send_to_char(ch, "This player is in a state that can't be changed just yet.\r\n");
     return;
        }
   } else if (compares(GET_NAME(d->character), oldname)) {
-  ch = d->character;
+  tch = d->character;
   break;
   }
   }
-      if (!ch) {
+      if (!tch) {
       if (get_id_by_name(oldname) == -1) {
       new_send_to_char(ch, "A player by that name doesn't exist here.\r\n");
       return;
       }
+      CREATE(tch, struct char_data, 1);
+      if (load_char(oldname, tch) <= 0) {
+      free(tch);
+      log("load char error in namechange");
       return;
-         //CREATE(ch
+      }
+      loaded = 1;
       }
   
-      free_string(&GET_PC_NAME(d->character));
-      GET_PC_NAME(d->character) = str_dup(newname);
+      free_string(&GET_PC_NAME(tch));
+      GET_PC_NAME(tch) = str_dup(newname);
       newname[0] = LOWER(newname[0]);
-      snprintf(passw,  "%s", CRYPT(GET_PC_NAME(d->character), GET_PASSWD(d->character)));
-      strncpy(GET_PASSWD(d->character),
-              CRYPT(passw, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);
-      *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
-      save_char(d->character);
-      Crash_crashsave(d->character);
-      write_aliases(d->character);
+      //snprintf(passw,  "%s", CRYPT(GET_PC_NAME(tch), GET_PASSWD(tch)));
+      strncpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
+      *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
+      save_char(tch);
+      Crash_crashsave(tch);
+      write_aliases(tch);
 
-      change_plrindex_name(GET_IDNUM(d->character), newname);
+      change_plrindex_name(GET_IDNUM(tch), newname);
       new_send_to_char(ch, "%s's name changed to %s.\r\n", oldname, newname);
-      return;
- 
-  new_send_to_char(ch, "%s's not playing.\r\n", oldname);
+    
+      if (loaded)
+      {
+      free_char(tch);
+      }
 }
 
 ACMD(do_decrypt)
