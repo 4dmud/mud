@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.53  2007/06/07 11:46:10  w4dimenscor
+ * Updated the assemble code to give a good message that people can't assemble, which needs to be overridden in triggers, basically it is the same as 'do_not_here'
+ *
  * Revision 1.52  2007/06/07 10:30:50  w4dimenscor
  * Added the ability for scripts to check assemblies for existance, and to create the products of assemblies
  *
@@ -434,7 +437,9 @@ ACMD(do_assemble)
   long         lVnum = NOTHING;
   int type = getTypeFromSubskill(subcmd);
 
-
+  ch->Send("You either don't have all the parts you need to %s, or you can't do that here.\r\n", sub_name(subcmd));
+  return;
+  /* the rest of this is not used at the moment, because it is all parsed by triggers - mord 7th June 2007*/
   skip_spaces(&argument);
 
   if (!get_sub(ch, subcmd))
