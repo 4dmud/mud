@@ -242,6 +242,7 @@ void redit_save_internally(struct descriptor_data *d)
 
   room_num->proto_script = OLC_SCRIPT(d);
   assign_triggers(room_num, WLD_TRIGGER);
+OLC_SCRIPT(d) = NULL;
   /* end trigger update */
 
 

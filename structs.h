@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
+ * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
+ *
  * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -924,7 +927,6 @@ extern int message_type;
 #define ITEM_NOTDEADYET         62
 #define ITEM_SHIFTABLE          63
 #define ITEM_KEYSTAY		64
-#define ITEM_PULLABLE 		65
 
 
 

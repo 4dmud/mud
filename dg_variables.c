@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/06/14 11:29:36 $                                           * 
-*  $Revision: 1.14 $                                                    *
+*  $Date: 2005/08/14 02:27:13 $                                           * 
+*  $Revision: 1.15 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -1705,18 +1705,44 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
         }
 
-        else if (!strcasecmp(field, "val0"))
+        else if (!strcasecmp(field, "val0")) {
+if (subfield && *subfield && is_number(subfield))
+          {
+GET_OBJ_VAL(o, 0) = atoi(subfield);
+          }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
+}
 
-        else if (!strcasecmp(field, "val1"))
+        else if (!strcasecmp(field, "val1")){
+if (subfield && *subfield && is_number(subfield))
+          {
+GET_OBJ_VAL(o, 1) = atoi(subfield);
+          }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
+}
 
-        else if (!strcasecmp(field, "val2"))
+        else if (!strcasecmp(field, "val2")){
+if (subfield && *subfield && is_number(subfield))
+          {
+GET_OBJ_VAL(o, 2) = atoi(subfield);
+          }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
+}
 
-        else if (!strcasecmp(field, "val3"))
+        else if (!strcasecmp(field, "val3")){
+if (subfield && *subfield && is_number(subfield))
+          {
+GET_OBJ_VAL(o, 3) = atoi(subfield);
+          }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 3));
-
+}
+else if (!strcasecmp(field, "val4")){
+if (subfield && *subfield && is_number(subfield))
+          {
+GET_OBJ_VAL(o, 4) = atoi(subfield);
+          }
+          snprintf(str, slen, "%d", GET_OBJ_VAL(o, 4));
+}
         break;
       case 'w':
         if (!strcasecmp(field, "weight"))

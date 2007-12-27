@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
+ * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
+ *
  * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -1369,9 +1372,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                    	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                    	    return (0);
-                                                                                    	}*/
+                                                                                        	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                        	    return (0);
+                                                                                        	}*/
   }
 
 
@@ -3502,6 +3505,7 @@ ACMD(do_remove)
 C_FUNC(pull_object)
 {
   struct obj_data *obj;
+  room_rnum rm;
   int dir = 0;
   obj = find_obj(d->character->loader);
   d->character->loader = -1;
@@ -3510,57 +3514,65 @@ C_FUNC(pull_object)
     write_to_output(d, "It isn't here any longer.\r\n");
     return;
   }
-  if (!arg || !*arg) {
-  write_to_output(d, "That isn't a valid direction.\r\n");
-  return;
+  if (!arg || !*arg)
+  {
+    write_to_output(d, "That isn't a valid direction.\r\n");
+    return;
   }
-  switch (LOWER(*arg)) {
+  switch (LOWER(*arg))
+  {
   case 'n':
-  dir = NORTH;
-  break;
+    dir = NORTH;
+    break;
   case 's':
-  dir = SOUTH;
-  break;
+    dir = SOUTH;
+    break;
   case 'e':
-  dir = EAST;
-  break;
+    dir = EAST;
+    break;
   case 'w':
-  dir = WEST;
-  break;
+    dir = WEST;
+    break;
   case 'u':
-  dir = UP;
-  break;
+    dir = UP;
+    break;
   case 'd':
-  dir = DOWN;
-  break;
+    dir = DOWN;
+    break;
   default:
-  write_to_output(d, "That isn't a valid direction.\r\n");
-  return;
-  break;
+    write_to_output(d, "That isn't a valid direction.\r\n");
+    return;
+    break;
   }
-  
-  if (!EXIT(d->character, dir)) {
-  write_to_output(d, "No exit that way.\r\n");
-  return;
+
+  if (!EXIT(d->character, dir))
+  {
+    write_to_output(d, "No exit that way.\r\n");
+    return;
   }
-         if (IS_SET(EXIT(d->character, dir)->exit_info, EX_CLOSED)) {
-	 write_to_output(d, "You need to open the door first.\r\n");
-	 return;
-	 }
-      if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE)) {
-      write_to_output(d, "It doesnt look like you can pull it that direction.\r\n");
-      return;
-      }
-      
-      
-  obj_from_room(obj);
-    write_to_output(d,"You pull %s %s.\r\n", obj->short_description, dirs[dir]);
-  
-  
+  if (IS_SET(EXIT(d->character, dir)->exit_info, EX_CLOSED))
+  {
+    write_to_output(d, "You need to open the door first.\r\n");
+    return;
+  }
+  if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE))
+  {
+    write_to_output(d, "It doesn't look like you can pull it that direction.\r\n");
+    return;
+  }
+
+
+  rm = EXIT(d->character, dir)->to_room;
+  if (do_simple_move(d->character, dir, FALSE))
+  {
+    do_simple_obj_move(obj,dir, d->character);
+  }
+
+
 }
 ACMD(do_pull)
 {
-//  char arg[MAX_INPUT_LENGTH];
+  //  char arg[MAX_INPUT_LENGTH];
   struct obj_data *obj;
   int cnt=0,i;
   skip_spaces(&argument);
@@ -3573,7 +3585,7 @@ ACMD(do_pull)
 
   if (NULL != (obj = get_obj_in_list_vis(ch, argument, NULL, IN_ROOM(ch)->contents)))
   {
-    if (!OBJ_FLAGGED(obj, ITEM_PULLABLE))
+    if (!OBJ_FLAGGED(obj, ITEM_SHIFTABLE))
     {
       new_send_to_char(ch, "That isn't pullable!\r\n");
       return;
@@ -3591,14 +3603,16 @@ ACMD(do_pull)
       cnt ++;
       new_send_to_char(ch, "%s ", dirs[i]);
     }
-    if (!cnt) {
+    if (!cnt)
+    {
       new_send_to_char(ch, "Nowhere\r\n");
-    return;
-    } else
+      return;
+    }
+    else
       new_send_to_char(ch, "\r\n");
-      new_send_to_char(ch, "Please type a direction:");
-      ch->loader = GET_ID(obj);
-      line_input(ch->desc, argument, pull_object, NULL);
+    new_send_to_char(ch, "Please type a direction:");
+    ch->loader = GET_ID(obj);
+    line_input(ch->desc, argument, pull_object, NULL);
   }
   /* for now only pull pin will work and must be wielding a grenade */
   else if (!str_cmp(argument, "pin"))
@@ -4144,7 +4158,6 @@ int speed_update(struct char_data *ch)
 
     speed += class_speed(ch);
     speed += race_speed(ch);
-    speed += GET_ADD(ch);
     speed += ((GET_MOVE(ch)*300)/GET_MAX_MOVE(ch))- 200;
 
 
@@ -4166,9 +4179,9 @@ int speed_update(struct char_data *ch)
 
 
     if (RIDING(ch) && HERE(RIDING(ch), ch) && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 50 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
+      speed += 25 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
     else if (GET_RACE(ch) == RACE_CENTAUR && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 50 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
+      speed += 25 +  (total_chance(ch, SKILL_MOUNTED_COMBAT) /3);
     // end of player speed
   }
   if (weps)

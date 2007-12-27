@@ -228,6 +228,7 @@ void look_at_room(struct char_data *ch, int mode);
 struct char_data *rand_group(struct char_data *ch);
 
 /* in act.movmement.c */
+int do_simple_obj_move(struct obj_data *obj, int dir, struct char_data *ch);
 int do_simple_move(struct char_data *ch, int dir, int following);
 int perform_move(struct char_data *ch, int dir, int following);
 

@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
+ * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
+ *
  * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -327,7 +330,7 @@ float has_staff(struct char_data *ch)
       multi += ((float)GET_OBJ_VAL(staff, 0));
       if (multi > 3000 && GET_OBJ_TIMER(staff) > 1)
         GET_OBJ_TIMER(staff) = 1;
-      multi = IRANGE(1.05, (multi/900.0), 1.50);
+      multi = IRANGE(1.05, (multi/700.0), 1.50);
       break;
     case FOCUS_ORBSTAFF:
       multi += ((float)GET_OBJ_VAL(staff, 0));

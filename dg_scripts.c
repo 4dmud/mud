@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/07 04:12:39 $
-*  $Revision: 1.12 $
+*  $Date: 2005/08/14 02:27:13 $
+*  $Revision: 1.13 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.13  2005/08/14 02:27:13  w4dimenscor
+ * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
+ *
  * Revision 1.12  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -752,8 +755,6 @@ obj_data *get_obj_in_room(room_data * room, char *name)
 {
   struct obj_data *obj;
 
-  if (*name == UID_CHAR)
-    return find_obj(atoi(name+1));
   if (room)
   {
     for (obj = room->contents; obj; obj = obj->next_content)
@@ -768,9 +769,6 @@ obj_data *get_obj_in_room(room_data * room, char *name)
 obj_data *get_obj_by_room(room_data *room, char *name)
 {
   obj_data *obj;
-
-  if (*name == UID_CHAR)
-    return find_obj(atoi(name+1));
 
   if (room)
   {
@@ -3365,40 +3363,40 @@ int process_return(trig_data *trig, char *cmd)
                   }
 
                   /* returns the real number of the trigger with given virtual number */
-		  /** TODO: This function should be a binary search but when it runs the binary search
-		  the results are bad. So sequential for now. Need to find out where the list stops being sorted.
-		  **/
+                  /** TODO: This function should be a binary search but when it runs the binary search
+                  the results are bad. So sequential for now. Need to find out where the list stops being sorted.
+                  **/
                   trig_rnum real_trigger(int vnum)
                   {
-		  /*
-                    int bot = 0, mid;
-                    int top = top_of_trigt - 1;
+                    /*
+                                    int bot = 0, mid;
+                                    int top = top_of_trigt - 1;
 
 
-                    for (;;)
-                    {
-                      mid = (bot + top) / 2;
-                      // Thanks to Derek Fisk for fixing this loop 
-                      if (bot > top)
-                        return (NOTHING);
-                      if (trig_index[mid]->vnum == vnum)
-                        return (mid);
-                      if (top == 0)
-                        return (NOTHING);
-                      if (trig_index[mid]->vnum > vnum)
-                        top = mid - 1;
-                      else
-                        bot = mid + 1;
-                    }
-                  }
+                                    for (;;)
+                                    {
+                                      mid = (bot + top) / 2;
+                                      // Thanks to Derek Fisk for fixing this loop 
+                                      if (bot > top)
+                                        return (NOTHING);
+                                      if (trig_index[mid]->vnum == vnum)
+                                        return (mid);
+                                      if (top == 0)
+                                        return (NOTHING);
+                                      if (trig_index[mid]->vnum > vnum)
+                                        top = mid - 1;
+                                      else
+                                        bot = mid + 1;
+                                    }
+                                  }
 
-                  */
-                   int rnum;
+                                  */
+                    int rnum;
                     for (rnum=0; rnum < top_of_trigt; rnum++)
                     {
                       if (trig_index[rnum]->vnum==vnum) break;
                     }
-                   
+
                     if (rnum==top_of_trigt) rnum = -1;
                     return (rnum);
                   }
@@ -3641,19 +3639,19 @@ void init_lookup_table(void)
     lookup_table[i].c    = NULL;
     lookup_table[i].next = NULL;
   }
-  #endif
+#endif
 }
 
 struct char_data *find_char_by_uid_in_lookup_table(long uid)
 {
 #if 1
-struct char_data *tch;
-for (tch = character_list; tch; tch = tch->next)
-      if (GET_ID(tch) == uid)
-         return tch;
-      
-return NULL;  
-	
+  struct char_data *tch;
+  for (tch = character_list; tch; tch = tch->next)
+    if (GET_ID(tch) == uid)
+      return tch;
+
+  return NULL;
+
 #else
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
@@ -3672,17 +3670,18 @@ return NULL;
       //return NULL;
     }
 #if 0
-if (character_list) {
-   struct char_data *tch;
-    for (tch = character_list; tch; tch = tch->next)
-      if (GET_ID(tch) == GET_ID(ch))
-        if (tch != ch)
-        {
-          log("ERROR: lookup table contains wrong character's ID (%ld) (%s instead of %s)!",GET_ID(tch), GET_NAME(ch), GET_NAME(tch));
-          ch = tch;
-          break;
-        }
-	}
+    if (character_list)
+    {
+      struct char_data *tch;
+      for (tch = character_list; tch; tch = tch->next)
+        if (GET_ID(tch) == GET_ID(ch))
+          if (tch != ch)
+          {
+            log("ERROR: lookup table contains wrong character's ID (%ld) (%s instead of %s)!",GET_ID(tch), GET_NAME(ch), GET_NAME(tch));
+            ch = tch;
+            break;
+          }
+    }
 #endif
     return ch;
   }
@@ -3690,18 +3689,18 @@ if (character_list) {
   log("find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
 
   return NULL;
-  #endif
+#endif
 }
 
 struct obj_data *find_obj_by_uid_in_lookup_table(long uid)
 {
 #if 1
-struct obj_data *o;
-for (o = object_list;o;o = o->next)
-if (GET_ID(o) == uid)
-return o;
+  struct obj_data *o;
+  for (o = object_list;o;o = o->next)
+    if (GET_ID(o) == uid)
+      return o;
 
-return NULL;
+  return NULL;
 #else
   int bucket = (int) (uid & (BUCKET_COUNT - 1));
   struct lookup_table_t *lt = &lookup_table[bucket];
@@ -3713,7 +3712,7 @@ return NULL;
 
   log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
   return NULL;
-  #endif
+#endif
 }
 
 void add_to_lookup_table(long uid, void *c)
@@ -3739,7 +3738,7 @@ void add_to_lookup_table(long uid, void *c)
   CREATE(lt->next, struct lookup_table_t, 1);
   lt->next->uid = uid;
   lt->next->c = c;
-  #endif
+#endif
 }
 
 
@@ -3780,6 +3779,6 @@ void remove_from_lookup_table(long uid)
 
 
   log("remove_from_lookup. UID %ld not found.", uid);
-  #endif
+#endif
 }
 

@@ -648,6 +648,7 @@ return;
       return;
     }
   }
+if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE || ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
   if (!can_take_obj(ch, obj))
   return;
   
@@ -689,7 +690,10 @@ buynum = inum;
       obj_from_char(obj);
       SHOP_SORT(shop_nr)--;
     }
+if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE || ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
     obj_to_char(obj, ch);
+ else
+    obj_to_room(obj, IN_ROOM(ch));
 
     charged = buy_price(obj, shop_nr, keeper, ch);
     goldamt += charged;
