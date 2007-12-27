@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.31  2006/02/23 18:41:50  w4dimenscor
+ * added a few needed files to cvs
+ *
  * Revision 1.30  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -4181,7 +4184,7 @@ ACMD(do_compare)
       if (CAN_SEE_OBJ(ch, obj2) && GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1) && CAN_GET_OBJ(ch, obj2))
       {
         new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
-                         obj1->short_description, obj2->short_description);
+                         obj2->short_description, obj1->short_description);
         switch (GET_OBJ_TYPE(obj1))
         {
         case ITEM_WEAPON:
@@ -4210,7 +4213,7 @@ ACMD(do_compare)
         continue;
       if (CAN_WEAR(obj1, where_to_worn(it)))
       {
-        new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj1->short_description, obj2->short_description, body[it]);
+        new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj2->short_description,obj1->short_description, body[it]);
         if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1))
         {
           switch (GET_OBJ_TYPE(obj1))

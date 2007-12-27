@@ -21,6 +21,7 @@ const char * prof_name(int pro);
 const char * prof_group_name(int pro);
 int prof_group(int pro);
 int skill_cost(int h, int m, int v, CHAR_DATA *ch);
+extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 static int prof_group_data[] = {
                                  PGRP_MISC, //misc

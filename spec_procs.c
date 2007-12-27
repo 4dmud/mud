@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.10  2006/02/23 18:41:50  w4dimenscor
+ * added a few needed files to cvs
+ *
  * Revision 1.9  2005/11/19 06:18:39  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -66,6 +69,8 @@ extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 extern int guild_info[][3];
 extern const char *cmd_door[];
+
+extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
 int mag_manacost(struct char_data *ch, int spellnum);
