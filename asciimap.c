@@ -330,7 +330,7 @@ ACMD(do_map)
     mapgrid[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */
 
     /* switch default will print out the */
-    if ((GET_LEVEL(ch) < LVL_GOD) || (IS_NPC(ch))) {
+//    if ((GET_LEVEL(ch) < LVL_GOD) || (IS_NPC(ch))) {
 	if (!IS_SET_AR(IN_ROOM(ch)->room_flags, ROOM_WILDERNESS)) {
 #if defined(MINI_MAP)
          mini_map(ch);
@@ -352,13 +352,13 @@ ACMD(do_map)
 	    IN_ROOM(ch) = was_in;
 	    return;
 	}
-    }
-
+//    }
     /* mortals not in city, enter or inside will always get a ShowRoom */
+/* unnecesary to have a seperate command for gods. besides, it crashes the mud.
     if (GET_LEVEL(ch) >= LVL_GOD) {
 	if (arg1[0] == '\0') {
-	    //ShowRoom(ch, min, max + 1);
-	    //IN_ROOM(ch) = was_in;
+	   // ShowRoom(ch, min, max + 1);
+	   // IN_ROOM(ch) = was_in;
 
 	} else {
 	    ShowMap(ch, min, max + 1);
@@ -366,7 +366,7 @@ ACMD(do_map)
 	}
 	return;
     }
-
+    */
     send_to_char("What??\r\n", ch);
     IN_ROOM(ch) = was_in;
     return;

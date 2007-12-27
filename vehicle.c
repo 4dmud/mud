@@ -131,8 +131,8 @@ ACMD(do_drive)
 	send_to_char("Drive which direction?\r\n", ch);
 	return;
     }
-
-    /* Driving Into another Vehicle */
+/* Disabled until it doesn't freeze the mud anymore (Thotter)
+    // Driving Into another Vehicle
     if (is_abbrev(arg, "into")) {
 	room_rnum was_in, is_in, is_going_to;
 
@@ -206,7 +206,9 @@ ACMD(do_drive)
 		vehicle_in_out->short_description);
 
 	return;
-    } else
+    } 
+    */
+    else
 	for (x = 0; x < (GET_OBJ_VAL(vehicle, 1) ? PILOT_DIRS :
 			 DRIVE_DIRS); x++)
 	    /* Drive in a direction... */
