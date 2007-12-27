@@ -521,7 +521,7 @@ void do_show_corpses(Character *ch) {
         diff = (GET_OBJ_EXPIRE(temp->corpse) - tm);
         ch->Send( "In room %d is %s - {cC%ld{cy min and {cY%ld{cy seconds  until Automeld{c0\r\n", GET_OBJ_VROOM(temp->corpse), temp->corpse->short_description,  diff/60, diff%60);
         } else
-        ch->Send( "In room %d is %s - (Timer not set)\r\n", GET_OBJ_VROOM(temp->corpse), temp->corpse->short_description, GET_OBJ_TIMER(temp->corpse));
+        ch->Send( "In room %d is %s - (Timer not set)\r\n", GET_OBJ_VROOM(temp->corpse), temp->corpse->short_description);
         temp = temp->next;
     }
 }
