@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/07 12:18:39 $                                           * 
-*  $Revision: 1.50 $                                                      *
+*  $Date: 2007/06/08 10:19:05 $                                           * 
+*  $Revision: 1.51 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -305,8 +305,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         if (vd)
             snprintf(str, slen, "%s", vd->value.c_str());
         else {
-
-            if (!strcasecmp(var, "self")) {
+if (!strcasecmp(var, "realday")) {
+snprintf(str, slen, "%ld", SECS_PER_REAL_DAY);
+} else if (!strcasecmp(var, "realhour")) {
+snprintf(str, slen, "%ld", SECS_PER_REAL_HOUR);
+} else if (!strcasecmp(var, "now")) {
+snprintf(str, slen, "%ld", time(0));
+} 
+            else if (!strcasecmp(var, "self")) {
                 switch (type) {
                 case MOB_TRIGGER:
                     snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID((Character *) go));

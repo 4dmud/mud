@@ -45,13 +45,13 @@ void assign_mob_stats(void) {
         /* ac needs to drop from 100 at level <1 to -100 at level > 50  */
         s[1] = ((i > 50) ? -100 : (100 - ((i< 1?1:i)*4)));
         //Hp
-        s[2] = i;
-        s[3] = i;
+        s[2] = FTOI(i * 1.5);
+        s[3] = FTOI(i * 1.5);
         s[4] = MAX(40, (i * i * i)/35) + 150;
         //Damroll
-        s[5] = MAX(1, FTOI((i*0.3) + (i*0.2)));
-        s[6] = MAX(2, FTOI((i*0.25) + (i*0.2)));
-        s[7] = FTOI(m_powf(i, (i*0.0026)+1.35));//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+        s[5] = FTOI(i * 0.5);
+        s[6] = i;
+        s[7] = FTOI(m_powf(i, (i*0.0026)+1.34));//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
         s[8]  = FTOI((i * i * i * 15) + 200); /* exp */
         s[9]  = FTOI((i * i * i * 1.4)); /* gold */

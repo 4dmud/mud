@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.16  2007/06/08 10:19:05  w4dimenscor
+ * Added a way to check for real time, and time passed in dgscripts, REALDAY and REALHOUR and NOW are all variables, and also made it so tha the newbie channel doesnt sound drunk, also, practicing spells and skills need more practices
+ *
  * Revision 1.15  2006/12/07 18:49:13  w4dimenscor
  * Rangers now have kick.
  *
@@ -304,8 +307,8 @@ long find_class_bitvector(char arg)
 int prac_params[4][NUM_CLASSES] = {
                                     /*   MAG    CLE    THE     WAR   HUN    RAN    GYP    ESP             */
                                     {   50,    50,    50,    50,    50,    50,    50,    50}, /*learned level */
-                                    {   10,    10,     8,     8,     8,     8,    10,    10}, /* max per prac */
-                                    {    5,     5,     2,     2,     2,     5,     5,    5 }, /* min per pac  */
+                                    {   4,    4,     2,     2,     2,     2,    4,    4}, /* max per prac */
+                                    {    2,     2,     1,     1,     1,     1,     2,    2 }, /* min per pac  */
                                     {SPELL, SPELL, SKILL, SKILL, SKILL, SKILL, SKILL, SPELL}  /* prac name    */
                                   };
 

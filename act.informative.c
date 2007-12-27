@@ -359,10 +359,11 @@ void list_obj_to_char(struct obj_data *list, Character *ch,
 
 
 void diag_char_to_char(Character *i, Character *ch) {
-   static struct {
+    static struct {
         byte percent;
         const char *text;
-    }  diagnosis[] = {
+    }
+    diagnosis[] = {
                       {100, "is in excellent condition."},
                       { 90, "has a few scratches."},
                       { 75, "has some small wounds and bruises."},
@@ -372,7 +373,7 @@ void diag_char_to_char(Character *i, Character *ch) {
                       {  0, "is in awful condition."},
                       { -1, "is bleeding awfully from big wounds."},
                   };
-                  
+
     int percent, ar_index;
     const char *pers = PERS(i, ch);
 
@@ -381,7 +382,7 @@ void diag_char_to_char(Character *i, Character *ch) {
     else
         percent = -1;        /* How could MAX_HIT be < 1?? */
 
-        
+
     for (ar_index = 0; diagnosis[ar_index].percent >= 0; ar_index++)
         if (percent >= diagnosis[ar_index].percent)
             break;
@@ -1267,6 +1268,7 @@ void look_at_room(Character *ch, int ignore_brief) {
 
 void list_scanned_chars(Character *list, Character *ch,
                         int distance, int door) {
+
     const char *how_far[] = {
                                 "close by",
                                 "a ways off",
@@ -1275,27 +1277,35 @@ void list_scanned_chars(Character *list, Character *ch,
 
     Character *i;
     int count = 0, count2 = 0;
+    room_rnum is_in;
 
+    if (!list)
+        return;
     /* this loop is a quick, easy way to help make a grammatical sentence
        (i.e., "You see x, x, y, and z." with commas, "and", etc.) */
-
-    for (i = list; i; i = i->next_in_room)
+    is_in = IN_ROOM(ch);
+    IN_ROOM(ch) = IN_ROOM(list);
+    for (i = list; i; i = i->next_in_room) {
 
         /* put any other conditions for scanning someone in this if statement -
            i.e., if (CAN_SEE(ch, i) && condition2 && condition3) or whatever */
-
-        if (CAN_SEE(ch, i))
+        if (!(MOB_FLAGGED(i, MOB_WIZINVIS) || (i->player.long_descr && i->player.long_descr[0] == '{' && strlen(i->player.long_descr) <= 3)) && CAN_SEE(ch, i))
             count++;
 
-    if (!count)
+    }
+
+    if (!count) {
+        IN_ROOM(ch) = is_in;
         return;
+    }
 
     for (i = list; i; i = i->next_in_room) {
 
         /* make sure to add changes to the if statement above to this one also, using
            or's to join them.. i.e., 
            if (!CAN_SEE(ch, i) || !condition2 || !condition3) */
-
+        if (MOB_FLAGGED(i, MOB_WIZINVIS) || (i->player.long_descr && i->player.long_descr[0] == '{' && strlen(i->player.long_descr) <= 3))
+            continue;
         if (!CAN_SEE(ch, i))
             continue;
         if (!count2++)
@@ -1311,6 +1321,7 @@ void list_scanned_chars(Character *list, Character *ch,
 
         }
     }
+    IN_ROOM(ch) = is_in;
 }
 
 
@@ -3858,7 +3869,7 @@ ACMD(do_consider) {
         if ((PLR_FLAGGED(ch, PLR_PK) && PLR_FLAGGED(victim, PLR_PK))
                 || (PLR_FLAGGED(victim, PLR_KILLER))
                 || (arena_ok(ch, victim))) {
-           victim->Send("You get considered by somebody.\r\n");
+            victim->Send("You get considered by somebody.\r\n");
             diff = (GET_MAX_HIT(ch) - GET_MAX_HIT(victim));
             diff2 = (GET_MAX_MANA(ch) - GET_MAX_MANA(victim));
             diff3 = (GET_DAMROLL(ch) - GET_DAMROLL(victim));
@@ -4271,11 +4282,11 @@ ACMD(do_toggle) {
         ONOFF(PRF_FLAGGED(ch, PRF_AUTOSAC)),
         ONOFF(PRF_FLAGGED(ch, PRF_OOC)),
         YESNO(PRF_FLAGGED(ch, PRF_MOUNTABLE)),
-#if defined(HAVE_ZLIB)
+        #if defined(HAVE_ZLIB)
         ONOFF(!PRF_FLAGGED(ch, PRF_NOCOMPRESS)),
-#else
+        #else
         "N/A",
-#endif
+        #endif
         PAGEHEIGHT(ch),
         PAGEWIDTH(ch),
         ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
@@ -4318,11 +4329,11 @@ void sort_commands(void) {
 }
 
 ACMD(do_commandslike) {
-   int no, i, cmd_num;
+    int no, i, cmd_num;
     int wizhelp = 0, socials = 0;
     Character *vict = ch;
     skip_spaces(&argument);
-    
+
     if (subcmd == SCMD_SOCIALS)
         socials = 1;
     else if (subcmd == SCMD_WIZHELP)
@@ -4487,7 +4498,7 @@ ACMD(do_prereq) {
 
 
         ch->Send( "Pre-requisites for %s :-\r\n",
-                spell_info[skill_num].name);
+                  spell_info[skill_num].name);
 
         if (spell_info[skill_num].first_prereq !=   TYPE_UNDEFINED) {
             len += snprintf(msg1 + len, sizeof(msg1) - len,  "    %s",
@@ -4855,7 +4866,7 @@ ACMD(set_perc) {
     total_perc(ch);
 
     ch->Send("You set %s's involvement to %4.1f%%, your involvement is now %4.1f%%.\r\n",
-        GET_NAME(tch), GET_PERC(tch), GET_PERC(ch));
+             GET_NAME(tch), GET_PERC(tch), GET_PERC(ch));
     tch->Send( "%s sets your involvement to %4.1f%%.\r\n", GET_NAME(ch), GET_PERC(tch));
 
 }

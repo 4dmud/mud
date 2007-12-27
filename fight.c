@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.64  2007/06/08 10:19:05  w4dimenscor
+ * Added a way to check for real time, and time passed in dgscripts, REALDAY and REALHOUR and NOW are all variables, and also made it so tha the newbie channel doesnt sound drunk, also, practicing spells and skills need more practices
+ *
  * Revision 1.63  2007/05/24 20:29:16  w4dimenscor
  * Last few fixes to hunting and directionals.
  * --Thotter
@@ -5329,11 +5332,11 @@ int can_fight(Character *ch, Character *vict, int silent) {
         return 0;
     }
 
-    if (!(RIDDEN_BY(ch) || RIDDEN_BY(vict)) && (AFF_FLAGGED(ch, AFF_CHARM) || AFF_FLAGGED(vict, AFF_CHARM))) {
+   /* if (!(RIDDEN_BY(ch) || RIDDEN_BY(vict)) && (AFF_FLAGGED(ch, AFF_CHARM) || AFF_FLAGGED(vict, AFF_CHARM))) {
         if (ch->master)
             //new_send_to_char(ch->master, "Charmed mobs cant fight! Silly mortal\r\n");
             return 0;
-    }
+    }*/
     /* Do some sanity checking, in case someone flees, etc. */
     if (!HERE(ch, vict) && GET_SPELL_DIR(ch) == NOWHERE) {
         if (FIGHTING(ch) && FIGHTING(ch) == vict)

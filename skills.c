@@ -2020,7 +2020,7 @@ ASKILL(skill_martial_arts)
   }
   else
   {
-    *ch << "You stetch your arms and legs limbering up for a fight.\r\n";
+    *ch << "You stretch your arms and legs limbering up for a fight.\r\n";
     percent = number(1, 101); /* 101% is a complete failure */
     if (use_stamina( ch, 15) < 0)
     {
@@ -2419,6 +2419,8 @@ ASKILL(skill_scan)
       {
         for (i = IN_ROOM(ch)->people; i; i = i->next_in_room)
         {
+        if (MOB_FLAGGED(i, MOB_WIZINVIS) || (i->player.long_descr && i->player.long_descr[0] == '{' && strlen(i->player.long_descr) <= 3))
+        continue;
           if ((!((ch == i) && (dis == 0))) && CAN_SEE(ch, i))
           {
             ch->Send( "%33s: %s%s%s%s\r\n", GET_NAME(i),

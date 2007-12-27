@@ -241,10 +241,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
             ch->Send( "You can't move out of this sector.\r\n");
         return 0;
     }
-    if (ch->hitched && !ROOM_FLAGGED(EXIT(ch, dir)->to_room, ROOM_VEHICLE)) {
+/*    if (ch->hitched && !ROOM_FLAGGED(EXIT(ch, dir)->to_room, ROOM_VEHICLE)) {
         ch->Send( "You cannot drag the %s that direction.\r\n", ch->hitched->short_description);
         return 0;
-    }
+    }*/
     if (ch->MountHere() && GET_POS(RIDING(ch)) < POS_STANDING) {
 	ch->Send("You can't move anywhere while your mount is like that!\r\n");
 	return 0;
@@ -1947,10 +1947,11 @@ ACMD(do_follow) {
                 *ch << "Sorry, but following in loops is not allowed.\r\n";
                 return;
             }
-            if (IS_NPC(leader) && !IS_NPC(ch)) {
-                *ch << "You can't follow " << PERS_S(leader, ch) <<"!!\r\n";
-                return;
-            }
+            /** you can follow mobs again - mord **/
+            //if (IS_NPC(leader) && !IS_NPC(ch)) {
+            //    *ch << "You can't follow " << PERS_S(leader, ch) <<"!!\r\n";
+            //    return;
+            //}
             /** Bypass the stuff below if the leader is set to autogroup, mob or no mob */
             if (PRF_FLAGGED(leader, PRF_AUTOGROUP)) {
                 if (ch->master)
@@ -1976,7 +1977,7 @@ ACMD(do_follow) {
                     leader->loader = GET_IDNUM(ch);
                     line_input(leader->desc, buf, allow_follow, NULL);
                 } else {
-                    *ch << "You cant follow " << HSSH(leader) << " just yet, " << GET_NAME(leader) << " is too busy to reply.\r\n";
+                    *ch << "You can't follow " << HSSH(leader) << " just yet, " << GET_NAME(leader) << " is too busy to reply.\r\n";
                 }
             } else {
                 if (ch->master)

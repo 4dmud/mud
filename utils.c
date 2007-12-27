@@ -171,63 +171,7 @@ int dice(int num, int size) {
 }
 
 
-gold_int MIN(gold_int a, gold_int b) {
-    return (a < b ? a : b);
-}
-gold_int MAX(gold_int a, gold_int b) {
-    return (a > b ? a : b);
-}
-int MIN(int a, int b) {
-    return (a < b ? a : b);
-}
-int MAX(int a, int b) {
-    return (a > b ? a : b);
-}
 
-float MIN(float a, float b) {
-    return (a < b ? a : b);
-}
-float MAX(float a, float b) {
-    return (a > b ? a : b);
-}
-
-
-double MIN(double a, double b) {
-    return (a < b ? a : b);
-}
-double MAX(double a, double b) {
-    return (a > b ? a : b);
-}
-
-unsigned int MIN(unsigned int a, unsigned int b) {
-    return (a < b ? a : b);
-}
-unsigned int MAX(unsigned int a, unsigned int b) {
-    return (a > b ? a : b);
-}
-
-long MIN(long a, long b) {
-    return (a < b ? a : b);
-}
-long MAX(long a, long b) {
-    return (a > b ? a : b);
-}
-
-
-char *CAP(char *txt) {
-    *txt = UPPER(*txt);
-    return (txt);
-}
-
-
-
-/* Create a duplicate of a string */
-char *str_dup(const char *source) {
-    char *new_z = NULL;
-
-    CREATE(new_z, char, strlen(source) + 1);
-    return (strcpy(new_z, source));
-}
 
 
 //#ifndef (HAVE_STRLCPY)

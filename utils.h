@@ -217,20 +217,20 @@ unsigned long circle_random(void);
 #undef MIN
 #endif
 
-gold_int MIN(gold_int a, gold_int b);
-gold_int MAX(gold_int a, gold_int b);
-int MIN(int a, int b);
-int MAX(int a, int b);
-float MIN(float a, float b);
-float MAX(float a, float b);
-double MIN(double a, double b);
-double MAX(double a, double b);
-unsigned int MIN(unsigned int a, unsigned int b);
-unsigned int MAX(unsigned int a, unsigned int b);
-long MIN(long a, long b);
-long MAX(long a, long b);
+inline gold_int MIN(gold_int a, gold_int b) {return (a < b ? a : b);}
+inline gold_int MAX(gold_int a, gold_int b) {return (a > b ? a : b);}
+inline int MIN(int a, int b) {return (a < b ? a : b);}
+inline int MAX(int a, int b) {return (a > b ? a : b);}
+inline float MIN(float a, float b) {return (a < b ? a : b);}
+inline float MAX(float a, float b) {return (a > b ? a : b);}
+inline double MIN(double a, double b) {return (a < b ? a : b);}
+inline double MAX(double a, double b) {return (a > b ? a : b);}
+inline unsigned int MIN(unsigned int a, unsigned int b) {return (a < b ? a : b);}
+inline unsigned int MAX(unsigned int a, unsigned int b) {return (a > b ? a : b);}
+inline long MIN(long a, long b) {return (a < b ? a : b);}
+inline long MAX(long a, long b) {return (a > b ? a : b);}
 
-char *CAP(char *txt);
+
 
 /* in class.c */
 int class_elem_weakness(int chcl);
@@ -338,6 +338,10 @@ extern const struct race_data races[NUM_RACES];
 
 #define AN(string) (strchr("aeiouAEIOU", *string) ? "an" : "a")
 
+inline char *CAP(char *txt) {
+    *txt = UPPER(*txt);
+    return (txt);
+}
 
 /* memory utils **********************************************************/
 #define CREATE(result, type, number)  do {\
@@ -349,6 +353,16 @@ extern const struct race_data races[NUM_RACES];
 #define RECREATE(result,type,number) do {\
   if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
 		{ perror("SYSERR: realloc failure"); abort(); } } while(0)
+
+
+
+/* Create a duplicate of a string */
+inline char *str_dup(const char *source) {
+    char *new_z = NULL;
+
+    CREATE(new_z, char, strlen(source) + 1);
+    return (strcpy(new_z, source));
+}
 
 /* Dynamic string buffer macros. */
 
