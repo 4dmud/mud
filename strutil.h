@@ -15,6 +15,7 @@ static const string SPACES = " \t\r\n";           // what gets removed when we t
 string Trim (const string & s, const string & t);
 string Trim (const string & s);
 string tolower (const string & s);
+string tocapitals (const string & s);
 string FindAndReplace
   (const string& source, const string target, const string replacement);
 

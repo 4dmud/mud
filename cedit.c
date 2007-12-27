@@ -169,14 +169,18 @@ void cedit_setup(Descriptor *d)
   else
     OLC_CONFIG(d)->operation.DFLT_IP     = NULL;
   
-  if (CONFIG_DFLT_DIR)
+  if (CONFIG_DFLT_DIR) {
+  if (OLC_CONFIG(d)->operation.DFLT_DIR)
+  free(OLC_CONFIG(d)->operation.DFLT_DIR);
     OLC_CONFIG(d)->operation.DFLT_DIR    = strdup(CONFIG_DFLT_DIR);
-  else
+  } else
     OLC_CONFIG(d)->operation.DFLT_DIR    = NULL;
 
-  if (CONFIG_LOGNAME)
+  if (CONFIG_LOGNAME) {
+  if (OLC_CONFIG(d)->operation.LOGNAME != NULL)
+  free(OLC_CONFIG(d)->operation.LOGNAME);
     OLC_CONFIG(d)->operation.LOGNAME     = strdup(CONFIG_LOGNAME);
-  else
+  } else
     OLC_CONFIG(d)->operation.LOGNAME     = NULL;
   
   if (CONFIG_MENU)

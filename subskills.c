@@ -1029,6 +1029,8 @@ int total_sub_chance(Character *ch, enum subskill_list  subcmd) {
     } else
         return 0;
 }
+
+
 void improveallsubs(Character *ch) {
     vector<sub_list>::iterator it;
     for (int su = SUB_UNDEFINED;(subskill_list)su < TOP_SUB_DEFINE;su++) {
@@ -1051,6 +1053,7 @@ void improveallsubs(Character *ch) {
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
 }
+/* valgrind throws an error when sort reaches cockfighting for some reason. when adding entries one by one*/
 void improve_sub(Character *ch, subskill_list sub, int amount) {
 
     if (IS_NPC(ch)) {

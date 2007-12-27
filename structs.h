@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.47  2006/08/18 09:55:31  w4dimenscor
+ * Fixed the wizlist so it didnt have a memory leak, ran fast, and actually worked
+ *
  * Revision 1.46  2006/08/17 10:53:49  w4dimenscor
  * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
  *
@@ -1168,16 +1171,18 @@ class Room;
  * LVL_IMMORT should always be the LOWEST immortal level.  The number of
  * mortal levels will always be LVL_IMMORT - 1.
  */
-#define LVL_IMPL    56
-#define LVL_SEN          55
-#define LVL_BLD             53
+#define LVL_IMPL    	56
+#define LVL_SEN     	55
+#define LVL_CRT		54
+#define LVL_BLD     	53
+#define LVL_GOD    	 	52
+#define LVL_HERO    	51
+#define LVL_MAX_MORT   	50
 
+#define LVL_NBLD    LVL_BLD
 
-#define LVL_NBLD    53
-#define LVL_GOD          52
-#define LVL_IMMORT  52
-#define LVL_HERO    51
-#define LVL_MAX_MORT   50
+#define LVL_IMMORT  LVL_GOD
+
 
 /* Level of the 'freeze' command */
 #define LVL_FREEZE  LVL_GRGOD

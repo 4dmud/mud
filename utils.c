@@ -21,6 +21,7 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "descriptor.h"
+#include "strutil.h"
 
 extern struct time_data time_info;
 
@@ -1490,182 +1491,172 @@ struct control_rec {
 };
 
 struct level_rec {
-    struct control_rec *params;
-    struct level_rec *next;
-    struct name_rec *names;
-};
+    const control_rec *params;
+    vector<string> names;
+    level_rec() {
+        params = NULL;
+    }
+    ~level_rec() {}
+}
+;
+#define LVL_IMPL    	56
+#define LVL_SEN     	55
+#define LVL_CRT		54
+#define LVL_BLD     	53
+#define LVL_GOD    	 	52
+#define LVL_HERO    	51
+const control_rec level_params[] = {
+                                       { LVL_HERO, 	"Heros"        },
+                                       { LVL_GOD, 	"Gods"		},
+                                       { LVL_BLD, 	"Builders"	},
+                                       { LVL_CRT,      "Creators" 	},
+                                       { LVL_SEN, 	"Senior Staff"	},
+                                       { LVL_IMPL, 	"Implementors"	},
+                                       { 0, 			""			}
+                                   };
 
-struct control_rec level_params[] = {
-                                        {
-                                            LVL_HERO, "Heros"
-                                        },
-                                        {LVL_GOD, "Gods"},
-                                        {LVL_GRGOD, "Greater Gods"},
-                                        {LVL_IMPL, "Implementors"},
-                                        {0, ""}
-                                    };
 
-
-struct level_rec *levels = 0;
+vector<level_rec> levels;
 
 void wiz_initialize(void) {
-    struct level_rec *tmp;
+    level_rec tmp;
     int i = 0;
-
+if (levels.size() == 0 )
     while (level_params[i].level > 0) {
-        tmp = (struct level_rec *) malloc(sizeof(struct level_rec));
-        tmp->names = 0;
-        tmp->params = &(level_params[i++]);
-        tmp->next = levels;
-        levels = tmp;
+        tmp.params = &(level_params[i++]);
+        levels.push_back(tmp);
     }
 }
 
 
 void wiz_read_file(void) {
     void wiz_add_name(byte level,const char *name);
-    Character *vict;
     int i;
     extern struct player_index_element *player_table;    /* index to plr file     */
     extern int top_of_p_table;
+    
+    vector<level_rec>::iterator curr_level;
+    for ( curr_level = levels.begin();curr_level != levels.end();curr_level++)
+    (*curr_level).names.clear();
 
     for (i = 0; i <= top_of_p_table; i++)
         if (*player_table[i].name) {
-            vict = new Character(FALSE);
-            TEMP_LOAD_CHAR = TRUE;
-            if (store_to_char(player_table[i].name, vict) > -1) {
-                delete vict;
-                TEMP_LOAD_CHAR = TRUE;
-                continue;
+            if ( player_table[i].level >= MIN_LEVEL &&
+                    !IS_SET(player_table[i].flags, PINDEX_DELETED) &&
+                    !IS_SET(player_table[i].flags, PINDEX_SELFDELETE)) {
+                //log("Update Wizlist: %d - %s", player_table[i].level, player_table[i].name);
+                wiz_add_name(player_table[i].level, player_table[i].name);
             }
-
-
-            if (( GET_LEVEL(vict) >= MIN_LEVEL &&
-                    !(PLR_FLAGGED(vict, PLR_FROZEN)) &&
-                    !PLR_FLAGGED(vict, PLR_NOWIZLIST)) &&
-                    !PLR_FLAGGED(vict, PLR_DELETED)) {
-                log("Update Wizlist: %d - %s", GET_LEVEL(vict), GET_NAME(vict));
-                wiz_add_name(GET_LEVEL(vict), GET_NAME(vict));
-            }
-            TEMP_LOAD_CHAR = TRUE;
-
-            delete (vict);
         }
 
 
 }
 
 
+
 void wiz_add_name(byte level,const char *name) {
-    struct name_rec *tmp;
-    struct level_rec *curr_level;
-    const char *ptr;
-
-    if (!*name)
-        return;
-
-    for (ptr = name; *ptr; ptr++)
-        if (!isalpha(*ptr))
+    string tmp = tocapitals(string(name));
+    vector<level_rec>::iterator curr_level;
+    for ( curr_level = levels.begin();curr_level != levels.end();curr_level++) {
+        if ((*curr_level).params->level == level) {
+            (*curr_level).names.push_back(tmp);
+            log("AUTOWIZ: %s (lev %d) added to %s", name, level, (*curr_level).params->level_name);
             return;
+        }
+    }
 
-    tmp = (struct name_rec *) malloc(sizeof(struct name_rec));
-    strcpy(tmp->name, name);
-    tmp->next = 0;
-
-    curr_level = levels;
-    while (curr_level->params->level > level)
-        curr_level = curr_level->next;
-
-    tmp->next = curr_level->names;
-    curr_level->names = tmp;
 }
 
 
 void wiz_sort_names(void) {
-    struct level_rec *curr_level;
-    struct name_rec *a, *b;
-    char temp[100];
-
-    for (curr_level = levels; curr_level; curr_level = curr_level->next) {
-        for (a = curr_level->names; a && a->next; a = a->next) {
-            for (b = a->next; b; b = b->next) {
-                if (strcmp(a->name, b->name) > 0) {
-                    strcpy(temp, a->name);
-                    strcpy(a->name, b->name);
-                    strcpy(b->name, temp);
-                }
-            }
-        }
-    }
+    vector<level_rec>::iterator curr_level;
+    for (curr_level = levels.begin(); curr_level != levels.end(); curr_level++)
+        sort((*curr_level).names.begin(), (*curr_level).names.end());
 }
 
 
 void write_wizlist(FILE * out, int minlev, int maxlev) {
-    char buf[100];
-    struct level_rec *curr_level;
-    struct name_rec *curr_name;
-    unsigned int i;
-    unsigned int j;
+    vector<level_rec>::iterator curr_level;
+    vector<string>::iterator curr_name;
+    char line[150];
+    string buf;
+    unsigned int i, j;
 
     fprintf(out,
             "****************************************************************************\n"
-            "* The following people have reached immortality on CircleMUD.  They are to *\n"
-            "* treated with respect and awe.  Occasional prayers to them are advisable. *\n"
-            "* Annoying them is not recommended.  Stealing from them is punishable by   *\n"
-            "* immediate death.                                                         *\n"
+            "*                           4Dimensions Immortals                          *\n"
             "****************************************************************************\n\n");
 
-    for (curr_level = levels; curr_level; curr_level = curr_level->next) {
-        if (curr_level->params->level < minlev ||
-                curr_level->params->level > maxlev)
+    for (curr_level = levels.end()-1; curr_level >= levels.begin(); curr_level--) {
+        if ((*curr_level).params->level < minlev ||  (*curr_level).params->level > maxlev)
             continue;
-        i = 39 - (strlen(curr_level->params->level_name) >> 1);
+        if ((*curr_level).names.size() == 0)
+            continue;
+            
+        log("Wiz list entry %s", (*curr_level).params->level_name);
+        i = 39 - (strlen((*curr_level).params->level_name) >> 1);
         for (j = 1; j <= i; j++)
             fputc(' ', out);
-        fprintf(out, "%s\n", curr_level->params->level_name);
+        fprintf(out, "%s\n", (*curr_level).params->level_name);
         for (j = 1; j <= i; j++)
             fputc(' ', out);
-        for (j = 1; j <= strlen(curr_level->params->level_name); j++)
+        for (j = 1; j <= strlen((*curr_level).params->level_name); j++)
             fputc('~', out);
         fprintf(out, "\n");
 
-        strcpy(buf, "");
-        curr_name = curr_level->names;
-        while (curr_name) {
-            strlcat(buf, curr_name->name, sizeof(buf));
-            if (strlen(buf) > LINE_LEN) {
-                if (curr_level->params->level <= COL_LEVEL)
-                    fprintf(out, IMM_LMARG);
-                else {
-                    i = 40 - (strlen(buf) >> 1);
-                    for (j = 1; j <= i; j++)
-                        fputc(' ', out);
-                }
-                fprintf(out, "%s\n", buf);
-                strlcpy(buf, "", sizeof(buf));
-            } else {
-                if (curr_level->params->level <= COL_LEVEL) {
-                    for (j = 1; j <= (IMM_NSIZE - strlen(curr_name->name)); j++)
-                        strlcat(buf, " ", sizeof(buf));
-                }
-                if (curr_level->params->level > COL_LEVEL)
-                    strlcat(buf, "   ", sizeof(buf));
-            }
-            curr_name = curr_name->next;
-        }
+        buf = "";
+        for (curr_name = (*curr_level).names.begin(); curr_name != (*curr_level).names.end(); curr_name++) {
 
-        if (*buf) {
-            if (curr_level->params->level <= COL_LEVEL)
-                fprintf(out, "%s%s\n", IMM_LMARG, buf);
-            else {
-                i = 40 - (strlen(buf) >> 1);
-                for (j = 1; j <= i; j++)
-                    fputc(' ', out);
-                fprintf(out, "%s\n", buf);
+            log("Wiz list name %s",buf.c_str());
+            if ((*curr_name).length() + buf.length() > 75) {
+                snprintf(line, sizeof(line)-1, "%*s%s\n", (int)((80 - buf.length())/2), "", buf.c_str());
+                fprintf(out, line);
+                buf = "";
             }
+            buf += (*curr_name);
+            buf += "  ";
         }
-        fprintf(out, "\n");
+        snprintf(line, sizeof(line)-1, "%*s%s\n\n",(int)((80 - buf.length())/2), "", buf.c_str());
+        fprintf(out, line);
     }
+#if 0
+    buf += (*curr_name);
+    if (buf.length() > LINE_LEN) {
+        if ((*curr_level).params->level <= COL_LEVEL)
+            fprintf(out, IMM_LMARG);
+        else {
+            i = 40 - (buf.length() >> 1);
+            for (j = 1; j <= i; j++)
+                fputc(' ', out);
+        }
+        fprintf(out, "%s\n", buf.c_str());
+    } else {
+        if ((*curr_level).params->level <= COL_LEVEL) {
+            for (j = 1; j <= (IMM_NSIZE - buf.length()); j++)
+                buf += " ";
+        }
+        if ((*curr_level).params->level > COL_LEVEL)
+            buf += "  ";
+
+        fprintf(out, "%s", buf.c_str());
+    }
+
+}
+
+if (buf.length() > 0) {
+    if ((*curr_level).params->level <= COL_LEVEL)
+        fprintf(out, "%s%s\n", IMM_LMARG, buf.c_str());
+    else {
+        i = 40 - (buf.length() >> 1);
+        for (j = 1; j <= i; j++)
+            fputc(' ', out);
+        fprintf(out, "%s\n", buf.c_str());
+    }
+}
+fprintf(out, "\n");
+}
+#endif
+
 }
 
 
@@ -1883,6 +1874,7 @@ string to_string(T c) {
     string s;
     stringstream strstm;
     strstm << c;
-    strstm >> s;
+    strstm >>
+    s;
     return s;
 }
