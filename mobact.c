@@ -126,8 +126,8 @@ void mobile_activity(void) {
             Character *vnext;
             for (vict = IN_ROOM(ch)->people; vict && !found; vict = vnext) {
                 vnext = vict->next_in_room;
-                if (!SELF(vict, ch))
-                	continue;
+                if (SELF(vict, ch))
+               	    continue;
                 if (IS_NPC(vict) || !CAN_SEE(ch, vict)
                         || PRF_FLAGGED(vict, PRF_NOHASSLE))
                     continue;
