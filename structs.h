@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.55  2006/08/26 08:28:47  w4dimenscor
+ * Fixed the saving of skills and subskills finally
+ *
  * Revision 1.54  2006/08/25 06:39:43  w4dimenscor
  * fixed the way skills would be deleted when you quit
  *
@@ -1858,6 +1861,7 @@ public:
             l = 0;
         if (!HasSub(ss)) {
             subs[ss] = new sub_list();
+            subs[ss]->subskill = ss;
             subs[ss]->learn = l;
         } else {
             subs[ss]->learn = l;
@@ -1871,6 +1875,7 @@ public:
             l = 0;
         if (!HasSub(ss)) {
             subs[ss] = new sub_list();
+            subs[ss]->subskill = ss;
             subs[ss]->learn = l;
         } else {
             subs[ss]->learn += l;
@@ -1920,10 +1925,10 @@ public:
             l = 0;
         if (!HasSkill(ss)) {
         skills[ss] = new skillspell_data();
+	   skills[ss]->skill = ss;
         skills[ss]->learn = l;
         } else 
             skills[ss]->learn = l;
-
         return skills[ss]->learn;
     }
     int UpdateSkillLearn(int ss, int l) {
@@ -1933,6 +1938,7 @@ public:
             l = 0;
         if (!HasSkill(ss)) {
         skills[ss] = new skillspell_data();
+	   skills[ss]->skill = ss;
         skills[ss]->learn = l;
         } else 
             skills[ss]->learn += l;

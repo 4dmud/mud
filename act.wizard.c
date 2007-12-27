@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.63  2006/08/26 08:28:47  w4dimenscor
+ * Fixed the saving of skills and subskills finally
+ *
  * Revision 1.62  2006/08/25 10:49:30  w4dimenscor
  * added command to fix peoples skills back to the practiced amount they were at
  *
@@ -6545,6 +6548,8 @@ void fixskills(Character *ch, int lrn) {
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
         if (knows_spell(ch, i))
             SAVED(ch).SetSkillLearn(i, learned);
+            
+  SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
 }
 void fixskills(Character *ch) {
