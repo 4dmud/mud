@@ -189,27 +189,33 @@ ACMD(do_convey) {
         return;
     }
 
-    if (isname(arg2, "tokens") && (amount <= 5)) {
-        if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
-            ch->Send("You convey %lld brass tokens to %lld training sessions.\r\n",
-                     amount, amount);
-            GET_BRASS_TOKEN_COUNT(ch) -= amount;
-            GET_PRACTICES(ch) += amount;
-            return;
-        } else {
-            ch->Send("You don't have that many brass tokens on account.\r\n");
-            return;
-        }
-    } else if (isname(arg2, "tokens") && (amount == 5)) {
-        if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
-            ch->Send("You convey 1 bronze token to %d training sessions.\r\n",5);
-            GET_BRONZE_TOKEN_COUNT(ch) -= 1;
-            GET_PRACTICES(ch) += 5;
-            return;
-        } else {
-            ch->Send("You can only convey between 1 and 5, or exactly 10 at a time.\r\n");
-            return;
-        }
+    if(isname(arg2, "tokens")) {
+	if(amount < 5) {
+	    if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
+		ch->Send("You convey %lld brass tokens to %lld training session.\r\n",
+		     amount, amount);
+		GET_BRASS_TOKEN_COUNT(ch) -= amount;
+		GET_PRACTICES(ch) += amount;
+		return;
+	    } else {
+		ch->Send("You don't have that many brass tokens on your account.\r\n");
+		return;
+	    }
+        } else if (amount == 5) {
+	    if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
+		ch->Send("You convey 1 bronze token to %d training sessions.\r\n",10);
+		GET_BRONZE_TOKEN_COUNT(ch) -= 1;
+		GET_PRACTICES(ch) += 10;
+		return;
+	    } else {
+		ch->Send("You don't have a bronze token on your account.\r\n");
+		return;
+	    }
+	} else {
+	    ch->Send("You can only convey between 1 and 5, or exactly 10 at a time.\r\n");
+	    return;
+	}
+
     } else if (isname(arg2, "sessions")) {
         if ((amount % 20)) {
             ch->Send("The number must be devisable by 20.");
