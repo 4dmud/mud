@@ -91,13 +91,11 @@ ACMD(do_oasis_zedit)
       }
     } else if (GET_LEVEL(ch) >= LVL_IMPL) {
       if (str_cmp("new", buf1) || !buf3 || !*buf3)
-        new_send_to_char(ch, "Format: zedit new <zone number> <bottom-room> "
-           "<upper-room>\r\n");
+        new_send_to_char(ch, "Format: zedit new <zone number> <bottom-room> <top-room>\r\n");
       else {
         char sbot[MAX_INPUT_LENGTH], stop[MAX_INPUT_LENGTH];
         room_vnum bottom, top;
         
-        skip_spaces(&buf3);
         two_arguments(buf3, sbot, stop);
         
         number = atoi(buf2);

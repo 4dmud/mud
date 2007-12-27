@@ -2476,11 +2476,28 @@ void zap_char(struct char_data *victim)
     if (GET_EQ(victim, i)
         && (invalid_align(victim, GET_EQ(victim, i))))
     {
+//    char objname[MAX_INPUT_LENGTH];
+    int i = 0;
       obj = unequip_char(victim, i);
       act("You are zapped by $p and instantly let go of it.",
           FALSE, victim, obj, 0, TO_CHAR);
+	  /*if (strlen(obj->short_description) < MAX_INPUT_LENGTH) {
+	  strcpy(objname, obj->short_description);
+	  i = strlen(objname);
+	  
+	  while (objname[i] == ' ') {
+	  objname[i] = '\0';
+	  i--;	  
+	  }
+	  if (objname[i] == 's') {
+	  //check to see if it is a plural and apostrophy appropriately
+	  act("$n is zapped by $p' and instantly lets go of it.",
+          FALSE, victim, obj, 0, TO_ROOM);
+	  }
+	  } else */{	  
       act("$n is zapped by $p and instantly lets go of it.",
           FALSE, victim, obj, 0, TO_ROOM);
+	  }
       obj_to_char(obj, victim);
     }
   }

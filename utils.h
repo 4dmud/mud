@@ -76,7 +76,10 @@ int use_stamina(struct char_data *ch, int amount);
 #define IS_HERO(ch) (0)
 #define IS_ELEMENTAL(ch) ((MOB_FLAGGED(ch, MOB_ELEM_EARTH)|| (MOB_FLAGGED(ch, MOB_ELEM_AIR))||(MOB_FLAGGED(ch, MOB_ELEM_WATER))||(MOB_FLAGGED(ch, MOB_ELEM_FIRE))))
 
-size_t strlcpy(char *dest, const char *src, size_t copylen);
+size_t strlcpy (char *dest,
+           const char *src,
+           size_t dest_size);
+
 /*replace parts of strings*/
 char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
 /*string concat for multiple strings*/
@@ -565,6 +568,8 @@ int has_body(CHAR_DATA *ch, int flag);
 #define GET_WIMP_LEV(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.wimp_level))
 #define GET_FREEZE_LEV(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.freeze_level))
 #define GET_BAD_PWS(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.bad_pws))
+
+#define IS_SAVING(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.saving))
 #define GET_TALK(ch, i)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.talks[i]))
 #define GET_KILLS(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->kills))
 #define GET_NEWBIE_STATUS(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->newbie_status))

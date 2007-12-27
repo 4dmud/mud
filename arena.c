@@ -655,7 +655,7 @@ int arena_ok(struct char_data *ch, struct char_data *victim)
 }
 
 
-void arena_kill(struct char_data *ch, struct char_data *victim)
+void arena_kill(struct char_data *ch)
 {
   room_rnum rm = real_room(1205);
   if (FIGHTING(ch))

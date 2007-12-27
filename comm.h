@@ -23,7 +23,7 @@ void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void perform_to_all(const char *messg, struct char_data *ch);
 void close_socket(struct descriptor_data *d);
-char *wordwrap(char *cmd, int width, size_t maxlen);
+char *wordwrap(char *cmd, size_t width, size_t maxlen);
 
 void perform_act(const char *orig, struct char_data *ch,
 		 struct obj_data *obj, const void *vict_obj,
@@ -57,7 +57,7 @@ void free_commlist(struct comm_data *c);
 #define DG_NO_TRIG      256	/* don't check act trigger   */
 
 /* I/O functions */
-int	write_to_descriptor(socket_t desc, const char *txt, struct compr *comp);;
+int	write_to_descriptor(socket_t desc, const char *txt, struct compr *comp);
 void write_to_q(const char *txt, struct txt_q *queue, int aliased);
 size_t	write_to_output(struct descriptor_data *d, const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
 size_t vwrite_to_output(struct descriptor_data *d, const char *format, va_list args);

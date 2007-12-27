@@ -21,14 +21,14 @@
 #include "constants.h"
 #include "comm.h"
 
-struct queue *event_q;		/* the event queue */
+struct queue *event_q = NULL;		/* the event queue */
 
 extern long pulse;
 
 /* initializes the event queue */
 void event_init(void)
 {
-    event_q = queue_init();
+  event_q = queue_init();
 }
 
 /*
@@ -37,108 +37,116 @@ void event_init(void)
 /* creates an event and returns it */
 struct event *event_create(EVENTFUNC(*func), void *event_obj, long when)
 {
-    struct event *new_event;
+  struct event *new_event;
 
-    if (when < 1)		/* make sure its in the future */
-	when = 1;
+  if (when < 1)		/* make sure its in the future */
+    when = 1;
 
-    CREATE(new_event, struct event, 1);
-    new_event->func = func;
-    new_event->event_obj = event_obj;
-    new_event->q_el = queue_enq(event_q, new_event, when + pulse);
+  CREATE(new_event, struct event, 1);
+  new_event->func = func;
+  new_event->event_obj = event_obj;
+  new_event->q_el = queue_enq(event_q, new_event, when + pulse);
 
-    return new_event;
+  return new_event;
 }
 
 
 /* removes the event from the system */
 void event_cancel(struct event *event)
 {
-    if (!event) {
-	log("SYSERR:  Attempted to cancel a NULL event");
-	ALERT_2;
-  core_dump();
-  abort();
-	return;
-    }
+  if (!event)
+  {
+    log("SYSERR:  Attempted to cancel a NULL event");
+    ALERT_2;
+    core_dump();
+    abort();
+    return;
+  }
 
-    if (!event->q_el) {
+  if (!event->q_el)
+  {
     /** this happens when the event is being canceled within the event function **/
-	log("SYSERR: (dg_events) Attempting to cancel a non-NULL unqueued event!!");
-	ALERT_2;
-    } else
-	queue_deq(event_q, event->q_el);
+    log("SYSERR: (dg_events) Attempting to cancel a non-NULL unqueued event!!");
+    //ALERT_2;
+    return;
+  }
+  else
+    queue_deq(event_q, event->q_el);
 
-    if (event->event_obj)
-	free(event->event_obj);
-    free(event);
+  if (event->event_obj)
+    free(event->event_obj);
+  free(event);
 }
 
 
 /* Process any events whose time has come. */
 void event_process(void)
 {
-    struct event *the_event = NULL;
-    long new_time;
+  struct event *the_event = NULL;
+  long new_time;
 
-    while ((long) pulse >= queue_key(event_q)) {
-	if (!(the_event = (struct event *) queue_head(event_q))) {
-	    log("SYSERR: Attempt to get a NULL event");
-	    ALERT_2;
-	    return;
-	}
-
-	/*
-	 ** Set the_event->q_el to NULL so that any functions called beneath
-	 ** event_process can tell if they're being called beneath the actual
-	 ** event function.
-	 */
-	the_event->q_el = NULL;
-
-	/* call event func, reenqueue event if retval > 0 */
-	if ((new_time = (the_event->func) (the_event->event_obj)) > 0)
-	    the_event->q_el =
-		queue_enq(event_q, the_event, new_time + pulse);
-	else
-	    free(the_event);
+  while (pulse >= queue_key(event_q))
+  {
+    if (!(the_event = (struct event *) queue_head(event_q)))
+    {
+      log("SYSERR: Attempt to get a NULL event");
+      ALERT_2;
+      return;
     }
+
+    /*
+     ** Set the_event->q_el to NULL so that any functions called beneath
+     ** event_process can tell if they're being called beneath the actual
+     ** event function.
+     */
+    the_event->q_el = NULL;
+
+    /* call event func, reenqueue event if retval > 0 */
+    if ((new_time = (the_event->func) (the_event->event_obj)) > 0)
+      the_event->q_el =
+        queue_enq(event_q, the_event, new_time + pulse);
+    else
+      free(the_event);
+  }
 }
 
 /* returns the time remaining before the event */
 long event_time(struct event *event)
 {
-    long when;
-    if (event == NULL || event->q_el == NULL) {
+  long when;
+  if (event == NULL || event->q_el == NULL)
+  {
     ALERT_2;
     return 0;
-    }
+  }
 
-    when = queue_elmt_key(event->q_el);
+  when = queue_elmt_key(event->q_el);
 
-    return (when - pulse);
+  return (when - pulse);
 }
 
 
 /* frees all events in the queue */
 void event_free_all(void)
 {
-    struct event *the_event;
+  struct event *the_event;
 
-    while ((the_event = (struct event *) queue_head(event_q))) {
-	if (the_event->event_obj)
-	    free(the_event->event_obj);
-	free(the_event);
-    }
-    queue_free(event_q);
+  while ((the_event = (struct event *) queue_head(event_q)))
+  {
+    if (the_event->event_obj)
+      free(the_event->event_obj);
+    free(the_event);
+  }
+  queue_free(event_q);
 }
 
 /* boolean function to tell whether an event is queued or not */
 int event_is_queued(struct event *event)
 {
-    if (event->q_el)
-	return 1;
-    else
-	return 0;
+  if (event->q_el)
+    return 1;
+  else
+    return 0;
 }
 
 /* ************************************************************************
@@ -151,80 +159,86 @@ int event_is_queued(struct event *event)
 /* returns a new, initialized queue */
 struct queue *queue_init(void)
 {
-    struct queue *q;
+  struct queue *q;
 
-    CREATE(q, struct queue, 1);
+  CREATE(q, struct queue, 1);
 
-    return q;
+  return q;
 }
 
 
 /* add data into the priority queue q with key */
 struct q_element *queue_enq(struct queue *q, void *data, long key)
 {
-    struct q_element *qe, *i;
-    int bucket;
+  struct q_element *qe, *i;
+  int bucket;
 
-    CREATE(qe, struct q_element, 1);
-    qe->data = data;
-    qe->key = key;
+  CREATE(qe, struct q_element, 1);
+  qe->data = data;
+  qe->key = key;
 
-    bucket = key % NUM_EVENT_QUEUES;	/* which queue does this go in */
+  bucket = key % NUM_EVENT_QUEUES;	/* which queue does this go in */
 
-    if (!q->head[bucket]) {	/* queue is empty */
-	q->head[bucket] = qe;
-	q->tail[bucket] = qe;
+  if (!q->head[bucket])
+  {	/* queue is empty */
+    q->head[bucket] = qe;
+    q->tail[bucket] = qe;
+  }
+
+  else
+  {
+    for (i = q->tail[bucket]; i; i = i->prev)
+    {
+
+      if (i->key < key)
+      {	/* found insertion point */
+        if (i == q->tail[bucket])
+          q->tail[bucket] = qe;
+        else
+        {
+          qe->next = i->next;
+          i->next->prev = qe;
+        }
+
+        qe->prev = i;
+        i->next = qe;
+        break;
+      }
     }
 
-    else {
-	for (i = q->tail[bucket]; i; i = i->prev) {
-
-	    if (i->key < key) {	/* found insertion point */
-		if (i == q->tail[bucket])
-		    q->tail[bucket] = qe;
-		else {
-		    qe->next = i->next;
-		    i->next->prev = qe;
-		}
-
-		qe->prev = i;
-		i->next = qe;
-		break;
-	    }
-	}
-
-	if (i == NULL) {	/* insertion point is front of list */
-	    qe->next = q->head[bucket];
-	    q->head[bucket] = qe;
-	    qe->next->prev = qe;
-	}
-
+    if (i == NULL)
+    {	/* insertion point is front of list */
+      qe->next = q->head[bucket];
+      q->head[bucket] = qe;
+      qe->next->prev = qe;
     }
 
-    return qe;
+  }
+
+  return qe;
 }
 
 
 /* remove queue element qe from the priority queue q */
 void queue_deq(struct queue *q, struct q_element *qe)
 {
-    int i;
+  int i;
 
-    assert(qe);
+  assert(qe);
 
-    i = (qe->key % (NUM_EVENT_QUEUES));
+  i = (qe->key % (NUM_EVENT_QUEUES));
 
-    if (qe->prev == NULL)
-	q->head[i] = qe->next;
-    else
-	qe->prev->next = qe->next;
+  if (qe->prev == NULL)
+    q->head[i] = qe->next;
+  else
+    qe->prev->next = qe->next;
 
-    if (qe->next == NULL)
-	q->tail[i] = qe->prev;
-    else
-	qe->next->prev = qe->prev;
+  if (qe->next == NULL)
+    q->tail[i] = qe->prev;
+  else
+    qe->next->prev = qe->prev;
 
-    free(qe);
+  free(qe);
 }
 
 
@@ -237,17 +251,17 @@ void queue_deq(struct queue *q, struct q_element *qe)
  */
 void *queue_head(struct queue *q)
 {
-    void *data;
-    int i;
+  void *data;
+  int i;
 
-    i = pulse % NUM_EVENT_QUEUES;
+  i = pulse % NUM_EVENT_QUEUES;
 
-    if (!q->head[i])
-	return NULL;
+  if (!q->head[i])
+    return NULL;
 
-    data = q->head[i]->data;
-    queue_deq(q, q->head[i]);
-    return data;
+  data = q->head[i]->data;
+  queue_deq(q, q->head[i]);
+  return data;
 }
 
 
@@ -257,35 +271,36 @@ void *queue_head(struct queue *q)
  */
 long queue_key(struct queue *q)
 {
-    int i;
+  int i;
 
-    i = pulse % NUM_EVENT_QUEUES;
+  i = pulse % NUM_EVENT_QUEUES;
 
-    if (q->head[i])
-	return q->head[i]->key;
-    else
-	return LONG_MAX;
+  if (q->head[i])
+    return q->head[i]->key;
+  else
+    return LONG_MAX;
 }
 
 
 /* returns the key of queue element qe */
 long queue_elmt_key(struct q_element *qe)
 {
-    return qe->key;
+  return qe ? qe->key : 0;
 }
 
 
 /* free q and contents */
 void queue_free(struct queue *q)
 {
-    int i;
-    struct q_element *qe, *next_qe;
+  int i;
+  struct q_element *qe, *next_qe;
 
-    for (i = 0; i < NUM_EVENT_QUEUES; i++)
-	for (qe = q->head[i]; qe; qe = next_qe) {
-	    next_qe = qe->next;
-	    free(qe);
-	}
+  for (i = 0; i < NUM_EVENT_QUEUES; i++)
+    for (qe = q->head[i]; qe; qe = next_qe)
+    {
+      next_qe = qe->next;
+      free(qe);
+    }
 
-    free(q);
+  free(q);
 }

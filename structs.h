@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.8  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.7  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -375,6 +378,9 @@ extern int message_type;
 #define MOB_SWIMS        38
 #define MOB_WIZINVIS     39
 #define MOB_STAY_SECTOR  40
+#define MOB_HEALER       41
+#define MOB_POSTMASTER   42
+#define MOB_QUEST        43
 
 /* Preference flags: used by char_data.player_specials.pref 		*/
 #define PRF_BRIEF       0	/* Room descs won't normally be shown        */
@@ -426,6 +432,8 @@ extern int message_type;
 #define PRF_REPLYLOCK   46
 #define PRF_BUSY	47	/* Player is busy                             */
 #define PRF_AGGRO	48	/* Player is aggro                            */
+#define PRF_NOBRAG      49
+#define PRF_NOGATE 	50
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */
@@ -522,8 +530,9 @@ extern int message_type;
 #define AFF_POLY_BEAR	      85
 #define AFF_POLY_BOAR	      86
 #define AFF_POLY_TOAD	      87
+#define AFF_IMMFREEZE	      88
 
-#define MAX_AFF_APPLY         88
+#define MAX_AFF_APPLY         89
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \
@@ -802,6 +811,7 @@ extern int message_type;
 #define ITEM_LOCKER             81
 #define ITEM_GAROTTE            82
 #define ITEM_VIAL		83
+#define ITEM_BANKBOOK		84
 
 #define VIAL_NONE      -1
 #define VIAL_HITP 	0
@@ -876,6 +886,7 @@ extern int message_type;
 #define ITEM_NODISPLAY          61
 #define ITEM_NOTDEADYET         62
 #define ITEM_SHIFTABLE          63
+#define ITEM_KEYSTAY		64
 
 
 
@@ -1215,6 +1226,8 @@ struct race_data
   int race;
   unsigned long long body_bits;
 };
+
+
 
 /* object-related structures ******************************************/
 
@@ -1559,6 +1572,7 @@ struct player_special_data_saved
   int pref[PR_ARRAY_MAX];	/* preference flags for PC's.           */
   ubyte bad_pws;		/* number of bad password attempts      */
   sbyte conditions[3];	/* Drunk, full, thirsty                 */
+  int saving;
 
   /* spares below for future expansion.  You can change the names from
      'sparen' to something meaningful, but don't change the order.  */

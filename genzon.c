@@ -79,7 +79,7 @@ zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, 
     return NOWHERE;
   }
 
-#if _CIRCLEMUD < CIRCLEMUD_VERSION(3,0,21)
+#if 0 || _CIRCLEMUD < CIRCLEMUD_VERSION(3,0,21)
   /*
    * New with bpl19, the OLC interface should decide whether
    * to allow overlap before calling this function. There
@@ -94,18 +94,27 @@ zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, 
   /*
    * Make sure the zone does not exist.
    */
-  room = vzone_num * 100; /* Old CircleMUD 100-zones. */
+  room = bottom;//vzone_num * 100; /* Old CircleMUD 100-zones. */
   for (i = 0; i <= top_of_zone_table; i++)
     if (genolc_zone_bottom(i) <= room && zone_table[i].top >= room) {
       *error = "A zone already covers that area.\r\n";
       return NOWHERE;
     }
 #else
-  for (i = 0; i < top_of_zone_table; i++)
+  for (i = 0; i < top_of_zone_table; i++) {
     if (zone_table[i].number == vzone_num) {
       *error = "That virtual zone already exists.\r\n";
       return NOWHERE;
      }
+     if (genolc_zone_bottom(i) <= bottom && zone_table[i].top >= bottom) {
+      *error = "A zone already covers that area.\r\n";
+      return NOWHERE;
+    }
+    if (genolc_zone_bottom(i) <= top && zone_table[i].top >= top) {
+      *error = "A zone already covers that area.\r\n";
+      return NOWHERE;
+    }
+    }
 #endif
 
 /* create directory */
@@ -122,7 +131,7 @@ mkdir(buf, S_IRWXO | S_IRWXU | S_IRWXG);
     *error = "Could not write zone file.\r\n";
     return NOWHERE;
   }
-fprintf(fp, "#%d\nNew Zone~\n~\n%d 30 2 0\nS\n$\n", vzone_num, top);
+fprintf(fp, "#%d\nNew Zone~\n~\n%d %d 30 2 0 %d\nS\n$\n", vzone_num, bottom, top, D_ALL);
   fclose(fp);
 
   /*
@@ -136,7 +145,7 @@ fprintf(fp, "#%d\nNew Zone~\n~\n%d 30 2 0\nS\n$\n", vzone_num, top);
   }
       fprintf(fp,
 	"#%d\nThe Beginning~\nNot much here.\n~\nYou smell nothing of interest.\n~\nYou hear nothing out of the ordinary.\n~\n%d 0 0 0 0 0\nS\n$\n",
-	    vzone_num * 100, vzone_num);
+	    bottom, vzone_num);
   fclose(fp);
 
   /*
@@ -217,7 +226,7 @@ fprintf(fp, "#%d\nNew Zone~\n~\n%d 30 2 0\nS\n$\n", vzone_num, top);
   zone->number = vzone_num;
   zone->builders = strdup("None");
   zone->dimension = D_ALL;
-  zone->bot = (vzone_num * 100);
+  zone->bot = bottom;
   zone->top = top;
   zone->lifespan = 30;
   zone->age = 0;

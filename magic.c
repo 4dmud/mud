@@ -1131,7 +1131,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_SWEET_DREAMS:
-    if (number(1, 23) > GET_INT(ch))
+    if (number(1, 25) > GET_INT(ch))
     {
       new_send_to_char(ch, "You slip and draw the wrong rune!\r\n");
       victim = ch;
@@ -1200,7 +1200,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[0].modifier = (10*staff);
 
     accum_duration =FALSE;
-    to_vict = "You bare your teeth and fire runs through your veins.";
+    to_vict = "You bare your teeth as the fire of anger runs through your veins.";
     break;
   case SPELL_MAGIC_BUBBLE:
     if (OBJ_INNATE)
@@ -1231,7 +1231,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[0].bitvector = AFF_CONFUSED;
 
     accum_duration =FALSE;
-    to_room = "$N frowns. Not sure what just happened.";
+    to_room = "$n frowns. Not sure what just happened.";
     to_vict = "You frown. Not sure what just happened.";
     break;
 
@@ -1352,8 +1352,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   for (i = 0; i < MAX_SPELL_AFFECTS; i++)
     if (af[i].bitvector || (af[i].location != APPLY_NONE))
     {
-      affect_join(victim, af + i, accum_duration, FALSE,
-                  accum_affect, FALSE);
+      affect_join(victim, af + i, accum_duration, FALSE, accum_affect, FALSE);
       suc_val = 1;
     }
   if (suc_val)
@@ -1995,6 +1994,7 @@ void mag_unaffects(int level, struct char_data *ch,
     spell = SPELL_BLINDNESS;
     to_vict = "Your vision returns!";
     to_room = "There's a momentary gleam in $n's eyes.";
+    affect_from_char(victim, SPELL_COLOR_SPRAY);
     break;
   case SPELL_ANTIDOTE_1:
     spell = SPELL_POISON;

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.2  2004/11/20 19:43:28  w4dimenscor
  * added aggro flag
  *
@@ -517,6 +520,9 @@ const char *action_bits[] =
     "SWIMS",
     "WIZINVIS",
     "STAY_SECTOR",
+    "HEALER",
+    "POSTMASTER",
+    "QUESTMOB",
     "\n"
   };
 
@@ -572,6 +578,7 @@ const char *preference_bits[] =
     "REPLYLOCK",
     "BUSY",
     "AGGRO",
+    "!BRAG",
     "\n"
   };
 
@@ -667,6 +674,7 @@ const char *affected_bits[] =
     "POLY_BEAR",
     "POLY_BOAR",
     "POLY_TOAD",
+    "IMMFREEZE",
     "\n"
   };
 
@@ -1194,6 +1202,7 @@ const char *item_types[] =
     "locker",
     "garotte",
     "vial",
+    "bankbook",
     "\n"
   };
 
@@ -1309,6 +1318,8 @@ const char *extra_bits[] =
     "move-stealing",
     "undisplayed",
     "extracting-(CODE)",
+    "shiftable",
+    "key-rent",
     "\n"
   };
 

@@ -1071,8 +1071,29 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_NPC_FLAGS:
     if ((i = atoi(arg)) <= 0)
       break;
-    else if (i <= NUM_MOB_FLAGS)
+    else if (i <= NUM_MOB_FLAGS) {
+    switch (i) {
+    case MOB_AGGRESSIVE:
+    if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGRESSIVE)) {
+    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
+    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);
+    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_GOOD);
+    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_EVIL);    
+    REMOVE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AGGR_NEUTRAL);
+    }
+    break;
+    case MOB_QUEST:
+    if (!IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_QUEST)) {
+    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOCHARM);
+    SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_NOSUMMON);  
+    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_INFRAVISION);
+    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_DETECT_INVIS);
+    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_SENSE_LIFE);  
+    SET_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_NOTRACK);  
+    }
+    }
       TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)), (i - 1));
+      }
     medit_disp_mob_flags(d);
     return;
     /*-------------------------------------------------------------------*/

@@ -75,6 +75,12 @@ void tag_argument(char *argument, char *tag);
 void clean_pfiles(void);
 int is_aggro(CHAR_DATA *ch);
 void generate_weapon(OBJ_DATA *obj);
+
+void ASSIGNMOB(mob_vnum mob, SPECIAL(fname));
+void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
+SPECIAL(postmaster);
+SPECIAL(cleric);
+SPECIAL(bank);
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
 **************************************************************************/
@@ -117,12 +123,6 @@ struct index_data *obj_index;	/* index table for object file   */
 struct obj_data *obj_proto;	/* prototypes for objs           */
 obj_rnum top_of_objt = 0;	/* top of object index table     */
 struct zone_list_data *zone_list = NULL;
-
-NOTE_DATA *note_list = NULL;
-NOTE_DATA *idea_list = NULL;
-NOTE_DATA *penalty_list = NULL;
-NOTE_DATA *news_list = NULL;
-NOTE_DATA *changes_list = NULL;
 
 struct zone_data *zone_table;	/* zone table                    */
 zone_rnum top_of_zone_table = 0;	/* top element of zone tab       */
@@ -224,7 +224,7 @@ char fread_letter(FILE *fp);
 void free_followers(struct follow_type *k);
 void load_default_config( void );
 void load_config( void );
- 
+
 
 
 
@@ -352,8 +352,8 @@ int check_dir(char *dirname)
       log("Directory %s is missing its .shp file", dirname);
     if (!wld)
       log("Directory %s is missing its .wld file", dirname);
-if (eps)
-    free(eps);
+    if (eps)
+      free(eps);
     if ((zon + trg + mob + obj + shp + wld) == 6)
       return 1;
     else
@@ -391,41 +391,47 @@ int numsort(const void *a, const void *b)
   {
     return (atoi(a1->d_name) - atoi(b1->d_name));
   }
-  else {
-  log("ERROR in directory sort: a1 is %s, b1 is %s", a1->d_name, b1->d_name);
+  else
+  {
+    log("ERROR in directory sort: a1 is %s, b1 is %s", a1->d_name, b1->d_name);
     return -1;
-    }
+  }
 
 }
-static int zone_compare(const void *a, const void *b) {
-const struct zone_list_data *aa, *bb;
+static int zone_compare(const void *a, const void *b)
+{
+  const struct zone_list_data *aa, *bb;
 
-aa = *(const struct zone_list_data **)a;
-bb = *(const struct zone_list_data **)b;
+  aa = *(const struct zone_list_data **)a;
+  bb = *(const struct zone_list_data **)b;
 
-if (aa->num < bb->num)
-return -1;
-else if (aa->num > bb->num)
-return 1;
-else
-return 0;
+  if (aa->num < bb->num)
+    return -1;
+  else if (aa->num > bb->num)
+    return 1;
+  else
+    return 0;
 }
-void sort_zone_list(int total) {
-struct zone_list_data *temp_list[total + 1], *temp;
-int i;
-for (i = 0, temp = zone_list; i<total && temp; temp = temp->next, i++) {
-temp_list[i] = temp;
-} 
+void sort_zone_list(int total)
+{
+  struct zone_list_data *temp_list[total + 1], *temp;
+  int i;
+  for (i = 0, temp = zone_list; i<total && temp; temp = temp->next, i++)
+  {
+    temp_list[i] = temp;
+  }
 #if 1
-for (i=0;i<total;i++) {
-log("Before - %d", temp_list[i]->num);
-}
-#endif 
-qsort(temp_list,total,sizeof(temp_list[0]),zone_compare);
+  for (i=0;i<total;i++)
+  {
+    log("Before - %d", temp_list[i]->num);
+  }
+#endif
+  qsort(temp_list,total,sizeof(temp_list[0]),zone_compare);
 #if 1
-for (i=0;i<total;i++) {
-log("After  - %d", temp_list[i]->num);
-} 
+  for (i=0;i<total;i++)
+  {
+    log("After  - %d", temp_list[i]->num);
+  }
 #endif
 }
 
@@ -457,7 +463,7 @@ int create_zone_index(void)
           temp->next = zone_list;
           zone_list = temp;
           free(eps[cnt]);
-	  total++;
+          total++;
           //log("zone: %d", temp->num);
         }
       }
@@ -470,7 +476,7 @@ int create_zone_index(void)
     exit(1);
   }
   if (eps)
-  free(eps);
+    free(eps);
   log(" -- sorting zones");
   //sort_zone_list(total);
   return 0;
@@ -1146,7 +1152,7 @@ void build_player_index(void)
   top_of_p_file = top_of_p_table = i - 1;
 
 
-/** lets check for duplicate id nums soon**/
+  /** lets check for duplicate id nums soon**/
 
 
   if (save_index)
@@ -1380,10 +1386,10 @@ void index_boot(int mode)
     log("SYSERR: Unknown subcommand %d to index_boot!", mode);
     exit(1);
   }
-      if (mini_mud)
-      index_filename = MINDEX_FILE;
-    else
-      index_filename = INDEX_FILE;
+  if (mini_mud)
+    index_filename = MINDEX_FILE;
+  else
+    index_filename = INDEX_FILE;
   //TODO: fix dynamic loading for minimud mode
   if (mode == DB_BOOT_HLP)
   {
@@ -1391,16 +1397,18 @@ void index_boot(int mode)
 
     snprintf(buf2, sizeof(buf2), "%s%s", prefix, index_filename);
 
-    if (!(index = fopen(buf2, "r")))
+    if ((index = fopen(buf2, "ro")) == NULL)
     {
       log("SYSERR: opening index file '%s': %s", buf2, strerror(errno));
       return;
     }
 
     /* first, count the number of records in the file so we can malloc */
-    if (fscanf(index, "%s\n", buf1) == -1) {
-//      load_xml_help(prefix);
-    return;
+    if (fscanf(index, "%s\n", buf1) == -1)
+    {
+      //      load_xml_help(prefix);
+      fclose(index);
+      return;
     }
     while (*buf1 != '$')
     {
@@ -1419,7 +1427,6 @@ void index_boot(int mode)
       fclose(db_file);
       fscanf(index, "%s\n", buf1);
     }
-
     /* Exit if 0 records, unless this is shops */
     if (!rec_count)
     {
@@ -1684,7 +1691,7 @@ char fread_letter(FILE * fp)
 void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
 {
   static struct room_data * room_nr = NULL;
-  static zone_rnum zone = 0;
+  zone_rnum zone = 0;
   int t[10], i;
   char line[256], flags[128], flags2[128], flags3[128], flags4[128];
   struct extra_descr_data *new_descr;
@@ -1698,35 +1705,38 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
     exit(1);
   }
 
-  zone = real_zone(zon);
-  if (zone == NOWHERE)
+  //log("Zone Load: %d - %d (%d)", zone, real_zone(zon), zon); 
+  if ((zone = real_zone(zon)) == NOWHERE)
   {
     log("Real zone for zone %d - is nowhere", zon);
     exit(1);
   }
 
+
   snprintf(buf2, sizeof(buf2), "#room %d", virtual_nr);//for fread_string
 
   if (virtual_nr < zone_table[zone].bot)
   {
-    log("SYSERR: Room #%d is below zone %d.", virtual_nr, zone);
+    log("SYSERR: Room #%d is below zone %d's bottom %d.", virtual_nr, zone_table[zone].number,zone_table[zone].bot);
     exit(1);
   }				//mord??
-  while (virtual_nr > zone_table[zone].top) {
-    if (++zone > top_of_zone_table)
+  while (virtual_nr > zone_table[zone].top)
+  {
+    if ((++zone) > top_of_zone_table)
     {
       log("SYSERR: Room %d is outside of any zone.", virtual_nr);
       exit(1);
     }
-    }
-    if (world_vnum[virtual_nr] != NULL) {
+  }
+  if (world_vnum[virtual_nr] != NULL)
+  {
     log("Room: %d somehow already has been made when it is loading now: %s", virtual_nr,world_vnum[virtual_nr]->name);
     free_room_strings(world_vnum[virtual_nr]);
     free(world_vnum[virtual_nr]);
     world_vnum[virtual_nr] = NULL;
-    }
+  }
   room_nr=(struct room_data *)malloc(sizeof(struct room_data));
-  room_nr->zone = zone;
+  room_nr->zone = real_zone(zon);
   room_nr->number = virtual_nr;
   room_nr->name = fread_string(fl, buf2);
   room_nr->description = fread_string(fl, buf2);
@@ -1743,9 +1753,7 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
     exit(1);
   }
 
-  if (sscanf
-      (line, " %d %s %s %s %s %d ", t, flags, flags2, flags3, flags4,
-       t + 2) != 6)
+  if (sscanf(line, " %d %s %s %s %s %d ", t, flags, flags2, flags3, flags4, t + 2) != 6)
   {
     log("SYSERR: Format error in roomflags/sector type of room #%d", virtual_nr);
     exit(1);
@@ -1773,8 +1781,6 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
   room_nr->look_behind_description = NULL;
   room_nr->look_under_description = NULL;
 
-
-
   for (;;)
   {
     if (!get_line(fl, line))
@@ -1797,10 +1803,11 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
        * -- Welcor 09/03 
        */
       {
-      	char *end = strchr(new_descr->description, '\0');
-      	if (end > new_descr->description && *(end-1) != '\n') {
-      	  CREATE(end, char, strlen(new_descr->description)+3);
-      	  sprintf(end, "%s\r\n", new_descr->description); /* snprintf ok : size checked above*/
+        char *end = strchr(new_descr->description, '\0');
+        if (end > new_descr->description && *(end-1) != '\n')
+        {
+          CREATE(end, char, strlen(new_descr->description)+3);
+          sprintf(end, "%s\r\n", new_descr->description); /* snprintf ok : size checked above*/
           free(new_descr->description);
           new_descr->description = end;
         }
@@ -2191,7 +2198,7 @@ void parse_simple_mob(FILE * mob_f, int i, int nr)
   mob_proto[i].player.chclass = 0;
   mob_proto[i].player.weight = 200;
   mob_proto[i].player.height = 198;
-  mob_proto[i].real_abils.str = 20;
+  mob_proto[i].real_abils.str = 25;
   mob_proto[i].real_abils.str_add = 100;
 
   /*
@@ -2469,11 +2476,12 @@ void die_link(CHAR_DATA *mob)
 void delete_one_join(CHAR_DATA *mob, int i)
 {
   int j = 0;
-  struct combine_data *temp = NULL, *prev = NULL;
+  struct combine_data *temp, *prev = NULL;
 
 
   if (mob == NULL)
     return;
+    temp = mob->mob_specials.join_list;
 
   while (temp)
   {
@@ -2616,7 +2624,6 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
    * structure is to save newbie coders from themselves. -gg 2/25/98
    */
   mob_proto[i].player_specials = &dummy_mob;
-  //reset_char(mob_proto + i);
   snprintf(buf2, sizeof(buf2), "mob vnum %d", nr);	/* sprintf: OK (for 'buf2 >= 19') */
 
   /***** String data *****/
@@ -2661,6 +2668,8 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
     log("SYSERR: Mob #%d has reserved bit MOB_NOTDEADYET set.", nr);
     REMOVE_BIT_AR(MOB_FLAGS(mob_proto + i), MOB_NOTDEADYET);
   }
+ 
+  
   //check_bitvector_names(MOB_FLAGS(mob_proto + i), action_bits_count, buf2, "mobile");
 
   AFF_FLAGS(mob_proto + i)[0] = asciiflag_conv(f5);
@@ -2728,7 +2737,13 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
 
   if (GET_CLASS(mob_proto + i) == CLASS_NORMAL)
     give_mob_class(mob_proto + i, nr);
-
+    
+ if (MOB_FLAGGED(mob_proto + i, MOB_HEALER)) {
+  ASSIGNMOB(nr, cleric);
+  }
+  if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER)) {
+  ASSIGNMOB(nr, postmaster);
+  }
   top_of_mobt = i++;
 }
 
@@ -2990,6 +3005,9 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
       exit(1);
     }
   }
+  
+  if (GET_OBJ_TYPE(obj_proto + i) == ITEM_BANKBOOK)
+  ASSIGNOBJ(nr, bank);
 }
 
 
@@ -3228,20 +3246,78 @@ void load_zones(FILE * fl, char *zonename)
 #undef Z
 int int_compare(const void *aa, const void* bb)
 {
-   int a = * (int *) aa;
-   int b = * (int *) bb;
+  int a = * (int *) aa;
+  int b = * (int *) bb;
 
-   return a - b;
+  return a - b;
 }
 void renumber_zones()
 {
-  int i;
-  zone_rnum temp[top_of_zone_table];
-  for (i = 0; i < top_of_zone_table; i++)
-    temp[i] = zone_table[i].number;
+  int i, j;
+  for (j = 0; j < top_of_zone_table; j++)
+  {
+    for (i = 0; i < top_of_zone_table; i++)
+    {
+      if (i==j)
+        continue;
+      if (zone_table[j].number == zone_table[i].number)
+      {
+        log("ERROR: Virtual zone exists twice - [%s] and [%s]", zone_table[j].name, zone_table[i].name);
+      }
+      if (zone_table[j].bot <= zone_table[i].bot && zone_table[j].top >= zone_table[i].bot)
+      {
+        log("ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)",
+            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
-  qsort(temp, top_of_zone_table - 1, sizeof(int), int_compare);
+      }
+      if (zone_table[j].bot <= zone_table[i].top && zone_table[j].top >= zone_table[i].top)
+      {
+        log("ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)",
+            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
+      }
+    }
+  }
+
+
+}
+void do_show_errors(CHAR_DATA *ch) {
+int i, j;
+int found = FALSE;
+  for (j = 0; j < top_of_zone_table; j++)
+  {
+    for (i = 0; i < top_of_zone_table; i++)
+    {
+      if (i==j)
+        continue;
+      if (zone_table[j].number == zone_table[i].number)
+      {
+      found = TRUE;
+        new_send_to_char(ch,"ERROR: Virtual zone exists twice - [%s] and [%s]\r\n", zone_table[j].name, zone_table[i].name);
+      }
+      if (zone_table[j].bot <= zone_table[i].bot && zone_table[j].top >= zone_table[i].bot)
+      {
+      found = TRUE;
+        new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
+            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
+
+      }
+      if (zone_table[j].bot <= zone_table[i].top && zone_table[j].top >= zone_table[i].top)
+      {
+      found = TRUE;
+        new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
+            zone_table[j].number, zone_table[j].bot, zone_table[j].top,
+            zone_table[i].number, zone_table[i].bot, zone_table[i].top);
+
+      }
+    }
+  }
+  if (!found) {
+  new_send_to_char(ch, "No zone overlaps found\r\n");
+  }
 }
 
 
@@ -3260,9 +3336,10 @@ void the_free_help(void)
   int hp;
 
   if (!help_table)
-     return;
+    return;
 
-  for (hp = 0; hp <= top_of_helpt; hp++) {
+  for (hp = 0; hp <= top_of_helpt; hp++)
+  {
     if (help_table[hp].keywords)
       free(help_table[hp].keywords);
     if (help_table[hp].entry && !help_table[hp].duplicate)
@@ -3357,23 +3434,27 @@ void load_help(FILE *fl)
 
   /* get the first keyword line */
   get_one_line(fl, key);
-  while (*key != '$') {
+  while (*key != '$')
+  {
     strcat(key, "\r\n");	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
     entrylen = strlcpy(entry, key, sizeof(entry));
 
     /* read in the corresponding help entry */
     get_one_line(fl, line);
-    while (*line != '#' && entrylen < sizeof(entry) - 1) {
+    while (*line != '#' && entrylen < sizeof(entry) - 1)
+    {
       entrylen += strlcpy(entry + entrylen, line, sizeof(entry) - entrylen);
 
-      if (entrylen + 2 < sizeof(entry) - 1) {
+      if (entrylen + 2 < sizeof(entry) - 1)
+      {
         strcpy(entry + entrylen, "\r\n");	/* strcpy: OK (size checked above) */
         entrylen += 2;
       }
       get_one_line(fl, line);
     }
 
-    if (entrylen >= sizeof(entry) - 1) {
+    if (entrylen >= sizeof(entry) - 1)
+    {
       int keysize;
       const char *truncmsg = "\r\n*TRUNCATED*\r\n";
 
@@ -3386,14 +3467,15 @@ void load_help(FILE *fl)
       while (*line != '#')
         get_one_line(fl, line);
     }
-el.min_level = 0;
+    el.min_level = 0;
     if ((*line == '#') && (*(line + 1) != 0))
       el.min_level = atoi((line + 1));
     /* now, add the entry to the index with each keyword on the keyword line */
     el.duplicate = 0;
     el.entry = strdup(entry);
     scan = one_word(key, next_key);
-    while (*next_key) {
+    while (*next_key)
+    {
       el.keywords = strdup(next_key);
       help_table[top_of_helpt++] = el;
       el.duplicate++;
@@ -3414,7 +3496,7 @@ struct help_index_element *add_to_help_index(struct help_index_element *perent,i
   CREATE(el, struct help_index_element, 1);
   if (!perent)
   {
-//    create_help_core_perent(perent);
+    //    create_help_core_perent(perent);
   }
   el->next = perent->items;
   perent->items = el;
@@ -3481,7 +3563,7 @@ int vnum_object(char *searchname, struct char_data *ch)
       DYN_RESIZE(buf);
     }
   }
-    page_string(ch->desc, dynbuf, DYN_BUFFER);
+  page_string(ch->desc, dynbuf, DYN_BUFFER);
   return (found);
 }
 
@@ -3724,9 +3806,9 @@ void zone_update(void)
                    zone_table[update_u->zone_to_reset].name);
       }
       //else
-       /* new_mudlog(CMP, LVL_GOD, FALSE, "Auto zone reset (Zone %3d): %s ",
-                   zone_table[update_u->zone_to_reset].number,
-                   zone_table[update_u->zone_to_reset].name);*/
+      /* new_mudlog(CMP, LVL_GOD, FALSE, "Auto zone reset (Zone %3d): %s ",
+                  zone_table[update_u->zone_to_reset].number,
+                  zone_table[update_u->zone_to_reset].name);*/
       reset_zone(update_u->zone_to_reset);
       /* dequeue */
       if (update_u == reset_q.head)
@@ -4255,7 +4337,7 @@ void reset_zone(zone_rnum zone)
             {
               if (obj)
               {
-// 	      purge_qic(ZCMD.arg1);
+                // 	      purge_qic(ZCMD.arg1);
                 extract_obj(obj);
                 obj = NULL;
                 tobj = obj;
@@ -5192,7 +5274,7 @@ int store_to_char(char *name, struct char_data *ch)
   if (!TEMP_LOAD_CHAR)
   {
 
-    
+
 
     for (i = 0; i < MAX_AFFECT && tmp_aff[i].type != 0; i++)
     {
@@ -5200,16 +5282,16 @@ int store_to_char(char *name, struct char_data *ch)
         affect_to_char(ch, &tmp_aff[i]);
     }
 
- 
+
   }
-if (GET_LEVEL(ch) >= LVL_IMMORT)
-    {
-      for (i = 1; i <= MAX_SKILLS; i++)
-        set_skill(ch, i, 100);
-      GET_COND(ch, FULL) = -1;
-      GET_COND(ch, THIRST) = -1;
-      GET_COND(ch, DRUNK) = -1;
-    }
+  if (GET_LEVEL(ch) >= LVL_IMMORT)
+  {
+    for (i = 1; i <= MAX_SKILLS; i++)
+      set_skill(ch, i, 100);
+    GET_COND(ch, FULL) = -1;
+    GET_COND(ch, THIRST) = -1;
+    GET_COND(ch, DRUNK) = -1;
+  }
   return 1;
 }
 
@@ -5445,22 +5527,25 @@ void char_to_store(struct char_data *ch)
   fprintf(fl, "Thr3: %d\n", GET_SAVE(ch, 2));
   fprintf(fl, "Thr4: %d\n", GET_SAVE(ch, 3));
   fprintf(fl, "Thr5: %d\n", GET_SAVE(ch, 4));
-  fprintf(fl, "Skil:\n");
-  skill = ch->skills;
-  while (skill != NULL)
+  if (GET_LEVEL(ch) < LVL_IMMORT)
   {
-    if (knows_spell(ch, skill->skill) && skill->learn > 0)
-      fprintf(fl, "%d %d %d 0\n", skill->skill, skill->learn, skill->wait);
-    skill = skill->next;
+    fprintf(fl, "Skil:\n");
+    skill = ch->skills;
+    while (skill != NULL)
+    {
+      if (knows_spell(ch, skill->skill) && skill->learn > 0)
+        fprintf(fl, "%d %d %d 0\n", skill->skill, skill->learn, skill->wait);
+      skill = skill->next;
+    }
+    fprintf(fl, "0 0 0 0\n");
+    fprintf(fl, "Subs:\n");
+    for (temp = ch->subs; temp != NULL; temp = temp->next)
+    {
+      if (temp->learn > 0)
+        fprintf(fl, "%d %d %d\n", temp->subskill, temp->learn, temp->status);
+    }
+    fprintf(fl, "0 0 0\n");
   }
-  fprintf(fl, "0 0 0 0\n");
-  fprintf(fl, "Subs:\n");
-  for (temp = ch->subs; temp != NULL; temp = temp->next)
-  {
-    if (temp->learn > 0)
-      fprintf(fl, "%d %d %d\n", temp->subskill, temp->learn, temp->status);
-  }
-  fprintf(fl, "0 0 0\n");
   if (CMD_FLAGS(ch))
     fprintf(fl, "Flag: %ld\n", CMD_FLAGS(ch));
   fprintf(fl, "Wimp: %d\n", GET_WIMP_LEV(ch));
@@ -5848,14 +5933,15 @@ void free_followers(struct follow_type *k)
   free(k);
 }
 
-void free_mob_memory(memory_rec *k) {
-if (!k)
-return;
+void free_mob_memory(memory_rec *k)
+{
+  if (!k)
+    return;
 
-if (k->next)
-free_mob_memory(k->next);
+  if (k->next)
+    free_mob_memory(k->next);
 
-free(k);
+  free(k);
 }
 
 /* release memory allocated for a char struct */
@@ -5891,8 +5977,8 @@ void free_char(struct char_data *ch)
 
   free_travel_points(TRAVEL_LIST(ch));
   TRAVEL_LIST(ch) = NULL;
-free_mob_memory(MEMORY(ch));
-MEMORY(ch) = NULL;
+  free_mob_memory(MEMORY(ch));
+  MEMORY(ch) = NULL;
   free_followers(ch->followers);
   ch->followers = NULL;
   free_note(ch->pnote, -1);
@@ -6003,7 +6089,7 @@ MEMORY(ch) = NULL;
 void free_obj_delayed(struct obj_data *obj)
 {
   struct obj_data *temp;
-    for (temp = dead_obj; temp; temp = temp->next)
+  for (temp = dead_obj; temp; temp = temp->next)
     if (temp == obj)
     {
       log("Object %s attempted to be added to dead list twice!", obj->short_description);
@@ -6182,6 +6268,7 @@ void reset_char(struct char_data *ch)
   MINE_BONUS(ch) = 0;
   MINE_DAMAGE(ch) = 0;
   HAS_MAIL(ch) = -1;
+  IS_SAVING(ch) = FALSE;
 
   if (GET_HIT(ch) <= 0)
     GET_HIT(ch) = 1;
@@ -6811,7 +6898,7 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
       /* read line check for xap. */
       if (!strcasecmp("XAP", line))
       {	/* then this is a Xap Obj, requires
-                                                                                                                						   special care */
+                                                                                                                        						   special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
           temp->name = "undefined";

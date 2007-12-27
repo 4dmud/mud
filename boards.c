@@ -61,10 +61,6 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
 /* Board appearance order. */
 #define	NEWEST_AT_TOP	FALSE
 
-extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *obj_index;
-
 /*
 format:	vnum, read lvl, write lvl, remove lvl, filename, 0 at end
 Be sure to also change NUM_OF_BOARDS in board.h
@@ -90,7 +86,8 @@ struct board_info_type board_info[NUM_OF_BOARDS] =
     {8470, 0, 0, LVL_GOD, LIB_ETC "board.bitch", 0},
     {9421, 0, 0, LVL_GOD, LIB_ETC "board.chaos", 0},
     {9435, 0, 0, LVL_GOD, LIB_ETC "board.chaos2", 0},
-    {10026, 0, 0, LVL_GOD, LIB_ETC "board.dragon", 0},
+    {10026, 0, 0, LVL_GOD, LIB_ETC "board.dragon", 0},    
+    {10031, 0, 0, LVL_GOD, LIB_ETC "board.dragon2", 0},
     {10402, 0, 0, LVL_GOD, LIB_ETC "board.dj", 0},
     {12000, 0, 0, LVL_GOD, LIB_ETC "board.zaade", 0},
     {12422, 0, 0, LVL_GOD, LIB_ETC "board.saints", 0},

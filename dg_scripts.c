@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/26 23:02:45 $
-*  $Revision: 1.4 $
+*  $Date: 2005/02/04 20:46:11 $
+*  $Revision: 1.5 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.5  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.4  2004/11/26 23:02:45  w4dimenscor
  * Added more notes into fight code, and more debugging checks, made combat reuse the event
  *
@@ -1653,7 +1656,7 @@ return 0;
 void eval_op(char *op, char *lhs, char *rhs, char *result, void *go,
              struct script_data *sc, trig_data *trig)
 {
-  unsigned char *p = NULL;
+  char *p = NULL;
   int n =0;
 
   /* strip off extra spaces at begin and end */
@@ -2836,7 +2839,7 @@ int process_return(trig_data *trig, char *cmd)
                     char varname[MAX_INPUT_LENGTH];
                     char num_s[MAX_INPUT_LENGTH];
                     char string[MAX_INPUT_LENGTH];
-                    int num;
+                    size_t num;
 
                     half_chop(cmd, junk, cmd);   /* "dg_letter" */
                     half_chop(cmd, varname, cmd);
@@ -3613,6 +3616,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
   if (lt)
   {
     char_data *ch = (struct char_data *)(lt->c);
+    char_data *tch;
     if (!ch)
       return NULL;
     if (DEAD(ch))
@@ -3620,6 +3624,15 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
       log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
       //return NULL;
     }
+    #if 1
+    for (tch = character_list; tch; tch = tch->next)
+    if (GET_ID(tch) == GET_ID(ch))
+    if (tch != ch) {
+    log("ERROR: lookup table contains wrong character in it!");
+    ch = tch;
+    break;
+    }
+    #endif
     return ch;
   }
 

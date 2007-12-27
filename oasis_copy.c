@@ -165,7 +165,7 @@ ACMD(do_rdig)
     /* 
      * update rrnum to the correct room rnum after adding the room 
      */
-    world_vnum[rvnum] = rrnum;
+    rrnum = world_vnum[rvnum];
   }
 
   /*
@@ -407,7 +407,7 @@ int buildwalk(struct char_data *ch, int dir) {
 
     if (!can_edit_zone(ch, IN_ROOM(ch)->zone)) {
       new_send_to_char(ch, "You do not have build permissions in this zone.\r\n");
-    } else if ((vnum = redit_find_new_vnum(real_zone(IN_ROOM(ch)->zone))) == NOWHERE)
+    } else if ((vnum = redit_find_new_vnum(IN_ROOM(ch)->zone)) == NOWHERE)
     new_send_to_char(ch, "No free vnums are available in this zone!\r\n");
     else {
       struct descriptor_data *d = ch->desc;

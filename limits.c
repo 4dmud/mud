@@ -66,14 +66,6 @@ int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,
     return (p6);		/* >= 80 */
 }
 
-/*
- * The hit_limit, mana_limit, and move_limit functions are gone.  They
- * added an unnecessary level of complexity to the internal structure,
- * weren't particularly useful, and led to some annoying bugs.  From the
- * players' point of view, the only difference the removal of these
- * functions will make is that a character's age will now only affect
- * the HMV gain per tick, and _not_ the HMV maximums.
- */
 
 /* several affects like poison, freezing, burning and acid affect regen
  * i would like to give these affects their own events in time. but for now this will do. - mord
@@ -476,7 +468,6 @@ void gain_exp(struct char_data *ch, gold_int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
-  int newb = 0;
   int num_hp, num_ma, num_mv;
 
   if (!IS_NPC(ch))
@@ -491,11 +482,6 @@ void gain_exp(struct char_data *ch, gold_int gain)
   if (gain > 0)
   {
 
-    if (REMORTS(ch) == 0)
-    {
-      gain *= 2;
-      newb = 1;
-    }
     if (dexp)
       gain *= 2;
 
@@ -520,8 +506,7 @@ void gain_exp(struct char_data *ch, gold_int gain)
                  GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s",
                  GET_LEVEL(ch));
       GET_GROUP_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)) * 0.2);
-      if (newb)
-        new_send_to_char(ch, "You are gaining DOUBLE exp, as this is your first class.\r\n");
+
       if (dexp)
         new_send_to_char(ch, "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
       if (num_levels == 1)
@@ -537,7 +522,7 @@ void gain_exp(struct char_data *ch, gold_int gain)
   }
   else if (gain < 0)
   {
-    if (GET_LEVEL(ch) < 20 && newb)
+    if (GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0)
       gain = 0;
     gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);	/* Cap max exp lost per death */
     GET_EXP(ch) += gain;
@@ -634,7 +619,7 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
 
     if (REMORTS(ch) == 0)
     {
-      gain *= 2;
+
       newb = 1;
     }
     if (dexp)
@@ -658,8 +643,7 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
       new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
                  GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
       GET_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)));
-      if (newb)
-        new_send_to_char(ch, "You are gaining DOUBLE group points, as this is your first class.\r\n");
+
       if (dexp)
         new_send_to_char(ch, "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
       if (num_levels == 1)

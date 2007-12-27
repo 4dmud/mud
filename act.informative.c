@@ -31,8 +31,7 @@ extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
 
-extern const int wear_order_index[NUM_WEARS];	/* RG 6/28/98 */
-extern struct clan_rec clan[MAX_CLANS];
+extern struct clan_rec clan[];
 extern struct spell_info_type spell_info[];
 
 extern char *credits;
@@ -670,7 +669,7 @@ void look_at_char(struct char_data *i, struct char_data *ch)
     *buf2 = '\0';
 
     /* The thief path can see what another has in their inventory */
-    if (ch != i && (IS_THIEF(ch) || GET_LEVEL(ch) >= LVL_GOD))
+    if (ch != i && ((IS_THIEF(ch) || GET_LEVEL(ch) >= LVL_GOD) || ((PLR_FLAGGED(ch, PLR_NEWBIE_HLPR)) && GET_CLAN(i) == 12)))
     {
       found = FALSE;
       act("\r\nYou attempt to peek at $s inventory:", FALSE, i, 0,
@@ -1329,8 +1328,8 @@ void look_at_room(struct char_data *ch, int ignore_brief)
     else
     {
       new_send_to_char(ch, "%s", view_room->description);
-      if (can_fly(ch))
-        new_send_to_char(ch, "You are flying a few feet up in the air.\r\n");
+      //if (can_fly(ch))
+        //new_send_to_char(ch, "You are flying a few feet up in the air.\r\n");
     }
 
     new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
@@ -1430,7 +1429,7 @@ void look_in_direction(struct char_data *ch, int dir)
                        fname(EXIT(ch, dir)->keyword));
     }
 
-    if CAN_GO2(orig_room, dir)
+    if (CAN_GO2(orig_room, dir))
       nextroom = EXIT2(orig_room, dir)->to_room;
     else
       nextroom = NULL;
@@ -1443,8 +1442,7 @@ void look_in_direction(struct char_data *ch, int dir)
         list_scanned_chars(nextroom->people, ch, distance, dir);
 
       room = nextroom;
-      if CAN_GO2
-      (room, dir)
+      if (CAN_GO2(room, dir))
         nextroom = EXIT2(room, dir)->to_room;
       else
         nextroom = NULL;
@@ -1791,7 +1789,7 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 
 void look_around(CHAR_DATA *ch)
 {
-  int inside = (!OUTSIDE(ch));
+  
   char zonename[MAX_STRING_LENGTH], *zp;
 
   if (IN_ROOM(ch) == NULL)
@@ -1820,7 +1818,7 @@ void look_around(CHAR_DATA *ch)
   }
   if (zone_table[IN_ROOM(ch)->zone].dimension)
     new_send_to_char(ch, "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
-  new_send_to_char(ch, "\r\n{cyYou are %s in %s{c0\r\n", (inside ? "inside" : "outside"), zonename);
+  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zonename);
   new_send_to_char(ch, "{cc%s{C0\r\n", scan_zone_mobs(IN_ROOM(ch)->zone, zonename, sizeof(zonename)));
 
 }
@@ -3306,6 +3304,8 @@ ACMD(do_who)
       mb = 1;
       DYN_RESIZE(Mort_buf);
     }
+    
+  
 
     if (GET_LEVEL(wch) >= LVL_HERO && (GET_SEX(wch) != SEX_FEMALE))
     {
@@ -3432,6 +3432,9 @@ ACMD(do_who)
       len += snprintf(buf + len, sizeof(buf) - len, " (AFK)");
     if (PRF_FLAGGED(wch, PRF_BUSY))
       len += snprintf(buf + len, sizeof(buf) - len, " (BUSY)");
+        if (wch->char_specials.timer > 15 && !GET_INVIS_LEV(wch)) {    
+      len += snprintf(buf + len, sizeof(buf) - len, " (idle)");
+    }
 
 
     if (GET_LEVEL(wch) >= LVL_HERO)
@@ -3677,8 +3680,7 @@ ACMD(do_users)
     if (d->character && STATE(d) == CON_PLAYING
         && GET_LEVEL(d->character) < LVL_GOD)
       sprintf(idletime, "%3d",
-              d->character->char_specials.timer * SECS_PER_MUD_HOUR /
-              SECS_PER_REAL_MIN);
+              d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN);
     else
       strcpy(idletime, "");
 
@@ -4581,7 +4583,8 @@ ACMD(do_toggle)
                    "     PageHeight: %-3d    "
                    "      PageWidth: %-3d\r\n"
                    "     Aggro Mode: %-3s    "
-                   "       PageWrap: %-3s\r\n",
+                   "       PageWrap: %-3s    "
+		   "          Brags: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
@@ -4623,7 +4626,8 @@ ACMD(do_toggle)
                    PAGEHEIGHT(ch),
                    PAGEWIDTH(ch),
                    ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
-                   YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP))
+                   YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP)),
+		   ONOFF(!PRF_FLAGGED(ch, PRF_NOBRAG))
                   );
 
 }
@@ -4790,6 +4794,8 @@ ACMD(do_prereq)
   else
   {
     skill_num = find_skill_num(argument);
+    if (skill_num == NOTHING)
+    return;
 
 
     sprintf(msg1, "Pre-requisites for %s :-\r\n",
@@ -4953,6 +4959,20 @@ ACMD(do_worth)
 
 }
 
+int frozen_time(struct char_data *ch) {
+  struct affected_type *aff;
+  if (ch->affected)
+  {
+    for (aff = ch->affected; aff; aff = aff->next)
+    {
+      if (aff->type == SPELL_IMMFREEZE)
+        return time_to_sec(aff->expire + 1);
+      
+      } 
+      }
+       return -1;
+}
+
 ACMD(do_affects)
 {
   struct affected_type *aff;
@@ -4974,9 +4994,9 @@ ACMD(do_affects)
                          CCNRM(ch, C_NRM));
       else
       {
-        if ((minsec = time_to_sec(aff->expire)) < 0)
+        if ((minsec = time_to_sec(aff->expire + 1)) <= 0)
           continue;
-        new_send_to_char(ch, "SPL: ({cy%-3d{c0%s)  %s%-21s%s ",
+        new_send_to_char(ch, "SPL: ({cy%-6d{c0%s)  %s%-21s%s ",
                          (minsec > 60 ? minsec/60 : minsec),
                          (minsec/60 ?   "min"   : "sec" ),
                          CCCYN(ch, C_NRM), skill_name(aff->type), CCNRM(ch, C_NRM));
@@ -5194,30 +5214,46 @@ void do_auto_exits(struct char_data *ch)
     new_send_to_char(ch, "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
 }
 */
-
-void display_map(struct char_data *ch)
-{
-  room_rnum rmv[6];
-  int door;
-
-  for (door = 0; door < NUM_OF_DIRS; door++)
+void fill_exit_list(room_rnum list[], struct char_data *ch) {
+int door;
+for (door = 0; door < NUM_OF_DIRS; door++)
   {
     if (EXIT(ch, door) && EXIT(ch, door)->to_room != NULL &&
         !(EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN)) &&
         !(EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)))
-      rmv[door] = EXIT(ch, door)->to_room;
+      list[door] = EXIT(ch, door)->to_room;
     else
-      rmv[door] = NULL;
+      list[door] = NULL;
   }
+}
 
-  /*
+void display_map(struct char_data *ch)
+{
+  room_rnum rmv[6];
+  
+
+  fill_exit_list(rmv, ch);
+
+  /**
       [N] [U]   
        | /      
   [W]-[*]-[E]   
      / |        
   [D] [S]       
    
-  */
+  TODO: change it to be this one
+
+             |  
+          --[N]--            
+        |    | [U]| 
+      -[W]--[*]--[E]-
+        |[D] |    |
+          --[S]--
+             |
+	     
+	     **/
+	     
+
   new_send_to_char(ch,
                    "\r\n{cC     %3s {cc%3s   {c0\r\n",
                    (rmv[NORTH] != NULL) ? "[N]" : "   ",

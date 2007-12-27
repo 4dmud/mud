@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.5  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.4  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -333,30 +336,10 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
 
   /* Modify this list to suit which spells you
    * want to be able to mix. */
-  switch (scroll)
-  {
-  case SPELL_CURE_BLIND:
-  case SPELL_CURE_LIGHT:
-  case SPELL_CURE_CRITIC:
-  case SPELL_DETECT_MAGIC:
-  case SPELL_DETECT_POISON:
-  case SPELL_STRENGTH:
-  case SPELL_WORD_OF_RECALL:
-  case SPELL_SENSE_LIFE:
-  case SPELL_WATERWALK:
-  case SPELL_INFRAVISION:
-  case SPELL_HEAL:
-  case SPELL_SANCTUARY:
-  case SPELL_FORTIFY_BODY:
-  case SPELL_FLAME_ARROW:
-  case SPELL_DEMONSHREAK:
-  case SPELL_SHIELD:
-    break;
-
-  default:
-    can_make = FALSE;
-    break;
-  }
+   if (IS_SET(class_elem_strength(GET_CLASS(ch)), (1 << elemental_type(scroll))))
+   can_make = TRUE;
+   else 
+   can_make = FALSE;
 
   if (can_make == FALSE)
   {

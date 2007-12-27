@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/20 02:33:25 $
-*  $Revision: 1.2 $
+*  $Date: 2005/02/04 20:46:11 $
+*  $Revision: 1.3 $
 **************************************************************************/
 
 #include "conf.h"
@@ -117,7 +117,61 @@ WCMD(do_wasound)
       act_to_room(argument, exit->to_room);
   }
 }
+WCMD(do_wlag)
+{
+  char_data *victim;
+  int wait = 0;
+  //int room;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
+  two_arguments(argument, arg1, arg2);
+
+  if (!*arg1 || !*arg2)
+  {
+    wld_log(room, "wlag called with too few args");
+    return;
+  }
+
+
+
+  if (*arg1 == UID_CHAR)
+  {
+    if (!(victim = get_char(arg1)))
+    {
+      wld_log(room, "wlag: victim (%s) not found", arg1);
+      return;
+    }
+  }
+  else if (!(victim = get_char_by_room(room, arg1)))
+  {
+    wld_log(room, "wlag: victim (%s) not found", arg1);
+    return;
+  }
+
+
+
+  if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_NOHASSLE))
+  {
+    wld_log(room, "wlag: target has nohassle on");
+    return;
+  }
+
+  if ((wait = atoi(arg2)) < 1)
+    return;
+
+  if (wait > 300)
+  {
+    wld_log(room,"wlag: duration longer then 30 seconds outside range.");
+    return;
+  }
+
+
+
+  wait = (wait RL_SEC)*0.1;
+
+  WAIT_STATE(victim, wait);
+  return;
+}
 
 WCMD(do_wecho)
 {

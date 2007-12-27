@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.6  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.5  2004/12/07 09:31:26  w4dimenscor
  * Trees modularized, fix added to message event
  *
@@ -474,6 +477,9 @@ void list_skills(struct char_data *ch, int skillspell)
                 skill_name(i), how_good_perc(ch, total_chance(ch, i)));
         DYN_RESIZE(buf);
 
+        sprintf(buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier);
+        DYN_RESIZE(buf);
+
 
 
         if (skillspell == 1)
@@ -485,6 +491,12 @@ void list_skills(struct char_data *ch, int skillspell)
         if (skillspell == 1 && elemental_type(i) != ELEM_NONE)
         {
           snprintf(buf, sizeof(buf), "[{cp%-11s{c0]", elemental_types[elemental_type(i)]);
+          DYN_RESIZE(buf);
+        }
+
+        if (spell_info[i].wait)
+        {
+          sprintf(buf, "[Delay of %3d sec]",spell_info[i].wait);
           DYN_RESIZE(buf);
         }
 
@@ -509,10 +521,6 @@ void list_skills(struct char_data *ch, int skillspell)
                   skill_name(SECOND_PRE(i)));
           DYN_RESIZE(buf);
         }
-
-
-
-
 
         sprintf(buf, "\r\n");
         DYN_RESIZE(buf);
@@ -1502,12 +1510,12 @@ ACMD(do_recover)
     amt = GET_LEVEL(ch) * 50000;
 
   amt += REMORTS(ch) * 500000;
-        /* charge the character */
-    if (char_gold(ch, 0, GOLD_BANK) < amt)
-    {
-      send_to_char("Your bank account can not afford this service!\r\n", ch);
-      return;
-    }
+  /* charge the character */
+  if (char_gold(ch, 0, GOLD_BANK) < amt)
+  {
+    send_to_char("Your bank account can not afford this service!\r\n", ch);
+    return;
+  }
   /* search the world for the corpse, if it still exists */
   for (num = 0, temp = corpse_list; temp; temp = tnext)
   {

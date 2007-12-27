@@ -1,3 +1,5 @@
+
+extern const int wear_order_index[];	/* RG 6/28/98 */
 extern const char *vial_types[];
 extern const char *newbie_status[];
 extern const char *creation_state_types[];

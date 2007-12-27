@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
- * Revision 1.1  2004/11/12 02:16:40  w4dimenscor
- * Initial revision
+ * Revision 1.2  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:40  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.43  2004/09/22 09:40:41  molly
  * automeld added so that corpses arent so easily lost, and also made pk corpses lootable
@@ -1358,57 +1361,21 @@ gold_int level_exp(int chclass, int level, int tier, int remorts)
   if (tier>2) multi = mult_2((tier+1));
 
 
-  /*
-   * Gods have exp close to EXP_MAX.  This statement should never have to
-   * changed, regardless of how many mortal or immortal levels exist.
-   */
-  /*if (level > LVL_HERO) {
-    return (2200000000 - ((LVL_IMPL-level) * 1000));
-  }*/
-
-  /* Exp required for normal mortals is below
-
-  switch (chclass) {
-    
-  case CLASS_WARRIOR:
-      mod = 17;
-      break;
-  case CLASS_MAGE:
-      mod = 17;
-      break;
-  case CLASS_PRIEST:
-      mod = 17;
-      break;
-  case CLASS_THIEF:
-      mod = 17;
-      break;
-  case CLASS_HUNTER:
-      mod = 17;
-      break;
-  case CLASS_RANGER:
-      mod = 17;
-      break;
-  case CLASS_GYPSY:
-      mod = 17;
-      break;
-  case CLASS_ESPER:
-      mod = 17;
-      break;
-  default:
-  mod = 100;
-  break;
-  }
-  */
   if (level==1)
   {
     return (level);
   }
   else
   {
+float div = 0.5;
     amount = (multi*((mod+1)*(mod+1)));
 
     amount = (multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5));
     amount += ((remorts) * (amount*0.05));
+if (remorts == 0)
+amount *= div;
+else if (remorts < 5)
+    amount *= div + ((float)remorts * 0.1);
     return amount;
   }
 #undef mod
@@ -1651,7 +1618,6 @@ ACMD(do_skilllist)
   int the_class;
   int i, j , k;
   char buf[MAX_INPUT_LENGTH];
-  extern struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
   DYN_DEFINE;
   *buf = 0;
 

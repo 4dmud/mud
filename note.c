@@ -104,7 +104,6 @@ int count_spool(CHAR_DATA *ch, NOTE_DATA *spool)
 
 void do_unread(CHAR_DATA *ch)
 {
-  char buf[MAX_STRING_LENGTH];
   int count;
   bool found = FALSE;
 
@@ -114,41 +113,36 @@ void do_unread(CHAR_DATA *ch)
   if ((count = count_spool(ch,news_list)) > 0)
   {
     found = TRUE;
-    sprintf(buf,"There %s %d new news article%s waiting.\n\r",
+    new_send_to_char(ch, "There %s %d new news article%s waiting.\n\r",
             count > 1 ? "are" : "is",count, count > 1 ? "s" : "");
-    send_to_char(buf,ch);
   }
   if ((count = count_spool(ch,changes_list)) > 0)
   {
     found = TRUE;
-    sprintf(buf,"There %s %d change%s waiting to be read.\n\r",
+    new_send_to_char(ch,"There %s %d change%s waiting to be read.\n\r",
             count > 1 ? "are" : "is", count, count > 1 ? "s" : "");
-    send_to_char(buf,ch);
   }
   if ((count = count_spool(ch,note_list)) > 0)
   {
     found = TRUE;
-    sprintf(buf,"You have %d new note%s waiting.\n\r",
+    new_send_to_char(ch,"You have %d new note%s waiting.\n\r",
             count, count > 1 ? "s" : "");
-    send_to_char(buf,ch);
   }
   if ((count = count_spool(ch,idea_list)) > 0)
   {
     found = TRUE;
-    sprintf(buf,"You have %d unread idea%s to peruse.\n\r",
+    new_send_to_char(ch,"You have %d unread idea%s to peruse.\n\r",
             count, count > 1 ? "s" : "");
-    send_to_char(buf,ch);
   }
   if (IS_TRUSTED(ch,ANGEL) && (count = count_spool(ch,penalty_list)) > 0)
   {
     found = TRUE;
-    sprintf(buf,"%d %s been added.\n\r",
+    new_send_to_char(ch,"%d %s been added.\n\r",
             count, count > 1 ? "penalties have" : "penalty has");
-    send_to_char(buf,ch);
   }
 
   if (!found)
-    send_to_char("You have no unread notes.\n\r",ch);
+    new_send_to_char(ch,"You have no unread notes.\n\r");
 }
 
 ACMD(do_note)
@@ -1027,7 +1021,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   if ( is_abbrev( arg, "to" ) )
   {
   if (GET_LEVEL(ch) < LVL_IMMORT) {
-  if (isname("all", arg)) {
+  if (isname("all", argument)) {
   new_send_to_char(ch, "You can't send to all.\r\nYou can send it to all the imms by sending it to IMM\r\nor to the Head Staff with ADMIN\r\n");
   return;
   }

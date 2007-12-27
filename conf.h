@@ -78,7 +78,7 @@
 /* #undef HAVE_STRICMP */
 
 /* Define if you have the strlcpy function.  */
-#define HAVE_STRLCPY 1
+#define HAVE_STRLCPY 0
 
 /* Define if you have the strncasecmp function.  */
 #define HAVE_STRNCASECMP 1

@@ -20,9 +20,6 @@
 #include "db.h"
 
 struct ban_list_element *ban_list = NULL;
-extern struct descriptor_data *descriptor_list;
-extern int top_of_mobt;
-extern struct char_data *mob_proto;
 
 /* local functions */
 void load_banned(void);

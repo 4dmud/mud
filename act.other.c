@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.4  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.3  2004/12/05 09:46:52  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -135,6 +138,35 @@ ACMD(do_quit)
     extract_char(ch);		/* Char is saved before extracting. */
     make_wholist();
   }
+}
+
+ACMD(do_ground)
+{
+int landed = FALSE, i;
+struct obj_data *obj;
+if (affected_by_spell(ch, SPELL_FLIGHT)) {
+affect_from_char(ch, SPELL_FLIGHT);
+landed = TRUE;
+} 
+
+for (i = 0; i < NUM_WEARS; i++)
+  {
+    if (HAS_BODY(ch, i) && (GET_EQ(ch, i)) &&
+        (GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_WINGS)) {
+      obj = unequip_char(ch, i);
+      obj_to_char(obj, ch);
+      act("$n detaches $p from $s body.", FALSE, ch, obj, NULL, TO_ROOM);
+      act("You detach $p from your body.", FALSE, ch, obj, NULL, TO_CHAR);
+      landed = TRUE;
+      }
+  }
+
+if (landed == TRUE) {
+act("You find yourself grounded firmly again.", FALSE, ch, NULL, NULL, TO_CHAR);
+act("$n kisses the ground seeming happy to be back on it.", FALSE, ch, NULL, NULL, TO_ROOM);
+} else {
+act("You seem to be on the ground already!", FALSE, ch, NULL, NULL, TO_CHAR);
+}
 }
 
 ACMD(do_die)
@@ -307,8 +339,7 @@ ACMD(do_visible)
   if (GET_LEVEL(ch) >= LVL_GOD)
     perform_immort_vis(ch);
 
-  if AFF_FLAGGED
-  (ch, AFF_INVISIBLE)
+  if (AFF_FLAGGED(ch, AFF_INVISIBLE))
   {
     appear(ch);
     send_to_char("You break the spell of invisibility.\r\n", ch);
@@ -1018,7 +1049,7 @@ ACMD(do_gen_write)
     send_to_char("Could not open the file.  Sorry.\r\n", ch);
     return;
   }
-  fprintf(fl, "<P>%-8s (%6.6s) [%5d] %s</P>\n", GET_NAME(ch), (tmp + 4),
+  fprintf(fl, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
   fclose(fl);
   send_to_char("Okay.  Thanks!\r\n", ch);
@@ -1103,8 +1134,7 @@ ACMD(do_gen_tog)
   const char *tog_messages[][2] =
     {
       {"You are now safe from summoning by other players.\r\n",
-       "You may now be summoned by other players.\r\n"
-      },
+       "You may now be summoned by other players.\r\n"},
       {"Nohassle disabled.\r\n",
        "Nohassle enabled.\r\n"},
       {"Brief mode off.\r\n",
@@ -1192,7 +1222,9 @@ ACMD(do_gen_tog)
       {"BUSY flag is now off.\r\n",
        "BUSY flag is now on.\r\n"},
       {"Aggro mode disabled.\r\n",
-       "Aggro mode enabled.\r\n"}
+       "Aggro mode enabled.\r\n"},
+       {"Nobrag on.\r\n",
+       "Nobrag off.\r\n"},
 
 
 
@@ -1359,7 +1391,9 @@ ACMD(do_gen_tog)
   case SCMD_REPLYLOCK:
     result = PRF_TOG_CHK(ch, PRF_REPLYLOCK);
     break;
-
+      case SCMD_NOBRAG:
+    result = PRF_TOG_CHK(ch, PRF_NOBRAG);
+ break;
   default:
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);
     return;

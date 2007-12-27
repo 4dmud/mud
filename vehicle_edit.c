@@ -48,7 +48,7 @@ int vehicle_count(void)
   return count;
 }
 
-int valid_vehicle_num(number)
+int valid_vehicle_num(int number)
 {
   return number > 0 && number <= vehicle_count();
 }

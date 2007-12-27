@@ -152,7 +152,7 @@ int connected_to_intermud;
 byte reread_wizlist;		/* signal: SIGUSR1 */
 byte emergency_unban;		/* signal: SIGUSR2 */
 
-void free_host_list(struct meta_host_data *this);
+void free_host_list(struct meta_host_data *thi);
 void add_ip_to_host_list(char *host_ip, char *host, time_t date);
 
 int no_ext_processes = 0;       /* shall we use external processes? */
@@ -315,12 +315,12 @@ static void get_lookup_reply(void);
 
 /* first compression neg. string */
 const char compress_offer[] =
-{
-  (char) IAC,
-  (char) WILL,
-  (char) TELOPT_COMPRESS2,
-  (char) 0,
-};
+  {
+    (char) IAC,
+    (char) WILL,
+    (char) TELOPT_COMPRESS2,
+    (char) 0,
+  };
 
 
 #endif
@@ -583,8 +583,8 @@ int main(int argc, char **argv)
     free_vehicles();
     free_commlist(comlist);
     if (comfile)
-    fclose(comfile);
-    
+      fclose(comfile);
+
 
   }
   /* probably should free the entire config here.. */
@@ -614,6 +614,8 @@ void copyover_recover()
   bool fOld;
   char name[MAX_INPUT_LENGTH];
 
+  int saved_loadroom = NOWHERE, varcnt = 0;
+
   log("Copyover recovery initiated");
 
   fp = fopen(COPYOVER_FILE, "r");
@@ -630,9 +632,11 @@ void copyover_recover()
   for (;;)
   {
     fOld = TRUE;
-    fscanf(fp, "%d %s %s\n", &desc, name, host);
+    varcnt = fscanf(fp, "%d %s %s %d\n", &desc, name, host, &saved_loadroom);
     if (desc == -1)
       break;
+      if (varcnt !=4)
+      continue;
 
     /* Write something, and check if it goes error-free */
     if (write_to_descriptor(desc,"\n\r...the hourglass turns over and the sand starts flowing again...\n\r", NULL) == 0)
@@ -688,14 +692,16 @@ void copyover_recover()
     else
     {		/* ok! */
 
-       write_to_descriptor (desc, "\n\rColor floods back into the world.\n\r", NULL);
+      write_to_descriptor (desc, "\n\rColor floods back into the world.\n\r", NULL);
 #ifdef HAVE_ZLIB_H
-       if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS)) {
-         d->comp->state = 1; /* indicates waiting for comp negotiation */
-         write_to_output(d, "%s", compress_offer);
-       }
+      if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
+      {
+        d->comp->state = 1; /* indicates waiting for comp negotiation */
+        write_to_output(d, "%s", compress_offer);
+      }
 #endif /* HAVE_ZLIB_H */
-
+      d->connected = CON_PLAYING;
+      GET_LOADROOM(d->character) = saved_loadroom;
       enter_player_game(d);
 
 
@@ -1738,9 +1744,9 @@ int get_from_q(struct txt_q *queue, char *dest, int *aliased)
   queue->head = queue->head->next;
 
   if (tmp->text)
-  free(tmp->text);
+    free(tmp->text);
   if (tmp)
-  free(tmp);
+    free(tmp);
 
   return (1);
 }
@@ -1752,6 +1758,7 @@ void init_descriptor(struct descriptor_data *newd, int desc)
 
   /* initialize descriptor data */
   *newd->small_outbuf = 0;
+  newd->large_outbuf = NULL;
   newd->descriptor = desc;
   newd->character = NULL;
   newd->idle_tics = 0;
@@ -1771,7 +1778,7 @@ void init_descriptor(struct descriptor_data *newd, int desc)
   if (++last_desc == 1000)
     last_desc = 1;
   newd->desc_num = last_desc;
-  
+
 
   CREATE(newd->comp, struct compr, 1);
   newd->comp->state = 0; /* we start in normal mode */
@@ -1785,8 +1792,6 @@ void init_descriptor(struct descriptor_data *newd, int desc)
 /* Empty the queues before closing connection */
 void flush_queues(struct descriptor_data *d)
 {
-
-
   if (d->large_outbuf)
   {
     d->large_outbuf->next = bufpool;
@@ -1877,6 +1882,8 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format,
   {			/* else create a new one */
     CREATE(t->large_outbuf, struct txt_block, 1);
     CREATE(t->large_outbuf->text, char, LARGE_BUFSIZE);
+    //t->large_outbuf->next = bufpool;
+    //bufpool = t->large_outbuf;
     buf_largecount++;
   }
 
@@ -1893,17 +1900,18 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format,
   return (t->bufspace);
 }
 
-void free_bufpool_recu(struct txt_block *k) {
-if (!k)
-return;
+void free_bufpool_recu(struct txt_block *k)
+{
+  if (!k)
+    return;
 
-if (k->next)
-free_bufpool_recu(k->next);
+  if (k->next)
+    free_bufpool_recu(k->next);
 
-if (k->text)
-free(k->text);
+  if (k->text)
+    free(k->text);
 
-free(k);
+  free(k);
 }
 
 void free_bufpool(void)
@@ -2092,28 +2100,26 @@ static void get_lookup_reply(void)
 }
 
 #endif
-void free_host_list(struct meta_host_data *this)
+void free_host_list(struct meta_host_data *thi)
 {
-  if (!this)
+  if (!thi)
     return;
 
-  if (this->next)
-    free_host_list(this->next);
+  if (thi->next)
+    free_host_list(thi->next);
 
-  free(this);
+  free(thi);
 }
 void save_host_list(void)
 {
   FILE *fl;
-  struct meta_host_data *this;
+  struct meta_host_data *thi;
 
   if ((fl = fopen(HOST_LIST_FILE, "wb")) == NULL)
     return;
-  this = host_list;
-  while (this != NULL)
+  for (thi = host_list;thi;thi=thi->next)
   {
-    fprintf(fl, "%s %s %ld\n", this->host_ip, this->host, this->date);
-    this = this->next;
+    fprintf(fl, "%s %s %ld\n", thi->host_ip, thi->host, thi->date);
   }
   fprintf(fl, "~\n");
   fclose(fl);
@@ -2157,28 +2163,28 @@ void load_host_list(void)
 
 void add_ip_to_host_list(char *host_ip, char *host, time_t date)
 {
-  struct meta_host_data *this;
+  struct meta_host_data *thi;
   if (!host_ip || !*host_ip || !host || !*host)
     return;
-  CREATE(this, struct meta_host_data, 1);
-  this->next = host_list;
-  snprintf(this->host_ip, HOST_LENGTH, host_ip);
-  snprintf(this->host, HOST_LENGTH, host);
-  this->date = date;
-  host_list = this;
+  CREATE(thi, struct meta_host_data, 1);
+  thi->next = host_list;
+  snprintf(thi->host_ip, HOST_LENGTH, host_ip);
+  snprintf(thi->host, HOST_LENGTH, host);
+  thi->date = date;
+  host_list = thi;
 }
 int check_for_ip(char *ip_add, char *host)
 {
-  struct meta_host_data *this;
-  for (this = host_list; this; this = this->next)
+  struct meta_host_data *thi;
+  for (thi = host_list; thi; thi = thi->next)
   {
-    if (!strcmp(this->host_ip, ip_add))
+    if (!strcmp(thi->host_ip, ip_add))
     {
-      strncpy(host, this->host, HOST_LENGTH);
+      strncpy(host, thi->host, HOST_LENGTH);
       *(host + HOST_LENGTH) = '\0';
-      if (strcmp(this->host, ip_add))
+      if (strcmp(thi->host, ip_add))
       {
-        this->date = time(0);
+        thi->date = time(0);
         save_host_list();
       }
       return 1;
@@ -2223,8 +2229,8 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
 
     if (sockets_connected >= CONFIG_MAX_PLAYING)
     {
-      write_to_descriptor(desc,"Sorry, 4Dimensions is full right now... \r\b"
-                     "Please try again later!\r\n", NULL);
+      write_to_descriptor(desc,"Sorry, 4Dimensions is full right now... \r\n"
+                          "Please try again later!\r\n", NULL);
       CLOSE_SOCKET(desc);
       return (NULL);
     }
@@ -2270,9 +2276,9 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
       free(newd);
       return (NULL);
     }/*
-                 
-                 
-                  */
+                         
+                         
+                          */
   } //copyover
 
   init_descriptor(newd, desc);
@@ -2295,6 +2301,7 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
     /* now lookup the hostname and username */
     id_lookup(newd);
 #endif
+
   }
   return (newd);
 }
@@ -2309,12 +2316,12 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
  *	 2 bytes: extra \r\n for non-comapct
  *      14 bytes: unused
  */
- /*
- if (t->character && PRF_FLAGGED(t->character, PRF_PAGEWRAP))
-      wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
- */
+/*
+if (t->character && PRF_FLAGGED(t->character, PRF_PAGEWRAP))
+     wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
+*/
 
- 
+
 int process_output(struct descriptor_data *t)
 {
   char i[MAX_SOCK_BUF], *osb = i + 2;
@@ -2331,43 +2338,49 @@ int process_output(struct descriptor_data *t)
     strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
   /* add the extra CRLF if the person isn't in compact mode */
-  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT)) 
+  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
     strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
   /* add a prompt */
   strcat(i, make_prompt(t));	/* strcpy: OK (i:MAX_SOCK_BUF reserves space) */
 
   if (t->character && PRF_FLAGGED(t->character, PRF_PAGEWRAP))
-      wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
-  
+    wordwrap(i, PAGEWIDTH(t->character), sizeof(i));
+
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
    */
-  if (t->has_prompt) {
+  if (t->has_prompt)
+  {
     t->has_prompt = FALSE;
     result = write_to_descriptor(t->descriptor, i, t->comp);
     if (result >= 2)
       result -= 2;
-  } else
+  }
+  else
     result = write_to_descriptor(t->descriptor, osb, t->comp);
 
-  if (result < 0) {	/* Oops, fatal error. Bye! */
+  if (result < 0)
+  {	/* Oops, fatal error. Bye! */
     close_socket(t);
     return (-1);
-  } else if (result == 0)	/* Socket buffer full. Try later. */
+  }
+  else if (result == 0)	/* Socket buffer full. Try later. */
     return (0);
 
   /* Handle snooping: prepend "% " and send to snooper. */
   if (t->snoop_by)
     write_to_output(t->snoop_by, "%% %*s%%%%", result, t->output);
   /* The common case: all saved output was handed off to the kernel buffer. */
-  if (result >= t->bufptr ) {
+  if (result >= t->bufptr )
+  {
     /*
      * if we were using a large buffer, put the large buffer on the buffer pool
      * and switch back to the small one
      */
-    if (t->large_outbuf) {
+    if (t->large_outbuf)
+    {
       t->large_outbuf->next = bufpool;
       bufpool = t->large_outbuf;
       t->large_outbuf = NULL;
@@ -2383,7 +2396,8 @@ int process_output(struct descriptor_data *t)
      * them. There will be enough space for them if this is true.  'result'
      * is effectively unsigned here anyway.
      */
-    if ((unsigned int)result < strlen(osb)) {
+    if ((unsigned int)result < strlen(osb))
+    {
       size_t savetextlen = strlen(osb + result);
 
       strcat(t->output, osb + result);
@@ -2391,7 +2405,9 @@ int process_output(struct descriptor_data *t)
       t->bufspace += savetextlen;
     }
 
-  } else {
+  }
+  else
+  {
     /* Not all data in buffer sent.  result < output buffersize. */
 
     strcpy(t->output, t->output + result);	/* strcpy: OK (overlap) */
@@ -2557,9 +2573,10 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length, stru
 
 #ifdef HAVE_ZLIB_H
   int compr_result, tmp, cnt, bytes_copied;
-  
+
   /* MCCP! this is where the zlib compression is handled */
-  if (comp && comp->state >= 2) { /* compress2 on */
+  if (comp && comp->state >= 2)
+  { /* compress2 on */
     /* copy data to input buffer */
     /* first check that overflow won't happen */
     /* if it will, we only copy over so much text */
@@ -2567,7 +2584,7 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length, stru
       bytes_copied = comp->total_in - comp->size_in;
     else
       bytes_copied = length;
-    
+
     /* now copy what will fit into the buffer */
     strncpy(comp->buff_in + comp->size_in, txt, bytes_copied);
     comp->size_in += bytes_copied;
@@ -2575,47 +2592,52 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length, stru
     /* set up stream input */
     comp->stream->avail_in = comp->size_in;
     comp->stream->next_in = comp->buff_in;
-    
+
     /* lets do it */
     /* deflate all the input - this means flushing our output buffer when it fills */
-    do {
+    do
+    {
       /* set up stream output - the size_out bit is somewhat unnecessary, but makes things safer */
       comp->stream->avail_out = comp->total_out - comp->size_out;
       comp->stream->next_out = comp->buff_out + comp->size_out;
-      
+
       compr_result = deflate(comp->stream, comp->state == 3 ? Z_FINISH : Z_SYNC_FLUSH);
-      
+
       if (compr_result == Z_STREAM_END)
         compr_result = 0;
       else if (compr_result == Z_OK && !(comp->stream->avail_out))
         compr_result = 1;
-      else if (compr_result < 0) {  /* uh oh, fatal zlib error */
-	result = 0;
-	break;
-      } else
-	compr_result = 0;
-    
+      else if (compr_result < 0)
+      {  /* uh oh, fatal zlib error */
+        result = 0;
+        break;
+      }
+      else
+        compr_result = 0;
+
       /* adjust output state value */
       comp->size_out = comp->total_out - comp->stream->avail_out;
 
       /* write out compressed data - flush buff_out */
       /* if problems encountered, resort to resending all data by breaking and returning < 1.. */
       tmp = 0;
-      while (comp->size_out > 0) {
-	result = write(desc, comp->buff_out + tmp, comp->size_out);
-	if (result < 1) /* unsuccessful write or socket error */
-	  goto exitzlibdo; /* yummy, goto. faster than two breaks ! */ 
-	comp->size_out -= result;
-	tmp += result;
+      while (comp->size_out > 0)
+      {
+        result = write(desc, comp->buff_out + tmp, comp->size_out);
+        if (result < 1) /* unsuccessful write or socket error */
+          goto exitzlibdo; /* yummy, goto. faster than two breaks ! */
+        comp->size_out -= result;
+        tmp += result;
       }
-    } while (compr_result);
-exitzlibdo:
-    
+    }
+    while (compr_result);
+  exitzlibdo:
+
     /* adjust buffers - is this necessary? not with Z_SYNC_FLUSH I think - but just to be safe */
     /* input loses size_in - avail_in bytes */
     tmp = comp->size_in - comp->stream->avail_in;
     for (cnt = tmp; cnt < comp->size_in; cnt++)
-	*(comp->buff_in + (cnt - tmp)) = *(comp->buff_in + cnt);
+      *(comp->buff_in + (cnt - tmp)) = *(comp->buff_in + cnt);
 
     /* adjust input state value - it is important that this is done after the previous step */
     comp->size_in = comp->stream->avail_in;
@@ -2623,11 +2645,12 @@ exitzlibdo:
     /*comp->size_in = 0;*/
 
     if (result > 0)
-	result = bytes_copied;
-  } else 
+      result = bytes_copied;
+  }
+  else
 #endif /* HAVE_ZLIB_H */
 
-  result = write(desc, txt, length);
+    result = write(desc, txt, length);
 
   if (result > 0)
   {
@@ -2685,17 +2708,23 @@ int write_to_descriptor(socket_t desc, const char *txt, struct compr *comp)
   ssize_t bytes_written;
   size_t total = strlen(txt), write_total = 0;
 
-  while (total > 0) {
+  while (total > 0)
+  {
     bytes_written = perform_socket_write(desc, txt, total, comp);
 
-    if (bytes_written < 0) {
+    if (bytes_written < 0)
+    {
       /* Fatal error.  Disconnect the player. */
       perror("SYSERR: Write to socket");
       return (-1);
-    } else if (bytes_written == 0) {
+    }
+    else if (bytes_written == 0)
+    {
       /* Temporary failure -- socket buffer full. */
       return (write_total);
-    } else {
+    }
+    else
+    {
       txt += bytes_written;
       total -= bytes_written;
       write_total += bytes_written;
@@ -2805,14 +2834,14 @@ int process_input(struct descriptor_data *t)
 
 #ifdef HAVE_ZLIB_H
   const char compress_start[] =
-  {
-    (char) IAC,
-    (char) SB,
-    (char) COMPRESS2,
-    (char) IAC,
-    (char) SE,
-    (char) 0
-  };
+    {
+      (char) IAC,
+      (char) SB,
+      (char) COMPRESS2,
+      (char) IAC,
+      (char) SE,
+      (char) 0
+    };
 #endif /* HAVE_ZLIB_H */
 
   /* first, find the point where we left off reading data */
@@ -2820,8 +2849,10 @@ int process_input(struct descriptor_data *t)
   read_point = t->inbuf + buf_length;
   space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
-  do {
-    if (space_left <= 0) {
+  do
+  {
+    if (space_left <= 0)
+    {
       log("WARNING: process_input: about to close connection: input overflow");
       return (-1);
     }
@@ -2837,42 +2868,47 @@ int process_input(struct descriptor_data *t)
     /* note: this will bork if the user is giving lots of input when he first connects */
     /* he shouldn't be doing this, and for the sake of efficiency, the read buffer isn't searched */
     /* (ie. it assumes that read_point[0] will be IAC, etc.) */
-    if (t->comp->state == 1) {
+    if (t->comp->state == 1)
+    {
 #ifdef HAVE_ZLIB_H
-      if (*read_point == (char)IAC && *(read_point + 1) == (char)DO && *(read_point + 2) == (char)COMPRESS2) {
-	/* compression just turned on */
-	/* first send plaintext start of the compression stream */
-	write_to_descriptor(t->descriptor, compress_start, NULL);
-	
-	/* init the compression stream */	
-	CREATE(t->comp->stream, z_stream, 1);
-	t->comp->stream->zalloc = z_alloc;
-	t->comp->stream->zfree = z_free;
-	t->comp->stream->opaque = Z_NULL;
-	deflateInit(t->comp->stream, Z_DEFAULT_COMPRESSION);
-        
-	/* init the state structure */
-	/* first the output component */
-	CREATE(t->comp->buff_out, Bytef, SMALL_BUFSIZE);
-	t->comp->total_out = SMALL_BUFSIZE;
-	t->comp->size_out = 0;
-	/* now the input component */
-	CREATE(t->comp->buff_in, Bytef, SMALL_BUFSIZE);
-	t->comp->total_in = SMALL_BUFSIZE;
-	t->comp->size_in = 0;
+      if (*read_point == (char)IAC && *(read_point + 1) == (char)DO && *(read_point + 2) == (char)COMPRESS2)
+      {
+        /* compression just turned on */
+        /* first send plaintext start of the compression stream */
+        write_to_descriptor(t->descriptor, compress_start, NULL);
 
-	/* finally, turn compression on */
-	t->comp->state = 2;
-	
-	bytes_read = 0; /* ignore the compression string - don't process it further */
-      } else if (*read_point == (char)IAC && *(read_point + 1) == (char)DONT && *(read_point + 2) == (char)COMPRESS2) {
-	t->comp->state = 0;
-	
-	bytes_read = 0; /* ignore the compression string - don't process it further */
+        /* init the compression stream */
+        CREATE(t->comp->stream, z_stream, 1);
+        t->comp->stream->zalloc = z_alloc;
+        t->comp->stream->zfree = z_free;
+        t->comp->stream->opaque = Z_NULL;
+        deflateInit(t->comp->stream, Z_DEFAULT_COMPRESSION);
+
+        /* init the state structure */
+        /* first the output component */
+        CREATE(t->comp->buff_out, Bytef, SMALL_BUFSIZE);
+        t->comp->total_out = SMALL_BUFSIZE;
+        t->comp->size_out = 0;
+        /* now the input component */
+        CREATE(t->comp->buff_in, Bytef, SMALL_BUFSIZE);
+        t->comp->total_in = SMALL_BUFSIZE;
+        t->comp->size_in = 0;
+
+        /* finally, turn compression on */
+        t->comp->state = 2;
+
+        bytes_read = 0; /* ignore the compression string - don't process it further */
+      }
+      else if (*read_point == (char)IAC && *(read_point + 1) == (char)DONT && *(read_point + 2) == (char)COMPRESS2)
+      {
+        t->comp->state = 0;
+
+        bytes_read = 0; /* ignore the compression string - don't process it further */
       }
 #else /* HAVE_ZLIB_H */
       t->comp->state = 0; /* We can't compress without zlib...turn it off */
 #endif /* HAVE_ZLIB_H */
+
     }
     /* at this point, we know we got some data from the read */
 
@@ -2881,25 +2917,29 @@ int process_input(struct descriptor_data *t)
     /* search for a newline in the data we just read */
     for (ptr = read_point; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr))
-	nl_pos = ptr;
+        nl_pos = ptr;
 
     read_point += bytes_read;
     space_left -= bytes_read;
 
-/*
- * on some systems such as AIX, POSIX-standard nonblocking I/O is broken,
- * causing the MUD to hang when it encounters input not terminated by a
- * newline.  This was causing hangs at the Password: prompt, for example.
- * I attempt to compensate by always returning after the _first_ read, instead
- * of looping forever until a read returns -1.  This simulates non-blocking
- * I/O because the result is we never call read unless we know from select()
- * that data is ready (process_input is only called if select indicates that
- * this descriptor is in the read set).  JE 2/23/95.
- */
+    /*
+     * on some systems such as AIX, POSIX-standard nonblocking I/O is broken,
+     * causing the MUD to hang when it encounters input not terminated by a
+     * newline.  This was causing hangs at the Password: prompt, for example.
+     * I attempt to compensate by always returning after the _first_ read, instead
+     * of looping forever until a read returns -1.  This simulates non-blocking
+     * I/O because the result is we never call read unless we know from select()
+     * that data is ready (process_input is only called if select indicates that
+     * this descriptor is in the read set).  JE 2/23/95.
+     */
 #if !defined(POSIX_NONBLOCK_BROKEN)
-  } while (nl_pos == NULL);
+
+  }
+  while (nl_pos == NULL);
 #else
-  } while (0);
+
+  }
+  while (0);
 
   if (nl_pos == NULL)
     return (0);
@@ -2912,71 +2952,89 @@ int process_input(struct descriptor_data *t)
 
   read_point = t->inbuf;
 
-  while (nl_pos != NULL) {
+  while (nl_pos != NULL)
+  {
     write_point = tmp;
     space_left = MAX_INPUT_LENGTH - 1;
 
     /* The '> 1' reserves room for a '$ => $$' expansion. */
-    for (ptr = read_point; (space_left > 1) && (ptr < nl_pos); ptr++) {
-      if (*ptr == '\b' || *ptr == 127) { /* handle backspacing or delete key */
-	if (write_point > tmp) {
-	  if (*(--write_point) == '$') {
-	    write_point--;
-	    space_left += 2;
-	  } else
-	    space_left++;
-	}
-      } else if (isascii(*ptr) && isprint(*ptr)) {
-	if ((*(write_point++) = *ptr) == '$') {		/* copy one character */
-	  *(write_point++) = '$';	/* if it's a $, double it */
-	  space_left -= 2;
-	} else
-	  space_left--;
-      } 
+    for (ptr = read_point; (space_left > 1) && (ptr < nl_pos); ptr++)
+    {
+      if (*ptr == '\b' || *ptr == 127)
+      { /* handle backspacing or delete key */
+        if (write_point > tmp)
+        {
+          if (*(--write_point) == '$')
+          {
+            write_point--;
+            space_left += 2;
+          }
+          else
+            space_left++;
+        }
+      }
+      else if (isascii(*ptr) && isprint(*ptr))
+      {
+        if ((*(write_point++) = *ptr) == '$')
+        {		/* copy one character */
+          *(write_point++) = '$';	/* if it's a $, double it */
+          space_left -= 2;
+        }
+        else
+          space_left--;
+      }
     }
 
     *write_point = '\0';
 
-    if ((space_left <= 0) && (ptr < nl_pos)) {
+    if ((space_left <= 0) && (ptr < nl_pos))
+    {
       char buffer[MAX_INPUT_LENGTH + 64];
 
       snprintf(buffer, sizeof(buffer), "Line too long.  Truncated to:\r\n%s\r\n", tmp);
       if (write_to_descriptor(t->descriptor, buffer, t->comp) < 0)
-	return (-1);
+        return (-1);
     }
-    if (t->snoop_by) 
+    if (t->snoop_by)
       write_to_output(t->snoop_by, "%% %s\r\n", tmp);
     failed_subst = 0;
     if (*tmp == '-' && *(tmp + 1) == '-')
       flush_queues(t);
     else if (*tmp == '!' && !(*(tmp + 1)))	/* Redo last command. */
       strcpy(tmp, t->last_input);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-    else if (*tmp == '!' && *(tmp + 1)) {
+    else if (*tmp == '!' && *(tmp + 1))
+    {
       char *commandln = (tmp + 1);
       int starting_pos = t->history_pos,
-	  cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
+                         cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
 
       skip_spaces(&commandln);
-      for (; cnt != starting_pos; cnt--) {
-	if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
-	  strcpy(tmp, t->history[cnt]);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-	  strcpy(t->last_input, tmp);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+      for (; cnt != starting_pos; cnt--)
+      {
+        if (t->history[cnt] && is_abbrev(commandln, t->history[cnt]))
+        {
+          strcpy(tmp, t->history[cnt]);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+          strcpy(t->last_input, tmp);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
           write_to_output(t, "%s\r\n", tmp);
-	  break;
-	}
+          break;
+        }
         if (cnt == 0)	/* At top, loop to bottom. */
-	  cnt = HISTORY_SIZE;
+          cnt = HISTORY_SIZE;
       }
-    } else if (*tmp == '^') {
+    }
+    else if (*tmp == '^')
+    {
       if (!(failed_subst = perform_subst(t, t->last_input, tmp)))
-	strcpy(t->last_input, tmp);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-    } else {
+        strcpy(t->last_input, tmp);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
+    }
+    else
+    {
       strcpy(t->last_input, tmp);	/* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
       if (t->history[t->history_pos])
-	free(t->history[t->history_pos]);	/* Clear the old line. */
+        free(t->history[t->history_pos]);	/* Clear the old line. */
       t->history[t->history_pos] = strdup(tmp);	/* Save the new. */
       if (++t->history_pos >= HISTORY_SIZE)	/* Wrap to top. */
-	t->history_pos = 0;
+        t->history_pos = 0;
     }
 
     if (!failed_subst)
@@ -2990,7 +3048,7 @@ int process_input(struct descriptor_data *t)
     read_point = ptr = nl_pos;
     for (nl_pos = NULL; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr))
-	nl_pos = ptr;
+        nl_pos = ptr;
   }
 
   /* now move the rest of the buffer up to the beginning for the next pass */
@@ -3032,7 +3090,8 @@ int perform_subst(struct descriptor_data *t, char *orig, char *subst)
   first = subst + 1;
 
   /* now find the second '^' */
-  if (!(second = strchr(first, '^'))) {
+  if (!(second = strchr(first, '^')))
+  {
     write_to_output(t, "Invalid substitution.\r\n");
     return (1);
   }
@@ -3041,7 +3100,8 @@ int perform_subst(struct descriptor_data *t, char *orig, char *subst)
   *(second++) = '\0';
 
   /* now, see if the contents of the first string appear in the original */
-  if (!(strpos = strstr(orig, first))) {
+  if (!(strpos = strstr(orig, first)))
+  {
     write_to_output(t, "Invalid substitution.\r\n");
     return (1);
   }
@@ -3079,38 +3139,47 @@ void close_socket(struct descriptor_data *d)
   if (d->snooping)
     d->snooping->snoop_by = NULL;
 
-  if (d->snoop_by) {
+  if (d->snoop_by)
+  {
     write_to_output(d->snoop_by, "Your victim is no longer among us.\r\n");
     d->snoop_by->snooping = NULL;
     d->snoop_by = NULL;
   }
 
-  if (d->character) {
+  if (d->character)
+  {
     /* If we're switched, this resets the mobile taken. */
     d->character->desc = NULL;
 
     /* Plug memory leak, from Eric Green. */
-    if (!IS_NPC(d->character) && PLR_FLAGGED(d->character, PLR_MAILING) && d->str) {
+    if (!IS_NPC(d->character) && PLR_FLAGGED(d->character, PLR_MAILING) && d->str)
+    {
       if (*(d->str))
         free(*(d->str));
       free(d->str);
       d->str = NULL;
-    } else if (d->backstr && !IS_NPC(d->character) && !PLR_FLAGGED(d->character, PLR_WRITING)) {
+    }
+    else if (d->backstr && !IS_NPC(d->character) && !PLR_FLAGGED(d->character, PLR_WRITING))
+    {
       free(d->backstr);      /* editing description ... not olc */
       d->backstr = NULL;
     }
-    if (IS_PLAYING(d) || STATE(d) == CON_DISCONNECT) {
+    if (IS_PLAYING(d) || STATE(d) == CON_DISCONNECT)
+    {
       struct char_data *link_challenged = d->original ? d->original : d->character;
 
       /* We are guaranteed to have a person. */
       act("$n has lost $s link.", TRUE, link_challenged, 0, 0, TO_ROOM);
       //save_char(link_challenged);
       new_mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, "Closing link to: %s.", GET_NAME(link_challenged));
-    } else {
+    }
+    else
+    {
       new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing player: %s.", GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
       free_char(d->character);
     }
-  } else
+  }
+  else
     new_mudlog(CMP, LVL_IMMORT, TRUE, "Losing descriptor without char.");
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
@@ -3118,11 +3187,12 @@ void close_socket(struct descriptor_data *d)
     d->original->desc = NULL;
 
   /* Clear the command history. */
-  if (d->history) {
+  if (d->history)
+  {
     int cnt;
     for (cnt = 0; cnt < HISTORY_SIZE; cnt++)
       if (d->history[cnt])
-	free(d->history[cnt]);
+        free(d->history[cnt]);
     free(d->history);
     d->history = NULL;
   }
@@ -3133,35 +3203,37 @@ void close_socket(struct descriptor_data *d)
     free(d->showstr_vector);
 
   /*. Kill any OLC stuff .*/
-  switch (d->connected) {
-    case CON_OEDIT:
-    case CON_REDIT:
-    case CON_ZEDIT:
-    case CON_MEDIT:
-    case CON_SEDIT:
-    case CON_TEDIT:
-    case CON_AEDIT:
-    case CON_TRIGEDIT:
-      cleanup_olc(d, CLEANUP_ALL);
-      break;
-    default:
-      break;
+  switch (d->connected)
+  {
+  case CON_OEDIT:
+  case CON_REDIT:
+  case CON_ZEDIT:
+  case CON_MEDIT:
+  case CON_SEDIT:
+  case CON_TEDIT:
+  case CON_AEDIT:
+  case CON_TRIGEDIT:
+    cleanup_olc(d, CLEANUP_ALL);
+    break;
+  default:
+    break;
   }
 
   /* free compression structures */
 #ifdef HAVE_ZLIB_H
-  if (d->comp->stream) {
+  if (d->comp->stream)
+  {
     deflateEnd(d->comp->stream);
     free(d->comp->stream);
     free(d->comp->buff_out);
     free(d->comp->buff_in);
-    
+
   }
 #endif /* HAVE_ZLIB_H */
   /* d->comp was still created even if there is no zlib, for comp->state) */
   if (d->comp)
-    free(d->comp);  
-      
+    free(d->comp);
+
   free(d);
 }
 
@@ -3172,14 +3244,18 @@ void check_idle_passwords(void)
 {
   struct descriptor_data *d, *next_d;
 
-  for (d = descriptor_list; d; d = next_d) {
+  for (d = descriptor_list; d; d = next_d)
+  {
     next_d = d->next;
     if (STATE(d) != CON_PASSWORD && STATE(d) != CON_GET_NAME)
       continue;
-    if (!d->idle_tics) {
+    if (!d->idle_tics)
+    {
       d->idle_tics++;
       continue;
-    } else {
+    }
+    else
+    {
       echo_on(d);
       write_to_output(d, "\r\nTimed out... goodbye.\r\n");
       STATE(d) = CON_CLOSE;
@@ -3297,14 +3373,14 @@ RETSIGTYPE hupsig(int sig)
 {
   log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...");
   exit(0);			/* perhaps something more elegant should
-              				 * substituted */
+                  				 * substituted */
 }
 
 RETSIGTYPE chldsig()
 {
   struct rusage ru;
 
-  pid_t wait3(int *, int, struct rusage *);
+  //  pid_t wait3(int *, int, struct rusage *);
 
   wait3(NULL, WNOHANG, &ru);
 }
@@ -3360,16 +3436,16 @@ void signal_setup(void)
   struct itimerval itime;
   struct timeval interval;
 
-  my_signal(SIGSEGV, core_dump_on_crash);
+  my_signal(SIGSEGV, (sigfunc *)core_dump_on_crash);
   /* user signal 1: reread wizlists.  Used by autowiz system. */
-  my_signal(SIGUSR1, reread_wizlists);
+  my_signal(SIGUSR1, (sigfunc *)reread_wizlists);
 
 
   /*
    * user signal 2: unrestrict game.  Used for emergencies if you lock
    * yourself out of the MUD somehow.  (Duh...)
    */
-  my_signal(SIGUSR2, unrestrict_game);
+  my_signal(SIGUSR2, (sigfunc *)unrestrict_game);
 
   /*
    * set up the deadlock-protection so that the MUD aborts itself if it gets
@@ -3380,22 +3456,22 @@ void signal_setup(void)
   itime.it_interval = interval;
   itime.it_value = interval;
   setitimer(ITIMER_VIRTUAL, &itime, NULL);
-  my_signal(SIGVTALRM, checkpointing);
+  my_signal(SIGVTALRM, (sigfunc *)checkpointing);
 
   /* just to be on the safe side: */
-  my_signal(SIGHUP, hupsig);
-  my_signal(SIGCHLD, reap);
+  my_signal(SIGHUP, (sigfunc *)hupsig);
+  my_signal(SIGCHLD, (sigfunc *)reap);
 #endif				/* CIRCLE_MACINTOSH */
-  my_signal(SIGINT, hupsig);
-  my_signal(SIGTERM, hupsig);
-  my_signal(SIGPIPE, SIG_IGN);
-  my_signal(SIGALRM, SIG_IGN);
+  my_signal(SIGINT, (sigfunc *)hupsig);
+  my_signal(SIGTERM, (sigfunc *)hupsig);
+  my_signal(SIGPIPE, (sigfunc *)SIG_IGN);
+  my_signal(SIGALRM, (sigfunc *)SIG_IGN);
 
 #ifdef SIGCLD  /* only on SYSV */
-  my_signal(SIGCLD, SIG_IGN);  /* "automagically" delete zombies */
+  my_signal(SIGCLD, (sigfunc *)SIG_IGN);  /* "automagically" delete zombies */
 #else
  # ifdef SIGCHLD
-  my_signal(SIGCHLD, sigchld);  /* remove zombies */
+  my_signal(SIGCHLD, (sigfunc *)sigchld);  /* remove zombies */
 # endif /* SIGCHLD */
  #endif /* SIGCLD */
 }
@@ -4136,14 +4212,16 @@ void brag(struct char_data *ch, struct char_data *vict)
 
   if (ch == vict)
     return;
-
+  //  if (IS_NPC(ch))
+  // snprintf(buf, sizeof(buf), "Someone brags, '%s'", brag[number(0, 53)]);
+  // else
   snprintf(buf, sizeof(buf), "%s brags, '%s'", GET_NAME(ch),  brag[number(0, 53)]);
 
   for (i = descriptor_list; i; i = next)
   {
     next = i->next;
     if (!i->connected && i != ch->desc && i->character &&
-        !PRF_FLAGGED(i->character, PRF_NOGOSS) &&
+        !PRF_FLAGGED(i->character, PRF_NOBRAG) &&
         !PLR_FLAGGED(i->character, PLR_WRITING) &&
         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
     {
@@ -4173,11 +4251,11 @@ void make_wholist(void)
     return;
   if ((fl = fopen("/var/www/html/images/wholist.xml", "w")) == 0)
   {
-  if (++xml_log_trys < 4)
-    log("XML Who List unable to be opened (Try %d)", xml_log_trys);
+    if (++xml_log_trys < 4)
+      log("XML Who List unable to be opened (Try %d)", xml_log_trys);
     else if (xml_log_trys == 4)
-    log("XML Who List unable to be opened (Try 4) [Error will no longer be reported]");
-    
+      log("XML Who List unable to be opened (Try 4) [Error will no longer be reported]");
+
     return;			/* or log it ? *shrug* */
   }
 
@@ -4326,7 +4404,7 @@ char * parse_prompt(CHAR_DATA *ch)
     if (count >= 0)
       len += count;
   }
- 
+
 
   if ((check_mail(ch) && len < psize)
       && (PRF_FLAGGED(ch, PRF_MAIL)))
@@ -4636,13 +4714,13 @@ char * parse_prompt(CHAR_DATA *ch)
    Mordecai@xtra.co.nz
 */
 
-char *wordwrap(char *cmd, int width, size_t maxlen)
+char *wordwrap(char *cmd, size_t width, size_t maxlen)
 {
   char *buf;
-  int srcOS = 0;
-  int dstOS = 0;
-  int cntOS = 0;
-  int skip = FALSE;
+  size_t srcOS = 0;
+  size_t dstOS = 0;
+  size_t cntOS = 0;
+  size_t skip = FALSE;
   size_t len;
 
   /* no need to wrap the text if it is shorter then the width, just return */

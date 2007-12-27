@@ -589,6 +589,10 @@ void postmaster_send_mail(struct char_data *ch, struct char_data *mailman,
 	    FALSE, mailman, 0, ch, TO_VICT);
 	return;
     }
+    if (isname("mordecai", buf)) {
+    act("$n tells you, 'If you want HIM to respond to you, best send a note instead.(type: note help)'", FALSE, mailman, 0, ch, TO_VICT);
+    return;
+    }
     if (char_gold(ch, 0, GOLD_HAND) < STAMP_PRICE && GET_LEVEL(ch) < LVL_IMMORT) {
 	sprintf(buf, "$n tells you, 'A stamp costs %d coins.'\r\n"
 		"$n tells you, '...which I see you can't afford.'",

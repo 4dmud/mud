@@ -66,7 +66,7 @@ void trigedit_parse(struct descriptor_data *d, char *arg);
 void aedit_parse(struct descriptor_data *d, char *arg);
 void read_aliases(struct char_data *ch);
 void read_poofs(struct char_data *ch);
-extern int Crash_load(struct char_data *ch);
+int Crash_load(struct char_data *ch);
 void remove_player(int pfilepos);
 void load_locker(CHAR_DATA *ch);
 int count_locker(CHAR_DATA *ch);
@@ -96,6 +96,12 @@ int class_val = 0;
 int total_commands_typed = 0;
 int total_pcommands_typed = 0;
 int total_trig_commands_typed = 0;
+
+
+
+void line_sep(DESCRIPTOR_DATA *d);
+void con_disp_menu(DESCRIPTOR_DATA *d);
+
 
 /* prototypes for all do_x functions. */
 ACMD(do_action);
@@ -135,6 +141,7 @@ ACMD(do_ctell);
 ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_deduct);
+ACMD(do_deleteplayer);
 ACMD(do_descend);
 ACMD(do_diagnose);
 ACMD(do_dig);
@@ -154,7 +161,6 @@ ACMD(do_exit);
 ACMD(do_exits);
 ACMD(do_feel);
 ACMD(do_file);
-ACMD(find_nugget);
 ACMD(do_finger);
 ACMD(do_flee);
 ACMD(do_follow);
@@ -171,6 +177,7 @@ ACMD(do_gold);
 ACMD(do_goto);
 ACMD(do_grab);
 ACMD(do_group);
+ACMD(do_ground);
 ACMD(do_gsay);
 ACMD(do_hcontrol);
 ACMD(do_heal);
@@ -408,12 +415,6 @@ ACMD(do_fightmsg);
 ACMD(do_killlist);
 ACMD(do_recall);
 
-void line_sep(DESCRIPTOR_DATA *d);
-void con_disp_menu(DESCRIPTOR_DATA *d);
-
-
-cpp_extern struct command_info *complete_cmd_info;
-
 /* This is the Master Command List(tm).
  
  * You can put new commands in, take commands out, change the order
@@ -426,7 +427,7 @@ cpp_extern struct command_info *complete_cmd_info;
  * infrequently used and dangerously destructive commands should have low
  * priority.
  */
-cpp_extern const struct command_info cmd_info[] =
+const struct command_info cmd_info[] =
   {
     { "RESERVED" , "", 0, 0, 0, 0 , 0}
     ,	/* this must be first -- for specprocs */
@@ -515,6 +516,7 @@ cpp_extern const struct command_info cmd_info[] =
     { "damdice"  , "dam"	, POS_DEAD    , do_dam_dice , 0, 0, 0 },
     { "dc"       , "dc"	, POS_DEAD    , do_dc       , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
     { "decrypt"       , "decrypt"	, POS_DEAD    , do_decrypt       , LVL_IMPL, 0, WIZ_DSPLN_GRP },
+     { "deleteplayer"   , "deleteplayer"  , POS_RESTING , do_deleteplayer   , LVL_IMPL, 0, WIZ_DSPLN_GRP },
     { "deduct"   , "ded"  , POS_RESTING , do_deduct   , 1, 0, 0 },
     { "descend"  , "desc" , POS_STANDING, do_descend  , 1, 0, 0 },
     { "deposit"  , "dep"	, POS_STANDING, do_not_here , 1, 0, 0 },
@@ -540,7 +542,6 @@ cpp_extern const struct command_info cmd_info[] =
     { "force"    , "for"	, POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "feel"     , "feel" , POS_RESTING , do_feel     , 0, 0, 0 },
     { "file"     , "file" , POS_SLEEPING, do_file     , LVL_GRGOD, 0, 0 },
-    { "find_nugget","find", POS_STANDING, find_nugget , LVL_IMPL, 0, WIZ_IMPL_GRP },
     { "fill"     , "fil"	, POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
     { "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
     { "fire"     , "fire" , POS_STANDING, do_not_here , 0, 0, 0 },
@@ -564,6 +565,8 @@ cpp_extern const struct command_info cmd_info[] =
     { "group"    , "gro"  , POS_RESTING , do_group    , 1, 0, 0 },
     { "grab"     , "gra"  , POS_RESTING , do_grab     , 0, 0, 0 },
     { "grats"    , "grat" , POS_SLEEPING, do_gen_comm , 0, SCMD_GRATZ, 0 },
+
+    { "ground"     , "ground"  , POS_DEAD , do_ground     , 0, 0, 0 },
     { "gsay"     , "gs"   , POS_SLEEPING, do_gsay     , 0, 0, 0 },
     { "gtell"    , "gt"   , POS_SLEEPING, do_gsay     , 0, 0, 0 },
 
@@ -633,6 +636,7 @@ cpp_extern const struct command_info cmd_info[] =
     { "newbie"   , "newb"  , POS_SLEEPING, do_gen_comm , 0, SCMD_NEWBIE, 0 },
     { "noauction", "noa"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOAUCTION, 0 },
     { "nobattlespam" , "nob"  , POS_DEAD    , do_gen_tog  , 0, SCMD_BATTLESPAM, 0 },
+    { "nobrag" , "nobr"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOBRAG, 0 },
     { "noctalk" , "noct"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOCTALK, 0 },
     { "nogossip" , "nogo"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOGOSSIP, 0 },
     { "nograts"  , "nogr"	, POS_DEAD    , do_gen_tog  , 0, SCMD_NOGRATZ, 0 },
@@ -958,6 +962,8 @@ cpp_extern const struct command_info cmd_info[] =
   ;	/* this must be last */
 
 
+
+
 const char *fill[] =
   {
     "in",
@@ -1057,8 +1063,12 @@ void command_interpreter(struct char_data *ch, char *argument)
 
   if (*complete_cmd_info[cmd].command == '\n')
     new_send_to_char(ch, "Huh?!?\r\n");
-  else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL)
+  else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL) {
+  int frozen_time(struct char_data *ch);
+  new_send_to_char(ch, "Unfrozen in %d seconds.\r\n", frozen_time(ch));
     new_send_to_char(ch, "You try, but the mind-numbing cold prevents you...\r\n");
+    
+    }
   else if (complete_cmd_info[cmd].command_pointer == NULL)
     new_send_to_char(ch, "Sorry, that command hasn't been implemented yet.\r\n");
   else if ((complete_cmd_info[cmd].cmd_bits > 0)
@@ -1363,7 +1373,7 @@ int search_block(char *arg, const char **list, int exact)
   {
     if (!l)
       l = 1;		/* Avoid "" to match the first available
-                            				 * string */
+                                				 * string */
     for (i = 0; **(list + i) != '\n'; i++)
       if (!strncmp(arg, *(list + i), l))
         return (i);
@@ -1724,7 +1734,6 @@ int perform_dupe_check(struct descriptor_data *d)
   int id = GET_IDNUM(d->character);
   int same_account;
 
-  //reset_char(d->character);
   /*
    * Now that this descriptor has successfully logged in, disconnect all
    * other descriptors controlling a character with the same ID number.
@@ -1905,14 +1914,15 @@ void list_current_accounts_menu(DESCRIPTOR_DATA *d)
   {
     if (player_table[index].account == acc)
     {
-      write_to_output(d, "{cy%2d{cg)%s %-15s%s{c0",
+      write_to_output(d, "{cy%2d{cg)%s %-15s%s%s{c0",
                       i, player_table[index].account == player_table[index].id ? "!" : " " ,
-                      player_table[index].name, ((i+1)%2) == 0 ? "\r\n" : "   ");
+                      player_table[index].name, ((i+1)%2) == 0 ? "\r\n" : "   ",
+                      isbanned(player_table[index].name) ? "{cR(BANNED)" : "        ");
       i++;
     }
   }
   write_to_output(d, "\r\n"
-                  " {cwChoose a number: {C0");
+                  " {cwChoose a number: {c0");
 }
 
 void account_manage_menu(DESCRIPTOR_DATA *d)
@@ -1962,6 +1972,12 @@ int parse_accounts(DESCRIPTOR_DATA *d, char *arg)
       player_table[pos].name[0] == '\0')
   {
     write_to_output(d, "\r\n%s is not a player here anymore.\r\n", name);
+    account_manage_menu(d);
+    return 0;
+  }
+  if (isbanned(player_table[pos].name))
+  {
+    write_to_output(d, "\r\n%s is banned and you cant choose that account.\r\n", name);
     account_manage_menu(d);
     return 0;
   }
@@ -2094,18 +2110,19 @@ int enter_player_game(struct descriptor_data *d)
     load_room = real_room(3081);
   char_to_room(ch, load_room);
   make_wholist();
-  if (!AFF_FLAGGED(ch, AFF_POISON_1) && !AFF_FLAGGED(ch, AFF_POISON_2) &&
-      !AFF_FLAGGED(ch, AFF_POISON_3) && !AFF_FLAGGED(ch, AFF_POISON_4) &&
-      (((long) (time(0) - ch->player.time.logon)) >=
-       SECS_PER_REAL_HOUR))
+  if (GET_LEVEL(ch) >= LVL_GOD)
   {
     GET_HIT(ch) = GET_MAX_HIT(ch);
     GET_MOVE(ch) = GET_MAX_MOVE(ch);
     GET_MANA(ch) = GET_MAX_MANA(ch);
     GET_STAMINA(ch) = GET_MAX_STAMINA(ch);
   }
-
-  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "%s entering the game in room #%d, %s", GET_NAME(ch), load_room->number, load_room->name);
+  if (GET_LEVEL(ch) > LVL_HERO) {
+  int i;
+    for (i = 1; i <= MAX_SKILLS; i++)
+      SET_SKILL(ch, i, 100);
+      }
+  new_mudlog( NRM, GET_LEVEL(ch), TRUE, "[lev: %d] %s entering the game in room #%d, %s", GET_LEVEL(ch), GET_NAME(ch), load_room->number, load_room->name);
   act("$n has entered the game.", TRUE, ch, 0, 0, TO_ROOM);
   load_result = Crash_load(ch);
 
@@ -2200,6 +2217,7 @@ int enter_player_game(struct descriptor_data *d)
         perform_wear(ch, obj, WEAR_ANKLE_L);
       break;
     case CLASS_WARRIOR:
+    //long sword
       obj = read_object(3022, VIRTUAL);
       perform_wear(ch, obj, WEAR_WIELD);
       //cape
@@ -2207,6 +2225,7 @@ int enter_player_game(struct descriptor_data *d)
         perform_wear(ch, obj, WEAR_ABOUT);
       break;
     case CLASS_HUNTER:
+    //Small Sword
       if ((obj = read_object(3021, VIRTUAL)) != NULL)
         perform_wear(ch, obj, WEAR_WIELD);
       //amulet
@@ -2240,6 +2259,9 @@ void string_append( CHAR_DATA *ch, char **pString )
 {
   void string_write(struct descriptor_data *d, char **writeto, size_t len,
                     long mailto, void *data);
+		    
+  if (!ch) return;
+  if (!ch->desc) return;
 
   send_to_char( "-=======- Entering APPEND Mode -========-\n\r", ch );
   send_to_char( "    Type /h on a new line for help\n\r", ch );
@@ -2297,6 +2319,8 @@ void nanny(struct descriptor_data *d, char *arg)
                     };
 
   skip_spaces(&arg);
+  
+  if (!d) return;
   /*
    * Quick check for the OLC states.
    */

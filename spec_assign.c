@@ -176,6 +176,7 @@ void assign_mobiles(void)
     ASSIGNMOB(15014, cleric);	// camelot priest
     ASSIGNMOB(20542, cleric);	// convent
     ASSIGNMOB(27800, cleric);
+    ASSIGNMOB(30960, cleric);
 
     ASSIGNMOB(1200, receptionist);	// immortal zone
     ASSIGNMOB(1809, receptionist);
@@ -361,6 +362,7 @@ void assign_objects(void)
     ASSIGNOBJ(17101, gen_board);	/* board for Nicoli */
     ASSIGNOBJ(17807, gen_board);
     ASSIGNOBJ(28705, gen_board);	/* board for vampire clan */
+    ASSIGNOBJ(10031, gen_board);
     
 #endif
 
@@ -406,6 +408,7 @@ void assign_rooms(void)
     ASSIGNROOM(8283, pet_shops);
     ASSIGNROOM(10453, pet_shops);
     ASSIGNROOM(14398, pet_shops);
+    ASSIGNROOM(30943, pet_shops);
 
     ASSIGNROOM(201, door_down);
     ASSIGNROOM(7377, door_down_7377);

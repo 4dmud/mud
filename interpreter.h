@@ -82,9 +82,8 @@ struct ignore
  * Necessary for CMD_IS macro.  Borland needs the structure defined first
  * so it has been moved down here.
  */
-#ifndef __INTERPRETER_C__
-extern struct command_info *complete_cmd_info;
-#endif
+cpp_extern struct command_info *complete_cmd_info;
+extern const struct command_info cmd_info[];
 
 /*
  * Alert! Changed from 'struct alias' to 'struct alias_data' in bpl15
@@ -189,6 +188,7 @@ struct alias_data
 #define SCMD_REPLYLOCK  42
 #define SCMD_BUSY	43
 #define SCMD_AGGRO	44
+#define SCMD_NOBRAG	45
 
 /* do_wizutil */
 #define SCMD_REROLL	0
@@ -345,4 +345,3 @@ struct alias_data
 /*do_give*/
 #define SCMD_GIVE 0
 #define SCMD_SLIP 1
-

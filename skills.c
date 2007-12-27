@@ -2024,7 +2024,7 @@ ASKILL(skill_slip)
     fail = TRUE;
   }
   slipping = FALSE;
-  return ((fail || !number(0, 60))? TYPE_UNDEFINED :SKILL_SLIP );
+  return ((fail || number(0, 60))? TYPE_UNDEFINED :SKILL_SLIP );
 }
 
 ASKILL(skill_hyperactivity)

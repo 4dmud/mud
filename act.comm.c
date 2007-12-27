@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.7  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.6  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -1379,18 +1382,22 @@ ACMD(do_ctell)
    * mort: ctell <bla bla bla>    imms: ctell <clan_num> <bla bla bla>
    * Imms cannot actually see ctells but they can send them
    *
-   if (GET_LEVEL(ch) >= LVL_GOD){
+   */
+   if (GET_LEVEL(ch) >= LVL_GOD) {
    c = atoi (argument);
    if ((c <= 0) || (c > num_of_clans)){
+   if ((c = find_clan_by_id(GET_CLAN(ch))) == -1) {
    send_to_char ("There is no clan with that number.\r\n", ch);
    return;
    }
+   } else {
    while ((*argument != ' ') && (*argument != '\0'))
    argument++;
    while (*argument == ' ') argument++;
    }
+   }
    else
-   */
+   
   if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0)
   {
     send_to_char("You're not part of a clan.\r\n", ch);
@@ -1447,17 +1454,15 @@ ACMD(do_ctell)
   {
     for (i = descriptor_list; i; i = i->next)
     {
-      if (STATE(i) == CON_PLAYING && i->character &&
-          !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
+      if (IS_PLAYING(i) && i->character && !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
       {
-        if (GET_CLAN(i->character) == GET_CLAN(ch) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
+        if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
           if (i->character->player_specials->saved.clan_rank >=minlev)
           {
             if ((i->character) != ch)
             {
-              write_to_output(i, "%s tells your clan%s, '%s'\r\n",
-                              PERS(ch, i->character), level_string, argument);
+              write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
             }
           }
         }

@@ -266,8 +266,7 @@ char *str_dup(const char *source)
 }
 
 
-
-//#if !defined(HAVE_STRLCPY)
+//#ifndef (HAVE_STRLCPY)
 /*
  * A 'strlcpy' function in the same fashion as 'strdup' below.
  *
@@ -279,16 +278,48 @@ char *str_dup(const char *source)
  * (Note that you may have _expected_ truncation because you only wanted
  * a few characters from the source string.)
  */
+ #if 0
 size_t strlcpy(char *dest, const char *src, size_t copylen)
 {
   strncpy(dest, src, copylen - 1);	/* strncpy: OK (we must assume 'totalsize' is correct) */
   dest[copylen - 1] = '\0';
   return strlen(src);
 }
+#endif
+size_t strlcpy (char *dest,
+           const char *src,
+           size_t dest_size)
+{
+  register char *d = dest;
+  register const char *s = src;
+  register size_t n = dest_size;
+
+  if (dest == NULL || src == NULL)
+return 0;
+
+  /* Copy as many bytes as will fit */
+  if (n != 0 && --n != 0) {
+    register char c;
+    do
+      {
+        c = *d++ = *s++;
+        if (c == '\0')
+          break;
+      }
+    while (--n != 0);
+  }
+
+  /* If not enough room in dest, add NUL and traverse rest of src */
+  if (n == 0) {
+    if (dest_size != 0)
+      *d = '\0';    /* NUL-terminate dst */
+    while (*s++)
+      ;
+  }
+
+  return s - src - 1;  /* count does not include NUL */
+}
 //#endif
-
-
-
 
 /*
  * Strips \r\n from end of string.

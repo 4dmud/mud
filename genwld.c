@@ -41,7 +41,7 @@ room_rnum add_room(struct room_data *room)
     return NULL;
   }
 
-  if ((i = room->number) != NOWHERE)
+  if ((i = room->number) != NOWHERE && world_vnum[i])
   {
 
     if (SCRIPT(world_vnum[i]))

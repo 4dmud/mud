@@ -29,7 +29,7 @@ int copy_mobile_strings(struct char_data *t, struct char_data *f);
 int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd);
 #endif
 
-
+float m_powf(float x, float y);
 struct mob_stat_table mob_stats[MAX_MOB_LEVELS];
 
 void assign_mob_stats()
@@ -49,9 +49,9 @@ void assign_mob_stats()
     s[3] = (i == 0 ? 1 : (i < 13 ? (i%5) : (i%13)))+1;
     s[4] = MAX(40, (i * i * i * 0.22)) + 400;
     //Damroll
-    s[5] = MAX(1, (i*0.4) + (i * 0.125));
-    s[6] = MAX(1, (i*0.4) + (i * 0.125));
-    s[7] = (i >= 30) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+    s[5] = MAX(1, (i*0.4) + (i * 0.4));
+    s[6] = MAX(1, (i*0.4) + (i * 0.4));
+    s[7] = m_powf(i, (i*0.004)+1.356);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
     s[8] =  (i * i * i * 10) + 200; /* exp */
     s[9] = (i * i * i * 1.4); /* gold */
@@ -547,3 +547,6 @@ void check_mobile_string(mob_vnum i, char **string, const char *dscr)
     *string = strdup("An undefined string.");
   }
 }
+
+
+

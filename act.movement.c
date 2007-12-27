@@ -355,12 +355,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     ("The thought of leaving your master makes you weep.\r\n", ch);
     return (0);
   }
-      if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_STAY_SECTOR) && (SECT(IN_ROOM(ch)) != SECT(EXIT(ch, dir)->to_room)))
-    {
-      if (ch->desc)
-        new_send_to_char(ch, "You can't move out of this sector.\r\n");
-      return 0;
-    }
+  if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_STAY_SECTOR) && (SECT(IN_ROOM(ch)) != SECT(EXIT(ch, dir)->to_room)))
+  {
+    if (ch->desc)
+      new_send_to_char(ch, "You can't move out of this sector.\r\n");
+    return 0;
+  }
   if (!IS_IMM(ch))
   {
     if ((ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)))
@@ -503,7 +503,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
   }
   if ((RIDING(ch) && HERE(RIDING(ch), ch))
-      && GET_SKILL(ch, SKILL_RIDING) < number(1, 101) - number(-4, need_movement)
+      && GET_SKILL(ch, SKILL_RIDING) < number(1, GET_LEVEL(RIDING(ch)) * 2) - number(-4, need_movement)
       && !AFF_FLAGGED(RIDING(ch), AFF_TAMED))
   {
     act("$N rears backwards, throwing you to the ground.", FALSE, ch,
@@ -513,7 +513,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     act("$N rears backwards, throwing $n to the ground.", FALSE, ch, 0,
         RIDING(ch), TO_NOTVICT);
     dismount_char(ch);
-    damage(ch, ch, dice(1, 6), -1);
+    set_fighting(RIDING(ch), ch);
     return (0);
   }
   else
@@ -1461,7 +1461,7 @@ ACMD(do_enter)
 
   if (*buf)
   {			/* an argument was supplied, search for door
-                                				 * keyword */
+                                    				 * keyword */
     if ((obj = get_obj_in_list_vis(ch, buf, NULL, IN_ROOM(ch)->contents)))
     {
       if (CAN_SEE_OBJ(ch, obj))
@@ -1960,7 +1960,7 @@ ACMD(do_follow)
 {
   struct char_data *leader;
   char buf[MAX_INPUT_LENGTH];
-  int diff;
+  //int diff;
   one_argument(argument, buf);
 
   if (*buf)
@@ -2040,19 +2040,19 @@ ACMD(do_follow)
 
       if (!IS_NPC(ch))
       {
-        diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));
+        /*diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));
         if (abs(diff) > 100)
         {
           new_send_to_char(ch, "The difference in your powers is too great.\r\n");
           return;
-        }
+        }*/
         if (STATE(leader->desc) == CON_PLAYING
             && !(PLR_FLAGGED(leader, PLR_MAILING)
                  || PLR_FLAGGED(leader, PLR_WRITING)))
         {
           snprintf(buf, sizeof(buf),"[%s wishes to join your group: Allow? (Type: Y | N )]", GET_NAME(ch));
           new_send_to_char(ch,"You ask %s if you can join %s group.\r\n", GET_NAME(leader), HSHR(leader));
-	  leader->loader = GET_IDNUM(ch);
+          leader->loader = GET_IDNUM(ch);
           line_input(leader->desc, buf, allow_follow, NULL);
         }
         else
@@ -2227,9 +2227,10 @@ ASKILL(skill_tame)
     new_send_to_char(ch, "You are too exausted!");
     return 0;
   }
-  if ((GET_LEVEL(ch) +3) < GET_LEVEL(vict)) {
-  new_send_to_char(ch, "They are too powerful to tame, you must take your chances!\r\n");
-  return 0;
+  if ((GET_LEVEL(ch) +3) < GET_LEVEL(vict))
+  {
+    new_send_to_char(ch, "They are too powerful to tame, you must take your chances!\r\n");
+    return 0;
   }
 
   af.type = SKILL_TAME;

@@ -116,7 +116,9 @@ int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
 
 
 /* prototypes from crash save system */
-
+int delete_pobj_file(char *name);
+void delete_aliases(const char *charname);
+void delete_variables(const char *charname);
 int Crash_get_filename(char *orig_name, char *filename);
 int Crash_delete_file(char *name);
 int Crash_delete_crashfile(struct char_data *ch);

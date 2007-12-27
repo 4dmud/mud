@@ -985,7 +985,7 @@ int strangle_affect(struct char_data *ch, struct char_data *vict, int num)
     toggle_sub_status(ch, SUB_THROTTLE, STATUS_OFF);
     act("You struggle free from $n's grasp!!", FALSE, ch, 0, vict, TO_VICT);
     act("$N struggles free from your grasp!!", FALSE, ch, 0, vict, TO_CHAR);
-    start_fighting(vict, ch);
+    start_fighting_delay(vict, ch);
     return 0;
   }
 
@@ -996,7 +996,6 @@ int strangle_affect(struct char_data *ch, struct char_data *vict, int num)
 
   if (GET_POS(vict) == POS_DEAD)
   {
-    gain_exp(ch, GET_EXP(vict)/3);
     die(vict, ch);
     return -1;
   }

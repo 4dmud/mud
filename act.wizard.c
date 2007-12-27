@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.7  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.6  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -97,6 +100,7 @@ extern const char *pc_race_types[];
 void weight_to_object(struct obj_data *obj, int weight);
 void write_aliases(struct char_data *ch);
 void do_show_corpses(CHAR_DATA *ch);
+void do_show_errors(CHAR_DATA *ch);
 int get_weapon_speed(OBJ_DATA *wep);
 int get_weapon_attack(OBJ_DATA *wep);
 int get_weapon_defence(OBJ_DATA *wep);
@@ -127,7 +131,13 @@ void print_zone(struct char_data *ch, zone_vnum vnum);
 extern zone_rnum real_zone_by_thing(room_vnum vznum); /* added for zone_checker */
 SPECIAL(shop_keeper);
 
+void Crash_rentsave(struct char_data *ch, int cost);
+
 /* local functions */
+
+void show_door_errors(struct char_data *ch);
+C_FUNC(delete_player);
+void perform_delete_player(char *charname);
 char *balance_display(int balance);
 ACMD(do_potionweight);
 int perform_set(struct char_data *ch, struct char_data *vict, int mode,
@@ -183,6 +193,7 @@ int update_reward(struct char_data *ch);
 void snoop_check(struct char_data *ch);
 ACMD(do_saveall);
 ACMD(do_ps_aux);
+ACMD(do_deleteplayer);
 
 
 struct player_gold_info
@@ -685,8 +696,8 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
           return IN_ROOM(target_obj->carried_by);
         else if (target_obj->worn_by && IN_ROOM(target_obj->worn_by) != NULL)
           return IN_ROOM(target_obj->worn_by);
-	  else if (target_obj->in_locker && IN_ROOM(target_obj->in_locker) != NULL)
-        return IN_ROOM(target_obj->in_locker);
+        else if (target_obj->in_locker && IN_ROOM(target_obj->in_locker) != NULL)
+          return IN_ROOM(target_obj->in_locker);
       }
     }
 
@@ -741,7 +752,7 @@ room_rnum find_target_room(struct char_data *ch, char *rawroomstr)
   {
     new_send_to_char(ch, "Sorry, that is out of limits.\r\nIf found there you may lose your imm.\r\n");
     new_mudlog(CMP,(GET_LEVEL(ch) == LVL_IMPL ? GET_LEVEL(ch):GET_LEVEL(ch)+1), TRUE, "(GC) %s tried to goto %d.",
-    GET_NAME(ch),location->number);
+               GET_NAME(ch),location->number);
 
   }
   else if (ROOM_FLAGGED(location, ROOM_GODROOM) && GET_LEVEL(ch) < LVL_SEN)
@@ -784,7 +795,7 @@ ACMD(do_at)
   /* a location has been found. */
   original_loc = IN_ROOM(ch);
   if (!move_char_to(ch, location))
-  return;
+    return;
   command_interpreter(ch, command);
 
   /* check if the char is still there */
@@ -849,7 +860,7 @@ ACMD(do_goto)
 
   act(buf, TRUE, ch, 0, 0, TO_ROOM);
   if (!move_char_to(ch, location))
-  return;
+    return;
 
   if (POOFIN(ch))
     snprintf(buf, sizeof(buf), "%s", POOFIN(ch));
@@ -896,7 +907,7 @@ ACMD(do_trans)
                        PERS(victim, ch),
                        IN_ROOM(victim)->number);
       if (!move_char_to(victim, IN_ROOM(ch)))
-      return;
+        return;
       act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0,
           TO_ROOM);
       act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
@@ -928,7 +939,7 @@ ACMD(do_trans)
         act("$n disappears in a mushroom cloud.", FALSE, victim, 0,
             0, TO_ROOM);
         if (move_char_to(victim, IN_ROOM(ch)))
-	return;
+          return;
         act("$n arrives from a puff of smoke.", FALSE, victim, 0,
             0, TO_ROOM);
         act("$n has transferred you!", FALSE, ch, 0, victim,
@@ -970,7 +981,7 @@ ACMD(do_teleport)
     act("$n disappears in a puff of smoke.", FALSE, victim, 0, 0,
         TO_ROOM);
     if (!move_char_to(victim, target))
-    return;
+      return;
     act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0,
         TO_ROOM);
     act("$n has teleported you!", FALSE, ch, 0, (char *) victim,
@@ -1379,7 +1390,7 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
   new_send_to_char(ch, "%s\r\n",   j->worn_by ? GET_NAME(j->worn_by) : "Nobody");
   new_send_to_char(ch,", In Locker: ");
   new_send_to_char(ch, "%s\r\n",   j->in_locker ? GET_NAME(j->in_locker) : "Nobody");
-  
+
 
   switch (GET_OBJ_TYPE(j))
   {
@@ -1754,7 +1765,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
       }
     }
     if (!IS_NPC(k) && PREG(k) > 0)
- new_send_to_char(ch, "%d hours away from giving birth.\r\n", PREG(k));
+      new_send_to_char(ch, "%d hours away from giving birth.\r\n", PREG(k));
     if (IS_MOB(k))
       new_send_to_char(ch, "Mob Spec-Proc: %s, NPC Bare Hand Dam: %dd%d\r\n",
                        (mob_index[GET_MOB_RNUM(k)].func ? "Exists" : "None"),
@@ -2475,7 +2486,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-    				 * or char */
+                                				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -2591,7 +2602,6 @@ extern FILE *player_fl;
 /* (c) 1996-97 Erwin S. Andreasen <erwin@pip.dknet.dk> */
 ACMD(do_copyover)
 {
-  extern ush_int port;
   FILE *fp;
   struct descriptor_data *d, *d_next;
   char buf[MAX_INPUT_LENGTH];
@@ -2622,33 +2632,38 @@ ACMD(do_copyover)
     }
     else
     {
-      fprintf(fp, "%d %s %s\n", d->descriptor, GET_NAME(och),d->host);
+      fprintf(fp, "%d %s %s %d\n", d->descriptor, GET_NAME(och), d->host, IN_ROOM(d->character)->number);
 
       /* save och */
       if (!IS_IMM(och))
         GET_LOADROOM(och) = GET_ROOM_VNUM(GET_WAS_IN(och) == NULL? IN_ROOM(och) : GET_WAS_IN(och));
-	save_char(och);
-      Crash_crashsave(och);
-      
-        REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
-      
-        write_aliases(och);
+
+      log("printing descriptor name and host of connected players");
+      save_char(och);
+      Crash_rentsave(och, 0);
+
+      REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
+
+      write_aliases(och);
       snprintf(buf, sizeof(buf), "Colors drain away and the world slowly grinds to a halt...\r\n");
 #ifdef HAVE_ZLIB_H
-      if (d->comp->state == 2) {
+      if (d->comp->state == 2)
+      {
         d->comp->state = 3; /* Code to use Z_FINISH for deflate */
       }
 #endif /* HAVE_ZLIB_H */
       write_to_descriptor (d->descriptor, buf, d->comp);
       d->comp->state = 0;
 #ifdef HAVE_ZLIB_H
-      if (d->comp->stream) {
+      if (d->comp->stream)
+      {
         deflateEnd(d->comp->stream);
         free(d->comp->stream);
         free(d->comp->buff_out);
         free(d->comp->buff_in);
       }
 #endif /* HAVE_ZLIB_H */
+
     }
   }
   fprintf(fp, "-1\n");
@@ -2666,6 +2681,8 @@ ACMD(do_copyover)
 
   /* Failed - sucessful exec will not return */
   perror("do_copyover: execl");
+
+  new_send_to_char (ch, "Copyover FAILED!\n\r");
   exit(1);			/* too much trouble to try to recover! */
 }
 
@@ -2839,7 +2856,7 @@ ACMD(do_restore)
     GET_MOVE(vict) = (GET_MAX_MOVE(vict));
     GET_STAMINA(vict) = (GET_MAX_STAMINA(vict));
 
-    if (GET_LEVEL(ch) >= LVL_GRGOD &&(GET_LEVEL(vict) >= LVL_HERO))
+    if (GET_LEVEL(ch) >= LVL_GRGOD && (GET_LEVEL(vict) >= LVL_HERO))
     {
       if (GET_COND(vict, THIRST) != (-1))
         GET_COND(vict, THIRST) = (-1);
@@ -2847,18 +2864,17 @@ ACMD(do_restore)
         GET_COND(vict, FULL) = (-1);
 
 
-      if (GET_LEVEL(vict) >= LVL_GRGOD)
-      {
-        for (i = 1; i <= MAX_SKILLS; i++)
-          SET_SKILL(vict, i, 100);
-        vict->real_abils.str_add = 100;
-        vict->real_abils.intel = 25;
-        vict->real_abils.wis = 25;
-        vict->real_abils.dex = 25;
-        vict->real_abils.str = 25;
-        vict->real_abils.con = 25;
-        vict->real_abils.cha = 25;
-      }
+
+      for (i = 1; i <= MAX_SKILLS; i++)
+        SET_SKILL(vict, i, 100);
+      vict->real_abils.str_add = 100;
+      vict->real_abils.intel = 25;
+      vict->real_abils.wis = 25;
+      vict->real_abils.dex = 25;
+      vict->real_abils.str = 25;
+      vict->real_abils.con = 25;
+      vict->real_abils.cha = 25;
+
       vict->aff_abils = vict->real_abils;
     }
     GET_POS(vict) = POS_STANDING;
@@ -3000,7 +3016,7 @@ int allowed_pretitle(CHAR_DATA *ch)
   if (PLR_FLAGGED(ch, PLR_HERO))
     return TRUE;
 
-  if (GET_REWARD(ch) >= 200)
+  if (GET_AWARD(ch) >= 200)
     return TRUE;
 
   return FALSE;
@@ -3014,7 +3030,7 @@ ACMD(do_pretitle)
 
   if (!allowed_pretitle(ch))
   {
-    new_send_to_char(ch, "Sorry, but you dont deserve a pretitle yet.\r\n");
+    new_send_to_char(ch, "Sorry, but you don't deserve a pretitle yet.\r\n");
     return;
   }
 
@@ -3544,8 +3560,9 @@ ACMD(do_wizutil)
   struct char_data *vict;
   long result;
   char arg[MAX_INPUT_LENGTH];
+  void immfreeze_affect(struct char_data *ch, struct char_data *vict, char *argument);
 
-  one_argument(argument, arg);
+  argument = one_argument(argument, arg);
 
   if (!*arg)
     new_send_to_char(ch, "Yes, but for whom?!?\r\n");
@@ -3616,7 +3633,8 @@ ACMD(do_wizutil)
       }
       SET_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
       GET_FREEZE_LEV(vict) = GET_LEVEL(ch);
-      new_send_to_char(vict,"A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n");
+      immfreeze_affect(ch, vict, argument);
+      new_send_to_char(vict,"A bitter wind suddenly rises and drains every ounce of heat from your body!\r\nYou feel frozen!\r\n");
       new_send_to_char(ch, "Frozen.\r\n");
       act("A sudden cold wind conjured from nowhere freezes $n!",
           FALSE, vict, 0, 0, TO_ROOM);
@@ -3636,13 +3654,15 @@ ACMD(do_wizutil)
                          GET_FREEZE_LEV(vict), GET_NAME(vict), HMHR(vict));
         return;
       }
-      new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s un-frozen by %s.", GET_NAME(vict),
-                 GET_NAME(ch));
+      new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s un-frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+     if (!affected_by_spell(vict, SPELL_IMMFREEZE))
       REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
+      else
+      affect_from_char(vict, SPELL_IMMFREEZE);
+      
       new_send_to_char(vict, "A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n");
       new_send_to_char(ch, "Thawed.\r\n");
-      act("A sudden fireball conjured from nowhere thaws $n!", FALSE,
-          vict, 0, 0, TO_ROOM);
+      act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
       break;
     case SCMD_UNAFFECT:
       if (vict->affected)
@@ -3667,6 +3687,51 @@ ACMD(do_wizutil)
     save_char(vict);
     // log("(do_wizutil)Saved %s in room %d.", GET_NAME(vict), vict->in_room);
   }
+}
+
+void immfreeze_affect(struct char_data *ch, struct char_data *vict, char *argument)
+{
+  int duration=0;
+  char charname[MAX_INPUT_LENGTH];
+  char time_size[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+  int multi=0;
+  struct affected_type af;
+
+  argument = two_arguments(argument, charname, duration_p);
+  one_argument(argument, time_size);
+
+  if (!*duration_p || !*time_size)
+  {
+    new_send_to_char(ch, "FREEZE <player> <time> (Day|Hours)\r\n");
+    return;
+  }
+
+  duration = atoi(duration_p);
+  if (duration <= 0)
+  {
+    new_send_to_char(ch, "You need positive duration!\r\n");
+    return;
+  }
+  if (is_abbrev(time_size, "days"))
+    multi = SECS_PER_REAL_DAY;
+  else if (is_abbrev(time_size, "hours"))
+    multi = SECS_PER_REAL_HOUR;
+  else
+  {
+    new_send_to_char(ch, "You must specify Days or Hours\r\n"
+                     "FREEZE <player> <time> (Day|Hours)\r\n");
+    return;
+  }
+
+  /* add the affect */
+  af.type = SPELL_IMMFREEZE;
+  af.expire = sec_to_time(duration * multi);
+  af.modifier = 0;
+  af.location = 0;
+  af.bitvector = AFF_IMMFREEZE;
+
+
+  affect_to_char(vict, &af);
 }
 
 int gsort(const void *a, const void *b)
@@ -3760,8 +3825,6 @@ ACMD(do_hostfind)
       free(victim);
       continue;
     }
-
-
   }
   TEMP_LOAD_CHAR = FALSE;
   return;
@@ -3779,7 +3842,7 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
     int i, j, k, l, m, n;
     extern int top_of_trigt;
     extern struct index_data **trig_index;
-    extern int count_shops(shop_vnum low, shop_vnum high);
+    int count_shops(shop_vnum low, shop_vnum high);
     char zflags[MAX_STRING_LENGTH];
 
     sprintbit(zone_table[zone].zone_flags, zone_bits, zflags);
@@ -3877,28 +3940,24 @@ ACMD(do_show)
     const char level;
   }
   fields[] = {
-               {
-                 "nothing", 0},		/* 0 */
-               {
-                 "zones", LVL_GOD},	/* 1 */
-               {
-                 "player", LVL_GOD}, {
-                 "rent", LVL_GOD}, {
-                 "stats", LVL_GOD}, {
-                 "roleplay", LVL_IMPL},	/* 5 */
-               {
-                 "death", LVL_GOD}, {
-                 "godrooms", LVL_GOD}, {
-                 "shops", LVL_GOD}, {
-                 "houses", LVL_GOD}, {
-                 "connections", LVL_BLD},	/* 10 */
-               {
-                 "arena", LVL_GOD}, {
-                 "snoop", LVL_IMPL}, {
-                 "gold", LVL_GOD}, {
-                 "builder", LVL_IMPL},
-               {"olc", LVL_GOD},
-               {"corpses", LVL_GOD},
+               {"nothing",	 0},		/* 0 */
+               {"zones", 	LVL_GOD},	/* 1 */
+               {"player", 	LVL_GOD},
+               {"rent", 	LVL_GOD},
+               {"stats", 	LVL_GOD},
+               {"roleplay", 	LVL_IMPL},	/* 5 */
+               {"death", 	LVL_GOD},
+               {"godrooms", 	LVL_GOD},
+               {"shops", 	LVL_GOD},
+               {"houses", 	LVL_GOD},
+               {"connections", 	LVL_BLD},	/* 10 */
+               {"arena", 	LVL_GOD},
+               {"snoop", 	LVL_IMPL},
+               {"gold", 	LVL_GOD},
+               {"builder", 	LVL_IMPL},
+               {"olc", 		LVL_GOD},
+               {"corpses", 	LVL_GOD},
+               {"errors",       LVL_GOD},
                {"\n", 0}
              };
 
@@ -3941,8 +4000,8 @@ ACMD(do_show)
     /* tightened up by JE 4/6/93 */
     if (self)
     {
-        DYN_CREATE;
-    *dynbuf = 0;
+      DYN_CREATE;
+      *dynbuf = 0;
       print_zone_to_buf(buf, sizeof(buf), IN_ROOM(ch)->zone, 1);
       DYN_RESIZE(buf);
     }
@@ -3951,8 +4010,8 @@ ACMD(do_show)
       for (zvn = atoi(value), zrn = 0; zrn <= top_of_zone_table && zone_table[zrn].number != zvn;zrn++);
       if (zrn <= top_of_zone_table)
       {
-          DYN_CREATE;
-    *dynbuf = 0;
+        DYN_CREATE;
+        *dynbuf = 0;
         print_zone_to_buf(buf, sizeof(buf), zrn, 1);
         DYN_RESIZE(buf);
       }
@@ -3962,16 +4021,17 @@ ACMD(do_show)
         return;
       }
     }
-    else {
-        DYN_CREATE;
-    *dynbuf = 0;
+    else
+    {
+      DYN_CREATE;
+      *dynbuf = 0;
       for (len = zrn = 0; zrn <= top_of_zone_table; zrn++)
       {
         nlen =
           print_zone_to_buf(buf, sizeof(buf), zrn, 0);
         DYN_RESIZE(buf);
       }
-      }
+    }
     page_string(ch->desc, dynbuf, DYN_BUFFER);
     break;
 
@@ -4085,12 +4145,12 @@ ACMD(do_show)
     DYN_RESIZE(buf);
     for (i = 0, k = 0; i <= top_of_world; i++)
       for (j = 0; j < NUM_OF_DIRS; j++)
-      if (world_vnum[i] != NULL)
-        if (ROOM_FLAGGED(world_vnum[i], ROOM_ROLEPLAY))
-      {
-        snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, i,   world_vnum[i]->name);
-        DYN_RESIZE(buf);
-      }
+        if (world_vnum[i] != NULL)
+          if (ROOM_FLAGGED(world_vnum[i], ROOM_ROLEPLAY))
+          {
+            snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, i,   world_vnum[i]->name);
+            DYN_RESIZE(buf);
+          }
 
 
     page_string(ch->desc, dynbuf, DYN_BUFFER);
@@ -4101,12 +4161,12 @@ ACMD(do_show)
     strcpy(buf, "Death Traps\r\n-----------\r\n");
     DYN_RESIZE(buf);
     for (i = 0, j = 0; i <= top_of_world; i++)
-    if (world_vnum[i] != NULL)
-      if (ROOM_FLAGGED(world_vnum[i], ROOM_DEATH))
-      {
-        snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, GET_ROOM_VNUM(world_vnum[i]),  world_vnum[i]->name);
-        DYN_RESIZE(buf);
-      }
+      if (world_vnum[i] != NULL)
+        if (ROOM_FLAGGED(world_vnum[i], ROOM_DEATH))
+        {
+          snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, GET_ROOM_VNUM(world_vnum[i]),  world_vnum[i]->name);
+          DYN_RESIZE(buf);
+        }
     page_string(ch->desc, dynbuf, DYN_BUFFER);
     break;
   case 7:
@@ -4115,12 +4175,12 @@ ACMD(do_show)
     strcpy(buf, "Godrooms\r\n--------------------------\r\n");
     DYN_RESIZE(buf);
     for (i = 0, j = 0; i <= top_of_world; i++)
-    if (world_vnum[i] != NULL)
-      if (ROOM_FLAGGED(world_vnum[i], ROOM_GODROOM))
-      {
-        snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, GET_ROOM_VNUM(world_vnum[i]),   world_vnum[i]->name);
-        DYN_RESIZE(buf);
-      }
+      if (world_vnum[i] != NULL)
+        if (ROOM_FLAGGED(world_vnum[i], ROOM_GODROOM))
+        {
+          snprintf(buf, sizeof(buf), "%2d: [%5d] %s\r\n", ++j, GET_ROOM_VNUM(world_vnum[i]),   world_vnum[i]->name);
+          DYN_RESIZE(buf);
+        }
     page_string(ch->desc, dynbuf, DYN_BUFFER);
     break;
   case 8:
@@ -4225,11 +4285,15 @@ ACMD(do_show)
 
     }
     if (!i)
-      new_send_to_char(ch, "You no zone to your name.");
+      new_send_to_char(ch, "You have no zone to your name.");
 
     break;
   case 16:
     do_show_corpses(ch);
+    break;
+  case 17:
+    do_show_errors(ch);
+    show_door_errors(ch);
     break;
 
     /* show what? */
@@ -4931,11 +4995,11 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     else if (isname(val_arg, "riddlers"))
       i = 3;
     else if (isname(val_arg, "assholes"))
-    i = 4;
+      i = 4;
     else if (isname(val_arg, "orsinis"))
-    i = 5;
+      i = 5;
     else if (isname(val_arg, "Lolthite"))
-    i = 6;
+      i = 6;
     else if (!strcmp(val_arg, "none"))
       i = 0;
     GET_RP_GROUP(vict) = i;
@@ -4957,18 +5021,20 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
     SET_OR_REMOVE(PLR_FLAGS(vict), PLR_HERO);
     break;
   case 76:
-  if (strlen(val_arg) > 20) {
-  new_send_to_char(ch, "Sorry it must be 20 characters or less\r\n");
-  return 0;
-  }
-  if (strstr(val_arg, "{")) {
-  new_send_to_char(ch, "Sorry, no color codes please.\r\n");
-  return 0;
-  }
+    if (strlen(val_arg) > 20)
+    {
+      new_send_to_char(ch, "Sorry it must be 20 characters or less\r\n");
+      return 0;
+    }
+    if (strstr(val_arg, "{"))
+    {
+      new_send_to_char(ch, "Sorry, no color codes please.\r\n");
+      return 0;
+    }
     free_string(IMMTITLE(vict));
     IMMTITLE(vict) = NULL;
     if (val_arg && *val_arg)
-    IMMTITLE(vict) = strdup(val_arg);
+      IMMTITLE(vict) = strdup(val_arg);
     snprintf(output, sizeof(output), "Imm Title of %s set to: %s",GET_NAME(vict), val_arg);
     break;
   default:
@@ -5280,10 +5346,11 @@ ACMD(do_own)
   {
     new_send_to_char(ch, "You don't seem to have any %ss.\r\n", what);
   }
-if (!is_number(owner)) {
-new_send_to_char(ch, "%s is not an ID number.\r\n", owner);
-return;
-}
+  if (!is_number(owner))
+  {
+    new_send_to_char(ch, "%s is not an ID number.\r\n", owner);
+    return;
+  }
   idnum = atol(owner);
   if (idnum == 0)
   {
@@ -5395,8 +5462,8 @@ int check_potion_weight(struct obj_data *obj)
     weight_to_object(obj,weight);
     return 1;
     break;
-    case ITEM_WAND:
-    case ITEM_STAFF:
+  case ITEM_WAND:
+  case ITEM_STAFF:
     weight += spell_weight(obj, 3) * GET_OBJ_VAL(obj, 2);
     weight_to_object(obj,weight);
     return 1;
@@ -5424,10 +5491,10 @@ int check_potion_price(struct obj_data *obj)
     weight += spell_price(obj, 3);
     weight *= 2000;
     GET_OBJ_COST(obj) = weight;
-    return 1;    
+    return 1;
     break;
-        case ITEM_WAND:
-    case ITEM_STAFF:
+  case ITEM_WAND:
+  case ITEM_STAFF:
     weight += spell_price(obj, 3) * GET_OBJ_VAL(obj, 2);
     weight *= 2000;
     GET_OBJ_COST(obj) = weight;
@@ -5558,8 +5625,8 @@ void do_connections(struct char_data *ch, char *arg)
 
     for (i = 0, k = 0; i <= top_of_world; i++)
     {
-    if (!world_vnum[i])
-    continue;
+      if (!world_vnum[i])
+        continue;
       for (j = 0; j < NUM_OF_DIRS; j++)
       {
         if (world_vnum[i]->zone == zone_num &&
@@ -5584,7 +5651,7 @@ void do_connections(struct char_data *ch, char *arg)
     for (i = 0, k = 0; i <= top_of_world; i++)
     {
       if (!world_vnum[i])
-    continue;
+        continue;
       for (j = 0; j < NUM_OF_DIRS; j++)
       {
         if (world_vnum[i]->zone != zone_num &&
@@ -5602,7 +5669,7 @@ void do_connections(struct char_data *ch, char *arg)
       }
     }
 
-      page_string(ch->desc, dynbuf, DYN_BUFFER);
+    page_string(ch->desc, dynbuf, DYN_BUFFER);
   }
 }
 
@@ -6012,8 +6079,8 @@ ACMD(do_reward)
   char arg2[MAX_INPUT_LENGTH];
   struct char_data *vict;
   int pts;
-new_send_to_char(ch, "Use AWARD please.\r\n");
-return;
+  new_send_to_char(ch, "Use AWARD please.\r\n");
+  return;
   if (IS_NPC(ch))
     return;
 
@@ -6236,7 +6303,7 @@ ACMD(do_get_free_mem)
 void change_plrindex_name(long id, char *change)
 {
   int tp;
-  
+
   if (!change)
     return;
   for (tp = 0; tp <= top_of_p_table; tp++)
@@ -6262,10 +6329,10 @@ ACMD(do_namechange)
 
   if ((!*oldname || !*newname || !*passw) )
   {
-  new_send_to_char(ch, "namechange <oldname> <newname> <newpassword>\r\n");
+    new_send_to_char(ch, "namechange <oldname> <newname> <newpassword>\r\n");
     return;
   }
-  
+
   if ( (strlen(newname) >= MAX_NAME_LENGTH) || (strlen(newname) < 3))
   {
     new_send_to_char(ch, "Sorry but that name is the wrong length\r\n");
@@ -6327,4 +6394,129 @@ void list_destinations(struct travel_point_data *travel_list, struct char_data *
     }
   }
   new_send_to_char(ch, "\r\n");
+}
+
+ACMD(do_deleteplayer)
+{
+
+  char buf2[MAX_INPUT_LENGTH];
+  one_argument(argument, buf2);
+  ch->loader = -1;
+  if (!*buf2)
+  {
+    new_send_to_char(ch,"Delete which player?\r\n");
+    return;
+  }
+  else if (!(ch->loader = get_id_by_name(buf2)))
+  {
+    send_to_char("There is no such player.\r\n", ch);
+    return;
+  }
+  new_send_to_char(ch, "{cYAre you ABSOLUTELY certain you want to delete {cR%s{cY?{c0\r\n\r\n{cgIf you are certain, type: 'yes I am' --:{c0", buf2);
+  line_input(ch->desc,
+             "",
+             delete_player, NULL);
+
+}
+
+C_FUNC(delete_player)
+{
+  struct char_data *tch = d->character;
+  char *charname;
+
+  if (!tch)
+    return;
+  charname = get_name_by_id(tch->loader);
+
+  if (arg && *arg && !strcmp(arg, "yes I am"))
+  {
+    write_to_output(d, "Deleting...\r\n");
+    perform_delete_player(charname);
+    write_to_output(d, "\r\n...Done\r\n");
+  }
+  else
+  {
+    write_to_output(d, "You cancel the delete on %s.\r\n", charname);
+  }
+}
+
+void perform_delete_player(char *charname)
+{
+  void remove_player(int pfilepos);
+  int find_name(char *name);
+  int player_i;
+  Crash_delete_file(charname);
+  delete_pobj_file(charname);
+  delete_aliases(charname);
+  delete_variables(charname);
+  if ((player_i = find_name(charname)) >= 0)
+  {
+    SET_BIT(player_table[player_i].flags, PINDEX_SELFDELETE);
+    remove_player(player_i);
+  }
+
+}
+
+void show_door_errors(struct char_data *ch)
+{
+  int i, door;
+  int found = 0;
+  obj_vnum vkey;
+  obj_rnum rkey;
+  char buf[MAX_STRING_LENGTH];
+  DYN_DEFINE;
+  DYN_CREATE;
+  for (i = 0; i < top_of_world; i++)
+  {
+    if (world_vnum[i] == NULL)
+      continue;
+
+    for (door = 0; door < NUM_OF_DIRS; door++)
+    {
+      if (world_vnum[i]->dir_option[door])
+      {
+        vkey = world_vnum[i]->dir_option[door]->key;
+        if (vkey > 0)
+        {
+          if ((rkey = real_object(vkey)) != NOTHING)
+          {
+            if (GET_OBJ_TYPE(obj_proto + rkey) != ITEM_KEY)
+            {
+              found++;
+              snprintf(buf, sizeof(buf), "Room [%5d] Dir [%5s] Key [%5d] - {cCKEY is not of type key (%s).{c0\r\n", i, dirs[door], vkey, item_types[(int)GET_OBJ_TYPE(obj_proto + rkey)]);
+              DYN_RESIZE(buf);
+            }
+          }
+          else
+          {
+            found++;
+            snprintf(buf, sizeof(buf), "Room [%5d] Dir [%5s] Key [%5d] - {cRKEY vnum does not exist.{c0\r\n", i, dirs[door], vkey);
+            DYN_RESIZE(buf);
+          }
+        }
+        /*
+                if (IS_SET(world_vnum[i]->dir_option[door]->exit_info, EX_ISDOOR) && vkey > 0)
+                {
+                  found++;
+                  snprintf(buf, sizeof(buf), "Room [%5d] Dir [%5s] Key [%5d] - {cyEXIT has key and no door.{c0\r\n", i, dirs[door], vkey);
+                  DYN_RESIZE(buf);
+                }
+                if (IS_SET(world_vnum[i]->dir_option[door]->exit_info, EX_ISDOOR) && 
+        	(!world_vnum[i]->dir_option[door]->keyword || !*world_vnum[i]->dir_option[door]->keyword))
+                {
+                  found++;
+                  snprintf(buf, sizeof(buf), "Room [%5d] Dir [%5s] Key [%5d] - EXIT has door and no name.\r\n", i, dirs[door], vkey);
+                  DYN_RESIZE(buf);
+                }
+        	*/
+
+      }
+    }
+  }
+  if (!found)
+  {
+    sprintf(buf, "No door errors found!\r\n");
+    DYN_RESIZE(buf);
+  }
+  page_string(ch->desc, dynbuf, DYN_BUFFER);
 }

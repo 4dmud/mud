@@ -595,7 +595,10 @@ void paginate_string(char *str, struct descriptor_data *d)
 {
   int i;
   int length = 20, width = 80;
-
+if (!d) {
+log("Paginate_string passed null descriptor!");
+return;
+}
   if (d->character)
   {
     length = PAGEHEIGHT(d->character);
@@ -626,6 +629,7 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
     {
       free(str);
     }
+    return;
   }
   if (d->character)
   {

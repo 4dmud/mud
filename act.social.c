@@ -23,6 +23,7 @@
 /* extern variables */
 extern struct room_data *world_vnum[];
 extern struct descriptor_data *descriptor_list;
+struct command_info *complete_cmd_info;
 
 /* extern functions */
 char *fread_action(FILE * fl, int nr);
@@ -333,7 +334,7 @@ void create_command_list(void)
 {
   int i, j, k;
   struct social_messg temp;
-  extern struct command_info cmd_info[];
+  extern const struct command_info cmd_info[];
 
   /* free up old command list */
   if (complete_cmd_info)

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.2  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -566,10 +569,17 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       (casttype != CAST_BREATH
        || (casttype == CAST_BREATH && !IS_NPC(caster))))
   {
-    if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC))
+    if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC) && GET_NAME(caster))
     {
-      send_to_char("Your magic fizzles out and dies.\r\n", caster);
-      act("$ns magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
+      int n = 0;
+      char *name = GET_NAME(caster);
+      n = strlen(name);
+      if (n > 0 && name[n-1] == 's')
+        act("$n' magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
+      else
+        act("$ns magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
+
+      new_send_to_char(caster, "Your magic fizzles out and dies.\r\n");
       GET_WAIT_STATE(caster) += ( 2 RL_SEC);
       return (0);
     }
@@ -1089,6 +1099,8 @@ ACMD(do_cast)
   a = abuf;
 
 
+
+
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
     return;
   GET_SPELL_DIR(ch) = NOWHERE;
@@ -1117,6 +1129,7 @@ ACMD(do_cast)
     send_to_char("Cast what?!?\r\n", ch);
     return;
   }
+
 
 
 
@@ -1375,25 +1388,55 @@ int knows_spell(struct char_data *ch, int spell)
   int tier_level(struct char_data *ch, int chclass);
   int has_class(struct char_data *ch, int chclass);
 
-  int i, gm;
+  int i, gm, t;
   int ret_val = 0;
 
   if (GET_LEVEL(ch) >= LVL_IMMORT)
     return 1;
+  if (spell_info[spell].min_level >= LVL_IMMORT)
+    return 0;
+
   gm = grand_master(ch);
 
   for (i = 0; i < NUM_CLASSES ; i++)
   {
-    if (gm || (IS_SET(spell_info[spell].classes, (1 << i)) && has_class(ch, i)))
+    if (gm)
     {
-    
-      if (spell_info[spell].tier < ( (GET_CLASS(ch) == i) ? tier_level(ch, i) : 2) && spell_info[spell].min_level < LVL_IMMORT)
+      if (IS_SET(spell_info[spell].classes, (1 << i)) && GET_CLASS(ch) == i)
+        t = tier_level(ch, i);
+      else
+        t = MIN(tier_level(ch, i), 2);
+
+      if (spell_info[spell].tier < t)
       {
         ret_val++;
       }
-      else if (spell_info[spell].tier <= ( (GET_CLASS(ch) == i) ? tier_level(ch, i) : 2) && spell_info[spell].min_level <= GET_LEVEL(ch))
+      else if (spell_info[spell].tier == t)
+      {
+        if (spell_info[spell].min_level <= GET_LEVEL(ch))
+          ret_val++;
+      }
+
+    }
+    else if (IS_SET(spell_info[spell].classes, (1 << i)))
+    {
+      if (!has_class(ch, i))
+        continue;
+
+      if (GET_CLASS(ch) == i)
+        t = tier_level(ch, i);
+      else
+        t = MIN(tier_level(ch, i), 2);
+
+
+      if (spell_info[spell].tier < t)
       {
         ret_val++;
+      }
+      else if (spell_info[spell].tier == t)
+      {
+        if (spell_info[spell].min_level <= GET_LEVEL(ch))
+          ret_val++;
       }
     }
 
@@ -1660,7 +1703,7 @@ void mag_assign_spells(void)
          MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30);
 
   spello(SPELL_EVIL_EYE, "evil eye", 60 , 30 , 2,
-         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 1000,
+         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 200,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40);
 
   spello(SPELL_GROUP_ARMOR, "group armor", 50 , 30 , 2,
@@ -1696,11 +1739,11 @@ void mag_assign_spells(void)
          10, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42);
 
   spello(SPELL_ELECTRIC_BLAST, "electric blast", 140 , 125 , 3,
-         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 1000,
+         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 100,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15);
 
   spello(SPELL_INFERNO, "inferno", 140 , 125 , 3,
-         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 1000,
+         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 100,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15);
 
 
@@ -2081,6 +2124,8 @@ void mag_assign_spells(void)
          TAR_CHAR_ROOM, TRUE, MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
 
   spello(SPELL_DG_AFFECT, "Malactation", 0, 0, 0, POS_SITTING,
+         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
+  spello(SPELL_IMMFREEZE, "Imm Freeze", 0, 0, 0, POS_SITTING,
          TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0);
 
   /*

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/12/04 07:42:36 $
-*  $Revision: 1.3 $
+*  $Date: 2005/02/04 20:46:11 $
+*  $Revision: 1.4 $
 **************************************************************************/
 
 #include "conf.h"
@@ -203,53 +203,59 @@ OCMD(do_oforce)
 
 OCMD(do_olag)
 {
-        char_data *victim;
-	int wait = 0;
-    //int room;
-    char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  char_data *victim;
+  int wait = 0;
+  //int room;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
-    two_arguments(argument, arg1, arg2);
+  two_arguments(argument, arg1, arg2);
 
-    if (!*arg1 || !*arg2) {
-	obj_log(obj, "olag called with too few args");
-	return;
-    }
-
-
-
-    if (*arg1 == UID_CHAR) {
-	if (!(victim = get_char(arg1))) {
-	 obj_log(obj, "olag: victim (%s) not found", arg1);
-	    return;
-	}
-    } else if (!(victim = get_char_by_obj(obj, arg1))) {
-obj_log(obj, "olag: victim (%s) not found", arg1);
-	    return;
-	}
-
-
-
-    if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_NOHASSLE)) {
-	obj_log(obj, "olag: target has nohassle on");
-	return;
-    }
-
-    if ((wait = atoi(arg2)) < 1)
+  if (!*arg1 || !*arg2)
+  {
+    obj_log(obj, "olag called with too few args");
     return;
-    
-    if (wait > 300) {
-	    obj_log(obj,"olag: duration longer then 30 seconds outside range.");
-    return;
+  }
+
+
+
+  if (*arg1 == UID_CHAR)
+  {
+    if (!(victim = get_char(arg1)))
+    {
+      obj_log(obj, "olag: victim (%s) not found", arg1);
+      return;
     }
-
-
-    
-    wait = (wait RL_SEC)/10;
-
-    WAIT_STATE(victim, wait);
+  }
+  else if (!(victim = get_char_by_obj(obj, arg1)))
+  {
+    obj_log(obj, "olag: victim (%s) not found", arg1);
     return;
+  }
+
+
+
+  if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_NOHASSLE))
+  {
+    obj_log(obj, "olag: target has nohassle on");
+    return;
+  }
+
+  if ((wait = atoi(arg2)) < 1)
+    return;
+
+  if (wait > 300)
+  {
+    obj_log(obj,"olag: duration longer then 30 seconds outside range.");
+    return;
+  }
+
+
+
+  wait = (wait RL_SEC)*0.1;
+
+  WAIT_STATE(victim, wait);
+  return;
 }
-
 
 OCMD(do_ozoneecho)
 {

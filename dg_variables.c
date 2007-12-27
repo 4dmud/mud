@@ -4,14 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2004/12/04 07:42:36 $                                           * 
-*  $Revision: 1.3 $                                                    *
+*  $Date: 2005/02/04 20:46:11 $                                           * 
+*  $Revision: 1.4 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
 #include "sysdep.h"
 
- 
+
 #include "structs.h"
 #include "dg_scripts.h"
 #include "utils.h"
@@ -44,25 +44,28 @@ extern struct time_info_data time_info;
 void add_var(struct trig_var_data **var_list, char *name, char *value, long id)
 {
   struct trig_var_data *vd;
-  
-  if (strchr(name, '.')) {
+
+  if (strchr(name, '.'))
+  {
     log("add_var() : Attempt to add illegal var: %s", name);
     return;
   }
-  
+
   for (vd = *var_list; vd && str_cmp(vd->name, name); vd = vd->next);
 
-  if (vd && (!vd->context || vd->context==id)) {
+  if (vd && (!vd->context || vd->context==id))
+  {
     free(vd->value);
     CREATE(vd->value, char, strlen(value) + 1);
   }
 
-  else {
+  else
+  {
     CREATE(vd, struct trig_var_data, 1);
-    
+
     CREATE(vd->name, char, strlen(name) + 1);
     strcpy(vd->name, name);                            /* strcpy: ok*/
-    
+
     CREATE(vd->value, char, strlen(value) + 1);
 
     vd->next = *var_list;
@@ -74,20 +77,20 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, long id)
 }
 
 
-/* perhaps not the best place for this, but I didn't want a new file 
+/* perhaps not the best place for this, but I didn't want a new file
 char *skill_percent(struct char_data *ch, char *skill)
 {
   static char retval[16];
   int skillnum;
-
+ 
   skillnum = find_skill_num(skill);
   if (skillnum<=0) return("unknown skill");
-
+ 
   snprintf(retval, sizeof(retval), "%d", GET_SKILL(ch, skillnum));
   return retval;
 }*/
 
-/* 
+/*
    search through all the persons items, including containers
    and 0 if it doesnt exist, and greater then 0 if it does!
    Jamie Nelson (mordecai@timespace.co.nz)
@@ -97,41 +100,49 @@ char *skill_percent(struct char_data *ch, char *skill)
    Now returns the number of matching objects -- Welcor 02/04
 */
 
-int item_in_list(char *item, obj_data *list) 
+int item_in_list(char *item, obj_data *list)
 {
   obj_data *i;
-  int count = 0;    
+  int count = 0;
 
-  if (*item == UID_CHAR) {
+  if (*item == UID_CHAR)
+  {
     long id = atol(item + 1);
 
-    for (i = list; i; i = i->next_content) {
-      if (id == GET_ID(i)) 
+    for (i = list; i; i = i->next_content)
+    {
+      if (id == GET_ID(i))
         count ++;
-      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)       
+      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)
         count += item_in_list(item, i->contains);
     }
-  } else if (is_number(item)) { /* check for vnum */
+  }
+  else if (is_number(item))
+  { /* check for vnum */
     obj_vnum ovnum = atoi(item);
-    
-    for (i = list; i; i = i->next_content) {
-      if (GET_OBJ_VNUM(i) == ovnum) 
+
+    for (i = list; i; i = i->next_content)
+    {
+      if (GET_OBJ_VNUM(i) == ovnum)
         count++;
-      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)           
+      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)
         count += item_in_list(item, i->contains);
     }
-  } else {
-    for (i = list; i; i = i->next_content) {
-      if (isname(item, i->name)) 
+  }
+  else
+  {
+    for (i = list; i; i = i->next_content)
+    {
+      if (isname(item, i->name))
         count++;
-      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)           
+      if (GET_OBJ_TYPE(i) == ITEM_CONTAINER)
         count += item_in_list(item, i->contains);
     }
   }
   return count;
 }
 
-/* 
+/*
    BOOLEAN return, just check if a player or mob
    has an item of any sort, searched for by name
    or id. 
@@ -145,8 +156,8 @@ int char_has_item(char *item, struct char_data *ch)
 {
 
   /* If this works, no more searching needed */
-  if (get_object_in_equip(ch, item) != NULL) 
-    return 1; 
+  if (get_object_in_equip(ch, item) != NULL)
+    return 1;
 
   if (item_in_list(item, ch->carrying) == 0)
     return 0;
@@ -159,60 +170,68 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd,
 {
   char *p, *p2;
   char tmpvar[MAX_STRING_LENGTH];
-  
-  if (!str_cmp(field, "strlen")) {                     /* strlen    */
+
+  if (!str_cmp(field, "strlen"))
+  {                     /* strlen    */
     snprintf(str, slen, "%d", strlen(vd->value));
     return TRUE;
-  } else if (!str_cmp(field, "trim")) {                /* trim      */
+  }
+  else if (!str_cmp(field, "trim"))
+  {                /* trim      */
     /* trim whitespace from ends */
     snprintf(tmpvar, sizeof(tmpvar)-1 , "%s", vd->value); /* -1 to use later*/
-    p = tmpvar;                       
-    p2 = tmpvar + strlen(tmpvar) - 1; 
-    while (*p && isspace(*p)) p++;     
-    while ((p<=p2) && isspace(*p2)) p2--; 
-    if (p>p2) { /* nothing left */
+    p = tmpvar;
+    p2 = tmpvar + strlen(tmpvar) - 1;
+    while (*p && isspace(*p)) p++;
+    while ((p<=p2) && isspace(*p2)) p2--;
+    if (p>p2)
+    { /* nothing left */
       *str = '\0';
       return TRUE;
     }
     *(++p2) = '\0';                                         /* +1 ok (see above) */
     snprintf(str, slen, "%s", p);
     return TRUE;
-  } else if (!str_cmp(field, "contains")) {            /* contains  */
+  }
+  else if (!str_cmp(field, "contains"))
+  {            /* contains  */
     if (str_str(vd->value, subfield))
       strcpy(str, "1");
-    else 
+    else
       strcpy(str, "0");
     return TRUE;
-  } else if (!str_cmp(field, "car")) {                 /* car       */
+  }
+  else if (!str_cmp(field, "car"))
+  {                 /* car       */
     char *car = vd->value;
     while (*car && !isspace(*car))
       *str++ = *car++;
     *str = '\0';
     return TRUE;
- 
-  } else if (!str_cmp(field, "cdr")) {                 /* cdr       */
+
+  }
+  else if (!str_cmp(field, "cdr"))
+  {                 /* cdr       */
     char *cdr = vd->value;
     while (*cdr && !isspace(*cdr)) cdr++; /* skip 1st field */
     while (*cdr && isspace(*cdr)) cdr++;  /* skip to next */
 
     snprintf(str, slen, "%s", cdr);
     return TRUE;
-  } else if (!str_cmp(field, "mudcommand")) {
-    /* find the mud command returned from this text */
-/* NOTE: you may need to replace "cmd_info" with "complete_cmd_info", */
-/* depending on what patches you've got applied.                      */
-    extern const struct command_info cmd_info[];
-/* on older source bases:    extern struct command_info *cmd_info; */
+  }
+  else if (!str_cmp(field, "mudcommand"))
+  {
+
     int length, cmd;
     for (length = strlen(vd->value), cmd = 0;
-         *cmd_info[cmd].command != '\n'; cmd++)
-      if (!strncmp(cmd_info[cmd].command, vd->value, length))
+         *complete_cmd_info[cmd].command != '\n'; cmd++)
+      if (!strncmp(complete_cmd_info[cmd].command, vd->value, length))
         break;
 
-    if (*cmd_info[cmd].command == '\n') 
+    if (*complete_cmd_info[cmd].command == '\n')
       *str = '\0';
-    else 
-      snprintf(str, slen, "%s", cmd_info[cmd].command);
+    else
+      snprintf(str, slen, "%s", complete_cmd_info[cmd].command);
     return TRUE;
   }
 
@@ -248,6 +267,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
   char *at[] = { "mat ", "oat ", "wat " };
   /* there is no such thing as wtransform, thus the wecho below  */
   char *transform[]      = {"mtransform ",  "otransform ",  "wecho"       };
+  char *lag[]      = {"mlag ",  "olag ",  "wlag"       };
 
 
   /* X.global() will have a NULL trig */
@@ -314,6 +334,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         snprintf(str, slen, "%s", at[type]);
       else if (!strcasecmp(var, "transform"))
         snprintf(str, slen, "%s", transform[type]);
+      else if (!strcasecmp(var, "lag"))
+        snprintf(str, slen, "%s", lag[type]);
       else
         *str = '\0';
     }
@@ -332,29 +354,32 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       case MOB_TRIGGER:
         ch = (char_data *) go;
 
-        if ((r = get_room(name)));
-        else if ((o = get_object_in_equip(ch, name)));
+
+        if ((o = get_object_in_equip(ch, name)));
         else if ((o = get_obj_in_list(name, ch->carrying)));
         else if ((c = get_char_room(name, NULL, IN_ROOM(ch))));
         else if ((o = get_obj_in_list(name,IN_ROOM(ch)->contents)));
         else if ((c = get_char(name)));
-      else if ((o = get_obj(name))) {}
+        else if ((o = get_obj(name))) ;
+      else if ((r = get_room(name))) {}
 
         break;
       case OBJ_TRIGGER:
         obj = (obj_data *) go;
 
-        if ((r = get_room(name)));
-	else if ((c = get_char_by_obj(obj, name)));
-        else if ((o = get_obj_by_obj(obj, name))) {}
+
+        if ((c = get_char_by_obj(obj, name)));
+        else if ((o = get_obj_by_obj(obj, name)));
+      else if ((r = get_room(name))){}
 
         break;
       case WLD_TRIGGER:
         room = (struct room_data *) go;
 
-	if ((r = get_room(name)));
-        else if ((c = get_char_by_room(room, name)));
-        else if ((o = get_obj_by_room(room, name))) {}
+
+        if ((c = get_char_by_room(room, name)));
+        else if ((o = get_obj_by_room(room, name)));
+      else if ((r = get_room(name))) {}
 
         break;
       }
@@ -383,7 +408,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           break;
         }
       }
-      /*
+      /**
 
         %findobj.<room vnum X>(<object vnum/id/name>)%
           - count number of objects in room X with this name/id/vnum
@@ -990,26 +1015,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         break;
       case 'm':
-
         if (!strcasecmp(field, "maxhitp"))
           snprintf(str, slen, "%d", GET_MAX_HIT(c));
-
         else if (!strcasecmp(field, "mid"))
           snprintf(str, slen, "%ld", GET_ID(MASTER(c)));
-
         else if (!strcasecmp(field, "maxmana"))
           snprintf(str, slen, "%d", GET_MAX_MANA(c));
         else if (!strcasecmp(field, "maxmove"))
           snprintf(str, slen, "%d", GET_MAX_MOVE(c));
         else if (!strcasecmp(field, "mana"))
           snprintf(str, slen, "%d", GET_MANA(c));
-
         else if (!strcasecmp(field, "move"))
           snprintf(str, slen, "%d", GET_MOVE(c));
         else if (!strcasecmp(field, "master"))
         {
           if (!c->master)
-            strcpy(str, "");
+            *str = '\0';
           else
             snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(c->master));
         }
@@ -1022,15 +1043,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             snprintf(str, slen, "%c%ld", UID_CHAR,
                      GET_ID(c->next_in_room));
           else
-            strcpy(str, "");
+            *str = '\0';
         }
 
         else if (!strcasecmp(field, "name"))
         {
           if (GET_SHORT(c))
             snprintf(str, slen, "%s", GET_SHORT(c));
-          else
+          else if (GET_NAME(c))
             snprintf(str, slen, "%s", GET_NAME(c));
+          else
+            *str = '\0';
         }
         break;
       case 'p':
@@ -2008,7 +2031,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 }
 
 
-/* 
+/*
  * Now automatically checks if the variable has more then one field
  * in it. And if the field returns a name or a script UID or the like
  * it can recurse.
@@ -2022,7 +2045,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
  * will double the actors gold every time its called.  etc...
  * - Jamie Nelson 31st Oct 2003 01:24
  */
-   
+
 /* substitutes any variables into line and returns it as buf */
 void var_subst(void *go, struct script_data *sc, trig_data *trig,
                int type, char *line, char *buf)
@@ -2036,30 +2059,34 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
   int dots = 0;
 
   /* skip out if no %'s */
-  if (!strchr(line, '%')) {
+  if (!strchr(line, '%'))
+  {
     strcpy(buf, line);
     return;
   }
   /*lets just empty these to start with*/
   *repl_str = *tmp = *tmp2 = '\0';
-  
+
   p = strcpy(tmp, line);
   subfield_p = subfield;
-  
 
-  while (*p && (left > 0)) {
+
+  while (*p && (left > 0))
+  {
 
 
     /* copy until we find the first % */
-    while (*p && (*p != '%') && (left > 0)) {
+    while (*p && (*p != '%') && (left > 0))
+    {
       *(buf++) = *(p++);
       left--;
     }
-    
+
     *buf = '\0';
-    
+
     /* double % */
-    if (*p && (*(++p) == '%') && (left > 0)) {
+    if (*p && (*(++p) == '%') && (left > 0))
+    {
       *(buf++) = *(p++);
       *buf = '\0';
       left--;
@@ -2067,20 +2094,25 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
     }
 
     /* so it wasn't double %'s */
-    else if (*p && (left > 0)) {
-      
-      /* search until end of var or beginning of field */      
+    else if (*p && (left > 0))
+    {
+
+      /* search until end of var or beginning of field */
       for (var = p; *p && (*p != '%') && (*p != '.'); p++);
-      
+
       field = p;
-      if (*p == '.') {
+      if (*p == '.')
+      {
         *(p++) = '\0';
         dots = 0;
-        for (field = p; *p && ((*p != '%')||(paren_count > 0) || (dots)); p++) {
-          if (dots > 0) {
+        for (field = p; *p && ((*p != '%')||(paren_count > 0) || (dots)); p++)
+        {
+          if (dots > 0)
+          {
             *subfield_p = '\0';
             find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
-            if (*repl_str) {   
+            if (*repl_str)
+            {
               snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
               process_eval(go, sc, trig, type, tmp2);
               strcpy(var, "tmpvr");
@@ -2089,35 +2121,44 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
               continue;
             }
             dots = 0;
-          } else if (*p=='(') {
+          }
+          else if (*p=='(')
+          {
             *p = '\0';
             paren_count++;
-          } else if (*p==')') {
+          }
+          else if (*p==')')
+          {
             *p = '\0';
             paren_count--;
-          } else if (paren_count > 0) {
+          }
+          else if (paren_count > 0)
+          {
             *subfield_p++ = *p;
-          } else if (*p=='.') {
+          }
+          else if (*p=='.')
+          {
             *p = '\0';
             dots++;
-          } 
+          }
         } /* for (field.. */
       } /* if *p == '.' */
-      
+
       *(p++) = '\0';
       *subfield_p = '\0';
-      
-      if (*subfield) {
+
+      if (*subfield)
+      {
         var_subst(go, sc, trig, type, subfield, tmp2);
         strcpy(subfield, tmp2);
       }
 
       find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
-      
+
       strncat(buf, repl_str, left);
       len = strlen(repl_str);
       buf += len;
       left -= len;
     } /* else if *p .. */
-  } /* while *p .. */ 
+  } /* while *p .. */
 }

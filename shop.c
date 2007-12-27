@@ -606,7 +606,8 @@ void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
-
+if (!ch->desc)
+return;
   if (SHOP_SORT(shop_nr) < IS_CARRYING_N(keeper))
     sort_keeper_objs(keeper, shop_nr);
 

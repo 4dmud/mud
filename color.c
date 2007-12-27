@@ -9,8 +9,11 @@
  *****************************************************************************/
 /*
  * $Log: color.c,v $
- * Revision 1.1  2004/11/12 02:16:47  w4dimenscor
- * Initial revision
+ * Revision 1.2  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:47  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.10  2004/08/15 01:12:26  molly
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
@@ -410,7 +413,7 @@ size_t proc_color(char *inbuf, int color_lvl, size_t len)
 {
     char /* *out_buf = NULL,*/ insert_text[10] = "", *out_buf;//[36768] = "";
     int has_color = color_lvl, current_color = -1;
-    register int inpos = 0, outpos = 0;
+    size_t inpos = 0, outpos = 0;
     int remaining, color = -2;
     int i;
 

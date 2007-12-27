@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.8  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.7  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -2716,11 +2719,11 @@ void wear_message(struct char_data *ch, struct obj_data *obj, int where)
       {"$n wears $p on $s hips.",
        "You wear $p on your hips."},
 
-      {"$n sticks $p in $s right earlobe.",
-       "You stick $p in your right earlobe."},
+      {"$n sticks $p in $s ear.",
+       "You stick $p in your ear."},
 
-      {"$n sticks $p in $s left earlobe.",
-       "You stick $p in your left earlobe."},
+      {"$n sticks $p in $s ear.",
+       "You stick $p in your ear."},
 
       {"$n wears $p on $s right ankle.",
        "You wear $p on your right ankle."},
@@ -2930,7 +2933,8 @@ void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
                        "You can't wield anything while focusing on something.\r\n");
       return;
     }
-    if (wep_hands(obj) == 2 && ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD))))))
+    if ((wep_hands(obj) == 2 || (GET_EQ(ch, WEAR_WIELD) && wep_hands(GET_EQ(ch, WEAR_WIELD)) == 2)) && 
+    ((GET_EQ(ch, WEAR_SHIELD) || (!GET_SKILL(ch, SKILL_LONGARM) && (GET_EQ(ch, WEAR_WIELD_2) || GET_EQ(ch, WEAR_WIELD))))))
     {
       new_send_to_char(ch, "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n");
       return;

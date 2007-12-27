@@ -298,10 +298,6 @@ int valid_dg_target(struct char_data *ch, int allow_gods)
 {
     if (!ch)
     return FALSE;
-    if (DEAD(ch))
-    return FALSE;
-    else if (IN_ROOM(ch) == NULL)
-    return FALSE;
     else if (IS_NPC(ch))
 	return TRUE;		/* all npcs are allowed as targets */
     else if (GET_LEVEL(ch) < LVL_IMMORT)

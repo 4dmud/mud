@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.11  2005/02/04 20:46:11  w4dimenscor
+ * Many changes - i couldn't connect to this for a while
+ *
  * Revision 1.10  2004/12/17 07:13:20  w4dimenscor
  * A few little updates.
  *
@@ -97,7 +100,7 @@ void spill_gold(struct char_data *ch);
 void add_corpse_to_list(OBJ_DATA *corpse);
 void dismount_char(struct char_data *ch);
 int highest_tier(struct char_data *ch);
-void Crash_rentsave(struct char_data *ch, int cost);
+void Crash_crashsave(struct char_data *ch);
 
 void send_char_pos(struct char_data *ch, int dam);
 char *fread_action(FILE * fl, int nr);
@@ -620,11 +623,17 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
       start_fighting_delay(ch, victim);
     else
     {
+      long ch_id = GET_ID(ch);
       FIGHTING(ch) = victim;
       GET_POS(ch) = POS_FIGHTING;
+      
 
-      if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0)
+      if (fight_event_hit(ch, victim, find_fe_type(ch), next_attack_type(ch)) >= 0) {
+      if (find_char(ch_id))
         next_round(ch);
+	else
+	return;
+	}
     }
   }
   if (IS_NPC(ch))
@@ -647,10 +656,11 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 void start_fighting_delay(struct char_data *ch, struct char_data *vict)
 {
-  CHAR_DATA *victim;
-
+CHAR_DATA *victim;
   /*to stop recursion*/
   if (!ch || !vict)
+    return;
+    if (DEAD(ch) || DEAD(vict))
     return;
 victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict : vict;
 
@@ -685,12 +695,14 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 int next_round(struct char_data* ch)
 {
-  CHAR_DATA *victim = FIGHTING(ch);
+  CHAR_DATA *victim;
 
   /*to stop recursion*/
   if (!ch)
     return 0;
-  if (victim)
+  if (DEAD(ch))
+    return 0;
+  if ((victim = FIGHTING(ch)) != NULL)
   victim = RIDDEN_BY(victim) ? HERE(RIDDEN_BY(victim), victim) ? RIDDEN_BY(victim) : victim : victim;
 
   /*to stop recursion*/
@@ -789,12 +801,16 @@ EVENTFUNC(fight_event)
       int a_t = 0;
       fe_t = find_fe_type(ch);
       a_t = next_attack_type(ch);
+      struct char_data * tch;
 
       if (fight_event_hit(ch, FIGHTING(ch), fe_t, a_t) >= 0)
       {
-        if ((ch = find_char(id)) != NULL)
+        if ((tch = find_char(id)) != NULL)
         {
+	if (tch == ch && !DEAD(ch))
           next_round(ch);
+	  else
+	  return 0;
         }
         else return 0;
       }
@@ -1423,7 +1439,18 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   if (RIDDEN_BY(ch) && RIDDEN_BY(ch) == vict)
     dismount_char(vict);
 
+if (affected_by_spell(vict, SPELL_SLEEP)) {
+    affect_from_char(vict, SPELL_SLEEP);
+    act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
+    act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
+    }
 
+  if (affected_by_spell(vict, SPELL_SWEET_DREAMS)) {
+    affect_from_char(vict, SPELL_SWEET_DREAMS);
+    act("$n wakes up!", TRUE, vict, 0, 0, TO_ROOM);
+    act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
+    }
+  
   if (!FIGHTING(vict))
     start_fighting_delay(vict, ch);
   if (!FIGHTING(ch))
@@ -2042,7 +2069,7 @@ of item.
 int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
 {
   int ret_val = 0;
-  int hp = 0, ma = 0, mv = 0;
+  float hp = 0, ma = 0, mv = 0;
   //const char * to_vict, *to_ch;
 
   struct obj_data *shield = GET_EQ(ch, WEAR_SHIELD);
@@ -2116,32 +2143,32 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
       mv += 1;
   }
 
-  if (IS_NPC(ch) && (MOB_SUBSKILL(ch) == (SUB_DRAIN_BLOOD) || GET_LEVEL(ch) > number(50, 300)))
-    hp +=15;
+  if (IS_NPC(ch) && (MOB_SUBSKILL(ch) == (SUB_DRAIN_BLOOD) || ((GET_CLASS(ch) == CLASS_UNDEAD) && GET_LEVEL(ch) > number(50, 300))))
+    hp +=10;
   if (!IS_NPC(ch))
     hp += GET_SUB(ch, SUB_DRAIN_BLOOD) * 0.05;
 
 
 
 
-  if (GET_MANA(ch) < GET_MAX_MANA(ch) && (ma=((dam*ma)/100)) > 0)
+  if (GET_MANA(ch) < GET_MAX_MANA(ch) && (ma=((dam*ma)/100.0)) > 0.0)
   {
     alter_mana(ch, -ma);
     alter_mana(vict, ma);
   }
 
-  if (GET_MOVE(ch) < GET_MAX_MOVE(ch) &&(mv=((dam*mv)/100)) > 0)
+  if (GET_MOVE(ch) < GET_MAX_MOVE(ch) &&(mv=((dam*mv)/100.0)) > 0.0)
   {
     alter_move(ch, -mv);
     alter_move(vict, mv);
   }
-  if (GET_HIT(ch) < GET_MAX_HIT(ch) &&(hp=((dam*hp)/100)) > 0)
+  if (GET_HIT(ch) < GET_MAX_HIT(ch) &&(hp=((dam*hp)/100.0)) > 0.0)
   {
-    /* TODO: add message for this */
-    act("$n drains your energy.", FALSE, ch, 0, vict, TO_VICT);
-    act("You drain $N's energy.", FALSE, ch, 0, vict, TO_CHAR);
+    /* TODO: add ramdom message's for this */
+    act("$n steals your energy.", FALSE, ch, 0, vict, TO_VICT);
+    act("You steal $N's energy.", FALSE, ch, 0, vict, TO_CHAR);
     damage(vict,ch, -hp, TYPE_UNDEFINED);
-    ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
+    //ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
   }
 
 
@@ -4050,7 +4077,7 @@ Aberrant, Abominable, Absurd, Abysmal, Acidic, Acrocephalic*, Adhesive, Adipose*
  Sulphurous, Syrupy, Teeming, Tentacled, Terrible, Thickening, Thrashing, Throbbing, Toothy*, Transformed, 
  Transparent, Tubular, Tumultuous, Turbid, Turbulent, Ugly, Ultimate, Umber*, Unclean, Uncouth, Undigested, 
  Ungainly, Unhallowed*, Unholy*, Unknown, Unmasked, Unnatural*, Unripe, Unseen, Unspeakable, Unutterable, 
- Vague, Vaporous, Vast, Venous*, Vermillion*, Verminous*, Vestigial*, Vibrating, Vile, Viperous, Viscous, 
+ Vague, Vaporous, Vast, Venous*, Vermillion*, Verminous*,'no Vestigial*, Vibrating, Vile, Viperous, Viscous, 
  Vivid, Voluminous, Vomiting, Voracious*, Vulpine*, Wailing, Wan, Warped, Waxen, Webbed, Wet, Whirling, 
  Whithered, Worm-Eaten, Wormy, Wretched, Writhing, Xanthous*, Xenophobic, Yammering, Yonic*, Zodiacal, Zymotic
  
@@ -4078,7 +4105,7 @@ void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   dam_size[] = {
                  {"miss", "misses", ""},
                  {"scratch", "scratches", ""},
-                 {"blemish", "blemishs", ""},
+                 {"blemish", "blemishes", ""},
                  {"stub", "stubs", ""},
                  {"slap", "slaps", ""},
                  {"bruise", "bruises", ""},
@@ -4622,7 +4649,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer)
   make_corpse(ch, killer);
   // clears out eq
   if (IS_NPC(ch))
-    Crash_rentsave(ch, 0);
+    Crash_crashsave(ch);
   death_room(ch);
 }
 
@@ -5383,6 +5410,9 @@ int can_fight(struct char_data *ch, struct char_data *vict)
     return 0;
   if (PLR_FLAGGED(vict, PLR_DYING) || PLR_FLAGGED(ch, PLR_DYING))
     return 0;
+    if (!IS_NPC(ch) && !ch->desc) {
+    return 0;
+    }
 
 
 

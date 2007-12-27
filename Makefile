@@ -26,7 +26,7 @@ BINDIR = ../bin
 CFLAGS = -O -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
-LIBS =  -lcrypt -lz -lmcheck -lm
+LIBS =  -lcrypt -lz -lmcheck -lm -lc
 #gprof for profiling
 
 OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
@@ -40,7 +40,7 @@ OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	gamble.o graph.o genmob.o genobj.o genolc.o genshp.o genwld.o \
 	genzon.o handler.o house.o improved-edit.o \
 	ignore.o interpreter.o ident.o kalten.o limits.o lockers.o mine.o magic.o mail.o  \
-	mobact.o modify.o molly.o mordecai.o medit.o note.o objsave.o oedit.o \
+	math.o mobact.o modify.o molly.o mordecai.o medit.o note.o objsave.o oedit.o \
 	oasis_copy.o oasis_delete.o oasis_list.o oasis.o proffessions.o qic.o \
 	race.o random.o regen.o remort.o redit.o shop.o sedit.o skills.o spec_assign.o \
 	spec_procs.o spell_parser.o subskills.o spells.o string.o task.o trees.o\
@@ -57,7 +57,7 @@ CXREF_FILES = act.comm.c act.create.c act.informative.c act.item.c \
 	gamble.c graph.c genmob.c genobj.c genolc.c genshp.c genwld.c \
 	genzon.c handler.c house.c  improved-edit.c\
 	ignore.c interpreter.c ident.c kalten.c limits.c lockers.o mine.c magic.c mail.c  \
-	mobact.c modify.c molly.c mordecai.c medit.c note.c objsave.c oedit.c \
+	math.c mobact.c modify.c molly.c mordecai.c medit.c note.c objsave.c oedit.c \
 	oasis_copy.c oasis_delete.c oasis_list.c oasis.c  proffessions.c qic.c \
 	race.c random.c regen.c remort.c redit.c shop.c sedit.c skills.c spec_assign.c \
 	spec_procs.c spell_parser.c subskills.c spells.c string.c task.c trees.c \
@@ -70,7 +70,7 @@ INC = *.h
 default: all
 
 all: .accepted
-	$(MAKE) -j8 $(BINDIR)/circle
+	$(MAKE) $(BINDIR)/circle
 #	$(MAKE) utils      # --  There's nothing in there...
 
 .accepted:

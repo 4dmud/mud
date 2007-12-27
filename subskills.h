@@ -93,7 +93,7 @@ SUB_REPEL_SANC,
 SUB_UNDYING,
 
 TOP_SUB_DEFINE
-} subdata;
+};
 
 enum sub_status_types {
 STATUS_TYPE_TRAINABLE,

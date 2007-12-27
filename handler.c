@@ -653,8 +653,13 @@ void affect_from_char(struct char_data *ch, int type)
   for (hjp = ch->affected; hjp; hjp = next)
   {
     next = hjp->next;
-    if (hjp->type == type)
+    if (hjp->type == type) {
+    if (type == SPELL_IMMFREEZE)
+      {
+      REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_FROZEN);
+      }
       affect_remove(ch, hjp);
+      }
   }
 }
 
@@ -2024,10 +2029,11 @@ void extract_char_final(struct char_data *ch)
     if (HUNTING(hunt->hunter) != ch)
       continue;
 
-    //HUNTING(hunt->hunter) = NULL;
+    //
     forget(hunt->hunter, ch);
     forget(ch, hunt->hunter);
     remove_hunter(hunt->hunter);
+//    HUNTING(hunt->hunter) = NULL;
 
   }
 
