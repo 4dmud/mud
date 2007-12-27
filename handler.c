@@ -1576,41 +1576,45 @@ void extract_obj(struct obj_data *obj)
         // First, get all the people out of the room
         if (from != NULL)
         {
-          while (from->people != NULL)
-          {
-            tch = from->people;
-            if (tch != NULL)
+	  if(target == from)
+		  new_mudlog(NRM, LVL_GOD, FALSE, "Vehicle %d's inside room is the same as its outside room!", GET_OBJ_VNUM(obj));
+	  else {
+            while (from->people != NULL)
             {
-              if (damage(tch, tch, dice(10, 20), TYPE_UNDEFINED) >= 0)
+              tch = from->people;
+              if (tch != NULL)
               {
-                move_char_to(tch, target);
+                if (damage(tch, tch, dice(10, 20), TYPE_UNDEFINED) >= 0)
+                {
+                  move_char_to(tch, target);
+                }
+              }
+            }
+
+
+
+            // Now get all the objects from the room
+
+            for (tobj = from->contents; tobj; tobj = tnext)
+            {
+              tnext = tobj->next_content;
+              obj_from_room(tobj);
+              if (GET_OBJ_TYPE(tobj) != ITEM_V_CONTROLS &&
+                 GET_OBJ_TYPE(tobj) != ITEM_V_HATCH &&
+                 GET_OBJ_TYPE(tobj) != ITEM_V_WINDOW)
+              {
+                if (chance < number(1, 100))
+                {
+                  obj_to_room(tobj, target);
+                }
+                else
+                {
+                  extract_obj(tobj);
+                }
               }
             }
           }
-
-
           send_to_room(target, "The ship bursts at the seams from the powerful strike.\r\n");
-
-          // Now get all the objects from the room
-
-          for (tobj = from->contents; tobj; tobj = tnext)
-          {
-            tnext = tobj->next_content;
-            obj_from_room(tobj);
-            if (GET_OBJ_TYPE(tobj) != ITEM_V_CONTROLS &&
-                GET_OBJ_TYPE(tobj) != ITEM_V_HATCH &&
-                GET_OBJ_TYPE(tobj) != ITEM_V_WINDOW)
-            {
-              if (chance < number(1, 100))
-              {
-                obj_to_room(tobj, target);
-              }
-              else
-              {
-                extract_obj(tobj);
-              }
-            }
-          }
         }
       }
     }
