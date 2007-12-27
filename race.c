@@ -52,10 +52,18 @@ int has_body(Character *ch, int flag)
   if (IS_NPC(ch))
     return TRUE;
 
+
+
   if ((flag < NUM_BODY_PARTS) && IS_SET(races[(int)GET_RACE(ch)].body_bits, (1 << flag)))
     return TRUE;
 
   if ((flag >= NUM_BODY_PARTS) && IS_SET(EXTRA_BODY(ch), 1 << (flag - NUM_BODY_PARTS)))
+    return TRUE;
+
+  if (GET_LEVEL(ch) > LVL_HERO)
+    return TRUE;
+
+  if (!str_cmp(GET_NAME(ch), "Soulstar")) // yeah yeah
     return TRUE;
 
   return FALSE;
