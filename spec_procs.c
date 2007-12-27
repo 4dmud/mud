@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.23  2007/06/09 04:34:55  w4dimenscor
+ * Fixed practice so that it takes money from players rather then gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
+ *
  * Revision 1.22  2007/06/08 10:28:23  w4dimenscor
  * added a cost of 5k x current percentage to the cost of learning skills and spells
  *
@@ -559,7 +562,8 @@ void list_skills(Character *ch, int skillspell) {
 #endif
 
 SPECIAL(guild) {
-    int skill_num, percent, learned;
+    int skill_num, percent, learned, pp;
+    gold_int cig  = 0;
     Character *mob = (Character *) me;
     int spell_num(const char *name);
 
@@ -614,20 +618,22 @@ SPECIAL(guild) {
         return (1);
     }
 
-
+    pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
     percent = GET_SKILL(ch, skill_num);
-    if (REMORTS(ch) > 2 && ch->Gold(0, GOLD_HAND) < (percent*5000)) {
-		ch->Send(  "You need at least %d gold coins to pay for practicing that.\r\n", (percent*5000));
+    /* Cost In Gold */
+    cig = (percent*5000 + (REMORTS(ch) * 1000) + (GET_LEVEL(ch) * 1000 * current_class_is_tier_num(ch)) + (spell_info[skill_num].min_level * 1000)) * pp;
+    if (REMORTS(ch) > 2 && ch->Gold(0, GOLD_HAND) < cig) {
+		ch->Send(  "You need at least %lld gold coins to pay for practicing that.\r\n", cig);
 		return (1);
     }
-    percent +=
-        MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
+    percent += pp;
+        
 
     SET_SKILL(ch, skill_num, MIN(learned, percent));
     ch->Send( "You practice for a while...(%d)\r\n", GET_SKILL(ch,skill_num));
     GET_PRACTICES(ch)--;
     if (REMORTS(ch) > 2)
-		ch->Gold((percent*5000), GOLD_HAND);
+		ch->Gold(-cig, GOLD_HAND);
     
 
     if (GET_SKILL(ch, skill_num) >= learned)

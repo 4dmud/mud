@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.54  2007/06/09 04:34:55  w4dimenscor
+ * Fixed practice so that it takes money from players rather then gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
+ *
  * Revision 1.53  2007/06/07 11:46:10  w4dimenscor
  * Updated the assemble code to give a good message that people can't assemble, which needs to be overridden in triggers, basically it is the same as 'do_not_here'
  *
@@ -1725,6 +1728,10 @@ ACMD(do_drop)
 
   switch (subcmd)
   {
+  case SCMD_DISCARD:
+    sname = "discard";
+    mode = SCMD_JUNK;
+    break;
   case SCMD_JUNK:
     sname = "junk";
     mode = SCMD_JUNK;

@@ -561,6 +561,7 @@ const struct command_info cmd_info[] =
     { "diagnose" , "dia" , POS_RESTING , do_diagnose , 0, 0, 0 },
     { "dig"      , "dig"  , POS_STANDING, do_dig_ground      , 0, 0, 0 },
     { "dismount" , "dism" , POS_STANDING, do_dismount , 0, 0, 0 },
+    { "discard"     , "disc"   , POS_RESTING , do_drop     , 0, SCMD_DISCARD, 0 },
     { "donate"   , "don" , POS_RESTING , do_drop     , 0, SCMD_DONATE, 0 },
     { "drink"    , "dr"  , POS_RESTING , do_drink    , 0, SCMD_DRINK, 0 },
     { "drive"    , "drive", POS_SITTING , do_drive    , 0, 0, 0 },

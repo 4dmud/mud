@@ -249,6 +249,7 @@ struct alias_data
 #define SCMD_JUNK	1
 #define SCMD_DONATE	2
 #define SCMD_SPILL      3
+#define SCMD_DISCARD	4
 
 /* do_gen_write */
 #define SCMD_BUG	0
