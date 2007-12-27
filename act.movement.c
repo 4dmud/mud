@@ -830,9 +830,9 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
 
   move_char_to(ch, was_in->dir_option[dir]->to_room);
-  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
+  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1))){
     look_at_room(ch, 0);
-
+   }
   if (bike)
   {
     struct char_data *tempch;
@@ -862,13 +862,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   }
   if (RIDING(ch) && IN_ROOM(RIDING(ch)) == was_in && IN_ROOM(RIDING(ch)) != IN_ROOM(ch))
   {
-    if (move_char_to(RIDING(ch), IN_ROOM(ch)))
       has_moved = TRUE;
   }
   else if (RIDDEN_BY(ch) && IN_ROOM(RIDDEN_BY(ch)) == was_in
            && IN_ROOM(RIDDEN_BY(ch)) != IN_ROOM(ch))
   {
-    if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)))
+
       has_moved = TRUE;
   }
   else if (!bike)
@@ -895,8 +894,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
-      if (has_moved)
+      if (has_moved){
         act(buf2, TRUE, ch, RIDING(ch)->hitched, RIDING(ch), TO_ROOM);
+      if (move_char_to(RIDING(ch), IN_ROOM(ch)))
+      snprintf(buf2, sizeof(buf2), "You are ridden %s by $N.",dirs[dir]);
+      act(buf2,TRUE,RIDING(ch),RIDING(ch)->hitched,ch,TO_CHAR);
+      look_at_room(RIDING(ch),0);
+
+      }
     }
     else if (ridden_by && same_room
              && !IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK))
@@ -911,8 +916,13 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
-      if (has_moved)
-        act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
+      if (has_moved){
+           act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
+               if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)))
+      snprintf(buf2, sizeof(buf2), "$N rides you %s.",dirs[dir]);
+      act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
+      look_at_room(RIDDEN_BY(ch),0);
+      }
     }
     else if (!riding || (riding && !same_room))
     {
