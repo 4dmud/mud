@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.11  2006/06/07 06:36:57  w4dimenscor
+ * Color code purple is back in now, and i have removed the FTOI macro from the exp_needed function
+ *
  * Revision 1.10  2006/06/07 06:29:31  w4dimenscor
  * Color code purple is back in now, and i have removed the FTOI macro from the exp_needed function
  *
@@ -953,7 +956,8 @@ void do_start(Character * ch)
  */
 void advance_level(Character * ch)
 {
-  int add_hp = 0, add_mana = 0, add_move = 0, i;
+  float add_hp = 0, add_mana = 0, add_move = 0;
+  unsigned i;
   int num_melee_tier(Character *ch);
   int level = GET_LEVEL(ch), casttier = num_casting(ch), fightier = TIERS;
 
@@ -972,7 +976,7 @@ void advance_level(Character * ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    add_hp += number((2 + (GET_CHA(ch) * 0.25)), ((8 * fightier) + (GET_CHA(ch) * 0.35) + 4));
+    add_hp += number(FTOI(2 + (GET_CHA(ch) * 0.25)), FTOI((8 * fightier) + (GET_CHA(ch) * 0.35) + 4));
     add_mana += number(level, ((casttier * level))) + 2;
     add_move += number(1, (2 * fightier));
     break;
@@ -1057,11 +1061,11 @@ void advance_level(Character * ch)
     break;
   }
 
-  GET_MAX_HIT(ch) += MAX(1, add_hp);
-  GET_MAX_MOVE(ch) += MAX(1, add_move);
+  GET_MAX_HIT(ch) += MAX(1, FTOI(add_hp));
+  GET_MAX_MOVE(ch) += MAX(1, FTOI(add_move));
 
   if (GET_LEVEL(ch) > 1)
-    GET_MAX_MANA(ch) += add_mana;
+    GET_MAX_MANA(ch) += FTOI(add_mana);
 
   GET_MAX_STAMINA(ch) += current_class_is_tier_num(ch) + (GET_DEX(ch) > 20);
 
@@ -1073,7 +1077,7 @@ void advance_level(Character * ch)
   if (GET_LEVEL(ch) >= LVL_GOD)
   {
     for (i = 0; i < 3; i++)
-      GET_COND(ch, i) = (char) -1;
+      GET_COND(ch, i) = (char)-1;
     SET_BIT_AR(PRF_FLAGS(ch), PRF_HOLYLIGHT);
   }
   else
@@ -1389,7 +1393,7 @@ gold_int group_exp_needed(Character *ch)
   if (IS_NPC(ch))
     return 0;
   else
-    return ((level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2)) - GET_GROUP_EXP(ch);
+    return (gold_int)((level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2)) - GET_GROUP_EXP(ch);
 }
 
 gold_int exp_needed(Character *ch)
@@ -1422,14 +1426,14 @@ gold_int level_exp(int chclass, int level, int tier, int remorts)
   else
   {
     float div_by = 0.5;
-    amount = (multi*((mod+1)*(mod+1)));
+    amount = (gold_int)(multi*((mod+1)*(mod+1)));
 
-    amount = ((multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5)));
-    amount += (((remorts) * (amount*0.05)));
+    amount = (gold_int)((multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5)));
+    amount += (gold_int)(((remorts) * (amount*0.05)));
     if (remorts == 0)
-      amount = (amount * div_by);
+      amount = (gold_int)(amount * div_by);
     else if (remorts < 5)
-      amount = (amount * (div_by + ((float)remorts * 0.1)));
+      amount = (gold_int)(amount * (div_by + ((float)remorts * 0.1)));
     return amount;
   }
 #undef mod
