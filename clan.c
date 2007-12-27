@@ -821,7 +821,7 @@ void do_clan_who(struct char_data *ch)
       continue;
     if ((tch = d->character)) {
     if (CAN_SEE(ch, tch))
-      if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 && ()
+      if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 )
         new_send_to_char(ch, "%s\r\n", GET_NAME(tch));
 	
 	}
