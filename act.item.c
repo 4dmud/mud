@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.47  2006/12/04 10:24:32  w4dimenscor
+ * FIXED:take pie all would show up all undisplayed containers in the room.
+ *
  * Revision 1.46  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -1211,8 +1214,8 @@ void perform_get(Character *ch, char *num, char *arg2, char *arg3)
     wearall = 1;
     for (cont = ch->carrying; cont; cont = cont->next_content)
     {
-      if (CAN_SEE_OBJ(ch, cont) &&
-          (cont_dotmode == FIND_ALL
+      if (CAN_SEE_OBJ(ch, cont)
+           && (cont_dotmode == FIND_ALL
            || isname(cont_desc, cont->name)))
       {
         if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER)
@@ -1229,8 +1232,11 @@ void perform_get(Character *ch, char *num, char *arg2, char *arg3)
     }
     for (cont = IN_ROOM(ch)->contents; cont; cont = cont->next_content)
     {
-      if (CAN_SEE_OBJ(ch, cont)
-          && (cont_dotmode == FIND_ALL
+      if (((CAN_SEE_OBJ(ch, cont)
+	   && !IS_SET_AR(GET_OBJ_EXTRA(cont), ITEM_HIDDEN)
+	   && !OBJ_FLAGGED(cont, ITEM_NODISPLAY))
+	   || GET_LEVEL(ch)>=LVL_IMMORT)
+           && (cont_dotmode == FIND_ALL
               || isname(cont_desc, cont->name)))
       {
         if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER)
