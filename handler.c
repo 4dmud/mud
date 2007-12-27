@@ -1214,7 +1214,7 @@ int get_number(const char **name)
     strlcpy(number, nname, sizeof(number));
     //strcpy(*name, ppos);    /* strcpy: OK (always smaller) */
     memmove(nname, ppos, (plen = strlen(ppos)));
-    *(((char *)name + (plen))) = '\0';
+    *(((char *)*name + (plen))) = '\0';
 
     for (i = 0; *(number + i); i++)
       if (!isdigit(*(number + i)))
