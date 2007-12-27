@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.31  2006/06/21 09:28:57  w4dimenscor
+ * Added the ability for Mortals of imms to listen to the wizchat. it is a
+ * flag with the name wizmort, so set player wizmort on should do the
+ * trick.
+ *
  * Revision 1.30  2006/06/19 06:25:39  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -1311,7 +1316,6 @@ ACMD(do_gen_tog)
           "You will automaticly agree to group people when they request to follow.\r\n"}
 
 
-
     };
 
 
@@ -1348,7 +1352,12 @@ ACMD(do_gen_tog)
     result = PRF_TOG_CHK(ch, PRF_NOGRATZ);
     break;
   case SCMD_NOWIZ:
-    result = PRF_TOG_CHK(ch, PRF_NOWIZ);
+    if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (GET_LEVEL(ch)>LVL_HERO+1 && (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP))))
+      result = PRF_TOG_CHK(ch, PRF_NOWIZ);
+    else {
+      ch->Send("Huh?!?\r\n");
+      result = -1;
+    }
     break;
   case SCMD_QUEST:
     result = PRF_TOG_CHK(ch, PRF_QUEST);
@@ -1499,12 +1508,12 @@ ACMD(do_gen_tog)
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);
     return;
   }
-
-  if (result)
-    ch->Send( "%s", tog_messages[subcmd][TOG_ON]);
-  else
-    ch->Send( "%s", tog_messages[subcmd][TOG_OFF]);
-
+  if (result!=-1){
+    if (result)
+      ch->Send( "%s", tog_messages[subcmd][TOG_ON]);
+    else
+      ch->Send( "%s", tog_messages[subcmd][TOG_OFF]);
+  }
   return;
 }
 

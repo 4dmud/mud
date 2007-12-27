@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.41  2006/06/21 09:28:58  w4dimenscor
+ * Added the ability for Mortals of imms to listen to the wizchat. it is a
+ * flag with the name wizmort, so set player wizmort on should do the
+ * trick.
+ *
  * Revision 1.40  2006/06/19 06:25:40  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -443,7 +448,7 @@ class cstring;
 #define PLR_HERO        24      /* player is a hero type */
 #define PLR_DYING       25      /* player is in the state of dying */
 #define PLR_RP_LEADER   26      /* player has echo, and award commands */
-
+#define PLR_IMM_MORT	27	/* Player is the mortal of an immortal, and should hear wiznet*/
 
 #define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */

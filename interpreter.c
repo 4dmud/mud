@@ -322,6 +322,7 @@ ACMD(do_wield);
 ACMD(do_wimpy);
 ACMD(do_wizlock);
 ACMD(do_wiznet);
+ACMD(do_wizsplit);
 ACMD(do_wizutil);
 ACMD(do_worth);
 ACMD(do_write);
@@ -703,7 +704,8 @@ const struct command_info cmd_info[] =
     { "nohero"   , "nohe"     , POS_DEAD    , do_gen_tog  , 1, SCMD_NOHERO, 0 },
     { "nonewbie"   , "nonew"  , POS_DEAD    , do_gen_tog  , 1, SCMD_NONEWBIE, 0 },
     { "notitle"  , "noti"     , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_NOTITLE, WIZ_DSPLN_GRP },
-    { "nowiz"    , "now" , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOWIZ, WIZ_IMM1_GRP },
+//    { "nowiz"    , "now" , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOWIZ, WIZ_IMM1_GRP },
+    { "nowiz"    , "now" , POS_DEAD    , do_gen_tog  , 0, SCMD_NOWIZ, 0 },
     { "noteleport"    , "notele" , POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELEPORT, 0},
     { "namechange"    , "namechange"    , POS_DEAD    , do_namechange  , LVL_SEN, 0, WIZ_SEN_GRP },
 
@@ -895,8 +897,11 @@ const struct command_info cmd_info[] =
     { "wield"    , "wie" , POS_RESTING , do_wield    , 0, 0, 0 },
     { "wimpy"    , "wim" , POS_DEAD    , do_wimpy    , 0, 0, 0 },
     { "withdraw" , "with"     , POS_STANDING, do_not_here , 1, 0, 0 },
-    { "wiznet"   , "wiz" , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
-    { ";"        , ";"   , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
+    { "wiz"	 , "wiz"	, POS_DEAD, do_wizsplit, 0, 0, 0 },
+//    { "wiznet"   , "wiz" , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
+//    { ";"        , ";"   , POS_DEAD    , do_wiznet   , LVL_HERO+1, 0, WIZ_IMM1_GRP },
+    { "wiznet"   , "wiz" , POS_DEAD    , do_wiznet   , 0, 0, 0 },
+    { ";"        , ";"   , POS_DEAD    , do_wiznet   , 0, 0, 0 },
     { "wizhelp"  , "wizh"     , POS_SLEEPING, do_commands , LVL_IMMORT, SCMD_WIZHELP, WIZ_IMM1_GRP },
     { "wizlist"  , "wizl"     , POS_DEAD    , do_gen_ps   , 0, SCMD_WIZLIST, 0 },
     { "wizlock"  , "wizlo", POS_DEAD    , do_wizlock  , LVL_IMMORT, 0, WIZ_SEN_GRP },

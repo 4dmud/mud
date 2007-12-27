@@ -10,6 +10,11 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.55  2006/06/21 09:28:58  w4dimenscor
+ * Added the ability for Mortals of imms to listen to the wizchat. it is a
+ * flag with the name wizmort, so set player wizmort on should do the
+ * trick.
+ *
  * Revision 1.54  2006/06/19 06:25:39  w4dimenscor
  * Changed the player saved mount feature so that all players can load mounts from houses
  *
@@ -307,6 +312,8 @@ int check_potion_price(struct obj_data *obj);
 void write_ignorelist(Character *ch);
 void Crash_rentsave(Character *ch, int cost);
 
+ACMD(do_gen_ps);
+
 /* local functions */
 int spell_price(struct obj_data *obj, int val);
 void show_door_errors(Character *ch);
@@ -371,6 +378,7 @@ ACMD(do_deleteplayer);
 ACMD(do_search_triggers);
 ACMD(do_ctellsnoop);
 ACMD(do_addtp);
+ACMD(do_wizsplit);
 
 struct player_gold_info
 {
@@ -3648,143 +3656,145 @@ ACMD(do_wiznet)
   skip_spaces(&argument);
   delete_doubledollar(argument);
 
-  if (!*argument)
-  {
-    ch->Send( "       Usage: wiznet <text> | #<level> <text> | *<emotetext> |\r\n"
-                     "       wiznet @<level> *<emotetext> | wiz @  (for wiz who list) | wiz %% (for arena info)\r\n"
-                     "       use as backslash as an escape char.\r\n");
+  if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (GET_LEVEL(ch)>LVL_HERO+1 && (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP)))){
+    if (!*argument)
+    {
+      ch->Send( "       Usage: wiznet <text> | #<level> <text> | *<emotetext> |\r\n"
+                       "       wiznet @<level> *<emotetext> | wiz @  (for wiz who list) | wiz %% (for arena info)\r\n"
+                       "       use as backslash as an escape char.\r\n");
 
-    return;
-  }
-  switch (*argument)
-  {
-  case '*':
-    emote = TRUE;
-  case '#':
-    one_argument(argument + 1, buf1);
-    if (is_number(buf1))
-    {
-      half_chop(argument + 1, buf1, argument);
-      level = MAX(atoi(buf1), LVL_GOD);
-      if (level > (GET_ORIG_LEV(ch) ? GET_ORIG_LEV(ch) :GET_LEVEL(ch)))
-      {
-        ch->Send("You can't wiznet above your own level.\r\n");
-        return;
-      }
+      return;
     }
-    else if (emote)
-      argument++;
-    break;
-  case '@':
-    for (d = descriptor_list; d; d = d->next)
+    switch (*argument)
     {
-      if (STATE(d) == CON_PLAYING
-          && GET_LEVEL(d->character) >= LVL_GOD
-          && !PRF_FLAGGED(d->character, PRF_NOWIZ)
-          && (CAN_SEE(ch, d->character)
-              || GET_LEVEL(ch) == LVL_IMPL))
+    case '*':
+      emote = TRUE;
+    case '#':
+      one_argument(argument + 1, buf1);
+      if (is_number(buf1))
       {
-        if (!any)
+        half_chop(argument + 1, buf1, argument);
+        level = MAX(atoi(buf1), LVL_GOD);
+        if (level > (GET_ORIG_LEV(ch) ? GET_ORIG_LEV(ch) :GET_LEVEL(ch)))
         {
-          ch->Send( "Gods online:\r\n");
-          any = TRUE;
+          ch->Send("You can't wiznet above your own level.\r\n");
+          return;
         }
-        ch->Send( "  %s",GET_NAME(d->character));
-        if (PLR_FLAGGED(d->character, PLR_WRITING))
-          ch->Send( " (Writing)\r\n");
-        else if (PLR_FLAGGED(d->character, PLR_MAILING))
-          ch->Send( " (Writing mail)\r\n");
-        else
-          ch->Send( "\r\n");
-
       }
-    }
-    any = FALSE;
-    for (d = descriptor_list; d; d = d->next)
-    {
-      if (STATE(d) == CON_PLAYING
+      else if (emote)
+        argument++;
+      break;
+    case '@':
+      for (d = descriptor_list; d; d = d->next)
+      {
+        if (STATE(d) == CON_PLAYING
+            && GET_LEVEL(d->character) >= LVL_GOD
+            && !PRF_FLAGGED(d->character, PRF_NOWIZ)
+            && (CAN_SEE(ch, d->character)
+                || GET_LEVEL(ch) == LVL_IMPL))
+        {
+          if (!any)
+          {
+            ch->Send( "Gods online:\r\n");
+            any = TRUE;
+          }
+          ch->Send( "  %s",GET_NAME(d->character));
+          if (PLR_FLAGGED(d->character, PLR_WRITING))
+            ch->Send( " (Writing)\r\n");
+          else if (PLR_FLAGGED(d->character, PLR_MAILING))
+            ch->Send( " (Writing mail)\r\n");
+          else
+            ch->Send( "\r\n");  
+        }
+      }
+      any = FALSE;
+      for (d = descriptor_list; d; d = d->next)
+      {
+        if (STATE(d) == CON_PLAYING
           && GET_LEVEL(d->character) >= LVL_GOD
           && PRF_FLAGGED(d->character, PRF_NOWIZ)
           && CAN_SEE(ch, d->character))
-      {
-        if (!any)
         {
-          ch->Send( "Gods offline:\r\n");
-          any = TRUE;
+          if (!any)
+          {
+            ch->Send( "Gods offline:\r\n");
+            any = TRUE;
+          }
+          ch->Send( "  %s\r\n",GET_NAME(d->character));
         }
-        ch->Send( "  %s\r\n",GET_NAME(d->character));
+      }
+      return;
+    case '\\':
+      ++argument;
+      break;
+    case '%':              /* arena */
+      if (in_arena == ARENA_OFF)
+      {
+        ch->Send( "The Arena is closed right now.\r\n");
+      }
+      else if (in_arena == ARENA_START)
+      {
+        ch->Send( "Arena will start in %d hour(s)\r\n",   time_to_start);
+        ch->Send( "It will last for %d hour(s)\r\n",  game_length);
+      }
+      else if (in_arena == ARENA_RUNNING)
+      {
+        ch->Send( "Arena will end in %d hour(s)\r\n", time_left_in_game);
+      }
+      return;
+    default:
+      break;
+    }
+    if (PRF_FLAGGED(ch, PRF_NOWIZ))
+    {
+      ch->Send("You are offline!\r\n");
+      return;
+    }
+    skip_spaces(&argument);
+  
+    if (!*argument)
+    {
+      ch->Send("Don't bother the gods like that!\r\n");
+      return;
+    }
+    if (level > LVL_GOD)
+    {
+      snprintf(buf1, sizeof(buf1), "%s: <%d> %s%s\r\n", GET_NAME(ch), level,
+               emote ? "<--- " : "", argument);
+      snprintf(buf2, sizeof(buf2), "Someone: <%d> %s%s\r\n", level,
+               emote ? "<--- " : "", argument);
+    }
+    else
+    {
+      snprintf(buf1, sizeof(buf1), "%s: %s%s\r\n", GET_NAME(ch), emote ? "<--- " : "",
+               argument);
+      snprintf(buf2, sizeof(buf2), "Someone: %s%s\r\n", emote ? "<--- " : "", argument);
+    }
+  
+    for (d = descriptor_list; d; d = d->next)
+    {
+    if ((STATE(d) == CON_PLAYING) && (((GET_ORIG_LEV(d->character) ? GET_ORIG_LEV(d->character) : GET_LEVEL(d->character)) >= level) || PLR_FLAGGED(d->character, PLR_IMM_MORT))
+          && (!PRF_FLAGGED(d->character, PRF_NOWIZ))
+          && (!PLR_FLAGGED(d->character, PLR_MAILING)
+              || !PLR_FLAGGED(d->character, PLR_WRITING))
+          && (d != ch->desc
+              || !(PRF_FLAGGED(d->character, PRF_NOREPEAT))))
+      {
+        new_send_to_char(d->character, "%s", CCCYN(d->character, C_NRM));
+        if (CAN_SEE(d->character, ch))
+          new_send_to_char(d->character, "%s", buf1);
+        else
+          new_send_to_char(d->character, "%s", buf2);
+        new_send_to_char(d->character, "%s", CCNRM(d->character, C_NRM));
       }
     }
-    return;
-  case '\\':
-    ++argument;
-    break;
-  case '%':              /* arena */
-    if (in_arena == ARENA_OFF)
-    {
-      ch->Send( "The Arena is closed right now.\r\n");
-    }
-    else if (in_arena == ARENA_START)
-    {
-      ch->Send( "Arena will start in %d hour(s)\r\n",   time_to_start);
-      ch->Send( "It will last for %d hour(s)\r\n",  game_length);
-    }
-    else if (in_arena == ARENA_RUNNING)
-    {
-      ch->Send( "Arena will end in %d hour(s)\r\n", time_left_in_game);
-    }
-    return;
-  default:
-    break;
-  }
-  if (PRF_FLAGGED(ch, PRF_NOWIZ))
-  {
-    ch->Send("You are offline!\r\n");
-    return;
-  }
-  skip_spaces(&argument);
 
-  if (!*argument)
-  {
-    ch->Send("Don't bother the gods like that!\r\n");
-    return;
+    if (PRF_FLAGGED(ch, PRF_NOREPEAT))
+      ch->Send( "%s", CONFIG_OK);
   }
-  if (level > LVL_GOD)
-  {
-    snprintf(buf1, sizeof(buf1), "%s: <%d> %s%s\r\n", GET_NAME(ch), level,
-             emote ? "<--- " : "", argument);
-    snprintf(buf2, sizeof(buf2), "Someone: <%d> %s%s\r\n", level,
-             emote ? "<--- " : "", argument);
-  }
-  else
-  {
-    snprintf(buf1, sizeof(buf1), "%s: %s%s\r\n", GET_NAME(ch), emote ? "<--- " : "",
-             argument);
-    snprintf(buf2, sizeof(buf2), "Someone: %s%s\r\n", emote ? "<--- " : "", argument);
-  }
-
-  for (d = descriptor_list; d; d = d->next)
-  {
-    if ((STATE(d) == CON_PLAYING) && ((GET_ORIG_LEV(d->character) ? GET_ORIG_LEV(d->character) : GET_LEVEL(d->character)) >= level)
-        && (!PRF_FLAGGED(d->character, PRF_NOWIZ))
-        && (!PLR_FLAGGED(d->character, PLR_MAILING)
-            || !PLR_FLAGGED(d->character, PLR_WRITING))
-        && (d != ch->desc
-            || !(PRF_FLAGGED(d->character, PRF_NOREPEAT))))
-    {
-      new_send_to_char(d->character, "%s", CCCYN(d->character, C_NRM));
-      if (CAN_SEE(d->character, ch))
-        new_send_to_char(d->character, "%s", buf1);
-      else
-        new_send_to_char(d->character, "%s", buf2);
-      new_send_to_char(d->character, "%s", CCNRM(d->character, C_NRM));
-    }
-  }
-
-  if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-    ch->Send( "%s", CONFIG_OK);
-}
-
+  else 
+    ch->Send("Huh?!?\r\n");
+}  
 
 
 ACMD(do_zreset)
@@ -4809,6 +4819,7 @@ set_fields[] = {
                  {"rpl", LVL_GOD, PC, BINARY},
                  {"tradepoints",LVL_GOD,PC,NUMBER},
                  {"pet", LVL_SEN, PC, NUMBER},
+                 {"wizmort", LVL_SEN, PC, BINARY},
                  {   "\n", 0, BOTH, MISC}
                };
 
@@ -5462,6 +5473,9 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     snprintf(buf, sizeof(buf), "Pet of %s set to: %s",GET_NAME(vict), val_arg);
    vict->pet = atoi(val_arg);
+    break;
+    case 81:
+      SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_IMM_MORT);
     break;
   default:
     ch->Send( "Can't set that!\r\n");
@@ -7273,4 +7287,11 @@ ACMD(do_addtp)
   new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "%s gives %s %d tradepoints.",  GET_NAME(ch), GET_NAME(vict), amount);
   ch->Send("Amount of tradepoints is now %d (was: %d).\r\n",TRADEPOINTS(vict),orig_tp);
   
+}
+
+ACMD(do_wizsplit){
+  if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (GET_LEVEL(ch)>LVL_HERO+1 && (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP))))
+    do_wiznet(ch, argument, cmd, subcmd);
+  else
+    do_gen_ps(ch, argument, cmd, SCMD_WIZLIST);
 }
