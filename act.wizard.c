@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.10  2005/02/16 13:06:13  w4dimenscor
+ * fixed update_award and update_reward to give immortals initial 30 points
+ * to hand out. otherwise immortals can't award points without at least being
+ * once a hero and giving award points to initialize the special player fields.
+ *
  * Revision 1.9  2005/02/09 09:23:43  w4dimenscor
  * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
  *
@@ -6027,6 +6032,12 @@ int update_award(struct char_data *ch)
     GET_REWARD(ch) = 15;
     GET_AWARD(ch)  = 15;
   }
+  if (GET_LEVEL(ch) > LVL_IMMORT)
+  {
+    SPECIALS(ch)->last_reward = (find_month());
+    GET_REWARD(ch) = 30;
+    GET_AWARD(ch)  = 30;
+  }
   return GET_AWARD(ch);
 }
 
@@ -6037,6 +6048,12 @@ int update_reward(struct char_data *ch)
     SPECIALS(ch)->last_reward = (find_month());
     GET_REWARD(ch) = 15;
     GET_AWARD(ch)  = 15;
+  }
+  if (GET_LEVEL(ch) > LVL_IMMORT)
+  {
+    SPECIALS(ch)->last_reward = (find_month());
+    GET_REWARD(ch) = 30;
+    GET_AWARD(ch)  = 30;
   }
   return GET_REWARD(ch);
 }
