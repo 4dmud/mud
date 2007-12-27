@@ -248,7 +248,8 @@ void medit_setup_new(Descriptor *d) {
 #endif
 
     SCRIPT(mob) = NULL;
-    mob->proto_script = OLC_SCRIPT(d) = NULL;
+    mob->proto_script = NULL;
+    OLC_SCRIPT(d) = NULL;
 
     OLC_MOB(d) = mob;
     /* Has changed flag. (It hasn't so far, we just made it.) */
@@ -357,11 +358,12 @@ void medit_save_internally(Descriptor *d) {
 
     /* Update triggers */
     /* Free old proto list  */
-    if (pmob->proto_script &&
-            pmob->proto_script != OLC_SCRIPT(d))
-        free_proto_script(pmob, MOB_TRIGGER);
-
+   if (pmob->proto_script &&
+           pmob->proto_script != OLC_SCRIPT(d))
+       delete pmob->proto_script;
     pmob->proto_script = OLC_SCRIPT(d);
+    OLC_SCRIPT(d) = NULL;
+    
 
     /* this takes care of the mobs currently in-game */
     for (mob = character_list; mob; mob = mob->next) {

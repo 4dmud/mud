@@ -137,11 +137,13 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
             script_log("dg_cast: Cannot load the caster mob!");
             return;
         }
+        caster->free_non_proto_strings();
         /* set the caster's name to that of the object, or the gods.... */
-        if (type==OBJ_TRIGGER)
+        if (type==OBJ_TRIGGER) {
             caster->player.short_descr = strdup(((struct obj_data *)go)->short_description);
-        else if (type==WLD_TRIGGER)
+        } else if (type==WLD_TRIGGER) {
             caster->player.short_descr = strdup("The gods");
+            }
         char_to_room(caster, caster_room);
         /*
         caster->next_in_room = caster_room->people;
@@ -149,6 +151,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
         caster->in_room = real_room(caster_room->number);
         */
         call_magic(caster, tch, tobj,"", spellnum, DG_SPELL_LEVEL, CAST_SPELL);
+        caster->free_non_proto_strings();
         extract_char(caster);
     } else
         call_magic(caster, tch, tobj,"", spellnum, GET_LEVEL(caster), CAST_SPELL);

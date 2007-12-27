@@ -10,7 +10,6 @@
 //void script_copy(void *dst, void *src, int type);
 void script_save_to_disk(FILE * fp, void *item, int type);
 void dg_olc_script_free(Descriptor *d);
-void dg_olc_script_copy(Descriptor *d);
 void dg_script_menu(Descriptor *d);
 int dg_script_edit_parse(Descriptor *d, char *arg);
 

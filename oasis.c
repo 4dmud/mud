@@ -284,6 +284,10 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
   }
 
 
+if (OLC_SCRIPT(d)) {
+delete OLC_SCRIPT(d);
+OLC_SCRIPT(d) = NULL;
+}
 
   /*. Check for aedit stuff -- M. Scott */
   if (OLC_ACTION(d))

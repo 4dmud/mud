@@ -274,6 +274,7 @@ void Character::freeself() {
             GET_ALIASES(this) = (GET_ALIASES(this))->next;
             free_alias(a);
         }
+        free_non_proto_strings();
         free_string(&BPROMPT(this));
         free_string(&PROMPT(this));
         free_string(&player_specials->poofin);
@@ -308,10 +309,10 @@ void Character::freeself() {
         free_char_strings();
     } else if (!proto) {
         /* otherwise, free strings only if the string is not pointing at proto */
-        free_non_proto_strings();
+
         /* free script proto list if it's not the prototype */
         if (proto_script && proto_script != GetMobProto(vnum)->proto_script)
-            free_proto_script(this, MOB_TRIGGER);
+           free_proto_script(this, MOB_TRIGGER);
 
         if (mob_specials.join_list && mob_specials.join_list != GetMobProto(vnum)->mob_specials.join_list)
             free_join_list(mob_specials.join_list);
@@ -529,7 +530,6 @@ void Character::init() {
     GET_GROUP_EXP(this) = 0;
     GET_LOGOUTMSG(this) = NULL;
     GET_LOGINMSG(this) = NULL;
-    pet = -1;
 
 
     //TODO: check this
@@ -577,7 +577,7 @@ void Character::default_char() {
     proto = TRUE;
     master 			= NULL;
     desc 				= NULL;
-    proto_script 		= NULL;
+//    proto_script 		= NULL;
     next 				= NULL;
     script 			= NULL;
     affected 			= NULL;

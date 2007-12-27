@@ -280,8 +280,8 @@ int free_mobile(Character *mob) {
         
     } else {	/* Prototyped mobile. */
         /* free script proto list if it's not the prototype */
-        if (mob->proto_script && mob->proto_script != GetMobProto(mob->vnum)->proto_script)
-            free_proto_script(mob, MOB_TRIGGER);
+//        if (mob->proto_script && mob->proto_script != GetMobProto(mob->vnum)->proto_script)
+//            free_proto_script(mob, MOB_TRIGGER);
 	mob->remove_all_affects();
 	mob->free_non_proto_strings();
 	

@@ -162,7 +162,7 @@ struct oasis_olc_data {
   int script_mode;
   int trigger_position;          
   int item_type;                 
-  struct trig_proto_list *script; /* for assigning triggers in [r|o|m]edit*/
+  vector<int> *script; /* for assigning triggers in [r|o|m]edit*/
 
   struct assembly_data *OlcAssembly; /* used for 'assedit'         */
 };

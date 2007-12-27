@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.57  2006/09/06 12:02:41  w4dimenscor
+ * Have stopped the crashing and erroring in OLC in my port, however, i am still finding memory leaks.
+ *
  * Revision 1.56  2006/08/31 10:39:17  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -1450,7 +1453,7 @@ struct obj_data {
     struct obj_data *contains;     /* Contains objects                 */
 
     long id;             /* used by DG triggers              */
-    struct trig_proto_list *proto_script;    /* list of default triggers  */
+    vector<int> *proto_script;    /* list of default triggers  */
     struct script_data *script;    /* script info for the object       */
 
     struct obj_data *next_content; /* For 'contains' lists             */
@@ -1576,7 +1579,7 @@ public:
     byte light;               /* Number of lightsources in room       */
     SPECIAL(*func);
 
-    struct trig_proto_list *proto_script;    /* list of default triggers    */
+    vector<int> *proto_script;    /* list of default triggers    */
     struct script_data *script;    /* script info for the object           */
 
     struct obj_data *contents;     /* List of items in room                */
@@ -2487,6 +2490,8 @@ struct index_data {
     }
 };
 
+typedef vector<int> tpl_vec;
+#if 0
 /* linked list for mob/object prototype trigger lists */
 struct trig_proto_list {
     int vnum;            /* vnum of the trigger   */
@@ -2503,7 +2508,7 @@ struct trig_proto_list {
     ~trig_proto_list() {}
 }
 ;
-
+#endif
 /* used in the socials */
 struct social_messg {
     int act_nr;

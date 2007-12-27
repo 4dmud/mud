@@ -2948,6 +2948,7 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon) {
     j = 0;
 
     obj_proto[i].ex_description = NULL;
+    obj_proto[i].proto_script = NULL;
 
     for (;;) {
         if (!get_line(obj_f, line)) {
@@ -5284,6 +5285,7 @@ void char_to_store(Character *ch) {
         fprintf(fl, "Prtn: %ld\n", PARTNER(ch));
     }
     fprintf(fl, "Preg: %d\n", PREG(ch));
+    if (ch->pet != NOBODY)
     fprintf(fl, "PetM: %d\n", ch->pet);
     if (PRETITLE(ch))
         fprintf(fl, "PreT: %s\n", PRETITLE(ch));
@@ -5859,6 +5861,7 @@ void clear_object(struct obj_data *obj) {
     obj->obj_flags.obj_innate = 0;
     obj->skin = NOTHING;
     obj->hitched = NULL;
+    obj->proto_script = NULL;
 }
 
 /* returns the real number of the room with given virtual number */

@@ -70,6 +70,7 @@ Room::~Room() {
         if (SCRIPT(this))
             extract_script(this, WLD_TRIGGER);
         /* free script proto list */
+        if (proto_script)
         free_proto_script(this, WLD_TRIGGER);
 }
 

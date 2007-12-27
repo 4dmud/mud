@@ -41,7 +41,7 @@ public:
     Descriptor *desc;  /* NULL for mobiles              */
 
     long id;             /* used by DG triggers             */
-    struct trig_proto_list *proto_script;    /* list of default triggers      */
+    vector<int> *proto_script;    /* list of default triggers      */
     struct script_data *script;    /* script info for the object      */
     struct script_memory *memory;  /* for mob memory triggers         */
 
