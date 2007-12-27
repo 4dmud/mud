@@ -32,7 +32,6 @@ void assemblyBootAssemblies( void ) {
     int          iExtract = 0;
     int          iInRoom = 0;
     int          iType = 0;
-    int          iTrig = 0;
     long         lLineCount = 0;
     long         lPartVnum = NOTHING;
     long         lVnum = NOTHING;
