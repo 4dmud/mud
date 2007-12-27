@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/12 02:16:15 $
-*  $Revision: 1.1 $
+*  $Date: 2005/08/19 08:51:14 $
+*  $Revision: 1.2 $
 **************************************************************************/
 
 #include "conf.h"
@@ -543,8 +543,6 @@ void fight_mtrigger(char_data * ch)
     if (TRIGGER_CHECK(t, MTRIG_FIGHT) &&
         (number(1, 100) <= GET_TRIG_NARG(t)))
     {
-
-
       actor = FIGHTING(ch);
       if (actor)
         ADD_UID_VAR(buf, t, actor, "actor", 0);

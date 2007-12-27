@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.9  2005/08/19 08:51:14  w4dimenscor
+ * fixed the variables not working
+ *
  * Revision 1.8  2005/06/18 12:20:53  w4dimenscor
  * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
  *
@@ -817,6 +820,11 @@ ACMD(do_mload)
     {
       if (CAN_WEAR(object, ITEM_WEAR_TAKE))
       {
+if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s loads %s in %d",  GET_NAME(ch), object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
         obj_to_char(object, ch);
       }
       else
@@ -839,6 +847,11 @@ ACMD(do_mload)
         load_otrigger(object);
         return;
       }
+if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description,GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
       obj_to_char(object, tch);
       load_otrigger(object);
       return;
@@ -846,11 +859,21 @@ ACMD(do_mload)
     cnt = (arg1 && *arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
     if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER)
     {
+if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description, cnt->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
       obj_to_obj(object, cnt);
       load_otrigger(object);
       return;
     }
     /* neither char nor container found - just dump it in room */
+if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s loads %s to room %d",  GET_NAME(ch), object->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
     obj_to_room(object, IN_ROOM(ch));
     load_otrigger(object);
     return;
@@ -899,6 +922,11 @@ ACMD(do_mpurge)
 
     for (obj = IN_ROOM(ch)->contents; obj; obj = obj_next)
     {
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s purges %s in room %d",  GET_NAME(ch), obj->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
       obj_next = obj->next_content;
       extract_obj(obj);
     }
@@ -919,6 +947,11 @@ ACMD(do_mpurge)
 
     if (obj)
     {
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      mob_log(ch, "[TOKEN] %s purges %s",  GET_NAME(ch), obj->short_description);
+  }
       extract_obj(obj);
       obj = NULL;
     }

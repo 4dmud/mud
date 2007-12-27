@@ -596,7 +596,7 @@ gold_int sell_price(struct obj_data *obj, int shop_nr, struct char_data *keeper,
 
 void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
 {
-  char tempstr[MAX_INPUT_LENGTH], tempbuf[MAX_INPUT_LENGTH];
+  char tempstr[MAX_INPUT_LENGTH] = "", tempbuf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
   int mcnt = 0;
@@ -648,7 +648,7 @@ return;
       return;
     }
   }
-if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE || ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
+if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE && (!(CAN_WEAR(obj, ITEM_WEAR_TAKE))))
   if (!can_take_obj(ch, obj))
   return;
   
@@ -690,10 +690,12 @@ buynum = inum;
       obj_from_char(obj);
       SHOP_SORT(shop_nr)--;
     }
-if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE || ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
+if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE && ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
     obj_to_char(obj, ch);
  else
     obj_to_room(obj, IN_ROOM(ch));
+
+strlcpy(tempstr, obj->short_description, sizeof(tempstr));
 
     charged = buy_price(obj, shop_nr, keeper, ch);
     goldamt += charged;
@@ -725,15 +727,15 @@ if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE || ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
   if (!IS_GOD(ch))
     GET_GOLD(keeper) += goldamt;
 
-  strlcpy(tempstr, times_message(ch->carrying, 0, bought), sizeof(tempstr));
+  //strlcpy(tempstr, times_message(ch->carrying, 0, bought), sizeof(tempstr));
 
-  snprintf(tempbuf, sizeof(tempbuf), "$n buys %s.", tempstr);
+  snprintf(tempbuf, sizeof(tempbuf), "$n buys %s.",  times_message(0, tempstr, bought));
   act(tempbuf, FALSE, ch, obj, 0, TO_ROOM);
 
   snprintf(tempbuf, sizeof(tempbuf), shop_index[shop_nr].message_buy, GET_NAME(ch), goldamt);
   do_tell(keeper, tempbuf, cmd_tell, 0);
 
-  new_send_to_char(ch, "You now have %s.\r\n", tempstr);
+  new_send_to_char(ch, "You now have %s.\r\n", times_message(0, tempstr, bought));
 
   if (SHOP_USES_BANK(shop_nr))
     if (GET_GOLD(keeper) > MAX_OUTSIDE_BANK)

@@ -977,9 +977,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
     if (!IS_NPC(ch))
       SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
       
-      if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s to character %s", object->short_description, GET_NAME(ch));
-
+     
     if (GET_OBJ_RNUM(object) != NOTHING && obj_index[GET_OBJ_RNUM(object)].qic)
     {
       if (!IS_NPC(ch) && object->owner == 0 && GET_LEVEL(ch) < LVL_HERO)

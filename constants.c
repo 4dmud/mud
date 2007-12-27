@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.10  2005/08/19 08:51:14  w4dimenscor
+ * fixed the variables not working
+ *
  * Revision 1.9  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -2125,6 +2128,8 @@ const char *trig_types[] =
     "Leave",
     "Door",
     "UNUSED",
+    "FUNCTION",
+    "UNUSED",
     "\n"
   };
 
@@ -2150,6 +2155,8 @@ const char *otrig_types[] =
     "Cast",
     "Leave",
     "Consume",
+    "FUNCTION",
+    "UNUSED",
     "\n"
   };
 
@@ -2176,6 +2183,8 @@ const char *wtrig_types[] =
     "Cast",
     "Leave",
     "Door",
+    "UNUSED",
+    "FUNCTION",
     "UNUSED",
     "\n"
   };

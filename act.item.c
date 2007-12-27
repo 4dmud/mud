@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.19  2005/08/19 08:51:14  w4dimenscor
+ * fixed the variables not working
+ *
  * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
  * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
  *
@@ -322,6 +325,15 @@ bool perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *co
   {
     act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
     return FALSE;
+  }
+  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (cont->carried_by)
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s put %s into %s (inventory)",  GET_NAME(ch), obj->short_description, cont->short_description);
+    else if (IN_ROOM(cont))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s put %s into %s room %d",  GET_NAME(ch), obj->short_description,cont->short_description, GET_ROOM_VNUM(IN_ROOM(cont)));
+    else
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s put %s into %s",  GET_NAME(ch), obj->short_description, cont->short_description);
   }
 
   obj_from_char(obj);
@@ -819,7 +831,15 @@ bool perform_get_from_container(struct char_data *ch, struct obj_data *obj,
   {
     return FALSE;
   }
-
+  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (cont->carried_by)
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from %s (inventory)",  GET_NAME(ch), obj->short_description, cont->short_description);
+    else if (IN_ROOM(cont))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from %s in room %d",  GET_NAME(ch), obj->short_description,cont->short_description, GET_ROOM_VNUM(IN_ROOM(cont)));
+    else
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from %s",  GET_NAME(ch), obj->short_description, cont->short_description);
+  }
   obj_from_obj(obj);
   obj_to_char(obj, ch);
   if (!wearall || (PRF_FLAGGED(ch, PRF_BATTLESPAM)))
@@ -1043,6 +1063,13 @@ bool perform_get_from_room(struct char_data *ch, struct obj_data *obj)
 {
   if (can_take_obj(ch, obj) && get_otrigger(obj, ch) > 0)
   {
+  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(obj))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(obj)));
+    else
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s",  GET_NAME(ch), obj->short_description);
+  }
     obj_from_room(obj);
     obj_to_char(obj, ch);
     if (!wearall || (PRF_FLAGGED(ch, PRF_BATTLESPAM)))
@@ -1372,9 +1399,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                        	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                        	    return (0);
-                                                                                        	}*/
+                                                                                            	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                            	    return (0);
+                                                                                            	}*/
   }
 
 
@@ -1405,6 +1432,12 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
   switch (mode)
   {
   case SCMD_DROP:
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s drops %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+    
+  }
     obj_to_room(obj, IN_ROOM(ch));
     if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
@@ -1415,10 +1448,20 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
     }
     return (0);
   case SCMD_DONATE:
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s donates %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
     obj_to_room(obj, RDR);
     act("$p suddenly appears in a puff a smoke!", FALSE, 0, obj, 0, TO_ROOM);
     return (0);
   case SCMD_JUNK:
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s junks %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
     value = MAX(1, MIN(200, GET_OBJ_COST(obj) / 16));
     extract_obj(obj);
     char_gold(ch, value, GOLD_BANK);
@@ -1632,6 +1675,11 @@ void perform_give(struct char_data *ch, struct char_data *vict,
 
   obj_from_char(obj);
   obj_to_char(obj, vict);
+if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  {
+    if (IN_ROOM(ch))
+      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gives %s to %s in %d",  GET_NAME(ch), obj->short_description, GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(ch)));
+  }
   if (!slipping)
   {
     act("You give $p to $N.", FALSE, ch, obj, vict, TO_CHAR);

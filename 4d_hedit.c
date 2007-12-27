@@ -195,7 +195,7 @@ void hedit_save_to_disk(struct descriptor_data *d)
             help->keywords && *help->keywords ? help->keywords : "UNDEFINED",
             help->entry && *help->entry ? help->entry : "Empty",
             help->min_level);
-    log("%d - %s", i, help->keywords);
+    //log("%d - %s", i, help->keywords);
   }
   /*
    * Write final line and close.

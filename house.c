@@ -922,7 +922,7 @@ ACMD(do_house)
     send_to_char("You must be in your house to set guests.\r\n", ch);
   else if ((i = find_house(GET_ROOM_VNUM(IN_ROOM(ch)))) == NOWHERE)
     send_to_char("Um.. this house seems to be screwed up.\r\n", ch);
-  else if (GET_IDNUM(ch) != house_control[i].owner)
+  else if (GET_IDNUM(ch) != house_control[i].owner && GET_LEVEL(ch) < LVL_IMPL)
     send_to_char("Only the primary owner can set guests.\r\n", ch);
   else if (!*arg)
     House_list_guests(ch, i, FALSE);

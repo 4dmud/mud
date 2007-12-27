@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/08/14 02:27:13 $                                           * 
-*  $Revision: 1.15 $                                                    *
+*  $Date: 2005/08/19 08:51:14 $                                           * 
+*  $Revision: 1.16 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -290,6 +290,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       snprintf(str, slen, "%s", vd->value);
     else
     {
+
       if (!strcasecmp(var, "self"))
       {
         switch (type)
@@ -341,10 +342,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
     }
 
     return;
-  }
-
-  else
-  {
+  }  else {
     if (vd)
     {
       name = vd->value;
@@ -387,27 +385,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
     else
     {
-      if (!strcasecmp(var, "self"))
-      {
-        switch (type)
+
+        if (!strcasecmp(var, "self"))
         {
-        case MOB_TRIGGER:
-          c = (char_data *) go;
-          r = NULL;
-          o = NULL;	/* NULL assignments added to avoid self to always be    */
-          break;	/* the room.  - Welcor        */
-        case OBJ_TRIGGER:
-          o = (obj_data *) go;
-          c = NULL;
-          r = NULL;
-          break;
-        case WLD_TRIGGER:
-          r = (struct room_data *) go;
-          c = NULL;
-          o = NULL;
-          break;
+          switch (type)
+          {
+          case MOB_TRIGGER:
+            c = (char_data *) go;
+            r = NULL;
+            o = NULL;	/* NULL assignments added to avoid self to always be    */
+            break;	/* the room.  - Welcor        */
+          case OBJ_TRIGGER:
+            o = (obj_data *) go;
+            c = NULL;
+            r = NULL;
+            break;
+          case WLD_TRIGGER:
+            r = (struct room_data *) go;
+            c = NULL;
+            o = NULL;
+            break;
+          }
         }
-      }
 
 
       /**
@@ -432,133 +431,133 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       **/
 
       /* addition inspired by Jamie Nelson - mordecai@xtra.co.nz */
-      else if (!strcasecmp(var, "findmob"))
-      {
-        if (!field || !*field || !subfield || !*subfield)
+        else if (!strcasecmp(var, "findmob"))
         {
-          script_log("findmob.vnum(mvnum) - illegal syntax");
-          strcpy(str, "0");
-        }
-        else
-        {
-          room_rnum rrnum = real_room(atoi(field));
-          mob_vnum mvnum = atoi(subfield);
-
-          if (rrnum == NULL)
+          if (!field || !*field || !subfield || !*subfield)
           {
-            script_log("findmob.vnum(ovnum): No room with vnum %d", atoi(field));
+            script_log("findmob.vnum(mvnum) - illegal syntax");
             strcpy(str, "0");
           }
           else
           {
-            int i = 0;
-            char_data *ch;
-            for (ch = rrnum->people; ch; ch = ch->next_in_room)
-              if (GET_MOB_VNUM(ch) == mvnum)
-                i++;
+            room_rnum rrnum = real_room(atoi(field));
+            mob_vnum mvnum = atoi(subfield);
 
-            snprintf(str, slen, "%d", i);
+            if (rrnum == NULL)
+            {
+              script_log("findmob.vnum(ovnum): No room with vnum %d", atoi(field));
+              strcpy(str, "0");
+            }
+            else
+            {
+              int i = 0;
+              char_data *ch;
+              for (ch = rrnum->people; ch; ch = ch->next_in_room)
+                if (GET_MOB_VNUM(ch) == mvnum)
+                  i++;
+
+              snprintf(str, slen, "%d", i);
+            }
           }
         }
-      }
       /* addition inspired by Jamie Nelson - mordecai@xtra.co.nz  7426mob 7409room*/
-      else if (!strcasecmp(var, "findobj"))
-      {
-        if (!field || !*field || !subfield || !*subfield)
+        else if (!strcasecmp(var, "findobj"))
         {
-          script_log("findobj.vnum(ovnum) - illegal syntax");
-          strcpy(str, "0");
-        }
-        else
-        {
-          room_rnum rrnum = real_room(atoi(field));
-
-          if (rrnum == NULL)
+          if (!field || !*field || !subfield || !*subfield)
           {
-            script_log("findobj.vnum(ovnum): No room with vnum %d", atoi(field));
+            script_log("findobj.vnum(ovnum) - illegal syntax");
             strcpy(str, "0");
           }
           else
           {
-            /* item_in_list looks within containers as well. */
-            snprintf(str, slen, "%d", item_in_list(subfield, rrnum->contents));
+            room_rnum rrnum = real_room(atoi(field));
+
+            if (rrnum == NULL)
+            {
+              script_log("findobj.vnum(ovnum): No room with vnum %d", atoi(field));
+              strcpy(str, "0");
+            }
+            else
+            {
+              /* item_in_list looks within containers as well. */
+              snprintf(str, slen, "%d", item_in_list(subfield, rrnum->contents));
+            }
           }
         }
-      }
-      else if (!strcasecmp(var, "people"))
-      {
-        snprintf(str, slen, "%d",((num = atoi(field)) > 0) ? trgvar_in_room(num) : 0);
-        return;
-      }
-      else if (!strcasecmp(var, "time"))
-      {
-        if (!strcasecmp(field, "hour"))
-          snprintf(str, slen, "%d", time_info.hours);
-        else if (!strcasecmp(field, "day"))
-          snprintf(str, slen, "%d", time_info.day + 1);
-        else if (!strcasecmp(field, "month"))
-          snprintf(str, slen, "%d", time_info.month + 1);
-        else if (!strcasecmp(field, "year"))
-          snprintf(str, slen, "%d", time_info.year);
-        else
-          *str = '\0';
-        return;
-      }
-      else if (!strcasecmp(var, "random"))
-      {
-        if (!strcasecmp(field, "char"))
+        else if (!strcasecmp(var, "people"))
         {
-          rndm = NULL;
-          count = 0;
-
-          if (type == MOB_TRIGGER)
-          {
-            ch = (char_data *) go;
-            for (c = IN_ROOM(ch)->people; c;
-                 c = c->next_in_room)
-              if ((c != ch) && valid_dg_target(c, TRUE)
-                  && CAN_SEE(ch, c))
-              {
-                if (!number(0, count))
-                  rndm = c;
-                count++;
-              }
-          }
-
-          else if (type == OBJ_TRIGGER)
-          {
-            room_rnum trm = obj_room((obj_data *) go);
-            for (c = trm->people; c; c = c->next_in_room)
-              if (valid_dg_target(c, TRUE))
-              {
-                if (!number(0, count))
-                  rndm = c;
-                count++;
-              }
-          }
-
-          else if (type == WLD_TRIGGER)
-          {
-            for (c = ((struct room_data *) go)->people; c; c = c->next_in_room)
-              if (valid_dg_target(c, TRUE))
-              {
-                if (!number(0, count))
-                  rndm = c;
-                count++;
-              }
-          }
-
-          if (rndm)
-            snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(rndm));
+          snprintf(str, slen, "%d",((num = atoi(field)) > 0) ? trgvar_in_room(num) : 0);
+          return;
+        }
+        else if (!strcasecmp(var, "time"))
+        {
+          if (!strcasecmp(field, "hour"))
+            snprintf(str, slen, "%d", time_info.hours);
+          else if (!strcasecmp(field, "day"))
+            snprintf(str, slen, "%d", time_info.day + 1);
+          else if (!strcasecmp(field, "month"))
+            snprintf(str, slen, "%d", time_info.month + 1);
+          else if (!strcasecmp(field, "year"))
+            snprintf(str, slen, "%d", time_info.year);
           else
             *str = '\0';
+          return;
         }
+        else if (!strcasecmp(var, "random"))
+        {
+          if (!strcasecmp(field, "char"))
+          {
+            rndm = NULL;
+            count = 0;
 
-        else
-          snprintf(str, slen, "%d", ((num = atoi(field)) > 0) ? number(1, num) : 0);
+            if (type == MOB_TRIGGER)
+            {
+              ch = (char_data *) go;
+              for (c = IN_ROOM(ch)->people; c;
+                   c = c->next_in_room)
+                if ((c != ch) && valid_dg_target(c, TRUE)
+                    && CAN_SEE(ch, c))
+                {
+                  if (!number(0, count))
+                    rndm = c;
+                  count++;
+                }
+            }
 
-        return;
-      }
+            else if (type == OBJ_TRIGGER)
+            {
+              room_rnum trm = obj_room((obj_data *) go);
+              for (c = trm->people; c; c = c->next_in_room)
+                if (valid_dg_target(c, TRUE))
+                {
+                  if (!number(0, count))
+                    rndm = c;
+                  count++;
+                }
+            }
+
+            else if (type == WLD_TRIGGER)
+            {
+              for (c = ((struct room_data *) go)->people; c; c = c->next_in_room)
+                if (valid_dg_target(c, TRUE))
+                {
+                  if (!number(0, count))
+                    rndm = c;
+                  count++;
+                }
+            }
+
+            if (rndm)
+              snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(rndm));
+            else
+              *str = '\0';
+          }
+
+          else
+            snprintf(str, slen, "%d", ((num = atoi(field)) > 0) ? number(1, num) : 0);
+
+          return;
+        }
     }
 
     if (c)
@@ -801,7 +800,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           snprintf(str, slen, "0");
           if (c->followers)
           {
-	  mob_vnum mvn = atoi(subfield);
+            mob_vnum mvn = atoi(subfield);
             for (k = c->followers; k; k = k->next)
             {
               if ((!strcasecmp(GET_NAME(k->follower), subfield) || (mvn == GET_MOB_VNUM(k->follower))))
@@ -829,9 +828,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
               }
             }
           }
-	  
-            if (h)
-              snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(h));
+
+          if (h)
+            snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(h));
         }
 
         else if (!strcasecmp(field, "fighting"))
@@ -1705,44 +1704,49 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           }
         }
 
-        else if (!strcasecmp(field, "val0")) {
-if (subfield && *subfield && is_number(subfield))
+        else if (!strcasecmp(field, "val0"))
+        {
+          if (subfield && *subfield && is_number(subfield))
           {
-GET_OBJ_VAL(o, 0) = atoi(subfield);
+            GET_OBJ_VAL(o, 0) = atoi(subfield);
           }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
-}
+        }
 
-        else if (!strcasecmp(field, "val1")){
-if (subfield && *subfield && is_number(subfield))
+        else if (!strcasecmp(field, "val1"))
+        {
+          if (subfield && *subfield && is_number(subfield))
           {
-GET_OBJ_VAL(o, 1) = atoi(subfield);
+            GET_OBJ_VAL(o, 1) = atoi(subfield);
           }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
-}
+        }
 
-        else if (!strcasecmp(field, "val2")){
-if (subfield && *subfield && is_number(subfield))
+        else if (!strcasecmp(field, "val2"))
+        {
+          if (subfield && *subfield && is_number(subfield))
           {
-GET_OBJ_VAL(o, 2) = atoi(subfield);
+            GET_OBJ_VAL(o, 2) = atoi(subfield);
           }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
-}
+        }
 
-        else if (!strcasecmp(field, "val3")){
-if (subfield && *subfield && is_number(subfield))
+        else if (!strcasecmp(field, "val3"))
+        {
+          if (subfield && *subfield && is_number(subfield))
           {
-GET_OBJ_VAL(o, 3) = atoi(subfield);
+            GET_OBJ_VAL(o, 3) = atoi(subfield);
           }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 3));
-}
-else if (!strcasecmp(field, "val4")){
-if (subfield && *subfield && is_number(subfield))
+        }
+        else if (!strcasecmp(field, "val4"))
+        {
+          if (subfield && *subfield && is_number(subfield))
           {
-GET_OBJ_VAL(o, 4) = atoi(subfield);
+            GET_OBJ_VAL(o, 4) = atoi(subfield);
           }
           snprintf(str, slen, "%d", GET_OBJ_VAL(o, 4));
-}
+        }
         break;
       case 'w':
         if (!strcasecmp(field, "weight"))
