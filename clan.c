@@ -394,8 +394,6 @@ void do_clan_destroy(Character *ch, char *arg)
     }
   }
 
-  vector<clan_rec>::iterator it;
-  
   clan.erase((clan.begin()+i));
   send_to_char("Clan deleted.\r\n", ch);
   save_clans();
