@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.66  2007/06/10 04:51:20  w4dimenscor
+ * Changed it so that mobs can assist in fights - still beta testing this, but safe to put in the game
+ *
  * Revision 1.65  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -847,7 +850,7 @@ void start_fighting(Character* ch, Character* vict) {
                 continue;
             if (SELF(f->follower, ch))
                 continue;
-            if (IS_NPC(f->follower))
+            if (IS_NPC(f->follower) && !AFF_FLAGGED(f->follower, AFF_CHARM))
                 continue;
 
             perform_assist(f->follower, ch);
@@ -1268,6 +1271,9 @@ int modify_dam(int dam, Character *ch, Character *vict , int w_type) {
             dam /= 2;
     }
 
+    /* half of your involvement percantage is taken from the dam you do */
+    dam -= ((100 - valid_perc(ch)) * dam)/200;
+
 
     return (int) damage;
 }
@@ -1467,6 +1473,9 @@ int evasion_tot(Character *vict) {
 
     if (AFF_FLAGGED(vict, AFF_CURSE))
         evasion_roll -= (evasion_roll / 4);
+
+    evasion_roll = (100-valid_perc(vict) * evasion_roll)/100;
+
     evasion_roll = (evasion_roll <= 0 ? 1 : evasion_roll);
 
     return evasion_roll;
@@ -1561,7 +1570,7 @@ int accuracy_tot(Character *attacker) {
     accuracy_roll += get_weapon_accuracy(GET_EQ(attacker, WEAR_WIELD));
     accuracy_roll += get_weapon_accuracy(GET_EQ(attacker, WEAR_WIELD_2));
 
-
+    accuracy_roll = (valid_perc(attacker) * accuracy_roll)/100;
     accuracy_roll = (accuracy_roll <= 0 ? 1 : accuracy_roll);
 
     return accuracy_roll;
@@ -1664,41 +1673,42 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
             ch->Send( "You can't fight while resting!");
             return 0;
         }
+    }
 
-        GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
+    GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
 
-        /** Make sure that:
-            - You have group members
-            - That are in the same room as you
-            - That they are fighting the same thing as you
+    /** Make sure that:
+        - You have group members
+        - That are in the same room as you
+        - That they are fighting the same thing as you
 
-            If so, then check if the group is going to get in the way.
-        -Mord
-        **/
-        if (ch->master || ch->followers) {
-            int fols = 0;
-            k = (ch->master ? ch->master : ch);
-            if (k != ch && HERE(k, ch))
+        If so, then check if the group is going to get in the way.
+    -Mord
+    **/
+    if (ch->master || ch->followers) {
+        int fols = 0;
+        k = (ch->master ? ch->master : ch);
+        if (k != ch && HERE(k, ch))
+            fols += 1;
+        for (f = k->followers;f;f=f->next)
+            if (f->follower != ch && HERE(f->follower, ch) && FIGHTING(f->follower) == FIGHTING(ch))
                 fols += 1;
-            for (f = k->followers;f;f=f->next)
-                if (f->follower != ch && HERE(f->follower, ch) && FIGHTING(f->follower) == FIGHTING(ch))
-                    fols += 1;
-            if (fols > 0) {
-                shortwep = is_short_wep(GET_EQ(ch, WEAR_WIELD));
-                perc = valid_perc(ch) * 3;
+        if (fols > 0) {
+            shortwep = is_short_wep(GET_EQ(ch, WEAR_WIELD));
+            perc = valid_perc(ch) * 3;
 perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 : 0) ) : 0);
-                perc += (IS_SPELL_ATK(num) ? 20 : 0);
-                perc += (IS_SPELL_CAST(num) ? 25 : 0);
-                perc += (IS_SKILL(num) ? 20 : 0);
+            perc += (IS_SPELL_ATK(num) ? 20 : 0);
+            perc += (IS_SPELL_CAST(num) ? 25 : 0);
+            perc += (IS_SKILL(num) ? 20 : 0);
 
 
-                if (number(0, 40) > perc) {
-                    act("Your group members get in the way of your attack!", FALSE, ch, 0, 0, TO_CHAR);
-                    return 0;
-                }
+            if (number(0, 40) > perc) {
+                act("Your group members get in the way of your attack!", FALSE, ch, 0, 0, TO_CHAR);
+                return 0;
             }
         }
     }
+
 
     /* no auto assist if in same group */
     if (!((!ch->master && vict->master == ch) || (ch->master && ch->master == vict->master) || (!vict->master && ch->master == vict))) {
@@ -2364,7 +2374,7 @@ int fe_after_damage(Character* ch, Character* vict,
 
         alter_hit(vict, partial);
         update_pos(vict);
-        if (!IS_NPC(ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA)) {
+        if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA)) {
             if (RIDING(ch) && HERE(ch, RIDING(ch))) {
                 int dam_exp = partial;
                 if (IS_NPC(vict) && !IS_NPC(RIDING(ch)) && partial > 2) {
@@ -2412,10 +2422,10 @@ int fe_after_damage(Character* ch, Character* vict,
     if (!SELF(ch, vict)) {
 
         if (IS_NPC(vict)) {
-	    if (CAN_HUNT(vict)) {
-            	add_hunter(vict);
-	        HUNTING(vict) = ch;
-	    }
+            if (CAN_HUNT(vict)) {
+                add_hunter(vict);
+                HUNTING(vict) = ch;
+            }
             remember(vict, ch);
         }
         if (partial) {
@@ -2501,8 +2511,8 @@ int fe_after_damage(Character* ch, Character* vict,
             if (GET_MRACE(ch) == 0)
                 brag(ch, vict);
 
-//            if (MOB_FLAGGED(ch, MOB_MEMORY))
-                forget(ch, vict);
+            //            if (MOB_FLAGGED(ch, MOB_MEMORY))
+            forget(ch, vict);
         } else {
             if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
                 //mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
@@ -4998,10 +5008,10 @@ void strike_missile(Character *ch, Character *tch,
                 tch = tch->mob_specials.head_join;
             SET_BIT_AR(MOB_FLAGS(tch), MOB_MEMORY);
             remember(tch, ch);
-	    if (CAN_HUNT(ch)) {
-            	HUNTING(tch) = ch;
-            	add_hunter(tch);
-	    }
+            if (CAN_HUNT(ch)) {
+                HUNTING(tch) = ch;
+                add_hunter(tch);
+            }
         }
     return;
 }
@@ -5228,7 +5238,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;
@@ -5335,11 +5345,11 @@ int can_fight(Character *ch, Character *vict, int silent) {
         return 0;
     }
 
-   /* if (!(RIDDEN_BY(ch) || RIDDEN_BY(vict)) && (AFF_FLAGGED(ch, AFF_CHARM) || AFF_FLAGGED(vict, AFF_CHARM))) {
-        if (ch->master)
-            //new_send_to_char(ch->master, "Charmed mobs cant fight! Silly mortal\r\n");
-            return 0;
-    }*/
+    /* if (!(RIDDEN_BY(ch) || RIDDEN_BY(vict)) && (AFF_FLAGGED(ch, AFF_CHARM) || AFF_FLAGGED(vict, AFF_CHARM))) {
+         if (ch->master)
+             //new_send_to_char(ch->master, "Charmed mobs cant fight! Silly mortal\r\n");
+             return 0;
+     }*/
     /* Do some sanity checking, in case someone flees, etc. */
     if (!HERE(ch, vict) && GET_SPELL_DIR(ch) == NOWHERE) {
         if (FIGHTING(ch) && FIGHTING(ch) == vict)

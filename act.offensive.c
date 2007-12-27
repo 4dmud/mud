@@ -326,15 +326,13 @@ ACMD(do_order) {
         send_to_char("Order who to do what?\r\n", ch);
     else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM))
              && !is_abbrev(name, "followers"))
-        send_to_char("That person isn't here.\r\n", ch);
+        ch->Send("That person isn't here.\r\n");
     else if (ch == vict)
-        send_to_char("You obviously suffer from skitzofrenia.\r\n", ch);
+        ch->Send("You obviously suffer from skitzofrenia.\r\n");
 
     else {
         if (AFF_FLAGGED(ch, AFF_CHARM)) {
-            send_to_char
-            ("Your superior would not aprove of you giving orders.\r\n",
-             ch);
+            ch->Send("Your superior would not aprove of you giving orders.\r\n");
             return;
         }
         if (vict) {
@@ -365,8 +363,7 @@ ACMD(do_order) {
             if (found)
                 ch->Send( "%s", CONFIG_OK);
             else
-                send_to_char
-                ("Nobody here is a loyal subject of yours!\r\n", ch);
+                ch->Send("Nobody here is a loyal subject of yours!\r\n");
         }
     }
 }
@@ -379,13 +376,12 @@ ACMD(do_flee) {
     void halt_fighting(Character *ch);
 
     if (AFF_FLAGGED(ch, AFF_HOLD)) {
-        send_to_char("You have been snared and can't flee.\r\n", ch);
+        ch->Send("You have been snared and can't flee.\r\n");
         return;
     }
 
     if (GET_POS(ch) < POS_FIGHTING) {
-        send_to_char("You are in pretty bad shape, unable to flee!\r\n",
-                     ch);
+        ch->Send("You are in pretty bad shape, unable to flee!\r\n");
         return;
     }
     if (!number(0, 4) && IS_NPC(ch))
@@ -405,7 +401,7 @@ ACMD(do_flee) {
                 stop_fighting(ch);
 
 
-                send_to_char("You flee head over heels.\r\n", ch);
+                ch->Send("You flee head over heels.\r\n");
                 if (was_fighting && !DEAD(was_fighting) && !IS_NPC(ch) && IS_NPC(was_fighting) &&
                         !(GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0)) {
                     loss = FTOI(IRANGE(0, GET_EXP(was_fighting) * 0.15, CONFIG_MAX_EXP_LOSS * 5));
@@ -419,7 +415,7 @@ ACMD(do_flee) {
             return;
         }
     }
-    send_to_char("PANIC!  You couldn't escape!\r\n", ch);
+    ch->Send("PANIC!  You couldn't escape!\r\n");
 }
 
 
