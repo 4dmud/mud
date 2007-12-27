@@ -278,7 +278,7 @@ CHAR_DATA *vict = NULL;
 		continue;
 		if (MOB_FLAGGED(ch, MOB_WIMPY) && AWAKE(vict))
 		    continue;
-		if (vict->master != NULL && HERE(vict->master, vict) && GET_PERC(vict) == 0)
+		if (vict->master != NULL && HERE(vict->master, vict))
 		    continue;
 		if (!MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN) ||
 		    (MOB_FLAGGED(ch, MOB_AGGR_EVIL) && IS_EVIL(vict)) ||

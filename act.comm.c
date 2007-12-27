@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.3  2004/11/27 22:34:58  w4dimenscor
+ * fixed the skills attacks, added an extra multi to elemental spells for when they are affected by mind enhancements
+ *
  * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -1360,11 +1363,7 @@ ACMD(do_ctell)
 {
   struct descriptor_data *i;
   int minlev = 1, c = 0;
-  char level_buf[10];
-  char *level_string;
-
-  level_string = level_buf;
-  *level_string = '\0';
+  char level_string[10];
 
   skip_spaces(&argument);
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -1407,8 +1406,10 @@ ACMD(do_ctell)
 
   if (*argument == '#')
   {
+  char loc_a[MAX_INPUT_LENGTH];
     argument++;
-    minlev = atoi(argument);
+    argument = one_argument(argument, loc_a);
+    minlev = atoi(loc_a);
     if (minlev > clan[c].ranks)
     {
       send_to_char
@@ -1416,11 +1417,11 @@ ACMD(do_ctell)
        ch);
       return;
     }
-    while (*argument != ' ')
+    /*while (*argument != ' ')
       argument++;
     while (*argument == ' ')
-      argument++;
-    snprintf(level_string, sizeof(level_string), "(%d)", minlev);
+      argument++;*/
+    snprintf(level_string, sizeof(level_string), " (#%d) ", minlev);
   }
 
   if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
@@ -1444,8 +1445,7 @@ ACMD(do_ctell)
       {
         if (i->character->player_specials->saved.clan == c && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
-          if (i->character->player_specials->saved.clan_rank >=
-              minlev)
+          if (i->character->player_specials->saved.clan_rank >=minlev)
           {
             if ((i->character) != ch)
             {

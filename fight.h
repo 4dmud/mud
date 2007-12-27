@@ -36,7 +36,7 @@ int apply_ac(struct char_data *ch, int eq_pos);
 #define FE_TYPE_SPELL -3
 #define FE_TYPE_UNDEAD -4
 #define FE_TYPE_ANIMAL -5
-#define PULSES_PER_FIGHT (5*PASSES_PER_SEC)
+#define PULSES_PER_FIGHT (7*PASSES_PER_SEC)
 
 #define SHIELD_BLOCK     0
 #define SHIELD_REFLECT   1

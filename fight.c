@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.6  2004/11/27 22:34:58  w4dimenscor
+ * fixed the skills attacks, added an extra multi to elemental spells for when they are affected by mind enhancements
+ *
  * Revision 1.5  2004/11/27 20:16:46  w4dimenscor
  * fixed bug in 'get all all.corpse' that caused infinite loop, fixed up bug in combat where event wern't being canceled properly
  *
@@ -41,12 +44,12 @@
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
  *
  */
- 
- /**TODO:
- - need to make it so that spells when cast in battle are passed completely to the combat handler
- so that spell affects arent done at time of casting and damage is done at time of combat. - mord
- 
- **/
+
+/**TODO:
+- need to make it so that spells when cast in battle are passed completely to the combat handler
+so that spell affects arent done at time of casting and damage is done at time of combat. - mord
+
+**/
 #include "conf.h"
 #include "sysdep.h"
 
@@ -690,17 +693,13 @@ int next_round(struct char_data* ch)
 
   if (GET_FIGHT_EVENT(ch) != NULL)
   {
-  return 0;
-    if (GET_FIGHT_EVENT(ch) != NULL)
-      event_cancel(GET_FIGHT_EVENT(ch));
-    GET_FIGHT_EVENT(ch) = NULL;
-    //return 0;
+    return 0;
   }
 
 
   if (GET_POS(ch) > POS_STUNNED)
   {
-  
+
     struct fight_event_obj *ch_event = NULL;
     int fe_t = find_fe_type(ch);
     long time = fight_timeout_calc(ch, fe_t, 0);
@@ -709,13 +708,15 @@ int next_round(struct char_data* ch)
     ch_event->id = GET_ID(ch);
     GET_FIGHT_EVENT(ch) = event_create(fight_event, ch_event, time);
 
-  } else {
-  stop_fighting(ch);
+  }
+  else
+  {
+    stop_fighting(ch);
   }
   if (IS_NPC(ch))
   {
-  
-  struct combine_data *temp, *tnext;
+
+    struct combine_data *temp, *tnext;
     if (ch->mob_specials.head_join)
       temp = ch->mob_specials.head_join->mob_specials.join_list;
     else
@@ -738,7 +739,7 @@ EVENTFUNC(fight_event)
   long id = fight->id;
   struct char_data *ch = find_char(id);
 
-if (event_obj) 
+  if (event_obj)
     free(event_obj);
 
   if (ch)
@@ -761,26 +762,32 @@ if (event_obj)
       }
     }
 #endif
-      GET_FIGHT_EVENT(ch)->event_obj = NULL;
-      GET_FIGHT_EVENT(ch) = NULL; 
+    GET_FIGHT_EVENT(ch)->event_obj = NULL;
+    GET_FIGHT_EVENT(ch) = NULL;
 
     if (!DEAD(ch) && FIGHTING(ch))
       FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch)) ? HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)) ? RIDDEN_BY(FIGHTING(ch)) : FIGHTING(ch) : FIGHTING(ch);
-      
+
     if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch)) && GET_POS(ch) > POS_STUNNED)
     {
       int fe_t = 0;
       int a_t = 0;
       fe_t = find_fe_type(ch);
-      a_t = next_attack_type(ch);           
-	
+      a_t = next_attack_type(ch);
+
       if (fight_event_hit(ch, FIGHTING(ch), fe_t, a_t) >= 0)
       {
-      if ((ch = find_char(id)) != NULL) {
+        if ((ch = find_char(id)) != NULL)
+        {
+          next_round(ch);
+        }
+        else return 0;
+      }
+      else
+      {
+        stop_fighting(ch);
         GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
-        next_round(ch);
-	} else return 0;
-      } else stop_fighting(ch); 
+      }
     }
   }
   return 0;
@@ -810,8 +817,8 @@ void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int p
       fight_event_hit(ch, vict, 0, skill);
     else
     {
-    if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch, "%s", stance_change[number(0, 2)]);
+      if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
+        new_send_to_char(ch, "%s", stance_change[number(0, 2)]);
       GET_NEXT_SKILL(ch) = skill;
       GET_NEXT_VICTIM(ch) = GET_ID(vict);
     }
@@ -1428,7 +1435,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   {
 
     if (GET_WAIT_STATE(ch) > 0)
-    	    return 0;
+      return 0;
 
 
     if (GET_POS(ch) == POS_SITTING)
@@ -1839,8 +1846,8 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
 
   if (total_perc == 0)
     to_ret = fe_solo_damage(ch, vict, damage, w_type);
-    
-    if (to_ret == -1)
+
+  if (to_ret == -1)
     return to_ret;
 
   /* so now we have our list of targets, and their percentage total.
@@ -1856,12 +1863,14 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
 
     temp_damage = IRANGE(1, temp_damage, MAX_MOB_DAM);
 
-    if (list == vict) {
+    if (list == vict)
+    {
       to_ret = fe_solo_damage(ch, list, (int) temp_damage, w_type);
       if (to_ret == -1)
-    return to_ret;
-   } else if (fe_solo_damage(ch, list, (int) temp_damage, w_type) == -1)
-   return -1;
+        return to_ret;
+    }
+    else if (fe_solo_damage(ch, list, (int) temp_damage, w_type) == -1)
+      return -1;
 
   }
 
@@ -4301,16 +4310,14 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 
 void stop_fighting(struct char_data* ch)
 {
- /* if (GET_FIGHT_EVENT(ch))
-  {
-    event_cancel(GET_FIGHT_EVENT(ch));
-    GET_FIGHT_EVENT(ch) = NULL;
-  }*/
+  /* if (GET_FIGHT_EVENT(ch))
+   {
+     event_cancel(GET_FIGHT_EVENT(ch));
+     GET_FIGHT_EVENT(ch) = NULL;
+   }*/
 
   FIGHTING(ch) = NULL;
   GET_POS(ch) = POS_STANDING;
-  GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
-  
   update_pos(ch);
 
   return;
@@ -5245,7 +5252,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                				   the grenade */
+                                                                                                                          				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -6168,6 +6175,27 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     dam += 0.25;
   if (affected_by_spell(ch, SPELL_DEVINE_MIND))
     dam += 0.25;
+  switch (elemental_type(type))
+  {
+  default:
+    break;
+  case ELEM_FIRE:
+    if (affected_by_spell(ch, SPELL_MIND_FIRE))
+      dam += 0.5;
+    break;
+  case ELEM_ICE:
+    if (affected_by_spell(ch, SPELL_MIND_ICE))
+      dam += 0.5;
+    break;
+  case ELEM_ELEC:
+    if (affected_by_spell(ch, SPELL_MIND_ELEC))
+      dam += 0.5;
+    break;
+  case ELEM_WATER:
+    if (affected_by_spell(ch, SPELL_MIND_WATER))
+      dam += 0.5;
+    break;
+  }
   return dam;
 
 }

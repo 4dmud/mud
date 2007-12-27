@@ -1767,7 +1767,7 @@ void eq_to_room(CHAR_DATA *ch)
 void death_room(struct char_data *ch)
 {
   struct hunter_data *hunt = NULL, *hnext;
-  int i;
+ 
 
   if (IS_NPC(ch))
   {
@@ -1785,19 +1785,26 @@ void death_room(struct char_data *ch)
 
   stop_fusion(ch);
 
-  if (ch->followers || ch->master)
-    die_follower(ch);
+  /** leave people grouped when they die **/
+  /*if (ch->followers || ch->master)
+   die_follower(ch);*/
 
   /*ends fight event*/
   halt_fighting(ch);
 
   /* cancel point updates */
+ /** no need to cancle regen!**/
+ /* 
+ {
+  int i;
   for (i = 0; i < 4; i++)
     if (GET_POINTS_EVENT(ch, i))
     {
       event_cancel(GET_POINTS_EVENT(ch, i));
       GET_POINTS_EVENT(ch, i) = NULL;
     }
+    }
+    */
   /* cancel message updates */
   if (GET_MESSAGE_EVENT(ch))
   {
