@@ -579,7 +579,7 @@ void Character::default_char() {
     time_t tme = time(0);
     if (!this)
         return;
-
+desc = NULL;
     affected = NULL;
     subs = NULL; //yep subskills are a linked list. - mord
     skills = NULL; // and now skills and spells are a linked list
