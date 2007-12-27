@@ -14,5 +14,13 @@ struct auction_data {
 #define AUC_TWICE  3
 #define AUC_SOLD   4
 
+/*
+ * User tweakables.
+ */
+#define AUC_MOB         "auctioneer"
+#define AUC_LIMIT  10
+
 #define PULSE_AUCTION   (15 RL_SEC)
 void auction_update(void);
+struct char_data *get_char_auc(char *name);
+

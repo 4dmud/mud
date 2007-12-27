@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.25  2006/02/26 00:33:42  w4dimenscor
+ * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use color codes
+ *
  * Revision 1.24  2005/11/20 06:10:00  w4dimenscor
  * Fixed Directional spells, and exp
  *
@@ -111,6 +114,7 @@
 #include "dg_scripts.h"
 #include "clan.h"
 #include "improved-edit.h"
+#include "auction.h"
 
 /* extern variables */
 extern int level_can_shout;
@@ -1167,6 +1171,7 @@ ACMD(do_gen_comm)
   char color_on[24];
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
+  struct char_data *auctioneer = get_char_auc(AUC_MOB);
 
   /* Array of flags which must _not_ be set in order for comm to be heard */
   int channels[] = {
@@ -1248,8 +1253,9 @@ ACMD(do_gen_comm)
        "{cw"}
 
     };
+  
   /* to keep pets, etc from being ordered to shout */
-  if ((!ch->desc) && (!HAS_SCRIPT(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (!SELF(ch, auctioneer) && (!ch->desc) && (!HAS_SCRIPT(ch) || IS_AFFECTED(ch, AFF_CHARM)))
     return;
 
   if (PLR_FLAGGED(ch, PLR_NOSHOUT))
@@ -1292,7 +1298,7 @@ ACMD(do_gen_comm)
     return;
   }
   /* skip leading spaces */
-  if (has_char(argument, '{'))
+  if (!SELF(ch, auctioneer) && has_char(argument, '{'))
   {
     new_send_to_char(ch, "No color code in the open channels please.\r\n");
     return;

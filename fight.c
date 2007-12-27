@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.32  2006/02/26 00:33:42  w4dimenscor
+ * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use color codes
+ *
  * Revision 1.31  2006/02/25 23:42:45  w4dimenscor
  * Directional spells work now, BUT mana blast doesn't
  *
@@ -2427,7 +2430,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
       if (RIDING(ch) && HERE(ch, RIDING(ch)))
       {
         int dam_exp = partial/2;
-        if (IS_NPC(vict) && partial > 2)
+        if (IS_NPC(vict) && !IS_NPC(RIDING(ch)) && partial > 2)
         {
           damage_count(vict, IS_NPC(RIDING(ch)) ? -1 : GET_ID(RIDING(ch)), dam_exp);
           damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
