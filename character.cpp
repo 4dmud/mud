@@ -581,6 +581,9 @@ void Character::default_char() {
         return;
 desc = NULL;
 proto_script = NULL;
+next = NULL;
+GET_TITLE(this) = NULL;
+
 script = NULL;
     affected = NULL;
     subs = NULL; //yep subskills are a linked list. - mord
@@ -668,7 +671,12 @@ script = NULL;
     PRETITLE(this) = NULL;
     IMMTITLE(this) = NULL;
     REMORTS(this) = 0;
-
+GET_FIGHT_EVENT(this) = NULL;
+GET_MESSAGE_EVENT(this) = NULL;
+GET_POINTS_EVENT(this, 0) = NULL;
+GET_POINTS_EVENT(this, 1) = NULL;
+GET_POINTS_EVENT(this, 2) = NULL;
+GET_POINTS_EVENT(this, 3) = NULL;
     GET_REGEN_HIT(this) = 0;
     GET_REGEN_MANA(this) = 0;
     GET_REGEN_MOVE(this) = 0;
