@@ -993,12 +993,13 @@ void add_follower(struct char_data *ch, struct char_data *leader)
  *
  * Returns the number of lines advanced in the file.
  */
+/** BUG: This command should also be passed the size of the buffer it will be filling - mord */
 int get_line(FILE *fl, char *buf)
 {
   char temp[READ_SIZE];
   int lines = 0;
   int sl;
-
+  /** This do while loop skips over any blank lines or comments starting with * **/
   do
   {
     if (!fgets(temp, READ_SIZE, fl))
@@ -1007,7 +1008,7 @@ int get_line(FILE *fl, char *buf)
   }
   while (*temp == '*' || *temp == '\n' || *temp == '\r');
 
-  /* Last line of file doesn't always have a \n, but it should. */
+  /** Last line of file doesn't always have a \n, but it should. */
   sl = strlen(temp);
   while (sl > 0 && (temp[sl - 1] == '\n' || temp[sl - 1] == '\r'))
     temp[--sl] = '\0';

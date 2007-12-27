@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.24  2006/05/11 06:39:12  w4dimenscor
+ * Added comments to some files, changed the width of the name field in the typo and bug reports
+ *
  * Revision 1.23  2006/05/11 06:20:02  w4dimenscor
  * Altered the list of typos to fix in act.comm.c, added room vnum to the typo and bug mud log
  *
@@ -1129,7 +1132,7 @@ new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_RO
     return;
   }
   fprintf(fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
-          "<tr><td class='plrname'>%-8s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME(ch), (tmp + 4),
+          "<tr><td class='plrname'>%-13s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
 
   fclose(fl);

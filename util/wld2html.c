@@ -495,12 +495,13 @@ int real_room(int virtual, int reference)
  * The newline character is removed from the input.  Lines which begin
  * with '*' are considered to be comments.
  */
+/**BUG: this should REALLY take the size of the buf also - mord **/
 int get_line(FILE * fl, char *buf)
 {
-  char temp[256];
+  char temp[READ_SIZE];
 
   do {
-    fgets(temp, 256, fl);
+    fgets(temp, READ_SIZE, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
   } while (!feof(fl) && (*temp == '*' || !*temp));
