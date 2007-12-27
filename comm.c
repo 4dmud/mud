@@ -5281,8 +5281,8 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
   write_to_output( d, "%s", start_mxp_str);
   write_to_output( d, "%s", MXPMODE (6) );   /* permanent secure mode */
   /* Exit tag */
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"  color=green FLAG=RoomExit"));
-  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" color=green FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"  FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" FLAG=RoomExit"));
   /* Room description tag */
   write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc \'<p>\' FLAG=RoomDesc"));
   /* Get an item tag (for things on the ground) */
