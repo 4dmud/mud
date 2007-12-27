@@ -10,6 +10,15 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.78  2007/11/23 22:09:39  w4dimenscor
+ * changed the display of multi in the identify spell for orbs and staves
+ *
+ * Revision 1.77  2007/11/23 21:23:14  w4dimenscor
+ * changed ORBSTAFF to be devided by 1000 in their multi so that they can have decimals
+ *
+ * Revision 1.76  2007/11/23 05:37:28  w4dimenscor
+ * fixed staff multi
+ *
  * Revision 1.75  2007/08/19 01:06:10  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -497,7 +506,7 @@ float staff_multi(Character *ch, struct obj_data *staff) {
     if (staff && (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MINOR||GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR)) {
         switch ((staff_type = GET_OBJ_VAL(staff, 2))) {
         case FOCUS_STAFF:
-            multi += ((((float)GET_OBJ_VAL(staff, 0)+num_casting(ch)) * 100.0)+((GET_LEVEL(ch) * 6.0)));
+            multi += ((((float)(GET_OBJ_VAL(staff, 3)/1000)+num_casting(ch)) * 100.0)+((GET_LEVEL(ch) * 6.0)));
             multi = IRANGE(1.55, (multi/1000.0), 2.15);
             break;
         case FOCUS_ORB:
@@ -507,7 +516,7 @@ float staff_multi(Character *ch, struct obj_data *staff) {
             multi = IRANGE(1.05, (multi/700.0), 1.50);
             break;
         case FOCUS_ORBSTAFF:
-            multi += ((float)GET_OBJ_VAL(staff, 0));
+            multi += (GET_OBJ_VAL(staff, 0)*0.001);
             break;
         }
         if (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR)
@@ -1262,16 +1271,16 @@ int modify_dam(int dam, Character *ch, Character *vict , int w_type) {
     }
 
     if (wep && AFF_FLAGGED(vict, AFF_SHIELD))
-        damage = (damage/4)*3; //25% reduction
+        damage -= (damage/4); //25% reduction
 
     if (AFF_FLAGGED(vict, AFF_SHIELD_HOLY))
-        damage = (damage/5)*4; //20% reduction
+        damage -= (damage/5); //20% reduction
 
     if (affected_by_spell(vict, SPELL_STEELSKIN))
-        damage = (damage/5)*4; //20% reduction
+        damage -= (damage/5); //20% reduction
 
     if (AFF_FLAGGED(vict, AFF_STONESKIN))
-        damage = (damage/5)*4; //20% reduction
+        damage -= (damage/5); //20% reduction
 
 
     if ((IS_SPELL_ATK(w_type) || IS_SPELL_CAST(w_type) )&&
@@ -3439,10 +3448,10 @@ int weapon_type_mod(int w_type, int area) {
             amount = (10);
             break;
         case PART_TOP_RIGHT:
-            amount = (10);
+            amount = (20);
             break;
         case PART_CENTER:
-            amount = (20);
+            amount = (10);
             break;
         case PART_LOWER_LEFT:
             amount = (5);
@@ -3455,7 +3464,7 @@ int weapon_type_mod(int w_type, int area) {
     case TYPE_BLAST:
         switch (area) {
         case PART_TOP_CENTER:
-            amount = (5);
+            amount = (25);
             break;
         case PART_TOP_LEFT:
             amount = (5);
@@ -5826,7 +5835,7 @@ void combat_skill(Character *ch) {
         return;
     }
 }
-
+#define HPLEFT(vict) ((GET_HIT(vict)*100)/GET_MAX_HIT(vict))
 float skill_type_multi(Character *ch, Character *vict, int type) {
     int m_user = FALSE, chclass = TYPE_UNDEFINED;
     int chcha = 1, tier = 1;
@@ -5856,11 +5865,11 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
         break;
         /* skills */
     case SKILL_BACKSTAB:
-        return backstab_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_BACKSTAB)/100.0f);
+        return backstab_mult(HPLEFT(vict), tier) + (total_chance(ch, SKILL_BACKSTAB)/100.0f);
     case SKILL_CLEAVE:
-        return cleave_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_CLEAVE)/100.0f);
+        return cleave_mult(HPLEFT(vict), tier) + (total_chance(ch, SKILL_CLEAVE)/100.0f);
     case SKILL_BEHEAD:
-        return cleave_mult(GET_LEVEL(ch), tier) + (total_chance(ch, SKILL_BEHEAD)/100.0f);
+        return cleave_mult(HPLEFT(vict), tier) + (total_chance(ch, SKILL_BEHEAD)/100.0f);
     case SKILL_KICK: {
             float spd = GET_SPEED(ch) - GET_SPEED(vict);
             if (spd < 0)

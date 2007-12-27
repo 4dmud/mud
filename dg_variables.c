@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/30 04:20:19 $                                           * 
-*  $Revision: 1.56 $                                                      *
+*  $Date: 2007/11/23 04:54:20 $                                           * 
+*  $Revision: 1.59 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -27,7 +27,7 @@
 #include "descriptor.h"
 #include "strutil.h"
 #include "assemblies.h"
-
+#include "genmob.h"
 
 /* External variables and functions */
 
@@ -919,6 +919,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     }
                 } else if (!strcasecmp(field, "is_pc"))
                     snprintf(str, slen, "%d", !IS_NPC(c));
+else if (!strcasecmp(field, "is_pk"))
+                    snprintf(str, slen, "%d", IS_PK(c));
+
                 else if (!strcasecmp(field, "is_npc"))
                     snprintf(str, slen, "%d", IS_NPC(c));
                 else if (!strcasecmp(field, "is_hero"))
@@ -1018,6 +1021,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
                 if (!strcasecmp(field, "level"))
                     snprintf(str, slen, "%d", GET_LEVEL(c));
+else if (!strcasecmp(field, "longdesc"))
+snprintf(str, slen, "%s", GET_LDESC(c));
 
                 break;
             case 'm':
@@ -1096,6 +1101,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                         *str = '\0';
                 }
                 break;
+case 'o':
+if (!strcasecmp(field, "omr")) 
+snprintf(str, slen, "%s","mobile");
+break;
             case 'p':
 
 
@@ -1594,6 +1603,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 }
 
                 break;
+case 'o':
+if (!strcasecmp(field, "omr"))
+snprintf(str, slen, "%s","object");
+break;
+
             case 'p':
                 if (!strcasecmp(field, "people")) {
                     if (obj_room(o) != NULL) {
@@ -1841,6 +1855,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 }
 
                 break;
+case 'o':
+if (!strcasecmp(field, "omr"))
+snprintf(str, slen, "%s","room");
+break;
+
             case 'p':
                 if (!strcasecmp(field, "people")) {
                     if ((num = atoi(subfield))!=0) {

@@ -349,12 +349,14 @@ ACTION(thing_control_weather_worse)
   const char *to_room = NULL;
   int i;
 
-  if (!*num)
+  if (!*num || !ch)
   {
     if (ch)
       ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
+if (!IN_ROOM(ch))
+return 0;
   i = GET_ROOM_ZONE(IN_ROOM(ch));
   if (!(number(0, 105) < total_chance(ch, SPELL_CONTROL_WEATHER)))
   {
@@ -445,12 +447,15 @@ ACTION(thing_control_weather_better)
   const char *to_room = NULL;
   int i;
 
-  if (!*num)
+  if (!*num || !ch)
   {
     if (ch)
       ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
+if (!IN_ROOM(ch))
+return 0;
+
   i = GET_ROOM_ZONE(IN_ROOM(ch));
   if (!(number(0, 105) < total_chance(ch, SPELL_CONTROL_WEATHER)))
   {

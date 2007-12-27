@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.42  2007/11/28 06:41:52  w4dimenscor
+ * Changed Midas touch to be castable within combat
+ *
  * Revision 1.41  2007/06/26 10:48:05  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -1639,7 +1642,7 @@ void mag_assign_spells(void) {
            FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 28);
 
     spello(SPELL_MIDAS_TOUCH, "midas touch", 150 ,
-           100 , 10, POS_STANDING, TAR_CHAR_ROOM| TAR_FIGHT_VICT,
+           100 , 10, POS_FIGHTING, TAR_CHAR_ROOM| TAR_FIGHT_VICT,
            FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4);
 
 

@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.82  2007/11/22 08:36:52  w4dimenscor
+ * Added more info to the tsearch function
+ *
  * Revision 1.81  2007/11/14 21:39:41  w4dimenscor
  * Added the Gladiator race for the gladiatorpits.
  * --Matthijs
@@ -6557,8 +6560,18 @@ int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, in
 
     size_t nlen = 0;
     int found = 0, count = 0;
-    char strtmp2[MAX_STRING_LENGTH];
-    count = snprintf(buf + nlen, len - nlen, "\r\n%sVnum: %-7d -- Name: %-50s%s\r\n",GRN, vnum, trig->name, REM);
+    char strtmp2[MAX_STRING_LENGTH], trty[100], trIS[100];
+    if (trig->attach_type==OBJ_TRIGGER) {
+	    snprintf(trIS, sizeof(trIS), "Objects");
+	    new_sprintbit(GET_TRIG_TYPE(trig), otrig_types, trty, sizeof(trty));
+    } else if (trig->attach_type==WLD_TRIGGER) {
+	    snprintf(trIS, sizeof(trIS), "Rooms  ");
+	    new_sprintbit(GET_TRIG_TYPE(trig), wtrig_types, trty, sizeof(trty));
+    } else {
+	    snprintf(trIS, sizeof(trIS), "Mobiles");
+	    new_sprintbit(GET_TRIG_TYPE(trig), trig_types, trty, sizeof(trty));
+    }
+    count = snprintf(buf + nlen, len - nlen, "\r\n%sVnum: %-7d - %s%s - %s%s - Name: %-50s%s\r\n",GRN, vnum, CYN, trIS, trty,REM , trig->name, REM);
     if (count > 0)
         nlen += count;
 

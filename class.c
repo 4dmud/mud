@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.19  2007/11/22 01:51:20  w4dimenscor
+ * Updated the house expand value to be 200 instead of 125, to encourage people to spend their tokens on expanding existing houses. Also in class.c updated the gold gain values, and added in bonus practice sessions too.
+ *
  * Revision 1.18  2007/11/14 21:39:41  w4dimenscor
  * Added the Gladiator race for the gladiatorpits.
  * --Matthijs
@@ -1051,35 +1054,46 @@ void advance_level(Character * ch)
                          "When you die from now on you will \r\n"
                          "need to retrieve your corpse.\r\n{c0");
       ch->Send( "{cYYou gain 100000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 10 bonus practice sessions!{c0\r\n");
+      GET_PRACTICES(ch) += 10;
       ch->Gold( 100000, GOLD_BANK);
+      
     }
     break;
   case 15:
     if (REMORTS(ch) < 4)
     {
-      ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
-      ch->Gold( 500000, GOLD_BANK);
+      ch->Send( "{cYYou gain 1000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 10 bonus practice sessions!{c0\r\n");
+      GET_PRACTICES(ch) += 10;
+      ch->Gold( 1000000, GOLD_BANK);
     }
     break;
   case 20:
     if (REMORTS(ch) < 5)
     {
-      ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
-      ch->Gold( 500000, GOLD_BANK);
+      ch->Send( "{cYYou gain 5000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 10 bonus practice sessions!{c0\r\n");
+      GET_PRACTICES(ch) += 10;
+      ch->Gold( 5000000, GOLD_BANK);
     }
     break;
   case 30:
     if (REMORTS(ch) < 6)
     {
-      ch->Send( "{cYYou gain 2000000 coins to your bank!{c0\r\n");
-      ch->Gold( 2000000, GOLD_BANK);
+      ch->Send( "{cYYou gain 10000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 10 bonus practice sessions!{c0\r\n");
+      GET_PRACTICES(ch) += 10;
+      ch->Gold( 10000000, GOLD_BANK);
     }
     break;
   case 45:
     if (REMORTS(ch) < 7)
     {
-      ch->Send( "{cYYou gain 5000000 coins to your bank!{c0\r\n");
-      ch->Gold( 5000000, GOLD_BANK);
+      ch->Send( "{cYYou gain 25000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 10 bonus practice sessions!{c0\r\n");
+      GET_PRACTICES(ch) += 20;
+      ch->Gold( 25000000, GOLD_BANK);
     }
     break;
   }
@@ -1124,19 +1138,25 @@ void advance_level(Character * ch)
  */
 float backstab_mult(int level, int tier)
 {
+float mt = 1.5f;
+if (level > 50)
+mt += 0.5f;
   switch (tier)
   {
-  default:
-    return 2.0f;
   case 1:
-    return 2.25f;
+    mt += 0.35f;
+    break;
   case 2:
-    return 2.75f;
+    mt += 0.85f;
+    break;
   case 3:
-    return 3.25f;
+    mt += 1.35f;
+    break;
   case 4:
-    return 3.75f;
+    mt += 1.85f;
+    break;
   }
+  return mt;
 
 }
 float cleave_mult(int level, int tier)
@@ -1145,15 +1165,15 @@ float cleave_mult(int level, int tier)
   switch (tier)
   {
   default:
-    return 1.0f;
+    return 1.1f + (level < 10);
   case 1:
-    return 1.55f;
+    return 1.55f + (level < 10);
   case 2:
-    return 2.0f;
+    return 1.7f + (level < 10);
   case 3:
-    return 2.4f;
+    return 1.9f + (level < 10);
   case 4:
-    return 2.75f;
+    return 2.0f + (level < 10);
   }
 }
 

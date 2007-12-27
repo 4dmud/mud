@@ -1023,7 +1023,7 @@ int House_can_enter(Character *ch, room_vnum house)
 }
 
 void house_expand_house(Character *ch, int house) {
-
+	ch->Send("Sorry, you will be able to do this yourself soon. For now, please ask an admin.\r\n");
 }
 
 void hcontrol_expand_house(Character *ch, char *argument)
@@ -1034,16 +1034,16 @@ void hcontrol_expand_house(Character *ch, char *argument)
   
   if (!argument || !*argument)
   {
-  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
-                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 200 sized units>\r\n"
+                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 200 sized units>\r\n");
     return;
   }
   argument = two_arguments(argument, arg1, arg2);
   
   if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
   {
-  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
-                   "To remove expantions:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 200 sized units>\r\n"
+                   "To remove expantions:\r\nhcontrol expand <house vnum> <-num of 200 sized units>\r\n");
     return;
   }
   
@@ -1052,7 +1052,7 @@ void hcontrol_expand_house(Character *ch, char *argument)
   {
     
   ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
-                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
+                   "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 200 sized units>\r\n");
       return;
     
   }
@@ -1074,7 +1074,7 @@ void hcontrol_expand_house(Character *ch, char *argument)
   
 
     house_control[i].expantions += (long)amount;
-ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, pi.NameById(house_control[i].owner), house_capacity(i));
+ch->Send( "%d units of 200 added to house %d (owner: %s) new capacity %d\r\n", amount, house, pi.NameById(house_control[i].owner), house_capacity(i));
 
   
   House_save_control();
@@ -1083,7 +1083,7 @@ ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", a
 int house_capacity(room_vnum house) {
 if (house == NOWHERE)
 return 500;
-  return 500 + (125 * house_control[house].expantions);
+  return 500 + (200 * house_control[house].expantions);
 }
 void hcontrol_set_stable(Character *ch, char *argument)
 {

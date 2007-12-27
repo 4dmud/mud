@@ -262,7 +262,7 @@ room_vnum donation_room_1 = 3063;
 room_vnum donation_room_2 = 3063;	/* unused - room for expansion */
 room_vnum donation_room_3 = 3063;	/* unused - room for expansion */
 
-room_vnum gladiator_death_room = 1205;
+room_vnum gladiator_death_room = 26783;
 
 /****************************************************************************/
 /****************************************************************************/

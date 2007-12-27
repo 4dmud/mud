@@ -55,6 +55,7 @@ void free_identifier(struct obj_data *obj);
 int has_identifier(struct obj_data *obj, long id);
 bool can_have_follower(Character *ch, mob_vnum mob_num);
 bool can_have_follower(Character *ch, Character *vict);
+float staff_multi(Character *ch, struct obj_data *staff);
 /*
  * Special spells appear below.
  */
@@ -434,8 +435,8 @@ ASPELL(spell_locate_object) {
     DYN_CREATE;
     *dynbuf = 0;
 
-	    for (obj_list_type::iterator ob = object_list.begin();(j > 0) && ob != object_list.end(); ob++) {
-		    i = (ob->second);
+    for (obj_list_type::iterator ob = object_list.begin();(j > 0) && ob != object_list.end(); ob++) {
+        i = (ob->second);
         if (!isname_full(strarg, i->name))
             continue;
         if (GET_LEVEL(ch) < LVL_IMMORT && number(0, 1))
@@ -679,13 +680,13 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     else
         ch->Send( ".{c0\r\n");
 
-//if (GET_TIMER_EVENT(obj) != NULL) {
-      //time_t diff = (event_time(GET_TIMER_EVENT(obj))/PASSES_PER_SEC) - time(0);
+    //if (GET_TIMER_EVENT(obj) != NULL) {
+    //time_t diff = (event_time(GET_TIMER_EVENT(obj))/PASSES_PER_SEC) - time(0);
     check_timer(obj);
     if (GET_OBJ_EXPIRE(obj) > time(0)) {
-    time_t diff = (GET_OBJ_EXPIRE(obj) - time(0));
+        time_t diff = (GET_OBJ_EXPIRE(obj) - time(0));
         ch->Send( "{cyIt has {cC%ld{cy Min and {cY%ld{cy seconds left till it disintergrates{c0\r\n",   diff/60, diff%60);
-        }
+    }
 
     found = FALSE;
     for (i = 0; i < MAX_OBJ_AFFECT; i++) {
@@ -776,6 +777,24 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         break;
     case ITEM_ARMOR:
         ch->Send("{cyAC-apply is {cC%d{c0\r\n", GET_OBJ_VAL(obj, 0));
+        break;
+    case ITEM_FOCUS_MINOR:
+    case ITEM_FOCUS_MAJOR:
+        switch (GET_OBJ_VAL(obj, 2)) {
+        case FOCUS_STAFF:
+            ch->Send("This staff ");
+            break;
+        case FOCUS_ORB:
+            ch->Send("This orb ");
+            break;
+        case FOCUS_ORBSTAFF:
+            ch->Send("This orb bound staff ");
+            break;
+        default:
+            ch->Send("Uh, there is something wrong with this item.\r\n");
+            return;
+        }
+        ch->Send("gives a multiplier of %f\r\n", staff_multi(ch, obj));
         break;
     case ITEM_LIGHTSABRE_HILT:
         ch->Send( "{cyPossable Saber blades: {cC%d{c0\r\n"
@@ -1355,5 +1374,9 @@ bool operator<(vector<skillspell_data>::iterator &a, vector<skillspell_data>::it
 bool operator<(vector<sub_list>::iterator &a, vector<sub_list>::iterator &b) {
     return ((*a).subskill < (*b).subskill);
 }
-bool operator<(const sub_list &a,const sub_list &b) { return (a.subskill < b.subskill);}
-bool operator<(const skillspell_data &a, const skillspell_data &b) { return (a.skill < b.skill);}
+bool operator<(const sub_list &a,const sub_list &b) {
+    return (a.subskill < b.subskill);
+}
+bool operator<(const skillspell_data &a, const skillspell_data &b) {
+    return (a.skill < b.skill);
+}
