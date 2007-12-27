@@ -1056,7 +1056,6 @@ ACMD(do_ignite) {
     tmpobj.proto_script = hilt->proto_script;
     tmpobj.script = hilt->script;
     tmpobj.next_content = hilt->next_content;
-    tmpobj.next = hilt->next;
     memcpy(hilt, &tmpobj, sizeof(*hilt));
     hilt->description = sabre->description;
     hilt->short_description = sabre->short_description;
@@ -1107,7 +1106,6 @@ struct obj_data * revert_object(struct obj_data *hilt) {
     tmpobj.proto_script = hilt->proto_script;
     tmpobj.script = hilt->script;
     tmpobj.next_content = hilt->next_content;
-    tmpobj.next = hilt->next;
     memcpy(hilt, &tmpobj, sizeof(*hilt));
 
 

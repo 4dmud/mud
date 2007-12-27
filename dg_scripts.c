@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/11/14 03:30:12 $
-*  $Revision: 1.41 $
+*  $Date: 2007/11/18 06:50:38 $
+*  $Revision: 1.42 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.42  2007/11/18 06:50:38  w4dimenscor
+ * Fixed the bug where you could dig up any buried object in the mud. Removed all threadding from the code to stop the freezes.
+ *
  * Revision 1.41  2007/11/14 03:30:12  w4dimenscor
  * Changed the world and the index to classes. Fixed the room save bug where it would wipe descriptions
  *
@@ -771,7 +774,7 @@ struct obj_data *get_obj(const char *name) {
         return find_obj(atoi(name + 1));
     else {
 	    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) 
-		    if (isname((ob->second)->name, name))
+		    if (ob->second && isname((ob->second)->name, name))
 			    return ob->second;
     }
 
@@ -955,7 +958,7 @@ obj_data *get_obj_in_room(Room * room, char *name) {
 
 /* returns obj with name - searches room, then world */
 obj_data *get_obj_by_room(Room *room, const char *name) {
-    obj_data *obj;
+    obj_data *obj = NULL;
     if (*name == UID_CHAR)
         return find_obj(atoi(name + 1));
     if (room) {

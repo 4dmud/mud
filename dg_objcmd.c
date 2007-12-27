@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/11/14 08:25:48 $
-*  $Revision: 1.19 $
+*  $Date: 2007/11/18 06:50:38 $
+*  $Revision: 1.20 $
 **************************************************************************/
 
 #include "conf.h"
@@ -400,7 +400,6 @@ OCMD(do_otransform)
 	tmpobj.proto_script = obj->proto_script;
 	tmpobj.script = obj->script;
 	tmpobj.next_content = obj->next_content;
-	tmpobj.next = obj->next;
 	memcpy(obj, &tmpobj, sizeof(*obj));
 
 	if (wearer) {

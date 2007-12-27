@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.42  2007/11/18 06:50:38  w4dimenscor
+ * Fixed the bug where you could dig up any buried object in the mud. Removed all threadding from the code to stop the freezes.
+ *
  * Revision 1.41  2007/08/23 20:41:29  w4dimenscor
  * - Created a new MudException class, so that we can try and throw and catch errors.
  * - Fixed room description editing in OLC so that it works with the new system.
@@ -2056,8 +2059,8 @@ ACMD(do_dig_ground)
         return;
       }
     }
-    /* go to the next obj */
-    obj = obj->next;
+    /* go to the next obj in room*/
+    obj = obj->next_content;
   }
   /* if the player didn't find anything */
   *ch << "Sorry! You didn't find anything.\r\n";

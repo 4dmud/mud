@@ -95,8 +95,6 @@
 #include "mxp.h"
 #include "descriptor.h"
 #include "trees.h"
-//#include "dlib/threads.h"
-#include "dlib/misc_api.h"  // for dlib::sleep
 #include "compressor.h"
 
 #ifndef INVALID_SOCKET
@@ -4558,4 +4556,7 @@ void mccp_off(Descriptor *d) {
 #endif /* HAVE_ZLIB_H */
 
 }
-
+#include "dlib/error.cpp"
+#include "dlib/dir_nav/dir_nav_kernel_1.cpp"
+#include "dlib/dir_nav/dir_nav_kernel_2.cpp"
+//#include "dlib/linker/linker_kernel_1.cpp"

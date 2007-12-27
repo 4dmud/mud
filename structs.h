@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.66  2007/11/18 06:50:41  w4dimenscor
+ * Fixed the bug where you could dig up any buried object in the mud. Removed all threadding from the code to stop the freezes.
+ *
  * Revision 1.65  2007/11/14 22:51:25  w4dimenscor
  * Added cedit options to set double exp day and to set the room where gladiators go to after dying.
  * --Thotter
@@ -1505,7 +1508,7 @@ struct obj_data {
     struct script_data *script;    /* script info for the object       */
 
     struct obj_data *next_content; /* For 'contains' lists             */
-    struct obj_data *next;    /* For the object list              */
+    //struct obj_data *next;    /* For the object list              */
     Character *sitting_here;  /* Who is sitting in it (null if none)   */
     obj_vnum was_vnum;  /* object is child of object proto with that vnum */
     long owner;

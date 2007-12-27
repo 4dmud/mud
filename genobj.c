@@ -79,7 +79,6 @@ int update_objects(struct obj_data *refobj)
     obj->in_obj = swap.in_obj;
     obj->contains = swap.contains;
     obj->next_content = swap.next_content;
-    obj->next = swap.next;
     obj->sitting_here = swap.sitting_here;
   }
 
