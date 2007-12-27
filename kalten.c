@@ -1109,25 +1109,28 @@ void explosion_messages(room_rnum room, int damage, struct obj_data *target) {
     Character *tch;
 
     while (room->people != NULL) {
-        tch = room->people;
-        switch (damage) {
-        case 1:
-            act("A missile strikes the $p, causing considerable damage.",
-                FALSE, tch, target, 0, TO_CHAR);
-            act("A missile strikes the $p, causing considerable damage.",
-                FALSE, tch, target, 0, TO_ROOM);
-            break;
-        case 2:
-            act("The $p shakes and groans under the impact of a missile.",
-                FALSE, tch, target, 0, TO_CHAR);
-            act("The $p shakes and groans under the impact of a missile.",
-                FALSE, tch, target, 0, TO_ROOM);
-            break;
-        default:
-            act("A missile whizzes past, missing your ship by inches.\r\n"
-                "{cRRED ALERT!!! Enemy ship attacking! RED ALERT!!!{cx",
-                FALSE, tch, target, 0, TO_ROOM);
-            break;
+        for(tch = room->people;tch;tch = tch->next_in_room)
+	{
+	
+            switch (damage) {
+            case 1:
+                act("A missile strikes the $p, causing considerable damage.",
+                    FALSE, tch, target, 0, TO_CHAR);
+                act("A missile strikes the $p, causing considerable damage.",
+                    FALSE, tch, target, 0, TO_ROOM);
+                break;
+            case 2:
+                act("The $p shakes and groans under the impact of a missile.",
+                    FALSE, tch, target, 0, TO_CHAR);
+                act("The $p shakes and groans under the impact of a missile.",
+                    FALSE, tch, target, 0, TO_ROOM);
+                break;
+            default:
+                act("A missile whizzes past, missing your ship by inches.\r\n"
+                    "{cRRED ALERT!!! Enemy ship attacking! RED ALERT!!!{cx",
+                    FALSE, tch, target, 0, TO_ROOM);
+                break;
+	    }
         }
         return;
     }

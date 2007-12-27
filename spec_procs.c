@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.30  2007/07/10 19:12:37  w4dimenscor
+ * Ships don't give the purge message anymore when they are purged,
+ * except when this happens because of a missile.
+ * --Thotter
+ *
  * Revision 1.29  2007/06/26 10:48:05  w4dimenscor
  * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
@@ -2070,8 +2075,9 @@ SPECIAL(fire) {
                             NULL, TO_CHAR);
                         act("$n blows up the $p.", TRUE, ch, target, NULL,
                             TO_ROOM);
-
+			Room *explosion_room = IN_ROOM(target);
                         extract_obj(target);
+			send_to_room(explosion_room, "The ship bursts at the seams from the powerful strike.\r\n");
                         return (1);
                     } else {	/* needs more damage */
                         IN_ROOM(ch) = was_in;

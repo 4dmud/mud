@@ -1496,7 +1496,6 @@ void extract_object_final(OBJ_DATA *obj) {
                                 }
                             }
                         }
-                        send_to_room(target, "The ship bursts at the seams from the powerful strike.\r\n");
                     }
                 }
             }
