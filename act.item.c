@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.50  2007/03/03 22:42:27  w4dimenscor
+ * added the get from container trigger.
+ *
  * Revision 1.49  2007/03/01 23:48:55  w4dimenscor
  * Forgot to add %actor% in new trigger type. --Thotter
  *
@@ -1043,6 +1046,11 @@ bool perform_get_from_container(Character *ch, struct obj_data *obj,
   {
     return FALSE;
   }
+  if (get_out_otrigger(cont, obj, ch) <= 0)
+  {
+    return FALSE;
+  }
+
   if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
   {
     if (cont->carried_by)

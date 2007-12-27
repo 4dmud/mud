@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/03/01 23:48:55 $
-*  $Revision: 1.13 $
+*  $Date: 2007/03/03 22:42:27 $
+*  $Revision: 1.14 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1374,6 +1374,34 @@ int put_in_otrigger(obj_data *container, obj_data *obj, Character *actor)
 	for (t = TRIGGERS(SCRIPT(container)); t; t = t->next)
 	{
 		if(TRIGGER_CHECK(t, OTRIG_PUT_IN)){
+      			ADD_UID_VAR(buf, t, obj, "object", 0);
+      			ADD_UID_VAR(buf, t, actor, "actor", 0);
+      			ret_val = script_driver(&container, t, OBJ_TRIGGER, TRIG_NEW);
+
+			      /* don't allow a put to take place, if
+			       * the object is purged (nothing to put).
+			       */
+			if (!obj)
+				return -1;
+			else
+				return ret_val;
+		}
+	}
+	return 1;
+}
+
+int get_out_otrigger(obj_data *container, obj_data *obj, Character *actor)
+{
+	trig_data *t;
+	int ret_val;
+	char buf[MAX_INPUT_LENGTH];
+	
+	if(!SCRIPT_CHECK(container, OTRIG_GET_OUT))
+		return 1;
+
+	for (t = TRIGGERS(SCRIPT(container)); t; t = t->next)
+	{
+		if(TRIGGER_CHECK(t, OTRIG_GET_OUT)){
       			ADD_UID_VAR(buf, t, obj, "object", 0);
       			ADD_UID_VAR(buf, t, actor, "actor", 0);
       			ret_val = script_driver(&container, t, OBJ_TRIGGER, TRIG_NEW);
