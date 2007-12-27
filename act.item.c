@@ -10,6 +10,11 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.39  2006/05/15 16:16:12  w4dimenscor
+ * Fixed the level you need to see undisplayed items. Some of it was equal to
+ * LVL_IMMORT, some of it was higher then LVL_IMMORT. It is now all higher then
+ * LVL_IMMORT. Fixed some other small things too.
+ *
  * Revision 1.38  2006/05/15 15:45:19  w4dimenscor
  * the nodisplay flag prevents items from showing up with get all again. Imms can
  * still use get all to pick up a nodisplay item.
@@ -1325,7 +1330,7 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
       next_obj = obj->next_content;
       if (CAN_SEE_OBJ(ch, obj)
           && !IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_HIDDEN)
-          && (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || GET_LEVEL(ch)>=LVL_IMMORT)
+          && (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || GET_LEVEL(ch)>LVL_IMMORT)
           && (dotmode == FIND_ALL || isname(obj_desc, obj->name)))
       {
         perform_get_from_room(ch, obj) ? processed_get_counter++ : failed_get_counter++;
