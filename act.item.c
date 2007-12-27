@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.52  2007/06/07 10:30:50  w4dimenscor
+ * Added the ability for scripts to check assemblies for existance, and to create the products of assemblies
+ *
  * Revision 1.51  2007/05/20 18:54:35  w4dimenscor
  * fixed beanbag pull crashbug.
  *
@@ -3852,12 +3855,12 @@ C_FUNC(pull_object)
     d->Output( "You need to open the door first.\r\n");
     return;
   }
-  if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE))
+/*  if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE))
   {
     d->Output( "It doesn't look like you can pull it that direction.\r\n");
     return;
   }
-
+*/
 
   rm = EXIT(d->character, dir)->to_room;
   if (do_simple_move(d->character, dir, FALSE))
@@ -4074,9 +4077,9 @@ ACMD(do_pull)
         continue;
       if (IS_SET(EXIT(ch, i)->exit_info, EX_CLOSED))
         continue;
-      if (!IS_SET_AR(ROOM_FLAGS(EXIT(ch, i)->to_room), ROOM_VEHICLE))
-        continue;
-      cnt ++;
+      //if (!IS_SET_AR(ROOM_FLAGS(EXIT(ch, i)->to_room), ROOM_VEHICLE))
+       // continue;
+      cnt++;
       ch->Send( "%s ", dirs[i]);
     }
     if (!cnt)
