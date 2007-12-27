@@ -47,6 +47,7 @@ ACMD(do_tell);
 SPECIAL(receptionist);
 SPECIAL(cryogenicist);
 void write_aliases(Character *ch);
+void check_timer(obj_data *obj);
 
 /* local functions */
 struct obj_data *Obj_from_store(struct obj_file_elem object,
@@ -739,7 +740,7 @@ int Crash_is_unrentable(struct obj_data *obj)
   if (!obj)
     return 0;
 
-  if (IS_OBJ_STAT(obj, ITEM_NORENT) || (GET_OBJ_TYPE(obj) == ITEM_KEY && OBJ_FLAGGED(obj, ITEM_KEYSTAY)))
+  if (IS_OBJ_STAT(obj, ITEM_NORENT) || (GET_OBJ_TYPE(obj) == ITEM_KEY && !OBJ_FLAGGED(obj, ITEM_KEYSTAY)))
     return 1;
 
   return 0;
@@ -1318,6 +1319,7 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
   fprintf(fl, "Vroom: %d\n", GET_OBJ_VROOM(obj));
   fprintf(fl, "Owner: %ld\n", obj->owner);
   fprintf(fl, "Timer: %d\n", GET_OBJ_TIMER(obj));
+  fprintf(fl, "Expir: %ld\n", GET_OBJ_EXPIRE(obj));
   return fprintf(fl, "@END\n\n");
 }
 
@@ -1467,6 +1469,7 @@ int load_objects_to_room(room_rnum rnum, FILE *fl)
       generate_weapon(temp);
       obj_to_room(temp, rnum);
       relocate_obj(rnum, NULL, temp, locate, cont_row);
+      check_timer(temp);
     }
   }
 
@@ -1765,6 +1768,8 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         sscanf(line, "%d %d %d %d", &GET_OBJ_EXTRA(temp)[0], &GET_OBJ_EXTRA(temp)[1],  &GET_OBJ_EXTRA(temp)[2], &GET_OBJ_EXTRA(temp)[3]);
       else if (!strcmp(tag, "ExDescr"))
         read_extra_descs(fl, temp);
+      else if (!strcmp(tag, "Expir"))
+        GET_OBJ_EXPIRE(temp) = atol(line);
       break;
     case 'f':
       if (!strcmp(tag, "Feel"))

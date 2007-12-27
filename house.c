@@ -1080,7 +1080,9 @@ ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", a
   House_save_control();
 }
 
-int house_capacity(int house) {
+int house_capacity(room_vnum house) {
+if (house == NOWHERE)
+return 500;
   return 500 + (125 * house_control[house].expantions);
 }
 void hcontrol_set_stable(Character *ch, char *argument)

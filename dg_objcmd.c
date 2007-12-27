@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/06/08 08:24:59 $
-*  $Revision: 1.16 $
+*  $Date: 2007/06/14 23:55:39 $
+*  $Revision: 1.17 $
 **************************************************************************/
 
 #include "conf.h"
@@ -49,6 +49,7 @@ OCMD(do_oasound);
 OCMD(do_odoor);
 OCMD(do_osetval);
 OCMD(do_oat);
+void update_timer(struct obj_data *obj);
 void obj_command_interpreter(obj_data *obj, char *argument);
 
 struct obj_command_info {
@@ -348,8 +349,11 @@ OCMD(do_otimer)
 	obj_log(obj, "otimer: missing argument");
     else if (!isdigit(*arg))
 	obj_log(obj, "otimer: bad argument");
-    else
+    else {
 	GET_OBJ_TIMER(obj) = atoi(arg);
+	update_timer(obj);
+	}
+	
 }
 
 

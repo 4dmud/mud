@@ -4,7 +4,7 @@
 #define HOUSE_PRIVATE	0
 
 void add_follower(Character *ch, Character *leader);
-int house_capacity(int house);
+int house_capacity(room_vnum house);
 
 struct house_control_rec {
     room_vnum vnum;		/* vnum of this house           */

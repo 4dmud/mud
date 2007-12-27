@@ -31,6 +31,7 @@ extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);
 
+void check_timer(obj_data *obj);
 int wep_hands(OBJ_DATA *wep);
 void dismount_char(Character *ch);
 char *balance_display(int balance);
@@ -673,8 +674,13 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     else
         ch->Send( ".{c0\r\n");
 
-    if (GET_OBJ_TIMER(obj) >= 0)
-        ch->Send( "{cyIt has {cC%d{cy hours left till it disintergrates{c0\r\n",   GET_OBJ_TIMER(obj));
+//if (GET_TIMER_EVENT(obj) != NULL) {
+      //time_t diff = (event_time(GET_TIMER_EVENT(obj))/PASSES_PER_SEC) - time(0);
+    check_timer(obj);
+    if (GET_OBJ_EXPIRE(obj) > time(0)) {
+    time_t diff = (GET_OBJ_EXPIRE(obj) - time(0));
+        ch->Send( "{cyIt has {cC%ld{cy Min and {cY%ld{cy seconds left till it disintergrates{c0\r\n",   diff/60, diff%60);
+        }
 
     found = FALSE;
     for (i = 0; i < MAX_OBJ_AFFECT; i++) {

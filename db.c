@@ -5855,6 +5855,8 @@ void clear_object(struct obj_data *obj) {
     IN_ROOM(obj) = NULL;
     GET_OBJ_VROOM(obj) = NOWHERE;
     GET_OBJ_TIMER(obj) = -1;
+    GET_OBJ_EXPIRE(obj) = 0;
+    GET_TIMER_EVENT(obj) = NULL;
     obj->worn_on = NOWHERE;
     GET_OBJ_VROOM(obj) = NOWHERE;
     for  (i = 0; i < NUM_OBJ_VAL_POSITIONS; i ++)

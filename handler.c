@@ -40,11 +40,12 @@ void affect_modify_ar(Character *ch, byte loc, sbyte mod,
                          );
 int apply_ac(Character *ch, int eq_pos);
 //void update_object(struct obj_data *obj, int use);
-void update_object(Character *ch, struct obj_data *obj, int use);
+void update_object(Character *ch, struct obj_data *obj, int use, time_t timenow);
 void update_char_objects(Character *ch);
 
 
 /* external functions */
+void check_timer(obj_data *obj);
 OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj);
 void purge_qic(obj_rnum rnum);
 void die_link(Character *mob);
@@ -268,7 +269,7 @@ void affect_modify(Character *ch, byte loc, int mod,
     if (loc < 0)
         return ;
     if (add
-       )
+            == TRUE)
         SET_BIT_AR(AFF_FLAGS(ch), bitv);
     else {
         REMOVE_BIT_AR(AFF_FLAGS(ch), bitv);
@@ -844,10 +845,10 @@ void obj_to_char(struct obj_data *object, Character *ch) {
         IS_CARRYING_N(ch)++;
 
         /* set flag for crash-save system, but not on mobs! */
-        if (!IS_NPC(ch))
+        if (!IS_NPC(ch)) {
             SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
-
-
+            check_timer(object);
+        }
 
         #if defined(ARTIS_ARE_OWNED)
 
@@ -880,8 +881,10 @@ void obj_to_char_no_weight(struct obj_data *object, Character *ch) {
         IS_CARRYING_N(ch)++;
 
         /* set flag for crash-save system, but not on mobs! */
-        if (!IS_NPC(ch))
+        if (!IS_NPC(ch)) {
             SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+            check_timer(object);
+        }
     } else
         log("SYSERR: NULL or dead obj (%p) or char (%p) passed to obj_to_char.",
             object, ch);
@@ -1394,12 +1397,11 @@ void extract_pending_objects(void) {
 
     obj_extractions_pending = 0;
 }
-void extract_object_final(OBJ_DATA *obj)
+void extract_object_final(OBJ_DATA *obj) {
 #else
 /* Extract an object from the world */
-void extract_obj(struct obj_data *obj)
+void extract_obj(struct obj_data *obj) {
 #endif
-{
     struct obj_data *temp;
     Character *ch, *next = NULL;
     struct obj_data *tobj, *onext, *tnext;
@@ -1421,7 +1423,6 @@ void extract_obj(struct obj_data *obj)
     log("extracting object that hasn't been initilised");
     }
     if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE)) {
-
     save_corpses();
     }
     if (obj->in_locker)
@@ -1476,11 +1477,8 @@ void extract_obj(struct obj_data *obj)
                                 }
                             }
                         }
-
-
-
+                        
                         // Now get all the objects from the room
-
                         for (tobj = from->contents; tobj; tobj = tnext) {
                             tnext = tobj->next_content;
                             obj_from_room(tobj);
@@ -1499,6 +1497,12 @@ void extract_obj(struct obj_data *obj)
                 }
             }
         }
+    }
+
+        /* cancel message updates */
+    if (GET_TIMER_EVENT(obj)) {
+        event_cancel(GET_TIMER_EVENT(obj));
+        GET_TIMER_EVENT(obj) = NULL;
     }
 
     free_travel_points(TRAVEL_LIST(obj));
@@ -1557,20 +1561,16 @@ void crumble_obj(Character *ch, struct obj_data *obj) {
             SET_BIT_AR(IN_ROOM(obj)->room_flags, ROOM_HOUSE_CRASH);
 
     if (GET_OBJ_TYPE(obj) == ITEM_PORTAL) {  /* If it is a portal */
-        if (GET_OBJ_VAL(obj, 2) > 0)
-            GET_OBJ_VAL(obj, 2)--;
-        if (!GET_OBJ_VAL(obj, 2)) {
-            if (obj->carried_by == NULL && IN_ROOM(obj) != NULL) {
-                act("A glowing portal fades from existence.",
-                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
-                act("A glowing portal fades from existence.",
-                    TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
-            } else if (obj->carried_by) {
-                obj_from_char(obj);
-            }
-            extract_obj(obj);
-
+        if (obj->carried_by == NULL && IN_ROOM(obj) != NULL) {
+            act("A glowing portal fades from existence.",
+                TRUE, IN_ROOM(obj)->people, obj, 0, TO_ROOM);
+            act("A glowing portal fades from existence.",
+                TRUE, IN_ROOM(obj)->people, obj, 0, TO_CHAR);
+        } else if (obj->carried_by) {
+            obj_from_char(obj);
         }
+        extract_obj(obj);
+
     } else if (IN_ROOM(obj) != NULL) {  /* In a room */
         if (IN_ROOM(obj)->people) {
             act("A quivering horde of maggots consumes $p.",
@@ -1615,9 +1615,7 @@ void crumble_obj(Character *ch, struct obj_data *obj) {
 }
 
 
-void update_object(Character *ch, struct obj_data *obj, int use) {
-
-
+void update_object(Character *ch, struct obj_data *obj, int use, time_t timenow) {
 
     if (GET_OBJ_TIMER(obj) == -1)
         return;
@@ -1626,19 +1624,18 @@ void update_object(Character *ch, struct obj_data *obj, int use) {
 
     // log("(update_obj.2) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
     if (obj->next_content)
-        update_object(ch, obj->next_content, use);
+        update_object(ch, obj->next_content, use, timenow);
     // log("(update_obj.3) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
     if (obj->contains)
-        update_object(ch, obj->contains, use);
+        update_object(ch, obj->contains, use, timenow);
     // log("(update_obj.4) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-    if ((GET_OBJ_TIMER(obj) -= use) < 1) {
+
+    if (timenow <= GET_OBJ_EXPIRE(obj)) {
         if (timer_otrigger(obj) == -1)
             return;
 
         crumble_obj(ch, obj);
     }
-
-
     // log("(update_obj.6) obj: %s, timer: %d", obj->name, GET_OBJ_TIMER(obj));
 }
 

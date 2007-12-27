@@ -25,7 +25,7 @@
 
 struct queue *event_q = NULL;      /* the event queue */
 
-extern long pulse;
+extern unsigned long pulse;
 
 /* initializes the event queue */
 void event_init(void) {
@@ -80,6 +80,9 @@ void event_cancel(struct event *event) {
         case EVENT_TYPE_TRIG:
             delete (struct wait_event_data *)event->event_obj;
             break;
+        case EVENT_TYPE_TIMER:
+            delete (struct timer_event_data *)event->event_obj;
+            break;
         default:
             free(event->event_obj);
             break;
@@ -118,7 +121,7 @@ void event_process(void) {
 }
 
 /* returns the time remaining before the event */
-long event_time(struct event *event) {
+unsigned long event_time(struct event *event) {
     long when;
     if (event == NULL || event->q_el == NULL) {
         ALERT_2;
@@ -153,6 +156,9 @@ void event_free_all(void) {
             case EVENT_TYPE_TRIG:
                 delete (struct wait_event_data *)the_event->event_obj;
                 break;
+            case EVENT_TYPE_TIMER:
+				delete (struct timer_event_data *)the_event->event_obj;
+				break;
             default:
                 free(the_event->event_obj);
                 break;

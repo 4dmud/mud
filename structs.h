@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.61  2007/06/14 23:55:39  w4dimenscor
+ * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
+ *
  * Revision 1.60  2007/06/10 08:18:13  w4dimenscor
  * added new body parts CHEST and BACK
  *
@@ -1431,9 +1434,12 @@ struct obj_flag_data {
     int cost;            /* Value when sold (gp.)         */
     int cost_per_day;         /* Cost to keep pr. real day     */
     int timer;           /* Timer for object              */
+    time_t expire;
+    struct event *timer_event;
     int bitvector[AF_ARRAY_MAX];   /* To set chars bits             */
     int obj_innate;      /* Variable to hold the spell    */
 };
+
 
 
 /* Used in obj_file_elem *DO*NOT*CHANGE* */
@@ -2812,6 +2818,16 @@ struct stave_stat_table {
     int chance;
     int start;
 };
+
+/* The event data for the wait command */
+struct timer_event_data {
+    struct obj_data *obj;
+    timer_event_data(struct obj_data *o) {
+        obj = o;
+    }
+    ~timer_event_data() {}
+}
+;
 
 #include "character.h"
 

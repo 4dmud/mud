@@ -736,8 +736,9 @@ void check_idling(Character *ch) {
 /* Update PCs, NPCs, and objects */
 void point_update(void) {
     Character *i, *next_char;
-    struct obj_data *j, *next_thing, *jj, *next_thing2;
+//    struct obj_data *j, *next_thing, *jj, *next_thing2;
     int tleft = 0;
+//    time_t timenow = time(0);
 
     /* characters */
     for (i = character_list; i; i = next_char) {
@@ -824,7 +825,7 @@ void point_update(void) {
 
         }
     }
-
+#if 0
     /* objects */
     for (j = object_list; j; j = next_thing) {
         next_thing = j->next;	/* Next in object list */
@@ -835,15 +836,24 @@ void point_update(void) {
 
         if (GET_OBJ_TIMER(j) == -1)
             continue;
+
+        if (GET_OBJ_EXPIRE(j) == 0) {
+            update_timer(j);
+            continue;
+            }
+        
         /** This is the timer countdown, if the item is in a house,
         make sure the item's new timer value is saved */
-        if (GET_OBJ_TIMER(j) > 0) {
+        /*if (GET_OBJ_TIMER(j) > 0) {
             GET_OBJ_TIMER(j)--;
             if (IN_ROOM(j) != NULL)
                 if (ROOM_FLAGGED(IN_ROOM(j), ROOM_HOUSE))
                     SET_BIT_AR(IN_ROOM(j)->room_flags, ROOM_HOUSE_CRASH);
             continue;
-        }
+        }*/
+        /** If the current time hasn't reached the time the object is expiring, just continue **/
+        if (timenow < GET_OBJ_EXPIRE(j))
+        continue;
         /** timer has run out on the item, lets check it it was a corpse that can be automelded  - mord*/
         if (automeld(j))
             continue;
@@ -867,4 +877,5 @@ void point_update(void) {
         }
 
     }
+#endif
 }

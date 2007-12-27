@@ -23,6 +23,7 @@ extern int slipping;
 extern int corpse_mod;
 
 /* external functions */
+void crumble_obj(Character *ch, OBJ_DATA *obj);
 ACMD(do_give);
 ACMD(do_put);
 ACMD(do_drop);
@@ -1835,7 +1836,7 @@ ASKILL(skill_fortify)
 
 ASKILL(skill_scalp)
 {
-  void crumble_obj(Character *ch, OBJ_DATA *obj);
+  
   OBJ_DATA *scalp = NULL;
   struct extra_descr_data *new_descr = NULL;
   char /*buf1[MAX_STRING_LENGTH],*/ buf2[MAX_STRING_LENGTH];

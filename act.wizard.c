@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.75  2007/06/14 23:55:39  w4dimenscor
+ * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
+ *
  * Revision 1.74  2007/06/11 08:33:12  w4dimenscor
  * text_processed was accedentally moved to the wrong part of find_replacement
  *
@@ -1551,6 +1554,18 @@ void do_stat_object(Character *ch, struct obj_data *j) {
         ch->Send( "ZONE: (%-3d) %-30s [%s]\r\n",
                   zone_table[zone].number, zone_table[zone].name,zone_table[zone].builders);
     }
+    ch->Send("Timer: %d mud hours. ", GET_OBJ_TIMER(j));
+    if (GET_OBJ_EXPIRE(j) == 0)
+        ch->Send("Expires in: Timer hasn't been started yet!\r\n");
+    else {
+        if (GET_OBJ_EXPIRE(j) > time(0)) {
+            time_t diff = (GET_OBJ_EXPIRE(j) - time(0));
+            ch->Send( "Expires in: {cC%ld{c0 min and {cY%ld{c0 seconds\r\n",   diff/60, diff%60);
+        } else {
+            ch->Send("Expires in: NOW!\r\n");
+        }
+
+    }
     if (j->owner != 0)
         ch->Send( "Object owned by: {cW%s{c0\r\n", get_name_by_id(j->owner));
     ch->Send( "L-Des: %s\r\n",
@@ -2588,7 +2603,7 @@ ACMD(do_purge) {
     one_argument(argument, buf);
 
     if (*buf) {            /* argument supplied. destroy single object
-                                                                                                                         * or char */
+                                                                                                                                 * or char */
         if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
             if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict))) {
                 ch->Send("Fuuuuuuuuu!\r\n");
@@ -5017,9 +5032,9 @@ int perform_set(Character *ch, Character *vict, int mode,
                      val_arg, ONOFF(togglebody(vict, bodypartname(val_arg))));
         } else {
             ch->Send("You can toggle these bits: \r\n");
-			ch->Send("rthumb lthumb saddle eartip lshoulder\r\n");
-			ch->Send("rshoulder crest lthigh rthigh lknee\r\n");
-			ch->Send("rknee floating back chest\r\n");
+            ch->Send("rthumb lthumb saddle eartip lshoulder\r\n");
+            ch->Send("rshoulder crest lthigh rthigh lknee\r\n");
+            ch->Send("rknee floating back chest\r\n");
         }
         break;
     default:

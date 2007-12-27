@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/06/10 08:18:13 $
-*  $Revision: 1.37 $
+*  $Date: 2007/06/14 23:55:39 $
+*  $Revision: 1.38 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.38  2007/06/14 23:55:39  w4dimenscor
+ * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
+ *
  * Revision 1.37  2007/06/10 08:18:13  w4dimenscor
  * added new body parts CHEST and BACK
  *
@@ -1023,7 +1026,7 @@ EVENTFUNC(trig_wait_event) {
     delete wait_event_obj;
     GET_TRIG_WAIT(trig) = NULL;
 
-#if 1  /* debugging */
+#if 0  /* debugging */
 
     {
         int found = FALSE;

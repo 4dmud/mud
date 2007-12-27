@@ -21,6 +21,7 @@
 #define EVENT_TYPE_FIGHT 2
 #define EVENT_TYPE_DAMAGE 3
 #define EVENT_TYPE_TRIG 4
+#define EVENT_TYPE_TIMER 5
 
 
 /********** Event related section *********/
@@ -111,7 +112,7 @@ void event_init(void);
 struct event *event_create(EVENTFUNC(*func), void *event_obj, long when, int type);
 void event_cancel(struct event *event);
 void event_process(void);
-long event_time(struct event *event);
+unsigned long event_time(struct event *event);
 void event_free_all(void);
 
 /* - queues - function protos need by other modules */
