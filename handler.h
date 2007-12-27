@@ -62,8 +62,8 @@ Character *get_char(const char *name);
 
 Character *get_player_room(room_rnum room, char *name, int *number,
                                         int inroom);
-Character *get_room_vis(room_rnum room, char *name, int *number);
-Character *find_in_dir(room_rnum room, char *name, int dir);   //in magic.c
+Character *get_room_vis(room_rnum room, char *name, int *number, Character *ch = NULL);
+Character *find_in_dir(room_rnum room, char *name, int dir, Character *ch = NULL);   //in magic.c
 int move_char_to(Character *ch, room_rnum room);
 void char_from_room(Character *ch);
 void char_to_room(Character *ch, room_rnum room);

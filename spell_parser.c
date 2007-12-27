@@ -9,6 +9,13 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.37  2007/05/24 20:19:50  w4dimenscor
+ * Directional spells don't hit everything in their path anymore.
+ *
+ * Also, the code will check whether or not you can see a target
+ * before attacking it.
+ * --Thotter
+ *
  * Revision 1.36  2007/05/02 19:08:48  w4dimenscor
  * Spells won't think that they are directional when they are not
  * anymore.
@@ -1139,9 +1146,10 @@ ACMD(do_cast) {
                can be used for door spells. Can be used for far sight spells.
                can be used for missile spells. Or even movement. */
             //ch->Send( "target is %d\r\n", target);
-            if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR) && dir != NOWHERE) {
-                tch = find_in_dir(IN_ROOM(ch), a, dir);
-                if (((sp_dist = magic_distance(ch, spellnum, dir, tch)) != NOWHERE)) {
+            if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR) && dir != NOWHERE && EXIT2(IN_ROOM(ch),dir) != NULL) {
+		//start find_in_dir one room away
+                tch = find_in_dir(EXIT2(IN_ROOM(ch),dir)->to_room, a, dir,ch);
+                if (tch && ((sp_dist = magic_distance(ch, spellnum, dir, tch)) != NOWHERE)) {
                     target = TRUE;
                     GET_SPELL_DIR(ch) = dir;
                 } else if (((sp_dist = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&

@@ -230,8 +230,8 @@ int magic_distance(Character *ch, int spellnum, int dir,
 }
 
 
-Character *find_in_dir(room_rnum room, char *name, int dir) {
-
+//Default value of ch is NULL, as defined in handler.h
+Character *find_in_dir(room_rnum room, char *name, int dir, Character *ch) {
     Character *tch;
     int i, num = get_number(&name);
     room_rnum nextroom = NULL;
@@ -248,7 +248,7 @@ Character *find_in_dir(room_rnum room, char *name, int dir) {
     nextroom = room;
     for (i = 0; i < 10 && (nextroom != NULL); i++) {
 
-        if ((tch = get_room_vis(nextroom, name, &num)) != NULL)
+        if ((tch = get_room_vis(nextroom, name, &num,ch)) != NULL)
             return tch;
 
         if (CAN_GO2(nextroom, dir))

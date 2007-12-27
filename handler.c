@@ -2309,7 +2309,8 @@ Character *get_player_room(room_rnum room, char *name, int *number,
   return (NULL);
 }
 
-Character *get_room_vis(room_rnum room, char *name, int *number)
+//Default argument for ch is NULL, as defined in handler.h
+Character *get_room_vis(room_rnum room, char *name, int *number,Character *ch)
 {
   Character *i;
   int num;
@@ -2328,7 +2329,7 @@ Character *get_room_vis(room_rnum room, char *name, int *number)
     return (get_player_room(room, name, NULL, FIND_CHAR_ROOM));
 
   for (i = room->people; i && *number; i = i->next_in_room)
-    if (isname_full(name, GET_NAME(i)))
+    if (isname_full(name, GET_NAME(i)) && (!ch || CAN_SEE(ch,i)))
       if (--(*number) == 0)
         return (i);
 
