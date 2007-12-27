@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/03/01 23:19:41 $                                           * 
-*  $Revision: 1.43 $                                                      *
+*  $Date: 2007/04/22 21:44:43 $                                           * 
+*  $Revision: 1.44 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1355,8 +1355,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     if (o->contains == NULL) {
                         strcpy(str, "");
                     } else {
+			if(!subfield || !*subfield){
+				snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(o->contains));
+				return;
+			}
+
                         for (item = o->contains; item && !found; item = next_obj) {
                             next_obj = item->next_content;
+
                             if (is_number(subfield)) {
                                 if (atoi(subfield) == GET_OBJ_VNUM(item)) {
 
@@ -1374,11 +1380,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                                     found = TRUE;
                                     break;
                                 }
-                            }
+                             }
                         }
                         if (!found)
                             strcpy(str, "");
-                    }
+		}
 
 
                 } else if (!strcasecmp(field, "count")) {
@@ -1388,7 +1394,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     if (GET_OBJ_TYPE(o) == ITEM_CONTAINER) {
                         for (item = o->contains; item; item = next_obj) {
                             next_obj = item->next_content;
-                            if (is_number(subfield)) {
+			    if(!subfield || !*subfield)
+				    ++cnt;
+			    else if (is_number(subfield)) {
                                 if (atoi(subfield) == GET_OBJ_VNUM(item))
                                     ++cnt;
                             } else {
