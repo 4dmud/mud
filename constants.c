@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.17  2006/02/25 04:21:30  w4dimenscor
+ * Fixed crash bug, where constants.c was missing 'NOTELEPORT' string
+ *
  * Revision 1.16  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -657,6 +660,7 @@ const char *preference_bits[] =
     "GATE",
     "RP",
     "FISHTALLY",
+    "NOTELEPORT",
     "\n"
   };
 
