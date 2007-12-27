@@ -2838,7 +2838,7 @@ ASKILL(skill_circle)
     skill_attack(ch, vict, SKILL_BACKSTAB, FALSE);
 
 
-  WAIT_STATE(ch, 3 RL_SEC);
+  WAIT_STATE(ch, 2 RL_SEC);
 
 
   return SKILL_CIRCLE;
