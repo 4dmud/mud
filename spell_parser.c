@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.15  2006/02/25 23:42:45  w4dimenscor
+ * Directional spells work now, BUT mana blast doesn't
+ *
  * Revision 1.14  2006/02/24 20:51:14  w4dimenscor
  * Added a message to quaff for empty potions
  *
@@ -1070,16 +1073,17 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     {
       new_send_to_char(ch, "%s", CONFIG_OK);
     }
-    else if ( IS_SET(SINFO.routines, MAG_DAMAGE))
-    {
-      new_send_to_char(ch, "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
-    }
+
     else if (GET_SPELL_DIR(ch) != NOWHERE)
     {
       new_send_to_char(ch,
                        "You concentrate your energy and send the runes of %s %s.\r\n",
                        skill_name(spellnum),
                        dirs[GET_SPELL_DIR(ch)]);
+    }
+    else if ( IS_SET(SINFO.routines, MAG_DAMAGE))
+    {
+      new_send_to_char(ch, "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
     }
     else
     {

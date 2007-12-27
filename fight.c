@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.31  2006/02/25 23:42:45  w4dimenscor
+ * Directional spells work now, BUT mana blast doesn't
+ *
  * Revision 1.30  2006/02/24 20:09:02  w4dimenscor
  * * Fixed offline automeld so that if a player leaves their corpse and quits,
  *   it will still meld properly.
@@ -1007,7 +1010,7 @@ void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int p
       fight_event_hit(ch, vict, 0, skill);
     else if (GET_FIGHT_EVENT(ch) == NULL)
       fight_event_hit(ch, vict, 0, skill);
-    else if (IS_SPELL_CAST(skill) && IS_SET(spell_info[skill].routines, MAG_AREAS))
+    else if (IS_SPELL_CAST(skill) && (IS_SET(spell_info[skill].routines, MAG_AREAS) || GET_SPELL_DIR(ch) != NOWHERE))
       fight_event_hit(ch, vict, 0, skill);
     else
     {
@@ -1305,7 +1308,9 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
   if (PLR_FLAGGED(attacker, PLR_FROZEN))
     return (ATK_CHANCE(attacker) = 0);
 
-
+  if (IS_SKILL(type) || IS_SPELL_CAST(type))
+    return (ATK_CHANCE(attacker) = 3);
+  
   /*gotta be a moron to not reeally fuck up a sleeping person*/
   if (!AWAKE(vict))
     return (ATK_CHANCE(attacker) = 3);
@@ -1321,7 +1326,7 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
   maxs = class_max_strike(attacker);
 
   if ((diceroll = number(0, 101)) <= 1)
-    return 0;
+    return (ATK_CHANCE(attacker) = 0);
 
   /* lower totalchance, better chance of success */
 
@@ -1376,7 +1381,7 @@ int defence_tot(struct char_data *vict)
 
   victim_ac = (200 - (100 + compute_armor_class(vict)));
   if (victim_ac != 0)
-  defense_roll += (victim_ac/3); // between 0 and 66
+    defense_roll += (victim_ac/3); // between 0 and 66
   if ((part = GET_SUB(vict, SUB_LOYALDEFEND) ) > 0)
     defense_roll += part * 0.5;
 
@@ -1592,9 +1597,9 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
     act("You are brutally woken by $N!", TRUE, vict, 0, ch, TO_CHAR);
   }
 
-  if (!FIGHTING(vict))
+  if (!FIGHTING(vict) && HERE(vict, ch))
     start_fighting_delay(vict, ch);
-  if (!FIGHTING(ch))
+  if (!FIGHTING(ch) && HERE(vict, ch))
     start_fighting_delay(ch, vict);
 
   if (IS_NPC(ch))
@@ -1641,19 +1646,39 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
 
     GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
 
+    /** Make sure that:
+        - You have group members
+        - That are in the same room as you
+        - That they are fighting the same thing as you
 
-    shortwep = is_short_wep(GET_EQ(ch, WEAR_WIELD));
-    perc = valid_perc(ch) * 3;
-    perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 : 0) ) : 0);
-    perc += (IS_SPELL_ATK(num) ? 20 : 0);
-    perc += (IS_SPELL_CAST(num) ? 25 : 0);
-    perc += (IS_SKILL(num) ? 20 : 0);
-
-
-    if (number(0, 40) > perc)
+        If so, then check if the group is going to get in the way.
+    -Mord
+    **/
+    if (ch->master || ch->followers)
     {
-      act("Your group members get in the way of your attack!", FALSE, ch, 0, 0, TO_CHAR);
-      return 0;
+      int fols = 0;
+      k = (ch->master ? ch->master : ch);
+      if (k != ch && HERE(k, ch))
+        fols += 1;
+      for (f = k->followers;f;f=f->next)
+        if (f->follower != ch && HERE(f->follower, ch) && FIGHTING(f->follower) == FIGHTING(ch))
+          fols += 1;
+      if (fols > 0)
+      {
+        shortwep = is_short_wep(GET_EQ(ch, WEAR_WIELD));
+        perc = valid_perc(ch) * 3;
+        perc += (IS_WEAPON(num) ? (perc > 60  ? (!shortwep ? 0 : 20) : (!shortwep ? 20 : 0) ) : 0);
+        perc += (IS_SPELL_ATK(num) ? 20 : 0);
+        perc += (IS_SPELL_CAST(num) ? 25 : 0);
+        perc += (IS_SKILL(num) ? 20 : 0);
+
+
+        if (number(0, 40) > perc)
+        {
+          act("Your group members get in the way of your attack!", FALSE, ch, 0, 0, TO_CHAR);
+          return 0;
+        }
+      }
     }
   }
 
@@ -1709,8 +1734,8 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
       }
       if (AFF_FLAGGED(ch, AFF_MAGIC_BUBBLE))
       {
-        new_send_to_char(ch, "Your magic doesn't penetrate your magic bubble.\r\n");
-        act("$n's magic doesn't penetrate $s magic bubble!", FALSE, ch, 0 , 0, TO_ROOM);
+        new_send_to_char(ch, "Your magic can't penetrate your own magic bubble.\r\n");
+        act("$n's magic doesn't penetrate $s own magic bubble!", FALSE, ch, 0 , 0, TO_ROOM);
         return (fe_melee_hit(ch, vict, TYPE_HIT, TRUE));
       }
 
@@ -1883,7 +1908,7 @@ int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type)
 
   /* for now lets make type random */
   if (type == TYPE_UNDEFINED)
-    type = IS_SPELL_ATK(type) ? type : number(TYPE_ATK_ORB, TYPE_ATK_TORPEDO);
+    type = number(TYPE_ATK_ORB, TYPE_ATK_TORPEDO);
 
   attack_chance = attack_roll(ch, vict, type);
 
@@ -2122,7 +2147,7 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
   {
     return -1;
   }
-  if (!FIGHTING(ch))
+  if (HERE(ch, vict) && !FIGHTING(ch))
   {
     start_fighting_delay(ch, vict);
     return -1;
@@ -2729,7 +2754,7 @@ int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_t
   if (!HERE(ch,vict))
     return 0;
 
-  if (is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD))
+  if (HERE(ch, vict) && is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD))
   {
     if (!number(0, 5) && !AFF_FLAGGED(vict, AFF_FROZEN))
     {
@@ -2818,7 +2843,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
     return 0;
 
 
-  if (has_weapon(ch) && ((parrychance = has_weapon(vict))!= 0) &&
+  if (IS_WEAPON(w_type) && has_weapon(ch) && ((parrychance = has_weapon(vict))!= 0) &&
       (number(1, 30) < GET_DEX(vict)) &&
       (number(1, 300) < (GET_SKILL(vict, SKILL_PARRY) * parrychance)))
   {
@@ -2842,10 +2867,8 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
   {
     if (skill_cost(0, 2, 20, vict))
     {
-      new_send_to_char(ch, "%s dodges your attack.\r\n",
-                       PERS(vict,ch));
-      new_send_to_char(vict,  "You dodge %s's attack.\r\n",
-                       PERS(ch, vict));
+      new_send_to_char(ch, "%s dodges your attack.\r\n", PERS(vict,ch));
+      new_send_to_char(vict,  "You dodge %s's attack.\r\n", PERS(ch, vict));
       return 1;
     }
     else
@@ -5517,7 +5540,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                           the grenade */
+                                                                                                                                                                                                                                                                                                     the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {

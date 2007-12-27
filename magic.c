@@ -305,6 +305,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   int good = 1;
   int evil = 1;
   int pass = TRUE;
+  struct char_data *pvict = NULL;
 
 
   if (ch)
@@ -383,7 +384,17 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
   if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
     pass = FALSE;
+  /** if the player is fighting already, savethe person they are fighting with **/
+  if (FIGHTING(ch) != victim)
+    pvict = FIGHTING(ch);
+  /** Temporarily make this other person the FIGHTEE **/
+  FIGHTING(ch) = victim;
+  /** attack them **/
   skill_attack(ch, victim, spellnum, pass);
+  /** then switch back if nessercery **/
+  if (pvict != NULL)
+  FIGHTING(ch) = check_ch(pvict);
+  
   if (DEAD(victim) || GET_POS(victim) == POS_DEAD)
     return -1;
   else
@@ -1451,15 +1462,13 @@ int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struc
     tch_next = tch->next_in_room;
     if (vict && tch != vict)
       continue;
-    if (tch == ch)
+    if (SELF(tch,ch))
       continue;
     if (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_GOD)
       continue;
     if (tch->master == ch)
       continue;
-    if (!both_pk(ch,tch))
-      continue;
-    else if (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA))
+    if ((IS_NPC(tch) || IS_NPC(ch))  && (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA) || !both_pk(ch,tch)))
       continue;
     act(format, FALSE, tch, 0, ch, TO_CHAR);
     act(format2, TRUE, tch, 0, ch, TO_ROOM);
@@ -1472,6 +1481,7 @@ int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struc
     case SPELL_FLAME_ARROW:
     case SPELL_MAGIC_MISSILE:
     case SPELL_CONE_OF_COLD:
+    case SPELL_FIREBALL:
 
       if (mag_damage(level, ch, tch, spellnum, 1))
         ret += 1;
