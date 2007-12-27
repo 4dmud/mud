@@ -94,6 +94,7 @@
 #include "auction.h"
 #include "mxp.h"
 #include "descriptor.h"
+#include "trees.h"
 
 
 #ifndef INVALID_SOCKET
@@ -217,7 +218,6 @@ void zlib_free(void *opaque, void *address);
 #endif
 
 void free_all_notes(void);
-void check_all_trees(void);
 void clear_free_list(void);
 void free_messages(void);
 void Board_clear_all(void);

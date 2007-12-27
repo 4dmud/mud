@@ -1,6 +1,7 @@
 int save_forest(void);
 int load_forest(void);
 void load_trees(void);
+void check_all_trees(void);
 void init_trees(int num);
 void create_trees(void);
 int load_tree(room_rnum room, int v0, int v1, int v2, int v3);

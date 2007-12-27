@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.59  2006/09/27 10:52:35  w4dimenscor
+ * Changed the way trees check how old they are. Fixed zedit crash bug when updating objects
+ *
  * Revision 1.58  2006/09/24 08:24:22  w4dimenscor
  * Fixed combat in groups
  *
@@ -5201,7 +5204,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;

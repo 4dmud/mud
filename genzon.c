@@ -350,7 +350,7 @@ int Zone::write_zone() {
             arg1 = obj_index[ZPCMD(subcmd).arg1].vnum;
             arg2 = ZPCMD(subcmd).arg2;
             arg3 = ZPCMD(subcmd).arg3;
-            comment = obj_proto[arg1].short_description;
+            comment = obj_proto[ZPCMD(subcmd).arg1].short_description;
             break;
         case 'G':
             arg1 = obj_index[ZPCMD(subcmd).arg1].vnum;
