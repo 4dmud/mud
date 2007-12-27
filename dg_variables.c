@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/05/01 11:29:26 $                                           * 
-*  $Revision: 1.25 $                                                      *
+*  $Date: 2006/05/08 23:39:11 $                                           * 
+*  $Revision: 1.26 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1391,10 +1391,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           {
             for (vdt = SCRIPT(c)->global_vars; vdt; vdt = vdt->next)
             {
-              if (!strcasecmp(vd->name, subfield))
+              if (!strcasecmp(vdt->name, subfield))
                 break;
             }
-            if (vdt)
+            if (vdt) 
               snprintf(str, slen, "1");
             else
               snprintf(str, slen, "0");
