@@ -2380,7 +2380,7 @@ ACMD(do_score)
                      "{cg| |-------------------------------------------------------------------| |\r\n"
                      "{cg| |   {cwExp. Total: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
                      exphave, exp_needed(ch) > 0 ? expneed : "No More");
-    if (GET_LEVEL(ch) >= 20)
+    if (GET_LEVEL(ch) >= 60)
     {
       commafmt(exphave, sizeof(exphave),GET_GROUP_EXP(ch));
       commafmt(expneed, sizeof(expneed),group_exp_needed(ch));

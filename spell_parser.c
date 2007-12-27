@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.11  2005/11/20 06:10:00  w4dimenscor
+ * Fixed Directional spells, and exp
+ *
  * Revision 1.10  2005/11/19 06:18:39  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -1189,8 +1192,8 @@ ACMD(do_cast)
     a = one_argument(t, arg);
     skip_spaces(&t);
     skip_spaces(&a);
-    if (*a || a)
-      dir = search_block(a, dirs, FALSE);
+    if (arg && *arg)
+      dir = search_block(arg, dirs, FALSE);
   }
   //new_send_to_char(ch, "a is %s, dir is %s, t is %s\r\n", a, dirs[dir], t);
 
@@ -1246,7 +1249,7 @@ ACMD(do_cast)
       {
         for (i = 0; !target && i < NUM_WEARS; i++)
           if (HAS_BODY(ch, i) && GET_EQ(ch, i)
-              && isname(t, GET_EQ(ch, i)->name))
+              && isname_full(t, GET_EQ(ch, i)->name))
           {
             tobj = GET_EQ(ch, i);
             target = TRUE;
@@ -1267,17 +1270,16 @@ ACMD(do_cast)
          can be used for door spells. Can be used for far sight spells.
          can be used for missile spells. Or even movement. */
       //new_send_to_char(ch, "target is %d\r\n", target);
-      if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR))
+      if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR) && dir != NOWHERE)
       {
-        if (((tch = find_in_dir(IN_ROOM(ch), t, dir)) != NULL) &&
-            ((distance = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
+        tch = find_in_dir(IN_ROOM(ch), a, dir);
+        if (((distance = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
         {
           target = TRUE;
           GET_SPELL_DIR(ch) = dir;
         }
-        else if (((dir = search_block(t, dirs, FALSE)) != NOWHERE) &&
-                 ((distance = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
-                 IS_SET(SINFO.targets, TAR_IGNORE))
+        else if (((distance = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
+                 IS_SET(SINFO.targets, TAR_IGNORE) && dir != NOWHERE)
         {
           tch = NULL;
           GET_SPELL_DIR(ch) = dir;

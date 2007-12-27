@@ -1398,11 +1398,12 @@ ASPELL(spell_recharge)
 
 ASPELL(spell_knock)
 {
-  int cnt = 0, i;
+  int cnt = 0, i, ret_door = 0;
   if (!obj) {
 
   for (i = 0; i < NUM_OF_DIRS; i++)
   {
+    ret_door = 0;
     /** from this way **/
     if (!EXIT(ch, i))
       continue;
@@ -1417,25 +1418,21 @@ ASPELL(spell_knock)
     if (EXIT(ch, i)->to_room == NULL)
       continue;
     /** and from that way **/
-    if (!EXIT(ch, rev_dir[i]))
-      continue;
-    if (!IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_ISDOOR))
-      continue;
-    if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF))
-      continue;
-    if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_HIDDEN))
-      continue;
-    if (EXIT(ch, rev_dir[i])->to_room == NULL)
-      continue;
+    if (EXIT(ch, rev_dir[i]) &&
+        IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_ISDOOR) &&
+        IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+        EXIT(ch, rev_dir[i])->to_room != NULL)
+      ret_door = 1;
     /** lets make it so they can only open doors that are on the inside **/
 
     cnt++;
     send_to_room(IN_ROOM(ch), "The exit %s burts open under the force of some etherial hand.", dirs[i]);
     send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some etherial hand.", dirs[rev_dir[i]]);
-    if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
+    if (ret_door && IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
       TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED);
     if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
       TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_LOCKED);
+    if (ret_door)
     TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_CLOSED);
     TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_CLOSED);
   }
@@ -1453,8 +1450,8 @@ ASPELL(spell_knock)
       new_send_to_char(ch, "%s resists your magic.\r\n", obj->short_description);
     } else if (GET_SKILL(ch, SPELL_KNOCK) > number(1, 130)) {
       if (OBJVAL_FLAGGED(obj, CONT_LOCKED))
-    TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED))
-        TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_OPEN))
+        TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED);
+      TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_CLOSED);
         act("$p pops right open under the stress of your magic.", FALSE, ch, obj, NULL, TO_CHAR);
       act("$p pops right open under the stress of $n's magic.", FALSE, ch, obj, NULL, TO_ROOM);
     } else {
@@ -1462,4 +1459,5 @@ ASPELL(spell_knock)
       act("$p shivers and glows, but stays shut.", FALSE, ch, obj, NULL, TO_ROOM);
     }
 
+}
 }

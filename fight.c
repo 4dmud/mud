@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.26  2005/11/20 06:10:00  w4dimenscor
+ * Fixed Directional spells, and exp
+ *
  * Revision 1.25  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -210,6 +213,8 @@ int attack_group = 1;
 
 
 /*mord*/
+
+void perform_assist(struct char_data *ch, struct char_data *helpee);
 int speed_msg = 0;
 int ch_speed = 0;
 int global_dam = 0;
@@ -260,21 +265,21 @@ int wep_hands(OBJ_DATA *wep);
 struct attack_hit_type attack_hit_text[] =
   {
     {"hit", "hits"}
-    ,		/* 0 */
+    ,          /* 0 */
     {"sting", "stings"},
     {"whip", "whips"},
     {"slash", "slashes"},
-    {"bite", "bites"},		/*  5 */
+    {"bite", "bites"},        /*  5 */
     {"bludgeon", "bludgeons"},
     {"crush", "crushes"},
     {"pound", "pounds"},
     {"claw", "claws"},
-    {"maul", "mauls"},		/* 10 */
+    {"maul", "mauls"},        /* 10 */
     {"thrash", "thrashes"},
     {"pierce", "pierces"},
     {"blast", "blasts"},
     {"punch", "punches"},
-    {"stab", "stabs"},		/* 15 */
+    {"stab", "stabs"},        /* 15 */
     {"kick", "kicks"},
     {"gore", "gores"},
     /* spell attacks */
@@ -295,7 +300,7 @@ struct attack_hit_type attack_hit_text[] =
 struct hit_chance_type chance_message[] =
   {
     {"", ""}
-    ,			/*should never see this one */
+    ,               /*should never see this one */
     {"graze", "grazes"},
     {"strike", "strikes"},
     {"penetrate", "penetrates"}
@@ -325,8 +330,9 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
     {ONE_HANDED, 15, -70, 10, -30, 40, -80, 40, "Projectile"}
   };
 
-float staff_multi(struct char_data *ch, struct obj_data *staff) {
-  
+float staff_multi(struct char_data *ch, struct obj_data *staff)
+{
+
   int staff_type;
   float multi = 0;
   if (staff && (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MINOR||GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR))
@@ -349,7 +355,7 @@ float staff_multi(struct char_data *ch, struct obj_data *staff) {
     }
     if (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR)
       multi *=2.0;
-    
+
     return multi;
   }
   else
@@ -543,9 +549,9 @@ int size_dice_wep(struct char_data *ch, short dual)
       add += GET_SPEED(ch)/100;
 
 
-    if (RIDING(ch) && HERE(ch, RIDING(ch))) 
+    if (RIDING(ch) && HERE(ch, RIDING(ch)))
       add += (mnt = GET_SKILL(ch, SKILL_MOUNTED_COMBAT)) > 0 ? mnt / 20 : 0;
-    
+
 
     if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
       add += 3;
@@ -660,6 +666,8 @@ struct fight_event_obj
 void start_fighting(struct char_data* ch, struct char_data* vict)
 {
   struct combine_data *temp, *tnext;
+struct char_data *k = (ch->master ? ch->master : ch);
+  struct follow_type *f;
   CHAR_DATA *victim;
 
   /*to stop recursion*/
@@ -719,7 +727,7 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
       }
     }
   }
-  if (IS_NPC(ch))
+  if (IS_NPC(ch) && !DEAD(ch))
   {
     if (ch->mob_specials.head_join)
       temp = ch->mob_specials.head_join->mob_specials.join_list;
@@ -732,6 +740,16 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
       temp = tnext;
     }
   }
+    for (f = k->followers; f; f = f->next)
+    {
+      if ( (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim))
+      {
+        if (!IS_NPC(f->follower))
+          perform_assist(f->follower, ch);
+      }
+    }
+    
+  
 
 
 }
@@ -1036,7 +1054,8 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
   float damage = dam;
   int rand = number(0, 101);
   struct affected_type af;
-
+  struct char_data *k = NULL;
+  struct follow_type *f;
   int skill_cost(int h, int m, int v, struct char_data *ch);
   int wep = IS_WEAPON(w_type);
   //  struct char_data *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
@@ -1108,6 +1127,13 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
     damage -= damage/4;
 
 
+k = (vict->master ? vict->master : vict);
+  for (f = k->followers; f; f = f->next)
+    if ( !DEAD(vict) && HERE(f->follower,ch) && FIGHTING(f->follower) == vict)
+        damage -= damage/10;
+    
+  
+  
   /**TODO: this needs to be fixed up and finished (currently crashes us)**/
   /*
   if (immune_to(vict, elemental_type(w_type)))
@@ -1301,13 +1327,13 @@ float pos_multi(int pos)
     break;
   case POS_DEAD:
   case POS_MORTALLYW: /* mortally wounded     */
-  case POS_INCAP:	/* incapacitated        */
+  case POS_INCAP:   /* incapacitated        */
     return 6.0f;
     break;
-  case POS_STUNNED:  return 4.0f;	/* stunned              */
-  case POS_SLEEPING: return 3.0f;	/* sleeping             */
-  case POS_RESTING:  return 2.0f;	/* resting              */
-  case POS_SITTING:  return 1.2f;	/* sitting              */
+  case POS_STUNNED:  return 4.0f;  /* stunned              */
+  case POS_SLEEPING: return 3.0f;  /* sleeping             */
+  case POS_RESTING:  return 2.0f;  /* resting              */
+  case POS_SITTING:  return 1.2f;  /* sitting              */
   }
 
 }
@@ -1393,6 +1419,8 @@ int attack_tot(struct char_data *attacker)
 {
   int attacker_roll = 0;
   int calc_thaco;
+  struct char_data *k = NULL;
+  struct follow_type *f;
 
   if (!IS_NPC(attacker))
     calc_thaco = (thaco((int) GET_CLASS(attacker), (int) GET_LEVEL(attacker)));
@@ -1419,6 +1447,12 @@ int attack_tot(struct char_data *attacker)
   attacker_roll += total_chance(attacker, SKILL_MELEE)/2;
   attacker_roll += total_chance(attacker, SKILL_SECOND_ATTACK);
   attacker_roll += total_chance(attacker, SKILL_THIRD_ATTACK);
+  if (FIGHTING(attacker)) {
+k = (FIGHTING(attacker)->master ? FIGHTING(attacker)->master : FIGHTING(attacker));
+  for (f = k->followers; f; f = f->next)
+    if ( !DEAD(FIGHTING(attacker)) && HERE(f->follower,attacker) && FIGHTING(f->follower) == attacker)
+      attacker_roll += 10;
+  }
 
 
   if (!IS_NPC(attacker))
@@ -1605,12 +1639,12 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
 
     if (!IS_NPC(ch))
     {
-      k = (ch->master ? ch->master : ch);	/* Find the master */
+      k = (ch->master ? ch->master : ch);    /* Find the master */
       /* Not an NPC, Not Yourself, Not Fighting, Above standing */
       if (k != ch && GET_POS(k) == POS_STANDING)
       {
         if (((AFF_FLAGGED(k, AFF_CHARM)) || PRF_FLAGGED(k, PRF_AUTOASSIST)) && HERE(k, vict) && !FIGHTING(k))
-        {	/* If he is flagged to assist */
+        { /* If he is flagged to assist */
           start_fighting_delay(k, vict);
         }
       }
@@ -1619,7 +1653,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
       {
         if ((f->follower == ch)
             || (GET_POS(f->follower) != POS_STANDING))
-          continue;	/* Skip if any of these are true */
+          continue; /* Skip if any of these are true */
         if (FIGHTING(f->follower))
           continue;
         if (((AFF_FLAGGED(f->follower, AFF_CHARM)) || PRF_FLAGGED(f->follower, PRF_AUTOASSIST))&& HERE(f->follower,vict))
@@ -2309,7 +2343,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     else
       partial = dam;
 
-    if (!IS_NPC(ch) && GET_SUB(ch, SUB_SWEEP_ATTACK) > 0)
+    if (!IS_NPC(ch) && GET_SUB(ch, SUB_SWEEP_ATTACK) > 0 && dam > 0)
     {
       if (get_sub_status(ch, SUB_SWEEP_ATTACK) == STATUS_ON )
       {
@@ -2338,8 +2372,13 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     }
     else
       GET_SWEEP_DAM(ch) = 0;
+
     alter_hit(vict, partial);
     update_pos(vict);
+    if (IS_NPC(vict) && partial > 0)
+      damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), partial);
+
+
     if (!SELF(ch, vict))
     {
       if (partial > 5 && steal_affects(ch, partial, w_type, vict) == -1)
@@ -2872,7 +2911,7 @@ int skill_roll(struct char_data *ch, int skill_num)
 int compute_armor_class(struct char_data *ch)
 {
   int armorclass = GET_AC(ch);
-  return (IRANGE(-100, armorclass, 100));	/* -100 is lowest */
+  return (IRANGE(-100, armorclass, 100));    /* -100 is lowest */
 }
 
 
@@ -3754,7 +3793,7 @@ char *replace_string2(char *str, const char *str2)
       *(cp++) = *str;
 
     *cp = 0;
-  }				/* For */
+  }                 /* For */
   return (buff);
 }
 
@@ -3886,7 +3925,7 @@ char *fight_type_message(char *str, struct char_data *attacker, struct char_data
   case FE_TYPE_MELEE:
   case FE_TYPE_SKILL:
     if (run_type >= TYPE_HIT)
-      run_type -= TYPE_HIT;		/* Change to base of table with text */
+      run_type -= TYPE_HIT;        /* Change to base of table with text */
     switch (fst)
     {
     case FE_TO_CHAR:
@@ -4180,40 +4219,40 @@ void dam_message(int dam, struct char_data *ch, struct char_data *victim,
     char * other;
   }
   dam_size[] = {
-    {"miss", "misses", ""},//0
-    {"scratch", "scratches", ""},//1
-    {"blemish", "blemishes", ""},//2
-    {"stub", "stubs", ""},//3
-    {"slap", "slaps", ""},//4
-    {"bruise", "bruises", ""},//5
-    {"batter", "batters", ""},//6
-    {"hurt", "hurts", ""},//7
-    {"abuse", "abuses", ""},//8
-    {"scathe", "scathes", ""},//9
-    {"smash", "smashs", ""},//10
-    {"injure", "injures", ""},//11
-    {"mangle", "mangles", ""},//12
-    {"damage", "damages", ""},//13
-    {"maim", "maims", ""},//14
-    {"lacerate", "lacerates", ""},//15
-    {"massacre", "massacres", ""},//16
-    {"cripple", "cripples", ""},//17
-    {"{cROBLITERATE{c0", "{cROBLITERATES{c0", ""},//18
-    {"{cRANNIHILATE{c0", "{cRANNIHILATES{c0", ""},//19
-    {"{cRMUTILATE{c0", "{cRMUTILATES{c0", ""},//20
-    {"{cRDISINTEGRATE{c0", "{cRDISINTEGRATES{c0", ""},//21
-    {"{cRINCAPACITATE{c0", "{cRINCAPACITATES{c0", ""},//22
-    {"{cRDESTROY{c0", "{cRDESTROYS{c0", ""},//23
-    {"do {cRUNSPEAKABLE{cy things to", "does {cRUNSPEAKABLE{cr things to", "does {cRUNSPEAKABLE{c0 things to"},//24
-    {"do {cRUNNATURAL{cy things to", "does {cRUNNATURAL{cr things to", "does {cRUNNATURAL{c0 things to"},//25
-    {"do {cRDEVASTATING{cy things to", "does {cRDEVASTATING{cr things to", "does {cRDEVASTATING{c0 things to"},//26
-    {"do {cRUNHOLY{cy things to", "does {cRUNHOLY{cr things to", "does {cRUNHOLY{c0 things to"},//27
-    {"do {cRCATACLYSMIC{cy things to", "does {cRCATACLYSMIC{cr things to", "does {cRCATACLYSMIC{c0 things to"},//28
-    {"do {cRDESOLATING{cy things to", "does {cRDESOLATING{cr things to", "does {cRDESOLATING{c0 things to"},//29
-    {"do {cRSAVAGE{cy things to", "does {cRSAVAGE{cr things to", "does {cRSAVAGE{c0 things to"},//30
-    {"do {cRDISGUSTING{cy things to", "does {cRDISGUSTING{cr things to", "does {cRDISGUSTING{c0 things to"},//31
-    {"do {cRHELLISH{cy things to", "does {cRHELLISH{cr things to", "does {cRHELLISH{c0 things to"},//32
-    {"do {cRTERMINAL{cy things to", "does {cRTERMINAL{cr things to", "does {cRTERMINAL{c0 things to"}//33
+                 {"miss", "misses", ""},//0
+                 {"scratch", "scratches", ""},//1
+                 {"blemish", "blemishes", ""},//2
+                 {"stub", "stubs", ""},//3
+                 {"slap", "slaps", ""},//4
+                 {"bruise", "bruises", ""},//5
+                 {"batter", "batters", ""},//6
+                 {"hurt", "hurts", ""},//7
+                 {"abuse", "abuses", ""},//8
+                 {"scathe", "scathes", ""},//9
+                 {"smash", "smashs", ""},//10
+                 {"injure", "injures", ""},//11
+                 {"mangle", "mangles", ""},//12
+                 {"damage", "damages", ""},//13
+                 {"maim", "maims", ""},//14
+                 {"lacerate", "lacerates", ""},//15
+                 {"massacre", "massacres", ""},//16
+                 {"cripple", "cripples", ""},//17
+                 {"{cROBLITERATE{c0", "{cROBLITERATES{c0", ""},//18
+                 {"{cRANNIHILATE{c0", "{cRANNIHILATES{c0", ""},//19
+                 {"{cRMUTILATE{c0", "{cRMUTILATES{c0", ""},//20
+                 {"{cRDISINTEGRATE{c0", "{cRDISINTEGRATES{c0", ""},//21
+                 {"{cRINCAPACITATE{c0", "{cRINCAPACITATES{c0", ""},//22
+                 {"{cRDESTROY{c0", "{cRDESTROYS{c0", ""},//23
+                 {"do {cRUNSPEAKABLE{cy things to", "does {cRUNSPEAKABLE{cr things to", "does {cRUNSPEAKABLE{c0 things to"},//24
+                 {"do {cRUNNATURAL{cy things to", "does {cRUNNATURAL{cr things to", "does {cRUNNATURAL{c0 things to"},//25
+                 {"do {cRDEVASTATING{cy things to", "does {cRDEVASTATING{cr things to", "does {cRDEVASTATING{c0 things to"},//26
+                 {"do {cRUNHOLY{cy things to", "does {cRUNHOLY{cr things to", "does {cRUNHOLY{c0 things to"},//27
+                 {"do {cRCATACLYSMIC{cy things to", "does {cRCATACLYSMIC{cr things to", "does {cRCATACLYSMIC{c0 things to"},//28
+                 {"do {cRDESOLATING{cy things to", "does {cRDESOLATING{cr things to", "does {cRDESOLATING{c0 things to"},//29
+                 {"do {cRSAVAGE{cy things to", "does {cRSAVAGE{cr things to", "does {cRSAVAGE{c0 things to"},//30
+                 {"do {cRDISGUSTING{cy things to", "does {cRDISGUSTING{cr things to", "does {cRDISGUSTING{c0 things to"},//31
+                 {"do {cRHELLISH{cy things to", "does {cRHELLISH{cr things to", "does {cRHELLISH{c0 things to"},//32
+                 {"do {cRTERMINAL{cy things to", "does {cRTERMINAL{cr things to", "does {cRTERMINAL{c0 things to"}//33
 
                };
 
@@ -4500,14 +4539,14 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
     }
     //SET_BIT_AR(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
     SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_NODONATE);
-    GET_OBJ_VAL(corpse, 0) = 0;	/* You can't store stuff in a corpse */
-    GET_OBJ_VAL(corpse, 3) = 1;	/* corpse identifier */
+    GET_OBJ_VAL(corpse, 0) = 0;    /* You can't store stuff in a corpse */
+    GET_OBJ_VAL(corpse, 3) = 1;    /* corpse identifier */
 
 
     GET_OBJ_WEIGHT(corpse) = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
     /*
         if (GET_OBJ_WEIGHT(corpse) > 5000 || GET_OBJ_WEIGHT(corpse) < 0)
-    	GET_OBJ_WEIGHT(corpse) = 500;*/
+     GET_OBJ_WEIGHT(corpse) = 500;*/
 
     GET_OBJ_RENT(corpse) = 100000;
 
@@ -4736,7 +4775,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer)
 
 void delay_die(struct char_data *ch, struct char_data *killer)
 {
-  
+
   if (!IS_NPC(killer) || SELF(killer, ch) || (GET_LEVEL(ch)<=10 && REMORTS(ch) == 0))
   {
     die(ch, killer);
@@ -4747,14 +4786,16 @@ void delay_die(struct char_data *ch, struct char_data *killer)
                    "leave a corpse. To leave a corpse now, type DIE{c0\r\n");
   SET_BIT_AR(PLR_FLAGS(ch), PLR_DYING);
   DIE_TIME(ch) = time(0);
-  
+
 }
-struct char_data * char_by_id_desc_list(long idnum) {
+struct char_data * char_by_id_desc_list(long idnum)
+{
   struct descriptor_data *d;
   if (!descriptor_list)
     return NULL;
 
-  for (d = descriptor_list;d;d = d->next) {
+  for (d = descriptor_list;d;d = d->next)
+  {
     if (IS_PLAYING(d) && d->character && GET_IDNUM(d->character) == idnum)
       return d->character;
   }
@@ -4788,24 +4829,44 @@ void die(struct char_data *ch, struct char_data *killer)
       idnum = GET_IDNUM(killer);
     else
       idnum = -1;
-    
-    if (!IS_NPC(ch)) {
-    exp =
-      (level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1,  current_class_is_tier_num(ch), REMORTS(ch)) - (level_exp(GET_CLASS(ch), GET_LEVEL(ch),  current_class_is_tier_num(ch), REMORTS(ch))));
-    gain_exp(ch, -(exp / 6));
+
+    if (!IS_NPC(ch))
+    {
+      exp =
+        (level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1,  current_class_is_tier_num(ch), REMORTS(ch)) - (level_exp(GET_CLASS(ch), GET_LEVEL(ch),  current_class_is_tier_num(ch), REMORTS(ch))));
+      gain_exp(ch, -(exp / 6));
     }
-    
-    
+
+
     for (t = MOB_DAM_LIST(ch); t; t = t->next)
     {
       if (t->id != -1)
       {
         temp = char_by_id_desc_list(t->id);
         exp = (GET_EXP(ch) * t->damage)/MOB_DAM_TAKEN(ch);
-        gain_exp(ch, exp);
+        if (exp < ((GET_EXP(ch) * ((160 - GET_LEVEL(ch))/10))/100)) /*(16% for level 1, 1% for level 150)*/
+          exp = ((GET_EXP(ch) * ((160 - GET_LEVEL(ch))/10))/100);
+        if (!PRF_FLAGGED(temp, PRF_BATTLESPAM))
+        {
+          if (HERE(ch, temp))
+          {
+            if (exp > 1)
+              new_send_to_char(temp, "You receive your share of experience -- %lld points.\r\n", exp);
+            else
+              new_send_to_char(temp, "You receive your share of experience -- one measly little point!\r\n");
+          }
+          else
+          {
+            if (exp > 1)
+              new_send_to_char(temp, "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME(ch), exp);
+            else
+              new_send_to_char(temp, "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME(ch));
+          }
+        }
+        gain_exp(temp, exp);
       }
     }
-    
+
     raw_kill(ch, killer);
   }
 }
@@ -4842,23 +4903,23 @@ set mobs to count the amount of damage/hits they take from
 each person.
 And when they die, the exp is distributed through the list
 of people that had caused damage to that mob.
-
+ 
 new value on the mob,
 int damage_taken;
-
+ 
 and a linked list which lists the ID nums of all the players/mobs
 that caused damage to this mob.
-
+ 
 If something caused damage but now doesn't exist, then that damage
 is still removed from the total.
-
+ 
 Involvement will need to control how likely people are to land their attacks better.
-
+ 
 Havd a special id num of -1,
 for things like poison and scripts and mobs that cause damage that doesn't get distributed.
-
+ 
 This addition would mean that mobs/pets could be used to fight along side players again.
-
+ 
 */
 
 void group_gain(struct char_data *ch, struct char_data *victim)
@@ -4987,7 +5048,7 @@ char *replace_string(const char *str, const char *weapon_singular,
         for (; *strike_sing; *(cp++) = *(strike_sing++));
         break;
       case 't':
-        for (; *hitcount_word; *(cp++) = *(hitcount_word++));	/*added by mord */
+        for (; *hitcount_word; *(cp++) = *(hitcount_word++));    /*added by mord */
         break;
       default:
         *(cp++) = '#';
@@ -4998,7 +5059,7 @@ char *replace_string(const char *str, const char *weapon_singular,
       *(cp++) = *str;
 
     *cp = 0;
-  }				/* For */
+  }                 /* For */
 
   return (buf);
 }
@@ -5098,7 +5159,7 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
         }
       }
       else if (ch != vict)
-      {	/* Dam == 0 */
+      {   /* Dam == 0 */
         new_send_to_char(ch, "%s", CCYEL(ch, C_CMP));
         act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
         new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
@@ -5259,7 +5320,7 @@ void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
   if (GET_OBJ_TYPE(missile) == ITEM_GRENADE)
   {
     send_to_char("You throw it!\r\n", ch);
-    sprintf(buf, "$n throws %s %s.", missile->short_description, dirs[dir]);	//maybe it should be missile
+    sprintf(buf, "$n throws %s %s.", missile->short_description, dirs[dir]);    //maybe it should be missile
     act(buf, FALSE, ch, 0, 0, TO_ROOM);
     send_to_room(nextroom, "%s flies in from the %s.\r\n",
                  missile->short_description, dirs[rev_dir[dir]]);
@@ -5419,8 +5480,8 @@ void tick_grenade(void)
           /* blow it up */
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
-          s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                        				   the grenade */
+          s = 0;    /* we'll jump out after 5 containers deep and just delete
+                                                                                                                                                                                                                                                                       the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -5453,7 +5514,7 @@ void tick_grenade(void)
             return;
           }
           else
-          {	/* ok we have a room to blow up */
+          {    /* ok we have a room to blow up */
 
             /* peaceful rooms */
             if (ROOM_FLAGGED(t, ROOM_PEACEFUL))
@@ -5485,7 +5546,7 @@ void tick_grenade(void)
               if (GET_POS(tch) <= POS_DEAD)
               {
                 log("SYSERR: Attempt to damage a corpse.");
-                return;	/* -je, 7/7/92 */
+                return;  /* -je, 7/7/92 */
               }
 
               /* You can't damage an immortal! */
@@ -5508,9 +5569,9 @@ void tick_grenade(void)
             extract_obj(i);
             return;;
           }
-        }		/* end else stmt that took care of explosions */
-      }			/* end if stmt that took care of live grenades */
-    }			/* end loop that searches the mud for objects. */
+        }      /* end else stmt that took care of explosions */
+      }             /* end if stmt that took care of live grenades */
+    }               /* end loop that searches the mud for objects. */
   }
   return;
 
@@ -5873,7 +5934,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
   float dam = 1.0;
   int inside, hot, cold, underwater, sky, raining, day, night;
 
-  m_user = (IS_MAGE(ch) || IS_ESPER(ch) || IS_PRIEST(ch) || IS_NPC(ch));	/*The main magic users */
+  m_user = (IS_MAGE(ch) || IS_ESPER(ch) || IS_PRIEST(ch) || IS_NPC(ch));   /*The main magic users */
   chclass = GET_CLASS(ch);
   chcha = GET_CHA(ch);
   tier = current_class_is_tier_num(ch);
@@ -5936,7 +5997,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
 
     }
     break;
-  case SPELL_CHILL_TOUCH:	/* chill touch also has an affect */
+  case SPELL_CHILL_TOUCH:     /* chill touch also has an affect */
     if (cold)
       dam = 1.8;
     else if (hot)

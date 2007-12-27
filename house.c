@@ -629,8 +629,8 @@ const char *HCONTROL_FORMAT =
   "       hcontrol save\r\n"
   "       hcontrol listrent <house vnum>\r\n"
   "       hcontrol calc <house vnum>\r\n"
-  "       hcontrol mount <house vnum> <mob vnum>\r\n";
-  "       hcontrol expand <house vnum> <number of gold tokens paid>
+  "       hcontrol mount <house vnum> <mob vnum>\r\n"
+  "       hcontrol expand <house vnum> <number of gold tokens paid>\r\n";
 //"       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
 
 void hcontrol_list_houses(struct char_data *ch)
@@ -1066,7 +1066,7 @@ void hcontrol_expand_house(struct char_data *ch, char *argument)
   }
   
 
-    house_control[i].expantion += (long)amount;
+    house_control[i].expantions += (long)amount;
 new_send_to_char(ch, "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, get_name_by_id(house_control[i].owner), house_capacity(i));
 
   
@@ -1074,7 +1074,7 @@ new_send_to_char(ch, "%d units of 125 added to house %d (owner: %s) new capacity
 }
 
 int house_capacity(int house) {
-  return 500 + (125 * house_control[house].expantion);
+  return 500 + (125 * house_control[house].expantions);
 }
 void hcontrol_set_mount(struct char_data *ch, char *argument)
 {

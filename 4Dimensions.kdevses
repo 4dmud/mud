@@ -3,7 +3,7 @@
 <KDevPrjSession>
  <DocsAndViews NumberOfDocuments="17" >
   <Doc0 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/assedit.c" >
-   <View0 line="184" Type="Source" />
+   <View0 Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/fight.c" >
    <View0 line="4893" Type="Source" />
@@ -12,46 +12,46 @@
    <View0 line="1265" Type="Source" />
   </Doc2>
   <Doc3 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/structs.h" >
-   <View0 line="1812" Type="Source" />
+   <View0 line="224" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/utils.h" >
-   <View0 line="659" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/damage.c" >
+  <Doc4 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/damage.c" >
    <View0 line="179" Type="Source" />
-  </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/damage.h" >
+  </Doc4>
+  <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/damage.h" >
    <View0 line="14" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.informative.c" >
+  </Doc5>
+  <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.informative.c" >
    <View0 line="1542" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_mobcmd.c" >
-   <View0 line="74" Type="Source" />
-  </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/spec_procs.c" >
-   <View0 line="55" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/db.c" >
+  </Doc6>
+  <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/db.c" >
    <View0 line="44" Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.movement.c" >
-   <View0 line="12" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/genmob.c" >
+  </Doc7>
+  <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.movement.c" >
+   <View0 line="1303" Type="Source" />
+  </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/genmob.c" >
    <View0 line="57" Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/ignore.c" >
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/ignore.c" >
    <View0 line="42" Type="Source" />
+  </Doc10>
+  <Doc11 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
+   <View0 line="1990" Type="Source" />
+  </Doc11>
+  <Doc12 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/spells.c" >
+   <View0 line="1433" Type="Source" />
+  </Doc12>
+  <Doc13 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.comm.c" >
+   <View0 line="1294" Type="Source" />
   </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/comm.c" >
-   <View0 line="4142" Type="Source" />
+  <Doc14 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/kalten.c" >
+   <View0 line="2927" Type="Source" />
   </Doc14>
-  <Doc15 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
-   <View0 line="1979" Type="Source" />
+  <Doc15 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/house.c" >
+   <View0 line="1018" Type="Source" />
   </Doc15>
-  <Doc16 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/medit.c" >
-   <View0 line="0" Type="Source" />
+  <Doc16 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/house.h" >
+   <View0 line="6" Type="Source" />
   </Doc16>
  </DocsAndViews>
  <pluginList>
@@ -78,16 +78,16 @@
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
      <mark line="392" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/fight.c" >
-     <mark line="4886" />
-     <mark line="673" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.other.c" >
+     <mark line="241" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/redit.c" >
      <mark line="211" />
      <mark line="315" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.other.c" >
-     <mark line="241" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/fight.c" >
+     <mark line="4886" />
+     <mark line="673" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.informative.c" >
      <mark line="1834" />
@@ -98,23 +98,23 @@
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
      <mark line="6578" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
-     <mark line="1258" />
-     <mark line="1785" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
+     <mark line="737" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_triggers.c" >
      <mark line="544" />
      <mark line="1173" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
-     <mark line="737" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
+     <mark line="1258" />
+     <mark line="1785" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/constants.c" >
+     <mark line="2425" />
+     <mark line="201" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/qic.c" >
      <mark line="269" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/constants.c" >
-     <mark line="2423" />
-     <mark line="201" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_scripts.c" >
      <mark line="3230" />

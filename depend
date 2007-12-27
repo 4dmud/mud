@@ -6,22 +6,22 @@ act.comm.o: act.comm.c conf.h sysdep.h structs.h subskills.h utils.h \
   improved-edit.h
 act.create.o: act.create.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
-  dg_event.h genolc.h trees.h
+  dg_event.h genolc.h trees.h damage.h
 act.informative.o: act.informative.c conf.h sysdep.h structs.h \
   subskills.h utils.h comm.h interpreter.h handler.h db.h spells.h \
   screen.h constants.h dg_scripts.h clan.h fight.h
 action.o: action.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
-  dg_event.h trees.h
+  dg_event.h trees.h damage.h fight.h
 act.item.o: act.item.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
   screen.h fight.h assemblies.h
 act.movement.o: act.movement.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h house.h \
-  constants.h dg_scripts.h kalten.h
+  constants.h dg_scripts.h kalten.h fight.h damage.h
 act.offensive.o: act.offensive.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h dg_event.h \
-  dg_scripts.h constants.h
+  dg_scripts.h constants.h fight.h
 act.other.o: act.other.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h screen.h house.h \
   constants.h dg_scripts.h
@@ -75,11 +75,11 @@ corpse.o: corpse.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
   db.h interpreter.h utils.h spells.h
 damage.o: damage.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_event.h dg_scripts.h \
-  constants.h
+  constants.h fight.h
 db.o: db.c conf.h sysdep.h structs.h subskills.h utils.h db.h comm.h \
   handler.h spells.h mail.h interpreter.h house.h constants.h oasis.h \
   dg_scripts.h dg_event.h clan.h genobj.h genmob.h genwld.h xmlhelp.h \
-  assemblies.h trees.h htree.h
+  assemblies.h trees.h htree.h damage.h
 dg_comm.o: dg_comm.c conf.h sysdep.h structs.h subskills.h dg_scripts.h \
   utils.h comm.h handler.h db.h constants.h
 dg_db_scripts.o: dg_db_scripts.c conf.h sysdep.h structs.h subskills.h \
@@ -95,7 +95,7 @@ dg_misc.o: dg_misc.c conf.h sysdep.h structs.h subskills.h dg_scripts.h \
   spells.h constants.h
 dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h db.h utils.h handler.h interpreter.h comm.h spells.h \
-  constants.h
+  constants.h fight.h
 dg_objcmd.o: dg_objcmd.c conf.h sysdep.h structs.h subskills.h screen.h \
   dg_scripts.h utils.h comm.h interpreter.h handler.h db.h constants.h
 dg_olc.o: dg_olc.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -119,10 +119,10 @@ event.o: event.c conf.h sysdep.h structs.h subskills.h event.h utils.h \
   comm.h handler.h db.h dg_scripts.h
 familiar.o: familiar.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h house.h screen.h constants.h \
-  oasis.h dg_scripts.h spells.h
+  oasis.h dg_scripts.h spells.h fight.h
 fight.o: fight.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   handler.h interpreter.h db.h spells.h screen.h constants.h dg_scripts.h \
-  arena.h dg_event.h fight.h
+  arena.h dg_event.h fight.h damage.h
 fishing.o: fishing.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
   dg_event.h
@@ -150,7 +150,8 @@ group.o: group.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   comm.h handler.h spells.h mail.h interpreter.h house.h constants.h \
   dg_scripts.h clan.h
 handler.o: handler.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  db.h handler.h interpreter.h spells.h dg_scripts.h dg_event.h trees.h
+  db.h handler.h interpreter.h spells.h dg_scripts.h dg_event.h trees.h \
+  damage.h
 hedit.o: hedit.c conf.h sysdep.h structs.h subskills.h comm.h utils.h \
   db.h boards.h oasis.h
 house.o: house.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
@@ -169,9 +170,9 @@ interpreter.o: interpreter.c conf.h sysdep.h structs.h subskills.h comm.h \
   improved-edit.h
 kalten.o: kalten.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h house.h screen.h constants.h \
-  oasis.h dg_scripts.h clan.h event.h kalten.h
+  oasis.h dg_scripts.h clan.h damage.h event.h kalten.h
 limits.o: limits.c conf.h sysdep.h structs.h subskills.h utils.h spells.h \
-  comm.h db.h handler.h interpreter.h dg_scripts.h clan.h
+  comm.h db.h handler.h interpreter.h dg_scripts.h clan.h damage.h
 lockers.o: lockers.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   screen.h spells.h handler.h interpreter.h db.h constants.h
 magic.o: magic.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -193,13 +194,13 @@ mine.o: mine.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
   dg_event.h
 mobact.o: mobact.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
-  comm.h interpreter.h handler.h spells.h constants.h
+  comm.h interpreter.h handler.h spells.h constants.h fight.h
 modify.o: modify.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h handler.h db.h comm.h spells.h mail.h boards.h \
   improved-edit.h oasis.h tedit.h
 molly.o: molly.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h spells.h screen.h constants.h dg_scripts.h \
-  dg_event.h
+  dg_event.h damage.h
 mordecai.o: mordecai.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h house.h screen.h constants.h \
   oasis.h dg_scripts.h spells.h
@@ -248,19 +249,20 @@ shop.o: shop.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
   db.h interpreter.h utils.h shop.h constants.h screen.h
 skills.o: skills.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h interpreter.h handler.h spells.h screen.h constants.h dg_scripts.h \
-  dg_event.h
+  dg_event.h fight.h damage.h
 spec_assign.o: spec_assign.c conf.h sysdep.h structs.h subskills.h db.h \
   interpreter.h utils.h
 spec_procs.o: spec_procs.c conf.h sysdep.h structs.h subskills.h utils.h \
-  comm.h interpreter.h handler.h db.h spells.h dg_scripts.h constants.h
+  comm.h interpreter.h handler.h db.h spells.h dg_scripts.h constants.h \
+  damage.h fight.h
 spelledit.o: spelledit.c conf.h sysdep.h structs.h subskills.h \
   interpreter.h handler.h comm.h utils.h db.h oasis.h screen.h
 spell_parser.o: spell_parser.c conf.h sysdep.h structs.h subskills.h \
   utils.h interpreter.h spells.h handler.h comm.h db.h dg_scripts.h \
-  constants.h
+  constants.h fight.h
 spells.o: spells.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   spells.h handler.h db.h constants.h interpreter.h dg_scripts.h fight.h \
-  dg_event.h
+  dg_event.h damage.h
 string.o: string.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h constants.h oasis.h
 subskills.o: subskills.c conf.h sysdep.h structs.h subskills.h utils.h \

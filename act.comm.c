@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.24  2005/11/20 06:10:00  w4dimenscor
+ * Fixed Directional spells, and exp
+ *
  * Revision 1.23  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -1295,7 +1298,7 @@ ACMD(do_gen_comm)
     return;
   }
   skip_spaces(&argument);
-  delete_doubledollar(argument); /* this was needed! - mord */
+  
 
   /* make sure that there is something there to say! */
   if (!*argument)
@@ -1363,6 +1366,7 @@ ACMD(do_gen_comm)
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {
       snprintf(buf, sizeof(buf), "%s$n %ss, '%s'", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument);
+      delete_doubledollar(buf); /* this was needed! - mord */
     }
     else
     {

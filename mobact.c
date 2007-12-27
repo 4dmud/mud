@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "spells.h"
 #include "constants.h"
+#include "fight.h"
 
 /* external structs */
 extern int no_specials;

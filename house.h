@@ -38,3 +38,5 @@ void House_save_all(void);
 int House_can_enter(struct char_data *ch, room_vnum house);
 void House_crashsave(room_vnum vnum);
 void House_list_guests(struct char_data *ch, int i, int quiet);
+void house_expand_house(struct char_data *ch, int house);
+void hcontrol_expand_house(struct char_data *ch, char *argument);

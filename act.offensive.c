@@ -68,12 +68,12 @@ ACMD(do_trample);
 void send_not_to_spam(char *buf, struct char_data *ch,
                       struct char_data *victim, struct obj_data *weap,
                       int spam);
-
+void perform_assist(struct char_data *ch, struct char_data *helpee);
 
 
 ACMD(do_assist)
 {
-  struct char_data *helpee, *opponent;
+  struct char_data *helpee;
   char arg[MAX_INPUT_LENGTH];
 
   if (FIGHTING(ch))
@@ -93,7 +93,13 @@ ACMD(do_assist)
     send_to_char("You can't help yourself any more than this!\r\n",
                  ch);
   else
-  {
+    perform_assist(ch, helpee);
+}
+
+void perform_assist(struct char_data *ch, struct char_data *helpee) {
+  struct char_data  *opponent;
+  
+
     /*
      * Hit the same enemy the person you're helping is.
      */
@@ -103,7 +109,7 @@ ACMD(do_assist)
       for (opponent = ch->in_room->people;
            opponent && (FIGHTING(opponent) != helpee);
            opponent = opponent->next_in_room);
-
+    
     if (!opponent)
       act("But nobody is fighting $M!", FALSE, ch, 0, helpee,
           TO_CHAR);
@@ -128,12 +134,11 @@ ACMD(do_assist)
         return;
       send_to_char("You join the fight!\r\n", ch);
       act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
-      send_not_to_spam("{cg$n engages in combat with $N.{c0", ch, opponent, NULL, 0);
+      act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, opponent, TO_ROOM);
       start_fighting(ch, opponent);
     }
-  }
+  
 }
-
 
 ACMD(do_hit)
 {
@@ -182,7 +187,7 @@ ACMD(do_hit)
         if (FIGHTING(vict))
 	    continue;
 	    
-          send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
+          act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, vict, TO_ROOM);
           new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
           if (!FIGHTING(ch))
           {
@@ -247,9 +252,20 @@ ACMD(do_hit)
   //if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
   if (!FIGHTING(ch))
   {
-    send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
+  struct char_data *k = (ch->master ? ch->master : ch);
+    struct follow_type *f;
+    send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 1);
     new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
     start_fighting(ch, vict);
+    for (f = k->followers; f; f = f->next)
+    {
+      if ( (FIGHTING(ch) && !DEAD(vict)) && HERE(f->follower,vict))
+      {
+        if (!IS_NPC(f->follower))
+          perform_assist(f->follower, ch);
+      }
+    }
+      
   }
   else
     send_to_char("You do the best you can!\r\n", ch);
