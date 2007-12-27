@@ -4979,7 +4979,7 @@ void container_disp(Character *ch,OBJ_DATA * obj) {
     }
 
 }
-
+/*
 ACMD(do_compresstest) {
 	long id;
 	char *ret;
@@ -4992,4 +4992,4 @@ ACMD(do_compresstest) {
 	ch->Send(ret);
 	free(ret);
 }
-
+*/

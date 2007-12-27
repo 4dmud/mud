@@ -137,7 +137,7 @@ ACMD(do_commands);
 ACMD(do_commandslike);
 ACMD(do_comm);
 ACMD(do_compare);
-ACMD(do_compresstest);
+//ACMD(do_compresstest);
 ACMD(do_consider);
 ACMD(do_convert);
 ACMD(do_convey);
@@ -535,7 +535,7 @@ const command_info cmd_info[] = {
                                            { "commandslike" , "commandslike"     , POS_DEAD    , do_commandslike , 0, SCMD_COMMANDS, 0 },
                                            { "compact"  , "comp"     , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPACT, 0 },
                                            { "compress"  , "compress"     , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPRESS, 0 },
-					   { "ctest"  , "ctest"     , POS_DEAD    , do_compresstest  , 0, SCMD_COMPRESS, 0 },
+//					   { "ctest"  , "ctest"     , POS_DEAD    , do_compresstest  , 0, SCMD_COMPRESS, 0 },
                                            { "compare"  , "compa", POS_RESTING , do_compare  , 0, 0, 0 },
                                            { "copyover" , "copyo", POS_DEAD    , do_copyover , LVL_IMMORT, 0, WIZ_SEN_GRP },
                                            { "credits"  , "cre" , POS_DEAD    , do_gen_ps   , 0, SCMD_CREDITS, 0 },
