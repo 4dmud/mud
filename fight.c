@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.68  2007/06/11 08:33:12  w4dimenscor
+ * text_processed was accedentally moved to the wrong part of find_replacement
+ *
  * Revision 1.67  2007/06/10 06:59:18  w4dimenscor
  * added the ability for scripts to toggle body parts on and off, and imms to do so too
  *
@@ -6226,4 +6229,20 @@ int attack_type(char chclass) {
         return 0;
         break;
     }
+}
+
+float ctl_elemental(Character *ch, Character *elem) {
+if (!IS_NPC(elem))
+return 1.0f;
+
+    if (MOB_FLAGGED(elem, MOB_ELEM_EARTH)) {
+    
+    } else if (MOB_FLAGGED(elem, MOB_ELEM_FIRE)) {
+    
+    } else if (MOB_FLAGGED(elem, MOB_ELEM_AIR)) {
+    
+    } else if (MOB_FLAGGED(elem, MOB_ELEM_WATER)) {
+    
+    }
+    return 1.0f;
 }

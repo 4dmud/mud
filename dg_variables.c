@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/10 06:59:18 $                                           * 
-*  $Revision: 1.53 $                                                      *
+*  $Date: 2007/06/11 08:33:12 $                                           * 
+*  $Revision: 1.54 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -363,8 +363,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         return;
     }  else {
-        if (text_processed(field, subfield, vd, str, slen))
-            return;
+        
         if (vd) {
             name = vd->value.c_str();
 
@@ -581,6 +580,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         if (c) {
             if (DEAD(c))
                 return; //dead - please dont screw anything up!
+            else if (text_processed(field, subfield, vd, str, slen))
+                return;
 
 
 
@@ -653,7 +654,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 if (!strcasecmp(field, "bodycheck")) {
                     if (subfield && *subfield) {
                         int bpn = bodypartname(subfield);
-                        if (bpn)
+                        if (bpn != -1)
                             snprintf(str, slen, "%d", has_body(c, bpn));
                         else
                             snprintf(str, slen, "0");
@@ -661,7 +662,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 } else if (!strcasecmp(field, "body")) {
                     if (subfield && *subfield) {
                         int bpn = bodypartname(subfield);
-                        if (bpn)
+                        if (bpn != -1)
                             snprintf(str, slen, "%d", togglebody(c, bpn));
                         else
                             snprintf(str, slen, "0");

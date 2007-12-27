@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.74  2007/06/11 08:33:12  w4dimenscor
+ * text_processed was accedentally moved to the wrong part of find_replacement
+ *
  * Revision 1.73  2007/06/10 08:18:13  w4dimenscor
  * added new body parts CHEST and BACK
  *
@@ -5009,7 +5012,7 @@ int perform_set(Character *ch, Character *vict, int mode,
         SET_OR_REMOVE_AR(PLR_FLAGS(vict), PLR_IMM_MORT);
         break;
     case 82:
-        if (bodypartname(val_arg)) {
+        if (bodypartname(val_arg) != -1) {
             snprintf(buf, sizeof(buf), "%s's body part %s is now %s", GET_NAME(vict),
                      val_arg, ONOFF(togglebody(vict, bodypartname(val_arg))));
         } else {
