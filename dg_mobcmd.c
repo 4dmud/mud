@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.15  2006/05/08 20:55:12  w4dimenscor
+ * Whoops, made a little mistake in the trigger firing. All set now.
+ *
  * Revision 1.14  2006/05/08 19:36:27  w4dimenscor
  * Commiting some files that were out of the cvs because of the last backup fiasco, and there is also a bugfix for teleport in
  * scripts.
@@ -1085,8 +1088,6 @@ ACMD(do_mteleport)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   room_rnum target, was_in;
   char_data *vict, *next_ch;
-  
-
   if (!MOB_OR_IMPL(ch))
   {
     new_send_to_char(ch, "Huh?!?\r\n");
@@ -1112,7 +1113,6 @@ ACMD(do_mteleport)
     mob_log(ch, "mteleport target is an invalid room");
     return;
   }
-
   if (!str_cmp(arg1, "all"))
   {
     if (target == IN_ROOM(ch))
@@ -1154,15 +1154,14 @@ ACMD(do_mteleport)
       // mob_log(ch, buf);
       return;
     }
-
     if (valid_dg_target(vict, TRUE))
     {
       was_in = IN_ROOM(vict);
       char_from_room(vict);
       char_to_room(vict, target);
-      entry_memory_mtrigger(ch);
-      greet_mtrigger(ch, -1);
-      greet_memory_mtrigger(ch);
+      entry_memory_mtrigger(vict);
+      greet_mtrigger(vict, -1);
+      greet_memory_mtrigger(vict);
       enter_wtrigger(IN_ROOM(vict), vict, -1);
       if (isname(argument, "followers"))
         followers_to_master(vict, was_in);
