@@ -579,7 +579,7 @@ return;
 	break;
     case BFS_NO_PATH:
 	ch->Send(
-			 "You cant sense the track to your corpse.\r\n");
+			 "You can't sense the track to your corpse.\r\n");
 	break;
     default:			/* Success! */
 	ch->Send(
