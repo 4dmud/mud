@@ -3015,10 +3015,10 @@ ACMD(do_who) {
                 continue;
 
             if (seperate == 0) {
-                if (GET_LEVEL(wch) < LVL_HERO)
+                if (GET_LEVEL(wch) < LVL_IMMORT)
                     continue;
             } else {
-                if (GET_LEVEL(wch) >= LVL_HERO)
+                if (GET_LEVEL(wch) >= LVL_IMMORT)
                     continue;
             }
 
@@ -3026,8 +3026,8 @@ ACMD(do_who) {
                 continue;
             if (GET_LEVEL(wch) < low || GET_LEVEL(wch) > high)
                 continue;
-            if ((noimm && GET_LEVEL(wch) >= LVL_HERO)
-                    || (nomort && GET_LEVEL(wch) < LVL_HERO))
+            if ((noimm && GET_LEVEL(wch) >= LVL_IMMORT)
+                    || (nomort && GET_LEVEL(wch) < LVL_IMMORT))
                 continue;
             if (*name_search && str_cmp(GET_NAME(wch), name_search)
                     && !strstr(GET_TITLE(wch), name_search))
@@ -3064,11 +3064,11 @@ ACMD(do_who) {
         if ((d = wch->desc) == NULL)
             continue;
 
-        if (!ib && GET_LEVEL(wch) >= LVL_HERO) {
+        if (!ib && GET_LEVEL(wch) >= LVL_IMMORT) {
             ib = 1;
             DYN_RESIZE(Imm_buf);
         }
-        if (!mb && GET_LEVEL(wch) < LVL_HERO) {
+        if (!mb && GET_LEVEL(wch) < LVL_IMMORT) {
             mb = 1;
             DYN_RESIZE(Mort_buf);
         }
