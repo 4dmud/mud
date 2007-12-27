@@ -234,7 +234,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
     script_log("Trigger: %s, VNum %d. dg_affect: cannot locate target!",
       GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
     return;
-  }
+  }	
   if (!str_cmp(value_p, "off")) {
     affect_from_char(ch, SPELL_DG_AFFECT);
     return;
@@ -245,7 +245,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
   af.expire = sec_to_time(duration);
   af.modifier = value;
   if (type == APPLY_TYPE) {
-    af.location = (i-1);
+    af.location = (i);
     af.bitvector = 0;
   } else {
     af.location = 0;
