@@ -2192,8 +2192,7 @@ int enter_player_game(Descriptor *d)
   add_char_to_list(ch);
   if (GET_LEVEL(ch) == 0)
     load_room = real_room(3081);
-  else
-    ch->LoadKillList();
+    
   char_to_room(ch, load_room);
   make_wholist();
   if (GET_LEVEL(ch) >= LVL_GOD)
@@ -2250,7 +2249,7 @@ int enter_player_game(Descriptor *d)
     GET_MAX_STAMINA(ch) = 100;
     SET_BIT_AR(AFF_FLAGS(ch), AFF_GROUP);
     SET_BIT_AR(PRF_FLAGS(ch), PRF_NOGOSS);
-
+    ch->LoadKillList();
     LOOK(ch);
 
     //Backpack

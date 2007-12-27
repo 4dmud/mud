@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.52  2006/08/23 10:34:14  w4dimenscor
+ * Fixes for KillList Crash
+ *
  * Revision 1.51  2006/08/23 09:01:27  w4dimenscor
  * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
  *
@@ -2166,11 +2169,13 @@ public:
     bool HasKill(mob_vnum v) {
     return (kills.find(v) != kills.end());
     }
-    void SetKill(mob_vnum &v, int count, time_t last, time_t first) {
-		kills[v].count = 1;
+    void SetKill(mob_vnum v, int count, time_t last, time_t first) {
+    if (v > 0) {
+		kills[v].count = count;
 		kills[v].vnum = v;
 		kills[v].last = time(0);
 		kills[v].first = time(0);
+		}
     }
 	void UpdateKill(mob_vnum &v) {
 	kill_map::iterator it = kills.find(v);

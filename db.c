@@ -5033,12 +5033,13 @@ void Character::LoadKillList() {
     long tl[2];
     int id;
     
-    if (!(id = get_id_by_name(GET_NAME(this)))) {
+    if ((id = get_id_by_name(GET_NAME(this)))<=0) {
         log("bad index passed to load_killlist");
         return;
     }
-    
-    if (!SPECIALS(this) || SPECIALS(this) == &dummy_mob)
+    if (id < 0 || id >= player_table.size())
+    return;
+    if (SPECIALS(this) == NULL || SPECIALS(this) == &dummy_mob)
     	   return;
     
 
