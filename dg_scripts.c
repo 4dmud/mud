@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 09:32:57 $
-*  $Revision: 1.16 $
+*  $Date: 2005/08/19 09:34:04 $
+*  $Revision: 1.17 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.17  2005/08/19 09:34:04  w4dimenscor
+ * fixed issue with FUNCTIONS not passing back vars, i mean, it does now.
+ *
  * Revision 1.16  2005/08/19 09:32:57  w4dimenscor
  * fixed issue with FUNCTIONS not passing back vars, didnt compile, this one does
  *
@@ -2551,7 +2554,7 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
   add_var(&GET_TRIG_VARS(parent), "args", cmd, 0);
 
  for (vd = GET_TRIG_VARS(parent); vd; vd = vd->next)
-     add_var(&GET_TRIG_VARS(trig), vd->name, vd->value, vd->context);
+     add_var(&GET_TRIG_VARS(t), vd->name, vd->value, vd->context);
 
   t->parent = parent;
   script_driver(&go, t, type, TRIG_NEW);
