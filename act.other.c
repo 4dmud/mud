@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.8  2005/03/17 10:41:59  w4dimenscor
+ * fixed bug: nogat toggles nosum instead of nogat
+ *
  * Revision 1.7  2005/02/28 15:07:55  w4dimenscor
  * fixed messages for noct and afktell
  *
@@ -1379,7 +1382,7 @@ ACMD(do_gen_tog)
     result = PRF_TOG_CHK(ch, PRF_CLS);
     break;
   case SCMD_NOGATE:
-    result = PRF_TOG_CHK(ch, PRF_SUMMONABLE);
+    result = PRF_TOG_CHK(ch, PRF_GATEABLE);
     break;
   case SCMD_BUILDWALK:
     if (GET_LEVEL(ch) < LVL_BUILDER)
