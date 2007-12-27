@@ -1916,13 +1916,14 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
   {
     char dest[size + size_mxp + 20];
     int mxpon = t->mxp;
+    dest[0] = '\0';
     if (size > sizeof(txt))
       mxpon = 0;
     convert_mxp_tags(mxpon, dest, txt, size);
 
     if (size + size_mxp > sizeof(txt))
       log("Mxp cut off");
-    strlcpy(txt, dest, sizeof(txt));
+    strlcpy(txt, dest, sizeof(txt)); /*this may cause overflows? */
   }
   while(0);
 

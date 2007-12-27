@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.31  2005/08/28 02:59:21  w4dimenscor
+ * fixed a memory leak situation that could appear with overlapping rooms, adjusted the ignore save to not save certain words, adjusted the mobs to it a little softer
+ *
  * Revision 1.30  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -1742,12 +1745,13 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
           new_send_to_char(ch, "Compression: Disabled    ");
       }
 #endif
-      if (ch->desc) {
+      if (k->desc) {
         new_send_to_char(ch, "Telopt Prompts: %d    ", k->desc->eor);
 	new_send_to_char(ch, "MXP: %d    ", k->desc->mxp);
-	} 
+	 
 	new_send_to_char(ch, "Wordwrap: %s - %d\r\n", ONOFF(PRF_FLAGGED(k->desc->character, PRF_PAGEWRAP)), PAGEWIDTH(k->desc->character));
-      new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
+}      
+new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
         new_send_to_char(ch, "  Remort: %s", pc_class_types[(int)GET_REMORT(k)]);

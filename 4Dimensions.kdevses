@@ -1,15 +1,15 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="9" >
+ <DocsAndViews NumberOfDocuments="11" >
   <Doc0 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/db.c" >
-   <View0 line="1393" Type="Source" />
+   <View0 line="3485" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.movement.c" >
    <View0 line="310" Type="Source" />
   </Doc1>
   <Doc2 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
-   <View0 line="0" Type="Source" />
+   <View0 line="1761" Type="Source" />
   </Doc2>
   <Doc3 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/structs.h" >
    <View0 line="925" Type="Source" />
@@ -18,10 +18,10 @@
    <View0 line="27" Type="Source" />
   </Doc4>
   <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
-   <View0 line="461" Type="Source" />
+   <View0 line="2246" Type="Source" />
   </Doc5>
   <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_scripts.c" >
-   <View0 line="2493" Type="Source" />
+   <View0 line="1871" Type="Source" />
   </Doc6>
   <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_triggers.c" >
    <View0 line="859" Type="Source" />
@@ -29,6 +29,12 @@
   <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_db_scripts.c" >
    <View0 line="0" Type="Source" />
   </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/comm.c" >
+   <View0 line="1922" Type="Source" />
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/ignore.c" >
+   <View0 line="145" Type="Source" />
+  </Doc10>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -37,11 +43,11 @@
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/comm.c" >
-     <mark line="2385" />
-     <mark line="2437" />
+     <mark line="2386" />
+     <mark line="2438" />
      <mark line="738" />
-     <mark line="4860" />
-     <mark line="3075" />
+     <mark line="4861" />
+     <mark line="3076" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/subskills.c" >
      <mark line="1128" />
@@ -56,22 +62,22 @@
      <mark line="907" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
-     <mark line="6566" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
-     <mark line="737" />
+     <mark line="6567" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_triggers.c" >
      <mark line="544" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
+     <mark line="737" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/qic.c" >
      <mark line="269" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_scripts.c" >
-     <mark line="3338" />
-     <mark line="2488" />
-     <mark line="3339" />
-     <mark line="3226" />
+     <mark line="3230" />
+     <mark line="2489" />
+     <mark line="3342" />
+     <mark line="3343" />
     </bookmark>
    </bookmarks>
   </kdevbookmarks>

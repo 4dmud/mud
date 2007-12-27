@@ -1754,6 +1754,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
   {
     log("Room: %d somehow already has been made when it is loading now: %s", virtual_nr,world_vnum[virtual_nr]->name);
     free_room_strings(world_vnum[virtual_nr]);
+if (SCRIPT(world_vnum[virtual_nr]))
+      extract_script(world_vnum[virtual_nr], WLD_TRIGGER);
+    /* free script proto list */
+    free_proto_script(world_vnum[virtual_nr], WLD_TRIGGER);
     free(world_vnum[virtual_nr]);
     world_vnum[virtual_nr] = NULL;
   }
@@ -8140,3 +8144,20 @@ int valid_id_num(long id)
       return 0;
   return 1;
 }
+int valid_to_save(char *name) {
+int tp;
+for (tp = 0; tp <= top_of_p_table; tp++)
+  {
+    if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
+        !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
+        (!player_table[tp].name || !*player_table[tp].name))
+      continue;
+    if (*player_table[tp].name == *name && !strcmp(player_table[tp].name, name))
+    {
+      return 1;
+    }
+  }
+return 0;
+}
+
+

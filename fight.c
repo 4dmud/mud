@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.19  2005/08/28 02:59:21  w4dimenscor
+ * fixed a memory leak situation that could appear with overlapping rooms, adjusted the ignore save to not save certain words, adjusted the mobs to it a little softer
+ *
  * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
  * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
  *
@@ -324,7 +327,7 @@ float has_staff(struct char_data *ch)
     {
     case FOCUS_STAFF:
       multi += ((((float)GET_OBJ_VAL(staff, 0)+num_casting(ch)) * 100.0)+((GET_LEVEL(ch) * 6.0)));
-      multi = IRANGE(1.55, (multi/1000.0), 2.05);
+      multi = IRANGE(1.55, (multi/1000.0), 2.15);
       break;
     case FOCUS_ORB:
       multi += ((float)GET_OBJ_VAL(staff, 0));
@@ -369,7 +372,7 @@ int spell_size_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    sdice += 5  + highest_tier(ch);
+    sdice += 6  + highest_tier(ch);
     sdice += (GET_LEVEL(ch)>10);
     sdice += (GET_LEVEL(ch)>30);
     sdice += (GET_LEVEL(ch)>45);
@@ -417,7 +420,7 @@ int spell_num_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    ndice += 5;
+    ndice += 6;
     ndice += (GET_LEVEL(ch)>10);
     ndice += (GET_LEVEL(ch)>30);
     ndice += (GET_LEVEL(ch)>45);

@@ -81,6 +81,7 @@ void write_ignorelist(struct char_data *ch)
   FILE *file;
   char ignoref[127];
   struct ignore *ignoretemp;
+int valid_to_save(char *name);
 
   get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
   unlink(ignoref);
@@ -94,6 +95,7 @@ void write_ignorelist(struct char_data *ch)
   ignoretemp = GET_IGNORELIST(ch);
   while (ignoretemp)
   {
+if (valid_to_save(ignoretemp->ignore))
     fprintf(file, "%d\n%s\n", strlen(ignoretemp->ignore), ignoretemp->ignore);
     ignoretemp = ignoretemp->next;
   }
