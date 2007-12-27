@@ -2827,7 +2827,7 @@ void add_hunter(Character *ch)
   temp->next = hunter_list;
   hunter_list = temp;
   temp->hunter = ch;
-  HUNT_COUNT(ch) = FTOI((GET_LEVEL(ch) * 0.2) + 2);
+  HUNT_COUNT(ch) = MAX_HUNTSTEPS(ch);
 }
 
 void remove_hunter(Character *ch)

@@ -10,6 +10,10 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.63  2007/05/24 20:29:16  w4dimenscor
+ * Last few fixes to hunting and directionals.
+ * --Thotter
+ *
  * Revision 1.62  2007/05/24 20:25:16  w4dimenscor
  * lots of hunt changes. Should all work now.
  *
@@ -2401,9 +2405,11 @@ int fe_after_damage(Character* ch, Character* vict,
     }
     if (!SELF(ch, vict)) {
 
-        if (IS_NPC(vict) && CAN_HUNT(vict)) {
-            add_hunter(vict);
-            HUNTING(vict) = ch;
+        if (IS_NPC(vict)) {
+	    if (CAN_HUNT(vict)) {
+            	add_hunter(vict);
+	        HUNTING(vict) = ch;
+	    }
             remember(vict, ch);
         }
         if (partial) {
@@ -2489,7 +2495,7 @@ int fe_after_damage(Character* ch, Character* vict,
             if (GET_MRACE(ch) == 0)
                 brag(ch, vict);
 
-            if (MOB_FLAGGED(ch, MOB_MEMORY))
+//            if (MOB_FLAGGED(ch, MOB_MEMORY))
                 forget(ch, vict);
         } else {
             if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
@@ -4981,13 +4987,15 @@ void strike_missile(Character *ch, Character *tch,
              dirs[rev_dir[dir]]);
     act(buf, FALSE, ch, missile, tch, TO_VICT);
     if (damage(ch, tch, dam, attacktype) != -1)
-        if (IS_NPC(tch) && !IS_NPC(ch) && CAN_HUNT(ch) && GET_POS(tch) > POS_STUNNED) {
+        if (IS_NPC(tch) && !IS_NPC(ch) && GET_POS(tch) > POS_STUNNED) {
             if (tch->mob_specials.head_join)
                 tch = tch->mob_specials.head_join;
             SET_BIT_AR(MOB_FLAGS(tch), MOB_MEMORY);
             remember(tch, ch);
-            HUNTING(tch) = ch;
-            add_hunter(tch);
+	    if (CAN_HUNT(ch)) {
+            	HUNTING(tch) = ch;
+            	add_hunter(tch);
+	    }
         }
     return;
 }

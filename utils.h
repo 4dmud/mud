@@ -600,6 +600,7 @@ int has_body(Character *ch, int flag);
 #define MASTER(ch)	  ((ch)->master)
 #define HUNTING(ch)	  ((ch)->char_specials.hunting)
 #define HUNT_COUNT(ch)	  ((ch)->char_specials.hunt_count)
+#define MAX_HUNTSTEPS(ch) FTOI((GET_LEVEL(ch) * 0.2) + 2)
 #define RIDING(ch)	  ((ch)->char_specials.riding)	// (DAK)
 #define RIDDEN_BY(ch)	  ((ch)->char_specials.ridden_by)	// (DAK)
 #define GET_SAVE(ch, i)	  ((ch)->char_specials.saved.apply_saving_throw[i])

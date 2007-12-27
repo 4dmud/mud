@@ -1248,10 +1248,11 @@ bool Character::canHuntChar(Character *vict)
 		return false;
 
 	//check for path things here (see notes)
+	int stepcount = 0;
 	int stepdir = find_first_step(IN_ROOM(this),IN_ROOM(vict));
 //	Room *steproom = IN_ROOM(this)->dir_option[find_first_step(IN_ROOM(this),IN_ROOM(vict))]->to_room;
 	Room *curroom = IN_ROOM(this);
-	while (curroom && stepdir>=0 && stepdir <= 5)
+	while (curroom && stepdir>=0 && stepdir <= 5 && stepcount++ != MAX_HUNTSTEPS(this) && curroom->dir_option[stepdir])
 	{
 		if (IS_SET(curroom->dir_option[stepdir]->exit_info, EX_CLOSED))
 			return false;

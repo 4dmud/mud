@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.38  2007/05/24 20:29:16  w4dimenscor
+ * Last few fixes to hunting and directionals.
+ * --Thotter
+ *
  * Revision 1.37  2007/05/24 20:19:50  w4dimenscor
  * Directional spells don't hit everything in their path anymore.
  *
@@ -957,6 +961,10 @@ int cast_spell(Character *ch, Character *tch,
         ("You can not cast this spell if you are not in a group!\r\n",
          ch);
         return (0);
+    }
+    if(GET_SPELL_DIR(ch) != NOWHERE && SINFO.violent && CAN_HUNT(tch) && !tch->canHuntChar(ch)) {
+	    *ch << "You can't get a clear shot.\n";
+	    return (0);
     }
 
     if (!focus) {
