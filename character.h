@@ -130,6 +130,7 @@ public:
     ~Character();
 
     Character * assign (Character *b);
+    bool zone_empty();
 private:
     stringstream *send_string;
 

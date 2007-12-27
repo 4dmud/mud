@@ -555,7 +555,6 @@ const char *wing_color(int align) {
 
 int check_dam_affects(Character *ch) {
     struct obj_data *obj = NULL;
-    char buf[MAX_STRING_LENGTH];
 
     if (GET_POS(ch) <= POS_STUNNED)
         return -1;
@@ -581,10 +580,7 @@ int check_dam_affects(Character *ch) {
             }
             alter_mana(ch, FTOI(GET_MANA(ch)/16.0));
             alter_move(ch, FTOI(GET_MOVE(ch)/16.0));
-
         }
-
-
 
         if (AFF_FLAGGED(ch, AFF_POISON_3)) {
             if (damage(ch, ch, FTOI(150 + (GET_MAX_HIT(ch) * 0.0003)), SPELL_POISON) == -1)
@@ -594,7 +590,6 @@ int check_dam_affects(Character *ch) {
             alter_move(ch, FTOI(GET_MOVE(ch)/8.0));
 
         }
-
 
         if (AFF_FLAGGED(ch, AFF_POISON_4)) {
             if (damage(ch, ch, FTOI(200 + (GET_MAX_HIT(ch) * 0.0004)), SPELL_POISON) == -1)
@@ -619,8 +614,6 @@ int check_dam_affects(Character *ch) {
         }
     }
 
-
-
     if (AFF_FLAGGED(ch, AFF_ACIDED))
         if (damage(ch, ch, 100, SPELL_ACID) == -1)
             return -1;
@@ -632,35 +625,34 @@ int check_dam_affects(Character *ch) {
     if (AFF_FLAGGED(ch, AFF_BURNING))
         if (damage(ch, ch, 100, SPELL_BURN) == -1)
             return -1;
-
-
-
-    if ( AFF_FLAGGED(ch, AFF_FLY) && GET_POS(ch) == POS_STANDING) {
-        if (number(1, 200) >195) {
-            if (number(0, 1)) {
-                if (!IS_NPC(ch)) {
-                    snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", wing_color(GET_ALIGNMENT(ch)));
-                    act(buf, FALSE, ch, 0, 0, TO_CHAR);
-                    snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_color(GET_ALIGNMENT(ch)));
-                    act(buf, FALSE, ch, 0, 0, TO_ROOM);
+    if (!ch->zone_empty()) {
+        if ( AFF_FLAGGED(ch, AFF_FLY) && GET_POS(ch) == POS_STANDING) {
+            if (number(1, 200) >195) {
+                if (number(0, 1)) {
+                    if (!IS_NPC(ch)) {
+                        char buf[MAX_INPUT_LENGTH];
+                        snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", wing_color(GET_ALIGNMENT(ch)));
+                        act(buf, FALSE, ch, 0, 0, TO_CHAR);
+                        snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_color(GET_ALIGNMENT(ch)));
+                        act(buf, FALSE, ch, 0, 0, TO_ROOM);
+                    } else {
+                        act("$n flaps $s wings and lifts $mself a little higher.", FALSE, ch, 0, 0, TO_ROOM);
+                    }
                 } else {
-                    act("$n flaps $s wings and lifts $mself a little higher.", FALSE, ch, 0, 0, TO_ROOM);
-                }
-            } else {
-                if (!IS_NPC(ch)) {
-                    snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
-                    act(buf, FALSE, ch, 0, 0, TO_CHAR);
-                    snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
-                    act(buf, FALSE, ch, 0, 0, TO_ROOM);
-                } else {
-                    act("$n stills $s wings and swoops a little closer to the ground.", FALSE, ch, 0, 0, TO_ROOM);
+                    if (!IS_NPC(ch)) {
+                        char buf[MAX_INPUT_LENGTH];
+                        snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
+                        act(buf, FALSE, ch, 0, 0, TO_CHAR);
+                        snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
+                        act(buf, FALSE, ch, 0, 0, TO_ROOM);
+                    } else {
+                        act("$n stills $s wings and swoops a little closer to the ground.", FALSE, ch, 0, 0, TO_ROOM);
+                    }
                 }
             }
         }
-
     }
     return 0;
-
 }
 
 void sector_update(void) {

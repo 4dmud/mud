@@ -3045,8 +3045,9 @@ void load_zones(FILE * fl, char *zonename) {
     if (num_of_cmds == 0) {
         log("SYSERR: %s is empty!", zname);
         exit(1);
-    } else
-        Z.cmd = new reset_com[num_of_cmds];
+    } else {
+        Z.cmd.assign(num_of_cmds, reset_com());
+        }
 
 
     line_num += get_line(fl, buf);
@@ -5567,7 +5568,10 @@ int create_entry(const char *name) {
 }
 
 
-
+void clearAllZones() {
+for (vector<Zone>::iterator z = zone_table.begin();z != zone_table.end();z++)
+(*z).num_players = 0;
+}
 /************************************************************************
 *  funcs of a (more or less) general utility nature              *
 ************************************************************************/

@@ -291,10 +291,10 @@ public:
     room_vnum bot;		/* starting room number for this zone */
     room_vnum top;		/* upper limit for rooms in this zone */
     int dimension;
-
+    int num_players;	/* how many players are in this zone currently? */
     int reset_mode;		/* conditions for reset (see below)   */
     zone_vnum number;		/* virtual number of this zone    */
-    struct reset_com *cmd;	/* command table for reset                */
+    vector<reset_com> cmd;	/* command table for reset                */
     int pressure;		/* How is the pressure (Mb)               */
     int change;			/* How fast and what way does it change */
     int sky;			/* How is the sky                         */
@@ -326,13 +326,13 @@ public:
         dimension = D_ALL;
         reset_mode = 2;
         number = NOWHERE;
-        cmd = NULL;
         pressure = 1021;
         change = 1;
         sky = SKY_CLOUDLESS;
         builders = NULL;
         zone_flags = 0;
         idle_time = 0;
+        num_players = 0;
     }
 
     Zone(const char * n, zone_vnum vn, room_vnum b, room_vnum t) {
@@ -344,7 +344,6 @@ public:
         dimension = D_ALL;
         reset_mode = 2;
         number = NOWHERE;
-        cmd = NULL;
         pressure = 1021;
         change = 1;
         sky = SKY_CLOUDLESS;
@@ -357,14 +356,13 @@ public:
         number = vn;
         if (n)
         name = strdup(n);
-        cmd = new reset_com[1];
-        cmd[0].command = 'S';
+        reset_com rc = reset_com();
+        rc.command = 'S';
+        cmd.push_back(rc);
+        num_players = 0;
     }
 
     void Destroy() {
- 	   if (this->cmd != NULL)
-            delete[] this->cmd;
-            this->cmd = NULL;
         if (this->name != NULL)
             free(this->name);
             this->name = NULL;
@@ -539,6 +537,7 @@ int read_xap_objects(FILE * fl, Character *ch);
 float mob_hitpoint_multi(int chclass);
 void generate_weapon(OBJ_DATA *obj);
 void add_char_to_list(Character *ch);
+void clearAllZones();
 #define CUR_WORLD_VERSION 1
 #define CUR_ZONE_VERSION 3
 #define HIGHEST_VNUM  99900

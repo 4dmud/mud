@@ -700,6 +700,7 @@ int move_char_to(Character *ch, room_rnum room)
     char_from_chair(ch);
 
   unhitch_mob(ch);
+  
 
   if (cur == IN_ROOM(ch))
     return 0;
@@ -811,9 +812,13 @@ void char_from_room(Character *ch)
       if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2)) /* Light is ON */
         IN_ROOM(ch)->light--;
 
+        if (!IS_NPC(ch))
+        zone_table[IN_ROOM(ch)->zone].num_players--;
+
   REMOVE_FROM_LIST(ch, IN_ROOM(ch)->people, next_in_room);
   IN_ROOM(ch) = NULL;
   ch->next_in_room = NULL;
+  
 }
 
 
@@ -849,6 +854,9 @@ void char_to_room(Character *ch, room_rnum room)
     if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
       if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2)) /* Light ON */
         room->light++;
+
+  if (!IS_NPC(ch))
+        zone_table[IN_ROOM(ch)->zone].num_players--;
 
   /* Stop fighting now, if we left. */
   if (FIGHTING(ch) && IN_ROOM(ch) != IN_ROOM(FIGHTING(ch)))

@@ -1110,6 +1110,7 @@ void game_loop(socket_t s_mother_desc)
     if (descriptor_list == NULL)
     {
       log("No connections.  Going to sleep.");
+      clearAllZones();
       make_who2html();
       FD_ZERO(&input_set);
       FD_SET(s_mother_desc, &input_set);

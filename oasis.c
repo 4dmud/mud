@@ -255,9 +255,8 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
    */
   if (OLC_ZONE(d))
   {
-    free(OLC_ZONE(d)->name);
-    free(OLC_ZONE(d)->cmd);
-    free(OLC_ZONE(d));
+    OLC_ZONE(d)->Destroy();
+    delete OLC_ZONE(d);
   }
 
 

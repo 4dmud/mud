@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.18  2006/08/21 09:51:53  w4dimenscor
+ * Fixed bug with zedit that caused a crash
+ *
  * Revision 1.17  2006/08/18 11:09:59  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -2105,7 +2108,7 @@ SPECIAL(radar) {
     }
 
     /* since inside a vehicle, need to save the room they were in */
-    was_in = IN_ROOM(ch);
+    is_in = was_in = IN_ROOM(ch);
 
     /* now, find the room the vehicle is in and put the character there */
     viewport =
@@ -2113,12 +2116,10 @@ SPECIAL(radar) {
     if (viewport) {
         if ((vehicle =
                     find_vehicle_by_vnum(GET_OBJ_VAL(viewport, 0))) != NULL)
-            IN_ROOM(ch) = vehicle->in_room;
+            is_in = vehicle->in_room;
         else
             return (0);
     }
-
-    is_in = IN_ROOM(ch);
 
     if (GET_LEVEL(ch) >= LVL_IMMORT)
         maxdis = 7;
@@ -2160,5 +2161,5 @@ SPECIAL(radar) {
     if (found == 0)
         *ch << "Nobody anywhere near you.";
     IN_ROOM(ch) = was_in;
-    return (1);
+    return (1); /** this function doesnt updatethe zones num_players value, watch for this if getting fancy - mord**/
 }

@@ -1135,4 +1135,9 @@ void Character::init_char_strings() {
     player.description  = NULL;        /* Extra descriptions                   */
     player.title = NULL;         /* PC / NPC's title                     */
 }
+bool Character::zone_empty() {
+if (in_room == NULL)
+return TRUE;
 
+return zone_table[GET_ROOM_ZONE(in_room)].num_players > 0;
+}

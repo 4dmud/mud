@@ -211,7 +211,6 @@ zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, 
     /** clear vars on the zd so that they don't get freed! - mord **/
     zd->name = NULL;
     zd->builders = NULL;
-    zd->cmd = NULL;
     log("Deleting Temporary Zone Structure");
     delete zd;
     
@@ -246,7 +245,7 @@ void remove_room_zone_commands(zone_rnum zone, room_rnum room_num) {
             break;
         }
         if (cmd_room == room_num->number)
-            remove_cmd_from_list(&zone_table[zone].cmd, subcmd);
+            remove_cmd_from_list(zone_table[zone].cmd, subcmd);
         else
             subcmd++;
     }
@@ -479,33 +478,20 @@ int count_commands(struct reset_com *list) {
  * Adds a new reset command into a list.  Takes a pointer to the list
  * so that it may play with the memory locations.
  */
-void add_cmd_to_list(struct reset_com **list, struct reset_com *newcmd, int pos) {
-    int count, i, l;
-    struct reset_com *newlist;
-
-    /*
-     * Count number of commands (not including terminator).
-     */
-    count = count_commands(*list);
-
-    /*
-     * Value is +2 for the terminator and new field to add.
-     */
-    newlist = new reset_com[count + 2];
-
-    /*
-     * Even tighter loop to copy the old list and insert a new command.
-     */
-    for (i = 0, l = 0; i <= count; i++) {
-        newlist[i] = ((i == pos) ? *newcmd : (*list)[l++]);
-    }
-
+void add_cmd_to_list(vector<reset_com> &list, reset_com &newcmd, int pos) {
     /*
      * Add terminator, then insert new list.
      */
-    newlist[count + 1].command = 'S';
-    free(*list);
-    *list = newlist;
+    
+    if (pos == list.size()) {
+    reset_com rc = reset_com();
+    rc.command = 'S';
+    (*(list.end() -1)) = newcmd;
+    list.push_back(rc);
+    } else {
+    list.insert(list.begin() + pos, newcmd);
+    }
+    
 }
 
 /*-------------------------------------------------------------------*/
@@ -514,7 +500,11 @@ void add_cmd_to_list(struct reset_com **list, struct reset_com *newcmd, int pos)
  * Remove a reset command from a list.	Takes a pointer to the list
  * so that it may play with the memory locations.
  */
-void remove_cmd_from_list(struct reset_com **list, int pos) {
+void remove_cmd_from_list(vector<reset_com> &list, int pos) {
+
+#if 1
+list.erase(list.begin() + pos);
+#else
     int count, i, l;
     struct reset_com *newlist;
 
@@ -543,6 +533,7 @@ void remove_cmd_from_list(struct reset_com **list, int pos) {
     newlist[count - 1].command = 'S';
     free(*list);
     *list = newlist;
+    #endif
 }
 
 /*-------------------------------------------------------------------*/
@@ -551,24 +542,19 @@ void remove_cmd_from_list(struct reset_com **list, int pos) {
  * Error check user input and then add new (blank) command  
  */
 int new_command(Zone *zone, int pos) {
-    int subcmd = 0;
-    struct reset_com *new_com;
-
     /*
      * Error check to ensure users hasn't given too large an index  
      */
-    while (zone->cmd[subcmd].command != 'S')
-        subcmd++;
 
-    if (pos < 0 || pos > subcmd)
+    if (pos < 0 || pos >= zone->cmd.size())
         return 0;
 
+    reset_com new_com = reset_com();
     /*
      * Ok, let's add a new (blank) command 
      */
-    new_com = new reset_com[1];
-    new_com[0].command = 'N';
-    add_cmd_to_list(&zone->cmd, new_com, pos);
+    new_com.command = 'N';
+    add_cmd_to_list(zone->cmd, new_com, pos);
     return 1;
 }
 
@@ -578,21 +564,18 @@ int new_command(Zone *zone, int pos) {
  * Error check user input and then remove command  
  */
 void delete_command(Zone *zone, int pos) {
-    int subcmd = 0;
+//    int subcmd = 0;
 
     /*
      * Error check to ensure users hasn't given too large an index  
      */
-    while (zone->cmd[subcmd].command != 'S')
-        subcmd++;
-
-    if (pos < 0 || pos >= subcmd)
+    if (pos < 0 || pos >= zone->cmd.size())
         return;
 
     /*
      * Ok, let's zap it  
      */
-    remove_cmd_from_list(&zone->cmd, pos);
+    remove_cmd_from_list(zone->cmd, pos);
 }
 
 /*-------------------------------------------------------------------*/

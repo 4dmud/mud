@@ -255,8 +255,9 @@ void zedit_setup(Descriptor *d, room_rnum room_num)
   /*
    * Start the reset command list with a terminator.
    */
-  zone->cmd = new reset_com[1];
-  zone->cmd[0].command = 'S';
+  reset_com rc = reset_com();
+  rc.command = 'S';
+  zone->cmd.push_back(rc);
 
   /*
    * Add all entries in zone_table that relate to this room.
@@ -277,7 +278,7 @@ void zedit_setup(Descriptor *d, room_rnum room_num)
       break;
     }
     if (cmd_room == room_num) {
-      add_cmd_to_list(&(zone->cmd), &ZCMD(OLC_ZNUM(d), subcmd), count);
+      add_cmd_to_list(zone->cmd, ZCMD(OLC_ZNUM(d), subcmd), count);
       count++;
     }
     subcmd++;
@@ -389,7 +390,7 @@ void zedit_save_internally(Descriptor *d)
         mobloaded = objloaded = FALSE;
         break;
     }
-    add_cmd_to_list(&(zone_table[OLC_ZNUM(d)].cmd), &MYCMD, subcmd);
+    add_cmd_to_list(zone_table[OLC_ZNUM(d)].cmd, MYCMD, subcmd);
   }
 
   /*
@@ -425,7 +426,7 @@ void zedit_save_to_disk(int zone)
  */
 int start_change_command(Descriptor *d, int pos)
 {
-  if (pos < 0 || pos >= count_commands(OLC_ZONE(d)->cmd))
+  if (pos < 0 || pos >= OLC_ZONE(d)->cmd.size())
     return 0;
 
   /*
