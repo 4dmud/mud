@@ -91,6 +91,7 @@ SPECIAL(bank);
 
 struct help_index_element *help_table = 0;	/* the help table	 */
 unsigned int top_of_helpt = 0;		/* top of help index table	 */
+unsigned int max_help_id = 0;
 struct help_category_data *help_categories;
 
 int TEMP_LOAD_CHAR = FALSE;
@@ -256,7 +257,6 @@ void load_banned(void);
 void Read_Invalid_List(void);
 void boot_the_shops(FILE * shop_f, char *filename, int rec_count);
 int find_name(char *name);
-int hsort(const void *a, const void *b);	//mord??
 void init_clans(void);
 int find_first_step(room_rnum src, room_rnum target);
 void load_corpses(void);
@@ -1552,8 +1552,6 @@ void index_boot(int mode)
     }
     fclose(index);
 
-    /* sort the help index */
-    sort_help();
   }
   else
   {
@@ -3464,12 +3462,12 @@ void load_help(FILE * fl)
 void load_help(FILE *fl)
 {
 #if defined(CIRCLE_MACINTOSH)
-  static char key[READ_SIZE + 1], next_key[READ_SIZE + 1], entry[32384]; /* too big for stack? */
+  static char key[READ_SIZE + 1],  entry[32384]; /* too big for stack? */
 #else
-  char key[READ_SIZE + 1], next_key[READ_SIZE + 1], entry[32384];
+  char key[READ_SIZE + 1], entry[32384];
 #endif
   size_t entrylen;
-  char line[READ_SIZE + 1], *scan;
+  char line[READ_SIZE + 1];
   struct help_index_element el;
 
   /* get the first keyword line */
@@ -3512,15 +3510,13 @@ void load_help(FILE *fl)
       el.min_level = atoi((line + 1));
     /* now, add the entry to the index with each keyword on the keyword line */
     el.duplicate = 0;
+    el.id = max_help_id++;
     el.entry = str_dup(entry);
-    scan = one_word(key, next_key);
-    while (*next_key)
-    {
-      el.keywords = strdup(next_key);
+    prune_crlf(key);
+    el.keywords = str_dup(key);
+    el.duplicate = 0; //redundant call
       help_table[top_of_helpt++] = el;
-      el.duplicate++;
-      scan = one_word(scan, next_key);
-    }
+      
 
     /* get next keyword line (or $) */
     get_one_line(fl, key);

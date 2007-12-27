@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.16  2005/06/21 08:53:40  w4dimenscor
+ * added in better help finder and help editor, a la mordecai
+ *
  * Revision 1.15  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -605,6 +608,7 @@ extern int message_type;
 #define CON_ACCOUNT_MANAGE 41
 #define CON_CREATE_NEW 42
 #define CON_VEDIT      43
+#define CON_FIND_HELP  44
 
 #define STATE_ANSI    0
 #define STATE_NEW_HERE 1

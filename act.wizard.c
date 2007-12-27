@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.28  2005/06/21 08:53:40  w4dimenscor
+ * added in better help finder and help editor, a la mordecai
+ *
  * Revision 1.27  2005/06/18 12:20:52  w4dimenscor
  * changed a bunch of send_to_char's to new_send_to_chars, adjusted some mxp code
  *
@@ -644,13 +647,15 @@ ACMD(do_echo)
 
     if (subcmd == SCMD_EMOTE)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
-    else if (subcmd == SCMD_POSE) {
-    char_posing = ch;
+    else if (subcmd == SCMD_POSE)
+    {
+      char_posing = ch;
       snprintf(buf, sizeof(buf), "%s", argument);
-    
-     } else
+
+    }
+    else
       strlcpy(buf, argument, sizeof(buf) );
-    
+
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
 
@@ -658,7 +663,7 @@ ACMD(do_echo)
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
       act(buf, FALSE, ch, 0, 0, TO_CHAR);
-      char_posing = NULL;
+    char_posing = NULL;
   }
 }
 
@@ -2585,7 +2590,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                                    				 * or char */
+                                                        				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -6640,14 +6645,14 @@ ACMD(do_namechange)
     }
     reset_char(tch);
     read_aliases(tch);
-      GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
-  add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
-  
+    GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
+    add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
+
     char_to_room(tch, IN_ROOM(ch));
     GET_KILLS(tch) = load_killlist(GET_NAME(tch));
     load_locker(ch);
-      ch->next = character_list;
-  character_list = ch;
+    ch->next = character_list;
+    character_list = ch;
     loaded = 1;
   }
 

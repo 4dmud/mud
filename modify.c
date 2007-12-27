@@ -301,7 +301,7 @@ void playing_string_cleanup(struct descriptor_data *d, int action)
 
 void help_string_cleanup(struct descriptor_data *d, int action)
 {
-  //   hedit_disp_menu(d);
+   hedit_disp_menu(d);
   return;
 }
 void note_string_cleanup(struct descriptor_data *d, int action)

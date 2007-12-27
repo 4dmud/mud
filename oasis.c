@@ -174,7 +174,7 @@ ACMD(do_oasis)
     do_oasis_trigedit(ch, argument, cmd, subcmd);
     break;
   case SCMD_OASIS_HEDIT:
-//    do_oasis_hedit(ch, argument, cmd, subcmd);
+    do_oasis_hedit(ch, argument, cmd, subcmd);
     break;
 
   default:

@@ -325,12 +325,14 @@ struct help_index_element {
    char *entry;
    int min_level;
    int duplicate;
+   int id;
+   int entries; /* How many key words there are */
 };
 
 
 void the_free_help(void);
 void free_help(struct help_index_element *help);
-void sort_help(void);
+extern unsigned int top_of_helpt;
 
 
 /* don't change these */

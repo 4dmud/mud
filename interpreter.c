@@ -46,6 +46,7 @@ extern int TEMP_LOAD_CHAR;
 extern char last_command[];
 
 /* external functions */
+void display_help(struct char_data *ch, unsigned int i);
 void send_compress_offer(struct descriptor_data *d);
 int delete_pobj_file(char *name);
 void echo_on(struct descriptor_data *d);
@@ -58,7 +59,7 @@ int Valid_Name(char *newname);
 void roll_real_abils(struct char_data *ch);
 void oedit_parse(struct descriptor_data *d, char *arg);
 void redit_parse(struct descriptor_data *d, char *arg);
-//void hedit_parse(struct descriptor_data *d, char *arg);
+void hedit_parse(struct descriptor_data *d, char *arg);
 void zedit_parse(struct descriptor_data *d, char *arg);
 void medit_parse(struct descriptor_data *d, char *arg);
 void sedit_parse(struct descriptor_data *d, char *arg);
@@ -587,7 +588,7 @@ const struct command_info cmd_info[] =
     { "holler"   , "hol"	, POS_RESTING , do_gen_comm , 1, SCMD_HOLLER, 0 },
     { "holylight", "holy"	, POS_DEAD    , do_gen_tog  , LVL_HERO, SCMD_HOLYLIGHT, 0 },
     { "house"    , "hou"	, POS_RESTING , do_house    , 0, 0, 0 },
-    //{ "hedit"    , "hedit"	, POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_HEDIT, WIZ_EDIT_GRP },
+    { "hedit"    , "hedit"	, POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_HEDIT, WIZ_EDIT_GRP },
 
     { "inventory", "i"	, POS_RESTING , do_inventory, 0, 0, 0 },
     { "identify", "ident"	, POS_RESTING    , do_not_here, 0, 0, 0 },
@@ -2330,7 +2331,7 @@ void nanny(struct descriptor_data *d, char *arg)
                       { CON_CEDIT, cedit_parse },
                       { CON_AEDIT, aedit_parse },
                       { CON_TRIGEDIT, trigedit_parse },
-                      //{ CON_HEDIT, hedit_parse},
+                      { CON_HEDIT, hedit_parse},
                       { CON_VEDIT, vedit_parse},
                       { -1, NULL }
                     };
@@ -2904,6 +2905,22 @@ send_out_signals(d);
   case CON_IDENT:
     /* do nothing */
     break;
+  case CON_FIND_HELP:
+  {
+  int i;
+  if (!arg || !*arg)
+  STATE(d) = CON_PLAYING;
+  else if (!is_number(arg))
+  STATE(d) = CON_PLAYING;
+  else if ((i = atoi(arg)) < 0)
+  STATE(d) = CON_PLAYING;
+  else if (i > top_of_helpt)
+  STATE(d) = CON_PLAYING;
+  else
+  display_help(d->character, i);
+  STATE(d) = CON_PLAYING;
+  }
+  break;
   case CON_LINE_INPUT:
     {
       if (d->callback)

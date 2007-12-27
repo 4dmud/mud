@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.19  2005/06/21 08:53:40  w4dimenscor
+ * added in better help finder and help editor, a la mordecai
+ *
  * Revision 1.18  2005/05/30 09:48:26  w4dimenscor
  * changed affects color display and reduced the initial output
  *
@@ -1329,7 +1332,7 @@ ACMD(do_gen_comm)
     }
   }
 
-  snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",color_on , GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
+  snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",color_on , GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
   comlog("%s", buf1);
   add_to_comm( com_msgs[subcmd][1], buf1);
 

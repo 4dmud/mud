@@ -1970,7 +1970,7 @@ ASKILL(skill_cleave)
     send_to_char("You need to wield a slashing weapon to cleave.\r\n",  ch);
     return 0;
   }
-  if (use_stamina( ch, 5) < 0)
+  if (use_stamina( ch, 25) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");
     return 0;
@@ -1985,7 +1985,7 @@ ASKILL(skill_cleave)
 
   /* Only appropriately skilled PCs and uncharmed mobs */
   corpse_mod = 2;
-  skill_attack(ch, vict, SKILL_CLEAVE, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_CLEAVE)) > number(0, 100));
+  skill_attack(ch, vict, SKILL_CLEAVE, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_CLEAVE)) > number(0, 120));
   corpse_mod = 0;
   return SKILL_CLEAVE;
 }
@@ -2000,7 +2000,7 @@ ASKILL(skill_behead)
     send_to_char("You need to wield a slashing weapon to behead.\r\n",  ch);
     return 0;
   }
-  if (use_stamina( ch, 5) < 0)
+  if (use_stamina( ch, 25) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");
     return 0;
@@ -2014,7 +2014,7 @@ ASKILL(skill_behead)
   */
   /* Only appropriately skilled PCs and uncharmed mobs */
   corpse_mod = 1;
-  skill_attack(ch, vict, SKILL_BEHEAD, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_BEHEAD)) > number(0, 100));
+  skill_attack(ch, vict, SKILL_BEHEAD, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_BEHEAD)) > number(0, 120));
   corpse_mod = 0;
   return SKILL_BEHEAD;
 }
@@ -2325,6 +2325,7 @@ ASKILL(skill_scan)
   int  dir = 0, dis, maxdis, x, found = 0;
   room_rnum location = NULL, original_loc, is_in;
   char arg[MAX_STRING_LENGTH];
+  int is_aggro = PRF_FLAGGED(ch, PRF_AGGRO);
 
   const dirParseStruct dirParse[6] =
     {
@@ -2410,9 +2411,7 @@ ASKILL(skill_scan)
       return 0;
     }
     else
-      if (IS_SET
-          (original_loc->dir_option[dir]->exit_info,
-           EX_CLOSED))
+      if (IS_SET(original_loc->dir_option[dir]->exit_info,      EX_CLOSED))
       {
         /* But the door is closed */
         if (original_loc->dir_option[dir]->keyword)
@@ -2430,8 +2429,12 @@ ASKILL(skill_scan)
     original_loc = IN_ROOM(ch);
     location = original_loc->dir_option[dir]->to_room;
     char_from_room(ch);
+    if (is_aggro)
+    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
     char_to_room(ch, location);
     LOOK(ch);
+    if (is_aggro)
+    SET_BIT_AR(PRF_FLAGS(ch), PRF_AGGRO);
 
     /* check if the char is still there */
     if (IN_ROOM(ch) == location)

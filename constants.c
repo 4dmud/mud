@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.7  2005/06/21 08:53:40  w4dimenscor
+ * added in better help finder and help editor, a la mordecai
+ *
  * Revision 1.6  2005/04/23 12:18:12  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -744,6 +747,7 @@ const char *connected_types[] =
     "Email",
     "Create Character",
     "Vehicle Editor",
+    "Help Selection",
     "\n"
   };
 

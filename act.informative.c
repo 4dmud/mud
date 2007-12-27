@@ -51,7 +51,6 @@ Put <item multiple words> in <item multiple words>
 */
 
 /* extern variables */
-extern int top_of_helpt;
 extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
@@ -949,7 +948,7 @@ void do_auto_exits(struct char_data *ch)
     strcpy(tag_close, "/VEx");
   }
 
-new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
+  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
 
@@ -1025,7 +1024,7 @@ ACMD(do_exits)
   int door, len = 0;
   char dirnameb[50];
   char *dirname;;
-  
+
   //if (GET_LEVEL(ch) > LVL_IMMORT)
   //new_send_to_char(ch, MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
 
@@ -2863,31 +2862,63 @@ struct help_index_element *find_help(char *keyword)
   return NULL;
 }
 #endif
+
+void display_help(struct char_data *ch, unsigned int i)
+{
+
+  new_send_to_char(ch,
+                   "----------------------------------------------------------------------------\r\n"
+                   "%s\r\n"
+                   "----------------------------------------------------------------------------\r\n"
+                   "%s",
+                   help_table[i].keywords, help_table[i].entry);
+}
+
+void display_help_list(struct descriptor_data *d, char *keywords)
+{
+  unsigned int i, cnt = 0;
+  char buf[MAX_STRING_LENGTH];
+  char buf1[1024];
+  size_t len = 0;
+  strcpy(buf, "  Help files simmilar\r\n---------------------------------------\r\n");
+  len = strlen(buf);
+  for (i=0;i<top_of_helpt;i++)
+    if (isname_full(keywords, help_table[i].keywords))
+    {
+      snprintf(buf1, sizeof(buf1), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords);
+      strlcat(buf, buf1, sizeof(buf));
+      cnt++;
+    }
+
+  if (cnt == 1)
+  {
+    for (i=0;i<top_of_helpt;i++)
+    {
+      if (isname_full(keywords, help_table[i].keywords))
+      {
+        display_help(d->character, i); //TODO: Write this function, nerd
+        return;
+      }
+    }
+  }
+  if (cnt == 0)
+  {
+    write_to_output(d, "No help found on that topic, this has been logged please check for this help file in the future.\r\n");
+    log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(d->character), keywords);
+    return;
+  }
+  snprintf(buf1, sizeof(buf1),
+           "\r\n\r\nPlease type the number of the help file to view it\r\nOr type anything else to cancel\r\nWhich Help file: ");
+  strlcat(buf, buf1, sizeof(buf));
+  page_string(d, buf, 0);
+  STATE(d) = CON_FIND_HELP;
+
+
+}
+
 ACMD(do_help)
 {
-#if 0
-  new_send_to_char(ch,
-                   "Hi, and thanks for using the 4dimensions help system.\r\n"
-                   "Because _all_ our helpfiles are busily getting themselves rewritten\r\n"
-                   "your request cannot be processed.\r\n"
-                   "\r\n"
-                   "In the mean time, if you have a question or need help on something,\r\n"
-                   "You can download yourself the full list of help files for browsing while\r\n"
-                   "offline, or at your leasure from: http://www.4dimensions.org/images/helps.html\r\n"
-                   "or\r\n"
-                   "please utilise the question channel.\r\n"
-                   "to use it type:\r\n"
-                   "question <your question>\r\n"
-                   "as in:\r\n"
-                   "question How can I do more damage?\r\n"
-                   "\r\n"
-                   "Thankyou for using 4Dimensions help, your help requirements are\r\n"
-                   "valuble to us, and your help request has been placed in a priority queue.\r\n"
-                   "\r\n"
-                   "(light music ensues)\r\n"
 
-                  );
-#else
   int chk, bot, top, mid, minlen;
 
   if (!ch->desc)
@@ -2905,8 +2936,8 @@ ACMD(do_help)
     new_send_to_char(ch, "No help available.\r\n");
     return;
   }
-
-
+  display_help_list(ch->desc, argument);
+  return;
 
   bot = 0;
   top = top_of_helpt;
@@ -2924,15 +2955,10 @@ ACMD(do_help)
       return;
     }
     else
-      if (!
-          (chk =
-             strn_cmp(argument, help_table[mid].keywords, minlen)))
+      if (!(chk = strn_cmp(argument, help_table[mid].keywords, minlen)))
       {
         /* trace backwards to find first matching entry. Thanks Jeff Fink! */
-        while ((mid > 0) &&
-               (!(chk =
-                    strn_cmp(argument, help_table[mid - 1].keywords,
-                             minlen))))
+        while ((mid > 0) && (!(chk =strn_cmp(argument, help_table[mid - 1].keywords,minlen))))
           mid--;
 
         //strip_string(help_table[mid].entry);
@@ -2947,7 +2973,6 @@ ACMD(do_help)
           top = mid - 1;
       }
   }
-#endif
 }
 
 ACMD(do_spellinfo)
