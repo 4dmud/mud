@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.40  2006/10/03 22:23:02  w4dimenscor
+ * say $p no longer tries to parse $p.
+ *
  * Revision 1.39  2006/08/18 11:09:58  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -358,7 +361,7 @@ ACMD(do_say)
 
 
 
-    delete_doubledollar(argument);
+    //delete_doubledollar(argument);
 
     if (argument[strlen(argument) - 1] == '?')
     {
