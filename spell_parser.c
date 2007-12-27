@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.14  2006/02/24 20:51:14  w4dimenscor
+ * Added a message to quaff for empty potions
+ *
  * Revision 1.13  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -943,7 +946,12 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
 
     if (!consume_otrigger(obj, ch, OCMD_QUAFF))  /* check trigger */
       return;
-
+    if (GET_OBJ_VAL(obj, 1) < 0 && GET_OBJ_VAL(obj, 2) < 0 && GET_OBJ_VAL(obj, 3) < 0) {
+      act("You quaff a little bit of air from $p then burp.", FALSE, ch, obj, NULL, TO_CHAR);
+      act("$n quaffs a little bit of air from $p then burps.", FALSE, ch, obj, NULL, TO_ROOM);
+      extract_obj(obj);
+      return;
+    }
     act("You quaff $p.", FALSE, ch, obj, NULL, TO_CHAR);
     if (obj->action_description)
       act(obj->action_description, FALSE, ch, obj, NULL, TO_ROOM);
