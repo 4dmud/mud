@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.53  2006/09/21 07:37:57  w4dimenscor
+ * added a check for riders into combat
+ *
  * Revision 1.52  2006/09/21 07:29:33  w4dimenscor
  * changed the combat things a little, to put riders as the one getting hit in combat
  *
@@ -730,8 +733,10 @@ void start_fighting(Character* ch, Character* vict) {
     /*to stop recursion*/
     if (!ch || !vict)
         return;
+    if (RIDDEN_BY(vict))
 	victim = vict->RiderHere() ? RIDDEN_BY(vict) : vict;
-    if ( DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
+	
+    if ( !victim || DEAD(ch) || DEAD(victim)|| !HERE(ch, victim) || SELF(ch, victim))
         return;
 
     if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
