@@ -40,7 +40,7 @@ void add_follower(Character *ch, Character *leader);
 int arena_ok(Character *ch, Character *victim);
 void change_alignment(Character *ch, Character *victim);
 void zap_char(Character *victim);
-
+int find_first_step(room_rnum src, room_rnum target);
 
 
 /* local functions */
@@ -344,7 +344,7 @@ int mag_damage(int level, Character *ch, Character *victim,
     if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
         affect_from_char(victim, SPELL_SWEET_DREAMS);
 
-    if ((MOB_FLAGGED(victim, MOB_NOPUSH) || MOB_FLAGGED(victim, MOB_SENTINEL))&& GET_SPELL_DIR(ch) != NOWHERE)
+    if (!victim->canHuntChar(ch) && GET_SPELL_DIR(ch) != NOWHERE)
         pass = FALSE;
     if (FIGHTING(ch) != NULL) {
         /** if the player is fighting already, savethe person they are fighting with **/

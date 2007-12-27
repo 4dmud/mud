@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.62  2007/05/24 20:25:16  w4dimenscor
+ * lots of hunt changes. Should all work now.
+ *
  * Revision 1.61  2007/05/20 21:01:46  w4dimenscor
  * Fixed the spamcast bug.
  * -- Thotter
@@ -2398,7 +2401,7 @@ int fe_after_damage(Character* ch, Character* vict,
     }
     if (!SELF(ch, vict)) {
 
-        if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_NOPUSH)) {
+        if (IS_NPC(vict) && CAN_HUNT(vict)) {
             add_hunter(vict);
             HUNTING(vict) = ch;
             remember(vict, ch);
@@ -4978,7 +4981,7 @@ void strike_missile(Character *ch, Character *tch,
              dirs[rev_dir[dir]]);
     act(buf, FALSE, ch, missile, tch, TO_VICT);
     if (damage(ch, tch, dam, attacktype) != -1)
-        if (IS_NPC(tch) && !IS_NPC(ch) && !MOB_FLAGGED(tch, MOB_NOPUSH) && GET_POS(tch) > POS_STUNNED) {
+        if (IS_NPC(tch) && !IS_NPC(ch) && CAN_HUNT(ch) && GET_POS(tch) > POS_STUNNED) {
             if (tch->mob_specials.head_join)
                 tch = tch->mob_specials.head_join;
             SET_BIT_AR(MOB_FLAGS(tch), MOB_MEMORY);

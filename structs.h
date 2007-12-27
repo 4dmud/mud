@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.58  2007/05/24 20:25:16  w4dimenscor
+ * lots of hunt changes. Should all work now.
+ *
  * Revision 1.57  2006/09/06 12:02:41  w4dimenscor
  * Have stopped the crashing and erroring in OLC in my port, however, i am still finding memory leaks.
  *
@@ -1182,7 +1185,8 @@ class Room;
 #define EF_ARRAY_MAX    4
 
 /* Character.internal_flags (INT_XXX) ************************************/
-#define INT_MARK    (1 <<  0)
+#define INT_MARK     (1 <<  0)
+#define INT_LOSTPREY (1 <<  1)
 
 #define NEWB_NONE   0
 #define NEWB_NEW    1

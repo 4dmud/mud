@@ -150,7 +150,7 @@ void mobile_activity(void) {
         }
 
         /* Mob Memory */
-        if (MOB_FLAGGED(ch, MOB_MEMORY) && MEMORY(ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
+        if (/*MOB_FLAGGED(ch, MOB_MEMORY) && */MEMORY(ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
 
             found = FALSE;
             for (vict = IN_ROOM(ch)->people; vict && !found;
@@ -300,7 +300,7 @@ int hunt_location(void *thing, int type) {
     room_vnum dest = NOWHERE;
     struct obj_data *obj = NULL;
     Character *mob = NULL;
-    int find_first_step(room_rnum src, room_rnum target);
+    int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 
     if (!thing)
         return 0;

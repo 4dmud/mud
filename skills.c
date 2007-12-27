@@ -40,7 +40,7 @@ int compute_armor_class(Character *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
             int routines, int wait, int first_prereq, int second_prereq, int tier, int level);
-int find_first_step(room_rnum src, room_rnum target);
+int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 void skill_attack(Character *ch, Character *vict, int skill, int pass);
 ACMD(do_gen_door);
 void send_not_to_spam(char *buf, Character *ch,
@@ -1177,7 +1177,7 @@ ASKILL(skill_track)
   }
 
   /* They passed the skill check. */
-  dir = find_first_step(IN_ROOM(ch), vict->in_room);
+  dir = find_first_step(IN_ROOM(ch), vict->in_room,true);
 
   switch (dir)
   {

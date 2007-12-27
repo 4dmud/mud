@@ -35,7 +35,7 @@ extern room_vnum frozen_start_room;
 extern int save_new_style;
 
 /* External Functions */
-int find_first_step(room_rnum src, room_rnum target);
+int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 int get_pidx_from_name(Character *ch);
 void obj_from_room(struct obj_data *obj);
 void obj_to_room(struct obj_data *object, room_rnum room);

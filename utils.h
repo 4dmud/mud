@@ -759,6 +759,7 @@ int current_class_is_tier_num(Character *ch);
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
 #define CAN_SEE_IN_DARK(ch) \
 (AFF_FLAGGED(ch, AFF_INFRAVISION) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || GET_RACE(ch) == RACE_DWARF)))
+#define CAN_HUNT(ch) (!MOB_FLAGGED(ch, MOB_NOPUSH) && !MOB_FLAGGED(ch, MOB_SENTINEL))
 
 #define IS_GOOD(ch)    	(GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch)    	(GET_ALIGNMENT(ch) <= -350)

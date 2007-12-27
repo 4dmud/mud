@@ -28,11 +28,11 @@ ACMD(do_say);
 void improve_skill(Character *ch, int skill);
 
 /* Local functions */
-int VALID_EDGE(room_rnum x, int y);
+int VALID_EDGE(room_rnum x, int y,bool honour_notrack);
 void bfs_enqueue(room_rnum room, int dir);
 void bfs_dequeue(void);
 void bfs_clear_queue(void);
-int find_first_step(room_rnum src, room_rnum target);
+int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 ACMD(do_track);
 void hunt_victim(Character *ch);
 
@@ -51,12 +51,12 @@ static struct bfs_queue_struct *queue_head = 0, *queue_tail = 0;
 #define TOROOM(x, y) 	((x)->dir_option[(y)]->to_room)
 #define IS_CLOSED(x, y) (EXIT_FLAGGED((x)->dir_option[(y)], EX_CLOSED))
 
-int VALID_EDGE(room_rnum x, int y) {
+int VALID_EDGE(room_rnum x, int y,bool honour_notrack) {
     if (x->dir_option[y] == NULL || TOROOM(x, y) == NULL)
         return (0);
     if (CONFIG_TRACK_T_DOORS == FALSE && IS_CLOSED(x, y))
         return (0);
-    if (ROOM_FLAGGED(TOROOM(x, y), ROOM_NOTRACK)
+    if ((ROOM_FLAGGED(TOROOM(x, y), ROOM_NOTRACK) && honour_notrack)
             || IS_MARKED(TOROOM(x, y)))
         return (0);
 
@@ -103,7 +103,7 @@ void bfs_clear_queue(void) {
  * Intended usage: in mobile_activity, give a mob a dir to go if they're
  * tracking another mob or a PC.  Or, a 'track' skill for PCs.
  */
-int find_first_step(room_rnum src, room_rnum target) {
+int find_first_step(room_rnum src, room_rnum target,bool honour_notrack) {
     int curr_dir;
     int curr_room;
 
@@ -124,7 +124,7 @@ int find_first_step(room_rnum src, room_rnum target) {
 
     /* first, enqueue the first steps, saving which direction we're going. */
     for (curr_dir = 0; curr_dir < NUM_OF_DIRS; curr_dir++)
-        if (VALID_EDGE(src, curr_dir)) {
+        if (VALID_EDGE(src, curr_dir,honour_notrack)) {
             MARK(TOROOM(src, curr_dir));
             bfs_enqueue(TOROOM(src, curr_dir), curr_dir);
         }
@@ -137,7 +137,7 @@ int find_first_step(room_rnum src, room_rnum target) {
             return (curr_dir);
         } else {
             for (curr_dir = 0; curr_dir < NUM_OF_DIRS; curr_dir++)
-                if (VALID_EDGE(queue_head->room, curr_dir)) {
+                if (VALID_EDGE(queue_head->room, curr_dir,honour_notrack)) {
                     MARK(TOROOM(queue_head->room, curr_dir));
                     bfs_enqueue(TOROOM(queue_head->room, curr_dir),
                                 queue_head->dir);
@@ -239,16 +239,23 @@ void hunt_victim(Character *ch) {
         remove_hunter(ch);
         return;
     }
-    if ((dir = find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)))) < 0) {
+    if ((dir = find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)))) < 0 || dir > 5 ||
+	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB)) {
         if (dir != BFS_ALREADY_THERE) {
-            snprintf(tbuf, sizeof(tbuf), "Damn! I lost %s!", HMHR(HUNTING(ch)));
-            do_say(ch, tbuf, 0, 0);
+	    if (!IS_SET(INTERNAL(ch), INT_LOSTPREY)) {
+                snprintf(tbuf, sizeof(tbuf), "Damn! I lost %s!", HMHR(HUNTING(ch)));
+                do_say(ch, tbuf, 0, 0);
+	        //now that the world knows that, we don't have to repeat it all the time.
+		//Continue hunting though.
+	        SET_BIT(INTERNAL(ch), INT_LOSTPREY);
+	    }
         } else {
             HUNTING(ch) = NULL;
             remove_hunter(ch);
         }
     } else {
         if (IN_ROOM(ch) && HUNTING(ch) && IN_ROOM(HUNTING(ch)) && IN_ROOM(HUNTING(ch))->zone == IN_ROOM(ch)->zone) {
+	    REMOVE_BIT(INTERNAL(ch), INT_LOSTPREY);
             switch (number(0, 20)) {
             case 0:
                 HUNTING(ch)->Send("You sense something nearby, coming for you.\r\n");

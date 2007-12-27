@@ -97,6 +97,8 @@ void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add
 int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 extern long top_idnum;
 
+int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
+
 /* ================== Structure for player/non-player ===================== */
 
 
@@ -1235,4 +1237,34 @@ Character * Character::NextFightingMe() {
             return v;
     }
     return NULL;
+}
+
+bool Character::canHuntChar(Character *vict)
+{
+	if(!CAN_HUNT(this) ||
+	    ((MOB_FLAGGED(this, MOB_STAY_ZONE) && IN_ROOM(this)->zone != IN_ROOM(vict)->zone) ||
+	    (MOB_FLAGGED(this, MOB_STAY_SECTOR) && IN_ROOM(this)->sector_type != IN_ROOM(vict)->sector_type) ||
+	    find_first_step(IN_ROOM(this), IN_ROOM(vict)) < 0))
+		return false;
+
+	//check for path things here (see notes)
+	int stepdir = find_first_step(IN_ROOM(this),IN_ROOM(vict));
+//	Room *steproom = IN_ROOM(this)->dir_option[find_first_step(IN_ROOM(this),IN_ROOM(vict))]->to_room;
+	Room *curroom = IN_ROOM(this);
+	while (curroom && stepdir>=0 && stepdir <= 5)
+	{
+		if (IS_SET(curroom->dir_option[stepdir]->exit_info, EX_CLOSED))
+			return false;
+		Room *steproom = curroom->dir_option[stepdir]->to_room;
+		if (!steproom || (MOB_FLAGGED(this, MOB_STAY_SECTOR) && steproom->zone != IN_ROOM(vict)->zone) ||
+		    (MOB_FLAGGED(this, MOB_STAY_ZONE) && steproom->sector_type != IN_ROOM(vict)->sector_type) ||
+                    ROOM_FLAGGED(steproom, ROOM_NOMOB) ||
+                    ROOM_FLAGGED(steproom, ROOM_DEATH))
+			return false;
+		curroom = steproom;
+		if (curroom == IN_ROOM(vict))
+			return true;
+	}
+
+	return false;
 }
