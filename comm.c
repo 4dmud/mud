@@ -1389,7 +1389,7 @@ void heartbeat(int heart_pulse) {
 
     if (!(heart_pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC))) {
         //log("Pulse for: weather and time, affect, point, time trigger check");
-        // weather_and_time(1);
+        weather_and_time(1);
         check_time_triggers();
         affect_update();
         point_update();
