@@ -213,7 +213,9 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
     {
     case CLEANUP_ALL:
       /* free(OLC_SCRIPT(d)) equivalent */
-      delete OLC_ROOM(d);
+      //delete OLC_ROOM(d);
+      delete OLC_SCRIPT(d);
+      OLC_SCRIPT(d)=NULL;
       break;
     case CLEANUP_STRUCTS:
       delete OLC_ROOM(d);
