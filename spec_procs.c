@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.26  2007/06/17 04:34:38  w4dimenscor
+ * updated combat for charmies. Made it split the damage among the group better
+ *
  * Revision 1.25  2007/06/15 07:11:40  w4dimenscor
  * changed the display message for practicing to include what you spent.
  *
@@ -639,13 +642,11 @@ SPECIAL(guild) {
     if (REMORTS(ch) > 2) {
 		ch->Gold(-cig, GOLD_HAND);
     		ch->Send( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL(ch,skill_num));
+    		ch->Gold(-cig, GOLD_HAND);
     } else {
 		ch->Send( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL(ch,skill_num));
     }
     GET_PRACTICES(ch)--;
-    if (REMORTS(ch) > 2)
-		ch->Gold(-cig, GOLD_HAND);
-    
 
     if (GET_SKILL(ch, skill_num) >= learned)
         *ch << "You cannot train that any further here. \r\nAlthough it may improve through use.\r\n";

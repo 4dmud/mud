@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.72  2007/06/17 04:34:37  w4dimenscor
+ * updated combat for charmies. Made it split the damage among the group better
+ *
  * Revision 1.71  2007/06/15 00:12:03  w4dimenscor
  * Set timers on mob corpses too.
  *
@@ -1817,6 +1820,22 @@ int melee_type_dam(Character *ch, Character *vict, int attack_chance, int weps, 
     return dam;
 }
 
+int followers_assisting(Character *ch) {
+    Character *k;
+    struct follow_type *f;
+    int cnt = 0;
+
+    k = (ch->master ? ch->master : ch);
+    for (f = k->followers;f != NULL;f = f->next) {
+        if (f->follower != ch) {
+            if (HERE(f->follower, ch) && (FIGHTING(ch) != NULL))
+                if (FIGHTING(ch) == FIGHTING(f->follower))
+                    cnt++;
+        }
+    }
+    return cnt;
+}
+
 int fe_melee_hit(Character* ch, Character* vict,
                  int type, int melee) {
     struct obj_data* wielded = NULL;
@@ -1859,7 +1878,13 @@ int fe_melee_hit(Character* ch, Character* vict,
     }
 
     GET_ATTACK_POS(ch) =  find_body_part(ch, w_type);
-    attack_chance = attack_roll(ch, vict, w_type);
+    if (IS_NPC(vict) && (vict->followers || vict->master)) {
+        if (followers_assisting(vict) == 0)
+            attack_chance = 3;
+        else
+            attack_chance = attack_roll(ch, vict, w_type);
+    } else
+        attack_chance = attack_roll(ch, vict, w_type);
 
     if (evade_hit_check(ch, vict, w_type)||attack_chance == 0 )
         damage_ret = fe_after_damage(ch, vict, 0, w_type);
@@ -2002,7 +2027,52 @@ int fe_solo_damage(Character* ch, Character* vict,
     return fe_after_damage(ch, vict, damage, w_type);
 }
 
+Character *find_next_target(Character *ch) {
+    Character *k = (ch->master != NULL ? ch->master : ch);
+    float total_perc = 0, cur_perc = 0;
+    float rr;
+    struct follow_type* f = NULL;
+    if (GET_PERC(k) != 0 && HERE(k, ch) && FIGHTING(ch) && FIGHTING(ch) == FIGHTING(k))
+        total_perc += GET_PERC(k);
+    /*check the followers*/
+    for (f = k->followers; f; f = f->next) {
+        if (!HERE(f->follower, ch))
+            continue;
+        if (!IS_NPC(f->follower) && (PLR_FLAGGED(f->follower, PLR_DYING) || GET_LEVEL(f->follower) >= LVL_IMMORT))
+            continue;
+        if (GET_PERC(f->follower)==0)
+            continue;
+        if (FIGHTING(f->follower)==FIGHTING(ch)) {
+            total_perc += GET_PERC(f->follower);
+        }
+    }
+    rr = number(1, (int)((total_perc+0.5)*10))/10;
 
+    if (GET_PERC(k) != 0 && HERE(k, ch) && FIGHTING(ch) && FIGHTING(ch) == FIGHTING(k)) {
+        if (rr > cur_perc && rr <= (cur_perc + GET_PERC(k)))
+            return k;
+        else
+            cur_perc += GET_PERC(k);
+    }
+
+    for (f = k->followers; f; f = f->next) {
+        if (!HERE(f->follower, ch))
+            continue;
+        if (!IS_NPC(f->follower) && (PLR_FLAGGED(f->follower, PLR_DYING) || GET_LEVEL(f->follower) >= LVL_IMMORT))
+            continue;
+        if (GET_PERC(f->follower)==0)
+            continue;
+        if (FIGHTING(f->follower)!=FIGHTING(ch))
+            continue;
+        if (rr > cur_perc && rr <= (cur_perc + GET_PERC(f->follower)))
+            return f->follower;
+        else
+            cur_perc += GET_PERC(f->follower);
+    }
+
+    /* somehow didn't find anything right */
+    return ch;
+}
 /* When we're hitting a group of actual players, this gets
    called so that we break up the damage between them.
    ch is hitting vict and all the people in his group that
@@ -2178,7 +2248,9 @@ int fe_deal_damage(Character* ch, Character* vict,
             return fe_solo_damage(ch, vict, dam, w_type);
     }
     /*victim is the master of the group -- so whack the group */
-    return fe_group_damage(ch, vict, dam, w_type);
+    //return fe_group_damage(ch, vict, dam, w_type);
+
+    return fe_solo_damage(ch, vict, dam, w_type);
 
 }
 
@@ -2339,6 +2411,9 @@ int fe_after_damage(Character* ch, Character* vict,
     victnext = NULL;
     sweeping = FALSE;
 
+    if (IS_NPC(vict) && (vict->master || vict->followers))
+        if (followers_assisting(vict) == 0)
+            dam = 100 + (dam*2);
 
     if (!can_fight(ch, vict, FALSE)) {
         //stop_fighting(ch);
@@ -2352,15 +2427,15 @@ int fe_after_damage(Character* ch, Character* vict,
         return (-1);
     }
 
-    if (vict->master == ch)
+    if (vict->master && (vict->master == ch || vict->master == ch->master))
         stop_follower(vict);
 
     if (dam) {
 
         if (RIDING(vict) && HERE(RIDING(vict), vict) && RIDING(vict) != ch) {
             partial = ((dam * 3)/4);
-            //if (damage(ch, RIDING(vict), partial, w_type) == -1)
-            // return -1;
+            if (damage(ch, RIDING(vict), partial, w_type) == -1)
+                return -1;
         } else
             partial = dam;
 
@@ -2402,8 +2477,6 @@ int fe_after_damage(Character* ch, Character* vict,
                     damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), partial);
             }
         }
-
-
 
         if (!SELF(ch, vict)) {
             if (partial > 5 && steal_affects(ch, partial, w_type, vict) == -1)
@@ -2573,6 +2646,10 @@ int fe_after_damage(Character* ch, Character* vict,
 
         return -1;
     }
+
+    /** switch targets in groups **/
+    if (vict->master || vict->followers)
+        FIGHTING(ch) = find_next_target(vict);
 
     if (!FIGHTING(vict) && !SELF(ch, vict) && HERE(ch, vict))
         start_fighting_delay(vict, ch);
@@ -4466,7 +4543,7 @@ void make_corpse(Character *ch, Character *killer) {
             add_corpse_to_list(corpse);
             save_corpses();
         } else
-        check_timer(corpse);
+            check_timer(corpse);
     }
 }
 
@@ -5252,7 +5329,7 @@ void tick_grenade(void) {
                     /* checks to see if inside containers */
                     /* to avoid possible infinite loop add a counter variable */
                     s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           the grenade */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       the grenade */
 
                     for (tobj = i; tobj; tobj = tobj->in_obj) {
                         s++;
@@ -6240,17 +6317,12 @@ int attack_type(char chclass) {
 }
 
 float ctl_elemental(Character *ch, Character *elem) {
-if (!IS_NPC(elem))
-return 1.0f;
+    if (!IS_NPC(elem))
+        return 1.0f;
 
-    if (MOB_FLAGGED(elem, MOB_ELEM_EARTH)) {
-    
-    } else if (MOB_FLAGGED(elem, MOB_ELEM_FIRE)) {
-    
-    } else if (MOB_FLAGGED(elem, MOB_ELEM_AIR)) {
-    
-    } else if (MOB_FLAGGED(elem, MOB_ELEM_WATER)) {
-    
-    }
+if (MOB_FLAGGED(elem, MOB_ELEM_EARTH)) {}
+    else if (MOB_FLAGGED(elem, MOB_ELEM_FIRE)) {}
+    else if (MOB_FLAGGED(elem, MOB_ELEM_AIR)) {}
+    else if (MOB_FLAGGED(elem, MOB_ELEM_WATER)) {}
     return 1.0f;
 }
