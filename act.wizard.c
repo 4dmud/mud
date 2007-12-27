@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.21  2005/05/03 10:21:25  w4dimenscor
+ * changed the free_string function to take a pointer to a pointer so it can nullk the string off properly now. Also, fixed a door loading error, that assumed that all door rooms existed when loading, and now it checks for existstance. Also, fixed the multi arg for 'get' command
+ *
  * Revision 1.20  2005/05/01 11:42:12  w4dimenscor
  * started a change in the server so that multiple arguments can be used when referencing items: have done this for locate object, look, goto, at and a few other things, havent done it for: get, put, drink, wear and a few others
  *
@@ -5208,7 +5211,7 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
       new_send_to_char(ch, "Sorry, no color codes please.\r\n");
       return 0;
     }
-    free_string(IMMTITLE(vict));
+    free_string(&IMMTITLE(vict));
     IMMTITLE(vict) = NULL;
     if (val_arg && *val_arg)
       IMMTITLE(vict) = strdup(val_arg);
@@ -5588,7 +5591,7 @@ int check_item_hack_invis(struct obj_data *obj, int fix)
     if (fix)
     {
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODISPLAY);
-      free_string(obj->description);
+      free_string(&obj->description);
       snprintf(buf, sizeof(buf), "%s lies here", obj->short_description);
       obj->description = strdup(buf);
     }
@@ -6542,7 +6545,7 @@ ACMD(do_namechange)
       continue;
     if (compares(GET_NAME(d->character), oldname))
     {
-      free_string(GET_PC_NAME(d->character));
+      free_string(&GET_PC_NAME(d->character));
       GET_PC_NAME(d->character) = str_dup(newname);
       newname[0] = LOWER(newname[0]);
       sprintf(passw, "%s", CRYPT(GET_PC_NAME(d->character), GET_PASSWD(d->character)));

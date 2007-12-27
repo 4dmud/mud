@@ -2279,7 +2279,7 @@ void remove_clan_member(char * name, int clan)
     if (!strcmp(find->name, name))
     {
       REMOVE_FROM_LIST(find, clan_list[clan], next);
-      free_string(find->name);
+      free_string(&find->name);
       free(find);
       return;
     }
@@ -2314,7 +2314,7 @@ void free_clan_list(struct clan_list_data *find)
   if (find->next != NULL)
     free_clan_list(find->next);
 
-  free_string(find->name);
+  free_string(&find->name);
   free(find);
 }
 

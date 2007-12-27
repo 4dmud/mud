@@ -4730,7 +4730,7 @@ char * parse_prompt(CHAR_DATA *ch)
     }
   }
 #endif
-  free_string(GET_LAST_PROMPT(ch));
+  free_string(&GET_LAST_PROMPT(ch));
   GET_LAST_PROMPT(ch) = strdup(prompt);
 
 

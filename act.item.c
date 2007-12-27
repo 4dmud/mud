@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.14  2005/05/03 10:21:25  w4dimenscor
+ * changed the free_string function to take a pointer to a pointer so it can nullk the string off properly now. Also, fixed a door loading error, that assumed that all door rooms existed when loading, and now it checks for existstance. Also, fixed the multi arg for 'get' command
+ *
  * Revision 1.13  2005/05/01 12:31:07  w4dimenscor
  * added multi arg names to wear and remove
  *
@@ -473,7 +476,7 @@ ACMD(do_put)
       if (obj_data != cont_data &&
           CAN_SEE_OBJ(ch, obj_data) &&
           GET_OBJ_TYPE(obj_data) != ITEM_CONTAINER &&
-          (obj_dotmode == FIND_ALL || isname(obj_desc, obj_data->name)))
+          (obj_dotmode == FIND_ALL || isname_full(obj_desc, obj_data->name)))
       {
         perform_put(ch, obj_data, cont_data) ? processed_put_counter++ : failed_put_counter++;
       }
@@ -860,7 +863,7 @@ void get_from_container(struct char_data *ch, struct obj_data *cont,
     {
       next_obj = obj->next_content;
       if (CAN_SEE_OBJ(ch, obj) &&
-          (obj_dotmode == FIND_ALL || isname(obj_desc, obj->name)))
+          (obj_dotmode == FIND_ALL || isname_full(obj_desc, obj->name)))
       {
         perform_get_from_container(ch, obj, cont, mode) ? processed_get_counter++ : failed_get_counter++;
       }
@@ -901,7 +904,7 @@ void get_from_container(struct char_data *ch, struct obj_data *cont,
   }
 }
 
-void perform_get(struct char_data *ch, char *arg1, char *arg2, char *arg3)
+void perform_get(struct char_data *ch, char *num, char *arg2, char *arg3)
 {
   int cont_dotmode, obj_dotmode, found = 0, mode = 0;
   struct obj_data *cont;
@@ -909,17 +912,11 @@ void perform_get(struct char_data *ch, char *arg1, char *arg2, char *arg3)
   int amount = 1;
   char *obj_desc, *cont_desc;
 
-  if (is_number(arg1))
-  {
-    amount = atoi(arg1);
+
+    amount = atoi(num);
     obj_desc = arg2;
     cont_desc = arg3;
-  }
-  else
-  {
-    obj_desc = arg1;
-    cont_desc = arg2;
-  }
+  
 
   cont_dotmode = find_all_dots(cont_desc);
   obj_dotmode = find_all_dots(obj_desc);
@@ -1147,10 +1144,19 @@ void get_from_room(struct char_data *ch, char *obj_desc, int howmany)
 ACMD(do_get)
 {
   char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  char arg3[MAX_INPUT_LENGTH];
+  char arg3[MAX_INPUT_LENGTH] = "";
+  char num[MAX_INPUT_LENGTH] = "1";
+  char *from;
 
-  one_argument(two_arguments(argument, arg1, arg2), arg3);
+  skip_spaces(&argument);
+  if (begins_with_number(argument))
+  argument = any_one_arg(argument, num);
+  from = str_until(argument, "from", arg1, sizeof(arg1));
+  skip_spaces(&from);
+  if (*from)
+  strlcpy(arg3, from, sizeof(arg3));
+  //one_argument(two_arguments(argument, arg1, arg2), arg3);
+  
 
   if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
   {
@@ -1168,22 +1174,22 @@ ACMD(do_get)
   if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
   // get <item>
-  if (!*arg2)
+  if (!*from)
   {
     get_from_room(ch, arg1, 1);
     return;
   }
 
   // get <number> <item>
-  if (is_number(arg1) && !*arg3)
+  if (*num && !*from)
   {
-    get_from_room(ch, arg2, atoi(arg1));
+    get_from_room(ch, arg3, atoi(num));
     return;
   }
 
   // get <item> <container>
-  // get <number> <item> <container>
-  perform_get(ch, arg1, arg2, arg3);
+  // get <number> <item> from <container>
+  perform_get(ch, num, arg1, arg3);
 
   // using SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH) instead of immediate saveing
   // Crash_crashsave(ch);

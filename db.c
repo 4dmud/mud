@@ -1946,9 +1946,12 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
   sprintf(buf2,"room #%d, direction D%d",room->number,dir);
   if (dir < 0 || dir >= NUM_OF_DIRS)
   {
-    log("Doors are only in the range of 0 to %d, this door isn't: %s", NUM_OF_DIRS, buf2);
-    free_string(fread_string(fl, buf2));
-    free_string(fread_string(fl, buf2));
+  char *di;
+    log("Doors are only in the range of 0 to %d, this door isn't: %s\r\n(gulping door)", NUM_OF_DIRS, buf2);
+    di = fread_string(fl, buf2);
+    free_string(&di);
+    di = fread_string(fl, buf2);
+    free_string(&di);
     if (!get_line(fl, line))
     {
       log("SYSERR: Format error, %s", buf2);
@@ -1963,9 +1966,10 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
       CREATE(room->dir_option[dir], struct room_direction_data, 1);
       room->dir_option[dir]->general_description = NULL;
       room->dir_option[dir]->keyword = NULL;
+    } else {
+    free_string(&room->dir_option[dir]->keyword);
+    free_string(&room->dir_option[dir]->general_description);
     }
-    free_string(room->dir_option[dir]->keyword);
-    free_string(room->dir_option[dir]->general_description);
     room->dir_option[dir]->general_description = fread_string(fl, buf2);
     room->dir_option[dir]->keyword = fread_string(fl, buf2);
     room->dir_option[dir]->nosave = 0;
@@ -2032,7 +2036,7 @@ void renum_world(void)
         if (world_vnum[room]->dir_option[door])
           if (world_vnum[room]->dir_option[door]->to_room_tmp != NOWHERE)
             world_vnum[room]->dir_option[door]->to_room =
-              world_vnum[world_vnum[room]->dir_option[door]->to_room_tmp];
+              real_room(world_vnum[room]->dir_option[door]->to_room_tmp);
 }
 
 
@@ -6070,7 +6074,7 @@ void free_char(struct char_data *ch)
       GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
       free_alias(a);
     }
-    free_string(GET_LAST_PROMPT(ch));
+    free_string(&GET_LAST_PROMPT(ch));
     if (PROMPT(ch));
     free(PROMPT(ch));
     if (ch->player_specials->poofin)
@@ -6105,10 +6109,10 @@ void free_char(struct char_data *ch)
     /* if this is a player, or a non-prototyped non-player, free all */
     if (GET_NAME(ch))
       free(GET_NAME(ch));
-    free_string(ch->player.title);
-    free_string(ch->player.short_descr);
-    free_string(ch->player.long_descr);
-    free_string(ch->player.description);
+    free_string(&ch->player.title);
+    free_string(&ch->player.short_descr);
+    free_string(&ch->player.long_descr);
+    free_string(&ch->player.description);
 
     /* free script proto list */
     free_proto_script(ch, MOB_TRIGGER);

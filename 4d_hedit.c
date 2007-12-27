@@ -354,8 +354,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
 
 
     case HEDIT_KEYWORDS:
-	if (OLC_HELP(d)->keywords)
-	    free_string(OLC_HELP(d)->keywords);
+	    free_string(&OLC_HELP(d)->keywords);
 	if (strlen(arg) > MAX_HELP_KEYWORDS)
 	    arg[MAX_HELP_KEYWORDS - 1] = '\0';
 	OLC_HELP(d)->keywords = str_dup((arg && *arg) ? arg : "UNDEFINED");
@@ -396,7 +395,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
 void free_help(struct help_index_element *help)
 {
 
-	free_string(help->keywords);
+	free_string(&help->keywords);
   if (help->entry && !help->duplicate) {
 	    free(help->entry);
       help->entry = NULL;

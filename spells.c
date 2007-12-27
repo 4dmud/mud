@@ -489,7 +489,7 @@ ASPELL(spell_locate_object)
 
   if (j == ((level / 2) * (TIERNUM+1)))
   {
-    free_string(dynbuf);
+    free_string(&dynbuf);
     send_to_char("You sense nothing.\r\n", ch);
   }
   else

@@ -73,11 +73,11 @@ void parse_tree_name(struct obj_data *tree)
   struct extra_descr_data *new_descr = NULL;
   char buf2[MAX_INPUT_LENGTH];
 
-  free_string(tree->name);
-  free_string(tree->description);
-  free_string(tree->short_description);
-  free_string(tree->smell);
-  free_string(tree->feel);
+  free_string(&tree->name);
+  free_string(&tree->description);
+  free_string(&tree->short_description);
+  free_string(&tree->smell);
+  free_string(&tree->feel);
 
   tree->smell = strdup("It smells good!\r\n");
   tree->feel = strdup("It feels alive.\r\n");

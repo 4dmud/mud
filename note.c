@@ -491,7 +491,7 @@ void note_remove( CHAR_DATA *ch, NOTE_DATA *pnote, bool del)
     /* Just a simple recipient removal? */
     if ( str_cmp( GET_NAME(ch), pnote->sender ) && to_new[0] != '\0' )
     {
-      free_string( pnote->to_list );
+      free_string(&pnote->to_list );
       pnote->to_list = str_dup( to_new + 1 );
       return;
     }
@@ -942,7 +942,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     strcpy(buffer, ch->pnote->text);
     strcat(buffer,argument);
     strcat(buffer,"\n\r");
-    free_string( ch->pnote->text );
+    free_string(&ch->pnote->text );
     ch->pnote->text = strdup( buffer );
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -982,14 +982,14 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         else /* found the second one */
         {
           buf[len + 1] = '\0';
-          free_string(ch->pnote->text);
+          free_string(&ch->pnote->text);
           ch->pnote->text = str_dup(buf);
           return;
         }
       }
     }
     buf[0] = '\0';
-    free_string(ch->pnote->text);
+    free_string(&ch->pnote->text);
     ch->pnote->text = str_dup(buf);
     return;
   }
@@ -1012,7 +1012,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       return;
     }
 
-    free_string( ch->pnote->subject );
+    free_string( &ch->pnote->subject );
     ch->pnote->subject = str_dup( argument );
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -1033,7 +1033,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         "You already have a different note in progress.\n\r",ch);
       return;
     }
-    free_string( ch->pnote->to_list );
+    free_string( &ch->pnote->to_list );
     ch->pnote->to_list = str_dup( argument );
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -1204,11 +1204,10 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         ch->pnote->text = str_dup( pnote->text );
 
         snprintf(buf, sizeof(buf), "FWD from (%s): %s", pnote->sender, pnote->subject );
-        if (ch->pnote->subject)
-          free_string(ch->pnote->subject);
+
+          free_string(&ch->pnote->subject);
         ch->pnote->subject = str_dup(buf);
-        if (ch->pnote->to_list)
-          free_string( ch->pnote->to_list );
+          free_string(&ch->pnote->to_list );
         ch->pnote->to_list = str_dup( argument );
 
         if (!str_cmp(ch->pnote->to_list,""))
@@ -1391,11 +1390,11 @@ void free_note(NOTE_DATA *note, int type)
     break;
   }
 
-  free_string( note->text    );
-  free_string( note->subject );
-  free_string( note->to_list );
-  free_string( note->date    );
-  free_string( note->sender  );
+  free_string( &note->text    );
+  free_string( &note->subject );
+  free_string( &note->to_list );
+  free_string( &note->date    );
+  free_string( &note->sender  );
 
   if (list)
   {
@@ -1411,22 +1410,26 @@ void free_char_note(NOTE_DATA *note)
 
   if (!note)
     return;
-  free_string( note->text    );
-  free_string( note->subject );
-  free_string( note->to_list );
-  free_string( note->date    );
-  free_string( note->sender  );
+  free_string( &note->text    );
+  free_string( &note->subject );
+  free_string( &note->to_list );
+  free_string( &note->date    );
+  free_string( &note->sender  );
   free(note);
   note = NULL;
 
 
 }
 
-void free_string(char *pt)
+void free_string(char **pt)
 {
-  if (pt)
-    free(pt);
-  pt = NULL;
+if (!pt) {
+log("null pointer to pointer passed to free string!");
+return;
+}
+  if (*pt)
+    free(*pt);
+  *pt = NULL;
 }
 
 

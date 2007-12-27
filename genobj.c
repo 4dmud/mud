@@ -365,13 +365,13 @@ void free_object_strings(struct obj_data *obj)
   assert(i <= 1);
 #endif
 
-  free_string(obj->name);
-  free_string(obj->description);
-  free_string(obj->short_description);
-  free_string(obj->action_description);
-  free_string(obj->smell);
-  free_string(obj->taste);
-  free_string(obj->feel);
+  free_string(&obj->name);
+  free_string(&obj->description);
+  free_string(&obj->short_description);
+  free_string(&obj->action_description);
+  free_string(&obj->smell);
+  free_string(&obj->taste);
+  free_string(&obj->feel);
   if (obj->ex_description)
     free_ex_descriptions(obj->ex_description);
 }

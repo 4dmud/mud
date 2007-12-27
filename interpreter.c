@@ -2291,7 +2291,7 @@ void string_append( CHAR_DATA *ch, char **pString )
     new_send_to_char(ch, "%s", numlineas(*pString));
 
 
-  free_string(ch->desc->backstr);
+  free_string(&ch->desc->backstr);
   /*if (pString != NULL)
   ch->desc->backstr = strdup(pString);
   else 

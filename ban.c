@@ -335,7 +335,7 @@ void Free_Invalid_List(void)
   int invl;
 
   for (invl = 0; invl < num_invalid; invl++)
-    free_string(invalid_list[invl]);
+    free_string(&invalid_list[invl]);
 
   num_invalid = 0;
 }

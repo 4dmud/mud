@@ -168,6 +168,15 @@ int loop = 0;
   return p;
 }
 
+int begins_with_number(char * str) {
+char num[MAX_INPUT_LENGTH];
+any_one_arg(str, num);
+if (is_number(num))
+return 1;
+else
+return 0;
+}
+
 /*
 int isname(const char *str, const char *namelist)
 {

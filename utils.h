@@ -50,7 +50,7 @@ long get_acc_by_id(long id);
 #define INVALIDATE(data) 	((data)->valid = FALSE)
 #define UMAX(a, b)               ((a) > (b) ? (a) : (b))
 
-void free_string(char *pt);
+void free_string(char **pt);
 char *numlineas( char *string );
 void string_append( CHAR_DATA *ch, char **pString );
 

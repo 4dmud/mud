@@ -29,6 +29,7 @@ int isname_full(const char *strlist, const char *namelist);
 char *fname(const char *namelist);
 int get_number(char **name);
 char * str_until(char *strlist, const char *key, char *newstr, size_t len);
+int begins_with_number(char * str);
 
 /* ******** objects *********** */
 
