@@ -151,7 +151,7 @@ string Descriptor::convert_mxp_tags (const int bMXP, char *src, size_t lenn)
   int bInTag = FALSE;
   int bInEntity = FALSE;
   int srclen = lenn;
-  char dest[lenn];
+  char dest[lenn+1];
   
   if (srclen == 0)
     return string("");
