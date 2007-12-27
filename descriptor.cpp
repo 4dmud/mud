@@ -94,6 +94,8 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     //  const int maxSize = 1024 * 64; /* max size 60 KB */
     char *txt;//, *tmp;
     size_t size, len = MAX_INPUT_LENGTH * 3, slen, wraplen;
+    va_list args_bak;
+    va_copy(args_bak,args);
     //    int size_mxp;
     //   bool overf = FALSE;
     /* if we're in the overflow state already, ignore this new output */
@@ -111,6 +113,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     size = vsnprintf(txt, len - 1, format, args);
     /** too big for buffer! Overflow! lets reallocate! - Mord **/
     while (size == -1 || size >= len) {
+	args=args_bak;
         // Try a bigger size
         len *= 2;
         txt = (char *)realloc(txt, len);
