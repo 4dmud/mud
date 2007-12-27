@@ -17,7 +17,7 @@ MYFLAGS = -Wall -pipe -Wstrict-prototypes -Wunused
 
 #flags for profiling (see hacker.doc for more information)
 PROFILE =
-# -pg
+#gprof for profiling -pg
 
 ##############################################################################
 # Do Not Modify Anything Below This Line (unless you know what you're doing) #
@@ -28,7 +28,7 @@ CFLAGS = -O2 -ggdb $(MYFLAGS) $(PROFILE)
 #-O2
 
 LIBS =  -lcrypt -lz -lm -lc
-#gprof for profiling -pg
+
 
 OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	act.movement.o act.offensive.o act.other.o act.social.o \

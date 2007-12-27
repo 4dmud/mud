@@ -1232,7 +1232,13 @@ int store_to_clan(int i)
     case 'D':
       if (!strcmp(tag, "Desc"))
       {
-        strcpy(clan[i].description, fread_string(fl, buf2));
+        char *tmpd;
+        
+        if ((tmpd = fread_string(fl, buf2)) == NULL)
+          tmpd = strdup("Undefined");
+        
+        strcpy(clan[i].description, tmpd);
+        free_string(&tmpd);
       }
       else if (!strcmp(tag, "Dues"))
         clan[i].dues = num;

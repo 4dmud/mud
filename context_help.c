@@ -256,7 +256,8 @@ void boot_context_help(void) {
   }
   while (get_line(fl, line)) {
     if (sscanf(line, "#%d *", &num) == 1 && num >= 0 && num < NUM_CONTEXTS) /* got a number, now get the text */
-      context_help_list[num] = fread_string(fl, "Context sensitive help");
+      if ((context_help_list[num] = fread_string(fl, "Context sensitive help")) == NULL)
+        context_help_list[num] = strdup("Undefined");
   }
   
   fclose(fl);

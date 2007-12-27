@@ -371,8 +371,10 @@ void setup_dir(FILE * fl, int room, int dir)
   sprintf(buf2, "room #%d, direction D%d", world[room].number, dir);
 
   CREATE(world[room].dir_option[dir], struct room_direction_data, 1);
-  world[room].dir_option[dir]->general_description = fread_string(fl, buf2);
-  world[room].dir_option[dir]->keyword = fread_string(fl, buf2);
+  if ((world[room].dir_option[dir]->general_description = fread_string(fl, buf2)) == NULL)
+    world[room].dir_option[dir]->general_description = strdup("Undefined");
+  if ((world[room].dir_option[dir]->keyword = fread_string(fl, buf2)) == NULL)
+    world[room].dir_option[dir]->keyword = strdup("Undefined");
 
   if (!get_line(fl, line)) {
     fprintf(stderr, "Format error, %s\n", buf2);

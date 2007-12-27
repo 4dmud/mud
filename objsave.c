@@ -431,14 +431,21 @@ void Crash_listrent(struct char_data *ch, char *name)
         free_obj(obj, FALSE);
       }
       else
-      {   /* its nothing, and a unique item. bleh. partial parse. */
+      { char *di;
+   /* its nothing, and a unique item. bleh. partial parse. */
         get_line(fl, line);   /* this is obj+val */
         get_line(fl, line);   /* this is XAP */
         sprintf(buf2, "xap objects in listrent");
-        fread_string(fl, buf2);    /* screw the name */
+        di = fread_string(fl, buf2);    /* screw the name */
+        if (di)
+          free_string( &di);
         sdesc = fread_string(fl, buf2);
-        fread_string(fl, buf2);    /* screw the long desc */
-        fread_string(fl, buf2);    /* screw the action desc. */
+        di = fread_string(fl, buf2);    /* screw the long desc */
+        if (di)
+          free_string( &di);
+        di = fread_string(fl, buf2);    /* screw the action desc. */
+        if (di)
+          free_string( &di);
         get_line(fl, line);   /* this is an important line.rent.. */
         sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3,
                t + 4);
@@ -1373,8 +1380,10 @@ void read_extra_descs(FILE *fl, OBJ_DATA *temp)
     {
     case 'E':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(fl, buf2);
-      new_descr->description = fread_string(fl, buf2);
+      if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+        new_descr->keyword = strdup("Undefined");
+      if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       new_descr->next = temp->ex_description;
       temp->ex_description = new_descr;
       tf = fl;
@@ -2116,8 +2125,10 @@ int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
           {
           case 'E':
             CREATE(new_descr, struct extra_descr_data, 1);
-            new_descr->keyword = fread_string(fl, buf2);
-            new_descr->description = fread_string(fl, buf2);
+            if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+              new_descr->keyword = strdup("Undefined");
+            if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+              new_descr->description = strdup("Undefined");
             new_descr->next = temp->ex_description;
             temp->ex_description = new_descr;
             get_line(fl, line);

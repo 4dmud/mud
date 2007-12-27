@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/05 05:26:17 $
-*  $Revision: 1.3 $
+*  $Date: 2006/05/20 05:46:19 $
+*  $Revision: 1.4 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -50,7 +50,11 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon)
   snprintf(errors, sizeof(errors), "trig vnum %d", nr);
 
   trig->nr = top_of_trigt;
-  trig->name = fread_string(trig_f, errors);
+  if ((trig->name = fread_string(trig_f, errors)) == NULL)
+  {
+  log("SYSERR: %s has no name in file!", errors);
+    exit(1);
+  }
 
   get_line(trig_f, line);
   k = sscanf(line, "%d %s %d", &attach_type, flags, t);
@@ -58,9 +62,15 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon)
   trig->trigger_type = (long)asciiflag_conv(flags);
   trig->narg = (k == 3) ? t[0] : 0;
 
-  trig->arglist = fread_string(trig_f, errors);
+  if ((trig->arglist = fread_string(trig_f, errors)) == NULL) {
+  log("SYSERR: %s has no args in file!", errors);
+    exit(1);
+  }
 
-  cmds = s = fread_string(trig_f, errors);
+  if ((cmds = s = fread_string(trig_f, errors)) == NULL) {
+  log("SYSERR: %s has no commands in file!", errors);
+    exit(1);
+  }
 
   CREATE(trig->cmdlist, struct cmdlist_element, 1);
   trig->cmdlist->cmd = strdup(strtok(s, "\n\r"));

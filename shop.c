@@ -1396,7 +1396,11 @@ void boot_the_shops(FILE *shop_f, char *filename, int rec_count)
 
   while (!done)
   {
-    buf = fread_string(shop_f, buf2);
+    if ((buf = fread_string(shop_f, buf2)) == NULL)
+    {
+      log("SYSERR: Empty string in %s", buf2);
+      exit(1);
+    }
     if (*buf == '#')
     {		/* New shop */
       sscanf(buf, "#%d\n", &temp);

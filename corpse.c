@@ -358,16 +358,15 @@ if (retval == 11) {
 	    if (!strcasecmp("XAP", line)) {	/* then this is a Xap Obj, requires
 						   special care */
 		if ((temp->name = fread_string(fp, buf2)) == NULL) {
-		    temp->name = "undefined";
+          temp->name = strdup("undefined");
 		}
 
-		if ((temp->short_description =
-		     fread_string(fp, buf2)) == NULL) {
-		    temp->short_description = "undefined";
+		if ((temp->short_description = fread_string(fp, buf2)) == NULL) {
+               temp->short_description = strdup("undefined");
 		}
 
 		if ((temp->description = fread_string(fp, buf2)) == NULL) {
-		    temp->description = "undefined";
+          temp->description = strdup("undefined");
 		}
 
 		if ((temp->action_description =
@@ -410,8 +409,10 @@ if (retval == 11) {
 		    switch (*line) {
 		    case 'E':
 			CREATE(new_descr, struct extra_descr_data, 1);
-			new_descr->keyword = fread_string(fp, buf2);
-			new_descr->description = fread_string(fp, buf2);
+              if ((new_descr->keyword = fread_string(fp, buf2)) == NULL)
+                new_descr->keyword = strdup("Undefined");
+                if ((new_descr->description = fread_string(fp, buf2)) == NULL)
+                  new_descr->description = strdup("Undefined");
 			new_descr->next = temp->ex_description;
 			temp->ex_description = new_descr;
 			get_line(fp, line);

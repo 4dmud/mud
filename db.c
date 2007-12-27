@@ -1879,10 +1879,14 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
   room_nr=(struct room_data *)malloc(sizeof(struct room_data));
   room_nr->zone = real_zone(zon);
   room_nr->number = virtual_nr;
-  room_nr->name = fread_string(fl, buf2);
-  room_nr->description = fread_string(fl, buf2);
-  room_nr->smell = fread_string(fl, buf2);
-  room_nr->listen = fread_string(fl, buf2);
+  if ((room_nr->name = fread_string(fl, buf2)) == NULL)
+    room_nr->name = strdup("Undefined");
+  if ((room_nr->description = fread_string(fl, buf2)) == NULL)
+    room_nr->description = strdup("Undefined");
+  if ((room_nr->smell = fread_string(fl, buf2)) == NULL)
+    room_nr->smell  = strdup("Undefined");
+  if ((room_nr->listen = fread_string(fl, buf2)) == NULL)
+    room_nr->listen  = strdup("Undefined");
   room_nr->proto_script = NULL;
   room_nr->script = NULL;
   room_nr->affects = NULL;
@@ -1940,8 +1944,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
       break;
     case 'E':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(fl, buf2);
-      new_descr->description = fread_string(fl, buf2);
+      if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+        new_descr->keyword  = strdup("Undefined");
+      if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       /* fix for crashes in the editor when formatting
        * - e-descs are assumed to end with a \r\n
        * -- Welcor 09/03 
@@ -1968,8 +1974,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
       break;
     case 'A':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(fl, buf2);
-      new_descr->description = fread_string(fl, buf2);
+      if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+        new_descr->keyword  = strdup("Undefined");
+      if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       /* fix for crashes in the editor when formatting
        * - e-descs are assumed to end with a \r\n
        * -- Welcor 09/03 
@@ -1989,8 +1997,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
       break;
     case 'B':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(fl, buf2);
-      new_descr->description = fread_string(fl, buf2);
+      if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+        new_descr->keyword  = strdup("Undefined");
+      if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       /* fix for crashes in the editor when formatting
        * - e-descs are assumed to end with a \r\n
        * -- Welcor 09/03 
@@ -2010,8 +2020,10 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon)
       break;
     case 'U':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(fl, buf2);
-      new_descr->description = fread_string(fl, buf2);
+      if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+        new_descr->keyword  = strdup("Undefined");
+      if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       /* fix for crashes in the editor when formatting
        * - e-descs are assumed to end with a \r\n
        * -- Welcor 09/03 
@@ -2087,8 +2099,10 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
     char *di;
     log("Doors are only in the range of 0 to %d, this door isn't: %s\r\n(gulping door)", NUM_OF_DIRS, buf2);
     di = fread_string(fl, buf2);
+    if (di)
     free_string(&di);
     di = fread_string(fl, buf2);
+    if (di)
     free_string(&di);
     if (!get_line(fl, line))
     {
@@ -2110,8 +2124,10 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
       free_string(&room->dir_option[dir]->keyword);
       free_string(&room->dir_option[dir]->general_description);
     }
-    room->dir_option[dir]->general_description = fread_string(fl, buf2);
-    room->dir_option[dir]->keyword = fread_string(fl, buf2);
+    if ((room->dir_option[dir]->general_description = fread_string(fl, buf2)) == NULL)
+      room->dir_option[dir]->general_description = strdup("Undefined");
+    if ((room->dir_option[dir]->keyword = fread_string(fl, buf2)) == NULL)
+      room->dir_option[dir]->keyword = strdup("Undefined");
     room->dir_option[dir]->nosave = 0;
   }
 
@@ -2806,14 +2822,18 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
   snprintf(buf2, sizeof(buf2), "mob vnum %d", nr);     /* sprintf: OK (for 'buf2 >= 19') */
 
   /***** String data *****/
-  mob_proto[i].player.name = fread_string(mob_f, buf2);
-  tmpptr = mob_proto[i].player.short_descr = fread_string(mob_f, buf2);
+  if ((mob_proto[i].player.name = fread_string(mob_f, buf2)) == NULL)
+    mob_proto[i].player.name = strdup("Undefined");
+  if ((tmpptr = mob_proto[i].player.short_descr = fread_string(mob_f, buf2)) == NULL)
+    tmpptr = mob_proto[i].player.short_descr = strdup("Undefined");
   if (tmpptr && *tmpptr)
     if (!strcmp(fname(tmpptr), "a") || !strcmp(fname(tmpptr), "an")
         || !strcmp(fname(tmpptr), "the"))
       *tmpptr = LOWER(*tmpptr);
-  mob_proto[i].player.long_descr = fread_string(mob_f, buf2);
-  mob_proto[i].player.description = fread_string(mob_f, buf2);
+  if ((mob_proto[i].player.long_descr = fread_string(mob_f, buf2)) == NULL)
+    mob_proto[i].player.long_descr = strdup("Undefined");
+  if ((mob_proto[i].player.description = fread_string(mob_f, buf2)) == NULL)
+    mob_proto[i].player.description = strdup("Undefined");
   GET_TITLE(mob_proto + i) = NULL;
   mob_proto[i].player.race = 5;
   //  set_race(mob_proto[i], mob_proto[i].player.race);
@@ -2982,7 +3002,8 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
     exit(1);
   }
 
-  obj_proto[i].short_description = tmpptr = fread_string(obj_f, buf2);
+  if ((obj_proto[i].short_description = tmpptr = fread_string(obj_f, buf2)) == NULL)
+    tmpptr = obj_proto[i].short_description = strdup("Undefined");
   if (tmpptr && *tmpptr)
     if (!strcmp(fname(tmpptr), "a") || !strcmp(fname(tmpptr), "an")
         || !strcmp(fname(tmpptr), "the"))
@@ -2990,14 +3011,20 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
 
 
   /* this now checks to see if the item was made "invi" with {c */
+  
 
-  obj_proto[i].description = fread_string(obj_f, buf2);
+  if ((obj_proto[i].description = fread_string(obj_f, buf2)) == NULL)
+    obj_proto[i].description = strdup("Undefined");
 
 
-  obj_proto[i].action_description = fread_string(obj_f, buf2);
-  obj_proto[i].smell = fread_string(obj_f, buf2);
-  obj_proto[i].taste = fread_string(obj_f, buf2);
-  obj_proto[i].feel = fread_string(obj_f, buf2);
+  if ((obj_proto[i].action_description = fread_string(obj_f, buf2)) == NULL)
+    obj_proto[i].action_description = strdup("Undefined");
+  if ((obj_proto[i].smell = fread_string(obj_f, buf2)) == NULL)
+    obj_proto[i].smell = strdup("Undefined");
+  if ((obj_proto[i].taste = fread_string(obj_f, buf2)) == NULL)
+    obj_proto[i].taste = strdup("Undefined");
+  if ((obj_proto[i].feel = fread_string(obj_f, buf2)) == NULL)
+    obj_proto[i].feel = strdup("Undefined");
 
   /* *** numeric data *** */
   if (!get_line(obj_f, line))
@@ -3147,8 +3174,10 @@ char *parse_object(FILE * obj_f, int nr, zone_vnum zon)
     {
     case 'E':
       CREATE(new_descr, struct extra_descr_data, 1);
-      new_descr->keyword = fread_string(obj_f, buf2);
-      new_descr->description = fread_string(obj_f, buf2);
+      if ((new_descr->keyword = fread_string(obj_f, buf2)) == NULL)
+        new_descr->keyword = strdup("Undefined");
+      if ((new_descr->description = fread_string(obj_f, buf2)) == NULL)
+        new_descr->description = strdup("Undefined");
       new_descr->next = obj_proto[i].ex_description;
       obj_proto[i].ex_description = new_descr;
       break;
@@ -5135,9 +5164,10 @@ int store_to_char(char *name, struct char_data *ch)
     case 'D':
       if (!strcmp(tag, "Desc"))
       {
-        char buf2[MAX_STRING_LENGTH];
-        strcpy(buf2, "d: store_to_char");
-        ch->player.description = fread_string(fl, buf2);
+        char buf2[MAX_INPUT_LENGTH];
+        strcpy(buf2, "desc: store_to_char");
+        if ((ch->player.description = fread_string(fl, buf2)) == NULL)
+            ch->player.description = strdup("Undefined");
       }
       else if (!strcmp(tag, "Dex "))
         ch->real_abils.dex = num;
@@ -5156,9 +5186,10 @@ int store_to_char(char *name, struct char_data *ch)
         GET_GROUP_EXP(ch) = num6;
       else if (!strcmp(tag, "Emai"))
       {
-        char buf2[MAX_STRING_LENGTH];
-        strcpy(buf2, "e: store to char");
-        GET_EMAIL(ch) = fread_string(fl, buf2);
+        char buf2[MAX_INPUT_LENGTH];
+        strcpy(buf2, "email: store to char");
+        if ((GET_EMAIL(ch) = fread_string(fl, buf2)) == NULL)
+          GET_EMAIL(ch) = strdup("Undefined");
       }
       break;
 
@@ -6157,7 +6188,7 @@ int create_entry(char *name)
 
 
 
-/* file read string */
+/* file read string will always return atleast a \r\n*/
 char *fread_string(FILE *fl, const char *error)
 {
   char buf[MAX_STRING_LENGTH], tmp[516];
@@ -6181,7 +6212,7 @@ char *fread_string(FILE *fl, const char *error)
     if (tlen > 0)
     {
       point = (tmp + tlen - 1);
-      for (; point>tmp && (*point=='\r' || *point=='\n'); point--);
+      for (; point>=tmp && (*point=='\r' || *point=='\n'); point--);
       if (*point=='~')
       {
         *point='\0';
@@ -6216,7 +6247,7 @@ char *fread_string(FILE *fl, const char *error)
   while (!done);
 
   /* allocate space for the new string and copy it */
-  return (strlen(buf) ? strdup(buf) : NULL);
+return (strlen(buf) ? strdup(buf) : strdup("\r\n"));
 }
 /* Called to free all allocated follow_type structs */
 void free_followers(struct follow_type *k)
@@ -7299,8 +7330,10 @@ int read_xap_objects(FILE * fl, struct char_data *ch)
           {
           case 'E':
             CREATE(new_descr, struct extra_descr_data, 1);
-            new_descr->keyword = fread_string(fl, buf2);
-            new_descr->description = fread_string(fl, buf2);
+            if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+              new_descr->keyword = strdup("Undefined");
+            if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+              new_descr->description = strdup("Undefined");
             new_descr->next = temp->ex_description;
             temp->ex_description = new_descr;
             get_line(fl, line);

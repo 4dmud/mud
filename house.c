@@ -220,24 +220,24 @@ int old_house_load(room_rnum rnum, FILE *fl)
                                 						   special care */
         if ((obj->name = fread_string(fl, buf2)) == NULL)
         {
-          obj->name = "undefined";
+          obj->name = strdup("undefined");
         }
 
         if ((obj->short_description =
                fread_string(fl, buf2)) == NULL)
         {
-          obj->short_description = "undefined";
+          obj->short_description = strdup("undefined");
         }
 
         if ((obj->description = fread_string(fl, buf2)) == NULL)
         {
-          obj->description = "undefined";
+          obj->description = strdup("undefined");
         }
 
         if ((obj->action_description =
                fread_string(fl, buf2)) == NULL)
         {
-          obj->action_description = "undefined";
+          obj->action_description = strdup("undefined");
         }
 
         if (!get_line(fl, line) ||
@@ -282,8 +282,10 @@ int old_house_load(room_rnum rnum, FILE *fl)
           {
           case 'E':
             CREATE(new_descr, struct extra_descr_data, 1);
-            new_descr->keyword = fread_string(fl, buf2);
-            new_descr->description = fread_string(fl, buf2);
+            if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
+              new_descr->keyword = strdup("Undefined");
+            if ((new_descr->description = fread_string(fl, buf2)) == NULL)
+              new_descr->description = strdup("Undefined");
             new_descr->next = obj->ex_description;
             obj->ex_description = new_descr;
             get_line(fl, line);

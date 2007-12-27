@@ -70,17 +70,18 @@ char* print_gold(char* result, gold_int gold)
 char *center_align(char *str, int width)
 {
   static char retbuf[MAX_STRING_LENGTH];
-  char statbuf[MAX_STRING_LENGTH], *stptr, *eptr = NULL;
-  int len;
+  char statbuf[MAX_STRING_LENGTH], *stptr;
+  size_t len;
   if (!str)
     return NULL;
-  len = strlen(str);
-  snprintf(statbuf, sizeof(statbuf), "%s", str);
+
+  strlcpy(statbuf, str, sizeof(statbuf));
+  len = strlen(statbuf);
+
+  while (len && isspace(statbuf[len]))
+    statbuf[len--] = '\0';
+
   stptr = statbuf;
-  eptr = (statbuf + strlen(statbuf) - 1);
-  for (;isspace(*eptr);*eptr--) *eptr = '\0';
-  eptr = NULL; /* nulling the value so that gcc doesn't give a warning - mord*/
- 
   if (*stptr) skip_spaces(&stptr);
 
   len = strlen(stptr);
@@ -280,7 +281,7 @@ char *str_dup(const char *source)
 #if 0
 size_t strlcpy(char *dest, const char *src, size_t copylen)
 {
-  strncpy(dest, src, copylen - 1);	/* strncpy: OK (we must assume 'totalsize' is correct) */
+  strncpy(dest, src, copylen - 1); /* strncpy: OK (we must assume 'totalsize' is correct) */
   dest[copylen - 1] = '\0';
   return strlen(src);
 }
@@ -351,7 +352,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   for (i = 0; arg1[i] || arg2[i]; i++)
     if ((chk = LOWER(arg1[i]) - LOWER(arg2[i])) != 0)
-      return (chk);	/* not equal */
+      return (chk); /* not equal */
 
   return (0);
 }
@@ -393,7 +394,7 @@ int strn_cmp(const char *arg1, const char *arg2, int n)
 
   for (i = 0; (arg1[i] || arg2[i]) && (n > 0); i++, n--)
     if ((chk = LOWER(arg1[i]) - LOWER(arg2[i])) != 0)
-      return (chk);	/* not equal */
+      return (chk); /* not equal */
 
   return (0);
 }
@@ -537,9 +538,9 @@ void basic_mud_log(const char *format, ...)
     char *time_s = asctime(localtime(&ct));
  
     if (logfile == NULL)
-	puts("SYSERR: Using log() before stream was initialized!");
+     puts("SYSERR: Using log() before stream was initialized!");
     if (format == NULL)
-	format = "SYSERR: log() received a NULL format.";
+     format = "SYSERR: log() received a NULL format.";
  
     time_s[strlen(time_s) - 1] = '\0';
  
@@ -582,7 +583,7 @@ void new_mudlog(int type, int level, int file, const char *str, ...)
   va_list args;
 
   if (str == NULL)
-    return;	/* eh, oh well. */
+    return;    /* eh, oh well. */
 
   if (file)
   {
@@ -594,11 +595,11 @@ void new_mudlog(int type, int level, int file, const char *str, ...)
   if (level < 0)
     return;
 
-  strcpy(buf, "[ ");	/* strcpy: OK */
+  strcpy(buf, "[ ");     /* strcpy: OK */
   va_start(args, str);
   vsnprintf(buf + 2, sizeof(buf) - 6, str, args);
   va_end(args);
-  strcat(buf, " ]\r\n");	/* strcat: OK */
+  strcat(buf, " ]\r\n"); /* strcat: OK */
 
   for (i = descriptor_list; i; i = i->next)
   {
@@ -627,7 +628,7 @@ void mudlog(const char *str, int type, int level, int file)
   struct descriptor_data *i;
 
   if (str == NULL)
-    return;			/* eh, oh well. */
+    return;              /* eh, oh well. */
   if (file)
     log(str);
   if (level < 0)
@@ -637,7 +638,7 @@ void mudlog(const char *str, int type, int level, int file)
 
   for (i = descriptor_list; i; i = i->next)
   {
-    if (STATE(i) != CON_PLAYING || IS_NPC(i->character))	/* switch */
+    if (STATE(i) != CON_PLAYING || IS_NPC(i->character))    /* switch */
       continue;
     if (GET_ORIG_LEV(i->character) ? GET_ORIG_LEV(i->character) < level : GET_LEVEL(i->character) < level )
       continue;
@@ -753,15 +754,15 @@ size_t new_sprintbit(bitvector_t bitvector, const char *names[],
   {
     if (IS_SET(bitvector, 1))
     {
-    strlcat(result, *names[nr] != '\n' ? names[nr] : "UNDEFINED", reslen);
-    /*
-      nlen =
-        snprintf(result + len, reslen - len, "%s ",
-                 *names[nr] != '\n' ? names[nr] : "UNDEFINED");
-      if (len + nlen >= reslen || nlen < 0)
-        break;
-      len += nlen;
-      */
+      strlcat(result, *names[nr] != '\n' ? names[nr] : "UNDEFINED", reslen);
+      /*
+        nlen =
+          snprintf(result + len, reslen - len, "%s ",
+                   *names[nr] != '\n' ? names[nr] : "UNDEFINED");
+        if (len + nlen >= reslen || nlen < 0)
+          break;
+        len += nlen;
+        */
     }
 
     if (*names[nr] != '\n')
@@ -799,10 +800,10 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1)
 
   secs = (long) (t2 - t1);
 
-  now.hours = (secs / SECS_PER_REAL_HOUR) % 24;	/* 0..23 hours */
+  now.hours = (secs / SECS_PER_REAL_HOUR) % 24;   /* 0..23 hours */
   secs -= SECS_PER_REAL_HOUR * now.hours;
 
-  now.day = (secs / SECS_PER_REAL_DAY);	/* 0..34 days  */
+  now.day = (secs / SECS_PER_REAL_DAY); /* 0..34 days  */
   /* secs -= SECS_PER_REAL_DAY * now.day; - Not used. */
 
   now.month = -1;
@@ -821,16 +822,16 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1)
 
   secs = (long) (t2 - t1);
 
-  now.hours = (secs / SECS_PER_MUD_HOUR) % 24;	/* 0..23 hours */
+  now.hours = (secs / SECS_PER_MUD_HOUR) % 24;    /* 0..23 hours */
   secs -= SECS_PER_MUD_HOUR * now.hours;
 
-  now.day = (secs / SECS_PER_MUD_DAY) % 35;	/* 0..34 days  */
+  now.day = (secs / SECS_PER_MUD_DAY) % 35;  /* 0..34 days  */
   secs -= SECS_PER_MUD_DAY * now.day;
 
-  now.month = (secs / SECS_PER_MUD_MONTH) % 17;	/* 0..16 months */
+  now.month = (secs / SECS_PER_MUD_MONTH) % 17;   /* 0..16 months */
   secs -= SECS_PER_MUD_MONTH * now.month;
 
-  now.year = (secs / SECS_PER_MUD_YEAR);	/* 0..XX? years */
+  now.year = (secs / SECS_PER_MUD_YEAR);     /* 0..XX? years */
 
   return (&now);
 }
@@ -853,7 +854,7 @@ struct time_info_data *age(struct char_data *ch)
 
   player_age = *mud_time_passed(time(0), ch->player.time.birth);
 
-  player_age.year += 17;	/* All players start at 17 */
+  player_age.year += 17; /* All players start at 17 */
 
   return (&player_age);
 }
@@ -902,14 +903,14 @@ void stop_follower(struct char_data *ch)
   }
 
   if (ch->master->followers->follower == ch)
-  {	/* Head of follower-list? */
+  {  /* Head of follower-list? */
     k = ch->master->followers;
     ch->master->followers = k->next;
     free(k);
 
   }
   else
-  {			/* locate follower who is not head of list */
+  {            /* locate follower who is not head of list */
 
 
     for (k = ch->master->followers; k && k->next ; k = (k ? k->next : NULL))
@@ -1021,10 +1022,10 @@ int get_line(FILE *fl, char *buf)
 const char *get_dirname(char *filename, size_t len, char oname, int mode)
 {
   const char *prefix, *middle, *suffix;
-  
+
   if (oname == '\0')
-   return NULL;
-  
+    return NULL;
+
   switch (mode)
   {
   case CRASH_FILE:
@@ -1066,7 +1067,7 @@ const char *get_dirname(char *filename, size_t len, char oname, int mode)
   default:
     return NULL;
   }
-  
+
   switch (oname)
   {
   case 'a':
@@ -1109,7 +1110,7 @@ const char *get_dirname(char *filename, size_t len, char oname, int mode)
     middle = "ZZZ";
     break;
   }
-  
+
   snprintf(filename, len,  "%s%s" SLASH, prefix, middle);
   return filename;
 }
@@ -1158,7 +1159,7 @@ int get_filename(const char *orig_name, char *filename, int mode)
     prefix = LIB_PLROBJS;
     suffix = "locker";
     break;
-      case IGNORE_FILE:
+  case IGNORE_FILE:
     prefix = LIB_PLRALIAS;
     suffix = "ignore";
     break;
@@ -1360,7 +1361,7 @@ void line_input(struct descriptor_data *d, const char *prompt,
 {
   lock_desc(d);
   d->callback = callback;
-  d->callback_depth++;	// Increase depth of possible recursiveness.
+  d->callback_depth++;   // Increase depth of possible recursiveness.
   d->c_data = (char *) info;
   ORIG_STATE(d) = STATE(d);
   STATE(d) = CON_LINE_INPUT;
@@ -1610,7 +1611,7 @@ size_t commafmt(char   *buf,            /* Buffer for formatted string  */
 
 const char *ordinal_text(int num)
 {
-const char *text[] = {"th", "st", "nd", "rd"};
+  const char *text[] = {"th", "st", "nd", "rd"};
   if (((num %= 100) > 9 && num < 20) || (num %= 10) > 3)
     num = 0;
   return text[num];
@@ -1679,7 +1680,7 @@ void wiz_read_file(void)
   void wiz_add_name(byte level, char *name);
   struct char_data *vict;
   int i;
-  extern struct player_index_element *player_table;	/* index to plr file     */
+  extern struct player_index_element *player_table;    /* index to plr file     */
   extern int top_of_p_table;
 
   for (i = 0; i <= top_of_p_table; i++)
@@ -2017,14 +2018,14 @@ size_t strlcat(char *dest, const char *src, size_t copylen)
 
 int fileExists (char * fileName)
 {
-   struct stat buf;
-   int i = stat ( fileName, &buf );
-     if ( i == 0 )
-     {
-       return 1;
-     }
-     return 0;
-       
+  struct stat buf;
+  int i = stat ( fileName, &buf );
+  if ( i == 0 )
+  {
+    return 1;
+  }
+  return 0;
+
 }
 
 
@@ -2032,17 +2033,17 @@ int fileExists (char * fileName)
 void ReplaceSection ( char * string, int length, char * replace , size_t len)
 {
   int repLength = (replace == NULL ? 0: strlen(replace));
-  
-     // Something to move?
+
+  // Something to move?
   if ( length != repLength )
   {
-          // Make room.
+    // Make room.
     memmove ( &string[repLength],&string[length], strlen(&string[length]) + 1 );
   }
-     // Is there something to replace.
+  // Is there something to replace.
   if ( repLength > 0 )
   {
-          // Copy it in.
+    // Copy it in.
     memcpy ( string, replace, repLength );
   }
 }
@@ -2053,24 +2054,27 @@ void ReplaceString ( char * string, char * search, char * replace, size_t len )
   char *found;
   size_t repsize = strlen(replace);
   int smaller = (repsize <= strlen(search));
-  
 
-  
+
+
   if (!strcmp(search, replace))
     return;
   // Replace all occurrences.
-  if (string != NULL && search != NULL && replace != NULL) {
-    
+  if (string != NULL && search != NULL && replace != NULL)
+  {
+
     found = strstr ( string, search );
-    do {
+    do
+    {
       if (found == NULL)
         break;
-      
+
       if (smaller || ((strlen(string) + strlen(replace)) < len))
         ReplaceSection(found, strlen(search), replace , len);
       else
         break;
       found = strstr(found + repsize, search);
-    } while (found != NULL);
+    }
+    while (found != NULL);
   }
 }

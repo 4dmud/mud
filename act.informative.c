@@ -746,6 +746,10 @@ void list_one_char(struct char_data *i, struct char_data *ch)
     };
   if (IS_NPC(i))
   {
+    if (!i->player.long_descr) {
+    new_mudlog( BRF, 51, TRUE, "SYSERR: Mob Vnum %d has NULL (empty) long description!", GET_MOB_VNUM(i));
+      return;
+    }
     if (MOB_FLAGGED(i, MOB_WIZINVIS) || (*i->player.long_descr == '{' && strlen(i->player.long_descr) <= 3))
     {
       if (GET_LEVEL(ch) < LVL_IMMORT)
@@ -1898,7 +1902,8 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 void look_around(CHAR_DATA *ch)
 {
 
-  char zonename[MAX_STRING_LENGTH], *zp = NULL;
+  char zonename[MAX_INPUT_LENGTH], *zp = NULL;
+  size_t len, x;
 
   if (IN_ROOM(ch) == NULL)
   {
@@ -1912,19 +1917,17 @@ void look_around(CHAR_DATA *ch)
   if (!zone_table[IN_ROOM(ch)->zone].name || !*zone_table[IN_ROOM(ch)->zone].name)
     return;
 
-  strcpy(zonename, zone_table[IN_ROOM(ch)->zone].name);
+  strlcpy(zonename, zone_table[IN_ROOM(ch)->zone].name, sizeof(zonename));
   if (!zonename || !*zonename)
     return;
-
-  for (zp = zonename; *zp; *zp++)
-  {
-    if (*zp == '-')
+  len = strlen(zonename);
+  for (x = 0; x < len; x++)
+    if (zonename[x] == '-')
     {
-      *zp = '\0';
+      zonename[x] = '\0';
       break;
     }
-  }
-  zp = zonename; /* Nulling this value to stop gcc warning - mord */
+  
   if (zone_table[IN_ROOM(ch)->zone].dimension)
     new_send_to_char(ch, "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
   new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zp);
