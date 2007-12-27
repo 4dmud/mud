@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.51  2007/05/20 18:54:35  w4dimenscor
+ * fixed beanbag pull crashbug.
+ *
  * Revision 1.50  2007/03/03 22:42:27  w4dimenscor
  * added the get from container trigger.
  *
@@ -4041,6 +4044,9 @@ ACMD(do_pull)
   struct obj_data *obj;
   int cnt=0,i;
   skip_spaces(&argument);
+
+  if (IS_NPC(ch))
+    return;
 
   if (!*argument)
   {
