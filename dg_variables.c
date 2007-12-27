@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/11/11 20:42:25 $                                           * 
-*  $Revision: 1.38 $                                                      *
+*  $Date: 2006/11/11 21:16:52 $                                           * 
+*  $Revision: 1.39 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -35,6 +35,7 @@ int genpreg(void);
 void hunt_victim(Character *ch);
 extern const char *pc_class_types[];
 extern struct time_info_data time_info;
+void die(Character *ch, Character *killer);
 
 /* Utility functions */
 
@@ -808,8 +809,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 else if (!strcasecmp(field, "hitp")) {
                     if (subfield && *subfield) {
                         int newhit = atoi(subfield);
+			int oldhit = GET_HIT(c);
                         GET_HIT(c) = newhit;
 			alter_hit(c,0);
+			update_pos(c);
+			c->send_char_pos(oldhit-newhit);
+			if(GET_POS(c)==POS_DEAD)
+				die(c,NULL);
                     }
                     snprintf(str, slen, "%d", GET_HIT(c));
                 } else if (!strcasecmp(field, "has_item")) {
