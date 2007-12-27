@@ -31,57 +31,57 @@
 # ifdef __BORLANDC__
 #  include <dir.h>
 # else                   /* MSVC */
-#  include <direct.h>
-# endif
-# include <mmsystem.h>
-#endif                   /* CIRCLE_WINDOWS */
+    #  include <direct.h>
+    # endif
+    # include <mmsystem.h>
+    #endif                   /* CIRCLE_WINDOWS */
 
-#ifdef CIRCLE_AMIGA      /* Includes for the Amiga */
-# include <sys/ioctl.h>
-# include <clib/socket_protos.h>
-#endif                   /* CIRCLE_AMIGA */
+    #ifdef CIRCLE_AMIGA      /* Includes for the Amiga */
+    # include <sys/ioctl.h>
+    # include <clib/socket_protos.h>
+    #endif                   /* CIRCLE_AMIGA */
 
-#ifdef CIRCLE_ACORN      /* Includes for the Acorn (RiscOS) */
-# include <socklib.h>
-# include <inetlib.h>
-# include <sys/ioctl.h>
-#endif
+    #ifdef CIRCLE_ACORN      /* Includes for the Acorn (RiscOS) */
+    # include <socklib.h>
+    # include <inetlib.h>
+    # include <sys/ioctl.h>
+    #endif
 
-/*
- * Note, most includes for all platforms are in sysdep.h.  The list of
- * files that is included is controlled by conf.h for that platform.
- */
+    /*
+     * Note, most includes for all platforms are in sysdep.h.  The list of
+     * files that is included is controlled by conf.h for that platform.
+     */
 
-#include "structs.h"
-#include "utils.h"
-#include "comm.h"
-#include "interpreter.h"
-#include "handler.h"
-#include "db.h"
-#include "house.h"
-#include "dg_scripts.h"
-#include "screen.h"
-#include "arena.h"
-#include "mail.h"
-#include "dg_event.h"
-#include "clan.h"
-#include "oasis.h"
-#include "genolc.h"
-#include "constants.h"
-#include "ident.h"
-#include "auction.h"
-#include "descriptor.h"
-#include "spells.h"
-#include "regen.h"
+    #include "structs.h"
+    #include "utils.h"
+    #include "comm.h"
+    #include "interpreter.h"
+    #include "handler.h"
+    #include "db.h"
+    #include "house.h"
+    #include "dg_scripts.h"
+    #include "screen.h"
+    #include "arena.h"
+    #include "mail.h"
+    #include "dg_event.h"
+    #include "clan.h"
+    #include "oasis.h"
+    #include "genolc.h"
+    #include "constants.h"
+    #include "ident.h"
+    #include "auction.h"
+    #include "descriptor.h"
+    #include "spells.h"
+    #include "regen.h"
 
-#ifdef HAVE_ARPA_TELNET_H
-#include <arpa/telnet.h>
-#else
-#include "telnet.h"
-#endif
+    #ifdef HAVE_ARPA_TELNET_H
+    #include <arpa/telnet.h>
+    #else
+    #include "telnet.h"
+    #endif
 
 
-void free_join_list(struct combine_data *list);
+    void free_join_list(struct combine_data *list);
 void free_killlist(Character *ch);
 long get_ptable_by_name(const char *name);
 
@@ -241,6 +241,9 @@ void Character::freeself() {
 
     if (this == NULL)
         return;
+
+    /* fix seated players */
+    char_from_chair(this);
 
     while (affected)
         affect_remove(affected);
@@ -430,6 +433,7 @@ void Character::reset() {
     HAS_MAIL(this)            = -1;
     IS_SAVING(this)           = FALSE;
     hitched                   = NULL;
+    internal_flags 			= 0;
 
     if (GET_HIT(this) <= 0)
         GET_HIT(this) = 1;
@@ -946,7 +950,7 @@ Character *Character::assign (Character *b) {
     else
         player.title = NULL;
 
-#if 0
+    #if 0
 
     if (mp != NULL) {
         if (b->player.name && b->player.name != mp->player.name)
@@ -964,7 +968,7 @@ Character *Character::assign (Character *b) {
         if (b->player.title && b->player.title != mp->player.title)
             player.title = strdup(b->player.title);
     }
-#endif
+    #endif
     real_abils = b->real_abils;     /* Abilities without modifiers   */
     aff_abils = b->aff_abils; /* Abils with spells/stones/etc  */
     points = b->points; /* Points                        */
@@ -989,7 +993,7 @@ Character *Character::assign (Character *b) {
             hjp = hjp->next;
         }
         **/
-#if 0
+    #if 0
 
     affected = b->affected;
     b->affected = NULL;
@@ -1027,7 +1031,7 @@ Character *Character::assign (Character *b) {
     //Character *next_fighting; /* For fighting list               */
     /** Do not assign followers, this can be done in the calling function **/
     //struct follow_type *followers; /* List of chars followers       */
-#endif
+    #endif
     //master;   /* Who is char following?        */
     cmd2 = b->cmd2;
     //long cmd2;           /* These wizcmds aren't saved     */
@@ -1239,33 +1243,31 @@ Character * Character::NextFightingMe() {
     return NULL;
 }
 
-bool Character::canHuntChar(Character *vict)
-{
-	if(!CAN_HUNT(this) ||
-	    ((MOB_FLAGGED(this, MOB_STAY_ZONE) && IN_ROOM(this)->zone != IN_ROOM(vict)->zone) ||
-	    (MOB_FLAGGED(this, MOB_STAY_SECTOR) && IN_ROOM(this)->sector_type != IN_ROOM(vict)->sector_type) ||
-	    find_first_step(IN_ROOM(this), IN_ROOM(vict)) < 0))
-		return false;
+bool Character::canHuntChar(Character *vict) {
+    if(!CAN_HUNT(this) ||
+            ((MOB_FLAGGED(this, MOB_STAY_ZONE) && IN_ROOM(this)->zone != IN_ROOM(vict)->zone) ||
+             (MOB_FLAGGED(this, MOB_STAY_SECTOR) && IN_ROOM(this)->sector_type != IN_ROOM(vict)->sector_type) ||
+             find_first_step(IN_ROOM(this), IN_ROOM(vict)) < 0))
+        return false;
 
-	//check for path things here (see notes)
-	int stepcount = 0;
-	int stepdir = find_first_step(IN_ROOM(this),IN_ROOM(vict));
-//	Room *steproom = IN_ROOM(this)->dir_option[find_first_step(IN_ROOM(this),IN_ROOM(vict))]->to_room;
-	Room *curroom = IN_ROOM(this);
-	while (curroom && stepdir>=0 && stepdir <= 5 && stepcount++ != MAX_HUNTSTEPS(this) && curroom->dir_option[stepdir])
-	{
-		if (IS_SET(curroom->dir_option[stepdir]->exit_info, EX_CLOSED))
-			return false;
-		Room *steproom = curroom->dir_option[stepdir]->to_room;
-		if (!steproom || (MOB_FLAGGED(this, MOB_STAY_SECTOR) && steproom->zone != IN_ROOM(vict)->zone) ||
-		    (MOB_FLAGGED(this, MOB_STAY_ZONE) && steproom->sector_type != IN_ROOM(vict)->sector_type) ||
-                    ROOM_FLAGGED(steproom, ROOM_NOMOB) ||
-                    ROOM_FLAGGED(steproom, ROOM_DEATH))
-			return false;
-		curroom = steproom;
-		if (curroom == IN_ROOM(vict))
-			return true;
-	}
+    //check for path things here (see notes)
+    int stepcount = 0;
+    int stepdir = find_first_step(IN_ROOM(this),IN_ROOM(vict));
+    //	Room *steproom = IN_ROOM(this)->dir_option[find_first_step(IN_ROOM(this),IN_ROOM(vict))]->to_room;
+    Room *curroom = IN_ROOM(this);
+    while (curroom && stepdir>=0 && stepdir <= 5 && stepcount++ != MAX_HUNTSTEPS(this) && curroom->dir_option[stepdir]) {
+        if (IS_SET(curroom->dir_option[stepdir]->exit_info, EX_CLOSED))
+            return false;
+        Room *steproom = curroom->dir_option[stepdir]->to_room;
+        if (!steproom || (MOB_FLAGGED(this, MOB_STAY_SECTOR) && steproom->zone != IN_ROOM(vict)->zone) ||
+                (MOB_FLAGGED(this, MOB_STAY_ZONE) && steproom->sector_type != IN_ROOM(vict)->sector_type) ||
+                ROOM_FLAGGED(steproom, ROOM_NOMOB) ||
+                ROOM_FLAGGED(steproom, ROOM_DEATH))
+            return false;
+        curroom = steproom;
+        if (curroom == IN_ROOM(vict))
+            return true;
+    }
 
-	return false;
+    return false;
 }

@@ -219,9 +219,8 @@ void show_obj_to_char(struct obj_data *obj, Character *ch,
                     ch->Send( "%s [FUEL: %d%%]",obj->description, GET_FUEL(obj) > 0 ? (GET_FUEL(obj) * 100)/ GET_MAX_FUEL(obj) : 0);
                 else
                     ch->Send( "%s", obj->description);
-
             }
-        } else {
+        } else if (GET_OBJ_TYPE(obj) == ITEM_SPACEBIKE || GET_OBJ_TYPE(obj) == ITEM_FURNITURE) {
             for (temp = OBJ_SAT_IN_BY(obj); temp;temp = NEXT_SITTING(temp)) {
                 if (temp == ch)
                     found = TRUE;
@@ -233,8 +232,6 @@ void show_obj_to_char(struct obj_data *obj, Character *ch,
                 else
                     ch->Send( "You are mounted upon %s.", obj->short_description);
             }
-
-
         }
 
         break;
@@ -4830,7 +4827,7 @@ ACMD(set_perc) {
         even_group(ch);
         ch->Send( "You split the involvement evenly.\r\n");
         return;
-    }else if (is_number(buf2))
+    } else if (is_number(buf2))
         amount = atoi(buf2);
     else {
         ch->Send("involve <groupmember> <amount (1 to %3d)>\r\n", 90 - group_size(ch));
