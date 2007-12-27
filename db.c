@@ -4920,15 +4920,15 @@ int store_to_char(const char *name, Character *ch) {
                 do {
                     get_line(fl, line);
                     sscanf(line, "%d %d %d 0", &num, &num2, &num3);
-                    if (!str_cmp("hesara", ch->player.name))
-                    	log("%s - %d, %d, %d",ch->player.name, num, num2, num3);
-                    if (num != 0) {
+                    //if (!str_cmp("hesara", ch->player.name))
+                    //	log("%s - %d, %d, %d",ch->player.name, num, num2, num3);
+                    if (num2 != 0) {
                         set_skill(ch, num, num2);
-                        if (!str_cmp("hesara", ch->player.name))
-                    	   log("HasSkill - %d", SAVED(ch).HasSkill(num));
+                     //   if (!str_cmp("hesara", ch->player.name))
+                    //	   log("HasSkill - %d", SAVED(ch).HasSkill(num));
                         set_skill_wait(ch, num, num3);
                     }
-                } while (num != 0);
+                } while (num2 != 0);
             } else if (!strcmp(tag, "Subs")) {
             sub_list *s;
                 do {
