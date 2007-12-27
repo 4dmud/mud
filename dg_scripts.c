@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/30 09:14:19 $
-*  $Revision: 1.25 $
+*  $Date: 2006/06/21 05:22:35 $
+*  $Revision: 1.26 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.26  2006/06/21 05:22:35  w4dimenscor
+ * found an error where is find_room was passed too large a number, it would segfault. Fixed
+ *
  * Revision 1.25  2006/05/30 09:14:19  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -512,14 +515,8 @@ struct obj_data *find_obj(long n)
 /* return room with UID n */
 struct room_data *find_room(long n)
 {
-  room_rnum rnum;
   n -= ROOM_ID_BASE;
-
-  if (n<0)
-    return NULL;
-  rnum = world_vnum[n];
-
-  return rnum;
+  return real_room(n);
 }
 
 
