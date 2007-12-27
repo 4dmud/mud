@@ -828,7 +828,7 @@ const struct command_info cmd_info[] =
     { "subdisplay" , "subdisplay" , POS_SLEEPING, do_subdisplay , 0, 0, 0 },
     { "slay"     , "slay" , POS_RESTING , do_slay     , LVL_IMMORT, 0, WIZ_KILL_GRP },
     { "sleep"    , "sl"  , POS_SLEEPING, do_sleep    , 0, 0, 0 },
-    { "slist"    , "sli"  , POS_SITTING , do_oasis    , LVL_BUILDER, SCMD_OASIS_SLIST, WIZ_SEN_GRP },
+    { "slist"    , "sli"  , POS_SITTING , do_oasis    , LVL_BUILDER, SCMD_OASIS_SLIST, WIZ_OLC_GRP },
     { "slowns"   , "slown", POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_SLOWNS, WIZ_SEN_GRP },
     { "smell"    , "smell", POS_SITTING , do_smell    , 0, 0, 0 },
     { "smite"    , "smite", POS_DEAD    , do_smite    , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
