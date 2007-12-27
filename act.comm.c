@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.41  2007/01/28 21:25:10  w4dimenscor
+ * Fixed the space issue to the whisperer sayto -> say to
+ * 01/28/07 Hal.
+ *
  * Revision 1.40  2006/10/03 22:23:02  w4dimenscor
  * say $p no longer tries to parse $p.
  *
@@ -964,17 +968,17 @@ ACMD(do_spec_comm)
   switch (subcmd)
   {
   case SCMD_WHISPER:
-    action_sing = "whisper to";
+    action_sing = "whisper to ";
     action_plur = "whispers to";
     action_others = "$n whispers something to $N.";
     break;
   case SCMD_ASK:
-    action_sing = "ask";
+    action_sing = "ask ";
     action_plur = "asks";
     action_others = "$n asks $N a question.";
     break;
   default:
-    action_sing = "oops";
+    action_sing = "oops ";
     action_plur = "oopses";
     action_others = "$n is tongue-tied trying to speak with $N.";
     break;
