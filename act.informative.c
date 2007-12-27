@@ -2341,7 +2341,7 @@ if ((blocking = MIN(50, FTOI((AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5f*apply_ac
                    "{cg| | {cwHit  Points: [{cc%6d{cw][{cc%6d{cw]     Speed: [{cc%6d{cw]      AC: [{cc%4d{cw] {cg| |\r\n"
                    "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
                    "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]  Accuracy: [{cy%4d{cw]   Evasion: [{cy%4d{cw] {cg| |{c0\r\n",
-                   GET_HIT(ch), GET_MAX_HIT(ch),speed_update(ch),compute_armor_class(ch),
+                   GET_HIT(ch), GET_MAX_HIT(ch),speed_update(ch),ch->compute_armor_class(),
                    GET_MANA(ch), GET_MAX_MANA(ch), GET_HITROLL(ch),   class_damroll(ch) ,
                    GET_MOVE(ch), GET_MAX_MOVE(ch), accuracy_tot(ch), evasion_tot(ch));
 

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.23  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.22  2006/05/30 09:14:20  w4dimenscor
  * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
@@ -402,11 +405,11 @@ int find_skill_num(char *name)
 }
 */
 
-int get_skill(Character *ch, int i)
+int Character::get_skill(int i)
 {
-  struct skillspell_data *temp = ch->skills;
+  struct skillspell_data *temp = skills;
 
-  if (GET_RACE(ch) == RACE_CENTAUR &&
+  if (GET_RACE(this) == RACE_CENTAUR &&
       (i == 141 || i == 142) )
     return 100;
 

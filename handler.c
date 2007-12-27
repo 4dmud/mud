@@ -593,12 +593,12 @@ void affect_total(Character *ch)
   GET_WIS(ch) = IRANGE(0, GET_WIS(ch), i);
   GET_CON(ch) = IRANGE(0, GET_CON(ch), i);
   GET_CHA(ch) = IRANGE(0, GET_CHA(ch), 100);
-  GET_STR(ch) = MAX(0, GET_STR(ch));
+  GET_STR(ch) = MAX(0, (int)GET_STR(ch));
 
 
   if (IS_NPC(ch))
   {
-    GET_STR(ch) = MIN(GET_STR(ch), i);
+    GET_STR(ch) = MIN((int)GET_STR(ch), i);
   }
   else
   {

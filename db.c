@@ -2494,7 +2494,7 @@ void interpret_espec(const char *keyword, const char *value, int i, int nr)
 
   CASE("Subskill")
   {
-    RANGE(-1, TOP_SUB_DEFINE);
+    RANGE(-1, (int)TOP_SUB_DEFINE);
     mob_proto[i].mob_specials.subskill = num_arg;
   }
   CASE("Skin")

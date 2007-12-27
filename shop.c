@@ -980,7 +980,7 @@ void shopping_sell(char *arg, Character *ch, Character *keeper, int shop_nr)
 
   if (GET_GOLD(keeper) < MIN_OUTSIDE_BANK)
   {
-    goldamt = MIN(MAX_OUTSIDE_BANK - GET_GOLD(keeper), SHOP_BANK(shop_nr));
+    goldamt = MIN(MAX_OUTSIDE_BANK - GET_GOLD(keeper), (gold_int)SHOP_BANK(shop_nr));
     SHOP_BANK(shop_nr) -= goldamt;
     GET_GOLD(keeper) += goldamt;
   }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.39  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.38  2006/06/16 06:28:35  w4dimenscor
  * converted the functions to load fight messages to C++ streams
  *
@@ -1891,7 +1894,8 @@ struct note_data {
     struct note_data *next;
 };
 
-
+int number(int from, int to);
+float number(float from, float to);
 #define MAKE_STRING(msg) \
    (((ostringstream&) (ostringstream() << boolalpha << msg)).str())
 class Character {
@@ -1958,15 +1962,25 @@ public:
     size_t Send(string i);
     size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
     void send_char_pos(int dam);
+    int get_skill(int i);
+    void appear();
     template<typename T>
     Character & operator<< (const T & i)  {
         if (this != NULL && desc != NULL) {
-stringstream s;
-s << i;
-Send(s.str());
+			stringstream s;
+			s << i;
+			Send(s.str());
         }
         return *this;
     };
+
+    int skill_roll(int skill_num) {
+    	return (get_skill(skill_num) > number(1, 101));
+	};
+
+	int compute_armor_class() {
+	return points.armor < -100 ? -100 : points.armor > 100 ? 100 : points.armor;  /* -100 is lowest */
+	};
 
 };
 /* ====================================================================== */

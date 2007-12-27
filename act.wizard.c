@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.53  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.52  2006/06/06 10:50:42  w4dimenscor
  * Working on the Descriptor class, have removed the close_socked and new_descriptor functions in favor of constructors and destructors in the class
  *
@@ -3151,7 +3154,7 @@ ACMD(do_restore)
     update_pos(vict);
     check_regen_rates(vict);
     save_char(vict);
-    ch->Send( "%s",CONFIG_OK);
+    *ch << CONFIG_OK;
     act("You have been fully restored by $N!", FALSE, vict, 0, ch,
         TO_CHAR);
   }
@@ -3163,13 +3166,13 @@ void perform_immort_vis(Character *ch)
   if (GET_INVIS_LEV(ch) == 0
       && !AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE))
   {
-    ch->Send( "You are already fully visible.\r\n");
+    *ch << "You are already fully visible.\r\n";
     return;
   }
 
   GET_INVIS_LEV(ch) = 0;
-  appear(ch);
-  ch->Send( "You are now fully visible.\r\n");
+  ch->appear();
+  *ch << "You are now fully visible.\r\n";
 }
 
 

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.44  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.43  2006/06/11 10:10:11  w4dimenscor
  * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
  *
@@ -4483,7 +4486,7 @@ int class_speed(Character *ch)
 
   speed *= FTOI((1.0  + (current_class_is_tier_num(ch) * 0.5)));
 
-  speed += FTOI((( 100 + (compute_armor_class(ch)))-200) * armorcost);
+  speed += FTOI((( 100 + (ch->compute_armor_class()))-200) * armorcost);
 
   return (speed);
 }

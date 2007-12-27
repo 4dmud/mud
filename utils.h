@@ -158,6 +158,7 @@ void mudlog(const char *str, int type, int level, int file);
 void    new_mudlog(int type, int level, int file, const char *str, ...) __attribute__ ((format (printf, 4, 5)));
 void log_death_trap(Character *ch);
 int number(int from, int to);
+float number(float from, float to);
 int dice(int number, int size);
 size_t new_sprintbit(bitvector_t vektor, const char *names[], char *result,
                      size_t reslen);
@@ -214,8 +215,19 @@ unsigned long circle_random(void);
 #undef MIN
 #endif
 
-int MAX(int a, int b);
+gold_int MIN(gold_int a, gold_int b);
+gold_int MAX(gold_int a, gold_int b);
 int MIN(int a, int b);
+int MAX(int a, int b);
+float MIN(float a, float b);
+float MAX(float a, float b);
+double MIN(double a, double b);
+double MAX(double a, double b);
+unsigned int MIN(unsigned int a, unsigned int b);
+unsigned int MAX(unsigned int a, unsigned int b);
+long MIN(long a, long b);
+long MAX(long a, long b);
+
 char *CAP(char *txt);
 
 /* in class.c */
@@ -381,7 +393,6 @@ void improve_sub(Character *ch, enum subskill_list sub, int amount);
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
 
-int get_skill(Character *ch, int i);
 void set_skill(Character *ch, int skill, int amount);
 /* basic bitvector utils *************************************************/
 
@@ -691,7 +702,7 @@ int get_skill_wait(Character *ch, int skill);
 void set_skill_wait(Character *ch, int skill, int wait);
 void make_wholist(void);
 
-#define GET_SKILL(ch, i)	get_skill(ch, i)
+#define GET_SKILL(ch, i)	ch->get_skill(i)
 #define SET_SKILL(ch, i, pct)	set_skill(ch, i, pct)
 #define GET_SPELL_WAIT(ch, i)   get_skill_wait(ch, i)
 #define SET_SPELL_WAIT(ch, i, skill) set_skill_wait(ch, i, skill)

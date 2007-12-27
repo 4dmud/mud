@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.12  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.11  2006/06/07 06:36:57  w4dimenscor
  * Color code purple is back in now, and i have removed the FTOI macro from the exp_needed function
  *
@@ -1070,9 +1073,9 @@ void advance_level(Character * ch)
   GET_MAX_STAMINA(ch) += current_class_is_tier_num(ch) + (GET_DEX(ch) > 20);
 
   if (IS_MAGE(ch) || IS_PRIEST(ch) || IS_ESPER(ch))
-    GET_PRACTICES(ch) += MAX(2, wis_app[GET_WIS(ch)].bonus);
+    GET_PRACTICES(ch) += MAX(2, (int)wis_app[GET_WIS(ch)].bonus);
   else
-    GET_PRACTICES(ch) += MIN(2, MAX(1, wis_app[GET_WIS(ch)].bonus));
+    GET_PRACTICES(ch) += MIN(2, MAX(1, (int)wis_app[GET_WIS(ch)].bonus));
 
   if (GET_LEVEL(ch) >= LVL_GOD)
   {

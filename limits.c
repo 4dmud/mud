@@ -541,7 +541,7 @@ void gain_exp(Character *ch, gold_int gain)
   {
     if (GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0)
       gain = 0;
-    gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);	/* Cap max exp lost per death */
+    gain = MAX((gold_int)-CONFIG_MAX_EXP_LOSS, gain);	/* Cap max exp lost per death */
     GET_EXP(ch) += gain;
     if (GET_EXP(ch) < 0)
       GET_EXP(ch) = 0;

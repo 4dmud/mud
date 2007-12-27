@@ -55,7 +55,7 @@ ACMD(do_action)
   arg2=arg;
   if ((act_nr = find_action(cmd)) < 0)
   {
-    send_to_char("That action is not supported.\r\n", ch);
+    *ch << "That action is not supported.\r\n";
     return;
   }
 
@@ -63,7 +63,7 @@ ACMD(do_action)
 
   if (!argument || !*argument)
   {
-    ch->Send( "%s\r\n", action->char_no_arg);
+    *ch << action->char_no_arg << "\r\n";
     act(action->others_no_arg, action->hide, ch, 0, 0, TO_ROOM);
     return;
   }
@@ -73,7 +73,7 @@ ACMD(do_action)
 
   if ((!action->char_body_found) && (*part))
   {
-    ch->Send( "Sorry, this social does not support body parts.\r\n");
+    *ch << "Sorry, this social does not support body parts.\r\n";
     return;
   }
 
@@ -87,9 +87,9 @@ ACMD(do_action)
   if (!(fnum = get_number(&arg2)))
   {
     if (action->not_found)
-      ch->Send( "%s\r\n", action->not_found);
+      *ch << action->not_found << "\r\n";
     else
-      ch->Send( "I don't see anything by that name here.\r\n");
+      *ch << "I don't see anything by that name here.\r\n";
     return;
   }
 
@@ -127,17 +127,17 @@ ACMD(do_action)
       }
     }
     if (action->not_found)
-      ch->Send( "%s\r\n", action->not_found);
+      *ch << action->not_found << "\r\n";
     else
-      ch->Send( "I don't see anything by that name here.\r\n");
+      *ch << "I don't see anything by that name here.\r\n";
     return;
   }
   else if (vict == ch)
   {
     if (action->char_auto)
-      ch->Send( "%s\r\n", action->char_auto);
+      *ch << action->char_auto << "\r\n";
     else
-      ch->Send( "Erm, no.\r\n");
+      *ch << "Erm, no.\r\n";
     act(action->others_auto, action->hide, ch, 0, 0, TO_ROOM);
     return;
   }
@@ -166,11 +166,11 @@ ACMD(do_action)
 }
 //}
 
-const char * afar_act(int afar, const char * string, char *buf, size_t len) {
+const char * afar_act(int afar, const char * str, char *buf, size_t len) {
 if (!afar) {
-return string;
+return str;
 } else {
-snprintf(buf, len, "From afar, %s", string);
+snprintf(buf, len, "From afar, %s", str);
 return (const char *)buf;
 }
 }
@@ -228,38 +228,15 @@ if (ch && !PLR_FLAGGED(ch, PLR_COVENTRY))
       }
       else
       {		/* ch == victim */
-        send_to_char("You feel insulted.\r\n", ch);
+        *ch << "You feel insulted.\r\n";
       }
     }
   }
   else
-    send_to_char
-    ("I'm sure you don't want to insult *everybody*...\r\n", ch);
+    *ch << "I'm sure you don't want to insult *everybody*...\r\n";
 }
 
 
-#if 0
-char *fread_action(FILE * fl, int nr)
-{
-  char buf[MAX_STRING_LENGTH], *rslt;
-
-  fgets(buf, MAX_STRING_LENGTH, fl);
-  if (feof(fl))
-  {
-    log("SYSERR: fread_action: unexpected EOF near action #%d", nr);
-    exit(1);
-  }
-  if (*buf == '#')
-    return (NULL);
-  else
-  {
-    *(buf + strlen(buf) - 1) = '\0';
-    CREATE(rslt, char, strlen(buf) + 1);
-    strcpy(rslt, buf);
-    return (rslt);
-  }
-}
-#endif
 void boot_social_messages(void)
 {
   FILE *fl;

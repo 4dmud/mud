@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.29  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.28  2006/06/11 10:10:11  w4dimenscor
  * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
  *
@@ -499,11 +502,11 @@ ACMD(do_visible)
 
   if (AFF_FLAGGED(ch, AFF_INVISIBLE))
   {
-    appear(ch);
-    send_to_char("You break the spell of invisibility.\r\n", ch);
+    ch->appear();
+    *ch << "You break the spell of invisibility.\r\n";
   }
   else
-    send_to_char("You are already visible.\r\n", ch);
+    *ch << "You are already visible.\r\n";
 }
 
 
@@ -514,25 +517,19 @@ ACMD(do_title)
   delete_doubledollar(argument);
 
   if (IS_NPC(ch))
-    send_to_char("Your title is fine... go away.\r\n", ch);
+    *ch << "Your title is fine... go away.\r\n";
   else if (PLR_FLAGGED(ch, PLR_NOTITLE))
-    send_to_char
-    ("You can't title yourself -- you shouldn't have abused it!\r\n",
-     ch);
+    *ch << "You can't title yourself -- you shouldn't have abused it!\r\n";
   else if (strstr(argument, "(") || strstr(argument, ")"))
-    send_to_char("Titles can't contain the ( or ) characters.\r\n",
-                 ch);
+    *ch << "Titles can't contain the ( or ) characters.\r\n";
   else if (strlen(argument) > MAX_TITLE_LENGTH)
   {
-    ch->Send(
-                     "Sorry, titles can't be longer than %d characters.\r\n",
-                     MAX_TITLE_LENGTH);
+    ch->Send("Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH);
   }
   else
   {
     set_title(ch, argument);
-    ch->Send( "Okay, you're now %s %s.\r\n", GET_NAME(ch),
-                     GET_TITLE(ch));
+    ch->Send( "Okay, you're now %s %s.\r\n", GET_NAME(ch), GET_TITLE(ch));
   }
 }
 

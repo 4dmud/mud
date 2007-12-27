@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/30 09:14:19 $
-*  $Revision: 1.11 $
+*  $Date: 2006/06/16 10:54:51 $
+*  $Revision: 1.12 $
 **************************************************************************/
 
 #include "conf.h"
@@ -611,7 +611,7 @@ WCMD(do_wload)
     {
       if (!isdigit(*target) || (rnum = real_room(atoi(target))) == NULL)
       {
-        wld_log(room, "wload: room target vnum doesn't exist (loading mob vnum %d to room %s)", number, target);
+        wld_log(room, "wload: room target vnum doesn't exist (loading mob vnum %d to room %s)", num, target);
         return;
       }
     }

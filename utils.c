@@ -220,7 +220,6 @@ int number(int from, int to)
   return ((circle_random() % (to - from + 1)) + from);
 }
 
-
 /* simulates dice roll */
 int dice(int num, int size)
 {
@@ -237,13 +236,56 @@ int dice(int num, int size)
 }
 
 
+gold_int MIN(gold_int a, gold_int b)
+{
+  return (a < b ? a : b);
+}
+gold_int MAX(gold_int a, gold_int b)
+{
+  return (a > b ? a : b);
+}
 int MIN(int a, int b)
 {
   return (a < b ? a : b);
 }
-
-
 int MAX(int a, int b)
+{
+  return (a > b ? a : b);
+}
+
+float MIN(float a, float b)
+{
+  return (a < b ? a : b);
+}
+float MAX(float a, float b)
+{
+  return (a > b ? a : b);
+}
+
+
+double MIN(double a, double b)
+{
+  return (a < b ? a : b);
+}
+double MAX(double a, double b)
+{
+  return (a > b ? a : b);
+}
+
+unsigned int MIN(unsigned int a, unsigned int b)
+{
+  return (a < b ? a : b);
+}
+unsigned int MAX(unsigned int a, unsigned int b)
+{
+  return (a > b ? a : b);
+}
+
+long MIN(long a, long b)
+{
+  return (a < b ? a : b);
+}
+long MAX(long a, long b)
 {
   return (a > b ? a : b);
 }

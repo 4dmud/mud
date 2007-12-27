@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.43  2006/06/16 10:54:51  w4dimenscor
+ * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
+ *
  * Revision 1.42  2006/06/16 06:28:35  w4dimenscor
  * converted the functions to load fight messages to C++ streams
  *
@@ -750,8 +753,8 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
     }
 
     if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-        appear(ch);
-        ch->Send( "You slowly fade into existence.\r\n");
+        ch->appear();
+        *ch << "You slowly fade into existence.\r\n";
     }
 
 
@@ -861,8 +864,8 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
         affect_from_char(victim, SPELL_SWEET_DREAMS);
 
     if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-        appear(ch);
-        send_to_char("You slowly fade into existence.\r\n", ch);
+        ch->appear();
+        *ch << "You slowly fade into existence.\r\n";
     }
 
 
@@ -1364,7 +1367,7 @@ int evasion_tot(Character *vict) {
 
     evasion_roll = FTOI((IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_EVASION(vict)));
 
-    victim_ac = (200 - (100 + compute_armor_class(vict)));
+    victim_ac = (200 - (100 + vict->compute_armor_class()));
     if (victim_ac != 0)
         evasion_roll += (victim_ac/3); // between 0 and 66
     if ((part = GET_SUB(vict, SUB_LOYALDEFEND) ) > 0)
@@ -1551,8 +1554,8 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
 
 
     if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-        appear(ch);
-        ch->Send( "You slowly fade into existence.\r\n");
+        ch->appear();
+        *ch << "You slowly fade into existence.\r\n";
     }
 
     if (RIDING(ch) && RIDING(ch) == vict)
@@ -2756,27 +2759,20 @@ void send_not_to_spam(char *buf, Character *ch,
 
 /* The Fight related routines */
 
-void appear(Character *ch) {
-    if (affected_by_spell(ch, SPELL_INVISIBLE))
-        affect_from_char(ch, SPELL_INVISIBLE);
+void Character::appear() {
+    if (affected_by_spell(this, SPELL_INVISIBLE))
+        affect_from_char(this, SPELL_INVISIBLE);
 
-    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_INVISIBLE);
-    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+    REMOVE_BIT_AR(AFF_FLAGS(this), AFF_INVISIBLE);
+    REMOVE_BIT_AR(AFF_FLAGS(this), AFF_HIDE);
 
-    if (GET_LEVEL(ch) <= LVL_HERO)
-        act("$n slowly fades into existence.", FALSE, ch, 0, 0, TO_ROOM);
+    if (GET_LEVEL(this) <= LVL_HERO)
+        act("$n slowly fades into existence.", FALSE, this, 0, 0, TO_ROOM);
     else
-        act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, 0, 0, TO_ROOM);
+        act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, this, 0, 0, TO_ROOM);
 }
 
-int skill_roll(Character *ch, int skill_num) {
-    return (GET_SKILL(ch, skill_num) > number(1, 101));
-}
 
-int compute_armor_class(Character *ch) {
-    int armorclass = GET_AC(ch);
-    return (IRANGE(-100, armorclass, 100));    /* -100 is lowest */
-}
 
 
 /*min from -10 to 0*/
@@ -2858,17 +2854,6 @@ int class_max_strike(Character *ch) {
     }
     return 5;
 }
-/*
-void free_messages_type(struct msg_type *msg)
-{
-  if (msg->attacker_msg)
-    free(msg->attacker_msg);
-  if (msg->victim_msg)
-    free(msg->victim_msg);
-  if (msg->room_msg)
-    free(msg->room_msg);
-}
-*/
 
 void free_messages(void) {
     for (int i = 0; i < MAX_MESSAGES; i++)
@@ -2879,7 +2864,6 @@ void free_messages(void) {
         }
 }
 string fread_fight_action(std::ifstream &fl, int nr, string &chk) {
-    //char buf[READ_SIZE];
     if (!fl || fl.eof()) {
         log("SYSERR: fread_fight_action: unexpected EOF near action #%d", nr);
         exit(1);
@@ -3530,7 +3514,7 @@ int chance_hit_part(Character *ch, int part) {
     float l_l = 1;
     float l_r = 1;
     float total = 0;
-    float ac_tot = (float)(200 - (compute_armor_class(ch) + 100))/2;
+    float ac_tot = (float)(200 - (ch->compute_armor_class() + 100))/2;
 
     /* this can be sped up alot in future but for now
        we will just go through this each time it gets called.
@@ -5114,7 +5098,7 @@ void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
             }
 
             if (attacktype != TYPE_UNDEFINED) {
-                shot = skill_roll(ch, attacktype);
+                shot = ch->skill_roll(attacktype);
                 improve_skill(ch, attacktype);
             } else
                 shot = FALSE;
