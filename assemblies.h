@@ -67,7 +67,7 @@ void           assemblySaveAssemblies( void );
 void           assemblyListToChar( Character *pCharacter );
 
 bool           assemblyAddComponent( long lVnum, long lComponentVnum,
-                                     bool bExtract, bool bInRoom );
+                                     bool bExtract, int bInRoom );
 bool           assemblyCheckComponents( long lVnum, Character
                                         *pCharacter , bool check_only);
 bool           assemblyCreate( long lVnum, int iAssembledType );

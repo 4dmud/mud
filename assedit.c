@@ -34,6 +34,7 @@ void assedit_delete(Descriptor *d);
 void assedit_edit_extract(Descriptor *d);
 void assedit_edit_inroom(Descriptor *d);
 void nodigit(Descriptor *d);
+const char *compIn(int i);
 
 
 /*-------------------------------------------------------------------*
@@ -215,11 +216,11 @@ void assedit_disp_menu(Descriptor *d)
       else
       {
         d->Output(
-                        "%s %d%s) [%5ld] %-20.20s  In room:%s %-3.3s %s   Extract:%s %-3.3s%s \r\n",
+                        "%s %d%s) [%5ld] %-20.20s  In:%s %-3.3s %s   Extract:%s %-3.3s%s \r\n",
                         grn,  i+1, nrm,
                         OLC_ASSEDIT(d)->pComponents[i].lVnum,
                         obj_proto[ lRnum ].short_description,
-                        yel, (OLC_ASSEDIT(d)->pComponents[ i ].bInRoom  ? "Yes" : "No"), nrm,
+                        yel, (compIn(OLC_ASSEDIT(d)->pComponents[ i ].bInRoom)), nrm,
                         yel, (OLC_ASSEDIT(d)->pComponents[ i ].bExtract ? "Yes" : "No"), nrm           );
       }
     }
@@ -294,12 +295,6 @@ void assedit_parse(Descriptor *d, char *arg)
       }
       d->Output( "Enter the assembly type : ");
       OLC_MODE(d) = ASSEDIT_EDIT_TYPES;
-
-      break;
-    case 's':
-    case 'S':
-      d->Output( "Enter the trigger vnum : ");
-      OLC_MODE(d) = ASSEDIT_EDIT_TRIGGER;
 
       break;
     case 'a':
@@ -378,7 +373,7 @@ void assedit_parse(Descriptor *d, char *arg)
       OLC_ASSEDIT(d)->pComponents = pTComponents;
       OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].lVnum = pos;
       OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bExtract = YES;
-      OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bInRoom = NO;
+      OLC_ASSEDIT(d)->pComponents[ OLC_ASSEDIT(d)->lNumComponents ].bInRoom = 0;
       OLC_ASSEDIT(d)->lNumComponents += 1;
 
       assedit_disp_menu(d);
@@ -454,20 +449,26 @@ void assedit_parse(Descriptor *d, char *arg)
   case ASSEDIT_EDIT_INROOM:
     switch (*arg)
     {
-    case 'y':
-    case 'Y':
-      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = TRUE;
+    case '1':
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 1;
       assedit_disp_menu(d);
       break;
 
-    case 'n':
-    case 'N':
-      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = FALSE;
+    case '0':
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 0;
+      assedit_disp_menu(d);
+      break;
+          case '2':
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 2;
+      assedit_disp_menu(d);
+      break;
+          case '3':
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 3;
       assedit_disp_menu(d);
       break;
 
     default:
-      d->Output( "Object in the room when assembly is created? (n =  in inventory):");
+      d->Output( "Location of item:\r\n0 :Inventory\r\n1 :Room\r\n2 :Hold\r\n3 :Wield\r\nWhat do you select:");
       break;
     }
     break;
@@ -499,7 +500,7 @@ void assedit_edit_extract(Descriptor *d)
 
 void assedit_edit_inroom(Descriptor *d)
 {
-  d->Output( "Should the object be in the room when assembly is created (n = in inventory)?");
+  d->Output( "Location of item:\r\n0 :Inventory\r\n1 :Room\r\n2 :Hold\r\n3 :Wield\r\nWhat do you select:");
   OLC_MODE(d) = ASSEDIT_EDIT_INROOM;
   return;
 }

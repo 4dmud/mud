@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "descriptor.h"
+/* inroom = 1, inventory = 0, hold = 2, wield = 3 */
 
 /* Local global variables. */
 long           g_lNumAssemblies = 0;
@@ -30,7 +31,7 @@ void assemblyBootAssemblies( void ) {
     char         szTag[ MAX_STRING_LENGTH ] = { '\0' };
     char         szType[ MAX_STRING_LENGTH ] = { '\0' };
     int          iExtract = 0;
-    int          iInRoom = 0;
+    int          iInRoom = 0; /* inroom = 1, inventory = 0, hold = 2, wield = 3 */
     int          iType = 0;
     long         lLineCount = 0;
     long         lPartVnum = NOTHING;
@@ -106,7 +107,7 @@ void assemblySaveAssemblies( void ) {
             fprintf( pFile, "Component           #%ld %d %d\n",
                      pAssembly->pComponents[ j ].lVnum,
                      (pAssembly->pComponents[ j ].bExtract ? 1 : 0),
-                     (pAssembly->pComponents[ j ].bInRoom ? 1 : 0) );
+                     pAssembly->pComponents[ j ].bInRoom  );
         }
 
         if( i < g_lNumAssemblies - 1 )
@@ -114,6 +115,23 @@ void assemblySaveAssemblies( void ) {
     }
 
     fclose( pFile );
+}
+const char *compIn(int i) {
+    switch (i) {
+    case 0:
+        return "Inventory";
+        break;
+    case 1:
+        return "Room";
+        break;
+    case 2:
+        return "Hold";
+        break;
+    case 3:
+        return "Wield";
+        break;
+    }
+    return "";
 }
 
 void assemblyListToChar( Character *pCharacter ) {
@@ -150,17 +168,17 @@ void assemblyListToChar( Character *pCharacter ) {
                     log( "SYSERR: assemblyListToChar(): Invalid component vnum #%ld in assembly for vnum #%ld.",
                          g_pAssemblyTable[ i ].pComponents[ j ].lVnum, g_pAssemblyTable[ i ].lVnum );
                 } else {
-                    pCharacter->Send( " %5ld: %-20.20s Extract=%-3.3s InRoom=%-3.3s\r\n",+           g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
+                    pCharacter->Send( " %5ld: %-20.20s Extract=%-3.3s Item in %s\r\n",          g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
                                       obj_proto[ lRnum ].short_description,
                                       (g_pAssemblyTable[ i ].pComponents[ j ].bExtract ? "Yes" : "No"),
-                                      (g_pAssemblyTable[ i ].pComponents[ j ].bInRoom  ? "Yes" : "No") );
+                                      compIn(g_pAssemblyTable[ i ].pComponents[ j ].bInRoom) );
                 }
             }
         }
     }
 }
 
-bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, bool bInRoom ) {
+bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, int bInRoom ) {
     ASSEMBLY     *pAssembly = NULL;
     COMPONENT    *pNewComponents = NULL;
 
@@ -216,6 +234,7 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
     long         i = 0;
     long         lRnum = 0;
     struct obj_data **ppComponentObjects = NULL;
+    struct obj_data *tobj = NULL;
     ASSEMBLY     *pAssembly = NULL;
 
     if( pCharacter == NULL ) {
@@ -237,17 +256,34 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
         if( (lRnum = real_object( pAssembly->pComponents[ i ].lVnum )) < 0 )
             bOk = FALSE;
         else {
-            if( pAssembly->pComponents[ i ].bInRoom ) {
+            switch ( pAssembly->pComponents[ i ].bInRoom ) {
+            case 1:
                 if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL )
                     bOk = FALSE;
                 else
                     obj_from_room( ppComponentObjects[ i ] );
-            } else {
-                if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum,
-                                               pCharacter->carrying )) == NULL )
+                break;
+            case 0: /*inventory*/
+                if ( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum,
+                                                pCharacter->carrying )) == NULL )
                     bOk = FALSE;
                 else
                     obj_from_char( ppComponentObjects[ i ] );
+                break;
+            case 2: /* HOLD */
+                tobj = GET_EQ(pCharacter, WEAR_HOLD);
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) )
+                    bOk = FALSE;
+                else
+                    ppComponentObjects[ i ] = unequip_char(pCharacter, WEAR_HOLD);
+                break;
+            case 3: /*wield*/
+                tobj = GET_EQ(pCharacter, WEAR_WIELD);
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) )
+                    bOk = FALSE;
+                else
+                    ppComponentObjects[ i ] = unequip_char(pCharacter, WEAR_WIELD);
+                break;
             }
         }
     }
@@ -259,10 +295,22 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
 
         if( pAssembly->pComponents[ i ].bExtract && bOk && !check_only)
             extract_obj( ppComponentObjects[ i ] );
-        else if( pAssembly->pComponents[ i ].bInRoom )
-            obj_to_room( ppComponentObjects[ i ], IN_ROOM( pCharacter ) );
-        else
-            obj_to_char( ppComponentObjects[ i ], pCharacter );
+        else {
+            switch ( pAssembly->pComponents[ i ].bInRoom ) {
+            case 1:
+                obj_to_room( ppComponentObjects[ i ], IN_ROOM( pCharacter ) );
+                break;
+            case 0:
+                obj_to_char( ppComponentObjects[ i ], pCharacter );
+                break;
+            case 2:
+                equip_char( pCharacter,ppComponentObjects[ i ], WEAR_HOLD);
+                break;
+            case 3:
+                equip_char( pCharacter, ppComponentObjects[ i ],WEAR_WIELD);
+                break;
+            }
+        }
     }
 
     free( ppComponentObjects );
@@ -503,10 +551,10 @@ long assemblyFindAssembly( const char *pszAssemblyName ) {
         return (-1);
     if (is_number(pszAssemblyName)) {
         long vn = atol(pszAssemblyName);
-        for( i = 0; i < g_lNumAssemblies; i++ ) 
+        for( i = 0; i < g_lNumAssemblies; i++ )
             if (vn == g_pAssemblyTable[ i ].lVnum)
                 return (g_pAssemblyTable[ i ].lVnum);
-        
+
     } else {
         for( i = 0; i < g_lNumAssemblies; i++ ) {
             if( (lRnum = real_object( g_pAssemblyTable[ i ].lVnum )) < 0 )
