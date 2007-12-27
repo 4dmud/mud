@@ -778,6 +778,7 @@ void sedit_parse(Descriptor *d, char *arg)
     sedit_namelist_menu(d);
     return;
   case SEDIT_NEW_PRODUCT:
+    i = atoi(arg);
     if (i != -1)
       if ((i = real_object(i)) == NOTHING) {
 	d->Output( "That object does not exist, try again : ");
