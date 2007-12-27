@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.10  2006/06/07 06:29:31  w4dimenscor
+ * Color code purple is back in now, and i have removed the FTOI macro from the exp_needed function
+ *
  * Revision 1.9  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -961,7 +964,7 @@ void advance_level(Character * ch)
   if (REMORTS(ch) > 5)
     add_hp += (REMORTS(ch) / 6);
   add_mana = MIN(REMORTS(ch), 25);
-  add_move = FTOI(MIN(REMORTS(ch), 25) * 0.5);
+  add_move = (MIN(REMORTS(ch), 25) * 0.5);
 
   switch (GET_CLASS(ch))
   {
@@ -969,8 +972,8 @@ void advance_level(Character * ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    add_hp += number(FTOI(2 + (GET_CHA(ch) * 0.25)), FTOI((8 * fightier) + (GET_CHA(ch) * 0.35) + 4));
-    add_mana += number(level, FTOI((casttier * level))) + 2;
+    add_hp += number((2 + (GET_CHA(ch) * 0.25)), ((8 * fightier) + (GET_CHA(ch) * 0.35) + 4));
+    add_mana += number(level, ((casttier * level))) + 2;
     add_move += number(1, (2 * fightier));
     break;
 
@@ -1386,7 +1389,7 @@ gold_int group_exp_needed(Character *ch)
   if (IS_NPC(ch))
     return 0;
   else
-    return FTOI((level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2)) - GET_GROUP_EXP(ch);
+    return ((level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2)) - GET_GROUP_EXP(ch);
 }
 
 gold_int exp_needed(Character *ch)
@@ -1421,12 +1424,12 @@ gold_int level_exp(int chclass, int level, int tier, int remorts)
     float div_by = 0.5;
     amount = (multi*((mod+1)*(mod+1)));
 
-    amount = FTOI((multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5)));
-    amount += FTOI(((remorts) * (amount*0.05)));
+    amount = ((multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5)));
+    amount += (((remorts) * (amount*0.05)));
     if (remorts == 0)
-      amount = FTOI(amount * div_by);
+      amount = (amount * div_by);
     else if (remorts < 5)
-      amount = FTOI(amount * (div_by + ((float)remorts * 0.1)));
+      amount = (amount * (div_by + ((float)remorts * 0.1)));
     return amount;
   }
 #undef mod

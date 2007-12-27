@@ -102,6 +102,7 @@ string cstring::c_str() {
                 case 'b':
                     tmp += CBLU;
                     break;
+                    case 'p';
                 case 'm':
                     tmp += CMAG;
                     break;
@@ -126,6 +127,7 @@ string cstring::c_str() {
                 case 'B':
                     tmp += BBLU;
                     break;
+                    case 'P':
                 case 'M':
                     tmp += BMAG;
                     break;
