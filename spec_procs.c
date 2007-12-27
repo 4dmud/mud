@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.22  2007/06/08 10:28:23  w4dimenscor
+ * added a cost of 5k x current percentage to the cost of learning skills and spells
+ *
  * Revision 1.21  2007/02/02 15:32:19  w4dimenscor
  * Fixed the guild guards. --Thotter
  *
@@ -583,11 +586,8 @@ SPECIAL(guild) {
         list_skills(ch, 2);
         return (1);
     }
+    
 
-    if (GET_PRACTICES(ch) <= 0) {
-        *ch << "You do not seem to be able to practice now.\r\n";
-        return (1);
-    }
     learned = IRANGE(30, (20*(TIERNUM)), 80);
     skill_num = find_skill_num(argument);
 
@@ -606,20 +606,29 @@ SPECIAL(guild) {
             !knows_spell(ch, skill_num)) {
         ch->Send(  "You do not know of that %s.\r\n", SPLSKL(ch));
         return (1);
-    }
-    if (GET_SKILL(ch, skill_num) >= learned) {
+    } else if (GET_SKILL(ch, skill_num) >= learned) {
         *ch << "You can't memorize that skill any further for now, come back when you remort.\r\n";
+        return (1);
+    } else if (GET_PRACTICES(ch) <= 0) {
+        *ch << "You do not seem to be able to practice now.\r\n";
         return (1);
     }
 
 
     percent = GET_SKILL(ch, skill_num);
+    if (REMORTS(ch) > 2 && ch->Gold(0, GOLD_HAND) < (percent*5000)) {
+		ch->Send(  "You need at least %d gold coins to pay for practicing that.\r\n", (percent*5000));
+		return (1);
+    }
     percent +=
         MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
 
     SET_SKILL(ch, skill_num, MIN(learned, percent));
     ch->Send( "You practice for a while...(%d)\r\n", GET_SKILL(ch,skill_num));
     GET_PRACTICES(ch)--;
+    if (REMORTS(ch) > 2)
+		ch->Gold((percent*5000), GOLD_HAND);
+    
 
     if (GET_SKILL(ch, skill_num) >= learned)
         *ch << "You cannot train that any further here. \r\nAlthough it may improve through use.\r\n";

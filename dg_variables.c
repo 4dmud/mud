@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/08 10:19:05 $                                           * 
-*  $Revision: 1.51 $                                                      *
+*  $Date: 2007/06/08 10:28:23 $                                           * 
+*  $Revision: 1.52 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -306,9 +306,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             snprintf(str, slen, "%s", vd->value.c_str());
         else {
 if (!strcasecmp(var, "realday")) {
-snprintf(str, slen, "%ld", SECS_PER_REAL_DAY);
+snprintf(str, slen, "%d", SECS_PER_REAL_DAY);
 } else if (!strcasecmp(var, "realhour")) {
-snprintf(str, slen, "%ld", SECS_PER_REAL_HOUR);
+snprintf(str, slen, "%d", SECS_PER_REAL_HOUR);
 } else if (!strcasecmp(var, "now")) {
 snprintf(str, slen, "%ld", time(0));
 } 
