@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.56  2006/09/22 22:41:00  w4dimenscor
+ * Added a check for numm values to assist and joined mobs
+ *
  * Revision 1.55  2006/09/21 13:51:57  w4dimenscor
  * After the last change, which prevented riding sleeping/sitting mounts, mounted players couldn't flee anymore. apparently charmed mounts were assisting their master in the fight! The reason for this was fight_event_hit, which apparently made all charmies assist (recent code change?). I changed it so that charmies that have someone mounted on them won't assist.
  *
@@ -793,12 +796,13 @@ void start_fighting(Character* ch, Character* vict) {
             temp = ch->mob_specials.join_list;
         while (temp) {
             tnext = temp->next;
+            if (temp->joined)
             start_fighting(temp->joined, victim);
             temp = tnext;
         }
     }
     for (f = k->followers; f; f = f->next) {
-        if (victim && (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim)) {
+        if (victim && f->follower && ch && (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim)) {
             if (!IS_NPC(f->follower))
                 perform_assist(f->follower, ch);
         }
