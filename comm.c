@@ -165,6 +165,7 @@ ush_int port = 0;
 char last_command[MAX_STRING_LENGTH] = "Empty";
 
 /* functions in this file */
+char * send_mxp_status(struct descriptor_data *t);
 void send_out_signals(struct descriptor_data *d);
 void turn_on_mxp (DESCRIPTOR_DATA *d);
 int count_mxp_tags (const int bMXP, const char *txt, int length);
@@ -2420,21 +2421,23 @@ hp = GET_HIT(t->character);
 mana = GET_MANA(t->character);
 move = GET_MOVE(t->character);
 stam = GET_STAMINA(t->character);
+
 mhp = GET_MAX_HIT(t->character);
 mmana = GET_MAX_MANA(t->character);
 mmove = GET_MAX_MOVE(t->character);
 mstam = GET_MAX_STAMINA(t->character);
 }
 
-len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'><!ENTITY xhp '%d'>",hp,mhp);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'><!ENTITY xmana '%d'>",mana,mmana);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'><!ENTITY xmove '%d'>",move,mmove);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'><!ENTITY xstam '%d'>",stam,mstam);
-//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE mana Max=%d Caption=\"Mana (%d)\" Color=blue>%d</GAUGE>", mmana,mana,  mana);
-//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE move Max=%d Caption=\"Move (%d)\" Color=green>%d</GAUGE>",mmove, move,  move);
-//len = snprintf(stat + len, sizeof(stat) - len, "<GAUGE stam Max=%d Caption=\"Stamina (%d)\" Color=yellow>%d</GAUGE>",  mstam,stam, stam);
-//len = snprintf(stat + len, sizeof(stat) - len, "%s", MXPMODE());
+/*len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
+len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
+len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
+len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
+len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
+write_to_output(t,  "%s", MXPMODE(6));
+write_to_output(t, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
+write_to_output(t, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
+write_to_output(t, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
+write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);
 return stat;
 }
 void send_compress_offer(struct descriptor_data *d)
@@ -2486,8 +2489,7 @@ int process_output(struct descriptor_data *t)
     strcat(osb, "\r\n");
 
   /* add a prompt */
-if (t->mxp)
- strlcat(i, send_mxp_status(t), sizeof(i));
+  send_mxp_status(t);
   strlcat(i, make_prompt(t), sizeof(i));
 
   /**TODO: need to in the future, check this against the fact that we don't
@@ -5345,7 +5347,7 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
  write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
  write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
  write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
- write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
+ //write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
   write_to_output( d, "%s", MXPTAG
                    ("!ELEMENT List \"<send href='"
                     "buy &name;| "
