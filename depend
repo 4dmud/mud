@@ -1,4 +1,4 @@
-col_string.o: col_string.cpp
+col_string.o: col_string.cpp conf.h sysdep.h color.h col_string.h
 cppstring.o: cppstring.cpp conf.h sysdep.h
 descriptor.o: descriptor.cpp conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h house.h dg_scripts.h screen.h \
