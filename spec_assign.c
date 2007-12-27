@@ -409,6 +409,8 @@ void assign_rooms(void)
     ASSIGNROOM(8283, pet_shops);
     ASSIGNROOM(10453, pet_shops);
     ASSIGNROOM(14398, pet_shops);
+    ASSIGNROOM(27000, pet_shops);
+    ASSIGNROOM(27002, pet_shops);
     ASSIGNROOM(30943, pet_shops);
 
     ASSIGNROOM(201, door_down);
