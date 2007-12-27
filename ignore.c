@@ -40,7 +40,7 @@ otherwise it returns 0
 int is_ignoring(struct char_data *ch, struct char_data *vict)
 {
   struct ignore *temp;
-  char buf[127];
+//  char buf[127];
 
   if (!ch || !vict)
     return (0);
@@ -51,7 +51,7 @@ int is_ignoring(struct char_data *ch, struct char_data *vict)
   temp = GET_IGNORELIST(ch);
   while (temp != NULL)
   {
-    if (!str_cmp(buf, temp->ignore))
+    if (!str_cmp(GET_NAME(vict), temp->ignore))
       return (1);
     temp = temp->next;
   }
