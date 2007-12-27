@@ -770,6 +770,8 @@ void destroy_db(void)
 
   log("Freeing forests.");
   free_forests(forest);
+  log("Freeing Assemblies.");
+  free_assemblies();
 
   log("Free Clan Lists");
   free_clan_lists();
@@ -5909,6 +5911,11 @@ void char_to_store(struct char_data *ch)
   {
     save_index = TRUE;
     player_table[id].last = ch->player.time.logon;
+  }
+if (player_table[id].id != GET_IDNUM(ch))
+  {
+    save_index = TRUE;
+    player_table[id].id = GET_IDNUM(ch);
   }
 
   i = player_table[id].flags;

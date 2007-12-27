@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 08:51:14 $
-*  $Revision: 1.4 $
+*  $Date: 2005/10/09 01:54:08 $
+*  $Revision: 1.5 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -68,7 +68,7 @@
 #define MTRIG_RECEIVE          (1 << 9)	/* character is given obj     */
 #define MTRIG_FIGHT            (1 << 10)	/* each pulse while fighting  */
 #define MTRIG_HITPRCNT         (1 << 11)	/* fighting and below some hp */
-#define MTRIG_BRIBE	       (1 << 12)	/* coins are given to mob     */
+#define MTRIG_BRIBE	           (1 << 12)	/* coins are given to mob     */
 #define MTRIG_LOAD             (1 << 13)	/* the mob is loaded          */
 #define MTRIG_MEMORY           (1 << 14)	/* mob see's someone remembered */
 #define MTRIG_TIME	           (1 << 15)	/* mob is on a time prog      */
@@ -81,7 +81,7 @@
 #define OTRIG_GLOBAL           (1 << 0)	/* unused                     */
 #define OTRIG_RANDOM           (1 << 1)	/* checked randomly           */
 #define OTRIG_COMMAND          (1 << 2)	/* character types a command  */
-#define OTRIG_SPEECH	       (1 << 3)	/* character speaks          */
+#define OTRIG_SPEECH	      (1 << 3)	/* character speaks          */
 
 #define OTRIG_TIMER            (1 << 5)	/* item's timer expires       */
 #define OTRIG_GET              (1 << 6)	/* item is picked up          */
@@ -110,7 +110,6 @@
 #define WTRIG_DROP             (1 << 7)	/* something dropped in room  */
 
 #define WTRIG_TIME             (1 << 15)	/* room has a time trigger    */
-
 #define WTRIG_CAST             (1 << 16)	/* spell cast in room */
 #define WTRIG_LEAVE            (1 << 17)	/* character leaves the room */
 #define WTRIG_DOOR             (1 << 18)	/* door manipulated in room  */

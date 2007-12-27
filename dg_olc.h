@@ -22,7 +22,7 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg);
 
 
 
-#define NUM_TRIG_TYPE_FLAGS		21
+#define NUM_TRIG_TYPE_FLAGS		20
 
 
 /*

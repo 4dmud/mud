@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.22  2005/10/09 01:54:08  w4dimenscor
+ * Fixed the trigger type otrig-speech so it works as expected, make id num's save to the player index, fixed the trigger types
+ *
  * Revision 1.21  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -255,7 +258,6 @@ char *makedrunk(char *string, struct char_data *ch)
 
 ACMD(do_say)
 {
-  void string_format(BYTE * cmd, LWORD space);
 
   skip_spaces(&argument);
 

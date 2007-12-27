@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.14  2005/10/09 01:54:08  w4dimenscor
+ * Fixed the trigger type otrig-speech so it works as expected, make id num's save to the player index, fixed the trigger types
+ *
  * Revision 1.13  2005/09/24 08:52:33  w4dimenscor
  * finished the assemblies code
  *
@@ -2172,7 +2175,6 @@ const char *trig_types[] =
     "Cast",
     "Leave",
     "Door",
-    "UNUSED",
     "FUNCTION",
     "UNUSED",
     "\n"
@@ -2199,9 +2201,9 @@ const char *otrig_types[] =
     "Time",
     "Cast",
     "Leave",
+    "UNUSED",
     "Consume",
     "FUNCTION",
-    "UNUSED",
     "\n"
   };
 
@@ -2228,7 +2230,6 @@ const char *wtrig_types[] =
     "Cast",
     "Leave",
     "Door",
-    "UNUSED",
     "FUNCTION",
     "UNUSED",
     "\n"

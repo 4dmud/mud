@@ -15,7 +15,7 @@ action.o: action.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   dg_event.h trees.h
 act.item.o: act.item.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h constants.h dg_scripts.h \
-  screen.h fight.h
+  screen.h fight.h assemblies.h
 act.movement.o: act.movement.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h house.h \
   constants.h dg_scripts.h kalten.h
@@ -29,7 +29,7 @@ act.social.o: act.social.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h
 act.wizard.o: act.wizard.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h house.h screen.h \
-  constants.h dg_scripts.h arena.h clan.h oasis.h
+  constants.h dg_scripts.h arena.h clan.h oasis.h assemblies.h
 aedit.o: aedit.c conf.h sysdep.h structs.h subskills.h interpreter.h \
   handler.h comm.h utils.h db.h oasis.h screen.h constants.h genolc.h
 alias.o: alias.c conf.h sysdep.h structs.h subskills.h utils.h \
@@ -39,6 +39,10 @@ arena.o: arena.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
 asciimap.o: asciimap.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h house.h constants.h \
   dg_scripts.h oasis.h mapper.h
+assedit.o: assedit.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
+  comm.h handler.h interpreter.h oasis.h assemblies.h
+assemblies.o: assemblies.c conf.h sysdep.h structs.h subskills.h utils.h \
+  assemblies.h comm.h constants.h db.h handler.h interpreter.h
 ban.o: ban.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h
 boards.o: boards.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
@@ -72,7 +76,7 @@ corpse.o: corpse.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
 db.o: db.c conf.h sysdep.h structs.h subskills.h utils.h db.h comm.h \
   handler.h spells.h mail.h interpreter.h house.h constants.h oasis.h \
   dg_scripts.h dg_event.h clan.h genobj.h genmob.h genwld.h xmlhelp.h \
-  trees.h htree.h
+  assemblies.h trees.h htree.h
 dg_comm.o: dg_comm.c conf.h sysdep.h structs.h subskills.h dg_scripts.h \
   utils.h comm.h handler.h db.h constants.h
 dg_db_scripts.o: dg_db_scripts.c conf.h sysdep.h structs.h subskills.h \

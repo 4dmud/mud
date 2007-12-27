@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 08:51:14 $
-*  $Revision: 1.2 $
+*  $Date: 2005/10/09 01:54:08 $
+*  $Revision: 1.3 $
 **************************************************************************/
 
 #include "conf.h"
@@ -207,7 +207,7 @@ void greet_memory_mtrigger(char_data * actor)
         continue;
       if (mem->cmd)
       {
-        command_interpreter(ch, mem->cmd);	/* no script */
+        command_interpreter(ch, mem->cmd);   /* no script */
         command_performed = 1;
         break;
       }
@@ -352,7 +352,7 @@ void entry_memory_mtrigger(char_data * ch)
             free(mem->cmd);
           free(mem);
         }
-      }			/* for (mem =..... */
+      }             /* for (mem =..... */
     }
   }
 }
@@ -828,11 +828,9 @@ int timer_otrigger(struct obj_data *obj)
   {
     if (TRIGGER_CHECK(t, OTRIG_TIMER))
     {
-
-
       script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW);
-if (!obj)
-return -1;
+      if (!obj)
+        return -1;
     }
   }
 
@@ -938,17 +936,19 @@ int command_otrigger(char_data * actor, char *cmd, char *argument)
       if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP))
         return 1;
 
-  for (obj = actor->carrying; obj; obj = next) {
-  next = obj->next_content;
+  for (obj = actor->carrying; obj; obj = next)
+  {
+    next = obj->next_content;
     if (obj->carried_by == actor && cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN))
       return 1;
-      }
+  }
 
-  for (obj = IN_ROOM(actor)->contents; obj; obj = next) {
-       next = obj->next_content;
+  for (obj = IN_ROOM(actor)->contents; obj; obj = next)
+  {
+    next = obj->next_content;
     if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM))
       return 1;
-      }
+  }
 
   return 0;
 }
@@ -1102,7 +1102,7 @@ int give_otrigger(obj_data * obj, char_data * actor, char_data * victim)
        */
       if (!obj )
         return -1;
-     else if (obj->carried_by != actor)
+      else if (obj->carried_by != actor)
         return 0;
       else
         return ret_val;
@@ -1127,7 +1127,7 @@ int load_otrigger(obj_data * obj)
 
 
       script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW);
-	
+
       return obj ? 1 : -1;
     }
   }
@@ -1179,19 +1179,14 @@ int speech_otrig(obj_data * obj, char_data * actor, char *str, int type)
     {
       if (!TRIGGER_CHECK(t, OTRIG_SPEECH))
         continue;
-
-      if (IS_SET(GET_TRIG_NARG(t), type) &&
-          (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)))
+      /*IS_SET(GET_TRIG_NARG(t), type) &&*/
+      if ( (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)))
       {
-        sprintf(buf,
-                "SYSERR: O-SPEECH Trigger #%d has no text argument!",
-                GET_TRIG_VNUM(t));
-        mudlog(buf, NRM, LVL_BUILDER, TRUE);
+        new_mudlog(NRM, LVL_BUILDER, TRUE, "SYSERR: O-SPEECH Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
         continue;
       }
 
-      if (IS_SET(GET_TRIG_NARG(t), type) &&
-          ((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) ||
+      if (((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) ||
            (!GET_TRIG_NARG(t)
             && is_substring(GET_TRIG_ARG(t), str))))
       {

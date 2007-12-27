@@ -5,7 +5,7 @@ void init_trees(int num);
 void create_trees(void);
 int load_tree(room_rnum room, int v0, int v1, int v2, int v3);
 room_rnum find_forest_rand(void);
-struct obj_data *make_tree(void);
+struct obj_data *make_tree(int v0, int v1, int v2);
 void parse_tree_name(struct obj_data *tree);
 extern int tree_total;
 extern struct forest_data *forest;

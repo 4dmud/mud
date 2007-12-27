@@ -21,14 +21,14 @@
 *  If you like the snippet let me know                                    *
 ***************************************************************************/
 /**************************************************************************
- * 	                       Version History                                *
+ *                          Version History                                *
  **************************************************************************
  *  (v1.0) - Converted Automapper to AFKMud 1.64 and added additional     *
  *           directions and removed room desc code into a sep func        *
  **************************************************************************/
 
 /*
-	 TO DO
+      TO DO
    1. Add a way of displaying up and down directions effectively
  */
 
@@ -114,7 +114,7 @@ void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
 void clear_coord( int x, int y )
 {
   map[x][y].tegn[0] = ' ';
-map[x][y].tegn[1] = '\0';
+  map[x][y].tegn[1] = '\0';
   map[x][y].vnum = 0;
   map[x][y].depth = 0;
   map[x][y].can_see = TRUE;
@@ -159,36 +159,36 @@ void map_exits(struct char_data *ch, room_rnum pRoom, int x, int y, int depth)
   struct room_direction_data *pExit;
 
   /* Setup this coord as a room */
-snprintf(map[x][y].tegn, 2, "%d", SECTOR(pRoom));
-/*
-  switch(SECTOR(pRoom))
-  {
-  case SECT_CITY:
-  case SECT_INSIDE:
-    map[x][y].tegn = 'O';
-    break;
-  case SECT_FIELD:
-  case SECT_FOREST:
-  case SECT_HILLS:
-    map[x][y].tegn = '*';
-    break;
-  case SECT_MOUNTAIN:
-    map[x][y].tegn = '@';
-    break;
-  case SECT_WATER_SWIM:
-  case SECT_WATER_NOSWIM:
-    map[x][y].tegn = '=';
-    break;
-  case SECT_FLYING:
-    map[x][y].tegn = '~';
-    break;
-  case SECT_DESERT:
-    map[x][y].tegn = '+';
-    break;
-  default:
-    map[x][y].tegn = 'O';
-    break;
-  }*/
+  snprintf(map[x][y].tegn, 2, "%d", SECTOR(pRoom));
+  /*
+    switch(SECTOR(pRoom))
+    {
+    case SECT_CITY:
+    case SECT_INSIDE:
+      map[x][y].tegn = 'O';
+      break;
+    case SECT_FIELD:
+    case SECT_FOREST:
+    case SECT_HILLS:
+      map[x][y].tegn = '*';
+      break;
+    case SECT_MOUNTAIN:
+      map[x][y].tegn = '@';
+      break;
+    case SECT_WATER_SWIM:
+    case SECT_WATER_NOSWIM:
+      map[x][y].tegn = '=';
+      break;
+    case SECT_FLYING:
+      map[x][y].tegn = '~';
+      break;
+    case SECT_DESERT:
+      map[x][y].tegn = '+';
+      break;
+    default:
+      map[x][y].tegn = 'O';
+      break;
+    }*/
   map[x][y].vnum = pRoom->number;
   map[x][y].depth = depth;
   map[x][y].can_see = room_is_dark( pRoom ) && affected_by_spell(ch, SPELL_INFRAVISION);
@@ -203,9 +203,9 @@ snprintf(map[x][y].tegn, 2, "%d", SECTOR(pRoom));
     if ( ( pExit = get_exit( pRoom, door ) ) == NULL )
       continue;
     if (EXIT_FLAGGED(pExit, EX_HIDDEN))
-        continue;
-      if (EXIT_FLAGGED(pExit, EX_CLOSED))
-continue;
+      continue;
+    if (EXIT_FLAGGED(pExit, EX_CLOSED))
+      continue;
 
     /* Skip up and down until I can figure out a good way to display it */
     if (door == 4 || door == 5)
@@ -242,7 +242,7 @@ continue;
     map[exitx][exity].depth = depth;
     map[exitx][exity].vnum = pExit->to_room->number;
     map[exitx][exity].tegn[0] = map_chars[door];
-map[exitx][exity].tegn[1] = '\0';
+    map[exitx][exity].tegn[1] = '\0';
 
 
     /* More to do? If so we recurse */
@@ -330,16 +330,16 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
 {
   char buf[MAX_STRING_LENGTH * 2];
   int x, y, pos, sec, sect = 0;
-  //	char *p;
+  // char *p;
   //bool alldesc = FALSE; /* Has desc been fully displayed? */
 
   //if ( !text ) alldesc = TRUE;
 
   pos = 0;
-  //	p = text;
+  // p = text;
   buf[0] = '\0';
-if (mxp)
-new_send_to_char(ch, "%s", MXPTAG("FRAME Map REDIRECT"));
+  if (mxp)
+    new_send_to_char(ch, "%s", MXPTAG("FRAME Map REDIRECT"));
 
   new_send_to_char(ch, "\n\r {cy+-----------+{cw\n\r");
 
@@ -364,10 +364,10 @@ new_send_to_char(ch, "%s", MXPTAG("FRAME Map REDIRECT"));
         sprintf(buf + strlen(buf), " ");
         break;
       case 'X':
-sprintf(buf + strlen(buf), "{cR*");
-     break;
+        sprintf(buf + strlen(buf), "{cR*");
+        break;
       default:
-sec = atoi(map[x][y].tegn);
+        sec = atoi(map[x][y].tegn);
         switch (sec)
         {
         case NUM_ROOM_SECTORS:
@@ -406,63 +406,66 @@ sec = atoi(map[x][y].tegn);
       }
     }
     //strlcat( buf, "\r\n ", sizeof(buf) );
-    
-if (!mxp) {
-new_send_to_char(ch, "%s", buf);
-new_send_to_char(ch, "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n", 
-    MDIS(0) ? map_bit[sect].color : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
-    MDIS(1) ? map_bit[sect+1].color : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
-sect+=2;
 
-} else {
-new_send_to_char(ch, "%s {cy|{c0\r\n", buf);
-}
+    if (!mxp)
+    {
+      new_send_to_char(ch, "%s", buf);
+      new_send_to_char(ch, "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
+                       MDIS(0) ? map_bit[sect].color : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
+                       MDIS(1) ? map_bit[sect+1].color : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
+      sect+=2;
+
+    }
+    else
+    {
+      new_send_to_char(ch, "%s {cy|{c0\r\n", buf);
+    }
 
     //if (y == 0 && IS_PLR_FLAG( ch, PLR_AUTOEXIT))  /* the autoexits */
     //{
-    //	sprintf(buf + strlen( buf ), "%s", get_exits(ch));
-    //	continue;
+    //    sprintf(buf + strlen( buf ), "%s", get_exits(ch));
+    //    continue;
     //}
 
     /* Add the text, if necessary */
     /*if ( !alldesc )
     {
-    	pos = get_line( p, 63 );
-    	if ( pos > 0 )
-    	{
-    		mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
-    		strncat( buf, p, pos );
-    		p += pos;
-    	}
-    	else
-    	{
-    		mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
-    		mudstrlcat( buf, p, MSL );
-    		alldesc = TRUE;
-    	}
+     pos = get_line( p, 63 );
+     if ( pos > 0 )
+     {
+          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          strncat( buf, p, pos );
+          p += pos;
+     }
+     else
+     {
+          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, p, MSL );
+          alldesc = TRUE;
+     }
     }
     mudstrlcat( buf, "\n\r", MSL );*/
   }
 
   /* Finish off map area */
   new_send_to_char(ch, " {cy+-----------+{c0\r\n");
-if (mxp)
-new_send_to_char(ch, "%s", MXPTAG("FRAME _previous REDIRECT"));
+  if (mxp)
+    new_send_to_char(ch, "%s", MXPTAG("FRAME _previous REDIRECT"));
   /*if ( !alldesc )
   {
-  	pos = get_line( p, 63 );
-  	if ( pos > 0 )
-  	{
-  		mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
-  		strncat( buf, p, pos );
-  		p += pos;
-  	}
-  	else
-  	{
-  		mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
-  		mudstrlcat( buf, p, MSL );
-  		alldesc = TRUE;
-  	}
+     pos = get_line( p, 63 );
+     if ( pos > 0 )
+     {
+          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          strncat( buf, p, pos );
+          p += pos;
+     }
+     else
+     {
+          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, p, MSL );
+          alldesc = TRUE;
+     }
   }
   */
 
@@ -524,19 +527,20 @@ void draw_map( CHAR_DATA *ch)
 
   /* Current position should be a "X" */
   map[x][y].tegn[0] = 'X';
-map[x][y].tegn[1] = '\0';
+  map[x][y].tegn[1] = '\0';
 
   /* Send the map */
 
   show_map(ch, FALSE);
 }
-void update_mxp_map(struct char_data *ch) {
+void update_mxp_map(struct char_data *ch)
+{
   int x, y;
   static char buf[MAX_STRING_LENGTH];
   *buf = 0;
 
-/** need to add support to detect if the client supports this **/
-return;
+  /** need to add support to detect if the client supports this **/
+  return;
   //strlcpy( buf, desc, len);
   /* Remove undesirable characters */
   //reformat_desc( buf );
@@ -562,7 +566,7 @@ return;
 
   /* Current position should be a "X" */
   map[x][y].tegn[0] = 'X';
-map[x][y].tegn[1] = '\0';
+  map[x][y].tegn[1] = '\0';
 
   /* Send the map */
 

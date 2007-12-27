@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.35  2005/10/09 01:54:08  w4dimenscor
+ * Fixed the trigger type otrig-speech so it works as expected, make id num's save to the player index, fixed the trigger types
+ *
  * Revision 1.34  2005/09/24 08:52:33  w4dimenscor
  * finished the assemblies code
  *
@@ -1119,14 +1122,11 @@ ACMD(do_teleport)
   else if ((target = find_target_room(ch, buf2)) >= 0)
   {
     new_send_to_char(ch, "%s", CONFIG_OK);
-    act("$n disappears in a puff of smoke.", FALSE, victim, 0, 0,
-        TO_ROOM);
+    act("$n disappears in a puff of smoke.", FALSE, victim, 0, 0,  TO_ROOM);
     if (!move_char_to(victim, target))
       return;
-    act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0,
-        TO_ROOM);
-    act("$n has teleported you!", FALSE, ch, 0, (char *) victim,
-        TO_VICT);
+    act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
+    act("$n has teleported you!", FALSE, ch, 0, (char *) victim, TO_VICT);
     LOOK(victim);
     entry_memory_mtrigger(victim);
     greet_mtrigger(victim, -1);
@@ -3189,6 +3189,8 @@ int allowed_pretitle(CHAR_DATA *ch)
     return FALSE;
 
   if (PLR_FLAGGED(ch, PLR_HERO))
+    return TRUE;
+  if (PLR_FLAGGED(ch, PLR_RP_LEADER))
     return TRUE;
 
   if (GET_AWARD(ch) >= 200)

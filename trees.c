@@ -34,7 +34,7 @@ int forest_room;
 struct forest_data *forest = NULL;
 
 
-struct obj_data *make_tree(void)
+struct obj_data *make_tree(int v0, int v1, int v2)
 {
 
   struct obj_data *final_tree;
@@ -53,14 +53,24 @@ struct obj_data *make_tree(void)
   GET_OBJ_TYPE(final_tree) = ITEM_TREE;
   SET_BIT_AR(GET_OBJ_EXTRA(final_tree), ITEM_GLOW);
   //SET_BIT_AR(GET_OBJ_EXTRA(final_tree), ITEM_UNIQUE_SAVE);
-  GET_OBJ_VAL(final_tree, 0) = (int) time(0);
-  GET_OBJ_VAL(final_tree, 1) = age;
-  GET_OBJ_VAL(final_tree, 2) = num;
+  if (v0)           //time of creation
+    GET_OBJ_VAL(final_tree, 0) = v0;
+  else
+    GET_OBJ_VAL(final_tree, 0) = (int) time(0);
+  if (v1)           //age desc number (sapling, old, aging)
+    GET_OBJ_VAL(final_tree, 1) = IRANGE(0, v1, 8);
+  else
+    GET_OBJ_VAL(final_tree, 1) = age;
+  if (v2)           //type desc number (oak, willow, pine)
+    GET_OBJ_VAL(final_tree, 2) = IRANGE(0, v2, 8);
+  else
+    GET_OBJ_VAL(final_tree, 2) = num;
   GET_OBJ_VAL(final_tree, 3) = 0;
   GET_OBJ_COST(final_tree) = 500;
   GET_OBJ_WEIGHT(final_tree) = 1;
   GET_OBJ_RENT(final_tree) = 0;
   GET_OBJ_TIMER(final_tree) = -1;
+
   parse_tree_name(final_tree);
   tree_total++;
 
@@ -153,10 +163,11 @@ ACMD(forest_find)
     for (tree = object_list; tree; tree = next_tree)
     {
       next_tree = tree->next;
-      if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING)) {
-      tree_total--;
+      if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING))
+      {
+        tree_total--;
         extract_obj(tree);
-	}
+      }
     }
     save_forest();
     new_send_to_char(ch, "Cleared and saved.\r\n");
@@ -214,17 +225,18 @@ int save_forest(void)
   {
     if (k->in_room && GET_OBJ_TYPE(k) == ITEM_TREE)
     {
-    /** lets clean this up **/
-    count++;
+      /** lets clean this up **/
+      count++;
       fprintf(fl, "%d %d %d %d %d\n",
               k->in_room->number, GET_OBJ_VAL(k, 0),
               GET_OBJ_VAL(k, 1), GET_OBJ_VAL(k, 2), GET_OBJ_VAL(k,3));
     }
 
   }
-  if (count != tree_total) {
-  log("Tree's resync'ing");
-  tree_total = count;
+  if (count != tree_total)
+  {
+    log("Tree's resync'ing");
+    tree_total = count;
   }
   fclose(fl);
   return 1;
@@ -255,7 +267,7 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3)
   //room is the VNUM
 
   //make_tree() creates a tree prototype
-  if ((tree = make_tree()) == NULL)
+  if ((tree = make_tree(v0, v1, v2)) == NULL)
     return (0);
 
   if (rm == NULL)
@@ -263,26 +275,25 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3)
 
   if (rm == NULL)
   {
-  tree_total--;
+    tree_total--;
     extract_obj(tree);
     return 0;
   }
 
   if (SECT(rm) != SECT_FOREST)
   {
-  tree_total--;
+    tree_total--;
     extract_obj(tree);
     return (0);
   }
-
-
-  if (v0)			//time of creation
+#if 0
+  if (v0)           //time of creation
     GET_OBJ_VAL(tree, 0) = v0;
 
-  if (v1)			//age desc number (sapling, old, aging)
+  if (v1)           //age desc number (sapling, old, aging)
     GET_OBJ_VAL(tree, 1) = IRANGE(0, v1, 8);
 
-  if (v2)			//type desc number (oak, willow, pine)
+  if (v2)           //type desc number (oak, willow, pine)
     GET_OBJ_VAL(tree, 2) = IRANGE(0, v2, 8);
 
   GET_OBJ_VAL(tree, 3) = rm == NULL ? NOWHERE : rm->number;
@@ -291,9 +302,10 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3)
     if (GET_OBJ_VAL(tree, 1) < MAX_TREE_AGE)
       GET_OBJ_VAL(tree, 1)++;
 
-
   parse_tree_name(tree);
+#endif
 
+  GET_OBJ_VAL(tree, 3) = rm == NULL ? NOWHERE : rm->number;
   obj_to_room(tree, rm);
   return (1);
 }
@@ -308,7 +320,7 @@ void check_all_trees(void)
 
   for (obj = object_list; obj; obj = tmp)
   {
-  tmp = obj->next;
+    tmp = obj->next;
     /*tree check*/
     if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING)
     {
@@ -326,7 +338,7 @@ void check_all_trees(void)
           ext++;
           if (IN_ROOM(obj) != NULL)
             send_to_room(IN_ROOM(obj), "With a sigh and a whisper %s collapses to the forest floor.\r\n", obj->short_description);
-	    tree_total--;
+          tree_total--;
           extract_obj(obj);
         }
       }
