@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.16  2005/03/15 09:55:49  w4dimenscor
+ * fixed error with mtransform and linked mobs
+ *
  * Revision 1.15  2005/03/15 08:35:09  w4dimenscor
  * xml page update, and a few other bits
  *
@@ -1869,7 +1872,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     }
     list_destinations(TRAVEL_LIST(k), ch);
     new_send_to_char(ch, "To see global variables: type\r\nvstat player <name>\r\n");
-    if (k->desc)
+    if (GET_LEVEL(ch) == LVL_IMPL && k->desc)
     {
       int i, cnt = 0;
       new_send_to_char(ch, "Last commands typed, oldest at top, newest at bottom:\r\n");

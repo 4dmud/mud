@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.4  2005/03/15 09:55:49  w4dimenscor
+ * fixed error with mtransform and linked mobs
+ *
  * Revision 1.3  2004/12/05 09:46:52  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -64,8 +67,10 @@ int real_zone(int number);
 void die(struct char_data *ch, struct char_data *killer);
 int valid_dg_target(struct char_data *ch, int allow_gods);
 room_rnum find_target_room(struct char_data *ch, char *rawroomstr);
-
+void stop_fusion(CHAR_DATA *ch);
 room_data *get_room(char *name);
+void die_link(CHAR_DATA *mob);
+extern struct hunter_data *hunter_list;
 
 /*
  * Local functions.
@@ -1346,6 +1351,7 @@ ACMD(do_mtransform)
   char arg[MAX_INPUT_LENGTH];
   char_data *m, tmpmob;
   obj_data *obj[NUM_WEARS];
+  struct hunter_data *hunt = NULL, *hnext;
   mob_rnum this_rnum = GET_MOB_RNUM(ch);
   int keep_hp = 1;		/* new mob keeps the old mob's hp/max hp/exp */
   int pos;
@@ -1403,6 +1409,29 @@ ACMD(do_mtransform)
 
     /* put the mob in the same room as ch so extract will work */
     char_to_room(m, IN_ROOM(ch));
+        
+  char_from_chair(ch);
+  stop_fusion(ch);
+  
+  remove_hunter(ch);
+
+  /* we can't forget the hunters either... */
+  for (hunt = hunter_list; hunt; hunt = hnext)
+  {
+    hnext = hunt->next;
+
+    if (!hunt->hunter)
+      continue;
+    if (HUNTING(hunt->hunter) != ch)
+      continue;
+
+    //
+    forget(hunt->hunter, ch);
+    forget(ch, hunt->hunter);
+    remove_hunter(hunt->hunter);
+    //    HUNTING(hunt->hunter) = NULL;
+
+  }
 
     memcpy(&tmpmob, m, sizeof(*m));
     //rryan: we need to copy the strings so we don't end up free'ing the prototypes later
@@ -1427,13 +1456,17 @@ ACMD(do_mtransform)
     tmpmob.next_fighting = ch->next_fighting;
     tmpmob.followers = ch->followers;
     tmpmob.master = ch->master;
+    tmpmob.mob_specials = ch->mob_specials;
     GET_FIGHT_EVENT(&tmpmob) = GET_FIGHT_EVENT(ch);
+    GET_MESSAGE_EVENT(&tmpmob) = GET_MESSAGE_EVENT(ch);
 
-    {
+
+
+     do {
       int i;
       for (i = 0; i < 4; i++)
         GET_POINTS_EVENT(&tmpmob, i) = GET_POINTS_EVENT(ch, i);
-    }
+    } while (0);
 
     GET_WAS_IN(&tmpmob) = GET_WAS_IN(ch);
     if (keep_hp)
@@ -1458,6 +1491,8 @@ ACMD(do_mtransform)
       if (obj[pos]) equip_char(ch, obj[pos], pos);
     }
     ch->nr = this_rnum;
+    /* setting this to 0 to see if it affects the code */
+    GET_ID(m) = 0;
     extract_char(m);
   }
 }
