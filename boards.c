@@ -88,6 +88,7 @@ struct board_info_type board_info[NUM_OF_BOARDS] =
     {8403, 0, 0, LVL_GOD, LIB_ETC "board.rp4", 0},
     {8449, 0, 0, LVL_GOD, LIB_ETC "board.spy", 0},
     {8470, 0, 0, LVL_GOD, LIB_ETC "board.bitch", 0},
+    {8477, 0, 0, LVL_GOD, LIB_ETC "board.rpl", 0},
     {9421, 0, 0, LVL_GOD, LIB_ETC "board.chaos", 0},
     {9435, 0, 0, LVL_GOD, LIB_ETC "board.chaos2", 0},
     {10026, 0, 0, LVL_GOD, LIB_ETC "board.dragon", 0},    
