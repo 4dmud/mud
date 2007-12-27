@@ -2005,7 +2005,8 @@ void extract_char_final(struct char_data *ch)
   struct descriptor_data *d = NULL;
   struct hunter_data *hunt = NULL, *hnext;
   int i;
-
+  if (!ch)
+    return;
   if (IN_ROOM(ch) == NULL)
   {
     log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)", GET_NAME(ch), __FILE__);

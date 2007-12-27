@@ -6676,7 +6676,7 @@ void init_char(struct char_data *ch)
   }
 
   for (i = 0; i < 2; i++)
-    GET_COND(ch, i) = (GET_LEVEL(ch) == LVL_IMPL ? -1 : 24);
+    GET_COND(ch, i) = (GET_LEVEL(ch) == LVL_IMPL ? -1 : 48);
   GET_COND(ch, 2) = 0;
 
   GET_LOADROOM(ch) = NOWHERE;

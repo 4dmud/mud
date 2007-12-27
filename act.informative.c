@@ -2357,13 +2357,13 @@ ACMD(do_score)
                    "{cg| |     Hunger: [{cy%3d%%{cg]      Thirst:[{cy%3d%%{cg]      Intoxication:[{cy%3d%%{cg]    | |\r\n",
                    GET_COND(ch,
                             FULL) ==
-                   -1 ? 0 : 100 - ((GET_COND(ch, FULL) * 100) / 24),
+                   -1 ? 0 : 100 - ((GET_COND(ch, FULL) * 100) / 49),
                    GET_COND(ch,
                             THIRST) ==
-                   -1 ? 0 : 100 - ((GET_COND(ch, THIRST) * 100) / 24),
+                   -1 ? 0 : 100 - ((GET_COND(ch, THIRST) * 100) / 49),
                    GET_COND(ch,
                             DRUNK) ==
-                   -1 ? 0 : ((GET_COND(ch, DRUNK) * 100) / 24));
+                   -1 ? 0 : ((GET_COND(ch, DRUNK) * 100) / 49));
 
   if (GET_LEVEL(ch) < LVL_HERO)
   {

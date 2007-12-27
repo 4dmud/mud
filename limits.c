@@ -374,31 +374,8 @@ int stamina_gain(struct char_data *ch)
     gain *=2;
   return (abs(gain));
 }
-int allowed_loginmsg(CHAR_DATA *ch)
-{
-  if (GET_LEVEL(ch) > LVL_HERO)
-    return TRUE;
-  
-  if (!PLR_FLAGGED(ch, PLR_ROLEPLAYER))
-    return FALSE;
-  
-  if (PLR_FLAGGED(ch, PLR_HERO))
-    return TRUE;
-  if (PLR_FLAGGED(ch, PLR_RP_LEADER))
-    return TRUE;
-  
-  if (GET_AWARD(ch) >= 250)
-    return TRUE;
-  
-  return FALSE;
-  
-}
  void set_loginmsg(struct char_data *ch, char *loginmsg){
-   if (!allowed_loginmsg(ch))
-   {
-     new_send_to_char(ch, "Sorry, but you don't deserve a login message yet.\r\n");
-     return;
-   }
+
    if (GET_LOGINMSG(ch))
      free(GET_LOGINMSG(ch));
       if(!loginmsg || !*loginmsg) GET_LOGINMSG(ch)=NULL;
@@ -406,11 +383,7 @@ int allowed_loginmsg(CHAR_DATA *ch)
    }
  
  void set_logoutmsg(struct char_data *ch, char *logoutmsg){
-   if (!allowed_loginmsg(ch))
-   {
-     new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
-     return;
-   }
+
    if (GET_LOGOUTMSG(ch))
      free(GET_LOGOUTMSG(ch));
       if(!logoutmsg || !*logoutmsg) GET_LOGOUTMSG(ch)=NULL;
@@ -741,7 +714,7 @@ void gain_condition(struct char_data *ch, int condition, int value)
 
   GET_COND(ch, condition) += value;
 
-  GET_COND(ch, condition) = IRANGE(0, GET_COND(ch, condition), 24);
+  GET_COND(ch, condition) = IRANGE(0, GET_COND(ch, condition), 48);
 
   if (GET_COND(ch, condition) || PLR_FLAGGED(ch, PLR_WRITING))
     return;
@@ -750,18 +723,18 @@ void gain_condition(struct char_data *ch, int condition, int value)
   {
   case FULL:
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      send_to_char("You are hungry.\r\n", ch);
+      new_send_to_char(ch, "You are hungry.\r\n");
     check_regen_rates(ch);
     break;
   case THIRST:
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      send_to_char("You are thirsty.\r\n", ch);
+      new_send_to_char(ch,"You are thirsty.\r\n");
     check_regen_rates(ch);
     break;
   case DRUNK:
     if (intoxicated)
       if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-        send_to_char("You are now sober.\r\n", ch);
+        new_send_to_char(ch,"You are now sober.\r\n");
     break;
   default:
     log("default reached in gain_condition! %d", condition);

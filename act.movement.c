@@ -2428,8 +2428,8 @@ ASKILL(skill_blackjack)
 
   if (affected_by_spell(vict, SKILL_BLACKJACK))
   {
-    send_to_char
-    ("They are guarding their head too well right now.\r\n", ch);
+    new_send_to_char
+    (ch, "They are guarding their head too well right now.\r\n");
     return 0;
   }
 
@@ -2444,21 +2444,17 @@ ASKILL(skill_blackjack)
     send_to_char("They are moving about too much.\r\n", ch);
     return 0;
   }
-
-  chance += (GET_LEVEL(ch) - GET_LEVEL(vict));
+  chance += GET_SKILL(ch, SKILL_BLACKJACK);
+  chance += (GET_LEVEL(ch) - (GET_LEVEL(vict)/2));
 
   if (!GET_EQ(ch, WEAR_HEAD))
     chance -= 10;
 
   if (number(1, 101) < chance)
   {
-    act("You whack $N over the head with a heavy looking sack. Ouch.",
-        FALSE, ch, 0, vict, TO_CHAR);
-    act("$n whacks $N over the head with a heavy looking sack. Ouch.",
-        FALSE, ch, 0, vict, TO_NOTVICT);
-    send_to_char
-    ("You feel a sudden pain erupt through the back of your skull.\r\n",
-     vict);
+    act("You whack $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n whacks $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_NOTVICT);
+    new_send_to_char(ch, "You feel a sudden pain erupt through the back of your skull.\r\n");
 
     af.location = 0;
     af.type = SKILL_BLACKJACK;
@@ -2472,12 +2468,9 @@ ASKILL(skill_blackjack)
   }
   else
   {
-    act("You attempt to blackjack $N but fail.", FALSE, ch, 0, vict,
-        TO_CHAR);
-    act("$n attempts to blackjack $N but misses.", FALSE, ch, 0, vict,
-        TO_NOTVICT);
-    act("$n hits you over the head with a heavy sack.", FALSE, ch, 0,
-        vict, TO_VICT);
+    act("You attempt to blackjack $N but fail.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n attempts to blackjack $N but misses.", FALSE, ch, 0, vict, TO_NOTVICT);
+    act("$n hits you over the head with a heavy sack.", FALSE, ch, 0,vict, TO_VICT);
     damage(ch, vict, 2 + 2 * number(2, 5), SKILL_BLACKJACK);
 
 

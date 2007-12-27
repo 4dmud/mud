@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.9  2005/10/30 08:37:05  w4dimenscor
+ * Updated compare command and fixed mining
+ *
  * Revision 1.8  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -1778,11 +1781,11 @@ void mag_assign_spells(void)
 
   spello(SPELL_GROUP_HEAL, "group heal", 80 , 40 , 5,
          POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 0,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 34);
+         SPELL_HEAL, TYPE_UNDEFINED, 4, 3);
 
   spello(SPELL_GROUP_RECALL, "group recall", 90 , 30 , 2,
          POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 20,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 24);
+         SPELL_WORD_OF_RECALL, TYPE_UNDEFINED, 3, 24);
 
   spello(SPELL_HARM, "harm", 75 , 45 , 3, POS_FIGHTING,
          TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE, 0,
@@ -1790,7 +1793,7 @@ void mag_assign_spells(void)
 
   spello(SPELL_HEAL, "heal", 70 , 35 , 3, POS_FIGHTING,
          TAR_CHAR_ROOM, FALSE, MAG_POINTS | MAG_UNAFFECTS, 1,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 2);
+         SPELL_CURE_CRITIC, TYPE_UNDEFINED, 3, 32);
 
   spello(SPELL_INFRAVISION, "infravision", 25 , 10 , 1,
          POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,

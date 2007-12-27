@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.25  2005/10/30 08:37:05  w4dimenscor
+ * Updated compare command and fixed mining
+ *
  * Revision 1.24  2005/10/23 13:53:30  w4dimenscor
  * Added thotters login/logout message concept
  *
@@ -150,11 +153,11 @@ C_FUNC(push_object);
 
 /* Local Variables */
 int slipping = FALSE;
-int curbid = 0;			/* current bid on item being auctioned */
-int aucstat = AUC_NULL_STATE;	/* state of auction.. first_bid etc.. */
-struct obj_data *obj_selling = NULL;	/* current object for sale */
-struct char_data *ch_selling = NULL;	/* current character selling obj */
-struct char_data *ch_buying = NULL;	/* current character buying the object */
+int curbid = 0;               /* current bid on item being auctioned */
+int aucstat = AUC_NULL_STATE; /* state of auction.. first_bid etc.. */
+struct obj_data *obj_selling = NULL;    /* current object for sale */
+struct char_data *ch_selling = NULL;    /* current character selling obj */
+struct char_data *ch_buying = NULL;     /* current character buying the object */
 static int wearall = 0;
 /*gold tally*/
 static long long shop_in = 0;
@@ -303,34 +306,36 @@ void spill_gold(struct char_data *ch)
   perform_drop_gold(ch, spill_gold_amount(ch), SCMD_SPILL, 0);
 }
 
-int getTypeFromSubskill(int subskill) {
+int getTypeFromSubskill(int subskill)
+{
 
-  switch (subskill) {
-case SUB_ASSEMBLE:
-return ASSM_ASSEMBLE;
-case SUB_BAKE:
-return ASSM_BAKE;
-case SUB_BREW:
-return ASSM_BREW;
-case SUB_CRAFT:
-return ASSM_CRAFT;
-case SUB_FLETCH:
-return ASSM_FLETCH;
-case SUB_KNIT:
-return ASSM_KNIT;
-case SUB_MAKE:
-return ASSM_MAKE;
-case SUB_MIX:
-return ASSM_MIX;
-case SUB_THATCH:
-return ASSM_THATCH;
-case SUB_WEAVE:
-return ASSM_WEAVE;
-case SUB_FORGE:
-return ASSM_FORGE;
-break;
-}
-return ASSM_ASSEMBLE;
+  switch (subskill)
+  {
+  case SUB_ASSEMBLE:
+    return ASSM_ASSEMBLE;
+  case SUB_BAKE:
+    return ASSM_BAKE;
+  case SUB_BREW:
+    return ASSM_BREW;
+  case SUB_CRAFT:
+    return ASSM_CRAFT;
+  case SUB_FLETCH:
+    return ASSM_FLETCH;
+  case SUB_KNIT:
+    return ASSM_KNIT;
+  case SUB_MAKE:
+    return ASSM_MAKE;
+  case SUB_MIX:
+    return ASSM_MIX;
+  case SUB_THATCH:
+    return ASSM_THATCH;
+  case SUB_WEAVE:
+    return ASSM_WEAVE;
+  case SUB_FORGE:
+    return ASSM_FORGE;
+    break;
+  }
+  return ASSM_ASSEMBLE;
 }
 
 ACMD(do_assemble)
@@ -341,44 +346,55 @@ ACMD(do_assemble)
 
   skip_spaces(&argument);
 
-  if (!get_sub(ch, subcmd)) {
+  if (!get_sub(ch, subcmd))
+  {
     new_send_to_char(ch, "You know nothing of that art!\r\n");
     return;
   }
 
-  if (*argument == '\0') {
+  if (*argument == '\0')
+  {
     new_send_to_char(ch, "What would you like to %s?\r\n", CMD_NAME);
     return;
-  } else if ((lVnum = assemblyFindAssembly(argument)) < 0) {
+  }
+  else if ((lVnum = assemblyFindAssembly(argument)) < 0)
+  {
     new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
     return;
-  } else if (assemblyGetType(lVnum) != (type - 101)) {
+  }
+  else if (assemblyGetType(lVnum) != (type - 101))
+  {
     new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
     return;
-  } else if (!assemblyCheckComponents(lVnum, ch, TRUE)) {
+  }
+  else if (!assemblyCheckComponents(lVnum, ch, TRUE))
+  {
     new_send_to_char(ch, "You haven't got all the things you need.\r\n");
     return;
   }
 
   assemble_otrigger(lVnum, ch, subcmd, cmd);
-  
+
 }
 
 
-int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {
+int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd)
+{
   int percent;
   struct obj_data *pObject = NULL;
-/* Create the assembled object. */
-  if (!assemblyCheckComponents(lVnum, ch, FALSE)) {
+  /* Create the assembled object. */
+  if (!assemblyCheckComponents(lVnum, ch, FALSE))
+  {
     new_send_to_char(ch, "You haven't got all the things you need.\r\n");
     return 0;
   }
-  if ((pObject = read_object(lVnum, VIRTUAL)) == NULL ) {
+  if ((pObject = read_object(lVnum, VIRTUAL)) == NULL )
+  {
     new_send_to_char(ch, "You can't %s one of those.\r\n", CMD_NAME);
     return 0;
   }
   percent = number(1, 101);
-  
+
   if (percent < 5)
     improve_sub(ch, (enum subskill_list ) subcmd,1);
 
@@ -388,7 +404,7 @@ int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) 
   /* Tell the character they made something. */
   sprintf(buf, "You %s $p.", CMD_NAME);
   act(buf, FALSE, ch, pObject, NULL, TO_CHAR);
-  
+
   /* Tell the room the character made something. */
   sprintf(buf, "$n %ss $p.", CMD_NAME);
   act(buf, FALSE, ch, pObject, NULL, TO_ROOM);
@@ -534,13 +550,13 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
 
 /* The following put modes are supported by the code below:
  
-	1) put <object one word> <container one word>
-	2) put all.<object> <container>
-	3) put all <container>
-	4) put <number> <object> <container>
+     1) put <object one word> <container one word>
+     2) put all.<object> <container>
+     3) put all <container>
+     4) put <number> <object> <container>
  
-	<container> must be in inventory or on ground.
-	all objects to be put into container must be in inventory.
+     <container> must be in inventory or on ground.
+     all objects to be put into container must be in inventory.
 */
 ACMD(do_put)
 {
@@ -1171,13 +1187,13 @@ bool perform_get_from_room(struct char_data *ch, struct obj_data *obj)
 {
   if (can_take_obj(ch, obj) && get_otrigger(obj, ch) > 0)
   {
-  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(obj))
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(obj)));
-    else
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s",  GET_NAME(ch), obj->short_description);
-  }
+    if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+    {
+      if (IN_ROOM(obj))
+        new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(obj)));
+      else
+        new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gets %s",  GET_NAME(ch), obj->short_description);
+    }
     obj_from_room(obj);
     obj_to_char(obj, ch);
     if (!wearall || (PRF_FLAGGED(ch, PRF_BATTLESPAM)))
@@ -1415,7 +1431,7 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
 
     if (mode != SCMD_JUNK)
     {
-      WAIT_STATE(ch, PULSE_VIOLENCE);	/* to prevent coin-bombing */
+      WAIT_STATE(ch, PULSE_VIOLENCE);   /* to prevent coin-bombing */
       obj = create_money(amount);
       if (mode == SCMD_DONATE)
       {
@@ -1452,7 +1468,7 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
       else
       {
         switch (drop_wtrigger(obj, ch))
-        {	/* obj may be purged */
+        { /* obj may be purged */
         case  0: extract_obj(obj); return;
         case -1: return;
         }
@@ -1482,7 +1498,7 @@ void perform_drop_gold(struct char_data *ch, gold_int amount,
 
 
 #define VANISH(mode) ((mode == SCMD_DONATE || mode == SCMD_JUNK) ? \
-		      "  It vanishes in a puff of smoke!" : "")
+                "  It vanishes in a puff of smoke!" : "")
 
 int perform_drop(struct char_data *ch, struct obj_data *obj,
                  byte mode, const char *sname, struct room_data *  RDR)
@@ -1507,9 +1523,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                            	   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                            	    return (0);
-                                                                                            	}*/
+                                                                                                               new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                                                return (0);
+                                                                                                            }*/
   }
 
 
@@ -1540,12 +1556,12 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
   switch (mode)
   {
   case SCMD_DROP:
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s drops %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-    
-  }
+    if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+    {
+      if (IN_ROOM(ch))
+        new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s drops %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+
+    }
     obj_to_room(obj, IN_ROOM(ch));
     if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
@@ -1556,20 +1572,20 @@ if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
     }
     return (0);
   case SCMD_DONATE:
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s donates %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+    if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+    {
+      if (IN_ROOM(ch))
+        new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s donates %s from room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+    }
     obj_to_room(obj, RDR);
     act("$p suddenly appears in a puff a smoke!", FALSE, 0, obj, 0, TO_ROOM);
     return (0);
   case SCMD_JUNK:
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
-  {
-    if (IN_ROOM(ch))
-      new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s junks %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-  }
+    if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+    {
+      if (IN_ROOM(ch))
+        new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s junks %s in room %d",  GET_NAME(ch), obj->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+    }
     value = MAX(1, MIN(200, GET_OBJ_COST(obj) / 16));
     extract_obj(obj);
     char_gold(ch, value, GOLD_BANK);
@@ -1783,7 +1799,7 @@ void perform_give(struct char_data *ch, struct char_data *vict,
 
   obj_from_char(obj);
   obj_to_char(obj, vict);
-if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
   {
     if (IN_ROOM(ch))
       new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "[TOKEN] %s gives %s to %s in %d",  GET_NAME(ch), obj->short_description, GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(ch)));
@@ -1888,7 +1904,7 @@ ACMD(do_give)
       return;
     }
     else if (!*arg)
-    {	/* Give multiple code. */
+    {     /* Give multiple code. */
       new_send_to_char(ch, "What do you want to give %lld of?\r\n",
                        amount);
     }
@@ -2044,7 +2060,7 @@ void name_from_drinkcon(struct obj_data *obj)
   }
 
   liqlen = strlen(liqname);
-  CREATE(new_name, char, strlen(obj->name) - strlen(liqname));	/* +1 for NUL, -1 for space */
+  CREATE(new_name, char, strlen(obj->name) - strlen(liqname));   /* +1 for NUL, -1 for space */
 
   for (cur_name = obj->name; cur_name; cur_name = next)
   {
@@ -2060,8 +2076,8 @@ void name_from_drinkcon(struct obj_data *obj)
       continue;
 
     if (*new_name)
-      strcat(new_name, " ");	/* strcat: OK (size precalculated) */
-    strncat(new_name, cur_name, cpylen);	/* strncat: OK (size precalculated) */
+      strcat(new_name, " ");  /* strcat: OK (size precalculated) */
+    strncat(new_name, cur_name, cpylen);     /* strncat: OK (size precalculated) */
   }
 
   if (GET_OBJ_RNUM(obj) == NOTHING
@@ -2083,7 +2099,7 @@ void name_to_drinkcon(struct obj_data *obj, int type)
 
   CREATE(new_name, char,
          strlen(obj->name) + strlen(drinknames[type]) + 2);
-  sprintf(new_name,  "%s %s", obj->name, drinknames[type]);	/* sprintf: OK */
+  sprintf(new_name,  "%s %s", obj->name, drinknames[type]); /* sprintf: OK */
 
   if (GET_OBJ_RNUM(obj) == NOTHING
       || obj->name != obj_proto[GET_OBJ_RNUM(obj)].name)
@@ -2105,7 +2121,7 @@ ACMD(do_drink)
 
   one_argument(argument, arg);
 
-  if (IS_NPC(ch))		/* Cannot use GET_COND() on mobs. */
+  if (IS_NPC(ch))        /* Cannot use GET_COND() on mobs. */
     return;
 
   if (!*arg)
@@ -2189,7 +2205,7 @@ ACMD(do_drink)
           TO_ROOM);
       return;
     }
-    if ((GET_COND(ch, FULL) > 23) && (GET_COND(ch, THIRST) > 0))
+    if ((GET_COND(ch, FULL) > 47) && (GET_COND(ch, THIRST) > 0))
     {
       new_send_to_char(ch,"Your stomach can't contain anymore!\r\n");
       return;
@@ -2217,7 +2233,7 @@ ACMD(do_drink)
 
       if (drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK] > 0)
       {
-        amount = (25 - GET_COND(ch, THIRST)) / drink_aff[GET_OBJ_VAL(temp,2)][DRUNK];
+        amount = (49 - GET_COND(ch, THIRST)) / drink_aff[GET_OBJ_VAL(temp,2)][DRUNK];
       }
       else
         amount = number(3, 10);
@@ -2281,7 +2297,7 @@ ACMD(do_drink)
     weight = MIN(amount, GET_OBJ_WEIGHT(temp));
   }
 
-  weight_change_object(temp, -weight);	/* Subtract amount */
+  weight_change_object(temp, -weight);  /* Subtract amount */
 
   if (GET_OBJ_TYPE(temp) == ITEM_VIAL)
   {
@@ -2320,17 +2336,19 @@ ACMD(do_drink)
     if (GET_COND(ch, DRUNK) > 10)
       new_send_to_char(ch,"You feel drunk.\r\n");
 
-    if (GET_COND(ch, THIRST) > 23)
+    if (GET_COND(ch, THIRST) > 47)
+      new_send_to_char(ch, "You REALLY don't feel thirsty any more.\r\n");
+    else if (GET_COND(ch, THIRST) > 23)
       new_send_to_char(ch,"You don't feel thirsty any more.\r\n");
-
-    if (GET_COND(ch, FULL) > 23)
+    if (GET_COND(ch, FULL) > 47)
+      new_send_to_char(ch, "You REALLY don't feel hungry any more.\r\n");
+    else if (GET_COND(ch, FULL) > 23)
       new_send_to_char(ch,"You are full.\r\n");
 
     if (GET_OBJ_VAL(temp, 3))
-    {	/* The shit was poisoned ! */
+    {     /* The shit was poisoned ! */
       new_send_to_char(ch,"Oops, it tasted rather strange!\r\n");
-      act("$n chokes and utters some strange sounds.", TRUE, ch, 0, 0,
-          TO_ROOM);
+      act("$n chokes and utters some strange sounds.", TRUE, ch, 0, 0, TO_ROOM);
 
       af.type = SPELL_POISON;
       af.expire = HOURS_TO_EXPIRE((amount * 3));
@@ -2344,7 +2362,7 @@ ACMD(do_drink)
   /* empty the container, and no longer poison. */
   GET_OBJ_VAL(temp, 1) -= amount;
   if (!GET_OBJ_VAL(temp, 1))
-  {	/* The last bit */
+  {  /* The last bit */
     if (GET_OBJ_TYPE(temp) == ITEM_VIAL)
     {
       GET_OBJ_VAL(temp, 0) = -1;
@@ -2370,7 +2388,7 @@ ACMD(do_eat)
 
   one_argument(argument, arg);
 
-  if (IS_NPC(ch))		/* Cannot use GET_COND() on mobs. */
+  if (IS_NPC(ch))        /* Cannot use GET_COND() on mobs. */
     return;
 
   if (!*arg)
@@ -2394,8 +2412,8 @@ ACMD(do_eat)
     new_send_to_char(ch,"You can't eat THAT!\r\n");
     return;
   }
-  if (GET_COND(ch, FULL) > 20)
-  {	/* Stomach full */
+  if (GET_COND(ch, FULL) > 47)
+  {  /* Stomach full */
     new_send_to_char(ch,"You are too full to eat more!\r\n");
     return;
   }
@@ -2417,8 +2435,9 @@ ACMD(do_eat)
   amount = (subcmd == SCMD_EAT ? GET_OBJ_VAL(food, 0) : 1);
 
   gain_condition(ch, FULL, amount);
-
-  if (GET_COND(ch, FULL) > 20)
+  if (GET_COND(ch, FULL) > 47)
+    new_send_to_char(ch,"You are REALLY full.\r\n");
+  else if (GET_COND(ch, FULL) > 20)
     new_send_to_char(ch,"You are full.\r\n");
 
   if (GET_OBJ_VAL(food, 3) && (GET_LEVEL(ch) < LVL_GOD))
@@ -2460,7 +2479,7 @@ ACMD(do_pour)
   if (subcmd == SCMD_POUR)
   {
     if (!*arg1)
-    {		/* No arguments */
+    {          /* No arguments */
       new_send_to_char(ch,"From what do you want to pour?\r\n");
       return;
     }
@@ -2480,7 +2499,7 @@ ACMD(do_pour)
   else if (subcmd == SCMD_FILL)
   {
     if (!*arg1)
-    {		/* no arguments */
+    {          /* no arguments */
       new_send_to_char(ch,"What do you want to fill?  And what are you filling it from?\r\n");
       return;
     }
@@ -2495,7 +2514,7 @@ ACMD(do_pour)
       return;
     }
     if (!*arg2)
-    {		/* no 2nd argument */
+    {          /* no 2nd argument */
       act("What do you want to fill $p from?", FALSE, ch, to_obj, 0,
           TO_CHAR);
       return;
@@ -2522,7 +2541,7 @@ ACMD(do_pour)
     return;
   }
   if (subcmd == SCMD_POUR)
-  {	/* pour */
+  {  /* pour */
     if (!*arg2)
     {
       new_send_to_char(ch,"Where do you want it?  Out or in what?\r\n");
@@ -2535,7 +2554,7 @@ ACMD(do_pour)
       if (GET_OBJ_TYPE(from_obj) == ITEM_VIAL)
         weight_change_object(from_obj, GET_OBJ_WEIGHT(from_obj));
       else
-        weight_change_object(from_obj, -GET_OBJ_VAL(from_obj, 1));	/* Empty */
+        weight_change_object(from_obj, -GET_OBJ_VAL(from_obj, 1));    /* Empty */
       if (GET_OBJ_TYPE(from_obj) == ITEM_VIAL)
         GET_OBJ_VAL(from_obj, 0) = -1; /* vial type */
       else
@@ -2681,7 +2700,7 @@ ACMD(do_pour)
     GET_OBJ_VAL(to_obj, 1) = GET_OBJ_VAL(to_obj, 0);
 
     if (GET_OBJ_VAL(from_obj, 1) < 0)
-    {	/* There was too little */
+    {     /* There was too little */
       GET_OBJ_VAL(to_obj, 1) += GET_OBJ_VAL(from_obj, 1);
       amount += GET_OBJ_VAL(from_obj, 1);
       GET_OBJ_VAL(from_obj, 1) = 0;
@@ -2695,7 +2714,7 @@ ACMD(do_pour)
 
     /* And the weight boogie */
     weight_change_object(from_obj, -amount);
-    weight_change_object(to_obj, amount);	/* Add weight */
+    weight_change_object(to_obj, amount);    /* Add weight */
   }
   else
   {
@@ -2718,11 +2737,11 @@ ACMD(do_pour)
     weight = GET_OBJ_WEIGHT(to_obj);
     weight *= 100;
     weight = (GET_OBJ_VAL(to_obj, 1) - weight)/100.0;
-    weight_change_object(to_obj, weight);	/* Add weight */
+    weight_change_object(to_obj, weight);    /* Add weight */
     weight = GET_OBJ_WEIGHT(from_obj);
     weight *= 100;
     weight = (weight - GET_OBJ_VAL(from_obj, 1))/100.0;
-    weight_change_object(from_obj, -weight);	/* subtract weight */
+    weight_change_object(from_obj, -weight); /* subtract weight */
   }
 
 }
@@ -3116,7 +3135,7 @@ void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
       return;
   }
   */
-if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
+  if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
   {
     new_send_to_char(ch, "You can't wear that! It is owned by %s\r\n", get_name_by_id(obj->owner));
     return;
@@ -3209,7 +3228,7 @@ if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
     }
     else
     {
-      new_send_to_char(ch, "%s", already_wearing[where]);	//mord
+      new_send_to_char(ch, "%s", already_wearing[where]);   //mord
       return;
     }
   }
@@ -3230,7 +3249,6 @@ if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
 int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
 {
   int where = -1;
-  extern const char *body[];
 
   if (!arg || !*arg)
   {
@@ -3793,15 +3811,133 @@ else {new_send_to_char(ch, "Pull what?\r\n");}
   return;
 }
 
+int get_obj_aff(struct obj_data *obj, int location)
+{
+  int i, t = 0;
+  for (i = 0; i < MAX_OBJ_AFFECT; i++)
+    if (obj->affected[i].modifier)
+      if (location == obj->affected[i].location)
+        t += obj->affected[i].modifier;
+
+  return t;
+}
+
+
+
+void compare_weapons(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
+{
+  float wep_multi[2] = { 1, 1};
+  int value1, value2;
+  if (!item || !comp)
+    return;
+  if (IS_FIGHTER(GET_CLASS(ch)))
+    wep_multi[0] = (is_short_wep(item) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
+  else if (IS_ROGUE(GET_CLASS(ch)))
+    wep_multi[0] = (is_short_wep(item) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
+
+  if (IS_FIGHTER(GET_CLASS(ch)))
+    wep_multi[1] = (is_short_wep(comp) ? SHORT_WEP_MULTI : LONG_WEP_MULTI);
+  else if (IS_ROGUE(GET_CLASS(ch)))
+    wep_multi[1] = (is_short_wep(comp) ? SHORT_WEP_MULTI_ROGUE : LONG_WEP_MULTI_ROGUE);
+
+  value1 = (((item->obj_flags.value[1]+1) * item->obj_flags.value[2] * wep_multi[0])/2);
+  value2 = (((comp->obj_flags.value[1]+1) * comp->obj_flags.value[2] * wep_multi[1])/2);
+
+  new_send_to_char(ch, "      {cgYou would do %s damage with ({cRB{cg) then ({cGA{cg).{c0\r\n",
+                   value2 > value1 ? "more" : "less");
+}
+void compare_staves(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
+{
+  float staff_multi(struct char_data *ch, struct obj_data *staff);
+  if (!item || !comp)
+    return;
+  if (staff_multi(ch, comp) > staff_multi(ch, item)) {
+    new_send_to_char(ch, "      {cgYou would get a higher multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  } else {
+    new_send_to_char(ch, "      {cgYou would get a lower multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  }
+}
+void compare_armor(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
+{
+  if (!item || !comp)
+    return;
+
+  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0)) {
+    new_send_to_char(ch, "      {cgYou would get more armor from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  } else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0)) {
+    new_send_to_char(ch, "      {cgYou would get less armor from ({cRB{cg) then ({cGA{cg).{c0\r\n");
+  } else {
+    new_send_to_char(ch, "      {cgYou would get the same armor from ({cRB{cg) and ({cGA{cg).{c0\r\n");
+  }
+  
+}
+void compare_affects(struct char_data *ch, struct obj_data *item, struct obj_data *comp)
+{
+  int i;
+  int points = 0;
+  if (!item || !comp)
+    return;
+  for (i = 0; i < MAX_APPLY; i++)
+    switch (i)
+    {
+    case APPLY_NONE:
+      break;
+    case APPLY_HIT:
+    case APPLY_MANA:
+    case APPLY_MOVE:
+    case APPLY_REGEN_HIT:
+    case APPLY_REGEN_MOVE:
+    case APPLY_REGEN_MANA:
+        points += (0.2 * get_obj_aff(comp, i)) - (0.2 * get_obj_aff(item, i));
+     
+      break;
+    case APPLY_AC:
+      
+        points += (-1 * get_obj_aff(comp, i)) - (-1 * get_obj_aff(item, i));
+
+      break;
+    case APPLY_DAMROLL:
+    case APPLY_STR:
+    case APPLY_CON:
+      if (IS_FIGHTER(GET_CLASS(ch)) || IS_ROGUE(GET_CLASS(ch)))
+      {
+        points += (2 * get_obj_aff(comp, i)) - (2 * get_obj_aff(item, i));
+      }
+      break;
+    case APPLY_CHA:
+    case APPLY_INT:
+    case APPLY_WIS:
+      if (IS_CASTER(GET_CLASS(ch)))
+      {
+        points += (2 * get_obj_aff(comp, i)) - (2 * get_obj_aff(item, i));
+      }
+      else
+        points += get_obj_aff(comp, i) - get_obj_aff(item, i);
+      break;
+    default:
+      points += get_obj_aff(comp, i) - get_obj_aff(item, i);
+      break;
+    }
+
+  new_send_to_char(ch, "      {cg({cRB{cg) has %s beneficial affects then ({cGA{cg) with a difference score of %d.{c0\r\n",
+                    points > 0 ? "more" : "less",  points);
+
+}
+
+int same_location(struct obj_data *a, struct obj_data *b) {
+  int cnt = 0, i;
+  for (i = 1;i < NUM_WEARS;i++) 
+    if (CAN_WEAR(a, i) && CAN_WEAR(b, i))
+      cnt++;
+  return cnt;
+}
+
 ACMD(do_compare)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   struct obj_data *obj1;
   struct obj_data *obj2;
-  int value1;
-  int value2;
-  char *msg;
 
   two_arguments(argument, arg1, arg2);
 
@@ -3818,20 +3954,59 @@ ACMD(do_compare)
   }
 
   if (arg2[0] == '\0')
-  {
+  { int it, cnt = 0;
     for (obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
     {
-      if (!((obj2->obj_flags.type_flag == ITEM_WEAPON) ||
-            (obj2->obj_flags.type_flag == ITEM_FIREWEAPON) ||
-            (obj2->obj_flags.type_flag == ITEM_ARMOR) ||
-            (obj2->obj_flags.type_flag == ITEM_WORN))
-          && CAN_SEE_OBJ(ch, obj2)
-          && obj1->obj_flags.type_flag == obj2->obj_flags.type_flag
-          && CAN_GET_OBJ(ch, obj2))
-        break;
+      if (obj1 == obj2)
+        continue;
+      if (!same_location(obj1, obj2))
+        continue;
+      if (CAN_SEE_OBJ(ch, obj2) && GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1) && CAN_GET_OBJ(ch, obj2)) {
+        new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
+                         obj1->short_description, obj2->short_description);
+        switch (GET_OBJ_TYPE(obj1)) {
+        case ITEM_WEAPON:
+          compare_weapons(ch, obj1, obj2);
+          break;
+        case ITEM_ARMOR:
+          compare_armor(ch, obj1, obj2);
+          break;
+        case ITEM_FOCUS_MAJOR:
+        case ITEM_FOCUS_MINOR:
+          compare_staves(ch, obj1, obj2);
+          break;
+        }
+          compare_affects(ch, obj1, obj2);
+      cnt++;
     }
-
-    if (!obj2)
+    }
+    for (it = 0; it < NUM_WEARS; it++) {
+      obj2 = GET_EQ(ch, it);
+      if (!obj2) continue;
+      if (!CAN_SEE_OBJ(ch, obj2))
+        continue;
+      if (CAN_WEAR(obj1, where_to_worn(it))) {
+        new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj1->short_description, obj2->short_description, body[it]);
+      if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1)) {
+      switch (GET_OBJ_TYPE(obj1)) {
+      case ITEM_WEAPON:
+        compare_weapons(ch, obj1, obj2);
+        break;
+      case ITEM_ARMOR:
+        compare_armor(ch, obj1, obj2);
+        break;
+      case ITEM_FOCUS_MAJOR:
+      case ITEM_FOCUS_MINOR:
+        compare_staves(ch, obj1, obj2);
+        break;
+      }
+      }
+      compare_affects(ch, obj1, obj2);
+        cnt++;
+      }
+    }
+      
+    if (!cnt)
     {
       new_send_to_char(ch,"You aren't wearing anything comparable.\r\n");
       return;
@@ -3841,54 +4016,30 @@ ACMD(do_compare)
   {
     if (!(obj2 = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying)))
     {
-      new_send_to_char(ch,"You do not have that item.\r\n");
-      return;
+      if (!(obj2 = get_obj_in_equip_vis(ch, arg2, NULL, ch->equipment)))
+      {
+        new_send_to_char(ch,"You do not have that item.\r\n");
+        return;
+      }
     }
-  }
-
-  msg = NULL;
-  value1 = 0;
-  value2 = 0;
-
-  if (obj1 == obj2)
-  {
-    msg = "You compare $p to itself.  It looks about the same.";
-  }
-  else if (obj1->obj_flags.type_flag != obj2->obj_flags.type_flag)
-  {
-    msg = "You can't compare $p and $P.";
-  }
-  else
-  {
-    switch (obj1->obj_flags.type_flag)
-    {
-    default:
-      msg = "You can't compare $p and $P.";
-      break;
-
-    case ITEM_ARMOR:
-      value1 = obj1->obj_flags.value[0];
-      value2 = obj2->obj_flags.value[0];
-      break;
-
-    case ITEM_WEAPON:
-      value1 = obj1->obj_flags.value[1] + obj1->obj_flags.value[2];
-      value2 = obj2->obj_flags.value[1] + obj2->obj_flags.value[2];
-      break;
+    new_send_to_char(ch, "{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy):\r\n", obj2->short_description, obj1->short_description);
+    if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1)) {
+      switch (GET_OBJ_TYPE(obj1)) {
+      case ITEM_WEAPON:
+        compare_weapons(ch, obj1, obj2);
+        break;
+      case ITEM_ARMOR:
+        compare_armor(ch, obj1, obj2);
+        break;
+      case ITEM_FOCUS_MAJOR:
+      case ITEM_FOCUS_MINOR:
+        compare_staves(ch, obj1, obj2);
+        break;
+      }
     }
+    compare_affects(ch, obj1, obj2);
   }
 
-  if (!msg)
-  {
-    if (value1 == value2)
-      msg = "$p and $P look about the same.";
-    else if (value1 > value2)
-      msg = "$p looks better than $P.";
-    else
-      msg = "$p looks worse than $P.";
-  }
-
-  act(msg, FALSE, ch, obj1, obj2, TO_CHAR);
   return;
 }
 
@@ -4395,7 +4546,7 @@ int class_speed(struct char_data *ch)
   case CLASS_WARRIOR:
   case CLASS_HUNTER:
     speed = 10;
-    armorcost = 0.65;
+    armorcost = 0.5;
     break;
   default:
     speed = 10;
@@ -4462,7 +4613,7 @@ ACMD(do_skin)
 {
   OBJ_DATA *skin = NULL, *obj = NULL;
   char arg[MAX_INPUT_LENGTH];
-skip_spaces(&argument);
+  skip_spaces(&argument);
 
   if (!*arg)
   {
@@ -4479,14 +4630,14 @@ skip_spaces(&argument);
   if (!IS_OBJ_STAT(obj, ITEM_NPC_CORPSE))
   {
     new_send_to_char(ch, "The skin from that would fall apart too fast.\r\n");
-return;
+    return;
   }
   if (use_stamina( ch, 50) < 0)
   {
     new_send_to_char(ch, "You are far too exausted!");
     return;
   }
-  
+
 
   /* we've got an obj that is a mob corpse and can be food */
   if ((skin = read_object(obj->skin, VIRTUAL)) != NULL)

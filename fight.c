@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.23  2005/10/30 08:37:05  w4dimenscor
+ * Updated compare command and fixed mining
+ *
  * Revision 1.22  2005/09/24 07:11:51  w4dimenscor
  * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
  *
@@ -182,7 +185,6 @@ char *replace_string(const char *str, const char *weapon_singular,
 void perform_violence(void);
 void improve_skill(struct char_data *ch, int skill);
 int compute_armor_class(struct char_data *ch);
-int compute_thaco(struct char_data *ch);
 void send_not_to_spam(char *buf, struct char_data *ch,
                       struct char_data *victim, struct obj_data *weap,
                       int spam);
@@ -320,16 +322,10 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
     {ONE_HANDED, 15, -70, 10, -30, 40, -80, 40, "Projectile"}
   };
 
-float has_staff(struct char_data *ch)
-{
-  float multi = 0;
-  struct obj_data *staff;
+float staff_multi(struct char_data *ch, struct obj_data *staff) {
+  
   int staff_type;
-
-  if (!ch) //its being called from an object spell
-    return 1.0;
-
-  staff = GET_EQ(ch, WEAR_FOCUS);
+  float multi = 0;
   if (staff && (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MINOR||GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR))
   {
     switch ((staff_type = GET_OBJ_VAL(staff, 2)))
@@ -350,12 +346,17 @@ float has_staff(struct char_data *ch)
     }
     if (GET_OBJ_TYPE(staff) == ITEM_FOCUS_MAJOR)
       multi *=2.0;
-
+    
     return multi;
   }
   else
     return 0;
-
+}
+float has_staff(struct char_data *ch)
+{
+  if (!ch) //its being called from an object spell
+    return 1.0;
+  return staff_multi(ch,GET_EQ(ch, WEAR_FOCUS));
 }
 /*Affects from spells should change these dice*/
 
@@ -901,10 +902,10 @@ EVENTFUNC(fight_event)
     GET_FIGHT_EVENT(ch) = NULL;
     if (event_obj)
       free(event_obj);
-
-    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch)))
-      if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)))
-        FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch));
+    /* removed because this part is where gdb would sometimes get segfaults - mord */
+    //    if (!DEAD(ch) && FIGHTING(ch) && !DEAD(FIGHTING(ch)))
+    // if (RIDDEN_BY(FIGHTING(ch)) && HERE(RIDDEN_BY(FIGHTING(ch)), FIGHTING(ch)))
+    //   FIGHTING(ch) = RIDDEN_BY(FIGHTING(ch));
 
     if (FIGHTING(ch) && can_fight(ch, FIGHTING(ch), FALSE) && GET_POS(ch) > POS_STUNNED)
     {

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.13  2005/10/30 08:37:05  w4dimenscor
+ * Updated compare command and fixed mining
+ *
  * Revision 1.12  2005/10/23 13:53:30  w4dimenscor
  * Added thotters login/logout message concept
  *
@@ -155,7 +158,7 @@ ACMD(do_quit)
              if (GET_LOGOUTMSG(ch)==NULL)                                             /*Thotter edit */
                   act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);              /*Thotter edit*/
              else 
-               send_to_room(IN_ROOM(ch), "[%s logout] %s", GET_NAME(ch), GET_LOGOUTMSG(ch));
+               send_to_room(IN_ROOM(ch), "%s\r\n",  GET_LOGOUTMSG(ch));
               
     }
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
@@ -242,12 +245,36 @@ void check_for_dead(void)
       die(d->character, NULL);
   }
 }
+
+int allowed_loginmsg(CHAR_DATA *ch)
+{
+  if (GET_LEVEL(ch) > LVL_HERO)
+    return TRUE;
+  
+  if (!PLR_FLAGGED(ch, PLR_ROLEPLAYER))
+    return FALSE;
+  
+  if (PLR_FLAGGED(ch, PLR_HERO))
+    return TRUE;
+  if (PLR_FLAGGED(ch, PLR_RP_LEADER))
+    return TRUE;
+  
+  if (GET_AWARD(ch) >= 250)
+    return TRUE;
+  
+  return FALSE;
+  
+}
 #define MAX_LOGINMSG_LENGTH 80
 #define MAX_LOGOUTMSG_LENGTH 80
  ACMD(do_loginmsg) {
     skip_spaces(&argument);
     delete_doubledollar(argument);
-
+   if (!allowed_loginmsg(ch))
+   {
+     new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
+     return;
+   }
     if (strlen(argument) > MAX_LOGINMSG_LENGTH)
       new_send_to_char(ch, "Sorry, but your login message can't be longer then %d characters.\r\n",
         MAX_LOGINMSG_LENGTH);
@@ -264,7 +291,11 @@ void check_for_dead(void)
  ACMD(do_logoutmsg) {
     skip_spaces(&argument);
     delete_doubledollar(argument);
-
+   if (!allowed_loginmsg(ch))
+   {
+     new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
+     return;
+   }
     if (strlen(argument) > MAX_LOGOUTMSG_LENGTH)
       new_send_to_char(ch, "Sorry, but your logout message can't be longer then %d characters.\r\n",
         MAX_LOGOUTMSG_LENGTH);

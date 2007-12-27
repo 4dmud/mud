@@ -315,7 +315,7 @@ ACTION(thing_tunneling)
 
       }
 
-      time = (11 RL_SEC) * ((100.0 - MINE_SPEED(ch))/100.0);
+      time = (11 RL_SEC) * ((100.0 - MAX(0, MINE_SPEED(ch)))/100.0);
       break;
     case 1:
       *num = 0;

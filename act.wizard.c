@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.37  2005/10/30 08:37:05  w4dimenscor
+ * Updated compare command and fixed mining
+ *
  * Revision 1.36  2005/10/23 05:21:46  w4dimenscor
  * Altered assemblies, and fixed a few mem leaks
  *
@@ -3009,9 +3012,9 @@ ACMD(do_restore)
           new_send_to_char(ch,"You restored %s.\r\n", GET_NAME(vict));
 
         if (GET_COND(vict, THIRST) != (-1))
-          GET_COND(vict, THIRST) = 24;
+          GET_COND(vict, THIRST) = 48;
         if (GET_COND(vict, FULL) != (-1))
-          GET_COND(vict, FULL) = 24;
+          GET_COND(vict, FULL) = 48;
         GET_HIT(vict) = (GET_MAX_HIT(vict));
         GET_MANA(vict) = (GET_MAX_MANA(vict));
         GET_MOVE(vict) = (GET_MAX_MOVE(vict));

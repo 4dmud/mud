@@ -19,10 +19,10 @@ int arena_ok(struct char_data *ch, struct char_data *victim);
 			  (pos) == WEAR_ANTENNA )
 			  
 #define IS_TOP_LEFT(pos)    ((pos) == WEAR_FINGER_L  || (pos) == WEAR_HANDS ||(pos) == WEAR_ARMS \
-                          || (pos) == WEAR_SHIELD  ||(pos) == WEAR_WRIST_L || (pos) == WEAR_HOLD ||(pos) == WEAR_ABOUT)
+                          || (pos) == WEAR_SHIELD  ||(pos) == WEAR_WRIST_L ||(pos) == WEAR_ABOUT)
 			  
 #define IS_TOP_RIGHT(pos)   ((pos) == WEAR_FINGER_R || (pos) == WEAR_HANDS ||(pos) == WEAR_ARMS \
-                          || (pos) == WEAR_SHIELD || (pos) == WEAR_WRIST_R || (pos) == WEAR_HOLD || (pos) == WEAR_ABOUT)
+                          || (pos) == WEAR_WRIST_R || (pos) == WEAR_HOLD || (pos) == WEAR_ABOUT)
 			  
 #define IS_CENTER(pos)      ((pos) == WEAR_NECK_1 ||(pos) == WEAR_NECK_2 ||(pos) == WEAR_BODY || (pos) == WEAR_SHIELD \
                           || (pos) == WEAR_ABOUT || (pos) == WEAR_WAIST ||(pos) == WEAR_TAIL )

@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/10/23 13:53:30 $
-*  $Revision: 1.4 $
+*  $Date: 2005/10/30 08:37:05 $
+*  $Revision: 1.5 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1260,7 +1260,7 @@ int leave_otrigger(room_data *room, char_data *actor, int dir)
 
   return final;
 }
-
+/* this needs to start a script running, and at the end of the script, call the assemble function - mord*/
 int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];

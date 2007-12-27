@@ -1420,8 +1420,6 @@ ASPELL(spell_knock)
       continue;
     if (!IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_ISDOOR))
       continue;
-    if (!IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_CLOSED))
-      continue;
     if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF))
       continue;
     if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_HIDDEN))
@@ -1429,12 +1427,10 @@ ASPELL(spell_knock)
     if (EXIT(ch, rev_dir[i])->to_room == NULL)
       continue;
     /** lets make it so they can only open doors that are on the inside **/
-    if (!(ROOM_FLAGGED(EXIT(ch, rev_dir[i])->to_room, ROOM_INDOORS)||SECT(EXIT(ch, rev_dir[i])->to_room)==SECT_INSIDE) )
-      continue;
 
     cnt++;
-    send_to_room(IN_ROOM(ch), "The exit %s creaks open under the force of some etherial hand.", dirs[i]);
-    send_to_room(EXIT(ch, i)->to_room, "The exit %s creaks open under the force of some etherial hand.", dirs[rev_dir[i]]);
+    send_to_room(IN_ROOM(ch), "The exit %s slams open under the force of some etherial hand.", dirs[i]);
+    send_to_room(EXIT(ch, i)->to_room, "The exit %s slams open under the force of some etherial hand.", dirs[rev_dir[i]]);
     if (IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
       TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED);
     if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
