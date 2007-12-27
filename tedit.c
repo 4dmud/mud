@@ -13,6 +13,7 @@
 #include "comm.h"
 #include "db.h"
 #include "genolc.h"
+#include "handler.h"
 #include "oasis.h"
 #include "improved-edit.h"
 #include "tedit.h"
@@ -40,16 +41,20 @@ void tedit_string_cleanup(struct descriptor_data *d, int terminator)
     if (!(fl = fopen(storage, "w")))
       new_mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Can't write file '%s'.", storage);
     else {
+      lock_desc(d);
       if (*d->str) {
         strip_cr(*d->str);
         fputs(*d->str, fl);
       }
+      
+      unlock_desc(d);
       fclose(fl);
       new_mudlog(CMP, LVL_GOD, TRUE, "OLC: %s saves '%s'.", GET_NAME(d->character), storage);
       write_to_output(d, "Saved.\r\n");
     }
     break;
   case STRINGADD_ABORT:
+    
     write_to_output(d, "Edit aborted.\r\n");
     act("$n stops editing some scrolls.", TRUE, d->character, 0, 0, TO_ROOM);
     break;

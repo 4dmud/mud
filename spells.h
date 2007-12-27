@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.8  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -632,3 +635,4 @@ int elemental_type(int spell);
 int immune_to(CHAR_DATA *ch, int elem);
 float resist_elem(CHAR_DATA *ch, int elem);
 int grand_master(struct char_data *ch);
+int spell_num(const char *name);

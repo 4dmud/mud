@@ -252,11 +252,14 @@ continue;
 	}
 
 	if ((change >= 1) && (change <= 6)) {
-	    for (j = descriptor_list; j; j = j->next)
+     for (j = descriptor_list; j; j = j->next) {
+       lock_desc(j);
 		if (!j->connected && j->character && AWAKE(j->character) &&
 		    OUTSIDE(j->character) &&
 		    (zone_table[j->character->in_room->zone].number == i))
 		    write_to_output(j, "%s", buf);
+       unlock_desc(j);
+     }
 	}
 
     }

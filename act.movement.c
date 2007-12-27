@@ -49,9 +49,9 @@ void raw_kill(CHAR_DATA *ch, CHAR_DATA * vict);
 
 
 /* MatingMod Defines */
-#define NINE_MONTHS     6000	/* 6000 realtime minutes TO GO */
+#define NINE_MONTHS     6000  /* 6000 realtime minutes TO GO */
 #define MONTHS_8        5333
-#define MONTHS_7        4666	/* Note: These are MONTHS REMAINING */
+#define MONTHS_7        4666  /* Note: These are MONTHS REMAINING */
 #define MONTHS_6        4000
 #define MONTHS_5        3333
 #define MONTHS_4        2666
@@ -295,10 +295,10 @@ int move_cost(struct char_data *ch, int dir)
     new_send_to_char(ch, "You drag your feet under that amount of weight!\r\n");
     need_movement += GET_MAX_MOVE(ch) * 0.5;
   }
-if (has_vehicle(ch))
-return 0;
-else
-  return need_movement;
+  if (has_vehicle(ch))
+    return 0;
+  else
+    return need_movement;
 }
 
 /* do_simple_move assumes
@@ -366,6 +366,11 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
       new_send_to_char(ch, "You can't move out of this sector.\r\n");
     return 0;
   }
+  if (ch->hitched && !ROOM_FLAGGED(EXIT(ch, dir)->to_room, ROOM_VEHICLE))
+  {
+    new_send_to_char(ch, "You cannot drag the %s that direction.\r\n", ch->hitched->short_description);
+    return 0;
+  }
   if (!IS_IMM(ch))
   {
     if ((ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)))
@@ -422,40 +427,40 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
       }
     }
   }//is imm
-  
-  
-    if (SECT(EXIT(ch, dir)->to_room) == SECT_SPACE)
-    {
-      struct obj_data *v;
-      if ((v = has_vehicle(ch)) == NULL)
-      {
-        need_movement = 1000;
-	stam = use_stamina(ch, 100);
-      }
-      else
-      {
-        if (GET_FUEL(v) == 0)
-        {
-          act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
-          return 0;
-        }
-        GET_FUEL(v)--;
 
-      }
+
+  if (SECT(EXIT(ch, dir)->to_room) == SECT_SPACE)
+  {
+    struct obj_data *v;
+    if ((v = has_vehicle(ch)) == NULL)
+    {
+      need_movement = 1000;
+      stam = use_stamina(ch, 100);
     }
     else
     {
-      struct obj_data *v;
-      if ((v = has_vehicle(ch)) != NULL)
+      if (GET_FUEL(v) == 0)
       {
-        if (GET_FUEL(v) == 0)
-        {
-          act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
-          return 0;
-        }
-        GET_FUEL(v)--;
+        act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
+        return 0;
       }
+      GET_FUEL(v)--;
+
     }
+  }
+  else
+  {
+    struct obj_data *v;
+    if ((v = has_vehicle(ch)) != NULL)
+    {
+      if (GET_FUEL(v) == 0)
+      {
+        act("Your $p is out of fuel.", FALSE, ch, v, NULL, TO_CHAR);
+        return 0;
+      }
+      GET_FUEL(v)--;
+    }
+  }
 
   /*
    * if this room or the one we're going to is in space, 
@@ -482,10 +487,13 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
    }
    }
    */
-   if (!need_movement)
-  need_movement = move_cost(ch, dir);
+  if (!need_movement)
+    need_movement = move_cost(ch, dir);
   if (need_movement == -1) //giving birth
     return 0;
+
+  if (ch->hitched)
+    need_movement *= 1.5;
 
 
   if ((RIDING(ch) && HERE(RIDING(ch), ch)))
@@ -511,7 +519,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     }
   }
   {
-    
+
     if (!IS_NPC(ch) && GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
       stam += use_stamina(ch, 1);
     else if (RIDING(ch) && HERE(RIDING(ch), ch))
@@ -552,7 +560,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         RIDING(ch), TO_VICT);
     act("$N rears backwards, throwing $n to the ground.", FALSE, ch, 0,
         RIDING(ch), TO_NOTVICT);
-    
+
     set_fighting(RIDING(ch), ch);
     dismount_char(ch);
     return (0);
@@ -640,13 +648,29 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (IS_AFFECTED(ch, AFF_SNEAK))
       {
-        snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
-        act(buf2, TRUE, RIDING(ch), 0, 0, TO_ROOM);
+        if (RIDING(ch)->hitched)
+        {
+          snprintf(buf2, sizeof(buf2), "$n hovers %s followed by $p.", dirs[dir]);
+          act(buf2, TRUE, RIDING(ch), RIDING(ch)->hitched, 0, TO_ROOM);
+        }
+        else
+        {
+          snprintf(buf2, sizeof(buf2), "$n hovers %s.", dirs[dir]);
+          act(buf2, TRUE, RIDING(ch), 0, 0, TO_ROOM);
+        }
       }
       else
       {
-        snprintf(buf2, sizeof(buf2), "$n rides $N %s.", dirs[dir]);
-        act(buf2, TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
+        if (RIDING(ch)->hitched)
+        {
+          snprintf(buf2, sizeof(buf2), "$n rides $N %s pulling $p.", dirs[dir]);
+          act(buf2, TRUE, ch, RIDING(ch)->hitched, RIDING(ch), TO_NOTVICT);
+        }
+        else
+        {
+          snprintf(buf2, sizeof(buf2), "$n rides $N %s.", dirs[dir]);
+          act(buf2, TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
+        }
       }
     }
   }
@@ -656,8 +680,16 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK))
       {
-        snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
-        act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+        if (ch->hitched)
+        {
+          snprintf(buf2, sizeof(buf2), "$n leaves %s pulling $p.", dirs[dir]);
+          act(buf2, TRUE, ch, ch->hitched, 0, TO_ROOM);
+        }
+        else
+        {
+          snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
+          act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+        }
       }
       else
       {
@@ -678,13 +710,15 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
              && !AFF_FLAGGED(ch, AFF_HASTE))
       len = snprintf(local_buf, sizeof(local_buf), " slowly");
 
+    if (ch->hitched)
+      len = snprintf(local_buf + len, sizeof(local_buf) - len, " pulling $p");
 
     if ((GET_HIT(ch) * 10) < (GET_MAX_HIT(ch)))
-      snprintf(local_buf + len, sizeof(local_buf) - len, ", leaving a trail of dark fluid.");
+      len = snprintf(local_buf + len, sizeof(local_buf) - len, ", leaving a trail of dark fluid.");
     else if (!IS_NPC(ch) && GET_COND(ch, DRUNK) > 10)
-      snprintf(local_buf + len, sizeof(local_buf) - len, ", weaving crookedly.");
+      len = snprintf(local_buf + len, sizeof(local_buf) - len, ", weaving crookedly.");
     else
-      snprintf(local_buf + len, sizeof(local_buf) - len, ".");
+      len = snprintf(local_buf + len, sizeof(local_buf) - len, ".");
 
 
     if (AFF_FLAGGED((ch), AFF_FLY))
@@ -776,7 +810,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         snprintf(buf2, sizeof(buf2), "$n leaves %s%s", dirs[dir], local_buf);
         break;
       }
-    act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+    act(buf2, TRUE, ch, ch->hitched, 0, TO_ROOM);
   }
   //end and restart message restrict
   message_type = NOTHING;
@@ -793,10 +827,10 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   was_in = IN_ROOM(ch);
   if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
     bike = SITTING(ch);
-  
+
 
   move_char_to(ch, was_in->dir_option[dir]->to_room);
-   if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
+  if (ch->desc != NULL && !IS_NPC(ch) && (!PLR_FLAGGED(ch, PLR_SPEEDWALK) && (ch->master ? !PLR_FLAGGED(ch->master, PLR_SPEEDWALK) : 1)))
     look_at_room(ch, 0);
 
   if (bike)
@@ -818,9 +852,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     SITTING(ch) = bike;
     NEXT_SITTING(ch) = NULL;
     GET_OBJ_VAL(bike, 1) += 1;
-    
+
   }
 
+  if (ch->hitched)
+  {
+    obj_from_room(ch->hitched);
+    obj_to_room(ch->hitched, IN_ROOM(ch));
+  }
   if (RIDING(ch) && IN_ROOM(RIDING(ch)) == was_in && IN_ROOM(RIDING(ch)) != IN_ROOM(ch))
   {
     if (move_char_to(RIDING(ch), IN_ROOM(ch)))
@@ -843,35 +882,56 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
   if (!IS_AFFECTED(ch, AFF_SNEAK))
   {
+
     if (riding && same_room && !IS_AFFECTED(RIDING(ch), AFF_SNEAK))
     {
-      snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, riding $N.",
-               (dir < UP ? "the " : ""),
-               (dir == UP ? "below" : dir ==
-                DOWN ? "above" : dirs[rev_dir[dir]]));
+      if (RIDING(ch)->hitched)
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, riding $N followed by $p.",
+                 (dir < UP ? "the " : ""),
+                 (dir == UP ? "below" : dir ==
+                  DOWN ? "above" : dirs[rev_dir[dir]]));
+      else
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, riding $N.",
+                 (dir < UP ? "the " : ""),
+                 (dir == UP ? "below" : dir ==
+                  DOWN ? "above" : dirs[rev_dir[dir]]));
       if (has_moved)
-        act(buf2, TRUE, ch, 0, RIDING(ch), TO_ROOM);
+        act(buf2, TRUE, ch, RIDING(ch)->hitched, RIDING(ch), TO_ROOM);
     }
     else if (ridden_by && same_room
              && !IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK))
     {
-      snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, ridden by $N.",
-               (dir < UP ? "the " : ""),
-               (dir == UP ? "below" : dir ==
-                DOWN ? "above" : dirs[rev_dir[dir]]));
+      if (ch->hitched)
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s pulling $p, ridden by $N.",
+                 (dir < UP ? "the " : ""),
+                 (dir == UP ? "below" : dir ==
+                  DOWN ? "above" : dirs[rev_dir[dir]]));
+      else
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, ridden by $N.",
+                 (dir < UP ? "the " : ""),
+                 (dir == UP ? "below" : dir ==
+                  DOWN ? "above" : dirs[rev_dir[dir]]));
       if (has_moved)
-        act(buf2, TRUE, ch, 0, RIDDEN_BY(ch), TO_ROOM);
+        act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
     }
     else if (!riding || (riding && !same_room))
     {
-      act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
+      if (ch->hitched)
+        act("$n has arrived pulling $p.", TRUE, ch, ch->hitched, 0, TO_ROOM);
+      else
+        act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
     }
   }
   if (IS_AFFECTED(ch, AFF_SNEAK))
     if (ch->master && ch->master != ch)
       if (IN_ROOM(ch->master) == IN_ROOM(ch))
-        new_send_to_char(ch->master, "%s sneaks in after you.\r\n",
-                         PERS(ch, ch->master));
+      {
+        if (ch->hitched)
+          new_send_to_char(ch->master, "%s sneaks in after you pulling %s.\r\n", PERS(ch, ch->master), ch->hitched->short_description);
+        else
+          new_send_to_char(ch->master, "%s sneaks in after you.\r\n", PERS(ch, ch->master));
+
+      }
 
   /*if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_HERD)) {
   for (herd = was_in->people; herd; herd = next) {
@@ -888,7 +948,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   NULL, TO_ROOM);
   } */
 
- 
+
 
   /* end the message restriction */
   message_type = NOTHING;
@@ -1106,14 +1166,14 @@ int find_door(struct char_data *ch, const char *type, char *dir,
   int door;
 
   if (*dir)
-  {			/* a direction was specified */
+  {            /* a direction was specified */
     if ((door = search_block(dir, dirs, FALSE)) == -1)
-    {	/* Partial Match */
+    {     /* Partial Match */
       send_to_char("That's not a direction.\r\n", ch);
       return (-1);
     }
     if (EXIT(ch, door) && !IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN))
-    {	/* Braces added according to indent. -gg */
+    {     /* Braces added according to indent. -gg */
       if (EXIT(ch, door)->keyword)
       {
         if (isname(type, EXIT(ch, door)->keyword))
@@ -1136,7 +1196,7 @@ int find_door(struct char_data *ch, const char *type, char *dir,
     }
   }
   else
-  {			/* try to locate the keyword */
+  {            /* try to locate the keyword */
     if (!*type)
     {
       new_send_to_char(ch, "What is it you want to %s?\r\n", cmdname);
@@ -1173,10 +1233,10 @@ int has_key(struct char_data *ch, obj_vnum key)
 
 
 
-#define NEED_OPEN	(1 << 0)
-#define NEED_CLOSED	(1 << 1)
-#define NEED_UNLOCKED	(1 << 2)
-#define NEED_LOCKED	(1 << 3)
+#define NEED_OPEN   (1 << 0)
+#define NEED_CLOSED (1 << 1)
+#define NEED_UNLOCKED    (1 << 2)
+#define NEED_LOCKED (1 << 3)
 
 const char *cmd_door[] =
   {
@@ -1197,13 +1257,13 @@ const int flags_door[] =
   };
 
 
-#define EXITN(room, door)		(room->dir_option[door])
-#define OPEN_DOOR(room, obj, door)	((obj) ?\
-		(TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_CLOSED)) :\
-		(TOGGLE_BIT(EXITN(room, door)->exit_info, EX_CLOSED)))
-#define LOCK_DOOR(room, obj, door)	((obj) ?\
-		(TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED)) :\
-		(TOGGLE_BIT(EXITN(room, door)->exit_info, EX_LOCKED)))
+#define EXITN(room, door)          (room->dir_option[door])
+#define OPEN_DOOR(room, obj, door) ((obj) ?\
+          (TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_CLOSED)) :\
+          (TOGGLE_BIT(EXITN(room, door)->exit_info, EX_CLOSED)))
+#define LOCK_DOOR(room, obj, door) ((obj) ?\
+          (TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED)) :\
+          (TOGGLE_BIT(EXITN(room, door)->exit_info, EX_LOCKED)))
 
 void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
                 int scmd)
@@ -1294,26 +1354,26 @@ int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof, int scmd)
 }
 
 
-#define DOOR_IS_OPENABLE(ch, obj, door)	((obj) ? \
-			((GET_OBJ_TYPE(obj) == ITEM_CONTAINER) && \
-			OBJVAL_FLAGGED(obj, CONT_CLOSEABLE)) :\
-			((EXIT_FLAGGED(EXIT(ch, door), EX_ISDOOR))))
-#define DOOR_IS_OPEN(ch, obj, door)	((obj) ? \
-			(!OBJVAL_FLAGGED(obj, CONT_CLOSED)) :\
-			(!EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)))
-#define DOOR_IS_UNLOCKED(ch, obj, door)	((obj) ? \
-			(!OBJVAL_FLAGGED(obj, CONT_LOCKED)) :\
-			(!EXIT_FLAGGED(EXIT(ch, door), EX_LOCKED)))
+#define DOOR_IS_OPENABLE(ch, obj, door) ((obj) ? \
+               ((GET_OBJ_TYPE(obj) == ITEM_CONTAINER) && \
+               OBJVAL_FLAGGED(obj, CONT_CLOSEABLE)) :\
+               ((EXIT_FLAGGED(EXIT(ch, door), EX_ISDOOR))))
+#define DOOR_IS_OPEN(ch, obj, door)     ((obj) ? \
+               (!OBJVAL_FLAGGED(obj, CONT_CLOSED)) :\
+               (!EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)))
+#define DOOR_IS_UNLOCKED(ch, obj, door) ((obj) ? \
+               (!OBJVAL_FLAGGED(obj, CONT_LOCKED)) :\
+               (!EXIT_FLAGGED(EXIT(ch, door), EX_LOCKED)))
 #define DOOR_IS_PICKPROOF(ch, obj, door) ((obj) ? \
-			(OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) : \
-			(EXIT_FLAGGED(EXIT(ch, door), EX_PICKPROOF)))
+               (OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) : \
+               (EXIT_FLAGGED(EXIT(ch, door), EX_PICKPROOF)))
 
-#define DOOR_IS_CLOSED(ch, obj, door)	(!(DOOR_IS_OPEN(ch, obj, door)))
-#define DOOR_IS_LOCKED(ch, obj, door)	(!(DOOR_IS_UNLOCKED(ch, obj, door)))
-#define DOOR_KEY(ch, obj, door)		((obj) ? (GET_OBJ_VAL(obj, 2)) : \
-					(EXIT(ch, door)->key))
-#define DOOR_LOCK(ch, obj, door)	((obj) ? (GET_OBJ_VAL(obj, 1)) : \
-					(EXIT(ch, door)->exit_info))
+#define DOOR_IS_CLOSED(ch, obj, door)   (!(DOOR_IS_OPEN(ch, obj, door)))
+#define DOOR_IS_LOCKED(ch, obj, door)   (!(DOOR_IS_UNLOCKED(ch, obj, door)))
+#define DOOR_KEY(ch, obj, door)         ((obj) ? (GET_OBJ_VAL(obj, 2)) : \
+                         (EXIT(ch, door)->key))
+#define DOOR_LOCK(ch, obj, door)   ((obj) ? (GET_OBJ_VAL(obj, 1)) : \
+                         (EXIT(ch, door)->exit_info))
 
 ACMD(do_gen_door)
 {
@@ -1372,14 +1432,14 @@ ACMD(do_gen_door)
   }
   return;
 }
-#define FTYPE_NONE	0
-#define FTYPE_OPEN 	1
-#define FTYPE_CLOSE	2
-#define FTYPE_BUILD	3
-#define FTYPE_REMOVE	4
-#define FTYPE_WIRE	5
-#define FTYPE_WOOD	6
-#define FTYPE_MESH	7
+#define FTYPE_NONE  0
+#define FTYPE_OPEN  1
+#define FTYPE_CLOSE 2
+#define FTYPE_BUILD 3
+#define FTYPE_REMOVE     4
+#define FTYPE_WIRE  5
+#define FTYPE_WOOD  6
+#define FTYPE_MESH  7
 #define GATE_USE_MSG "GATE <OPEN|CLOSE|BUILD|REMOVE> <direction>\r\n"
 #define FENCE_USE_MSG "FENCE <BUILD|REMOVE> <WIRE|TIMBER|MESH> <direction>\r\n"
 
@@ -1493,9 +1553,9 @@ int followers_to_master(struct char_data *ch, room_rnum was_in)
   if (!ch->followers)
     return 0;
   if (!IN_ROOM(ch))
-      return 0;
-      if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH))
-        return 0;
+    return 0;
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH))
+    return 0;
 
   for (k = ch->followers; k; k = next)
   {
@@ -1532,8 +1592,8 @@ ACMD(do_enter)
   int pass = TRUE;
 
   if (*buf)
-  {			/* an argument was supplied, search for door
-                                        				 * keyword */
+  {            /* an argument was supplied, search for door
+                                                             * keyword */
     if ((obj = get_obj_in_list_vis(ch, buf, NULL, IN_ROOM(ch)->contents)))
     {
       if (CAN_SEE_OBJ(ch, obj))
@@ -2084,7 +2144,7 @@ ACMD(do_follow)
         ch->master, TO_CHAR);
   }
   else
-  {			/* Not Charmed follow person */
+  {            /* Not Charmed follow person */
     if (leader == ch)
     {
       if (!ch->master)
@@ -2189,18 +2249,20 @@ ASKILL(skill_mount)
       act("$n mounts $p", TRUE, ch, obj, NULL, TO_ROOM);
       return 0;
     }
-    if (!vict) {
-  act("You can't mount $p!", FALSE, ch, obj, NULL, TO_CHAR);
-  return 0;
-  }
+    if (!vict)
+    {
+      act("You can't mount $p!", FALSE, ch, obj, NULL, TO_CHAR);
+      return 0;
+    }
 
   }
-  else if (!vict) {
-  act("You can't mount that!", FALSE, ch, NULL, NULL, TO_CHAR);
-  return 0;
+  else if (!vict)
+  {
+    act("You can't mount that!", FALSE, ch, NULL, NULL, TO_CHAR);
+    return 0;
   }
-  
-  
+
+
   if ((GET_RACE(ch) == RACE_CENTAUR && GET_LEVEL(ch) < LVL_IMMORT) || (!IS_NPC(vict) && GET_RACE(vict) != RACE_CENTAUR))
   {
     send_to_char("Ehh... no.\r\n", ch);
@@ -2275,23 +2337,27 @@ ACMD(do_dismount)
 
   if (RIDING(ch))
   {
-    
-  if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch))
+
+    if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch))
+    {
+      new_send_to_char(ch,"Yah, right, and then drown...\r\n");
+      return;
+    }
+
+    act("You dismount $N.", FALSE, ch, 0, RIDING(ch), TO_CHAR);
+    act("$n dismounts from you.", FALSE, ch, 0, RIDING(ch), TO_VICT);
+    act("$n dismounts $N.", TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
+  }
+  else if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
   {
-    new_send_to_char(ch,"Yah, right, and then drown...\r\n");
+    act("You dismount $p.", FALSE, ch, SITTING(ch), NULL, TO_CHAR);
+    act("$n dismounts $p.", TRUE, ch, SITTING(ch), NULL, TO_ROOM);
+  }
+  else
+  {
+    new_send_to_char(ch, "You aren't even riding anything.\r\n");
     return;
   }
-
-  act("You dismount $N.", FALSE, ch, 0, RIDING(ch), TO_CHAR);
-  act("$n dismounts from you.", FALSE, ch, 0, RIDING(ch), TO_VICT);
-  act("$n dismounts $N.", TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
-  } else if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE) {
-  act("You dismount $p.", FALSE, ch, SITTING(ch), NULL, TO_CHAR);
-  act("$n dismounts $p.", TRUE, ch, SITTING(ch), NULL, TO_ROOM);
-  } else {
-  new_send_to_char(ch, "You aren't even riding anything.\r\n");
-    return;
-    }
   dismount_char(ch);
 }
 

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.30  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.29  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -165,8 +168,6 @@ C_FUNC(push_object);
 
 /* Local Variables */
 int slipping = FALSE;
-int curbid = 0;               /* current bid on item being auctioned */
-int aucstat = AUC_NULL_STATE; /* state of auction.. first_bid etc.. */
 struct obj_data *obj_selling = NULL;    /* current object for sale */
 struct char_data *ch_selling = NULL;    /* current character selling obj */
 struct char_data *ch_buying = NULL;     /* current character buying the object */
@@ -188,22 +189,6 @@ int class_speed(struct char_data *ch);
 int race_speed(struct char_data *ch);
 int alter_gold(struct char_data *ch, gold_int amount);
 int where_to_worn(int where);
-
-
-char *auctioneer[AUC_BID + 1] = {
-
-                                  "The auctioneer auctions, '$n puts $p up for sale at %d coins.'",
-                                  "The auctioneer auctions, '$p at %d coins going once!'",
-                                  "The auctioneer auctions, '$p at %d coins going twice!'",
-                                  "The auctioneer auctions, 'Last call: $p going to $N for %d coins.'",
-                                  "The auctioneer auctions, 'Unfortunately $p is unsold, returning it to $n.'",
-                                  "The auctioneer auctions, 'SOLD! $p to $n for %d coins!'",
-                                  "The auctioneer auctions, 'Sorry, $n has cancelled the auction.'",
-                                  "The auctioneer auctions, 'Sorry, $n has left us, the auction can't go on.'",
-                                  "The auctioneer auctions, 'Sorry, $p has been confiscated, shame on you $n.'",
-                                  "The auctioneer tells you, '$n is selling $p for %d gold.'",
-                                  "The auctioneer auctions, '$n bids %d coins on $p.'"
-                                };
 
 /* local functions */
 bool can_take_obj(struct char_data *ch, struct obj_data *obj);
@@ -848,7 +833,7 @@ void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
     obj_to_char(item, ch);
     get_check_money(ch, item);
   }
-  
+
   if (REMORTS(ch) && !HERE(corpse, ch))
   {
     if (REMORTS(ch) < 5)
@@ -856,7 +841,7 @@ void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse)
     else
       GET_WAIT_STATE(ch) = REMORTS(ch) RL_SEC;
   }
-      extract_obj(corpse);
+  extract_obj(corpse);
   save_corpses();
   Crash_crashsave(ch);
 }
@@ -881,7 +866,7 @@ int automeld(struct obj_data *obj)
   {
     if (d->character && GET_ID(d->character) == GET_OBJ_VAL(obj, 0))
     {
-
+      
       perform_meld(d->character, obj);
       new_mudlog( CMP, GET_LEVEL(d->character), TRUE, "AUTOMELD: %s (online - link)", GET_NAME(d->character));
       return 1;
@@ -1537,9 +1522,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                                               new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                                                return (0);
-                                                                                                            }*/
+                                                                                                                           new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                                                            return (0);
+                                                                                                                        }*/
   }
 
 
@@ -1864,7 +1849,9 @@ void perform_give_gold(struct char_data *ch, struct char_data *vict,
   {
     new_send_to_char(ch,"Heh heh heh ... we are jolly funny today, eh?\r\n");
     return;
-  } else if (amount > 2000000000) {
+  }
+  else if (amount > 2000000000)
+  {
     new_send_to_char(ch,"You can't give more then 2 billion.\r\n");
     return;
   }
@@ -3697,7 +3684,7 @@ C_FUNC(pull_object)
   struct obj_data *obj;
   room_rnum rm;
   int dir = 0;
-  obj = find_obj(d->character->loader);
+  obj = find_obj(d->character->pulling);
   d->character->pulling = -1;
   if (!obj || !HERE(d->character, obj))
   {
@@ -3760,6 +3747,177 @@ C_FUNC(pull_object)
 
 
 }
+
+ACMD(do_hitch)
+{
+  char arg1[MAX_INPUT_LENGTH], *arg2;
+  struct obj_data *obj;
+  struct char_data *vict = NULL;
+  skip_spaces(&argument);
+  arg2 = str_until(argument, "to", arg1, sizeof(arg1));
+  skip_spaces(&arg2);
+
+  if (!*arg1)
+  {
+    new_send_to_char(ch,"Hitch <cart or other item> to <centaur or animal>\r\n");
+    return;
+  }
+  if ((!*arg2 || isname(arg2, "me self")) && !((!IS_NPC(ch) && GET_RACE(ch) == RACE_CENTAUR) || (IS_NPC(ch) && GET_CLASS(ch) == CLASS_ANIMAL)))
+  {
+    new_send_to_char(ch, "You can't hitch that to yourself since you are not an animal or a Centaur.\r\n");
+    return;
+  }
+  else
+  {
+    if (!IS_NPC(ch))
+    {
+      if ((GET_RACE(ch) == RACE_CENTAUR) && PRF_FLAGGED(ch, PRF_MOUNTABLE))
+        vict = ch;
+      else
+      {
+        new_send_to_char(ch, "You must be mountable to hitch things to yourself.\r\n");
+        return;
+      }
+    }
+    else
+      vict = ch;
+  }
+
+
+  if (NULL == (obj = get_obj_in_list_vis(ch, arg1, NULL, IN_ROOM(ch)->contents)))
+  {
+    new_send_to_char(ch, "That isn't here.\r\n");
+    return;
+  }
+  if (!OBJ_FLAGGED(obj, ITEM_SHIFTABLE))
+  {
+    new_send_to_char(ch, "That isn't hitchable!\r\n");
+    return;
+  }
+
+  if (!vict && !(vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_ROOM)))
+  {
+    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  if (!((!IS_NPC(vict) && GET_RACE(vict) == RACE_CENTAUR && PRF_FLAGGED(vict, PRF_MOUNTABLE)) || (IS_NPC(vict) && GET_CLASS(vict) == CLASS_ANIMAL)))
+  {
+    new_send_to_char(ch, "You can only hitch things to mountable players and animals.\r\n");
+    if (!IS_NPC(vict))
+      new_send_to_char(vict, "%s just tried to hitch something to you but you are not mountable.\r\n", PERS(vict, ch));
+    return;
+  }
+  if (obj->hitched)
+  {
+    new_send_to_char(ch, "%s is already hitched to something. Unhitch it first.\r\n", obj->short_description);
+    return;
+  }
+  if (vict->hitched)
+  {
+    new_send_to_char(ch, "%s is already hitched to something. Unhitch it first.\r\n", GET_NAME(vict));
+    return;
+  }
+  if (vict == ch)
+  {
+    act("You hitch $p to yourself.", TRUE, ch, obj, vict, TO_CHAR);
+    act("$n hitches $p to $mself.", TRUE, ch, obj, vict, TO_CHAR);
+  }
+  else
+  {
+    act("$n hitches $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT);
+    act("You hitch $p to $N.", TRUE, ch, obj, vict, TO_CHAR);
+    act("$n hitches $p to you.", TRUE, ch, obj, vict, TO_VICT);
+  }
+  obj->hitched = vict;
+  ch->hitched = obj;
+
+
+}
+
+void unhitch_item(struct obj_data *obj)
+{
+  struct char_data *tmp;
+  if (obj && obj->hitched)
+  {
+    for (tmp = character_list;tmp;tmp = tmp->next)
+    {
+      if (obj->hitched == tmp)
+      {
+        tmp->hitched = NULL;
+        break;
+      }
+    }
+    obj->hitched = NULL;
+  }
+}
+void unhitch_mob(struct char_data *ch)
+{
+  struct obj_data *tmp;
+  if (ch && ch->hitched)
+  {
+    for (tmp = object_list;tmp;tmp = tmp->next)
+    {
+      if (ch->hitched == tmp)
+      {
+        tmp->hitched = NULL;
+        break;
+      }
+    }
+    ch->hitched = NULL;
+  }
+}
+
+ACMD(do_unhitch)
+{
+  struct obj_data *obj;
+  struct char_data *vict = NULL;
+  skip_spaces(&argument);
+
+  if (!*argument)
+  {
+    new_send_to_char(ch,"Unhitch what?\r\n");
+    return;
+  }
+
+  if (NULL == (obj = get_obj_in_list_vis(ch, argument, NULL, IN_ROOM(ch)->contents)))
+  {
+    if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM)))
+    {
+      new_send_to_char(ch, "I can't find that item, animal or Centaur here.");
+      return;
+    }
+    else
+    {
+      if (vict->hitched)
+        obj = vict->hitched;
+    }
+  }
+  else
+  {
+    if (obj->hitched)
+      vict = obj->hitched;
+  }
+
+  if (vict == ch)
+  {
+    act("You unhitch $p from yourself.", TRUE, ch, obj, vict, TO_CHAR);
+    act("$n unhitches $p from $mself.", TRUE, ch, obj, vict, TO_ROOM);
+  }
+  else
+  {
+    act("$n unhitches $p from $N.", TRUE, ch, obj, vict, TO_NOTVICT);
+    act("You unhitch $p from $N.", TRUE, ch, obj, vict, TO_CHAR);
+    act("$n unhitches $p from you.", TRUE, ch, obj, vict, TO_VICT);
+  }
+  unhitch_item(obj);
+  unhitch_mob(vict);
+  if (obj->hitched)
+    log("Obj didn't unhitch properly.");
+  if (vict->hitched)
+    log("Mob didn't unhitch properly");
+}
+
 ACMD(do_pull)
 {
   //  char arg[MAX_INPUT_LENGTH];
@@ -3778,6 +3936,11 @@ ACMD(do_pull)
     if (!OBJ_FLAGGED(obj, ITEM_SHIFTABLE))
     {
       new_send_to_char(ch, "That isn't pullable!\r\n");
+      return;
+    }
+    if (obj->hitched)
+    {
+      new_send_to_char(ch, "You will need to unhitch it first!\r\n");
       return;
     }
     /* check each direction to see if it can be pulled into. */
@@ -3800,7 +3963,7 @@ ACMD(do_pull)
     }
     else
       new_send_to_char(ch, "\r\n");
-    new_send_to_char(ch, "Please type a direction:");
+    new_send_to_char(ch, "Please type a direction:\r\n");
     ch->pulling = GET_ID(obj);
     line_input(ch->desc, argument, pull_object, NULL);
   }
@@ -3853,14 +4016,14 @@ void compare_weapons(struct char_data *ch,struct obj_data *item, struct obj_data
     wep_multi[0] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
   else
     wep_multi[0] = 1.0f;
-  
+
   if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(comp))
     wep_multi[1] += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
   else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(comp))
     wep_multi[1] += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
   else
     wep_multi[1] = 1.0f;
-  
+
   value1 = (((item->obj_flags.value[1]+1) * item->obj_flags.value[2] * wep_multi[0])/2);
   value2 = (((comp->obj_flags.value[1]+1) * comp->obj_flags.value[2] * wep_multi[1])/2);
 
@@ -3872,12 +4035,16 @@ void compare_staves(struct char_data *ch,struct obj_data *item, struct obj_data 
   float staff_multi(struct char_data *ch, struct obj_data *staff);
   if (!item || !comp)
     return;
-  if (staff_multi(ch, comp) > staff_multi(ch, item)) {
+  if (staff_multi(ch, comp) > staff_multi(ch, item))
+  {
     new_send_to_char(ch, "      {cgYou would get a higher multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  }else if (staff_multi(ch, comp) == staff_multi(ch, item)){
+  }
+  else if (staff_multi(ch, comp) == staff_multi(ch, item))
+  {
     new_send_to_char(ch, "      {cgYou would get the same multiplyer from ({cRB{cg) and ({cGA{cg).{c0\r\n");
   }
-  else {
+  else
+  {
     new_send_to_char(ch, "      {cgYou would get a lower multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n");
   }
 }
@@ -3886,28 +4053,38 @@ void compare_armor(struct char_data *ch,struct obj_data *item, struct obj_data *
   if (!item || !comp)
     return;
 
-  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0)) {
+  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0))
+  {
     new_send_to_char(ch, "      {cgYou would get more armor from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  } else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0)) {
+  }
+  else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0))
+  {
     new_send_to_char(ch, "      {cgYou would get the same from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  } else {
+  }
+  else
+  {
     new_send_to_char(ch, "      {cgYou would get less armor from ({cRB{cg) and ({cGA{cg).{c0\r\n");
   }
-  
+
 }
 void compare_food(struct char_data *ch,struct obj_data *item, struct obj_data *comp)
 {
   if (!item || !comp)
     return;
-  
-  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0)) {
+
+  if (GET_OBJ_VAL(comp, 0) > GET_OBJ_VAL(item, 0))
+  {
     new_send_to_char(ch, "      {cgYou would get more food from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  } else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0)) {
+  }
+  else if (GET_OBJ_VAL(comp, 0) == GET_OBJ_VAL(item, 0))
+  {
     new_send_to_char(ch, "      {cgYou would get the same food from ({cRB{cg) then ({cGA{cg).{c0\r\n");
-  } else {
+  }
+  else
+  {
     new_send_to_char(ch, "      {cgYou would get less food from ({cRB{cg) and ({cGA{cg).{c0\r\n");
   }
-  
+
 }
 void compare_affects(struct char_data *ch, struct obj_data *item, struct obj_data *comp)
 {
@@ -3926,12 +4103,12 @@ void compare_affects(struct char_data *ch, struct obj_data *item, struct obj_dat
     case APPLY_REGEN_HIT:
     case APPLY_REGEN_MOVE:
     case APPLY_REGEN_MANA:
-        points += (0.2 * get_obj_aff(comp, i)) - (0.2 * get_obj_aff(item, i));
-     
+      points += (0.2 * get_obj_aff(comp, i)) - (0.2 * get_obj_aff(item, i));
+
       break;
     case APPLY_AC:
-      
-        points += (-1 * get_obj_aff(comp, i)) - (-1 * get_obj_aff(item, i));
+
+      points += (-1 * get_obj_aff(comp, i)) - (-1 * get_obj_aff(item, i));
 
       break;
     case APPLY_DAMROLL:
@@ -3962,9 +4139,10 @@ void compare_affects(struct char_data *ch, struct obj_data *item, struct obj_dat
 
 }
 
-int same_location(struct obj_data *a, struct obj_data *b) {
+int same_location(struct obj_data *a, struct obj_data *b)
+{
   int cnt = 0, i;
-  for (i = 1;i < NUM_WEARS;i++) 
+  for (i = 1;i < NUM_WEARS;i++)
     if (CAN_WEAR(a, i) && CAN_WEAR(b, i))
       cnt++;
   return cnt;
@@ -3992,17 +4170,20 @@ ACMD(do_compare)
   }
 
   if (arg2[0] == '\0')
-  { int it, cnt = 0;
+  {
+    int it, cnt = 0;
     for (obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
     {
       if (obj1 == obj2)
         continue;
       if (same_location(obj1, obj2))
         continue;
-      if (CAN_SEE_OBJ(ch, obj2) && GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1) && CAN_GET_OBJ(ch, obj2)) {
+      if (CAN_SEE_OBJ(ch, obj2) && GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1) && CAN_GET_OBJ(ch, obj2))
+      {
         new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
                          obj1->short_description, obj2->short_description);
-        switch (GET_OBJ_TYPE(obj1)) {
+        switch (GET_OBJ_TYPE(obj1))
+        {
         case ITEM_WEAPON:
           compare_weapons(ch, obj1, obj2);
           break;
@@ -4017,39 +4198,43 @@ ACMD(do_compare)
           compare_staves(ch, obj1, obj2);
           break;
         }
-          compare_affects(ch, obj1, obj2);
-      cnt++;
+        compare_affects(ch, obj1, obj2);
+        cnt++;
+      }
     }
-    }
-    for (it = 0; it < NUM_WEARS; it++) {
+    for (it = 0; it < NUM_WEARS; it++)
+    {
       obj2 = GET_EQ(ch, it);
       if (!obj2) continue;
       if (!CAN_SEE_OBJ(ch, obj2))
         continue;
-      if (CAN_WEAR(obj1, where_to_worn(it))) {
+      if (CAN_WEAR(obj1, where_to_worn(it)))
+      {
         new_send_to_char(ch, "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj1->short_description, obj2->short_description, body[it]);
-      if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1)) {
-      switch (GET_OBJ_TYPE(obj1)) {
-      case ITEM_WEAPON:
-        compare_weapons(ch, obj1, obj2);
-        break;
-      case ITEM_ARMOR:
-        compare_armor(ch, obj1, obj2);
-        break;
-      case ITEM_FOOD:
-        compare_food(ch, obj1, obj2);
-        break;
-      case ITEM_FOCUS_MAJOR:
-      case ITEM_FOCUS_MINOR:
-        compare_staves(ch, obj1, obj2);
-        break;
-      }
-      }
-      compare_affects(ch, obj1, obj2);
+        if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1))
+        {
+          switch (GET_OBJ_TYPE(obj1))
+          {
+          case ITEM_WEAPON:
+            compare_weapons(ch, obj1, obj2);
+            break;
+          case ITEM_ARMOR:
+            compare_armor(ch, obj1, obj2);
+            break;
+          case ITEM_FOOD:
+            compare_food(ch, obj1, obj2);
+            break;
+          case ITEM_FOCUS_MAJOR:
+          case ITEM_FOCUS_MINOR:
+            compare_staves(ch, obj1, obj2);
+            break;
+          }
+        }
+        compare_affects(ch, obj1, obj2);
         cnt++;
       }
     }
-      
+
     if (!cnt)
     {
       new_send_to_char(ch,"You aren't wearing anything comparable.\r\n");
@@ -4067,8 +4252,10 @@ ACMD(do_compare)
       }
     }
     new_send_to_char(ch, "{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy):\r\n", obj2->short_description, obj1->short_description);
-    if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1)) {
-      switch (GET_OBJ_TYPE(obj1)) {
+    if (GET_OBJ_TYPE(obj2) == GET_OBJ_TYPE(obj1))
+    {
+      switch (GET_OBJ_TYPE(obj1))
+      {
       case ITEM_WEAPON:
         compare_weapons(ch, obj1, obj2);
         break;
@@ -4089,398 +4276,6 @@ ACMD(do_compare)
 
   return;
 }
-
-void start_auction(struct char_data *ch, struct obj_data *obj, int bid)
-{
-  /* Take object from character and set variables */
-  char buf[MAX_INPUT_LENGTH];
-  obj_from_char(obj);
-  obj_selling = obj;
-  ch_selling = ch;
-  ch_buying = NULL;
-  curbid = bid;
-
-  /* Tell th character where his item went */
-  new_send_to_char(ch,
-                   "%s magicly flies away from your hands to be auctioned!\r\n",
-                   obj_selling->short_description);
-
-
-  /* Anounce the item is being sold */
-  snprintf(buf, sizeof(buf), auctioneer[AUC_NULL_STATE], curbid);
-  auc_send_to_all(buf, FALSE);
-
-  aucstat = AUC_OFFERING;
-}
-
-void check_auction(void)
-{
-  char buf[MAX_INPUT_LENGTH];
-  switch (aucstat)
-  {
-  case AUC_NULL_STATE:
-    return;
-  case AUC_OFFERING:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_OFFERING], curbid);
-    CAP(buf);
-    auc_send_to_all(buf, FALSE);
-    aucstat = AUC_GOING_ONCE;
-    return;
-  case AUC_GOING_ONCE:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_GOING_ONCE], curbid);
-    CAP(buf);
-    auc_send_to_all(buf, FALSE);
-    aucstat = AUC_GOING_TWICE;
-    return;
-  case AUC_GOING_TWICE:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_GOING_TWICE], curbid);
-    CAP(buf);
-    auc_send_to_all(buf, FALSE);
-    aucstat = AUC_LAST_CALL;
-    return;
-  case AUC_LAST_CALL:
-    if (ch_buying == NULL)
-    {
-      snprintf(buf, sizeof(buf), auctioneer[AUC_LAST_CALL]);
-
-      CAP(buf);
-      auc_send_to_all(buf, FALSE);
-
-      new_send_to_char(ch_selling, "%s flies out the sky and into your hands.\r\n",
-                       obj_selling->short_description);
-
-      obj_to_char(obj_selling, ch_selling);
-
-      /* Reset auctioning values */
-      obj_selling = NULL;
-      ch_selling = NULL;
-      ch_buying = NULL;
-      curbid = 0;
-      aucstat = AUC_NULL_STATE;
-      return;
-    }
-    else
-    {
-      snprintf(buf, sizeof(buf), auctioneer[AUC_SOLD], curbid);
-      auc_send_to_all(buf, TRUE);
-
-      /* Give the object to the buyer */
-      obj_to_char(obj_selling, ch_buying);
-      new_send_to_char(ch_buying,
-                       "%s flies out the sky and into your hands, what a steel!\r\n",
-                       obj_selling->short_description);
-
-
-      new_send_to_char(ch_selling, "Congrats! You have sold %s for %d coins!\r\n",
-                       obj_selling->short_description, curbid);
-
-      /* Give selling char the money for his stuff */
-      char_gold(ch_selling, curbid, GOLD_ALL);
-      gold_data(AUCTION_OUT, curbid);
-
-      /* Reset auctioning values */
-      obj_selling = NULL;
-      ch_selling = NULL;
-      ch_buying = NULL;
-      curbid = 0;
-      aucstat = AUC_NULL_STATE;
-      return;
-    }
-  }
-}
-
-
-bool can_auction_item(struct char_data * ch, struct obj_data * obj)
-{
-  if (GET_OBJ_TYPE(obj) == ITEM_WORN || GET_OBJ_TYPE(obj) == ITEM_OTHER
-      || GET_OBJ_TYPE(obj) == ITEM_TRASH
-      || GET_OBJ_TYPE(obj) == ITEM_TRAP || GET_OBJ_TYPE(obj) == ITEM_NOTE
-      || GET_OBJ_TYPE(obj) == ITEM_KEY || GET_OBJ_TYPE(obj) == ITEM_FOOD
-      || GET_OBJ_TYPE(obj) == ITEM_MONEY || GET_OBJ_TYPE(obj) == ITEM_PEN
-      || GET_OBJ_TYPE(obj) == ITEM_BOAT
-      || GET_OBJ_TYPE(obj) == ITEM_FOUNTAIN
-      || GET_OBJ_TYPE(obj) == ITEM_WEAPON
-      || GET_OBJ_TYPE(obj) == ITEM_ARMOR)
-    return (TRUE);
-  else
-    return (FALSE);
-}
-
-ACMD(do_auction)
-{
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  struct obj_data *obj;
-  int bid = 0, fee = 0;
-
-  new_send_to_char(ch, "Sorry, but auto-auction has been disabled. \r\nTry your skills at a manual auction using AUCTALK.\r\n");
-  return;
-
-
-  two_arguments(argument, arg1, arg2);
-
-  if (!*arg1)
-  {
-    new_send_to_char(ch,"Auction what?\r\n");
-    return;
-  }
-  else if (is_abbrev(arg1, "cancel") || is_abbrev(arg1, "stop"))
-  {
-    if ((ch != ch_selling && GET_LEVEL(ch) < LVL_GRGOD)
-        || aucstat == AUC_NULL_STATE)
-    {
-      new_send_to_char(ch,"You're not even selling anything!\r\n");
-      return;
-    }
-    else if (ch == ch_selling)
-    {
-      stop_auction(AUC_NORMAL_CANCEL, NULL);
-      return;
-    }
-    else
-    {
-      stop_auction(AUC_WIZ_CANCEL, ch);
-    }
-  }
-  else if (is_abbrev(arg1, "stats") || is_abbrev(arg1, "identify"))
-  {
-    auc_stat(ch, obj_selling);
-    return;
-  }
-  else if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
-  {
-    new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg1), arg1);
-    return;
-  }
-  else if (!*arg2 && (bid = obj->obj_flags.cost) <= 0)
-  {
-    new_send_to_char(ch, "What should be the minimum bid?\r\n");
-    return;
-  }
-  else if (*arg2 && (bid = atoi(arg2)) <= 0)
-  {
-    new_send_to_char(ch,"Come on? One coin at least?\r\n");
-    return;
-  }
-  else if (aucstat != AUC_NULL_STATE)
-  {
-    new_send_to_char(ch,
-                     "Sorry, but %s is already auctioning %s at %d coins!\r\n",
-                     GET_NAME(ch_selling), obj_selling->short_description, bid);
-    return;
-  }
-  else if (OBJ_FLAGGED(obj, ITEM_NOSELL) || !can_auction_item(ch, obj))
-  {
-    new_send_to_char(ch,"Sorry but you can't sell that!\r\n");
-    return;
-  }
-  else
-  {
-    new_send_to_char(ch, "%s", CONFIG_OK);
-    fee = bid / 10;
-    if (char_gold(ch, 0, GOLD_ALL) < fee)
-    {
-      new_send_to_char(ch,"Sorry but you can't pay the auction fees.\r\n");
-      return;
-    }
-    else
-      char_gold(ch, fee, GOLD_ALL);
-    start_auction(ch, obj, bid);
-    return;
-  }
-}
-
-
-ACMD(do_bid)
-{
-  char arg[MAX_INPUT_LENGTH];
-  int bid;
-  char buf[MAX_INPUT_LENGTH];
-
-  if (IS_NPC(ch))
-    return;
-
-  one_argument(argument, arg);
-
-  if (!*arg)
-  {
-    new_send_to_char(ch,"Bid yes, good idea, but HOW MUCH??\r\n");
-    return;
-  }
-  else if (aucstat == AUC_NULL_STATE)
-  {
-    new_send_to_char(ch,"Thats very enthusiastic of you, but nothing is being SOLD!\r\n");
-    return;
-  }
-  else if (ch == ch_selling)
-  {
-    new_send_to_char(ch,"Why bid on something your selling?  You can 'cancel' the auction!\r\n");
-    return;
-  }
-  else if ((bid = atoi(arg)) < ((int) curbid * 1.1 - 1)
-           && ch_buying != NULL)
-  {
-    new_send_to_char(ch,
-                     "You must bid at least 10 percent more than the current bid. (%d)\r\n",
-                     (int) (curbid * 1.1));
-    return;
-  }
-  else if (ch_buying == NULL && bid < curbid)
-  {
-    new_send_to_char(ch, "You must at least bid the minimum!\r\n");
-    return;
-  }
-  else if (bid > (char_gold(ch, 0, GOLD_ALL)))
-  {
-    new_send_to_char(ch,"You don't have that much gold!\r\n");
-    return;
-  }
-  else
-  {
-    if (ch == ch_buying)
-    {
-      char_gold(ch, -(bid - curbid), GOLD_ALL);
-      gold_data(AUCTION_IN, (bid - curbid));
-    }
-    else
-    {
-      char_gold(ch, -bid, GOLD_ALL);
-      auction_in += bid;
-
-      if (!(ch_buying == NULL))
-      {
-        char_gold(ch_buying, curbid, GOLD_ALL);
-        gold_data(AUCTION_IN, (curbid));
-      }
-    }
-
-    curbid = bid;
-    ch_buying = ch;
-
-
-    snprintf(buf, sizeof(buf), auctioneer[AUC_BID], bid);
-    auc_send_to_all(buf, TRUE);
-
-    aucstat = AUC_OFFERING;
-    return;
-  }
-}
-
-void stop_auction(int type, struct char_data *ch)
-{
-  char buf[MAX_INPUT_LENGTH];
-  switch (type)
-  {
-  case AUC_NORMAL_CANCEL:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_NORMAL_CANCEL]);
-    auc_send_to_all(buf, FALSE);
-    break;
-  case AUC_QUIT_CANCEL:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_QUIT_CANCEL]);
-    auc_send_to_all(buf, FALSE);
-    break;
-  case AUC_WIZ_CANCEL:
-    snprintf(buf, sizeof(buf), auctioneer[AUC_WIZ_CANCEL]);
-    auc_send_to_all(buf, FALSE);
-    break;
-  default:
-    if (ch)
-      new_send_to_char(ch,"Sorry, that is an unrecognised cancel command, please report.");
-    return;
-  }
-
-
-  if (type != AUC_WIZ_CANCEL)
-  {
-    new_send_to_char(ch, "%s flies out the sky and into your hands.\r\n",
-                     obj_selling->short_description);
-    obj_to_char(obj_selling, ch_selling);
-  }
-  else
-  {
-    new_send_to_char(ch, "%s flies out the sky and into your hands.\r\n",
-                     obj_selling->short_description);
-    obj_to_char(obj_selling, ch);
-  }
-
-  if (!(ch_buying == NULL))
-  {
-    char_gold(ch_buying, curbid, GOLD_ALL);
-    gold_data(AUCTION_OUT, curbid);
-  }
-
-  obj_selling = NULL;
-  ch_selling = NULL;
-  ch_buying = NULL;
-  curbid = 0;
-
-  aucstat = AUC_NULL_STATE;
-
-}
-
-void auc_stat(struct char_data *ch, struct obj_data *obj)
-{
-
-  char buf[MAX_INPUT_LENGTH];
-  if (aucstat == AUC_NULL_STATE)
-  {
-    new_send_to_char(ch,"Nothing is being auctioned!\r\n");
-    return;
-  }
-  else if (ch == ch_selling)
-  {
-    new_send_to_char(ch,"You should have found that out BEFORE auctioning it!\r\n");
-    return;
-  }
-  else if (char_gold(ch, 0, GOLD_ALL) < 500)
-  {
-    new_send_to_char(ch,"You can't afford to find the stats on that, it costs 500 coins!\r\n");
-    return;
-  }
-  else
-  {
-    /* auctioneer tells the character the auction details */
-    new_send_to_char(ch, "%s", CCRED(ch, C_SPR));
-    snprintf(buf, sizeof(buf), auctioneer[AUC_STAT], curbid);
-
-    act(buf, TRUE, ch_selling, obj, ch, TO_VICT | TO_SLEEP);
-    new_send_to_char(ch,"%s", CCNRM(ch, C_SPR));
-    char_gold(ch, -500, GOLD_ALL);
-    auction_in += 500;
-
-    call_magic(ch, NULL, obj_selling, 0, SPELL_IDENTIFY, 30,
-               CAST_SPELL);
-  }
-}
-
-void auc_send_to_all(char *messg, bool buyer)
-{
-  struct descriptor_data *i;
-
-  if (messg == NULL)
-    return;
-
-  for (i = descriptor_list; i; i = i->next)
-  {
-    if (STATE(i) == CON_PLAYING && i->character)
-    {
-      if (PRF_FLAGGED(i->character, PRF_NOAUCT))
-        continue;
-
-      write_to_output(i, "%s", CCMAG(i->character, C_SPR));
-
-      if (buyer)
-        act(messg, TRUE, ch_buying, obj_selling, i->character,
-            TO_VICT | TO_SLEEP);
-      else
-        act(messg, TRUE, ch_selling, obj_selling, i->character,
-            TO_VICT | TO_SLEEP);
-
-      write_to_output(i, "%s", CCNRM(i->character, C_SPR));
-    }
-  }
-}
-
 
 
 /*speed functions*/

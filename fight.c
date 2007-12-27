@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.29  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.28  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -953,16 +956,19 @@ EVENTFUNC(fight_event)
       }
       else
       {
-        if (GET_SWEEP_DAM(ch)) {
-        struct char_data *victnext = find_random_victim(ch);
-        if (victnext) {
-          act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
-          act("$n sweeps around into you!", TRUE, ch, NULL, victnext, TO_VICT);
-          FIGHTING(ch) = victnext;
-          GET_POS(ch) = POS_FIGHTING;
-          fight_event_hit(ch, victnext, find_fe_type(ch), next_attack_type(ch));
-        } else
-          GET_SWEEP_DAM(ch) = 0;
+        if (GET_SWEEP_DAM(ch))
+        {
+          struct char_data *victnext = find_random_victim(ch);
+          if (victnext)
+          {
+            act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
+            act("$n sweeps around into you!", TRUE, ch, NULL, victnext, TO_VICT);
+            FIGHTING(ch) = victnext;
+            GET_POS(ch) = POS_FIGHTING;
+            fight_event_hit(ch, victnext, find_fe_type(ch), next_attack_type(ch));
+          }
+          else
+            GET_SWEEP_DAM(ch) = 0;
         }
         stop_fighting(ch);
         GET_NEXT_SKILL(ch) = TYPE_UNDEFINED;
@@ -1289,7 +1295,7 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
   */
   if (PLR_FLAGGED(attacker, PLR_FROZEN))
     return (ATK_CHANCE(attacker) = 0);
-    
+
 
   /*gotta be a moron to not reeally fuck up a sleeping person*/
   if (!AWAKE(vict))
@@ -1360,8 +1366,9 @@ int defence_tot(struct char_data *vict)
   defense_roll = (IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_DEFENCE(vict));
 
   victim_ac = (200 - (100 + compute_armor_class(vict)));
-  defense_roll += (victim_ac*0.33); // between 0 and 66
-  if ((part = GET_SUB(vict, SUB_LOYALDEFEND) )> 0)
+  if (victim_ac != 0)
+  defense_roll += (victim_ac/3); // between 0 and 66
+  if ((part = GET_SUB(vict, SUB_LOYALDEFEND) ) > 0)
     defense_roll += part * 0.5;
 
   if (!IS_NPC(vict))
@@ -1415,8 +1422,8 @@ int defence_tot(struct char_data *vict)
   defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD));
   defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD_2));
 
-  if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CURSE))
-    defense_roll *= 0.5;
+  if (AFF_FLAGGED(vict, AFF_CURSE))
+    defense_roll *= 0.75;
   defense_roll = (defense_roll <= 0 ? 1 : defense_roll);
 
   return defense_roll;
@@ -2371,18 +2378,34 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     }
     else
       GET_SWEEP_DAM(ch) = 0;
-    
+
     if (partial > 0 && (GET_HIT(vict) - partial) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 250))
     {
       act("{cGYou concentrate your energy on the on coming killing blow,\r\nand before it lands you move out of range of combat.{c0", FALSE ,vict, 0,0,TO_CHAR);
       return -1;
-      
+
     }
 
     alter_hit(vict, partial);
     update_pos(vict);
-    if (IS_NPC(vict) && partial > 0)
-      damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), partial);
+    if (!IS_NPC(ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
+    {
+      if (RIDING(ch) && HERE(ch, RIDING(ch)))
+      {
+        int dam_exp = partial/2;
+        if (IS_NPC(vict) && partial > 2)
+        {
+          damage_count(vict, IS_NPC(RIDING(ch)) ? -1 : GET_ID(RIDING(ch)), dam_exp);
+          damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), dam_exp);
+        }
+      }
+      else
+      {
+        if (IS_NPC(vict) && partial > 0)
+          damage_count(vict, IS_NPC(ch) ? -1 : GET_ID(ch), partial);
+      }
+    }
+
 
 
     if (!SELF(ch, vict))
@@ -2426,32 +2449,39 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     if (partial)
     {
 
-      
+
       /* learn */
       if (!IS_NPC( ch ) )
       {
-        switch (has_weapon(ch)) {
+        switch (has_weapon(ch))
+        {
         case 2:
-          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD_2))) {
+          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
+          {
             if (number(0, 1000) < 2)
               improve_skill(ch, SKILL_LONGARM);
-          } else {
+          }
+          else
+          {
             if (number(0, 1000) < 2)
               improve_skill(ch, SKILL_SHORT_BLADE);
           }
         case 1:
-          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD))) {
+          if (!is_short_wep(GET_EQ(ch, WEAR_WIELD)))
+          {
             if (number(0, 1000) < 2)
               improve_skill(ch, SKILL_LONGARM);
-          } else {
+          }
+          else
+          {
             if (number(0, 1000) < 2)
               improve_skill(ch, SKILL_SHORT_BLADE);
           }
-            
+
           break;
         }
-        
-        
+
+
         if ( number(1,100) > GET_PERM_OFFENCE(ch) && number(1, 1000) < 5)
         {
           GET_PERM_OFFENCE(ch)++;
@@ -2477,18 +2507,6 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
       }
       poison_wep_check(ch, vict, w_type, partial);
     }
-    /*
-    if (!IS_NPC(ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
-    {
-      dam_exp = (GET_LEVEL(vict) * partial) / 3;
-      if (RIDING(ch) && HERE(ch, RIDING(ch)))
-      {
-        dam_exp /= 3;
-        if (!IS_NPC(ch))
-          gain_exp(RIDING(ch), dam_exp * 2);
-      }
-      gain_exp(ch, dam_exp);
-    }*/
 
   }
 
@@ -2521,9 +2539,6 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
   if (GET_POS(vict) == POS_DEAD)
   {
     halt_fighting(vict);
-
-    //if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
-    //group_gain(ch, vict);
 
     if (!IS_NPC(vict))
     {
@@ -2578,7 +2593,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
           gld < char_gold(ch, 0, GOLD_HAND))
         do_split(ch, local_buf, 0, 0);
     }
- 
+
     return -1;
   }
 
@@ -2711,7 +2726,8 @@ int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_t
     {
       //SET_BIT_AR(AFF_FLAGS(vict), AFF_FROZEN);
       act("You freeze as you touch $N's shield of ice.", FALSE, ch, 0 , vict, TO_CHAR);
-      act("$N is frozen as $E touches your shield of ice.", FALSE, ch, 0, vict, TO_CHAR);
+      act("$N is frozen as $E touches $N's shield of ice.", FALSE, ch, 0, vict, TO_NOTVICT);
+      act("$N is frozen as $E touches your shield of ice.", FALSE, ch, 0, vict, TO_VICT);
       af.location = APPLY_SPEED;
       af.expire = HOURS_TO_EXPIRE(1);
       af.modifier = -2 * (GET_LEVEL(vict)+1);
@@ -5489,7 +5505,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;    /* we'll jump out after 5 containers deep and just delete
-                                                                                                                                                                                                                                                                                 the grenade */
+                                                                                                                                                                                                                                                                                           the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {

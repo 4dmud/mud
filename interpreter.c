@@ -192,6 +192,7 @@ ACMD(do_heal);
 ACMD(do_help);
 ACMD(do_heroutil);
 ACMD(do_hit);
+ACMD(do_hitch);
 ACMD(do_house);
 ACMD(do_ignore);
 ACMD(do_info);
@@ -301,6 +302,7 @@ ACMD(do_unban);
 ACMD(do_ungroup);
 ACMD(do_use);
 ACMD(do_users);
+ACMD(do_unhitch);
 ACMD(do_visible);
 ACMD(do_vnum);
 ACMD(do_vstat);
@@ -606,6 +608,7 @@ const struct command_info cmd_info[] =
     { "hgossip"  , "hgos"  , POS_SLEEPING, do_gen_comm ,0, SCMD_HERO, 0 },
     { "hire"     , "hire" , POS_STANDING, do_not_here , LVL_IMPL, 0, 0 },
     { "hit"      , "h"   , POS_FIGHTING, do_hit      , 0, SCMD_HIT, 0 },
+    { "hitch"      , "hitch"   , POS_STANDING, do_hitch      , 0, 0, 0 },
     { "hold"     , "ho"  , POS_RESTING , do_grab     , 1, 0, 0 },
     { "holler"   , "hol" , POS_RESTING , do_gen_comm , 1, SCMD_HOLLER, 0 },
     { "holylight", "holy"     , POS_DEAD    , do_gen_tog  , LVL_HERO, SCMD_HOLYLIGHT, 0 },
@@ -851,7 +854,9 @@ const struct command_info cmd_info[] =
     { "ungroup"  , "ung" , POS_DEAD    , do_ungroup  , 0, 0, 0 },
     { "unban"    , "unb" , POS_DEAD    , do_unban    , LVL_IMMORT, 0, WIZ_BAN_GRP },
     { "unaffect" , "una" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_UNAFFECT, WIZ_HEAL_GRP },
+    { "unhitch"      , "unhitch"   , POS_STANDING, do_unhitch      , 0, 0, 0 },
     { "unregister" , "unreg"  , POS_STANDING, do_register , 0, SCMD_UNREGISTER, 0 },
+      
     { "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
     { "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
     { "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
@@ -1797,7 +1802,7 @@ int perform_dupe_check(struct descriptor_data *d)
 
     if (k == d)
       continue;
-
+    lock_desc(k);
     if (d->character && k->character)
       same_account = (GET_ACC(d->character) == GET_ACC(k->character));
     else
@@ -1831,16 +1836,21 @@ int perform_dupe_check(struct descriptor_data *d)
 
       if (!target && IS_PLAYING(k))
       {
+        unlock_desc(k);
         write_to_output(k, "\r\nThis body has been usurped!\r\n");
+        lock_desc(k);
         target = k->character;
         mode = USURP;
       }
       k->character->desc = NULL;
       k->character = NULL;
       k->original = NULL;
+      unlock_desc(k);
       write_to_output(k, "\r\nMultiple login detected -- disconnecting.\r\n");
+      lock_desc(k);
       STATE(k) = CON_CLOSE;
     }
+    unlock_desc(k);
   }
 
   /*
@@ -1890,6 +1900,7 @@ int perform_dupe_check(struct descriptor_data *d)
     return (0);
 
   /* Okay, we've found a target.  Connect d to target. */
+  lock_desc(d);
   free_char(d->character); /* get rid of the old char */
   d->character = target;
   d->character->desc = d;
@@ -1899,7 +1910,7 @@ int perform_dupe_check(struct descriptor_data *d)
   REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
   REMOVE_BIT_AR(AFF_FLAGS(d->character), AFF_GROUP);
   STATE(d) = CON_PLAYING;
-
+  unlock_desc(d);
   switch (mode)
   {
   case RECON:
@@ -2417,9 +2428,10 @@ void nanny(struct descriptor_data *d, char *arg)
 
       d->character->desc = d;
     }
-    if (!*arg)
+    if (!*arg) {
       STATE(d) = CON_CLOSE;
-    else
+      d->close_me = TRUE;
+    } else
     {
       if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 ||
           strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name)
@@ -2955,6 +2967,7 @@ void nanny(struct descriptor_data *d, char *arg)
      * the game_loop() axe them.
      */
   case CON_CLOSE:
+    d->close_me = TRUE;
     break;
   case CON_ASSEDIT:
     assedit_parse(d, arg);

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.15  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -1279,8 +1282,8 @@ ACMD(do_gen_tog)
        "Aggro mode enabled.\r\n"},
       {"Nobrag on.\r\n",
        "Nobrag off.\r\n"},
-      {"You are now safe from gating by other players.\r\n",
-       "You may now be gated to by other players.\r\n"},
+      {"You may now be gated to by other players.\r\n",
+          "You are now safe from gating by other players.\r\n"    },
       {"You are not roleplaying anymore.\r\n",
        "You are now roleplaying.\r\n"},
       {"You will no longer see a tally of how many fish you have caught.\r\n",

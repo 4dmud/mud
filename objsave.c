@@ -1074,6 +1074,7 @@ void Crash_save_all(void)
   struct descriptor_data *d;
   for (d = descriptor_list; d; d = d->next)
   {
+    lock_desc(d);
     if (IS_PLAYING(d) && d->character && !IS_NPC(d->character))
     {
       if (PLR_FLAGGED(d->character, PLR_CRASH))
@@ -1084,6 +1085,7 @@ void Crash_save_all(void)
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
       }
     }
+    unlock_desc(d);
   }
 }
 

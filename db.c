@@ -8,9 +8,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-int sunlight;
-//dont move this sunlight from up here.
-
 
 #define __DB_C__
 
@@ -153,6 +150,7 @@ int circle_restrict = 0;	/* level of game restriction     */
 extern int no_specials;
 extern int scheck;
 int zone_count = 0;
+int sunlight;
 
 // Declare real-nums of battle-rooms
 //room_vnum r_battle_start_room;   /* rnum of battle start room     */
@@ -1271,7 +1269,7 @@ cnt++;
 }
   i = fprintf(index_file, "~\n");
   fclose(index_file);
-  if (i == -1)
+  if (i < 0)
     remove(tempname);
   else
     rename(tempname, PLR_INDEX_FILE);
@@ -1617,7 +1615,6 @@ void index_boot(int mode)
     //end
   }
 }
-
 
 
 void discrete_load(FILE * fl, int mode, char *filename, zone_vnum zon)
@@ -2466,8 +2463,12 @@ struct combine_data *add_base_link_mob(CHAR_DATA *mob, int vnum)
 struct combine_data *add_full_link(CHAR_DATA *mob, struct combine_data *current, CHAR_DATA *segment)
 {
 
-  if (segment!=NULL)
+  if (segment && mob)
   {
+    if (GET_MOB_VNUM(segment) == GET_MOB_VNUM(mob)) {
+    log("ERROR: mob vnum %d is a segment of itself!", GET_MOB_VNUM(mob));
+      return current->next;
+    }
     current->joined = segment;
     segment->mob_specials.head_join = mob;
     SET_BIT_AR(MOB_FLAGS(segment), MOB_SENTINEL);
@@ -4538,6 +4539,7 @@ int is_empty(zone_rnum zone_nr)
 
   for (i = descriptor_list; i; i = i->next)
   {
+    
     if (STATE(i) != CON_PLAYING)
       continue;
     if (IN_ROOM(i->character) == NULL)
@@ -6366,12 +6368,13 @@ int file_to_string_alloc(const char *name, char **buf)
   {
     if (!in_use->showstr_count || *in_use->showstr_vector != *buf)
       continue;
-
+    lock_desc(in_use);
     /* Let's be nice and leave them at the page they were on. */
     temppage = in_use->showstr_page;
     paginate_string((in_use->showstr_head =
                        strdup(*in_use->showstr_vector)), in_use);
     in_use->showstr_page = temppage;
+    unlock_desc(in_use);
   }
 
   if (*buf)
@@ -6473,6 +6476,7 @@ void reset_char(struct char_data *ch)
   HAS_MAIL(ch) = -1;
   IS_SAVING(ch) = FALSE;
   GET_IGNORELIST(ch) = NULL;
+  ch->hitched = NULL;
 
   if (GET_HIT(ch) <= 0)
     GET_HIT(ch) = 1;
@@ -6518,6 +6522,7 @@ void clear_char(struct char_data *ch)
   RIDDEN_BY(ch) = NULL;
   HUNTING(ch) = NULL;
   HUNT_COUNT(ch) = 0;
+  ch->hitched = NULL;
   //ch->attack_type = NOTHING;
   GET_ATTACK_POS(ch) = TYPE_UNDEFINED;
   //ch->owner_id = -1;
@@ -6564,6 +6569,7 @@ void clear_object(struct obj_data *obj)
 obj->idents = NULL;
   obj->obj_flags.obj_innate = 0;
   obj->skin = NOTHING;
+  obj->hitched = NULL;
 }
 
 

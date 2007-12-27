@@ -604,7 +604,9 @@ void new_mudlog(int type, int level, int file, const char *str, ...)
   {
     if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) /* switch */
       continue;
-    if (GET_LEVEL(i->character) < level)
+    if (GET_ORIG_LEV(i->character) == 0 && GET_LEVEL(i->character) < level)
+      continue;
+    if (GET_ORIG_LEV(i->character) != 0 && GET_ORIG_LEV(i->character) < level)
       continue;
     if (PLR_FLAGGED(i->character, PLR_WRITING))
       continue;
@@ -1261,12 +1263,14 @@ int get_pidx_from_name(struct char_data *ch)
 void line_input(struct descriptor_data *d, const char *prompt,
                 C_FUNC(*callback), void *info)
 {
+  lock_desc(d);
   d->callback = callback;
   d->callback_depth++;	// Increase depth of possible recursiveness.
   d->c_data = (char *) info;
   ORIG_STATE(d) = STATE(d);
   STATE(d) = CON_LINE_INPUT;
   SEND_TO_Q(prompt, d);
+  unlock_desc(d);
 }
 
 

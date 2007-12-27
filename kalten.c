@@ -16,6 +16,7 @@
 #include "clan.h"
 #include "damage.h"
 #include "event.h"
+#include "fight.h"
 #include "kalten.h"
 
 /* Romance Module Defines */

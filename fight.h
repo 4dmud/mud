@@ -8,6 +8,15 @@ int has_weapon(struct char_data *ch);
 int can_fight(struct char_data *ch, struct char_data *vict, int silent);
 int both_pk(struct char_data *a, struct char_data *b);
 void kill_list(struct char_data *ch, struct char_data *vict);
+int chance_hit_part(struct char_data *ch, int part);
+
+/* prototypes from fight.c */
+void set_fighting(struct char_data *ch, struct char_data *victim);
+void stop_fighting(struct char_data *ch);
+void forget(struct char_data *ch, struct char_data *victim);
+void remember(struct char_data *ch, struct char_data *victim);
+int skill_message(int dam, struct char_data *ch, struct char_data *vict,
+                  int attacktype);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
 #define IS_SPELL_ATK(type) (((type) >= TYPE_ATK_ORB) && ((type) <= TYPE_ATK_TORPEDO))

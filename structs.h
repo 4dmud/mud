@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.28  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.27  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -1079,22 +1082,6 @@ extern int message_type;
 #define TW_ARRAY_MAX    4
 #define EF_ARRAY_MAX    4
 
-/* Auctioning states */
-
-#define AUC_NULL_STATE          0	/* not doing anything */
-#define AUC_OFFERING            1	/* object has been offfered */
-#define AUC_GOING_ONCE          2	/* object is going once! */
-#define AUC_GOING_TWICE         3	/* object is going twice! */
-#define AUC_LAST_CALL           4	/* last call for the object! */
-#define AUC_SOLD                5	/* Auction cancle states */
-#define AUC_NORMAL_CANCEL       6	/* normal cancellation of auction */
-#define AUC_QUIT_CANCEL         7	/* auction canclled because player quit */
-#define AUC_WIZ_CANCEL          8	/* auction cancelled by a god */
-/* Other auctioneer functions */
-#define AUC_STAT                9
-#define AUC_BID                 10
-
-
 /* char_data.internal_flags (INT_XXX) ************************************/
 #define INT_MARK	(1 <<  0)
 
@@ -1142,12 +1129,11 @@ extern int message_type;
 #define PULSE_ZONE      (10 RL_SEC)
 #define PULSE_MOBILE    (10 RL_SEC)
 #define PULSE_VIOLENCE  ( 2 RL_SEC)
-#define PULSE_AUCTION   (60 RL_SEC)
 
 
 
 /* Variables for the output buffering system */
-#define MAX_SOCK_BUF            (13 * 1024)	/* Size of kernel's sock buf   */
+#define MAX_SOCK_BUF            (12 * 1024)	/* Size of kernel's sock buf   */
 #define MAX_PROMPT_LENGTH       256	/* Max length of prompt        */
 #define MAX_MXP_STATUS          1024
 #define GARBAGE_SPACE		32	/* Space for **OVERFLOW** etc  */
@@ -1156,7 +1142,7 @@ extern int message_type;
 #define LARGE_BUFSIZE	   (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH - MAX_MXP_STATUS)
 
 #define HISTORY_SIZE		5	/* Keep last 5 commands. */
-#define MAX_STRING_LENGTH	16384
+#define MAX_STRING_LENGTH	(2 * 8192)
 #define MAX_INPUT_LENGTH	512	/* Max length per *line* of input */
 #define MAX_RAW_INPUT_LENGTH	1024	/* Max size of *raw* input */
 #define MAX_MESSAGES		400
@@ -1359,6 +1345,7 @@ struct obj_data
   struct char_data *carried_by;	/* Carried by :NULL in room/conta   */
   struct char_data *worn_by;	/* Worn by?  */
   struct char_data *in_locker;  /* lockered? */
+  struct char_data *hitched;
   sh_int worn_on;		/* Worn where?                      */
 
   struct obj_data *in_obj;	/* In what object NULL when none    */
@@ -1955,7 +1942,7 @@ struct char_data
   int has_note[NUM_NOTE_TYPES];
   struct char_data *fuses[TOP_FUSE_LOCATION];
   struct char_data *fused_to;
-
+  struct obj_data *hitched;
   time_t last_move;
   int sweep_damage;
   int body;                   /* body positions aquired */
@@ -2029,6 +2016,8 @@ struct descriptor_data
   size_t max_str;	        /* maximum size of string in modify-str	*/
   long mail_to;		/* name for mail system                 */
   int has_prompt;		/* is the user at a prompt?             */
+  int close_me;
+  int wait;
   char inbuf[MAX_RAW_INPUT_LENGTH];	/* buffer for raw input           */
   char last_input[MAX_INPUT_LENGTH];	/* the last input                 */
   char small_outbuf[SMALL_BUFSIZE];	/* standard output buffer         */
@@ -2054,11 +2043,11 @@ struct descriptor_data
   int eor; /* End Of Record - for prompts - telnet proticol - mord*/
   int mxp;
   int telnet_capable; /* if any of the protocols are processed then set this flag */
-
+  bool locked; /* Is this descriptor in a locked state? Multithreading - mord*/
   struct sockaddr_in saddr;
-  char               host_ip[HOST_LENGTH + 1];
-  char               host_name[HOST_LENGTH + 1];
-  char               user_name[HOST_LENGTH + 1];
+  char  host_ip[HOST_LENGTH + 1];
+  char  host_name[HOST_LENGTH + 1];
+  char  user_name[HOST_LENGTH + 1];
 };
 
 

@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/11/30 19:08:47 $
-*  $Revision: 1.18 $
+*  $Date: 2006/02/17 22:19:54 $
+*  $Revision: 1.19 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.19  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.18  2005/11/30 19:08:47  w4dimenscor
  * fixes an issue in function triggers
  *
@@ -938,10 +941,13 @@ EVENTFUNC(trig_wait_event)
     }
     if (!found)
     {
-      log("Trigger restarted on unknown entity. Vnum: %d", GET_TRIG_VNUM(trig));
-      log("Type: %s trigger", type==MOB_TRIGGER ? "Mob" : type == OBJ_TRIGGER ? "Obj" : "Room");
-      log("attached %d places", trig_index[trig->nr]->number);
-      script_log("Trigger restart attempt on unknown entity.");
+      if (0) {
+        log("Trigger restarted on unknown entity. Vnum: %d", GET_TRIG_VNUM(trig));
+        log("Type: %s trigger", type==MOB_TRIGGER ? "Mob" : type == OBJ_TRIGGER ? "Obj" : "Room");
+        log("attached %d places", trig_index[trig->nr]->number);
+      }
+      script_log("Trigger restart attempt on unknown entity. ");
+      script_log("Possibly caused by the mob or obj being purged that had the script on it");
       return 0;
     }
   }
@@ -949,7 +955,7 @@ EVENTFUNC(trig_wait_event)
 
   script_driver(&go, trig, type, TRIG_RESTART);
 
-  /* Do not reenqueue*/
+  /* Do not reenqueue */
   return 0;
 }
 
@@ -1623,7 +1629,9 @@ void script_vlog(const char *format, va_list args)
   {
     if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) /* switch */
       continue;
-    if (GET_LEVEL(i->character) < LVL_BUILDER)
+    if (GET_ORIG_LEV(i->character) == 0 && GET_LEVEL(i->character) < LVL_BUILDER)
+      continue;
+    if (GET_ORIG_LEV(i->character) != 0 && GET_ORIG_LEV(i->character) < LVL_BUILDER)
       continue;
     if (PLR_FLAGGED(i->character, PLR_WRITING))
       continue;

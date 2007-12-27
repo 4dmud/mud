@@ -111,6 +111,7 @@ void smash_tilde(char *str)
  */
 void string_write(struct descriptor_data *d, char **writeto, size_t len, long mailto, void *data)
 {
+  lock_desc(d);
   if (d->character && !IS_NPC(d->character))
     SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
 
@@ -121,6 +122,7 @@ void string_write(struct descriptor_data *d, char **writeto, size_t len, long ma
   d->str = writeto;
   d->max_str = len;
   d->mail_to = mailto;
+  unlock_desc(d);
 }
 
 /*
@@ -144,7 +146,7 @@ void string_add(struct descriptor_data *d, char *str)
   else
     if ((action = improved_editor_execute(d, str)) == STRINGADD_ACTION)
       return;
-
+  lock_desc(d);
   if (action != STRINGADD_OK)
     /* Do nothing. */ ;
   else if (!(*d->str))
@@ -180,6 +182,7 @@ void string_add(struct descriptor_data *d, char *str)
       strcat(*d->str, str);	/* strcat: OK (size precalculated) */
     }
   }
+
 
   /*
    * Common cleanup code.
@@ -258,6 +261,7 @@ void string_add(struct descriptor_data *d, char *str)
   }
   else if (action != STRINGADD_ACTION && strlen(*d->str) + 3 <= d->max_str) /* 3 = \r\n\0 */
     strcat(*d->str, "\r\n");
+  unlock_desc(d);
 }
 
 void playing_string_cleanup(struct descriptor_data *d, int action)
@@ -599,6 +603,7 @@ if (!d) {
 log("Paginate_string passed null descriptor!");
 return;
 }
+  lock_desc(d);
   if (d->character)
   {
     length = PAGEHEIGHT(d->character);
@@ -615,6 +620,7 @@ return;
     str = d->showstr_vector[i] = next_page(str, length, width);
 
   d->showstr_page = 0;
+  unlock_desc(d);
 }
 
 
@@ -631,15 +637,17 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
     }
     return;
   }
+
+  if (!str || !*str)
+    return;
+
+  lock_desc(d);
+  
   if (d->character)
   {
     length = PAGEHEIGHT(d->character);
     width = PAGEWIDTH(d->character);
   }
-
-
-  if (!str || !*str)
-    return;
 
   d->showstr_count = count_pages(str, length, width);
   CREATE(d->showstr_vector, char *, d->showstr_count);
@@ -650,11 +658,13 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
       d->showstr_head = str;
     else
       d->showstr_head = strdup(str);
+    unlock_desc(d);
     paginate_string(d->showstr_head, d);
   }
-  else
+  else {
+    unlock_desc(d);
     paginate_string(str, d);
-
+  }
   show_string(d, actbuf);
 }
 
@@ -666,10 +676,11 @@ void show_string(struct descriptor_data *d, char *input)
   int diff;
 
   any_one_arg(input, buf);
-
+  lock_desc(d);
   /* Q is for quit. :) */
   if (LOWER(*buf) == 'q')
   {
+
     free(d->showstr_vector);
     d->showstr_vector = NULL;
     d->showstr_count = 0;
@@ -678,6 +689,7 @@ void show_string(struct descriptor_data *d, char *input)
       free(d->showstr_head);
       d->showstr_head = NULL;
     }
+    unlock_desc(d);
     return;
   }
   /* R is for refresh, so back up one page internally so we can display
@@ -700,6 +712,7 @@ void show_string(struct descriptor_data *d, char *input)
 
   else if (*buf)
   {
+    unlock_desc(d);
     new_send_to_char(d->character, "Valid commands while paging are RETURN, Q, R, B, or a numeric value.\r\n");
     return;
   }
@@ -740,7 +753,10 @@ void show_string(struct descriptor_data *d, char *input)
     else
       /* Tack \r\n onto the end to fix bug with prompt overwriting last line. */
       strcpy(buffer + diff, "\r\n");	/* strcpy: OK (size checked) */
+    unlock_desc(d);
     new_send_to_char(d->character, "%s", buffer);
+    lock_desc(d);
     d->showstr_page++;
+    unlock_desc(d);
   }
 }

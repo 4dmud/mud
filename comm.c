@@ -86,6 +86,7 @@
 #include "genolc.h"
 #include "constants.h"
 #include "ident.h"
+#include "auction.h"
 
 #ifdef HAVE_ARPA_TELNET_H
 #include <arpa/telnet.h>
@@ -156,7 +157,6 @@ void free_host_list(struct meta_host_data *thi);
 void add_ip_to_host_list(char *host_ip, char *host, time_t date);
 
 int no_ext_processes = 0;       /* shall we use external processes? */
-
 extern int use_external_lookup_process; /* see config.c */
 
 static bool fCopyOver;        /* Are we booting in copyover mode? */
@@ -1006,9 +1006,91 @@ int get_max_players(void)
   return (max_descs);
 #endif                   /* CIRCLE_UNIX */
 }
+#if 0
+void *process_io(void *loopstate)
+{
+  struct descriptor_data *d, *next_d;
+  char comm[MAX_INPUT_LENGTH];
+  int aliased;
 
+  if (loopstate == NULL)
+  { /* we're a thread */
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+  }
 
+  do
+  {
+    if (dlock++ > 3600)
+      dlock = 0;
 
+    /* Process commands we just read from process_input */
+    for (d = descriptor_list; d; d = next_d)
+    {
+      
+      next_d = d->next;
+      if (is_locked(d))
+        continue;
+      if (d->close_me)
+        continue;
+
+      /* FIXME: d->wait will be off. */
+      if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased))
+      {
+        if (d->character)
+        {
+          /* Reset the idle timer & pull char back from void if necessary */
+          d->character->char_specials.timer = 0;
+          if (!d->connected && GET_WAS_IN(d->character) != NULL)
+          {
+            if (d->character->in_room != NULL)
+              char_from_room(d->character);
+            char_to_room(d->character, GET_WAS_IN(d->character));
+            GET_WAS_IN(d->character) = NULL;
+            act("$n fades in to view.", TRUE, d->character, 0, 0, TO_ROOM);
+          }
+        }
+        d->wait = 1;
+        d->has_prompt = 0;
+
+        if (d->str)         /* Writing boards, mail, etc. */
+          string_add(d, comm);
+        else if (d->showstr_count) /* Reading something w/ pager */
+          show_string(d, comm);
+        else if (d->connected != CON_PLAYING) /* In menus, etc. */
+          nanny(d, comm);
+        else
+        {              /* else: we're playing normally. */
+          if (aliased)      /* To prevent recursive aliases. */
+            d->has_prompt = 1;   /* To get newline before next cmd output. */
+          else
+          {
+            if (perform_alias(d, comm, sizeof(comm) -1))     /* Run it through aliasing system */
+              get_from_q(&d->input, comm, &aliased);
+          }
+          dlock++;     /* Deadlock counter. */
+#if 0 /* debugging */
+          sleep(number(1,12));
+#endif
+          command_interpreter(d->character, comm); /* Send it to interpreter */
+          dlock++;
+        }
+      }
+    }
+
+    /* Now we pause here if we are a thread to let input accumulate. */
+    if (loopstate == NULL)
+    {
+      usleep(1); /* FIXME: Sleep for 1/10 of second like game_loop */
+      pthread_testcancel();
+    }
+
+  }
+  while (loopstate == NULL);    /* We're a thread if loopstate == NULL */
+
+  return NULL;
+}
+#endif
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
  * cycles once every 0.10 seconds and is responsible for accepting new
@@ -1146,125 +1228,116 @@ void game_loop(socket_t mother_desc)
     for (d = descriptor_list; d; d = next_d)
     {
       next_d = d->next;
-      if (FD_ISSET(d->descriptor, &exc_set))
+      if (d->close_me || STATE(d) == CON_CLOSE || FD_ISSET(d->descriptor, &exc_set))
       {
-        FD_CLR(d->descriptor, &input_set);
-        FD_CLR(d->descriptor, &output_set);
-        close_socket(d);
-      }
-    }
-
-    /* Process descriptors with input pending */
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-      if (FD_ISSET(d->descriptor, &input_set))
-        if (process_input(d) < 0)
+        {
+          FD_CLR(d->descriptor, &input_set);
+          FD_CLR(d->descriptor, &output_set);
           close_socket(d);
-    }
+        }
+      }
 
+      /* Process descriptors with input pending */
+      for (d = descriptor_list; d; d = next_d)
+      {
+        next_d = d->next;
+        if (FD_ISSET(d->descriptor, &input_set))
+          if (process_input(d) < 0)
+            close_socket(d);
+      }
+
+      
     /* Process commands we just read from process_input */
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-
+      for (d = descriptor_list; d; d = next_d)
+      {
+        next_d = d->next;
+        
       /*
        * Not combined to retain --(d->wait) behavior. -gg 2/20/98
        * If no wait state, no subtraction.  If there is a wait
        * state then 1 is subtracted. Therefore we don't go less
        * than 0 ever and don't require an 'if' bracket. -gg 2/27/99
        */
-      if (d->character)
-      {
-        GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
-
-        if (GET_WAIT_STATE(d->character) > 0)
-          continue;
-      }
-
-      if (!get_from_q(&d->input, comm, &aliased))
-        continue;
-
-      if (d->character)
-      {
-        /* Reset the idle timer & pull char back from void if necessary */
-        d->character->char_specials.timer = 0;
-        if (STATE(d) == CON_PLAYING
-            && GET_WAS_IN(d->character) != NULL)
+        if (d->character)
         {
-          if (IN_ROOM(d->character) != NULL)
-            char_from_room(d->character);
-          char_to_room(d->character, GET_WAS_IN(d->character));
-          GET_WAS_IN(d->character) = NULL;
-          act("You fade into view.", TRUE, d->character, 0, 0, TO_CHAR);
-          act("$n fades into view.", TRUE, d->character, 0, 0, TO_ROOM);
+          GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
+          
+          if (GET_WAIT_STATE(d->character) > 0)
+            continue;
         }
-        GET_WAIT_STATE(d->character) = 1;
-      }
-      d->has_prompt = FALSE;
-
-      if (d->showstr_count) /* Reading something w/ pager */
-        show_string(d, comm);
-      else if (d->str)        /* Writing boards, mail, etc. */
-        string_add(d, comm);
-      else if (STATE(d) != CON_PLAYING) /* In menus, etc. */
-        nanny(d, comm);
-      else
-      {        /* else: we're playing normally. */
-        if (aliased)     /* To prevent recursive aliases. */
-          d->has_prompt = TRUE;    /* To get newline before next cmd output. */
-        else if (perform_alias(d, comm, sizeof(comm))) /* Run it through aliasing system */
-          get_from_q(&d->input, comm, &aliased);
-        command_interpreter(d->character, comm);  /* Send it to interpreter */
-      }
-    }
-#if 0
-    /* Send queued output out to the operating system (ultimately to user). */
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-      if (*(d->output) && FD_ISSET(d->descriptor, &output_set))
-      {
-        /* Output for this player is ready */
-        process_output(d);
-        if (d->bufptr == 0)
-          d->has_prompt = TRUE;
-      }
-    }
-#else
-    /* Send queued output out to the operating system (ultimately to user). */
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-      if (*(d->output) && FD_ISSET(d->descriptor, &output_set))
-      {
-        /* Output for this player is ready */
-        if (process_output(d) < 0)
-          close_socket(d);
+        
+        if (!get_from_q(&d->input, comm, &aliased))
+          continue;
+        
+        if (d->character)
+        {
+        /* Reset the idle timer & pull char back from void if necessary */
+          d->character->char_specials.timer = 0;
+          if (STATE(d) == CON_PLAYING
+              && GET_WAS_IN(d->character) != NULL)
+          {
+            if (IN_ROOM(d->character) != NULL)
+              char_from_room(d->character);
+            char_to_room(d->character, GET_WAS_IN(d->character));
+            GET_WAS_IN(d->character) = NULL;
+            act("You fade into view.", TRUE, d->character, 0, 0, TO_CHAR);
+            act("$n fades into view.", TRUE, d->character, 0, 0, TO_ROOM);
+          }
+          GET_WAIT_STATE(d->character) = 1;
+        }
+        d->has_prompt = FALSE;
+        
+        if (d->showstr_count) /* Reading something w/ pager */
+          show_string(d, comm);
+        else if (d->str)        /* Writing boards, mail, etc. */
+          string_add(d, comm);
+        else if (STATE(d) != CON_PLAYING) /* In menus, etc. */
+          nanny(d, comm);
         else
-          d->has_prompt = 1;
+        {        /* else: we're playing normally. */
+          if (aliased)     /* To prevent recursive aliases. */
+            d->has_prompt = TRUE;    /* To get newline before next cmd output. */
+          else if (perform_alias(d, comm, sizeof(comm))) /* Run it through aliasing system */
+            get_from_q(&d->input, comm, &aliased);
+          command_interpreter(d->character, comm);  /* Send it to interpreter */
+        }
       }
-    }
-#endif
+  }
 
-    /* Print prompts for other descriptors who had no other output */
-    for (d = descriptor_list; d; d = d->next)
-    {
-      if (!d->has_prompt)
+    /* Send queued output out to the operating system (ultimately to user). */
+      for (d = descriptor_list; d; d = next_d)
       {
-        write_to_descriptor(d->descriptor, make_prompt(d), d->comp);
-        d->has_prompt = TRUE;
+        next_d = d->next;
+        if (*(d->output) && FD_ISSET(d->descriptor, &output_set))
+        {
+        /* Output for this player is ready */
+          if (process_output(d) < 0)
+            close_socket(d);
+          else
+            d->has_prompt = 1;
+        }
       }
-    }
-    /* Kick out folks in the CON_CLOSE or CON_DISCONNECT state */
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-      if (STATE(d) == CON_CLOSE || STATE(d) == CON_DISCONNECT)
-        close_socket(d);
-    }
 
-    /*
+      
+    /* Print prompts for other descriptors who had no other output */
+      for (d = descriptor_list; d; d = d->next)
+      {
+        if (!d->has_prompt)
+        {
+          write_to_descriptor(d->descriptor, make_prompt(d), d->comp);
+          d->has_prompt = TRUE;
+        }
+      }
+    /* Kick out folks in the CON_CLOSE or CON_DISCONNECT state */
+      for (d = descriptor_list; d; d = next_d)
+      {
+        next_d = d->next;
+        if (STATE(d) == CON_CLOSE || STATE(d) == CON_DISCONNECT)
+          close_socket(d);
+      }
+      
+
+    /**
      * Now, we execute as many pulses as necessary--just one if we haven't
      * missed any pulses, or make up for lost time if we missed a few
      * pulses by sleeping for too long.
@@ -1351,7 +1424,7 @@ void heartbeat(int heart_pulse)
     mobile_activity();
 
   if (!(heart_pulse % PULSE_AUCTION))
-    check_auction();
+    auction_update();
 
   if (!(heart_pulse % (5 * PASSES_PER_SEC)))      // kalten
     sector_update();     // kalten
@@ -1909,14 +1982,16 @@ size_t write_to_output(struct descriptor_data *d, const char *txt, ...)
 size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list args)
 {
   const char *text_overflow = "\r\nOVERFLOW\r\n";
-  char txt[MAX_STRING_LENGTH];
+  static char txt[MAX_STRING_LENGTH];
   size_t size;
   int size_mxp;
 
-
+  *txt = '\0';
   /* if we're in the overflow state already, ignore this new output */
   if (t->bufspace == 0)
     return (0);
+
+  lock_desc(t);
 
   size = vsnprintf(txt, sizeof(txt), format, args);
   if (t->character)
@@ -1940,7 +2015,7 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
 
     if (size + size_mxp > sizeof(txt))
       log("Mxp cut off");
-    strlcpy(txt, dest, sizeof(txt)); /*this may cause overflows? */
+    size = strlcpy(txt, dest, sizeof(txt)); /*this may cause overflows? */
   }
   while(0);
 
@@ -1955,14 +2030,13 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
     char dest[(((len / PAGEWIDTH(t->character)) * 3) + len + 3)];
     wordwrap(txt, dest, PAGEWIDTH(t->character), len); //size checked above
 
-    strlcpy(txt, dest, sizeof(txt));
-
+    size = strlcpy(txt, dest, sizeof(txt));
 
   }
-  size = strlen(txt);
   /* If exceeding the size of the buffer, truncate it for the overflow message */
   if (size >= sizeof(txt))
   {
+    log("Output exceeding size of buffer");
     size = sizeof(txt) - 1;
     strcpy(txt + size - strlen(text_overflow), text_overflow);   /* strcpy: OK */
   }
@@ -1978,7 +2052,7 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
     size = LARGE_BUFSIZE - t->bufptr - 1;
     if (size > 0)
       txt[size] = '\0';
-    else
+    else 
       txt[0] = '\0';
     buf_overflows++;
   }
@@ -1991,40 +2065,34 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
   {
 
     strcpy(t->output + t->bufptr, txt); /* strcpy: OK (size checked above) */
-    //memmove(t->output + t->bufptr, txt, sizeof(txt));
-    //*((t->output + t->bufptr) + sizeof(txt)) = '\0';
     t->bufspace -= size;
     t->bufptr += size;
+    unlock_desc(t);
     return (t->bufspace);
   }
 
   buf_switches++;
-
+  
   /* if the pool has a buffer in it, grab it */
-  if (bufpool != NULL)
-  {
+  if (bufpool != NULL) {
     t->large_outbuf = bufpool;
     bufpool = bufpool->next;
-  }
-  else
-  {            /* else create a new one */
+  } else {               /* else create a new one */
     CREATE(t->large_outbuf, struct txt_block, 1);
     CREATE(t->large_outbuf->text, char, LARGE_BUFSIZE);
-    //t->large_outbuf->next = bufpool;
-    //bufpool = t->large_outbuf;
     buf_largecount++;
   }
-
+  *t->large_outbuf->text = '\0';
   strcpy(t->large_outbuf->text, t->output);  /* strcpy: OK (size checked previously) */
   t->output = t->large_outbuf->text;    /* make big buffer primary */
   strcat(t->output, txt);     /* strcat: OK (size checked) */
-
+  
   /* set the pointer for the next write */
   t->bufptr = strlen(t->output);
-
+  
   /* calculate how much space is left in the buffer */
   t->bufspace = LARGE_BUFSIZE - 1 - t->bufptr;
-
+  unlock_desc(t);
   return (t->bufspace);
 }
 
@@ -2507,12 +2575,14 @@ int process_output(struct descriptor_data *t)
   /* we may need this \r\n for later -- see below */
   strlcpy(i, "\r\n", sizeof(i));   /* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
 
-  if (strlen(t->output)-1 > MAX_SOCK_BUF) {
+  if (strlen(t->output)-1 > MAX_SOCK_BUF)
+  {
     log("output bigger then sock buf");
     strcpy(osb, "##OVERFLOW##\r\n");
-  } else
-  /* now, append the 'real' output */
-  strcpy(osb, t->output);     /* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
+  }
+  else
+    /* now, append the 'real' output */
+    strcpy(osb, t->output);     /* strcpy: OK (t->output:LARGE_BUFSIZE < osb:MAX_SOCK_BUF-2) */
 
 
   /* if we're in the overflow state, notify the user */
@@ -2555,8 +2625,8 @@ int process_output(struct descriptor_data *t)
     return (-1);
   }
   else if (result == 0)
-  {  /* Socket buffer full. Try later. */
-
+  {
+    /* Socket buffer full. Try later. */
     return (0);
   }
 
@@ -3085,7 +3155,7 @@ int process_input(struct descriptor_data *t)
 #endif
         if (memcmp (ptr, do_eor, strlen (do_eor)) == 0)
         {
-          t->telnet_capable = 1;
+          t->telnet_capable = 0;
           t->eor = 1;
           //log("eor found");
           memmove (ptr, &ptr [strlen (do_eor)], strlen (&ptr [strlen (do_eor)]) + 1);
@@ -3098,7 +3168,7 @@ int process_input(struct descriptor_data *t)
           memmove (ptr, &ptr [strlen (do_ga)], strlen (&ptr [strlen (do_ga)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
-        if (memcmp (ptr, do_ga, strlen (do_ech)) == 0)
+        if (memcmp (ptr, do_ech, strlen (do_ech)) == 0)
         {
           t->telnet_capable = 1;
           /** wanna do something with this? **/
@@ -3595,7 +3665,7 @@ RETSIGTYPE hupsig(int sig)
 {
   log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...");
   exit(0);               /* perhaps something more elegant should
-                                                   * substituted */
+                                                       * substituted */
 }
 
 RETSIGTYPE chldsig()

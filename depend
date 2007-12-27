@@ -35,7 +35,7 @@ aedit.o: aedit.c conf.h sysdep.h structs.h subskills.h interpreter.h \
 alias.o: alias.c conf.h sysdep.h structs.h subskills.h utils.h \
   interpreter.h db.h
 arena.o: arena.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
-  screen.h spells.h handler.h interpreter.h db.h arena.h
+  screen.h spells.h handler.h interpreter.h db.h arena.h fight.h
 asciimap.o: asciimap.c conf.h sysdep.h structs.h subskills.h utils.h \
   comm.h interpreter.h handler.h db.h spells.h house.h constants.h \
   dg_scripts.h oasis.h mapper.h
@@ -43,11 +43,15 @@ assedit.o: assedit.c conf.h sysdep.h structs.h subskills.h utils.h db.h \
   comm.h handler.h interpreter.h oasis.h assemblies.h
 assemblies.o: assemblies.c conf.h sysdep.h structs.h subskills.h utils.h \
   assemblies.h comm.h constants.h db.h handler.h interpreter.h
+auction.o: auction.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
+  interpreter.h handler.h db.h auction.h
 ban.o: ban.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h
 boards.o: boards.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h boards.h interpreter.h handler.h improved-edit.h clan.h
 bsd-snprintf.o: bsd-snprintf.c conf.h sysdep.h
+calender.o: calender.c conf.h sysdep.h structs.h subskills.h comm.h \
+  interpreter.h calender.h db.h utils.h
 cali.o: cali.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h house.h screen.h constants.h oasis.h \
   dg_scripts.h
@@ -65,7 +69,7 @@ clientcolors.o: clientcolors.c
 color.o: color.c conf.h sysdep.h structs.h subskills.h utils.h
 comm.o: comm.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   interpreter.h handler.h db.h house.h dg_scripts.h screen.h arena.h \
-  mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h
+  mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h auction.h
 config.o: config.c conf.h sysdep.h structs.h subskills.h interpreter.h
 constants.o: constants.c conf.h sysdep.h structs.h subskills.h \
   interpreter.h house.h constants.h utils.h versionlist.h
@@ -177,7 +181,7 @@ lockers.o: lockers.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   screen.h spells.h handler.h interpreter.h db.h constants.h
 magic.o: magic.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   spells.h handler.h db.h interpreter.h dg_scripts.h dg_event.h \
-  constants.h
+  constants.h fight.h
 mail.o: mail.c conf.h sysdep.h structs.h subskills.h utils.h comm.h db.h \
   interpreter.h handler.h mail.h
 mapmaker.o: mapmaker.c conf.h sysdep.h structs.h subskills.h utils.h \
@@ -227,6 +231,8 @@ oedit.o: oedit.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h spells.h utils.h db.h boards.h constants.h shop.h \
   genolc.h genobj.h genzon.h oasis.h improved-edit.h dg_olc.h \
   dg_scripts.h
+pk.o: pk.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
+  interpreter.h handler.h db.h fight.h
 proffessions.o: proffessions.c conf.h sysdep.h structs.h subskills.h \
   utils.h comm.h interpreter.h handler.h db.h spells.h screen.h \
   constants.h dg_scripts.h clan.h fight.h

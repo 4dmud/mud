@@ -20,6 +20,7 @@
 #include "interpreter.h"
 #include "dg_scripts.h"
 #include "clan.h"
+#include "fight.h"
 #include "damage.h"
 
 /* local functions */

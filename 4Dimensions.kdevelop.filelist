@@ -2,3 +2,6 @@
 pk.c
 calendar.c
 calender.h
+auction.c
+auction.h
+zreload.c

@@ -106,6 +106,8 @@ SUB_FORGE,
 TOP_SUB_DEFINE
 };
 
+extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
+
 enum sub_status_types {
 STATUS_TYPE_TRAINABLE,
 STATUS_TYPE_ONOFF
@@ -192,6 +194,5 @@ struct sub_list *next;
 #define SUB_TYPE_DEFAULT_ON     (1 << 4)
 #define SUB_TYPE_PROF		(1 << 5)
 
-extern struct sub_skill_info_type sub_info[];
 
 

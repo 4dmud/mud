@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.39  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.38  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
  *
@@ -165,8 +168,11 @@
 #include "clan.h"
 #include "oasis.h"
 #include "assemblies.h"
+#include "fight.h"
 
 /*   external vars  */
+extern struct index_data *obj_index;
+extern struct obj_data *obj_proto;
 extern int TEMP_LOAD_CHAR;
 extern struct time_data time_info;
 extern struct attack_hit_type attack_hit_text[];
@@ -199,8 +205,12 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
-void weight_to_object(struct obj_data *obj, int weight);
 
+char *one_arg(char *arg, char *first_arg);
+void remove_player(int pfilepos);
+int find_name(char *name);
+void weight_to_object(struct obj_data *obj, int weight);
+char *getline( char *str, char *buf, size_t len );
 void write_aliases(struct char_data *ch);
 void do_show_corpses(CHAR_DATA *ch);
 void do_show_errors(CHAR_DATA *ch);
@@ -234,11 +244,13 @@ void print_zone(struct char_data *ch, zone_vnum vnum);
 zone_rnum real_zone_by_thing(room_vnum vznum); /* added for zone_checker */
 SPECIAL(shop_keeper);
 
+int check_potion_weight(struct obj_data *obj);
+int check_potion_price(struct obj_data *obj);
 void write_ignorelist(struct char_data *ch);
 void Crash_rentsave(struct char_data *ch, int cost);
 
 /* local functions */
-
+int spell_price(struct obj_data *obj, int val);
 void show_door_errors(struct char_data *ch);
 C_FUNC(delete_player);
 void perform_delete_player(char *charname);
@@ -2790,7 +2802,7 @@ ACMD(do_copyover)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
   int process_output(struct descriptor_data *t);
-  //char buf [100], buf2[100];
+
 
   fp = fopen(COPYOVER_FILE, "w");
 
@@ -2800,7 +2812,6 @@ ACMD(do_copyover)
     return;
   }
 
-  /* Consider changing all saved areas here, if you use OLC */
   save_all(); //done
   /* For each playing descriptor, save its state */
   for (d = descriptor_list; d; d = d_next)
@@ -5731,11 +5742,8 @@ int check_item_hack_invis(struct obj_data *obj, int fix)
 
 ACMD(do_potionweight)
 {
-  extern struct index_data *obj_index;
-  extern struct obj_data *obj_proto;
+
   int nr, found = 0;
-  int check_potion_weight(struct obj_data *obj);
-  int check_potion_price(struct obj_data *obj);
   char buf[MAX_INPUT_LENGTH];
   DYN_DEFINE;
   *buf = 0;
@@ -5793,7 +5801,6 @@ int check_potion_weight(struct obj_data *obj)
 }
 int check_potion_price(struct obj_data *obj)
 {
-  int spell_price(struct obj_data *obj, int val);
   int weight = 0;
 
 
@@ -6071,23 +6078,43 @@ void olc_list_flags(struct char_data *ch, const char *apply_stuff[])
 
 ACMD(do_statinnate)
 {
-  int count = 0, object,  bot=0, top=1000;
+  int count = 0, object,  bot=0, top=0, s = -1;
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
   DYN_DEFINE;
-  two_arguments(argument, buf, buf1);
-  if (is_number(buf) && is_number(buf1))
-  {
-    bot = atoi(buf);
-    top = atoi(buf1);
+  skip_spaces(&argument);
+  if (!*argument) {
+    new_send_to_char(ch, "You must supply an argument.\r\nstatinnate <bottom vnum> <top vnum>\r\nstatinnate <name of innate>\r\n");
+    return;
+  }
+  if (!is_number(argument)) {
+    s = spell_num(argument);
+  } else {
+    two_arguments(argument, buf, buf1);
+    if (is_number(buf) && is_number(buf1))
+    {
+      bot = atoi(buf);
+      top = atoi(buf1);
+    }
   }
   DYN_CREATE;
   *dynbuf = 0;
-  new_send_to_char(ch, "You list the innates:\r\n");
+new_send_to_char(ch, "You list the innates:\r\n");
   for (object = 0; object <= top_of_objt; object++)
   {
-    if (obj_proto[object].obj_flags.obj_innate && obj_index[object].vnum >= bot && obj_index[object].vnum <= top)
-    {
+    if (!obj_proto[object].obj_flags.obj_innate)
+      continue;
+    if (bot + top != 0) {
+      if (obj_index[object].vnum >= bot && obj_index[object].vnum <= top)
+      {
+        count++;
+        snprintf(buf, sizeof(buf), "[vnum: %7d] innate: %s - %s\r\n",
+                 obj_index[object].vnum,
+                 skill_name(obj_proto[object].obj_flags.obj_innate),
+                 obj_proto[object].short_description);
+        DYN_RESIZE(buf);
+      }
+    } else if (s != -1 && obj_proto[object].obj_flags.obj_innate == s) {
       count++;
       snprintf(buf, sizeof(buf), "[vnum: %7d] innate: %s - %s\r\n",
                obj_index[object].vnum,
@@ -6095,14 +6122,14 @@ ACMD(do_statinnate)
                obj_proto[object].short_description);
       DYN_RESIZE(buf);
     }
-
+    
   }
   if (!count)
     new_send_to_char(ch, "No innates!");
   else
     page_string(ch->desc, dynbuf, DYN_BUFFER);
-
-
+  
+  
 }
 
 ACMD(do_statlist)
@@ -6756,7 +6783,6 @@ ACMD(do_namechange)
 
 ACMD(do_decrypt)
 {
-  char *one_arg(char *arg, char *first_arg);
   char arg1[256], arg2[256];
   argument = one_arg(argument, arg1);
   argument = one_arg(argument, arg2);
@@ -6829,8 +6855,7 @@ C_FUNC(delete_player)
 
 void perform_delete_player(char *charname)
 {
-  void remove_player(int pfilepos);
-  int find_name(char *name);
+;
   int player_i;
   Crash_delete_file(charname);
   delete_pobj_file(charname);
@@ -6974,7 +6999,7 @@ int hilite(const char *regex, const char *str, char *buf, size_t buflen)
 
 int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, int vnum, const char *phrase)
 {
-  char *getline( char *str, char *buf, size_t len );
+  
   size_t nlen = 0;
   int found = 0, count = 0;
   char strtmp2[MAX_STRING_LENGTH];

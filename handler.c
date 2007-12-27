@@ -22,6 +22,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "trees.h"
+#include "fight.h"
 #include "damage.h"
 /* local vars */
 int extractions_pending = 0;
@@ -72,6 +73,8 @@ int move_link_room(CHAR_DATA *mob, room_rnum room);
 void eq_to_room(CHAR_DATA *ch);
 void extract_obj_final(struct obj_data *obj);
 
+void unhitch_mob(struct char_data *ch);
+
 char *fname(const char *namelist)
 {
   static char holder[READ_SIZE];
@@ -99,7 +102,7 @@ int isname(const char *str, const char *namelist)
   if (!str_cmp(str, namelist)) /* the easy way */
     return 1;
 
-  lp = newlist = strdup(namelist);	/* make a copy since strtok 'modifies' strings */
+  lp = newlist = strdup(namelist); /* make a copy since strtok 'modifies' strings */
   for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
     if (curtok && is_abbrev(str, curtok))
     {
@@ -128,53 +131,57 @@ int isname_full(const char *strlist, const char *namelist)
 
   /* make a copy since strtok 'modifies' strings */
 
-    lp = newlist = strdup(strlist);
-    cnt = 0;
-    for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
-      if (curtok)
+  lp = newlist = strdup(strlist);
+  cnt = 0;
+  for (curtok = strsep(&newlist, WHITESPACE); curtok; curtok = strsep(&newlist, WHITESPACE))
+    if (curtok)
+    {
+      if (!isname(curtok, namelist))
       {
-        if (!isname(curtok, namelist)) {
-	free(lp);
-	return 0;
-	} 
-	else
-        {
-          cnt ++;
-        }
+        free(lp);
+        return 0;
       }
+      else
+      {
+        cnt ++;
+      }
+    }
 
-free(lp);
-  
+  free(lp);
+
   return cnt;
 }
 
-char * str_until(char *strlist, const char *key, char *newstr, size_t len) {
-char *p = strlist;
-char arg[MAX_INPUT_LENGTH];
-int loop = 0;
+char * str_until(char *strlist, const char *key, char *newstr, size_t len)
+{
+  char *p = strlist;
+  char arg[MAX_INPUT_LENGTH];
+  int loop = 0;
   if (!strlist || !*strlist || len <= 0)
     return 0;
-    *newstr = '\0';
-    for (p = any_one_arg(p, arg);p && arg && *arg;p = any_one_arg(p, arg)) {
+  *newstr = '\0';
+  for (p = any_one_arg(p, arg);p && arg && *arg;p = any_one_arg(p, arg))
+  {
     if (!str_cmp(key, arg))
-    break;
+      break;
     loop++;
     if (loop != 1)
-    strlcat(newstr, " ", len);
+      strlcat(newstr, " ", len);
     strlcat(newstr, arg, len);
-    }
-  
-  
+  }
+
+
   return p;
 }
 
-int begins_with_number(char * str) {
-char num[MAX_INPUT_LENGTH];
-any_one_arg(str, num);
-if (is_number(num))
-return 1;
-else
-return 0;
+int begins_with_number(char * str)
+{
+  char num[MAX_INPUT_LENGTH];
+  any_one_arg(str, num);
+  if (is_number(num))
+    return 1;
+  else
+    return 0;
 }
 
 /*
@@ -186,23 +193,23 @@ int isname(const char *str, const char *namelist)
   for (;;) {
     for (curstr = str;; curstr++, curname++) {
       if (!*curstr && !isalpha(*curname))
-	return (1);
+     return (1);
  
       if (!*curname)
-	return (0);
+     return (0);
  
       if (!*curstr || *curname == ' ')
-	break;
+     break;
  
       if (LOWER(*curstr) != LOWER(*curname))
-	break;
+     break;
     }
  
  
     for (; isalpha(*curname); curname++);
     if (!*curname)
       return (0);
-    curname++;			
+    curname++;           
   }
 }
 */
@@ -239,7 +246,7 @@ int is_name(const char *str, const char *namelist)
     for (; isalpha(*curname); curname++);
     if (!*curname)
       return (0);
-    curname++;		/* first char of new name */
+    curname++;      /* first char of new name */
   }
 }
 
@@ -375,7 +382,7 @@ void affect_modify(struct char_data *ch, byte loc, int mod,
         loc, __FILE__);
     break;
 
-  }				/* switch */
+  }                 /* switch */
 }
 
 
@@ -515,12 +522,12 @@ void aff_apply_modify(struct char_data *ch, byte loc, int mod, char *msg)
         loc, __FILE__);
     break;
 
-  }				/* switch */
+  }                 /* switch */
 }
 
 /*
 void affect_modify(struct char_data * ch, byte loc, sbyte mod,
-		   bitvector_t bitv, bool add)
+             bitvector_t bitv, bool add)
 {
   if (add) 
     SET_BIT_AR(AFF_FLAGS(ch), bitv);
@@ -600,7 +607,7 @@ void affect_total(struct char_data *ch)
   }
 
 
-  //check_regen_rates(ch);	/* update regen rates (for age) */
+  //check_regen_rates(ch);    /* update regen rates (for age) */
 
 }
 
@@ -797,8 +804,10 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
   if (cur != NULL)
     char_from_room(ch);
-    if (SITTING(ch))
-  char_from_chair(ch);
+  if (SITTING(ch))
+    char_from_chair(ch);
+
+  unhitch_mob(ch);
 
   if (cur == IN_ROOM(ch))
     return 0;
@@ -830,7 +839,7 @@ void char_from_chair(struct char_data *ch)
 
   if (!ch || !SITTING(ch))
     return;
-    
+
   if (!(chair = SITTING(ch)))
   {
     log("SYSERR: ACK, no chair for char in char from chair");
@@ -897,7 +906,7 @@ void char_from_room(struct char_data *ch)
   }
 
   if (SITTING(ch))
-  char_from_chair(ch);
+    char_from_chair(ch);
 
   if (FIGHTING(ch) != NULL)
     halt_fighting(ch);
@@ -907,7 +916,7 @@ void char_from_room(struct char_data *ch)
 
   if (GET_EQ(ch, WEAR_LIGHT) != NULL)
     if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
-      if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2))	/* Light is ON */
+      if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2)) /* Light is ON */
         IN_ROOM(ch)->light--;
 
   REMOVE_FROM_LIST(ch, IN_ROOM(ch)->people, next_in_room);
@@ -946,7 +955,7 @@ void char_to_room(struct char_data *ch, room_rnum room)
 
   if (GET_EQ(ch, WEAR_LIGHT))
     if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
-      if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2))	/* Light ON */
+      if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2)) /* Light ON */
         room->light++;
 
   /* Stop fighting now, if we left. */
@@ -976,8 +985,8 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
     /* set flag for crash-save system, but not on mobs! */
     if (!IS_NPC(ch))
       SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
-      
-     
+
+
 
 #if defined(ARTIS_ARE_OWNED)
     if (GET_OBJ_RNUM(object) != NOTHING && obj_index[GET_OBJ_RNUM(object)].qic)
@@ -987,7 +996,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
         new_send_to_char(ch, "%s binds itself to you.\r\n", object->short_description);
         object->owner = GET_IDNUM(ch);
       }
-      
+
       new_mudlog(CMP, MAX(LVL_SEN, GET_INVIS_LEV(ch)), TRUE, "%s to character %s (Owner: %s)",
                  object->short_description, GET_NAME(ch), object->owner == 0 ? "nobody" : get_name_by_id(object->owner));
 
@@ -1079,14 +1088,14 @@ int apply_ac(struct char_data *ch, int eq_pos)
     break;
   case WEAR_BODY:
     factor = 3;
-    break;			/* 30% */
+    break;               /* 30% */
   case WEAR_HEAD:
   case WEAR_LEGS:
     factor = 2;
-    break;			/* 20% */
+    break;               /* 20% */
   default:
     factor = 1;
-    break;			/* all others 10% */
+    break;               /* all others 10% */
   }
 
   if (IS_OBJ_STAT(GET_EQ(ch, eq_pos), ITEM_NODROP))
@@ -1139,8 +1148,8 @@ int equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   {
     act("You are zapped by $p and instantly let go of it.", FALSE, ch, obj, 0, TO_CHAR);
     act("$n is zapped by $p and instantly lets go of it.", FALSE, ch, obj, 0, TO_ROOM);
-    obj_to_char(obj, ch);	// changed to drop in inventory instead of
-    zap_char(ch);		// ground
+    obj_to_char(obj, ch);     // changed to drop in inventory instead of
+    zap_char(ch);        // ground
     return 0;
   }
 
@@ -1155,7 +1164,7 @@ int equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   if (IN_ROOM(ch) != NULL)
   {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)
-      if (GET_OBJ_VAL(obj, 2))	/* if light is ON */
+      if (GET_OBJ_VAL(obj, 2))     /* if light is ON */
         IN_ROOM(ch)->light++;
   }
   else if (ch->loader == NOBODY)
@@ -1169,8 +1178,8 @@ int equip_char(struct char_data *ch, struct obj_data *obj, int pos)
 
   if (obj->obj_flags.obj_innate)
   {
-    for (aff = ch->affected; aff; aff = aff->next)	/* run through list */
-      if (aff->type == obj->obj_flags.obj_innate)	/* if already affected */
+    for (aff = ch->affected; aff; aff = aff->next)     /* run through list */
+      if (aff->type == obj->obj_flags.obj_innate) /* if already affected */
         continue;
     OBJ_INNATE = TRUE;
     mag_affects(90, NULL, ch, obj->obj_flags.obj_innate, NOBODY);
@@ -1218,7 +1227,7 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   if (IN_ROOM(ch) != NULL)
   {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)
-      if (GET_OBJ_VAL(obj, 2))	/* if light is ON */
+      if (GET_OBJ_VAL(obj, 2))     /* if light is ON */
         IN_ROOM(ch)->light--;
   }
   else
@@ -1275,7 +1284,7 @@ int get_number(char **name)
   {
     *ppos++ = '\0';
     strlcpy(number, *name, sizeof(number));
-    //strcpy(*name, ppos);	/* strcpy: OK (always smaller) */
+    //strcpy(*name, ppos);    /* strcpy: OK (always smaller) */
     memmove(*name, ppos, (plen = strlen(ppos)));
     *((*name + (plen))) = '\0';
 
@@ -1509,6 +1518,8 @@ void extract_obj(struct obj_data *obj)
   if (GET_OBJ_RNUM(obj) != NOTHING)
     (obj_index[GET_OBJ_RNUM(obj)].number)--;
 
+  if (obj->hitched)
+    unhitch_obj(obj);
 
   /* Get rid of the contents of the object, as well. */
   for (tobj = obj->contains; tobj; tobj = next)
@@ -1631,8 +1642,8 @@ void extract_obj(struct obj_data *obj)
       }
       else
       {
-        target = room;	// the room the vehicle is in
-        from = real_room(GET_OBJ_VAL(obj, 0));	// the room where the mobs/objs are in
+        target = room;   // the room the vehicle is in
+        from = real_room(GET_OBJ_VAL(obj, 0));    // the room where the mobs/objs are in
 
         // First, get all the people out of the room
         if (from != NULL)
@@ -1734,7 +1745,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
       SET_BIT_AR(IN_ROOM(obj)->room_flags, ROOM_HOUSE_CRASH);
 
   if (GET_OBJ_TYPE(obj) == ITEM_PORTAL)
-  {	/* If it is a portal */
+  {  /* If it is a portal */
     if (GET_OBJ_VAL(obj, 2) > 0)
       GET_OBJ_VAL(obj, 2)--;
     if (!GET_OBJ_VAL(obj, 2))
@@ -1755,7 +1766,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
     }
   }
   else if (IN_ROOM(obj) != NULL)
-  {	/* In a room */
+  {  /* In a room */
     if (IN_ROOM(obj)->people)
     {
       act("A quivering horde of maggots consumes $p.",
@@ -1777,7 +1788,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
     item_from_locker(obj->in_locker, obj);
   }
   else if (!obj->in_obj && obj->carried_by)
-  {	/* Worn or inventory */
+  {  /* Worn or inventory */
 
     for (loop = obj->contains; loop; loop = obj->contains)
     {
@@ -1785,7 +1796,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
       obj_to_char(loop, ch);
     }
     if (!obj->carried_by)
-    {	/* Equipped */
+    {     /* Equipped */
       for (index = 0; index < NUM_WEARS; index++)
         if (GET_EQ(ch, index) == obj)
         {
@@ -1801,7 +1812,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
     }
   }
   else if (obj->in_obj)
-  {			/* In an object */
+  {            /* In an object */
     for (loop = obj->contains; loop; loop = obj->contains)
     {
       obj_from_obj(loop);
@@ -1929,9 +1940,12 @@ void death_room(struct char_data *ch)
 
   /*ends fight event*/
   if (FIGHTING(ch))
-  halt_fighting(ch);
+    halt_fighting(ch);
   if (SITTING(ch))
-  char_from_chair(ch);
+    char_from_chair(ch);
+
+  if (ch->hitched)
+    unhitch_mob(ch);
 
   /* cancel point updates */
   /** no need to cancel regen!**/
@@ -2014,11 +2028,6 @@ void extract_char_final(struct char_data *ch)
     abort();
   }
 
-  if (ch == ch_selling)
-    stop_auction(AUC_QUIT_CANCEL, NULL);
-
-
-
   /* Forget snooping, if applicable */
   if (ch->desc)
   {
@@ -2084,9 +2093,9 @@ void extract_char_final(struct char_data *ch)
 
   /*ends fight event*/
   if (FIGHTING(ch))
-  halt_fighting(ch);
+    halt_fighting(ch);
   if (SITTING(ch))
-  char_from_chair(ch);
+    char_from_chair(ch);
 
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);
@@ -2126,16 +2135,20 @@ void extract_char_final(struct char_data *ch)
   stop_task(ch);
   if (SCRIPT(ch))
     extract_script(ch, MOB_TRIGGER);
-  if (!IS_NPC(ch)) {
+  if (!IS_NPC(ch))
+  {
     void free_alias(struct alias_data *a);
     struct alias_data *a;
-  while ((a = GET_ALIASES(ch)) != NULL)
-  {
-    GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
-    free_alias(a);
-  }
+    while ((a = GET_ALIASES(ch)) != NULL)
+    {
+      GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
+      free_alias(a);
+    }
   }
   remove_hunter(ch);
+
+  if (ch->hitched)
+    unhitch_mob(ch);
 
   /* we can't forget the hunters either... */
   for (hunt = hunter_list; hunt; hunt = hnext)
@@ -2161,7 +2174,7 @@ void extract_char_final(struct char_data *ch)
   char_from_room(ch);
   if (IS_NPC(ch))
   {
-    if (GET_MOB_RNUM(ch) != NOTHING)	/* prototyped */
+    if (GET_MOB_RNUM(ch) != NOTHING)    /* prototyped */
       mob_index[GET_MOB_RNUM(ch)].number--;
     clearMemory(ch);
     if (SCRIPT(ch))
@@ -2211,7 +2224,7 @@ void extract_char(struct char_data *ch)
       log("Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM(ch), GET_NAME(ch));
     return;
   }
-    if (GET_ID(ch) > 0)
+  if (GET_ID(ch) > 0)
     remove_from_lookup_table(GET_ID(ch));
   if (IS_NPC(ch))
   {
@@ -2288,7 +2301,7 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
   struct char_data *i;
   DESCRIPTOR_DATA *d;
   int num;
-  
+
   skip_spaces(&name);
 
   if (!number)
@@ -2364,7 +2377,7 @@ struct char_data *get_player_room(room_rnum room, char *name, int *number,
       continue;
     if (inroom == FIND_CHAR_ROOM && IN_ROOM(ch) != room)
       continue;
-    if (str_cmp(ch->player.name, name))	/* If not same, continue */
+    if (str_cmp(ch->player.name, name)) /* If not same, continue */
       continue;
     if (--(*number) != 0)
       continue;
@@ -2755,7 +2768,7 @@ int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
     return (0);
 
   if (IS_SET(bitvector, FIND_CHAR_ROOM))
-  {	/* Find person in room */
+  {  /* Find person in room */
     if ((*tar_ch = get_char_room_vis(ch, name, &number)) != NULL)
       return (FIND_CHAR_ROOM);
   }
@@ -2845,10 +2858,10 @@ void dismount_char(struct char_data *ch)
     RIDING(RIDDEN_BY(ch)) = NULL;
     RIDDEN_BY(ch) = NULL;
   }
-  
+
   if (SITTING(ch))
-  char_from_chair(ch);
-  
+    char_from_chair(ch);
+
 }
 
 
@@ -2917,5 +2930,56 @@ void remove_hunter(struct char_data *ch)
   }
 }
 
+struct char_data *check_ch(struct char_data *ch)
+{
+  register struct char_data *tch;
+
+  if (!ch)
+    return NULL;
+
+  for (tch = character_list; tch; tch = tch->next)
+    if (ch == tch)
+      return tch;
+
+  return NULL;
+}
+
+int lock_desc(struct descriptor_data *d)
+{
+  if (!d)
+    return -1;
+
+  if (d->locked)
+    log("Descriptor is being locked when it is already in a locked state.");
+
+  d->locked = TRUE;
+
+  return TRUE;
+}
+
+int unlock_desc(struct descriptor_data *d)
+{
+  if (!d)
+    return -1;
+
+  if (!d->locked)
+    log("Descriptor is being unlocked when it is already in a unlocked state.");
+
+  d->locked = FALSE;
+
+  return TRUE;
+}
+
+
+int is_locked(struct descriptor_data *d)
+{
+  if (!d)
+    return -1;
+
+  if (d->locked)
+    return TRUE;
+  else
+    return FALSE;
+}
 
 

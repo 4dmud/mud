@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.11  2006/02/17 22:19:54  w4dimenscor
+ * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+ *
  * Revision 1.10  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -1180,6 +1183,7 @@ ACMD(do_mforce)
 
     for (i = descriptor_list; i; i = i->next)
     {
+      lock_desc(i);
       if ((i->character != ch) && !i->connected &&
           (IN_ROOM(i->character) == IN_ROOM(ch)))
       {
@@ -1190,6 +1194,7 @@ ACMD(do_mforce)
           command_interpreter(vch, argument);
         }
       }
+      unlock_desc(i);
     }
   }
   else

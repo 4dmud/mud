@@ -94,6 +94,9 @@ int boot_high = 0;
 int color_space = 0;
 
 /* extern functions */
+
+int highest_tier(struct char_data *ch);
+const char *how_good(int percent);
 int grand_master(struct char_data *ch);
 const char *simple_class_name(struct char_data *ch);
 size_t proc_color(char *inbuf, int color_lvl, size_t len);
@@ -435,8 +438,7 @@ void show_affect_to_char(struct char_data *i, struct char_data *ch)
 
 
     if (GET_LEVEL(i)>=LVL_IMMORT && GET_LEVEL(i)<=LVL_IMMORT+1)
-      act("...$e crackles with creative energy!", FALSE, i, 0, ch,
-          TO_VICT);
+      act("...$e crackles with creative energy!", FALSE, i, 0, ch, TO_VICT);
     if (GET_LEVEL(i)>=LVL_IMMORT+2 && GET_LEVEL(i)<=LVL_IMMORT+3)
       act("...$e is surrounded by a divine light!", FALSE, i, 0, ch,
           TO_VICT);
@@ -1940,11 +1942,12 @@ ACMD(do_gold)
   new_send_to_char(ch,"{cY   |_|   |_|    {cw-------------------------------------------{c0\r\n");
   new_send_to_char(ch,"                {ccTotal Balance{cW:        [{cy%19s{cW]{c0\r\n",goldtot);
   new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
-  new_send_to_char(ch,
-                   "                {ccTokens on file{cW: %5d brass,  %5d bronze.\r\n"
-                   "                                %5d silver, %5d gold.{c0\r\n",
+  new_send_to_char(ch,"                {ccTokens on file{cW: %5d brass,  %5d bronze.\r\n"
+                      "                                %5d silver, %5d gold.{c0\r\n",
                    GET_BRASS_TOKEN_COUNT(ch), GET_BRONZE_TOKEN_COUNT(ch),
                    GET_SILVER_TOKEN_COUNT(ch), GET_GOLD_TOKEN_COUNT(ch));
+  new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
+  new_send_to_char(ch,"                {ccTradepoints   {cW: %5d  {c0\r\n",TRADEPOINTS(ch));
 
 }
 
@@ -4035,7 +4038,8 @@ void perform_immort_where(struct char_data *ch, char *arg)
   if (!*arg)
   {
     send_to_char("Players\r\n-------\r\n", ch);
-    for (d = descriptor_list; d; d = d->next)
+    for (d = descriptor_list; d; d = d->next) {
+      lock_desc(d);
       if (STATE(d) == CON_PLAYING)
       {
         i = (d->original ? d->original : d->character);
@@ -4053,6 +4057,8 @@ void perform_immort_where(struct char_data *ch, char *arg)
                              i->in_room->name,  zone_table[(i->in_room)->zone].name);
         }
       }
+      unlock_desc(d);
+    }
   }
   else
   {
@@ -4273,7 +4279,6 @@ int arena_ok(struct char_data *ch, struct char_data *victim);
 ACMD(do_consider)
 {
   struct char_data *victim;
-  int highest_tier(struct char_data *ch);
   int diff, diff2, diff3;
   //  char buf[MAX_INPUT_LENGTH];
   skip_spaces(&argument);
@@ -5006,7 +5011,6 @@ O===================================================================O
 
 ACMD(do_worth)
 {
-  int chance_hit_part(struct char_data *ch, int part);
   char buf[40] = "", buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   size_t len = 0;
   int i;
@@ -5424,7 +5428,7 @@ ACMD(do_ipsearch)
 
 void container_disp(CHAR_DATA *ch,OBJ_DATA * obj)
 {
-  const char *how_good(int percent);
+  
   int max, percent = 0;
   if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
   {
