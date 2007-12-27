@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/01/27 13:50:15 $                                           * 
-*  $Revision: 1.42 $                                                      *
+*  $Date: 2007/03/01 23:19:41 $                                           * 
+*  $Revision: 1.43 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1475,6 +1475,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     else
                         strcpy(str, "");
                 }
+		else if (!strcasecmp(field, "is_inobj")) {
+			if (o->in_obj!=NULL)
+				snprintf(str, slen,"%c%ld",UID_CHAR, (long)o->in_obj);
+			else
+				strcpy(str, "");
+		}
 
                 break;
             case 'n':

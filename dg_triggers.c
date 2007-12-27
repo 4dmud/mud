@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.11 $
+*  $Date: 2007/03/01 23:19:41 $
+*  $Revision: 1.12 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1362,6 +1362,33 @@ void time_otrigger(obj_data *obj)
   }
 }
 
+int put_in_otrigger(obj_data *container, obj_data *obj)
+{
+	trig_data *t;
+	int ret_val;
+	char buf[MAX_INPUT_LENGTH];
+	
+	if(!SCRIPT_CHECK(container, OTRIG_PUT_IN))
+		return 1;
+
+	for (t = TRIGGERS(SCRIPT(container)); t; t = t->next)
+	{
+		if(TRIGGER_CHECK(t, OTRIG_PUT_IN)){
+      			ADD_UID_VAR(buf, t, obj, "object", 0);
+      			ret_val = script_driver(&container, t, OBJ_TRIGGER, TRIG_NEW);
+
+			      /* don't allow a put to take place, if
+			       * the object is purged (nothing to put).
+			       */
+			if (!obj)
+				return -1;
+			else
+				return ret_val;
+		}
+	}
+	return 1;
+}
+
 /*
  *  world triggers
  */
@@ -1378,6 +1405,7 @@ void reset_wtrigger(Room * room)
     if (TRIGGER_CHECK(t, WTRIG_RESET) &&
         (number(1, 100) <= GET_TRIG_NARG(t)))
     {
+	
 
 
       script_driver(&room, t, WLD_TRIGGER, TRIG_NEW);

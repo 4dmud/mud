@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.48  2007/03/01 23:19:41  w4dimenscor
+ * Added a new object trigger type for containers that checks wether something is being put into them. %object% refers to the object being put in. Also added %object.is_inobj% which returns the UID of the object it is in, or nothing if it isn't in a container. --Thotter
+ *
  * Revision 1.47  2006/12/04 10:24:32  w4dimenscor
  * FIXED:take pie all would show up all undisplayed containers in the room.
  *
@@ -495,6 +498,9 @@ bool perform_put(Character *ch, struct obj_data *obj, struct obj_data *cont)
   int value;
 
   if (drop_otrigger(obj, ch) <= 0)
+    return FALSE;
+
+  if (put_in_otrigger(cont, obj) <= 0)
     return FALSE;
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_HOUSE) &&

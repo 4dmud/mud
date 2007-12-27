@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.23  2007/03/01 23:19:41  w4dimenscor
+ * Added a new object trigger type for containers that checks wether something is being put into them. %object% refers to the object being put in. Also added %object.is_inobj% which returns the UID of the object it is in, or nothing if it isn't in a container. --Thotter
+ *
  * Revision 1.22  2006/10/06 22:25:30  w4dimenscor
  * fixed staves crested from woodsing
  *
@@ -2226,9 +2229,9 @@ const char *otrig_types[] =
     "Wear",
     "Assemble",
     "Remove",
-    "UNUSED",
+    "put_in",
     "Load", /* 13 */
-    "UNUSED",
+    "get_out",
     "Time",
     "Cast",
     "Leave",

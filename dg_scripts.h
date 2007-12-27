@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/23 09:01:26 $
-*  $Revision: 1.11 $
+*  $Date: 2007/03/01 23:19:41 $
+*  $Revision: 1.12 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -91,8 +91,10 @@
 #define OTRIG_WEAR             (1 << 9)	/* character trys to wear obj */
 #define OTRIG_ASSEMBLE         (1 << 10)/* attached to the assembly command group */
 #define OTRIG_REMOVE           (1 << 11)/* character trys to remove obj */
+#define OTRIG_PUT_IN	       (1 << 12)/* character tries to put something into a container */
 
 #define OTRIG_LOAD             (1 << 13)/* the object is loaded       */
+#define OTRIG_GET_OUT          (1 << 14)/* character tries to get something out of a container */
 #define OTRIG_TIME             (1 << 15)/* time prog */
 #define OTRIG_CAST             (1 << 16)/* object targetted by spell */
 #define OTRIG_LEAVE            (1 << 17)     /* someone leaves room seen    */
@@ -300,6 +302,7 @@ int door_mtrigger(Character *actor, int subcmd, int dir);
 int door_wtrigger(Character *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, Character *actor, int cmd);
+int put_in_otrigger(obj_data *cont, obj_data *obj);
 
 /* function prototypes from dg_scripts.c */
 void script_damage(Character *vict, int dam);
