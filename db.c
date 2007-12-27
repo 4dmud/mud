@@ -5375,6 +5375,7 @@ void char_to_store(Character *ch) {
     if(GET_CSNP_LVL(ch))
         fprintf(fl, "Csnp: %d\n", GET_CSNP_LVL(ch));
     /* the end! *bows to the massive cheering from the audience* Read 1984! */
+    /** hoho thots :-P - mord**/
     if (CREATE_POINTS(ch))
         fprintf(fl, "CrPt: %d\n", CREATE_POINTS(ch));
     {
@@ -5404,8 +5405,7 @@ void char_to_store(Character *ch) {
        If it errors, bail - mord
     */
     if (i == -1) {
-        if (remove
-                (tempname) == -1) {
+        if (remove(tempname) == -1) {
             new_mudlog(NRM, LVL_GOD, TRUE, "unable to remove temp file: %s", tempname);
             log("unable to remove temp file: %s", tempname);
         }
@@ -5434,7 +5434,7 @@ void char_to_store(Character *ch) {
         }
     }
 
-    if (GET_IDNUM(ch) == 0 || GET_IDNUM(ch) > top_idnum) {
+    if (GET_IDNUM(ch) <= 0 || GET_IDNUM(ch) > top_idnum) {
         GET_IDNUM(ch) = GET_ID(ch) =  top_idnum++;
         add_to_lookup_table(GET_ID(ch), (void *)ch);
     }
