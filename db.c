@@ -4821,7 +4821,8 @@ void default_char(struct char_data *ch)
   LOCKER_EXPIRE(ch) = 0;
   LOCKER_LIMIT(ch) = 0;
   GET_KILLS(ch) = NULL;
-
+  GET_LOGOUTMSG(ch) = NULL;
+  GET_LOGINMSG(ch) = NULL;
 
 }
 
@@ -5134,6 +5135,10 @@ int store_to_char(char *name, struct char_data *ch)
       }
       else if (!strcmp(tag, "LocL"))
         LOCKER_LIMIT(ch) = num;
+       /*A little something by Thotter */
+      else if (!strcmp(tag, "Lgim")) GET_LOGINMSG(ch)    = strdup(line);
+      else if (!strcmp(tag, "Lgom")) GET_LOGOUTMSG(ch)   = strdup(line);
+       /*Ends here */
       break;
 
     case 'M':
@@ -5826,6 +5831,12 @@ void char_to_store(struct char_data *ch)
     fprintf(fl, "NewL: %d\n", GET_NEWBIE_STATUS(ch));
   if (GET_EMAIL(ch) && *GET_EMAIL(ch))
     fprintf(fl, "Emai: \n%s~\n", GET_EMAIL(ch));
+  /*Here follows a little something made by Thotter */
+     if (GET_LOGINMSG(ch))
+       fprintf(fl, "Lgim: %s\n", GET_LOGINMSG(ch));
+     if(GET_LOGOUTMSG(ch))
+       fprintf(fl, "Lgom: %s\n", GET_LOGOUTMSG(ch));
+  /*end :P */
   if (CREATE_POINTS(ch))
     fprintf(fl, "CrPt: %d\n", CREATE_POINTS(ch));
   {
@@ -6626,6 +6637,8 @@ void init_char(struct char_data *ch)
   ch->points.gold = 15000;
   GET_STAMINA(ch) = 100;
   GET_GROUP_EXP(ch) = 0;
+  GET_LOGOUTMSG(ch) = NULL;
+  GET_LOGINMSG(ch) = NULL;
 
 
   //TODO: check this

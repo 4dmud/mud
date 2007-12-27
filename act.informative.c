@@ -72,9 +72,9 @@ extern char *race_abbrevs[];
 
 
 /* MatingMod Defines -- DO NOT PLAY WITH THESE UNLESS YOU'RE SURE OF WHAT YOU'RE DOING! */
-#define NINE_MONTHS    6000	/* 6000 realtime minutes TO GO */
+#define NINE_MONTHS    6000   /* 6000 realtime minutes TO GO */
 #define MONTHS_8        5333
-#define MONTHS_7        4666	/* Note: These are MONTHS REMAINING */
+#define MONTHS_7        4666  /* Note: These are MONTHS REMAINING */
 #define MONTHS_6        4000
 #define MONTHS_5        3333
 #define MONTHS_4        2666
@@ -176,10 +176,10 @@ int *cmd_sort_info;
 bool examine_on = FALSE;
 int class_disp_done = -1;
 
-/* For show_obj_to_char 'mode'.	/-- arbitrary */
-#define SHOW_OBJ_LONG		0
-#define SHOW_OBJ_SHORT		1
-#define SHOW_OBJ_ACTION		2
+/* For show_obj_to_char 'mode'.    /-- arbitrary */
+#define SHOW_OBJ_LONG         0
+#define SHOW_OBJ_SHORT        1
+#define SHOW_OBJ_ACTION       2
 #define MAX_NOTE_LENGTH 1024
 
 ACMD(do_settime);
@@ -319,16 +319,16 @@ void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
       new_send_to_char(ch, " ...it is invisible");
     if (IS_OBJ_STAT(obj, ITEM_BLESS)
         && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
-      new_send_to_char(ch, " ...it has a holy aura");	// dark cyan
+      new_send_to_char(ch, " ...it has a holy aura");  // dark cyan
     if (IS_OBJ_STAT(obj, ITEM_MAGIC)
         && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
-      new_send_to_char(ch, " ...it sparkles with magic");	// dark yellow
+      new_send_to_char(ch, " ...it sparkles with magic");   // dark yellow
     if (IS_OBJ_STAT(obj, ITEM_GLOW))
-      new_send_to_char(ch, " ...it is glowing with an inner light");	//dark yellow
+      new_send_to_char(ch, " ...it is glowing with an inner light");  //dark yellow
     if (IS_OBJ_STAT(obj, ITEM_HUM))
-      new_send_to_char(ch, " ...it is humming with energy");	//dark cyan
+      new_send_to_char(ch, " ...it is humming with energy");     //dark cyan
     if (IS_OBJ_STAT(obj, ITEM_NODROP))
-      new_send_to_char(ch, " ...it has a dull red aura");	//dark cyan
+      new_send_to_char(ch, " ...it has a dull red aura");   //dark cyan
   }
 
 }
@@ -404,12 +404,12 @@ void diag_char_to_char(struct char_data *i, struct char_data *ch)
   if (GET_MAX_HIT(i) > 0)
     percent = (100 * GET_HIT(i)) / GET_MAX_HIT(i);
   else
-    percent = -1;		/* How could MAX_HIT be < 1?? */
+    percent = -1;        /* How could MAX_HIT be < 1?? */
 
   if (GET_MAX_HIT(i) > 0)
     percent = (100 * GET_HIT(i)) / GET_MAX_HIT(i);
   else
-    percent = -1;		/* How could MAX_HIT be < 1?? */
+    percent = -1;        /* How could MAX_HIT be < 1?? */
 
   for (ar_index = 0; diagnosis[ar_index].percent >= 0; ar_index++)
     if (percent >= diagnosis[ar_index].percent)
@@ -537,7 +537,7 @@ void look_at_char(struct char_data *i, struct char_data *ch)
   }
 
   if (!examine_on)
-  {		/*split do_look into two parts */
+  {       /*split do_look into two parts */
     if (i->player.description)
       new_send_to_char(ch, "%s", i->player.description);
     else
@@ -613,20 +613,20 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       if (PREG(i) < 7)
         new_send_to_char(ch, "%s %s giving birth!\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "are" : "is");
-      else if (PREG(i) < (MONTHS_2))	// Customize these messages, if you want.
+      else if (PREG(i) < (MONTHS_2))    // Customize these messages, if you want.
         new_send_to_char(ch, "%s look%s as if %s may give birth to a healthy, baby sometime soon.\r\n",
-                         i == ch ? "You" : GET_NAME(i), i == ch ? "" : "s", i == ch ? "you" : "she");	// They're pretty cheesy.
-      else if (PREG(i) < (MONTHS_3))	// Month 8
+                         i == ch ? "You" : GET_NAME(i), i == ch ? "" : "s", i == ch ? "you" : "she");    // They're pretty cheesy.
+      else if (PREG(i) < (MONTHS_3))    // Month 8
         new_send_to_char(ch,
                          "%s %s a large, cumbersome bulge in %s waist.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
-      else if (PREG(i) < (MONTHS_4))	// Month 7
+      else if (PREG(i) < (MONTHS_4))    // Month 7
         new_send_to_char(ch, "%s %s already had to let out %s armor.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
-      else if (PREG(i) < (MONTHS_5))	// Month 6
+      else if (PREG(i) < (MONTHS_5))    // Month 6
         new_send_to_char(ch, "%s %s a small bulge in %s midsection.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
-      else if (PREG(i) < (MONTHS_6))	// Month 5
+      else if (PREG(i) < (MONTHS_6))    // Month 5
         new_send_to_char(ch, "%s %s just beginning to show.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "are" : "is");
       else
@@ -721,7 +721,7 @@ void look_at_char(struct char_data *i, struct char_data *ch)
         new_send_to_char(ch, "You can't see anything.\r\n");
     }
 
-  }				//end of examine on
+  }                 //end of examine on
 }
 
 void list_one_char(struct char_data *i, struct char_data *ch)
@@ -897,7 +897,7 @@ void list_one_char(struct char_data *i, struct char_data *ch)
 
       }
     }
-    else			/* NIL fighting pointer */
+    else            /* NIL fighting pointer */
       new_send_to_char(ch, " is here struggling with thin air.");
   }
 
@@ -1304,7 +1304,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
 {
   char tbuf[MAX_STRING_LENGTH];
   struct room_data *rm, *view_room;
-void update_mxp_map(struct char_data *ch);
+  void update_mxp_map(struct char_data *ch);
   *tbuf = '\0';
   char buf[MAX_INPUT_LENGTH];
   if (VEHICLE_ROOM == NULL)
@@ -1392,9 +1392,9 @@ void update_mxp_map(struct char_data *ch);
   new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
   list_char_to_char(view_room->people, ch);
   new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
-  
-if (ch->desc && ch->desc->mxp)
-update_mxp_map(ch);
+
+  if (ch->desc && ch->desc->mxp)
+    update_mxp_map(ch);
 
   if ( KILL_ALL_ENABLED && PRF_FLAGGED(ch, PRF_AGGRO) )
   {
@@ -1556,7 +1556,7 @@ void look_in_obj(struct char_data *ch, char *arg)
       }
     }
     else
-    {		/* item must be a fountain or drink container */
+    {          /* item must be a fountain or drink container */
       if (GET_OBJ_VAL(obj, 1) <= 0)
         send_to_char("It is empty.\r\n", ch);
       else
@@ -1564,7 +1564,7 @@ void look_in_obj(struct char_data *ch, char *arg)
         if (GET_OBJ_VAL(obj, 0) <= 0
             || GET_OBJ_VAL(obj, 1) > GET_OBJ_VAL(obj, 0))
         {
-          new_send_to_char(ch, "Its contents seem somewhat murky.\r\n");	/* BUG */
+          new_send_to_char(ch, "Its contents seem somewhat murky.\r\n");   /* BUG */
         }
         else
         {
@@ -1717,7 +1717,7 @@ ACMD(do_look)
   else if (IS_DARK(IN_ROOM(ch)) && !CAN_SEE_IN_DARK(ch))
   {
     send_to_char("It is pitch black...\r\n", ch);
-    list_char_to_char(IN_ROOM(ch)->people, ch);	/* glowing red eyes */
+    list_char_to_char(IN_ROOM(ch)->people, ch);   /* glowing red eyes */
   }
   else if (subcmd == SCMD_READ)
   {
@@ -1753,7 +1753,7 @@ ACMD(do_look)
     skip_spaces(&trail);
 
     examine_on = TRUE;
-    if (!*arg)		/* "look" alone, without an argument at all */
+    if (!*arg)      /* "look" alone, without an argument at all */
       look_at_room(ch, 1);
     else if (look_in)
       look_in_obj(ch, argument);
@@ -1813,12 +1813,12 @@ ACMD(do_examine)
 
   if (tmp_object)
   {
-int has_identifier(struct obj_data *obj, long id);
-void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
+    int has_identifier(struct obj_data *obj, long id);
+    void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
     new_send_to_char(ch, "You examine %s:\r\n", tmp_object->short_description);
 
     examine_on = FALSE;
-    look_at_target(ch, tempsave);	/* strcpy: OK */
+    look_at_target(ch, tempsave);  /* strcpy: OK */
     examine_on = TRUE;
     if (GET_OBJ_INNATE(tmp_object) != TYPE_UNDEFINED && affected_by_spell(ch, SPELL_DETECT_MAGIC))
       new_send_to_char(ch, "\r\nYou sense that this item is further embued with the spell %s.\r\n",
@@ -1831,17 +1831,18 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
       look_in_obj(ch, arg);
     }
 
-if (has_identifier(tmp_object, GET_ID(ch))) {
-new_send_to_char(ch, "You remember the time you identified %s\r\n", tmp_object->short_description);
-identify_object(ch, tmp_object);
-}
+    if (has_identifier(tmp_object, GET_ID(ch)))
+    {
+      new_send_to_char(ch, "You remember the time you identified %s\r\n", tmp_object->short_description);
+      identify_object(ch, tmp_object);
+    }
   }
   else if (tmp_char)
   {
     new_send_to_char(ch, "You examine %s:\r\n", GET_NAME(tmp_char));
 
     examine_on = FALSE;
-    look_at_target(ch, tempsave);	/* strcpy: OK */
+    look_at_target(ch, tempsave);  /* strcpy: OK */
   }
 }
 
@@ -2288,10 +2289,13 @@ ACMD(do_score)
     len = snprintf(webs, sizeof(webs), " ");
   }
 
-
-
-  new_send_to_char(ch,
-                   "\r\n{cg(*)-----------------------------------------Class--TierName-----Tier--(*){c0\r\n");
+  /* yikes, nasty hack job here testing for a player name but hey... -mord */
+  if (!str_cmp("thotter", GET_NAME(ch)))
+    new_send_to_char(ch,
+                     "\r\n{cg(*)---[{cC{cuKing Of Pie{cg]-------------------------Class--TierName-----Tier--(*){c0\r\n");
+  else
+    new_send_to_char(ch,
+                     "\r\n{cg(*)-----------------------------------------Class--TierName-----Tier--(*){c0\r\n");
   new_send_to_char(ch,"{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw   %s %-29s {cg| |\r\n",
                    GET_NAME(ch),GET_LEVEL(ch),
                    (color_space ? "   " : ""),    primary_class(ch, blank));
@@ -2409,6 +2413,8 @@ ACMD(do_score)
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
+   if (GET_LOGINMSG(ch)) new_send_to_char(ch, "Login Message: %s\r\n", GET_LOGINMSG(ch));                  /*THOTTER EDIT*/
+   if (GET_LOGOUTMSG(ch)) new_send_to_char(ch,"Logout Message: %s\r\n", GET_LOGOUTMSG(ch));               /*THOTTER EDIT*/
   /** Display info about your scooter **/
   if (has_vehicle(ch))
   {
@@ -2559,7 +2565,7 @@ ACMD(do_score)
   if (PREG(ch) > NOT_PREG)
   {
     if (GET_LEVEL(ch) >= LVL_HERO)
-    {	/* THIS ELSE-IF OPTIONAL */
+    {     /* THIS ELSE-IF OPTIONAL */
       new_send_to_char(ch,
                        "You are %d hours away from giving birth.\r\n",
                        PREG(ch));
@@ -3238,7 +3244,7 @@ ACMD(do_who)
     }
     else if (*arg == '-')
     {
-      mode = *(arg + 1);	/* just in case; we destroy arg in the switch */
+      mode = *(arg + 1); /* just in case; we destroy arg in the switch */
       switch (mode)
       {
       case 'o':
@@ -3293,15 +3299,15 @@ ACMD(do_who)
       default:
         send_to_char(WHO_USAGE, ch);
         return;
-      }			/* end of switch */
+      }             /* end of switch */
 
     }
     else
-    {		/* endif */
+    {          /* endif */
       send_to_char(WHO_USAGE, ch);
       return;
     }
-  }				/* end while (parser) */
+  }                 /* end while (parser) */
   DYN_CREATE;
   *dynbuf = '\0';
 
@@ -3414,31 +3420,31 @@ ACMD(do_who)
       {
         snprintf(buf, sizeof(buf), "[--------TOAD--------] A slimy toad looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
-      else	if (AFF_FLAGGED(wch, AFF_POLY_WOLF))
+      else     if (AFF_FLAGGED(wch, AFF_POLY_WOLF))
       {
         snprintf(buf, sizeof(buf), "[--------WOLF--------] A grey wolf looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".", GET_NAME(wch));
       }
-      else	if (AFF_FLAGGED(wch, AFF_POLY_BOAR))
+      else     if (AFF_FLAGGED(wch, AFF_POLY_BOAR))
       {
         snprintf(buf, sizeof(buf), "[--------BOAR--------] A frisky boar looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".", GET_NAME(wch));
       }
-      else	if (AFF_FLAGGED(wch, AFF_POLY_BEAR))
+      else     if (AFF_FLAGGED(wch, AFF_POLY_BEAR))
       {
         snprintf(buf, sizeof(buf), "[--------BEAR--------] A shaggy bear looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
-      else	if (AFF_FLAGGED(wch, AFF_POLY_LION))
+      else     if (AFF_FLAGGED(wch, AFF_POLY_LION))
       {
         snprintf(buf, sizeof(buf), "[--------LION--------] A black lion looking vaguely like " MXPTAG("B") "%s" MXPTAG("/B") ".",  GET_NAME(wch));
       }
-      else	if (get_sub_status(wch, SUB_SHADOWCLOAK))
+      else     if (get_sub_status(wch, SUB_SHADOWCLOAK))
       {
         snprintf(buf, sizeof(buf), "[-------SHADOWS------] A swirling tower of shadows.");
       }
-      else	if (get_sub_status(wch, SUB_CLOAK))
+      else     if (get_sub_status(wch, SUB_CLOAK))
       {
         snprintf(buf, sizeof(buf), "[-------CLOAKED------] A cloaked figure.");
       }
-      else	if (get_sub_status(wch, SUB_MASK))
+      else     if (get_sub_status(wch, SUB_MASK))
       {
         snprintf(buf, sizeof(buf), "[-------MASKED-------] A masked figure.");
       }
@@ -3449,26 +3455,26 @@ ACMD(do_who)
           snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0" MXPTAG("B") "%s" MXPTAG("/B") " %s",
                    TIER_COLOR_WHO(current_class_is_tier_num(wch)),
                    current_class_is_tier_num(wch), GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
-                   (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
-                   (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),	//is RP or not? dark green
+                   (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),   //is PK or not? bold red
+                   (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),     //is RP or not? dark green
                    ((GET_SEX(wch) == SEX_FEMALE) ? "F" : (GET_SEX(wch) == SEX_MALE) ? "M" : "N"),
                    (wch->desc && ((nw - 60) < wch->desc->login_time)) ? "{cy>{cW" : " ",
                    (GET_REMORT(wch) != -1 ? " " : "*"),
                    (PRETITLE(wch) == NULL ? "" : PRETITLE(wch)),
                    (PRETITLE(wch) == NULL ? "" : " "),
                    GET_NAME(wch),
-                   GET_TITLE(wch));	//has a star if hasnt remorted
+                   GET_TITLE(wch));     //has a star if hasnt remorted
         }
         else
         {
           snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0" MXPTAG("B") "%-20s" MXPTAG("/B") ,
                    TIER_COLOR_WHO(current_class_is_tier_num(wch)),
                    current_class_is_tier_num(wch),GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
-                   (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
-                   (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),	//is RP or not? dark green
+                   (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),   //is PK or not? bold red
+                   (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),     //is RP or not? dark green
                    ((GET_SEX(wch) == SEX_FEMALE) ? "F" : (GET_SEX(wch) == SEX_MALE) ? "M" : "N"),
                    (GET_REMORT(wch) != -1 ? "  " : " *"),
-                   GET_NAME(wch));	//has a star if hasnt remorted
+                   GET_NAME(wch)); //has a star if hasnt remorted
         }
       }
       Mortals++;
@@ -3478,7 +3484,7 @@ ACMD(do_who)
     DYN_RESIZE(buf);
 
     if ((GET_LEVEL(wch) < LVL_HERO) && GET_CLAN(wch))
-    {	/*added ' leader' to the clan name, gave it round brackets and light cyan color that wont bleed a imms title */
+    {     /*added ' leader' to the clan name, gave it round brackets and light cyan color that wont bleed a imms title */
       len += snprintf(buf + len, sizeof(buf) - len, " %s(" MXPTAG("em") "%s%s%s%s" MXPTAG("/em") ")",
                       (GET_LEVEL(wch) >= LVL_HERO ? CCYEL(ch, C_SPR):CCNRM(ch, C_NRM)), CCCYN(ch, C_NRM),
                       clan_name(find_clan_by_id(GET_CLAN(wch))),
@@ -3488,16 +3494,16 @@ ACMD(do_who)
     }
 
     if (PLR_FLAGGED(wch, PLR_NEWBIE_HLPR))
-      len += snprintf(buf + len, sizeof(buf) - len, " (%sHelper%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
+      len += snprintf(buf + len, sizeof(buf) - len, " (%sHelper%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));   //not displaying helper flag yet
     if (PLR_FLAGGED(wch, PLR_RP_LEADER))
-      len += snprintf(buf + len, sizeof(buf) - len, " (%sRPL%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
+      len += snprintf(buf + len, sizeof(buf) - len, " (%sRPL%s)", CCGRN(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM))); //not displaying helper flag yet
     if (GET_INVIS_LEV(wch))
       len += snprintf(buf + len, sizeof(buf) - len, " (i%d)", GET_INVIS_LEV(wch));
     if (IS_AFFECTED(wch, AFF_INVISIBLE))
       len += snprintf(buf + len, sizeof(buf) - len, " (invis)");
 
     if ((GET_LEVEL(wch) < LVL_HERO) && PLR_FLAGGED(wch, PLR_HERO))
-      len += snprintf(buf + len, sizeof(buf) - len, " (%sHERO%s)", CCYEL(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
+      len += snprintf(buf + len, sizeof(buf) - len, " (%sHERO%s)", CCYEL(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));     //not displaying helper flag yet
     if (affected_by_spell(wch, SPELL_SILENCED) && (GET_LEVEL(ch) > LVL_HERO || PLR_FLAGGED(ch, PLR_HERO)))
       len += snprintf(buf + len, sizeof(buf) - len, " (S)");
 
@@ -3516,7 +3522,7 @@ ACMD(do_who)
     if (GET_ORIG_LEV(wch) >= 1)
       len += snprintf(buf + len, sizeof(buf) - len, " (IMM)");
     if (PRF_FLAGGED(wch, PRF_NOGOSS))
-      len += snprintf(buf + len, sizeof(buf) - len, " (nogos)");	//Threw in a Nogos flag
+      len += snprintf(buf + len, sizeof(buf) - len, " (nogos)"); //Threw in a Nogos flag
     if (PRF_FLAGGED(wch, PRF_NOTELL))
       len += snprintf(buf + len, sizeof(buf) - len, " (notell)");
     if (PRF_FLAGGED(wch, PRF_QUEST))
@@ -3588,7 +3594,7 @@ ACMD(do_who)
 
     len += snprintf(buf + len, sizeof(buf) - len, "\r\n");
     DYN_RESIZE(buf);
-  }				/* end of for */
+  }                 /* end of for */
   len = 0;
   strcpy(buf, "\r\n");
   DYN_RESIZE(buf);
@@ -3655,7 +3661,7 @@ ACMD(do_users)
     half_chop(buf, arg, buf1);
     if (*arg == '-')
     {
-      mode = *(arg + 1);	/* just in case; we destroy arg in the switch */
+      mode = *(arg + 1); /* just in case; we destroy arg in the switch */
       switch (mode)
       {
       case 'o':
@@ -3702,15 +3708,15 @@ ACMD(do_users)
       default:
         send_to_char(USERS_FORMAT, ch);
         return;
-      }			/* end of switch */
+      }             /* end of switch */
 
     }
     else
-    {		/* endif */
+    {          /* endif */
       send_to_char(USERS_FORMAT, ch);
       return;
     }
-  }				/* end while (parser) */
+  }                 /* end while (parser) */
   new_send_to_char(ch,
                    "Num Class       Name         State          Idl Login@   Site\r\n"
                    "--- ----------- ------------ -------------- --- -------- ------------------------\r\n");
@@ -3913,7 +3919,7 @@ void perform_mortal_where(struct char_data *ch, char *arg)
     }
   }
   else
-  {			/* print only FIRST char, not all. */
+  {            /* print only FIRST char, not all. */
     for (i = character_list; i; i = i->next)
     {
       if (i->in_room == NULL || i == ch)
@@ -4772,7 +4778,7 @@ void sort_commands(void)
 
   while (complete_cmd_info[num_of_cmds].command[0] != '\n')
     num_of_cmds++;
-  num_of_cmds++;		/* \n */
+  num_of_cmds++;         /* \n */
 
   CREATE(cmd_sort_info, int, num_of_cmds);
 
@@ -4848,7 +4854,7 @@ ACMD(do_commands)
     if (!wizhelp && socials != (complete_cmd_info[i].command_pointer == do_action || complete_cmd_info[i].command_pointer == do_insult))
       continue;
 
-    new_send_to_char(ch, "%-15s%s", complete_cmd_info[i].command,			 no++ % 7 == 0 ? "\r\n" : "");
+    new_send_to_char(ch, "%-15s%s", complete_cmd_info[i].command,                no++ % 7 == 0 ? "\r\n" : "");
   }
 
   if (no % 7 != 1)
@@ -5311,25 +5317,25 @@ void do_auto_exits(struct char_data *ch)
     int door, slen = 0;
  
     new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
-		     CBWHT(ch, C_NRM));
+               CBWHT(ch, C_NRM));
  
     for (door = 0; door < NUM_OF_DIRS; door++)
-	if (EXIT(ch, door) && EXIT(ch, door)->to_room != NULL &&
-	    !IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
-	    if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)) {
-	    if (GET_LEVEL(ch) > LVL_IMMORT){
-	    	new_send_to_char(ch, "{cg%c {cW", UPPER(*dirs[door]));
-		slen++;
-		}
-	    } else {
-	        new_send_to_char(ch, "%c ", LOWER(*dirs[door]));
-		slen++;
-		}
+     if (EXIT(ch, door) && EXIT(ch, door)->to_room != NULL &&
+         !IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
+         if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)) {
+         if (GET_LEVEL(ch) > LVL_IMMORT){
+          new_send_to_char(ch, "{cg%c {cW", UPPER(*dirs[door]));
+          slen++;
+          }
+         } else {
+             new_send_to_char(ch, "%c ", LOWER(*dirs[door]));
+          slen++;
+          }
  
-	        
-	}
-	if (!slen)
-	new_send_to_char(ch, "None!");
+             
+     }
+     if (!slen)
+     new_send_to_char(ch, "None!");
  
     new_send_to_char(ch, "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
 }

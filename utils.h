@@ -249,6 +249,8 @@ void point_update(void);
 void update_pos(struct char_data *victim);
 void total_perc(struct char_data *ch);
 int group_size(struct char_data *ch);
+void set_loginmsg(struct char_data *ch, char *loginmsg);      /* EDIT BY THOTTER!!!*/
+void set_logoutmsg(struct char_data *ch, char *logoutmsg);    /* ^^^^^^^^^^^^*/
 
 /* in comm.c */
 void    circle_exit(int r);
@@ -609,6 +611,8 @@ int has_body(CHAR_DATA *ch, int flag);
 #define POOFIN(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->poofin))
 #define IMMTITLE(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->immtitle))
 #define POOFOUT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->poofout))
+#define GET_LOGINMSG(ch)      CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->loginmsg) )/*EDITED BY THOTTER!!! */
+#define GET_LOGOUTMSG(ch)     CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->logoutmsg))/*EDITED BY THOTTER!!! */
 #define PROMPT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->prompt))
 #define BPROMPT(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->battle_prompt))
 #define GET_OLC_ZONE(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.olc_zone))

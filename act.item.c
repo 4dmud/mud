@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.24  2005/10/23 13:53:30  w4dimenscor
+ * Added thotters login/logout message concept
+ *
  * Revision 1.23  2005/10/23 05:21:46  w4dimenscor
  * Altered assemblies, and fixed a few mem leaks
  *
@@ -329,7 +332,7 @@ break;
 }
 return ASSM_ASSEMBLE;
 }
-int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {return 1;}
+
 ACMD(do_assemble)
 {
   long         lVnum = NOTHING;
@@ -393,6 +396,7 @@ int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) 
   return 1;
 }
 
+/*int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {return perform_assemble(lVnum, ch, subcmd, cmd);}*/
 
 bool perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
 {

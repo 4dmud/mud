@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.12  2005/10/23 13:53:30  w4dimenscor
+ * Added thotters login/logout message concept
+ *
  * Revision 1.11  2005/08/07 04:12:39  w4dimenscor
  * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
  *
@@ -98,6 +101,7 @@ void add_follower(struct char_data *ch, struct char_data *leader);
 void raw_kill(struct char_data *ch, struct char_data *killer);
 
 
+
 /* local functions */
 int perform_group(struct char_data *ch, struct char_data *vict);
 void print_group(struct char_data *ch);
@@ -119,6 +123,8 @@ ACMD(do_gen_tog);
 ACMD(do_file);
 ACMD(do_follow);
 ACMD(do_die);
+ACMD(do_loginmsg);    /*THOTTER EDIT!!! */
+ACMD(do_logoutmsg);   /*THOTTER EDIT!!! */
 C_FUNC(allow_follow);
 
 
@@ -145,7 +151,13 @@ ACMD(do_quit)
     }
 
     if (!GET_INVIS_LEV(ch))
-      act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
+    {
+             if (GET_LOGOUTMSG(ch)==NULL)                                             /*Thotter edit */
+                  act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);              /*Thotter edit*/
+             else 
+               send_to_room(IN_ROOM(ch), "[%s logout] %s", GET_NAME(ch), GET_LOGOUTMSG(ch));
+              
+    }
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
     new_send_to_char(ch,"Goodbye, %s.. Come back soon!\r\n", GET_NAME(ch));
 
@@ -230,6 +242,42 @@ void check_for_dead(void)
       die(d->character, NULL);
   }
 }
+#define MAX_LOGINMSG_LENGTH 80
+#define MAX_LOGOUTMSG_LENGTH 80
+ ACMD(do_loginmsg) {
+    skip_spaces(&argument);
+    delete_doubledollar(argument);
+
+    if (strlen(argument) > MAX_LOGINMSG_LENGTH)
+      new_send_to_char(ch, "Sorry, but your login message can't be longer then %d characters.\r\n",
+        MAX_LOGINMSG_LENGTH);
+    else {
+       set_loginmsg(ch, argument);
+       if(GET_LOGINMSG(ch)==NULL)
+         new_send_to_char(ch, "Ok, you don't have a login message anymore.\r\n");
+       else
+         new_send_to_char(ch, "Your new loginmsg is: %s\r\n", GET_LOGINMSG(ch));
+    }
+    return;
+ }
+ 
+ ACMD(do_logoutmsg) {
+    skip_spaces(&argument);
+    delete_doubledollar(argument);
+
+    if (strlen(argument) > MAX_LOGOUTMSG_LENGTH)
+      new_send_to_char(ch, "Sorry, but your logout message can't be longer then %d characters.\r\n",
+        MAX_LOGOUTMSG_LENGTH);
+    else {
+       set_logoutmsg(ch, argument);
+       if(GET_LOGOUTMSG(ch)==NULL)
+         new_send_to_char(ch, "Ok, you don't have a logout message anymore.\r\n");
+       else
+         new_send_to_char(ch, "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG(ch));
+    }
+    return;
+ }
+ 
 
 ACMD(do_save)
 {

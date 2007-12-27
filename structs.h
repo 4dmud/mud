@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.23  2005/10/23 13:53:30  w4dimenscor
+ * Added thotters login/logout message concept
+ *
  * Revision 1.22  2005/09/24 08:52:33  w4dimenscor
  * finished the assemblies code
  *
@@ -1764,6 +1767,9 @@ struct player_special_data
   char *afk_msg;
   char *busy_msg;
   char *pretitle;
+  
+    char       *loginmsg;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
+    char       *logoutmsg;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
   int remorts;
   int conversions;
   time_t last_note;

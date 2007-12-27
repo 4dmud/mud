@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/10/09 01:54:08 $
-*  $Revision: 1.3 $
+*  $Date: 2005/10/23 13:53:30 $
+*  $Revision: 1.4 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1259,6 +1259,32 @@ int leave_otrigger(room_data *room, char_data *actor, int dir)
   }
 
   return final;
+}
+
+int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {
+  trig_data *t;
+  char buf[MAX_INPUT_LENGTH];
+  int ret_val = 0;
+  //ADD_UID_VAR(buf, t, ch, "actor", 0);
+  /*switch (cmd)
+  {
+  case OCMD_EAT:
+    add_var(&GET_TRIG_VARS(t), "command", "eat", 0);
+    break;
+  case OCMD_DRINK:
+    add_var(&GET_TRIG_VARS(t), "command", "drink", 0);
+    break;
+  }*/
+  
+  //ret_val = script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW);
+  
+      /* don't allow a wear to take place, if
+       * the object is purged.
+       */
+  //if (!obj)
+  //return -1;
+  //else
+    return ret_val;
 }
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd)

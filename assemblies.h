@@ -86,6 +86,9 @@ ASSEMBLY*      assemblyGetAssemblyPtr( long lVnum );
 void           free_assemblies(void);
 bool           assemblyAddTrigger(long lVnum,int iTrig);
 
+int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd);
+int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd);
+
 /* ******************************************************************** */
 
 #endif

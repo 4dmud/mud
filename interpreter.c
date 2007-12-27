@@ -205,6 +205,8 @@ ACMD(do_levels);
 ACMD(do_linkload);
 ACMD(do_listen);
 ACMD(do_load);
+ACMD(do_loginmsg);    /* THOTTER EDIT!!! */
+ACMD(do_logoutmsg);   /* THOTTER EDIT!!! */
 ACMD(do_landscape);
 ACMD(do_look);
 ACMD(do_map);
@@ -641,6 +643,8 @@ const struct command_info cmd_info[] =
     { "lock"     , "loc"	, POS_SITTING , do_gen_door , 0, SCMD_LOCK, 0 },
     { "locker"   , "locker"  , POS_RESTING , do_locker   , 0, 0, 0 },
     { "load"     , "loa"	, POS_DEAD    , do_load     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
+    { "loginmsg"        , "loginm"      , POS_DEAD      , do_loginmsg   , 0, 0, 0 },      /*EDITED BY THOTTER!!! */
+    { "logoutmsg"       , "logoutm"     , POS_DEAD      , do_logoutmsg  , 0, 0, 0 },      /*EDITED BY THOTTER!!! */
     { "landscape"     , "landscape"	, POS_DEAD    , do_landscape     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
 
     { "medit"    , "med"	, POS_DEAD    , do_oasis      , LVL_BUILDER, SCMD_OASIS_MEDIT, WIZ_OLC_GRP },
@@ -2170,7 +2174,10 @@ if (!valid_id_num( GET_IDNUM(ch)))
       SET_SKILL(ch, i, 100);
       }
   new_mudlog( NRM, GET_LEVEL(ch), TRUE, "[lev: %d] %s entering the game in room #%d, %s", GET_LEVEL(ch), GET_NAME(ch), load_room->number, load_room->name);
+  if(GET_LOGINMSG(d->character)==NULL)
   act("$n has entered the game.", TRUE, ch, 0, 0, TO_ROOM);
+   else
+     send_to_room(real_room(load_room->number), "[%s login] %s", GET_NAME(d->character),GET_LOGINMSG(d->character));
   load_result = Crash_load(ch);
   read_ignorelist(ch);
   load_locker(ch);
