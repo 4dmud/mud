@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.19  2006/04/28 08:05:23  w4dimenscor
+ * Fixed the html formatting for bugs and typos
+ *
  * Revision 1.18  2006/04/27 08:57:26  w4dimenscor
  * updated the typo and bug files to write using DIV and SPAN, so that the data can be formatted in a browser.
  *
@@ -1112,7 +1115,7 @@ ACMD(do_gen_write)
     send_to_char("Could not open the file.  Sorry.\r\n", ch);
     return;
   }
-  fprintf(fl, "<div class='txtline'><span class='plrname'>%-8s</span> <span class='date'>%6.6s</span> <span class='room'>%5d</span><span='comment'>%s</span></div>\n", GET_NAME(ch), (tmp + 4),
+  fprintf(fl, "<div class='txtline'><span class='plrname'>%-8s</span> <span class='date'>%6.6s</span> <span class='room'>%5d</span><span class='comment'>%s</span></div>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
 
   fclose(fl);
