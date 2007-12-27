@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.5  2005/03/16 18:47:03  w4dimenscor
+ * updated some spacing and formatting
+ *
  * Revision 1.4  2005/03/15 09:55:49  w4dimenscor
  * fixed error with mtransform and linked mobs
  *
@@ -1355,6 +1358,7 @@ ACMD(do_mtransform)
   mob_rnum this_rnum = GET_MOB_RNUM(ch);
   int keep_hp = 1;		/* new mob keeps the old mob's hp/max hp/exp */
   int pos;
+  long tmpid;
 
   if (!MOB_OR_IMPL(ch))
   {
@@ -1414,6 +1418,7 @@ ACMD(do_mtransform)
   stop_fusion(ch);
   
   remove_hunter(ch);
+  tmpid = GET_ID(m);
 
   /* we can't forget the hunters either... */
   for (hunt = hunter_list; hunt; hunt = hnext)
@@ -1491,8 +1496,7 @@ ACMD(do_mtransform)
       if (obj[pos]) equip_char(ch, obj[pos], pos);
     }
     ch->nr = this_rnum;
-    /* setting this to 0 to see if it affects the code */
-    GET_ID(m) = 0;
+    GET_ID(m) = tmpid;
     extract_char(m);
   }
 }

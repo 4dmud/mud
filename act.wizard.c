@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.19  2005/03/16 18:47:03  w4dimenscor
+ * updated some spacing and formatting
+ *
  * Revision 1.18  2005/03/16 16:44:08  w4dimenscor
  * Added Award Points to stat display
  *
@@ -1869,7 +1872,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
       {
         *buf2 = '\0';
         if (aff->expire == -2)
-          new_send_to_char(ch, "SPL: (innate) %s%-21s%s ", CCCYN(ch, C_NRM),
+          new_send_to_char(ch, "SPL: ( innate) %s%-21s%s ", CCCYN(ch, C_NRM),
                            skill_name(aff->type), CCNRM(ch, C_NRM));
         else
           new_send_to_char(ch, "SPL: (%4ldsec)  %s%-21s%s ", time_to_sec(aff->expire + 1),
