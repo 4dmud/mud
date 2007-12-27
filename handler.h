@@ -113,6 +113,7 @@ int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
 #define FIND_OBJ_ROOM      (1 << 3)
 #define FIND_OBJ_WORLD     (1 << 4)
 #define FIND_OBJ_EQUIP     (1 << 5)
+#define FIND_CHAR_NOTINROOM (1 << 6)
 
 //Max number of items alloud in houses
 #define MAX_HOUSE_ITEMS  500

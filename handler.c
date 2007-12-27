@@ -2304,14 +2304,12 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
     if (i && valid_dg_target(i, TRUE))
       return i;
   }
-
   for (d = descriptor_list; d; d = d->next)
   {
     if (!IS_PLAYING(d))
       continue;
     if (inroom == FIND_CHAR_ROOM && !HERE(d->character, ch))
       continue;
-
     if (!isname(name, d->character->player.name))
       continue;
 
@@ -2323,14 +2321,15 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
     return (d->character);
 
   }
-
+  if(inroom!=FIND_CHAR_NOTINROOM)
   for (i = character_list; i; i = i->next)
   {
     if (inroom == FIND_CHAR_ROOM && !HERE(i, ch))
       continue;
     if (IS_NPC(i))
       continue;
-
+    if (inroom == FIND_CHAR_NOTINROOM && HERE(i, ch))
+      continue;
     if (!isname_full(name, i->player.name))
       continue;
 
