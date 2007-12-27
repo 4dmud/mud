@@ -235,8 +235,10 @@ void queue_deq(struct queue *q, struct q_element *qe)
 
   if (qe->next == NULL)
     q->tail[i] = qe->prev;
-  else
+  else if (qe->next)
     qe->next->prev = qe->prev;
+    else 
+    log("ERROR: qe->next non existant!");
 
   free(qe);
 }

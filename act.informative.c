@@ -198,9 +198,7 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
     }
     else
     {
-      temp = OBJ_SAT_IN_BY(obj);
-      for (temp = OBJ_SAT_IN_BY(obj); temp;
-           temp = NEXT_SITTING(temp))
+      for (temp = OBJ_SAT_IN_BY(obj); temp;temp = NEXT_SITTING(temp))
       {
         if (temp == ch)
           found = TRUE;

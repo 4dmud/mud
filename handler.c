@@ -756,7 +756,7 @@ void char_from_chair(struct char_data *ch)
   struct char_data *tempch;
   int i, found = 0;
 
-  if (!SITTING(ch))
+  if (!ch || !SITTING(ch))
     return;
 
   if (!(chair = SITTING(ch)))
@@ -1590,9 +1590,14 @@ void extract_obj(struct obj_data *obj)
 
   for (ch = OBJ_SAT_IN_BY(obj); ch; ch = next)
   {
+    
+    if (ch) {
     next = NEXT_SITTING(ch);
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
+    } else {
+    break;
+    }
   }
   OBJ_SAT_IN_BY(obj) = NULL;
 
@@ -1828,6 +1833,7 @@ alter_hit(ch, GET_HIT(ch) -3);
 
   /*ends fight event*/
   halt_fighting(ch);
+  char_from_chair(ch);
 
   /* cancel point updates */
  /** no need to cancel regen!**/
@@ -1978,6 +1984,7 @@ void extract_char_final(struct char_data *ch)
 
   /*ends fight event*/
   halt_fighting(ch);
+  char_from_chair(ch);
   
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);

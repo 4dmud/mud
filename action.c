@@ -898,7 +898,7 @@ ACTION(thing_throttle)
   const char *to_vict = NULL;
   char buf[MAX_INPUT_LENGTH];
 
-  if (!*num || !ch)
+  if (!*num || !ch || !vict)
   {
     if (ch)
       new_send_to_char(ch, "Broken for some reason!??\r\n");

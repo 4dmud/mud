@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.5  2005/02/20 00:20:48  w4dimenscor
+ * now extracting chars are removed from chairs, and throttling checks for victim
+ *
  * Revision 1.4  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -1051,7 +1054,10 @@ ACMD(do_gen_write)
   }
   fprintf(fl, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
+	  
   fclose(fl);
+        new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
+          GET_ROOM_VNUM(IN_ROOM(ch)), argument);
   send_to_char("Okay.  Thanks!\r\n", ch);
 }
 

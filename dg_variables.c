@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/02/09 09:47:12 $                                           * 
-*  $Revision: 1.5 $                                                    *
+*  $Date: 2005/02/20 00:20:48 $                                           * 
+*  $Revision: 1.6 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -408,6 +408,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           break;
         }
       }
+      
+      
       /**
 
         %findobj.<room vnum X>(<object vnum/id/name>)%
@@ -561,6 +563,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
     if (c)
     {
+    if (DEAD(c)) return; //dead - please dont screw anything up!
       if (text_processed(field, subfield, vd, str, slen)) return;
 
 
@@ -759,7 +762,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           else if ((pos = find_eq_pos_script(subfield)) < 0 || !GET_EQ(c, pos))
             strcpy(str, "");
           else
-            snprintf(str, slen, "%c\r\n%ld", UID_CHAR, GET_ID(GET_EQ(c, pos)));
+            snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(GET_EQ(c, pos)));
         }
 
 
@@ -885,10 +888,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
               {
                 snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
                 return;
-              } else if (isname(subfield, obj->short_description)) {
-	      snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
+              }
+              else if (isname(subfield, obj->short_description))
+              {
+                snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
                 return;
-		}
+              }
             }
             if (!obj)
               strcpy(str, "");	/* arg given, not found */
@@ -989,12 +994,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           {
             if (!strcasecmp("off", subfield))
             {
-              if (PREG(c) > 0 && PREG(c) != MALE)
+              if (PREG(c) > 0 && GET_SEX(c) != SEX_MALE)
                 PREG(c) = NOT_PREG;
             }
             else if (!strcasecmp("on", subfield))
             {
-              if (PREG(c) < 0 && PREG(c) != MALE)
+              if (PREG(c) < 0 && GET_SEX(c) != SEX_MALE)
                 PREG(c) = genpreg();
             }
           }
@@ -1170,8 +1175,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         if (!strcasecmp(field, "speed"))
           snprintf(str, slen, "%d", GET_SPEED(c));
         else if (!strcasecmp(field, "sex"))
+        {
+          if (subfield && *subfield)
+          {
+            if (!strcasecmp(subfield, "male"))
+              GET_SEX(c) = SEX_MALE;
+            else if (!strcasecmp(subfield, "female"))
+              GET_SEX(c) = SEX_FEMALE;
+            else if (!strcasecmp(subfield, "neutral"))
+              GET_SEX(c) = SEX_NEUTRAL;
+          }
           snprintf(str, slen, genders[(int) GET_SEX(c)]);
-
+        }
         else if (!strcasecmp(field, "str"))
         {
           if (subfield && *subfield)
@@ -1424,6 +1439,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                   snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(item));
                   found = TRUE;
                   break;
+                }
+                else if (isname(subfield, item->short_description))
+                {
+                  snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(item));	/* arg given, found */
+                  return;
                 }
               }
               else
@@ -1734,6 +1754,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                 snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
                 return;
               }
+              else if (isname(subfield, obj->short_description))
+              {
+                snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
+              }
+
             }
             if (!obj)
               strcpy(str, "");	/* arg given, not found */
