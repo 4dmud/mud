@@ -341,7 +341,7 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
 if (mxp)
 new_send_to_char(ch, "%s", MXPTAG("FRAME Map REDIRECT"));
 
-  new_send_to_char(ch, " {cy+-----------+{cw\n\r");
+  new_send_to_char(ch, "\n\r {cy+-----------+{cw\n\r");
 
   /* Write out the main map area with text */
   for( y = 0; y <= MAPY; y++ )

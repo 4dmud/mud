@@ -1570,8 +1570,9 @@ const char *end_prompt(struct descriptor_data *d)
     return "";
   if (d->eor == 1)
     return eor_prompt;
-  else if (d->telnet_capable == 1)
-    return ga_prompt;
+/** edited out for the moment - needs to check for compatability first - mord**/
+ // else if (d->telnet_capable == 1)
+ //   return ga_prompt;
   else
     return "";
 }

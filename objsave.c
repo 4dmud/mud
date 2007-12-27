@@ -718,6 +718,7 @@ void Crash_extract_norents(struct obj_data *obj, CHAR_DATA *ch)
   {
     Crash_extract_norents(obj->contains, ch);
     Crash_extract_norents(obj->next_content, ch);
+
     if (obj->owner != 0)
     {
       if (obj->owner != GET_IDNUM(ch) && obj->worn_by == NULL)

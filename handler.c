@@ -978,6 +978,8 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
       SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
       
      
+
+#if defined(ARTIS_ARE_OWNED)
     if (GET_OBJ_RNUM(object) != NOTHING && obj_index[GET_OBJ_RNUM(object)].qic)
     {
       if (!IS_NPC(ch) && object->owner == 0 && GET_LEVEL(ch) < LVL_HERO)
@@ -990,6 +992,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
                  object->short_description, GET_NAME(ch), object->owner == 0 ? "nobody" : get_name_by_id(object->owner));
 
     }
+#endif
 
 
   }

@@ -1,58 +1,40 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="17" >
+ <DocsAndViews NumberOfDocuments="11" >
   <Doc0 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/db.c" >
    <View0 Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
-   <View0 line="7069" Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/interpreter.h" >
+   <View0 line="364" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/dg_handler.c" >
-   <View0 line="228" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/assemblies.h" >
+   <View0 line="16" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/mapper.c" >
-   <View0 line="365" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/assemblies.c" >
+   <View0 line="289" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/mapper.h" >
-   <View0 line="14" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.item.c" >
+   <View0 line="113" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/utils.h" >
-   <View0 line="700" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/subskills.c" >
+   <View0 line="1077" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/objsave.c" >
-   <View0 line="1267" Type="Source" />
+  <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/constants.c" >
+   <View0 line="2438" Type="Source" />
   </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.informative.c" >
-   <View0 line="5346" Type="Source" />
+  <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/interpreter.c" >
+   <View0 line="2939" Type="Source" />
   </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/medit.c" >
-   <View0 line="777" Type="Source" />
+  <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/assedit.c" >
+   <View0 line="439" Type="Source" />
   </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/genmob.c" >
-   <View0 line="467" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/oasis.h" >
-   <View0 line="393" Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/skills.c" >
-   <View0 line="2760" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/spells.h" >
+  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.movement.c" >
    <View0 line="297" Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.item.c" >
-   <View0 line="4370" Type="Source" />
-  </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/fight.c" >
-   <View0 line="4522" Type="Source" />
-  </Doc14>
-  <Doc15 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/oedit.c" >
-   <View0 line="37" Type="Source" />
-  </Doc15>
-  <Doc16 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/action.c" >
-   <View0 line="223" Type="Source" />
-  </Doc16>
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/game-oasis/src/act.informative.c" >
+   <View0 line="852" Type="Source" />
+  </Doc10>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -68,38 +50,42 @@
      <mark line="3076" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.item.c" >
-     <mark line="963" />
+     <mark line="1049" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/subskills.c" >
-     <mark line="1128" />
+     <mark line="1157" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
      <mark line="392" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/fight.c" >
+     <mark line="675" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/redit.c" >
      <mark line="211" />
      <mark line="315" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/fight.c" >
-     <mark line="675" />
-    </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.create.c" >
      <mark line="907" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
-     <mark line="6574" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
-     <mark line="1763" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
-     <mark line="737" />
+     <mark line="6579" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_triggers.c" >
      <mark line="544" />
     </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/shop.c" >
+     <mark line="737" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
+     <mark line="1768" />
+    </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/qic.c" >
      <mark line="269" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/constants.c" >
+     <mark line="2426" />
+     <mark line="201" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_scripts.c" >
      <mark line="3230" />

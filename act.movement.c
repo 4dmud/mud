@@ -293,6 +293,9 @@ int move_cost(struct char_data *ch, int dir)
     new_send_to_char(ch, "You drag your feet under that amount of weight!\r\n");
     need_movement += GET_MAX_MOVE(ch) * 0.5;
   }
+if (has_vehicle(ch))
+return 0;
+else
   return need_movement;
 }
 

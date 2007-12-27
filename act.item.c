@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.22  2005/10/02 03:37:16  w4dimenscor
+ * Removed prompt ends from the output because I am not diagnosing the client well enough to stop a misdisplay on some, also artifacts will no longer be auto owned.
+ *
  * Revision 1.21  2005/09/24 08:52:33  w4dimenscor
  * finished the assemblies code
  *
@@ -3100,8 +3103,7 @@ void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
       return;
   }
   */
-
-  if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
+if (obj->owner != 0 && !IS_NPC(ch) && GET_IDNUM(ch) != obj->owner)
   {
     new_send_to_char(ch, "You can't wear that! It is owned by %s\r\n", get_name_by_id(obj->owner));
     return;

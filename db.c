@@ -1227,7 +1227,7 @@ void build_player_index(void)
 
 void save_player_index(void)
 {
-  int i;
+  int i, j, cnt = 0;
   char bits[64];
   FILE *index_file;
   char tempname[MAX_STRING_LENGTH];
@@ -1241,8 +1241,17 @@ void save_player_index(void)
 
   for (i = 0; i <= top_of_p_table; i++)
   {
-    if (*player_table[i].name)
+cnt = 0;
+if (*player_table[i].name && 
+         !IS_SET(player_table[i].flags, PINDEX_DELETED) && 
+         !IS_SET(player_table[i].flags, PINDEX_SELFDELETE)) {
+  for (j = 0; j <= top_of_p_table; j++)
+  {
+    if (cnt == 0 && *player_table[i].name && !strcmp(player_table[i].name, player_table[j].name) &&
+         !IS_SET(player_table[i].flags, PINDEX_DELETED) && 
+         !IS_SET(player_table[i].flags, PINDEX_SELFDELETE))
     {
+cnt++;
       sprintbits(player_table[i].flags, bits);
       *player_table[i].name = LOWER(*player_table[i].name);
       fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd\n",
@@ -1252,6 +1261,8 @@ void save_player_index(void)
               player_table[i].clan, player_table[i].rank);
     }
   }
+}
+}
   i = fprintf(index_file, "~\n");
   fclose(index_file);
   if (i == -1)
