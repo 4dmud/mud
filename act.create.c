@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.6  2005/02/05 05:26:17  w4dimenscor
+ * Added tsearch command to full text search triggers
+ *
  * Revision 1.5  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -60,9 +63,9 @@ ASKILL(skill_manifest);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
 
-extern struct char_data *find_char(long n);
-extern struct obj_data *find_obj(long n);
-extern struct room_data *find_room(long n);
+struct char_data *find_char(long n);
+struct obj_data *find_obj(long n);
+struct room_data *find_room(long n);
 void run_task(struct char_data *ch);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);

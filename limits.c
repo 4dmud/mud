@@ -414,7 +414,7 @@ void set_pretitle(struct char_data *ch, char *title)
 void run_autowiz(void)
 {
 
-  extern int create_wizlist(int wizlevel,char *file1, int immlevel, char *file2);
+  int create_wizlist(int wizlevel,char *file1, int immlevel, char *file2);
 #if defined(CIRCLE_UNIX) || defined(CIRCLE_WINDOWS)
   if (CONFIG_USE_AUTOWIZ)
   {
@@ -432,7 +432,7 @@ void run_autowiz(void)
 void check_autowiz(struct char_data *ch)
 {
 
-  extern int create_wizlist(int wizlevel,char *file1, int immlevel, char *file2);
+  int create_wizlist(int wizlevel,char *file1, int immlevel, char *file2);
 #if defined(CIRCLE_UNIX) || defined(CIRCLE_WINDOWS)
   if (CONFIG_USE_AUTOWIZ && GET_LEVEL(ch) >= LVL_IMMORT)
   {
@@ -752,8 +752,8 @@ void check_idling(struct char_data *ch)
       }
       act("$n fades from sight as $e blends with $s surroundings.", TRUE, ch, 0, 0, TO_ROOM);
       send_to_char("You fade from sight as you blend with your surroundings.\r\n", ch);
-      save_char(ch);
-      Crash_crashsave(ch);
+      //save_char(ch);
+      //Crash_crashsave(ch);
       char_from_room(ch);
       char_to_room(ch, world_vnum[1]);
     }

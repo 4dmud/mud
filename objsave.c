@@ -793,6 +793,19 @@ void Crash_crashsave(struct char_data *ch)
 
   if (IS_NPC(ch))
     return;
+      if (!ch->desc)
+  {
+
+    log("Saving %s eq when they are linkless", GET_NAME(ch));
+    Crash_crashsave(ch);
+    return;
+  }
+  if (!IS_PLAYING(ch->desc))
+  {
+    log("Saving %s eq when they aren't state playing", GET_NAME(ch));
+    //don't save because they might be naked in the menu
+    return;
+  }
     if (IS_SAVING(ch)) {
     log("Attempt made to crashsave %s's equipment when it is currently being saved!", GET_NAME(ch));
     return;
@@ -899,7 +912,7 @@ void Crash_rentsave(struct char_data *ch, int cost)
   if (!IS_PLAYING(ch->desc))
   {
     log("Saving %s eq when they aren't state playing", GET_NAME(ch));
-    Crash_crashsave(ch);
+    //don't save because they might be naked in the menu
     return;
   }
 

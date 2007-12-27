@@ -64,8 +64,8 @@
 #define MAX_MAP 72
 #define MAX_MAP_DIR 4
 
-extern struct obj_data *find_vehicle_by_vnum(int vnum);
-extern struct obj_data *get_obj_in_list_type(int type,
+struct obj_data *find_vehicle_by_vnum(int vnum);
+struct obj_data *get_obj_in_list_type(int type,
 					     struct obj_data *list);
 
 extern struct room_data *world_vnum[];

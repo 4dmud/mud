@@ -40,7 +40,7 @@ float mob_hitpoint_multi(int chclass);
 /*
  * External function prototypes/
  */
-extern void smash_tilde(char *str);
+void smash_tilde(char *str);
 const char * race_name(struct char_data *ch);
 const char *simple_class_name(struct char_data *ch);
 

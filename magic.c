@@ -38,7 +38,7 @@ void clearMemory(struct char_data *ch);
 void weight_change_object(struct obj_data *obj, int weight);
 void add_follower(struct char_data *ch, struct char_data *leader);
 extern struct spell_info_type spell_info[];
-extern int arena_ok(struct char_data *ch, struct char_data *victim);
+int arena_ok(struct char_data *ch, struct char_data *victim);
 void change_alignment(struct char_data *ch, struct char_data *victim);
 void zap_char(struct char_data *victim);
 

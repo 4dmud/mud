@@ -12,7 +12,7 @@
 #include "house.h"
 #include "constants.h"
 
-extern struct obj_data *get_obj_in_list_type(int type,
+struct obj_data *get_obj_in_list_type(int type,
 					     struct obj_data *list);
 
 room_rnum VEHICLE_ROOM = NULL;

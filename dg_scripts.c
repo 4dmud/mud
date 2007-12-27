@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/04 20:46:11 $
-*  $Revision: 1.5 $
+*  $Date: 2005/02/05 05:26:17 $
+*  $Revision: 1.6 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.6  2005/02/05 05:26:17  w4dimenscor
+ * Added tsearch command to full text search triggers
+ *
  * Revision 1.5  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -64,8 +67,8 @@ void extract_trigger(struct trig_data *trig);
 int eval_lhs_op_rhs(char *expr, char *result, void *go,
                     struct script_data *sc, trig_data * trig, int type);
 //int find_eq_pos_script(struct char_data *ch, char *arg);
-extern int find_skill_num(char *name);
-extern int find_sub_num(char *name);
+int find_skill_num(char *name);
+int find_sub_num(char *name);
 /*hm...mord*/
 const char *simple_class_name(struct char_data *ch);
 const char *race_name(struct char_data *ch);

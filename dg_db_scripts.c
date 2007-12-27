@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/20 02:33:25 $
-*  $Revision: 1.2 $
+*  $Date: 2005/02/05 05:26:17 $
+*  $Revision: 1.3 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -28,8 +28,8 @@
 
 
 
-extern void half_chop(char *string, char *arg1, char *arg2);
-extern bitvector_t asciiflag_conv(char *flag);
+void half_chop(char *string, char *arg1, char *arg2);
+bitvector_t asciiflag_conv(char *flag);
 
 void parse_trigger(FILE *trig_f, int nr, zone_vnum zon)
 {

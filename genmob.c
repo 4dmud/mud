@@ -82,7 +82,7 @@ float dam_avg(int from, int to, int lev)
   return ret_val;
 }
 
-extern void smash_tilde(char *str);
+void smash_tilde(char *str);
 
 int add_mobile(struct char_data *mob, mob_vnum vnum)
 {

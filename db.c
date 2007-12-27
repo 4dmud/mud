@@ -103,8 +103,8 @@ int top_of_socialt = -1;                        /* number of socials */
 
 struct char_data *character_list = NULL;	/* global linked list of chars */
 extern enum subskill_list subskill;
-extern void subs_remove(struct char_data *ch, struct sub_list *af);
-extern void skills_remove(struct char_data *ch, struct skillspell_data *af);
+void subs_remove(struct char_data *ch, struct sub_list *af);
+void skills_remove(struct char_data *ch, struct skillspell_data *af);
 
 struct index_data **trig_index;	/* index table for triggers      */
 struct trig_data *trigger_list = NULL;	/* all attached triggers */

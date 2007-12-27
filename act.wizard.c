@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.8  2005/02/05 05:26:17  w4dimenscor
+ * Added tsearch command to full text search triggers
+ *
  * Revision 1.7  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -128,7 +131,7 @@ const char *simple_class_name(struct char_data *ch);
 int show_vars = FALSE;
 int save_all(void);
 void print_zone(struct char_data *ch, zone_vnum vnum);
-extern zone_rnum real_zone_by_thing(room_vnum vznum); /* added for zone_checker */
+zone_rnum real_zone_by_thing(room_vnum vznum); /* added for zone_checker */
 SPECIAL(shop_keeper);
 
 void Crash_rentsave(struct char_data *ch, int cost);
@@ -194,6 +197,7 @@ void snoop_check(struct char_data *ch);
 ACMD(do_saveall);
 ACMD(do_ps_aux);
 ACMD(do_deleteplayer);
+ACMD(do_search_triggers);
 
 
 struct player_gold_info
@@ -1555,7 +1559,7 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
   struct obj_data *j;
   struct follow_type *fol;
   struct affected_type *aff;
-  extern int speed_update(struct char_data *ch);
+  int speed_update(struct char_data *ch);
   char *clan_name(int idnum);
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
@@ -2486,7 +2490,7 @@ ACMD(do_purge)
 
   if (*buf)
   {			/* argument supplied. destroy single object
-                                				 * or char */
+                                        				 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -3655,11 +3659,11 @@ ACMD(do_wizutil)
         return;
       }
       new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s un-frozen by %s.", GET_NAME(vict), GET_NAME(ch));
-     if (!affected_by_spell(vict, SPELL_IMMFREEZE))
-      REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
+      if (!affected_by_spell(vict, SPELL_IMMFREEZE))
+        REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
       else
-      affect_from_char(vict, SPELL_IMMFREEZE);
-      
+        affect_from_char(vict, SPELL_IMMFREEZE);
+
       new_send_to_char(vict, "A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n");
       new_send_to_char(ch, "Thawed.\r\n");
       act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
@@ -6518,5 +6522,178 @@ void show_door_errors(struct char_data *ch)
     sprintf(buf, "No door errors found!\r\n");
     DYN_RESIZE(buf);
   }
+  page_string(ch->desc, dynbuf, DYN_BUFFER);
+}
+/**
+This function searches a string for a regular expression or keyword
+and returns a positive number if it is found. and 0 if unfound.
+regex : phrase/keyword (could be made regular expression compliant in future 
+(don't want to confuse my builders for now)
+str   : the string to be searched
+buf   : the new string with the expression hilighted
+buflen: the size of the buf
+--Mordecai : Sat Feb 5th 2005
+**/
+int hilite(const char *regex, const char *str, char *buf, size_t buflen)
+{
+  char *p, *s = (char *)str;
+  int tmp = 0;
+  bool found = FALSE;
+  int cnt = strlen(regex);
+  if ((p = strstr(str, regex)) == NULL) return 0;
+
+
+
+  while ( *s  && tmp < buflen)
+  {
+    if ( s == p )
+    {
+      if (tmp + 3 < buflen)
+      {
+        buf[tmp++] = '{';
+        buf[tmp++] = 'c';
+        buf[tmp++] = 'u';
+        found = TRUE;
+      }
+    }
+    if (found)
+    {
+      if (!cnt--)
+      {
+        if (tmp + 3 < buflen)
+        {
+          buf[tmp++] = '{';
+          buf[tmp++] = 'c';
+          buf[tmp++] = '0';
+
+          found = FALSE;
+        }
+
+      }
+    }
+
+    buf[tmp++] = *(s++);
+  }
+
+
+  buf[tmp] = '\0';
+
+  return 1;
+}
+
+#define T_ARG 0
+#define T_BOD 1
+#define T_NAM 2
+#define T_ALL 3
+
+int search_one_trig(int stype, struct trig_data *trig, char *buf, size_t len, int vnum, const char *phrase)
+{
+  char *getline( char *str, char *buf, size_t len );
+  size_t nlen = 0;
+  int found = 0, count = 0;
+  char strtmp2[MAX_STRING_LENGTH];
+  count = snprintf(buf + nlen, len - nlen, "\r\n{cgVnum: %-7d -- Name: %-50s\r\n{c0", vnum, trig->name);
+  if (count > 0)
+    nlen += count;
+
+  if ((stype == T_NAM || stype == T_ALL) && trig->name)
+  {
+    if (hilite(phrase, (const char *)trig->name, strtmp2, sizeof(strtmp2)))
+    {
+      count = snprintf(buf + nlen, len - nlen, "      {cc[NAME]{c0 %s{c0\r\n", strtmp2);
+      if (count >= 0)
+        nlen += count;
+      found++;
+    }
+
+  }
+  if ((stype == T_ARG || stype == T_ALL) && trig->arglist)
+  {
+    if (hilite(phrase, (const char *)trig->arglist, strtmp2, sizeof(strtmp2)))
+    {
+      count = snprintf(buf + nlen, len - nlen, "      {cM[ARGS]{c0 %s{c0\r\n", strtmp2);
+      if (count >= 0)
+        nlen += count;
+      found++;
+    }
+
+  }
+  if ((stype == T_BOD || stype == T_ALL) && trig->cmdlist)
+  {
+    int n = 0;
+    struct cmdlist_element *c;
+    for (c = trig->cmdlist; c; c=c->next)
+    {
+      n++;
+      if (hilite(phrase, c->cmd, strtmp2, sizeof(strtmp2)))
+      {
+        count = snprintf(buf + nlen, len - nlen, "      {cy[BODY]{c0 Line %3d: %s{c0\r\n", n, strtmp2);
+        if (count >= 0)
+          nlen += count;
+        found++;
+      }
+    }
+
+  }
+
+
+  return found;
+}
+ACMD(do_search_triggers)
+{
+  int i;
+  int found = 0;
+  int stype;
+  char buf[MAX_STRING_LENGTH];
+  DYN_DEFINE;
+  DYN_CREATE;
+
+  argument = one_argument(argument, buf);
+  skip_spaces(&argument);
+  if (!*buf || !*argument)
+  {
+    new_send_to_char(ch, "TSEARCH <ALL | BODY | NAME | ARGS> <phrase to find>\r\n");
+    return;
+  }
+  if (isname("all", buf))
+  {
+    stype = T_ALL;
+  }
+  else if (isname("body", buf))
+  {
+    stype = T_BOD;
+  }
+  else if (isname("name", buf))
+  {
+    stype = T_NAM;
+  }
+  else if (isname("args", buf))
+  {
+    stype = T_ARG;
+  }
+  else
+  {
+    new_send_to_char(ch, "TSEARCH <ALL | BODY | NAME | ARGS> <phrase to find>\r\n");
+    return;
+  }
+
+
+  for (i = 0; i < top_of_trigt; i++)
+  {
+    if (trig_index[i]->proto)
+    {
+      if (search_one_trig(stype, trig_index[i]->proto, buf, sizeof(buf), trig_index[i]->vnum, (const char*)argument))
+      {
+        DYN_RESIZE(buf);
+        found ++;
+      }
+    }
+
+  }
+  if (!found)
+    sprintf(buf, "No triggers found!\r\n");
+  else
+    sprintf(buf, "%d triggers found!\r\n", found);
+  DYN_RESIZE(buf);
   page_string(ch->desc, dynbuf, DYN_BUFFER);
 }

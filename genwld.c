@@ -504,6 +504,11 @@ int save_rooms(zone_rnum rzone)
                   "%s~\n", ex_desc->keyword, buf);
         }
       }
+      if (room->mine) {
+      fprintf(sf,	"M\n"
+                  "%d\n"
+                  "%d\n", room->mine->num, room->mine->difficulty);
+      }
 
       fprintf(sf, "S\n");
       script_save_to_disk(sf, room, WLD_TRIGGER);

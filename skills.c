@@ -33,7 +33,7 @@ void dismount_char(struct char_data *ch);
 int can_fight(CHAR_DATA *ch, CHAR_DATA *vict);
 void perform_give(CHAR_DATA *ch, CHAR_DATA *vict,
                   OBJ_DATA *obj);
-extern int arena_ok(CHAR_DATA *ch, CHAR_DATA *victim);
+int arena_ok(CHAR_DATA *ch, CHAR_DATA *victim);
 void improve_skill(CHAR_DATA *ch, int skill);
 int compute_armor_class(CHAR_DATA *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
@@ -1250,7 +1250,7 @@ ASKILL(skill_disarm)
 ASKILL(skill_trample)
 {
   int chance = 0, dam = 0;
-  extern int average_damage(struct char_data *ch);
+  int average_damage(struct char_data *ch);
   char buf[MAX_STRING_LENGTH];
   if (!(RIDING(ch) || GET_RACE(ch) == RACE_CENTAUR))
   {
@@ -1755,7 +1755,7 @@ ASKILL(skill_fortify)
 
 ASKILL(skill_scalp)
 {
-  extern void crumble_obj(CHAR_DATA *ch, OBJ_DATA *obj);
+  void crumble_obj(CHAR_DATA *ch, OBJ_DATA *obj);
   OBJ_DATA *scalp = NULL;
   struct extra_descr_data *new_descr = NULL;
   char /*buf1[MAX_STRING_LENGTH],*/ buf2[MAX_STRING_LENGTH];

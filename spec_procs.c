@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.7  2005/02/05 05:26:17  w4dimenscor
+ * Added tsearch command to full text search triggers
+ *
  * Revision 1.6  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -72,8 +75,8 @@ void play_high_dice(struct char_data *ch, struct char_data *dealer,
 void play_seven(struct char_data *ch, struct char_data *dealer,
                 char *guess, int bet);
 void play_craps(struct char_data *ch, struct char_data *dealer, int bet);
-extern struct obj_data *find_vehicle_by_vnum(int vnum);
-extern struct obj_data *get_obj_in_list_type(int type,
+struct obj_data *find_vehicle_by_vnum(int vnum);
+struct obj_data *get_obj_in_list_type(int type,
             struct obj_data *list);
 void explosion_messages(room_rnum room, int damage, struct obj_data *target);
 void set_race(struct char_data *ch, int race);
@@ -1139,8 +1142,8 @@ SPECIAL(pet_shops)
   room_rnum pet_room;
   struct char_data *pet, *k, *tch;
   int num_of_pets = 0;
-  extern const char *simple_class_name(struct char_data *ch);
-  extern const char *race_name(struct char_data *ch);
+const char *simple_class_name(struct char_data *ch);
+const char *race_name(struct char_data *ch);
 
 
   struct follow_type *f, *f_next;

@@ -25,7 +25,7 @@ extern struct descriptor_data *descriptor_list;
 extern int pk_allowed;
 
 /* external functions */
-extern int arena_ok(struct char_data *ch, struct char_data *victim);
+int arena_ok(struct char_data *ch, struct char_data *victim);
 void improve_skill(struct char_data *ch, int skill);
 int compute_armor_class(struct char_data *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,

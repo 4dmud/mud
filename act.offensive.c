@@ -48,7 +48,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer);
 int perform_move(struct char_data *ch, int dir, int specials_check);
 struct ignore *find_ignore(struct ignore *ignore_list, char *str);
 int compute_armor_class(struct char_data *ch);
-extern void print_ignorelist(struct char_data *ch, struct char_data *vict);
+void print_ignorelist(struct char_data *ch, struct char_data *vict);
 int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
 //
 /* Daniel Houghton's revised external functions */
@@ -62,7 +62,7 @@ void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
                   struct obj_data *missile, int pos, int range, int dir);
 void check_killer(struct char_data *ch, struct char_data *vict);
 int computer_armor_class(struct char_data *ch);
-extern int arena_ok(struct char_data *ch, struct char_data *victim);
+int arena_ok(struct char_data *ch, struct char_data *victim);
 void improve_skill(struct char_data *ch, int skill);
 
 void aff_damage(struct char_data *ch, int dam, long interval, int recurse,
@@ -578,7 +578,7 @@ ACMD(do_flee)
 {
   int i, attempt, loss;
   struct char_data *was_fighting;
-  extern void halt_fighting(struct char_data *ch);
+  void halt_fighting(struct char_data *ch);
 
   if (AFF_FLAGGED(ch, AFF_HOLD))
   {

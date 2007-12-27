@@ -22,7 +22,7 @@ extern const char *preference_bits[];
 extern const char *affected_bits[];
 extern const char *connected_types[];
 extern const char *where[];
-extern const char *disp_where(int pos, struct char_data *ch);
+const char *disp_where(int pos, struct char_data *ch);
 extern const char *equipment_types[];
 extern const char *item_types[];
 extern const char *wear_bits[];

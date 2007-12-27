@@ -358,13 +358,13 @@ extern const struct race_data races[NUM_RACES];
          temp->next = (item)->next;	\
    }					\
 
-extern int get_sub(struct char_data *ch, int i);
-extern void improve_sub(struct char_data *ch, enum subskill_list sub, int amount);
+int get_sub(struct char_data *ch, int i);
+void improve_sub(struct char_data *ch, enum subskill_list sub, int amount);
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
 
-extern int get_skill(struct char_data *ch, int i);
-extern void set_skill(struct char_data *ch, int skill, int amount);
+int get_skill(struct char_data *ch, int i);
+void set_skill(struct char_data *ch, int skill, int amount);
 /* basic bitvector utils *************************************************/
 
 #define Q_FIELD(x)  ((int) (x) / 32)
@@ -692,7 +692,7 @@ void make_wholist(void);
           (GET_ADD(ch) <= 90) ? 28 :( \
           (GET_ADD(ch) <= 99) ? 29 :  30 ) ) )                   \
         )
-extern int current_class_is_tier_num(struct char_data *ch);
+int current_class_is_tier_num(struct char_data *ch);
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + (400 * ((current_class_is_tier_num(ch)/2))))
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
@@ -1002,8 +1002,8 @@ void alter_mana(struct char_data *ch, int amount);
 void alter_move(struct char_data *ch, int amount);
 void check_regen_rates(struct char_data *ch);
 int sub_number(char *name);
-extern const char * color_option_name(int num);
-extern struct obj_data *revert_object(struct obj_data *obj);
+const char * color_option_name(int num);
+struct obj_data *revert_object(struct obj_data *obj);
 #define GOLD_BANK   0
 #define GOLD_HAND   1
 #define GOLD_ALL    2

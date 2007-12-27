@@ -4126,7 +4126,7 @@ const char * dam_consider[] =
 
 #define NUM_CONS_DAMAGE 10
 
-extern int arena_ok(struct char_data *ch, struct char_data *victim);
+int arena_ok(struct char_data *ch, struct char_data *victim);
 
 ACMD(do_consider)
 {

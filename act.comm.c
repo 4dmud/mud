@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.8  2005/02/05 05:26:17  w4dimenscor
+ * Added tsearch command to full text search triggers
+ *
  * Revision 1.7  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -62,7 +65,7 @@ extern int holler_move_cost;
 
 void strip_color(char *inbuf);
 /* extern functions */
-extern int is_ignoring(struct char_data *ch, struct char_data *vict);
+int is_ignoring(struct char_data *ch, struct char_data *vict);
 extern struct time_info_data time_info;
 
 /* local functions */
@@ -218,7 +221,7 @@ ACMD(do_say)
     new_send_to_char(ch, "Yes, but WHAT do you want to say?\r\n");
   else
   {
-    char buf[MAX_INPUT_LENGTH + 12];    
+    char buf[MAX_INPUT_LENGTH + 12];
     char buf2[MAX_INPUT_LENGTH + 12];
 
     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -249,160 +252,160 @@ ACMD(do_say)
     argument = makedrunk(argument, ch);
 
 
-    
-      delete_doubledollar(argument);
 
-      if (argument[strlen(argument) - 1] == '?')
-      {
-        snprintf(buf, sizeof(buf), "You ask, '%s'", argument);
-        snprintf(buf2, sizeof(buf2), "$n asks, '%s'", argument);
-      }
-      else if (argument[strlen(argument) - 1] == '!' &&
-               argument[strlen(argument) - 2] == '!')
-      {
-        snprintf(buf, sizeof(buf), "You excitedly exclaim, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n excitedly exclaims, '%s'",
-                 argument);
-      }
-      else if (argument[strlen(argument) - 1] == '!')
-      {
-        snprintf(buf, sizeof(buf), "You exclaim, '%s'", argument);
-        snprintf(buf2, sizeof(buf2), "$n exclaims, '%s'", argument);
-      }
+    delete_doubledollar(argument);
 
-      else if (argument[strlen(argument) - 1] == '.' &&
-               argument[strlen(argument) - 2] == '.' &&
-               argument[strlen(argument) - 3] == '.')
-      {
-        snprintf(buf, sizeof(buf), "You mutter, '%s'", argument);
-        snprintf(buf2, sizeof(buf2), "$n mutters, '%s'", argument);
-      }
-      else if (argument[strlen(argument) - 1] == '.')
-      {
-        snprintf(buf, sizeof(buf), "You state, '%s'", argument);
-        snprintf(buf2, sizeof(buf2), "$n states, '%s'", argument);
-      }
-      else if (argument[strlen(argument) - 1] == ')' &&
-               argument[strlen(argument) - 2] == ':' &&
-               argument[strlen(argument) - 3] == ' ')
-      {
-        argument[strlen(argument) - 3] = '\0';
-        snprintf(buf, sizeof(buf), "You smile and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
-                 argument);
-      }
-      else if (argument[strlen(argument) - 1] == '(' &&
-               argument[strlen(argument) - 2] == ':' &&
-               argument[strlen(argument) - 3] == ' ')
-      {
-        argument[strlen(argument) - 3] = '\0';
-        snprintf(buf, sizeof(buf), "You frown and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n frowns and says, '%s'",
-                 argument);
-      }
-      else if (argument[strlen(argument) - 1] == ')'
-               && argument[strlen(argument) - 2] == '-'
-               && argument[strlen(argument) - 3] == ':'
-               && argument[strlen(argument) - 4] == ' ')
-      {
-        argument[strlen(argument) - 4] = '\0';
-        snprintf(buf, sizeof(buf), "You smile and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
-                 argument);
-      }
-      else if (argument[strlen(argument) - 1] == ')'
-               && argument[strlen(argument) - 2] == '-'
-               && argument[strlen(argument) - 3] == ';'
-               && argument[strlen(argument) - 4] == ' ')
-      {
-        argument[strlen(argument) - 4] = '\0';
-        snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
-                 argument);
-      }
-      else if (argument[strlen(argument) - 1] == ')'
-               && argument[strlen(argument) - 2] == ';'
-               && argument[strlen(argument) - 3] == ' ')
-      {
-        argument[strlen(argument) - 3] = '\0';
-        snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
-                 argument);
-      }
-      else if (LOWER(argument[strlen(argument) - 1]) == 'p'
-               && argument[strlen(argument) - 2] == '-'
-               && argument[strlen(argument) - 3] == ':'
-               && argument[strlen(argument) - 4] == ' ')
-      {
-        argument[strlen(argument) - 4] = '\0';
-        snprintf(buf, sizeof(buf), "You make a face and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n makes a face and says, '%s'",
-                 argument);
-      }
-      else if (LOWER(argument[strlen(argument) - 1]) == 'p'
-               && argument[strlen(argument) - 2] == ';'
-               && argument[strlen(argument) - 3] == ' ')
-      {
-        argument[strlen(argument) - 3] = '\0';
-        snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
-                 argument);
-      }
-      else if (LOWER(argument[strlen(argument) - 1]) == 'p'
-               && argument[strlen(argument) - 2] == ':'
-               && argument[strlen(argument) - 3] == ' ')
-      {
-        argument[strlen(argument) - 3] = '\0';
-        snprintf(buf, sizeof(buf), "You wink and say, '%s'",
-                 argument);
-        snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
-                 argument);
-      }
-      else
-      {
-        snprintf(buf, sizeof(buf), "You say, '%s'", argument);
-        snprintf(buf2, sizeof(buf2), "$n says, '%s'", argument);
-      }
+    if (argument[strlen(argument) - 1] == '?')
+    {
+      snprintf(buf, sizeof(buf), "You ask, '%s'", argument);
+      snprintf(buf2, sizeof(buf2), "$n asks, '%s'", argument);
+    }
+    else if (argument[strlen(argument) - 1] == '!' &&
+             argument[strlen(argument) - 2] == '!')
+    {
+      snprintf(buf, sizeof(buf), "You excitedly exclaim, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n excitedly exclaims, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == '!')
+    {
+      snprintf(buf, sizeof(buf), "You exclaim, '%s'", argument);
+      snprintf(buf2, sizeof(buf2), "$n exclaims, '%s'", argument);
+    }
+
+    else if (argument[strlen(argument) - 1] == '.' &&
+             argument[strlen(argument) - 2] == '.' &&
+             argument[strlen(argument) - 3] == '.')
+    {
+      snprintf(buf, sizeof(buf), "You mutter, '%s'", argument);
+      snprintf(buf2, sizeof(buf2), "$n mutters, '%s'", argument);
+    }
+    else if (argument[strlen(argument) - 1] == '.')
+    {
+      snprintf(buf, sizeof(buf), "You state, '%s'", argument);
+      snprintf(buf2, sizeof(buf2), "$n states, '%s'", argument);
+    }
+    else if (argument[strlen(argument) - 1] == ')' &&
+             argument[strlen(argument) - 2] == ':' &&
+             argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You smile and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == '(' &&
+             argument[strlen(argument) - 2] == ':' &&
+             argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You frown and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n frowns and says, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == ')'
+             && argument[strlen(argument) - 2] == '-'
+             && argument[strlen(argument) - 3] == ':'
+             && argument[strlen(argument) - 4] == ' ')
+    {
+      argument[strlen(argument) - 4] = '\0';
+      snprintf(buf, sizeof(buf), "You smile and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == ')'
+             && argument[strlen(argument) - 2] == '-'
+             && argument[strlen(argument) - 3] == ';'
+             && argument[strlen(argument) - 4] == ' ')
+    {
+      argument[strlen(argument) - 4] = '\0';
+      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == ')'
+             && argument[strlen(argument) - 2] == ';'
+             && argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
+               argument);
+    }
+    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
+             && argument[strlen(argument) - 2] == '-'
+             && argument[strlen(argument) - 3] == ':'
+             && argument[strlen(argument) - 4] == ' ')
+    {
+      argument[strlen(argument) - 4] = '\0';
+      snprintf(buf, sizeof(buf), "You make a face and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n makes a face and says, '%s'",
+               argument);
+    }
+    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
+             && argument[strlen(argument) - 2] == ';'
+             && argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
+               argument);
+    }
+    else if (LOWER(argument[strlen(argument) - 1]) == 'p'
+             && argument[strlen(argument) - 2] == ':'
+             && argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You wink and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n winks and says, '%s'",
+               argument);
+    }
+    else
+    {
+      snprintf(buf, sizeof(buf), "You say, '%s'", argument);
+      snprintf(buf2, sizeof(buf2), "$n says, '%s'", argument);
+    }
 
 
-      if (subcmd == SCMD_RSAY)
-      {
+    if (subcmd == SCMD_RSAY)
+    {
       struct char_data *people;
       char buf3[MAX_INPUT_LENGTH], buf4[MAX_INPUT_LENGTH];
-        snprintf(buf3, sizeof(buf3),  "{cg[%s]{cw %s{c0", race_name(ch), buf);
-        snprintf(buf4, sizeof(buf4), "{cg[%s]{cw %s{c0", race_name(ch), buf2);
-        
-        for (people = IN_ROOM(ch)->people; people; people = people->next_in_room)
-        {
-          if (people == ch)
-            continue;
-          if (IS_NPC(people))
-            continue;
-          if (PLR_FLAGGED(ch, PLR_COVENTRY))
-            continue;
-          if (GET_RACE(ch) == GET_RACE(people))
-            perform_act(buf4, ch, NULL, NULL, people);
-          else
-            perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
+      snprintf(buf3, sizeof(buf3),  "{cg[%s]{cw %s{c0", race_name(ch), buf);
+      snprintf(buf4, sizeof(buf4), "{cg[%s]{cw %s{c0", race_name(ch), buf2);
 
-        }
-        act(buf3, FALSE, ch, NULL, NULL, TO_CHAR);
-      }
-      else
+      for (people = IN_ROOM(ch)->people; people; people = people->next_in_room)
       {
-        act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-        if (!PLR_FLAGGED(ch, PLR_COVENTRY))
-          act(buf2, FALSE, ch, NULL, NULL /*argument*/, TO_ROOM | DG_NO_TRIG);
+        if (people == ch)
+          continue;
+        if (IS_NPC(people))
+          continue;
+        if (PLR_FLAGGED(ch, PLR_COVENTRY))
+          continue;
+        if (GET_RACE(ch) == GET_RACE(people))
+          perform_act(buf4, ch, NULL, NULL, people);
+        else
+          perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
+
       }
-    
+      act(buf3, FALSE, ch, NULL, NULL, TO_CHAR);
+    }
+    else
+    {
+      act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+      if (!PLR_FLAGGED(ch, PLR_COVENTRY))
+        act(buf2, FALSE, ch, NULL, NULL /*argument*/, TO_ROOM | DG_NO_TRIG);
+    }
+
     /* trigger check */
     speech_mtrigger(ch, argument);
     speech_wtrigger(ch, argument);
@@ -671,8 +674,8 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
 int is_tell_ok(struct char_data *ch, struct char_data *vict)
 {
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-  return FALSE;
-  
+    return FALSE;
+
   if (ch == vict)
   {
     send_to_char("You try to tell yourself something.\r\n", ch);
@@ -799,8 +802,8 @@ ACMD(do_spec_comm)
   const char *action_sing, *action_plur, *action_others;
 
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
-if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-  return;
+  if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
+    return;
 
   switch (subcmd)
   {
@@ -1210,21 +1213,21 @@ ACMD(do_gen_comm)
     strcpy(argument, "ribbit");
   }
   else if (AFF_FLAGGED(ch, AFF_POLY_WOLF))
-    {
-      strcpy(argument, "howl");
-    }
-    else if (AFF_FLAGGED(ch, AFF_POLY_BOAR))
-      {
-        strcpy(argument, "snort");
-      }
-      else if (AFF_FLAGGED(ch, AFF_POLY_BEAR))
-        {
-          strcpy(argument, "growl");
-        }
-        else if (AFF_FLAGGED(ch, AFF_POLY_LION))
-          {
-            strcpy(argument, "roar");
-          }
+  {
+    strcpy(argument, "howl");
+  }
+  else if (AFF_FLAGGED(ch, AFF_POLY_BOAR))
+  {
+    strcpy(argument, "snort");
+  }
+  else if (AFF_FLAGGED(ch, AFF_POLY_BEAR))
+  {
+    strcpy(argument, "growl");
+  }
+  else if (AFF_FLAGGED(ch, AFF_POLY_LION))
+  {
+    strcpy(argument, "roar");
+  }
   argument = makedrunk(argument, ch);
   if (subcmd == SCMD_HOLLER)
   {
@@ -1319,7 +1322,7 @@ ACMD(do_qcomm)
     return;
   }
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-  return;
+    return;
   skip_spaces(&argument);
 
   if (!*argument)
@@ -1376,33 +1379,38 @@ ACMD(do_ctell)
 
   skip_spaces(&argument);
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-  return;
+    return;
   /*
    * The syntax of ctell for imms is different then for morts
    * mort: ctell <bla bla bla>    imms: ctell <clan_num> <bla bla bla>
    * Imms cannot actually see ctells but they can send them
    *
    */
-   if (GET_LEVEL(ch) >= LVL_GOD) {
-   c = atoi (argument);
-   if ((c <= 0) || (c > num_of_clans)){
-   if ((c = find_clan_by_id(GET_CLAN(ch))) == -1) {
-   send_to_char ("There is no clan with that number.\r\n", ch);
-   return;
-   }
-   } else {
-   while ((*argument != ' ') && (*argument != '\0'))
-   argument++;
-   while (*argument == ' ') argument++;
-   }
-   }
-   else
-   
-  if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0)
+  if (GET_LEVEL(ch) >= LVL_GOD)
   {
-    send_to_char("You're not part of a clan.\r\n", ch);
-    return;
+    c = atoi (argument);
+    if ((c <= 0) || (c > num_of_clans))
+    {
+      if ((c = find_clan_by_id(GET_CLAN(ch))) == -1)
+      {
+        send_to_char ("There is no clan with that number.\r\n", ch);
+        return;
+      }
+    }
+    else
+    {
+      while ((*argument != ' ') && (*argument != '\0'))
+        argument++;
+      while (*argument == ' ') argument++;
+    }
   }
+  else
+
+    if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0)
+    {
+      send_to_char("You're not part of a clan.\r\n", ch);
+      return;
+    }
   if (PRF_FLAGGED(ch, PRF_NOCTALK))
   {
     new_send_to_char(ch, "You can now hear you clan again.\r\n");
@@ -1419,7 +1427,7 @@ ACMD(do_ctell)
 
   if (*argument == '#')
   {
-  char loc_a[MAX_INPUT_LENGTH];
+    char loc_a[MAX_INPUT_LENGTH];
     argument++;
     argument = one_argument(argument, loc_a);
     minlev = atoi(loc_a);
@@ -1434,7 +1442,7 @@ ACMD(do_ctell)
       argument++;
     while (*argument == ' ')
       argument++;*/
-      skip_spaces(&argument);
+    skip_spaces(&argument);
     snprintf(level_string, sizeof(level_string), " (to ranks > %d)", minlev);
   }
 
@@ -1456,7 +1464,7 @@ ACMD(do_ctell)
     {
       if (IS_PLAYING(i) && i->character && !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
       {
-        if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (PRF_FLAGGED(i->character, PRF_NOCTALK)) )
+        if (GET_CLAN(i->character) != -1 && ((find_clan_by_id(GET_CLAN(i->character)) == c || GET_LEVEL(i->character) > LVL_HERO)) && (!PRF_FLAGGED(i->character, PRF_NOCTALK)) )
         {
           if (i->character->player_specials->saved.clan_rank >=minlev)
           {

@@ -83,12 +83,12 @@ ACMD(do_string)
 }
 
 /* buf queda con la linea sin \n\r */
-char *getline( char *str, char *buf )
+char *getline( char *str, char *buf , size_t len)
 {
         int tmp = 0;
         bool found = FALSE;
 
-        while ( *str )
+        while ( *str  && tmp < len)
         {
                 if ( *str == '\n' )
                 {
@@ -123,7 +123,7 @@ char *numlineas( char *string )
 
         while ( *string )
         {
-                string = getline( string, tmpb );
+                string = getline( string, tmpb , sizeof(tmpb));
                 sprintf( buf2, "%2d. %s\n\r", cnt++, tmpb );
                 strcat( buf, buf2 );
         }
