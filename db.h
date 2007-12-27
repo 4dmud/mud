@@ -103,6 +103,7 @@
 #define CONTEXT_HELP_FILE LIB_TEXT"contexthelp"	/* context help for olc	*/
 #define VEHICLE_FILE   LIB_TEXT"vehicles"
 
+
 //#define IDEA_FILE     LIB_MISC"ideas"
 //#define TYPO_FILE       LIB_MISC"typos"
 //#define BUG_FILE        LIB_MISC"bugs"
@@ -132,6 +133,7 @@
 #define QIC_FILE	LIB_ETC"qicdb"	/* qic database          */
 #define CLAN_DIR	LIB_ETC"/clan/"
 #define CLAN_INDEX_FILE CLAN_DIR"clan_index"
+#define ASSEMBLIES_FILE LIB_ETC"assemblies" /* Assemblies engine 	*/
 
 #define PLR_PREFIX	"pfiles"
 #define BACKUP_PREFIX	"pfiles/backup"

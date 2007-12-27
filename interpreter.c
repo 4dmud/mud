@@ -76,6 +76,8 @@ long get_acc_by_id(long id);
 void default_char(struct char_data *ch);
 void read_ignorelist(struct char_data *ch);
 void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
+void assemblies_parse(struct descriptor_data *d, char *arg);
+extern void assedit_parse(struct descriptor_data *d, char *arg);
 /* local functions */
 int perform_dupe_check(struct descriptor_data *d);
 struct alias_data *find_alias(struct alias_data *alias_list, char *str);
@@ -113,6 +115,8 @@ ACMD(do_affects);
 ACMD(do_alias);
 ACMD(do_arena);
 ACMD(do_assist);
+ACMD(do_assemble);
+ACMD(do_assedit);
 ACMD(do_astat);
 ACMD(do_at);
 ACMD(do_atlvl);
@@ -463,6 +467,8 @@ const struct command_info cmd_info[] =
     { "arena"    , "arena", POS_STANDING, do_arena    , 0, 0, 0 },
     { "arinfo"   , "arinf", POS_SLEEPING, do_gen_tog  , 0, SCMD_ARENA, 0 },
     { "assist"   , "as"	, POS_FIGHTING, do_assist   , 1, 0, 0 },
+{ "assemble" , "ass"	, POS_SITTING , do_assemble , 0, SUB_ASSEMBLE, 0 },
+  { "assedit"  , "asse"	, POS_STANDING, do_assedit  , LVL_IMMORT, 0, WIZ_EDIT_GRP },
     { "ask"      , "ask"	, POS_RESTING , do_spec_comm, 0, SCMD_ASK, 0 },
     { "auction"  , "auc"  , POS_RESTING , do_auction  , 1, 0, 0 },
     { "auctalk"  , "auct"	, POS_SLEEPING, do_gen_comm , 0, SCMD_AUCTION, 0 },
@@ -481,11 +487,13 @@ const struct command_info cmd_info[] =
 
     { "ban"      , "ban"	, POS_DEAD    , do_ban      , LVL_IMMORT, 0, WIZ_BAN_GRP },
     { "balance"  , "bal"	, POS_STANDING, do_not_here , 1, 0, 0 },
+  { "bake"     , "bak"	, POS_SITTING , do_assemble , 0, SUB_BAKE, 0 },
     { "bet"      , "bet"  , POS_DEAD    , do_not_here , 1, 0, 0 },
     { "bid"      , "bid"  , POS_RESTING , do_bid      , 1, 0, 0 },
     { "blowup"   , "blow" , POS_STANDING, do_blowup   , LVL_IMPL, 0, WIZ_IMPL_GRP},
         { "bprompt"   , "bpromp", POS_DEAD    , /*do_display*/ do_prompt_new  , 0, SCMD_BPROMPT, 0 },
     { "brief"    , "br"   , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF, 0 },
+  //{ "brew"     , "brew"	, POS_SITTING , do_assemble , 0, SUB_BREW, 0 },
     { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog,   LVL_IMMORT, SCMD_BUILDWALK, WIZ_OLC_GRP },
     { "buck"     , "buck" , POS_STANDING, do_buck     , 0, 0, 0 },
     { "bury"     , "bury" , POS_STANDING, do_bury     , 0, 0, 0 },
@@ -517,6 +525,7 @@ const struct command_info cmd_info[] =
     { "compare"  , "compa", POS_RESTING , do_compare  , 0, 0, 0 },
     { "copyover" , "copyo", POS_DEAD    , do_copyover , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "credits"  , "cre"	, POS_DEAD    , do_gen_ps   , 0, SCMD_CREDITS, 0 },
+  { "craft"    , "craft"	, POS_SITTING , do_assemble , 0, SUB_CRAFT, 0 },
     { "ctell"    , "ct"   , POS_SLEEPING, do_ctell    , 0, 0, 0 },
 
     { "date"     , "da"	, POS_DEAD    , do_date     , 0, SCMD_DATE, 0 },
@@ -553,12 +562,16 @@ const struct command_info cmd_info[] =
     { "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
     { "fire"     , "fire" , POS_STANDING, do_not_here , 0, 0, 0 },
     { "flee"     , "fl"	, POS_FIGHTING, do_flee     , 1, 0, 0 },
+
+  { "fletch"   , "fletch"	, POS_SITTING , do_assemble , 0, SUB_FLETCH, 0 },
     { "fly"      , "fly"  , POS_STANDING, do_drive    , 0, 0, 0 },
     { "follow"   , "fol"	, POS_RESTING , do_follow   , 0, 0, 0 },
     { "fuse"     , "fuse"	, POS_RESTING , do_fuse   , 0, 0, 0 },
     { "fusion"   , "fusion"	, POS_RESTING , do_fusion   , 0, 0, 0 },
     { "freeze"   , "free" , POS_DEAD    , do_heroutil  , 0, SCMD_FREEZE, 0 },
     { "forest"   , "forest" , POS_DEAD    , forest_find  , LVL_IMMORT, 0, 0 },
+
+  { "forge"    , "for"	, POS_SITTING , do_assemble , 0, SUB_FORGE , 0},
     { "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 
 
@@ -613,6 +626,8 @@ const struct command_info cmd_info[] =
     { "killlist"     , "killlist"	, POS_FIGHTING, do_killlist      , 0, 0, 0 },
     { "keeptitle", "keep" , POS_RESTING , do_gen_tog  , 1, SCMD_KEEPTITLE, 0 },
 
+  { "knit"     , "knit"	, POS_SITTING , do_assemble , 0, SUB_KNIT, 0 },
+
     { "look"     , "l"	, POS_RESTING , do_look     , 0, SCMD_LOOK, 0 },
     { "last"     , "la"	, POS_DEAD    , do_last     , LVL_IMMORT, 0, WIZ_IMM2_GRP },
     { "leader"   , "lead"	, POS_STANDING    , do_leader   , 0, 0, 0 },
@@ -632,6 +647,8 @@ const struct command_info cmd_info[] =
     { "movemsg" , "mov"	, POS_DEAD    , do_gen_tog  , 0, SCMD_MOVEMSG, 0 },
     { "motd"     , "motd" , POS_DEAD    , do_gen_ps   , 0, SCMD_MOTD, 0 },
     { "mail"     , "mail"	, POS_STANDING, do_not_here , 1, 0, 0 },
+  { "make"     , "make"	, POS_STANDING, do_assemble , 0, SUB_MAKE, 0 },
+  { "mix"      , "mix"	, POS_STANDING, do_assemble , 0, SUB_MIX, 0 },
     { "map"      , "map"  , POS_DEAD    , do_map      , 0, 0, 0 },
     { "mine"     , "mine" , POS_STANDING, do_mine     , 0, 0, 0 },
     { "meld"     , "meld" , POS_STANDING, do_meld     , 0, 0, 0 },
@@ -802,6 +819,7 @@ const struct command_info cmd_info[] =
     { "task"    , "ta"	, POS_DEAD    , do_task    , 0, 0, 0 },
     { "tedit"    , "ted"	, POS_DEAD    , do_tedit    , LVL_GRGOD, 0, WIZ_IMPL_GRP },
     { "tell"     , "te"	, POS_SLEEPING    , do_tell     , 0, 0, 0 },
+{ "thatch"   , "thatch"	, POS_SITTING , do_assemble , 0, SUB_THATCH, 0 },
     { "take"     , "ta"	, POS_RESTING , do_get      , 0, 0, 0 },
     { "taste"    , "tas"  , POS_RESTING , do_taste    , 0, 0, 0 },
     { "teleport" , "tel"	, POS_DEAD    , do_teleport , LVL_IMMORT, 0, WIZ_TELE_GRP },
@@ -839,6 +857,7 @@ const struct command_info cmd_info[] =
     { "wager"    , "wager", POS_RESTING , do_bet      , 0, 0, 0 },
     { "wear"     , "wea"	, POS_RESTING , do_wear     , 0, 0, 0 },
     { "weather"  , "weat" , POS_RESTING , do_weather  , 0, 0, 0 },
+{ "weave"    , "weave"	, POS_SITTING , do_assemble , 0, SUB_WEAVE, 0 },
     { "who"      , "who"	, POS_DEAD    , do_who      , 0, 0, 0 },
     { "whoami"   , "whoa"	, POS_DEAD    , do_gen_ps   , 0, SCMD_WHOAMI, 0 },
     { "where"    , "whe"	, POS_RESTING , do_where    , 1, 0, 0 },
@@ -2344,6 +2363,7 @@ void nanny(struct descriptor_data *d, char *arg)
                       { CON_TRIGEDIT, trigedit_parse },
                       { CON_HEDIT, hedit_parse},
                       { CON_VEDIT, vedit_parse},
+    { CON_ASSEDIT, assedit_parse },
                       { -1, NULL }
                     };
 
@@ -2914,6 +2934,9 @@ send_compress_offer(d);
      * the game_loop() axe them.
      */
   case CON_CLOSE:
+    break;
+  case CON_ASSEDIT:
+    assedit_parse(d, arg);
     break;
   case CON_IDENT:
     /* do nothing */

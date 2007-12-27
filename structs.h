@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.22  2005/09/24 08:52:33  w4dimenscor
+ * finished the assemblies code
+ *
  * Revision 1.21  2005/09/24 07:11:51  w4dimenscor
  * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
  *
@@ -626,6 +629,7 @@ extern int message_type;
 #define CON_CREATE_NEW 42
 #define CON_VEDIT      43
 #define CON_FIND_HELP  44
+#define CON_ASSEDIT      45     /* OLC mode - Assemblies                */
 
 #define STATE_ANSI    0
 #define STATE_NEW_HERE 1

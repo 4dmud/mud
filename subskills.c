@@ -579,6 +579,39 @@ void assign_subskills(void)
        0, POS_SLEEPING, 0 , PEAC,
        SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_NONE, TYPE_UNDEFINED);
 
+  subo(SUB_ASSEMBLE, "Assemble", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_BAKE, "Bake", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_BREW, "Brew", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_CRAFT, "Craft", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_FLETCH, "Fletch", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_KNIT, "Knit", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_MAKE, "Make", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_MIX, "Mix", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_THATCH, "Thatch", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_WEAVE, "Weave", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
+subo(SUB_FORGE, "Forge", 0, 0,
+       0, POS_SITTING, 0 , PEAC,
+       SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
 
 }
 #undef SINFO
@@ -1096,10 +1129,6 @@ void improve_sub(struct char_data *ch, enum subskill_list  sub, int amount)
   save_char(ch);
 }
 
-int subkillset(struct char_data *ch, enum subskill_list  subcmd, int amount)
-{
-  return 0;
-}
 
 const char * color_option_name(int num)
 {

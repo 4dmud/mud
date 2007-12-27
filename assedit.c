@@ -59,11 +59,11 @@ ACMD (do_assedit)
  if (IS_NPC(ch))
       return;
  if (GET_LEVEL(ch) < LVL_IMPL)
-     send_to_char(ch, "You do not have permission to do that.\r\n");
+     new_send_to_char(ch, "You do not have permission to do that.\r\n");
 
  for (d = descriptor_list; d; d = d->next) {
      if (d->connected == CON_ASSEDIT) {
-     send_to_char(ch, "Assemblies are already being editted by someone.\r\n");
+     new_send_to_char(ch, "Assemblies are already being editted by someone.\r\n");
      return;
      }
    }
@@ -83,7 +83,7 @@ ACMD (do_assedit)
             nodigit(d);
          else {
             assemblyCreate(atoi(buf2), 0);
-            send_to_char(d->character, "Assembly Created.\r\n");
+            new_send_to_char(d->character, "Assembly Created.\r\n");
             assemblySaveAssemblies();
             return;
             }
@@ -94,7 +94,7 @@ ACMD (do_assedit)
             nodigit(d);
          else {
              assemblyDestroy(atoi(buf2));
-             send_to_char(d->character, "Assembly Deleted.\r\n");
+             new_send_to_char(d->character, "Assembly Deleted.\r\n");
              assemblySaveAssemblies();
              return;
              }
@@ -125,7 +125,7 @@ void assedit_setup(struct descriptor_data *d, int number)
 
 
     if( (pOldAssembly = assemblyGetAssemblyPtr( number )) == NULL ) {
-      send_to_char(d->character, "That assembly does not exist\r\n");
+      new_send_to_char(d->character, "That assembly does not exist\r\n");
       cleanup_olc(d, CLEANUP_ALL);
       return;
     } else {
@@ -150,7 +150,7 @@ void assedit_setup(struct descriptor_data *d, int number)
 
     if ( (lRnum = real_object( OLC_ASSEDIT(d)->lVnum ) ) < 0)
       {
-       send_to_char(d->character, "Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
+       new_send_to_char(d->character, "Assembled item may not exist, check the vnum and assembles (show assemblies). \r\n");
        cleanup_olc(d, CLEANUP_ALL);    /* for right now we just get out! */
        return;
       }
@@ -175,7 +175,7 @@ void assedit_disp_menu(struct descriptor_data *d)
 
 #if defined(CLEAR_SCREEN)
 sprintf(buf, "%c[H%c[J", 27, 27);
-send_to_char(d->character, buf);
+new_send_to_char(d->character, buf);
 #endif
 
   sprintf(buf,
@@ -187,10 +187,10 @@ send_to_char(d->character, buf);
         yel,  obj_proto[ real_object(OLC_ASSEDIT(d)->lVnum) ].short_description, nrm,
         yel,  szAssmType, nrm
        );
-    send_to_char(d->character, buf);
+    new_send_to_char(d->character, buf);
 
   if(OLC_ASSEDIT(d)->lNumComponents <= 0)
-    send_to_char(d->character, "   < NONE > \r\n");
+    new_send_to_char(d->character, "   < NONE > \r\n");
   else {
    for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++ ) {
      if ( (lRnum = real_object(OLC_ASSEDIT(d)->pComponents[i].lVnum)) < 0)
@@ -208,7 +208,7 @@ send_to_char(d->character, buf);
            yel, (OLC_ASSEDIT(d)->pComponents[ i ].bInRoom  ? "Yes" : "No"), nrm,
            yel, (OLC_ASSEDIT(d)->pComponents[ i ].bExtract ? "Yes" : "No"), nrm           );
        }
-      send_to_char(d->character, buf);
+      new_send_to_char(d->character, buf);
       }
      }
   sprintf(buf,
@@ -220,7 +220,7 @@ send_to_char(d->character, buf);
        "\r\nEnter your choice : ",
        grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm
          );
-  send_to_char(d->character, buf);
+  new_send_to_char(d->character, buf);
 
   OLC_MODE(d) = ASSEDIT_MAIN_MENU;
 
@@ -256,7 +256,7 @@ void assedit_parse(struct descriptor_data *d, char *arg)
                                 OLC_ASSEDIT(d)->pComponents[i].bInRoom
                                 );
             }
-       send_to_char(d->character, "\r\nSaving all assemblies\r\n");
+       new_send_to_char(d->character, "\r\nSaving all assemblies\r\n");
        assemblySaveAssemblies();
 
 /*       free(pTComponents);
@@ -270,35 +270,35 @@ void assedit_parse(struct descriptor_data *d, char *arg)
          get_char_colors(d->character);
 #if defined(CLEAR_SCREEN)
 sprintf(buf, "%c[H%c[J", 27, 27);
-send_to_char(d->character, buf);
+new_send_to_char(d->character, buf);
 #endif
       for (counter = 0; counter < MAX_ASSM; counter++) {
            sprintf(buf, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
                 AssemblyTypes[counter], !(++columns % 2) ? "\r\n" : "");
-           send_to_char(d->character, buf);
+           new_send_to_char(d->character, buf);
            }
-           send_to_char(d->character, "Enter the assembly type : ");
+           new_send_to_char(d->character, "Enter the assembly type : ");
      OLC_MODE(d) = ASSEDIT_EDIT_TYPES;
 
      break;
      case 'a':
      case 'A':                /* add a new component */
-       send_to_char(d->character, "\r\nWhat is the vnum of the new component?");
+       new_send_to_char(d->character, "\r\nWhat is the vnum of the new component?");
        OLC_MODE(d) = ASSEDIT_ADD_COMPONENT;
       break;
 
      case 'e':
      case 'E':                /* edit a component */
-       send_to_char(d->character, "\r\nEdit which component? ");
+       new_send_to_char(d->character, "\r\nEdit which component? ");
        OLC_MODE(d) = ASSEDIT_EDIT_COMPONENT;
       break;
      case 'd':
      case 'D':                /* delete a component */
        if ((pos < 0) || pos > OLC_ASSEDIT(d)->lNumComponents) {
-           send_to_char(d->character, "\r\nWhich component do you wish to remove?");
+           new_send_to_char(d->character, "\r\nWhich component do you wish to remove?");
            assedit_disp_menu(d);
        } else {
-           send_to_char(d->character, "\r\nWhich component do you wish to remove?");
+           new_send_to_char(d->character, "\r\nWhich component do you wish to remove?");
            OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
        }
       break;
@@ -354,7 +354,7 @@ send_to_char(d->character, buf);
      assedit_disp_menu(d);
 
    } else {
-     send_to_char(d->character, "That object does not exist. Please try again\r\n");
+     new_send_to_char(d->character, "That object does not exist. Please try again\r\n");
      assedit_disp_menu(d);
      }
   break;
@@ -411,7 +411,7 @@ send_to_char(d->character, buf);
     break;
 
     default:
-      send_to_char(d->character, "Is the item to be extracted when the assembly is created? (Y/N)");
+      new_send_to_char(d->character, "Is the item to be extracted when the assembly is created? (Y/N)");
     break;
     }
    break;
@@ -430,15 +430,15 @@ send_to_char(d->character, buf);
     break;
 
     default:
-      send_to_char(d->character, "Object in the room when assembly is created? (n =  in inventory):");
+      new_send_to_char(d->character, "Object in the room when assembly is created? (n =  in inventory):");
     break;
     }
  break;
 
  default:                        /* default for whole assedit parse function */
                                  /* we should never get here */
- mudlog(BRF, LVL_GOD, TRUE, "SYSERR: OLC assedit_parse(): Reached default case!");
- send_to_char(d->character, "Opps...\r\n");
+ new_mudlog(BRF, LVL_GOD, TRUE, "SYSERR: OLC assedit_parse(): Reached default case!");
+ new_send_to_char(d->character, "Opps...\r\n");
  STATE(d) = CON_PLAYING;
  break;
  }
@@ -447,7 +447,7 @@ send_to_char(d->character, buf);
 
 void assedit_delete(struct descriptor_data *d)
 {
- send_to_char(d->character, "Which item number do you wish to delete from this assembly?");
+ new_send_to_char(d->character, "Which item number do you wish to delete from this assembly?");
  OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
  return;
 }
@@ -455,23 +455,23 @@ void assedit_delete(struct descriptor_data *d)
 
 void assedit_edit_extract(struct descriptor_data *d)
 {
- send_to_char(d->character, "Is the item to be extracted when the assembly is created? (Y/N):");
+ new_send_to_char(d->character, "Is the item to be extracted when the assembly is created? (Y/N):");
  OLC_MODE(d) = ASSEDIT_EDIT_EXTRACT;
  return;
 }
 
 void assedit_edit_inroom(struct descriptor_data *d)
 {
- send_to_char(d->character, "Should the object be in the room when assembly is created (n = in inventory)?");
+ new_send_to_char(d->character, "Should the object be in the room when assembly is created (n = in inventory)?");
  OLC_MODE(d) = ASSEDIT_EDIT_INROOM;
  return;
 }
 
 void nodigit(struct descriptor_data *d)
 {
-  send_to_char(d->character, "Usage: assedit <vnum>\r\n");
-  send_to_char(d->character, "     : assedit new <vnum>\r\n");
-  send_to_char(d->character, "     : assedit delete <vnum>\r\n");
+  new_send_to_char(d->character, "Usage: assedit <vnum>\r\n");
+  new_send_to_char(d->character, "     : assedit new <vnum>\r\n");
+  new_send_to_char(d->character, "     : assedit delete <vnum>\r\n");
   return;
 }
 

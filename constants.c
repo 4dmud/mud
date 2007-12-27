@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.13  2005/09/24 08:52:33  w4dimenscor
+ * finished the assemblies code
+ *
  * Revision 1.12  2005/09/24 07:11:51  w4dimenscor
  * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
  *
@@ -222,6 +225,38 @@ const char *material_names[] =
     "wool",
     "wood",
     "magic-wood",
+   "bone",
+   "ceramic",
+   "mithril",
+   "obsidian",
+   "steel",
+   "stone",
+   "glass",
+   "organic",
+   "currency",
+   "paper",
+   "cotton",
+   "satin",
+   "silk",
+   "burlap",
+   "velvet",
+   "platinum",
+   "adamantite",
+   "onyx",
+   "ivory",
+   "brass",
+   "marble",
+   "bronze",
+   "pewter",
+   "ruby",
+   "sapphire",
+   "emerald",
+   "gemstone",
+   "granite",
+   "energy",
+   "hemp",
+   "crystal",
+   "earth",
     "\n"
   };
 
@@ -735,6 +770,7 @@ const char *connected_types[] =
     "Self-Delete 1",
     "Self-Delete 2",
     "Disconnecting",
+  
     "Object edit",
     "Room edit",
     "Zone edit",
@@ -765,6 +801,7 @@ const char *connected_types[] =
     "Create Character",
     "Vehicle Editor",
     "Help Selection",
+"Assembly Edit",
     "\n"
   };
 
@@ -2390,4 +2427,22 @@ const char *tunnel_msgs[] =
     "$p easily sinks deep into the earth. You'll be rich before you know it.",
     "$p hits something solid. Is that a stone or a bone?"  //36
   };
+
+
+/* Constants for Assemblies    *****************************************/
+const char *AssemblyTypes[] = {
+  "assemble",
+  "bake",
+  "brew",
+  "craft",
+  "fletch",
+  "knit",
+  "make",
+  "mix",
+  "thatch",
+  "weave",
+  "forge",
+  "\n"
+};
+
 

@@ -4,10 +4,10 @@ extern const char *vial_types[];
 extern const char *newbie_status[];
 extern const char *creation_state_types[];
 extern const char * dimension_types[];
-extern const char *material_names[]; 
- extern const char *fourdimensions_version;
- extern const char *circlemud_version;
- extern const char *oasisolc_version;
+extern const char *material_names[];
+extern const char *fourdimensions_version;
+extern const char *circlemud_version;
+extern const char *oasisolc_version;
 extern const char * profession_names[];
 extern const char * profession_group_names[];
 extern const char *dirs[];
@@ -78,4 +78,5 @@ extern size_t extra_bits_count;
 extern size_t wear_bits_count;
 
 extern struct class_name_data class_name[];
+extern const char *AssemblyTypes[];
 

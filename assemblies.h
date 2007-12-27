@@ -24,7 +24,7 @@
 #define ASSM_MIX               108       // Assembly must be mixed.
 #define ASSM_THATCH            109       // Assembly must be thatched.
 #define ASSM_WEAVE             110       // Assembly must be woven.
-#define ASSM_FORGE             111       // Assembly must be woven.
+#define ASSM_FORGE             111       // Assembly must be forged.
 
 #define MAX_ASSM               11      // Number of assembly types.
 

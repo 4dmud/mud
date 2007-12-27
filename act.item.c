@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.21  2005/09/24 08:52:33  w4dimenscor
+ * finished the assemblies code
+ *
  * Revision 1.20  2005/09/24 07:11:51  w4dimenscor
  * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
  *
@@ -112,6 +115,7 @@
 #include "dg_scripts.h"
 #include "screen.h"
 #include "fight.h"
+#include "assemblies.h"
 
 /* extern variables */
 extern bool LS_REMOVE;
@@ -208,6 +212,7 @@ void auc_send_to_all(char *messg, bool buyer);
 void stop_auction(int type, struct char_data *ch);
 void auc_stat(struct char_data *ch, struct obj_data *obj);
 long long gold_data(int type, long long amount);
+ACMD(do_assemble);
 ACMD(do_remove);
 ACMD(do_put);
 ACMD(do_get);
@@ -289,8 +294,92 @@ void spill_gold(struct char_data *ch)
   perform_drop_gold(ch, spill_gold_amount(ch), SCMD_SPILL, 0);
 }
 
+int getTypeFromSubskill(int subskill) {
+
+  switch (subskill) {
+case SUB_ASSEMBLE:
+return ASSM_ASSEMBLE;
+case SUB_BAKE:
+return ASSM_BAKE;
+case SUB_BREW:
+return ASSM_BREW;
+case SUB_CRAFT:
+return ASSM_CRAFT;
+case SUB_FLETCH:
+return ASSM_FLETCH;
+case SUB_KNIT:
+return ASSM_KNIT;
+case SUB_MAKE:
+return ASSM_MAKE;
+case SUB_MIX:
+return ASSM_MIX;
+case SUB_THATCH:
+return ASSM_THATCH;
+case SUB_WEAVE:
+return ASSM_WEAVE;
+case SUB_FORGE:
+return ASSM_FORGE;
+break;
+}
+return ASSM_ASSEMBLE;
+}
+
+ACMD(do_assemble)
+{
+  long         lVnum = NOTHING;
+  struct obj_data *pObject = NULL;
+  char buf[MAX_STRING_LENGTH];
+  int percent, type = getTypeFromSubskill(subcmd);
 
 
+  skip_spaces(&argument);
+
+  if (!get_sub(ch, subcmd)) {
+    new_send_to_char(ch, "You know nothing of that art!\r\n");
+    return;
+  }
+
+  if (*argument == '\0') {
+    new_send_to_char(ch, "What would you like to %s?\r\n", CMD_NAME);
+    return;
+  } else if ((lVnum = assemblyFindAssembly(argument)) < 0) {
+    new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
+    return;
+  } else if (assemblyGetType(lVnum) != (type - 101)) {
+    new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
+    return;
+  } else if (!assemblyCheckComponents(lVnum, ch)) {
+    new_send_to_char(ch, "You haven't got all the things you need.\r\n");
+    return;
+  }
+
+  percent = number(1, 101);
+
+  if (percent < 5)
+   improve_sub(ch, (enum subskill_list ) subcmd,1);
+
+  if (percent > get_sub(ch, subcmd)) {
+    new_send_to_char(ch, "You attempt to create ends in failure!\r\n");
+    return;
+  } else {
+    /* Create the assembled object. */
+    if ((pObject = read_object(lVnum, VIRTUAL)) == NULL ) {
+      new_send_to_char(ch, "You can't %s %s %s.\r\n", CMD_NAME, AN(argument), argument);
+      return;
+    }
+  }
+
+  /* Now give the object to the character. */
+  obj_to_char(pObject, ch);
+
+  /* Tell the character they made something. */
+  sprintf(buf, "You %s $p.", CMD_NAME);
+  act(buf, FALSE, ch, pObject, NULL, TO_CHAR);
+
+  /* Tell the room the character made something. */
+  sprintf(buf, "$n %ss $p.", CMD_NAME);
+  act(buf, FALSE, ch, pObject, NULL, TO_ROOM);
+}
 
 
 bool perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)

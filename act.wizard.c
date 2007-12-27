@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.34  2005/09/24 08:52:33  w4dimenscor
+ * finished the assemblies code
+ *
  * Revision 1.33  2005/09/16 10:20:10  w4dimenscor
  * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
  *
@@ -149,6 +152,7 @@
 #include "arena.h"
 #include "clan.h"
 #include "oasis.h"
+#include "assemblies.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -4244,6 +4248,7 @@ ACMD(do_show)
                {"olc", 		LVL_GOD},
                {"corpses", 	LVL_GOD},
                {"errors",       LVL_GOD},
+               {"assemblies",   LVL_BLD},
                {"\n", 0}
              };
 
@@ -4581,7 +4586,10 @@ ACMD(do_show)
     do_show_errors(ch);
     show_door_errors(ch);
     break;
-
+  /* show assembly */
+  case 18:
+    assemblyListToChar(ch);
+    break;
     /* show what? */
   default:
     new_send_to_char(ch,"Sorry, I don't understand that.\r\n");

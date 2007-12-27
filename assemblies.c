@@ -158,18 +158,18 @@ void assemblyListToChar( struct char_data *pCharacter )
   }
   else if( g_pAssemblyTable == NULL )
   {
-    send_to_char(pCharacter, "No assemblies exist.\r\n");
+    new_send_to_char(pCharacter, "No assemblies exist.\r\n");
     return;
   }
 
   /* Send out a "header" of sorts. */
-  send_to_char(pCharacter, "The following assemblies exists:\r\n");
+  new_send_to_char(pCharacter, "The following assemblies exists:\r\n");
 
   for( i = 0; i < g_lNumAssemblies; i++ )
   {
     if( (lRnum = real_object( g_pAssemblyTable[ i ].lVnum )) < 0 )
     {
-      send_to_char(pCharacter, "[-----] ***RESERVED***\r\n");
+      new_send_to_char(pCharacter, "[-----] ***RESERVED***\r\n");
       log( "SYSERR: assemblyListToChar(): Invalid vnum #%ld in assembly table.", g_pAssemblyTable[i].lVnum);
     }
     else
@@ -177,13 +177,13 @@ void assemblyListToChar( struct char_data *pCharacter )
       sprinttype(g_pAssemblyTable[ i ].uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
       sprintf( szBuffer, "[%5ld] %s (%s)\r\n", g_pAssemblyTable[ i ].lVnum,
        obj_proto[ lRnum ].short_description, szAssmType );
-      send_to_char(pCharacter, szBuffer);
+      new_send_to_char(pCharacter, szBuffer);
 
       for( j = 0; j < g_pAssemblyTable[ i ].lNumComponents; j++ )
       {
        if( (lRnum = real_object( g_pAssemblyTable[ i ].pComponents[ j ].lVnum )) < 0 )
        {
-         send_to_char(pCharacter, " -----: ***RESERVED***\r\n");
+         new_send_to_char(pCharacter, " -----: ***RESERVED***\r\n");
          log( "SYSERR: assemblyListToChar(): Invalid component vnum #%ld in assembly for vnum #%ld.",
            g_pAssemblyTable[ i ].pComponents[ j ].lVnum, g_pAssemblyTable[ i ].lVnum );
        }
@@ -193,7 +193,7 @@ void assemblyListToChar( struct char_data *pCharacter )
            obj_proto[ lRnum ].short_description,
            (g_pAssemblyTable[ i ].pComponents[ j ].bExtract ? "Yes" : "No"),
            (g_pAssemblyTable[ i ].pComponents[ j ].bInRoom  ? "Yes" : "No") );
-         send_to_char(pCharacter, szBuffer);
+         new_send_to_char(pCharacter, szBuffer);
        }
       }
     }
@@ -287,8 +287,7 @@ bool assemblyCheckComponents( long lVnum, struct char_data *pCharacter )
     {
       if( pAssembly->pComponents[ i ].bInRoom )
       {
-       if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum,
-         world[ IN_ROOM( pCharacter ) ].contents )) == NULL )
+       if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL )
          bOk = FALSE;
        else
          obj_from_room( ppComponentObjects[ i ] );

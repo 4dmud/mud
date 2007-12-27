@@ -163,6 +163,8 @@ struct oasis_olc_data {
   int trigger_position;          
   int item_type;                 
   struct trig_proto_list *script; /* for assigning triggers in [r|o|m]edit*/
+
+  struct assembly_data *OlcAssembly; /* used for 'assedit'         */
 };
 
 /*
@@ -193,6 +195,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OLC_CONFIG(d)	(OLC(d)->config)	/* Config structure.	*/
 #define OLC_TRIG(d)     (OLC(d)->trig)          /* Trigger structure.   */
 #define OLC_VEHICLE(d)  (OLC(d)->vehicle)
+#define OLC_ASSEDIT(d)  (OLC(d)->OlcAssembly)   /* assembly olc        */
 
 #if CONFIG_OASIS_MPROG
 #define OLC_MPROG(d)	(OLC(d)->mprog)		/* Temporary MobProg.	*/
@@ -506,6 +509,14 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define VEDIT_HATCH	 3
 #define VEDIT_WINDOW	 4
 
+#define ASSEDIT_DO_NOT_USE              0
+#define ASSEDIT_MAIN_MENU               1
+#define ASSEDIT_ADD_COMPONENT           2
+#define ASSEDIT_EDIT_COMPONENT          3
+#define ASSEDIT_DELETE_COMPONENT        4
+#define ASSEDIT_EDIT_EXTRACT            5
+#define ASSEDIT_EDIT_INROOM             6
+#define ASSEDIT_EDIT_TYPES              7
 
 #ifndef __GENOLC_C__
 
