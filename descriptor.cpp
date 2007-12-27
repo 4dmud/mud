@@ -241,6 +241,7 @@ Descriptor::Descriptor() {
     telnet_capable = 0;
     locked = 0;
     close_me = 0;
+    host = NULL;
     str = NULL;
     snoop_by = NULL;
     input.head = NULL;

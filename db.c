@@ -5126,8 +5126,8 @@ int store_to_char(char *name, Character *ch)
       {
         if (!(ch->desc))
           ch->player_specials->host = str_dup(line);
-        else
-          ch->player_specials->host = str_dup(ch->desc->host);
+        else if (ch->desc->host)
+          ch->player_specials->host = str_dup(ch->desc->host); 
       }
       else if (!strcmp(tag, "Hrol"))
         GET_HITROLL(ch) = num;
