@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.3  2004/11/20 20:16:51  w4dimenscor
+ * removing olc.c and olc.h
+ *
  * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
  * updated and cleaned up the script system
  *
@@ -3940,8 +3943,6 @@ int speed_update(struct char_data *ch)
   {
     speed += get_weapon_speed(GET_EQ(ch, WEAR_WIELD));
     speed += get_weapon_speed(GET_EQ(ch, WEAR_WIELD_2));
-    if (weps == 2)
-      speed += total_chance(ch, SKILL_DUAL)/2;
   }
 
 
