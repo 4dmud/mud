@@ -2093,8 +2093,8 @@ ACMD(do_score)
       primax *= (1.0 + (highest_tier(ch) * 0.25));
       if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
       {
-        primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
-        primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
+        primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
+        primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
       }
 
       if  (total_chance(ch, SKILL_MOUNTED_COMBAT) && RIDING(ch))
@@ -2148,8 +2148,8 @@ ACMD(do_score)
       secmax *= (1.0 + (highest_tier(ch) * 0.25));
       if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
       {
-        secmin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
-        secmax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
+        secmin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
+        secmax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
       }
 
       if  (total_chance(ch, SKILL_MOUNTED_COMBAT) && RIDING(ch))
@@ -2217,8 +2217,8 @@ ACMD(do_score)
     primax *= (1.0 + (highest_tier(ch) * 0.25));
     if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
     {
-      primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
-      primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.004));
+      primin *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
+      primax *= (1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.003));
     }
 
     if  (total_chance(ch, SKILL_MOUNTED_COMBAT) && RIDING(ch))

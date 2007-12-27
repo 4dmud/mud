@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.5  2005/03/19 15:02:55  w4dimenscor
+ * gave centaurs the innate skill mount and riding at 100 % also adjusted
+ * damage and speed a little.
+ *
  * Revision 1.4  2005/02/25 05:02:45  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -343,6 +347,10 @@ int find_skill_num(char *name)
 int get_skill(struct char_data *ch, int i)
 {
   struct skillspell_data *temp = ch->skills;
+
+  if (GET_RACE(ch) == RACE_CENTAUR && 
+      (i == 141 || i == 142) )
+    return 100;
 
   while (temp)
   {

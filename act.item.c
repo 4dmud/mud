@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.12  2005/03/19 15:02:55  w4dimenscor
+ * gave centaurs the innate skill mount and riding at 100 % also adjusted
+ * damage and speed a little.
+ *
  * Revision 1.11  2005/03/17 09:09:17  w4dimenscor
  * fixed a crash bug in the energize command
  *
@@ -4024,7 +4028,7 @@ int speed_update(struct char_data *ch)
     if (RIDING(ch) && HERE(RIDING(ch), ch) && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
       speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
     else if (GET_RACE(ch) == RACE_CENTAUR && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
+      speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0020);
     // end of player speed
   }
   if (weps)
