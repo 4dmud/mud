@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.65  2006/08/27 02:29:12  w4dimenscor
+ * added a command to reset everyones skills based on logon time
+ *
  * Revision 1.64  2006/08/26 09:01:37  w4dimenscor
  * Added a command to list logons in the last x days
  *
@@ -3872,7 +3875,7 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
 
 }
 
-void show_last_logons(Character *ch, int days) {
+void show_last_logons(Character *ch, int days, bool fix) {
     time_t tm = time(0) - (days * SECS_PER_REAL_DAY);
     for (int tp = 0; tp < player_table.size(); tp++) {
         if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
@@ -3880,13 +3883,19 @@ void show_last_logons(Character *ch, int days) {
                 (!player_table[tp].name || !*player_table[tp].name))
             continue;
         if (player_table[tp].last > tm) {
+        if (fix) {
+        SET_BIT(player_table[tp].flags, PINDEX_FIXSKILLS);
+    }
         *ch << player_table[tp].name;
         if (IS_SET(player_table[tp].flags, PINDEX_FIXSKILLS))
           *ch << "- Skills Flagged to be fixed";
 
           *ch << "\r\n";
+          
             }
     }
+    if (fix)
+    save_player_index();
 }
 
 
@@ -4260,7 +4269,7 @@ ACMD(do_show) {
     i = atoi(value);
     if (i == 0)
     i = 2;
-    show_last_logons(ch, i);
+    show_last_logons(ch, i, *arg ? TRUE : FALSE);
     break;
         /* show what? */
     default:
@@ -6575,7 +6584,8 @@ void fixskills(Character *ch, int lrn) {
             SAVED(ch).SetSkillLearn(i, learned);
     /* twice over to get the pre-req's */
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
-        if (knows_spell(ch, i))
+        if (knows_spell(ch, i)) 
+        if (SAVED(ch).GetSkillLearn(i) < learned)
             SAVED(ch).SetSkillLearn(i, learned);
 
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
