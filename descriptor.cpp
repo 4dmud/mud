@@ -115,12 +115,19 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     while (size == -1 || size >= len) {
 	args=args_bak;
         // Try a bigger size
-        len *= 2;
-        txt = (char *)realloc(txt, len);
+	if(size >= len){
+		txt = (char *)realloc(txt, size+1);
+		len = size+1;
+	}
+	//backwards compatibility. vsnprintf doesn't return -1 in C99
+	else {
+	        len *= 2;
+	        txt = (char *)realloc(txt, len);
+	}
         //strlcpy(tmp, txt, len);
         //free( txt );
         //txt = tmp;
-        size = vsnprintf(txt, len, format, args);
+        size = vsnprintf(txt, len -1, format, args);
     }
 
     stxt = string( txt );
