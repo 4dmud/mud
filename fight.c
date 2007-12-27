@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.69  2007/06/11 09:20:28  w4dimenscor
+ * fixed evasion rating
+ *
  * Revision 1.68  2007/06/11 08:33:12  w4dimenscor
  * text_processed was accedentally moved to the wrong part of find_replacement
  *
@@ -1480,7 +1483,8 @@ int evasion_tot(Character *vict) {
     if (AFF_FLAGGED(vict, AFF_CURSE))
         evasion_roll -= (evasion_roll / 4);
 
-    evasion_roll = (100-valid_perc(vict) * evasion_roll)/100;
+    if (IS_NPC(vict))
+    evasion_roll = (int)(((100.0f-valid_perc(vict))/100.0f) * evasion_roll);
 
     evasion_roll = (evasion_roll <= 0 ? 1 : evasion_roll);
 
@@ -2101,7 +2105,7 @@ Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
 
 
     if (vict == NULL || (!ch->master && ch->followers == NULL))
-        return FTOI(GET_PERC(ch));
+        return FTOI((GET_PERC(ch) = 100));
 
 
     /*check if the master is a valid target - and add the value of  */
@@ -2115,8 +2119,8 @@ Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
         if (IN_ROOM(f->follower)!=rm)
             continue;
 
-        if (!AFF_FLAGGED(f->follower, AFF_GROUP))
-            continue;
+        /*if (!AFF_FLAGGED(f->follower, AFF_GROUP))
+            continue;*/
 
         if (FIGHTING(f->follower)==vict)
             total_perc += GET_PERC(f->follower);
