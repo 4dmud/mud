@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 09:31:43 $
-*  $Revision: 1.15 $
+*  $Date: 2005/08/19 09:32:57 $
+*  $Revision: 1.16 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.16  2005/08/19 09:32:57  w4dimenscor
+ * fixed issue with FUNCTIONS not passing back vars, didnt compile, this one does
+ *
  * Revision 1.15  2005/08/19 09:31:43  w4dimenscor
  * fixed issue with FUNCTIONS not passing back vars, maybe.
  *
@@ -3350,7 +3353,7 @@ if (go) {
 if (trig->parent && sc) {
 struct trig_var_data *vd = NULL;
  for (vd = GET_TRIG_VARS(trig); vd; vd = vd->next)
-     add_var(&GET_TRIG_VARS(trig->perent), vd->name, vd->value, vd->context);
+     add_var(&GET_TRIG_VARS(trig->parent), vd->name, vd->value, vd->context);
 } 
 if (sc)
     free_varlist(GET_TRIG_VARS(trig));
