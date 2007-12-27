@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.32  2006/02/24 09:25:15  w4dimenscor
+ * fixed bug in pouring that allowed you to create negative empty potions. Potions now change into object 3044 (empty vial), usable for brewing.
+ *
  * Revision 1.31  2006/02/23 18:41:50  w4dimenscor
  * added a few needed files to cvs
  *
@@ -167,6 +170,8 @@ int can_wear_on_pos(struct obj_data *obj, int pos);
 void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse);
 int count_magic(struct obj_data *obj, CHAR_DATA *ch);
 int is_magic(OBJ_DATA *obj);
+
+int check_potion_weight(struct obj_data *obj);
 C_FUNC(push_object);
 
 /* Local Variables */
@@ -2560,10 +2565,19 @@ ACMD(do_pour)
       act("You empty $p.", FALSE, ch, from_obj, 0, TO_CHAR);
       if (GET_OBJ_TYPE(from_obj) == ITEM_VIAL)
         weight_change_object(from_obj, GET_OBJ_WEIGHT(from_obj));
+      else if (GET_OBJ_TYPE(from_obj) == ITEM_POTION)
+        GET_OBJ_WEIGHT(from_obj)=check_potion_weight(from_obj);
       else
         weight_change_object(from_obj, -GET_OBJ_VAL(from_obj, 1));    /* Empty */
       if (GET_OBJ_TYPE(from_obj) == ITEM_VIAL)
         GET_OBJ_VAL(from_obj, 0) = -1; /* vial type */
+      else if (GET_OBJ_TYPE(from_obj) == ITEM_POTION) {
+         obj_vnum vialvnum;
+         vialvnum=3044;
+         extract_obj(from_obj);
+         from_obj = read_object(vialvnum, VIRTUAL);
+         obj_to_char(from_obj, ch);
+      }
       else
       {
         GET_OBJ_VAL(from_obj, 2) = 0;
@@ -2571,7 +2585,8 @@ ACMD(do_pour)
         name_from_drinkcon(from_obj);
       }
       /* amount*/
-      GET_OBJ_VAL(from_obj, 1) = 0;
+      if(GET_OBJ_TYPE(from_obj)!=ITEM_POTION)
+         GET_OBJ_VAL(from_obj, 1) = 0;
 
       return;
     }
@@ -2595,6 +2610,10 @@ ACMD(do_pour)
   }
   if ((GET_OBJ_TYPE(to_obj) != ITEM_VIAL))
   {
+    if(GET_OBJ_TYPE(from_obj) == ITEM_POTION){
+     act("That is not a vial.", FALSE, ch, 0, 0, TO_CHAR);
+     return;
+    }
     if ((GET_OBJ_VAL(to_obj, 1) != 0) &&
         (GET_OBJ_VAL(to_obj, 2) != GET_OBJ_VAL(from_obj, 2)))
     {
@@ -2622,7 +2641,7 @@ ACMD(do_pour)
       act("Those two vials are of different energys and can't be mixed.", FALSE, ch, 0, 0, TO_CHAR);
       return;
     }
-    if (GET_OBJ_TYPE(from_obj) == ITEM_POTION)
+    if (GET_OBJ_TYPE(from_obj) == ITEM_POTION && GET_OBJ_TYPE(to_obj) == ITEM_VIAL)
     {
       int i;
       for (i=1;i<4;i++)
