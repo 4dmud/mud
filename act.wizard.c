@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.60  2006/08/23 09:01:26  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.59  2006/08/20 12:17:47  w4dimenscor
  * fixed  an uninitialised vale, and and removed an unused value fromthe code
  *
@@ -6823,10 +6826,11 @@ ACMD(do_namechange)
     tch->reset();
     read_aliases(tch);
     GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
-    add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
+    addChToLookupTable(GET_IDNUM(ch), ch);
 
     char_to_room(tch, IN_ROOM(ch));
-    GET_KILLS(tch) = load_killlist(GET_NAME(tch));
+    tch->LoadKillList();
+    
     load_locker(ch);
     add_char_to_list(ch);
     loaded = 1;

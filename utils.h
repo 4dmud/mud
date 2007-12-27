@@ -394,8 +394,6 @@ int get_sub(Character *ch, int i);
 void improve_sub(Character *ch, enum subskill_list sub, int amount);
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
-
-void set_skill(Character *ch, int skill, int amount, bool do_sort);
 void set_skill(Character *ch, int skill, int amount);
 /* basic bitvector utils *************************************************/
 
@@ -611,7 +609,8 @@ int has_body(Character *ch, int flag);
 #define TALLY_FOBJ(ch)	  ((ch)->char_specials.tally[1])
 #define TALLY_DEBRIS(ch)  ((ch)->char_specials.tally[2])
 
-#define SPECIALS(ch)            ((ch)->player_specials)
+#define SPECIALS(ch)          ((ch)->player_specials)
+#define SAVED(ch)            	(SPECIALS(ch)->saved)
 #define GET_COND(ch, i)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.conditions[(i)]))
 #define GET_LOADROOM(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.load_room))
 #define GET_PRACTICES(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.spells_to_learn))

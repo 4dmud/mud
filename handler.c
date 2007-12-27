@@ -2141,7 +2141,7 @@ void extract_char(Character *ch)
     return;
   }
   if (GET_ID(ch) > 0)
-    remove_from_lookup_table(GET_ID(ch));
+    removeFromChLookupTable(GET_ID(ch));
   if (IS_NPC(ch))
   {
     SET_BIT_AR(MOB_FLAGS(ch), MOB_NOTDEADYET);

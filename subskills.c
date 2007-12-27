@@ -1010,20 +1010,17 @@ void unused_sub(enum subskill_list subcmd) {
 int total_sub_chance(Character *ch, enum subskill_list  subcmd) {
     int count = 0, total = 0, check = TRUE;
 
-
     if (!IS_SET(SINFO.flags, SUB_TYPE_PROF) && SINFO.perent != TYPE_UNDEFINED) {
-        if (GET_SKILL(ch, SINFO.perent) > 1) {
+        if (SAVED(ch).HasSkill(SINFO.perent)) {
             count++;
-            total += GET_SKILL(ch, SINFO.perent);
-        } else {
+            total += SAVED(ch).GetSkillLearn(SINFO.perent);
+        } else 
             check = FALSE;
-        }
     }
-
 
     if (check) {
         count++;
-        total += GET_SUB(ch, subcmd);
+        total += SAVED(ch).GetSubLearn(subcmd);
         return (total / count);
     } else
         return 0;
@@ -1031,24 +1028,8 @@ int total_sub_chance(Character *ch, enum subskill_list  subcmd) {
 
 
 void improveallsubs(Character *ch) {
-    vector<sub_list>::iterator it;
-    for (int su = SUB_UNDEFINED;(subskill_list)su < TOP_SUB_DEFINE;su++) {
-        if (GET_SUBS(ch).size() > 0) {
-            it = find(GET_SUBS(ch).begin(), GET_SUBS(ch).end(), (subskill_list)su);
-            if (it != GET_SUBS(ch).end()) {
-                (*it).learn = 100;
-                break;
-            }
-        }
-
-        sub_list s;
-        s.subskill = (subskill_list)(su);
-        s.learn = 100;
-        s.status = (sub_status_toggle)0;
-        GET_SUBS(ch).push_back(s);
-    }
-    if (GET_SUBS(ch).size() > 1)
-        sort(GET_SUBS(ch).begin(), GET_SUBS(ch).end());
+    for (int su = SUB_UNDEFINED;(subskill_list)su < TOP_SUB_DEFINE;su++)
+    SAVED(ch).SetSubLearn((subskill_list)su, 100);
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
 }
@@ -1059,34 +1040,8 @@ void improve_sub(Character *ch, subskill_list sub, int amount) {
         MOB_SUBSKILL(ch) = sub;
         return;
     }
-
-    if (amount > 100)
-        amount = 100;
-    if (amount < 0)
-        amount = 0;
-    log("SUBSKILL: %s checking for %s, list size %d.", GET_NAME(ch), sub_name(sub), GET_SUBS(ch).size());
-
-    if (GET_SUBS(ch).size() > 0) {
-        vector<sub_list>::iterator it;
-        it = find(GET_SUBS(ch).begin(), GET_SUBS(ch).end(), sub);
-        if (it != GET_SUBS(ch).end()) {
-            (*it).learn += amount;
-            SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
-            log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), amount, sub_name(sub));
-            return;
-        }
-    }
-
-    sub_list s = sub_list();
-    s.subskill = (sub);
-    s.learn = amount;
-    s.status = (sub_status_toggle)0;
-    GET_SUBS(ch).push_back(s);
-    if (GET_SUBS(ch).size() > 1)
-        sort(GET_SUBS(ch).begin(), GET_SUBS(ch).end());
+    log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), SAVED(ch).UpdateSubLearn(sub, amount), sub_name(sub));
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
-    log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), amount, sub_name(sub));
-
 }
 
 
@@ -1101,27 +1056,13 @@ const char * color_option_name(int num) {
 int get_sub(Character *ch, int i) {
     if (IS_NPC(ch) && MOB_SUBSKILL(ch) == i)
         return 100;
-    do {
-        vector<sub_list>::iterator it;
-        it = find(GET_SUBS(ch).begin(), GET_SUBS(ch).end(), i);
-        if (it != GET_SUBS(ch).end())
-            return (*it).learn;
-        else
-            return 0;
-    } while (0);
-
+return SAVED(ch).GetSubLearn((subskill_list)i);
 }
 
 int get_sub_status(Character *ch, int i) {
     if (IS_NPC(ch) && MOB_SUBSKILL(ch) == 1)
         return STATUS_ON;
-    do {
-        vector<sub_list>::iterator it;
-        it = find(GET_SUBS(ch).begin(), GET_SUBS(ch).end(), i);
-        if (it != GET_SUBS(ch).end())
-            return (*it).status;
-    } while (0);
-    return STATUS_OFF;
+    return SAVED(ch).GetSubStatus((subskill_list)i);
 
 }
 
@@ -1129,21 +1070,13 @@ int toggle_sub_status(Character *ch, int i, int onoff) {
     if (IS_NPC(ch))
         return STATUS_ON;
 
-    do {
-        vector<sub_list>::iterator it;
-        it = find(GET_SUBS(ch).begin(), GET_SUBS(ch).end(), i);
-        if (it != GET_SUBS(ch).end())
-            return ((*it).status = (enum sub_status_toggle)onoff);
-    } while (0);
-
-    return STATUS_OFF;
-
+        return SAVED(ch).SetSubStatus((subskill_list)i, (sub_status_toggle)onoff);
 }
 
 
 /* display your skill/subskill based toggles */
 ACMD(do_subdisplay) {
-    vector<sub_list>::iterator it;
+    subs_map::iterator it;
     char buf[MAX_INPUT_LENGTH];
     int i = 0;
     DYN_DEFINE;
@@ -1153,19 +1086,19 @@ ACMD(do_subdisplay) {
         ch->Send( "Nah, sorry.. Yours are set up differently\r\n");
         return;
     }
-    if (GET_SUBS(ch).size() == 0) {
+    if (SAVED(ch).CountSubs() == 0) {
         ch->Send( "You don't even KNOW any subskills!\r\n");
         return;
     }
 
     DYN_CREATE;
     *dynbuf = 0;
-    for (it = GET_SUBS(ch).begin();it != GET_SUBS(ch).end();it++) {
+    for (it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) {
 
-        if ((*it).subskill > 0 &&  (sub_info[(*it).subskill].stat_type == STATUS_TYPE_ONOFF)) {
+        if ((it->second).subskill > 0 &&  (sub_info[(it->second).subskill].stat_type == STATUS_TYPE_ONOFF)) {
             i++;
-            sprintf(buf, "{cc%22s: [{cy%3s{cc] %s\r\n",
-                    sub_name((*it).subskill), ONOFF((*it).status), IS_SET(sub_info[(*it).subskill].flags,SUB_TYPE_AUTO) ? "(Uncontroled)" : "(  Controled)");
+            sprintf(buf, "{cc%22s: [{cy%3s{cc] (%11s)\r\n",
+                    sub_name((it->second).subskill), ONOFF((it->second).status), IS_SET(sub_info[(it->second).subskill].flags,SUB_TYPE_AUTO) ? "Uncontroled" : "Controled");
 
             DYN_RESIZE(buf);
         }
@@ -1179,7 +1112,7 @@ ACMD(do_subdisplay) {
 
 }
 
-int default_on(enum subskill_list sub) {
+int default_on(enum subskill_list &sub) {
     if (IS_SET(sub_info[sub].flags, SUB_TYPE_DEFAULT_ON))
         return 1;
     else
@@ -1187,8 +1120,8 @@ int default_on(enum subskill_list sub) {
 }
 
 void reset_default_status(Character *ch) {
-    for (vector<sub_list>::iterator it = GET_SUBS(ch).begin();it != GET_SUBS(ch).end();it++)
-        (*it).status = (enum sub_status_toggle)default_on((*it).subskill);
+    for (subs_map::iterator it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) 
+        (it->second).status = (enum sub_status_toggle)default_on((it->second).subskill);
 }
 
 

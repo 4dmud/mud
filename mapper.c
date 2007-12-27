@@ -58,7 +58,7 @@
 #include "mapper.h"
 
 /* The map itself */
-struct map_type map[MAPX + 1][MAPY + 1];
+struct map_type amap[MAPX + 1][MAPY + 1];
 
 /* Take care of some repetitive code for later */
 void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
@@ -113,11 +113,11 @@ void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
 /* Clear one map coord */
 void clear_coord( int x, int y )
 {
-  map[x][y].tegn[0] = ' ';
-  map[x][y].tegn[1] = '\0';
-  map[x][y].vnum = 0;
-  map[x][y].depth = 0;
-  map[x][y].can_see = TRUE;
+  amap[x][y].tegn[0] = ' ';
+  amap[x][y].tegn[1] = '\0';
+  amap[x][y].vnum = 0;
+  amap[x][y].depth = 0;
+  amap[x][y].can_see = TRUE;
 }
 
 /* Clear all exits for one room */
@@ -159,39 +159,39 @@ void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
   struct room_direction_data *pExit;
 
   /* Setup this coord as a room */
-  snprintf(map[x][y].tegn, 2, "%d", SECTOR(pRoom));
+  snprintf(amap[x][y].tegn, 2, "%d", SECTOR(pRoom));
   /*
     switch(SECTOR(pRoom))
     {
     case SECT_CITY:
     case SECT_INSIDE:
-      map[x][y].tegn = 'O';
+      amap[x][y].tegn = 'O';
       break;
     case SECT_FIELD:
     case SECT_FOREST:
     case SECT_HILLS:
-      map[x][y].tegn = '*';
+      amap[x][y].tegn = '*';
       break;
     case SECT_MOUNTAIN:
-      map[x][y].tegn = '@';
+      amap[x][y].tegn = '@';
       break;
     case SECT_WATER_SWIM:
     case SECT_WATER_NOSWIM:
-      map[x][y].tegn = '=';
+      amap[x][y].tegn = '=';
       break;
     case SECT_FLYING:
-      map[x][y].tegn = '~';
+      amap[x][y].tegn = '~';
       break;
     case SECT_DESERT:
-      map[x][y].tegn = '+';
+      amap[x][y].tegn = '+';
       break;
     default:
-      map[x][y].tegn = 'O';
+      amap[x][y].tegn = 'O';
       break;
     }*/
-  map[x][y].vnum = pRoom->number;
-  map[x][y].depth = depth;
-  map[x][y].can_see = room_is_dark( pRoom ) && affected_by_spell(ch, SPELL_INFRAVISION);
+  amap[x][y].vnum = pRoom->number;
+  amap[x][y].depth = depth;
+  amap[x][y].can_see = room_is_dark( pRoom ) && affected_by_spell(ch, SPELL_INFRAVISION);
 
   /* Limit recursion */
   if ( depth > MAXDEPTH ) return;
@@ -222,11 +222,11 @@ void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
     if ( pExit->to_room == NULL ) continue;
 
     /* Ensure there are no clashes with previously defined rooms */
-    if ( ( map[roomx][roomy].vnum != 0 ) &&
-         ( map[roomx][roomy].vnum != pExit->to_room->number ))
+    if ( ( amap[roomx][roomy].vnum != 0 ) &&
+         ( amap[roomx][roomy].vnum != pExit->to_room->number ))
     {
       /* Use the new room if the depth is higher */
-      if ( map[roomx][roomy].depth <= depth ) continue;
+      if ( amap[roomx][roomy].depth <= depth ) continue;
 
       /* It is so clear the old room */
       clear_room( roomx, roomy );
@@ -236,19 +236,19 @@ void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
     if ( depth == MAXDEPTH ) continue;
 
     /* No need for exits that are already mapped */
-    if ( map[exitx][exity].depth > 0 ) continue;
+    if ( amap[exitx][exity].depth > 0 ) continue;
 
     /* Fill in exit */
-    map[exitx][exity].depth = depth;
-    map[exitx][exity].vnum = pExit->to_room->number;
-    map[exitx][exity].tegn[0] = map_chars[door];
-    map[exitx][exity].tegn[1] = '\0';
+    amap[exitx][exity].depth = depth;
+    amap[exitx][exity].vnum = pExit->to_room->number;
+    amap[exitx][exity].tegn[0] = map_chars[door];
+    amap[exitx][exity].tegn[1] = '\0';
 
 
     /* More to do? If so we recurse */
     if ( ( depth < MAXDEPTH ) &&
-         ( ( map[roomx][roomy].vnum == pExit->to_room->number ) ||
-           ( map[roomx][roomy].vnum == 0 ) ) )
+         ( ( amap[roomx][roomy].vnum == pExit->to_room->number ) ||
+           ( amap[roomx][roomy].vnum == 0 ) ) )
     {
       /* Depth increases by one each time */
       map_exits( ch, pExit->to_room, roomx, roomy, depth + 1 );
@@ -352,13 +352,13 @@ void show_map( Character *ch, int mxp/*, char *text */)
 
     for( x = 0; x <= MAPX; x++ )
     {
-      switch(*map[x][y].tegn)
+      switch(*amap[x][y].tegn)
       {
       case '-':
       case '|':
       case '\\':
       case '/':
-        sprintf(buf + strlen(buf), "{cg%c{c0", *map[x][y].tegn);
+        sprintf(buf + strlen(buf), "{cg%c{c0", *amap[x][y].tegn);
         break;
       case ' ':
         sprintf(buf + strlen(buf), " ");
@@ -367,7 +367,7 @@ void show_map( Character *ch, int mxp/*, char *text */)
         sprintf(buf + strlen(buf), "{cR*");
         break;
       default:
-        sec = atoi(map[x][y].tegn);
+        sec = atoi(amap[x][y].tegn);
         switch (sec)
         {
         case NUM_ROOM_SECTORS:
@@ -519,15 +519,15 @@ void draw_map( Character *ch)
   x = MAPX / 2;
   y = MAPY / 2;
 
-  map[x][y].vnum = ch->in_room->number;
-  map[x][y].depth = 0;
+  amap[x][y].vnum = ch->in_room->number;
+  amap[x][y].depth = 0;
 
   /* Generate the map */
   map_exits( ch, ch->in_room, x, y, 0 );
 
   /* Current position should be a "X" */
-  map[x][y].tegn[0] = 'X';
-  map[x][y].tegn[1] = '\0';
+  amap[x][y].tegn[0] = 'X';
+  amap[x][y].tegn[1] = '\0';
 
   /* Send the map */
 
@@ -558,15 +558,15 @@ void update_mxp_map(Character *ch)
   x = MAPX / 2;
   y = MAPY / 2;
 
-  map[x][y].vnum = ch->in_room->number;
-  map[x][y].depth = 0;
+  amap[x][y].vnum = ch->in_room->number;
+  amap[x][y].depth = 0;
 
   /* Generate the map */
   map_exits( ch, ch->in_room, x, y, 0 );
 
   /* Current position should be a "X" */
-  map[x][y].tegn[0] = 'X';
-  map[x][y].tegn[1] = '\0';
+  amap[x][y].tegn[0] = 'X';
+  amap[x][y].tegn[1] = '\0';
 
   /* Send the map */
 

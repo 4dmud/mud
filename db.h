@@ -498,7 +498,7 @@ struct ban_list_element {
 #ifndef __DB_C__
 extern struct config_data config_info;
 extern int top_of_world;
-extern struct player_special_data dummy_mob;
+extern player_special_data dummy_mob;
 extern struct social_messg *soc_mess_list;
 extern int top_of_socialt;
 extern obj_rnum top_of_objt;

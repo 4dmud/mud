@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.51  2006/08/23 09:01:27  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.50  2006/08/20 12:12:33  w4dimenscor
  * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
  *
@@ -1444,7 +1447,7 @@ struct obj_data {
 struct obj_file_elem {
     obj_vnum item_number;
     sh_int locate;       /* that's the (1+)wear-location (when equipped) or
-                                                     (20+)index in obj file (if it's in a container) BK */
+                                                         (20+)index in obj file (if it's in a container) BK */
     int value[NUM_OBJ_VAL_POSITIONS];
     int extra_flags[EF_ARRAY_MAX];
     int weight;
@@ -1728,15 +1731,24 @@ struct skillspell_data {
 
     skillspell_data() : skill(-1), learn(0), wait(0) {}
 
-    bool operator==(int n) { return (this->skill == n);}
-    bool operator==(const skillspell_data &b) { return (this->skill == b.skill);}
-    bool operator<(const skillspell_data &b) { return (this->skill < b.skill);}
-    bool operator<(skillspell_data &b) { return (this->skill < b.skill);}
+    bool operator==(int n) {
+        return (this->skill == n);
+    }
+    bool operator==(const skillspell_data &b) {
+        return (this->skill == b.skill);
+    }
+    bool operator<(const skillspell_data &b) {
+        return (this->skill < b.skill);
+    }
+    bool operator<(skillspell_data &b) {
+        return (this->skill < b.skill);
+    }
 };
+typedef map<subskill_list, sub_list> subs_map;
+typedef map<int, skillspell_data> skills_map;
 
-
-struct player_special_data_saved {
-
+class player_special_data_saved {
+public:
     int wimp_level;      /* Below this # of hit points, flee!    */
     byte freeze_level;        /* Level of god who froze char, if any  */
     int invis_level;          /* level of invisibility                */
@@ -1783,9 +1795,158 @@ struct player_special_data_saved {
     bool tier1;
     bool tier2;
     bool tier3;
+
+    void UpdateSub(sub_list &s) {
+        subs[s.subskill] = s;
+    }
+    void UpdateSkill(skillspell_data &s) {
+        skills[s.skill] = s;
+    }
+    void DeleteSub(subskill_list &ss) {
+        map<subskill_list, sub_list>::iterator s_it =
+            subs.find(ss);
+        if (s_it == subs.end())
+            return;
+        subs.erase(ss);
+    }
+    void DeleteSkill(int &ss) {
+        skills_map::iterator s_it =
+            skills.find(ss);
+        if (s_it == skills.end())
+            return;
+        skills.erase(ss);
+    }
+    bool HasSub(subskill_list &ss) {
+        return (subs.find(ss) != subs.end());
+    }
+    bool HasSkill(int &ss) {
+        return (skills.find(ss) != skills.end());
+    }
+    void SkillWaitTick() {
+       for (skills_map::iterator s_it = skills.begin();s_it != skills.end();s_it++)
+       	if (s_it->second.wait > 0)
+       		s_it->second.wait--;
+    }
+	int CountSubs() {
+		return subs.size();
+	}
+    int GetSubLearn(subskill_list ss) {
+        if (!HasSub(ss))
+            return 0;
+        else
+            return subs[ss].learn;
+    }
+    sub_status_toggle GetSubStatus(subskill_list ss) {
+        if (!HasSub(ss))
+            return STATUS_OFF;
+        else
+            return subs[ss].status;
+    }
+    sub_status_toggle SetSubStatus(subskill_list ss, sub_status_toggle t) {
+        if (!HasSub(ss))
+            return STATUS_OFF;
+            
+	   subs[ss].status = t;
+        return subs[ss].status;
+    }
+    int SetSubLearn(subskill_list ss, int l) {
+        sub_list sl = sub_list();
+        if (!HasSub(ss)) {
+            sl.learn = l;
+        } else {
+            sl = subs[ss];
+            sl.learn = l;
+        }
+        if (sl.learn > 100)
+            sl.learn = 100;
+        else if (sl.learn < 0)
+            sl.learn = 0;
+        UpdateSub(sl);
+        return sl.learn;
+    }
+    int UpdateSubLearn(subskill_list &ss, int &l) {
+        sub_list sl = sub_list();
+        if (!HasSub(ss)) {
+            sl.learn = l;
+        } else {
+            sl = subs[ss];
+            sl.learn += l;
+        }
+        if (sl.learn > 100)
+            sl.learn = 100;
+        else if (sl.learn < 0)
+            sl.learn = 0;
+        UpdateSub(sl);
+        return sl.learn;
+    }
+    subs_map::iterator SubsBegin() {
+    return subs.begin();
+    }
+    subs_map::iterator SubsEnd() {
+    return subs.end();
+    }
+    skills_map::iterator SkillsBegin() {
+    return skills.begin();
+    }
+    skills_map::iterator SkillsEnd() {
+    return skills.end();
+    }
     
-    vector<sub_list> subs; /*list of subskills available to that person*/
-    vector<skillspell_data> skills; /*list of skills and spells available to that person */
+    /**skills**/
+    int GetSkillLearn(int &ss) {
+        if (!HasSkill(ss))
+            return 0;
+        else
+            return skills[ss].learn;
+    }
+    int GetSkillWait(int &ss) {
+        if (!HasSkill(ss))
+            return 0;
+        else
+            return skills[ss].wait;
+    }
+    int SetSkillWait(int &ss, int &w) {
+        if (!HasSkill(ss))
+            return 0;
+        
+        skills[ss].wait = w < 0 ? 0 : w;
+        return skills[ss].wait ;
+    }
+    int CountSkills() {
+		return skills.size();
+	}
+    int SetSkillLearn(int &ss, int &l) {
+        skillspell_data sl = skillspell_data();
+        if (!HasSkill(ss)) {
+            sl.learn = l;
+        } else {
+            sl = skills[ss];
+            sl.learn = l;
+        }
+        if (sl.learn > 100)
+            sl.learn = 100;
+        else if (sl.learn < 0)
+            sl.learn = 0;
+        UpdateSkill(sl);
+        return sl.learn;
+    }
+    int UpdateSkillLearn(int &ss, int &l) {
+        skillspell_data sl = skillspell_data();
+        if (!HasSkill(ss)) {
+            sl.learn = l;
+        } else {
+            sl = skills[ss];
+            sl.learn += l;
+        }
+        if (sl.learn > 100)
+            sl.learn = 100;
+        else if (sl.learn < 0)
+            sl.learn = 0;
+        UpdateSkill(sl);
+        return sl.learn;
+    }
+
+
 
     int reg_hit; /* regen rates */
     int reg_mana;
@@ -1811,85 +1972,87 @@ struct player_special_data_saved {
     int ctellsnoop;
 
     player_special_data_saved() {
-    wimp_level = 0;      /* Below this # of hit points, flee!    */
-    freeze_level = 0;        /* Level of god who froze char, if any  */
-    invis_level = 0;          /* level of invisibility                */
-    for (int i = 0; i < PR_ARRAY_MAX;i++)
-    pref[i] = 0;   /* preference flags for PC's.           */
-    bad_pws =0;       /* number of bad password attempts      */
-    conditions[0] = 0; /* Drunk, full, thirsty                 */
-    conditions[1] = 0;
-    conditions[2] = 0;
-    saving = 0;
+        wimp_level = 0;      /* Below this # of hit points, flee!    */
+        freeze_level = 0;        /* Level of god who froze char, if any  */
+        invis_level = 0;          /* level of invisibility                */
+        for (int i = 0; i < PR_ARRAY_MAX;i++)
+            pref[i] = 0;   /* preference flags for PC's.           */
+        bad_pws =0;       /* number of bad password attempts      */
+        conditions[0] = 0; /* Drunk, full, thirsty                 */
+        conditions[1] = 0;
+        conditions[2] = 0;
+        saving = 0;
 
-    /* spares below for future expansion.  You can change the names from
-       'sparen' to something meaningful, but don't change the order.  */
-    clan_rank = 0;
-    orig_race = 0;
-    brass_tokens = 0;
-    bronze_tokens = 0;
-    silver_tokens = 0;
-    gold_tokens = 0;
-    spells_to_learn = 0; /* How many can you learn yet this level */
-    clan = 0;
-    rip_cnt = 0;
-    kill_cnt = 0;
-    dt_cnt = 0;
-    bet_amt = 0;
-    betted_on = 0;
-    load_room = 0;       /* Where the character will load        */
-    speed = 0;
-    coolness = 0;
-    aff_speed = 0;
-    cmd = 0;
-    orig_lev = 0;
-    /*mord - Pk addition*/
-    pk_kills = 0;
-    pk_deaths = 0;
-    pk_points = 0;
-    /*mord - fighting and defending ability learned */
-    perm_accuracy = 0;
-    perm_evasion = 0;
-    /*mord - fencing values*/
-    fence_posts = 0;
-    fence_nails = 0;
-    fence_wire = 0;
+        /* spares below for future expansion.  You can change the names from
+           'sparen' to something meaningful, but don't change the order.  */
+        clan_rank = 0;
+        orig_race = 0;
+        brass_tokens = 0;
+        bronze_tokens = 0;
+        silver_tokens = 0;
+        gold_tokens = 0;
+        spells_to_learn = 0; /* How many can you learn yet this level */
+        clan = 0;
+        rip_cnt = 0;
+        kill_cnt = 0;
+        dt_cnt = 0;
+        bet_amt = 0;
+        betted_on = 0;
+        load_room = 0;       /* Where the character will load        */
+        speed = 0;
+        coolness = 0;
+        aff_speed = 0;
+        cmd = 0;
+        orig_lev = 0;
+        /*mord - Pk addition*/
+        pk_kills = 0;
+        pk_deaths = 0;
+        pk_points = 0;
+        /*mord - fighting and defending ability learned */
+        perm_accuracy = 0;
+        perm_evasion = 0;
+        /*mord - fencing values*/
+        fence_posts = 0;
+        fence_nails = 0;
+        fence_wire = 0;
 
-    /*mordecai - remort specialization*/
-    tier = 0;
-    tier1 = 0;
-    tier2 = 0;
-    tier3 = 0;
-    
-    subs.clear(); /*list of subskills available to that person*/
-    skills.clear(); /*list of skills and spells available to that person */
+        /*mordecai - remort specialization*/
+        tier = 0;
+        tier1 = 0;
+        tier2 = 0;
+        tier3 = 0;
 
-     reg_hit = 0; /* regen rates */
-     reg_mana = 0;
-     reg_move = 0;
-     reg_stamina = 0;
+        subs.clear(); /*list of subskills available to that person*/
+        skills.clear(); /*list of skills and spells available to that person */
 
-     rp_group = 0;
-     last_dam_done = 0;
-     last_dam_taken = 0;
-     for (int i = 0; i < NUM_CLASSES;i++)
-     master[i] = 0;
+        reg_hit = 0; /* regen rates */
+        reg_mana = 0;
+        reg_move = 0;
+        reg_stamina = 0;
 
-     olc_zone = 0;
-     mine_dir = 0;
-     mine_stealth = 0;
-     mine_damage = 0;
-     mine_bonus = 0;
-     mine_speed = 0;
+        rp_group = 0;
+        last_dam_done = 0;
+        last_dam_taken = 0;
+        for (int i = 0; i < NUM_CLASSES;i++)
+            master[i] = 0;
 
-     has_mail = 0;
-     tradepoints = 0;
+        olc_zone = 0;
+        mine_dir = 0;
+        mine_stealth = 0;
+        mine_damage = 0;
+        mine_bonus = 0;
+        mine_speed = 0;
 
-    /*Thotts: ctell snoop flags */
-     ctellsnoop = 0;
+        has_mail = 0;
+        tradepoints = 0;
+
+        /*Thotts: ctell snoop flags */
+        ctellsnoop = 0;
     }
 
-
+private:
+subs_map subs; /*list of subskills available to that person*/
+skills_map skills; /*list of skills and spells available to that person */
 
 };
 
@@ -1898,7 +2061,6 @@ struct kill_data {
     int count;
     time_t last;
     time_t first;
-    struct kill_data *next;
 };
 
 
@@ -1909,8 +2071,11 @@ struct kill_data {
  * be changed freely; beware, though, that changing the contents of
  * player_special_data_saved will corrupt the playerfile.
  */
-struct player_special_data {
-    struct player_special_data_saved saved;
+typedef map<mob_vnum, kill_data> kill_map;
+ 
+class player_special_data {
+public:
+    player_special_data_saved saved;
     char *prompt;
     char *immtitle;
     char *poofin;        /* Description on arrival of a god.  */
@@ -1944,7 +2109,6 @@ struct player_special_data {
     char *battle_prompt;
     time_t dying;
     float skillmulti;
-    struct kill_data *kills;
     char *email;
     short newbie_status;
     struct help_index_element *help;
@@ -1984,14 +2148,50 @@ struct player_special_data {
         battle_prompt = 0;
         dying = 0;
         skillmulti = 0;
-        kills = NULL;
         email  = NULL;
         newbie_status = 0;
         help  = NULL;
 
     }
     ~player_special_data() {}
+    kill_map::iterator KillsBegin() {
+    return kills.begin();
+    }
+    kill_map::iterator KillsEnd() {
+    return kills.end();
+    }
+    int KillsCount() {
+    return kills.size();
+    }
+    bool HasKill(mob_vnum v) {
+    return (kills.find(v) != kills.end());
+    }
+    void SetKill(mob_vnum &v, int count, time_t last, time_t first) {
+		kills[v].count = 1;
+		kills[v].vnum = v;
+		kills[v].last = time(0);
+		kills[v].first = time(0);
+    }
+	void UpdateKill(mob_vnum &v) {
+	kill_map::iterator it = kills.find(v);
+	
+	if (it == kills.end()) {
+		struct kill_data temp;
+		temp.count = 1;
+		temp.vnum = v;
+		temp.last = time(0);
+		temp.first = time(0);
+		kills[v] = temp;
+	} else {
+		kills[v].count++;
+		kills[v].last = time(0);
+	}
+	
+	
+	}
 
+    private:
+    kill_map kills;
 }
 ;
 
@@ -2273,7 +2473,7 @@ struct social_messg {
     int act_nr;
     char *command;       /* holds copy of activating command */
     char *sort_as;       /* holds a copy of a similar command or
-                                                   * abbreviation to sort by for the parser */
+                                                       * abbreviation to sort by for the parser */
     int hide;            /* ? */
     int min_victim_position;  /* Position of victim */
     int min_char_position;    /* Position of char */

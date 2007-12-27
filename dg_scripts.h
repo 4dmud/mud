@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.10 $
+*  $Date: 2006/08/23 09:01:26 $
+*  $Revision: 1.11 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -343,9 +343,13 @@ void process_eval(void *go, struct script_data *sc, trig_data *trig,
                   int type, char *cmd);
 void read_saved_vars(Character *ch);
 void save_char_vars(Character *ch);
-void init_lookup_table(void);
-void add_to_lookup_table(long uid, void *c);
-void remove_from_lookup_table(long uid);
+//void init_lookup_table(void);
+//void add_to_lookup_table(long uid, void *c);
+//void remove_from_lookup_table(long uid);
+void addObjToLookupTable(long uid, obj_data * o);
+void addChToLookupTable(long uid, Character * c);
+void removeFromObjLookupTable(long uid);
+void removeFromChLookupTable(long uid);
 
 /* from dg_db_scripts.c */
 void parse_trigger(FILE * trig_f, int nr, zone_vnum zon);

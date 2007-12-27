@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.34  2006/08/23 09:01:26  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.33  2006/08/18 11:09:58  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -410,29 +413,29 @@ void list_kills_to_char(Character *ch)
   char line[MAX_INPUT_LENGTH];
   char *first, *last;
   mob_rnum rnum;
-  struct kill_data *temp;
-  DYN_DEFINE;
   int found = 0;
-  if (!GET_KILLS(ch))
+  if (SPECIALS(ch)->KillsCount() == 0)
   {
     ch->Send( "You have no recorded kills.\r\n");
     return;
   }
+  
+  DYN_DEFINE;
   DYN_CREATE;
-  for (temp = GET_KILLS(ch); temp; temp = temp->next)
+  for (kill_map::iterator it = SPECIALS(ch)->KillsBegin();it != SPECIALS(ch)->KillsEnd();it++)
   {
-    if (temp->vnum == NOBODY)
+    if ((it->second).vnum == NOBODY)
       continue;
 
-    if ((rnum = real_mobile(temp->vnum)) != NOTHING)
+    if ((rnum = real_mobile((it->second).vnum)) != NOTHING)
     {
-      first = asctime(localtime(&temp->first));
+      first = asctime(localtime(&(it->second).first));
       first += 4;
       //*(first + strlen(first) - 2) = '\0';
-      last = asctime(localtime(&temp->last));
+      last = asctime(localtime(&(it->second).last));
       last += 4;
       //*(last + 11 ) = '\0';
-      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", temp->count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
+      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", (it->second).count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
       DYN_RESIZE(line);
       found++;
     }

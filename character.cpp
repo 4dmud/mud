@@ -214,14 +214,11 @@ Character::Character(bool is_mob) {
         player_specials = &dummy_mob;
     default_char();
     if (!is_mob) {
-        GET_SUBS(this).clear();
-        GET_SKILLS(this).clear();
         GET_BRASS_TOKEN_COUNT(this) = 0;
     GET_BRONZE_TOKEN_COUNT(this) = 0;
     GET_SILVER_TOKEN_COUNT(this) = 0;
     GET_GOLD_TOKEN_COUNT(this) = 0;
     GET_COOLNESS(this) 		= 0;
-    GET_KILLS(this) 		= NULL;
     GET_PK_CNT(this) 		= 0;
     GET_PK_RIP(this)		= 0;
     GET_PK_POINTS(this) 		= 0;
@@ -294,7 +291,6 @@ void Character::freeself() {
 
         extract_all_in_list(LOCKER(this));
         LOCKER(this) = NULL;
-        free_killlist(this);
 
 
         if (IS_NPC(this))
@@ -339,7 +335,7 @@ void Character::freeself() {
         desc->character = NULL;
     /* find_char helper */
     if (GET_ID(this) > 0)
-        remove_from_lookup_table(GET_ID(this));
+        removeFromChLookupTable(GET_ID(this));
 }
 
 /* clear ALL the working variables of a char; do NOT free any space alloc'ed */
@@ -492,7 +488,6 @@ void Character::init() {
     /* Romance Initialization, initialize to no partner and single */
     player.romance = 0;
     player.partner = 0;
-    GET_KILLS(this) = NULL;
 
     player.time.birth = time(0);
     player.time.played = 0;
@@ -546,7 +541,7 @@ void Character::init() {
 			log("Error new id %ld being assigned to %s already exists!",top_idnum, player.name);
 			
         player_table[i].account = player_table[i].id = GET_IDNUM(this) = GET_ID(this) = top_idnum;
-        add_to_lookup_table(GET_ID(this), (void *)this);
+        addChToLookupTable(GET_ID(this), this);
 
 
     for (taeller = 0; taeller < AF_ARRAY_MAX; taeller++)
@@ -703,7 +698,6 @@ void Character::default_char() {
     PAGEHEIGHT(this) 		= 25;
     LOCKER_EXPIRE(this) 		= 0;
     LOCKER_LIMIT(this) 		= 0;
-    GET_KILLS(this) 		= NULL;
     FIGHTING(this) 			= NULL;
     SITTING(this)			= NULL;
     GET_LOGOUTMSG(this) 		= NULL;
@@ -905,7 +899,7 @@ void Character::save() {
     }
     OBJ_INNATE_MESSAGE = FALSE;
     char_to_store(this);
-    save_killlist(get_ptable_by_id(GET_IDNUM(this)), GET_KILLS(this));
+    SaveKillList();
     OBJ_INNATE_MESSAGE = TRUE;
     save_char_vars(this);
 }

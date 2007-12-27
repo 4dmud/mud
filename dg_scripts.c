@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/20 12:12:32 $
-*  $Revision: 1.31 $
+*  $Date: 2006/08/23 09:01:26 $
+*  $Revision: 1.32 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.32  2006/08/23 09:01:26  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.31  2006/08/20 12:12:32  w4dimenscor
  * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
  *
@@ -3507,7 +3510,12 @@ void save_char_vars(Character *ch) {
 }
 
 /* find_char() helpers */
+typedef  map<long, Character *> ch_map;
+typedef  map<long, obj_data *> obj_map;
+ch_map ch_lookup_table;
+obj_map obj_lookup_table;
 
+#if 0
 // Must be power of 2
 #define BUCKET_COUNT 64
 // to recognize an empty bucket
@@ -3539,7 +3547,7 @@ void init_lookup_table(void) {
     }
 #endif
 }
-
+#endif
 Character *find_char_by_uid_in_lookup_table(long uid) {
 #if 0
     Character *tch;
@@ -3549,7 +3557,7 @@ Character *find_char_by_uid_in_lookup_table(long uid) {
 
     return NULL;
 
-#else
+#elseif (0)
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
     vector<lookup_table_t>::iterator lt;
@@ -3564,19 +3572,24 @@ Character *find_char_by_uid_in_lookup_table(long uid) {
             log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
             //return NULL;
         }
-#if 0
-        if (character_list) {
-            Character *tch;
-            for (tch = character_list; tch; tch = tch->next)
-                if (GET_ID(tch) == GET_ID(ch))
-                    if (tch != ch) {
-                        log("ERROR: lookup table contains wrong character's ID (%ld) (%s instead of %s)!",GET_ID(tch), GET_NAME(ch), GET_NAME(tch));
-                        ch = tch;
-                        break;
-                    }
-        }
-#endif
+
         return ch;
+    }
+
+    log("find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
+
+    return NULL;
+#else
+ch_map::iterator ch = ch_lookup_table.find(uid);
+    if (ch != ch_lookup_table.end()) {
+    if (ch->second == NULL)
+    return NULL;
+        if (DEAD((ch->second))) {
+            log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
+            //return NULL;
+        }
+
+        return (ch->second);
     }
 
     log("find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
@@ -3593,7 +3606,7 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid) {
             return o;
 
     return NULL;
-#else
+#elseif (0)
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
     vector<lookup_table_t>::iterator lt;
@@ -3604,11 +3617,39 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid) {
 
     log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
     return NULL;
+#else
+obj_map::iterator o = obj_lookup_table.find(uid);
+if (o == obj_lookup_table.end()) {
+    log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
+    return NULL;
+} else
+    return (o->second);
 #endif
 }
 
-void add_to_lookup_table(long uid, void *c) {
-#if 1
+void addChToLookupTable(long uid, Character * c) {
+ch_map::iterator ch = ch_lookup_table.find(uid);
+if (ch == ch_lookup_table.end())
+ch_lookup_table[uid] = c;
+else {
+if ((ch->second) != c) {
+log("Adding %s to lookup table when %s already exists there.", GET_NAME(c), GET_NAME((ch->second)));
+}
+}
+}
+
+void addObjToLookupTable(long uid, obj_data * o) {
+obj_map::iterator obj = obj_lookup_table.find(uid);
+if (obj == obj_lookup_table.end())
+obj_lookup_table[uid] = o;
+else {
+if ((obj->second) != o) {
+log("Adding %d to lookup table when %d already exists there.", o->item_number, obj->second->item_number);
+}
+}
+}
+void add_to_lookup_tablex(long uid, void *c) {
+#if 0
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
     //struct lookup_table_t *lt = &lookup_table[bucket];
     vector<lookup_table_t>::iterator lt;
@@ -3636,10 +3677,20 @@ void add_to_lookup_table(long uid, void *c) {
 #endif
 }
 
+void removeFromChLookupTable(long uid) {
+ch_map::iterator ch = ch_lookup_table.find(uid);
+if (ch != ch_lookup_table.end())
+ch_lookup_table.erase(uid);
+}
+void removeFromObjLookupTable(long uid) {
+obj_map::iterator obj = obj_lookup_table.find(uid);
+if (obj != obj_lookup_table.end())
+obj_lookup_table.erase(uid);
+}
 
-void remove_from_lookup_table(long uid) {
+void remove_from_lookup_tablex(long uid) {
 
-#if 1
+#if 0
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
     //struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
@@ -3667,6 +3718,18 @@ void remove_from_lookup_table(long uid) {
 
 #endif
 }
+
+bool valid_id_num(long id) {
+    Descriptor *d;
+    for (d = descriptor_list; d; d = d->next)
+        if (d->character && GET_ID(d->character) == id)
+            return FALSE;
+    if (ch_lookup_table.find(id) != ch_lookup_table.end())
+            return FALSE;
+
+    return TRUE;
+}
+
 /*
  * processes a script return command.
  * returns the new value for the script to return.

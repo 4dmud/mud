@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.28  2006/08/23 09:01:27  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.27  2006/08/20 12:12:33  w4dimenscor
  * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
  *
@@ -354,67 +357,24 @@ const char *skill_name(int num) {
     else
         return ("UNDEFINED");
 }
-bool operator==(struct skillspell_data &d, const char *s) {
-return (!strcmp(skill_name(d.skill), s));
-}
 
 int Character::get_skill(int i) {
-    vector<skillspell_data>::iterator it;
-
     if (GET_RACE(this) == RACE_CENTAUR &&
             (i == 141 || i == 142) )
         return 100;
 
-        it = find(GET_SKILLS(this).begin(), GET_SKILLS(this).end(), i);
-        if (it == GET_SKILLS(this).end())
-        return 0;
-
-        return (*it).learn;
+    return SAVED(this).GetSkillLearn(i);
 }
 void set_skill(Character *ch, int skill, int amount) {
-set_skill(ch, skill, amount, TRUE);
-}
-void set_skill(Character *ch, int skill, int amount, bool do_sort) {
-    vector<skillspell_data>::iterator it;
-
-    if (IS_NPC(ch))
-        return;
-    if (amount > 100)
-        amount = 100;
-    if (amount < 0)
-        amount = 0;
-
-    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
-    if (it != GET_SKILLS(ch).end()) {
-        (*it).learn = amount;
-    } else {
-        skillspell_data s = skillspell_data();
-        s.skill = skill;
-        s.learn = amount;
-        s.wait = 0;
-        GET_SKILLS(ch).push_back(s);
-        if (do_sort == TRUE)
-        sort(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end());
-    }
+    SAVED(ch).SetSkillLearn(skill, amount);
 }
 
 int get_skill_wait(Character *ch, int skill) {
-    vector<skillspell_data>::iterator it;
-    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
-    if (it != GET_SKILLS(ch).end())
-        return (*it).wait;
-    return 0;
+    return SAVED(ch).GetSkillWait(skill);
 }
 
 void set_skill_wait(Character *ch, int skill, int w) {
-vector<skillspell_data>::iterator it;
-
-    if (w < 0)
-        w = 0;
-        
-    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
-    if (it != GET_SKILLS(ch).end())
-        (*it).wait = w;
+    SAVED(ch).SetSkillWait(skill, w);
 }
 
 
@@ -562,7 +522,7 @@ int call_magic(Character *caster, Character *cvict,
     /* determine the type of saving throw */
     switch (casttype) {
     case CAST_STAFF:
-        case CAST_SCROLL:
+    case CAST_SCROLL:
     case CAST_POTION:
     case CAST_WAND:
         savetype = SAVING_ROD;
@@ -1271,6 +1231,13 @@ int knows_spell(Character *ch, int spell) {
 
     int i, gm, t;
     int ret_val = 0;
+    if (IS_NPC(ch)) {
+        if (ch->nr == real_mobile(DG_CASTER_PROXY))
+            return TRUE;
+        else if (spell >= SPELL_FIRE_BREATH && spell <= SPELL_LIGHTNING_BREATH)
+            return TRUE;
+    }
+
 
     if (GET_LEVEL(ch) >= LVL_IMMORT)
         return 1;
@@ -1294,13 +1261,16 @@ int knows_spell(Character *ch, int spell) {
             }
 
         } else if (IS_SET(spell_info[spell].classes, (1 << i))) {
-            if (!has_class(ch, i))
-                continue;
+            if (!IS_NPC(ch)) {
+                if (!has_class(ch, i))
+                    continue;
 
-            if (GET_CLASS(ch) == i)
-                t = tier_level(ch, i);
-            else
-                t = MIN(tier_level(ch, i), 2);
+                if (GET_CLASS(ch) == i)
+                    t = tier_level(ch, i);
+                else
+                    t = MIN(tier_level(ch, i), 2);
+            } else
+                t = MOB_TIER(ch);
 
 
             if (spell_info[spell].tier < t) {
@@ -2491,10 +2461,7 @@ void update_spell_wait(void) {
     for (i = descriptor_list; i; i = i->next) {
         if (!IS_PLAYING(i))
             continue;
-        for (vector<skillspell_data>::iterator it = GET_SKILLS(PLR).begin();
-        it != GET_SKILLS(PLR).end(); it++)
-            if ((*it).wait >0)
-                (*it).wait--;
+        SAVED(i->character).SkillWaitTick();
     }
 
 }

@@ -176,7 +176,7 @@ char *startup = NULL;         /* startup screen                */
 
 
 struct time_info_data time_info;   /* the infomation about the time    */
-struct player_special_data dummy_mob = player_special_data();   /* dummy spec area for mobs     */
+player_special_data dummy_mob = player_special_data();   /* dummy spec area for mobs     */
 struct reset_q_type reset_q;  /* queue of zones to be reset    */
 
 /* local functions */
@@ -3494,7 +3494,6 @@ int vnum_mobile(char *searchname, Character *ch) {
         }
         nr++;
     }
-    if (found)
         page_string(ch->desc, dynbuf, DYN_BUFFER);
     return (found);
 }
@@ -3596,7 +3595,7 @@ Character *read_mobile(mob_vnum nr, int type) {                   /* and mob_rnu
     }
     GET_ID(mob) = max_mob_id++;
     /* find_char helper */
-    add_to_lookup_table(GET_ID(mob), (void *)mob);
+    addChToLookupTable(GET_ID(mob), mob);
 
     copy_proto_script(mob_proto[i], mob, MOB_TRIGGER);
     assign_triggers(mob, MOB_TRIGGER);
@@ -3627,7 +3626,7 @@ struct obj_data *create_obj(void) {
 
     GET_ID(obj) = max_obj_id++;
     /* find_obj helper */
-    add_to_lookup_table(GET_ID(obj), (void *)obj);
+    addObjToLookupTable(GET_ID(obj), obj);
 
 
     return (obj);
@@ -3659,7 +3658,7 @@ struct obj_data *read_object(obj_vnum nr, int type) {                   /* and o
 
     GET_ID(obj) = max_obj_id++;
     /* find_obj helper */
-    add_to_lookup_table(GET_ID(obj), (void *)obj);
+    addObjToLookupTable(GET_ID(obj), obj);
     generate_weapon(obj);
     copy_proto_script(&obj_proto[i], obj, OBJ_TRIGGER);
     assign_triggers(obj, OBJ_TRIGGER);
@@ -4924,16 +4923,14 @@ int store_to_char(const char *name, Character *ch) {
                 if (num2 >= 100)
                     GET_MAX_STAMINA(ch) = num2;
             } else if (!strcmp(tag, "Skil")) {
-            GET_SKILLS(ch).clear();
                 do {
                     get_line(fl, line);
                     sscanf(line, "%d %d %d 0", &num, &num2, &num3);
                     if (num != 0) {
-                        set_skill(ch, num, num2, FALSE);
+                        set_skill(ch, num, num2);
                         set_skill_wait(ch, num, num3);
                     }
                 } while (num != 0);
-                sort(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end());
             } else if (!strcmp(tag, "Subs")) {
                 struct sub_list s;
                 do {
@@ -4943,11 +4940,10 @@ int store_to_char(const char *name, Character *ch) {
                             s.subskill = (enum subskill_list)(num);
                             s.status = (enum sub_status_toggle)num3;
                             s.learn = num2;
-                            GET_SUBS(ch).push_back(s);
+                            SAVED(ch).UpdateSub(s);
                         }
                     }
                 } while (num != 0);
-                sort(GET_SUBS(ch).begin(), GET_SUBS(ch).end());
             } else if (!strcmp(tag, "Str ")) {
                 sscanf(line, "%d/%d", &num, &num2);
                 ch->real_abils.str = num;
@@ -5030,65 +5026,55 @@ int store_to_char(const char *name, Character *ch) {
     return 1;
 }
 
-struct kill_data *load_killlist(const char *name) {
+void Character::LoadKillList() {
     char filename[MAX_INPUT_LENGTH], line[READ_SIZE];
     FILE *fl;
     int t[2];
     long tl[2];
-    struct kill_data *temp = NULL, *top = NULL;
-    if (!get_id_by_name(name)) {
+    int id;
+    
+    if (!(id = get_id_by_name(GET_NAME(this)))) {
         log("bad index passed to load_killlist");
-        return top;
+        return;
     }
+    
+    if (!SPECIALS(this) || SPECIALS(this) == &dummy_mob)
+    	   return;
+    
+
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
-             PLR_PREFIX, LOWER(*name), name, ".kills");
+             PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
     if (!(fl = fopen(filename, "r")))
-        return top;
+        return;
     while (get_line(fl, line)) {
         if (sscanf(line, "%d %d %ld %ld",t, t+1, tl, tl+1) != 4)
             continue;
-        CREATE(temp, struct kill_data, 1);
-        temp->vnum  = t[0];
-        temp->count = t[1];
-        temp->first = tl[0];
-        temp->last  = tl[1];
-        temp->next = top;
-        top = temp;
+            SPECIALS(this)->SetKill(t[0], t[1], tl[1], tl[0]);
     }
     fclose(fl);
-    return top;
+    return;
 }
-
-int save_killlist(int id, struct kill_data *kills) {
+void Character::SaveKillList() {
+int id;
     char filename[MAX_INPUT_LENGTH];
     FILE *fl;
-    struct kill_data *temp = NULL;
-    if (!kills || id < 0 || id >= player_table.size())
-        return 0;
+    id = get_ptable_by_id(GET_IDNUM(this));
+    if (!SPECIALS(this) || SPECIALS(this)->KillsCount() == 0 || id < 0 || id >= player_table.size())
+        return;
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
              PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
     if (!(fl = fopen(filename, "w"))) {
         log("Can't open file %s for writing", filename);
-        return 0;
+        return;
     }
 
-    for (temp = kills; temp; temp=temp->next)
-        fprintf(fl, "%d %d %ld %ld\n",temp->vnum,  temp->count, temp->first, temp->last);
+    for (kill_map::iterator it = SPECIALS(this)->KillsBegin(); it != SPECIALS(this)->KillsEnd(); it++)
+        fprintf(fl, "%d %d %ld %ld\n",(it->second).vnum,  (it->second).count, (it->second).first, (it->second).last);
 
     fclose(fl);
-    return 1;
+    return;
 }
-void free_killlist_all(struct kill_data *kills) {
-    if (!kills)
-        return;
-    if (kills->next)
-        free_killlist_all(kills->next);
-    free(kills);
-}
-void free_killlist(Character *ch) {
-    free_killlist_all(GET_KILLS(ch));
-    GET_KILLS(ch) = NULL;
-}
+
 
 /* remove ^M's from file output */
 /* There may be a similar function in Oasis (and I'm sure
@@ -5226,17 +5212,17 @@ void char_to_store(Character *ch) {
     fprintf(fl, "Thr5: %d\n", GET_SAVE(ch, 4));
     if (GET_LEVEL(ch) < LVL_IMMORT) {
         fprintf(fl, "Skil:\n");
-        for (vector<skillspell_data>::iterator it = GET_SKILLS(ch).begin();
-                it != GET_SKILLS(ch).end();it++) {
-            if (knows_spell(ch, (*it).skill) && (*it).learn > 0)
-                fprintf(fl, "%d %d %d 0\n", (*it).skill, (*it).learn, (*it).wait);
+        for (skills_map::iterator it = SAVED(ch).SkillsBegin();
+                it != SAVED(ch).SkillsEnd();it++) {
+            if (knows_spell(ch, (it->second).skill) && (it->second).learn > 0)
+                fprintf(fl, "%d %d %d 0\n", (it->second).skill, (it->second).learn, (it->second).wait);
         }
         fprintf(fl, "0 0 0 0\n");
         fprintf(fl, "Subs:\n");
-        for (vector<sub_list>::iterator it = GET_SUBS(ch).begin();
-                it != GET_SUBS(ch).end(); it++) {
-            if ((*it).learn > 0)
-                fprintf(fl, "%d %d %d\n", (*it).subskill, (*it).learn, (*it).status);
+        for (subs_map::iterator it = SAVED(ch).SubsBegin();
+                it != SAVED(ch).SubsEnd(); it++) {
+            if ((it->second).learn > 0)
+                fprintf(fl, "%d %d %d\n", (it->second).subskill, (it->second).learn, (it->second).status);
         }
         fprintf(fl, "0 0 0\n");
     }
@@ -5444,7 +5430,7 @@ void char_to_store(Character *ch) {
 
     if (GET_IDNUM(ch) <= 0 || GET_IDNUM(ch) > top_idnum) {
         GET_IDNUM(ch) = GET_ID(ch) =  top_idnum++;
-        add_to_lookup_table(GET_ID(ch), (void *)ch);
+        addChToLookupTable(GET_ID(ch), ch);
     }
 
     if ((id = find_name(GET_NAME(ch))) < 0)
@@ -5745,7 +5731,7 @@ void free_obj(struct obj_data *obj, int extracted) {
     if (SCRIPT(obj))
         extract_script(obj, OBJ_TRIGGER);
 
-    remove_from_lookup_table(GET_ID(obj));
+    removeFromObjLookupTable(GET_ID(obj));
     if (!extracted && GET_OBJ_RNUM(obj) >= 0) {
         purge_qic(GET_OBJ_RNUM(obj));
         obj_index[obj->item_number].number--;
@@ -7378,19 +7364,7 @@ zone_rnum real_zone(zone_vnum vnum) {
 
 }
 
-bool valid_id_num(long id) {
-    Character *tch;
-    Descriptor *d;
-    for (d = descriptor_list; d; d = d->next)
-        if (d->character && GET_ID(d->character) == id)
-            return FALSE;
 
-    for (tch = character_list; tch; tch = tch->next)
-        if (GET_ID(tch) == id)
-            return FALSE;
-
-    return TRUE;
-}
 int valid_to_save(const char *name) {
     for (int tp = 0; tp < player_table.size(); tp++) {
         if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&

@@ -758,9 +758,9 @@ void init_game(ush_int s_port)
   }
   log("Initiating events.");
   event_init();
-  log("Setting hash table");
+//  log("Setting hash table");
   /* set up hash table for find_char() */
-  init_lookup_table();
+//  init_lookup_table();
   log("Booting database.");
   boot_db();
 

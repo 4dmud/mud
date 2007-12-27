@@ -214,6 +214,8 @@ int has_class(Character *ch, int chclass)
     log("SYSERR: null class asked for in has_class");
     return -1;
   }
+  if (IS_NPC(ch))
+  return 0;
 
   if ((chclass == GET_CLASS(ch)) || (chclass == GET_REMORT(ch))
       || (chclass == GET_REMORT_TWO(ch))
@@ -226,6 +228,8 @@ int has_class(Character *ch, int chclass)
 
 int class_count(Character *ch, int chclass)
 {
+if (IS_NPC(ch))
+  return 0;
   int count = 0;
   if (chclass == -1)
   {

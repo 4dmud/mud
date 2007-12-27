@@ -27,7 +27,7 @@ public:
     struct char_ability_data aff_abils; /* Abils with spells/stones/etc  */
     struct char_point_data points; /* Points                        */
     struct char_special_data char_specials;  /* PC/NPC specials        */
-    struct player_special_data *player_specials;  /* PC specials            */
+    player_special_data *player_specials;  /* PC specials            */
     struct mob_special_data mob_specials;    /* NPC specials           */
 
     struct combat_skill_data combatskill;
@@ -131,6 +131,8 @@ public:
 
     Character * assign (Character *b);
     bool zone_empty();
+    void LoadKillList();
+    void SaveKillList();
 private:
     stringstream *send_string;
 

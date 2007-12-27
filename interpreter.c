@@ -93,7 +93,6 @@ int _parse_name(char *arg, char *name);
 int get_account_num(int num, long acc);
 int has_note(Character *ch, int type);
 void con_character_creation(Descriptor *d, char *arg);
-struct kill_data *load_killlist(const char *name);
 /* local global vars */
 
 int race_val = 0;
@@ -140,6 +139,7 @@ ACMD(do_climb);
 ACMD(do_color);
 ACMD(do_copyover);
 ACMD(do_commands);
+ACMD(do_commandslike);
 ACMD(do_comm);
 ACMD(do_compare);
 ACMD(do_consider);
@@ -537,6 +537,7 @@ const struct command_info cmd_info[] =
     { "colour"   , "colour"   , POS_DEAD    , do_color    , 0, 0, 0 },
     { "\"" , "\""   , POS_DEAD    , do_comm , 0, 0, 0 },
     { "commands" , "comm"     , POS_DEAD    , do_commands , 0, SCMD_COMMANDS, 0 },
+    { "commandslike" , "commandslike"     , POS_DEAD    , do_commandslike , 0, SCMD_COMMANDS, 0 },
     { "compact"  , "comp"     , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPACT, 0 },
     { "compress"  , "compress"     , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPRESS, 0 },
     { "compare"  , "compa", POS_RESTING , do_compare  , 0, 0, 0 },
@@ -2150,7 +2151,7 @@ int enter_player_game(Descriptor *d)
 // if (!valid_id_num( GET_ID(ch)))
 //    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
-  add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
+  addChToLookupTable(GET_IDNUM(ch), ch);
 
 
 
@@ -2192,7 +2193,7 @@ int enter_player_game(Descriptor *d)
   if (GET_LEVEL(ch) == 0)
     load_room = real_room(3081);
   else
-    GET_KILLS(ch) = load_killlist(GET_NAME(ch));
+    ch->LoadKillList();
   char_to_room(ch, load_room);
   make_wholist();
   if (GET_LEVEL(ch) >= LVL_GOD)

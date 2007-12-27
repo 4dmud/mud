@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.46  2006/08/23 09:01:26  w4dimenscor
+ * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
+ *
  * Revision 1.45  2006/08/13 06:26:51  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -6103,29 +6106,13 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
 }
 
 void kill_list(Character *ch, Character *vict) {
-    struct kill_data *temp;
-    int vnum;
     if (!ch || !vict || !IS_NPC(vict))
         return;
-
-    vnum = GET_MOB_VNUM(vict);
+    int vnum = GET_MOB_VNUM(vict);
     if (vnum == NOBODY)
         return;
-    for (temp = GET_KILLS(ch); temp; temp = temp->next) {
-        if (vnum == temp->vnum) {
-            temp->last = time(0);
-            temp->count++;
-            return;
-        }
 
-    }
-    CREATE(temp, struct kill_data, 1);
-    temp->vnum = vnum;
-    temp->first = time(0);
-    temp->last = temp->first;
-    temp->count = 1;
-    temp->next = GET_KILLS(ch);
-    GET_KILLS(ch) = temp;
+        SPECIALS(ch)->UpdateKill(vnum);
 }
 
 

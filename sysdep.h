@@ -151,7 +151,7 @@
 
 #include <list>
 
-//#include <map>
+#include <map>
 #include <set>
 #include <vector>
 #include <stdexcept>
