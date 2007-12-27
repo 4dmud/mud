@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.69  2006/10/23 13:34:42  w4dimenscor
+ * Changed the code so that level 55 immortals in the IMPL trust group can do all the imp commands too.
+ *
  * Revision 1.68  2006/09/15 08:25:46  w4dimenscor
  * Fixed an error in act.wiz
  *
@@ -657,7 +660,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM1_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM2_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMM3_GRP)
-            SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMPL_GRP)
+            //SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_IMPL_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_KILL_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_LOAD_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_OLC_GRP)
@@ -668,6 +671,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_MARRY_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_GOTO_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_GLOBAL_GRP)
+	    SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HEDIT_GRP)
         } else {
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_BAN_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_DSPLN_GRP)
@@ -676,7 +680,8 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HOUSE_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM1_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM2_GRP)
-            SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMPL_GRP)
+            //SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMPL_GRP)
+	    SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM3_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_KILL_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_LOAD_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_OLC_GRP)
@@ -687,6 +692,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_MARRY_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GOTO_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GLOBAL_GRP)
+	    SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HEDIT_GRP)
         }
         break;
     case 16:
