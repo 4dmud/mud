@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.18  2006/04/27 08:57:26  w4dimenscor
+ * updated the typo and bug files to write using DIV and SPAN, so that the data can be formatted in a browser.
+ *
  * Revision 1.17  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -1109,12 +1112,12 @@ ACMD(do_gen_write)
     send_to_char("Could not open the file.  Sorry.\r\n", ch);
     return;
   }
-  fprintf(fl, "%-8s (%6.6s) [%5d] %s<br>\n", GET_NAME(ch), (tmp + 4),
+  fprintf(fl, "<div class='txtline'><span class='plrname'>%-8s</span> <span class='date'>%6.6s</span> <span class='room'>%5d</span><span='comment'>%s</span></div>\n", GET_NAME(ch), (tmp + 4),
           GET_ROOM_VNUM(IN_ROOM(ch)), argument);
 
   fclose(fl);
-  new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);
-  send_to_char("Okay.  Thanks!\r\n", ch);
+  /*new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);*/
+  new_send_to_char(ch, "Okay.  Thanks!\r\n");
 }
 
 void parse_afk(struct char_data *ch, char *argument)
