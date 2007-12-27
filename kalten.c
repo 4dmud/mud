@@ -1913,6 +1913,8 @@ int check_dam_affects(struct char_data *ch)
   struct obj_data *obj = NULL;
   char buf[MAX_STRING_LENGTH];
 
+  if (GET_POS(ch) <= POS_STUNNED)
+    return -1;
 
   if (AFF_FLAGGED(ch, AFF_SUFFOCATING))
   {

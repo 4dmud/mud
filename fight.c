@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.37  2006/04/06 14:00:57  w4dimenscor
+ * fixed a memory bug in dg scripts
+ *
  * Revision 1.36  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -2624,9 +2627,14 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
     }
 
     kill_points(ch, vict);
-
-
     die(vict, ch);
+
+    if (GET_FIGHT_EVENT(vict))
+    {
+      event_cancel(GET_FIGHT_EVENT(vict));
+      GET_FIGHT_EVENT(vict) = NULL;
+    }
+    
 
     if (!IS_NPC(ch))
     {

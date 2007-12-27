@@ -1927,7 +1927,8 @@ void death_room(struct char_data *ch)
 
   write_to_output(ch->desc, "{cYAs your last breath passes, time rolls back to just before you died\r\n"
                   "and you find yourself transfered to a temple of healing.{c0\r\n");
-  alter_hit(ch, GET_HIT(ch) -3);
+
+  GET_HIT(ch) = 3;
 
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);
@@ -1947,19 +1948,6 @@ void death_room(struct char_data *ch)
   if (ch->hitched)
     unhitch_mob(ch);
 
-  /* cancel point updates */
-  /** no need to cancel regen!**/
-  /*
-  {
-   int i;
-   for (i = 0; i < 4; i++)
-     if (GET_POINTS_EVENT(ch, i))
-     {
-       event_cancel(GET_POINTS_EVENT(ch, i));
-       GET_POINTS_EVENT(ch, i) = NULL;
-     }
-     }
-     */
   /* cancel message updates */
   if (GET_MESSAGE_EVENT(ch))
   {
@@ -1990,11 +1978,11 @@ void death_room(struct char_data *ch)
 
   }
   move_char_to(ch, real_room(1205));
-  LOOK(ch);
   GET_WAIT_STATE(ch) = 2 RL_SEC;
   affect_total(ch);
   check_regen_rates(ch);
   save_char(ch);
+  LOOK(ch);
 
 }
 void free_hunter_list(void)

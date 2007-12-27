@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/02/17 22:19:54 $
-*  $Revision: 1.19 $
+*  $Date: 2006/04/06 14:00:57 $
+*  $Revision: 1.20 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.20  2006/04/06 14:00:57  w4dimenscor
+ * fixed a memory bug in dg scripts
+ *
  * Revision 1.19  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -1708,12 +1711,14 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *g
     lhs++;
   while (*rhs && isspace(*rhs))
     rhs++;
-
+  if (*lhs != '\0') {
   for (p = lhs; *p; p++);
   for (--p; isspace(*p) && ((char *)p > lhs); *p-- = '\0');
+  }
+  if (*rhs != '\0') {
   for (p = rhs; *p; p++);
   for (--p; isspace(*p) && ((char *)p > rhs); *p-- = '\0');
-
+  }
 
   /* find the op, and figure out the value */
   if (!strcmp("||", op))
