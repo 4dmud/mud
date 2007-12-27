@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.32  2006/05/17 06:09:43  w4dimenscor
+ * requesting help on the top helpfile + 1 should no longer crash the game
+ *
  * Revision 1.31  2006/05/13 06:21:29  w4dimenscor
  * put in a few more typo fixes that molly suggested
  *
@@ -1673,7 +1676,7 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, "arn't", "aren't", len);
   ReplaceString(str, " asthe ", " as the ", len);
   ReplaceString(str, " atthe ", " at the ", len);
-  ReplaceString(str, " n;t ", " n't ", len);
+  ReplaceString(str, "n;t ", "n't ", len);
   ReplaceString(str, "havent", "haven't", len);
   ReplaceString(str, "perhapes", "perhaps", len);
   ReplaceString(str, "yopu", "you", len);

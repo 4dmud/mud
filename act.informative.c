@@ -2851,6 +2851,7 @@ struct help_index_element *find_help(char *keyword)
 
 void display_help(struct char_data *ch, unsigned int i)
 {
+  if (ch) {
   DYN_DEFINE;
   DYN_CREATE;
   *dynbuf = '\0';
@@ -2868,6 +2869,7 @@ void display_help(struct char_data *ch, unsigned int i)
                      "%s\r\n",
                      help_table[i].keywords, help_table[i].entry);
   */
+  }
 }
 
 void display_help_list(struct descriptor_data *d, char *keywords)
@@ -2878,7 +2880,8 @@ void display_help_list(struct descriptor_data *d, char *keywords)
   size_t len = 0;
   strcpy(buf, "  Help files simmilar\r\n---------------------------------------\r\n");
   len = strlen(buf);
-  for (i=0;i<=top_of_helpt;i++)
+
+  for (i=0;i<top_of_helpt;i++)
   {
     if (is_number(keywords) && i == atoi(keywords))
     {
@@ -2896,7 +2899,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
 
   if (cnt == 1)
   {
-    for (i=0;i<=top_of_helpt;i++)
+    for (i=0;i<top_of_helpt;i++)
     {
       if (is_number(keywords) && i == atoi(keywords))
       {
