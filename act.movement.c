@@ -1917,9 +1917,6 @@ ACMD(do_follow) {
         return;
     }
 
-
-
-
     if (leader->master && (leader != ch)) {
         *ch << GET_NAME(leader) << "'s master is "<< GET_NAME(leader->master) <<", so you ask to follow " << HMHR(leader->master) << " insead.\r\n";
         leader = leader->master;
@@ -1962,21 +1959,21 @@ ACMD(do_follow) {
                 return;
             }
 
-            if (!IS_NPC(ch)) {
+            if (!IS_NPC(ch) && !IS_NPC(leader)) {
                 /*diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));
                 if (abs(diff) > 100)
                 {
                   ch->Send( "The difference in your powers is too great.\r\n");
                   return;
                 }*/
-                if (STATE(leader->desc) == CON_PLAYING
+                if (leader->desc && STATE(leader->desc) == CON_PLAYING
                         && !(PLR_FLAGGED(leader, PLR_MAILING)
                              || PLR_FLAGGED(leader, PLR_WRITING))) {
                     snprintf(buf, sizeof(buf),"[%s wishes to join your group: Allow? (Type: Y | N )]", GET_NAME(ch));
                     *ch << "You ask " << GET_NAME(leader) << " if you can join " << HSHR(leader) << " group.\r\n";
                     leader->loader = GET_IDNUM(ch);
                     line_input(leader->desc, buf, allow_follow, NULL);
-                } else {
+                } else if (leader->desc) {
                     *ch << "You can't follow " << HSSH(leader) << " just yet, " << GET_NAME(leader) << " is too busy to reply.\r\n";
                 }
             } else {
