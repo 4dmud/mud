@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/04/09 05:15:44 $
-*  $Revision: 1.7 $
+*  $Date: 2006/04/09 05:26:34 $
+*  $Revision: 1.8 $
 **************************************************************************/
 
 #include "conf.h"
@@ -502,8 +502,9 @@ OCMD(do_oteleport)
     }
 
     else {
-      was_in = IN_ROOM(ch);
 	if ((ch = get_char_by_obj(obj, arg1))) {
+     
+     was_in = IN_ROOM(ch);  
 	    if (valid_dg_target(ch, TRUE)) {
 		if (ROOM_FLAGGED(ch->in_room, ROOM_NORECALL)) {
 		    send_to_char
