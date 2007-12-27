@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.18  2005/05/30 09:48:26  w4dimenscor
+ * changed affects color display and reduced the initial output
+ *
  * Revision 1.17  2005/05/29 11:16:02  w4dimenscor
  * set exits to expire, set tells not to be mxp when from mobs, and made gauges
  *
@@ -684,7 +687,7 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
     arg = makedrunk(arg, ch);
-    if (IS_NPC(vict))
+    if (IS_NPC(ch))
     snprintf(buf, sizeof(buf), "$n tells you, '%s%s%s'",
              CBWHT(vict, C_CMP), arg, CCNRM(vict, C_CMP));
 	     else

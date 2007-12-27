@@ -1554,16 +1554,18 @@ void echo_on(struct descriptor_data *d)
 
 const char *end_prompt(struct descriptor_data *d)
 {
-  static const char eor_prompt[] = {
-                               (char) IAC,
-                               (char) EOR,
-                               (char) 0
-                             };
-  static const char ga_prompt[] = {
-                              (char) IAC,
-                              (char) GA,
-                              (char) 0
-                            };
+  static const char eor_prompt[] =
+    {
+      (char) IAC,
+      (char) EOR,
+      (char) 0
+    };
+  static const char ga_prompt[] =
+    {
+      (char) IAC,
+      (char) GA,
+      (char) 0
+    };
   if (!d)
     return "";
   if (d->eor == 1)
@@ -1906,11 +1908,11 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
 
   /* work out how much we need to expand/contract it */
   size_mxp = count_mxp_tags(t->mxp, txt, strlen(txt));
- if (size_mxp < 0)
- size_mxp = 0;
+  if (size_mxp < 0)
+    size_mxp = 0;
   //size = size_mxp + strlen(txt);
 
-  do   
+  do
   {
     char dest[size + size_mxp + 20];
     int mxpon = t->mxp;
@@ -1919,12 +1921,13 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
     convert_mxp_tags(mxpon, dest, txt, size);
 
     if (size + size_mxp > sizeof(txt))
-    log("Mxp cut off");
+      log("Mxp cut off");
     strlcpy(txt, dest, sizeof(txt));
-  } while(0);
+  }
+  while(0);
 
 
-/** dont wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
+  /** dont wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
   if (t->character && !t->mxp && PRF_FLAGGED(t->character, PRF_PAGEWRAP) && PAGEWIDTH(t->character) > 0)
   {
     int len = strlen(txt);
@@ -1935,10 +1938,10 @@ size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list a
     wordwrap(txt, dest, PAGEWIDTH(t->character), len); //size checked above
 
     strlcpy(txt, dest, sizeof(txt));
-    
+
 
   }
-size = strlen(txt);
+  size = strlen(txt);
   /* If exceeding the size of the buffer, truncate it for the overflow message */
   if (size >= sizeof(txt))
   {
@@ -1953,7 +1956,7 @@ size = strlen(txt);
    */
   if (size + t->bufptr + 1 > LARGE_BUFSIZE)
   {
-  log("too big for buffer");
+    log("too big for buffer");
     size = LARGE_BUFSIZE - t->bufptr - 1;
     txt[size] = '\0';
     buf_overflows++;
@@ -1965,7 +1968,7 @@ size = strlen(txt);
    */
   if (t->bufspace > size)
   {
-  
+
     strcpy(t->output + t->bufptr, txt);	/* strcpy: OK (size checked above) */
     //memmove(t->output + t->bufptr, txt, sizeof(txt));
     //*((t->output + t->bufptr) + sizeof(txt)) = '\0';
@@ -2380,9 +2383,9 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
       free(newd);
       return (NULL);
     }/*
-                                                 
-                                                 
-                                                  */
+                                                     
+                                                     
+                                                      */
   } //copyover
 
   init_descriptor(newd, desc);
@@ -2409,36 +2412,38 @@ struct descriptor_data *new_descriptor(socket_t s, int copyover)
   }
   return (newd);
 }
-char * send_mxp_status(struct descriptor_data *t) {
-static char stat[MAX_MXP_STATUS];
-size_t len = 0;
-int hp = 0, mhp = 0;
-int mana = 0, mmana = 0;
-int move = 0, mmove = 0;
-int stam = 0, mstam = 0;
-if (t->character) {
-hp = GET_HIT(t->character);
-mana = GET_MANA(t->character);
-move = GET_MOVE(t->character);
-stam = GET_STAMINA(t->character);
+char * send_mxp_status(struct descriptor_data *t)
+{
+  static char stat[MAX_MXP_STATUS];
+  size_t len = 0;
+  int hp = 0, mhp = 0;
+  int mana = 0, mmana = 0;
+  int move = 0, mmove = 0;
+  int stam = 0, mstam = 0;
+  if (t->character)
+  {
+    hp = GET_HIT(t->character);
+    mana = GET_MANA(t->character);
+    move = GET_MOVE(t->character);
+    stam = GET_STAMINA(t->character);
 
-mhp = GET_MAX_HIT(t->character);
-mmana = GET_MAX_MANA(t->character);
-mmove = GET_MAX_MOVE(t->character);
-mstam = GET_MAX_STAMINA(t->character);
-}
+    mhp = GET_MAX_HIT(t->character);
+    mmana = GET_MAX_MANA(t->character);
+    mmove = GET_MAX_MOVE(t->character);
+    mstam = GET_MAX_STAMINA(t->character);
+  }
 
-len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'>" "<!ENTITY xmove '%d'>",move,mmove);
-len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'>" "<!ENTITY xstam '%d'>",stam,mstam);
-/*write_to_output(t,  "%s", MXPMODE(6));
-write_to_output(t, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
-write_to_output(t, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
-write_to_output(t, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
-write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
-return stat;
+  len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
+  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
+  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);
+  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'>" "<!ENTITY xmove '%d'>",move,mmove);
+  len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'>" "<!ENTITY xstam '%d'>",stam,mstam);
+  /*write_to_output(t,  "%s", MXPMODE(6));
+  write_to_output(t, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
+  write_to_output(t, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
+  write_to_output(t, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
+  write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
+  return stat;
 }
 void send_compress_offer(struct descriptor_data *d)
 {
@@ -2490,7 +2495,7 @@ int process_output(struct descriptor_data *t)
 
   /* add a prompt */
   if (t->mxp && t->character && IS_PLAYING(t))
-  send_mxp_status(t);
+    send_mxp_status(t);
   strlcat(i, make_prompt(t), sizeof(i));
 
   /**TODO: need to in the future, check this against the fact that we don't
@@ -2570,9 +2575,9 @@ int process_output(struct descriptor_data *t)
   {
     /* Not all data in buffer sent.  result < output buffersize. */
     //size_t outlen = strlen(t->output) - result;
-   // if (outlen > 0)
+    // if (outlen > 0)
     //  memmove(t->output, t->output + result, outlen);
-        strcpy(t->output, t->output + result);
+    strcpy(t->output, t->output + result);
     t->bufptr   -= result;
     t->bufspace += result;
   }
@@ -3643,7 +3648,7 @@ RETSIGTYPE hupsig(int sig)
 {
   log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...");
   exit(0);			/* perhaps something more elegant should
-                              				 * substituted */
+                                				 * substituted */
 }
 
 RETSIGTYPE chldsig()
@@ -4661,7 +4666,7 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
   gold_int expe;
   size_t len = 0, psize;
   if (ch && ch->desc)
-  d = ch->desc;
+    d = ch->desc;
 
 
   if (PROMPT(ch) && *PROMPT(ch))
@@ -4848,38 +4853,38 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
             snprintf(insert_text, sizeof(insert_text), "%d",(GET_STAMINA(ch) * 100) / GET_MAX_STAMINA(ch));
             break;
           case 'H':
-	  /*if (d && d->mxp)
-	  snprintf(insert_text, sizeof(insert_text), "<hp>%d</hp>", GET_MAX_HIT(ch));
-	  else*/
+            /*if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "<hp>%d</hp>", GET_MAX_HIT(ch));
+            else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MAX_HIT(ch));
             break;
           case 'h':
-	  /*if (d && d->mxp)
-            snprintf(insert_text, sizeof(insert_text), "%s<xhp>%d</xhp>%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");*/
-	    snprintf(insert_text, sizeof(insert_text), "%s%d%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");
+            /*if (d && d->mxp)
+                     snprintf(insert_text, sizeof(insert_text), "%s<xhp>%d</xhp>%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");*/
+            snprintf(insert_text, sizeof(insert_text), "%s%d%s",mhp <= 30 ? "\x1B[1;31m" : "", GET_HIT(ch), mhp <= 30 ? "\x1B[1m""\x1B[0m" : "");
             break;
           case 'M':
-	 /* if (d && d->mxp)
-            snprintf(insert_text, sizeof(insert_text), "<xmana>%d</xmana>",GET_MAX_MANA(ch));
-	    else*/
-	    snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MANA(ch));
+            /* if (d && d->mxp)
+                      snprintf(insert_text, sizeof(insert_text), "<xmana>%d</xmana>",GET_MAX_MANA(ch));
+               else*/
+            snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MANA(ch));
             break;
           case 'm':
-	  /*if (d && d->mxp)
-	  snprintf(insert_text, sizeof(insert_text), "<mana>%d</mana>", GET_MANA(ch));
-	  else*/
+            /*if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "<mana>%d</mana>", GET_MANA(ch));
+            else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MANA(ch));
             break;
           case 'V':
-	  /*if (d && d->mxp)
-	  snprintf(insert_text, sizeof(insert_text), "<xmove>%d</xmove>", GET_MAX_MOVE(ch));
-	  else*/
+            /*if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "<xmove>%d</xmove>", GET_MAX_MOVE(ch));
+            else*/
             snprintf(insert_text, sizeof(insert_text), "%d",GET_MAX_MOVE(ch));
             break;
           case 'v':
-	  /*if (d && d->mxp)
-	  snprintf(insert_text, sizeof(insert_text), "<move>%d</move>", GET_MOVE(ch));
-	  else*/
+            /*if (d && d->mxp)
+            snprintf(insert_text, sizeof(insert_text), "<move>%d</move>", GET_MOVE(ch));
+            else*/
             snprintf(insert_text, sizeof(insert_text), "%d", GET_MOVE(ch));
             break;
           case 'G':
@@ -5234,8 +5239,9 @@ void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn
       if (c == ';')
         bInEntity = FALSE;
     } /* end of being inside a tag */
-    else {
-    switch (c)
+    else
+    {
+      switch (c)
       {
       case MXP_BEGc:
         bInTag = TRUE;
@@ -5284,14 +5290,14 @@ void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn
             break;  /* end of default */
 
           } /* end of inner switch */
-	  
+
         }
         else
           *pd++ = c;  /* not MXP - just copy character */
         break;
 
       } /* end of switch on character */
-      } /*end of else */
+    } /*end of else */
 
   }   /* end of converting special characters */
   *pd = 0;
@@ -5308,20 +5314,30 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
   /* Exit tag */
   write_to_output( d, "%s", MXPTAG ("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\" EXPIRE=\"Exits\"  FLAG=RoomExit"));
   write_to_output( d, "%s", MXPTAG ("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" EXPIRE=\"Exits\" FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG
+                   ("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
+                    "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;' "
+                    "'Send a message to &name;' prompt>\" "
+                    "ATT=\"name\""));
+  write_to_output(d, "%s", MXPTAG("!ELEMENT affect '<COLOR &col;><em>' ATT='col=whitesmoke'"));
+  write_to_output(d, "%s", MXPTAG("!ELEMENT LookAt '<send href=\"look at &at;\">'"));
+  write_to_output(d, "%s", MXPTAG("!ELEMENT Read '<send href=\"read at &at;\">'"));
+#if 0
   /* Room description tag */
   write_to_output( d, "%s", MXPTAG ("!ELEMENT rdesc '<p>' FLAG=RoomDesc"));
+
   /* Get an item tag (for things on the ground) */
-  write_to_output( d, "%s", 
-              MXPTAG("!ELEMENT GroundItem \"<send href='"
-                    "get &name;|"
-                    "examine &name;|"
-                    "drink &name;" 
-                    "' "
-                    "hint='RH mouse click to use this object|"
-                    "Get &desc;|"
-                    "Examine &desc;|"
-                    "Drink from &desc;"
-                    "'>\" ATT='name desc'"));
+  write_to_output( d, "%s",
+                   MXPTAG("!ELEMENT GroundItem \"<send href='"
+                          "get &name;|"
+                          "examine &name;|"
+                          "drink &name;"
+                          "' "
+                          "hint='RH mouse click to use this object|"
+                          "Get &desc;|"
+                          "Examine &desc;|"
+                          "Drink from &desc;"
+                          "'>\" ATT='name desc'"));
   /* Drop an item tag (for things in the inventory) */
   write_to_output( d, "%s",  MXPTAG
                    ("!ELEMENT InvenItem \"<send href='"
@@ -5338,17 +5354,6 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
                     "Eat &desc;|"
                     "Drink &desc;"
                     "'>\" ATT='name desc'"));
-  /* Bid an item tag (for things in the auction) */
-  write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT Bid \"<send href='bid &name;' "
-                    "hint='Bid for &desc;'>\" "
-                    "ATT='name desc'"));
-  /* List an item tag (for things in a shop) */
- write_to_output(d, "%s", MXPTAG("GAUGE 'hp' Max='xhp' Caption='Health' Color='red'"));
- write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
- write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
- write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
- //write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
   write_to_output( d, "%s", MXPTAG
                    ("!ELEMENT List \"<send href='"
                     "buy &name;| "
@@ -5356,10 +5361,15 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
                     "' "
                     "hint='Buy &desc;|Id &desc;'>\" "
                     "ATT='name desc'"));
+#endif
   /* Player tag (for who lists, tells etc.) */
-  write_to_output( d, "%s", MXPTAG
-                   ("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
-		   "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;' "
-                    "'Send a message to &name;' prompt>\" "
-                    "ATT=\"name\""));
+
+  /* List an item tag (for things in a shop) */
+  //write_to_output(d, "%s", MXPTAG("GAUGE 'hp' Max='xhp' Caption='Health' Color='red'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
+  //write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
+  //write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
+
+
 } /* end of turn_on_mxp */

@@ -448,46 +448,46 @@ void show_affect_to_char(struct char_data *i, struct char_data *ch)
         TO_VICT);
 
   if (AFF_FLAGGED(i, AFF_FREEZING) && !AFF_FLAGGED(i, AFF_PROT_COLD))
-    act("\x1B[1;34m...$e in stuck inside a huge glacier!\x1B[0m",
+    act(MXPTAG("affect lightskyblue")"...$e in stuck inside a huge glacier!"MXPTAG("/affect "),
         FALSE, i, 0, ch, TO_VICT);
   if (PLR_FLAGGED(i, PLR_FROZEN))
-    act("\x1B[1;34m...$e's stuck inside a huge iceburg!\x1B[0m",
+    act(MXPTAG("affect paleturquoise")"...$e's stuck inside a huge iceburg!"MXPTAG("/affect "),
         FALSE, i, 0, ch, TO_VICT);
   if (AFF_FLAGGED(i, AFF_ACIDED))
-    act("...$e is covered with concentrated acid!", FALSE, i, 0, ch,
+    act(MXPTAG("affect snow")"...$e is covered with concentrated acid!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_HYPERACTIVITY))
-    act("...$e is bouncing off the walls!", FALSE, i, 0, ch,
+    act(MXPTAG("affect ivory")"...$e is bouncing off the walls!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_MIND_FIRE))
-    act("...$s eyes glow like embers!", FALSE, i, 0, ch,
+    act(MXPTAG("affect orange")"...$s eyes glow like embers!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_MIND_ICE))
-    act("...$s eyes are frosted with ice!", FALSE, i, 0, ch,
+    act(MXPTAG("affect lightcyan")"...$s eyes are frosted with ice!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_MIND_WATER))
-    act("...$s eyes hold the ocean!", FALSE, i, 0, ch,
+    act(MXPTAG("affect aquamarine")"...$s eyes hold the ocean!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_MIND_ELEC))
-    act("...$s eyelashes crackle with electricity!", FALSE, i, 0, ch,
+    act(MXPTAG("affect lavender")"...$s eyelashes crackle with electricity!"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_SHIELD_HOLY))
-    act("...$e is under a geas.", FALSE, i, 0, ch,
+    act(MXPTAG("affect")"...$e is under a geas."MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_SANCTUARY))
-    act("\x1B[1;37m...$e glows with a bright light!\x1B[0m", FALSE, i,
+    act(MXPTAG("affect oldlace")"...$e glows with a bright light!"MXPTAG("/affect "), FALSE, i,
         0, ch, TO_VICT);
   if (AFF_FLAGGED(i, AFF_BLIND))
-    act("\x1B[0m...$e is groping around blindly", FALSE, i, 0, ch,
+    act(MXPTAG("affect")"...$e is groping around blindly"MXPTAG("/affect "), FALSE, i, 0, ch,
         TO_VICT);
   if (AFF_FLAGGED(i, AFF_FIRE_SHIELD))
-    act("\x1B[31m...$e is surrounded by a flaming red shield!\x1B[0m",
+    act(MXPTAG("affect orangered")"...$e is surrounded by a flaming red shield!" MXPTAG("/affect "),
         FALSE, i, 0, ch, TO_VICT);
   if (AFF_FLAGGED(i, AFF_SHIELD))
-    act("\x1B[36m...$e is surrounded by a humming blue shield!\x1B[0m",
+    act(MXPTAG("affect mediumturquoise")"...$e is surrounded by a humming blue shield!"MXPTAG("/affect "),
         FALSE, i, 0, ch, TO_VICT);
   if (AFF_FLAGGED(i, AFF_HASTE))
-    act("\x1B[0m...$e is moving with unnatural speed!", FALSE, i, 0,
+    act(MXPTAG("affect snow")"...$e is moving with unnatural speed!"MXPTAG("/affect "), FALSE, i, 0,
         ch, TO_VICT);
 }
 
@@ -1026,8 +1026,8 @@ ACMD(do_exits)
   char dirnameb[50];
   char *dirname;;
   
-  if (GET_LEVEL(ch) > LVL_IMMORT)
-  new_send_to_char(ch, MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
+  //if (GET_LEVEL(ch) > LVL_IMMORT)
+  //new_send_to_char(ch, MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
 
   if (AFF_FLAGGED(ch, AFF_BLIND))
   {
@@ -1053,7 +1053,7 @@ ACMD(do_exits)
                        GET_ROOM_VNUM(EXIT(ch, door)->to_room),
                        EXIT(ch, door)->to_room->name);
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, " (Closed)");
+        new_send_to_char(ch, " (%sClosed%s)", MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
         new_send_to_char(ch, " (Hidden)");
       new_send_to_char(ch, "\r\n");
@@ -1063,7 +1063,7 @@ ACMD(do_exits)
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
         continue;
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, "%s%-5s%s - (Closed)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"));
+        new_send_to_char(ch, "%s%-5s%s - (%sClosed%s)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
       else
         new_send_to_char(ch, "%s%-5s%s - %s", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                          IS_DARK(EXIT(ch, door)->to_room)
