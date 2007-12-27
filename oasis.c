@@ -219,6 +219,7 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
       break;
     case CLEANUP_STRUCTS:
       delete OLC_ROOM(d);
+      OLC_ROOM(d) = NULL;
       break;
     case CLEANUP_CONFIG:
       free_config(OLC_CONFIG(d));
@@ -243,6 +244,7 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
   {
     free_object_strings(OLC_OBJ(d));
     free(OLC_OBJ(d));
+    OLC_OBJ(d) = NULL;
   }
 
   /*
@@ -252,6 +254,7 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
   if (OLC_MOB(d)) {
     free_mobile(OLC_MOB(d));
     log("Freed OLC mobile");
+    OLC_MOB(d) = NULL;
     }
 
   /*

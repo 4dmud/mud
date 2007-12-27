@@ -20,6 +20,7 @@
 #include "db.h"
 #include "spells.h"
 #include "constants.h"
+#include "graph.h"
 
 
 /* Externals */
@@ -28,30 +29,14 @@ ACMD(do_say);
 void improve_skill(Character *ch, int skill);
 
 /* Local functions */
-int VALID_EDGE(room_rnum x, int y,bool honour_notrack);
-void bfs_enqueue(room_rnum room, int dir);
-void bfs_dequeue(void);
-void bfs_clear_queue(void);
-int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 ACMD(do_track);
 void hunt_victim(Character *ch);
 
-struct bfs_queue_struct {
-    room_rnum room;
-    char dir;
-    struct bfs_queue_struct *next;
-};
+Graph graph;
 
-static struct bfs_queue_struct *queue_head = 0, *queue_tail = 0;
 
-/* Utility macros */
-#define MARK(room) 	(SET_BIT_AR(ROOM_FLAGS(room), ROOM_BFS_MARK))
-#define UNMARK(room) 	(REMOVE_BIT_AR(ROOM_FLAGS(room), ROOM_BFS_MARK))
-#define IS_MARKED(room) (ROOM_FLAGGED(room, ROOM_BFS_MARK))
-#define TOROOM(x, y) 	((x)->dir_option[(y)]->to_room)
-#define IS_CLOSED(x, y) (EXIT_FLAGGED((x)->dir_option[(y)], EX_CLOSED))
 
-int VALID_EDGE(room_rnum x, int y,bool honour_notrack) {
+int Graph::VALID_EDGE(room_rnum x, int y,bool honour_notrack) {
     if (x->dir_option[y] == NULL || TOROOM(x, y) == NULL)
         return (0);
     if (CONFIG_TRACK_T_DOORS == FALSE && IS_CLOSED(x, y))
@@ -63,36 +48,38 @@ int VALID_EDGE(room_rnum x, int y,bool honour_notrack) {
     return (1);
 }
 
-void bfs_enqueue(room_rnum room, int dir) {
-    struct bfs_queue_struct *curr;
-
-    CREATE(curr, struct bfs_queue_struct, 1);
-    curr->room = room;
-    curr->dir = dir;
-    curr->next = 0;
+void Graph::bfs_enqueue(room_rnum room, int dir) {
+	struct bfs_queue_struct *curr = new bfs_queue_struct(room, dir);
 
     if (queue_tail) {
         queue_tail->next = curr;
         queue_tail = curr;
     } else
         queue_head = queue_tail = curr;
+    
 }
 
 
-void bfs_dequeue(void) {
+void Graph::bfs_dequeue(void) {
     struct bfs_queue_struct *curr;
 
     curr = queue_head;
 
     if (!(queue_head = queue_head->next))
         queue_tail = 0;
-    free(curr);
+    delete curr;
 }
 
 
-void bfs_clear_queue(void) {
+void Graph::bfs_clear_queue(void) {
+	/*std::list <bfs_queue_struct *>::iterator it;
+	for (it = bfs_queue.begin();it != bfs_queue.end();it++) {
+		delete (*it);
+		*it = NULL;
+	}
+	bfs_queue.clear();*/
     while (queue_head)
-        bfs_dequeue();
+       bfs_dequeue();
 }
 
 
@@ -103,9 +90,11 @@ void bfs_clear_queue(void) {
  * Intended usage: in mobile_activity, give a mob a dir to go if they're
  * tracking another mob or a PC.  Or, a 'track' skill for PCs.
  */
-int find_first_step(room_rnum src, room_rnum target,bool honour_notrack) {
+int Graph::find_first_step(room_rnum src, room_rnum target,bool honour_notrack) {
     int curr_dir;
-    int curr_room;
+    if (!src || !target) {	    
+	    return (BFS_ERROR);
+    }
 
     if (src->number < 0 || src->number > top_of_world || target->number < 0
             || target->number > top_of_world) {
@@ -115,10 +104,10 @@ int find_first_step(room_rnum src, room_rnum target,bool honour_notrack) {
     if (src == target)
         return (BFS_ALREADY_THERE);
 
-    /* clear marks first, some OLC systems will save the mark. */
-    for (curr_room = 0; curr_room <= top_of_world; curr_room++)
+    /* clear marks first, some OLC systems will save the mark. */ 
+    for (int curr_room = 0; curr_room <= top_of_world; curr_room++)
         if (world_vnum[curr_room])
-            UNMARK(world_vnum[curr_room]);
+    UNMARK(world_vnum[curr_room]);
 
     MARK(src);
 
@@ -193,7 +182,7 @@ ACMD(do_track) {
     }
 
     /* They passed the skill check. */
-    dir = find_first_step(ch->in_room, vict->in_room);
+    dir = graph.find_first_step(ch->in_room, vict->in_room);
 
     switch (dir) {
     case BFS_ERROR:
@@ -239,7 +228,7 @@ void hunt_victim(Character *ch) {
         remove_hunter(ch);
         return;
     }
-    if ((dir = find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
+    if ((dir = graph.find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
 	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB)) {
         if (dir != BFS_ALREADY_THERE) {
 	    if (!IS_SET(INTERNAL(ch), INT_LOSTPREY)) {

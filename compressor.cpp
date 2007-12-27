@@ -269,21 +269,21 @@ long Compressor::CompressToId(const char *in, bool comp) {
     zmap[newId] = cmps;
     return newId;
 }
-long Compressor::CompressToId(const char *in, long i) {
+long Compressor::CompressToId(const char *_in, long i) {
     map<long, compress_map_data *>::iterator it;
-    if (!in)
+    if (!_in)
         return -1;
     compress_map_data *cmps = new compress_map_data();
-    if (strlen(in) < 80) {
+    if (strlen(_in) < 80) {
         cmps->parsed = false;
-        cmps->saved = (unsigned char*)strdup(in);
+        cmps->saved = (unsigned char*)strdup(_in);
     } else {
         try {
             cmps->parsed = true;
-            cmps->saved = def((unsigned char*)in, cmps->length);
+            cmps->saved = def((unsigned char*)_in, cmps->length);
         } catch (MudException &e) {
             cmps->parsed = false;
-            cmps->saved = (unsigned char*)strdup(in);
+            cmps->saved = (unsigned char*)strdup(_in);
         }
     }
 
@@ -297,21 +297,21 @@ long Compressor::CompressToId(const char *in, long i) {
     return i;
 }
 
-long Compressor::CompressToId(const char *in, long i, bool comp) {
+long Compressor::CompressToId(const char *_in, long i, bool comp) {
     map<long, compress_map_data *>::iterator it;
-    if (!in)
+    if (!_in)
         return -1;
     compress_map_data *cmps = new compress_map_data();
-    if (strlen(in) < 80 || !comp) {
+    if (strlen(_in) < 80 || !comp) {
         cmps->parsed = false;
-        cmps->saved = (unsigned char*)strdup(in);
+        cmps->saved = (unsigned char*)strdup(_in);
     } else {
         try {
             cmps->parsed = true;
-            cmps->saved = def((unsigned char*)in, cmps->length);
+            cmps->saved = def((unsigned char*)_in, cmps->length);
         } catch (MudException &e) {
             cmps->parsed = false;
-            cmps->saved = (unsigned char*)strdup(in);
+            cmps->saved = (unsigned char*)strdup(_in);
 	    
         }
     }

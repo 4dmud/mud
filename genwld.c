@@ -40,20 +40,22 @@ room_rnum add_room(Room *room)
 
   if ((i = room->number) != NOWHERE && world_vnum[i])
   {
-	  log("Room Desc 1: %s", room->GetDescription());
+	 // log("Room Desc 1: %s", room->GetDescription());
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
     /** save the new string **/
     //world_vnum[i]->t_description = strdup(room->GetDescription());
-    world_vnum[i]->free_room_strings();
-    log("Room Desc 2: %s", room->GetDescription());
+    
+    //log("Room Desc 2: %s", room->GetDescription());
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
+    world_vnum[i]->free_room_strings();
     *world_vnum[i] = *room;
+    world_vnum[i]->SetDesc(-1);
     world_vnum[i]->mine = room->mine;
     world_vnum[i]->copy_room_strings(room);
-    log("Room Desc 4: %s", room->GetDescription());
-    log("Room Desc 5: %s", world_vnum[i]->GetDescription());
+    //log("Room Desc 4: %s", room->GetDescription());
+    //log("Room Desc 5: %s", world_vnum[i]->GetDescription());
     add_to_save_list(zone_table[room->zone].number, SL_WLD);
     log("GenOLC: add_room: Updated existing room #%d.", i);
     return world_vnum[i];

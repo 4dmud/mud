@@ -15,6 +15,7 @@
 #include "fight.h"
 #include "damage.h"
 #include "descriptor.h"
+#include "graph.h"
 
 /* external variables */
 SPECIAL(shop_keeper);
@@ -1178,7 +1179,7 @@ ASKILL(skill_track)
   }
 
   /* They passed the skill check. */
-  dir = find_first_step(IN_ROOM(ch), vict->in_room,true);
+  dir = graph.find_first_step(IN_ROOM(ch), vict->in_room,true);
 
   switch (dir)
   {

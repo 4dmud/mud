@@ -26,12 +26,6 @@ struct house_control_rec {
     long spare7;
 };
 
-
-
-
-#define TOROOM(room, dir) (room->dir_option[dir] ? \
-			    room->dir_option[dir]->to_room : NULL)
-
 void House_listrent(Character *ch, room_vnum vnum);
 void House_boot(void);
 void House_save_all(void);

@@ -11,13 +11,13 @@ CC = g++
 CXREF = cxref
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -Wno-sign-compare -Wunused 
+MYFLAGS = -Wall -Wno-sign-compare -Wunused -combine -Wformat
 #-D NO_MAKEFILE
 # -Wnested-externs -Wshadow -m32 -Wstrict-prototypes 
 # -I/usr/src/lib/libcrypt/ 
 
 #flags for profiling (see hacker.doc for more information)
-PROFILE =
+PROFILE = -fprofile-arcs
 #gprof for profiling -pg
 
 ##############################################################################

@@ -244,7 +244,7 @@ void redit_save_internally(Descriptor *d)
   OLC_SCRIPT(d) = NULL;
   /* end trigger update */
 
-
+  REMOVE_BIT_AR(ROOM_FLAGS(room_num), ROOM_BFS_MARK);
   /* Don't adjust numbers on a room update. */
   if (!new_room)
     return;

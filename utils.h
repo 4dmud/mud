@@ -566,6 +566,8 @@ int has_body(Character *ch, int flag);
 			 (ch)->player.short_descr : GET_PC_NAME(ch))
 #define GET_TITLE(ch)   ((ch)->player.title)
 
+#define TOROOM(room, dir) (room->dir_option[dir] ? \
+			    room->dir_option[dir]->to_room : NULL)
 #if 0
 #define GET_PC_NAME_S(ch)	(*(ch)->player.name)
 #define GET_PC_NAME_SP(ch)	((ch)->player.name)

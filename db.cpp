@@ -1640,9 +1640,8 @@ void parse_room(FILE * fl, int virtual_nr, zone_vnum zon) {
     room_nr->room_flags[3] = asciiflag_conv(flags4);
     room_nr->sector_type = t[2];
 
-
-
-
+    REMOVE_BIT_AR(ROOM_FLAGS(room_nr), ROOM_BFS_MARK);
+    
     room_nr->func = NULL;
     room_nr->contents = NULL;
     room_nr->people = NULL;

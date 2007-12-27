@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/08/19 01:06:10 $
-*  $Revision: 1.40 $
+*  $Date: 2007/11/14 03:30:12 $
+*  $Revision: 1.41 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.41  2007/11/14 03:30:12  w4dimenscor
+ * Changed the world and the index to classes. Fixed the room save bug where it would wipe descriptions
+ *
  * Revision 1.40  2007/08/19 01:06:10  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -3275,9 +3278,7 @@ ACMD(do_tlist) {
     two_arguments(argument, buf, buf2);
 
     if (!*buf) {
-        send_to_char
-        ("Usage: tlist <begining number or zone> [<ending number>]\r\n",
-         ch);
+        ch->Send("Usage: tlist <begining number or zone> [<ending number>]\r\n");
         return;
     }
 
@@ -3290,7 +3291,7 @@ ACMD(do_tlist) {
     }
 
     if ((bottom < 0) || (bottom > 999999) || (top < 0) || (top > 999999)) {
-        send_to_char("Values must be between 0 and 999999.\n\r", ch);
+	    ch->Send("Values must be between 0 and 999999.\n\r");
         return;
     }
 
@@ -3321,7 +3322,7 @@ ACMD(do_tlist) {
                 sprintf(buf, "wld %s%s%s\r\n", QYEL, trgtypes, QNRM);
             } else {
                 new_sprintbit(GET_TRIG_TYPE(trig_index[i]->proto), trig_types, trgtypes, sizeof(trgtypes));
-                sprintf(buf, "mob %s%s%s\r\n", QYEL, trgtypes, QNRM);
+		snprintf(buf, sizeof(buf), "mob %s%s%s\r\n", QYEL, trgtypes, QNRM);
             }
             DYN_RESIZE(buf);
 

@@ -73,6 +73,7 @@
     #include "descriptor.h"
     #include "spells.h"
     #include "regen.h"
+#include "graph.h"
 
 #ifdef HAVE_ARPA_TELNET_H
     #include <arpa/telnet.h>
@@ -1254,12 +1255,12 @@ bool Character::canHuntChar(Character *vict) {
     if(!CAN_HUNT(this) ||
             ((MOB_FLAGGED(this, MOB_STAY_ZONE) && IN_ROOM(this)->zone != IN_ROOM(vict)->zone) ||
              (MOB_FLAGGED(this, MOB_STAY_SECTOR) && IN_ROOM(this)->sector_type != IN_ROOM(vict)->sector_type) ||
-             find_first_step(IN_ROOM(this), IN_ROOM(vict)) < 0))
+             graph.find_first_step(IN_ROOM(this), IN_ROOM(vict)) < 0))
         return false;
 
     //check for path things here (see notes)
     int stepcount = 0;
-    int stepdir = find_first_step(IN_ROOM(this),IN_ROOM(vict));
+    int stepdir = graph.find_first_step(IN_ROOM(this),IN_ROOM(vict));
     //	Room *steproom = IN_ROOM(this)->dir_option[find_first_step(IN_ROOM(this),IN_ROOM(vict))]->to_room;
     Room *curroom = IN_ROOM(this);
     while (curroom && stepdir>=0 && stepdir <= 5 && stepcount++ != MAX_HUNTSTEPS(this) && curroom->dir_option[stepdir]) {

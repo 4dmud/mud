@@ -22,6 +22,7 @@
 #include "constants.h"
 #include "fight.h"
 #include "descriptor.h"
+#include "graph.h"
 
 /* external structs */
 extern int no_specials;
@@ -343,7 +344,7 @@ int hunt_location(void *thing, int type) {
         return 0;
 
     //std::binary_search as opposed to find*/
-    if ((dir = find_first_step(curr_room, rnum)) < 0) {
+    if ((dir = graph.find_first_step(curr_room, rnum)) < 0) {
         if (dir != BFS_ALREADY_THERE) {
             return 0;
         } else {

@@ -37,7 +37,7 @@ character.o: character.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   character.h utils.h comm.h interpreter.h handler.h db.h playerindex.h \
   house.h dg_scripts.h screen.h arena.h mail.h dg_event.h clan.h oasis.h \
   genolc.h constants.h ident.h auction.h descriptor.h col_string.h \
-  spells.h regen.h
+  spells.h regen.h graph.h
 col_string.o: col_string.cpp conf.h sysdep.h dlib/dir_nav.h \
   dlib/platform.h dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -381,7 +381,7 @@ room.o: room.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h db.h playerindex.h handler.h comm.h genolc.h \
-  genwld.h genzon.h dg_olc.h dg_scripts.h shop.h
+  genwld.h genzon.h dg_olc.h dg_scripts.h shop.h compressor.h
 strutil.o: strutil.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -894,7 +894,7 @@ act.wizard.o: act.wizard.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/threads/threaded_object_extension.h \
   dlib/threads/threaded_object_extension_abstract.h \
   dlib/threads/thread_specific_data_extension.h \
-  dlib/threads/thread_specific_data_extension_abstract.h
+  dlib/threads/thread_specific_data_extension_abstract.h compressor.h
 aedit.o: aedit.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -1630,7 +1630,7 @@ comm.o: comm.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/threads/thread_specific_data_extension_abstract.h dlib/misc_api.h \
   dlib/misc_api/posix.h dlib/misc_api/misc_api_kernel_2.h \
   dlib/misc_api/misc_api_kernel_abstract.h dlib/misc_api/../algs.h \
-  dlib/misc_api/../uintn.h
+  dlib/misc_api/../uintn.h compressor.h
 config.o: config.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -1780,7 +1780,7 @@ corpse.o: corpse.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h comm.h handler.h db.h playerindex.h interpreter.h utils.h \
-  spells.h
+  spells.h graph.h
 damage.o: damage.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -2775,7 +2775,7 @@ graph.o: graph.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h comm.h interpreter.h handler.h db.h playerindex.h \
-  spells.h constants.h
+  spells.h constants.h graph.h
 group.o: group.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -3463,7 +3463,7 @@ mobact.o: mobact.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h db.h playerindex.h comm.h interpreter.h handler.h \
-  spells.h constants.h fight.h descriptor.h col_string.h
+  spells.h constants.h fight.h descriptor.h col_string.h graph.h
 modify.o: modify.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -4309,7 +4309,7 @@ skills.o: skills.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h comm.h db.h playerindex.h interpreter.h handler.h \
   spells.h screen.h constants.h dg_scripts.h dg_event.h fight.h damage.h \
-  descriptor.h col_string.h
+  descriptor.h col_string.h graph.h
 spec_assign.o: spec_assign.c conf.h sysdep.h dlib/dir_nav.h \
   dlib/platform.h dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \

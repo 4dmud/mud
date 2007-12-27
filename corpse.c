@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "utils.h"
 #include "spells.h"
+#include "graph.h"
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE LIB_MISC"corpse.save"
@@ -572,7 +573,7 @@ ACMD(do_corpse) {
         int dir;
 
         /* They passed the skill check. */
-        dir = find_first_step(IN_ROOM(ch), rnum);
+        dir = graph.find_first_step(IN_ROOM(ch), rnum);
 
         switch (dir) {
         case BFS_ERROR:
