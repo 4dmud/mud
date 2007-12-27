@@ -27,7 +27,7 @@ extern struct room_data *world_vnum[];
 extern struct descriptor_data *descriptor_list;
 extern const char *dirs[];
 extern int rev_dir[];
-    int can_fight(struct char_data *ch, struct char_data *vict);
+int can_fight(struct char_data *ch, struct char_data *vict);
 struct aff_dam_event_obj
 {
   struct char_data* ch;
@@ -52,7 +52,8 @@ int perform_move(struct char_data *ch, int dir, int specials_check);
 struct ignore *find_ignore(struct ignore *ignore_list, char *str);
 int compute_armor_class(struct char_data *ch);
 extern void print_ignorelist(struct char_data *ch, struct char_data *vict);
-
+int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
+// 
 /* Daniel Houghton's revised external functions */
 int skill_roll(struct char_data *ch, int skill_num);
 void strike_missile(struct char_data *ch, struct char_data *tch,
@@ -278,54 +279,86 @@ ACMD(do_hit)
     struct char_data *vict;
     char arg[MAX_INPUT_LENGTH];
 
-
     one_argument(argument, arg);
 
-    if (!*arg)
-	send_to_char("Hit who?\r\n", ch);
-    else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
-	send_to_char("They don't seem to be here.\r\n", ch);
-    else if (vict == ch) {
-	send_to_char("You hit yourself...OUCH!.\r\n", ch);
-	act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
-    } else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
-	act("$N is just such a good friend, you simply can't hit $M.",
-	    FALSE, ch, 0, vict, TO_CHAR);
-    else {
-    if (ch != vict &&
-      ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
-    send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
-    return;
-  }
-  if (!can_fight(ch, vict))
-	           return;
-	if (!CONFIG_PK_ALLOWED && !arena_ok(ch, vict)) {
-	    if (!IS_NPC(vict) && !IS_NPC(ch)) {
-		if (subcmd != SCMD_MURDER) {
-		    send_to_char("Use 'murder' to hit another player.\r\n",
-				 ch);
-		    return;
-		} else {
-		
-		    check_killer(ch, vict);
-		}
-	    }
-
-	    if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master)
-		&& !IS_NPC(vict))
-		return;		/* you can't order a charmed pet to attack a
-				 * player */
-	}
-
-
-	//if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
-	if (!FIGHTING(ch)) {
-	    send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
-	    new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
-            start_fighting(ch, vict);
-	} else
-	    send_to_char("You do the best you can!\r\n", ch);
+    if (!*arg) {
+        send_to_char("Hit who?\r\n", ch);
+        return;
     }
+    if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+        if ( !strcmp(arg, "all") ) {
+            if ( ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL) ) {
+                send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
+                return;
+            }
+            for (vict = IN_ROOM(ch)->people; vict ; vict = vict->next_in_room) {
+                if (ch != vict &&
+                        !(AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict)) &&
+			!(AFF_FLAGGED(vict, AFF_CHARM) && (vict->master == ch)) &&
+                        can_fight(ch, vict) &&	
+                        CAN_SEE(ch, vict)) {
+                    if (!CONFIG_PK_ALLOWED && !arena_ok(ch, vict)) {
+                        if (!IS_NPC(vict) && !IS_NPC(ch)) {
+                            continue;
+                    }
+                    if (AFF_FLAGGED(ch, AFF_CHARM) &&
+                            !IS_NPC(ch->master)
+                            && !IS_NPC(vict))
+                        continue;		/* you can't order a charmed pet to attack a player */
+                    }
+                    send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
+                    new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
+                    if (!FIGHTING(ch)) {
+                        start_fighting(ch, vict);
+                    } else {
+                        fe_after_damage(ch, vict, 0, 0);
+                    }
+                }
+            }
+            return;
+        }
+        send_to_char("They don't seem to be here.\r\n", ch);
+        return;
+    }
+    if (vict == ch) {
+        send_to_char("You hit yourself...OUCH!.\r\n", ch);
+        act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
+        return;
+    }
+    if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict)) {
+        act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
+        return;
+    }
+    if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
+        send_to_char("This room just has such a peaceful, easy feeling...\r\n", ch);
+        return;
+    }
+    if (!can_fight(ch, vict)) {
+        return;
+    }
+
+    if (!CONFIG_PK_ALLOWED && !arena_ok(ch, vict)) {
+        if (!IS_NPC(vict) && !IS_NPC(ch)) {
+            if (subcmd != SCMD_MURDER) {
+                send_to_char("Use 'murder' to hit another player.\r\n", ch);
+                return;
+            } else {
+                check_killer(ch, vict);
+            }
+        }
+        if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master)
+                && !IS_NPC(vict))
+            return;		/* you can't order a charmed pet to attack a player */
+    }
+
+    //if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
+    if (!FIGHTING(ch)) {
+        send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 0);
+        new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
+        start_fighting(ch, vict);
+    } else
+        send_to_char("You do the best you can!\r\n", ch);
+
     return;
 }
 

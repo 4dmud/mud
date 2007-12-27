@@ -455,6 +455,7 @@ cpp_extern const struct command_info cmd_info[] =
     { "aedit"    , "aed"	, POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
     { "astat"    , "ast"	, POS_DEAD    , do_astat      , LVL_IMMORT, SCMD_OASIS_AEDIT, WIZ_EDIT_GRP },
     { "affects"  , "aff"  , POS_RESTING , do_affects  , 0, 0, 0 },
+    { "aggro"      , "aggro"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AGGRO, 0 },
     { "ahall"    , "ahall", POS_DEAD    , do_ahall    , 0, 0, 0 },
     { "alias"    , "ali"	, POS_DEAD    , do_alias    , 0, 0, 0 },
     { "answer"   , "answ" , POS_SLEEPING, do_gen_comm , 0, SCMD_NEWBIE1, 0 },

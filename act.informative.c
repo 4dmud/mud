@@ -1351,6 +1351,8 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   list_char_to_char(view_room->people, ch);
   new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
 
+  if ( PRF_FLAGGED(ch, PRF_AGGRO) )
+    command_interpreter(ch, "kill all");
 }
 
 
@@ -4577,6 +4579,7 @@ ACMD(do_toggle)
                    "    Compression: %-3s    "
                    "     PageHeight: %-3d    "
                    "      PageWidth: %-3d\r\n"
+                   "     Aggro Mode: %-3s    "
                    "       PageWrap: %-3s\r\n",
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
@@ -4618,6 +4621,7 @@ ACMD(do_toggle)
 #endif
                    PAGEHEIGHT(ch),
                    PAGEWIDTH(ch),
+                   ONOFF(PRF_FLAGGED(ch, PRF_AGGRO)),
                    YESNO(PRF_FLAGGED(ch, PRF_PAGEWRAP))
                   );
 

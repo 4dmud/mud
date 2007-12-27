@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
- * Revision 1.1  2004/11/12 02:15:41  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/17 14:19:46  w4dimenscor
+ * added Aggro mode to attack everything in sight and 'kill all' command
+ *
+ * Revision 1.1.1.1  2004/11/12 02:15:41  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.77  2004/09/18 04:42:47  molly
  * cleared up some memory leaks again, possibly fixed the QIC miscounts
@@ -406,7 +409,8 @@ extern int message_type;
 #define PRF_OOC         44
 #define PRF_PAGEWRAP    45
 #define PRF_REPLYLOCK   46
-#define PRF_BUSY		47	/* Player is busy                             */
+#define PRF_BUSY	47	/* Player is busy                             */
+#define PRF_AGGRO	48	/* Player is aggro                            */
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */

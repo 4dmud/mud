@@ -294,7 +294,8 @@
 #define PRF_NOIC	31 /* Player can't use this channel		*/
 #define PRF_BATTLESPAM  32 /* Player will not see battlespam            */
 #define PRF_MAIL        33 /* Player will not see mail message in prompt*/
-#define PRF_BUSY		47 /* Player is busy				*/
+#define PRF_BUSY	47 /* Player is busy				*/
+#define PRF_AGGRO	48 /* Player is aggro				*/
 
 /* Affect bits: used in char_data.char_specials.saved.affected_by */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */

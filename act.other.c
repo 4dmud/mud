@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
- * Revision 1.1  2004/11/12 02:16:45  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/17 14:19:46  w4dimenscor
+ * added Aggro mode to attack everything in sight and 'kill all' command
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:45  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.39  2004/09/18 04:42:45  molly
  * cleared up some memory leaks again, possibly fixed the QIC miscounts
@@ -1184,7 +1187,9 @@ ACMD(do_gen_tog)
       {"You unlock your replyer.\r\n",
        "You unlock your replier.\r\n"},
       {"BUSY flag is now off.\r\n",
-       "BUSY flag is now on.\r\n"}
+       "BUSY flag is now on.\r\n"},
+      {"Aggro mode disabled.\r\n",
+       "Aggro mode enabled.\r\n"}
 
 
 
@@ -1250,6 +1255,9 @@ ACMD(do_gen_tog)
       parse_afk(ch, argument);
     else
       parse_afk(ch, NULL);
+    break;
+  case SCMD_AGGRO:
+    result = PRF_TOG_CHK(ch, PRF_AGGRO);
     break;
   case SCMD_BUSY:
     result = PRF_TOG_CHK(ch, PRF_BUSY);

@@ -185,6 +185,7 @@ struct alias_data {
 #define SCMD_PAGEWRAP   41
 #define SCMD_REPLYLOCK  42
 #define SCMD_BUSY	43
+#define SCMD_AGGRO	44
 
 /* do_wizutil */
 #define SCMD_REROLL	0
