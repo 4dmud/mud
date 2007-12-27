@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/03/03 22:42:27 $
-*  $Revision: 1.14 $
+*  $Date: 2007/05/19 18:06:12 $
+*  $Revision: 1.15 $
 **************************************************************************/
 
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
@@ -83,7 +83,7 @@
 #define OTRIG_RANDOM           (1 << 1)	/* checked randomly           */
 #define OTRIG_COMMAND          (1 << 2)	/* character types a command  */
 #define OTRIG_SPEECH	      (1 << 3)	/* character speaks          */
-
+#define OTRIG_ENTER	       (1 << 4) /* object enters the room     */
 #define OTRIG_TIMER            (1 << 5)	/* item's timer expires       */
 #define OTRIG_GET              (1 << 6)	/* item is picked up          */
 #define OTRIG_DROP             (1 << 7)	/* character trys to drop obj */
@@ -304,6 +304,7 @@ int door_wtrigger(Character *actor, int subcmd, int dir);
 int consume_otrigger(obj_data *obj, Character *actor, int cmd);
 int put_in_otrigger(obj_data *cont, obj_data *obj, Character *actor);
 int get_out_otrigger(obj_data *cont, obj_data *obj, Character *actor);
+int enter_otrigger(obj_data *object, const char* direction);
 
 /* function prototypes from dg_scripts.c */
 void script_damage(Character *vict, int dam);

@@ -2399,9 +2399,14 @@ int perform_move_obj(struct obj_data *obj, int dir, Character *ch) {
         */
         if (ch && !(do_simple_move(ch, dir, 0)))
             return (0);
-
+	Room *previousroom = IN_ROOM(obj);
         if (!do_simple_obj_move(obj, dir, ch))
             return (0);
+
+	if (!enter_otrigger(obj, dirs[rev_dir[dir]])) {
+    	    obj_from_room(obj);
+    	    obj_to_room(obj, previousroom);
+        }
 
         return (1);
     }

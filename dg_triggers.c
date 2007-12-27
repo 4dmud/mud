@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2007/03/03 22:42:27 $
-*  $Revision: 1.14 $
+*  $Date: 2007/05/19 18:06:12 $
+*  $Revision: 1.15 $
 **************************************************************************/
 
 #include "conf.h"
@@ -1411,6 +1411,31 @@ int get_out_otrigger(obj_data *container, obj_data *obj, Character *actor)
 			       */
 			if (!obj)
 				return -1;
+			else
+				return ret_val;
+		}
+	}
+	return 1;
+}
+
+//for dg_dest on objects, and maybe for animated objects and object teleport in the future.
+int enter_otrigger(obj_data *object, const char* dir)
+{
+	trig_data *t;
+	int ret_val;
+	
+	if(!SCRIPT_CHECK(object, OTRIG_ENTER) || number(1, 100) > GET_TRIG_NARG(t))
+		return 1;
+
+	for (t = TRIGGERS(SCRIPT(object)); t; t = t->next)
+	{
+		if(TRIGGER_CHECK(t, OTRIG_ENTER)){
+                        add_var(&GET_TRIG_VARS(t), "direction", dir, 0);
+      			ret_val = script_driver(&object, t, OBJ_TRIGGER, TRIG_NEW);
+
+			// don't move back if the object purged.
+			if (!object)
+				return 1;
 			else
 				return ret_val;
 		}

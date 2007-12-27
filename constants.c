@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.24  2007/05/19 18:06:12  w4dimenscor
+ * Added an object trigger type that triggers when the object
+ * enters a room (currently only through dg_dest).
+ * --Thotter
+ *
  * Revision 1.23  2007/03/01 23:19:41  w4dimenscor
  * Added a new object trigger type for containers that checks wether something is being put into them. %object% refers to the object being put in. Also added %object.is_inobj% which returns the UID of the object it is in, or nothing if it isn't in a container. --Thotter
  *
@@ -2221,7 +2226,7 @@ const char *otrig_types[] =
     "Random",
     "Command",
     "Speech",
-    "UNUSED",
+    "ObjEnter",
     "Timer",
     "Get",
     "Drop",
