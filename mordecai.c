@@ -206,7 +206,7 @@ ACMD(do_convey) {
         return;
     }
 
-    if (isname("token", arg2) && (amount <= 5)) {
+    if (isname(arg2, "tokens") && (amount <= 5)) {
         if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
             ch->Send("You convey %lld brass tokens to %lld training sessions.\r\n",
                      amount, amount);
@@ -217,7 +217,7 @@ ACMD(do_convey) {
             ch->Send("You don't have that many brass tokens on account.\r\n");
             return;
         }
-    } else if (isname("token", arg2) && (amount == 5)) {
+    } else if (isname(arg2, "tokens") && (amount == 5)) {
         if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
             ch->Send("You convey 1 bronze token to %d training sessions.\r\n",5);
             GET_BRONZE_TOKEN_COUNT(ch) -= 1;
@@ -227,7 +227,7 @@ ACMD(do_convey) {
             ch->Send("You can only convey between 1 and 5, or exactly 10 at a time.\r\n");
             return;
         }
-    } else if (isname("sessions", arg2)) {
+    } else if (isname(arg2, "sessions")) {
         if ((amount % 20)) {
             ch->Send("The number must be devisable by 20.");
             return;
@@ -269,7 +269,7 @@ ACMD(do_convey) {
             ch->Send( "You cant afford to!\r\n");
         }
 
-    }  else if (isname("maxmove", arg2)) {
+    }  else if (isname(arg2, "maxmove")) {
         if (!(amount == 1)) {
             ch->Send("The amount must be 1.");
             return;
@@ -289,7 +289,7 @@ ACMD(do_convey) {
             ch->Send( "You cant afford to!\r\n");
         }
 
-    } else if (isname("award", arg2)) {
+    } else if (isname(arg2, "award")) {
 
 
         if (PLR_FLAGGED(ch, PLR_HERO)) {
@@ -319,7 +319,7 @@ ACMD(do_convey) {
         GET_AWARD(ch) -= amount;
         convert_tokens(ch);
 
-    } else if (isname("tradepoints", arg2)) {
+    } else if (isname(arg2, "tradepoints")) {
         if (amount < 1) {
             ch->Send( "You have to convey at least 1\r\n");
             return;
