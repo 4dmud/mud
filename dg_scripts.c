@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2004/11/23 06:12:20 $
-*  $Revision: 1.3 $
+*  $Date: 2004/11/26 23:02:45 $
+*  $Revision: 1.4 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.4  2004/11/26 23:02:45  w4dimenscor
+ * Added more notes into fight code, and more debugging checks, made combat reuse the event
+ *
  * Revision 1.3  2004/11/23 06:12:20  w4dimenscor
  * fixed some mem leaks in lightsabers, discovered function is_num is fucked, reverted it
  *
@@ -3615,7 +3618,7 @@ struct char_data *find_char_by_uid_in_lookup_table(long uid)
     if (DEAD(ch))
     {
       log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
-      return NULL;
+      //return NULL;
     }
     return ch;
   }

@@ -2227,6 +2227,10 @@ ASKILL(skill_tame)
     new_send_to_char(ch, "You are too exausted!");
     return 0;
   }
+  if ((GET_LEVEL(ch) +3) < GET_LEVEL(vict)) {
+  new_send_to_char(ch, "They are too powerful to tame, you must take your chances!\r\n");
+  return 0;
+  }
 
   af.type = SKILL_TAME;
   af.expire = HOURS_TO_EXPIRE((24));

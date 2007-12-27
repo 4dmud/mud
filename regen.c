@@ -128,6 +128,7 @@ http://www.imaxx.net/~thrytis
 #include "spells.h"
 #include "handler.h"
 #include "comm.h"
+#include "db.h"
 #include "dg_event.h"		/* For modern (pl8+) DG_SCRIPTS packages */
 
 
@@ -139,7 +140,6 @@ http://www.imaxx.net/~thrytis
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 
-extern struct char_data *find_char(long n);
 
 /* event object structure for point regen */
 struct regen_event_obj {
@@ -158,10 +158,28 @@ EVENTFUNC(points_event)
     type = regen->type;
 
 
-	if (ch != NULL && GET_POS(ch) >= POS_STUNNED && IN_ROOM(ch) != NULL) {
-	    /* no help for the dying */
-
-	    /*
+	if (ch != NULL && !DEAD(ch) && GET_POS(ch) >= POS_STUNNED && IN_ROOM(ch) != NULL) {
+	    /** no help for the dying */
+#if 1
+    {
+      int found = FALSE;
+      struct char_data *tch;
+      for (tch = character_list;tch&&!found;tch = tch->next)
+      {
+        /** Assume Unique **/
+        if (tch == ch)
+          found = TRUE;
+      }
+      if (!found)
+      {
+          if (event_obj) 
+    free(event_obj);
+        log("Character not found for regen!\r\n");
+        return 0;
+      }
+    }
+#endif
+	    /**
 	     * Increment type of points by one.
 	     * If not at max, reenqueue the event.
 	     */
@@ -175,7 +193,7 @@ EVENTFUNC(points_event)
 
 		if (GET_HIT(ch) < GET_MAX_HIT(ch)) {
 		    /* reenqueue the event */
-		    gain = (hit_gain(ch) * 0.333);
+		    gain = (hit_gain(ch));
 		    return IRANGE(1, (PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
@@ -185,7 +203,7 @@ EVENTFUNC(points_event)
 
 		if (GET_MANA(ch) < GET_MAX_MANA(ch)) {
 		    /* reenqueue the event */
-		    gain = (mana_gain(ch) * 0.333);
+		    gain = (mana_gain(ch));
 		    return IRANGE(1,(PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
@@ -195,7 +213,7 @@ EVENTFUNC(points_event)
 
 		if (GET_MOVE(ch) < GET_MAX_MOVE(ch)) {
 		    /* reenqueue the event */
-		    gain = (move_gain(ch) * 0.333);
+		    gain = (move_gain(ch));
 		    return IRANGE(1,(PULSES_PER_MUD_HOUR / (gain ? gain : 1)), PULSES_PER_MUD_HOUR);
 		}
 		break;
@@ -221,8 +239,8 @@ EVENTFUNC(points_event)
 	    }
 	}
     
-    /* kill this event */
-    if (ch != NULL) 
+    /** kill this event **/
+    if (ch) 
     GET_POINTS_EVENT(ch, type) = NULL;
     
     if (event_obj) 
