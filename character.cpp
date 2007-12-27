@@ -702,6 +702,7 @@ void Character::default_char() {
     mob_specials.join_list = NULL;
     mob_specials.head_join = NULL;
     mob_specials.dam_list = NULL;
+    player.description = NULL;
 
 }
 
