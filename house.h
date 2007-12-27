@@ -16,7 +16,7 @@ struct house_control_rec {
     int num_of_guests;		/* how many guests for house    */
     long guests[MAX_GUESTS];	/* idnums of house's guests     */
     time_t last_payment;	/* date of last house payment   */
-    long mount;
+    long stable;
     long size;
     long expantions;
     long spare3;

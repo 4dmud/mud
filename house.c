@@ -38,7 +38,7 @@ struct obj_data *Obj_from_store(struct obj_file_elem object,
 void House_listrent(Character *ch, room_vnum vnum);
 void count_items_in_list(struct obj_data *obj);
 int house_item_count(room_vnum vnum);
-void hcontrol_set_mount(Character *ch, char *arg);
+void hcontrol_set_stable(Character *ch, char *arg);
 void house_load_mount(Character *ch, int i);
 struct house_control_rec house_control[MAX_HOUSES];
 int num_of_houses = 0;
@@ -597,6 +597,7 @@ void House_boot(void)
 
   temp_house.expantions = (temp_house.expantions > 9000 || temp_house.expantions < 0) ? 0 : temp_house.expantions;
 
+
     house_control[num_of_houses++] = temp_house;
 
     SET_BIT_AR(ROOM_FLAGS(real_house), ROOM_HOUSE);
@@ -632,7 +633,7 @@ const char *HCONTROL_FORMAT =
   "       hcontrol save\r\n"
   "       hcontrol listrent <house vnum>\r\n"
   "       hcontrol calc <house vnum>\r\n"
- // "       hcontrol mount <house vnum> <mob vnum>\r\n"
+  "       hcontrol stable <house vnum>\r\n"
   "       hcontrol expand <house vnum> <number of gold tokens paid>\r\n";
 //"       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
 
@@ -647,7 +648,8 @@ void hcontrol_list_houses(Character *ch)
     send_to_char("No houses have been defined.\r\n", ch);
     return;
   }
-*ch << "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items\r\n-------  ------  ----------  ------  ------------ ------------ -----\r\n";
+*ch << "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items Stable\r\n";
+*ch << "-------  ------  ----------  ------  ------------ ------------ ----- ------\r\n";
 
   for (i = 0; i < num_of_houses; i++)
   {
@@ -676,10 +678,10 @@ void hcontrol_list_houses(Character *ch)
     /* Now we need a copy of the owner's name to capitalize. -gg 6/21/98 */
     strcpy(own_name, temp);
 
-    ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d\r\n",
+    ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-6s\r\n",
                      house_control[i].vnum, house_control[i].atrium, built_on,
                      house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 125),
-                     house_item_count(house_control[i].vnum)/*, house_control[i].mount*/);
+                     house_item_count(house_control[i].vnum), house_control[i].stable == 0 ? "No" : "Yes");
 
     House_list_guests(ch, i, TRUE);
   }
@@ -770,7 +772,7 @@ void hcontrol_build_house(Character *ch, char *arg)
   temp_house.last_payment = 0;
   temp_house.owner = owner;
   temp_house.num_of_guests = 0;
-  temp_house.mount = 0;
+  temp_house.stable = 0;
   temp_house.expantions = 0;
 
   house_control[num_of_houses++] = temp_house;
@@ -893,8 +895,8 @@ ACMD(do_hcontrol)
     hcontrol_destroy_house(ch, arg2);
   else if (is_abbrev(arg1, "pay"))
     hcontrol_pay_house(ch, arg2);
-  else if (is_abbrev(arg1, "mount"))
-    hcontrol_set_mount(ch, arg2);
+  else if (is_abbrev(arg1, "stable"))
+    hcontrol_set_stable(ch, arg2);
   else if (is_abbrev(arg1, "show"))
     hcontrol_list_houses(ch);
   else if (is_abbrev(arg1, "expand"))
@@ -1076,9 +1078,8 @@ ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", a
 int house_capacity(int house) {
   return 500 + (125 * house_control[house].expantions);
 }
-void hcontrol_set_mount(Character *ch, char *argument)
+void hcontrol_set_stable(Character *ch, char *argument)
 {
-  mob_vnum mount = NOBODY;
   room_vnum house = NOWHERE;
   int i = 0;
   int remove = FALSE;
@@ -1086,43 +1087,36 @@ void hcontrol_set_mount(Character *ch, char *argument)
 
   if (!argument || !*argument)
   {
-    ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
-                     "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
+    ch->Send( "To add a stable: \r\nhcontrol stable <house vnum> add\r\n"
+                     "To remove the stable:\r\nhcontrol mount <house vnum> remove\r\n");
     return;
   }
   argument = two_arguments(argument, arg1, arg2);
 
   if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
   {
-    ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
-                     "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
+    ch->Send( "To add a stable: \r\nhcontrol stable <house vnum> add\r\n"
+                     "To remove the stable:\r\nhcontrol stable <house vnum> remove\r\n");
     return;
   }
 
 
-  if (!is_number(arg2))
-  {
-    if (!strcmp(arg2, "none"))
+
+    if (!strcmp(arg2, "remove"))
     {
       remove = TRUE;
     }
-    else
+    else if (!strcmp(arg2, "add"))
     {
-      ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
-                       "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
+      remove = FALSE;
+    } else {
+    ch->Send( "To add a stable: \r\nhcontrol stable <house vnum> add\r\n"
+                     "To remove the stable:\r\nhcontrol stable <house vnum> remove\r\n");
       return;
     }
-  }
-
+    
   house = atoi(arg1);
-  if (!remove)
-    mount = atoi(arg2);
 
-  if (house <= 0 || (!remove && mount <= 0))
-  {
-    ch->Send( "Positive numbers please.\r\n");
-    return;
-  }
 
   if ((i = find_house(house)) == NOWHERE)
   {
@@ -1130,23 +1124,17 @@ void hcontrol_set_mount(Character *ch, char *argument)
     return;
   }
 
-  if (!remove && real_mobile(mount) == NOBODY)
-  {
-    ch->Send( "That mount doesn't exist...yet :)\r\n");
-    return;
-  }
-
   if (remove)
   {
-    house_control[i].mount = 0l;
+    house_control[i].stable = FALSE;
 
-    ch->Send( "Mount has been removerized.\r\n");
+    ch->Send( "Stable has been removerized.\r\n");
     return;
   }
   else
   {
-    house_control[i].mount = (long)mount;
-    ch->Send( "Mount %d added to house %d (owner: %s)\r\n", mount, house, get_name_by_id(house_control[i].owner));
+    house_control[i].stable = TRUE;
+    ch->Send( "Stable added to house %d (owner: %s)\r\n", house, get_name_by_id(house_control[i].owner));
   }
 
   House_save_control();
@@ -1163,6 +1151,10 @@ void house_load_mount(Character *ch, int i)
   {
     ch->Send( "You haven't brought a mount.\r\n");
     return;
+  }
+  if (house_control[i].stable == 0) {
+*ch << "This house doesn't have a stable.\r\n";
+return;
   }
 
   for (f = ch->followers; f; f = f_next)
