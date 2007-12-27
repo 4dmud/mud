@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.70  2007/06/12 04:46:21  w4dimenscor
+ * Evasion was converting to 0 for mobs still. Bad Math
+ *
  * Revision 1.69  2007/06/11 09:20:28  w4dimenscor
  * fixed evasion rating
  *
@@ -1482,9 +1485,6 @@ int evasion_tot(Character *vict) {
 
     if (AFF_FLAGGED(vict, AFF_CURSE))
         evasion_roll -= (evasion_roll / 4);
-
-    if (IS_NPC(vict))
-    evasion_roll = (int)(((100.0f-valid_perc(vict))/100.0f) * evasion_roll);
 
     evasion_roll = (evasion_roll <= 0 ? 1 : evasion_roll);
 
