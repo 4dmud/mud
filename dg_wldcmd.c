@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/04/06 07:16:28 $
-*  $Revision: 1.6 $
+*  $Date: 2006/04/09 05:15:44 $
+*  $Revision: 1.7 $
 **************************************************************************/
 
 #include "conf.h"
@@ -29,7 +29,9 @@ zone_rnum real_zone_by_thing(room_vnum vznum);
 bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
-    void (name)(room_data *room, char *argument, int cmd, int subcmd)
+void (name)(room_data *room, char *argument, int cmd, int subcmd)
+
+int followers_to_master(struct char_data *ch, room_rnum was_in);
 void wld_log(room_data *room, const char *format, ...);
 void act_to_room(char *str, room_data *room);
 WCMD(do_wasound);
@@ -418,12 +420,12 @@ WCMD(do_wdoor)
 WCMD(do_wteleport)
 {
   char_data *ch, *next_ch;
-  room_rnum target;
+  room_rnum target, was_in;
   room_vnum nr;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
-  two_arguments(argument, arg1, arg2);
-
+  argument = two_arguments(argument, arg1, arg2);
+  skip_spaces(&argument);
   if (!*arg1 || !*arg2)
   {
     wld_log(room, "wteleport called with too few args");
@@ -461,9 +463,12 @@ WCMD(do_wteleport)
     {
       if (valid_dg_target(ch, TRUE))
       {
+        was_in = IN_ROOM(ch);
         char_from_room(ch);
         char_to_room(ch, target);
         enter_wtrigger(IN_ROOM(ch), ch, -1);
+        if (isname(argument, "followers"))
+          followers_to_master(ch, was_in);
       }
     }
     else

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/04/06 07:16:28 $
-*  $Revision: 1.6 $
+*  $Date: 2006/04/09 05:15:44 $
+*  $Revision: 1.7 $
 **************************************************************************/
 
 #include "conf.h"
@@ -31,6 +31,7 @@ zone_rnum real_zone_by_thing(room_vnum vznum);
 #define OCMD(name)  \
    void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
 
+int followers_to_master(struct char_data *ch, room_rnum was_in);
 void obj_log(obj_data *obj, const char *format, ...);
 room_rnum find_obj_target_room(obj_data *obj, char *rawroomstr);
 OCMD(do_oecho);
@@ -463,10 +464,11 @@ OCMD(do_opurge)
 OCMD(do_oteleport)
 {
     struct char_data *ch = NULL, *next_ch;
-    room_rnum target, rm;
+  room_rnum target, rm, was_in;
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
-    two_arguments(argument, arg1, arg2);
+    argument = two_arguments(argument, arg1, arg2);
+  skip_spaces(&argument);
 
     if (!*arg1 || !*arg2) {
 	obj_log(obj, "oteleport called with too few args");
@@ -500,6 +502,7 @@ OCMD(do_oteleport)
     }
 
     else {
+      was_in = IN_ROOM(ch);
 	if ((ch = get_char_by_obj(obj, arg1))) {
 	    if (valid_dg_target(ch, TRUE)) {
 		if (ROOM_FLAGGED(ch->in_room, ROOM_NORECALL)) {
@@ -511,6 +514,8 @@ OCMD(do_oteleport)
 		char_from_room(ch);
 		char_to_room(ch, target);
 		enter_wtrigger(IN_ROOM(ch), ch, -1);
+         if (isname(argument, "followers"))
+           followers_to_master(ch, was_in);
 	    }
 	}
 

@@ -27,6 +27,11 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.12  2006/04/09 05:15:44  w4dimenscor
+ *
+ * added the ability to script teleports to move followers:
+ * %teleport% %actor% 1234 followers
+ *
  * Revision 1.11  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -93,7 +98,7 @@ void stop_fusion(CHAR_DATA *ch);
 room_data *get_room(char *name);
 void die_link(CHAR_DATA *mob);
 extern struct hunter_data *hunter_list;
-
+int followers_to_master(struct char_data *ch, room_rnum was_in);
 /*
  * Local functions.
  */
@@ -1071,8 +1076,9 @@ ACMD(do_mat)
 ACMD(do_mteleport)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  room_rnum target;
+  room_rnum target, was_in;
   char_data *vict, *next_ch;
+  
 
   if (!MOB_OR_IMPL(ch))
   {
@@ -1084,6 +1090,7 @@ ACMD(do_mteleport)
     return;
 
   argument = two_arguments(argument, arg1, arg2);
+  skip_spaces(&argument);
 
   if (!*arg1 || !*arg2)
   {
@@ -1138,11 +1145,14 @@ ACMD(do_mteleport)
       return;
     }
 
-    if (valid_dg_target(ch, TRUE))
+    if (valid_dg_target(vict, TRUE))
     {
+      was_in = IN_ROOM(vict);
       char_from_room(vict);
       char_to_room(vict, target);
-      enter_wtrigger(IN_ROOM(ch), ch, -1);
+      enter_wtrigger(IN_ROOM(vict), vict, -1);
+      if (isname(argument, "followers"))
+        followers_to_master(vict, was_in);
     }
   }
 }
