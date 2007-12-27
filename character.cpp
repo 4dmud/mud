@@ -699,6 +699,9 @@ void Character::default_char() {
     GET_LOGINMSG(this) = NULL;
     TRADEPOINTS(this) = 0;
     GET_CSNP_LVL(this)=-2;
+    mob_specials.join_list = NULL;
+    mob_specials.head_join = NULL;
+    mob_specials.dam_list = NULL;
 
 }
 
