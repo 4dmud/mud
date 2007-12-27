@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.19  2006/08/25 10:22:44  w4dimenscor
+ * added command to fix peoples skills back to the practiced amount they were at
+ *
  * Revision 1.18  2006/08/21 09:51:53  w4dimenscor
  * Fixed bug with zedit that caused a crash
  *
@@ -413,7 +416,7 @@ void list_skills(Character *ch, int skillspell) {
 
     imm = -1;
 
-    if (!GET_PRACTICES(ch))
+    if (GET_PRACTICES(ch) <= 0)
         strcpy(buf, "You have no practice sessions remaining.\r\n");
     else
         sprintf(buf, "You have %d practice session%s remaining.\r\n",

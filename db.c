@@ -5010,6 +5010,12 @@ int store_to_char(const char *name, Character *ch) {
             affect_to_char(ch, &tmp_aff[i]);
     }
 
+if (!TEMP_LOAD_CHAR && IS_SET(player_table[id].flags, PINDEX_FIXSKILLS)) {
+    fixskills(ch);
+    REMOVE_BIT(player_table[id].flags, PINDEX_FIXSKILLS);
+    save_player_index();
+    }
+
     if (GET_LEVEL(ch) >= LVL_IMMORT) {
         for (i = 1; i <= MAX_SKILLS; i++)
             set_skill(ch, i, 100);
@@ -5212,13 +5218,14 @@ void char_to_store(Character *ch) {
     fprintf(fl, "Thr4: %d\n", GET_SAVE(ch, 3));
     fprintf(fl, "Thr5: %d\n", GET_SAVE(ch, 4));
     if (GET_LEVEL(ch) < LVL_IMMORT) {
+    if ( SAVED(ch).CountSkills() > 0) {
         fprintf(fl, "Skil:\n");
-        for (skills_map::iterator it = SAVED(ch).SkillsBegin();
-                it != SAVED(ch).SkillsEnd();it++) {
+        for (skills_map::iterator it = SAVED(ch).SkillsBegin(); it != SAVED(ch).SkillsEnd();it++) {
             if (knows_spell(ch, (it->second)->skill) && (it->second)->learn > 0)
                 fprintf(fl, "%d %d %d 0\n", (it->second)->skill, (it->second)->learn, (it->second)->wait);
         }
         fprintf(fl, "0 0 0 0\n");
+        }
         fprintf(fl, "Subs:\n");
         for (subs_map::iterator it = SAVED(ch).SubsBegin();
                 it != SAVED(ch).SubsEnd(); it++) {

@@ -3456,12 +3456,6 @@ ACMD(do_ipstat) {
         ch->Send( "Um... yeah your host is crap all.\r\n");
         return;
     }
-
-//ch->Send("You have %d skills and %d subskills", SAVED(ch).CountSkills(), SAVED(ch).CountSubs());
-//ch->Send("Adding skill backstab - %d - %d", SAVED(ch).HasSkill(SKILL_BACKSTAB), SAVED(ch).SetSkillLearn(SKILL_BACKSTAB, 50));
-
-
-
     if (ch->desc->host && *ch->desc->host)
         ch->Send( "{cGYour ip is [%s]\r\n{c0", ch->desc->host);
     else

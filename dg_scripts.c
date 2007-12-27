@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/23 09:01:26 $
-*  $Revision: 1.32 $
+*  $Date: 2006/08/25 10:22:43 $
+*  $Revision: 1.33 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.33  2006/08/25 10:22:43  w4dimenscor
+ * added command to fix peoples skills back to the practiced amount they were at
+ *
  * Revision 1.32  2006/08/23 09:01:26  w4dimenscor
  * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
  *
@@ -3584,10 +3587,9 @@ ch_map::iterator ch = ch_lookup_table.find(uid);
     if (ch != ch_lookup_table.end()) {
     if (ch->second == NULL)
     return NULL;
-        if (DEAD((ch->second))) {
+        if (DEAD((ch->second))) 
             log("find_char_by_uid_in_lookup_table : character is flagged to be extracted");
-            //return NULL;
-        }
+        
 
         return (ch->second);
     }

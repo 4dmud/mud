@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.30  2006/08/25 10:22:44  w4dimenscor
+ * added command to fix peoples skills back to the practiced amount they were at
+ *
  * Revision 1.29  2006/08/23 11:37:33  w4dimenscor
  * Adjustments to the SkillsSpells Functions in char specials
  *
@@ -177,6 +180,9 @@ void mag_assign_spells(void);
 void default_message(void);
 int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum);
 int sp_dist = -1;
+
+    int tier_level(Character *ch, int chclass);
+    int has_class(Character *ch, int chclass);
 /*
  * This arrangement is pretty stupid, but the number of skills is limited by
  * the playerfile.  We can arbitrarily increase the number of skills by
@@ -1230,10 +1236,6 @@ int grand_master(Character *ch) {
 
 /* This works for skills too -- Mord */
 int knows_spell(Character *ch, int spell) {
-
-    int tier_level(Character *ch, int chclass);
-    int has_class(Character *ch, int chclass);
-
     int i, gm, t;
     int ret_val = 0;
     if (IS_NPC(ch)) {
@@ -1246,6 +1248,8 @@ int knows_spell(Character *ch, int spell) {
 
     if (GET_LEVEL(ch) >= LVL_IMMORT)
         return 1;
+        if (spell < 0 && spell < TOP_SPELL_DEFINE)
+        return 0;
     if (spell_info[spell].min_level >= LVL_IMMORT)
         return 0;
 
@@ -1411,7 +1415,7 @@ void mag_assign_spells(void) {
 
     /* Do not change the loop below */
     for (i = 0; i <= TOP_SPELL_DEFINE; i++)
-        unused_spell(i);
+        spell_info[i] = spell_info_type();
     /* Do not change the loop above */
 
     spello(SPELL_VITALIZE, "vitalize", 60 , 30 , 2,

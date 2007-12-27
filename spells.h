@@ -11,6 +11,9 @@
  */
 /*
 * $Log: spells.h,v $
+* Revision 1.13  2006/08/25 10:22:44  w4dimenscor
+* added command to fix peoples skills back to the practiced amount they were at
+*
 * Revision 1.12  2006/08/18 11:09:59  w4dimenscor
 * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
 *
@@ -486,6 +489,27 @@ struct spell_info_type {
     int tier;
     int wait;
     int classes;
+
+    spell_info_type() {
+    min_position = 0;		/* Position for caster   */
+    mana_min = 0;		/* Min amount of mana used by a spell
+      				 * (highest lev) */
+    mana_max = 0;		/* Max amount of mana used by a spell
+      				 * (lowest lev) */
+    mana_change = 0;		/* Change in mana used by spell from
+      				 * lev to lev */
+
+    min_level = 0;
+    routines = 0;
+    violent = 0;
+    targets = 0;		/* See below for use with TAR_XXX  */
+    name = "!UNUSED!";
+    first_prereq = TYPE_UNDEFINED;
+    second_prereq = TYPE_UNDEFINED;
+    tier = 0;
+    wait = 0;
+    classes = 0;
+    }
 
 };
 

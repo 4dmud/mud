@@ -144,6 +144,7 @@
 #define PINDEX_DELETED		(1 << 0)
 #define PINDEX_NODELETE		(1 << 1)
 #define PINDEX_SELFDELETE	(1 << 2)
+#define PINDEX_FIXSKILLS		(1 << 3)
 
 #define NOTE_NOTE 	0
 #define NOTE_IDEA 	1
@@ -218,7 +219,7 @@ struct obj_data *read_object(obj_vnum nr, int type);
 int vnum_object(char *searchname, Character *ch);
 int my_obj_save_to_disk(FILE * fp, struct obj_data *obj, int locate);
 bool str_prefix( const char *astr, const char *bstr );
-
+void fixskills(Character *ch);
 /*
  * Read a letter from a file.
  */
