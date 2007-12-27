@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.49  2006/09/14 08:05:42  w4dimenscor
+ * added convey tradepoints, and fixed iceshield
+ *
  * Revision 1.48  2006/08/31 10:39:16  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -2611,7 +2614,7 @@ int shield_check(Character *ch, Character *vict, int type, int w_type) {
         return 0;
 
     if (HERE(ch, vict) && is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD)) {
-        if (!number(0, 5) && !AFF_FLAGGED(vict, AFF_FROZEN)) {
+        if (!number(0, 5) && !AFF_FLAGGED(ch, AFF_FROZEN)) {
             //SET_BIT_AR(AFF_FLAGS(vict), AFF_FROZEN);
             act("You freeze as you touch $N's shield of ice.", FALSE, ch, 0 , vict, TO_CHAR);
             act("$N is frozen as $E touches $N's shield of ice.", FALSE, ch, 0, vict, TO_NOTVICT);

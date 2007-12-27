@@ -67,6 +67,7 @@ O======================================================================O
 #include "oasis.h"
 #include "dg_scripts.h"
 #include "spells.h"
+#include "genmob.h"
 
 
 /* external functions */
@@ -178,7 +179,6 @@ ACMD(do_convey)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    char buffer[MAX_STRING_LENGTH];
     gold_int amount = 0;
 
     if (IS_NPC(ch)) {
@@ -187,8 +187,7 @@ ACMD(do_convey)
     }
 
     if (GET_REMORT(ch) == -1) {
-	send_to_char("This command works for remorted players only.\r\n",
-		     ch);
+	ch->Send("This command works for remorted players only.\r\n");
 	return;
     }
 
@@ -196,90 +195,73 @@ ACMD(do_convey)
 
 
     if (!*arg1 || !*arg2) {
-	send_to_char("Usage: convey <token|sessions|gold|maxmove|award> <amount>.\r\n", ch);
-	send_to_char("see HELP CONVEY for more info.\r\n"
-	"CONVEY gold <amount>, turns gold coins into exp points at 10 to 1 ratio\r\n"
-	"CONVEY maxmove 1, turns (num of times used x ) 10 mill into 100 maxmove\r\n", ch);
+	ch->Send("Usage: convey <token|sessions|gold|maxmove|award|tradepoints> <amount>.\r\n");
+	ch->Send("see HELP CONVEY for more info.\r\n"
+	"CONVEY gold <amount>, turns gold coins into exp points at 4 to 1 ratio\r\n"
+	"CONVEY maxmove 1, turns (num of times used x ) 10 mill into 100 maxmove\r\n");
 	return;
     }
     amount = atoll(arg1);
 
     if (amount <= 0) {
-	send_to_char
-	    ("Your attempt at cheating has been logged.  The Imms will be notified.\r\n",
-	     ch);
+	*ch << "Your usage is wrong.\r\n";
 	return;
     }
 
     if (isname("token", arg2) && (amount <= 5)) {
 	if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
-	    sprintf(buffer,
-		    "You convey %lld brass tokens to %lld training sessions.\r\n",
+	    ch->Send("You convey %lld brass tokens to %lld training sessions.\r\n",
 		    amount, amount);
-	    send_to_char(buffer, ch);
 	    GET_BRASS_TOKEN_COUNT(ch) -= amount;
 	    GET_PRACTICES(ch) += amount;
 	    return;
 	} else {
-	    send_to_char
-		("You don't have that many brass tokens on account.\r\n",
-		 ch);
+	    ch->Send("You don't have that many brass tokens on account.\r\n");
 	    return;
 	}
     } else if (isname("token", arg2) && (amount == 5)) {
 	if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
-	    sprintf(buffer,
-		    "You convey 1 bronze token to %d training sessions.\r\n",
-		    5);
-	    send_to_char(buffer, ch);
+	    ch->Send("You convey 1 bronze token to %d training sessions.\r\n",5);
 	    GET_BRONZE_TOKEN_COUNT(ch) -= 1;
 	    GET_PRACTICES(ch) += 5;
 	    return;
 	} else {
-	    send_to_char
-		("You can only convey between 1 and 5, or exactly 10 at a time.\r\n",
-		 ch);
+	    ch->Send("You can only convey between 1 and 5, or exactly 10 at a time.\r\n");
 	    return;
 	}
     } else if (isname("sessions", arg2)) {
 	if ((amount % 20)) {
-	    send_to_char("The number must be devisable by 20.", ch);
+	    ch->Send("The number must be devisable by 20.");
 	    return;
 	}
-	if (!(amount >= 20)) {
-	    send_to_char("The amount must be greater then 20.", ch);
+	if (amount < 20) {
+	    ch->Send("The amount must be greater then 20.");
 	    return;
 	}
 	if (!(amount <= 200)) {
-	    send_to_char("The amount must be less then or equal to 200.",
-			 ch);
+	    ch->Send("The amount must be less then or equal to 200.");
 	    return;
 	}
 	if (GET_PRACTICES(ch) >= amount) {
-	    sprintf(buffer,
-		    "You convey %lld practice sessions to %lld brass tokens.\r\n",
+	    ch->Send("You convey %lld practice sessions to %lld brass tokens.\r\n",
 		    amount, amount / 20);
-	    send_to_char(buffer, ch);
 	    GET_BRASS_TOKEN_COUNT(ch) += amount / 20;
 	    GET_PRACTICES(ch) -= amount;
 	    convert_tokens(ch);
 
 	    return;
 	} else {
-	    send_to_char("You don't have that many tokens on account.\r\n",
-			 ch);
+	    ch->Send("You don't have that many sessions.\r\n");
 	    return;
 	}
     } else if (isname("gold", arg2)) {
-    
-
 	if (!(amount >= 4)) {
-	    send_to_char("The amount must be greater then 4.", ch);
+	    ch->Send("The amount must be greater then 4.");
 	    return;
 	}
 
 	if (ch->Gold( 0, GOLD_ALL) >= amount) {
-	log("INFO: %s conveyed %lld gold into %lld exp", GET_NAME(ch), amount, amount/4);
+	    log("INFO: %s conveyed %lld gold into %lld exp", GET_NAME(ch), amount, amount/4);
 	    ch->Send("You convey %lld gold to %lld exp points.\r\n", amount, amount / 4);
 	    gain_exp(ch, amount / 4);
 	    ch->Gold( -amount, GOLD_ALL);
@@ -290,18 +272,14 @@ ACMD(do_convey)
 	    }
     
     }  else if (isname("maxmove", arg2)) {
-    
-
 	if (!(amount == 1)) {
-	    send_to_char("The amount must be 1.", ch);
+	    ch->Send("The amount must be 1.");
 	    return;
 	}
 	
-
 	if (ch->Gold( 0, GOLD_ALL) >= (amount*10000000)* GET_CONVERSIONS(ch)) {
 	log("INFO: %s conveyed %lld gold into %d maxmove", GET_NAME(ch), (gold_int) ((amount * 10000000) * GET_CONVERSIONS(ch)), (int)amount * 100);
-	    ch->Send(
-		    "You convey %lld gold to %d maxmove.\r\n",
+	    ch->Send("You convey %lld gold to %d maxmove.\r\n",
 		    (gold_int)((amount * 10000000)* GET_CONVERSIONS(ch)), (int)amount * 100);
 	    GET_MAX_MOVE(ch) += (amount * 100);
 	    ch->Gold( (-amount* 10000000)* GET_CONVERSIONS(ch), GOLD_ALL);
@@ -322,7 +300,7 @@ ACMD(do_convey)
     }
     
 	if ((amount % 10)) {
-	    send_to_char("The amount must be a multiple of 10.", ch);
+	    ch->Send("The amount must be a multiple of 10.");
 	    return;
 	}
 	
@@ -343,9 +321,22 @@ ACMD(do_convey)
 	    GET_AWARD(ch) -= amount;
 	    convert_tokens(ch);
 	    
+    } else if (isname("tradepoints", arg2)) {
+if (amount < 1) {
+	ch->Send( "You have to convey at least 1\r\n");
+	return;
+	}
+	
+	if (amount > TRADEPOINTS(ch)) {
+	ch->Send( "You can't afford that action.\r\n");
+	return;
+	}
+	ch->Send("You convey tradepoints for exp \r\nat the rate of 1 tradepoint per level 30 mob's exp equivilent.\r\n");
+	gain_exp(ch, amount * mob_stats[30].exp);
+	TRADEPOINTS(ch) -= amount;
     
     } else {
-	send_to_char("You can only convey tokens, gold, maxmove, award points, or sessions.\r\n", ch);
+	ch->Send("You can only convey tokens, gold, maxmove, award points, trade points or sessions.\r\n");
 	return;
     }
     return;
