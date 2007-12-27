@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.30  2006/03/13 19:07:40  w4dimenscor
+ * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ *
  * Revision 1.29  2006/03/06 09:38:28  w4dimenscor
  * Changed it so that you can clan expel people who are offline and in another room
  *
@@ -456,58 +459,59 @@ extern int message_type;
 /* Preference flags: used by char_data.player_specials.pref 		*/
 #define PRF_BRIEF       0	/* Room descs won't normally be shown        */
 #define PRF_COMPACT     1	/* No extra CRLF pair before prompts         */
-#define PRF_DEAF	2	/* Can't hear shouts                         */
-#define PRF_NOTELL	3	/* Can't receive tells                       */
-#define PRF_DISPHP	4	/* Display hit points in prompt              */
-#define PRF_DISPMANA	5	/* Display mana points in prompt             */
-#define PRF_DISPMOVE	6	/* Display move points in prompt             */
-#define PRF_AUTOEXIT	7	/* Display exits in a room                   */
-#define PRF_NOHASSLE	8	/* Aggr mobs won't attack                    */
-#define PRF_QUEST	9	/* On quest                                  */
-#define PRF_SUMMONABLE	10	/* Can be summoned                           */
-#define PRF_NOREPEAT	11	/* No repetition of comm commands            */
-#define PRF_HOLYLIGHT	12	/* Can see in dark                           */
-#define PRF_COLOR_1	13	/* Color (low bit)                           */
-#define PRF_COLOR_2	14	/* Color (high bit)                          */
-#define PRF_NOWIZ	15	/* Can't hear wizline                        */
-#define PRF_LOG1	16	/* On-line System Log (low bit)              */
-#define PRF_LOG2	17	/* On-line System Log (high bit)             */
-#define PRF_NOAUCT	18	/* Can't hear auction channel                */
-#define PRF_NOGOSS	19	/* Can't hear gossip channel                 */
-#define PRF_NOGRATZ	20	/* Can't hear grats channel                  */
-#define PRF_ROOMFLAGS	21	/* Can see room flags (ROOM_x)               */
+#define PRF_DEAF	    2	/* Can't hear shouts                         */
+#define PRF_NOTELL	    3	/* Can't receive tells                       */
+#define PRF_DISPHP	    4	/* Display hit points in prompt              */
+#define PRF_DISPMANA    5	/* Display mana points in prompt             */
+#define PRF_DISPMOVE    6	/* Display move points in prompt             */
+#define PRF_AUTOEXIT    7	/* Display exits in a room                   */
+#define PRF_NOHASSLE    8	/* Aggr mobs won't attack                    */
+#define PRF_QUEST	    9	/* On quest                                  */
+#define PRF_SUMMONABLE  10	/* Can be summoned                           */
+#define PRF_NOREPEAT    11	/* No repetition of comm commands            */
+#define PRF_HOLYLIGHT   12	/* Can see in dark                           */
+#define PRF_COLOR_1	    13	/* Color (low bit)                           */
+#define PRF_COLOR_2	    14	/* Color (high bit)                          */
+#define PRF_NOWIZ	    15	/* Can't hear wizline                        */
+#define PRF_LOG1	    16	/* On-line System Log (low bit)              */
+#define PRF_LOG2	    17	/* On-line System Log (high bit)             */
+#define PRF_NOAUCT	    18	/* Can't hear auction channel                */
+#define PRF_NOGOSS	    19	/* Can't hear gossip channel                 */
+#define PRF_NOGRATZ	    20	/* Can't hear grats channel                  */
+#define PRF_ROOMFLAGS   21	/* Can see room flags (ROOM_x)               */
 #define PRF_AUTOASSIST  22	/* Autoassists in a fight                    */
-#define PRF_AFK		23	/* Player is afk                             */
-#define PRF_AUTOSPLIT	24	/* Player autosplits                         */
-#define PRF_AUTOLOOT	25	/* Player autloots                           */
-#define PRF_AUTOGOLD	26	/* Player gets gold automatically            */
-#define PRF_ARENA	27	/* can see arena messages                    */
-#define PRF_NONEWBIE	28	/* Can't hear the newbie channel             */
-#define PRF_KEEPTITLE	29	/* Player keeps title upon levelling         */
-#define PRF_NOIC	30	/* Player can't use this channel             */
+#define PRF_AFK	    23	/* Player is afk                             */
+#define PRF_AUTOSPLIT   24	/* Player autosplits                         */
+#define PRF_AUTOLOOT    25	/* Player autloots                           */
+#define PRF_AUTOGOLD    26	/* Player gets gold automatically            */
+#define PRF_ARENA	    27	/* can see arena messages                    */
+#define PRF_NONEWBIE    28	/* Can't hear the newbie channel             */
+#define PRF_KEEPTITLE   29	/* Player keeps title upon levelling         */
+#define PRF_NOIC	    30	/* Player can't use this channel             */
 #define PRF_BATTLESPAM  31	/* Player will not see battlespam            */
 #define PRF_MAIL        32	/* Player will not see mail message in prompt */
 #define PRF_NOCTALK     33
 #define PRF_AFKTELL     34      /* player gets a message that someone sent a tell while afk*/
 #define PRF_MOVEMSG     35      /* toggle to turn on seeing movement messages */
 #define PRF_MOUNTABLE   36
-#define PRF_NOHERO	37
-#define PRF_TIME	38
+#define PRF_NOHERO	    37
+#define PRF_TIME	    38
 #define PRF_AUTOSAC     39
-#define PRF_DISPAUTO	40 /* Show prompt HP, MP, MV when < 25%.	*/
+#define PRF_DISPAUTO    40 /* Show prompt HP, MP, MV when < 25%.	*/
 #define PRF_CLS         41 /* Clear screen in OLC                */
 #define PRF_BUILDWALK   42 /* Build new rooms while walking ?    */
 #define PRF_NOCOMPRESS  43 /* If you want to force MCCP2 off		*/
 #define PRF_OOC         44
 #define PRF_PAGEWRAP    45
 #define PRF_REPLYLOCK   46
-#define PRF_BUSY	47	/* Player is busy                             */
-#define PRF_AGGRO	48	/* Player is aggro                            */
+#define PRF_BUSY	    47	/* Player is busy                             */
+#define PRF_AGGRO	    48	/* Player is aggro                            */
 #define PRF_NOBRAG      49
-#define PRF_GATEABLE 	50
-#define PRF_RP	 	51	/* Player is roleplaying */
+#define PRF_GATEABLE    50
+#define PRF_RP	 	    51	/* Player is roleplaying */
 #define PRF_FISHPROMPT  52
 #define PRF_TELEPORTABLE  53
+#define PRF_AUTOGROUP   54
 
 
 /* Descriptor flags */

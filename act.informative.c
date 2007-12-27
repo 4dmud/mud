@@ -174,6 +174,7 @@ char * secondary_class(struct char_data *ch, char * blank);
 char * tertary_class(struct char_data *ch, char * blank);
 char * quatry_class(struct char_data *ch, char * blank);
 void list_damage(CHAR_DATA *ch);
+int even_group(struct char_data *ch);
 /* local globals */
 int *cmd_sort_info;
 bool examine_on = FALSE;
@@ -1517,7 +1518,8 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
   int amt, bits = -100;
   char buf2[MAX_INPUT_LENGTH];
 
-  if (!obj && !arg && !*arg) {
+  if (!obj && !arg && !*arg)
+  {
     new_send_to_char(ch, "Look in what?\r\n");
     return;
   }
@@ -1534,7 +1536,8 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
       else
       {
         new_send_to_char(ch, "%s", obj->short_description);
-        if (bits == -100) {
+        if (bits == -100)
+        {
           if (obj->carried_by)
             bits = FIND_OBJ_INV;
           else if (obj->in_room)
@@ -1544,7 +1547,7 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
           else
             bits = FIND_OBJ_ROOM;
         }
-        
+
         switch (bits)
         {
         case FIND_OBJ_INV:
@@ -1849,7 +1852,9 @@ ACMD(do_examine)
 
     examine_on = FALSE;
     look_at_target(ch, tempsave);  /* strcpy: OK */
-  } else {
+  }
+  else
+  {
     new_send_to_char(ch, "You can't see that here.\r\n");
   }
 }
@@ -1943,7 +1948,7 @@ ACMD(do_gold)
   new_send_to_char(ch,"                {ccTotal Balance{cW:        [{cy%19s{cW]{c0\r\n",goldtot);
   new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
   new_send_to_char(ch,"                {ccTokens on file{cW: %5d brass,  %5d bronze.\r\n"
-                      "                                %5d silver, %5d gold.{c0\r\n",
+                   "                                %5d silver, %5d gold.{c0\r\n",
                    GET_BRASS_TOKEN_COUNT(ch), GET_BRONZE_TOKEN_COUNT(ch),
                    GET_SILVER_TOKEN_COUNT(ch), GET_GOLD_TOKEN_COUNT(ch));
   new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
@@ -2182,7 +2187,7 @@ ACMD(do_score)
       primin = size_dice_wep(ch, WEAPON_PRIM_AFF);
       primax =
         size_dice_wep(ch, WEAPON_PRIM_AFF) + (size_dice_wep(ch, WEAPON_PRIM_AFF) * num_dice_wep(ch, WEAPON_PRIM_AFF));
-      
+
       if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD)))
         shortmulti += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
       else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD)))
@@ -2422,8 +2427,8 @@ ACMD(do_score)
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
-   if (GET_LOGINMSG(ch)) new_send_to_char(ch, "Login Message: %s\r\n", GET_LOGINMSG(ch));                  /*THOTTER EDIT*/
-   if (GET_LOGOUTMSG(ch)) new_send_to_char(ch,"Logout Message: %s\r\n", GET_LOGOUTMSG(ch));               /*THOTTER EDIT*/
+  if (GET_LOGINMSG(ch)) new_send_to_char(ch, "Login Message: %s\r\n", GET_LOGINMSG(ch));                  /*THOTTER EDIT*/
+  if (GET_LOGOUTMSG(ch)) new_send_to_char(ch,"Logout Message: %s\r\n", GET_LOGOUTMSG(ch));               /*THOTTER EDIT*/
   /** Display info about your scooter **/
   if (has_vehicle(ch))
   {
@@ -2853,14 +2858,14 @@ void display_help(struct char_data *ch, unsigned int i)
   DYN_RESIZE("----------------------------------------------------------------------------\r\n");
   DYN_RESIZE(help_table[i].entry);
   page_string(ch->desc, dynbuf, DYN_BUFFER);
-/*
-new_send_to_char(ch,
-                   "----------------------------------------------------------------------------\r\n"
-                   "%s\r\n"
-                   "----------------------------------------------------------------------------\r\n"
-                   "%s\r\n",
-                   help_table[i].keywords, help_table[i].entry);
-*/
+  /*
+  new_send_to_char(ch,
+                     "----------------------------------------------------------------------------\r\n"
+                     "%s\r\n"
+                     "----------------------------------------------------------------------------\r\n"
+                     "%s\r\n",
+                     help_table[i].keywords, help_table[i].entry);
+  */
 }
 
 void display_help_list(struct descriptor_data *d, char *keywords)
@@ -4038,7 +4043,8 @@ void perform_immort_where(struct char_data *ch, char *arg)
   if (!*arg)
   {
     send_to_char("Players\r\n-------\r\n", ch);
-    for (d = descriptor_list; d; d = d->next) {
+    for (d = descriptor_list; d; d = d->next)
+    {
       lock_desc(d);
       if (STATE(d) == CON_PLAYING)
       {
@@ -4689,7 +4695,7 @@ ACMD(do_toggle)
                    "Hit Pnt Display: %-3s    "
                    "     Brief Mode: %-3s    "
                    " Summon Protect: %-3s\r\n"
-                   "   Move Display: %-3s    "
+                   "      AUTOGROUP: %-3s    "
                    "   Compact Mode: %-3s    "
                    "       On Quest: %-3s\r\n"
                    "   Mana Display: %-3s    "
@@ -4731,7 +4737,7 @@ ACMD(do_toggle)
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
                    ONOFF(!PRF_FLAGGED(ch, PRF_SUMMONABLE)),
-                   ONOFF(PRF_FLAGGED(ch, PRF_DISPMOVE)),
+                   ONOFF(PRF_FLAGGED(ch, PRF_AUTOGROUP)),
                    ONOFF(PRF_FLAGGED(ch, PRF_COMPACT)),
                    YESNO(PRF_FLAGGED(ch, PRF_QUEST)),
                    ONOFF(PRF_FLAGGED(ch, PRF_DISPMANA)),
@@ -5220,7 +5226,6 @@ void total_perc(struct char_data *ch)
     temp2 = (100.0 / (float) i);
     GET_PERC(k) = temp2;
     for (f = k->followers; f; f = f->next)
-      if ((k != f->follower))
         GET_PERC(f->follower) = temp2;
   }
 
@@ -5255,6 +5260,25 @@ struct char_data *rand_group(struct char_data *ch)
   }
 
   return k;
+}
+
+
+int even_group(struct char_data *ch)
+{
+
+  struct char_data *k;
+  struct follow_type *f;
+  float share, max;
+
+  k = (ch->master ? ch->master : ch);
+  rand = (1000.0 / group_size(k))/10.0;
+
+  for (f = k->followers; f; f = f->next)
+    GET_PERC(f->follower) = share;
+
+  GET_PERC(k) = share;
+
+  return (int)share;
 
 }
 
@@ -5272,13 +5296,18 @@ ACMD(set_perc)
   if (!*buf)
   {
     new_send_to_char(ch,
-                     "involve <groupmember> <amount (1 to %3d)>\r\n",
+                     "involve <groupmember> <amount (1 to %3d)>\r\n"
+                     "To split involvement evenly: \r\ninvolve even\r\n",
                      90 - group_size(ch));
     return;
   }
 
   if (is_number(buf2))
     amount = atoi(buf2);
+  else if (!str_cmp(buf2, "even")) {
+    even_group(ch);
+    new_send_to_char(ch, "You split the involvement evenly.\r\n");
+  }
   else
   {
     new_send_to_char(ch,
@@ -5428,7 +5457,7 @@ ACMD(do_ipsearch)
 
 void container_disp(CHAR_DATA *ch,OBJ_DATA * obj)
 {
-  
+
   int max, percent = 0;
   if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
   {

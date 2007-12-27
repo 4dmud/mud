@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.16  2006/03/13 19:07:40  w4dimenscor
+ * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ *
  * Revision 1.15  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -1289,7 +1292,9 @@ ACMD(do_gen_tog)
       {"You will no longer see a tally of how many fish you have caught.\r\n",
        "You will now see a tally of how many fish you have caught.\r\n"},
       {"You can now have the teleport spell cast on you.\r\n",
-          "You can now no longer have the teleport spell cast on you.\r\n"}
+          "You can now no longer have the teleport spell cast on you.\r\n"},
+      {"You will automaticly agree to group people when they request to follow.\r\n",
+          "You will NOT automaticly agree to group people when they request to follow.\r\n"}
 
 
 
@@ -1433,6 +1438,9 @@ ACMD(do_gen_tog)
     if (IS_PK(ch))
     new_send_to_char(ch, "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
     result = PRF_TOG_CHK(ch, PRF_TELEPORTABLE);
+    break;
+  case SCMD_AUTOGROUP:
+    result = PRF_TOG_CHK(ch, PRF_AUTOGROUP);
     break;
   case SCMD_BUILDWALK:
     if (GET_LEVEL(ch) < LVL_BUILDER)

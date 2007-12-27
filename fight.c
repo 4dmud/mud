@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.34  2006/03/13 19:07:40  w4dimenscor
+ * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ *
  * Revision 1.33  2006/03/06 09:38:28  w4dimenscor
  * Changed it so that you can clan expel people who are offline and in another room
  *
@@ -2892,7 +2895,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
     return 1;
   }
 
-  if (number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && number(1, 30) < GET_INT(vict) && AFF_FLAGGED(vict, AFF_PHASE) && number(1, 300) < GET_SKILL(vict, SKILL_PHASE) )
+  if (AFF_FLAGGED(vict, AFF_PHASE) && number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && number(1, 300) < GET_SKILL(vict, SKILL_PHASE) )
   {
     if (skill_cost(0, 2, 20, vict))
     {
