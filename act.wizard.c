@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.68  2006/09/15 08:25:46  w4dimenscor
+ * Fixed an error in act.wiz
+ *
  * Revision 1.67  2006/09/15 08:01:11  w4dimenscor
  * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
  *
@@ -344,7 +347,7 @@ int check_potion_weight(struct obj_data *obj);
 int check_potion_price(struct obj_data *obj);
 void write_ignorelist(Character *ch);
 void Crash_rentsave(Character *ch, int cost);
-
+void read_ignorelist(Character *ch);
 ACMD(do_gen_ps);
 
 /* local functions */
@@ -6205,12 +6208,11 @@ if (!str_cmp(newname, passw))
         read_aliases(tch);
         GET_ID(tch) = GET_IDNUM(tch);// = player_table[id].id;
         addChToLookupTable(GET_IDNUM(ch), tch);
-
-        char_to_room(tch, IN_ROOM(ch));
         tch->LoadKillList();
 	   read_ignorelist(tch);
         load_locker(tch);
         add_char_to_list(tch);
+        char_to_room(tch, IN_ROOM(ch));
         loaded = 1;
     }
     free_string(&tch->player.name);
