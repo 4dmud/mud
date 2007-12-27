@@ -92,7 +92,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     //  const int maxSize = 1024 * 64; /* max size 60 KB */
     char *txt;//, *tmp;
     size_t size, len = MAX_INPUT_LENGTH * 3, slen, wraplen;
-    int size_mxp;
+//    int size_mxp;
     //   bool overf = FALSE;
     string stxt;
     /* if we're in the overflow state already, ignore this new output */
@@ -119,16 +119,17 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
         size = vsnprintf(txt, len, format, args);
     }
 
-
+stxt = string(txt);
+free( txt );
     /* work out how much we need to expand/contract it */
-    size_mxp = count_mxp_tags(this->mxp, txt, size);
+    /*size_mxp = count_mxp_tags(this->mxp, txt, size);
     if (size_mxp < 0)
-        size_mxp = 0;
+        size_mxp = 0;*/
 
     /* this should safely put all expanded MXP tags into the string */
-    stxt = convert_mxp_tags(this->mxp, txt, size + size_mxp);
+    stxt = convert_mxp_tags(this->mxp, stxt);
 
-    free( txt );
+    
 
     /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
     if (this->character && !this->mxp && PRF_FLAGGED(this->character, PRF_PAGEWRAP) && PAGEWIDTH(this->character) > 0) {

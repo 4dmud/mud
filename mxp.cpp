@@ -143,40 +143,41 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
 } /* end of count_mxp_tags */
 
 /* size gets pre checked by count mxp tags */
-string Descriptor::convert_mxp_tags (const int bMXP, char *src, size_t lenn)
+string Descriptor::convert_mxp_tags (const int bMXP, string src)
 {
   char c;
-  const char * ps;
-  char * pd;
+  //const char * ps;
+  //char * pd;
   int bInTag = FALSE;
   int bInEntity = FALSE;
-  int srclen = lenn;
-  char dest[lenn+1];
+  int srclen = src.size();
+  string dest("");
+  size_t ps;
   
   if (srclen == 0)
-    return string("");
+    return src;
   
   
-  for (ps = src, pd = dest; srclen > 0; ps++, srclen--)
+  for (ps = 0; srclen > 0; ps++, srclen--)
   {
-    c = *ps;
+    c = src[ps];
     if (bInTag)  /* in a tag, eg. <send> */
     {
       if (c == MXP_ENDc)
       {
         bInTag = FALSE;
         if (bMXP)
-          *pd++ = '>';
+          dest += ">";
       }
       else if (bMXP)
-        *pd++ = c;  /* copy tag only in MXP mode */
-      else
-        *pd = '\0';
+        dest += c;  /* copy tag only in MXP mode */
+      /*else
+        *pd = '\0';*/
     } /* end of being inside a tag */
     else if (bInEntity)  /* in a tag, eg. <send> */
     {
       if (bMXP)
-        *pd++ = c;  /* copy tag only in MXP mode */
+        dest += c;  /* copy tag only in MXP mode */
       if (c == ';')
         bInEntity = FALSE;
     } /* end of being inside a tag */
@@ -188,21 +189,22 @@ string Descriptor::convert_mxp_tags (const int bMXP, char *src, size_t lenn)
         bInTag = TRUE;
         if (bMXP)
         {
-          memcpy (pd, MXPMODE (1), 4);
-          pd += 4;
-          *pd++ = '<';
+        dest += MXPMODE(1);
+          //memcpy (pd, MXPMODE (1), 4);
+          //pd += 4;
+          dest += "<";
         }
         break;
         
       case MXP_ENDc:    /* shouldn't get this case */
         if (bMXP)
-          *pd++ = '>';
+          dest += ">";
         break;
         
       case MXP_AMPc:
         bInEntity = TRUE;
         if (bMXP)
-          *pd++ = '&';
+          dest += "&";
         break;
         
       default:
@@ -211,43 +213,49 @@ string Descriptor::convert_mxp_tags (const int bMXP, char *src, size_t lenn)
           switch (c)
           {
           case '<':
-            memcpy (pd, "&lt;", 4);
-            pd += 4;
+            //memcpy (pd, "&lt;", 4);
+            //pd += 4;
+            dest += "&lt;";
             break;
             
           case '>':
-            memcpy (pd, "&gt;", 4);
-            pd += 4;
+            //memcpy (pd, "&gt;", 4);
+            //pd += 4;
+            dest += "&gt;";
             break;
             
           case '&':
-            memcpy (pd, "&amp;", 5);
-            pd += 5;
+            //memcpy (pd, "&amp;", 5);
+            //pd += 5;
+            dest += "&amp;";
             break;
             
           case '"':
-            memcpy (pd, "&quot;", 6);
-            pd += 6;
+            //memcpy (pd, "&quot;", 6);
+            //pd += 6;
+            dest += "&quot;";
             break;
             
           default:
-            *pd++ = c;
+            //*pd++ = c;
+            dest += c;
             break;  /* end of default */
             
           } /* end of inner switch */
           
         }
         else
-          *pd++ = c;  /* not MXP - just copy character */
+          //*pd++ = c;  /* not MXP - just copy character */
+          dest += c;
         break;
         
       } /* end of switch on character */
     } /*end of else */
     
   }   /* end of converting special characters */
-  *pd = 0;
+  //*pd = 0;
 
-  return string(dest);
+  return dest;
 } /* end of convert_mxp_tags */
 
 

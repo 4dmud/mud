@@ -68,7 +68,7 @@ public:
   size_t Output(const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
   size_t Output(string *txt, ...);
   size_t vwrite_to_output(const char *format, va_list args);
-  string convert_mxp_tags (const int bMXP, char *src, size_t lenn);
+  string convert_mxp_tags (const int bMXP, string src);
   int count_mxp_tags (const int bMXP, const char *txt, int length);
   void turn_on_mxp ();
   char * send_mxp_status();
