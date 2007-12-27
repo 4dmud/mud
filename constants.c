@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
- * Revision 1.1  2004/11/12 02:16:04  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/11/20 19:43:28  w4dimenscor
+ * added aggro flag
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:04  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.54  2004/08/31 10:06:55  molly
  * make speed bonus from mounts only when you know mounted combat, changed max multi of magicmissile from 1.6 to 1.7, change who layout, fix error with room editing
@@ -568,6 +571,7 @@ const char *preference_bits[] =
     "PAGEWRAP",
     "REPLYLOCK",
     "BUSY",
+    "AGGRO",
     "\n"
   };
 
