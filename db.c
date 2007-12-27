@@ -3488,12 +3488,19 @@ void load_help(FILE *fl)
 
       if (entrylen + 2 < sizeof(entry) - 1)
       {
-        strcpy(entry + entrylen, "\r\n");	/* strcpy: OK (size checked above) */
-        entrylen += 2;
+       strcpy(entry + entrylen, "\r\n");	/* strcpy: OK (size checked above) */
+      entrylen += 2;
       }
+
       get_one_line(fl, line);
     }
 
+{
+int i = entrylen-1;
+	while (entry[i] == '\n' || entry[i] == '\r') /* Trim trailing whitespace */
+	  entry[i--] = 0;
+entrylen = i + 1;
+}
     if (entrylen >= sizeof(entry) - 1)
     {
       int keysize;
