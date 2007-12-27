@@ -481,7 +481,7 @@ void sedit_disp_menu(Descriptor *d)
 
 void sedit_parse(Descriptor *d, char *arg)
 {
-  int i;
+  int i = 0;
 
   if (OLC_MODE(d) > SEDIT_NUMERICAL_RESPONSE) {
     if (!isdigit(arg[0]) && ((*arg == '-') && (!isdigit(arg[1])))) {

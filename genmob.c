@@ -86,7 +86,6 @@ void smash_tilde(char *str);
 mob_vnum add_mobile(Character *mob, mob_vnum vnum) {
     int found = FALSE;
     Character *live_mob, *pmob = NULL, *nmob;
-    mp_iter it;
     if (vnum != NOBODY && MobProtoExists(vnum))
 	pmob = GetMobProto(vnum);
     if (pmob != NULL) {
