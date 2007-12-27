@@ -258,30 +258,34 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
         else {
             switch ( pAssembly->pComponents[ i ].bInRoom ) {
             case 1:
-                if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL )
+                if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL ) {
+                new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s room doesn't contain needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
-                else
+                } else
                     obj_from_room( ppComponentObjects[ i ] );
                 break;
             case 0: /*inventory*/
                 if ( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum,
-                                                pCharacter->carrying )) == NULL )
+                                                pCharacter->carrying )) == NULL ) {
+                new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s isn't carrying needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
-                else
+                } else
                     obj_from_char( ppComponentObjects[ i ] );
                 break;
             case 2: /* HOLD */
                 tobj = GET_EQ(pCharacter, WEAR_HOLD);
-                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) )
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) ) {
+                    new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s isn't holding needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
-                else
+                } else
                     ppComponentObjects[ i ] = unequip_char(pCharacter, WEAR_HOLD);
                 break;
             case 3: /*wield*/
                 tobj = GET_EQ(pCharacter, WEAR_WIELD);
-                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) )
+                if ( (ppComponentObjects[ i ] = (tobj && GET_OBJ_RNUM(tobj) == lRnum) ? tobj : NULL ) ) {
+                new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s isn't wielding needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
-                else
+                } else
                     ppComponentObjects[ i ] = unequip_char(pCharacter, WEAR_WIELD);
                 break;
             }
