@@ -1298,9 +1298,7 @@ void game_loop(socket_t s_mother_desc)
         if (d->pending_output() && FD_ISSET(d->descriptor, &output_set))
         {
         /* Output for this player is ready */
-          if (process_output(d) < 0)
-            delete d;
-          else
+          if (process_output(d) >= 0)
             d->has_prompt = 1;
         }
       }
@@ -2404,6 +2402,7 @@ int process_output(Descriptor *t)
   if (result < 0)
   {  /* Oops, fatal error. Bye! */
     delete t;
+    t= NULL;
 
     return (-1);
   }

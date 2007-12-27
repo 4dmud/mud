@@ -124,9 +124,10 @@ void mobile_activity(void) {
                               || MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN))) {
             found = FALSE;
             Character *vnext;
-            for (vict = IN_ROOM(ch)->people; vict && !found;
-                    vict = vnext) {
+            for (vict = IN_ROOM(ch)->people; vict && !found; vict = vnext) {
                 vnext = vict->next_in_room;
+                if (!SELF(vict, ch))
+                	continue;
                 if (IS_NPC(vict) || !CAN_SEE(ch, vict)
                         || PRF_FLAGGED(vict, PRF_NOHASSLE))
                     continue;
@@ -136,6 +137,7 @@ void mobile_activity(void) {
                     continue;
                 if (vict->master != NULL && IN_ROOM(vict->master) == IN_ROOM(vict) && GET_PERC(vict) == 0)
                     continue;
+                    
                 if (!MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN) ||
                         (MOB_FLAGGED(ch, MOB_AGGR_EVIL) && IS_EVIL(vict)) ||
                         (MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL) && IS_NEUTRAL(vict))
