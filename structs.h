@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.26  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.25  2005/11/19 06:18:39  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -1165,6 +1168,7 @@ extern int message_type;
 #define MAX_GROUP		10	/*used for defining group size max */
 #define TREE_MAX 		50
 #define MAX_TREE_AGE		8
+#define MAX_TREE_TYPES 9
 
 #define TOP_ORE_DEFINE		76
 #define MAX_COLOR_OPTIONS       134
@@ -2467,6 +2471,26 @@ struct comm_data
   char * type;
   char * text;
   struct comm_data * next;
+};
+
+/**
+Tree      Affect    Max  Chance    Start Age
+Willow    speed     240  1 in 20   5
+elder     speed     110  1 in 5    1
+pine      cha       9    1 in 10   1
+dogwood   wis       3    1 in 15   6
+ironwood  hp        600  1 in 15   3
+fir       mana      2000 1 in 20   1
+maple     int       3    1 in 10   3
+elm       mana      1000 1 in 10   1
+Oak       hp        400  1 in 5    2
+
+**/
+struct stave_stat_table {
+  int affect;
+  int max;
+  int chance;
+  int start;
 };
 
 

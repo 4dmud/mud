@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.6  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.5  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -61,8 +64,7 @@ int num_casting(struct char_data *ch);
 /* local functions */
 int   parse_class(char arg);
 int   thaco(int chclass_num, int level);
-int   backstab_mult(int level, int tier);
-int   cleave_mult(int level, int tier);
+
 int   invalid_class(struct char_data *ch, struct obj_data *obj);
 long find_class_bitvector(char arg);
 byte  saving_throws(int chclass_num, int type, int level);
@@ -940,11 +942,14 @@ void advance_level(struct char_data * ch)
 {
   int add_hp = 0, add_mana = 0, add_move = 0, i;
   int num_melee_tier(struct char_data *ch);
+  int level = GET_LEVEL(ch), casttier = num_casting(ch), fightier = TIERS;
 
 
 
   add_hp += (con_app[GET_CON(ch)].hitp * current_class_is_tier_num(ch));
   add_hp += MIN(REMORTS(ch), 25);
+  if (REMORTS(ch) > 5)
+    add_hp += (REMORTS(ch) / 6);
   add_mana = MIN(REMORTS(ch), 25);
   add_move = MIN(REMORTS(ch), 25) * 0.5;
 
@@ -954,9 +959,9 @@ void advance_level(struct char_data * ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    add_hp += number(2 + (GET_CHA(ch) * 0.25), (8 * TIERS) + (GET_CHA(ch) * 0.35) + 4);
-    add_mana += number(GET_LEVEL(ch), (int)(num_casting(ch) * GET_LEVEL(ch))) + 2;
-    add_move += number(1, (2 * TIERS));
+    add_hp += number(2 + (GET_CHA(ch) * 0.25), (8 * fightier) + (GET_CHA(ch) * 0.35) + 4);
+    add_mana += number(level, (int)(casttier * level)) + 2;
+    add_move += number(1, (2 * fightier));
     break;
 
   case CLASS_THIEF:
@@ -1077,13 +1082,37 @@ void advance_level(struct char_data * ch)
  * that it would be easier to add more levels to your MUD.  This doesn't
  * really create a big performance hit because it's not used very often.
  */
-int backstab_mult(int level, int tier)
+float backstab_mult(int level, int tier)
 {
-  return IRANGE(2, (level)/(12 - tier), 5);
+  switch (tier) {
+  default:
+    return 2.0f;
+  case 1:
+    return 2.25f;
+  case 2:
+    return 2.75f;
+  case 3:
+    return 3.25f;
+  case 4:
+    return 3.75f;
+  }
+    
 }
-int cleave_mult(int level, int tier)
+float cleave_mult(int level, int tier)
 {
-  return IRANGE(1, (level)/(16 - tier), 4);
+  
+  switch (tier) {
+  default:
+    return 1.0f;
+  case 1:
+    return 1.55f;
+  case 2:
+    return 2.0f;
+  case 3:
+    return 2.4f;
+  case 4:
+    return 2.75f;
+  }
 }
 
 ACMD(do_dam_dice)
@@ -1150,12 +1179,12 @@ void init_spell_levels(void)
 
   assign_class(SPELL_ANIMATE_DEAD, 	PRI);
   assign_class(SPELL_MAGIC_MISSILE,    ALL_CASTERS);
-  assign_class(SKILL_MANIFEST, 	       ALL_CASTERS);
+  assign_class(SKILL_MANIFEST, 	    ALL_CASTERS);
   assign_class(SPELL_DETECT_INVIS,     MAG | ESP | RAN);
   assign_class(SPELL_DETECT_MAGIC,     ALL_CASTERS);
   assign_class(SPELL_MIND_WATER,       ALL_CASTERS);
-  assign_class(SPELL_MIND_ICE,         PRI);
-  assign_class(SPELL_MIND_ELEC,        ESP);
+  assign_class(SPELL_MIND_ICE,         PRI | MAG);
+  assign_class(SPELL_MIND_ELEC,        PRI | ESP);
   assign_class(SPELL_MIND_FIRE,        MAG);
   assign_class(SPELL_CHILL_TOUCH,      ALL_CASTERS);
   assign_class(SPELL_INVISIBLE,        ALL_CASTERS);
@@ -1239,17 +1268,17 @@ void init_spell_levels(void)
   assign_class(SPELL_SANCTUARY,       	PRI);
   assign_class(SPELL_HOLY_WORD,		PRI);
   assign_class(SPELL_HOLY_SHOUT,	PRI);
-  assign_class(SPELL_CALL_LIGHTNING,  	PRI);
+  assign_class(SPELL_CALL_LIGHTNING,  	PRI | GYP);
   assign_class(SPELL_HEAL,            	PRI);
   assign_class(SPELL_CONTROL_WEATHER, 	ALL_CASTERS);
-  assign_class(SPELL_SENSE_LIFE,      	PRI | HUN);
+  assign_class(SPELL_SENSE_LIFE,      	PRI | HUN | GYP);
   assign_class(SPELL_HARM,            	PRI);
   assign_class(SPELL_GROUP_HEAL,      	PRI);
-  assign_class(SPELL_VITALIZE,    	PRI | ESP);
+  assign_class(SPELL_VITALIZE,    	PRI | ESP | GYP);
   assign_class(SPELL_REMOVE_CURSE,    	PRI);
   assign_class(SPELL_DISPELL_SANCTURY,  PRI | ESP);
   assign_class(SPELL_SUFFOCATE,		ESP);
-  assign_class(SPELL_ENCHANT_ARMOR,    	PRI);
+  assign_class(SPELL_ENCHANT_ARMOR,    	PRI | GYP);
   assign_class(SPELL_PARALYZE,		ESP);
   assign_class(SKILL_BREW,		PRI);
   assign_class(SPELL_ABSOLVE,		PRI);
@@ -1285,7 +1314,7 @@ void init_spell_levels(void)
   assign_class(SKILL_DISARM,		THI | ALL_FIGHTER);
   assign_class(SKILL_SMASH,		ALL_FIGHTER);
   assign_class(SKILL_CIRCLE,		THI);
-  assign_class(SKILL_BLACKJACK, 	THI);
+  assign_class(SKILL_BLACKJACK, 	THI | GYP);
   assign_class(SKILL_PUSH,		ALL_FIGHTER);
   assign_class(SKILL_POISON_WEAPON,	THI);
   assign_class(SKILL_MOUNTED_COMBAT,     ALL_ROGUE | ALL_FIGHTER);

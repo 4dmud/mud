@@ -477,6 +477,7 @@ void make_tunnel(struct char_data *ch)
     new_send_to_char(ch, "As your last strike hits the %s wall it opens up a new tunnel.\r\n", dirs[MINE_DIR(ch)]);
     act("$n tunnels a new passage!", FALSE, ch, 0, 0, TO_ROOM);
     send_to_room(rnew, "A passage opens up in the %s wall.\r\n", dirs[rev_dir[MINE_DIR(ch)]]);
+    log("%s creates a tunnel.", GET_NAME(ch));
   }
   toggle_sub_status(ch, SUB_TUNNELING, STATUS_OFF);
   if (GET_TASK(ch) && GET_TASK(ch)->sub == SUB_TUNNELING)

@@ -496,8 +496,7 @@ ACMD(do_linkload)
     if (GET_LEVEL(victim) < GET_LEVEL(ch))
     {
       new_mudlog( BRF, GET_LEVEL(ch) + 1, TRUE, "(GC) %s has link-loaded %s.", GET_NAME(ch), GET_NAME(victim));
-      victim->next = character_list;
-      character_list = victim;
+      add_char_to_list(victim);
       victim->desc = NULL;
       char_to_room(victim, IN_ROOM(ch));
       Crash_load(victim);
@@ -1916,7 +1915,7 @@ int check_dam_affects(struct char_data *ch)
 
   if (AFF_FLAGGED(ch, AFF_SUFFOCATING))
   {
-    if (damage(ch, ch, number(25, 50) + (GET_MAX_HIT(ch) * 0.001), SPELL_SUFFOCATE) == -1)
+    if (damage(ch, ch, number(25, 50) + (GET_MAX_HIT(ch) * 0.01), SPELL_SUFFOCATE) == -1)
       return -1;
   }
   if (!MOB_FLAGGED(ch, MOB_NOPOISON))

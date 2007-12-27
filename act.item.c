@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.28  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.27  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -567,8 +570,8 @@ bool is_put_ok(struct char_data *ch, char *obj_desc, char *cont_desc, int obj_do
 ACMD(do_put)
 {
   char arg1[MAX_INPUT_LENGTH] = "";
-  char arg2[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH] = "";
+  char buf[MAX_INPUT_LENGTH] = "";
   struct obj_data *next_obj_data, *obj_data, *cont_data;
   int obj_dotmode, cont_dotmode, howmany = 1, processed_put_counter = 0, failed_put_counter = 0;
   char *obj_desc, *cont_desc;
@@ -687,7 +690,7 @@ ACMD(do_put)
       {
         snprintf(buf, sizeof(buf), "You put %d %s%s into $p.", processed_put_counter, obj_desc, (processed_put_counter > 1) ? "s" : "");
         act(buf, FALSE, ch, cont_data, 0, TO_CHAR);
-        if (!slipping)
+        if (!slipping && *arg2)
         {
           snprintf(buf, sizeof(buf), "$n puts all the %ss $e can into $p.", arg2);
           act(buf, FALSE, ch, cont_data, 0, TO_ROOM);
@@ -911,8 +914,7 @@ int automeld(struct obj_data *obj)
             return 0;
           }
           new_mudlog( CMP, GET_LEVEL(ch), TRUE, "AUTOMELD: %s (offline)", GET_NAME(ch));
-          ch->next = character_list;
-          character_list = ch;
+          add_char_to_list(ch);
           ch->desc = NULL;
           char_to_room(ch, world_vnum[1200]);
           Crash_load(ch);

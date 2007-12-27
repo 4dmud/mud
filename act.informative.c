@@ -2142,31 +2142,31 @@ ACMD(do_score)
 
   if (AFF_FLAGGED(ch, AFF_POLY_TOAD))
   {
-    new_send_to_char(ch, "You puzzle, but your toad mind cant comprehend that!\r\n");
+    new_send_to_char(ch, "You puzzle, but your toad mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_WOLF))
   {
-    new_send_to_char(ch, "You puzzle, but your wolf mind cant comprehend that!\r\n");
+    new_send_to_char(ch, "You puzzle, but your wolf mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BOAR))
   {
-    new_send_to_char(ch, "You puzzle, but your boar mind cant comprehend that!\r\n");
+    new_send_to_char(ch, "You puzzle, but your boar mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BEAR))
   {
-    new_send_to_char(ch, "You puzzle, but your bear mind cant comprehend that!\r\n");
+    new_send_to_char(ch, "You puzzle, but your bear mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_LION))
   {
-    new_send_to_char(ch, "You puzzle, but your lion mind cant comprehend that!\r\n");
+    new_send_to_char(ch, "You puzzle, but your lion mind can't comprehend that!\r\n");
     return;
   }
 
-  if ((blocking = MIN(50.0, (AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5*apply_ac(ch, WEAR_SHIELD) : apply_ac(ch, WEAR_SHIELD)))))
+  if ((blocking = MIN(50.0f, (AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5f*apply_ac(ch, WEAR_SHIELD) : apply_ac(ch, WEAR_SHIELD)))))
     len = snprintf(shld, sizeof(shld), "Shield Block Chance: %2.2f%%", blocking);
   else
     strcpy(shld, "  ");
@@ -2186,13 +2186,13 @@ ACMD(do_score)
 
       primin += class_damroll(ch);
       primax += class_damroll(ch);
-      primin *= ((wep_num==1) ? 1.1 : 1.0);
-      primax *= ((wep_num==1) ? 1.1 : 1.0);
+      primin *= ((wep_num==1) ? 1.1f : 1.0f);
+      primax *= ((wep_num==1) ? 1.1f : 1.0f);
       primin *= shortmulti;
       primax *= shortmulti;
 
-      primin += (primin * ((REMORTS(ch) * 0.005)));
-      primax += (primax * ((REMORTS(ch) * 0.005)));
+      primin += ((float)primin * (((float)REMORTS(ch) * 0.005f)));
+      primax += ((float)primax * (((float)REMORTS(ch) * 0.005f)));
 
       primin *= race_dam_mod(GET_RACE(ch), 0);
       primax *= race_dam_mod(GET_RACE(ch), 0);
@@ -2200,8 +2200,8 @@ ACMD(do_score)
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
-        primin *= 1.2;
-        primax *= 1.2;
+        primin *= 1.2f;
+        primax *= 1.2f;
       }
     }
     if (wep_num == 2)
@@ -2218,8 +2218,8 @@ ACMD(do_score)
       secmin *= shortmulti;
       secmax *= shortmulti;
 
-      secmin += (secmin * ((REMORTS(ch) * 0.005)));
-      secmax += (secmax * ((REMORTS(ch) * 0.005)));
+      secmin += ((float)secmin * (((float)REMORTS(ch) * 0.005f)));
+      secmax += ((float)secmax * (((float)REMORTS(ch) * 0.005f)));
 
       secmin *= race_dam_mod(GET_RACE(ch), 0);
       secmax *= race_dam_mod(GET_RACE(ch), 0);
@@ -2227,8 +2227,8 @@ ACMD(do_score)
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
-        secmin *= 1.2;
-        secmax *= 1.2;
+        secmin *= 1.2f;
+        secmax *= 1.2f;
       }
     }
 

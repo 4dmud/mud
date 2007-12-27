@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.13  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.12  2005/11/19 06:18:38  w4dimenscor
  * Fixed many bugs, and added features
  *
@@ -82,7 +85,7 @@ ASKILL(skill_manifest);
 void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
 ASPELL(spell_control_weather);
-
+extern struct stave_stat_table stave_table[9];
 
 struct char_data *find_char(long n);
 struct obj_data *find_obj(long n);
@@ -115,6 +118,22 @@ ACTION(thing_throttle);
 ACTION(thing_tunneling);
 ACTION(thing_control_weather_better);
 ACTION(thing_control_weather_worse);
+
+/**
+Tree      Affect    Max  Chance    Start Age
+Willow    speed     240  1 in 20   5
+elder     speed     110  1 in 5    1
+pine      cha       9    1 in 10   1
+dogwood   wis       3    1 in 15   6
+ironwood  hp        600  1 in 15   3
+fir       mana      2000 1 in 20   1
+maple     int       3    1 in 10   3
+elm       mana      1000 1 in 10   1
+Oak       hp        400  1 in 5    2
+
+**/
+
+
 
 char *get_spell_name(char *argument)
 {
@@ -608,7 +627,7 @@ ASKILL(skill_tinker)
     damage(ch, ch, dam, TYPE_UNDEFINED);
     return 0;
   }
-  time = 1000;
+  time = 3000;
   if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_BLESS))
     time *= 2;
   if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_HUM))
@@ -708,6 +727,12 @@ void make_focus(struct char_data *ch, int type, struct obj_data *o)
   GET_OBJ_WEIGHT(final_focus) = 3;
   GET_OBJ_RENT(final_focus) = 0;
   GET_OBJ_TIMER(final_focus) = GET_LEVEL(ch) * 300;
+  /** new affect addition - mord (from discussion with Azreal)**/
+  if (v1 >= stave_table[v2].start) {
+  final_focus->affected[0].location = stave_table[v2].affect;
+    final_focus->affected[0].modifier =
+      (stave_table[v2].max) * (v1 - stave_table[v2].start) / (9 - stave_table[v2].start);
+  }
 
   obj_to_char(final_focus, ch);
   if (type == SKILL_SING_WOOD)

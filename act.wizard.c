@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.38  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.37  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining
  *
@@ -6725,8 +6728,7 @@ ACMD(do_namechange)
     char_to_room(tch, IN_ROOM(ch));
     GET_KILLS(tch) = load_killlist(GET_NAME(tch));
     load_locker(ch);
-    ch->next = character_list;
-    character_list = ch;
+    add_char_to_list(ch);
     loaded = 1;
   }
 

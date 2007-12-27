@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.27  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.26  2005/11/20 06:10:00  w4dimenscor
  * Fixed Directional spells, and exp
  *
@@ -154,8 +157,6 @@ ACMD(do_get);
 ACMD(do_split);
 ACMD(do_flee);
 ACMD(do_assist);
-int backstab_mult(int level, int tier);
-int cleave_mult(int level, int tier);
 int thaco(int ch_class, int level);
 int ok_damage_shopkeeper(struct char_data *ch, struct char_data *victim);
 void save_corpses(void);
@@ -393,8 +394,7 @@ int spell_size_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    sdice += 6  + highest_tier(ch);
-    sdice += (GET_LEVEL(ch)>10);
+    sdice += 8  + highest_tier(ch);
     sdice += (GET_LEVEL(ch)>30);
     sdice += (GET_LEVEL(ch)>45);
     sdice += (GET_INT(ch) > 14);
@@ -443,7 +443,7 @@ int spell_num_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    ndice += 6;
+    ndice += 7;
     ndice += (GET_LEVEL(ch)>10);
     ndice += (GET_LEVEL(ch)>30);
     ndice += (GET_LEVEL(ch)>45);
@@ -467,7 +467,7 @@ int spell_num_dice(struct char_data *ch)
 
   }
   if ((GET_SUB(ch, SUB_LOYALDAMAGE) )> 0)
-    ndice += 2;
+    ndice += 3;
 
 
   return MAX(0, ((int)ndice));
@@ -1060,7 +1060,10 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
   int wep = IS_WEAPON(w_type);
   //  struct char_data *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
 
-
+  if (!IS_NPC(vict)) {
+    /** Oh god what was i thinking?? - mord **/
+    damage *= 0.1;
+  }
   //Take less if victim is a tier
   switch (highest_tier(vict))
   {
@@ -1092,10 +1095,8 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
   if (!IS_NPC(ch))
   {
     damage *= race_dam_mod(GET_RACE(ch), IS_SPELL_ATK(w_type) || IS_SPELL_CAST(w_type));
-    damage += (damage * ( (REMORTS(ch) * 0.005)));
+    damage += ((float)damage * ( (float)(REMORTS(ch) * 0.005)));
   }
-  if (!IS_NPC(vict) && damage > 10)
-    damage -= IRANGE( 0, (damage/10), (damage/2));
 
   if (wep && AFF_FLAGGED(vict, AFF_BRACE) && damage > 3)
   {
@@ -1408,7 +1409,7 @@ int defence_tot(struct char_data *vict)
   defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD));
   defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD_2));
 
-  if (AFF_FLAGGED(vict, AFF_CURSE))
+  if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CURSE))
     defense_roll *= 0.5;
   defense_roll = (defense_roll <= 0 ? 1 : defense_roll);
 
@@ -1929,7 +1930,7 @@ int fe_solo_damage(struct char_data* ch, struct char_data* vict,
   if (damage > 0 && (GET_HIT(vict) - damage) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 200))
   {
     damage = GET_HIT(vict) - 200;
-    act("You concentrate your energy on the on coming killing blow!", FALSE ,vict, 0,0,TO_CHAR);
+    act("{cGYou concentrate your energy on the on coming killing blow!{c0", FALSE ,vict, 0,0,TO_CHAR);
   }
 
 
@@ -4724,11 +4725,14 @@ void make_half(struct char_data *ch)
 /* When ch kills victim */
 void change_alignment(struct char_data *ch, struct char_data *victim)
 {
+  if (ch && victim) {
   /*
    * new alignment change algorithm: if you kill a monster with alignment A,
    * you move 1/16th of the way to having alignment -A.  Simple and fast.
    */
+  if (ch != victim)
   GET_ALIGNMENT(ch) += (-GET_ALIGNMENT(victim) - GET_ALIGNMENT(ch)) / 16;
+  }
 }
 
 
@@ -4829,6 +4833,8 @@ void die(struct char_data *ch, struct char_data *killer)
       idnum = GET_IDNUM(killer);
     else
       idnum = -1;
+    
+    change_alignment(killer, ch);
 
     if (!IS_NPC(ch))
     {
@@ -4843,6 +4849,8 @@ void die(struct char_data *ch, struct char_data *killer)
       if (t->id != -1)
       {
         temp = char_by_id_desc_list(t->id);
+        if (!temp)
+          continue;
         exp = (GET_EXP(ch) * t->damage)/MOB_DAM_TAKEN(ch);
         if (exp < ((GET_EXP(ch) * ((160 - GET_LEVEL(ch))/10))/100)) /*(16% for level 1, 1% for level 150)*/
           exp = ((GET_EXP(ch) * ((160 - GET_LEVEL(ch))/10))/100);
@@ -5957,12 +5965,11 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     break;
     /* skills */
   case SKILL_BACKSTAB:
-    return backstab_mult(GET_LEVEL(ch), tier);
-    break;
+    return backstab_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_BACKSTAB)/100.0f);
   case SKILL_CLEAVE:
+    return cleave_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_CLEAVE)/100.0f);
   case SKILL_BEHEAD:
-    return cleave_mult(GET_LEVEL(ch), tier);
-    break;
+    return cleave_mult(GET_LEVEL(ch), tier) + (GET_SKILL(ch, SKILL_BEHEAD)/100.0f);
   case SKILL_KICK:
     {
       float spd = GET_SPEED(ch) - GET_SPEED(vict);

@@ -2104,6 +2104,8 @@ void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
     {
       GET_OBJ_VAL(obj, 3) = 1;
       to_char = "$p steams briefly.";
+    } else {
+      to_char = "$p cannot be poisoned, only food or drink can be.";
     }
     break;
   case SPELL_REMOVE_CURSE:

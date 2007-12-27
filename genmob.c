@@ -68,7 +68,7 @@ void assign_mob_stats()
     mob_stats[i].dam_dice 	= s[5];
     mob_stats[i].dam_sides 	= s[6];
     mob_stats[i].dam_bonus 	= s[7];
-    mob_stats[i].exp 		= s[8];
+    mob_stats[i].exp 		= s[8] + (s[8] * 0.05); /*added 5%*/
     mob_stats[i].gold 		= s[9];
     mob_stats[i].hitroll 	= s[10];
     log("LEV:%-2d -- HP:%-6d Avg Dam:%-4d X:%-7d G:%-d",

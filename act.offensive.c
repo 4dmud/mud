@@ -200,7 +200,7 @@ ACMD(do_hit)
         }
       }
       /*
-      if (!FIGHTING(ch))      
+      if (FIGHTING(ch))
     send_to_char("They don't seem to be here.\r\n", ch);
       */
       return;
@@ -252,20 +252,9 @@ ACMD(do_hit)
   //if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
   if (!FIGHTING(ch))
   {
-  struct char_data *k = (ch->master ? ch->master : ch);
-    struct follow_type *f;
     send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 1);
     new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
     start_fighting(ch, vict);
-    for (f = k->followers; f; f = f->next)
-    {
-      if ( (FIGHTING(ch) && !DEAD(vict)) && HERE(f->follower,vict))
-      {
-        if (!IS_NPC(f->follower))
-          perform_assist(f->follower, ch);
-      }
-    }
-      
   }
   else
     send_to_char("You do the best you can!\r\n", ch);

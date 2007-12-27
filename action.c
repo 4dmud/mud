@@ -257,7 +257,6 @@ ACTION(thing_tunneling)
   {
     new_send_to_char(ch, "You can't tunnel without a tool!\r\n");
     *num = 0;
-    time = 0;
     return 0;
   }
 
@@ -280,6 +279,7 @@ ACTION(thing_tunneling)
   {
     to_char = "You discover a tunnel already exists where you are mining.";
     *num = 0;
+    time = 0;
   }
   else
   {
@@ -312,15 +312,17 @@ ACTION(thing_tunneling)
         to_char = "You continue to tunnel down with $p.";
         to_room = "$n continues to tunnel down with $p.";
         break;
-        if (number(0, 1))
-          to_char = tunnel_msgs[number(0, 36)];
-
       }
+      if (number(0, 1))
+        to_char = tunnel_msgs[number(0, 36)];
 
-      time = (11 RL_SEC) * ((100.0 - MAX(0, MINE_SPEED(ch)))/100.0);
+      time = (11 RL_SEC) * ((100.0 - IRANGE(0, MINE_SPEED(ch), 99))/100.0);
+      log("%ld next tunnel hit is that many seconds.", time);
+      new_send_to_char(ch ,"Next tunnel hit in %ld seconds.\r\n", time);
       break;
     case 1:
       *num = 0;
+      log("Ending_tunneling start make_tunnel");
       make_tunnel(ch);
       return 0;
     }

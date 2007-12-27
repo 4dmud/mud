@@ -401,7 +401,7 @@ void strip_string(char *buffer);
 int read_xap_objects(FILE * fl, struct char_data *ch);
 float mob_hitpoint_multi(int chclass);
 void generate_weapon(OBJ_DATA *obj);
-
+void add_char_to_list(struct char_data *ch);
 #define CUR_WORLD_VERSION 1
 #define CUR_ZONE_VERSION 3
 #define HIGHEST_VNUM  1280000

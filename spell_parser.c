@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.12  2005/11/30 18:47:12  w4dimenscor
+ * changed slightly some gains you get from remorts
+ *
  * Revision 1.11  2005/11/20 06:10:00  w4dimenscor
  * Fixed Directional spells, and exp
  *
@@ -1862,7 +1865,7 @@ void mag_assign_spells(void)
          MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31);
 
   spello(SPELL_SLEEP, "sleep", 40 , 25 , 5, POS_STANDING,
-         TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12);
+         TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 180, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12);
 
   spello(SPELL_STRENGTH, "strength", 60 , 40 , 1,
          POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
@@ -2053,7 +2056,7 @@ void mag_assign_spells(void)
          TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12);
 
   spello(SPELL_SWEET_DREAMS, "sweet dreams", 50 , 30 , 2,
-         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
+         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 240,
          TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 23);
 
   spello(SPELL_DEVINE_MIND, "devine mind", 50 , 30 , 2,
@@ -2082,7 +2085,7 @@ void mag_assign_spells(void)
 
   spello(SPELL_MAGIC_BUBBLE, "magic bubble", 50 , 30 , 2,
          POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 14);
+         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 14);
 
 
   spello(SPELL_PSI_PANIC, "psi panic", 100 , 80 , 2,

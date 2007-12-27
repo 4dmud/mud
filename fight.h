@@ -159,3 +159,6 @@ void group_gain(struct char_data *ch, struct char_data *victim);
 void solo_gain(struct char_data *ch, struct char_data *victim,
                bool missile);
 void die(struct char_data *ch, struct char_data *killer);
+float   backstab_mult(int level, int tier);
+float   cleave_mult(int level, int tier);
+

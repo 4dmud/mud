@@ -559,7 +559,7 @@ const struct command_info cmd_info[] =
 
     { "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "feel"     , "feel" , POS_RESTING , do_feel     , 0, 0, 0 },
-    { "file"     , "file" , POS_SLEEPING, do_file     , LVL_GRGOD, 0, 0 },
+    { "file"     , "file" , POS_SLEEPING, do_file     , LVL_HERO, 0, 0 },
     { "fill"     , "fil" , POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
     { "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
     { "fire"     , "fire" , POS_STANDING, do_not_here , 0, 0, 0 },
@@ -2156,8 +2156,7 @@ int enter_player_game(struct descriptor_data *d)
 
   new_send_to_char(ch, "%s", CONFIG_WELC_MESSG);
   //save_char(ch, NOWHERE);
-  ch->next = character_list;
-  character_list = ch;
+  add_char_to_list(ch);
   if (GET_LEVEL(ch) == 0)
     load_room = real_room(3081);
   else

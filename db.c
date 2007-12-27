@@ -3672,8 +3672,7 @@ struct char_data *create_char(void)
 
   CREATE(ch, struct char_data, 1);
   clear_char(ch);
-  ch->next = character_list;
-  character_list = ch;
+  add_char_to_list(ch);
   //TODO: check this
   while (!valid_id_num(max_mob_id))
   {
@@ -3708,8 +3707,7 @@ struct char_data *read_mobile(mob_vnum nr, int type)
   CREATE(mob, struct char_data, 1);
   clear_char(mob);
   *mob = mob_proto[i];
-  mob->next = character_list;
-  character_list = mob;
+  add_char_to_list(mob);
   set_race(mob, mob_proto[i].player.race);
 
   if (MOB_TIER(mob) == 0 && (!is_aggro(mob)))
@@ -4738,7 +4736,7 @@ void default_char(struct char_data *ch)
   ch->skills = NULL; // and now skills and spells are a linked list
   GET_SEX(ch) = SEX_MALE;
   GET_CLASS(ch) = CLASS_WARRIOR;
-  GET_LEVEL(ch) = 1;
+  GET_LEVEL(ch) = 0;
   GET_HEIGHT(ch) = 100;
   GET_WEIGHT(ch) = 100;
   GET_ALIGNMENT(ch) = 0;
@@ -8311,4 +8309,11 @@ for (tp = 0; tp <= top_of_p_table; tp++)
 return 0;
 }
 
+void add_char_to_list(struct char_data *ch) {
+  //struct char_data *tch;
+  if (ch != character_list) {
+    ch->next = character_list;
+    character_list = ch;
+  }
+}
 

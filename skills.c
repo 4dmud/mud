@@ -261,7 +261,7 @@ void assign_skills(void)
 
   skillo(SKILL_BLACKJACK, "blackjack",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 0, 7);
+         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 1, 7);
 
   skillo(SKILL_CHARGE, "charge",
          TAR_IGNORE, SK_VIOLENT, NO_FIRST, NO_SECOND, 3, 26);
@@ -273,7 +273,7 @@ void assign_skills(void)
          SK_NONE, NO_FIRST, NO_SECOND, 3, 20);
 
   skillo(SKILL_FOCUS, "focus", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-         SK_NONE, NO_FIRST, NO_SECOND, 3, 24);
+         SK_NONE, NO_FIRST, NO_SECOND, 2, 24);
 
   skillo(SKILL_HOLY_STRENGTH, "holy strength",   TAR_CHAR_ROOM | TAR_SELF_ONLY,
          SK_NONE, NO_FIRST, NO_SECOND,2, 5);
@@ -965,10 +965,13 @@ ASKILL(skill_hide)
 
 ASKILL(skill_steal)
 {
-
-
   char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
   int percent, gold, eq_pos, pcsteal = 0, ohoh = 0;
+
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA)) {
+    new_send_to_char(ch, "You can't steal here. Try outside of the Arena.\r\n");
+    return 0 ;
+  }
 
   if (use_stamina( ch, 5) < 0)
   {
@@ -1093,11 +1096,11 @@ ASKILL(skill_steal)
           {
             obj_from_char(obj);
             obj_to_char(obj, ch);
-            send_to_char("Got it!\r\n", ch);
+            new_send_to_char(ch, "Got it!\r\n");
           }
         }
         else
-          send_to_char("You cannot carry that much.\r\n", ch);
+          new_send_to_char(ch, "You cannot carry that much.\r\n");
       }
     }
   }
@@ -1991,6 +1994,7 @@ ASKILL(skill_cleave)
   corpse_mod = 2;
   skill_attack(ch, vict, SKILL_CLEAVE, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_CLEAVE)) > number(0, 120));
   corpse_mod = 0;
+  WAIT_STATE(ch, 2 RL_SEC);
   return SKILL_CLEAVE;
 }
 
@@ -2020,6 +2024,7 @@ ASKILL(skill_behead)
   corpse_mod = 1;
   skill_attack(ch, vict, SKILL_BEHEAD, (IS_NPC(ch) ? GET_LEVEL(ch) : GET_SKILL(ch, SKILL_BEHEAD)) > number(0, 120));
   corpse_mod = 0;
+  WAIT_STATE(ch, 2 RL_SEC);
   return SKILL_BEHEAD;
 }
 
@@ -2077,7 +2082,7 @@ ASKILL(skill_martial_arts)
       af[1].type = SKILL_MARTIAL_ARTS;
       affect_to_char(ch, &af[1]);
     }
-
+    WAIT_STATE(ch, 2 RL_SEC);
     return SKILL_MARTIAL_ARTS;
   }
 }

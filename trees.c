@@ -33,18 +33,34 @@ int tree_total = 0;
 int forest_room;
 struct forest_data *forest = NULL;
 
-
+struct stave_stat_table stave_table[MAX_TREE_TYPES] =
+  {
+    {APPLY_SPEED, 240,   5,    4},
+    {APPLY_SPEED, 110,   25,   0},
+    {APPLY_CHA,   9,     35,   0},
+    {APPLY_WIS,   3,     42,    5},
+    {APPLY_HIT,   1000,  47,    2},
+    {APPLY_MANA,  2000,  52,    0},
+    {APPLY_INT,   3,     62,   2},
+    {APPLY_MANA,  1000,  72,   0},
+    {APPLY_HIT,   500,   28,   1}
+  } ;
 struct obj_data *make_tree(int v0, int v1, int v2)
 {
 
   struct obj_data *final_tree;
 
-  int num = 0, age = 0;
+  int num = -1, age = 0, ran = number(0, 100);
 
   if (tree_total > TREE_MAX)
     return (NULL);
 
-  num = number(0, MAX_TREE_TYPES - 1);
+  for (num=0;num<MAX_TREE_TYPES;num++)
+  {
+  if (ran >= (num == 0 ? 0 : stave_table[num-1].chance) && ran <= stave_table[num].chance)
+    break;
+  }
+
   final_tree = create_obj();
 
   final_tree->item_number = NOTHING;
@@ -65,6 +81,7 @@ struct obj_data *make_tree(int v0, int v1, int v2)
     GET_OBJ_VAL(final_tree, 2) = IRANGE(0, v2, 8);
   else
     GET_OBJ_VAL(final_tree, 2) = num;
+  
   GET_OBJ_VAL(final_tree, 3) = 0;
   GET_OBJ_COST(final_tree) = 500;
   GET_OBJ_WEIGHT(final_tree) = 1;
@@ -324,12 +341,14 @@ void check_all_trees(void)
     /*tree check*/
     if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING)
     {
-      if ((tm - GET_OBJ_VAL(obj, 0)) / (7 * SECS_PER_REAL_DAY) > GET_OBJ_VAL(obj, 1))
+      /** current time minus the time the tree was last updated
+          in seconds, devided by 7 days of seconds.
+          then check if it is more then the age of the tree -- mord **/
+      if (((tm - GET_OBJ_VAL(obj, 0)) / (5 * SECS_PER_REAL_DAY)) > GET_OBJ_VAL(obj, 1))
       {
         if (GET_OBJ_VAL(obj, 1) <= MAX_TREE_AGE)
         {
           add++;
-          GET_OBJ_VAL(obj, 0) = (int) time(0);
           GET_OBJ_VAL(obj, 1)++;
           parse_tree_name(obj);
         }

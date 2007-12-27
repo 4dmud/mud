@@ -112,8 +112,7 @@ int House_load(room_vnum vnum)
     retval = old_house_load(rnum, fl);
     fclose(fl);
   }
-  else
-    return retval;
+  
   return retval;
 
 }
@@ -593,6 +592,8 @@ void House_boot(void)
 
     if (TOROOM(real_house, temp_house.exit_num) != real_atrium)
       continue;		/* exit num mismatch -- skip */
+
+  temp_house.expantions = (temp_house.expantions > 9000 || temp_house.expantions < 0) ? 0 : temp_house.expantions;
 
     house_control[num_of_houses++] = temp_house;
 
