@@ -6388,14 +6388,10 @@ obj_rnum real_object(obj_vnum vnum) {
 //    obj_rnum bot, top, mid, i, last_top;
 
 //    i = htree_find(obj_htree, vnum);
-    if(obj_vTor.find(vnum)!=obj_vTor.end()){
-	    printf("possible\n");
+    if(obj_vTor.find(vnum)!=obj_vTor.end())
 	    return obj_vTor[vnum];
-    }
-    else {
-	    printf("impossible!\n");
+    else 
 	    return NOTHING;
-    }
 #if 0
     if (i != NOWHERE && obj_index[i].vnum == vnum)
         return i;
