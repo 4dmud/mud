@@ -4538,10 +4538,10 @@ int store_to_char(const char *name, Character *ch) {
             } else if (!strcmp(tag, "Alin"))
                 GET_ALIGNMENT(ch) = num;
             else if (!strcmp(tag, "Awrd")) {
-            if (num > 1000)
-            num = 0;
+                if (num > 1000)
+                    num = 0;
                 GET_AWARD(ch) = num;
-           }  else if (!strcmp(tag, "Aff "))
+            }  else if (!strcmp(tag, "Aff "))
                 sscanf(line, "%u %u %u %u",
                        &(ch->char_specials.saved.affected_by[0]),
                        &(ch->char_specials.saved.affected_by[1]),
@@ -4592,15 +4592,15 @@ int store_to_char(const char *name, Character *ch) {
                 GET_CLAN(ch) = num;
             else if (!strcmp(tag, "ClRk")) {
                 GET_CLAN_RANK(ch) =  player_table[id].rank < 0 ? player_table[id].rank : num;
-            } else if (!strcmp(tag, "Clns")){
-            if (num > 100)
-            num = 0;
+            } else if (!strcmp(tag, "Clns")) {
+                if (num > 100)
+                    num = 0;
                 GET_COOLNESS(ch) = num;
             } else if (!strcmp(tag, "Conv"))
                 GET_CONVERSIONS(ch) = num;
             else if (!strcmp(tag, "CrPt")) {
-            if (num > 100)
-            num = 0;
+                if (num > 100)
+                    num = 0;
                 CREATE_POINTS(ch) = num;
             } else if (!strcmp(tag, "Csnp"))
                 GET_CSNP_LVL(ch) = num;
@@ -4619,10 +4619,10 @@ int store_to_char(const char *name, Character *ch) {
             else if (!strcmp(tag, "Drol"))
                 GET_DAMROLL(ch) = num;
             else if (!strcmp(tag, "DTC ")) {
-            if (num > 100)
-            num = 0;
+                if (num > 100)
+                    num = 0;
                 GET_DT_CNT(ch) = num;
-                }
+            }
             break;
 
         case 'E':
@@ -4689,10 +4689,10 @@ int store_to_char(const char *name, Character *ch) {
 
         case 'K':
             if (!strcmp(tag, "KilC")) {
-            if (num > 2000000)
-            num = 0;
+                if (num > 2000000)
+                    num = 0;
                 GET_KILL_CNT(ch) = num;
-                }
+            }
             break;
 
         case 'L':
@@ -4803,15 +4803,14 @@ int store_to_char(const char *name, Character *ch) {
                 break;
             case 'n':
                 if (!strcmp(tag, "Ppnt")) {
-                if (num > 1000)
-                num = 0;
+                    if (num > 1000)
+                        num = 0;
                     GET_PK_POINTS(ch) = num;
-                    }
-                else if (!strcmp(tag, "Pcnt")) {
-                if (num > 1000)
-                num = 0;
+                } else if (!strcmp(tag, "Pcnt")) {
+                    if (num > 1000)
+                        num = 0;
                     GET_PK_CNT(ch) = num;
-                    }
+                }
                 break;
             case 'o':
                 if (!strcmp(tag, "PfOt"))
@@ -4864,10 +4863,10 @@ int store_to_char(const char *name, Character *ch) {
                 break;
             case 'c':
                 if (!strcmp(tag, "RipC")) {
-                if (num > 10000)
-                num = 0;
+                    if (num > 10000)
+                        num = 0;
                     GET_RIP_CNT(ch) = num;
-                    }
+                }
                 break;
             case 'd':
                 if (!strcmp(tag, "Rwrd"))
@@ -5435,10 +5434,10 @@ void char_to_store(Character *ch) {
         }
     }
 
-     if (GET_IDNUM(ch) == 0 || GET_IDNUM(ch) > top_idnum) {
+    if (GET_IDNUM(ch) == 0 || GET_IDNUM(ch) > top_idnum) {
         GET_IDNUM(ch) = GET_ID(ch) =  top_idnum++;
         add_to_lookup_table(GET_ID(ch), (void *)ch);
-        }
+    }
 
     if ((id = find_name(GET_NAME(ch))) < 0)
         return;
@@ -6187,7 +6186,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
             get_line(fl, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {   /* then this is a Xap Obj, requires
-                                                                                                                                                                                                                                                                                                                                                                                   special care */
+                                                                                                                                                                                                                                                                                                                                                                                                   special care */
                 if ((temp->name = fread_string(fl, buf2)) == NULL) {
                     temp->name = "undefined";
                 }

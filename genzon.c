@@ -564,8 +564,8 @@ int new_command(Zone *zone, int pos) {
     /*
      * Ok, let's add a new (blank) command 
      */
-    new_com= new reset_com[1];
-    new_com->command = 'N';
+    new_com = new reset_com[1];
+    new_com[0].command = 'N';
     add_cmd_to_list(&zone->cmd, new_com, pos);
     return 1;
 }
