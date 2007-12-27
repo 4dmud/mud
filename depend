@@ -157,7 +157,7 @@ handler.o: handler.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   db.h handler.h interpreter.h spells.h dg_scripts.h dg_event.h trees.h \
   fight.h damage.h
 hedit.o: hedit.c conf.h sysdep.h structs.h subskills.h comm.h utils.h \
-  db.h boards.h oasis.h
+  db.h boards.h oasis.h handler.h
 house.o: house.c conf.h sysdep.h structs.h subskills.h comm.h handler.h \
   db.h interpreter.h utils.h house.h constants.h
 htree.o: htree.c conf.h sysdep.h structs.h subskills.h utils.h db.h \

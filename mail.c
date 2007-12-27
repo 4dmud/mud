@@ -25,12 +25,12 @@ Written by Jeremy Elson (jelson@circlemud.org)
 #include "handler.h"
 #include "mail.h"
 extern int TEMP_LOAD_CHAR;
-void postmaster_send_mail(struct char_data *ch, struct char_data *mailman,
+void postmaster_send_mail(Character *ch, Character *mailman,
 			  int cmd, char *arg);
-void postmaster_check_mail(struct char_data *ch, struct char_data *mailman,
+void postmaster_check_mail(Character *ch, Character *mailman,
 			   int cmd, char *arg);
-void postmaster_receive_mail(struct char_data *ch,
-			     struct char_data *mailman, int cmd,
+void postmaster_receive_mail(Character *ch,
+			     Character *mailman, int cmd,
 			     char *arg);
 SPECIAL(postmaster);
 
@@ -77,12 +77,12 @@ void free_mail_index(void)
 
 int mail_recip_ok(const char *name)
 {
-  struct char_data *victim;
+  Character *victim;
   int ret = FALSE;
 if (!get_id_by_name((char *)name)) 
 	return ret;
 
-  CREATE(victim, struct char_data, 1);
+  CREATE(victim, Character, 1);
   clear_char(victim);
   TEMP_LOAD_CHAR = TRUE;
   if (store_to_char((char *)name, victim) >= 0) {
@@ -318,7 +318,7 @@ int has_mail(long recipient)
 {
     return (find_char_in_index(recipient) != NULL);
 }
-int check_mail(struct char_data *ch) {
+int check_mail(Character *ch) {
 
 if (HAS_MAIL(ch) == -1)
 return (HAS_MAIL(ch) = has_mail(GET_IDNUM(ch)));
@@ -556,20 +556,20 @@ SPECIAL(postmaster)
     }
 
     if (CMD_IS("mail")) {
-	postmaster_send_mail(ch, (struct char_data *) me, cmd, argument);
+	postmaster_send_mail(ch, (Character *) me, cmd, argument);
 	return (1);
     } else if (CMD_IS("check")) {
-	postmaster_check_mail(ch, (struct char_data *) me, cmd, argument);
+	postmaster_check_mail(ch, (Character *) me, cmd, argument);
 	return (1);
     } else if (CMD_IS("receive")) {
-	postmaster_receive_mail(ch, (struct char_data *) me, cmd, argument);
+	postmaster_receive_mail(ch, (Character *) me, cmd, argument);
 	return (1);
     } else
 	return (0);
 }
 
 
-void postmaster_send_mail(struct char_data *ch, struct char_data *mailman,
+void postmaster_send_mail(Character *ch, Character *mailman,
 			  int cmd, char *arg)
 {
     long recipient;
@@ -620,7 +620,7 @@ void postmaster_send_mail(struct char_data *ch, struct char_data *mailman,
 }
 
 
-void postmaster_check_mail(struct char_data *ch, struct char_data *mailman,
+void postmaster_check_mail(Character *ch, Character *mailman,
 			   int cmd, char *arg)
 {
     char buf[256];
@@ -634,8 +634,8 @@ void postmaster_check_mail(struct char_data *ch, struct char_data *mailman,
 }
 
 
-void postmaster_receive_mail(struct char_data *ch,
-			     struct char_data *mailman, int cmd, char *arg)
+void postmaster_receive_mail(Character *ch,
+			     Character *mailman, int cmd, char *arg)
 {
     char buf[256];
     int y;

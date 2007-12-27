@@ -28,7 +28,7 @@
 
 extern struct spell_info_type spell_info[];
 
-void die(struct char_data *ch, struct char_data * killer);
+void die(Character *ch, Character * killer);
 
 
 /* cast a spell; can be called by mobiles, objects and rooms, and no   */
@@ -42,8 +42,8 @@ void die(struct char_data *ch, struct char_data * killer);
 void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
 		 int type, char *cmd)
 {
-  struct char_data *caster = NULL;
-  struct char_data *tch = NULL;
+  Character *caster = NULL;
+  Character *tch = NULL;
   struct obj_data *tobj = NULL;
   struct room_data *caster_room = NULL;
   char *s, *t;
@@ -53,7 +53,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
   /* need to get the caster or the room of the temporary caster */
   switch (type) {
     case MOB_TRIGGER:
-      caster = (struct char_data *)go;
+      caster = (Character *)go;
       break;
     case WLD_TRIGGER:
       caster_room = (struct room_data *)go;
@@ -170,7 +170,7 @@ strcpy(orig_cmd, cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
 		  int script_type, char *cmd)
 {
-  struct char_data *ch = NULL;
+  Character *ch = NULL;
   int value=0, duration=0;
   char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
   char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
@@ -255,7 +255,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
   affect_to_char(ch, &af);
 }
 
-void send_char_pos(struct char_data *ch, int dam)
+void send_char_pos(Character *ch, int dam)
 {
    switch (GET_POS(ch)) {
    case POS_MORTALLYW:
@@ -278,13 +278,13 @@ void send_char_pos(struct char_data *ch, int dam)
 	break;
     case POS_DEAD:
 	act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
-	new_send_to_char(ch, "You are dead!  Sorry...\r\n");
+	ch->Send( "You are dead!  Sorry...\r\n");
 	break;
     default:			/* >= POSITION SLEEPING */
 	if (dam > (GET_MAX_HIT(ch) >> 2))
 	    act("That really did HURT!", FALSE, ch, 0, 0, TO_CHAR);
 	if (GET_HIT(ch) < (GET_MAX_HIT(ch) >> 2))
-	    new_send_to_char(ch,
+	    ch->Send(
                     "%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
                     CCRED(ch, C_SPR), CCNRM(ch, C_SPR));
     }
@@ -296,7 +296,7 @@ void send_char_pos(struct char_data *ch, int dam)
  * - allow_gods is false when called by %force%, for instance,
  * while true for %teleport%.  -- Welcor
  */
-int valid_dg_target(struct char_data *ch, int allow_gods)
+int valid_dg_target(Character *ch, int allow_gods)
 {
     if (!ch)
     return FALSE;
@@ -322,7 +322,7 @@ int valid_dg_target(struct char_data *ch, int allow_gods)
 void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
 		  int script_type, char *cmd)
 {
-  char_data *ch = NULL, *c = NULL;
+  Character *ch = NULL, *c = NULL;
   obj_data *obj = NULL, *o = NULL;
   room_data *room = NULL;
   char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
@@ -369,7 +369,7 @@ void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
    /* locate target */
    switch (script_type) {
 	    case MOB_TRIGGER:
-		    ch = (char_data *) go;
+		    ch = (Character *) go;
         if (!strcmp(name, "self"))
         c = ch;     
         else if ((o = get_object_in_equip(ch, name)));

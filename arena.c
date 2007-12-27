@@ -44,7 +44,7 @@ struct hall_of_fame_element *fame_list = NULL;
 ACMD(do_bet)
 {
   gold_int newbet;
-  struct char_data *bet_on;
+  Character *bet_on;
   char arg[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
 
@@ -86,7 +86,7 @@ ACMD(do_bet)
     send_to_char("Arena is in session, no more bets.\r\n", ch);
   }
   else if (!(bet_on = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (!(bet_on->in_room->zone == ARENA_ZONE &&
              ROOM_FLAGGED(IN_ROOM(bet_on), ROOM_ARENA)))
     send_to_char("Sorry that person is not in the arena.\r\n", ch);
@@ -121,7 +121,7 @@ ACMD(do_bet)
     arena_pot += (newbet / 2);
     bet_pot += (newbet / 2);
     GET_AMT_BET(ch) = newbet;
-    new_send_to_char(ch, "You place %lld coins on %s.\r\n", newbet,
+    ch->Send( "You place %lld coins on %s.\r\n", newbet,
                      GET_NAME(bet_on));
     send_to_arena("## %s has placed %lld coins on %s.", GET_NAME(ch),
                   newbet, GET_NAME(bet_on));
@@ -144,7 +144,7 @@ ACMD(do_arena)
   }
   else if (GET_LEVEL(ch) < lo_lim)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "You must be at least level %d to enter this arena.\r\n",
                      lo_lim);
   }
@@ -160,7 +160,7 @@ ACMD(do_arena)
   }
   else if (char_gold(ch, 0, GOLD_ALL) < (unsigned) (cost_per_lev * GET_LEVEL(ch)))
   {
-    new_send_to_char(ch, "Sorry but you need %d coins to enter the arena.\r\n",
+    ch->Send( "Sorry but you need %d coins to enter the arena.\r\n",
                      (cost_per_lev * GET_LEVEL(ch)));
   }
   else if (in_arena == ARENA_RUNNING)
@@ -181,7 +181,7 @@ ACMD(do_arena)
     send_to_arena("%s has joined the blood bath.\r\n", GET_NAME(ch));
     char_gold(ch, - (cost_per_lev * GET_LEVEL(ch)), GOLD_ALL);
     arena_pot += (cost_per_lev * GET_LEVEL(ch));
-    new_send_to_char(ch, "You pay %d coins to enter the arena\r\n",
+    ch->Send( "You pay %d coins to enter the arena\r\n",
                      (cost_per_lev * GET_LEVEL(ch)));
     alter_hit(ch, -GET_MAX_HIT(ch));
     alter_mana(ch, -GET_MAX_MANA(ch));
@@ -294,7 +294,7 @@ void show_jack_pot(void)
 
 void start_game(void)
 {
-  register struct char_data *i;
+  register Character *i;
   struct descriptor_data *d;
 
   for (d = descriptor_list; d; d = d->next)
@@ -357,7 +357,7 @@ void do_game(void)
 
 void find_game_winner(void)
 {
-  register struct char_data *i;
+  register Character *i;
   struct descriptor_data *d;
   struct hall_of_fame_element *fame_node;
 
@@ -426,7 +426,7 @@ void silent_end(void)
 
 void do_end_game(void)
 {
-  register struct char_data *i;
+  register Character *i;
   struct descriptor_data *d;
 
   for (d = descriptor_list; d; d = d->next)
@@ -453,7 +453,7 @@ void do_end_game(void)
 
 int num_in_arena(void)
 {
-  register struct char_data *i;
+  register Character *i;
   struct descriptor_data *d;
   int num = 0;
 
@@ -476,7 +476,7 @@ int num_in_arena(void)
 ACMD(do_awho)
 {
   struct descriptor_data *d;
-  struct char_data *tch;
+  Character *tch;
   int num = 0;
 
   if (in_arena == ARENA_OFF)
@@ -484,12 +484,12 @@ ACMD(do_awho)
     send_to_char("There is no Arena going on right now.\r\n", ch);
     return;
   }
-  new_send_to_char(ch, "  Gladiators in the Arena\r\n"
+  ch->Send( "  Gladiators in the Arena\r\n"
                    "---------------------------------------\r\n"
                    "Game Length = %-3d   Time To Start %-3d\r\n",  game_length, time_to_start);
-  new_send_to_char(ch, "Level Limits %d to %d\r\n", lo_lim, hi_lim);
-  new_send_to_char(ch, "         Jackpot = %ld\r\n",  arena_pot);
-  new_send_to_char(ch, "---------------------------------------\r\n");
+  ch->Send( "Level Limits %d to %d\r\n", lo_lim, hi_lim);
+  ch->Send( "         Jackpot = %ld\r\n",  arena_pot);
+  ch->Send( "---------------------------------------\r\n");
 
   for (d = descriptor_list; d; d = d->next)
     if (!d->connected)
@@ -499,11 +499,11 @@ ACMD(do_awho)
           ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA) &&
           (IN_ROOM(tch) != NULL) && GET_LEVEL(tch) < LVL_HERO)
       {
-        new_send_to_char(ch, "%-20.20s%s",
+        ch->Send( "%-20.20s%s",
                          GET_NAME(tch), (!(++num % 3) ? "\r\n" : ""));
       }
     }
-  new_send_to_char(ch, "\r\n\r\n");
+  ch->Send( "\r\n\r\n");
 }
 
 
@@ -518,20 +518,20 @@ ACMD(do_ahall)
     return;
   }
 
-  new_send_to_char(ch, "%s|---------------------------------------|%s\r\n",
+  ch->Send( "%s|---------------------------------------|%s\r\n",
                    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
-  new_send_to_char(ch,
+  ch->Send(
                    "%s|%sPast Winners of Arena%s                  |%s\r\n",
                    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM), CCBLU(ch, C_NRM),
                    CCNRM(ch, C_NRM));
-  new_send_to_char(ch,
+  ch->Send(
                    "%s|---------------------------------------|%s\r\n\r\n",
                    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
 
 
-  new_send_to_char(ch, "%-10.10s  %-15.15s  %-40s\r\n", "Date", "Award Amt", "Name");
+  ch->Send( "%-10.10s  %-15.15s  %-40s\r\n", "Date", "Award Amt", "Name");
 
-  new_send_to_char(ch, "%-10.10s  %-15.15s  %-40s\r\n",
+  ch->Send( "%-10.10s  %-15.15s  %-40s\r\n",
                    "---------------------------------",
                    "--------------------------------",
                    "-------------------------------------------------");
@@ -547,7 +547,7 @@ ACMD(do_ahall)
     }
     else
       strcpy(site, "Unknown");
-    new_send_to_char(ch, "%-10.10s  %-16ld %s\r\n", site, fame_node->award,
+    ch->Send( "%-10.10s  %-16ld %s\r\n", site, fame_node->award,
                      CAP(fame_node->name));
   }
 
@@ -612,9 +612,9 @@ void write_one_fame_node(FILE * fp, struct hall_of_fame_element *node)
 }
 
 
-void find_bet_winners(struct char_data *winner)
+void find_bet_winners(Character *winner)
 {
-  register struct char_data *i;
+  register Character *i;
   struct descriptor_data *d;
 
 
@@ -638,7 +638,7 @@ void find_bet_winners(struct char_data *winner)
 }
 
 
-int arena_ok(struct char_data *ch, struct char_data *victim)
+int arena_ok(Character *ch, Character *victim)
 {
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA) &&
       ROOM_FLAGGED(victim->in_room, ROOM_ARENA))
@@ -650,7 +650,7 @@ int arena_ok(struct char_data *ch, struct char_data *victim)
 }
 
 
-void arena_kill(struct char_data *ch)
+void arena_kill(Character *ch)
 {
   room_rnum rm = real_room(1205);
   if (FIGHTING(ch))

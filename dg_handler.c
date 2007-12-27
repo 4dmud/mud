@@ -114,14 +114,14 @@ void extract_script(void *thing, int type)
 {
   struct script_data *sc = NULL;
   struct trig_data *trig, *next_trig;
-  char_data *mob;
+  Character *mob;
   obj_data *obj;
   room_data *room;
 
   switch (type)
   {
   case MOB_TRIGGER:
-    mob = (struct char_data *)thing;
+    mob = (Character *)thing;
     sc = SCRIPT(mob);
     SCRIPT(mob) = NULL;
     break;
@@ -139,7 +139,7 @@ void extract_script(void *thing, int type)
 
 #if 0 /* debugging */
   {
-    struct char_data *i = character_list;
+    Character *i = character_list;
     struct obj_data *j = object_list;
     room_rnum k;
     if (sc)
@@ -187,14 +187,14 @@ void free_proto_script(void *thing, int type)
 {
 
   struct trig_proto_list *proto = NULL, *fproto;
-  char_data *mob;
+  Character *mob;
   obj_data *obj;
   room_data *room;
 
   switch (type)
   {
   case MOB_TRIGGER:
-    mob = (struct char_data *) thing;
+    mob = (Character *) thing;
     proto = mob->proto_script;
     mob->proto_script = NULL;
     break;
@@ -211,7 +211,7 @@ void free_proto_script(void *thing, int type)
   }
 #if 0 /* debugging */
   {
-    struct char_data *i = character_list;
+    Character *i = character_list;
     struct obj_data *j = object_list;
     room_rnum k;
     if (proto)
@@ -237,7 +237,7 @@ void free_proto_script(void *thing, int type)
 }
 
 /* perhaps not the best place for this, but I didn't want a new file */
-char *sub_percent(struct char_data *ch, char *sub)
+char *sub_percent(Character *ch, char *sub)
 {
   static char retval[16];
   int subnum;
@@ -250,7 +250,7 @@ char *sub_percent(struct char_data *ch, char *sub)
   return retval;
 }
 /* perhaps not the best place for this, but I didn't want a new file */
-char *skill_percent(struct char_data *ch, char *skill)
+char *skill_percent(Character *ch, char *skill)
 {
   static char retval[16];
   int skillnum;
@@ -275,7 +275,7 @@ void copy_proto_script(void *source, void *dest, int type)
   switch (type)
   {
   case MOB_TRIGGER:
-    tp_src = ((char_data *)source)->proto_script;
+    tp_src = ((Character *)source)->proto_script;
     break;
   case OBJ_TRIGGER:
     tp_src = ((obj_data *)source)->proto_script;
@@ -291,7 +291,7 @@ void copy_proto_script(void *source, void *dest, int type)
     switch (type)
     {
     case MOB_TRIGGER:
-      ((char_data *)dest)->proto_script = tp_dst;
+      ((Character *)dest)->proto_script = tp_dst;
       break;
     case OBJ_TRIGGER:
       ((obj_data *)dest)->proto_script = tp_dst;

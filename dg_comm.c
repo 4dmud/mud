@@ -31,7 +31,7 @@ char *any_one_name(char *argument, char *first_arg)
 }
 
 
-void sub_write_to_char(char_data * ch, char *tokens[],
+void sub_write_to_char(Character * ch, char *tokens[],
                        void *otokens[], char type[])
 {
   char sb[MAX_STRING_LENGTH];
@@ -48,49 +48,49 @@ void sub_write_to_char(char_data * ch, char *tokens[],
     case '~':
       if (!otokens[i])
         strlcat(sb, "someone", sizeof(sb));
-      else if ((char_data *) otokens[i] == ch)
+      else if ((Character *) otokens[i] == ch)
         strlcat(sb, "you", sizeof(sb));
       else
-        strlcat(sb, PERS((char_data *) otokens[i], ch), sizeof(sb));
+        strlcat(sb, PERS((Character *) otokens[i], ch), sizeof(sb));
       break;
 
     case '@':
       if (!otokens[i])
         strlcat(sb, "someone's", sizeof(sb));
-      else if ((char_data *) otokens[i] == ch)
+      else if ((Character *) otokens[i] == ch)
         strlcat(sb, "your", sizeof(sb));
       else
       {
-        strlcat(sb, PERS((char_data *) otokens[i], ch), sizeof(sb));
+        strlcat(sb, PERS((Character *) otokens[i], ch), sizeof(sb));
         strlcat(sb, "'s", sizeof(sb));
       }
       break;
 
     case '^':
-      if (!otokens[i] || !CAN_SEE(ch, (char_data *) otokens[i]))
+      if (!otokens[i] || !CAN_SEE(ch, (Character *) otokens[i]))
         strlcat(sb, "its", sizeof(sb));
       else if (otokens[i] == ch)
         strlcat(sb, "your", sizeof(sb));
       else
-        strlcat(sb, HSHR((char_data *) otokens[i]), sizeof(sb));
+        strlcat(sb, HSHR((Character *) otokens[i]), sizeof(sb));
       break;
 
     case '&':
-      if (!otokens[i] || !CAN_SEE(ch, (char_data *) otokens[i]))
+      if (!otokens[i] || !CAN_SEE(ch, (Character *) otokens[i]))
         strlcat(sb, "it", sizeof(sb));
       else if (otokens[i] == ch)
         strlcat(sb, "you", sizeof(sb));
       else
-        strlcat(sb, HSSH((char_data *) otokens[i]), sizeof(sb));
+        strlcat(sb, HSSH((Character *) otokens[i]), sizeof(sb));
       break;
 
     case '*':
-      if (!otokens[i] || !CAN_SEE(ch, (char_data *) otokens[i]))
+      if (!otokens[i] || !CAN_SEE(ch, (Character *) otokens[i]))
         strlcat(sb, "it", sizeof(sb));
       else if (otokens[i] == ch)
         strlcat(sb, "you", sizeof(sb));
       else
-        strlcat(sb, HMHR((char_data *) otokens[i]), sizeof(sb));
+        strlcat(sb, HMHR((Character *) otokens[i]), sizeof(sb));
       break;
 
     case '`':
@@ -106,17 +106,17 @@ void sub_write_to_char(char_data * ch, char *tokens[],
   strlcat(sb, "\r\n", sizeof(sb));
   if (*sb)
   *sb = toupper(*sb);
-  new_send_to_char(ch, "%s", sb);
+  ch->Send( "%s", sb);
 }
 
 
-void sub_write(char *arg, char_data * ch, byte find_invis, int targets)
+void sub_write(char *arg, Character * ch, byte find_invis, int targets)
 {
   char str[MAX_INPUT_LENGTH * 2];
   char type[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
   char *tokens[MAX_INPUT_LENGTH], *s, *p;
   void *otokens[MAX_INPUT_LENGTH];
-  char_data *to;
+  Character *to;
   obj_data *obj;
   int i, tmp = 0;
   int to_sleeping = 1;	/* mainly for windows compiles */
@@ -137,7 +137,7 @@ void sub_write(char *arg, char_data * ch, byte find_invis, int targets)
     case '^':
     case '&':
     case '*':
-      /* get char_data, move to next token */
+      /* get Character, move to next token */
       type[i] = *p;
       *s = '\0';
       p = any_one_name(++p, name);

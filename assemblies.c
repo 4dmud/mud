@@ -159,7 +159,7 @@ void assemblySaveAssemblies( void )
   fclose( pFile );
 }
 
-void assemblyListToChar( struct char_data *pCharacter )
+void assemblyListToChar( Character *pCharacter )
 {
   char         szBuffer[ MAX_STRING_LENGTH ] = { '\0' };
   char         szAssmType[ MAX_INPUT_LENGTH ] = { '\0' };
@@ -278,7 +278,7 @@ bool assemblyAddComponent( long lVnum, long lComponentVnum, bool bExtract, bool 
   return (TRUE);
 }
 
-bool assemblyCheckComponents( long lVnum, struct char_data *pCharacter , bool check_only)
+bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_only)
 {
   bool         bOk = TRUE;
   long         i = 0;

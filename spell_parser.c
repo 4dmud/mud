@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.20  2006/05/21 11:02:27  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.19  2006/05/08 19:36:27  w4dimenscor
  * Commiting some files that were out of the cvs because of the last backup fiasco, and there is also a bugfix for teleport in
  * scripts.
@@ -129,23 +133,23 @@ extern int spell_sorted_info[];
 
 /* external functions */
 int check_potion_weight(struct obj_data *obj);
-void improve_skill(struct char_data *ch, int skill);
+void improve_skill(Character *ch, int skill);
 
 /* local functions */
-void say_spell(struct char_data *ch, int spellnum, struct char_data *tch,
+void say_spell(Character *ch, int spellnum, Character *tch,
                struct obj_data *tobj);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
             int routines, int wait, int first_prereq, int second_prereq, int tier, int level);
 
-int mag_manacost(struct char_data *ch, int spellnum);
+int mag_manacost(Character *ch, int spellnum);
 char * print_elemental(int chcl, int weak, char * buf, size_t len);
 ACMD(do_cast);
 void unused_spell(int spl);
 void mag_assign_spells(void);
 void default_message(void);
-int do_magic_direction(int level, int dir, int dist, struct char_data *ch, struct char_data *vict, int spellnum);
-int distance = -1;
+int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum);
+int sp_dist = -1;
 /*
  * This arrangement is pretty stupid, but the number of skills is limited by
  * the playerfile.  We can arbitrarily increase the number of skills by
@@ -205,25 +209,25 @@ struct syllable syls[] =
 const char *unused_spellname = "!UNUSED!";   /* So we can get &unused_spellname */
 //const char *unused_spellmessage = "You summon the energy to change spells.";  /* So we can get &unused_spellmessage */
 
-int mag_manacost(struct char_data *ch, int spellnum)
+int mag_manacost(Character *ch, int spellnum)
 {
-  return (MAX(SINFO.mana_max - (SINFO.mana_change *
+  return FTOI((MAX(SINFO.mana_max - (SINFO.mana_change *
                                 (GET_LEVEL(ch) -
                                  SINFO.min_level)),
-              SINFO.mana_min)) * (1.4 + (-resist_elem(ch, elemental_type(spellnum))*0.01));
+                   SINFO.mana_min)) * (1.4 + (-resist_elem(ch, elemental_type(spellnum))*0.01)));
 }
 
 
 /* say_spell erodes buf, buf1, buf2 */
 
-void say_spell(struct char_data *ch, int spellnum, struct char_data *tch,
+void say_spell(Character *ch, int spellnum, Character *tch,
                struct obj_data *tobj)
 {
   struct obj_data *focus = GET_EQ(ch, WEAR_FOCUS);
   char lbuf[256], buf[256], buf1[256], buf2[256]; /* FIXME */
   const char *format;
 
-  struct char_data *i;
+  Character *i;
   int j, ofs = 0;
 
   *buf = '\0';
@@ -390,7 +394,7 @@ int find_skill_num(char *name)
 }
 */
 
-int get_skill(struct char_data *ch, int i)
+int get_skill(Character *ch, int i)
 {
   struct skillspell_data *temp = ch->skills;
 
@@ -408,7 +412,7 @@ int get_skill(struct char_data *ch, int i)
 
 }
 
-void set_skill(struct char_data *ch, int skill, int amount)
+void set_skill(Character *ch, int skill, int amount)
 {
   struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
   struct skillspell_data *temp2    = NULL;
@@ -464,7 +468,7 @@ void set_skill(struct char_data *ch, int skill, int amount)
   //save_char(ch, 0);
 }
 
-int get_skill_wait(struct char_data *ch, int skill)
+int get_skill_wait(Character *ch, int skill)
 {
   struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
 
@@ -480,7 +484,7 @@ int get_skill_wait(struct char_data *ch, int skill)
 
 }
 
-void set_skill_wait(struct char_data *ch, int skill, int w)
+void set_skill_wait(Character *ch, int skill, int w)
 {
   struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
   if (w < 0)
@@ -597,7 +601,7 @@ int find_skill_num(char *name)
  * This is also the entry point for non-spoken or unrestricted spells.
  * Spellnum 0 is legal but silently ignored here, to make callers simpler.
  */
-int call_magic(struct char_data *caster, struct char_data *cvict,
+int call_magic(Character *caster, Character *cvict,
                struct obj_data *ovict, char *tar_str, int spellnum,
                int level, int casttype)
 {
@@ -667,8 +671,8 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     break;
   }
 
-  if (GET_SPELL_DIR(caster)!=NOWHERE && distance != NOWHERE)
-    return do_magic_direction(level, GET_SPELL_DIR(caster), distance, caster,cvict, spellnum);
+  if (GET_SPELL_DIR(caster)!=NOWHERE && sp_dist != NOWHERE)
+    return do_magic_direction(level, GET_SPELL_DIR(caster), sp_dist, caster,cvict, spellnum);
 
   if (IS_SET(SINFO.routines, MAG_DAMAGE))
     if (mag_damage(level, caster, cvict, spellnum, savetype) == -1)
@@ -787,11 +791,11 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
  * files (this is a CircleMUD enhancement).
  */
 
-void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
+void mag_objectmagic(Character *ch, struct obj_data *obj,
                      char *argument)
 {
   int i, k;
-  struct char_data *tch = NULL;//, *next_tch;
+  Character *tch = NULL;//, *next_tch;
   struct obj_data *tobj = NULL;
   char arg[MAX_INPUT_LENGTH];
 
@@ -802,7 +806,7 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
 
   if (use_stamina( ch, 3) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return;
   }
 
@@ -1023,7 +1027,7 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj,
  * by NPCs via specprocs.
  */
 
-int cast_spell(struct char_data *ch, struct char_data *tch,
+int cast_spell(Character *ch, Character *tch,
                struct obj_data *tobj, char *tar_str, int spellnum)
 {
   int result;
@@ -1089,23 +1093,23 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   {
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
     {
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     }
 
     else if (GET_SPELL_DIR(ch) != NOWHERE)
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You concentrate your energy and send the runes of %s %s.\r\n",
                        skill_name(spellnum),
                        dirs[GET_SPELL_DIR(ch)]);
     }
     else if ( IS_SET(SINFO.routines, MAG_DAMAGE))
     {
-      new_send_to_char(ch, "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
+      ch->Send( "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
     }
     else
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You concentrate and draw the runes for %s in the air.\r\n",
                        skill_name(spellnum));
     }
@@ -1114,22 +1118,22 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   {
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
     {
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     }
     else if ( IS_SET(SINFO.routines, MAG_DAMAGE))
     {
-      new_send_to_char(ch, "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
+      ch->Send( "You power up %s %s attack.\r\n", LANA(skill_name(spellnum)), skill_name(spellnum));
     }
     else if (GET_SPELL_DIR(ch) != NOWHERE)
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You focus your energy and send the runes of %s %s.\r\n",
                        skill_name(spellnum),
                        dirs[GET_SPELL_DIR(ch)]);
     }
     else
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You focus and draw the runes for %s in the air.\r\n",
                        skill_name(spellnum));
     }
@@ -1157,7 +1161,7 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
 ACMD(do_cast)
 {
 
-  struct char_data *tch = NULL;//, *victim = NULL;
+  Character *tch = NULL;//, *victim = NULL;
   struct obj_data *tobj = NULL;
   char *s, *t, abuf[MAX_INPUT_LENGTH], *a;
   int mana, spellnum, i, target = 0, dir = NOWHERE;
@@ -1182,7 +1186,7 @@ ACMD(do_cast)
   s = strtok(NULL, "'");
   if (s == NULL)
   {
-    new_send_to_char(ch, "Spell names must be enclosed in the Holy Magic Symbols: '\r\n");
+    ch->Send( "Spell names must be enclosed in the Holy Magic Symbols: '\r\n");
     return;
   }
   t = strtok(NULL, "\0");
@@ -1208,7 +1212,7 @@ ACMD(do_cast)
   if (!IS_NPC(ch) && GET_LEVEL(ch) <= LVL_GOD)
     if (GET_SPELL_WAIT(ch, spellnum) > 0)
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "Your ability to cast this spell has been worn out for \r\n"
                        "at least another %d second%s\r\n",
                        GET_SPELL_WAIT(ch, spellnum),
@@ -1231,7 +1235,7 @@ ACMD(do_cast)
     if (arg && *arg)
       dir = search_block(arg, dirs, FALSE);
   }
-  //new_send_to_char(ch, "a is %s, dir is %s, t is %s\r\n", a, dirs[dir], t);
+  //ch->Send( "a is %s, dir is %s, t is %s\r\n", a, dirs[dir], t);
 
   /*Special case Locate Object*/
   if (spellnum == SPELL_LOCATE_OBJECT)
@@ -1305,16 +1309,16 @@ ACMD(do_cast)
       /*New case: TAR_AREA_DIR targets someone, in a direction, or just a direction.
          can be used for door spells. Can be used for far sight spells.
          can be used for missile spells. Or even movement. */
-      //new_send_to_char(ch, "target is %d\r\n", target);
+      //ch->Send( "target is %d\r\n", target);
       if (!target && IS_SET(SINFO.targets, TAR_AREA_DIR) && dir != NOWHERE)
       {
         tch = find_in_dir(IN_ROOM(ch), a, dir);
-        if (((distance = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
+        if (((sp_dist = magic_distance(ch, spellnum, dir, tch)) != NOWHERE))
         {
           target = TRUE;
           GET_SPELL_DIR(ch) = dir;
         }
-        else if (((distance = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
+        else if (((sp_dist = magic_distance(ch, spellnum, dir, NULL)) != NOWHERE) &&
                  IS_SET(SINFO.targets, TAR_IGNORE) && dir != NOWHERE)
         {
           tch = NULL;
@@ -1323,7 +1327,7 @@ ACMD(do_cast)
 
         }
       }
-      //new_send_to_char(ch, "target is %d\r\n", target);
+      //ch->Send( "target is %d\r\n", target);
       /*New case: TAR_AREA_ROOM targets the casters room but cycles through everyone in the room */
 
       if (!target && IS_SET(SINFO.targets, TAR_AREA_ROOM))
@@ -1358,7 +1362,7 @@ ACMD(do_cast)
 
       if (!target)
       {
-        new_send_to_char(ch, "Upon %s should the spell be cast?\r\n",
+        ch->Send( "Upon %s should the spell be cast?\r\n",
                          IS_SET(SINFO.targets,
                                 TAR_OBJ_ROOM | TAR_OBJ_INV |
                                 TAR_OBJ_WORLD | TAR_OBJ_EQUIP) ? "what"
@@ -1376,13 +1380,13 @@ ACMD(do_cast)
   }
 
   /*if (dir == NOWHERE && (t != NULL && *t)
-  && IS_SET(SINFO.targets, TAR_AREA_DIR) && distance)
+  && IS_SET(SINFO.targets, TAR_AREA_DIR) && sp_dist)
   if ((dir = search_block(t, dirs, FALSE)) != NOWHERE) {
    tch = NULL;
    GET_SPELL_DIR(ch) = dir;
    target = TRUE;
   }*/
-  //new_send_to_char(ch, "target is %d\r\n", target);
+  //ch->Send( "target is %d\r\n", target);
   if (!target)
   {
     send_to_char("Cannot find the target of your spell!\r\n", ch);
@@ -1391,14 +1395,14 @@ ACMD(do_cast)
 
   if (use_stamina(ch, 3) < 0)
   {
-    new_send_to_char(ch, "You haven't the energy to cast %s!\r\n", skill_name(spellnum));
+    ch->Send( "You haven't the energy to cast %s!\r\n", skill_name(spellnum));
     GET_SPELL_DIR(ch) = NOWHERE;
     return;
   }
   mana = mag_manacost(ch, spellnum);
   if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    new_send_to_char(ch, "You haven't the energy to cast %s!\r\n",
+    ch->Send( "You haven't the energy to cast %s!\r\n",
                      skill_name(spellnum));
     GET_SPELL_DIR(ch) = NOWHERE;
     return;
@@ -1411,9 +1415,9 @@ ACMD(do_cast)
     if (!tch || !skill_message(0, ch, tch, spellnum))
       GET_SPELL_DIR(ch) = NOWHERE;
     if (RIDING(ch))
-      new_send_to_char(ch, "Your mount knocks you about too much!\r\n");
+      ch->Send( "Your mount knocks you about too much!\r\n");
     else
-      new_send_to_char(ch, "You lost your concentration!\r\n");
+      ch->Send( "You lost your concentration!\r\n");
     if (mana > 0)
       alter_mana(ch, mana / 2);
     if (SINFO.violent && tch && IS_NPC(tch) && HERE(tch, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
@@ -1437,7 +1441,7 @@ ACMD(do_cast)
     }
   }
 }
-int grand_master(struct char_data *ch)
+int grand_master(Character *ch)
 {
   int i, m = 0;
   for (i = 0; i < NUM_CLASSES; i++)
@@ -1447,11 +1451,11 @@ int grand_master(struct char_data *ch)
 }
 
 /* This works for skills too -- Mord */
-int knows_spell(struct char_data *ch, int spell)
+int knows_spell(Character *ch, int spell)
 {
 
-  int tier_level(struct char_data *ch, int chclass);
-  int has_class(struct char_data *ch, int chclass);
+  int tier_level(Character *ch, int chclass);
+  int has_class(Character *ch, int chclass);
 
   int i, gm, t;
   int ret_val = 0;
@@ -2661,7 +2665,7 @@ int anti_elem(int elem)
 }
 
 
-int immune_to(CHAR_DATA *ch, int elem)
+int immune_to(Character *ch, int elem)
 {
   return 0;
 
@@ -2671,7 +2675,7 @@ int immune_to(CHAR_DATA *ch, int elem)
     return 0;
 }
 
-float resist_elem(CHAR_DATA *ch, int elem)
+float resist_elem(Character *ch, int elem)
 {
   float retval = 0;
   if (IS_SET(class_elem_weakness(GET_CLASS(ch)), (1 << elem)))

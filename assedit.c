@@ -59,13 +59,13 @@ ACMD (do_assedit)
   if (IS_NPC(ch))
     return;
   if (GET_LEVEL(ch) < LVL_IMPL)
-    new_send_to_char(ch, "You do not have permission to do that.\r\n");
+    ch->Send( "You do not have permission to do that.\r\n");
 
   for (d = descriptor_list; d; d = d->next)
   {
     if (d->connected == CON_ASSEDIT)
     {
-      new_send_to_char(ch, "Assemblies are already being editted by someone.\r\n");
+      ch->Send( "Assemblies are already being editted by someone.\r\n");
       return;
     }
   }

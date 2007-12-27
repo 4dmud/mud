@@ -41,7 +41,7 @@ void exdesc_string_cleanup(struct descriptor_data *d, int action);
 void trigedit_string_cleanup(struct descriptor_data *d, int terminator);
 void help_string_cleanup(struct descriptor_data *d, int action);
 void note_string_cleanup(struct descriptor_data *d, int action);
-struct char_data *find_char(long n);
+Character *find_char(long n);
 
 
 const char *string_fields[] =
@@ -270,7 +270,7 @@ void playing_string_cleanup(struct descriptor_data *d, int action)
   {
     if (action == STRINGADD_SAVE && *d->str)
     {
-      struct char_data *to;
+      Character *to;
       store_mail(d->mail_to, GET_IDNUM(d->character), *d->str);
       write_to_output(d, "Message sent!\r\n");
       if ((to = find_char(d->mail_to)) != NULL)
@@ -330,7 +330,7 @@ void exdesc_string_cleanup(struct descriptor_data *d, int action)
 
 ACMD(do_skillset)
 {
-  struct char_data *vict;
+  Character *vict;
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH], help[MAX_STRING_LENGTH];
   int skill, value, i, qend;
@@ -339,24 +339,24 @@ ACMD(do_skillset)
 
   if (!*name)
   {			/* no arguments. print an informative text */
-    new_send_to_char(ch, "Syntax: skillset <name> '<skill>' <value>\r\n"
+    ch->Send( "Syntax: skillset <name> '<skill>' <value>\r\n"
                      "Skill being one of the following:\r\n");
     for (qend = 0, i = 0; i <= TOP_SPELL_DEFINE; i++)
     {
       if (spell_info[i].name == unused_spellname)	/* This is valid. */
         continue;
-      new_send_to_char(ch, "%18s", spell_info[i].name);
+      ch->Send( "%18s", spell_info[i].name);
       if (qend++ % 4 == 3)
-        new_send_to_char(ch, "\r\n");
+        ch->Send( "\r\n");
     }
     if (qend % 4 != 0)
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     return;
   }
 
   if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD)))
   {
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   skip_spaces(&argument);
@@ -364,12 +364,12 @@ ACMD(do_skillset)
   /* If there is no chars in argument */
   if (!*argument)
   {
-    new_send_to_char(ch, "Skill name expected.\r\n");
+    ch->Send( "Skill name expected.\r\n");
     return;
   }
   if (*argument != '\'')
   {
-    new_send_to_char(ch, "Skill must be enclosed in: ''\r\n");
+    ch->Send( "Skill must be enclosed in: ''\r\n");
     return;
   }
   /* Locate the last quote and lowercase the magic words (if any) */
@@ -379,14 +379,14 @@ ACMD(do_skillset)
 
   if (argument[qend] != '\'')
   {
-    new_send_to_char(ch, "Skill must be enclosed in: ''\r\n");
+    ch->Send( "Skill must be enclosed in: ''\r\n");
     return;
   }
   strcpy(help, (argument + 1));	/* strcpy: OK (MAX_INPUT_LENGTH <= MAX_STRING_LENGTH) */
   help[qend - 1] = '\0';
   if ((skill = find_skill_num(help)) <= 0)
   {
-    new_send_to_char(ch, "Unrecognized skill.\r\n");
+    ch->Send( "Unrecognized skill.\r\n");
     return;
   }
   argument += qend + 1;		/* skip to next parameter */
@@ -394,23 +394,23 @@ ACMD(do_skillset)
 
   if (!*buf)
   {
-    new_send_to_char(ch, "Learned value expected.\r\n");
+    ch->Send( "Learned value expected.\r\n");
     return;
   }
   value = atoi(buf);
   if (value < 0)
   {
-    new_send_to_char(ch, "Minimum value for learned is 0.\r\n");
+    ch->Send( "Minimum value for learned is 0.\r\n");
     return;
   }
   if (value > 100)
   {
-    new_send_to_char(ch, "Max value for learned is 100.\r\n");
+    ch->Send( "Max value for learned is 100.\r\n");
     return;
   }
   if (IS_NPC(vict))
   {
-    new_send_to_char(ch, "You can't set NPC skills.\r\n");
+    ch->Send( "You can't set NPC skills.\r\n");
     return;
   }
 
@@ -420,13 +420,13 @@ ACMD(do_skillset)
    */
   SET_SKILL(vict, skill, value);
   new_mudlog(BRF, LVL_IMMORT, TRUE, "%s changed %s's %s to %d.", GET_NAME(ch), GET_NAME(vict), spell_info[skill].name, value);
-  new_send_to_char(ch, "You change %s's %s to %d.\r\n", GET_NAME(vict), spell_info[skill].name, value);
+  ch->Send( "You change %s's %s to %d.\r\n", GET_NAME(vict), spell_info[skill].name, value);
 }
 
 
 ACMD(do_subskillset)
 {
-  struct char_data *vict;
+  Character *vict;
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH], help[MAX_STRING_LENGTH];
   int skill, value, i, qend;
@@ -438,23 +438,23 @@ ACMD(do_subskillset)
    */
   if (!*name)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "Syntax: subskillset <name> '<skill>' <value>\r\n"
                      "Skill being one of the following:\r\n");
     for (qend = 0, i = 0; i <= TOP_SUB_DEFINE; i++)
     {
-      new_send_to_char(ch, "%18s", sub_name(i));
+      ch->Send( "%18s", sub_name(i));
       if (qend++ % 4 == 3)
-        new_send_to_char(ch, "\r\n");
+        ch->Send( "\r\n");
     }
     if (qend % 4 != 0)
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     return;
   }
 
   if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD)))
   {
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   skip_spaces(&argument);
@@ -517,7 +517,7 @@ ACMD(do_subskillset)
 
   improve_sub(vict, (enum subskill_list)skill, value - GET_SUB(vict, skill));
 
-  new_send_to_char(ch, "You change %s's %s to %d.\r\n", GET_NAME(vict),
+  ch->Send( "You change %s's %s to %d.\r\n", GET_NAME(vict),
                    sub_name(skill), value);
 }
 

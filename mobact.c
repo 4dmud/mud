@@ -26,13 +26,13 @@
 extern int no_specials;
 
 ACMD(do_get);
-void hunt_victim(struct char_data *ch);
-void parse_mob_commands(struct char_data *ch);
-CHAR_DATA * parse_aggressive(struct char_data *ch);
+void hunt_victim(Character *ch);
+void parse_mob_commands(Character *ch);
+Character * parse_aggressive(Character *ch);
 
 /* local functions */
 void mobile_activity(void);
-void clearMemory(struct char_data *ch);
+void clearMemory(Character *ch);
 
 int total_actions = 0;
 int max_actions = 0;
@@ -42,7 +42,7 @@ int min_actions = -1;
 
 void mobile_activity(void)
 {
-    struct char_data *ch, *next_ch, *vict;
+    Character *ch, *next_ch, *vict;
     struct obj_data *obj, *best_obj;
     int door, found, max;
     memory_rec *names;
@@ -56,7 +56,7 @@ void mobile_activity(void)
 	next_ch = ch->next;
 	/*
 	   if ((!IS_NPC(ch)) && (IS_POISONED(ch)))
-	   new_send_to_char(ch, "{cRYou feel the poison curdling your blood.\r\n");
+	   ch->Send( "{cRYou feel the poison curdling your blood.\r\n");
 	 */
 
 	if (!IS_MOB(ch) || DEAD(ch))
@@ -123,7 +123,7 @@ void mobile_activity(void)
 	if (!FIGHTING(ch) && (MOB_FLAGGED(ch, MOB_AGGRESSIVE)
 	    || MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN))) {
 	    found = FALSE;
-	    CHAR_DATA *vnext;
+	    Character *vnext;
 	    for (vict = IN_ROOM(ch)->people; vict && !found;
 		 vict = vnext) {
 		 vnext = vict->next_in_room;
@@ -205,7 +205,7 @@ void mobile_activity(void)
 /* Mob Memory Routines */
 
 /* make ch remember victim */
-void remember(struct char_data *ch, struct char_data *victim)
+void remember(Character *ch, Character *victim)
 {
     memory_rec *tmp;
     bool present = FALSE;
@@ -227,7 +227,7 @@ void remember(struct char_data *ch, struct char_data *victim)
 
 
 /* make ch forget victim */
-void forget(struct char_data *ch, struct char_data *victim)
+void forget(Character *ch, Character *victim)
 {
     memory_rec *curr, *prev = NULL;
 
@@ -252,7 +252,7 @@ void forget(struct char_data *ch, struct char_data *victim)
 
 
 /* erase ch's memory */
-void clearMemory(struct char_data *ch)
+void clearMemory(Character *ch)
 {
     memory_rec *curr, *next;
 
@@ -267,8 +267,8 @@ void clearMemory(struct char_data *ch)
     MEMORY(ch) = NULL;
 }
 
-CHAR_DATA * parse_aggressive(struct char_data *ch) {
-CHAR_DATA *vict = NULL;
+Character * parse_aggressive(Character *ch) {
+Character *vict = NULL;
 /* Aggressive Mobs */
 	if (!FIGHTING(ch) && (MOB_FLAGGED(ch, MOB_AGGRESSIVE)
 	    || MOB_FLAGGED(ch, MOB_AGGR_TO_ALIGN))) {
@@ -300,7 +300,7 @@ struct travel_point_data *tlist, *ttop = NULL;
 room_rnum rnum, curr_room = NULL;
 room_vnum dest = NOWHERE;
 struct obj_data *obj = NULL;
-struct char_data *mob = NULL;
+Character *mob = NULL;
 int find_first_step(room_rnum src, room_rnum target);
 
 if (!thing)
@@ -308,7 +308,7 @@ return 0;
 
 switch (type) {
    case STRUCT_IS_MOB:
-   mob = *(struct char_data**)thing;
+   mob = *(Character**)thing;
    if ((curr_room = IN_ROOM(mob)) == NULL)
 	   return 0;
    if ((ttop = TRAVEL_LIST(mob)) == NULL)
@@ -393,13 +393,13 @@ void add_travel_point_by_pointer(struct travel_point_data **tlist, room_vnum des
 
 void add_travel_point_by_thing(void *thing, int type, room_vnum dest) {
   struct travel_point_data *tlist, *temp, *ttop;
-  struct char_data *mob = NULL;
+  Character *mob = NULL;
   struct obj_data  *obj = NULL;
   if (!thing)
   return;
   switch (type) {
      case STRUCT_IS_MOB:
-         mob = *(struct char_data **)thing;
+         mob = *(Character **)thing;
          ttop = TRAVEL_LIST(mob);
      break;
      case STRUCT_IS_OBJ:

@@ -12,27 +12,27 @@
 
 #define COPYOVER_FILE "copyover.dat"
 /* comm.c */
-size_t new_send_to_char(struct char_data *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
-size_t send_to_fusion(struct char_data *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
+size_t new_send_to_char(Character *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
+size_t send_to_fusion(Character *ch, const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
 void	send_to_all(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void	send_to_arena(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
-void send_to_char(const char *messg, struct char_data *ch);
+void send_to_char(const char *messg, Character *ch);
 void	send_to_range(room_vnum start, room_vnum finish, const char *messg, ...) __attribute__ ((format (printf, 3, 4)));
 void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format (printf, 2, 3)));
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
-void perform_to_all(const char *messg, struct char_data *ch);
+void perform_to_all(const char *messg, Character *ch);
 void close_socket(struct descriptor_data *d);
 char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen);
 
-int is_ignoring(struct char_data *ch, struct char_data *vict);
+int is_ignoring(Character *ch, Character *vict);
 
-void perform_act(const char *orig, struct char_data *ch,
+void perform_act(const char *orig, Character *ch,
 		 struct obj_data *obj, const void *vict_obj,
-		 const struct char_data *to);
+		 const Character *to);
 
-void act(const char *str, int hide_invisible, struct char_data *ch, struct obj_data *obj, const void *vict_obj, int type);
+void act(const char *str, int hide_invisible, Character *ch, struct obj_data *obj, const void *vict_obj, int type);
 
-void brag(struct char_data *ch, struct char_data *victim);
+void brag(Character *ch, Character *victim);
 
 extern struct comm_data * comlist;
 

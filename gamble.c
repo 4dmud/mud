@@ -25,7 +25,7 @@
 
 
 /* New for TD 6/10/95 */
-void play_slots(struct char_data *ch)
+void play_slots(Character *ch)
 {
     int num1, num2, num3, win = 0;
     char *slot_msg[] = {
@@ -72,20 +72,20 @@ void play_slots(struct char_data *ch)
 	    win += 1;
     }
 
-    new_send_to_char(ch, "You got %s, %s, %s, ", slot_msg[num1],
+    ch->Send( "You got %s, %s, %s, ", slot_msg[num1],
 	    slot_msg[num2], slot_msg[num3]);
     if (win > 1)
-	new_send_to_char(ch, "you win %d gold pieces!\r\n", win);
+	ch->Send( "you win %d gold pieces!\r\n", win);
     else if (win == 1)
-	new_send_to_char(ch, "you win 1 gold piece!\r\n");
+	ch->Send( "you win 1 gold piece!\r\n");
     else
-	new_send_to_char(ch, "you lose.\r\n");
+	ch->Send( "you lose.\r\n");
     char_gold(ch,win, GOLD_ALL);
 
     return;
 }
 
-void play_high_dice(struct char_data *ch, struct char_data *dealer,
+void play_high_dice(Character *ch, Character *dealer,
 		    int bet)
 {
     int die1, die2, die3, die4;
@@ -124,25 +124,25 @@ void play_high_dice(struct char_data *ch, struct char_data *dealer,
 	    "$N rolls the dice, $E gets %d, and %d, for a total of %d.",
 	    die3, die4, (die3 + die4));
     act(buf, FALSE, dealer, 0, ch, TO_NOTVICT);
-    new_send_to_char(ch,
+    ch->Send(
 	    "You roll the dice, and get %d, and %d, for a total of %d.\r\n",
 	    die3, die4, (die3 + die4));
 
     if ((die1 + die2) >= (die3 + die4)) {
 	sprintf(buf, "The house wins %d coins from $N.", bet);
 	act(buf, FALSE, dealer, 0, ch, TO_NOTVICT);
-	new_send_to_char(ch, "The house wins %d coins from you.\r\n", bet);
+	ch->Send( "The house wins %d coins from you.\r\n", bet);
     } else {
 	sprintf(buf, "$N wins %d gold coins!", bet * 2);
 	act(buf, FALSE, dealer, 0, ch, TO_NOTVICT);
-	new_send_to_char(ch, "You win %d gold coins!\r\n", bet * 2);
+	ch->Send( "You win %d gold coins!\r\n", bet * 2);
 	char_gold(ch, (bet * 2), GOLD_ALL);
     }
     return;
 }
 
 
-void play_triples(struct char_data *ch, struct char_data *dealer,
+void play_triples(Character *ch, Character *dealer,
 		  char *guess, int bet)
 {
     int die1, die2, die3, total = 0;
@@ -227,7 +227,7 @@ void play_triples(struct char_data *ch, struct char_data *dealer,
     return;
 }
 
-void play_seven(struct char_data *ch, struct char_data *dealer,
+void play_seven(Character *ch, Character *dealer,
 		char *guess, int bet)
 {
     int die1, die2, total = 0;
@@ -313,7 +313,7 @@ void play_seven(struct char_data *ch, struct char_data *dealer,
     return;
 }
 
-void play_craps(struct char_data *ch, struct char_data *dealer, int bet)
+void play_craps(Character *ch, Character *dealer, int bet)
 {
     int die1, die2, mark = 0, last = 0;
     bool won = FALSE, firstime = TRUE;
@@ -392,7 +392,7 @@ void play_craps(struct char_data *ch, struct char_data *dealer, int bet)
     return;
 }
 
-void play_blackjack(struct char_data *ch, struct char_data *dealer,
+void play_blackjack(Character *ch, Character *dealer,
 		    char *guess, int bet)
 {
     send_to_char("This is currently unavailable\r\n", ch);

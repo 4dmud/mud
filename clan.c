@@ -43,7 +43,7 @@ char clan_privileges[NUM_CP + 1][20] = {
                                          "withdraw", "setapplev"
                                        };
 
-void send_clan_format(struct char_data *ch)
+void send_clan_format(Character *ch)
 {
   int c, r;
 
@@ -112,7 +112,7 @@ void send_clan_format(struct char_data *ch)
 }
 
 /* clan code */
-struct char_data *is_playing(char *vict_name)
+Character *is_playing(char *vict_name)
       //char *is_playing(char *vict_name)
 {
   extern struct descriptor_data *descriptor_list;
@@ -128,9 +128,9 @@ struct char_data *is_playing(char *vict_name)
   return NULL;
 }
 
-void do_clan_create(struct char_data *ch, char *arg)
+void do_clan_create(Character *ch, char *arg)
 {
-  struct char_data *leader = NULL;
+  Character *leader = NULL;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int new_id = 0, i;
 
@@ -217,7 +217,7 @@ void do_clan_create(struct char_data *ch, char *arg)
 
   return;
 }
-void do_clan_recall(struct char_data *ch, char *arg)
+void do_clan_recall(Character *ch, char *arg)
 {
   obj_vnum brd;
   int clan_num = -1;
@@ -266,14 +266,14 @@ void do_clan_recall(struct char_data *ch, char *arg)
 
   clan[clan_num].recall = brd;
 
-  new_send_to_char(ch, "Done.\r\n");
+  ch->Send( "Done.\r\n");
 
   save_clans();
   return;
 
 
 }
-void do_clan_board(struct char_data *ch, char *arg)
+void do_clan_board(Character *ch, char *arg)
 {
   obj_vnum brd;
   int clan_num = -1;
@@ -330,7 +330,7 @@ void do_clan_board(struct char_data *ch, char *arg)
 
   clan[clan_num].board = brd;
 
-  new_send_to_char(ch, "Done.\r\n");
+  ch->Send( "Done.\r\n");
 
   save_clans();
   return;
@@ -338,13 +338,13 @@ void do_clan_board(struct char_data *ch, char *arg)
 
 }
 
-void do_clan_destroy(struct char_data *ch, char *arg)
+void do_clan_destroy(Character *ch, char *arg)
 {
 
   int i, j;
   extern int top_of_p_table;
   extern struct player_index_element *player_table;
-  struct char_data *victim = NULL, *cbuf = NULL;
+  Character *victim = NULL, *cbuf = NULL;
 
   if (!*arg)
   {
@@ -377,7 +377,7 @@ void do_clan_destroy(struct char_data *ch, char *arg)
     }
     else
     {
-      CREATE(cbuf, struct char_data, 1);
+      CREATE(cbuf, Character, 1);
       CREATE(cbuf->player_specials, struct player_special_data, 1);
       clear_char(cbuf);
       if (load_char((player_table + j)->name, cbuf) >= 0)
@@ -407,9 +407,9 @@ void do_clan_destroy(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_enroll(struct char_data *ch, char *arg)
+void do_clan_enroll(Character *ch, char *arg)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   int clan_num, immcom = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -495,9 +495,9 @@ void do_clan_enroll(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_expel(struct char_data *ch, char *arg)
+void do_clan_expel(Character *ch, char *arg)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   int clan_num, immcom = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -509,7 +509,7 @@ void do_clan_expel(struct char_data *ch, char *arg)
     return;
   }
 
-  //new_send_to_char(ch, "Sorry, this command is disabled for a few days! Sorry! Mordecai\r\n");
+  //ch->Send( "Sorry, this command is disabled for a few days! Sorry! Mordecai\r\n");
   //return;
 
   if (GET_LEVEL(ch) < LVL_GOD)
@@ -576,14 +576,14 @@ void do_clan_expel(struct char_data *ch, char *arg)
     clan[clan_num].power -= GET_LEVEL(vict);
     remove_clan_member(GET_NAME(vict), clan_num);
     new_send_to_char(vict, "You've been kicked out of your clan!\r\n");
-    new_send_to_char(ch, "Done.\r\n");
+    ch->Send( "Done.\r\n");
 
   }
   else
   {
     if (immcom || ((player_table[ids].rank >= 0) && (player_table[ids].clan == GET_CLAN(ch)) && (player_table[ids].rank < GET_CLAN_RANK(ch))))
     {
-      new_send_to_char(ch, "%s is kicked out of your clan!\r\n", player_table[ids].name);
+      ch->Send( "%s is kicked out of your clan!\r\n", player_table[ids].name);
       
       player_table[ids].rank = -1;
       clan[clan_num].members--;
@@ -592,7 +592,7 @@ void do_clan_expel(struct char_data *ch, char *arg)
       remove_clan_member(player_table[ids].name, clan_num);
       save_player_index();
     } else {
-      new_send_to_char(ch, "%s cannot be kicked out.\r\n", player_table[ids].name);
+      ch->Send( "%s cannot be kicked out.\r\n", player_table[ids].name);
     }
   }
 
@@ -608,9 +608,9 @@ int at_war(int cln, int war_clan)
 void declare_war(int cln, int war_clan)
 {}
 
-void do_clan_war(struct char_data *ch, char *arg)
+void do_clan_war(Character *ch, char *arg)
 {
-  //    struct char_data *vict = NULL;
+  //    Character *vict = NULL;
   int clan_num, immcom = 0, war_num = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -670,9 +670,9 @@ void do_clan_war(struct char_data *ch, char *arg)
 }
 
 
-void do_clan_demote(struct char_data *ch, char *arg)
+void do_clan_demote(Character *ch, char *arg)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   int clan_num, immcom = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -753,9 +753,9 @@ void do_clan_demote(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_promote(struct char_data *ch, char *arg)
+void do_clan_promote(Character *ch, char *arg)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   int clan_num, immcom = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -838,10 +838,10 @@ void do_clan_promote(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_who(struct char_data *ch)
+void do_clan_who(Character *ch)
 {
   struct descriptor_data *d;
-  struct char_data *tch;
+  Character *tch;
 
   if (GET_CLAN_RANK(ch) == 0)
   {
@@ -859,7 +859,7 @@ void do_clan_who(struct char_data *ch)
     {
       if (CAN_SEE(ch, tch))
         if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 )
-          new_send_to_char(ch, "%s\r\n", GET_NAME(tch));
+          ch->Send( "%s\r\n", GET_NAME(tch));
 
     }
 
@@ -867,7 +867,7 @@ void do_clan_who(struct char_data *ch)
   return;
 }
 
-void do_clan_status(struct char_data *ch)
+void do_clan_status(Character *ch)
 {
   int clan_num;
 
@@ -879,7 +879,7 @@ void do_clan_status(struct char_data *ch)
   {
     if (clan_num >= 0)
     {
-      new_send_to_char(ch, "You applied to %s\r\n",clan[clan_num].name);
+      ch->Send( "You applied to %s\r\n",clan[clan_num].name);
       return;
     }
     else
@@ -889,14 +889,14 @@ void do_clan_status(struct char_data *ch)
     }
   }
 
-  new_send_to_char(ch,  "You are %s (Rank %d) of %s (ID %d)\r\n",
+  ch->Send(  "You are %s (Rank %d) of %s (ID %d)\r\n",
                    clan[clan_num].rank_name[GET_CLAN_RANK(ch) - 1],
                    GET_CLAN_RANK(ch), clan[clan_num].name, clan[clan_num].id);
 
   return;
 }
 
-void do_clan_apply(struct char_data *ch, char *arg)
+void do_clan_apply(Character *ch, char *arg)
 {
   int clan_num;
 
@@ -944,12 +944,12 @@ void do_clan_apply(struct char_data *ch, char *arg)
   save_clans();
   GET_CLAN(ch) = clan[clan_num].id;
   save_char(ch);
-  new_send_to_char(ch, "You've applied to the %s!\r\n", clan[clan_num].name);
+  ch->Send( "You've applied to the %s!\r\n", clan[clan_num].name);
 
   return;
 }
 
-void do_clan_info(struct char_data *ch, char *arg)
+void do_clan_info(Character *ch, char *arg)
 {
   int i = 0, j;
 
@@ -961,9 +961,9 @@ void do_clan_info(struct char_data *ch, char *arg)
 
   if (!(*arg))
   {
-    new_send_to_char(ch, "\r\n");
+    ch->Send( "\r\n");
     for (i = 0; i < num_of_clans; i++)
-      new_send_to_char(ch,
+      ch->Send(
                        "[%-3d]  %-20s Id: %3d Members: %3d  Power: %5d  Appfee: %lld\r\n",
                        i, clan[i].name, clan[i].id, clan[i].members,
                        clan[i].power, clan[i].app_fee);
@@ -975,7 +975,7 @@ void do_clan_info(struct char_data *ch, char *arg)
     return;
   }
 
-  new_send_to_char(ch,
+  ch->Send(
                    "\r\n   <----------------[%-14s]--------------->\r\n"
                    "   O-----------------------------------------------O\r\n"
                    "   |    Ranks  : %-3d    |    Power   : %-5d       |\r\n"
@@ -984,14 +984,14 @@ void do_clan_info(struct char_data *ch, char *arg)
                    clan[i].name, clan[i].ranks, clan[i].power,
                    clan[i].members, clan[i].treasure);
   if (0) {
-  new_send_to_char(ch,
+  ch->Send(
                    "   |         Points          |      Tokens         |\r\n"
                    "   |   Quartz 0  Amethyst 0  |  Brass 0 Bronze 0   |\r\n"
                    "   | Sapphire 0      Ruby 0  | Silver 0   Gold 0   |\r\n"
                    "   O-----------------------------------------------O\r\n");
   }
 
-  new_send_to_char(ch,
+  ch->Send(
                    "   |    Enroll   : %-3d  |    Expel       : %-3d     |\r\n"
                    "   |    Promote  : %-3d  |    Demote      : %-3d     |\r\n"
                    "   |    Setplan  : %-3d  |    Setfees     : %-3d     |\r\n"
@@ -1002,7 +1002,7 @@ void do_clan_info(struct char_data *ch, char *arg)
                    clan[i].privilege[0], clan[i].privilege[5],
                    clan[i].privilege[6], clan[i].privilege[7]);
 
-  new_send_to_char(ch,
+  ch->Send(
                    "   |    Application Fee  : {cc%-10lld {c0             |\r\n"
                    "   |    Monthly Dues     : {cc%-10lld{c0              |\r\n"
                    "   |    Application level: {cc%-3d{c0                     |\r\n"
@@ -1022,7 +1022,7 @@ void do_clan_info(struct char_data *ch, char *arg)
 
   for (j = 0; j < clan[i].ranks; j++)
   {
-    new_send_to_char(ch, "({cg%3d{c0 - {cy%-20s{c0)%s", j + 1,
+    ch->Send( "({cg%3d{c0 - {cy%-20s{c0)%s", j + 1,
                      clan[i].rank_name[j], (j % 2 ? "\r\n" : " "));
   };
 
@@ -1408,8 +1408,8 @@ void init_clans()
       continue;
 #if 0
     {
-      struct char_data *victim;
-      CREATE(victim, struct char_data, 1);
+      Character *victim;
+      CREATE(victim, Character, 1);
       clear_char(victim);
       TEMP_LOAD_CHAR = TRUE;
 
@@ -1451,7 +1451,7 @@ void init_clans()
 }
 
 /*
-void do_clan_list(struct char_data *ch, char *arg)
+void do_clan_list(Character *ch, char *arg)
 {
   send_to_char("This command has been temporarily disabled.\r\n", ch);
   return;
@@ -1461,7 +1461,7 @@ void do_clan_list(struct char_data *ch, char *arg)
  
 */
 
-void do_clan_list(struct char_data *ch, char *arg)
+void do_clan_list(Character *ch, char *arg)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -1477,13 +1477,13 @@ void do_clan_list(struct char_data *ch, char *arg)
   else
     i = find_clan_by_id(GET_CLAN(ch));
 
-  new_send_to_char(ch, "Members of the %s clan\r\n", clan_name(i));
+  ch->Send( "Members of the %s clan\r\n", clan_name(i));
   send_to_char("-------------------------------\r\n", ch);
 
 
   if (i==NOTHING || i > (MAX_CLANS-1 ))
   {
-    new_send_to_char(ch, "Error.\r\n");
+    ch->Send( "Error.\r\n");
     return;
   }
 
@@ -1507,7 +1507,7 @@ void do_clan_list(struct char_data *ch, char *arg)
 
 }
 
-void do_clan_bank(struct char_data *ch, char *arg, int action)
+void do_clan_bank(Character *ch, char *arg, int action)
 {
   int clan_num, immcom = 0;
   gold_int amount = 0;
@@ -1568,7 +1568,7 @@ void do_clan_bank(struct char_data *ch, char *arg, int action)
   amount = atoll(arg);
   if (amount < 0)
   {
-    new_send_to_char(ch, "Don't be silly.\r\n");
+    ch->Send( "Don't be silly.\r\n");
     return;
   }
 
@@ -1624,7 +1624,7 @@ void do_clan_bank(struct char_data *ch, char *arg, int action)
   return;
 }
 
-void do_clan_money(struct char_data *ch, char *arg, int action)
+void do_clan_money(Character *ch, char *arg, int action)
 {
   int clan_num, immcom = 0;
   long amount = 0;
@@ -1703,7 +1703,7 @@ void do_clan_money(struct char_data *ch, char *arg, int action)
   return;
 }
 
-void do_clan_ranks(struct char_data *ch, char *arg)
+void do_clan_ranks(Character *ch, char *arg)
 {
   int i, j;
   int clan_num, immcom = 0;
@@ -1712,7 +1712,7 @@ void do_clan_ranks(struct char_data *ch, char *arg)
   char arg2[MAX_INPUT_LENGTH];
   extern int top_of_p_table;
   extern struct player_index_element *player_table;
-  struct char_data *victim = NULL;
+  Character *victim = NULL;
 
   if (!(*arg))
   {
@@ -1805,7 +1805,7 @@ void do_clan_ranks(struct char_data *ch, char *arg)
     }
     else
     {
-      CREATE(victim, struct char_data, 1);
+      CREATE(victim, Character, 1);
       CREATE(victim->player_specials, struct player_special_data, 1);
       clear_char(victim);
       if (load_char((player_table + j)->name, victim) >= 0)
@@ -1837,7 +1837,7 @@ void do_clan_ranks(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_titles(struct char_data *ch, char *arg)
+void do_clan_titles(Character *ch, char *arg)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int clan_num = 0, rank;
@@ -1913,7 +1913,7 @@ void do_clan_titles(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_application(struct char_data *ch, char *arg)
+void do_clan_application(Character *ch, char *arg)
 {
   int clan_num, immcom = 0;
   int applevel;
@@ -1986,7 +1986,7 @@ void do_clan_application(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_sp(struct char_data *ch, char *arg, int priv)
+void do_clan_sp(Character *ch, char *arg, int priv)
 {
   int clan_num, immcom = 0;
   int rank;
@@ -2058,7 +2058,7 @@ void do_clan_sp(struct char_data *ch, char *arg, int priv)
   return;
 }
 
-void do_clan_plan(struct char_data *ch, char *arg)
+void do_clan_plan(Character *ch, char *arg)
 {
   int clan_num;
 
@@ -2101,13 +2101,13 @@ void do_clan_plan(struct char_data *ch, char *arg)
 
   if (strlen(clan[clan_num].description) == 0)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "Enter the description, or plan for clan <<%s>>.\r\n",
                      clan[clan_num].name);
   }
   else
   {
-    new_send_to_char(ch, "Old plan for clan <<%s>>:\r\n",
+    ch->Send( "Old plan for clan <<%s>>:\r\n",
                      clan[clan_num].name);
     send_to_char(clan[clan_num].description, ch);
     send_to_char("Enter new plan:\r\n", ch);
@@ -2119,7 +2119,7 @@ void do_clan_plan(struct char_data *ch, char *arg)
   return;
 }
 
-void do_clan_privilege(struct char_data *ch, char *arg)
+void do_clan_privilege(Character *ch, char *arg)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int i;
@@ -2168,11 +2168,11 @@ void do_clan_privilege(struct char_data *ch, char *arg)
   }
   send_to_char("\r\nClan privileges:\r\n", ch);
   for (i = 0; i < NUM_CP; i++)
-    new_send_to_char(ch, "\t%s\r\n", clan_privileges[i]);
+    ch->Send( "\t%s\r\n", clan_privileges[i]);
 
 }
 
-void do_clan_set(struct char_data *ch, char *arg)
+void do_clan_set(Character *ch, char *arg)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 

@@ -50,25 +50,25 @@ long get_acc_by_id(long id);
 
 void free_string(char **pt);
 char *numlineas( char *string );
-void string_append( CHAR_DATA *ch, char **pString );
+void string_append( Character *ch, char **pString );
 
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
-const char *race_name(struct char_data *ch);
-int has_weapon(struct char_data *ch);
-float has_staff(struct char_data *ch);
-int num_dice_wep(struct char_data *ch, short dual);
-int size_dice_wep(struct char_data *ch, short dual);
-int highest_tier(struct char_data *ch);
+const char *race_name(Character *ch);
+int has_weapon(Character *ch);
+float has_staff(Character *ch);
+int num_dice_wep(Character *ch, short dual);
+int size_dice_wep(Character *ch, short dual);
+int highest_tier(Character *ch);
 float race_dam_mod(int race, int magic);
 
 void strip_color(char *inbuf, size_t i_buf);
 size_t proc_color(char *inbuf, int color_lvl, size_t len);
 extern int sub_success;
-int total_chance(CHAR_DATA *ch, int skill);
-gold_int exp_needed(CHAR_DATA *ch);
-gold_int group_exp_needed(CHAR_DATA *ch);
+int total_chance(Character *ch, int skill);
+gold_int exp_needed(Character *ch);
+gold_int group_exp_needed(Character *ch);
 gold_int level_exp(int chclass, int level, int tier, int remorts);
-int use_stamina(struct char_data *ch, int amount);
+int use_stamina(Character *ch, int amount);
 
 #define divide_2(a)  (a>>1)
 #define mult_2(a)     (a<<1)
@@ -133,7 +133,7 @@ list *lsort (list *p);
 
 /*comma format a long*/
 size_t commafmt(char   *buf,            /* Buffer for formatted string  */
-                int     bufsize,        /* Size of buffer               */
+                size_t     bufsize,        /* Size of buffer               */
                 gold_int    N);              /* Number to convert            */
 
 /* public functions in utils.c */
@@ -155,7 +155,7 @@ void basic_mud_log(const char *format, ...)   __attribute__ ((format(printf, 1, 
 int touch(const char *path);
 void mudlog(const char *str, int type, int level, int file);
 void    new_mudlog(int type, int level, int file, const char *str, ...) __attribute__ ((format (printf, 4, 5)));
-void log_death_trap(struct char_data *ch);
+void log_death_trap(Character *ch);
 int number(int from, int to);
 int dice(int number, int size);
 size_t new_sprintbit(bitvector_t vektor, const char *names[], char *result,
@@ -169,7 +169,7 @@ int get_filename(const char *orig_name, char *filename, int mode);
 void sprintbitarray(int bitvector[], const char *name[], int maxar,
                     char *result, size_t r_len);
 time_t mud_time_to_secs(struct time_info_data *now);
-struct time_info_data *age(struct char_data *ch);
+struct time_info_data *age(Character *ch);
 int num_pc_in_room(struct room_data *room);
 void line_input(struct descriptor_data *d, const char *prompt,
                 C_FUNC(*callback), void *info);
@@ -180,8 +180,8 @@ char *stripcr(char *dest, const char *src);
 int room_is_dark(room_rnum room);
 time_t sec_to_time(int sec);
 long time_to_sec(time_t timeCheck);
-char *center_align(char *str, int width);
-#define HOURS_TO_EXPIRE(num) (time(0) + ((num) * SECS_PER_MUD_HOUR))
+char *center_align(char *str, size_t width);
+#define HOURS_TO_EXPIRE(num) ((time_t)(time(0) + ((num) * SECS_PER_MUD_HOUR)))
 
 void basic_mud_vlog(const char *format, va_list args);
 
@@ -192,13 +192,13 @@ void basic_mud_vlog(const char *format, va_list args);
 
 // m0rd
 char* print_gold(char* result, gold_int gold);
-int alter_gold(struct char_data *ch, gold_int amount);
-void alter_stamina(struct char_data *ch, int amount);
-int speed_update(struct char_data *ch);
+int alter_gold(Character *ch, gold_int amount);
+void alter_stamina(Character *ch, int amount);
+int speed_update(Character *ch);
 
 //attack functions
-int accuracy_tot(struct char_data *attacker);
-int evasion_tot(struct char_data *vict);
+int accuracy_tot(Character *attacker);
+int evasion_tot(Character *vict);
 
 /* random functions in random.c */
 void circle_srandom(unsigned long initial_seed);
@@ -222,36 +222,36 @@ int class_elem_weakness(int chcl);
 int class_elem_strength(int chcl);
 
 /* in magic.c */
-bool circle_follow(struct char_data *ch, struct char_data *victim);
+bool circle_follow(Character *ch, Character *victim);
 
 /* in act.informative.c */
-void look_at_room(struct char_data *ch, int mode);
-struct char_data *rand_group(struct char_data *ch);
+void look_at_room(Character *ch, int mode);
+Character *rand_group(Character *ch);
 
 /* in act.movmement.c */
-int do_simple_obj_move(struct obj_data *obj, int dir, struct char_data *ch);
-int do_simple_move(struct char_data *ch, int dir, int following);
-int perform_move(struct char_data *ch, int dir, int following);
+int do_simple_obj_move(struct obj_data *obj, int dir, Character *ch);
+int do_simple_move(Character *ch, int dir, int following);
+int perform_move(Character *ch, int dir, int following);
 
 /* in limits.c */
-int mana_gain(struct char_data *ch);
-int hit_gain(struct char_data *ch);
-int move_gain(struct char_data *ch);
-int stamina_gain(struct char_data *ch);
-void advance_level(struct char_data *ch);
-void set_title(struct char_data *ch, char *title);
-void set_pretitle(struct char_data *ch, char *title);
-void gain_exp(struct char_data *ch, gold_int gain);
-void gain_exp_regardless(struct char_data *ch, gold_int gain);
-void gain_condition(struct char_data *ch, int condition, int value);
-void check_idling(struct char_data *ch);
+int mana_gain(Character *ch);
+int hit_gain(Character *ch);
+int move_gain(Character *ch);
+int stamina_gain(Character *ch);
+void advance_level(Character *ch);
+void set_title(Character *ch, char *title);
+void set_pretitle(Character *ch, char *title);
+void gain_exp(Character *ch, gold_int gain);
+void gain_exp_regardless(Character *ch, gold_int gain);
+void gain_condition(Character *ch, int condition, int value);
+void check_idling(Character *ch);
 void regen_update(void);
 void point_update(void);
-void update_pos(struct char_data *victim);
-void total_perc(struct char_data *ch);
-int group_size(struct char_data *ch);
-void set_loginmsg(struct char_data *ch, char *loginmsg);      /* EDIT BY THOTTER!!!*/
-void set_logoutmsg(struct char_data *ch, char *logoutmsg);    /* ^^^^^^^^^^^^*/
+void update_pos(Character *victim);
+void total_perc(Character *ch);
+int group_size(Character *ch);
+void set_loginmsg(Character *ch, char *loginmsg);      /* EDIT BY THOTTER!!!*/
+void set_logoutmsg(Character *ch, char *logoutmsg);    /* ^^^^^^^^^^^^*/
 
 /* in comm.c */
 void    circle_exit(int r);
@@ -375,13 +375,13 @@ extern const struct race_data races[NUM_RACES];
          temp->next = (item)->next;	\
    }					\
 
-int get_sub(struct char_data *ch, int i);
-void improve_sub(struct char_data *ch, enum subskill_list sub, int amount);
+int get_sub(Character *ch, int i);
+void improve_sub(Character *ch, enum subskill_list sub, int amount);
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
 
-int get_skill(struct char_data *ch, int i);
-void set_skill(struct char_data *ch, int skill, int amount);
+int get_skill(Character *ch, int i);
+void set_skill(Character *ch, int skill, int amount);
 /* basic bitvector utils *************************************************/
 
 #define Q_FIELD(x)  ((int) (x) / 32)
@@ -444,7 +444,7 @@ void set_skill(struct char_data *ch, int skill, int amount);
 #define ROOM_FLAGGED(loc, flag) (IS_SET_AR(ROOM_FLAGS(loc), (flag)))
 #define ZONE_FLAGGED(loc, flag) (IS_SET(ZONE_FLAGS(loc), (flag)))
 #define SECTOR(loc) ((loc)->sector_type)
-int has_body(CHAR_DATA *ch, int flag);
+int has_body(Character *ch, int flag);
 #define HAS_BODY(ch, flag) (has_body(ch, flag))
 #define EXIT_FLAGGED(exit, flag) (IS_SET((exit)->exit_info, (flag)))
 #define OBJAFF_FLAGGED(obj, flag) (IS_SET(GET_OBJ_AFFECT(obj), (flag)))
@@ -621,7 +621,7 @@ int has_body(CHAR_DATA *ch, int flag);
 #define MINE_SPEED(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_speed))
 #define MINE_BONUS(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_bonus))
 #define MINE_DAMAGE(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_damage))
-int check_mail(struct char_data *ch);
+int check_mail(Character *ch);
 #define HAS_MAIL(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.has_mail))
 #define AFK_MSG(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->afk_msg))
 #define BUSY_MSG(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->busy_msg))
@@ -686,8 +686,8 @@ int check_mail(struct char_data *ch);
 #define DG_GOLD_IN 	9
 #define DG_GOLD_OUT 	10
 
-int get_skill_wait(struct char_data *ch, int skill);
-void set_skill_wait(struct char_data *ch, int skill, int wait);
+int get_skill_wait(Character *ch, int skill);
+void set_skill_wait(Character *ch, int skill, int wait);
 void make_wholist(void);
 
 #define GET_SKILL(ch, i)	get_skill(ch, i)
@@ -723,7 +723,7 @@ void make_wholist(void);
           (GET_ADD(ch) <= 90) ? 28 :( \
           (GET_ADD(ch) <= 99) ? 29 :  30 ) ) )                   \
         )
-int current_class_is_tier_num(struct char_data *ch);
+int current_class_is_tier_num(Character *ch);
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + (400 * ((current_class_is_tier_num(ch)/2))))
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
@@ -865,7 +865,7 @@ int current_class_is_tier_num(struct char_data *ch);
 #define CAN_GET_OBJ(ch, obj)   \
    (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && \
     CAN_SEE_OBJ((ch),(obj)))
-const char * hidden_name(struct char_data *ch);
+const char * hidden_name(Character *ch);
 #define PERS(ch, vict)   (!CAN_SEE(vict, ch) ?  "someone" :  hidden_name(ch))
 
 
@@ -1002,7 +1002,7 @@ char *print_weather(room_rnum room, char *buf, size_t len);
 
 #define GET_IGNORELIST(ch) (SPECIALS(ch)->ignorelist)
 
-void char_from_chair(struct char_data *ch);
+void char_from_chair(Character *ch);
 #define SITTING(ch)          ((ch)->char_specials.chair)
 #define NEXT_SITTING(ch)     ((ch)->char_specials.next_in_chair)
 #define OBJ_SAT_IN_BY(obj)   ((obj)->sitting_here)
@@ -1033,23 +1033,23 @@ typedef unsigned long int FLAG;	/* 32bit unsigned */
 
 
 /* prototypes from regen.c */
-void alter_hit(struct char_data *ch, int amount);
-void alter_mana(struct char_data *ch, int amount);
-void alter_move(struct char_data *ch, int amount);
-void check_regen_rates(struct char_data *ch);
+void alter_hit(Character *ch, int amount);
+void alter_mana(Character *ch, int amount);
+void alter_move(Character *ch, int amount);
+void check_regen_rates(Character *ch);
 int sub_number(char *name);
 const char * color_option_name(int num);
 struct obj_data *revert_object(struct obj_data *obj);
 #define GOLD_BANK   0
 #define GOLD_HAND   1
 #define GOLD_ALL    2
-gold_int char_gold(struct char_data *ch, gold_int amount, short type);
+gold_int char_gold(Character *ch, gold_int amount, short type);
 float square_root(float num);
-int get_sub_status(struct char_data *ch, int i);
-int toggle_sub_status(struct char_data *ch, int i, int onoff);
-int stop_task(struct char_data *ch);
-int first_word_is_name(struct char_data *ch, char * argument);
-int choose_real_abils(struct char_data *ch, char select, int amount);
+int get_sub_status(Character *ch, int i);
+int toggle_sub_status(Character *ch, int i, int onoff);
+int stop_task(Character *ch);
+int first_word_is_name(Character *ch, char * argument);
+int choose_real_abils(Character *ch, char select, int amount);
 
 #define TRAVEL_LIST(thing) ((thing)->travel_list)
 int hunt_location(void *thing, int type);
@@ -1060,9 +1060,9 @@ void remove_travel_point_by_num(struct travel_point_data **tlist, int num);
 void remove_travel_point_by_pointer(struct travel_point_data **tlist, struct travel_point_data *dead);
 void free_travel_points(struct travel_point_data *t);
 
-int do_simple_obj_move(struct obj_data *obj, int dir, struct char_data *ch);
-int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch);
-struct obj_data *has_vehicle(struct char_data *ch);
+int do_simple_obj_move(struct obj_data *obj, int dir, Character *ch);
+int perform_move_obj(struct obj_data *obj, int dir, Character *ch);
+struct obj_data *has_vehicle(Character *ch);
 
 
 /*******************  Config macros *********************/
@@ -1129,4 +1129,7 @@ struct obj_data *has_vehicle(struct char_data *ch);
 
 int valid_id_num(long id);
 int fileExists (char * fileName);
+
+#define FTOI(f) ((int)((f) + 0.5))
+
 

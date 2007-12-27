@@ -28,38 +28,38 @@ ACMD(do_give);
 ACMD(do_put);
 ACMD(do_drop);
 ACMD(do_get);
-int class_damroll(struct char_data *ch);
-void start_fighting_delay(struct char_data *ch, struct char_data *vict);
-void halt_fighting(struct char_data *ch);
-void dismount_char(struct char_data *ch);
-int can_fight(CHAR_DATA *ch, CHAR_DATA *vict, int silent);
-void perform_give(CHAR_DATA *ch, CHAR_DATA *vict,
+int class_damroll(Character *ch);
+void start_fighting_delay(Character *ch, Character *vict);
+void halt_fighting(Character *ch);
+void dismount_char(Character *ch);
+int can_fight(Character *ch, Character *vict, int silent);
+void perform_give(Character *ch, Character *vict,
                   OBJ_DATA *obj);
-int arena_ok(CHAR_DATA *ch, CHAR_DATA *victim);
-void improve_skill(CHAR_DATA *ch, int skill);
-int compute_armor_class(CHAR_DATA *ch);
+int arena_ok(Character *ch, Character *victim);
+void improve_skill(Character *ch, int skill);
+int compute_armor_class(Character *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
             int routines, int wait, int first_prereq, int second_prereq, int tier, int level);
 int find_first_step(room_rnum src, room_rnum target);
-void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass);
+void skill_attack(Character *ch, Character *vict, int skill, int pass);
 ACMD(do_gen_door);
-void send_not_to_spam(char *buf, CHAR_DATA *ch,
-                      CHAR_DATA *victim, OBJ_DATA *weap,
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, OBJ_DATA *weap,
                       int spam);
-void check_killer(CHAR_DATA *ch, CHAR_DATA *vict);
-int has_class(CHAR_DATA *ch, int chclass);
-int tier_level(CHAR_DATA *ch, int chclass);
-int perform_push(CHAR_DATA *ch, int dir, int need_specials_check,
-                 CHAR_DATA *attacker);
-void log_push_to_death(CHAR_DATA *ch, CHAR_DATA *attacker);
+void check_killer(Character *ch, Character *vict);
+int has_class(Character *ch, int chclass);
+int tier_level(Character *ch, int chclass);
+int perform_push(Character *ch, int dir, int need_specials_check,
+                 Character *attacker);
+void log_push_to_death(Character *ch, Character *attacker);
 ACMD(do_assist);
-int has_weapon(CHAR_DATA *ch);
-int perform_grapple(CHAR_DATA *ch, int dir, int need_specials_check,
-                    CHAR_DATA *attacker);
-int perform_charge(CHAR_DATA *ch, CHAR_DATA *vict);
-int skill_cost(int h, int m, int v, CHAR_DATA *ch);
-void view_room_by_rnum(struct char_data *ch, room_rnum is_in);
+int has_weapon(Character *ch);
+int perform_grapple(Character *ch, int dir, int need_specials_check,
+                    Character *attacker);
+int perform_charge(Character *ch, Character *vict);
+int skill_cost(int h, int m, int v, Character *ch);
+void view_room_by_rnum(Character *ch, room_rnum is_in);
 
 
 #define TIER (ch ? current_class_is_tier_num(ch) : 1)
@@ -88,7 +88,7 @@ typedef struct
 dirParseStruct;
 
 /* Local Functions */
-int total_chance(CHAR_DATA *ch, int skill);
+int total_chance(Character *ch, int skill);
 ASKILL(skill_backstab);
 ASKILL(skill_bash);
 ASKILL(skill_hide);
@@ -354,7 +354,7 @@ void assign_skills(void)
 ACMD(do_skills)
 {
 
-  CHAR_DATA *vict = NULL, *orig = ch;
+  Character *vict = NULL, *orig = ch;
   OBJ_DATA *obj = NULL;
   int target = 0;
   int i = 0;
@@ -367,11 +367,11 @@ ACMD(do_skills)
   /** Can we even use this skill right here and right now?
    ** I know there is redundancy in the messages of these checks*/
   if (IS_NPC(orig) && orig->desc)
-    new_send_to_char(ch, "You have no idea how to do that.\r\n");
+    ch->Send( "You have no idea how to do that.\r\n");
   else if (!IS_NPC(orig) && ((!knows_spell(orig, subcmd) || !GET_SKILL(ch, subcmd)) && GET_LEVEL(orig) < LVL_GOD))
-    new_send_to_char(ch, "You have no idea how to do that.\r\n");
+    ch->Send( "You have no idea how to do that.\r\n");
   else if (IS_SET(SINFO.flags, SK_VIOLENT) && ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
-    new_send_to_char(ch,"This room just has such a peaceful, easy feeling...\r\n");
+    ch->Send("This room just has such a peaceful, easy feeling...\r\n");
   else
   {
     char arg[MAX_STRING_LENGTH];
@@ -430,29 +430,29 @@ ACMD(do_skills)
       if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD)
           && !(vict = get_char_vis(ch, arg1, &fnum, FIND_CHAR_WORLD)))
       {
-        new_send_to_char(ch, "Nobody is around by that name!\r\n");
+        ch->Send( "Nobody is around by that name!\r\n");
         return;
       }
       else if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM)
                && !(vict =
                       get_char_vis(ch, arg1, &fnum, FIND_CHAR_ROOM)))
       {
-        new_send_to_char(ch, "Nobody is here by that name!\r\n");
+        ch->Send( "Nobody is here by that name!\r\n");
         return;
       }
     }
 
     if (SINFO.targets != TAR_IGNORE && !vict && !target)
-      new_send_to_char(ch,
+      ch->Send(
                        "%s needs an argument to work.\r\n",
                        SINFO.name);
     else if (IS_SET(SINFO.targets, TAR_NOT_SELF) && vict == ch)
-      new_send_to_char(ch, "You can't %s yourself!\r\n", SINFO.name);
+      ch->Send( "You can't %s yourself!\r\n", SINFO.name);
     else if (IS_SET(SINFO.targets, TAR_SELF_ONLY) && vict != ch)
-      new_send_to_char(ch, "That can only be done to yourself.\r\n");
+      ch->Send( "That can only be done to yourself.\r\n");
     else if (IS_SET(SINFO.flags, SK_NEED_WEAPON)
              && !has_weapon(ch))
-      new_send_to_char(ch,
+      ch->Send(
                        "You need to wield a weapon to make it a success.\r\n");
     else
     {
@@ -460,13 +460,13 @@ ACMD(do_skills)
       {
         if (!can_fight(ch, vict, TRUE))
         {
-          new_send_to_char(ch, "You can't do that to them!\r\n");
+          ch->Send( "You can't do that to them!\r\n");
           return;
         }
       }
       if (!skill_cost(0, 0, 4, ch))
       {
-        new_send_to_char(ch, "You are exausted!");
+        ch->Send( "You are exausted!");
         return;
       }
       switch (subcmd)
@@ -648,31 +648,31 @@ ASKILL(skill_backstab)
 
   int percent, prob;
   OBJ_DATA *wep = GET_EQ(ch, WEAR_WIELD);
-  int size_dice_wep(CHAR_DATA *ch, short dual);
-  int num_dice_wep(CHAR_DATA *ch, short dual);
-  int class_damroll(CHAR_DATA *ch);
+  int size_dice_wep(Character *ch, short dual);
+  int num_dice_wep(Character *ch, short dual);
+  int class_damroll(Character *ch);
 
 
   if (use_stamina( ch, 12) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   if (!skill_cost(0, 0, 40, ch))
   {
-    new_send_to_char(ch, "You are exausted!");
+    ch->Send( "You are exausted!");
     return 0;
   }
 
   if (!IS_NPC(ch) && (!wep ||GET_OBJ_VAL(wep, 3) != TYPE_PIERCE - TYPE_HIT))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "Only piercing weapons can be used for backstabbing.\r\n");
     return 0;
   }
   if (FIGHTING(vict))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "You can't backstab a fighting person -- they're too alert!\r\n");
     return 0;
   }
@@ -701,11 +701,11 @@ ASKILL(skill_backstab)
 
 ASKILL(skill_charge)
 {
-  CHAR_DATA *temp = NULL, *temp_next = NULL;
+  Character *temp = NULL, *temp_next = NULL;
   int ret = 0;
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -736,7 +736,7 @@ ASKILL(skill_charge)
   return SKILL_CHARGE;
 }
 
-int perform_charge(CHAR_DATA *ch, CHAR_DATA *vict)
+int perform_charge(Character *ch, Character *vict)
 {
   int prob, percent = number(0, 150);
   if (MOB_FLAGGED(vict, MOB_NOBASH))
@@ -778,7 +778,7 @@ ASKILL(skill_bash)
   }
   if (GET_POS(vict) == POS_SITTING)
   {
-    new_send_to_char(ch, "They are already down and your bash goes right over them!!\r\n");
+    ch->Send( "They are already down and your bash goes right over them!!\r\n");
     fe_deal_damage(ch, vict, 0, SKILL_BASH);
     GET_POS(ch) = POS_SITTING;
     GET_WAIT_STATE(ch) += 2 RL_SEC;
@@ -786,12 +786,12 @@ ASKILL(skill_bash)
   }
   if (use_stamina( ch, 25) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   if (!skill_cost(0, 0, 25, ch))
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -827,12 +827,12 @@ ASKILL(skill_bash)
 ASKILL(skill_rescue)
 {
 
-  CHAR_DATA *tmp_ch;
+  Character *tmp_ch;
   int percent, prob;
 
   if (!skill_cost(0, 10, 40, ch))
   {
-    new_send_to_char(ch, "You are exausted!");
+    ch->Send( "You are exausted!");
     return 0;
   }
 
@@ -883,13 +883,13 @@ ASKILL(skill_kick)
   int percent, prob;
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   /* 101% is a complete failure */
   percent = ((10 - (compute_armor_class(vict) / 10)) * 2) + number(1, 70);
   prob = total_chance(ch, SKILL_KICK);
-  WAIT_STATE(ch, 1.5 RL_SEC);
+  WAIT_STATE(ch, FTOI(1.5 RL_SEC));
 
   skill_attack(ch, vict, SKILL_KICK, (percent < prob));
 
@@ -912,7 +912,7 @@ ASKILL(skill_sneak)
   {
     if (use_stamina( ch, 10) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     send_to_char("Okay, you'll try to move silently for a while.\r\n", ch);
@@ -922,7 +922,7 @@ ASKILL(skill_sneak)
     if (percent >
         GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You stumble over your own feet\r\n");
+      ch->Send( "You stumble over your own feet\r\n");
       return 0;
     }
 
@@ -945,14 +945,14 @@ ASKILL(skill_hide)
   if (AFF_FLAGGED(ch, AFF_HIDE))
   {
     REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
-    new_send_to_char(ch, "You stop hiding.");
+    ch->Send( "You stop hiding.");
   }
   else
   {
 
     if (use_stamina( ch, 10) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     send_to_char("You attempt to hide yourself.\r\n", ch);
@@ -975,13 +975,13 @@ ASKILL(skill_steal)
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
   {
-    new_send_to_char(ch, "You can't steal here. Try outside of the Arena.\r\n");
+    ch->Send( "You can't steal here. Try outside of the Arena.\r\n");
     return 0 ;
   }
 
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1000,7 +1000,7 @@ ASKILL(skill_steal)
 
   if ((!IS_NPC(ch) && !IS_NPC(vict)) && !(both_pk(vict,ch)))
   {
-    new_send_to_char(ch, "You can't steal from them!\r\n");
+    ch->Send( "You can't steal from them!\r\n");
     return 0;
   }
 
@@ -1057,11 +1057,11 @@ ASKILL(skill_steal)
           if (!give_otrigger(obj, vict, ch) ||
               !receive_mtrigger(ch, vict, obj))
           {
-            new_send_to_char(ch, "Impossible!\r\n");
+            ch->Send( "Impossible!\r\n");
             return 0;
           }
           {
-            new_send_to_char(ch, "Its stuck!\r\n");
+            ch->Send( "Its stuck!\r\n");
             return 0;
           }
           act("You unequip $p and steal it.", FALSE, ch, obj, 0,
@@ -1093,7 +1093,7 @@ ASKILL(skill_steal)
           if (!give_otrigger(obj, vict, ch) ||
               !receive_mtrigger(ch, vict, obj))
           {
-            new_send_to_char(ch, "Impossible!\r\n");
+            ch->Send( "Impossible!\r\n");
             return 0;
           }
           if (IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <
@@ -1101,11 +1101,11 @@ ASKILL(skill_steal)
           {
             obj_from_char(obj);
             obj_to_char(obj, ch);
-            new_send_to_char(ch, "Got it!\r\n");
+            ch->Send( "Got it!\r\n");
           }
         }
         else
-          new_send_to_char(ch, "You cannot carry that much.\r\n");
+          ch->Send( "You cannot carry that much.\r\n");
       }
     }
   }
@@ -1131,7 +1131,7 @@ ASKILL(skill_steal)
         char_gold(vict, -gold, GOLD_HAND);
         if (gold > 1)
         {
-          new_send_to_char(ch, "Bingo!  You got %d gold coins.\r\n",
+          ch->Send( "Bingo!  You got %d gold coins.\r\n",
                            gold);
         }
         else
@@ -1166,7 +1166,7 @@ ASKILL(skill_track)
   }
   if (use_stamina( ch, 10) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   /* 101 is a complete failure, no matter what the proficiency. */
@@ -1179,7 +1179,7 @@ ASKILL(skill_track)
       dir = number(0, NUM_OF_DIRS - 1);
     }
     while (!CAN_GO(ch, dir) && --tries);
-    new_send_to_char(ch,
+    ch->Send(
                      "{cWYou notice some tracks leading %s from here!{c0\r\n",
                      dirs[dir]);
     return 0;
@@ -1197,11 +1197,11 @@ ASKILL(skill_track)
     send_to_char("You're already in the same room!!\r\n", ch);
     break;
   case BFS_NO_PATH:
-    new_send_to_char(ch,
+    ch->Send(
                      "There are confusing tracks all around you.\r\n");
     break;
   default:               /* Success! */
-    new_send_to_char(ch,
+    ch->Send(
                      "{cWYou notice some tracks leading %s from here!{c0\r\n",
                      dirs[dir]);
     return SKILL_TRACK;
@@ -1221,7 +1221,7 @@ ASKILL(skill_disarm)
   }
   if (use_stamina( ch, 15) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1282,7 +1282,7 @@ ASKILL(skill_smash)
   }
   if (use_stamina( ch, 15) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1342,7 +1342,7 @@ ASKILL(skill_smash)
 ASKILL(skill_trample)
 {
   int chance = 0, dam = 0;
-  int average_damage(struct char_data *ch);
+  int average_damage(Character *ch);
   char buf[MAX_STRING_LENGTH];
   if (!(RIDING(ch) || GET_RACE(ch) == RACE_CENTAUR))
   {
@@ -1353,7 +1353,7 @@ ASKILL(skill_trample)
   }
   if (use_stamina( ch, 20) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1407,12 +1407,12 @@ ASKILL(skill_joust)
 
   if (!(RIDING(ch) || GET_RACE(ch) == RACE_CENTAUR))
   {
-    new_send_to_char(ch, "You aren't a centaur and you arent riding anything.\r\n");
+    ch->Send( "You aren't a centaur and you arent riding anything.\r\n");
     return 0;
   }
   if (use_stamina( ch, 10) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   /* knocks vict off horse and onto ground, small damage.
@@ -1421,7 +1421,7 @@ ASKILL(skill_joust)
   if (number(1, 101) >
       total_chance(ch, SKILL_JOUST))
   {
-    new_send_to_char(ch, "You fail!\r\n");
+    ch->Send( "You fail!\r\n");
     GET_WAIT_STATE(ch) += 2 RL_SEC;
     return 0;
   }
@@ -1435,7 +1435,7 @@ ASKILL(skill_joust)
   }
   else
   {
-    new_send_to_char(ch, "But they aren't riding anything!\r\n");
+    ch->Send( "But they aren't riding anything!\r\n");
 
   }
   return 0;
@@ -1450,7 +1450,7 @@ ASKILL(skill_dodge)
 
   if (use_stamina( ch, 15) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   if (AFF_FLAGGED(ch, AFF_DODGE))
@@ -1488,7 +1488,7 @@ ASKILL(skill_phase)
 
   if (use_stamina( ch, 15) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   if (AFF_FLAGGED(ch, AFF_PHASE))
@@ -1535,7 +1535,7 @@ ASKILL(skill_grip)
   {
     if (use_stamina( ch, 25) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     send_to_char("You clench your hand on your weapon.\r\n", ch);
@@ -1549,7 +1549,7 @@ ASKILL(skill_grip)
     if (percent >
         GET_SKILL(ch, SKILL_GRIP) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "Your hands cramp.\r\n");
+      ch->Send( "Your hands cramp.\r\n");
       return 0;
     }
 
@@ -1568,18 +1568,18 @@ ASKILL(skill_face)
 
   if (!FIGHTING(ch))
   {
-    new_send_to_char(ch, "Type 'hit <victim>'\r\n");
+    ch->Send( "Type 'hit <victim>'\r\n");
     return 0;
   }
 
   if (FIGHTING(ch) == vict)
   {
-    new_send_to_char(ch, "You redouble your efforts!\r\n");
+    ch->Send( "You redouble your efforts!\r\n");
     return 0;
   }
   if (use_stamina( ch, 8) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   WAIT_STATE(ch, 1 RL_SEC);
@@ -1601,7 +1601,7 @@ ASKILL(skill_focus)
   byte percent;
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1621,7 +1621,7 @@ ASKILL(skill_focus)
     if (percent >
         GET_SKILL(ch, SKILL_FOCUS) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You can't seem to focus properly.\r\n");
+      ch->Send( "You can't seem to focus properly.\r\n");
       return 0;
     }
 
@@ -1639,16 +1639,16 @@ ASKILL(skill_grapple)
 {
   //char name[100], todir[256];
   int to, fail = FALSE;
-  //CHAR_DATA *victim = NULL;
+  //Character *victim = NULL;
 
   if (affected_by_spell(vict, SKILL_SNARE))
   {
-    new_send_to_char(ch, "You can't throw someone who is snared!\r\n");
+    ch->Send( "You can't throw someone who is snared!\r\n");
     return 0;
   }
   if (use_stamina( ch, 10) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   to = number(0, 5);
@@ -1691,7 +1691,7 @@ ASKILL(skill_beserk)
 
   if (use_stamina( ch, 20) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -1711,7 +1711,7 @@ ASKILL(skill_beserk)
     if (percent >
         GET_SKILL(ch, SKILL_BESERK) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You stumble over your own feet\r\n");
+      ch->Send( "You stumble over your own feet\r\n");
       return 0;
     }
 
@@ -1745,7 +1745,7 @@ ASKILL(skill_meditate)
     if (percent >
         GET_SKILL(ch, SKILL_MEDITATE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You can not seem to clear your thoughts.\r\n");
+      ch->Send( "You can not seem to clear your thoughts.\r\n");
       return 0;
     }
     act("$n closes $s eyes and starts meditating.", FALSE, ch, 0, NULL, TO_ROOM);
@@ -1770,7 +1770,7 @@ ASKILL(skill_true_strike)
 
   if (use_stamina( ch, 25) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   if (AFF_FLAGGED(ch, AFF_TRUE_STRIKING))
@@ -1788,7 +1788,7 @@ ASKILL(skill_true_strike)
     if (percent >
         GET_SKILL(ch, SKILL_TRUE_STRIKE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You stutter and forget the battlesong.\r\n");
+      ch->Send( "You stutter and forget the battlesong.\r\n");
       return 0;
     }
 
@@ -1806,7 +1806,7 @@ ASKILL(skill_true_strike)
 //TODO
 ASKILL(skill_flank)
 {
-  new_send_to_char(ch, "This Skill Is Unfinished.\r\n");
+  ch->Send( "This Skill Is Unfinished.\r\n");
   return 0;
 }
 
@@ -1826,7 +1826,7 @@ ASKILL(skill_fortify)
 
     if (use_stamina( ch, 25) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     send_to_char("You clench your muscles and focus your energy.\r\n", ch);
@@ -1836,7 +1836,7 @@ ASKILL(skill_fortify)
     if (percent >
         GET_SKILL(ch, SKILL_FORTIFY) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You can't seem to concentrate.\r\n");
+      ch->Send( "You can't seem to concentrate.\r\n");
       return 0;
     }
     act("$n clenches $s muscles and fortifies $s energy.", FALSE, ch, 0, NULL, TO_ROOM);
@@ -1853,7 +1853,7 @@ ASKILL(skill_fortify)
 
 ASKILL(skill_scalp)
 {
-  void crumble_obj(CHAR_DATA *ch, OBJ_DATA *obj);
+  void crumble_obj(Character *ch, OBJ_DATA *obj);
   OBJ_DATA *scalp = NULL;
   struct extra_descr_data *new_descr = NULL;
   char /*buf1[MAX_STRING_LENGTH],*/ buf2[MAX_STRING_LENGTH];
@@ -1865,17 +1865,17 @@ ASKILL(skill_scalp)
   {
     if (!IS_CORPSE(obj))
     {
-      new_send_to_char(ch, "You rip off the scalp of... nothing really! Fear your stupidity!\r\n");
+      ch->Send( "You rip off the scalp of... nothing really! Fear your stupidity!\r\n");
       return 0;
     }
     else if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE) && GET_OBJ_VAL(obj, 6) == 0)
     {
-      new_send_to_char(ch, "They aren't a PK'er!\r\n");
+      ch->Send( "They aren't a PK'er!\r\n");
       return 0;
     }
     if (use_stamina( ch, 80) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     pc = IS_OBJ_STAT(obj, ITEM_PC_CORPSE);
@@ -1950,7 +1950,7 @@ ASKILL(skill_blade_dance)
   {
     if (use_stamina( ch, 30) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     send_to_char("You spin your weapons around in your fingers.\r\n", ch);
@@ -1960,7 +1960,7 @@ ASKILL(skill_blade_dance)
     if (percent >
         GET_SKILL(ch, SKILL_BLADE_DANCE) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You stumble over your own feet\r\n");
+      ch->Send( "You stumble over your own feet\r\n");
       return 0;
     }
 
@@ -1988,7 +1988,7 @@ ASKILL(skill_cleave)
   }
   if (use_stamina( ch, 25) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   /*
@@ -2019,7 +2019,7 @@ ASKILL(skill_behead)
   }
   if (use_stamina( ch, 25) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   /*
@@ -2057,13 +2057,13 @@ ASKILL(skill_martial_arts)
     percent = number(1, 101); /* 101% is a complete failure */
     if (use_stamina( ch, 15) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     if (percent >
         GET_SKILL(ch, SKILL_MARTIAL_ARTS) + dex_app_skill[GET_DEX(ch)].sneak)
     {
-      new_send_to_char(ch, "You stumble over your own feet\r\n");
+      ch->Send( "You stumble over your own feet\r\n");
       return 0;
     }
     for (i = 0; i < 2; i++)
@@ -2098,7 +2098,7 @@ ASKILL(skill_martial_arts)
 
 ASKILL(skill_punch)
 {
-  new_send_to_char(ch, "This Skill Is Unfinished.\r\n");
+  ch->Send( "This Skill Is Unfinished.\r\n");
   return 0;
 }
 
@@ -2120,7 +2120,7 @@ ASKILL(skill_slip)
     do_put(ch, argument, 0, 0);
   else
   {
-    new_send_to_char(ch, "Sorry, but only the commands: give, get, drop and put\r\n");
+    ch->Send( "Sorry, but only the commands: give, get, drop and put\r\n");
     fail = TRUE;
   }
   slipping = FALSE;
@@ -2141,7 +2141,7 @@ ASKILL(skill_hyperactivity)
   else
     if (use_stamina( ch, 5) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
   send_to_char("Okay, you start to spin out!!\r\n", ch);
@@ -2151,7 +2151,7 @@ ASKILL(skill_hyperactivity)
 
   if (percent > GET_SKILL(ch, SKILL_HYPERACTIVITY))
   {
-    new_send_to_char(ch, "You feel calm.\r\n");
+    ch->Send( "You feel calm.\r\n");
     return 0;
   }
 
@@ -2180,7 +2180,7 @@ ASKILL(skill_holy_strength)
   else
     if (use_stamina( ch, 15) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
   send_to_char("Your muscles bulge!!\r\n", ch);
@@ -2190,7 +2190,7 @@ ASKILL(skill_holy_strength)
 
   if (percent > GET_SKILL(ch, SKILL_HOLY_STRENGTH))
   {
-    new_send_to_char(ch, "You still feel weak.\r\n");
+    ch->Send( "You still feel weak.\r\n");
     return 0;
   }
 
@@ -2220,7 +2220,7 @@ ASKILL(skill_brace)
   }
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   percent = number(1, 101);   /* 101% is a complete failure */
@@ -2246,7 +2246,7 @@ ASKILL(skill_push)
 {
   char name[100], todir[256];
   int to;
-  CHAR_DATA *victim = NULL;
+  Character *victim = NULL;
   char buf[MAX_STRING_LENGTH];
 
   half_chop(argument, name, todir);
@@ -2272,7 +2272,7 @@ ASKILL(skill_push)
     GET_WAIT_STATE(ch) += 3 RL_SEC;
     if (use_stamina( ch, 20) < 0)
     {
-      new_send_to_char(ch, "You are far too exausted!");
+      ch->Send( "You are far too exausted!");
       return 0;
     }
     strcpy(todir, dirs[to]);
@@ -2295,7 +2295,7 @@ ASKILL(skill_push)
     act("$n is trying to push $N", FALSE, ch, 0, victim, TO_NOTVICT);
     if (!CAN_GO(victim, to))
     {
-      new_send_to_char(ch, "Can't push %s there\r\n", HMHR(ch));
+      ch->Send( "Can't push %s there\r\n", HMHR(ch));
     }
     else if (GET_LEVEL(victim) >= LVL_GOD
              && GET_LEVEL(ch) != LVL_IMPL)
@@ -2306,9 +2306,9 @@ ASKILL(skill_push)
     }
     else if (GET_LEVEL(victim) - GET_LEVEL(ch) > 4)
     {
-      new_send_to_char(ch, "You can't push %s.\r\n", HMHR(victim));
+      ch->Send( "You can't push %s.\r\n", HMHR(victim));
 
-      new_send_to_char(ch, "%s can't push you.\r\n", GET_NAME(ch));
+      ch->Send( "%s can't push you.\r\n", GET_NAME(ch));
     }
     else if (MOB_FLAGGED(victim, MOB_NOBASH))
     {
@@ -2339,7 +2339,7 @@ ASKILL(skill_push)
 ASKILL(skill_scan)
 {
 
-  CHAR_DATA *i;
+  Character *i;
   int  dir = 0, dis, maxdis, x, found = 0;
   room_rnum location = NULL, original_loc, is_in;
   char arg[MAX_STRING_LENGTH];
@@ -2376,7 +2376,7 @@ ASKILL(skill_scan)
 
   if (use_stamina( ch, 3) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   WAIT_STATE(ch, 1 RL_SEC);
@@ -2433,7 +2433,7 @@ ASKILL(skill_scan)
         /* But the door is closed */
         if (original_loc->dir_option[dir]->keyword)
         {
-          new_send_to_char(ch, "The %s seems to be closed.\r\n",
+          ch->Send( "The %s seems to be closed.\r\n",
                            fname(original_loc->dir_option[dir]->keyword));
         }
         else
@@ -2482,7 +2482,7 @@ ASKILL(skill_scan)
         {
           if ((!((ch == i) && (dis == 0))) && CAN_SEE(ch, i))
           {
-            new_send_to_char(ch, "%33s: %s%s%s%s\r\n", GET_NAME(i),
+            ch->Send( "%33s: %s%s%s%s\r\n", GET_NAME(i),
                              distance[dis],
                              ((dis > 0) && (dir < (NUM_OF_DIRS - 2))) ? "to the " : "",
                              (dis > 0) ? dirs[dir] : "",
@@ -2549,7 +2549,7 @@ ASKILL(skill_poison_weapon)
   }
   if (!skill_cost(0, 10, 150, ch))
   {
-    new_send_to_char(ch, "You are exausted!");
+    ch->Send( "You are exausted!");
     return 0;
   }
   /* Now we have a valid weapon...check to see if we have the powder. */
@@ -2747,7 +2747,7 @@ ASKILL(skill_filet)
   }
   if (use_stamina( ch, 15) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   prob = number(1, 101);
@@ -2772,7 +2772,7 @@ ASKILL(skill_filet)
     return SKILL_FILET;
   }
   else
-    new_send_to_char(ch, "Your hands turn numb and you fumble.\r\n");
+    ch->Send( "Your hands turn numb and you fumble.\r\n");
   return 0;
 }
 
@@ -2794,7 +2794,7 @@ ASKILL(skill_forage)
   }
   if (use_stamina( ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
   send_to_char("You start searching the area.\r\n",ch);
@@ -2803,7 +2803,7 @@ ASKILL(skill_forage)
   if (IS_NPC(ch) || (number(1, 125) > GET_SKILL(ch, SKILL_FORAGE)))
   {
     WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-    new_send_to_char(ch, "You have no luck finding anything.\r\n");
+    ch->Send( "You have no luck finding anything.\r\n");
     return 0;
   }
   else
@@ -2811,7 +2811,7 @@ ASKILL(skill_forage)
     item_no = 50 + number(1, 11);
     if ((item_found = read_object(item_no, VIRTUAL)) == NULL)
     {
-      new_send_to_char(ch, "You have no luck finding anything to eat\r\n");
+      ch->Send( "You have no luck finding anything to eat\r\n");
       return 0;
     }
     obj_to_char(item_found, ch);
@@ -2850,13 +2850,13 @@ ASKILL(skill_circle)
   }
   if (use_stamina( ch, 20) < 0)
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
   if (!skill_cost(0, 0, 25, ch))
   {
-    new_send_to_char(ch, "You are far too exausted!");
+    ch->Send( "You are far too exausted!");
     return 0;
   }
 
@@ -2875,7 +2875,7 @@ ASKILL(skill_circle)
 
 }
 
-void improve_skill(CHAR_DATA *ch, int skill)
+void improve_skill(Character *ch, int skill)
 {
   extern struct spell_info_type spell_info[];
 
@@ -2915,18 +2915,18 @@ void improve_skill(CHAR_DATA *ch, int skill)
   percent++;
 
   if (percent >= 97)
-    share = exp_needed(ch) * 0.2;
+    share = (gold_int)(exp_needed(ch) * 0.2);
   else
     share = number(50, 120) * (percent) * splevel;
 
   SET_SKILL(ch, skill, percent);
-  new_send_to_char(ch, "You feel your ability in %s %s.\r\n",  skill_name(skill), (percent >= 97) ? "reach full strength" : "improve");
+  ch->Send( "You feel your ability in %s %s.\r\n",  skill_name(skill), (percent >= 97) ? "reach full strength" : "improve");
   gain_exp(ch, share);
 
   return;
 }
 
-int total_chance(CHAR_DATA *ch, int skill)
+int total_chance(Character *ch, int skill)
 {
   int count = 0, total = 0, check = TRUE;
   int skch = 0;
@@ -2975,13 +2975,13 @@ int total_chance(CHAR_DATA *ch, int skill)
     return 0;
 }
 
-int perform_grapple(CHAR_DATA *ch, int dir, int need_specials_check,
-                    CHAR_DATA *attacker)
+int perform_grapple(Character *ch, int dir, int need_specials_check,
+                    Character *attacker)
 {
   room_rnum was_in;
-  int House_can_enter(CHAR_DATA *ch, room_vnum house);
-  void death_cry(CHAR_DATA *ch);
-  int special(CHAR_DATA *ch, int cmd, char *arg);
+  int House_can_enter(Character *ch, room_vnum house);
+  void death_cry(Character *ch);
+  int special(Character *ch, int cmd, char *arg);
   int fail = FALSE;
 
 
@@ -3037,7 +3037,7 @@ int perform_grapple(CHAR_DATA *ch, int dir, int need_specials_check,
   return 1;
 }
 
-int skill_cost(int h, int m, int v, CHAR_DATA *ch)
+int skill_cost(int h, int m, int v, Character *ch)
 {
   int mv;
   if (GET_LEVEL(ch) > LVL_IMMORT)

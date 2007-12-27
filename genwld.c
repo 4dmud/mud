@@ -30,7 +30,7 @@ void update_wait_events(struct room_data *to, struct room_data *from);
  */
 room_rnum add_room(struct room_data *room)
 {
-  //  struct char_data *tch;
+  //  Character *tch;
   //  struct obj_data *tobj;
   int i, found = FALSE;
   //  room_rnum i;
@@ -178,7 +178,7 @@ int delete_room(room_rnum rnum)
 {
   int i;
   int j;
-  struct char_data *ppl, *next_ppl;
+  Character *ppl, *next_ppl;
   struct obj_data *obj, *next_obj;
   struct room_data *room;
 

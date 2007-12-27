@@ -29,11 +29,11 @@ ACMD(do_register)
     {
       GET_GOLD_TOKEN_COUNT(ch)--;
       REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_PK);
-      new_send_to_char(ch, "You are charged 1 Gold Token, and have had your PK flag removed.\r\n");
+      ch->Send( "You are charged 1 Gold Token, and have had your PK flag removed.\r\n");
     }
     else
     {
-      new_send_to_char(ch, "You cannot afford to unregister, the cost is 1 gold token on file.\r\n");
+      ch->Send( "You cannot afford to unregister, the cost is 1 gold token on file.\r\n");
     }
     return;
   }
@@ -46,13 +46,13 @@ ACMD(do_register)
 
   if (GET_ROOM_VNUM(IN_ROOM(ch)) != 3138)
   {
-    new_send_to_char(ch, "You can only register at the Mayor's Secretary's office in Olde Yorke.\r\n");
+    ch->Send( "You can only register at the Mayor's Secretary's office in Olde Yorke.\r\n");
     return;
   }
 
   if (REMORTS(ch) < 4)
   {
-    new_send_to_char(ch, "You must have at least 4 remorts to register for Player Killing.\r\n");
+    ch->Send( "You must have at least 4 remorts to register for Player Killing.\r\n");
     return;
   }
 
@@ -60,16 +60,16 @@ ACMD(do_register)
   {
     GET_SILVER_TOKEN_COUNT(ch)--;
     SET_BIT_AR(PLR_FLAGS(ch), PLR_PK);
-    new_send_to_char(ch, "That cost 1 Silver token.\r\nWelcome to the World of Player Killing.\r\n");
+    ch->Send( "That cost 1 Silver token.\r\nWelcome to the World of Player Killing.\r\n");
   }
   else
   {
-    new_send_to_char(ch, "You need to have at least 1 silver token on file to afford this.\r\n");
+    ch->Send( "You need to have at least 1 silver token on file to afford this.\r\n");
   }
   return;
 }
 
-int both_pk(struct char_data *a, struct char_data *b)
+int both_pk(Character *a, Character *b)
 {
   /* If either is a mob, they can't be PK */
   if (IS_NPC(a) || IS_NPC(b))
@@ -83,7 +83,7 @@ int both_pk(struct char_data *a, struct char_data *b)
 
 
 
-void kill_points(struct char_data *ch, struct char_data *vict)
+void kill_points(Character *ch, Character *vict)
 {
 
   int points = 50;

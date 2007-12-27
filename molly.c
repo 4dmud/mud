@@ -21,7 +21,7 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 ACMD(do_smell)
 {
   int bits, found = FALSE, j,fnum;
-  struct char_data *found_char = NULL;
+  Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH],arg2[MAX_STRING_LENGTH];
   char *arg1;
@@ -33,7 +33,7 @@ ACMD(do_smell)
   strncpy(arg2,arg,MAX_STRING_LENGTH);
   if (!*arg)
   {
-    new_send_to_char(ch, "%s", IN_ROOM(ch)->smell);
+    ch->Send( "%s", IN_ROOM(ch)->smell);
     return;
   }
   if (!(fnum = get_number(&arg1)))
@@ -116,7 +116,7 @@ ACMD(do_smell)
 ACMD(do_taste)
 {
   int bits, found = FALSE, j,fnum;
-  struct char_data *found_char = NULL;
+  Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
   char *arg1;
@@ -204,7 +204,7 @@ ACMD(do_taste)
 ACMD(do_feel)
 {
   int bits, found = FALSE, j, fnum;
-  struct char_data *found_char = NULL;
+  Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
   char *arg1;
@@ -277,11 +277,11 @@ ACMD(do_listen)
   if (!ch->desc)
     return;
   if (IN_ROOM(ch)->listen)
-    new_send_to_char(ch, "%s", IN_ROOM(ch)->listen);
+    ch->Send( "%s", IN_ROOM(ch)->listen);
   return;
 }
 
-void look_above_target(struct char_data *ch, char *arg)
+void look_above_target(Character *ch, char *arg)
 {
   char *desc;
 
@@ -308,7 +308,7 @@ void look_above_target(struct char_data *ch, char *arg)
   }
 }
 
-void look_behind_target(struct char_data *ch, char *arg)
+void look_behind_target(Character *ch, char *arg)
 {
   char *desc;
 
@@ -336,7 +336,7 @@ void look_behind_target(struct char_data *ch, char *arg)
   }
 }
 
-void look_under_target(struct char_data *ch, char *arg)
+void look_under_target(Character *ch, char *arg)
 {
   char *desc;
 
@@ -451,7 +451,7 @@ ACMD(do_climb)
         }
       }
     }
-    new_send_to_char(ch, "There is no %s here.\r\n", buf);
+    ch->Send( "There is no %s here.\r\n", buf);
   }
   else
   {
@@ -550,7 +550,7 @@ ACMD(do_descend)
        }
       }
     }
-    new_send_to_char(ch, "There is no %s here.\r\n", buf);
+    ch->Send( "There is no %s here.\r\n", buf);
   }
   else
   {

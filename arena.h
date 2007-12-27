@@ -47,7 +47,7 @@ void silent_end(void);
 void write_fame_list(void);
 void write_one_fame_node(FILE * fp, struct hall_of_fame_element *node);
 void load_hall_of_fame(void);
-void find_bet_winners(struct char_data *winner);
+void find_bet_winners(Character *winner);
 
 extern int in_arena;
 extern int game_length;

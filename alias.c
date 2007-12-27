@@ -16,11 +16,11 @@
 #include "interpreter.h"
 #include "db.h"
 
-void write_aliases(struct char_data *ch);
-void read_aliases(struct char_data *ch);
+void write_aliases(Character *ch);
+void read_aliases(Character *ch);
 void delete_aliases(const char *charname);
 
-void write_aliases(struct char_data *ch)
+void write_aliases(Character *ch)
 {
   FILE *file;
   char fn[MAX_STRING_LENGTH];
@@ -53,7 +53,7 @@ void write_aliases(struct char_data *ch)
   fclose(file);
 }
 
-void read_aliases(struct char_data *ch)
+void read_aliases(Character *ch)
 {   
   FILE *file;
   char xbuf[MAX_STRING_LENGTH];

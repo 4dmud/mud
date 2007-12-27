@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/08 19:36:27 $
-*  $Revision: 1.9 $
+*  $Date: 2006/05/21 11:02:26 $
+*  $Revision: 1.10 $
 **************************************************************************/
 
 #include "conf.h"
@@ -24,14 +24,14 @@
 #include "constants.h"
 
 
-void die(struct char_data *ch, struct char_data *killer);
+void die(Character *ch, Character *killer);
 zone_rnum real_zone_by_thing(room_vnum vznum);
 bitvector_t asciiflag_conv(char *flag);
 
 #define WCMD(name)  \
 void (name)(room_data *room, char *argument, int cmd, int subcmd)
 
-int followers_to_master(struct char_data *ch, room_rnum was_in);
+int followers_to_master(Character *ch, room_rnum was_in);
 void wld_log(room_data *room, const char *format, ...);
 void act_to_room(char *str, room_data *room);
 WCMD(do_wasound);
@@ -121,7 +121,7 @@ WCMD(do_wasound)
 }
 WCMD(do_wlag)
 {
-  char_data *victim;
+  Character *victim;
   int w = 0;
   //int room;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -169,7 +169,7 @@ WCMD(do_wlag)
 
 
 
-  w = (w RL_SEC)*0.1;
+  w = FTOI((w RL_SEC)*0.1);
 
   WAIT_STATE(victim, w);
   return;
@@ -190,7 +190,7 @@ WCMD(do_wecho)
 WCMD(do_wsend)
 {
   char buf[MAX_INPUT_LENGTH], *msg;
-  char_data *ch;
+  Character *ch;
 
   msg = any_one_arg(argument, buf);
 
@@ -419,7 +419,7 @@ WCMD(do_wdoor)
 
 WCMD(do_wteleport)
 {
-  char_data *ch, *next_ch;
+  Character *ch, *next_ch;
   room_rnum target, was_in;
   room_vnum nr;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -484,7 +484,7 @@ WCMD(do_wteleport)
 
 WCMD(do_wforce)
 {
-  char_data *ch, *next_ch;
+  Character *ch, *next_ch;
   char arg1[MAX_INPUT_LENGTH], *line;
 
   line = one_argument(argument, arg1);
@@ -525,7 +525,7 @@ WCMD(do_wforce)
 WCMD(do_wpurge)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *ch, *next_ch;
+  Character *ch, *next_ch;
   obj_data *obj, *next_obj;
 
   one_argument(argument, arg);
@@ -584,10 +584,10 @@ WCMD(do_wload)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int num = 0;
-  char_data *mob;
+  Character *mob;
   obj_data *object;
   char *target;
-  char_data *tch;
+  Character *tch;
   obj_data *cnt;
   int pos;
 
@@ -692,7 +692,7 @@ WCMD(do_wdamage)
 {
   char name[MAX_INPUT_LENGTH], amount[MAX_INPUT_LENGTH];
   int dam = 0;
-  char_data *ch;
+  Character *ch;
 
   two_arguments(argument, name, amount);
 
@@ -707,7 +707,7 @@ WCMD(do_wdamage)
   
   if (!str_cmp("all", name))
   {
-    CHAR_DATA *tvict, *vict;
+    Character *tvict, *vict;
     if ((room) == NULL)
       return;
     /**TODO: I hate this loop, because it is possable that on the extraction

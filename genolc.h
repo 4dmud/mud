@@ -29,7 +29,7 @@ int remove_from_save_list(zone_vnum, int type);
 int add_to_save_list(zone_vnum, int type);
 int in_save_list(zone_vnum, int type);
 void strip_cr(char *);
-void do_show_save_list(struct char_data *);
+void do_show_save_list(Character *);
 int save_all(void);
 char *str_udup(const char *);
 void copy_ex_descriptions(struct extra_descr_data **to, struct extra_descr_data *from);

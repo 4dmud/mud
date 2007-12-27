@@ -47,32 +47,32 @@ ACMD(do_action);
 ACMD(do_tell);
 SPECIAL(receptionist);
 SPECIAL(cryogenicist);
-void write_aliases(struct char_data *ch);
+void write_aliases(Character *ch);
 
 /* local functions */
 struct obj_data *Obj_from_store(struct obj_file_elem object,
                                       int *location);
-void Crash_extract_norent_eq(struct char_data *ch);
-void Crash_report_rent(struct char_data *ch, struct char_data *recep,
+void Crash_extract_norent_eq(Character *ch);
+void Crash_report_rent(Character *ch, Character *recep,
                        struct obj_data *obj, gold_int *cost,
                        long *nitems, int display, int factor);
 void update_obj_file(void);
-void Crash_rent_deadline(struct char_data *ch, struct char_data *recep,
+void Crash_rent_deadline(Character *ch, Character *recep,
                          long cost);
 void Crash_restore_weight(struct obj_data *obj);
-void Crash_extract_objs(struct obj_data *obj, CHAR_DATA *ch);
-void Crash_extract_norents(struct obj_data *obj, CHAR_DATA *ch);
+void Crash_extract_objs(struct obj_data *obj, Character *ch);
+void Crash_extract_norents(struct obj_data *obj, Character *ch);
 void Crash_extract_expensive(struct obj_data *obj);
 void Crash_calculate_rent(struct obj_data *obj, gold_int *cost);
-void Crash_rentsave(struct char_data *ch, int cost);
-int Crash_offer_rent(struct char_data *ch, struct char_data *receptionist,
+void Crash_rentsave(Character *ch, int cost);
+int Crash_offer_rent(Character *ch, Character *receptionist,
                      int display, int factor);
-int Crash_report_unrentables(struct char_data *ch, struct char_data *recep,
+int Crash_report_unrentables(Character *ch, Character *recep,
                              struct obj_data *obj);
 int Obj_to_store(struct obj_data *obj, FILE * fl, int location);
-int Crash_write_rentcode(struct char_data *ch, FILE * fl,
+int Crash_write_rentcode(Character *ch, FILE * fl,
                          struct rent_info *rent);
-int gen_receptionist(struct char_data *ch, struct char_data *recep,
+int gen_receptionist(Character *ch, Character *recep,
                      int cmd, char *arg, int mode);
 int Crash_save(struct obj_data *obj, FILE * fp, int locate);
 int Crash_is_unrentable(struct obj_data *obj);
@@ -82,11 +82,11 @@ char *remove_cr(char *str, char *buf, size_t len);
 int write_extra_desc(FILE *fl, struct extra_descr_data *ex_desc);
 int write_extra_descs(FILE *fl, OBJ_DATA *obj);
 int write_object_affects(FILE *fl, OBJ_DATA *obj);
-int load_char_objects_to_char_old(CHAR_DATA *ch, FILE *fl);
-int load_char_objects_to_char(CHAR_DATA *ch, FILE *fl);
+int load_char_objects_to_char_old(Character *ch, FILE *fl);
+int load_char_objects_to_char(Character *ch, FILE *fl);
 struct obj_data *read_one_item(FILE *fl, OBJ_DATA *temp, int *locate);
-int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row);
-int save_char_objs(CHAR_DATA *ch);
+int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row);
+int save_char_objs(Character *ch);
 int save_one_item( OBJ_DATA *obj, FILE *fl, int locate);
 int load_qic_check(int rnum);
 void new_load_corpses(void);
@@ -192,7 +192,7 @@ int Crash_delete_file(char *name)
 }
 
 
-int Crash_delete_crashfile(struct char_data *ch)
+int Crash_delete_crashfile(Character *ch)
 {
   char fname[MAX_INPUT_LENGTH];
   FILE *fl;
@@ -364,7 +364,7 @@ void update_obj_file(void)
 
 
 
-void Crash_listrent(struct char_data *ch, char *name)
+void Crash_listrent(Character *ch, char *name)
 {
   FILE *fl;
   char fname[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -381,7 +381,7 @@ void Crash_listrent(struct char_data *ch, char *name)
 
   if (!(fl = fopen(fname, "rb")))
   {
-    new_send_to_char(ch, "%s has no rent file.\r\n", name);
+    ch->Send( "%s has no rent file.\r\n", name);
     return;
   }
   sprintf(buf, "%s\r\n", fname);
@@ -467,7 +467,7 @@ void Crash_listrent(struct char_data *ch, char *name)
 
 
 
-int Crash_write_rentcode(struct char_data *ch, FILE * fl,
+int Crash_write_rentcode(Character *ch, FILE * fl,
                          struct rent_info *rent)
 {
 
@@ -484,7 +484,7 @@ int Crash_write_rentcode(struct char_data *ch, FILE * fl,
 
 
 /* so this is gonna be the auto equip (hopefully) */
-void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
+void auto_equip(Character *ch, struct obj_data *obj, int locate)
 {
   int j;
 
@@ -664,7 +664,7 @@ void auto_equip(struct char_data *ch, struct obj_data *obj, int locate)
         1 - load failure or load of crash items -- put char in temple.
         2 - rented equipment lost (no $)
 */
-int Crash_load(struct char_data *ch)
+int Crash_load(Character *ch)
 {
   return (Crash_load_xapobjs(ch));
 }
@@ -708,7 +708,7 @@ void Crash_restore_weight(struct obj_data *obj)
   }
 }
 
-void Crash_extract_objs(struct obj_data *obj, CHAR_DATA *ch)
+void Crash_extract_objs(struct obj_data *obj, Character *ch)
 {
   obj_rnum nrr;
   if (obj)
@@ -744,7 +744,7 @@ int Crash_is_unrentable(struct obj_data *obj)
 }
 
 
-void Crash_extract_norents(struct obj_data *obj, CHAR_DATA *ch)
+void Crash_extract_norents(struct obj_data *obj, Character *ch)
 {
   if (obj)
   {
@@ -760,7 +760,7 @@ void Crash_extract_norents(struct obj_data *obj, CHAR_DATA *ch)
         if (obj->carried_by)
           obj_from_char(obj);
         obj_to_room(obj, IN_ROOM(ch));
-        new_send_to_char(ch, "%s drops to the ground.\r\n", obj->short_description);
+        ch->Send( "%s drops to the ground.\r\n", obj->short_description);
         act("$p drops to the ground.", FALSE, ch, obj, NULL, TO_ROOM);
         return;
       }
@@ -783,7 +783,7 @@ void Crash_extract_norents(struct obj_data *obj, CHAR_DATA *ch)
  * Get !RENT items from equipment to inventory and
  * extract !RENT out of worn containers.
  */
-void Crash_extract_norent_eq(struct char_data *ch)
+void Crash_extract_norent_eq(Character *ch)
 {
   int j;
 
@@ -818,7 +818,7 @@ void Crash_calculate_rent(struct obj_data *obj, gold_int *cost)
 }
 
 
-void Crash_crashsave(struct char_data *ch)
+void Crash_crashsave(Character *ch)
 {
   char filename[MAX_INPUT_LENGTH];
   char tempname[MAX_INPUT_LENGTH + 4];
@@ -925,7 +925,7 @@ void Crash_crashsave(struct char_data *ch)
 }
 
 
-void Crash_rentsave(struct char_data *ch, int cost)
+void Crash_rentsave(Character *ch, int cost)
 {
   char filename[MAX_INPUT_LENGTH];
   char tempname[MAX_INPUT_LENGTH + 4];
@@ -1027,13 +1027,13 @@ void Crash_rentsave(struct char_data *ch, int cost)
 * Routines used for the receptionist                          *
 ************************************************************************* */
 
-void Crash_rent_deadline(struct char_data *ch, struct char_data *recep,
+void Crash_rent_deadline(Character *ch, Character *recep,
                          long cost)
 {
   return;
 }
 
-int Crash_report_unrentables(struct char_data *ch, struct char_data *recep,
+int Crash_report_unrentables(Character *ch, Character *recep,
                              struct obj_data *obj)
 {
 
@@ -1042,7 +1042,7 @@ int Crash_report_unrentables(struct char_data *ch, struct char_data *recep,
 
 
 
-void Crash_report_rent(struct char_data *ch, struct char_data *recep,
+void Crash_report_rent(Character *ch, Character *recep,
                        struct obj_data *obj, gold_int *cost,
                        long *nitems, int display, int factor)
 {
@@ -1051,7 +1051,7 @@ void Crash_report_rent(struct char_data *ch, struct char_data *recep,
 
 
 
-int Crash_offer_rent(struct char_data *ch, struct char_data *receptionist,
+int Crash_offer_rent(Character *ch, Character *receptionist,
                      int display, int factor)
 {
   return 0;
@@ -1059,7 +1059,7 @@ int Crash_offer_rent(struct char_data *ch, struct char_data *receptionist,
 
 
 
-int gen_receptionist(struct char_data *ch, struct char_data *recep,
+int gen_receptionist(Character *ch, Character *recep,
                      int cmd, char *arg, int mode)
 {
   return 0;
@@ -1069,14 +1069,14 @@ int gen_receptionist(struct char_data *ch, struct char_data *recep,
 SPECIAL(receptionist)
 {
   return (gen_receptionist
-          (ch, (struct char_data *) me, cmd, argument, RENT_FACTOR));
+          (ch, (Character *) me, cmd, argument, RENT_FACTOR));
 }
 
 
 SPECIAL(cryogenicist)
 {
   return (gen_receptionist
-          (ch, (struct char_data *) me, cmd, argument, CRYO_FACTOR));
+          (ch, (Character *) me, cmd, argument, CRYO_FACTOR));
 }
 
 
@@ -1100,7 +1100,7 @@ void Crash_save_all(void)
   }
 }
 
-int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row)
+int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row)
 {
 
   int j;
@@ -1612,7 +1612,7 @@ void scan_char_objects_qic(char *name, long id)
   return;
 }
 
-int load_char_objects_to_char(CHAR_DATA *ch, FILE * fl)
+int load_char_objects_to_char(Character *ch, FILE * fl)
 {
   //FILE *fl;
   int num_objs = 0;
@@ -1871,7 +1871,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   return temp;
 }
 
-int Crash_load_xapobjs(struct char_data *ch)
+int Crash_load_xapobjs(Character *ch)
 {
   char fname1[MAX_STRING_LENGTH], fname2[MAX_STRING_LENGTH];
   FILE *fl;
@@ -1886,7 +1886,7 @@ int Crash_load_xapobjs(struct char_data *ch)
     {     /* if it fails, NOT because of no file */
       new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
       log("SYSERR: READING OBJECT FILE %s (5)", fname1);
-      new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
+      ch->Send("\r\n********************* NOTICE *********************\r\n"
                        "There was a problem loading your objects from disk.\r\n"
                        "Contact a God for assistance.\r\n");
     }
@@ -1897,7 +1897,7 @@ int Crash_load_xapobjs(struct char_data *ch)
 
         new_mudlog( NRM, GET_LEVEL(ch), TRUE, "Error reading obj file: %s", fname1);
         log("SYSERR: READING OBJECT FILE %s (5)", fname1);
-        new_send_to_char(ch,"\r\n********************* NOTICE *********************\r\n"
+        ch->Send("\r\n********************* NOTICE *********************\r\n"
                          "There was a problem loading your objects from disk.\r\n"
                          "Contact a God for assistance.\r\n");
       }
@@ -1921,7 +1921,7 @@ int Crash_load_xapobjs(struct char_data *ch)
   return retval;
 }
 
-int load_char_objects_to_char_old(CHAR_DATA *ch, FILE * fl)
+int load_char_objects_to_char_old(Character *ch, FILE * fl)
 {
 
   //FILE *fl;

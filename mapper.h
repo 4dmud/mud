@@ -19,8 +19,8 @@ struct map_type
 };
 
 /* mapper.c */
-void  draw_map (struct char_data *ch);
-char *get_exits(struct char_data *ch);
+void  draw_map (Character *ch);
+char *get_exits(Character *ch);
 
 static struct map_bit_data {
     char bit[2];

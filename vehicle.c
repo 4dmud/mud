@@ -17,15 +17,15 @@ struct obj_data *get_obj_in_list_type(int type,
 
 room_rnum VEHICLE_ROOM = NULL;
 
-void view_room_by_rnum(struct char_data *ch, room_rnum is_in);
+void view_room_by_rnum(Character *ch, room_rnum is_in);
 void parse_room_name(int in_room, char *bufptr);
 void parse_room_description(int in_room, char *bufptr);
-void list_obj_to_char(struct obj_data *list, struct char_data *ch,
+void list_obj_to_char(struct obj_data *list, Character *ch,
 		      int mode, int show);
-void list_char_to_char(struct char_data *list, struct char_data *ch);
+void list_char_to_char(Character *list, Character *ch);
 void ASSIGNOBJ(int obj, SPECIAL(fname));
 
-int enter_wtrigger(struct room_data *room, struct char_data *actor,
+int enter_wtrigger(struct room_data *room, Character *actor,
 		   int dir);
 
 ACMD(do_look);
@@ -57,31 +57,31 @@ struct obj_data *find_vehicle_by_vnum(int vnum)
     return (0);
 }
 
-struct obj_data *has_vehicle(struct char_data *ch) {
+struct obj_data *has_vehicle(Character *ch) {
 if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
 return SITTING(ch);
 return NULL;
 }
 
-void auto_exits_by_rnum(struct char_data *ch, room_rnum is_in)
+void auto_exits_by_rnum(Character *ch, room_rnum is_in)
 {
     int door;
     int found = 0;
 
-    new_send_to_char(ch, "%s[ Exits: %s",CBGRN(ch, C_NRM),CBWHT(ch, C_NRM));
+    ch->Send( "%s[ Exits: %s",CBGRN(ch, C_NRM),CBWHT(ch, C_NRM));
 
     for (door = 0; door < NUM_OF_DIRS; door++)
 	if (EXITN(is_in, door) && EXITN(is_in, door)->to_room != NULL &&
 	    !IS_SET(EXITN(is_in, door)->exit_info, EX_CLOSED)) {
-	    new_send_to_char(ch, "%c ", LOWER(*dirs[door]));
+	    ch->Send( "%c ", LOWER(*dirs[door]));
 	    found = 1;
 	    }
 
-    new_send_to_char(ch, "%s%s]%s\r\n", (found ? "" : "None! "), CBGRN(ch, C_NRM),   CCNRM(ch, C_NRM));
+    ch->Send( "%s%s]%s\r\n", (found ? "" : "None! "), CBGRN(ch, C_NRM),   CCNRM(ch, C_NRM));
 }
 
 
-void view_room_by_rnum(struct char_data *ch, room_rnum is_in)
+void view_room_by_rnum(Character *ch, room_rnum is_in)
 {
    VEHICLE_ROOM = is_in;
    LOOK(ch);
@@ -91,7 +91,7 @@ void view_room_by_rnum(struct char_data *ch, room_rnum is_in)
 
 ACMD(do_drive)
 {
-    struct char_data *people;
+    Character *people;
     char buf2[MAX_STRING_LENGTH];
     char arg[MAX_STRING_LENGTH];
     int x, dir;
@@ -224,7 +224,7 @@ ACMD(do_drive)
 		    if (IS_SET(EXIT(vehicle, dir)->exit_info, EX_CLOSED)) {
 		    /* But the door is closed */
 		    if (EXIT(vehicle, dir)->keyword) {
-			new_send_to_char(ch, "The %s seems to be closed.\r\n",
+			ch->Send( "The %s seems to be closed.\r\n",
 				fname(EXIT(vehicle, dir)->keyword));
 		    } else
 			send_to_char("It seems to be closed.\r\n", ch);

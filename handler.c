@@ -34,46 +34,46 @@ extern const char *MENU;
 struct hunter_data *hunter_list = NULL;
 
 /* local functions */
-void affect_modify_ar(struct char_data *ch, byte loc, sbyte mod,
+void affect_modify_ar(Character *ch, byte loc, sbyte mod,
                       int bitv[], bool add);
-int apply_ac(struct char_data *ch, int eq_pos);
+int apply_ac(Character *ch, int eq_pos);
 //void update_object(struct obj_data *obj, int use);
-void update_object(struct char_data *ch, struct obj_data *obj, int use);
-void update_char_objects(struct char_data *ch);
+void update_object(Character *ch, struct obj_data *obj, int use);
+void update_char_objects(Character *ch);
 
 
 /* external functions */
-OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj);
+OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj);
 void purge_qic(obj_rnum rnum);
-void die_link(CHAR_DATA *mob);
+void die_link(Character *mob);
 void extract_all_in_list(OBJ_DATA *obj);
 int delete_pobj_file(char *name);
-void stop_fusion(CHAR_DATA *ch);
+void stop_fusion(Character *ch);
 void remove_corpse_from_list(OBJ_DATA *corpse);
-int stop_task(struct char_data *ch) ;
-extern struct char_data *ch_selling;
-void stop_auction(int type, struct char_data *ch);
-int invalid_class(struct char_data *ch, struct obj_data *obj);
-int invalid_race(struct char_data *ch, struct obj_data *obj);
-void remove_follower(struct char_data *ch);
-void clearMemory(struct char_data *ch);
-void die_follower(struct char_data *ch);
-void set_race(struct char_data *ch, int race);
+int stop_task(Character *ch) ;
+extern Character *ch_selling;
+void stop_auction(int type, Character *ch);
+int invalid_class(Character *ch, struct obj_data *obj);
+int invalid_race(Character *ch, struct obj_data *obj);
+void remove_follower(Character *ch);
+void clearMemory(Character *ch);
+void die_follower(Character *ch);
+void set_race(Character *ch, int race);
 ACMD(do_return);
 void save_corpses(void);
 void reset_zone(int zone);
-void zap_char(struct char_data *victim);
+void zap_char(Character *victim);
 void clean_events2(void *pointer);
-int speed_update(struct char_data *ch);
-void halt_fighting(struct char_data *ch);
+int speed_update(Character *ch);
+void halt_fighting(Character *ch);
 int OBJ_INNATE;
-void extract_linked_mob(CHAR_DATA *mob);
-void dismount_char(struct char_data *ch);
-int move_link_room(CHAR_DATA *mob, room_rnum room);
-void eq_to_room(CHAR_DATA *ch);
+void extract_linked_mob(Character *mob);
+void dismount_char(Character *ch);
+int move_link_room(Character *mob, room_rnum room);
+void eq_to_room(Character *ch);
 void extract_obj_final(struct obj_data *obj);
 
-void unhitch_mob(struct char_data *ch);
+void unhitch_mob(Character *ch);
 
 char *fname(const char *namelist)
 {
@@ -255,7 +255,7 @@ int is_name(const char *str, const char *namelist)
 
 
 
-void affect_modify(struct char_data *ch, byte loc, int mod,
+void affect_modify(Character *ch, byte loc, int mod,
                    bitvector_t bitv, bool add)
 {
 
@@ -389,7 +389,7 @@ void affect_modify(struct char_data *ch, byte loc, int mod,
 }
 
 
-void aff_apply_modify(struct char_data *ch, byte loc, int mod, char *msg)
+void aff_apply_modify(Character *ch, byte loc, int mod, char *msg)
 {
 
 
@@ -529,7 +529,7 @@ void aff_apply_modify(struct char_data *ch, byte loc, int mod, char *msg)
 }
 
 /*
-void affect_modify(struct char_data * ch, byte loc, sbyte mod,
+void affect_modify(Character * ch, byte loc, sbyte mod,
              bitvector_t bitv, bool add)
 {
   if (add) 
@@ -545,7 +545,7 @@ void affect_modify(struct char_data * ch, byte loc, sbyte mod,
 
 /* This updates a character by subtracting everything he is affected by */
 /* restoring original abilities, and then affecting all again           */
-void affect_total(struct char_data *ch)
+void affect_total(Character *ch)
 {
   struct affected_type *af;
   int i, j;
@@ -615,7 +615,7 @@ void affect_total(struct char_data *ch)
 }
 
 
-void affect_modify_ar(struct char_data *ch, byte loc, sbyte mod,
+void affect_modify_ar(Character *ch, byte loc, sbyte mod,
                       int bitv[], bool add)
 {
   int i, j;
@@ -641,9 +641,9 @@ void affect_modify_ar(struct char_data *ch, byte loc, sbyte mod,
 
 
 
-/* Insert an affect_type in a char_data structure
+/* Insert an affect_type in a Character structure
    Automatically sets apropriate bits and apply's */
-void affect_to_char(struct char_data *ch, struct affected_type *af)
+void affect_to_char(Character *ch, struct affected_type *af)
 {
   struct affected_type *affected_alloc;
 
@@ -668,7 +668,7 @@ void affect_to_char(struct char_data *ch, struct affected_type *af)
  * reaches zero). Pointer *af must never be NIL!  Frees mem and calls
  * affect_location_apply
  */
-void affect_remove(struct char_data *ch, struct affected_type *af)
+void affect_remove(Character *ch, struct affected_type *af)
 {
   struct affected_type *temp;
 
@@ -686,7 +686,7 @@ void affect_remove(struct char_data *ch, struct affected_type *af)
 
 }
 
-void subs_remove(struct char_data *ch, struct sub_list *af)
+void subs_remove(Character *ch, struct sub_list *af)
 {
   struct sub_list *temp = NULL;
 
@@ -702,7 +702,7 @@ void subs_remove(struct char_data *ch, struct sub_list *af)
 
 }
 
-void skills_remove(struct char_data *ch, struct skillspell_data *af)
+void skills_remove(Character *ch, struct skillspell_data *af)
 {
 
   struct skillspell_data *temp = NULL;
@@ -722,7 +722,7 @@ void skills_remove(struct char_data *ch, struct skillspell_data *af)
 
 
 /* Call affect_remove with every spell of spelltype "skill" */
-void affect_from_char(struct char_data *ch, int type)
+void affect_from_char(Character *ch, int type)
 {
   struct affected_type *hjp = NULL, *next = NULL;
 
@@ -750,7 +750,7 @@ void affect_from_char(struct char_data *ch, int type)
  * Return TRUE if a char is affected by a spell (SPELL_XXX),
  * FALSE indicates not affected.
  */
-bool affected_by_spell(struct char_data *ch, int type)
+bool affected_by_spell(Character *ch, int type)
 {
   struct affected_type *hjp;
 
@@ -763,7 +763,7 @@ bool affected_by_spell(struct char_data *ch, int type)
 
 
 
-void affect_join(struct char_data *ch, struct affected_type *af,
+void affect_join(Character *ch, struct affected_type *af,
                  bool add_dur, bool avg_dur, bool add_mod, bool avg_mod)
 {
   struct affected_type *hjp, *a_next;
@@ -794,7 +794,7 @@ void affect_join(struct char_data *ch, struct affected_type *af,
     affect_to_char(ch, af);
 }
 
-int move_char_to(struct char_data *ch, room_rnum room)
+int move_char_to(Character *ch, room_rnum room)
 {
   room_rnum cur;
   if (!ch)
@@ -834,10 +834,10 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
 
 }
-void char_from_chair(struct char_data *ch)
+void char_from_chair(Character *ch)
 {
   struct obj_data *chair;
-  struct char_data *tempch;
+  Character *tempch;
   int i, found = 0;
 
   if (!ch || !SITTING(ch))
@@ -892,9 +892,9 @@ void char_from_chair(struct char_data *ch)
 }
 
 /* move a player out of a room */
-void char_from_room(struct char_data *ch)
+void char_from_room(Character *ch)
 {
-  struct char_data *temp;
+  Character *temp;
 
 
   if (ch == NULL)
@@ -929,7 +929,7 @@ void char_from_room(struct char_data *ch)
 
 
 /* place a character in a room */
-void char_to_room(struct char_data *ch, room_rnum room)
+void char_to_room(Character *ch, room_rnum room)
 {
 
   if (IN_ROOM(ch) != NULL)
@@ -972,7 +972,7 @@ void char_to_room(struct char_data *ch, room_rnum room)
 
 
 /* give an object to a char   */
-void obj_to_char(struct obj_data *object, struct char_data *ch)
+void obj_to_char(struct obj_data *object, Character *ch)
 {
 
 
@@ -996,7 +996,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
     {
       if (!IS_NPC(ch) && object->owner == 0 && GET_LEVEL(ch) < LVL_HERO)
       {
-        new_send_to_char(ch, "%s binds itself to you.\r\n", object->short_description);
+        ch->Send( "%s binds itself to you.\r\n", object->short_description);
         object->owner = GET_IDNUM(ch);
       }
 
@@ -1015,7 +1015,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
 
 
 /* give an object to a char -- don't add the weight back */
-void obj_to_char_no_weight(struct obj_data *object, struct char_data *ch)
+void obj_to_char_no_weight(struct obj_data *object, Character *ch)
 {
   if (object && ch)
   {
@@ -1067,7 +1067,7 @@ int obj_from_char(struct obj_data *object)
 
 
 /* Return the effect of a piece of armor in position eq_pos */
-int apply_ac(struct char_data *ch, int eq_pos)
+int apply_ac(Character *ch, int eq_pos)
 {
   int factor;
 
@@ -1107,7 +1107,7 @@ int apply_ac(struct char_data *ch, int eq_pos)
     return (factor * GET_OBJ_VAL(GET_EQ(ch, eq_pos), 0));
 }
 
-int invalid_align(struct char_data *ch, struct obj_data *obj)
+int invalid_align(Character *ch, struct obj_data *obj)
 {
   if (IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch))
     return TRUE;
@@ -1118,7 +1118,7 @@ int invalid_align(struct char_data *ch, struct obj_data *obj)
   return FALSE;
 }
 
-int equip_char(struct char_data *ch, struct obj_data *obj, int pos)
+int equip_char(Character *ch, struct obj_data *obj, int pos)
 {
   int j;
   struct affected_type *aff;
@@ -1195,7 +1195,7 @@ int equip_char(struct char_data *ch, struct obj_data *obj, int pos)
 
 }
 
-struct obj_data *unequip_char(struct char_data *ch, int pos)
+struct obj_data *unequip_char(Character *ch, int pos)
 {
   int j;
   struct obj_data *obj = NULL;
@@ -1257,7 +1257,7 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   return (LS_REMOVE ? revert_object(obj) : obj);
 }
 
-void remove_all_normal_affects(struct char_data *ch)
+void remove_all_normal_affects(Character *ch)
 {
   struct affected_type *aff = NULL, *anext;
   for (aff = ch->affected;aff;aff=anext)
@@ -1331,9 +1331,9 @@ struct obj_data *get_obj_num(obj_rnum nr)
 
 
 /* search a room for a char, and return a pointer if found..  */
-struct char_data *get_char_room(char *name, int *number, room_rnum room)
+Character *get_char_room(char *name, int *number, room_rnum room)
 {
-  struct char_data *i;
+  Character *i;
   int num;
 
   if (!name || !*name)
@@ -1360,9 +1360,9 @@ struct char_data *get_char_room(char *name, int *number, room_rnum room)
 
 
 /* search all over the world for a char num, and return a pointer if found */
-struct char_data *get_char_num(mob_rnum nr)
+Character *get_char_num(mob_rnum nr)
 {
-  struct char_data *i;
+  Character *i;
 
   for (i = character_list; i; i = i->next)
     if (GET_MOB_RNUM(i) == nr)
@@ -1494,7 +1494,7 @@ int obj_from_obj(struct obj_data *obj)
 
 
 /* Set all carried_by to point to new owner */
-void object_list_new_owner(struct obj_data *list, struct char_data *ch)
+void object_list_new_owner(struct obj_data *list, Character *ch)
 {
   if (list)
   {
@@ -1507,7 +1507,7 @@ void object_list_new_owner(struct obj_data *list, struct char_data *ch)
 void extract_obj(struct obj_data *obj)
 {
   struct obj_data *tobj, *next;
-  struct char_data *tch;
+  Character *tch;
 
 
   if (!obj)
@@ -1572,9 +1572,9 @@ void extract_obj(struct obj_data *obj)
 #endif
 {
   struct obj_data *temp;
-  struct char_data *ch, *next = NULL;
+  Character *ch, *next = NULL;
   struct obj_data *tobj, *onext, *tnext;
-  struct char_data *tch;
+  Character *tch;
   int chance = 20;
   room_rnum room = NULL, from, target;
 
@@ -1738,7 +1738,7 @@ void extract_obj(struct obj_data *obj)
 #endif
 }
 
-void crumble_obj(struct char_data *ch, struct obj_data *obj)
+void crumble_obj(Character *ch, struct obj_data *obj)
 {
   struct obj_data *loop;
   int index;
@@ -1827,7 +1827,7 @@ void crumble_obj(struct char_data *ch, struct obj_data *obj)
 }
 
 
-void update_object(struct char_data *ch, struct obj_data *obj, int use)
+void update_object(Character *ch, struct obj_data *obj, int use)
 {
 
 
@@ -1857,7 +1857,7 @@ void update_object(struct char_data *ch, struct obj_data *obj, int use)
 }
 
 
-void update_char_objects(struct char_data *ch)
+void update_char_objects(Character *ch)
 {
   int i;
 
@@ -1889,7 +1889,7 @@ void update_char_objects(struct char_data *ch)
 #endif
 }
 
-void eq_to_room(CHAR_DATA *ch)
+void eq_to_room(Character *ch)
 {
   OBJ_DATA *obj;
   int i;
@@ -1917,7 +1917,7 @@ void eq_to_room(CHAR_DATA *ch)
     }
 }
 
-void death_room(struct char_data *ch)
+void death_room(Character *ch)
 {
   struct hunter_data *hunt = NULL, *hnext;
 
@@ -2004,7 +2004,7 @@ void free_hunter_list(void)
 
 #if 1
 /* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char_final(struct char_data *ch)
+void extract_char_final(Character *ch)
 {
 
   struct descriptor_data *d = NULL;
@@ -2205,7 +2205,7 @@ void extract_char_final(struct char_data *ch)
  
  */
 #if 1
-void extract_char(struct char_data *ch)
+void extract_char(Character *ch)
 {
   if (DEAD(ch))
   {
@@ -2241,7 +2241,7 @@ void extract_char(struct char_data *ch)
  */
 void extract_pending_chars(void)
 {
-  struct char_data *vict, *next_vict, *prev_vict;
+  Character *vict, *next_vict, *prev_vict;
 
   if (extractions_pending < 0)
     log("SYSERR: Negative (%d) extractions pending.",
@@ -2286,10 +2286,10 @@ void extract_pending_chars(void)
 
 
 
-struct char_data *get_player_vis(struct char_data *ch, char *name,
+Character *get_player_vis(Character *ch, char *name,
                                        int *number, int inroom)
 {
-  struct char_data *i;
+  Character *i;
   DESCRIPTOR_DATA *d;
   int num;
 
@@ -2347,11 +2347,11 @@ struct char_data *get_player_vis(struct char_data *ch, char *name,
 }
 
 
-struct char_data *get_player_room(room_rnum room, char *name, int *number,
+Character *get_player_room(room_rnum room, char *name, int *number,
                                         int inroom)
 {
   struct descriptor_data *i;
-  struct char_data *ch;
+  Character *ch;
   int num;
 
   if (!number)
@@ -2377,9 +2377,9 @@ struct char_data *get_player_room(room_rnum room, char *name, int *number,
   return (NULL);
 }
 
-struct char_data *get_room_vis(room_rnum room, char *name, int *number)
+Character *get_room_vis(room_rnum room, char *name, int *number)
 {
-  struct char_data *i;
+  Character *i;
   int num;
 
   if (!number)
@@ -2403,10 +2403,10 @@ struct char_data *get_room_vis(room_rnum room, char *name, int *number)
   return (NULL);
 }
 
-struct char_data *get_char_room_vis(struct char_data *ch, char *name,
+Character *get_char_room_vis(Character *ch, char *name,
                                           int *number)
 {
-  struct char_data *i;
+  Character *i;
   int num = 1;
 
   if (!number)
@@ -2438,10 +2438,10 @@ struct char_data *get_char_room_vis(struct char_data *ch, char *name,
 
 
 
-struct char_data *get_char_world_vis(struct char_data *ch, char *name,
+Character *get_char_world_vis(Character *ch, char *name,
                                            int *number)
 {
-  struct char_data *i;
+  Character *i;
   int num;
 
   if (!ch)
@@ -2476,7 +2476,7 @@ struct char_data *get_char_world_vis(struct char_data *ch, char *name,
 }
 
 
-struct char_data *get_char_vis(struct char_data *ch, char *name,
+Character *get_char_vis(Character *ch, char *name,
                                      int *number, int where)
 {
   if (where == FIND_CHAR_ROOM)
@@ -2489,7 +2489,7 @@ struct char_data *get_char_vis(struct char_data *ch, char *name,
 
 
 
-struct obj_data *get_obj_in_list_vis(struct char_data *ch, char *name,
+struct obj_data *get_obj_in_list_vis(Character *ch, char *name,
                                            int *number, struct obj_data *list)
 {
   struct obj_data *i;
@@ -2517,7 +2517,7 @@ struct obj_data *get_obj_in_list_vis(struct char_data *ch, char *name,
 
 
 /* search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(struct char_data *ch, char *name, int *number)
+struct obj_data *get_obj_vis(Character *ch, char *name, int *number)
 {
   struct obj_data *i;
   int num;
@@ -2552,7 +2552,7 @@ struct obj_data *get_obj_vis(struct char_data *ch, char *name, int *number)
 }
 
 
-struct obj_data *get_obj_in_equip_vis(struct char_data *ch, char *arg,
+struct obj_data *get_obj_in_equip_vis(Character *ch, char *arg,
                                             int *number,
                                             struct obj_data *equipment[])
 {
@@ -2575,7 +2575,7 @@ struct obj_data *get_obj_in_equip_vis(struct char_data *ch, char *arg,
 
   return (NULL);
 }
-int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number,
+int get_obj_pos_in_equip_vis(Character *ch, char *arg, int *number,
                              struct obj_data *equipment[])
 {
   int j, num;
@@ -2740,8 +2740,8 @@ struct obj_data *create_money(gold_int gamount)
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
-                 struct char_data **tar_ch, struct obj_data **tar_obj)
+int generic_find(char *arg, bitvector_t bitvector, Character *ch,
+                 Character **tar_ch, struct obj_data **tar_obj)
 {
   int i, found, number;
   char name_val[MAX_INPUT_LENGTH];
@@ -2835,7 +2835,7 @@ int find_all_dots(char *arg)
 //   someone is mounting our character, then we dismount that someone.
 //   This is used for cleaning up after a mount is cancelled by
 //   something (either intentionally or by death, etc.)
-void dismount_char(struct char_data *ch)
+void dismount_char(Character *ch)
 {
   if (RIDING(ch))
   {
@@ -2860,7 +2860,7 @@ void dismount_char(struct char_data *ch)
 //   what-so-ever to see if the _mount_ is mountable, etc.  That is
 //   left up to the calling function.  This does not present any
 //   messages, either.
-void mount_char(struct char_data *ch, struct char_data *mount)
+void mount_char(Character *ch, Character *mount)
 {
   RIDING(ch) = mount;
   RIDDEN_BY(mount) = ch;
@@ -2877,7 +2877,7 @@ struct obj_data *get_obj_in_list_type(int type, struct obj_data *list)
   return NULL;
 }
 
-void add_hunter(struct char_data *ch)
+void add_hunter(Character *ch)
 {
   struct hunter_data *temp, *hunt, *nhunt;
   if (!ch)
@@ -2894,10 +2894,10 @@ void add_hunter(struct char_data *ch)
   temp->next = hunter_list;
   hunter_list = temp;
   temp->hunter = ch;
-  HUNT_COUNT(ch) = (GET_LEVEL(ch) * 0.1) + 2;
+  HUNT_COUNT(ch) = FTOI((GET_LEVEL(ch) * 0.2) + 2);
 }
 
-void remove_hunter(struct char_data *ch)
+void remove_hunter(Character *ch)
 {
   struct hunter_data *temp, *hunt, *nhunt = NULL;
   if (!ch)
@@ -2920,9 +2920,9 @@ void remove_hunter(struct char_data *ch)
   }
 }
 
-struct char_data *check_ch(struct char_data *ch)
+Character *check_ch(Character *ch)
 {
-  register struct char_data *tch;
+  register Character *tch;
 
   if (!ch)
     return NULL;

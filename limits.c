@@ -26,23 +26,23 @@
 /* local functions */
 int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,
          int p6);
-void check_autowiz(struct char_data *ch);
+void check_autowiz(Character *ch);
 int dexp = 0;
 
 /* External Functions */
 int automeld(struct obj_data *obj);
 void save_corpses(void);
-void Crash_rentsave(struct char_data *ch, int cost);
-void update_char_objects(struct char_data *ch);	/* handler.c */
+void Crash_rentsave(Character *ch, int cost);
+void update_char_objects(Character *ch);	/* handler.c */
 void reboot_wizlists(void);
-void symptoms(struct char_data *ch);
-void crumble_obj(struct char_data *ch, struct obj_data *obj);
+void symptoms(Character *ch);
+void crumble_obj(Character *ch, struct obj_data *obj);
 char *title_male(int chclass, int level);
 char *title_female(int chclass, int level);
-int has_space_suit(struct char_data *ch);
-int can_breathe_underwater(struct char_data *ch);
-void send_not_to_spam(char *buf, struct char_data *ch,
-                      struct char_data *victim, struct obj_data *weap,
+int has_space_suit(Character *ch);
+int can_breathe_underwater(Character *ch);
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
                       int spam);
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
@@ -74,7 +74,7 @@ int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,
  */
 
 /* manapoint gain pr. game hour */
-int mana_gain(struct char_data *ch)
+int mana_gain(Character *ch)
 {
   int gain = 0;
 
@@ -118,17 +118,17 @@ int mana_gain(struct char_data *ch)
       gain *= 3;
       break;
     case POS_RESTING:
-      gain += (gain * 0.5);	/* Divide by 2 */
+      gain += FTOI(gain * 0.5);	/* Divide by 2 */
       break;
     case POS_SITTING:
-      gain += (gain * 0.25);	/* Divide by 4 */
+      gain += FTOI(gain * 0.25);	/* Divide by 4 */
       break;
     }
     if (SITTING(ch))
-      gain += (gain * 0.25);
+      gain += FTOI(gain * 0.25);
 
     if ((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain *= (0.015);
+      gain = FTOI( gain * (0.015) );
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_GOOD)
@@ -136,7 +136,7 @@ int mana_gain(struct char_data *ch)
     gain *= 4;
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_EVIL)
            && ROOM_FLAGGED(IN_ROOM(ch), ROOM_MANA))
-    gain *= 0.018;
+    gain = FTOI( gain * 0.018);
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_MANA))
     gain *= 2;
 
@@ -150,7 +150,7 @@ int mana_gain(struct char_data *ch)
 
 
 
-int hit_gain(struct char_data *ch)
+int hit_gain(Character *ch)
 {
   int gain = 0;
   //bool poison = FALSE;
@@ -201,7 +201,7 @@ int hit_gain(struct char_data *ch)
       break;
     }
     if (SITTING(ch))
-      gain += (gain * 0.25);
+      gain += FTOI(gain * 0.25);
 
 
 
@@ -233,7 +233,7 @@ int hit_gain(struct char_data *ch)
 
 
 /* move gain pr. game hour */
-int move_gain(struct char_data *ch)
+int move_gain(Character *ch)
 {
   int gain = 0;
 
@@ -283,7 +283,7 @@ int move_gain(struct char_data *ch)
       break;
     }
     if (SITTING(ch))
-      gain += (gain * 0.25);
+      gain += FTOI(gain * 0.25);
 
     if ((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0))
       gain /= 4;
@@ -306,7 +306,7 @@ int move_gain(struct char_data *ch)
 }
 
 /* move gain pr. game hour */
-int stamina_gain(struct char_data *ch)
+int stamina_gain(Character *ch)
 {
   int gain = 0;
 
@@ -322,7 +322,7 @@ int stamina_gain(struct char_data *ch)
   if (IS_NPC(ch))
   {
     /* Neat and fast */
-    gain = MAX(5, GET_LEVEL(ch) * 0.25);
+    gain = MAX(5, FTOI(GET_LEVEL(ch) * 0.25));
   }
   else
   {
@@ -358,7 +358,7 @@ int stamina_gain(struct char_data *ch)
 
 
     if ((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain *= 0.25;
+      gain += gain/4;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_GOOD)
@@ -366,7 +366,7 @@ int stamina_gain(struct char_data *ch)
     gain *= 4;
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_EVIL)
            && ROOM_FLAGGED(IN_ROOM(ch), ROOM_MOVE))
-    gain *= 0.15;
+    gain = FTOI( gain * 0.15 );
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_MOVE))
     gain *= 2;
 
@@ -376,7 +376,7 @@ int stamina_gain(struct char_data *ch)
     gain *=2;
   return (abs(gain));
 }
- void set_loginmsg(struct char_data *ch, char *loginmsg){
+ void set_loginmsg(Character *ch, char *loginmsg){
 
    if (GET_LOGINMSG(ch))
      free(GET_LOGINMSG(ch));
@@ -384,7 +384,7 @@ int stamina_gain(struct char_data *ch)
       else GET_LOGINMSG(ch)=strdup(loginmsg);
    }
  
- void set_logoutmsg(struct char_data *ch, char *logoutmsg){
+ void set_logoutmsg(Character *ch, char *logoutmsg){
 
    if (GET_LOGOUTMSG(ch))
      free(GET_LOGOUTMSG(ch));
@@ -392,7 +392,7 @@ int stamina_gain(struct char_data *ch)
       else GET_LOGOUTMSG(ch)=strdup(logoutmsg);
 }
 
-void set_title(struct char_data *ch, char *title)
+void set_title(Character *ch, char *title)
 {
   if (!PRF_FLAGGED(ch, PRF_KEEPTITLE))
   {
@@ -414,7 +414,7 @@ void set_title(struct char_data *ch, char *title)
   }
 }
 
-void set_pretitle(struct char_data *ch, char *title)
+void set_pretitle(Character *ch, char *title)
 {
 
 
@@ -446,7 +446,7 @@ void run_autowiz(void)
 }
 
 
-void check_autowiz(struct char_data *ch)
+void check_autowiz(Character *ch)
 {
 
   int create_wizlist(int wizlevel,char *file1, int immlevel, char *file2);
@@ -470,7 +470,7 @@ void check_autowiz(struct char_data *ch)
 }
 
 
-int can_level(struct char_data *ch)
+int can_level(Character *ch)
 {
   gold_int needed;
   if (GET_EXP(ch) >= (needed = level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)))||
@@ -481,7 +481,7 @@ int can_level(struct char_data *ch)
 
 }
 
-void gain_exp(struct char_data *ch, gold_int gain)
+void gain_exp(Character *ch, gold_int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
@@ -515,24 +515,24 @@ void gain_exp(struct char_data *ch, gold_int gain)
     }
 
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch,"You receive %s%lld experience points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
+      ch->Send("You receive %s%lld experience points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
 
     if (is_altered && (GET_LEVEL(ch) < LVL_HERO))
     {
       new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
                  GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
-      GET_GROUP_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)) * 0.2);
+      GET_GROUP_EXP(ch) = FTOI(level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)) * 0.2);
 
       if (dexp)
-        new_send_to_char(ch, "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
+        ch->Send( "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
       if (num_levels == 1)
-        new_send_to_char(ch, "{cG[ You rise a level! ]{c0\r\n");
+        ch->Send( "{cG[ You rise a level! ]{c0\r\n");
       else
-        new_send_to_char(ch, "{cG[ You rise %d levels! ]{c0\r\n", num_levels);
+        ch->Send( "{cG[ You rise %d levels! ]{c0\r\n", num_levels);
       num_hp = GET_MAX_HIT(ch) - num_hp;
       num_ma = GET_MAX_MANA(ch) - num_ma;
       num_mv = GET_MAX_MOVE(ch) - num_mv;
-      new_send_to_char(ch, "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv);
+      ch->Send( "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv);
       save_char(ch);
     }
   }
@@ -548,7 +548,7 @@ void gain_exp(struct char_data *ch, gold_int gain)
 }
 
 
-void gain_exp_regardless(struct char_data *ch, gold_int gain)
+void gain_exp_regardless(Character *ch, gold_int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
@@ -584,7 +584,7 @@ void gain_exp_regardless(struct char_data *ch, gold_int gain)
     }
 
 
-    new_send_to_char(ch, "You receive %lld exp.\r\n", gain);
+    ch->Send( "You receive %lld exp.\r\n", gain);
 
     if (is_altered && (GET_LEVEL(ch) < LVL_GOD))
     {
@@ -593,13 +593,13 @@ void gain_exp_regardless(struct char_data *ch, gold_int gain)
                  GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s",
                  GET_LEVEL(ch));
       if (num_levels == 1)
-        new_send_to_char(ch, "{cR[ You rise a level! ]{c0\r\n");
+        ch->Send( "{cR[ You rise a level! ]{c0\r\n");
       else
-        new_send_to_char(ch, "{cR[ You rise %d levels! ]{c0\r\n", num_levels);
+        ch->Send( "{cR[ You rise %d levels! ]{c0\r\n", num_levels);
       num_hp = GET_MAX_HIT(ch) - num_hp;
       num_ma = GET_MAX_MANA(ch) - num_ma;
       num_mv = GET_MAX_MOVE(ch) - num_mv;
-      new_send_to_char(ch, "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv);
+      ch->Send( "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv);
 
       save_char(ch);
 
@@ -616,7 +616,7 @@ void gain_exp_regardless(struct char_data *ch, gold_int gain)
 
 
 
-void gain_group_exp(struct char_data *ch, gold_int gain)
+void gain_group_exp(Character *ch, gold_int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
@@ -644,7 +644,7 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
     }
 
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch,"You receive %s%lld grouping points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
+      ch->Send("You receive %s%lld grouping points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
 
     if (is_altered && (GET_LEVEL(ch) < LVL_HERO))
     {
@@ -653,11 +653,11 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
       GET_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)));
 
       if (dexp)
-        new_send_to_char(ch, "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
+        ch->Send( "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
       if (num_levels == 1)
-        new_send_to_char(ch, "{cG[ You rise a level! ]{c0\r\n");
+        ch->Send( "{cG[ You rise a level! ]{c0\r\n");
       else
-        new_send_to_char(ch, "{cG[ You rise %d levels! ]{c0\r\n",
+        ch->Send( "{cG[ You rise %d levels! ]{c0\r\n",
                          num_levels);
 
       save_char(ch);
@@ -666,7 +666,7 @@ void gain_group_exp(struct char_data *ch, gold_int gain)
   }
 }
 #if 0
-void gain_condition(struct char_data *ch, int condition, int value)
+void gain_condition(Character *ch, int condition, int value)
 {
   bool intoxicated;
 
@@ -701,7 +701,7 @@ void gain_condition(struct char_data *ch, int condition, int value)
 
 }
 #endif
-void gain_condition(struct char_data *ch, int condition, int value)
+void gain_condition(Character *ch, int condition, int value)
 {
   bool intoxicated;
 
@@ -725,18 +725,18 @@ void gain_condition(struct char_data *ch, int condition, int value)
   {
   case FULL:
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch, "You are hungry.\r\n");
+      ch->Send( "You are hungry.\r\n");
     check_regen_rates(ch);
     break;
   case THIRST:
     if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch,"You are thirsty.\r\n");
+      ch->Send("You are thirsty.\r\n");
     check_regen_rates(ch);
     break;
   case DRUNK:
     if (intoxicated)
       if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-        new_send_to_char(ch,"You are now sober.\r\n");
+        ch->Send("You are now sober.\r\n");
     break;
   default:
     log("default reached in gain_condition! %d", condition);
@@ -746,7 +746,7 @@ void gain_condition(struct char_data *ch, int condition, int value)
 }
 
 
-void check_idling(struct char_data *ch)
+void check_idling(Character *ch)
 {
   if (++(ch->char_specials.timer) > CONFIG_IDLE_VOID && !IS_NPC(ch))
   {
@@ -798,7 +798,7 @@ void check_idling(struct char_data *ch)
 /* Update PCs, NPCs, and objects */
 void point_update(void)
 {
-  struct char_data *i, *next_char;
+  Character *i, *next_char;
   struct obj_data *j, *next_thing, *jj, *next_thing2;
   int tleft = 0;
 

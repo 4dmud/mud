@@ -16,23 +16,23 @@
 #include "spells.h"
 #include "fight.h"
 
-int can_take_obj(struct char_data *ch, struct obj_data *obj);
-void make_manifest(struct char_data *ch,struct obj_data *obj);
-int perform_get_from_room(struct char_data *ch, struct obj_data *obj);
-void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
-struct char_data *load_familiar(struct char_data *owner);
-void save_familiar(struct char_data *owner);
-struct char_data *find_owner(struct char_data *familiar);
-long familiar_exp(struct char_data *ch, long exp);
-void set_familiar_type(struct char_data *familiar, int type);
-int show_familiar_type(struct char_data *familiar);
-float split_percent(struct char_data *ch);
-int call_magic(struct char_data *caster, struct char_data *cvict,
+int can_take_obj(Character *ch, struct obj_data *obj);
+void make_manifest(Character *ch,struct obj_data *obj);
+int perform_get_from_room(Character *ch, struct obj_data *obj);
+void perform_wear(Character *ch, struct obj_data *obj, int where);
+Character *load_familiar(Character *owner);
+void save_familiar(Character *owner);
+Character *find_owner(Character *familiar);
+long familiar_exp(Character *ch, long exp);
+void set_familiar_type(Character *familiar, int type);
+int show_familiar_type(Character *familiar);
+float split_percent(Character *ch);
+int call_magic(Character *caster, Character *cvict,
 	       struct obj_data *ovict, char *tar_str, int spellnum,
 	       int level, int casttype);
 	       
-void find_usable_weapon(struct char_data *ch);
-void dismount_char(struct char_data *ch);
+void find_usable_weapon(Character *ch);
+void dismount_char(Character *ch);
 ACMD(do_wear);
 ASKILL(skill_snare);
 ASKILL(skill_backstab);
@@ -41,21 +41,21 @@ ASKILL(skill_encircle);
 ASKILL(skill_disarm);
 
 /* NPC -- AI stuff -- mord*/
-void parse_mob_commands(struct char_data *ch); // this gets called for all mobs.
-void parse_class_actions(struct char_data *ch);
-void parse_elemental_actions(struct char_data *ch);
+void parse_mob_commands(Character *ch); // this gets called for all mobs.
+void parse_class_actions(Character *ch);
+void parse_elemental_actions(Character *ch);
 
-void parse_rogue_commands(struct char_data *ch);
-void parse_caster_commands(struct char_data *ch);
-void parse_fighter_commands(struct char_data *ch);
-void parse_animal_commands(struct char_data *ch);
-void parse_undead_commands(struct char_data *ch);
-CHAR_DATA * parse_aggressive(struct char_data *ch);
-void parse_tasks(struct char_data *ch);
+void parse_rogue_commands(Character *ch);
+void parse_caster_commands(Character *ch);
+void parse_fighter_commands(Character *ch);
+void parse_animal_commands(Character *ch);
+void parse_undead_commands(Character *ch);
+Character * parse_aggressive(Character *ch);
+void parse_tasks(Character *ch);
 
 #define CAST_THE_SPELL(ch, vict, i) call_magic((ch), (vict), NULL, NULL, (i), GET_LEVEL((ch)), CAST_BREATH)
 
-void parse_mob_commands(struct char_data *ch) {
+void parse_mob_commands(Character *ch) {
 int health = ((GET_HIT(ch)*100)/GET_MAX_HIT(ch));
 
 
@@ -86,7 +86,7 @@ if (IS_AFFECTED(ch, AFF_CHARM) && ch->master) {
 
 
 
-void parse_class_actions(struct char_data *ch) {
+void parse_class_actions(Character *ch) {
 
 	switch (GET_CLASS(ch)) {
 	case CLASS_ROGUE:
@@ -112,10 +112,10 @@ void parse_class_actions(struct char_data *ch) {
 
 
 
-void parse_caster_commands(struct char_data *ch) {
-void make_manifest(struct char_data *ch,struct obj_data *obj);
-struct char_data *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
-struct char_data *vict;
+void parse_caster_commands(Character *ch) {
+void make_manifest(Character *ch,struct obj_data *obj);
+Character *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
+Character *vict;
 int spl = TYPE_UNDEFINED;
 find_usable_weapon(ch);
 if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
@@ -266,9 +266,9 @@ vict = parse_aggressive(ch);
 
  }
 }
-void parse_rogue_commands(struct char_data *ch) {
+void parse_rogue_commands(Character *ch) {
 find_usable_weapon(ch);
-struct char_data *vict,  *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
+Character *vict,  *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
 find_usable_weapon(ch);
 
 
@@ -290,7 +290,7 @@ find_usable_weapon(ch);
 	case 1:
 	act("$n ducks, sidesteps and stabs you in the back!!", FALSE, ch, 0, master, TO_VICT);
 	act("$n ducks, sidesteps and stabs $M in the back!!", FALSE, ch, 0, master, TO_NOTVICT);
-	fe_solo_damage(ch, master, dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1), TYPE_UNDEFINED);
+     fe_solo_damage(ch, master, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), TYPE_UNDEFINED);
 	return;
 	case 2:
 	case 3:
@@ -335,12 +335,12 @@ if ((vict = parse_aggressive(ch)) != NULL) {
 }
 
 }
-void parse_fighter_commands(struct char_data *ch) {
+void parse_fighter_commands(Character *ch) {
 parse_rogue_commands(ch);
  if (GET_POS(ch) < POS_FIGHTING)
  return;
 return;
-struct char_data *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
+Character *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
 int spl = TYPE_UNDEFINED;
 find_usable_weapon(ch);
 if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
@@ -487,8 +487,8 @@ do_wear(ch, "orb", 0, 0);
 
 }
 
-void parse_animal_commands(struct char_data *ch) {
-struct char_data *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
+void parse_animal_commands(Character *ch) {
+Character *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
 int spl = TYPE_UNDEFINED;
 return;
 find_usable_weapon(ch);
@@ -635,8 +635,8 @@ do_wear(ch, "orb", 0, 0);
 
 }
 
-void parse_undead_commands(struct char_data *ch) {
-struct char_data *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
+void parse_undead_commands(Character *ch) {
+Character *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
 int spl = TYPE_UNDEFINED;
 return;
 find_usable_weapon(ch);
@@ -783,7 +783,7 @@ do_wear(ch, "orb", 0, 0);
 
 }
 
-void parse_elemental_actions(struct char_data *ch) {
+void parse_elemental_actions(Character *ch) {
 
 	if (MOB_FLAGGED(ch, MOB_ELEM_EARTH)) {
 
@@ -799,17 +799,17 @@ void parse_elemental_actions(struct char_data *ch) {
 	}
 }
 
-void parse_tasks(struct char_data *ch) {
+void parse_tasks(Character *ch) {
 
 
 }
 
 #define LEVELS_PER_CHA 4
 #define TCH f->follower
-void check_group_control(struct char_data *ch) {
+void check_group_control(Character *ch) {
 int cha = 0;
 struct follow_type *f, *f_next;
-int can_control_follower(struct char_data *ch, struct char_data *vict, int amount);
+int can_control_follower(Character *ch, Character *vict, int amount);
 
 if (ch) {
 if (ch->followers == NULL)
@@ -838,7 +838,7 @@ if (!number(0, 5)) {
 
 }
 
-int can_control_follower(struct char_data *ch, struct char_data *vict, int amount) {
+int can_control_follower(Character *ch, Character *vict, int amount) {
 int ret_val = 1;
 
 if (ch->desc)
@@ -850,7 +850,7 @@ return ret_val;
 
 }
 
-void find_usable_weapon(struct char_data *ch) {
+void find_usable_weapon(Character *ch) {
 struct obj_data *obj = GET_EQ(ch, WEAR_WIELD), *onext;
 struct obj_data *shield = GET_EQ(ch, WEAR_SHIELD);
 int found = 0;
@@ -898,15 +898,15 @@ perform_wear(ch, shield, WEAR_SHIELD);
 
 
 #if 0
-struct char_data *load_familiar(struct char_data *owner)
+Character *load_familiar(Character *owner)
 {
 
-    struct char_data victim;
+    Character victim;
     FILE *fam_f;
 
 
 
-    CREATE(victim, struct char_data, 1);
+    CREATE(victim, Character, 1);
     clear_char(victim);
     CREATE(victim->player_specials, struct player_special_data, 1);
 }
@@ -914,7 +914,7 @@ struct char_data *load_familiar(struct char_data *owner)
 
 void parse_mobile(FILE * mob_f, int nr)
 {
-    void set_race(struct char_data *ch, int race);
+    void set_race(Character *ch, int race);
 
     static int i = 0;
     int j, t[10];

@@ -9,17 +9,17 @@
 ************************************************************************ */
 
 /* handling the affected-structures */
-void affect_total(struct char_data *ch);
-void affect_modify(struct char_data *ch, byte loc, int mod,
+void affect_total(Character *ch);
+void affect_modify(Character *ch, byte loc, int mod,
                    bitvector_t bitv, bool add);
-void affect_to_char(struct char_data *ch, struct affected_type *af);
-void affect_remove(struct char_data *ch, struct affected_type *af);
-void affect_from_char(struct char_data *ch, int type);
-bool affected_by_spell(struct char_data *ch, int type);
-void affect_join(struct char_data *ch, struct affected_type *af,
+void affect_to_char(Character *ch, struct affected_type *af);
+void affect_remove(Character *ch, struct affected_type *af);
+void affect_from_char(Character *ch, int type);
+bool affected_by_spell(Character *ch, int type);
+void affect_join(Character *ch, struct affected_type *af,
                  bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
 
-void remove_all_normal_affects(struct char_data *ch);
+void remove_all_normal_affects(Character *ch);
 /* utility */
 const char *money_desc(gold_int amount);
 struct obj_data *create_money(gold_int amount);
@@ -33,13 +33,13 @@ int begins_with_number(char * str);
 
 /* ******** objects *********** */
 
-void obj_to_char(struct obj_data *object, struct char_data *ch);
-void obj_to_char_no_weight(struct obj_data *object, struct char_data *ch);
+void obj_to_char(struct obj_data *object, Character *ch);
+void obj_to_char_no_weight(struct obj_data *object, Character *ch);
 int obj_from_char(struct obj_data *object);
 
-int equip_char(struct char_data *ch, struct obj_data *obj, int pos);
-struct obj_data *unequip_char(struct char_data *ch, int pos);
-int invalid_align(struct char_data *ch, struct obj_data *obj);
+int equip_char(Character *ch, struct obj_data *obj, int pos);
+struct obj_data *unequip_char(Character *ch, int pos);
+int invalid_align(Character *ch, struct obj_data *obj);
 
 struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
 struct obj_data *get_obj_in_list_num(int num, struct obj_data *list);
@@ -50,45 +50,45 @@ void obj_to_room(struct obj_data *object, room_rnum room);
 void obj_from_room(struct obj_data *object);
 void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
 int obj_from_obj(struct obj_data *obj);
-void object_list_new_owner(struct obj_data *list, struct char_data *ch);
+void object_list_new_owner(struct obj_data *list, Character *ch);
 
 void extract_obj(struct obj_data *obj);
 void extract_obj_q(struct obj_data *obj);
 
 /* ******* characters ********* */
 
-struct char_data *get_char_room(char *name, int *number, room_rnum room);
-struct char_data *get_char_num(mob_rnum nr);
-struct char_data *get_char(char *name);
+Character *get_char_room(char *name, int *number, room_rnum room);
+Character *get_char_num(mob_rnum nr);
+Character *get_char(char *name);
 
-struct char_data *get_player_room(room_rnum room, char *name, int *number,
+Character *get_player_room(room_rnum room, char *name, int *number,
                                         int inroom);
-struct char_data *get_room_vis(room_rnum room, char *name, int *number);
-struct char_data *find_in_dir(room_rnum room, char *name, int dir);   //in magic.c
-int move_char_to(struct char_data *ch, room_rnum room);
-void char_from_room(struct char_data *ch);
-void char_to_room(struct char_data *ch, room_rnum room);
-void extract_char(struct char_data *ch);
-void extract_char_final(struct char_data *ch);
+Character *get_room_vis(room_rnum room, char *name, int *number);
+Character *find_in_dir(room_rnum room, char *name, int dir);   //in magic.c
+int move_char_to(Character *ch, room_rnum room);
+void char_from_room(Character *ch);
+void char_to_room(Character *ch, room_rnum room);
+void extract_char(Character *ch);
+void extract_char_final(Character *ch);
 void extract_pending_chars(void);
-void remove_hunter(struct char_data *ch);
-void add_hunter(struct char_data *ch);
+void remove_hunter(Character *ch);
+void add_hunter(Character *ch);
 
 /* find if character can see */
-struct char_data *get_char_room_vis(struct char_data *ch, char *name,
+Character *get_char_room_vis(Character *ch, char *name,
                                           int *number);
-struct char_data *get_player_vis(struct char_data *ch, char *name,
+Character *get_player_vis(Character *ch, char *name,
                                        int *number, int inroom);
 
-struct char_data *get_char_vis(struct char_data *ch, char *name,
+Character *get_char_vis(Character *ch, char *name,
                                      int *number, int where);
-struct obj_data *get_obj_in_list_vis(struct char_data *ch, char *name,
+struct obj_data *get_obj_in_list_vis(Character *ch, char *name,
                                            int *number, struct obj_data *list);
-struct obj_data *get_obj_vis(struct char_data *ch, char *name, int *num);
-struct obj_data *get_obj_in_equip_vis(struct char_data *ch, char *arg,
+struct obj_data *get_obj_vis(Character *ch, char *name, int *num);
+struct obj_data *get_obj_in_equip_vis(Character *ch, char *arg,
                                             int *number,
                                             struct obj_data *equipment[]);
-int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *num,
+int get_obj_pos_in_equip_vis(Character *ch, char *arg, int *num,
                              struct obj_data *equipment[]);
 
 
@@ -101,11 +101,11 @@ int find_all_dots(char *arg);
 #define FIND_ALLDOT 2
 
 
-const char *simple_class_name(struct char_data *ch);
+const char *simple_class_name(Character *ch);
 /* Generic Find */
 
-int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
-                 struct char_data **tar_ch, struct obj_data **tar_obj);
+int generic_find(char *arg, bitvector_t bitvector, Character *ch,
+                 Character **tar_ch, struct obj_data **tar_obj);
 
 #define FIND_CHAR_ROOM     (1 << 0)
 #define FIND_CHAR_WORLD    (1 << 1)
@@ -118,7 +118,7 @@ int generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
 //Max number of items alloud in houses
 #define MAX_HOUSE_ITEMS  500
 
-struct char_data *check_ch(struct char_data *ch);
+Character *check_ch(Character *ch);
 
 /* prototypes from crash save system */
 int delete_pobj_file(char *name);
@@ -126,17 +126,17 @@ void delete_aliases(const char *charname);
 void delete_variables(const char *charname);
 int Crash_get_filename(char *orig_name, char *filename);
 int Crash_delete_file(char *name);
-int Crash_delete_crashfile(struct char_data *ch);
+int Crash_delete_crashfile(Character *ch);
 int Crash_clean_file(char *name);
-void Crash_listrent(struct char_data *ch, char *name);
-int Crash_load(struct char_data *ch);
-void Crash_crashsave(struct char_data *ch);
-void Crash_idlesave(struct char_data *ch);
+void Crash_listrent(Character *ch, char *name);
+int Crash_load(Character *ch);
+void Crash_crashsave(Character *ch);
+void Crash_idlesave(Character *ch);
 void Crash_save_all(void);
-int Crash_load_xapobjs(struct char_data *ch);
+int Crash_load_xapobjs(Character *ch);
 
 
-void stop_follower(struct char_data *ch);
+void stop_follower(Character *ch);
 
 int lock_desc(struct descriptor_data *d);
 int unlock_desc(struct descriptor_data *d);

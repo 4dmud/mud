@@ -9,8 +9,8 @@
 #include "comm.h"
 
 extern const char *mob_races[];
-const char * race_name(struct char_data *ch);
-int has_body(CHAR_DATA *ch, int flag);
+const char * race_name(Character *ch);
+int has_body(Character *ch, int flag);
 
 const char *race_abbrevs[] =
   {
@@ -47,7 +47,7 @@ const char *pc_race_types[] =
     "\n"
   };
 
-int has_body(CHAR_DATA *ch, int flag)
+int has_body(Character *ch, int flag)
 {
   if (IS_NPC(ch))
     return TRUE;
@@ -61,7 +61,7 @@ int has_body(CHAR_DATA *ch, int flag)
   return FALSE;
 }
 
-const char * race_name(struct char_data *ch)
+const char * race_name(Character *ch)
 {
   if (IS_NPC(ch))
     return (mob_races[(int)GET_MRACE(ch)]);
@@ -142,13 +142,13 @@ const struct race_data races[NUM_RACES] =
 
 //** I made these function so you could have error checking and
 //** to provide the easy ability to add things like poly
-void set_race(struct char_data *ch, int race)
+void set_race(Character *ch, int race)
 {
   long long rem, r;
   struct obj_data *obj;
   extern const char *body[];
-  void obj_to_char(struct obj_data *object, struct char_data *ch);
-  struct obj_data *unequip_char(struct char_data *ch, int pos);
+  void obj_to_char(struct obj_data *object, Character *ch);
+  struct obj_data *unequip_char(Character *ch, int pos);
   char buf[MAX_STRING_LENGTH];
 
   rem = GET_BODY(ch);
@@ -215,14 +215,14 @@ ACMD(do_race)
   {
     r = parse_race(*arg);
     sprintbit(races[r].body_bits, body, body_parts, sizeof(body_parts));
-    new_send_to_char(ch, "%s: %s\r\n", pc_race_types[r], body_parts);
+    ch->Send( "%s: %s\r\n", pc_race_types[r], body_parts);
   }
   else
   {
     for (r = 1; r < 8; r++)
     {
       sprintbit(races[r].body_bits, body, body_parts, sizeof(body_parts));
-      new_send_to_char(ch, "%s: %s\r\n", pc_race_types[r], body_parts);
+      ch->Send( "%s: %s\r\n", pc_race_types[r], body_parts);
     }
   }
 
@@ -244,7 +244,7 @@ long find_race_bitvector(char arg) {
   }
 }
 */
-int invalid_race(struct char_data *ch, struct obj_data *obj)
+int invalid_race(Character *ch, struct obj_data *obj)
 {
   if ((IS_OBJ_STAT(obj, ITEM_ANTI_FAUN) && IS_FAUN(ch)) ||
       (IS_OBJ_STAT(obj, ITEM_ANTI_CENTAUR) && IS_CENTAUR(ch)) ||

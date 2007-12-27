@@ -3,7 +3,7 @@
 
 #define HOUSE_PRIVATE	0
 
-void add_follower(struct char_data *ch, struct char_data *leader);
+void add_follower(Character *ch, Character *leader);
 int house_capacity(int house);
 
 struct house_control_rec {
@@ -32,11 +32,11 @@ struct house_control_rec {
 #define TOROOM(room, dir) (room->dir_option[dir] ? \
 			    room->dir_option[dir]->to_room : NULL)
 
-void House_listrent(struct char_data *ch, room_vnum vnum);
+void House_listrent(Character *ch, room_vnum vnum);
 void House_boot(void);
 void House_save_all(void);
-int House_can_enter(struct char_data *ch, room_vnum house);
+int House_can_enter(Character *ch, room_vnum house);
 void House_crashsave(room_vnum vnum);
-void House_list_guests(struct char_data *ch, int i, int quiet);
-void house_expand_house(struct char_data *ch, int house);
-void hcontrol_expand_house(struct char_data *ch, char *argument);
+void House_list_guests(Character *ch, int i, int quiet);
+void house_expand_house(Character *ch, int house);
+void hcontrol_expand_house(Character *ch, char *argument);

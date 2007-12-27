@@ -23,7 +23,7 @@
  * External variable declarations.
  */
 extern struct shop_data *shop_index;
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern struct obj_data *obj_proto;
 extern struct room_data *world_vnum[];
 extern struct zone_data *zone_table;
@@ -73,11 +73,11 @@ ACMD(do_oasis_sedit)
   buf3 = two_arguments(argument, buf1, buf2);
   
   if (!*buf1) {
-    new_send_to_char(ch, "Specify a shop VNUM to edit.\r\n");
+    ch->Send( "Specify a shop VNUM to edit.\r\n");
     return;
   } else if (!isdigit(*buf1)) {
     if (str_cmp("save", buf1) != 0) {
-      new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
+      ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
     
@@ -95,7 +95,7 @@ ACMD(do_oasis_sedit)
     }
     
     if (num == NOWHERE) {
-      new_send_to_char(ch, "Save which zone?\r\n");
+      ch->Send( "Save which zone?\r\n");
       return;
     }
   }
@@ -112,7 +112,7 @@ ACMD(do_oasis_sedit)
   for (d = descriptor_list; d; d = d->next) {
     if (STATE(d) == CON_SEDIT) {
       if (d->olc && OLC_NUM(d) == num) {
-        new_send_to_char(ch, "That shop is currently being edited by %s.\r\n",
+        ch->Send( "That shop is currently being edited by %s.\r\n",
           PERS(d->character, ch));
         return;
       }
@@ -140,7 +140,7 @@ ACMD(do_oasis_sedit)
   /****************************************************************************/
   OLC_ZNUM(d) = save ? real_zone(num) : real_zone_by_thing(num);
   if (OLC_ZNUM(d) == NOWHERE) {
-    new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    ch->Send( "Sorry, there is no zone for that number!\r\n");
     free(d->olc);
     d->olc = NULL;
     return;
@@ -150,7 +150,7 @@ ACMD(do_oasis_sedit)
   /** Everyone but IMPLs can only edit zones they have been assigned.        **/
   /****************************************************************************/
   if (!can_edit_zone(ch, OLC_ZNUM(d))) {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     
     /**************************************************************************/
     /** Free the OLC structure.                                              **/
@@ -161,7 +161,7 @@ ACMD(do_oasis_sedit)
   }
   
   if (save) {
-    new_send_to_char(ch, "Saving all shops in zone %d.\r\n",
+    ch->Send( "Saving all shops in zone %d.\r\n",
       zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
       "OLC: %s saves shop info for zone %d.",

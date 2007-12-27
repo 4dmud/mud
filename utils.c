@@ -29,8 +29,8 @@ extern struct room_data *world_vnum[];
 /* local functions */
 struct time_info_data *real_time_passed(time_t t2, time_t t1);
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
-void die_follower(struct char_data *ch);
-void add_follower(struct char_data *ch, struct char_data *leader);
+void die_follower(Character *ch);
+void add_follower(Character *ch, Character *leader);
 char *stripcr(char *dest, const char *src);
 void prune_crlf(char *txt);
 
@@ -67,7 +67,7 @@ char* print_gold(char* result, gold_int gold)
   return result;
 }
 
-char *center_align(char *str, int width)
+char *center_align(char *str, size_t width)
 {
   static char retbuf[MAX_STRING_LENGTH];
   char statbuf[MAX_STRING_LENGTH], *stptr;
@@ -107,7 +107,7 @@ char *center_align(char *str, int width)
    type = for a transaction type, taxed untaxted.. or whatever.
    
 */
-gold_int char_gold(struct char_data *ch, gold_int amount, short type)
+gold_int char_gold(Character *ch, gold_int amount, short type)
 {
 
   gold_int temp = 0;
@@ -357,7 +357,7 @@ int str_cmp(const char *arg1, const char *arg2)
   return (0);
 }
 
-int first_word_is_name(struct char_data *ch, char * argument)
+int first_word_is_name(Character *ch, char * argument)
 {
   char *first_arg, *name_p;
   int chk, i;
@@ -401,7 +401,7 @@ int strn_cmp(const char *arg1, const char *arg2, int n)
 #endif
 
 /* log a death trap hit */
-void log_death_trap(struct char_data *ch)
+void log_death_trap(Character *ch)
 {
   new_mudlog(BRF, LVL_GOD, TRUE, "%s hit death trap #%d (%s)", GET_NAME(ch),
              GET_ROOM_VNUM(IN_ROOM(ch)), IN_ROOM(ch)->name);
@@ -848,7 +848,7 @@ time_t mud_time_to_secs(struct time_info_data * now)
   return (time(NULL) - when);
 }
 
-struct time_info_data *age(struct char_data *ch)
+struct time_info_data *age(Character *ch)
 {
   static struct time_info_data player_age;
 
@@ -862,9 +862,9 @@ struct time_info_data *age(struct char_data *ch)
 
 /* Check if making CH follow VICTIM will create an illegal */
 /* Follow "Loop/circle"                                    */
-bool circle_follow(struct char_data * ch, struct char_data * victim)
+bool circle_follow(Character * ch, Character * victim)
 {
-  struct char_data *k;
+  Character *k;
 
   for (k = victim; k; k = k->master)
   {
@@ -879,7 +879,7 @@ bool circle_follow(struct char_data * ch, struct char_data * victim)
 
 /* Called when stop following persons, or stopping charm */
 /* This will NOT do if a character quits/dies!!          */
-void stop_follower(struct char_data *ch)
+void stop_follower(Character *ch)
 {
   struct follow_type *j, *k;
 
@@ -946,7 +946,7 @@ void stop_follower(struct char_data *ch)
 
 
 /* Called when a character that follows/is followed dies */
-void die_follower(struct char_data *ch)
+void die_follower(Character *ch)
 {
   struct follow_type *j, *k;
 
@@ -964,7 +964,7 @@ void die_follower(struct char_data *ch)
 
 /* Do NOT call this before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(struct char_data *ch, struct char_data *leader)
+void add_follower(Character *ch, Character *leader)
 {
   struct follow_type *k;
 
@@ -1223,7 +1223,7 @@ int get_filename(const char *orig_name, char *filename, int mode)
 int num_pc_in_room(struct room_data *room)
 {
   int i = 0;
-  struct char_data *ch;
+  Character *ch;
 
   for (ch = room->people; ch != NULL; ch = ch->next_in_room)
     if (!IS_NPC(ch))
@@ -1343,7 +1343,7 @@ char *stripcr(char *dest, const char *src)
   return dest;
 }
 
-int get_pidx_from_name(struct char_data *ch)
+int get_pidx_from_name(Character *ch)
 {
   return GET_IDNUM(ch);
 }
@@ -1562,7 +1562,7 @@ void    *sortl(void *list, void *(*getnext)(void *),
   return(low_list);
 }
 size_t commafmt(char   *buf,            /* Buffer for formatted string  */
-                int     bufsize,        /* Size of buffer               */
+                size_t     bufsize,        /* Size of buffer               */
                 gold_int    N)              /* Number to convert            */
 {
   int posn = 1, sign = 1;
@@ -1678,7 +1678,7 @@ void wiz_initialize(void)
 void wiz_read_file(void)
 {
   void wiz_add_name(byte level, char *name);
-  struct char_data *vict;
+  Character *vict;
   int i;
   extern struct player_index_element *player_table;    /* index to plr file     */
   extern int top_of_p_table;
@@ -1689,7 +1689,7 @@ void wiz_read_file(void)
 
 
 
-      CREATE(vict, struct char_data, 1);
+      CREATE(vict, Character, 1);
       clear_char(vict);
       TEMP_LOAD_CHAR = TRUE;
       //CREATE(vict->player_specials, struct player_special_data, 1);
@@ -2077,4 +2077,13 @@ void ReplaceString ( char * string, char * search, char * replace, size_t len )
     }
     while (found != NULL);
   }
+}
+
+template<class T> string to_string(T c)
+{
+  string s;
+  stringstream strstm;
+  strstm << c;
+  strstm >> s;
+  return s;
 }

@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.16  2006/05/21 11:02:25  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.15  2006/04/21 12:46:43  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -89,15 +93,15 @@ ASKILL(skill_tinker);
 ASKILL(skill_sing_wood);
 EVENTFUNC(message_event);
 ASKILL(skill_manifest);
-void make_manifest(struct char_data *ch,struct obj_data *obj);
+void make_manifest(Character *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
 ASPELL(spell_control_weather);
 extern struct stave_stat_table stave_table[9];
 
-struct char_data *find_char(long n);
+Character *find_char(long n);
 struct obj_data *find_obj(long n);
 struct room_data *find_room(long n);
-void run_task(struct char_data *ch);
+void run_task(Character *ch);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
 int save_forest(void);
@@ -110,8 +114,8 @@ extern struct spell_info_type spell_info[];
 
 
 /* extern procedures */
-int mag_manacost(struct char_data *ch, int spellnum);
-void improve_skill(struct char_data *ch, int skill);
+int mag_manacost(Character *ch, int spellnum);
+void improve_skill(Character *ch, int skill);
 ACTION(thing_lumberjack);
 ACTION(thing_manifest);
 ACTION(thing_singwood);
@@ -147,7 +151,7 @@ char *get_spell_name(char *argument)
   return s;
 }
 
-void make_potion(struct char_data *ch, int potion,
+void make_potion(Character *ch, int potion,
                  struct obj_data *container)
 {
   struct obj_data *final_potion;
@@ -208,12 +212,12 @@ void make_potion(struct char_data *ch, int potion,
 
   if (can_make == FALSE)
   {
-    new_send_to_char(ch, "That spell cannot be mixed into a potion.\r\n");
+    ch->Send( "That spell cannot be mixed into a potion.\r\n");
     return;
   }
   else if ((number(1, 3) == 3) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    new_send_to_char(ch,"As you begin mixing the potion, it violently explodes!\r\n");
+    ch->Send("As you begin mixing the potion, it violently explodes!\r\n");
     act("$n begins to mix a potion, but it suddenly explodes!",        FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(container);
     dam = number(15, mag_manacost(ch, potion) * 2);
@@ -227,13 +231,13 @@ void make_potion(struct char_data *ch, int potion,
   {
     if (GET_LEVEL(ch) < LVL_HERO)
       alter_mana(ch, mana);
-    new_send_to_char(ch, "You create a %s potion.\r\n", skill_name(potion));
+    ch->Send( "You create a %s potion.\r\n", skill_name(potion));
     act("$n creates a potion!", FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(container);
   }
   else
   {
-    new_send_to_char(ch,"You don't have enough mana to mix that potion!\r\n");
+    ch->Send("You don't have enough mana to mix that potion!\r\n");
     return;
   }
 
@@ -267,7 +271,7 @@ void make_potion(struct char_data *ch, int potion,
   GET_OBJ_VAL(final_potion, 2) = -1;
   GET_OBJ_VAL(final_potion, 3) = -1;
   GET_OBJ_COST(final_potion) = GET_LEVEL(ch) * 500;
-  GET_OBJ_WEIGHT(final_potion) = 10 + (GET_LEVEL(ch) * 0.1);
+  GET_OBJ_WEIGHT(final_potion) = FTOI(10 + (GET_LEVEL(ch) * 0.1));
   GET_OBJ_RENT(final_potion) = 0;
   GET_OBJ_TIMER(final_potion) = 100;
 
@@ -286,7 +290,7 @@ ASKILL(skill_brew)
 
   if (!knows_spell(ch, SKILL_BREW))
   {
-    new_send_to_char(ch,"You are not schooled enough to brew anything!\r\n");
+    ch->Send("You are not schooled enough to brew anything!\r\n");
     return 0;
   }
 
@@ -309,7 +313,7 @@ ASKILL(skill_brew)
 
   if (!*bottle_name || !*spell_name)
   {
-    new_send_to_char(ch,"What do you wish to mix in where?\r\n");
+    ch->Send("What do you wish to mix in where?\r\n");
     return 0;
   }
 
@@ -327,19 +331,19 @@ ASKILL(skill_brew)
   }
   if (found != FALSE && (GET_OBJ_VNUM(container) != 3044))
   {
-    new_send_to_char(ch, "You don't have the proper container!\r\n");
+    ch->Send( "You don't have the proper container!\r\n");
     return 0;
   }
   if (found == FALSE)
   {
-    new_send_to_char(ch, "You don't have %s in your inventory!\r\n",
+    ch->Send( "You don't have %s in your inventory!\r\n",
                      bottle_name);
     return 0;
   }
 
   if (!spell_name || !*spell_name)
   {
-    new_send_to_char(ch,"Spell names must be enclosed in single quotes!\r\n");
+    ch->Send("Spell names must be enclosed in single quotes!\r\n");
     return 0;
   }
 
@@ -347,17 +351,17 @@ ASKILL(skill_brew)
 
   if ((potion < 1) || (potion > MAX_SPELLS))
   {
-    new_send_to_char(ch,"Mix what spell?!?\r\n");
+    ch->Send("Mix what spell?!?\r\n");
     return 0;
   }
   if (!knows_spell(ch, potion))
   {
-    new_send_to_char(ch,"You do not know how to make that potion!\r\n");
+    ch->Send("You do not know how to make that potion!\r\n");
     return 0;
   }
   if (GET_SKILL(ch, potion) == 0)
   {
-    new_send_to_char(ch, "You are unfamiliar brewing %s.\r\n", skill_name(potion));
+    ch->Send( "You are unfamiliar brewing %s.\r\n", skill_name(potion));
     return 0;
   }
   make_potion(ch, potion, container);
@@ -366,7 +370,7 @@ ASKILL(skill_brew)
 
 
 
-void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
+void make_scroll(Character *ch, int scroll, struct obj_data *paper)
 {
   struct obj_data *final_scroll;
   struct extra_descr_data *new_descr;
@@ -384,12 +388,12 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
 
   if (can_make == FALSE)
   {
-    new_send_to_char(ch, "That spell cannot be scribed into a scroll.\r\n");
+    ch->Send( "That spell cannot be scribed into a scroll.\r\n");
     return;
   }
   else if ((number(1, 3) == 3) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    new_send_to_char(ch,"As you begin inscribing the final rune, the scroll violently explodes!\r\n");
+    ch->Send("As you begin inscribing the final rune, the scroll violently explodes!\r\n");
     act("$n tries to scribe a spell, but it explodes!",  FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(paper);
     dam = number(15, mag_manacost(ch, scroll) * 2);
@@ -403,13 +407,13 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
   {
     if (GET_LEVEL(ch) < LVL_HERO)
       alter_mana(ch, mana);
-    new_send_to_char(ch, "You create a scroll of %s.\r\n", skill_name(scroll));
+    ch->Send( "You create a scroll of %s.\r\n", skill_name(scroll));
     act("$n creates a scroll!", FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(paper);
   }
   else
   {
-    new_send_to_char(ch,"You don't have enough mana to scribe such a powerful spell!\r\n");
+    ch->Send("You don't have enough mana to scribe such a powerful spell!\r\n");
     return;
   }
 
@@ -445,7 +449,7 @@ void make_scroll(struct char_data *ch, int scroll, struct obj_data *paper)
   GET_OBJ_VAL(final_scroll, 2) = -1;
   GET_OBJ_VAL(final_scroll, 3) = -1;
   GET_OBJ_COST(final_scroll) = GET_LEVEL(ch) * 500;
-  GET_OBJ_WEIGHT(final_scroll) = 10 + (GET_LEVEL(ch) * 0.1);;
+  GET_OBJ_WEIGHT(final_scroll) = FTOI(10 + (GET_LEVEL(ch) * 0.1));
   GET_OBJ_RENT(final_scroll) = 0;
   GET_OBJ_TIMER(final_scroll) = -1;
 
@@ -469,7 +473,7 @@ ASKILL(skill_scribe)
 
   if (!knows_spell(ch, SKILL_SCRIBE))
   {
-    new_send_to_char(ch,"You are not schooled enough to scribe anything!\r\n");
+    ch->Send("You are not schooled enough to scribe anything!\r\n");
     return 0;
   }
 
@@ -489,7 +493,7 @@ ASKILL(skill_scribe)
 
   if (!*paper_name || !*spell_name)
   {
-    new_send_to_char(ch, "What do you wish to scribe where?\r\n");
+    ch->Send( "What do you wish to scribe where?\r\n");
     return 0;
   }
 
@@ -506,18 +510,18 @@ ASKILL(skill_scribe)
   }
   if (found && (GET_OBJ_TYPE(paper) != ITEM_SCROLL || !blank_scroll(paper)))
   {
-    new_send_to_char(ch,"You can't write on that!\r\n");
+    ch->Send("You can't write on that!\r\n");
     return 0;
   }
   if (found == FALSE)
   {
-    new_send_to_char(ch, "You don't have %s in your inventory!\r\n",  paper_name);
+    ch->Send( "You don't have %s in your inventory!\r\n",  paper_name);
     return 0;
   }
 
   if (!spell_name || !*spell_name)
   {
-    new_send_to_char(ch,"Spell names must be enclosed in single quotes!\r\n");
+    ch->Send("Spell names must be enclosed in single quotes!\r\n");
     return 0;
   }
 
@@ -525,12 +529,12 @@ ASKILL(skill_scribe)
 
   if ((scroll < 1) || (scroll > MAX_SPELLS))
   {
-    new_send_to_char(ch,"Scribe what spell?!?\r\n");
+    ch->Send("Scribe what spell?!?\r\n");
     return 0;
   }
   if (!knows_spell(ch, scroll))
   {
-    new_send_to_char(ch, "You are not schooled enough to cast that spell!\r\n");
+    ch->Send( "You are not schooled enough to cast that spell!\r\n");
     return 0;
   }
 
@@ -559,12 +563,12 @@ ASKILL(skill_tinker)
 
   if (!knows_spell(ch, SKILL_TINKER))
   {
-    new_send_to_char(ch,"You are not schooled enough to tinker anything!\r\n");
+    ch->Send("You are not schooled enough to tinker anything!\r\n");
     return 0;
   }
   if (!*weapon_name)
   {
-    new_send_to_char(ch,"What do you wish to tinker on?\r\n");
+    ch->Send("What do you wish to tinker on?\r\n");
     return 0;
   }
 
@@ -583,14 +587,14 @@ ASKILL(skill_tinker)
 
   if (found == FALSE)
   {
-    new_send_to_char(ch, "You don't have %s in your inventory!\r\n",
+    ch->Send( "You don't have %s in your inventory!\r\n",
                      weapon_name);
     return 0;
   }
 
   if (found && (GET_OBJ_TYPE(weapon) != ITEM_WEAPON))
   {
-    new_send_to_char(ch, "It doesn't look like %s would make a"
+    ch->Send( "It doesn't look like %s would make a"
                      " good weapon...\r\n", weapon_name);
     return 0;
   }
@@ -608,7 +612,7 @@ ASKILL(skill_tinker)
       IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_POISONED_3) ||
       IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_POISONED_4))
   {
-    new_send_to_char(ch,"The weapon is poisoned.\r\n You cannot further affect its form.\r\n");
+    ch->Send("The weapon is poisoned.\r\n You cannot further affect its form.\r\n");
     return 0;
   }
 
@@ -619,9 +623,9 @@ ASKILL(skill_tinker)
 
   if ((number(10, 100) > prob) && (GET_LEVEL(ch) < LVL_HERO))
   {
-    new_send_to_char(ch, "As you pound out the dents in the weapon,"
+    ch->Send( "As you pound out the dents in the weapon,"
                      " you hit a weak spot and it explodes!\r\n");
-    new_send_to_char(ch, "Hot broken shards go in your eyes!\r\n");
+    ch->Send( "Hot broken shards go in your eyes!\r\n");
     act("$n tries to forge a weapon, but it explodes!",
         FALSE, ch, 0, 0, TO_ROOM);
     extract_obj(weapon);
@@ -645,12 +649,12 @@ ASKILL(skill_tinker)
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_MAGIC);
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_TINKERED);
 
-  new_send_to_char(ch,"You have forged new life into the weapon!\r\n");
+  ch->Send("You have forged new life into the weapon!\r\n");
   act("$n vigorously pounds on a weapon!", FALSE, ch, 0, 0, TO_ROOM);
   return SKILL_TINKER;
 }
 
-void make_focus(struct char_data *ch, int type, struct obj_data *o)
+void make_focus(Character *ch, int type, struct obj_data *o)
 {
   struct obj_data *final_focus;
   struct extra_descr_data *new_descr;
@@ -666,11 +670,11 @@ void make_focus(struct char_data *ch, int type, struct obj_data *o)
 
   if (can_make == FALSE)
   {
-    new_send_to_char(ch, "That item cannot be made into a focus.\r\n");
+    ch->Send( "That item cannot be made into a focus.\r\n");
     return;
   }
 
-  /*new_send_to_char(ch, "You sing %s %s %s %s focus staff from %s.\r\n",
+  /*ch->Send( "You sing %s %s %s %s focus staff from %s.\r\n",
      LANA(age_desc_staff[GET_OBJ_VAL(o, 1)]),
      age_desc_staff[GET_OBJ_VAL(o, 1)], random_desc[num2],
      tree_names[GET_OBJ_VAL(o, 2)], o->short_description);
@@ -758,7 +762,7 @@ ASKILL(skill_sing_wood)
   /* sanity check */
   if (!tree_name)
   {
-    new_send_to_char(ch, "What do you wish to sing to?\r\n");
+    ch->Send( "What do you wish to sing to?\r\n");
     return 0;
   }
 
@@ -777,7 +781,7 @@ ASKILL(skill_sing_wood)
   if ((o =
          get_obj_in_list_vis(ch, tree_name, 0,IN_ROOM(ch)->contents)) == NULL)
   {
-    new_send_to_char(ch, "The tree you need is not here.\r\n");
+    ch->Send( "The tree you need is not here.\r\n");
     return 0;
   }
   else
@@ -788,26 +792,26 @@ ASKILL(skill_sing_wood)
 
   if (found != FALSE &&  ((GET_OBJ_TYPE(o) != ITEM_TREE) || GET_OBJ_VNUM(o) != NOTHING))
   {
-    new_send_to_char(ch, "You can't see the proper tree!\r\n");
+    ch->Send( "You can't see the proper tree!\r\n");
     return 0;
   }
   if (found == FALSE)
   {
-    new_send_to_char(ch, "There is no tree here!\r\n");
+    ch->Send( "There is no tree here!\r\n");
     return 0;
   }
   if (GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return 0;
   }
   if (GET_MSG_RUN(ch))
   {
-    new_send_to_char(ch, "You are already working on something else!\r\n");
+    ch->Send( "You are already working on something else!\r\n");
     return 0;
   }
 
-  new_send_to_char(ch, "You take a deap breath and clear your mind.\r\n");
+  ch->Send( "You take a deap breath and clear your mind.\r\n");
 
   GET_MSG_RUN(ch) = 1;
 
@@ -837,25 +841,25 @@ ASKILL(skill_manifest)
 
   if (!*buf)
   {
-    new_send_to_char(ch,"Usage: manifest <weapon>\r\n");
+    ch->Send("Usage: manifest <weapon>\r\n");
     return 0;
   }
 
   if (!(obj = get_obj_vis(ch, buf, NULL)))
   {
-    new_send_to_char(ch, "No such object around.\r\n");
+    ch->Send( "No such object around.\r\n");
     return 0;
   }
 
   if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
   {
-    new_send_to_char(ch, "No such weapon around\r\n");
+    ch->Send( "No such weapon around\r\n");
     return 0;
   }
 
   if (GET_MSG_RUN(ch))
   {
-    new_send_to_char(ch, "You are already working on something else!\r\n");
+    ch->Send( "You are already working on something else!\r\n");
     return 0;
   }
 
@@ -868,7 +872,7 @@ ASKILL(skill_manifest)
   }
   else if (obj->carried_by != ch)
   {
-    new_send_to_char(ch, "You are not wearing that weapon or don't have it in your inventory.\r\n");
+    ch->Send( "You are not wearing that weapon or don't have it in your inventory.\r\n");
     return 0;
   }
   GET_MSG_RUN(ch) = 1;
@@ -884,7 +888,7 @@ ASKILL(skill_manifest)
   return SKILL_MANIFEST;
 }
 
-void make_manifest(struct char_data *ch,struct obj_data *obj)
+void make_manifest(Character *ch,struct obj_data *obj)
 {
 
   char buf[MAX_STRING_LENGTH];
@@ -941,7 +945,7 @@ void make_manifest(struct char_data *ch,struct obj_data *obj)
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_TAKE);
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_FOCUS);
   }
-  GET_OBJ_VAL(final_focus, 0) = 1000 + ((((v1 * v2)+v1)/2.0)*(TIER - 0.60)*(GET_SKILL(ch, SKILL_MANIFEST)*0.01));
+  GET_OBJ_VAL(final_focus, 0) = FTOI(1000 + ((((v1 * v2)+v1)/2.0)*(TIER - 0.60)*(GET_SKILL(ch, SKILL_MANIFEST)*0.01)));
   GET_OBJ_VAL(final_focus, 1) = -1;
   GET_OBJ_VAL(final_focus, 2) = FOCUS_ORB;
   GET_OBJ_VAL(final_focus, 3) = GET_LEVEL(ch)*TIER*1000;
@@ -962,13 +966,13 @@ void make_manifest(struct char_data *ch,struct obj_data *obj)
 EVENTFUNC(message_event)
 {
   struct message_event_obj *msg = (struct message_event_obj *) event_obj;
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   struct obj_data *obj = NULL;
   struct room_data *room = NULL;
   long time = 0;
 
   long uid = msg->id;
-  struct char_data *ch = msg->ch;
+  Character *ch = msg->ch;
   short type = msg->type;
   int skill = msg->skill;
 
@@ -1017,7 +1021,7 @@ EVENTFUNC(message_event)
      else
       {
       time = 0;
-      new_send_to_char(ch, "You need to specify, 'better' or 'worse'.\r\n");
+      ch->Send( "You need to specify, 'better' or 'worse'.\r\n");
       }
     case SKILL_PICK_LOCK:
       break;
@@ -1067,7 +1071,7 @@ EVENTFUNC(message_event)
     return 0;
   }
   else {
-    GET_MESSAGE_EVENT(ch) = event_obj;
+    GET_MESSAGE_EVENT(ch) = (event *)event_obj;
     return time;
   }
 }
@@ -1084,14 +1088,14 @@ ACMD(do_fell)
 
   if (GET_SUB(ch, SUB_LUMBERJACK) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return;
   }
 
 
   if (!axe || GET_OBJ_TYPE(axe) != ITEM_AXE)
   {
-    new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+    ch->Send( "You can't chop trees without a good axe!\r\n");
     return;
   }
   skip_spaces(&argument);
@@ -1100,14 +1104,14 @@ ACMD(do_fell)
   /* sanity check */
   if (!tree_name)
   {
-    new_send_to_char(ch, "What do you wish to fell?\r\n");
+    ch->Send( "What do you wish to fell?\r\n");
     return;
   }
 
   if ((o =
          get_obj_in_list_vis(ch, tree_name, 0,IN_ROOM(ch)->contents)) == NULL)
   {
-    new_send_to_char(ch, "The tree you need is not here.\r\n");
+    ch->Send( "The tree you need is not here.\r\n");
     return;
   }
   else
@@ -1118,22 +1122,22 @@ ACMD(do_fell)
 
   if (found != FALSE && (GET_OBJ_TYPE(o) != ITEM_TREE))
   {
-    new_send_to_char(ch, "You can't see the proper tree!\r\n");
+    ch->Send( "You can't see the proper tree!\r\n");
     return;
   }
   if (found == FALSE)
   {
-    new_send_to_char(ch, "There is no tree here!\r\n");
+    ch->Send( "There is no tree here!\r\n");
     return;
   }
   if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return;
   }
 
 
-  new_send_to_char(ch, "You flex your muscles and swing your axe.\r\n");
+  ch->Send( "You flex your muscles and swing your axe.\r\n");
   GET_MSG_RUN(ch) = 1;
 
   CREATE(msg, struct message_event_obj, 1);
@@ -1161,36 +1165,36 @@ ASKILL(skill_manipulate)
   /* sanity check */
   if (!arg)
   {
-    new_send_to_char(ch, "What do you wish to manipulate?\r\n");
+    ch->Send( "What do you wish to manipulate?\r\n");
     return 0;
   }
 
   if ((o =
          get_obj_in_list_vis(ch, arg, 0, ch->carrying)) == NULL)
   {
-    new_send_to_char(ch, "The weapon must be in your inventory.\r\n");
+    ch->Send( "The weapon must be in your inventory.\r\n");
     return 0;
   }
 
   if (GET_OBJ_TYPE(o) != ITEM_WEAPON)
   {
-    new_send_to_char(ch, "That isnt a weapon!\r\n");
+    ch->Send( "That isnt a weapon!\r\n");
     return 0;
   }
 
   if (OBJ_FLAGGED(o, ITEM_ENHANCED))
   {
-    new_send_to_char(ch, "That item has been enhanced already!\r\n");
+    ch->Send( "That item has been enhanced already!\r\n");
     return 0;
   }
   if (IS_SET_AR(GET_OBJ_EXTRA(o), ITEM_MAGIC))
   {
-    new_send_to_char(ch, "That item has been changed already!\r\n");
+    ch->Send( "That item has been changed already!\r\n");
     return 0;
   }
   if (GET_MANA(ch) < 600)
   {
-    new_send_to_char(ch, "You don't have enough mana to manipulate!\r\n");
+    ch->Send( "You don't have enough mana to manipulate!\r\n");
     return 0;
   }
   obj_from_char(o);
@@ -1201,12 +1205,12 @@ ASKILL(skill_manipulate)
   {
     GET_WEP_BALANCE(o) = number(0, 100);
 
-    new_send_to_char(ch, "Your concentration slips and you throw the balance in randomly!\r\n");
+    ch->Send( "Your concentration slips and you throw the balance in randomly!\r\n");
   }
   else
   {
     GET_WEP_BALANCE(o) = (curr_balance(o) + perf_balance(GET_WEP_TYPE(o)))/2;
-    new_send_to_char(ch, "You pour all your energy into changing the balance of the weapon by re-weighting it.\r\n");
+    ch->Send( "You pour all your energy into changing the balance of the weapon by re-weighting it.\r\n");
   }
   alter_mana(ch, GET_MANA(ch)/2);
 

@@ -47,7 +47,7 @@ ACMD(do_oasis_trigedit)
   skip_spaces(&argument);
   if (!*argument || !isdigit(*argument))
   {
-    new_send_to_char(ch, "Specify a trigger VNUM to edit.\r\n");
+    ch->Send( "Specify a trigger VNUM to edit.\r\n");
     return;
   }
 
@@ -62,7 +62,7 @@ ACMD(do_oasis_trigedit)
     {
       if (d->olc && OLC_NUM(d) == number)
       {
-        new_send_to_char(ch, "That trigger is currently being edited by %s.\r\n",
+        ch->Send( "That trigger is currently being edited by %s.\r\n",
                          GET_NAME(d->character));
         return;
       }
@@ -85,7 +85,7 @@ ACMD(do_oasis_trigedit)
    */
   if ((OLC_ZNUM(d) = real_zone_by_thing(number)) == NOWHERE)
   {
-    new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    ch->Send( "Sorry, there is no zone for that number!\r\n");
     free(d->olc);
     d->olc = NULL;
     return;
@@ -96,7 +96,7 @@ ACMD(do_oasis_trigedit)
    */
   if (!can_edit_zone(ch, OLC_ZNUM(d)))
   {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE, "OLC: %s tried to edit zone %d (allowed zone %d)",
                GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
     free(d->olc);
@@ -130,7 +130,7 @@ void script_save_to_disk(FILE *fp, void *item, int type)
   struct trig_proto_list *t;
 
   if (type==MOB_TRIGGER)
-    t = ((struct char_data *)item)->proto_script;
+    t = ((Character *)item)->proto_script;
   else if (type==OBJ_TRIGGER)
     t = ((struct obj_data *)item)->proto_script;
   else if (type==WLD_TRIGGER)
@@ -443,7 +443,7 @@ void new_sprintbits(int data, char *dest)
 /* save the zone's triggers to internal memory and to disk */
 void trigedit_save(struct descriptor_data *d)
 {
-  int i;
+  unsigned int i, top;
   trig_rnum rnum;
   int found = 0;
   char *s;
@@ -454,7 +454,7 @@ void trigedit_save(struct descriptor_data *d)
   struct index_data **new_index;
   struct descriptor_data *dsc;
   FILE *trig_file;
-  int zone, top;
+  int zone;
   char buf[MAX_CMD_LENGTH];
   char bitBuf[MAX_INPUT_LENGTH];
   char fname[MAX_INPUT_LENGTH];

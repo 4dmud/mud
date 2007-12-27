@@ -32,24 +32,24 @@ extern int siteok_everyone;
 int parse_class(char arg);
 
 /* local functions */
-void remort_char(struct char_data *ch);
-int has_class(struct char_data *ch, int chclass);
-int class_count(struct char_data *ch, int chclass);
+void remort_char(Character *ch);
+int has_class(Character *ch, int chclass);
+int class_count(Character *ch, int chclass);
 int parse_spec(char arg);
-int can_level(struct char_data *ch);
+int can_level(Character *ch);
 
 
 /*tier fucntions by Mordecai*/
-int highest_tier(struct char_data *ch);	/* returns dominant class */
-int has_tier(struct char_data *ch, int chclass);	/* returns 0 for no, 1 for yes */
-int tier_level(struct char_data *ch, int chclass);	/* returns 0 to 4 for how many of that class that ch has spec */
-int count_tiers(struct char_data *ch);	/* returns 0 to 4 for how many tiers ch has non specific */
-int current_class_is_tier(struct char_data *ch);	/* returns 0 or 1 */
-int current_class_is_tier_num(struct char_data *ch);	/* returns 0 to 4 */
-int num_casting(struct char_data *ch);
+int highest_tier(Character *ch);	/* returns dominant class */
+int has_tier(Character *ch, int chclass);	/* returns 0 for no, 1 for yes */
+int tier_level(Character *ch, int chclass);	/* returns 0 to 4 for how many of that class that ch has spec */
+int count_tiers(Character *ch);	/* returns 0 to 4 for how many tiers ch has non specific */
+int current_class_is_tier(Character *ch);	/* returns 0 or 1 */
+int current_class_is_tier_num(Character *ch);	/* returns 0 to 4 */
+int num_casting(Character *ch);
 
 
-void remort_char(struct char_data *ch)
+void remort_char(Character *ch)
 {
   GET_LEVEL(ch) = 1;
   GET_EXP(ch) = 1;
@@ -91,7 +91,7 @@ ACMD(do_remort)
 
   if (IS_NPC(ch) || GET_LEVEL(ch) != 50)
   {
-    new_send_to_char(ch,"That is not a very good idea.\r\n");
+    ch->Send("That is not a very good idea.\r\n");
     return;
   }
 
@@ -99,20 +99,20 @@ ACMD(do_remort)
 
   if (!argument)
   {
-    new_send_to_char(ch,"What class do you want to remort to?\r\nREMORT <class>\r\n");
+    ch->Send("What class do you want to remort to?\r\nREMORT <class>\r\n");
     return;
   }
 
   // did they supply a valid class
   if ((i = parse_class(*argument)) == CLASS_UNDEFINED)
   {
-    new_send_to_char(ch, "That is not a valid class.\r\n");
+    ch->Send( "That is not a valid class.\r\n");
     return;
   }
   // do they have the experience
   if (!can_level(ch))
   {
-    new_send_to_char(ch, "You need more experience before you can remort.\r\n");
+    ch->Send( "You need more experience before you can remort.\r\n");
     return;
   }
   /* remove affects from eq and spells (from char_to_store) */
@@ -156,7 +156,7 @@ ACMD(do_remort)
               simple_class_name(ch),
               (grand_master(ch) ? " Grand Master!" : "!"));
   log("REMORT: %s has just remorted to %s", GET_NAME(ch), simple_class_name(ch));
-  new_send_to_char(ch, "Enjoy being %s.\r\n", simple_class_name(ch));
+  ch->Send( "Enjoy being %s.\r\n", simple_class_name(ch));
 
   for (i = 0; i < NUM_WEARS; i++)
   {
@@ -206,7 +206,7 @@ every class's master.
  
 */
 
-int has_class(struct char_data *ch, int chclass)
+int has_class(Character *ch, int chclass)
 {
 
   if (chclass == -1)
@@ -224,7 +224,7 @@ int has_class(struct char_data *ch, int chclass)
   return 0;
 }
 
-int class_count(struct char_data *ch, int chclass)
+int class_count(Character *ch, int chclass)
 {
   int count = 0;
   if (chclass == -1)
@@ -261,7 +261,7 @@ int parse_spec(char arg)
 }
 
 
-int highest_tier(struct char_data *ch)
+int highest_tier(Character *ch)
 {				/* returns dominant class */
   int count = 0, chclass;
   int temp = 0, counter = 0;
@@ -292,7 +292,7 @@ int highest_tier(struct char_data *ch)
 
 }
 
-int dominant_tier(struct char_data *ch)
+int dominant_tier(Character *ch)
 {				/* returns dominant class */
   int count = 0, chclass;
   int temp = 0, counter = 0;
@@ -332,7 +332,7 @@ GET_REMORT_THREE_TIER(ch)
 
 /* returns 0 for no, 1 for yes
  * If they have a tier of that class */
-int has_tier(struct char_data *ch, int chclass)
+int has_tier(Character *ch, int chclass)
 {				/* returns 0 for no, 1 for yes */
   if (IS_NPC(ch))
   {
@@ -354,7 +354,7 @@ int has_tier(struct char_data *ch, int chclass)
   return 0;
 }
 
-int tier_level(struct char_data *ch, int chclass)
+int tier_level(Character *ch, int chclass)
 {				/* returns 0 to 4 for how many of that class that ch has spec */
   int count = 0;
   if (IS_NPC(ch))
@@ -379,7 +379,7 @@ int tier_level(struct char_data *ch, int chclass)
 
 
 
-int current_class_is_tier_num(struct char_data *ch)
+int current_class_is_tier_num(Character *ch)
 {				/* returns 0 to 4 */
   int chclass = GET_CLASS(ch);
   int count = 1;
@@ -397,7 +397,7 @@ int current_class_is_tier_num(struct char_data *ch)
   return count;
 }
 #define CASTER(cl) (cl == CLASS_MAGE || cl == CLASS_ESPER || cl == CLASS_PRIEST)
-int num_casting(struct char_data *ch)
+int num_casting(Character *ch)
 {
   int chclass = GET_CLASS(ch);
   int count = 1;
@@ -419,7 +419,7 @@ int num_casting(struct char_data *ch)
 
 
 #define MELEE(cl) (cl == CLASS_THIEF || cl == CLASS_RANGER || cl == CLASS_HUNTER || cl == CLASS_WARRIOR || cl == CLASS_GYPSY)
-int num_melee_tier(struct char_data *ch)
+int num_melee_tier(Character *ch)
 {
   int chclass = GET_CLASS(ch);
   int count = 0;

@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.12  2006/05/21 11:02:27  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.11  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -76,28 +80,28 @@ extern const char *cmd_door[];
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
-int mag_manacost(struct char_data *ch, int spellnum);
-void add_follower(struct char_data *ch, struct char_data *leader);
-int get_pidx_from_name(struct char_data *ch);
-int find_door(struct char_data *ch, const char *type, char *dir,
+int mag_manacost(Character *ch, int spellnum);
+void add_follower(Character *ch, Character *leader);
+int get_pidx_from_name(Character *ch);
+int find_door(Character *ch, const char *type, char *dir,
               const char *cmdname);
-void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
+void do_doorcmd(Character *ch, struct obj_data *obj, int door,
                 int scmd);
-void play_triples(struct char_data *ch, struct char_data *dealer,
+void play_triples(Character *ch, Character *dealer,
                   char *guess, int bet);
-void play_slots(struct char_data *ch);
-void play_high_dice(struct char_data *ch, struct char_data *dealer,
+void play_slots(Character *ch);
+void play_high_dice(Character *ch, Character *dealer,
                     int bet);
-void play_seven(struct char_data *ch, struct char_data *dealer,
+void play_seven(Character *ch, Character *dealer,
                 char *guess, int bet);
-void play_craps(struct char_data *ch, struct char_data *dealer, int bet);
+void play_craps(Character *ch, Character *dealer, int bet);
 struct obj_data *find_vehicle_by_vnum(int vnum);
 struct obj_data *get_obj_in_list_type(int type,
             struct obj_data *list);
 void explosion_messages(room_rnum room, int damage, struct obj_data *target);
-void set_race(struct char_data *ch, int race);
-int has_class(struct char_data *ch, int chclass);
-int tier_level(struct char_data *ch, int chclass);
+void set_race(Character *ch, int race);
+int has_class(Character *ch, int chclass);
+int tier_level(Character *ch, int chclass);
 void remove_corpse_from_list(OBJ_DATA *corpse);
 
 ACMD(do_drop);
@@ -108,8 +112,8 @@ ACMD(do_say);
 void sort_spells(void);
 int compare_spells(const void *x, const void *y);
 const char *how_good(int percent);
-void list_skills(struct char_data *ch, int skillspell);
-void npc_steal(struct char_data *ch, struct char_data *victim);
+void list_skills(Character *ch, int skillspell);
+void npc_steal(Character *ch, Character *victim);
 void sort_spell_data(void);
 void sort_skill_data(void);
 
@@ -308,7 +312,7 @@ const char *how_good(int percent)
   return "\x1B[36m##########\x1B[0m";
 }
 
-char * how_good_perc(struct char_data *ch, int perc)
+char * how_good_perc(Character *ch, int perc)
 {
   static char  perc_buf[80];
   if (GET_INT(ch) < 22)
@@ -341,7 +345,7 @@ extern int prac_params[4][NUM_CLASSES];
 
 #if defined(WIN32)
 
-void list_skills(struct char_data *ch, int skillspell)
+void list_skills(Character *ch, int skillspell)
 {
   int i, sortpos;
   DYN_DEFINE;
@@ -379,7 +383,7 @@ void list_skills(struct char_data *ch, int skillspell)
 }
 
 #else
-void list_skills(struct char_data *ch, int skillspell)
+void list_skills(Character *ch, int skillspell)
 {
   extern struct spell_info_type spell_info[];
   int i, sortpos, h = 0, imm, ending, sub;
@@ -565,7 +569,7 @@ void list_skills(struct char_data *ch, int skillspell)
 SPECIAL(guild)
 {
   int skill_num, percent, learned;
-  struct char_data *mob = (struct char_data *) me;
+  Character *mob = (Character *) me;
   int spell_num(const char *name);
 
   if (IS_NPC(ch) || !CMD_IS("practice"))
@@ -626,7 +630,7 @@ SPECIAL(guild)
   if (skill_num < 1 ||
       !knows_spell(ch, skill_num))
   {
-    new_send_to_char(ch,  "You do not know of that %s.\r\n", SPLSKL(ch));
+    ch->Send(  "You do not know of that %s.\r\n", SPLSKL(ch));
     return (1);
   }
   if (GET_SKILL(ch, skill_num) >= learned)
@@ -641,7 +645,7 @@ SPECIAL(guild)
     MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
 
   SET_SKILL(ch, skill_num, MIN(learned, percent));
-  new_send_to_char(ch, "You practice for a while...(%d)\r\n", GET_SKILL(ch,skill_num));
+  ch->Send( "You practice for a while...(%d)\r\n", GET_SKILL(ch,skill_num));
   GET_PRACTICES(ch)--;
 
   if (GET_SKILL(ch, skill_num) >= learned)
@@ -796,7 +800,7 @@ SPECIAL(mayor)
 ******************************************************************** */
 
 
-void npc_steal(struct char_data *ch, struct char_data *victim)
+void npc_steal(Character *ch, Character *victim)
 {
   gold_int gold;
 
@@ -886,7 +890,7 @@ SPECIAL(snake)
 
 SPECIAL(thief)
 {
-  struct char_data *cons;
+  Character *cons;
 
   if (cmd)
     return (FALSE);
@@ -907,7 +911,7 @@ SPECIAL(thief)
 
 SPECIAL(magic_user)
 {
-  struct char_data *vict;
+  Character *vict;
 
   if (cmd || GET_POS(ch) != POS_FIGHTING)
     return (FALSE);
@@ -985,7 +989,7 @@ SPECIAL(magic_user)
 SPECIAL(guild_guard)
 {
   int i;
-  struct char_data *guard = (struct char_data *) me;
+  Character *guard = (Character *) me;
   const char *buf = "The guard humiliates you, and blocks your way.\r\n";
   const char *buf2 = "The guard humiliates $n, and blocks $s way.";
 
@@ -1095,7 +1099,7 @@ SPECIAL(janitor)
 
 SPECIAL(cityguard)
 {
-  struct char_data *tch, *evil;
+  Character *tch, *evil;
   int max_evil;
 
   if (cmd || !AWAKE(ch) || FIGHTING(ch))
@@ -1156,10 +1160,10 @@ SPECIAL(pet_shops)
 {
   char buf[MAX_STRING_LENGTH], pet_name[256];
   room_rnum pet_room;
-  struct char_data *pet, *k, *tch;
+  Character *pet, *k, *tch;
   int num_of_pets = 0;
-const char *simple_class_name(struct char_data *ch);
-const char *race_name(struct char_data *ch);
+const char *simple_class_name(Character *ch);
+const char *race_name(Character *ch);
 
 
   struct follow_type *f, *f_next;
@@ -1287,10 +1291,10 @@ SPECIAL(bank)
   if (CMD_IS("balance"))
   {
     if (GET_BANK_GOLD(ch) > 0)
-      new_send_to_char(ch, "Your current balance is %lld coins.\r\n",
+      ch->Send( "Your current balance is %lld coins.\r\n",
                        GET_BANK_GOLD(ch));
     else
-      new_send_to_char(ch, "You currently have no money deposited.\r\n");
+      ch->Send( "You currently have no money deposited.\r\n");
     return (1);
   }
   else if (CMD_IS("deposit"))
@@ -1315,10 +1319,10 @@ SPECIAL(bank)
       return (1);
     }
     if (char_gold(ch, 0, GOLD_BANK) + amount > 100000000)
-      new_send_to_char(ch, "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawl. Thankyou.\r\n");
+      ch->Send( "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawl. Thankyou.\r\n");
     char_gold(ch, -amount, GOLD_HAND);
     char_gold(ch, amount, GOLD_BANK);
-    new_send_to_char(ch, "You deposit %lld coins.\r\n", amount);
+    ch->Send( "You deposit %lld coins.\r\n", amount);
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (1);
   }
@@ -1342,18 +1346,18 @@ SPECIAL(bank)
     }
     if (char_gold(ch, 0, GOLD_BANK) > 100000000)
     {
-      new_send_to_char(ch, "Because of your huge bank investment, and the untimely withdraw,\r\n"
+      ch->Send( "Because of your huge bank investment, and the untimely withdraw,\r\n"
                        "You are charged bank fees summing to 10 percent of the amount.\r\n");
       if ((char_gold(ch, 0, GOLD_BANK)-(amount + 1)) < (amount/10))
       {
-        new_send_to_char(ch, "Which you cant afford. Please withdraw a smaller amount.\r\n");
+        ch->Send( "Which you cant afford. Please withdraw a smaller amount.\r\n");
         return (1);
       }
       char_gold(ch, -((amount/10)+1), GOLD_BANK);
     }
     char_gold(ch, amount, GOLD_HAND);
     char_gold(ch, -amount, GOLD_BANK);
-    new_send_to_char(ch, "You withdraw %lld coins.\r\n", amount);
+    ch->Send( "You withdraw %lld coins.\r\n", amount);
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (1);
   }
@@ -1370,7 +1374,7 @@ SPECIAL(cleric)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct char_data *vict;
+  Character *vict;
   struct price_info
   {
     short int number;
@@ -1415,17 +1419,17 @@ SPECIAL(cleric)
         {
           if (char_gold(ch, 0, GOLD_HAND) < prices[i].price)
           {
-            act("$n tells you, 'You don't have enough gold for that spell!'", FALSE, (struct char_data *) me, 0, ch, TO_VICT);
+            act("$n tells you, 'You don't have enough gold for that spell!'", FALSE, (Character *) me, 0, ch, TO_VICT);
             return TRUE;
           }
           else
           {
 
-            act("$N gives $n some money.",  FALSE, (struct char_data *) me, 0, ch, TO_NOTVICT);
-            new_send_to_char(ch, "You give %s %lld coins.\r\n", GET_NAME((struct char_data *) me), prices[i].price);
+            act("$N gives $n some money.",  FALSE, (Character *) me, 0, ch, TO_NOTVICT);
+            ch->Send( "You give %s %lld coins.\r\n", GET_NAME((Character *) me), prices[i].price);
             char_gold(ch, -prices[i].price, GOLD_HAND);
-            char_gold((struct char_data *) me, prices[i].price, GOLD_HAND);
-            cast_spell((struct char_data *) me, ch, NULL, 0, prices[i].number);
+            char_gold((Character *) me, prices[i].price, GOLD_HAND);
+            cast_spell((Character *) me, ch, NULL, 0, prices[i].number);
             return TRUE;
 
           }
@@ -1433,16 +1437,16 @@ SPECIAL(cleric)
       }
       act("$n tells you, 'I do not know of that spell!"
           "  Type 'heal' for a list.'", FALSE,
-          (struct char_data *) me, 0, ch, TO_VICT);
+          (Character *) me, 0, ch, TO_VICT);
 
       return TRUE;
     }
     else
     {
-      act("$n tells you, 'Here is a listing of the prices for my services.'", FALSE, (struct char_data *) me, 0, ch, TO_VICT);
+      act("$n tells you, 'Here is a listing of the prices for my services.'", FALSE, (Character *) me, 0, ch, TO_VICT);
       for (i = 0; prices[i].number > SPELL_RESERVED_DBC; i++)
       {
-        new_send_to_char(ch, "{cc%-15s {cg- {cy%lld{c0\r\n", prices[i].name, prices[i].price);
+        ch->Send( "{cc%-15s {cg- {cy%lld{c0\r\n", prices[i].name, prices[i].price);
       }
       return TRUE;
     }
@@ -1510,7 +1514,7 @@ ACMD(do_recover)
   int num = 0, found = 0;
   gold_int amt;
   struct obj_data *obj = NULL;
-  void perform_meld(CHAR_DATA *ch, OBJ_DATA *corpse);
+  void perform_meld(Character *ch, OBJ_DATA *corpse);
 
   struct corpse_list_data *temp = NULL, *tnext;
 
@@ -1545,13 +1549,13 @@ ACMD(do_recover)
       continue;
     if (!obj->contains)
     {
-      new_send_to_char(ch, "An empty corpse is found. Not Recovered. Removed From List.\r\n");
+      ch->Send( "An empty corpse is found. Not Recovered. Removed From List.\r\n");
       remove_corpse_from_list(obj);
       continue;
     }
     else if (obj->carried_by)
     {
-      new_send_to_char(ch, "Your corpse was found being carried by %s and can't be recovered.\r\n", GET_NAME(obj->carried_by));
+      ch->Send( "Your corpse was found being carried by %s and can't be recovered.\r\n", GET_NAME(obj->carried_by));
       continue;
       remove_corpse_from_list(obj);
     }
@@ -1583,7 +1587,7 @@ ACMD(do_recover)
   else
   {
 
-    new_send_to_char(ch, "You are charged %lld gold for the recovery.\r\n",amt);
+    ch->Send( "You are charged %lld gold for the recovery.\r\n",amt);
     char_gold(ch, -amt, GOLD_BANK);
   }
 }
@@ -1591,8 +1595,8 @@ ACMD(do_recover)
 SPECIAL(guard_white)
 {
   char buf[MAX_STRING_LENGTH];
-  struct char_data *victim;
-  struct char_data *ech;
+  Character *victim;
+  Character *ech;
   char *crime;
   int max_evil;
 
@@ -1650,8 +1654,8 @@ SPECIAL(guard_white)
 SPECIAL(guard_black)
 {
   char buf[MAX_STRING_LENGTH];
-  struct char_data *victim;
-  struct char_data *ech;
+  Character *victim;
+  Character *ech;
   char *crime;
   int max_good;
 
@@ -1710,7 +1714,7 @@ SPECIAL(bottle)
 {
   int vnum = 0;
   struct obj_data *obj = (struct obj_data *) me;
-  struct char_data *mob;
+  Character *mob;
   ACMD(do_hit);
 
   if (CMD_IS("open"))
@@ -1815,8 +1819,8 @@ SPECIAL(door_down)
   int door = -1;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct obj_data *obj = NULL;
-  struct char_data *victim = NULL;
-  struct char_data *mob;
+  Character *victim = NULL;
+  Character *mob;
 
   if (CMD_IS("open"))
   {
@@ -1858,8 +1862,8 @@ SPECIAL(door_down_7377)
   int door = -1;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct obj_data *obj = NULL;
-  struct char_data *victim = NULL;
-  struct char_data *mob;
+  Character *victim = NULL;
+  Character *mob;
 
 
   if (CMD_IS("open"))
@@ -1901,7 +1905,7 @@ SPECIAL(triples)
 {
   int bet;
   char buf[256], buf2[10];
-  struct char_data *mob = (struct char_data *) me;
+  Character *mob = (Character *) me;
 
   if (CMD_IS("bet"))
   {
@@ -1937,7 +1941,7 @@ SPECIAL(high_dice)
   int bet;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
-  struct char_data *mob = (struct char_data *) me;
+  Character *mob = (Character *) me;
 
   if (CMD_IS("bet"))
   {
@@ -1962,7 +1966,7 @@ SPECIAL(seven)
   int bet;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];;
-  struct char_data *mob = (struct char_data *) me;
+  Character *mob = (Character *) me;
 
   if (CMD_IS("bet"))
   {
@@ -1986,7 +1990,7 @@ SPECIAL(craps)
 {
   int bet;
   char buf[MAX_INPUT_LENGTH];
-  struct char_data *mob = (struct char_data *) me;
+  Character *mob = (Character *) me;
 
   if (CMD_IS("bet"))
   {
@@ -2009,7 +2013,7 @@ SPECIAL(craps)
 /* Dragon's breath procedures */
 SPECIAL(dragon_fire)
 {
-  struct char_data *dragon = (struct char_data *) me;
+  Character *dragon = (Character *) me;
 
   /* I don't know what 'cmd' is but we never do anything if we don't breathe
    * fire unless we're fighting.
@@ -2038,7 +2042,7 @@ SPECIAL(dragon_fire)
 
 SPECIAL(dragon_gas)
 {
-  struct char_data *dragon = (struct char_data *) me;
+  Character *dragon = (Character *) me;
 
   /* I don't know what 'cmd' is but we never do anything if we don't breathe
    * gas unless we're fighting.
@@ -2069,7 +2073,7 @@ SPECIAL(dragon_gas)
 
 SPECIAL(dragon_frost)
 {
-  struct char_data *dragon = (struct char_data *) me;
+  Character *dragon = (Character *) me;
 
   /* I don't know what 'cmd' is but we never do anything if we don't breathe
    * frost unless we're fighting.
@@ -2099,7 +2103,7 @@ SPECIAL(dragon_frost)
 
 SPECIAL(dragon_acid)
 {
-  struct char_data *dragon = (struct char_data *) me;
+  Character *dragon = (Character *) me;
 
   /* I don't know what 'cmd' is but we never do anything if we don't breathe
    * acid unless we're fighting.
@@ -2128,7 +2132,7 @@ SPECIAL(dragon_acid)
 
 SPECIAL(dragon_lightning)
 {
-  struct char_data *dragon = (struct char_data *) me;
+  Character *dragon = (Character *) me;
 
   /* I don't know what 'cmd' is but we never do anything if we don't breathe
    * lightning unless we're fighting.
@@ -2305,7 +2309,7 @@ SPECIAL(fire)
 
 SPECIAL(radar)
 {
-  struct char_data *i;
+  Character *i;
   struct obj_data *viewport, *vehicle;
   room_rnum was_in,is_in;
   int dir, dis, maxdis, found = 0;
@@ -2368,7 +2372,7 @@ SPECIAL(radar)
         {
           if ((!((ch == i) && (dis == 0))) && CAN_SEE(ch, i))
           {
-            new_send_to_char(ch, "%33s: %s%s%s%s", GET_NAME(i),
+            ch->Send( "%33s: %s%s%s%s", GET_NAME(i),
                              distance[dis], ((dis > 0)
                                              && (dir <
                                                  (NUM_OF_DIRS -

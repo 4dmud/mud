@@ -150,7 +150,7 @@ struct room_direction_data *get_exit(room_rnum  pRoom,int door )
     return pRoom->dir_option[door];
 }
 /* This function is recursive, ie it calls itself */
-void map_exits(struct char_data *ch, room_rnum pRoom, int x, int y, int depth)
+void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
 {
   static char map_chars [11] = "|-|-UD/\\\\/";
   int door;
@@ -326,7 +326,7 @@ int get_line( char *desc, int max_len )
 }
 #endif
 /* Display the map to the player */
-void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
+void show_map( Character *ch, int mxp/*, char *text */)
 {
   char buf[MAX_STRING_LENGTH * 2];
   int x, y, pos, sec, sect = 0;
@@ -339,9 +339,9 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
   // p = text;
   buf[0] = '\0';
   if (mxp)
-    new_send_to_char(ch, "%s", MXPTAG("FRAME Map REDIRECT"));
+    ch->Send( "%s", MXPTAG("FRAME Map REDIRECT"));
 
-  new_send_to_char(ch, "\n\r {cy+-----------+{cw\n\r");
+  ch->Send( "\n\r {cy+-----------+{cw\n\r");
 
   /* Write out the main map area with text */
   for( y = 0; y <= MAPY; y++ )
@@ -409,8 +409,8 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
 
     if (!mxp)
     {
-      new_send_to_char(ch, "%s", buf);
-      new_send_to_char(ch, "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
+      ch->Send( "%s", buf);
+      ch->Send( "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
                        MDIS(0) ? map_bit[sect].color : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
                        MDIS(1) ? map_bit[sect+1].color : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
       sect+=2;
@@ -418,7 +418,7 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
     }
     else
     {
-      new_send_to_char(ch, "%s {cy|{c0\r\n", buf);
+      ch->Send( "%s {cy|{c0\r\n", buf);
     }
 
     //if (y == 0 && IS_PLR_FLAG( ch, PLR_AUTOEXIT))  /* the autoexits */
@@ -448,9 +448,9 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
   }
 
   /* Finish off map area */
-  new_send_to_char(ch, " {cy+-----------+{c0\r\n");
+  ch->Send( " {cy+-----------+{c0\r\n");
   if (mxp)
-    new_send_to_char(ch, "%s", MXPTAG("FRAME _previous REDIRECT"));
+    ch->Send( "%s", MXPTAG("FRAME _previous REDIRECT"));
   /*if ( !alldesc )
   {
      pos = get_line( p, 63 );
@@ -497,7 +497,7 @@ void show_map( CHAR_DATA *ch, int mxp/*, char *text */)
 }
 
 /* Clear, generate and display the map */
-void draw_map( CHAR_DATA *ch)
+void draw_map( Character *ch)
 {
   int x, y;
   static char buf[MAX_STRING_LENGTH];
@@ -533,7 +533,7 @@ void draw_map( CHAR_DATA *ch)
 
   show_map(ch, FALSE);
 }
-void update_mxp_map(struct char_data *ch)
+void update_mxp_map(Character *ch)
 {
   int x, y;
   static char buf[MAX_STRING_LENGTH];

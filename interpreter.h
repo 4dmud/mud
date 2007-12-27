@@ -10,18 +10,18 @@
 #define READ_SIZE 256
 
 #define ACMD(name)  \
-   void name(struct char_data *ch, char *argument, int cmd, int subcmd)
+   void name(Character *ch, char *argument, int cmd, int subcmd)
 
 #define ACTION(name)  \
-   long name(struct char_data *ch, struct char_data *vict, struct obj_data *obj, \
+   long name(Character *ch, Character *vict, struct obj_data *obj, \
    struct room_data *room, int *num)
 
 #define ASKILL(name)  \
-   int name(struct char_data *ch, struct char_data *vict, \
+   int name(Character *ch, Character *vict, \
    struct obj_data *obj, char *argument)
 
 #define ASUB(name)  \
-   int name(struct char_data *ch, struct char_data *vict, \
+   int name(Character *ch, Character *vict, \
    struct obj_data *obj, char *argument)
 
 ACMD(do_move);
@@ -30,7 +30,7 @@ ACMD(do_move);
 #define CMD_IS(cmd_name) (!strcmp(cmd_name, complete_cmd_info[cmd].command))
 #define IS_MOVE(cmdnum) (complete_cmd_info[cmdnum].command_pointer == do_move)
 
-void command_interpreter(struct char_data *ch, char *argument);
+void command_interpreter(Character *ch, char *argument);
 int search_block(char *arg, const char **list, int exact);
 char lower(char c);
 char *one_argument(char *argument, char *first_arg);
@@ -46,8 +46,8 @@ int find_command(const char *command);
 void skip_spaces(char **string);
 char *delete_doubledollar(char *string);
 //
-void write_aliases(struct char_data *ch);
-void read_aliases(struct char_data *ch);
+void write_aliases(Character *ch);
+void read_aliases(Character *ch);
 void delete_aliases(const char *charname);
 
 /* WARNING: if you have added diagonal directions and have them at the
@@ -66,7 +66,7 @@ struct command_info
   const char *command;
   const char *sort_as;
   byte minimum_position;
-  void (*command_pointer) (struct char_data * ch, char *argument, int cmd, int subcmd);
+  void (*command_pointer) (Character * ch, char *argument, int cmd, int subcmd);
   sh_int minimum_level;
   int subcmd;
   long cmd_bits;

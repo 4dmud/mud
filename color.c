@@ -9,6 +9,10 @@
  *****************************************************************************/
 /*
  * $Log: color.c,v $
+ * Revision 1.4  2006/05/21 11:02:26  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.3  2005/02/26 01:21:34  w4dimenscor
  * Changed more of the code to be more buffer safe using strlcpy and strlcat
  *
@@ -189,8 +193,7 @@ int count_chars(const char *txt, char character)
 
 void strip_color(char *inbuf, size_t i_buf) {
 char *out_buf = NULL, insert_text[10];
-   //int current_color = -1;
-    register int inpos = 0, outpos = 0;
+    register unsigned int inpos = 0, outpos = 0;
     int remaining, color = -2;
     register int i;
     size_t b_len;

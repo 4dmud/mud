@@ -47,7 +47,7 @@ ACMD(do_oasis_list)
     rzone = real_zone(atoi(smin));
 
     if (rzone == NOWHERE) {
-      new_send_to_char(ch, "Sorry, there's no zone with that number\r\n");
+      ch->Send( "Sorry, there's no zone with that number\r\n");
       return;
     }
   } else {
@@ -56,7 +56,7 @@ ACMD(do_oasis_list)
     vmax = atoi(smax);
 
     if (vmin > vmax) {
-      new_send_to_char(ch, "List from %d to %d - Aren't we funny today!\r\n",
+      ch->Send( "List from %d to %d - Aren't we funny today!\r\n",
 	vmin, vmax);
       return;
     }
@@ -70,7 +70,7 @@ ACMD(do_oasis_list)
     case SCMD_OASIS_SLIST: list_shops(ch, rzone, vmin, vmax); break;
     case SCMD_OASIS_ZLIST: list_zones(ch, rzone, vmin, vmax); break;
     default:
-      new_send_to_char(ch, "You can't list that!\r\n");
+      ch->Send( "You can't list that!\r\n");
       new_mudlog(BRF, LVL_IMMORT, TRUE,
         "SYSERR: do_oasis_list: Unknown list option: %d", subcmd);
   }
@@ -89,7 +89,7 @@ ACMD(do_oasis_links)
   one_argument(argument, arg);
     
   if (!arg || !*arg) {
-    new_send_to_char(ch,
+    ch->Send(
       "Syntax: links <zone_vnum> ('.' for zone you are standing in)\r\n");
       return;
     }
@@ -103,21 +103,21 @@ ACMD(do_oasis_links)
   }
     
   if (zrnum == NOWHERE || zvnum == NOWHERE) {
-    new_send_to_char(ch, "No zone was found with that number.\r\n");
+    ch->Send( "No zone was found with that number.\r\n");
     return;
   }
 
   last  = zone_table[zrnum].top;
   first = zone_table[zrnum].bot;
 
-  new_send_to_char(ch, "Zone %d is linked to the following zones:\r\n", zvnum);
+  ch->Send( "Zone %d is linked to the following zones:\r\n", zvnum);
   for (nr = 0; nr <= top_of_world && (GET_ROOM_VNUM(world_vnum[nr]) <= last); nr++) {
     if (GET_ROOM_VNUM(world_vnum[nr]) >= first) {
       for (j = 0; j < NUM_OF_DIRS; j++) {
 	if (world_vnum[nr]->dir_option[j]) {
 	  to_room = world_vnum[nr]->dir_option[j]->to_room;
 	  if (to_room != NULL && (zrnum != to_room->zone))
-	    new_send_to_char(ch, "%3d %-30s at %5d (%-5s) ---> %5d\r\n",
+	    ch->Send( "%3d %-30s at %5d (%-5s) ---> %5d\r\n",
 	      zone_table[to_room->zone].number,
 	      zone_table[to_room->zone].name,
 	      nr, dirs[j], to_room->number);
@@ -135,7 +135,7 @@ ACMD(do_oasis_links)
 /*
  * List all rooms in a zone.                              
  */                                                                           
-void list_rooms(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
+void list_rooms(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
   room_vnum i;
   room_vnum bottom, top;
@@ -164,7 +164,7 @@ void list_rooms(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
     if ((world_vnum[i]->number >= bottom) && (world_vnum[i]->number <= top)) {
       counter++;
       
-      new_send_to_char(ch, "%4d) [%s%-5d%s] %s%-40.40s%s %s",
+      ch->Send( "%4d) [%s%-5d%s] %s%-40.40s%s %s",
                           counter, QGRN, world_vnum[i]->number, QNRM, 
                           QCYN, world_vnum[i]->name, QNRM,
                           world_vnum[i]->proto_script ? "[TRIG] " : ""
@@ -177,22 +177,22 @@ void list_rooms(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
           continue;
           
         if (W_EXIT(world_vnum[i], j)->to_room->zone != world_vnum[i]->zone) 
-          new_send_to_char(ch, "(%s%d%s)", QYEL, W_EXIT(world_vnum[i], j)->to_room->number, QNRM);
+          ch->Send( "(%s%d%s)", QYEL, W_EXIT(world_vnum[i], j)->to_room->number, QNRM);
      
       }
     
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     }
   }
   
   if (counter == 0)
-    new_send_to_char(ch, "No rooms found for zone #%d\r\n", zone_table[rnum].number);
+    ch->Send( "No rooms found for zone #%d\r\n", zone_table[rnum].number);
 }
 
 /*
  * List all mobiles in a zone.                              
  */                                                                           
-void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
+void list_mobiles(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
   mob_rnum i;
   mob_vnum bottom, top;
@@ -206,7 +206,7 @@ void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnu
     top    = vmax;
   }
   
-  new_send_to_char(ch,
+  ch->Send(
   "Index VNum    Mobile Name                                   Level\r\n"
   "----- ------- --------------------------------------------- -----\r\n");
   
@@ -214,7 +214,7 @@ void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnu
     if (mob_index[i].vnum >= bottom && mob_index[i].vnum <= top) {
       counter++;
       
-      new_send_to_char(ch, "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
+      ch->Send( "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
         QGRN, counter, QNRM, QGRN, mob_index[i].vnum, QNRM,
         QCYN, mob_proto[i].player.short_descr, 
         QYEL, mob_proto[i].player.level, QNRM,
@@ -225,13 +225,13 @@ void list_mobiles(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnu
   }
   
   if (counter == 0)
-    new_send_to_char(ch, "None found.\r\n");
+    ch->Send( "None found.\r\n");
 }
 
 /*
  * List all objects in a zone.                              
  */                                                                           
-void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnum vmax)
+void list_objects(Character *ch, zone_rnum rnum, room_vnum vmin, room_vnum vmax)
 {
   shop_rnum i;
   shop_vnum bottom, top;
@@ -245,7 +245,7 @@ void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnu
     top    = vmax;
   }
   
-  new_send_to_char(ch,
+  ch->Send(
   "Index VNum    Object Name                                  Object Type\r\n"
   "----- ------- -------------------------------------------- ----------------\r\n");
   
@@ -253,7 +253,7 @@ void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnu
     if (obj_index[i].vnum >= bottom && obj_index[i].vnum <= top) {
       counter++;
       
-      new_send_to_char(ch, "%s%4d%s) [%s%-5d%s] %s%-35.35s %s[%s]%s%s(%s%s%s)\r\n",
+      ch->Send( "%s%4d%s) [%s%-5d%s] %s%-35.35s %s[%s]%s%s(%s%s%s)\r\n",
         QGRN, counter, QNRM, QGRN, obj_index[i].vnum, QNRM,
         QCYN, obj_proto[i].short_description, QYEL,
                    item_types[(int)obj_proto[i].obj_flags.type_flag], QNRM,
@@ -264,14 +264,14 @@ void list_objects(struct char_data *ch, zone_rnum rnum, room_vnum vmin, room_vnu
   }
   
   if (counter == 0)
-    new_send_to_char(ch, "None found.\r\n");
+    ch->Send( "None found.\r\n");
 }
 
 
 /*
  * List all shops in a zone.                              
  */                                                                           
-void list_shops(struct char_data *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax)
+void list_shops(Character *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax)
 {
   shop_rnum i;
   shop_vnum bottom, top;
@@ -296,32 +296,32 @@ void list_shops(struct char_data *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum 
       
       shop = shop_index + i;
       /* the +1 is strange but fits the rest of the shop code */
-      new_send_to_char(ch, "%s%4d%s) [%s%-5d%s] [%s%-5d%s] [%s%-5d%s]",
+      ch->Send( "%s%4d%s) [%s%-5d%s] [%s%-5d%s] [%s%-5d%s]",
         QGRN, counter, QNRM, QGRN, SHOP_NUM(i), QNRM, QGRN, i + 1, QNRM, QGRN, S_KEEPER(shop) == NOBODY ? -1 : mob_index[S_KEEPER(shop)].vnum, QNRM); 
 	
       
       
       /* Thanks to Ken Ray (kenr86@hotmail.com) for this display fix -- Welcor*/      
       for (j = 0; SHOP_ROOM(i, j) != NULL; j++)
-        new_send_to_char(ch, "%s%s[%s%-5d%s]%s",
+        ch->Send( "%s%s[%s%-5d%s]%s",
                       ((j > 0) && (j % 6 == 0)) ? "\r\n                      " : " ",
                       QCYN, QYEL, SHOP_ROOM(i, j)->number, QCYN, QNRM);
       
       if (j == 0)
-        new_send_to_char(ch, "%sNone.%s", QCYN, QNRM);
+        ch->Send( "%sNone.%s", QCYN, QNRM);
       
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     }
   }
   
   if (counter == 0)
-    new_send_to_char(ch, "None found.\r\n");
+    ch->Send( "None found.\r\n");
 }
 
 /*
  * List all zones in the world (sort of like 'show zones').                              
  */                                                                           
-void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
+void list_zones(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
 {
   int counter = 0;
   zone_rnum i;
@@ -336,12 +336,12 @@ void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
     top    = vmax;
   }
   
-  new_send_to_char(ch,
+  ch->Send(
   "VNum  Zone Name                      Builder(s)\r\n"
   "----- ------------------------------ --------------------------------------\r\n");
  for (i = 0; i <= top_of_zone_table; i++) {
     if (zone_table[i].number >= bottom && zone_table[i].number <= top) {
-    new_send_to_char(ch, "[%s%3d%s] %s%-30.30s %s%-1s%s\r\n",
+    ch->Send( "[%s%3d%s] %s%-30.30s %s%-1s%s\r\n",
       QGRN, zone_table[i].number, QNRM, QCYN, zone_table[i].name,
       QYEL, zone_table[i].builders ? zone_table[i].builders : "None.", QNRM);
       
@@ -350,7 +350,7 @@ void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
   }
   
   if (!counter)
-    new_send_to_char(ch, "  None found within those parameters.\r\n");
+    ch->Send( "  None found within those parameters.\r\n");
 }
 
 
@@ -358,7 +358,7 @@ void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum 
 /*
  * Prints all of the zone information for the selected zone.
  */
-void print_zone(struct char_data *ch, zone_rnum rnum)
+void print_zone(Character *ch, zone_rnum rnum)
 {
   int size_rooms, size_objects, size_mobiles, i;
   room_vnum top, bottom;
@@ -403,7 +403,7 @@ void print_zone(struct char_data *ch, zone_rnum rnum)
   /****************************************************************************/
   /** Display all of the zone information at once.                           **/
   /****************************************************************************/
-  new_send_to_char(ch,
+  ch->Send(
     "%sVirtual Number = %s%d\r\n"
     "%sName of zone   = %s%s\r\n"
     "%sBuilders       = %s%s\r\n"
@@ -432,9 +432,10 @@ void print_zone(struct char_data *ch, zone_rnum rnum)
 }
 
 /* List code by Ronald Evers - dlanor@xs4all.nl */
-void list_triggers(struct char_data *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax)
+void list_triggers(Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax)
 {
-  int i, bottom, top, counter = 0;
+  int bottom, top, counter = 0;
+  unsigned int i;
   char trgtypes[256];
 
   /** Expect a minimum / maximum number if the rnum for the zone is NOWHERE. **/
@@ -459,23 +460,23 @@ void list_triggers(struct char_data *ch, zone_rnum rnum, trig_vnum vmin, trig_vn
     if ((trig_index[i]->vnum >= bottom) && (trig_index[i]->vnum <= top)) {
       counter++;
 
-      new_send_to_char(ch, "%4d) [%s%5d%s] %s%-45.45s ",
+      ch->Send( "%4d) [%s%5d%s] %s%-45.45s ",
         counter, QGRN, trig_index[i]->vnum, QNRM, QCYN, trig_index[i]->proto->name);
 
        if (trig_index[i]->proto->attach_type == OBJ_TRIGGER) {
         new_sprintbit(GET_TRIG_TYPE(trig_index[i]->proto), otrig_types, trgtypes, sizeof(trgtypes));
-        new_send_to_char(ch, "obj %s%s%s\r\n", QYEL, trgtypes, QNRM);
+        ch->Send( "obj %s%s%s\r\n", QYEL, trgtypes, QNRM);
 } else if (trig_index[i]->proto->attach_type == WLD_TRIGGER) {
         new_sprintbit(GET_TRIG_TYPE(trig_index[i]->proto), wtrig_types, trgtypes, sizeof(trgtypes));
-        new_send_to_char(ch, "wld %s%s%s\r\n", QYEL, trgtypes, QNRM);
+        ch->Send( "wld %s%s%s\r\n", QYEL, trgtypes, QNRM);
       } else {
         new_sprintbit(GET_TRIG_TYPE(trig_index[i]->proto), trig_types, trgtypes, sizeof(trgtypes));
-        new_send_to_char(ch, "mob %s%s%s\r\n", QYEL, trgtypes, QNRM);
+        ch->Send( "mob %s%s%s\r\n", QYEL, trgtypes, QNRM);
       }
 
     }
   }
 
   if (counter == 0)
-    new_send_to_char(ch, "No triggers found for zone #%d\r\n", zone_table[rnum].number);
+    ch->Send( "No triggers found for zone #%d\r\n", zone_table[rnum].number);
 }

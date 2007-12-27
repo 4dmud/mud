@@ -33,20 +33,20 @@ extern const char *pc_class_types[];
 
 /* external functions */
 
-void hit_death_trap(CHAR_DATA *ch);
-void do_objstat(struct char_data *ch, struct obj_data *j);
-void do_sstat_objdump(char_data * ch, obj_data * j);
-void script_stat_dump(char_data * ch, struct script_data *sc);
-void affect_modify_ar(struct char_data *ch, byte loc, sbyte mod,
+void hit_death_trap(Character *ch);
+void do_objstat(Character *ch, struct obj_data *j);
+void do_sstat_objdump(Character * ch, obj_data * j);
+void script_stat_dump(Character * ch, struct script_data *sc);
+void affect_modify_ar(Character *ch, byte loc, sbyte mod,
                       int bitv[], bool add);
-void improve_skill(struct char_data *ch, int skill);
-void dismount_char(struct char_data *ch);
-int can_breathe_underwater(struct char_data *ch);
-int has_space_suit(struct char_data *ch);
-int has_sun_protection(struct char_data *ch);
-int invalid_align(struct char_data *ch, struct obj_data *obj);
+void improve_skill(Character *ch, int skill);
+void dismount_char(Character *ch);
+int can_breathe_underwater(Character *ch);
+int has_space_suit(Character *ch);
+int has_sun_protection(Character *ch);
+int invalid_align(Character *ch, struct obj_data *obj);
 int zdelete_check(int zone);
-void perform_remove(struct char_data *ch, int pos);
+void perform_remove(Character *ch, int pos);
 
 
 
@@ -223,7 +223,7 @@ ACMD(do_objdump)
 }
 
 
-void do_objstat(struct char_data *ch, struct obj_data *j)
+void do_objstat(Character *ch, struct obj_data *j)
 {
   int i, found;
   obj_vnum vnum;
@@ -360,7 +360,7 @@ void do_objstat(struct char_data *ch, struct obj_data *j)
   //  }
 }
 
-void do_sstat_objdump(char_data * ch, obj_data * j)
+void do_sstat_objdump(Character * ch, obj_data * j)
 {
   FILE *fp;
 
@@ -380,7 +380,7 @@ void do_sstat_objdump(char_data * ch, obj_data * j)
 
 
 /* general function to display stats on script sc */
-void script_stat_dump(char_data * ch, struct script_data *sc)
+void script_stat_dump(Character * ch, struct script_data *sc)
 {
   struct trig_var_data *tv;
   trig_data *t;
@@ -445,7 +445,7 @@ void script_stat_dump(char_data * ch, struct script_data *sc)
 
 ACMD(do_linkload)
 {
-  struct char_data *victim = 0;
+  Character *victim = 0;
   char arg[MAX_INPUT_LENGTH];
 
   one_argument(argument, arg);
@@ -462,7 +462,7 @@ ACMD(do_linkload)
     return;
   }
 
-  CREATE(victim, struct char_data, 1);
+  CREATE(victim, Character, 1);
   clear_char(victim);
   CREATE(victim->player_specials, struct player_special_data, 1);
   if (GET_IDNUM(ch))
@@ -509,7 +509,7 @@ ACMD(do_find)
     if ((obj = read_object(nr, REAL)) &&
         (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ARTIFACT)))
     {
-      new_send_to_char(ch, "QIC Flag on %s, vnum: %d.\r\n",
+      ch->Send( "QIC Flag on %s, vnum: %d.\r\n",
                        obj->short_description, GET_OBJ_VNUM(obj));
       
     }
@@ -555,7 +555,7 @@ ACMD(do_reload)
 
   if (GET_OBJ_VAL(weapon, 2) >= GET_OBJ_VAL(weapon, 1))
   {
-    new_send_to_char(ch, "%s is fully loaded.\r\n", weapon->short_description);
+    ch->Send( "%s is fully loaded.\r\n", weapon->short_description);
     return;
   }
   else
@@ -596,9 +596,9 @@ return "crackling hazy black";
 }
 
 
-#define TEST(x) new_send_to_char(ch, "%d\r\n", (x));
+#define TEST(x) ch->Send( "%d\r\n", (x));
 
-int check_dam_affects(struct char_data *ch)
+int check_dam_affects(Character *ch)
 {
   struct obj_data *obj = NULL;
   char buf[MAX_STRING_LENGTH];
@@ -608,31 +608,31 @@ int check_dam_affects(struct char_data *ch)
 
   if (AFF_FLAGGED(ch, AFF_SUFFOCATING))
   {
-    if (damage(ch, ch, number(25, 50) + (GET_MAX_HIT(ch) * 0.01), SPELL_SUFFOCATE) == -1)
+    if (damage(ch, ch, FTOI(number(25, 50) + (GET_MAX_HIT(ch) * 0.01)), SPELL_SUFFOCATE) == -1)
       return -1;
   }
   if (!MOB_FLAGGED(ch, MOB_NOPOISON))
   {
     if (AFF_FLAGGED(ch, AFF_POISON_1))
     {
-      if (damage(ch, ch, 20 + (GET_MAX_HIT(ch) * 0.0001), SPELL_POISON) == -1)
+      if (damage(ch, ch, FTOI(20 + (GET_MAX_HIT(ch) * 0.0001)), SPELL_POISON) == -1)
       {
         return -1;
       }
-      alter_mana(ch, GET_MANA(ch)/25.0);
-      alter_move(ch, GET_MOVE(ch)/25.0);
+      alter_mana(ch, FTOI(GET_MANA(ch)/25.0));
+      alter_move(ch, FTOI(GET_MOVE(ch)/25.0));
 
     }
 
 
     if (AFF_FLAGGED(ch, AFF_POISON_2))
     {
-      if (damage(ch, ch, 75 + (GET_MAX_HIT(ch) * 0.0002), SPELL_POISON) == -1)
+      if (damage(ch, ch, FTOI(75 + (GET_MAX_HIT(ch) * 0.0002)), SPELL_POISON) == -1)
       {
         return -1;
       }
-      alter_mana(ch, GET_MANA(ch)/16.0);
-      alter_move(ch, GET_MOVE(ch)/16.0);
+      alter_mana(ch, FTOI(GET_MANA(ch)/16.0));
+      alter_move(ch, FTOI(GET_MOVE(ch)/16.0));
 
     }
 
@@ -640,22 +640,22 @@ int check_dam_affects(struct char_data *ch)
 
     if (AFF_FLAGGED(ch, AFF_POISON_3))
     {
-      if (damage(ch, ch, 150 + (GET_MAX_HIT(ch) * 0.0003), SPELL_POISON) == -1)
+      if (damage(ch, ch, FTOI(150 + (GET_MAX_HIT(ch) * 0.0003)), SPELL_POISON) == -1)
         return -1;
 
-      alter_mana(ch, GET_MANA(ch)/8.0);
-      alter_move(ch, GET_MOVE(ch)/8.0);
+      alter_mana(ch, FTOI(GET_MANA(ch)/8.0));
+      alter_move(ch, FTOI(GET_MOVE(ch)/8.0));
 
     }
 
 
     if (AFF_FLAGGED(ch, AFF_POISON_4))
     {
-      if (damage(ch, ch, 200 + (GET_MAX_HIT(ch) * 0.0004), SPELL_POISON) == -1)
+      if (damage(ch, ch, FTOI(200 + (GET_MAX_HIT(ch) * 0.0004)), SPELL_POISON) == -1)
         return -1;
 
-      alter_mana(ch, (GET_MANA(ch)/6.0)+2);
-      alter_move(ch, (GET_MOVE(ch)/6.0)+2);
+      alter_mana(ch, FTOI((GET_MANA(ch)/6.0)+2));
+      alter_move(ch, FTOI((GET_MOVE(ch)/6.0)+2));
 
     }
   }
@@ -664,7 +664,7 @@ int check_dam_affects(struct char_data *ch)
   {
     if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
     {
-      new_send_to_char(ch,"Your weapon becomes too heavy for you.\r\n");
+      ch->Send("Your weapon becomes too heavy for you.\r\n");
       perform_remove(ch, WEAR_WIELD_2);
     }
   }
@@ -672,7 +672,7 @@ int check_dam_affects(struct char_data *ch)
   {
     if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
     {
-      new_send_to_char(ch, "Your weapon becomes too heavy for you.\r\n");
+      ch->Send( "Your weapon becomes too heavy for you.\r\n");
       perform_remove(ch, WEAR_WIELD);
     }
   }
@@ -734,7 +734,7 @@ int check_dam_affects(struct char_data *ch)
 
 void sector_update(void)
 {
-  struct char_data *i, *next_char;
+  Character *i, *next_char;
 
   for (i = character_list; i != NULL; i = next_char)
   {
@@ -784,7 +784,7 @@ void sector_update(void)
 }
 
 
-int can_mate_with(struct char_data *ch, struct char_data *mate)
+int can_mate_with(Character *ch, Character *mate)
 {
   if (!MOB_FLAGGED(mate, MOB_CAN_MATE))
     return (0);
@@ -807,7 +807,7 @@ int can_mate_with(struct char_data *ch, struct char_data *mate)
 
 void mobile_mating(void)
 {
-  struct char_data *i, *k = NULL, *next_char;
+  Character *i, *k = NULL, *next_char;
 
   for (i = character_list; i != NULL; i = next_char)
   {
@@ -839,20 +839,20 @@ void mobile_mating(void)
   }
 }
 
-void log_push_to_death(struct char_data *ch, struct char_data *attacker)
+void log_push_to_death(Character *ch, Character *attacker)
 {
   new_mudlog(BRF, LVL_GOD, TRUE, "%s pushed to Death Trap #%d (%s)", GET_NAME(ch),
              IN_ROOM(ch)->number, IN_ROOM(ch)->name);
   new_mudlog(BRF, LVL_GOD, TRUE, "Pushed by %s", GET_NAME(attacker));
 }
 
-int perform_push(struct char_data *ch, int dir, int need_specials_check,
-                 struct char_data *attacker)
+int perform_push(Character *ch, int dir, int need_specials_check,
+                 Character *attacker)
 {
   room_rnum was_in;
-  int House_can_enter(struct char_data *ch, room_vnum house);
-  void death_cry(struct char_data *ch);
-  int special(struct char_data *ch, int cmd, char *arg);
+  int House_can_enter(Character *ch, room_vnum house);
+  void death_cry(Character *ch);
+  int special(Character *ch, int cmd, char *arg);
   char buf2[MAX_INPUT_LENGTH];
 
   if (need_specials_check && special(ch, dir + 1, ""))
@@ -862,14 +862,14 @@ int perform_push(struct char_data *ch, int dir, int need_specials_check,
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master &&
       IN_ROOM(ch) == ch->master->in_room)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "The thought of leaving your master makes you weep.\r\n");
     new_send_to_char(attacker, "You cant push charmies!\r\n");
     return 0;
   }
   if (!enter_wtrigger(EXIT(ch, dir)->to_room, ch, dir))
   {
-    new_send_to_char(ch, "You slam into an invisible barrier!\r\n");
+    ch->Send( "You slam into an invisible barrier!\r\n");
     new_send_to_char(attacker, "You push, but can't get them into that room.\r\n");
     return 0;
   }
@@ -878,7 +878,7 @@ int perform_push(struct char_data *ch, int dir, int need_specials_check,
   {
     if (!House_can_enter(ch, EXIT(ch, dir)->to_room->number))
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You are pushed, but you can't tresspass!\r\n");
       return 0;
     }
@@ -916,7 +916,7 @@ int perform_push(struct char_data *ch, int dir, int need_specials_check,
 
 ACMD(do_finger)
 {
-  struct char_data *vict;
+  Character *vict;
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   char state[MAX_INPUT_LENGTH];
@@ -945,12 +945,12 @@ ACMD(do_finger)
   }
   if (!d)
   {
-    CREATE(vict, struct char_data, 1);
+    CREATE(vict, Character, 1);
     clear_char(vict);
     TEMP_LOAD_CHAR = TRUE;
     if (store_to_char(arg, vict) == -1)
     {
-      new_send_to_char(ch, "Player doesn't exist.\r\n");
+      ch->Send( "Player doesn't exist.\r\n");
       TEMP_LOAD_CHAR = FALSE;
       free(vict);
       return;
@@ -986,7 +986,7 @@ ACMD(do_finger)
   {
     strcpy(state, "Logged Out");
   }
-  new_send_to_char(ch,
+  ch->Send(
                    "\r\n {cyO-----------------------------------------------------------O{c0\r\n"
                    "     {ccName: {cg%-15s{ccRace: {cg%-8s        {ccClass: {cg%-8s\r\n"
                    "  {ccRemorts: {cg%-3d           {ccLevel: {cg%-2d       {ccCurrent Tier: {cg%d\r\n"
@@ -1029,7 +1029,7 @@ ACMD(do_zlist)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
-  new_send_to_char(ch, "Please use: show zones\r\n");
+  ch->Send( "Please use: show zones\r\n");
   return;
 
   int first, last, nr, found = 0;
@@ -1059,7 +1059,7 @@ ACMD(do_zlist)
 
   for (nr = 0; nr <= top_of_zone_table; nr++)
   {
-    new_send_to_char(ch, "%5d. [%5d] %-60s %ld\r\n", ++found,
+    ch->Send( "%5d. [%5d] %-60s %ld\r\n", ++found,
                      zone_table[nr].number,
                      zone_table[nr].name, zone_table[nr].zone_flags);
   }
@@ -1068,7 +1068,7 @@ ACMD(do_zlist)
     send_to_char("No mobiles were found in those parameters.\r\n", ch);
 }
 
-void zap_char(struct char_data *victim)
+void zap_char(Character *victim)
 {
   int i;
   struct obj_data *obj = NULL;
@@ -1108,7 +1108,7 @@ void zap_char(struct char_data *victim)
 ACMD(do_smite)
 {				/* by Garion */
   struct obj_data *obj;
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -1244,7 +1244,7 @@ ACMD(do_blowup)
 
 void explosion_messages(room_rnum room, int damage, struct obj_data *target)
 {
-  struct char_data *tch;
+  Character *tch;
 
   while (room->people != NULL)
   {
@@ -1637,13 +1637,13 @@ ACMD(do_mpdelayed)
     log("Mpdelayed - the delay is invalid.");
   else
   {
-    new_send_to_char(ch, "Ok. Executing '%s' in %d seconds.\r\n", buf,
+    ch->Send( "Ok. Executing '%s' in %d seconds.\r\n", buf,
                      delay);
     add_event2(delay, delayed_command, ch, NULL, strdup(buf));
   };
 }
 
-int has_metal_detector(struct char_data *ch)
+int has_metal_detector(Character *ch)
 {
   if (GET_LEVEL(ch) >= LVL_IMPL)
     return (1);

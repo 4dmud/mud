@@ -57,7 +57,7 @@ ACMD(do_oasis_aedit)
 
   if (CONFIG_NEW_SOCIALS == 0)
   {
-    new_send_to_char(ch, "Socials cannot be edited at the moment.\r\n");
+    ch->Send( "Socials cannot be edited at the moment.\r\n");
     return;
   }
 
@@ -66,7 +66,7 @@ ACMD(do_oasis_aedit)
   for (d = descriptor_list; d; d = d->next)
     if (STATE(d) == CON_AEDIT)
     {
-      new_send_to_char(ch, "Sorry, only one can edit socials at a time.\r\n");
+      ch->Send( "Sorry, only one can edit socials at a time.\r\n");
       return;
     }
 
@@ -74,7 +74,7 @@ ACMD(do_oasis_aedit)
 
   if (!*arg)
   {
-    new_send_to_char(ch, "Please specify a social to edit.\r\n");
+    ch->Send( "Please specify a social to edit.\r\n");
     return;
   }
 
@@ -83,9 +83,9 @@ ACMD(do_oasis_aedit)
   if (!str_cmp("save", arg))
   {
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, "OLC: %s saves socials.", GET_NAME(ch));
-    new_send_to_char(ch, "Writing social file..\r\n");
+    ch->Send( "Writing social file..\r\n");
     aedit_save_to_disk(d);
-    new_send_to_char(ch, "Done.\r\n");
+    ch->Send( "Done.\r\n");
     return;
   }
 
@@ -110,16 +110,16 @@ ACMD(do_oasis_aedit)
   {
     if ((i = aedit_find_command(OLC_STORAGE(d))) != -1)
     {
-      new_send_to_char(ch, "The '%s' command already exists (%s).\r\n", OLC_STORAGE(d), complete_cmd_info[i].command);
+      ch->Send( "The '%s' command already exists (%s).\r\n", OLC_STORAGE(d), complete_cmd_info[i].command);
       cleanup_olc(d, CLEANUP_ALL);
       return;
     }
-    new_send_to_char(ch, "Do you wish to add the '%s' action? ", OLC_STORAGE(d));
+    ch->Send( "Do you wish to add the '%s' action? ", OLC_STORAGE(d));
     OLC_MODE(d) = AEDIT_CONFIRM_ADD;
   }
   else
   {
-    new_send_to_char(ch, "Do you wish to edit the '%s' action? ", soc_mess_list[OLC_ZNUM(d)].command);
+    ch->Send( "Do you wish to edit the '%s' action? ", soc_mess_list[OLC_ZNUM(d)].command);
     OLC_MODE(d) = AEDIT_CONFIRM_EDIT;
   }
   STATE(d) = CON_AEDIT;
@@ -287,7 +287,7 @@ void aedit_save_to_disk(struct descriptor_data *d)
 void aedit_disp_menu(struct descriptor_data * d)
 {
   struct social_messg *action = OLC_ACTION(d);
-  struct char_data *ch        = d->character;
+  Character *ch        = d->character;
 
   get_char_colors(ch);
 
@@ -838,7 +838,7 @@ ACMD(do_astat)
 
   if(!*arg)
   {
-    new_send_to_char(ch, "Astat which social?\r\n");
+    ch->Send( "Astat which social?\r\n");
     return;
   }
 
@@ -853,12 +853,12 @@ ACMD(do_astat)
 
   if (!real)
   {
-    new_send_to_char(ch, "No such social.\r\n");
+    ch->Send( "No such social.\r\n");
     return;
   }
 
   get_char_colors(ch);
-  new_send_to_char(ch,
+  ch->Send(
                    "n) Command         : %s%-15.15s%s 1) Sort as Command : %s%-15.15s%s\r\n"
                    "2) Min Position[CH]: %s%-8.8s%s        3) Min Position[VT]: %s%-8.8s%s\r\n"
                    "4) Min Level   [CH]: %s%-3d%s             5) Show if Invis   : %s%s%s\r\n"

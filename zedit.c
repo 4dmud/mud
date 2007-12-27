@@ -22,7 +22,7 @@
 extern struct zone_data *zone_table;
 extern zone_rnum top_of_zone_table;
 extern struct index_data *mob_index;
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern struct index_data *obj_index;
 extern struct obj_data *obj_proto;
 extern struct descriptor_data *descriptor_list;
@@ -86,12 +86,12 @@ ACMD(do_oasis_zedit)
       }
       
       if (number == NOWHERE) {
-        new_send_to_char(ch, "Save which zone?\r\n");
+        ch->Send( "Save which zone?\r\n");
         return;
       }
     } else if (GET_LEVEL(ch) >= LVL_IMPL) {
       if (str_cmp("new", buf1) || !buf3 || !*buf3)
-        new_send_to_char(ch, "Format: zedit new <zone number> <bottom-room> <top-room>\r\n");
+        ch->Send( "Format: zedit new <zone number> <bottom-room> <top-room>\r\n");
       else {
         char sbot[MAX_INPUT_LENGTH], stop[MAX_INPUT_LENGTH];
         room_vnum bottom, top;
@@ -116,7 +116,7 @@ ACMD(do_oasis_zedit)
       return;
       
     } else {
-      new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
+      ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
   }
@@ -133,7 +133,7 @@ ACMD(do_oasis_zedit)
   for (d = descriptor_list; d; d = d->next) {
     if (STATE(d) == CON_ZEDIT) {
       if (d->olc && OLC_NUM(d) == number) {
-        new_send_to_char(ch, "That zone is currently being edited by %s.\r\n",
+        ch->Send( "That zone is currently being edited by %s.\r\n",
           PERS(d->character, ch));
         return;
       }
@@ -161,7 +161,7 @@ ACMD(do_oasis_zedit)
   /****************************************************************************/
   OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
   if (OLC_ZNUM(d) == NOWHERE) {
-    new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    ch->Send( "Sorry, there is no zone for that number!\r\n");
     
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
@@ -175,7 +175,7 @@ ACMD(do_oasis_zedit)
   /** Everyone but IMPLs can only edit zones they have been assigned.        **/
   /****************************************************************************/
   if (!can_edit_zone(ch, OLC_ZNUM(d))) {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE,
       "OLC: %s tried to edit zone %d allowed zone %d", GET_NAME(ch),
       zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
@@ -188,7 +188,7 @@ ACMD(do_oasis_zedit)
   /** If we need to save, then save the zone.                                **/
   /****************************************************************************/
   if (save) {
-    new_send_to_char(ch, "Saving all zone information for zone %d.\r\n",
+    ch->Send( "Saving all zone information for zone %d.\r\n",
       zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
       "OLC: %s saves zone information for zone %d.", GET_NAME(ch),
@@ -302,7 +302,7 @@ void zedit_setup(struct descriptor_data *d, room_rnum room_num)
 /*
  * Create a new zone.
  */
-void zedit_new_zone(struct char_data *ch, zone_vnum vzone_num, room_vnum bottom, room_vnum top)
+void zedit_new_zone(Character *ch, zone_vnum vzone_num, room_vnum bottom, room_vnum top)
 {
   int result;
   const char *error;

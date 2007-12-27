@@ -53,9 +53,9 @@ Using
   ch->points.hit.  When you use this patch, any changes must be done using
   the functions:
  
-      void alter_hit(struct char_data *ch, int amount);
-      void alter_mana(struct char_data *ch, int amount);
-      void alter_move(struct char_data *ch, int amount);
+      void alter_hit(Character *ch, int amount);
+      void alter_mana(Character *ch, int amount);
+      void alter_move(Character *ch, int amount);
  
   The first argument is the character to alter.  The second argument is
   the number of points to subtract from the points.  To add points, use
@@ -67,7 +67,7 @@ Using
   Another function is provided to update regeneration on all three points
   types:
  
-      void check_regen_rates(struct char_data *ch);
+      void check_regen_rates(Character *ch);
  
   This will make sure that any point category below maximum has an event
   to regenerate it.  It also will recalculate the regeneration rate if
@@ -145,7 +145,7 @@ http://www.imaxx.net/~thrytis
 /* event object structure for point regen */
 struct regen_event_obj
 {
-  struct char_data *ch;	/* character regening */
+  Character *ch;	/* character regening */
   int type;			/* HIT, MOVE, or MANA */
 };
 
@@ -153,7 +153,7 @@ struct regen_event_obj
 EVENTFUNC(points_event)
 {
   struct regen_event_obj *regen = (struct regen_event_obj *) event_obj;
-  struct char_data *ch = regen->ch;
+  Character *ch = regen->ch;
   int type, gain;
 
 
@@ -166,7 +166,7 @@ EVENTFUNC(points_event)
 #if 0
     {
       int found = FALSE;
-      struct char_data *tch;
+      Character *tch;
       for (tch = character_list;tch&&!found;tch = tch->next)
       {
         /** Assume Unique **/
@@ -233,7 +233,7 @@ EVENTFUNC(points_event)
       if (GET_STAMINA(ch) < GET_MAX_STAMINA(ch))
       {
         if (ch->desc && GET_STAMINA(ch) * 20 < GET_MAX_STAMINA(ch))
-          new_send_to_char(ch, "You pant heavily, deep and fast.\r\n");
+          ch->Send( "You pant heavily, deep and fast.\r\n");
 
         /* reenqueue the event */
         gain = stamina_gain(ch);
@@ -271,7 +271,7 @@ EVENTFUNC(points_event)
 /*
  * subtracts amount of hitpoints from ch's current and starts points event
  */
-void alter_hit(struct char_data *ch, int amount)
+void alter_hit(Character *ch, int amount)
 {
 
   GET_HIT(ch) = MIN(GET_HIT(ch) - amount, GET_MAX_HIT(ch));
@@ -313,7 +313,7 @@ void alter_hit(struct char_data *ch, int amount)
 /*
  * subtracts amount of mana from ch's current and starts points event
  */
-void alter_mana(struct char_data *ch, int amount)
+void alter_mana(Character *ch, int amount)
 {
 
 
@@ -347,7 +347,7 @@ void alter_mana(struct char_data *ch, int amount)
 /*
  * subtracts amount of moves from ch's current and starts points event
  */
-void alter_move(struct char_data *ch, int amount)
+void alter_move(Character *ch, int amount)
 {
 
 
@@ -383,7 +383,7 @@ void alter_move(struct char_data *ch, int amount)
 /*
  * subtracts amount of moves from ch's current and starts points event
  */
-void alter_stamina(struct char_data *ch, int amount)
+void alter_stamina(Character *ch, int amount)
 {
 
 
@@ -425,7 +425,7 @@ void alter_stamina(struct char_data *ch, int amount)
 }
 
 /* updates regen rates.  Use when big regen rate changes are made */
-void check_regen_rates(struct char_data *ch)
+void check_regen_rates(Character *ch)
 {
   struct regen_event_obj *regen;
   int type, gain = 0;

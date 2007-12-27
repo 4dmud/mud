@@ -25,24 +25,24 @@ struct auction_data *auction;
  * Function prototypes.
  */
 void free_auction(struct auction_data *auc);
-void auction_forfeit(struct char_data *mob);
+void auction_forfeit(Character *mob);
 void auction_reset(void);
 int is_on_block(struct obj_data *obj);
-struct obj_data *check_obj(struct char_data *ch, struct obj_data *obj);
-struct char_data *check_ch(struct char_data *ch);
-void show_auction_status(struct char_data *ch);
+struct obj_data *check_obj(Character *ch, struct obj_data *obj);
+Character *check_ch(Character *ch);
+void show_auction_status(Character *ch);
 ACMD(do_gen_comm);
-struct char_data *get_char_auc(char *name);
+Character *get_char_auc(char *name);
 
-bool can_auction_item(struct char_data * ch, struct obj_data * obj);
+bool can_auction_item(Character * ch, struct obj_data * obj);
 
 /*
  * External global variables.
  */
-extern struct char_data *character_list;
+extern Character *character_list;
 extern struct room_data *world;
 
-void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
+void identify_object(Character *ch, OBJ_DATA *obj);
 /*
  * User tweakables.
  */
@@ -65,7 +65,7 @@ int valid_auction(struct auction_data *ac)
 void auction_update(void)
 {
   char buf2[MAX_STRING_LENGTH];
-  struct char_data *mob = NULL;
+  Character *mob = NULL;
 
   if (auction && auction->ticks == AUC_NONE)
     while (auction && !valid_auction(auction)) {
@@ -178,13 +178,13 @@ void auction_update(void)
 ACMD(do_bid)
 {
   long bid;
-  struct char_data *mob = get_char_auc((char *)AUC_MOB);
+  Character *mob = get_char_auc((char *)AUC_MOB);
   int num = 0, i = 0;
   char buf[MAX_INPUT_LENGTH], buf1[MAX_INPUT_LENGTH];
   struct auction_data *auc = auction;
 
   if (!auc) {
-    new_send_to_char(ch, "Nothing has been auctioned!\r\n");
+    ch->Send( "Nothing has been auctioned!\r\n");
     return;
   }
   
@@ -209,49 +209,49 @@ ACMD(do_bid)
   }
 
   if (i != num) {
-    new_send_to_char(ch, "That number does not exist.\r\n");
+    ch->Send( "That number does not exist.\r\n");
     return;
   } else if (i == 0)
     *buf1 = '\0';
 
   if (auc->ticks == AUC_NONE) {
-    new_send_to_char(ch, "Nothing is up for sale.\r\n");
+    ch->Send( "Nothing is up for sale.\r\n");
     return;
   }
   if (!*buf) {
-  new_send_to_char(ch, "Current bid: %ld coin%s\r\n", auc->bid,
+  ch->Send( "Current bid: %ld coin%s\r\n", auc->bid,
         auc->bid != 1 ? "s." : ".");
    } else if (isname(buf, "stat")) {
      gold_int bid_stat = 0;
      if (auc->bid < 1000)
        bid_stat = 1000;
      else
-       bid_stat = auc->bid * 0.1;
+       bid_stat = (gold_int)(auc->bid * 0.1);
      if (char_gold(ch, 0, GOLD_HAND) < bid_stat) {
-       new_send_to_char(ch, "You need at least %lld gold to stat that item.\r\n", bid_stat);
+       ch->Send( "You need at least %lld gold to stat that item.\r\n", bid_stat);
        return;
      }
      char_gold(ch, -bid_stat, GOLD_HAND);
      identify_object(ch, auc->obj);
   }
   else if (ch == auc->bidder)
-    new_send_to_char(ch, "You're trying to outbid yourself.\r\n");
+    ch->Send( "You're trying to outbid yourself.\r\n");
   else if (ch == auc->seller)
-    new_send_to_char(ch, "You can't bid on your own item.\r\n");
+    ch->Send( "You can't bid on your own item.\r\n");
   else if (!isname(buf1, auc->obj->name) && *buf1 && num == 0)
-    new_send_to_char(ch, "That object is not for sale currently.\r\n");
+    ch->Send( "That object is not for sale currently.\r\n");
   else if (bid < auc->bid && !auc->bidder) {
-    new_send_to_char(ch, "You have to bid over the minimum of %ld coin%s\r\n",
+    ch->Send( "You have to bid over the minimum of %ld coin%s\r\n",
     auc->bid, auc->bid != 1 ? "s." : ".");
   } else if ((bid < (auc->bid * 1.05) && auc->bidder) || bid == 0) {
-    new_send_to_char(ch, "Try bidding at least 5%% over the current bid of %ld. (%.0f coins).\r\n",
+    ch->Send( "Try bidding at least 5%% over the current bid of %ld. (%.0f coins).\r\n",
         auc->bid, auc->bid * 1.05 + 1);
   } else if (char_gold(ch, 0, GOLD_HAND) < bid) {
-    new_send_to_char(ch, "You have only %lld coins on hand.\r\n", char_gold(ch, 0, GOLD_HAND));
+    ch->Send( "You have only %lld coins on hand.\r\n", char_gold(ch, 0, GOLD_HAND));
   } else if (PLR_FLAGGED(ch, PLR_NOSHOUT))
-    new_send_to_char(ch, "You can't auction.\r\n");
+    ch->Send( "You can't auction.\r\n");
   else if (mob == NULL)
-    new_send_to_char(ch, "The auctioneer seems to be dead.\r\n");
+    ch->Send( "The auctioneer seems to be dead.\r\n");
   else {
     if (auc->bidder) {
       new_send_to_char(auc->bidder, "%s has placed a %ld bid over your %ld bid for %s.\r\n",
@@ -266,7 +266,7 @@ ACMD(do_bid)
       if (auc->bid != 1) strcat(buf2, "s."); else strcat(buf2, ".");
       do_gen_comm(ch, buf2, 0, SCMD_AUCTION);
     } else {
-      new_send_to_char(ch, "A %ld coin bid placed on %s.\r\n", bid,
+      ch->Send( "A %ld coin bid placed on %s.\r\n", bid,
          auc->obj->short_description);
     }
   }
@@ -275,7 +275,7 @@ ACMD(do_bid)
 ACMD(do_auction)
 {
   struct obj_data *obj;
-  struct char_data *mob = get_char_auc(AUC_MOB);
+  Character *mob = get_char_auc(AUC_MOB);
   struct auction_data *auc_add;
   char buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   int i = 0;
@@ -283,32 +283,32 @@ ACMD(do_auction)
   two_arguments(argument, buf1, buf2);
 
   if (!*buf1) {
-    new_send_to_char(ch, "Format: auction item [min]\r\n"
+    ch->Send( "Format: auction item [min]\r\n"
           "        auction list/status\r\n");
     if (GET_LEVEL(ch) >= LVL_GOD)
-      new_send_to_char(ch, "        auction stop\r\n");
-    new_send_to_char(ch, "Auction what for what minimum?\r\n");
+      ch->Send( "        auction stop\r\n");
+    ch->Send( "Auction what for what minimum?\r\n");
   } else if (isname(buf1, "list status"))
     show_auction_status(ch);
 
   else if (GET_LEVEL(ch) >= LVL_GOD && is_abbrev(buf1, "stop"))
     auction_reset();
   else if ((obj = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)) == NULL) {
-    new_send_to_char(ch, "You don't seem to have that to sell.\r\n");
+    ch->Send( "You don't seem to have that to sell.\r\n");
   } else if (is_on_block(obj))
-    new_send_to_char(ch, "You are already auctioning that!\r\n");
+    ch->Send( "You are already auctioning that!\r\n");
   else if (OBJ_FLAGGED(obj, ITEM_NOSELL) || !can_auction_item(ch, obj))
-    new_send_to_char(ch, "You can't auction that item.\r\n");
+    ch->Send( "You can't auction that item.\r\n");
   else if (mob == NULL)
-    new_send_to_char(ch, "The auctioneer seems to be dead.\r\n");
+    ch->Send( "The auctioneer seems to be dead.\r\n");
   else if((atoi(buf2) != 0 ? atoi(buf2) : 1)<0){
-    new_send_to_char(ch, "Try a positive amount instead.\r\n");
+    ch->Send( "Try a positive amount instead.\r\n");
   }
   else {
     struct auction_data *n_auc;
     for (n_auc = auction; n_auc && n_auc->next; n_auc = n_auc->next, i++);
     if (i >= AUC_LIMIT) {
-      new_send_to_char(ch, "Sorry, only %d items allowed on the block at a time.\r\n", AUC_LIMIT);
+      ch->Send( "Sorry, only %d items allowed on the block at a time.\r\n", AUC_LIMIT);
       return;
     }
     CREATE(auc_add, struct auction_data, 1);
@@ -323,10 +323,10 @@ ACMD(do_auction)
     else
       auction = auc_add;     /* Making the list. */
     if (i)
-    new_send_to_char(ch, "Auction noted, currently %d item%sahead of yours.\r\n",
+    ch->Send( "Auction noted, currently %d item%sahead of yours.\r\n",
     i, i == 1 ? " " : "s ");
     else
-      new_send_to_char(ch, "Auction noted.\r\n");
+      ch->Send( "Auction noted.\r\n");
   }
 }
 
@@ -339,7 +339,7 @@ void auction_reset(void)
   auction->bid = 0;
 }
 
-struct obj_data *check_obj(struct char_data *ch, struct obj_data *obj)
+struct obj_data *check_obj(Character *ch, struct obj_data *obj)
 {
   struct obj_data *ch_obj;
 
@@ -352,7 +352,7 @@ struct obj_data *check_obj(struct char_data *ch, struct obj_data *obj)
 
 
 
-void auction_forfeit(struct char_data *mob)
+void auction_forfeit(Character *mob)
 {
   /* Item not found */
   if (mob) {
@@ -367,20 +367,20 @@ void auction_forfeit(struct char_data *mob)
   auction_reset();
 }
 
-void show_auction_status(struct char_data *ch)
+void show_auction_status(Character *ch)
 {
   struct auction_data *auc;
   int i = 1;
 
-  new_send_to_char(ch, "Items up for auction:\r\n");
+  ch->Send( "Items up for auction:\r\n");
   for(auc = auction, i = 0; auc; auc = auc->next, i++)
     if (auc->seller)
-      new_send_to_char(ch, "%d. %s auctioning %s for %ld coin%sto %s.\r\n",
+      ch->Send( "%d. %s auctioning %s for %ld coin%sto %s.\r\n",
     i, PERS(auc->seller, ch), auc->obj->short_description,
     auc->bid, auc->bid == 1 ? " " : "s ",
     auc->bidder ? GET_NAME(auc->bidder) : "no one");
   else
-  new_send_to_char(ch, "  Nothing.\r\n");
+  ch->Send( "  Nothing.\r\n");
 }
 
 int is_on_block(struct obj_data *obj)
@@ -399,9 +399,9 @@ void free_auction(struct auction_data *auc)
   free(auc);
 }
 
-struct char_data *get_char_auc(char *name)
+Character *get_char_auc(char *name)
 {
-  struct char_data *i;
+  Character *i;
   int j = 0, gcnumber;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp = tmpname;
@@ -418,7 +418,7 @@ struct char_data *get_char_auc(char *name)
   return NULL;
 }
 
-bool can_auction_item(struct char_data * ch, struct obj_data * obj)
+bool can_auction_item(Character * ch, struct obj_data * obj)
 {
   if (GET_OBJ_TYPE(obj) == ITEM_WORN || GET_OBJ_TYPE(obj) == ITEM_OTHER
       || GET_OBJ_TYPE(obj) == ITEM_TRASH

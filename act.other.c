@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.25  2006/05/21 11:02:25  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.24  2006/05/11 06:39:12  w4dimenscor
  * Added comments to some files, changed the width of the name field in the typo and bug reports
  *
@@ -115,29 +119,29 @@ extern struct room_data *world_vnum[];
 extern struct descriptor_data *descriptor_list;
 extern struct spell_info_type spell_info[];
 extern struct index_data *mob_index;
-extern struct char_data *ch_selling;
+extern Character *ch_selling;
 extern char *class_abbrevs[];
 extern const int xap_objs;
 
 /* extern procedures */
-void list_skills(struct char_data *ch, int skillspell);
-void appear(struct char_data *ch);
-void perform_immort_vis(struct char_data *ch);
+void list_skills(Character *ch, int skillspell);
+void appear(Character *ch);
+void perform_immort_vis(Character *ch);
 SPECIAL(shop_keeper);
 ACMD(do_gen_comm);
-void die(struct char_data *ch, struct char_data *killer);
-void Crash_rentsave(struct char_data *ch, int cost);
-void write_poofs(struct char_data *ch);
-void improve_skill(struct char_data *ch, int skill);
-void stop_auction(int type, struct char_data *ch);
-void add_follower(struct char_data *ch, struct char_data *leader);
-void raw_kill(struct char_data *ch, struct char_data *killer);
+void die(Character *ch, Character *killer);
+void Crash_rentsave(Character *ch, int cost);
+void write_poofs(Character *ch);
+void improve_skill(Character *ch, int skill);
+void stop_auction(int type, Character *ch);
+void add_follower(Character *ch, Character *leader);
+void raw_kill(Character *ch, Character *killer);
 void ReplaceString ( char * string, char * search, char * replace , size_t len);
 
 
 /* local functions */
-int perform_group(struct char_data *ch, struct char_data *vict);
-void print_group(struct char_data *ch);
+int perform_group(Character *ch, Character *vict);
+void print_group(Character *ch);
 ACMD(do_quit);
 ACMD(do_save);
 ACMD(do_not_here);
@@ -192,7 +196,7 @@ ACMD(do_quit)
 
     }
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
-    new_send_to_char(ch,"Goodbye, %s.. Come back soon!\r\n", GET_NAME(ch));
+    ch->Send("Goodbye, %s.. Come back soon!\r\n", GET_NAME(ch));
 
     /*  We used to check here for duping attempts, but we may as well
          *  do it right in extract_char(), since there is no check if a
@@ -251,12 +255,12 @@ ACMD(do_die)
     return;
   if (PLR_FLAGGED(ch, PLR_DYING))
   {
-    new_send_to_char(ch, "See you next lifetime...\r\n");
+    ch->Send( "See you next lifetime...\r\n");
     raw_kill(ch, NULL);
   }
   else
   {
-    new_send_to_char(ch, "You are far to healthy! Get deader!\r\n");
+    ch->Send( "You are far to healthy! Get deader!\r\n");
   }
 }
 
@@ -276,7 +280,7 @@ void check_for_dead(void)
   }
 }
 
-int allowed_loginmsg(CHAR_DATA *ch)
+int allowed_loginmsg(Character *ch)
 {
   if (GET_LEVEL(ch) > LVL_HERO)
     return TRUE;
@@ -303,19 +307,19 @@ ACMD(do_loginmsg)
   delete_doubledollar(argument);
   if (!allowed_loginmsg(ch))
   {
-    new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
+    ch->Send( "Sorry, but you don't deserve a logout message yet.\r\n");
     return;
   }
   if (strlen(argument) > MAX_LOGINMSG_LENGTH)
-    new_send_to_char(ch, "Sorry, but your login message can't be longer then %d characters.\r\n",
+    ch->Send( "Sorry, but your login message can't be longer then %d characters.\r\n",
                      MAX_LOGINMSG_LENGTH);
   else
   {
     set_loginmsg(ch, argument);
     if(GET_LOGINMSG(ch)==NULL)
-      new_send_to_char(ch, "Ok, you don't have a login message anymore.\r\n");
+      ch->Send( "Ok, you don't have a login message anymore.\r\n");
     else
-      new_send_to_char(ch, "Your new loginmsg is: %s\r\n", GET_LOGINMSG(ch));
+      ch->Send( "Your new loginmsg is: %s\r\n", GET_LOGINMSG(ch));
   }
   return;
 }
@@ -326,19 +330,19 @@ ACMD(do_logoutmsg)
   delete_doubledollar(argument);
   if (!allowed_loginmsg(ch))
   {
-    new_send_to_char(ch, "Sorry, but you don't deserve a logout message yet.\r\n");
+    ch->Send( "Sorry, but you don't deserve a logout message yet.\r\n");
     return;
   }
   if (strlen(argument) > MAX_LOGOUTMSG_LENGTH)
-    new_send_to_char(ch, "Sorry, but your logout message can't be longer then %d characters.\r\n",
+    ch->Send( "Sorry, but your logout message can't be longer then %d characters.\r\n",
                      MAX_LOGOUTMSG_LENGTH);
   else
   {
     set_logoutmsg(ch, argument);
     if(GET_LOGOUTMSG(ch)==NULL)
-      new_send_to_char(ch, "Ok, you don't have a logout message anymore.\r\n");
+      ch->Send( "Ok, you don't have a logout message anymore.\r\n");
     else
-      new_send_to_char(ch, "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG(ch));
+      ch->Send( "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG(ch));
   }
   return;
 }
@@ -364,7 +368,7 @@ ACMD(do_save)
       send_to_char("Saving aliases.\r\n", ch);
       return;
     }
-    new_send_to_char(ch, "Saving %s and aliases.\r\n", GET_NAME(ch));
+    ch->Send( "Saving %s and aliases.\r\n", GET_NAME(ch));
   }
 
   write_aliases(ch);
@@ -374,9 +378,9 @@ ACMD(do_save)
     House_crashsave(GET_ROOM_VNUM(IN_ROOM(ch)));
 }
 
-void list_rprooms_to_char(struct char_data *ch)
+void list_rprooms_to_char(Character *ch)
 {}
-void list_kills_to_char(struct char_data *ch)
+void list_kills_to_char(Character *ch)
 {
   char line[MAX_INPUT_LENGTH];
   char *name, *first, *last;
@@ -386,7 +390,7 @@ void list_kills_to_char(struct char_data *ch)
   int found = 0;
   if (!GET_KILLS(ch))
   {
-    new_send_to_char(ch, "You have no recorded kills.\r\n");
+    ch->Send( "You have no recorded kills.\r\n");
     return;
   }
   DYN_CREATE;
@@ -445,14 +449,14 @@ ACMD(do_practice)
 
   if (!*arg)
   {
-    new_send_to_char(ch, "You have {cW%d{c0 practice sessions remaining.\r\n\r\n", GET_PRACTICES(ch));
-    new_send_to_char(ch,"To View Skills Or Spells Either Type:\r\n");
-    new_send_to_char(ch,"{cCpractice skills{c0 or type {cCpractice spells{c0\r\n\r\n");
-    new_send_to_char(ch,"To view any other abilities you may have (subskills, clan skills, etc) type:\r\n");
-    new_send_to_char(ch,"{cCpractice subs{c0\r\n\r\n");
-    new_send_to_char(ch,"Otherwise to get better in that skill or spell try:\r\n");
-    new_send_to_char(ch,"{ccpractice <skill/spell name>{c0\r\n");
-    new_send_to_char(ch,"{cG[NOTE: You can practice with your skills and spells at a guildmaster]{c0\r\n");
+    ch->Send( "You have {cW%d{c0 practice sessions remaining.\r\n\r\n", GET_PRACTICES(ch));
+    ch->Send("To View Skills Or Spells Either Type:\r\n");
+    ch->Send("{cCpractice skills{c0 or type {cCpractice spells{c0\r\n\r\n");
+    ch->Send("To view any other abilities you may have (subskills, clan skills, etc) type:\r\n");
+    ch->Send("{cCpractice subs{c0\r\n\r\n");
+    ch->Send("Otherwise to get better in that skill or spell try:\r\n");
+    ch->Send("{ccpractice <skill/spell name>{c0\r\n");
+    ch->Send("{cG[NOTE: You can practice with your skills and spells at a guildmaster]{c0\r\n");
     return;
   }
 
@@ -472,7 +476,7 @@ ACMD(do_practice)
     list_skills(ch, 2);
     return;
   }
-  new_send_to_char(ch,"{cCpractice skills{c0 or type {cCpractice spells{c0 or {cCpractice subs{c0\r\n\r\n");
+  ch->Send("{cCpractice skills{c0 or type {cCpractice spells{c0 or {cCpractice subs{c0\r\n\r\n");
 }
 
 
@@ -509,20 +513,20 @@ ACMD(do_title)
                  ch);
   else if (strlen(argument) > MAX_TITLE_LENGTH)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "Sorry, titles can't be longer than %d characters.\r\n",
                      MAX_TITLE_LENGTH);
   }
   else
   {
     set_title(ch, argument);
-    new_send_to_char(ch, "Okay, you're now %s %s.\r\n", GET_NAME(ch),
+    ch->Send( "Okay, you're now %s %s.\r\n", GET_NAME(ch),
                      GET_TITLE(ch));
   }
 }
 
 
-int perform_group(struct char_data *ch, struct char_data *vict)
+int perform_group(Character *ch, Character *vict)
 {
 
   if (!CAN_SEE(ch, vict))
@@ -552,7 +556,7 @@ int perform_group(struct char_data *ch, struct char_data *vict)
 
 C_FUNC(allow_follow)
 {
-  struct char_data *tch = find_char(d->character->loader);
+  Character *tch = find_char(d->character->loader);
   if (!tch)
   {
     new_send_to_char(d->character, "%s isn't in the game any longer.\r\n", get_name_by_id(d->character->loader));
@@ -569,9 +573,9 @@ C_FUNC(allow_follow)
 }
 
 
-void print_group(struct char_data *ch)
+void print_group(Character *ch)
 {
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   char buf[MAX_INPUT_LENGTH];
 
@@ -608,7 +612,7 @@ void print_group(struct char_data *ch)
     }
     else
     {
-      new_send_to_char(ch, "No group.\r\n");
+      ch->Send( "No group.\r\n");
       return;
     }
 
@@ -656,7 +660,7 @@ void print_group(struct char_data *ch)
 
 ACMD(do_group)
 {
-  struct char_data *vict;
+  Character *vict;
   struct follow_type *f;
   int found;
   char buf[MAX_INPUT_LENGTH];
@@ -693,7 +697,7 @@ ACMD(do_group)
   }
 
   if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if ((vict->master != ch) && (vict != ch))
     act("$N must follow you to enter your group.", FALSE, ch, 0, vict,
         TO_CHAR);
@@ -722,7 +726,7 @@ ACMD(do_group)
 ACMD(do_ungroup)
 {
   struct follow_type *f, *next_fol;
-  struct char_data *tch;
+  Character *tch;
 
   char buf[MAX_INPUT_LENGTH];
 
@@ -787,7 +791,7 @@ ACMD(do_ungroup)
 ACMD(do_report)
 {
   char buf[MAX_INPUT_LENGTH];
-  /*   struct char_data *k;
+  /*   Character *k;
      struct follow_type *f;*/
 
   /*if (!AFF_FLAGGED(ch, AFF_GROUP)) {
@@ -826,7 +830,7 @@ ACMD(do_report)
 ACMD(do_split)
 {
   gold_int amount, num, share, rest;
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
 
   char buf[MAX_INPUT_LENGTH];
@@ -907,12 +911,12 @@ ACMD(do_split)
     }
     if (num)
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "You split %lld coins among %lld members -- %lld coins each.\r\n",
                        amount, num, share);
       if (rest)
       {
-        new_send_to_char(ch,
+        ch->Send(
                          "%lld coin%s %s not splitable, so you keep "
                          "the money.\r\n", rest,
                          (rest == 1) ? "" : "s",
@@ -923,7 +927,7 @@ ACMD(do_split)
   }
   else
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "How many coins do you wish to split with your group?\r\n");
     return;
   }
@@ -943,7 +947,7 @@ ACMD(do_use)
   half_chop(argument, arg, buf);
   if (!*arg)
   {
-    new_send_to_char(ch, "What do you want to %s?\r\n", CMD_NAME);
+    ch->Send( "What do you want to %s?\r\n", CMD_NAME);
     return;
   }
   mag_item = GET_EQ(ch, WEAR_HOLD);
@@ -958,12 +962,12 @@ ACMD(do_use)
           (mag_item =
              get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
       {
-        new_send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg),arg);
+        ch->Send( "You don't seem to have %s %s.\r\n", AN(arg),arg);
         return;
       }
       break;
     case SCMD_USE:
-      new_send_to_char(ch, "You don't seem to be holding %s %s.\r\n",
+      ch->Send( "You don't seem to be holding %s %s.\r\n",
                        AN(arg), arg);
       return;
     default:
@@ -1021,7 +1025,7 @@ ACMD(do_wimpy)
   {
     if (GET_WIMP_LEV(ch))
     {
-      new_send_to_char(ch, "Your current wimp level is %d hit points.\r\n",
+      ch->Send( "Your current wimp level is %d hit points.\r\n",
                        GET_WIMP_LEV(ch));
       return;
     }
@@ -1050,7 +1054,7 @@ ACMD(do_wimpy)
          ch);
       else
       {
-        new_send_to_char(ch,
+        ch->Send(
                          "Okay, you'll wimp out if you drop below %d hit points.\r\n",
                          wimp_lev);
         GET_WIMP_LEV(ch) = wimp_lev;
@@ -1137,10 +1141,10 @@ new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_RO
 
   fclose(fl);
   /*new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);*/
-  new_send_to_char(ch, "Okay.  Thanks!\r\n");
+  ch->Send( "Okay.  Thanks!\r\n");
 }
 
-void parse_afk(struct char_data *ch, char *argument)
+void parse_afk(Character *ch, char *argument)
 {
   char *def = "Away From Keyboard";
   char **msg;
@@ -1153,7 +1157,7 @@ void parse_afk(struct char_data *ch, char *argument)
     skip_spaces(&argument);
     if (strlen(argument) > 79)
     {
-      new_send_to_char(ch, "Your afk message must be shorter than 80 characters.\r\n");
+      ch->Send( "Your afk message must be shorter than 80 characters.\r\n");
       return;
     }
     if (*msg)
@@ -1161,7 +1165,7 @@ void parse_afk(struct char_data *ch, char *argument)
     *msg = str_dup((!argument || !*argument) ? def : argument);
     snprintf(buf, sizeof(buf), "$n has gone AFK: %s", AFK_MSG(ch));
     act(buf, TRUE, ch, 0, 0, TO_ROOM);
-    new_send_to_char(ch, "AFK: %s\r\n", AFK_MSG(ch));
+    ch->Send( "AFK: %s\r\n", AFK_MSG(ch));
   }
   else
   {
@@ -1174,7 +1178,7 @@ void parse_afk(struct char_data *ch, char *argument)
 
 }
 
-void parse_busy(struct char_data *ch, char *argument)
+void parse_busy(Character *ch, char *argument)
 {
   char *def = "Do not disturb.";
   char **msg;
@@ -1187,7 +1191,7 @@ void parse_busy(struct char_data *ch, char *argument)
     skip_spaces(&argument);
     if (strlen(argument) > 79)
     {
-      new_send_to_char(ch, "Your busy message must be shorter than 80 characters.\r\n");
+      ch->Send( "Your busy message must be shorter than 80 characters.\r\n");
       return;
     }
     if (*msg)
@@ -1195,7 +1199,7 @@ void parse_busy(struct char_data *ch, char *argument)
     *msg = str_dup((!argument || !*argument) ? def : argument);
     snprintf(buf, sizeof(buf), "$n has gone BUSY: %s", *msg);
     act(buf, TRUE, ch, 0, 0, TO_ROOM);
-    new_send_to_char(ch, "BUSY: %s\r\n", BUSY_MSG(ch));
+    ch->Send( "BUSY: %s\r\n", BUSY_MSG(ch));
   }
   else
   {
@@ -1462,7 +1466,7 @@ ACMD(do_gen_tog)
     break;
   case SCMD_NOTELEPORT:
     if (IS_PK(ch))
-      new_send_to_char(ch, "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
+      ch->Send( "As a PKer, the teleport toggle will not work vs other PK players.\r\n");
     result = PRF_TOG_CHK(ch, PRF_TELEPORTABLE);
     break;
   case SCMD_AUTOGROUP:
@@ -1471,7 +1475,7 @@ ACMD(do_gen_tog)
   case SCMD_BUILDWALK:
     if (GET_LEVEL(ch) < LVL_BUILDER)
     {
-      new_send_to_char(ch, "Builders only, sorry.\r\n");
+      ch->Send( "Builders only, sorry.\r\n");
       return;
     }
     result = PRF_TOG_CHK(ch, PRF_BUILDWALK);
@@ -1513,9 +1517,9 @@ ACMD(do_gen_tog)
   }
 
   if (result)
-    new_send_to_char(ch, "%s", tog_messages[subcmd][TOG_ON]);
+    ch->Send( "%s", tog_messages[subcmd][TOG_ON]);
   else
-    new_send_to_char(ch, "%s", tog_messages[subcmd][TOG_OFF]);
+    ch->Send( "%s", tog_messages[subcmd][TOG_OFF]);
 
   return;
 }
@@ -1558,11 +1562,11 @@ ACMD(do_file)
 
   if (!*argument)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "USAGE: file <option> <num lines>\r\n\r\nFile options:\r\n");
     for (j = 0, i = 1; fields[i].level; i++)
       if (fields[i].level <= GET_LEVEL(ch))
-        new_send_to_char(ch, "%-15s%s\r\n", fields[i].cmd,
+        ch->Send( "%-15s%s\r\n", fields[i].cmd,
                          fields[i].file);
     return;
   }
@@ -1674,7 +1678,7 @@ ACMD(do_sac)
   extract_obj(obj);
 }
 #if 0
-void write_aliases(struct char_data *ch)
+void write_aliases(Character *ch)
 {
   FILE *file;
   char fn[127], buf1[MAX_STRING_LENGTH *2], *buf;
@@ -1712,7 +1716,7 @@ void write_aliases(struct char_data *ch)
   fclose(file);
 }
 
-void read_aliases(struct char_data *ch)
+void read_aliases(Character *ch)
 {
   FILE *file;
   char fn[256];
@@ -1760,7 +1764,7 @@ void read_aliases(struct char_data *ch)
 #endif
 
 /*
-void write_poofs(struct char_data *ch)
+void write_poofs(Character *ch)
 {
     FILE *file;
     char fn[127];
@@ -1789,7 +1793,7 @@ void write_poofs(struct char_data *ch)
     fclose(file);
 }
  
-void read_poofs(struct char_data *ch)
+void read_poofs(Character *ch)
 {   
     FILE *file;
     char fn[127], pin[127], pout[127];
@@ -1925,13 +1929,13 @@ ACMD(do_bury)
 
   if (!*arg)
   {
-    new_send_to_char(ch, "What do you want to %s?\r\n", CMD_NAME);
+    ch->Send( "What do you want to %s?\r\n", CMD_NAME);
     return;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
   {
-    new_send_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+    ch->Send( "You don't have %s %s.\r\n", AN(arg), arg);
     return;
   }
 
@@ -2038,10 +2042,10 @@ ACMD(do_pageheight)
   num = atoi(argument);
   if (num < 5 || num > 75)
   {
-    new_send_to_char(ch, "Please keep the page height between 5 and 75 lines.\r\n");
+    ch->Send( "Please keep the page height between 5 and 75 lines.\r\n");
     return;
   }
-  new_send_to_char(ch, "You set your page height to %d, default is 25\r\n", num);
+  ch->Send( "You set your page height to %d, default is 25\r\n", num);
   PAGEHEIGHT(ch) = num;
   save_char(ch);
 }
@@ -2052,10 +2056,10 @@ ACMD(do_pagewidth)
   num = atoi(argument);
   if (num < 20 || num > 200)
   {
-    new_send_to_char(ch, "Please keep the page width between 20 and 200 characters.\r\n");
+    ch->Send( "Please keep the page width between 20 and 200 characters.\r\n");
     return;
   }
-  new_send_to_char(ch, "You set your page width to %d, default is 80\r\n", num);
+  ch->Send( "You set your page width to %d, default is 80\r\n", num);
   PAGEWIDTH(ch) = num;
   save_char(ch);
 }

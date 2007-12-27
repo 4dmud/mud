@@ -95,44 +95,44 @@ int color_space = 0;
 
 /* extern functions */
 
-int highest_tier(struct char_data *ch);
+int highest_tier(Character *ch);
 const char *how_good(int percent);
-int grand_master(struct char_data *ch);
-const char *simple_class_name(struct char_data *ch);
+int grand_master(Character *ch);
+const char *simple_class_name(Character *ch);
 size_t proc_color(char *inbuf, int color_lvl, size_t len);
 ACMD(do_action);
 ACMD(do_insult);
-int average_damage(struct char_data *ch);
-int can_fly(struct char_data *ch);
+int average_damage(Character *ch);
+int can_fly(Character *ch);
 long find_class_bitvector(char arg);
 //long find_race_bitvector(char arg);
 char *title_male(int chclass, int level);
 char *title_female(int chclass, int level);
-int speed_update(struct char_data *ch);
-int tier_level(struct char_data *ch, int chclass);
+int speed_update(Character *ch);
+int tier_level(Character *ch, int chclass);
 int parse_class(char arg);
-int spell_size_dice(struct char_data *ch);
-int spell_num_dice(struct char_data *ch);
-int update_award(struct char_data *ch);
-int update_reward(struct char_data *ch);
+int spell_size_dice(Character *ch);
+int spell_num_dice(Character *ch);
+int update_award(Character *ch);
+int update_reward(Character *ch);
 char * print_elemental(int chcl, int weak, char * buf, size_t len);
-void container_disp(CHAR_DATA *ch,OBJ_DATA * obj);
+void container_disp(Character *ch,OBJ_DATA * obj);
 
 struct time_info_data *real_time_passed(time_t t2, time_t t1);
-int compute_armor_class(struct char_data *ch);
+int compute_armor_class(Character *ch);
 
 /* local functions */
-void display_map(struct char_data *ch);
-void look_around(CHAR_DATA *ch);
-void skill_spell_help(struct char_data *ch, int spell);
+void display_map(Character *ch);
+void look_around(Character *ch);
+void skill_spell_help(Character *ch, int spell);
 int sort_commands_helper(const void *a, const void *b);
 void print_object_location(int num, struct obj_data *obj,
-                           struct char_data *ch, int recur, char *buffer);
-void show_obj_to_char(struct obj_data *object, struct char_data *ch,
+                           Character *ch, int recur, char *buffer);
+void show_obj_to_char(struct obj_data *object, Character *ch,
                       int mode);
-void list_obj_to_char(struct obj_data *list, struct char_data *ch,
+void list_obj_to_char(struct obj_data *list, Character *ch,
                       int mode, int show);
-void show_obj_modifiers(struct obj_data *obj, struct char_data *ch);
+void show_obj_modifiers(struct obj_data *obj, Character *ch);
 ACMD(do_look);
 ACMD(do_examine);
 ACMD(do_gold);
@@ -145,8 +145,8 @@ ACMD(do_help);
 ACMD(do_who);
 ACMD(do_users);
 ACMD(do_gen_ps);
-void perform_mortal_where(struct char_data *ch, char *arg);
-void perform_immort_where(struct char_data *ch, char *arg);
+void perform_mortal_where(Character *ch, char *arg);
+void perform_immort_where(Character *ch, char *arg);
 ACMD(do_where);
 ACMD(do_levels);
 ACMD(do_consider);
@@ -156,25 +156,25 @@ ACMD(do_toggle);
 ACMD(do_worth);
 void sort_commands(void);
 ACMD(do_commands);
-void diag_char_to_char(struct char_data *i, struct char_data *ch);
-void look_at_char(struct char_data *i, struct char_data *ch);
-void list_one_char(struct char_data *i, struct char_data *ch);
-void list_char_to_char(struct char_data *list, struct char_data *ch);
-void do_auto_exits(struct char_data *ch);
+void diag_char_to_char(Character *i, Character *ch);
+void look_at_char(Character *i, Character *ch);
+void list_one_char(Character *i, Character *ch);
+void list_char_to_char(Character *list, Character *ch);
+void do_auto_exits(Character *ch);
 ACMD(do_exits);
-void look_in_direction(struct char_data *ch, int dir);
-void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item);
+void look_in_direction(Character *ch, int dir);
+void look_in_obj(Character *ch, char *arg, struct obj_data *item);
 char *find_exdesc(char *word, struct extra_descr_data *list);
-void look_at_target(struct char_data *ch, char *arg);
-void look_above_target(struct char_data *ch, char *arg);
-void look_behind_target(struct char_data *ch, char *arg);
-void look_under_target(struct char_data *ch, char *arg);
-char * primary_class(struct char_data *ch, char * blank);
-char * secondary_class(struct char_data *ch, char * blank);
-char * tertary_class(struct char_data *ch, char * blank);
-char * quatry_class(struct char_data *ch, char * blank);
-void list_damage(CHAR_DATA *ch);
-int even_group(struct char_data *ch);
+void look_at_target(Character *ch, char *arg);
+void look_above_target(Character *ch, char *arg);
+void look_behind_target(Character *ch, char *arg);
+void look_under_target(Character *ch, char *arg);
+char * primary_class(Character *ch, char * blank);
+char * secondary_class(Character *ch, char * blank);
+char * tertary_class(Character *ch, char * blank);
+char * quatry_class(Character *ch, char * blank);
+void list_damage(Character *ch);
+int even_group(Character *ch);
 /* local globals */
 int *cmd_sort_info;
 bool examine_on = FALSE;
@@ -192,12 +192,12 @@ ACMD(do_settime);
 /*
  * This function screams bitvector... -gg 6/45/98
  */
-void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
+void show_obj_to_char(struct obj_data *obj, Character *ch,
                       int mode)
 {
 
   bool found = FALSE;
-  struct char_data *temp;
+  Character *temp;
 
   if (!obj || !ch)
   {
@@ -210,23 +210,23 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
   {
 
   case SHOW_OBJ_LONG://start
-    new_send_to_char(ch, "{cy");
+    ch->Send( "{cy");
     if (GET_LEVEL(ch) > LVL_IMMORT)
     {
-      new_send_to_char(ch, "[%5d]", GET_OBJ_VNUM(obj));
+      ch->Send( "[%5d]", GET_OBJ_VNUM(obj));
 
       if (!IS_NPC(ch) && SCRIPT(obj) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))
-        new_send_to_char(ch, "[Trig]");
-      new_send_to_char(ch, " ");
+        ch->Send( "[Trig]");
+      ch->Send( " ");
     }
     if (GET_OBJ_VAL(obj, 1) == 0 || !OBJ_SAT_IN_BY(obj))
     {
       if (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || (GET_LEVEL(ch) > LVL_IMMORT))
       {
         if (GET_OBJ_TYPE(obj) == ITEM_SPACEBIKE)
-          new_send_to_char(ch, "%s [FUEL: %d%%]",obj->description, GET_FUEL(obj) > 0 ? (GET_FUEL(obj) * 100)/ GET_MAX_FUEL(obj) : 0);
+          ch->Send( "%s [FUEL: %d%%]",obj->description, GET_FUEL(obj) > 0 ? (GET_FUEL(obj) * 100)/ GET_MAX_FUEL(obj) : 0);
         else
-          new_send_to_char(ch, "%s", obj->description);
+          ch->Send( "%s", obj->description);
 
       }
     }
@@ -240,10 +240,10 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
       if (found == TRUE)
       {
         if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE)
-          new_send_to_char(ch, "You are %s upon %s.",
+          ch->Send( "You are %s upon %s.",
                            GET_POS(ch) == POS_SITTING ? "sitting" : "resting", obj->short_description);
         else
-          new_send_to_char(ch, "You are mounted upon %s.", obj->short_description);
+          ch->Send( "You are mounted upon %s.", obj->short_description);
       }
 
 
@@ -256,12 +256,12 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
   case 4:
     if (GET_LEVEL(ch) > LVL_IMMORT)
     {
-      new_send_to_char(ch, "[%5d]", GET_OBJ_VNUM(obj));
+      ch->Send( "[%5d]", GET_OBJ_VNUM(obj));
       if (!IS_NPC(ch) && SCRIPT(obj) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))
-        new_send_to_char(ch, "[Trig]");
-      new_send_to_char(ch, " ");
+        ch->Send( "[Trig]");
+      ch->Send( " ");
     }
-    new_send_to_char(ch, "%s", obj->short_description);
+    ch->Send( "%s", obj->short_description);
     break;
 
   case SHOW_OBJ_ACTION:
@@ -277,15 +277,15 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
         page_string(ch->desc, notebuf, TRUE);
       }
       else
-        new_send_to_char(ch, "It's blank.\r\n");
+        ch->Send( "It's blank.\r\n");
       return;
 
     case ITEM_DRINKCON:
-      new_send_to_char(ch, "It looks like a drink container.");
+      ch->Send( "It looks like a drink container.");
       break;
 
     default:
-      new_send_to_char(ch, "You see nothing special..");
+      ch->Send( "You see nothing special..");
       break;
     }
     break;
@@ -300,10 +300,10 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
   if (mode == SHOW_OBJ_LONG)
   {
     if (!OBJ_FLAGGED(obj, ITEM_NODISPLAY) || (GET_LEVEL(ch) > LVL_IMMORT))
-      new_send_to_char(ch, "{c0\r\n");
+      ch->Send( "{c0\r\n");
   }
   else
-    new_send_to_char(ch, "{c0\r\n");
+    ch->Send( "{c0\r\n");
 
 
 }
@@ -311,34 +311,34 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch,
 #define TIER_COLOR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cc|" : (tier == 3 ? "{cB|" : "{cr|"))))
 #define TIER_COLOR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cc" : (tier == 3 ? "{cB" : "{cr"))))
 
-void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
+void show_obj_modifiers(struct obj_data *obj, Character *ch)
 {
   if (IS_OBJ_STAT(obj, ITEM_BURIED) && CAN_SEE_OBJ(ch, obj))
-    new_send_to_char(ch, " (buried)");
+    ch->Send( " (buried)");
   if (OBJ_FLAGGED(obj, ITEM_NODISPLAY) && GET_LEVEL(ch) >= LVL_IMMORT)
-    new_send_to_char(ch, " (!display)");
+    ch->Send( " (!display)");
 
   if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
   {
     if (IS_OBJ_STAT(obj, ITEM_INVISIBLE))
-      new_send_to_char(ch, " ...it is invisible");
+      ch->Send( " ...it is invisible");
     if (IS_OBJ_STAT(obj, ITEM_BLESS)
         && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
-      new_send_to_char(ch, " ...it has a holy aura");  // dark cyan
+      ch->Send( " ...it has a holy aura");  // dark cyan
     if (IS_OBJ_STAT(obj, ITEM_MAGIC)
         && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
-      new_send_to_char(ch, " ...it sparkles with magic");   // dark yellow
+      ch->Send( " ...it sparkles with magic");   // dark yellow
     if (IS_OBJ_STAT(obj, ITEM_GLOW))
-      new_send_to_char(ch, " ...it is glowing with an inner light");  //dark yellow
+      ch->Send( " ...it is glowing with an inner light");  //dark yellow
     if (IS_OBJ_STAT(obj, ITEM_HUM))
-      new_send_to_char(ch, " ...it is humming with energy");     //dark cyan
+      ch->Send( " ...it is humming with energy");     //dark cyan
     if (IS_OBJ_STAT(obj, ITEM_NODROP))
-      new_send_to_char(ch, " ...it has a dull red aura");   //dark cyan
+      ch->Send( " ...it has a dull red aura");   //dark cyan
   }
 
 }
 
-void list_obj_to_char(struct obj_data *list, struct char_data *ch,
+void list_obj_to_char(struct obj_data *list, Character *ch,
                       int mode, int show)
 {
   struct obj_data *i, *j;
@@ -375,7 +375,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
     {
       if ((GET_OBJ_TYPE(i) != ITEM_CONTAINER) && (GET_OBJ_TYPE(i) != ITEM_SPACEBIKE) && (num != 1) && (mode!=SHOW_OBJ_LONG || !OBJ_FLAGGED(i, ITEM_NODISPLAY) || GET_LEVEL(ch)>LVL_IMMORT))
       {
-        new_send_to_char(ch, "(%2i) ", num);
+        ch->Send( "(%2i) ", num);
       }
       show_obj_to_char(i, ch, mode);
       found = TRUE;
@@ -386,7 +386,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch,
 }
 
 
-void diag_char_to_char(struct char_data *i, struct char_data *ch)
+void diag_char_to_char(Character *i, Character *ch)
 {
   struct
   {
@@ -420,23 +420,23 @@ void diag_char_to_char(struct char_data *i, struct char_data *ch)
     if (percent >= diagnosis[ar_index].percent)
       break;
   if (GET_LEVEL(ch) > LVL_IMMORT)
-    new_send_to_char(ch, "%c%s %s (at {cY%d%%{c0)\r\n", UPPER(*pers), pers + 1,
+    ch->Send( "%c%s %s (at {cY%d%%{c0)\r\n", UPPER(*pers), pers + 1,
                      diagnosis[ar_index].text, percent);
   else
-    new_send_to_char(ch, "%c%s %s\r\n", UPPER(*pers), pers + 1,
+    ch->Send( "%c%s %s\r\n", UPPER(*pers), pers + 1,
                      diagnosis[ar_index].text);
 }
 
-void show_affect_to_char(struct char_data *i, struct char_data *ch)
+void show_affect_to_char(Character *i, Character *ch)
 {
   if (!IS_NPC(i))
   {
 
 
     if (AFK_MSG(i))
-      new_send_to_char(ch, "   -- {cgAFK: %s{c0\r\n", AFK_MSG(i));
+      ch->Send( "   -- {cgAFK: %s{c0\r\n", AFK_MSG(i));
     if (BUSY_MSG(i))
-      new_send_to_char(ch, "   -- {cgBUSY: %s{c0\r\n", BUSY_MSG(i));
+      ch->Send( "   -- {cgBUSY: %s{c0\r\n", BUSY_MSG(i));
 
 
     if (GET_LEVEL(i)>=LVL_IMMORT && GET_LEVEL(i)<=LVL_IMMORT+1)
@@ -505,7 +505,7 @@ void show_affect_to_char(struct char_data *i, struct char_data *ch)
 }
 
 
-void look_at_char(struct char_data *i, struct char_data *ch)
+void look_at_char(Character *i, Character *ch)
 {
   int j, found;
   struct obj_data *tmp_obj;
@@ -516,46 +516,46 @@ void look_at_char(struct char_data *i, struct char_data *ch)
 
   if (AFF_FLAGGED(i, AFF_POLY_TOAD))
   {
-    new_send_to_char(ch, "You see %s in the form of a slimy toad!\r\n", GET_NAME(i));
+    ch->Send( "You see %s in the form of a slimy toad!\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_WOLF))
   {
-    new_send_to_char(ch, "You see %s in the form of a grey wolf!\r\n", GET_NAME(i));
+    ch->Send( "You see %s in the form of a grey wolf!\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_BOAR))
   {
-    new_send_to_char(ch, "You see %s in the form of a frisky boar!\r\n", GET_NAME(i));
+    ch->Send( "You see %s in the form of a frisky boar!\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_BEAR))
   {
-    new_send_to_char(ch, "You see %s in the form of a shaggy bear!\r\n", GET_NAME(i));
+    ch->Send( "You see %s in the form of a shaggy bear!\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_LION))
   {
-    new_send_to_char(ch, "You see %s in the form of a black lion!\r\n", GET_NAME(i));
+    ch->Send( "You see %s in the form of a black lion!\r\n", GET_NAME(i));
     return;
   }
 
   if (!examine_on)
   {       /*split do_look into two parts */
     if (i->player.description)
-      new_send_to_char(ch, "%s", i->player.description);
+      ch->Send( "%s", i->player.description);
     else
     {
       if (i == ch)
-        new_send_to_char(ch, "You see nothing special about yourself.\r\n");
+        ch->Send( "You see nothing special about yourself.\r\n");
       else
         act("You see nothing special about $m.", FALSE, i, 0, ch, TO_VICT);
     }
 
     if (AFK_MSG(i))
-      new_send_to_char(ch, "{cYAFK: %s{c0\r\n", AFK_MSG(i));
+      ch->Send( "{cYAFK: %s{c0\r\n", AFK_MSG(i));
     if (BUSY_MSG(i))
-      new_send_to_char(ch, "{cYBUSY: %s{c0\r\n", BUSY_MSG(i));
+      ch->Send( "{cYBUSY: %s{c0\r\n", BUSY_MSG(i));
 
     if (!IS_NPC(i))
     {
@@ -563,9 +563,9 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       {
         /* Char is engaged */
         if (i == ch)
-          new_send_to_char(ch, "You have an engagement ring from %s.\r\n", get_name_by_id(PARTNER(i)));
+          ch->Send( "You have an engagement ring from %s.\r\n", get_name_by_id(PARTNER(i)));
         else
-          new_send_to_char(ch, "%s has an engagement ring from %s.\r\n",
+          ch->Send( "%s has an engagement ring from %s.\r\n",
                            GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
 
       }
@@ -573,9 +573,9 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       {
         /* Char is married */
         if (i == ch)
-          new_send_to_char(ch, "You have a wedding ring from %s.", get_name_by_id(PARTNER(i)));
+          ch->Send( "You have a wedding ring from %s.", get_name_by_id(PARTNER(i)));
         else
-          new_send_to_char(ch, "%s has a wedding ring from %s.",
+          ch->Send( "%s has a wedding ring from %s.",
                            GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
 
 
@@ -584,9 +584,9 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       {
         /* Char is dating */
         if (i == ch)
-          new_send_to_char(ch,  "You are dating %s.\r\n", get_name_by_id(PARTNER(i)));
+          ch->Send(  "You are dating %s.\r\n", get_name_by_id(PARTNER(i)));
         else
-          new_send_to_char(ch, "%s is dating %s.\r\n", GET_NAME(i),
+          ch->Send( "%s is dating %s.\r\n", GET_NAME(i),
                            ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : get_name_by_id(PARTNER(i)));
 
 
@@ -595,9 +595,9 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       {
         /* Char is single */
         if (i == ch)
-          new_send_to_char(ch, "You are single.\r\n");
+          ch->Send( "You are single.\r\n");
         else
-          new_send_to_char(ch, "%s is single.\r\n", GET_NAME(i));
+          ch->Send( "%s is single.\r\n", GET_NAME(i));
 
       }
     } /*is npc*/
@@ -608,32 +608,32 @@ void look_at_char(struct char_data *i, struct char_data *ch)
 
       if (GET_LEVEL(ch) >= LVL_GOD)
       {
-        new_send_to_char(ch, "%s %s %d hours away from giving birth.\r\n",
+        ch->Send( "%s %s %d hours away from giving birth.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "are" : "is", PREG(i));
       }
 
       if (PREG(i) < 7)
-        new_send_to_char(ch, "%s %s giving birth!\r\n",
+        ch->Send( "%s %s giving birth!\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "are" : "is");
       else if (PREG(i) < (MONTHS_2))    // Customize these messages, if you want.
-        new_send_to_char(ch, "%s look%s as if %s may give birth to a healthy, baby sometime soon.\r\n",
+        ch->Send( "%s look%s as if %s may give birth to a healthy, baby sometime soon.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "" : "s", i == ch ? "you" : "she");    // They're pretty cheesy.
       else if (PREG(i) < (MONTHS_3))    // Month 8
-        new_send_to_char(ch,
+        ch->Send(
                          "%s %s a large, cumbersome bulge in %s waist.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
       else if (PREG(i) < (MONTHS_4))    // Month 7
-        new_send_to_char(ch, "%s %s already had to let out %s armor.\r\n",
+        ch->Send( "%s %s already had to let out %s armor.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
       else if (PREG(i) < (MONTHS_5))    // Month 6
-        new_send_to_char(ch, "%s %s a small bulge in %s midsection.\r\n",
+        ch->Send( "%s %s a small bulge in %s midsection.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has", i == ch ? "you" : "her");
       else if (PREG(i) < (MONTHS_6))    // Month 5
-        new_send_to_char(ch, "%s %s just beginning to show.\r\n",
+        ch->Send( "%s %s just beginning to show.\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "are" : "is");
       else
       {
-        new_send_to_char(ch, "%s %s a motherly glow...\r\n",
+        ch->Send( "%s %s a motherly glow...\r\n",
                          i == ch ? "You" : GET_NAME(i), i == ch ? "have" : "has");
       }
     }
@@ -646,7 +646,7 @@ void look_at_char(struct char_data *i, struct char_data *ch)
   {
 
     if (i->player.description && IS_NPC(i))
-      new_send_to_char(ch, "%s", i->player.description);
+      ch->Send( "%s", i->player.description);
 
     if (RIDING(i) && RIDING(i)->in_room == i->in_room)
     {
@@ -682,7 +682,7 @@ void look_at_char(struct char_data *i, struct char_data *ch)
         act("\r\nYou are using:", FALSE, i, 0, ch, TO_VICT);
       else
       {
-        new_send_to_char(ch, "\r\n");
+        ch->Send( "\r\n");
         act("$n is using:", FALSE, i, 0, ch, TO_VICT);
       }
       for (j = 0; j < NUM_WEARS; j++)
@@ -720,13 +720,13 @@ void look_at_char(struct char_data *i, struct char_data *ch)
       }
 
       if (!found)
-        new_send_to_char(ch, "You can't see anything.\r\n");
+        ch->Send( "You can't see anything.\r\n");
     }
 
   }                 //end of examine on
 }
 
-void list_one_char(struct char_data *i, struct char_data *ch)
+void list_one_char(Character *i, Character *ch)
 {
   struct obj_data *chair = NULL;
   int wizinvis = FALSE;
@@ -763,35 +763,35 @@ void list_one_char(struct char_data *i, struct char_data *ch)
   {
     if (i->mob_specials.head_join)
     {
-      new_send_to_char(ch, "      {cc({cCLINKED{cc)  [{cw%d - {cy%-15s{cc] linked to [{cg%s{cc]{c0\r\n",GET_MOB_VNUM(i), GET_NAME(i), GET_NAME(i->mob_specials.head_join));
+      ch->Send( "      {cc({cCLINKED{cc)  [{cw%d - {cy%-15s{cc] linked to [{cg%s{cc]{c0\r\n",GET_MOB_VNUM(i), GET_NAME(i), GET_NAME(i->mob_specials.head_join));
       return;
     }
   }
-  new_send_to_char(ch,"%s%s", TIER_COLOR_LIST((IS_NPC(i) ? MOB_TIER(i) : current_class_is_tier_num(i))) , CBCYN(ch, C_NRM));
+  ch->Send("%s%s", TIER_COLOR_LIST((IS_NPC(i) ? MOB_TIER(i) : current_class_is_tier_num(i))) , CBCYN(ch, C_NRM));
 
   if (AFF_FLAGGED(i, AFF_POLY_TOAD))
   {
-    new_send_to_char(ch, "A slimy toad stands here looking vaguely like %s.\r\n", GET_NAME(i));
+    ch->Send( "A slimy toad stands here looking vaguely like %s.\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_WOLF))
   {
-    new_send_to_char(ch, "A grey wolf stands here looking vaguely like %s.\r\n", GET_NAME(i));
+    ch->Send( "A grey wolf stands here looking vaguely like %s.\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_BOAR))
   {
-    new_send_to_char(ch, "A frisky boar stands here looking vaguely like %s.\r\n", GET_NAME(i));
+    ch->Send( "A frisky boar stands here looking vaguely like %s.\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_BEAR))
   {
-    new_send_to_char(ch, "A shaggy bear stands here looking vaguely like %s.\r\n", GET_NAME(i));
+    ch->Send( "A shaggy bear stands here looking vaguely like %s.\r\n", GET_NAME(i));
     return;
   }
   if (AFF_FLAGGED(i, AFF_POLY_LION))
   {
-    new_send_to_char(ch, "A black lion stands here looking vaguely like %s.\r\n", GET_NAME(i));
+    ch->Send( "A black lion stands here looking vaguely like %s.\r\n", GET_NAME(i));
     return;
   }
 
@@ -800,87 +800,87 @@ void list_one_char(struct char_data *i, struct char_data *ch)
   {
     if (GET_LEVEL(ch) > LVL_IMMORT)
     {
-      new_send_to_char(ch, "%s[%5d]", CBCYN(ch, C_NRM), GET_MOB_VNUM(i) );
+      ch->Send( "%s[%5d]", CBCYN(ch, C_NRM), GET_MOB_VNUM(i) );
       if (!IS_NPC(ch) && SCRIPT(i) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))
-        new_send_to_char(ch, "[Trig]");
-      new_send_to_char(ch, " ");
+        ch->Send( "[Trig]");
+      ch->Send( " ");
     }
     if (AFF_FLAGGED(i, AFF_INVISIBLE))
-      new_send_to_char(ch, "*");
+      ch->Send( "*");
 
     if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
     {
       if (IS_EVIL(i))
-        new_send_to_char(ch, "(Red Aura) ");
+        ch->Send( "(Red Aura) ");
       else if (IS_GOOD(i))
-        new_send_to_char(ch, "(Blue Aura) ");
+        ch->Send( "(Blue Aura) ");
     }
     if (wizinvis)
-      new_send_to_char(ch, "(wizinvis) ");
-    new_send_to_char(ch, "%s%s",(i->mob_specials.join_list != NULL ? CCCYN(ch, C_NRM) : ""), wizinvis ? GET_NAME(i) : i->player.long_descr);
+      ch->Send( "(wizinvis) ");
+    ch->Send( "%s%s",(i->mob_specials.join_list != NULL ? CCCYN(ch, C_NRM) : ""), wizinvis ? GET_NAME(i) : i->player.long_descr);
     if (wizinvis)
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     show_affect_to_char(i, ch);
     return;
   }
   if (IS_NPC(i))
   {
     if (GET_LEVEL(ch) > LVL_IMMORT)
-      new_send_to_char(ch, "%s[%5d]",CBCYN(ch, C_NRM), GET_MOB_VNUM(i) );
+      ch->Send( "%s[%5d]",CBCYN(ch, C_NRM), GET_MOB_VNUM(i) );
     if (!IS_NPC(ch) && SCRIPT(i) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))
-      new_send_to_char(ch, "[Trig]");
-    new_send_to_char(ch, " ");
-    new_send_to_char(ch, "%s%s%s", CBCYN(ch, C_NRM), i->player.short_descr,CBCYN(ch, C_NRM));
+      ch->Send( "[Trig]");
+    ch->Send( " ");
+    ch->Send( "%s%s%s", CBCYN(ch, C_NRM), i->player.short_descr,CBCYN(ch, C_NRM));
   }
   else
   {
     if (!PRF_FLAGGED(ch, PRF_BATTLESPAM))
-      new_send_to_char(ch, "{cY@ {cC%s%s%s%s%s",
+      ch->Send( "{cY@ {cC%s%s%s%s%s",
                        (PRETITLE(i) == NULL ? "{cC" : PRETITLE(i)),(PRETITLE(i) == NULL ? "{cC" : " ") ,
                        GET_NAME(i), CBCYN(ch, C_NRM), CBCYN(ch, C_NRM));
     else
-      new_send_to_char(ch, "%s%s%s%s%s",
+      ch->Send( "%s%s%s%s%s",
                        CBCYN(ch, C_NRM), i->player.name,
                        ((strlen(GET_TITLE(i)) == 0) ? "" : " "),
                        GET_TITLE(i), CBCYN(ch, C_NRM));
   }
 
   if (AFF_FLAGGED(i, AFF_INVISIBLE))
-    new_send_to_char(ch, " (invis)");
+    ch->Send( " (invis)");
   if (AFF_FLAGGED(i, AFF_HIDE))
-    new_send_to_char(ch, " (hidden)");
+    ch->Send( " (hidden)");
   if (!IS_NPC(i) && !i->desc)
-    new_send_to_char(ch, " (linkless)");
+    ch->Send( " (linkless)");
   if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
-    new_send_to_char(ch, " (writing)");
+    ch->Send( " (writing)");
   if (PRF_FLAGGED(i, PRF_AFK))
-    new_send_to_char(ch, " (AFK)");
+    ch->Send( " (AFK)");
   if (PRF_FLAGGED(i, PRF_RP))
-    new_send_to_char(ch, " (RolePlaying)");
+    ch->Send( " (RolePlaying)");
 
   if (RIDING(i) && HERE(RIDING(i), i))
   {
-    new_send_to_char(ch, " is here, mounted upon ");
+    ch->Send( " is here, mounted upon ");
     if (RIDING(i) == ch)
-      new_send_to_char(ch, "you");
+      ch->Send( "you");
     else
-      new_send_to_char(ch, "%s", PERS(RIDING(i), ch));
-    new_send_to_char(ch, ".");
+      ch->Send( "%s", PERS(RIDING(i), ch));
+    ch->Send( ".");
   }
   else if (GET_POS(i) != POS_FIGHTING)
   {
     if (!SITTING(i))
     {
       if (GET_POS(i) == POS_STANDING && can_fly(i))
-        new_send_to_char(ch, " is flying here.");
+        ch->Send( " is flying here.");
       else
-        new_send_to_char(ch, "%s", positions[(int) GET_POS(i)]);
+        ch->Send( "%s", positions[(int) GET_POS(i)]);
 
     }
     else
     {
       chair = SITTING(i);
-      new_send_to_char(ch, " is %s upon %s.",
+      ch->Send( " is %s upon %s.",
                        ((GET_POS(i) ==
                          POS_SITTING) ? "sitting" : "resting"),
                        (CAN_SEE_OBJ(ch, chair) ? chair->
@@ -891,41 +891,41 @@ void list_one_char(struct char_data *i, struct char_data *ch)
   {
     if (FIGHTING(i))
     {
-      new_send_to_char(ch, " is here, fighting ");
+      ch->Send( " is here, fighting ");
       if (FIGHTING(i) == ch)
-        new_send_to_char(ch, "YOU!");
+        ch->Send( "YOU!");
       else
       {
         if (i->in_room == FIGHTING(i)->in_room)
-          new_send_to_char(ch, "%s!", PERS(FIGHTING(i), ch));
+          ch->Send( "%s!", PERS(FIGHTING(i), ch));
         else
-          new_send_to_char(ch, "someone who has already left!");
+          ch->Send( "someone who has already left!");
 
       }
     }
     else            /* NIL fighting pointer */
-      new_send_to_char(ch, " is here struggling with thin air.");
+      ch->Send( " is here struggling with thin air.");
   }
 
   if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
   {
     if (IS_EVIL(i))
-      new_send_to_char(ch, " (Red Aura)");
+      ch->Send( " (Red Aura)");
     else if (IS_GOOD(i))
-      new_send_to_char(ch, " (Blue Aura)");
+      ch->Send( " (Blue Aura)");
   }
-  new_send_to_char(ch, "\r\n");
+  ch->Send( "\r\n");
   if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
     show_affect_to_char(i, ch);
 
-  new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
+  ch->Send( "%s", CBCYN(ch, C_NRM));
 }
 
 
 
-void list_char_to_char(struct char_data *list, struct char_data *ch)
+void list_char_to_char(Character *list, Character *ch)
 {
-  struct char_data *i;
+  Character *i;
 
   for (i = list; i; i = i->next_in_room)
     if ((ch != i) && (i != NULL))
@@ -946,7 +946,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch)
 }
 
 
-void do_auto_exits(struct char_data *ch)
+void do_auto_exits(Character *ch)
 {
   int door, slen = 0;
   char tag_open[10], tag_close[10];
@@ -964,8 +964,8 @@ void do_auto_exits(struct char_data *ch)
     strcpy(tag_close, "/VEx");
   }
 
-  //  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
-  new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
+  //  ch->Send( "%s", MXPTAG("EXPIRE Exits"));
+  ch->Send( "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
 
   for (door = 0; door < NUM_OF_DIRS; door++)
@@ -979,24 +979,24 @@ void do_auto_exits(struct char_data *ch)
         if (GET_LEVEL(ch) > LVL_IMMORT)
         {
           if (IS_SET(W_EXIT(view_room, door)->exit_info, EX_HIDDEN))
-            new_send_to_char(ch, "{cg{cu%c{c0 {cW", UPPER(*dirs[door]));
+            ch->Send( "{cg{cu%c{c0 {cW", UPPER(*dirs[door]));
           else
-            new_send_to_char(ch, "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
+            ch->Send( "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
           slen++;
         }
       }
       else
       {
-        new_send_to_char(ch, "%s%s %s%s%c%s%s%s ", MXP_BEG, tag_open, dirs[door], MXP_END, LOWER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
+        ch->Send( "%s%s %s%s%c%s%s%s ", MXP_BEG, tag_open, dirs[door], MXP_END, LOWER(*dirs[door]), MXP_BEG, tag_close, MXP_END);
         slen++;
       }
 
 
     }
   if (!slen)
-    new_send_to_char(ch, "None!");
+    ch->Send( "None!");
 
-  new_send_to_char(ch, "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
+  ch->Send( "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
 }
 
 ACMD(do_search)
@@ -1009,7 +1009,7 @@ ACMD(do_search)
     return;
   }
 
-  new_send_to_char(ch, "You begin to search for hidden exits.\r\n");
+  ch->Send( "You begin to search for hidden exits.\r\n");
 
   for (door = 0; door < NUM_OF_DIRS; door++)
   {
@@ -1024,14 +1024,14 @@ ACMD(do_search)
 
         if (number(1, 6) <= chance || GET_LEVEL(ch) > LVL_IMMORT)
         {
-          new_send_to_char(ch, "\r\n{cWYou have found a secret door %s{cx.\r\n", dirs[door]);
+          ch->Send( "\r\n{cWYou have found a secret door %s{cx.\r\n", dirs[door]);
           REMOVE_BIT(EXIT(ch, door)->exit_info, EX_HIDDEN);
           return;
         }
       }
     }
   }
-  new_send_to_char(ch, "\r\n{cWYou don't find anything.\r\n{c0");
+  ch->Send( "\r\n{cWYou don't find anything.\r\n{c0");
 }
 
 
@@ -1042,7 +1042,7 @@ ACMD(do_exits)
   char *dirname;;
 
   //if (GET_LEVEL(ch) > LVL_IMMORT)
-  //new_send_to_char(ch, MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
+  //ch->Send( MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
 
   if (AFF_FLAGGED(ch, AFF_BLIND))
   {
@@ -1050,7 +1050,7 @@ ACMD(do_exits)
                  ch);
     return;
   }
-  new_send_to_char(ch, "Obvious exits:\r\n");
+  ch->Send( "Obvious exits:\r\n");
 
   for (door = 0; door < NUM_OF_DIRS; door++)
   {
@@ -1064,34 +1064,34 @@ ACMD(do_exits)
     if (GET_LEVEL(ch) >= LVL_IMMORT)
     {
 
-      new_send_to_char(ch, "%s%-5s%s - [%5d] %s",MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
+      ch->Send( "%s%-5s%s - [%5d] %s",MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                        GET_ROOM_VNUM(EXIT(ch, door)->to_room),
                        EXIT(ch, door)->to_room->name);
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, " (%sClosed%s)", MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
+        ch->Send( " (%sClosed%s)", MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
-        new_send_to_char(ch, " (Hidden)");
-      new_send_to_char(ch, "\r\n");
+        ch->Send( " (Hidden)");
+      ch->Send( "\r\n");
     }
     else
     {
       if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
         continue;
       if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-        new_send_to_char(ch, "%s%-5s%s - (%sClosed%s)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
+        ch->Send( "%s%-5s%s - (%sClosed%s)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
       else
-        new_send_to_char(ch, "%s%-5s%s - %s", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
+        ch->Send( "%s%-5s%s - %s", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                          IS_DARK(EXIT(ch, door)->to_room)
                          && !CAN_SEE_IN_DARK(ch) ? "Too dark to tell."
                          : EXIT(ch, door)->to_room->name);
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     }
   }
 
   if (!len)
-    new_send_to_char(ch, " None.\r\n");
+    ch->Send( " None.\r\n");
   else
-    new_send_to_char(ch, "\r\n");
+    ch->Send( "\r\n");
 
 }
 
@@ -1306,11 +1306,11 @@ void parse_room_description(room_rnum in_room, char *bufptr, size_t len)
 
 }
 
-void look_at_room(struct char_data *ch, int ignore_brief)
+void look_at_room(Character *ch, int ignore_brief)
 {
   char tbuf[MAX_STRING_LENGTH];
   struct room_data *rm, *view_room;
-  void update_mxp_map(struct char_data *ch);
+  void update_mxp_map(Character *ch);
   *tbuf = '\0';
   char buf[MAX_INPUT_LENGTH];
   if (VEHICLE_ROOM == NULL)
@@ -1325,35 +1325,35 @@ void look_at_room(struct char_data *ch, int ignore_brief)
 
   if (IS_DARK(view_room) && !CAN_SEE_IN_DARK(ch))
   {
-    new_send_to_char(ch,"It is %s...\r\n", number(0,1) ? "dark in here" : "pitch black");
+    ch->Send("It is %s...\r\n", number(0,1) ? "dark in here" : "pitch black");
     return;
   }
   else if (AFF_FLAGGED(ch, AFF_BLIND))
   {
-    new_send_to_char(ch,"You see nothing but infinite darkness...\r\n");
+    ch->Send("You see nothing but infinite darkness...\r\n");
     return;
   }
-  new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
+  ch->Send( "%s", CBCYN(ch, C_NRM));
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS))
   {
     sprintbitarray(ROOM_FLAGS(view_room), room_bits, RF_ARRAY_MAX, buf, sizeof(buf));
     if (ROOM_FLAGGED(view_room, ROOM_WILDERNESS))
     {
       parse_room_name(view_room, tbuf, sizeof(tbuf));
-      new_send_to_char(ch, "[%s%5d%s]%s %s [%s %s %s] (WILDERNESS)",
+      ch->Send( "[%s%5d%s]%s %s [%s %s %s] (WILDERNESS)",
                        CBWHT(ch, C_NRM), GET_ROOM_VNUM(IN_ROOM(ch)),
                        CCCYN(ch, C_NRM), SCRIPT(rm) ? "[{cWTRIG{cC] " : "",
                        tbuf, CBWHT(ch, C_NRM), buf,
                        CCCYN(ch, C_NRM));
     }
     else
-      new_send_to_char(ch, "[%s%5d%s]%s %s [%s %s %s]",
+      ch->Send( "[%s%5d%s]%s %s [%s %s %s]",
                        CBWHT(ch, C_NRM), GET_ROOM_VNUM(view_room),
                        CCCYN(ch, C_NRM), SCRIPT(rm) ? "[{cWTRIG{cC] " : "",
                        view_room->name,
                        CBWHT(ch, C_NRM), buf, CCCYN(ch, C_NRM));
     sprinttype(rm->sector_type, sector_types, tbuf, sizeof(tbuf));
-    new_send_to_char(ch, " (%s)", tbuf);
+    ch->Send( " (%s)", tbuf);
   }
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_WILDERNESS))
   {
@@ -1362,13 +1362,13 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   }
   else if (ROOM_FLAGGED(view_room, ROOM_ARENA))
   {
-    new_send_to_char(ch, "%s (%sARENA%s)", view_room->name,
+    ch->Send( "%s (%sARENA%s)", view_room->name,
                      CBWHT(ch, C_NRM), CCCYN(ch, C_NRM));
   }
   else
-    new_send_to_char(ch, "%s", view_room->name);
+    ch->Send( "%s", view_room->name);
 
-  new_send_to_char(ch, "%s\r\n", CCNRM(ch, C_NRM));
+  ch->Send( "%s\r\n", CCNRM(ch, C_NRM));
   /* autoexits */
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOEXIT))
     do_auto_exits(ch);
@@ -1376,28 +1376,28 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   if ((!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_BRIEF)) || ignore_brief ||
       ROOM_FLAGGED(view_room, ROOM_DEATH))
   {
-    new_send_to_char(ch, "%s", CCGRN(ch, C_NRM));
+    ch->Send( "%s", CCGRN(ch, C_NRM));
     if (ROOM_FLAGGED(view_room, ROOM_WILDERNESS))
     {
       parse_room_description(view_room, tbuf, sizeof(tbuf));
-      new_send_to_char(ch, "%s", tbuf);
+      ch->Send( "%s", tbuf);
     }
     else
     {
-      new_send_to_char(ch, "%s", view_room->description);
+      ch->Send( "%s", view_room->description);
       //if (can_fly(ch))
-      //new_send_to_char(ch, "You are flying a few feet up in the air.\r\n");
+      //ch->Send( "You are flying a few feet up in the air.\r\n");
     }
 
-    new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
+    ch->Send( "%s", CCNRM(ch, C_NRM));
   }
 
   /* now list characters & objects */
-  new_send_to_char(ch, "%s", CCYEL(ch, C_NRM));
+  ch->Send( "%s", CCYEL(ch, C_NRM));
   list_obj_to_char(view_room->contents, ch, 0, FALSE);
-  new_send_to_char(ch, "%s", CBCYN(ch, C_NRM));
+  ch->Send( "%s", CBCYN(ch, C_NRM));
   list_char_to_char(view_room->people, ch);
-  new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
+  ch->Send( "%s", CCNRM(ch, C_NRM));
 
   if (ch->desc && ch->desc->mxp)
     update_mxp_map(ch);
@@ -1409,7 +1409,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
 }
 
 
-void list_scanned_chars(struct char_data *list, struct char_data *ch,
+void list_scanned_chars(Character *list, Character *ch,
                         int distance, int door)
 {
   const char *how_far[] =
@@ -1419,7 +1419,7 @@ void list_scanned_chars(struct char_data *list, struct char_data *ch,
       "far off to the"
     };
 
-  struct char_data *i;
+  Character *i;
   int count = 0, count2 = 0;
 
   /* this loop is a quick, easy way to help make a grammatical sentence
@@ -1446,23 +1446,23 @@ void list_scanned_chars(struct char_data *list, struct char_data *ch,
     if (!CAN_SEE(ch, i))
       continue;
     if (!count2++)
-      new_send_to_char(ch, "You see %s", GET_NAME(i));
+      ch->Send( "You see %s", GET_NAME(i));
     else
-      new_send_to_char(ch, "%s",  GET_NAME(i));
+      ch->Send( "%s",  GET_NAME(i));
     if (--count > 1)
-      new_send_to_char(ch, ", ");
+      ch->Send( ", ");
     else if (count == 1)
-      new_send_to_char(ch, " and ");
+      ch->Send( " and ");
     else
     {
-      new_send_to_char(ch, " %s %s.\r\n", how_far[distance], dirs[door]);
+      ch->Send( " %s %s.\r\n", how_far[distance], dirs[door]);
 
     }
   }
 }
 
 
-void look_in_direction(struct char_data *ch, int dir)
+void look_in_direction(Character *ch, int dir)
 {
   struct room_data *room, *nextroom, *orig_room = IN_ROOM(ch);
   int distance;
@@ -1471,7 +1471,7 @@ void look_in_direction(struct char_data *ch, int dir)
   {
     if (EXIT(ch, dir)->general_description
         && !EXIT_FLAGGED(EXIT(ch, dir), EX_HIDDEN))
-      new_send_to_char(ch, "%s", EXIT(ch, dir)->general_description);
+      ch->Send( "%s", EXIT(ch, dir)->general_description);
     else
       send_to_char("You see nothing special.\r\n", ch);
 
@@ -1479,13 +1479,13 @@ void look_in_direction(struct char_data *ch, int dir)
         && EXIT(ch, dir)->keyword
         && !EXIT_FLAGGED(EXIT(ch, dir), EX_HIDDEN))
     {
-      new_send_to_char(ch, "The %s is closed.\r\n",
+      ch->Send( "The %s is closed.\r\n",
                        fname(EXIT(ch, dir)->keyword));
     }
     else if (EXIT_FLAGGED(EXIT(ch, dir), EX_ISDOOR)
              && EXIT(ch, dir)->keyword)
     {
-      new_send_to_char(ch, "The %s is open.\r\n",
+      ch->Send( "The %s is open.\r\n",
                        fname(EXIT(ch, dir)->keyword));
     }
 
@@ -1516,22 +1516,22 @@ void look_in_direction(struct char_data *ch, int dir)
 
 
 
-void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
+void look_in_obj(Character *ch, char *arg, struct obj_data *item)
 {
   struct obj_data *obj = item;
-  struct char_data *dummy = NULL;
+  Character *dummy = NULL;
   int amt, bits = -100;
   char buf2[MAX_INPUT_LENGTH];
 
   if (!obj && !arg && !*arg)
   {
-    new_send_to_char(ch, "Look in what?\r\n");
+    ch->Send( "Look in what?\r\n");
     return;
   }
   else if (!obj && !(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &dummy, &obj)))
-    new_send_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
+    ch->Send( "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
   else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_FOUNTAIN) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
-    new_send_to_char(ch, "There's nothing inside that!\r\n");
+    ch->Send( "There's nothing inside that!\r\n");
   else
   {
     if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
@@ -1540,7 +1540,7 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
         send_to_char("It is closed.\r\n", ch);
       else
       {
-        new_send_to_char(ch, "%s", obj->short_description);
+        ch->Send( "%s", obj->short_description);
         if (bits == -100)
         {
           if (obj->carried_by)
@@ -1566,7 +1566,7 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
           break;
         }
         container_disp(ch, obj);
-        new_send_to_char(ch, "-------------------------\r\n");
+        ch->Send( "-------------------------\r\n");
         list_obj_to_char(obj->contains, ch, SHOW_OBJ_SHORT, TRUE);
       }
     }
@@ -1579,14 +1579,14 @@ void look_in_obj(struct char_data *ch, char *arg, struct obj_data *item)
         if (GET_OBJ_VAL(obj, 0) <= 0
             || GET_OBJ_VAL(obj, 1) > GET_OBJ_VAL(obj, 0))
         {
-          new_send_to_char(ch, "Its contents seem somewhat murky.\r\n");   /* BUG */
+          ch->Send( "Its contents seem somewhat murky.\r\n");   /* BUG */
         }
         else
         {
           container_disp(ch, obj);
           amt = (GET_OBJ_VAL(obj, 1) * 3) / GET_OBJ_VAL(obj, 0);
           sprinttype(GET_OBJ_VAL(obj, 2), color_liquid, buf2, sizeof(buf2));
-          new_send_to_char(ch, "It's %sfull of a %s liquid.\r\n", fullness[amt], buf2);
+          ch->Send( "It's %sfull of a %s liquid.\r\n", fullness[amt], buf2);
         }
       }
     }
@@ -1615,10 +1615,10 @@ char *find_exdesc(char *word, struct extra_descr_data *list)
  * Thanks to Angus Mezick <angus@EDGIL.CCMAIL.COMPUSERVE.COM> for the
  * suggested fix to this problem.
  */
-void look_at_target(struct char_data *ch, char *arg)
+void look_at_target(Character *ch, char *arg)
 {
   int bits, found = FALSE, j, fnum, i = 0;
-  struct char_data *found_char = NULL;
+  Character *found_char = NULL;
   struct obj_data *obj, *found_obj = NULL;
   char *desc;
 
@@ -1672,7 +1672,7 @@ void look_at_target(struct char_data *ch, char *arg)
              find_exdesc(arg, GET_EQ(ch, j)->ex_description)) != NULL
           && ++i == fnum)
       {
-        new_send_to_char(ch, "%s", desc);
+        ch->Send( "%s", desc);
         found = TRUE;
       }
 
@@ -1683,7 +1683,7 @@ void look_at_target(struct char_data *ch, char *arg)
       if ((desc = find_exdesc(arg, obj->ex_description)) != NULL
           && ++i == fnum)
       {
-        new_send_to_char(ch, "%s", desc);
+        ch->Send( "%s", desc);
         found = TRUE;
       }
   }
@@ -1707,7 +1707,7 @@ void look_at_target(struct char_data *ch, char *arg)
     else
     {
       show_obj_modifiers(found_obj, ch);
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     }
   }
   else if (!found)
@@ -1804,7 +1804,7 @@ ACMD(do_look)
 
 ACMD(do_examine)
 {
-  struct char_data *tmp_char;
+  Character *tmp_char;
   struct obj_data *tmp_object;
   char tempsave[MAX_INPUT_LENGTH];
   char arg[MAX_STRING_LENGTH];
@@ -1828,14 +1828,14 @@ ACMD(do_examine)
   if (tmp_object)
   {
     int has_identifier(struct obj_data *obj, long id);
-    void identify_object(CHAR_DATA *ch, OBJ_DATA *obj);
-    new_send_to_char(ch, "You examine %s:\r\n", tmp_object->short_description);
+    void identify_object(Character *ch, OBJ_DATA *obj);
+    ch->Send( "You examine %s:\r\n", tmp_object->short_description);
 
     examine_on = FALSE;
     look_at_target(ch, tempsave);  /* strcpy: OK */
     examine_on = TRUE;
     if (GET_OBJ_INNATE(tmp_object) != TYPE_UNDEFINED && affected_by_spell(ch, SPELL_DETECT_MAGIC))
-      new_send_to_char(ch, "\r\nYou sense that this item is further embued with the spell %s.\r\n",
+      ch->Send( "\r\nYou sense that this item is further embued with the spell %s.\r\n",
                        skill_name(GET_OBJ_INNATE(tmp_object)));
     if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) ||
         (GET_OBJ_TYPE(tmp_object) == ITEM_FOUNTAIN) ||
@@ -1847,26 +1847,26 @@ ACMD(do_examine)
 
     if (has_identifier(tmp_object, GET_ID(ch)))
     {
-      new_send_to_char(ch, "You remember the time you identified %s\r\n", tmp_object->short_description);
+      ch->Send( "You remember the time you identified %s\r\n", tmp_object->short_description);
       identify_object(ch, tmp_object);
     }
   }
   else if (tmp_char)
   {
-    new_send_to_char(ch, "You examine %s:\r\n", GET_NAME(tmp_char));
+    ch->Send( "You examine %s:\r\n", GET_NAME(tmp_char));
 
     examine_on = FALSE;
     look_at_target(ch, tempsave);  /* strcpy: OK */
   }
   else
   {
-    new_send_to_char(ch, "You can't see that here.\r\n");
+    ch->Send( "You can't see that here.\r\n");
   }
 }
 
 char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
 {
-  CHAR_DATA *i;
+  Character *i;
   int low = 70, high = 0, t_m = 0, t_l = 0, avg;
 
 
@@ -1899,7 +1899,7 @@ char *scan_zone_mobs(zone_rnum zone_nr, char *buf, size_t len)
   return buf;
 }
 
-void look_around(CHAR_DATA *ch)
+void look_around(Character *ch)
 {
 
   char zonename[MAX_INPUT_LENGTH];
@@ -1929,9 +1929,9 @@ void look_around(CHAR_DATA *ch)
     }
   
   if (zone_table[IN_ROOM(ch)->zone].dimension)
-    new_send_to_char(ch, "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
-  new_send_to_char(ch, "\r\n{cyYou are in %s{c0\r\n", zonename);
-  new_send_to_char(ch, "{cc%s{C0\r\n", scan_zone_mobs(IN_ROOM(ch)->zone, zonename, sizeof(zonename)));
+    ch->Send( "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM(ch)->zone].dimension]);
+  ch->Send( "\r\n{cyYou are in %s{c0\r\n", zonename);
+  ch->Send( "{cc%s{C0\r\n", scan_zone_mobs(IN_ROOM(ch)->zone, zonename, sizeof(zonename)));
 
 }
 
@@ -1944,20 +1944,20 @@ ACMD(do_gold)
   commafmt(goldtot, sizeof(goldtot), char_gold(ch, 0, GOLD_HAND) + char_gold(ch, 0, GOLD_BANK));
 
 
-  new_send_to_char(ch,"\r\n{cY        _       {cc            4 DIMENSIONS FINANCIAL SERVICES{c0\r\n");
-  new_send_to_char(ch,"{cY  _    |-|  _   {cw-------------------------------------------{c0\r\n");
-  new_send_to_char(ch,"{cY |-|_  |-|_|-|  {ccGold in Bank{cW:         [{cy%19s{cW]{c0\r\n",goldbank);
-  new_send_to_char(ch,"{cY |_|-| |_|-|_|  {cw-------------------------------------------{c0  \r\n");
-  new_send_to_char(ch,"{cY |_|-| |_|-|_|  {ccGold Carried{cW:         [{cy%19s{cW]{c0\r\n",goldhand);
-  new_send_to_char(ch,"{cY   |_|   |_|    {cw-------------------------------------------{c0\r\n");
-  new_send_to_char(ch,"                {ccTotal Balance{cW:        [{cy%19s{cW]{c0\r\n",goldtot);
-  new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
-  new_send_to_char(ch,"                {ccTokens on file{cW: %5d brass,  %5d bronze.\r\n"
+  ch->Send("\r\n{cY        _       {cc            4 DIMENSIONS FINANCIAL SERVICES{c0\r\n");
+  ch->Send("{cY  _    |-|  _   {cw-------------------------------------------{c0\r\n");
+  ch->Send("{cY |-|_  |-|_|-|  {ccGold in Bank{cW:         [{cy%19s{cW]{c0\r\n",goldbank);
+  ch->Send("{cY |_|-| |_|-|_|  {cw-------------------------------------------{c0  \r\n");
+  ch->Send("{cY |_|-| |_|-|_|  {ccGold Carried{cW:         [{cy%19s{cW]{c0\r\n",goldhand);
+  ch->Send("{cY   |_|   |_|    {cw-------------------------------------------{c0\r\n");
+  ch->Send("                {ccTotal Balance{cW:        [{cy%19s{cW]{c0\r\n",goldtot);
+  ch->Send("                {cw-------------------------------------------{c0\r\n");
+  ch->Send("                {ccTokens on file{cW: %5d brass,  %5d bronze.\r\n"
                    "                                %5d silver, %5d gold.{c0\r\n",
                    GET_BRASS_TOKEN_COUNT(ch), GET_BRONZE_TOKEN_COUNT(ch),
                    GET_SILVER_TOKEN_COUNT(ch), GET_GOLD_TOKEN_COUNT(ch));
-  new_send_to_char(ch,"                {cw-------------------------------------------{c0\r\n");
-  new_send_to_char(ch,"                {ccTradepoints   {cW: %5d  {c0\r\n",TRADEPOINTS(ch));
+  ch->Send("                {cw-------------------------------------------{c0\r\n");
+  ch->Send("                {ccTradepoints   {cW: %5d  {c0\r\n",TRADEPOINTS(ch));
 
 }
 
@@ -1969,13 +1969,13 @@ ACMD(do_tiername)
   j = parse_class(*thebuf);
   if (j==-1)
   {
-    new_send_to_char(ch, "Invalid name");
+    ch->Send( "Invalid name");
     return;
   }
 
-  new_send_to_char(ch, "Classes in the %s Specialization:\r\n", class_name[j].name[0]);
+  ch->Send( "Classes in the %s Specialization:\r\n", class_name[j].name[0]);
   for (i = 0; i < 5;i++)
-    new_send_to_char(ch, "Class Name:%-12s Tier Num:%d\r\n", class_name[j].name[i], i);
+    ch->Send( "Class Name:%-12s Tier Num:%d\r\n", class_name[j].name[i], i);
 
 }
 
@@ -1984,7 +1984,7 @@ ACMD(do_tiername)
 
 
 
-char * primary_class(struct char_data *ch, char * blank)
+char * primary_class(Character *ch, char * blank)
 {
   sh_int t = TIER, cl = GET_CLASS(ch);
   size_t len;
@@ -1999,7 +1999,7 @@ char * primary_class(struct char_data *ch, char * blank)
 
 }
 
-char * secondary_class(struct char_data *ch, char * blank)
+char * secondary_class(Character *ch, char * blank)
 {
   sh_int cl = GET_CLASS(ch);
   sh_int cl_next = -1;
@@ -2029,7 +2029,7 @@ char * secondary_class(struct char_data *ch, char * blank)
   return blank;
 }
 
-char * tertary_class(struct char_data *ch, char * blank)
+char * tertary_class(Character *ch, char * blank)
 {
   sh_int t = TIER, cl = GET_CLASS(ch), cl_next = -1, tl = 0;
   size_t len;
@@ -2066,7 +2066,7 @@ char * tertary_class(struct char_data *ch, char * blank)
 
 }
 
-char * quatry_class(struct char_data *ch, char * blank)
+char * quatry_class(Character *ch, char * blank)
 {
   sh_int t = TIER, cl = GET_CLASS(ch), cl_next = -1, tl = 0;
   size_t len;
@@ -2135,7 +2135,7 @@ ACMD(do_score)
   char *gld, goldy[50], *gld2, goldy2[50];
   char *blank, blankbuf[100];
 
-  int class_damroll(struct char_data *ch);
+  int class_damroll(Character *ch);
   char webp[250];
   char webs[250], shld[250];
   int primin = 0, primax = 0, secmin = 0, secmax = 0;
@@ -2155,31 +2155,31 @@ ACMD(do_score)
 
   if (AFF_FLAGGED(ch, AFF_POLY_TOAD))
   {
-    new_send_to_char(ch, "You puzzle, but your toad mind can't comprehend that!\r\n");
+    ch->Send( "You puzzle, but your toad mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_WOLF))
   {
-    new_send_to_char(ch, "You puzzle, but your wolf mind can't comprehend that!\r\n");
+    ch->Send( "You puzzle, but your wolf mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BOAR))
   {
-    new_send_to_char(ch, "You puzzle, but your boar mind can't comprehend that!\r\n");
+    ch->Send( "You puzzle, but your boar mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BEAR))
   {
-    new_send_to_char(ch, "You puzzle, but your bear mind can't comprehend that!\r\n");
+    ch->Send( "You puzzle, but your bear mind can't comprehend that!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_LION))
   {
-    new_send_to_char(ch, "You puzzle, but your lion mind can't comprehend that!\r\n");
+    ch->Send( "You puzzle, but your lion mind can't comprehend that!\r\n");
     return;
   }
 
-  if ((blocking = MIN(50.0f, (AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5f*apply_ac(ch, WEAR_SHIELD) : apply_ac(ch, WEAR_SHIELD)))))
+if ((blocking = MIN(50, FTOI((AFF_FLAGGED(ch, AFF_SHIELD_STATIC) ? 2.5f*apply_ac(ch, WEAR_SHIELD) : apply_ac(ch, WEAR_SHIELD))))))
     len = snprintf(shld, sizeof(shld), "Shield Block Chance: %2.2f%%", blocking);
   else
     strcpy(shld, "  ");
@@ -2202,15 +2202,15 @@ ACMD(do_score)
 
       primin += class_damroll(ch);
       primax += class_damroll(ch);
-      primin *= ((wep_num==1) ? 1.1f : 1.0f);
-      primax *= ((wep_num==1) ? 1.1f : 1.0f);
-      primin *= shortmulti;
-      primax *= shortmulti;
+      primin = FTOI(primin * ((wep_num==1) ? 1.1f : 1.0f));
+      primax = FTOI(primax * ((wep_num==1) ? 1.1f : 1.0f));
+      primin = FTOI(primin * shortmulti);
+      primax = FTOI(primax * shortmulti);
 
-      primin *= race_dam_mod(GET_RACE(ch), 0);
-      primax *= race_dam_mod(GET_RACE(ch), 0);
-      primin += ((float)primin * (((float)REMORTS(ch) * 0.005f)));
-      primax += ((float)primax * (((float)REMORTS(ch) * 0.005f)));
+      primin = FTOI(primin * race_dam_mod(GET_RACE(ch), 0));
+      primax = FTOI(primax * race_dam_mod(GET_RACE(ch), 0));
+      primin += FTOI(((float)primin * (((float)REMORTS(ch) * 0.005f))));
+      primax += FTOI(((float)primax * (((float)REMORTS(ch) * 0.005f))));
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
@@ -2224,19 +2224,19 @@ ACMD(do_score)
       secmax =
         size_dice_wep(ch, WEAPON_SECO_AFF) + (size_dice_wep(ch, WEAPON_SECO_AFF) * num_dice_wep(ch, WEAPON_SECO_AFF));
       if (GET_SKILL(ch, SKILL_LONGARM) > 0 && !is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
-        shortmulti += (LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0;
+        shortmulti += ((LONG_WEP_MULTI * ((float)GET_SKILL(ch, SKILL_LONGARM)))/100.0);
       else if (GET_SKILL(ch, SKILL_SHORT_BLADE) > 0 && is_short_wep(GET_EQ(ch, WEAR_WIELD_2)))
-        shortmulti += (SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0;
+        shortmulti += ((SHORT_WEP_MULTI_ROGUE * ((float)GET_SKILL(ch, SKILL_SHORT_BLADE)))/100.0);
       else
         shortmulti = 1.0f;
       secmin += class_damroll(ch);
       secmax += class_damroll(ch);
-      secmin *= shortmulti;
-      secmax *= shortmulti;
-      secmin *= race_dam_mod(GET_RACE(ch), 0);
-      secmax *= race_dam_mod(GET_RACE(ch), 0);
-      secmin += ((float)secmin * (((float)REMORTS(ch) * 0.005f)));
-      secmax += ((float)secmax * (((float)REMORTS(ch) * 0.005f)));
+      secmin = FTOI(secmin * shortmulti);
+      secmax = FTOI(secmax * shortmulti);
+      secmin = FTOI(secmin * race_dam_mod(GET_RACE(ch), 0));
+      secmax = FTOI(secmax * race_dam_mod(GET_RACE(ch), 0));
+      secmin += FTOI((float)secmin * (((float)REMORTS(ch) * 0.005f)));
+      secmax += FTOI((float)secmax * (((float)REMORTS(ch) * 0.005f)));
 
       if (GET_MASTERY(ch, CLASS_GYPSY))
       {
@@ -2266,8 +2266,8 @@ ACMD(do_score)
     primin += class_damroll(ch);
     primax = (spell_size_dice(ch) + (spell_size_dice(ch)*spell_num_dice(ch)));
     primax += class_damroll(ch);
-    primin *= (staff ? staff : 1.0);
-    primax *= (staff ? staff : 1.0);
+  primin = FTOI(primin * (staff ? staff : 1.0));
+  primax = FTOI(primax * (staff ? staff : 1.0));
     /*
     if (GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
     {
@@ -2284,10 +2284,10 @@ ACMD(do_score)
       primax += average_damage(RIDING(ch));
     }
     */
-    primin *= race_dam_mod(GET_RACE(ch), TRUE);
-    primax *= race_dam_mod(GET_RACE(ch), TRUE);
-    primin += (primin * ( (REMORTS(ch) * 0.005)));
-    primax += (primax * ( (REMORTS(ch) * 0.005)));
+    primin = FTOI(primin * race_dam_mod(GET_RACE(ch), TRUE));
+    primax = FTOI(primax * race_dam_mod(GET_RACE(ch), TRUE));
+    primin += FTOI(primin * ( (REMORTS(ch) * 0.005)));
+    primax += FTOI(primax * ( (REMORTS(ch) * 0.005)));
     /*
     primin *= damspeed;
     primax *= damspeed;
@@ -2296,8 +2296,8 @@ ACMD(do_score)
 
     if (GET_MASTERY(ch, CLASS_MAGE))
     {
-      primax *= (1.20f);
-      primin *= (1.20f);
+      primax += primax/5;
+      primin += primin/5;
     }
 
     len = snprintf(webp, sizeof(webp), "Magic Damage: %4d to %-4d", primin, primax);
@@ -2310,34 +2310,34 @@ ACMD(do_score)
 
   /* yikes, nasty hack job here testing for a player name but hey... -mord */
   if (!str_cmp("thotter", GET_NAME(ch)))
-    new_send_to_char(ch,
+    ch->Send(
                      "\r\n{cg(*)---[{cC{cuKing Of Pie{cg]-------------------------Class--TierName-----Tier--(*){c0\r\n");
   else
-    new_send_to_char(ch,
+    ch->Send(
                      "\r\n{cg(*)-----------------------------------------Class--TierName-----Tier--(*){c0\r\n");
-  new_send_to_char(ch,"{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw   %s %-29s {cg| |\r\n",
+  ch->Send("{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw   %s %-29s {cg| |\r\n",
                    GET_NAME(ch),GET_LEVEL(ch),
                    (color_space ? "   " : ""),    primary_class(ch, blank));
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |{cw Race:{cc %-9s{cw        {cwAlign: {cc%-5d{cw %s%-29s {cg| |\r\n",
                    race_name(ch),  GET_ALIGNMENT(ch),
                    (color_space ? "   " : ""), secondary_class(ch, blank));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |  {cwSex:{cy %-7s{cw      Practices: {cc%-6d{cw%s%-29s {cg| |\r\n",
                    (GET_SEX(ch) == SEX_MALE ? "Male" : (GET_SEX(ch) ? "Female" :  "Neutral")),
                    GET_PRACTICES(ch),  (color_space ? "   " : ""), tertary_class(ch, blank));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| | {cwClan: {cy%-17s {cwRank: {cc%-2d{cw    %s%-29s {cg| |\r\n",
                    ((!GET_CLAN(ch)) ? "<none>" : clan[find_clan_by_id(GET_CLAN(ch))].name),
                    GET_CLAN_RANK(ch),
                    (color_space ? "   " : ""), quatry_class(ch, blank));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |-------------------------------------------------------------------| |{cw\r\n");
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| | {cwHit  Points: [{cc%6d{cw][{cc%6d{cw]     Speed: [{cc%6d{cw]      AC: [{cc%4d{cw] {cg| |\r\n"
                    "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
                    "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]  Accuracy: [{cy%4d{cw]   Evasion: [{cy%4d{cw] {cg| |{c0\r\n",
@@ -2345,33 +2345,33 @@ ACMD(do_score)
                    GET_MANA(ch), GET_MAX_MANA(ch), GET_HITROLL(ch),   class_damroll(ch) ,
                    GET_MOVE(ch), GET_MAX_MOVE(ch), accuracy_tot(ch), evasion_tot(ch));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |-------------------------------------------------------------------| |{cw\r\n");
   if (IS_PK(ch))
-    new_send_to_char(ch, "{cg| | {cw   PKwin: [{cc%6d{cw]     PKloss: [{cc%6d{cw]     PK-Points:[{cc%6d{cw]    {cg| |\r\n",
+    ch->Send( "{cg| | {cw   PKwin: [{cc%6d{cw]     PKloss: [{cc%6d{cw]     PK-Points:[{cc%6d{cw]    {cg| |\r\n",
                      GET_PK_CNT(ch), GET_PK_RIP(ch), GET_PK_POINTS(ch));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| | {cw   Kills: [{cc%6d{cw]     Deaths: [{cc%6d{cw]     Deathtraps: [{cc%4d{cw]    {cg| |\r\n",
                    GET_KILL_CNT(ch), GET_RIP_CNT(ch), GET_DT_CNT(ch));
   if (*webp || *webs)
-    new_send_to_char(ch, "{cg| |->{cC%-30s{cg<|>{cC%-30s{cg<-| |{cw\r\n", webp,  webs);
+    ch->Send( "{cg| |->{cC%-30s{cg<|>{cC%-30s{cg<-| |{cw\r\n", webp,  webs);
   if ((staff || wep_num > 1) && GET_EQ(ch, WEAR_SHIELD) && *shld)
-    new_send_to_char(ch, "{cg| |->              {cC%30s{cg                   <-| |{cw\r\n", shld);
+    ch->Send( "{cg| |->              {cC%30s{cg                   <-| |{cw\r\n", shld);
   if (GET_EQ(ch, WEAR_WIELD) &&
       (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_SHOVEL ||
        GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_PICKAXE))
-    new_send_to_char(ch,
+    ch->Send(
                      "{cg| |{cC[Mining] {cwSpeed: {cc%3d{cw   Bonus: {cc%3d{cw   Protection: {cc%3d   {cwStealth: {cc%3d{cg  | |\r\n",
                      MINE_SPEED(ch), MINE_BONUS(ch), MINE_DAMAGE(ch), MINE_STEALTH(ch));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |-------------------------------------------------------------------| |\r\n"
                    "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-2d{cg   | |\r\n",
                    GET_STR(ch), GET_ADD(ch), GET_INT(ch), GET_WIS(ch),
                    GET_CON(ch),GET_DEX(ch), GET_CHA(ch));
 
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |-------------------------------------------------------------------| |\r\n"
                    "{cg| |     Hunger: [{cy%3d%%{cg]      Thirst:[{cy%3d%%{cg]      Intoxication:[{cy%3d%%{cg]    | |\r\n",
                    GET_COND(ch,
@@ -2389,7 +2389,7 @@ ACMD(do_score)
     char exphave[50], expneed[50];
     commafmt(exphave, sizeof(exphave),GET_EXP(ch));
     commafmt(expneed, sizeof(expneed),exp_needed(ch));
-    new_send_to_char(ch,
+    ch->Send(
                      "{cg| |-------------------------------------------------------------------| |\r\n"
                      "{cg| |   {cwExp. Total: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
                      exphave, exp_needed(ch) > 0 ? expneed : "No More");
@@ -2397,7 +2397,7 @@ ACMD(do_score)
     {
       commafmt(exphave, sizeof(exphave),GET_GROUP_EXP(ch));
       commafmt(expneed, sizeof(expneed),group_exp_needed(ch));
-      new_send_to_char(ch,"{cg| |    {cwGroup Pts: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
+      ch->Send("{cg| |    {cwGroup Pts: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
                        exphave, group_exp_needed(ch) > 0 ? expneed : "No More");
     }
 
@@ -2407,179 +2407,179 @@ ACMD(do_score)
 
   playing_time = *real_time_passed((time(0) - ch->player.time.logon) +
                                    ch->player.time.played, 0);
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg| |-------------------------------------------------------------------| |\r\n"
                    "| | {cwAge: {cy%-3d{cg  --  {cwYou have been playing for [{cy%3d{cw] day%s and [{cy%2d{cw] hour%-s{cg | |\r\n",
                    GET_AGE(ch),
                    playing_time.day, playing_time.day == 1 ? "" : "s",
                    playing_time.hours,
                    playing_time.hours == 1 ? " " : "s");
-  new_send_to_char(ch,
+  ch->Send(
                    "{cg-------------------------------------------------------------------------{c0\r\n");
   if (GET_RP_GROUP(ch))
-    new_send_to_char(ch, "Your RP group is: %s\r\n", rp_group_names[GET_RP_GROUP(ch)]);
+    ch->Send( "Your RP group is: %s\r\n", rp_group_names[GET_RP_GROUP(ch)]);
   if (GET_LEVEL(ch) >= LVL_HERO)
-    new_send_to_char(ch, "Pretitle: %s\r\n",( PRETITLE(ch) != NULL ? PRETITLE(ch) : "none"));
+    ch->Send( "Pretitle: %s\r\n",( PRETITLE(ch) != NULL ? PRETITLE(ch) : "none"));
   if (GET_LEVEL(ch) >= LVL_IMMORT)
   {
 
     if (POOFIN(ch))
-      new_send_to_char(ch, "Poofin :%s\r\n", POOFIN(ch));
+      ch->Send( "Poofin :%s\r\n", POOFIN(ch));
     if (POOFOUT(ch))
-      new_send_to_char(ch, "Poofout:%s\r\n", POOFOUT(ch));
+      ch->Send( "Poofout:%s\r\n", POOFOUT(ch));
     if (GET_LOADROOM(ch) != -1)
-      new_send_to_char(ch, "Loadroom: %s [vnum: %d]\r\n",
+      ch->Send( "Loadroom: %s [vnum: %d]\r\n",
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
-  if (GET_LOGINMSG(ch)) new_send_to_char(ch, "Login Message: %s\r\n", GET_LOGINMSG(ch));                  /*THOTTER EDIT*/
-  if (GET_LOGOUTMSG(ch)) new_send_to_char(ch,"Logout Message: %s\r\n", GET_LOGOUTMSG(ch));               /*THOTTER EDIT*/
+  if (GET_LOGINMSG(ch)) ch->Send( "Login Message: %s\r\n", GET_LOGINMSG(ch));                  /*THOTTER EDIT*/
+  if (GET_LOGOUTMSG(ch)) ch->Send("Logout Message: %s\r\n", GET_LOGOUTMSG(ch));               /*THOTTER EDIT*/
   /** Display info about your scooter **/
   if (has_vehicle(ch))
   {
     struct obj_data *v = has_vehicle(ch);
-    new_send_to_char(ch, "Vehicle Fuel: [%d]\r\n", GET_FUEL(v) > 0 ? (GET_FUEL(v) * 100)/ GET_MAX_FUEL(v) : 0);
+    ch->Send( "Vehicle Fuel: [%d]\r\n", GET_FUEL(v) > 0 ? (GET_FUEL(v) * 100)/ GET_MAX_FUEL(v) : 0);
   }
   /** End scooter info **/
   if (PRF_FLAGGED(ch, PRF_RP))
   {
-    new_send_to_char(ch, "You are RolePlaying!\r\n");
+    ch->Send( "You are RolePlaying!\r\n");
   }
   if (PRF_FLAGGED(ch, PRF_BUSY))
   {
     if (ch->player_specials->busy_msg)
-      new_send_to_char(ch, "You are BUSY: %s\r\n", ch->player_specials->busy_msg);
+      ch->Send( "You are BUSY: %s\r\n", ch->player_specials->busy_msg);
     else
-      new_send_to_char(ch, "You are BUSY!\r\n");
+      ch->Send( "You are BUSY!\r\n");
   }
   if (PRF_FLAGGED(ch, PRF_AFK))
   {
     if (ch->player_specials->afk_msg)
-      new_send_to_char(ch, "You are AFK: %s\r\n", ch->player_specials->afk_msg);
+      ch->Send( "You are AFK: %s\r\n", ch->player_specials->afk_msg);
     else
-      new_send_to_char(ch, "You are AFK!\r\n");
+      ch->Send( "You are AFK!\r\n");
   }
   switch (GET_POS(ch))
   {
   case POS_DEAD:
-    new_send_to_char(ch, "You are DEAD!\r\n");
+    ch->Send( "You are DEAD!\r\n");
     break;
   case POS_MORTALLYW:
-    new_send_to_char(ch,
+    ch->Send(
                      "You are mortally wounded!  You should seek help!\r\n");
     break;
   case POS_INCAP:
-    new_send_to_char(ch,
+    ch->Send(
                      "You are incapacitated, slowly fading away...\r\n");
     break;
   case POS_STUNNED:
-    new_send_to_char(ch, "You are stunned!  You can't move!\r\n");
+    ch->Send( "You are stunned!  You can't move!\r\n");
     break;
   case POS_SLEEPING:
-    new_send_to_char(ch, "You are sleeping.\r\n");
+    ch->Send( "You are sleeping.\r\n");
     break;
   case POS_RESTING:
-    new_send_to_char(ch, "You are resting.\r\n");
+    ch->Send( "You are resting.\r\n");
     break;
   case POS_SITTING:
     if (!SITTING(ch))
-      new_send_to_char(ch, "You are sitting.\r\n");
+      ch->Send( "You are sitting.\r\n");
     else
     {
       struct obj_data *chair = SITTING(ch);
-      new_send_to_char(ch, "You are sitting upon %s.\r\n",
+      ch->Send( "You are sitting upon %s.\r\n",
                        chair->short_description);
     }
     break;
   case POS_FIGHTING:
     if (FIGHTING(ch))
-      new_send_to_char(ch, "You are fighting %s.\r\n",
+      ch->Send( "You are fighting %s.\r\n",
                        PERS(FIGHTING(ch), ch));
     else
-      new_send_to_char(ch, "You are fighting thin air.\r\n");
+      ch->Send( "You are fighting thin air.\r\n");
     break;
   case POS_STANDING:
-    new_send_to_char(ch, "You are standing.\r\n");
+    ch->Send( "You are standing.\r\n");
     break;
   default:
-    new_send_to_char(ch, "You are floating.\r\n");
+    ch->Send( "You are floating.\r\n");
     break;
   }
 
 
 
   if (AFF_FLAGGED(ch, AFF_BLIND))
-    new_send_to_char(ch, "You have been blinded!\r\n");
+    ch->Send( "You have been blinded!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_INVISIBLE))
-    new_send_to_char(ch, "You are invisible.\r\n");
+    ch->Send( "You are invisible.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_DETECT_INVIS))
-    new_send_to_char(ch,
+    ch->Send(
                      "You are sensitive to the presence of invisible things.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_SANCTUARY))
-    new_send_to_char(ch, "You are protected by Sanctuary.\r\n");
+    ch->Send( "You are protected by Sanctuary.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) ||
       AFF_FLAGGED(ch, AFF_POISON_3) || AFF_FLAGGED(ch, AFF_POISON_4))
-    new_send_to_char(ch, "You are poisoned!\r\n");
+    ch->Send( "You are poisoned!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_CHARM))
-    new_send_to_char(ch, "You have been charmed!\r\n");
+    ch->Send( "You have been charmed!\r\n");
 
   if (affected_by_spell(ch, SPELL_ARMOR))
-    new_send_to_char(ch, "You feel protected.\r\n");
+    ch->Send( "You feel protected.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_INFRAVISION))
-    new_send_to_char(ch, "Your eyes are glowing {cRred{cx.\r\n");
+    ch->Send( "Your eyes are glowing {cRred{cx.\r\n");
 
   if (PRF_FLAGGED(ch, PRF_SUMMONABLE))
-    new_send_to_char(ch, "You are summonable by other players.\r\n");
+    ch->Send( "You are summonable by other players.\r\n");
   if (PRF_FLAGGED(ch, PRF_GATEABLE))
-    new_send_to_char(ch, "You are gateable by other players.\r\n");
+    ch->Send( "You are gateable by other players.\r\n");
   if (PRF_FLAGGED(ch, PRF_GATEABLE))
-    new_send_to_char(ch, "You are teleportable.\r\n");
+    ch->Send( "You are teleportable.\r\n");
   if (AFF_FLAGGED(ch, AFF_PROT_FIRE))
-    new_send_to_char(ch, "You are protected against fire.\r\n");
+    ch->Send( "You are protected against fire.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_PROT_COLD))
-    new_send_to_char(ch, "You are protected against freezing.\r\n");
+    ch->Send( "You are protected against freezing.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_BURNING) && !AFF_FLAGGED(ch, AFF_PROT_FIRE))
-    new_send_to_char(ch, "You are {cRburning{cx!\r\n");
+    ch->Send( "You are {cRburning{cx!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_FREEZING) && !AFF_FLAGGED(ch, AFF_PROT_COLD))
-    new_send_to_char(ch, "You are {cCfreezing{cx!\r\n");
+    ch->Send( "You are {cCfreezing{cx!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_ACIDED))
-    new_send_to_char(ch, "You are acided!\r\n");
+    ch->Send( "You are acided!\r\n");
 
   if (AFF_FLAGGED(ch, AFF_FIRE_SHIELD))
-    new_send_to_char(ch, "You are protected by a fire shield!\r\n");
+    ch->Send( "You are protected by a fire shield!\r\n");
   if (can_fly(ch))
-    new_send_to_char(ch, "You are flying!\r\n");
+    ch->Send( "You are flying!\r\n");
 
   /* Romance Module Additions */
   switch (ROMANCE(ch))
   {
   case 0:
-    new_send_to_char(ch, "You are single.\r\n");
+    ch->Send( "You are single.\r\n");
     break;
   case 1:
-    new_send_to_char(ch, "You are dating %s.\r\n", get_name_by_id(PARTNER(ch)));
+    ch->Send( "You are dating %s.\r\n", get_name_by_id(PARTNER(ch)));
     break;
   case 2:
-    new_send_to_char(ch, "You are engaged to %s.\r\n", get_name_by_id(PARTNER(ch)));
+    ch->Send( "You are engaged to %s.\r\n", get_name_by_id(PARTNER(ch)));
     break;
   case 3:
-    new_send_to_char(ch, "You are married to %s.\r\n", get_name_by_id(PARTNER(ch)));
+    ch->Send( "You are married to %s.\r\n", get_name_by_id(PARTNER(ch)));
     break;
   case 4:
-    new_send_to_char(ch, "You are asking %s out.\r\n", get_name_by_id(PARTNER(ch)));
+    ch->Send( "You are asking %s out.\r\n", get_name_by_id(PARTNER(ch)));
     break;
   case 5:
-    new_send_to_char(ch, "You are proposing to %s.\r\n", get_name_by_id(PARTNER(ch)));
+    ch->Send( "You are proposing to %s.\r\n", get_name_by_id(PARTNER(ch)));
     break;
   }
   /* MatingMod Additions */
@@ -2587,52 +2587,52 @@ ACMD(do_score)
   {
     if (GET_LEVEL(ch) >= LVL_HERO)
     {     /* THIS ELSE-IF OPTIONAL */
-      new_send_to_char(ch,
+      ch->Send(
                        "You are %d hours away from giving birth.\r\n",
                        PREG(ch));
     }
     else
     {
-      new_send_to_char(ch, "You are ");
+      ch->Send( "You are ");
       if (PREG(ch) < 7)
       {
-        new_send_to_char(ch, "giving birth!\r\n");
+        ch->Send( "giving birth!\r\n");
       }
       else if (PREG(ch) < MONTHS_2)
       {
-        new_send_to_char(ch, "9 months pregnant.\r\n");
+        ch->Send( "9 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_3)
       {
-        new_send_to_char(ch, "8 months pregnant.\r\n");
+        ch->Send( "8 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_4)
       {
-        new_send_to_char(ch, "7 months pregnant.\r\n");
+        ch->Send( "7 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_5)
       {
-        new_send_to_char(ch, "6 months pregnant.\r\n");
+        ch->Send( "6 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_6)
       {
-        new_send_to_char(ch, "5 months pregnant.\r\n");
+        ch->Send( "5 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_7)
       {
-        new_send_to_char(ch, "4 months pregnant.\r\n");
+        ch->Send( "4 months pregnant.\r\n");
       }
       else if (PREG(ch) < MONTHS_8)
       {
-        new_send_to_char(ch, "3 months pregnant.\r\n");
+        ch->Send( "3 months pregnant.\r\n");
       }
       else if (PREG(ch) < NINE_MONTHS)
       {
-        new_send_to_char(ch, "2 months pregnant.\r\n");
+        ch->Send( "2 months pregnant.\r\n");
       }
       else
       {
-        new_send_to_char(ch, "1 month pregnant.\r\n");
+        ch->Send( "1 month pregnant.\r\n");
       }
     }
   }
@@ -2644,7 +2644,7 @@ ACMD(do_score)
 
 ACMD(do_inventory)
 {
-  new_send_to_char(ch,
+  ch->Send(
                    "\r\n{cy[You are carrying {cC%d{cy of {cc%d {cyitem%s] \r\n"
                    "[You have a total weight of {cC%d{cy/{cc%d{cy]{c0\r\n",
                    IS_CARRYING_N(ch), CAN_CARRY_N(ch),
@@ -2654,7 +2654,7 @@ ACMD(do_inventory)
   list_obj_to_char(ch->carrying, ch, 1, TRUE);
 }
 
-void list_damage(CHAR_DATA *ch)
+void list_damage(Character *ch)
 {
   //TODO: list damage of all the players on
 }
@@ -2665,27 +2665,27 @@ ACMD(do_equipment)
   int i, found = 0, all = FALSE;
   if (AFF_FLAGGED(ch, AFF_POLY_TOAD))
   {
-    new_send_to_char(ch, "You look great in warty green brown skin!\r\n");
+    ch->Send( "You look great in warty green brown skin!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_WOLF))
   {
-    new_send_to_char(ch, "You look great in shaggy fur!\r\n");
+    ch->Send( "You look great in shaggy fur!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BOAR))
   {
-    new_send_to_char(ch, "You look great covered in straight short hairs!\r\n");
+    ch->Send( "You look great covered in straight short hairs!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_BEAR))
   {
-    new_send_to_char(ch, "You look great covered in a heavy shaggy fur!\r\n");
+    ch->Send( "You look great covered in a heavy shaggy fur!\r\n");
     return;
   }
   if (AFF_FLAGGED(ch, AFF_POLY_LION))
   {
-    new_send_to_char(ch, "You look great in huge claws and teeth. Woo!\r\n");
+    ch->Send( "You look great in huge claws and teeth. Woo!\r\n");
     return;
   }
   if (isname("all", argument))
@@ -2699,7 +2699,7 @@ ACMD(do_equipment)
     {
       if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
         send_to_char("\x1B[33m", ch);
-      new_send_to_char(ch, "%s ", disp_where(wear_order_index[i], ch));
+      ch->Send( "%s ", disp_where(wear_order_index[i], ch));
       if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
         send_to_char("\x1B[0m", ch);
       found = TRUE;
@@ -2713,7 +2713,7 @@ ACMD(do_equipment)
         {
           if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
             send_to_char("\x1B[33m", ch);
-          new_send_to_char(ch, "%s ", disp_where(wear_order_index[i], ch));
+          ch->Send( "%s ", disp_where(wear_order_index[i], ch));
           if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
             send_to_char("\x1B[0m", ch);
         }
@@ -2722,22 +2722,22 @@ ACMD(do_equipment)
       }
       else
       {
-        new_send_to_char(ch, "%s Something.\r\n",
+        ch->Send( "%s Something.\r\n",
                          all ? "" : disp_where(wear_order_index[i], ch));
         found = TRUE;
       }
     }
     else if (all)
     {
-      new_send_to_char(ch, " Empty. \r\n");
+      ch->Send( " Empty. \r\n");
     }
     /*else if (PRF_FLAGGED(ch, PRF_BATTLESPAM)) {
-       new_send_to_char(ch, "%s Nothing.\r\n", where[wear_order_index[i]]);
+       ch->Send( "%s Nothing.\r\n", where[wear_order_index[i]]);
        } */
   }
   if (!found)
   {
-    new_send_to_char(ch, " Nothing.\r\n");
+    ch->Send( " Nothing.\r\n");
   }
 }
 
@@ -2765,7 +2765,7 @@ ACMD(do_time)
   /* 35 days in a month, 7 days a week */
   weekday = ((35 * time_info.month) + day) % 7;
 
-  new_send_to_char(ch, "It is %d o'clock %s, on %s\r\n",
+  ch->Send( "It is %d o'clock %s, on %s\r\n",
                    ((time_info.hours % 12 ==
                      0) ? 12 : ((time_info.hours) % 12)),
                    ((time_info.hours >= 12) ? "pm" : "am"),
@@ -2798,7 +2798,7 @@ ACMD(do_time)
     }
   }
 
-  new_send_to_char(ch, "The %d%s Day of the %s, Year %d.\r\n",
+  ch->Send( "The %d%s Day of the %s, Year %d.\r\n",
                    day, suf, month_name[time_info.month],
                    time_info.year);
 }
@@ -2818,7 +2818,7 @@ ACMD(do_weather)
 
   if (OUTSIDE(ch))
   {
-    new_send_to_char(ch, "The sky is %s and %s.\r\n",
+    ch->Send( "The sky is %s and %s.\r\n",
                      sky_look[zone_table[IN_ROOM(ch)->zone].sky],
                      (zone_table[IN_ROOM(ch)->zone].change >= 0 ?
                       "you feel a warm wind from the south" :
@@ -2830,7 +2830,7 @@ ACMD(do_weather)
 
   if (GET_LEVEL(ch) >= LVL_GOD)
   {
-    new_send_to_char(ch, "Pressure: {cC%d{cx, Change: {cC%d{cx\r\n",
+    ch->Send( "Pressure: {cC%d{cx, Change: {cC%d{cx\r\n",
                      zone_table[GET_ROOM_ZONE(IN_ROOM(ch))].pressure,
                      zone_table[GET_ROOM_ZONE(IN_ROOM(ch))].change);
   }
@@ -2839,7 +2839,7 @@ ACMD(do_weather)
 #if 1
 struct help_index_element *find_help(char *keyword)
 {
-  int i;
+  unsigned int i;
 
   for (i = 0; i <= top_of_helpt; i++)
     if (is_name(keyword, help_table[i].keywords))
@@ -2852,7 +2852,7 @@ struct help_index_element *find_help(char *keyword)
 }
 #endif
 
-void display_help(struct char_data *ch, unsigned int i)
+void display_help(Character *ch, unsigned int i)
 {
   if (ch) {
   DYN_DEFINE;
@@ -2865,7 +2865,7 @@ void display_help(struct char_data *ch, unsigned int i)
   DYN_RESIZE(help_table[i].entry);
   page_string(ch->desc, dynbuf, DYN_BUFFER);
   /*
-  new_send_to_char(ch,
+  ch->Send(
                      "----------------------------------------------------------------------------\r\n"
                      "%s\r\n"
                      "----------------------------------------------------------------------------\r\n"
@@ -2886,7 +2886,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
 
   for (i=0;i<top_of_helpt;i++)
   {
-    if (is_number(keywords) && i == atoi(keywords))
+    if (is_number(keywords) && i == (unsigned int) atoi(keywords))
     {
       snprintf(buf1, sizeof(buf1), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords);
       strlcat(buf, buf1, sizeof(buf));
@@ -2904,7 +2904,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
   {
     for (i=0;i<top_of_helpt;i++)
     {
-      if (is_number(keywords) && i == atoi(keywords))
+      if (is_number(keywords) && i == (unsigned int) atoi(keywords))
       {
         display_help(d->character, i);
         return;
@@ -2949,7 +2949,7 @@ ACMD(do_help)
   }
   if (!help_table)
   {
-    new_send_to_char(ch, "No help available.\r\n");
+    ch->Send( "No help available.\r\n");
     return;
   }
   display_help_list(ch->desc, argument);
@@ -2966,7 +2966,7 @@ ACMD(do_help)
     if (bot > top)
     {
       //TODO: add in random examples
-      new_send_to_char(ch, "There is no help on that (yet).\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
+      ch->Send( "There is no help on that (yet).\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
       log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(ch), argument);
       return;
     }
@@ -2997,35 +2997,35 @@ ACMD(do_spellinfo)
   skip_spaces(&argument);
   if (!*argument || argument == NULL)
   {
-    new_send_to_char(ch, "Which skill or spell?\r\n");
+    ch->Send( "Which skill or spell?\r\n");
     return;
   }
   if ((i = find_skill_num(argument)) == TYPE_UNDEFINED)
-    new_send_to_char(ch, "Unrecognised spell or skill.\r\n");
+    ch->Send( "Unrecognised spell or skill.\r\n");
   else
     skill_spell_help(ch, i);
 
 }
 
-void skill_spell_help(struct char_data *ch, int spell)
+void skill_spell_help(Character *ch, int spell)
 {
   int i;
   extern const char *pc_class_types[];
   if (spell == TYPE_UNDEFINED)
     return;
 
-  new_send_to_char(ch, "{cg----------------------------------------------------\r\n");
-  new_send_to_char(ch, "                Name: {cy%s{cg\r\n", skill_name(spell));
+  ch->Send( "{cg----------------------------------------------------\r\n");
+  ch->Send( "                Name: {cy%s{cg\r\n", skill_name(spell));
   if (spell_info[spell].first_prereq != TYPE_UNDEFINED)
-    new_send_to_char(ch, "First Pre Requisite : {cy%s{cg\r\n", skill_name(spell_info[spell].first_prereq));
+    ch->Send( "First Pre Requisite : {cy%s{cg\r\n", skill_name(spell_info[spell].first_prereq));
   if (spell_info[spell].second_prereq != TYPE_UNDEFINED)
-    new_send_to_char(ch, "Second Pre Requisite: {cy%s{cg\r\n", skill_name(spell_info[spell].second_prereq));
-  new_send_to_char(ch, "Tier: {cc%d{cg     Level: {cc%2d{cg    \r\n"
+    ch->Send( "Second Pre Requisite: {cy%s{cg\r\n", skill_name(spell_info[spell].second_prereq));
+  ch->Send( "Tier: {cc%d{cg     Level: {cc%2d{cg    \r\n"
                    "MinPosition: {cy%s{cg   Elemental Type: {cy%s{cg\r\n\r\n",
                    spell_info[spell].tier, spell_info[spell].min_level, position_types[(int)spell_info[spell].min_position],
                    elemental_types[elemental_type(spell)]);
 
-  new_send_to_char(ch,
+  ch->Send(
                    "Directional: {cy%-3s{cg            Offensive: {cy%-3s{cg\r\n"
                    "    Affects: {cy%-3s{cg            Unaffects: {cy%-3s{cg\r\n"
                    "     Points: {cy%-3s{cg       Alters Objects: {cy%-3s{cg\r\n"
@@ -3045,20 +3045,20 @@ void skill_spell_help(struct char_data *ch, int spell)
                    YESNO(IS_SET(spell_info[spell].routines, MAG_CREATIONS))
                   );
   if (IS_SET(spell_info[spell].targets, TAR_SELF_ONLY))
-    new_send_to_char(ch, "This spell can only be cast upon yourself.\r\n");
+    ch->Send( "This spell can only be cast upon yourself.\r\n");
   if (IS_SET(spell_info[spell].targets, TAR_NOT_SELF))
-    new_send_to_char(ch, "This spell can not be cast on yourself.\r\n");
-  new_send_to_char(ch, "Classes: {cy");
+    ch->Send( "This spell can not be cast on yourself.\r\n");
+  ch->Send( "Classes: {cy");
   for (i = 0; i < NUM_CLASSES ; i++)
     if (IS_SET(spell_info[spell].classes, (1 << i)))
-      new_send_to_char(ch, "%s  ", pc_class_types[i]);
-  new_send_to_char(ch, "{cg\r\n");
+      ch->Send( "%s  ", pc_class_types[i]);
+  ch->Send( "{cg\r\n");
 
 
 
   if (knows_spell(ch, spell))
-    new_send_to_char(ch, "{cCYou know this spell{cg\r\n");
-  new_send_to_char(ch, "----------------------------------------------------{c0\r\n");
+    ch->Send( "{cCYou know this spell{cg\r\n");
+  ch->Send( "----------------------------------------------------{c0\r\n");
 }
 
 #if 0
@@ -3106,13 +3106,13 @@ ACMD(do_help_old)
 #endif
 int who_sort_helper_level(const void *a, const void *b)
 {
-  CHAR_DATA *a1, *b1;
+  Character *a1, *b1;
 
   if (!a || !b)
     return 0;
 
-  a1 = *(CHAR_DATA **) a;
-  b1 = *(CHAR_DATA **) b;
+  a1 = *(Character **) a;
+  b1 = *(Character **) b;
 
   if (a1 == NULL && b1 == NULL)
     return 0;
@@ -3140,13 +3140,13 @@ int who_sort_helper_level(const void *a, const void *b)
 }
 int who_sort_helper_class(const void *a, const void *b)
 {
-  CHAR_DATA *a1, *b1;
+  Character *a1, *b1;
 
   if (!a || !b)
     return 0;
 
-  a1 = *(CHAR_DATA **) a;
-  b1 = *(CHAR_DATA **) b;
+  a1 = *(Character **) a;
+  b1 = *(Character **) b;
 
   if (a1 == NULL && b1 == NULL)
     return 0;
@@ -3161,13 +3161,13 @@ int who_sort_helper_class(const void *a, const void *b)
 }
 int who_sort_helper_race(const void *a, const void *b)
 {
-  CHAR_DATA *a1, *b1;
+  Character *a1, *b1;
 
   if (!a || !b)
     return 0;
 
-  a1 = *(CHAR_DATA **) a;
-  b1 = *(CHAR_DATA **) b;
+  a1 = *(Character **) a;
+  b1 = *(Character **) b;
 
   if (a1 == NULL && b1 == NULL)
     return 0;
@@ -3207,7 +3207,7 @@ char *WHO_USAGE =
 ACMD(do_who)
 {
   struct descriptor_data *d;
-  struct char_data *wch;
+  Character *wch;
   char name_search[MAX_INPUT_LENGTH + 1];
   char mode;
   char *clan_name(int idnum);
@@ -3215,7 +3215,7 @@ ACMD(do_who)
   char arg[MAX_STRING_LENGTH];
   char buf1[MAX_STRING_LENGTH];
   extern int max_players;
-  CHAR_DATA *sort_desc[max_players];
+  Character *sort_desc[max_players];
   int num_desc = 0, j;
   int mb = 0, ib = 0;
   int seperate = 0;
@@ -3402,11 +3402,11 @@ ACMD(do_who)
   if (!sort_login)
   {
     if (sort_class)
-      qsort(sort_desc, max_players, sizeof(CHAR_DATA *), who_sort_helper_class);
+      qsort(sort_desc, max_players, sizeof(Character *), who_sort_helper_class);
     else if (sort_race)
-      qsort(sort_desc, max_players, sizeof(CHAR_DATA *), who_sort_helper_race);
+      qsort(sort_desc, max_players, sizeof(Character *), who_sort_helper_race);
     else
-      qsort(sort_desc, max_players, sizeof(CHAR_DATA *), who_sort_helper_level);
+      qsort(sort_desc, max_players, sizeof(Character *), who_sort_helper_level);
   }
 
   for (j = 0; j < max_players; j++)
@@ -3677,7 +3677,7 @@ ACMD(do_users)
   char line[200], line2[220], idletime[10], classname[20];
   char state[30], *timeptr, mode;
   char name_search[MAX_INPUT_LENGTH], host_search[MAX_INPUT_LENGTH];
-  struct char_data *tch;
+  Character *tch;
   struct descriptor_data *d;
   size_t i;
   int low = 0, high = LVL_IMPL, num_can_see = 0;
@@ -3751,7 +3751,7 @@ ACMD(do_users)
       return;
     }
   }                 /* end while (parser) */
-  new_send_to_char(ch,
+  ch->Send(
                    "Num Class       Name         State          Idl Login@   Site\r\n"
                    "--- ----------- ------------ -------------- --- -------- ------------------------\r\n");
 
@@ -3844,12 +3844,12 @@ ACMD(do_users)
     if (STATE(d) != CON_PLAYING ||
         (STATE(d) == CON_PLAYING && CAN_SEE(ch, d->character)))
     {
-      new_send_to_char(ch, "%s", line);
+      ch->Send( "%s", line);
       num_can_see++;
     }
   }
 
-  new_send_to_char(ch, "\r\n%d visible sockets connected.\r\n",
+  ch->Send( "\r\n%d visible sockets connected.\r\n",
                    num_can_see);
 
 }
@@ -3859,16 +3859,16 @@ ACMD(do_ipstat)
 
   if (!ch->desc || IS_NPC(ch))
   {
-    new_send_to_char(ch, "Um... yeah your host is crap all.\r\n");
+    ch->Send( "Um... yeah your host is crap all.\r\n");
     return;
   }
 
 
 
   if (ch->desc->host && *ch->desc->host)
-    new_send_to_char(ch, "{cGYour ip is [%s]\r\n{c0", ch->desc->host);
+    ch->Send( "{cGYour ip is [%s]\r\n{c0", ch->desc->host);
   else
-    new_send_to_char(ch, "{cGYour ip is [Hostname unknown]{c0\r\n");
+    ch->Send( "{cGYour ip is [Hostname unknown]{c0\r\n");
 
 }
 
@@ -3908,13 +3908,13 @@ ACMD(do_gen_ps)
     send_to_char("\033[H\033[J", ch);
     break;
   case SCMD_VERSION:
-    new_send_to_char(ch, "%s\r\n", fourdimensions_version);
-    new_send_to_char(ch, "%s\r\n", oasisolc_version);
-    new_send_to_char(ch, "%s\r\n", circlemud_version);
+    ch->Send( "%s\r\n", fourdimensions_version);
+    ch->Send( "%s\r\n", oasisolc_version);
+    ch->Send( "%s\r\n", circlemud_version);
     new_send_to_char(ch ,"%s\r\n", DG_SCRIPT_VERSION);
     break;
   case SCMD_WHOAMI:
-    new_send_to_char(ch, "%s\r\n", GET_NAME(ch));
+    ch->Send( "%s\r\n", GET_NAME(ch));
     break;
   default:
     log("SYSERR: Unhandled case in do_gen_ps. (%d)", subcmd);
@@ -3923,9 +3923,9 @@ ACMD(do_gen_ps)
 }
 
 
-void perform_mortal_where(struct char_data *ch, char *arg)
+void perform_mortal_where(Character *ch, char *arg)
 {
-  register struct char_data *i;
+  register Character *i;
   register struct descriptor_data *d;
 
   if (!*arg)
@@ -3948,7 +3948,7 @@ void perform_mortal_where(struct char_data *ch, char *arg)
         continue;
       if (get_sub_status(i, SUB_MASK))
         continue;
-      new_send_to_char(ch, "{cg%-20s{cw - {cc%s{c0\r\n", GET_NAME(i),
+      ch->Send( "{cg%-20s{cw - {cc%s{c0\r\n", GET_NAME(i),
                        IN_ROOM(i)->name);
     }
   }
@@ -3963,7 +3963,7 @@ void perform_mortal_where(struct char_data *ch, char *arg)
         continue;
       if (!isname_full(arg, i->player.name))
         continue;
-      new_send_to_char(ch, "{cg%-25s{cw - {cc%s{c0\r\n", GET_NAME(i),
+      ch->Send( "{cg%-25s{cw - {cc%s{c0\r\n", GET_NAME(i),
                        IN_ROOM(i)->name);
       return;
     }
@@ -3971,7 +3971,7 @@ void perform_mortal_where(struct char_data *ch, char *arg)
   }
 }
 
-const char * hidden_name(struct char_data *ch)
+const char * hidden_name(Character *ch)
 {
   if (get_sub_status(ch, SUB_SHADOWCLOAK))
     return "a shadowy figure";
@@ -3985,7 +3985,7 @@ const char * hidden_name(struct char_data *ch)
 
 
 void print_object_location(int num, struct obj_data *obj,
-                           struct char_data *ch, int recur, char *buffer)
+                           Character *ch, int recur, char *buffer)
 {
   if (num > 0)
     sprintf(buffer, "O%3d. [%5d] %-25s - ", num, GET_OBJ_VNUM(obj), obj->short_description);
@@ -4035,9 +4035,9 @@ void print_object_location(int num, struct obj_data *obj,
 
 
 
-void perform_immort_where(struct char_data *ch, char *arg)
+void perform_immort_where(Character *ch, char *arg)
 {
-  register struct char_data *i;
+  register Character *i;
   register struct obj_data *k;
   struct descriptor_data *d;
   int num = 0, counter = 0, found = 0;
@@ -4060,13 +4060,13 @@ void perform_immort_where(struct char_data *ch, char *arg)
         if (i && CAN_SEE(ch, i) && (i->in_room != NULL))
         {
           if (d->original)
-            new_send_to_char(ch,  "%-15s - [%5d] %-25s (in %s)\r\n",
+            ch->Send(  "%-15s - [%5d] %-25s (in %s)\r\n",
                              GET_NAME(i),
                              GET_ROOM_VNUM(IN_ROOM(d->character)),
                              d->character->in_room->name,
                              GET_NAME(d->character));
           else
-            new_send_to_char(ch,  "%-15s - [%5d] %-25s - {cC%s{c0\r\n", GET_NAME(i),
+            ch->Send(  "%-15s - [%5d] %-25s - {cC%s{c0\r\n", GET_NAME(i),
                              GET_ROOM_VNUM(IN_ROOM(i)),
                              i->in_room->name,  zone_table[(i->in_room)->zone].name);
         }
@@ -4196,7 +4196,7 @@ ACMD(do_levels)
 /*
 ACMD(do_consider)
 {
-  struct char_data *victim;
+  Character *victim;
   int diff;
  
   one_argument(argument, buf);
@@ -4288,11 +4288,11 @@ const char * dam_consider[] =
 
 #define NUM_CONS_DAMAGE 10
 
-int arena_ok(struct char_data *ch, struct char_data *victim);
+int arena_ok(Character *ch, Character *victim);
 
 ACMD(do_consider)
 {
-  struct char_data *victim;
+  Character *victim;
   int diff, diff2, diff3;
   //  char buf[MAX_INPUT_LENGTH];
   skip_spaces(&argument);
@@ -4308,7 +4308,7 @@ ACMD(do_consider)
     send_to_char("Easy!  Very easy indeed!\r\n", ch);
     return;
   }
-  new_send_to_char(ch, "%s is a tier %d %s\r\n", GET_NAME(victim), current_class_is_tier_num(victim), simple_class_name(victim));
+  ch->Send( "%s is a tier %d %s\r\n", GET_NAME(victim), current_class_is_tier_num(victim), simple_class_name(victim));
   if (!IS_NPC(victim))
   {
 
@@ -4426,9 +4426,9 @@ ACMD(do_consider)
   diff = IRANGE(0, ((speed_update(victim)+1000)/250), 7);
   act(speed_consider[diff], FALSE, ch, 0, victim, TO_CHAR);
 
-  new_send_to_char(ch, "%s would land about %.1f%% of %s attacks on you.\r\n",
+  ch->Send( "%s would land about %.1f%% of %s attacks on you.\r\n",
                    GET_NAME(victim),100 - (float) ((evasion_tot(ch)*100)/(evasion_tot(ch) + accuracy_tot(victim))), GET_SEX(victim) == SEX_MALE ? "his" : "her" );
-  new_send_to_char(ch, "You would land about %.1f%% of your attacks on %s.\r\n",
+  ch->Send( "You would land about %.1f%% of your attacks on %s.\r\n",
                    100-(float)((evasion_tot(victim)*100)/(evasion_tot(victim) + accuracy_tot(ch))), GET_NAME(victim));
 
   diff3 = GET_HIT(victim);
@@ -4438,7 +4438,7 @@ ACMD(do_consider)
   diff = IRANGE(0, diff2, 7);
   act(hitp_consider[diff], FALSE, ch, 0, victim, TO_CHAR);
 
-  new_send_to_char(ch, "You guess %s would probably do around %d damage to you per hit if you had no protection.\r\n",
+  ch->Send( "You guess %s would probably do around %d damage to you per hit if you had no protection.\r\n",
                    GET_NAME(victim), modify_dam(average_damage(victim), victim, ch, find_fe_type(victim)));
 
 }
@@ -4454,7 +4454,7 @@ int count_followers(struct follow_type *f)
 
   return cnt + 1;
 }
-void add_fusion(CHAR_DATA *ch, CHAR_DATA *fuse, int loc)
+void add_fusion(Character *ch, Character *fuse, int loc)
 {
   if (!ch || !fuse)
     return;
@@ -4478,21 +4478,21 @@ ACMD(do_fuse)
   struct follow_type *f;
   if (FUSED_TO(ch))
   {
-    new_send_to_char(ch, "You are already fused. Huzzah!\r\n");
+    ch->Send( "You are already fused. Huzzah!\r\n");
     return;
   }
-  //CHAR_DATA *tmpfuse;
+  //Character *tmpfuse;
   int nf = count_followers(ch->followers);
   switch (nf)
   {
   default:
-    new_send_to_char(ch, "You need EXACTLY 5 followers to form a fused unit, not %d like you have.\r\n", nf);
+    ch->Send( "You need EXACTLY 5 followers to form a fused unit, not %d like you have.\r\n", nf);
     return;
   case 0:
-    new_send_to_char(ch, "You have NO followers, let alone 5 which you need to fuse!\r\n");
+    ch->Send( "You have NO followers, let alone 5 which you need to fuse!\r\n");
     return;
   case 5:
-    new_send_to_char(ch, "You fuse and form the %s", fusion_locations[i]);
+    ch->Send( "You fuse and form the %s", fusion_locations[i]);
     add_fusion(ch, ch, i++);
     f = ch->followers;
     do
@@ -4513,7 +4513,7 @@ ACMD(do_fuse)
 
 
 
-void stop_fusion(CHAR_DATA *ch)
+void stop_fusion(Character *ch)
 {
   int i;
 
@@ -4569,7 +4569,7 @@ ACMD(do_fusion)
 {
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  CHAR_DATA *fuse = FUSED_TO(ch);
+  Character *fuse = FUSED_TO(ch);
   int i;
 
   argument = two_arguments(argument, arg, arg2);
@@ -4580,17 +4580,17 @@ ACMD(do_fusion)
 
     if (fuse == NULL)
     {
-      new_send_to_char(ch, "Not fused at all.\r\n");
+      ch->Send( "Not fused at all.\r\n");
       return;
     }
-    new_send_to_char(ch, "{cRFusion location stats -----{c0\r\n");
+    ch->Send( "{cRFusion location stats -----{c0\r\n");
     for (i = 0; i < TOP_FUSE_LOCATION; i++)
     {
       if (!FUSE_LOC(fuse, i))
-        new_send_to_char(ch, "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n", fusion_locations[i], "EMPTY", 0, 0, 0, 0);
+        ch->Send( "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n", fusion_locations[i], "EMPTY", 0, 0, 0, 0);
       else
       {
-        new_send_to_char(ch, "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n",
+        ch->Send( "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n",
                          fusion_locations[i],
                          GET_NAME(FUSE_LOC(fuse, i)),
                          ((GET_HIT(FUSE_LOC(fuse, i))*100)/GET_MAX_HIT(FUSE_LOC(fuse, i))),
@@ -4603,20 +4603,20 @@ ACMD(do_fusion)
 
   }
   else
-    new_send_to_char(ch, "You can't get information on that fusion location yet.\r\n");
+    ch->Send( "You can't get information on that fusion location yet.\r\n");
 
 
 }
 
 ACMD(do_diagnose)
 {
-  struct char_data *vict;
+  Character *vict;
   skip_spaces(&argument);
 
   if (*argument)
   {
     if (!(vict = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM)))
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
     else
       diag_char_to_char(vict, ch);
   }
@@ -4647,7 +4647,7 @@ ACMD(do_color)
 
   if (!*arg)
   {
-    new_send_to_char(ch, "Your current color level is %s.\r\n",
+    ch->Send( "Your current color level is %s.\r\n",
                      ctypes[COLOR_LEV(ch)]);
 
     return;
@@ -4664,7 +4664,7 @@ ACMD(do_color)
     SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
   if (tp & 2)
     SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_2);
-  new_send_to_char(ch, "Your %scolor%s is now %s.\r\n", CCRED(ch, C_SPR),
+  ch->Send( "Your %scolor%s is now %s.\r\n", CCRED(ch, C_SPR),
                    CCNRM(ch, C_OFF), ctypes[tp]);
 }
 
@@ -4686,7 +4686,7 @@ ACMD(do_toggle)
     else if(GET_CSNP_LVL(ch)==-1) snprintf(buf3,50,"All");
     else if(GET_CSNP_LVL(ch)>=0 && GET_CSNP_LVL(ch)<=num_of_clans) sprintf(buf3,clan[GET_CSNP_LVL(ch)].name);
 
-    new_send_to_char(ch,
+    ch->Send(
                      "      Buildwalk: %-3s    "
                      "Clear Screen in OLC: %-3s"
                      "    Ctell snoop: %-3s\r\n",
@@ -4696,7 +4696,7 @@ ACMD(do_toggle)
                     );
 
 
-    new_send_to_char(ch,
+    ch->Send(
                      "      No Hassle: %-3s    "
                      "      Holylight: %-3s    "
                      "     Room Flags: %-3s\r\n",
@@ -4706,7 +4706,7 @@ ACMD(do_toggle)
                     );
   }
 
-  new_send_to_char(ch,
+  ch->Send(
                    "Hit Pnt Display: %-3s    "
                    "     Brief Mode: %-3s    "
                    " Summon Protect: %-3s\r\n"
@@ -4836,7 +4836,7 @@ ACMD(do_commands)
 {
   int no, i, cmd_num;
   int wizhelp = 0, socials = 0;
-  struct char_data *vict;
+  Character *vict;
   skip_spaces(&argument);
 
 
@@ -4861,7 +4861,7 @@ ACMD(do_commands)
   else if (subcmd == SCMD_WIZHELP)
     wizhelp = 1;
 
-  new_send_to_char(ch, "The following %s%s are available to %s:\r\n",
+  ch->Send( "The following %s%s are available to %s:\r\n",
                    wizhelp ? "privileged " : "",
                    socials ? "socials" : "commands",
                    vict == ch ? "you" : GET_NAME(vict));
@@ -4895,11 +4895,11 @@ ACMD(do_commands)
     if (!wizhelp && socials != (complete_cmd_info[i].command_pointer == do_action || complete_cmd_info[i].command_pointer == do_insult))
       continue;
 
-    new_send_to_char(ch, "%-15s%s", complete_cmd_info[i].command,                no++ % 7 == 0 ? "\r\n" : "");
+    ch->Send( "%-15s%s", complete_cmd_info[i].command,                no++ % 7 == 0 ? "\r\n" : "");
   }
 
   if (no % 7 != 1)
-    new_send_to_char(ch, "\r\n");
+    ch->Send( "\r\n");
 }
 
 ACMD(do_prereq)
@@ -5077,7 +5077,7 @@ ACMD(do_worth)
   for (i = 0; i < NUM_CLASSES; i++)
     if (GET_MASTERY(ch, i))    len += snprintf(buf+len, sizeof(buf) - len, "%c ", UPPER(*pc_class_types[i]));
 
-  new_send_to_char(ch, "\r\n{cy"
+  ch->Send( "\r\n{cy"
                    "O=====================================================================O\r\n"
                    "|%-32s{cy|#|   {cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
                    "|%-32s{cy|#|                                       \r\n"
@@ -5124,7 +5124,7 @@ ACMD(do_worth)
 
 }
 
-int frozen_time(struct char_data *ch)
+int frozen_time(Character *ch)
 {
   struct affected_type *aff;
   if (ch->affected)
@@ -5155,36 +5155,36 @@ ACMD(do_affects)
     for (aff = ch->affected; aff; aff = aff->next)
     {
       if (aff->expire == -2)
-        new_send_to_char(ch, "SPL: (  {cPinnate{c0  ) %s%-21s%s ",
+        ch->Send( "SPL: (  {cPinnate{c0  ) %s%-21s%s ",
                          CCCYN(ch, C_NRM), skill_name(aff->type),
                          CCNRM(ch, C_NRM));
       else
       {
         if ((minsec = time_to_sec(aff->expire + 1)) <= 0)
           continue;
-        new_send_to_char(ch, "SPL: ({cy%-6d{c0 %s)  %s%-21s%s ",
+        ch->Send( "SPL: ({cy%-6d{c0 %s)  %s%-21s%s ",
                          (minsec > 60 ? minsec/60 : minsec),
                          (minsec/60 ?   "min"   : "sec" ),
                          CCCYN(ch, C_NRM), skill_name(aff->type), CCNRM(ch, C_NRM));
       }
       if (aff->modifier)
       {
-        new_send_to_char(ch, "%+d to %s", aff->modifier,
+        ch->Send( "%+d to %s", aff->modifier,
                          apply_types[(int) aff->location]);
       }
       if (aff->bitvector)
       {
         if (aff->modifier)
-          new_send_to_char(ch, ", sets ");
+          ch->Send( ", sets ");
         else
-          new_send_to_char(ch, " sets ");
-        new_send_to_char(ch, affected_bits[aff->bitvector]);
+          ch->Send( " sets ");
+        ch->Send( affected_bits[aff->bitvector]);
       }
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     }
   }
   if (!i)
-    new_send_to_char(ch, "You are not affected by anything!\r\n");
+    ch->Send( "You are not affected by anything!\r\n");
 }
 
 
@@ -5192,9 +5192,9 @@ ACMD(do_affects)
 
 
 /*group functions*/
-int group_size(struct char_data *ch)
+int group_size(Character *ch)
 {
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   int i = 1;
 
@@ -5208,10 +5208,10 @@ int group_size(struct char_data *ch)
 
 }
 
-void total_perc(struct char_data *ch)
+void total_perc(Character *ch)
 {
 
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   float temp = 0.0, temp2 = 0.0;
   int i = 1;
@@ -5248,10 +5248,10 @@ void total_perc(struct char_data *ch)
   return;
 }
 
-struct char_data *rand_group(struct char_data *ch)
+Character *rand_group(Character *ch)
 {
 
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   float rand, max, temp;
 
@@ -5278,10 +5278,10 @@ struct char_data *rand_group(struct char_data *ch)
 }
 
 
-int even_group(struct char_data *ch)
+int even_group(Character *ch)
 {
 
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   float share;
 
@@ -5302,7 +5302,7 @@ int even_group(struct char_data *ch)
 
 ACMD(set_perc)
 {
-  struct char_data *tch;
+  Character *tch;
   //struct follow_type *f;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
@@ -5312,7 +5312,7 @@ ACMD(set_perc)
   two_arguments(argument, buf, buf2);
   if (!*buf)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "involve <groupmember> <amount (1 to %3d)>\r\n"
                      "To split involvement evenly: \r\ninvolve even\r\n",
                      90 - group_size(ch));
@@ -5323,12 +5323,12 @@ ACMD(set_perc)
     amount = atoi(buf2);
   else if (isname(buf2, "even split auto")) {
     even_group(ch);
-    new_send_to_char(ch, "You split the involvement evenly.\r\n");
+    ch->Send( "You split the involvement evenly.\r\n");
     return;
   }
   else
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "involve <groupmember> <amount (1 to %3d)>\r\n",
                      90 - group_size(ch));
     return;
@@ -5336,7 +5336,7 @@ ACMD(set_perc)
 
   if (amount < 0 || amount > (90 - group_size(ch)))
   {
-    new_send_to_char(ch, "%d is not a valid involvement amount.\r\n",
+    ch->Send( "%d is not a valid involvement amount.\r\n",
                      amount);
     return;
   }
@@ -5356,7 +5356,7 @@ ACMD(set_perc)
 
   if (amount > (GET_PERC(ch) + GET_PERC(tch))-10)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "That amount is higher then you have available to set for %s (%4.1f max).\r\n",
                      GET_NAME(tch), GET_PERC(ch) + GET_PERC(tch) - 10);
     return;
@@ -5367,7 +5367,7 @@ ACMD(set_perc)
   GET_PERC(ch) -= (float) amount;
   total_perc(ch);
 
-  new_send_to_char(ch,
+  ch->Send(
                    "You set %s's involvement to %4.1f%%, your involvement is now %4.1f%%.\r\n",
                    GET_NAME(tch), GET_PERC(tch), GET_PERC(ch));
   new_send_to_char(tch, "%s sets your involvement to %4.1f%%.\r\n",
@@ -5379,11 +5379,11 @@ ACMD(set_perc)
 molly:$1$XmCBLRQX$ut53Cto7qi/4bs.KIWhMy/
 */
 /*
-void do_auto_exits(struct char_data *ch)
+void do_auto_exits(Character *ch)
 {
     int door, slen = 0;
  
-    new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
+    ch->Send( "%s[ Exits: %s", CBGRN(ch, C_NRM),
                CBWHT(ch, C_NRM));
  
     for (door = 0; door < NUM_OF_DIRS; door++)
@@ -5391,23 +5391,23 @@ void do_auto_exits(struct char_data *ch)
          !IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
          if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)) {
          if (GET_LEVEL(ch) > LVL_IMMORT){
-          new_send_to_char(ch, "{cg%c {cW", UPPER(*dirs[door]));
+          ch->Send( "{cg%c {cW", UPPER(*dirs[door]));
           slen++;
           }
          } else {
-             new_send_to_char(ch, "%c ", LOWER(*dirs[door]));
+             ch->Send( "%c ", LOWER(*dirs[door]));
           slen++;
           }
  
              
      }
      if (!slen)
-     new_send_to_char(ch, "None!");
+     ch->Send( "None!");
  
-    new_send_to_char(ch, "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
+    ch->Send( "%s]%s\r\n", CBGRN(ch, C_NRM),  CCNRM(ch, C_NRM));
 }
 */
-void fill_exit_list(room_rnum list[], struct char_data *ch)
+void fill_exit_list(room_rnum list[], Character *ch)
 {
   int door;
   for (door = 0; door < NUM_OF_DIRS; door++)
@@ -5421,7 +5421,7 @@ void fill_exit_list(room_rnum list[], struct char_data *ch)
   }
 }
 
-void display_map(struct char_data *ch)
+void display_map(Character *ch)
 {
   room_rnum rmv[6];
 
@@ -5448,23 +5448,23 @@ void display_map(struct char_data *ch)
       **/
 
 
-  new_send_to_char(ch,
+  ch->Send(
                    "\r\n{cC     %3s {cc%3s   {c0\r\n",
                    (rmv[NORTH] != NULL) ? "[N]" : "   ",
                    (rmv[UP] != NULL) ? "[U]" : "   ");
-  new_send_to_char(ch,
+  ch->Send(
                    "{cy      %1s %1s      {c0\r\n",
                    (rmv[NORTH] != NULL) ? "|" : " ",
                    (rmv[UP] != NULL) ? "/" : " ");
-  new_send_to_char(ch,
+  ch->Send(
                    "{cC %4s{cy[{cR*{cy]%4s   {c0\r\n",
                    (rmv[WEST] != NULL) ? "[W]{cy-" : "    ",
                    (rmv[EAST] != NULL) ? "-{cC[E]" : "    ");
-  new_send_to_char(ch,
+  ch->Send(
                    "{cy    %1s %1s        {c0\r\n",
                    (rmv[DOWN] != NULL) ? "/" : " ",
                    (rmv[SOUTH] != NULL) ? "|" : " ");
-  new_send_to_char(ch,
+  ch->Send(
                    "{cc %3s{cC %3s       {c0\r\n",
                    (rmv[DOWN] != NULL) ? "[D]" : "   ",
                    (rmv[SOUTH] != NULL) ? "[S]" : "   ");
@@ -5474,7 +5474,7 @@ void display_map(struct char_data *ch)
 ACMD(do_ipsearch)
 {}
 
-void container_disp(CHAR_DATA *ch,OBJ_DATA * obj)
+void container_disp(Character *ch,OBJ_DATA * obj)
 {
 
   int max, percent = 0;
@@ -5491,7 +5491,7 @@ void container_disp(CHAR_DATA *ch,OBJ_DATA * obj)
   if (max >= percent)
   {
     percent = (int)((percent*100.0f)/(float)max);
-    new_send_to_char(ch, "[%s] - max %d\r\n", how_good(percent), max);
+    ch->Send( "[%s] - max %d\r\n", how_good(percent), max);
   }
 
 }

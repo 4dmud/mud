@@ -70,14 +70,14 @@ struct obj_data *get_obj_in_list_type(int type,
 					     struct obj_data *list);
 
 extern struct room_data *world_vnum[];
-void display_map(struct char_data *ch);
+void display_map(Character *ch);
 void parse_room_name(room_rnum in_room, char *bufptr, size_t len);
 
-int map[MAX_MAP][MAX_MAP];
+int mapgrid[MAX_MAP][MAX_MAP];
 int offsets[4][2] = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
 
 /* Heavily modified - Edward */
-void MapArea(room_rnum room, struct char_data *ch, int x, int y, int min,
+void MapArea(room_rnum room, Character *ch, int x, int y, int min,
 	     int max)
 {
     room_rnum prospect_room;
@@ -86,12 +86,12 @@ void MapArea(room_rnum room, struct char_data *ch, int x, int y, int min,
     int door;
 
     /* marks the room as visited */
-    map[x][y] = room->sector_type;
+    mapgrid[x][y] = room->sector_type;
 
     /* mark vehicles on the map */
     for (obj = room->contents; obj; obj = obj->next_content)
 	if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE)
-	    map[x][y] = SECT_VEHICLE;
+	    mapgrid[x][y] = SECT_VEHICLE;
 
     /* Otherwise we get a nasty crash */
     if (!IS_SET_AR(IN_ROOM(ch)->room_flags, ROOM_WILDERNESS))
@@ -109,7 +109,7 @@ void MapArea(room_rnum room, struct char_data *ch, int x, int y, int min,
 	    /* if not two way */
 	    if (prospect_room->dir_option[rev_dir[door]] &&
 		prospect_room->dir_option[rev_dir[door]]->to_room !=room) {
-		map[x][y] = NUM_ROOM_SECTORS + 1;
+		mapgrid[x][y] = NUM_ROOM_SECTORS + 1;
 		return;
 	    }
 	    /* end two way */
@@ -119,12 +119,12 @@ void MapArea(room_rnum room, struct char_data *ch, int x, int y, int min,
 		|| (prospect_room->sector_type == SECT_INSIDE)
 		|| (prospect_room->sector_type == SECT_FOREST)
 		|| IS_SET_AR(prospect_room->room_flags, ROOM_NOVIEW)) {
-		map[x + offsets[door][0]][y + offsets[door][1]] =
+		mapgrid[x + offsets[door][0]][y + offsets[door][1]] =
 		    prospect_room->sector_type;
 		/* ^--two way into area */
 	    }
 
-	    if (map[x + offsets[door][0]][y + offsets[door][1]] ==
+	    if (mapgrid[x + offsets[door][0]][y + offsets[door][1]] ==
 		NUM_ROOM_SECTORS) {
 		MapArea(pexit->to_room, ch, x + offsets[door][0],
 			y + offsets[door][1], min, max);
@@ -135,7 +135,7 @@ void MapArea(room_rnum room, struct char_data *ch, int x, int y, int min,
 }
 
 /* mlk :: shows a map, specified by size */
-void ShowMap(struct char_data *ch, int min, int max)
+void ShowMap(Character *ch, int min, int max)
 {
     int x, y;
     int sect;
@@ -155,8 +155,8 @@ sect = 0;
     if (x < max) {
 	/* every column */
 	for (y = min; y < max; ++y) {
-	    if ((y == min) || (map[x][y - 1] != map[x][y])) {
-switch (map[x][y])
+	    if ((y == min) || (mapgrid[x][y - 1] != mapgrid[x][y])) {
+switch (mapgrid[x][y])
 {
 case NUM_ROOM_SECTORS:
 case SECT_INSIDE:
@@ -185,7 +185,7 @@ case SECT_ICE:
 case SECT_PRAIRIE:
 case SECT_BADLANDS:
 case SECT_RAIL:
-  len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[map[x][y]].color, map_bit[map[x][y]].bit);
+  len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].color, map_bit[mapgrid[x][y]].bit);
   break;
 		case (NUM_ROOM_SECTORS + 1):
 		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cM?");
@@ -196,7 +196,7 @@ case SECT_RAIL:
 		}
 		len += snprintf(mapdisp + len, sizeof(mapdisp) - len," ");
 	    } else {
-		switch (map[x][y]) {
+		switch (mapgrid[x][y]) {
 		case NUM_ROOM_SECTORS:
 		case SECT_INSIDE:
 		case SECT_CITY:
@@ -225,7 +225,7 @@ case SECT_ICE:
 case SECT_PRAIRIE:
 case SECT_BADLANDS:
 case SECT_RAIL:
-		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[map[x][y]].color, map_bit[map[x][y]].bit);
+		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].color, map_bit[mapgrid[x][y]].bit);
 		    break;
 		case (NUM_ROOM_SECTORS + 1):
 		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cM?");
@@ -245,7 +245,7 @@ case SECT_RAIL:
     
     len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cx\r\n");
     mapdisp[len] = 0;
-    new_send_to_char(ch, "%s", mapdisp);
+    ch->Send( "%s", mapdisp);
     return;
 }
 
@@ -254,27 +254,27 @@ case SECT_RAIL:
 /* this is the main function to show the map, its do_map with " " */
 
 /* Heavily modified - Edward */
-void ShowRoom(struct char_data *ch, int min, int max)
+void ShowRoom(Character *ch, int min, int max)
 {
     char dispbuf[MAX_INPUT_LENGTH];
 
     #if 0
     /* mlk :: rounds edges */
-    map[min][min] = NUM_ROOM_SECTORS;
-    map[max - 1][max - 1] = NUM_ROOM_SECTORS;
-    map[min][max - 1] = NUM_ROOM_SECTORS;
-    map[max - 1][min] = NUM_ROOM_SECTORS;
+    mapgrid[min][min] = NUM_ROOM_SECTORS;
+    mapgrid[max - 1][max - 1] = NUM_ROOM_SECTORS;
+    mapgrid[min][max - 1] = NUM_ROOM_SECTORS;
+    mapgrid[max - 1][min] = NUM_ROOM_SECTORS;
     #endif
 
    
 
 		 parse_room_name(IN_ROOM(ch), dispbuf, sizeof(dispbuf));
-		 new_send_to_char(ch, "{cx   {cc%s{cx", dispbuf);
+		 ch->Send( "{cx   {cc%s{cx", dispbuf);
 
 	    if (GET_LEVEL(ch) >= LVL_GOD) 
-		new_send_to_char(ch, " {cc[Room %d]{cx", IN_ROOM(ch)->number);
+		ch->Send( " {cc[Room %d]{cx", IN_ROOM(ch)->number);
 		
-	    new_send_to_char(ch, "\r\n");
+	    ch->Send( "\r\n");
 	    
  ShowMap(ch, min, max);
 //draw_map(ch);
@@ -321,13 +321,13 @@ ACMD(do_map)
 
     for (x = 0; x < MAX_MAP; ++x)
 	for (y = 0; y < MAX_MAP; ++y)
-	    map[x][y] = NUM_ROOM_SECTORS;
+	    mapgrid[x][y] = NUM_ROOM_SECTORS;
 
     /* starts the mapping with the center room */
     MapArea(IN_ROOM(ch), ch, center, center, min - 1, max - 1);
 
     /* marks the center, where ch is */
-    map[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */
+    mapgrid[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */
 
     /* switch default will print out the */
     if ((GET_LEVEL(ch) < LVL_GOD) || (IS_NPC(ch))) {

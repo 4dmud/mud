@@ -181,7 +181,7 @@ STATUS_ON
 struct sub_list {
 enum subskill_list subskill;
 int learn;
-enum sub_status_types status;
+enum sub_status_toggle status;
 struct sub_list *next;
 };
 

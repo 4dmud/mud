@@ -27,25 +27,25 @@
 #include "damage.h"
 
 /* external functs */
-void eq_to_room(CHAR_DATA *ch);
+void eq_to_room(Character *ch);
 int Crash_delete_file(char *name);
-void add_follower(struct char_data *ch, struct char_data *leader);
-void death_cry(struct char_data *ch);
-void dismount_char(struct char_data *ch);
-void mount_char(struct char_data *ch, struct char_data *mount);
-void improve_skill(struct char_data *ch, int skill);
-int special(struct char_data *ch, int cmd, char *arg);
-int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg);
-int ok_damage_shopkeeper(struct char_data *ch, struct char_data *victim);
-int has_metal_detector(struct char_data *ch);
-void spill_gold(struct char_data *ch);
-int can_fly(struct char_data *ch);
+void add_follower(Character *ch, Character *leader);
+void death_cry(Character *ch);
+void dismount_char(Character *ch);
+void mount_char(Character *ch, Character *mount);
+void improve_skill(Character *ch, int skill);
+int special(Character *ch, int cmd, char *arg);
+int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
+int ok_damage_shopkeeper(Character *ch, Character *victim);
+int has_metal_detector(Character *ch);
+void spill_gold(Character *ch);
+int can_fly(Character *ch);
 ACMD(do_sac);
-int buildwalk(struct char_data *ch, int dir);
-int move_fusion(CHAR_DATA *ch, int dir);
+int buildwalk(Character *ch, int dir);
+int move_fusion(Character *ch, int dir);
 int delete_pobj_file(char *name);
-void hit_death_trap(CHAR_DATA *ch);
-void raw_kill(CHAR_DATA *ch, CHAR_DATA * vict);
+void hit_death_trap(Character *ch);
+void raw_kill(Character *ch, Character * vict);
 ACMD(do_drive);
 
 /* MatingMod Defines */
@@ -60,18 +60,18 @@ ACMD(do_drive);
 #define MONTH_1         666
 
 /* local functions */
-int use_stamina(struct char_data *ch, int amount);
-void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
+int use_stamina(Character *ch, int amount);
+void do_doorcmd(Character *ch, struct obj_data *obj, int door,
                 int scmd);
-int has_boat(struct char_data *ch);
-int find_door(struct char_data *ch, const char *type, char *dir,
+int has_boat(Character *ch);
+int find_door(Character *ch, const char *type, char *dir,
               const char *cmdname);
-int has_key(struct char_data *ch, obj_vnum key);
-int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof,
+int has_key(Character *ch, obj_vnum key);
+int ok_pick(Character *ch, obj_vnum keynum, int pickproof,
             int scmd);
-int skill_cost(int h, int m, int v, struct char_data *ch);
+int skill_cost(int h, int m, int v, Character *ch);
 OBJ_DATA  *is_trapped(room_rnum rm);
-int can_enter(struct char_data *ch, room_vnum room, room_vnum to_room);
+int can_enter(Character *ch, room_vnum room, room_vnum to_room);
 
 ACMD(do_gen_door);
 ACMD(do_enter);
@@ -101,7 +101,7 @@ ACMD(do_recall)
     act("Through a gap in space and time $n arrives at recall point.", FALSE, ch, 0, 0, TO_ROOM);
     act("Through a gap in space and time you arrive at recall point.", FALSE, ch, 0, 0, TO_CHAR);
     if (GET_LEVEL(ch) < LVL_IMMORT && GET_LEVEL(ch) > 35)
-      new_send_to_char(ch, "{cRThis service is available until level 40 only.{c0\r\n");
+      ch->Send( "{cRThis service is available until level 40 only.{c0\r\n");
     look_at_room(ch, 0);
     entry_memory_mtrigger(ch);
     greet_mtrigger(ch, -1);
@@ -110,7 +110,7 @@ ACMD(do_recall)
   }
 }
 
-int can_move(struct char_data *ch)
+int can_move(Character *ch)
 {
   if (AFF_FLAGGED(ch, AFF_STUCK))
     return (0);
@@ -123,7 +123,7 @@ int can_move(struct char_data *ch)
   return 1;
 }
 /* simple function to determine if char can walk on water */
-int has_boat(struct char_data *ch)
+int has_boat(Character *ch)
 {
   struct obj_data *obj;
   int i;
@@ -151,7 +151,7 @@ int has_boat(struct char_data *ch)
   return (0);
 }
 
-int can_fly(struct char_data *ch)
+int can_fly(Character *ch)
 {
   sh_int i;
 
@@ -171,7 +171,7 @@ int can_fly(struct char_data *ch)
   return (0);
 }
 
-int has_space_suit(struct char_data *ch)
+int has_space_suit(Character *ch)
 {
   sh_int i;
 
@@ -189,7 +189,7 @@ int has_space_suit(struct char_data *ch)
   return (0);
 }
 
-int has_sun_protection(struct char_data *ch)
+int has_sun_protection(Character *ch)
 {
   sh_int i;
 
@@ -204,7 +204,7 @@ int has_sun_protection(struct char_data *ch)
   return (0);
 }
 
-int can_breathe_underwater(struct char_data *ch)
+int can_breathe_underwater(Character *ch)
 {
   sh_int i;
 
@@ -240,7 +240,7 @@ OBJ_DATA  *is_trapped(room_rnum rm)
   return trap;
 }
 
-int move_cost(struct char_data *ch, int dir)
+int move_cost(Character *ch, int dir)
 {
   int need_movement = 0;
   if (!ch)
@@ -293,13 +293,13 @@ int move_cost(struct char_data *ch, int dir)
 
 
   if (AFF_FLAGGED(ch, AFF_FLY))
-    need_movement -= (need_movement * 0.30);
+    need_movement -= FTOI((need_movement * 0.30));
 
 
   if (IS_CARRYING_W(ch) > CAN_CARRY_W(ch))
   {
-    new_send_to_char(ch, "You drag your feet under that amount of weight!\r\n");
-    need_movement += GET_MAX_MOVE(ch) * 0.5;
+    ch->Send( "You drag your feet under that amount of weight!\r\n");
+    need_movement += FTOI(GET_MAX_MOVE(ch) * 0.5);
   }
   if (has_vehicle(ch))
     return 0;
@@ -315,7 +315,7 @@ int move_cost(struct char_data *ch, int dir)
  *   1 : If success.
  *   0 : If fail
  */
-int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
+int do_simple_move(Character *ch, int dir, int need_specials_check)
 {
   int same_room = 0, riding = 0, ridden_by = 0;
   struct room_data * was_in = IN_ROOM(ch);
@@ -325,10 +325,10 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   char local_buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
   struct obj_data *bike = NULL;
-  /*    struct char_data *herd, *next;
+  /*    Character *herd, *next;
       bool FOUND = FALSE;*/
 
-  int special(struct char_data *ch, int cmd, char *arg);
+  int special(Character *ch, int cmd, char *arg);
 
   /*
    * Check for special routines (North is 1 in command list, but 0 here) Note
@@ -339,7 +339,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
   if (!can_move(ch))
   {
-    new_send_to_char(ch, "You can't go anywhere in that state!\r\n");
+    ch->Send( "You can't go anywhere in that state!\r\n");
     return 0;
   }
   // check if they're mounted
@@ -363,25 +363,25 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   // charmed?
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && HERE(ch, ch->master))
   {
-    new_send_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+    ch->Send( "The thought of leaving your master makes you weep.\r\n");
     return (0);
   }
   if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_STAY_SECTOR) && (SECT(IN_ROOM(ch)) != SECT(EXIT(ch, dir)->to_room)))
   {
     if (ch->desc)
-      new_send_to_char(ch, "You can't move out of this sector.\r\n");
+      ch->Send( "You can't move out of this sector.\r\n");
     return 0;
   }
   if (ch->hitched && !ROOM_FLAGGED(EXIT(ch, dir)->to_room, ROOM_VEHICLE))
   {
-    new_send_to_char(ch, "You cannot drag the %s that direction.\r\n", ch->hitched->short_description);
+    ch->Send( "You cannot drag the %s that direction.\r\n", ch->hitched->short_description);
     return 0;
   }
   if (!IS_IMM(ch))
   {
     if ((ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)))
     {
-      new_send_to_char(ch, "That area isn't open yet. Try back later.\r\n");
+      ch->Send( "That area isn't open yet. Try back later.\r\n");
       return (0);
     }
     /* if this room or the one we're going to needs a boat, check for one */
@@ -390,12 +390,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (riding && same_room && !has_boat(RIDING(ch)))
       {
-        new_send_to_char(ch, "Your mount needs a boat to go there.\r\n");
+        ch->Send( "Your mount needs a boat to go there.\r\n");
         return (0);
       }
       else if (!has_boat(ch))
       {
-        new_send_to_char(ch, "You need a boat to go there.\r\n");
+        ch->Send( "You need a boat to go there.\r\n");
         return 0;
       }
     }
@@ -407,12 +407,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (riding && same_room && can_fly(RIDING(ch)))
       {
-        new_send_to_char(ch, "Your mount can't fly into that room!\r\n");
+        ch->Send( "Your mount can't fly into that room!\r\n");
         return (0);
       }
       else if (can_fly(ch))
       {
-        new_send_to_char(ch, "You can't fly into that room!\r\n");
+        ch->Send( "You can't fly into that room!\r\n");
         return 0;
       }
     }
@@ -423,12 +423,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     {
       if (riding && same_room && !can_fly(RIDING(ch)))
       {
-        new_send_to_char(ch, "Your mount needs to be able to fly to go there.\r\n");
+        ch->Send( "Your mount needs to be able to fly to go there.\r\n");
         return (0);
       }
       else if (!can_fly(ch))
       {
-        new_send_to_char(ch, "You need to be able to fly to go there.\r\n");
+        ch->Send( "You need to be able to fly to go there.\r\n");
         return (0);
       }
     }
@@ -499,7 +499,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     return 0;
 
   if (ch->hitched)
-    need_movement *= 1.5;
+    need_movement = FTOI(need_movement * 1.5);
 
 
   if ((RIDING(ch) && HERE(RIDING(ch), ch)))
@@ -530,7 +530,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
       stam += use_stamina(ch, 1);
     else if (RIDING(ch) && HERE(RIDING(ch), ch))
     {
-      if (use_stamina(RIDING(ch),  MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1)) < 0)
+    if (use_stamina(RIDING(ch),  FTOI(MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1))) < 0)
       {
         act("Your mount collapses in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
         act("$n falls over in exhaustion, panting.", FALSE, RIDING(ch), 0, 0, TO_ROOM);
@@ -542,7 +542,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
       stam += use_stamina(ch, 1);
     }
     else
-      stam += use_stamina(ch,  MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1));
+      stam += use_stamina(ch,  FTOI(MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1)));
 
 
 
@@ -600,9 +600,9 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         num_pc_in_room((EXIT(ch, dir)->to_room)) > CONFIG_TUNNEL_SIZE)
     {
       if (CONFIG_TUNNEL_SIZE > 1)
-        new_send_to_char(ch, "There isn't enough room for you to go there!\r\n");
+        ch->Send( "There isn't enough room for you to go there!\r\n");
       else
-        new_send_to_char(ch, "There isn't enough room there for more than one person!\r\n");
+        ch->Send( "There isn't enough room there for more than one person!\r\n");
       return (0);
     }
   }
@@ -636,14 +636,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT && !RIDDEN_BY(ch))
   {
     if (RIDING(ch) && HERE(RIDING(ch), ch))
-      alter_move(ch, need_movement - (need_movement * 0.3));
+      alter_move(ch, FTOI(need_movement - (need_movement * 0.3)));
     else
       alter_move(ch, need_movement);
   }
   if (RIDING(ch) && HERE(RIDING(ch), ch))
-    alter_move(RIDING(ch), need_m_movement + (need_movement * 0.3));
+    alter_move(RIDING(ch), FTOI(need_m_movement + (need_movement * 0.3)));
   else if (RIDDEN_BY(ch) && HERE(RIDDEN_BY(ch), ch))
-    alter_move(ch, need_movement - (need_movement * 0.3));
+    alter_move(ch, FTOI(need_movement - (need_movement * 0.3)));
 
   /*hide move messages from people with the preference to not see it */
   message_type = REST_MOVE;
@@ -852,7 +852,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 
   /** Move the ch now from their current room to the new room */
   if (move_char_to(ch, was_in->dir_option[dir]->to_room) == 0) {
-    new_send_to_char(ch, "You can't go there.\r\n");
+    ch->Send( "You can't go there.\r\n");
     return 0;
   }
 
@@ -863,7 +863,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   }
   if (bike)
   {
-    struct char_data *tempch;
+    Character *tempch;
 
     obj_from_room(bike);
     obj_to_room(bike, IN_ROOM(ch));
@@ -1126,7 +1126,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   return (1);
 }
 
-void hit_death_trap(CHAR_DATA *ch)
+void hit_death_trap(Character *ch)
 {
   if (!ch)
     return;
@@ -1140,7 +1140,7 @@ void hit_death_trap(CHAR_DATA *ch)
   }
 }
 
-int can_pass_fence(struct char_data *ch, int dir)
+int can_pass_fence(Character *ch, int dir)
 {
   int chance, type = 0;
   char fencebuf[100];
@@ -1180,7 +1180,7 @@ int can_pass_fence(struct char_data *ch, int dir)
 
   if (!IS_NPC(ch))
   {
-    new_send_to_char(ch, "%s", fencebuf);
+    ch->Send( "%s", fencebuf);
     return 1;
   }
   else
@@ -1202,11 +1202,11 @@ int can_pass_fence(struct char_data *ch, int dir)
 
 }
 
-int perform_move(struct char_data *ch, int dir, int need_specials_check)
+int perform_move(Character *ch, int dir, int need_specials_check)
 {
   room_rnum was_in;
   struct follow_type *k, *next;
-  struct char_data *mob;
+  Character *mob;
 
   if (ch == NULL || dir < 0 || dir >= NUM_OF_DIRS || FIGHTING(ch))
     return (0);
@@ -1219,7 +1219,7 @@ int perform_move(struct char_data *ch, int dir, int need_specials_check)
   {
     if (EXIT(ch, dir)->keyword)
     {
-      new_send_to_char(ch, "The %s seems to be closed.\r\n",
+      ch->Send( "The %s seems to be closed.\r\n",
                        fname(EXIT(ch, dir)->keyword));
     }
     else
@@ -1240,15 +1240,15 @@ int perform_move(struct char_data *ch, int dir, int need_specials_check)
         send_to_char("You are stuck in a snare!\r\n", ch);
         return 0;
       }
-      new_send_to_char(ch, "You struggle ");
+      ch->Send( "You struggle ");
       if (number(1, 101) < GET_SKILL(ch, SKILL_TRAP_AWARE))
       {
-        new_send_to_char(ch, "and manage to free yourself from the snare.\r\n");
+        ch->Send( "and manage to free yourself from the snare.\r\n");
         affect_from_char(ch, SKILL_SNARE);
       }
       else
       {
-        new_send_to_char(ch, "but cant get free of the snare!\r\n");
+        ch->Send( "but cant get free of the snare!\r\n");
         return 0;
       }
     }
@@ -1311,7 +1311,7 @@ ACMD(do_move)
  }
 
 
-int find_door(struct char_data *ch, const char *type, char *dir,
+int find_door(Character *ch, const char *type, char *dir,
               const char *cmdname)
 {
   int door;
@@ -1331,7 +1331,7 @@ int find_door(struct char_data *ch, const char *type, char *dir,
           return (door);
         else
         {
-          new_send_to_char(ch, "I see no %s there.\r\n", type);
+          ch->Send( "I see no %s there.\r\n", type);
           return (-1);
         }
       }
@@ -1340,7 +1340,7 @@ int find_door(struct char_data *ch, const char *type, char *dir,
     }
     else
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "I really don't see how you can %s anything there.\r\n",
                        cmdname);
       return (-1);
@@ -1350,7 +1350,7 @@ int find_door(struct char_data *ch, const char *type, char *dir,
   {            /* try to locate the keyword */
     if (!*type)
     {
-      new_send_to_char(ch, "What is it you want to %s?\r\n", cmdname);
+      ch->Send( "What is it you want to %s?\r\n", cmdname);
       return (-1);
     }
     for (door = 0; door < NUM_OF_DIRS; door++)
@@ -1360,14 +1360,14 @@ int find_door(struct char_data *ch, const char *type, char *dir,
           if (isname(type, EXIT(ch, door)->keyword))
             return (door);
 
-    new_send_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(type),
+    ch->Send( "There doesn't seem to be %s %s here.\r\n", AN(type),
                      type);
     return (-1);
   }
 }
 
 
-int has_key(struct char_data *ch, obj_vnum key)
+int has_key(Character *ch, obj_vnum key)
 {
   struct obj_data *o;
 
@@ -1416,7 +1416,7 @@ const int flags_door[] =
           (TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED)) :\
           (TOGGLE_BIT(EXITN(room, door)->exit_info, EX_LOCKED)))
 
-void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
+void do_doorcmd(Character *ch, struct obj_data *obj, int door,
                 int scmd)
 {
   room_rnum other_room = NULL;
@@ -1437,7 +1437,7 @@ void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
     OPEN_DOOR(IN_ROOM(ch), obj, door);
     if (back)
       OPEN_DOOR(other_room, obj, rev_dir[door]);
-    new_send_to_char(ch, "%s", CONFIG_OK);
+    ch->Send( "%s", CONFIG_OK);
     break;
   case SCMD_UNLOCK:
   case SCMD_LOCK:
@@ -1482,7 +1482,7 @@ void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door,
 }
 
 
-int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof, int scmd)
+int ok_pick(Character *ch, obj_vnum keynum, int pickproof, int scmd)
 {
   int percent;
 
@@ -1532,12 +1532,12 @@ ACMD(do_gen_door)
   obj_vnum keynum;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct obj_data *obj = NULL;
-  struct char_data *victim = NULL;
+  Character *victim = NULL;
 
   skip_spaces(&argument);
   if (!*argument)
   {
-    new_send_to_char(ch, "%s what?\r\n", cmd_door[subcmd]);
+    ch->Send( "%s what?\r\n", cmd_door[subcmd]);
     return;
   }
   two_arguments(argument, type, dir);
@@ -1659,7 +1659,7 @@ ACMD(do_fence)
   /* check if the player typed anything*/
   if (type == NULL || adir == NULL)
   {
-    new_send_to_char(ch, "%s", (subcmd == SCMD_GATE ? GATE_USE_MSG : FENCE_USE_MSG));
+    ch->Send( "%s", (subcmd == SCMD_GATE ? GATE_USE_MSG : FENCE_USE_MSG));
     return;
   }
   else
@@ -1667,7 +1667,7 @@ ACMD(do_fence)
     /* make sure the type the typed is valid, hash check */
     if ((t = parse_fence_type(*type)) == 0)
     {
-      new_send_to_char(ch, "%s", (subcmd == SCMD_GATE ? GATE_USE_MSG : FENCE_USE_MSG));
+      ch->Send( "%s", (subcmd == SCMD_GATE ? GATE_USE_MSG : FENCE_USE_MSG));
       return;
     }
 
@@ -1675,7 +1675,7 @@ ACMD(do_fence)
     dir = search_block(adir, dirs, FALSE);
     if (dir == NOWHERE)
     {
-      new_send_to_char(ch, "Valid Directions Are: North, South, East, West, Up, and Down.\r\n");
+      ch->Send( "Valid Directions Are: North, South, East, West, Up, and Down.\r\n");
       return;
     }
     /* make sure the sort of fence they want is valid*/
@@ -1683,7 +1683,7 @@ ACMD(do_fence)
     {
       if ((t = parse_fence_sort(*fsort)) == 0)
       {
-        new_send_to_char(ch, "%s",  FENCE_USE_MSG);
+        ch->Send( "%s",  FENCE_USE_MSG);
         return;
       }
     }
@@ -1698,7 +1698,7 @@ ACMD(do_fence)
 
 }
 
-int followers_to_master(struct char_data *ch, room_rnum was_in)
+int followers_to_master(Character *ch, room_rnum was_in)
 {
   struct follow_type *k, *next;
   if (!ch->followers)
@@ -1782,7 +1782,7 @@ ACMD(do_enter)
 
           if (dest_room == NULL)
           {
-            new_send_to_char(ch, "Sorry, you can't enter that currently.\r\n");
+            ch->Send( "Sorry, you can't enter that currently.\r\n");
             new_mudlog(BRF, LVL_GOD, TRUE, "%s tried to enter portal vnum %d in room %d, but portal has no exit",
                        GET_NAME(ch), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(IN_ROOM(ch)));
             return;
@@ -1859,7 +1859,7 @@ ACMD(do_enter)
             perform_move(ch, door, 1);
             return;
           }
-    new_send_to_char(ch, "There is no %s here.\r\n", buf);
+    ch->Send( "There is no %s here.\r\n", buf);
   }
   else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_INDOORS))
     send_to_char("You are already indoors.\r\n", ch);
@@ -1947,7 +1947,7 @@ ACMD(do_stand)
 ACMD(do_sit)
 {
   struct obj_data *chair, *vehicle_control;
-  struct char_data *tempch;
+  Character *tempch;
   int found,is_vehicle;
   char arg[MAX_INPUT_LENGTH];
   char message[MAX_INPUT_LENGTH];
@@ -1978,7 +1978,7 @@ ACMD(do_sit)
     if (found == 0)
     {
       if(is_vehicle) {
-        new_send_to_char(ch, "You sit down at %s.\r\n",vehicle_control->short_description);
+        ch->Send( "You sit down at %s.\r\n",vehicle_control->short_description);
         snprintf(message,sizeof(message),"$n sits down at %s.", vehicle_control->short_description);
         act(message, FALSE, ch, 0, 0, TO_ROOM);
       }
@@ -2030,7 +2030,7 @@ ACMD(do_sit)
         GET_OBJ_VAL(chair, 1) += 1;
         GET_POS(ch) = POS_SITTING;
         if(is_vehicle){
-          new_send_to_char(ch, "You sit down upon %s and start using %s.\r\n", chair->short_description,vehicle_control->short_description);
+          ch->Send( "You sit down upon %s and start using %s.\r\n", chair->short_description,vehicle_control->short_description);
           snprintf(message,sizeof(message),"$n sits down upon $p and starts using %s.",vehicle_control->short_description);
           act(message, TRUE, ch, chair, 0, TO_ROOM);
         }
@@ -2137,7 +2137,7 @@ ACMD(do_sleep)
 
 ACMD(do_wake)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   int self = 0;
   char arg[MAX_INPUT_LENGTH];
 
@@ -2149,7 +2149,7 @@ ACMD(do_wake)
                    ch);
     else if ((vict =
                 get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) == NULL)
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
     else if (vict == ch)
       self = 1;
     else if (AWAKE(vict))
@@ -2175,7 +2175,7 @@ ACMD(do_wake)
   if (AFF_FLAGGED(ch, AFF_SLEEP))
     send_to_char("You can't wake up!\r\n", ch);
   else if (AFF_FLAGGED(ch, AFF_SWEET_DREAMS))
-    new_send_to_char(ch, "You are in a far to happy slumber.\r\n");
+    ch->Send( "You are in a far to happy slumber.\r\n");
   else if (GET_POS(ch) > POS_SLEEPING)
     send_to_char("You are already awake...\r\n", ch);
   else
@@ -2189,7 +2189,7 @@ ACMD(do_wake)
 ACMD(do_leader)
 {
   int found = 0;
-  struct char_data *leader;
+  Character *leader;
   struct follow_type * f;
   char buf[MAX_INPUT_LENGTH];
   one_argument(argument, buf);
@@ -2198,7 +2198,7 @@ ACMD(do_leader)
   {
     if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
   }
@@ -2209,13 +2209,13 @@ ACMD(do_leader)
   }
   if (leader == ch)
   {
-    new_send_to_char(ch, "You give yourself the vote for leadership. Aint that dandy.\r\n");
+    ch->Send( "You give yourself the vote for leadership. Aint that dandy.\r\n");
     return;
   }
 
   if (IS_NPC(leader))
   {
-    new_send_to_char(ch, "Yeah, put the most inteligent person as leader. Can't do that sorry...\r\n");
+    ch->Send( "Yeah, put the most inteligent person as leader. Can't do that sorry...\r\n");
     return;
   }
 
@@ -2229,10 +2229,10 @@ ACMD(do_leader)
 
 
   if (!found)
-    new_send_to_char(ch, "That person isnt following you!\r\n");
+    ch->Send( "That person isnt following you!\r\n");
   else
   {
-    new_send_to_char(ch, "You make %s the leader.\r\n", GET_NAME(leader));
+    ch->Send( "You make %s the leader.\r\n", GET_NAME(leader));
     new_send_to_char(leader, "%s makes you the leader.\r\n", GET_NAME(ch));
 
 
@@ -2263,7 +2263,7 @@ ACMD(do_leader)
 
 ACMD(do_follow)
 {
-  struct char_data *leader;
+  Character *leader;
   char buf[MAX_INPUT_LENGTH];
   //int diff;
   one_argument(argument, buf);
@@ -2272,7 +2272,7 @@ ACMD(do_follow)
   {
     if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
   }
@@ -2284,7 +2284,7 @@ ACMD(do_follow)
 
   if (ch->followers != NULL)
   {
-    new_send_to_char(ch, "You cannot follow another person while you have your own followers.\r\n");
+    ch->Send( "You cannot follow another person while you have your own followers.\r\n");
     return;
   }
 
@@ -2293,7 +2293,7 @@ ACMD(do_follow)
 
   if (leader->master && (leader != ch))
   {
-    new_send_to_char(ch, "%s's master is %s, so you ask to follow %s insead.\r\n",
+    ch->Send( "%s's master is %s, so you ask to follow %s insead.\r\n",
                      GET_NAME(leader), GET_NAME(leader->master), HMHR(leader->master));
     leader = leader->master;
   }
@@ -2338,7 +2338,7 @@ ACMD(do_follow)
       }
       if (IS_NPC(leader) && !IS_NPC(ch))
       {
-        new_send_to_char(ch, "You cant follow %s!!\r\n",
+        ch->Send( "You cant follow %s!!\r\n",
                          PERS(leader, ch));
         return;
       }
@@ -2358,7 +2358,7 @@ ACMD(do_follow)
         /*diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));
         if (abs(diff) > 100)
         {
-          new_send_to_char(ch, "The difference in your powers is too great.\r\n");
+          ch->Send( "The difference in your powers is too great.\r\n");
           return;
         }*/
         if (STATE(leader->desc) == CON_PLAYING
@@ -2366,13 +2366,13 @@ ACMD(do_follow)
                  || PLR_FLAGGED(leader, PLR_WRITING)))
         {
           snprintf(buf, sizeof(buf),"[%s wishes to join your group: Allow? (Type: Y | N )]", GET_NAME(ch));
-          new_send_to_char(ch,"You ask %s if you can join %s group.\r\n", GET_NAME(leader), HSHR(leader));
+          ch->Send("You ask %s if you can join %s group.\r\n", GET_NAME(leader), HSHR(leader));
           leader->loader = GET_IDNUM(ch);
           line_input(leader->desc, buf, allow_follow, NULL);
         }
         else
         {
-          new_send_to_char(ch,"You cant follow %s just yet, %s is too busy to reply.\r\n", HSSH(leader), GET_NAME(leader));
+          ch->Send("You cant follow %s just yet, %s is too busy to reply.\r\n", HSSH(leader), GET_NAME(leader));
         }
       }
       else
@@ -2394,22 +2394,22 @@ ASKILL(skill_mount)
 {
   if (obj)
   {
-    struct char_data *tempch;
+    Character *tempch;
     if (GET_OBJ_TYPE(obj) == ITEM_SPACEBIKE)
     {
       if (RIDING(ch) || RIDDEN_BY(ch))
       {
-        new_send_to_char(ch, "You are already mounted.\r\n");
+        ch->Send( "You are already mounted.\r\n");
         return 0;
       }
       if (OBJ_SAT_IN_BY(obj))
       {
-        new_send_to_char(ch, "It is already mounted.\r\n");
+        ch->Send( "It is already mounted.\r\n");
         return 0;
       }
       if (SITTING(ch))
       {
-        new_send_to_char(ch, "You are sitting on something already.\r\n");
+        ch->Send( "You are sitting on something already.\r\n");
         return 0;
       }
 
@@ -2462,7 +2462,7 @@ ASKILL(skill_mount)
   }
   else if (!IS_NPC(vict) && !(!IS_NPC(vict) && PRF_FLAGGED(vict, PRF_MOUNTABLE)))
   {
-    new_send_to_char(ch, "They have nomount turned off.\r\n");
+    ch->Send( "They have nomount turned off.\r\n");
     return 0;
   }
   else if ((GET_LEVEL(ch) < LVL_IMMORT && (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_MOUNTABLE))))
@@ -2478,7 +2478,7 @@ ASKILL(skill_mount)
   }
   else if (use_stamina(ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are too exausted!");
+    ch->Send( "You are too exausted!");
     return 0;
   }
   else if (GET_SKILL(ch, SKILL_MOUNT) <= number(1, 101))
@@ -2521,7 +2521,7 @@ ACMD(do_dismount)
 
     if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch))
     {
-      new_send_to_char(ch,"Yah, right, and then drown...\r\n");
+      ch->Send("Yah, right, and then drown...\r\n");
       return;
     }
 
@@ -2536,7 +2536,7 @@ ACMD(do_dismount)
   }
   else
   {
-    new_send_to_char(ch, "You aren't even riding anything.\r\n");
+    ch->Send( "You aren't even riding anything.\r\n");
     return;
   }
   dismount_char(ch);
@@ -2597,12 +2597,12 @@ ASKILL(skill_tame)
   }
   if (use_stamina(ch, 10) < 0)
   {
-    new_send_to_char(ch, "You are too exausted!");
+    ch->Send( "You are too exausted!");
     return 0;
   }
   if ((GET_LEVEL(ch) +3) < GET_LEVEL(vict))
   {
-    new_send_to_char(ch, "They are too powerful to tame, you must take your chances!\r\n");
+    ch->Send( "They are too powerful to tame, you must take your chances!\r\n");
     return 0;
   }
 
@@ -2627,7 +2627,7 @@ ASKILL(skill_snare)
   GET_WAIT_STATE(ch) += ( 1 RL_SEC);
   if (use_stamina(ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are too exausted!");
+    ch->Send( "You are too exausted!");
     return 0;
   }
 
@@ -2675,7 +2675,7 @@ ASKILL(skill_blackjack)
 
   if (use_stamina(ch, 10) < 0)
   {
-    new_send_to_char(ch, "You are exausted!");
+    ch->Send( "You are exausted!");
     return 0;
   }
 
@@ -2743,7 +2743,7 @@ ACMD(do_speedwalk)
 
   SET_BIT_AR(PLR_FLAGS(ch), PLR_SPEEDWALK);
   act("$n starts speedwalking.", TRUE, ch, 0, 0, TO_ROOM);
-  new_send_to_char(ch, "You start speedwalking.\r\n");
+  ch->Send( "You start speedwalking.\r\n");
 
   for (r = 1; *argument && r; argument++)
   {
@@ -2795,7 +2795,7 @@ ACMD(do_speedwalk)
 if cant consume amount then returns negitive
 Otherwise it returns the stamina used
 */
-int use_stamina(struct char_data *ch, int amount)
+int use_stamina(Character *ch, int amount)
 {
   float multi = 0.0f;
   int ret_val;
@@ -2805,7 +2805,7 @@ int use_stamina(struct char_data *ch, int amount)
     return 0;
 
   if (IS_NPC(ch))
-    amount *= 0.4;
+    amount = FTOI(amount * 0.4);
 
   switch ((int)seconds)
   {
@@ -2831,16 +2831,16 @@ int use_stamina(struct char_data *ch, int amount)
     multi = 0.1f;
   }
 
-  ret_val = (GET_STAMINA(ch) - (amount * multi));
+  ret_val = (GET_STAMINA(ch) - FTOI((amount * multi)));
   if (ret_val > 0)
-    alter_stamina(ch, amount * multi);
+    alter_stamina(ch, FTOI(amount * multi));
 
   LAST_MOVE(ch) = time(0);
 
   return ret_val;
 }
 
-int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch)
+int perform_move_obj(struct obj_data *obj, int dir, Character *ch)
 {
   if (IN_ROOM(obj) == NULL)
     return 0;
@@ -2880,11 +2880,11 @@ int perform_move_obj(struct obj_data *obj, int dir, struct char_data *ch)
  *   1 : If success.
  *   0 : If fail
  */
-int do_simple_obj_move(struct obj_data *obj, int dir, struct char_data *ch)
+int do_simple_obj_move(struct obj_data *obj, int dir, Character *ch)
 {
   room_rnum was_in;
-  struct char_data *p;
-  void view_room_by_rnum(struct char_data *ch, room_rnum is_in);
+  Character *p;
+  void view_room_by_rnum(Character *ch, room_rnum is_in);
 
   switch (SECT(IN_ROOM(obj)))
   {

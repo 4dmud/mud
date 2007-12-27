@@ -1,6 +1,6 @@
 struct auction_data {
-  struct char_data *seller;
-  struct char_data *bidder;
+  Character *seller;
+  Character *bidder;
   struct obj_data *obj;
   long bid;
   int ticks;
@@ -22,5 +22,5 @@ struct auction_data {
 
 #define PULSE_AUCTION   (15 RL_SEC)
 void auction_update(void);
-struct char_data *get_char_auc(char *name);
+Character *get_char_auc(char *name);
 

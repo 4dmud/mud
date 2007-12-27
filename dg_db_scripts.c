@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/20 05:46:19 $
-*  $Revision: 1.4 $
+*  $Date: 2006/05/21 11:02:26 $
+*  $Revision: 1.5 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -63,8 +63,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon)
   trig->narg = (k == 3) ? t[0] : 0;
 
   if ((trig->arglist = fread_string(trig_f, errors)) == NULL) {
-  log("SYSERR: %s has no args in file!", errors);
-    exit(1);
+    /* no args is fine */
   }
 
   if ((cmds = s = fread_string(trig_f, errors)) == NULL) {
@@ -94,7 +93,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon)
  * create a new trigger from a prototype.
  * nr is the real number of the trigger.
  */
-trig_data *read_trigger(int nr)
+trig_data *read_trigger(unsigned int nr)
 {
   index_data *t_index;
   trig_data *trig;
@@ -162,7 +161,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
   char line[READ_SIZE];
   char junk[8];
   int vnum, rnum, count;
-  char_data *mob;
+  Character *mob;
   room_data *room;
   struct trig_proto_list *trg_proto, *new_trg;
 
@@ -184,7 +183,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
     case MOB_TRIGGER:
       new_mudlog(BRF, LVL_BUILDER, TRUE,
                  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (mob: %s - %d)",
-                 vnum, GET_NAME((char_data *)proto), GET_MOB_VNUM((char_data *)proto));
+                 vnum, GET_NAME((Character *)proto), GET_MOB_VNUM((Character *)proto));
       break;
     case WLD_TRIGGER:
       new_mudlog(BRF, LVL_BUILDER, TRUE,
@@ -206,7 +205,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
     new_trg->vnum = vnum;
     new_trg->next = NULL;
 
-    mob = (char_data *)proto;
+    mob = (Character *)proto;
     trg_proto = mob->proto_script;
     if (!trg_proto)
     {
@@ -297,7 +296,7 @@ void dg_obj_trigger(char *line, struct obj_data *obj)
 
 void assign_triggers(void *i, int type)
 {
-  struct char_data *mob = NULL;
+  Character *mob = NULL;
   struct obj_data *obj = NULL;
   struct room_data *room = NULL;
   int rnum;
@@ -306,7 +305,7 @@ void assign_triggers(void *i, int type)
   switch (type)
   {
   case MOB_TRIGGER:
-    mob = (char_data *)i;
+    mob = (Character *)i;
     trg_proto = mob->proto_script;
     while (trg_proto)
     {

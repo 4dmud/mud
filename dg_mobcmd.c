@@ -27,6 +27,10 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.17  2006/05/21 11:02:26  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.16  2006/05/20 09:33:12  w4dimenscor
  * fixed the bug where if a mob was purged while fighting the people who were fighting it would stay fighting nothing
  *
@@ -98,24 +102,24 @@
 #include "constants.h"
 #include "fight.h"
 
-void raw_kill(struct char_data *ch, struct char_data *killer);
+void raw_kill(Character *ch, Character *killer);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
                         int upper_vnum);
 void reset_zone(zone_rnum zone);
 bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
-void die(struct char_data *ch, struct char_data *killer);
-int valid_dg_target(struct char_data *ch, int allow_gods);
-room_rnum find_target_room(struct char_data *ch, char *rawroomstr);
-void stop_fusion(CHAR_DATA *ch);
+void die(Character *ch, Character *killer);
+int valid_dg_target(Character *ch, int allow_gods);
+room_rnum find_target_room(Character *ch, char *rawroomstr);
+void stop_fusion(Character *ch);
 room_data *get_room(char *name);
-void die_link(CHAR_DATA *mob);
+void die_link(Character *mob);
 extern struct hunter_data *hunter_list;
-int followers_to_master(struct char_data *ch, room_rnum was_in);
+int followers_to_master(Character *ch, room_rnum was_in);
 /*
  * Local functions.
  */
-void mob_log(char_data *mob, const char *format, ...);
+void mob_log(Character *mob, const char *format, ...);
 ACMD(do_masound);
 ACMD(do_mkill);
 ACMD(do_mjunk);
@@ -139,7 +143,7 @@ ACMD(do_mfollow);
 ACMD(do_mrecho);
 
 /* attaches mob's name and vnum to msg and sends it to script_log */
-void mob_log(char_data *mob, const char *format, ...)
+void mob_log(Character *mob, const char *format, ...)
 {
   va_list args;
   char output[MAX_STRING_LENGTH];
@@ -165,14 +169,14 @@ void mob_log(char_data *mob, const char *format, ...)
 
 ACMD(do_msteal)
 {
-  struct char_data *vict;
+  Character *vict;
   struct obj_data *obj;
   char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
 
   vict = get_char_room_vis(ch, vict_name, NULL);
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -224,7 +228,7 @@ ACMD(do_masound)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -260,11 +264,11 @@ ACMD(do_masound)
 ACMD(do_mkill)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -320,12 +324,12 @@ ACMD(do_mlag)
 {
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
   int w = 0;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -395,12 +399,12 @@ ACMD(do_mjunk)
   int pos, junk_all = 0;
   obj_data *obj = NULL;
   obj_data *obj_next = NULL;
-  int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg);
+  int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -465,12 +469,12 @@ ACMD(do_mjunk)
 ACMD(do_mechoaround)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
   char *p;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -516,12 +520,12 @@ ACMD(do_mechoaround)
 ACMD(do_msend)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
   char *p;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -585,7 +589,7 @@ ACMD(do_mecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -611,7 +615,7 @@ ACMD(do_mzecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -641,7 +645,7 @@ ACMD(do_mzrecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -674,7 +678,7 @@ ACMD(do_mrecho)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
   msg = two_arguments(argument, start, finish);
@@ -692,11 +696,11 @@ ACMD(do_mdamage)
 {
   char name[MAX_INPUT_LENGTH], amount[MAX_INPUT_LENGTH];
   int dam = 0;
-  char_data *vict;
+  Character *vict;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -722,7 +726,7 @@ ACMD(do_mdamage)
   }
   else if (!str_cmp("all", name))
   {
-    CHAR_DATA *tvict;
+    Character *tvict;
     if (!IN_ROOM(ch))
       return;
     /**TODO: I hate this loop, because it is possable that on the extraction
@@ -763,16 +767,16 @@ ACMD(do_mload)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int num = 0;
-  char_data *mob;
+  Character *mob;
   obj_data *object;
   char *target;
-  char_data *tch;
+  Character *tch;
   obj_data *cnt;
   int pos;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -915,12 +919,12 @@ ACMD(do_mload)
 ACMD(do_mpurge)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
   obj_data  *obj;
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -935,7 +939,7 @@ ACMD(do_mpurge)
   if (!*arg)
   {
     /* 'purge' */
-    char_data *vnext;
+    Character *vnext;
     obj_data  *obj_next;
 
     for (victim = IN_ROOM(ch)->people; victim; victim = vnext)
@@ -1006,7 +1010,7 @@ ACMD(do_mgoto)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1044,7 +1048,7 @@ ACMD(do_mat)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1090,10 +1094,10 @@ ACMD(do_mteleport)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   room_rnum target, was_in;
-  char_data *vict, *next_ch;
+  Character *vict, *next_ch;
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1183,7 +1187,7 @@ ACMD(do_mforce)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1204,7 +1208,7 @@ ACMD(do_mforce)
   if (!str_cmp(arg, "all"))
   {
     struct descriptor_data *i;
-    char_data *vch;
+    Character *vch;
 
     for (i = descriptor_list; i; i = i->next)
     {
@@ -1224,7 +1228,7 @@ ACMD(do_mforce)
   }
   else
   {
-    char_data *victim;
+    Character *victim;
 
     if (*arg == UID_CHAR)
     {
@@ -1258,12 +1262,12 @@ ACMD(do_mforce)
 /* hunt for someone */
 ACMD(do_mhunt)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1312,13 +1316,13 @@ ACMD(do_mhunt)
 /* place someone into the mob's memory list */
 ACMD(do_mremember)
 {
-  char_data *victim;
+  Character *victim;
   struct script_memory *mem;
   char arg[MAX_INPUT_LENGTH];
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1377,13 +1381,13 @@ ACMD(do_mremember)
 /* remove someone from the list */
 ACMD(do_mforget)
 {
-  char_data *victim;
+  Character *victim;
   struct script_memory *mem, *prev;
   char arg[MAX_INPUT_LENGTH];
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1451,7 +1455,7 @@ ACMD(do_mforget)
 ACMD(do_mtransform)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *m, tmpmob;
+  Character *m, tmpmob;
   obj_data *obj[NUM_WEARS];
   struct hunter_data *hunt = NULL, *hnext;
   mob_rnum this_rnum = GET_MOB_RNUM(ch);
@@ -1460,7 +1464,7 @@ ACMD(do_mtransform)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1469,7 +1473,7 @@ ACMD(do_mtransform)
 
   if (ch->desc)
   {
-    new_send_to_char(ch,"You've got no VNUM to return to, dummy! try 'switch'\r\n");
+    ch->Send("You've got no VNUM to return to, dummy! try 'switch'\r\n");
     return;
   }
 
@@ -1631,7 +1635,7 @@ ACMD(do_mdoor)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch,"Huh?!?\r\n");
+    ch->Send("Huh?!?\r\n");
     return;
   }
 
@@ -1723,12 +1727,12 @@ ACMD(do_mdoor)
 
 ACMD(do_mslay)
 {
-  struct char_data *vict;
+  Character *vict;
   char arg[MAX_INPUT_LENGTH];
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch,"Huh?!?\r\n");
+    ch->Send("Huh?!?\r\n");
     return;
   }
 
@@ -1736,19 +1740,19 @@ ACMD(do_mslay)
 
   if (!*arg)
   {
-    new_send_to_char(ch,"Kill who?\r\n");
+    ch->Send("Kill who?\r\n");
     return;
   }
 
   if (!(vict = get_char_room_vis(ch, arg, NULL)))
   {
-    new_send_to_char(ch,"They aren't here.\r\n");
+    ch->Send("They aren't here.\r\n");
     return;
   }
 
   if (ch == vict)
   {
-    new_send_to_char(ch,"Your mother would be so sad.. :(\r\n");
+    ch->Send("Your mother would be so sad.. :(\r\n");
     return;
   }
 
@@ -1771,7 +1775,7 @@ ACMD(do_mcollision)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
     return;
   }
 
@@ -1830,7 +1834,7 @@ ACMD(do_mzreset)
 
   if (!MOB_OR_IMPL(ch))
   {
-    new_send_to_char(ch,"Huh?!?\r\n");
+    ch->Send("Huh?!?\r\n");
     return;
   }
 
@@ -1843,5 +1847,5 @@ ACMD(do_mzreset)
                zone_table[i].name);
   }
   else
-    new_send_to_char(ch,"Invalid zone number.\r\n");
+    ch->Send("Invalid zone number.\r\n");
 }

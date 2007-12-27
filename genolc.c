@@ -29,13 +29,12 @@
 extern struct zone_data *zone_table;
 extern zone_rnum top_of_zone_table;
 extern struct room_data *world_vnum[];
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct shop_data *shop_index;
 extern struct index_data **trig_index;
 extern int top_shop;
-extern int top_of_trigt;
 
 int save_config( int nowhere );        /* Exported from cedit.c */
 
@@ -54,7 +53,7 @@ struct save_list_data *save_list;
 /*
  * Structure defining all known save types.
  */
-struct {
+struct known_save_types {
   int save_type;
   int (*func)(int rnum);
   const char *message;
@@ -229,19 +228,19 @@ int in_save_list(zone_vnum zone, int type)
 /*
  * Used from do_show(), ideally.
  */
-void do_show_save_list(struct char_data *ch)
+void do_show_save_list(Character *ch)
 {
   if (save_list == NULL)
-    new_send_to_char(ch, "All world files are up to date.\r\n");
+    ch->Send( "All world files are up to date.\r\n");
   else {
     struct save_list_data *item;
 
-    new_send_to_char(ch, "The following files need saving:\r\n");
+    ch->Send( "The following files need saving:\r\n");
     for (item = save_list; item; item = item->next) {
       if (item->type != SL_CFG)
-        new_send_to_char(ch, " - %s data for zone %d.\r\n", save_types[item->type].message, item->zone);
+        ch->Send( " - %s data for zone %d.\r\n", save_types[item->type].message, item->zone);
       else
-        new_send_to_char(ch, " - Game configuration data.\r\n");
+        ch->Send( " - Game configuration data.\r\n");
     }
   }
 }
@@ -282,24 +281,24 @@ ACMD(do_edit)
     case 'd':
       if ((idx = real_mobile(num)) != NOBODY) {
 	delete_mobile(idx);	/* Delete -> Real */
-	new_send_to_char(ch, "%s", CONFIG_OK);
+	ch->Send( "%s", CONFIG_OK);
       } else
-	new_send_to_char(ch, "What mobile?\r\n");
+	ch->Send( "What mobile?\r\n");
       break;
     case 's':
       save_mobiles(num);
       break;
     case 'c':
       if ((num = real_mobile(num)) == NOBODY)
-	new_send_to_char(ch, "What mobile?\r\n");
+	ch->Send( "What mobile?\r\n");
       else if ((mun = real_mobile(mun)) == NOBODY)
-	new_send_to_char(ch, "Can only copy over an existing mob.\r\n");
+	ch->Send( "Can only copy over an existing mob.\r\n");
       else {
         /* Otherwise the old ones have dangling string pointers. */
         extract_mobile_all(mob_index[mun].vnum);
         /* To <- From */
 	copy_mobile(mob_proto + mun, mob_proto + num);
-	new_send_to_char(ch, "%s", CONFIG_OK);
+	ch->Send( "%s", CONFIG_OK);
       }
       break;
     }
@@ -330,9 +329,9 @@ ACMD(do_edit)
     case 'd':
       if ((idx = num) != NOWHERE) {
 	delete_room(world_vnum[idx]);
-	new_send_to_char(ch, "%s", CONFIG_OK);
+	ch->Send( "%s", CONFIG_OK);
       } else
-	new_send_to_char(ch, "What room?\r\n");
+	ch->Send( "What room?\r\n");
       break;
     case 's':
       save_rooms(real_zone(num));
@@ -345,7 +344,7 @@ ACMD(do_edit)
     do_show_save_list(ch);
     break;
   default:
-    new_send_to_char(ch, "What?\r\n");
+    ch->Send( "What?\r\n");
     break;
   }
 }

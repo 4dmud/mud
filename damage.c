@@ -17,17 +17,17 @@
 
 struct aff_dam_event_obj
 {
-  struct char_data* ch;
+  Character* ch;
   int damage;
   int interval;
   int recurse;
-  int (*event_fun)(int, struct char_data*);
+  int (*event_fun)(int, Character*);
   int id;
 };
 
 struct aff_dam_event_list
 {
-  struct char_data* ch;
+  Character* ch;
   struct event* event;
   struct aff_dam_event_list* next;
   int id;
@@ -35,18 +35,18 @@ struct aff_dam_event_list
 ACMD(do_sac);
 ACMD(do_get);
 ACMD(do_split);
-void aff_damage(struct char_data *ch, int dam, long interval, int recurse,
-                int (*event_fun)(int, struct char_data*));
+void aff_damage(Character *ch, int dam, long interval, int recurse,
+                int (*event_fun)(int, Character*));
 EVENTFUNC(affdam_event);
 void add_ade(struct aff_dam_event_obj* new_ade_obj);
-void cancel_affdam_events(struct char_data* ch);
+void cancel_affdam_events(Character* ch);
 void remove_affdam_event(int idnum);
 
 struct aff_dam_event_list* ade_list = NULL;
 struct aff_dam_event_list* ade_list_end = NULL;
 int ade_counter = 0;
 
-void damage_count(struct char_data *vict, long id, int dam)
+void damage_count(Character *vict, long id, int dam)
 {
   struct dam_from_list * t;
   if (!IS_NPC(vict))
@@ -78,13 +78,13 @@ void damage_count_free_one(struct dam_from_list * t)
 
   free(t);
 }
-void damage_count_free(struct char_data *vict)
+void damage_count_free(Character *vict)
 {
   damage_count_free_one(MOB_DAM_LIST(vict));
   MOB_DAM_LIST(vict) = NULL;
 }
 
-void damage_vict(struct char_data *vict, int dam)
+void damage_vict(Character *vict, int dam)
 {
   if (GET_LEVEL(vict)>=LVL_IMMORT && (dam > 0))
   {
@@ -97,7 +97,7 @@ void damage_vict(struct char_data *vict, int dam)
   send_char_pos(vict, dam);
 }
 
-void script_damage(struct char_data *vict, int dam)
+void script_damage(Character *vict, int dam)
 {
   if (!dam)
     return;
@@ -115,7 +115,7 @@ void script_damage(struct char_data *vict, int dam)
 }
 
 
-int mine_damage(struct char_data *vict, int dam)
+int mine_damage(Character *vict, int dam)
 {
   if (!dam)
     return 0;
@@ -142,7 +142,7 @@ int mine_damage(struct char_data *vict, int dam)
  *   = 0  No damage.
  *   > 0  How much damage done.
  */
-int damage(struct char_data *ch, struct char_data *victim, int dam,
+int damage(Character *ch, Character *victim, int dam,
            int attacktype)
 {
   gold_int local_gold = GET_GOLD(victim);
@@ -206,8 +206,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam,
   return dam;
 }
 
-void aff_damage(struct char_data *ch, int dam, long interval, int recurse,
-                int (*event_fun)(int, struct char_data*))
+void aff_damage(Character *ch, int dam, long interval, int recurse,
+                int (*event_fun)(int, Character*))
 {
   struct aff_dam_event_obj* new_event;
   CREATE(new_event, struct aff_dam_event_obj, 1);
@@ -271,7 +271,7 @@ void add_ade(struct aff_dam_event_obj* new_ade_obj)
   new_elem->event = event_create(affdam_event, new_ade_obj, t);
 }
 
-void cancel_affdam_events(struct char_data* ch)
+void cancel_affdam_events(Character* ch)
 {
   struct aff_dam_event_list* current;
   struct aff_dam_event_list* oneback;

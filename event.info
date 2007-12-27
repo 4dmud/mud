@@ -47,7 +47,7 @@
 +
 +    The event object is any structure with the fields to store any data
 +    needed by the event function.  The event object should not be a game
-+    object (such as a struct char_data), since this object is freed when
++    object (such as a Character), since this object is freed when
 +    events are canceled (see cancel_event() below).  All unique data
 +    contained by the object should be freed by a call of free(event_obj).
 +    In other words, don't have event_obj include pointers to other structures
@@ -116,7 +116,7 @@
 +
 +  /* the event object for the sniff event */
 +  struct sniff_event_obj {
-+      struct char_data *ch;
++      Character *ch;
 +      byte type;
 +  };
 +
@@ -124,7 +124,7 @@
 +  EVENTFUNC(sniff_event)
 +  {
 +    struct sniff_event_obj *seo = (struct sniff_event_obj *) event_obj;
-+    struct char_data *ch, *victim;
++    Character *ch, *victim;
 +
 +    ch = seo->ch;
 +
@@ -164,7 +164,7 @@
 +  }
 +
 +
-+  void extract_char(struct char_data *ch)
++  void extract_char(Character *ch)
 +  {
 +
 +    ...

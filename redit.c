@@ -29,7 +29,7 @@
  */
 extern struct room_data *world_vnum[];
 extern struct obj_data *obj_proto;
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern const char *room_bits[];
 extern const char *sector_types[];
 extern const char *exit_bits[];
@@ -60,7 +60,7 @@ ACMD(do_oasis_redit)
   {
     if (str_cmp("save", buf1) != 0)
     {
-      new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
+      ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
 
@@ -80,7 +80,7 @@ ACMD(do_oasis_redit)
 
     if (num == NOWHERE)
     {
-      new_send_to_char(ch, "Save which zone?\r\n");
+      ch->Send( "Save which zone?\r\n");
       return;
     }
   }
@@ -98,7 +98,7 @@ ACMD(do_oasis_redit)
     {
       if (d->olc && OLC_NUM(d) == num)
       {
-        new_send_to_char(ch, "That room is currently being edited by %s.\r\n",
+        ch->Send( "That room is currently being edited by %s.\r\n",
                          PERS(d->character, ch));
         return;
       }
@@ -122,7 +122,7 @@ ACMD(do_oasis_redit)
   OLC_ZNUM(d) = save ? real_zone(num) : real_zone_by_thing(num);
   if (OLC_ZNUM(d) == NOWHERE)
   {
-    new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    ch->Send( "Sorry, there is no zone for that number!\r\n");
     free(d->olc);
     d->olc = NULL;
     return;
@@ -131,7 +131,7 @@ ACMD(do_oasis_redit)
   /* Make sure the builder is allowed to modify this zone. */
   if (!can_edit_zone(ch, OLC_ZNUM(d)))
   {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE, "OLC: %s tried to edit zone %d allowed zone %d",
                GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 
@@ -142,7 +142,7 @@ ACMD(do_oasis_redit)
 
   if (save)
   {
-    new_send_to_char(ch, "Saving all rooms in zone %d.\r\n", zone_table[OLC_ZNUM(d)].number);
+    ch->Send( "Saving all rooms in zone %d.\r\n", zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, "OLC: %s saves room info for zone %d.", GET_NAME(ch), zone_table[OLC_ZNUM(d)].number);
 
     /* Save the rooms. */

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/01 11:29:26 $
-*  $Revision: 1.9 $
+*  $Date: 2006/05/21 11:02:26 $
+*  $Revision: 1.10 $
 **************************************************************************/
 
 #include "conf.h"
@@ -24,14 +24,14 @@
 #include "constants.h"
 
 
-void die(struct char_data *ch, struct char_data *killer);
+void die(Character *ch, Character *killer);
 bitvector_t asciiflag_conv(char *flag);
 int real_zone(int number);
 zone_rnum real_zone_by_thing(room_vnum vznum);
 #define OCMD(name)  \
    void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
 
-int followers_to_master(struct char_data *ch, room_rnum was_in);
+int followers_to_master(Character *ch, room_rnum was_in);
 void obj_log(obj_data *obj, const char *format, ...);
 room_rnum find_obj_target_room(obj_data *obj, char *rawroomstr);
 OCMD(do_oecho);
@@ -100,7 +100,7 @@ room_rnum find_obj_target_room(obj_data * obj, char *rawroomstr)
 {
     int tmp;
     room_rnum location;
-    char_data *target_mob;
+    Character *target_mob;
     obj_data *target_obj;
     char roomstr[MAX_INPUT_LENGTH];
 
@@ -165,7 +165,7 @@ OCMD(do_oecho)
 
 OCMD(do_oforce)
 {
-    char_data *ch, *next_ch;
+    Character *ch, *next_ch;
     room_rnum room;
     char arg1[MAX_INPUT_LENGTH], *line;
 
@@ -204,7 +204,7 @@ OCMD(do_oforce)
 
 OCMD(do_olag)
 {
-  char_data *victim;
+  Character *victim;
   int w = 0;
   //int room;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -252,7 +252,7 @@ OCMD(do_olag)
 
 
 
-  w = (w RL_SEC)*0.1;
+  w = FTOI((w RL_SEC)*0.1);
 
   WAIT_STATE(victim, w);
   return;
@@ -283,7 +283,7 @@ OCMD(do_ozoneecho)
 OCMD(do_osend)
 {
     char buf[MAX_INPUT_LENGTH], *msg;
-    char_data *ch;
+    Character *ch;
 
     msg = any_one_arg(argument, buf);
 
@@ -318,7 +318,7 @@ OCMD(do_osend)
 /* increases the target's exp */
 OCMD(do_oexp)
 {
-    char_data *ch;
+    Character *ch;
     char name[MAX_INPUT_LENGTH], amount[MAX_INPUT_LENGTH];
 
     two_arguments(argument, name, amount);
@@ -360,7 +360,7 @@ OCMD(do_otransform)
 {
     char arg[MAX_INPUT_LENGTH];
     obj_data *o, tmpobj;
-    struct char_data *wearer = NULL;
+    Character *wearer = NULL;
     int pos = 0;
     long objid = 0;
 
@@ -413,7 +413,7 @@ OCMD(do_otransform)
 OCMD(do_opurge)
 {
     char arg[MAX_INPUT_LENGTH];
-    char_data *ch, *next_ch;
+    Character *ch, *next_ch;
     obj_data *o, *next_obj;
     room_rnum rm;
 
@@ -463,7 +463,7 @@ OCMD(do_opurge)
 
 OCMD(do_oteleport)
 {
-    struct char_data *ch = NULL, *next_ch;
+    Character *ch = NULL, *next_ch;
   room_rnum target, rm, was_in;
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
@@ -531,10 +531,10 @@ OCMD(do_dgoload)
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
     int num = 0;
     room_rnum room;
-    char_data *mob;
+    Character *mob;
     obj_data *object;
     char *target;
-    char_data *tch;
+    Character *tch;
     obj_data *cnt;
     int pos;
 
@@ -657,7 +657,7 @@ OCMD(do_odamage)
 {
     char name[MAX_INPUT_LENGTH], amount[MAX_INPUT_LENGTH];
     int dam = 0;
-    struct char_data *ch;
+    Character *ch;
 
 //    if (obj->worn_by)
 //      strcpy(name, GET_NAME(obj->worn_by));
@@ -677,7 +677,7 @@ OCMD(do_odamage)
     dam = atoi(amount);
   if (!str_cmp("all", name))
 {
-  CHAR_DATA *tvict, *vict;
+  Character *tvict, *vict;
   room_rnum rm;
   if ((rm = obj_room(obj)) == NULL)
     return;

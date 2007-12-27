@@ -22,8 +22,8 @@
 extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
-int mine_damage(struct char_data *vict, int dam);
-void die(struct char_data *ch, struct char_data *killer);
+int mine_damage(Character *vict, int dam);
+void die(Character *ch, Character *killer);
 struct mine_list *mine_shafts = NULL;
 
 
@@ -37,13 +37,13 @@ ASUB(sub_tunneling)
 
   if (GET_SUB(ch, SUB_TUNNELING) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return SUB_UNDEFINED;
   }
 
   if (get_sub_status(ch, SUB_TUNNELING) == STATUS_ON)
   {
-    new_send_to_char(ch, "You stop tunneling.\r\n");
+    ch->Send( "You stop tunneling.\r\n");
     act("$n stops tunneling.", FALSE, ch, 0, 0, TO_ROOM);
     toggle_sub_status(ch, SUB_TUNNELING, STATUS_OFF);
     if (GET_TASK(ch) && GET_TASK(ch)->sub == SUB_TUNNELING)
@@ -57,14 +57,14 @@ ASUB(sub_tunneling)
   {
     if (pri == NULL)
     {
-      new_send_to_char(ch, "You can't mine with out a tool!\r\n");
+      ch->Send( "You can't mine with out a tool!\r\n");
       return SUB_UNDEFINED;
     }
 
 
     if (!(GET_OBJ_TYPE(pri) == ITEM_PICKAXE || (sec && GET_OBJ_TYPE(sec) == ITEM_PICKAXE)))
     {
-      new_send_to_char(ch, "Sorry but you need a pickaxe to tunnel there.\r\n");
+      ch->Send( "Sorry but you need a pickaxe to tunnel there.\r\n");
       return SUB_UNDEFINED;
     }
   }
@@ -73,21 +73,21 @@ ASUB(sub_tunneling)
 
     if (pri == NULL)
     {
-      new_send_to_char(ch, "You can't mine with out a tool!\r\n");
+      ch->Send( "You can't mine with out a tool!\r\n");
       return SUB_UNDEFINED;
     }
 
 
     if (!(GET_OBJ_TYPE(pri) == ITEM_SHOVEL || (sec && GET_OBJ_TYPE(sec) == ITEM_SHOVEL)))
     {
-      new_send_to_char(ch, "Sorry but you need a shovel to tunnel there.\r\n");
+      ch->Send( "Sorry but you need a shovel to tunnel there.\r\n");
       return SUB_UNDEFINED;
     }
   }
 
   if (!hard && !soft && rm->mine.num == -1)
   {
-    new_send_to_char(ch, "Sorry, this place cannot be tunneled.\r\n");
+    ch->Send( "Sorry, this place cannot be tunneled.\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -96,7 +96,7 @@ ASUB(sub_tunneling)
 
   if ((!direction || !*direction))
   {
-    new_send_to_char(ch, "Usage: tunnel <direction>\r\n");
+    ch->Send( "Usage: tunnel <direction>\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -121,29 +121,29 @@ ASUB(sub_tunneling)
     dir = DOWN;
     break;
   default:
-    new_send_to_char(ch, "Invalid direction! Directions are: north south east west up down.\r\n");
+    ch->Send( "Invalid direction! Directions are: north south east west up down.\r\n");
     return SUB_UNDEFINED;
   }
   if ((dir != DOWN && (rm->mine.num == -1)) || W_EXIT(rm, dir))
   {
-    new_send_to_char(ch, "There is no good mining area that direction.\r\n");
+    ch->Send( "There is no good mining area that direction.\r\n");
     return SUB_UNDEFINED;
   }
 
   if (GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return  SUB_UNDEFINED;
   }
   if (GET_MSG_RUN(ch))
   {
-    new_send_to_char(ch, "You are already working on something else!\r\n");
+    ch->Send( "You are already working on something else!\r\n");
     return  SUB_UNDEFINED;
   }
 
   if (rm == NULL)
   {
-    new_send_to_char(ch, "Error! Invalid room\r\n");
+    ch->Send( "Error! Invalid room\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -151,7 +151,7 @@ ASUB(sub_tunneling)
   density += (hard ? 3 + number(1, 3) : 0);
   density += (soft ? 1 + number(1, 2) : 0);
 
-  new_send_to_char(ch, "You begin to tunnel %s.\r\n", dirs[dir]);
+  ch->Send( "You begin to tunnel %s.\r\n", dirs[dir]);
 
   GET_MSG_RUN(ch) = TRUE;
   MINE_DIR(ch) = dir;
@@ -168,7 +168,7 @@ ASUB(sub_tunneling)
   return SUB_TUNNELING;
 }
 
-int check_mine_traps(struct char_data *ch)
+int check_mine_traps(Character *ch)
 {
   int hit = GET_HIT(ch), mhit = GET_MAX_HIT(ch);
   int dam = 0;
@@ -223,7 +223,7 @@ int check_mine_traps(struct char_data *ch)
     break;
   }
   if (dam)
-    dam *= ((float)(100.0 - MAX(0, MINE_DAMAGE(ch)))/100.0);
+    dam = (FTOI( dam * ((float)(100.0 - MAX(0, MINE_DAMAGE(ch)))/100.0)));
 
   return mine_damage(ch, dam);
   
@@ -385,7 +385,7 @@ room_vnum find_mine_room(int num, int dif)
   return -1;
 }
 
-void make_tunnel(struct char_data *ch)
+void make_tunnel(Character *ch)
 {
   room_vnum newroom = NOWHERE;
   room_rnum rnew = NULL;
@@ -401,17 +401,17 @@ void make_tunnel(struct char_data *ch)
 
   if (level == 0 && MINE_DIR(ch) != DOWN)
   {
-    new_send_to_char(ch, "You can't mine there.\r\n");
+    ch->Send( "You can't mine there.\r\n");
     return;
   }
   else if (level == 1 && MINE_DIR(ch) == UP)
   {
-    new_send_to_char(ch, "You can't seem to break through.\r\n");
+    ch->Send( "You can't seem to break through.\r\n");
     return;
   }
   else if (level == 6 && MINE_DIR(ch) == DOWN)
   {
-    new_send_to_char(ch, "You can't mine there.\r\n");
+    ch->Send( "You can't mine there.\r\n");
     return;
   }
 
@@ -454,7 +454,7 @@ void make_tunnel(struct char_data *ch)
     exit->nosave = 1;
     snprintf(description, sizeof(description), "A cave-in made by %s.\r\n", GET_NAME(ch));
     exit->general_description = str_dup(description);
-    new_send_to_char(ch, "As your last strike hits the %s wall it collapses in a cave-in.\r\n", dirs[MINE_DIR(ch)]);
+    ch->Send( "As your last strike hits the %s wall it collapses in a cave-in.\r\n", dirs[MINE_DIR(ch)]);
     act("$n's tunneling causes a cave-in!", FALSE, ch, 0, 0, TO_ROOM);
   }
   else
@@ -474,7 +474,7 @@ void make_tunnel(struct char_data *ch)
     exit->keyword = NULL;
     snprintf(description, sizeof(description), "A tunnel entrance made by %s.\r\n", GET_NAME(ch));
     exit->general_description = str_dup(description);
-    new_send_to_char(ch, "As your last strike hits the %s wall it opens up a new tunnel.\r\n", dirs[MINE_DIR(ch)]);
+    ch->Send( "As your last strike hits the %s wall it opens up a new tunnel.\r\n", dirs[MINE_DIR(ch)]);
     act("$n tunnels a new passage!", FALSE, ch, 0, 0, TO_ROOM);
     send_to_room(rnew, "A passage opens up in the %s wall.\r\n", dirs[rev_dir[MINE_DIR(ch)]]);
     log("%s creates a tunnel.", GET_NAME(ch));

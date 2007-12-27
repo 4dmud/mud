@@ -234,7 +234,7 @@ void free_vehicles(void)
   vehicles = NULL;
 }
 
-void list_vehicles(struct char_data *ch)
+void list_vehicles(Character *ch)
 {
   struct vehicle_data *v;
   int count = 0;
@@ -244,7 +244,7 @@ void list_vehicles(struct char_data *ch)
   DYN_CREATE;
   *dynbuf = '\0';
 
-  new_send_to_char(ch,
+  ch->Send(
                    "Vehicle list ------------------------------------------------\r\n");
   for (v = vehicles;v;v = v->next)
   {
@@ -274,7 +274,7 @@ ACMD(do_oasis_vedit)
 
   if (!*buf1)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "vedit new                -- to add a new vehicle\r\n"
                      "vedit <number>           -- to edit an existing vehicle\r\n"
                      "vedit remove <number>    -- to remove an existing vehicle\r\n"
@@ -290,7 +290,7 @@ ACMD(do_oasis_vedit)
       rem = TRUE;
     else
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "vedit new                -- to add a new vehicle\r\n"
                        "vedit <number>           -- to edit an existing vehicle\r\n"
                        "vedit remove <number>    -- to remove an existing vehicle\r\n"
@@ -306,14 +306,14 @@ ACMD(do_oasis_vedit)
       {
         if (!valid_vehicle_num(number))
         {
-          new_send_to_char(ch, "That is not a valid vehicle number (use vlist to view numbers).\r\n");
+          ch->Send( "That is not a valid vehicle number (use vlist to view numbers).\r\n");
           return;
         }
       }
     }
     else
     {
-      new_send_to_char(ch, "That is not a number!\r\n");
+      ch->Send( "That is not a number!\r\n");
       return;
     }
   }
@@ -327,7 +327,7 @@ ACMD(do_oasis_vedit)
 
     if (!valid_vehicle_num(number))
     {
-      new_send_to_char(ch, "That is not a valid vehicle number (use vlist to view numbers).\r\n");
+      ch->Send( "That is not a valid vehicle number (use vlist to view numbers).\r\n");
       return;
     }
   }
@@ -337,7 +337,7 @@ ACMD(do_oasis_vedit)
   {
     if (STATE(d) == CON_VEDIT)
     {
-      new_send_to_char(ch, "The vehicles are currently being edited by %s.\r\n",
+      ch->Send( "The vehicles are currently being edited by %s.\r\n",
                        PERS(d->character, ch));
       return;
     }
@@ -356,7 +356,7 @@ ACMD(do_oasis_vedit)
   if (rem)
   {
     remove_vehicle_num(number);
-    new_send_to_char(ch, "Vehicle entry removed.\r\n");
+    ch->Send( "Vehicle entry removed.\r\n");
     /* Free the olc data from the descriptor. */
     return;
   }

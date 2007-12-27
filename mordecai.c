@@ -70,7 +70,7 @@ O======================================================================O
 
 
 /* external functions */
-void convert_tokens(struct char_data *ch);
+void convert_tokens(Character *ch);
 
 ACMD(do_convert)
 {
@@ -277,7 +277,7 @@ ACMD(do_convey)
 
 	if (char_gold(ch, 0, GOLD_ALL) >= amount) {
 	log("INFO: %s conveyed %lld gold into %lld exp", GET_NAME(ch), amount, amount/4);
-	    new_send_to_char(ch,
+	    ch->Send(
 		    "You convey %lld gold to %lld exp points.\r\n",
 		    amount, amount / 4);
 	    gain_exp(ch, amount / 4);
@@ -285,7 +285,7 @@ ACMD(do_convey)
 
 	    return;
 	    } else {
-	    new_send_to_char(ch, "You cant afford to!\r\n");
+	    ch->Send( "You cant afford to!\r\n");
 	    }
     
     }  else if (isname("maxmove", arg2)) {
@@ -299,7 +299,7 @@ ACMD(do_convey)
 
 	if (char_gold(ch, 0, GOLD_ALL) >= (amount*10000000)* GET_CONVERSIONS(ch)) {
 	log("INFO: %s conveyed %lld gold into %d maxmove", GET_NAME(ch), (gold_int) ((amount * 10000000) * GET_CONVERSIONS(ch)), (int)amount * 100);
-	    new_send_to_char(ch,
+	    ch->Send(
 		    "You convey %lld gold to %d maxmove.\r\n",
 		    (gold_int)((amount * 10000000)* GET_CONVERSIONS(ch)), (int)amount * 100);
 	    GET_MAX_MOVE(ch) += (amount * 100);
@@ -309,14 +309,14 @@ ACMD(do_convey)
 
 	    return;
 	    } else {
-	    new_send_to_char(ch, "You cant afford to!\r\n");
+	    ch->Send( "You cant afford to!\r\n");
 	    }
     
     } else if (isname("award", arg2)) {
     
 
     if (PLR_FLAGGED(ch, PLR_HERO)) {
-    new_send_to_char(ch, "Sorry, cant do that.\r\n");
+    ch->Send( "Sorry, cant do that.\r\n");
     return;
     }
     
@@ -326,18 +326,18 @@ ACMD(do_convey)
 	}
 	
 	if (amount < 10) {
-	new_send_to_char(ch, "You can only convey 10 or more.\r\n");
+	ch->Send( "You can only convey 10 or more.\r\n");
 	return;
 	}
 	
 	if (amount > GET_AWARD(ch)) {
-	new_send_to_char(ch, "You can't afford that action.\r\n");
+	ch->Send( "You can't afford that action.\r\n");
 	return;
 	}
 
 	log("INFO: %s conveyed %d award points into %d bronze tokens", GET_NAME(ch), (int)amount, (int) (amount/10));
 	    
-	    new_send_to_char(ch,"You convey %d award points to %d bronze tokens.\r\n", (int) amount, (int)(amount/10));
+	    ch->Send("You convey %d award points to %d bronze tokens.\r\n", (int) amount, (int)(amount/10));
 	    GET_BRONZE_TOKEN_COUNT(ch) += (int)(amount/10);
 	    GET_AWARD(ch) -= amount;
 	    convert_tokens(ch);

@@ -33,5 +33,5 @@
 #define MONTHS_2        1333
 #define MONTH_1         666
 
-char * romance_status(struct char_data *ch);
-char * baby_status(struct char_data *i, char * buf, size_t len);
+char * romance_status(Character *ch);
+char * baby_status(Character *i, char * buf, size_t len);

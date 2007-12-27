@@ -47,17 +47,17 @@ extern int TEMP_LOAD_CHAR;
 extern char last_command[];
 
 /* external functions */
-void display_help(struct char_data *ch, unsigned int i);
+void display_help(Character *ch, unsigned int i);
 void send_compress_offer(struct descriptor_data *d);
 int delete_pobj_file(char *name);
 void echo_on(struct descriptor_data *d);
 void echo_off(struct descriptor_data *d);
-void do_start(struct char_data *ch);
-int special(struct char_data *ch, int cmd, char *arg);
+void do_start(Character *ch);
+int special(Character *ch, int cmd, char *arg);
 int isbanned(char *hostname);
-void read_saved_vars(struct char_data *ch);
+void read_saved_vars(Character *ch);
 int Valid_Name(char *newname);
-void roll_real_abils(struct char_data *ch);
+void roll_real_abils(Character *ch);
 void oedit_parse(struct descriptor_data *d, char *arg);
 void redit_parse(struct descriptor_data *d, char *arg);
 void hedit_parse(struct descriptor_data *d, char *arg);
@@ -66,20 +66,20 @@ void medit_parse(struct descriptor_data *d, char *arg);
 void sedit_parse(struct descriptor_data *d, char *arg);
 void trigedit_parse(struct descriptor_data *d, char *arg);
 void aedit_parse(struct descriptor_data *d, char *arg);
-void read_aliases(struct char_data *ch);
-void read_poofs(struct char_data *ch);
-int Crash_load(struct char_data *ch);
+void read_aliases(Character *ch);
+void read_poofs(Character *ch);
+int Crash_load(Character *ch);
 void remove_player(int pfilepos);
-void load_locker(CHAR_DATA *ch);
-int count_locker(CHAR_DATA *ch);
+void load_locker(Character *ch);
+int count_locker(Character *ch);
 long get_acc_by_name(char *name);
 long get_acc_by_id(long id);
-void default_char(struct char_data *ch);
-void read_ignorelist(struct char_data *ch);
-void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
+void default_char(Character *ch);
+void read_ignorelist(Character *ch);
+void perform_wear(Character *ch, struct obj_data *obj, int where);
 void assemblies_parse(struct descriptor_data *d, char *arg);
 
-int frozen_time(struct char_data *ch);
+int frozen_time(Character *ch);
 extern void assedit_parse(struct descriptor_data *d, char *arg);
 /* local functions */
 int perform_dupe_check(struct descriptor_data *d);
@@ -92,7 +92,7 @@ int reserved_word(char *argument);
 int find_name(char *name);
 int _parse_name(char *arg, char *name);
 int get_account_num(int num, long acc);
-int has_note(CHAR_DATA *ch, int type);
+int has_note(Character *ch, int type);
 void con_character_creation(DESCRIPTOR_DATA *d, char *arg);
 struct kill_data *load_killlist(char *name);
 /* local global vars */
@@ -1029,7 +1029,7 @@ const struct command_info cmd_info[] =
 
 
 
-const char *fill[] =
+const char *fillword[] =
   {
     "in",
     "from",
@@ -1059,7 +1059,7 @@ const char *reserved[] =
  * It makes sure you are the proper level and position to execute the command,
  * then calls the appropriate function.
  */
-void command_interpreter(struct char_data *ch, char *argument)
+void command_interpreter(Character *ch, char *argument)
 {
   int cmd, length;
   char *line;
@@ -1087,7 +1087,7 @@ void command_interpreter(struct char_data *ch, char *argument)
 
   if (AFF_FLAGGED(ch, AFF_HIDE))
   {
-    new_send_to_char(ch, "You come out from concealment.\r\n");
+    ch->Send( "You come out from concealment.\r\n");
     REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
   }
 
@@ -1131,27 +1131,27 @@ void command_interpreter(struct char_data *ch, char *argument)
   }
 
   if (*complete_cmd_info[cmd].command == '\n')
-    new_send_to_char(ch, "Huh?!?\r\n");
+    ch->Send( "Huh?!?\r\n");
   else if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL && frozen_time(ch) > 0)
   {
-    new_send_to_char(ch, "Unfrozen in %d seconds.\r\n", frozen_time(ch));
-    new_send_to_char(ch, "You try, but the mind-numbing cold prevents you...\r\n");
+    ch->Send( "Unfrozen in %d seconds.\r\n", frozen_time(ch));
+    ch->Send( "You try, but the mind-numbing cold prevents you...\r\n");
 
   }
   else if (complete_cmd_info[cmd].command_pointer == NULL)
-    new_send_to_char(ch, "Sorry, that command hasn't been implemented yet.\r\n");
+    ch->Send( "Sorry, that command hasn't been implemented yet.\r\n");
   else if ((complete_cmd_info[cmd].cmd_bits > 0)
            && (((!CMD_FLAGGED(ch, complete_cmd_info[cmd].cmd_bits))
                 && (!CMD_FLAGGED2(ch, complete_cmd_info[cmd].cmd_bits))
                 && (GET_LEVEL(ch) < LVL_IMPL)) || IS_NPC(ch)))
     send_to_char("You do not have that Immortal privilege.\r\n", ch);
   else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level > LVL_IMMORT)
-    new_send_to_char(ch, "You can't use immortal commands while switched.\r\n");
+    ch->Send( "You can't use immortal commands while switched.\r\n");
   else if (GET_POS(ch) < complete_cmd_info[cmd].minimum_position)
     switch (GET_POS(ch))
     {
     case POS_DEAD:
-      new_send_to_char(ch, "Lie still; you are DEAD!!! :-(\r\n");
+      ch->Send( "Lie still; you are DEAD!!! :-(\r\n");
       break;
     case POS_INCAP:
     case POS_MORTALLYW:
@@ -1527,7 +1527,7 @@ char *remove_percentage(char *string)
 
 int fill_word(char *argument)
 {
-  return (search_block(argument, fill, TRUE) >= 0);
+  return (search_block(argument, fillword, TRUE) >= 0);
 }
 
 
@@ -1708,10 +1708,10 @@ int find_command(const char *command)
 }
 
 
-int special(struct char_data *ch, int cmd, char *arg)
+int special(Character *ch, int cmd, char *arg)
 {
   register struct obj_data *i;
-  register struct char_data *k;
+  register Character *k;
   int j;
 
   /* special in room? */
@@ -1798,7 +1798,7 @@ int _parse_name(char *arg, char *name)
 int perform_dupe_check(struct descriptor_data *d)
 {
   struct descriptor_data *k, *next_k;
-  struct char_data *target = NULL, *ch, *next_ch;
+  Character *target = NULL, *ch, *next_ch;
   int diff_acc = FALSE;
   int mode = 0;
 
@@ -2022,7 +2022,7 @@ int parse_accounts(DESCRIPTOR_DATA *d, char *arg)
   char pass[MAX_INPUT_LENGTH] = "";
   char real_pass[MAX_INPUT_LENGTH];
   int pass_pass = 0;
-  CHAR_DATA *member;
+  Character *member;
   int pos;
   arg = two_arguments(arg, cmd, name);
   skip_spaces(&arg);
@@ -2060,7 +2060,7 @@ int parse_accounts(DESCRIPTOR_DATA *d, char *arg)
     account_manage_menu(d);
     return 0;
   }
-  CREATE(member, CHAR_DATA, 1);
+  CREATE(member, Character, 1);
   clear_char(member);
 
   TEMP_LOAD_CHAR = TRUE;
@@ -2141,9 +2141,9 @@ int enter_player_game(struct descriptor_data *d)
 {
   struct obj_data *obj = NULL;
   room_rnum load_room = NULL;
-  struct char_data *ch = d->character;
+  Character *ch = d->character;
   int load_result;
-  void reset_default_status(struct char_data *ch);
+  void reset_default_status(Character *ch);
 
   reset_char(ch);
   read_aliases(ch);
@@ -2188,7 +2188,7 @@ int enter_player_game(struct descriptor_data *d)
   if (BPROMPT(ch) == NULL)
     BPROMPT(ch) = str_dup("{cg%h{cwH {cc%m{cwM {cW(%S) {cC%E{cyTNL {cwVictHp:{cM%f%%{c0 >");
 
-  new_send_to_char(ch, "%s", CONFIG_WELC_MESSG);
+  ch->Send( "%s", CONFIG_WELC_MESSG);
   //save_char(ch, NOWHERE);
   add_char_to_list(ch);
   if (GET_LEVEL(ch) == 0)
@@ -2226,7 +2226,7 @@ int enter_player_game(struct descriptor_data *d)
   {
     GET_CLAN_RANK(ch) = 0;
     GET_CLAN(ch) = 0;
-    new_send_to_char(ch, "You have been removed from your clan.\r\n");
+    ch->Send( "You have been removed from your clan.\r\n");
   }
 
   /* Clear their load room if it's not persistant. */
@@ -2341,7 +2341,7 @@ int enter_player_game(struct descriptor_data *d)
     if (AFF_FLAGGED(ch, AFF_SWEET_DREAMS))
     {
       GET_POS(ch) = POS_SLEEPING;
-      new_send_to_char(ch, "zzZZzzZZzzZZzzZZzz\r\n");
+      ch->Send( "zzZZzzZZzzZZzzZZzz\r\n");
     }
     else {LOOK(ch);}
   }
@@ -2353,7 +2353,7 @@ int enter_player_game(struct descriptor_data *d)
   return load_result;
 }
 
-void string_append( CHAR_DATA *ch, char **pString )
+void string_append( Character *ch, char **pString )
 {
   void string_write(struct descriptor_data *d, char **writeto, size_t len,
                     long mailto, void *data);
@@ -2371,7 +2371,7 @@ void string_append( CHAR_DATA *ch, char **pString )
     *pString = str_dup( "" );
   }
   else
-    new_send_to_char(ch, "%s", numlineas(*pString));
+    ch->Send( "%s", numlineas(*pString));
 
 
   free_string(&ch->desc->backstr);
@@ -2441,7 +2441,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
     if (d->character == NULL)
     {
-      CREATE(d->character, struct char_data, 1);
+      CREATE(d->character, Character, 1);
       clear_char(d->character);
       CREATE(d->character->player_specials, struct player_special_data, 1);
 
@@ -2498,7 +2498,7 @@ void nanny(struct descriptor_data *d, char *arg)
           free_char(d->character);
           /* Check for multiple creations... */
 
-          CREATE(d->character, struct char_data, 1);
+          CREATE(d->character, Character, 1);
           clear_char(d->character);
           CREATE(d->character->player_specials,struct player_special_data, 1);
 
@@ -2876,7 +2876,7 @@ void nanny(struct descriptor_data *d, char *arg)
       /* add the change character stuff here */
       free_char(d->character);
       d->character = NULL;
-      CREATE(d->character, struct char_data, 1);
+      CREATE(d->character, Character, 1);
       clear_char(d->character);
 
       d->character->desc = d;
@@ -3006,7 +3006,7 @@ void nanny(struct descriptor_data *d, char *arg)
         STATE(d) = ORIG_STATE(d);
       else if ((i = atoi(arg)) < 0)
         STATE(d) = ORIG_STATE(d);
-      else if (i > top_of_helpt)
+      else if (i > (int)top_of_helpt)
         STATE(d) = ORIG_STATE(d);
       else
         display_help(d->character, i);

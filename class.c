@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.9  2006/05/21 11:02:26  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.8  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -66,23 +70,23 @@
 
 
 
-int num_casting(struct char_data *ch);
+int num_casting(Character *ch);
 /* local functions */
 int   parse_class(char arg);
 int   thaco(int chclass_num, int level);
 
-int   invalid_class(struct char_data *ch, struct obj_data *obj);
+int   invalid_class(Character *ch, struct obj_data *obj);
 long find_class_bitvector(char arg);
 byte  saving_throws(int chclass_num, int type, int level);
-void  roll_real_abils(struct char_data * ch);
-void  do_start(struct char_data * ch);
+void  roll_real_abils(Character * ch);
+void  do_start(Character * ch);
 const char *title_male(int chclass, int level);
 const char *title_female(int chclass, int level);
-const char *simple_class_name(struct char_data *ch);
+const char *simple_class_name(Character *ch);
 ACMD(do_skilllist);
 void assign_class(int spell,
                   int chclass);
-void set_mastery(CHAR_DATA *ch,char buf);
+void set_mastery(Character *ch,char buf);
 
 
 /* Names first */
@@ -114,7 +118,7 @@ const char *pc_class_types[] =
     "\n"
   };
 
-void set_mastery(CHAR_DATA *ch, char buf)
+void set_mastery(Character *ch, char buf)
 {
 
   int cl = parse_class(buf);
@@ -123,7 +127,7 @@ void set_mastery(CHAR_DATA *ch, char buf)
 
 }
 
-const char *simple_class_name(struct char_data *ch)
+const char *simple_class_name(Character *ch)
 {
   if (IS_NPC(ch))
   {
@@ -271,16 +275,16 @@ long find_class_bitvector(char arg)
  * following spells" vs. "You know of the following skills"
  */
 
-#define SPELL	0
-#define SKILL	1
+#define SPELL  0
+#define SKILL  1
 
-/* #define LEARNED_LEVEL	0  % known which is considered "learned" */
-/* #define MAX_PER_PRAC		1  max percent gain in skill per practice */
-/* #define MIN_PER_PRAC		2  min percent gain in skill per practice */
-/* #define PRAC_TYPE		3  should it say 'spell' or 'skill'?	*/
+/* #define LEARNED_LEVEL 0  % known which is considered "learned" */
+/* #define MAX_PER_PRAC       1  max percent gain in skill per practice */
+/* #define MIN_PER_PRAC       2  min percent gain in skill per practice */
+/* #define PRAC_TYPE          3  should it say 'spell' or 'skill'?    */
 
 int prac_params[4][NUM_CLASSES] = {
-                                    /*   MAG    CLE    THE     WAR   HUN    RAN    GYP    ESP		      */
+                                    /*   MAG    CLE    THE     WAR   HUN    RAN    GYP    ESP             */
                                     {   50,    50,    50,    50,    50,    50,    50,    50}, /*learned level */
                                     {   10,    10,     8,     8,     8,     8,    10,    10}, /* max per prac */
                                     {    5,     5,     2,     2,     2,     5,     5,    5 }, /* min per pac  */
@@ -313,7 +317,7 @@ int guild_info[][3] = {
                         {CLASS_ESPER,        10423,   SCMD_WEST },
 
                         /* Brass Dragon */
-                        {-999 /* all */ ,	5065,	SCMD_WEST},
+                        {-999 /* all */ ,    5065,     SCMD_WEST},
                         {-999,                3006,   SCMD_WEST},
 
                         /* this must go last -- add new guards above! */
@@ -447,7 +451,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (80 - ((80 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_SPELL:	/* Generic spells */
+    case SAVING_SPELL:   /* Generic spells */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -467,7 +471,7 @@ byte saving_throws(int chclass_num, int type, int level)
   case CLASS_RANGER:
     switch (type)
     {
-    case SAVING_PARA:	/* Paralyzation */
+    case SAVING_PARA:    /* Paralyzation */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -478,7 +482,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (65 - ((65 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_ROD:	/* Rods */
+    case SAVING_ROD:     /* Rods */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -489,7 +493,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (70 - ((70 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_PETRI:	/* Petrification */
+    case SAVING_PETRI:   /* Petrification */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -500,7 +504,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (60 - ((60 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_BREATH:	/* Breath weapons */
+    case SAVING_BREATH:  /* Breath weapons */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -511,7 +515,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (80 - ((80 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_SPELL:	/* Generic spells */
+    case SAVING_SPELL:   /* Generic spells */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -531,7 +535,7 @@ byte saving_throws(int chclass_num, int type, int level)
   case CLASS_HUNTER:
     switch (type)
     {
-    case SAVING_PARA:	/* Paralyzation */
+    case SAVING_PARA:    /* Paralyzation */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -542,7 +546,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (70 - ((70 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_ROD:	/* Rods */
+    case SAVING_ROD:     /* Rods */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -553,7 +557,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (75 - ((75 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_PETRI:	/* Petrification */
+    case SAVING_PETRI:   /* Petrification */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -564,7 +568,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (75 - ((75 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_BREATH:	/* Breath weapons */
+    case SAVING_BREATH:  /* Breath weapons */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -575,7 +579,7 @@ byte saving_throws(int chclass_num, int type, int level)
       {
         return (85 - ((85 * level) / (LVL_IMMORT - 1)));
       }
-    case SAVING_SPELL:	/* Generic spells */
+    case SAVING_SPELL:   /* Generic spells */
       if (level == 0)
         return 100;
       if (level >= LVL_IMMORT)
@@ -688,7 +692,7 @@ int add_fib(int current, int to_add)
 }
 
 /* 1 if valid, 0 if invalid */
-int choose_real_abils(struct char_data *ch, char selected, int amount)
+int choose_real_abils(Character *ch, char selected, int amount)
 {
 
   if ((CREATE_POINTS(ch) - amount) < 0)
@@ -750,7 +754,7 @@ int choose_real_abils(struct char_data *ch, char selected, int amount)
  * the best 3 out of 4 rolls of a 6-sided die.  Each class then decides
  * which priority will be given for the best to worst stats.
  */
-void roll_real_abils(struct char_data * ch)
+void roll_real_abils(Character * ch)
 {
   int i, j, k, temp;
   ubyte table[6];
@@ -852,7 +856,7 @@ void roll_real_abils(struct char_data * ch)
 
 }
 
-void race_abils(CHAR_DATA *ch)
+void race_abils(Character *ch)
 {
   switch (GET_RACE(ch))
   {
@@ -899,7 +903,7 @@ void race_abils(CHAR_DATA *ch)
 }
 
 /* Some initializations for characters, including initial skills */
-void do_start(struct char_data * ch)
+void do_start(Character * ch)
 {
   GET_LEVEL(ch) = 1;
   GET_EXP(ch) = 1;
@@ -944,10 +948,10 @@ void do_start(struct char_data * ch)
  * This function controls the change to maxmove, maxmana, and maxhp for
  * each class every time they gain a level.
  */
-void advance_level(struct char_data * ch)
+void advance_level(Character * ch)
 {
   int add_hp = 0, add_mana = 0, add_move = 0, i;
-  int num_melee_tier(struct char_data *ch);
+  int num_melee_tier(Character *ch);
   int level = GET_LEVEL(ch), casttier = num_casting(ch), fightier = TIERS;
 
 
@@ -957,7 +961,7 @@ void advance_level(struct char_data * ch)
   if (REMORTS(ch) > 5)
     add_hp += (REMORTS(ch) / 6);
   add_mana = MIN(REMORTS(ch), 25);
-  add_move = MIN(REMORTS(ch), 25) * 0.5;
+  add_move = FTOI(MIN(REMORTS(ch), 25) * 0.5);
 
   switch (GET_CLASS(ch))
   {
@@ -965,8 +969,8 @@ void advance_level(struct char_data * ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    add_hp += number(2 + (GET_CHA(ch) * 0.25), (8 * fightier) + (GET_CHA(ch) * 0.35) + 4);
-    add_mana += number(level, (int)(casttier * level)) + 2;
+    add_hp += number(FTOI(2 + (GET_CHA(ch) * 0.25)), FTOI((8 * fightier) + (GET_CHA(ch) * 0.35) + 4));
+    add_mana += number(level, FTOI((casttier * level))) + 2;
     add_move += number(1, (2 * fightier));
     break;
 
@@ -978,7 +982,7 @@ void advance_level(struct char_data * ch)
 
   case CLASS_GYPSY:
     add_hp += number((12 * TIERS), (15 * TIERS)) + (GET_CHA(ch)/7);
-    add_mana += number(GET_LEVEL(ch) * 0.34, (int)(1.5 * GET_LEVEL(ch))) + num_casting(ch);
+    add_mana += number(FTOI(GET_LEVEL(ch) * 0.34), FTOI((1.5 * GET_LEVEL(ch)))) + num_casting(ch);
     add_move += number(2 * TIERS, 4 * TIERS);
     break;
 
@@ -1001,11 +1005,11 @@ void advance_level(struct char_data * ch)
   {
   case 5:
     if (REMORTS(ch) == 0)
-      new_send_to_char(ch, "{cRYou will now start to feel hungry and thirsty.\r\n"
+      ch->Send( "{cRYou will now start to feel hungry and thirsty.\r\n"
                        "So remember to eat and drink.\r\n{c0");
     if (REMORTS(ch) < 2)
     {
-      new_send_to_char(ch, "{cYYou gain 50000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 50000 coins to your bank!{c0\r\n");
       char_gold(ch, 50000, GOLD_BANK);
     }
     break;
@@ -1013,38 +1017,38 @@ void advance_level(struct char_data * ch)
     if (REMORTS(ch) < 3)
     {
       if (REMORTS(ch) == 0)
-        new_send_to_char(ch, "{cRYou will no longer be immune to death.\r\n"
+        ch->Send( "{cRYou will no longer be immune to death.\r\n"
                          "When you die from now on you will \r\n"
                          "need to retrieve your corpse.\r\n{c0");
-      new_send_to_char(ch, "{cYYou gain 100000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 100000 coins to your bank!{c0\r\n");
       char_gold(ch, 100000, GOLD_BANK);
     }
     break;
   case 15:
     if (REMORTS(ch) < 4)
     {
-      new_send_to_char(ch, "{cYYou gain 500000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
       char_gold(ch, 500000, GOLD_BANK);
     }
     break;
   case 20:
     if (REMORTS(ch) < 5)
     {
-      new_send_to_char(ch, "{cYYou gain 500000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 500000 coins to your bank!{c0\r\n");
       char_gold(ch, 500000, GOLD_BANK);
     }
     break;
   case 30:
     if (REMORTS(ch) < 6)
     {
-      new_send_to_char(ch, "{cYYou gain 2000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 2000000 coins to your bank!{c0\r\n");
       char_gold(ch, 2000000, GOLD_BANK);
     }
     break;
   case 45:
     if (REMORTS(ch) < 7)
     {
-      new_send_to_char(ch, "{cYYou gain 5000000 coins to your bank!{c0\r\n");
+      ch->Send( "{cYYou gain 5000000 coins to your bank!{c0\r\n");
       char_gold(ch, 5000000, GOLD_BANK);
     }
     break;
@@ -1090,7 +1094,8 @@ void advance_level(struct char_data * ch)
  */
 float backstab_mult(int level, int tier)
 {
-  switch (tier) {
+  switch (tier)
+  {
   default:
     return 2.0f;
   case 1:
@@ -1102,12 +1107,13 @@ float backstab_mult(int level, int tier)
   case 4:
     return 3.75f;
   }
-    
+
 }
 float cleave_mult(int level, int tier)
 {
-  
-  switch (tier) {
+
+  switch (tier)
+  {
   default:
     return 1.0f;
   case 1:
@@ -1131,14 +1137,14 @@ ACMD(do_dam_dice)
     two_arguments(argument, num1, num2);
     i = atoi(num1);
     j = atoi(num2);
-    new_send_to_char(ch, "%2dD%-2d avg %.1f max %3d   ", i, j,
+    ch->Send( "%2dD%-2d avg %.1f max %3d   ", i, j,
                      (((j + 1) / 2.0) * i), /*avg dam*/     (i + (i * j)) /*max damn*/     );
     return;
   }
-  new_send_to_char(ch, "Dam Dice:\r\n");
+  ch->Send( "Dam Dice:\r\n");
   for (i = 0; i< 10; i++)
     for (j = 0; j < 10; j++)
-      new_send_to_char(ch, "%2dD%-2d avg %.1f max %3d   %s", i, j,
+      ch->Send( "%2dD%-2d avg %.1f max %3d   %s", i, j,
                        (((j + 1) / 2.0) * i), //avg dam
                        (i + (i * j)), //max damn
                        (i%2?"  ":" \r\n"));
@@ -1149,7 +1155,7 @@ ACMD(do_dam_dice)
  * invalid_class is used by handler.c to determine if a piece of equipment is
  * usable by a particular class, based on the ITEM_ANTI_{class} bitvectors.
  */
-int invalid_class(struct char_data *ch, struct obj_data *obj)
+int invalid_class(Character *ch, struct obj_data *obj)
 {
   if ((IS_OBJ_STAT(obj, ITEM_ANTI_MAGE)    && IS_MAGE(ch))    ||
       (IS_OBJ_STAT(obj, ITEM_ANTI_PRIEST)  && IS_PRIEST(ch))  ||
@@ -1183,9 +1189,9 @@ void init_spell_levels(void)
   assign_class(SKILL_DRUNK, ALL_CLASSES);
 
 
-  assign_class(SPELL_ANIMATE_DEAD, 	PRI);
+  assign_class(SPELL_ANIMATE_DEAD,      PRI);
   assign_class(SPELL_MAGIC_MISSILE,    ALL_CASTERS);
-  assign_class(SKILL_MANIFEST, 	    ALL_CASTERS);
+  assign_class(SKILL_MANIFEST,         ALL_CASTERS);
   assign_class(SPELL_DETECT_INVIS,     MAG | ESP | RAN);
   assign_class(SPELL_DETECT_MAGIC,     ALL_CASTERS);
   assign_class(SPELL_MIND_WATER,       ALL_CASTERS);
@@ -1196,7 +1202,7 @@ void init_spell_levels(void)
   assign_class(SPELL_INVISIBLE,        ALL_CASTERS);
   assign_class(SPELL_SHIELD,           ESP | PRI);
   assign_class(SPELL_ACID_ARROW,       MAG );
-  assign_class(SPELL_GATE,	       ESP | MAG);
+  assign_class(SPELL_GATE,           ESP | MAG);
   assign_class(SPELL_BURNING_HANDS,    MAG | PRI);
   assign_class(SPELL_LOCATE_OBJECT,    ESP | GYP | RAN);
   assign_class(SPELL_STRENGTH,         PRI | ESP);
@@ -1218,30 +1224,30 @@ void init_spell_levels(void)
   assign_class(SPELL_FIREBALL,         MAG);
   assign_class(SPELL_CHARM,            ESP | GYP);
   assign_class(SPELL_GROUP_RECALL,     ALL_CASTERS);
-  assign_class(SPELL_WATERWALK,	       PRI | HUN);
+  assign_class(SPELL_WATERWALK,           PRI | HUN);
   assign_class(SPELL_MAGIC_BUBBLE,     ESP | GYP);
-  assign_class(SPELL_PROT_FIRE,	       PRI | MAG | GYP);
-  assign_class(SPELL_PROT_COLD,	       MAG | HUN | RAN | ESP);
+  assign_class(SPELL_PROT_FIRE,           PRI | MAG | GYP);
+  assign_class(SPELL_PROT_COLD,           MAG | HUN | RAN | ESP);
   assign_class(SPELL_SHIELD_MIRROR,    MAG | PRI);
   assign_class(SPELL_BATTLE_RAGE,      MAG);
   assign_class(SPELL_ENCHANT_WEAPON,   MAG | GYP);
   assign_class(SPELL_FORTIFY_MIND,     MAG | ESP);
-  assign_class(SPELL_HASTE,	       MAG | ESP);
-  assign_class(SPELL_KNOCK,	       PRI);
+  assign_class(SPELL_HASTE,          MAG | ESP);
+  assign_class(SPELL_KNOCK,          PRI);
   assign_class(SPELL_DEMONSHREAK,      ESP | PRI);
   assign_class(SPELL_SHIELD_ICE,      MAG | PRI | ESP | RAN);
   assign_class(SPELL_CLONE,            ESP | PRI);
   assign_class(SPELL_MINOR_IDENTIFY,   ESP | GYP | PRI);
   assign_class(SPELL_AIR_ELEMENTAL,    MAG);
-  assign_class(SPELL_STEELSKIN,	       PRI | ESP);
+  assign_class(SPELL_STEELSKIN,           PRI | ESP);
   assign_class(SPELL_FLIGHT,           MAG);
-  assign_class(SKILL_SCRIBE,	       ALL_CASTERS);
+  assign_class(SKILL_SCRIBE,         ALL_CASTERS);
   assign_class(SPELL_SLOW,             MAG | ESP);
   assign_class(SPELL_FIRE_ELEMENTAL,   MAG);
   assign_class(SPELL_SHIELD_MANA,      MAG);
   assign_class(SPELL_MANA_TRANSFER,    ALL_CASTERS);
-  assign_class(SPELL_TELEPORT,	       ALL_CASTERS);
-  assign_class(SPELL_RECHARGE,	       ALL_CASTERS);
+  assign_class(SPELL_TELEPORT,            ALL_CASTERS);
+  assign_class(SPELL_RECHARGE,            ALL_CASTERS);
   assign_class(SPELL_HOLD_PERSON,      ESP);
   assign_class(SPELL_WATER_ELEMENTAL,  PRI);
   assign_class(SPELL_CHAIN_LIGHTNING,  PRI);
@@ -1249,118 +1255,118 @@ void init_spell_levels(void)
   assign_class(SPELL_GROUP_SHIELD,     PRI | ESP);
   assign_class(SPELL_EARTH_ELEMENTAL,  ESP);
   assign_class(SPELL_INFERNO,          MAG);
-  assign_class(SPELL_CURE_LIGHT,      	PRI);
-  assign_class(SPELL_ARMOR,           	PRI | ESP);
-  assign_class(SPELL_CREATE_FOOD,     	PRI | ESP);
-  assign_class(SPELL_CREATE_WATER,    	PRI | MAG);
-  assign_class(SPELL_SOULSMASH,    	PRI);
+  assign_class(SPELL_CURE_LIGHT,        PRI);
+  assign_class(SPELL_ARMOR,             PRI | ESP);
+  assign_class(SPELL_CREATE_FOOD,       PRI | ESP);
+  assign_class(SPELL_CREATE_WATER,      PRI | MAG);
+  assign_class(SPELL_SOULSMASH,         PRI);
   assign_class(SPELL_PROT_FROM_GOOD,    PRI);
-  assign_class(SPELL_DETECT_ALIGN,    	PRI | ESP);
-  assign_class(SPELL_CURE_BLIND,      	PRI | HUN);
-  assign_class(SPELL_WEAKEN,    	PRI);
-  assign_class(SPELL_BLESS,           	PRI);
-  assign_class(SPELL_WATER_TO_WINE,    	PRI);
-  assign_class(SPELL_INFRAVISION,     	ALL_CASTERS | HUN);
-  assign_class(SPELL_PROT_FROM_EVIL,  	PRI);
-  assign_class(SPELL_GROUP_ARMOR,     	PRI);
-  assign_class(SPELL_CURE_CRITIC,     	PRI | HUN);
-  assign_class(SPELL_SUMMON,          	PRI);
-  assign_class(SPELL_ANTIDOTE_1,   	PRI | HUN);
-  assign_class(SPELL_SHIELD_THORN,    	PRI);
-  assign_class(SPELL_EARTHQUAKE,      	PRI);
-  assign_class(SPELL_CONE_OF_COLD,	PRI | ESP);
-  assign_class(SPELL_DISPEL_EVIL,     	PRI);
-  assign_class(SPELL_DISPEL_GOOD,     	PRI);
-  assign_class(SPELL_SANCTUARY,       	PRI);
-  assign_class(SPELL_HOLY_WORD,		PRI);
-  assign_class(SPELL_HOLY_SHOUT,	PRI);
-  assign_class(SPELL_CALL_LIGHTNING,  	PRI | GYP);
-  assign_class(SPELL_HEAL,            	PRI);
-  assign_class(SPELL_CONTROL_WEATHER, 	ALL_CASTERS);
-  assign_class(SPELL_SENSE_LIFE,      	PRI | HUN | GYP);
-  assign_class(SPELL_HARM,            	PRI);
-  assign_class(SPELL_GROUP_HEAL,      	PRI);
-  assign_class(SPELL_VITALIZE,    	PRI | ESP | GYP);
-  assign_class(SPELL_REMOVE_CURSE,    	PRI);
+  assign_class(SPELL_DETECT_ALIGN,      PRI | ESP);
+  assign_class(SPELL_CURE_BLIND,        PRI | HUN);
+  assign_class(SPELL_WEAKEN,       PRI);
+  assign_class(SPELL_BLESS,             PRI);
+  assign_class(SPELL_WATER_TO_WINE,     PRI);
+  assign_class(SPELL_INFRAVISION,       ALL_CASTERS | HUN);
+  assign_class(SPELL_PROT_FROM_EVIL,    PRI);
+  assign_class(SPELL_GROUP_ARMOR,       PRI);
+  assign_class(SPELL_CURE_CRITIC,       PRI | HUN);
+  assign_class(SPELL_SUMMON,            PRI);
+  assign_class(SPELL_ANTIDOTE_1,        PRI | HUN);
+  assign_class(SPELL_SHIELD_THORN,      PRI);
+  assign_class(SPELL_EARTHQUAKE,        PRI);
+  assign_class(SPELL_CONE_OF_COLD, PRI | ESP);
+  assign_class(SPELL_DISPEL_EVIL,       PRI);
+  assign_class(SPELL_DISPEL_GOOD,       PRI);
+  assign_class(SPELL_SANCTUARY,         PRI);
+  assign_class(SPELL_HOLY_WORD,         PRI);
+  assign_class(SPELL_HOLY_SHOUT,   PRI);
+  assign_class(SPELL_CALL_LIGHTNING,    PRI | GYP);
+  assign_class(SPELL_HEAL,              PRI);
+  assign_class(SPELL_CONTROL_WEATHER,   ALL_CASTERS);
+  assign_class(SPELL_SENSE_LIFE,        PRI | HUN | GYP);
+  assign_class(SPELL_HARM,              PRI);
+  assign_class(SPELL_GROUP_HEAL,        PRI);
+  assign_class(SPELL_VITALIZE,     PRI | ESP | GYP);
+  assign_class(SPELL_REMOVE_CURSE,      PRI);
   assign_class(SPELL_DISPELL_SANCTURY,  PRI | ESP);
-  assign_class(SPELL_SUFFOCATE,		ESP);
-  assign_class(SPELL_ENCHANT_ARMOR,    	PRI | GYP);
-  assign_class(SPELL_PARALYZE,		ESP);
-  assign_class(SKILL_BREW,		PRI);
-  assign_class(SPELL_ABSOLVE,		PRI);
-  assign_class(SPELL_DEVINE_MIND,    	PRI | ESP);
-  assign_class(SPELL_LIFE_TRANSFER,	ESP);
+  assign_class(SPELL_SUFFOCATE,         ESP);
+  assign_class(SPELL_ENCHANT_ARMOR,     PRI | GYP);
+  assign_class(SPELL_PARALYZE,          ESP);
+  assign_class(SKILL_BREW,         PRI);
+  assign_class(SPELL_ABSOLVE,      PRI);
+  assign_class(SPELL_DEVINE_MIND,       PRI | ESP);
+  assign_class(SPELL_LIFE_TRANSFER,     ESP);
   assign_class(SPELL_ELECTRIC_BLAST,    PRI);
-  assign_class(SPELL_SHIELD_HOLY,    	PRI);
-  assign_class(SKILL_HANDTOHAND,	ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_FLANK,		THI);
-  assign_class(SKILL_SLIP,		THI);
-  assign_class(SKILL_MANIPULATE,	MAG | GYP);
-  assign_class(SKILL_MEDITATE,		ALL_FIGHTER);
-  assign_class(SKILL_HOLY_STRENGTH, 	MAG | PRI);
-  assign_class(SPELL_LIFESUCK, 		MAG);
-  assign_class(SPELL_HEARTSQUEEZE, 	MAG);
-  assign_class(SPELL_FIRE_SHIELD, 	MAG);
-  assign_class(SPELL_CORRUPT_ARMOR, 	MAG);
-  assign_class(SPELL_REMOVE_ALIGNMENT, 	MAG);
-  assign_class(SPELL_STONESKIN, 	MAG);
-  assign_class(SKILL_SNEAK,     	ALL_ROGUE);
-  assign_class(SKILL_THROW,		ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_PICK_LOCK, 	ALL_ROGUE);
-  assign_class(SKILL_BACKSTAB,  	ALL_ROGUE);
-  assign_class(SKILL_TAME,      	ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_STEAL,     	ALL_ROGUE);
-  assign_class(SKILL_FIREARM,   	ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_HIDE,      	THI | RAN | HUN);
-  assign_class(SKILL_SLING,		ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_TRACK,     	ALL_ROGUE | HUN);
-  assign_class(SKILL_SNARE,     	GYP | HUN | THI);
-  assign_class(SKILL_TRAP_AWARE,	THI | HUN);
-  assign_class(SKILL_CROSSBOW,		ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_DISARM,		THI | ALL_FIGHTER);
-  assign_class(SKILL_SMASH,		ALL_FIGHTER);
-  assign_class(SKILL_CIRCLE,		THI);
-  assign_class(SKILL_BLACKJACK, 	THI | GYP);
-  assign_class(SKILL_PUSH,		ALL_FIGHTER);
-  assign_class(SKILL_POISON_WEAPON,	THI);
+  assign_class(SPELL_SHIELD_HOLY,       PRI);
+  assign_class(SKILL_HANDTOHAND,   ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_FLANK,        THI);
+  assign_class(SKILL_SLIP,         THI);
+  assign_class(SKILL_MANIPULATE,   MAG | GYP);
+  assign_class(SKILL_MEDITATE,          ALL_FIGHTER);
+  assign_class(SKILL_HOLY_STRENGTH,     MAG | PRI);
+  assign_class(SPELL_LIFESUCK,          MAG);
+  assign_class(SPELL_HEARTSQUEEZE,      MAG);
+  assign_class(SPELL_FIRE_SHIELD,  MAG);
+  assign_class(SPELL_CORRUPT_ARMOR,     MAG);
+  assign_class(SPELL_REMOVE_ALIGNMENT,  MAG);
+  assign_class(SPELL_STONESKIN,    MAG);
+  assign_class(SKILL_SNEAK,        ALL_ROGUE);
+  assign_class(SKILL_THROW,        ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_PICK_LOCK,    ALL_ROGUE);
+  assign_class(SKILL_BACKSTAB,     ALL_ROGUE);
+  assign_class(SKILL_TAME,         ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_STEAL,        ALL_ROGUE);
+  assign_class(SKILL_FIREARM,      ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_HIDE,         THI | RAN | HUN);
+  assign_class(SKILL_SLING,        ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_TRACK,        ALL_ROGUE | HUN);
+  assign_class(SKILL_SNARE,        GYP | HUN | THI);
+  assign_class(SKILL_TRAP_AWARE,   THI | HUN);
+  assign_class(SKILL_CROSSBOW,          ALL_ROGUE | ALL_FIGHTER);
+  assign_class(SKILL_DISARM,       THI | ALL_FIGHTER);
+  assign_class(SKILL_SMASH,        ALL_FIGHTER);
+  assign_class(SKILL_CIRCLE,       THI);
+  assign_class(SKILL_BLACKJACK,    THI | GYP);
+  assign_class(SKILL_PUSH,         ALL_FIGHTER);
+  assign_class(SKILL_POISON_WEAPON,     THI);
   assign_class(SKILL_MOUNTED_COMBAT,     ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_TRAMPLE,            ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_JOUST,              ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_GRAPPLE,            ALL_ROGUE | ALL_FIGHTER);
-  assign_class(SKILL_MELEE,		ALL_FIGHTER | ALL_ROGUE);
-  assign_class(SKILL_KICK,          	ALL_FIGHTER);
-  assign_class(SKILL_RESCUE,        	WAR);
-  assign_class(SKILL_BASH,          	ALL_FIGHTER);
-  assign_class(SKILL_SECOND_ATTACK, 	ALL_FIGHTER | ALL_ROGUE);
-  assign_class(SKILL_BOW,		RAN | HUN);
-  assign_class(SKILL_DUAL,          	ALL_FIGHTER | ALL_ROGUE);
-  assign_class(SKILL_RETREAT,		WAR | RAN);
-  assign_class(SKILL_PARRY,		ALL_FIGHTER);
+  assign_class(SKILL_MELEE,        ALL_FIGHTER | ALL_ROGUE);
+  assign_class(SKILL_KICK,              ALL_FIGHTER);
+  assign_class(SKILL_RESCUE,            WAR);
+  assign_class(SKILL_BASH,              ALL_FIGHTER);
+  assign_class(SKILL_SECOND_ATTACK,     ALL_FIGHTER | ALL_ROGUE);
+  assign_class(SKILL_BOW,          RAN | HUN);
+  assign_class(SKILL_DUAL,              ALL_FIGHTER | ALL_ROGUE);
+  assign_class(SKILL_RETREAT,      WAR | RAN);
+  assign_class(SKILL_PARRY,        ALL_FIGHTER);
   assign_class(SKILL_THIRD_ATTACK,      ALL_FIGHTER);
   assign_class(SKILL_HAMSTRING,     WAR | HUN);
   assign_class(SKILL_SHORT_BLADE,      ALL_ROGUE);
-  assign_class(SKILL_DODGE,		ALL_ROGUE);
-  assign_class(SKILL_PHASE,		ESP | ALL_ROGUE);
-  assign_class(SKILL_CHARGE,		WAR);
-  assign_class(SKILL_GRIP,		WAR);
-  assign_class(SKILL_FACE,		THI | HUN);
-  assign_class(SKILL_STRANGLE,		THI);
-  assign_class(SKILL_FOCUS,		GYP | RAN);
-  assign_class(SKILL_MARTIAL_ARTS,	ALL_ROGUE);
-  assign_class(SKILL_BESERK,		ALL_FIGHTER);
-  assign_class(SKILL_TRUE_STRIKE,	WAR | RAN);
-  assign_class(SKILL_FORTIFY,		ALL_FIGHTER);
-  assign_class(SKILL_SCALP,		GYP | RAN | HUN);
-  assign_class(SKILL_BLADE_DANCE,	GYP | THI | HUN);
-  assign_class(SKILL_LONGARM,		 ALL_FIGHTER | RAN);
-  assign_class(SKILL_CLEAVE,		WAR);
-  assign_class(SKILL_BEHEAD,		HUN);
-  assign_class(SKILL_BRACE,		ALL_FIGHTER);
-  assign_class(SKILL_FILET,		HUN | GYP | RAN | THI);
-  assign_class(SKILL_FORAGE,		HUN | RAN | THI | GYP);
-  assign_class(SKILL_HYPERACTIVITY,	HUN | GYP);
+  assign_class(SKILL_DODGE,        ALL_ROGUE);
+  assign_class(SKILL_PHASE,        ESP | ALL_ROGUE);
+  assign_class(SKILL_CHARGE,       WAR);
+  assign_class(SKILL_GRIP,         WAR);
+  assign_class(SKILL_FACE,         THI | HUN);
+  assign_class(SKILL_STRANGLE,          THI);
+  assign_class(SKILL_FOCUS,        GYP | RAN);
+  assign_class(SKILL_MARTIAL_ARTS, ALL_ROGUE);
+  assign_class(SKILL_BESERK,       ALL_FIGHTER);
+  assign_class(SKILL_TRUE_STRIKE,  WAR | RAN);
+  assign_class(SKILL_FORTIFY,      ALL_FIGHTER);
+  assign_class(SKILL_SCALP,        GYP | RAN | HUN);
+  assign_class(SKILL_BLADE_DANCE,  GYP | THI | HUN);
+  assign_class(SKILL_LONGARM,       ALL_FIGHTER | RAN);
+  assign_class(SKILL_CLEAVE,       WAR);
+  assign_class(SKILL_BEHEAD,       HUN);
+  assign_class(SKILL_BRACE,        ALL_FIGHTER);
+  assign_class(SKILL_FILET,        HUN | GYP | RAN | THI);
+  assign_class(SKILL_FORAGE,       HUN | RAN | THI | GYP);
+  assign_class(SKILL_HYPERACTIVITY,     HUN | GYP);
   assign_class(SKILL_SCAN,              RAN | HUN | THI);
-  assign_class(SKILL_SING_WOOD,	      GYP);
+  assign_class(SKILL_SING_WOOD,          GYP);
   assign_class(SKILL_TINKER,          GYP);
   assign_class(SPELL_MIDAS_TOUCH,     GYP);
   assign_class(SPELL_SWEET_DREAMS,    ESP);
@@ -1375,15 +1381,15 @@ void init_spell_levels(void)
 }
 
 
-gold_int group_exp_needed(CHAR_DATA *ch)
+gold_int group_exp_needed(Character *ch)
 {
   if (IS_NPC(ch))
     return 0;
   else
-    return (level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2) - GET_GROUP_EXP(ch);
+    return FTOI((level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1, current_class_is_tier_num(ch), REMORTS(ch)) * 0.2)) - GET_GROUP_EXP(ch);
 }
 
-gold_int exp_needed(CHAR_DATA *ch)
+gold_int exp_needed(Character *ch)
 {
   if (IS_NPC(ch))
     return 0;
@@ -1412,24 +1418,24 @@ gold_int level_exp(int chclass, int level, int tier, int remorts)
   }
   else
   {
-float div_by = 0.5;
+    float div_by = 0.5;
     amount = (multi*((mod+1)*(mod+1)));
 
-    amount = (multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5));
-    amount += ((remorts) * (amount*0.05));
-if (remorts == 0)
-amount *= div_by;
-else if (remorts < 5)
-    amount *= div_by + ((float)remorts * 0.1);
+    amount = FTOI((multi * (((((level+mod) * level)*((level+mod) * level * level))-amount)*0.5)));
+    amount += FTOI(((remorts) * (amount*0.05)));
+    if (remorts == 0)
+      amount = FTOI(amount * div_by);
+    else if (remorts < 5)
+      amount = FTOI(amount * (div_by + ((float)remorts * 0.1)));
     return amount;
   }
 #undef mod
 }
 /*
-
+ 
 amount = (10 * (((3350) * (167500) - 3240)/2) = 2805608800
 amount += 100 * (amount * 0.05)
-
+ 
 */
 
 /*
@@ -1677,7 +1683,7 @@ ACMD(do_skilllist)
 
   if (!*argument && GET_LEVEL(ch) < LVL_IMMORT)
   {
-    new_send_to_char(ch, "Which class?\r\n");
+    ch->Send( "Which class?\r\n");
     return;
   }
   else if (!*argument)
@@ -1700,7 +1706,7 @@ ACMD(do_skilllist)
     the_class = parse_class(*argument);
     if (the_class == CLASS_UNDEFINED)
     {
-      new_send_to_char(ch, "That isn't a proper class!\r\n");
+      ch->Send( "That isn't a proper class!\r\n");
       return;
     }
     DYN_CREATE;

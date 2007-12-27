@@ -26,22 +26,22 @@
 EVENTFUNC(message_event);
 ASKILL(skill_manifest);
 ACMD(do_flee);
-int can_fight(struct char_data *ch, struct char_data *vict, int silent);
-void make_manifest(struct char_data *ch,struct obj_data *obj);
+int can_fight(Character *ch, Character *vict, int silent);
+void make_manifest(Character *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
 /* extern variables */
-int has_weapon(struct char_data *ch);
-void start_fighting_delay(struct char_data *vict, struct char_data *ch);
+int has_weapon(Character *ch);
+void start_fighting_delay(Character *vict, Character *ch);
 extern struct spell_info_type spell_info[];
-int skill_cost(int h, int m, int v, struct char_data *ch);
-int tier_level(struct char_data *ch, int chclass);
+int skill_cost(int h, int m, int v, Character *ch);
+int tier_level(Character *ch, int chclass);
 ASUB(sub_throttle);
-int strangle_affect(struct char_data *ch, struct char_data *vict, int num);
+int strangle_affect(Character *ch, Character *vict, int num);
 /* extern procedures */
-int mag_manacost(struct char_data *ch, int spellnum);
-void improve_skill(struct char_data *ch, int skill);
-void make_focus(struct char_data *ch, int type, struct obj_data *o);
-int set_task(struct char_data *ch, int task);
+int mag_manacost(Character *ch, int spellnum);
+void improve_skill(Character *ch, int skill);
+void make_focus(Character *ch, int type, struct obj_data *o);
+int set_task(Character *ch, int task);
 
 void weather_change(int zon);
 /*local*/
@@ -71,7 +71,7 @@ int i;
 
   if (!object || GET_OBJ_TYPE(object) != ITEM_AXE)
   {
-    new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+    ch->Send( "You can't chop trees without a good axe!\r\n");
     *num = 0;
     time = 0;
   }
@@ -79,7 +79,7 @@ int i;
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
 
@@ -209,11 +209,11 @@ lognum = GET_OBJ_VAL(obj, 4);
       }
       else
       {
-        new_send_to_char(ch, "The tree disolves into sawdust.\r\n");
+        ch->Send( "The tree disolves into sawdust.\r\n");
         return time;
       } 
 if (real_object(lognum) == NOTHING) {
-new_send_to_char(ch, "The tree disolves into sawdust.\r\n");
+ch->Send( "The tree disolves into sawdust.\r\n");
         return time;
 }
       
@@ -250,12 +250,12 @@ ACTION(thing_tunneling)
   const char *to_char = NULL;
   const char *to_room = NULL;
   struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
-  int check_mine_traps(struct char_data *ch);
-  void make_tunnel(struct char_data *ch);
+  int check_mine_traps(Character *ch);
+  void make_tunnel(Character *ch);
 
   if (!object)
   {
-    new_send_to_char(ch, "You can't tunnel without a tool!\r\n");
+    ch->Send( "You can't tunnel without a tool!\r\n");
     *num = 0;
     return 0;
   }
@@ -264,7 +264,7 @@ ACTION(thing_tunneling)
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
 
@@ -316,7 +316,7 @@ ACTION(thing_tunneling)
       if (number(0, 1))
         to_char = tunnel_msgs[number(0, 36)];
 
-      time = (11 RL_SEC) * ((100.0 - IRANGE(0, MINE_SPEED(ch), 99))/100.0);
+      time = (long)((11 RL_SEC) * ((100.0 - IRANGE(0, MINE_SPEED(ch), 99))/100.0));
       log("%ld next tunnel hit is that many seconds.", time);
       new_send_to_char(ch ,"Next tunnel hit in %ld seconds.\r\n", time);
       break;
@@ -352,7 +352,7 @@ ACTION(thing_control_weather_worse)
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
@@ -448,7 +448,7 @@ ACTION(thing_control_weather_better)
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
@@ -542,7 +542,7 @@ ACTION(thing_manifest)
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
 
@@ -624,7 +624,7 @@ ACTION(thing_singwood)
   if (!*num)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
 
@@ -729,13 +729,13 @@ ASUB(sub_juggle)
     vict = NULL;
   if (GET_SUB(ch, SUB_JUGGLE) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return SUB_UNDEFINED;
   }
 
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
-    new_send_to_char(ch, "You stop juggling.\r\n");
+    ch->Send( "You stop juggling.\r\n");
     act("$n stops juggling.", FALSE, ch, 0, 0, TO_ROOM);
     toggle_sub_status(ch, SUB_JUGGLE, STATUS_OFF);
     if (GET_TASK(ch) && GET_TASK(ch)->sub == SUB_JUGGLE)
@@ -745,7 +745,7 @@ ASUB(sub_juggle)
 
   if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -753,7 +753,7 @@ ASUB(sub_juggle)
 
   if (vict != NULL && get_sub_status(vict, SUB_JUGGLE) == STATUS_OFF)
   {
-    new_send_to_char(ch, "They arent even juggling!\r\n");
+    ch->Send( "They arent even juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -785,7 +785,7 @@ ASUB(sub_juggle)
 
 ACTION(thing_juggle)
 {
-  void reward_juggling(struct char_data *ch, struct char_data *vict,  int diff);
+  void reward_juggling(Character *ch, Character *vict,  int diff);
   //long time = 0;
   int diff = 1;
   //const char *to_vict = NULL;
@@ -796,7 +796,7 @@ ACTION(thing_juggle)
   if (!*num || !ch)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     return 0;
   }
 
@@ -838,7 +838,7 @@ ACTION(thing_juggle)
       act("$n watches in horror as $s balls mysteriously disappear into thin air.\r\n"
           "Maybe the Imms weren't as impressed as some others.", FALSE, ch, 0, 0, TO_ROOM);
     case 3:
-      new_send_to_char(ch, "You loose concentration and drop the balls everywhere!!\r\n");
+      ch->Send( "You loose concentration and drop the balls everywhere!!\r\n");
       act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
       break;
     }
@@ -987,12 +987,12 @@ ACTION(thing_juggle)
    difficulty is a multiplyer for the exp and gold.
 */
 
-void reward_juggling(struct char_data *ch, struct char_data *vict, int diff)
+void reward_juggling(Character *ch, Character *vict, int diff)
 {
   gold_int amount = 0;
   gold_int gain = 0;
   gold_int exp = 0;
-  struct char_data *person = NULL;
+  Character *person = NULL;
   if (IN_ROOM(ch) == NULL)
     return;
 
@@ -1043,7 +1043,7 @@ void reward_juggling(struct char_data *ch, struct char_data *vict, int diff)
 
   if (amount)
   {
-    new_send_to_char(ch, "You gain a total of %lld gold coins!\r\n", amount);
+    ch->Send( "You gain a total of %lld gold coins!\r\n", amount);
     char_gold(ch, amount, GOLD_HAND);
   }
   if (gain)
@@ -1063,13 +1063,13 @@ ASKILL(skill_strangle)
 
   if (GET_SKILL(ch, SKILL_STRANGLE) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return TYPE_UNDEFINED;
   }
 
   if (get_sub_status(ch, SUB_THROTTLE) == STATUS_ON)
   {
-    new_send_to_char(ch, "You release your grip on your victims neck.\r\n");
+    ch->Send( "You release your grip on your victims neck.\r\n");
     toggle_sub_status(ch, SUB_THROTTLE, STATUS_OFF);
     toggle_sub_status(ch, SUB_GAROTTE, STATUS_OFF);
     return TYPE_UNDEFINED;
@@ -1079,30 +1079,30 @@ ASKILL(skill_strangle)
 
   if (!vict)
   {
-    new_send_to_char(ch, "Strangle what poor unsuspecting victim?\r\n");
+    ch->Send( "Strangle what poor unsuspecting victim?\r\n");
     return TYPE_UNDEFINED;
   }
 
   if (AFF_FLAGGED(vict, AFF_STUCK))
   {
-    new_send_to_char(ch, "They are too cautious!\r\n");
+    ch->Send( "They are too cautious!\r\n");
     return TYPE_UNDEFINED;
   }
 
   if (!can_fight(ch, vict, TRUE))
   {
-    new_send_to_char(ch, "You can't strangle %s!\r\n", GET_NAME(vict));
+    ch->Send( "You can't strangle %s!\r\n", GET_NAME(vict));
     return TYPE_UNDEFINED;
   }
   if (has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD))
   {
-    new_send_to_char(ch, "You can't strangle %s with your hands full!\r\n", GET_NAME(vict));
+    ch->Send( "You can't strangle %s with your hands full!\r\n", GET_NAME(vict));
     return TYPE_UNDEFINED;
   }
   if (!GET_SUB(ch, SUB_THROTTLE))
   {
     improve_sub(ch, SUB_THROTTLE, 10);
-    new_send_to_char(ch, "You gain the subskill THROTTLE as a combo with this skill.\r\n");
+    ch->Send( "You gain the subskill THROTTLE as a combo with this skill.\r\n");
   }
   if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_GAROTTE && GET_SUB(ch, SUB_THROTTLE))
   {
@@ -1121,7 +1121,7 @@ ASUB(sub_throttle)
 
   if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     toggle_sub_status(ch, SUB_GAROTTE, STATUS_OFF);
     toggle_sub_status(ch, SUB_THROTTLE, STATUS_OFF);
     return SUB_UNDEFINED;
@@ -1166,7 +1166,7 @@ ACTION(thing_throttle)
   if (!*num || !ch || !vict)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     *num = 0;
     return 0;
   }
@@ -1179,7 +1179,7 @@ ACTION(thing_throttle)
       has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD)  ||
       ((number(0, 110) - GET_DEX(ch)) > GET_SKILL(ch, SKILL_STRANGLE)))
   {
-    new_send_to_char(ch, "You loose focus and stop strangling.\r\n");
+    ch->Send( "You loose focus and stop strangling.\r\n");
     act("$n relaxes his grip.\r\n", FALSE, ch, 0, 0, TO_ROOM);
     start_fighting(vict, ch);
     *num = 0;
@@ -1188,7 +1188,7 @@ ACTION(thing_throttle)
   else if (((!HERE(vict,ch)) || get_sub_status(ch, SUB_THROTTLE) == STATUS_OFF))
   {
     if (ch)
-      new_send_to_char(ch, "You stop strangling.\r\n");
+      ch->Send( "You stop strangling.\r\n");
     *num = 0;
     return 0;
   }
@@ -1233,10 +1233,10 @@ ACTION(thing_throttle)
 
 }
 
-int strangle_affect(struct char_data *ch, struct char_data *vict, int num)
+int strangle_affect(Character *ch, Character *vict, int num)
 {
   int diff, diff1, diff2;
-  void die(struct char_data *ch, struct char_data *killer);
+  void die(Character *ch, Character *killer);
 
   diff = (GET_LEVEL(ch)*(tier_level(ch, CLASS_THIEF)+1) + (GET_SUB(ch, SUB_THROTTLE))) ;
   diff1 = ((GET_LEVEL(vict)*(current_class_is_tier_num(vict)+1)))*(num/10);
@@ -1276,13 +1276,13 @@ ACMD(do_struggle)
   if (number(0, 100) > diff2 || !AFF_FLAGGED(ch, AFF_STUCK))
   {
     affect_from_char(ch, SKILL_STRANGLE);
-    new_send_to_char(ch,"You struggle free!!\r\n");
+    ch->Send("You struggle free!!\r\n");
     act("$n struggles free of these mortal coils!!", FALSE, ch, 0, 0, TO_ROOM);
     do_flee(ch, "", 0, 0);
 
     return;
   }
-  new_send_to_char(ch, "You struggle in a vain attempt to escape.\r\n");
+  ch->Send( "You struggle in a vain attempt to escape.\r\n");
 }
 
 
@@ -1294,13 +1294,13 @@ ASUB(sub_tumble)
     vict = NULL;
   if (GET_SUB(ch, SUB_JUGGLE) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return SUB_UNDEFINED;
   }
 
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
-    new_send_to_char(ch, "You stop juggling.\r\n");
+    ch->Send( "You stop juggling.\r\n");
     act("$n stops juggling.", FALSE, ch, 0, 0, TO_ROOM);
     toggle_sub_status(ch, SUB_JUGGLE, STATUS_OFF);
 
@@ -1311,7 +1311,7 @@ ASUB(sub_tumble)
 
   if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1319,7 +1319,7 @@ ASUB(sub_tumble)
 
   if (vict != NULL && get_sub_status(vict, SUB_JUGGLE) == STATUS_OFF)
   {
-    new_send_to_char(ch, "They arent even juggling!\r\n");
+    ch->Send( "They arent even juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1355,14 +1355,14 @@ ASUB(sub_clown)
     vict = NULL;
   if (GET_SUB(ch, SUB_JUGGLE) <= 0)
   {
-    new_send_to_char(ch, "You have no idea how to use that command!\r\n");
+    ch->Send( "You have no idea how to use that command!\r\n");
     return SUB_UNDEFINED;
   }
 
 
   if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
   {
-    new_send_to_char(ch, "You stop juggling.\r\n");
+    ch->Send( "You stop juggling.\r\n");
     act("$n stops juggling.", FALSE, ch, 0, 0, TO_ROOM);
     toggle_sub_status(ch, SUB_JUGGLE, STATUS_OFF);
     if (GET_TASK(ch) && GET_TASK(ch)->sub == SUB_JUGGLE)
@@ -1372,7 +1372,7 @@ ASUB(sub_clown)
 
   if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
   {
-    new_send_to_char(ch, "You are in the middle of something else!\r\n");
+    ch->Send( "You are in the middle of something else!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1380,7 +1380,7 @@ ASUB(sub_clown)
 
   if (vict != NULL && get_sub_status(vict, SUB_JUGGLE) == STATUS_OFF)
   {
-    new_send_to_char(ch, "They arent even juggling!\r\n");
+    ch->Send( "They arent even juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1410,7 +1410,7 @@ ASUB(sub_clown)
 
 ACTION(thing_tumble)
 {
-  void reward_juggling(struct char_data *ch, struct char_data *vict,  int diff);
+  void reward_juggling(Character *ch, Character *vict,  int diff);
   //long time = 0;
   int diff = 1;
   //const char *to_vict = NULL;
@@ -1421,7 +1421,7 @@ ACTION(thing_tumble)
   if (!*num || !ch)
   {
     if (ch)
-      new_send_to_char(ch, "Broken for some reason!??\r\n");
+      ch->Send( "Broken for some reason!??\r\n");
     *num = 0;
     return 0;
   }
@@ -1429,7 +1429,7 @@ ACTION(thing_tumble)
 
   if (!IS_STUCK(vict) || !skill_cost(0, 0, 50, ch) ||  (number(0, 110) - GET_DEX(ch) > GET_SKILL(ch, SKILL_STRANGLE)))
   {
-    new_send_to_char(ch, "You loose focus and stop strangling!!\r\n");
+    ch->Send( "You loose focus and stop strangling!!\r\n");
     act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
     *num = 0;
     return 0;

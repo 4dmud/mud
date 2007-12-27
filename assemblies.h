@@ -64,11 +64,11 @@ struct component_data
 
 void           assemblyBootAssemblies( void );
 void           assemblySaveAssemblies( void );
-void           assemblyListToChar( struct char_data *pCharacter );
+void           assemblyListToChar( Character *pCharacter );
 
 bool           assemblyAddComponent( long lVnum, long lComponentVnum,
                                      bool bExtract, bool bInRoom );
-bool           assemblyCheckComponents( long lVnum, struct char_data
+bool           assemblyCheckComponents( long lVnum, Character
                                         *pCharacter , bool check_only);
 bool           assemblyCreate( long lVnum, int iAssembledType );
 bool           assemblyDestroy( long lVnum );
@@ -86,8 +86,8 @@ ASSEMBLY*      assemblyGetAssemblyPtr( long lVnum );
 void           free_assemblies(void);
 bool           assemblyAddTrigger(long lVnum,int iTrig);
 
-int perform_assemble(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd);
-int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd);
+int perform_assemble(obj_vnum lVnum, Character *ch, int subcmd, int cmd);
+int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd);
 
 /* ******************************************************************** */
 

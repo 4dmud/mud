@@ -120,9 +120,9 @@ extern int top_of_socialt;
  *   -- Umm, shouldn't this say 'from oasis.c' now???  * Mythran
  */
 void cleanup_olc(struct descriptor_data *d, byte cleanup_type);
-void get_char_colors(struct char_data *ch);
+void get_char_colors(Character *ch);
 void split_argument(char *argument, char *tag);
-int can_edit_zone(struct char_data *ch, zone_rnum rnum);
+int can_edit_zone(Character *ch, zone_rnum rnum);
 /*
  * OLC structures.
  */
@@ -140,7 +140,7 @@ struct oasis_olc_data {
   room_vnum number;              /* vnum of subject          */
   int value;                     /* mostly 'has changed' flag*/
   char *storage;                 /* used for 'tedit'         */
-  struct char_data *mob;         /* used for 'medit'         */
+  Character *mob;         /* used for 'medit'         */
   struct room_data *room;        /* used for 'redit'         */
   struct obj_data *obj;          /* used for 'oedit'         */
   struct zone_data *zone;        /* used for 'zedit'         */
@@ -526,10 +526,10 @@ extern const char *nrm, *grn, *cyn, *yel;
  */
 #ifndef ACMD
 #define ACMD(name)  \
-   void name(struct char_data *ch, char *argument, int cmd, int subcmd)
+   void name(Character *ch, char *argument, int cmd, int subcmd)
 #endif
 void clear_screen(struct descriptor_data *);
-int can_edit_zone(struct char_data *ch, zone_rnum rnum);
+int can_edit_zone(Character *ch, zone_rnum rnum);
 ACMD(do_oasis);
 ACMD(do_oasis_list);
 ACMD(do_oasis_links);
@@ -553,10 +553,10 @@ void hedit_save_to_disk(struct descriptor_data *d);
 int  hedit_find_entry(char *keyword);
 void hedit_save_internally(struct descriptor_data *d);
  
-void medit_free_mobile(struct char_data *mob);
+void medit_free_mobile(Character *mob);
 void medit_setup_new(struct descriptor_data *d);
 void medit_setup_existing(struct descriptor_data *d, int rmob_num);
-void init_mobile(struct char_data *mob);
+void init_mobile(Character *mob);
 void medit_save_internally(struct descriptor_data *d);
 void medit_save_to_disk(zone_vnum zone_num);
 void medit_disp_positions(struct descriptor_data *d);
@@ -630,7 +630,7 @@ void sedit_parse(struct descriptor_data *d, char *arg);
 ACMD(do_oasis_sedit);
 
 void zedit_setup(struct descriptor_data *d, room_rnum room_num);
-void zedit_new_zone(struct char_data *ch, zone_vnum vzone_num, room_vnum bottom, room_vnum top);
+void zedit_new_zone(Character *ch, zone_vnum vzone_num, room_vnum bottom, room_vnum top);
 void zedit_create_index(int znum, char *type);
 void zedit_save_internally(struct descriptor_data *d);
 void zedit_save_to_disk(int zone_num);
@@ -661,19 +661,19 @@ int free_strings(void *data, int type);
 /* oasis_list.c */
 ACMD(do_oasis_list);
 ACMD(do_oasis_links);
-void list_triggers(struct char_data *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax);
-void list_rooms(struct char_data *ch  , zone_rnum rnum, room_vnum vmin, room_vnum vmax);
-void list_mobiles(struct char_data *ch, zone_rnum rnum, mob_vnum vmin , mob_vnum vmax );
-void list_objects(struct char_data *ch, zone_rnum rnum, obj_vnum vmin , obj_vnum vmax );
-void list_shops(struct char_data *ch  , zone_rnum rnum, shop_vnum vmin, shop_vnum vmax);
-void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax);
-void print_zone(struct char_data *ch, zone_rnum rnum);
+void list_triggers(Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vmax);
+void list_rooms(Character *ch  , zone_rnum rnum, room_vnum vmin, room_vnum vmax);
+void list_mobiles(Character *ch, zone_rnum rnum, mob_vnum vmin , mob_vnum vmax );
+void list_objects(Character *ch, zone_rnum rnum, obj_vnum vmin , obj_vnum vmax );
+void list_shops(Character *ch  , zone_rnum rnum, shop_vnum vmin, shop_vnum vmax);
+void list_zones(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax);
+void print_zone(Character *ch, zone_rnum rnum);
 
 ACMD(do_oasis_vedit);
 void vedit_setup_new(struct descriptor_data *d);
 void vedit_setup_existing(struct descriptor_data *d, int num);
 void vehicle_menu(DESCRIPTOR_DATA *d);
-void list_vehicles(struct char_data *ch);
+void list_vehicles(Character *ch);
 void vedit_parse(DESCRIPTOR_DATA *d,char *arg);
 
 #define CONTEXT_HELP_STRING "help"

@@ -55,7 +55,7 @@ ACMD(do_oasis_cedit)
   one_argument(argument, buf1);
   
   if (GET_LEVEL(ch) < LVL_IMPL) {
-    new_send_to_char(ch, "You can't modify the game configuration.\r\n");
+    ch->Send( "You can't modify the game configuration.\r\n");
     return;
   }
   
@@ -73,11 +73,11 @@ ACMD(do_oasis_cedit)
       "OLC: %s starts editing the game configuration.", GET_NAME(ch));
     return;
   } else if (str_cmp("save", buf1) != 0) {
-    new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
+    ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
     return;
   }
   
-  new_send_to_char(ch, "Saving the game configuration.\r\n");
+  ch->Send( "Saving the game configuration.\r\n");
   new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, 
     "OLC: %s saves the game configuration.", GET_NAME(ch));
   

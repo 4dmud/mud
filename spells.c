@@ -29,18 +29,18 @@ ACMD(do_flee);
 EVENTFUNC(message_event);
 
 int wep_hands(OBJ_DATA *wep);
-void dismount_char(struct char_data *ch);
+void dismount_char(Character *ch);
 char *balance_display(int balance);
 int weapon_type_mod(int w_type, int area);
-void clearMemory(struct char_data *ch);
+void clearMemory(Character *ch);
 void weight_change_object(struct obj_data *obj, int weight);
-void add_follower(struct char_data *ch, struct char_data *leader);
-int mag_savingthrow(struct char_data *ch, int type, int modifier);
+void add_follower(Character *ch, Character *leader);
+int mag_savingthrow(Character *ch, int type, int modifier);
 void name_to_drinkcon(struct obj_data *obj, int type);
 void name_from_drinkcon(struct obj_data *obj);
-void set_race(struct char_data *ch, int race);
-int compute_armor_class(struct char_data *ch);
-struct char_data *FindNext(struct char_data *ch, struct char_data *v[]);
+void set_race(Character *ch, int race);
+int compute_armor_class(Character *ch);
+Character *FindNext(Character *ch, Character *v[]);
 int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
 int fuzzy_balance(OBJ_DATA *wep);
@@ -63,7 +63,7 @@ ASPELL(spell_create_water)
 
   if (!obj)
   {
-    new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
+    ch->Send("What are you trying to do? Flood the play. Specify a container.\r\n");
     return;
   }
 
@@ -100,7 +100,7 @@ ASPELL(spell_water_to_wine)
 
   if (!obj)
   {
-    new_send_to_char(ch,"What are you trying to do? Flood the play. Specify a container.\r\n");
+    ch->Send("What are you trying to do? Flood the play. Specify a container.\r\n");
     return;
   }
 
@@ -114,11 +114,11 @@ ASPELL(spell_water_to_wine)
 
     }
     else
-      new_send_to_char(ch, "You can't cast it on that it is not water!\r\n");
+      ch->Send( "You can't cast it on that it is not water!\r\n");
 
   }
   else
-    new_send_to_char(ch, "You can't cast it on that!\r\n");
+    ch->Send( "You can't cast it on that!\r\n");
 }
 
 ASPELL(spell_midas_touch)
@@ -127,7 +127,7 @@ ASPELL(spell_midas_touch)
   WAIT_STATE(ch, 1 RL_SEC);
   if (use_stamina(ch, 5) < 0)
   {
-    new_send_to_char(ch, "You are too exausted!");
+    ch->Send( "You are too exausted!");
     return;
   }
 
@@ -170,19 +170,19 @@ ASPELL(spell_recall)
 
   if (IS_IMM(victim))
   {
-    new_send_to_char(ch,"That isn't such a good idea.\r\n");
+    ch->Send("That isn't such a good idea.\r\n");
     return;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NORECALL))
   {
-    new_send_to_char(ch,"You cannot recall from this room.\r\n");
+    ch->Send("You cannot recall from this room.\r\n");
     return;
   }
 
   if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NORECALL))
   {
-    new_send_to_char(ch,"You cannot recall from this zone.\r\n");
+    ch->Send("You cannot recall from this zone.\r\n");
     return;
   }
 
@@ -207,7 +207,7 @@ ASPELL(spell_teleport)
 
   if (IS_IMM(victim) || IS_NPC(victim))
   {
-    new_send_to_char(ch,"That's not such a good idea.\r\n");
+    ch->Send("That's not such a good idea.\r\n");
     return;
   }
 
@@ -226,7 +226,7 @@ ASPELL(spell_teleport)
                    GET_NAME(ch), 
                    HSSH(ch));
     
-    new_send_to_char(ch, "You failed the teleport spell because %s has teleport protection on.\r\n",
+    ch->Send( "You failed the teleport spell because %s has teleport protection on.\r\n",
                      GET_NAME(victim));
     
     
@@ -283,13 +283,13 @@ ASPELL(spell_summon)
 
   if (GET_LEVEL(victim) > MIN(LVL_GOD - 1, level + 3))
   {
-    new_send_to_char(ch, "%s", SUMMON_FAIL);
+    ch->Send( "%s", SUMMON_FAIL);
     return;
   }
 
   if (ZONE_FLAGGED(victim->in_room->zone, ZONE_NOSUMMON_OUT))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "A magical barrier prevents you from summoning %s from that zone.\r\n",
                      GET_NAME(victim));
     return;
@@ -297,7 +297,7 @@ ASPELL(spell_summon)
 
   if (ROOM_FLAGGED(victim->in_room, ROOM_NOSUMMON_OUT))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "A magical barrier prevents you from summoning %s from that room.\r\n",
                      GET_NAME(victim));
     return;
@@ -305,7 +305,7 @@ ASPELL(spell_summon)
 
   if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_IN))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "A magical barrier prevents you from summoning %s to this zone.\r\n",
                      GET_NAME(victim));
     return;
@@ -313,7 +313,7 @@ ASPELL(spell_summon)
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOSUMMON_IN))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "A magical barrier prevents you from summoning %s to this room.\r\n",
                      GET_NAME(victim));
     return;
@@ -332,13 +332,13 @@ ASPELL(spell_summon)
     if (!IS_NPC(victim) && !PRF_FLAGGED(victim, PRF_SUMMONABLE) &&
         !PLR_FLAGGED(victim, PLR_KILLER))
     {
-      new_send_to_char(ch, "%s just tried to summon you to: %s.\r\n"
+      ch->Send( "%s just tried to summon you to: %s.\r\n"
                        "%s failed because you have summon protection on.\r\n"
                        "Type NOSUMMON to allow other players to summon you.\r\n",
                        GET_NAME(ch), IN_ROOM(ch)->name,
                        (ch->player.sex == SEX_MALE) ? "He" : "She");
 
-      new_send_to_char(ch,
+      ch->Send(
                        "You failed because %s has summon protection on.\r\n",
                        GET_NAME(victim));
 
@@ -353,7 +353,7 @@ ASPELL(spell_summon)
   if (MOB_FLAGGED(victim, MOB_NOSUMMON) ||
       (IS_NPC(victim) && mag_savingthrow(victim, SAVING_SPELL, 0)))
   {
-    new_send_to_char(ch, "%s", SUMMON_FAIL);
+    ch->Send( "%s", SUMMON_FAIL);
     return;
   }
 
@@ -377,40 +377,40 @@ ASPELL(spell_gate)
 
   if (GET_LEVEL(victim) > MIN(LVL_GOD - 1, level + 3))
   {
-    new_send_to_char(ch, "%s", SUMMON_FAIL);
+    ch->Send( "%s", SUMMON_FAIL);
     return;
   }
 
   if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_OUT))
   {
-    new_send_to_char(ch,"A magical barrier prevents you from gating to %s from this zone.\r\n",
+    ch->Send("A magical barrier prevents you from gating to %s from this zone.\r\n",
                      GET_NAME(victim));
     return;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOSUMMON_OUT))
   {
-    new_send_to_char(ch, "A magical barrier prevents you from gating to %s from this room.\r\n",
+    ch->Send( "A magical barrier prevents you from gating to %s from this room.\r\n",
                      GET_NAME(victim));
     return;
   }
 
   if (ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOSUMMON_IN))
   {
-    new_send_to_char(ch, "A magical barrier prevents you from gating to %s to that zone.\r\n",
+    ch->Send( "A magical barrier prevents you from gating to %s to that zone.\r\n",
                      GET_NAME(victim));
     return;
   }
 
   if (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOSUMMON_IN))
   {
-    new_send_to_char(ch, "A magical barrier prevents you from summoning %s to this room.\r\n",
+    ch->Send( "A magical barrier prevents you from summoning %s to this room.\r\n",
                      GET_NAME(victim));
     return;
   }
   if (IS_NPC(victim))
   {
-    new_send_to_char(ch, "You cant seem to get a good focus on your target.");
+    ch->Send( "You cant seem to get a good focus on your target.");
     return;
   }
 
@@ -423,7 +423,7 @@ ASPELL(spell_gate)
                      GET_NAME(ch), IN_ROOM(victim)->name,
                      HSSH(ch));
 
-    new_send_to_char(ch, "You failed the gate because %s has summon protection on.\r\n",
+    ch->Send( "You failed the gate because %s has summon protection on.\r\n",
                      GET_NAME(victim));
 
 
@@ -468,7 +468,7 @@ ASPELL(spell_locate_object)
   /* use the temporary object that do_cast created */
   if (!strarg)
   {
-    new_send_to_char(ch,"What object would you like to find?\r\n");
+    ch->Send("What object would you like to find?\r\n");
     return;
   }
 
@@ -517,7 +517,7 @@ ASPELL(spell_locate_object)
   if (j == ((level / 2) * (TIERNUM+1)))
   {
     free_string(&dynbuf);
-    new_send_to_char(ch, "You sense nothing.\r\n");
+    ch->Send( "You sense nothing.\r\n");
   }
   else
     page_string(ch->desc, dynbuf, DYN_BUFFER);
@@ -533,24 +533,24 @@ ASPELL(spell_charm)
     return;
 
   if (victim == ch)
-    new_send_to_char(ch,"You like yourself even better!\r\n");
+    ch->Send("You like yourself even better!\r\n");
   else if (!IS_NPC(victim) && !PRF_FLAGGED(victim, PRF_SUMMONABLE))
-    new_send_to_char(ch,"You fail because SUMMON protection is on!\r\n");
+    ch->Send("You fail because SUMMON protection is on!\r\n");
   else if (AFF_FLAGGED(victim, AFF_SANCTUARY))
-    new_send_to_char(ch,"Your victim is protected by sanctuary!\r\n");
+    ch->Send("Your victim is protected by sanctuary!\r\n");
   else if (MOB_FLAGGED(victim, MOB_NOCHARM))
-    new_send_to_char(ch,"Your victim resists!\r\n");
+    ch->Send("Your victim resists!\r\n");
   else if (AFF_FLAGGED(ch, AFF_CHARM))
-    new_send_to_char(ch,"You can't have any followers of your own!\r\n");
+    ch->Send("You can't have any followers of your own!\r\n");
   else if (AFF_FLAGGED(victim, AFF_CHARM) || level < GET_LEVEL(victim))
-    new_send_to_char(ch,"You fail.\r\n");
+    ch->Send("You fail.\r\n");
   /* player charming another player - no legal reason for this */
   else if ((!CONFIG_PK_ALLOWED)  && !IS_NPC(victim))
-    new_send_to_char(ch,"You fail - shouldn't be doing it anyway.\r\n");
+    ch->Send("You fail - shouldn't be doing it anyway.\r\n");
   else if (circle_follow(victim, ch))
-    new_send_to_char(ch,"Sorry, following in circles can not be allowed.\r\n");
+    ch->Send("Sorry, following in circles can not be allowed.\r\n");
   else if (mag_savingthrow(victim, SAVING_PARA, 0))
-    new_send_to_char(ch,"Your victim resists!\r\n");
+    ch->Send("Your victim resists!\r\n");
   else
   {
     if (victim->master)
@@ -603,9 +603,9 @@ ASPELL(spell_polymorph)
   struct affected_type af;
 
   if (affected_by_spell(victim, SPELL_POLYMORPH))
-    new_send_to_char(ch,"You fail.\r\n");
+    ch->Send("You fail.\r\n");
   else if (mag_savingthrow(victim, SAVING_PARA, 0))
-    new_send_to_char(ch,"Your victim resists!\r\n");
+    ch->Send("Your victim resists!\r\n");
   else
   {
 
@@ -638,7 +638,7 @@ ASPELL(spell_polymorph)
     }
     affect_to_char(victim, &af);
     if (SELF(victim, ch))
-      new_send_to_char(ch, "Now see what ya did!\r\n");
+      ch->Send( "Now see what ya did!\r\n");
     act("You feel REALLY funny.", FALSE, ch, 0, victim,  TO_VICT);
     act("$N looks REALLY funny.", FALSE, ch, 0, victim,  TO_CHAR);
     if (IS_NPC(victim))
@@ -684,7 +684,7 @@ void free_identifier(struct obj_data *obj)
 }
 
 
-void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
+void identify_object(Character *ch, OBJ_DATA *obj)
 {
   int i;
   int found;
@@ -709,35 +709,35 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
      000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
      000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
    */
-  new_send_to_char(ch,
+  ch->Send(
                    "----------------------------------------------------------------------\r\n");
   sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
-  new_send_to_char(ch, "{cc%s{cy is a type of {cc%s{cy made from {cc%s{c0\r\n",
+  ch->Send( "{cc%s{cy is a type of {cc%s{cy made from {cc%s{c0\r\n",
                    buf2, buf, material_name(GET_OBJ_MATERIAL(obj)));
   zone = real_zone(GET_OBJ_VNUM(obj));
   if (zone > 0 && dimension_types[zone_table[zone].dimension])
-    new_send_to_char(ch, "{cyIt is from the dimension {cy%s{c0\r\n",dimension_types[zone_table[zone].dimension]);
+    ch->Send( "{cyIt is from the dimension {cy%s{c0\r\n",dimension_types[zone_table[zone].dimension]);
   sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf, sizeof(buf));
   if (strncmp(buf, "NOBITS", 6))
   {
     if (str_str(buf, (char *)"TAKE"))
-      new_send_to_char(ch, "{cyIt can be taken and worn on {cc%s{c0\r\n", buf);
+      ch->Send( "{cyIt can be taken and worn on {cc%s{c0\r\n", buf);
     else
-      new_send_to_char(ch, "{cyIt can and worn on {cc%s{c0\r\n", buf);
+      ch->Send( "{cyIt can and worn on {cc%s{c0\r\n", buf);
   }
   sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf, sizeof(buf));
   if (strncmp(buf, "NOBITS", 6))
-    new_send_to_char(ch, "{cyIt is {cc%s{c0\r\n", buf);
+    ch->Send( "{cyIt is {cc%s{c0\r\n", buf);
 
-  new_send_to_char(ch, "{cyIts weight is {cC%d{cy and its valued at {cC%d{cy coins",
+  ch->Send( "{cyIts weight is {cC%d{cy and its valued at {cC%d{cy coins",
                    GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj));
   if (GET_OBJ_LEVEL(obj))
-    new_send_to_char(ch, ", and its Min-level is {cC%d{c0\r\n" ,GET_OBJ_LEVEL(obj));
+    ch->Send( ", and its Min-level is {cC%d{c0\r\n" ,GET_OBJ_LEVEL(obj));
   else
-    new_send_to_char(ch, ".{c0\r\n");
+    ch->Send( ".{c0\r\n");
 
   if (GET_OBJ_TIMER(obj) >= 0)
-    new_send_to_char(ch, "{cyIt has {cC%d{cy hours left till it disintergrates{c0\r\n",   GET_OBJ_TIMER(obj));
+    ch->Send( "{cyIt has {cC%d{cy hours left till it disintergrates{c0\r\n",   GET_OBJ_TIMER(obj));
 
   found = FALSE;
   for (i = 0; i < MAX_OBJ_AFFECT; i++)
@@ -748,39 +748,39 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
       form++;
       if (!found)
       {
-        new_send_to_char(ch, "{cyIf worn it will give you --{c0\r\n");
+        ch->Send( "{cyIf worn it will give you --{c0\r\n");
         found = TRUE;
       }
       sprinttype(obj->affected[i].location, apply_types, buf2, sizeof(buf2));
-      new_send_to_char(ch, "   {cC%3d{cy to your {cc%s{c0\r\n",
+      ch->Send( "   {cC%3d{cy to your {cc%s{c0\r\n",
                        obj->affected[i].modifier,  buf2);
     }
   }
 
-  new_send_to_char(ch, "\r\n");
+  ch->Send( "\r\n");
 
   switch (GET_OBJ_TYPE(obj))
   {
   case ITEM_SCROLL:
   case ITEM_POTION:
-    new_send_to_char(ch, "{cyThis %s casts ",
+    ch->Send( "{cyThis %s casts ",
                      item_types[(int) GET_OBJ_TYPE(obj)]);
 
     if (GET_OBJ_VAL(obj, 1) >= 1)
-      new_send_to_char(ch, " {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 1)));
+      ch->Send( " {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 1)));
     if (GET_OBJ_VAL(obj, 2) >= 1)
-      new_send_to_char(ch, ", {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 2)));
+      ch->Send( ", {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 2)));
     if (GET_OBJ_VAL(obj, 3) >= 1)
-      new_send_to_char(ch, ", {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 3)));
-    new_send_to_char(ch, "{c0\r\n");
+      ch->Send( ", {cc%s{cy", skill_name(GET_OBJ_VAL(obj, 3)));
+    ch->Send( "{c0\r\n");
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
-    new_send_to_char(ch, "{cyThis %s casts",
+    ch->Send( "{cyThis %s casts",
                      item_types[(int) GET_OBJ_TYPE(obj)]);
-    new_send_to_char(ch, " {cc%s{cy\r\n",
+    ch->Send( " {cc%s{cy\r\n",
                      skill_name(GET_OBJ_VAL(obj, 3)));
-    new_send_to_char(ch,
+    ch->Send(
                      "It has {cC%d{cy maximum charge%s and {cC%d{cy remaining.{c0\r\n",
                      GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj,
                                                       1) == 1 ? "" : "s",
@@ -788,18 +788,18 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
     break;
   case ITEM_WEAPON:
 
-    new_send_to_char(ch, "{cyWanted Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n"
+    ch->Send( "{cyWanted Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n"
                      "{cyActual Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n",
                      balance_display(perf_balance(GET_WEP_TYPE(obj))),
                      balance_display(GET_WEP_BALANCE(obj))
                     );
-    new_send_to_char(ch, "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
+    ch->Send( "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
                      get_weapon_speed(obj),
                      get_weapon_accuracy(obj),
                      get_weapon_evasion(obj));
 
     w_type = GET_OBJ_VAL(obj, 3);
-    new_send_to_char(ch, "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
+    ch->Send( "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",
                      wep_hands(obj) == 2 ? "two" : "one",GET_WEP_LENGTH(obj), weapon_type_name(obj),
                      attack_hit_text[w_type].singular, GET_OBJ_VAL(obj, 1),  GET_OBJ_VAL(obj, 2));
     w_type += TYPE_HIT;
@@ -812,7 +812,7 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
 
     total = (att[0] +att[1] +att[2] +att[3] +att[4] +att[5]);
 
-    new_send_to_char(ch,
+    ch->Send(
                      "\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
                      "                (Head)\r\n"
                      "                ({cR%2d%%{cc)\r\n"
@@ -831,10 +831,10 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
 
     break;
   case ITEM_ARMOR:
-    new_send_to_char(ch,"{cyAC-apply is {cC%d{c0\r\n", GET_OBJ_VAL(obj, 0));
+    ch->Send("{cyAC-apply is {cC%d{c0\r\n", GET_OBJ_VAL(obj, 0));
     break;
   case ITEM_LIGHTSABRE_HILT:
-    new_send_to_char(ch, "{cyPossable Saber blades: {cC%d{c0\r\n"
+    ch->Send( "{cyPossable Saber blades: {cC%d{c0\r\n"
                      "{cyDamage dice: {cC%d{cyD{cC%d{c0\r\n"
                      "{cySaber Color: {cc%s{c0\r\n",
                      (int) GET_OBJ_VAL(obj, 0),(int) GET_OBJ_VAL(obj, 1), (int) GET_OBJ_VAL(obj, 2),
@@ -842,33 +842,33 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
     break;
   }
 
-  new_send_to_char(ch,
+  ch->Send(
                    "----------------------------------------------------------------------\r\n");
 
 }
 
-void identify_character(CHAR_DATA *ch, CHAR_DATA *victim)
+void identify_character(Character *ch, Character *victim)
 {
 
-  new_send_to_char(ch, "Name: %s\r\n", GET_NAME(victim));
+  ch->Send( "Name: %s\r\n", GET_NAME(victim));
   if (!IS_NPC(victim))
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "%s is %d years, %d months, %d days and %d hours old.\r\n",
                      GET_NAME(victim), age(victim)->year,
                      age(victim)->month, age(victim)->day,
                      age(victim)->hours);
   }
-  new_send_to_char(ch, "Height %d cm, Weight %d pounds\r\n",
+  ch->Send( "Height %d cm, Weight %d pounds\r\n",
                    GET_HEIGHT(victim), GET_WEIGHT(victim));
-  new_send_to_char(ch,
+  ch->Send(
                    "Str: %d/%d, Int: %d, Wis: %d, Dex: %d, Con: %d, Cha: %d\r\n",
                    GET_STR(victim), GET_ADD(victim), GET_INT(victim),
                    GET_WIS(victim), GET_DEX(victim), GET_CON(victim),
                    GET_CHA(victim));
 }
 
-void identify_room(CHAR_DATA *ch, room_rnum room)
+void identify_room(Character *ch, room_rnum room)
 {}
 
 ASPELL(spell_identify)
@@ -910,10 +910,10 @@ ASPELL(spell_enchant_weapon)
   SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
 
   obj->affected[0].location = APPLY_HITROLL;
-  obj->affected[0].modifier = (current_class_is_tier_num(ch) * 0.5) + (level >= 18);
+  obj->affected[0].modifier = (sbyte)((current_class_is_tier_num(ch) * 0.5) + (level >= 18));
 
   obj->affected[1].location = APPLY_DAMROLL;
-  obj->affected[1].modifier = (current_class_is_tier_num(ch) * 0.5) + (level >= 20);
+  obj->affected[1].modifier = sbyte((current_class_is_tier_num(ch) * 0.5) + (level >= 20));
 
   if (IS_GOOD(ch))
   {
@@ -935,9 +935,9 @@ ASPELL(spell_detect_poison)
     if (victim == ch)
     {
       if (AFF_FLAGGED(victim, AFF_POISON_1))
-        new_send_to_char(ch,"You can sense poison in your blood.\r\n");
+        ch->Send("You can sense poison in your blood.\r\n");
       else
-        new_send_to_char(ch,"You feel healthy.\r\n");
+        ch->Send("You feel healthy.\r\n");
     }
     else
     {
@@ -965,7 +965,7 @@ ASPELL(spell_detect_poison)
             ch, obj, 0, TO_CHAR);
       break;
     default:
-      new_send_to_char(ch,"You sense that it should not be consumed.\r\n");
+      ch->Send("You sense that it should not be consumed.\r\n");
     }
   }
 }
@@ -1064,18 +1064,18 @@ ASPELL(spell_control_weather)
   struct message_event_obj *msg = NULL;
   if (!OUTSIDE(ch))
   {
-    new_send_to_char(ch, "You are unable to concentrate enough to take control over nature.\r\n");
+    ch->Send( "You are unable to concentrate enough to take control over nature.\r\n");
     return;
   }
   if (!strarg || !*strarg)
   {
-    new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+    ch->Send( "You must specify BETTER or WORSE.\r\n");
     return;
   }
 
   if (GET_INT(ch) < number(1, 19))
   {
-    new_send_to_char(ch,"You fail.\r\n");
+    ch->Send("You fail.\r\n");
     return;
   }
   i = GET_ROOM_ZONE(IN_ROOM(ch));
@@ -1087,7 +1087,7 @@ ASPELL(spell_control_weather)
   }
   else
   {
-    new_send_to_char(ch, "You must specify BETTER or WORSE.\r\n");
+    ch->Send( "You must specify BETTER or WORSE.\r\n");
     return;
   }
   GET_MSG_RUN(ch) = 1;
@@ -1142,7 +1142,7 @@ ASPELL(spell_minor_identify)
 
   if (!obj)
   {
-    new_send_to_char(ch,"You can only cast this on objects.\r\n");
+    ch->Send("You can only cast this on objects.\r\n");
     return;
   }
 
@@ -1153,12 +1153,12 @@ ASPELL(spell_minor_identify)
 
   if (!obj->affected[0].modifier)
   {
-    new_send_to_char(ch, "%s cannot help you in any special way.\r\nBut it might \
+    ch->Send( "%s cannot help you in any special way.\r\nBut it might \
                      bring %s if you sold it.\r\n", obj->short_description,
                      money_desc(cost));
     return;
   }
-  new_send_to_char(ch,"%s can help you in the following way:\r\n",
+  ch->Send("%s can help you in the following way:\r\n",
                    obj->short_description);
   for (i = 0; i < MAX_OBJ_AFFECT; i++)
     if (obj->affected[i].modifier)
@@ -1174,7 +1174,7 @@ ASPELL(spell_minor_identify)
         //	    case APPLY_LEVEL:
         if (!found)
         {
-          new_send_to_char(ch, min_id[0], money_desc(cost));
+          ch->Send( min_id[0], money_desc(cost));
           found = TRUE;
           sent = TRUE;
         }
@@ -1182,7 +1182,7 @@ ASPELL(spell_minor_identify)
       default:
         mes_get = obj->affected[i].location;
         x = number(0, 1);
-        new_send_to_char(ch, "%s%s",
+        ch->Send( "%s%s",
                          (x ? "it might do something about " :
                           "It could do something about "), min_id[mes_get]);
         sent = TRUE;
@@ -1193,7 +1193,7 @@ ASPELL(spell_minor_identify)
 
   if (!sent)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "It seems to you that %s cannot help you in any special way.\r\n",
                      obj->short_description);
 
@@ -1203,9 +1203,9 @@ ASPELL(spell_minor_identify)
 
 }
 
-void fchar_init_flags_room(struct char_data *ch, int *numtargets)
+void fchar_init_flags_room(Character *ch, int *numtargets)
 {
-  struct char_data *vict;
+  Character *vict;
 
   for (vict = IN_ROOM(ch)->people; (vict);
        vict = vict->next_in_room)
@@ -1221,10 +1221,10 @@ void fchar_init_flags_room(struct char_data *ch, int *numtargets)
   }
 }
 
-struct char_data *fchar_next(struct char_data *ch, int *numtargets)
+Character *fchar_next(Character *ch, int *numtargets)
 {
   int i;
-  struct char_data *vict;
+  Character *vict;
 
   i = number(0, *numtargets - 1);
   if (*numtargets <= 0)
@@ -1246,10 +1246,10 @@ struct char_data *fchar_next(struct char_data *ch, int *numtargets)
   return NULL;
 }
 
-struct char_data *FindNext(struct char_data *ch, struct char_data *v[])
+Character *FindNext(Character *ch, Character *v[])
 {
   int inx, j, k, numch;
-  struct char_data *vict;
+  Character *vict;
 
   numch = 0;
   for (vict = IN_ROOM(ch)->people; vict; vict = vict->next_in_room)
@@ -1289,7 +1289,7 @@ struct char_data *FindNext(struct char_data *ch, struct char_data *v[])
 ASPELL(spell_chain_lightning)
 {
   int dam;
-  struct char_data *v[4] = { NULL, NULL, NULL, NULL };
+  Character *v[4] = { NULL, NULL, NULL, NULL };
 
 
 
@@ -1301,13 +1301,13 @@ ASPELL(spell_chain_lightning)
 
     if (GET_LEVEL(victim) >= LVL_GOD)
     {
-      new_send_to_char(ch,"You fool...\r\n");
+      ch->Send("You fool...\r\n");
       return;
     }
 
     if (!IS_NPC(ch) && !IS_NPC(victim) && !CONFIG_PK_ALLOWED)
     {
-      new_send_to_char(ch,"You rather shouldn't do this...\r\n");
+      ch->Send("You rather shouldn't do this...\r\n");
       return;
     }
 
@@ -1366,12 +1366,12 @@ ASPELL(spell_recharge)
   {
     if (GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1))
     {
-      new_send_to_char(ch,"You attempt to recharge the wand.\r\n");
+      ch->Send("You attempt to recharge the wand.\r\n");
       restored_charges = number(1, 5);
       GET_OBJ_VAL(obj, 2) += restored_charges;
       if (GET_OBJ_VAL(obj, 2) > GET_OBJ_VAL(obj, 1))
       {
-        new_send_to_char(ch, "The wand is overcharged and explodes!\r\n");
+        ch->Send( "The wand is overcharged and explodes!\r\n");
         act("$n overcharges $p and it explodes!", TRUE, ch, obj, 0, TO_ROOM);
         explode = dice(GET_OBJ_VAL(obj, 2), 2);
         extract_obj(obj);
@@ -1380,14 +1380,14 @@ ASPELL(spell_recharge)
       }
       else
       {
-        new_send_to_char(ch, "You restore %d charges to the wand.\r\n",
+        ch->Send( "You restore %d charges to the wand.\r\n",
                          restored_charges);
         return;
       }
     }
     else
     {
-      new_send_to_char(ch,"That item is already at full charges!\r\n");
+      ch->Send("That item is already at full charges!\r\n");
       return;
     }
   }
@@ -1395,12 +1395,12 @@ ASPELL(spell_recharge)
   {
     if (GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1))
     {
-      new_send_to_char(ch,"You attempt to recharge the staff.\r\n");
+      ch->Send("You attempt to recharge the staff.\r\n");
       restored_charges = number(1, 3);
       GET_OBJ_VAL(obj, 2) += restored_charges;
       if (GET_OBJ_VAL(obj, 2) > GET_OBJ_VAL(obj, 1))
       {
-        new_send_to_char(ch, "The staff is overcharged and explodes!\r\n");
+        ch->Send( "The staff is overcharged and explodes!\r\n");
         act("$n overcharges $p and it explodes!", TRUE, ch, obj, 0, TO_ROOM);
         explode = dice(GET_OBJ_VAL(obj, 2), 3);
         extract_obj(obj);
@@ -1409,14 +1409,14 @@ ASPELL(spell_recharge)
       }
       else
       {
-        new_send_to_char(ch, "You restore %d charges to the staff.\r\n",
+        ch->Send( "You restore %d charges to the staff.\r\n",
                          restored_charges);
         return;
       }
     }
     else
     {
-      new_send_to_char(ch,"That item is already at full charges!\r\n");
+      ch->Send("That item is already at full charges!\r\n");
       return;
     }
   }
@@ -1465,15 +1465,15 @@ ASPELL(spell_knock)
 
   if (cnt == 0)
   {
-    new_send_to_char(ch, "The room grows chilly, but nothing seems to happen.\r\n");
+    ch->Send( "The room grows chilly, but nothing seems to happen.\r\n");
   }
   } else {
     if (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) {
-      new_send_to_char(ch, "You can't cast knock on %s\r\n", obj->short_description);
+      ch->Send( "You can't cast knock on %s\r\n", obj->short_description);
     } else if (!OBJVAL_FLAGGED(obj, CONT_CLOSEABLE) || !OBJVAL_FLAGGED(obj, CONT_CLOSED)) {
-      new_send_to_char(ch, "%s is wide open!\r\n", obj->short_description);
+      ch->Send( "%s is wide open!\r\n", obj->short_description);
     } else if (!OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {
-      new_send_to_char(ch, "%s resists your magic.\r\n", obj->short_description);
+      ch->Send( "%s resists your magic.\r\n", obj->short_description);
     } else if (GET_SKILL(ch, SPELL_KNOCK) > number(1, 130)) {
       if (OBJVAL_FLAGGED(obj, CONT_LOCKED))
         TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED);

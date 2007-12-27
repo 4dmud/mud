@@ -35,11 +35,11 @@ int Obj_to_store_from(struct obj_data *obj, FILE * fl, int locate);
 struct obj_data *Obj_from_store_to(struct obj_file_elem obj, int *locate);
 struct obj_data *Obj_from_store(struct obj_file_elem object,
                                       int *location);
-void House_listrent(struct char_data *ch, room_vnum vnum);
+void House_listrent(Character *ch, room_vnum vnum);
 void count_items_in_list(struct obj_data *obj);
 int house_item_count(room_vnum vnum);
-void hcontrol_set_mount(struct char_data *ch, char *arg);
-void house_load_mount(struct char_data *ch, int i);
+void hcontrol_set_mount(Character *ch, char *arg);
+void house_load_mount(Character *ch, int i);
 struct house_control_rec house_control[MAX_HOUSES];
 int num_of_houses = 0;
 
@@ -51,17 +51,17 @@ void House_restore_weight(struct obj_data *obj);
 void House_delete_file(int vnum);
 int find_house(room_vnum vnum);
 void House_save_control(void);
-void hcontrol_list_houses(struct char_data *ch);
-void hcontrol_build_house(struct char_data *ch, char *arg);
-void hcontrol_destroy_house(struct char_data *ch, char *arg);
-void hcontrol_pay_house(struct char_data *ch, char *arg);
+void hcontrol_list_houses(Character *ch);
+void hcontrol_build_house(Character *ch, char *arg);
+void hcontrol_destroy_house(Character *ch, char *arg);
+void hcontrol_pay_house(Character *ch, char *arg);
 ACMD(do_hcontrol);
 ACMD(do_house);
 int old_house_load(room_rnum rnum, FILE *fl);
 
 /** new house save stuff **/
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate);
-int relocate_obj(room_rnum rnum, CHAR_DATA *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row);
+int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_DATA **cont_row);
 int load_objects_to_room(room_rnum rnum, FILE *fl);
 int save_one_item( OBJ_DATA *obj, FILE *fl, int locate);
 
@@ -464,7 +464,7 @@ void House_delete_file(int vnum)
 
 
 /* List all objects in a house file */
-void House_listrent(struct char_data *ch, room_vnum vnum)
+void House_listrent(Character *ch, room_vnum vnum)
 {
   FILE *fl;
   char filename[MAX_STRING_LENGTH];
@@ -476,7 +476,7 @@ void House_listrent(struct char_data *ch, room_vnum vnum)
     return;
   if (!(fl = fopen(filename, "rb")))
   {
-    new_send_to_char(ch, "No objects on file for house #%d.\r\n", vnum);
+    ch->Send( "No objects on file for house #%d.\r\n", vnum);
     return;
   }
   *buf = '\0';
@@ -500,7 +500,7 @@ void House_listrent(struct char_data *ch, room_vnum vnum)
       if (real_object(object.item_number) > -1)
       {
         obj = read_object(object.item_number, VIRTUAL);
-        new_send_to_char(ch,  "[%5d] (%5dau) %s\r\n",
+        ch->Send(  "[%5d] (%5dau) %s\r\n",
                          GET_OBJ_VNUM(obj), GET_OBJ_RENT(obj),
                          obj->short_description);
         free_obj(obj, FALSE);
@@ -636,7 +636,7 @@ const char *HCONTROL_FORMAT =
   "       hcontrol expand <house vnum> <number of gold tokens paid>\r\n";
 //"       hcontrol size <house vnum> <additional amount of items to hold (base is 500)>\r\n";
 
-void hcontrol_list_houses(struct char_data *ch)
+void hcontrol_list_houses(Character *ch)
 {
   ush_int i;
   char *timestr, *temp;
@@ -647,9 +647,9 @@ void hcontrol_list_houses(struct char_data *ch)
     send_to_char("No houses have been defined.\r\n", ch);
     return;
   }
-  new_send_to_char(ch,
+  ch->Send(
                    "Address  Atrium  Build Date  Guests  Owner        ExpandedSize Items Mount\r\n");
-  new_send_to_char(ch,
+  ch->Send(
                    "-------  ------  ----------  ------  ------------ ------------ ----- -----\r\n");
 
   for (i = 0; i < num_of_houses; i++)
@@ -679,7 +679,7 @@ void hcontrol_list_houses(struct char_data *ch)
     /* Now we need a copy of the owner's name to capitalize. -gg 6/21/98 */
     strcpy(own_name, temp);
 
-    new_send_to_char(ch,  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-5ld\r\n",
+    ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-5ld\r\n",
                      house_control[i].vnum, house_control[i].atrium, built_on,
                      house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 125),
                      house_item_count(house_control[i].vnum), house_control[i].mount);
@@ -690,7 +690,7 @@ void hcontrol_list_houses(struct char_data *ch)
 
 
 
-void hcontrol_build_house(struct char_data *ch, char *arg)
+void hcontrol_build_house(Character *ch, char *arg)
 {
   char arg1[MAX_INPUT_LENGTH];
   struct house_control_rec temp_house;
@@ -733,12 +733,12 @@ void hcontrol_build_house(struct char_data *ch, char *arg)
   }
   if ((exit_num = search_block(arg1, dirs, FALSE)) < 0)
   {
-    new_send_to_char(ch,  "'%s' is not a valid direction.\r\n", arg1);
+    ch->Send(  "'%s' is not a valid direction.\r\n", arg1);
     return;
   }
   if (TOROOM(real_house, exit_num) == NULL)
   {
-    new_send_to_char(ch,  "There is no exit %s from room %d.\r\n",
+    ch->Send(  "There is no exit %s from room %d.\r\n",
                      dirs[exit_num], virt_house);
     return;
   }
@@ -761,7 +761,7 @@ void hcontrol_build_house(struct char_data *ch, char *arg)
   }
   if ((owner = get_id_by_name(arg1)) < 0)
   {
-    new_send_to_char(ch,  "Unknown player '%s'.\r\n", arg1);
+    ch->Send(  "Unknown player '%s'.\r\n", arg1);
     return;
   }
 
@@ -789,7 +789,7 @@ void hcontrol_build_house(struct char_data *ch, char *arg)
 
 
 
-void hcontrol_destroy_house(struct char_data *ch, char *arg)
+void hcontrol_destroy_house(Character *ch, char *arg)
 {
   int i, j;
   room_rnum real_atrium, real_house;
@@ -841,7 +841,7 @@ void hcontrol_destroy_house(struct char_data *ch, char *arg)
 }
 
 
-void hcontrol_pay_house(struct char_data *ch, char *arg)
+void hcontrol_pay_house(Character *ch, char *arg)
 {
   int i;
 
@@ -860,7 +860,7 @@ void hcontrol_pay_house(struct char_data *ch, char *arg)
   }
 }
 
-void hcontrol_calc_house(struct char_data *ch, char *arg)
+void hcontrol_calc_house(Character *ch, char *arg)
 {
   room_rnum vroom;
   int rent = 0, i;
@@ -878,7 +878,7 @@ void hcontrol_calc_house(struct char_data *ch, char *arg)
   for (obj = vroom->contents; obj; obj = obj->next_content)
     rent += obj->obj_flags.cost;
 
-  new_send_to_char(ch, "Current rent for %d is %d gold coins.\r\n",
+  ch->Send( "Current rent for %d is %d gold coins.\r\n",
                    house_control[i].vnum, rent);
   return;
 }
@@ -998,7 +998,7 @@ void House_save_all(void)
 
 
 /* note: arg passed must be house vnum, so there. */
-int House_can_enter(struct char_data *ch, room_vnum house)
+int House_can_enter(Character *ch, room_vnum house)
 {
   int i, j;
 
@@ -1018,11 +1018,11 @@ int House_can_enter(struct char_data *ch, room_vnum house)
   return (0);
 }
 
-void house_expand_house(struct char_data *ch, int house) {
+void house_expand_house(Character *ch, int house) {
 
 }
 
-void hcontrol_expand_house(struct char_data *ch, char *argument)
+void hcontrol_expand_house(Character *ch, char *argument)
 {
 
   int i = 0, house = 0, amount = 0;
@@ -1030,7 +1030,7 @@ void hcontrol_expand_house(struct char_data *ch, char *argument)
   
   if (!argument || !*argument)
   {
-  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
                    "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
     return;
   }
@@ -1038,7 +1038,7 @@ void hcontrol_expand_house(struct char_data *ch, char *argument)
   
   if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
   {
-  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
                    "To remove expantions:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
     return;
   }
@@ -1047,7 +1047,7 @@ void hcontrol_expand_house(struct char_data *ch, char *argument)
   if (!is_number(arg2))
   {
     
-  new_send_to_char(ch, "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
                    "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 125 sized units>\r\n");
       return;
     
@@ -1058,19 +1058,19 @@ void hcontrol_expand_house(struct char_data *ch, char *argument)
   
   if (house <= 0 )
   {
-    new_send_to_char(ch, "Positive numbers please.\r\n");
+    ch->Send( "Positive numbers please.\r\n");
     return;
   }
   
   if ((i = find_house(house)) == NOWHERE)
   {
-    new_send_to_char(ch, "That house doesn't seem to be in the house list.\r\n");
+    ch->Send( "That house doesn't seem to be in the house list.\r\n");
     return;
   }
   
 
     house_control[i].expantions += (long)amount;
-new_send_to_char(ch, "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, get_name_by_id(house_control[i].owner), house_capacity(i));
+ch->Send( "%d units of 125 added to house %d (owner: %s) new capacity %d\r\n", amount, house, get_name_by_id(house_control[i].owner), house_capacity(i));
 
   
   House_save_control();
@@ -1079,7 +1079,7 @@ new_send_to_char(ch, "%d units of 125 added to house %d (owner: %s) new capacity
 int house_capacity(int house) {
   return 500 + (125 * house_control[house].expantions);
 }
-void hcontrol_set_mount(struct char_data *ch, char *argument)
+void hcontrol_set_mount(Character *ch, char *argument)
 {
   mob_vnum mount = NOBODY;
   room_vnum house = NOWHERE;
@@ -1089,7 +1089,7 @@ void hcontrol_set_mount(struct char_data *ch, char *argument)
 
   if (!argument || !*argument)
   {
-    new_send_to_char(ch, "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
+    ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
                      "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
     return;
   }
@@ -1097,7 +1097,7 @@ void hcontrol_set_mount(struct char_data *ch, char *argument)
 
   if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
   {
-    new_send_to_char(ch, "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
+    ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
                      "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
     return;
   }
@@ -1111,7 +1111,7 @@ void hcontrol_set_mount(struct char_data *ch, char *argument)
     }
     else
     {
-      new_send_to_char(ch, "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
+      ch->Send( "To add a mount: \r\nhcontrol mount <house vnum> <mount vnum>\r\n"
                        "To remove the mount:\r\nhcontrol mount <house vnum> none\r\n");
       return;
     }
@@ -1123,19 +1123,19 @@ void hcontrol_set_mount(struct char_data *ch, char *argument)
 
   if (house <= 0 || (!remove && mount <= 0))
   {
-    new_send_to_char(ch, "Positive numbers please.\r\n");
+    ch->Send( "Positive numbers please.\r\n");
     return;
   }
 
   if ((i = find_house(house)) == NOWHERE)
   {
-    new_send_to_char(ch, "That house doesn't seem to be in the house list.\r\n");
+    ch->Send( "That house doesn't seem to be in the house list.\r\n");
     return;
   }
 
   if (!remove && real_mobile(mount) == NOBODY)
   {
-    new_send_to_char(ch, "That mount doesn't exist...yet :)\r\n");
+    ch->Send( "That mount doesn't exist...yet :)\r\n");
     return;
   }
 
@@ -1143,28 +1143,28 @@ void hcontrol_set_mount(struct char_data *ch, char *argument)
   {
     house_control[i].mount = 0l;
 
-    new_send_to_char(ch, "Mount has been removerized.\r\n");
+    ch->Send( "Mount has been removerized.\r\n");
     return;
   }
   else
   {
     house_control[i].mount = (long)mount;
-    new_send_to_char(ch, "Mount %d added to house %d (owner: %s)\r\n", mount, house, get_name_by_id(house_control[i].owner));
+    ch->Send( "Mount %d added to house %d (owner: %s)\r\n", mount, house, get_name_by_id(house_control[i].owner));
   }
 
   House_save_control();
 }
-void house_load_mount(struct char_data *ch, int i)
+void house_load_mount(Character *ch, int i)
 {
   struct follow_type *f, *f_next;
-  struct char_data *pet, *next_ch, *tch;
+  Character *pet, *next_ch, *tch;
   mob_vnum mount = 0;
 
   if (i < 0)
     return;
   if ((mount = house_control[i].mount) == 0)
   {
-    new_send_to_char(ch, "You haven't brought a mount for this house.\r\n");
+    ch->Send( "You haven't brought a mount for this house.\r\n");
     return;
   }
 
@@ -1178,12 +1178,12 @@ void house_load_mount(struct char_data *ch, int i)
     {
       if (HERE(tch, ch))
       {
-        new_send_to_char(ch, "It is already here and following you!\r\n");
+        ch->Send( "It is already here and following you!\r\n");
         return;
       }
       else
       {
-        new_send_to_char(ch,
+        ch->Send(
                          "Mount is already following you, but isn't here. Transfering...\r\n");
         act("$n appears with an implosion of glittery pink sparkles.", FALSE, tch, 0, 0, TO_ROOM);
         move_char_to(tch, IN_ROOM(ch));
@@ -1199,9 +1199,9 @@ void house_load_mount(struct char_data *ch, int i)
     if (GET_MOB_VNUM(tch) != mount)
       continue;
 
-    new_send_to_char(ch, "A mount of yours was found running free!\r\n");
+    ch->Send( "A mount of yours was found running free!\r\n");
     act("A frenzy of pink sparkles consumes $n.", FALSE, tch, 0, 0, TO_ROOM);
-    new_send_to_char(ch,"It was destroyed gracefully... allowing you to have a new one now.\r\n");
+    ch->Send("It was destroyed gracefully... allowing you to have a new one now.\r\n");
     extract_char(tch);
 
   }
@@ -1225,7 +1225,7 @@ void house_load_mount(struct char_data *ch, int i)
 }
 
 
-void House_list_guests(struct char_data *ch, int i, int quiet)
+void House_list_guests(Character *ch, int i, int quiet)
 {
   int j;
   char *temp;
@@ -1237,7 +1237,7 @@ void House_list_guests(struct char_data *ch, int i, int quiet)
     return;
   }
 
-  new_send_to_char(ch,  "  Guests: ");
+  ch->Send(  "  Guests: ");
 
   /* Avoid <UNDEF>. -gg 6/21/98 */
   for (j = 0; j < house_control[i].num_of_guests; j++)
@@ -1246,8 +1246,8 @@ void House_list_guests(struct char_data *ch, int i, int quiet)
     {
       continue;
     }
-    new_send_to_char(ch, "%s ", temp);
+    ch->Send( "%s ", temp);
   }
 
-  new_send_to_char(ch,  "\r\n");
+  ch->Send(  "\r\n");
 }

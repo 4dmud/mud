@@ -25,31 +25,31 @@
 #include "fight.h"
 
 /* extern variables */
-int can_fight(struct char_data *ch, struct char_data *vict, int silent);
+int can_fight(Character *ch, Character *vict, int silent);
 
 
 /* extern functions */
-void raw_kill(struct char_data *ch, struct char_data *killer);
-int perform_move(struct char_data *ch, int dir, int specials_check);
+void raw_kill(Character *ch, Character *killer);
+int perform_move(Character *ch, int dir, int specials_check);
 struct ignore *find_ignore(struct ignore *ignore_list, char *str);
-void write_ignorelist(struct char_data *ch);
-int compute_armor_class(struct char_data *ch);
-void print_ignorelist(struct char_data *ch, struct char_data *vict);
-int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
+void write_ignorelist(Character *ch);
+int compute_armor_class(Character *ch);
+void print_ignorelist(Character *ch, Character *vict);
+int fe_after_damage(Character* ch, Character* vict, int damage, int w_type);
 //
 /* Daniel Houghton's revised external functions */
-int skill_roll(struct char_data *ch, int skill_num);
-void strike_missile(struct char_data *ch, struct char_data *tch,
+int skill_roll(Character *ch, int skill_num);
+void strike_missile(Character *ch, Character *tch,
                     struct obj_data *missile, int dir, int attacktype);
-void miss_missile(struct char_data *ch, struct char_data *tch,
+void miss_missile(Character *ch, Character *tch,
                   struct obj_data *missile, int dir, int attacktype);
-void mob_reaction(struct char_data *ch, struct char_data *vict, int dir);
-void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
+void mob_reaction(Character *ch, Character *vict, int dir);
+void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
                   struct obj_data *missile, int pos, int range, int dir);
-void check_killer(struct char_data *ch, struct char_data *vict);
-int computer_armor_class(struct char_data *ch);
-int arena_ok(struct char_data *ch, struct char_data *victim);
-void improve_skill(struct char_data *ch, int skill);
+void check_killer(Character *ch, Character *vict);
+int computer_armor_class(Character *ch);
+int arena_ok(Character *ch, Character *victim);
+void improve_skill(Character *ch, int skill);
 
 
 
@@ -65,15 +65,15 @@ ACMD(do_rescue);
 ACMD(do_kick);
 ACMD(do_slay);
 ACMD(do_trample);
-void send_not_to_spam(char *buf, struct char_data *ch,
-                      struct char_data *victim, struct obj_data *weap,
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
                       int spam);
-void perform_assist(struct char_data *ch, struct char_data *helpee);
+void perform_assist(Character *ch, Character *helpee);
 
 
 ACMD(do_assist)
 {
-  struct char_data *helpee;
+  Character *helpee;
   char arg[MAX_INPUT_LENGTH];
 
   if (FIGHTING(ch))
@@ -88,7 +88,7 @@ ACMD(do_assist)
   if (!*arg)
     send_to_char("Whom do you wish to assist?\r\n", ch);
   else if (!(helpee = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (helpee == ch)
     send_to_char("You can't help yourself any more than this!\r\n",
                  ch);
@@ -96,9 +96,9 @@ ACMD(do_assist)
     perform_assist(ch, helpee);
 }
 
-void perform_assist(struct char_data *ch, struct char_data *helpee)
+void perform_assist(Character *ch, Character *helpee)
 {
-  struct char_data  *opponent;
+  Character  *opponent;
 
 
   /*
@@ -143,7 +143,7 @@ void perform_assist(struct char_data *ch, struct char_data *helpee)
 
 ACMD(do_hit)
 {
-  struct char_data *vict;
+  Character *vict;
   char arg[MAX_INPUT_LENGTH];
 
   one_argument(argument, arg);
@@ -189,7 +189,7 @@ ACMD(do_hit)
             continue;
 
           act("{cg$n engages in combat with $N.{c0",FALSE, ch, NULL, vict, TO_ROOM);
-          new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
+          ch->Send( "You engage in combat with %s!\r\n", GET_NAME(vict));
           if (!FIGHTING(ch))
           {
             start_fighting(ch, vict);
@@ -254,7 +254,7 @@ ACMD(do_hit)
   if (!FIGHTING(ch))
   {
     send_not_to_spam( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 1);
-    new_send_to_char(ch, "You engage in combat with %s!\r\n", GET_NAME(vict));
+    ch->Send( "You engage in combat with %s!\r\n", GET_NAME(vict));
     start_fighting(ch, vict);
   }
   else
@@ -265,7 +265,7 @@ ACMD(do_hit)
 
 ACMD(do_slay)
 {
-  struct char_data *vict;
+  Character *vict;
   char arg2[MAX_INPUT_LENGTH];
   char arg[MAX_INPUT_LENGTH];
 
@@ -283,7 +283,7 @@ ACMD(do_slay)
       send_to_char("Your mother would be so sad.. :(\r\n", ch);
     else if (GET_LEVEL(ch)<GET_LEVEL(vict) && !IS_NPC(vict))
     {
-      new_send_to_char(ch, "You chop %s to pieces, but %s reforms immediately and slices your throat!\r\n", GET_NAME(vict), HSSH(vict));
+      ch->Send( "You chop %s to pieces, but %s reforms immediately and slices your throat!\r\n", GET_NAME(vict), HSSH(vict));
       vict = ch;
     }
     else if (!str_cmp(arg2, "skin"))
@@ -370,7 +370,7 @@ ACMD(do_order)
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   bool found = FALSE;
   room_rnum org_room;
-  struct char_data *vict;
+  Character *vict;
   struct follow_type *k;
   char buf[MAX_INPUT_LENGTH];
 
@@ -404,7 +404,7 @@ ACMD(do_order)
             TO_ROOM);
       else
       {
-        new_send_to_char(ch, "%s", CONFIG_OK);
+        ch->Send( "%s", CONFIG_OK);
         command_interpreter(vict, message);
       }
     }
@@ -425,7 +425,7 @@ ACMD(do_order)
           }
       }
       if (found)
-        new_send_to_char(ch, "%s", CONFIG_OK);
+        ch->Send( "%s", CONFIG_OK);
       else
         send_to_char
         ("Nobody here is a loyal subject of yours!\r\n", ch);
@@ -438,8 +438,8 @@ ACMD(do_order)
 ACMD(do_flee)
 {
   int i, attempt, loss;
-  struct char_data *was_fighting;
-  void halt_fighting(struct char_data *ch);
+  Character *was_fighting;
+  void halt_fighting(Character *ch);
 
   if (AFF_FLAGGED(ch, AFF_HOLD))
   {
@@ -478,8 +478,8 @@ ACMD(do_flee)
         if (was_fighting && !DEAD(was_fighting) && !IS_NPC(ch) && IS_NPC(was_fighting) &&
             !(GET_LEVEL(ch) <= 20 && REMORTS(ch) == 0))
         {
-          loss = IRANGE(0, GET_EXP(was_fighting) * 0.3, CONFIG_MAX_EXP_LOSS * 5);
-          new_send_to_char(ch, "[You lose %d exp]\r\n", loss);
+          loss = FTOI(IRANGE(0, GET_EXP(was_fighting) * 0.3, CONFIG_MAX_EXP_LOSS * 5));
+          ch->Send( "[You lose %d exp]\r\n", loss);
           gain_exp(ch, -loss);
         }
       }
@@ -548,7 +548,7 @@ ACMD(do_shoot)
 
   if (!holding || holding < 0)
   {
-    new_send_to_char(ch, "Snap Its Broken! It probably has the wrong kinda ammo in it.\r\n");
+    ch->Send( "Snap Its Broken! It probably has the wrong kinda ammo in it.\r\n");
     return;
   }
 
@@ -699,7 +699,7 @@ ACMD(do_throw)
 
 ACMD(do_ignore)
 {
-  struct char_data *victim;
+  Character *victim;
   struct ignore *a, *temp;
   char arg[MAX_INPUT_LENGTH];
 
@@ -707,24 +707,24 @@ ACMD(do_ignore)
 
   if (!*arg)
   {
-    new_send_to_char(ch, "SYNTAX: ignore <victim>\r\n");
-    new_send_to_char(ch, "Currently on your list:\r\n");
+    ch->Send( "SYNTAX: ignore <victim>\r\n");
+    ch->Send( "Currently on your list:\r\n");
     print_ignorelist(ch, ch);
   }
   else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
   {
     REMOVE_FROM_LIST(a, GET_IGNORELIST(ch), next);
-    new_send_to_char(ch, "You no longer ignore them.\r\n");
+    ch->Send( "You no longer ignore them.\r\n");
     free(a->ignore);
     free(a);
     write_ignorelist(ch);
   }
   else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (victim == ch)
-    new_send_to_char(ch, "Ignore yourself?  Go seek help!\r\n");
+    ch->Send( "Ignore yourself?  Go seek help!\r\n");
   else if (IS_NPC(victim))
-    new_send_to_char(ch, "No ignoring monsters.  That isn't nice.\r\n");
+    ch->Send( "No ignoring monsters.  That isn't nice.\r\n");
 
   else
   {
@@ -732,7 +732,7 @@ ACMD(do_ignore)
     a->ignore = str_dup(arg);
     a->next = GET_IGNORELIST(ch);
     GET_IGNORELIST(ch) = a;
-    new_send_to_char(ch, "%s", CONFIG_OK);
+    ch->Send( "%s", CONFIG_OK);
     write_ignorelist(ch);
   }
 }
@@ -756,20 +756,20 @@ ACMD(do_ignore)
           && !(AFF_FLAGGED(ch, AFF_PROT_FIRE))) {
           gain += BURN_DAMAGE*3;
           if (!IS_NPC(ch))
-          new_send_to_char(ch, "{crYour skin burns!{c0\r\n");
+          ch->Send( "{crYour skin burns!{c0\r\n");
           }
           
          if (AFF_FLAGGED(ch, AFF_FREEZING)
           && !(AFF_FLAGGED(ch, AFF_PROT_COLD))) {
           gain += BURN_DAMAGE*3;
           if (!IS_NPC(ch))
-          new_send_to_char(ch, "{cCYou shiver with cold!{c0\r\n");
+          ch->Send( "{cCYou shiver with cold!{c0\r\n");
           }
          if (AFF_FLAGGED(ch, AFF_ACIDED)
           && !(AFF_FLAGGED(ch, AFF_STONESKIN))) {
           gain += BURN_DAMAGE*3;
           if (!IS_NPC(ch))
-          new_send_to_char(ch, "{cgYou skin bubbles with concentrated acid!{c0\r\n");
+          ch->Send( "{cgYou skin bubbles with concentrated acid!{c0\r\n");
           }
          
     if (AFF_FLAGGED(ch, AFF_POISON_1))

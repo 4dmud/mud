@@ -25,7 +25,7 @@
 /* Externals */
 ACMD(do_say);
 /* External functions */
-void improve_skill(struct char_data *ch, int skill);
+void improve_skill(Character *ch, int skill);
 
 /* Local functions */
 int VALID_EDGE(room_rnum x, int y);
@@ -34,7 +34,7 @@ void bfs_dequeue(void);
 void bfs_clear_queue(void);
 int find_first_step(room_rnum src, room_rnum target);
 ACMD(do_track);
-void hunt_victim(struct char_data *ch);
+void hunt_victim(Character *ch);
 
 struct bfs_queue_struct {
     room_rnum room;
@@ -161,7 +161,7 @@ int find_first_step(room_rnum src, room_rnum target)
 
 ACMD(do_track)
 {
-    struct char_data *vict;
+    Character *vict;
     int dir;
     char arg[MAX_INPUT_LENGTH];
 
@@ -193,7 +193,7 @@ ACMD(do_track)
 	do {
 	    dir = number(0, NUM_OF_DIRS - 1);
 	} while (!CAN_GO(ch, dir) && --tries);
-	new_send_to_char(ch, "You sense a trail %s from here!\r\n", dirs[dir]);
+	ch->Send( "You sense a trail %s from here!\r\n", dirs[dir]);
 	improve_skill(ch, SKILL_TRACK);
 	return;
     }
@@ -209,20 +209,20 @@ ACMD(do_track)
 	send_to_char("You're already in the same room!!\r\n", ch);
 	break;
     case BFS_NO_PATH:
-	new_send_to_char(ch, "You can't sense a trail to %s from here.\r\n",HMHR(vict));
+	ch->Send( "You can't sense a trail to %s from here.\r\n",HMHR(vict));
 	break;
     default:			/* Success! */
-	new_send_to_char(ch, "You sense a trail %s from here!\r\n", dirs[dir]);
+	ch->Send( "You sense a trail %s from here!\r\n", dirs[dir]);
 	break;
     }
 }
 
 
-void hunt_victim(struct char_data *ch)
+void hunt_victim(Character *ch)
 {
 int dir;
 byte found;
-struct char_data *tmp;
+Character *tmp;
 char tbuf[MAX_STRING_LENGTH];
 
  if (!ch || !HUNTING(ch) || FIGHTING(ch) || ch == HUNTING(ch))

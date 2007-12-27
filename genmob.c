@@ -19,16 +19,16 @@
 #include "htree.h"
 
 
-int update_mobile_strings(struct char_data *t, struct char_data *f);
-void check_mobile_strings(struct char_data *mob);
+int update_mobile_strings(Character *t, Character *f);
+void check_mobile_strings(Character *mob);
 void check_mobile_string(mob_vnum i, char **string, const char *dscr);
-int write_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);
-int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd);
-int write_mobile_links(mob_vnum mvnum, struct char_data *mob, FILE *fd);
-int free_mobile_strings(struct char_data *mob);
-int copy_mobile_strings(struct char_data *t, struct char_data *f);
+int write_mobile_record(mob_vnum mvnum, Character *mob, FILE *fd);
+int write_mobile_espec(mob_vnum mvnum, Character *mob, FILE *fd);
+int write_mobile_links(mob_vnum mvnum, Character *mob, FILE *fd);
+int free_mobile_strings(Character *mob);
+int copy_mobile_strings(Character *t, Character *f);
 #if CONFIG_GENOLC_MOBPROG
-int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd);
+int write_mobile_mobprog(mob_vnum mvnum, Character *mob, FILE *fd);
 #endif
 
 float m_powf(float x, float y);
@@ -51,13 +51,13 @@ void assign_mob_stats(void)
     s[3] = i;
     s[4] = MAX(40, (i * i * i)/35) + 150;
     //Damroll
-    s[5] = MAX(1, (i*0.3) + (i*0.2));
-    s[6] = MAX(2, (i*0.25) + (i*0.2));
-    s[7] = m_powf(i, (i*0.0026)+1.35);//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
+    s[5] = MAX(1, FTOI((i*0.3) + (i*0.2)));
+    s[6] = MAX(2, FTOI((i*0.25) + (i*0.2)));
+    s[7] = FTOI(m_powf(i, (i*0.0026)+1.35));//(i >= 10) ? (i * i * i * (0.0036 + (i>=60?0.01:0.0))) : (i);
 
-    s[8] =  (i * i * i * 15) + 200; /* exp */
-    s[9] = (i * i * i * 1.4); /* gold */
-    s[10] = i * (1.0 + (i * 0.035)); /* hitroll */
+    s[8]  = FTOI((i * i * i * 15) + 200); /* exp */
+    s[9]  = FTOI((i * i * i * 1.4)); /* gold */
+    s[10] = FTOI(i * (1.0 + (i * 0.035))); /* hitroll */
 
     /*-------put it back together--------*/
     mob_stats[i].level 		= s[0];
@@ -68,7 +68,7 @@ void assign_mob_stats(void)
     mob_stats[i].dam_dice 	= s[5];
     mob_stats[i].dam_sides 	= s[6];
     mob_stats[i].dam_bonus 	= s[7];
-    mob_stats[i].exp 		= s[8] + (s[8] * 0.05); /*added 5%*/
+    mob_stats[i].exp 		= FTOI(s[8] + (s[8] * 0.05)); /*added 5%*/
     mob_stats[i].gold 		= s[9];
     mob_stats[i].hitroll 	= s[10];
     log("LEV:%-2d -- HP:%-6d Avg Dam:%-4d X:%-7d G:%-d",
@@ -86,11 +86,11 @@ float dam_avg(int from, int to, int lev)
 
 void smash_tilde(char *str);
 
-int add_mobile(struct char_data *mob, mob_vnum vnum)
+int add_mobile(Character *mob, mob_vnum vnum)
 {
   int rnum, i, found = FALSE, shop, cmd_no;
   zone_rnum zone;
-  struct char_data *live_mob;
+  Character *live_mob;
 
   if ((rnum = real_mobile(vnum)) != NOBODY)
   {
@@ -107,7 +107,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     return rnum;
   }
 
-  RECREATE(mob_proto, struct char_data, top_of_mobt + 2);
+  RECREATE(mob_proto, Character, top_of_mobt + 2);
   RECREATE(mob_index, struct index_data, top_of_mobt + 2);
   top_of_mobt++;
 
@@ -177,7 +177,7 @@ htree_add(mob_htree, mob_index[0].vnum, 0);
   return found;
 }
 
-int copy_mobile(struct char_data *to, struct char_data *from)
+int copy_mobile(Character *to, Character *from)
 {
   free_mobile_strings(to);
   *to = *from;
@@ -188,7 +188,7 @@ int copy_mobile(struct char_data *to, struct char_data *from)
 
 void extract_mobile_all(mob_vnum vnum)
 {
-  struct char_data *next, *ch;
+  Character *next, *ch;
 
   for (ch = character_list; ch; ch = next)
   {
@@ -200,7 +200,7 @@ void extract_mobile_all(mob_vnum vnum)
 
 int delete_mobile(mob_rnum refpt)
 {
-  struct char_data *live_mob;
+  Character *live_mob;
   int counter, cmd_no;
   mob_vnum vnum;
   zone_rnum zone;
@@ -230,7 +230,7 @@ int delete_mobile(mob_rnum refpt)
 
   top_of_mobt--;
   RECREATE(mob_index, struct index_data, top_of_mobt + 1);
-  RECREATE(mob_proto, struct char_data, top_of_mobt + 1);
+  RECREATE(mob_proto, Character, top_of_mobt + 1);
 
   /*
    * Update live mobile rnums.
@@ -256,7 +256,7 @@ int delete_mobile(mob_rnum refpt)
   return refpt;
 }
 
-int copy_mobile_strings(struct char_data *t, struct char_data *f)
+int copy_mobile_strings(Character *t, Character *f)
 {
   if (f->player.name)
     t->player.name = strdup(f->player.name);
@@ -271,7 +271,7 @@ int copy_mobile_strings(struct char_data *t, struct char_data *f)
   return TRUE;
 }
 
-int update_mobile_strings(struct char_data *t, struct char_data *f)
+int update_mobile_strings(Character *t, Character *f)
 {
   if (f->player.name)
     t->player.name = f->player.name;
@@ -286,7 +286,7 @@ int update_mobile_strings(struct char_data *t, struct char_data *f)
   return TRUE;
 }
 
-int free_mobile_strings(struct char_data *mob)
+int free_mobile_strings(Character *mob)
 {
   if (mob->player.name)
     free(mob->player.name);
@@ -305,7 +305,7 @@ int free_mobile_strings(struct char_data *mob)
  * Free a mobile structure that has been edited.
  * Take care of existing mobiles and their mob_proto!
  */
-int free_mobile(struct char_data *mob)
+int free_mobile(Character *mob)
 {
   mob_rnum i;
 
@@ -402,7 +402,7 @@ int save_mobiles(zone_rnum rznum)
 }
 
 #if CONFIG_GENOLC_MOBPROG
-int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd)
+int write_mobile_mobprog(mob_vnum mvnum, Character *mob, FILE *fd)
 {
   char wmmarg[MAX_STRING_LENGTH], wmmcom[MAX_STRING_LENGTH];
   MPROG_DATA *mob_prog;
@@ -424,7 +424,7 @@ int write_mobile_mobprog(mob_vnum mvnum, struct char_data *mob, FILE *fd)
   return TRUE;
 }
 #endif
-int write_mobile_links(mob_vnum mvnum, struct char_data *mob, FILE *fd)
+int write_mobile_links(mob_vnum mvnum, Character *mob, FILE *fd)
 {
   struct combine_data *temp = NULL;
   if ((temp = mob->mob_specials.join_list) != NULL)
@@ -440,7 +440,7 @@ int write_mobile_links(mob_vnum mvnum, struct char_data *mob, FILE *fd)
   return TRUE;
 }
 
-int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
+int write_mobile_espec(mob_vnum mvnum, Character *mob, FILE *fd)
 {
   if (GET_ATTACK(mob) != 0)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));
@@ -471,7 +471,7 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 }
 
 
-int write_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd)
+int write_mobile_record(mob_vnum mvnum, Character *mob, FILE *fd)
 {
 
 
@@ -532,7 +532,7 @@ int write_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd)
   return TRUE;
 }
 
-void check_mobile_strings(struct char_data *mob)
+void check_mobile_strings(Character *mob)
 {
   mob_vnum mvnum = mob_index[mob->nr].vnum;
   check_mobile_string(mvnum, &GET_LDESC(mob), "long description");

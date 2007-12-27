@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/01 11:29:26 $
-*  $Revision: 1.8 $
+*  $Date: 2006/05/21 11:02:26 $
+*  $Revision: 1.9 $
 **************************************************************************/
 
 #include "conf.h"
@@ -140,7 +140,7 @@ int word_check(char *str, char *wordlist)
  *  mob triggers
  */
 
-void random_mtrigger(char_data * ch)
+void random_mtrigger(Character * ch)
 {
   trig_data *t;
 
@@ -163,7 +163,7 @@ void random_mtrigger(char_data * ch)
   }
 }
 
-void bribe_mtrigger(char_data * ch, char_data * actor, int amount)
+void bribe_mtrigger(Character * ch, Character * actor, int amount)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -186,10 +186,10 @@ void bribe_mtrigger(char_data * ch, char_data * actor, int amount)
   }
 }
 
-void greet_memory_mtrigger(char_data * actor)
+void greet_memory_mtrigger(Character * actor)
 {
   trig_data *t;
-  char_data *ch;
+  Character *ch;
   struct script_memory *mem;
   char buf[MAX_INPUT_LENGTH];
   int command_performed = 0;
@@ -253,10 +253,10 @@ void greet_memory_mtrigger(char_data * actor)
 }
 
 
-int greet_mtrigger(char_data * actor, int dir)
+int greet_mtrigger(Character * actor, int dir)
 {
   trig_data *t = NULL;
-  char_data *ch = NULL;
+  Character *ch = NULL;
   char buf[MAX_INPUT_LENGTH];
   int intermediate, final = TRUE;
   if (IN_ROOM(actor) == NULL)
@@ -299,10 +299,10 @@ int greet_mtrigger(char_data * actor, int dir)
 
 **/
 
-void entry_memory_mtrigger(char_data * ch)
+void entry_memory_mtrigger(Character * ch)
 {
   trig_data *t;
-  char_data *actor;
+  Character *actor;
   struct script_memory *mem;
   char buf[MAX_INPUT_LENGTH];
 
@@ -359,7 +359,7 @@ void entry_memory_mtrigger(char_data * ch)
   }
 }
 
-int entry_mtrigger(char_data * ch)
+int entry_mtrigger(Character * ch)
 {
   trig_data *t;
 
@@ -380,9 +380,9 @@ int entry_mtrigger(char_data * ch)
   return 1;
 }
 
-int command_mtrigger(char_data * actor, char *cmd, char *argument)
+int command_mtrigger(Character * actor, char *cmd, char *argument)
 {
-  char_data *ch, *ch_next;
+  Character *ch, *ch_next;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   char *remove_percentage(char *string);
@@ -437,9 +437,9 @@ int command_mtrigger(char_data * actor, char *cmd, char *argument)
 }
 
 
-void speech_mtrigger(char_data * actor, char *str)
+void speech_mtrigger(Character * actor, char *str)
 {
-  char_data *ch, *ch_next;
+  Character *ch, *ch_next;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
   char *remove_percentage(char *string);
@@ -479,8 +479,8 @@ void speech_mtrigger(char_data * actor, char *str)
   }
 }
 
-void act_mtrigger(const char_data * ch, char *str, char_data * actor,
-                  char_data * victim, obj_data * object,
+void act_mtrigger(const Character * ch, char *str, Character * actor,
+                  Character * victim, obj_data * object,
                   obj_data * target, char *arg)
 {
   trig_data *t;
@@ -530,9 +530,9 @@ void act_mtrigger(const char_data * ch, char *str, char_data * actor,
     }
 }
 
-void fight_mtrigger(char_data * ch)
+void fight_mtrigger(Character * ch)
 {
-  struct char_data *actor;
+  Character *actor;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
 
@@ -558,7 +558,7 @@ void fight_mtrigger(char_data * ch)
   }
 }
 
-void time_mtrigger(char_data *ch)
+void time_mtrigger(Character *ch)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -585,9 +585,9 @@ void time_mtrigger(char_data *ch)
 
 
 
-void hitprcnt_mtrigger(char_data * ch)
+void hitprcnt_mtrigger(Character * ch)
 {
-  struct char_data *actor;
+  Character *actor;
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
 
@@ -616,7 +616,7 @@ void hitprcnt_mtrigger(char_data * ch)
 }
 
 
-int receive_mtrigger(char_data * ch, char_data * actor, obj_data * obj)
+int receive_mtrigger(Character * ch, Character * actor, obj_data * obj)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -648,7 +648,7 @@ int receive_mtrigger(char_data * ch, char_data * actor, obj_data * obj)
 }
 
 
-int death_mtrigger(char_data * ch, char_data * actor)
+int death_mtrigger(Character * ch, Character * actor)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -673,7 +673,7 @@ int death_mtrigger(char_data * ch, char_data * actor)
   return 1;
 }
 
-int load_mtrigger(char_data * ch)
+int load_mtrigger(Character * ch)
 {
   trig_data *t;
 
@@ -694,7 +694,7 @@ int load_mtrigger(char_data * ch)
   return 1;
 }
 
-int cast_mtrigger(char_data * actor, char_data * ch, int spellnum)
+int cast_mtrigger(Character * actor, Character * ch, int spellnum)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -725,10 +725,10 @@ int cast_mtrigger(char_data * actor, char_data * ch, int spellnum)
   return 1;
 }
 
-int leave_mtrigger(char_data * actor, int dir)
+int leave_mtrigger(Character * actor, int dir)
 {
   trig_data *t;
-  char_data *ch;
+  Character *ch;
   char buf[MAX_INPUT_LENGTH];
 
   for (ch = IN_ROOM(actor)->people; ch; ch = ch->next_in_room)
@@ -758,10 +758,10 @@ int leave_mtrigger(char_data * actor, int dir)
   return 1;
 }
 
-int door_mtrigger(char_data * actor, int subcmd, int dir)
+int door_mtrigger(Character * actor, int subcmd, int dir)
 {
   trig_data *t;
-  char_data *ch;
+  Character *ch;
   char buf[MAX_INPUT_LENGTH];
 
   for (ch = IN_ROOM(actor)->people; ch; ch = ch->next_in_room)
@@ -840,7 +840,7 @@ int timer_otrigger(struct obj_data *obj)
 }
 
 
-int get_otrigger(obj_data * obj, char_data * actor)
+int get_otrigger(obj_data * obj, Character * actor)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -876,7 +876,7 @@ int get_otrigger(obj_data * obj, char_data * actor)
 }
 
 /* checks for command trigger on specific object. assumes obj has cmd trig */
-int cmd_otrig(obj_data * obj, char_data * actor, char *cmd,
+int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
               char *argument, int type)
 {
   trig_data *t;
@@ -918,7 +918,7 @@ int cmd_otrig(obj_data * obj, char_data * actor, char *cmd,
 }
 
 
-int command_otrigger(char_data * actor, char *cmd, char *argument)
+int command_otrigger(Character * actor, char *cmd, char *argument)
 {
   obj_data *obj, *next;
   int i;
@@ -956,7 +956,7 @@ int command_otrigger(char_data * actor, char *cmd, char *argument)
 }
 
 
-int wear_otrigger(obj_data * obj, char_data * actor, int wh)
+int wear_otrigger(obj_data * obj, Character * actor, int wh)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -994,7 +994,7 @@ int wear_otrigger(obj_data * obj, char_data * actor, int wh)
 }
 
 
-int remove_otrigger(obj_data * obj, char_data * actor)
+int remove_otrigger(obj_data * obj, Character * actor)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1032,7 +1032,7 @@ int remove_otrigger(obj_data * obj, char_data * actor)
 }
 
 
-int drop_otrigger(obj_data * obj, char_data * actor)
+int drop_otrigger(obj_data * obj, Character * actor)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1071,7 +1071,7 @@ int drop_otrigger(obj_data * obj, char_data * actor)
 }
 
 
-int give_otrigger(obj_data * obj, char_data * actor, char_data * victim)
+int give_otrigger(obj_data * obj, Character * actor, Character * victim)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1136,7 +1136,7 @@ int load_otrigger(obj_data * obj)
   return 1;
 }
 
-int cast_otrigger(char_data * actor, obj_data * obj, int spellnum)
+int cast_otrigger(Character * actor, obj_data * obj, int spellnum)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1168,7 +1168,7 @@ int cast_otrigger(char_data * actor, obj_data * obj, int spellnum)
 
 
 /* checks for speech trigger on specific object. assumes obj has speech trig */
-int speech_otrig(obj_data * obj, char_data * actor, char *str, int type)
+int speech_otrig(obj_data * obj, Character * actor, char *str, int type)
 {
   //    struct obj_data *obj, *obj_next;
   trig_data *t;
@@ -1206,7 +1206,7 @@ int speech_otrig(obj_data * obj, char_data * actor, char *str, int type)
 }
 
 
-int speech_otrigger(char_data * actor, char *str)
+int speech_otrigger(Character * actor, char *str)
 {
   obj_data *obj;
   int i;
@@ -1227,7 +1227,7 @@ int speech_otrigger(char_data * actor, char *str)
   return (0);
 }
 
-int leave_otrigger(room_data *room, char_data *actor, int dir)
+int leave_otrigger(room_data *room, Character *actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1263,7 +1263,7 @@ int leave_otrigger(room_data *room, char_data *actor, int dir)
   return final;
 }
 /* this needs to start a script running, and at the end of the script, call the assemble function - mord*/
-int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd) {
+int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd) {
   //  trig_data *t;
   //char buf[MAX_INPUT_LENGTH];
   int ret_val = 0;
@@ -1289,7 +1289,7 @@ int assemble_otrigger(obj_vnum lVnum, struct char_data *ch, int subcmd, int cmd)
     return ret_val;
 }
 
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd)
+int consume_otrigger(obj_data *obj, Character *actor, int cmd)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1395,7 +1395,7 @@ void random_wtrigger(struct room_data *room)
 }
 
 
-int enter_wtrigger(struct room_data *room, char_data * actor, int dir)
+int enter_wtrigger(struct room_data *room, Character * actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1425,7 +1425,7 @@ int enter_wtrigger(struct room_data *room, char_data * actor, int dir)
 }
 
 
-int command_wtrigger(char_data * actor, char *cmd, char *argument)
+int command_wtrigger(Character * actor, char *cmd, char *argument)
 {
   struct room_data *room;
   trig_data *t;
@@ -1473,7 +1473,7 @@ int command_wtrigger(char_data * actor, char *cmd, char *argument)
 }
 
 
-void speech_wtrigger(char_data * actor, char *str)
+void speech_wtrigger(Character * actor, char *str)
 {
   struct room_data *room;
   trig_data *t;
@@ -1512,7 +1512,7 @@ void speech_wtrigger(char_data * actor, char *str)
   }
 }
 
-int drop_wtrigger(obj_data * obj, char_data * actor)
+int drop_wtrigger(obj_data * obj, Character * actor)
 {
   struct room_data *room;
   trig_data *t;
@@ -1546,7 +1546,7 @@ int drop_wtrigger(obj_data * obj, char_data * actor)
 }
 
 
-int cast_wtrigger(char_data * actor, char_data * vict, obj_data * obj,
+int cast_wtrigger(Character * actor, Character * vict, obj_data * obj,
                   int spellnum)
 {
   room_data *room;
@@ -1582,7 +1582,7 @@ int cast_wtrigger(char_data * actor, char_data * vict, obj_data * obj,
 }
 
 
-int leave_wtrigger(struct room_data *room, char_data * actor, int dir)
+int leave_wtrigger(struct room_data *room, Character * actor, int dir)
 {
   trig_data *t;
   char buf[MAX_INPUT_LENGTH];
@@ -1609,7 +1609,7 @@ int leave_wtrigger(struct room_data *room, char_data * actor, int dir)
   return 1;
 }
 
-int door_wtrigger(char_data * actor, int subcmd, int dir)
+int door_wtrigger(Character * actor, int subcmd, int dir)
 {
   room_data *room;
   trig_data *t;

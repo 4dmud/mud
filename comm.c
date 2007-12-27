@@ -170,7 +170,7 @@ void send_out_signals(struct descriptor_data *d);
 void turn_on_mxp (DESCRIPTOR_DATA *d);
 int count_mxp_tags (const int bMXP, const char *txt, int length);
 void convert_mxp_tags (const int bMXP, char * dest, const char *src, size_t lenn);
-char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn);
+char * parse_prompt(Character *ch, char *str, size_t lenn);
 void clear_char_q(struct descriptor_data *t);
 RETSIGTYPE reread_wizlists(int sig);
 RETSIGTYPE unrestrict_game(int sig);
@@ -271,9 +271,9 @@ int real_zone(int number);
 int isbanned(char *hostname);
 void free_messages(void);
 void update_spell_wait(void);
-int restrict_check(const struct char_data *ch);
+int restrict_check(const Character *ch);
 void Board_clear_all(void);
-int has_note(CHAR_DATA *ch, int type);
+int has_note(Character *ch, int type);
 void thefree_social_messages(void);
 void free_ban_list(void);
 void free_vehicles(void);
@@ -702,7 +702,7 @@ void copyover_recover(void)
 
     /* Now, find the pfile */
 
-    CREATE(d->character, struct char_data, 1);
+    CREATE(d->character, Character, 1);
     CREATE(d->character->player_specials, struct player_special_data,        1);
     clear_char(d->character);
     d->character->desc = d;
@@ -1475,8 +1475,10 @@ void heartbeat(int heart_pulse)
 #endif
 }
 
+
+
 //Mordecais altered send_to_char
-size_t new_send_to_char(struct char_data *ch, const char *messg, ...)
+size_t new_send_to_char(Character *ch, const char *messg, ...)
 {
   if (ch && ch->desc && messg && *messg)
   {
@@ -1491,14 +1493,14 @@ size_t new_send_to_char(struct char_data *ch, const char *messg, ...)
   return 0;
 }
 
-size_t send_to_fusion(struct char_data *ch, const char *messg, ...)
+size_t send_to_fusion(Character *ch, const char *messg, ...)
 {
   if (FUSED_TO(ch) && messg && *messg)
   {
     size_t left = 0;
     va_list args;
     int i = 0;
-    CHAR_DATA *fuse, *tmpfuse;
+    Character *fuse, *tmpfuse;
 
     fuse = (FUSED_TO(ch));
     tmpfuse = fuse;
@@ -2638,7 +2640,7 @@ int process_output(struct descriptor_data *t)
   This needs to not return the altered buffer size!
   **/
   /* The common case: all saved output was handed off to the kernel buffer. */
-  if (result >= t->bufptr )
+  if (result >= (int)t->bufptr )
   {
     /*
      * if we were using a large buffer, put the large buffer on the buffer pool
@@ -3355,7 +3357,7 @@ int process_input(struct descriptor_data *t)
 ACMD(do_clear_buffer)
 {
 
-  new_send_to_char(ch, "Commands cleared.\r\n");
+  ch->Send( "Commands cleared.\r\n");
 }
 
 void clear_char_q(struct descriptor_data *t)
@@ -3458,7 +3460,7 @@ void close_socket(struct descriptor_data *d)
     }
     if (IS_PLAYING(d) || STATE(d) == CON_DISCONNECT)
     {
-      struct char_data *link_challenged = d->original ? d->original : d->character;
+      Character *link_challenged = d->original ? d->original : d->character;
 
       /* We are guaranteed to have a person. */
       act("$n has lost $s link.", TRUE, link_challenged, 0, 0, TO_ROOM);
@@ -3774,10 +3776,10 @@ void signal_setup(void)
 *       Public routines for system-to-player-communication        *
 **************************************************************** */
 
-void send_to_char(const char *messg, struct char_data *ch)
+void send_to_char(const char *messg, Character *ch)
 {
   if (ch && ch->desc && messg)
-    new_send_to_char(ch, "%s", messg);
+    ch->Send( "%s", messg);
 }
 
 void send_to_arena(const char *messg, ...)
@@ -3966,7 +3968,7 @@ void string_format(BYTE * cmd, LWORD space)
 
 void send_to_room(room_rnum room, const char *messg, ...)
 {
-  struct char_data *i;
+  Character *i;
   va_list args;
 
   if (messg == NULL)
@@ -3987,7 +3989,7 @@ void send_to_room(room_rnum room, const char *messg, ...)
 
 void send_to_range(room_vnum start, room_vnum finish, const char *messg, ...)
 {
-  struct char_data *i;
+  Character *i;
   va_list args;
   room_rnum rm;
   room_vnum r;
@@ -4024,13 +4026,13 @@ void send_to_range(room_vnum start, room_vnum finish, const char *messg, ...)
 
 
 /* higher-level communication: the act() function */
-void perform_act(const char *orig, struct char_data *ch,
+void perform_act(const char *orig, Character *ch,
                  struct obj_data *obj, const void *vict_obj,
-                 const struct char_data *to)
+                 const Character *to)
 {
   const char *i = NULL;
   char lbuf[MAX_STRING_LENGTH], *buf, *j;
-  struct char_data *dg_victim = NULL;
+  Character *dg_victim = NULL;
   struct obj_data *dg_target = NULL;
   char *dg_arg = NULL;
   bool uppercasenext = FALSE;
@@ -4055,29 +4057,29 @@ void perform_act(const char *orig, struct char_data *ch,
         i = PERS(ch, to);
         break;
       case 'N':
-        CHECK_NULL(vict_obj, PERS((struct char_data *) vict_obj, to));
-        dg_victim = (struct char_data *) vict_obj;
+        CHECK_NULL(vict_obj, PERS((Character *) vict_obj, to));
+        dg_victim = (Character *) vict_obj;
         break;
       case 'm':
         i = HMHR(ch);
         break;
       case 'M':
-        CHECK_NULL(vict_obj, HMHR((const struct char_data *) vict_obj));
-        dg_victim = (struct char_data *) vict_obj;
+        CHECK_NULL(vict_obj, HMHR((const Character *) vict_obj));
+        dg_victim = (Character *) vict_obj;
         break;
       case 's':
         i = HSHR(ch);
         break;
       case 'S':
-        CHECK_NULL(vict_obj, HSHR((const struct char_data *) vict_obj));
-        dg_victim = (struct char_data *) vict_obj;
+        CHECK_NULL(vict_obj, HSHR((const Character *) vict_obj));
+        dg_victim = (Character *) vict_obj;
         break;
       case 'e':
         i = HSSH(ch);
         break;
       case 'E':
-        CHECK_NULL(vict_obj,  HSSH((const struct char_data *) vict_obj));
-        dg_victim = (struct char_data *) vict_obj;
+        CHECK_NULL(vict_obj,  HSSH((const Character *) vict_obj));
+        dg_victim = (Character *) vict_obj;
         break;
       case 'o':
         CHECK_NULL(obj, OBJN(obj, to));
@@ -4164,7 +4166,7 @@ void perform_act(const char *orig, struct char_data *ch,
 }
 
 
-int restrict_check(const struct char_data *ch)
+int restrict_check(const Character *ch)
 {
 
   if (ch == NULL)
@@ -4188,10 +4190,10 @@ int restrict_check(const struct char_data *ch)
 #endif
 */
 
-void act(const char *str, int hide_invisible, struct char_data *ch,
+void act(const char *str, int hide_invisible, Character *ch,
          struct obj_data *obj, const void *vict_obj, int type)
 {
-  const struct char_data *to = NULL;
+  const Character *to = NULL;
   int to_sleeping;
 
   if (!str || !*str)
@@ -4224,10 +4226,10 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
 
   if (type == TO_VICT)
   {
-    if ((to = (const struct char_data *) vict_obj)
-        && ((SENDOK(to) && restrict_check((const struct char_data *)to)) || dg_act_check))
+    if ((to = (const Character *) vict_obj)
+        && ((SENDOK(to) && restrict_check((const Character *)to)) || dg_act_check))
     {
-      if (!is_ignoring((struct char_data *)to, ch))
+      if (!is_ignoring((Character *)to, ch))
         perform_act(str, ch, obj, vict_obj, to);
     }
     return;
@@ -4252,9 +4254,9 @@ void act(const char *str, int hide_invisible, struct char_data *ch,
       continue;
     if (type != TO_ROOM && to == vict_obj)
       continue;
-    if (!restrict_check((const struct char_data *)to))
+    if (!restrict_check((const Character *)to))
       continue;
-    if (!is_ignoring((struct char_data *)to, ch))
+    if (!is_ignoring((Character *)to, ch))
       perform_act(str, ch, obj, vict_obj, to);
   }
 }
@@ -4421,9 +4423,9 @@ void zlib_free(void *opaque, void *address)
 
 
 /*
-void send_to_prf(char *messg, struct char_data *nosend, int prf_flags) {
+void send_to_prf(char *messg, Character *nosend, int prf_flags) {
   register struct descriptor_data *i;
-  register struct char_data *ch;
+  register Character *ch;
   int to_sleeping = 1;
   
  
@@ -4435,7 +4437,7 @@ void send_to_prf(char *messg, struct char_data *nosend, int prf_flags) {
 }
 */
 
-void brag(struct char_data *ch, struct char_data *vict)
+void brag(Character *ch, Character *vict)
 {
   /* Npc taunts slayed player characters.  Text goes out through gossip
      channel.  Muerte - Telnet://betterbox.net:4000                     */
@@ -4533,7 +4535,7 @@ void brag(struct char_data *ch, struct char_data *vict)
 void make_wholist(void)
 {
   FILE *fl;
-  CHAR_DATA *ch;
+  Character *ch;
   DESCRIPTOR_DATA *d;
   char * the_date_now(char * buf, size_t len);
   char * the_uptime(char * buf, size_t len);
@@ -4604,7 +4606,7 @@ void make_who2html(void)
   extern char *class_abbrevs[];
   FILE *opf;
   struct descriptor_data *d;
-  struct char_data *ch;
+  Character *ch;
 
   char buf[MAX_STRING_LENGTH];
   if (port != 6000)
@@ -4664,7 +4666,7 @@ void make_who2html(void)
   fclose(opf);
 }
 #define PROMPT_CHAR '%'
-char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
+char * parse_prompt(Character *ch, char *str, size_t lenn)
 {
 
   char insert_text[MAX_INPUT_LENGTH] = "";
@@ -4672,13 +4674,14 @@ char * parse_prompt(CHAR_DATA *ch, char *str, size_t lenn)
   //static char prompt[MAX_STRING_LENGTH + 1] = "";
   char out_buf[MAX_STRING_LENGTH + 1] = "";
   char ptemp[MAX_PROMPT_LENGTH * 5] = "";
-  register int inpos = 0, outpos = 0;
+  register unsigned int inpos = 0, outpos = 0;
   struct descriptor_data *d = NULL;
   time_t ct = time(0);
   bool def = FALSE;
   int count = 0, mhp= 0;
   gold_int expe;
   size_t len = 0, psize;
+  
   if (ch && ch->desc)
     d = ch->desc;
   char **msg;

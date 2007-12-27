@@ -173,7 +173,7 @@ ACMD(forest_find)
   {
     room_rnum ffr = find_forest_rand();
     if (ffr)
-      new_send_to_char(ch, "A forest room is [%d]\r\n", ffr->number);
+      ch->Send( "A forest room is [%d]\r\n", ffr->number);
   }
   else if (!strcmp(argument, "clear"))
   {
@@ -187,11 +187,11 @@ ACMD(forest_find)
       }
     }
     save_forest();
-    new_send_to_char(ch, "Cleared and saved.\r\n");
+    ch->Send( "Cleared and saved.\r\n");
   }
   else
   {
-    new_send_to_char(ch, "Either forest, or forest clear\r\n");
+    ch->Send( "Either forest, or forest clear\r\n");
   }
 }
 

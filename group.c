@@ -19,20 +19,20 @@
 
 //#define MASTER 0
 
-void display_group(struct char_data *ch);
-void check_group(struct char_data *ch);
+void display_group(Character *ch);
+void check_group(Character *ch);
 
-void clear_group(struct char_data *ch);
-struct char_data find_master(struct char_data *ch);
-struct char_data find_follower(struct char_data *ch, int number);
-int join_group(struct char_data *master, struct char_data *follower);
-int leave_group(struct char_data *master);
+void clear_group(Character *ch);
+Character find_master(Character *ch);
+Character find_follower(Character *ch, int number);
+int join_group(Character *master, Character *follower);
+int leave_group(Character *master);
 
 
 
-void display_group(struct char_data *ch)
+void display_group(Character *ch)
 {
-    struct char_data *tch;
+    Character *tch;
     int i;
 
     tch = find_master(ch);
@@ -43,7 +43,7 @@ void display_group(struct char_data *ch)
     }
     sort_group(tch->group);
     for (i = 0; (i < MAX_GROUP) && (GET_GROUP(tch, i) != NOBODY); i++) {
-	new_send_to_char(ch, "%2d: %12s %3.2f %s", i,
+	ch->Send( "%2d: %12s %3.2f %s", i,
 			 get_name_by_id(GET_GROUP(tch, i)),
 			 GET_PERC(GET_GROUP(tch, i)),
 			 i % 2 ? "\r\n" : "    ");
@@ -52,7 +52,7 @@ void display_group(struct char_data *ch)
 
 
 
-struct char_data find_master(struct char_data *ch)
+Character find_master(Character *ch)
 {
     if (GET_GROUP(ch, MASTER) == NOBODY)
 	clear_group(ch);

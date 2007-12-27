@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/05/08 23:39:11 $                                           * 
-*  $Revision: 1.26 $                                                      *
+*  $Date: 2006/05/21 11:02:26 $                                           * 
+*  $Revision: 1.27 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -30,7 +30,7 @@
 
 long long gold_data(int type, long long amount);
 int genpreg(void);
-void hunt_victim(struct char_data *ch);
+void hunt_victim(Character *ch);
 extern const char *pc_class_types[];
 extern struct time_info_data time_info;
 
@@ -78,7 +78,7 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, long id)
 
 
 /* perhaps not the best place for this, but I didn't want a new file
-char *skill_percent(struct char_data *ch, char *skill)
+char *skill_percent(Character *ch, char *skill)
 {
   static char retval[16];
   int skillnum;
@@ -152,7 +152,7 @@ int item_in_list(char *item, obj_data *list)
    MUD -- 4dimensions.org:6000
 */
 
-int char_has_item(char *item, struct char_data *ch)
+int char_has_item(char *item, Character *ch)
 {
 
   /* If this works, no more searching needed */
@@ -245,7 +245,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 {
   struct trig_var_data *vd = NULL;
   extern struct zone_data *zone_table;
-  char_data *ch = NULL, *c = NULL, *rndm;
+  Character *ch = NULL, *c = NULL, *rndm;
   obj_data *obj, *o = NULL;
   struct room_data *room, *r = NULL;
   char *name;
@@ -296,7 +296,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         switch (type)
         {
         case MOB_TRIGGER:
-          snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID((char_data *) go));
+          snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID((Character *) go));
           break;
         case OBJ_TRIGGER:
           snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID((obj_data *) go));
@@ -350,7 +350,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
       switch (type)
       {
       case MOB_TRIGGER:
-        ch = (char_data *) go;
+        ch = (Character *) go;
 
 
         if ((o = get_object_in_equip(ch, name)));
@@ -391,7 +391,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           switch (type)
           {
           case MOB_TRIGGER:
-            c = (char_data *) go;
+            c = (Character *) go;
             r = NULL;
             o = NULL;	/* NULL assignments added to avoid self to always be    */
             break;	/* the room.  - Welcor        */
@@ -451,7 +451,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
             else
             {
               int i = 0;
-              char_data *tch;
+              Character *tch;
               for (tch = rrnum->people; tch; tch = tch->next_in_room)
                 if (GET_MOB_VNUM(tch) == mvnum)
                   i++;
@@ -512,7 +512,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
             if (type == MOB_TRIGGER)
             {
-              ch = (char_data *) go;
+              ch = (Character *) go;
               for (c = IN_ROOM(ch)->people; c;
                    c = c->next_in_room)
                 if ((c != ch) && valid_dg_target(c, TRUE)
@@ -614,7 +614,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         else if (!strcasecmp(field, "canbeseen"))
         {
           if ((type == MOB_TRIGGER)
-              && !CAN_SEE(((char_data *) go), c))
+              && !CAN_SEE(((Character *) go), c))
             snprintf(str, slen, "0");
           else
             snprintf(str, slen,"1");
@@ -815,7 +815,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
         else if (!strcasecmp(field, "next_follower"))
         {
           struct follow_type *k;
-          struct char_data *h = NULL;
+          Character *h = NULL;
           snprintf(str, slen, "0");
           if (c->master)
           {

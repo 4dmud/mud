@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.21  2006/05/21 11:02:26  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.20  2006/04/30 13:36:18  w4dimenscor
  * stat on an imm no longer shows UNDEFINED instead of imm3, trust all adds the imm3 trust group too now and vstat uses pages.
  *
@@ -1016,7 +1020,7 @@ const char *front_leg_pos[] =
     "Spacewolf",
     */
 
-const char *disp_where(int pos, struct char_data *ch)
+const char *disp_where(int pos, Character *ch)
 {
   int race;
   if (IS_NPC(ch))

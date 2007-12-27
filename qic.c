@@ -346,7 +346,7 @@ ACMD(do_setqic)
 	q->limit = j;		/* set the new limit */
     }
     save_record(i);		/* save the QIC record */
-    new_send_to_char(ch, "%s", CONFIG_OK);
+    ch->Send( "%s", CONFIG_OK);
  
     new_mudlog( NRM, LVL_SEN, TRUE,"QIC record for item %d changed to %d removed by %s.", i,
 	    j, GET_NAME(ch));
@@ -422,13 +422,13 @@ ACMD(do_owners)
 	return;
     }
 
-    new_send_to_char(ch, "Registered owners at boot (item #%d - %s):\r\n",
+    ch->Send( "Registered owners at boot (item #%d - %s):\r\n",
 	    obj_index[i].vnum, obj_proto[i].short_description);
 
     for (j = 0; j < QIC_OWNERS; j += 2) {
 	if (obj_index[i].qic->owners[j] < 1)
 	    break;
-	new_send_to_char(ch, "%20.20s  %20.20s\r\n",
+	ch->Send( "%20.20s  %20.20s\r\n",
 		get_name_by_id(obj_index[i].qic->owners[j]),
 		obj_index[i].qic->owners[j +
 					 1] ? get_name_by_id(obj_index[i].
@@ -437,7 +437,7 @@ ACMD(do_owners)
 								    1]) :
 		"");
     }
-    new_send_to_char(ch, "\r\n");
+    ch->Send( "\r\n");
 
 }
 

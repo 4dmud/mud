@@ -135,6 +135,7 @@
 
 #ifdef HAVE_STRING_H
 #include <string.h>
+
 #endif
 
 #ifdef HAVE_STRINGS_H
@@ -144,6 +145,9 @@
 #include <sys/types.h> 
 #include <sys/wait.h>
 #include <sys/stat.h>
+
+#include <string>
+#include <sstream>
 
 #if     (defined (STDC_HEADERS) || defined (__GNU_LIBRARY__))
 #include <stdlib.h>
@@ -701,4 +705,5 @@ size_t strlcpy(char *dest, const char *src, size_t copylen);
 #endif /* __COMM_C__ */
 
 
+using namespace std;
 #endif /* NO_LIBRARY_PROTOTYPES */

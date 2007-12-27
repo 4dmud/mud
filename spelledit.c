@@ -20,15 +20,15 @@
 #include "screen.h"
 
 /* external functions */
-void improve_skill(struct char_data *ch, int skill);
+void improve_skill(Character *ch, int skill);
 
 /* local functions */
-void say_spell(struct char_data *ch, int spellnum, struct char_data *tch,
+void say_spell(Character *ch, int spellnum, Character *tch,
 	       struct obj_data *tobj);
 void spello(int spl, const char *name, int max_mana, int min_mana,
 	    int mana_change, int minpos, int targets, int violent,
 	    int routines, int wait, const char *message, int pulse);
-int mag_manacost(struct char_data *ch, int spellnum);
+int mag_manacost(Character *ch, int spellnum);
 ACMD(do_cast);
 void unused_spell(int spl);
 void mag_assign_spells(void);
@@ -256,7 +256,7 @@ void aedit_save_to_disk(struct descriptor_data *d)
 void aedit_disp_menu(struct descriptor_data *d)
 {
     struct social_messg *action = OLC_ACTION(d);
-    struct char_data *ch = d->character;
+    Character *ch = d->character;
 
     get_char_cols(ch);
 

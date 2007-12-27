@@ -36,7 +36,7 @@ extern int save_new_style;
 
 /* External Functions */
 int find_first_step(room_rnum src, room_rnum target);
-int get_pidx_from_name(struct char_data *ch);
+int get_pidx_from_name(Character *ch);
 void obj_from_room(struct obj_data *obj);
 void obj_to_room(struct obj_data *object, room_rnum room);
 void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
@@ -45,7 +45,7 @@ int new_write_corpse(FILE * fp, struct obj_data *obj, int locate);
 void new_load_corpses(void);
 
 /* Local Function Declerations */
-void do_show_corpses(CHAR_DATA *ch);
+void do_show_corpses(Character *ch);
 void remove_corpse_from_list(OBJ_DATA *corpse);
 int old_write_corpse(FILE * fp, struct obj_data *obj, int locate);
 void save_corpses(void);
@@ -510,15 +510,15 @@ free_corpse_list(cor->next);
 free(cor);
 }
 
-void do_show_corpses(CHAR_DATA *ch) {
+void do_show_corpses(Character *ch) {
 struct corpse_list_data *temp = NULL;
 if (!corpse_list) {
-new_send_to_char(ch, "No player corpses around.\r\n");
+ch->Send( "No player corpses around.\r\n");
 return;
 }
 temp = corpse_list;
 while (temp) {
-new_send_to_char(ch, "In room %d is %s - (AUTOMELD IN %d MUD HOURS)\r\n", GET_OBJ_VROOM(temp->corpse), temp->corpse->short_description, GET_OBJ_TIMER(temp->corpse));
+ch->Send( "In room %d is %s - (AUTOMELD IN %d MUD HOURS)\r\n", GET_OBJ_VROOM(temp->corpse), temp->corpse->short_description, GET_OBJ_TIMER(temp->corpse));
 temp = temp->next;
 }
 }
@@ -530,7 +530,7 @@ char arg[MAX_INPUT_LENGTH];
 room_rnum rnum = NULL;
 int track;
 if (!corpse_list) {
-new_send_to_char(ch, "No player corpses around.\r\n");
+ch->Send( "No player corpses around.\r\n");
 return;
 }
 one_argument(argument, arg);
@@ -542,7 +542,7 @@ while (temp) {
 if (IN_ROOM(temp->corpse) != NULL) {
 if (GET_OBJ_VAL(temp->corpse, 0) == get_pidx_from_name(ch)) {
 if (track)
-new_send_to_char(ch, "In room %s is %s - (AUTOMELD IN %d MUD HOURS)\r\n", IN_ROOM(temp->corpse)->name, temp->corpse->short_description,
+ch->Send( "In room %s is %s - (AUTOMELD IN %d MUD HOURS)\r\n", IN_ROOM(temp->corpse)->name, temp->corpse->short_description,
 GET_OBJ_TIMER(temp->corpse));
 else
 rnum = IN_ROOM(temp->corpse);
@@ -552,7 +552,7 @@ found = 1;
 temp = temp->next;
 }
 if (!found) {
-new_send_to_char(ch, "No unrecovered corpse of yours found.\r\n");
+ch->Send( "No unrecovered corpse of yours found.\r\n");
 return;
 }
 if (track)
@@ -560,7 +560,7 @@ return;
 
 /* track corpse */
 if (rnum == NULL) {
-new_send_to_char(ch, "Can't find corpse to track.\r\n");
+ch->Send( "Can't find corpse to track.\r\n");
 return;
 }
 
@@ -578,11 +578,11 @@ return;
 	send_to_char("You're already in the same room!!\r\n", ch);
 	break;
     case BFS_NO_PATH:
-	new_send_to_char(ch,
+	ch->Send(
 			 "You cant sense the track to your corpse.\r\n");
 	break;
     default:			/* Success! */
-	new_send_to_char(ch,
+	ch->Send(
 			 "{cWYou sense the track to your corpse leading %s from here!{c0\r\n",
 			 dirs[dir]);
 			 WAIT_STATE(ch, PULSE_VIOLENCE);

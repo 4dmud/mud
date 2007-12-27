@@ -46,7 +46,7 @@ void qic_scan_rent(void);
 void purge_qic(obj_rnum rnum);
 void free_corpse_list(struct corpse_list_data *cor);
 void qic_load(int rnum);
-int allowed_pretitle(CHAR_DATA *ch);
+int allowed_pretitle(Character *ch);
 void free_clan_lists(void); 
 void extract_all_in_list(OBJ_DATA *obj);
 void load_host_list(void);
@@ -75,7 +75,7 @@ void assign_subskills(void);
 void sprintbits(long vektor, char *outstring);
 void tag_argument(char *argument, char *tag);
 void clean_pfiles(void);
-int is_aggro(CHAR_DATA *ch);
+int is_aggro(Character *ch);
 void generate_weapon(OBJ_DATA *obj);
 
 void ASSIGNMOB(mob_vnum mob, SPECIAL(fname));
@@ -105,14 +105,14 @@ struct social_messg *soc_mess_list = NULL;      /* list of socials */
 int top_of_socialt = -1;                        /* number of socials */
 
 
-struct char_data *character_list = NULL;     /* global linked list of chars */
+Character *character_list = NULL;     /* global linked list of chars */
 extern enum subskill_list subskill;
-void subs_remove(struct char_data *ch, struct sub_list *af);
-void skills_remove(struct char_data *ch, struct skillspell_data *af);
+void subs_remove(Character *ch, struct sub_list *af);
+void skills_remove(Character *ch, struct skillspell_data *af);
 
 struct index_data **trig_index;    /* index table for triggers      */
 struct trig_data *trigger_list = NULL;  /* all attached triggers */
-int top_of_trigt = 0;         /* top of trigger index table    */
+unsigned int top_of_trigt = 0;         /* top of trigger index table    */
 struct htree_node *mob_htree = NULL;    /* hash tree for fast mob lookup */
 
 long max_mob_id = MOB_ID_BASE;     /* for unique mob id's       */
@@ -121,7 +121,7 @@ int dg_owner_purged;          /* For control of scripts */
 struct htree_node *obj_htree = NULL;    /* hash tree for fast obj lookup */
 
 struct index_data *mob_index; /* index table for mobile file   */
-struct char_data *mob_proto;  /* prototypes for mobs           */
+Character *mob_proto;  /* prototypes for mobs           */
 mob_rnum top_of_mobt = 0;     /* top of mobile index table     */
 
 struct obj_data *object_list = NULL;    /* global linked list of objs    */
@@ -213,7 +213,7 @@ void interpret_espec(const char *keyword, const char *value, int i,
 void parse_espec(char *buf, int i, int nr);
 void parse_enhanced_mob(FILE * mob_f, int i, int nr);
 void get_one_line(FILE * fl, char *buf);
-void save_etext(struct char_data *ch);
+void save_etext(Character *ch);
 //void check_start_rooms(void);
 void renum_world(void);
 void renum_zone_table(void);
@@ -221,10 +221,10 @@ void log_zone_error(zone_rnum zone, int cmd_no, const char *message);
 void reset_time(void);
 long get_ptable_by_name(char *name);
 long get_ptable_by_id(long id);
-void give_mob_class(struct char_data *ch, int vnum);
+void give_mob_class(Character *ch, int vnum);
 void free_note(NOTE_DATA *note, int type);
 void free_social_messages(void);
-void set_mastery(CHAR_DATA *ch, char buf);
+void set_mastery(Character *ch, char buf);
 void free_object_strings(struct obj_data *obj);
 void free_object_strings_proto(struct obj_data *obj);
 void boot_context_help(void);
@@ -241,7 +241,7 @@ void load_config( void );
 // kalten
 //void assign_vehicles(void);
 void load_vehicles(void); //mord
-void set_race(struct char_data *ch, int race);
+void set_race(Character *ch, int race);
 
 
 
@@ -267,7 +267,7 @@ void init_clans(void);
 int find_first_step(room_rnum src, room_rnum target);
 void load_corpses(void);
 void new_load_corpses(void);
-void save_char_vars(struct char_data *ch);
+void save_char_vars(Character *ch);
 void destroy_shops(void);     //mord??
 void strip_cr(char *);        //...
 void load_notes(void);
@@ -610,27 +610,27 @@ ACMD(do_reboot)
     if (file_to_string_alloc(GREETINGS_FILE, &GREETINGS) == 0)
       prune_crlf(GREETINGS);
     if (file_to_string_alloc(WIZLIST_FILE, &wizlist) < 0)
-      new_send_to_char(ch, "Can not read wizlist\r\n");
+      ch->Send( "Can not read wizlist\r\n");
     if (file_to_string_alloc(IMMLIST_FILE, &immlist) < 0)
-      new_send_to_char(ch, "Can not read immlist\r\n");
+      ch->Send( "Can not read immlist\r\n");
     if (file_to_string_alloc(NEWS_FILE, &news) < 0)
-      new_send_to_char(ch, "Can not read news\r\n");
+      ch->Send( "Can not read news\r\n");
     if (file_to_string_alloc(CREDITS_FILE, &credits) < 0)
-      new_send_to_char(ch, "Can not read credits\r\n");
+      ch->Send( "Can not read credits\r\n");
     if (file_to_string_alloc(MOTD_FILE, &motd) < 0)
-      new_send_to_char(ch, "Can not read motd\r\n");
+      ch->Send( "Can not read motd\r\n");
     if (file_to_string_alloc(IMOTD_FILE, &imotd) < 0)
-      new_send_to_char(ch, "Can not read imotd\r\n");
+      ch->Send( "Can not read imotd\r\n");
     if (file_to_string_alloc(HELP_PAGE_FILE, &help) < 0)
-      new_send_to_char(ch, "Can not read help front page\r\n");
+      ch->Send( "Can not read help front page\r\n");
     if (file_to_string_alloc(INFO_FILE, &info) < 0)
-      new_send_to_char(ch, "Can not read info file\r\n");
+      ch->Send( "Can not read info file\r\n");
     if (file_to_string_alloc(POLICIES_FILE, &policies) < 0)
-      new_send_to_char(ch, "Can not read policies\r\n");
+      ch->Send( "Can not read policies\r\n");
     if (file_to_string_alloc(HANDBOOK_FILE, &handbook) < 0)
-      new_send_to_char(ch, "Can not read handbook\r\n");
+      ch->Send( "Can not read handbook\r\n");
     if (file_to_string_alloc(BACKGROUND_FILE, &background) < 0)
-      new_send_to_char(ch, "Can not read background\r\n");
+      ch->Send( "Can not read background\r\n");
     if (help_table)
       the_free_help();
     index_boot(DB_BOOT_HLP);
@@ -638,64 +638,64 @@ ACMD(do_reboot)
   else if (!strcmp(arg, "wizlist"))
   {
     if (file_to_string_alloc(WIZLIST_FILE, &wizlist) < 0)
-      new_send_to_char(ch, "Can not read wizlist\r\n");
+      ch->Send( "Can not read wizlist\r\n");
   }
   else if (!strcmp(arg, "immlist"))
   {
     if (file_to_string_alloc(IMMLIST_FILE, &immlist) < 0)
-      new_send_to_char(ch, "Can not read immlist\r\n");
+      ch->Send( "Can not read immlist\r\n");
   }
   else if (!strcmp(arg, "news"))
   {
     if (file_to_string_alloc(NEWS_FILE, &news) < 0)
-      new_send_to_char(ch, "Can not read news\r\n");
+      ch->Send( "Can not read news\r\n");
   }
   else if (!strcmp(arg, "credits"))
   {
     if (file_to_string_alloc(CREDITS_FILE, &credits) < 0)
-      new_send_to_char(ch, "Can not read credits\r\n");
+      ch->Send( "Can not read credits\r\n");
   }
   else if (!strcmp(arg, "motd"))
   {
     if (file_to_string_alloc(MOTD_FILE, &motd) < 0)
-      new_send_to_char(ch, "Can not read motd\r\n");
+      ch->Send( "Can not read motd\r\n");
   }
   else if (!strcmp(arg, "imotd"))
   {
     if (file_to_string_alloc(IMOTD_FILE, &imotd) < 0)
-      new_send_to_char(ch, "Can not read imotd\r\n");
+      ch->Send( "Can not read imotd\r\n");
   }
   else if (!strcmp(arg, "help"))
   {
     if (file_to_string_alloc(HELP_PAGE_FILE, &help) < 0)
-      new_send_to_char(ch, "Can not read help front page\r\n");
+      ch->Send( "Can not read help front page\r\n");
   }
   else if (!strcmp(arg, "info"))
   {
     if (file_to_string_alloc(INFO_FILE, &info) < 0)
-      new_send_to_char(ch, "Can not read info\r\n");
+      ch->Send( "Can not read info\r\n");
   }
   else if (!strcmp(arg, "policy"))
   {
     if (file_to_string_alloc(POLICIES_FILE, &policies) < 0)
-      new_send_to_char(ch, "Can not read policy\r\n");
+      ch->Send( "Can not read policy\r\n");
   }
   else if (!strcmp(arg, "handbook"))
   {
     if (file_to_string_alloc(HANDBOOK_FILE, &handbook) < 0)
-      new_send_to_char(ch, "Can not read handbook\r\n");
+      ch->Send( "Can not read handbook\r\n");
   }
   else if (!strcmp(arg, "background"))
   {
     if (file_to_string_alloc(BACKGROUND_FILE, &background) < 0)
-      new_send_to_char(ch, "Can not read background\r\n");
+      ch->Send( "Can not read background\r\n");
   }
   else if (!strcmp(arg, "greetings"))
   {
     if (file_to_string_alloc(GREETINGS_FILE, &GREETINGS) == 0)
       prune_crlf(GREETINGS);
     else
-      new_send_to_char(ch, "Can not read greetings.\r\n");
+      ch->Send( "Can not read greetings.\r\n");
   }
   else if (!strcmp(arg, "xhelp"))
   {
@@ -706,11 +706,11 @@ ACMD(do_reboot)
   }
   else
   {
-    new_send_to_char(ch, "Unknown reload option.\r\n");
+    ch->Send( "Unknown reload option.\r\n");
     return;
   }
 
-  new_send_to_char(ch, "%s", CONFIG_OK);
+  ch->Send( "%s", CONFIG_OK);
 }
 
 
@@ -792,7 +792,7 @@ void free_pending_objects(OBJ_DATA *obj)
   obj=NULL;
 }
 
-void free_characters(CHAR_DATA *ch)
+void free_characters(Character *ch)
 {
   if (!ch)
     return;
@@ -813,7 +813,8 @@ void free_zone_list(struct zone_list_data *z)
 /* Free the world, in a memory allocation sense. */
 void destroy_db(void)
 {
-  ssize_t cnt, itr;
+  ssize_t itr;
+  unsigned int cnt;
   log("Free Hunter List");
   free_hunter_list();
   log("Freeing the memory of the database.");
@@ -837,7 +838,7 @@ void destroy_db(void)
   free_clan_lists();
   /* Rooms */
   log("Freeing rooms.");
-  for (cnt = 0; cnt <= top_of_world; cnt++)
+  for (cnt = 0; (int)cnt <= top_of_world; cnt++)
   {
     if (world_vnum[cnt] == NULL)
       continue;
@@ -853,7 +854,7 @@ void destroy_db(void)
   }
   top_of_world = 0;
   /* Objects */
-  for (cnt = 0; cnt <= top_of_objt; cnt++)
+  for (cnt = 0; (int)cnt <= top_of_objt; cnt++)
   {
     free_object_strings(obj_proto + cnt);
 
@@ -870,7 +871,7 @@ void destroy_db(void)
   htree_free(obj_htree);
 
   /* Mobiles */
-  for (cnt = 0; cnt <= top_of_mobt; cnt++)
+  for (cnt = 0; (int)cnt <= top_of_mobt; cnt++)
   {
     free_mobile_strings(&mob_proto[cnt]);
     /* free script proto list */
@@ -904,7 +905,7 @@ void destroy_db(void)
       ftemp = temp;
     }
   }
-  for (cnt = 0; cnt <= top_of_zone_table; cnt++)
+  for (cnt = 0; (int)cnt <= top_of_zone_table; cnt++)
   {
     if (zone_table[cnt].name)
       free(zone_table[cnt].name);
@@ -1267,13 +1268,13 @@ void build_player_index(void)
   if (save_index)
   {
     int j;
-    struct char_data *victim;
+    Character *victim;
     log("    fixing index fields: clans");
     for (j = 0; j <= top_of_p_table; j++)
     {
       if (!IS_SET(player_table[j].flags, PINDEX_DELETED) && !IS_SET(player_table[j].flags, PINDEX_SELFDELETE))
       {
-        CREATE(victim, struct char_data, 1);
+        CREATE(victim, Character, 1);
         clear_char(victim);
         TEMP_LOAD_CHAR = TRUE;
 
@@ -1624,10 +1625,10 @@ void index_boot(int mode)
     log("   %d rooms, %d bytes.", rec_count, size[0]);
     break;
   case DB_BOOT_MOB:
-    CREATE(mob_proto, struct char_data, rec_count);
+    CREATE(mob_proto, Character, rec_count);
     CREATE(mob_index, struct index_data, rec_count);
     size[0] = sizeof(struct index_data) * rec_count;
-    size[1] = sizeof(struct char_data) * rec_count;
+    size[1] = sizeof(Character) * rec_count;
     log("   %d mobs, %d bytes in index, %d bytes in prototypes.",
         rec_count, size[0], size[1]);
     break;
@@ -2556,7 +2557,7 @@ struct combine_data *add_base_link(int i, int vnum)
   return blink;
 
 }
-struct combine_data *add_base_link_mob(CHAR_DATA *mob, int vnum)
+struct combine_data *add_base_link_mob(Character *mob, int vnum)
 {
   struct combine_data *blink = NULL;
   CREATE(blink, struct combine_data, 1);
@@ -2571,7 +2572,7 @@ struct combine_data *add_base_link_mob(CHAR_DATA *mob, int vnum)
    Assumes all links pre created
    Gives new segment its head_join
 */
-struct combine_data *add_full_link(CHAR_DATA *mob, struct combine_data *current, CHAR_DATA *segment)
+struct combine_data *add_full_link(Character *mob, struct combine_data *current, Character *segment)
 {
 
   if (segment && mob)
@@ -2608,7 +2609,7 @@ struct combine_data *copy_proto_link(struct combine_data *proto)
   return temp;
 }
 
-void load_links(CHAR_DATA *mob)
+void load_links(Character *mob)
 {
   struct combine_data *temp = NULL;
   if ((temp = mob->mob_specials.join_list) == NULL)
@@ -2619,7 +2620,7 @@ void load_links(CHAR_DATA *mob)
 
 }
 
-int move_link_room(CHAR_DATA *mob, room_rnum room)
+int move_link_room(Character *mob, room_rnum room)
 {
   struct combine_data *temp = NULL;
   if (mob->mob_specials.head_join != NULL)
@@ -2642,10 +2643,10 @@ int move_link_room(CHAR_DATA *mob, room_rnum room)
   return 1;
 }
 
-void die_link(CHAR_DATA *mob)
+void die_link(Character *mob)
 {
   struct combine_data *temp = NULL, *blink = NULL;
-  CHAR_DATA *head;
+  Character *head;
   if (mob == NULL)
     return;
   if ((head = mob->mob_specials.head_join) == NULL)
@@ -2661,14 +2662,14 @@ void die_link(CHAR_DATA *mob)
   if (blink != NULL)
   {
     REMOVE_FROM_LIST(blink, head->mob_specials.join_list, next);
-    free(link);
+    free((void *)link);
     blink = NULL;
     mob->mob_specials.head_join = NULL;
     return;
   }
 }
 
-void delete_one_join(CHAR_DATA *mob, int i)
+void delete_one_join(Character *mob, int i)
 {
   int j = 0;
   struct combine_data *temp, *prev = NULL;
@@ -2721,7 +2722,7 @@ struct combine_data *extract_all_links(struct combine_data *proto)
   return temp;
 }
 
-int join_count(CHAR_DATA *mob)
+int join_count(Character *mob)
 {
   struct combine_data *temp = mob->mob_specials.join_list;
   int i = 0;
@@ -2734,7 +2735,7 @@ int join_count(CHAR_DATA *mob)
   return i;
 }
 
-void die_link_head(CHAR_DATA *mob)
+void die_link_head(Character *mob)
 {
   if (mob->mob_specials.join_list != NULL)
     extract_all_links(mob->mob_specials.join_list);
@@ -2742,7 +2743,7 @@ void die_link_head(CHAR_DATA *mob)
   return;
 }
 
-void extract_linked_mob(CHAR_DATA *mob)
+void extract_linked_mob(Character *mob)
 {
   die_link_head(mob);
   //die_link(mob);
@@ -2795,7 +2796,7 @@ void parse_joined_mob(FILE * mob_f, int i, int nr)
 
 void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
 {
-  void set_race(struct char_data *ch, int race);
+  void set_race(Character *ch, int race);
 
   static int i = 0;
   int j, t[10];
@@ -2949,7 +2950,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
   top_of_mobt = i++;
 }
 
-int is_aggro(CHAR_DATA *ch)
+int is_aggro(Character *ch)
 {
   if ( MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
        (MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
@@ -3499,7 +3500,7 @@ void renumber_zones(void)
 
 
 }
-void do_show_errors(CHAR_DATA *ch)
+void do_show_errors(Character *ch)
 {
   int i, j;
   int found = FALSE;
@@ -3512,12 +3513,12 @@ void do_show_errors(CHAR_DATA *ch)
       if (zone_table[j].number == zone_table[i].number)
       {
         found = TRUE;
-        new_send_to_char(ch,"ERROR: Virtual zone exists twice - [%s] and [%s]\r\n", zone_table[j].name, zone_table[i].name);
+        ch->Send("ERROR: Virtual zone exists twice - [%s] and [%s]\r\n", zone_table[j].name, zone_table[i].name);
       }
       if (zone_table[j].bot <= zone_table[i].bot && zone_table[j].top >= zone_table[i].bot)
       {
         found = TRUE;
-        new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
+        ch->Send("ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
                          zone_table[j].number, zone_table[j].bot, zone_table[j].top,
                          zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
@@ -3525,7 +3526,7 @@ void do_show_errors(CHAR_DATA *ch)
       if (zone_table[j].bot <= zone_table[i].top && zone_table[j].top >= zone_table[i].top)
       {
         found = TRUE;
-        new_send_to_char(ch,"ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
+        ch->Send("ERROR: Zone [%d] (%d to %d) covers zone [%d] (%d to %d)\r\n",
                          zone_table[j].number, zone_table[j].bot, zone_table[j].top,
                          zone_table[i].number, zone_table[i].bot, zone_table[i].top);
 
@@ -3534,7 +3535,7 @@ void do_show_errors(CHAR_DATA *ch)
   }
   if (!found)
   {
-    new_send_to_char(ch, "No zone overlaps found\r\n");
+    ch->Send( "No zone overlaps found\r\n");
   }
 }
 
@@ -3551,7 +3552,7 @@ void get_one_line(FILE * fl, char *buf)
 }
 void the_free_help(void)
 {
-  int hp;
+  unsigned int hp;
 
   if (!help_table)
     return;
@@ -3741,7 +3742,7 @@ struct help_index_element *add_to_help_index(struct help_index_element *perent,i
 
 
 
-int vnum_mobile(char *searchname, struct char_data *ch)
+int vnum_mobile(char *searchname, Character *ch)
 {
   int nr, found = 0;
   char buf[MAX_INPUT_LENGTH];
@@ -3767,7 +3768,7 @@ int vnum_mobile(char *searchname, struct char_data *ch)
 
 
 
-int vnum_object(char *searchname, struct char_data *ch)
+int vnum_object(char *searchname, Character *ch)
 {
   int nr, found = 0;
   char buf[MAX_INPUT_LENGTH];
@@ -3793,11 +3794,11 @@ int vnum_object(char *searchname, struct char_data *ch)
 
 #if USE_CREATE_CHAR
 /* create a character, and add it to the char list */
-struct char_data *create_char(void)
+Character *create_char(void)
 {
-  struct char_data *ch;
+  Character *ch;
 
-  CREATE(ch, struct char_data, 1);
+  CREATE(ch, Character, 1);
   clear_char(ch);
   add_char_to_list(ch);
   //TODO: check this
@@ -3815,10 +3816,10 @@ struct char_data *create_char(void)
 
 
 /* create a new mobile from a prototype */
-struct char_data *read_mobile(mob_vnum nr, int type)
+Character *read_mobile(mob_vnum nr, int type)
 {                   /* and mob_rnum */
   mob_rnum i;
-  struct char_data *mob;
+  Character *mob;
 
   if (type == VIRTUAL)
   {
@@ -3831,7 +3832,7 @@ struct char_data *read_mobile(mob_vnum nr, int type)
   else
     i = nr;
 
-  CREATE(mob, struct char_data, 1);
+  CREATE(mob, Character, 1);
   clear_char(mob);
   *mob = mob_proto[i];
   add_char_to_list(mob);
@@ -3851,7 +3852,7 @@ struct char_data *read_mobile(mob_vnum nr, int type)
   {
     mob->points.max_hit = dice(mob->points.hit, mob->points.mana) + mob->points.move;
   }
-  mob->points.max_hit *= (mob_hitpoint_multi(GET_CLASS(mob)) * (1.0  + (MOB_TIER(mob) * 0.75))) ;
+  mob->points.max_hit = FTOI(mob->points.max_hit * (mob_hitpoint_multi(GET_CLASS(mob)) * (1.0  + (MOB_TIER(mob) * 0.75)))) ;
   mob->points.hit = mob->points.max_hit;
   mob->points.mana = mob->points.max_mana;
   mob->points.move = mob->points.max_move;
@@ -3948,7 +3949,7 @@ struct obj_data *read_object(obj_vnum nr, int type)
 
 int purge_zone(int zone)
 {
-  struct char_data *ch, *next_ch;
+  Character *ch, *next_ch;
   struct obj_data *ob, *next_ob;
 
   for (ch = character_list; ch; ch = next_ch)
@@ -4183,9 +4184,9 @@ void make_maze(int zone)
 void reset_zone(zone_rnum zone)
 {
   int cmd_no, last_cmd = 0;
-  struct char_data *mob = NULL;
+  Character *mob = NULL;
   struct obj_data *obj, *obj_to;
-  struct char_data *tmob = NULL;   /* for trigger assignment */
+  Character *tmob = NULL;   /* for trigger assignment */
   struct obj_data *tobj = NULL;    /* for trigger assignment */
   room_rnum rm;
   room_vnum vrm;
@@ -4780,9 +4781,9 @@ char *get_name_by_id(long id)
 }
 
 
-int load_char(char *name, struct char_data *ch)
+int load_char(char *name, Character *ch)
 {
-  CHAR_DATA *tch;
+  Character *tch;
   int ret_val = 0;
   int tp, k;
 
@@ -4852,7 +4853,7 @@ int load_char(char *name, struct char_data *ch)
                         break;                    \
                     }
 
-void default_char(struct char_data *ch)
+void default_char(Character *ch)
 {
   int i;
   time_t tme = time(0);
@@ -4964,7 +4965,7 @@ void default_char(struct char_data *ch)
 
 }
 
-int store_to_char(char *name, struct char_data *ch)
+int store_to_char(char *name, Character *ch)
 {
   int id, num = 0, num2 = 0, num3 = 0, num4 = 0, num5 = 0, i;
   gold_int num6 = 0;
@@ -5502,7 +5503,7 @@ int store_to_char(char *name, struct char_data *ch)
               CREATE(temp, struct sub_list, 1);
               temp->next = ch->subs;
               temp->subskill = (enum subskill_list)(num);
-              temp->status = (enum sub_status_types)num3;
+              temp->status = (enum sub_status_toggle)num3;
               temp->learn = num2;
               ch->subs = temp;
             }
@@ -5656,7 +5657,7 @@ void free_killlist_all(struct kill_data *kills)
     free_killlist_all(kills->next);
   free(kills);
 }
-void free_killlist(struct char_data *ch)
+void free_killlist(Character *ch)
 {
   free_killlist_all(GET_KILLS(ch));
   GET_KILLS(ch) = NULL;
@@ -5684,7 +5685,7 @@ void kill_ems(char *str)
   *ptr2 = '\0';
 }
 
-void save_char(struct char_data *ch)
+void save_char(Character *ch)
 {
 
   if (ch == NULL)
@@ -5702,7 +5703,7 @@ void save_char(struct char_data *ch)
 }
 
 
-void char_to_store(struct char_data *ch)
+void char_to_store(Character *ch)
 {
   FILE *fl;
   char outname[80], bits[127], buf[MAX_STRING_LENGTH];
@@ -6134,7 +6135,7 @@ void sprintbits(long vektor, char *outstring)
   *outstring = 0;
 }
 
-void save_etext(struct char_data *ch)
+void save_etext(Character *ch)
 {
   /* this will be really cool soon */
 
@@ -6188,7 +6189,6 @@ int create_entry(char *name)
 
 
 
-/* file read string will always return atleast a \r\n*/
 char *fread_string(FILE *fl, const char *error)
 {
   char buf[MAX_STRING_LENGTH], tmp[516];
@@ -6220,7 +6220,7 @@ char *fread_string(FILE *fl, const char *error)
       else
       {
         
-        if((x > 0 && x < tlen-4) || (tmp[x]!='\r' && tmp[x]!='\n')) ++x;
+        if((x > 0 && x < tlen-3) || (tmp[x]!='\r' && tmp[x]!='\n')) ++x;
         tmp[x] = '\r';
         tmp[x++] = '\n';
         tmp[x++] = '\0';
@@ -6242,7 +6242,7 @@ char *fread_string(FILE *fl, const char *error)
   while (!done);
 
   /* allocate space for the new string and copy it */
-return (strlen(buf) ? strdup(buf) : strdup("\r\n"));
+return (strlen(buf) ? strdup(buf) : NULL);
 }
 /* Called to free all allocated follow_type structs */
 void free_followers(struct follow_type *k)
@@ -6269,9 +6269,9 @@ void free_mob_memory(memory_rec *k)
 }
 
 /* release memory allocated for a char struct */
-void free_char(struct char_data *ch)
+void free_char(Character *ch)
 {
-  void free_ignorelist(struct char_data *ch);
+  void free_ignorelist(Character *ch);
   int i;
   struct alias_data *a;
 
@@ -6563,7 +6563,7 @@ int file_to_string(const char *name, char *buf, size_t b_len)
 
 
 /* clear some of the the working variables of a char */
-void reset_char(struct char_data *ch)
+void reset_char(Character *ch)
 {
   int i;
 
@@ -6637,9 +6637,9 @@ void reset_char(struct char_data *ch)
 
 
 /* clear ALL the working variables of a char; do NOT free any space alloc'ed */
-void clear_char(struct char_data *ch)
+void clear_char(Character *ch)
 {
-  memset((char *) ch, 0, sizeof(struct char_data));
+  memset((char *) ch, 0, sizeof(Character));
 
   IN_ROOM(ch) = NULL;
   TRAVEL_LIST(ch) = NULL;
@@ -6716,7 +6716,7 @@ void clear_object(struct obj_data *obj)
  * (and then never again for that character).
  */
 /* initialize a new character only if class is set */
-void init_char(struct char_data *ch)
+void init_char(Character *ch)
 {
   int i, taeller;
 
@@ -7159,7 +7159,7 @@ int my_obj_save_to_disk(FILE * fp, struct obj_data *obj, int locate)
 
 
 
-int read_xap_objects(FILE * fl, struct char_data *ch)
+int read_xap_objects(FILE * fl, Character *ch)
 {
   char line[MAX_STRING_LENGTH];
   int t[20], nr, danger, j, k, zwei;
@@ -7584,7 +7584,7 @@ void generate_weapon(OBJ_DATA *obj)
 
 
 
-void give_mob_class(struct char_data *ch, int vnum)
+void give_mob_class(Character *ch, int vnum)
 {
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   char *point;
@@ -8433,7 +8433,7 @@ zone_rnum real_zone(zone_vnum vnum)
 
 int valid_id_num(long id)
 {
-  CHAR_DATA *tch;
+  Character *tch;
   DESCRIPTOR_DATA *d;
   for (d = descriptor_list; d; d = d->next)
     if (d->character && GET_ID(d->character) == id)
@@ -8462,9 +8462,9 @@ int valid_to_save(char *name)
   return 0;
 }
 
-void add_char_to_list(struct char_data *ch)
+void add_char_to_list(Character *ch)
 {
-  //struct char_data *tch;
+  //Character *tch;
   if (ch != character_list)
   {
     ch->next = character_list;

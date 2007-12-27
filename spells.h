@@ -11,6 +11,10 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.10  2006/05/21 11:02:27  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.9  2006/04/21 12:46:45  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -449,7 +453,7 @@ enum skill_list {
 #define TAR_AREA_AREA   (1 << 12) /*spell does affect to all in that room and ajacent rooms, used with TAR_AREA_ROOM*/
 #define TAR_AREA_DIR    (1 << 13) /*spell does affect to a victim in a particular direction, used with TAR_AREA_ROOM */
 #define TAR_AREA_ZONE   (1 << 14) /*spell affects everything in the zone */
-int magic_distance(struct char_data *ch, int spellnum, int dir, struct char_data *victim);
+int magic_distance(Character *ch, int spellnum, int dir, Character *victim);
 #define TIERNUM current_class_is_tier_num(ch)
 
 
@@ -540,8 +544,8 @@ struct spell_class_type
 
 
 #define ASPELL(spellname) \
-void	spellname(int level, struct char_data *ch, \
-		  struct char_data *victim, struct obj_data *obj, char *strarg)
+void	spellname(int level, Character *ch, \
+		  Character *victim, struct obj_data *obj, char *strarg)
 
 #define MANUAL_SPELL(spellname)	spellname(level, caster, cvict, ovict, tar_str);
 
@@ -571,51 +575,51 @@ ASPELL(spell_knock);
 int find_skill_num(char *name);
 
 int
-mag_damage(int level, struct char_data *ch, struct char_data *victim,
+mag_damage(int level, Character *ch, Character *victim,
            int spellnum, int savetype);
 
 void
-mag_affects(int level, struct char_data *ch, struct char_data *victim,
+mag_affects(int level, Character *ch, Character *victim,
             int spellnum, int savetype);
 
-void mag_groups(int level, struct char_data *ch, int spellnum,
+void mag_groups(int level, Character *ch, int spellnum,
                 int savetype);
 
-void mag_masses(int level, struct char_data *ch, int spellnum,
+void mag_masses(int level, Character *ch, int spellnum,
                 int savetype);
 
-void mag_areas(int level, struct char_data *ch, int spellnum,
+void mag_areas(int level, Character *ch, int spellnum,
                int savetype);
 
 void
-mag_summons(int level, struct char_data *ch, struct obj_data *obj,
+mag_summons(int level, Character *ch, struct obj_data *obj,
             int spellnum, int savetype);
 
 void
-mag_points(int level, struct char_data *ch, struct char_data *victim,
+mag_points(int level, Character *ch, Character *victim,
            int spellnum, int savetype);
 
 void
-mag_unaffects(int level, struct char_data *ch, struct char_data *victim,
+mag_unaffects(int level, Character *ch, Character *victim,
               int spellnum, int type);
 
 void
-mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
+mag_alter_objs(int level, Character *ch, struct obj_data *obj,
                int spellnum, int type);
 
-void mag_creations(int level, struct char_data *ch, int spellnum);
+void mag_creations(int level, Character *ch, int spellnum);
 
 int
-call_magic(struct char_data *caster, struct char_data *cvict,
+call_magic(Character *caster, Character *cvict,
            struct obj_data *ovict, char *svict, int spellnum, int level,
            int casttype);
 
 void
-mag_objectmagic(struct char_data *ch, struct obj_data *obj,
+mag_objectmagic(Character *ch, struct obj_data *obj,
                 char *argument);
 
 int
-cast_spell(struct char_data *ch, struct char_data *tch,
+cast_spell(Character *ch, Character *tch,
            struct obj_data *tobj, char *tar_str, int spellnum);
 
 
@@ -624,13 +628,13 @@ void spell_level(int first_prereq, int second_prereq, int spell,
                  int chclass, int level, int tier, int val1, int val2);
 void init_spell_levels(void);
 const char *skill_name(int num);
-float has_staff(struct char_data *ch);
+float has_staff(Character *ch);
 const char *sub_name(int num);
-int knows_spell(struct char_data *ch, int spell);
+int knows_spell(Character *ch, int spell);
 int elemental_type(int spell);
-int immune_to(CHAR_DATA *ch, int elem);
-float resist_elem(CHAR_DATA *ch, int elem);
-int grand_master(struct char_data *ch);
+int immune_to(Character *ch, int elem);
+float resist_elem(Character *ch, int elem);
+int grand_master(Character *ch);
 int spell_num(const char *name);
 
 extern struct spell_info_type spell_info[];

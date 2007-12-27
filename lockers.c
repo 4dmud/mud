@@ -15,21 +15,21 @@
 
 /*external functions */
 OBJ_DATA * load_objects_to_list(FILE *fl); /*objsave.c*/
-void convert_tokens(struct char_data *ch); /*cali.c*/
+void convert_tokens(Character *ch); /*cali.c*/
 int save_one_item( OBJ_DATA *obj, FILE *fl, int locate); /*objsave.c*/
 
 #define ITEMS_PER_BRONZE 15
 /*local functions */
-int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj);
-OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj);
-int remove_item_from_locker(CHAR_DATA *ch, int num);
-void save_locker(CHAR_DATA *ch);
-void list_locker_to_char(CHAR_DATA *ch);
-void load_locker(CHAR_DATA *ch);
-void send_policy(CHAR_DATA *ch);
+int add_item_to_locker(Character *ch, OBJ_DATA *obj);
+OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj);
+int remove_item_from_locker(Character *ch, int num);
+void save_locker(Character *ch);
+void list_locker_to_char(Character *ch);
+void load_locker(Character *ch);
+void send_policy(Character *ch);
 int locker_in_room(room_rnum room);
 void extract_all_in_list(OBJ_DATA *obj);
-void rent_locker(CHAR_DATA *ch, int size,int months);
+void rent_locker(Character *ch, int size,int months);
 /*
 Adds an item to a locker to be saved.
    returns:
@@ -37,7 +37,7 @@ Adds an item to a locker to be saved.
    1 is success
 */
 
-int count_locker(CHAR_DATA *ch)
+int count_locker(Character *ch)
 {
   OBJ_DATA *obj;
   int count = 0;
@@ -46,7 +46,7 @@ int count_locker(CHAR_DATA *ch)
   return count;
 }
 
-int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj)
+int add_item_to_locker(Character *ch, OBJ_DATA *obj)
 {
   if (!obj)
     return 0;
@@ -57,12 +57,12 @@ int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj)
   }
   if (count_locker(ch) >= LOCKER_LIMIT(ch))
   {
-    new_send_to_char(ch, "Your locker is full.\r\n");
+    ch->Send( "Your locker is full.\r\n");
     return 0;
   }
   if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
   {
-    new_send_to_char(ch, "Containers cannot be stored.\r\n");
+    ch->Send( "Containers cannot be stored.\r\n");
     return 0;
   }
 
@@ -74,7 +74,7 @@ int add_item_to_locker(CHAR_DATA *ch, OBJ_DATA *obj)
   Crash_crashsave(ch);
   return 1;
 }
-OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj)
+OBJ_DATA *item_from_locker(Character *ch, OBJ_DATA *obj)
 {
   OBJ_DATA *temp = NULL;
   REMOVE_FROM_LIST(obj, LOCKER(ch), next_content);
@@ -83,13 +83,13 @@ OBJ_DATA *item_from_locker(CHAR_DATA *ch, OBJ_DATA *obj)
   return obj;
 }
 
-int remove_item_from_locker(CHAR_DATA *ch, int num)
+int remove_item_from_locker(Character *ch, int num)
 {
   OBJ_DATA *obj;
   int count = 1, found = FALSE;
   if (!LOCKER_EXPIRE(ch))
   {
-    new_send_to_char(ch, "{cRYour locker has expired, you have %d items in it.\r\n"
+    ch->Send( "{cRYour locker has expired, you have %d items in it.\r\n"
                      "To regain access to these items, please purchase a new locker.\r\n\r\n", count_locker(ch));
     send_policy(ch);
     return 0;
@@ -112,19 +112,19 @@ int remove_item_from_locker(CHAR_DATA *ch, int num)
   }
   if (!found)
   {
-    new_send_to_char(ch, "There is no item at that number.\r\n");
+    ch->Send( "There is no item at that number.\r\n");
     return 0;
   }
   obj_to_char(obj, ch);
-  new_send_to_char(ch, "You get %s from your locker.\r\n", obj->short_description);
+  ch->Send( "You get %s from your locker.\r\n", obj->short_description);
   save_locker(ch);
   Crash_crashsave(ch);
   return 1;
 }
 
-void send_policy(CHAR_DATA *ch)
+void send_policy(Character *ch)
 {
-  new_send_to_char(ch, "You aren't currently renting a locker.\r\n"
+  ch->Send( "You aren't currently renting a locker.\r\n"
                    "To rent a locker type: rent <number of items> <number of months>\r\n"
                    "Where <number of items is the space for items in your locker.\r\n"
                    "It's 1 bronze per 10 items per month.\r\n"
@@ -132,7 +132,7 @@ void send_policy(CHAR_DATA *ch)
                    "Any items left in the locker when the lease expires will be incinerated.\r\n");
 }
 
-void save_locker(CHAR_DATA *ch)
+void save_locker(Character *ch)
 {
   char fname[MAX_INPUT_LENGTH];
   char tempname[MAX_INPUT_LENGTH + 4];
@@ -170,7 +170,7 @@ void save_locker(CHAR_DATA *ch)
   }
 }
 
-void load_locker(CHAR_DATA *ch)
+void load_locker(Character *ch)
 {
   char fname[MAX_INPUT_LENGTH];
   FILE *fp;
@@ -188,7 +188,7 @@ void load_locker(CHAR_DATA *ch)
   fclose(fp);
 }
 
-void list_locker_to_char(CHAR_DATA *ch)
+void list_locker_to_char(Character *ch)
 {
   OBJ_DATA *obj;
   int  count = 0;
@@ -198,17 +198,17 @@ void list_locker_to_char(CHAR_DATA *ch)
 
   if (LOCKER_EXPIRE(ch) < time(0))
   {
-    new_send_to_char(ch, "{cRSorry but your locker has expired. \r\n"
+    ch->Send( "{cRSorry but your locker has expired. \r\n"
                      "To access these items, rent a new locker of any size.{c0\r\n");
   }
   else
   {
     days = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_DAY;
-    new_send_to_char(ch, "You have %d days left on this locker.\r\n", days);
+    ch->Send( "You have %d days left on this locker.\r\n", days);
     hours = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_HOUR;
-    new_send_to_char(ch, "You have %d hours left on this locker.\r\n", hours);
+    ch->Send( "You have %d hours left on this locker.\r\n", hours);
     mins = (LOCKER_EXPIRE(ch) - time(0))/SECS_PER_REAL_MIN;
-    new_send_to_char(ch, "You have %d mins left on this locker.\r\n", mins);
+    ch->Send( "You have %d mins left on this locker.\r\n", mins);
   }
   if (LOCKER(ch))
   {
@@ -222,17 +222,17 @@ void list_locker_to_char(CHAR_DATA *ch)
     }
 
 
-    new_send_to_char(ch, "You have %d items in your locker, with room for %d more.\r\n",count, LOCKER_LIMIT(ch) - count);
+    ch->Send( "You have %d items in your locker, with room for %d more.\r\n",count, LOCKER_LIMIT(ch) - count);
 
 
 
-    new_send_to_char(ch, "No.     Type     Name\r\n"
+    ch->Send( "No.     Type     Name\r\n"
                      "----------------------------------------------\r\n");
 
     page_string(ch->desc, dynbuf, DYN_BUFFER);
   }
   else
-    new_send_to_char(ch, "\r\nYour locker is empty.\r\n");
+    ch->Send( "\r\nYour locker is empty.\r\n");
 }
 
 ACMD(do_locker)
@@ -245,7 +245,7 @@ ACMD(do_locker)
 
   if (!arg || !*arg)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "{cCLocker commands: - cost: %d items per bronze per 4 weeks{cy\r\n"
                      "locker list                 - lists the content of your locker\r\n"
                      "locker put <item>           - puts an item from your inventory into the locker\r\n"
@@ -260,7 +260,7 @@ ACMD(do_locker)
   switch (LOWER(*arg))
   {
   default:
-    new_send_to_char(ch,
+    ch->Send(
                      "{cCLocker commands: - cost: %d items per bronze per 4 weeks{cy\r\n"
                      "locker list                 - lists the content of your locker\r\n"
                      "locker put <item>           - puts an item from your inventory into the locker\r\n"
@@ -277,39 +277,39 @@ ACMD(do_locker)
   case 'p':
     if (!locker_in_room(IN_ROOM(ch)))
     {
-      new_send_to_char(ch, "You need to be at a locker to do that.\r\n");
+      ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
     if (!arg1 || !*arg1)
     {
-      new_send_to_char(ch, "locker put what?\r\n");
+      ch->Send( "locker put what?\r\n");
       return;
     }
     if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying)))
     {
-      new_send_to_char(ch, "You aren't carrying %s %s.\r\n",  AN(arg1), arg1);
+      ch->Send( "You aren't carrying %s %s.\r\n",  AN(arg1), arg1);
       return;
     }
     if (add_item_to_locker(ch, obj))
     {
-      new_send_to_char(ch, "You put %s into your locker.\r\n", obj->short_description);
+      ch->Send( "You put %s into your locker.\r\n", obj->short_description);
       return;
     }
     break;
   case 'g':
     if (!locker_in_room(IN_ROOM(ch)))
     {
-      new_send_to_char(ch, "You need to be at a locker to do that.\r\n");
+      ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
     if (!arg1 || !*arg1)
     {
-      new_send_to_char(ch, "locker get, what num?\r\n");
+      ch->Send( "locker get, what num?\r\n");
       return;
     }
     if (!atoi(arg1))
     {
-      new_send_to_char(ch, "That is not a valid number.\r\n");
+      ch->Send( "That is not a valid number.\r\n");
       return;
     }
     remove_item_from_locker(ch, atoi(arg1));
@@ -318,22 +318,22 @@ ACMD(do_locker)
   case 'r':
     if (!locker_in_room(IN_ROOM(ch)))
     {
-      new_send_to_char(ch, "You need to be at a locker to do that.\r\n");
+      ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
     if (!arg1 || !*arg1 || !argument || !*argument)
     {
-      new_send_to_char(ch, "locker rent how big, how long?\r\n");
+      ch->Send( "locker rent how big, how long?\r\n");
       return;
     }
     if ((size = atoi(arg1)) == 0)
     {
-      new_send_to_char(ch, "That is not a valid size.\r\n");
+      ch->Send( "That is not a valid size.\r\n");
       return;
     }
     if ((months = atoi(argument)) == 0)
     {
-      new_send_to_char(ch, "That is not a valid number of months.\r\n");
+      ch->Send( "That is not a valid number of months.\r\n");
       return;
     }
     rent_locker(ch, size, months);
@@ -341,12 +341,12 @@ ACMD(do_locker)
   case 'c':
     if (!locker_in_room(IN_ROOM(ch)))
     {
-      new_send_to_char(ch, "You need to be at a locker to do that.\r\n");
+      ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
     if (strcmp(arg, "cancel"))
     {
-      new_send_to_char(ch, "You need to type the whole word 'cancel' for it to work.\r\n");
+      ch->Send( "You need to type the whole word 'cancel' for it to work.\r\n");
       return;
     }
     LOCKER_EXPIRE(ch) = 0;
@@ -355,7 +355,7 @@ ACMD(do_locker)
     LOCKER(ch) = NULL;
     save_locker(ch);
     save_char(ch);
-    new_send_to_char(ch, "Locker canceled and purged.\r\n");
+    ch->Send( "Locker canceled and purged.\r\n");
     break;
   }
 
@@ -384,7 +384,7 @@ void extract_all_in_list(OBJ_DATA *obj)
   extract_obj(obj);
 }
 
-void rent_locker(CHAR_DATA *ch, int size,int months)
+void rent_locker(Character *ch, int size,int months)
 {
   int cost = (size * months)/(ITEMS_PER_BRONZE);
   int payment = 0;
@@ -392,7 +392,7 @@ void rent_locker(CHAR_DATA *ch, int size,int months)
 
   if (size%ITEMS_PER_BRONZE)
   {
-    new_send_to_char(ch, "The size of the locker needs to be a multiple of %d.\r\n", ITEMS_PER_BRONZE);
+    ch->Send( "The size of the locker needs to be a multiple of %d.\r\n", ITEMS_PER_BRONZE);
     return;
   }
   payment += (100 * GET_GOLD_TOKEN_COUNT(ch));
@@ -401,7 +401,7 @@ void rent_locker(CHAR_DATA *ch, int size,int months)
 
   if (payment < cost)
   {
-    new_send_to_char(ch, "You can't afford something of that size and length\r\n"
+    ch->Send( "You can't afford something of that size and length\r\n"
                      "It's cost would be %d bronze. You have %d bronze.\r\n", cost, payment);
     return;
 
@@ -410,17 +410,17 @@ void rent_locker(CHAR_DATA *ch, int size,int months)
   {
     if (LOCKER_LIMIT(ch) != size)
     {
-      new_send_to_char(ch, "You can't change an existing lockers size.\r\n");
+      ch->Send( "You can't change an existing lockers size.\r\n");
       return;
     }
     else
     {
-      new_send_to_char(ch, "You add %d more months onto your locker rental.\r\n", months);
+      ch->Send( "You add %d more months onto your locker rental.\r\n", months);
       adding = LOCKER_EXPIRE(ch) - time(0);
     }
   }
   else
-    new_send_to_char(ch, "You rent a %d item locker for %d month%s.\r\n", size, months, months > 1 ? "s" : "");
+    ch->Send( "You rent a %d item locker for %d month%s.\r\n", size, months, months > 1 ? "s" : "");
 
   LOCKER_LIMIT(ch) = size;
   LOCKER_EXPIRE(ch) = time(0) + (SECS_PER_REAL_DAY * 28 * months) + adding;

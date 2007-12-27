@@ -10,6 +10,10 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.39  2006/05/21 11:02:26  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.38  2006/04/21 12:46:44  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -182,110 +186,110 @@ int corpse_mod = 0;
 float skillmulti = 0;
 
 /* Daniel Houghton's revision */
-int skill_roll(struct char_data *ch, int skill_num);
+int skill_roll(Character *ch, int skill_num);
 ACMD(do_sac);
 
 /* External procedures */
-void spill_gold(struct char_data *ch);
+void spill_gold(Character *ch);
 void add_corpse_to_list(OBJ_DATA *corpse);
-void dismount_char(struct char_data *ch);
-int highest_tier(struct char_data *ch);
-void Crash_crashsave(struct char_data *ch);
+void dismount_char(Character *ch);
+int highest_tier(Character *ch);
+void Crash_crashsave(Character *ch);
 
-void send_char_pos(struct char_data *ch, int dam);
+void send_char_pos(Character *ch, int dam);
 char *fread_action(FILE * fl, int nr);
 ACMD(do_get);
 ACMD(do_split);
 ACMD(do_flee);
 ACMD(do_assist);
 int thaco(int ch_class, int level);
-int ok_damage_shopkeeper(struct char_data *ch, struct char_data *victim);
+int ok_damage_shopkeeper(Character *ch, Character *victim);
 void save_corpses(void);
-void send_to_prf(char *messg, struct char_data *nosend, int prf_flags);
-void brag(struct char_data *ch, struct char_data *victim);
-int get_pidx_from_name(struct char_data *ch);
-void arena_kill(struct char_data *ch);
-void diag_char_to_char(struct char_data *i, struct char_data *ch);
+void send_to_prf(char *messg, Character *nosend, int prf_flags);
+void brag(Character *ch, Character *victim);
+int get_pidx_from_name(Character *ch);
+void arena_kill(Character *ch);
+void diag_char_to_char(Character *i, Character *ch);
 
 /* local functions */
-void delay_die(struct char_data *ch, struct char_data *killer);
-int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_type);
-void make_half(struct char_data *ch);
-void make_head(struct char_data *ch);
-int class_min_strike(struct char_data *ch);
-int class_max_strike(struct char_data *ch);
-void perform_group_gain(struct char_data *ch, gold_int base,
-                        struct char_data *victim);
-void dam_message(int dam, struct char_data *ch, struct char_data *victim,
+void delay_die(Character *ch, Character *killer);
+int shield_check(Character *ch, Character *vict, int type, int w_type);
+void make_half(Character *ch);
+void make_head(Character *ch);
+int class_min_strike(Character *ch);
+int class_max_strike(Character *ch);
+void perform_group_gain(Character *ch, gold_int base,
+                        Character *victim);
+void dam_message(int dam, Character *ch, Character *victim,
                  int w_type);
-void appear(struct char_data *ch);
+void appear(Character *ch);
 void load_messages(void);
 void free_messages(void);
 void free_messages_type(struct msg_type *msg);
-void check_killer(struct char_data *ch, struct char_data *vict);
-void make_corpse(struct char_data *ch, struct char_data *killer);
-void change_alignment(struct char_data *ch, struct char_data *victim);
-void death_cry(struct char_data *ch);
-void raw_kill(struct char_data *ch, struct char_data *killer);
+void check_killer(Character *ch, Character *vict);
+void make_corpse(Character *ch, Character *killer);
+void change_alignment(Character *ch, Character *victim);
+void death_cry(Character *ch);
+void raw_kill(Character *ch, Character *killer);
 char *replace_string(const char *str, const char *weapon_singular,
                      const char *weapon_plural, const char *strike_sing,
                      const char *strike_plural, const char *hitcount_word);
 void perform_violence(void);
-void improve_skill(struct char_data *ch, int skill);
-int compute_armor_class(struct char_data *ch);
-void send_not_to_spam(char *buf, struct char_data *ch,
-                      struct char_data *victim, struct obj_data *weap,
+void improve_skill(Character *ch, int skill);
+int compute_armor_class(Character *ch);
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
                       int spam);
 
 EVENTFUNC(fight_event);
-int calc_fight_speed(struct char_data* ch);
-long fight_timeout_calc(struct char_data* ch, short type, short number);
-int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, short number);
-int fe_group_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
-int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
-int fe_solo_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
+int calc_fight_speed(Character* ch);
+long fight_timeout_calc(Character* ch, short type, short number);
+int fight_event_hit(Character* ch, Character* vict, short type, short number);
+int fe_group_damage(Character* ch, Character* vict, int damage, int w_type);
+int fe_after_damage(Character* ch, Character* vict, int damage, int w_type);
+int fe_solo_damage(Character* ch, Character* vict, int damage, int w_type);
 
 
-int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type);
-int one_hit_damage(struct char_data *ch, int type);
-int speed_update(struct char_data *ch);
-void kill_list(struct char_data *ch, struct char_data *vict);
+int evade_hit_check(Character *ch, Character *vict, int w_type);
+int one_hit_damage(Character *ch, int type);
+int speed_update(Character *ch);
+void kill_list(Character *ch, Character *vict);
 int attack_group = 1;
 
 
 /*mord*/
 
-void perform_assist(struct char_data *ch, struct char_data *helpee);
+void perform_assist(Character *ch, Character *helpee);
 int speed_msg = 0;
 int ch_speed = 0;
 int global_dam = 0;
 char buff[MAX_INPUT_LENGTH];
 int speed_info(int input, int type);
-int attack_roll(struct char_data *attacker, struct char_data *vict, int type);
-int spell_size_dice(struct char_data *ch);
-int spell_num_dice(struct char_data *ch);
-int class_damroll(struct char_data *ch);
-void poison_wep_check(struct char_data *ch, struct char_data *vict,int w_type, int dam);
-void kill_points(struct char_data *ch, struct char_data *vict);
-int next_attack_type(struct char_data *ch);
-void halt_fighting(struct char_data *ch);
-int next_round(struct char_data* ch);
-int num_dice_wep(struct char_data *ch, short dual);
-int size_dice_wep(struct char_data *ch, short dual);
-int num_melee_tier(struct char_data *ch);//remort
-int find_body_part(struct char_data *ch, int w_type);
+int attack_roll(Character *attacker, Character *vict, int type);
+int spell_size_dice(Character *ch);
+int spell_num_dice(Character *ch);
+int class_damroll(Character *ch);
+void poison_wep_check(Character *ch, Character *vict,int w_type, int dam);
+void kill_points(Character *ch, Character *vict);
+int next_attack_type(Character *ch);
+void halt_fighting(Character *ch);
+int next_round(Character* ch);
+int num_dice_wep(Character *ch, short dual);
+int size_dice_wep(Character *ch, short dual);
+int num_melee_tier(Character *ch);//remort
+int find_body_part(Character *ch, int w_type);
 float area_damage_multi(int area);
 int find_part_area(int part);
-int chance_hit_part(struct char_data *ch, int part);
-void start_fighting_delay(struct char_data *vict, struct char_data *ch);
-int steal_affects(struct char_data *ch,int dam, int w_type, CHAR_DATA *vict);
-int valid_perc(struct char_data *ch);
-void gain_group_exp(struct char_data *ch, gold_int gain);
-int fe_special_hit(struct char_data* ch, struct char_data* vict, int type);
-float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict,int type);
+int chance_hit_part(Character *ch, int part);
+void start_fighting_delay(Character *vict, Character *ch);
+int steal_affects(Character *ch,int dam, int w_type, Character *vict);
+int valid_perc(Character *ch);
+void gain_group_exp(Character *ch, gold_int gain);
+int fe_special_hit(Character* ch, Character* vict, int type);
+float skill_type_multi(Character *ch, Character *vict,int type);
 float atk_chance_multi(int acm);
-int num_casting(struct char_data *ch);
-void death_room(struct char_data *ch);
+int num_casting(Character *ch);
+void death_room(Character *ch);
 
 /* weapon balance protos */
 int perf_balance(int weapon_type);
@@ -369,7 +373,7 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
     {ONE_HANDED, 15, -70, 10, -30, 40, -80, 40, "Projectile"}
   };
 
-float staff_multi(struct char_data *ch, struct obj_data *staff)
+float staff_multi(Character *ch, struct obj_data *staff)
 {
 
   int staff_type;
@@ -400,7 +404,7 @@ float staff_multi(struct char_data *ch, struct obj_data *staff)
   else
     return 0;
 }
-float has_staff(struct char_data *ch)
+float has_staff(Character *ch)
 {
   if (!ch) //its being called from an object spell
     return 1.0;
@@ -408,7 +412,7 @@ float has_staff(struct char_data *ch)
 }
 /*Affects from spells should change these dice*/
 
-int spell_size_dice(struct char_data *ch)
+int spell_size_dice(Character *ch)
 {
   int chclass = GET_CLASS(ch);
   int sdice = 0;
@@ -458,7 +462,7 @@ int spell_size_dice(struct char_data *ch)
   return MAX(0, ((int)sdice));
 
 }
-int spell_num_dice(struct char_data *ch)
+int spell_num_dice(Character *ch)
 {
 
   int chclass = GET_CLASS(ch);
@@ -511,7 +515,7 @@ int spell_num_dice(struct char_data *ch)
   return MAX(0, ((int)ndice));
 }
 
-int has_weapon(struct char_data *ch)
+int has_weapon(Character *ch)
 {
 
   int count = 0;
@@ -541,7 +545,7 @@ int is_short_wep(struct obj_data *obj)
 }
 
 
-int size_dice_wep(struct char_data *ch, short dual)
+int size_dice_wep(Character *ch, short dual)
 {
   struct obj_data *weapon;
   int add = 0, mnt = 0;
@@ -609,7 +613,7 @@ int size_dice_wep(struct char_data *ch, short dual)
   return add;
 }
 
-int num_dice_wep(struct char_data *ch, short dual)
+int num_dice_wep(Character *ch, short dual)
 {
   struct obj_data *weapon;
   int add = 0;
@@ -666,7 +670,7 @@ int num_dice_wep(struct char_data *ch, short dual)
 }
 
 
-int average_damage(struct char_data *ch)
+int average_damage(Character *ch)
 {
   float dam = class_damroll(ch) * 0.75;
 
@@ -695,18 +699,18 @@ int average_damage(struct char_data *ch)
 /*move this to constants */
 struct fight_event_obj
 {
-  //struct char_data *ch;
+  //Character *ch;
   long id;
 };
 
 
 
-void start_fighting(struct char_data* ch, struct char_data* vict)
+void start_fighting(Character* ch, Character* vict)
 {
   struct combine_data *temp, *tnext;
-  struct char_data *k = (ch->master ? ch->master : ch);
+  Character *k = (ch->master ? ch->master : ch);
   struct follow_type *f;
-  CHAR_DATA *victim;
+  Character *victim;
 
   /*to stop recursion*/
   if (!ch || !vict)
@@ -724,7 +728,7 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
   if (AFF_FLAGGED(ch, AFF_INVISIBLE))
   {
     appear(ch);
-    new_send_to_char(ch, "You slowly fade into existence.\r\n");
+    ch->Send( "You slowly fade into existence.\r\n");
   }
 
 
@@ -791,9 +795,9 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
 
 }
-struct char_data *find_random_victim(struct char_data *ch)
+Character *find_random_victim(Character *ch)
 {
-  struct char_data *vict;
+  Character *vict;
   for (vict = IN_ROOM(ch)->people; vict ; vict = vict->next_in_room)
   {
     if (SELF(ch, vict))
@@ -826,9 +830,9 @@ struct char_data *find_random_victim(struct char_data *ch)
   return NULL;
 }
 
-void start_fighting_delay(struct char_data *ch, struct char_data *vict)
+void start_fighting_delay(Character *ch, Character *vict)
 {
-  CHAR_DATA *victim;
+  Character *victim;
   /*to stop recursion*/
   if (!ch || !vict)
     return;
@@ -865,9 +869,9 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 }
 
 
-int next_round(struct char_data* ch)
+int next_round(Character* ch)
 {
-  CHAR_DATA *victim;
+  Character *victim;
 
   /*to stop recursion*/
   if (!ch)
@@ -937,7 +941,7 @@ EVENTFUNC(fight_event)
 {
   struct fight_event_obj* fight = (struct fight_event_obj*) event_obj;
   long id = fight->id;
-  struct char_data *ch = find_char(id);
+  Character *ch = find_char(id);
 
 
 
@@ -947,7 +951,7 @@ EVENTFUNC(fight_event)
 #if 0
     {
       int found = FALSE;
-      struct char_data *tch;
+      Character *tch;
       for (tch = character_list;tch&&!found;tch = tch->next)
       {
         /** Assume Unique **/
@@ -975,7 +979,7 @@ EVENTFUNC(fight_event)
       int a_t = 0;
       fe_t = find_fe_type(ch);
       a_t = next_attack_type(ch);
-      struct char_data * tch;
+      Character * tch;
 
       if (fight_event_hit(ch, FIGHTING(ch), fe_t, a_t) >= 0)
       {
@@ -992,7 +996,7 @@ EVENTFUNC(fight_event)
       {
         if (GET_SWEEP_DAM(ch))
         {
-          struct char_data *victnext = find_random_victim(ch);
+          Character *victnext = find_random_victim(ch);
           if (victnext)
           {
             act("You sweep around into $N!", TRUE, ch, NULL, victnext, TO_CHAR);
@@ -1012,7 +1016,7 @@ EVENTFUNC(fight_event)
   return 0;
 }
 
-int next_attack_type(struct char_data *ch)
+int next_attack_type(Character *ch)
 {
 
   /* Attack type, this calls special attacks
@@ -1024,7 +1028,7 @@ int next_attack_type(struct char_data *ch)
 }
 
 
-void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass)
+void skill_attack(Character *ch, Character *vict, int skill, int pass)
 {
   if (pass)
   {
@@ -1037,7 +1041,7 @@ void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int p
     else
     {
       if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-        new_send_to_char(ch, "%s", stance_change[number(0, 2)]);
+        ch->Send( "%s", stance_change[number(0, 2)]);
       GET_NEXT_SKILL(ch) = skill;
       GET_NEXT_VICTIM(ch) = GET_ID(vict);
     }
@@ -1050,7 +1054,7 @@ void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int p
 }
 
 
-int calc_fight_speed(struct char_data* ch)
+int calc_fight_speed(Character* ch)
 {
   float to_ret =  (speed_update(ch));
   if (IS_NPC(ch))
@@ -1101,14 +1105,14 @@ float race_dam_mod(int race, int magic)
 }
 
 
-int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_type)
+int modify_dam(int dam, Character *ch, Character *vict , int w_type)
 {
   float damage = dam;
-  struct char_data *k = NULL;
+  Character *k = NULL;
   struct follow_type *f;
-  int skill_cost(int h, int m, int v, struct char_data *ch);
+  int skill_cost(int h, int m, int v, Character *ch);
   int wep = IS_WEAPON(w_type);
-  //  struct char_data *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
+  //  Character *mount = (RIDING(ch) && (HERE(ch, RIDING(ch)))) ? RIDING(ch) : NULL;
 
   if (!IS_NPC(vict))
   {
@@ -1262,7 +1266,7 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
 }
 
 
-int class_damroll(struct char_data *ch)
+int class_damroll(Character *ch)
 {
   int dam = 0;
   if (!IS_NPC(ch))
@@ -1309,7 +1313,7 @@ int class_damroll(struct char_data *ch)
 This function works for all attack types.
 */
 
-int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
+int attack_roll(Character *attacker, Character *vict, int type)
 {
 
   int accuracy_roll = 0;
@@ -1342,7 +1346,7 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
     evasion_roll /= 2;
   accuracy_roll = accuracy_tot(attacker);
 
-  totalchance = (( evasion_roll * 100.0)/(accuracy_roll + evasion_roll));
+  totalchance = FTOI((( evasion_roll * 100.0)/(accuracy_roll + evasion_roll)));
 
   mins = class_min_strike(attacker);
   maxs = class_max_strike(attacker);
@@ -1388,7 +1392,7 @@ float pos_multi(int pos)
 }
 
 
-int evasion_tot(struct char_data *vict)
+int evasion_tot(Character *vict)
 {
   //yeah i know its a typo
   int evasion_roll = 0;
@@ -1399,13 +1403,13 @@ int evasion_tot(struct char_data *vict)
     return 0;
 
 
-  evasion_roll = (IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_EVASION(vict));
+evasion_roll = FTOI((IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_EVASION(vict)));
 
   victim_ac = (200 - (100 + compute_armor_class(vict)));
   if (victim_ac != 0)
     evasion_roll += (victim_ac/3); // between 0 and 66
   if ((part = GET_SUB(vict, SUB_LOYALDEFEND) ) > 0)
-    evasion_roll += part * 0.5;
+    evasion_roll += FTOI(part * 0.5);
 
   if (!IS_NPC(vict))
   {
@@ -1461,17 +1465,17 @@ int evasion_tot(struct char_data *vict)
   evasion_roll += get_weapon_evasion(GET_EQ(vict, WEAR_WIELD_2));
 
   if (AFF_FLAGGED(vict, AFF_CURSE))
-    evasion_roll *= 0.75;
+    evasion_roll -= (evasion_roll / 4);
   evasion_roll = (evasion_roll <= 0 ? 1 : evasion_roll);
 
   return evasion_roll;
 }
 
-int accuracy_tot(struct char_data *attacker)
+int accuracy_tot(Character *attacker)
 {
   int accuracy_roll = 0;
   int calc_thaco;
-  struct char_data *k = NULL;
+  Character *k = NULL;
   struct follow_type *f;
 
   if (!IS_NPC(attacker))
@@ -1487,9 +1491,9 @@ int accuracy_tot(struct char_data *attacker)
   calc_thaco = IRANGE(-10, calc_thaco, 70);
 
 
-  accuracy_roll = (IS_NPC(attacker) ? ((MOB_TIER(attacker))) *
+  accuracy_roll = FTOI((IS_NPC(attacker) ? ((MOB_TIER(attacker))) *
                    (GET_LEVEL(attacker) * 2.0) * (0.5 + (GET_LEVEL(attacker)>30) + (GET_LEVEL(attacker)>40) +
-                                                  (GET_LEVEL(attacker)>=50) + (GET_LEVEL(attacker)>=60)) : GET_PERM_ACCURACY(attacker));
+                     (GET_LEVEL(attacker)>=50) + (GET_LEVEL(attacker)>=60)) : GET_PERM_ACCURACY(attacker)));
   accuracy_roll += calc_thaco;
   if (AFF_FLAGGED(attacker, AFF_BESERK)) /* Char has gone Beserk      */
     accuracy_roll += 10;
@@ -1566,7 +1570,7 @@ int accuracy_tot(struct char_data *attacker)
   return accuracy_roll;
 }
 
-long fight_timeout_calc(struct char_data* ch, short type, short number)
+long fight_timeout_calc(Character* ch, short type, short number)
 {
   /* This function needs to calculate the number of heartbeats we should wait
      through until we hit the guy again.  This calculation involves player
@@ -1574,19 +1578,19 @@ long fight_timeout_calc(struct char_data* ch, short type, short number)
      terms...
   */
   float fspeed = calc_fight_speed(ch)+1000.0;
-  long to_ret = 0;
+  int to_ret = 0;
   float partial = 0.0f;
 
 
   partial = (100.0f-(fspeed * 0.05)); // puts the speed between 1 and 100 - 100 being fastest
-  to_ret = (long)((PULSES_PER_FIGHT*partial)/100.0f); // puts the time of the next hit between .001 and 6 seconds from now.
+  to_ret = (int)((PULSES_PER_FIGHT*partial)/100.0f); // puts the time of the next hit between .001 and 6 seconds from now.
 
-  return IRANGE(1, to_ret, PULSES_PER_FIGHT);
+  return (long)IRANGE(1, FTOI(to_ret), PULSES_PER_FIGHT);
 }
 
-int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, short num)
+int fight_event_hit(Character* ch, Character* vict, short type, short num)
 {
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
   int perc = 0;
   int shortwep = 0;
@@ -1598,7 +1602,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   if (AFF_FLAGGED(ch, AFF_INVISIBLE))
   {
     appear(ch);
-    new_send_to_char(ch, "You slowly fade into existence.\r\n");
+    ch->Send( "You slowly fade into existence.\r\n");
   }
 
   if (RIDING(ch) && RIDING(ch) == vict)
@@ -1659,12 +1663,12 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
 
     if (GET_POS(ch) == POS_SITTING)
     {
-      new_send_to_char(ch, "You can't fight while sitting!");
+      ch->Send( "You can't fight while sitting!");
       return 0;
     }
     if (GET_POS(ch) == POS_RESTING)
     {
-      new_send_to_char(ch, "You can't fight while resting!");
+      ch->Send( "You can't fight while resting!");
       return 0;
     }
 
@@ -1758,7 +1762,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
       }
       if (AFF_FLAGGED(ch, AFF_MAGIC_BUBBLE))
       {
-        new_send_to_char(ch, "Your magic can't penetrate your own magic bubble.\r\n");
+        ch->Send( "Your magic can't penetrate your own magic bubble.\r\n");
         act("$n's magic doesn't penetrate $s own magic bubble!", FALSE, ch, 0 , 0, TO_ROOM);
         return (fe_melee_hit(ch, vict, TYPE_HIT, TRUE));
       }
@@ -1780,7 +1784,7 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
 }
 
 
-int melee_type_dam(CHAR_DATA *ch, CHAR_DATA *vict, int attack_chance, int weps, int second)
+int melee_type_dam(Character *ch, Character *vict, int attack_chance, int weps, int second)
 {
   int dam = 0;
   if (!IS_NPC(ch))
@@ -1801,17 +1805,17 @@ int melee_type_dam(CHAR_DATA *ch, CHAR_DATA *vict, int attack_chance, int weps, 
 
   dam += class_damroll(ch);
 
-  dam *= atk_chance_multi(attack_chance);
+  dam = FTOI(dam * atk_chance_multi(attack_chance));
 
   if (weps == SINGLE_WEP)
-    dam *= 1.1;
+    dam += dam / 10;
 
-  dam *= pos_multi(GET_POS(vict));
+  dam = FTOI(dam * pos_multi(GET_POS(vict)));
 
   return dam;
 }
 
-int fe_melee_hit(struct char_data* ch, struct char_data* vict,
+int fe_melee_hit(Character* ch, Character* vict,
                  int type, int melee)
 {
   struct obj_data* wielded = NULL;
@@ -1868,7 +1872,7 @@ int fe_melee_hit(struct char_data* ch, struct char_data* vict,
   {
     dam = melee_type_dam(ch, vict, attack_chance, weps, wield_2);
     /* Depending on weapon type change the damage */
-    dam *= wep_multi;
+    dam = FTOI(dam * wep_multi);
     damage_ret = fe_deal_damage(ch, vict, dam, w_type);
   }
 
@@ -1878,7 +1882,7 @@ int fe_melee_hit(struct char_data* ch, struct char_data* vict,
 
 }
 
-int fe_special_hit(struct char_data* ch, struct char_data* vict, int type)
+int fe_special_hit(Character* ch, Character* vict, int type)
 {
   int dam = 0, attack_chance = 3, damage_ret;
   GET_ATTACK_POS(ch) = TYPE_UNDEFINED;
@@ -1908,14 +1912,14 @@ int fe_special_hit(struct char_data* ch, struct char_data* vict, int type)
 
       dam += class_damroll(ch);
 
-      dam += (dam * has_staff(ch));
+      dam += FTOI(dam * has_staff(ch));
 
-      dam *= pos_multi(GET_POS(vict));
+      dam = FTOI( dam * pos_multi(GET_POS(vict)) );
 
-      dam *= atk_chance_multi(attack_chance);
+      dam = FTOI( dam * atk_chance_multi(attack_chance));
     }
 
-    dam *= (GET_SKILLMULTI(ch) = skill_type_multi(ch, vict, type));
+    dam = FTOI( dam * (GET_SKILLMULTI(ch) = skill_type_multi(ch, vict, type)));
 
     damage_ret = fe_solo_damage(ch, vict, dam, type); //change this in future?
   }
@@ -1924,7 +1928,7 @@ int fe_special_hit(struct char_data* ch, struct char_data* vict, int type)
   return damage_ret;
 }
 
-int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type)
+int fe_spell_hit(Character* ch, Character* vict, int type)
 {
   int attack_chance;
   int dam = 0;
@@ -1949,11 +1953,11 @@ int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type)
 
     dam += class_damroll(ch);
 
-    dam += (dam * has_staff(ch));
+    dam += FTOI(dam * has_staff(ch));
 
-    dam *= pos_multi(GET_POS(vict));
+    dam = FTOI( dam * pos_multi(GET_POS(vict)));
 
-    dam *= atk_chance_multi(attack_chance);
+    dam = FTOI( dam * atk_chance_multi(attack_chance));
 
     damage_ret = fe_deal_damage(ch, vict, dam, type); //change this in future?
   }
@@ -1986,7 +1990,7 @@ float atk_chance_multi(int acm)
    takes those affects into account before the calling.
 */
 
-int fe_solo_damage(struct char_data* ch, struct char_data* vict,
+int fe_solo_damage(Character* ch, Character* vict,
                    int damage, int w_type)
 {
   if (ch == NULL || vict == NULL)
@@ -2023,11 +2027,11 @@ int fe_solo_damage(struct char_data* ch, struct char_data* vict,
    that should be hitting each player, we just call
    fe_solo_damage....no thrills here.
  */
-int fe_group_damage(struct char_data* ch, struct char_data* vict,
+int fe_group_damage(Character* ch, Character* vict,
                     int damage, int w_type)
 {
   struct follow_type* f = NULL;
-  struct char_data* master = NULL;
+  Character* master = NULL;
 
 
   float total_perc  = 0;
@@ -2038,7 +2042,7 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
   /* this is probably a bad way to do it - FIXME */
   int hit_list[30];
   int count = 0;
-  struct char_data *list;
+  Character *list;
 
   /* also make sure that noone that is attacked and has 0 involvement but isnt with the group is counted.
      if you have 0 involvement and are alone you should get full attacks.
@@ -2111,12 +2115,12 @@ int fe_group_damage(struct char_data* ch, struct char_data* vict,
   return to_ret;
 }
 
-int valid_perc(struct char_data *ch)
+int valid_perc(Character *ch)
 {
 
   struct follow_type* f = NULL;
-  struct char_data *vict = FIGHTING(ch);
-  struct char_data *master = (ch ? (ch->master ? ch->master : ch) : NULL);
+  Character *vict = FIGHTING(ch);
+  Character *master = (ch ? (ch->master ? ch->master : ch) : NULL);
   room_rnum rm = IN_ROOM(ch);
   float total_perc = 0.0;
 
@@ -2129,7 +2133,7 @@ int valid_perc(struct char_data *ch)
 
 
   if (vict == NULL || (!ch->master && ch->followers == NULL))
-    return GET_PERC(ch);
+    return FTOI(GET_PERC(ch));
 
 
   /*check if the master is a valid target - and add the value of  */
@@ -2155,7 +2159,7 @@ int valid_perc(struct char_data *ch)
   if (total_perc == 0)
     return 0;
 
-  return ((GET_PERC(ch)*100)/total_perc);
+  return FTOI(((GET_PERC(ch)*100)/total_perc));
 }
 
 /* Gets called from fe_melee_hit and handles ch hitting vict
@@ -2163,10 +2167,10 @@ int valid_perc(struct char_data *ch)
    offloads the work to fe_solo_damage or fe_group_damage,
    dependant upon wether vict is a mob or not.
  */
-int fe_deal_damage(struct char_data* ch, struct char_data* vict,
+int fe_deal_damage(Character* ch, Character* vict,
                    int dam, int w_type)
 {
-  CHAR_DATA *master = NULL;
+  Character *master = NULL;
   if (!vict)
   {
     return -1;
@@ -2216,10 +2220,10 @@ int fe_deal_damage(struct char_data* ch, struct char_data* vict,
 }
 
 
-void halt_fighting(struct char_data *ch)
+void halt_fighting(Character *ch)
 {
 
-  struct char_data* people, *p_next;
+  Character* people, *p_next;
 
   /*stop everyone in this room fighting them */
   stop_fighting(ch);
@@ -2253,7 +2257,7 @@ of item.
  
  
 */
-int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
+int steal_affects(Character *ch, int dam, int w_type, Character *vict)
 {
   int ret_val = 0;
   float hp = 0, ma = 0, mv = 0;
@@ -2340,21 +2344,21 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
 
   if (GET_MANA(ch) < GET_MAX_MANA(ch) && (ma=((dam*ma)/100.0)) > 0.0)
   {
-    alter_mana(ch, -ma);
-    alter_mana(vict, ma);
+    alter_mana(ch, FTOI(-ma));
+    alter_mana(vict, FTOI(ma));
   }
 
   if (GET_MOVE(ch) < GET_MAX_MOVE(ch) &&(mv=((dam*mv)/100.0)) > 0.0)
   {
-    alter_move(ch, -mv);
-    alter_move(vict, mv);
+    alter_move(ch, FTOI(-mv));
+    alter_move(vict, FTOI(mv));
   }
   if (GET_HIT(ch) < GET_MAX_HIT(ch) &&(hp=((dam*hp)/100.0)) > 0.0)
   {
     /* TODO: add ramdom message's for this */
     act("$n steals your energy.", FALSE, ch, 0, vict, TO_VICT);
     act("You steal $N's energy.", FALSE, ch, 0, vict, TO_CHAR);
-    damage(vict,ch, -hp, TYPE_UNDEFINED);
+    damage(vict,ch, FTOI(-hp), TYPE_UNDEFINED);
     //ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
   }
 
@@ -2374,7 +2378,7 @@ int steal_affects(struct char_data *ch, int dam, int w_type, CHAR_DATA *vict)
    The function has been cleaned up alot, looking much better.
 */
 
-int fe_after_damage(struct char_data* ch, struct char_data* vict,
+int fe_after_damage(Character* ch, Character* vict,
                     int dam, int w_type)
 {
   gold_int local_gold = 0;
@@ -2382,7 +2386,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
   char local_buf[100] = "";
   int partial = 0;
   //int dam_exp = 0;
-  struct char_data *victnext;
+  Character *victnext;
   int sweeping;
 
   victnext = NULL;
@@ -2425,7 +2429,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
         if (GET_SWEEP_DAM(ch))
         {
           //partial *= 0.6;
-          partial *= (GET_SUB(ch, SUB_SWEEP_ATTACK) * 0.01);
+          partial = FTOI( partial * (GET_SUB(ch, SUB_SWEEP_ATTACK) * 0.01));
           partial += GET_SWEEP_DAM(ch);
         }
         if (GET_HIT(vict) < partial)
@@ -2547,7 +2551,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
         if ( number(1,100) > GET_PERM_ACCURACY(ch) && number(1, 1000) < 5)
         {
           GET_PERM_ACCURACY(ch)++;
-          new_send_to_char(ch, "Your natural accuracy rating just increased to %d!\r\n", GET_PERM_ACCURACY(ch));
+          ch->Send( "Your natural accuracy rating just increased to %d!\r\n", GET_PERM_ACCURACY(ch));
         }
       }
 
@@ -2646,7 +2650,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
         do_get(ch, "coin corpse", 0, 0);
 
       if (bonus_gold)
-        new_send_to_char(ch, "{cbYou pillage the corpse and find an extra %d coins!{c0\r\n",  bonus_gold);
+        ch->Send( "{cbYou pillage the corpse and find an extra %d coins!{c0\r\n",  bonus_gold);
 
       if (PRF_FLAGGED(ch, PRF_AUTOLOOT))
         do_get(ch, "all corpse", 0, 0);
@@ -2671,7 +2675,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
 }
 
 
-void poison_wep_check(struct char_data *ch, struct char_data *vict, int w_type, int dam)
+void poison_wep_check(Character *ch, Character *vict, int w_type, int dam)
 {
 
   if (MOB_FLAGGED(vict, MOB_NOPOISON))
@@ -2775,7 +2779,7 @@ void poison_wep_check(struct char_data *ch, struct char_data *vict, int w_type, 
 
 
 
-int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_type)
+int shield_check(Character *ch, Character *vict, int type, int w_type)
 {
   int success = FALSE;
   struct affected_type af;
@@ -2783,7 +2787,7 @@ int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_t
   int lev = GET_LEVEL(vict);
   int ded = (GET_POS(vict) <= POS_STUNNED);
   int sht = is_short_wep(GET_EQ(ch, WEAR_WIELD));
-  global_dam = (ded? global_dam : global_dam * 0.2);
+global_dam = (ded? global_dam : global_dam/5);
   if (!HERE(ch,vict))
     return 0;
 
@@ -2807,7 +2811,7 @@ int shield_check(struct char_data *ch, struct char_data *vict, int type, int w_t
   switch (type)
   {
   case SHIELD_BLOCK:
-    armor_rating = MIN(40.0, (AFF_FLAGGED(vict, AFF_SHIELD_STATIC) ? 2*apply_ac(vict, WEAR_SHIELD) : apply_ac(vict, WEAR_SHIELD)));
+    armor_rating = MIN(40, (AFF_FLAGGED(vict, AFF_SHIELD_STATIC) ? 2*apply_ac(vict, WEAR_SHIELD) : apply_ac(vict, WEAR_SHIELD)));
 
     success = (armor_rating ? (number(0, 100) < armor_rating) : 0);
     if (success)
@@ -2867,9 +2871,9 @@ seperate into its own function
 add other evacive skills and spell checks here.
 dodge, evade, phase, etc etc
 */
-int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
+int evade_hit_check(Character *ch, Character *vict, int w_type)
 {
-  int skill_cost(int h, int m, int v, struct char_data *ch);
+  int skill_cost(int h, int m, int v, Character *ch);
   int parrychance = 0;
   int v_type = w_type;
   if ((!ch || !vict) || GET_POS(vict) < POS_FIGHTING)
@@ -2890,7 +2894,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
     if ((v_type) >= TYPE_HIT)
       v_type -= TYPE_HIT;
 
-    new_send_to_char(ch, "%s parries your attack with a swift %s.\r\n",
+    ch->Send( "%s parries your attack with a swift %s.\r\n",
                      PERS(vict,ch), attack_hit_text[v_type].singular);
     new_send_to_char(vict,  "You parry %s's attack with a swift %s.\r\n",
                      PERS(ch, vict), attack_hit_text[v_type].singular);
@@ -2900,7 +2904,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
   {
     if (skill_cost(0, 2, 20, vict))
     {
-      new_send_to_char(ch, "%s dodges your attack.\r\n", PERS(vict,ch));
+      ch->Send( "%s dodges your attack.\r\n", PERS(vict,ch));
       new_send_to_char(vict,  "You dodge %s's attack.\r\n", PERS(ch, vict));
       return 1;
     }
@@ -2932,7 +2936,7 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
 
   if (number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && AFF_FLAGGED(vict, AFF_DRUNKEN_MASTER) && number(1, 200) < (70-GET_LEVEL(vict)))
   {
-    new_send_to_char(ch, "%s weaves drunkenly out of your reach!\r\n", PERS(vict,ch));
+    ch->Send( "%s weaves drunkenly out of your reach!\r\n", PERS(vict,ch));
     new_send_to_char(vict, "You weave drunkenly out of %s's reach!\r\n",  PERS(ch, vict));
     return 1;
   }
@@ -2941,11 +2945,11 @@ int evade_hit_check(struct char_data *ch, struct char_data *vict, int w_type)
 }
 
 
-void send_not_to_spam(char *buf, struct char_data *ch,
-                      struct char_data *victim, struct obj_data *weap,
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
                       int spam)
 {
-  struct char_data *people;
+  Character *people;
 
   if (!ch)
     return;
@@ -2970,7 +2974,7 @@ void send_not_to_spam(char *buf, struct char_data *ch,
 
 /* The Fight related routines */
 
-void appear(struct char_data *ch)
+void appear(Character *ch)
 {
   if (affected_by_spell(ch, SPELL_INVISIBLE))
     affect_from_char(ch, SPELL_INVISIBLE);
@@ -2984,12 +2988,12 @@ void appear(struct char_data *ch)
     act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, 0, 0, TO_ROOM);
 }
 
-int skill_roll(struct char_data *ch, int skill_num)
+int skill_roll(Character *ch, int skill_num)
 {
   return (GET_SKILL(ch, skill_num) > number(1, 101));
 }
 
-int compute_armor_class(struct char_data *ch)
+int compute_armor_class(Character *ch)
 {
   int armorclass = GET_AC(ch);
   return (IRANGE(-100, armorclass, 100));    /* -100 is lowest */
@@ -2997,7 +3001,7 @@ int compute_armor_class(struct char_data *ch)
 
 
 /*min from -10 to 0*/
-int class_min_strike(struct char_data *ch)
+int class_min_strike(Character *ch)
 {
   if (!IS_NPC(ch))
   {
@@ -3042,7 +3046,7 @@ int class_min_strike(struct char_data *ch)
 }
 
 /*max from 0 to 10 */
-int class_max_strike(struct char_data *ch)
+int class_max_strike(Character *ch)
 {
   if (!IS_NPC(ch))
   {
@@ -3626,7 +3630,7 @@ int weapon_type_mod(int w_type, int area)
 /* should be called only once per attack, returns a random part
    ch has no use yet, but may do in future.
 */
-int find_body_part(struct char_data *ch, int w_type)
+int find_body_part(Character *ch, int w_type)
 {
   int up_center = 10;
   int up_left = 10;
@@ -3761,10 +3765,10 @@ int rand_area_part(int area)
 
 
 /* returns a number between 0 and 100 as a percentage chance */
-int chance_hit_part(struct char_data *ch, int part)
+int chance_hit_part(Character *ch, int part)
 {
   int area = find_part_area(part);
-  int apply_ac(struct char_data *ch, int eq_pos);
+  int apply_ac(Character *ch, int eq_pos);
   int pos;
   float t_c = 1;
   float t_l = 1;
@@ -3802,25 +3806,25 @@ int chance_hit_part(struct char_data *ch, int part)
   switch (area)
   {
   case PART_TOP_CENTER:
-    return IRANGE(0, total != 6 ? (ac_tot * (t_c/total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (t_c/total)) : 0, 100);
     break;
   case PART_TOP_LEFT:
-    return IRANGE(0, total != 6 ? (ac_tot * (t_l/total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (t_l/total)) : 0, 100);
     break;
   case PART_TOP_RIGHT:
-    return IRANGE(0, total != 6 ? (ac_tot * (t_r/total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (t_r/total)) : 0, 100);
     break;
   case PART_CENTER:
-    return IRANGE(0, total != 6 ? (ac_tot * (c  /total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (c  /total)) : 0, 100);
     break;
   case PART_LOWER_LEFT:
-    return IRANGE(0, total != 6 ? (ac_tot * (l_l/total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (l_l/total)) : 0, 100);
     break;
   case PART_LOWER_RIGHT:
-    return IRANGE(0, total != 6 ? (ac_tot * (l_r/total)) : 0, 100);
+    return IRANGE(0, total != 6 ? FTOI(ac_tot * (l_r/total)) : 0, 100);
     break;
   default:
-    return ac_tot;
+    return FTOI(ac_tot);
   }
 }
 
@@ -3888,7 +3892,7 @@ type is either a default message of melee, skill or magic, or a specific skill o
 w_type for weapon type
 fst is either to room, to vict or to char
 */
-char *fight_type_message(char *str, struct char_data *attacker, struct char_data *victim, int type, int w_type, int fst)
+char *fight_type_message(char *str, Character *attacker, Character *victim, int type, int w_type, int fst)
 {
 
   int ran = number(1, 1000);
@@ -4179,7 +4183,7 @@ char *fight_type_message(char *str, struct char_data *attacker, struct char_data
   return str;
 }
 
-int find_fe_type(struct char_data *ch)
+int find_fe_type(Character *ch)
 {
 
   int chcl;
@@ -4283,13 +4287,13 @@ Aberrant, Abominable, Absurd, Abysmal, Acidic, Acrocephalic*, Adhesive, Adipose*
 
 /* message for doing damage with a weapon - from fight.c*/
 #define MAX_DAM_MESSAGE 24
-void dam_message(int dam, struct char_data *ch, struct char_data *victim,
+void dam_message(int dam, Character *ch, Character *victim,
                  int w_type)
 {
   char buf[MAX_INPUT_LENGTH] = "";
   char msgbuf[MAX_INPUT_LENGTH] = "";
   int msgnum = 0, tt;
-  struct char_data *people;
+  Character *people;
   int type_save = w_type;
 
 
@@ -4424,7 +4428,7 @@ void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   if (dam)
   {
     /* damage message to damager */
-    new_send_to_char(ch, "%s", CCYEL(ch, C_CMP));
+    ch->Send( "%s", CCYEL(ch, C_CMP));
 
     if (PRF_FLAGGED(ch, PRF_BRIEF))
       act("You hurt $N.", FALSE, ch, NULL, victim, TO_CHAR);
@@ -4436,7 +4440,7 @@ void dam_message(int dam, struct char_data *ch, struct char_data *victim,
       act(msgbuf, FALSE, ch, NULL, victim, TO_CHAR);
     }
 
-    new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
+    ch->Send( "%s", CCNRM(ch, C_CMP));
   }
   else if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
     act("You miss $N!", FALSE, ch, NULL, victim, TO_CHAR);
@@ -4497,7 +4501,7 @@ void dam_message(int dam, struct char_data *ch, struct char_data *victim,
 }
 
 
-void update_pos(struct char_data *victim)
+void update_pos(Character *victim)
 {
   if (AFF_FLAGGED(victim, AFF_MEDITATE) && GET_POS(victim) > POS_SLEEPING)
   {
@@ -4523,7 +4527,7 @@ void update_pos(struct char_data *victim)
 }
 
 
-void check_killer(struct char_data *ch, struct char_data *vict)
+void check_killer(Character *ch, Character *vict)
 {
 
   if (!PLR_FLAGGED(vict, PLR_KILLER) && !PLR_FLAGGED(vict, PLR_THIEF)
@@ -4541,13 +4545,13 @@ void check_killer(struct char_data *ch, struct char_data *vict)
     new_mudlog(BRF, LVL_GOD, TRUE,
                "PC Killer bit set on %s for initiating attack on %s at %s.",
                GET_NAME(ch), GET_NAME(vict), vict->in_room->name);
-    new_send_to_char(ch,"If you want to be a PLAYER KILLER, so be it...\r\n");
+    ch->Send("If you want to be a PLAYER KILLER, so be it...\r\n");
   }
 }
 
 
 /* start one char fighting another (yes, it is horrible, I know... )  */
-void set_fighting(struct char_data *ch, struct char_data *vict)
+void set_fighting(Character *ch, Character *vict)
 {
 
   //redundant
@@ -4556,7 +4560,7 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 }
 
 
-void stop_fighting(struct char_data* ch)
+void stop_fighting(Character* ch)
 {
   /* if (GET_FIGHT_EVENT(ch))
    {
@@ -4571,7 +4575,7 @@ void stop_fighting(struct char_data* ch)
   return;
 }
 
-void make_corpse(struct char_data *ch, struct char_data *killer)
+void make_corpse(Character *ch, Character *killer)
 {
   struct obj_data *corpse = NULL, *o, *next_obj;
   struct obj_data *money;
@@ -4704,7 +4708,7 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
   }
 }
 
-void make_head(struct char_data *ch)
+void make_head(Character *ch)
 {
   struct obj_data *corpse;
   int x, y;
@@ -4754,7 +4758,7 @@ void make_head(struct char_data *ch)
   obj_to_room(corpse, IN_ROOM(ch));
 }
 
-void make_half(struct char_data *ch)
+void make_half(Character *ch)
 {
   struct obj_data *corpse;
   int x, y;
@@ -4806,7 +4810,7 @@ void make_half(struct char_data *ch)
 
 
 /* When ch kills victim */
-void change_alignment(struct char_data *ch, struct char_data *victim)
+void change_alignment(Character *ch, Character *victim)
 {
   if (ch && victim)
   {
@@ -4821,7 +4825,7 @@ void change_alignment(struct char_data *ch, struct char_data *victim)
 
 
 
-void death_cry(struct char_data *ch)
+void death_cry(Character *ch)
 {
   int door;
 
@@ -4836,7 +4840,7 @@ void death_cry(struct char_data *ch)
 
 
 
-void raw_kill(struct char_data *ch, struct char_data *killer)
+void raw_kill(Character *ch, Character *killer)
 {
   if (!ch || DEAD(ch))
     return;
@@ -4861,7 +4865,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer)
   death_room(ch);
 }
 
-void delay_die(struct char_data *ch, struct char_data *killer)
+void delay_die(Character *ch, Character *killer)
 {
 
   if (!IS_NPC(killer) || SELF(killer, ch) || (GET_LEVEL(ch)<=10 && REMORTS(ch) == 0))
@@ -4870,13 +4874,13 @@ void delay_die(struct char_data *ch, struct char_data *killer)
     return;
   }
   stop_fighting(ch);
-  new_send_to_char(ch, "{cWYou are dead, you have 60 seconds to be healed or you will\r\n"
+  ch->Send( "{cWYou are dead, you have 60 seconds to be healed or you will\r\n"
                    "leave a corpse. To leave a corpse now, type DIE{c0\r\n");
   SET_BIT_AR(PLR_FLAGS(ch), PLR_DYING);
   DIE_TIME(ch) = time(0);
 
 }
-struct char_data * char_by_id_desc_list(long idnum)
+Character * char_by_id_desc_list(long idnum)
 {
   struct descriptor_data *d;
   if (!descriptor_list)
@@ -4890,7 +4894,7 @@ struct char_data * char_by_id_desc_list(long idnum)
   return NULL;
 }
 
-void die(struct char_data *ch, struct char_data *killer)
+void die(Character *ch, Character *killer)
 {
   gold_int exp = (GET_LEVEL(ch)<=10 && REMORTS(ch) == 0);
 
@@ -4901,7 +4905,7 @@ void die(struct char_data *ch, struct char_data *killer)
   {
     halt_fighting(ch);
     if (exp)
-      new_send_to_char(ch, "You die before your time and are restored by the gods!\r\n"
+      ch->Send( "You die before your time and are restored by the gods!\r\n"
                        "This will only happen till level 10,\r\nafter that the gods will have no pity.\r\n");
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%sDEATH: %s killed and restored.", (exp ? "NEWBIE" : "ARENA" ),GET_NAME(ch));
 
@@ -4912,7 +4916,7 @@ void die(struct char_data *ch, struct char_data *killer)
   {
     struct dam_from_list * t;
     long idnum;
-    struct char_data *temp = NULL;
+    Character *temp = NULL;
     if (killer)
       idnum = GET_IDNUM(killer);
     else
@@ -4965,8 +4969,8 @@ void die(struct char_data *ch, struct char_data *killer)
 
 #if 0
 
-void perform_group_gain(struct char_data *ch, gold_int base,
-                        struct char_data *victim)
+void perform_group_gain(Character *ch, gold_int base,
+                        Character *victim)
 {
 
   gold_int share;
@@ -4981,9 +4985,9 @@ void perform_group_gain(struct char_data *ch, gold_int base,
   if (!PRF_FLAGGED(ch, PRF_BATTLESPAM))
   {
     if (share > 1)
-      new_send_to_char(ch, "You receive your share of experience -- %lld points.\r\n", share);
+      ch->Send( "You receive your share of experience -- %lld points.\r\n", share);
     else
-      new_send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
+      ch->Send( "You receive your share of experience -- one measly little point!\r\n");
   }
 
   gain_exp(ch, share);
@@ -5014,12 +5018,12 @@ This addition would mean that mobs/pets could be used to fight along side player
  
 */
 
-void group_gain(struct char_data *ch, struct char_data *victim)
+void group_gain(Character *ch, Character *victim)
 {
   float tot_members = 0.0, group_bonus = 0.0;
   int count = 0;
   gold_int tot_gain = 0;
-  struct char_data *k = (ch->master ? ch->master : ch);
+  Character *k = (ch->master ? ch->master : ch);
   struct follow_type *f;
 
 
@@ -5082,7 +5086,7 @@ void group_gain(struct char_data *ch, struct char_data *victim)
 }
 
 
-void solo_gain(struct char_data *ch, struct char_data *victim,
+void solo_gain(Character *ch, Character *victim,
                bool missile)
 {
   gold_int exp;
@@ -5102,9 +5106,9 @@ void solo_gain(struct char_data *ch, struct char_data *victim,
   exp = MAX(exp, 1);
   if (!PRF_FLAGGED(ch, PRF_BATTLESPAM))
 
-    new_send_to_char(ch, "You receive %lld experience points.\r\n", exp);
+    ch->Send( "You receive %lld experience points.\r\n", exp);
   else
-    new_send_to_char(ch, "You receive one lousy experience point.\r\n");
+    ch->Send( "You receive one lousy experience point.\r\n");
 
   if (!missile)
     gain_exp(ch, exp);
@@ -5162,7 +5166,7 @@ ACMD(do_fightmsg)
   int i;
   for (i = 0; i < MAX_MESSAGES; i++)
   {
-    new_send_to_char(ch, "Num: %-3d - %s\r\n", fight_messages[i].a_type, skill_name(fight_messages[i].a_type));
+    ch->Send( "Num: %-3d - %s\r\n", fight_messages[i].a_type, skill_name(fight_messages[i].a_type));
   }
 }
 
@@ -5170,12 +5174,12 @@ ACMD(do_fightmsg)
  * message for doing damage with a spell or skill
  *  C3.0: Also used for weapon damage on miss and death blows
  */
-int skill_message(int dam, struct char_data *ch, struct char_data *vict, int attacktype)
+int skill_message(int dam, Character *ch, Character *vict, int attacktype)
 {
   int i, j, nr;
   struct message_type *msg = NULL;
-  struct char_data *people = NULL;
-  struct char_data *victim = vict;;
+  Character *people = NULL;
+  Character *victim = vict;;
 
   struct obj_data *weap = GET_EQ(ch, WEAR_WIELD);
 
@@ -5184,7 +5188,7 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
     if (fight_messages[i].a_type == attacktype)
     {
       if (dam && ch != victim && !IS_NPC(ch))
-        new_send_to_char(ch, "{cg%2.2fx) {cy", GET_SKILLMULTI(ch));
+        ch->Send( "{cg%2.2fx) {cy", GET_SKILLMULTI(ch));
       nr = number(1, fight_messages[i].number_of_attacks);
       for (j = 1, msg = fight_messages[i].msg; (j < nr) && msg; j++)
         msg = msg->next;
@@ -5211,9 +5215,9 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
       {
         if (GET_POS(vict) == POS_DEAD)
         {
-          new_send_to_char(ch, "%s", CCYEL(ch, C_CMP));
+          ch->Send( "%s", CCYEL(ch, C_CMP));
           act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
-          new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
+          ch->Send( "%s", CCNRM(ch, C_CMP));
 
           new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
           act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
@@ -5230,9 +5234,9 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
         }
         else
         {
-          new_send_to_char(ch, "%s", CCYEL(ch, C_CMP));
+          ch->Send( "%s", CCYEL(ch, C_CMP));
           act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
-          new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
+          ch->Send( "%s", CCNRM(ch, C_CMP));
 
           new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
           act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
@@ -5252,9 +5256,9 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
       }
       else if (ch != vict)
       {   /* Dam == 0 */
-        new_send_to_char(ch, "%s", CCYEL(ch, C_CMP));
+        ch->Send( "%s", CCYEL(ch, C_CMP));
         act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
-        new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
+        ch->Send( "%s", CCNRM(ch, C_CMP));
 
         new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
         act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
@@ -5273,9 +5277,9 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
       }
       if (ch != victim && HERE(ch, victim) && PRF_FLAGGED(ch, PRF_BATTLESPAM))
       {
-        new_send_to_char(ch, "%s", CCCYN(ch, C_CMP));
+        ch->Send( "%s", CCCYN(ch, C_CMP));
         diag_char_to_char(victim, ch);
-        new_send_to_char(ch, "%s", CCNRM(ch, C_CMP));
+        ch->Send( "%s", CCNRM(ch, C_CMP));
       }
       return (1);
     }
@@ -5284,7 +5288,7 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict, int att
 }
 
 
-void strike_missile(struct char_data *ch, struct char_data *tch,
+void strike_missile(Character *ch, Character *tch,
                     struct obj_data *missile, int dir, int attacktype)
 {
   int dam;
@@ -5294,7 +5298,7 @@ void strike_missile(struct char_data *ch, struct char_data *tch,
   dam += dice(missile->obj_flags.value[1], missile->obj_flags.value[2]);
   dam += GET_DAMROLL(ch);
   if (AFF_FLAGGED(tch, AFF_SHIELD))
-    dam *= 0.5;
+    dam /= 2;
 
   snprintf(buf, sizeof(buf), "Your $p strikes $N!");
   act(buf, FALSE, ch, missile, tch, TO_CHAR);
@@ -5318,7 +5322,7 @@ void strike_missile(struct char_data *ch, struct char_data *tch,
 }
 
 
-void miss_missile(struct char_data *ch, struct char_data *tch,
+void miss_missile(Character *ch, Character *tch,
                   struct obj_data *missile, int dir, int attacktype)
 {
   char buf[MAX_INPUT_LENGTH];
@@ -5330,7 +5334,7 @@ void miss_missile(struct char_data *ch, struct char_data *tch,
              dirs[rev_dir[dir]]);
     act(buf, FALSE, tch, 0, 0, TO_ROOM);
     act(buf, FALSE, tch, 0, 0, TO_CHAR);
-    new_send_to_char(ch, "Your bullet narrowly misses %s. BAH!",
+    ch->Send( "Your bullet narrowly misses %s. BAH!",
                      PERS(tch, ch));
   }
   else
@@ -5348,7 +5352,7 @@ void miss_missile(struct char_data *ch, struct char_data *tch,
 }
 
 
-void mob_reaction(struct char_data *ch, struct char_data *vict, int dir)
+void mob_reaction(Character *ch, Character *vict, int dir)
 {
   if (IS_NPC(vict) && !FIGHTING(vict) && GET_POS(vict) > POS_STUNNED)
   {
@@ -5378,7 +5382,7 @@ void mob_reaction(struct char_data *ch, struct char_data *vict, int dir)
 }
 
 
-void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
+void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
                   struct obj_data *missile, int pos, int range, int dir)
 {
   bool shot = FALSE, found = FALSE;
@@ -5386,7 +5390,7 @@ void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
   room_rnum room, nextroom;
   int distance;
   //int r_num;
-  struct char_data *vict;
+  Character *vict;
   char buf[MAX_STRING_LENGTH];
 
 
@@ -5438,7 +5442,7 @@ void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
     {
       if (MOB_FLAGGED(vict, MOB_NOSHOOT))
       {
-        new_send_to_char(ch, "You can't get a clear shot.\r\n");
+        ch->Send( "You can't get a clear shot.\r\n");
         return;
       }
 
@@ -5548,7 +5552,7 @@ void fire_missile(struct char_data *ch, char arg1[MAX_INPUT_LENGTH],
 void tick_grenade(void)
 {
   struct obj_data *i, *tobj;
-  struct char_data *tch, *next_tch;
+  Character *tch, *next_tch;
   int s, dam, door;
   room_rnum t;
 
@@ -5669,7 +5673,7 @@ void tick_grenade(void)
 
 }
 
-int can_fight(struct char_data *ch, struct char_data *vict, int silent)
+int can_fight(Character *ch, Character *vict, int silent)
 {
   int ret = 1;
 
@@ -5689,7 +5693,7 @@ int can_fight(struct char_data *ch, struct char_data *vict, int silent)
   if (ch->master && ch->master == vict)
   {
     if (!silent)
-      new_send_to_char(ch, "You can't fight your leader!\r\n");
+      ch->Send( "You can't fight your leader!\r\n");
     return 0;
   }
 
@@ -5715,7 +5719,7 @@ int can_fight(struct char_data *ch, struct char_data *vict, int silent)
     else if (!ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
     {
       if (!silent)
-        new_send_to_char(ch, "You can't attack %s.\r\n", GET_NAME(vict));
+        ch->Send( "You can't attack %s.\r\n", GET_NAME(vict));
       ret = 0;
     }
   }
@@ -6007,7 +6011,7 @@ int generate_wep_type(char *name)
   return WEP_STANDARD;
 }
 
-void combat_skill(CHAR_DATA *ch)
+void combat_skill(Character *ch)
 {
   if (!IS_SKILL(GET_NEXT_SKILL(ch))&&(!IS_SPELL_CAST(GET_NEXT_SKILL(ch))))
     return;
@@ -6018,7 +6022,7 @@ void combat_skill(CHAR_DATA *ch)
   }
 }
 
-float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
+float skill_type_multi(Character *ch, Character *vict, int type)
 {
   int m_user = FALSE, chclass = TYPE_UNDEFINED;
   int chcha = 1, tier = 1;
@@ -6522,7 +6526,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
 
 }
 
-void kill_list(struct char_data *ch, struct char_data *vict)
+void kill_list(Character *ch, Character *vict)
 {
   struct kill_data *temp;
   int vnum;

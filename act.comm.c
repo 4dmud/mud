@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.34  2006/05/21 11:02:25  w4dimenscor
+ * converted game from being C code to C++
+ * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+ *
  * Revision 1.33  2006/05/20 09:33:12  w4dimenscor
  * fixed the bug where if a mob was purged while fighting the people who were fighting it would stay fighting nothing
  *
@@ -152,10 +156,10 @@ extern struct time_info_data time_info;
 void ReplaceString ( char * string, char * search, char * replace , size_t len);
 
 /* local functions */
-void perform_tell(struct char_data *ch, struct char_data *vict, char *arg);
-int is_tell_ok(struct char_data *ch, struct char_data *vict);
+void perform_tell(Character *ch, Character *vict, char *arg);
+int is_tell_ok(Character *ch, Character *vict);
 void add_to_comm(const char *type, const char *text);
-int is_ignoring(struct char_data *ch, struct char_data *vict);
+int is_ignoring(Character *ch, Character *vict);
 char *fix_typos(char * str, size_t len);
 ACMD(do_say);
 ACMD(do_gsay);
@@ -179,13 +183,13 @@ struct drunk_struct
   char *replacement[11];
 };
 
-char *makedrunk(char *string, struct char_data *ch);
+char *makedrunk(char *string, Character *ch);
 
 /* How to make a string look drunk... by Apex (robink@htsa.hva.nl) */
 /* Modified and enhanced for envy(2) by the Maniac from Mythran    */
 /* Ported to Stock Circle 3.0 by Haddixx (haddixx@megamed.com)     */
 
-char *makedrunk(char *string, struct char_data *ch)
+char *makedrunk(char *string, Character *ch)
 {
 
   /* This structure defines all changes for a character */
@@ -302,7 +306,7 @@ ACMD(do_say)
   skip_spaces(&argument);
 
   if (!*argument)
-    new_send_to_char(ch, "Yes, but WHAT do you want to say?\r\n");
+    ch->Send( "Yes, but WHAT do you want to say?\r\n");
   else
   {
     char buf[MAX_INPUT_LENGTH + 12];
@@ -489,7 +493,7 @@ ACMD(do_say)
 
     if (subcmd == SCMD_RSAY)
     {
-      struct char_data *people;
+      Character *people;
       char buf3[MAX_INPUT_LENGTH], buf4[MAX_INPUT_LENGTH];
       snprintf(buf3, sizeof(buf3),  "{cg[%s]{cw %s{c0", race_name(ch), buf);
       snprintf(buf4, sizeof(buf4), "{cg[%s]{cw %s{c0", race_name(ch), buf2);
@@ -530,17 +534,17 @@ ACMD(do_sayto)
 {
   size_t len = 0;
   char buf[MAX_INPUT_LENGTH];
-  CHAR_DATA *vict;
+  Character *vict;
 
   argument = any_one_arg(argument, buf);
   skip_spaces(&argument);
 
   if (!*buf || !*argument)
-    new_send_to_char(ch,  "Whom do you want to say to.. and what??\r\n");
+    ch->Send(  "Whom do you want to say to.. and what??\r\n");
   else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (vict == ch)
-    new_send_to_char(ch, "You can't get your mouth close enough to your ear...\r\n");
+    ch->Send( "You can't get your mouth close enough to your ear...\r\n");
   else
   {
     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -580,7 +584,7 @@ ACMD(do_sayto)
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
     {
-      new_send_to_char(ch,  "%s", CONFIG_OK);
+      ch->Send(  "%s", CONFIG_OK);
     }
     else
     {
@@ -697,7 +701,7 @@ ACMD(do_sayto)
 
 ACMD(do_gsay)
 {
-  struct char_data *k;
+  Character *k;
   struct follow_type *f;
 
   skip_spaces(&argument);
@@ -752,14 +756,14 @@ ACMD(do_gsay)
           act(buf, FALSE, ch, 0, f->follower, TO_VICT | TO_SLEEP);
     }
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      new_send_to_char(ch,  "%s", CONFIG_OK);
+      ch->Send(  "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "You tell the group, '%s'\r\n", argument);
+      ch->Send( "You tell the group, '%s'\r\n", argument);
   }
 }
 
 
-void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
+void perform_tell(Character *ch, Character *vict, char *arg)
 {
   char buf[MAX_INPUT_LENGTH];
   
@@ -778,7 +782,7 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
     act(buf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP);
   }
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
-    new_send_to_char(ch, "%s", CONFIG_OK);
+    ch->Send( "%s", CONFIG_OK);
   else
   {
   if (IS_NPC(vict))
@@ -799,7 +803,7 @@ void perform_tell(struct char_data *ch, struct char_data *vict, char *arg)
 
 
 
-int is_tell_ok(struct char_data *ch, struct char_data *vict)
+int is_tell_ok(Character *ch, Character *vict)
 {
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
     return FALSE;
@@ -840,7 +844,7 @@ int is_tell_ok(struct char_data *ch, struct char_data *vict)
     if (!AFK_MSG(vict))
       act("$E is afk right now, try again later.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
-      new_send_to_char(ch, "AFK %s: %s\r\n", GET_NAME(vict), AFK_MSG(vict));
+      ch->Send( "AFK %s: %s\r\n", GET_NAME(vict), AFK_MSG(vict));
     if (!PRF_FLAGGED(vict, PRF_AFKTELL))
       return (FALSE);
   }
@@ -849,7 +853,7 @@ int is_tell_ok(struct char_data *ch, struct char_data *vict)
     if (!BUSY_MSG(vict))
       act("$E is busy right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
-      new_send_to_char(ch, "BUSY %s: %s\r\n", GET_NAME(vict), BUSY_MSG(vict));
+      ch->Send( "BUSY %s: %s\r\n", GET_NAME(vict), BUSY_MSG(vict));
   }
   else if (!IS_NPC(ch) && PRF_FLAGGED(vict, PRF_RP))
   {
@@ -865,7 +869,7 @@ int is_tell_ok(struct char_data *ch, struct char_data *vict)
  */
 ACMD(do_tell)
 {
-  struct char_data *vict = NULL;
+  Character *vict = NULL;
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 
   half_chop(argument, buf, buf2);
@@ -874,7 +878,7 @@ ACMD(do_tell)
   if (!*buf || !*buf2)
     send_to_char("Who do you wish to tell what??\r\n", ch);
   else if (!(vict = get_player_vis(ch, buf, NULL, FIND_CHAR_WORLD)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (PRF_FLAGGED(ch, PRF_AFK))
     send_to_char("Impossible...you are afk.\r\n", ch);
   else if (is_ignoring(vict, ch) && (GET_LEVEL(ch) <= LVL_GOD))
@@ -886,7 +890,7 @@ ACMD(do_tell)
 
 ACMD(do_reply)
 {
-  struct char_data *tch = character_list;
+  Character *tch = character_list;
 
   if (IS_NPC(ch))
     return;
@@ -930,7 +934,7 @@ ACMD(do_reply)
 
 ACMD(do_spec_comm)
 {
-  struct char_data *vict;
+  Character *vict;
   const char *action_sing, *action_plur, *action_others;
 
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
@@ -959,15 +963,15 @@ ACMD(do_spec_comm)
   half_chop(argument, buf, buf2);
 
   if (!*buf || !*buf2)
-    new_send_to_char(ch,  "Whom do you want to %s.. and what??\r\n", action_sing);
+    ch->Send(  "Whom do you want to %s.. and what??\r\n", action_sing);
   else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
   else if (is_ignoring(vict, ch))
 {
-  new_send_to_char(ch, "%s is ignoring you.\r\n", GET_NAME(vict));
+  ch->Send( "%s is ignoring you.\r\n", GET_NAME(vict));
 }
   else if (vict == ch)
-    new_send_to_char(ch, "You can't get your mouth close enough to your ear...\r\n");
+    ch->Send( "You can't get your mouth close enough to your ear...\r\n");
   else
   {
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
@@ -978,9 +982,9 @@ ACMD(do_spec_comm)
       act(buf, FALSE, ch, 0, vict, TO_VICT);
     }
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "You %s %s, '%s'\r\n", action_sing,
+      ch->Send( "You %s %s, '%s'\r\n", action_sing,
                        GET_NAME(vict), buf2);
 
     act(action_others, FALSE, ch, 0, vict, TO_NOTVICT);
@@ -1018,13 +1022,13 @@ ACMD(do_write)
         (paper =
            get_obj_in_list_vis(ch, papername, NULL, ch->carrying)))
     {
-      new_send_to_char(ch, "You have no %s.\r\n", papername);
+      ch->Send( "You have no %s.\r\n", papername);
 
       return;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, NULL, ch->carrying)))
     {
-      new_send_to_char(ch, "You have no %s.\r\n", penname);
+      ch->Send( "You have no %s.\r\n", penname);
       return;
     }
   }
@@ -1034,7 +1038,7 @@ ACMD(do_write)
         (paper =
            get_obj_in_list_vis(ch, papername, NULL, ch->carrying)))
     {
-      new_send_to_char(ch, "There is no %s in your inventory.\r\n",
+      ch->Send( "There is no %s in your inventory.\r\n",
                        papername);
       return;
     }
@@ -1052,14 +1056,14 @@ ACMD(do_write)
     /* One object was found.. now for the other one. */
     if (!GET_EQ(ch, WEAR_HOLD))
     {
-      new_send_to_char(ch, "You can't write with %s %s alone.\r\n",
+      ch->Send( "You can't write with %s %s alone.\r\n",
                        AN(papername), papername);
 
       return;
     }
     if (PLR_FLAGGED(ch, PLR_COVENTRY))
     {
-      new_send_to_char(ch, "That thing has nothing to do with writing.\r\n");
+      ch->Send( "That thing has nothing to do with writing.\r\n");
       return;
     }
     if (!CAN_SEE_OBJ(ch, GET_EQ(ch, WEAR_HOLD)))
@@ -1088,8 +1092,8 @@ ACMD(do_write)
     if (paper->action_description)
     {
       backstr = strdup(paper->action_description);
-      new_send_to_char(ch, "There's something written on it already:\r\n");
-      new_send_to_char(ch, "%s", paper->action_description);
+      ch->Send( "There's something written on it already:\r\n");
+      ch->Send( "%s", paper->action_description);
     }
 
     /* we can write - hooray! */
@@ -1108,26 +1112,26 @@ ACMD(do_comm)
   skip_spaces(&argument);
   if (IS_NPC(ch))
   {
-    new_send_to_char(ch, "Not mobs sorry!");
+    ch->Send( "Not mobs sorry!");
     return;
   }
   if (!argument || !*argument)
   {
-    new_send_to_char(ch, "\"<channel>\r\n");
+    ch->Send( "\"<channel>\r\n");
     return;
   }
   if (is_abbrev(argument, "hero gossip") && !(PLR_FLAGGED(ch, PLR_HERO) || GET_LEVEL(ch) > LVL_HERO))
   {
-    new_send_to_char(ch, "Sorry, but you aren't heroic enough!");
+    ch->Send( "Sorry, but you aren't heroic enough!");
     return;
   }
   for (com = comlist, i = 0; com && i < 15; com = com->next) {
     if (is_abbrev(argument, com->type))
-      new_send_to_char(ch, "%2d: %s\r\n",i++, com->text);
+      ch->Send( "%2d: %s\r\n",i++, com->text);
       }
 
   if (i == 0)
-    new_send_to_char(ch, "None.\r\n");
+    ch->Send( "None.\r\n");
 
 }
 
@@ -1136,7 +1140,7 @@ ACMD(do_comm)
 ACMD(do_page)
 {
   struct descriptor_data *d;
-  struct char_data *vict;
+  Character *vict;
   char arg[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
@@ -1175,7 +1179,7 @@ ACMD(do_page)
         if (!PLR_FLAGGED(ch, PLR_COVENTRY))
           act(buf, FALSE, ch, 0, vict, TO_VICT);
         if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-          new_send_to_char(ch, "%s", CONFIG_OK);
+          ch->Send( "%s", CONFIG_OK);
         else
           act(buf, FALSE, ch, 0, vict, TO_CHAR);
       }
@@ -1209,7 +1213,7 @@ ACMD(do_gen_comm)
   char color_on[24];
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
-  struct char_data *auctioneer = get_char_auc(AUC_MOB);
+  Character *auctioneer = get_char_auc(AUC_MOB);
 
   /* Array of flags which must _not_ be set in order for comm to be heard */
   int channels[] = {
@@ -1325,20 +1329,20 @@ ACMD(do_gen_comm)
   /* level_can_shout defined in config.c */
   if (GET_LEVEL(ch) < CONFIG_LEVEL_CAN_SHOUT)
   {
-    new_send_to_char(ch, "You must be at least level %d before you can %s.\r\n", CONFIG_LEVEL_CAN_SHOUT, com_msgs[subcmd][1]);
+    ch->Send( "You must be at least level %d before you can %s.\r\n", CONFIG_LEVEL_CAN_SHOUT, com_msgs[subcmd][1]);
 
     return;
   }
   /* make sure the char is on the channel */
   if (PRF_FLAGGED(ch, channels[subcmd]))
   {
-    new_send_to_char(ch, "%s", com_msgs[subcmd][2]);
+    ch->Send( "%s", com_msgs[subcmd][2]);
     return;
   }
   /* skip leading spaces */
   if (!SELF(ch, auctioneer) && has_char(argument, '{'))
   {
-    new_send_to_char(ch, "No color code in the open channels please.\r\n");
+    ch->Send( "No color code in the open channels please.\r\n");
     return;
   }
   skip_spaces(&argument);
@@ -1347,7 +1351,7 @@ ACMD(do_gen_comm)
   /* make sure that there is something there to say! */
   if (!*argument)
   {
-    new_send_to_char(ch, "Yes, %s, fine, %s we must, but WHAT???\r\n",
+    ch->Send( "Yes, %s, fine, %s we must, but WHAT???\r\n",
                      com_msgs[subcmd][1], com_msgs[subcmd][1]);
     return;
   }
@@ -1391,9 +1395,9 @@ ACMD(do_gen_comm)
   {
     /* first, set up strings to be given to the communicator */
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "%s%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
+      ch->Send( "%s%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       snprintf(buf, sizeof(buf), "%s%s: %s", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
@@ -1405,9 +1409,9 @@ ACMD(do_gen_comm)
 
     /* first, set up strings to be given to the communicator */
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], color_on, argument, CCNRM(ch, C_CMP));
+      ch->Send( "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], color_on, argument, CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {
@@ -1479,7 +1483,7 @@ ACMD(do_qcomm)
   skip_spaces(&argument);
 
   if (!*argument)
-    new_send_to_char(ch, "%s?  Yes, fine, %s we must, but WHAT??\r\n",
+    ch->Send( "%s?  Yes, fine, %s we must, but WHAT??\r\n",
                      CMD_NAME, CMD_NAME);
   else
   {
@@ -1489,7 +1493,7 @@ ACMD(do_qcomm)
     if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
       send_to_char("The walls seem to absorb your words.\r\n", ch);
     else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-      new_send_to_char(ch, "%s", CONFIG_OK);
+      ch->Send( "%s", CONFIG_OK);
     else
     {
       if (subcmd == SCMD_QSAY)
@@ -1573,7 +1577,7 @@ ACMD(do_ctell)
     }
   if (PRF_FLAGGED(ch, PRF_NOCTALK))
   {
-    new_send_to_char(ch, "You can now hear you clan again.\r\n");
+    ch->Send( "You can now hear you clan again.\r\n");
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_NOCTALK);
   }
 
@@ -1610,23 +1614,23 @@ ACMD(do_ctell)
 
   if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
   {
-    new_send_to_char(ch, "The walls seem to absorb your words.\r\n");
+    ch->Send( "The walls seem to absorb your words.\r\n");
     return;
   }
   else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
-    new_send_to_char(ch, "%s", CONFIG_OK);
+    ch->Send( "%s", CONFIG_OK);
   else
     if (GET_LEVEL(ch)<LVL_HERO || c==find_clan_by_id(GET_CLAN(ch))){
       if (level_string)
-        new_send_to_char(ch, "You tell your clan%s, '%s'\r\n", level_string,argument);
+        ch->Send( "You tell your clan%s, '%s'\r\n", level_string,argument);
       else
-        new_send_to_char(ch, "You tell your clan, '%s'\r\n", argument);
+        ch->Send( "You tell your clan, '%s'\r\n", argument);
     }
     else {
       if (level_string)
-        new_send_to_char(ch, "You tell the %s%s, '%s'\r\n", clan[c].name,level_string,argument);
+        ch->Send( "You tell the %s%s, '%s'\r\n", clan[c].name,level_string,argument);
       else
-        new_send_to_char(ch, "You tell the %s, '%s'\r\n", clan[c].name,argument);    
+        ch->Send( "You tell the %s, '%s'\r\n", clan[c].name,argument);
    }   
   if (!PLR_FLAGGED(ch, PLR_COVENTRY))
   {
@@ -1664,7 +1668,7 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, " Im ", " I'm ", len);
   ReplaceString(str, " ive ", " I've ", len);
   ReplaceString(str, " Ive ", " I've ", len);
-  ReplaceString(str, "itll", "it'll", len);
+  ReplaceString(str, " itll ", " it'll ", len);
   ReplaceString(str, " teh ", " the ", len);
   ReplaceString(str, " tyhe ", " the ", len);
   ReplaceString(str, " yuopu ", " you ", len);
@@ -1677,8 +1681,8 @@ char *fix_typos(char * str, size_t len) {
   ReplaceString(str, " adn ", " and ", len);
   ReplaceString(str, "ahve", "have", len);
   ReplaceString(str, "amke", "make", len);
-  ReplaceString(str, "arent", "aren't", len);
-  ReplaceString(str, "arn't", "aren't", len);
+  ReplaceString(str, " arent ", " aren't ", len);
+  ReplaceString(str, " arn't ", " aren't ", len);
   ReplaceString(str, " asthe ", " as the ", len);
   ReplaceString(str, " atthe ", " at the ", len);
   ReplaceString(str, "n;t ", "n't ", len);

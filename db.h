@@ -192,19 +192,19 @@ mob_rnum real_mobile(mob_vnum vnum);
 obj_rnum real_object(obj_vnum vnum);
 //mord
 
-void char_to_store(struct char_data *ch);
-int store_to_char(char *name, struct char_data *ch);
-int load_char(char *name, struct char_data *ch);
-void save_char(struct char_data *ch);
-void init_char(struct char_data *ch);
+void char_to_store(Character *ch);
+int store_to_char(char *name, Character *ch);
+int load_char(char *name, Character *ch);
+void save_char(Character *ch);
+void init_char(Character *ch);
 #if USE_CREATE_CHAR
-struct char_data *create_char(void);
+Character *create_char(void);
 #endif
-struct char_data *read_mobile(mob_vnum nr, int type);
-int vnum_mobile(char *searchname, struct char_data *ch);
-void clear_char(struct char_data *ch);
-void reset_char(struct char_data *ch);
-void free_char(struct char_data *ch);
+Character *read_mobile(mob_vnum nr, int type);
+int vnum_mobile(char *searchname, Character *ch);
+void clear_char(Character *ch);
+void reset_char(Character *ch);
+void free_char(Character *ch);
 void save_player_index(void);
 
 struct obj_data *create_obj(void);
@@ -215,7 +215,7 @@ void free_obj_q(struct obj_data *obj);
 void free_obj_q_delayed(struct obj_data *obj);
 void free_obj_forget(struct obj_data *obj);
 struct obj_data *read_object(obj_vnum nr, int type);
-int vnum_object(char *searchname, struct char_data *ch);
+int vnum_object(char *searchname, Character *ch);
 int my_obj_save_to_disk(FILE * fp, struct obj_data *obj, int locate);
 bool str_prefix( const char *astr, const char *bstr );
 
@@ -376,12 +376,12 @@ extern struct shop_data *shop_index;
 extern int top_shop;
 extern struct index_data **trig_index;
 extern struct trig_data *trigger_list;
-extern int top_of_trigt;
+extern unsigned int top_of_trigt;
 extern long max_mob_id;
 extern long max_obj_id;
 extern int dg_owner_purged;
 extern struct room_data *world_vnum[];
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern struct obj_data *obj_proto;
 extern struct zone_data *zone_table;
 extern struct obj_data *object_list;
@@ -389,7 +389,7 @@ extern struct obj_data *dead_obj;	/* delayed obj removal   */
     extern int top_of_zone_table;
 #endif /* __DB_C__ */
 extern struct descriptor_data *descriptor_list;
-extern struct char_data *character_list;
+extern Character *character_list;
 extern struct player_index_element *player_table;
 extern int top_of_p_table;
 
@@ -398,10 +398,10 @@ extern struct htree_node *mob_htree;
 extern struct htree_node *obj_htree;
 
 void strip_string(char *buffer);
-int read_xap_objects(FILE * fl, struct char_data *ch);
+int read_xap_objects(FILE * fl, Character *ch);
 float mob_hitpoint_multi(int chclass);
 void generate_weapon(OBJ_DATA *obj);
-void add_char_to_list(struct char_data *ch);
+void add_char_to_list(Character *ch);
 #define CUR_WORLD_VERSION 1
 #define CUR_ZONE_VERSION 3
 #define HIGHEST_VNUM  1280000

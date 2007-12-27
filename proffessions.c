@@ -14,13 +14,13 @@
 #include "clan.h"
 #include "fight.h"
 
-void list_subs_in_prof(struct char_data *ch,int pro);
+void list_subs_in_prof(Character *ch,int pro);
 int tot_subs_in_prof(int pro);
-int knows_subs_in_prof(struct char_data *ch, int pro);
+int knows_subs_in_prof(Character *ch, int pro);
 const char * prof_name(int pro);
 const char * prof_group_name(int pro);
 int prof_group(int pro);
-int skill_cost(int h, int m, int v, CHAR_DATA *ch);
+int skill_cost(int h, int m, int v, Character *ch);
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 static int prof_group_data[] = {
@@ -112,7 +112,7 @@ ACMD(do_professions)
     DYN_CREATE;
     *dynbuf = 0;
 
-    new_send_to_char(ch, "professions ::\r\n");
+    ch->Send( "professions ::\r\n");
     for (j = 0; j < PGRP_MAX; j++)
     {
       sprintf(buf, "{cY<In the %s profession group>{c0\r\n", prof_group_name(j));
@@ -134,12 +134,12 @@ ACMD(do_professions)
   }
   else
   {
-    new_send_to_char(ch, "  You know %2d of a total %2d subskills -- %s\r\n", knows_subs_in_prof(ch, pro), tot_subs_in_prof(pro), prof_name(pro));
+    ch->Send( "  You know %2d of a total %2d subskills -- %s\r\n", knows_subs_in_prof(ch, pro), tot_subs_in_prof(pro), prof_name(pro));
     list_subs_in_prof(ch, pro);
   }
 }
 
-int knows_subs_in_prof(struct char_data *ch, int pro)
+int knows_subs_in_prof(Character *ch, int pro)
 {
   int count = 0, i;
   for (i = 0; i < TOP_SUB_DEFINE; i++)
@@ -166,7 +166,7 @@ int tot_subs_in_prof(int pro)
 
 }
 
-void list_subs_in_prof(struct char_data *ch,int pro)
+void list_subs_in_prof(Character *ch,int pro)
 {
   int i;
   for (i = 0; i < TOP_SUB_DEFINE; i++)
@@ -178,20 +178,20 @@ void list_subs_in_prof(struct char_data *ch,int pro)
 
     if (GET_SUB(ch, i))
     {
-      new_send_to_char(ch, "  {cg(known)  :: {cc%-20s{c0\r\n", sub_name(i));
+      ch->Send( "  {cg(known)  :: {cc%-20s{c0\r\n", sub_name(i));
     }
     else
     {
-      new_send_to_char(ch, " {cy(unknown) :: {cc%-20s{c0\r\n", sub_name(i));
+      ch->Send( " {cy(unknown) :: {cc%-20s{c0\r\n", sub_name(i));
     }
   }
 }
 #if 0
 ACMD(do_skin)
 {
-  extern void crumble_obj(CHAR_DATA *ch, OBJ_DATA *obj);
+  extern void crumble_obj(Character *ch, OBJ_DATA *obj);
   OBJ_DATA *scalp = NULL, *obj = NULL;
-  CHAR_DATA *tch = NULL;
+  Character *tch = NULL;
   struct extra_descr_data *new_descr = NULL;
   char /*buf1[MAX_STRING_LENGTH],*/ buf2[MAX_STRING_LENGTH];
   char scalpb[MAX_STRING_LENGTH];
@@ -204,12 +204,12 @@ ACMD(do_skin)
   {
     if (!IS_CORPSE(obj))
     {
-      new_send_to_char(ch, "You slice the knife in to... nothing really! Fear your stupidity!\r\n");
+      ch->Send( "You slice the knife in to... nothing really! Fear your stupidity!\r\n");
       return;
     }
     if (!skill_cost(0, 0, 10, ch))
     {
-      new_send_to_char(ch, "You are exausted!");
+      ch->Send( "You are exausted!");
       return;
     }
     pc = IS_OBJ_STAT(obj, ITEM_PC_CORPSE);

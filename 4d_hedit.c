@@ -37,13 +37,13 @@ ACMD(do_oasis_hedit)
   for (d = descriptor_list; d; d = d->next)
     if (STATE(d) == CON_HEDIT)
     {
-      new_send_to_char(ch, "Sorry, only one can edit help at a time.\r\n");
+      ch->Send( "Sorry, only one can edit help at a time.\r\n");
       return;
     }
   skip_spaces(&argument);
   if (!argument || !*argument)
   {
-    new_send_to_char(ch, "Please specify a help entry to edit.\r\n");
+    ch->Send( "Please specify a help entry to edit.\r\n");
     return;
   }
 
@@ -52,10 +52,10 @@ ACMD(do_oasis_hedit)
   if (!str_cmp("save", argument))
   {
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, "OLC: %s saves help files.", GET_NAME(ch));
-    new_send_to_char(ch, "Writing help file..\r\n");
+    ch->Send( "Writing help file..\r\n");
     //process_output(ch->desc);
     hedit_save_to_disk(d);
-    new_send_to_char(ch, "Done.\r\n");
+    ch->Send( "Done.\r\n");
     //process_output(ch->desc);
     return;
   }
@@ -83,12 +83,12 @@ ACMD(do_oasis_hedit)
   {
     /**TODO: i want this to ask the player, and if they say NO then
              to keep checking the list for the next one **/
-    new_send_to_char(ch, "Do you wish to add the '%s' help entry? ", OLC_STORAGE(d));
+    ch->Send( "Do you wish to add the '%s' help entry? ", OLC_STORAGE(d));
     OLC_MODE(d) = HEDIT_CONFIRM_ADD;
   }
   else
   {
-    new_send_to_char(ch, "Do you wish to edit the '%s' help entry? ", help_table[OLC_ZNUM(d)].keywords);
+    ch->Send( "Do you wish to edit the '%s' help entry? ", help_table[OLC_ZNUM(d)].keywords);
     OLC_MODE(d) = HEDIT_CONFIRM_EDIT;
   }
   STATE(d) = CON_HEDIT;

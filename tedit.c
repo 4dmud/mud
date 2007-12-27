@@ -100,18 +100,18 @@ ACMD(do_tedit)
   one_argument(argument, field);
 
   if (!*field) {
-    new_send_to_char(ch, "Files available to be edited:\r\n");
+    ch->Send( "Files available to be edited:\r\n");
     for (l = 0; *fields[l].cmd != '\n'; l++) {
       if (GET_LEVEL(ch) >= fields[l].level) {
-	new_send_to_char(ch, "%-11.11s ", fields[l].cmd);
+	ch->Send( "%-11.11s ", fields[l].cmd);
 	if (!(++i % 7))
-	  new_send_to_char(ch, "\r\n");
+	  ch->Send( "\r\n");
       }
     }
     if (i % 7)
-      new_send_to_char(ch, "\r\n");
+      ch->Send( "\r\n");
     if (i == 0)
-      new_send_to_char(ch, "None.\r\n");
+      ch->Send( "None.\r\n");
     return;
   }
   for (l = 0; *(fields[l].cmd) != '\n'; l++)
@@ -119,19 +119,19 @@ ACMD(do_tedit)
       break;
    
   if (*fields[l].cmd == '\n') {
-    new_send_to_char(ch, "Invalid text editor option.\r\n");
+    ch->Send( "Invalid text editor option.\r\n");
     return;
   }
    
   if (GET_LEVEL(ch) < fields[l].level) {
-    new_send_to_char(ch, "You are not godly enough for that!\r\n");
+    ch->Send( "You are not godly enough for that!\r\n");
     return;
   }
 
   /* set up editor stats */
   clear_screen(ch->desc);
   send_editor_help(ch->desc);
-  new_send_to_char(ch, "Edit file below:\r\n\r\n");
+  ch->Send( "Edit file below:\r\n\r\n");
 
   if (ch->desc->olc) {
     new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: do_tedit: Player already had olc structure.");
@@ -140,7 +140,7 @@ ACMD(do_tedit)
   CREATE(ch->desc->olc, struct oasis_olc_data, 1);
   
   if (*fields[l].buffer) {
-    new_send_to_char(ch, "%s", *fields[l].buffer);
+    ch->Send( "%s", *fields[l].buffer);
     backstr = strdup(*fields[l].buffer);
   }
 

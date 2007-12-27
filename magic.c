@@ -25,33 +25,33 @@
 #include "fight.h"
 
 
-int spell_size_dice(struct char_data *ch);
-int spell_num_dice(struct char_data *ch);
+int spell_size_dice(Character *ch);
+int spell_num_dice(Character *ch);
 #define S_SDICE (spell_size_dice(ch))
 #define S_NDICE (spell_num_dice(ch))
 extern int mini_mud;
 
-void skill_attack(struct char_data *ch, struct char_data *vict, int skill, int pass);
-void start_fighting_delay(struct char_data *vict, struct char_data *ch);
+void skill_attack(Character *ch, Character *vict, int skill, int pass);
+void start_fighting_delay(Character *vict, Character *ch);
 byte saving_throws(int class_num, int type, int level);     /* class.c */
-void clearMemory(struct char_data *ch);
+void clearMemory(Character *ch);
 void weight_change_object(struct obj_data *obj, int weight);
-void add_follower(struct char_data *ch, struct char_data *leader);
+void add_follower(Character *ch, Character *leader);
 extern struct spell_info_type spell_info[];
-int arena_ok(struct char_data *ch, struct char_data *victim);
-void change_alignment(struct char_data *ch, struct char_data *victim);
-void zap_char(struct char_data *victim);
+int arena_ok(Character *ch, Character *victim);
+void change_alignment(Character *ch, Character *victim);
+void zap_char(Character *victim);
 
 
 
 /* local functions */
-int mag_materials(struct char_data *ch, int item0, int item1, int item2,
+int mag_materials(Character *ch, int item0, int item1, int item2,
                   int extract, int verbose);
-void perform_mag_groups(int level, struct char_data *ch,
-                        struct char_data *tch, int spellnum, int savetype);
-int mag_savingthrow(struct char_data *ch, int type, int modifier);
-int do_magic_direction(int level, int dir, int dist, struct char_data *ch, struct char_data *vict, int spellnum);
-int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struct char_data *vict, int spellnum);
+void perform_mag_groups(int level, Character *ch,
+                        Character *tch, int spellnum, int savetype);
+int mag_savingthrow(Character *ch, int type, int modifier);
+int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum);
+int perform_mag_direction(int level, room_rnum room, Character *ch, Character *vict, int spellnum);
 void affect_update(void);
 
 
@@ -67,7 +67,7 @@ void affect_update(void);
  * saving throw instead of the random number of the character as
  * in some other systems.
  */
-int mag_savingthrow(struct char_data *ch, int type, int modifier)
+int mag_savingthrow(Character *ch, int type, int modifier)
 {
   /* NPCs use warrior tables according to some book */
   int class_sav = CLASS_WARRIOR;
@@ -95,7 +95,7 @@ int mag_savingthrow(struct char_data *ch, int type, int modifier)
 void affect_update(void)
 {
   struct affected_type *af, *next;
-  struct char_data *i;
+  Character *i;
   time_t t = time(0);
 
   for (i = character_list; i; i = i->next)
@@ -127,7 +127,7 @@ void affect_update(void)
  * it to implement your own spells which require ingredients (i.e., some
  * heal spell which requires a rare herb or some such.)
  */
-int mag_materials(struct char_data *ch, int item0, int item1, int item2,
+int mag_materials(Character *ch, int item0, int item1, int item2,
                   int extract, int verbose)
 {
   struct obj_data *tobj;
@@ -207,8 +207,8 @@ will return
  >0 the distance of the target if target, or the distance of the
     furthest reachable room. 
 */
-int magic_distance(struct char_data *ch, int spellnum, int dir,
-                   struct char_data *victim)
+int magic_distance(Character *ch, int spellnum, int dir,
+                   Character *victim)
 {
   int maxdis = TIERNUM+1;
   int i;
@@ -220,7 +220,7 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
 
   if ((!CAN_GO2(room, dir)) || (dir == NOWHERE))
   {
-    new_send_to_char(ch, "You can not cast magic that direction.\r\n");
+    ch->Send( "You can not cast magic that direction.\r\n");
     return NOWHERE;      //cant send magic that way.
   }
   if (ROOM_FLAGGED(room, ROOM_PEACEFUL)
@@ -248,17 +248,17 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
 
   if (vroom != NULL)
   {
-    new_send_to_char(ch, "Nothing by that name in range to the %s.\r\n", dirs[dir]);
+    ch->Send( "Nothing by that name in range to the %s.\r\n", dirs[dir]);
     return NOTHING;
   }
   return i;
 }
 
 
-struct char_data *find_in_dir(room_rnum room, char *name, int dir)
+Character *find_in_dir(room_rnum room, char *name, int dir)
 {
 
-  struct char_data *tch;
+  Character *tch;
   int i;
   room_rnum nextroom = NULL;
 
@@ -297,7 +297,7 @@ struct char_data *find_in_dir(room_rnum room, char *name, int dir)
  *
  * -1 = dead, otherwise the amount of damage done.
  */
-int mag_damage(int level, struct char_data *ch, struct char_data *victim,
+int mag_damage(int level, Character *ch, Character *victim,
                int spellnum, int savetype)
 {
 
@@ -305,7 +305,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   int good = 1;
   int evil = 1;
   int pass = TRUE;
-  struct char_data *pvict = NULL;
+  Character *pvict = NULL;
 
 
   if (ch)
@@ -411,7 +411,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 */
 
 
-void mag_affects(int level, struct char_data *ch, struct char_data *victim,
+void mag_affects(int level, Character *ch, Character *victim,
                  int spellnum, int savetype)
 {
   struct affected_type af[MAX_SPELL_AFFECTS];
@@ -471,10 +471,10 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     else
       af[0].expire = HOURS_TO_EXPIRE(4);
 
-    af[0].modifier = -4 * staff;
+    af[0].modifier = FTOI(-4 * staff);
     af[1].bitvector = AFF_PROCRASTINATE;
     af[1].location = APPLY_SPEED;
-    af[1].modifier = -75 * staff;
+    af[1].modifier = FTOI(-75 * staff);
     af[1].expire = af[0].expire;
 
 
@@ -497,7 +497,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       af[0].expire = -2;
     else
       af[0].expire = HOURS_TO_EXPIRE(18*staff);
-    accum_duration =FALSE;
+    accum_duration = FALSE;
     to_vict = "You feel someone protecting you.";
     break;
   case SPELL_ENERGY_DRAIN:
@@ -547,7 +547,8 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     if (MOB_FLAGGED(victim, MOB_NOBLIND)
         || mag_savingthrow(victim, savetype, 0))
     {
-      send_to_char("You fail.\r\n", ch);
+      if (ch)
+      ch->Send("You fail.\r\n");
       return;
     }
 
@@ -571,9 +572,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_CURSE:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
 
@@ -637,9 +638,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_HOLD_PERSON:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
     af[0].expire = HOURS_TO_EXPIRE(6);
@@ -650,9 +651,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_PARALYZE:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
     af[0].location = APPLY_HITROLL;
@@ -693,7 +694,8 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_POISON:
     if (!IS_NPC(victim) && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      if (ch)
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
 
@@ -706,9 +708,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_POISON_2:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
 
@@ -721,9 +723,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_POISON_3:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
 
@@ -736,9 +738,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_POISON_4:
-    if (mag_savingthrow(victim, savetype, 0))
+    if (ch && mag_savingthrow(victim, savetype, 0))
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
 
@@ -791,7 +793,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
     if (GET_POS(victim) > POS_SLEEPING)
     {
-      send_to_char("You feel very sleepy...  Zzzz......", victim);
+      victim->Send( "You feel very sleepy...  Zzzz......");
       act("$n goes to sleep.", TRUE, victim, 0, 0, TO_ROOM);
       GET_POS(victim) = POS_SLEEPING;
     }
@@ -1142,16 +1144,16 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       af[0].expire = HOURS_TO_EXPIRE(24);
     af[0].bitvector = AFF_FORTIFY_BODY;
     af[0].location = APPLY_HIT;
-    af[0].modifier = (30*staff);
+    af[0].modifier = FTOI(30*staff);
 
     accum_duration =FALSE;
     to_vict = "You feel more sure of your actions.";
     break;
 
   case SPELL_SWEET_DREAMS:
-    if (number(1, 25) > GET_INT(ch))
+    if (ch && number(1, 25) > GET_INT(ch))
     {
-      new_send_to_char(ch, "You slip and draw the wrong rune!\r\n");
+      ch->Send( "You slip and draw the wrong rune!\r\n");
       victim = ch;
     }
     af[0].expire = HOURS_TO_EXPIRE(2);
@@ -1168,7 +1170,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       af[0].expire = HOURS_TO_EXPIRE(24);
     af[0].bitvector = AFF_DEVINE_MIND;
     af[0].location = APPLY_CHA;
-    af[0].modifier = (5*staff);
+    af[0].modifier = FTOI(5*staff);
 
     accum_duration =FALSE;
     to_vict = "Focus and determination fills your mind.";
@@ -1190,7 +1192,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     else
       af[0].expire = HOURS_TO_EXPIRE(24);
     af[0].location = APPLY_SPEED;
-    af[0].modifier = -(100*staff);
+    af[0].modifier = FTOI(-(100*staff));
     af[0].bitvector = AFF_SLOW;
 
     accum_duration =FALSE;
@@ -1215,7 +1217,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       af[0].expire = HOURS_TO_EXPIRE(24);
     af[0].bitvector = AFF_BATTLE_RAGE;
     af[0].location = APPLY_AC;
-    af[0].modifier = (10*staff);
+    af[0].modifier = FTOI(10*staff);
 
     accum_duration =FALSE;
     to_vict = "You bare your teeth as the fire of anger runs through your veins.";
@@ -1294,25 +1296,25 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     {
       affect_from_char(victim, SPELL_MIND_FIRE);
       if (*spell_wear_off_msg[SPELL_MIND_FIRE])
-        new_send_to_char(victim, "%s\r\n",spell_wear_off_msg[SPELL_MIND_FIRE]);
+        victim->Send( "%s\r\n",spell_wear_off_msg[SPELL_MIND_FIRE]);
     }
     if (affected_by_spell(victim, SPELL_MIND_ICE))
     {
       affect_from_char(victim, SPELL_MIND_ICE);
       if (*spell_wear_off_msg[SPELL_MIND_ICE])
-        new_send_to_char(victim, "%s\r\n",spell_wear_off_msg[SPELL_MIND_ICE]);
+        victim->Send( "%s\r\n",spell_wear_off_msg[SPELL_MIND_ICE]);
     }
     if (affected_by_spell(victim, SPELL_MIND_WATER))
     {
       affect_from_char(victim, SPELL_MIND_WATER);
       if (*spell_wear_off_msg[SPELL_MIND_WATER])
-        new_send_to_char(victim, "%s\r\n",spell_wear_off_msg[SPELL_MIND_WATER]);
+        victim->Send( "%s\r\n",spell_wear_off_msg[SPELL_MIND_WATER]);
     }
     if (affected_by_spell(victim, SPELL_MIND_ELEC))
     {
       affect_from_char(victim, SPELL_MIND_ELEC);
       if (*spell_wear_off_msg[SPELL_MIND_ELEC])
-        new_send_to_char(victim, "%s\r\n",spell_wear_off_msg[SPELL_MIND_ELEC]);
+        victim->Send( "%s\r\n",spell_wear_off_msg[SPELL_MIND_ELEC]);
     }
   }
 
@@ -1331,7 +1333,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     for (i = 0; i < MAX_SPELL_AFFECTS; i++)
       if (AFF_FLAGGED(victim, af[i].bitvector) && ch)
       {
-        new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+        ch->Send( "%s", CONFIG_NOEFFECT);
         return;
       }
 
@@ -1343,9 +1345,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   if (affected_by_spell(victim, spellnum)
       && !(accum_duration || accum_affect) && ch)
   {
-    if (is_innate)
+    if (is_innate && ch)
     {
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
       return;
     }
     else
@@ -1360,7 +1362,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
   if (affected_by_spell(victim, spellnum) && is_innate && ch)
   {
-    new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+    ch->Send( "%s", CONFIG_NOEFFECT);
     return;
   }
 
@@ -1384,7 +1386,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   }
 }
 
-int do_magic_direction(int level, int dir, int dist, struct char_data *ch, struct char_data *vict, int spellnum)
+int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum)
 {
   int i;
   room_rnum nextroom = IN_ROOM(ch);
@@ -1395,7 +1397,7 @@ int do_magic_direction(int level, int dir, int dist, struct char_data *ch, struc
 
     ret += perform_mag_direction( level, nextroom , ch , vict , spellnum);
 
-    if CAN_GO2(nextroom, dir)
+    if (CAN_GO2(nextroom, dir))
       nextroom = EXIT2(nextroom, dir)->to_room;
     else
       nextroom = NULL;
@@ -1403,9 +1405,9 @@ int do_magic_direction(int level, int dir, int dist, struct char_data *ch, struc
   return ret;
 }
 
-int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struct char_data *vict, int spellnum)
+int perform_mag_direction(int level, room_rnum room, Character *ch, Character *vict, int spellnum)
 {
-  struct char_data *tch, *tch_next;
+  Character *tch, *tch_next;
   char format[MAX_INPUT_LENGTH];
   char format2[MAX_INPUT_LENGTH];
   const char *dirname;
@@ -1503,8 +1505,8 @@ int perform_mag_direction(int level, room_rnum room, struct char_data *ch, struc
  * is the one you should change to add new group spells.
  */
 
-void perform_mag_groups(int level, struct char_data *ch,
-                        struct char_data *tch, int spellnum, int savetype)
+void perform_mag_groups(int level, Character *ch,
+                        Character *tch, int spellnum, int savetype)
 {
   switch (spellnum)
   {
@@ -1536,10 +1538,10 @@ void perform_mag_groups(int level, struct char_data *ch,
  * mag_groups -- just add a new case to perform_mag_groups.
  */
 
-void mag_groups(int level, struct char_data *ch, int spellnum,
+void mag_groups(int level, Character *ch, int spellnum,
                 int savetype)
 {
-  struct char_data *tch, *k;
+  Character *tch, *k;
   struct follow_type *f, *f_next;
 
   if (ch == NULL)
@@ -1576,10 +1578,10 @@ void mag_groups(int level, struct char_data *ch, int spellnum,
  * No spells of this class currently implemented as of Circle 3.0.
  */
 
-void mag_masses(int level, struct char_data *ch, int spellnum,
+void mag_masses(int level, Character *ch, int spellnum,
                 int savetype)
 {
-  struct char_data *tch, *tch_next;
+  Character *tch, *tch_next;
 
   for (tch = ch->in_room->people; tch; tch = tch_next)
   {
@@ -1601,9 +1603,9 @@ void mag_masses(int level, struct char_data *ch, int spellnum,
  *  area spells have limited targets within the room.
 */
 
-void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
+void mag_areas(int level, Character *ch, int spellnum, int savetype)
 {
-  struct char_data *tch, *next_tch;
+  Character *tch, *next_tch;
   const char *to_char = NULL, *to_room = NULL;
   int count = 0, rounds;
 
@@ -1611,7 +1613,7 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
   if (ch == NULL)
     return;
 
-  rounds = level * 0.33;
+  rounds = level/3;
   /*
    * to add spells to this fn, just add the message here plus an entry
    * in mag_damage for the damaging part of the spell.
@@ -1785,10 +1787,10 @@ const char *mag_summon_fail_msgs[] =
 #define MOB_FIRE_ELEM         25
 
 
-void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
+void mag_summons(int level, Character *ch, struct obj_data *obj,
                  int spellnum, int savetype)
 {
-  struct char_data *mob = NULL;
+  Character *mob = NULL;
   struct obj_data *tobj, *next_obj;
   int pfail = 0, msg = 0, fmsg = 0, num = 1, handle_corpse = FALSE, i;
   mob_vnum mob_num;
@@ -1921,7 +1923,7 @@ void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
 }
 
 
-void mag_points(int level, struct char_data *ch, struct char_data *victim,
+void mag_points(int level, Character *ch, Character *victim,
                 int spellnum, int savetype)
 {
   int hit = 0, move = 0, mana = 0, stam = 0, spell_lvl = 0;
@@ -1977,7 +1979,7 @@ void mag_points(int level, struct char_data *ch, struct char_data *victim,
     send_to_char("You feel a strong flow of magical energy.\r\n", victim);
     break;
   case SPELL_VITALIZE:
-    move = dice(spell_lvl * 0.5, spell_lvl * 0.5);
+    move = dice(FTOI(spell_lvl * 0.5), FTOI(spell_lvl * 0.5));
     stam = spell_lvl;
     act("Your mind scans $N's body, revitalizing them.", FALSE, ch, 0, victim, TO_CHAR);
     act("$n's mind scans your body, revitalizing you.", FALSE, ch, 0, victim, TO_VICT);
@@ -1992,8 +1994,8 @@ void mag_points(int level, struct char_data *ch, struct char_data *victim,
 }
 
 
-void mag_unaffects(int level, struct char_data *ch,
-                   struct char_data *victim, int spellnum, int type)
+void mag_unaffects(int level, Character *ch,
+                   Character *victim, int spellnum, int type)
 {
   int spell = 0, poisoned = 0;
   const char *to_vict = NULL, *to_room = NULL;
@@ -2054,7 +2056,7 @@ void mag_unaffects(int level, struct char_data *ch,
   if (!affected_by_spell(victim, spell))
   {
     if (spellnum != SPELL_HEAL)    /* 'cure blindness' message. */
-      new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+      ch->Send( "%s", CONFIG_NOEFFECT);
     return;
   }
 
@@ -2070,7 +2072,7 @@ void mag_unaffects(int level, struct char_data *ch,
 }
 
 
-void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
+void mag_alter_objs(int level, Character *ch, struct obj_data *obj,
                     int spellnum, int savetype)
 {
   const char *to_char = NULL, *to_room = NULL;
@@ -2138,7 +2140,7 @@ void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
   }
 
   if (to_char == NULL)
-    new_send_to_char(ch, "%s", CONFIG_NOEFFECT);
+    ch->Send( "%s", CONFIG_NOEFFECT);
   else
     act(to_char, TRUE, ch, obj, 0, TO_CHAR);
 
@@ -2151,7 +2153,7 @@ void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
 
 
 
-void mag_creations(int level, struct char_data *ch, int spellnum)
+void mag_creations(int level, Character *ch, int spellnum)
 {
   struct obj_data *tobj;
   obj_vnum z;

@@ -42,15 +42,15 @@ float mob_hitpoint_multi(int chclass);
  * External function prototypes/
  */
 void smash_tilde(char *str);
-const char * race_name(struct char_data *ch);
-const char *simple_class_name(struct char_data *ch);
+const char * race_name(Character *ch);
+const char *simple_class_name(Character *ch);
 
-struct combine_data *add_base_link_mob(CHAR_DATA *mob, int vnum);
+struct combine_data *add_base_link_mob(Character *mob, int vnum);
 void free_join_list(struct combine_data *list);
-int join_count(CHAR_DATA *mob);
+int join_count(Character *mob);
 struct combine_data *copy_proto_link(struct combine_data *proto);
 
-void delete_one_join(CHAR_DATA *mob, int i);
+void delete_one_join(Character *mob, int i);
 
 /*-------------------------------------------------------------------*/
 
@@ -92,14 +92,14 @@ ACMD(do_oasis_medit)
 
   if (!*buf1)
   {
-    new_send_to_char(ch, "Specify a mobile VNUM to edit.\r\n");
+    ch->Send( "Specify a mobile VNUM to edit.\r\n");
     return;
   }
   else if (!isdigit(*buf1))
   {
     if (str_cmp("save", buf1) != 0)
     {
-      new_send_to_char(ch, "Yikes!  Stop that, someone will get hurt!\r\n");
+      ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
 
@@ -119,7 +119,7 @@ ACMD(do_oasis_medit)
 
     if (number == NOWHERE)
     {
-      new_send_to_char(ch, "Save which zone?\r\n");
+      ch->Send( "Save which zone?\r\n");
       return;
     }
   }
@@ -139,7 +139,7 @@ ACMD(do_oasis_medit)
     {
       if (d->olc && OLC_NUM(d) == number)
       {
-        new_send_to_char(ch, "That mobile is currently being edited by %s.\r\n",
+        ch->Send( "That mobile is currently being edited by %s.\r\n",
                          GET_NAME(d->character));
         return;
       }
@@ -166,7 +166,7 @@ ACMD(do_oasis_medit)
   OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
   if (OLC_ZNUM(d) == NOWHERE)
   {
-    new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    ch->Send( "Sorry, there is no zone for that number!\r\n");
     free(d->olc);
     d->olc = NULL;
     return;
@@ -177,7 +177,7 @@ ACMD(do_oasis_medit)
   /****************************************************************************/
   if (!can_edit_zone(ch, OLC_ZNUM(d)))
   {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE, "OLC: %s tried to edit zone %d allowed zone %d",
                GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
     free(d->olc);
@@ -190,7 +190,7 @@ ACMD(do_oasis_medit)
   /****************************************************************************/
   if (save)
   {
-    new_send_to_char(ch, "Saving all mobiles in zone %d.\r\n",
+    ch->Send( "Saving all mobiles in zone %d.\r\n",
                      zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
                "OLC: %s saves mobile info for zone %d.",
@@ -240,12 +240,12 @@ void medit_save_to_disk(zone_vnum foo)
 
 void medit_setup_new(struct descriptor_data *d)
 {
-  struct char_data *mob;
+  Character *mob;
 
   /*
    * Allocate a scratch mobile structure.  
    */
-  CREATE(mob, struct char_data, 1);
+  CREATE(mob, Character, 1);
 
   init_mobile(mob);
 
@@ -276,12 +276,12 @@ void medit_setup_new(struct descriptor_data *d)
 
 void medit_setup_existing(struct descriptor_data *d, int rmob_num)
 {
-  struct char_data *mob;
+  Character *mob;
 
   /*
    * Allocate a scratch mobile structure. 
    */
-  CREATE(mob, struct char_data, 1);
+  CREATE(mob, Character, 1);
 
   copy_mobile(mob, mob_proto + rmob_num);
 
@@ -328,7 +328,7 @@ void medit_setup_existing(struct descriptor_data *d, int rmob_num)
  * Ideally, this function should be in db.c, but I'll put it here for
  * portability.
  */
-void init_mobile(struct char_data *mob)
+void init_mobile(Character *mob)
 {
   clear_char(mob);
 
@@ -361,7 +361,7 @@ void medit_save_internally(struct descriptor_data *d)
   int i;
   mob_rnum new_rnum;
   struct descriptor_data *dsc;
-  struct char_data *mob;
+  Character *mob;
 
   i = (real_mobile(OLC_NUM(d)) == NOBODY);
 
@@ -709,7 +709,7 @@ void medit_disp_aff_flags(struct descriptor_data *d)
  */
 void medit_disp_menu(struct descriptor_data *d)
 {
-  struct char_data *mob;
+  Character *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
 
   mob = OLC_MOB(d);

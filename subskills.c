@@ -25,25 +25,25 @@ extern struct descriptor_data *descriptor_list;
 extern int pk_allowed;
 
 /* external functions */
-int arena_ok(struct char_data *ch, struct char_data *victim);
-void improve_skill(struct char_data *ch, int skill);
-int compute_armor_class(struct char_data *ch);
+int arena_ok(Character *ch, Character *victim);
+void improve_skill(Character *ch, int skill);
+int compute_armor_class(Character *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
             int routines, int wait, const char *message, int pulse);
 int find_first_step(room_rnum src, room_rnum target);
 ACMD(do_gen_door);
-void send_not_to_spam(char *buf, struct char_data *ch,
-                      struct char_data *victim, struct obj_data *weap,
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
                       int spam);
-void check_killer(struct char_data *ch, struct char_data *vict);
-int has_class(struct char_data *ch, int chclass);
-int tier_level(struct char_data *ch, int chclass);
-int perform_push(struct char_data *ch, int dir, int need_specials_check,
-                 struct char_data *attacker);
-void log_push_to_death(struct char_data *ch, struct char_data *attacker);
+void check_killer(Character *ch, Character *vict);
+int has_class(Character *ch, int chclass);
+int tier_level(Character *ch, int chclass);
+int perform_push(Character *ch, int dir, int need_specials_check,
+                 Character *attacker);
+void log_push_to_death(Character *ch, Character *attacker);
 ACMD(do_assist);
-int has_weapon(struct char_data *ch);
+int has_weapon(Character *ch);
 //-----
 
 /*local variables*/
@@ -52,11 +52,11 @@ enum subskill_list subskill;
 struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* local functions */
-int toggle_sub_status(struct char_data *ch, int i, int onoff);
-int get_sub_status(struct char_data *ch, int i);
-int subkillset(struct char_data *ch, enum subskill_list subcmd, int amount);
-void improve_sub(struct char_data *ch, enum subskill_list  sub, int amount);
-int total_sub_chance(struct char_data *ch, enum subskill_list  sub);
+int toggle_sub_status(Character *ch, int i, int onoff);
+int get_sub_status(Character *ch, int i);
+int subkillset(Character *ch, enum subskill_list subcmd, int amount);
+void improve_sub(Character *ch, enum subskill_list  sub, int amount);
+int total_sub_chance(Character *ch, enum subskill_list  sub);
 void unused_sub(enum subskill_list subcmd);
 
 void subo(enum subskill_list subcmd, const char *name, int stat, int cost,
@@ -619,7 +619,7 @@ subo(SUB_FORGE, "Forge", 0, 0,
 ACMD(do_subskill)
 {
 
-  struct char_data *vict = NULL, *orig = ch;
+  Character *vict = NULL, *orig = ch;
   struct obj_data *obj = NULL;
   int pass = 1;
   int chclass;
@@ -707,16 +707,16 @@ ACMD(do_subskill)
     }
 
     if (!IS_SET(SINFO.targets, TAR_IGNORE) && !vict)
-      new_send_to_char(ch,
+      ch->Send(
                        "%s... aren't we missing something here?\r\n",
                        SINFO.name);
     else if (IS_SET(SINFO.targets, TAR_NOT_SELF) && vict == ch)
-      new_send_to_char(ch, "You can't %s yourself!\r\n", SINFO.name);
+      ch->Send( "You can't %s yourself!\r\n", SINFO.name);
     else if (IS_SET(SINFO.targets, TAR_SELF_ONLY) && vict != ch)
-      new_send_to_char(ch, "That can only be done to yourself.\r\n");
+      ch->Send( "That can only be done to yourself.\r\n");
     else if (IS_SET(SINFO.routines, SK_NEED_WEAPON)
              && !has_weapon(ch))
-      new_send_to_char(ch,
+      ch->Send(
                        "You need to wield a weapon to make it a success.\r\n");
     else
     {
@@ -744,7 +744,7 @@ ACMD(do_subskill)
        CALL_SUB(sub_sweep_attack);
        break;
       default:
-        new_send_to_char(ch, "I don't know that subskill.\r\n");
+        ch->Send( "I don't know that subskill.\r\n");
         return;
 
       }
@@ -755,7 +755,7 @@ ACMD(do_subskill)
 
 ASUB(sub_fury_attacks)
 {
-  new_send_to_char(ch, "This subskill is unfinished!\r\n");
+  ch->Send( "This subskill is unfinished!\r\n");
   return FALSE;
 
 
@@ -768,19 +768,19 @@ ASUB(sub_drain_blood)
   /** You do as much damage as you are damaged **/
  if (GET_SUB(ch, SUB_DRAIN_BLOOD) <= 0)
   {
-    new_send_to_char(ch, "You haven't got that ability!\r\n");
+    ch->Send( "You haven't got that ability!\r\n");
     return SUB_UNDEFINED;
   }
   
   if (get_sub_status(ch, SUB_DRAIN_BLOOD) == STATUS_OFF ) {
   if (GET_ALIGNMENT(ch) > -600) {
-  new_send_to_char(ch, "You focus on draining blood.\r\n");
+  ch->Send( "You focus on draining blood.\r\n");
   toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_ON);
   } else {
-  new_send_to_char(ch, "You aren't evil enough drain blood.\r\n");
+  ch->Send( "You aren't evil enough drain blood.\r\n");
   }
   } else {
-  new_send_to_char(ch, "You focus on normal attacks.\r\n");
+  ch->Send( "You focus on normal attacks.\r\n");
   toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_OFF);
   }
   return TRUE;
@@ -799,19 +799,19 @@ ASUB(sub_sweep_attack)
 
  if (GET_SUB(ch, SUB_SWEEP_ATTACK) <= 0)
   {
-    new_send_to_char(ch, "You haven't got that ability!\r\n");
+    ch->Send( "You haven't got that ability!\r\n");
     return SUB_UNDEFINED;
   }
   
   if (get_sub_status(ch, SUB_SWEEP_ATTACK) == STATUS_OFF ) {
   if (speed_update(ch) > 500) {
-  new_send_to_char(ch, "You focus on sweeping attacks.\r\n");
+  ch->Send( "You focus on sweeping attacks.\r\n");
   toggle_sub_status(ch, SUB_SWEEP_ATTACK, STATUS_ON);
   } else {
-  new_send_to_char(ch, "You aren't speedy enough to focus on sweeping attacks.\r\n");
+  ch->Send( "You aren't speedy enough to focus on sweeping attacks.\r\n");
   }
   } else {
-  new_send_to_char(ch, "You focus on normal attacks.\r\n");
+  ch->Send( "You focus on normal attacks.\r\n");
   toggle_sub_status(ch, SUB_SWEEP_ATTACK, STATUS_OFF);
   }
   return TRUE;
@@ -836,24 +836,24 @@ ACMD(do_ignite)
 
   if (pass == 0)
   {
-    new_send_to_char(ch, "You don't have the right equipment to do that.\r\n");
+    ch->Send( "You don't have the right equipment to do that.\r\n");
     return;
   }
 
   if (GET_SUB(ch, SUB_LIGHTSABER_PROF) > 0)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "With a snap-hiss your glowing blade extends to it's full length, filling the area with a subtle hum.\r\n");
     act("You hear a loud hiss, followed by an everpresent hum, as $n's lightsaber extends to full length.", FALSE, ch, 0, 0, TO_ROOM);
   }
   else
   {
-    new_send_to_char(ch, "You can't figure out where the on button is!\r\n");
+    ch->Send( "You can't figure out where the on button is!\r\n");
     return;
   }
   if (GET_OBJ_VAL(hilt, 0) < 1 || GET_OBJ_VAL(hilt, 0) > 2)
   {
-    new_send_to_char(ch, "Your sabre seems to be broken!\r\n");
+    ch->Send( "Your sabre seems to be broken!\r\n");
     return;
   }
 
@@ -1047,7 +1047,7 @@ void unused_sub(enum subskill_list subcmd)
 }
 
 
-int total_sub_chance(struct char_data *ch, enum subskill_list  subcmd)
+int total_sub_chance(Character *ch, enum subskill_list  subcmd)
 {
   int count = 0, total = 0, check = TRUE;
 
@@ -1075,7 +1075,7 @@ int total_sub_chance(struct char_data *ch, enum subskill_list  subcmd)
   else
     return 0;
 }
-void improve_sub(struct char_data *ch, enum subskill_list  sub, int amount)
+void improve_sub(Character *ch, enum subskill_list  sub, int amount)
 {
   struct sub_list *temp 	= (IS_NPC(ch) ? NULL : ch->subs);
   struct sub_list *temp2 	= NULL;
@@ -1111,7 +1111,7 @@ void improve_sub(struct char_data *ch, enum subskill_list  sub, int amount)
     CREATE(ch->subs, struct sub_list, 1);
     ch->subs->subskill = (enum subskill_list)(sub);
     ch->subs->learn = amount;
-    ch->subs->status = (enum sub_status_types)0;
+    ch->subs->status = (enum sub_status_toggle)0;
     ch->subs->next = NULL;
   }
   else
@@ -1120,7 +1120,7 @@ void improve_sub(struct char_data *ch, enum subskill_list  sub, int amount)
     CREATE(temp2->next, struct sub_list, 1);
     temp2->next->subskill = (enum subskill_list)(sub);
     temp2->next->learn = amount;
-    temp2->next->status = (enum sub_status_types)0;
+    temp2->next->status = (enum sub_status_toggle)0;
     temp2->next->next = NULL;
 
   }
@@ -1141,7 +1141,7 @@ const char * color_option_name(int num)
 
 }
 
-int get_sub(struct char_data *ch, int i)
+int get_sub(Character *ch, int i)
 {
   struct sub_list *temp = (IS_NPC(ch) ? NULL : ch->subs);
 
@@ -1158,7 +1158,7 @@ int get_sub(struct char_data *ch, int i)
 
 }
 
-int get_sub_status(struct char_data *ch, int i)
+int get_sub_status(Character *ch, int i)
 {
   struct sub_list *temp = (IS_NPC(ch) ? NULL : ch->subs);
 
@@ -1172,7 +1172,7 @@ int get_sub_status(struct char_data *ch, int i)
 
 }
 
-int toggle_sub_status(struct char_data *ch, int i, int onoff)
+int toggle_sub_status(Character *ch, int i, int onoff)
 {
   struct sub_list *temp = (IS_NPC(ch) ? NULL : ch->subs);
 
@@ -1200,12 +1200,12 @@ ACMD(do_subdisplay)
 
   if (IS_NPC(ch))
   {
-    new_send_to_char(ch, "Nah, sorry.. yours are set up differently\r\n");
+    ch->Send( "Nah, sorry.. yours are set up differently\r\n");
     return;
   }
   if ((temp = ch->subs) == NULL)
   {
-    new_send_to_char(ch, "You don't even KNOW any subskills!\r\n");
+    ch->Send( "You don't even KNOW any subskills!\r\n");
     return;
   }
 
@@ -1241,7 +1241,7 @@ int default_on(enum subskill_list sub)
     return 0;
 }
 
-void reset_default_status(struct char_data *ch)
+void reset_default_status(Character *ch)
 {
   struct sub_list *temp = NULL;
 
@@ -1250,7 +1250,7 @@ void reset_default_status(struct char_data *ch)
 
   while (temp != NULL)
   {
-    temp->status = (enum sub_status_types)default_on(temp->subskill);
+    temp->status = (enum sub_status_toggle)default_on(temp->subskill);
     temp = temp->next;
   }
 

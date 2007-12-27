@@ -42,7 +42,7 @@
 #define NOBODY	   -1    /* nil reference for mobiles		*/
 
 #define SPECIAL(name) \
-   int (name)(struct char_data *ch, void *me, int cmd, char *argument)
+   int (name)(Character *ch, void *me, int cmd, char *argument)
 
 /* misc editor defines **************************************************/
 
@@ -203,7 +203,7 @@
 #define POS_STANDING   8	/* standing		*/
 
 
-/* Player flags: used by char_data.char_specials.act */
+/* Player flags: used by Character.char_specials.act */
 #define PLR_KILLER	0   /* Player is a player-killer		*/
 #define PLR_THIEF	1   /* Player is a player-thief			*/
 #define PLR_FROZEN	2   /* Player is frozen				*/
@@ -228,7 +228,7 @@
 #define MOB_RACE_ANIMAL   2	/* Mob doesn't carry money		*/
 #define MOB_RACE_EXOTIC   3	/* Mob could carry money		*/
 
-/* Mobile flags: used by char_data.char_specials.act */
+/* Mobile flags: used by Character.char_specials.act */
 #define MOB_SPEC         0  /* Mob has a callable spec-proc		*/
 #define MOB_SENTINEL     1  /* Mob should not move			*/
 #define MOB_SCAVENGER    2  /* Mob picks up stuff on the ground		*/
@@ -260,7 +260,7 @@
 #define MOB_NOFREEZE	 28 /* Mob can't be frozen			*/
 #define MOB_CAN_MATE	 29 /* Mob can be mated with other animals      */
 
-/* Preference flags: used by char_data.player_specials.pref 		*/
+/* Preference flags: used by Character.player_specials.pref 		*/
 #define PRF_BRIEF       0  /* Room descs won't normally be shown	*/
 #define PRF_COMPACT     1  /* No extra CRLF pair before prompts		*/
 #define PRF_DEAF	2  /* Can't hear shouts				*/
@@ -299,7 +299,7 @@
 #define PRF_NOBRAG      49 /* player can't hear Brags 			*/
 #define PRF_RP		50 /* Player is roleplaying			*/
 
-/* Affect bits: used in char_data.char_specials.saved.affected_by */
+/* Affect bits: used in Character.char_specials.saved.affected_by */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define AFF_DONOTUSE          0
 #define AFF_BLIND             1 	   /* (R) Char is blind		*/
@@ -375,7 +375,7 @@
 #define CON_CONFIRM_QCLASS 29           /* Confirm Class Selection      */
 #define CON_CONFIRM_STATS  30		/* Roll stats 			*/
 
-/* Character equipment positions: used as index for char_data.equipment[] */
+/* Character equipment positions: used as index for Character.equipment[] */
 /* NOTE: Don't confuse these constants with the ITEM_ bitvectors
    which control the valid places you can wear a piece of equipment */
 #define WEAR_LIGHT      0
@@ -728,7 +728,7 @@
 #define AUC_BID                 10  
 
 
-/* char_data.internal_flags (INT_XXX) ************************************/
+/* Character.internal_flags (INT_XXX) ************************************/
 #define INT_MARK	(1 <<  0)
 
 
@@ -893,8 +893,8 @@ struct obj_data {
    char	*short_description;       /* when worn/carry/in cont.         */
    char	*action_description;      /* What to write when used          */
    struct extra_descr_data *ex_description; /* extra descriptions     */
-   struct char_data *carried_by;  /* Carried by :NULL in room/conta   */
-   struct char_data *worn_by;	  /* Worn by?			      */
+   Character *carried_by;  /* Carried by :NULL in room/conta   */
+   Character *worn_by;	  /* Worn by?			      */
    sh_int worn_on;		  /* Worn where?		      */
 
    struct obj_data *in_obj;       /* In what object NULL when none    */
@@ -906,7 +906,7 @@ struct obj_data {
 
    struct obj_data *next_content; /* For 'contains' lists             */
    struct obj_data *next;         /* For the object list              */
-   struct char_data *sitting_here;/* Who is sitting in it (null if none)   */
+   Character *sitting_here;/* Who is sitting in it (null if none)   */
 };
 /* ======================================================================= */
 
@@ -993,7 +993,7 @@ struct room_data {
    struct script_data *script;  /* script info for the object           */
 
    struct obj_data *contents;   /* List of items in room                */
-   struct char_data *people;    /* List of NPC / PC in room             */
+   Character *people;    /* List of NPC / PC in room             */
 };
 /* ==================================================================== */
 
@@ -1103,10 +1103,10 @@ struct char_special_data_saved {
 
 /* Special playing constants shared by PCs and NPCs which aren't in pfile */
 struct char_special_data {
-   struct char_data *fighting;	/* Opponent				*/
-   struct char_data *hunting;	/* Char hunted by this char		*/
-   struct char_data *riding;	// Who are they riding? (DAK)
-   struct char_data *ridden_by; // Who is riding them? (DAK)
+   Character *fighting;	/* Opponent				*/
+   Character *hunting;	/* Char hunted by this char		*/
+   Character *riding;	// Who are they riding? (DAK)
+   Character *ridden_by; // Who is riding them? (DAK)
    byte position;		/* Standing, fighting, sleeping, etc.	*/
 
    int	carry_weight;		/* Carried weight			*/
@@ -1115,7 +1115,7 @@ struct char_special_data {
 
    struct char_special_data_saved saved; /* constants saved in plrfile	*/
    struct obj_data *chair;	/* object the char is sitting in	*/
-   struct char_data *next_in_chair; /* The next person in the chair	*/
+   Character *next_in_chair; /* The next person in the chair	*/
 };
 
 
@@ -1218,13 +1218,13 @@ struct affected_type {
 
 /* Structure used for chars following other chars */
 struct follow_type {
-   struct char_data *follower;
+   Character *follower;
    struct follow_type *next;
 };
 
 
 /* ================== Structure for player/non-player ===================== */
-struct char_data {
+Character {
    int pfilepos;			 /* playerfile pos		  */
    mob_rnum nr;                          /* Mob's rnum			  */
    room_rnum in_room;                    /* Location (real room number)	  */
@@ -1250,12 +1250,12 @@ struct char_data {
    struct script_data *script;         /* script info for the object      */
    struct script_memory *memory;       /* for mob memory triggers         */
 
-   struct char_data *next_in_room;     /* For room->people - list         */
-   struct char_data *next;             /* For either monster or ppl-list  */
-   struct char_data *next_fighting;    /* For fighting list               */
+   Character *next_in_room;     /* For room->people - list         */
+   Character *next;             /* For either monster or ppl-list  */
+   Character *next_fighting;    /* For fighting list               */
 
    struct follow_type *followers;        /* List of chars followers       */
-   struct char_data *master;             /* Who is char following?        */
+   Character *master;             /* Who is char following?        */
    long cmd2;				/* These wizcmds aren't saved     */
    byte internal_flags;			/* Flags used internally - not saved */
 };
@@ -1345,8 +1345,8 @@ struct descriptor_data {
    int	bufspace;		/* space left in the output buffer	*/
    struct txt_block *large_outbuf; /* ptr to large buffer, if we need it */
    struct txt_q input;		/* q of unprocessed input		*/
-   struct char_data *character;	/* linked to char			*/
-   struct char_data *original;	/* original char if switched		*/
+   Character *character;	/* linked to char			*/
+   Character *original;	/* original char if switched		*/
    struct descriptor_data *snooping; /* Who is this char snooping	*/
    struct descriptor_data *snoop_by; /* And who is snooping this char	*/
    struct descriptor_data *next; /* link to next descriptor		*/

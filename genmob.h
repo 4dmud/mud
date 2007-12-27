@@ -5,11 +5,11 @@
  ************************************************************************/
 
 int delete_mobile(mob_rnum);
-int copy_mobile(struct char_data *to, struct char_data *from);
-int add_mobile(struct char_data *, mob_vnum);
-int copy_mob_strings(struct char_data *to, struct char_data *from);
-int free_mobile_strings(struct char_data *mob);
-int free_mobile(struct char_data *mob);
+int copy_mobile(Character *to, Character *from);
+int add_mobile(Character *, mob_vnum);
+int copy_mob_strings(Character *to, Character *from);
+int free_mobile_strings(Character *mob);
+int free_mobile(Character *mob);
 int save_mobiles(zone_rnum rznum);
 void extract_mobile_all(mob_vnum vnum);
 

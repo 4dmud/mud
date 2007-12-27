@@ -51,7 +51,7 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg);
 
 #ifndef ACMD
 #define ACMD(name)  \
-   void name(struct char_data *ch, char *argument, int cmd, int subcmd)
+   void name(Character *ch, char *argument, int cmd, int subcmd)
 #endif
 
 

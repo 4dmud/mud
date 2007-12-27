@@ -46,7 +46,7 @@ ACMD(do_rdig)
   
   /* Can't dig if we don't know where to go. */
   if (!*sdir || !*sroom) {
-    new_send_to_char(ch, "Format: rdig <direction> <room> [<new room name>]- to create an exit\r\n"
+    ch->Send( "Format: rdig <direction> <room> [<new room name>]- to create an exit\r\n"
                      "        rdig <direction> -1     - to delete an exit\r\n");
     return;
   }
@@ -61,12 +61,12 @@ ACMD(do_rdig)
   zone = IN_ROOM(ch)->zone;
 
   if (dir < 0) {
-    new_send_to_char(ch, "Can not create an exit to the '%s'.\r\n", sdir);
+    ch->Send( "Can not create an exit to the '%s'.\r\n", sdir);
     return;
   }
   /* Make sure that the builder has access to the zone he's in. */
   if ((zone == NOWHERE) || !can_edit_zone(ch, zone)) {
-    new_send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    ch->Send( "You do not have permission to edit this zone.\r\n");
     return;
   }
   /*
@@ -74,7 +74,7 @@ ACMD(do_rdig)
    * After all, it'd just get us more errors on 'show errors'
    */
   if (rvnum == 0) {
-   new_send_to_char(ch, "The target exists, but you can't dig to limbo!\r\n");
+   ch->Send( "The target exists, but you can't dig to limbo!\r\n");
    return;
   }
   /*
@@ -90,10 +90,10 @@ ACMD(do_rdig)
       free(W_EXIT(IN_ROOM(ch), dir));
       W_EXIT(IN_ROOM(ch), dir) = NULL;
       add_to_save_list(zone_table[IN_ROOM(ch)->zone].number, SL_WLD);
-      new_send_to_char(ch, "You remove the exit to the %s.\r\n", dirs[dir]);
+      ch->Send( "You remove the exit to the %s.\r\n", dirs[dir]);
       return;
     }
-    new_send_to_char(ch, "There is no exit to the %s.\r\n"
+    ch->Send( "There is no exit to the %s.\r\n"
                      "No exit removed.\r\n", dirs[dir]);
     return;
   }  
@@ -101,18 +101,18 @@ ACMD(do_rdig)
    * Can't dig in a direction, if it's already a door. 
    */
   if (W_EXIT(IN_ROOM(ch), dir)) {
-      new_send_to_char(ch, "There already is an exit to the %s.\r\n", dirs[dir]);
+      ch->Send( "There already is an exit to the %s.\r\n", dirs[dir]);
       return;
   }
   
   /* Make sure that the builder has access to the zone he's linking to. */
   zone = real_zone_by_thing(rvnum);  
   if (zone == NOWHERE) {
-    new_send_to_char(ch, "You cannot link to a non-existing zone!\r\n");
+    ch->Send( "You cannot link to a non-existing zone!\r\n");
     return;
   }
   if (!can_edit_zone(ch, zone)) {
-    new_send_to_char(ch, "You do not have permission to edit room #%d.\r\n", rvnum);
+    ch->Send( "You do not have permission to edit room #%d.\r\n", rvnum);
     return;
   }
   /*
@@ -160,7 +160,7 @@ ACMD(do_rdig)
     redit_save_internally(d);
     OLC_VAL(d) = 0;
     
-    new_send_to_char(ch, "New room (%d) created.\r\n", rvnum);
+    ch->Send( "New room (%d) created.\r\n", rvnum);
     cleanup_olc(d, CLEANUP_STRUCTS);
     /* 
      * update rrnum to the correct room rnum after adding the room 
@@ -177,14 +177,14 @@ ACMD(do_rdig)
   W_EXIT(IN_ROOM(ch), dir)->to_room = rrnum;
   add_to_save_list(zone_table[IN_ROOM(ch)->zone].number, SL_WLD);
   
-  new_send_to_char(ch, "You make an exit %s to room %d (%s).\r\n", 
+  ch->Send( "You make an exit %s to room %d (%s).\r\n", 
                    dirs[dir], rvnum, rrnum->name);
 
   /* 
    * check if we can dig from there to here. 
    */
   if (W_EXIT(rrnum, rev_dir[dir])) 
-    new_send_to_char(ch, "Can not rdig from %d to here. The target room already has an exit to the %s.\r\n",
+    ch->Send( "Can not rdig from %d to here. The target room already has an exit to the %s.\r\n",
                      rvnum, dirs[rev_dir[dir]]);
   else {
     CREATE(W_EXIT(rrnum, rev_dir[dir]), struct room_direction_data, 1);
@@ -207,23 +207,23 @@ ACMD(do_room_copy)
    one_argument(argument, buf);
    
    if (!*buf) {
-     new_send_to_char(ch, "Usage: rclone <target room>\r\n");
+     ch->Send( "Usage: rclone <target room>\r\n");
      return;
    }
    
    if (real_room((buf_num = atoi(buf))) != NULL) {
-     new_send_to_char(ch, "That room already exist!\r\n");
+     ch->Send( "That room already exist!\r\n");
      return;
    }
 
    if ((dst_zone = real_zone_by_thing(buf_num)) == NOWHERE) {
-     new_send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+     ch->Send( "Sorry, there is no zone for that number!\r\n");
      return;
    }
     
    if (!can_edit_zone(ch, dst_zone) ||
        !can_edit_zone(ch, IN_ROOM(ch)->zone) ) {
-     new_send_to_char(ch, "You may only copy rooms within your designated zone(s)!\r\n");
+     ch->Send( "You may only copy rooms within your designated zone(s)!\r\n");
      return;
    }
    
@@ -236,7 +236,7 @@ ACMD(do_room_copy)
    /*
    * Allocate space for all strings.
    */
-   new_send_to_char(ch, "Cloning room....\r\n");
+   ch->Send( "Cloning room....\r\n");
    
    room_dst->name = str_udup(IN_ROOM(ch)->name);
    room_dst->description = str_udup(IN_ROOM(ch)->description);
@@ -252,7 +252,7 @@ ACMD(do_room_copy)
    * Extra descriptions, if necessary.
    */
   
-  new_send_to_char(ch, "Cloning extra descriptions....\r\n");
+  ch->Send( "Cloning extra descriptions....\r\n");
   if (IN_ROOM(ch)->ex_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
     CREATE(temp, struct extra_descr_data, 1);
@@ -273,7 +273,7 @@ ACMD(do_room_copy)
    * Extra descriptions, if necessary.
    */
   
-  new_send_to_char(ch, "Cloning look under descriptions....\r\n");
+  ch->Send( "Cloning look under descriptions....\r\n");
   if (IN_ROOM(ch)->look_under_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
     CREATE(temp, struct extra_descr_data, 1);
@@ -294,7 +294,7 @@ ACMD(do_room_copy)
    * Extra descriptions, if necessary.
    */
   
-  new_send_to_char(ch, "Cloning look behind descriptions....\r\n");
+  ch->Send( "Cloning look behind descriptions....\r\n");
   if (IN_ROOM(ch)->look_behind_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
     CREATE(temp, struct extra_descr_data, 1);
@@ -315,7 +315,7 @@ ACMD(do_room_copy)
    * Extra descriptions, if necessary.
    */
   
-  new_send_to_char(ch, "Cloning look above descriptions....\r\n");
+  ch->Send( "Cloning look above descriptions....\r\n");
   if (IN_ROOM(ch)->look_above_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
     CREATE(temp, struct extra_descr_data, 1);
@@ -335,10 +335,10 @@ ACMD(do_room_copy)
    /*
     * Now save the room in the right place:
     */ 
-  new_send_to_char(ch, "Saving new room...\r\n");
+  ch->Send( "Saving new room...\r\n");
     
   if ((room_num = add_room(room_dst)) == NULL) {
-    new_send_to_char(ch, "Something went wrong...\r\n");
+    ch->Send( "Something went wrong...\r\n");
     log("SYSERR: do_room_copy: Something failed!");
     return;
   }
@@ -370,7 +370,7 @@ ACMD(do_room_copy)
   }
   add_to_save_list(real_zone_by_thing(atoi(buf)), SL_WLD);
   redit_save_to_disk(real_zone_by_thing(atoi(buf)));
-  new_send_to_char(ch, "Room cloned to %d.\r\nAll Done.\r\n", buf_num);
+  ch->Send( "Room cloned to %d.\r\nAll Done.\r\n", buf_num);
 }
 
 
@@ -394,7 +394,7 @@ room_vnum redit_find_new_vnum(zone_rnum zone)
 
 }
 
-int buildwalk(struct char_data *ch, int dir) {
+int buildwalk(Character *ch, int dir) {
   char buf[MAX_STRING_LENGTH];
   room_vnum vnum;
   room_rnum rnum;
@@ -406,9 +406,9 @@ int buildwalk(struct char_data *ch, int dir) {
     get_char_colors(ch);
 
     if (!can_edit_zone(ch, IN_ROOM(ch)->zone)) {
-      new_send_to_char(ch, "You do not have build permissions in this zone.\r\n");
+      ch->Send( "You do not have build permissions in this zone.\r\n");
     } else if ((vnum = redit_find_new_vnum(IN_ROOM(ch)->zone)) == NOWHERE)
-    new_send_to_char(ch, "No free vnums are available in this zone!\r\n");
+    ch->Send( "No free vnums are available in this zone!\r\n");
     else {
       struct descriptor_data *d = ch->desc;
       /*
@@ -448,7 +448,7 @@ int buildwalk(struct char_data *ch, int dir) {
   rnum->dir_option[rev_dir[dir]]->to_room = IN_ROOM(ch);
 
   /* Memory cleanup */
-  new_send_to_char(ch, "%sRoom #%d created by BuildWalk.%s\r\n", yel, vnum, nrm);
+  ch->Send( "%sRoom #%d created by BuildWalk.%s\r\n", yel, vnum, nrm);
   cleanup_olc(d, CLEANUP_STRUCTS);
   return(1);
   }

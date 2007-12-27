@@ -30,7 +30,7 @@ const char *nrm, *grn, *cyn, *yel;
 /** External Data Structures                                                 **/
 /******************************************************************************/
 extern struct obj_data *obj_proto;
-extern struct char_data *mob_proto;
+extern Character *mob_proto;
 extern struct room_data *world_vnum[];
 extern zone_rnum top_of_zone_table;
 extern struct zone_data *zone_table;
@@ -195,7 +195,7 @@ ACMD(do_oasis)
  * see at color level NRM.  Changing the entries here will change 
  * the colour scheme throughout the OLC.
  */
-void get_char_colors(struct char_data *ch)
+void get_char_colors(Character *ch)
 {
   nrm = CCNRM(ch, C_NRM);
   grn = CCGRN(ch, C_NRM);
@@ -440,7 +440,7 @@ void free_config(struct config_data *data)
 /**                  FALSE.                                                  **/
 /**                                                                          **/
 /******************************************************************************/
-int can_edit_zone(struct char_data *ch, zone_rnum rnum)
+int can_edit_zone(Character *ch, zone_rnum rnum)
 {
   if (!ch->desc && IS_NPC(ch))
     return TRUE; //used for goto and teleport for mobs.

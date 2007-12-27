@@ -37,7 +37,7 @@ struct ignore *find_ignore(struct ignore *ignore_list, char *str)
 If ch is ignoring vict then this function returns 1
 otherwise it returns 0
 */
-int is_ignoring(struct char_data *ch, struct char_data *vict)
+int is_ignoring(Character *ch, Character *vict)
 {
   struct ignore *temp;
 //  char buf[127];
@@ -57,7 +57,7 @@ int is_ignoring(struct char_data *ch, struct char_data *vict)
   }
   return (0);
 }
-void print_ignorelist(struct char_data *ch, struct char_data *vict)
+void print_ignorelist(Character *ch, Character *vict)
 {
   struct ignore *temp;
 
@@ -76,7 +76,7 @@ void print_ignorelist(struct char_data *ch, struct char_data *vict)
   return;
 }
 
-void write_ignorelist(struct char_data *ch)
+void write_ignorelist(Character *ch)
 {
   FILE *file;
   char ignoref[127];
@@ -102,7 +102,7 @@ if (valid_to_save(ignoretemp->ignore))
   fclose(file);
 }
 
-void read_ignorelist(struct char_data *ch)
+void read_ignorelist(Character *ch)
 {
   FILE *file;
   char ignoref[127];
@@ -144,7 +144,7 @@ free_ignore(i->next);
 free_string(&i->ignore);
 free(i);
 }
-void free_ignorelist(struct char_data *ch) {
+void free_ignorelist(Character *ch) {
 free_ignore(GET_IGNORELIST(ch));
 GET_IGNORELIST(ch) = NULL;
 }

@@ -34,7 +34,7 @@ end
 %purge% %self%
 
 */
-void convert_tokens(struct char_data *ch)
+void convert_tokens(Character *ch)
 {
     div_t brass, bronze, silver;
 
@@ -75,7 +75,7 @@ SPECIAL(token_machine)
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     struct obj_data *obj, *cont;
-    struct char_data *tmp_char;
+    Character *tmp_char;
 //  int obj_dotmode, cont_dotmode, found = 0;
 
     if (!CMD_IS("put"))
@@ -104,12 +104,12 @@ SPECIAL(token_machine)
 	return (0);
 
     if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
-	new_send_to_char(ch, "You aren't carrying %s %s.\r\n", AN(arg1), arg1);
+	ch->Send( "You aren't carrying %s %s.\r\n", AN(arg1), arg1);
 	return (1);
     } else if ((GET_OBJ_VNUM(obj) == 3301) || (GET_OBJ_VNUM(obj) == 3304)
 	       || (GET_OBJ_VNUM(obj) == 3307)
 	       || (GET_OBJ_VNUM(obj) == 3310)) {
-	new_send_to_char(ch,  "You put %s %s into the machine.\r\n", AN(arg1),
+	ch->Send(  "You put %s %s into the machine.\r\n", AN(arg1),
 		arg1);
 	obj_from_char(obj);
 	extract_obj(obj);
@@ -117,7 +117,7 @@ SPECIAL(token_machine)
 	convert_tokens(ch);
 	return (1);
     } else if (GET_OBJ_VNUM(obj) == 3300) {
-	new_send_to_char(ch, "You put %s %s into the machine.\r\n", AN(arg1),
+	ch->Send( "You put %s %s into the machine.\r\n", AN(arg1),
 		arg1);
 	obj_from_char(obj);
 	extract_obj(obj);
@@ -127,7 +127,7 @@ SPECIAL(token_machine)
     } else if ((GET_OBJ_VNUM(obj) == 3302) || (GET_OBJ_VNUM(obj) == 3305)
 	       || (GET_OBJ_VNUM(obj) == 3308)
 	       || (GET_OBJ_VNUM(obj) == 3311)) {
-	new_send_to_char(ch,  "You put %s %s into the machine.\r\n", AN(arg1),
+	ch->Send(  "You put %s %s into the machine.\r\n", AN(arg1),
 		arg1);
 	obj_from_char(obj);
 	extract_obj(obj);
@@ -137,7 +137,7 @@ SPECIAL(token_machine)
     } else if ((GET_OBJ_VNUM(obj) == 3303) || (GET_OBJ_VNUM(obj) == 3306)
 	       || (GET_OBJ_VNUM(obj) == 3309)
 	       || (GET_OBJ_VNUM(obj) == 3312)) {
-	new_send_to_char(ch, "You put %s %s into the machine.\r\n", AN(arg1),
+	ch->Send( "You put %s %s into the machine.\r\n", AN(arg1),
 		arg1);
 	obj_from_char(obj);
 	extract_obj(obj);
@@ -180,7 +180,7 @@ ACMD(do_deduct)
 
     if (isname("brass", arg2)) {
 	if (GET_BRASS_TOKEN_COUNT(ch) >= amount) {
-	    new_send_to_char(ch, 
+	    ch->Send( 
 		    "%d tokens were deducted from your account.\r\n",
 		    amount);
 	    GET_BRASS_TOKEN_COUNT(ch) -= amount;
@@ -197,7 +197,7 @@ ACMD(do_deduct)
 	}
     } else if (isname("bronze", arg2)) {
 	if (GET_BRONZE_TOKEN_COUNT(ch) >= amount) {
-	   new_send_to_char(ch, 
+	   ch->Send( 
 		    "%d tokens were deducted from your account.\r\n",
 		    amount);
 	    GET_BRONZE_TOKEN_COUNT(ch) -= amount;
@@ -214,7 +214,7 @@ ACMD(do_deduct)
 	}
     } else if (isname("silver", arg2)) {
 	if (GET_SILVER_TOKEN_COUNT(ch) >= amount) {
-	    new_send_to_char(ch, 
+	    ch->Send( 
 		    "%d tokens were deducted from your account.\r\n",
 		    amount);
 	    GET_SILVER_TOKEN_COUNT(ch) -= amount;
@@ -231,7 +231,7 @@ ACMD(do_deduct)
 	}
     } else if (isname("gold", arg2)) {
 	if (GET_GOLD_TOKEN_COUNT(ch) >= amount) {
-	    new_send_to_char(ch, 
+	    ch->Send( 
 		    "%d tokens were deducted from your account.\r\n",
 		    amount);
 	    GET_GOLD_TOKEN_COUNT(ch) -= amount;

@@ -1,21 +1,21 @@
 
 
-int apply_ac(struct char_data *ch, int eq_pos);
-int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_type);
-int arena_ok(struct char_data *ch, struct char_data *victim);
-int find_fe_type(struct char_data *ch);
-int has_weapon(struct char_data *ch);
-int can_fight(struct char_data *ch, struct char_data *vict, int silent);
-int both_pk(struct char_data *a, struct char_data *b);
-void kill_list(struct char_data *ch, struct char_data *vict);
-int chance_hit_part(struct char_data *ch, int part);
+int apply_ac(Character *ch, int eq_pos);
+int modify_dam(int dam, Character *ch, Character *vict , int w_type);
+int arena_ok(Character *ch, Character *victim);
+int find_fe_type(Character *ch);
+int has_weapon(Character *ch);
+int can_fight(Character *ch, Character *vict, int silent);
+int both_pk(Character *a, Character *b);
+void kill_list(Character *ch, Character *vict);
+int chance_hit_part(Character *ch, int part);
 
 /* prototypes from fight.c */
-void set_fighting(struct char_data *ch, struct char_data *victim);
-void stop_fighting(struct char_data *ch);
-void forget(struct char_data *ch, struct char_data *victim);
-void remember(struct char_data *ch, struct char_data *victim);
-int skill_message(int dam, struct char_data *ch, struct char_data *vict,
+void set_fighting(Character *ch, Character *victim);
+void stop_fighting(Character *ch);
+void forget(Character *ch, Character *victim);
+void remember(Character *ch, Character *victim);
+int skill_message(int dam, Character *ch, Character *vict,
                   int attacktype);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
@@ -158,19 +158,19 @@ extern struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES];
 #define ATTACK_SKILL 2
 #define ATTACK_MELEE 3
 int attack_type(char chclass);
-void start_fighting(struct char_data* ch, struct char_data* vict);
+void start_fighting(Character* ch, Character* vict);
 
-int fe_solo_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
-int fe_melee_hit(struct char_data* ch, struct char_data* vict, int type, int melee);
-int fe_spell_hit(struct char_data* ch, struct char_data* vict, int type);
-int fe_deal_damage(struct char_data* ch, struct char_data* vict, int dam, int w_type);
-void stop_fighting(struct char_data* ch);
+int fe_solo_damage(Character* ch, Character* vict, int damage, int w_type);
+int fe_melee_hit(Character* ch, Character* vict, int type, int melee);
+int fe_spell_hit(Character* ch, Character* vict, int type);
+int fe_deal_damage(Character* ch, Character* vict, int dam, int w_type);
+void stop_fighting(Character* ch);
 int attack_type(char chclass);
 
-void group_gain(struct char_data *ch, struct char_data *victim);
-void solo_gain(struct char_data *ch, struct char_data *victim,
+void group_gain(Character *ch, Character *victim);
+void solo_gain(Character *ch, Character *victim,
                bool missile);
-void die(struct char_data *ch, struct char_data *killer);
+void die(Character *ch, Character *killer);
 float   backstab_mult(int level, int tier);
 float   cleave_mult(int level, int tier);
 

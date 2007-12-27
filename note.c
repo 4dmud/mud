@@ -68,10 +68,10 @@ void smash_tilde(char *str);
 
 /* local procedures */
 void load_thread(char *name, NOTE_DATA **list, int type, time_t free_time);
-void parse_note(CHAR_DATA *ch, char *argument, int type);
-bool hide_note(CHAR_DATA *ch, NOTE_DATA *pnote);
+void parse_note(Character *ch, char *argument, int type);
+bool hide_note(Character *ch, NOTE_DATA *pnote);
 void free_note(NOTE_DATA *note, int type);
-int has_note(CHAR_DATA *ch, int type);
+int has_note(Character *ch, int type);
 void free_all_notes(void);
 void free_note_list(NOTE_DATA *note, int type);
 void free_char_note(NOTE_DATA *note);
@@ -90,7 +90,7 @@ NOTE_DATA *note_free;
 #define IS_IMMORTAL(ch)     (GET_LEVEL(ch) >= LVL_IMMORT)
 #define IS_ADMIN(ch)        (GET_LEVEL(ch) == LVL_IMPL)
 
-int count_spool(CHAR_DATA *ch, NOTE_DATA *spool)
+int count_spool(Character *ch, NOTE_DATA *spool)
 {
   int count = 0;
   NOTE_DATA *pnote;
@@ -102,7 +102,7 @@ int count_spool(CHAR_DATA *ch, NOTE_DATA *spool)
   return count;
 }
 
-void do_unread(CHAR_DATA *ch)
+void do_unread(Character *ch)
 {
   int count;
   bool found = FALSE;
@@ -113,36 +113,36 @@ void do_unread(CHAR_DATA *ch)
   if ((count = count_spool(ch,news_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch, "There %s %d new news article%s waiting.\r\n",
+    ch->Send( "There %s %d new news article%s waiting.\r\n",
             count > 1 ? "are" : "is",count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,changes_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"There %s %d change%s waiting to be read.\r\n",
+    ch->Send("There %s %d change%s waiting to be read.\r\n",
             count > 1 ? "are" : "is", count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,note_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"You have %d new note%s waiting.\r\n",
+    ch->Send("You have %d new note%s waiting.\r\n",
             count, count > 1 ? "s" : "");
   }
   if ((count = count_spool(ch,idea_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"You have %d unread idea%s to peruse.\r\n",
+    ch->Send("You have %d unread idea%s to peruse.\r\n",
             count, count > 1 ? "s" : "");
   }
   if (IS_TRUSTED(ch,ANGEL) && (count = count_spool(ch,penalty_list)) > 0)
   {
     found = TRUE;
-    new_send_to_char(ch,"%d %s been added.\r\n",
+    ch->Send("%d %s been added.\r\n",
             count, count > 1 ? "penalties have" : "penalty has");
   }
 
   if (!found)
-    new_send_to_char(ch,"You have no unread notes.\r\n");
+    ch->Send("You have no unread notes.\r\n");
 }
 
 ACMD(do_note)
@@ -407,7 +407,7 @@ void append_note(NOTE_DATA *pnote)
   //fpReserve = fopen( NULL_FILE, "r" );
 }
 
-bool is_note_to( CHAR_DATA *ch, NOTE_DATA *pnote )
+bool is_note_to( Character *ch, NOTE_DATA *pnote )
 {
   if ( !str_cmp( GET_NAME(ch), pnote->sender ) )
     return TRUE;
@@ -445,7 +445,7 @@ bool is_note_to( CHAR_DATA *ch, NOTE_DATA *pnote )
 
 
 
-void note_attach( CHAR_DATA *ch, int type )
+void note_attach( Character *ch, int type )
 {
   NOTE_DATA *pnote;
 
@@ -467,7 +467,7 @@ void note_attach( CHAR_DATA *ch, int type )
 
 
 
-void note_remove( CHAR_DATA *ch, NOTE_DATA *pnote, bool del)
+void note_remove( Character *ch, NOTE_DATA *pnote, bool del)
 {
   char to_new[MAX_INPUT_LENGTH];
   char to_one[MAX_INPUT_LENGTH];
@@ -552,7 +552,7 @@ void note_remove( CHAR_DATA *ch, NOTE_DATA *pnote, bool del)
   return;
 }
 
-bool hide_note (CHAR_DATA *ch, NOTE_DATA *pnote)
+bool hide_note (Character *ch, NOTE_DATA *pnote)
 {
   time_t last_read;
 
@@ -592,7 +592,7 @@ bool hide_note (CHAR_DATA *ch, NOTE_DATA *pnote)
   return FALSE;
 }
 
-void update_read(CHAR_DATA *ch, NOTE_DATA *pnote)
+void update_read(Character *ch, NOTE_DATA *pnote)
 {
   time_t stamp;
 
@@ -623,7 +623,7 @@ void update_read(CHAR_DATA *ch, NOTE_DATA *pnote)
   }
 }
 
-int has_note(CHAR_DATA *ch, int type)
+int has_note(Character *ch, int type)
 {
   NOTE_DATA **list;
   NOTE_DATA *pnote;
@@ -663,7 +663,7 @@ int has_note(CHAR_DATA *ch, int type)
 }
 
 
-void parse_note( CHAR_DATA *ch, char *argument, int type )
+void parse_note( Character *ch, char *argument, int type )
 {
   DESCRIPTOR_DATA *d;
   char buffer[MAX_STRING_LENGTH];
@@ -732,7 +732,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       {
         if (!hide_note(ch,pnote))
         {
-          new_send_to_char(ch,
+          ch->Send(
                            "{cyNote Number: {cc%3d{c0\r\n"
                            "{cy       From: {cc%-s{c0\r\n"
                            "{cy    Subject: {cg%-s{c0\r\n"
@@ -754,7 +754,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         else if (is_note_to(ch,pnote))
           vnum++;
       }
-      new_send_to_char(ch,"[%s] You have none unread.\r\n",list_name);
+      ch->Send("[%s] You have none unread.\r\n",list_name);
       ch->has_note[type] = (FALSE);
       return;
     }
@@ -775,7 +775,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     {
       if ( is_note_to( ch, pnote ) && ( vnum++ == anum || fAll ) )
       {
-        new_send_to_char(ch,
+        ch->Send(
                          "{cyNote Number: {cc%3d{c0\r\n"
                          "{cy       From: {cc%-s{c0\r\n"
                          "{cy    Subject: {cg%-s{c0\r\n"
@@ -808,7 +808,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     {
       if ( is_note_to( ch, pnote ) )
       {
-        new_send_to_char(ch, "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\r\n",
+        ch->Send( "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\r\n",
                          vnum, hide_note(ch,pnote) ? " " : "N",
                          pnote->sender, pnote->subject );
         vnum++;
@@ -863,7 +863,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       }
     }
 
-    new_send_to_char(ch,"There aren't that many %ss.",list_name);
+    ch->Send("There aren't that many %ss.",list_name);
     return;
   }
 
@@ -887,7 +887,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
       }
     }
 
-    new_send_to_char(ch,"There aren't that many %ss.",list_name);
+    ch->Send("There aren't that many %ss.",list_name);
     return;
   }
 
@@ -919,7 +919,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   if ((type == NOTE_NEWS && !IS_TRUSTED(ch,ANGEL))
       ||  (type == NOTE_CHANGES && !IS_TRUSTED(ch,CREATOR)))
   {
-    new_send_to_char(ch,"You aren't high enough level to write %ss.",list_name);
+    ch->Send("You aren't high enough level to write %ss.",list_name);
     return;
   }
 
@@ -1024,7 +1024,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
   {
   if (GET_LEVEL(ch) < LVL_IMMORT) {
   if (isname("all", argument)) {
-  new_send_to_char(ch, "You can't send to all.\r\nYou can send it to all the imms by sending it to IMM\r\nor to the Head Staff with ADMIN\r\n");
+  ch->Send( "You can't send to all.\r\nYou can send it to all the imms by sending it to IMM\r\nor to the Head Staff with ADMIN\r\n");
   return;
   }
   }
@@ -1068,7 +1068,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
     }
 
 
-    new_send_to_char(ch,
+    ch->Send(
                      "\r\n{cy   From: {cc%-s{c0\r\n"
                      "{cySubject: {cg%-s{c0\r\n"
                      "{cy     To: {cw%-s{c0\r\n"
@@ -1077,7 +1077,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
                      ch->pnote->subject,
                      ch->pnote->to_list
                     );
-    new_send_to_char(ch, "%s", ch->pnote->text);
+    ch->Send( "%s", ch->pnote->text);
     return;
   }
 
@@ -1121,7 +1121,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
 
     append_note(ch->pnote);
 
-    new_send_to_char(ch, "You post the note.\r\n");
+    ch->Send( "You post the note.\r\n");
 
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
@@ -1226,7 +1226,7 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         ch->pnote->date_stamp		= current_time;
 
         append_note(ch->pnote);
-        new_send_to_char(ch, "You FWD the note.\r\n");
+        ch->Send( "You FWD the note.\r\n");
 
         for ( d = descriptor_list; d != NULL; d = d->next )
         {
@@ -1281,11 +1281,11 @@ void parse_note( CHAR_DATA *ch, char *argument, int type )
         return;
       }
     }
-    new_send_to_char(ch,"There aren't that many %s.\r\n",list_name);
+    ch->Send("There aren't that many %s.\r\n",list_name);
     return;
   }
 
-  new_send_to_char(ch, "Correct usage is:\r\n"
+  ch->Send( "Correct usage is:\r\n"
                    "==============CREATING================\r\n"
                    "%s TO <recipients>\r\n"
                    "Gives the %s a list of people who can read the %s.\r\n"

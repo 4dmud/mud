@@ -10,6 +10,6 @@
 //
 //
 
-int damage(struct char_data *ch, struct char_data *victim, int dam,int attacktype);
-void damage_count_free(struct char_data *vict);
-void damage_count(struct char_data *vict, long id, int dam);
+int damage(Character *ch, Character *victim, int dam,int attacktype);
+void damage_count_free(Character *vict);
+void damage_count(Character *vict, long id, int dam);

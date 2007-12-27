@@ -27,7 +27,7 @@ extern struct time_info_data time_info;
 extern struct spell_info_type spell_info[];
 EVENTFUNC(message_event);
 
-int in_fish_room(struct char_data *ch) {
+int in_fish_room(Character *ch) {
 char *nm = NULL;
 if (!IN_ROOM(ch))
 return 0;
@@ -55,7 +55,7 @@ return 1;
 return 0;
 
 }
-int has_bait(struct char_data *ch) {
+int has_bait(Character *ch) {
 struct obj_data *bait;
 char *nm;
 if ((bait = GET_EQ(ch, POS_HOLD)) == NULL)
@@ -83,7 +83,7 @@ return NULL;
 
 }
 
-int has_rod(struct char_data *ch) {
+int has_rod(Character *ch) {
 struct obj_data *rod;
 if (!ch)
 return 0;
@@ -99,18 +99,18 @@ char arg[MAX_INPUT_LENGTH];
 argument = one_argument(argument, arg);
 struct obj_data *bait, *rod;
 if (IS_NPC(ch)) {
-new_send_to_char(ch, "mobs can't fish\r\n");
+ch->Send( "mobs can't fish\r\n");
 return;
 }
 
 if (FIGHTING(ch)) {
-new_send_to_char(ch, "You can't concentrate enough!\r\n");
+ch->Send( "You can't concentrate enough!\r\n");
 return;
 }
 
 if (*arg) {
 if (!str_cmp(arg, "tally") || !str_cmp(arg, "talley")) {
-new_send_to_char(ch, 
+ch->Send( 
 "\r\n"
 "[   FishObjects: %-5d  ]\r\n"
 "[   LiveOnes   : %-5d  ]\r\n"
@@ -118,22 +118,22 @@ new_send_to_char(ch,
 TALLY_FOBJ(ch), TALLY_FISH(ch), TALLY_DEBRIS(ch));
 }
 else
-new_send_to_char(ch, "That option isnt available yet, just type fish, or fish tally\r\n");
+ch->Send( "That option isnt available yet, just type fish, or fish tally\r\n");
 return;
 }
 
 if (!(rod = has_rod(ch))) {
-new_send_to_char(ch, "You can't fish without a rod or line!\r\n");
+ch->Send( "You can't fish without a rod or line!\r\n");
 return;
 }
 
 if (!in_fish_room(ch)) {
-new_send_to_char(ch, "You can't fish here.\r\n");
+ch->Send( "You can't fish here.\r\n");
 return;
 }
 
 if (!(bait = has_bait(ch))) {
-new_send_to_char(ch, "You are not holding suitable bait!\r\n");
+ch->Send( "You are not holding suitable bait!\r\n");
 return;
 }
 
@@ -148,8 +148,8 @@ act("$n puts some $p on the hook and drops it in the water.", FALSE, ch, bait, 0
 }
 }
 
-int fish(struct char_data *ch, int chance, int round) {
-new_send_to_char(ch, "[FISH] ");
+int fish(Character *ch, int chance, int round) {
+ch->Send( "[FISH] ");
 if (chance < 0) {
 act("You get a few tugs on your line", FALSE, ch, 0, 0, TO_CHAR);
 act("$n's line twitches.", FALSE, ch, 0, 0, TO_ROOM);

@@ -27,7 +27,7 @@
 #define BASE_YEAR   1990      /* Year from which all calculations are done.     */
 
                          /* Function declatations */
-int calender_month(struct char_data *ch, int month, int year, int theday);
+int calender_month(Character *ch, int month, int year, int theday);
 int start_day(const int month, const int year);
 int leap(int);
 void load_current_events();
@@ -85,7 +85,7 @@ ACMD(do_calender)
 /*        Display one calender month.                  */
 /************************************************************************/
 
-int calender_month(struct char_data *ch, int month, int year, int theday)
+int calender_month(Character *ch, int month, int year, int theday)
 {
   int i,j,count;              /* General Purpose variables. */
   
@@ -137,27 +137,27 @@ int calender_month(struct char_data *ch, int month, int year, int theday)
     }
   }
                          /* O/P Title bar.        */
-  new_send_to_char(ch, "\r\n%s %d\r\n",months[month], year);
+  ch->Send( "\r\n%s %d\r\n",months[month], year);
                          /* O/P the calender      */
   for (j=1; j<=DAYS_IN_A_WEEK; j++)
   {
-    new_send_to_char(ch,"%5s ",days[j]);       /* Day names             */
+    ch->Send("%5s ",days[j]);       /* Day names             */
     
     for (i=1; i<=MAX_COLS; i++)
     {
       if (theday != -1 && month_map[j][i] == theday)
-        new_send_to_char(ch, "{cV");
-      new_send_to_char(ch, "%s", event_day(month_map[j][i], month, year));
+        ch->Send( "{cV");
+      ch->Send( "%s", event_day(month_map[j][i], month, year));
       if ( month_map[j][i] == 0 )  /* dates            */
-      {new_send_to_char(ch, "   ");}
+      {ch->Send( "   ");}
       else 
-      {new_send_to_char(ch,"%2d ", month_map[j][i]);}
+      {ch->Send("%2d ", month_map[j][i]);}
 
       if (theday != -1 && month_map[j][i] == theday)
-        new_send_to_char(ch, "{c0");
+        ch->Send( "{c0");
     }
     
-    new_send_to_char(ch,"\r\n");                /* puts supplies a Newline    */
+    ch->Send("\r\n");                /* puts supplies a Newline    */
   }
 }
 

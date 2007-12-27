@@ -27,7 +27,7 @@
 
 /* local functions */
 int genpreg(void);
-int crashcheck_alpha(struct char_data *ch, struct char_data *vict);
+int crashcheck_alpha(Character *ch, Character *vict);
 
 
 /* -^- *** YORU'S ROMANCE MODULE     *** -^-
@@ -37,7 +37,7 @@ int crashcheck_alpha(struct char_data *ch, struct char_data *vict);
 /* Extra Thanks to Philip Ames for help debugging V 0.92 */
 /* Extra Thanks to Brian Finley for help debugging V 0.9/0.92.2b */
 
-void namesave(struct char_data *ch, struct char_data *vict)
+void namesave(Character *ch, Character *vict)
 {
   /* Saves the names in PARTNER() */
   /* Now we're set! Save it! */
@@ -46,13 +46,13 @@ void namesave(struct char_data *ch, struct char_data *vict)
   if (!IS_NPC(vict)) SET_BIT_AR(PLR_FLAGS(vict), PLR_CRASH);
 }
 
-void changesave(struct char_data *ch, struct char_data *vict)
+void changesave(Character *ch, Character *vict)
 {
   /* Saves changes after rejection */
   namesave(ch, vict);
 }
 
-int check_samesex(struct char_data *ch, struct char_data *victim)
+int check_samesex(Character *ch, Character *victim)
 {
   /*Checks if it's a same-sex proposition/marriage */
   /* Then checks if SAME_SEX_ALLOWED is TRUE. */
@@ -73,7 +73,7 @@ int check_samesex(struct char_data *ch, struct char_data *victim)
 /* Romance Module -- Ask Someone Out */
 ACMD(do_askout)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   
   one_argument(argument, arg);
@@ -85,7 +85,7 @@ ACMD(do_askout)
   else if (!(victim = get_char_room_vis(ch, arg, NULL)))
   {
     /* Is that person here? Nope! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   
@@ -147,7 +147,7 @@ ACMD(do_askout)
 
 ACMD(do_accept)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   if (ROMANCE(ch) < ASKED_OUT)
   {  /* You're not being asked out.. */
@@ -166,7 +166,7 @@ ACMD(do_accept)
     else if (!(victim = get_char_room_vis(ch, arg, NULL)))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
@@ -244,7 +244,7 @@ ACMD(do_accept)
 /* Romance Module -- Reject A Proposition */
 ACMD(do_reject)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH+1];
   if (ROMANCE(ch) < ASKED_OUT)
   {  /* You're not being asked out.. */
@@ -263,7 +263,7 @@ ACMD(do_reject)
     else if (!(victim = get_char_room_vis(ch, arg, NULL)))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
@@ -334,35 +334,35 @@ ACMD(do_reject)
 ACMD(do_propose)
 {
   /* To propose to someone. */
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   
   switch (ROMANCE(ch))
   {
   default:
-    new_send_to_char(ch, "Error!!\r\n");
+    ch->Send( "Error!!\r\n");
     return;
   case 1:
     //success:
     break;
   case 2:
-    new_send_to_char(ch, "But you're already engaged!\r\n");
+    ch->Send( "But you're already engaged!\r\n");
     return;
   case 3:
-    new_send_to_char(ch,
+    ch->Send(
                      "But you're married already! %s wouldn't approve!\r\n", get_name_by_id(PARTNER(ch)));
     return;
   case 4:
-    new_send_to_char(ch, "But you're being asked out! That would be rude!\r\n");
+    ch->Send( "But you're being asked out! That would be rude!\r\n");
     return;
   case 5:
-    new_send_to_char(ch, "But you're already proposing!\r\n");
+    ch->Send( "But you're already proposing!\r\n");
     return;
   }
   
   if (ROMANCE(ch) == ASKING)
   {  /*Asking someone out? */
-    new_send_to_char(ch, "But you're asking someone else!\r\n");
+    ch->Send( "But you're asking someone else!\r\n");
     return;
     
   }
@@ -371,18 +371,18 @@ ACMD(do_propose)
     one_argument(argument, arg);
     if (!*arg)
     {          /* Propose to no one? */
-      new_send_to_char(ch,"Whom do you want to propose to?\r\n");
+      ch->Send("Whom do you want to propose to?\r\n");
       return;
     }
     else if (!(victim = get_char_room_vis(ch, arg, NULL)))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
     {     /* Propose to yourself? */
-      new_send_to_char(ch,"You can't propose to yourself!\r\n");
+      ch->Send("You can't propose to yourself!\r\n");
       return;
     }
     else if (crashcheck_alpha(victim, ch) == 1)
@@ -391,53 +391,53 @@ ACMD(do_propose)
     }
     else if (ROMANCE(victim) < 1)
     {     /* Are they already dating? */
-      new_send_to_char(ch, "But they're not dating anyone!\r\n");
+      ch->Send( "But they're not dating anyone!\r\n");
       return;
     }
     else if (ROMANCE(victim) == 2)
     {     /* Are they already engaged? */
-      new_send_to_char(ch, "But they're already engaged to %s!\r\n",
+      ch->Send( "But they're already engaged to %s!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if (ROMANCE(victim) == 3)
     {     /* Are they already married? */
-      new_send_to_char(ch,
+      ch->Send(
                        "But they're married already! %s wouldn't approve!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if (ROMANCE(victim) == 4)
     {     /* Are they being asked out? */
-      new_send_to_char(ch, "But they're being asked out! That would be rude!\r\n");
+      ch->Send( "But they're being asked out! That would be rude!\r\n");
       return;
     }
     else if (ROMANCE(victim) == 5)
     {     /* Are they already proposing? */
-      new_send_to_char(ch,"But they're already proposing!\r\n");
+      ch->Send("But they're already proposing!\r\n");
       return;
     }
     else if (ROMANCE(victim) == 6)
     {     /*Asking someone? */
-      new_send_to_char(ch,"But they're already asking someone else!\r\n");
+      ch->Send("But they're already asking someone else!\r\n");
       return;
     }
     else if (ROMANCE(victim) > 6)
     {     /* Any errors in the module? */
-    new_send_to_char(ch, "ERROR IN ROMANCE MODULE: Romance Factor > 5!\r\n");
+    ch->Send( "ERROR IN ROMANCE MODULE: Romance Factor > 5!\r\n");
       return;
     }
     /* Okay, we've established you're both dating someone.. */
     else if (PARTNER(ch) != GET_IDNUM(victim))
     {
       /* But are you dating them? */
-      new_send_to_char(ch, "But you're not dating %s!\r\n",   GET_NAME(victim));
+      ch->Send( "But you're not dating %s!\r\n",   GET_NAME(victim));
       return;
     }
     else if (PARTNER(victim) != GET_IDNUM(ch))
     {
       /* Are they dating you? We shouldn't need this, though.. */
-      new_send_to_char(ch, "But %s isn't dating you!\r\n", GET_NAME(victim));
+      ch->Send( "But %s isn't dating you!\r\n", GET_NAME(victim));
       return;
     }
     /* Okay, you're dating each other, now we can get on with it! */
@@ -460,7 +460,7 @@ ACMD(do_propose)
 
 ACMD(do_breakup)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   /* First, standard checks: Are you in a relationship? */
   if (ROMANCE(ch) == 0)
@@ -470,7 +470,7 @@ ACMD(do_breakup)
   }
   else if (ROMANCE(ch) == 3)
   {
-    new_send_to_char(ch,
+    ch->Send(
                      "But you're already married! You have to DIVORCE %s!\r\n",
                      get_name_by_id(PARTNER(ch)));
     return;
@@ -487,7 +487,7 @@ ACMD(do_breakup)
     else if (!(victim = get_char_room_vis(ch, arg, NULL)))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
@@ -507,35 +507,35 @@ ACMD(do_breakup)
     else if ((ROMANCE(victim) == 1)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch, "But they're dating %s, not you!\r\n",
+      ch->Send( "But they're dating %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 2)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch, "But they're engaged to %s, not you!\r\n",
+      ch->Send( "But they're engaged to %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch, "But they're married to %s, not you!\r\n",
+      ch->Send( "But they're married to %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
              && (PARTNER(victim) == GET_IDNUM(ch)))
     {
-      new_send_to_char(ch,
+      ch->Send(
                        "They're already married to you! You have to DIVORCE %s!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if (PARTNER(victim) != GET_IDNUM(ch))
     {
-      new_send_to_char(ch, "But %s isn't involved with you!\r\n",
+      ch->Send( "But %s isn't involved with you!\r\n",
                        GET_NAME(victim));
       return;
     }
@@ -612,7 +612,7 @@ ACMD(do_breakup)
       }
       else
       {        /* Guess you're not involved after all. */
-        new_send_to_char(ch, "But you're not involved with %s!",
+        ch->Send( "But you're not involved with %s!",
                          GET_NAME(victim));
         return;
       }
@@ -621,8 +621,8 @@ ACMD(do_breakup)
 }
 
 /* Function for the actual marriage */
-void marry_them(struct char_data *ch, struct char_data *victim,
-                struct char_data *imm)
+void marry_them(Character *ch, Character *victim,
+                Character *imm)
 {
   char buf[MAX_STRING_LENGTH];
   /* Do standard checks.. */
@@ -670,7 +670,7 @@ void marry_them(struct char_data *ch, struct char_data *victim,
     {
       /* Regular Marriage */
       /* They're engaged to each other, now perform the marriage. */
-      new_send_to_char(ch, "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(ch)));
+      ch->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(ch)));
       new_send_to_char(victim, "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(victim)));
       new_send_to_char(imm, "You declare %s and %s man and wife!\r\n",   GET_NAME(ch),GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s man and wife!\r\n",
@@ -679,7 +679,7 @@ void marry_them(struct char_data *ch, struct char_data *victim,
     }
     else
     {          /* Same-sex Marriage */
-      new_send_to_char(ch, "%s declares you married to %s!\r\n",
+      ch->Send( "%s declares you married to %s!\r\n",
                        GET_NAME(imm), get_name_by_id(PARTNER(ch)));
       new_send_to_char(victim, "%s declares you married to %s!\r\n",
                        GET_NAME(imm), get_name_by_id(PARTNER(victim)));
@@ -705,8 +705,8 @@ void marry_them(struct char_data *ch, struct char_data *victim,
 
 ACMD(do_marry)
 {
-  struct char_data *groom;
-  struct char_data *bride;
+  Character *groom;
+  Character *bride;
   char groom_name[MAX_INPUT_LENGTH];
   char bride_name[MAX_INPUT_LENGTH];
   argument = one_argument(argument, groom_name);
@@ -714,13 +714,13 @@ ACMD(do_marry)
   if (!(groom = get_char_room_vis(ch, groom_name, NULL)))
   {
     /* Are they here? No! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   else if (!(bride = get_char_room_vis(ch, bride_name, NULL)))
   {
     /* Are they here? No! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   if (groom_name == bride_name)
@@ -760,7 +760,7 @@ ACMD(do_marry)
 
 ACMD(do_divorce)
 {
-  struct char_data *victim;
+  Character *victim;
   
   char arg[MAX_INPUT_LENGTH];
   /* First, standard checks: Are you in a relationship? */
@@ -781,7 +781,7 @@ ACMD(do_divorce)
     else if (!(victim = get_char_room_vis(ch, arg, NULL)))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
@@ -801,27 +801,27 @@ ACMD(do_divorce)
     else if ((ROMANCE(victim) == 1)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch, "But they're dating %s, not you!\r\n",
+      ch->Send( "But they're dating %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 2)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch,"But they're engaged to %s, not you!\r\n",
+      ch->Send("But they're engaged to %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if ((ROMANCE(victim) == 3)
              && (PARTNER(victim) != GET_IDNUM(ch)))
     {
-      new_send_to_char(ch, "But they're married to %s, not you!\r\n",
+      ch->Send( "But they're married to %s, not you!\r\n",
                        get_name_by_id(PARTNER(victim)));
       return;
     }
     else if (PARTNER(victim) != GET_IDNUM(ch))
     {
-      new_send_to_char(ch, "But %s isn't involved with you!\r\n",
+      ch->Send( "But %s isn't involved with you!\r\n",
                        GET_NAME(victim));
       return;
     }
@@ -842,7 +842,7 @@ ACMD(do_divorce)
   }
 }
 
-int crashcheck_alpha(struct char_data *ch, struct char_data *vict)
+int crashcheck_alpha(Character *ch, Character *vict)
 {
   /* Just some crash-preventing checks. */
   /* Returns 1 to indicate a crash will occur. */
@@ -879,7 +879,7 @@ int crashcheck_alpha(struct char_data *ch, struct char_data *vict)
 /* First command, to conceive */
 ACMD(do_seduce)
 {
-  struct char_data *victim;
+  Character *victim;
   
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
@@ -895,7 +895,7 @@ ACMD(do_seduce)
     else if (!(victim))
     {
       /* Are they here? No! */
-      new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+      ch->Send( "%s", CONFIG_NOPERSON);
       return;
     }
     else if (victim == ch)
@@ -973,7 +973,7 @@ ACMD(do_seduce)
 /* For Men - Agree */
 ACMD(do_consent)
 {
-  struct char_data *victim;
+  Character *victim;
   
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
@@ -986,7 +986,7 @@ ACMD(do_consent)
   else if (!(victim = get_char_room_vis(ch, arg, NULL)))
   {
     /* Are they here? No! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   else if (victim == ch)
@@ -1058,7 +1058,7 @@ ACMD(do_consent)
 
 ACMD(do_deny)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
   if (!*arg)
@@ -1069,7 +1069,7 @@ ACMD(do_deny)
   else if (!(victim = get_char_room_vis(ch, arg, NULL)))
   {
     /* Are they here? No! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   else if (victim == ch)
@@ -1129,7 +1129,7 @@ int genpreg(void)
 }
 
 /* Certain late-pregnancy symptoms.. */
-void symptoms(struct char_data *ch)
+void symptoms(Character *ch)
 {
   struct obj_data *obj;
   
@@ -1218,7 +1218,7 @@ void symptoms(struct char_data *ch)
 /* ABORT Command - MatingMod -- IMMORTAL LEVEL */
 ACMD(do_abort)
 {
-  struct char_data *victim;
+  Character *victim;
   char arg[MAX_INPUT_LENGTH];
   if (GET_LEVEL(ch) <= LVL_HERO)
   {
@@ -1239,12 +1239,12 @@ ACMD(do_abort)
   else if (!(victim = get_char_room_vis(ch, arg, NULL)))
   {
     /* Are they here? No! */
-    new_send_to_char(ch, "%s", CONFIG_NOPERSON);
+    ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
   if (PREG(victim) < 0)
   {
-    new_send_to_char(ch, "But %s isn't pregnant!\r\n", GET_NAME(victim));
+    ch->Send( "But %s isn't pregnant!\r\n", GET_NAME(victim));
     return;
   }
   
@@ -1313,7 +1313,7 @@ ACMD(mate_toggle)
   }
 }                   /* EO mate_toggle */
 
-char * romance_status(struct char_data *ch)
+char * romance_status(Character *ch)
 {
   switch (ROMANCE(ch))
   {
@@ -1334,7 +1334,7 @@ char * romance_status(struct char_data *ch)
     break;
   }
 }
-char * baby_status(struct char_data *i, char * buf, size_t len)
+char * baby_status(Character *i, char * buf, size_t len)
 {
   /* MatingMod Addition - Essential! */
   if ((PREG(i) > NOT_PREG) && !IS_NPC(i))

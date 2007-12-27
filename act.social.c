@@ -47,7 +47,7 @@ ACMD(do_action)
   int act_nr,fnum;
 //   int fnumbak, chars_found=0,i;
   struct social_messg *action;
-  struct char_data *vict;
+  Character *vict;
   struct obj_data *targ;
   char arg[MAX_INPUT_LENGTH], part[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH],*arg2;
@@ -62,7 +62,7 @@ ACMD(do_action)
 
   if (!argument || !*argument)
   {
-    new_send_to_char(ch, "%s\r\n", action->char_no_arg);
+    ch->Send( "%s\r\n", action->char_no_arg);
     act(action->others_no_arg, action->hide, ch, 0, 0, TO_ROOM);
     return;
   }
@@ -72,7 +72,7 @@ ACMD(do_action)
 
   if ((!action->char_body_found) && (*part))
   {
-    new_send_to_char(ch, "Sorry, this social does not support body parts.\r\n");
+    ch->Send( "Sorry, this social does not support body parts.\r\n");
     return;
   }
 
@@ -86,9 +86,9 @@ ACMD(do_action)
   if (!(fnum = get_number(&arg2)))
   {
     if (action->not_found)
-      new_send_to_char(ch, "%s\r\n", action->not_found);
+      ch->Send( "%s\r\n", action->not_found);
     else
-      new_send_to_char(ch, "I don't see anything by that name here.\r\n");
+      ch->Send( "I don't see anything by that name here.\r\n");
     return;
   }
 
@@ -126,17 +126,17 @@ ACMD(do_action)
       }
     }
     if (action->not_found)
-      new_send_to_char(ch, "%s\r\n", action->not_found);
+      ch->Send( "%s\r\n", action->not_found);
     else
-      new_send_to_char(ch, "I don't see anything by that name here.\r\n");
+      ch->Send( "I don't see anything by that name here.\r\n");
     return;
   }
   else if (vict == ch)
   {
     if (action->char_auto)
-      new_send_to_char(ch, "%s\r\n", action->char_auto);
+      ch->Send( "%s\r\n", action->char_auto);
     else
-      new_send_to_char(ch, "Erm, no.\r\n");
+      ch->Send( "Erm, no.\r\n");
     act(action->others_auto, action->hide, ch, 0, 0, TO_ROOM);
     return;
   }
@@ -176,7 +176,7 @@ return (const char *)buf;
 
 ACMD(do_insult)
 {
-  struct char_data *victim;
+  Character *victim;
 
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
@@ -189,7 +189,7 @@ ACMD(do_insult)
     {
       if (victim != ch)
       {
-        new_send_to_char(ch, "You insult %s.\r\n", GET_NAME(victim));
+        ch->Send( "You insult %s.\r\n", GET_NAME(victim));
 
         switch (number(0, 2))
         {

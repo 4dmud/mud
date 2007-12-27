@@ -189,7 +189,7 @@ char * landscape(int height, int width)
       pic0 = LEVEL_UNDEFINED;
       if ( picType[j*YB+i] == 'l' )
       {
-        pic0 = abs(pic[j*YB+i] - sealevel);
+        pic0 = abs((int)(pic[j*YB+i] - sealevel));
       }
       if ( picType[j*YB+i] == 's' )
       {
@@ -206,13 +206,13 @@ char * landscape(int height, int width)
 
 ACMD(do_landscape)
 {
-  picType = alloca((XB*YB+YB)*sizeof(char));
-  pic = alloca((XB*YB+YB)*sizeof(int));
+  picType = (char *) alloca((unsigned int)((XB*YB+YB)*sizeof(char)));
+  pic = (int *) alloca((unsigned int)((XB*YB+YB)*sizeof(int)));
   memset(pic, 0, (XB*YB+YB)*sizeof(int));
   memset(picType, 0, (XB*YB+YB)*sizeof(char));
   *buf2 ='\0';
 
-  new_send_to_char(ch, "%s", landscape(XB, YB));
+  ch->Send( "%s", landscape(XB, YB));
 }
 
 
