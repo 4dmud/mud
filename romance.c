@@ -671,7 +671,7 @@ void marry_them(Character *ch, Character *victim,
       /* Regular Marriage */
       /* They're engaged to each other, now perform the marriage. */
       ch->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(ch)));
-      new_send_to_char(victim, "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(victim)));
+      victim->Send( "%s declares you married to %s!\r\n",   GET_NAME(imm), get_name_by_id(PARTNER(victim)));
       new_send_to_char(imm, "You declare %s and %s man and wife!\r\n",   GET_NAME(ch),GET_NAME(victim));
       snprintf(buf, sizeof(buf), "%s declares %s and %s man and wife!\r\n",
                GET_NAME(imm), GET_NAME(ch), GET_NAME(victim));
@@ -681,7 +681,7 @@ void marry_them(Character *ch, Character *victim,
     {          /* Same-sex Marriage */
       ch->Send( "%s declares you married to %s!\r\n",
                        GET_NAME(imm), get_name_by_id(PARTNER(ch)));
-      new_send_to_char(victim, "%s declares you married to %s!\r\n",
+      victim->Send( "%s declares you married to %s!\r\n",
                        GET_NAME(imm), get_name_by_id(PARTNER(victim)));
       new_send_to_char(imm, "You declare %s and %s married!\r\n",
                        GET_NAME(ch), GET_NAME(victim));

@@ -247,7 +247,7 @@ void set_race(Character *ch, int race);
 
 /* external functions */
 void name_to_drinkcon(struct obj_data *obj, int type);
-void paginate_string(char *str, struct descriptor_data *d); //mord??
+void paginate_string(char *str, Descriptor *d); //mord??
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 void free_alias(struct alias_data *a);
 void load_messages(void);
@@ -273,7 +273,7 @@ void strip_cr(char *);        //...
 void load_notes(void);
 
 /* external vars */
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern struct spell_info_type spell_info[];
 extern const char *unused_spellname;
 extern const char *unused_spellmessage;
@@ -4662,7 +4662,7 @@ void reset_zone(zone_rnum zone)
 /* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
 int is_empty(zone_rnum zone_nr)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
 
   for (i = descriptor_list; i; i = i->next)
   {
@@ -6490,7 +6490,7 @@ int file_to_string_alloc(const char *name, char **buf)
 {
   int temppage;
   char temp[MAX_STRING_LENGTH];
-  struct descriptor_data *in_use;
+  Descriptor *in_use;
 
   for (in_use = descriptor_list; in_use; in_use = in_use->next)
     if (in_use->showstr_vector && *in_use->showstr_vector == *buf)
@@ -8434,7 +8434,7 @@ zone_rnum real_zone(zone_vnum vnum)
 int valid_id_num(long id)
 {
   Character *tch;
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   for (d = descriptor_list; d; d = d->next)
     if (d->character && GET_ID(d->character) == id)
       return 0;

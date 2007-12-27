@@ -71,7 +71,7 @@ struct known_save_types {
 
 /* -------------------------------------------------------------------------- */
 
-int genolc_checkstring(struct descriptor_data *d, char *arg)
+int genolc_checkstring(Descriptor *d, char *arg)
 {
   smash_tilde(arg);
   return TRUE;

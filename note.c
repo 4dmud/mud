@@ -665,7 +665,7 @@ int has_note(Character *ch, int type)
 
 void parse_note( Character *ch, char *argument, int type )
 {
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   char buffer[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];

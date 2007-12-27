@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.35  2006/05/22 10:50:49  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.34  2006/05/21 11:02:27  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -155,6 +159,7 @@ typedef long long gold_int;
 extern int message_type;
 
 class Character;
+class Descriptor;
 
 /* preamble *************************************************************/
 
@@ -172,7 +177,7 @@ class Character;
    int (name)(Character *ch, void *me, int cmd, char *argument)
 
 #define C_FUNC(name) \
-     void (name) (struct descriptor_data *d, char *arg, void *cinfo)
+     void (name) (Descriptor *d, char *arg, void *cinfo)
 
 /* misc editor defines **************************************************/
 
@@ -1899,7 +1904,7 @@ public:
   struct obj_data *equipment[NUM_WEARS];   /* Equipment array               */
   
   struct obj_data *carrying;     /* Head of list                  */
-  struct descriptor_data *desc;  /* NULL for mobiles              */
+  Descriptor *desc;  /* NULL for mobiles              */
   
   long id;             /* used by DG triggers             */
   struct trig_proto_list *proto_script;    /* list of default triggers      */
@@ -1940,6 +1945,8 @@ public:
   struct travel_point_data *travel_list;
   
   size_t Send(const char *messg, ...) __attribute__ ((format(printf, 2, 3)));
+  void send_char_pos(int dam);
+
   
   
 };
@@ -1983,7 +1990,8 @@ struct compr {
 #endif /* HAVE_ZLIB_H */
 };
 
-struct descriptor_data {
+class Descriptor {
+public:
     socket_t descriptor; /* file descriptor for socket           */
     char host[HOST_LENGTH + 1];    /* hostname                             */
     byte bad_pws;        /* number of bad pw attemps this login  */
@@ -2017,9 +2025,9 @@ struct descriptor_data {
     struct txt_q input;       /* q of unprocessed input               */
     Character *character;     /* linked to char                       */
     Character *original; /* original char if switched            */
-    struct descriptor_data *snooping;   /* Who is this char snooping       */
-    struct descriptor_data *snoop_by;   /* And who is snooping this char   */
-    struct descriptor_data *next;  /* link to next descriptor             */
+    Descriptor *snooping;   /* Who is this char snooping       */
+    Descriptor *snoop_by;   /* And who is snooping this char   */
+    Descriptor *next;  /* link to next descriptor             */
     struct oasis_olc_data *olc;   /* OLC info                            */
     struct account_data *acc;
     C_FUNC(*callback);        // Call back function for anything I want to do
@@ -2035,6 +2043,13 @@ struct descriptor_data {
     char  host_ip[HOST_LENGTH + 1];
     char  host_name[HOST_LENGTH + 1];
     char  user_name[HOST_LENGTH + 1];
+  
+  size_t Output(const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
+  size_t vwrite_to_output(const char *format, va_list args);
+  void convert_mxp_tags (const int bMXP,  char *dest, const char *src, size_t lenn);
+  int count_mxp_tags (const int bMXP, const char *txt, int length);
+  void turn_on_mxp ();
+  char * send_mxp_status();
 };
 
 
@@ -2199,7 +2214,6 @@ struct social_messg {
 };
 
 typedef struct note_data NOTE_DATA;
-typedef struct descriptor_data DESCRIPTOR_DATA;
 typedef struct obj_data OBJ_DATA;
 typedef struct room_data ROOM_DATA;
 

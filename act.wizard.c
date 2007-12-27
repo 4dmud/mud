@@ -10,6 +10,10 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.50  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.49  2006/05/21 11:02:25  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -224,7 +228,7 @@ extern zone_rnum top_of_zone_table;
 extern int circle_shutdown, circle_reboot;
 extern int circle_restrict;
 extern int buf_switches, buf_largecount, buf_overflows;
-extern const char *save_info_msg[];	/* In olc.c */
+extern const char *save_info_msg[];     /* In olc.c */
 extern int forget_num_obj;
 extern const char *wiz_groups[];
 extern socket_t mother_desc;
@@ -365,13 +369,13 @@ struct player_gold_info
 #define NPC 2
 #define BOTH 3
 
-#define MISC	0
-#define BINARY	1
-#define NUMBER	2
+#define MISC   0
+#define BINARY 1
+#define NUMBER 2
 
 #define SET_OR_REMOVE(flagset, flags) { \
-	if (on) SET_BIT_AR(flagset, flags); \
-	else if (off) REMOVE_BIT_AR(flagset, flags); }
+     if (on) SET_BIT_AR(flagset, flags); \
+     else if (off) REMOVE_BIT_AR(flagset, flags); }
 
 #define SET_OR_REMOVE_TRUST(flagset, flags) { \
         if (on) SET_BIT(flagset, flags); \
@@ -421,45 +425,45 @@ struct trust_struct
 }
 trust_fields[] = {
                    {
-                     "ban", LVL_IMPL, PC, BINARY},	/*  0 */
+                     "ban", LVL_IMPL, PC, BINARY},     /*  0 */
                    {
-                     "dspln", LVL_IMPL, PC, BINARY},	/*  1 */
+                     "dspln", LVL_IMPL, PC, BINARY},   /*  1 */
                    {
-                     "edit", LVL_IMPL, PC, BINARY},	/*  2 */
+                     "edit", LVL_IMPL, PC, BINARY},    /*  2 */
                    {
-                     "heal", LVL_IMPL, PC, BINARY},	/*  3 */
+                     "heal", LVL_IMPL, PC, BINARY},    /*  3 */
                    {
-                     "house", LVL_IMPL, PC, BINARY},	/*  4 */
+                     "house", LVL_IMPL, PC, BINARY},   /*  4 */
                    {
-                     "imm1", LVL_IMPL, PC, BINARY},	/*  5 */
+                     "imm1", LVL_IMPL, PC, BINARY},    /*  5 */
                    {
-                     "imm2", LVL_IMPL, PC, BINARY},	/*  6 */
+                     "imm2", LVL_IMPL, PC, BINARY},    /*  6 */
                    {
-                     "impl", LVL_IMPL, PC, BINARY},	/*  7 */
+                     "impl", LVL_IMPL, PC, BINARY},    /*  7 */
                    {
-                     "kill", LVL_IMPL, PC, BINARY},	/*  8 */
+                     "kill", LVL_IMPL, PC, BINARY},    /*  8 */
                    {
-                     "load", LVL_IMPL, PC, BINARY},	/*  9 */
+                     "load", LVL_IMPL, PC, BINARY},    /*  9 */
                    {
-                     "olc", LVL_IMPL, PC, BINARY},	/* 10 */
+                     "olc", LVL_IMPL, PC, BINARY},     /* 10 */
                    {
-                     "quest", LVL_IMPL, PC, BINARY},	/* 11 */
+                     "quest", LVL_IMPL, PC, BINARY},   /* 11 */
                    {
-                     "sen", LVL_IMPL, PC, BINARY},	/* 12 */
+                     "sen", LVL_IMPL, PC, BINARY},     /* 12 */
                    {
-                     "tele", LVL_IMPL, PC, BINARY},	/* 13 */
+                     "tele", LVL_IMPL, PC, BINARY},    /* 13 */
                    {
-                     "trig", LVL_IMPL, PC, BINARY},	/* 14 */
+                     "trig", LVL_IMPL, PC, BINARY},    /* 14 */
                    {
-                     "all", LVL_IMPL, PC, BINARY},	/* 15 */
+                     "all", LVL_IMPL, PC, BINARY},     /* 15 */
                    {
-                     "marry", LVL_IMPL, PC, BINARY},	/* 16 */
+                     "marry", LVL_IMPL, PC, BINARY},   /* 16 */
                    {
-                     "goto", LVL_IMPL, PC, BINARY},	/* 17 */
+                     "goto", LVL_IMPL, PC, BINARY},    /* 17 */
                    {
-                     "global", LVL_IMPL, PC, BINARY},	/* 18 */
+                     "global", LVL_IMPL, PC, BINARY},  /* 18 */
                    {
-                     "hedit", LVL_IMPL, PC, BINARY},	/* 19 */
+                     "hedit", LVL_IMPL, PC, BINARY},   /* 19 */
                    {
                      "imm3", LVL_IMPL, PC, BINARY},     /* 20 */
                    {
@@ -833,7 +837,7 @@ ACMD(do_send)
     ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
-  new_send_to_char(vict, "%s\r\n", buf);
+  vict->Send( "%s\r\n", buf);
   if (PRF_FLAGGED(ch, PRF_NOREPEAT))
     ch->Send( "Sent.\r\n");
   else
@@ -1123,7 +1127,7 @@ ACMD(do_goto)
 
 ACMD(do_trans)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
   Character *victim;
   char buf[MAX_INPUT_LENGTH];
 
@@ -1162,7 +1166,7 @@ ACMD(do_trans)
     }
   }
   else
-  {			/* Trans All */
+  {            /* Trans All */
     if (GET_LEVEL(ch) < LVL_GRGOD)
     {
       send_to_char("I think not.\r\n", ch);
@@ -1435,7 +1439,7 @@ void do_stat_room(Character *ch)
     ch->Send( "LISTEN:%s", rm->listen);
 
   ch->Send( "Chars present:%s", CCYEL(ch, C_NRM));
-  column = 14;		/* ^^^ strlen ^^^ */
+  column = 14;      /* ^^^ strlen ^^^ */
   for (found = FALSE, k = rm->people; k; k = k->next_in_room)
   {
     if (!CAN_SEE(ch, k))
@@ -1458,7 +1462,7 @@ void do_stat_room(Character *ch)
   if (rm->contents)
   {
     ch->Send( "Contents:%s", CCGRN(ch, C_NRM));
-    column = 9;		/* ^^^ strlen ^^^ */
+    column = 9;          /* ^^^ strlen ^^^ */
 
     for (found = 0, j = rm->contents; j; j = j->next_content)
     {
@@ -2372,7 +2376,7 @@ ACMD(do_account)
 ACMD(do_shutdown)
 {
   char arg[MAX_INPUT_LENGTH];
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   if (subcmd != SCMD_SHUTDOWN)
   {
     send_to_char("If you want to shut something down, say so!\r\n",
@@ -2673,8 +2677,8 @@ ACMD(do_vstat)
 {
   Character *mob;
   struct obj_data *obj;
-  mob_vnum num;		/* or obj_vnum ... */
-  mob_rnum r_num;		/* or obj_rnum ... */
+  mob_vnum num;          /* or obj_vnum ... */
+  mob_rnum r_num;        /* or obj_rnum ... */
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
@@ -2744,8 +2748,8 @@ ACMD(do_purge)
   one_argument(argument, buf);
 
   if (*buf)
-  {			/* argument supplied. destroy single object
-                                                            				 * or char */
+  {            /* argument supplied. destroy single object
+                                                                                 * or char */
     if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
     {
       if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
@@ -2783,7 +2787,7 @@ ACMD(do_purge)
     ch->Send( "%s", CONFIG_OK);
   }
   else
-  {			/* no argument. clean out the room */
+  {            /* no argument. clean out the room */
     act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM);
     send_to_room(IN_ROOM(ch), "The world seems a little cleaner.\r\n");
 
@@ -2856,16 +2860,16 @@ ACMD(do_syslog)
 
 extern int mother_desc;
 extern FILE *player_fl;
-#define EXE_FILE "bin/circle"	/* maybe use argv[0] but it's not reliable */
+#define EXE_FILE "bin/circle" /* maybe use argv[0] but it's not reliable */
 
 /* (c) 1996-97 Erwin S. Andreasen <erwin@pip.dknet.dk> */
 ACMD(do_copyover)
 {
   FILE *fp;
-  struct descriptor_data *d, *d_next;
+  Descriptor *d, *d_next;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
-  int process_output(struct descriptor_data *t);
+  int process_output(Descriptor *t);
 
 
   fp = fopen(COPYOVER_FILE, "w");
@@ -2881,12 +2885,12 @@ ACMD(do_copyover)
   for (d = descriptor_list; d; d = d_next)
   {
     Character *och = d->character;
-    d_next = d->next;	/* We delete from the list , so need to save this */
+    d_next = d->next;    /* We delete from the list , so need to save this */
 
     if (!d->character || !IS_PLAYING(d))
     {
       write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\r\n", d->comp);
-      close_socket(d);	/* throw'em out */
+      close_socket(d);   /* throw'em out */
     }
     else
     {
@@ -2942,7 +2946,7 @@ ACMD(do_copyover)
   perror("do_copyover: execl");
 
   new_send_to_char (ch, "Copyover FAILED!\r\n");
-  exit(1);			/* too much trouble to try to recover! */
+  exit(1);               /* too much trouble to try to recover! */
 }
 
 ACMD(do_advance)
@@ -3039,7 +3043,7 @@ ACMD(do_advance)
 
 ACMD(do_powerplay)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *tch;
   int count = 0;
   ch->Send( "Lvl  Class  Room   Name                   Health  Position\r\n");
@@ -3066,7 +3070,7 @@ ACMD(do_powerplay)
 
 ACMD(do_restore)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *vict;
   int i;
   char buf[MAX_INPUT_LENGTH];
@@ -3320,7 +3324,7 @@ ACMD(do_pretitle)
 
 ACMD(do_dc)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   int num_to_dc;
   char arg[MAX_INPUT_LENGTH];
 
@@ -3554,7 +3558,7 @@ ACMD(do_last)
 
 ACMD(do_force)
 {
-  struct descriptor_data *i, *next_desc;
+  Descriptor *i, *next_desc;
   Character *vict, *next_force;
   char to_force[MAX_INPUT_LENGTH + 2];
   char buf1[MAX_INPUT_LENGTH ];
@@ -3599,7 +3603,7 @@ ACMD(do_force)
     }
   }
   else
-  {			/* force all */
+  {            /* force all */
     ch->Send("%s",CONFIG_OK);
     new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s forced all to %s", GET_NAME(ch), to_force);
 
@@ -3620,7 +3624,7 @@ ACMD(do_force)
 
 ACMD(do_wiznet)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   char emote = FALSE;
   char any = FALSE;
   int level = LVL_GOD;
@@ -3701,7 +3705,7 @@ ACMD(do_wiznet)
   case '\\':
     ++argument;
     break;
-  case '%':			/* arena */
+  case '%':              /* arena */
     if (in_arena == ARENA_OFF)
     {
       ch->Send( "The Arena is closed right now.\r\n");
@@ -3801,7 +3805,7 @@ ACMD(do_zreset)
   if (i >= 0 && i <= top_of_zone_table)
   {
     reset_zone(i);
-    ch->Send( "Reset zone %d (#%d): %s.\r\n", i,	zone_table[i].number, zone_table[i].name);
+    ch->Send( "Reset zone %d (#%d): %s.\r\n", i,  zone_table[i].number, zone_table[i].name);
 
     new_mudlog(NRM, MAX(LVL_GRGOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s reset zone %d (%s)", GET_NAME(ch), zone_table[i].number,
                zone_table[i].name);
@@ -3857,7 +3861,7 @@ ACMD(do_heroutil)
       {
         SET_BIT_AR(PLR_FLAGS(vict), PLR_FROZEN);
         GET_FREEZE_LEV(vict) = GET_LEVEL(ch);
-        new_send_to_char(vict,"A bitter wind suddenly rises and drains every ounce of heat from your body!\r\nYou feel frozen!\r\n");
+        vict->Send("A bitter wind suddenly rises and drains every ounce of heat from your body!\r\nYou feel frozen!\r\n");
         ch->Send( "Frozen.\r\n");
         act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
         new_mudlog( BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(HC) %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
@@ -3886,7 +3890,7 @@ ACMD(do_heroutil)
       else
         affect_from_char(vict, SPELL_IMMFREEZE);
 
-      new_send_to_char(vict, "A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n");
+      vict->Send( "A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n");
       ch->Send( "Thawed.\r\n");
       act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
       break;
@@ -3961,7 +3965,7 @@ ACMD(do_wizutil)
                        GET_STR(vict), GET_ADD(vict), GET_INT(vict),
                        GET_WIS(vict), GET_DEX(vict), GET_CON(vict),
                        GET_CHA(vict));
-      new_send_to_char(vict,
+      vict->Send(
                        "New stats: Str %d/%d, Int %d, Wis %d, Dex %d, Con %d, Cha %d\r\n",
                        GET_STR(vict), GET_ADD(vict), GET_INT(vict),
                        GET_WIS(vict), GET_DEX(vict), GET_CON(vict),
@@ -3974,7 +3978,7 @@ ACMD(do_wizutil)
         REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_THIEF);
         REMOVE_BIT_AR(PLR_FLAGS(vict), PLR_KILLER);
         ch->Send("Pardoned.\r\n");
-        new_send_to_char(vict, "You have been pardoned by the Gods!\r\n");
+        vict->Send( "You have been pardoned by the Gods!\r\n");
         new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s pardoned by %s", GET_NAME(vict),
                    GET_NAME(ch));
       }
@@ -4001,7 +4005,7 @@ ACMD(do_wizutil)
       {
         while (vict->affected)
           affect_remove(vict, vict->affected);
-        new_send_to_char(vict, "There is a brief flash of light!\r\n"
+        vict->Send( "There is a brief flash of light!\r\n"
                          "You feel slightly different.\r\n");
         ch->Send( "All spells removed.\r\n");
         check_regen_rates(vict);
@@ -4104,7 +4108,7 @@ int silence_affect(Character *ch, Character *vict, char *argument)
   af.location = 0;
   af.bitvector = AFF_SILENCED;
 
-  new_send_to_char(vict,"You have been silenced - You will be heard again in %s %s\r\n", duration_p, time_size);
+  vict->Send("You have been silenced - You will be heard again in %s %s\r\n", duration_p, time_size);
   affect_to_char(vict, &af);
   return 1;
 }
@@ -4273,14 +4277,14 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
 
 ACMD(do_show)
 {
-  int i, j, k, l, con;	/* i, j, k to specifics? */
+  int i, j, k, l, con;   /* i, j, k to specifics? */
   size_t len, nlen;
   zone_rnum zrn = NOWHERE;
   zone_vnum zvn = NOWHERE;
   byte self = FALSE;
   Character *vict = NULL;
   struct obj_data *obj;
-  struct descriptor_data *d;
+  Descriptor *d;
   char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH];
   char tbuf[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -4314,23 +4318,23 @@ ACMD(do_show)
     const char level;
   }
   fields[] = {
-               {"nothing",	 0},		/* 0 */
-               {"zones", 	LVL_GOD},	/* 1 */
-               {"player", 	LVL_GOD},
-               {"rent", 	LVL_GOD},
-               {"stats", 	LVL_GOD},
-               {"roleplay", 	LVL_IMPL},	/* 5 */
-               {"death", 	LVL_GOD},
-               {"godrooms", 	LVL_GOD},
-               {"shops", 	LVL_GOD},
-               {"houses", 	LVL_GOD},
-               {"connections", 	LVL_BLD},	/* 10 */
-               {"arena", 	LVL_GOD},
-               {"snoop", 	LVL_IMPL},
-               {"gold", 	LVL_GOD},
-               {"builder", 	LVL_IMPL},
-               {"olc", 		LVL_GOD},
-               {"corpses", 	LVL_GOD},
+               {"nothing",     0},      /* 0 */
+               {"zones",      LVL_GOD}, /* 1 */
+               {"player",     LVL_GOD},
+               {"rent",  LVL_GOD},
+               {"stats",      LVL_GOD},
+               {"roleplay",   LVL_IMPL},     /* 5 */
+               {"death",      LVL_GOD},
+               {"godrooms",   LVL_GOD},
+               {"shops",      LVL_GOD},
+               {"houses",     LVL_GOD},
+               {"connections",     LVL_BLD}, /* 10 */
+               {"arena",      LVL_GOD},
+               {"snoop",      LVL_IMPL},
+               {"gold",  LVL_GOD},
+               {"builder",    LVL_IMPL},
+               {"olc",        LVL_GOD},
+               {"corpses",    LVL_GOD},
                {"errors",       LVL_GOD},
                {"assemblies",   LVL_BLD},
                {"\n", 0}
@@ -4369,7 +4373,7 @@ ACMD(do_show)
   switch (l)
   {
 
-  case 1:			// zone
+  case 1:           // zone
 
 
     /* tightened up by JE 4/6/93 */
@@ -4410,7 +4414,7 @@ ACMD(do_show)
     page_string(ch->desc, dynbuf, DYN_BUFFER);
     break;
 
-  case 2:			/* player */
+  case 2:           /* player */
     if (!*value)
     {
       ch->Send("A name would help.\r\n");
@@ -4697,100 +4701,100 @@ struct set_struct
 }
 set_fields[] = {
                  {
-                   "brief", LVL_GOD, PC, BINARY},	/* 0 */
+                   "brief", LVL_GOD, PC, BINARY}, /* 0 */
                  {
-                   "invstart", LVL_GOD, PC, BINARY},	/* 1 */
+                   "invstart", LVL_GOD, PC, BINARY},   /* 1 */
                  {
                    "title", LVL_GOD, PC, MISC}, {
                    "nosummon", LVL_GRGOD, PC, BINARY}, {
                    "maxhit", LVL_GRGOD, BOTH, NUMBER}, {
-                   "maxmana", LVL_GRGOD, BOTH, NUMBER},	/* 5 */
+                   "maxmana", LVL_GRGOD, BOTH, NUMBER},     /* 5 */
                  {
                    "maxmove", LVL_GRGOD, BOTH, NUMBER}, {
                    "hit", LVL_GRGOD, BOTH, NUMBER}, {
                    "mana", LVL_GRGOD, BOTH, NUMBER}, {
                    "move", LVL_GRGOD, BOTH, NUMBER}, {
-                   "align", LVL_GOD, BOTH, NUMBER},	/* 10 */
+                   "align", LVL_GOD, BOTH, NUMBER},    /* 10 */
                  {
                    "str", LVL_GRGOD, BOTH, NUMBER}, {
                    "stradd", LVL_GRGOD, BOTH, NUMBER}, {
                    "int", LVL_GRGOD, BOTH, NUMBER}, {
                    "wis", LVL_GRGOD, BOTH, NUMBER}, {
-                   "dex", LVL_GRGOD, BOTH, NUMBER},	/* 15 */
+                   "dex", LVL_GRGOD, BOTH, NUMBER},    /* 15 */
                  {
                    "con", LVL_GRGOD, BOTH, NUMBER}, {
                    "cha", LVL_GRGOD, BOTH, NUMBER}, {
                    "ac", LVL_GRGOD, BOTH, NUMBER}, {
                    "gold", LVL_GOD, BOTH, NUMBER}, {
-                   "bank", LVL_GOD, PC, NUMBER},	/* 20 */
+                   "bank", LVL_GOD, PC, NUMBER},  /* 20 */
                  {
                    "exp", LVL_GRGOD, BOTH, NUMBER}, {
                    "hitroll", LVL_GRGOD, BOTH, NUMBER}, {
                    "damroll", LVL_GRGOD, BOTH, NUMBER}, {
                    "invis", LVL_IMPL, PC, NUMBER}, {
-                   "nohassle", LVL_GRGOD, PC, BINARY},	/* 25 */
+                   "nohassle", LVL_GRGOD, PC, BINARY}, /* 25 */
                  {
                    "frozen", LVL_FREEZE, PC, BINARY}, {
                    "practices", LVL_GRGOD, PC, NUMBER}, {
                    "lessons", LVL_GRGOD, PC, NUMBER}, {
                    "drunk", LVL_GRGOD, BOTH, MISC}, {
-                   "hunger", LVL_GRGOD, BOTH, MISC},	/* 30 */
+                   "hunger", LVL_GRGOD, BOTH, MISC},   /* 30 */
                  {
                    "thirst", LVL_GRGOD, BOTH, MISC}, {
                    "killer", LVL_GOD, PC, BINARY}, {
                    "thief", LVL_GOD, PC, BINARY}, {
                    "level", LVL_IMPL, BOTH, NUMBER}, {
-                   "room", LVL_IMPL, BOTH, NUMBER},	/* 35 */
+                   "room", LVL_IMPL, BOTH, NUMBER},    /* 35 */
                  {
                    "roomflag", LVL_GRGOD, PC, BINARY}, {
                    "siteok", LVL_GRGOD, PC, BINARY}, {
                    "deleted", LVL_IMPL, PC, BINARY}, {
                    "class", LVL_GRGOD, BOTH, MISC}, {
-                   "nowizlist", LVL_GOD, PC, BINARY},	/* 40 */
+                   "nowizlist", LVL_GOD, PC, BINARY},  /* 40 */
                  {
                    "quest", LVL_GOD, PC, BINARY}, {
                    "loadroom", LVL_GRGOD, PC, MISC}, {
                    "color", LVL_GOD, PC, BINARY}, {
                    "idnum", LVL_IMPL, PC, NUMBER}, {
-                   "passwd", LVL_IMPL, PC, MISC},	/* 45 */
+                   "passwd", LVL_IMPL, PC, MISC}, /* 45 */
                  {
                    "nodelete", LVL_GOD, PC, BINARY}, {
                    "sex", LVL_GRGOD, BOTH, MISC}, {
                    "age", LVL_GRGOD, BOTH, NUMBER}, {
                    "remort", LVL_IMPL, PC, MISC}, {
-                   "rtwo", LVL_IMPL, PC, MISC},	/* 50 */
+                   "rtwo", LVL_IMPL, PC, MISC},   /* 50 */
                  {
                    "rthree", LVL_IMPL, PC, MISC}, {
                    "race", LVL_GRGOD, BOTH, MISC}, {
                    "pregnant", LVL_IMPL, PC, NUMBER}, {
                    "breakup", LVL_SEN, PC, MISC}, {
-                   "rp", LVL_SEN, PC, BINARY},	/* 55 */
+                   "rp", LVL_SEN, PC, BINARY},    /* 55 */
                  {
                    "pk", LVL_SEN, PC, BINARY}, {
                    "brasst", LVL_SEN, PC, NUMBER}, {
                    "bronzet", LVL_SEN, PC, NUMBER}, {
                    "silvert", LVL_SEN, PC, NUMBER}, {
-                   "goldt", LVL_SEN, PC, NUMBER},	/* 60 */
+                   "goldt", LVL_SEN, PC, NUMBER}, /* 60 */
                  {
                    "clan", LVL_SEN, PC, NUMBER}, {
                    "rank", LVL_SEN, PC, NUMBER}, {
                    "height", LVL_GOD, BOTH, NUMBER}, {
                    "weight", LVL_GOD, BOTH, NUMBER}, {
-                   "helper", LVL_SEN, PC, BINARY},	/* 65 */
+                   "helper", LVL_SEN, PC, BINARY},     /* 65 */
                  {
                    "spec01", LVL_SEN, PC, BINARY}, {
                    "spec02", LVL_SEN, PC, BINARY}, {
                    "spec03", LVL_SEN, PC, BINARY}, {
-                   "spec04", LVL_SEN, PC, BINARY},	/* 69 */
+                   "spec04", LVL_SEN, PC, BINARY},     /* 69 */
 
                  {"speed", LVL_SEN, BOTH, NUMBER},
                  {"coventry", LVL_SEN, PC, BINARY},
                  {"pretitle", LVL_SEN, PC, MISC},
                  {"rpgroup", LVL_SEN, PC, MISC},
-                 { "olc",		LVL_IMPL,	PC,	MISC },
-                 { "hero",		LVL_SEN,	PC,	BINARY }, /* 75 */
+                 { "olc",          LVL_IMPL, PC,  MISC },
+                 { "hero",         LVL_SEN,  PC,  BINARY }, /* 75 */
                  {"immtitle", LVL_IMPL, PC, MISC},
-                 {"mastery", LVL_IMPL, PC, MISC},	/* 77 */
+                 {"mastery", LVL_IMPL, PC, MISC}, /* 77 */
                  {"rpl", LVL_GOD, PC, BINARY},
                  {"tradepoints",LVL_GOD,PC,NUMBER},
                  {   "\n", 0, BOTH, MISC}
@@ -4856,7 +4860,7 @@ int perform_set(Character *ch, Character *vict, int mode,
   }
   else
   {
-    snprintf(output, sizeof(output), "Okay.");	/* can't use OK macro here 'cause of \r\n */
+    snprintf(output, sizeof(output), "Okay.");    /* can't use OK macro here 'cause of \r\n */
   }
 
   switch (mode)
@@ -4879,27 +4883,27 @@ int perform_set(Character *ch, Character *vict, int mode,
     break;
   case 4:
     vict->points.max_hit = RANGE(1, 100000);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 5:
     vict->points.max_mana = RANGE(1, 100000);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 6:
     vict->points.max_move = RANGE(1, 100000);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 7:
     vict->points.hit = RANGE(-9, vict->points.max_hit);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 8:
     vict->points.mana = RANGE(0, vict->points.max_mana);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 9:
     vict->points.move = RANGE(0, vict->points.max_move);
-    affect_total(vict);	/* affect_total() handles regen updates */
+    affect_total(vict);  /* affect_total() handles regen updates */
     break;
   case 10:
     GET_ALIGNMENT(vict) = RANGE(-1000, 1000);
@@ -5014,7 +5018,7 @@ int perform_set(Character *ch, Character *vict, int mode,
   case 31:
     if (!str_cmp(val_arg, "off"))
     {
-      GET_COND(vict, (mode - 29)) = (char) -1;	/* warning: magic number here */
+      GET_COND(vict, (mode - 29)) = (char) -1;    /* warning: magic number here */
       snprintf(output, sizeof(output), "%s's %s now off.", GET_NAME(vict),
                set_fields[mode].cmd);
     }
@@ -5022,7 +5026,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     {
       value = atoi(val_arg);
       RANGE(0, 24);
-      GET_COND(vict, (mode - 29)) = (char) value;	/* and here too */
+      GET_COND(vict, (mode - 29)) = (char) value; /* and here too */
       snprintf(output, sizeof(output), "%s's %s set to %d.", GET_NAME(vict),
                set_fields[mode].cmd, value);
     }
@@ -5138,9 +5142,9 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
     GET_SEX(vict) = i;
     break;
-  case 48:			/* set age */
+  case 48:               /* set age */
     if (value < 2 || value > 200)
-    {	/* Arbitrary limits. */
+    {     /* Arbitrary limits. */
       ch->Send( "Ages 2 to 200 accepted.\r\n");
       return (0);
     }
@@ -5211,7 +5215,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     }
 
     if ((value < -1) || (value >= 6600))
-    {	/* Limits */
+    {     /* Limits */
       send_to_char("Preg must be between -1 and 6600.\r\n", ch);
       return 0;
     }
@@ -5239,7 +5243,7 @@ int perform_set(Character *ch, Character *vict, int mode,
       PREG(vict) = value;
     }
     check_regen_rates(vict);
-    break;			/* End Mating Mod Debug Code */
+    break;               /* End Mating Mod Debug Code */
 
   case 54:
     ROMANCE(vict) = 0;
@@ -5534,7 +5538,7 @@ ACMD(do_set)
       }
     }
     else
-    {		/* is_mob */
+    {          /* is_mob */
       if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD)))
       {
         send_to_char("There is no such creature.\r\n", ch);
@@ -5672,8 +5676,8 @@ ACMD(do_objconv)
   Character *victim;
   extern struct player_index_element *player_table;
   int flag25 = 0, flag50 = 0, flag75 = 0, flag100 = 0;
-  int process_output(struct descriptor_data *t);
-  struct descriptor_data *d;
+  int process_output(Descriptor *t);
+  Descriptor *d;
 
   send_to_all("Please hold on - object conversion taking place.\r\n");
 
@@ -5905,7 +5909,7 @@ int check_potion_price(struct obj_data *obj)
 
 int spell_weight(struct obj_data *obj, int val)
 {
-  if (GET_OBJ_VAL(obj, val) == -1)	/* i.e.: no spell */
+  if (GET_OBJ_VAL(obj, val) == -1) /* i.e.: no spell */
     return 0;
 
   /*
@@ -5943,7 +5947,7 @@ int spell_weight(struct obj_data *obj, int val)
 
 int spell_price(struct obj_data *obj, int val)
 {
-  if (GET_OBJ_VAL(obj, val) == TYPE_UNDEFINED)	/* i.e.: no spell */
+  if (GET_OBJ_VAL(obj, val) == TYPE_UNDEFINED)    /* i.e.: no spell */
     return 0;
 
   /*
@@ -6121,7 +6125,7 @@ ACMD(do_innate)
     for (aff = victim->affected; aff; aff = aff->next)
     {
       if (is_abbrev(buf, skill_name(aff->type)))
-        aff->expire = -2;	/* well, -1 is innate neh? never goes away */
+        aff->expire = -2;     /* well, -1 is innate neh? never goes away */
     }
   else
     /* really, this is unaffect, with a specific target */
@@ -6546,7 +6550,7 @@ ACMD(do_reward)
       return;
     }
 
-    new_send_to_char(vict, "%s showers you in praise and rewards you %d point%s!", GET_NAME(ch), pts, pts > 1 ? "s" : "");
+    vict->Send( "%s showers you in praise and rewards you %d point%s!", GET_NAME(ch), pts, pts > 1 ? "s" : "");
     ch->Send( "You shower %s in praise and reward %d point%s!", GET_NAME(vict), pts, pts > 1 ? "s" : "");
     if ( (GET_LEVEL(ch) < LVL_IMMORT))
       GET_REWARD(ch)   -= pts;
@@ -6649,7 +6653,7 @@ ACMD(do_award)
       return;
     }
 
-    new_send_to_char(vict, "%s showers you in praise and awards you %d point%s!\r\n", GET_NAME(ch), pts, pts > 1 ? "s" : "");
+    vict->Send( "%s showers you in praise and awards you %d point%s!\r\n", GET_NAME(ch), pts, pts > 1 ? "s" : "");
     ch->Send( "You shower %s in praise and award %d point%s!\n\n", GET_NAME(vict), pts, pts > 1 ? "s" : "");
 
     if (GET_LEVEL(ch) < LVL_IMMORT)
@@ -6747,7 +6751,7 @@ void change_plrindex_name(long id, char *change)
 
 ACMD(do_namechange)
 {
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   Character *tch = NULL;
   int loaded = 0;
   char newname[MAX_INPUT_LENGTH], oldname[MAX_INPUT_LENGTH], passw[MAX_INPUT_LENGTH];
@@ -6915,13 +6919,13 @@ C_FUNC(delete_player)
 
   if (arg && *arg && !strcmp(arg, "yes I am"))
   {
-    write_to_output(d, "Deleting...\r\n");
+    d->Output( "Deleting...\r\n");
     perform_delete_player(charname);
-    write_to_output(d, "\r\n...Done\r\n");
+    d->Output( "\r\n...Done\r\n");
   }
   else
   {
-    write_to_output(d, "You cancel the delete on %s.\r\n", charname);
+    d->Output( "You cancel the delete on %s.\r\n", charname);
   }
 }
 
@@ -6986,13 +6990,13 @@ void show_door_errors(Character *ch)
                   DYN_RESIZE(buf);
                 }
                 if (IS_SET(world_vnum[i]->dir_option[door]->exit_info, EX_ISDOOR) && 
-        	(!world_vnum[i]->dir_option[door]->keyword || !*world_vnum[i]->dir_option[door]->keyword))
+          (!world_vnum[i]->dir_option[door]->keyword || !*world_vnum[i]->dir_option[door]->keyword))
                 {
                   found++;
                   snprintf(buf, sizeof(buf), "Room [%5d] Dir [%5s] Key [%5d] - EXIT has door and no name.\r\n", i, dirs[door], vkey);
                   DYN_RESIZE(buf);
                 }
-        	*/
+          */
 
       }
     }

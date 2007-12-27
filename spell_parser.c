@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.21  2006/05/22 10:50:49  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.20  2006/05/21 11:02:27  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -128,7 +132,7 @@
 struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
 
 extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern int spell_sorted_info[];
 
 /* external functions */
@@ -2704,7 +2708,7 @@ void update_spell_wait(void)
 {
 
   struct skillspell_data *temp;
-  struct descriptor_data *i;
+  Descriptor *i;
 
   for (i = descriptor_list; i; i = i->next)
   {

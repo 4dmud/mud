@@ -214,13 +214,13 @@ ASPELL(spell_teleport)
   if (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOTELEPORT_OUT) ||
       ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOTELEPORT_OUT))
   {
-    new_send_to_char(victim,"A magical barrier prevents you from leaving.\r\n");
+    victim->Send("A magical barrier prevents you from leaving.\r\n");
     return;
   }
   if (!SELF(ch, victim) && !IS_NPC(ch) && ((!PRF_FLAGGED(victim, PRF_TELEPORTABLE) &&
                        !PLR_FLAGGED(victim, PLR_KILLER)) || both_pk(ch,victim)))
   {
-  new_send_to_char(victim, "%s just tried to cast teleport on you but\r\n"
+  victim->Send( "%s just tried to cast teleport on you but\r\n"
                    "%s failed because you have teleport protection on.\r\n"
                    "Type NOTELEPORT to allow the spell to work.\r\n",
                    GET_NAME(ch), 
@@ -417,7 +417,7 @@ ASPELL(spell_gate)
   if (!PRF_FLAGGED(victim, PRF_GATEABLE) &&
       !PLR_FLAGGED(victim, PLR_KILLER))
   {
-    new_send_to_char(victim, "%s just tried to gate to you: %s.\r\n"
+    victim->Send( "%s just tried to gate to you: %s.\r\n"
                      "%s failed because you have gate protection on.\r\n"
                      "Type NOGATE to allow other players to gate to you.\r\n",
                      GET_NAME(ch), IN_ROOM(victim)->name,
@@ -1012,8 +1012,8 @@ ASPELL(spell_remove_alignment)
     }
 
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
-    obj->obj_flags.wear_flags[0] = 1;	/* Useless   */
-    GET_OBJ_COST(obj) = 0;	/* Worthless */
+    obj->obj_flags.wear_flags[0] = 1;   /* Useless   */
+    GET_OBJ_COST(obj) = 0;    /* Worthless */
     act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
         TO_CHAR);
     act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
@@ -1047,7 +1047,7 @@ ASPELL(spell_enchant_armor)
   }
 
   GET_OBJ_TYPE(obj) = ITEM_WORN;
-  GET_OBJ_COST(obj) = 0;	/* Worthless */
+  GET_OBJ_COST(obj) = 0; /* Worthless */
   act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
       TO_CHAR);
   act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
@@ -1108,32 +1108,32 @@ ASPELL(spell_control_weather)
 ASPELL(spell_minor_identify)
 {
   char *min_id[] = {
-                     "It would bring %s if you sold it!\r\n",	/* NONE */
-                     "your physique!\r\n",	/* STR */
-                     "your speed!\r\n",	/* DEX */
-                     "your thoughts!\r\n",	/* INT */
-                     "your knowledge of things!\r\n",	/* WIS */
-                     "your endurance!\r\n",	/* CON */
-                     "your appearance!\r\n",	/* CHA */
-                     "!CLASS!\r\n",		/* CLASS */
-                     "!LEVEL!\r\n",		/* LEVEL */
-                     "the time!\r\n",	/* AGE */
-                     "your burden of life!\r\n",	/* WEIGHT */
-                     "your vertical stance!\r\n",	/* HEIGHT */
-                     "your magical aura!\r\n",	/* MANA */
-                     "your physical resistance!\r\n",	/* HIT */
-                     "your ability to move!\r\n",	/* MOVE */
-                     "your wealth!\r\n",	/* GOLD */
-                     "your conscious perception!\r\n",	/* EXP */
-                     "your armor!\r\n",	/* AC */
-                     "the way you hit!\r\n",	/* HITROLL */
-                     "the damage you give!\r\n",	/* DAMROLL */
-                     "your ability to withstand paralysis!\r\n",	/* PARA */
-                     "your ability to withstand rod attacks!\r\n",	/* ROD */
-                     "your ability to withstand petrification!\r\n",	/* PETRI */
-                     "your ability to withstand breath Attacks!\r\n",	/* BREATH */
-                     "your ability to withstand spells!\r\n",	/* SPELL */
-                     "!RACES!\r\n"		/* RACE */
+                     "It would bring %s if you sold it!\r\n",    /* NONE */
+                     "your physique!\r\n",   /* STR */
+                     "your speed!\r\n", /* DEX */
+                     "your thoughts!\r\n",   /* INT */
+                     "your knowledge of things!\r\n",  /* WIS */
+                     "your endurance!\r\n",  /* CON */
+                     "your appearance!\r\n", /* CHA */
+                     "!CLASS!\r\n",          /* CLASS */
+                     "!LEVEL!\r\n",          /* LEVEL */
+                     "the time!\r\n",   /* AGE */
+                     "your burden of life!\r\n",  /* WEIGHT */
+                     "your vertical stance!\r\n", /* HEIGHT */
+                     "your magical aura!\r\n",    /* MANA */
+                     "your physical resistance!\r\n",  /* HIT */
+                     "your ability to move!\r\n", /* MOVE */
+                     "your wealth!\r\n",     /* GOLD */
+                     "your conscious perception!\r\n", /* EXP */
+                     "your armor!\r\n", /* AC */
+                     "the way you hit!\r\n", /* HITROLL */
+                     "the damage you give!\r\n",  /* DAMROLL */
+                     "your ability to withstand paralysis!\r\n", /* PARA */
+                     "your ability to withstand rod attacks!\r\n",    /* ROD */
+                     "your ability to withstand petrification!\r\n",  /* PETRI */
+                     "your ability to withstand breath Attacks!\r\n", /* BREATH */
+                     "your ability to withstand spells!\r\n",    /* SPELL */
+                     "!RACES!\r\n"      /* RACE */
                      "\n"
                    };
 
@@ -1170,8 +1170,8 @@ ASPELL(spell_minor_identify)
       {
       case APPLY_NONE:
         // case APPLY_RACE:
-        //	    case APPLY_CLASS:
-        //	    case APPLY_LEVEL:
+        //         case APPLY_CLASS:
+        //         case APPLY_LEVEL:
         if (!found)
         {
           ch->Send( min_id[0], money_desc(cost));

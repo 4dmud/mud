@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.41  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.40  2006/05/21 11:02:25  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -905,7 +909,7 @@ void perform_meld(Character *ch, OBJ_DATA *corpse)
 int automeld(struct obj_data *obj)
 {
   Character *ch = NULL;//, *j;
-  /*  struct descriptor_data *d;*/
+  /*  Descriptor *d;*/
   int i;
   if (!obj)
     return 0;
@@ -3766,12 +3770,12 @@ C_FUNC(pull_object)
   d->character->pulling = -1;
   if (!obj || !HERE(d->character, obj))
   {
-    write_to_output(d, "It isn't here any longer.\r\n");
+    d->Output( "It isn't here any longer.\r\n");
     return;
   }
   if (!arg || !*arg)
   {
-    write_to_output(d, "That isn't a valid direction.\r\n");
+    d->Output( "That isn't a valid direction.\r\n");
     return;
   }
   switch (LOWER(*arg))
@@ -3795,24 +3799,24 @@ C_FUNC(pull_object)
     dir = DOWN;
     break;
   default:
-    write_to_output(d, "That isn't a valid direction.\r\n");
+    d->Output( "That isn't a valid direction.\r\n");
     return;
     break;
   }
 
   if (!EXIT(d->character, dir))
   {
-    write_to_output(d, "No exit that way.\r\n");
+    d->Output( "No exit that way.\r\n");
     return;
   }
   if (IS_SET(EXIT(d->character, dir)->exit_info, EX_CLOSED))
   {
-    write_to_output(d, "You need to open the door first.\r\n");
+    d->Output( "You need to open the door first.\r\n");
     return;
   }
   if (!IS_SET_AR(ROOM_FLAGS(EXIT(d->character, dir)->to_room), ROOM_VEHICLE))
   {
-    write_to_output(d, "It doesn't look like you can pull it that direction.\r\n");
+    d->Output( "It doesn't look like you can pull it that direction.\r\n");
     return;
   }
 
@@ -3883,7 +3887,7 @@ ACMD(do_hitch)
   {
     ch->Send( "You can only hitch things to mountable players and animals.\r\n");
     if (!IS_NPC(vict))
-      new_send_to_char(vict, "%s just tried to hitch something to you but you are not mountable.\r\n", PERS(vict, ch));
+      vict->Send( "%s just tried to hitch something to you but you are not mountable.\r\n", PERS(vict, ch));
     return;
   }
   if (obj->hitched)

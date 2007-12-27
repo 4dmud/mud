@@ -273,7 +273,7 @@ int num_invalid = 0;
 int Valid_Name(char *newname)
 {
     int i, wovels = 0;
-    struct descriptor_data *dt;
+    Descriptor *dt;
     char tempname[MAX_INPUT_LENGTH];
 
     /*

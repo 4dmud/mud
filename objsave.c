@@ -1082,7 +1082,7 @@ SPECIAL(cryogenicist)
 
 void Crash_save_all(void)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   for (d = descriptor_list; d; d = d->next)
   {
     lock_desc(d);

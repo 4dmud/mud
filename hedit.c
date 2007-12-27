@@ -23,25 +23,25 @@
  */
 extern struct help_index_element *help_table;
 
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 
 /*------------------------------------------------------------------------*/
 
 /*
  * Function Prototypes
  */
-void hedit_disp_extradesc_menu(struct descriptor_data *d);
-void hedit_disp_exit_menu(struct descriptor_data *d);
-void hedit_disp_exit_flag_menu(struct descriptor_data *d);
-void hedit_disp_flag_menu(struct descriptor_data *d);
-void hedit_disp_sector_menu(struct descriptor_data *d);
-void hedit_disp_menu(struct descriptor_data *d);
-void hedit_parse(struct descriptor_data *d, char *arg);
-void hedit_setup_new(struct descriptor_data *d, char *new_key);
-void hedit_setup_existing(struct descriptor_data *d, int rnum);
+void hedit_disp_extradesc_menu(Descriptor *d);
+void hedit_disp_exit_menu(Descriptor *d);
+void hedit_disp_exit_flag_menu(Descriptor *d);
+void hedit_disp_flag_menu(Descriptor *d);
+void hedit_disp_sector_menu(Descriptor *d);
+void hedit_disp_menu(Descriptor *d);
+void hedit_parse(Descriptor *d, char *arg);
+void hedit_setup_new(Descriptor *d, char *new_key);
+void hedit_setup_existing(Descriptor *d, int rnum);
 void hedit_save_to_disk(void);
 int  hedit_find_entry(char *keyword);
-void hedit_save_internally(struct descriptor_data *d);
+void hedit_save_internally(Descriptor *d);
 void free_help(struct help_index_element *help);
 
 
@@ -51,7 +51,7 @@ void free_help(struct help_index_element *help);
   Utils and exported functions.
 \*------------------------------------------------------------------------*/
 
-void hedit_setup_new(struct descriptor_data *d, char *new_key)
+void hedit_setup_new(Descriptor *d, char *new_key)
 {
     CREATE(OLC_HELP(d), struct help_index_element, 1);
 
@@ -63,7 +63,7 @@ void hedit_setup_new(struct descriptor_data *d, char *new_key)
 
 /*------------------------------------------------------------------------*/
 
-void hedit_setup_existing(struct descriptor_data *d, int rnum)
+void hedit_setup_existing(Descriptor *d, int rnum)
 {
     struct help_index_element *help;
 
@@ -91,7 +91,7 @@ void hedit_setup_existing(struct descriptor_data *d, int rnum)
 
 /*------------------------------------------------------------------------*/
 
-void hedit_save_internally(struct descriptor_data *d)
+void hedit_save_internally(Descriptor *d)
 {
     int i, rnum;
     struct help_index_element *new_help_table;
@@ -198,7 +198,7 @@ void free_help(struct help_index_element *help)
 /*
  * The main menu.
  */
-void hedit_disp_menu(struct descriptor_data *d)
+void hedit_disp_menu(Descriptor *d)
 {
     struct help_index_element *help;
 
@@ -225,7 +225,7 @@ void hedit_disp_menu(struct descriptor_data *d)
   The main loop
  **************************************************************************/
 
-void hedit_parse(struct descriptor_data *d, char *arg)
+void hedit_parse(Descriptor *d, char *arg)
 {
     int number;
 

@@ -12,7 +12,7 @@
  *  Copyright (C) 1997 by Joachim Pileborg
  *  All rights reserved.
  *
- * $Id: ident.c,v 1.1 2004/11/12 02:16:53 w4dimenscor Exp $
+ * $Id: ident.c,v 1.2 2006/05/22 10:50:49 w4dimenscor Exp $
  */
 
 #include "conf.h"
@@ -142,7 +142,7 @@ void id_kill(void)
  * E-Mail   : pt94jpi@student.hk-r.se
  *
  */
-void id_lookup(struct descriptor_data *d)
+void id_lookup(Descriptor *d)
 {
   struct message msg;
   char          *str;

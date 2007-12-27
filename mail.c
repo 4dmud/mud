@@ -549,9 +549,7 @@ SPECIAL(postmaster)
 	return (0);
 
     if (no_mail) {
-	send_to_char
-	    ("Sorry, the mail system is having technical difficulties.\r\n",
-	     ch);
+	ch->Send("Sorry, the mail system is having technical difficulties.\r\n");
 	return (0);
     }
 

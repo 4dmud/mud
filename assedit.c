@@ -22,7 +22,7 @@
 /*-------------------------------------------------------------------*
  * External data structures.
  *-------------------------------------------------------------------*/
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern struct obj_data *obj_proto;
 
 extern const char *AssemblyTypes[];
@@ -30,12 +30,12 @@ extern const char *AssemblyTypes[];
 /*-------------------------------------------------------------------*
  * Function prototypes.
  *-------------------------------------------------------------------*/
-void assedit_setup(struct descriptor_data *d, int number);
-void assedit_disp_menu(struct descriptor_data *d);
-void assedit_delete(struct descriptor_data *d);
-void assedit_edit_extract(struct descriptor_data *d);
-void assedit_edit_inroom(struct descriptor_data *d);
-void nodigit(struct descriptor_data *d);
+void assedit_setup(Descriptor *d, int number);
+void assedit_disp_menu(Descriptor *d);
+void assedit_delete(Descriptor *d);
+void assedit_edit_extract(Descriptor *d);
+void assedit_edit_inroom(Descriptor *d);
+void nodigit(Descriptor *d);
 
 
 /*-------------------------------------------------------------------*
@@ -49,7 +49,7 @@ long lRnum = 0;
 
 ACMD (do_assedit)
 {
-  struct descriptor_data *d = ch->desc;
+  Descriptor *d = ch->desc;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
@@ -128,7 +128,7 @@ ACMD (do_assedit)
  * Assedit Functions
  *-------------------------------------------------------------------*/
 
-void assedit_setup(struct descriptor_data *d, int num)
+void assedit_setup(Descriptor *d, int num)
 {
 
   ASSEMBLY    *pOldAssembly = NULL;
@@ -178,7 +178,7 @@ void assedit_setup(struct descriptor_data *d, int num)
 
 }
 
-void assedit_disp_menu(struct descriptor_data *d)
+void assedit_disp_menu(Descriptor *d)
 {
   int i = 0;
   extern const char *AssemblyTypes[];
@@ -189,10 +189,10 @@ void assedit_disp_menu(struct descriptor_data *d)
   sprinttype(OLC_ASSEDIT(d)->uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
 
 #if defined(CLEAR_SCREEN)
-  write_to_output(d, "%c[H%c[J", 27, 27);
+  d->Output( "%c[H%c[J", 27, 27);
 #endif
 
-  write_to_output(d,
+  d->Output(
                   "   Assembly Number:%s %ld %s\r\n"
                   "   Assembly Name  :%s %s %s \r\n"
                   "   ---------------------------\r\n"
@@ -206,21 +206,21 @@ void assedit_disp_menu(struct descriptor_data *d)
                  );
 
   if(OLC_ASSEDIT(d)->lNumComponents <= 0)
-    write_to_output(d, "   < NONE > \r\n");
+    d->Output( "   < NONE > \r\n");
   else
   {
     for( i = 0; i < OLC_ASSEDIT(d)->lNumComponents; i++ )
     {
       if ( (lRnum = real_object(OLC_ASSEDIT(d)->pComponents[i].lVnum)) < 0)
       {
-        write_to_output(d,
+        d->Output(
                         "%s %d%s) %s ERROR --- Contact an Implimentor %s\r\n ",
                         grn, i+1, nrm, yel, nrm
                        );
       }
       else
       {
-        write_to_output(d,
+        d->Output(
                         "%s %d%s) [%5ld] %-20.20s  In room:%s %-3.3s %s   Extract:%s %-3.3s%s \r\n",
                         grn,  i+1, nrm,
                         OLC_ASSEDIT(d)->pComponents[i].lVnum,
@@ -230,7 +230,7 @@ void assedit_disp_menu(struct descriptor_data *d)
       }
     }
   }
-  write_to_output(d,
+  d->Output(
                   "%sA%s) Add a new component.\r\n"
                   "%sE%s) Edit a component.\r\n"
                   "%sD%s) Delete a component.\r\n"
@@ -247,7 +247,7 @@ void assedit_disp_menu(struct descriptor_data *d)
    Command Parse
  ***************************************************/
 
-void assedit_parse(struct descriptor_data *d, char *arg)
+void assedit_parse(Descriptor *d, char *arg)
 {
   int pos = 0, i = 0,  counter, columns = 0;
 
@@ -276,7 +276,7 @@ void assedit_parse(struct descriptor_data *d, char *arg)
       }
       assemblyAddTrigger(OLC_ASSEDIT(d)->lVnum,OLC_ASSEDIT(d)->trigVnum);
 
-      write_to_output(d, "\r\nSaving all assemblies\r\n");
+      d->Output( "\r\nSaving all assemblies\r\n");
       assemblySaveAssemblies();
       if (pTComponents)
         free(pTComponents);
@@ -292,44 +292,44 @@ void assedit_parse(struct descriptor_data *d, char *arg)
     case 'T':
       get_char_colors(d->character);
 #if defined(CLEAR_SCREEN)
-      write_to_output(d, "%c[H%c[J", 27, 27);
+      d->Output( "%c[H%c[J", 27, 27);
 #endif
       for (counter = 0; counter < MAX_ASSM; counter++)
       {
-        write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
+        d->Output( "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
                         AssemblyTypes[counter], !(++columns % 2) ? "\r\n" : "");
       }
-      write_to_output(d, "Enter the assembly type : ");
+      d->Output( "Enter the assembly type : ");
       OLC_MODE(d) = ASSEDIT_EDIT_TYPES;
 
       break;
     case 's':
     case 'S':
-      write_to_output(d, "Enter the trigger vnum : ");
+      d->Output( "Enter the trigger vnum : ");
       OLC_MODE(d) = ASSEDIT_EDIT_TRIGGER;
 
       break;
     case 'a':
     case 'A':                /* add a new component */
-      write_to_output(d,"\r\nWhat is the vnum of the new component?");
+      d->Output("\r\nWhat is the vnum of the new component?");
       OLC_MODE(d) = ASSEDIT_ADD_COMPONENT;
       break;
 
     case 'e':
     case 'E':                /* edit a component */
-      write_to_output(d, "\r\nEdit which component? ");
+      d->Output( "\r\nEdit which component? ");
       OLC_MODE(d) = ASSEDIT_EDIT_COMPONENT;
       break;
     case 'd':
     case 'D':                /* delete a component */
       if ((pos < 0) || pos > OLC_ASSEDIT(d)->lNumComponents)
       {
-        write_to_output(d, "\r\nWhich component do you wish to remove?");
+        d->Output( "\r\nWhich component do you wish to remove?");
         assedit_disp_menu(d);
       }
       else
       {
-        write_to_output(d, "\r\nWhich component do you wish to remove?");
+        d->Output( "\r\nWhich component do you wish to remove?");
         OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
       }
       break;
@@ -465,7 +465,7 @@ void assedit_parse(struct descriptor_data *d, char *arg)
       break;
 
     default:
-      write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N)");
+      d->Output( "Is the item to be extracted when the assembly is created? (Y/N)");
       break;
     }
     break;
@@ -485,7 +485,7 @@ void assedit_parse(struct descriptor_data *d, char *arg)
       break;
 
     default:
-      write_to_output(d, "Object in the room when assembly is created? (n =  in inventory):");
+      d->Output( "Object in the room when assembly is created? (n =  in inventory):");
       break;
     }
     break;
@@ -493,40 +493,40 @@ void assedit_parse(struct descriptor_data *d, char *arg)
   default:                        /* default for whole assedit parse function */
     /* we should never get here */
     new_mudlog(BRF, LVL_GOD, TRUE, "SYSERR: OLC assedit_parse(): Reached default case!");
-    write_to_output(d, "Opps...\r\n");
+    d->Output( "Opps...\r\n");
     STATE(d) = CON_PLAYING;
     break;
   }
 }
 /* End of Assedit Parse */
 
-void assedit_delete(struct descriptor_data *d)
+void assedit_delete(Descriptor *d)
 {
-  write_to_output(d, "Which item number do you wish to delete from this assembly?");
+  d->Output( "Which item number do you wish to delete from this assembly?");
   OLC_MODE(d) = ASSEDIT_DELETE_COMPONENT;
   return;
 }
 
 
-void assedit_edit_extract(struct descriptor_data *d)
+void assedit_edit_extract(Descriptor *d)
 {
-  write_to_output(d, "Is the item to be extracted when the assembly is created? (Y/N):");
+  d->Output( "Is the item to be extracted when the assembly is created? (Y/N):");
   OLC_MODE(d) = ASSEDIT_EDIT_EXTRACT;
   return;
 }
 
-void assedit_edit_inroom(struct descriptor_data *d)
+void assedit_edit_inroom(Descriptor *d)
 {
-  write_to_output(d, "Should the object be in the room when assembly is created (n = in inventory)?");
+  d->Output( "Should the object be in the room when assembly is created (n = in inventory)?");
   OLC_MODE(d) = ASSEDIT_EDIT_INROOM;
   return;
 }
 
-void nodigit(struct descriptor_data *d)
+void nodigit(Descriptor *d)
 {
-  write_to_output(d, "Usage: assedit <vnum>\r\n");
-  write_to_output(d, "     : assedit new <vnum>\r\n");
-  write_to_output(d, "     : assedit delete <vnum>\r\n");
+  d->Output( "Usage: assedit <vnum>\r\n");
+  d->Output( "     : assedit new <vnum>\r\n");
+  d->Output( "     : assedit delete <vnum>\r\n");
   return;
 }
 

@@ -295,7 +295,7 @@ void show_jack_pot(void)
 void start_game(void)
 {
   register Character *i;
-  struct descriptor_data *d;
+  Descriptor *d;
 
   for (d = descriptor_list; d; d = d->next)
   {
@@ -358,7 +358,7 @@ void do_game(void)
 void find_game_winner(void)
 {
   register Character *i;
-  struct descriptor_data *d;
+  Descriptor *d;
   struct hall_of_fame_element *fame_node;
 
   for (d = descriptor_list; d; d = d->next)
@@ -427,7 +427,7 @@ void silent_end(void)
 void do_end_game(void)
 {
   register Character *i;
-  struct descriptor_data *d;
+  Descriptor *d;
 
   for (d = descriptor_list; d; d = d->next)
     if (!d->connected)
@@ -454,7 +454,7 @@ void do_end_game(void)
 int num_in_arena(void)
 {
   register Character *i;
-  struct descriptor_data *d;
+  Descriptor *d;
   int num = 0;
 
   for (d = descriptor_list; d; d = d->next)
@@ -475,7 +475,7 @@ int num_in_arena(void)
 
 ACMD(do_awho)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *tch;
   int num = 0;
 
@@ -615,7 +615,7 @@ void write_one_fame_node(FILE * fp, struct hall_of_fame_element *node)
 void find_bet_winners(Character *winner)
 {
   register Character *i;
-  struct descriptor_data *d;
+  Descriptor *d;
 
 
   for (d = descriptor_list; d; d = d->next)

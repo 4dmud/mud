@@ -19,16 +19,16 @@
 #include "improved-edit.h"
 
 /* local */
-void con_display_spec(DESCRIPTOR_DATA *d);
-void con_display_class(DESCRIPTOR_DATA *d);
-void con_display_race(DESCRIPTOR_DATA *d);
-void con_display_stats(DESCRIPTOR_DATA *d);
-void con_display_sex(DESCRIPTOR_DATA *d, int valid);
-void con_display_ansi(DESCRIPTOR_DATA *d);
-void con_display_new_here(DESCRIPTOR_DATA *d);
-void explain_stats(DESCRIPTOR_DATA *d);
-void con_display_email(DESCRIPTOR_DATA *d);
-void line_sep(DESCRIPTOR_DATA *d);
+void con_display_spec(Descriptor *d);
+void con_display_class(Descriptor *d);
+void con_display_race(Descriptor *d);
+void con_display_stats(Descriptor *d);
+void con_display_sex(Descriptor *d, int valid);
+void con_display_ansi(Descriptor *d);
+void con_display_new_here(Descriptor *d);
+void explain_stats(Descriptor *d);
+void con_display_email(Descriptor *d);
+void line_sep(Descriptor *d);
 /*external*/
 extern const char *class_menu;
 extern const char *race_menu;
@@ -41,7 +41,7 @@ int parse_race(char arg);
 
 ACMD(do_help);
 
-void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
+void con_character_creation(Descriptor *d, char *arg)
 {
   
   char race_selection[256];
@@ -60,11 +60,11 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
     case 'Y':
       SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_1);
       SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_2);
-      write_to_output(d, "\r\n{cRColor on.{c0\r\n");
+      d->Output( "\r\n{cRColor on.{c0\r\n");
       break;
     case 'n':
     case 'N':
-      write_to_output(d, "\r\nColor off.\r\n");
+      d->Output( "\r\nColor off.\r\n");
       break;
     default:
       con_display_ansi(d);
@@ -85,7 +85,7 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
       GET_NEWBIE_STATUS(d->character) = NEWB_OLD;
       break;
     default:
-      write_to_output(d, "\r\nInvalid answer sorry.\r\n");
+      d->Output( "\r\nInvalid answer sorry.\r\n");
       con_display_new_here(d);
       return;
       break;
@@ -123,14 +123,14 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
     GET_RACE(d->character) = load_result;
     if (load_result == RACE_UNDEFINED)
     {
-    write_to_output(d,"\r\nThat's not a race.\r\nRace: ");
+    d->Output("\r\nThat's not a race.\r\nRace: ");
       return;
     }
     strcpy(race_selection, pc_race_types[load_result]);
-    write_to_output(d,"\r\n");
+    d->Output("\r\n");
     
     do_help(d->character, race_selection, 0, 0);
-    write_to_output(d,"Are you sure you want %s? ", race_selection);
+    d->Output("Are you sure you want %s? ", race_selection);
     SUB_STATE(d) = STATE_CONFIRM_QRACE;
     break;
     
@@ -176,7 +176,7 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
         amou = one_argument(arg, abil);
         skip_spaces(&amou);
         if (!(*abil && amou && *amou && choose_real_abils(d->character, *abil, atoi(amou))))
-          write_to_output(d, "Invalid input: type NEXT to move on, or the stat letter and an amount!"  );
+          d->Output( "Invalid input: type NEXT to move on, or the stat letter and an amount!"  );
         
         d->character->aff_abils = d->character->real_abils;
       }
@@ -192,16 +192,16 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
     
     if (load_result == CLASS_UNDEFINED)
     {
-    write_to_output(d,"\r\nThat's not a class.\r\nClass: ");
+    d->Output("\r\nThat's not a class.\r\nClass: ");
       return;
     }
     else
     {
       strcpy(class_selection, pc_class_types[load_result]);
-      write_to_output(d,"\r\n");
+      d->Output("\r\n");
     }
     do_help(d->character, class_selection, 0, 0);
-    write_to_output(d,"Are you sure you want to be a %s? ", class_selection);
+    d->Output("Are you sure you want to be a %s? ", class_selection);
     SUB_STATE(d) = STATE_CONFIRM_QCLASS;
     break;
     
@@ -253,8 +253,8 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
     save_char(d->character);
     save_player_index();
     line_sep(d);
-    write_to_output(d,"%s", motd);
-  write_to_output(d,"\r\n*** PRESS RETURN: ");
+    d->Output("%s", motd);
+  d->Output("\r\n*** PRESS RETURN: ");
     STATE(d) = CON_RMOTD;
     
     new_mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character),
@@ -266,23 +266,23 @@ void con_character_creation(DESCRIPTOR_DATA *d, char *arg)
   
 }
 
-void con_display_class(DESCRIPTOR_DATA *d)
+void con_display_class(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d,"\r\n%s\r\n{cyClass: {c0", class_menu);
+  d->Output("\r\n%s\r\n{cyClass: {c0", class_menu);
   SUB_STATE(d) = STATE_QCLASS;
 }
 
-void con_display_race(DESCRIPTOR_DATA *d)
+void con_display_race(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d,"\r\n%s\r\n{cyRace: {c0",race_menu);
+  d->Output("\r\n%s\r\n{cyRace: {c0",race_menu);
   SUB_STATE(d) = STATE_QRACE;
 }
-void explain_stats(DESCRIPTOR_DATA *d)
+void explain_stats(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d,
+  d->Output(
                   "{cyThe stats are as follows:{c0\r\n\r\n"
                   "{cgWisdom (WIS){cw\r\n"
                   "Gets you more practice sessions and mana when you level, and adds to magic damage.\r\n"
@@ -306,11 +306,11 @@ void explain_stats(DESCRIPTOR_DATA *d)
                   "{cy------------When ready hit enter------------{c0 \r\n\r\n");
   SUB_STATE(d) = STATE_CONFIRM_STATS;
 }
-void con_display_stats(DESCRIPTOR_DATA *d)
+void con_display_stats(Descriptor *d)
 {
 #if 1
   line_sep(d);
-  write_to_output(d,
+  d->Output(
                   "{ccHere you can add extra points your stats.\r\n\r\n"
                   
                   "Within the game equipment is also used to increase these stats further.\r\n\r\n"
@@ -339,10 +339,10 @@ void con_display_stats(DESCRIPTOR_DATA *d)
 #endif
   SUB_STATE(d) = STATE_CONFIRM_STATS;
 }
-void con_display_spec(DESCRIPTOR_DATA *d)
+void con_display_spec(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d,"\r\n"
+  d->Output("\r\n"
                   "{cyChoose your starting bonus Subskill:\r\n\r\n"
                   "{cg[{cGA{cg] Speed -- {cP+50 to speed{c0\r\n\r\n"
                   "{cg[{cGB{cg] Attack - {cP+50 to attack rating{c0\r\n\r\n"
@@ -351,25 +351,25 @@ void con_display_spec(DESCRIPTOR_DATA *d)
                   "{cyPlease choose a letter: {c0");
   SUB_STATE(d) = STATE_LOYAL;
 }
-void con_display_sex(DESCRIPTOR_DATA *d, int valid)
+void con_display_sex(Descriptor *d, int valid)
 {
   line_sep(d);
   if (!valid)
-    write_to_output(d, "\r\nThat is not a valid sex...\r\n");
-  write_to_output(d, "\r\n{cyWhat is your sex {cGM{cgale{cy or {cGF{cgemale{cy?{c0 ");
+    d->Output( "\r\nThat is not a valid sex...\r\n");
+  d->Output( "\r\n{cyWhat is your sex {cGM{cgale{cy or {cGF{cgemale{cy?{c0 ");
   SUB_STATE(d) = STATE_QSEX;
 }
-void con_display_ansi(DESCRIPTOR_DATA *d)
+void con_display_ansi(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d, "\r\nDoes your mudclient support color (Y/N)? ");
+  d->Output( "\r\nDoes your mudclient support color (Y/N)? ");
   SUB_STATE(d) = STATE_ANSI;
 }
 
-void con_display_new_here(DESCRIPTOR_DATA *d)
+void con_display_new_here(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d, "\r\n"
+  d->Output( "\r\n"
                   "  {cyPlease select from the following:{c0\r\n\r\n"
                   "  {cG1 {cc- I am new to mudding.\r\n"
                   "  {cG2 {cc- I am familiar with mudding, but new to 4Dimensions.\r\n"
@@ -377,10 +377,10 @@ void con_display_new_here(DESCRIPTOR_DATA *d)
                   "  Number:");
   SUB_STATE(d) = STATE_NEW_HERE;
 }
-void con_display_email(DESCRIPTOR_DATA *d)
+void con_display_email(Descriptor *d)
 {
   line_sep(d);
-  write_to_output(d, "\r\n"
+  d->Output( "\r\n"
                   "  {cWGiving your email is optional, but it helps us provide better service\r\n"
                   "  and security. Your email if given means you will get a notification should\r\n"
                   "  anything happen with the game server (new address, extended downtime, etc)\r\n"
@@ -392,9 +392,9 @@ void con_display_email(DESCRIPTOR_DATA *d)
   SUB_STATE(d) = STATE_EMAIL;
 }
 
-void line_sep(DESCRIPTOR_DATA *d)
+void line_sep(Descriptor *d)
 {
-  write_to_output(d,
+  d->Output(
                   "[H[J"
                   "\r\n"
                   "\r\n"

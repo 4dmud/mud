@@ -20,7 +20,7 @@ ACMD(do_help);
 /* local global */
 char *context_help_list[NUM_CONTEXTS];
 
-int find_context(struct descriptor_data *d)
+int find_context(Descriptor *d)
 {
   switch STATE(d) {
     case CON_TRIGEDIT: return find_context_trigedit(d);
@@ -33,7 +33,7 @@ int find_context(struct descriptor_data *d)
   }
 }
 
-int find_context_oedit(struct descriptor_data *d)
+int find_context_oedit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case OEDIT_MAIN_MENU:             return CONTEXT_OEDIT_MAIN_MENU;
@@ -67,7 +67,7 @@ int find_context_oedit(struct descriptor_data *d)
   }
 }
 
-int find_context_redit(struct descriptor_data *d)
+int find_context_redit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case REDIT_MAIN_MENU:            return CONTEXT_REDIT_MAIN_MENU;
@@ -91,7 +91,7 @@ int find_context_redit(struct descriptor_data *d)
   }
 }
 
-int find_context_zedit(struct descriptor_data *d)
+int find_context_zedit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case ZEDIT_MAIN_MENU:         return CONTEXT_ZEDIT_MAIN_MENU;
@@ -115,7 +115,7 @@ int find_context_zedit(struct descriptor_data *d)
   }
 }
 
-int find_context_medit(struct descriptor_data *d)
+int find_context_medit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case MEDIT_MAIN_MENU:         return CONTEXT_MEDIT_MAIN_MENU;
@@ -147,7 +147,7 @@ int find_context_medit(struct descriptor_data *d)
   }
 }
 
-int find_context_sedit(struct descriptor_data *d)
+int find_context_sedit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case SEDIT_MAIN_MENU:         return CONTEXT_SEDIT_MAIN_MENU;
@@ -182,7 +182,7 @@ int find_context_sedit(struct descriptor_data *d)
   }
 }
 
-int find_context_trigedit(struct descriptor_data *d)
+int find_context_trigedit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case TRIGEDIT_MAIN_MENU:         return CONTEXT_TRIGEDIT_MAIN_MENU;
@@ -198,7 +198,7 @@ int find_context_trigedit(struct descriptor_data *d)
   }
 }
 
-int find_context_script_edit(struct descriptor_data *d)
+int find_context_script_edit(Descriptor *d)
 {
   switch (OLC_SCRIPT_EDIT_MODE(d)) {
     case SCRIPT_MAIN_MENU:  return CONTEXT_SCRIPT_MAIN_MENU;	
@@ -211,7 +211,7 @@ int find_context_script_edit(struct descriptor_data *d)
 char *NO_HELP = "No help available (yet)!\r\n";
 #define FIND_HELP_CHAR '*'
 
-int context_help(struct descriptor_data *d, char *arg)
+int context_help(Descriptor *d, char *arg)
 {
   int context = NOTHING;
   char actbuf[MAX_INPUT_LENGTH], *tmp;
@@ -230,7 +230,7 @@ int context_help(struct descriptor_data *d, char *arg)
       strncpy(actbuf, context_help_list[context]+1, sizeof(actbuf)-1);
       do_help(d->character, actbuf, 0, 0);
   } else {
-      write_to_output(d, "\r\n%s\r\n>  ", context_help_list[context]);
+      d->Output( "\r\n%s\r\n>  ", context_help_list[context]);
     }
     return TRUE;
   }

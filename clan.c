@@ -21,7 +21,7 @@
 int num_of_clans;
 struct clan_rec clan[MAX_CLANS];
 void tag_argument(char *argument, char *tag);
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 void smash_tilde(char *str);
 void strip_cr(char *);
 void clan_to_store(int i);
@@ -115,8 +115,8 @@ void send_clan_format(Character *ch)
 Character *is_playing(char *vict_name)
       //char *is_playing(char *vict_name)
 {
-  extern struct descriptor_data *descriptor_list;
-  struct descriptor_data *i, *next_i;
+  extern Descriptor *descriptor_list;
+  Descriptor *i, *next_i;
 
   for (i = descriptor_list; i; i = next_i)
   {
@@ -575,7 +575,7 @@ void do_clan_expel(Character *ch, char *arg)
     clan[clan_num].members--;
     clan[clan_num].power -= GET_LEVEL(vict);
     remove_clan_member(GET_NAME(vict), clan_num);
-    new_send_to_char(vict, "You've been kicked out of your clan!\r\n");
+    vict->Send( "You've been kicked out of your clan!\r\n");
     ch->Send( "Done.\r\n");
 
   }
@@ -840,7 +840,7 @@ void do_clan_promote(Character *ch, char *arg)
 
 void do_clan_who(Character *ch)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *tch;
 
   if (GET_CLAN_RANK(ch) == 0)

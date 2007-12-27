@@ -1928,7 +1928,7 @@ void death_room(Character *ch)
     return;
   }
 
-  write_to_output(ch->desc, "{cYAs your last breath passes, time rolls back to just before you died\r\n"
+  ch->Send("{cYAs your last breath passes, time rolls back to just before you died\r\n"
                   "and you find yourself transfered to a temple of healing.{c0\r\n");
 
   GET_HIT(ch) = 3;
@@ -2007,7 +2007,7 @@ void free_hunter_list(void)
 void extract_char_final(Character *ch)
 {
 
-  struct descriptor_data *d = NULL;
+  Descriptor *d = NULL;
   struct hunter_data *hunt = NULL, *hnext;
   int i;
   if (!ch)
@@ -2029,7 +2029,7 @@ void extract_char_final(Character *ch)
     }
     if (ch->desc->snoop_by)
     {
-      SEND_TO_Q("Your victim is no longer among us.\r\n",  ch->desc->snoop_by);
+      ch->desc->snoop_by->Output("Your victim is no longer among us.\r\n");
       ch->desc->snoop_by->snooping = NULL;
       ch->desc->snoop_by = NULL;
     }
@@ -2078,7 +2078,7 @@ void extract_char_final(Character *ch)
           STATE(d) = CON_CLOSE;
       }
       STATE(ch->desc) = CON_MENU;
-      write_to_output(ch->desc, "%s", MENU);
+      ch->desc->Output("%s", MENU);
     }
   }
 
@@ -2290,7 +2290,7 @@ Character *get_player_vis(Character *ch, char *name,
                                        int *number, int inroom)
 {
   Character *i;
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   int num;
 
   skip_spaces(&name);
@@ -2350,7 +2350,7 @@ Character *get_player_vis(Character *ch, char *name,
 Character *get_player_room(room_rnum room, char *name, int *number,
                                         int inroom)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
   Character *ch;
   int num;
 
@@ -2934,7 +2934,7 @@ Character *check_ch(Character *ch)
   return NULL;
 }
 
-int lock_desc(struct descriptor_data *d)
+int lock_desc(Descriptor *d)
 {
   if (!d)
     return -1;
@@ -2947,7 +2947,7 @@ int lock_desc(struct descriptor_data *d)
   return TRUE;
 }
 
-int unlock_desc(struct descriptor_data *d)
+int unlock_desc(Descriptor *d)
 {
   if (!d)
     return -1;
@@ -2961,7 +2961,7 @@ int unlock_desc(struct descriptor_data *d)
 }
 
 
-int is_locked(struct descriptor_data *d)
+int is_locked(Descriptor *d)
 {
   if (!d)
     return -1;

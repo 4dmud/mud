@@ -68,8 +68,8 @@ void delete_one_join(Character *mob, int i);
  * Function prototypes.
  */
 #if CONFIG_OASIS_MPROG
-void medit_disp_mprog(struct descriptor_data *d);
-void medit_change_mprog(struct descriptor_data *d);
+void medit_disp_mprog(Descriptor *d);
+void medit_change_mprog(Descriptor *d);
 const char *medit_get_mprog_type(struct mob_prog_data *mprog);
 #endif
 
@@ -80,7 +80,7 @@ const char *medit_get_mprog_type(struct mob_prog_data *mprog);
 ACMD(do_oasis_medit)
 {
   int number = NOBODY, save = 0, real_num;
-  struct descriptor_data *d;
+  Descriptor *d;
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -238,7 +238,7 @@ void medit_save_to_disk(zone_vnum foo)
   save_mobiles(real_zone(foo));
 }
 
-void medit_setup_new(struct descriptor_data *d)
+void medit_setup_new(Descriptor *d)
 {
   Character *mob;
 
@@ -274,7 +274,7 @@ void medit_setup_new(struct descriptor_data *d)
 
 /*-------------------------------------------------------------------*/
 
-void medit_setup_existing(struct descriptor_data *d, int rmob_num)
+void medit_setup_existing(Descriptor *d, int rmob_num)
 {
   Character *mob;
 
@@ -356,11 +356,11 @@ void init_mobile(Character *mob)
 /*
  * Save new/edited mob to memory.
  */
-void medit_save_internally(struct descriptor_data *d)
+void medit_save_internally(Descriptor *d)
 {
   int i;
   mob_rnum new_rnum;
-  struct descriptor_data *dsc;
+  Descriptor *dsc;
   Character *mob;
 
   i = (real_mobile(OLC_NUM(d)) == NOBODY);
@@ -424,12 +424,12 @@ void medit_save_internally(struct descriptor_data *d)
 /**************************************************************************
  Menu functions 
  **************************************************************************/
-void medit_disp_mob_stats(struct descriptor_data *d, int state)
+void medit_disp_mob_stats(Descriptor *d, int state)
 {
   switch (state)
   {
   case (MEDIT_CHA):
-          write_to_output(d, "How much Charisma should this mob have:");
+          d->Output( "How much Charisma should this mob have:");
     break;
   }
 
@@ -437,7 +437,7 @@ void medit_disp_mob_stats(struct descriptor_data *d, int state)
 /*
  * Display positions. (sitting, standing, etc)
  */
-void medit_disp_positions(struct descriptor_data *d)
+void medit_disp_positions(Descriptor *d)
 {
   int i;
 
@@ -446,9 +446,9 @@ void medit_disp_positions(struct descriptor_data *d)
 
   for (i = 0; *position_types[i] != '\n'; i++)
   {
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, position_types[i]);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, position_types[i]);
   }
-  write_to_output(d, "Enter position number : ");
+  d->Output( "Enter position number : ");
 }
 
 /*-------------------------------------------------------------------*/
@@ -482,7 +482,7 @@ const char *medit_get_mprog_type(struct mob_prog_data *mprog)
 /*
  * Display the MobProgs.
  */
-void medit_disp_mprog(struct descriptor_data *d)
+void medit_disp_mprog(Descriptor *d)
 {
   struct mob_prog_data *mprog = OLC_MPROGL(d);
 
@@ -491,12 +491,12 @@ void medit_disp_mprog(struct descriptor_data *d)
   clear_screen(d);
   while (mprog)
   {
-    write_to_output(d, "%d) %s %s\r\n", OLC_MTOTAL(d), medit_get_mprog_type(mprog),
+    d->Output( "%d) %s %s\r\n", OLC_MTOTAL(d), medit_get_mprog_type(mprog),
                     (mprog->arglist ? mprog->arglist : "NONE"));
     OLC_MTOTAL(d)++;
     mprog = mprog->next;
   }
-  write_to_output(d, "%d) Create New Mob Prog\r\n"
+  d->Output( "%d) Create New Mob Prog\r\n"
                   "%d) Purge Mob Prog\r\n"
                   "Enter number to edit [0 to exit]:  ",
                   OLC_MTOTAL(d), OLC_MTOTAL(d) + 1);
@@ -508,10 +508,10 @@ void medit_disp_mprog(struct descriptor_data *d)
 /*
  * Change the MobProgs.
  */
-void medit_change_mprog(struct descriptor_data *d)
+void medit_change_mprog(Descriptor *d)
 {
   clear_screen(d);
-  write_to_output(d, "1) Type: %s\r\n"
+  d->Output( "1) Type: %s\r\n"
                   "2) Args: %s\r\n"
                   "3) Commands:\r\n%s\r\n\r\n"
                   "Enter number to edit [0 to exit]: ",
@@ -527,7 +527,7 @@ void medit_change_mprog(struct descriptor_data *d)
 /*
  * Change the MobProg type.
  */
-void medit_disp_mprog_types(struct descriptor_data *d)
+void medit_disp_mprog_types(Descriptor *d)
 {
   int i;
 
@@ -536,45 +536,45 @@ void medit_disp_mprog_types(struct descriptor_data *d)
 
   for (i = 0; i < NUM_PROGS-1; i++)
   {
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, mobprog_types[i]);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, mobprog_types[i]);
   }
-  write_to_output(d, "Enter mob prog type : ");
+  d->Output( "Enter mob prog type : ");
   OLC_MODE(d) = MEDIT_MPROG_TYPE;
 }
 #endif
 
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
-void medit_disp_mob_race(struct descriptor_data *d)
+void medit_disp_mob_race(Descriptor *d)
 {
   int i;
 
   get_char_colors(d->character);
 
   for (i = 0; i < NUM_MOB_RACES; i++)
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, mob_races[i]);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, mob_races[i]);
 
-  write_to_output(d,"Enter race number : ");
+  d->Output("Enter race number : ");
 }
-void medit_disp_mob_skin(struct descriptor_data *d)
+void medit_disp_mob_skin(Descriptor *d)
 {
   obj_vnum skin = MOB_SKIN(OLC_MOB(d));
 
   get_char_colors(d->character);
-  write_to_output(d, "When mob is skinned it will currently load: %d (%s)\r\n", skin ,  real_object(skin) != NOTHING ? "exists" : "doesn't exist yet");
+  d->Output( "When mob is skinned it will currently load: %d (%s)\r\n", skin ,  real_object(skin) != NOTHING ? "exists" : "doesn't exist yet");
 
-  write_to_output(d,"Enter skin vnum : ");
+  d->Output("Enter skin vnum : ");
 }
 
-void medit_disp_mob_joins(struct descriptor_data *d)
+void medit_disp_mob_joins(Descriptor *d)
 {
   int i, j = 0;
   struct combine_data *temp = (OLC_MOB(d)->mob_specials.join_list);
 
   get_char_colors(d->character);
-  write_to_output(d, "Mob segments linked:\r\n");
+  d->Output( "Mob segments linked:\r\n");
   if (!temp)
-    write_to_output(d, "None.\r\n");
+    d->Output( "None.\r\n");
   else
   {
 
@@ -582,16 +582,16 @@ void medit_disp_mob_joins(struct descriptor_data *d)
     {
       i = real_mobile(temp->vnum);
       if (i != NOTHING)
-        write_to_output(d, "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, mob_proto[i].player.short_descr);
+        d->Output( "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, mob_proto[i].player.short_descr);
       temp = temp->next;
     }
   }
-  write_to_output(d, "Enter vnum of new mob segment ('d' to delete, -1 to quit): ");
+  d->Output( "Enter vnum of new mob segment ('d' to delete, -1 to quit): ");
 
 }
 
 /*-------------------------------------------------------------------*/
-void medit_disp_mob_subskill(struct descriptor_data *d)
+void medit_disp_mob_subskill(Descriptor *d)
 {
   int i;
 
@@ -599,33 +599,33 @@ void medit_disp_mob_subskill(struct descriptor_data *d)
 
   for (i = 1; i < TOP_SUB_DEFINE; i++)
   {
-    write_to_output(d, "%s%2d%s) %20s", grn, i, nrm, sub_name(i));
+    d->Output( "%s%2d%s) %20s", grn, i, nrm, sub_name(i));
     if (!(i%3))
-      write_to_output(d,"\r\n");
+      d->Output("\r\n");
   }
-  write_to_output(d,"Enter subskill number (-1 for none): ");
+  d->Output("Enter subskill number (-1 for none): ");
 }
-void medit_disp_mob_tier(struct descriptor_data *d)
+void medit_disp_mob_tier(Descriptor *d)
 {
-  write_to_output(d,"Enter a Tier: 0 to 4: ");
+  d->Output("Enter a Tier: 0 to 4: ");
 }
 /*-------------------------------------------------------------------*/
-void medit_disp_mob_class(struct descriptor_data *d)
+void medit_disp_mob_class(Descriptor *d)
 {
   int i;
 
   get_char_colors(d->character);
 
   for (i = 0; i < NUM_MOB_CLASSES; i++)
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, npc_class_types[i]);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, npc_class_types[i]);
 
-  write_to_output(d,"Enter class number : ");
+  d->Output("Enter class number : ");
 }
 
 /*
  * Display the gender of the mobile.
  */
-void medit_disp_sex(struct descriptor_data *d)
+void medit_disp_sex(Descriptor *d)
 {
   int i;
 
@@ -634,9 +634,9 @@ void medit_disp_sex(struct descriptor_data *d)
 
   for (i = 0; i < NUM_GENDERS; i++)
   {
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, genders[i]);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, genders[i]);
   }
-  write_to_output(d, "Enter gender number : ");
+  d->Output( "Enter gender number : ");
 }
 
 /*-------------------------------------------------------------------*/
@@ -644,7 +644,7 @@ void medit_disp_sex(struct descriptor_data *d)
 /*
  * Display attack types menu.
  */
-void medit_disp_attack_types(struct descriptor_data *d)
+void medit_disp_attack_types(Descriptor *d)
 {
   int i;
 
@@ -653,9 +653,9 @@ void medit_disp_attack_types(struct descriptor_data *d)
 
   for (i = 0; i < NUM_ATTACK_TYPES; i++)
   {
-    write_to_output(d, "%s%2d%s) %s\r\n", grn, i, nrm, attack_hit_text[i].singular);
+    d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, attack_hit_text[i].singular);
   }
-  write_to_output(d, "Enter attack type : ");
+  d->Output( "Enter attack type : ");
 }
 
 /*-------------------------------------------------------------------*/
@@ -663,7 +663,7 @@ void medit_disp_attack_types(struct descriptor_data *d)
 /*
  * Display mob-flags menu.
  */
-void medit_disp_mob_flags(struct descriptor_data *d)
+void medit_disp_mob_flags(Descriptor *d)
 {
   int i, columns = 0;
   char flags[MAX_STRING_LENGTH];
@@ -672,11 +672,11 @@ void medit_disp_mob_flags(struct descriptor_data *d)
   clear_screen(d);
   for (i = 0; i < NUM_MOB_FLAGS; i++)
   {
-    write_to_output(d, "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, action_bits[i],
+    d->Output( "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, action_bits[i],
                     !(++columns % 2) ? "\r\n" : "");
   }
   sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits, PM_ARRAY_MAX, flags, sizeof(flags));
-  write_to_output(d, "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ",
+  d->Output( "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ",
                   cyn, flags, nrm);
 }
 
@@ -685,7 +685,7 @@ void medit_disp_mob_flags(struct descriptor_data *d)
 /*
  * Display affection flags menu.
  */
-void medit_disp_aff_flags(struct descriptor_data *d)
+void medit_disp_aff_flags(Descriptor *d)
 {
   int i, columns = 0;
   char flags[MAX_STRING_LENGTH];
@@ -694,11 +694,11 @@ void medit_disp_aff_flags(struct descriptor_data *d)
   clear_screen(d);
   for (i = 0; i < NUM_AFF_FLAGS; i++)
   {
-    write_to_output(d, "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, affected_bits[i],
+    d->Output( "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, affected_bits[i],
                     !(++columns % 2) ? "\r\n" : "");
   }
   sprintbitarray(AFF_FLAGS(OLC_MOB(d)), affected_bits, AF_ARRAY_MAX, flags, sizeof(flags));
-  write_to_output(d, "\r\nCurrent flags   : %s%s%s\r\nEnter aff flags (0 to quit) : ",
+  d->Output( "\r\nCurrent flags   : %s%s%s\r\nEnter aff flags (0 to quit) : ",
                   cyn, flags, nrm);
 }
 
@@ -707,7 +707,7 @@ void medit_disp_aff_flags(struct descriptor_data *d)
 /*
  * Display main menu.
  */
-void medit_disp_menu(struct descriptor_data *d)
+void medit_disp_menu(Descriptor *d)
 {
   Character *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
@@ -716,7 +716,7 @@ void medit_disp_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  write_to_output(d,
+  d->Output(
                   "-- Mob Number:  [%s%d%s]\r\n"
                   "%s1%s) Sex: %s%-7.7s%s	         %s2%s) Alias: %s%s\r\n"
                   "%s3%s) S-Desc: %s%s\r\n"
@@ -750,7 +750,7 @@ void medit_disp_menu(struct descriptor_data *d)
 
   sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags, sizeof(flags));
   sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2, sizeof(flag2));
-  write_to_output(d,
+  d->Output(
                   "%sI%s) Position  : %s%-9s %sJ%s) Default   : %s%s\r\n"
                   "%sK%s) Attack    : %s%s\r\n"
                   "%sL%s) NPC Flags : %s%s\r\n"
@@ -791,7 +791,7 @@ void medit_disp_menu(struct descriptor_data *d)
  *			The GARGANTAUN event handler			*
  ************************************************************************/
 
-void medit_parse(struct descriptor_data *d, char *arg)
+void medit_parse(Descriptor *d, char *arg)
 {
   int i = -1;
   char *oldtext = NULL;
@@ -801,7 +801,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     i = atoi(arg);
     if (!*arg || (!isdigit(arg[0]) && ((*arg == '-') && !isdigit(arg[1]))))
     {
-      write_to_output(d, "Field must be numerical, try again : ");
+      d->Output( "Field must be numerical, try again : ");
       return;
     }
   }
@@ -831,18 +831,18 @@ void medit_parse(struct descriptor_data *d, char *arg)
       if (CONFIG_OLC_SAVE)
       {
         medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);
-        write_to_output(d, "Mobile saved to disk.\r\n");
+        d->Output( "Mobile saved to disk.\r\n");
       }
       else
-        write_to_output(d, "Mobile saved to memory.\r\n");
+        d->Output( "Mobile saved to memory.\r\n");
       /* FALL THROUGH */
     case 'n':
     case 'N':
       cleanup_olc(d, CLEANUP_ALL);
       return;
     default:
-      write_to_output(d, "Invalid choice!\r\n");
-      write_to_output(d, "Do you wish to save the mobile? : ");
+      d->Output( "Invalid choice!\r\n");
+      d->Output( "Do you wish to save the mobile? : ");
       return;
     }
     break;
@@ -856,7 +856,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'Q':
       if (OLC_VAL(d))
       {	/* Anything been changed? */
-        write_to_output(d, "Do you wish to save the changes to the mobile? (y/n) : ");
+        d->Output( "Do you wish to save the changes to the mobile? (y/n) : ");
         OLC_MODE(d) = MEDIT_CONFIRM_SAVESTRING;
       }
       else
@@ -881,10 +881,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case '5':
       OLC_MODE(d) = MEDIT_D_DESC;
       send_editor_help(d);
-      write_to_output(d, "Enter mob description:\r\n\r\n");
+      d->Output( "Enter mob description:\r\n\r\n");
       if (OLC_MOB(d)->player.description)
       {
-        write_to_output(d, "%s", OLC_MOB(d)->player.description);
+        d->Output( "%s", OLC_MOB(d)->player.description);
         oldtext = strdup(OLC_MOB(d)->player.description);
       }
       string_write(d, &OLC_MOB(d)->player.description, MAX_MOB_DESC, 0, oldtext);
@@ -1026,11 +1026,11 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (i == 0)
       break;
     else if (i == 1)
-      write_to_output(d, "\r\nEnter new value : ");
+      d->Output( "\r\nEnter new value : ");
     else if (i == -1)
-      write_to_output(d, "\r\nEnter new text :\r\n] ");
+      d->Output( "\r\nEnter new text :\r\n] ");
     else
-      write_to_output(d, "Oops...\r\n");
+      d->Output( "Oops...\r\n");
     return;
     /*-------------------------------------------------------------------*/
   case OLC_SCRIPT_EDIT:
@@ -1072,7 +1072,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
      */
     cleanup_olc(d, CLEANUP_ALL);
     new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: medit_parse(): Reached D_DESC case!");
-    write_to_output(d, "Oops...\r\n");
+    d->Output( "Oops...\r\n");
     break;
     /*-------------------------------------------------------------------*/
 #if CONFIG_OASIS_MPROG
@@ -1163,7 +1163,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     }
     else if (i == (OLC_MTOTAL(d) + 1))
     {
-      write_to_output(d, "Which mob prog do you want to purge? ");
+      d->Output( "Which mob prog do you want to purge? ");
       OLC_MODE(d) = MEDIT_PURGE_MPROG;
     }
     else
@@ -1194,19 +1194,19 @@ void medit_parse(struct descriptor_data *d, char *arg)
       medit_disp_mprog_types(d);
     else if (i == 2)
     {
-      write_to_output(d, "Enter new arg list: ");
+      d->Output( "Enter new arg list: ");
       OLC_MODE(d) = MEDIT_MPROG_ARGS;
     }
     else if (i == 3)
     {
-      write_to_output(d, "Enter new mob prog commands:\r\n");
+      d->Output( "Enter new mob prog commands:\r\n");
       /*
        * Pass control to modify.c for typing.
        */
       OLC_MODE(d) = MEDIT_MPROG_COMLIST;
       if (OLC_MPROG(d)->comlist)
       {
-        write_to_output(d, "%s", OLC_MPROG(d)->comlist);
+        d->Output( "%s", OLC_MPROG(d)->comlist);
         oldtext = strdup(OLC_MPROG(d)->comlist);
       }
       string_write(d, &OLC_MPROG(d)->comlist, MAX_STRING_LENGTH, 0, oldtext);
@@ -1348,13 +1348,13 @@ void medit_parse(struct descriptor_data *d, char *arg)
     {
     case 'd':
     case 'D':
-      write_to_output(d, "Delete which segment number?: ");
+      d->Output( "Delete which segment number?: ");
       OLC_MODE(d) = MEDIT_DELETE_SEGMENT;
       return;
     default:
       if (((i = atoi(arg)) == 0 || i >= 999999) || i == GET_MOB_VNUM(OLC_MOB(d)))
       {
-        write_to_output(d, "That vnum is invalid!\r\n");
+        d->Output( "That vnum is invalid!\r\n");
         return;
       }
       else if (i == -1)
@@ -1363,7 +1363,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       }
       else if (!real_mobile(i))
       {
-        write_to_output(d, "That mob doesn't exist!\r\n");
+        d->Output( "That mob doesn't exist!\r\n");
         return;
       }
       else
@@ -1380,7 +1380,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     }
     else
     {
-      write_to_output(d, "That number is invalid!\r\n");
+      d->Output( "That number is invalid!\r\n");
       medit_disp_mob_joins(d);
       return;
     }
@@ -1392,7 +1392,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
      */
     cleanup_olc(d, CLEANUP_ALL);
     new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: medit_parse(): Reached default case!");
-    write_to_output(d, "Oops...\r\n");
+    d->Output( "Oops...\r\n");
     break;
   }
   /*-------------------------------------------------------------------*/
@@ -1407,7 +1407,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
   medit_disp_menu(d);
 }
 
-void medit_string_cleanup(struct descriptor_data *d, int terminator)
+void medit_string_cleanup(Descriptor *d, int terminator)
 {
   switch (OLC_MODE(d))
   {

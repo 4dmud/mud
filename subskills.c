@@ -21,7 +21,7 @@ extern struct spell_info_type spell_info[];
 extern int pt_allowed;
 SPECIAL(shop_keeper);
 /* extern variables */
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern int pk_allowed;
 
 /* external functions */

@@ -5,7 +5,7 @@ Want to display a configuration page for color, simmlar to the one for game vari
 These settings will applied after loading the character, as color elements
 in a 'stylesheet' for the game.
 for example:
-write_to_output(d, MXPTAG("!ELEMENT RoomTitle '<COLOR %s><B>'"), d->character->mxpcolor->RoomTitle);
+d->Output( MXPTAG("!ELEMENT RoomTitle '<COLOR %s><B>'"), d->character->mxpcolor->RoomTitle);
 
 There is a list of colors that work available in:
 const char * color_option_list[];

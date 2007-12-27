@@ -25,7 +25,7 @@
  * External data structures.
  */
 extern struct help_index_element *help_table;
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 
 /*------------------------------------------------------------------------*\
   Utils and exported functions.
@@ -33,7 +33,7 @@ extern struct descriptor_data *descriptor_list;
 
 ACMD(do_oasis_hedit)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   for (d = descriptor_list; d; d = d->next)
     if (STATE(d) == CON_HEDIT)
     {
@@ -98,7 +98,7 @@ ACMD(do_oasis_hedit)
 }
 
 
-void hedit_setup_new(struct descriptor_data *d)
+void hedit_setup_new(Descriptor *d)
 {
   CREATE(OLC_HELP(d), struct help_index_element, 1);
   OLC_HELP(d)->keywords     = str_dup(OLC_STORAGE(d));
@@ -110,7 +110,7 @@ void hedit_setup_new(struct descriptor_data *d)
 
 /*------------------------------------------------------------------------*/
 
-void hedit_setup_existing(struct descriptor_data *d, int real_num)
+void hedit_setup_existing(Descriptor *d, int real_num)
 {
   CREATE(OLC_HELP(d), struct help_index_element, 1);
   *OLC_HELP(d) = help_table[real_num];
@@ -132,7 +132,7 @@ void hedit_setup_existing(struct descriptor_data *d, int real_num)
 
 
 
-void hedit_save_internally(struct descriptor_data *d)
+void hedit_save_internally(Descriptor *d)
 {
   unsigned int i;
   struct help_index_element *new_help_table;
@@ -170,7 +170,7 @@ void hedit_save_internally(struct descriptor_data *d)
 
 /*------------------------------------------------------------------------*/
 
-void hedit_save_to_disk(struct descriptor_data *d)
+void hedit_save_to_disk(Descriptor *d)
 {
   FILE *fp;
   int i;
@@ -209,13 +209,13 @@ void hedit_save_to_disk(struct descriptor_data *d)
 /*------------------------------------------------------------------------*/
 
 /* Menu functions */
-void hedit_disp_menu(struct descriptor_data *d)
+void hedit_disp_menu(Descriptor *d)
 {
   struct help_index_element *help = OLC_HELP(d);
 
   get_char_colors(d->character);
 
-  write_to_output(d,
+  d->Output(
 #if defined(CLEAR_SCREEN)
                   "[H[J"
 #endif
@@ -242,7 +242,7 @@ void hedit_disp_menu(struct descriptor_data *d)
  The main loop
 **************************************************************************/
 
-void hedit_parse(struct descriptor_data *d, char *arg)
+void hedit_parse(Descriptor *d, char *arg)
 {
   int number;
 
@@ -261,7 +261,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
        * Do NOT free strings! Just the help structure.
        */
       cleanup_olc(d, CLEANUP_STRUCTS);
-      write_to_output(d, "Help entry saved to memory.\r\n");
+      d->Output( "Help entry saved to memory.\r\n");
       break;
     case 'n':
     case 'N':
@@ -271,7 +271,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:
-      write_to_output(d, "Invalid choice!\r\n"
+      d->Output( "Invalid choice!\r\n"
                       "Do you wish to save this help entry internally? : ");
       break;
     }
@@ -284,24 +284,24 @@ void hedit_parse(struct descriptor_data *d, char *arg)
     case 'Q':
       if (OLC_VAL(d))
       {	/* Something has been modified. */
-        write_to_output(d, "Do you wish to save this help entry internally? : ");
+        d->Output( "Do you wish to save this help entry internally? : ");
         OLC_MODE(d) = HEDIT_CONFIRM_SAVESTRING;
       }
       else
         cleanup_olc(d, CLEANUP_ALL);
-      write_to_output(d,"\r\n");
+      d->Output("\r\n");
       return;
     case '1':
-      write_to_output(d, "Enter keywords:-\r\n] ");
+      d->Output( "Enter keywords:-\r\n] ");
       OLC_MODE(d) = HEDIT_KEYWORDS;
       break;
     case '2':
       OLC_MODE(d) = HEDIT_ENTRY;
-      write_to_output(d,"Enter help entry: (/s saves /h for help)\r\n\r\n");
+      d->Output("Enter help entry: (/s saves /h for help)\r\n\r\n");
       d->backstr = NULL;
       if (OLC_HELP(d)->entry)
       {
-        write_to_output(d, "%s", OLC_HELP(d)->entry);
+        d->Output( "%s", OLC_HELP(d)->entry);
         d->backstr = str_dup(OLC_HELP(d)->entry);
       }
       d->str = &OLC_HELP(d)->entry;
@@ -310,11 +310,11 @@ void hedit_parse(struct descriptor_data *d, char *arg)
       OLC_VAL(d) = 1;
       break;
     case '3':
-      write_to_output(d, "Enter min level:-\r\n] ");
+      d->Output( "Enter min level:-\r\n] ");
       OLC_MODE(d) = HEDIT_MIN_LEVEL;
       break;
     default:
-      write_to_output(d, "Invalid choice!\r\n");
+      d->Output( "Invalid choice!\r\n");
       hedit_disp_menu(d);
       break;
     }
@@ -343,20 +343,20 @@ void hedit_parse(struct descriptor_data *d, char *arg)
           cleanup_olc(d, CLEANUP_ALL);
           break;
         }
-        write_to_output(d, "Do you wish to add the '%s' help entry? ",
+        d->Output( "Do you wish to add the '%s' help entry? ",
                         OLC_STORAGE(d));
         OLC_MODE(d) = HEDIT_CONFIRM_ADD;
       }
       else
       {
-        write_to_output(d, "Do you wish to edit the '%s' help entry? ",
+        d->Output( "Do you wish to edit the '%s' help entry? ",
                         help_table[OLC_ZNUM(d)].keywords);
         OLC_MODE(d) = HEDIT_CONFIRM_EDIT;
       }
       break;
       */
     default:
-      write_to_output(d, "Invalid choice!\r\n"
+      d->Output( "Invalid choice!\r\n"
                       "Do you wish to edit the '%s' help entry? ",
                       soc_mess_list[OLC_ZNUM(d)].command);
       break;
@@ -373,7 +373,7 @@ case 'n': case 'N': case 'q': case 'Q':
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:
-      write_to_output(d, "Invalid choice!\r\n"
+      d->Output( "Invalid choice!\r\n"
                       "Do you wish to add the '%s' help entry? ",
                       OLC_STORAGE(d));
       break;
@@ -398,7 +398,7 @@ case 'n': case 'N': case 'q': case 'Q':
   case HEDIT_MIN_LEVEL:
     number = atoi(arg);
     if ((number < 0) || (number > LVL_IMPL))
-      write_to_output(d, "That is not a valid choice!\r\n"
+      d->Output( "That is not a valid choice!\r\n"
                       "Enter min level:-\r\n] ");
     else
     {

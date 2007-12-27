@@ -39,7 +39,7 @@ char *any_one_arg(char *argument, char *first_arg);
 char *two_arguments(char *argument, char *first_arg, char *second_arg);
 int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
-void nanny(struct descriptor_data *d, char *arg);
+void nanny(Descriptor *d, char *arg);
 int is_abbrev(const char *arg1, const char *arg2);
 int is_number(const char *str);
 int find_command(const char *command);

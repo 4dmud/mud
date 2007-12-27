@@ -2321,14 +2321,14 @@ ASKILL(skill_push)
       if (perform_push(victim, to, TRUE, ch))
       {
         send_to_char("Ciao, ciao!\r\n", ch);
-        new_send_to_char(victim, "%s has pushed you!", GET_NAME(ch));
+        victim->Send( "%s has pushed you!", GET_NAME(ch));
         return SKILL_PUSH;
       }
     }
     else
     {
       send_to_char("Oops... you fail.", ch);
-      new_send_to_char(victim, "%s fails.\r\n", GET_NAME(ch));
+      victim->Send( "%s fails.\r\n", GET_NAME(ch));
 
     }
   }

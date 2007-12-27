@@ -2708,7 +2708,7 @@ ASKILL(skill_blackjack)
   {
     act("You whack $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_CHAR);
     act("$n whacks $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_NOTVICT);
-    new_send_to_char(vict, "You feel a sudden pain erupt through the back of your skull.\r\n");
+    vict->Send( "You feel a sudden pain erupt through the back of your skull.\r\n");
 
     af.location = 0;
     af.type = SKILL_BLACKJACK;

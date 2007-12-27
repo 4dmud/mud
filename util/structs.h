@@ -1243,7 +1243,7 @@ Character {
    struct obj_data *equipment[NUM_WEARS];/* Equipment array               */
 
    struct obj_data *carrying;            /* Head of list                  */
-   struct descriptor_data *desc;         /* NULL for mobiles              */
+   Descriptor *desc;         /* NULL for mobiles              */
 
    long id;                            /* used by DG triggers             */
    struct trig_proto_list *proto_script; /* list of default triggers      */
@@ -1317,7 +1317,7 @@ struct txt_q {
 };
 
 
-struct descriptor_data {
+Descriptor {
    socket_t	descriptor;	/* file descriptor for socket		*/
    char	host[HOST_LENGTH+1];	/* hostname				*/
    byte	bad_pws;		/* number of bad pw attemps this login	*/
@@ -1347,9 +1347,9 @@ struct descriptor_data {
    struct txt_q input;		/* q of unprocessed input		*/
    Character *character;	/* linked to char			*/
    Character *original;	/* original char if switched		*/
-   struct descriptor_data *snooping; /* Who is this char snooping	*/
-   struct descriptor_data *snoop_by; /* And who is snooping this char	*/
-   struct descriptor_data *next; /* link to next descriptor		*/
+   Descriptor *snooping; /* Who is this char snooping	*/
+   Descriptor *snoop_by; /* And who is snooping this char	*/
+   Descriptor *next; /* link to next descriptor		*/
    struct olc_data *olc;	     /*. OLC info - defined in olc.h   .*/
 };
 

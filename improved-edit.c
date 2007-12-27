@@ -14,19 +14,19 @@ improved-edit.c		Routines specific to the improved editor.
 #include "interpreter.h"
 #include "improved-edit.h"
 
-int format_script(struct descriptor_data *d);
+int format_script(Descriptor *d);
 
-void send_editor_help(struct descriptor_data *d)
+void send_editor_help(Descriptor *d)
 {
   if (using_improved_editor)
-    write_to_output(d, "Instructions: /s or @ to save, /h for more options.\r\n");
+    d->Output( "Instructions: /s or @ to save, /h for more options.\r\n");
   else
-    write_to_output(d, "Instructions: Type @ on a line by itself to end.\r\n");
+    d->Output( "Instructions: Type @ on a line by itself to end.\r\n");
 }
 
 #if CONFIG_IMPROVED_EDITOR
 
-int improved_editor_execute(struct descriptor_data *d, char *str)
+int improved_editor_execute(Descriptor *d, char *str)
 {
   char actions[MAX_INPUT_LENGTH];
 
@@ -44,9 +44,9 @@ int improved_editor_execute(struct descriptor_data *d, char *str)
     if (*(d->str)) {
       free(*d->str);
       *(d->str) = NULL;
-      write_to_output(d, "Current buffer cleared.\r\n");
+      d->Output( "Current buffer cleared.\r\n");
     } else
-      write_to_output(d, "Current buffer empty.\r\n");
+      d->Output( "Current buffer empty.\r\n");
     break;
   case 'd':
     parse_action(PARSE_DELETE, actions, d);
@@ -58,13 +58,13 @@ int improved_editor_execute(struct descriptor_data *d, char *str)
     if (*(d->str))
       parse_action(PARSE_FORMAT, actions, d);
     else
-      write_to_output(d, "Current buffer empty.\r\n");
+      d->Output( "Current buffer empty.\r\n");
     break;
   case 'i':
     if (*(d->str))
       parse_action(PARSE_INSERT, actions, d);
     else
-      write_to_output(d, "Current buffer empty.\r\n");
+      d->Output( "Current buffer empty.\r\n");
     break;
   case 'h':
     parse_action(PARSE_HELP, actions, d);
@@ -73,13 +73,13 @@ int improved_editor_execute(struct descriptor_data *d, char *str)
     if (*d->str)
       parse_action(PARSE_LIST_NORM, actions, d);
     else
-      write_to_output(d, "Current buffer empty.\r\n");
+      d->Output( "Current buffer empty.\r\n");
     break;
   case 'n':
     if (*d->str)
       parse_action(PARSE_LIST_NUM, actions, d);
     else
-      write_to_output(d, "Current buffer empty.\r\n");
+      d->Output( "Current buffer empty.\r\n");
     break;
   case 'r':
     parse_action(PARSE_REPLACE, actions, d);
@@ -87,7 +87,7 @@ int improved_editor_execute(struct descriptor_data *d, char *str)
   case 's':
     return STRINGADD_SAVE;
   default:
-    write_to_output(d, "Invalid option.\r\n");
+    d->Output( "Invalid option.\r\n");
     break;
   }
   return STRINGADD_ACTION;
@@ -96,7 +96,7 @@ int improved_editor_execute(struct descriptor_data *d, char *str)
 /*
  * Handle some editor commands.
  */
-void parse_action(int command, char *string, struct descriptor_data *d)
+void parse_action(int command, char *string, Descriptor *d)
 {
   int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
   unsigned int total_len;
@@ -106,7 +106,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 
   switch (command) {
   case PARSE_HELP:
-    write_to_output(d,
+    d->Output(
 	    "Editor command formats: /<letter>\r\n\r\n"
 	    "/a         -  aborts editor\r\n"
 	    "/c         -  clears buffer\r\n"
@@ -125,7 +125,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     break;
   case PARSE_FORMAT:
     if (STATE(d) == CON_TRIGEDIT) {
-      write_to_output(d, "Script %sformatted.\r\n", format_script(d) ? "": "not ");
+      d->Output( "Script %sformatted.\r\n", format_script(d) ? "": "not ");
       return;
     }
     while (isalpha(string[j]) && j < 2) {
@@ -135,7 +135,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
       }
     }
     format_text(d->str, flags, d, d->max_str);
-    write_to_output(d, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
+    d->Output( "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
     break;
   case PARSE_REPLACE:
     while (isalpha(string[j]) && j < 2)
@@ -143,42 +143,42 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	rep_all = 1;
 
     if ((s = strtok(string, "'")) == NULL) {
-      write_to_output(d, "Invalid format.\r\n");
+      d->Output( "Invalid format.\r\n");
       return;
     } else if ((s = strtok(NULL, "'")) == NULL) {
-      write_to_output(d, "Target string must be enclosed in single quotes.\r\n");
+      d->Output( "Target string must be enclosed in single quotes.\r\n");
       return;
     } else if ((t = strtok(NULL, "'")) == NULL) {
-      write_to_output(d, "No replacement string.\r\n");
+      d->Output( "No replacement string.\r\n");
       return;
     } else if ((t = strtok(NULL, "'")) == NULL) {
-      write_to_output(d, "Replacement string must be enclosed in single quotes.\r\n");
+      d->Output( "Replacement string must be enclosed in single quotes.\r\n");
       return;
       /*wb's fix for empty buffer replacement crashing */
     } else if ((!*d->str)) {
       return;
     } else if ((total_len = ((strlen(t) - strlen(s)) + strlen(*d->str))) <= d->max_str) {
       if ((replaced = replace_str(d->str, s, t, rep_all, d->max_str)) > 0) {
-	write_to_output(d, "Replaced %d occurance%sof '%s' with '%s'.\r\n",
+	d->Output( "Replaced %d occurance%sof '%s' with '%s'.\r\n",
 	  replaced, ((replaced != 1) ? "s " : " "), s, t);
       } else if (replaced == 0) {
-	write_to_output(d, "String '%s' not found.\r\n", s);
+	d->Output( "String '%s' not found.\r\n", s);
       } else
-	write_to_output(d, "ERROR: Replacement string causes buffer overflow, aborted replace.\r\n");
+	d->Output( "ERROR: Replacement string causes buffer overflow, aborted replace.\r\n");
     } else
-      write_to_output(d, "Not enough space left in buffer.\r\n");
+      d->Output( "Not enough space left in buffer.\r\n");
     break;
   case PARSE_DELETE:
     switch (sscanf(string, " %d - %d ", &line_low, &line_high)) {
     case 0:
-      write_to_output(d, "You must specify a line number or range to delete.\r\n");
+      d->Output( "You must specify a line number or range to delete.\r\n");
       return;
     case 1:
       line_high = line_low;
       break;
     case 2:
       if (line_high < line_low) {
-	write_to_output(d, "That range is invalid.\r\n");
+	d->Output( "That range is invalid.\r\n");
 	return;
       }
       break;
@@ -187,7 +187,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     i = 1;
     total_len = 1;
     if ((s = *d->str) == NULL) {
-      write_to_output(d, "Buffer is empty.\r\n");
+      d->Output( "Buffer is empty.\r\n");
       return;
     } else if (line_low > 0) {
       while (s && i < line_low)
@@ -196,7 +196,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	  s++;
 	}
       if (s == NULL || i < line_low) {
-	write_to_output(d, "Line(s) out of range; not deleting.\r\n");
+	d->Output( "Line(s) out of range; not deleting.\r\n");
 	return;
       }
       t = s;
@@ -213,10 +213,10 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	total_len--;
       *t = '\0';
       RECREATE(*d->str, char, strlen(*d->str) + 3);
-      write_to_output(d, "%d line%sdeleted.\r\n", total_len,
+      d->Output( "%d line%sdeleted.\r\n", total_len,
 	(total_len != 1 ? "s " : " "));
     } else {
-      write_to_output(d, "Invalid, line numbers to delete must be higher than 0.\r\n");
+      d->Output( "Invalid, line numbers to delete must be higher than 0.\r\n");
       return;
     }
     break;
@@ -241,10 +241,10 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     }
 
     if (line_low < 1) {
-      write_to_output(d, "Line numbers must be greater than 0.\r\n");
+      d->Output( "Line numbers must be greater than 0.\r\n");
       return;
     } else if (line_high < line_low) {
-      write_to_output(d, "That range is invalid.\r\n");
+      d->Output( "That range is invalid.\r\n");
       return;
     }
     *buf = '\0';
@@ -259,7 +259,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	s++;
       }
     if (i < line_low || s == NULL) {
-      write_to_output(d, "Line(s) out of range; no buffer listing.\r\n");
+      d->Output( "Line(s) out of range; no buffer listing.\r\n");
       return;
     }
     t = s;
@@ -303,11 +303,11 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     }
 
     if (line_low < 1) {
-      write_to_output(d, "Line numbers must be greater than 0.\r\n");
+      d->Output( "Line numbers must be greater than 0.\r\n");
       return;
     }
     if (line_high < line_low) {
-      write_to_output(d, "That range is invalid.\r\n");
+      d->Output( "That range is invalid.\r\n");
       return;
     }
     *buf = '\0';
@@ -320,7 +320,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	s++;
       }
     if (i < line_low || s == NULL) {
-      write_to_output(d, "Line(s) out of range; no buffer listing.\r\n");
+      d->Output( "Line(s) out of range; no buffer listing.\r\n");
       return;
     }
     t = s;
@@ -350,7 +350,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
   case PARSE_INSERT:
     half_chop(string, buf, buf2);
     if (*buf == '\0') {
-      write_to_output(d, "You must specify a line number before which to insert text.\r\n");
+      d->Output( "You must specify a line number before which to insert text.\r\n");
       return;
     }
     line_low = atoi(buf);
@@ -359,7 +359,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     i = 1;
     *buf = '\0';
     if ((s = *d->str) == NULL) {
-      write_to_output(d, "Buffer is empty, nowhere to insert.\r\n");
+      d->Output( "Buffer is empty, nowhere to insert.\r\n");
       return;
     }
     if (line_low > 0) {
@@ -369,14 +369,14 @@ void parse_action(int command, char *string, struct descriptor_data *d)
 	  s++;
 	}
       if (i < line_low || s == NULL) {
-	write_to_output(d, "Line number out of range; insert aborted.\r\n");
+	d->Output( "Line number out of range; insert aborted.\r\n");
 	return;
       }
       temp = *s;
       *s = '\0';
       if ((strlen(*d->str) + strlen(buf2) + strlen(s + 1) + 3) > d->max_str) {
 	*s = temp;
-	write_to_output(d, "Insert text pushes buffer over maximum size, insert aborted.\r\n");
+	d->Output( "Insert text pushes buffer over maximum size, insert aborted.\r\n");
 	return;
       }
       if (*d->str && **d->str)
@@ -388,9 +388,9 @@ void parse_action(int command, char *string, struct descriptor_data *d)
       RECREATE(*d->str, char, strlen(buf) + 3);
 
       strcpy(*d->str, buf);
-      write_to_output(d, "Line inserted.\r\n");
+      d->Output( "Line inserted.\r\n");
     } else {
-      write_to_output(d, "Line number must be higher than 0.\r\n");
+      d->Output( "Line number must be higher than 0.\r\n");
       return;
     }
     break;
@@ -398,7 +398,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
   case PARSE_EDIT:
     half_chop(string, buf, buf2);
     if (*buf == '\0') {
-      write_to_output(d, "You must specify a line number at which to change text.\r\n");
+      d->Output( "You must specify a line number at which to change text.\r\n");
       return;
     }
     line_low = atoi(buf);
@@ -407,7 +407,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
     i = 1;
     *buf = '\0';
     if ((s = *d->str) == NULL) {
-      write_to_output(d, "Buffer is empty, nothing to change.\r\n");
+      d->Output( "Buffer is empty, nothing to change.\r\n");
       return;
     }
     if (line_low > 0) {
@@ -423,7 +423,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
        * Make sure that there was a THAT line in the text.
        */
       if (s == NULL || i < line_low) {
-	write_to_output(d, "Line number out of range; change aborted.\r\n");
+	d->Output( "Line number out of range; change aborted.\r\n");
 	return;
       }
       /*
@@ -462,7 +462,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
        * Check for buffer overflow.
        */
       if (strlen(buf) > d->max_str) {
-	write_to_output(d, "Change causes new length to exceed buffer maximum size, aborted.\r\n");
+	d->Output( "Change causes new length to exceed buffer maximum size, aborted.\r\n");
 	return;
       }
       /*
@@ -470,14 +470,14 @@ void parse_action(int command, char *string, struct descriptor_data *d)
        */
       RECREATE(*d->str, char, strlen(buf) + 3);
       strcpy(*d->str, buf);
-      write_to_output(d, "Line changed.\r\n");
+      d->Output( "Line changed.\r\n");
     } else {
-      write_to_output(d, "Line number must be higher than 0.\r\n");
+      d->Output( "Line number must be higher than 0.\r\n");
       return;
     }
     break;
   default:
-    write_to_output(d, "Invalid option.\r\n");
+    d->Output( "Invalid option.\r\n");
     new_mudlog(BRF, LVL_IMPL, TRUE, "SYSERR: invalid command passed to parse_action");
     return;
   }
@@ -488,7 +488,7 @@ void parse_action(int command, char *string, struct descriptor_data *d)
  * Re-formats message type formatted char *.
  * (for strings edited with d->str) (mostly olc and mail)
  */
-void format_text(char **ptr_string, int mode, struct descriptor_data *d, unsigned int maxlen)
+void format_text(char **ptr_string, int mode, Descriptor *d, unsigned int maxlen)
 {
   int line_chars, cap_next = TRUE, cap_next_next = FALSE;
   char *flow, *start = NULL, temp;

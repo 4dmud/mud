@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.26  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.25  2006/05/21 11:02:25  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -116,7 +120,7 @@
 
 /* extern variables */
 extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern struct spell_info_type spell_info[];
 extern struct index_data *mob_index;
 extern Character *ch_selling;
@@ -266,7 +270,7 @@ ACMD(do_die)
 
 void check_for_dead(void)
 {
-  struct descriptor_data *d, *next_d;
+  Descriptor *d, *next_d;
   time_t curr = time(0);
   for (d = descriptor_list; d; d = next_d)
   {

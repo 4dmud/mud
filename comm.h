@@ -21,7 +21,7 @@ void	send_to_range(room_vnum start, room_vnum finish, const char *messg, ...) __
 void	send_to_room(room_rnum room, const char *messg, ...) __attribute__ ((format (printf, 2, 3)));
 void	send_to_outdoor(const char *messg, ...) __attribute__ ((format (printf, 1, 2)));
 void perform_to_all(const char *messg, Character *ch);
-void close_socket(struct descriptor_data *d);
+void close_socket(Descriptor *d);
 char *wordwrap(char *cmd, char *buf, size_t width, size_t maxlen);
 
 int is_ignoring(Character *ch, Character *vict);
@@ -37,7 +37,7 @@ void brag(Character *ch, Character *victim);
 extern struct comm_data * comlist;
 
 void free_commlist(struct comm_data *c);
-void send_out_signals(struct descriptor_data *d);
+void send_out_signals(Descriptor *d);
 
 #define ALERT_1 send_to_all("{cRALERT: 4Dimensions has had an internal error and is shutting down now.\r\n" \
 "Please Reconnect in 20 seconds.\r\n{c0");
@@ -60,13 +60,13 @@ void send_out_signals(struct descriptor_data *d);
 /* I/O functions */
 int	write_to_descriptor(socket_t desc, const char *txt, struct compr *comp);
 void write_to_q(const char *txt, struct txt_q *queue, int aliased);
-size_t write_to_output(struct descriptor_data *d, const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
-size_t vwrite_to_output(struct descriptor_data *d, const char *format, va_list args);
-void page_string(struct descriptor_data *d, char *str, int keep_internal);
-void string_add(struct descriptor_data *d, char *str);
-void string_write(struct descriptor_data *d, char **txt, size_t len,
+size_t write_to_output(Descriptor *d, const char *txt, ...) __attribute__ ((format (printf, 2, 3)));
+size_t vwrite_to_output(Descriptor *d, const char *format, va_list args);
+void page_string(Descriptor *d, char *str, int keep_internal);
+void string_add(Descriptor *d, char *str);
+void string_write(Descriptor *d, char **txt, size_t len,
 		  long mailto, void *data);
-int toggle_compression(struct descriptor_data *t);
+int toggle_compression(Descriptor *t);
 
 
 #define SEND_TO_SOCKET(messg, desc)	write_to_descriptor((desc), (messg), strlen(messg))

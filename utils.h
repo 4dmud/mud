@@ -171,7 +171,7 @@ void sprintbitarray(int bitvector[], const char *name[], int maxar,
 time_t mud_time_to_secs(struct time_info_data *now);
 struct time_info_data *age(Character *ch);
 int num_pc_in_room(struct room_data *room);
-void line_input(struct descriptor_data *d, const char *prompt,
+void line_input(Descriptor *d, const char *prompt,
                 C_FUNC(*callback), void *info);
 void core_dump_real(const char *, int);
 char *stristr(const char *String, const char *Pattern);

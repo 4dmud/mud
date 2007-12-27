@@ -187,7 +187,7 @@ void sub_write(char *arg, Character * ch, byte find_invis, int targets)
 
 void send_to_zone(char *messg, zone_rnum zone)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
 
   if (!messg || !*messg)
     return;
@@ -196,13 +196,13 @@ void send_to_zone(char *messg, zone_rnum zone)
     if (!i->connected && i->character && AWAKE(i->character) &&
         (IN_ROOM(i->character) != NULL) &&
         (IN_ROOM(i->character)->zone == zone))
-      write_to_output(i, "%s", messg);
+      i->Output( "%s", messg);
 }
 
 void send_to_zone_range(char *messg, int z_rnum, int lower_vnum,
                         int upper_vnum)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
 
   if (!messg || !*messg)
     return;
@@ -213,5 +213,5 @@ void send_to_zone_range(char *messg, int z_rnum, int lower_vnum,
         (IN_ROOM(i->character)->zone == z_rnum) &&
         (IN_ROOM(i->character)->number >= lower_vnum) &&
         (IN_ROOM(i->character)->number <= upper_vnum))
-      write_to_output(i, "%s", messg);
+      i->Output( "%s", messg);
 }

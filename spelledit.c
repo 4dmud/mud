@@ -50,12 +50,12 @@ void free_action(struct social_messg *action);
 
 
 /* function protos */
-void aedit_disp_menu(struct descriptor_data *d);
-void aedit_parse(struct descriptor_data *d, char *arg);
-void aedit_setup_new(struct descriptor_data *d);
-void aedit_setup_existing(struct descriptor_data *d, int real_num);
-void aedit_save_to_disk(struct descriptor_data *d);
-void aedit_save_internally(struct descriptor_data *d);
+void aedit_disp_menu(Descriptor *d);
+void aedit_parse(Descriptor *d, char *arg);
+void aedit_setup_new(Descriptor *d);
+void aedit_setup_existing(Descriptor *d, int real_num);
+void aedit_save_to_disk(Descriptor *d);
+void aedit_save_internally(Descriptor *d);
 
 
 
@@ -63,7 +63,7 @@ void aedit_save_internally(struct descriptor_data *d);
  * Utils and exported functions.
  */
 
-void aedit_setup_new(struct descriptor_data *d)
+void aedit_setup_new(Descriptor *d)
 {
     CREATE(OLC_ACTION(d), struct social_messg, 1);
     OLC_ACTION(d)->command = str_dup(OLC_STORAGE(d));
@@ -91,7 +91,7 @@ void aedit_setup_new(struct descriptor_data *d)
 
 /*------------------------------------------------------------------------*/
 
-void aedit_setup_existing(struct descriptor_data *d, int real_num)
+void aedit_setup_existing(Descriptor *d, int real_num)
 {
     CREATE(OLC_ACTION(d), struct social_messg, 1);
     OLC_ACTION(d)->command = str_dup(soc_mess_list[real_num].command);
@@ -147,7 +147,7 @@ void aedit_setup_existing(struct descriptor_data *d, int real_num)
 
 
 
-void aedit_save_internally(struct descriptor_data *d)
+void aedit_save_internally(Descriptor *d)
 {
     struct social_messg *new_soc_mess_list = NULL;
     int i;
@@ -187,7 +187,7 @@ void aedit_save_internally(struct descriptor_data *d)
 
 /*------------------------------------------------------------------------*/
 
-void aedit_save_to_disk(struct descriptor_data *d)
+void aedit_save_to_disk(Descriptor *d)
 {
     FILE *fp;
     int i;
@@ -253,7 +253,7 @@ void aedit_save_to_disk(struct descriptor_data *d)
 /* Menu functions */
 
 /* the main menu */
-void aedit_disp_menu(struct descriptor_data *d)
+void aedit_disp_menu(Descriptor *d)
 {
     struct social_messg *action = OLC_ACTION(d);
     Character *ch = d->character;
@@ -331,7 +331,7 @@ void aedit_disp_menu(struct descriptor_data *d)
  * The main loop
  */
 
-void aedit_parse(struct descriptor_data *d, char *arg)
+void aedit_parse(Descriptor *d, char *arg)
 {
     int i;
 

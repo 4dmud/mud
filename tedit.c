@@ -28,7 +28,7 @@ extern const char *background;
 extern const char *handbook;
 extern const char *policies;
 
-void tedit_string_cleanup(struct descriptor_data *d, int terminator)
+void tedit_string_cleanup(Descriptor *d, int terminator)
 {
   FILE *fl;
   char *storage = OLC_STORAGE(d);
@@ -50,12 +50,12 @@ void tedit_string_cleanup(struct descriptor_data *d, int terminator)
       unlock_desc(d);
       fclose(fl);
       new_mudlog(CMP, LVL_GOD, TRUE, "OLC: %s saves '%s'.", GET_NAME(d->character), storage);
-      write_to_output(d, "Saved.\r\n");
+      d->Output( "Saved.\r\n");
     }
     break;
   case STRINGADD_ABORT:
     
-    write_to_output(d, "Edit aborted.\r\n");
+    d->Output( "Edit aborted.\r\n");
     act("$n stops editing some scrolls.", TRUE, d->character, 0, 0, TO_ROOM);
     break;
   default:

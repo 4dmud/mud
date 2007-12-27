@@ -36,7 +36,7 @@ struct vehicle_data *vehicles = NULL;
 
 extern struct obj_data *obj_proto;
 
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 
 void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
 
@@ -267,7 +267,7 @@ ACMD(do_oasis_vedit)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   int number = NOWHERE, add = FALSE, rem = FALSE;
-  struct descriptor_data *d;
+  Descriptor *d;
 
   /* Parse any arguments. */
   buf3 = two_arguments(argument, buf1, buf2);
@@ -377,7 +377,7 @@ ACMD(do_oasis_vedit)
   new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s starts editing vehicles", GET_NAME(ch));
 }
 
-void vedit_setup_new(struct descriptor_data *d)
+void vedit_setup_new(Descriptor *d)
 {
   CREATE(OLC_VEHICLE(d), struct vehicle_data, 1);
   OLC_VEHICLE(d)->vehicle = -1;
@@ -388,7 +388,7 @@ void vedit_setup_new(struct descriptor_data *d)
   vehicle_menu(d);
   OLC_VAL(d) = 0;
 }
-void vedit_setup_existing(struct descriptor_data *d, int num)
+void vedit_setup_existing(Descriptor *d, int num)
 {
   struct vehicle_data *vehicle, *temp;
 
@@ -397,7 +397,7 @@ void vedit_setup_existing(struct descriptor_data *d, int num)
   {
     log("vehicle doesnt exist! %d", num);
     cleanup_olc(d, CLEANUP_ALL);
-    write_to_output(d, "That vehicle doesnt exist!\r\n");
+    d->Output( "That vehicle doesnt exist!\r\n");
     return;
   }
 
@@ -418,7 +418,7 @@ void vedit_setup_existing(struct descriptor_data *d, int num)
   vehicle_menu(d);
 }
 
-void vehicle_menu(DESCRIPTOR_DATA *d)
+void vehicle_menu(Descriptor *d)
 {
   obj_rnum rnum[4];
   rnum[0] = real_object(OLC_VEHICLE(d)->vehicle);
@@ -426,7 +426,7 @@ void vehicle_menu(DESCRIPTOR_DATA *d)
   rnum[2] = real_object(OLC_VEHICLE(d)->hatch);
   rnum[3] = real_object(OLC_VEHICLE(d)->window);
 
-  write_to_output(d,
+  d->Output(
                   "{Cy---Vehicle number: {cg%d{c0\r\n"
                   "{cRA){cy Vehicle  : {cc%-5d {c0-- %s\r\n"
                   "{cRB){cy Controls : {cc%-5d {c0-- %s\r\n"
@@ -451,7 +451,7 @@ void vehicle_menu(DESCRIPTOR_DATA *d)
 
 }
 
-void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
+void vedit_parse(Descriptor *d,char *arg)
 {
   obj_vnum vnum;
   obj_rnum rnum;
@@ -468,19 +468,19 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
     switch (LOWER(*arg))
     {
     case 'a':
-      write_to_output(d, "Vnum of vehicle: ");
+      d->Output( "Vnum of vehicle: ");
       OLC_MODE(d) = VEDIT_VEHICLE;
       break;
     case 'b':
-      write_to_output(d, "Vnum of controls: ");
+      d->Output( "Vnum of controls: ");
       OLC_MODE(d) = VEDIT_CONTROLS;
       break;
     case 'c':
-      write_to_output(d, "Vnum of hatch: ");
+      d->Output( "Vnum of hatch: ");
       OLC_MODE(d) = VEDIT_HATCH;
       break;
     case 'd':
-      write_to_output(d, "Vnum of window: ");
+      d->Output( "Vnum of window: ");
       OLC_MODE(d) = VEDIT_WINDOW;
       break;
     case 'q':
@@ -509,17 +509,17 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
           cleanup_olc(d, CLEANUP_ALL);
         }
         save_vehicles();
-        write_to_output(d, "Vehicle Saved!\r\n");
+        d->Output( "Vehicle Saved!\r\n");
         return;
       }
       break;
     case 'e':
       cleanup_olc(d, CLEANUP_ALL);
-      write_to_output(d, "Vehicle Aborted!\r\n");
+      d->Output( "Vehicle Aborted!\r\n");
       return;
       break;
     default:
-      write_to_output(d, "Ah.. not a valid option.\r\n");
+      d->Output( "Ah.. not a valid option.\r\n");
       vehicle_menu(d);
       break;
     }
@@ -527,25 +527,25 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
   case VEDIT_VEHICLE:
     if (!arg || !*arg || !isdigit(*arg))
     {
-      write_to_output(d, "\r\nThat is not a number!\r\n");
+      d->Output( "\r\nThat is not a number!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((vnum = atoi(arg)) <= 0)
     {
-      write_to_output(d, "\r\nPositive numbers only!\r\n");
+      d->Output( "\r\nPositive numbers only!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((rnum = real_object(vnum)) == NOTHING)
     {
-      write_to_output(d, "That is not even an object!\r\n");
+      d->Output( "That is not even an object!\r\n");
       vehicle_menu(d);
       return;
     }
     else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_VEHICLE)
     {
-      write_to_output(d, "\r\nThat is not a vehicle object!\r\n");
+      d->Output( "\r\nThat is not a vehicle object!\r\n");
       vehicle_menu(d);
       return;
     }
@@ -555,25 +555,25 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
   case VEDIT_CONTROLS:
     if (!arg || !*arg || !isdigit(*arg))
     {
-      write_to_output(d, "\r\nThat is not a number!\r\n");
+      d->Output( "\r\nThat is not a number!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((vnum = atoi(arg)) <= 0)
     {
-      write_to_output(d, "\r\nPositive numbers only!\r\n");
+      d->Output( "\r\nPositive numbers only!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((rnum = real_object(vnum)) == NOTHING)
     {
-      write_to_output(d, "That is not even an object!\r\n");
+      d->Output( "That is not even an object!\r\n");
       vehicle_menu(d);
       return;
     }
     else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_CONTROLS)
     {
-      write_to_output(d, "\r\nThat is not a vehicle controls object!\r\n");
+      d->Output( "\r\nThat is not a vehicle controls object!\r\n");
       vehicle_menu(d);
       return;
     }
@@ -583,25 +583,25 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
   case VEDIT_HATCH:
     if (!arg || !*arg || !isdigit(*arg))
     {
-      write_to_output(d, "\r\nThat is not a number!\r\n");
+      d->Output( "\r\nThat is not a number!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((vnum = atoi(arg)) <= 0)
     {
-      write_to_output(d, "\r\nPositive numbers only!\r\n");
+      d->Output( "\r\nPositive numbers only!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((rnum = real_object(vnum)) == NOTHING)
     {
-      write_to_output(d, "That is not even an object!\r\n");
+      d->Output( "That is not even an object!\r\n");
       vehicle_menu(d);
       return;
     }
     else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_HATCH)
     {
-      write_to_output(d, "\r\nThat is not a vehicle hatch object!\r\n");
+      d->Output( "\r\nThat is not a vehicle hatch object!\r\n");
       vehicle_menu(d);
       return;
     }
@@ -611,25 +611,25 @@ void vedit_parse(DESCRIPTOR_DATA *d,char *arg)
   case VEDIT_WINDOW:
     if (!arg || !*arg || !isdigit(*arg))
     {
-      write_to_output(d, "\r\nThat is not a number!\r\n");
+      d->Output( "\r\nThat is not a number!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((vnum = atoi(arg)) <= 0)
     {
-      write_to_output(d, "\r\nPositive numbers only!\r\n");
+      d->Output( "\r\nPositive numbers only!\r\n");
       vehicle_menu(d);
       return;
     }
     else if ((rnum = real_object(vnum)) == NOTHING)
     {
-      write_to_output(d, "That is not even an object!\r\n");
+      d->Output( "That is not even an object!\r\n");
       vehicle_menu(d);
       return;
     }
     else if (GET_OBJ_TYPE(obj_proto + rnum) != ITEM_V_WINDOW)
     {
-      write_to_output(d, "\r\nThat is not a vehicle object!\r\n");
+      d->Output( "\r\nThat is not a vehicle object!\r\n");
       vehicle_menu(d);
       return;
     }

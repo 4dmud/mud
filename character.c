@@ -85,10 +85,41 @@ size_t Character::Send(const char *messg, ...) {
     va_list args;
     
     va_start(args, messg);
-    left = vwrite_to_output(this->desc, messg, args);
+    left = this->desc->vwrite_to_output(messg, args);
     va_end(args);
     return left;
   }
   return 0;
+}
+
+void Character::send_char_pos(int dam)
+{
+  switch (GET_POS(this)) {
+  case POS_MORTALLYW:
+    act("$n is mortally wounded, and will die soon, if not aided.",
+        TRUE, this, 0, 0, TO_ROOM);
+    this->Send( "You are mortally wounded, and will die soon, if not aided.\r\n");
+    break;
+  case POS_INCAP:
+    act("$n is incapacitated and will slowly die, if not aided.", TRUE,
+        this, 0, 0, TO_ROOM);
+    this->Send( "You are incapacitated and will slowly die, if not aided.\r\n");
+    break;
+  case POS_STUNNED:
+    act("$n is stunned, but will probably regain consciousness again.",
+        TRUE, this, 0, 0, TO_ROOM);
+    this->Send( "You're stunned, but will probably regain consciousness again.\r\n");
+    break;
+  case POS_DEAD:
+    act("$n is dead!  R.I.P.", FALSE, this, 0, 0, TO_ROOM);
+    this->Send( "You are dead!  Sorry...\r\n");
+    break;
+  default:             /* >= POSITION SLEEPING */
+    if (dam > (GET_MAX_HIT(this) >> 2))
+      act("That really did HURT!", FALSE, this, 0, 0, TO_CHAR);
+    if (GET_HIT(this) < (GET_MAX_HIT(this) >> 2))
+      this->Send("%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
+               CCRED(this, C_SPR), CCNRM(this, C_SPR));
+  }
 }
 

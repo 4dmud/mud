@@ -21,7 +21,7 @@
 #include "handler.h"
 #include "interpreter.h"
 
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern struct time_data time_info;
 extern struct room_data *world_vnum[];
 
@@ -579,7 +579,7 @@ int touch(const char *path)
 void new_mudlog(int type, int level, int file, const char *str, ...)
 {
   char buf[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  Descriptor *i;
   va_list args;
 
   if (str == NULL)
@@ -625,7 +625,7 @@ void new_mudlog(int type, int level, int file, const char *str, ...)
 void mudlog(const char *str, int type, int level, int file)
 {
   char buf[MAX_STRING_LENGTH], tp;
-  struct descriptor_data *i;
+  Descriptor *i;
 
   if (str == NULL)
     return;              /* eh, oh well. */
@@ -649,9 +649,9 @@ void mudlog(const char *str, int type, int level, int file)
     if (tp < type)
       continue;
 
-    write_to_output(i, "%s", CCGRN(i->character, C_NRM));
-    write_to_output(i, "%s", buf);
-    write_to_output(i, "%s", CCNRM(i->character, C_NRM));
+    i->Output( "%s", CCGRN(i->character, C_NRM));
+    i->Output( "%s", buf);
+    i->Output( "%s", CCNRM(i->character, C_NRM));
   }
 
 }
@@ -1356,7 +1356,7 @@ int get_pidx_from_name(Character *ch)
 //                       parse_multiclass);
 // ONLY USE FROM CON_PLAYING STATE()'s!
 
-void line_input(struct descriptor_data *d, const char *prompt,
+void line_input(Descriptor *d, const char *prompt,
                 C_FUNC(*callback), void *info)
 {
   lock_desc(d);
@@ -1365,7 +1365,7 @@ void line_input(struct descriptor_data *d, const char *prompt,
   d->c_data = (char *) info;
   ORIG_STATE(d) = STATE(d);
   STATE(d) = CON_LINE_INPUT;
-  SEND_TO_Q(prompt, d);
+  d->Output("%s", prompt);
   unlock_desc(d);
 }
 

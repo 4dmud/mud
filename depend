@@ -57,7 +57,11 @@ cali.o: cali.c conf.h sysdep.h structs.h subskills.h utils.h comm.h \
   dg_scripts.h
 cedit.o: cedit.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h utils.h db.h constants.h genolc.h oasis.h improved-edit.h
-character.o: character.c conf.h sysdep.h structs.h subskills.h comm.h \
+character.o: character.c conf.h sysdep.h structs.h subskills.h utils.h \
+  comm.h interpreter.h handler.h db.h house.h dg_scripts.h screen.h \
+  arena.h mail.h dg_event.h clan.h oasis.h genolc.h constants.h ident.h \
+  auction.h
+chcreate.o: chcreate.c conf.h sysdep.h structs.h subskills.h comm.h \
   interpreter.h db.h utils.h spells.h handler.h mail.h screen.h \
   dg_scripts.h clan.h constants.h genolc.h oasis.h tedit.h \
   improved-edit.h

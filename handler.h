@@ -138,7 +138,7 @@ int Crash_load_xapobjs(Character *ch);
 
 void stop_follower(Character *ch);
 
-int lock_desc(struct descriptor_data *d);
-int unlock_desc(struct descriptor_data *d);
-int is_locked(struct descriptor_data *d);
+int lock_desc(Descriptor *d);
+int unlock_desc(Descriptor *d);
+int is_locked(Descriptor *d);
 

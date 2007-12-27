@@ -2875,7 +2875,7 @@ void display_help(Character *ch, unsigned int i)
   }
 }
 
-void display_help_list(struct descriptor_data *d, char *keywords)
+void display_help_list(Descriptor *d, char *keywords)
 {
   unsigned int i, cnt = 0;
   char buf[MAX_STRING_LENGTH];
@@ -2918,7 +2918,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
   }
   if (cnt == 0)
   {
-    write_to_output(d, "No help found on that topic, this has been logged please check for this help file in the future.\r\n");
+    d->Output( "No help found on that topic, this has been logged please check for this help file in the future.\r\n");
     log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(d->character), keywords);
     return;
   }
@@ -3206,7 +3206,7 @@ char *WHO_USAGE =
 
 ACMD(do_who)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *wch;
   char name_search[MAX_INPUT_LENGTH + 1];
   char mode;
@@ -3678,7 +3678,7 @@ ACMD(do_users)
   char state[30], *timeptr, mode;
   char name_search[MAX_INPUT_LENGTH], host_search[MAX_INPUT_LENGTH];
   Character *tch;
-  struct descriptor_data *d;
+  Descriptor *d;
   size_t i;
   int low = 0, high = LVL_IMPL, num_can_see = 0;
   int showclass = 0, outlaws = 0, playing = 0, deadweight = 0;
@@ -3926,7 +3926,7 @@ ACMD(do_gen_ps)
 void perform_mortal_where(Character *ch, char *arg)
 {
   register Character *i;
-  register struct descriptor_data *d;
+  register Descriptor *d;
 
   if (!*arg)
   {
@@ -4039,7 +4039,7 @@ void perform_immort_where(Character *ch, char *arg)
 {
   register Character *i;
   register struct obj_data *k;
-  struct descriptor_data *d;
+  Descriptor *d;
   int num = 0, counter = 0, found = 0;
   char buf[ MAX_STRING_LENGTH];
   DYN_DEFINE;

@@ -70,7 +70,7 @@ void print_ignorelist(Character *ch, Character *vict)
   temp = GET_IGNORELIST(ch);
   while (temp != NULL)
   {
-    new_send_to_char(vict, "%s\r\n", temp->ignore);
+    vict->Send( "%s\r\n", temp->ignore);
     temp = temp->next;
   }
   return;

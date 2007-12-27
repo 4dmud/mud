@@ -10,6 +10,10 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.40  2006/05/22 10:50:49  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.39  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -196,7 +200,6 @@ void dismount_char(Character *ch);
 int highest_tier(Character *ch);
 void Crash_crashsave(Character *ch);
 
-void send_char_pos(Character *ch, int dam);
 char *fread_action(FILE * fl, int nr);
 ACMD(do_get);
 ACMD(do_split);
@@ -2560,7 +2563,7 @@ int fe_after_damage(Character* ch, Character* vict,
         if ( number(1,100) > GET_PERM_EVASION(vict) && number(1, 1000) < 5 )
         {
           GET_PERM_EVASION(vict)++;
-          new_send_to_char(vict, "Your natural evasion rating just increased to %d!\r\n", GET_PERM_EVASION(vict));
+          vict->Send( "Your natural evasion rating just increased to %d!\r\n", GET_PERM_EVASION(vict));
         }
       }
 
@@ -2577,7 +2580,7 @@ int fe_after_damage(Character* ch, Character* vict,
   }
 
   update_pos(vict);
-  send_char_pos(vict, dam);
+  vict->send_char_pos(dam);
 
   if (!SELF(ch, vict))
   {
@@ -2896,7 +2899,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type)
 
     ch->Send( "%s parries your attack with a swift %s.\r\n",
                      PERS(vict,ch), attack_hit_text[v_type].singular);
-    new_send_to_char(vict,  "You parry %s's attack with a swift %s.\r\n",
+    vict->Send(  "You parry %s's attack with a swift %s.\r\n",
                      PERS(ch, vict), attack_hit_text[v_type].singular);
     return 1;
   }
@@ -2905,7 +2908,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type)
     if (skill_cost(0, 2, 20, vict))
     {
       ch->Send( "%s dodges your attack.\r\n", PERS(vict,ch));
-      new_send_to_char(vict,  "You dodge %s's attack.\r\n", PERS(ch, vict));
+      vict->Send(  "You dodge %s's attack.\r\n", PERS(ch, vict));
       return 1;
     }
     else
@@ -2937,7 +2940,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type)
   if (number(1, 30) < GET_DEX(vict) && IS_WEAPON(v_type) && AFF_FLAGGED(vict, AFF_DRUNKEN_MASTER) && number(1, 200) < (70-GET_LEVEL(vict)))
   {
     ch->Send( "%s weaves drunkenly out of your reach!\r\n", PERS(vict,ch));
-    new_send_to_char(vict, "You weave drunkenly out of %s's reach!\r\n",  PERS(ch, vict));
+    vict->Send( "You weave drunkenly out of %s's reach!\r\n",  PERS(ch, vict));
     return 1;
   }
 
@@ -4505,7 +4508,7 @@ void update_pos(Character *victim)
 {
   if (AFF_FLAGGED(victim, AFF_MEDITATE) && GET_POS(victim) > POS_SLEEPING)
   {
-    new_send_to_char(victim, "You stop meditating and become more alert.\r\n");
+    victim->Send( "You stop meditating and become more alert.\r\n");
     affect_from_char(victim, SKILL_MEDITATE);
   }
 
@@ -4882,7 +4885,7 @@ void delay_die(Character *ch, Character *killer)
 }
 Character * char_by_id_desc_list(long idnum)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   if (!descriptor_list)
     return NULL;
 
@@ -5219,9 +5222,9 @@ int skill_message(int dam, Character *ch, Character *vict, int attacktype)
           act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
           ch->Send( "%s", CCNRM(ch, C_CMP));
 
-          new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
+          vict->Send( "%s", CCRED(vict, C_CMP));
           act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
-          new_send_to_char(vict, "%s", CCNRM(vict, C_CMP));
+          vict->Send( "%s", CCNRM(vict, C_CMP));
 
           for (people = IN_ROOM(ch)->people; people; people = people->next_in_room)
           {
@@ -5238,9 +5241,9 @@ int skill_message(int dam, Character *ch, Character *vict, int attacktype)
           act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
           ch->Send( "%s", CCNRM(ch, C_CMP));
 
-          new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
+          vict->Send( "%s", CCRED(vict, C_CMP));
           act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
-          new_send_to_char(vict, "%s", CCNRM(vict, C_CMP));
+          vict->Send( "%s", CCNRM(vict, C_CMP));
 
           for (people = IN_ROOM(ch)->people; people; people = people->next_in_room)
           {
@@ -5260,9 +5263,9 @@ int skill_message(int dam, Character *ch, Character *vict, int attacktype)
         act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
         ch->Send( "%s", CCNRM(ch, C_CMP));
 
-        new_send_to_char(vict, "%s", CCRED(vict, C_CMP));
+        vict->Send( "%s", CCRED(vict, C_CMP));
         act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
-        new_send_to_char(vict, "%s", CCNRM(vict, C_CMP));
+        vict->Send( "%s", CCNRM(vict, C_CMP));
 
         for (people = IN_ROOM(ch)->people; people; people = people->next_in_room)
         {

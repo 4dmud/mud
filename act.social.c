@@ -22,7 +22,7 @@
 
 /* extern variables */
 extern struct room_data *world_vnum[];
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 struct command_info *complete_cmd_info;
 
 /* extern functions */

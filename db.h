@@ -388,7 +388,7 @@ extern struct obj_data *object_list;
 extern struct obj_data *dead_obj;	/* delayed obj removal   */
     extern int top_of_zone_table;
 #endif /* __DB_C__ */
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 extern Character *character_list;
 extern struct player_index_element *player_table;
 extern int top_of_p_table;

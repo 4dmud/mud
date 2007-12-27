@@ -174,18 +174,18 @@ void assemblyListToChar( Character *pCharacter )
   }
   else if( g_pAssemblyTable == NULL )
   {
-    new_send_to_char(pCharacter, "No assemblies exist.\r\n");
+    pCharacter->Send( "No assemblies exist.\r\n");
     return;
   }
 
   /* Send out a "header" of sorts. */
-  new_send_to_char(pCharacter, "The following assemblies exists:\r\n");
+  pCharacter->Send( "The following assemblies exists:\r\n");
 
   for( i = 0; i < g_lNumAssemblies; i++ )
   {
     if( (lRnum = real_object( g_pAssemblyTable[ i ].lVnum )) < 0 )
     {
-      new_send_to_char(pCharacter, "[-----] ***RESERVED***\r\n");
+      pCharacter->Send( "[-----] ***RESERVED***\r\n");
       log( "SYSERR: assemblyListToChar(): Invalid vnum #%ld in assembly table.", g_pAssemblyTable[i].lVnum);
     }
     else
@@ -193,25 +193,25 @@ void assemblyListToChar( Character *pCharacter )
       sprinttype(g_pAssemblyTable[ i ].uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
       sprintf( szBuffer, "[%5ld] %s (%s)\r\n", g_pAssemblyTable[ i ].lVnum,
                obj_proto[ lRnum ].short_description, szAssmType );
-      new_send_to_char(pCharacter, szBuffer);
+      pCharacter->Send( szBuffer);
 
       for( j = 0; j < g_pAssemblyTable[ i ].lNumComponents; j++ )
       {
         if( (lRnum = real_object( g_pAssemblyTable[ i ].pComponents[ j ].lVnum )) < 0 )
         {
-          new_send_to_char(pCharacter, " -----: ***RESERVED***\r\n");
+          pCharacter->Send( " -----: ***RESERVED***\r\n");
           log( "SYSERR: assemblyListToChar(): Invalid component vnum #%ld in assembly for vnum #%ld.",
                g_pAssemblyTable[ i ].pComponents[ j ].lVnum, g_pAssemblyTable[ i ].lVnum );
         }
         else
         {
-        new_send_to_char(pCharacter, " %5ld: %-20.20s Extract=%-3.3s InRoom=%-3.3s\r\n",+           g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
+        pCharacter->Send( " %5ld: %-20.20s Extract=%-3.3s InRoom=%-3.3s\r\n",+           g_pAssemblyTable[ i ].pComponents[ j ].lVnum,
                    obj_proto[ lRnum ].short_description,
                    (g_pAssemblyTable[ i ].pComponents[ j ].bExtract ? "Yes" : "No"),
                    (g_pAssemblyTable[ i ].pComponents[ j ].bInRoom  ? "Yes" : "No") );
         }
       }
-    new_send_to_char(pCharacter, "Script: %d", g_pAssemblyTable[ i ].trigVnum);
+    pCharacter->Send( "Script: %d", g_pAssemblyTable[ i ].trigVnum);
     }
   }
 }

@@ -14,7 +14,7 @@
  *  Copyright (C) 1997 by Joachim Pileborg
  *  All rights reserved.
  *
- * $Id: ident.h,v 1.1 2004/11/12 02:15:44 w4dimenscor Exp $
+ * $Id: ident.h,v 1.2 2006/05/22 10:50:49 w4dimenscor Exp $
  */
 
 #include <netinet/in.h>
@@ -38,9 +38,7 @@ struct message
 
 /*******************************************************************/
 
-struct descriptor_data;
-
-void id_lookup(struct descriptor_data *d);
+void id_lookup(Descriptor *d);
 int  id_init(void);
 void id_kill(void);
 

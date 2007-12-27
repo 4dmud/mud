@@ -428,7 +428,7 @@ int Board_remove_msg(int board_type, Character *ch, char *arg,
 {
   int ind, msg, slot_num, id;
   char num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-  struct descriptor_data *d;
+  Descriptor *d;
 
   one_argument(arg, num);
 

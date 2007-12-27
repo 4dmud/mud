@@ -255,40 +255,6 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
   affect_to_char(ch, &af);
 }
 
-void send_char_pos(Character *ch, int dam)
-{
-   switch (GET_POS(ch)) {
-   case POS_MORTALLYW:
-	act("$n is mortally wounded, and will die soon, if not aided.",
-	    TRUE, ch, 0, 0, TO_ROOM);
-	new_send_to_char
-	    (ch, "You are mortally wounded, and will die soon, if not aided.\r\n");
-	break;
-    case POS_INCAP:
-	act("$n is incapacitated and will slowly die, if not aided.", TRUE,
-	    ch, 0, 0, TO_ROOM);
-	new_send_to_char
-	    (ch, "You are incapacitated and will slowly die, if not aided.\r\n");
-	break;
-    case POS_STUNNED:
-	act("$n is stunned, but will probably regain consciousness again.",
-	    TRUE, ch, 0, 0, TO_ROOM);
-	new_send_to_char
-	    (ch, "You're stunned, but will probably regain consciousness again.\r\n");
-	break;
-    case POS_DEAD:
-	act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
-	ch->Send( "You are dead!  Sorry...\r\n");
-	break;
-    default:			/* >= POSITION SLEEPING */
-	if (dam > (GET_MAX_HIT(ch) >> 2))
-	    act("That really did HURT!", FALSE, ch, 0, 0, TO_CHAR);
-	if (GET_HIT(ch) < (GET_MAX_HIT(ch) >> 2))
-	    ch->Send(
-                    "%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
-                    CCRED(ch, C_SPR), CCNRM(ch, C_SPR));
-    }
-}
 
 
 /* Used throughout the xxxcmds.c files for checking if a char

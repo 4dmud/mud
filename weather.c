@@ -148,7 +148,7 @@ void another_hour(int mode)
 void weather_change(int zon)
 {
     int diff, change, i;
-    struct descriptor_data *j;
+    Descriptor *j;
     char buf[MAX_STRING_LENGTH];
 
     
@@ -257,7 +257,7 @@ continue;
 		if (!j->connected && j->character && AWAKE(j->character) &&
 		    OUTSIDE(j->character) &&
 		    (zone_table[j->character->in_room->zone].number == i))
-		    write_to_output(j, "%s", buf);
+		    j->Output( "%s", buf);
        unlock_desc(j);
      }
 	}

@@ -920,7 +920,7 @@ ACMD(do_finger)
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   char state[MAX_INPUT_LENGTH];
-  DESCRIPTOR_DATA *d;
+  Descriptor *d;
   int id = 0;
 
   one_argument(argument, arg);

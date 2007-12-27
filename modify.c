@@ -25,7 +25,7 @@
 #include "oasis.h"
 #include "tedit.h"
 
-void show_string(struct descriptor_data *d, char *input);
+void show_string(Descriptor *d, char *input);
 
 extern struct spell_info_type spell_info[];
 extern const char *unused_spellname;	/* spell_parser.c */
@@ -35,12 +35,12 @@ void smash_tilde(char *str);
 ACMD(do_skillset);
 char *next_page(char *str, int length,int width);
 int count_pages(char *str, int length,int width);
-void paginate_string(char *str, struct descriptor_data *d);
-void playing_string_cleanup(struct descriptor_data *d, int action);
-void exdesc_string_cleanup(struct descriptor_data *d, int action);
-void trigedit_string_cleanup(struct descriptor_data *d, int terminator);
-void help_string_cleanup(struct descriptor_data *d, int action);
-void note_string_cleanup(struct descriptor_data *d, int action);
+void paginate_string(char *str, Descriptor *d);
+void playing_string_cleanup(Descriptor *d, int action);
+void exdesc_string_cleanup(Descriptor *d, int action);
+void trigedit_string_cleanup(Descriptor *d, int terminator);
+void help_string_cleanup(Descriptor *d, int action);
+void note_string_cleanup(Descriptor *d, int action);
 Character *find_char(long n);
 
 
@@ -109,7 +109,7 @@ void smash_tilde(char *str)
  * else you may want through it.  The improved editor patch when updated
  * could use it to pass the old text buffer, for instance.
  */
-void string_write(struct descriptor_data *d, char **writeto, size_t len, long mailto, void *data)
+void string_write(Descriptor *d, char **writeto, size_t len, long mailto, void *data)
 {
   lock_desc(d);
   if (d->character && !IS_NPC(d->character))
@@ -129,7 +129,7 @@ void string_write(struct descriptor_data *d, char **writeto, size_t len, long ma
  * Add user input to the 'current' string (as defined by d->str).
  * This is still overly complex.
  */
-void string_add(struct descriptor_data *d, char *str)
+void string_add(Descriptor *d, char *str)
 {
   int action;
 
@@ -231,7 +231,7 @@ void string_add(struct descriptor_data *d, char *str)
     struct
     {
       int mode;
-      void (*func)(struct descriptor_data *d, int action);
+      void (*func)(Descriptor *d, int action);
     }
     cleanup_modes[] = {
                         { CON_CEDIT  , cedit_string_cleanup },
@@ -264,7 +264,7 @@ void string_add(struct descriptor_data *d, char *str)
   unlock_desc(d);
 }
 
-void playing_string_cleanup(struct descriptor_data *d, int action)
+void playing_string_cleanup(Descriptor *d, int action)
 {
   if (PLR_FLAGGED(d->character, PLR_MAILING))
   {
@@ -272,7 +272,7 @@ void playing_string_cleanup(struct descriptor_data *d, int action)
     {
       Character *to;
       store_mail(d->mail_to, GET_IDNUM(d->character), *d->str);
-      write_to_output(d, "Message sent!\r\n");
+      d->Output( "Message sent!\r\n");
       if ((to = find_char(d->mail_to)) != NULL)
       {
         HAS_MAIL(to) = -1;
@@ -281,7 +281,7 @@ void playing_string_cleanup(struct descriptor_data *d, int action)
 
     }
     else
-      write_to_output(d, "Mail aborted.\r\n");
+      d->Output( "Mail aborted.\r\n");
     free(*d->str);
     free(d->str);
   }
@@ -294,32 +294,32 @@ void playing_string_cleanup(struct descriptor_data *d, int action)
     Board_save_board(d->mail_to - BOARD_MAGIC);
 
     if (action == STRINGADD_ABORT)
-      write_to_output(d, "Post not aborted, use REMOVE <post #>.\r\n");
+      d->Output( "Post not aborted, use REMOVE <post #>.\r\n");
     else
-      write_to_output(d, "Posted!\r\n");
+      d->Output( "Posted!\r\n");
 
   }
 
   return;
 }
 
-void help_string_cleanup(struct descriptor_data *d, int action)
+void help_string_cleanup(Descriptor *d, int action)
 {
    hedit_disp_menu(d);
   return;
 }
-void note_string_cleanup(struct descriptor_data *d, int action)
+void note_string_cleanup(Descriptor *d, int action)
 {
-  write_to_output(d,  "Note Written, NOTE POST to submit it.\r\n");
+  d->Output(  "Note Written, NOTE POST to submit it.\r\n");
   return;
 }
 
-void exdesc_string_cleanup(struct descriptor_data *d, int action)
+void exdesc_string_cleanup(Descriptor *d, int action)
 {
   if (action == STRINGADD_ABORT)
-    write_to_output(d, "Description aborted.\r\n");
+    d->Output( "Description aborted.\r\n");
 
-  write_to_output(d, "%s", CONFIG_MENU);
+  d->Output( "%s", CONFIG_MENU);
   STATE(d) = CON_MENU;
 }
 
@@ -595,7 +595,7 @@ int count_pages(char *str, int length, int width)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(char *str, struct descriptor_data *d)
+void paginate_string(char *str, Descriptor *d)
 {
   int i;
   int length = 20, width = 80;
@@ -625,7 +625,7 @@ return;
 
 
 /* The call that gets the paging ball rolling... */
-void page_string(struct descriptor_data *d, char *str, int keep_internal)
+void page_string(Descriptor *d, char *str, int keep_internal)
 {
   char actbuf[MAX_INPUT_LENGTH] = "";
   int length = 20, width = 80;
@@ -670,7 +670,7 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
 
 
 /* The call that displays the next page. */
-void show_string(struct descriptor_data *d, char *input)
+void show_string(Descriptor *d, char *input)
 {
   char buffer[MAX_STRING_LENGTH], buf[MAX_INPUT_LENGTH];
   int diff;

@@ -38,7 +38,7 @@ ACMD(do_rdig)
   room_rnum rrnum = NULL;
   zone_rnum zone;
   int dir = 0, rawvnum;
-  struct descriptor_data *d = ch->desc; /* will save us some typing */
+  Descriptor *d = ch->desc; /* will save us some typing */
   
   /* Grab the room's name (if available). */
   new_room_name = two_arguments(argument, sdir, sroom);
@@ -201,7 +201,7 @@ ACMD(do_room_copy)
    int  j, buf_num;
    room_rnum room_num;
    zone_rnum dst_zone;
-   struct descriptor_data *dsc;
+   Descriptor *dsc;
    char buf[MAX_INPUT_LENGTH];
      
    one_argument(argument, buf);
@@ -410,7 +410,7 @@ int buildwalk(Character *ch, int dir) {
     } else if ((vnum = redit_find_new_vnum(IN_ROOM(ch)->zone)) == NOWHERE)
     ch->Send( "No free vnums are available in this zone!\r\n");
     else {
-      struct descriptor_data *d = ch->desc;
+      Descriptor *d = ch->desc;
       /*
        * Give the descriptor an olc struct.
        * This way we can let redit_save_internally handle the room adding.

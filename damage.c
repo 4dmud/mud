@@ -88,13 +88,13 @@ void damage_vict(Character *vict, int dam)
 {
   if (GET_LEVEL(vict)>=LVL_IMMORT && (dam > 0))
   {
-    new_send_to_char(vict, "Being the cool immortal you are, you sidestep a trap,\r\n"
+    vict->Send( "Being the cool immortal you are, you sidestep a trap,\r\n"
                      "obviously placed to kill you.\r\n");
     return;
   }
   alter_hit(vict, dam);
   update_pos(vict);
-  send_char_pos(vict, dam);
+  vict->send_char_pos(dam);
 }
 
 void script_damage(Character *vict, int dam)
@@ -151,7 +151,7 @@ int damage(Character *ch, Character *victim, int dam,
 
   if (!IS_NPC(ch) && GET_LEVEL(victim)>=LVL_IMMORT && (dam > 0))
   {
-    new_send_to_char(victim, "Being the cool immortal you are, you sidestep a trap,\r\n"
+    victim->Send( "Being the cool immortal you are, you sidestep a trap,\r\n"
                      "obviously placed to kill you.\r\n");
     return 0;
   }

@@ -34,7 +34,7 @@ extern Character *mob_proto;
 extern struct room_data *world_vnum[];
 extern zone_rnum top_of_zone_table;
 extern struct zone_data *zone_table;
-extern struct descriptor_data *descriptor_list;
+extern Descriptor *descriptor_list;
 
 /******************************************************************************/
 /** External Functions                                                       **/
@@ -73,10 +73,10 @@ void free_config(struct config_data *data);
 /*
  * Only player characters should be using OLC anyway.
  */
-void clear_screen(struct descriptor_data *d)
+void clear_screen(Descriptor *d)
 {
   if (PRF_FLAGGED(d->character, PRF_CLS))
-    write_to_output(d, "[H[J");
+    d->Output( "[H[J");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -208,7 +208,7 @@ void get_char_colors(Character *ch)
  * attatched to a descriptor, sets all flags back to how they
  * should be.
  */
-void cleanup_olc(struct descriptor_data *d, byte cleanup_type)
+void cleanup_olc(Descriptor *d, byte cleanup_type)
 {
   /*
    * Clean up WHAT?

@@ -23,7 +23,7 @@
 
 /* from modify.c */
 void smash_tilde(char *str);
-int genolc_checkstring(struct descriptor_data *d, char *arg);
+int genolc_checkstring(Descriptor *d, char *arg);
 
 int remove_from_save_list(zone_vnum, int type);
 int add_to_save_list(zone_vnum, int type);

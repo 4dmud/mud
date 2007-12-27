@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.35  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.34  2006/05/21 11:02:25  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -1139,7 +1143,7 @@ ACMD(do_comm)
 
 ACMD(do_page)
 {
-  struct descriptor_data *d;
+  Descriptor *d;
   Character *vict;
   char arg[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -1209,7 +1213,7 @@ int has_char(const char *txt, char character)
 
 ACMD(do_gen_comm)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
   char color_on[24];
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
@@ -1469,7 +1473,7 @@ ACMD(do_gen_comm)
 
 ACMD(do_qcomm)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
   char buf[MAX_INPUT_LENGTH];
   char buf1[MAX_INPUT_LENGTH];
 
@@ -1534,7 +1538,7 @@ ACMD(do_qcomm)
  */
 ACMD(do_ctell)
 {
-  struct descriptor_data *i;
+  Descriptor *i;
   int minlev = 1, c = 0;
   char level_string[128] = "";
 
@@ -1647,9 +1651,9 @@ ACMD(do_ctell)
               if ((i->character) != ch)
               {
                 if(GET_LEVEL(i->character)<LVL_HERO || c==find_clan_by_id(GET_CLAN(i->character)))
-                   write_to_output(i, "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
+                   i->Output( "%s tells your clan%s, '%s'\r\n", PERS(ch, i->character), level_string, argument);
                 else
-                   write_to_output(i, "%s tells the %s%s, '%s'\r\n", PERS(ch, i->character),clan[c].name, level_string, argument);
+                   i->Output( "%s tells the %s%s, '%s'\r\n", PERS(ch, i->character),clan[c].name, level_string, argument);
               }
             }
           }

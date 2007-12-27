@@ -4,11 +4,15 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/05/21 11:02:26 $
-*  $Revision: 1.23 $
+*  $Date: 2006/05/22 10:50:48 $
+*  $Revision: 1.24 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.24  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.23  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -1627,7 +1631,7 @@ ACMD(do_detach)
 void script_vlog(const char *format, va_list args)
 {
   char output[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  Descriptor *i;
 
   snprintf(output, sizeof(output), "SCRIPT ERR: %s", format);
 

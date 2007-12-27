@@ -27,6 +27,10 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.18  2006/05/22 10:50:48  w4dimenscor
+ * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
+ * struct descriptor_data has been converted to class Descriptor
+ *
  * Revision 1.17  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -1207,7 +1211,7 @@ ACMD(do_mforce)
 
   if (!str_cmp(arg, "all"))
   {
-    struct descriptor_data *i;
+    Descriptor *i;
     Character *vch;
 
     for (i = descriptor_list; i; i = i->next)
