@@ -67,7 +67,7 @@ void write_ignorelist(Character *ch) {
     }
     for (vector<string>::iterator s = GET_IGNORELIST(ch).begin();s != GET_IGNORELIST(ch).end();s++) {
         if (valid_to_save((*s).c_str()))
-            fprintf(file, "%d\n%s\n", (*s).length(), (*s).c_str());
+            fprintf(file, "%d\n%s\n", (int)((*s).length()), (*s).c_str());
     }
     fclose(file);
 }
@@ -84,7 +84,7 @@ void read_ignorelist(Character *ch) {
 
 
     do {
-        if (!fscanf(file, "%d\n", &ignorelength)) {
+        if (!fscanf(file, "%d\n", (int *)(&ignorelength))) {
             fclose(file);
             return;
         }
