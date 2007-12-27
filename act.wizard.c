@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.23  2005/06/02 08:21:03  w4dimenscor
+ * update to save file
+ *
  * Revision 1.22  2005/05/28 05:52:14  w4dimenscor
  * Fixed some errors in copyover, added MXP
  *
@@ -5350,8 +5353,8 @@ ACMD(do_set)
   }
   else if (is_file)
   {
-    new_send_to_char(ch, "This has been disabled as it is more trouble then it is worth.\r\n");
-    return;
+//    new_send_to_char(ch, "This has been disabled as it is more trouble then it is worth.\r\n");
+  //  return;
     /* try to load the player off disk */
     CREATE(cbuf, struct char_data, 1);
     clear_char(cbuf);
@@ -6539,7 +6542,9 @@ void change_plrindex_name(long id, char *change)
 ACMD(do_namechange)
 {
   DESCRIPTOR_DATA *d;
-  char newname[256], oldname[256], passw[256];
+  struct char_data *ch = NULL;
+  int loaded = 0;
+  char newname[MAX_INPUT_LENGTH], oldname[MAX_INPUT_LENGTH], passw[MAX_INPUT_LENGTH];
 
   argument = two_arguments(argument, oldname, newname);
   one_argument(argument, passw);
@@ -6556,17 +6561,35 @@ ACMD(do_namechange)
     return;
   }
   newname[0] = UPPER(newname[0]);
+  
+
 
   for (d = descriptor_list; d; d = d->next)
   {
-    if (!IS_PLAYING(d))
-      continue;
-    if (compares(GET_NAME(d->character), oldname))
+    if (!IS_PLAYING(d)) {
+      if (compares(GET_NAME(d->character), oldname))
     {
+    new_send_to_char(ch, "This player is in a state that cant be changed just yet.\r\n");
+    return;
+       }
+  } else if (compares(GET_NAME(d->character), oldname)) {
+  ch = d->character;
+  break;
+  }
+  }
+      if (!ch) {
+      if (get_id_by_name(oldname) == -1) {
+      new_send_to_char(ch, "A player by that name doesn't exist here.\r\n");
+      return;
+      }
+      return;
+         //CREATE(ch
+      }
+  
       free_string(&GET_PC_NAME(d->character));
       GET_PC_NAME(d->character) = str_dup(newname);
       newname[0] = LOWER(newname[0]);
-      sprintf(passw, "%s", CRYPT(GET_PC_NAME(d->character), GET_PASSWD(d->character)));
+      snprintf(passw,  "%s", CRYPT(GET_PC_NAME(d->character), GET_PASSWD(d->character)));
       strncpy(GET_PASSWD(d->character),
               CRYPT(passw, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);
       *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
@@ -6577,8 +6600,7 @@ ACMD(do_namechange)
       change_plrindex_name(GET_IDNUM(d->character), newname);
       new_send_to_char(ch, "%s's name changed to %s.\r\n", oldname, newname);
       return;
-    }
-  }
+ 
   new_send_to_char(ch, "%s's not playing.\r\n", oldname);
 }
 

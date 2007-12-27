@@ -5502,8 +5502,8 @@ void char_to_store(struct char_data *ch)
     log("SYSERR: Massive fuck up in char to store.");
     return;
   }
-  if (!ch->desc)
-    return;
+  //if (!ch->desc)
+    //return;
 
   for (i = 0; (*(bits + i) = LOWER(*(GET_NAME(ch) + i))); i++);
 

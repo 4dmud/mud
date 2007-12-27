@@ -1,9 +1,9 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="10" >
+ <DocsAndViews NumberOfDocuments="12" >
   <Doc0 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/db.c" >
-   <View0 Type="Source" />
+   <View0 line="4529" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/comm.c" >
    <View0 line="5236" Type="Source" />
@@ -12,7 +12,7 @@
    <View0 Type="Source" />
   </Doc2>
   <Doc3 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/color.c" >
-   <View0 line="0" Type="Source" />
+   <View0 Type="Source" />
   </Doc3>
   <Doc4 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/utils.c" >
    <View0 Type="Source" />
@@ -27,11 +27,17 @@
    <View0 Type="Source" />
   </Doc7>
   <Doc8 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/comm.h" >
-   <View0 line="18" Type="Source" />
+   <View0 Type="Source" />
   </Doc8>
   <Doc9 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/interpreter.c" >
-   <View0 line="2678" Type="Source" />
+   <View0 line="2677" Type="Source" />
   </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
+   <View0 line="6581" Type="Source" />
+  </Doc10>
+  <Doc11 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/structs.h" >
+   <View0 line="1494" Type="Source" />
+  </Doc11>
  </DocsAndViews>
  <pluginList>
   <kdevbookmarks>
@@ -51,6 +57,9 @@
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.create.c" >
      <mark line="907" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
+     <mark line="6565" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/qic.c" >
      <mark line="269" />
