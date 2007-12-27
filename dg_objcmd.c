@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/02/04 20:46:11 $
-*  $Revision: 1.4 $
+*  $Date: 2005/03/24 09:23:05 $
+*  $Revision: 1.5 $
 **************************************************************************/
 
 #include "conf.h"
@@ -361,6 +361,7 @@ OCMD(do_otransform)
     obj_data *o, tmpobj;
     struct char_data *wearer = NULL;
     int pos = 0;
+    long objid = 0;
 
     one_argument(argument, arg);
 
@@ -374,6 +375,7 @@ OCMD(do_otransform)
 	    obj_log(obj, "otransform: bad object vnum");
 	    return;
 	}
+	objid = GET_ID(o);
 
 	if (obj->worn_by) {
 	    pos = obj->worn_on;
@@ -400,7 +402,7 @@ OCMD(do_otransform)
 	if (wearer) {
 	    equip_char(wearer, obj, pos);
 	}
-
+        GET_ID(o) = objid;
 	extract_obj(o);
     }
 }

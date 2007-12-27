@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.6  2005/03/24 09:23:05  w4dimenscor
+ * Added info about where a spell can be cast to spellinfo
+ *
  * Revision 1.5  2005/03/16 18:47:03  w4dimenscor
  * updated some spacing and formatting
  *
@@ -1418,7 +1421,6 @@ ACMD(do_mtransform)
   stop_fusion(ch);
   
   remove_hunter(ch);
-  tmpid = GET_ID(m);
 
   /* we can't forget the hunters either... */
   for (hunt = hunter_list; hunt; hunt = hnext)
@@ -1496,7 +1498,14 @@ ACMD(do_mtransform)
       if (obj[pos]) equip_char(ch, obj[pos], pos);
     }
     ch->nr = this_rnum;
-    GET_ID(m) = tmpid;
+    GET_FIGHT_EVENT(m) = NULL;
+    GET_MESSAGE_EVENT(m) = NULL;
+    do {
+      int i;
+      for (i = 0; i < 4; i++)
+        GET_POINTS_EVENT(m, i) = NULL;
+    } while (0);
+
     extract_char(m);
   }
 }

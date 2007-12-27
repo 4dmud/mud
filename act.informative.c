@@ -2931,6 +2931,10 @@ void skill_spell_help(struct char_data *ch, int spell)
                    YESNO(IS_SET(spell_info[spell].routines, MAG_SUMMONS)),
                    YESNO(IS_SET(spell_info[spell].routines, MAG_CREATIONS))
                   );
+		    if (IS_SET(spell_info[spell].targets, TAR_SELF_ONLY))
+    new_send_to_char(ch, "This spell can only be cast upon yourself.\r\n");
+  if (IS_SET(spell_info[spell].targets, TAR_NOT_SELF))
+    new_send_to_char(ch, "This spell can not be cast on yourself.\r\n");
   new_send_to_char(ch, "Classes: {cy");
   for (i = 0; i < NUM_CLASSES ; i++)
     if (IS_SET(spell_info[spell].classes, (1 << i)))

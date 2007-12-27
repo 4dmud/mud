@@ -743,8 +743,8 @@ void check_idling(struct char_data *ch)
       }
       act("$n fades from sight as $e blends with $s surroundings.", TRUE, ch, 0, 0, TO_ROOM);
       send_to_char("You fade from sight as you blend with your surroundings.\r\n", ch);
-      //save_char(ch);
-      //Crash_crashsave(ch);
+      save_char(ch);
+      Crash_crashsave(ch);
       char_from_room(ch);
       char_to_room(ch, world_vnum[1]);
     }
