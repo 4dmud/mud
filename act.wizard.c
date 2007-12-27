@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.79  2007/09/01 19:09:24  w4dimenscor
+ * Changed error message if you try to talk on wiznet while having it turned off.
+ *
  * Revision 1.78  2007/08/23 20:41:29  w4dimenscor
  * - Created a new MudException class, so that we can try and throw and catch errors.
  * - Fixed room description editing in OLC so that it works with the new system.
@@ -3502,7 +3505,7 @@ ACMD(do_wiznet) {
             break;
         }
         if (PRF_FLAGGED(ch, PRF_NOWIZ)) {
-            ch->Send("You are offline!\r\n");
+            ch->Send("You are not on the wiznet channel!\r\n");
             return;
         }
         skip_spaces(&argument);
