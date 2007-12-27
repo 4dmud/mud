@@ -334,8 +334,6 @@ void init_mobile(Character *mob) {
     mob->aff_abils = mob->real_abils;
 
     SET_BIT_AR(MOB_FLAGS(mob), MOB_ISNPC);
-    if (mob->player_specials)
-        delete mob->player_specials;
     mob->player_specials = &dummy_mob;
 }
 
