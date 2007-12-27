@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.38  2006/06/16 06:28:35  w4dimenscor
+ * converted the functions to load fight messages to C++ streams
+ *
  * Revision 1.37  2006/06/11 10:10:11  w4dimenscor
  * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
  *
@@ -2037,9 +2040,9 @@ struct familiar_info {
 
 
 struct msg_type {
-    char *attacker_msg;       /* message to attacker */
-    char *victim_msg;         /* message to victim   */
-    char *room_msg;      /* message to room     */
+    string attacker_msg;       /* message to attacker */
+    string victim_msg;         /* message to victim   */
+    string room_msg;      /* message to room     */
 };
 
 

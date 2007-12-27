@@ -30,7 +30,7 @@ public:
 	{
 		Node* m_rep;
 	public:
-		friend class const_iterator;
+		friend class List::const_iterator;
 		friend class List;
 
 		inline iterator(Node* x=0):m_rep(x){}

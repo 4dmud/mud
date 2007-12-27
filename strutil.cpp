@@ -12,11 +12,12 @@
 
 #include "conf.h"
 #include "sysdep.h"
-
-static const string SPACES = " \t\r\n";           // what gets removed when we trim
+#include "strutil.h"
 
 // get rid of leading and trailing spaces from a string
-string Trim (const string & s, const string & t = SPACES)
+string Trim (const string & s){ return Trim(s, SPACES); }
+
+string Trim (const string & s, const string & t)
 {
   string d = s; 
   string::size_type i = d.find_last_not_of (t);

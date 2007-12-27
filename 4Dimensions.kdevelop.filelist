@@ -202,3 +202,4 @@ linkedlist.cpp
 linkedlist.h
 ptrlist.cpp
 strutil.cpp
+strutil.h

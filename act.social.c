@@ -20,6 +20,7 @@
 #include "db.h"
 #include "spells.h"
 #include "descriptor.h"
+#include "strutil.h"
 
 /* extern variables */
 extern struct room_data *world_vnum[];
@@ -28,7 +29,6 @@ struct command_info *complete_cmd_info;
 
 /* extern functions */
 char *fread_action(FILE * fl, int nr);
-
 
 /* local functions */
 int find_action(int cmd);
@@ -443,6 +443,9 @@ char *fread_action(FILE *fl, int nr)
   buf[strlen(buf) - 1] = '\0';
   return (strdup(buf));
 }
+
+
+
 
 void free_command_list(void)
 {
