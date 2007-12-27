@@ -92,7 +92,7 @@ int boot_high = 0;
 int color_space = 0;
 
 /* extern functions */
-string mob_name_by_vnum(mob_vnum v);
+char * mob_name_by_vnum(mob_vnum &v);
 int highest_tier(Character *ch);
 const char *how_good(int percent);
 int grand_master(Character *ch);

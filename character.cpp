@@ -217,6 +217,15 @@ Character::Character(bool is_mob) {
     if (!is_mob) {
         GET_SUBS(this).clear();
         GET_SKILLS(this).clear();
+        GET_BRASS_TOKEN_COUNT(this) = 0;
+    GET_BRONZE_TOKEN_COUNT(this) = 0;
+    GET_SILVER_TOKEN_COUNT(this) = 0;
+    GET_GOLD_TOKEN_COUNT(this) = 0;
+    GET_COOLNESS(this) 		= 0;
+    GET_KILLS(this) 		= NULL;
+    GET_PK_CNT(this) 		= 0;
+    GET_PK_RIP(this)		= 0;
+    GET_PK_POINTS(this) 		= 0;
     }
     init_char_strings();
     clear();
@@ -338,7 +347,7 @@ void Character::clear() {
     IN_ROOM(this) = NULL;
     TRAVEL_LIST(this) = NULL;
     GET_PFILEPOS(this) = -1;
-    GET_IDNUM(this) = 0;
+    GET_IDNUM(this) = -1;
     FIGHTING(this) = NULL;
     GET_NEXT_SKILL(this) = TYPE_UNDEFINED;
     GET_NEXT_VICTIM(this) = -1;
@@ -723,17 +732,24 @@ void Character::default_char() {
     GET_SPEED(this) 		= 0;
     GET_OLC_ZONE(this) 		= 0;
 
+    
+
 
 }
 
-string mob_name_by_vnum(mob_vnum v) {
-    string s = "";
-    for (unsigned int i = 0; i <= top_of_mobt; i++)
-        if (mob_index[i].vnum == v)
-            return string(mob_proto[i]->player.short_descr);
+char * mob_name_by_vnum(mob_vnum &v) {
+unsigned int j = 0;
+try {
+    for (vector<index_data>::iterator i = mob_index.begin(); i != mob_index.end(); i++,j++)
+        if ((*i).vnum == v &&
+        (mob_proto[j]) != NULL &&
+        mob_proto.at(j)->player.short_descr != NULL)
+            return mob_proto.at(j)->player.short_descr;
 
-    return s;
-
+    return "";
+} catch (runtime_error & e) {
+return "";
+}
 }
 void Character::remove_all_affects() {
     while (affected)

@@ -752,7 +752,7 @@ void free_zone_list(struct zone_list_data *z) {
 void destroy_db(void) {
 
     unsigned int cnt;
-//    vector<Character>::iterator it;
+    //    vector<Character>::iterator it;
 
     log("Free Hunter List");
     free_hunter_list();
@@ -865,7 +865,7 @@ void destroy_db(void) {
     // delete zone_table;
 
     for (vector<Zone>::iterator it = zone_table.begin();it != zone_table.end();it++)
-    (*it).Destroy();
+        (*it).Destroy();
 
     free_zone_list(zone_list);
     zone_list = NULL;
@@ -4556,11 +4556,19 @@ int store_to_char(const char *name, Character *ch) {
                 GET_BANK_GOLD(ch) = num6;
             else if (!strcmp(tag, "Brth"))
                 ch->player.time.birth = num6;
-            else if (!strcmp(tag, "BraT"))
+            else if (!strcmp(tag, "BraT")) {
+                if (num > 100) {
+                    new_mudlog(NRM, LVL_GOD, TRUE, "%s has more then 100 brass tokens. Correcting to 0.", GET_NAME(ch));
+                    num = 0;
+                }
                 GET_BRASS_TOKEN_COUNT(ch) = num;
-            else if (!strcmp(tag, "BroT"))
+            } else if (!strcmp(tag, "BroT")) {
+                if (num > 100) {
+                    new_mudlog(NRM, LVL_GOD, TRUE, "%s has more then 100 bronze tokens. Correcting to 0.", GET_NAME(ch));
+                    num = 0;
+                }
                 GET_BRONZE_TOKEN_COUNT(ch) = num;
-            else if (!strcmp(tag, "BetO"))
+            } else if (!strcmp(tag, "BetO"))
                 GET_BETTED_ON(ch) = num;
             else if (!strcmp(tag, "Body"))
                 EXTRA_BODY(ch) = num;
@@ -4631,8 +4639,13 @@ int store_to_char(const char *name, Character *ch) {
         case 'G':
             if (!strcmp(tag, "Gold"))
                 GET_GOLD(ch) = num6;
-            if (!strcmp(tag, "GolT"))
+            if (!strcmp(tag, "GolT")) {
+                if (num > 100) {
+                    new_mudlog(NRM, LVL_GOD, TRUE, "%s has more then 100 gold tokens. Correcting to 0.", GET_NAME(ch));
+                    num = 0;
+                }
                 GET_GOLD_TOKEN_COUNT(ch) = num;
+            }
             break;
 
         case 'H':
@@ -4895,7 +4908,7 @@ int store_to_char(const char *name, Character *ch) {
                     }
                 } while (num != 0);
             } else if (!strcmp(tag, "Subs")) {
-            struct sub_list s;
+                struct sub_list s;
                 do {
                     get_line(fl, line);
                     if (sscanf(line, "%d %d %d", &num, &num2, &num3) == 3) {
@@ -4912,8 +4925,13 @@ int store_to_char(const char *name, Character *ch) {
                 sscanf(line, "%d/%d", &num, &num2);
                 ch->real_abils.str = num;
                 ch->real_abils.str_add = num2;
-            } else if (!strcmp(tag, "SilT"))
+            } else if (!strcmp(tag, "SilT")) {
+                if (num > 100) {
+                    new_mudlog(NRM, LVL_GOD, TRUE, "%s has more then 100 silver tokens. Correcting to 0.", GET_NAME(ch));
+                    num = 0;
+                }
                 GET_SILVER_TOKEN_COUNT(ch) = num;
+            }
             break;
 
         case 'T':
@@ -5182,14 +5200,14 @@ void char_to_store(Character *ch) {
     if (GET_LEVEL(ch) < LVL_IMMORT) {
         fprintf(fl, "Skil:\n");
         for (vector<skillspell_data>::iterator it = GET_SKILLS(ch).begin();
-             it != GET_SKILLS(ch).end();it++) {
+                it != GET_SKILLS(ch).end();it++) {
             if (knows_spell(ch, (*it).skill) && (*it).learn > 0)
                 fprintf(fl, "%d %d %d 0\n", (*it).skill, (*it).learn, (*it).wait);
-                }
+        }
         fprintf(fl, "0 0 0 0\n");
         fprintf(fl, "Subs:\n");
         for (vector<sub_list>::iterator it = GET_SUBS(ch).begin();
-             it != GET_SUBS(ch).end(); it++) {
+                it != GET_SUBS(ch).end(); it++) {
             if ((*it).learn > 0)
                 fprintf(fl, "%d %d %d\n", (*it).subskill, (*it).learn, (*it).status);
         }
@@ -5396,6 +5414,11 @@ void char_to_store(Character *ch) {
         }
     }
 
+     if (GET_IDNUM(ch) == 0 || GET_IDNUM(ch) > top_idnum) {
+        GET_IDNUM(ch) = GET_ID(ch) =  top_idnum++;
+        add_to_lookup_table(GET_ID(ch), (void *)ch);
+        }
+
     if ((id = find_name(GET_NAME(ch))) < 0)
         return;
     if (player_table[id].clan != GET_CLAN(ch)) {
@@ -5417,6 +5440,7 @@ void char_to_store(Character *ch) {
     if (player_table[id].id != GET_IDNUM(ch)) {
         save_index = TRUE;
         player_table[id].id = GET_IDNUM(ch);
+        player_table[id].account = GET_IDNUM(ch);
     }
 
     i = player_table[id].flags;
@@ -6142,7 +6166,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
             get_line(fl, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {   /* then this is a Xap Obj, requires
-                                                                                                                                                                                                                                                                                                                                                                   special care */
+                                                                                                                                                                                                                                                                                                                                                                                   special care */
                 if ((temp->name = fread_string(fl, buf2)) == NULL) {
                     temp->name = "undefined";
                 }

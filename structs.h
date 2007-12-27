@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.49  2006/08/19 00:09:37  w4dimenscor
+ * found more issues with uninitialised values. Hopefully fixed them. gah
+ *
  * Revision 1.48  2006/08/18 11:09:59  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -1719,13 +1722,8 @@ struct skillspell_data {
     int skill; // which skill/spell it is
     int learn; // what percent it is at
     int wait; // recast delay left
-    struct skillspell_data *next;
 
-    skillspell_data() {
-    skill = -1;
-    learn = 0;
-    wait = 0;
-    }
+    skillspell_data() : skill(-1), learn(0), wait(0) {}
 
     bool operator==(int n) { return (this->skill == n);}
     bool operator==(const skillspell_data &b) { return (this->skill == b.skill);}
@@ -1809,6 +1807,85 @@ struct player_special_data_saved {
     /*Thotts: ctell snoop flags */
     int ctellsnoop;
 
+    player_special_data_saved() {
+    wimp_level = 0;      /* Below this # of hit points, flee!    */
+    freeze_level = 0;        /* Level of god who froze char, if any  */
+    invis_level = 0;          /* level of invisibility                */
+    for (int i = 0; i < PR_ARRAY_MAX;i++)
+    pref[i] = 0;   /* preference flags for PC's.           */
+    bad_pws =0;       /* number of bad password attempts      */
+    conditions[0] = 0; /* Drunk, full, thirsty                 */
+    conditions[1] = 0;
+    conditions[2] = 0;
+    saving = 0;
+
+    /* spares below for future expansion.  You can change the names from
+       'sparen' to something meaningful, but don't change the order.  */
+    clan_rank = 0;
+    orig_race = 0;
+    brass_tokens = 0;
+    bronze_tokens = 0;
+    silver_tokens = 0;
+    gold_tokens = 0;
+    spells_to_learn = 0; /* How many can you learn yet this level */
+    clan = 0;
+    rip_cnt = 0;
+    kill_cnt = 0;
+    dt_cnt = 0;
+    bet_amt = 0;
+    betted_on = 0;
+    load_room = 0;       /* Where the character will load        */
+    speed = 0;
+    coolness = 0;
+    aff_speed = 0;
+    cmd = 0;
+    orig_lev = 0;
+    /*mord - Pk addition*/
+    pk_kills = 0;
+    pk_deaths = 0;
+    pk_points = 0;
+    /*mord - fighting and defending ability learned */
+    perm_accuracy = 0;
+    perm_evasion = 0;
+    /*mord - fencing values*/
+    fence_posts = 0;
+    fence_nails = 0;
+    fence_wire = 0;
+
+    /*mordecai - remort specialization*/
+    tier = 0;
+    tier1 = 0;
+    tier2 = 0;
+    tier3 = 0;
+    
+    subs.clear(); /*list of subskills available to that person*/
+    skills.clear(); /*list of skills and spells available to that person */
+
+     reg_hit = 0; /* regen rates */
+     reg_mana = 0;
+     reg_move = 0;
+     reg_stamina = 0;
+
+     rp_group = 0;
+     last_dam_done = 0;
+     last_dam_taken = 0;
+     for (int i = 0; i < NUM_CLASSES;i++)
+     master[i] = 0;
+
+     olc_zone = 0;
+     mine_dir = 0;
+     mine_stealth = 0;
+     mine_damage = 0;
+     mine_bonus = 0;
+     mine_speed = 0;
+
+     has_mail = 0;
+     tradepoints = 0;
+
+    /*Thotts: ctell snoop flags */
+     ctellsnoop = 0;
+    }
+
 
 
 };
@@ -1871,6 +1948,7 @@ struct player_special_data {
     struct help_index_element *help;
 
     player_special_data() {
+        saved = player_special_data_saved();
         prompt = NULL;
         immtitle = NULL;
         poofin = NULL;        /* Description on arrival of a god.  */

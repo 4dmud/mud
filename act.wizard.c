@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.57  2006/08/19 00:09:36  w4dimenscor
+ * found more issues with uninitialised values. Hopefully fixed them. gah
+ *
  * Revision 1.56  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -7285,4 +7288,9 @@ ACMD(do_wizsplit){
     do_wiznet(ch, argument, cmd, subcmd);
   else
     do_gen_ps(ch, argument, cmd, SCMD_WIZLIST);
+}
+
+
+ACMD(do_fixid) {
+
 }
