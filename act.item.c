@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.11  2005/03/17 09:09:17  w4dimenscor
+ * fixed a crash bug in the energize command
+ *
  * Revision 1.10  2005/03/15 08:35:08  w4dimenscor
  * xml page update, and a few other bits
  *
@@ -2508,7 +2511,7 @@ ACMD(do_energize)
   const char *to_char = NULL;
   const char *to_room = NULL;
   int  amount = 0, type = VIAL_NONE;
-  char *arg = NULL, *arg1 = NULL;
+  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
   OBJ_DATA *temp;
   two_arguments(argument, arg, arg1);
 
