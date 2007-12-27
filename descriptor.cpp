@@ -96,7 +96,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     //   bool overf = FALSE;
     string stxt;
     /* if we're in the overflow state already, ignore this new output */
-    if (this->bufspace == 0)
+    if (bufspace == 0)
         return (0);
 
     lock_desc(this);
@@ -122,23 +122,23 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
 stxt = string(txt);
 free( txt );
     /* work out how much we need to expand/contract it */
-    /*size_mxp = count_mxp_tags(this->mxp, txt, size);
+    /*size_mxp = count_mxp_tags(mxp, txt, size);
     if (size_mxp < 0)
         size_mxp = 0;*/
 
     /* this should safely put all expanded MXP tags into the string */
-    stxt = convert_mxp_tags(this->mxp, stxt);
+    stxt = convert_mxp_tags(mxp, stxt);
 
     
 
     /** don't wordwrap for folks who use mxp they can wrap at client side, or it may get fuzzled - mord**/
-    if (this->character && !this->mxp && PRF_FLAGGED(this->character, PRF_PAGEWRAP) && PAGEWIDTH(this->character) > 0) {
+    if (character && !mxp && PRF_FLAGGED(character, PRF_PAGEWRAP) && PAGEWIDTH(character) > 0) {
         slen = stxt.size();
-        wraplen = (((slen / PAGEWIDTH(this->character)) * 3) + slen + 3);
+        wraplen = (((slen / PAGEWIDTH(character)) * 3) + slen + 3);
         /* at max you will be adding 3 more characters per line
          so this is just to make sure you have the room for this function. */
 
-        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(this->character), wraplen); //size checked above
+        stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
 
     }
 
@@ -146,11 +146,11 @@ free( txt );
     /*
      * If the text is too big to fit into even a large buffer, truncate
      * the new text to make it fit.  (This will switch to the overflow
-     * state automatically because this->bufspace will end up 0.)
+     * state automatically because bufspace will end up 0.)
      */
-    if (size + this->bufptr + 1 > LARGE_BUFSIZE) {
+    if (size + bufptr + 1 > LARGE_BUFSIZE) {
         log("Buffer Overflow: too big for buffer");
-        size = LARGE_BUFSIZE - this->bufptr - 1;
+        size = LARGE_BUFSIZE - bufptr - 1;
         if (size > 0)
             txt[size] = '\0';
         else
@@ -163,12 +163,12 @@ free( txt );
      * If we have enough space, just write to buffer and that's it! If the
      * text just barely fits, then it's switched to a large buffer instead.
      */
-    //  if (this->bufspace > size) {
-    //this->output += string(cstring(stxt).c_str());
-    this->output += cstring(stxt).c_str();
-    //  strcpy(this->output + this->bufptr, txt); /* strcpy: OK (size checked above) */
-    //this->bufspace -= size;
-    //     this->bufptr += size;
+    //  if (bufspace > size) {
+    //output += string(cstring(stxt).c_str());
+    output += cstring(stxt).c_str();
+    //  strcpy(output + bufptr, txt); /* strcpy: OK (size checked above) */
+    //bufspace -= size;
+    //     bufptr += size;
     unlock_desc(this);
     return (LARGE_BUFSIZE -1);
     // }
@@ -178,27 +178,27 @@ free( txt );
 
     /* if the pool has a buffer in it, grab it */
     if (bufpool != NULL) {
-        this->large_outbuf = bufpool;
+        large_outbuf = bufpool;
         bufpool = bufpool->next;
     } else {               /* else create a new one */
-        CREATE(this->large_outbuf, struct txt_block, 1);
-        CREATE(this->large_outbuf->text, char, LARGE_BUFSIZE);
+        CREATE(large_outbuf, struct txt_block, 1);
+        CREATE(large_outbuf->text, char, LARGE_BUFSIZE);
         buf_largecount++;
     }
-    *this->large_outbuf->text = '\0';
-    strcpy(this->large_outbuf->text, this->output);  /* strcpy: OK (size checked previously) */
-    this->output = this->large_outbuf->text;    /* make big buffer primary */
-    strcat(this->output, txt);     /* strcat: OK (size checked) */
+    *large_outbuf->text = '\0';
+    strcpy(large_outbuf->text, output);  /* strcpy: OK (size checked previously) */
+    output = large_outbuf->text;    /* make big buffer primary */
+    strcat(output, txt);     /* strcat: OK (size checked) */
 
     /* set the pointer for the next write */
-    this->bufptr = strlen(this->output);
+    bufptr = strlen(output);
 
     /* calculate how much space is left in the buffer */
-    this->bufspace = LARGE_BUFSIZE - 1 - this->bufptr;
+    bufspace = LARGE_BUFSIZE - 1 - bufptr;
     unlock_desc(this);
     free(txt);
 
-    return (this->bufspace);
+    return (bufspace);
 #endif
 }
 
@@ -208,91 +208,84 @@ void Descriptor::init_descriptor(int desc) {
 
     /* initialize descriptor data */
 
-    *this->small_outbuf = 0;
-    this->large_outbuf = NULL;
-    this->descriptor = desc;
-    this->character = NULL;
-    this->idle_tics = 0;
-    this->bufspace = SMALL_BUFSIZE - 1;
-    this->login_time = time(0);
-    this->output = string("");
-    this->bufptr = 0;
-    this->has_prompt = TRUE;  /* prompt is part of greetings */
+    *small_outbuf = 0;
+    descriptor = desc;
+    bufspace = SMALL_BUFSIZE - 1;
+    login_time = time(0);
+    output = string("");
+    has_prompt = TRUE;  /* prompt is part of greetings */
     /*
      * This isn't exactly optimal but allows us to make a design choice.
      * Do we embed the history in descriptor_data or keep it dynamically
      * allocated and allow a user defined history size?
      */
-    CREATE(this->history, char *, HISTORY_SIZE);
+    CREATE(history, char *, HISTORY_SIZE);
 
     if (++last_desc == 1000)
         last_desc = 1;
-    this->desc_num = last_desc;
+    desc_num = last_desc;
 
 
-    CREATE(this->comp, struct compr, 1);
-    this->comp->state = 0; /* we start in normal mode */
+    CREATE(comp, struct compr, 1);
+    comp->state = 0; /* we start in normal mode */
 #ifdef HAVE_ZLIB_H
 
-    this->comp->stream = NULL;
+    comp->stream = NULL;
 #endif /* HAVE_ZLIB_H */
-
-    this->eor = 0;
-    this->mxp = FALSE;
 
 }
 
 bool Descriptor::pending_output() {
-    return !(this->output.empty());
+    return !(output.empty());
 }
 
 Descriptor::Descriptor() {
-    this->showstr_count = 0;
-    this->telnet_capable = 0;
-    this->locked = 0;
-    this->close_me = 0;
-    this->str = NULL;
-    this->snoop_by = NULL;
-    this->input.head = NULL;
-    this->input.tail = NULL;
-    this->snooping = NULL;
-    this->inbuf[0] = '\0';
-    this->history_pos = 0;
-    this->output.erase();
+    showstr_count = 0;
+    telnet_capable = 0;
+    locked = 0;
+    close_me = 0;
+    str = NULL;
+    snoop_by = NULL;
+    input.head = NULL;
+    input.tail = NULL;
+    snooping = NULL;
+    inbuf[0] = '\0';
+    history_pos = 0;
+    output.erase();
     /** --- **/
-    this->bad_pws = 0;
-  this->idle_tics = 0;
-  this->connected = 0;
-  this->orig_connected = 0;
-  this->sub_state = 0;
-  this->desc_num = 0;
-  this->login_time = 0;
-  this->showstr_head = NULL; 
-  this->showstr_vector = NULL; 
-  this->showstr_page = 0;
-  this->pagebuf[0] = '\0';
-  this->backstr = NULL;
-  this->max_str = 0;
-  this->mail_to = 0;
-  this->has_prompt = 0;
-  this->wait = 0;
-  this->history = NULL;
-  this->bufptr = 0;
-  this->bufspace = 0;
-  this->large_outbuf = NULL;
-  this->character = NULL;     /* linked to char                       */
-  this->original = NULL;
-  this->next = NULL;  
-  this->olc = NULL;   /* OLC info                            */
-  this->acc = NULL;
-  this->callback_depth = 0;  
-  this->c_data = NULL; 
-  this->options = 0;
-  this->comp = NULL; 
-  this->eor = 0;
-  this->mxp = 0;
+    bad_pws = 0;
+  idle_tics = 0;
+  connected = 0;
+  orig_connected = 0;
+  sub_state = 0;
+  desc_num = 0;
+  login_time = 0;
+  showstr_head = NULL;
+  showstr_vector = NULL;
+  showstr_page = 0;
+  pagebuf[0] = '\0';
+  backstr = NULL;
+  max_str = 0;
+  mail_to = 0;
+  has_prompt = 0;
+  wait = 0;
+  history = NULL;
+  bufptr = 0;
+  bufspace = 0;
+  large_outbuf = NULL;
+  character = NULL;     /* linked to char                       */
+  original = NULL;
+  next = NULL;
+  olc = NULL;   /* OLC info                            */
+  acc = NULL;
+  callback_depth = 0;
+  c_data = NULL;
+  options = 0;
+  comp = NULL;
+  eor = FALSE;
+  mxp = FALSE;
 }
 
 Descriptor::~Descriptor() {
-    //  delete this->output;
+    //  delete output;
 }
