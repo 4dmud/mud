@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/06/19 06:25:39 $                                           * 
-*  $Revision: 1.29 $                                                      *
+*  $Date: 2006/06/25 07:10:59 $                                           * 
+*  $Revision: 1.30 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1204,6 +1204,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
 
         if (!strcasecmp(field, "race"))
           snprintf(str, slen, "%s", race_name(c));
+
+        else if (!strcmp(field, "remorts"))
+           snprintf(str, slen, "%u", REMORTS(c));
 
         else if (!strcasecmp(field, "riding"))
         {
