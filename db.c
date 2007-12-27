@@ -5032,6 +5032,8 @@ void Character::LoadKillList() {
     int t[2];
     long tl[2];
     int id;
+
+return;//disabled for the moment!
     
     if ((id = get_id_by_name(GET_NAME(this)))<=0) {
         log("bad index passed to load_killlist");
@@ -5047,9 +5049,11 @@ void Character::LoadKillList() {
              PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
     if (!(fl = fopen(filename, "r")))
         return;
+        log("Loading Kill List %s", filename);
     while (get_line(fl, line)) {
         if (sscanf(line, "%d %d %ld %ld",t, t+1, tl, tl+1) != 4)
             continue;
+            log("%d %d %ld %ld", t[0], t[1], tl[1], tl[0]);
             SPECIALS(this)->SetKill(t[0], t[1], tl[1], tl[0]);
     }
     fclose(fl);
@@ -5058,6 +5062,7 @@ void Character::LoadKillList() {
 void Character::SaveKillList() {
 int id;
     char filename[MAX_INPUT_LENGTH];
+    return;
     FILE *fl;
     id = get_ptable_by_id(GET_IDNUM(this));
     if (!SPECIALS(this) || SPECIALS(this)->KillsCount() == 0 || id < 0 || id >= player_table.size())

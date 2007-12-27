@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.29  2006/08/23 11:37:33  w4dimenscor
+ * Adjustments to the SkillsSpells Functions in char specials
+ *
  * Revision 1.28  2006/08/23 09:01:27  w4dimenscor
  * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
  *
@@ -362,8 +365,10 @@ int Character::get_skill(int i) {
     if (GET_RACE(this) == RACE_CENTAUR &&
             (i == 141 || i == 142) )
         return 100;
-
-    return SAVED(this).GetSkillLearn(i);
+if (!IS_NPC(this) && player_specials != NULL)
+    return player_specials->saved.GetSkillLearn(i);
+    else
+    return 0;
 }
 void set_skill(Character *ch, int skill, int amount) {
     SAVED(ch).SetSkillLearn(skill, amount);

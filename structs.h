@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.53  2006/08/23 11:37:33  w4dimenscor
+ * Adjustments to the SkillsSpells Functions in char specials
+ *
  * Revision 1.52  2006/08/23 10:34:14  w4dimenscor
  * Fixes for KillList Crash
  *
@@ -1733,19 +1736,6 @@ struct skillspell_data {
     int wait; // recast delay left
 
     skillspell_data() : skill(-1), learn(0), wait(0) {}
-
-    bool operator==(int n) {
-        return (this->skill == n);
-    }
-    bool operator==(const skillspell_data &b) {
-        return (this->skill == b.skill);
-    }
-    bool operator<(const skillspell_data &b) {
-        return (this->skill < b.skill);
-    }
-    bool operator<(skillspell_data &b) {
-        return (this->skill < b.skill);
-    }
 };
 typedef map<subskill_list, sub_list> subs_map;
 typedef map<int, skillspell_data> skills_map;
@@ -1799,30 +1789,30 @@ public:
     bool tier2;
     bool tier3;
 
-    void UpdateSub(sub_list &s) {
+    void UpdateSub(sub_list s) {
         subs[s.subskill] = s;
     }
-    void UpdateSkill(skillspell_data &s) {
+    void UpdateSkill(skillspell_data s) {
         skills[s.skill] = s;
     }
-    void DeleteSub(subskill_list &ss) {
+    void DeleteSub(subskill_list ss) {
         map<subskill_list, sub_list>::iterator s_it =
             subs.find(ss);
         if (s_it == subs.end())
             return;
         subs.erase(ss);
     }
-    void DeleteSkill(int &ss) {
+    void DeleteSkill(int ss) {
         skills_map::iterator s_it =
             skills.find(ss);
         if (s_it == skills.end())
             return;
         skills.erase(ss);
     }
-    bool HasSub(subskill_list &ss) {
+    bool HasSub(subskill_list ss) {
         return (subs.find(ss) != subs.end());
     }
-    bool HasSkill(int &ss) {
+    bool HasSkill(int ss) {
         return (skills.find(ss) != skills.end());
     }
     void SkillWaitTick() {
@@ -1853,34 +1843,30 @@ public:
         return subs[ss].status;
     }
     int SetSubLearn(subskill_list ss, int l) {
-        sub_list sl = sub_list();
+        if (l > 100)
+            l = 100;
+        else if (l < 0)
+            l = 0;
         if (!HasSub(ss)) {
-            sl.learn = l;
+            subs[ss] = sub_list();
+            subs[ss].learn = l;
         } else {
-            sl = subs[ss];
-            sl.learn = l;
+            subs[ss].learn = l;
         }
-        if (sl.learn > 100)
-            sl.learn = 100;
-        else if (sl.learn < 0)
-            sl.learn = 0;
-        UpdateSub(sl);
-        return sl.learn;
+        return subs[ss].learn;
     }
-    int UpdateSubLearn(subskill_list &ss, int &l) {
-        sub_list sl = sub_list();
+    int UpdateSubLearn(subskill_list ss, int l) {
+ if (l > 100)
+            l = 100;
+        else if (l < 0)
+            l = 0;
         if (!HasSub(ss)) {
-            sl.learn = l;
+            subs[ss] = sub_list();
+            subs[ss].learn = l;
         } else {
-            sl = subs[ss];
-            sl.learn += l;
+            subs[ss].learn += l;
         }
-        if (sl.learn > 100)
-            sl.learn = 100;
-        else if (sl.learn < 0)
-            sl.learn = 0;
-        UpdateSub(sl);
-        return sl.learn;
+        return subs[ss].learn;
     }
     subs_map::iterator SubsBegin() {
     return subs.begin();
@@ -1896,19 +1882,21 @@ public:
     }
     
     /**skills**/
-    int GetSkillLearn(int &ss) {
+    int GetSkillLearn(int ss) {
         if (!HasSkill(ss))
             return 0;
-        else
+        else {
+        
             return skills[ss].learn;
+            }
     }
-    int GetSkillWait(int &ss) {
+    int GetSkillWait(int ss) {
         if (!HasSkill(ss))
             return 0;
         else
             return skills[ss].wait;
     }
-    int SetSkillWait(int &ss, int &w) {
+    int SetSkillWait(int ss, int w) {
         if (!HasSkill(ss))
             return 0;
         
@@ -1918,35 +1906,31 @@ public:
     int CountSkills() {
 		return skills.size();
 	}
-    int SetSkillLearn(int &ss, int &l) {
-        skillspell_data sl = skillspell_data();
+    int SetSkillLearn(int ss, int l) {
+    if (l > 100)
+            l = 100;
+        else if (l < 0)
+            l = 0;
         if (!HasSkill(ss)) {
-            sl.learn = l;
-        } else {
-            sl = skills[ss];
-            sl.learn = l;
-        }
-        if (sl.learn > 100)
-            sl.learn = 100;
-        else if (sl.learn < 0)
-            sl.learn = 0;
-        UpdateSkill(sl);
-        return sl.learn;
+        skills[ss] = skillspell_data();
+        skills[ss].learn = l;
+        } else 
+            skills[ss].learn = l;
+
+        return skills[ss].learn;
     }
-    int UpdateSkillLearn(int &ss, int &l) {
-        skillspell_data sl = skillspell_data();
+    int UpdateSkillLearn(int ss, int l) {
+    if (l > 100)
+            l = 100;
+        else if (l < 0)
+            l = 0;
         if (!HasSkill(ss)) {
-            sl.learn = l;
-        } else {
-            sl = skills[ss];
-            sl.learn += l;
-        }
-        if (sl.learn > 100)
-            sl.learn = 100;
-        else if (sl.learn < 0)
-            sl.learn = 0;
-        UpdateSkill(sl);
-        return sl.learn;
+        skills[ss] = skillspell_data();
+        skills[ss].learn = l;
+        } else 
+            skills[ss].learn += l;
+
+        return skills[ss].learn;
     }
 
 
@@ -2182,11 +2166,12 @@ public:
 	
 	if (it == kills.end()) {
 		struct kill_data temp;
-		temp.count = 1;
-		temp.vnum = v;
-		temp.last = time(0);
-		temp.first = time(0);
 		kills[v] = temp;
+		kills[v].count = 1;
+		kills[v].vnum = v;
+		kills[v].last = time(0);
+		kills[v].first = time(0);
+		
 	} else {
 		kills[v].count++;
 		kills[v].last = time(0);
