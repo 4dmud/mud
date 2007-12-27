@@ -141,6 +141,7 @@ void assign_mobiles(void)
     ASSIGNMOB(12403, guild);
     ASSIGNMOB(12904, guild);
     ASSIGNMOB(27801, guild);
+     ASSIGNMOB(10204, guild);
 
     // guildmasters that teach special skills only
     ASSIGNMOB(7043, guild);	// scribe skill
@@ -177,6 +178,7 @@ void assign_mobiles(void)
     ASSIGNMOB(20542, cleric);	// convent
     ASSIGNMOB(27800, cleric);
     ASSIGNMOB(30960, cleric);
+    ASSIGNMOB(10203, cleric);
 
     ASSIGNMOB(1200, receptionist);	// immortal zone
     ASSIGNMOB(1809, receptionist);

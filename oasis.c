@@ -356,8 +356,12 @@ void cleanup_olc(struct descriptor_data *d, byte cleanup_type)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing the game configuration", GET_NAME(d->character));
     else if (STATE(d) == CON_TEDIT)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing text files.", GET_NAME(d->character));
-    else
+      else if (STATE(d) == CON_HEDIT)
+      new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing help files.", GET_NAME(d->character));
+    else if (GET_OLC_ZONE(d->character))
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing zone %d allowed zone %d", GET_NAME(d->character), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(d->character));
+      else
+      new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing zone %d", GET_NAME(d->character), zone_table[OLC_ZNUM(d)].number);
 
     STATE(d) = CON_PLAYING;
   }

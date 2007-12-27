@@ -2773,21 +2773,20 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon)
     give_mob_class(mob_proto + i, nr);
 
   if (MOB_FLAGGED(mob_proto + i, MOB_HEALER))
-  {
     ASSIGNMOB(nr, cleric);
-  }
+  
   if (MOB_FLAGGED(mob_proto + i, MOB_POSTMASTER))
-  {
     ASSIGNMOB(nr, postmaster);
-  }
+  
   top_of_mobt = i++;
 }
 
 int is_aggro(CHAR_DATA *ch)
 {
-  if (MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
+  if ( MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
       (MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
-       MOB_FLAGGED(ch, MOB_AGGR_EVIL) || MOB_FLAGGED(ch,MOB_AGGR_NEUTRAL)))
+       MOB_FLAGGED(ch, MOB_AGGR_EVIL) || 
+       MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL)))
     return 1;
   return 0;
 }
