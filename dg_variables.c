@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/06/25 07:10:59 $                                           * 
-*  $Revision: 1.30 $                                                      *
+*  $Date: 2006/07/03 14:33:15 $                                           * 
+*  $Revision: 1.31 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -235,6 +235,14 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd,
       snprintf(str, slen, "%s", complete_cmd_info[cmd].command);
     return TRUE;
   } 
+  else if (!str_cmp(field, "abbrev"))
+  {                 /* abbrev       */
+    if (is_abbrev(vd->value,subfield))
+      strcpy(str, "1");
+    else
+      strcpy(str, "0");
+    return TRUE;
+  }
 
   return FALSE;
 }

@@ -4,11 +4,15 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/06/21 05:22:35 $
-*  $Revision: 1.26 $
+*  $Date: 2006/07/03 14:33:15 $
+*  $Revision: 1.27 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.27  2006/07/03 14:33:15  w4dimenscor
+ * Added |= and %text.abbrev(blah)%. now we can test wether a word starts
+ * with  something. Great for command triggers.
+ *
  * Revision 1.26  2006/06/21 05:22:35  w4dimenscor
  * found an error where is find_room was passed too large a number, it would segfault. Fixed
  *
@@ -1826,6 +1830,8 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *g
     else
       snprintf(result,r_len, "%d", !*rhs);
   }
+  else if (!strcmp("|=", op))
+      snprintf(result,r_len, "%c", is_abbrev(lhs,rhs) ? '1' : '0');
 }
 
 
@@ -1934,6 +1940,7 @@ int eval_lhs_op_rhs(char *expr, char *result, size_t r_len, void *go, struct scr
                           "/",
                           "*",
                           "!",
+                          "|=",
                           "\n"
                         };
 
