@@ -53,7 +53,7 @@ struct assembly_data
 struct component_data
 {
   bool         bExtract;               /* Extract the object after use. */
-  bool         bInRoom;                /* Component in room, not inven. */
+  int          bInRoom;                /* Component in room, not inven. */
   long         lVnum;                  /* Vnum of the component object. */
 };
 

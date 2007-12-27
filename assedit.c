@@ -447,30 +447,15 @@ void assedit_parse(Descriptor *d, char *arg)
     }
     break;
   case ASSEDIT_EDIT_INROOM:
-    switch (*arg)
-    {
-    case '1':
-      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 1;
-      assedit_disp_menu(d);
-      break;
-
-    case '0':
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = atoi(arg);
+      if (OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom > 3) {
       OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 0;
-      assedit_disp_menu(d);
-      break;
-          case '2':
-      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 2;
-      assedit_disp_menu(d);
-      break;
-          case '3':
-      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 3;
-      assedit_disp_menu(d);
-      break;
-
-    default:
       d->Output( "Location of item:\r\n0 :Inventory\r\n1 :Room\r\n2 :Hold\r\n3 :Wield\r\nWhat do you select:");
-      break;
-    }
+      } else if (OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom < 0) {
+      OLC_ASSEDIT(d)->pComponents[ OLC_VAL(d) ].bInRoom = 0;
+      d->Output( "Location of item:\r\n0 :Inventory\r\n1 :Room\r\n2 :Hold\r\n3 :Wield\r\nWhat do you select:");
+      } else
+      assedit_disp_menu(d);
     break;
 
   default:                        /* default for whole assedit parse function */
