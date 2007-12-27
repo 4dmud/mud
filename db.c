@@ -4537,9 +4537,11 @@ int store_to_char(const char *name, Character *ch) {
                 } while (num != 0);
             } else if (!strcmp(tag, "Alin"))
                 GET_ALIGNMENT(ch) = num;
-            else if (!strcmp(tag, "Awrd"))
+            else if (!strcmp(tag, "Awrd")) {
+            if (num > 1000)
+            num = 0;
                 GET_AWARD(ch) = num;
-            else if (!strcmp(tag, "Aff "))
+           }  else if (!strcmp(tag, "Aff "))
                 sscanf(line, "%u %u %u %u",
                        &(ch->char_specials.saved.affected_by[0]),
                        &(ch->char_specials.saved.affected_by[1]),
@@ -4590,13 +4592,17 @@ int store_to_char(const char *name, Character *ch) {
                 GET_CLAN(ch) = num;
             else if (!strcmp(tag, "ClRk")) {
                 GET_CLAN_RANK(ch) =  player_table[id].rank < 0 ? player_table[id].rank : num;
-            } else if (!strcmp(tag, "Clns"))
+            } else if (!strcmp(tag, "Clns")){
+            if (num > 100)
+            num = 0;
                 GET_COOLNESS(ch) = num;
-            else if (!strcmp(tag, "Conv"))
+            } else if (!strcmp(tag, "Conv"))
                 GET_CONVERSIONS(ch) = num;
-            else if (!strcmp(tag, "CrPt"))
+            else if (!strcmp(tag, "CrPt")) {
+            if (num > 100)
+            num = 0;
                 CREATE_POINTS(ch) = num;
-            else if (!strcmp(tag, "Csnp"))
+            } else if (!strcmp(tag, "Csnp"))
                 GET_CSNP_LVL(ch) = num;
             break;
 
@@ -4612,8 +4618,11 @@ int store_to_char(const char *name, Character *ch) {
                 GET_COND(ch, DRUNK) = num;
             else if (!strcmp(tag, "Drol"))
                 GET_DAMROLL(ch) = num;
-            else if (!strcmp(tag, "DTC "))
+            else if (!strcmp(tag, "DTC ")) {
+            if (num > 100)
+            num = 0;
                 GET_DT_CNT(ch) = num;
+                }
             break;
 
         case 'E':
