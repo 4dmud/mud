@@ -233,7 +233,7 @@ int magic_distance(Character *ch, int spellnum, int dir,
 Character *find_in_dir(room_rnum room, char *name, int dir) {
 
     Character *tch;
-    int i;
+    int i, num = get_number(&name);
     room_rnum nextroom = NULL;
 
     if (room == NULL)
@@ -248,7 +248,7 @@ Character *find_in_dir(room_rnum room, char *name, int dir) {
     nextroom = room;
     for (i = 0; i < 10 && (nextroom != NULL); i++) {
 
-        if ((tch = get_room_vis(nextroom, name, 0)) != NULL)
+        if ((tch = get_room_vis(nextroom, name, &num)) != NULL)
             return tch;
 
         if (CAN_GO2(nextroom, dir))
@@ -837,7 +837,7 @@ void mag_affects(int level, Character *ch, Character *victim,
         else
             af[0].expire = HOURS_TO_EXPIRE(chcha);
         af[0].bitvector = AFF_SHIELD;
-        if (GET_SPEED(victim) > 400 && m_user) {
+        if (speed_update(victim) > 400 && m_user) {
             af[1].bitvector = AFF_BLUR;
             af[1].modifier = 1;
             af[1].expire = af[0].expire;
@@ -1390,7 +1390,7 @@ int perform_mag_direction(int level, room_rnum room, Character *ch, Character *v
             continue;
         if (tch->master == ch)
             continue;
-        if ((IS_NPC(tch) || IS_NPC(ch))  && (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA) || !both_pk(ch,tch)))
+        if ((!IS_NPC(tch) && !IS_NPC(ch))  && (!ROOM_FLAGGED(IN_ROOM(tch), ROOM_ARENA) || !both_pk(ch,tch)))
             continue;
         act(format, FALSE, tch, 0, ch, TO_CHAR);
         act(format2, TRUE, tch, 0, ch, TO_ROOM);

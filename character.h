@@ -135,6 +135,16 @@ public:
     bool zone_empty();
     void LoadKillList();
     void SaveKillList();
+    /* movement functions */
+    bool CanMove();
+    bool HasBoat();
+    bool Flying();
+    bool SpaceProtected();
+    bool SunProtected();
+    bool WaterBreathing();
+	inline bool MountHere() {return (char_specials.riding && char_specials.riding->in_room == in_room);}
+	inline bool RiderHere() {return (char_specials.ridden_by && char_specials.ridden_by->in_room == in_room);}
+	inline bool MasterHere() {return (master && master->in_room == in_room);}
 private:
     stringstream *send_string;
 

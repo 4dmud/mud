@@ -92,8 +92,8 @@ void free_followers(struct follow_type *k);
 void damage_count_free(Character *vict);
 void extract_all_in_list(OBJ_DATA *obj);
 void free_alias(struct alias_data *a);
-void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add
-                         );
+void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add );
+int find_eq_pos(Character *ch, struct obj_data *obj, char *arg);
 extern long top_idnum;
 
 /* ================== Structure for player/non-player ===================== */
@@ -1129,3 +1129,98 @@ return TRUE;
 
 return zone_table[GET_ROOM_ZONE(in_room)].num_players > 0;
 }
+bool Character::CanMove() {
+    if (AFF_FLAGGED(this, AFF_STUCK))
+        return FALSE;
+    if (AFF_FLAGGED(this, AFF_HOLD))
+        return FALSE;
+    if (get_sub_status(this, SUB_JUGGLE) == STATUS_ON)
+        return FALSE;
+
+    return TRUE;
+}
+
+/* simple function to determine if char can walk on water */
+bool Character::HasBoat() {
+    if (!IS_NPC(this) && GET_LEVEL(this) >= LVL_IMMORT)
+        return TRUE;
+    if (AFF_FLAGGED(this, AFF_WATERWALK))
+        return TRUE;
+    if (Flying())
+        return TRUE;
+
+    /* non-wearable boats in inventory will do it */
+    for (struct obj_data *obj = carrying; obj; obj = obj->next_content)
+        if (GET_OBJ_TYPE(obj) == ITEM_BOAT
+                && (find_eq_pos(this, obj, NULL) < 0))
+            return TRUE;
+
+    /* and any boat you're wearing will do it too */
+    for (int i = 0; i < NUM_WEARS; i++)
+        if (HAS_BODY(this, i) && GET_EQ(this, i) &&
+                GET_OBJ_TYPE(GET_EQ(this, i)) == ITEM_BOAT)
+            return TRUE;
+
+    return FALSE;
+}
+
+
+bool Character::Flying() {
+    if (!IS_NPC(this) && GET_LEVEL(this) >= LVL_IMPL)
+        return TRUE;
+
+    for (sh_int i = 0; i < NUM_WEARS; i++) {
+        if (HAS_BODY(this, i) && (GET_EQ(this, i)) &&
+                (GET_OBJ_TYPE(GET_EQ(this, i)) == ITEM_WINGS))
+            return TRUE;
+    }
+
+    if (AFF_FLAGGED(this, AFF_FLY))
+        return TRUE;
+
+    return FALSE;
+}
+
+bool Character::SpaceProtected() {
+    if (!IS_NPC(this) &&GET_LEVEL(this) >= LVL_IMPL)
+        return TRUE;
+
+    if (GET_RACE(this) == RACE_MARTIAN)
+        return TRUE;
+
+    for (sh_int i = 0; i < NUM_WEARS; i++)
+        if (HAS_BODY(this, i) && GET_EQ(this, i) &&
+                GET_OBJ_TYPE(GET_EQ(this, i)) == ITEM_SPACESUIT)
+            return TRUE;
+
+    return FALSE;
+}
+
+bool Character::SunProtected() {
+    if (!IS_NPC(this) && GET_LEVEL(this) >= LVL_IMPL)
+        return TRUE;
+
+    for (sh_int i = 0; i < NUM_WEARS; i++)
+        if (HAS_BODY(this, i) && GET_EQ(this, i) &&
+                GET_OBJ_TYPE(GET_EQ(this, i)) == ITEM_THERMAL_PROT)
+            return TRUE;
+
+    return FALSE;
+}
+
+bool Character::WaterBreathing() {
+    if (!IS_NPC(this) && GET_RACE(this) == RACE_MARTIAN)
+        return TRUE;
+
+    for (sh_int i = 0; i < NUM_WEARS; i++)
+        if (HAS_BODY(this, i) && GET_EQ(this, i) &&
+                GET_OBJ_TYPE(GET_EQ(this, i)) == ITEM_AQUALUNG)
+            return TRUE;
+
+    if (AFF_FLAGGED(this, AFF_GILLS))
+        return TRUE;
+
+    return FALSE;
+}
+
+

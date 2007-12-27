@@ -107,110 +107,8 @@ ACMD(do_recall) {
     }
 }
 
-int can_move(Character *ch) {
-    if (AFF_FLAGGED(ch, AFF_STUCK))
-        return (0);
-    if (AFF_FLAGGED(ch, AFF_HOLD))
-        return (0);
-    if (get_sub_status(ch, SUB_JUGGLE) == STATUS_ON)
-        return (0);
 
 
-    return 1;
-}
-/* simple function to determine if char can walk on water */
-int has_boat(Character *ch) {
-    struct obj_data *obj;
-    int i;
-
-    if (GET_LEVEL(ch) >= LVL_IMMORT)
-        return (1);
-
-    if (AFF_FLAGGED(ch, AFF_WATERWALK))
-        return (1);
-    if (can_fly(ch))
-        return (1);
-
-    /* non-wearable boats in inventory will do it */
-    for (obj = ch->carrying; obj; obj = obj->next_content)
-        if (GET_OBJ_TYPE(obj) == ITEM_BOAT
-                && (find_eq_pos(ch, obj, NULL) < 0))
-            return (1);
-
-    /* and any boat you're wearing will do it too */
-    for (i = 0; i < NUM_WEARS; i++)
-        if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
-                GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_BOAT)
-            return (1);
-
-    return (0);
-}
-
-int can_fly(Character *ch) {
-    sh_int i;
-
-    if (GET_LEVEL(ch) >= LVL_IMPL)
-        return (1);
-
-    for (i = 0; i < NUM_WEARS; i++) {
-        if (HAS_BODY(ch, i) && (GET_EQ(ch, i)) &&
-                (GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_WINGS))
-            return (1);
-    }
-
-    if (AFF_FLAGGED(ch, AFF_FLY))
-        return (1);
-
-    return (0);
-}
-
-int has_space_suit(Character *ch) {
-    sh_int i;
-
-    if (GET_LEVEL(ch) >= LVL_IMPL)
-        return (1);
-
-    if (GET_RACE(ch) == RACE_MARTIAN)
-        return 1;
-
-    for (i = 0; i < NUM_WEARS; i++)
-        if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
-                GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_SPACESUIT)
-            return (1);
-
-    return (0);
-}
-
-int has_sun_protection(Character *ch) {
-    sh_int i;
-
-    if (GET_LEVEL(ch) >= LVL_IMPL)
-        return (1);
-
-    for (i = 0; i < NUM_WEARS; i++)
-        if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
-                GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_THERMAL_PROT)
-            return (1);
-
-    return (0);
-}
-
-int can_breathe_underwater(Character *ch) {
-    sh_int i;
-
-    if (GET_RACE(ch) == RACE_MARTIAN)
-        return 1;
-
-    for (i = 0; i < NUM_WEARS; i++)
-        if (HAS_BODY(ch, i) && GET_EQ(ch, i) &&
-                GET_OBJ_TYPE(GET_EQ(ch, i)) == ITEM_AQUALUNG)
-            return (1);
-
-    if (AFF_FLAGGED(ch, AFF_GILLS))
-        return (1);
-
-    return (0);
-}
 
 OBJ_DATA  *is_trapped(room_rnum rm) {
     OBJ_DATA *trap = NULL;
@@ -290,7 +188,7 @@ int move_cost(Character *ch, int dir) {
  */
 int do_simple_move(Character *ch, int dir, int need_specials_check) {
     int same_room = 0, riding = 0, ridden_by = 0;
-    Room * was_in = IN_ROOM(ch);
+    room_rnum was_in = IN_ROOM(ch);
     int need_movement = 0, need_m_movement = 0;
     int vnum, chance, has_moved = FALSE;
     int stam = 0;
@@ -312,7 +210,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
     if (need_specials_check && special(ch, dir + 1, ""))
         return (0);
 
-    if (!can_move(ch)) {
+    if (!ch->CanMove()) {
         ch->Send( "You can't go anywhere in that state!\r\n");
         return 0;
     }
@@ -323,18 +221,18 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         ridden_by = 1;
 
     // if they're mounted, are they in the same room w/ their mount(ee)?
-    if (riding && HERE(RIDING(ch),ch))
+    if (ch->MountHere())
         same_room = 1;
-    else if (ridden_by && HERE(RIDDEN_BY(ch), ch))
+    else if (ch->RiderHere())
         same_room = 1;
 
     // tamed mobiles cannot move about (DAK)
-    if (ridden_by && same_room && AFF_FLAGGED(ch, AFF_TAMED)) {
-        send_to_char("You've been tamed.  Now act it!\r\n", ch);
+    if (ch->RiderHere() && AFF_FLAGGED(ch, AFF_TAMED)) {
+        ch->Send("You've been tamed.  Now act it!\r\n");
         return (0);
     }
     // charmed?
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && HERE(ch, ch->master)) {
+    if (IS_AFFECTED(ch, AFF_CHARM) && ch->MasterHere()) {
         ch->Send( "The thought of leaving your master makes you weep.\r\n");
         return (0);
     }
@@ -347,6 +245,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         ch->Send( "You cannot drag the %s that direction.\r\n", ch->hitched->short_description);
         return 0;
     }
+    if (ch->MountHere() && GET_POS(RIDING(ch)) < POS_STANDING) {
+	ch->Send("You can't move anywhere while your mount is like that!\r\n");
+	return 0;
+    }
     if (!IS_IMM(ch)) {
         if ((ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED))) {
             ch->Send( "That area isn't open yet. Try back later.\r\n");
@@ -355,10 +257,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         /* if this room or the one we're going to needs a boat, check for one */
         if ((SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM) ||
                 (SECT(EXIT(ch, dir)->to_room) == SECT_WATER_NOSWIM)) {
-            if (riding && same_room && !has_boat(RIDING(ch))) {
+            if (ch->MountHere() && !RIDING(ch)->HasBoat()) {
                 ch->Send( "Your mount needs a boat to go there.\r\n");
                 return (0);
-            } else if (!has_boat(ch)) {
+            } else if (!ch->HasBoat()) {
                 ch->Send( "You need a boat to go there.\r\n");
                 return 0;
             }
@@ -368,10 +270,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         /* if this room or the one we're going to needs a boat, check for one */
         if (((SECT(IN_ROOM(ch)) == SECT_WATER_SWIM) ||
                 (SECT(EXIT(ch, dir)->to_room) == SECT_WATER_SWIM))) {
-            if (riding && same_room && can_fly(RIDING(ch))) {
+            if (ch->MountHere() && RIDING(ch)->Flying()) {
                 ch->Send( "Your mount can't fly into that room!\r\n");
                 return (0);
-            } else if (can_fly(ch)) {
+            } else if (ch->Flying()) {
                 ch->Send( "You can't fly into that room!\r\n");
                 return 0;
             }
@@ -380,10 +282,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         /* if this room or the one we're going to is in the air, are we flying? */
         if ((SECT(IN_ROOM(ch)) == SECT_FLYING) ||
                 (SECT(EXIT(ch, dir)->to_room) == SECT_FLYING)) {
-            if (riding && same_room && !can_fly(RIDING(ch))) {
+            if (ch->MountHere() && !RIDING(ch)->Flying()) {
                 ch->Send( "Your mount needs to be able to fly to go there.\r\n");
                 return (0);
-            } else if (!can_fly(ch)) {
+            } else if (!ch->Flying()) {
                 ch->Send( "You need to be able to fly to go there.\r\n");
                 return (0);
             }
@@ -449,52 +351,50 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         need_movement = FTOI(need_movement * 1.5);
 
 
-    if ((RIDING(ch) && HERE(RIDING(ch), ch))) {
+    if (ch->MountHere()) {
         need_m_movement = move_cost(RIDING(ch), dir);
         if (need_m_movement == -1)//pregnant horse?
             return 0;
         if (GET_MOVE(RIDING(ch)) < need_m_movement) {
-            send_to_char("Your mount is too exhausted.\r\n", ch);
+            ch->Send("Your mount is too exhausted.\r\n");
             return (0);
         }
     } else {
         if (GET_MOVE(ch) < need_movement && !IS_NPC(ch)) {
             if (need_specials_check && ch->master)
-                send_to_char("You are too exhausted to follow.\r\n", ch);
+                ch->Send("You are too exhausted to follow.\r\n");
             else
-                send_to_char("You are too exhausted.\r\n", ch);
+                ch->Send("You are too exhausted.\r\n");
             return (0);
         }
     }
-    {
 
-        if (!IS_NPC(ch) && GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
-            stam += use_stamina(ch, 1);
-        else if (RIDING(ch) && HERE(RIDING(ch), ch)) {
-            if (use_stamina(RIDING(ch),  FTOI(MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1))) < 0) {
-                act("Your mount collapses in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
-                act("$n falls over in exhaustion, panting.", FALSE, RIDING(ch), 0, 0, TO_ROOM);
+    if (!IS_NPC(ch) && GET_RACE(ch) == RACE_CENTAUR && !RIDDEN_BY(ch))
+        stam += use_stamina(ch, 1);
+    else if (ch->MountHere()) {
+        if (use_stamina(RIDING(ch),  FTOI(MIN(need_m_movement, 15)  * (AFF_FLAGGED(RIDING(ch), AFF_HASTE) ? 0.5 : 1))) < 0) {
+            act("Your mount collapses in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
+            act("$n falls over in exhaustion, panting.", FALSE, RIDING(ch), 0, 0, TO_ROOM);
 
-                GET_POS(RIDING(ch)) = POS_RESTING;
-                dismount_char(ch);
-                return 0;
-            }
-            stam += use_stamina(ch, 1);
-        } else
-            stam += use_stamina(ch,  FTOI(MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1)));
-
-
-
-        if (stam < 0) {
-            act("You fall over in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
-            act("$n falls over in exhaustion, panting.", FALSE, ch, 0, 0, TO_ROOM);
-            GET_POS(ch) = POS_RESTING;
+            GET_POS(RIDING(ch)) = POS_RESTING;
             dismount_char(ch);
             return 0;
         }
+        stam += use_stamina(ch, 1);
+    } else
+        stam += use_stamina(ch,  FTOI(MIN(need_movement, 15)  * (AFF_FLAGGED(ch, AFF_HASTE) ? 0.5 : 1)));
 
+
+
+    if (stam < 0) {
+        act("You fall over in exhaustion, feeling sick.", FALSE, ch, 0, 0, TO_CHAR);
+        act("$n falls over in exhaustion, panting.", FALSE, ch, 0, 0, TO_ROOM);
+        GET_POS(ch) = POS_RESTING;
+        dismount_char(ch);
+        return 0;
     }
-    if ((RIDING(ch) && HERE(RIDING(ch), ch))
+
+    if (ch->MountHere()
             && GET_SKILL(ch, SKILL_RIDING) < number(1, GET_LEVEL(RIDING(ch)) * 2) - number(-4, need_movement)
             && !AFF_FLAGGED(RIDING(ch), AFF_TAMED)) {
         act("$N rears backwards, throwing you to the ground.", FALSE, ch,
@@ -508,7 +408,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         dismount_char(ch);
         return (0);
     } else {
-        if (RIDING(ch) && HERE(RIDING(ch), ch))
+        if (ch->MountHere())
             improve_skill(ch, SKILL_RIDING);
     }
 
@@ -516,14 +416,14 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
 
     if (IS_SET_AR(ROOM_FLAGS(IN_ROOM(ch)), ROOM_ATRIUM)) {
         if (!House_can_enter(ch, vnum)) {
-            send_to_char("That's private property -- no trespassing!\r\n",  ch);
+            ch->Send("That's private property -- no trespassing!\r\n");
             return (0);
         }
     }
 
-    if ((RIDING(ch) || RIDDEN_BY(ch))
+    if ((ch->RiderHere() || ch->MountHere())
             && IS_SET_AR(ROOM_FLAGS(EXIT(ch, dir)->to_room), ROOM_TUNNEL)) {
-        send_to_char("There isn't enough room there, while mounted.\r\n",    ch);
+        ch->Send("There isn't enough room there, while mounted.\r\n");
         return (0);
     } else {
         if (IS_SET_AR(ROOM_FLAGS(EXIT(ch, dir)->to_room), ROOM_TUNNEL) &&
@@ -540,13 +440,11 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
 
     if (IS_SET_AR(ROOM_FLAGS(EXIT(ch, dir)->to_room), ROOM_ROLEPLAY) &&
             !PLR_FLAGGED(ch, PLR_ROLEPLAYER) && !IS_NPC(ch)) {
-        send_to_char
-        ("That direction is off limits to non-roleplayers.\r\n", ch);
+        ch->Send("That direction is off limits to non-roleplayers.\r\n");
         return (0);
     }
     if (!enter_wtrigger(EXIT(ch, dir)->to_room, ch, dir))
         return 0;
-
 
     if (!leave_wtrigger(IN_ROOM(ch), ch, dir) || IN_ROOM(ch) != was_in) /* prevent teleport crashes */
         return 0;
@@ -557,25 +455,27 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
     if (!leave_mtrigger(ch, dir) || IN_ROOM(ch) != was_in) /* prevent teleport crashes */
         return 0;
 
-    /*will drop excess gold if carring it*/
+    /*will drop excess gold if carrying it*/
     if (GET_LEVEL(ch) < LVL_IMMORT && !IS_NPC(ch) && !number(0, 10))
         spill_gold(ch);
 
+    /* the player is either walking, or riding, but is not being ridden */
     if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT && !RIDDEN_BY(ch)) {
-        if (RIDING(ch) && HERE(RIDING(ch), ch))
+        if (ch->MountHere())
             alter_move(ch, FTOI(need_movement - (need_movement * 0.3)));
         else
             alter_move(ch, need_movement);
     }
-    if (RIDING(ch) && HERE(RIDING(ch), ch))
+    /* now the mount of the player gets altered */
+    if (ch->MountHere())
         alter_move(RIDING(ch), FTOI(need_m_movement + (need_movement * 0.3)));
-    else if (RIDDEN_BY(ch) && HERE(RIDDEN_BY(ch), ch))
+    else if (ch->RiderHere())
         alter_move(ch, FTOI(need_movement - (need_movement * 0.3)));
 
     /*hide move messages from people with the preference to not see it */
     message_type = REST_MOVE;
     /****/
-    if (RIDING(ch) && HERE(RIDING(ch), ch)) {
+    if (ch->MountHere()) {
         if (!IS_AFFECTED(RIDING(ch), AFF_SNEAK)) {
             if (IS_AFFECTED(ch, AFF_SNEAK)) {
                 if (RIDING(ch)->hitched) {
@@ -598,11 +498,11 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
             //It doesn't make sense that you are not sneaking while sitting on a sneaking mount. --Thotter
             //       if(!IS_AFFECTED(ch, AFF_SNEAK))
             //       {
-            //         snprintf(buf2, sizeof(buf2), "$n leavves %s.", dirs[dir]);
+            //         snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
             //         act(buf2, TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
             //       }
         }
-    } else if (RIDDEN_BY(ch) && HERE(RIDDEN_BY(ch), ch)) {
+    } else if (ch->RiderHere()) {
         if (!IS_AFFECTED(ch, AFF_SNEAK)) {
             if (IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK)) {
                 if (ch->hitched) {
@@ -745,7 +645,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
     /*if (MOB_FLAGGED(ch, MOB_HERD))
     act("The entire herd follows the leader.", TRUE, ch, 0, 0,
      TO_ROOM);*/
-    was_in = IN_ROOM(ch);
+
     if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_SPACEBIKE)
         bike = SITTING(ch);
 
@@ -816,7 +716,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
             if (has_moved) {
 
                 act(buf2, TRUE, ch, RIDING(ch)->hitched, RIDING(ch), TO_ROOM);
-
+                if (RIDING(ch)->hitched) {
+                    obj_from_room(RIDING(ch)->hitched);
+                    obj_to_room(RIDING(ch)->hitched, IN_ROOM(ch));
+                }
                 /** move the mount to the char, make sure they don't get dismounted yet!
                  ** then if it is a centaur player, let them know!*/
                 if (move_char_to(RIDING(ch), IN_ROOM(ch)) && !IS_NPC(RIDING(ch))) {
@@ -842,6 +745,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
             if (has_moved) {
                 act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
 
+                if (RIDDEN_BY(ch)->hitched) {
+                    obj_from_room(RIDDEN_BY(ch)->hitched);
+                    obj_to_room(RIDDEN_BY(ch)->hitched, IN_ROOM(ch));
+                }
                 /** move the mount to the char, make sure they don't get dismounted yet!
                  ** then if it is a centaur player, let them know!*/
                 if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)) && !IS_NPC(RIDDEN_BY(ch))) {
@@ -905,7 +812,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
             }
 
         if (has_moved) {
-            if ((RIDING(ch) && RIDING(ch)->hitched) || (RIDDEN_BY (ch) && RIDDEN_BY(ch)->hitched))
+            if ((RIDING(ch) && RIDING(ch)->hitched) || (RIDDEN_BY(ch) && RIDDEN_BY(ch)->hitched))
                 snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, followed by $p.",
                          (dir < UP ? "the " : ""),
                          (dir == UP ? "below" : dir ==
@@ -981,9 +888,10 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
         if (ch->desc != NULL) {
             chance = number(1, 100);
             if (chance > 25 && has_metal_detector(ch) && CAN_MINE(ch)) {
-                send_to_char("\007", ch);
-                send_to_char("Your metal detector begins to go off.\r\n", ch);
-                send_to_char("\007", ch);
+                ch->Send("%s%s%s",
+                         "\007",
+                         "Your metal detector begins to go off.\r\n",
+                         "\007");
             }
         }
     }
@@ -1534,7 +1442,7 @@ ACMD(do_enter) {
     int pass = TRUE;
 
     if (*buf) {            /* an argument was supplied, search for door
-                                                                         * keyword */
+                                                                                 * keyword */
         if ((obj = get_obj_in_list_vis(ch, buf, NULL, IN_ROOM(ch)->contents))) {
             if (CAN_SEE_OBJ(ch, obj)) {
                 switch (GET_OBJ_TYPE(obj)) {
@@ -2185,7 +2093,7 @@ ACMD(do_dismount) {
 
     if (RIDING(ch)) {
 
-        if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !has_boat(ch)) {
+        if (SECT(IN_ROOM(ch)) == SECT_WATER_NOSWIM && !ch->HasBoat()) {
             ch->Send("Yah, right, and then drown...\r\n");
             return;
         }

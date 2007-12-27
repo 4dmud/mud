@@ -782,7 +782,7 @@ void list_one_char(Character *i, Character *ch) {
         ch->Send( ".");
     } else if (GET_POS(i) != POS_FIGHTING) {
         if (!SITTING(i)) {
-            if (GET_POS(i) == POS_STANDING && can_fly(i))
+            if (GET_POS(i) == POS_STANDING && i->Flying())
                 ch->Send( " is flying here.");
             else
                 ch->Send( "%s", positions[(int) GET_POS(i)]);
@@ -1208,7 +1208,7 @@ void look_at_room(Character *ch, int ignore_brief) {
         if (ROOM_FLAGGED(view_room, ROOM_WILDERNESS)) {
             parse_room_name(view_room, tbuf, sizeof(tbuf));
             ch->Send( "[%s%5d%s]%s %s [%s %s %s] (WILDERNESS)",
-                      CBWHT(ch, C_NRM), GET_ROOM_VNUM(IN_ROOM(ch)),
+                      CBWHT(ch, C_NRM), GET_ROOM_VNUM(view_room),
                       CCCYN(ch, C_NRM), SCRIPT(rm) ? "[{cWTRIG{cC] " : "",
                       tbuf, CBWHT(ch, C_NRM), buf,
                       CCCYN(ch, C_NRM));
@@ -1220,8 +1220,8 @@ void look_at_room(Character *ch, int ignore_brief) {
                       CBWHT(ch, C_NRM), buf, CCCYN(ch, C_NRM));
         sprinttype(rm->sector_type, sector_types, tbuf, sizeof(tbuf));
         ch->Send( " (%s)", tbuf);
-    } else if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_WILDERNESS)) {
-        parse_room_name(IN_ROOM(ch), tbuf, sizeof(tbuf));
+    } else if (ROOM_FLAGGED(view_room, ROOM_WILDERNESS)) {
+        parse_room_name(view_room, tbuf, sizeof(tbuf));
         ch->Send(tbuf);
     } else if (ROOM_FLAGGED(view_room, ROOM_ARENA)) {
         ch->Send( "%s (%sARENA%s)", view_room->name,
@@ -2310,7 +2310,7 @@ ACMD(do_score) {
 
     if (AFF_FLAGGED(ch, AFF_FIRE_SHIELD))
         ch->Send( "You are protected by a fire shield!\r\n");
-    if (can_fly(ch))
+    if (ch->Flying())
         ch->Send( "You are flying!\r\n");
 
     /* Romance Module Additions */

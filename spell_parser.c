@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.33  2006/09/19 09:32:37  w4dimenscor
+ * Have changed the movement code, and made some new functions for it.
+ * Made it so that if your mount is sitting you can't move.
+ * Fixed the problem with directional spells
+ *
  * Revision 1.32  2006/09/15 08:01:12  w4dimenscor
  * Changed a large amount of send_to_char's to ch->Send and d->Output. fixed namechange command
  *
@@ -187,8 +192,8 @@ void default_message(void);
 int do_magic_direction(int level, int dir, int dist, Character *ch, Character *vict, int spellnum);
 int sp_dist = -1;
 
-    int tier_level(Character *ch, int chclass);
-    int has_class(Character *ch, int chclass);
+int tier_level(Character *ch, int chclass);
+int has_class(Character *ch, int chclass);
 /*
  * This arrangement is pretty stupid, but the number of skills is limited by
  * the playerfile.  We can arbitrarily increase the number of skills by
@@ -377,10 +382,10 @@ int Character::get_skill(int i) {
     if (GET_RACE(this) == RACE_CENTAUR &&
             (i == 141 || i == 142) )
         return 100;
-if (!IS_NPC(this) && player_specials != NULL)
-    return player_specials->saved.GetSkillLearn(i);
+    if (!IS_NPC(this) && player_specials != NULL)
+        return player_specials->saved.GetSkillLearn(i);
     else
-    return 0;
+        return 0;
 }
 void set_skill(Character *ch, int skill, int amount) {
     SAVED(ch).SetSkillLearn(skill, amount);
@@ -839,8 +844,6 @@ void mag_objectmagic(Character *ch, struct obj_data *obj,
         else
             act("$n quaffs $p.", TRUE, ch, obj, NULL, TO_ROOM);
 
-
-
         WAIT_STATE(ch, 1 RL_SEC);
         if (GET_OBJ_TYPE(obj) == ITEM_POTION) {
             for (i = 1; i <= 3; i++)
@@ -1005,7 +1008,7 @@ ACMD(do_cast) {
     s = strtok(argument, "'");
 
     if (s == NULL) {
-        send_to_char("Cast what where?\r\n", ch);
+        ch->Send("Cast what where?\r\n");
         return;
     }
     s = strtok(NULL, "'");
@@ -1019,7 +1022,7 @@ ACMD(do_cast) {
     spellnum = find_skill_num(s);
 
     if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
-        send_to_char("Cast what?!?\r\n", ch);
+        ch->Send("Cast what?!?\r\n");
         return;
     }
 
@@ -1027,7 +1030,7 @@ ACMD(do_cast) {
 
 
     if (!IS_NPC(ch) && total_chance(ch, spellnum) == 0) {
-        send_to_char("You are unfamiliar with that spell.\r\n", ch);
+        ch->Send("You are unfamiliar with that spell.\r\n");
         return;
     }
 
@@ -1172,9 +1175,7 @@ ACMD(do_cast) {
         }
 
     if (target && (tch == ch) && SINFO.violent) {
-        send_to_char
-        ("You shouldn't cast that on yourself -- could be bad for your health!\r\n",
-         ch);
+        ch->Send("You shouldn't cast that on yourself -- could be bad for your health!\r\n");
         return;
     }
 
@@ -1198,8 +1199,7 @@ ACMD(do_cast) {
     }
     mana = mag_manacost(ch, spellnum);
     if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_HERO)) {
-        ch->Send( "You haven't the energy to cast %s!\r\n",
-                  skill_name(spellnum));
+        ch->Send( "You haven't the energy to cast %s!\r\n", skill_name(spellnum));
         GET_SPELL_DIR(ch) = NOWHERE;
         return;
     }
@@ -1209,14 +1209,18 @@ ACMD(do_cast) {
 
         if (!tch || !skill_message(0, ch, tch, spellnum))
             GET_SPELL_DIR(ch) = NOWHERE;
+            
         if (RIDING(ch))
             ch->Send( "Your mount knocks you about too much!\r\n");
         else
             ch->Send( "You lost your concentration!\r\n");
+            
         if (mana > 0)
             alter_mana(ch, mana / 2);
+            
         if (SINFO.violent && tch && IS_NPC(tch) && HERE(tch, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
             start_fighting(tch, ch);
+            
     } else {            /* cast spell returns 1 on success; subtract mana & set waitstate */
         if (cast_spell(ch, tch, tobj, t, spellnum)) {
             GET_SPELL_DIR(ch) = NOWHERE;
@@ -1229,7 +1233,8 @@ ACMD(do_cast) {
                 if (mana > 0)
                     alter_mana(ch, mana);
             }
-        }
+        } else if (SINFO.violent && tch && IS_NPC(tch) && HERE(tch, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
+            start_fighting(tch, ch);
     }
 }
 int grand_master(Character *ch) {
@@ -1254,7 +1259,7 @@ int knows_spell(Character *ch, int spell) {
 
     if (GET_LEVEL(ch) >= LVL_IMMORT)
         return 1;
-        if (spell < 0 && spell < TOP_SPELL_DEFINE)
+    if (spell < 0 && spell < TOP_SPELL_DEFINE)
         return 0;
     if (spell_info[spell].min_level >= LVL_IMMORT)
         return 0;
