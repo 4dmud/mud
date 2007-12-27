@@ -223,7 +223,6 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
     new_send_to_char(ch, "You can not cast magic that direction.\r\n");
     return NOWHERE;		//cant send magic that way.
   }
-
   if (ROOM_FLAGGED(room, ROOM_PEACEFUL)
       || ((vroom != NULL) && ROOM_FLAGGED(vroom, ROOM_PEACEFUL)))
   {
@@ -241,7 +240,7 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
     if (vroom != NULL && vroom == nextroom)
       return i + 1;
 
-    if CAN_GO2(nextroom, dir)
+    if (CAN_GO2(nextroom, dir))
       nextroom = EXIT2(nextroom, dir)->to_room;
     else
       nextroom = NULL;
@@ -249,7 +248,7 @@ int magic_distance(struct char_data *ch, int spellnum, int dir,
 
   if (vroom != NULL)
   {
-    new_send_to_char(ch, "Nothing in by that name in range to the %s.\r\n", dirs[dir]);
+    new_send_to_char(ch, "Nothing by that name in range to the %s.\r\n", dirs[dir]);
     return NOTHING;
   }
   return i;
@@ -279,9 +278,8 @@ struct char_data *find_in_dir(room_rnum room, char *name, int dir)
     if ((tch = get_room_vis(nextroom, name, 0)) != NULL)
       return tch;
 
-    if CAN_GO2
-    (room, dir)
-      nextroom = EXIT2(room, dir)->to_room;
+    if (CAN_GO2(nextroom, dir))
+      nextroom = EXIT2(nextroom, dir)->to_room;
     else
       nextroom = NULL;
   }
@@ -376,7 +374,8 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   }				/* switch(spellnum) */
-
+if (MOB_FLAGGED(victim, MOB_NOPUSH) && GET_SPELL_DIR(ch) != NOWHERE)
+pass = FALSE;
   skill_attack(ch, victim, spellnum, pass);
   if (DEAD(victim) || GET_POS(victim) == POS_DEAD)
     return -1;

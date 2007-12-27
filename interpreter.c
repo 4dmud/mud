@@ -1363,7 +1363,7 @@ int search_block(char *arg, const char **list, int exact)
   {
     if (!l)
       l = 1;		/* Avoid "" to match the first available
-                        				 * string */
+                            				 * string */
     for (i = 0; **(list + i) != '\n'; i++)
       if (!strncmp(arg, *(list + i), l))
         return (i);
@@ -1736,12 +1736,12 @@ int perform_dupe_check(struct descriptor_data *d)
 
     if (k == d)
       continue;
-      
+
     if (d->character && k->character)
       same_account = (GET_ACC(d->character) == GET_ACC(k->character));
     else
       same_account = 0;
-      
+
     if (k->original && (GET_IDNUM(k->original) == id))
     {
       /* Original descriptor was switched, booting it and restoring normal body control. */
@@ -1862,7 +1862,7 @@ int perform_dupe_check(struct descriptor_data *d)
   return (1);
 }
 
-/** 
+/**
 //This is psudo code for something i would like to impliment eventually
  body human interfaces living {
        breathe {
@@ -2055,7 +2055,6 @@ int enter_player_game(struct descriptor_data *d)
 
 
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
-  if (find_char(GET_IDNUM(ch)) == NULL)
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
 
 
@@ -2222,7 +2221,12 @@ int enter_player_game(struct descriptor_data *d)
   }
   else
   {
-    LOOK(ch);
+    if (AFF_FLAGGED(ch, AFF_SWEET_DREAMS))
+    {
+      GET_POS(ch) = POS_SLEEPING;
+      new_send_to_char(ch, "zzZZzzZZzzZZzzZZzz\r\n");
+    }
+    else {LOOK(ch);}
   }
 
   GET_WAIT_STATE(ch) = 0;

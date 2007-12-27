@@ -9,8 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
- * Revision 1.1  2004/11/12 02:16:15  w4dimenscor
- * Initial revision
+ * Revision 1.2  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
+ * Revision 1.1.1.1  2004/11/12 02:16:15  w4dimenscor
+ * Initial clean submission of 4Dimensions src code
  *
  * Revision 1.48  2004/09/04 03:46:51  molly
  * made it so only one cost for recovering corpses, and skillist is sorted
@@ -1324,7 +1327,7 @@ ACMD(do_cast)
   }
 
   /* You throw the dice and take your chances.. 101% is total failure */
-  if (number(0, 101) > (GET_SKILL(ch, spellnum)-(RIDING(ch) ? 15 : 0)))
+  if (number(0, 101) > (GET_SKILL(ch, spellnum)))
   {
 
     if (!tch || !skill_message(0, ch, tch, spellnum))
@@ -1383,11 +1386,12 @@ int knows_spell(struct char_data *ch, int spell)
   {
     if (gm || (IS_SET(spell_info[spell].classes, (1 << i)) && has_class(ch, i)))
     {
-      if (spell_info[spell].tier < tier_level(ch, i) && spell_info[spell].min_level < LVL_IMMORT)
+    
+      if (spell_info[spell].tier < ( (GET_CLASS(ch) == i) ? tier_level(ch, i) : 2) && spell_info[spell].min_level < LVL_IMMORT)
       {
         ret_val++;
       }
-      else if (spell_info[spell].tier <= tier_level(ch, i) && spell_info[spell].min_level <= GET_LEVEL(ch))
+      else if (spell_info[spell].tier <= ( (GET_CLASS(ch) == i) ? tier_level(ch, i) : 2) && spell_info[spell].min_level <= GET_LEVEL(ch))
       {
         ret_val++;
       }

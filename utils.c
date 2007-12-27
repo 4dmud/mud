@@ -1212,62 +1212,7 @@ int get_pidx_from_name(struct char_data *ch)
   return GET_IDNUM(ch);
 }
 
-void char_from_chair(struct char_data *ch)
-{
-  struct obj_data *chair;
-  struct char_data *tempch;
-  int i, found = 0;
 
-  if (!SITTING(ch))
-    return;
-
-  if (!(chair = SITTING(ch)))
-  {
-    log("SYSERR: ACK, no chair for char in char from chair");
-    SITTING(ch) = NULL;
-    NEXT_SITTING(ch) = NULL;
-    return;
-  }
-
-  if (!(tempch = OBJ_SAT_IN_BY(chair)))
-  {
-    log("SYSERR: Char from chair, but no chair!");
-    SITTING(ch) = NULL;
-    NEXT_SITTING(ch) = NULL;
-    return;
-  }
-
-  if (tempch == ch)
-  {
-    if (!NEXT_SITTING(ch))
-      OBJ_SAT_IN_BY(chair) = NULL;
-    else
-      OBJ_SAT_IN_BY(chair) = NEXT_SITTING(ch);
-    GET_OBJ_VAL(chair, 1) -= 1;
-    SITTING(ch) = NULL;
-    NEXT_SITTING(ch) = NULL;
-
-    return;
-  }
-
-  for (i = 0; i < GET_OBJ_VAL(chair, 1) && found == 0; i++)
-  {
-    if (NEXT_SITTING(tempch) == ch)
-    {
-      NEXT_SITTING(tempch) = NEXT_SITTING(ch);
-      found = 1;
-    }
-  }
-  if (found == 0)
-    log("SYSERR: Char flagged as sitting, but not in chair");
-  else
-    GET_OBJ_VAL(chair, 1) -= 1;
-
-  SITTING(ch) = NULL;
-  NEXT_SITTING(ch) = NULL;
-
-  return;
-}
 
 
 // Called like so from somewhere that you want to ask a question:

@@ -245,7 +245,6 @@ EVENTFUNC(points_event)
     
     /** kill this event **/
     if (ch && GET_POINTS_EVENT(ch, type)) {
-    GET_POINTS_EVENT(ch, type)->event_obj = NULL;
     GET_POINTS_EVENT(ch, type) = NULL;
     }
     

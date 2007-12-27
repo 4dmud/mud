@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.10  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
  * Revision 1.9  2004/12/07 09:31:26  w4dimenscor
  * Trees modularized, fix added to message event
  *
@@ -57,7 +60,7 @@
 /**TODO:
 - need to make it so that spells when cast in battle are passed completely to the combat handler
 so that spell affects arent done at time of casting and damage is done at time of combat. - mord
-
+ 
 **/
 #include "conf.h"
 #include "sysdep.h"
@@ -86,7 +89,7 @@ int corpse_mod = 0;
 float skillmulti = 0;
 
 /* Daniel Houghton's revision */
-extern int skill_roll(struct char_data *ch, int skill_num);
+int skill_roll(struct char_data *ch, int skill_num);
 ACMD(do_sac);
 
 /* External procedures */
@@ -94,6 +97,7 @@ void spill_gold(struct char_data *ch);
 void add_corpse_to_list(OBJ_DATA *corpse);
 void dismount_char(struct char_data *ch);
 int highest_tier(struct char_data *ch);
+void Crash_rentsave(struct char_data *ch, int cost);
 
 void send_char_pos(struct char_data *ch, int dam);
 char *fread_action(FILE * fl, int nr);
@@ -294,8 +298,8 @@ float has_staff(struct char_data *ch)
     switch ((staff_type = GET_OBJ_VAL(staff, 2)))
     {
     case FOCUS_STAFF:
-      multi += ((((float)GET_OBJ_VAL(staff, 0)+num_casting(ch)) * 150.0)+((GET_LEVEL(ch) * 8.0)));
-      multi = IRANGE(1.55, (multi/1000.0), 2.5);
+      multi += ((((float)GET_OBJ_VAL(staff, 0)+num_casting(ch)) * 200.0)+((GET_LEVEL(ch) * 8.0)));
+      multi = IRANGE(1.55, (multi/1000.0), 3);
       break;
     case FOCUS_ORB:
       multi += ((float)GET_OBJ_VAL(staff, 0));
@@ -535,28 +539,28 @@ int num_dice_wep(struct char_data *ch, short dual)
 
 int average_damage(struct char_data *ch)
 {
-  int dam = class_damroll(ch);
+  float dam = class_damroll(ch) * 0.75;
 
   if (!IS_NPC(ch))
   {
     switch (find_fe_type(ch))
     {
     case FE_TYPE_SPELL:
-      dam += ((spell_size_dice(ch) +1)) * spell_num_dice(ch);
+      dam += 0.5 * (((spell_size_dice(ch) +1)) * spell_num_dice(ch));
       break;
     default:
-      dam += ((size_dice_wep(ch, WEAPON_PRIM_AFF) +1)) * num_dice_wep(ch, WEAPON_PRIM_AFF);
+      dam += 0.5 * (((size_dice_wep(ch, WEAPON_PRIM_AFF) +1)) * num_dice_wep(ch, WEAPON_PRIM_AFF));
       break;
     }
   }
   else
   {
-    dam += ((ch->mob_specials.damsizedice +1)) * ch->mob_specials.damnodice;
+    dam += (((ch->mob_specials.damsizedice +1)) * ch->mob_specials.damnodice) * 0.5;
     dam += dam * (MOB_TIER(ch) * 0.25);
   }
 
 
-  return dam;
+  return (int)dam;
 }
 
 /*move this to constants */
@@ -599,6 +603,9 @@ victim = RIDDEN_BY(vict) ? HERE(RIDDEN_BY(vict), vict) ? RIDDEN_BY(vict) : vict 
 
   if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
     affect_from_char(victim, SPELL_SWEET_DREAMS);
+
+  GET_POS(victim) = POS_STANDING;
+
 
 
   if (!can_fight(ch, victim))
@@ -771,7 +778,6 @@ EVENTFUNC(fight_event)
       }
     }
 #endif
-    GET_FIGHT_EVENT(ch)->event_obj = NULL;
     GET_FIGHT_EVENT(ch) = NULL;
 
     if (!DEAD(ch) && FIGHTING(ch))
@@ -1076,6 +1082,12 @@ int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_typ
       damage *= 0.8;
   }
 
+  if (GET_SPELL_DIR(ch) != NOWHERE && !HERE(ch, vict))
+  {
+    int v, dist = magic_distance(ch, w_type, GET_SPELL_DIR(ch), vict);
+    for (v = 0; v < dist; v++)
+    dam *= 0.5;
+  }
 
   /* P v P combat, lower damage */
   if (!IS_NPC(ch) && !IS_NPC(vict))
@@ -1443,9 +1455,9 @@ int fight_event_hit(struct char_data* ch, struct char_data* vict, short type, sh
   else
   {
 
-/** I want this to happen but the skills still need to pass through **/
-   // if (GET_WAIT_STATE(ch) > 0)
-   //   return 0;
+    /** I want this to happen but the skills still need to pass through **/
+    // if (GET_WAIT_STATE(ch) > 0)
+    //   return 0;
 
 
     if (GET_POS(ch) == POS_SITTING)
@@ -4425,7 +4437,7 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
     for (i = 0; i < NUM_WEARS; i++)
       if (GET_EQ(ch, i))
       {
-        remove_otrigger(GET_EQ(ch, i), ch);
+        //remove_otrigger(GET_EQ(ch, i), ch);
         obj_to_obj(unequip_char(ch, i), corpse);
       }
 
@@ -4451,8 +4463,11 @@ void make_corpse(struct char_data *ch, struct char_data *killer)
     }
 
     obj_to_room(corpse, IN_ROOM(ch));
+    if (!IS_NPC(ch))
+    {
     add_corpse_to_list(corpse);
     save_corpses();
+    }
   }
 }
 
@@ -4607,7 +4622,7 @@ void raw_kill(struct char_data *ch, struct char_data *killer)
   make_corpse(ch, killer);
   // clears out eq
   if (IS_NPC(ch))
-    Crash_crashsave(ch);
+    Crash_rentsave(ch, 0);
   death_room(ch);
 }
 
@@ -4727,7 +4742,7 @@ void group_gain(struct char_data *ch, struct char_data *victim)
 
   /* prevent illegal xp creation when killing players */
   if (!IS_NPC(victim))
-    tot_gain = MIN(CONFIG_MAX_EXP_LOSS * 2 / 3, tot_gain);
+    tot_gain = MIN(CONFIG_MAX_EXP_LOSS * 0.66, tot_gain);
 
   if (HERE(k, ch) && GET_PERC(k) > 0)
   {
@@ -5262,7 +5277,7 @@ void tick_grenade(void)
           /* checks to see if inside containers */
           /* to avoid possible infinite loop add a counter variable */
           s = 0;	/* we'll jump out after 5 containers deep and just delete
-                                                                                                                          				   the grenade */
+                                                                                                                                    				   the grenade */
 
           for (tobj = i; tobj; tobj = tobj->in_obj)
           {
@@ -5783,7 +5798,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
   case SPELL_BURNING_HANDS:
     if ( underwater )
       dam = 0.25;
-    else if ( raining || cold)
+    else if ( (!inside && raining) || cold)
       dam = 0.5;
     else if ( hot )
       dam = 1.7;
@@ -5813,7 +5828,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
 
     dam += .5;
 
-    if (raining)
+    if (raining && !inside)
       dam *= 0.5;
     else if (underwater)
       dam *= 0.01;
@@ -6079,8 +6094,8 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
 
     dam += 0.5;
 
-    if (raining)
-      dam *= 0.6;
+    if (raining && !inside)
+      dam *= 0.5;
     else if (underwater)
       dam *= 0.02;
     break;
@@ -6094,7 +6109,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     else
       dam = 1.5;
 
-    if (underwater || raining)
+    if (underwater || (!inside && raining))
       dam += 0.5;
 
     break;
@@ -6132,7 +6147,7 @@ float skill_type_multi(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     else
       dam = 1.3;
 
-    if (raining)
+    if (!inside && raining)
       dam *= 0.5;
     else if (underwater)
       dam *= 0.01;

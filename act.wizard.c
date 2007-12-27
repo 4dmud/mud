@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.6  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
  * Revision 1.5  2004/12/05 09:46:52  w4dimenscor
  * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
  *
@@ -6153,8 +6156,8 @@ ACMD(do_award)
       return;
     }
 
-    new_send_to_char(vict, "%s showers you in praise and awards you %d point%s!", GET_NAME(ch), pts, pts > 1 ? "s" : "");
-    new_send_to_char(ch, "You shower %s in praise and award %d point%s!", GET_NAME(vict), pts, pts > 1 ? "s" : "");
+    new_send_to_char(vict, "%s showers you in praise and awards you %d point%s!\r\n", GET_NAME(ch), pts, pts > 1 ? "s" : "");
+    new_send_to_char(ch, "You shower %s in praise and award %d point%s!\n\n", GET_NAME(vict), pts, pts > 1 ? "s" : "");
 
     if (GET_LEVEL(ch) < LVL_IMMORT)
       GET_AWARD(ch)   -= pts;
@@ -6192,7 +6195,7 @@ ACMD(do_ps_aux)
   char line[MAX_INPUT_LENGTH];
   FILE *fl;
 
-  system("ps auxc | grep circle > psaux");
+  system("ps aux | grep circle > psaux");
 
   if ((fl = fopen("psaux", "r")) == NULL)
   {
@@ -6254,9 +6257,16 @@ ACMD(do_namechange)
   DESCRIPTOR_DATA *d;
   char newname[256], oldname[256], passw[256];
 
-  two_arguments(argument, oldname, newname);
+  argument = two_arguments(argument, oldname, newname);
+  one_argument(argument, passw);
 
-  if ((!*oldname || !*newname) || (strlen(newname) >= MAX_NAME_LENGTH) || (strlen(newname) < 3))
+  if ((!*oldname || !*newname || !*passw) )
+  {
+  new_send_to_char(ch, "namechange <oldname> <newname> <newpassword>\r\n");
+    return;
+  }
+  
+  if ( (strlen(newname) >= MAX_NAME_LENGTH) || (strlen(newname) < 3))
   {
     new_send_to_char(ch, "Sorry but that name is the wrong length\r\n");
     return;
@@ -6269,8 +6279,8 @@ ACMD(do_namechange)
       continue;
     if (compares(GET_NAME(d->character), oldname))
     {
-      free_string(GET_NAME(d->character));
-      GET_NAME(d->character) = str_dup(newname);
+      free_string(GET_PC_NAME(d->character));
+      GET_PC_NAME(d->character) = str_dup(newname);
       newname[0] = LOWER(newname[0]);
       sprintf(passw, "%s", CRYPT(GET_PC_NAME(d->character), GET_PASSWD(d->character)));
       strncpy(GET_PASSWD(d->character),

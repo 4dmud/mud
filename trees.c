@@ -153,9 +153,10 @@ ACMD(forest_find)
     for (tree = object_list; tree; tree = next_tree)
     {
       next_tree = tree->next;
-      if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING))
+      if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING)) {
       tree_total--;
         extract_obj(tree);
+	}
     }
     save_forest();
     new_send_to_char(ch, "Cleared and saved.\r\n");
@@ -311,7 +312,7 @@ void check_all_trees(void)
     /*tree check*/
     if (GET_OBJ_TYPE(obj) == ITEM_TREE && GET_OBJ_VNUM(obj) == NOTHING)
     {
-      if ((tm - GET_OBJ_VAL(obj, 0)) > (7 * SECS_PER_REAL_DAY))
+      if ((tm - GET_OBJ_VAL(obj, 0)) / (7 * SECS_PER_REAL_DAY) > GET_OBJ_VAL(obj, 1))
       {
         if (GET_OBJ_VAL(obj, 1) <= MAX_TREE_AGE)
         {

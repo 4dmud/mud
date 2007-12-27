@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.7  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
  * Revision 1.6  2004/12/07 09:31:26  w4dimenscor
  * Trees modularized, fix added to message event
  *
@@ -4001,7 +4004,7 @@ int speed_update(struct char_data *ch)
 
 
     if (RIDING(ch) && HERE(RIDING(ch), ch) && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
-      speed += 100 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
+      speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
     else if (GET_RACE(ch) == RACE_CENTAUR && GET_SKILL(ch, SKILL_MOUNTED_COMBAT))
       speed += 50 * 1.0 + (total_chance(ch, SKILL_MOUNTED_COMBAT) * 0.0025);
     // end of player speed

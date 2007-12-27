@@ -721,6 +721,7 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
   if (cur != NULL)
     char_from_room(ch);
+    char_from_chair(ch);
 
   if (cur == IN_ROOM(ch))
     return 0;
@@ -744,7 +745,62 @@ int move_char_to(struct char_data *ch, room_rnum room)
 
 
 }
+void char_from_chair(struct char_data *ch)
+{
+  struct obj_data *chair;
+  struct char_data *tempch;
+  int i, found = 0;
 
+  if (!SITTING(ch))
+    return;
+
+  if (!(chair = SITTING(ch)))
+  {
+    log("SYSERR: ACK, no chair for char in char from chair");
+    SITTING(ch) = NULL;
+    NEXT_SITTING(ch) = NULL;
+    return;
+  }
+
+  if (!(tempch = OBJ_SAT_IN_BY(chair)))
+  {
+    log("SYSERR: Char from chair, but no chair!");
+    SITTING(ch) = NULL;
+    NEXT_SITTING(ch) = NULL;
+    return;
+  }
+
+  if (tempch == ch)
+  {
+    if (!NEXT_SITTING(ch))
+      OBJ_SAT_IN_BY(chair) = NULL;
+    else
+      OBJ_SAT_IN_BY(chair) = NEXT_SITTING(ch);
+    GET_OBJ_VAL(chair, 1) -= 1;
+    SITTING(ch) = NULL;
+    NEXT_SITTING(ch) = NULL;
+
+    return;
+  }
+
+  for (i = 0; i < GET_OBJ_VAL(chair, 1) && found == 0; i++)
+  {
+    if (NEXT_SITTING(tempch) == ch)
+    {
+      NEXT_SITTING(tempch) = NEXT_SITTING(ch);
+      found = 1;
+    }
+  }
+  if (found == 0)
+    log("SYSERR: Char flagged as sitting, but not in chair");
+  else
+    GET_OBJ_VAL(chair, 1) -= 1;
+
+  SITTING(ch) = NULL;
+  NEXT_SITTING(ch) = NULL;
+
+  return;
+}
 
 /* move a player out of a room */
 void char_from_room(struct char_data *ch)
@@ -1754,8 +1810,7 @@ void death_room(struct char_data *ch)
 
   write_to_output(ch->desc, "{cYAs your last breath passes, time rolls back to just before you died\r\n"
                   "and you find yourself transfered to a temple of healing.{c0\r\n");
-
-  GET_HIT(ch) = 1;
+alter_hit(ch, GET_HIT(ch) -3);
 
   if (RIDING(ch) || RIDDEN_BY(ch))
     dismount_char(ch);
@@ -1770,7 +1825,7 @@ void death_room(struct char_data *ch)
   halt_fighting(ch);
 
   /* cancel point updates */
- /** no need to cancle regen!**/
+ /** no need to cancel regen!**/
  /* 
  {
   int i;
@@ -1792,6 +1847,10 @@ void death_room(struct char_data *ch)
   /* cancel the task */
   stop_task(ch);
   remove_hunter(ch);
+  
+  
+  /* remove any pending event for/from this character */
+  clean_events2(ch);
 
   /* we can't forget the hunters either... */
   for (hunt = hunter_list; hunt; hunt = hnext)
@@ -1807,15 +1866,10 @@ void death_room(struct char_data *ch)
     remove_hunter(hunt->hunter);
 
   }
-
-  char_from_room(ch);
-  /* remove any pending event for/from this character */
-  clean_events2(ch);
-  char_to_room(ch, real_room(1205));
+  move_char_to(ch, real_room(1205));
   LOOK(ch);
   GET_WAIT_STATE(ch) = 2 RL_SEC;
   affect_total(ch);
-  GET_HIT(ch) = 3;
   check_regen_rates(ch);
   save_char(ch);
 
@@ -1844,8 +1898,7 @@ void extract_char_final(struct char_data *ch)
 
   if (IN_ROOM(ch) == NULL)
   {
-    log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)",
-        GET_NAME(ch), __FILE__);
+    log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
     ALERT_1;
     abort();
   }
@@ -1858,9 +1911,6 @@ void extract_char_final(struct char_data *ch)
   /* Forget snooping, if applicable */
   if (ch->desc)
   {
-
-
-
     if (ch->desc->snooping)
     {
       ch->desc->snooping->snoop_by = NULL;
@@ -1868,8 +1918,7 @@ void extract_char_final(struct char_data *ch)
     }
     if (ch->desc->snoop_by)
     {
-      SEND_TO_Q("Your victim is no longer among us.\r\n",
-                ch->desc->snoop_by);
+      SEND_TO_Q("Your victim is no longer among us.\r\n",  ch->desc->snoop_by);
       ch->desc->snoop_by->snooping = NULL;
       ch->desc->snoop_by = NULL;
     }
@@ -2227,7 +2276,7 @@ struct char_data *get_room_vis(room_rnum room, char *name, int *number)
     return (get_player_room(room, name, NULL, FIND_CHAR_ROOM));
 
   for (i = room->people; i && *number; i = i->next_in_room)
-    if (isname(name, i->player.name))
+    if (isname(name, GET_NAME(i)))
       if (--(*number) == 0)
         return (i);
 

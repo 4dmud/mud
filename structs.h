@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.7  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
  * Revision 1.6  2004/12/07 09:31:26  w4dimenscor
  * Trees modularized, fix added to message event
  *
@@ -2160,7 +2163,7 @@ struct ore_info_data
 /*event objects */
 struct message_event_obj
 {
-  long ch_id;
+  struct char_data *ch;
   int skill;
   int type; //0 = skill-spell : 1 = subskill
   int msg_num; // iterative number for what part of the skill it is in

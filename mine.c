@@ -165,7 +165,7 @@ ASUB(sub_tunneling)
   toggle_sub_status(ch, SUB_TUNNELING, STATUS_ON);
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = ch;
   msg->skill = SUB_TUNNELING;
   msg->type = THING_SUB;
   msg->msg_num = density;

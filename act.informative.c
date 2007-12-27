@@ -832,7 +832,7 @@ void list_one_char(struct char_data *i, struct char_data *ch)
   {
     if (!SITTING(i))
     {
-      if (can_fly(i))
+      if (GET_POS(i) == POS_STANDING && can_fly(i))
         new_send_to_char(ch, " is flying here.");
       else
         new_send_to_char(ch, "%s", positions[(int) GET_POS(i)]);
@@ -1202,7 +1202,7 @@ void parse_room_description(room_rnum in_room, char *bufptr, size_t len)
                "The immense heat emerging from the fusion of the sun burns your ship to\r\n"
                "cinders in a spilt second.  Nothing can survive this scorching heat.\r\n");
       break;
-          case SECT_BLACKHOLE:
+    case SECT_BLACKHOLE:
       snprintf(bufptr, len, "No light escapes from here, infact nothing escapes. Ever.");
       break;
     case SECT_VEHICLE:
@@ -1343,9 +1343,10 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   list_char_to_char(view_room->people, ch);
   new_send_to_char(ch, "%s", CCNRM(ch, C_NRM));
 
-  if ( KILL_ALL_ENABLED && PRF_FLAGGED(ch, PRF_AGGRO) ) {
+  if ( KILL_ALL_ENABLED && PRF_FLAGGED(ch, PRF_AGGRO) )
+  {
     command_interpreter(ch, "kill all");
-    }
+  }
 }
 
 
@@ -2345,7 +2346,7 @@ ACMD(do_score)
                      "{cg| |-------------------------------------------------------------------| |\r\n"
                      "{cg| |   {cwExp. Total: {cy%-15s{cg  Needed To Level: {cC%-15s{cg   | |\r\n",
                      exphave, exp_needed(ch) > 0 ? expneed : "No More");
-   if (GET_LEVEL(ch) >= 20)
+    if (GET_LEVEL(ch) >= 20)
     {
       commafmt(exphave, sizeof(exphave),GET_GROUP_EXP(ch));
       commafmt(expneed, sizeof(expneed),group_exp_needed(ch));
@@ -2384,19 +2385,19 @@ ACMD(do_score)
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
-     if (PRF_FLAGGED(ch, PRF_BUSY))
+  if (PRF_FLAGGED(ch, PRF_BUSY))
   {
-  if (ch->player_specials->busy_msg)
-    new_send_to_char(ch, "You are BUSY: %s\r\n", ch->player_specials->busy_msg);
+    if (ch->player_specials->busy_msg)
+      new_send_to_char(ch, "You are BUSY: %s\r\n", ch->player_specials->busy_msg);
     else
-    new_send_to_char(ch, "You are BUSY!\r\n");
+      new_send_to_char(ch, "You are BUSY!\r\n");
   }
-     if (PRF_FLAGGED(ch, PRF_AFK))
+  if (PRF_FLAGGED(ch, PRF_AFK))
   {
-  if (ch->player_specials->afk_msg)
-    new_send_to_char(ch, "You are AFK: %s\r\n", ch->player_specials->afk_msg);
+    if (ch->player_specials->afk_msg)
+      new_send_to_char(ch, "You are AFK: %s\r\n", ch->player_specials->afk_msg);
     else
-    new_send_to_char(ch, "You are AFK!\r\n");
+      new_send_to_char(ch, "You are AFK!\r\n");
   }
   switch (GET_POS(ch))
   {
@@ -2460,7 +2461,7 @@ ACMD(do_score)
   if (AFF_FLAGGED(ch, AFF_SANCTUARY))
     new_send_to_char(ch, "You are protected by Sanctuary.\r\n");
 
-if (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) ||
+  if (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) ||
       AFF_FLAGGED(ch, AFF_POISON_3) || AFF_FLAGGED(ch, AFF_POISON_4))
     new_send_to_char(ch, "You are poisoned!\r\n");
 
@@ -2842,7 +2843,8 @@ ACMD(do_help)
 
     if (bot > top)
     {
-      new_send_to_char(ch, "There is no help on that word.\r\n");
+    //TODO: add in random examples
+      new_send_to_char(ch, "There is no help on that word.\r\nUse QUESTION to ask the other players.\r\neg: question what is magic missile?\r\n");
       log("HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME(ch), argument);
       return;
     }
@@ -3351,7 +3353,7 @@ ACMD(do_who)
         if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
         {
           snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0%s{cx %s",
-	  TIER_COLOR_WHO(current_class_is_tier_num(wch)),
+                   TIER_COLOR_WHO(current_class_is_tier_num(wch)),
                    current_class_is_tier_num(wch), GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                    (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
                    (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),	//is RP or not? dark green
@@ -3367,7 +3369,7 @@ ACMD(do_who)
         {
           snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0%-20s{cx",
                    TIER_COLOR_WHO(current_class_is_tier_num(wch)),
-		   current_class_is_tier_num(wch),GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
+                   current_class_is_tier_num(wch),GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                    (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),	//is PK or not? bold red
                    (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),	//is RP or not? dark green
                    ((GET_SEX(wch) == SEX_FEMALE) ? "F" : (GET_SEX(wch) == SEX_MALE) ? "M" : "N"),
@@ -3381,10 +3383,10 @@ ACMD(do_who)
     len = 0;
     DYN_RESIZE(buf);
 
-    if (GET_CLAN(wch))
+    if ((GET_LEVEL(wch) < LVL_HERO) && GET_CLAN(wch))
     {	/*added ' leader' to the clan name, gave it round brackets and light cyan color that wont bleed a imms title */
-      len += snprintf(buf + len, sizeof(buf) - len, " %s(%s%s%s%s)", 
-      (GET_LEVEL(wch) >= LVL_HERO ? CCYEL(ch, C_SPR):CCNRM(ch, C_NRM)), CCCYN(ch, C_NRM),
+      len += snprintf(buf + len, sizeof(buf) - len, " %s(%s%s%s%s)",
+                      (GET_LEVEL(wch) >= LVL_HERO ? CCYEL(ch, C_SPR):CCNRM(ch, C_NRM)), CCCYN(ch, C_NRM),
                       clan_name(find_clan_by_id(GET_CLAN(wch))),
                       ((clan[find_clan_by_id(GET_CLAN(wch))].ranks ==
                         (GET_CLAN_RANK(wch))) ? " Leader" : ""),
@@ -3398,7 +3400,7 @@ ACMD(do_who)
     if (IS_AFFECTED(wch, AFF_INVISIBLE))
       len += snprintf(buf + len, sizeof(buf) - len, " (invis)");
 
-    if (PLR_FLAGGED(wch, PLR_HERO))
+    if ((GET_LEVEL(wch) < LVL_HERO) && PLR_FLAGGED(wch, PLR_HERO))
       len += snprintf(buf + len, sizeof(buf) - len, " (%sHERO%s)", CCYEL(ch, C_NRM), ((GET_LEVEL(wch) >= LVL_HERO) ? CCYEL(ch, C_NRM) : CCNRM(ch, C_NRM)));	//not displaying helper flag yet
 
 
@@ -3852,8 +3854,9 @@ void print_object_location(int num, struct obj_data *obj,
     sprintf(buffer + strlen(buffer), "worn by %s\r\n",
             PERS(obj->worn_by, ch));
   }
-  else if (obj->in_locker) {
-  sprintf(buffer + strlen(buffer), "in locker of %s\r\n",
+  else if (obj->in_locker)
+  {
+    sprintf(buffer + strlen(buffer), "in locker of %s\r\n",
             PERS(obj->in_locker, ch));
   }
   else if (obj->in_obj)
@@ -4942,7 +4945,7 @@ ACMD(do_worth)
                    SUNNY ? sunnage[11] : moonage[11], chance_hit_part(ch, PART_LEFT_LEG),
                    SUNNY ? sunnage[12] : moonage[12], chance_hit_part(ch, PART_LEFT_LEG),
                    SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS(ch),
-                   SUNNY ? sunnage[14] : moonage[14], update_award(ch), 
+                   SUNNY ? sunnage[14] : moonage[14], update_award(ch),
                    SUNNY ? sunnage[14] : moonage[14], buf,
                    SUNNY ? sunnage[14] : moonage[14], GET_STAMINA(ch), GET_MAX_STAMINA(ch),
                    SUNNY ? sunnage[14] : moonage[14], print_elemental(GET_CLASS(ch), TRUE, buf1, sizeof(buf1)),

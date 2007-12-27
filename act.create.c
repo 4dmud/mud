@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.4  2004/12/17 07:13:20  w4dimenscor
+ * A few little updates.
+ *
  * Revision 1.3  2004/12/07 09:31:26  w4dimenscor
  * Trees modularized, fix added to message event
  *
@@ -73,11 +76,6 @@ struct syllable
 /* extern variables */
 extern struct spell_info_type spell_info[];
 extern struct syllable syls[];
-extern struct index_data *obj_index;
-extern struct room_data *world;
-extern struct forest_data *forest;
-extern int tree_total;
-extern int forest_room;
 
 /* extern procedures */
 int mag_manacost(struct char_data *ch, int spellnum);
@@ -789,7 +787,7 @@ ASKILL(skill_sing_wood)
   GET_MSG_RUN(ch) = 1;
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = ch;
   msg->skill = SKILL_SING_WOOD;
   msg->type = THING_SKILL;
   msg->msg_num = 11;
@@ -855,7 +853,7 @@ ASKILL(skill_manifest)
   }
   GET_MSG_RUN(ch) = 1;
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = ch;
   msg->skill = SKILL_MANIFEST;
   msg->type = THING_SKILL;
   msg->msg_num = 8;
@@ -949,7 +947,7 @@ EVENTFUNC(message_event)
   long time = 0;
 
   long uid = msg->id;
-  struct char_data *ch = find_char(msg->ch_id);
+  struct char_data *ch = msg->ch;
   short type = msg->type;
   int skill = msg->skill;
 
@@ -965,7 +963,6 @@ EVENTFUNC(message_event)
 
   if (msg->msg_num == 0)
   {
-  GET_MESSAGE_EVENT(ch)->event_obj = NULL;
   GET_MESSAGE_EVENT(ch) = NULL;
     free(event_obj);
     return 0;
@@ -1027,7 +1024,6 @@ EVENTFUNC(message_event)
   {
     if (ch) {
       GET_MSG_RUN(ch) = 0;
-      GET_MESSAGE_EVENT(ch)->event_obj = NULL;
   GET_MESSAGE_EVENT(ch) = NULL;
   }
     free(event_obj);
@@ -1052,6 +1048,8 @@ ACMD(do_fell)
   char *temp1;
   int found = FALSE;
   struct message_event_obj *msg = NULL;
+  
+ struct obj_data *axe = GET_EQ(ch, WEAR_WIELD);
 
   if (GET_SUB(ch, SUB_LUMBERJACK) <= 0)
   {
@@ -1059,7 +1057,11 @@ ACMD(do_fell)
     return;
   }
 
-
+  
+  if (!axe || GET_OBJ_TYPE(axe) != ITEM_AXE) {
+  new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+  return;
+  }
   skip_spaces(&argument);
   temp1 = one_argument(argument, tree_name);
 
@@ -1103,7 +1105,7 @@ ACMD(do_fell)
   GET_MSG_RUN(ch) = 1;
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = ch;
   msg->skill = SUB_LUMBERJACK;
   msg->type = THING_SUB;
   msg->msg_num = 12;

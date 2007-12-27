@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "trees.h"
 
 #define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
 #define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
@@ -23,26 +24,13 @@ EVENTFUNC(message_event);
 ASKILL(skill_manifest);
 ACMD(do_flee);
 int can_fight(struct char_data *ch, struct char_data *vict);
-extern void make_manifest(struct char_data *ch,struct obj_data *obj);
+void make_manifest(struct char_data *ch,struct obj_data *obj);
 ASKILL(skill_manipulate);
-extern struct obj_data *make_tree(void);
-extern int find_forest_rand(void);
-extern void load_trees(void);
-extern void parse_tree_name(struct obj_data *tree);
-extern void create_trees(void);
-extern struct char_data *find_char(long n);
-extern struct obj_data *find_obj(long n);
-extern struct room_data *find_room(long n);
 /* extern variables */
 int has_weapon(struct char_data *ch);
 void start_fighting_delay(struct char_data *vict, struct char_data *ch);
 extern struct spell_info_type spell_info[];
 extern struct syllable syls[];
-extern struct index_data *obj_index;
-extern struct room_data *world_vnum[];
-extern struct forest_data *forest;
-extern int tree_total;
-extern int forest_room;
 int skill_cost(int h, int m, int v, struct char_data *ch);
 int tier_level(struct char_data *ch, int chclass);
 ASUB(sub_throttle);
@@ -73,7 +61,14 @@ ACTION(thing_lumberjack)
   //const char *to_vict = NULL;
   const char *to_char = NULL;
   const char *to_room = NULL;
-  struct obj_data *object = NULL;
+  
+  struct obj_data *object = GET_EQ(ch, WEAR_WIELD);
+  
+  if (!object || GET_OBJ_TYPE(object) != ITEM_AXE) {
+  new_send_to_char(ch, "You can't chop trees without a good axe!\r\n");
+  *num = 0;
+  time = 0;
+  }
 
   if (!*num)
   {
@@ -82,11 +77,12 @@ ACTION(thing_lumberjack)
     return 0;
   }
 
-  if (obj==NULL || IN_ROOM(obj)==NULL || (IN_ROOM(obj) != IN_ROOM(ch)))
+  if (obj==NULL || IN_ROOM(obj)==NULL || (!HERE(obj, ch)))
   {
     /* object is gone.*/
     to_char = "You can't seem to concentrate on felling the tree.";
     *num = 0;
+    time = 0;
   }
   else
   {
@@ -189,6 +185,7 @@ ACTION(thing_tunneling)
   {
     new_send_to_char(ch, "You can't tunnel without a tool!\r\n");
     *num = 0;
+    time = 0;
     return 0;
   }
 
@@ -204,6 +201,7 @@ ACTION(thing_tunneling)
   {
     to_char = "You can't seem to concentrate on tunneling.";
     *num = 0;
+    time = 0;
     return 0;
   }
   else if (R_EXIT(room, MINE_DIR(ch)))
@@ -507,7 +505,7 @@ ASUB(sub_juggle)
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = (ch);
   msg->skill = SUB_JUGGLE;
   msg->type = THING_SUB;
   msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));
@@ -882,7 +880,7 @@ ASUB(sub_throttle)
   toggle_sub_status(ch, SUB_THROTTLE, STATUS_ON);
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = (ch);
   msg->skill = SUB_THROTTLE;
   msg->type = THING_SUB;
   msg->msg_num = 18;
@@ -1079,7 +1077,7 @@ ASUB(sub_tumble)
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = (ch);
   msg->skill = SUB_JUGGLE;
   msg->type = THING_SUB;
   msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));
@@ -1144,7 +1142,7 @@ ASUB(sub_clown)
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   CREATE(msg, struct message_event_obj, 1);
-  msg->ch_id = GET_ID(ch);
+  msg->ch = (ch);
   msg->skill = SUB_JUGGLE;
   msg->type = THING_SUB;
   msg->msg_num = (vict == NULL ? number(1, 4) : number(5, 8));

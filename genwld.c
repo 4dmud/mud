@@ -235,6 +235,8 @@ int delete_room(room_rnum rnum)
   do
   {
     i--;
+    if (world_vnum[i] == NULL)
+    continue;
     for (j = 0; j < NUM_OF_DIRS; j++)
       if (W_EXIT(world_vnum[i], j) == NULL)
         continue;
