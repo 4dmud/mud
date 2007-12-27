@@ -898,6 +898,7 @@ const struct command_info cmd_info[] =
     { "slip"     , "sli" , POS_STANDING, do_skills     , 1, SKILL_SLIP, 0 },
     { "snare"    , "sna"  , POS_FIGHTING, do_skills    , 1, SKILL_SNARE, 0 },
     { "sneak"    , "snea"	, POS_STANDING, do_skills    , 1, SKILL_SNEAK, 0 },
+    { "smash"   , "smas" , POS_FIGHTING, do_skills   , 0, SKILL_SMASH, 0 },
     { "steal"    , "stea"	, POS_STANDING, do_skills    , 1, SKILL_STEAL, 0 },
     { "strangle"    , "stra", POS_STANDING, do_skills    , 1, SKILL_STRANGLE, 0 },
     { "tame"     , "tam"  , POS_RESTING , do_skills     , 0, SKILL_TAME, 0 },

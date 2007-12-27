@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.5  2005/03/17 12:42:13  w4dimenscor
+ * Added skill smash
+ *
  * Revision 1.4  2005/02/25 05:02:46  w4dimenscor
  * added new commands and a few little changes - i forget what eek
  *
@@ -315,6 +318,7 @@ enum skill_list {
   SKILL_BLADE_DANCE,
   SKILL_LONGARM,
   SKILL_CLEAVE,//199
+  SKILL_SMASH,
 
   MAX_SKILLS
 };

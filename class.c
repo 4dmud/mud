@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.3  2005/03/17 12:42:13  w4dimenscor
+ * Added skill smash
+ *
  * Revision 1.2  2005/02/04 20:46:11  w4dimenscor
  * Many changes - i couldn't connect to this for a while
  *
@@ -1274,6 +1277,7 @@ void init_spell_levels(void)
   assign_class(SKILL_TRAP_AWARE,	THI | HUN);
   assign_class(SKILL_CROSSBOW,		ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_DISARM,		THI | ALL_FIGHTER);
+  assign_class(SKILL_SMASH,		ALL_FIGHTER);
   assign_class(SKILL_CIRCLE,		THI);
   assign_class(SKILL_BLACKJACK, 	THI);
   assign_class(SKILL_PUSH,		ALL_FIGHTER);

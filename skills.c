@@ -98,6 +98,7 @@ ASKILL(skill_strangle);
 ASKILL(skill_track);
 ASKILL(skill_trample);
 ASKILL(skill_disarm);
+ASKILL(skill_smash);
 ASKILL(skill_joust);
 ASKILL(skill_dodge);
 ASKILL(skill_charge);
@@ -212,6 +213,8 @@ void assign_skills(void)
   skillo(SKILL_DISARM, "disarm", TAR_CHAR_ROOM | TAR_NOT_SELF |
          TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, SKILL_MELEE, NO_SECOND, 2,9);
 
+  skillo(SKILL_SMASH, "smash", TAR_CHAR_ROOM | TAR_NOT_SELF |
+         TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, SKILL_MELEE, NO_SECOND, 3,40);
 
   skillo(SKILL_BASH, "bash",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
@@ -563,6 +566,9 @@ ACMD(do_skills)
         break;
       case SKILL_DISARM:
         CALL_SKILL(skill_disarm);
+        break;
+      case SKILL_SMASH:
+        CALL_SKILL(skill_smash);
         break;
       case SKILL_FOCUS:
         CALL_SKILL(skill_focus);
@@ -1247,6 +1253,70 @@ ASKILL(skill_disarm)
   return (yesno ? SKILL_DISARM : 0);
 }
 
+/* NOTE: MOB_NOBASH prevents from smashing */
+ASKILL(skill_smash)
+{
+  bool yesno = 0;
+  if (vict == ch)
+  {
+    send_to_char("Try removing your shield instead.\r\n", ch);
+    return 0;
+  }
+  if (use_stamina( ch, 15) < 0)
+  {
+    new_send_to_char(ch, "You are far too exausted!");
+    return 0;
+  }
+
+  else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
+  {
+    send_to_char
+    ("The thought of smashing your master seems revolting to you.\r\n",
+     ch);
+    return 0;
+  }
+  else if (!(obj = GET_EQ(vict, WEAR_SHIELD)))
+    act("$N is not using a shield!", FALSE, ch, 0, vict, TO_CHAR);
+  else if (MOB_FLAGGED(vict, MOB_NOBASH) ||
+           (number(1, 101) > (!IS_NPC(ch) ?
+                  total_chance(ch, SKILL_SMASH) : number(0, 100))))
+  {
+    act("You failed to smash $N!", FALSE, ch, 0, vict, TO_CHAR);
+    damage(vict, ch, number(1, GET_LEVEL(vict)), TYPE_HIT);
+  }
+  else if (dice(2, GET_STR(ch)) + GET_LEVEL(ch) <=
+           dice(2, GET_STR(vict)) + GET_LEVEL(vict))
+  {
+    act("You almost succeed in smashing $N", FALSE, ch, 0, vict,
+        TO_CHAR);
+    act("You were almost smashed by $N!", FALSE, vict, 0, ch,
+        TO_CHAR);
+    damage(vict, ch, number(1, GET_LEVEL(vict) / 2), TYPE_HIT);
+  }
+  else
+  {
+    // a possibility that NPSs destroy your shield could be added
+    if ( IS_NPC(ch) ) {
+      obj_to_char(unequip_char(vict, WEAR_SHIELD), vict);
+      act("Your $p is smashed and you put it away to prevent further damage!", FALSE, vict, obj, 0,
+          TO_CHAR);
+      act("$n smashes $N forcing $m to put $s $p away to prevent further damage.", FALSE, ch, obj, vict,
+          TO_NOTVICT);
+    } else {
+      extract_obj(unequip_char(vict, WEAR_SHIELD));
+      act("You smash your enemies shield in a thousand splinters!", FALSE, ch, 0, 0,
+          TO_CHAR);
+      act("Your $p is smashed in a thousand splinters!", FALSE, vict, obj, 0,
+          TO_CHAR);
+      act("$n smashes $N, $p splinters into a thousand pieces!.", FALSE, ch, obj, vict,
+          TO_NOTVICT);
+    }
+    yesno = 1;
+  }
+  start_fighting(ch, vict);
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  return (yesno ? SKILL_SMASH : 0);
+}
 
 ASKILL(skill_trample)
 {
