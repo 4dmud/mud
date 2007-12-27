@@ -59,7 +59,7 @@ ACMD(do_smell)
 //      }
 
     for(found_char=IN_ROOM(ch)->people;found_char;found_char=found_char->next_in_room)
-       if(CAN_SEE(found_char, ch) && isname(arg, found_char->player.name)) 
+       if(CAN_SEE(found_char, ch) && isname(arg, GET_NAME(found_char))) 
           if(--fnum==0){
              act("You lean in close to $N and take a deep breath. Mmmmm ...", FALSE, ch, 0, found_char, TO_CHAR);
            act("$n leans in close and takes a deep breath..", FALSE,
