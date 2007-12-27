@@ -190,7 +190,8 @@ void hedit_save_to_disk(Descriptor *d) {
 			strcat(entry,"\n");
 			lengthleft-=carpointer-hptr+1;
 			hptr=carpointer;
-			while(*hptr=='\r' || *hptr=='\n') hptr++;
+			while(*hptr=='\r') hptr++;
+			while(*hptr=='\n') hptr++;
 		}
 		strncat(entry,hptr,(strlen(hptr)<lengthleft)?strlen(hptr):lengthleft);
 	}
