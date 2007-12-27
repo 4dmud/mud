@@ -10,6 +10,10 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.48  2006/05/09 15:01:08  w4dimenscor
+ * Fixed stat crashbug. It would crash if an implementor statted themselves,
+ * because of the last command thing.
+ *
  * Revision 1.47  2006/05/01 11:29:26  w4dimenscor
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
@@ -2081,10 +2085,10 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     {
       int m, cnt = 0;
       new_send_to_char(ch, "Last commands typed, oldest at top, newest at bottom:\r\n");
-      for (m = 0; m < HISTORY_SIZE;j++)
+      for (m = 0; m < HISTORY_SIZE;m++)
       {
         if (k->desc->history[m])
-          new_send_to_char(ch, "{cY%d:{cg %s{c0\r\n", cnt++, k->desc->history[i]);
+          new_send_to_char(ch, "{cY%d:{cg %s{c0\r\n", cnt++, k->desc->history[m]);
 
       }
     }
