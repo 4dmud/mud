@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.40  2006/03/22 20:27:20  w4dimenscor
+ * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
+ * Completed the autogroup toggle to work as expected (still untested though)
+ * For your evasion rating, i added some more points based on level and tier.
+ *
  * Revision 1.39  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -215,8 +220,8 @@ void write_aliases(struct char_data *ch);
 void do_show_corpses(CHAR_DATA *ch);
 void do_show_errors(CHAR_DATA *ch);
 int get_weapon_speed(OBJ_DATA *wep);
-int get_weapon_attack(OBJ_DATA *wep);
-int get_weapon_defence(OBJ_DATA *wep);
+int get_weapon_accuracy(OBJ_DATA *wep);
+int get_weapon_evasion(OBJ_DATA *wep);
 const char *material_name(int type);
 int find_month(void);
 void show_shops(struct char_data *ch, char *value);
@@ -1606,10 +1611,10 @@ void do_stat_object(struct char_data *ch, struct obj_data *j)
                      (int) GET_OBJ_VAL(j, 0),(int) GET_OBJ_VAL(j, 1), (int) GET_OBJ_VAL(j, 2),
                      (int) GET_OBJ_VAL(j, 3), (int) GET_WEP_LENGTH(j), (int) GET_WEP_BALANCE(j),
                      balance_display(GET_WEP_BALANCE(j)));
-    new_send_to_char(ch, "This balance gives the weapon %d speed, %d attack and %d defence.\r\n",
+    new_send_to_char(ch, "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
                      get_weapon_speed(j),
-                     get_weapon_attack(j),
-                     get_weapon_defence(j));
+                     get_weapon_accuracy(j),
+                     get_weapon_evasion(j));
     break;
   case ITEM_ARMOR:
     new_send_to_char(ch, "AC-apply: [%d]", (int) GET_OBJ_VAL(j, 0));

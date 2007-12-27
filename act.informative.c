@@ -2335,10 +2335,10 @@ ACMD(do_score)
   new_send_to_char(ch,
                    "{cg| | {cwHit  Points: [{cc%6d{cw][{cc%6d{cw]     Speed: [{cc%6d{cw]      AC: [{cc%4d{cw] {cg| |\r\n"
                    "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
-                   "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]    Attack: [{cy%4d{cw]   Defence: [{cy%4d{cw] {cg| |{c0\r\n",
+                   "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]  Accuracy: [{cy%4d{cw]   Evasion: [{cy%4d{cw] {cg| |{c0\r\n",
                    GET_HIT(ch), GET_MAX_HIT(ch),speed_update(ch),compute_armor_class(ch),
                    GET_MANA(ch), GET_MAX_MANA(ch), GET_HITROLL(ch),   class_damroll(ch) ,
-                   GET_MOVE(ch), GET_MAX_MOVE(ch), attack_tot(ch), defence_tot(ch));
+                   GET_MOVE(ch), GET_MAX_MOVE(ch), accuracy_tot(ch), evasion_tot(ch));
 
   new_send_to_char(ch,
                    "{cg| |-------------------------------------------------------------------| |{cw\r\n");
@@ -4419,9 +4419,9 @@ ACMD(do_consider)
   act(speed_consider[diff], FALSE, ch, 0, victim, TO_CHAR);
 
   new_send_to_char(ch, "%s would land about %.1f%% of %s attacks on you.\r\n",
-                   GET_NAME(victim),100 - (float) ((defence_tot(ch)*100)/(defence_tot(ch) + attack_tot(victim))), GET_SEX(victim) == SEX_MALE ? "his" : "her" );
+                   GET_NAME(victim),100 - (float) ((evasion_tot(ch)*100)/(evasion_tot(ch) + accuracy_tot(victim))), GET_SEX(victim) == SEX_MALE ? "his" : "her" );
   new_send_to_char(ch, "You would land about %.1f%% of your attacks on %s.\r\n",
-                   100-(float)((defence_tot(victim)*100)/(defence_tot(victim) + attack_tot(ch))), GET_NAME(victim));
+                   100-(float)((evasion_tot(victim)*100)/(evasion_tot(victim) + accuracy_tot(ch))), GET_NAME(victim));
 
   diff3 = GET_HIT(victim);
   diff2 = 0;
@@ -5066,8 +5066,8 @@ ACMD(do_worth)
                    "O=====================================================================O\r\n"
                    "|%-32s{cy|#|   {cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
                    "|%-32s{cy|#|                                       \r\n"
-                   "|%-32s{cy|#|   {cwNatural Attack Rating : {cg%-3d{cy         \r\n"
-                   "|%-32s{cy|#|   {cwNatural Defence Rating: {cg%-3d{cy         \r\n"
+                   "|%-32s{cy|#|    {cwNatural Accuracy Rating : {cg%-3d{cy         \r\n"
+                   "|%-32s{cy|#|    {cw Natural Evasion Rating : {cg%-3d{cy         \r\n"
                    "|%-32s{cy|#|   {cwRegenerating per mud hour:{cy          \r\n"
                    "|%-32s{cy|#| Hp:{cc%-3d{cy  Ma:{cc%-3d{cy  Mv:{cc%-3d{cy  St:{cc%-3d{cy        \r\n"
                    "|%-32s{cy|#|=====================================O\r\n"
@@ -5089,8 +5089,8 @@ ACMD(do_worth)
                    GET_REMORT_TWO(ch) == -1 ? "---" : class_abbrevs[(int)GET_REMORT_TWO(ch)],
                    GET_REMORT_THREE(ch) == -1 ? "---" : class_abbrevs[(int)GET_REMORT_THREE(ch)],
                    SUNNY ? sunnage[ 1] : moonage[ 1],
-                   SUNNY ? sunnage[ 2] : moonage[ 2], GET_PERM_OFFENCE(ch),
-                   SUNNY ? sunnage[ 3] : moonage[ 3], GET_PERM_DEFENCE(ch),
+                   SUNNY ? sunnage[ 2] : moonage[ 2], GET_PERM_ACCURACY(ch),
+                   SUNNY ? sunnage[ 3] : moonage[ 3], GET_PERM_EVASION(ch),
                    SUNNY ? sunnage[ 4] : moonage[ 4],
                    SUNNY ? sunnage[ 5] : moonage[ 5], hit_gain(ch), mana_gain(ch), move_gain(ch), stamina_gain(ch),
                    SUNNY ? sunnage[ 6] : moonage[ 6],
@@ -5304,9 +5304,10 @@ ACMD(set_perc)
 
   if (is_number(buf2))
     amount = atoi(buf2);
-  else if (!str_cmp(buf2, "even")) {
+  else if (isname(buf2, "even split auto")) {
     even_group(ch);
     new_send_to_char(ch, "You split the involvement evenly.\r\n");
+    return;
   }
   else
   {

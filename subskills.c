@@ -571,7 +571,7 @@ void assign_subskills(void)
        0, POS_SLEEPING, 0 , PEAC,
        SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_NONE, TYPE_UNDEFINED);
   /*reward - gives +10 defence rating */
-  subo(SUB_LOYALDEFEND, "BonusDefend", 0, 0,
+  subo(SUB_LOYALDEFEND, "BonusEvasion", 0, 0,
        0, POS_SLEEPING, 0 , PEAC,
        SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_NONE, TYPE_UNDEFINED);
   /*reward - gives +5% damage */

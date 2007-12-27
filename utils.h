@@ -197,8 +197,8 @@ void alter_stamina(struct char_data *ch, int amount);
 int speed_update(struct char_data *ch);
 
 //attack functions
-int attack_tot(struct char_data *attacker);
-int defence_tot(struct char_data *vict);
+int accuracy_tot(struct char_data *attacker);
+int evasion_tot(struct char_data *vict);
 
 /* random functions in random.c */
 void circle_srandom(unsigned long initial_seed);
@@ -645,8 +645,8 @@ int check_mail(struct char_data *ch);
 #define GET_POSTS(ch)           CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.fence_posts))
 #define GET_NAILS(ch)           CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.fence_nails))
 #define GET_WIRE(ch)            CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.fence_wire))
-#define GET_PERM_OFFENCE(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.perm_offence))
-#define GET_PERM_DEFENCE(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.perm_defence))
+#define GET_PERM_ACCURACY(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.perm_accuracy))
+#define GET_PERM_EVASION(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.perm_evasion))
 #define GET_LAST_DAM_D(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.last_dam_done))
 #define GET_LAST_DAM_T(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.last_dam_taken))
 #define GET_MASTERY(ch, i)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.master[i]))

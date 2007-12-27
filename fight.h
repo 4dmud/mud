@@ -139,10 +139,10 @@ struct weapon_type_data {
 int hands;
 int speedtop;
 int speedbot;
-int defencetop;
-int defencebot;
-int attacktop;
-int attackbot;
+int evasiontop;
+int evasionbot;
+int accuracytop;
+int accuracybot;
 int balance;
 const char *name;
 };

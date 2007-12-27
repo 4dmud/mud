@@ -10,6 +10,11 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.35  2006/03/22 20:27:20  w4dimenscor
+ * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
+ * Completed the autogroup toggle to work as expected (still untested though)
+ * For your evasion rating, i added some more points based on level and tier.
+ *
  * Revision 1.34  2006/03/13 19:07:40  w4dimenscor
  * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
@@ -282,8 +287,8 @@ int generate_wep_length(OBJ_DATA *wep);
 int generate_wep_type(char *name);
 int gen_wep_type_from_attack(OBJ_DATA *obj);
 int get_weapon_speed(OBJ_DATA *wep);
-int get_weapon_attack(OBJ_DATA *wep);
-int get_weapon_defence(OBJ_DATA *wep);
+int get_weapon_accuracy(OBJ_DATA *wep);
+int get_weapon_evasion(OBJ_DATA *wep);
 int wep_hands(OBJ_DATA *wep);
 
 
@@ -1299,8 +1304,8 @@ This function works for all attack types.
 int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
 {
 
-  int attacker_roll = 0;
-  int defense_roll = 0;
+  int accuracy_roll = 0;
+  int evasion_roll = 0;
   int totalchance = 0;
   int diceroll = 0;
   int attack_chance = 0;
@@ -1324,12 +1329,12 @@ int attack_roll(struct char_data *attacker, struct char_data *vict, int type)
   if (!AWAKE(vict))
     return (ATK_CHANCE(attacker) = 3);
 
-  defense_roll = defence_tot(vict);
-  if (!CAN_SEE(vict, attacker) && defense_roll)
-    defense_roll /= 2;
-  attacker_roll = attack_tot(attacker);
+  evasion_roll = evasion_tot(vict);
+  if (!CAN_SEE(vict, attacker) && evasion_roll)
+    evasion_roll /= 2;
+  accuracy_roll = accuracy_tot(attacker);
 
-  totalchance = (( defense_roll * 100.0)/(attacker_roll + defense_roll));
+  totalchance = (( evasion_roll * 100.0)/(accuracy_roll + evasion_roll));
 
   mins = class_min_strike(attacker);
   maxs = class_max_strike(attacker);
@@ -1375,10 +1380,10 @@ float pos_multi(int pos)
 }
 
 
-int defence_tot(struct char_data *vict)
+int evasion_tot(struct char_data *vict)
 {
   //yeah i know its a typo
-  int defense_roll = 0;
+  int evasion_roll = 0;
   int victim_ac = 0;
   int part=0;
 
@@ -1386,75 +1391,77 @@ int defence_tot(struct char_data *vict)
     return 0;
 
 
-  defense_roll = (IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_DEFENCE(vict));
+  evasion_roll = (IS_NPC(vict) ? ((MOB_TIER(vict)) + 1) * (GET_LEVEL(vict) * 2.0) * (1 + (GET_LEVEL(vict) > 30) + (GET_LEVEL(vict) > 40) + (GET_LEVEL(vict) > 60) + (GET_LEVEL(vict) > 65))   : GET_PERM_EVASION(vict));
 
   victim_ac = (200 - (100 + compute_armor_class(vict)));
   if (victim_ac != 0)
-    defense_roll += (victim_ac/3); // between 0 and 66
+    evasion_roll += (victim_ac/3); // between 0 and 66
   if ((part = GET_SUB(vict, SUB_LOYALDEFEND) ) > 0)
-    defense_roll += part * 0.5;
+    evasion_roll += part * 0.5;
 
   if (!IS_NPC(vict))
   {
     switch ((int)GET_RACE(vict))
     {
     case RACE_DWARF:
-      defense_roll += 30;
+      evasion_roll += 30;
       break;
     case RACE_ELF:
-      defense_roll -= 30;
+      evasion_roll -= 30;
       break;
     case RACE_FAUN:
-      defense_roll += 0;
+      evasion_roll += 0;
       break;
     case RACE_CENTAUR:
-      defense_roll += 40;
+      evasion_roll += 40;
       break;
     case RACE_MARTIAN:
-      defense_roll -= 40;
+      evasion_roll -= 40;
       break;
 
     }
   }
 
+  evasion_roll += ((GET_LEVEL(vict)/4) * highest_tier(vict));
+  
   if (AWAKE(vict))
-    defense_roll += dex_app[GET_DEX(vict)].defensive * 10;
+    evasion_roll += (12 - (6 + dex_app[GET_DEX(vict)].defensive)) * 10;
   if (GET_MASTERY(vict, CLASS_HUNTER))
-    defense_roll += 100;
+    evasion_roll += 100;
   if (AFF_FLAGGED(vict, AFF_BESERK)) /* Char has gone Beserk      */
-    defense_roll -= 30;
+    evasion_roll -= 30;
   if (AFF_FLAGGED(vict, AFF_JUDO)) /*fighting style - rogue*/
-    defense_roll += 15;
+    evasion_roll += 15;
   if (AFF_FLAGGED(vict, AFF_SHIELD_HOLY))  /*lowers chance to be hit*/
-    defense_roll += 5;
+    evasion_roll += 5;
   if (AFF_FLAGGED(vict, AFF_SHIELD_STATIC)) /*lowers melee hit chance */
-    defense_roll += 10;
+    evasion_roll += 10;
   if (AFF_FLAGGED(vict, AFF_BLUR)) /*lowers melee hit chance */
-    defense_roll += 40;
+    evasion_roll += 40;
   if (AFF_FLAGGED(vict, AFF_FORSEE)) /*lowers melee hit chance */
-    defense_roll += 15;
+    evasion_roll += 15;
   if (AFF_FLAGGED(vict, AFF_FORTIFY_BODY)) /*lowers melee hit chance */
-    defense_roll += 20;
+    evasion_roll += 20;
   if (affected_by_spell(vict, SPELL_STEELSKIN)) /*lowers melee hit chance */
-    defense_roll += 25;
+    evasion_roll += 25;
   if (AFF_FLAGGED(vict, AFF_STONESKIN)) /*lowers melee hit chance */
-    defense_roll += 25;
+    evasion_roll += 25;
   if (affected_by_spell(vict, SPELL_ARMOR)) /*lowers melee hit chance */
-    defense_roll += 15;
+    evasion_roll += 15;
 
-  defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD));
-  defense_roll += get_weapon_defence(GET_EQ(vict, WEAR_WIELD_2));
+  evasion_roll += get_weapon_evasion(GET_EQ(vict, WEAR_WIELD));
+  evasion_roll += get_weapon_evasion(GET_EQ(vict, WEAR_WIELD_2));
 
   if (AFF_FLAGGED(vict, AFF_CURSE))
-    defense_roll *= 0.75;
-  defense_roll = (defense_roll <= 0 ? 1 : defense_roll);
+    evasion_roll *= 0.75;
+  evasion_roll = (evasion_roll <= 0 ? 1 : evasion_roll);
 
-  return defense_roll;
+  return evasion_roll;
 }
 
-int attack_tot(struct char_data *attacker)
+int accuracy_tot(struct char_data *attacker)
 {
-  int attacker_roll = 0;
+  int accuracy_roll = 0;
   int calc_thaco;
   struct char_data *k = NULL;
   struct follow_type *f;
@@ -1472,24 +1479,24 @@ int attack_tot(struct char_data *attacker)
   calc_thaco = IRANGE(-10, calc_thaco, 70);
 
 
-  attacker_roll = (IS_NPC(attacker) ? ((MOB_TIER(attacker))) *
+  accuracy_roll = (IS_NPC(attacker) ? ((MOB_TIER(attacker))) *
                    (GET_LEVEL(attacker) * 2.0) * (0.5 + (GET_LEVEL(attacker)>30) + (GET_LEVEL(attacker)>40) +
-                                                  (GET_LEVEL(attacker)>=50) + (GET_LEVEL(attacker)>=60)) : GET_PERM_OFFENCE(attacker));
-  attacker_roll += calc_thaco;
+                                                  (GET_LEVEL(attacker)>=50) + (GET_LEVEL(attacker)>=60)) : GET_PERM_ACCURACY(attacker));
+  accuracy_roll += calc_thaco;
   if (AFF_FLAGGED(attacker, AFF_BESERK)) /* Char has gone Beserk      */
-    attacker_roll += 10;
+    accuracy_roll += 10;
   if (GET_SUB(attacker, SUB_LOYALATTACK))
-    attacker_roll += 50;
+    accuracy_roll += 50;
 
-  attacker_roll += total_chance(attacker, SKILL_MELEE)/2;
-  attacker_roll += total_chance(attacker, SKILL_SECOND_ATTACK);
-  attacker_roll += total_chance(attacker, SKILL_THIRD_ATTACK);
+  accuracy_roll += total_chance(attacker, SKILL_MELEE)/2;
+  accuracy_roll += total_chance(attacker, SKILL_SECOND_ATTACK);
+  accuracy_roll += total_chance(attacker, SKILL_THIRD_ATTACK);
   if (FIGHTING(attacker))
   {
     k = (FIGHTING(attacker)->master ? FIGHTING(attacker)->master : FIGHTING(attacker));
     for (f = k->followers; f; f = f->next)
       if ( !DEAD(FIGHTING(attacker)) && HERE(f->follower,attacker) && FIGHTING(f->follower) == attacker)
-        attacker_roll += 10;
+        accuracy_roll += 10;
   }
 
 
@@ -1498,57 +1505,57 @@ int attack_tot(struct char_data *attacker)
     switch ((int)GET_RACE(attacker))
     {
     case RACE_DWARF:
-      attacker_roll += 10;
+      accuracy_roll += 10;
       break;
     case RACE_ELF:
-      attacker_roll += 15;
+      accuracy_roll += 15;
       break;
     case RACE_FAUN:
-      attacker_roll += 25;
+      accuracy_roll += 25;
       break;
     case RACE_CENTAUR:
-      attacker_roll += 10;
+      accuracy_roll += 10;
       break;
     case RACE_MARTIAN:
-      attacker_roll -= 5;
+      accuracy_roll -= 5;
       break;
 
     }
   }
 
   if (GET_MASTERY(attacker, CLASS_THIEF))
-    attacker_roll += 100;
+    accuracy_roll += 100;
   if (AFF_FLAGGED(attacker, AFF_JUDO)) /*fighting style - rogue*/
-    attacker_roll += 25;
+    accuracy_roll += 25;
   if (AFF_FLAGGED(attacker, AFF_BLADEDANCE)) /*fighting style - rogue*/
-    attacker_roll += 25;
+    accuracy_roll += 25;
   if (AFF_FLAGGED(attacker, AFF_GODLY_BLESSING)) /*fighting style - rogue*/
-    attacker_roll += 5;
+    accuracy_roll += 5;
 
   if (AFF_FLAGGED(attacker, AFF_TRUE_STRIKING)) /*fighting style - rogue*/
-    attacker_roll += 30;
+    accuracy_roll += 30;
   if (AFF_FLAGGED(attacker, AFF_MARTIAL_ARTS)) /*fighting style - rogue*/
-    attacker_roll += 25;
+    accuracy_roll += 25;
   if (AFF_FLAGGED(attacker, AFF_FORSEE)) /*fighting style - rogue*/
-    attacker_roll += 10;
+    accuracy_roll += 10;
   if (AFF_FLAGGED(attacker, AFF_CONFUSED)) /*fighting style - rogue*/
-    attacker_roll -= 60;
+    accuracy_roll -= 60;
   if (AFF_FLAGGED(attacker, AFF_CORRUPTED)) /*fighting style - rogue*/
-    attacker_roll -= 40;
+    accuracy_roll -= 40;
   if (AFF_FLAGGED(attacker, AFF_FOCUS)) /*fighting style - rogue*/
-    attacker_roll += 15;
+    accuracy_roll += 15;
   if (AFF_FLAGGED(attacker, AFF_BATTLE_RAGE)) /*fighting style - rogue*/
-    attacker_roll += 15;
+    accuracy_roll += 15;
   if (AFF_FLAGGED(attacker, AFF_NUMB_MIND)) /*fighting style - rogue*/
-    attacker_roll -= 45;
+    accuracy_roll -= 45;
 
-  attacker_roll += get_weapon_attack(GET_EQ(attacker, WEAR_WIELD));
-  attacker_roll += get_weapon_attack(GET_EQ(attacker, WEAR_WIELD_2));
+  accuracy_roll += get_weapon_accuracy(GET_EQ(attacker, WEAR_WIELD));
+  accuracy_roll += get_weapon_accuracy(GET_EQ(attacker, WEAR_WIELD_2));
 
 
-  attacker_roll = (attacker_roll <= 0 ? 1 : attacker_roll);
+  accuracy_roll = (accuracy_roll <= 0 ? 1 : accuracy_roll);
 
-  return attacker_roll;
+  return accuracy_roll;
 }
 
 long fight_timeout_calc(struct char_data* ch, short type, short number)
@@ -2528,19 +2535,19 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
         }
 
 
-        if ( number(1,100) > GET_PERM_OFFENCE(ch) && number(1, 1000) < 5)
+        if ( number(1,100) > GET_PERM_ACCURACY(ch) && number(1, 1000) < 5)
         {
-          GET_PERM_OFFENCE(ch)++;
-          new_send_to_char(ch, "Your natural attack rating just increased to %d!\r\n", GET_PERM_OFFENCE(ch));
+          GET_PERM_ACCURACY(ch)++;
+          new_send_to_char(ch, "Your natural accuracy rating just increased to %d!\r\n", GET_PERM_ACCURACY(ch));
         }
       }
 
       if (!IS_NPC( vict ) )
       {
-        if ( number(1,100) > GET_PERM_DEFENCE(vict) && number(1, 1000) < 5 )
+        if ( number(1,100) > GET_PERM_EVASION(vict) && number(1, 1000) < 5 )
         {
-          GET_PERM_DEFENCE(vict)++;
-          new_send_to_char(vict, "Your natural defence rating just increased to %d!\r\n", GET_PERM_DEFENCE(vict));
+          GET_PERM_EVASION(vict)++;
+          new_send_to_char(vict, "Your natural evasion rating just increased to %d!\r\n", GET_PERM_EVASION(vict));
         }
       }
 
@@ -5820,7 +5827,7 @@ float diff_balance(OBJ_DATA *wep)
 
 }
 
-int get_weapon_attack(OBJ_DATA *wep)
+int get_weapon_accuracy(OBJ_DATA *wep)
 {
   int top, bot, retval;
   if (!wep)
@@ -5829,8 +5836,8 @@ int get_weapon_attack(OBJ_DATA *wep)
   if (GET_OBJ_TYPE(wep) != ITEM_WEAPON)
     return 0;
 
-  top = weapon_type_info[GET_WEP_TYPE(wep)].attacktop;
-  bot = weapon_type_info[GET_WEP_TYPE(wep)].attackbot;
+  top = weapon_type_info[GET_WEP_TYPE(wep)].accuracytop;
+  bot = weapon_type_info[GET_WEP_TYPE(wep)].accuracybot;
   bot = abs(bot);
   retval = (top + bot);
   retval = (int)(retval*diff_balance(wep));
@@ -5847,7 +5854,7 @@ int wep_hands(OBJ_DATA *wep)
   return weapon_type_info[GET_WEP_TYPE(wep)].hands;
 }
 
-int get_weapon_defence(OBJ_DATA *wep)
+int get_weapon_evasion(OBJ_DATA *wep)
 {
   int top, bot, retval;
   if (!wep)
@@ -5856,8 +5863,8 @@ int get_weapon_defence(OBJ_DATA *wep)
   if (GET_OBJ_TYPE(wep) != ITEM_WEAPON)
     return 0;
 
-  top = weapon_type_info[GET_WEP_TYPE(wep)].defencetop;
-  bot = weapon_type_info[GET_WEP_TYPE(wep)].defencebot;
+  top = weapon_type_info[GET_WEP_TYPE(wep)].evasiontop;
+  bot = weapon_type_info[GET_WEP_TYPE(wep)].evasionbot;
   bot = abs(bot);
   retval = ((bot) + top);
   retval = (int)((retval*diff_balance(wep)));

@@ -692,8 +692,8 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
   int w_type;
   int form = 0;
   int get_weapon_speed(OBJ_DATA *wep);
-  int get_weapon_attack(OBJ_DATA *wep);
-  int get_weapon_defence(OBJ_DATA *wep);
+  int get_weapon_accuracy(OBJ_DATA *wep);
+  int get_weapon_evasion(OBJ_DATA *wep);
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   zone_rnum zone;
@@ -793,10 +793,10 @@ void identify_object(CHAR_DATA *ch, OBJ_DATA *obj)
                      balance_display(perf_balance(GET_WEP_TYPE(obj))),
                      balance_display(GET_WEP_BALANCE(obj))
                     );
-    new_send_to_char(ch, "This balance gives the weapon %d speed, %d attack and %d defence.\r\n",
+    new_send_to_char(ch, "This balance gives the weapon %d speed, %d accuracy and %d evasion.\r\n",
                      get_weapon_speed(obj),
-                     get_weapon_attack(obj),
-                     get_weapon_defence(obj));
+                     get_weapon_accuracy(obj),
+                     get_weapon_evasion(obj));
 
     w_type = GET_OBJ_VAL(obj, 3);
     new_send_to_char(ch, "{cyThe %s handed weapon is a {cC%d{cycm{cc %s{cy that can {cc%s{cy at {cC%d{cyD{cC%d{cy damage.{c0\r\n",

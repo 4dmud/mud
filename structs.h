@@ -9,6 +9,11 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.31  2006/03/22 20:27:20  w4dimenscor
+ * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
+ * Completed the autogroup toggle to work as expected (still untested though)
+ * For your evasion rating, i added some more points based on level and tier.
+ *
  * Revision 1.30  2006/03/13 19:07:40  w4dimenscor
  * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
@@ -1708,8 +1713,8 @@ struct player_special_data_saved
   int pk_deaths;
   int pk_points;
   /*mord - fighting and defending ability learned */
-  sh_int perm_offence;
-  sh_int perm_defence;
+  sh_int perm_accuracy;
+  sh_int perm_evasion;
   /*mord - fencing values*/
   sh_int fence_posts;
   sh_int fence_nails;

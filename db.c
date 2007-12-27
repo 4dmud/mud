@@ -4797,8 +4797,8 @@ void default_char(struct char_data *ch)
   GET_POSTS(ch) = 0;
   GET_NAILS(ch)  = 0;
   GET_WIRE(ch)   = 0;
-  GET_PERM_OFFENCE(ch)	= 0;
-  GET_PERM_DEFENCE(ch)	= 0;
+  GET_PERM_ACCURACY(ch)	= 0;
+  GET_PERM_EVASION(ch)	= 0;
   GET_ORIG_LEV(ch) = 0;
   PRETITLE(ch) = NULL;
   IMMTITLE(ch) = NULL;
@@ -5197,7 +5197,7 @@ int store_to_char(char *name, struct char_data *ch)
         break;
       case 'e':
         if (!strcmp(tag, "Pdef"))
-          GET_PERM_DEFENCE(ch) = num;
+          GET_PERM_EVASION(ch) = num;
         else if (!strcmp(tag, "Preg"))
           PREG(ch) = num;
         else if (!strcmp(tag, "PreT"))
@@ -5213,7 +5213,7 @@ int store_to_char(char *name, struct char_data *ch)
         break;
       case 'f':
         if (!strcmp(tag, "Poff"))
-          GET_PERM_OFFENCE(ch)	= num;
+          GET_PERM_ACCURACY(ch)	= num;
         break;
       case 'h':
         if (!strcmp(tag, "PgHi"))
@@ -5813,10 +5813,10 @@ void char_to_store(struct char_data *ch)
     fprintf(fl, "Nail: %d\n",GET_NAILS(ch));
   if (GET_WIRE(ch))
     fprintf(fl, "Wire: %d\n",GET_WIRE(ch));
-  if (GET_PERM_OFFENCE(ch))
-    fprintf(fl, "Poff: %d\n",GET_PERM_OFFENCE(ch));
-  if (GET_PERM_DEFENCE(ch))
-    fprintf(fl, "Pdef: %d\n",GET_PERM_DEFENCE(ch));
+  if (GET_PERM_ACCURACY(ch))
+    fprintf(fl, "Poff: %d\n",GET_PERM_ACCURACY(ch));
+  if (GET_PERM_EVASION(ch))
+    fprintf(fl, "Pdef: %d\n",GET_PERM_EVASION(ch));
   if (GET_ORIG_LEV(ch))
     fprintf(fl, "Olev: %d\n", GET_ORIG_LEV(ch));
   if (GET_CONVERSIONS(ch))

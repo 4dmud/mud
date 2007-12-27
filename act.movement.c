@@ -2186,7 +2186,16 @@ ACMD(do_follow)
                          PERS(leader, ch));
         return;
       }
-
+      /** Bypass the stuff below if the leader is set to autogroup, mob or no mob */
+      if (PRF_FLAGGED(leader, PRF_AUTOGROUP)) {
+        if (ch->master)
+          stop_follower(ch);
+        GET_PERC(ch) = 0;
+        SET_BIT_AR(AFF_FLAGS(ch), AFF_GROUP);
+        add_follower(ch, leader);
+        return;
+      }
+      
       if (!IS_NPC(ch))
       {
         /*diff = (GET_LEVEL(ch) * current_class_is_tier_num(ch)) - (GET_LEVEL(leader) * current_class_is_tier_num(leader));

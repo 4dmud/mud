@@ -357,7 +357,7 @@ void con_display_spec(DESCRIPTOR_DATA *d)
                   "{cyChoose your starting bonus Subskill:\r\n\r\n"
                   "{cg[{cGA{cg] Speed -- {cP+50 to speed{c0\r\n\r\n"
                   "{cg[{cGB{cg] Attack - {cP+50 to attack rating{c0\r\n\r\n"
-                  "{cg[{cGC{cg] Defend - {cP+50 to defence rating{c0\r\n\r\n"
+                  "{cg[{cGC{cg] Evade  - {cP+50 to evasion rating{c0\r\n\r\n"
                   "{cg[{cGD{cg] Damage - {cP+15%% to damage{c0\r\n\r\n"
                   "{cyPlease choose a letter: {c0");
   SUB_STATE(d) = STATE_LOYAL;
