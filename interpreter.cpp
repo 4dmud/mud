@@ -2106,7 +2106,7 @@ int enter_player_game(Descriptor *d) {
         if ((obj = read_object(12922, VIRTUAL)) != NULL)
             obj_to_char(obj, ch);
         //Mini-quest leaflet
-        if ((obj = read_object(21492, VIRTUAL)) != NULL)
+        if ((obj = read_object(12992, VIRTUAL)) != NULL)
             obj_to_char(obj, ch);
 
         switch (GET_CLASS(ch)) {
