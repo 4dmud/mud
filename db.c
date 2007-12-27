@@ -2125,10 +2125,11 @@ void setup_dir(FILE * fl, room_rnum room, int dir)
       free_string(&room->dir_option[dir]->keyword);
       free_string(&room->dir_option[dir]->general_description);
     }
-    if ((room->dir_option[dir]->general_description = fread_string(fl, buf2)) == NULL)
-      room->dir_option[dir]->general_description = strdup("Undefined");
-    if ((room->dir_option[dir]->keyword = fread_string(fl, buf2)) == NULL)
-      room->dir_option[dir]->keyword = strdup("Undefined");
+    if ((room->dir_option[dir]->general_description = fread_string(fl, buf2)) == NULL){
+      /*room->dir_option[dir]->general_description = strdup("Undefined")*/}
+    if ((room->dir_option[dir]->keyword = fread_string(fl, buf2)) == NULL) {
+      /*room->dir_option[dir]->keyword = strdup("Undefined");*/
+    }
     room->dir_option[dir]->nosave = 0;
   }
 
