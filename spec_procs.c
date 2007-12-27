@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.25  2007/06/15 07:11:40  w4dimenscor
+ * changed the display message for practicing to include what you spent.
+ *
  * Revision 1.24  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -633,7 +636,12 @@ SPECIAL(guild) {
         
 
     SET_SKILL(ch, skill_num, MIN(learned, percent));
-    ch->Send( "You practice for a while...(%d)\r\n", GET_SKILL(ch,skill_num));
+    if (REMORTS(ch) > 2) {
+		ch->Gold(-cig, GOLD_HAND);
+    		ch->Send( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL(ch,skill_num));
+    } else {
+		ch->Send( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL(ch,skill_num));
+    }
     GET_PRACTICES(ch)--;
     if (REMORTS(ch) > 2)
 		ch->Gold(-cig, GOLD_HAND);
