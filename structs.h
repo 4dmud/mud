@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.64  2007/11/14 21:39:41  w4dimenscor
+ * Added the Gladiator race for the gladiatorpits.
+ * --Matthijs
+ *
  * Revision 1.63  2007/08/23 20:41:29  w4dimenscor
  * - Created a new MudException class, so that we can try and throw and catch errors.
  * - Fixed room description editing in OLC so that it works with the new system.
@@ -466,13 +470,14 @@ class Room;
 #define RACE_GRINGO      5
 #define RACE_MARTIAN     6
 #define RACE_SPACE_WOLF  7
-#define RACE_WORM        8
-#define RACE_TOAD        9
-#define RACE_BOAR       10
-#define RACE_WOLF       11
-#define RACE_LION       12
+#define RACE_GLADIATOR	 8
+#define RACE_WORM        9
+#define RACE_TOAD       10
+#define RACE_BOAR       11
+#define RACE_WOLF       12
+#define RACE_LION       13
 
-#define NUM_RACES       13
+#define NUM_RACES       14
 
 /* Sex */
 #define SEX_NEUTRAL   0

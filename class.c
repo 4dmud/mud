@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.18  2007/11/14 21:39:41  w4dimenscor
+ * Added the Gladiator race for the gladiatorpits.
+ * --Matthijs
+ *
  * Revision 1.17  2007/06/10 02:18:39  w4dimenscor
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
@@ -886,6 +890,7 @@ void race_abils(Character *ch)
   {
   case RACE_INDIAN:
   case RACE_GRINGO:
+  case RACE_GLADIATOR:
     break;
   case RACE_FAUN:
     ch->real_abils.intel -= 1;

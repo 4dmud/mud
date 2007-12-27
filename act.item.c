@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.61  2007/11/14 21:39:41  w4dimenscor
+ * Added the Gladiator race for the gladiatorpits.
+ * --Matthijs
+ *
  * Revision 1.60  2007/11/14 09:37:16  w4dimenscor
  * Fixed unhitch failure to have a better message. Also fixed the donation room issue where the item would just dissapear
  *
@@ -4039,6 +4043,9 @@ int race_speed(Character *ch) {
     case RACE_SPACE_WOLF:
         return 120;
         break;
+    case RACE_GLADIATOR:
+	return 100;
+	break;
     default:
         return 50;
         break;

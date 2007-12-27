@@ -1009,6 +1009,8 @@ extern room_rnum VEHICLE_ROOM;
                                 (GET_RACE(ch) == RACE_MARTIAN))
 #define IS_SPACE_WOLF(ch)       (!IS_NPC(ch) && \
                                 (GET_RACE(ch) == RACE_SPACE_WOLF))
+#define IS_GLADIATOR(ch)	(!IS_NPC(ch) && \
+				(GET_RACE(ch) == RACE_GLADIATOR))
 char *print_weather(room_rnum room, char *buf, size_t len);
 #define OUTSIDE(ch) (!(ROOM_FLAGGED((ch)->in_room, ROOM_INDOORS)||SECT((ch)->in_room)==SECT_INSIDE) )
 #define IS_DAY (sunlight == SUN_LIGHT)

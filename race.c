@@ -21,6 +21,7 @@ const char *race_abbrevs[] = {
                                  "Gri",
                                  "Mar",
                                  "SWf",
+				 "Gla",	
                                  "Wrm",
                                  "Tod",
                                  "Bor",
@@ -38,6 +39,7 @@ const char *pc_race_types[] = {
                                   "Gringo",
                                   "Martian",
                                   "Spacewolf",
+				  "Gladiator",
                                   "Toad",
                                   "Boar",
                                   "Wolf",
@@ -158,7 +160,8 @@ const struct race_data races[NUM_RACES] = {
                 RACE_INDIAN, HUMANOID}, {
                 RACE_GRINGO, HUMANOID}, {
                 RACE_MARTIAN, MARTIAN}, {
-                RACE_SPACE_WOLF, SWOLF}
+                RACE_SPACE_WOLF, SWOLF}, {
+		RACE_GLADIATOR, HUMANOID}
         };
 
 
@@ -189,8 +192,11 @@ void set_race(Character *ch, int race) {
         }
 }
 
-int parse_race(char arg) {
-    switch (LOWER(arg)) {
+int parse_race(char* arg, bool consider_gladiator) {
+    if(!arg || !*arg)
+	return RACE_UNDEFINED;
+
+    switch (LOWER(*arg)) {
     case 'f':
         return RACE_FAUN;
         break;
@@ -207,7 +213,12 @@ int parse_race(char arg) {
         return RACE_INDIAN;
         break;
     case 'g':
-        return RACE_GRINGO;
+	if(!consider_gladiator || strlen(arg) == 1 || LOWER(*(arg+1)) == 'r')
+            return RACE_GRINGO;
+	else if(LOWER(*(arg+1)) == 'l')
+	    return RACE_GLADIATOR;
+	else
+	    return RACE_UNDEFINED;
         break;
     case 'm':
         return RACE_MARTIAN;
@@ -221,6 +232,13 @@ int parse_race(char arg) {
     }
 }
 
+int parse_race(char arg) {
+    char tmp[2];
+    tmp[0] = arg;
+    tmp[1] = '\0';
+    return parse_race(tmp, false);
+}
+
 ACMD(do_race) {
     int r;
     char body_parts[512];
@@ -229,7 +247,7 @@ ACMD(do_race) {
     one_argument(argument, arg);
 
     if (*arg) {
-        r = parse_race(*arg);
+        r = parse_race(arg,true);
         sprintbit(races[r].body_bits, body, body_parts, sizeof(body_parts));
         ch->Send( "%s: %s\r\n", pc_race_types[r], body_parts);
     } else {

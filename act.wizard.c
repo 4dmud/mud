@@ -10,6 +10,10 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.81  2007/11/14 21:39:41  w4dimenscor
+ * Added the Gladiator race for the gladiatorpits.
+ * --Matthijs
+ *
  * Revision 1.80  2007/11/14 20:01:14  w4dimenscor
  * removed some threading from the code
  *
@@ -374,7 +378,7 @@ void appear(Character *ch);
 void reset_zone(zone_rnum zone);
 void roll_real_abils(Character *ch);
 int parse_class(char arg);
-int parse_race(char arg);
+int parse_race(char* arg, bool consider_gladiator);
 void write_poofs(Character *ch);
 void save_corpses(void);
 void check_autowiz(Character *ch);
@@ -4538,7 +4542,7 @@ int perform_set(Character *ch, Character *vict, int mode,
     room_rnum rnum;
     room_vnum rvnum;
     char buf[MAX_STRING_LENGTH];
-    int parse_race(char arg);
+    int parse_race(char* arg, bool consider_gladiator);
     void set_race(Character *ch, int race);
 
     /* Check to make sure all the levels are correct */
@@ -4886,7 +4890,7 @@ int perform_set(Character *ch, Character *vict, int mode,
         vict->check_regen_rates();
         break;
     case 52:
-        if ((i = parse_race(*val_arg)) == RACE_UNDEFINED) {
+        if ((i = parse_race(val_arg, true)) == RACE_UNDEFINED) {
             send_to_char("That is not a race.\r\n", ch);
             return 0;
         } else
