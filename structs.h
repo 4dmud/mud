@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.42  2006/07/14 19:06:09  w4dimenscor
+ * Fixed mtransform!
+ *
  * Revision 1.41  2006/06/21 09:28:58  w4dimenscor
  * Added the ability for Mortals of imms to listen to the wizchat. it is a
  * flag with the name wizmort, so set player wizmort on should do the
@@ -2000,6 +2003,7 @@ public:
 
 	Character();
 	~Character();
+        int is_mtransformed;
 
 };
 /* ====================================================================== */

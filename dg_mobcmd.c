@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.21  2006/07/14 19:06:09  w4dimenscor
+ * Fixed mtransform!
+ *
  * Revision 1.20  2006/06/18 12:42:21  w4dimenscor
  * %damage% %actor% works again on mobs. The problem was that the damage function was never called if only %actor% was
  * used (in stead of %actor.name%).
@@ -1475,6 +1478,7 @@ ACMD(do_mtransform)
   int keep_hp = 1;       /* new mob keeps the old mob's hp/max hp/exp */
   int pos;
 
+  tmpmob.freeself();
   if (!MOB_OR_IMPL(ch))
   {
     ch->Send( "Huh?!?\r\n");
@@ -1619,8 +1623,8 @@ ACMD(do_mtransform)
         GET_POINTS_EVENT(m, i) = NULL;
     }
     while (0);
-
     extract_char(m);
+    tmpmob.is_mtransformed=1;
   }
 }
 
