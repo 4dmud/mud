@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.25  2006/08/17 10:53:49  w4dimenscor
+ * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
+ *
  * Revision 1.24  2006/08/13 06:26:55  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -345,135 +348,65 @@ const char *skill_name(int num) {
     else
         return ("UNDEFINED");
 }
-
-
-
-/* this function should be done with a qsearch*/
-/*
-int find_skill_num(char *name)
-{
-    int skindex, ok;
-    char *temp, *temp2;
-    char first[256], first2[256], tempbuf[256];
-    for (skindex = 1; skindex <= TOP_SPELL_DEFINE; skindex++)
-    if (*spell_info[spell_sorted_info[skindex]].name == *name)
-    break;
- 
-    for (; skindex <= TOP_SPELL_DEFINE; skindex++) {
-     if (is_abbrev(name, spell_info[spell_sorted_info[skindex]].name))
-         return (spell_sorted_info[skindex]);
- 
-     ok = TRUE;
-     strlcpy(tempbuf, spell_info[spell_sorted_info[skindex]].name, sizeof(tempbuf)); 
-     temp = any_one_arg(tempbuf, first);
-     temp2 = any_one_arg(name, first2);
-     while (*first && *first2 && ok) {
-         if (!is_abbrev(first2, first))
-          ok = FALSE;
-         temp = any_one_arg(temp, first);
-         temp2 = any_one_arg(temp2, first2);
-     }
- 
-     if (ok && !*first2)
-         return (spell_sorted_info[skindex]);
-    }
- 
-    return (-1);
+bool operator==(struct skillspell_data &d, const char *s) {
+return (!strcmp(skill_name(d.skill), s));
 }
-*/
 
 int Character::get_skill(int i) {
-    struct skillspell_data *temp = skills;
+    vector<skillspell_data>::iterator it;
 
     if (GET_RACE(this) == RACE_CENTAUR &&
             (i == 141 || i == 142) )
         return 100;
 
-    while (temp) {
-        if (temp->skill == (i))
-            return temp->learn;
-        temp = temp->next;
-    }
-    return 0;
+        it = find(GET_SKILLS(this).begin(), GET_SKILLS(this).end(), i);
+        if (it == GET_SKILLS(this).end())
+        return 0;
 
+        return (*it).learn;
 }
 
 void set_skill(Character *ch, int skill, int amount) {
-    struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
-    struct skillspell_data *temp2    = NULL;
+    vector<skillspell_data>::iterator it;
 
-    if (IS_NPC(ch)) {
+    if (IS_NPC(ch))
         return;
-    }
+    if (amount > 100)
+        amount = 100;
+    if (amount < 0)
+        amount = 0;
 
-    while (temp) {
-        if (temp->skill == (skill)) {
-            temp->learn = amount;
-            if (temp->learn < 0)
-                temp->learn = 0;
-            if (temp->learn > 100)
-                temp->learn = 100;
-
-            return;
-        }
-
-        if (temp->next == NULL)
-            temp2 = temp;
-
-        temp = temp->next;
-    }
-
-    /*couldn't find it! - lets give t to em!*/
-    if (ch->skills == NULL) {
-
-        CREATE(ch->skills, struct skillspell_data, 1);
-        ch->skills->skill = (skill);
-        ch->skills->learn = amount;
-        ch->skills->wait = 0;
-        ch->skills->next = NULL;
-
+    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
+    if (it != GET_SKILLS(ch).end()) {
+        (*it).learn = amount;
     } else {
-        /* temp should equal null here */
-        CREATE(temp2->next, struct skillspell_data, 1);
-        temp2->next->skill = (skill);
-        temp2->next->learn = amount;
-        temp2->next->wait = 0;
-        temp2->next->next = NULL;
-
-
+        skillspell_data s;
+        s.skill = (skill);
+        s.learn = amount;
+        s.wait = 0;
+        GET_SKILLS(ch).push_back(s);
+        sort(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end());
     }
-
-
-    //save_char(ch, 0);
 }
 
 int get_skill_wait(Character *ch, int skill) {
-    struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
-
-    while (temp) {
-        if (temp->skill == (skill)) {
-            return temp->wait;
-        }
-        temp = temp->next;
+    vector<skillspell_data>::iterator it;
+    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
+    if (it != GET_SKILLS(ch).end()) {
+        return (*it).wait;
     }
     return 0;
-
 }
 
 void set_skill_wait(Character *ch, int skill, int w) {
-    struct skillspell_data *temp     = (IS_NPC(ch) ? NULL : ch->skills);
+vector<skillspell_data>::iterator it;
+
     if (w < 0)
         w = 0;
-
-    while (temp) {
-        if (temp->skill == (skill)) {
-            temp->wait = w;
-            return;
-        }
-        temp = temp->next;
-    }
-    ;
-
+        
+    it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
+    if (it != GET_SKILLS(ch).end())
+        (*it).wait = skill;
 }
 
 
@@ -1019,8 +952,7 @@ int cast_spell(Character *ch, Character *tch,
     if (!focus) {
         if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
             ch->Send( "%s", CONFIG_OK);
-        }
-        else if (GET_SPELL_DIR(ch) != NOWHERE) {
+        } else if (GET_SPELL_DIR(ch) != NOWHERE) {
             ch->Send(
                 "You concentrate your energy and send the runes of %s %s.\r\n",
                 skill_name(spellnum),
@@ -2546,19 +2478,15 @@ char * print_elemental(int chcl, int weak, char * buf, size_t len) {
 
 #define PLR i->character
 void update_spell_wait(void) {
-
-    struct skillspell_data *temp;
     Descriptor *i;
 
     for (i = descriptor_list; i; i = i->next) {
         if (!IS_PLAYING(i))
             continue;
-        temp = PLR->skills;
-        while (temp) {
-            if (temp->wait >0)
-                temp->wait--;
-            temp = temp->next;
-        }
+        for (vector<skillspell_data>::iterator it = GET_SKILLS(PLR).begin();
+        it != GET_SKILLS(PLR).end(); it++)
+            if ((*it).wait >0)
+                (*it).wait--;
     }
 
 }

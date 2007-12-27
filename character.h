@@ -59,8 +59,6 @@ public:
     float interact;      /*used for the percentage they land hits and get hit and gain exp in battle */
     int attack_location;
     long loader;         /*id of player who linkloaded them */
-    struct sub_list *subs; /*list of subskills available to that person*/
-    struct skillspell_data *skills; /*list of skills and spells available to that person */
     int msg_run;
     int on_task;
     struct note_data *pnote;

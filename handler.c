@@ -610,45 +610,6 @@ void affect_to_char(Character *ch, struct affected_type *af)
   if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 }
 
-
-
-
-
-void subs_remove(Character *ch, struct sub_list *af)
-{
-  struct sub_list *temp = NULL;
-
-  if (ch->subs == NULL)
-  {
-    core_dump();
-    return;
-  }
-
-  REMOVE_FROM_LIST(af, ch->subs, next);
-  free(af);
-  af = NULL;
-
-}
-
-void skills_remove(Character *ch, struct skillspell_data *af)
-{
-
-  struct skillspell_data *temp = NULL;
-
-  if (ch->skills == NULL)
-  {
-    core_dump();
-    return;
-  }
-
-  REMOVE_FROM_LIST(af, ch->skills, next);
-  free(af);
-  af = NULL;
-
-}
-
-
-
 /* Call affect_remove with every spell of spelltype "skill" */
 void affect_from_char(Character *ch, int type)
 {

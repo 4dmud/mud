@@ -232,7 +232,7 @@ void free_proto_script(void *thing, int type)
   {
     fproto = proto;
     proto = proto->next;
-    free(fproto);
+    delete fproto;
   }
   proto=NULL;
 }
@@ -288,7 +288,7 @@ void copy_proto_script(void *source, void *dest, int type)
 
   if (tp_src)
   {
-    CREATE(tp_dst, struct trig_proto_list, 1);
+    tp_dst = new trig_proto_list();
     switch (type)
     {
     case MOB_TRIGGER:
@@ -307,7 +307,7 @@ void copy_proto_script(void *source, void *dest, int type)
       tp_dst->vnum = tp_src->vnum;
       tp_src = tp_src->next;
       if (tp_src)
-        CREATE(tp_dst->next, struct trig_proto_list, 1);
+        tp_dst->next = new trig_proto_list();
       tp_dst = tp_dst->next;
     }
   }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.16  2006/08/17 10:53:49  w4dimenscor
+ * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
+ *
  * Revision 1.15  2006/08/13 06:26:55  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -89,6 +92,7 @@ extern const char *cmd_door[];
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
+void improveallsubs(Character *ch);
 int mag_manacost(Character *ch, int spellnum);
 void add_follower(Character *ch, Character *leader);
 int get_pidx_from_name(Character *ch);
@@ -430,8 +434,7 @@ void list_skills(Character *ch, int skillspell) {
             continue;*/
 
             if (GET_LEVEL(ch) > LVL_IMMORT) {
-                if (sub < 100)
-                    improve_sub(ch, (enum subskill_list)i, 100 - sub);
+            improveallsubs(ch);
                 sub = 100;
             }
             if (sub == 0)

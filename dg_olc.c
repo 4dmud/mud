@@ -744,7 +744,7 @@ void dg_olc_script_copy(Descriptor *d)
 
   if (origscript)
   {
-    CREATE(editscript, struct trig_proto_list, 1);
+    editscript = new trig_proto_list();
     OLC_SCRIPT(d) = editscript;
     while (origscript)
     {
@@ -752,7 +752,7 @@ void dg_olc_script_copy(Descriptor *d)
       editscript->next = NULL;
       origscript = origscript->next;
       if (origscript)
-        CREATE(editscript->next, struct trig_proto_list, 1);
+        editscript->next = new trig_proto_list();
       editscript = editscript->next;
     }
   }
@@ -873,8 +873,7 @@ int dg_script_edit_parse(Descriptor *d, char *arg)
 
     /* add the new info in position */
     currtrig = OLC_SCRIPT(d);
-    CREATE(trig, struct trig_proto_list, 1);
-    trig->vnum = vnum;
+    trig = new trig_proto_list(vnum);
 
     if (pos==1 || !currtrig)
     {

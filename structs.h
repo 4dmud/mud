@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.46  2006/08/17 10:53:49  w4dimenscor
+ * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
+ *
  * Revision 1.45  2006/08/13 09:08:51  w4dimenscor
  * Removed the mtransform flags
  *
@@ -1427,7 +1430,7 @@ struct obj_data {
 struct obj_file_elem {
     obj_vnum item_number;
     sh_int locate;       /* that's the (1+)wear-location (when equipped) or
-                                                 (20+)index in obj file (if it's in a container) BK */
+                                                     (20+)index in obj file (if it's in a container) BK */
     int value[NUM_OBJ_VAL_POSITIONS];
     int extra_flags[EF_ARRAY_MAX];
     int weight;
@@ -1500,9 +1503,9 @@ struct room_mine_data {
     int dif;
     int tool;
     room_mine_data() {
-    num = 0;
-    dif = 0;
-    tool = 0;
+        num = 0;
+        dif = 0;
+        tool = 0;
     }
 };
 
@@ -1548,7 +1551,7 @@ public:
     int copy_room(Room *from);
     Room();
     ~Room();
-    
+
 };
 /* ==================================================================== */
 
@@ -1709,6 +1712,17 @@ struct skillspell_data {
     int learn; // what percent it is at
     int wait; // recast delay left
     struct skillspell_data *next;
+
+    skillspell_data() {
+    skill = -1;
+    learn = 0;
+    wait = 0;
+    }
+
+    bool operator==(int n) { return (this->skill == n);}
+    bool operator==(const skillspell_data &b) { return (this->skill == b.skill);}
+    bool operator<(const skillspell_data &b) { return (this->skill < b.skill);}
+    bool operator<(skillspell_data &b) { return (this->skill < b.skill);}
 };
 
 
@@ -1724,8 +1738,6 @@ struct player_special_data_saved {
 
     /* spares below for future expansion.  You can change the names from
        'sparen' to something meaningful, but don't change the order.  */
-
-
     int clan_rank;
     ubyte orig_race;
     int brass_tokens;
@@ -1762,6 +1774,9 @@ struct player_special_data_saved {
     bool tier1;
     bool tier2;
     bool tier3;
+    
+    vector<sub_list> subs; /*list of subskills available to that person*/
+    vector<skillspell_data> skills; /*list of skills and spells available to that person */
 
     int reg_hit; /* regen rates */
     int reg_mana;
@@ -1848,49 +1863,50 @@ struct player_special_data {
     struct help_index_element *help;
 
     player_special_data() {
-    prompt = NULL;
-    immtitle = NULL;
-    poofin = NULL;        /* Description on arrival of a god.  */
-    poofout = NULL;       /* Description upon a god's exit.    */
-    aliases = NULL;    /* Character's aliases               */
-    last_tell = -1;      /* idnum of last tell from           */
-    last_olc_targ = NULL; /* olc control                       */
-    last_olc_mode = 0;        /* olc control                       */
-    ignorelist = NULL;
-    host = NULL;               /* player host                          */
-    afk_msg = NULL;
-    busy_msg = NULL;
-    pretitle  = NULL;
+        prompt = NULL;
+        immtitle = NULL;
+        poofin = NULL;        /* Description on arrival of a god.  */
+        poofout = NULL;       /* Description upon a god's exit.    */
+        aliases = NULL;    /* Character's aliases               */
+        last_tell = -1;      /* idnum of last tell from           */
+        last_olc_targ = NULL; /* olc control                       */
+        last_olc_mode = 0;        /* olc control                       */
+        ignorelist = NULL;
+        host = NULL;               /* player host                          */
+        afk_msg = NULL;
+        busy_msg = NULL;
+        pretitle  = NULL;
 
-    loginmsg  = NULL;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
-    logoutmsg  = NULL;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
-    remorts = 0;
-    conversions = 0;
-    last_note = 0;
-    last_idea = 0;
-    last_penalty = 0;
-    last_news = 0;
-    last_changes = 0;
-    awardpoints = 0;
-    rewardpoints = 0;
-    last_reward = 0;
-    pageheight = 0;
-    pagewidth = 0;
-    locker = NULL;
-    expire = 0;
-    limit = 0;
-    battle_prompt = 0;
-    dying = 0;
-    skillmulti = 0;
-    kills = NULL;
-    email  = NULL;
-    newbie_status = 0;
-    help  = NULL;
+        loginmsg  = NULL;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
+        logoutmsg  = NULL;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
+        remorts = 0;
+        conversions = 0;
+        last_note = 0;
+        last_idea = 0;
+        last_penalty = 0;
+        last_news = 0;
+        last_changes = 0;
+        awardpoints = 0;
+        rewardpoints = 0;
+        last_reward = 0;
+        pageheight = 0;
+        pagewidth = 0;
+        locker = NULL;
+        expire = 0;
+        limit = 0;
+        battle_prompt = 0;
+        dying = 0;
+        skillmulti = 0;
+        kills = NULL;
+        email  = NULL;
+        newbie_status = 0;
+        help  = NULL;
 
     }
     ~player_special_data() {}
 
-};
+}
+;
 
 struct combine_data {
     Character *joined;
@@ -2152,14 +2168,25 @@ struct index_data {
 struct trig_proto_list {
     int vnum;            /* vnum of the trigger   */
     struct trig_proto_list *next;  /* next trigger          */
-};
+
+    trig_proto_list() {
+        vnum = -1;
+        next = NULL;
+    }
+    trig_proto_list(int v) {
+        vnum = v;
+        next = NULL;
+    }
+    ~trig_proto_list() {}
+}
+;
 
 /* used in the socials */
 struct social_messg {
     int act_nr;
     char *command;       /* holds copy of activating command */
     char *sort_as;       /* holds a copy of a similar command or
-                                               * abbreviation to sort by for the parser */
+                                                   * abbreviation to sort by for the parser */
     int hide;            /* ? */
     int min_victim_position;  /* Position of victim */
     int min_char_position;    /* Position of char */
@@ -2260,7 +2287,7 @@ struct message_event_obj {
     char args[MAX_INPUT_LENGTH];
 
     message_event_obj() {}
-   
+
     message_event_obj(Character *c, int s, int t, int m, long i, char *a) {
         ch = c;
         skill = s;
@@ -2272,8 +2299,9 @@ struct message_event_obj {
     }
 
     ~message_event_obj() {}
-    
-};
+
+}
+;
 
 
 

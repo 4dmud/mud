@@ -87,8 +87,6 @@ long get_ptable_by_name(const char *name);
 
 void free_note(NOTE_DATA *note, int type);
 void free_mob_memory(memory_rec *k);
-void subs_remove(Character *ch, struct sub_list *af);
-void skills_remove(Character *ch, struct skillspell_data *af);
 void free_followers(struct follow_type *k);
 
 void damage_count_free(Character *vict);
@@ -216,6 +214,10 @@ Character::Character(bool is_mob) {
     else
         player_specials = &dummy_mob;
     default_char();
+    if (!is_mob) {
+        GET_SUBS(this).clear();
+        GET_SKILLS(this).clear();
+    }
     init_char_strings();
     clear();
 }
@@ -258,13 +260,6 @@ void Character::freeself() {
     free_followers(followers);
     followers = NULL;
     free_note(pnote, -1);
-
-    while (subs)
-        subs_remove(this, subs);
-    subs = NULL;
-    while (skills)
-        skills_remove(this, skills);
-    skills = NULL;
 
     free_ignore(SPECIALS(this)->ignorelist);
 
@@ -590,8 +585,6 @@ void Character::default_char() {
     next 				= NULL;
     script 			= NULL;
     affected 			= NULL;
-    subs 				= NULL; //yep subskills are a linked list. - mord
-    skills 			= NULL; // and now skills and spells are a linked list
     GET_SEX(this) 		= SEX_MALE;
     GET_CLASS(this) 	= CLASS_WARRIOR;
     GET_LEVEL(this) 	= 0;
@@ -729,6 +722,7 @@ void Character::default_char() {
     GET_CLAN_RANK(this) 		= 0;
     GET_SPEED(this) 		= 0;
     GET_OLC_ZONE(this) 		= 0;
+
 
 }
 
@@ -913,8 +907,8 @@ Character *Character::assign (Character *b) {
     /** Character Class Values **/
     if (b == NULL)
         return this;
-        mp = mob_proto[b->nr];
-        chch = mob_proto[nr];
+    mp = mob_proto[b->nr];
+    chch = mob_proto[nr];
     /** free non proto strings so they can share the new mob proto's strings */
     free_non_proto_strings();
     pfilepos = b->pfilepos;
@@ -922,8 +916,8 @@ Character *Character::assign (Character *b) {
     was_in_room = b->was_in_room;     /* location for linkdead people  */
     wait = b->wait;            /* wait for how many loops       */
 
-if (mp && chch)
-log("mob names: %s, and %s", mp->player.name, chch->player.name);
+    if (mp && chch)
+        log("mob names: %s, and %s", mp->player.name, chch->player.name);
     player = b->player;     /* Normal data                   */
     /** copy across strings from player data! */
     if (b->player.name)
@@ -1066,12 +1060,12 @@ log("mob names: %s, and %s", mp->player.name, chch->player.name);
     atk = b->atk;
     //pulling = b->pulling;
     pet = b->pet;
-    
-        
+
+
     nr = b->nr;         /* Mob's rnum                    */
     //struct travel_point_data *travel_list;
     if (mp && chch)
-log("mob names: %s, and %s", mp->player.name, chch->player.name);
+        log("mob names: %s, and %s", mp->player.name, chch->player.name);
     return this;
 
 }

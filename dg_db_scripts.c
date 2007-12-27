@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.6 $
+*  $Date: 2006/08/17 10:53:49 $
+*  $Revision: 1.7 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -134,6 +134,10 @@ void trig_data_init(trig_data * this_data)
 
 void trig_data_copy(trig_data * this_data, const trig_data * trg)
 {
+if (this_data == trg) {
+log("SYSERR: trig_data_copy passed two of the same pointers!");
+return;
+}
   trig_data_init(this_data);
 
   this_data->nr = trg->nr;
@@ -201,8 +205,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
   switch(type)
   {
   case MOB_TRIGGER:
-    CREATE(new_trg, struct trig_proto_list, 1);
-    new_trg->vnum = vnum;
+    new_trg = new trig_proto_list(vnum);
     new_trg->next = NULL;
 
     mob = (Character *)proto;
@@ -219,8 +222,7 @@ void dg_read_trigger(FILE *fp, void *proto, int type)
     }
     break;
   case WLD_TRIGGER:
-    CREATE(new_trg, struct trig_proto_list, 1);
-    new_trg->vnum = vnum;
+    new_trg = new trig_proto_list(vnum);
     new_trg->next = NULL;
     room = (Room *)proto;
     trg_proto = room->proto_script;
@@ -278,8 +280,7 @@ void dg_obj_trigger(char *line, struct obj_data *obj)
     return;
   }
 
-  CREATE(new_trg, struct trig_proto_list, 1);
-  new_trg->vnum = vnum;
+  new_trg = new trig_proto_list(vnum);
   new_trg->next = NULL;
 
   trg_proto = obj->proto_script;

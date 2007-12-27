@@ -1442,6 +1442,11 @@ struct index_data {
 struct trig_proto_list {
   int vnum;                             /* vnum of the trigger   */
   struct trig_proto_list *next;         /* next trigger          */
+  trig_proto_list() {
+   vnum = -1;
+   next = NULL;
+  }
+  ~trig_proto_list() {}
 };
 
 /* used in the socials */

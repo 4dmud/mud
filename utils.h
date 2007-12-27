@@ -618,6 +618,8 @@ int has_body(Character *ch, int flag);
 #define GET_WIMP_LEV(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.wimp_level))
 #define GET_FREEZE_LEV(ch)	CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.freeze_level))
 #define GET_BAD_PWS(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.bad_pws))
+#define GET_SKILLS(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.skills))
+#define GET_SUBS(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.subs))
 
 #define IS_SAVING(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.saving))
 #define GET_TALK(ch, i)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.talks[i]))

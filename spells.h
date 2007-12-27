@@ -9,46 +9,49 @@
  * CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               * 
  ***********************************************************************
  */
- /*
- * $Log: spells.h,v $
- * Revision 1.10  2006/05/21 11:02:27  w4dimenscor
- * converted game from being C code to C++
- * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
- *
- * Revision 1.9  2006/04/21 12:46:45  w4dimenscor
- * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
- *
- * Revision 1.8  2006/02/17 22:19:54  w4dimenscor
- * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
- *
- * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
- *
- * Revision 1.6  2005/08/07 04:12:39  w4dimenscor
- * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
- *
- * Revision 1.5  2005/03/17 12:42:13  w4dimenscor
- * Added skill smash
- *
- * Revision 1.4  2005/02/25 05:02:46  w4dimenscor
- * added new commands and a few little changes - i forget what eek
- *
- * Revision 1.3  2005/02/04 20:46:11  w4dimenscor
- * Many changes - i couldn't connect to this for a while
- *
- * Revision 1.2  2004/11/20 02:33:25  w4dimenscor
- * updated and cleaned up the script system
- *
- * Revision 1.1.1.1  2004/11/12 02:16:55  w4dimenscor
- * Initial clean submission of 4Dimensions src code
- *
- * Revision 1.38  2004/09/04 03:46:51  molly
- * made it so only one cost for recovering corpses, and skillist is sorted
- *
- * Revision 1.36  2004/08/15 01:12:31  molly
- * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
- *
- */
+/*
+* $Log: spells.h,v $
+* Revision 1.11  2006/08/17 10:53:49  w4dimenscor
+* moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
+*
+* Revision 1.10  2006/05/21 11:02:27  w4dimenscor
+* converted game from being C code to C++
+* to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
+*
+* Revision 1.9  2006/04/21 12:46:45  w4dimenscor
+* Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+*
+* Revision 1.8  2006/02/17 22:19:54  w4dimenscor
+* Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
+*
+* Revision 1.7  2006/01/23 05:23:19  w4dimenscor
+* sorry self. another. _cant remember the changes_ entry
+*
+* Revision 1.6  2005/08/07 04:12:39  w4dimenscor
+* Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
+*
+* Revision 1.5  2005/03/17 12:42:13  w4dimenscor
+* Added skill smash
+*
+* Revision 1.4  2005/02/25 05:02:46  w4dimenscor
+* added new commands and a few little changes - i forget what eek
+*
+* Revision 1.3  2005/02/04 20:46:11  w4dimenscor
+* Many changes - i couldn't connect to this for a while
+*
+* Revision 1.2  2004/11/20 02:33:25  w4dimenscor
+* updated and cleaned up the script system
+*
+* Revision 1.1.1.1  2004/11/12 02:16:55  w4dimenscor
+* Initial clean submission of 4Dimensions src code
+*
+* Revision 1.38  2004/09/04 03:46:51  molly
+* made it so only one cost for recovering corpses, and skillist is sorted
+*
+* Revision 1.36  2004/08/15 01:12:31  molly
+* aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
+*
+*/
 
 #define DEFAULT_STAFF_LVL	12
 #define DEFAULT_WAND_LVL	12
@@ -120,223 +123,223 @@
 #define E_DEATH (1 << 11)
 
 enum spell_list {
-  TYPE_UNDEFINED = -1,
-  SPELL_RESERVED_DBC,	/* SKILL NUMBER ZERO -- RESERVED */
+    TYPE_UNDEFINED = -1,
+    SPELL_RESERVED_DBC,	/* SKILL NUMBER ZERO -- RESERVED */
 
-  /* PLAYER SPELLS -- Numbered from 1 to MAX_SPELLS */
+    /* PLAYER SPELLS -- Numbered from 1 to MAX_SPELLS */
 
-  SPELL_ARMOR, //1
-  SPELL_TELEPORT,
-  SPELL_BLESS,
-  SPELL_BLINDNESS,
-  SPELL_BURNING_HANDS,
-  SPELL_CALL_LIGHTNING,
-  SPELL_CHARM,
-  SPELL_CHILL_TOUCH,
-  SPELL_CLONE,
-  SPELL_COLOR_SPRAY,//10
-  SPELL_CONTROL_WEATHER,
-  SPELL_CREATE_FOOD,
-  SPELL_CREATE_WATER,
-  SPELL_CURE_BLIND,
-  SPELL_CURE_CRITIC,
-  SPELL_CURE_LIGHT,
-  SPELL_CURSE,
-  SPELL_DETECT_ALIGN,
-  SPELL_DETECT_INVIS,
-  SPELL_DETECT_MAGIC,//20
-  SPELL_DETECT_POISON,
-  SPELL_DISPEL_EVIL,
-  SPELL_EARTHQUAKE,
-  SPELL_ENCHANT_WEAPON,
-  SPELL_ENERGY_DRAIN ,
-  SPELL_FIREBALL,
-  SPELL_HARM,
-  SPELL_HEAL,
-  SPELL_INVISIBLE,
-  SPELL_LIGHTNING_BOLT,//30
-  SPELL_LOCATE_OBJECT,
-  SPELL_MAGIC_MISSILE,
-  SPELL_POISON, //--?? message?
-  SPELL_PROT_FROM_EVIL,
-  SPELL_REMOVE_CURSE ,
-  SPELL_SANCTUARY,
-  SPELL_SHOCKING_GRASP,
-  SPELL_SLEEP,
-  SPELL_STRENGTH,
-  SPELL_SUMMON ,//40
-  SPELL_SUFFOCATE,
-  SPELL_WORD_OF_RECALL,
-  SPELL_ANTIDOTE_1,
-  SPELL_SENSE_LIFE,
-  SPELL_ANIMATE_DEAD,
-  SPELL_DISPEL_GOOD,
-  SPELL_GROUP_ARMOR,
-  SPELL_GROUP_HEAL,
-  SPELL_GROUP_RECALL,
-  SPELL_INFRAVISION,//50
-  SPELL_WATERWALK	,
-  SPELL_GATE,
-  SPELL_MINOR_IDENTIFY,
-  SPELL_REMOVE_ALIGNMENT,
-  SPELL_LOCATE_PERSON,
-  SPELL_POISON_2,
-  SPELL_POISON_3,
-  SPELL_POISON_4,
-  SPELL_ANTIDOTE_2,
-  SPELL_ANTIDOTE_3,//60
-  SPELL_EVIL_EYE,
-  SPELL_ABSOLVE,
-  SPELL_CHAIN_LIGHTNING,
-  SPELL_RECHARGE,
-  SPELL_METEOR_SHOWER,
-  SPELL_STONESKIN,
-  SPELL_STEELSKIN,
-  SPELL_HOLD_PERSON,
-  SPELL_PARALYZE,
-  SPELL_HOLY_WORD,//70 --
-  SPELL_HOLY_SHOUT, // --
-  SPELL_HASTE,
-  SPELL_SHIELD,
-  SPELL_GROUP_SHIELD,
-  SPELL_ACID_ARROW, //-- ala
-  SPELL_FLAME_ARROW, // -- ala
-  SPELL_CONE_OF_COLD, // -- ala
-  SPELL_KNOCK,
-  SPELL_PROT_FIRE,
-  SPELL_PROT_COLD,//80
-  SPELL_EARTH_ELEMENTAL,
-  SPELL_WATER_ELEMENTAL,
-  SPELL_AIR_ELEMENTAL,
-  SPELL_FIRE_ELEMENTAL ,
-  SPELL_FIRE_SHIELD,
-  SPELL_LIFE_TRANSFER ,
-  SPELL_MANA_TRANSFER,
-  SPELL_PROT_FROM_GOOD,
-  SPELL_MIND_FIRE,
-  SPELL_MIND_ELEC	,//90
-  SPELL_MIND_WATER,
-  SPELL_MIND_ICE	,
-  SPELL_SHIELD_ICE,
-  SPELL_SHIELD_THORN,
-  SPELL_SHIELD_MANA,
-  SPELL_SHIELD_MIRROR,
-  SPELL_SHIELD_HOLY,
-  SPELL_SHIELD_STATIC,
-  SPELL_FORTIFY_MIND,
-  SPELL_FORTIFY_BODY,//100
-  SPELL_SWEET_DREAMS,
-  SPELL_DEVINE_MIND,
-  SPELL_NUMB_MIND,
-  SPELL_SLOW,
-  SPELL_FLIGHT,
-  SPELL_BATTLE_RAGE,
-  SPELL_ENCHANT_ARMOR,
-  SPELL_MAGIC_BUBBLE,
-  SPELL_PSI_PANIC	,
-  SPELL_NIGHTMARE	,//110
-  SPELL_VITALIZE	,
-  SPELL_DISPELL_SANCTURY,
-  SPELL_FORSEE,
-  SPELL_MANA_BLAST,
-  SPELL_CONFUSE,
-  SPELL_CORRUPT_ARMOR,
-  SPELL_WEAKEN,
-  SPELL_SOULSMASH,
-  SPELL_DEMONSHREAK,
-  SPELL_LIFESUCK,//120
-  SPELL_BURNINGSKULL,
-  SPELL_HEARTSQUEEZE,
-  SPELL_FACEMELT,
-  SPELL_ELECTRIC_BLAST,
-  SPELL_INFERNO,
-  SPELL_WATER_TO_WINE,
-  SPELL_MIDAS_TOUCH,//127
-  SPELL_POLYMORPH,
-  
-
+    SPELL_ARMOR, //1
+    SPELL_TELEPORT,
+    SPELL_BLESS,
+    SPELL_BLINDNESS,
+    SPELL_BURNING_HANDS,
+    SPELL_CALL_LIGHTNING,
+    SPELL_CHARM,
+    SPELL_CHILL_TOUCH,
+    SPELL_CLONE,
+    SPELL_COLOR_SPRAY,//10
+    SPELL_CONTROL_WEATHER,
+    SPELL_CREATE_FOOD,
+    SPELL_CREATE_WATER,
+    SPELL_CURE_BLIND,
+    SPELL_CURE_CRITIC,
+    SPELL_CURE_LIGHT,
+    SPELL_CURSE,
+    SPELL_DETECT_ALIGN,
+    SPELL_DETECT_INVIS,
+    SPELL_DETECT_MAGIC,//20
+    SPELL_DETECT_POISON,
+    SPELL_DISPEL_EVIL,
+    SPELL_EARTHQUAKE,
+    SPELL_ENCHANT_WEAPON,
+    SPELL_ENERGY_DRAIN ,
+    SPELL_FIREBALL,
+    SPELL_HARM,
+    SPELL_HEAL,
+    SPELL_INVISIBLE,
+    SPELL_LIGHTNING_BOLT,//30
+    SPELL_LOCATE_OBJECT,
+    SPELL_MAGIC_MISSILE,
+    SPELL_POISON, //--?? message?
+    SPELL_PROT_FROM_EVIL,
+    SPELL_REMOVE_CURSE ,
+    SPELL_SANCTUARY,
+    SPELL_SHOCKING_GRASP,
+    SPELL_SLEEP,
+    SPELL_STRENGTH,
+    SPELL_SUMMON ,//40
+    SPELL_SUFFOCATE,
+    SPELL_WORD_OF_RECALL,
+    SPELL_ANTIDOTE_1,
+    SPELL_SENSE_LIFE,
+    SPELL_ANIMATE_DEAD,
+    SPELL_DISPEL_GOOD,
+    SPELL_GROUP_ARMOR,
+    SPELL_GROUP_HEAL,
+    SPELL_GROUP_RECALL,
+    SPELL_INFRAVISION,//50
+    SPELL_WATERWALK	,
+    SPELL_GATE,
+    SPELL_MINOR_IDENTIFY,
+    SPELL_REMOVE_ALIGNMENT,
+    SPELL_LOCATE_PERSON,
+    SPELL_POISON_2,
+    SPELL_POISON_3,
+    SPELL_POISON_4,
+    SPELL_ANTIDOTE_2,
+    SPELL_ANTIDOTE_3,//60
+    SPELL_EVIL_EYE,
+    SPELL_ABSOLVE,
+    SPELL_CHAIN_LIGHTNING,
+    SPELL_RECHARGE,
+    SPELL_METEOR_SHOWER,
+    SPELL_STONESKIN,
+    SPELL_STEELSKIN,
+    SPELL_HOLD_PERSON,
+    SPELL_PARALYZE,
+    SPELL_HOLY_WORD,//70 --
+    SPELL_HOLY_SHOUT, // --
+    SPELL_HASTE,
+    SPELL_SHIELD,
+    SPELL_GROUP_SHIELD,
+    SPELL_ACID_ARROW, //-- ala
+    SPELL_FLAME_ARROW, // -- ala
+    SPELL_CONE_OF_COLD, // -- ala
+    SPELL_KNOCK,
+    SPELL_PROT_FIRE,
+    SPELL_PROT_COLD,//80
+    SPELL_EARTH_ELEMENTAL,
+    SPELL_WATER_ELEMENTAL,
+    SPELL_AIR_ELEMENTAL,
+    SPELL_FIRE_ELEMENTAL ,
+    SPELL_FIRE_SHIELD,
+    SPELL_LIFE_TRANSFER ,
+    SPELL_MANA_TRANSFER,
+    SPELL_PROT_FROM_GOOD,
+    SPELL_MIND_FIRE,
+    SPELL_MIND_ELEC	,//90
+    SPELL_MIND_WATER,
+    SPELL_MIND_ICE	,
+    SPELL_SHIELD_ICE,
+    SPELL_SHIELD_THORN,
+    SPELL_SHIELD_MANA,
+    SPELL_SHIELD_MIRROR,
+    SPELL_SHIELD_HOLY,
+    SPELL_SHIELD_STATIC,
+    SPELL_FORTIFY_MIND,
+    SPELL_FORTIFY_BODY,//100
+    SPELL_SWEET_DREAMS,
+    SPELL_DEVINE_MIND,
+    SPELL_NUMB_MIND,
+    SPELL_SLOW,
+    SPELL_FLIGHT,
+    SPELL_BATTLE_RAGE,
+    SPELL_ENCHANT_ARMOR,
+    SPELL_MAGIC_BUBBLE,
+    SPELL_PSI_PANIC	,
+    SPELL_NIGHTMARE	,//110
+    SPELL_VITALIZE	,
+    SPELL_DISPELL_SANCTURY,
+    SPELL_FORSEE,
+    SPELL_MANA_BLAST,
+    SPELL_CONFUSE,
+    SPELL_CORRUPT_ARMOR,
+    SPELL_WEAKEN,
+    SPELL_SOULSMASH,
+    SPELL_DEMONSHREAK,
+    SPELL_LIFESUCK,//120
+    SPELL_BURNINGSKULL,
+    SPELL_HEARTSQUEEZE,
+    SPELL_FACEMELT,
+    SPELL_ELECTRIC_BLAST,
+    SPELL_INFERNO,
+    SPELL_WATER_TO_WINE,
+    SPELL_MIDAS_TOUCH,//127
+    SPELL_POLYMORPH,
 
 
 
-  /* Insert new spells here, up to MAX_SPELLS */
-  MAX_SPELLS = 130
+
+
+    /* Insert new spells here, up to MAX_SPELLS */
+    MAX_SPELLS = 130
 };
 
 enum skill_list {
-  /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-  SKILL_UNDEFINED = MAX_SPELLS,
-  SKILL_BACKSTAB, // 131
-  SKILL_BASH,
-  SKILL_HIDE,
-  SKILL_KICK,
-  SKILL_PICK_LOCK,//135
-  SKILL_FLANK,
-  SKILL_RESCUE,
-  SKILL_SNEAK,
-  SKILL_STEAL,
-  SKILL_TRACK,//140
-  SKILL_MOUNT,
-  SKILL_RIDING,
-  SKILL_TAME,
-  SKILL_SNARE ,
-  SKILL_THROW ,//145
-  SKILL_BOW,
-  SKILL_SLING,
-  SKILL_CROSSBOW,
-  SKILL_DUAL,
-  SKILL_CIRCLE,//150
-  SKILL_BLACKJACK,
-  SKILL_SECOND_ATTACK,
-  SKILL_FIREARM,
-  SKILL_PUSH,
-  SKILL_SCAN,//155
-  SKILL_BREW,
-  SKILL_SCRIBE,
-  SKILL_TINKER,
-  SKILL_POISON_WEAPON,
-  SKILL_RETREAT,//160
-  SKILL_FILET,
-  SKILL_DISARM,
-  SKILL_FORAGE,
-  SKILL_TRAP_AWARE,
-  SKILL_PARRY,//165
-  SKILL_MOUNTED_COMBAT,
-  SKILL_TRAMPLE,
-  SKILL_JOUST,
-  SKILL_GRAPPLE,
-  SKILL_DRUNK,//170
-  SKILL_HANDTOHAND,
-  SKILL_MELEE ,
-  SKILL_THIRD_ATTACK,
-  SKILL_HAMSTRING,
-  SKILL_SHORT_BLADE,//175
-  SKILL_DODGE,
-  SKILL_PHASE,
-  SKILL_CHARGE,
-  SKILL_GRIP,
-  SKILL_FACE,//180
-  SKILL_FOCUS,
-  SKILL_MARTIAL_ARTS,
-  SKILL_SLIP,
-  SKILL_MANIPULATE,
-  SKILL_HOLY_STRENGTH,//185
-  SKILL_BESERK,
-  SKILL_MEDITATE,
-  SKILL_SING_WOOD	,
-  SKILL_HYPERACTIVITY,
-  SKILL_TRUE_STRIKE,//190
-  SKILL_STRANGLE,
-  SKILL_FORTIFY,
-  SKILL_MANIFEST,
-  SKILL_SCALP,
-  SKILL_BRACE,//195
-  SKILL_BEHEAD,
-  SKILL_BLADE_DANCE,
-  SKILL_LONGARM,
-  SKILL_CLEAVE,//199
-  SKILL_SMASH,
+    /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
+    SKILL_UNDEFINED = MAX_SPELLS,
+    SKILL_BACKSTAB, // 131
+    SKILL_BASH,
+    SKILL_HIDE,
+    SKILL_KICK,
+    SKILL_PICK_LOCK,//135
+    SKILL_FLANK,
+    SKILL_RESCUE,
+    SKILL_SNEAK,
+    SKILL_STEAL,
+    SKILL_TRACK,//140
+    SKILL_MOUNT,
+    SKILL_RIDING,
+    SKILL_TAME,
+    SKILL_SNARE ,
+    SKILL_THROW ,//145
+    SKILL_BOW,
+    SKILL_SLING,
+    SKILL_CROSSBOW,
+    SKILL_DUAL,
+    SKILL_CIRCLE,//150
+    SKILL_BLACKJACK,
+    SKILL_SECOND_ATTACK,
+    SKILL_FIREARM,
+    SKILL_PUSH,
+    SKILL_SCAN,//155
+    SKILL_BREW,
+    SKILL_SCRIBE,
+    SKILL_TINKER,
+    SKILL_POISON_WEAPON,
+    SKILL_RETREAT,//160
+    SKILL_FILET,
+    SKILL_DISARM,
+    SKILL_FORAGE,
+    SKILL_TRAP_AWARE,
+    SKILL_PARRY,//165
+    SKILL_MOUNTED_COMBAT,
+    SKILL_TRAMPLE,
+    SKILL_JOUST,
+    SKILL_GRAPPLE,
+    SKILL_DRUNK,//170
+    SKILL_HANDTOHAND,
+    SKILL_MELEE ,
+    SKILL_THIRD_ATTACK,
+    SKILL_HAMSTRING,
+    SKILL_SHORT_BLADE,//175
+    SKILL_DODGE,
+    SKILL_PHASE,
+    SKILL_CHARGE,
+    SKILL_GRIP,
+    SKILL_FACE,//180
+    SKILL_FOCUS,
+    SKILL_MARTIAL_ARTS,
+    SKILL_SLIP,
+    SKILL_MANIPULATE,
+    SKILL_HOLY_STRENGTH,//185
+    SKILL_BESERK,
+    SKILL_MEDITATE,
+    SKILL_SING_WOOD	,
+    SKILL_HYPERACTIVITY,
+    SKILL_TRUE_STRIKE,//190
+    SKILL_STRANGLE,
+    SKILL_FORTIFY,
+    SKILL_MANIFEST,
+    SKILL_SCALP,
+    SKILL_BRACE,//195
+    SKILL_BEHEAD,
+    SKILL_BLADE_DANCE,
+    SKILL_LONGARM,
+    SKILL_CLEAVE,//199
+    SKILL_SMASH,
 
-  MAX_SKILLS
+    MAX_SKILLS
 };
 
 /*
@@ -459,67 +462,64 @@ int magic_distance(Character *ch, int spellnum, int dir, Character *victim);
 
 
 
-struct spell_info_type
-{
-  byte min_position;		/* Position for caster   */
-  int mana_min;		/* Min amount of mana used by a spell
-  				 * (highest lev) */
-  int mana_max;		/* Max amount of mana used by a spell
-  				 * (lowest lev) */
-  int mana_change;		/* Change in mana used by spell from
-  				 * lev to lev */
+struct spell_info_type {
+    byte min_position;		/* Position for caster   */
+    int mana_min;		/* Min amount of mana used by a spell
+      				 * (highest lev) */
+    int mana_max;		/* Max amount of mana used by a spell
+      				 * (lowest lev) */
+    int mana_change;		/* Change in mana used by spell from
+      				 * lev to lev */
 
-  int min_level;
-  int routines;
-  byte violent;
-  int targets;		/* See below for use with TAR_XXX  */
-  const char *name;
-  int first_prereq;	/* prerequisite
-  					 * skill/spell one */
-  int second_prereq;	/* prerequisite
-  					 * skill/spell two */
-  int tier;
-  int wait;
-  int classes;
+    int min_level;
+    int routines;
+    byte violent;
+    int targets;		/* See below for use with TAR_XXX  */
+    const char *name;
+    int first_prereq;	/* prerequisite
+      					 * skill/spell one */
+    int second_prereq;	/* prerequisite
+      					 * skill/spell two */
+    int tier;
+    int wait;
+    int classes;
 
 };
 
 
 
-struct sub_skill_info_type
-{
-  byte min_position;		/* Position for caster   */
-  int stat;		/* uses hitp, mana, or move points */
-  int cost;		        /* the cost in units */
-  int percentage;		/* the cost in percentage */
-  /*
-     where actual cost is the lower of the two, percentage or cost 
-     for example if the cost is 200 hitpoints, and the percentage is 15%
-     and the player has 1000 hp, the percentage hp is 150 points
-     then the actual cost will be 150, because the percentage 
-     is lower then the cost value -- mordipie
-  */
-  int routines;
-  byte violent;
-  int targets;		/* See below for use with TAR_XXX  */
-  const char *name; /*the name of the subskill*/
-  int perent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
-  int stat_type;
-  int flags;
-  int cl_type; /*who can use this sub?*/
+struct sub_skill_info_type {
+    byte min_position;		/* Position for caster   */
+    int stat;		/* uses hitp, mana, or move points */
+    int cost;		        /* the cost in units */
+    int percentage;		/* the cost in percentage */
+    /*
+       where actual cost is the lower of the two, percentage or cost 
+       for example if the cost is 200 hitpoints, and the percentage is 15%
+       and the player has 1000 hp, the percentage hp is 150 points
+       then the actual cost will be 150, because the percentage 
+       is lower then the cost value -- mordipie
+    */
+    int routines;
+    byte violent;
+    int targets;		/* See below for use with TAR_XXX  */
+    const char *name; /*the name of the subskill*/
+    int perent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
+    int stat_type;
+    int flags;
+    int cl_type; /*who can use this sub?*/
 
 };
 
 extern struct sub_skill_info_type sub_info[(int)TOP_SUB_DEFINE];
 // maybe split off all the class restricted values into a seperate table???
 
-struct spell_class_type
-{
-  int min_level;
-  int first_prereq;
-  int second_prereq;
-  sh_int tier;
-  int val[2];
+struct spell_class_type {
+    int min_level;
+    int first_prereq;
+    int second_prereq;
+    sh_int tier;
+    int val[2];
 };
 /*
  * Possible Targets:
@@ -636,5 +636,12 @@ int immune_to(Character *ch, int elem);
 float resist_elem(Character *ch, int elem);
 int grand_master(Character *ch);
 int spell_num(const char *name);
-
+bool operator==(vector<skillspell_data>::iterator &d, int i);
+bool operator==(vector<sub_list>::iterator &d, int i);
+bool operator<(vector<skillspell_data>::iterator &a, vector<skillspell_data>::iterator &b);
+bool operator<(vector<sub_list>::iterator &a, vector<sub_list>::iterator &b);
+bool operator<(const sub_list &a, const sub_list &b);
+bool operator<(const skillspell_data &a,const skillspell_data &b);
 extern struct spell_info_type spell_info[];
+
+

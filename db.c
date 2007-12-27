@@ -35,7 +35,6 @@
 #include "genmob.h"
 #include "genwld.h"
 #include "xmlhelp.h"
-
 #include "assemblies.h"
 #include "trees.h"
 #include "htree.h"
@@ -4445,7 +4444,6 @@ int store_to_char(const char *name, Character *ch) {
     char buf[MAX_INPUT_LENGTH];
     char  line[MAX_INPUT_LENGTH + 1], tag[6];
     struct affected_type tmp_aff[MAX_AFFECT];
-    struct sub_list *temp = NULL;
     int rec_count = 0;
 
     if (ch == NULL) {
@@ -4898,21 +4896,19 @@ int store_to_char(const char *name, Character *ch) {
                     }
                 } while (num != 0);
             } else if (!strcmp(tag, "Subs")) {
+            struct sub_list s;
                 do {
                     get_line(fl, line);
                     if (sscanf(line, "%d %d %d", &num, &num2, &num3) == 3) {
                         if (num != 0) {
-                            CREATE(temp, struct sub_list, 1);
-                            temp->next = ch->subs;
-                            temp->subskill = (enum subskill_list)(num);
-                            temp->status = (enum sub_status_toggle)num3;
-                            temp->learn = num2;
-                            ch->subs = temp;
+                            s.subskill = (enum subskill_list)(num);
+                            s.status = (enum sub_status_toggle)num3;
+                            s.learn = num2;
+                            GET_SUBS(ch).push_back(s);
                         }
                     }
-
-
                 } while (num != 0);
+                sort(GET_SUBS(ch).begin(), GET_SUBS(ch).end());
             } else if (!strcmp(tag, "Str ")) {
                 sscanf(line, "%d/%d", &num, &num2);
                 ch->real_abils.str = num;
@@ -5077,8 +5073,6 @@ void char_to_store(Character *ch) {
     int i, id, save_index = FALSE, thing = 0;
     struct affected_type *aff, tmp_aff[MAX_AFFECT];
     struct obj_data *char_eq[NUM_WEARS];
-    struct sub_list *temp;
-    struct skillspell_data *skill;
 
     if (IS_NPC(ch) || GET_NAME(ch) == NULL) {
         log("SYSERR: Massive fuck up in char to store.");
@@ -5188,17 +5182,17 @@ void char_to_store(Character *ch) {
     fprintf(fl, "Thr5: %d\n", GET_SAVE(ch, 4));
     if (GET_LEVEL(ch) < LVL_IMMORT) {
         fprintf(fl, "Skil:\n");
-        skill = ch->skills;
-        while (skill != NULL) {
-            if (knows_spell(ch, skill->skill) && skill->learn > 0)
-                fprintf(fl, "%d %d %d 0\n", skill->skill, skill->learn, skill->wait);
-            skill = skill->next;
-        }
+        for (vector<skillspell_data>::iterator it = GET_SKILLS(ch).begin();
+             it != GET_SKILLS(ch).end();it++) {
+            if (knows_spell(ch, (*it).skill) && (*it).learn > 0)
+                fprintf(fl, "%d %d %d 0\n", (*it).skill, (*it).learn, (*it).wait);
+                }
         fprintf(fl, "0 0 0 0\n");
         fprintf(fl, "Subs:\n");
-        for (temp = ch->subs; temp != NULL; temp = temp->next) {
-            if (temp->learn > 0)
-                fprintf(fl, "%d %d %d\n", temp->subskill, temp->learn, temp->status);
+        for (vector<sub_list>::iterator it = GET_SUBS(ch).begin();
+             it != GET_SUBS(ch).end(); it++) {
+            if ((*it).learn > 0)
+                fprintf(fl, "%d %d %d\n", (*it).subskill, (*it).learn, (*it).status);
         }
         fprintf(fl, "0 0 0\n");
     }

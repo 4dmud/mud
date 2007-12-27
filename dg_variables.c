@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/08/13 06:26:51 $                                           * 
-*  $Revision: 1.32 $                                                      *
+*  $Date: 2006/08/17 10:53:49 $                                           * 
+*  $Revision: 1.33 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -59,9 +59,12 @@ void add_var(struct trig_var_data **var_list,const char *name,const char *value,
         //free(vd->value);
         //CREATE(vd->value, char, strlen(value) + 1);
         //vd->value = new char(strlen(value) + 1);
+        vd->value.erase();
     }
-    else {
-        vd = new trig_var_data();
+    else if (!vd) {
+   // if (vd)
+    //delete vd;
+     vd = new trig_var_data();
 
         //CREATE(vd->name, char, strlen(name) + 1);
         //vd->name = new char(strlen(name)+1);
