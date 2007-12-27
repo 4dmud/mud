@@ -1904,8 +1904,9 @@ int parse_accounts(Descriptor *d, char *arg) {
         account_manage_menu(d);
         return 0;
     }
-
-    if ((pos = pi.TableIndexByName(name)) == -1) {
+    try {
+	    pos = pi.TableIndexByName(name);
+    } catch (MudException e) {
         d->Output( "\r\n%s is not a player here. Please write the name out completely.\r\n", name);
         account_manage_menu(d);
         return 0;

@@ -4304,11 +4304,8 @@ int store_to_char(const char *name, Character *ch) {
         log("SYSERR: store_to_char recieved null name!");
         return -1;
     }
-
-    if ((id = pi.TableIndexByName(name)) < 0) {
-        log("Name: '%s' unfound in player index", name);
-        return -1;
-    } else {
+    try {
+	    id = pi.TableIndexByName(name);
         pvti = pi.Begin() + id;
 
         snprintf(filename, sizeof(filename), "%s/%c/%s",
@@ -4356,6 +4353,9 @@ int store_to_char(const char *name, Character *ch) {
 
         }
 
+    } catch ( MudException e) {
+	    log("Name: '%s' unfound in player index", name);
+	    return -1;
     }
 
     while (get_line(fl, line)) {
@@ -5300,8 +5300,11 @@ void char_to_store(Character *ch) {
         addChToLookupTable(GET_ID(ch), ch);
     }
 
-    if ((id = pi.TableIndexByName(GET_NAME(ch))) < 0)
-        return;
+    try {
+	    id = pi.TableIndexByName(GET_NAME(ch));
+    } catch (MudException e) {
+            return;
+    }
     if (pi.ClanByIndex(id) != GET_CLAN(ch)) {
         save_index = TRUE;
         pi.SetClan(id, GET_CLAN(ch));

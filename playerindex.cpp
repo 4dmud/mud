@@ -246,7 +246,7 @@ long PlayerIndex::TableIndexByName(const char *name) {
     string s;
     ss << "Name " << name << " not found in player index.";
     s = ss.str();
-    throw MudException(s);
+    throw MudException(s);   
 }
 
 long PlayerIndex::TableIndexById(long &id) {

@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.59  2007/11/14 09:20:41  w4dimenscor
+ * Fixed crash bug with hitch. Fixed crash bug with finger nonexistant player. and adding new players to the management screen
+ *
  * Revision 1.58  2007/10/22 23:38:27  w4dimenscor
  * Fixed donate to do the right thing(tm).
  * --Matthijs
@@ -3562,9 +3565,9 @@ ACMD(do_unhitch) {
     }
     unhitch_item(obj);
     unhitch_mob(vict);
-    if (obj->hitched)
+    if (obj && obj->hitched)
         log("Obj didn't unhitch properly.");
-    if (vict->hitched)
+    if (vict && vict->hitched)
         log("Mob didn't unhitch properly");
 }
 
