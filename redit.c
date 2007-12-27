@@ -1348,7 +1348,7 @@ void redit_parse(struct descriptor_data *d, char *arg)
     if (*arg == 'y' || *arg == 'Y')
     {
       if (delete_room(OLC_ROOM(d)))
-        write_to_output(d, "Room deleted.\r\n");
+        write_to_output(d, "Room deleted.\r\nPlease confirm delete by saving zone\r\n");
       else
         write_to_output(d, "Couldn't delete the room!.\r\n");
 

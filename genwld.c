@@ -182,7 +182,7 @@ int delete_room(room_rnum rnum)
   if (rnum->number <= 0 || rnum->number > top_of_world)	/* Can't delete void yet. */
     return FALSE;
 
-  room = rnum;
+  room = world_vnum[rnum->number];
 
   add_to_save_list(zone_table[room->zone].number, SL_WLD);
 
@@ -297,7 +297,7 @@ int delete_room(room_rnum rnum)
   /*
    * Remove this room from all shop lists.
    */
-  {
+ do {
     extern int top_shop;
     for (i = 0;i < top_shop;i++)
     {
@@ -307,6 +307,11 @@ int delete_room(room_rnum rnum)
           SHOP_ROOM(i, j) = world_vnum[0]; /* set to the void */
       }
     }
+  } while (0);
+  
+  if (room) {
+  world_vnum[room->number] = NULL;
+  free(room);
   }
   /*
    * Now we actually move the rooms down.
@@ -632,18 +637,34 @@ int free_room_strings(struct room_data *room)
   int i;
 
   /* Free descriptions. */
-  free_string(room->name);
-  free_string(room->description);
-  free_string(room->smell);
-  free_string(room->listen);
+  if (room->name) {
+  free(room->name);
+  room->name = NULL;
+  }
+  if (room->description) {
+  free(room->description);
+  room->description = NULL;
+  }
+  if (room->smell) {
+  free(room->smell);
+  room->smell = NULL;
+  }
+  if (room->listen) {
+  free(room->listen);
+  room->listen = NULL;
+  }
   if (room->ex_description)
     free_ex_descriptions(room->ex_description);
+    room->ex_description = NULL;
   if (room->look_under_description)
     free_ex_descriptions(room->look_under_description);
+    room->look_under_description = NULL;
   if (room->look_above_description)
     free_ex_descriptions(room->look_above_description);
+    room->look_above_description = NULL;
   if (room->look_behind_description)
     free_ex_descriptions(room->look_behind_description);
+    room->look_behind_description = NULL;
 
   /* Free exits. */
   for (i = 0; i < NUM_OF_DIRS; i++)
@@ -655,6 +676,7 @@ int free_room_strings(struct room_data *room)
       if (R_EXIT(room, i)->keyword)
         free(R_EXIT(room, i)->keyword);
       free(R_EXIT(room, i));
+      R_EXIT(room, i) = NULL;
     }
   }
 
