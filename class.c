@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.15  2006/12/07 18:49:13  w4dimenscor
+ * Rangers now have kick.
+ *
  * Revision 1.14  2006/08/13 06:26:50  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -1350,7 +1353,7 @@ void init_spell_levels(void)
   assign_class(SKILL_JOUST,              ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_GRAPPLE,            ALL_ROGUE | ALL_FIGHTER);
   assign_class(SKILL_MELEE,        ALL_FIGHTER | ALL_ROGUE);
-  assign_class(SKILL_KICK,              ALL_FIGHTER);
+  assign_class(SKILL_KICK,              ALL_FIGHTER | RAN);
   assign_class(SKILL_RESCUE,            WAR);
   assign_class(SKILL_BASH,              ALL_FIGHTER);
   assign_class(SKILL_SECOND_ATTACK,     ALL_FIGHTER | ALL_ROGUE);
