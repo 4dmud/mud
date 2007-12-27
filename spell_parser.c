@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.17  2006/04/21 12:46:45  w4dimenscor
+ * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+ *
  * Revision 1.16  2006/04/03 23:31:35  w4dimenscor
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
@@ -104,6 +107,7 @@
 #include "dg_scripts.h"
 #include "constants.h"
 #include "fight.h"
+#include "action.h"
 
 struct spell_info_type spell_info[TOP_SPELL_DEFINE + 1];
 
@@ -139,11 +143,7 @@ int distance = -1;
 
 
 
-struct syllable
-{
-  const char *org;
-  const char *news;
-};
+
 
 
 struct syllable syls[] =

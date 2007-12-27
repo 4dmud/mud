@@ -1,5 +1,5 @@
 
-extern struct attack_hit_type attack_hit_text[];
+
 int apply_ac(struct char_data *ch, int eq_pos);
 int modify_dam(int dam, struct char_data *ch, struct char_data *vict , int w_type);
 int arena_ok(struct char_data *ch, struct char_data *victim);
@@ -174,3 +174,14 @@ void die(struct char_data *ch, struct char_data *killer);
 float   backstab_mult(int level, int tier);
 float   cleave_mult(int level, int tier);
 
+/* Weapon attack texts */
+/* Attacktypes with grammar */
+
+struct attack_hit_type
+{
+  const char *singular;
+  const char *plural;
+};
+
+
+extern struct attack_hit_type attack_hit_text[];

@@ -33,7 +33,6 @@ sh_int find_clan_by_id(int clan_id);
 sh_int find_clan(char *name);
 char *clan_name(int idnum);
 
-extern struct clan_rec clan[MAX_CLANS];
 extern int num_of_clans;
 
 struct clan_rec {
@@ -55,3 +54,5 @@ struct clan_rec {
     int clan_eq[NUM_CLAN_EQ];
     obj_vnum board;
 };
+
+extern struct clan_rec clan[MAX_CLANS];

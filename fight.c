@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.38  2006/04/21 12:46:44  w4dimenscor
+ * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+ *
  * Revision 1.37  2006/04/06 14:00:57  w4dimenscor
  * fixed a memory bug in dg scripts
  *
@@ -298,42 +301,41 @@ int get_weapon_evasion(OBJ_DATA *wep);
 int wep_hands(OBJ_DATA *wep);
 
 
-/* Weapon attack texts */
-struct attack_hit_type attack_hit_text[] =
-  {
-    {"hit", "hits"}
-    ,          /* 0 */
-    {"sting", "stings"},
-    {"whip", "whips"},
-    {"slash", "slashes"},
-    {"bite", "bites"},        /*  5 */
-    {"bludgeon", "bludgeons"},
-    {"crush", "crushes"},
-    {"pound", "pounds"},
-    {"claw", "claws"},
-    {"maul", "mauls"},        /* 10 */
-    {"thrash", "thrashes"},
-    {"pierce", "pierces"},
-    {"blast", "blasts"},
-    {"punch", "punches"},
-    {"stab", "stabs"},        /* 15 */
-    {"kick", "kicks"},
-    {"gore", "gores"},
-    /* spell attacks */
-    {"orb", "orbs"},
-    {"spark", "sparks"},
-    {"pulse", "pulses"},
-    {"beam", "beams"},
-    {"spear", "spears"},
-    {"bolt", "bolts"},
-    {"blast", "blasts"},
-    {"burst", "bursts"},
-    {"discharge", "discharge"},
-    {"eruption", "eruption"},
-    {"torrent", "torrent"},
-    {"torpedo", "torpedo"}
-  };
 
+struct attack_hit_type attack_hit_text[] =
+{
+  {"hit", "hits"}
+  ,          /* 0 */
+  {"sting", "stings"},
+  {"whip", "whips"},
+  {"slash", "slashes"},
+  {"bite", "bites"},        /*  5 */
+  {"bludgeon", "bludgeons"},
+  {"crush", "crushes"},
+  {"pound", "pounds"},
+  {"claw", "claws"},
+  {"maul", "mauls"},        /* 10 */
+  {"thrash", "thrashes"},
+  {"pierce", "pierces"},
+  {"blast", "blasts"},
+  {"punch", "punches"},
+  {"stab", "stabs"},        /* 15 */
+  {"kick", "kicks"},
+  {"gore", "gores"},
+    /* spell attacks */
+  {"orb", "orbs"},
+  {"spark", "sparks"},
+  {"pulse", "pulses"},
+  {"beam", "beams"},
+  {"spear", "spears"},
+  {"bolt", "bolts"},
+  {"blast", "blasts"},
+  {"burst", "bursts"},
+  {"discharge", "discharge"},
+  {"eruption", "eruption"},
+  {"torrent", "torrent"},
+  {"torpedo", "torpedo"}
+};
 struct hit_chance_type chance_message[] =
   {
     {"", ""}

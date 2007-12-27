@@ -6,3 +6,4 @@ auction.c
 auction.h
 zreload.c
 pfileclean.c
+action.h

@@ -16,6 +16,7 @@
 #include "trees.h"
 #include "damage.h"
 #include "fight.h"
+#include "action.h"
 
 #define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
 #define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
@@ -32,7 +33,6 @@ ASKILL(skill_manipulate);
 int has_weapon(struct char_data *ch);
 void start_fighting_delay(struct char_data *vict, struct char_data *ch);
 extern struct spell_info_type spell_info[];
-extern struct syllable syls[];
 int skill_cost(int h, int m, int v, struct char_data *ch);
 int tier_level(struct char_data *ch, int chclass);
 ASUB(sub_throttle);

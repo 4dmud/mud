@@ -3114,7 +3114,7 @@ int process_input(struct descriptor_data *t)
 
 #if defined(HAVE_ZLIB)
 
-        if (memcmp (ptr, do_sig2, strlen (do_sig2)) == 0)
+        if (memcmp (ptr, do_sig2, strlen ((const char *)do_sig2)) == 0)
         {
           t->telnet_capable = 1;
           //log("MCCP found on");
@@ -3153,43 +3153,43 @@ int process_input(struct descriptor_data *t)
           ptr--; /* adjust to allow for discarded bytes */
         }
 #endif
-        if (memcmp (ptr, do_eor, strlen (do_eor)) == 0)
+        if (memcmp (ptr, do_eor, strlen ((const char *)do_eor)) == 0)
         {
           t->telnet_capable = 0;
           t->eor = 1;
           //log("eor found");
-          memmove (ptr, &ptr [strlen (do_eor)], strlen (&ptr [strlen (do_eor)]) + 1);
+          memmove (ptr, &ptr [strlen ((const char *)do_eor)], strlen (&ptr [strlen ((const char *)do_eor)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
-        if (memcmp (ptr, do_ga, strlen (do_ga)) == 0)
+        if (memcmp (ptr, do_ga, strlen ((const char *)do_ga)) == 0)
         {
           t->telnet_capable = 1;
           //log("eor found");
-          memmove (ptr, &ptr [strlen (do_ga)], strlen (&ptr [strlen (do_ga)]) + 1);
+          memmove (ptr, &ptr [strlen ((const char *)do_ga)], strlen (&ptr [strlen ((const char *)do_ga)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
-        if (memcmp (ptr, do_ech, strlen (do_ech)) == 0)
+        if (memcmp (ptr, do_ech, strlen ((const char *)do_ech)) == 0)
         {
           t->telnet_capable = 1;
           /** wanna do something with this? **/
           //log("do echo found");
-          memmove (ptr, &ptr [strlen (do_ech)], strlen (&ptr [strlen (do_ech)]) + 1);
+          memmove (ptr, &ptr [strlen ((const char *)do_ech)], strlen (&ptr [strlen ((const char *)do_ech)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         }
-        if (memcmp (ptr, do_mxp_str, strlen (do_mxp_str)) == 0)
+        if (memcmp (ptr, do_mxp_str, strlen ((const char *)do_mxp_str)) == 0)
         {
           t->telnet_capable = 1;
           turn_on_mxp (t);
           /* remove string from input buffer */
-          memmove (ptr, &ptr [strlen (do_mxp_str)], strlen (&ptr [strlen (do_mxp_str)]) + 1);
+          memmove (ptr, &ptr [strlen ((const char *)do_mxp_str)], strlen (&ptr [strlen ((const char *)do_mxp_str)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         } /* end of turning on MXP */
-        else  if (memcmp (ptr, dont_mxp_str, strlen (dont_mxp_str)) == 0)
+        else  if (memcmp (ptr, dont_mxp_str, strlen ((const char *)dont_mxp_str)) == 0)
         {
           t->telnet_capable = 1;
           t->mxp = FALSE;
           /* remove string from input buffer */
-          memmove (ptr, &ptr [strlen (dont_mxp_str)], strlen (&ptr [strlen (dont_mxp_str)]) + 1);
+          memmove (ptr, &ptr [strlen ((const char *)dont_mxp_str)], strlen (&ptr [strlen ((const char *)dont_mxp_str)]) + 1);
           ptr--; /* adjust to allow for discarded bytes */
         } /* end of turning off MXP */
 
@@ -4553,7 +4553,7 @@ void make_wholist(void)
   }
 
   fprintf(fl, "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n" );
-  //fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.org/who.xsl\"?>\n");
+  //fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.mu-host.com/who.xsl\"?>\n");
   fprintf(fl, "<wholist>\n" );
 
   fprintf(fl, "<info>\n"

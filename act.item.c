@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.36  2006/04/21 12:46:44  w4dimenscor
+ * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+ *
  * Revision 1.35  2006/04/19 08:08:07  w4dimenscor
  * Added an \r\n that was missing in the fuel function.
  *
@@ -4504,10 +4507,10 @@ int race_speed(struct char_data *ch)
 ACMD(do_skin)
 {
   OBJ_DATA *skin = NULL, *obj = NULL;
-  char arg[MAX_INPUT_LENGTH];
+  //  char arg[MAX_INPUT_LENGTH];
   skip_spaces(&argument);
 
-  if (!*arg)
+  if (!*argument)
   {
     send_to_char("What do you want to filet?\r\n", ch);
     return;

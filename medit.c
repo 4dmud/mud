@@ -24,6 +24,7 @@
 #include "dg_olc.h"
 #include "screen.h"
 #include "constants.h"
+#include "fight.h"
 
 /*-------------------------------------------------------------------*/
 

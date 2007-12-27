@@ -11,6 +11,9 @@
  */
  /*
  * $Log: spells.h,v $
+ * Revision 1.9  2006/04/21 12:46:45  w4dimenscor
+ * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+ *
  * Revision 1.8  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
@@ -446,7 +449,6 @@ enum skill_list {
 #define TAR_AREA_AREA   (1 << 12) /*spell does affect to all in that room and ajacent rooms, used with TAR_AREA_ROOM*/
 #define TAR_AREA_DIR    (1 << 13) /*spell does affect to a victim in a particular direction, used with TAR_AREA_ROOM */
 #define TAR_AREA_ZONE   (1 << 14) /*spell affects everything in the zone */
-extern struct spell_info_type spell_info[];
 int magic_distance(struct char_data *ch, int spellnum, int dir, struct char_data *victim);
 #define TIERNUM current_class_is_tier_num(ch)
 
@@ -504,7 +506,7 @@ struct sub_skill_info_type
 
 };
 
-
+extern struct sub_skill_info_type sub_info[(int)TOP_SUB_DEFINE];
 // maybe split off all the class restricted values into a seperate table???
 
 struct spell_class_type
@@ -534,13 +536,7 @@ struct spell_class_type
 #define SPELL_TYPE_SCROLL  4
 
 
-/* Attacktypes with grammar */
 
-struct attack_hit_type
-{
-  const char *singular;
-  const char *plural;
-};
 
 
 #define ASPELL(spellname) \
@@ -636,3 +632,5 @@ int immune_to(CHAR_DATA *ch, int elem);
 float resist_elem(CHAR_DATA *ch, int elem);
 int grand_master(struct char_data *ch);
 int spell_num(const char *name);
+
+extern struct spell_info_type spell_info[];

@@ -3663,6 +3663,7 @@ void load_help(FILE *fl)
     el.duplicate = 0;
     el.id = max_help_id++;
     el.entry = str_dup(entry);
+    el.entries = 0;
     prune_crlf(key);
     el.keywords = str_dup(key);
     el.duplicate = 0; //redundant call

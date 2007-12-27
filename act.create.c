@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.15  2006/04/21 12:46:43  w4dimenscor
+ * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
+ *
  * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
  * sorry self. another. _cant remember the changes_ entry
  *
@@ -74,6 +77,7 @@
 #include "genolc.h"
 #include "trees.h"
 #include "damage.h"
+#include "action.h"
 
 
 #define TIER (current_class_is_tier_num(ch)+1)
@@ -98,17 +102,12 @@ int perf_balance(int weapon_type);
 int curr_balance(OBJ_DATA *wep);
 int save_forest(void);
 
-/* struct for syls */
-struct syllable
-{
-  char *org;
-  char *current;
-};
+
 
 
 /* extern variables */
 extern struct spell_info_type spell_info[];
-extern struct syllable syls[];
+
 
 /* extern procedures */
 int mag_manacost(struct char_data *ch, int spellnum);
