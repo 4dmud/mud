@@ -9,6 +9,14 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.9  2005/03/23 15:23:13  w4dimenscor
+ * Added toggle rp. roleplaying toggle is shown on:
+ * - who list
+ * - ooc
+ * - room description of char
+ * - tell
+ * - prompt
+ *
  * Revision 1.8  2005/03/17 10:41:59  w4dimenscor
  * fixed bug: nogat toggles nosum instead of nogat
  *
@@ -1247,7 +1255,9 @@ ACMD(do_gen_tog)
       {"Nobrag on.\r\n",
        "Nobrag off.\r\n"},
       {"You are now safe from gating by other players.\r\n",
-       "You may now be gated to by other players.\r\n"}
+       "You may now be gated to by other players.\r\n"},
+      {"You are not roleplaying anymore.\r\n",
+       "You are now roleplaying.\r\n"}
 
 
 
@@ -1313,6 +1323,9 @@ ACMD(do_gen_tog)
       parse_afk(ch, argument);
     else
       parse_afk(ch, NULL);
+    break;
+  case SCMD_RP:
+    result = PRF_TOG_CHK(ch, PRF_RP);
     break;
   case SCMD_AGGRO:
     result = PRF_TOG_CHK(ch, PRF_AGGRO);

@@ -297,6 +297,7 @@
 #define PRF_BUSY	47 /* Player is busy				*/
 #define PRF_AGGRO	48 /* Player is aggro				*/
 #define PRF_NOBRAG      49 /* player can't hear Brags 			*/
+#define PRF_RP		50 /* Player is roleplaying			*/
 
 /* Affect bits: used in char_data.char_specials.saved.affected_by */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */

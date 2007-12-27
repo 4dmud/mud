@@ -815,6 +815,8 @@ void list_one_char(struct char_data *i, struct char_data *ch)
     new_send_to_char(ch, " (writing)");
   if (PRF_FLAGGED(i, PRF_AFK))
     new_send_to_char(ch, " (AFK)");
+  if (PRF_FLAGGED(i, PRF_RP))
+    new_send_to_char(ch, " (RolePlaying)");
 
   if (RIDING(i) && HERE(RIDING(i), i))
   {
@@ -2381,6 +2383,10 @@ ACMD(do_score)
                        real_room(GET_LOADROOM(ch))->name,
                        GET_LOADROOM(ch));
   }
+  if (PRF_FLAGGED(ch, PRF_RP))
+  {
+      new_send_to_char(ch, "You are RolePlaying!\r\n");
+  }
   if (PRF_FLAGGED(ch, PRF_BUSY))
   {
     if (ch->player_specials->busy_msg)
@@ -3430,6 +3436,8 @@ ACMD(do_who)
       len += snprintf(buf + len, sizeof(buf) - len, " (KILLER)");
     if (PRF_FLAGGED(wch, PRF_AFK))
       len += snprintf(buf + len, sizeof(buf) - len, " (AFK)");
+    if (PRF_FLAGGED(wch, PRF_RP))
+      len += snprintf(buf + len, sizeof(buf) - len, " ({cyRolePlaying{c0)");
     if (PRF_FLAGGED(wch, PRF_BUSY))
       len += snprintf(buf + len, sizeof(buf) - len, " (BUSY)");
     if (wch->char_specials.timer > 15 && !GET_INVIS_LEV(wch))

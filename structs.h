@@ -9,6 +9,14 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.13  2005/03/23 15:23:13  w4dimenscor
+ * Added toggle rp. roleplaying toggle is shown on:
+ * - who list
+ * - ooc
+ * - room description of char
+ * - tell
+ * - prompt
+ *
  * Revision 1.12  2005/02/25 07:33:47  w4dimenscor
  * reformatted some code, fixed up coventry to ignore socials
  *
@@ -446,6 +454,7 @@ extern int message_type;
 #define PRF_AGGRO	48	/* Player is aggro                            */
 #define PRF_NOBRAG      49
 #define PRF_GATEABLE 	50
+#define PRF_RP	 	51	/* Player is roleplaying */
 
 /* Descriptor flags */
 #define DESC_CANZLIB	(1 << 0)  /* Client says compression capable.   */

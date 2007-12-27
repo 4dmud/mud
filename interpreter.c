@@ -734,6 +734,7 @@ const struct command_info cmd_info[] =
     { "rinnate"  , "rinn" , POS_DEAD    , do_innate   , LVL_IMPL, SCMD_RINNATE, WIZ_IMPL_GRP },
     { "rlist"    , "rli"  , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_RLIST, WIZ_OLC_GRP },
     { "rclone"   , "rclone"  , POS_DEAD    , do_room_copy, LVL_BUILDER, 0  , WIZ_OLC_GRP},
+    { "rp"      , "rp"  , POS_DEAD    , do_gen_tog  , 0, SCMD_RP, 0 },
     { "rsay"      , "rsa"	, POS_RESTING , do_say      , 0, SCMD_RSAY, 0 },
     { "roomflags", "roomf", POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_ROOMFLAGS, WIZ_IMM2_GRP },
     { "rouse"     , "rou"	, POS_SLEEPING, do_wake     , 0, SCMD_ROUSE, 0 },

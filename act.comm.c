@@ -10,6 +10,14 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.12  2005/03/23 15:23:13  w4dimenscor
+ * Added toggle rp. roleplaying toggle is shown on:
+ * - who list
+ * - ooc
+ * - room description of char
+ * - tell
+ * - prompt
+ *
  * Revision 1.11  2005/03/17 11:39:52  w4dimenscor
  * Fixed clan talk. they where ignoring everyone from there class.
  *
@@ -730,6 +738,9 @@ int is_tell_ok(struct char_data *ch, struct char_data *vict)
       act("$E is busy right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
     else
       new_send_to_char(ch, "BUSY %s: %s\r\n", GET_NAME(vict), BUSY_MSG(vict));
+  } else if (!IS_NPC(ch) && PRF_FLAGGED(vict, PRF_RP))
+  {
+      act("$E is roleplaying right now.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
   }
 
   return (TRUE);
@@ -1256,11 +1267,11 @@ ACMD(do_gen_comm)
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
+      new_send_to_char(ch, "%s%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
 
-      snprintf(buf, sizeof(buf), "%s: %s",com_msgs[subcmd][1],CAP( argument));
+      snprintf(buf, sizeof(buf), "%s%s: %s", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
     else
       return;
   }
@@ -1271,11 +1282,11 @@ ACMD(do_gen_comm)
     if (PRF_FLAGGED(ch, PRF_NOREPEAT))
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
-      new_send_to_char(ch, "%sYou %s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", com_msgs[subcmd][1], argument, CCNRM(ch, C_CMP));
+      new_send_to_char(ch, "%s%sYou %s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument, CCNRM(ch, C_CMP));
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
     {
-      snprintf(buf, sizeof(buf), "$n %ss, '%s'", com_msgs[subcmd][1], argument);
+      snprintf(buf, sizeof(buf), "%s$n %ss, '%s'", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument);
     }
     else
     {
@@ -1283,7 +1294,7 @@ ACMD(do_gen_comm)
     }
   }
 
-  snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",color_on, GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
+  snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",color_on , GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
   comlog("%s", buf1);
   add_to_comm( com_msgs[subcmd][1], buf1);
 

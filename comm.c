@@ -1550,6 +1550,12 @@ char *make_prompt(struct descriptor_data *d)
       if (count >= 0)
         len += count;
     }
+    if (PRF_FLAGGED(d->character, PRF_RP)&& len < sizeof(prompt))
+    {
+      count = snprintf(prompt + len, sizeof(prompt) - len, "\x1B[32m[RP]\x1B[0m ");
+      if (count >= 0)
+        len += count;
+    }
 
     if ((check_mail(d->character) && len < sizeof(prompt))
         && (PRF_FLAGGED(d->character, PRF_MAIL)))
@@ -4410,6 +4416,12 @@ char * parse_prompt(CHAR_DATA *ch)
   if (PRF_FLAGGED(ch, PRF_AFK)&& len < psize)
   {
     count = snprintf(prompt + len, psize - len, "\x1B[32m[AFK]\x1B[0m ");
+    if (count >= 0)
+      len += count;
+  }
+  if (PRF_FLAGGED(ch, PRF_RP)&& len < psize)
+  {
+    count = snprintf(prompt + len, psize - len, "\x1B[32m[RP]\x1B[0m ");
     if (count >= 0)
       len += count;
   }
