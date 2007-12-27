@@ -10,6 +10,15 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.37  2006/05/08 19:59:42  w4dimenscor
+ * repatching the files sinc ethe backup wipe
+ *
+ * Revision 1.38  2006/05/01 23:33:08  w4dimenscor
+ * Changed the fuel command, so that if you need less fuel to fill your spacebike then a gem provides, the bike will only use what it needs of the gem and not purge it
+ *
+ * Revision 1.37  2006/05/01 23:26:27  w4dimenscor
+ * Fixed the skin command so that if the animals skin is 0 or less it means that it is unskinnable. Moved anif check in do_fuel
+ *
  * Revision 1.36  2006/04/21 12:46:44  w4dimenscor
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
@@ -908,7 +917,7 @@ int automeld(struct obj_data *obj)
       return 1;
     }
   }
-  
+
 
   for (j = character_list; j; j = j->next)
   {
@@ -1561,9 +1570,9 @@ int perform_drop(struct char_data *ch, struct obj_data *obj,
                        value);
       return (0);
     } /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                                                           new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
-                                                                                                                            return (0);
-                                                                                                                        }*/
+                                                                                                                                   new_send_to_char(ch,"Sorry, but you drop containers here.\r\n");
+                                                                                                                                    return (0);
+                                                                                                                                }*/
   }
 
 
@@ -2602,12 +2611,13 @@ ACMD(do_pour)
         weight_change_object(from_obj, -GET_OBJ_VAL(from_obj, 1));    /* Empty */
       if (GET_OBJ_TYPE(from_obj) == ITEM_VIAL)
         GET_OBJ_VAL(from_obj, 0) = -1; /* vial type */
-      else if (GET_OBJ_TYPE(from_obj) == ITEM_POTION) {
-         obj_vnum vialvnum;
-         vialvnum=3044;
-         extract_obj(from_obj);
-         from_obj = read_object(vialvnum, VIRTUAL);
-         obj_to_char(from_obj, ch);
+      else if (GET_OBJ_TYPE(from_obj) == ITEM_POTION)
+      {
+        obj_vnum vialvnum;
+        vialvnum=3044;
+        extract_obj(from_obj);
+        from_obj = read_object(vialvnum, VIRTUAL);
+        obj_to_char(from_obj, ch);
       }
       else
       {
@@ -2617,7 +2627,7 @@ ACMD(do_pour)
       }
       /* amount*/
       if(GET_OBJ_TYPE(from_obj)!=ITEM_POTION)
-         GET_OBJ_VAL(from_obj, 1) = 0;
+        GET_OBJ_VAL(from_obj, 1) = 0;
 
       return;
     }
@@ -2641,9 +2651,10 @@ ACMD(do_pour)
   }
   if ((GET_OBJ_TYPE(to_obj) != ITEM_VIAL))
   {
-    if(GET_OBJ_TYPE(from_obj) == ITEM_POTION){
-     act("That is not a vial.", FALSE, ch, 0, 0, TO_CHAR);
-     return;
+    if(GET_OBJ_TYPE(from_obj) == ITEM_POTION)
+    {
+      act("That is not a vial.", FALSE, ch, 0, 0, TO_CHAR);
+      return;
     }
     if ((GET_OBJ_VAL(to_obj, 1) != 0) &&
         (GET_OBJ_VAL(to_obj, 2) != GET_OBJ_VAL(from_obj, 2)))
@@ -4512,7 +4523,7 @@ ACMD(do_skin)
 
   if (!*argument)
   {
-    send_to_char("What do you want to filet?\r\n", ch);
+    send_to_char("What do you want to skin?\r\n", ch);
     return;
   }
 
@@ -4532,14 +4543,17 @@ ACMD(do_skin)
     new_send_to_char(ch, "You are far too exausted!");
     return;
   }
+  if (obj->skin <= 0)
+  {
+    new_send_to_char(ch, "You don't seem to be able to remove the skin from the corpse.\r\n");
+    return;
+  }
 
 
-  /* we've got an obj that is a mob corpse and can be food */
+  /* we've got an obj that is a mob corpse and can be skinned */
   if ((skin = read_object(obj->skin, VIRTUAL)) != NULL)
   {
-    send_to_char
-    ("You skillfully slice the skin from the corpse and pick it up.\r\n",
-     ch);
+    new_send_to_char(ch, "You skillfully slice the skin from the corpse and pick it up.\r\n");
     act("$n skillfully slices the skin from from the corpse and picks it up.\r\n", FALSE, ch, 0, 0, TO_ROOM);
     obj_to_char(skin, ch);
     extract_obj(obj);
@@ -4548,11 +4562,13 @@ ACMD(do_skin)
     new_send_to_char(ch, "Your hands turn numb and you fumble.\r\n");
 }
 
-ACMD(do_fuel){
+ACMD(do_fuel)
+{
   obj_data *spacebike, *gemcluster;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  int fuel_amt;
   two_arguments(argument,arg1,arg2);
-  if(!*arg1)
+  if(!*arg1 || !*arg2)
   {
     new_send_to_char(ch, "Yes, fuelling, fine, fuelling we must, but WHAT???\r\n");
     return;
@@ -4562,30 +4578,32 @@ ACMD(do_fuel){
     new_send_to_char(ch,"There is no %s here!\r\n", arg1);
     return;
   }
-  if(GET_OBJ_TYPE(spacebike)!=ITEM_SPACEBIKE){
+  if(GET_OBJ_TYPE(spacebike)!=ITEM_SPACEBIKE)
+  {
     new_send_to_char(ch,"That doesn't look like a spacebike!\r\n");
     return;
   }
-  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike)){
+  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike))
+  {
     new_send_to_char(ch, "%s is already fueled to its maximum capacity!\r\n",OBJS(spacebike,ch));
     return;
   }
-  if(!*arg2)
+  if(!(gemcluster=get_obj_in_list_vis(ch, arg2, NULL, ch->carrying)))
   {
-    new_send_to_char(ch, "Yes, fuelling, fine, fuelling we must, but with WHAT???\r\n");
-    return;
-  }
-
-  if(!(gemcluster=get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))){
     new_send_to_char(ch,"There is no %s in your inventory!\r\n",arg2);
     return;
   }
-  if(GET_OBJ_TYPE(gemcluster)!=ITEM_GEM_CLUSTER){
+  if(GET_OBJ_TYPE(gemcluster)!=ITEM_GEM_CLUSTER)
+  {
     new_send_to_char(ch,"That is not a gemcluster!\r\n");
     return;
   }
-  GET_FUEL(spacebike)+=GET_GEM_FUEL(gemcluster);
-  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike))
+  if (GET_MAX_FUEL(spacebike) - GET_FUEL(spacebike) < GET_GEM_FUEL(gemcluster))
+    fuel_amt = GET_MAX_FUEL(spacebike) - GET_FUEL(spacebike);
+  else
+    fuel_amt = GET_GEM_FUEL(gemcluster);
+  GET_FUEL(spacebike)+=fuel_amt;
+  if(GET_FUEL(spacebike)>=GET_MAX_FUEL(spacebike))  
   {
     GET_FUEL(spacebike)=GET_MAX_FUEL(spacebike);
     new_send_to_char(ch,"You fill up %s to its maximum capacity, using %s.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
@@ -4593,14 +4611,17 @@ ACMD(do_fuel){
   else
   {
     int filled=GET_FUEL(spacebike)*100/GET_MAX_FUEL(spacebike);
-    if(filled <25) 
+    if(filled <25)
       new_send_to_char(ch,"You fill up %s using %s, but it is still very empty.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
     else if(filled<50)
       new_send_to_char(ch,"You fill up %s using %s, filling it about quarter full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
     else if(filled<75)
       new_send_to_char(ch,"You fill up %s using %s, filling it about half full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
-    else if(filled<100)
+    else if(filled<=100)
       new_send_to_char(ch,"You fill up %s using %s, filling it about three quarter full.\r\n",OBJS(spacebike,ch),OBJS(gemcluster,ch));
   }
-  extract_obj(gemcluster);
+  if (fuel_amt == GET_GEM_FUEL(gemcluster))
+    extract_obj(gemcluster);
+  else
+    GET_GEM_FUEL(gemcluster) -= fuel_amt;
 }
