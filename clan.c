@@ -31,6 +31,8 @@ void update_clan_member(char * name, int rank, int clan);
 void remove_clan_member(char * name, int clan);
 void add_clan_member(char * name, int rank, int clan);
 void free_clan_lists();
+long get_ptable_by_name(char *name);
+
 extern int TEMP_LOAD_CHAR;
 
 struct clan_list_data *clan_list[MAX_CLANS];
@@ -569,22 +571,22 @@ void do_clan_expel(struct char_data *ch, char *arg)
     save_char(vict);
     clan[clan_num].members--;
     clan[clan_num].power -= GET_LEVEL(vict);
-    send_to_char("You've been kicked out of your clan!\r\n", vict);
-    send_to_char("Done.\r\n", ch);
+    new_send_to_char(vict, "You've been kicked out of your clan!\r\n");
+    new_send_to_char(ch, "Done.\r\n");
 
   }
   else
   {
     if (!immcom && ((player_table[ids].clan == GET_CLAN(ch)) && (player_table[ids].rank < GET_CLAN_RANK(ch))))
     {
-      new_send_to_char("%s is kicked out of your clan!\r\n", ch);
+      new_send_to_char(ch, "%s is kicked out of your clan!\r\n", player_table[ids].name);
       player_table[ids].rank = -1;
 
       clan[clan_num].members--;
       clan[clan_num].power -= player_table[ids].level;
       save_player_index();
     } else {
-      new_send_to_char("%s cannot be kicked out.\r\n", ch);
+      new_send_to_char(ch, "%s cannot be kicked out.\r\n", player_table[ids].name);
     }
   }
 
