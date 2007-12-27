@@ -10,6 +10,10 @@
 
 /*
  * $Log: act.item.c,v $
+ * Revision 1.58  2007/10/22 23:38:27  w4dimenscor
+ * Fixed donate to do the right thing(tm).
+ * --Matthijs
+ *
  * Revision 1.57  2007/08/19 01:06:10  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -1529,10 +1533,11 @@ ACMD(do_drop) {
     struct obj_data *obj, *next_obj;
     Room *  RDR = NULL;
     byte mode = SCMD_DROP;
-    int dotmode, amount = 0, multi, num_don_rooms;
+    int dotmode, amount = 0, multi, num_don_rooms = 0;
     const char *sname;
     char buf[MAX_INPUT_LENGTH];
     char arg[MAX_INPUT_LENGTH];
+    Room * donationrooms[3];
 
     switch (subcmd) {
     case SCMD_DISCARD:
@@ -1546,29 +1551,37 @@ ACMD(do_drop) {
     case SCMD_DONATE:
         sname = "donate";
         mode = SCMD_DONATE;
-        /* fail + double chance for room 1   */
-        num_don_rooms = (CONFIG_DON_ROOM_1 != NULL) * 2 +
-                        (CONFIG_DON_ROOM_2 != NULL)     +
-                        (CONFIG_DON_ROOM_3 != NULL)     + 1 ;
-        switch (number(0, num_don_rooms)) {
+//        /* fail + double chance for room 1   */
+//        num_don_rooms = (CONFIG_DON_ROOM_1 != NULL) * 2 +
+//                        (CONFIG_DON_ROOM_2 != NULL)     +
+//                        (CONFIG_DON_ROOM_3 != NULL)     + 1 ;
+//        switch (number(0, num_don_rooms)) {
+	/* find the valid donation rooms */
+	if (CONFIG_DON_ROOM_1 != NULL && GET_ROOM_VNUM(CONFIG_DON_ROOM_1) != 0)
+	    donationrooms[num_don_rooms++] = CONFIG_DON_ROOM_1;
+	if (CONFIG_DON_ROOM_2 != NULL && GET_ROOM_VNUM(CONFIG_DON_ROOM_2) != 0)
+	    donationrooms[num_don_rooms++] = CONFIG_DON_ROOM_2;
+	if (CONFIG_DON_ROOM_3 != NULL && GET_ROOM_VNUM(CONFIG_DON_ROOM_3) != 0)
+	    donationrooms[num_don_rooms++] = CONFIG_DON_ROOM_3;
+
+	switch (number(0, num_don_rooms-1)) {
         case 0:
-            mode = SCMD_JUNK;
+            RDR = donationrooms[0];
             break;
         case 1:
+            RDR = donationrooms[1];
+            break;
         case 2:
-            RDR = CONFIG_DON_ROOM_1;
+            RDR = donationrooms[2];
             break;
-        case 3:
-            RDR = CONFIG_DON_ROOM_2;
-            break;
-        case 4:
-            RDR = CONFIG_DON_ROOM_3;
-            break;
+	default:
+	    RDR == NULL;
+	    break;
         }
         if (RDR == NULL) {
             ch->Send("Sorry, you can't donate anything right now.\r\n");
             return;
-        }
+	}
         break;
     default:
         sname = "drop";
