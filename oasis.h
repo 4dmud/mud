@@ -491,6 +491,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define CEDIT_NAMESERVER_IS_SLOW	51
 #define CEDIT_USE_AUTOWIZ		52
 #define CEDIT_MIN_WIZLIST_LEV		53
+#define CEDIT_GLA_DEATH_ROOM		54
 
 /* -------------------------------------------------------------------------- */
 #define MAX_HELP_KEYWORDS	75

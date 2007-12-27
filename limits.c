@@ -28,7 +28,6 @@
 int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5,
          int p6);
 void check_autowiz(Character *ch);
-int dexp = 0;
 
 /* External Functions */
 int automeld(struct obj_data *obj);
@@ -464,7 +463,7 @@ void gain_exp(Character *ch, gold_int gain) {
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
     if (gain > 0) {
 
-        if (dexp)
+        if (CONFIG_DOUBLE_EXP)
             gain *= 2;
 
         GET_EXP(ch) += gain;
@@ -479,14 +478,14 @@ void gain_exp(Character *ch, gold_int gain) {
         }
 
         if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-            ch->Send("You receive %s%lld experience points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
+            ch->Send("You receive %s%lld experience points.\r\n", CONFIG_DOUBLE_EXP ? "a massive double " : "", CONFIG_DOUBLE_EXP ? (gain/2) : gain);
 
         if (is_altered && (GET_LEVEL(ch) < LVL_HERO)) {
             new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
                        GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
             GET_GROUP_EXP(ch) = FTOI(level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)) * 0.2);
 
-            if (dexp)
+            if (CONFIG_DOUBLE_EXP)
                 ch->Send( "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
             if (num_levels == 1)
                 ch->Send( "{cG[ You rise a level! ]{c0\r\n");
@@ -581,7 +580,7 @@ void gain_group_exp(Character *ch, gold_int gain) {
         return;
 
     if (gain > 0)  {
-        if (dexp)
+        if (CONFIG_DOUBLE_EXP)
             gain *=2;
 
         GET_GROUP_EXP(ch) += gain;
@@ -594,14 +593,14 @@ void gain_group_exp(Character *ch, gold_int gain) {
         }
 
         if (PRF_FLAGGED(ch, PRF_BATTLESPAM))
-            ch->Send("You receive %s%lld grouping points.\r\n", dexp ? "a massive double " : "", dexp ? (gain/2) : gain);
+            ch->Send("You receive %s%lld grouping points.\r\n", CONFIG_DOUBLE_EXP ? "a massive double " : "", CONFIG_DOUBLE_EXP ? (gain/2) : gain);
 
         if (is_altered && (GET_LEVEL(ch) < LVL_HERO)) {
             new_mudlog(BRF, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
                        GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
             GET_EXP(ch) = (level_exp(GET_CLASS(ch), GET_LEVEL(ch), current_class_is_tier_num(ch), REMORTS(ch)));
 
-            if (dexp)
+            if (CONFIG_DOUBLE_EXP)
                 ch->Send( "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n");
             if (num_levels == 1)
                 ch->Send( "{cG[ You rise a level! ]{c0\r\n");

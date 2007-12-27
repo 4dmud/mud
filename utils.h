@@ -1167,6 +1167,7 @@ struct obj_data *has_vehicle(Character *ch);
 #define CONFIG_LOAD_INVENTORY   config_info.play.load_into_inventory
 #define CONFIG_TRACK_T_DOORS    config_info.play.track_through_doors
 #define CONFIG_IMMORT_LEVEL_OK  config_info.play.immort_level_ok
+#define CONFIG_DOUBLE_EXP	config_info.play.double_exp
 #define CONFIG_OK               config_info.play.OK
 #define CONFIG_NOPERSON         config_info.play.NOPERSON
 #define CONFIG_NOEFFECT         config_info.play.NOEFFECT
@@ -1187,6 +1188,7 @@ struct obj_data *has_vehicle(Character *ch);
 #define CONFIG_DON_ROOM_1       world_vnum[config_info.room_nums.donation_room_1]
 #define CONFIG_DON_ROOM_2       world_vnum[config_info.room_nums.donation_room_2]
 #define CONFIG_DON_ROOM_3       world_vnum[config_info.room_nums.donation_room_3]
+#define CONFIG_GLA_DEATH_ROOM	world_vnum[config_info.room_nums.gladiator_death_room]
 
 /** Game Operation **/
 #define CONFIG_DFLT_PORT        config_info.operation.DFLT_PORT

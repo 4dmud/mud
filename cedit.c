@@ -54,11 +54,11 @@ ACMD(do_oasis_cedit)
   /** Parse any arguments.                                                   **/
   /****************************************************************************/
   one_argument(argument, buf1);
-  
-  if (GET_LEVEL(ch) < LVL_IMPL) {
-    ch->Send( "You can't modify the game configuration.\r\n");
-    return;
-  }
+  //should be catched by the trust groups and such 
+//  if (GET_LEVEL(ch) < LVL_IMPL) {
+//    ch->Send( "You can't modify the game configuration.\r\n");
+//    return;
+//  }
   
   d = ch->desc;
   
@@ -116,6 +116,7 @@ void cedit_setup(Descriptor *d)
   OLC_CONFIG(d)->play.load_into_inventory = CONFIG_LOAD_INVENTORY;
   OLC_CONFIG(d)->play.track_through_doors = CONFIG_TRACK_T_DOORS;
   OLC_CONFIG(d)->play.immort_level_ok     = CONFIG_IMMORT_LEVEL_OK;
+  OLC_CONFIG(d)->play.double_exp	  = CONFIG_DOUBLE_EXP;
   
   /****************************************************************************/
   /** Crash Saves                                                            **/
@@ -137,6 +138,7 @@ void cedit_setup(Descriptor *d)
   OLC_CONFIG(d)->room_nums.donation_room_1   = CONFIG_DON_ROOM_1->number;
   OLC_CONFIG(d)->room_nums.donation_room_2   = CONFIG_DON_ROOM_2->number;
   OLC_CONFIG(d)->room_nums.donation_room_3   = CONFIG_DON_ROOM_3->number;
+  OLC_CONFIG(d)->room_nums.gladiator_death_room = CONFIG_GLA_DEATH_ROOM->number;
   
   /****************************************************************************/
   /** Game Operation                                                         **/
@@ -226,6 +228,7 @@ void cedit_save_internally(Descriptor *d)
   CONFIG_LOAD_INVENTORY = OLC_CONFIG(d)->play.load_into_inventory;
   CONFIG_TRACK_T_DOORS = OLC_CONFIG(d)->play.track_through_doors;
   CONFIG_IMMORT_LEVEL_OK     = OLC_CONFIG(d)->play.immort_level_ok;
+  CONFIG_DOUBLE_EXP 	     = OLC_CONFIG(d)->play.double_exp;
   
   /****************************************************************************/
   /** Crash Saves                                                            **/
@@ -247,6 +250,7 @@ void cedit_save_internally(Descriptor *d)
   config_info.room_nums.donation_room_1   = OLC_CONFIG(d)->room_nums.donation_room_1;
   config_info.room_nums.donation_room_2   = OLC_CONFIG(d)->room_nums.donation_room_2;
   config_info.room_nums.donation_room_3   = OLC_CONFIG(d)->room_nums.donation_room_3;
+  config_info.room_nums.gladiator_death_room = OLC_CONFIG(d)->room_nums.gladiator_death_room;
   
   /****************************************************************************/
   /** Game Operation                                                         **/
@@ -399,6 +403,8 @@ int save_config( int nowhere )
               "track_through_doors = %d\n\n", CONFIG_TRACK_T_DOORS);
   fprintf(fl, "* Should players who reach enough exp automatically level to immortal?\n"
               "immort_level_ok = %d\n\n", CONFIG_IMMORT_LEVEL_OK);
+  fprintf(fl, "* Should players get double experience?\n"
+              "double_exp = %d\n\n", CONFIG_DOUBLE_EXP);
               
   strcpy(buf, CONFIG_OK);
   strip_cr(buf);
@@ -469,6 +475,8 @@ int save_config( int nowhere )
               CONFIG_DON_ROOM_2 != NULL ? CONFIG_DON_ROOM_2->number : -1,
               CONFIG_DON_ROOM_3 != NULL ? CONFIG_DON_ROOM_3->number : -1);
   
+  fprintf(fl, "* The room dead gladiators should go to.\n"
+           "gladiator_death_room = %d\n\n", CONFIG_GLA_DEATH_ROOM->number);
   
   fprintf(fl, "\n\n\n* [ Game Operation Options ]\n");
   
@@ -635,6 +643,7 @@ void cedit_disp_game_play_options(Descriptor *d)
         "%sN%s) Objects Load Into Inventory : %s%s\r\n"
         "%sO%s) Track Through Doors         : %s%s\r\n"
         "%sP%s) Mortals Level To Immortal   : %s%s\r\n"
+        "%sR%s) Double Experience Day	    : %s%s\r\n"
         "%s1%s) OK Message Text         : %s%s"
         "%s2%s) NOPERSON Message Text   : %s%s"
         "%s3%s) NOEFFECT Message Text   : %s%s"
@@ -657,6 +666,7 @@ void cedit_disp_game_play_options(Descriptor *d)
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.load_into_inventory),
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.track_through_doors),
         grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.immort_level_ok),
+        grn, nrm, cyn, CHECK_VAR(OLC_CONFIG(d)->play.double_exp),
         
         grn, nrm, cyn, OLC_CONFIG(d)->play.OK,
         grn, nrm, cyn, OLC_CONFIG(d)->play.NOPERSON,
@@ -712,6 +722,7 @@ void cedit_disp_room_numbers(Descriptor *d)
      "%s1%s) Donation Room #1    : %s%d\r\n"
      "%s2%s) Donation Room #2    : %s%d\r\n"
      "%s3%s) Donation Room #3    : %s%d\r\n"
+     "%s4%s) Gladiator Death Room: %s%d\r\n"
      "%sQ%s) Exit To The Main Menu\r\n"
      "Enter your choice : ",
      grn, nrm, cyn, OLC_CONFIG(d)->room_nums.mortal_start_room,
@@ -720,6 +731,7 @@ void cedit_disp_room_numbers(Descriptor *d)
      grn, nrm, cyn, OLC_CONFIG(d)->room_nums.donation_room_1,
      grn, nrm, cyn, OLC_CONFIG(d)->room_nums.donation_room_2,
      grn, nrm, cyn, OLC_CONFIG(d)->room_nums.donation_room_3,
+     grn, nrm, cyn, OLC_CONFIG(d)->room_nums.gladiator_death_room,
      grn, nrm
      );
   
@@ -969,6 +981,11 @@ void cedit_parse(Descriptor *d, char *arg)
         case 'P':
           TOGGLE_VAR(OLC_CONFIG(d)->play.immort_level_ok);
           break;
+
+	case 'r':
+        case 'R':
+          TOGGLE_VAR(OLC_CONFIG(d)->play.double_exp);
+          break;
         
         case '1':
           d->Output( "Enter the OK message : ");
@@ -1089,6 +1106,11 @@ void cedit_parse(Descriptor *d, char *arg)
       case '3':
         d->Output( "Enter the vnum for donation room #3 : ");
         OLC_MODE(d) = CEDIT_DONATION_ROOM_3;
+        return;
+
+      case '4':
+        d->Output( "Enter the vnum for the gladiator death room : ");
+        OLC_MODE(d) = CEDIT_GLA_DEATH_ROOM;
         return;
         
       case 'q':
@@ -1585,6 +1607,23 @@ void cedit_parse(Descriptor *d, char *arg)
           "Enter the vnum for donation room #3 : ");
       } else {
         OLC_CONFIG(d)->room_nums.donation_room_3 = atoi(arg);
+        cedit_disp_room_numbers(d);
+      }
+      break;
+
+/*-------------------------------------------------------------------*/
+    
+    case CEDIT_GLA_DEATH_ROOM:
+      if (!*arg) {
+        d->Output(
+          "That is an invalid choice!\r\n"
+          "Enter the vnum for the gladiator death room : ");
+      } else if (real_room(atoi(arg)) == NULL) {
+        d->Output(
+          "That room doesn't exist!\r\n"
+          "Enter the vnum for the gladiator death room : ");
+      } else {
+        OLC_CONFIG(d)->room_nums.gladiator_death_room = atoi(arg);
         cedit_disp_room_numbers(d);
       }
       break;

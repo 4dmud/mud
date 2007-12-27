@@ -6872,6 +6872,7 @@ extern int dts_are_dumps;
 extern int load_into_inventory;
 extern int track_through_doors;
 extern int immort_level_ok;
+extern int double_exp;
 extern int free_rent;
 extern int max_obj_save;
 extern int min_rent_cost;
@@ -6885,6 +6886,7 @@ extern room_vnum frozen_start_room;
 extern room_vnum donation_room_1;
 extern room_vnum donation_room_2;
 extern room_vnum donation_room_3;
+extern room_vnum gladiator_death_room;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_IP;
 extern const char *DFLT_DIR;
@@ -6932,6 +6934,7 @@ void load_default_config( void ) {
     CONFIG_NOEFFECT        = strdup(NOEFFECT);
     CONFIG_TRACK_T_DOORS          = track_through_doors;
     CONFIG_IMMORT_LEVEL_OK = immort_level_ok;
+    CONFIG_DOUBLE_EXP		= double_exp;
 
     /****************************************************************************/
     /** Rent / crashsave options.                                              **/
@@ -6953,6 +6956,7 @@ void load_default_config( void ) {
     CONFIG_DON_ROOM_1             = world_vnum[donation_room_1];
     CONFIG_DON_ROOM_2             = world_vnum[donation_room_2];
     CONFIG_DON_ROOM_3             = world_vnum[donation_room_3];
+    CONFIG_GLA_DEATH_ROOM	  = world_vnum[gladiator_death_room];
 
     /****************************************************************************/
     /** Game operation options.                                                **/
@@ -7052,7 +7056,12 @@ void load_config( void ) {
                     CONFIG_DFLT_DIR = strdup(line);
                 else
                     CONFIG_DFLT_DIR = strdup(DFLT_DIR);
-            } else if (!strcmp(tag, "dflt_ip")) {
+            } else if (!strcmp(tag, "double_exp")) {
+		if (num != 1)
+		    config_info.play.double_exp = 0;
+		else
+		    config_info.play.double_exp = 1;
+	    } else if (!strcmp(tag, "dflt_ip")) {
                 if (CONFIG_DFLT_IP)
                     free(CONFIG_DFLT_IP);
                 if (line && *line)
@@ -7069,6 +7078,13 @@ void load_config( void ) {
             else if (!strcmp(tag, "frozen_start_room"))
                 config_info.room_nums.frozen_start_room = num;
             break;
+	
+	case 'g':
+	    if (!strcmp(tag, "gladiator_death_room")) {
+		    printf("loading gladiator death room!!! %d\n", num);
+		config_info.room_nums.gladiator_death_room = num;
+	    }
+	    break;
 
         case 'h':
             if (!strcmp(tag, "holler_move_cost"))

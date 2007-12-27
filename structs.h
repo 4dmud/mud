@@ -9,6 +9,10 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.65  2007/11/14 22:51:25  w4dimenscor
+ * Added cedit options to set double exp day and to set the room where gladiators go to after dying.
+ * --Thotter
+ *
  * Revision 1.64  2007/11/14 21:39:41  w4dimenscor
  * Added the Gladiator race for the gladiatorpits.
  * --Matthijs
@@ -2729,6 +2733,7 @@ struct game_data {
     int load_into_inventory;/* Objects load in immortals inventory. */
     int track_through_doors;/* Track through doors while closed?    */
     int immort_level_ok;    /* Automatically level mortals to imm?  */
+    int double_exp;	    /* Is it double experience time?		*/
 
     char *OK;               /* When player receives 'Okay.' text.       */
     char *NOPERSON;         /* 'No-one by that name here.'    */
@@ -2761,6 +2766,7 @@ struct room_numbers {
     room_vnum donation_room_1;    /* vnum of donation room #1.            */
     room_vnum donation_room_2;    /* vnum of donation room #2.            */
     room_vnum donation_room_3;    /* vnum of donation room #3.           */
+    room_vnum gladiator_death_room;	/* vnum where dead gladiators go to */
 };
 
 

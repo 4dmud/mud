@@ -1680,7 +1680,11 @@ void death_room(Character *ch) {
         remove_hunter(hunt->hunter);
 
     }
-    move_char_to(ch, real_room(1205));
+    if(GET_RACE(ch) == RACE_GLADIATOR)
+	move_char_to(ch, CONFIG_GLA_DEATH_ROOM);
+    else
+        move_char_to(ch, real_room(1205));
+
     GET_WAIT_STATE(ch) = 2 RL_SEC;
     ch->affect_total();
     ch->check_regen_rates();

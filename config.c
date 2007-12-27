@@ -137,6 +137,7 @@ const char *NOEFFECT = "Nothing seems to happen.\r\n";
  */
 int track_through_doors = YES;
 
+int double_exp = NO;
 /****************************************************************************/
 /****************************************************************************/
 
@@ -261,6 +262,7 @@ room_vnum donation_room_1 = 3063;
 room_vnum donation_room_2 = 3063;	/* unused - room for expansion */
 room_vnum donation_room_3 = 3063;	/* unused - room for expansion */
 
+room_vnum gladiator_death_room = 1205;
 
 /****************************************************************************/
 /****************************************************************************/

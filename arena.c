@@ -437,7 +437,11 @@ void do_end_game(void)
         alter_mana(i, -GET_MAX_MANA(i));
         alter_move(i, -GET_MAX_MOVE(i));
         remove_all_normal_affects(i);
-        move_char_to(i, real_room(1205));
+	if(GET_RACE(i) == RACE_GLADIATOR)
+	    move_char_to(i, CONFIG_GLA_DEATH_ROOM);
+	else
+           move_char_to(i, real_room(1205));
+
         look_at_room(i, 0);
         act("$n falls from the sky.", FALSE, i, 0, 0, TO_ROOM);
       }
@@ -648,7 +652,6 @@ int arena_ok(Character *ch, Character *victim)
 
 void arena_kill(Character *ch)
 {
-  room_rnum rm = real_room(1205);
   if (FIGHTING(ch))
     stop_fighting(ch);
 
@@ -669,8 +672,11 @@ void arena_kill(Character *ch)
 
   update_pos(ch);
 
-  if (!move_char_to(ch, rm))
-    move_char_to(ch, CONFIG_MORTAL_START);
+  if(GET_RACE(ch) == RACE_GLADIATOR)
+    move_char_to(ch, CONFIG_GLA_DEATH_ROOM);
+  else
+    move_char_to(ch, real_room(1205));
+
   look_at_room(ch, 0);
   act("$n is dropped from the sky.", FALSE, ch, 0, 0, TO_ROOM);
 }
