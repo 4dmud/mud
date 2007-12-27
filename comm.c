@@ -2428,16 +2428,16 @@ mmove = GET_MAX_MOVE(t->character);
 mstam = GET_MAX_STAMINA(t->character);
 }
 
-/*len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
-len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
-len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
-len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
-len = snprintf(stat + len, sizeof(stat) - len, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
-write_to_output(t,  "%s", MXPMODE(6));
+len = snprintf(stat, sizeof(stat), "%s", MXPMODE(6));
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY move '%d'>" "<!ENTITY xmove '%d'>",move,mmove);
+len = snprintf(stat + len, sizeof(stat) - len, "<!ENTITY stam '%d'>" "<!ENTITY xstam '%d'>",stam,mstam);
+/*write_to_output(t,  "%s", MXPMODE(6));
 write_to_output(t, MXP_BEG "!ENTITY hp '%d'" MXP_END MXP_BEG "!ENTITY xhp '%d'" MXP_END,hp,mhp);
 write_to_output(t, MXP_BEG "!ENTITY mana '%d'" MXP_END MXP_BEG "!ENTITY xmana '%d'" MXP_END,mana,mmana);
 write_to_output(t, MXP_BEG "!ENTITY move '%d'" MXP_END MXP_BEG "!ENTITY xmove '%d'" MXP_END,move,mmove);
-write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);
+write_to_output(t, MXP_BEG "!ENTITY stam '%d'" MXP_END MXP_BEG "!ENTITY xstam '%d'" MXP_END,stam,mstam);*/
 return stat;
 }
 void send_compress_offer(struct descriptor_data *d)
