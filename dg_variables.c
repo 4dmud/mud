@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/07 10:52:52 $                                           * 
-*  $Revision: 1.47 $                                                      *
+*  $Date: 2007/06/07 11:04:54 $                                           * 
+*  $Revision: 1.48 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -541,7 +541,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     snprintf(str, slen, "%d", ((num = atoi(field)) > 0) ? number(1, num) : 0);
 
                 return;
-            } else if (!strcasecmp(var, "assemble")) {
+            } else if (!strcasecmp(var, "assembly")) {
                 if (!strcasecmp(field, "exists")) {
                     if (subfield && *subfield) {
                         int lVnum;
@@ -605,7 +605,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                             snprintf(str, slen, "0");
                     } else
                         snprintf(str, slen, "0");
-                } else if (!strcasecmp(field, "assemblecheck")) {
+                } else if (!strcasecmp(field, "assemblycheck")) {
                     if (subfield && *subfield ) {
                         int lVnum;
                         if ((lVnum = assemblyFindAssembly(subfield)) < 0) {
