@@ -204,7 +204,7 @@ obj_rnum index_object(struct obj_data *obj, obj_vnum ovnum, obj_rnum ornum)
   copy_object_preserve(&obj_proto[ornum], obj);
   obj_proto[ornum].in_room = NULL;
 //  htree_add(obj_htree, obj_index[ornum].vnum, ornum);
-  obj_vTor[ornum]=ovnum;
+  obj_vTor[ovnum]=ornum;
 
   return ornum;
 }
