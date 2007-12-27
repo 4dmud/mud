@@ -1025,6 +1025,9 @@ ACMD(do_exits)
   int door, len = 0;
   char dirnameb[50];
   char *dirname;;
+  
+  if (GET_LEVEL(ch) > LVL_IMMORT)
+  new_send_to_char(ch, MXPTAG("hp") "%d" MXPTAG("/hp") MXPTAG("xhp") "%d" MXPTAG("/xhp"), GET_HIT(ch), GET_MAX_HIT(ch));
 
   if (AFF_FLAGGED(ch, AFF_BLIND))
   {

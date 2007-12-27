@@ -5344,10 +5344,10 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
                     "hint='Bid for &desc;'>\" "
                     "ATT='name desc'"));
   /* List an item tag (for things in a shop) */
- write_to_output(d, "%s", MXPTAG("GAUGE '&hp;' Max='&xhp;' Caption='Health' Color='red'"));
- write_to_output(d, "%s", MXPTAG("GAUGE '&mana;' Max='&xmana;' Caption='Mana' Color='cyan'"));
- write_to_output(d, "%s", MXPTAG("GAUGE '&move;' Max='&xmove;' Caption='Move' Color='green'"));
- write_to_output(d, "%s", MXPTAG("GAUGE '&stam;' Max='&xstam;' Caption='Stamina' Color='white'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'hp' Max='xhp' Caption='Health' Color='red'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'mana' Max='xmana' Caption='Mana' Color='cyan'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'move' Max='xmove' Caption='Move' Color='green'"));
+ write_to_output(d, "%s", MXPTAG("GAUGE 'stam' Max='xstam' Caption='Stamina' Color='white'"));
  //write_to_output(d, "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
   write_to_output( d, "%s", MXPTAG
                    ("!ELEMENT List \"<send href='"
