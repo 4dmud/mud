@@ -1,14 +1,39 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="1" >
+ <DocsAndViews NumberOfDocuments="8" >
   <Doc0 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/db.c" >
-   <View0 line="473" Type="Source" />
+   <View0 line="7114" Type="Source" />
   </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/oasis_list.c" >
+   <View0 line="212" Type="Source" />
+  </Doc1>
+  <Doc2 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/genwld.c" >
+   <View0 line="224" Type="Source" />
+  </Doc2>
+  <Doc3 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/redit.c" >
+   <View0 line="1350" Type="Source" />
+  </Doc3>
+  <Doc4 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.create.c" >
+   <View0 line="892" Type="Source" />
+  </Doc4>
+  <Doc5 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/fight.c" >
+   <View0 line="325" Type="Source" />
+  </Doc5>
+  <Doc6 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.comm.c" >
+   <View0 line="1318" Type="Source" />
+  </Doc6>
+  <Doc7 NumberOfViews="1" URL="file:/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
+   <View0 line="2330" Type="Source" />
+  </Doc7>
  </DocsAndViews>
  <pluginList>
   <kdevbookmarks>
-   <bookmarks/>
+   <bookmarks>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.create.c" >
+     <mark line="905" />
+    </bookmark>
+   </bookmarks>
   </kdevbookmarks>
   <kdevsubversion>
    <subversion recurseresolve="1" recurserelocate="1" recursemerge="1" recursecommit="1" base="" recursepropget="1" recurseswitch="1" recurseupdate="1" recursepropset="1" recursediff="1" recurserevert="1" forcemove="1" recursecheckout="1" forceremove="1" recurseadd="1" recurseproplist="1" forcemerge="1" />

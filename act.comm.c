@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.15  2005/04/26 10:15:18  w4dimenscor
+ * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
+ *
  * Revision 1.14  2005/04/23 12:18:12  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -1315,6 +1318,8 @@ ACMD(do_gen_comm)
         !PLR_FLAGGED(i->character, PLR_WRITING) &&
         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
     {
+    if (i->original && !PRF_FLAGGED(i->original, channels[subcmd]))
+    continue;
       if (subcmd == SCMD_IC
           && !PLR_FLAGGED(i->character, PLR_ROLEPLAYER))
         continue;

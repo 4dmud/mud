@@ -62,7 +62,7 @@ int OBJ_INNATE_MESSAGE = TRUE;
 void strip_color(char *inbuf);
 
 int gen_wep_type_from_attack(OBJ_DATA *obj);
-
+void renumber_zones();
 extern int save_new_style;
 extern struct corpse_list_data *corpse_list;
 struct config_data config_info; /* Game configuration list.	 */
@@ -666,6 +666,7 @@ void boot_world(void)
 
   log("Renumbering zone table.");
   renum_zone_table();
+  renumber_zones();
 
   log("Loading forest trees.");
   init_trees(load_forest());
@@ -994,6 +995,7 @@ void boot_db(void)
   {
     log("Deleting timed-out crash and rent files:");
     update_obj_file();
+    clean_pfiles();
     log("   Done.");
   }
 
@@ -1274,28 +1276,21 @@ void remove_player(int pfilepos)
 
 void clean_pfiles(void)
 {
-  int i, ci, timeout;
+  int i,  timeout = 0;
+  time_t tm = time(0);
 
   for (i = 0; i <= top_of_p_table; i++)
   {
     if (IS_SET(player_table[i].flags, PINDEX_NODELETE))
       continue;
     timeout = -1;
-    for (ci = 0; ci == 0 || (pclean_criteria[ci].level >
-                             pclean_criteria[ci - 1].level); ci++)
-    {
-      if ((pclean_criteria[ci].level == -1 &&
-           IS_SET(player_table[i].flags, PINDEX_DELETED)) ||
-          player_table[i].level <= pclean_criteria[ci].level)
+
+      if ((IS_SET(player_table[i].flags, PINDEX_DELETED)) || (player_table[i].level < 40 &&player_table[i].clan == 12))
       {
-        timeout = pclean_criteria[ci].days;
-        break;
-      }
-    }
-    if (timeout >= 0)
-    {
+        timeout = 90;
+       
       timeout *= SECS_PER_REAL_DAY;
-      if ((time(0) - player_table[i].last) > timeout)
+      if ((tm - player_table[i].last) > timeout)
         remove_player(i);
     }
   }

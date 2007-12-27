@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.15  2005/04/26 10:15:18  w4dimenscor
+ * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
+ *
  * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -297,7 +300,7 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
 
 float has_staff(struct char_data *ch)
 {
-  float multi = 0.2;
+  float multi = 0;
   struct obj_data *staff;
   int staff_type;
 
@@ -311,11 +314,13 @@ float has_staff(struct char_data *ch)
     {
     case FOCUS_STAFF:
       multi += ((((float)GET_OBJ_VAL(staff, 0)+num_casting(ch)) * 200.0)+((GET_LEVEL(ch) * 8.0)));
-      multi = IRANGE(1.55, (multi/1000.0), 3);
+      multi = IRANGE(1.55, (multi/1000.0), 3.55);
       break;
     case FOCUS_ORB:
       multi += ((float)GET_OBJ_VAL(staff, 0));
-      multi = IRANGE(1.05, (multi/1000.0), 1.55);
+      if (multi > 3000 && GET_OBJ_TIMER(staff) > 1)
+      GET_OBJ_TIMER(staff) = 1;
+      multi = IRANGE(1.05, (multi/1000.0), 3.0);
       break;
     case FOCUS_ORBSTAFF:
       multi += ((float)GET_OBJ_VAL(staff, 0));
@@ -354,7 +359,7 @@ int spell_size_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    sdice += (GET_INT(ch) * 0.65) + (GET_LEVEL(ch) * 0.09);
+    sdice += (GET_INT(ch) * 0.65) + (GET_LEVEL(ch) * 0.08);
     break;
   case CLASS_RANGER:
   case CLASS_GYPSY:
@@ -394,7 +399,7 @@ int spell_num_dice(struct char_data *ch)
   case CLASS_MAGE:
   case CLASS_PRIEST:
   case CLASS_ESPER:
-    ndice += (GET_INT(ch) * 0.65) + (GET_LEVEL(ch) * 0.1);
+    ndice += (GET_INT(ch) * 0.65) + (GET_LEVEL(ch) * 0.08);
     break;
   case CLASS_RANGER:
   case CLASS_GYPSY:

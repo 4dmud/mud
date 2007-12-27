@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.create.c,v $
+ * Revision 1.8  2005/04/26 10:15:18  w4dimenscor
+ * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
+ *
  * Revision 1.7  2005/04/23 12:18:12  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
  *
@@ -679,7 +682,7 @@ void make_focus(struct char_data *ch, int type, struct obj_data *o)
   new_descr->description = str_dup(buf2);
   new_descr->next = NULL;
   final_focus->ex_description = new_descr;
-  if (number(0, 400))
+  if (number(0, 400 - (GET_CHA(ch) + GET_SKILL(ch, SKILL_SING_WOOD))))
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MINOR;
   else
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MAJOR;
@@ -809,12 +812,6 @@ ASKILL(skill_manifest)
     new_send_to_char(ch, "No such object around.\r\n");
     return 0;
   }
-  if (IS_HERO(ch))
-  {
-    new_send_to_char(ch, "Sorry, heros can't manifest.\r\n");
-    return 0;
-  }
-
 
   if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
   {
@@ -909,11 +906,11 @@ void make_manifest(struct char_data *ch,struct obj_data *obj)
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_TAKE);
     SET_BIT_AR(GET_OBJ_WEAR(final_focus), ITEM_WEAR_FOCUS);
   }
-  GET_OBJ_VAL(final_focus, 0) = 1000 + (GET_LEVEL(ch) * TIER * 5) + v1 + v2;
+  GET_OBJ_VAL(final_focus, 0) = 1000 + ((((v1 * v2)+v1)/2.0)*(TIER - 0.60)*(GET_SKILL(ch, SKILL_MANIFEST)*0.01));
   GET_OBJ_VAL(final_focus, 1) = -1;
   GET_OBJ_VAL(final_focus, 2) = FOCUS_ORB;
   GET_OBJ_VAL(final_focus, 3) = GET_LEVEL(ch)*TIER*1000;
-  if (number(0, 1000))
+  if (number(0, 800 - (GET_CHA(ch) +(2* GET_SKILL(ch, SKILL_MANIFEST)))))
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MINOR;
   else
     GET_OBJ_TYPE(final_focus) = ITEM_FOCUS_MAJOR;

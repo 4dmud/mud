@@ -275,6 +275,8 @@ void qic_scan_file(char *name, long id)
 void qic_scan_rent(void)
 {
     int i;
+    int timeout = 120;
+    time_t tm = time(0);
 
     /* okay, first of all, clean out the item counters loaded by load_qic() */
     for (i = 0; i < top_of_objt; i++)
@@ -283,8 +285,17 @@ void qic_scan_rent(void)
 //          log("%5d, %3d.", obj_index[i].vnum, obj_index[i].qic->items);
 	}
 
-    for (i = 0; i <= top_of_p_table; i++)
+    for (i = 0; i <= top_of_p_table; i++) {
+    if (!IS_SET(player_table[i].flags, PINDEX_DELETED) &&
+        !IS_SET(player_table[i].flags, PINDEX_SELFDELETE) &&
+        (!player_table[i].name || !*player_table[i].name))
+      continue;timeout = 120;
+      timeout *= SECS_PER_REAL_DAY;
+      if ((tm - player_table[i].last) < timeout)
+       
 	scan_char_objects_qic((player_table + i)->name, (player_table + i)->id); //objsave.c
+	
+	}
     
     return;
 }
