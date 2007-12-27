@@ -173,7 +173,7 @@ ACMD(forest_find) {
         for (tree = object_list; tree; tree = next_tree) {
             next_tree = tree->next;
             if ((GET_OBJ_TYPE(tree) == ITEM_TREE) && (GET_OBJ_VNUM(tree) == NOTHING)) {
-                tree_total--;
+                
                 extract_obj(tree);
             }
         }
@@ -226,7 +226,7 @@ int save_forest(void) {
         return -1;
     }
     for (k = object_list; k; k = k->next) {
-        if (k->in_room && GET_OBJ_TYPE(k) == ITEM_TREE) {
+        if (k->in_room && GET_OBJ_TYPE(k) == ITEM_TREE && GET_OBJ_VNUM(k) == NOTHING) {
             /** lets clean this up **/
             count++;
             fprintf(fl, "%d %d %d %d %d\n",
@@ -272,13 +272,11 @@ int load_tree(room_rnum room, int v0, int v1, int v2, int v3) {
         rm = find_forest_rand();
 
     if (rm == NULL) {
-        tree_total--;
         extract_obj(tree);
         return 0;
     }
 
     if (SECT(rm) != SECT_FOREST) {
-        tree_total--;
         extract_obj(tree);
         return (0);
     }
@@ -327,7 +325,6 @@ void check_all_trees(void) {
                     ext++;
                     if (IN_ROOM(obj) != NULL)
                         send_to_room(IN_ROOM(obj), "With a sigh and a whisper %s collapses to the forest floor.\r\n", obj->short_description);
-                    tree_total--;
                     extract_obj(obj);
                 }
             }

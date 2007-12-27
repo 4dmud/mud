@@ -71,7 +71,7 @@ void extract_linked_mob(Character *mob);
 void dismount_char(Character *ch);
 int move_link_room(Character *mob, room_rnum room);
 void eq_to_room(Character *ch);
-void extract_obj_final(struct obj_data *obj);
+//void extract_obj_final(struct obj_data *obj);
 
 void unhitch_mob(Character *ch);
 
@@ -1640,6 +1640,9 @@ void extract_obj(struct obj_data *obj)
   if (GET_OBJ_RNUM(obj) == NOTHING || obj->proto_script != obj_proto[GET_OBJ_RNUM(obj)].proto_script)
     free_proto_script(obj, OBJ_TRIGGER);
 
+if ((GET_OBJ_TYPE(obj) == ITEM_TREE) && (GET_OBJ_VNUM(obj) == NOTHING)) {
+tree_total--;
+}
 
   if (GET_OBJ_RNUM(obj) != NOTHING && obj_index[GET_OBJ_RNUM(obj)].qic)
   {
