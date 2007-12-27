@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/07 11:04:54 $                                           * 
-*  $Revision: 1.48 $                                                      *
+*  $Date: 2007/06/07 11:38:07 $                                           * 
+*  $Revision: 1.49 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -632,10 +632,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                             percent = number(1, 101);
 
                             if (percent < 5)
-                                improve_sub(ch, (enum subskill_list ) assemblyGetType(lVnum),1);
+                                improve_sub(c, (enum subskill_list ) assemblyGetType(lVnum),1);
 
                             /* Now give the object to the character. */
-                            obj_to_char(pObject, ch);
+                            obj_to_char(pObject, c);
                             snprintf(str, slen, "%c%ld", UID_CHAR,                                     GET_ID(pObject));
                         }
                     }
