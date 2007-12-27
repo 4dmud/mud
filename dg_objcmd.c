@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/09/15 08:01:12 $
-*  $Revision: 1.14 $
+*  $Date: 2007/05/22 18:15:00 $
+*  $Revision: 1.15 $
 **************************************************************************/
 
 #include "conf.h"
@@ -823,8 +823,7 @@ OCMD(do_oat)
 {
   char location[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int vnum = 0;
-  room_rnum rnum = 0;
-  obj_data *object;
+  room_rnum rnum = 0, origroom;
 
   half_chop(argument, location, arg2);
 
@@ -841,15 +840,15 @@ OCMD(do_oat)
       return;
   }
 
-  object = read_object(GET_OBJ_VNUM(obj), VIRTUAL);
-  if (!object)
-    return;
-  
-  obj_to_room(object, rnum);
-  obj_command_interpreter(object, arg2);
-  
-  if (object->in_room == rnum)
-    extract_obj(object);
+  origroom = IN_ROOM(obj);
+
+  obj_from_room(obj);
+  obj_to_room(obj, rnum);
+
+  obj_command_interpreter(obj, arg2);
+
+  obj_from_room(obj);
+  obj_to_room(obj, origroom);
 }
 
 OCMD(do_ocontains)
