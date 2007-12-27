@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.18  2005/03/16 16:44:08  w4dimenscor
+ * Added Award Points to stat display
+ *
  * Revision 1.17  2005/03/16 14:20:14  w4dimenscor
  * added / changed:
  * set [char] mastery [class] : toggles the mastery of that class
@@ -1686,8 +1689,8 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
                        GET_CLAN(k), find_clan_by_id(GET_CLAN(k)), GET_CLAN_RANK(k),
                        clan_name(find_clan_by_id(GET_CLAN(k))));
 
-      new_send_to_char(ch, "TOKENS: G:%-2d S:%d BN:%d BS:%d\r\n",
-                       GET_GOLD_TOKEN_COUNT(k), GET_SILVER_TOKEN_COUNT(k),GET_BRONZE_TOKEN_COUNT(k), GET_BRASS_TOKEN_COUNT(k));
+      new_send_to_char(ch, "TOKENS: G:%-2d S:%-2d BN:%-2d BS:%-2d      AWARD POINTS: %-3d\r\n",
+                       GET_GOLD_TOKEN_COUNT(k), GET_SILVER_TOKEN_COUNT(k),GET_BRONZE_TOKEN_COUNT(k), GET_BRASS_TOKEN_COUNT(k), update_award(k));
 
 
       strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
