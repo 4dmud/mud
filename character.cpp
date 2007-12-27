@@ -465,7 +465,7 @@ void Character::init() {
 
     /* *** if this is our first player --- he be God *** */
 
-    if (player_table.size() == 0) {
+    if (player_table.size() == 0 || (player_table.size() == 1 && !strcasecmp(player_table[0].name,player.name))) {
 
         GET_LEVEL(this) = LVL_IMPL;
         GET_EXP(this) = exp_needed(this);

@@ -202,7 +202,7 @@ void con_character_creation(Descriptor *d, char *arg)
       d->Output("\r\n");
     }
     do_help(d->character, class_selection, 0, 0);
-    d->Output("Are you sure you want to be a %s? ", class_selection);
+    d->Output("\r\nAre you sure you want to be a %s? ", class_selection);
     SUB_STATE(d) = STATE_CONFIRM_QCLASS;
     break;
     
