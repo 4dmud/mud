@@ -4688,8 +4688,11 @@ int store_to_char(const char *name, Character *ch) {
             break;
 
         case 'K':
-            if (!strcmp(tag, "KilC"))
+            if (!strcmp(tag, "KilC")) {
+            if (num > 2000000)
+            num = 0;
                 GET_KILL_CNT(ch) = num;
+                }
             break;
 
         case 'L':
@@ -4799,10 +4802,16 @@ int store_to_char(const char *name, Character *ch) {
                 }
                 break;
             case 'n':
-                if (!strcmp(tag, "Ppnt"))
+                if (!strcmp(tag, "Ppnt")) {
+                if (num > 1000)
+                num = 0;
                     GET_PK_POINTS(ch) = num;
-                else if (!strcmp(tag, "Pcnt"))
+                    }
+                else if (!strcmp(tag, "Pcnt")) {
+                if (num > 1000)
+                num = 0;
                     GET_PK_CNT(ch) = num;
+                    }
                 break;
             case 'o':
                 if (!strcmp(tag, "PfOt"))
@@ -4854,8 +4863,11 @@ int store_to_char(const char *name, Character *ch) {
                     ROMANCE(ch) = num;
                 break;
             case 'c':
-                if (!strcmp(tag, "RipC"))
+                if (!strcmp(tag, "RipC")) {
+                if (num > 10000)
+                num = 0;
                     GET_RIP_CNT(ch) = num;
+                    }
                 break;
             case 'd':
                 if (!strcmp(tag, "Rwrd"))
