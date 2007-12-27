@@ -229,9 +229,6 @@ void Character::freeself() {
     int i;
     struct alias_data *a;
 
-    if(IS_SET(INTERNAL(this),INT_MTRANSFORMED))
-      return;
-
     if (this == NULL)
         return;
 

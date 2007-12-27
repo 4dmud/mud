@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.45  2006/08/13 09:08:51  w4dimenscor
+ * Removed the mtransform flags
+ *
  * Revision 1.44  2006/08/13 06:26:55  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -1144,8 +1147,6 @@ class Room;
 
 /* Character.internal_flags (INT_XXX) ************************************/
 #define INT_MARK    (1 <<  0)
-#define INT_MTRANSFORMED (1 << 1)
-#define INT_ISMTRANSFORM (1 << 2)
 
 #define NEWB_NONE   0
 #define NEWB_NEW    1
