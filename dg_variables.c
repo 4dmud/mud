@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $                              *
-*  $Date: 2005/02/04 20:46:11 $                                           * 
-*  $Revision: 1.4 $                                                    *
+*  $Date: 2005/02/09 09:47:12 $                                           * 
+*  $Revision: 1.5 $                                                    *
 **************************************************************************/
 
 #include "conf.h"
@@ -885,7 +885,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
               {
                 snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
                 return;
-              }
+              } else if (isname(subfield, obj->short_description)) {
+	      snprintf(str, slen, "%c%ld", UID_CHAR, GET_ID(obj));	/* arg given, found */
+                return;
+		}
             }
             if (!obj)
               strcpy(str, "");	/* arg given, not found */
