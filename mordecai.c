@@ -176,7 +176,7 @@ ACMD(do_convey) {
 
 
     if (!*arg1 || !*arg2) {
-        ch->Send("Usage: convey <token|sessions|gold|maxmove|award|tradepoints> <amount>.\r\n");
+        ch->Send("Usage: convey <token|gold|maxmove|award|tradepoints> <amount>.\r\n");
         ch->Send("see HELP CONVEY for more info.\r\n"
                  "CONVEY gold <amount>, turns gold coins into exp points at 4 to 1 ratio\r\n"
                  "CONVEY maxmove 1, turns (num of times used x ) 10 mill into 100 maxmove\r\n");
@@ -247,7 +247,7 @@ ACMD(do_convey) {
 			GET_PRACTICES(ch)         += sessions;
 		}
 	}
-
+/* no more session converting. It's EVIL!!!!
     } else if (isname(arg2, "sessions")) {
         if ((amount % 20)) {
             ch->Send("The number must be devisable by 20.");
@@ -273,6 +273,7 @@ ACMD(do_convey) {
             ch->Send("You don't have that many sessions.\r\n");
             return;
         }
+*/
     } else if (isname("gold", arg2)) {
 	if (isname(arg1, "maxmove")) {
 
@@ -356,7 +357,7 @@ ACMD(do_convey) {
         TRADEPOINTS(ch) -= amount;
 
     } else {
-        ch->Send("You can only convey tokens, gold, maxmove, award points, trade points or sessions.\r\n");
+        ch->Send("You can only convey tokens, gold, maxmove, award points or trade points.\r\n");
         return;
     }
     return;
