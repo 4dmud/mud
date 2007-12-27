@@ -40,15 +40,20 @@ room_rnum add_room(Room *room)
 
   if ((i = room->number) != NOWHERE && world_vnum[i])
   {
-
+	  log("Room Desc 1: %s", room->GetDescription());
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
+    /** save the new string **/
+    //world_vnum[i]->t_description = strdup(room->GetDescription());
     world_vnum[i]->free_room_strings();
+    log("Room Desc 2: %s", room->GetDescription());
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
     *world_vnum[i] = *room;
     world_vnum[i]->mine = room->mine;
     world_vnum[i]->copy_room_strings(room);
+    log("Room Desc 4: %s", room->GetDescription());
+    log("Room Desc 5: %s", world_vnum[i]->GetDescription());
     add_to_save_list(zone_table[room->zone].number, SL_WLD);
     log("GenOLC: add_room: Updated existing room #%d.", i);
     return world_vnum[i];
@@ -365,23 +370,23 @@ int save_rooms(zone_rnum rzone)
       /*
        * Copy the description and strip off trailing newlines.
        */
-      strncpy(buf, room->HasDesc() ? room->GetDescription() : "Empty room.", sizeof(buf)-1 );
+      strlcpy(buf, room->HasDesc() ? room->GetDescription() : "Empty room.", sizeof(buf)-1 );
       strip_cr(buf);
 
       /*
       * Remove the '\r\n' sequences from smell.
       */
-      strcpy(buf2,
+      strlcpy(buf2,
              room->smell ? room->
-             smell : "You smell nothing special.\n");
+			     smell : "You smell nothing special.\n", sizeof(buf2)-1);
       strip_cr(buf2);
 
       /*
        * Remove the '\r\n' sequences from description.
        */
-      strcpy(buf3,
+      strlcpy(buf3,
              room->listen ? room->
-             listen : "You hear nothing special.\n");
+			     listen : "You hear nothing special.\n", sizeof(buf3)-1);
       strip_cr(buf3);
 
       /*
@@ -414,7 +419,7 @@ int save_rooms(zone_rnum rzone)
           int dflag;
           if (R_EXIT(room, j)->general_description)
           {
-            strncpy(buf, R_EXIT(room, j)->general_description, sizeof(buf)-1);
+            strlcpy(buf, R_EXIT(room, j)->general_description, sizeof(buf)-1);
             strip_cr(buf);
           }
           else
@@ -434,7 +439,7 @@ int save_rooms(zone_rnum rzone)
             dflag = 0;
 
           if (R_EXIT(room, j)->keyword)
-            strncpy(buf1, R_EXIT(room, j)->keyword, sizeof(buf1)-1 );
+            strlcpy(buf1, R_EXIT(room, j)->keyword, sizeof(buf1)-1 );
           else
             *buf1 = '\0';
 
@@ -456,7 +461,7 @@ int save_rooms(zone_rnum rzone)
       {
         for (ex_desc = room->ex_description; ex_desc; ex_desc = ex_desc->next)
         {
-          strncpy(buf, ex_desc->description, sizeof(buf));
+          strlcpy(buf, ex_desc->description, sizeof(buf));
           strip_cr(buf);
           fprintf(sf,	"E\n"
                   "%s~\n"
@@ -467,7 +472,7 @@ int save_rooms(zone_rnum rzone)
       {
         for (ex_desc = room->look_above_description; ex_desc; ex_desc = ex_desc->next)
         {
-          strncpy(buf, ex_desc->description, sizeof(buf));
+          strlcpy(buf, ex_desc->description, sizeof(buf));
           strip_cr(buf);
           fprintf(sf,	"A\n"
                   "%s~\n"
@@ -489,7 +494,7 @@ int save_rooms(zone_rnum rzone)
       {
         for (ex_desc = room->look_behind_description; ex_desc; ex_desc = ex_desc->next)
         {
-          strncpy(buf, ex_desc->description, sizeof(buf));
+          strlcpy(buf, ex_desc->description, sizeof(buf));
           strip_cr(buf);
           fprintf(sf,	"B\n"
                   "%s~\n"

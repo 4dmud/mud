@@ -3378,7 +3378,7 @@ ACMD(do_users) {
             else if (!(tch = d->character))
                 continue;
 
-            if (*host_search && !strstr(d->host, host_search))
+	    if (*host_search && !strstr(d->host.c_str(), host_search))
                 continue;
             if (*name_search && str_cmp(GET_NAME(tch), name_search))
                 continue;
@@ -3434,8 +3434,8 @@ ACMD(do_users) {
                  "UNDEFINED",
                  state, idletime, timeptr);
 
-        if (d->host && *d->host)
-            snprintf(line + strlen(line), sizeof(line) - strlen(line), "[%s]\r\n", d->host);
+	if (!d->host.empty())
+		snprintf(line + strlen(line), sizeof(line) - strlen(line), "[%s]\r\n", d->host.c_str());
         else
             strlcat(line, "[Hostname unknown]\r\n", sizeof(line));
 
@@ -3462,8 +3462,8 @@ ACMD(do_ipstat) {
         ch->Send( "Um... yeah your host is crap all.\r\n");
         return;
     }
-    if (ch->desc->host && *ch->desc->host)
-        ch->Send( "{cGYour ip is [%s]\r\n{c0", ch->desc->host);
+    if (!ch->desc->host.empty())
+	    ch->Send( "{cGYour ip is [%s] host [%s]\r\n{c0", ch->desc->host_ip.c_str(), ch->desc->host.c_str());
     else
         ch->Send( "{cGYour ip is [Hostname unknown]{c0\r\n");
 

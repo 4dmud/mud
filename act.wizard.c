@@ -10,6 +10,12 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.78  2007/08/23 20:41:29  w4dimenscor
+ * - Created a new MudException class, so that we can try and throw and catch errors.
+ * - Fixed room description editing in OLC so that it works with the new system.
+ * - Removed called to ident.c from the code
+ * - changed the hostname values on descriptors and characters from char arrays to strings.
+ *
  * Revision 1.77  2007/08/19 01:06:10  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -307,6 +313,7 @@
 #include "descriptor.h"
 #include "strutil.h"
 #include "dlib/threads.h"
+#include "compressor.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -2752,7 +2759,7 @@ ACMD(do_copyover) {
             delete d;   /* throw'em out */
         } else {
             room_rnum rm = GET_WAS_IN(d->character) ? GET_WAS_IN(d->character) : IN_ROOM(d->character);
-            fprintf(fp, "%d %s %s %d %d\n", d->descriptor, GET_NAME(och), d->host, rm->number, d->mxp);
+	    fprintf(fp, "%d %s %s %d %d\n", d->descriptor, GET_NAME(och), d->host.c_str(), rm->number, d->mxp);
 
             /* save och */
             if (!IS_IMM(och))
@@ -3346,9 +3353,8 @@ ACMD(do_last) {
     ch->Send( "[%5ld] [%2d %s] %-12s \r\nHost:%-*s \r\nLast: %-20s\r\n",
               GET_IDNUM(vict), (int) GET_LEVEL(vict),
               class_abbrevs[(int) GET_CLASS(vict)], GET_NAME(vict),
-              HOST_LENGTH, vict->player_specials->host
-              && *vict->player_specials->host ? vict->player_specials->
-              host : "(NOHOST)", ctime(&vict->player.time.logon));
+              HOST_LENGTH, !vict->player_specials->host.empty() ? vict->player_specials->
+					      host.c_str() : "(NOHOST)", ctime(&vict->player.time.logon));
 
     delete vict;
 }
@@ -3896,8 +3902,8 @@ private:
             victim = new Character(FALSE);
 
             if (!pi.DeletedByIndex(j) && store_to_char(pi.NameByIndex(j), victim) > -1)
-                if (stristr(victim->player_specials->host, findname.c_str()) != NULL)
-                    ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
+		    if (stristr(victim->player_specials->host.c_str(), findname.c_str()) != NULL)
+			    ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host.c_str());
 
             delete (victim);
         }
@@ -3928,8 +3934,8 @@ ACMD(do_hostfindr) {
         victim = new Character(FALSE);
 
         if (store_to_char(pi.NameByIndex(j), victim) > -1)
-            if (stristr(victim->player_specials->host, argument) != NULL)
-                ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
+		if (stristr(victim->player_specials->host.c_str(), argument) != NULL)
+			ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host.c_str());
 
         delete (victim);
     }
@@ -4222,7 +4228,9 @@ ACMD(do_show) {
             "  %5d game commands parsed\r\n"
             "  %5d commands by players parsed\r\n"
             "  %5d command trigger commands parsed\r\n"
-            "  %5d triggers written\r\n",
+            "  %5d triggers written\r\n"
+	    "  %5.2f %s compressed to %5.2f %s\r\n",
+	
             i, con,
             pi.TopOfTable() + 1,
             j, GetMobProtoCount(),
@@ -4234,7 +4242,8 @@ ACMD(do_show) {
             min_actions,
             total_commands_typed,
             total_pcommands_typed,
-            total_trig_commands_typed, top_of_trigt);
+            total_trig_commands_typed, top_of_trigt,
+	    bytesToSize(compressor.Bigs()), bytesToUnit(compressor.Bigs()), bytesToSize(compressor.Smalls()), bytesToUnit(compressor.Smalls()));
 
         break;
 

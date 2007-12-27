@@ -1801,7 +1801,7 @@ int perform_dupe_check(Descriptor *d) {
     case RECON:
         d->Output( "Reconnecting.\r\n");
         act("$n has reconnected.", TRUE, d->character, 0, 0, TO_ROOM);
-        new_mudlog( NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+	new_mudlog( NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host.c_str());
         break;
     case USURP:
         d->Output("You take over %s, already in use!\r\n", diff_acc ? "an account of yours" : "your body");
@@ -1812,7 +1812,7 @@ int perform_dupe_check(Descriptor *d) {
         break;
     case UNSWITCH:
         d->Output("Reconnecting to unswitched char.");
-        new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(d->character)), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+	new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(d->character)), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host.c_str());
         break;
     }
 
@@ -2362,10 +2362,10 @@ void nanny(Descriptor *d, char *arg) {
         break;
     case CON_NAME_CNFRM:   /* wait for conf. of new name    */
         if (UPPER(*arg) == 'Y') {
-            if (isbanned(d->host) >= BAN_NEW) {
+		if (isbanned((char *)d->host.c_str()) >= BAN_NEW) {
                 new_mudlog(NRM, LVL_GOD, TRUE,
                            "Request for new char %s denied from [%s] (siteban)",
-                           GET_PC_NAME(d->character), d->host);
+			   GET_PC_NAME(d->character), d->host.c_str());
                 d->Output("Sorry, new characters are not allowed at the moment!\r\n");
                 STATE(d) = CON_CLOSE;
                 return;
@@ -2374,7 +2374,7 @@ void nanny(Descriptor *d, char *arg) {
                 d->Output("Sorry, new players can't be created at the moment.\r\n");
                 new_mudlog( NRM, LVL_GOD, TRUE,
                             "Request for new char %s denied from [%s] (wizlock)",
-                            GET_PC_NAME(d->character), d->host);
+			    GET_PC_NAME(d->character), d->host.c_str());
                 STATE(d) = CON_CLOSE;
                 return;
             }
@@ -2412,7 +2412,7 @@ void nanny(Descriptor *d, char *arg) {
         else {
             if (strncmp(CRYPT(arg, GET_PASSWD(d->character)),
                         GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
-                new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
+				new_mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host.c_str());
                 GET_BAD_PWS(d->character)++;
                 d->character->save();
                 // log("(nanny)Saved %s in room %d.", GET_NAME(d->character), NOWHERE);
@@ -2431,12 +2431,12 @@ void nanny(Descriptor *d, char *arg) {
             GET_BAD_PWS(d->character) = 0;
             d->bad_pws = 0;
 
-            if (isbanned(d->host) == BAN_SELECT &&
+	    if (isbanned((char *)d->host.c_str()) == BAN_SELECT &&
                     !PLR_FLAGGED(d->character, PLR_SITEOK)) {
                 d->Output("Sorry, this char has not been cleared for login from your site!\r\n");
                 STATE(d) = CON_CLOSE;
                 new_mudlog(NRM, LVL_GOD, TRUE,"Connection attempt for %s denied from %s",
-                           GET_NAME(d->character), d->host);
+			   GET_NAME(d->character), d->host.c_str());
                 return;
             }
             if (GET_LEVEL(d->character) < circle_restrict) {
@@ -2444,7 +2444,7 @@ void nanny(Descriptor *d, char *arg) {
                 STATE(d) = CON_CLOSE;
                 new_mudlog( NRM, LVL_GOD, TRUE,
                             "Request for login denied for %s [%s] (wizlock)",
-                            GET_NAME(d->character), d->host);
+			    GET_NAME(d->character), d->host.c_str());
                 return;
             }
             /* check and make sure no other copies of this player are logged in */
@@ -2462,11 +2462,11 @@ void nanny(Descriptor *d, char *arg) {
                 d->Output("%s",motd);
             if (GET_INVIS_LEV(d->character))
                 new_mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE,
-                           "%s [%s] has connected. (invis %d)", GET_NAME(d->character), d->host,
+			   "%s [%s] has connected. (invis %d)", GET_NAME(d->character), d->host.c_str(),
                            GET_INVIS_LEV(d->character));
             else
                 new_mudlog(BRF, LVL_IMMORT, TRUE,
-                           "%s [%s] has connected.", GET_NAME(d->character), d->host);
+			   "%s [%s] has connected.", GET_NAME(d->character), d->host.c_str());
             if (load_result) {
                 d->Output( "\r\n\r\n\007\007\007"
                            "%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",

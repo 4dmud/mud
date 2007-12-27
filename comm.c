@@ -97,14 +97,13 @@
 #include "trees.h"
 #include "dlib/threads.h"
 #include "dlib/misc_api.h"  // for dlib::sleep
-
+#include "compressor.h"
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
 #endif
 
 void delete_descriptor_list();
-
 /* externs */
 extern struct ban_list_element *ban_list;
 extern int num_invalid;
@@ -131,7 +130,7 @@ const char *ACTNULL = "<NULL>";
 /* local globals */
 struct comm_data * comlist = NULL;
 int syslogfd = -1;
-struct meta_host_data *host_list = NULL;
+std::map<string, meta_host_data *> host_list;
 int message_type = NOTHING;
 void string_format(BYTE * cmd, LWORD space);
 Descriptor *descriptor_list = NULL;   /* master desc list */
@@ -157,8 +156,8 @@ int connected_to_intermud;
 byte reread_wizlist;          /* signal: SIGUSR1 */
 byte emergency_unban;         /* signal: SIGUSR2 */
 
-void free_host_list(struct meta_host_data *thi);
-void add_ip_to_host_list(char *host_ip, char *host, time_t date);
+void free_host_list();
+void add_ip_to_host_list(string &host_ip, string &host, time_t date);
 
 int no_ext_processes = 0;       /* shall we use external processes? */
 extern int use_external_lookup_process; /* see config.c */
@@ -566,8 +565,8 @@ int main(int argc, char **argv) {
     log("%s", oasisolc_version);
     log("%s", fourdimensions_version);
 
-    if (id_init() < 0)
-        exit(2);
+//    if (id_init() < 0)
+//        exit(2);
 
     if (chdir(dir) < 0) {
         perror("SYSERR: Fatal error changing to data directory");
@@ -603,7 +602,7 @@ int main(int argc, char **argv) {
         the_free_help();          /* db.c */
         Free_Invalid_List(); /* ban.c */
         free_ban_list();          /* ban.c*/
-        free_host_list(host_list);
+        free_host_list();
         free_strings(&config_info, OASIS_CFG); /* oasis_delete.c */
         free_vehicles();
         free_commlist(comlist);
@@ -621,7 +620,7 @@ int main(int argc, char **argv) {
 }
 
 void circle_exit(int retval) {
-    id_kill();
+//    id_kill();
 #undef exit
 
     exit(retval);
@@ -678,7 +677,7 @@ void copyover_recover(void) {
 #endif
 
         d->mxp = mxpon;
-        strcpy(d->host, host);
+        d->host = host;
 
 
         d->connected = CON_CLOSE;
@@ -1379,8 +1378,10 @@ void heartbeat(int heart_pulse) {
         //  save_mud_time(&time_info);
     }
 
-    if (!(heart_pulse % (5 * 60 * PASSES_PER_SEC)))
+    if (!(heart_pulse % (5 * 60 * PASSES_PER_SEC))) {
         record_usage();
+	compressor.cleanInflated();
+    }
 
     if (!(heart_pulse % (SECS_PER_MUD_DAY * PASSES_PER_SEC)))
         check_all_trees();
@@ -1961,14 +1962,13 @@ static void get_lookup_reply(void) {
 }
 
 #endif
-void free_host_list(struct meta_host_data *thi) {
-    if (!thi)
-        return;
-
-    if (thi->next)
-        free_host_list(thi->next);
-
-    free(thi);
+void free_host_list() {
+	std::map<string, meta_host_data *>::iterator it;
+	for (it = host_list.begin();it != host_list.end();it++) {
+		delete it->second;
+		it->second = NULL;
+	}
+	host_list.clear();
 }
 void save_host_list(void) {
     FILE *fl;
@@ -1976,8 +1976,10 @@ void save_host_list(void) {
 
     if ((fl = fopen(HOST_LIST_FILE, "wb")) == NULL)
         return;
-    for (thi = host_list;thi;thi=thi->next) {
-        fprintf(fl, "%s %s %ld\n", thi->host_ip, thi->host, thi->date);
+    std::map<string, meta_host_data *>::iterator it;
+    for (it = host_list.begin();it != host_list.end();it++) {
+	    thi = it->second;
+	    fprintf(fl, "%s %s %ld\n", thi->host_ip.c_str(), thi->host.c_str(), thi->date);
     }
     fprintf(fl, "~\n");
     fclose(fl);
@@ -1985,9 +1987,10 @@ void save_host_list(void) {
 }
 void load_host_list(void) {
     FILE *fl;
-    char host[HOST_LENGTH+1];
-    char host_ip[HOST_LENGTH+1];
-    char line[HOST_LENGTH * 3];
+    char host[MAX_INPUT_LENGTH+1];
+    char host_ip[MAX_INPUT_LENGTH+1];
+    string hst, hstip;
+    char line[MAX_INPUT_LENGTH];
     time_t date;
     int retval = 0;
     time_t expire_date;
@@ -2004,9 +2007,11 @@ void load_host_list(void) {
                 fclose(fl);
                 return;
             }
-            if (date > expire_date)
-                add_ip_to_host_list(host_ip, host, date);
-
+	    if (date > expire_date) {
+		    hst = host;
+		    hstip = host_ip;
+                add_ip_to_host_list(hstip, hst, date);
+	    }
         }
         get_line(fl, line);
     }
@@ -2014,31 +2019,30 @@ void load_host_list(void) {
 
 }
 
-void add_ip_to_host_list(char *host_ip, char *host, time_t date) {
+void add_ip_to_host_list(string &host_ip, string &host, time_t date) {
     struct meta_host_data *thi;
-    if (!host_ip || !*host_ip || !host || !*host)
+    if (host_ip.empty() || host.empty())
         return;
-    CREATE(thi, struct meta_host_data, 1);
-    thi->next = host_list;
-    snprintf(thi->host_ip, HOST_LENGTH, host_ip);
-    snprintf(thi->host, HOST_LENGTH, host);
+    thi = new meta_host_data();
+//    thi->next = host_list;
+    thi->host_ip = host_ip;
+    thi->host = host;
     thi->date = date;
-    host_list = thi;
+    if (host_list.find(thi->host_ip) != host_list.end())
+	    delete host_list[thi->host_ip];
+    host_list[thi->host_ip] = thi;
 }
-int check_for_ip(char *ip_add, char *host) {
-    struct meta_host_data *thi;
-    for (thi = host_list; thi; thi = thi->next) {
-        if (!strcmp(thi->host_ip, ip_add)) {
-            strncpy(host, thi->host, HOST_LENGTH);
-            *(host + HOST_LENGTH) = '\0';
-            if (strcmp(thi->host, ip_add)) {
-                thi->date = time(0);
-                save_host_list();
-            }
-            return 1;
-        }
+bool check_for_ip(string &ip_add, string &host) {
+	std::map<string, meta_host_data *>::iterator it;    
+    
+    if ((it = host_list.find(ip_add)) == host_list.end())
+	    return false;
+    host = it->second->host;
+    if (it->second->host == ip_add) {
+	    it->second->date = time(0);
+	    save_host_list();
     }
-    return 0;
+    return true;
 }
 
 Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
@@ -2082,33 +2086,37 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
     /* create a new descriptor */
     newd = new Descriptor();
     if (!copyover) {
+	   
         /* find the numeric site address */
-        strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
+	    //strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
+	    newd->host_ip = (char *)inet_ntoa(peer.sin_addr);
 
         /* find the sitename */
-	if (!check_for_ip(newd->host_ip, newd->host)) {
+	    if (!check_for_ip(newd->host_ip, newd->host)) {
 
             if (!(from = gethostbyaddr((char *) &peer.sin_addr,
                                        sizeof(peer.sin_addr), AF_INET))) {
                 perror("SYSERR: gethostbyaddr");
 
                 /* find the numeric site address */
-                strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
+		//strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
+		newd->host = newd->host_ip;
 
             } else {
-                strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
+		    //strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
+		    newd->host = from->h_name;
 
             }
             add_ip_to_host_list(newd->host_ip, newd->host, time(0));
             save_host_list();
 
         } else { //check_for_ip
-            log("Meta Host Used: %s found.", newd->host);
+		log("Meta Host Used: %s found.", newd->host.c_str());
         }
 
-        if (isbanned(newd->host) == BAN_ALL) {
+	if (isbanned((char *)newd->host.c_str()) == BAN_ALL) {
             CLOSE_SOCKET(desc);
-            new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host);
+	    new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host.c_str());
             delete newd;
             return (NULL);
         }

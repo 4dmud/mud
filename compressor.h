@@ -17,6 +17,7 @@ typedef struct compress_map_data {
  bool parsed;
  time_t last_accessed;
  size_t length;
+ int copies;
  
  compress_map_data() {
 	 saved = NULL;
@@ -24,12 +25,14 @@ typedef struct compress_map_data {
 	 parsed = false;
 	 last_accessed = 0;
 	 length = 0;
+	 copies = 1;
  }
  ~compress_map_data() {
-	 if (inflated)
+	 copies -= 1;
+	if (copies == 0 && inflated)
 		 free(inflated);
 	 inflated = NULL;
-	 if (saved)
+	 if (copies == 0 && saved)
 		 free(saved);
 	 saved = NULL;
  }
@@ -44,6 +47,7 @@ class Compressor {
 		long CompressToId(const char *in, long i, bool comp);
 		long CompressToId(const char *in, bool comp);
 		bool DeleteId(long i);
+		int cleanInflated();
 		const char * zerr(int ret);
 		Compressor() {
 			TopID = 0;
@@ -68,9 +72,15 @@ class Compressor {
 			(void)deflateEnd(&dstrm);
 			(void)inflateEnd(&istrm);
 			
-			for (map<long, compress_map_data *>::iterator z = zmap.begin();z != zmap.end();z++)
+			for (std::map<long, compress_map_data *>::iterator z = zmap.begin();z != zmap.end();z++)
 				delete z->second;
 			zmap.clear();
+		}
+		inline int Bigs() {
+			return bigs;
+		}
+		inline int Smalls() {
+			return smalls;
 		}
 	private:
 		unsigned char * inf(unsigned char *source, size_t &dest);
@@ -81,7 +91,7 @@ class Compressor {
 		int dlen;
 		string o_s;
 		long TopID;
-		map<long, compress_map_data *> zmap;
+		std::map<long, compress_map_data *> zmap;
 		unsigned char in[CHUNK];
 		unsigned char out[CHUNK];
 		unsigned char *ctr;

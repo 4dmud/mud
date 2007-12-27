@@ -9,6 +9,12 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.63  2007/08/23 20:41:29  w4dimenscor
+ * - Created a new MudException class, so that we can try and throw and catch errors.
+ * - Fixed room description editing in OLC so that it works with the new system.
+ * - Removed called to ident.c from the code
+ * - changed the hostname values on descriptors and characters from char arrays to strings.
+ *
  * Revision 1.62  2007/08/19 01:06:11  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -1602,7 +1608,8 @@ public:
     int sector_type;          /* sector type (move/hide)              */
     char *name;               /* Rooms name 'You are ...'             */
     char * t_description; /* temporary buffer for writing strings */
-    long DescID;
+    long GetDesc();
+    void SetDesc(long id);
     
 
     char *smell;         /* smell description                    */
@@ -1641,6 +1648,7 @@ public:
     ~Room();
 	private:
 		char *description;        /* Shown when entered                   */
+		long DescID;
 #ifdef HAVE_ZLIB_H
     Bytef *buff_out;
     int total_out; /* size of input buffer */
@@ -2161,7 +2169,7 @@ public:
     void *last_olc_targ; /* olc control                       */
     int last_olc_mode;        /* olc control                       */
     vector<string> ignorelist;
-    char *host;               /* player host                          */
+    string host;               /* player host                          */
     char *afk_msg;
     char *busy_msg;
     char *pretitle;
@@ -2199,7 +2207,7 @@ public:
         last_tell = -1;      /* idnum of last tell from           */
         last_olc_targ = NULL; /* olc control                       */
         last_olc_mode = 0;        /* olc control                       */
-        host = NULL;               /* player host                          */
+                       /* player host                          */
         afk_msg = NULL;
         busy_msg = NULL;
         pretitle  = NULL;
@@ -2807,10 +2815,10 @@ struct hunter_data {
 };
 
 struct meta_host_data {
-    char host[HOST_LENGTH + 1];
-    char host_ip[HOST_LENGTH + 1];
+    string host;
+    string host_ip;
     time_t date;
-    struct meta_host_data *next;
+   // struct meta_host_data *next;
 };
 
 struct vehicle_data {

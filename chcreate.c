@@ -234,7 +234,7 @@ void con_character_creation(Descriptor *d, char *arg) {
         d->Output("\r\n*** PRESS RETURN: ");
         STATE(d) = CON_RMOTD;
 
-        new_mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character), d->host);
+	new_mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character), d->host.c_str());
         break;
     }
 

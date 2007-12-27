@@ -19,7 +19,7 @@ extern Descriptor *descriptor_list;
 class Descriptor {
 public:
     socket_t descriptor; /* file descriptor for socket           */
-    char host[HOST_LENGTH + 1];    /* hostname                             */
+    //char host[HOST_LENGTH + 1];    /* hostname                             */
     byte bad_pws;        /* number of bad pw attemps this login  */
     byte idle_tics;      /* tics idle at password prompt         */
     int connected;       /* mode of 'connectedness'              */
@@ -67,9 +67,9 @@ public:
     int telnet_capable; /* if any of the protocols are processed then set this flag */
     bool locked; /* Is this descriptor in a locked state? Multithreading - mord*/
     struct sockaddr_in saddr;
-    char  host_ip[HOST_LENGTH + 1];
-    char  host_name[HOST_LENGTH + 1];
-    char  user_name[HOST_LENGTH + 1];
+    string  host_ip;
+    string  host;//_name;
+    //char  user_name[HOST_LENGTH + 1];
     void init_descriptor(int desc);
     Descriptor *new_descriptor(socket_t s, int copyover);
     Descriptor();

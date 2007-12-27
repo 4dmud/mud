@@ -284,7 +284,7 @@ void Character::freeself() {
         free_string(&player_specials->poofout);
         free_string(&player_specials->afk_msg);
         free_string(&player_specials->busy_msg);
-        free_string(&player_specials->host);
+//        free_string(&player_specials->host);
         free_string(&player_specials->pretitle);
 
         free_string(&GET_LOGOUTMSG(this));
@@ -653,7 +653,7 @@ void Character::default_char() {
     GET_STAMINA(this) 		= 100;
     GET_MAX_STAMINA(this) 	= 100;
     if (player_specials)
-        player_specials->host = NULL;
+	    player_specials->host.clear();
     AFF_SPEED(this) 		= 0;
     player.time.last_logon 	= tme;
     GET_PERC(this) 			= 100;

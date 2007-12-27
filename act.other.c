@@ -9,6 +9,12 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.41  2007/08/23 20:41:29  w4dimenscor
+ * - Created a new MudException class, so that we can try and throw and catch errors.
+ * - Fixed room description editing in OLC so that it works with the new system.
+ * - Removed called to ident.c from the code
+ * - changed the hostname values on descriptors and characters from char arrays to strings.
+ *
  * Revision 1.40  2007/08/19 01:06:10  w4dimenscor
  * - Changed the playerindex to be a c++ object with search functions.
  * - changed the room descriptions to be searched from a MAP index, and
@@ -248,7 +254,7 @@ ACMD(do_quit)
         send_to_room(IN_ROOM(ch), "%s\r\n",  GET_LOGOUTMSG(ch));
 
     }
-    new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host);
+    new_mudlog( NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game [%s].", GET_NAME(ch), ch->desc->host.c_str());
     ch->Send("Goodbye, %s.. Come back soon!\r\n", GET_NAME(ch));
 
     /*  We used to check here for duping attempts, but we may as well

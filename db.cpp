@@ -1506,9 +1506,11 @@ void discrete_load(FILE * fl, int mode, char *filename, zone_vnum zon) {
                     last);
                 exit(1);
             }
-            if (nr >= 99999)
+	    if (nr >= HIGHEST_VNUM) {
+		    log("SYSERR: Vnum too high (max %d) in %s file %s near %s #%d",
+			HIGHEST_VNUM, modes[mode], filename, modes[mode], nr);
                 return;
-            else
+	    } else
                 switch (mode) {
                 case DB_BOOT_TRG:
                     parse_trigger(fl, nr, zon);
@@ -4517,9 +4519,9 @@ int store_to_char(const char *name, Character *ch) {
                 GET_HEIGHT(ch) = num;
             else if (!strcmp(tag, "Host")) {
                 if (!(ch->desc))
-                    ch->player_specials->host = str_dup(line);
-                else if (*ch->desc->host)
-                    ch->player_specials->host = str_dup(ch->desc->host);
+                    ch->player_specials->host = line;
+		else if (!ch->desc->host.empty())
+                    ch->player_specials->host = ch->desc->host;
             } else if (!strcmp(tag, "Hrol"))
                 GET_HITROLL(ch) = num;
             else if (!strcmp(tag, "Hung"))
@@ -5056,10 +5058,10 @@ void char_to_store(Character *ch) {
         fprintf(fl, "Last: %ld\n", time(0));
     else
         fprintf(fl, "Last: %ld\n", ch->player.time.logon);
-    if ((ch->desc) && (ch->desc->host))
-        fprintf(fl, "Host: %s\n", ch->desc->host);
-    else if (ch->player_specials->host)
-        fprintf(fl, "Host: %s\n", ch->player_specials->host);
+    if ((ch->desc) && (!ch->desc->host.empty()))
+	    fprintf(fl, "Host: %s\n", ch->desc->host.c_str());
+    else if (!ch->player_specials->host.empty())
+	    fprintf(fl, "Host: %s\n", ch->player_specials->host.c_str());
     fprintf(fl, "Hite: %d\n", GET_HEIGHT(ch));
     fprintf(fl, "Wate: %d\n", GET_WEIGHT(ch));
     fprintf(fl, "Alin: %d\n", GET_ALIGNMENT(ch));
@@ -5829,17 +5831,22 @@ int check_object_spell_number(struct obj_data *obj, int val, int nr) {
      * Check for negative spells, spells beyond the top define, and any
      * spell which is actually a skill.
      */
-    if (GET_OBJ_VAL(obj, val) < 0)
-        error = TRUE;
-    if (GET_OBJ_VAL(obj, val) > TOP_SPELL_DEFINE)
-        error = TRUE;
+    if (GET_OBJ_VAL(obj, val) < 0) {
+	    log("SYSERR: Object #%d (%s) has out of range spell (less then 0) (%s) #%d.",
+		nr, obj->short_description, skill_name(GET_OBJ_VAL(obj, val)), GET_OBJ_VAL(obj, val));
+	    return (error = TRUE);
+    }
+    if (GET_OBJ_VAL(obj, val) > TOP_SPELL_DEFINE) {
+	    log("SYSERR: Object #%d (%s) has out of range spell (bigger then %d) (%s) #%d.",
+		nr, obj->short_description, TOP_SPELL_DEFINE, skill_name(GET_OBJ_VAL(obj, val)), GET_OBJ_VAL(obj, val));
+	    return (error = TRUE);
+    }
     if (GET_OBJ_VAL(obj, val) > MAX_SPELLS
-            && GET_OBJ_VAL(obj, val) <= MAX_SKILLS)
-        error = TRUE;
-    if (error)
-        log("SYSERR: Object #%d (%s) has out of range spell #%d.",
-            nr, obj->short_description, GET_OBJ_VAL(obj,
-                                                    val));
+	&& GET_OBJ_VAL(obj, val) < MAX_SKILLS) {
+	    log("SYSERR: Object #%d (%s) has out of range spell (assigning a skill!) (%s) #%d.",
+		nr, obj->short_description, skill_name(GET_OBJ_VAL(obj, val)), GET_OBJ_VAL(obj, val));
+	    return (error = TRUE);
+	}   
 
     /*
      * This bug has been fixed, but if you don't like the special behavior...

@@ -170,6 +170,8 @@ extern NOTE_DATA *changes_list;
 
 extern int TEMP_LOAD_CHAR;
 /* public procedures in db.c */
+float bytesToSize(int by);
+const char *bytesToUnit(int b);
 void boot_db(void);
 void destroy_db(void);
 //mord ? ?

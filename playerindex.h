@@ -28,47 +28,6 @@ extern int auto_pwipe;
 #define TOGGLE_BIT(var,bit) ((var) ^= (bit))
 #endif
 
-
-class MudException {
-public:
-    MudException() {
-        msg = "";
-        num = -1;
-    }
-    MudException(const char *m) {
-        msg = m;
-        num = -1;
-    }
-    MudException(string &m) {
-        msg = m;
-        num = -1;
-    }
-    MudException(const char *m, int n) {
-        msg = m;
-        num = n;
-    }
-    MudException(string &m, int n) {
-        msg = m;
-        num = n;
-    }
-    MudException(string m, int n) {
-	    msg = m;
-	    num = n;
-    }
-    const char * Message() {
-        return msg.c_str();
-    }
-    int Number() {
-        return num;
-    }
-
-private:
-    string msg;
-    int num;
-
-};
-
-
 struct player_index_element {
     char *name;
     long id;

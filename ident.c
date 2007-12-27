@@ -12,7 +12,7 @@
  *  Copyright (C) 1997 by Joachim Pileborg
  *  All rights reserved.
  *
- * $Id: ident.c,v 1.3 2006/05/30 09:14:20 w4dimenscor Exp $
+ * $Id: ident.c,v 1.4 2007/08/23 20:41:29 w4dimenscor Exp $
  */
 
 #include "conf.h"
@@ -32,7 +32,7 @@
 /*******************************************************************/
 
 int id_serv_socket  = -1;
-
+#if 0
 /*******************************************************************/
 
 extern int lookup_hostname;
@@ -160,7 +160,7 @@ void id_lookup(Descriptor *d)
   {
     /* get the hostname */
     if (lookup_hostname && (str = id_lookup_hostname(d->saddr)) != NULL)
-      strcpy(d->host_name, str);
+      d->host_name = str;
     /* get the username */
     if (lookup_username && (str = id_lookup_username(d->saddr)) != NULL)
       strcpy(d->user_name, str);
@@ -342,7 +342,7 @@ static char *id_lookup_username(struct sockaddr_in sa)
   return NULL;
 }
 
-
+#endif
 
 /*******************************************************************/
 

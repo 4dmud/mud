@@ -195,7 +195,7 @@ void redit_setup_existing(Descriptor *d, room_vnum v_num)
   OLC_ROOM(d) = new Room();
 
   *OLC_ROOM(d) = *world_vnum[v_num];
-
+  OLC_ROOM(d)->SetDesc(-1);
   OLC_ROOM(d)->copy_room_strings(world_vnum[v_num]);
   /*
    * Attach copy of room to player's descriptor.
@@ -619,6 +619,7 @@ void redit_parse(Descriptor *d, char *arg)
       /*
        * Free everything up, including strings, etc.
        */
+	    OLC_ROOM(d)->free_room_strings();
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:
@@ -1384,12 +1385,8 @@ void redit_string_cleanup(Descriptor *d, int terminator)
 	  redit_disp_menu(d);
 	  break;
   case REDIT_DESC:
-	  if (STRINGADD_SAVE == terminator) {
-		  OLC_ROOM(d)->SetDescription(OLC_ROOM(d)->t_description);
-		  if (OLC_ROOM(d)->t_description)
-		  free(OLC_ROOM(d)->t_description);
-	  }
-		  
+	  if (STRINGADD_SAVE == terminator) 
+		  OLC_ROOM(d)->AssignTempDesc();		  
 	  redit_disp_menu(d);
     break;
   case REDIT_EXIT_DESCRIPTION:

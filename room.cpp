@@ -74,6 +74,7 @@ Room::Room() {
 }
 Room::~Room() {
     free_room_strings();
+
     /* free any assigned scripts */
     if (SCRIPT(this))
         extract_script(this, WLD_TRIGGER);
@@ -89,6 +90,7 @@ int Room::free_room_strings() {
 
     free_string(&name);
     free_string(&t_description);
+
     FreeDescription();
     free_string(&smell);
     free_string(&listen);
@@ -149,7 +151,10 @@ int Room::copy_room_strings(Room *source) {
         log("SYSERR: GenOLC: copy_room_strings: NULL values passed.");
         return FALSE;
     }
-    SetDescription(source->GetDescription());
+    /** this should be done way nicer, but hey! - Mord **/
+    t_description = strdup(source->GetDescription());
+    AssignTempDesc();
+    
     name = str_udup(source->name);
 
     smell = str_udup(source->smell);
@@ -180,35 +185,41 @@ int Room::copy_room_strings(Room *source) {
 
 
 const char *Room::GetDescription() {
-    //return description;
+    char * tmp = "";
     if (DescID != -1)
-        return compressor.InflateFromId(DescID);
+        tmp = compressor.InflateFromId(DescID);
+
+    if (tmp != NULL)
+        return tmp;
     else
-        return NULL;
+        return "";
 }
 void Room::SetDescription(char *p) {
     if (!p)
         return;
     //description = str_udup(p);
     if (DescID != -1)
-        DescID = compressor.CompressToId(p, false);
-    else
-        DescID = compressor.CompressToId(p, false);
+        compressor.DeleteId(DescID);
+    //  DescID = compressor.CompressToId(p, true);
+    // else
+    DescID = compressor.CompressToId(p, false);
 }
 void Room::SetDescription(const char *p) {
     if (!p)
         return;
     //description = str_udup(p);
     if (DescID != -1)
-        DescID = compressor.CompressToId(p, DescID, false);
-    else
-        DescID = compressor.CompressToId(p, false);
+        compressor.DeleteId(DescID);
+    // DescID = compressor.CompressToId(p, DescID, true);
+    //else
+    DescID = compressor.CompressToId(p, false);
 }
 void Room::FreeDescription() {
     if (description)
         free(description);
     description = NULL;
     compressor.DeleteId(DescID);
+    DescID = -1;
 }
 void Room::AssignTempDesc() {
     if (t_description) {
@@ -216,12 +227,19 @@ void Room::AssignTempDesc() {
             free(description);
         //description = t_description;
         if (DescID != -1)
-            DescID = compressor.CompressToId(t_description, DescID, false);
-        else
-            DescID = compressor.CompressToId(t_description, false);
+            compressor.DeleteId(DescID);
+        //   DescID = compressor.CompressToId(t_description, DescID, true);
+        //else
+        DescID = compressor.CompressToId(t_description, false);
         free(t_description);
         t_description = NULL;
     }
+}
+long Room::GetDesc() {
+    return DescID;
+}
+void Room::SetDesc(long id) {
+    DescID = id;
 }
 bool Room::HasDesc() {
     //return (description != NULL);
