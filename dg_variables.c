@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2007/06/07 11:38:07 $                                           * 
-*  $Revision: 1.49 $                                                      *
+*  $Date: 2007/06/07 12:18:39 $                                           * 
+*  $Revision: 1.50 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -1469,6 +1469,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                         snprintf(str, slen, "%d", cnt);
                     } else
                         snprintf(str, slen, "0");
+                } else if (!strcasecmp(field, "contained_by")) {
+                    if (o->in_obj!=NULL)
+                        snprintf(str, slen,"%c%ld",UID_CHAR, (long)o->in_obj);
+                    else
+                        strcpy(str, "");
                 }
                 break;
             case 'd':
