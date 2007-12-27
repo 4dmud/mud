@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.80  2007/11/14 20:01:14  w4dimenscor
+ * removed some threading from the code
+ *
  * Revision 1.79  2007/09/01 19:09:24  w4dimenscor
  * Changed error message if you try to talk on wiznet while having it turned off.
  *
@@ -315,7 +318,7 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "strutil.h"
-#include "dlib/threads.h"
+//#include "dlib/threads.h"
 #include "compressor.h"
 
 /*   external vars  */
@@ -3870,7 +3873,7 @@ ACMD(do_topgold) {
         ch->Send( "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount);
 
 }
-
+#if 0
 class hosts_lookup : public threaded_object {
 public:
     hosts_lookup(string fn, Character *c) {
@@ -3913,7 +3916,8 @@ private:
         TEMP_LOAD_CHAR = FALSE;
     }
 };
-
+#endif
+#if 0
 ACMD(do_hostfind) {
     skip_spaces(&argument);
     if (!argument || !*argument) {
@@ -3921,10 +3925,11 @@ ACMD(do_hostfind) {
         return;
     }
     ch->Send("Searching for hosts now, we will get back to you with results shortly.\r\n");
-    hosts_lookup hl(argument, ch);
+    //hosts_lookup hl(argument, ch);
     return;
 }
-ACMD(do_hostfindr) {
+#endif
+ACMD(do_hostfind) {
     int j;
     Character *victim = NULL;
     skip_spaces(&argument);
