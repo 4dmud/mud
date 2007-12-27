@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.13 $
+*  $Date: 2006/08/31 10:39:16 $
+*  $Revision: 1.14 $
 **************************************************************************/
 
 #include "conf.h"
@@ -615,7 +615,7 @@ WCMD(do_wload)
         return;
       }
     }
-    if ((mob = read_mobile(num, VIRTUAL)) == NULL)
+    if ((mob = read_mobile(num)) == NULL)
     {
       wld_log(room, "wload: bad mob vnum");
       return;

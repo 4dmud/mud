@@ -524,8 +524,8 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
     case 'M':
       d->Output( "%sLoad %s [%s%d%s], Max : %d",
               MYCMD.if_flag ? " then " : "",
-              mob_proto[MYCMD.arg1]->player.short_descr, cyn,
-              mob_index[MYCMD.arg1].vnum, yel, MYCMD.arg2
+              GetMobProto(MYCMD.arg1)->player.short_descr, cyn,
+              MYCMD.arg1, yel, MYCMD.arg2
               );
       break;
     case 'G':
@@ -1093,7 +1093,8 @@ void zedit_parse(Descriptor *d, char *arg)
     }
     switch (OLC_CMD(d).command) {
     case 'M':
-      if ((pos = real_mobile(atoi(arg))) != NOBODY) {
+    pos = atoi(arg);
+      if (MobProtoExists(pos)) {
 	OLC_CMD(d).arg1 = pos;
 	zedit_disp_arg2(d);
       } else

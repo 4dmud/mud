@@ -9,8 +9,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/17 10:53:49 $
-*  $Revision: 1.7 $
+*  $Date: 2006/08/31 10:39:16 $
+*  $Revision: 1.8 $
 ************************************************************************ */
 
 #include "conf.h"
@@ -315,7 +315,7 @@ void assign_triggers(void *i, int type)
       {
         new_mudlog(BRF, LVL_BUILDER, TRUE,
                    "SYSERR: trigger #%d non-existant, for mob #%d",
-                   trg_proto->vnum, mob_index.size() <= mob->nr ? mob_index[mob->nr].vnum : -1);
+                   trg_proto->vnum, mob->vnum);
       }
       else
       {

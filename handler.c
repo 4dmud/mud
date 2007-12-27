@@ -1285,12 +1285,12 @@ Character *get_char_room(const char *name, int *number, room_rnum room)
 
 
 /* search all over the world for a char num, and return a pointer if found */
-Character *get_char_num(mob_rnum nr)
+Character *get_char_num(mob_vnum nr)
 {
   Character *i;
 
   for (i = character_list; i; i = i->next)
-    if (GET_MOB_RNUM(i) == nr)
+    if (GET_MOB_VNUM(i) == nr)
       return (i);
 
   return (NULL);
@@ -2090,12 +2090,12 @@ void extract_char_final(Character *ch)
   char_from_room(ch);
   if (IS_NPC(ch))
   {
-    if (GET_MOB_RNUM(ch) != NOTHING)    /* prototyped */
-      mob_index[GET_MOB_RNUM(ch)].number--;
+    if (GET_MOB_VNUM(ch) != NOBODY && !ch->proto)    /* prototyped */
+      GetMobIndex(GET_MOB_VNUM(ch))->number--;
     clearMemory(ch);
     if (SCRIPT(ch))
       extract_script(ch, MOB_TRIGGER);
-    if (GET_MOB_RNUM(ch) == NOTHING || ch->proto_script != mob_proto[GET_MOB_RNUM(ch)]->proto_script)
+    if (ch->proto || !MobProtoExists(GET_MOB_VNUM(ch)) || ch->proto_script != GetMobProto(GET_MOB_VNUM(ch))->proto_script)
       free_proto_script(ch, MOB_TRIGGER);
     if (SCRIPT_MEM(ch))
       extract_script_mem(SCRIPT_MEM(ch));

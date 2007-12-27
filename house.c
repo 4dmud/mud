@@ -1199,7 +1199,7 @@ return;
     extract_char(tch);
 
   }
-  pet = read_mobile(mount, VIRTUAL);
+  pet = read_mobile(mount);
   GET_EXP(pet) = 0;
   SET_BIT_AR(AFF_FLAGS(pet), AFF_CHARM);
   char_to_room(pet, IN_ROOM(ch));

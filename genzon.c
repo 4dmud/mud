@@ -333,10 +333,10 @@ int Zone::write_zone() {
                 log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", this->number,ZPCMD(subcmd).command, subcmd, ZPCMD(subcmd).arg3);
                 exit(1);
             }
-            arg1 = mob_index.at(ZPCMD(subcmd).arg1).vnum;
+            arg1 = ZPCMD(subcmd).arg1;
             arg2 = ZPCMD(subcmd).arg2;
             arg3 = ZPCMD(subcmd).arg3;
-            comment = mob_proto[ZPCMD(subcmd).arg1]->player.short_descr;
+            comment = GetMobProto(ZPCMD(subcmd).arg1)->player.short_descr;
             break;
         case 'O':
             if (real_room(ZPCMD(subcmd).arg3) == NULL) {

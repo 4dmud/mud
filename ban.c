@@ -322,11 +322,6 @@ int Valid_Name(char *newname)
     for (i = 0; i < num_invalid; i++)
 	if (strstr(tempname, invalid_list[i]))
 	    return (0);
-	    
-/*  for (i = 0; i < top_of_mobt; i++) {
-    if (isname(tempname, mob_proto[i].player.name))
-      return 0;
-  }*/
 
     return (1);
 }

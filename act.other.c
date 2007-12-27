@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.other.c,v $
+ * Revision 1.36  2006/08/31 10:39:16  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.35  2006/08/25 06:39:43  w4dimenscor
  * fixed the way skills would be deleted when you quit
  *
@@ -415,7 +418,7 @@ void list_kills_to_char(Character *ch)
 {
   char line[MAX_INPUT_LENGTH];
   char *first, *last;
-  mob_rnum rnum;
+  Character *pmob = NULL;
   int found = 0;
   if (SPECIALS(ch)->KillsCount() == 0)
   {
@@ -430,15 +433,16 @@ void list_kills_to_char(Character *ch)
     if ((it->second)->vnum == NOBODY)
       continue;
 
-    if ((rnum = real_mobile((it->second)->vnum)) != NOTHING)
+    if (MobProtoExists((it->second)->vnum))
     {
+      pmob = GetMobProto((it->second)->vnum);
       first = asctime(localtime(&(it->second)->first));
       first += 4;
       //*(first + strlen(first) - 2) = '\0';
       last = asctime(localtime(&(it->second)->last));
       last += 4;
       //*(last + 11 ) = '\0';
-      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", (it->second)->count, mob_proto[rnum]->player.short_descr, GET_LEVEL(mob_proto[rnum]),  last);
+      snprintf(line, sizeof(line), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", (it->second)->count, pmob->player.short_descr, GET_LEVEL(pmob),  last);
       DYN_RESIZE(line);
       found++;
     }

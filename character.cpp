@@ -298,29 +298,26 @@ void Character::freeself() {
 
         delete player_specials;
     }
-    if (!IS_NPC(this) || (IS_NPC(this) && GET_MOB_RNUM(this) == NOBODY)) {
+    if (!IS_NPC(this) || proto || !MobProtoExists(vnum)) {
 
         /* free script proto list */
         free_proto_script(this, MOB_TRIGGER);
 
-        free_join_list(mob_specials.join_list);
+//        free_join_list(mob_specials.join_list);
         mob_specials.join_list = NULL;
         free_char_strings();
-
-
-    } else if ((i = GET_MOB_RNUM(this)) != NOBODY) {
+    } else if (!proto) {
         /* otherwise, free strings only if the string is not pointing at proto */
         free_non_proto_strings();
         /* free script proto list if it's not the prototype */
-        if (proto_script && proto_script != mob_proto[i]->proto_script)
+        if (proto_script && proto_script != GetMobProto(vnum)->proto_script)
             free_proto_script(this, MOB_TRIGGER);
 
-        if (mob_specials.join_list && mob_specials.join_list != mob_proto[i]->mob_specials.join_list)
+        if (mob_specials.join_list && mob_specials.join_list != GetMobProto(vnum)->mob_specials.join_list)
             free_join_list(mob_specials.join_list);
         mob_specials.join_list = NULL;
 
         damage_count_free(this);
-
     }
 
     /* free any assigned scripts */
@@ -347,7 +344,7 @@ void Character::clear() {
     FIGHTING(this) = NULL;
     GET_NEXT_SKILL(this) = TYPE_UNDEFINED;
     GET_NEXT_VICTIM(this) = -1;
-    GET_MOB_RNUM(this) = NOBODY;
+    //GET_MOB_RNUM(this) = NOBODY;
     GET_WAS_IN(this) = NULL;
     GET_POS(this) = POS_STANDING;
     mob_specials.default_pos = POS_STANDING;
@@ -576,7 +573,8 @@ void Character::default_char() {
     time_t tme = time(0);
     if (!this)
         return;
-
+    vnum = NOBODY;
+    proto = TRUE;
     master 			= NULL;
     desc 				= NULL;
     proto_script 		= NULL;
@@ -719,6 +717,15 @@ void Character::default_char() {
     GET_CLAN_RANK(this) 		= 0;
     GET_SPEED(this) 		= 0;
     GET_OLC_ZONE(this) 		= 0;
+    GET_MRACE(this) 		= 0;
+    MOB_SKIN(this)         	= -1;
+    char_specials.next_in_chair = NULL;
+    last_move = 0;
+    sweep_damage = 0;
+    pulling = NOBODY;
+    on_task = 0;
+    fused_to = 0;
+    
 
     
 
@@ -726,18 +733,10 @@ void Character::default_char() {
 }
 
 char * mob_name_by_vnum(mob_vnum &v) {
-unsigned int j = 0;
-try {
-    for (vector<index_data>::iterator i = mob_index.begin(); i != mob_index.end(); i++,j++)
-        if ((*i).vnum == v &&
-        (mob_proto[j]) != NULL &&
-        mob_proto.at(j)->player.short_descr != NULL)
-            return mob_proto.at(j)->player.short_descr;
+if (MobProtoExists(v))
+            return GetMobProto(v)->player.short_descr;
 
     return "";
-} catch (runtime_error & e) {
-return "";
-}
 }
 void Character::remove_all_affects() {
     while (affected)
@@ -911,8 +910,8 @@ Character *Character::assign (Character *b) {
     /** Character Class Values **/
     if (b == NULL)
         return this;
-    mp = mob_proto[b->nr];
-    chch = mob_proto[nr];
+    mp = GetMobProto(b->vnum);
+    chch = GetMobProto(vnum);
     /** free non proto strings so they can share the new mob proto's strings */
     free_non_proto_strings();
     pfilepos = b->pfilepos;
@@ -1066,7 +1065,7 @@ Character *Character::assign (Character *b) {
     pet = b->pet;
 
 
-    nr = b->nr;         /* Mob's rnum                    */
+//    nr = b->nr;         /* Mob's rnum                    */
     //struct travel_point_data *travel_list;
     if (mp && chch)
         log("mob names: %s, and %s", mp->player.name, chch->player.name);
@@ -1077,7 +1076,7 @@ Character *Character::assign (Character *b) {
 void Character::free_non_proto_strings() {
 
     if (IS_MOB(this)) {
-        Character *mp = mob_proto[nr];
+        Character *mp = GetMobProto(vnum);
 
         if (player.name && player.name != mp->player.name) {
             free_string(&player.name);

@@ -204,7 +204,7 @@ int save_killlist(int id, struct kill_data *kills);
 #if USE_CREATE_CHAR
 Character *create_char(void);
 #endif
-Character *read_mobile(mob_vnum nr, int type);
+Character *read_mobile(mob_vnum nr);
 int vnum_mobile(char *searchname, Character *ch);
 void save_player_index(void);
 
@@ -503,9 +503,9 @@ extern player_special_data dummy_mob;
 extern struct social_messg *soc_mess_list;
 extern int top_of_socialt;
 extern obj_rnum top_of_objt;
-extern mob_rnum top_of_mobt;
+//extern mob_rnum top_of_mobt;
 extern zone_rnum top_of_zone_table;
-extern vector <index_data> mob_index;
+extern map<mob_vnum, struct index_data*> mob_index;
 extern struct index_data *obj_index;
 extern struct shop_data *shop_index;
 extern int top_shop;
@@ -516,8 +516,7 @@ extern long max_mob_id;
 extern long max_obj_id;
 extern int dg_owner_purged;
 extern vector <Room *> world_vnum;
-extern vector <Character *> mob_proto;
-typedef vector<Character *>::iterator mp_iter;
+//extern map<mob_vnum, Character *> mob_proto;
 extern struct obj_data *obj_proto;
 //extern Zone *zone_table;
 extern vector <Zone> zone_table;
@@ -549,6 +548,19 @@ typedef CharacterList::iterator CharacterListIterator;
 
 typedef list <Descriptor*> DescriptorList;
 typedef DescriptorList::iterator DescriptorListIterator;
-
-typedef vector <Character *>::iterator mp_iter;
 typedef vector <Room *>::iterator WorldIterator;
+
+typedef map<mob_vnum, Character *>::iterator mp_iter;
+typedef map<mob_vnum, struct index_data *>::iterator mi_iter;
+
+bool MobProtoExists(mob_vnum nv);
+Character * GetMobProto(mob_vnum vn);
+void SetMobProto(mob_vnum vn, Character *c);
+int GetMobProtoCount();
+mob_vnum DeleteMobProto(mob_vnum vn);
+
+bool MobIndexExists(mob_vnum nv);
+struct index_data * GetMobIndex(mob_vnum vn);
+void SetMobIndex(mob_vnum vn, struct index_data *c);
+int GetMobIndexCount();
+mob_vnum DeleteMobIndex(mob_vnum vn);

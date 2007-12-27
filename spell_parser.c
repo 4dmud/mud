@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.31  2006/08/31 10:39:17  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.30  2006/08/25 10:22:44  w4dimenscor
  * added command to fix peoples skills back to the practiced amount they were at
  *
@@ -504,7 +507,7 @@ int call_magic(Character *caster, Character *cvict,
     }
 
 
-    if (caster->nr != real_mobile(DG_CASTER_PROXY) ||
+    if (caster->vnum != DG_CASTER_PROXY ||
             (casttype != CAST_BREATH
              || (casttype == CAST_BREATH && !IS_NPC(caster)))) {
         if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC) && GET_NAME(caster)) {
@@ -1239,7 +1242,7 @@ int knows_spell(Character *ch, int spell) {
     int i, gm, t;
     int ret_val = 0;
     if (IS_NPC(ch)) {
-        if (ch->nr == real_mobile(DG_CASTER_PROXY))
+        if (ch->vnum == DG_CASTER_PROXY)
             return TRUE;
         else if (spell >= SPELL_FIRE_BREATH && spell <= SPELL_LIGHTNING_BREATH)
             return TRUE;

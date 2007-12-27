@@ -56,7 +56,7 @@ void extract_obj_q(struct obj_data *obj);
 /* ******* characters ********* */
 
 Character *get_char_room(const char *name, int *number, room_rnum room);
-Character *get_char_num(mob_rnum nr);
+Character *get_char_num(mob_vnum nr);
 Character *get_char(char *name);
 Character *get_char(const char *name);
 

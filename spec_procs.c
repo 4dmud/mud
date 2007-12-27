@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.20  2006/08/31 10:39:17  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.19  2006/08/25 10:22:44  w4dimenscor
  * added command to fix peoples skills back to the practiced amount they were at
  *
@@ -1138,7 +1141,7 @@ SPECIAL(pet_shops) {
         }
         ch->Gold( -PET_PRICE(pet), GOLD_HAND);
 
-        pet = read_mobile(GET_MOB_RNUM(pet), REAL);
+        pet = read_mobile(GET_MOB_VNUM(pet));
         GET_EXP(pet) = 0;
         SET_BIT_AR(AFF_FLAGS(pet), AFF_CHARM);
         pet->Gold(-GET_GOLD(pet), GOLD_HAND);
@@ -1546,7 +1549,6 @@ SPECIAL(guard_black) {
 }
 
 SPECIAL(bottle) {
-    int vnum = 0;
     struct obj_data *obj = (struct obj_data *) me;
     Character *mob;
     ACMD(do_hit);
@@ -1557,8 +1559,7 @@ SPECIAL(bottle) {
                 && GET_OBJ_VAL(obj, 1) != 0) {
             if (GET_OBJ_VNUM(obj) == 216) {
                 GET_OBJ_VAL(obj, 1) = 0;	// open the object
-                vnum = real_mobile(204);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(204);
                 act("As you open the bottle, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR);
                 act("As $n opens the bottle, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM);
                 act("Going into a blood frenzy, $E attacks you!",
@@ -1571,8 +1572,7 @@ SPECIAL(bottle) {
                 return TRUE;
             } else if (GET_OBJ_VNUM(obj) == 1144) {
                 GET_OBJ_VAL(obj, 1) = 0;	// open the bottle
-                vnum = real_mobile(1163);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(1163);
                 act("$N crawls out of the box and stings your hand!",
                     FALSE, ch, 0, mob, TO_CHAR);
                 act("$N crawls out of the box and stings $n on the hand.",
@@ -1584,8 +1584,7 @@ SPECIAL(bottle) {
                 return TRUE;
             } else if (GET_OBJ_VNUM(obj) == 7563) {
                 GET_OBJ_VAL(obj, 1) = 0;	// open the bottle
-                vnum = real_mobile(7557);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(7557);
                 act("$N crawls out of the box and stings your hand!",
                     FALSE, ch, 0, mob, TO_CHAR);
                 act("$N crawls out of the box and stings $n on the hand.",
@@ -1597,8 +1596,7 @@ SPECIAL(bottle) {
                 return TRUE;
             } else if (GET_OBJ_VNUM(obj) == 1144) {
                 GET_OBJ_VAL(obj, 1) = 0;	// open the bottle
-                vnum = real_mobile(1163);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(1163);
                 act("$N crawls out of the box and stings your hand!",
                     FALSE, ch, 0, mob, TO_CHAR);
                 act("$N crawls out of the box and stings $n on the hand.",
@@ -1610,8 +1608,8 @@ SPECIAL(bottle) {
                 return TRUE;
             } else if (GET_OBJ_VNUM(obj) == 11245) {
                 GET_OBJ_VAL(obj, 1) = 0;
-                mob = read_mobile(real_mobile(11229), REAL);
-                act("The valut guard rushes into the room, with his great long sword, ready to strike.", FALSE, ch, 0, mob, TO_ROOM);
+                mob = read_mobile(11229);
+                act("The vault guard rushes into the room, with his great long sword, ready to strike.", FALSE, ch, 0, mob, TO_ROOM);
                 act("The vault guard rushes into the room, with his great long sword, ready to attack you.", FALSE, ch, 0, mob, TO_VICT);
                 GET_POS(ch) = POS_SITTING;
                 WAIT_STATE(ch, PULSE_VIOLENCE * 2);
@@ -1620,7 +1618,7 @@ SPECIAL(bottle) {
                 return TRUE;
             } else if (GET_OBJ_VNUM(obj) == 11244) {
                 GET_OBJ_VAL(obj, 1) = 0;
-                mob = read_mobile(real_mobile(11096), REAL);
+                mob = read_mobile(11096);
                 act("The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_VICT);
                 act("The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_ROOM);
                 GET_POS(ch) = POS_SITTING;
@@ -1635,7 +1633,6 @@ SPECIAL(bottle) {
 }
 
 SPECIAL(door_down) {
-    int vnum = 0;
     int door = -1;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct obj_data *obj = NULL;
@@ -1655,8 +1652,7 @@ SPECIAL(door_down) {
                 door = find_door(ch, type, dir, cmd_door[SCMD_OPEN]);
             if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)) {
                 do_doorcmd(ch, obj, door, SCMD_OPEN);
-                vnum = real_mobile(204);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(204);
                 act("As you open the trapdoor, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR);
                 act("As $n opens the trapdoor, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM);
                 act("Going into a blood frenzy, $E attacks you!", FALSE,
@@ -1674,7 +1670,6 @@ SPECIAL(door_down) {
 }
 
 SPECIAL(door_down_7377) {
-    int vnum = 0;
     int door = -1;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct obj_data *obj = NULL;
@@ -1695,8 +1690,7 @@ SPECIAL(door_down_7377) {
                 door = find_door(ch, type, dir, cmd_door[SCMD_OPEN]);
             if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED)) {
                 do_doorcmd(ch, obj, door, SCMD_OPEN);
-                vnum = real_mobile(7376);
-                mob = read_mobile(vnum, REAL);
+                mob = read_mobile(7376);
                 act("A green, slimy THING slithers out of the toilet and bites off your... whatever!", FALSE, ch, 0, mob, TO_CHAR);
                 act("As $n opens the lid, a green, slimy THING slithers out of the toilet and bites $m. Ouch!", FALSE, ch, 0, mob, TO_ROOM);
                 act("You feel {cWDIMINISHED!{c0", FALSE, ch, 0, mob,
@@ -1999,8 +1993,7 @@ SPECIAL(fire) {
     }
 
     /* now that you can go that way, find the next room */
-    if CAN_GO2
-    (room, dir)
+    if (CAN_GO2(room, dir))
         nextroom = EXIT2(room, dir)->to_room;
     else
         nextroom = NULL;
@@ -2073,8 +2066,7 @@ SPECIAL(fire) {
 
         /* target wasnt in the room, move to next room */
         room = nextroom;
-        if CAN_GO2
-        (room, dir)
+        if (CAN_GO2(room, dir))
             nextroom = EXIT2(room, dir)->to_room;
         else
             nextroom = NULL;

@@ -60,8 +60,8 @@ void delete_one_join(Character *mob, int i);
  * Handy internal macros.
  */
 #if CONFIG_OASIS_MPROG
-#define GET_MPROG(mob)		(mob_index[(mob)->nr].mobprogs)
-#define GET_MPROG_TYPE(mob)	(mob_index[(mob)->nr].progtypes)
+#define GET_MPROG(mob)		(GetMobIndex((mob)->vnum)->mobprogs)
+#define GET_MPROG_TYPE(mob)	(GetMobIndex((mob)->vnum)->progtypes)
 #endif
 
 /*-------------------------------------------------------------------*/
@@ -80,7 +80,7 @@ const char *medit_get_mprog_type(struct mob_prog_data *mprog);
 /*-------------------------------------------------------------------*/
 
 ACMD(do_oasis_medit) {
-    int number = NOBODY, save = 0, real_num;
+    int number = NOBODY, save = 0;
     Descriptor *d;
     char *buf3;
     char buf1[MAX_STRING_LENGTH];
@@ -203,10 +203,10 @@ ACMD(do_oasis_medit) {
     /** If this is a new mobile, setup a new one, otherwise, setup the         **/
     /** existing mobile.                                                       **/
     /****************************************************************************/
-    if ((real_num = real_mobile(number)) == NOBODY)
+    if (!MobProtoExists(number))
         medit_setup_new(d);
     else
-        medit_setup_existing(d, real_num);
+        medit_setup_existing(d, number);
 
     STATE(d) = CON_MEDIT;
 
@@ -234,8 +234,6 @@ void medit_setup_new(Descriptor *d) {
     mob = new Character();
 
     init_mobile(mob);
-
-    GET_MOB_RNUM(mob) = NOBODY;
     /*
      * Set up some default strings.
      */
@@ -262,15 +260,14 @@ void medit_setup_new(Descriptor *d) {
 
 /*-------------------------------------------------------------------*/
 
-void medit_setup_existing(Descriptor *d, int rmob_num) {
+void medit_setup_existing(Descriptor *d, int rmob_vnum) {
     Character *mob = new Character();
 
     /*
      * Allocate a scratch mobile structure. 
      */
-    //CREATE(mob, Character, 1);
 
-    copy_mobile(mob, mob_proto[rmob_num]);
+    copy_mobile(mob, GetMobProto(rmob_vnum));
 
 #if CONFIG_OASIS_MPROG
 
@@ -302,7 +299,7 @@ void medit_setup_existing(Descriptor *d, int rmob_num) {
      * The edited mob must not have a script.
      * It will be assigned to the updated mob later, after editing.
      */
-    SCRIPT(mob) = NULL;
+    SCRIPT(OLC_MOB(d)) = NULL;
     OLC_MOB(d)->proto_script = NULL;
 
     medit_disp_menu(d);
@@ -343,30 +340,32 @@ void init_mobile(Character *mob) {
  * Save new/edited mob to memory.
  */
 void medit_save_internally(Descriptor *d) {
-    int i;
-    mob_rnum new_rnum;
-    Descriptor *dsc;
-    Character *mob;
+  //  int i;
+    mob_vnum new_vnum = OLC_NUM(d);
+    Character *mob, *pmob;
 
-    i = (real_mobile(OLC_NUM(d)) == NOBODY);
+   
 
-    if ((new_rnum = add_mobile(OLC_MOB(d), OLC_NUM(d))) == NOBODY) {
+    add_mobile(OLC_MOB(d), new_vnum);
+
+    if (!MobProtoExists(new_vnum)) {
         log("medit_save_internally: add_mobile failed.");
         return;
     }
+    pmob = GetMobProto(new_vnum);
 
 
     /* Update triggers */
     /* Free old proto list  */
-    if (mob_proto[new_rnum]->proto_script &&
-            mob_proto[new_rnum]->proto_script != OLC_SCRIPT(d))
-        free_proto_script(mob_proto[new_rnum], MOB_TRIGGER);
+    if (pmob->proto_script &&
+            pmob->proto_script != OLC_SCRIPT(d))
+        free_proto_script(pmob, MOB_TRIGGER);
 
-    mob_proto[new_rnum]->proto_script = OLC_SCRIPT(d);
+    pmob->proto_script = OLC_SCRIPT(d);
 
     /* this takes care of the mobs currently in-game */
     for (mob = character_list; mob; mob = mob->next) {
-        if (GET_MOB_RNUM(mob) != new_rnum)
+        if (GET_MOB_VNUM(mob) != new_vnum)
             continue;
 
         /* remove any old scripts */
@@ -374,11 +373,11 @@ void medit_save_internally(Descriptor *d) {
             extract_script(mob, MOB_TRIGGER);
 
         free_proto_script(mob, MOB_TRIGGER);
-        copy_proto_script(mob_proto[new_rnum], mob, MOB_TRIGGER);
+        copy_proto_script(pmob, mob, MOB_TRIGGER);
         assign_triggers(mob, MOB_TRIGGER);
     }
     /* end trigger update */
-
+#if 0
     if (!i)	/* Only renumber on new mobiles. */
         return;
 
@@ -391,7 +390,6 @@ void medit_save_internally(Descriptor *d) {
         else if (STATE(dsc) == CON_MEDIT)
             GET_MOB_RNUM(OLC_MOB(dsc)) += (GET_MOB_RNUM(OLC_MOB(dsc)) >= new_rnum);
     }
-
     /*
      * Update other people in zedit too. From: C.Raehl 4/27/99
      */
@@ -401,6 +399,7 @@ void medit_save_internally(Descriptor *d) {
                 if (OLC_ZONE(dsc)->cmd[i].command == 'M')
                     if (OLC_ZONE(dsc)->cmd[i].arg1 >= new_rnum)
                         OLC_ZONE(dsc)->cmd[i].arg1++;
+#endif
 }
 
 /**************************************************************************
@@ -554,7 +553,7 @@ void medit_disp_mob_owner(Descriptor *d) {
 }
 
 void medit_disp_mob_joins(Descriptor *d) {
-    int i, j = 0;
+    int j = 0;
     struct combine_data *temp = (OLC_MOB(d)->mob_specials.join_list);
 
     get_char_colors(d->character);
@@ -564,9 +563,8 @@ void medit_disp_mob_joins(Descriptor *d) {
     else {
 
         while (temp) {
-            i = real_mobile(temp->vnum);
-            if (i != NOTHING)
-                d->Output( "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, mob_proto[i]->player.short_descr);
+            if (MobProtoExists(temp->vnum))
+                d->Output( "%s%2d%s) [%5d] %s\r\n\r\n", grn, ++j, nrm, temp->vnum, GetMobProto(temp->vnum)->player.short_descr);
             temp = temp->next;
         }
     }
@@ -1309,12 +1307,13 @@ void medit_parse(Descriptor *d, char *arg) {
             OLC_MODE(d) = MEDIT_DELETE_SEGMENT;
             return;
         default:
-            if (((i = atoi(arg)) == 0 || i >= 999999) || i == GET_MOB_VNUM(OLC_MOB(d))) {
+        i = atoi(arg);
+            if (i == -1) {
+                break;
+            } else if (i == GET_MOB_VNUM(OLC_MOB(d))) {
                 d->Output( "That vnum is invalid!\r\n");
                 return;
-            } else if (i == -1) {
-                break;
-            } else if (!real_mobile(i)) {
+            } else if (!MobProtoExists(i)) {
                 d->Output( "That mob doesn't exist!\r\n");
                 return;
             } else

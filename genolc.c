@@ -265,8 +265,8 @@ ACMD(do_edit) {
     case 'm':
         switch (b[0]) {
         case 'd':
-            if ((idx = real_mobile(num)) != NOBODY) {
-                delete_mobile(idx);	/* Delete -> Real */
+            if (MobProtoExists(num)) {
+                delete_mobile(num);	/* Delete -> Real */
                 ch->Send( "%s", CONFIG_OK);
             } else
                 ch->Send( "What mobile?\r\n");
@@ -275,15 +275,15 @@ ACMD(do_edit) {
             save_mobiles(num);
             break;
         case 'c':
-            if ((num = real_mobile(num)) == NOBODY)
+            if (!MobProtoExists(num))
                 ch->Send( "What mobile?\r\n");
-            else if ((mun = real_mobile(mun)) == NOBODY)
+            else if (!MobProtoExists(mun))
                 ch->Send( "Can only copy over an existing mob.\r\n");
             else {
                 /* Otherwise the old ones have dangling string pointers. */
-                extract_mobile_all(mob_index.at(mun).vnum);
+                extract_mobile_all(GetMobIndex(mun)->vnum);
                 /* To <- From */
-                copy_mobile(mob_proto[mun], mob_proto[num]);
+                copy_mobile(GetMobProto(mun), GetMobProto(num));
                 ch->Send( "%s", CONFIG_OK);
             }
             break;

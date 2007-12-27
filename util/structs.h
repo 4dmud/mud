@@ -971,7 +971,7 @@ struct room_direction_data {
 
 
 /* ================== Memory Structure for room ======================= */
-Room {
+class Room {
    room_vnum number;		/* Rooms number	(vnum)		        */
    zone_rnum zone;                 /* Room zone (for resetting)            */
    int	  sector_type;          /* sector type (move/hide)              */
@@ -1224,7 +1224,7 @@ struct follow_type {
 
 
 /* ================== Structure for player/non-player ===================== */
-Character {
+class Character {
    int pfilepos;			 /* playerfile pos		  */
    mob_rnum nr;                          /* Mob's rnum			  */
    room_rnum in_room;                    /* Location (real room number)	  */
@@ -1317,7 +1317,7 @@ struct txt_q {
 };
 
 
-Descriptor {
+class Descriptor {
    socket_t	descriptor;	/* file descriptor for socket		*/
    char	host[HOST_LENGTH+1];	/* hostname				*/
    byte	bad_pws;		/* number of bad pw attemps this login	*/

@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.66  2006/08/31 10:39:16  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.65  2006/08/27 02:29:12  w4dimenscor
  * added a command to reset everyones skills based on logon time
  *
@@ -1248,8 +1251,8 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
             case 'M':
                 ch->Send( "%sLoad %s [%s%d%s], Max : %d\r\n",
                           ZOCMD.if_flag ? " then " : "",
-                          mob_proto[ZOCMD.arg1]->player.short_descr, cyn,
-                          mob_index[ZOCMD.arg1].vnum, yel, ZOCMD.arg2
+                          GetMobProto(ZOCMD.arg1)->player.short_descr, cyn,
+                          ZOCMD.arg1, yel, ZOCMD.arg2
                         );
                 break;
             case 'G':
@@ -1741,8 +1744,7 @@ void do_stat_character(Character *ch, Character *k) {
                   buf, (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")),
                   GET_NAME(k),IS_NPC(k) ? GET_ID(k) : GET_IDNUM(k), GET_ROOM_VNUM(IN_ROOM(k)));
         if (IS_MOB(k))
-            ch->Send( "Alias: %s, VNum: [%5d], RNum: [%5d]\r\n",
-                      k->player.name, GET_MOB_VNUM(k), GET_MOB_RNUM(k));
+            ch->Send( "Alias: %s, VNum: [%5d]\r\n", k->player.name, GET_MOB_VNUM(k));
 
 
         if (!IS_MOB(k))
@@ -1939,9 +1941,11 @@ void do_stat_character(Character *ch, Character *k) {
         }
         if (!IS_NPC(k) && PREG(k) > 0)
             ch->Send( "%d hours away from giving birth.\r\n", PREG(k));
+        if (IS_MOB(k) && MobIndexExists(GET_MOB_VNUM(k)))
+            ch->Send( "Mob Spec-Proc: %s",
+                      (GetMobIndex(GET_MOB_VNUM(k))->func != NULL ? "Exists" : "None"));
         if (IS_MOB(k))
-            ch->Send( "Mob Spec-Proc: %s, NPC Bare Hand Dam: %dd%d\r\n",
-                      (mob_index[GET_MOB_RNUM(k)].func ? "Exists" : "None"),
+            ch->Send(", NPC Bare Hand Dam: %dd%d\r\n",
                       k->mob_specials.damnodice, k->mob_specials.damsizedice);
 
         ch->Send( "Carried: weight: %d, items: %d; ",   IS_CARRYING_W(k), IS_CARRYING_N(k));
@@ -2418,7 +2422,6 @@ ACMD(do_load) {
     char *times = timesb;
     int tnum = 0;
     mob_vnum num;
-    mob_rnum r_num;
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
 
@@ -2440,12 +2443,12 @@ ACMD(do_load) {
         return;
     }
     if (is_abbrev(buf, "mob")) {
-        if ((r_num = real_mobile(num)) < 0) {
+        if (!MobProtoExists(num)) {
             ch->Send("There is no monster with the number %d.\r\n", num);
             return;
         }
         for ((tnum == 0 ? tnum = 1 : tnum) ;tnum>0; tnum--) {
-            mob = read_mobile(r_num, REAL);
+            mob = read_mobile(num);
             char_to_room(mob, IN_ROOM(ch));
         }
 
@@ -2454,6 +2457,7 @@ ACMD(do_load) {
         act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
         load_mtrigger(mob);
     } else if (is_abbrev(buf, "obj")) {
+    obj_rnum r_num;
         if ((r_num = real_object(num)) < 0) {
             ch->Send( "There is no object with the number %d.\r\n",num);
             return;
@@ -2519,11 +2523,11 @@ ACMD(do_vstat) {
         return;
     }
     if (is_abbrev(buf, "mob")) {
-        if ((r_num = real_mobile(num)) < 0) {
+        if (!MobProtoExists(num)) {
             ch->Send("There is no monster with the number %d.\r\n", num);
             return;
         }
-        mob = read_mobile(r_num, REAL);
+        mob = read_mobile(num);
         char_to_room(mob, world_vnum[0]);
         do_stat_character(ch, mob);
         extract_char(mob);
@@ -3845,8 +3849,8 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
             if (obj_index[i].vnum >= zone_table[zone].bot && obj_index[i].vnum <= zone_table[zone].top)
                 k++;
 
-        for (i = 0; i < top_of_mobt; i++)
-            if (mob_index[i].vnum >= zone_table[zone].bot && mob_index[i].vnum <= zone_table[zone].top)
+        for (i = zone_table[zone].bot; i <= zone_table[zone].top; i++)
+            if (MobProtoExists(i))
                 l++;
 
         m = count_shops(zone_table[zone].bot, zone_table[zone].top);
@@ -4106,7 +4110,7 @@ ACMD(do_show) {
             "  %5d triggers written\r\n",
             i, con,
             top_of_p_table + 1,
-            j, top_of_mobt + 1,
+            j, GetMobProtoCount(),
             k, top_of_objt + 1,
             top_of_world + 1, top_of_zone_table + 1,
             buf_largecount,

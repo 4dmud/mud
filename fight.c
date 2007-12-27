@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.48  2006/08/31 10:39:16  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.47  2006/08/25 06:39:43  w4dimenscor
  * fixed the way skills would be deleted when you quit
  *
@@ -2454,8 +2457,9 @@ int fe_after_damage(Character* ch, Character* vict,
                 forget(ch, vict);
         } else {
             if (IS_NPC(vict) && GET_SUB(ch, SUB_PILLAGE) > number(1, 101)) {
-                mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
-                bonus_gold = (int)(GET_GOLD(mob_proto[mrn]) * 0.25);
+                //mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
+                if (MobProtoExists(GET_MOB_VNUM(vict)))
+                bonus_gold = (int)(GET_GOLD(GetMobProto(GET_MOB_VNUM(vict))) * 0.25);
 
                 ch->Gold(bonus_gold, GOLD_HAND);
                 if (!number(0, 200))
@@ -5020,7 +5024,7 @@ void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
 
     room = IN_ROOM(ch);
 
-    if CAN_GO2(room, dir)
+    if (CAN_GO2(room, dir))
         nextroom = EXIT2(room, dir)->to_room;
     else
         nextroom = NULL;

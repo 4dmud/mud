@@ -76,7 +76,7 @@ struct command_info
  * Necessary for CMD_IS macro.  Borland needs the structure defined first
  * so it has been moved down here.
  */
-cpp_extern struct command_info *complete_cmd_info;
+extern struct command_info *complete_cmd_info;
 extern const struct command_info cmd_info[];
 
 /*

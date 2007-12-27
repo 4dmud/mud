@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.56  2006/08/31 10:39:17  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.55  2006/08/26 08:28:47  w4dimenscor
  * Fixed the saving of skills and subskills finally
  *
@@ -2468,6 +2471,16 @@ struct index_data {
         farg = NULL;
         proto = NULL;
     }
+
+    index_data(int v) {
+        vnum = v;
+        number = 0;
+        qic = NULL;
+        func = NULL;
+        farg = NULL;
+        proto = NULL;
+    }
+    
     ~index_data() {
         if (qic)
             delete qic;

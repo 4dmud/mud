@@ -452,8 +452,8 @@ void sedit_disp_menu(Descriptor *d)
 	  "Enter Choice : ",
 
 	  cyn, OLC_NUM(d), nrm,
-	  grn, nrm, cyn, S_KEEPER(shop) == NOBODY ? -1 : mob_index[S_KEEPER(shop)].vnum,
-	  nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : mob_proto[S_KEEPER(shop)]->player.short_descr,
+	  grn, nrm, cyn, S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop),
+	  nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : GetMobProto(S_KEEPER(shop))->player.short_descr,
 	  grn, nrm, cyn, S_OPEN1(shop), nrm,
 	  grn, nrm, cyn, S_CLOSE1(shop),
 	  grn, nrm, cyn, S_OPEN2(shop), nrm,
@@ -735,8 +735,8 @@ void sedit_parse(Descriptor *d, char *arg)
      */
   case SEDIT_KEEPER:
     i = atoi(arg);
-    if ((i = atoi(arg)) != -1)
-      if ((i = real_mobile(i)) == NOBODY) {
+    if (i != -1)
+      if (!MobProtoExists(i)) {
 	d->Output( "That mobile does not exist, try again : ");
 	return;
       }
@@ -747,8 +747,8 @@ void sedit_parse(Descriptor *d, char *arg)
      * Fiddle with special procs.
      */
     S_FUNC(OLC_SHOP(d)) =
-      mob_index[i].func != shop_keeper ? mob_index[i].func : NULL;
-    mob_index[i].func = shop_keeper;
+      GetMobIndex(i)->func != shop_keeper ? GetMobIndex(i)->func : NULL;
+    GetMobIndex(i)->func = shop_keeper;
     break;
   case SEDIT_OPEN1:
     S_OPEN1(OLC_SHOP(d)) = LIMIT(atoi(arg), 0, 28);
@@ -778,7 +778,7 @@ void sedit_parse(Descriptor *d, char *arg)
     sedit_namelist_menu(d);
     return;
   case SEDIT_NEW_PRODUCT:
-    if ((i = atoi(arg)) != -1)
+    if (i != -1)
       if ((i = real_object(i)) == NOTHING) {
 	d->Output( "That object does not exist, try again : ");
 	return;

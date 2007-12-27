@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.24  2006/08/31 10:39:16  w4dimenscor
+ * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
+ *
  * Revision 1.23  2006/08/13 06:26:51  w4dimenscor
  * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
  *
@@ -735,7 +738,7 @@ ACMD(do_mload) {
                 return;
             }
         }
-        if ((mob = read_mobile(num, VIRTUAL)) == NULL) {
+        if ((mob = read_mobile(num)) == NULL) {
             mob_log(ch, "mload: bad mob vnum");
             return;
 
@@ -1283,7 +1286,7 @@ ACMD(do_mtransform) {
     Character *m;//, tmpmob, *tm;
     obj_data *obj[NUM_WEARS];
     struct hunter_data *hunt = NULL, *hnext;
-    mob_rnum new_rnum;//this_rnum = GET_MOB_RNUM(ch), new_rnum;
+//    mob_rnum new_rnum;//this_rnum = GET_MOB_RNUM(ch), new_rnum;
     int keep_hp = 1;       /* new mob keeps the old mob's hp/max hp/exp */
     int pos;
     mob_vnum mvnum = 0;
@@ -1317,12 +1320,11 @@ ACMD(do_mtransform) {
         }
 
         if (mvnum != GET_MOB_VNUM(ch)) {
-            m = read_mobile(mvnum, VIRTUAL);
+            m = read_mobile(mvnum);
             if (m == NULL) {
                 mob_log(ch, "mtransform: bad mobile vnum");
                 return;
             }
-            new_rnum = GET_MOB_RNUM(m);
 
             /* move new obj info over to old object and delete new obj */
 
@@ -1333,8 +1335,8 @@ ACMD(do_mtransform) {
                     obj[pos] = NULL;
             }
 
-            if (GET_MOB_RNUM(ch) != NOBODY)
-                mob_index.at(GET_MOB_RNUM(ch)).number--;
+            if (!ch->proto && ch->vnum != NOBODY)
+                GetMobIndex(ch->vnum)->number--;
 
             /* put the mob in the same room as ch so extract will work */
             char_to_room(m, IN_ROOM(ch));

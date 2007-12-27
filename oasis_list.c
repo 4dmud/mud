@@ -197,6 +197,7 @@ void list_mobiles(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
   mob_rnum i;
   mob_vnum bottom, top;
   int counter = 0;
+  Character *pmob;
   
   if (rnum != NOWHERE) {
     bottom = zone_table[rnum].bot;
@@ -210,18 +211,20 @@ void list_mobiles(Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax)
   "Index VNum    Mobile Name                                   Level\r\n"
   "----- ------- --------------------------------------------- -----\r\n");
   
-  for (i = 0; i < mob_index.size(); i++) {
-    if (mob_index[i].vnum >= bottom && mob_index[i].vnum <= top) {
+  for (i = bottom; i <= top; i++) {
+  if (!MobProtoExists(i))
+  continue;
       counter++;
+      pmob = GetMobProto(i);
       
       ch->Send( "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
-        QGRN, counter, QNRM, QGRN, mob_index[i].vnum, QNRM,
-        QCYN, mob_proto[i]->player.short_descr,
-        QYEL, mob_proto[i]->player.level, QNRM,
-        mob_proto[i]->proto_script ? " [TRIG]" : ""
+        QGRN, counter, QNRM, QGRN, i, QNRM,
+        QCYN, pmob->player.short_descr,
+        QYEL, pmob->player.level, QNRM,
+        pmob->proto_script ? " [TRIG]" : ""
         );
       
-    }
+    
   }
   
   if (counter == 0)
@@ -297,7 +300,7 @@ void list_shops(Character *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax)
       shop = shop_index + i;
       /* the +1 is strange but fits the rest of the shop code */
       ch->Send( "%s%4d%s) [%s%-5d%s] [%s%-5d%s] [%s%-5d%s]",
-        QGRN, counter, QNRM, QGRN, SHOP_NUM(i), QNRM, QGRN, i + 1, QNRM, QGRN, S_KEEPER(shop) == NOBODY ? -1 : mob_index[S_KEEPER(shop)].vnum, QNRM); 
+        QGRN, counter, QNRM, QGRN, SHOP_NUM(i), QNRM, QGRN, i + 1, QNRM, QGRN, S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop), QNRM);
 	
       
       
@@ -370,12 +373,10 @@ void print_zone(Character *ch, zone_rnum rnum)
   /** Locate the largest of the three, top_of_world, top_of_mobt, or         **/
   /** top_of_objt.                                                           **/
   /****************************************************************************/
-  if (top_of_world >= top_of_objt && top_of_world >= top_of_mobt)
+  if (top_of_world >= top_of_objt)
     largest_table = top_of_world;
-  else if (top_of_objt >= top_of_mobt && top_of_objt >= top_of_world)
-    largest_table = top_of_objt;
   else
-    largest_table = top_of_mobt;
+    largest_table = top_of_objt;
   
   /****************************************************************************/
   /** Initialize some of the variables.                                      **/
@@ -394,11 +395,10 @@ void print_zone(Character *ch, zone_rnum rnum)
     if (i <= top_of_objt)
       if (obj_index[i].vnum >= bottom && obj_index[i].vnum <= top)
         size_objects++;
-    
-    if (i <= top_of_mobt)
-      if (mob_index[i].vnum >= bottom && mob_index[i].vnum <= top)
-        size_mobiles++;
   }
+  for (mi_iter it = mob_index.begin();it != mob_index.end();it++)
+      if ((it->first) >= bottom && (it->first) <= top)
+        size_mobiles++;
   
   /****************************************************************************/
   /** Display all of the zone information at once.                           **/

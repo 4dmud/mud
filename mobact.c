@@ -69,12 +69,12 @@ void mobile_activity(void) {
 
         /* Examine call for special procedure */
         if (MOB_FLAGGED(ch, MOB_SPEC) && !no_specials) {
-            if (mob_index[GET_MOB_RNUM(ch)].func == NULL) {
+            if (GetMobIndex(GET_MOB_VNUM(ch))->func == NULL) {
                 log("SYSERR: %s (#%d): Attempting to call non-existing mob function.", GET_NAME(ch), GET_MOB_VNUM(ch));
                 REMOVE_BIT_AR(MOB_FLAGS(ch), MOB_SPEC);
             } else {
                 /* TODO: Need to see if they can handle NULL instead of "". */
-                if ((mob_index[GET_MOB_RNUM(ch)].func) (ch, ch, 0, ""))
+                if ((GetMobIndex(GET_MOB_VNUM(ch))->func) (ch, ch, 0, ""))
                     continue;	/* go to next char */
             }
         }

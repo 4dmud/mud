@@ -114,16 +114,16 @@ extern enum subskill_list subskill;
 struct index_data **trig_index;    /* index table for triggers      */
 struct trig_data *trigger_list = NULL;  /* all attached triggers */
 unsigned int top_of_trigt = 0;         /* top of trigger index table    */
-struct htree_node *mob_htree = NULL;    /* hash tree for fast mob lookup */
+//struct htree_node *mob_htree = NULL;    /* hash tree for fast mob lookup */
 
 long max_mob_id = MOB_ID_BASE;     /* for unique mob id's       */
 long max_obj_id = OBJ_ID_BASE;     /* for unique obj id's       */
 int dg_owner_purged;          /* For control of scripts */
 struct htree_node *obj_htree = NULL;    /* hash tree for fast obj lookup */
 
-vector <index_data> mob_index; /* index table for mobile file   */
-vector <Character *> mob_proto;  /* prototypes for mobs           */
-mob_rnum top_of_mobt = 0;     /* top of mobile index table     */
+map<mob_vnum, struct index_data *> mob_index; /* index table for mobile file   */
+map<mob_vnum, Character *> mob_proto;  /* prototypes for mobs           */
+//mob_rnum top_of_mobt = 0;     /* top of mobile index table     */
 
 struct obj_data *object_list = NULL;    /* global linked list of objs    */
 struct obj_data *dead_obj = NULL;  /* delayed obj removal   */
@@ -209,7 +209,7 @@ void boot_world(void);
 int count_alias_records(FILE * fl);
 int count_hash_records(FILE * fl);
 bitvector_t asciiflag_conv(char *flag);
-void parse_simple_mob(FILE * mob_f, mp_iter i, int nr);
+void parse_simple_mob(FILE * mob_f, Character *mob, int nr);
 void interpret_espec(const char *keyword, const char *value, int i,
                      int nr);
 void parse_espec(char *buf, int i, int nr);
@@ -808,15 +808,21 @@ void destroy_db(void) {
 
     /* Mobiles */
 
-    for (cnt = 0; cnt < mob_proto.size(); cnt++) {
-        mob_proto[cnt]->free_proto_mob();
-
-        delete mob_proto[cnt];
+    for (map<mob_vnum, Character *>::iterator it = mob_proto.begin(); it != mob_proto.end(); it++) {
+    if (it->second != NULL) {
+        (it->second)->free_proto_mob();
+        delete (it->second);
+        }
     }
+
+    for (map<mob_vnum, struct index_data *>::iterator it = mob_index.begin(); it != mob_index.end(); it++)
+    if (it->second != NULL)
+        delete (it->second);
+   
 
     //delete mob_proto;
     //free(mob_index);
-    htree_free(mob_htree);
+    //htree_free();
 
     htree_free(HTREE_NULL);
     free(HTREE_NULL);
@@ -1153,7 +1159,7 @@ void build_player_index(void) {
                              &pte.clan, &pte.rank, &pte.gc_amount, &pte.gt_amount)) < 10) {
             if (pte.id <= 0)
                 id_zero++;
-            if (id_zero >= 1) 
+            if (id_zero >= 1)
                 pte.repair = TRUE;
             if (retval == 5) {
                 pte.account = pte.id;
@@ -1183,8 +1189,8 @@ void build_player_index(void) {
         plrindex_it ptv;
         Character *victim;
         log("    fixing index fields: clans");
-        
-                TEMP_LOAD_CHAR = TRUE;
+
+        TEMP_LOAD_CHAR = TRUE;
         for (ptv = player_table.begin(); ptv != player_table.end(); ptv++) {
             if (!IS_SET((*ptv).flags, PINDEX_DELETED) && !IS_SET((*ptv).flags, PINDEX_SELFDELETE)) {
                 victim = new Character(FALSE);
@@ -1200,8 +1206,8 @@ void build_player_index(void) {
 
             }
         }
-        
-                TEMP_LOAD_CHAR = FALSE;
+
+        TEMP_LOAD_CHAR = FALSE;
         save_player_index();
     }
 }
@@ -2050,7 +2056,7 @@ void renum_zone_table(void) {
             oldc = ZCMD.arg3;
             switch (ZCMD.command) {
             case 'M':
-                a = ZCMD.arg1 = real_mobile(ZCMD.arg1);
+                a = ZCMD.arg1;
                 c = ZCMD.arg3;
                 break;
             case 'O':
@@ -2106,11 +2112,10 @@ void renum_zone_table(void) {
 
 
 
-void parse_simple_mob(FILE * mob_f, mp_iter i, int nr) {
+void parse_simple_mob(FILE * mob_f, Character *mob, int nr) {
     int j, t[10];
     char line[256];
     int k = 1;
-    Character *mob = *i;
 
     //mob_proto[i].real_abils.str = (number(3, 20));
     mob->real_abils.intel = (number(3, 20));
@@ -2229,11 +2234,9 @@ void parse_simple_mob(FILE * mob_f, mp_iter i, int nr) {
 #define RANGE(low, high) \
      (num_arg = MAX((low), MIN((high), (num_arg))))
 
-void interpret_espec(const char *keyword, const char *value, mp_iter i, int nr) {
+void interpret_espec(const char *keyword, const char *value, Character *mob, int nr) {
     int num_arg = 0;
     bool matched = FALSE;
-    Character *mob = *i;
-
     /*
      * If there isn't a colon, there is no value.  While Boolean options are
      * possible, we don't actually have any.  Feel free to make some.
@@ -2314,7 +2317,7 @@ void interpret_espec(const char *keyword, const char *value, mp_iter i, int nr) 
 #undef BOOL_CASE
 #undef RANGE
 
-void parse_espec(char *buf, mp_iter i, int nr) {
+void parse_espec(char *buf, Character *mob, int nr) {
     char *ptr;
 
     if ((ptr = strchr(buf, ':')) != NULL) {
@@ -2322,14 +2325,14 @@ void parse_espec(char *buf, mp_iter i, int nr) {
         while (isspace(*ptr))
             ptr++;
     }
-    interpret_espec(buf, ptr, i, nr);
+    interpret_espec(buf, ptr, mob, nr);
 }
 
 
-void parse_enhanced_mob(FILE * mob_f, mp_iter i, int nr) {
+void parse_enhanced_mob(FILE * mob_f, Character *mob, int nr) {
     char line[256];
 
-    parse_simple_mob(mob_f, i, nr);
+    parse_simple_mob(mob_f, mob, nr);
 
     while (get_line(mob_f, line)) {
         if (!strcmp(line, "E"))   /* end of the enhanced section */
@@ -2338,16 +2341,15 @@ void parse_enhanced_mob(FILE * mob_f, mp_iter i, int nr) {
             log("SYSERR: Unterminated E section in mob #%d", nr);
             exit(1);
         } else
-            parse_espec(line, i, nr);
+            parse_espec(line, mob, nr);
     }
 
     log("SYSERR: Unexpected end of file reached after mob #%d", nr);
     exit(1);
 }
 
-struct combine_data *add_base_link(mp_iter i, int vnum) {
+struct combine_data *add_base_link(Character *mob, int vnum) {
     struct combine_data *blink = NULL;
-    Character *mob = (*i);
     CREATE(blink, struct combine_data, 1);
     blink->vnum = vnum;
     blink->joined = NULL;
@@ -2410,7 +2412,7 @@ void load_links(Character *mob) {
         return;
 
     while (temp)
-        temp = add_full_link(mob, temp, read_mobile(temp->vnum, VIRTUAL));
+        temp = add_full_link(mob, temp, read_mobile(temp->vnum));
 
 }
 
@@ -2538,17 +2540,17 @@ void free_join_list(struct combine_data *blist) {
     blist = NULL;
 }
 
-void parse_jspec(char *buf, mp_iter i, int nr) {
+void parse_jspec(char *buf, Character *mob, int nr) {
     int vnum = atoi(buf);
     if (vnum > 0) // assume its valid, we have to
-        add_base_link(i, vnum);
+        add_base_link(mob, vnum);
 }
 
 
-void parse_joined_mob(FILE * mob_f, mp_iter i, int nr) {
+void parse_joined_mob(FILE * mob_f,Character *mob, int nr) {
     char line[256];
 
-    parse_enhanced_mob(mob_f,i,nr);
+    parse_enhanced_mob(mob_f,mob,nr);
 
     while (get_line(mob_f, line)) {
         if (!strcmp(line, "J"))   /* end of the enhanced section */
@@ -2557,7 +2559,7 @@ void parse_joined_mob(FILE * mob_f, mp_iter i, int nr) {
             log("SYSERR: Unterminated J section in mob #%d", nr);
             exit(1);
         } else
-            parse_jspec(line, i, nr);
+            parse_jspec(line, mob, nr);
     }
 
     log("SYSERR: Unexpected end of file reached after mob #%d", nr);
@@ -2568,7 +2570,7 @@ void parse_joined_mob(FILE * mob_f, mp_iter i, int nr) {
 void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     void set_race(Character *ch, int race);
 
-    static int i = 0;
+    //static int i = 0;
     int j, t[10];
     int vn, count;
     char junk[8], *tmpptr;
@@ -2577,20 +2579,16 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     f8[128];
     char buf2[MAX_INPUT_LENGTH];
     Character *mob;
-    mp_iter mit;
-    struct index_data mi = index_data();
+    struct index_data *mi;
 
 
-    //mi = new index_data();
-    mi.vnum = nr;
-    mi.number = 0;
-    mi.func = NULL;
-    //log("Mob proto size is: %d - %d", mob_proto.size(), i);
+    mi = new index_data(nr);
     mob = new Character();
-    mob_proto.push_back(mob);
-    mob_index.push_back(mi);
-    mob_proto[i]->clear();
-    mit = mob_proto.begin() + i;//mob_proto.end() - 1;
+    mob->clear();
+    mob->vnum = nr;
+    
+   SetMobProto(nr, mob);
+   SetMobIndex(nr, mi);
     //mob = mob_proto[i];
     /*
      * Mobiles should NEVER use anything in the 'player_specials' structure.
@@ -2678,11 +2676,11 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
 
     switch (UPPER(letter)) {
     case 'S':              /* Simple monsters */
-        parse_simple_mob(mob_f, mit, nr)
+        parse_simple_mob(mob_f, mob, nr)
         ;
         break;
     case 'E':              /* Circle3 Enhanced monsters */
-        parse_enhanced_mob(mob_f, mit, nr);
+        parse_enhanced_mob(mob_f, mob, nr);
         break;
 
         /* add new mob types here.. */
@@ -2703,7 +2701,7 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
             log("SYSERR: Error assigning LINK! - Line was\n  %s", line);
             return;
         }
-        add_base_link(mit, vn);
+        add_base_link(mob, vn);
         letter = fread_letter(mob_f);
         ungetc(letter, mob_f);
     }
@@ -2723,8 +2721,9 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
     for (j = 0; j < NUM_WEARS; j++)
         mob->equipment[j] = NULL;
 
-    mob->nr = i;
+    //mob->nr = i;
     mob->desc = NULL;
+    mob->proto = TRUE;
 
     if (GET_CLASS(mob) == CLASS_NORMAL)
         give_mob_class(mob, nr);
@@ -2734,11 +2733,12 @@ void parse_mobile(FILE * mob_f, int nr, zone_vnum zon) {
 
     if (MOB_FLAGGED(mob, MOB_POSTMASTER))
         ASSIGNMOB(nr, postmaster);
-    if (! mob_htree)
-        mob_htree = htree_init();
-    htree_add(mob_htree, nr, i);
-    top_of_mobt = mob_proto.size();
-    i++;
+   /// if (! mob_htree)
+   ///     mob_htree = htree_init();
+   /// htree_add(mob_htree, nr, i);
+   /// top_of_mobt = mob_proto.size();
+   ///i++;
+
 }
 
 int is_aggro(Character *ch) {
@@ -3041,7 +3041,7 @@ void load_zones(FILE * fl, char *zonename) {
         exit(1);
     } else {
         Z.cmd.assign(num_of_cmds, reset_com());
-        }
+    }
 
 
     line_num += get_line(fl, buf);
@@ -3479,16 +3479,16 @@ int vnum_mobile(char *searchname, Character *ch) {
     *dynbuf = 0;
 
     for (mp_iter mit = mob_proto.begin(); mit != mob_proto.end(); mit++) {
-    
-        if ((*mit) != NULL && isname_full(searchname, (*mit)->player.name)) {
+
+        if ((mit->second) != NULL && isname_full(searchname, (mit->second)->player.name)) {
             snprintf(buf, sizeof(buf), "%3d. [%5d] %-40s %s\r\n", ++found,
-                     mob_index[nr].vnum, (*mit)->player.short_descr,
-                     (*mit)->proto_script ? "[TRIG]" : "" );
+                     (mit->second)->vnum, (mit->second)->player.short_descr,
+                     (mit->second)->proto_script ? "[TRIG]" : "" );
             DYN_RESIZE(buf);
         }
         nr++;
     }
-        page_string(ch->desc, dynbuf, DYN_BUFFER);
+    page_string(ch->desc, dynbuf, DYN_BUFFER);
     return (found);
 }
 
@@ -3535,23 +3535,20 @@ Character *create_char(void) {
 
 
 /* create a new mobile from a prototype */
-Character *read_mobile(mob_vnum nr, int type) {                   /* and mob_rnum */
-    mob_rnum i;
+Character *read_mobile(mob_vnum nr) {
     Character *mob;
 
-    if (type == VIRTUAL) {
-        if ((i = real_mobile(nr)) == NOBODY) {
-            log("WARNING: Mobile vnum %d does not exist in database.", nr);
-            return (NULL);
-        }
-    } else
-        i = nr;
+    if (!MobProtoExists(nr)) {
+        log("WARNING: Mobile vnum %d does not exist in database.", nr);
+        return (NULL);
+    }
 
     mob = new Character();
     /** remove player data from mob **/
-    *mob = *mob_proto[i];
+    *mob = *GetMobProto(nr);
+    mob->proto = FALSE;
     add_char_to_list(mob);
-    set_race(mob, mob_proto[i]->player.race);
+    set_race(mob, GetMobProto(nr)->player.race);
 
     if (MOB_TIER(mob) == 0 && (!is_aggro(mob))) {
         if (!number(0, 10))
@@ -3582,7 +3579,7 @@ Character *read_mobile(mob_vnum nr, int type) {                   /* and mob_rnu
     if (GET_MRACE(mob) == MOB_RACE_ANIMAL)
         GET_GOLD(mob) = 0;
 
-    mob_index[i].number++;
+    GetMobIndex(nr)->number++;
     while (!valid_id_num(max_mob_id)) {
         log("Error new id being assigned to mob already exists(%ld)!", max_mob_id);
         max_mob_id++;
@@ -3591,9 +3588,9 @@ Character *read_mobile(mob_vnum nr, int type) {                   /* and mob_rnu
     /* find_char helper */
     addChToLookupTable(GET_ID(mob), mob);
 
-    copy_proto_script(mob_proto[i], mob, MOB_TRIGGER);
+    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
     assign_triggers(mob, MOB_TRIGGER);
-    mob->mob_specials.join_list = copy_proto_link(mob_proto[i]->mob_specials.join_list);
+    mob->mob_specials.join_list = copy_proto_link(GetMobProto(nr)->mob_specials.join_list);
     load_links(mob);
 
     return (mob);
@@ -3902,8 +3899,8 @@ void reset_zone(zone_rnum zone) {
                 log("Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3);
                 exit(1);
             }
-            if ((mob_index[ZCMD.arg1].number < ZCMD.arg2)) {
-                mob = read_mobile(ZCMD.arg1, REAL);
+            if (MobIndexExists(ZCMD.arg1) && (GetMobIndex(ZCMD.arg1)->number < ZCMD.arg2)) {
+                mob = read_mobile(ZCMD.arg1);
                 char_to_room(mob, world_vnum[ZCMD.arg3]);
                 if (load_mtrigger(mob) != -1) {
                     tmob = mob;
@@ -4924,13 +4921,13 @@ int store_to_char(const char *name, Character *ch) {
                     //	log("%s - %d, %d, %d",ch->player.name, num, num2, num3);
                     if (num2 != 0) {
                         set_skill(ch, num, num2);
-                     //   if (!str_cmp("hesara", ch->player.name))
-                    //	   log("HasSkill - %d", SAVED(ch).HasSkill(num));
+                        //   if (!str_cmp("hesara", ch->player.name))
+                        //	   log("HasSkill - %d", SAVED(ch).HasSkill(num));
                         set_skill_wait(ch, num, num3);
                     }
                 } while (num2 != 0);
             } else if (!strcmp(tag, "Subs")) {
-            sub_list *s;
+                sub_list *s;
                 do {
                     get_line(fl, line);
                     if (sscanf(line, "%d %d %d", &num, &num2, &num3) == 3) {
@@ -5014,10 +5011,10 @@ int store_to_char(const char *name, Character *ch) {
             affect_to_char(ch, &tmp_aff[i]);
     }
 
-if (!TEMP_LOAD_CHAR && IS_SET(player_table[id].flags, PINDEX_FIXSKILLS)) {
-    fixskills(ch);
-    REMOVE_BIT(player_table[id].flags, PINDEX_FIXSKILLS);
-    save_player_index();
+    if (!TEMP_LOAD_CHAR && IS_SET(player_table[id].flags, PINDEX_FIXSKILLS)) {
+        fixskills(ch);
+        REMOVE_BIT(player_table[id].flags, PINDEX_FIXSKILLS);
+        save_player_index();
     }
 
     if (GET_LEVEL(ch) >= LVL_IMMORT) {
@@ -5038,34 +5035,34 @@ void Character::LoadKillList() {
     long tl[2];
     int id;
 
-return;//disabled for the moment!
-    
+    return;//disabled for the moment!
+
     if ((id = get_id_by_name(GET_NAME(this)))<=0) {
         log("bad index passed to load_killlist");
         return;
     }
     if (id < 0 || id >= player_table.size())
-    return;
+        return;
     if (SPECIALS(this) == NULL || SPECIALS(this) == &dummy_mob)
-    	   return;
-    
+        return;
+
 
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
              PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
     if (!(fl = fopen(filename, "r")))
         return;
-        log("Loading Kill List %s", filename);
+    log("Loading Kill List %s", filename);
     while (get_line(fl, line)) {
         if (sscanf(line, "%d %d %ld %ld",t, t+1, tl, tl+1) != 4)
             continue;
-            log("%d %d %ld %ld", t[0], t[1], tl[1], tl[0]);
-            SPECIALS(this)->SetKill(t[0], t[1], tl[1], tl[0]);
+        log("%d %d %ld %ld", t[0], t[1], tl[1], tl[0]);
+        SPECIALS(this)->SetKill(t[0], t[1], tl[1], tl[0]);
     }
     fclose(fl);
     return;
 }
 void Character::SaveKillList() {
-int id;
+    int id;
     char filename[MAX_INPUT_LENGTH];
     return;
     FILE *fl;
@@ -5222,13 +5219,13 @@ void char_to_store(Character *ch) {
     fprintf(fl, "Thr4: %d\n", GET_SAVE(ch, 3));
     fprintf(fl, "Thr5: %d\n", GET_SAVE(ch, 4));
     if (GET_LEVEL(ch) < LVL_IMMORT) {
-    if ( SAVED(ch).CountSkills() > 0) {
-        fprintf(fl, "Skil:\n");
-        for (skills_map::iterator it = SAVED(ch).SkillsBegin(); it != SAVED(ch).SkillsEnd();it++) {
-            if (knows_spell(ch, (it->second)->skill) && (it->second)->learn > 0)
-                fprintf(fl, "%d %d %d 0\n", (it->second)->skill, (it->second)->learn, (it->second)->wait);
-        }
-        fprintf(fl, "0 0 0 0\n");
+        if ( SAVED(ch).CountSkills() > 0) {
+            fprintf(fl, "Skil:\n");
+            for (skills_map::iterator it = SAVED(ch).SkillsBegin(); it != SAVED(ch).SkillsEnd();it++) {
+                if (knows_spell(ch, (it->second)->skill) && (it->second)->learn > 0)
+                    fprintf(fl, "%d %d %d 0\n", (it->second)->skill, (it->second)->learn, (it->second)->wait);
+            }
+            fprintf(fl, "0 0 0 0\n");
         }
         fprintf(fl, "Subs:\n");
         for (subs_map::iterator it = SAVED(ch).SubsBegin();
@@ -5569,8 +5566,8 @@ int create_entry(const char *name) {
 
 
 void clearAllZones() {
-for (vector<Zone>::iterator z = zone_table.begin();z != zone_table.end();z++)
-(*z).num_players = 0;
+    for (vector<Zone>::iterator z = zone_table.begin();z != zone_table.end();z++)
+        (*z).num_players = 0;
 }
 /************************************************************************
 *  funcs of a (more or less) general utility nature              *
@@ -6205,7 +6202,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
             get_line(fl, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {   /* then this is a Xap Obj, requires
-                                                                                                                                                                                                                                                                                                                                                                                                                                       special care */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       special care */
                 if ((temp->name = fread_string(fl, buf2)) == NULL) {
                     temp->name = "undefined";
                 }
@@ -6314,7 +6311,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
 #endif
 
 
-
+#if 0
 /* returns the real number of the monster with given virtual number */
 mob_rnum real_mobile(mob_vnum vnum) {
     mob_rnum bot, top, mid, i, last_top;
@@ -6347,7 +6344,7 @@ mob_rnum real_mobile(mob_vnum vnum) {
         }
     }
 }
-
+#endif
 
 
 /* returns the real number of the object with given virtual number */
@@ -7396,5 +7393,78 @@ void add_char_to_list(Character *ch) {
         ch->next = character_list;
         character_list = ch;
     }
+}
+/** Mob Proto Functions **/
+bool MobProtoExists(mob_vnum vn) {
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to mob proto exists!");
+        return FALSE;
+    }
+    return (mob_proto.find(vn) != mob_proto.end());
+}
+
+Character * GetMobProto(mob_vnum vn) {
+    if (!MobProtoExists(vn))
+        return NULL;
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to get mob proto!");
+        return NULL;
+    }
+
+    return mob_proto[vn];
+}
+void SetMobProto(mob_vnum vn, Character *c) {
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to set mob proto!");
+        return;
+    }
+    mob_proto[vn] = c;
+}
+
+mob_vnum DeleteMobProto(mob_vnum vn) {
+    if (MobProtoExists(vn)) {
+        delete mob_proto[vn];
+        mob_proto.erase(vn);
+        return vn;
+    }
+    return NOBODY;
+}
+
+int GetMobProtoCount() {
+return mob_proto.size();
+}
+/** Mob Index Functions **/
+bool MobIndexExists(mob_vnum vn) {
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to mob index exists!");
+        return FALSE;
+    }
+    return (mob_index.find(vn) != mob_index.end());
+}
+
+struct index_data * GetMobIndex(mob_vnum vn) {
+    if (!MobIndexExists(vn))
+        return NULL;
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to get mob proto!");
+        return NULL;
+    }
+    return mob_index[vn];
+}
+void SetMobIndex(mob_vnum vn, struct index_data *c) {
+    if (vn == NOBODY) {
+        log("Passing NOTHING as vnum to set mob proto!");
+        return;
+    }
+    mob_index[vn] = c;
+}
+
+mob_vnum DeleteMobIndex(mob_vnum vn) {
+    if (MobIndexExists(vn)) {
+        delete mob_index[vn];
+        mob_index.erase(vn);
+        return vn;
+    }
+    return NOBODY;
 }
 

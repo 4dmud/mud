@@ -17,7 +17,9 @@ float number(float from, float to);
 class Character {
 public:
     int pfilepos;        /* playerfile pos                */
-    mob_rnum nr;         /* Mob's rnum                    */
+    //mob_rnum nr;         /* Mob's rnum                    */
+    mob_vnum vnum;
+    bool proto;
     Room * in_room;         /* Location (real room number)   */
     Room * was_in_room;     /* location for linkdead people  */
     int wait;            /* wait for how many loops       */

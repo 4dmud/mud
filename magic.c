@@ -1767,7 +1767,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         return;
     }
     for (i = 0; i < num; i++) {
-        if (!(mob = read_mobile(mob_num, VIRTUAL))) {
+        if (!(mob = read_mobile(mob_num))) {
             send_to_char
             ("You don't quite remember how to make that creature.\r\n",
              ch);

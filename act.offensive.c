@@ -125,7 +125,7 @@ void perform_assist(Character *ch, Character *helpee)
         ch, 0, opponent, TO_CHAR);
   else
   {
-    if (ch->nr != real_mobile(DG_CASTER_PROXY) &&
+    if (ch->vnum != DG_CASTER_PROXY &&
         ch != opponent &&
         ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
     {

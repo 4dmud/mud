@@ -442,8 +442,7 @@ void set_skill(Character *ch, int skill, int amount);
 #define SPELL_ROUTINES(spl)   (spell_info[spl].routines)
 
 #define IS_NPC(ch)  (IS_SET_AR(MOB_FLAGS(ch), MOB_ISNPC))
-#define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_RNUM(ch) <= top_of_mobt && \
-				GET_MOB_RNUM(ch) != NOBODY)
+#define IS_MOB(ch)  (IS_NPC(ch) && !(ch)->proto)
 
 #define IS_IMP(ch)	(GET_LEVEL(ch) == LVL_IMPL)
 #define IS_IMM(ch)	(GET_LEVEL(ch) >= LVL_IMMORT)
@@ -728,10 +727,9 @@ void make_wholist(void);
 
 #define GET_EQ(ch, i)		((ch)->equipment[i])
 
-#define GET_MOB_SPEC(ch)	(IS_MOB(ch) ? mob_index[(ch)->nr].func : NULL)
-#define GET_MOB_RNUM(mob)	((mob)->nr)
-#define GET_MOB_VNUM(mob)	(IS_MOB(mob) ? \
-				 mob_index[GET_MOB_RNUM(mob)].vnum : NOBODY)
+#define GET_MOB_SPEC(ch)	(IS_MOB(ch) ? mob_index[(ch)->vnum]->func : NULL)
+//#define GET_MOB_RNUM(mob)	((mob)->nr)
+#define GET_MOB_VNUM(mob)	((mob)->vnum)
 
 
 #define GET_MRACE(ch)		((ch)->mob_specials.race)

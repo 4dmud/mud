@@ -72,10 +72,8 @@ void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
 
 void ASSIGNMOB(mob_vnum mob, SPECIAL(fname))
 {
-    mob_rnum rnum;
-
-    if ((rnum = real_mobile(mob)) >= 0)
-	mob_index[rnum].func = fname;
+    if (MobIndexExists(mob))
+	mob_index[mob]->func = fname;
     else if (!mini_mud)
 	log("SYSERR: Attempt to assign spec to non-existant mob #%d", mob);
 }

@@ -5,8 +5,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/13 06:26:51 $
-*  $Revision: 1.12 $
+*  $Date: 2006/08/31 10:39:16 $
+*  $Revision: 1.13 $
 **************************************************************************/
 
 #include "conf.h"
@@ -564,7 +564,7 @@ OCMD(do_dgoload)
 	return;
 	}
 	}
-        if ((mob = read_mobile(num, VIRTUAL)) == NULL) {
+        if ((mob = read_mobile(num)) == NULL) {
             obj_log(obj, "oload: bad mob vnum");
             return;
 	   

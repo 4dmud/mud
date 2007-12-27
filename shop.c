@@ -1125,7 +1125,7 @@ SPECIAL(shop_keeper)
   int shop_nr;
 
   for (shop_nr = 0; shop_nr <= top_shop; shop_nr++)
-    if (SHOP_KEEPER(shop_nr) == keeper->nr)
+    if (SHOP_KEEPER(shop_nr) == keeper->vnum)
       break;
 
   if (shop_nr > top_shop)
@@ -1191,7 +1191,7 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
 {
   int sindex;
 
-  if (!IS_MOB(victim) || mob_index[GET_MOB_RNUM(victim)].func != shop_keeper)
+  if (!IS_MOB(victim) || mob_index[GET_MOB_VNUM(victim)]->func != shop_keeper)
     return (TRUE);
 
   /* Prevent "invincible" shopkeepers if they're charmed. */
@@ -1199,7 +1199,7 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
     return (TRUE);
 
   for (sindex = 0; sindex <= top_shop; sindex++)
-    if (GET_MOB_RNUM(victim) == SHOP_KEEPER(sindex) && !SHOP_KILL_CHARS(sindex))
+    if (GET_MOB_VNUM(victim) == SHOP_KEEPER(sindex) && !SHOP_KILL_CHARS(sindex))
     {
       char buf[MAX_INPUT_LENGTH];
 
@@ -1436,7 +1436,7 @@ void boot_the_shops(FILE *shop_f, char *filename, int rec_count)
       read_line(shop_f, "%ld", &SHOP_BITVECTOR(top_shop));
       read_line(shop_f, "%hd", &SHOP_KEEPER(top_shop));
 
-      SHOP_KEEPER(top_shop) = real_mobile(SHOP_KEEPER(top_shop));
+      //SHOP_KEEPER(top_shop) = real_mobile(SHOP_KEEPER(top_shop));
       read_line(shop_f, "%d", &SHOP_TRADE_WITH(top_shop));
 
       temp = read_list(shop_f, list, new_format, 1, LIST_ROOM);
@@ -1479,12 +1479,14 @@ void assign_the_shopkeepers(void)
   {
     if (SHOP_KEEPER(cindex) == NOBODY)
       continue;
+    if (!GetMobIndex(SHOP_KEEPER(cindex)))
+      continue;
 
     /* Having SHOP_FUNC() as 'shop_keeper' will cause infinite recursion. */
-    if (mob_index[SHOP_KEEPER(cindex)].func && mob_index[SHOP_KEEPER(cindex)].func != shop_keeper)
-      SHOP_FUNC(cindex) = mob_index[SHOP_KEEPER(cindex)].func;
+    if (GetMobIndex(SHOP_KEEPER(cindex))->func && GetMobIndex(SHOP_KEEPER(cindex))->func != shop_keeper)
+      SHOP_FUNC(cindex) = GetMobIndex(SHOP_KEEPER(cindex))->func;
 
-    mob_index[SHOP_KEEPER(cindex)].func = shop_keeper;
+    GetMobIndex(SHOP_KEEPER(cindex))->func = shop_keeper;
   }
 }
 
@@ -1556,7 +1558,7 @@ void list_all_shops(Character *ch)
     if (SHOP_KEEPER(shop_nr) == NOBODY)
       strcpy(buf1, "<NONE>");	/* strcpy: OK (for 'buf1 >= 7') */
     else
-      sprintf(buf1, "%6d", mob_index[SHOP_KEEPER(shop_nr)].vnum);	/* sprintf: OK (for 'buf1 >= 11', 32-bit int) */
+      sprintf(buf1, "%6d", SHOP_KEEPER(shop_nr));	/* sprintf: OK (for 'buf1 >= 11', 32-bit int) */
 
     len += snprintf(buf + len, sizeof(buf) - len,
                     "%3d   %6d   %6d    %s   %3.2f   %3.2f    %s\r\n",
@@ -1613,11 +1615,11 @@ void list_detailed_shop(Character *ch, int shop_nr)
     ch->Send( "Rooms:      None!");
 
   ch->Send( "\r\nShopkeeper: ");
-  if (SHOP_KEEPER(shop_nr) != NOBODY)
+  if (MobProtoExists(SHOP_KEEPER(shop_nr)))
   {
     ch->Send( "%s (#%d), Special Function: %s\r\n",
-                     GET_NAME(mob_proto[SHOP_KEEPER(shop_nr)]),
-                     mob_index[SHOP_KEEPER(shop_nr)].vnum,
+                     GET_NAME(GetMobProto(SHOP_KEEPER(shop_nr))),
+                     SHOP_KEEPER(shop_nr),
                      YESNO(SHOP_FUNC(shop_nr)));
 
     if ((k = get_char_num(SHOP_KEEPER(shop_nr))))
