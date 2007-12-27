@@ -438,6 +438,10 @@ ACMD(do_climb)
           }
           return;
         }
+        else if(GET_OBJ_TYPE(obj) == ITEM_DESCENDABLE){
+           act("There is no $p here that you can climb.", FALSE, ch, obj, 0, TO_CHAR);
+           return;
+        }
       }
     }
     new_send_to_char(ch, "There is no %s here.\r\n", buf);
@@ -533,6 +537,10 @@ ACMD(do_descend)
           }
           return;
         }
+        else if (GET_OBJ_TYPE(obj) == ITEM_CLIMBABLE){
+           act("There is no $p here that you can descend.", FALSE, ch, obj, 0, TO_CHAR);
+          return;
+       }
       }
     }
     new_send_to_char(ch, "There is no %s here.\r\n", buf);
