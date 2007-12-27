@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.52  2006/09/21 07:29:33  w4dimenscor
+ * changed the combat things a little, to put riders as the one getting hit in combat
+ *
  * Revision 1.51  2006/09/20 09:53:32  w4dimenscor
  * Fixed issue where players starting combat with a spell would not attack, and visa versa
  *
@@ -770,7 +773,7 @@ void start_fighting(Character* ch, Character* vict) {
             }
         }
     }
-    if (IS_NPC(ch) && !DEAD(ch)) {
+    if (IS_NPC(ch) && !DEAD(ch) && victim) {
         if (ch->mob_specials.head_join)
             temp = ch->mob_specials.head_join->mob_specials.join_list;
         else
@@ -782,7 +785,7 @@ void start_fighting(Character* ch, Character* vict) {
         }
     }
     for (f = k->followers; f; f = f->next) {
-        if ( (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim)) {
+        if (victim && (FIGHTING(ch) && !DEAD(victim)) && HERE(f->follower,victim)) {
             if (!IS_NPC(f->follower))
                 perform_assist(f->follower, ch);
         }
@@ -1523,6 +1526,9 @@ int fight_event_hit(Character* ch, Character* vict, short type, short num) {
     struct follow_type *f;
     int perc = 0;
     int shortwep = 0;
+
+    if (vict && vict->RiderHere())
+      vict = RIDDEN_BY(vict);
 
     if (!can_fight(ch, vict, FALSE))
         return -1;
