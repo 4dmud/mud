@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.70  2007/06/08 08:19:11  w4dimenscor
+ * Added the ability to see where mobs and objects reset, removed cpp_extern, needs testing, and changed assemblies so that you can specify a vnum instead of a name
+ *
  * Revision 1.69  2006/10/23 13:34:42  w4dimenscor
  * Changed the code so that level 55 immortals in the IMPL trust group can do all the imp commands too.
  *
@@ -408,6 +411,8 @@ void clearMemory(Character *ch);
 ACMD(do_autowiz);
 ACMD(do_statinnate);
 int mortal_player_info(Character *ch,Character *vict);
+void list_mob_resets(Character *vict, Character *ch);
+void list_obj_resets(obj_data *obj, Character *ch);
 int update_award(Character *ch);
 int update_reward(Character *ch);
 void snoop_check(Character *ch);
@@ -428,16 +433,16 @@ ACMD(do_wizsplit);
 #define NUMBER 2
 
 #define SET_OR_REMOVE(flagset, flags) { \
-     if (on) SET_BIT_AR(flagset, flags); \
-     else if (off) REMOVE_BIT_AR(flagset, flags); }
+    if (on) SET_BIT_AR(flagset, flags); \
+    else if (off) REMOVE_BIT_AR(flagset, flags); }
 
 #define SET_OR_REMOVE_TRUST(flagset, flags) { \
-        if (on) SET_BIT(flagset, flags); \
-        else if (off) REMOVE_BIT(flagset, flags); }
+    if (on) SET_BIT(flagset, flags); \
+    else if (off) REMOVE_BIT(flagset, flags); }
 
 #define SET_OR_REMOVE_AR(flagset, flags) { \
-        if (on) SET_BIT_AR(flagset, flags); \
-        else if (off) REMOVE_BIT_AR(flagset, flags); }
+    if (on) SET_BIT_AR(flagset, flags); \
+    else if (off) REMOVE_BIT_AR(flagset, flags); }
 
 #define RANGE(low, high) (value = MAX((low), MIN((high), (value))))
 
@@ -671,7 +676,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_MARRY_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_GOTO_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_GLOBAL_GRP)
-	    SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HEDIT_GRP)
+            SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HEDIT_GRP)
         } else {
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_BAN_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_DSPLN_GRP)
@@ -681,7 +686,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM1_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM2_GRP)
             //SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMPL_GRP)
-	    SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM3_GRP)
+            SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_IMM3_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_KILL_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_LOAD_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_OLC_GRP)
@@ -692,7 +697,7 @@ int perform_trust(Character *ch, Character *vict, int mode,
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_MARRY_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GOTO_GRP)
             SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GLOBAL_GRP)
-	    SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HEDIT_GRP)
+            SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HEDIT_GRP)
         }
         break;
     case 16:
@@ -1313,8 +1318,8 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
                 ch->Send( "%sSet door %s as %s.\r\n",
                           ZOCMD.if_flag ? " then " : "",
                           dirs[ZOCMD.arg2],
-                          ZOCMD.arg3 ? ((ZOCMD.arg3 == 1) ? "closed" : "locked") : "open"
-                                );
+          ZOCMD.arg3 ? ((ZOCMD.arg3 == 1) ? "closed" : "locked") : "open"
+                        );
                 break;
             case 'T':
                 ch->Send( "%sAttach trigger %s%s%s [%s%d%s] to %s\r\n",
@@ -1520,7 +1525,7 @@ void do_stat_object(Character *ch, struct obj_data *j) {
         CCGRN(ch, C_NRM), material_name(GET_OBJ_MATERIAL(j)),
         CCNRM(ch, C_NRM), CCGRN(ch, C_NRM), vnum, CCNRM(ch, C_NRM), GET_OBJ_RNUM(j),
         buf1, GET_ID(j)  ,
-        (GET_OBJ_RNUM(j) != NOTHING ? (obj_index[GET_OBJ_RNUM(j)].func ? "Exists" : "None") : "None"));
+    (GET_OBJ_RNUM(j) != NOTHING ? (obj_index[GET_OBJ_RNUM(j)].func ? "Exists" : "None") : "None"));
 
     if (GET_OBJ_RNUM(j) != NOTHING && obj_index[GET_OBJ_RNUM(j)].qic != NULL && (GET_LEVEL(ch) >= LVL_SEN)) {
         ch->Send(" QIC: %d(%d)\r\n",obj_index[GET_OBJ_RNUM(j)].qic->items ,
@@ -1726,6 +1731,7 @@ void do_stat_object(Character *ch, struct obj_data *j) {
     ch->Send("\r\n");
 
     list_destinations(TRAVEL_LIST(j), ch);
+    list_obj_resets(j, ch);
 
     /* check the object for a script */
     if (GET_LEVEL(ch) >= LVL_SEN /* || is_name(GET_NAME(ch), zone_table[(real_zone(vnum))].builders)*/)
@@ -1795,14 +1801,14 @@ void do_stat_character(Character *ch, Character *k) {
                   GET_ALIGNMENT(k), speed_update(k));
 
         if (!IS_NPC(k)) {
-#if defined(HAVE_ZLIB)
+            #if defined(HAVE_ZLIB)
             if (k->desc && k->desc->comp) {
                 if (k->desc->comp->state >= 2)
                     ch->Send( "Compression: Enabled    ");
                 else
                     ch->Send( "Compression: Disabled    ");
             }
-#endif
+            #endif
             if (k->desc) {
                 ch->Send( "Telopt Prompts: %d    ", k->desc->eor);
                 ch->Send( "MXP: %d    ", k->desc->mxp);
@@ -1958,7 +1964,7 @@ void do_stat_character(Character *ch, Character *k) {
                       (GetMobIndex(GET_MOB_VNUM(k))->func != NULL ? "Exists" : "None"));
         if (IS_MOB(k))
             ch->Send(", NPC Bare Hand Dam: %dd%d\r\n",
-                      k->mob_specials.damnodice, k->mob_specials.damsizedice);
+                     k->mob_specials.damnodice, k->mob_specials.damsizedice);
 
         ch->Send( "Carried: weight: %d, items: %d; ",   IS_CARRYING_W(k), IS_CARRYING_N(k));
 
@@ -2024,6 +2030,7 @@ void do_stat_character(Character *ch, Character *k) {
             }
         }
         list_destinations(TRAVEL_LIST(k), ch);
+        list_mob_resets(k, ch);
         ch->Send( "To see global variables: type\r\nvstat player <name>\r\n");
         if (GET_LEVEL(ch) == LVL_IMPL && k->desc) {
             int m, cnt = 0;
@@ -2469,7 +2476,7 @@ ACMD(do_load) {
         act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
         load_mtrigger(mob);
     } else if (is_abbrev(buf, "obj")) {
-    obj_rnum r_num;
+        obj_rnum r_num;
         if ((r_num = real_object(num)) < 0) {
             ch->Send( "There is no object with the number %d.\r\n",num);
             return;
@@ -2567,7 +2574,7 @@ ACMD(do_purge) {
     one_argument(argument, buf);
 
     if (*buf) {            /* argument supplied. destroy single object
-                                                                                                         * or char */
+                                                                                                                 * or char */
         if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
             if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict))) {
                 ch->Send("Fuuuuuuuuu!\r\n");
@@ -2703,15 +2710,15 @@ ACMD(do_copyover) {
 
             write_aliases(och);
             snprintf(buf, sizeof(buf), "Colors drain away and the world slowly grinds to a halt...\r\n");
-#ifdef HAVE_ZLIB_H
+            #ifdef HAVE_ZLIB_H
 
             if (d->comp->state == 2) {
                 d->comp->state = 3; /* Code to use Z_FINISH for deflate */
             }
-#endif /* HAVE_ZLIB_H */
+            #endif /* HAVE_ZLIB_H */
             write_to_descriptor (d->descriptor, buf, d->comp);
             d->comp->state = 0;
-#ifdef HAVE_ZLIB_H
+            #ifdef HAVE_ZLIB_H
 
             if (d->comp->stream) {
                 deflateEnd(d->comp->stream);
@@ -2719,7 +2726,7 @@ ACMD(do_copyover) {
                 free(d->comp->buff_out);
                 free(d->comp->buff_in);
             }
-#endif /* HAVE_ZLIB_H */
+            #endif /* HAVE_ZLIB_H */
 
         }
     }
@@ -3899,19 +3906,19 @@ void show_last_logons(Character *ch, int days, bool fix) {
                 (!player_table[tp].name || !*player_table[tp].name))
             continue;
         if (player_table[tp].last > tm) {
-        if (fix) {
-        SET_BIT(player_table[tp].flags, PINDEX_FIXSKILLS);
-    }
-        *ch << player_table[tp].name;
-        if (IS_SET(player_table[tp].flags, PINDEX_FIXSKILLS))
-          *ch << "- Skills Flagged to be fixed";
-
-          *ch << "\r\n";
-          
+            if (fix) {
+                SET_BIT(player_table[tp].flags, PINDEX_FIXSKILLS);
             }
+            *ch << player_table[tp].name;
+            if (IS_SET(player_table[tp].flags, PINDEX_FIXSKILLS))
+                *ch << "- Skills Flagged to be fixed";
+
+            *ch << "\r\n";
+
+        }
     }
     if (fix)
-    save_player_index();
+        save_player_index();
 }
 
 
@@ -4282,11 +4289,11 @@ ACMD(do_show) {
         assemblyListToChar(ch);
         break;
     case 19:
-    i = atoi(value);
-    if (i == 0)
-    i = 2;
-    show_last_logons(ch, i, *arg ? TRUE : FALSE);
-    break;
+        i = atoi(value);
+        if (i == 0)
+            i = 2;
+        show_last_logons(ch, i, *arg ? TRUE : FALSE);
+        break;
         /* show what? */
     default:
         ch->Send("Sorry, I don't understand that.\r\n");
@@ -4916,7 +4923,7 @@ int perform_set(Character *ch, Character *vict, int mode,
             i = 2;
         else if (isname(val_arg, "riddlers"))
             i = 3;
-        else if (isname(val_arg, "assholes"))
+        else if (isname(val_arg, "madmen"))
             i = 4;
         else if (isname(val_arg, "orsinis"))
             i = 5;
@@ -6169,10 +6176,9 @@ ACMD(do_namechange) {
         return;
     }
     newname[0] = UPPER(newname[0]);
-if (!str_cmp(newname, passw))
-    {
-      ch->Send("\r\nIllegal password.\r\n");
-      return;
+    if (!str_cmp(newname, passw)) {
+        ch->Send("\r\nIllegal password.\r\n");
+        return;
     }
 
 
@@ -6215,7 +6221,7 @@ if (!str_cmp(newname, passw))
         GET_ID(tch) = GET_IDNUM(tch);// = player_table[id].id;
         addChToLookupTable(GET_IDNUM(ch), tch);
         tch->LoadKillList();
-	   read_ignorelist(tch);
+        read_ignorelist(tch);
         load_locker(tch);
         add_char_to_list(tch);
         char_to_room(tch, IN_ROOM(ch));
@@ -6606,9 +6612,9 @@ void fixskills(Character *ch, int lrn) {
             SAVED(ch).SetSkillLearn(i, learned);
     /* twice over to get the pre-req's */
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
-        if (knows_spell(ch, i)) 
-        if (SAVED(ch).GetSkillLearn(i) < learned)
-            SAVED(ch).SetSkillLearn(i, learned);
+        if (knows_spell(ch, i))
+            if (SAVED(ch).GetSkillLearn(i) < learned)
+                SAVED(ch).SetSkillLearn(i, learned);
 
     SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
@@ -6655,4 +6661,40 @@ ACMD(do_fixskills) {
 
     *ch << "You update " << GET_NAME(vict) << "'s skills and spells.\r\n";
     act("$N updates your skills and spells!", TRUE, vict, NULL, ch, TO_CHAR);
+}
+#define ZCMD zone_table[zone].cmd[cmd_no]
+void list_mob_resets(Character *vict, Character *ch) {
+    if (!IS_NPC(vict))
+        return;
+
+    int vnum = GET_MOB_VNUM(vict);
+
+    for (zone_rnum zone = 0; zone <= top_of_zone_table; zone++)
+        for (int cmd_no = 0; ZCMD.command != 'S'; cmd_no++) {
+            switch (ZCMD.command) {
+            case 'M':
+                if (ZCMD.arg1 == vnum)
+                    ch->Send("Will reset in %d\r\n", ZCMD.arg3);
+                break;
+            }
+        }
+}
+
+void list_obj_resets(obj_data *obj, Character *ch) {
+    int vnum = GET_OBJ_VNUM(obj);
+    if (vnum <= 0)
+        return;
+
+    for (zone_rnum zone = 0; zone <= top_of_zone_table; zone++)
+        for (int cmd_no = 0; ZCMD.command != 'S'; cmd_no++) {
+            switch (ZCMD.command) {
+            case 'O':
+            case 'G':
+            case 'E':
+            case 'P':
+                if (obj_index[ZCMD.arg1].vnum == vnum)
+                	ch->Send("Will reset in %d\r\n", ZCMD.arg3);
+                break;
+            }
+        }
 }

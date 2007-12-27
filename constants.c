@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.25  2007/06/08 08:19:11  w4dimenscor
+ * Added the ability to see where mobs and objects reset, removed cpp_extern, needs testing, and changed assemblies so that you can specify a vnum instead of a name
+ *
  * Revision 1.24  2007/05/19 18:06:12  w4dimenscor
  * Added an object trigger type that triggers when the object
  * enters a room (currently only through dg_dest).
@@ -1738,7 +1741,7 @@ const char *fullness[] =
 
 /* [ch] strength apply (all) */
 /*to hit, to dam, carry, wield*/
-cpp_extern const struct str_app_type str_app[] =
+const struct str_app_type str_app[] =
   {
     {-5, -4, 0,  0 }
     ,          /* str = 0 */
@@ -1777,7 +1780,7 @@ cpp_extern const struct str_app_type str_app[] =
 
 
 /* [dex] skill apply (thieves only) */
-cpp_extern const struct dex_skill_type dex_app_skill[] =
+const struct dex_skill_type dex_app_skill[] =
   {
     {-99, -99, -90, -99, -60}
     ,     /* dex = 0 */
@@ -1811,7 +1814,7 @@ cpp_extern const struct dex_skill_type dex_app_skill[] =
 
 
 /* [dex] apply (all) */
-cpp_extern const struct dex_app_type dex_app[] =
+const struct dex_app_type dex_app[] =
   {
     {-7, -7, 6}
     ,          /* dex = 0 */
@@ -1845,7 +1848,7 @@ cpp_extern const struct dex_app_type dex_app[] =
 
 
 /* [con] apply (all) */
-cpp_extern const struct con_app_type con_app[] =
+const struct con_app_type con_app[] =
   {
     {-4, 20}
     ,               /* con = 0 */
@@ -1879,7 +1882,7 @@ cpp_extern const struct con_app_type con_app[] =
 
 
 /* [int] apply (all) */
-cpp_extern const struct int_app_type int_app[] =
+const struct int_app_type int_app[] =
   {
     {3}
     ,               /* int = 0 */
@@ -1912,7 +1915,7 @@ cpp_extern const struct int_app_type int_app[] =
 
 
 /* [wis] apply (all) */
-cpp_extern const struct wis_app_type wis_app[] =
+const struct wis_app_type wis_app[] =
   {
     {0}
     ,               /* wis = 0 */

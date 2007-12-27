@@ -82,8 +82,7 @@ void assemblyBootAssemblies( void ) {
                      "#%ld, type %s.", lVnum, szType );
                 lVnum = NOTHING;
             }
-        }
-        else {
+        } else {
             log( "SYSERR: Invalid tag '%s' in file %s, line #%ld.", szTag,
                  ASSEMBLIES_FILE, lLineCount );
         }
@@ -524,12 +523,19 @@ long assemblyFindAssembly( const char *pszAssemblyName ) {
         return (-1);
     else if( pszAssemblyName == NULL || *pszAssemblyName == '\0' )
         return (-1);
-
-    for( i = 0; i < g_lNumAssemblies; i++ ) {
-        if( (lRnum = real_object( g_pAssemblyTable[ i ].lVnum )) < 0 )
-            log( "SYSERR: assemblyFindAssembly(): Invalid vnum #%ld in assembly table.", g_pAssemblyTable[i].lVnum );
-        else if( isname_full( pszAssemblyName, obj_proto[ lRnum ].name ) )
-            return (g_pAssemblyTable[ i ].lVnum);
+    if (is_number(pszAssemblyName)) {
+        long vn = atol(pszAssemblyName);
+        for( i = 0; i < g_lNumAssemblies; i++ ) 
+            if (vn == g_pAssemblyTable[ i ].lVnum)
+                return (g_pAssemblyTable[ i ].lVnum);
+        
+    } else {
+        for( i = 0; i < g_lNumAssemblies; i++ ) {
+            if( (lRnum = real_object( g_pAssemblyTable[ i ].lVnum )) < 0 )
+                log( "SYSERR: assemblyFindAssembly(): Invalid vnum #%ld in assembly table.", g_pAssemblyTable[i].lVnum );
+            else if( isname_full( pszAssemblyName, obj_proto[ lRnum ].name ) )
+                return (g_pAssemblyTable[ i ].lVnum);
+        }
     }
 
     return (-1);
