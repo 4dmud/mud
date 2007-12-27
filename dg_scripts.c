@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2005/08/19 09:34:04 $
-*  $Revision: 1.17 $
+*  $Date: 2005/11/30 19:08:47 $
+*  $Revision: 1.18 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.18  2005/11/30 19:08:47  w4dimenscor
+ * fixes an issue in function triggers
+ *
  * Revision 1.17  2005/08/19 09:34:04  w4dimenscor
  * fixed issue with FUNCTIONS not passing back vars, i mean, it does now.
  *
@@ -2526,24 +2529,25 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
     script_log("Trigger: %s, VNum %d. calling function trigger of different attach type (%d)!",GET_TRIG_NAME(parent), GET_TRIG_VNUM(parent), vnum);
     return;
   }
+  /** i can't remember what this bit is for?? **/
   switch (t->attach_type)
   {
   case OBJ_TRIGGER:
-    if (TRIGGER_CHECK(t, OTRIG_FUNCTION))
+    if (!TRIGGER_CHECK(t, OTRIG_FUNCTION))
     {
       script_log("Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME(parent), GET_TRIG_VNUM(parent), vnum);
       return;
     }
     break;
   case MOB_TRIGGER:
-    if (TRIGGER_CHECK(t, MTRIG_FUNCTION))
+    if (!TRIGGER_CHECK(t, MTRIG_FUNCTION))
     {
       script_log("Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME(parent), GET_TRIG_VNUM(parent), vnum);
       return;
     }
     break;
   case WLD_TRIGGER:
-    if (TRIGGER_CHECK(t, WTRIG_FUNCTION))
+    if (!TRIGGER_CHECK(t, WTRIG_FUNCTION))
     {
       script_log("Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME(parent), GET_TRIG_VNUM(parent), vnum);
       return;
