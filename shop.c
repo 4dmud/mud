@@ -707,11 +707,15 @@ strlcpy(tempstr, obj->short_description, sizeof(tempstr));
     if (!same_obj(obj, last_obj))
       break;
   }
-
+  if (bought==0){
+     char buf[MAX_INPUT_LENGTH];
+     snprintf(buf, sizeof(buf), "%s You can't even carry it!", GET_NAME(ch));
+     do_tell(keeper, buf, cmd_tell, 0);
+     return;
+  }
   if (bought < buynum)
   {
     char buf[MAX_INPUT_LENGTH];
-
     if (!obj || !same_obj(last_obj, obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
     else if (GET_GOLD(ch) < buy_price(obj, shop_nr, keeper, ch))
@@ -724,6 +728,7 @@ strlcpy(tempstr, obj->short_description, sizeof(tempstr));
       snprintf(buf, sizeof(buf), "%s Something screwy only gave you %d.", GET_NAME(ch), bought);
     do_tell(keeper, buf, cmd_tell, 0);
   }
+
   if (!IS_GOD(ch))
     GET_GOLD(keeper) += goldamt;
 
