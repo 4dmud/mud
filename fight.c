@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.20  2005/08/28 09:04:08  w4dimenscor
+ * fixed redit to stop it removing existing scripts
+ *
  * Revision 1.19  2005/08/28 02:59:21  w4dimenscor
  * fixed a memory leak situation that could appear with overlapping rooms, adjusted the ignore save to not save certain words, adjusted the mobs to it a little softer
  *
@@ -2481,7 +2484,7 @@ int fe_after_damage(struct char_data* ch, struct char_data* vict,
       if (PRF_FLAGGED(ch, PRF_AUTOSAC))
         do_sac(ch, "corpse", 0, 0);
 
-      if (IS_AFFECTED(ch, AFF_GROUP) && local_gold > 0 &&
+      if (IS_AFFECTED(ch, AFF_GROUP) && (ch->master || ch->followers) && local_gold > 0 &&
           PRF_FLAGGED(ch, PRF_AUTOSPLIT) &&
           (PRF_FLAGGED(ch, PRF_AUTOLOOT) || PRF_FLAGGED(ch, PRF_AUTOGOLD)) &&
           gld < char_gold(ch, 0, GOLD_HAND))

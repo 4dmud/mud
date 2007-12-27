@@ -205,7 +205,6 @@ void redit_setup_existing(struct descriptor_data *d, room_vnum v_num)
   OLC_VAL(d) = 0;
   OLC_ITEM_TYPE(d) = WLD_TRIGGER;
   OLC_ROOM(d)->script = NULL;
-  OLC_ROOM(d)->proto_script = NULL;
   OLC_ROOM(d)->contents = NULL;
   OLC_ROOM(d)->people = NULL;
   dg_olc_script_copy(d);
