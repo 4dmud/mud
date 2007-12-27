@@ -340,7 +340,7 @@ int hunt_location(void *thing, int type) {
     if ((rnum = real_room(dest)) == NULL)
         return 0;
 
-//std::binary_search as opposed to find*/
+    //std::binary_search as opposed to find*/
     if ((dir = find_first_step(curr_room, rnum)) < 0) {
         if (dir != BFS_ALREADY_THERE) {
             return 0;
