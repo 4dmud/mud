@@ -657,12 +657,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         if (RIDING(ch)->hitched)
         {
           snprintf(buf2, sizeof(buf2), "$n hovers %s followed by $p.", dirs[dir]);
-          act(buf2, TRUE, RIDING(ch), RIDING(ch)->hitched, 0, TO_ROOM);
+          act(buf2, TRUE, RIDING(ch), RIDING(ch)->hitched, ch, TO_NOTVICT);
         }
         else
         {
           snprintf(buf2, sizeof(buf2), "$n hovers %s.", dirs[dir]);
-          act(buf2, TRUE, RIDING(ch), 0, 0, TO_ROOM);
+          act(buf2, TRUE, RIDING(ch), 0, ch, TO_NOTVICT);
         }
       }
       else
@@ -679,6 +679,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         }
       }
     }
+    else {
+//It doesn't make sense that you are not sneaking while sitting on a sneaking mount. --Thotter
+//       if(!IS_AFFECTED(ch, AFF_SNEAK))
+//       {
+//         snprintf(buf2, sizeof(buf2), "$n leavves %s.", dirs[dir]);
+//         act(buf2, TRUE, ch, 0, RIDING(ch), TO_NOTVICT);
+//       }
+    }
   }
   else if (RIDDEN_BY(ch) && HERE(RIDDEN_BY(ch), ch))
   {
@@ -692,15 +700,23 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
           act(buf2, TRUE, ch, ch->hitched, 0, TO_ROOM);
         }
         else
-        {
+        { //bookmark
           snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
-          act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+          act(buf2, TRUE, ch, 0, RIDDEN_BY(ch), TO_NOTVICT);
         }
       }
       else
       {
-        snprintf(buf2, sizeof(buf2), "$n rides $N %s.", dirs[dir]);
-        act(buf2, TRUE, RIDDEN_BY(ch), 0, ch, TO_NOTVICT);
+        snprintf(buf2, sizeof(buf2), "$n drags $N %s.", dirs[dir]);
+        act(buf2, TRUE, ch, 0, RIDDEN_BY(ch), TO_NOTVICT);
+      }
+    }
+    else
+    {
+      if(!IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK)){
+//It doesn't make sense that you are not sneaking while sitting on a sneaking mount. --Thotter
+//         snprintf(buf2, sizeof(buf2), "$n leaves %s.", dirs[dir]);
+//         act(buf2, TRUE, RIDDEN_BY(ch), 0, ch, TO_NOTVICT);
       }
     }
   }
@@ -927,12 +943,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
              && !IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK))
     {
       if (ch->hitched)
-        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s pulling $p, ridden by $N.",
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s pulling $p, dragging $N.",
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
       else
-        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, ridden by $N.",
+        snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, dragging $N.",
                  (dir < UP ? "the " : ""),
                  (dir == UP ? "below" : dir ==
                   DOWN ? "above" : dirs[rev_dir[dir]]));
@@ -945,7 +961,52 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
          ** then if it is a centaur player, let them know!*/
         if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)) && !IS_NPC(RIDDEN_BY(ch)))
         {
-          snprintf(buf2, sizeof(buf2), "$N rides you %s.",dirs[dir]);
+          snprintf(buf2, sizeof(buf2), "$N drags you %s.",dirs[dir]);
+          act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
+        }
+        LOOK(RIDDEN_BY(ch));
+      }
+    }
+    else if (riding && same_room && IS_AFFECTED(RIDING(ch), AFF_SNEAK))
+    {
+      if (has_moved)
+      {
+
+        /** move the mount to the char, make sure they don't get dismounted yet!
+         ** then if it is a centaur player, let them know!*/
+        if (move_char_to(RIDING(ch), IN_ROOM(ch)) && !IS_NPC(RIDING(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "You are ridden %s by $N.",dirs[dir]);
+          act(buf2,TRUE,RIDING(ch),NULL,ch,TO_CHAR);
+        }
+        LOOK(RIDING(ch));
+
+      }
+    }
+    else if (ridden_by && same_room
+             && IS_AFFECTED(RIDDEN_BY(ch), AFF_SNEAK))
+    {
+//       if (ch->hitched)
+//         snprintf(buf2, sizeof(buf2), "$n arrives from %s%s pulling $p.",
+//                  (dir < UP ? "the " : ""),
+//                  (dir == UP ? "below" : dir ==
+//                   DOWN ? "above" : dirs[rev_dir[dir]]));
+//       else
+//         snprintf(buf2, sizeof(buf2), "$n arrives from %s%s.",
+//                  (dir < UP ? "the " : ""),
+//                  (dir == UP ? "below" : dir ==
+//                   DOWN ? "above" : dirs[rev_dir[dir]]));
+      
+      if (has_moved)
+      {
+        snprintf(buf2, sizeof(buf2), "$n has arrived.");
+        act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
+        
+        /** move the mount to the char, make sure they don't get dismounted yet!
+         ** then if it is a centaur player, let them know!*/
+        if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)) && !IS_NPC(RIDDEN_BY(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "$N drags you %s.",dirs[dir]);
           act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
         }
         LOOK(RIDDEN_BY(ch));
@@ -959,7 +1020,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
         act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
     }
   }
-  if (IS_AFFECTED(ch, AFF_SNEAK))
+  if (IS_AFFECTED(ch, AFF_SNEAK)){
     if (ch->master && ch->master != ch)
       if (IN_ROOM(ch->master) == IN_ROOM(ch))
       {
@@ -967,6 +1028,42 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
           new_send_to_char(ch->master, "%s sneaks in after you pulling %s.\r\n", PERS(ch, ch->master), ch->hitched->short_description);
         else
           new_send_to_char(ch->master, "%s sneaks in after you.\r\n", PERS(ch, ch->master));
+
+      }
+
+      if (has_moved)
+      {
+        if ((RIDING(ch) && RIDING(ch)->hitched) || (RIDDEN_BY (ch) && RIDDEN_BY(ch)->hitched))
+          snprintf(buf2, sizeof(buf2), "$n arrives from %s%s, followed by $p.",
+                   (dir < UP ? "the " : ""),
+                   (dir == UP ? "below" : dir ==
+                    DOWN ? "above" : dirs[rev_dir[dir]]));
+        else
+         snprintf(buf2, sizeof(buf2), "$N has arrived.");
+         if(riding && !IS_AFFECTED(RIDING(ch), AFF_SNEAK))
+         act(buf2, TRUE, ch, ch->hitched, RIDING(ch), TO_ROOM);
+//          if(ridden_by)
+//          act(buf2, TRUE, ch, ch->hitched, RIDDEN_BY(ch), TO_ROOM);
+
+        /** move the mount to the char, make sure they don't get dismounted yet!
+         ** then if it is a centaur player, let them know!*/
+        if(ridden_by){
+        if (move_char_to(RIDDEN_BY(ch), IN_ROOM(ch)) && !IS_NPC(RIDDEN_BY(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "$N drags you %s.",dirs[dir]);
+          act(buf2,TRUE,RIDDEN_BY(ch),RIDDEN_BY(ch)->hitched,ch,TO_CHAR);
+        }
+        LOOK(RIDDEN_BY(ch));
+        }
+        if(riding){
+        if (move_char_to(RIDING(ch), IN_ROOM(ch)) && !IS_NPC(RIDING(ch)))
+        {
+          snprintf(buf2, sizeof(buf2), "You are ridden %s by $N.",dirs[dir]);
+          act(buf2,TRUE,RIDING(ch),RIDING(ch)->hitched,ch,TO_CHAR);
+        }
+        LOOK(RIDING(ch));
+        }
+      }
 
       }
 
@@ -2357,7 +2454,6 @@ ASKILL(skill_mount)
     damage(ch, ch, dice(1, 2), -1);
     return 0;
   }
-
   act("You mount $N.", FALSE, ch, 0, vict, TO_CHAR);
   act("$n mounts you.", FALSE, ch, 0, vict, TO_VICT);
   act("$n mounts $N.", TRUE, ch, 0, vict, TO_NOTVICT);
