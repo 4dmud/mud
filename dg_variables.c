@@ -3,9 +3,9 @@
 *  Usage: contains the functions dealing with variable substitution.      *
 *                                                                         *
 *                                                                         *
-*  $Author: w4dimenscor $                              *
-*  $Date: 2006/02/24 20:57:17 $                                           * 
-*  $Revision: 1.22 $                                                    *
+*  $Author: w4dimenscor $         		                          *
+*  $Date: 2006/02/24 21:11:14 $                                           * 
+*  $Revision: 1.23 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -888,6 +888,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           {
             int newhit = atoi(subfield);
             GET_HIT(c) = newhit;
+            update_pos(c);
           }
           snprintf(str, slen, "%d", GET_HIT(c));
         }
@@ -1071,7 +1072,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           if (subfield && *subfield)
           {
             int newmana = atoi(subfield);
-            GET_MANA(c) = newmana;
+            if(newmana >= 0)
+               GET_MANA(c) = newmana;
+            else {
+               GET_MANA(c) = 0;
+               script_log("Trigger: %s, VNum %d. attempt to set mana to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+            }
+            
           }
           snprintf(str, slen, "%d", GET_MANA(c));
         }
@@ -1079,7 +1086,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
           if (subfield && *subfield)
           {
             int newmove = atoi(subfield);
-            GET_MOVE(c) = newmove;
+            if(newmove >= 0)
+               GET_MOVE(c) = newmove;
+            else {
+               GET_MOVE(c)=0;
+               script_log("Trigger: %s, VNum %d. attempt to set movepoints to a negative number.",GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+            }
           }
           snprintf(str, slen, "%d", GET_MOVE(c));
         }
