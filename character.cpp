@@ -423,7 +423,6 @@ void Character::reset() {
     IS_SAVING(this)           = FALSE;
     GET_IGNORELIST(this)      = NULL;
     hitched                   = NULL;
-    pet                       = -1;
 
     if (GET_HIT(this) <= 0)
         GET_HIT(this) = 1;
