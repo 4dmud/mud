@@ -50,21 +50,21 @@ ACMD(do_register)
     return;
   }
 
-  if (REMORTS(ch) < 4)
+  if (REMORTS(ch) < 2)
   {
-    ch->Send( "You must have at least 4 remorts to register for Player Killing.\r\n");
+    ch->Send( "You must have at least 2 remorts to register for Player Killing.\r\n");
     return;
   }
 
-  if (GET_SILVER_TOKEN_COUNT(ch) >= 1)
+  if (GET_BRONZE_TOKEN_COUNT(ch) >= 1)
   {
-    GET_SILVER_TOKEN_COUNT(ch)--;
+    GET_BRONZE_TOKEN_COUNT(ch)--;
     SET_BIT_AR(PLR_FLAGS(ch), PLR_PK);
-    ch->Send( "That cost 1 Silver token.\r\nWelcome to the World of Player Killing.\r\n");
+    ch->Send( "That cost 1 Bronze token.\r\nWelcome to the World of Player Killing.\r\n");
   }
   else
   {
-    ch->Send( "You need to have at least 1 silver token on file to afford this.\r\n");
+    ch->Send( "You need to have at least 1 Bronze token on file to afford this.\r\n");
   }
   return;
 }

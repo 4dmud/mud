@@ -4,8 +4,8 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $         		                          *
-*  $Date: 2006/08/30 20:40:47 $                                           * 
-*  $Revision: 1.35 $                                                      *
+*  $Date: 2006/09/10 09:11:14 $                                           * 
+*  $Revision: 1.36 $                                                      *
 **************************************************************************/
 
 #include "conf.h"
@@ -853,6 +853,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
                     }
                 } else if (!strcasecmp(field, "is_pc"))
                     snprintf(str, slen, "%d", !IS_NPC(c));
+                else if (!strcasecmp(field, "is_npc"))
+                    snprintf(str, slen, "%d", IS_NPC(c));
                 else if (!strcasecmp(field, "is_hero"))
                     snprintf(str, slen, "%d", PLR_FLAGGED(c, PLR_HERO));
                 else if (!strcasecmp(field, "is_roleplay"))
