@@ -347,6 +347,7 @@ struct alias_data
 #define WIZ_MARRY_GRP	(1 << 15)
 #define WIZ_GOTO_GRP    (1 << 16)
 #define WIZ_GLOBAL_GRP    (1 << 17)
+#define WIZ_HEDIT_GRP    (1 << 18)
 
 /*do_give*/
 #define SCMD_GIVE 0

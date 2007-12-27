@@ -47,6 +47,7 @@ struct aff_dam_event_list
 void raw_kill(struct char_data *ch, struct char_data *killer);
 int perform_move(struct char_data *ch, int dir, int specials_check);
 struct ignore *find_ignore(struct ignore *ignore_list, char *str);
+void write_ignorelist(struct char_data *ch);
 int compute_armor_class(struct char_data *ch);
 void print_ignorelist(struct char_data *ch, struct char_data *vict);
 int fe_after_damage(struct char_data* ch, struct char_data* vict, int damage, int w_type);
@@ -850,23 +851,24 @@ ACMD(do_ignore)
 
   if (!*arg)
   {
-    send_to_char("SYNTAX: ignore <victim>\r\n", ch);
-    send_to_char("Currently on your list:\r\n", ch);
+    new_send_to_char(ch, "SYNTAX: ignore <victim>\r\n");
+    new_send_to_char(ch, "Currently on your list:\r\n");
     print_ignorelist(ch, ch);
+  }  else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
+  {
+    REMOVE_FROM_LIST(a, GET_IGNORELIST(ch), next);
+    new_send_to_char(ch, "You no longer ignore them.\r\n");
+    free(a->ignore);
+    free(a);
+    write_ignorelist(ch);
   }
   else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
     new_send_to_char(ch, "%s", CONFIG_NOPERSON);
   else if (victim == ch)
-    send_to_char("Ignore yourself?  Go seek help!\r\n", ch);
+    new_send_to_char(ch, "Ignore yourself?  Go seek help!\r\n");
   else if (IS_NPC(victim))
-    send_to_char("No ignoring monsters.  That isn't nice.\r\n", ch);
-  else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
-  {
-    REMOVE_FROM_LIST(a, GET_IGNORELIST(ch), next);
-    send_to_char("You no longer ignore them.\r\n", ch);
-    free(a->ignore);
-    free(a);
-  }
+    new_send_to_char(ch, "No ignoring monsters.  That isn't nice.\r\n");
+
   else
   {
     CREATE(a, struct ignore, 1);
@@ -874,6 +876,7 @@ ACMD(do_ignore)
     a->next = GET_IGNORELIST(ch);
     GET_IGNORELIST(ch) = a;
     new_send_to_char(ch, "%s", CONFIG_OK);
+    write_ignorelist(ch);
   }
 }
 

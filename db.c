@@ -3466,7 +3466,7 @@ void load_help(FILE *fl)
 #else
   char key[READ_SIZE + 1], entry[32384];
 #endif
-  size_t entrylen;
+  size_t entrylen = 0;
   char line[READ_SIZE + 1];
   struct help_index_element el;
 
@@ -3474,9 +3474,9 @@ void load_help(FILE *fl)
   get_one_line(fl, key);
   while (*key != '$')
   {
-    strlcat(key, "\r\n", sizeof(key));	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
-    entrylen = strlcpy(entry, key, sizeof(entry));
-
+    //strlcat(key, "\r\n", sizeof(key));	/* strcat: OK (READ_SIZE - "\n" + "\r\n" == READ_SIZE + 1) */
+    //entrylen = strlcpy(entry, key, sizeof(entry));
+entrylen = 0;
     /* read in the corresponding help entry */
     get_one_line(fl, line);
     while (*line != '#' && entrylen < sizeof(entry) - 1)

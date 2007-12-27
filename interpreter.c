@@ -74,7 +74,7 @@ int count_locker(CHAR_DATA *ch);
 long get_acc_by_name(char *name);
 long get_acc_by_id(long id);
 void default_char(struct char_data *ch);
-
+void read_ignorelist(struct char_data *ch);
 void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
 /* local functions */
 int perform_dupe_check(struct descriptor_data *d);
@@ -588,7 +588,7 @@ const struct command_info cmd_info[] =
     { "holler"   , "hol"	, POS_RESTING , do_gen_comm , 1, SCMD_HOLLER, 0 },
     { "holylight", "holy"	, POS_DEAD    , do_gen_tog  , LVL_HERO, SCMD_HOLYLIGHT, 0 },
     { "house"    , "hou"	, POS_RESTING , do_house    , 0, 0, 0 },
-    { "hedit"    , "hedit"	, POS_DEAD    , do_oasis      , LVL_IMMORT, SCMD_OASIS_HEDIT, WIZ_EDIT_GRP },
+    { "hedit"    , "hedit"	, POS_DEAD    , do_oasis      , 0, SCMD_OASIS_HEDIT, WIZ_HEDIT_GRP },
 
     { "inventory", "i"	, POS_RESTING , do_inventory, 0, 0, 0 },
     { "identify", "ident"	, POS_RESTING    , do_not_here, 0, 0, 0 },
@@ -608,7 +608,7 @@ const struct command_info cmd_info[] =
     { "junk"     , "j"	, POS_RESTING , do_drop     , 0, SCMD_JUNK, 0 },
 
     { "kill"     , "k"	, POS_FIGHTING, do_hit      , 0, 0, 0 },
-    { "killlist"     , "killist"	, POS_FIGHTING, do_killlist      , 0, 0, 0 },
+    { "killlist"     , "killlist"	, POS_FIGHTING, do_killlist      , 0, 0, 0 },
     { "keeptitle", "keep" , POS_RESTING , do_gen_tog  , 1, SCMD_KEEPTITLE, 0 },
 
     { "look"     , "l"	, POS_RESTING , do_look     , 0, SCMD_LOOK, 0 },
@@ -2142,7 +2142,7 @@ if (!valid_id_num( GET_IDNUM(ch)))
   new_mudlog( NRM, GET_LEVEL(ch), TRUE, "[lev: %d] %s entering the game in room #%d, %s", GET_LEVEL(ch), GET_NAME(ch), load_room->number, load_room->name);
   act("$n has entered the game.", TRUE, ch, 0, 0, TO_ROOM);
   load_result = Crash_load(ch);
-
+  read_ignorelist(ch);
   load_locker(ch);
   if (LOCKER(ch))
     new_mudlog( NRM, GET_LEVEL(ch), TRUE, "  -- with %d items in locker", count_locker(ch));
@@ -2582,6 +2582,9 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
 
       line_sep(d);
+      
+      
+      send_out_signals(d);
 
       if (GET_LEVEL(d->character) >= LVL_HERO)
         write_to_output(d,"%s",imotd);
@@ -2678,7 +2681,6 @@ void nanny(struct descriptor_data *d, char *arg)
 send_compress_offer(d);
     }
 #endif /* HAVE_ZLIB_H */
-send_out_signals(d);
     line_sep(d);
     con_disp_menu(d);
     break;

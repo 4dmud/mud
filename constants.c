@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.8  2005/06/26 04:37:00  w4dimenscor
+ * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
+ *
  * Revision 1.7  2005/06/21 08:53:40  w4dimenscor
  * added in better help finder and help editor, a la mordecai
  *
@@ -2194,6 +2197,7 @@ const char *wiz_groups[] =
     "marry",
     "goto",
     "globalEdit",
+    "hedit",
     "\n"
   };
 

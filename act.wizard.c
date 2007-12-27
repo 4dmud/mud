@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.29  2005/06/26 04:37:00  w4dimenscor
+ * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
+ *
  * Revision 1.28  2005/06/21 08:53:40  w4dimenscor
  * added in better help finder and help editor, a la mordecai
  *
@@ -165,7 +168,7 @@ extern char *startup;
 extern char *handbook;
 extern const char *pc_class_types[];
 extern const char *pc_race_types[];
-struct char_data *char_posing = NULL;
+
 
 /* extern functions */
 void weight_to_object(struct obj_data *obj, int weight);
@@ -203,6 +206,7 @@ void print_zone(struct char_data *ch, zone_vnum vnum);
 zone_rnum real_zone_by_thing(room_vnum vznum); /* added for zone_checker */
 SPECIAL(shop_keeper);
 
+void write_ignorelist(struct char_data *ch);
 void Crash_rentsave(struct char_data *ch, int cost);
 
 /* local functions */
@@ -336,6 +340,8 @@ trust_fields[] = {
                      "goto", LVL_IMPL, PC, BINARY},	/* 17 */
                    {
                      "global", LVL_IMPL, PC, BINARY},	/* 18 */
+		   {
+                     "hedit", LVL_IMPL, PC, BINARY},	/* 19 */
                    {
                      "\n", 0, PC, MISC}
                  };
@@ -534,6 +540,12 @@ int perform_trust(struct char_data *ch, struct char_data *vict, int mode,
       else
         SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_GLOBAL_GRP)
         break;
+	  case 19:
+    if (save == 1)
+      SET_OR_REMOVE_TRUST(CMD_FLAGS(vict), WIZ_HEDIT_GRP)
+      else
+        SET_OR_REMOVE_TRUST(CMD_FLAGS2(vict), WIZ_HEDIT_GRP)
+        break;
   default:
     send_to_char("That isn't a trust group!\r\n", ch);
     return 0;
@@ -566,7 +578,7 @@ ACMD(do_trust)
      ch);
     send_to_char("Valid trust groups:\r\n", ch);
     send_to_char
-    ("ban, dspln, edit, heal, house, imm1, imm2, impl, kill\r\nload, marry, olc, quest, sen, tele, trig, goto, global, all\r\n",
+    ("ban, dspln, edit, heal, house, imm1, imm2, impl, kill\r\nload, marry, olc, quest, sen, tele, trig, goto, global, hedit, all\r\n",
      ch);
     return;
   }
@@ -597,7 +609,7 @@ ACMD(do_trust)
     return;
   }
 
-  if (GET_LEVEL(vict) < LVL_GOD)
+  if (GET_LEVEL(vict) < LVL_GOD && !PLR_FLAGGED(vict, PLR_HERO))
   {
     send_to_char("You can't trust mortals! hehe..\r\n", ch);
     return;
@@ -649,8 +661,8 @@ ACMD(do_echo)
       snprintf(buf, sizeof(buf), "%s%s", sp ? "$n" : "$n ", argument);
     else if (subcmd == SCMD_POSE)
     {
-      char_posing = ch;
-      snprintf(buf, sizeof(buf), "%s", argument);
+      
+      snprintf(buf, sizeof(buf), "[$n]\r\n%s", argument);
 
     }
     else
@@ -658,12 +670,12 @@ ACMD(do_echo)
 
     if (!PLR_FLAGGED(ch, PLR_COVENTRY))
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
+      
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
       new_send_to_char(ch, "%s", CONFIG_OK);
     else
       act(buf, FALSE, ch, 0, 0, TO_CHAR);
-    char_posing = NULL;
   }
 }
 
@@ -1702,16 +1714,19 @@ void do_stat_character(struct char_data *ch, struct char_data *k)
     if (!IS_NPC(k))
     {
 #if defined(HAVE_ZLIB)
-      if (ch->desc && ch->desc->comp)
+      if (k->desc && k->desc->comp)
       {
-        if (ch->desc->comp->state >= 2)
-          new_send_to_char(ch, "Compression: Enabled\r\n");
+        if (k->desc->comp->state >= 2)
+          new_send_to_char(ch, "Compression: Enabled    ");
         else
-          new_send_to_char(ch, "Compression: Disabled\r\n");
+          new_send_to_char(ch, "Compression: Disabled    ");
       }
 #endif
-      if (ch->desc)
-        new_send_to_char(ch, "Telopt Prompts: %d\r\n", ch->desc->eor);
+      if (ch->desc) {
+        new_send_to_char(ch, "Telopt Prompts: %d    ", k->desc->eor);
+	new_send_to_char(ch, "MXP: %d    ", k->desc->mxp);
+	} 
+	new_send_to_char(ch, "Wordwrap: %s - %d\r\n", ONOFF(PRF_FLAGGED(k->desc->character, PRF_PAGEWRAP)), PAGEWIDTH(k->desc->character));
       new_send_to_char(ch, "Total Remorts: %d", REMORTS(k));
       if (GET_REMORT(k) >= 0)
       {
@@ -6659,14 +6674,14 @@ ACMD(do_namechange)
   free_string(&tch->player.name);
   tch->player.name = str_dup(newname);
   newname[0] = LOWER(newname[0]);
-  strncpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
-  *(GET_PASSWD(tch) + MAX_PWD_LENGTH) = '\0';
+  strlcpy(GET_PASSWD(tch), CRYPT(passw, GET_PC_NAME(tch)), MAX_PWD_LENGTH);
+  change_plrindex_name(GET_IDNUM(tch), newname);
   save_char(tch);
   if (!loaded)
     Crash_crashsave(tch);
   write_aliases(tch);
+  write_ignorelist(tch);
 
-  change_plrindex_name(GET_IDNUM(tch), newname);
   new_send_to_char(ch, "%s's name changed to %s.\r\n", oldname, newname);
   if (!loaded)
     new_send_to_char(tch, "{cYYour name has been changed to %s. It's best if you quit and reenter to save.\r\n{c0", newname);

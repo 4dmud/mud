@@ -1061,6 +1061,10 @@ int get_filename(const char *orig_name, char *filename, int mode)
     prefix = LIB_PLROBJS;
     suffix = "locker";
     break;
+      case IGNORE_FILE:
+    prefix = LIB_PLRALIAS;
+    suffix = "ignore";
+    break;
   default:
     return (0);
   }

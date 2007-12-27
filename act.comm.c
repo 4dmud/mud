@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.20  2005/06/26 04:37:00  w4dimenscor
+ * Changed pose, possibly fixed namechange (untested), fixed up some help adding stuff
+ *
  * Revision 1.19  2005/06/21 08:53:40  w4dimenscor
  * added in better help finder and help editor, a la mordecai
  *
@@ -332,6 +335,17 @@ ACMD(do_say)
       snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
                argument);
     }
+    else if (argument[strlen(argument) - 1] == ')' &&
+    argument[strlen(argument) - 2] == ')' &&
+             argument[strlen(argument) - 3] == ':' &&
+             argument[strlen(argument) - 4] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You grin and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n grins and says, '%s'",
+               argument);
+    }
     else if (argument[strlen(argument) - 1] == '(' &&
              argument[strlen(argument) - 2] == ':' &&
              argument[strlen(argument) - 3] == ' ')
@@ -340,6 +354,36 @@ ACMD(do_say)
       snprintf(buf, sizeof(buf), "You frown and say, '%s'",
                argument);
       snprintf(buf2, sizeof(buf2), "$n frowns and says, '%s'",
+               argument);
+    }
+        else if (argument[strlen(argument) - 1] == '/' &&
+             argument[strlen(argument) - 2] == ':' &&
+             argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You smirk and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n smirks and says, '%s'",
+               argument);
+    }
+        else if (argument[strlen(argument) - 1] == 'o' &&
+             argument[strlen(argument) - 2] == ':' &&
+             argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 3] = '\0';
+      snprintf(buf, sizeof(buf), "You look surprized as you say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n looks surprized as $e says, '%s'",
+               argument);
+    }
+    else if (argument[strlen(argument) - 1] == '>'
+             && argument[strlen(argument) - 2] == ':'
+             && argument[strlen(argument) - 3] == ' ')
+    {
+      argument[strlen(argument) - 4] = '\0';
+      snprintf(buf, sizeof(buf), "You smile and say, '%s'",
+               argument);
+      snprintf(buf2, sizeof(buf2), "$n smiles and says, '%s'",
                argument);
     }
     else if (argument[strlen(argument) - 1] == ')'

@@ -948,7 +948,7 @@ void do_auto_exits(struct char_data *ch)
     strcpy(tag_close, "/VEx");
   }
 
-  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
+//  new_send_to_char(ch, "%s", MXPTAG("EXPIRE Exits"));
   new_send_to_char(ch, "%s[ Exits: %s", CBGRN(ch, C_NRM),
                    CBWHT(ch, C_NRM));
 
@@ -2882,7 +2882,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
   size_t len = 0;
   strcpy(buf, "  Help files simmilar\r\n---------------------------------------\r\n");
   len = strlen(buf);
-  for (i=0;i<top_of_helpt;i++)
+  for (i=0;i<=top_of_helpt;i++)
     if (isname_full(keywords, help_table[i].keywords))
     {
       snprintf(buf1, sizeof(buf1), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords);
@@ -2892,7 +2892,7 @@ void display_help_list(struct descriptor_data *d, char *keywords)
 
   if (cnt == 1)
   {
-    for (i=0;i<top_of_helpt;i++)
+    for (i=0;i<=top_of_helpt;i++)
     {
       if (isname_full(keywords, help_table[i].keywords))
       {

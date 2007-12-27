@@ -4023,6 +4023,8 @@ void perform_act(const char *orig, struct char_data *ch,
     log("No string passed to perform_act!");
     return;
   }
+  
+
 
   buf = lbuf;
 
@@ -4133,21 +4135,12 @@ void perform_act(const char *orig, struct char_data *ch,
       uppercasenext = FALSE;
     }
   }
-
-
   *(--buf) = '\r';
   *(++buf) = '\n';
   *(++buf) = '\0';
 
-  if (lbuf == NULL || !*lbuf)
-    return;
-
-  if (to->desc) {
-  if (char_posing && to != char_posing && !PLR_FLAGGED(to, PLR_ROLEPLAYER))
-  write_to_output(to->desc, "%s (%s)", CAP(lbuf), PERS(char_posing, to));
-  else
-    write_to_output(to->desc, "%s", CAP(lbuf));
-    }
+  if (to->desc) 
+    write_to_output(to->desc, "%s", CAP(lbuf));   
 
   if ((IS_NPC(to) && dg_act_check) && (to != ch))
     act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
@@ -5314,10 +5307,10 @@ void turn_on_mxp (DESCRIPTOR_DATA *d)
 {
   d->mxp = TRUE;  /* turn it on now */
   write_to_output( d, "%s", start_mxp_str);
-  write_to_output( d, "%s", MXPMODE(6) );   /* permanent secure mode */
-  /* Exit tag */
-  write_to_output( d, "%s", MXPTAG("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\" EXPIRE=\"Exits\"  FLAG=RoomExit"));
-  write_to_output( d, "%s", MXPTAG("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\" EXPIRE=\"Exits\" FLAG=RoomExit"));
+ write_to_output( d, "%s", MXPMODE(6) );   // permanent secure mode 
+
+  write_to_output( d, "%s", MXPTAG("!ELEMENT Ex '<send href=\"&text;\">' ATT=\"text\"   FLAG=RoomExit"));
+  write_to_output( d, "%s", MXPTAG("!ELEMENT VEx '<send href=\"drive &text;\">' ATT=\"text\"  FLAG=RoomExit"));
   write_to_output( d, "%s", MXPTAG("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
                     "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;'  prompt>\" "
                     "ATT=\"name\""));

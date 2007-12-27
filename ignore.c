@@ -24,99 +24,111 @@
 
 struct ignore *find_ignore(struct ignore *ignore_list, char *str)
 {
-    while (ignore_list != NULL) {
-	if (*str == *ignore_list->ignore)
-	    if (!strcmp(str, ignore_list->ignore))
-		return ignore_list;
-	ignore_list = ignore_list->next;
-    }
-    return NULL;
+  while (ignore_list != NULL)
+  {
+    if (*str == *ignore_list->ignore)
+      if (!strcmp(str, ignore_list->ignore))
+        return ignore_list;
+    ignore_list = ignore_list->next;
+  }
+  return NULL;
 }
 
 int is_ignoring(struct char_data *ch, struct char_data *vict)
 {
-    struct ignore *temp;
-    char buf[127];
+  struct ignore *temp;
+  char buf[127];
 
-    if (!ch || !vict)
-	return (0);
-
-    if (IS_NPC(ch) || IS_NPC(vict))
-	return (0);
-
-    sprintf(buf, "%s", GET_NAME(ch));
-    temp = GET_IGNORELIST(vict);
-    while (temp != NULL) {
-	if (!str_cmp(buf, temp->ignore))
-	    return (1);
-	temp = temp->next;
-    }
+  if (!ch || !vict)
     return (0);
+
+  if (IS_NPC(ch) || IS_NPC(vict))
+    return (0);
+
+  sprintf(buf, "%s", GET_NAME(ch));
+  temp = GET_IGNORELIST(vict);
+  while (temp != NULL)
+  {
+    if (!str_cmp(buf, temp->ignore))
+      return (1);
+    temp = temp->next;
+  }
+  return (0);
 }
 void print_ignorelist(struct char_data *ch, struct char_data *vict)
 {
-    char buf[127];
-    struct ignore *temp;
+  char buf[127];
+  struct ignore *temp;
 
-    if (!ch || !vict)
-	return;
-
-    if (IS_NPC(ch) || IS_NPC(vict))
-	return;
-
-    temp = GET_IGNORELIST(ch);
-    while (temp != NULL) {
-	sprintf(buf, "%s\r\n", temp->ignore);
-	send_to_char(buf, vict);
-	temp = temp->next;
-    }
+  if (!ch || !vict)
     return;
+
+  if (IS_NPC(ch) || IS_NPC(vict))
+    return;
+
+  temp = GET_IGNORELIST(ch);
+  while (temp != NULL)
+  {
+    sprintf(buf, "%s\r\n", temp->ignore);
+    send_to_char(buf, vict);
+    temp = temp->next;
+  }
+  return;
 }
 
 void write_ignorelist(struct char_data *ch)
 {
-    FILE *file;
-    char ignoref[127];
-    struct ignore *ignoretemp;
-    int ignorelength;
+  FILE *file;
+  char ignoref[127];
+  struct ignore *ignoretemp;
 
-    get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
-    unlink(ignoref);
-    if (!GET_IGNORELIST(ch))
-	return;
-    file = fopen(ignoref, "wt");
-    ignoretemp = GET_IGNORELIST(ch);
-    while (ignoretemp) {
-	ignorelength = strlen(ignoretemp->ignore);
-	fprintf(file, "%d\n", ignorelength);
-	fprintf(file, "%s\n", ignoretemp->ignore);
-	ignoretemp = ignoretemp->next;
-    }
-    fclose(file);
+  get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
+  unlink(ignoref);
+  if (!GET_IGNORELIST(ch))
+    return;
+  if ((file = fopen(ignoref, "wt")) == NULL)
+  {
+    log("Can't open ignore file %s", ignoref);
+    return;
+  }
+  ignoretemp = GET_IGNORELIST(ch);
+  while (ignoretemp)
+  {
+    fprintf(file, "%d\n%s\n", strlen(ignoretemp->ignore), ignoretemp->ignore);
+    ignoretemp = ignoretemp->next;
+  }
+  fclose(file);
 }
 
 void read_ignorelist(struct char_data *ch)
 {
-    FILE *file;
-    char ignoref[127];
-    struct ignore *ignoretemp2;
-    char buf[127];
-    int ignorelength;
+  FILE *file;
+  char ignoref[127];
+  struct ignore *ignoretemp;
+  char buf[127];
+  size_t ignorelength;
 
-    get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
-    file = fopen(ignoref, "r");
-    if (!file)
-	return;
-    CREATE(GET_IGNORELIST(ch), struct ignore, 1);
-    ignoretemp2 = GET_IGNORELIST(ch);
-    do {
-	fscanf(file, "%d\n", &ignorelength);
-	fgets(buf, ignorelength + 1, file);
-	ignoretemp2->ignore = strdup(buf);
-	if (!feof(file)) {
-	    CREATE(ignoretemp2->next, struct ignore, 1);
-	    ignoretemp2 = ignoretemp2->next;
-	}
-    } while (!feof(file));
+  get_filename(GET_NAME(ch), ignoref, IGNORE_FILE);
+  file = fopen(ignoref, "r");
+  if (!file)
+    return;
+    GET_IGNORELIST(ch) = NULL;
+  
+  do
+  {
+    if (!fscanf(file, "%d\n", &ignorelength)) {
     fclose(file);
+    return;
+    }
+    if (!fgets(buf, ignorelength + 1, file)) {
+    fclose(file);
+    return;
+    }
+    CREATE(ignoretemp, struct ignore, 1);
+    ignoretemp->ignore = strdup(buf);
+    ignoretemp->next = GET_IGNORELIST(ch);
+    GET_IGNORELIST(ch) = ignoretemp;
+  }
+  while (!feof(file));
+  fclose(file);
 }

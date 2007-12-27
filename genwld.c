@@ -642,16 +642,13 @@ int free_room_strings(struct room_data *room)
   room->name = NULL;
   }
   if (room->description) {
-  free(room->description);
-  room->description = NULL;
+  free_string(&room->description);
   }
   if (room->smell) {
-  free(room->smell);
-  room->smell = NULL;
+  free_string(&room->smell);
   }
   if (room->listen) {
-  free(room->listen);
-  room->listen = NULL;
+  free_string(&room->listen);
   }
   if (room->ex_description)
     free_ex_descriptions(room->ex_description);
@@ -672,9 +669,9 @@ int free_room_strings(struct room_data *room)
     if (R_EXIT(room, i))
     {
       if (R_EXIT(room, i)->general_description)
-        free(R_EXIT(room, i)->general_description);
+        free_string(&R_EXIT(room, i)->general_description);
       if (R_EXIT(room, i)->keyword)
-        free(R_EXIT(room, i)->keyword);
+        free_string(&R_EXIT(room, i)->keyword);
       free(R_EXIT(room, i));
       R_EXIT(room, i) = NULL;
     }

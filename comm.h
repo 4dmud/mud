@@ -86,5 +86,4 @@ int toggle_compression(struct descriptor_data *t);
 
 typedef RETSIGTYPE sigfunc(int);
 
-extern struct char_data *char_posing;
 

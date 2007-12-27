@@ -34,7 +34,6 @@ extern struct descriptor_data *descriptor_list;
 ACMD(do_oasis_hedit)
 {
   struct descriptor_data *d;
-  unsigned int j;
   for (d = descriptor_list; d; d = d->next)
     if (STATE(d) == CON_HEDIT)
     {
@@ -75,13 +74,10 @@ ACMD(do_oasis_hedit)
   OLC_STORAGE(d) = strdup(argument);
 
  
-  for (j = 0;j < top_of_helpt;j++)
-    if (isname_full(OLC_STORAGE(d), help_table[j].keywords))
+  for (OLC_ZNUM(d) = 0;OLC_ZNUM(d) <= top_of_helpt;OLC_ZNUM(d)++)
+    if (isname_full(OLC_STORAGE(d), help_table[OLC_ZNUM(d)].keywords))
       break;
 
-  /* start znum here so that if the loop below doesnt find it
-     it will add a new one */
-  OLC_ZNUM(d) = j;
 
   if (OLC_ZNUM(d) > top_of_helpt)
   {
@@ -106,7 +102,7 @@ void hedit_setup_new(struct descriptor_data *d)
 {
   CREATE(OLC_HELP(d), struct help_index_element, 1);
   OLC_HELP(d)->keywords     = strdup(OLC_STORAGE(d));
-  OLC_HELP(d)->entry        = strdup("This is an unfinished help entry.");
+  OLC_HELP(d)->entry        = strdup("This is an unfinished help entry.\r\n");
   hedit_disp_menu(d);
   OLC_VAL(d) = 0;
 }
@@ -115,7 +111,6 @@ void hedit_setup_new(struct descriptor_data *d)
 
 void hedit_setup_existing(struct descriptor_data *d, int real_num)
 {
-  int i;
   char buf[MAX_STRING_LENGTH];
   *buf = '\0';
   CREATE(OLC_HELP(d), struct help_index_element, 1);
@@ -126,15 +121,9 @@ void hedit_setup_existing(struct descriptor_data *d, int real_num)
   /*
    * Allocate space for all strings.
    */
-  for (i = 0;i < top_of_helpt;i++)
-    if (help_table[real_num].id == help_table[i].id)
-    {
-      OLC_HELP(d)->entries++;
-      strlcat(buf, help_table[i].keywords, sizeof(buf));
-      strlcat(buf, " ", sizeof(buf));
-    }
-  OLC_HELP(d)->keywords = strdup(buf && *buf ?
-                                 buf : "UNDEFINED");
+
+  OLC_HELP(d)->keywords = strdup(help_table[real_num].keywords ?
+                                 help_table[real_num].keywords : "UNDEFINED");
 
   OLC_HELP(d)->entry = strdup(help_table[real_num].entry ?
                               help_table[real_num].entry : "undefined\r\n");
@@ -161,12 +150,12 @@ void hedit_save_internally(struct descriptor_data *d)
   }
   top_of_helpt++;
   free(help_table);
+  help_table = new_help_table;
   }
-  else {
  help_table[OLC_ZNUM(d)] = *OLC_HELP(d);
  help_table[OLC_ZNUM(d)].entry = str_dup(OLC_HELP(d)->entry);
  help_table[OLC_ZNUM(d)].keywords = str_dup(OLC_HELP(d)->keywords);
-}
+
 
   add_to_save_list(HEDIT_PERMISSION, SL_HELP);
   hedit_save_to_disk(d); /* autosave by Rumble */
