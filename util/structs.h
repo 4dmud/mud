@@ -274,8 +274,8 @@
 #define PRF_SUMMONABLE	10 /* Can be summoned				*/
 #define PRF_NOREPEAT	11 /* No repetition of comm commands		*/
 #define PRF_HOLYLIGHT	12 /* Can see in dark				*/
-#define PRF_COLOR_1	13 /* Color (low bit)				*/
-#define PRF_COLOR_2	14 /* Color (high bit)				*/
+#define PRF_COLOUR_1	13 /* Color (low bit)				*/
+#define PRF_COLOUR_2	14 /* Color (high bit)				*/
 #define PRF_NOWIZ	15 /* Can't hear wizline			*/
 #define PRF_LOG1	16 /* On-line System Log (low bit)		*/
 #define PRF_LOG2	17 /* On-line System Log (high bit)		*/

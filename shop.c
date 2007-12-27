@@ -1039,10 +1039,10 @@ char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr, Charac
     break;
   }
   CAP(itemname);
-  strip_color(itemname, sizeof(itemname));
+  strip_colour(itemname, sizeof(itemname));
   snprintf(result, sizeof(result), " {cy%2d{cg)  {cy%9s{cc   %-48s {cG%6lld{c0\r\n",
            aindex, quantity, itemname, buy_price(obj, shop_nr, keeper, ch));
-  proc_color(result, IRANGE(0, COLOR_LEV(ch), 3), sizeof(result));
+  proc_colour(result, IRANGE(0, COLOUR_LEV(ch), 3), sizeof(result));
   return (result);
 }
 

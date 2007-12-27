@@ -24,7 +24,7 @@ char *get_exits(Character *ch);
 
 static struct map_bit_data {
     char bit[2];
-    char color[5];
+    char colour[5];
     char name[15];
     } map_bit[] = {
 {"%", "{cW", "Inside"    },//SECT_INSIDE         

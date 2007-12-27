@@ -62,7 +62,7 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
 /* Board appearance order. */
 #define	NEWEST_AT_TOP	FALSE
 
-#define IMMORTAL_POST_COLOR "{cC"
+#define IMMORTAL_POST_COLOUR "{cC"
 
 /*
 format:	vnum, read lvl, write lvl, remove lvl, filename, 0 at end
@@ -330,7 +330,7 @@ int Board_show_board(int board_type, Character *ch, char *arg,
       if (!MSG_HEADING(board_type, i))
         goto fubar;
 
-      nlen = snprintf(buf + len, sizeof(buf) - len, "%-2d : %s%s{c0\r\n", num_of_msgs[board_type] - i, (MSG_LEVEL(board_type, i) > LVL_IMMORT ? IMMORTAL_POST_COLOR: ""), MSG_HEADING(board_type, i));
+      nlen = snprintf(buf + len, sizeof(buf) - len, "%-2d : %s%s{c0\r\n", num_of_msgs[board_type] - i, (MSG_LEVEL(board_type, i) > LVL_IMMORT ? IMMORTAL_POST_COLOUR: ""), MSG_HEADING(board_type, i));
       if (len + nlen >= sizeof(buf) || nlen < 0)
         break;
       len += nlen;
@@ -341,7 +341,7 @@ int Board_show_board(int board_type, Character *ch, char *arg,
       if (!MSG_HEADING(board_type, i))
         goto fubar;
 
-      nlen = snprintf(buf + len, sizeof(buf) - len, "%-2d : %s%s{c0\r\n", i + 1, (MSG_LEVEL(board_type, i) > LVL_IMMORT ? IMMORTAL_POST_COLOR: ""), MSG_HEADING(board_type, i));
+      nlen = snprintf(buf + len, sizeof(buf) - len, "%-2d : %s%s{c0\r\n", i + 1, (MSG_LEVEL(board_type, i) > LVL_IMMORT ? IMMORTAL_POST_COLOUR: ""), MSG_HEADING(board_type, i));
       if (len + nlen >= sizeof(buf) || nlen < 0)
         break;
       len += nlen;

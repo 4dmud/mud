@@ -535,7 +535,7 @@ bool check_time(void) {
         return FALSE;
 }
 
-const char *wing_color(int align) {
+const char *wing_colour(int align) {
     if (align > 950)
         return "shimmering silky white";
     else if (align > 350)
@@ -631,9 +631,9 @@ int check_dam_affects(Character *ch) {
                 if (number(0, 1)) {
                     if (!IS_NPC(ch)) {
                         char buf[MAX_INPUT_LENGTH];
-                        snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", wing_color(GET_ALIGNMENT(ch)));
+                        snprintf(buf,sizeof(buf), "You flap your %s wings and lift yourself a little higher.", wing_colour(GET_ALIGNMENT(ch)));
                         act(buf, FALSE, ch, 0, 0, TO_CHAR);
-                        snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_color(GET_ALIGNMENT(ch)));
+                        snprintf(buf,sizeof(buf), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_colour(GET_ALIGNMENT(ch)));
                         act(buf, FALSE, ch, 0, 0, TO_ROOM);
                     } else {
                         act("$n flaps $s wings and lifts $mself a little higher.", FALSE, ch, 0, 0, TO_ROOM);
@@ -641,9 +641,9 @@ int check_dam_affects(Character *ch) {
                 } else {
                     if (!IS_NPC(ch)) {
                         char buf[MAX_INPUT_LENGTH];
-                        snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
+                        snprintf(buf, sizeof(buf),"You still your %s wings and swoop a little closer to the ground.",  wing_colour(GET_ALIGNMENT(ch)));
                         act(buf, FALSE, ch, 0, 0, TO_CHAR);
-                        snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.",  wing_color(GET_ALIGNMENT(ch)));
+                        snprintf(buf,sizeof(buf), "$n stills $s %s wings and swoops a little closer to the ground.",  wing_colour(GET_ALIGNMENT(ch)));
                         act(buf, FALSE, ch, 0, 0, TO_ROOM);
                     } else {
                         act("$n stills $s wings and swoops a little closer to the ground.", FALSE, ch, 0, 0, TO_ROOM);

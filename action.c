@@ -759,11 +759,11 @@ ASUB(sub_juggle)
 
   if (vict)
   {
-    act("You start to juggle a few colored balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
-    act("$n starts to juggle a few colored balls to you.", FALSE, ch, 0, vict, TO_VICT);
+    act("You start to juggle a few coloured balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n starts to juggle a few coloured balls to you.", FALSE, ch, 0, vict, TO_VICT);
   }
   else
-    act("You start to juggle a few colored balls.", FALSE, ch, 0, 0, TO_CHAR);
+    act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
@@ -855,50 +855,50 @@ ACTION(thing_juggle)
     /* 5 to 8 is juggling with a partner.*/
   case 12:
     diff = 2;
-    to_char = "You spin two brightly colored balls in each hand.\r\n"
+    to_char = "You spin two brightly coloured balls in each hand.\r\n"
               "Every third moment you fire a ball high into the air,\r\n"
               "Finally you ping each spinning ball in a high arch over to $N.";
-    to_room = "$n spins two brightly colored balls in each hand.\r\n"
+    to_room = "$n spins two brightly coloured balls in each hand.\r\n"
               "Every third moment $e fires a ball high into the air,\r\n"
               "Finally pinging each spinning ball in a high arch over to $N.";
-    to_vict = "$n spin two brightly colored balls in each hand.\r\n"
+    to_vict = "$n spin two brightly coloured balls in each hand.\r\n"
               "Every third moment you fire a ball high into the air,\r\n"
               "Finally $e pings each spinning ball in a high arch over to you.";
 
     break;
   case 11:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly coloredm balls whizzing over your head!\r\n"
+              "brightly colouredm balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
   case 10:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly colored balls whizzing over your head!\r\n"
+              "brightly coloured balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
   case 9:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly colored balls whizzing over your head!\r\n"
+              "brightly coloured balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
@@ -922,10 +922,10 @@ ACTION(thing_juggle)
     break;
   case 5:
     to_char = "You juggle two balls in each hand, then add another.\r\n"
-              "The five balls suddenly start to color the the room\r\n"
+              "The five balls suddenly start to colour the the room\r\n"
               "with vibrant magical flashes.";
     to_room = "$n juggles two balls in each hand, then adds another.\r\n"
-              "The five balls suddenly start to color the the room\r\n"
+              "The five balls suddenly start to colour the the room\r\n"
               "with vibrant magical flashes.";
 
     break;
@@ -1315,11 +1315,11 @@ ASUB(sub_tumble)
 
   if (vict)
   {
-    act("You start to juggle a few colored balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
-    act("$n starts to juggle a few colored balls to you.", FALSE, ch, 0, vict, TO_VICT);
+    act("You start to juggle a few coloured balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n starts to juggle a few coloured balls to you.", FALSE, ch, 0, vict, TO_VICT);
   }
   else
-    act("You start to juggle a few colored balls.", FALSE, ch, 0, 0, TO_CHAR);
+    act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
@@ -1370,11 +1370,11 @@ ASUB(sub_clown)
 
   if (vict)
   {
-    act("You start to juggle a few colored balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
-    act("$n starts to juggle a few colored balls to you.", FALSE, ch, 0, vict, TO_VICT);
+    act("You start to juggle a few coloured balls to $N.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n starts to juggle a few coloured balls to you.", FALSE, ch, 0, vict, TO_VICT);
   }
   else
-    act("You start to juggle a few colored balls.", FALSE, ch, 0, 0, TO_CHAR);
+    act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
@@ -1426,50 +1426,50 @@ ACTION(thing_tumble)
     /* 5 to 8 is juggling with a partner.*/
   case 12:
     diff = 2;
-    to_char = "You spin two brightly colored balls in each hand.\r\n"
+    to_char = "You spin two brightly coloured balls in each hand.\r\n"
               "Every third moment you fire a ball high into the air,\r\n"
               "Finally you ping each spinning ball in a high arch over to $N.";
-    to_room = "$n spins two brightly colored balls in each hand.\r\n"
+    to_room = "$n spins two brightly coloured balls in each hand.\r\n"
               "Every third moment $e fires a ball high into the air,\r\n"
               "Finally pinging each spinning ball in a high arch over to $N.";
-    to_vict = "$n spin two brightly colored balls in each hand.\r\n"
+    to_vict = "$n spin two brightly coloured balls in each hand.\r\n"
               "Every third moment you fire a ball high into the air,\r\n"
               "Finally $e pings each spinning ball in a high arch over to you.";
 
     break;
   case 11:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly colored balls whizzing over your head!\r\n"
+              "brightly coloured balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
   case 10:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly colored balls whizzing over your head!\r\n"
+              "brightly coloured balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
   case 9:
     to_char = "You pick up a few more balls and start a huge circle of\r\n"
-              "brightly colored balls whizzing over your head!\r\n"
+              "brightly coloured balls whizzing over your head!\r\n"
               "Finally as each ball falls you throw it back over to $N.";
     to_room = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over your head!\r\n"
+              "brightly colours whizzing over your head!\r\n"
               "Finally as each ball falls $n throws it back over to $N.";
     to_vict = "$n picks up a few more balls and starts a huge circle of\r\n"
-              "brightly colors whizzing over $s head!\r\n"
+              "brightly colours whizzing over $s head!\r\n"
               "Finally as each ball falls $n throws it back over to you.";
 
     break;
@@ -1493,10 +1493,10 @@ ACTION(thing_tumble)
     break;
   case 5:
     to_char = "You juggle two balls in each hand, then add another.\r\n"
-              "The five balls suddenly start to color the the room\r\n"
+              "The five balls suddenly start to colour the the room\r\n"
               "with vibrant magical flashes.";
     to_room = "$n juggles two balls in each hand, then adds another.\r\n"
-              "The five balls suddenly start to color the the room\r\n"
+              "The five balls suddenly start to colour the the room\r\n"
               "with vibrant magical flashes.";
 
     break;

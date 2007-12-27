@@ -64,8 +64,8 @@ int size_dice_wep(Character *ch, short dual);
 int highest_tier(Character *ch);
 float race_dam_mod(int race, int magic);
 
-void strip_color(char *inbuf, size_t i_buf);
-size_t proc_color(char *inbuf, int color_lvl, size_t len);
+void strip_colour(char *inbuf, size_t i_buf);
+size_t proc_colour(char *inbuf, int color_lvl, size_t len);
 extern int sub_success;
 int total_chance(Character *ch, int skill);
 gold_int exp_needed(Character *ch);
@@ -1084,7 +1084,7 @@ void alter_hit(Character *ch, int amount);
 void alter_mana(Character *ch, int amount);
 void alter_move(Character *ch, int amount);
 int sub_number(char *name);
-const char * color_option_name(int num);
+const char * colour_option_name(int num);
 struct obj_data *revert_object(struct obj_data *obj);
 #define GOLD_BANK   0
 #define GOLD_HAND   1

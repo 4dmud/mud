@@ -6458,7 +6458,7 @@ void generate_weapon(OBJ_DATA *obj) {
 
 
         strcpy(buf, obj->short_description);
-        strip_color(buf, sizeof(buf));
+        strip_colour(buf, sizeof(buf));
         point = buf;
 
         do {

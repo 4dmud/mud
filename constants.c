@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: constants.c,v $
+ * Revision 1.26  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.25  2007/06/08 08:19:11  w4dimenscor
  * Added the ability to see where mobs and objects reset, removed cpp_extern, needs testing, and changed assemblies so that you can specify a vnum instead of a name
  *
@@ -850,7 +853,7 @@ const char *connected_types[] =
 
 const char *creation_state_types[] =
   {
-    "ansi color?",
+    "ansi colour?",
     "new here?",
     "sex?",
     "class?",
@@ -1438,7 +1441,7 @@ const char *extra_bits[] =
     "\n"
   };
 
-const char * color_option_list[] =
+const char * colour_option_list[] =
   {
     "Alice Blue",
     "Antique White",
@@ -1700,8 +1703,8 @@ int drink_aff[][3] = {
                      };
 
 
-/* color of the various drinks */
-const char *color_liquid[] =
+/* colour of the various drinks */
+const char *colour_liquid[] =
   {
     "clear",
     "brown",

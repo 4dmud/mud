@@ -182,7 +182,7 @@ void assedit_disp_menu(Descriptor *d)
   extern const char *AssemblyTypes[];
   char szAssmType[MAX_INPUT_LENGTH] = { '\0' };
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   sprinttype(OLC_ASSEDIT(d)->uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
 
@@ -284,7 +284,7 @@ void assedit_parse(Descriptor *d, char *arg)
 
     case 't':
     case 'T':
-      get_char_colors(d->character);
+      get_char_colours(d->character);
 #if defined(CLEAR_SCREEN)
       d->Output( "%c[H%c[J", 27, 27);
 #endif

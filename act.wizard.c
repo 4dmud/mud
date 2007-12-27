@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.71  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.70  2007/06/08 08:19:11  w4dimenscor
  * Added the ability to see where mobs and objects reset, removed cpp_extern, needs testing, and changed assemblies so that you can specify a vnum instead of a name
  *
@@ -70,7 +73,7 @@
  * Working on the Descriptor class, have removed the close_socked and new_descriptor functions in favor of constructors and destructors in the class
  *
  * Revision 1.51  2006/05/30 09:14:19  w4dimenscor
- * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ * rewrote the colour code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
  * Revision 1.50  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
@@ -1243,7 +1246,7 @@ void list_zone_commands_room(Character *ch, room_vnum rvnum) {
         return;
     }
 
-    get_char_colors(ch);
+    get_char_colours(ch);
 
     ch->Send( "Zone commands in this room:%s\r\n", yel);
     while (ZOCMD.command != 'S') {
@@ -1685,7 +1688,7 @@ void do_stat_object(Character *ch, struct obj_data *j) {
     case ITEM_LIGHTSABRE_HILT:
         ch->Send( "Num Sabers: %d Number dam dice: %d Size dam dice: %d\r\nSaber Color: %s ",
                   (int) GET_OBJ_VAL(j, 0),(int) GET_OBJ_VAL(j, 1), (int) GET_OBJ_VAL(j, 2),
-                  color_option_name((int) GET_OBJ_VAL(j, 3)));
+                  colour_option_name((int) GET_OBJ_VAL(j, 3)));
         break;
 
     default:
@@ -2804,7 +2807,7 @@ ACMD(do_advance) {
             "A strange feeling comes upon you,\r\n"
             "Like a giant hand, light comes down\r\n"
             "from above, grabbing your body, that\r\n"
-            "begins to pulse with colored lights\r\n"
+            "begins to pulse with coloured lights\r\n"
             "from inside.\r\n\r\n"
             "Your head seems to be filled with demons\r\n"
             "from another plane as your body dissolves\r\n"
@@ -3062,7 +3065,7 @@ ACMD(do_pretitle) {
 
     msg = &(PRETITLE(ch));
 
-    strip_color(argument, strlen(argument));
+    strip_colour(argument, strlen(argument));
     skip_spaces(&argument);
 
     if (strlen(argument) > 14) {
@@ -4369,7 +4372,7 @@ set_fields[] = {
                    {
                        "quest", LVL_GOD, PC, BINARY}, {
                        "loadroom", LVL_GRGOD, PC, MISC}, {
-                       "color", LVL_GOD, PC, BINARY}, {
+                       "colour", LVL_GOD, PC, BINARY}, {
                        "idnum", LVL_IMPL, PC, NUMBER}, {
                        "passwd", LVL_IMPL, PC, MISC}, /* 45 */
                    {
@@ -4697,8 +4700,8 @@ int perform_set(Character *ch, Character *vict, int mode,
         }
         break;
     case 43:
-        SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOR_1);
-        SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOR_2);
+        SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOUR_1);
+        SET_OR_REMOVE(PRF_FLAGS(vict), PRF_COLOUR_2);
         break;
     case 44:
         if (GET_IDNUM(ch) != 1 || !IS_NPC(vict))
@@ -4953,7 +4956,7 @@ int perform_set(Character *ch, Character *vict, int mode,
             return 0;
         }
         if (strstr(val_arg, "{")) {
-            ch->Send( "Sorry, no color codes please.\r\n");
+            ch->Send( "Sorry, no colour codes please.\r\n");
             return 0;
         }
         free_string(&IMMTITLE(vict));

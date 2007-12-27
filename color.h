@@ -1,5 +1,5 @@
 //
-// C++ Interface: color
+// C++ Interface: colour
 //
 // Description: 
 //
@@ -11,7 +11,7 @@
 //
 #define CNUL  ""
 
-/*             Plain Colors            has the CNRM before it to reset color!*/
+/*             Plain Colours            has the CNRM before it to reset color!*/
 #define CNRM  "\x1B[0;0m"     /* &n */
 #define CRED  "\x1B[0;0m\x1B[31m"  /* &r */
 #define CGRN  "\x1B[0;0m\x1B[32m"  /* &g */
@@ -46,9 +46,9 @@
 #define UNDER  "\x1B[4m" /* &U */
 #define FLASH  "\x1B[5m" /* &F */
 
-//const char *COLORLIST[] = {CNRM, CRED, CGRN, CYEL, CBLU, CMAG, CCYN, CWHT, CBLK,
+//const char *COLOURLIST[] = {CNRM, CRED, CGRN, CYEL, CBLU, CMAG, CCYN, CWHT, CBLK,
 //                BRED, BGRN, BYEL, BBLU, BMAG, BCYN, BWHT, BBLK,
 //                BKRED,BKGRN,BKYEL,BKBLU,BKMAG,BKCYN,BKWHT,BKBLK,
 //                UNDER,FLASH};
 //we'll use a switch so we can use letters
-#define MAX_COLORS 26
+#define MAX_COLOURS 26

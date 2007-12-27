@@ -637,7 +637,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     zone_rnum zone;
 
     strcpy(buf2, obj->short_description);
-    strip_color(buf2, sizeof(buf2));
+    strip_colour(buf2, sizeof(buf2));
     /*
         'a Kruesraker' is a type of 'weapon' made from 'unknown'
     It is glowing humming magic cursed
@@ -771,7 +771,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
                   "{cyDamage dice: {cC%d{cyD{cC%d{c0\r\n"
                   "{cySaber Color: {cc%s{c0\r\n",
                   (int) GET_OBJ_VAL(obj, 0),(int) GET_OBJ_VAL(obj, 1), (int) GET_OBJ_VAL(obj, 2),
-                  color_option_name((int) GET_OBJ_VAL(obj, 3)));
+                  colour_option_name((int) GET_OBJ_VAL(obj, 3)));
         break;
     }
 

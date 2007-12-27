@@ -187,7 +187,7 @@ int check_mine_traps(Character *ch)
     dam = ((mhit)/3)*2;
     break;
   case 3:
-    act("You are surrounded by a gas of scintillating colors!", FALSE, ch, 0, 0, TO_CHAR);
+    act("You are surrounded by a gas of scintillating colours!", FALSE, ch, 0, 0, TO_CHAR);
     dam = ((mhit)/2);
     break;
   case 4:

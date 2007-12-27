@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.40  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.39  2007/06/07 22:28:53  w4dimenscor
  * fixed a crash bug in the code where it checked for if a target of a directional was able to hunt the victim
  *
@@ -1511,7 +1514,7 @@ void mag_assign_spells(void) {
            TAR_CHAR_ROOM | TAR_IGNORE, FALSE, MAG_SUMMONS, 180,
            TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5);
 
-    spello(SPELL_COLOR_SPRAY, "color spray", 30 , 15 , 3,
+    spello(SPELL_COLOUR_SPRAY, "colour spray", 30 , 15 , 3,
            POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
            0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20);
 
@@ -2051,7 +2054,7 @@ int elemental_type(int spell) {
     case SPELL_CHILL_TOUCH:
         retval = ELEM_ICE;
         break;
-    case SPELL_COLOR_SPRAY:
+    case SPELL_COLOUR_SPRAY:
         retval = ELEM_LIGHT;
         break;
     case SPELL_CONTROL_WEATHER:

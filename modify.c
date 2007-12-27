@@ -517,11 +517,11 @@ char *next_page(char *str, int length, int width) {
         else if (line > length)
             return (str);
 
-        /* Check for the begining of an ANSI color code block. */
+        /* Check for the begining of an ANSI colour code block. */
         else if (*str == '\x1B' && !spec_code)
             spec_code = TRUE;
 
-        /* Check for the end of an ANSI color code block. */
+        /* Check for the end of an ANSI colour code block. */
         else if (*str == 'm' && spec_code)
             spec_code = FALSE;
 

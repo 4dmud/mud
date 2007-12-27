@@ -34,8 +34,8 @@ Tail_damage (add 2 times age_mod)
 carry_comp  (people/obj_weight)
 
 *All dragons long and short descriptions.
-long- A <color> <age_name> dragon rests here.
-short A <color> <age_name> dragon
+long- A <colour> <age_name> dragon rests here.
+short A <colour> <age_name> dragon
 
 
 
@@ -152,7 +152,7 @@ This dragon is this biggest! About 80 feet long and 40 feet wide!
 ----------------------
 Dragons By Color
 
-color
+colour
 breath_damage
 breath_type
 immune

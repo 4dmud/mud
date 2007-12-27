@@ -584,7 +584,7 @@ int save_config( int nowhere )
  */
 void cedit_disp_menu(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
 
   /*
@@ -615,7 +615,7 @@ void cedit_disp_menu(Descriptor *d)
 
 void cedit_disp_game_play_options(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   
   d->Output( "\r\n\r\n"
@@ -672,7 +672,7 @@ void cedit_disp_game_play_options(Descriptor *d)
 
 void cedit_disp_crash_save_options(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   
   d->Output( "\r\n\r\n"
@@ -702,7 +702,7 @@ void cedit_disp_crash_save_options(Descriptor *d)
 
 void cedit_disp_room_numbers(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   
   d->Output( "\r\n\r\n"
@@ -731,7 +731,7 @@ void cedit_disp_room_numbers(Descriptor *d)
 
 void cedit_disp_operation_options(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   
   d->Output( "\r\n\r\n"
@@ -776,7 +776,7 @@ void cedit_disp_operation_options(Descriptor *d)
 
 void cedit_disp_autowiz_options(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   
   d->Output( "\r\n\r\n"

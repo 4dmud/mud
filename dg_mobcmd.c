@@ -27,6 +27,9 @@
  ***************************************************************************/
 /*
  * $Log: dg_mobcmd.c,v $
+ * Revision 1.25  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.24  2006/08/31 10:39:16  w4dimenscor
  * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
  *
@@ -44,7 +47,7 @@
  * used (in stead of %actor.name%).
  *
  * Revision 1.19  2006/05/30 09:14:19  w4dimenscor
- * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ * rewrote the colour code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
  * Revision 1.18  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp

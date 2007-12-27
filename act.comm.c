@@ -10,6 +10,9 @@
 
 /*
  * $Log: act.comm.c,v $
+ * Revision 1.44  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.43  2007/06/08 10:19:05  w4dimenscor
  * Added a way to check for real time, and time passed in dgscripts, REALDAY and REALHOUR and NOW are all variables, and also made it so tha the newbie channel doesnt sound drunk, also, practicing spells and skills need more practices
  *
@@ -33,7 +36,7 @@
  * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
  *
  * Revision 1.36  2006/05/30 09:14:19  w4dimenscor
- * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
+ * rewrote the colour code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
  *
  * Revision 1.35  2006/05/22 10:50:48  w4dimenscor
  * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
@@ -71,7 +74,7 @@
  * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
  *
  * Revision 1.25  2006/02/26 00:33:42  w4dimenscor
- * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use color codes
+ * Fixed issue where ridden mobs took half exp, fixed issue where auctioneer couldnt talk on open channels or use colour codes
  *
  * Revision 1.24  2005/11/20 06:10:00  w4dimenscor
  * Fixed Directional spells, and exp
@@ -92,7 +95,7 @@
  * added in better help finder and help editor, a la mordecai
  *
  * Revision 1.18  2005/05/30 09:48:26  w4dimenscor
- * changed affects color display and reduced the initial output
+ * changed affects colour display and reduced the initial output
  *
  * Revision 1.17  2005/05/29 11:16:02  w4dimenscor
  * set exits to expire, set tells not to be mxp when from mobs, and made gauges
@@ -1079,7 +1082,7 @@ int has_char(const char *txt, char character) {
 
 ACMD(do_gen_comm) {
     Descriptor *i;
-    char color_on[24];
+    char colour_on[24];
     char buf[MAX_INPUT_LENGTH];
     char buf1[MAX_INPUT_LENGTH];
     Character *auctioneer = get_char_auc(AUC_MOB);
@@ -1103,7 +1106,7 @@ ACMD(do_gen_comm) {
         * com_msgs: [0] Message if you can't perform the action because of noshout
         *           [1] name of the action
         *           [2] message if you're not on the channel
-        *           [3] a color string.
+        *           [3] a colour string.
         */
     const char *com_msgs[][6] = {
                                     {"You cannot holler!!\r\n",
@@ -1202,7 +1205,7 @@ ACMD(do_gen_comm) {
     }
     /* skip leading spaces */
     if (!SELF(ch, auctioneer) && has_char(argument, '{')) {
-        ch->Send( "No color code in the open channels please.\r\n");
+        ch->Send( "No colour code in the open channels please.\r\n");
         return;
     }
     skip_spaces(&argument);
@@ -1236,15 +1239,15 @@ ACMD(do_gen_comm) {
         } else
             alter_move(ch, CONFIG_HOLLER_MOVE_COST);
     }
-    /* set up the color on code */
-    strcpy(color_on, com_msgs[subcmd][3]);
+    /* set up the colour on code */
+    strcpy(colour_on, com_msgs[subcmd][3]);
 
     if (first_word_is_name(ch, argument)) {
         /* first, set up strings to be given to the communicator */
         if (PRF_FLAGGED(ch, PRF_NOREPEAT))
             ch->Send( "%s", CONFIG_OK);
         else
-            ch->Send( "%s%s%s: %s%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
+            ch->Send( "%s%s%s: %s%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
 
         if (!PLR_FLAGGED(ch, PLR_COVENTRY))
             snprintf(buf, sizeof(buf), "%s%s: %s", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
@@ -1256,7 +1259,7 @@ ACMD(do_gen_comm) {
         if (PRF_FLAGGED(ch, PRF_NOREPEAT))
             ch->Send( "%s", CONFIG_OK);
         else
-            ch->Send( "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOR_LEV(ch) >= C_CMP ? color_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], color_on, argument, CCNRM(ch, C_CMP));
+            ch->Send( "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], colour_on, argument, CCNRM(ch, C_CMP));
 
         if (!PLR_FLAGGED(ch, PLR_COVENTRY)) {
             snprintf(buf, sizeof(buf), "%s$n %ss, '%s'", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument);
@@ -1266,7 +1269,7 @@ ACMD(do_gen_comm) {
         }
     }
 
-    snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",color_on , GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
+    snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s",colour_on , GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), com_msgs[subcmd][1], argument, KNRM);
     comlog("%s", buf1);
     add_to_comm( com_msgs[subcmd][1], buf1);
 
@@ -1296,10 +1299,10 @@ ACMD(do_gen_comm) {
             if (PRF_FLAGGED(i->character, PRF_RP) && ( subcmd != SCMD_SHOUT))
                 continue;
 
-            if (COLOR_LEV(i->character) >= C_NRM)
-                i->Output(color_on);
+            if (COLOUR_LEV(i->character) >= C_NRM)
+                i->Output(colour_on);
             act(buf, FALSE, ch, 0, i->character, TO_VICT | TO_SLEEP);
-            if (COLOR_LEV(i->character) >= C_NRM)
+            if (COLOUR_LEV(i->character) >= C_NRM)
                 i->Output(KNRM);
         }
     }

@@ -306,10 +306,10 @@ int get_line( char *desc, int max_len )
   /* Return if it's short enough for one line */
   if ( (int)strlen( desc ) <= max_len ) return 0;
 
-  /* Calculate end point in string without color */
+  /* Calculate end point in string without colour */
   for( i = 0; i <= (int)strlen( desc ); i++ )
   {
-    /* Here you need to skip your color sequences */
+    /* Here you need to skip your colour sequences */
     j++;
 
     if ( j > max_len ) break;
@@ -397,7 +397,7 @@ void show_map( Character *ch, int mxp/*, char *text */)
         case SECT_PRAIRIE:
         case SECT_BADLANDS:
         case SECT_RAIL:
-          sprintf(buf + strlen(buf), "%s%s", map_bit[sec].color, map_bit[sec].bit);
+          sprintf(buf + strlen(buf), "%s%s", map_bit[sec].colour, map_bit[sec].bit);
           break;
         default:
           sprintf(buf + strlen(buf), " ");
@@ -411,8 +411,8 @@ void show_map( Character *ch, int mxp/*, char *text */)
     {
       ch->Send( "%s", buf);
       ch->Send( "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
-                       MDIS(0) ? map_bit[sect].color : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
-                       MDIS(1) ? map_bit[sect+1].color : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
+                       MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
+                       MDIS(1) ? map_bit[sect+1].colour : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
       sect+=2;
 
     }
@@ -433,13 +433,13 @@ void show_map( Character *ch, int mxp/*, char *text */)
      pos = get_line( p, 63 );
      if ( pos > 0 )
      {
-          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
           strncat( buf, p, pos );
           p += pos;
      }
      else
      {
-          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
           mudstrlcat( buf, p, MSL );
           alldesc = TRUE;
      }
@@ -456,13 +456,13 @@ void show_map( Character *ch, int mxp/*, char *text */)
      pos = get_line( p, 63 );
      if ( pos > 0 )
      {
-          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
           strncat( buf, p, pos );
           p += pos;
      }
      else
      {
-          mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
           mudstrlcat( buf, p, MSL );
           alldesc = TRUE;
      }
@@ -479,13 +479,13 @@ void show_map( Character *ch, int mxp/*, char *text */)
       pos = get_line( p, 78 );
       if ( pos > 0 )
       {
-        mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+        mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
         strncat( buf, p, pos );
         p += pos;
       }
       else
       {
-        mudstrlcat( buf, color_str(AT_RMDESC, ch), MSL);
+        mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
         mudstrlcat( buf, p, MSL );
         alldesc = TRUE;
       }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spec_procs.c,v $
+ * Revision 1.24  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.23  2007/06/09 04:34:55  w4dimenscor
  * Fixed practice so that it takes money from players rather then gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
  *
@@ -933,7 +936,7 @@ SPECIAL(magic_user) {
     case 15:
     case 16:
     case 17:
-        cast_spell(ch, vict, NULL, 0, SPELL_COLOR_SPRAY);
+        cast_spell(ch, vict, NULL, 0, SPELL_COLOUR_SPRAY);
         break;
     default:
         cast_spell(ch, vict, NULL, 0, SPELL_FIREBALL);

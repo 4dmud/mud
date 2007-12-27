@@ -500,7 +500,7 @@ void mag_affects(int level, Character *ch, Character *victim,
         break;
 
     case SPELL_BLINDNESS:
-    case SPELL_COLOR_SPRAY:
+    case SPELL_COLOUR_SPRAY:
         if (MOB_FLAGGED(victim, MOB_NOBLIND)
                 || mag_savingthrow(victim, savetype, 0)) {
             if (ch)
@@ -1901,7 +1901,7 @@ void mag_unaffects(int level, Character *ch,
         spell = SPELL_BLINDNESS;
         to_vict = "Your vision returns!";
         to_room = "There's a momentary gleam in $n's eyes.";
-        affect_from_char(victim, SPELL_COLOR_SPRAY);
+        affect_from_char(victim, SPELL_COLOUR_SPRAY);
         break;
     case SPELL_ANTIDOTE_1:
         spell = SPELL_POISON;

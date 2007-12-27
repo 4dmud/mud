@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: screen.h                                      Part of CircleMUD *
-*  Usage: header file with ANSI color codes for online color              *
+*  Usage: header file with ANSI color codes for online colour              *
 *                                                                         *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
@@ -27,12 +27,12 @@
 #define BCYN  "\x1B[1;36m"
 #define BWHT  "\x1B[1;37m"
 
-/* conditional color.  pass it a pointer to a Character and a color level. */
+/* conditional colour.  pass it a pointer to a Character and a colour level. */
 #define C_OFF	0
 #define C_SPR	1
 #define C_NRM	2
 #define C_CMP	3
-#define _clrlevel(ch) (IS_NPC((ch)) ? 0 : (PRF_FLAGGED((ch), PRF_COLOR_1) ? 1 : 0) + (PRF_FLAGGED((ch), PRF_COLOR_2) ? 2 : 0))
+#define _clrlevel(ch) (IS_NPC((ch)) ? 0 : (PRF_FLAGGED((ch), PRF_COLOUR_1) ? 1 : 0) + (PRF_FLAGGED((ch), PRF_COLOUR_2) ? 2 : 0))
 #define clr(ch,lvl) (_clrlevel(ch) >= (lvl))
 #define CCNRM(ch,lvl)  (clr((ch),(lvl))?KNRM:KNUL)
 #define CCRED(ch,lvl)  (clr((ch),(lvl))?KRED:KNUL)
@@ -52,7 +52,7 @@
 #define CBCYN(ch,lvl)  (clr((ch),(lvl))?BCYN:KNUL)
 #define CBWHT(ch,lvl)  (clr((ch),(lvl))?BWHT:KNUL)
 
-#define COLOR_LEV(ch) (_clrlevel(ch))
+#define COLOUR_LEV(ch) (_clrlevel(ch))
 
 #define QNRM CCNRM(ch,C_SPR)
 #define QRED CCRED(ch,C_SPR)

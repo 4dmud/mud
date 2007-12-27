@@ -18,7 +18,7 @@
 
 
 /* external variables */
-extern const char *color_option_list[];
+extern const char *colour_option_list[];
 extern int pt_allowed;
 SPECIAL(shop_keeper);
 /* extern variables */
@@ -990,13 +990,13 @@ ACMD(do_ignite) {
     if (sabre->short_description)
         free(sabre->short_description);
 
-    snprintf(buf, sizeof(buf), "%s %s lightsaber", hilt->name, color_option_name((int) GET_OBJ_VAL(hilt, 3)));
+    snprintf(buf, sizeof(buf), "%s %s lightsaber", hilt->name, colour_option_name((int) GET_OBJ_VAL(hilt, 3)));
     sabre->name = str_dup(buf);
 
-    snprintf(buf2,sizeof(buf2), "a %s bladed %s lightsaber", GET_OBJ_VAL(hilt, 0)==1 ? "single" : "double", color_option_name((int) GET_OBJ_VAL(hilt, 3)));
+    snprintf(buf2,sizeof(buf2), "a %s bladed %s lightsaber", GET_OBJ_VAL(hilt, 0)==1 ? "single" : "double", colour_option_name((int) GET_OBJ_VAL(hilt, 3)));
     sabre->short_description = str_dup(buf2);
 
-    snprintf(buf2,sizeof(buf2), "a %s bladed %s lightsaber lies here", GET_OBJ_VAL(hilt, 0)==1 ? "single" : "double", color_option_name((int) GET_OBJ_VAL(hilt, 3)));
+    snprintf(buf2,sizeof(buf2), "a %s bladed %s lightsaber lies here", GET_OBJ_VAL(hilt, 0)==1 ? "single" : "double", colour_option_name((int) GET_OBJ_VAL(hilt, 3)));
     sabre->description = str_dup(buf2);
     sabre->item_number = hilt->item_number;
     GET_OBJ_WAS(sabre) = GET_OBJ_VNUM(hilt);
@@ -1198,11 +1198,11 @@ void improve_sub(Character *ch, subskill_list sub, int amount) {
 }
 
 
-const char * color_option_name(int num) {
-    if (num < 0 || num >= MAX_COLOR_OPTIONS)
+const char * colour_option_name(int num) {
+    if (num < 0 || num >= MAX_COLOUR_OPTIONS)
         return "UNDEFINED";
 
-    return color_option_list[num];
+    return colour_option_list[num];
 
 }
 

@@ -1,14 +1,17 @@
 /*****************************************************************************
- **  color.c                                                                **
+ **  colour.c                                                                **
  **									    **
- **  Handles embedded color codes.  This is a stripped-down version of my   **
- **  color routine.  Certain options are not present (like "remembering"    **
- **  colors) so that additional player data won't be needed.                **
+ **  Handles embedded colour codes.  This is a stripped-down version of my   **
+ **  colour routine.  Certain options are not present (like "remembering"    **
+ **  colours) so that additional player data won't be needed.                **
  **									    **	
  ** 			                	(C)opyright 1997 M.C. Lewis **
  *****************************************************************************/
 /*
  * $Log: color.c,v $
+ * Revision 1.5  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.4  2006/05/21 11:02:26  w4dimenscor
  * converted game from being C code to C++
  * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
@@ -26,17 +29,17 @@
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
  *
  */
-/* colors are /cr (red), /cR (extended red, which is either bold or light),
+/* colours are /cr (red), /cR (extended red, which is either bold or light),
    /Cu (cursor up), /Ch (home), /Cc (clear), etc.  Just read through it =) */
 
 /* These are the same codes supported by default in CircEdit, a CircleMUD
    area editor (builder) for Win95/NT.  It's available from the CircleMUD
    FTP site and my website, http://www.geocities.com/SiliconValley/Park/6028 */
 
-/* Note that when combining fg and bg colors, if you are using EXTENDED
-   fg colors, you can specify fg and bg in any order, i.e., /cW/bb or
-   /bb/cW.  When using NORMAL fg colors, you should specify the fg color
-   FIRST, since the ANSI code will turn off the current background color.
+/* Note that when combining fg and bg colours, if you are using EXTENDED
+   fg colours, you can specify fg and bg in any order, i.e., /cW/bb or
+   /bb/cW.  When using NORMAL fg colours, you should specify the fg colour
+   FIRST, since the ANSI code will turn off the current background colour.
    That is, /cw/bb will be normal white text on blue background, but 
    /bb/cw will just be normal white text WITHOUT background. */
 
@@ -44,7 +47,7 @@
 /* W W W :   http://www.geocities.com/SiliconValley/Park/6028 */
 
 
-#define _color_c_
+#define _colour_c_
 
 #include "conf.h"
 #include "sysdep.h"
@@ -55,7 +58,7 @@
 
 #define SPEC_CHAR '\x1C'
 
-/* The standard ANSI colors */
+/* The standard ANSI colours */
 #define COL_NONE	""
 #define COL_OFF 	"\x1B[0m"
 #define COL_BLACK	"\x1B[0;30m"
@@ -67,9 +70,9 @@
 #define COL_CYAN 	"\x1B[0;36m"
 #define COL_WHITE 	"\x1B[0;37m"
 #define COL_FG_OFF	"\x1B[38m"	/* works on normal terminals but not
-					   color_xterms */
+					   colour_xterms */
 
-/* The bold or extended ANSI colors */
+/* The bold or extended ANSI colours */
 #define COL_E_BLACK	"\x1B[1;30m"	/* /cl */
 #define COL_E_RED 	"\x1B[1;31m"
 #define COL_E_GREEN 	"\x1B[1;32m"
@@ -79,7 +82,7 @@
 #define COL_E_CYAN 	"\x1B[1;36m"
 #define COL_E_WHITE 	"\x1B[1;37m"
 
-/* The background colors */
+/* The background colours */
 
 #define COL_BK_BLACK    "\x1B[40m"	/* /cL */
 #define COL_BK_RED 	"\x1B[41m"
@@ -127,7 +130,7 @@
 #define C_LEFT  "\x1B[D"
 #define C_HOME  "\x1B[H"
 #define C_CLR   C_HOME"\x1B[J"
-size_t proc_color(char *inbuf, int color_lvl, size_t len);
+size_t proc_colour(char *inbuf, int colour_lvl, size_t len);
 void basic_mud_log(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 //extern char *malloc(), *calloc(), *realloc();
@@ -145,8 +148,8 @@ int already_proc(char *buf)
     return 0;
 }
 
-/* List of colors */
-const char *COLORLIST[] = {
+/* List of colours */
+const char *COLOURLIST[] = {
     COL_OFF, COL_NONE, COL_BLACK,
     COL_RED, COL_GREEN, COL_YELLOW,
     COL_BLUE, COL_MAGENTA, COL_CYAN,
@@ -165,7 +168,7 @@ const char *COLORLIST[] = {
     SOUND_BELL
 };
 
-#define LAST_COLOR 37
+#define LAST_COLOUR 37
 
 #define BUFSPACE	12*1024	/* This should be equal to LARGE_BUFSIZE
 				   in structs.h */
@@ -191,10 +194,10 @@ int count_chars(const char *txt, char character)
 }
 
 
-void strip_color(char *inbuf, size_t i_buf) {
+void strip_colour(char *inbuf, size_t i_buf) {
 char *out_buf = NULL, insert_text[10];
     register unsigned int inpos = 0, outpos = 0;
-    int remaining, color = -2;
+    int remaining, colour = -2;
     register int i;
     size_t b_len;
     
@@ -214,10 +217,10 @@ b_len = i * 5 + strlen(inbuf) + 2;
 								   + 1 character big buffer
 								   should be enough */
 
-    /* If color level is 1 (sparse), then character will get cursor controls
-       only.  If color level is 2, character will get color codes only.  If
-       color is complete (3), character will get both.   Color level 0 removes
-       all color codes, of course. =) */
+    /* If colour level is 1 (sparse), then character will get cursor controls
+       only.  If colour level is 2, character will get colour codes only.  If
+       colour is complete (3), character will get both.   colour level 0 removes
+       all colour codes, of course. =) */
 
     //out_buf[0] = SPEC_CHAR;
     *out_buf = '\0';
@@ -237,125 +240,125 @@ b_len = i * 5 + strlen(inbuf) + 2;
 		    inpos += 2;
 		    break;
 		case 'C':
-		case 'c':	/* foreground color */
+		case 'c':	/* foreground colour */
 		    switch (inbuf[inpos + 2]) {
 		    case 'l':
-			color = 2;
+			colour = 2;
 			break;
 		    case 'L':
-			color = 11;
+			colour = 11;
 			break;
 		    case 'r':
-			color = 3;
+			colour = 3;
 			break;
 		    case 'R':
-			color = 12;
+			colour = 12;
 			break;
 		    case 'g':
-			color = 4;
+			colour = 4;
 			break;
 		    case 'G':
-			color = 13;
+			colour = 13;
 			break;
 		    case 'y':
-			color = 5;
+			colour = 5;
 			break;
 		    case 'Y':
-			color = 14;
+			colour = 14;
 			break;
 		    case 'b':
-			color = 6;
+			colour = 6;
 			break;
 		    case 'B':
-			color = 15;
+			colour = 15;
 			break;
 		    case 'm':
 		    case 'p':
-			color = 7;
+			colour = 7;
 			break;
 		    case 'M':
 		    case 'P':
-			color = 16;
+			colour = 16;
 			break;
 		    case 'c':
-			color = 8;
+			colour = 8;
 			break;
 		    case 'C':
-			color = 17;
+			colour = 17;
 			break;
 		    case 'w':
-			color = 9;
+			colour = 9;
 			break;
 		    case 'W':
-			color = 18;
+			colour = 18;
 			break;
 		    case 'O':
 		    case 'o':
-			color = 10;
+			colour = 10;
 			break;
 		    case 'U':
 		    case 'u':
-			color = 35;
+			colour = 35;
 			break;
 		    case 'F':
 		    case 'f':
-			color = 36;
+			colour = 36;
 			break;
 		    case 'V':
 		    case 'v':
-			color = 37;
+			colour = 37;
 			break;
 
 		    case 'x':
 		    case '0':
-			color = 0;
+			colour = 0;
 			break;
 		    default:
-			color = 1;	/* no change */
+			colour = 1;	/* no change */
 			*insert_text = START_CHAR;
 		    insert_text[1] = '\0';
 		    inpos += 1;
 		    }
 
-		   if (color != 1)
+		   if (colour != 1)
 		          inpos += 3;
 		        
 			
 
 		    break;
 		case 'B':
-		case 'b':	/* background color */
+		case 'b':	/* background colour */
 		    switch (inbuf[inpos + 2]) {
 		    case 'l':
-			color = 20;
+			colour = 20;
 			break;
 		    case 'r':
-			color = 21;
+			colour = 21;
 			break;
 		    case 'g':
-			color = 22;
+			colour = 22;
 			break;
 		    case 'y':
-			color = 23;
+			colour = 23;
 			break;
 		    case 'b':
-			color = 24;
+			colour = 24;
 			break;
 		    case 'm':
 		    case 'p':
-			color = 25;
+			colour = 25;
 			break;
 		    case 'c':
-			color = 26;
+			colour = 26;
 			break;
 		    case 'w':
-			color = 27;
+			colour = 27;
 			break;
 		    case 'o':
-			color = 0;
+			colour = 0;
 			break;
 		    default:
-			color = 1;	/* no change */
+			colour = 1;	/* no change */
 			*insert_text = START_CHAR;
 		    insert_text[1] = '\0';
 		    inpos += 1;
@@ -363,7 +366,7 @@ b_len = i * 5 + strlen(inbuf) + 2;
 
 		    
 
-		    if (color != 1)
+		    if (colour != 1)
 		          inpos += 3;
 			
 		    break;
@@ -418,12 +421,12 @@ b_len = i * 5 + strlen(inbuf) + 2;
 
     strlcpy(inbuf, out_buf, i_buf);
 }
-size_t proc_color(char *inbuf, int color_lvl, size_t len)
+size_t proc_colour(char *inbuf, int colour_lvl, size_t len)
 {
     char /* *out_buf = NULL,*/ insert_text[10] = "", *out_buf;//[36768] = "";
-    int has_color = color_lvl, current_color = -1;
+    int has_colour = colour_lvl, current_colour = -1;
     size_t inpos = 0, outpos = 0;
-    int remaining, color = -2;
+    int remaining, colour = -2;
     int i;
     size_t b_len;
 
@@ -441,10 +444,10 @@ b_len = i * 5 + strlen(inbuf) + 1;
 								   + 1 character big buffer
 								   should be enough */
 
-    /* If color level is 1 (sparse), then character will get cursor controls
-       only.  If color level is 2, character will get color codes only.  If
-       color is complete (3), character will get both.   Color level 0 removes
-       all color codes, of course. =) */
+    /* If colour level is 1 (sparse), then character will get cursor controls
+       only.  If colour level is 2, character will get colour codes only.  If
+       colour is complete (3), character will get both.   colour level 0 removes
+       all colour codes, of course. =) */
 
    // *out_buf = '\0';
     //strcpy(insert_text, "");
@@ -464,139 +467,139 @@ b_len = i * 5 + strlen(inbuf) + 1;
 		    inpos += 2;
 		    break;
 		case 'C':
-		case 'c':	/* foreground color */
+		case 'c':	/* foreground colour */
 		    switch (inbuf[inpos + 2]) {
 		    case 'l':
-			color = 2;
+			colour = 2;
 			break;
 		    case 'L':
-			color = 11;
+			colour = 11;
 			break;
 		    case 'r':
-			color = 3;
+			colour = 3;
 			break;
 		    case 'R':
-			color = 12;
+			colour = 12;
 			break;
 		    case 'g':
-			color = 4;
+			colour = 4;
 			break;
 		    case 'G':
-			color = 13;
+			colour = 13;
 			break;
 		    case 'y':
-			color = 5;
+			colour = 5;
 			break;
 		    case 'Y':
-			color = 14;
+			colour = 14;
 			break;
 		    case 'b':
-			color = 6;
+			colour = 6;
 			break;
 		    case 'B':
-			color = 15;
+			colour = 15;
 			break;
 		    case 'm':
 		    case 'p':
-			color = 7;
+			colour = 7;
 			break;
 		    case 'M':
 		    case 'P':
-			color = 16;
+			colour = 16;
 			break;
 		    case 'c':
-			color = 8;
+			colour = 8;
 			break;
 		    case 'C':
-			color = 17;
+			colour = 17;
 			break;
 		    case 'w':
-			color = 9;
+			colour = 9;
 			break;
 		    case 'W':
-			color = 18;
+			colour = 18;
 			break;
 		    case 'O':
 		    case 'o':
-			color = 10;
+			colour = 10;
 			break;
 		    case 'U':
 		    case 'u':
-			color = 35;
+			colour = 35;
 			break;
 		    case 'F':
 		    case 'f':
-			color = 36;
+			colour = 36;
 			break;
 		    case 'V':
 		    case 'v':
-			color = 37;
+			colour = 37;
 			break;
 
 		    case 'x':
 		    case '0':
-			color = 0;
+			colour = 0;
 			break;
 		    default:
-			color = 1;	/* no change */
+			colour = 1;	/* no change */
 			*insert_text = START_CHAR;
 		    insert_text[1] = '\0';
 		    }
 
-		    if (color != current_color)
-			if (has_color)
-			    strcpy(insert_text, COLORLIST[color]);
-			if (color != 1)
+		    if (colour != current_colour)
+			if (has_colour)
+			    strcpy(insert_text, COLOURLIST[colour]);
+			if (colour != 1)
 		          inpos += 3;
 		        else
 			inpos += 1;
-		    current_color = color;
+		    current_colour = colour;
 		    break;
 		case 'B':
-		case 'b':	/* background color */
+		case 'b':	/* background colour */
 		    switch (inbuf[inpos + 2]) {
 		    case 'l':
-			color = 20;
+			colour = 20;
 			break;
 		    case 'r':
-			color = 21;
+			colour = 21;
 			break;
 		    case 'g':
-			color = 22;
+			colour = 22;
 			break;
 		    case 'y':
-			color = 23;
+			colour = 23;
 			break;
 		    case 'b':
-			color = 24;
+			colour = 24;
 			break;
 		    case 'm':
 		    case 'p':
-			color = 25;
+			colour = 25;
 			break;
 		    case 'c':
-			color = 26;
+			colour = 26;
 			break;
 		    case 'w':
-			color = 27;
+			colour = 27;
 			break;
 		    case 'o':
-			color = 0;
+			colour = 0;
 			break;
 		    default:
-			color = 1;	/* no change */
+			colour = 1;	/* no change */
 			*insert_text = START_CHAR;
 		    insert_text[1] = '\0';
 		    }
 
-		    if (color != current_color)
-			if (has_color)
-			    strcpy(insert_text, COLORLIST[color]);
-                    if (color != 1)
+		    if (colour != current_colour)
+			if (has_colour)
+			    strcpy(insert_text, COLOURLIST[colour]);
+                    if (colour != 1)
 		    inpos += 3;
 		        else
 			inpos += 1;
-		    current_color = color;
+		    current_colour = colour;
 		    break;
 
 		
@@ -607,7 +610,7 @@ b_len = i * 5 + strlen(inbuf) + 1;
 
 		}		/* switch */
 
-		//if (color_lvl == 0)
+		//if (colour_lvl == 0)
 		    out_buf[outpos] = '\0';
 		    outpos = strlcat(out_buf, insert_text, b_len);
 #if 0

@@ -332,11 +332,11 @@ void oedit_save_to_disk(int zone_num) {
 /**************************************************************************
  Menu functions 
  **************************************************************************/
-void oedit_disp_colors(Descriptor *d) {
+void oedit_disp_colours(Descriptor *d) {
     int i;
-    get_char_colors(d->character);
-    for (i = 0; i < MAX_COLOR_OPTIONS; i++) {
-        d->Output("%s%3d%s) %s%-15s  %s%s", grn, i,nrm, cyn, color_option_name(i), (!(i%4) ? "\r\n" : " "), nrm);
+    get_char_colours(d->character);
+    for (i = 0; i < MAX_COLOUR_OPTIONS; i++) {
+        d->Output("%s%3d%s) %s%-15s  %s%s", grn, i,nrm, cyn, colour_option_name(i), (!(i%4) ? "\r\n" : " "), nrm);
     }
 
     d->Output("Enter Color Number: ");
@@ -350,7 +350,7 @@ void oedit_disp_dubsing(Descriptor *d) {
  */
 void oedit_disp_container_flags_menu(Descriptor *d) {
     char bits[MAX_STRING_LENGTH];
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     new_sprintbit(GET_OBJ_VAL(OLC_OBJ(d), 1), container_bits, bits, sizeof(bits));
@@ -370,7 +370,7 @@ void oedit_disp_container_flags_menu(Descriptor *d) {
 void oedit_disp_extradesc_menu(Descriptor *d) {
     struct extra_descr_data *extra_desc = OLC_DESC(d);
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
     d->Output(
         "Extra desc menu\r\n"
@@ -393,7 +393,7 @@ void oedit_disp_prompt_apply_menu(Descriptor *d) {
     char apply_buf[MAX_STRING_LENGTH];
     int counter;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < MAX_OBJ_AFFECT; counter++) {
@@ -415,7 +415,7 @@ void oedit_disp_prompt_apply_menu(Descriptor *d) {
 void oedit_liquid_type(Descriptor *d) {
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_LIQ_TYPES; counter++) {
@@ -432,7 +432,7 @@ void oedit_liquid_type(Descriptor *d) {
 void oedit_disp_apply_menu(Descriptor *d) {
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_APPLIES; counter++) {
@@ -449,7 +449,7 @@ void oedit_disp_apply_menu(Descriptor *d) {
 void oedit_disp_weapon_menu(Descriptor *d) {
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_ATTACK_TYPES; counter++) {
@@ -466,7 +466,7 @@ void oedit_disp_weapon_menu(Descriptor *d) {
 void oedit_disp_spells_menu(Descriptor *d) {
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_SPELLS; counter++) {
@@ -715,7 +715,7 @@ void oedit_disp_val4_menu(Descriptor *d) {
         oedit_disp_weapon_menu(d);
         break;
     case ITEM_LIGHTSABRE_HILT:
-        oedit_disp_colors(d);
+        oedit_disp_colours(d);
         break;
     case ITEM_DRINKCON:
     case ITEM_FOUNTAIN:
@@ -760,7 +760,7 @@ void oedit_disp_val6_menu(Descriptor *d) {
 void oedit_disp_material_menu(Descriptor *d) {
     int mat, col = 0;
     OLC_MODE(d) = OEDIT_VALUE_10;
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     // clear_screen(d);
     for (mat = 1; mat < NUM_MATERIAL_TYPES; mat++) {
         d->Output( "%s%2d%s) %-20.20s %s", grn, mat, nrm,
@@ -775,7 +775,7 @@ void oedit_disp_material_menu(Descriptor *d) {
 void oedit_disp_type_menu(Descriptor *d) {
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_ITEM_TYPES; counter++) {
@@ -792,7 +792,7 @@ void oedit_disp_extra_menu(Descriptor *d) {
     char bits[MAX_STRING_LENGTH];
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_ITEM_FLAGS; counter++) {
@@ -812,7 +812,7 @@ void oedit_disp_perm_menu(Descriptor *d) {
     char bits[MAX_STRING_LENGTH];
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_AFF_FLAGS; counter++) {
@@ -830,7 +830,7 @@ void oedit_disp_wear_menu(Descriptor *d) {
     char bits[MAX_STRING_LENGTH];
     int counter, columns = 0;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (counter = 0; counter < NUM_ITEM_WEARS; counter++) {
@@ -851,7 +851,7 @@ void oedit_disp_menu(Descriptor *d) {
     struct obj_data *obj;
 
     obj = OLC_OBJ(d);
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     /*

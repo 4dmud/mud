@@ -59,8 +59,8 @@ void con_character_creation(Descriptor *d, char *arg)
     {
     case 'y':
     case 'Y':
-      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_1);
-      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_2);
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOUR_1);
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOUR_2);
       d->Output( "\r\n{cRColor on.{c0\r\n");
       break;
     case 'n':
@@ -360,7 +360,7 @@ void con_display_sex(Descriptor *d, int valid)
 void con_display_ansi(Descriptor *d)
 {
   line_sep(d);
-  d->Output( "\r\nDoes your mudclient support color (Y/N)? ");
+  d->Output( "\r\nDoes your mudclient support colour (Y/N)? ");
   SUB_STATE(d) = STATE_ANSI;
 }
 

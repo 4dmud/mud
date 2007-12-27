@@ -216,7 +216,7 @@ void hedit_save_to_disk(Descriptor *d) {
 void hedit_disp_menu(Descriptor *d) {
     struct help_index_element *help = OLC_HELP(d);
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
 
     d->Output(
 #if defined(CLEAR_SCREEN)

@@ -444,7 +444,7 @@ void zedit_disp_flag_menu(Descriptor *d)
     int counter, columns = 0;
     char buf1[MAX_INPUT_LENGTH];
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     // clear_screen(d);
     for (counter = 0; counter < NUM_ZONE_FLAGS; counter++) {
 	d->Output( "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
@@ -458,7 +458,7 @@ void zedit_disp_flag_menu(Descriptor *d)
 void zedit_disp_dimension_menu(Descriptor *d) {
 
        int counter, columns = 0;
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     for (counter = 0; counter <= D_PRE_HIST; counter++) {
 	d->Output( "%s%2d%s) %-20.20s %s", grn, counter, nrm,
 		dimension_types[counter], !(++columns % 2) ? "\r\n" : "");
@@ -476,7 +476,7 @@ void zedit_disp_menu(Descriptor *d)
   char buf1[MAX_STRING_LENGTH];
   room_rnum room;
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   room = real_room(OLC_NUM(d));
   
@@ -631,7 +631,7 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
  */
 void zedit_disp_comtype(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   d->Output(
 	"\r\n"

@@ -136,7 +136,7 @@ ACMD(do_cast);
 ACMD(do_chaos);
 ACMD(do_clan);
 ACMD(do_climb);
-ACMD(do_color);
+ACMD(do_colour);
 ACMD(do_copyover);
 ACMD(do_commands);
 ACMD(do_commandslike);
@@ -534,8 +534,8 @@ const struct command_info cmd_info[] =
     { "convert"  , "conv" , POS_RESTING , do_convert  , 0, 0, 0 },
     { "convey"   , "conve", POS_RESTING , do_convey   , 0, 0, 0 },
     { "corpse"   , "cor" , POS_DEAD    , do_corpse    , 0, 0, 0 },
-    { "color"    , "col" , POS_DEAD    , do_color    , 0, 0, 0 },
-    { "colour"   , "colour"   , POS_DEAD    , do_color    , 0, 0, 0 },
+    { "color"    , "col" , POS_DEAD    , do_colour    , 0, 0, 0 },
+    { "colour"   , "colour"   , POS_DEAD    , do_colour    , 0, 0, 0 },
     { "\"" , "\""   , POS_DEAD    , do_comm , 0, 0, 0 },
     { "commands" , "comm"     , POS_DEAD    , do_commands , 0, SCMD_COMMANDS, 0 },
     { "commandslike" , "commandslike"     , POS_DEAD    , do_commandslike , 0, SCMD_COMMANDS, 0 },

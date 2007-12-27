@@ -261,7 +261,7 @@ void sedit_products_menu(Descriptor *d)
   int i;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   d->Output( "##     VNUM     Product\r\n");
@@ -287,7 +287,7 @@ void sedit_compact_rooms_menu(Descriptor *d)
   int i, count = 0;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   for (i = 0; S_ROOM(shop, i) != NULL; i++) {
@@ -312,7 +312,7 @@ void sedit_rooms_menu(Descriptor *d)
   int i;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   d->Output( "##     VNUM     Room\r\n\r\n");
@@ -338,7 +338,7 @@ void sedit_namelist_menu(Descriptor *d)
   int i;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   d->Output( "##              Type   Namelist\r\n\r\n");
@@ -363,7 +363,7 @@ void sedit_shop_flags_menu(Descriptor *d)
   char bits[MAX_STRING_LENGTH];
   int i, count = 0;
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   for (i = 0; i < NUM_SHOP_FLAGS; i++) {
     d->Output( "%s%2d%s) %-20.20s   %s", grn, i + 1, nrm, shop_bits[i],
@@ -382,7 +382,7 @@ void sedit_no_trade_menu(Descriptor *d)
   char bits[MAX_STRING_LENGTH];
   int i, count = 0;
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   for (i = 0; i < NUM_TRADERS; i++) {
     d->Output( "%s%2d%s) %-20.20s   %s", grn, i + 1, nrm, trade_letters[i],
@@ -402,7 +402,7 @@ void sedit_types_menu(Descriptor *d)
   int i, count = 0;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   for (i = 0; i < NUM_ITEM_TYPES; i++) {
@@ -425,7 +425,7 @@ void sedit_disp_menu(Descriptor *d)
   struct shop_data *shop;
 
   shop = OLC_SHOP(d);
-  get_char_colors(d->character);
+  get_char_colours(d->character);
 
   clear_screen(d);
   new_sprintbit(S_NOTRADE(shop), trade_letters, buf1, sizeof(buf1));

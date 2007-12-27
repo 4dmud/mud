@@ -290,7 +290,7 @@ void aedit_disp_menu(Descriptor * d)
   struct social_messg *action = OLC_ACTION(d);
   Character *ch        = d->character;
 
-  get_char_colors(ch);
+  get_char_colours(ch);
 
   d->Output(
                   "%s-- Action editor\r\n"
@@ -858,7 +858,7 @@ ACMD(do_astat)
     return;
   }
 
-  get_char_colors(ch);
+  get_char_colours(ch);
   ch->Send(
                    "n) Command         : %s%-15.15s%s 1) Sort as Command : %s%-15.15s%s\r\n"
                    "2) Min Position[CH]: %s%-8.8s%s        3) Min Position[VT]: %s%-8.8s%s\r\n"

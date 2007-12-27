@@ -147,8 +147,8 @@ sect = 0;
     /* every row */
     for (x = min; x < (min + 12); ++x) {
     len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   |   ", 
-    MDIS(0) ? map_bit[sect].color : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
-    MDIS(1) ? map_bit[sect+1].color : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
+    MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
+    MDIS(1) ? map_bit[sect+1].colour : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
     sect += 2;
     
     if (x < max) {
@@ -184,7 +184,7 @@ case SECT_ICE:
 case SECT_PRAIRIE:
 case SECT_BADLANDS:
 case SECT_RAIL:
-  len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].color, map_bit[mapgrid[x][y]].bit);
+  len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit);
   break;
 		case (NUM_ROOM_SECTORS + 1):
 		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cM?");
@@ -224,7 +224,7 @@ case SECT_ICE:
 case SECT_PRAIRIE:
 case SECT_BADLANDS:
 case SECT_RAIL:
-		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].color, map_bit[mapgrid[x][y]].bit);
+		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit);
 		    break;
 		case (NUM_ROOM_SECTORS + 1):
 		    len += snprintf(mapdisp + len, sizeof(mapdisp) - len,"{cM?");

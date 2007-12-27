@@ -11,6 +11,9 @@
  */
 /*
 * $Log: spells.h,v $
+* Revision 1.14  2007/06/10 02:18:40  w4dimenscor
+* changed all entries in the code of 'color' to 'colour', but i now regret it.
+*
 * Revision 1.13  2006/08/25 10:22:44  w4dimenscor
 * added command to fix peoples skills back to the practiced amount they were at
 *
@@ -143,7 +146,7 @@ enum spell_list {
     SPELL_CHARM,
     SPELL_CHILL_TOUCH,
     SPELL_CLONE,
-    SPELL_COLOR_SPRAY,//10
+    SPELL_COLOUR_SPRAY,//10
     SPELL_CONTROL_WEATHER,
     SPELL_CREATE_FOOD,
     SPELL_CREATE_WATER,

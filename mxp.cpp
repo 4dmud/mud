@@ -377,7 +377,7 @@ void Descriptor::turn_on_mxp ()
   this->Output( "%s", MXPTAG("!ELEMENT Player \"<send href='tell &name; |ignore &name;' "
                           "hint='Tell &name; something or ignore them|Tell &name; |Ignore &name;'  prompt>\" "
                           "ATT=\"name\""));
-  this->Output( "%s", MXPTAG("!ELEMENT affect '<COLOR &col;>' ATT='col=whitesmoke'"));
+  this->Output( "%s", MXPTAG("!ELEMENT affect '<C &col;>' ATT='col=whitesmoke'"));
   this->Output( "%s", MXPTAG("!ELEMENT LookAt '<send href=\"look at &at;\">'"));
   this->Output( "%s", MXPTAG("!ELEMENT Read '<send href=\"read at &at;\">'"));
   

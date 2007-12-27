@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: class.c,v $
+ * Revision 1.17  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.16  2007/06/08 10:19:05  w4dimenscor
  * Added a way to check for real time, and time passed in dgscripts, REALDAY and REALHOUR and NOW are all variables, and also made it so tha the newbie channel doesnt sound drunk, also, practicing spells and skills need more practices
  *
@@ -951,8 +954,8 @@ void do_start(Character * ch)
   ch->player.time.logon = time(0);
 
   SET_BIT_AR(PRF_FLAGS(ch), PRF_AUTOEXIT);
-  SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
-  SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_2);
+  SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_1);
+  SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_2);
 
   SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
   SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
@@ -1241,7 +1244,7 @@ void init_spell_levels(void)
   assign_class(SPELL_CURSE,            GYP | PRI);
   assign_class(SPELL_FORTIFY_BODY,     PRI | ESP | GYP);
   assign_class(SPELL_BURNINGSKULL,     ESP);
-  assign_class(SPELL_COLOR_SPRAY,      MAG);
+  assign_class(SPELL_COLOUR_SPRAY,      MAG);
   assign_class(SPELL_ENERGY_DRAIN,     ESP);
   assign_class(SPELL_FIREBALL,         MAG);
   assign_class(SPELL_CHARM,            ESP | GYP);

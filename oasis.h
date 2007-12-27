@@ -120,7 +120,7 @@ extern int top_of_socialt;
  *   -- Umm, shouldn't this say 'from oasis.c' now???  * Mythran
  */
 void cleanup_olc(Descriptor *d, byte cleanup_type);
-void get_char_colors(Character *ch);
+void get_char_colours(Character *ch);
 void split_argument(char *argument, char *tag);
 int can_edit_zone(Character *ch, zone_rnum rnum);
 /*

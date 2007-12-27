@@ -424,7 +424,7 @@ void medit_disp_mob_stats(Descriptor *d, int state) {
 void medit_disp_positions(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (i = 0; *position_types[i] != '\n'; i++) {
@@ -519,7 +519,7 @@ void medit_change_mprog(Descriptor *d) {
 void medit_disp_mprog_types(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (i = 0; i < NUM_PROGS-1; i++) {
@@ -535,7 +535,7 @@ void medit_disp_mprog_types(Descriptor *d) {
 void medit_disp_mob_race(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
 
     for (i = 0; i < NUM_MOB_RACES; i++)
         d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, mob_races[i]);
@@ -561,7 +561,7 @@ void medit_disp_mob_joins(Descriptor *d) {
     int j = 0;
     struct combine_data *temp = (OLC_MOB(d)->mob_specials.join_list);
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     d->Output( "Mob segments linked:\r\n");
     if (!temp)
         d->Output( "None.\r\n");
@@ -581,7 +581,7 @@ void medit_disp_mob_joins(Descriptor *d) {
 void medit_disp_mob_subskill(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
 
     for (i = 1; i < TOP_SUB_DEFINE; i++) {
         d->Output( "%s%2d%s) %20s", grn, i, nrm, sub_name(i));
@@ -597,7 +597,7 @@ void medit_disp_mob_tier(Descriptor *d) {
 void medit_disp_mob_class(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
 
     for (i = 0; i < NUM_MOB_CLASSES; i++)
         d->Output( "%s%2d%s) %s\r\n", grn, i, nrm, npc_class_types[i]);
@@ -611,7 +611,7 @@ void medit_disp_mob_class(Descriptor *d) {
 void medit_disp_sex(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (i = 0; i < NUM_GENDERS; i++) {
@@ -628,7 +628,7 @@ void medit_disp_sex(Descriptor *d) {
 void medit_disp_attack_types(Descriptor *d) {
     int i;
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (i = 0; i < NUM_ATTACK_TYPES; i++) {
@@ -646,7 +646,7 @@ void medit_disp_mob_flags(Descriptor *d) {
     int i, columns = 0;
     char flags[MAX_STRING_LENGTH];
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
     for (i = 0; i < NUM_MOB_FLAGS; i++) {
         d->Output( "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, action_bits[i],
@@ -666,7 +666,7 @@ void medit_disp_aff_flags(Descriptor *d) {
     int i, columns = 0;
     char flags[MAX_STRING_LENGTH];
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
     for (i = 0; i < NUM_AFF_FLAGS; i++) {
         d->Output( "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, affected_bits[i],
@@ -687,7 +687,7 @@ void medit_disp_menu(Descriptor *d) {
     char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
 
     mob = OLC_MOB(d);
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     d->Output(

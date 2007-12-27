@@ -182,7 +182,7 @@ ACMD(do_oasis)
  * see at color level NRM.  Changing the entries here will change 
  * the colour scheme throughout the OLC.
  */
-void get_char_colors(Character *ch)
+void get_char_colours(Character *ch)
 {
   nrm = CCNRM(ch, C_NRM);
   grn = CCGRN(ch, C_NRM);

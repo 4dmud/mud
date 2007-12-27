@@ -89,7 +89,7 @@ extern char *race_abbrevs[];
 /* global */
 
 int boot_high = 0;
-int color_space = 0;
+int colour_space = 0;
 
 /* extern functions */
 char * mob_name_by_vnum(mob_vnum &v);
@@ -97,7 +97,7 @@ int highest_tier(Character *ch);
 const char *how_good(int percent);
 int grand_master(Character *ch);
 const char *simple_class_name(Character *ch);
-size_t proc_color(char *inbuf, int color_lvl, size_t len);
+size_t proc_colour(char *inbuf, int colour_lvl, size_t len);
 ACMD(do_action);
 ACMD(do_insult);
 int average_damage(Character *ch);
@@ -149,7 +149,7 @@ ACMD(do_where);
 ACMD(do_levels);
 ACMD(do_consider);
 ACMD(do_diagnose);
-ACMD(do_color);
+ACMD(do_colour);
 ACMD(do_toggle);
 ACMD(do_worth);
 void sort_commands(void);
@@ -287,8 +287,8 @@ void show_obj_to_char(struct obj_data *obj, Character *ch,
 
 }
 
-#define TIER_COLOR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cc|" : (tier == 3 ? "{cB|" : "{cr|"))))
-#define TIER_COLOR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cc" : (tier == 3 ? "{cB" : "{cr"))))
+#define TIER_COLOUR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cc|" : (tier == 3 ? "{cB|" : "{cr|"))))
+#define TIER_COLOUR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cc" : (tier == 3 ? "{cB" : "{cr"))))
 
 void show_obj_modifiers(struct obj_data *obj, Character *ch) {
     if (IS_OBJ_STAT(obj, ITEM_BURIED) && CAN_SEE_OBJ(ch, obj))
@@ -689,7 +689,7 @@ void list_one_char(Character *i, Character *ch) {
             return;
         }
     }
-    ch->Send("%s%s", TIER_COLOR_LIST((IS_NPC(i) ? MOB_TIER(i) : current_class_is_tier_num(i))) , CBCYN(ch, C_NRM));
+    ch->Send("%s%s", TIER_COLOUR_LIST((IS_NPC(i) ? MOB_TIER(i) : current_class_is_tier_num(i))) , CBCYN(ch, C_NRM));
 
     if (AFF_FLAGGED(i, AFF_POLY_TOAD)) {
         *ch << "A slimy toad stands here looking vaguely like " << GET_NAME(i) << ".\r\n";
@@ -946,7 +946,7 @@ ACMD(do_exits) {
                       GET_ROOM_VNUM(EXIT(ch, door)->to_room),
                       EXIT(ch, door)->to_room->name);
             if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-                ch->Send( " (%sClosed%s)", MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
+                ch->Send( " (%sClosed%s)", MXPTAG("C salmon"), MXPTAG("/C"));
             if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
                 ch->Send( " (Hidden)");
             ch->Send( "\r\n");
@@ -954,7 +954,7 @@ ACMD(do_exits) {
             if (EXIT_FLAGGED(EXIT(ch, door), EX_HIDDEN))
                 continue;
             if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED))
-                ch->Send( "%s%-5s%s - (%sClosed%s)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), MXPTAG("COLOR salmon"), MXPTAG("/COLOR"));
+                ch->Send( "%s%-5s%s - (%sClosed%s)", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"), MXPTAG("C salmon"), MXPTAG("/C"));
             else
                 ch->Send( "%s%-5s%s - %s", MXPTAG("Ex"), CAP(dirname), MXPTAG("/Ex"),
                           IS_DARK(EXIT(ch, door)->to_room)
@@ -1424,7 +1424,7 @@ void look_in_obj(Character *ch, char *arg, struct obj_data *item) {
                 } else {
                     container_disp(ch, obj);
                     amt = (GET_OBJ_VAL(obj, 1) * 3) / GET_OBJ_VAL(obj, 0);
-                    sprinttype(GET_OBJ_VAL(obj, 2), color_liquid, buf2, sizeof(buf2));
+                    sprinttype(GET_OBJ_VAL(obj, 2), colour_liquid, buf2, sizeof(buf2));
                     *ch << "It's " << fullness[amt] << "full of a " << buf2 << " liquid.\r\n";
                 }
             }
@@ -1777,7 +1777,7 @@ ACMD(do_tiername) {
 char * primary_class(Character *ch, char * blank) {
     sh_int t = TIER, cl = GET_CLASS(ch);
     size_t len;
-    color_space = 1;
+    colour_space = 1;
     //t = (GET_CLASS_TIER(ch) ? tier_level(ch, t) : 0);
     len = sprintf(blank,  TIER_FORMAT,
                   CCYEL(ch,_clrlevel(ch)), class_abbrevs[cl],CCWHT(ch,_clrlevel(ch)),
@@ -1793,7 +1793,7 @@ char * secondary_class(Character *ch, char * blank) {
     sh_int cl_next = -1;
     sh_int tl = 0;
     size_t len;
-    color_space = 0;
+    colour_space = 0;
 
     if (TIER==4)
         return "";
@@ -1807,7 +1807,7 @@ char * secondary_class(Character *ch, char * blank) {
 
     if (tl && cl_next == cl && GET_CLASS_TIER(ch))
         return "";
-    color_space = 1;
+    colour_space = 1;
     len = sprintf(blank, TIER_FORMAT,
                   CCYEL(ch,_clrlevel(ch)), class_abbrevs[cl_next],CCWHT(ch,_clrlevel(ch)),
                   CCCYN(ch,_clrlevel(ch)),grand_master(ch) ? "Grand Master" :class_name[cl_next].name[tl],CCWHT(ch,_clrlevel(ch)),
@@ -1819,7 +1819,7 @@ char * secondary_class(Character *ch, char * blank) {
 char * tertary_class(Character *ch, char * blank) {
     sh_int t = TIER, cl = GET_CLASS(ch), cl_next = -1, tl = 0;
     size_t len;
-    color_space = 0;
+    colour_space = 0;
 
     if (t==4)
         return "";
@@ -1840,7 +1840,7 @@ char * tertary_class(Character *ch, char * blank) {
             return "";
 
     }
-    color_space = 1;
+    colour_space = 1;
     len = sprintf(blank, TIER_FORMAT,
                   CCYEL(ch,_clrlevel(ch)), class_abbrevs[cl_next],CCWHT(ch,_clrlevel(ch)),
                   CCCYN(ch,_clrlevel(ch)),grand_master(ch) ? "Grand Master" :class_name[cl_next].name[tl],CCWHT(ch,_clrlevel(ch)),
@@ -1853,7 +1853,7 @@ char * tertary_class(Character *ch, char * blank) {
 char * quatry_class(Character *ch, char * blank) {
     sh_int t = TIER, cl = GET_CLASS(ch), cl_next = -1, tl = 0;
     size_t len;
-    color_space = 0;
+    colour_space = 0;
     if (t==4)
         return " ";
 
@@ -1876,7 +1876,7 @@ char * quatry_class(Character *ch, char * blank) {
             return " ";
 
     }
-    color_space = 1;
+    colour_space = 1;
     len = sprintf(blank, TIER_FORMAT,
                   CCYEL(ch,_clrlevel(ch)), class_abbrevs[cl_next],CCWHT(ch,_clrlevel(ch)),
                   CCCYN(ch,_clrlevel(ch)), grand_master(ch) ? "Grand Master" : class_name[cl_next].name[tl],CCWHT(ch,_clrlevel(ch)),
@@ -2082,22 +2082,22 @@ ACMD(do_score) {
             "\r\n{cg(*)-----------------------------------------Class--TierName-----Tier--(*){c0\r\n");
     ch->Send("{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw   %s %-29s {cg| |\r\n",
              GET_NAME(ch),GET_LEVEL(ch),
-             (color_space ? "   " : ""),    primary_class(ch, blank));
+             (colour_space ? "   " : ""),    primary_class(ch, blank));
     ch->Send(
         "{cg| |{cw Race:{cc %-9s{cw        {cwAlign: {cc%-5d{cw %s%-29s {cg| |\r\n",
         race_name(ch),  GET_ALIGNMENT(ch),
-        (color_space ? "   " : ""), secondary_class(ch, blank));
+        (colour_space ? "   " : ""), secondary_class(ch, blank));
 
     ch->Send(
         "{cg| |  {cwSex:{cy %-7s{cw      Practices: {cc%-6d{cw%s%-29s {cg| |\r\n",
         (GET_SEX(ch) == SEX_MALE ? "Male" : (GET_SEX(ch) ? "Female" :  "Neutral")),
-        GET_PRACTICES(ch),  (color_space ? "   " : ""), tertary_class(ch, blank));
+        GET_PRACTICES(ch),  (colour_space ? "   " : ""), tertary_class(ch, blank));
 
     ch->Send(
         "{cg| | {cwClan: {cy%-17s {cwRank: {cc%-2d{cw    %s%-29s {cg| |\r\n",
         ((!GET_CLAN(ch)) ? "<none>" : clan[find_clan_by_id(GET_CLAN(ch))].name),
         GET_CLAN_RANK(ch),
-        (color_space ? "   " : ""), quatry_class(ch, blank));
+        (colour_space ? "   " : ""), quatry_class(ch, blank));
 
     ch->Send(
         "{cg| |-------------------------------------------------------------------| |{cw\r\n");
@@ -3118,7 +3118,7 @@ ACMD(do_who) {
             } else {
                 if (PRF_FLAGGED(ch, PRF_BATTLESPAM)) {
                     snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0" MXPTAG("B") "%s" MXPTAG("/B") " %s",
-                             TIER_COLOR_WHO(current_class_is_tier_num(wch)),
+                             TIER_COLOUR_WHO(current_class_is_tier_num(wch)),
                              current_class_is_tier_num(wch), GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                              (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),   //is PK or not? bold red
                              (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),     //is RP or not? dark green
@@ -3131,7 +3131,7 @@ ACMD(do_who) {
                              GET_TITLE(wch));     //has a star if hasnt remorted
                 } else {
                     snprintf(buf, sizeof(buf), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0" MXPTAG("B") "%-20s" MXPTAG("/B") ,
-                             TIER_COLOR_WHO(current_class_is_tier_num(wch)),
+                             TIER_COLOUR_WHO(current_class_is_tier_num(wch)),
                              current_class_is_tier_num(wch),GET_LEVEL(wch), RACE_ABBR(wch), CLASS_ABBR(wch),
                              (PLR_FLAGGED(wch, PLR_PK) ? "{crPK{c0" : "{cr--{c0"),   //is PK or not? bold red
                              (PLR_FLAGGED(wch, PLR_ROLEPLAYER) ? "{cgRP{c0" : "{cg--{c0"),     //is RP or not? dark green
@@ -3146,7 +3146,7 @@ ACMD(do_who) {
         len = 0;
         DYN_RESIZE(buf);
 
-        if ((GET_LEVEL(wch) < LVL_HERO) && GET_CLAN(wch)) {     /*added ' leader' to the clan name, gave it round brackets and light cyan color that wont bleed a imms title */
+        if ((GET_LEVEL(wch) < LVL_HERO) && GET_CLAN(wch)) {     /*added ' leader' to the clan name, gave it round brackets and light cyan colour that wont bleed a imms title */
             len += snprintf(buf + len, sizeof(buf) - len, " %s(" MXPTAG("em") "%s%s%s%s" MXPTAG("/em") ")",
                             (GET_LEVEL(wch) >= LVL_HERO ? CCYEL(ch, C_SPR):CCNRM(ch, C_NRM)), CCCYN(ch, C_NRM),
                             clan_name(find_clan_by_id(GET_CLAN(wch))),
@@ -4135,7 +4135,7 @@ const char *ctypes[] = {
                            "off", "sparse", "normal", "complete", "\n"
                        };
 
-ACMD(do_color) {
+ACMD(do_colour) {
     char arg[MAX_INPUT_LENGTH];
     int tp;
 
@@ -4145,22 +4145,22 @@ ACMD(do_color) {
     one_argument(argument, arg);
 
     if (!*arg) {
-        ch->Send( "Your current color level is %s.\r\n",
-                  ctypes[COLOR_LEV(ch)]);
+        ch->Send( "Your current colour level is %s.\r\n",
+                  ctypes[COLOUR_LEV(ch)]);
 
         return;
     }
     if (((tp = search_block(arg, ctypes, FALSE)) == -1)) {
-        ch->Send("Usage: color {{ Off | Sparse | Normal | Complete }\r\n");
+        ch->Send("Usage: colour {{ Off | Sparse | Normal | Complete }\r\n");
         return;
     }
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_2);
+    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_1);
+    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_2);
     if (tp & 1)
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
+        SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_1);
     if (tp & 2)
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_2);
-    ch->Send( "Your %scolor%s is now %s.\r\n", CCRED(ch, C_SPR),
+        SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOUR_2);
+    ch->Send( "Your %scolour%s is now %s.\r\n", CCRED(ch, C_SPR),
               CCNRM(ch, C_OFF), ctypes[tp]);
 }
 
@@ -4267,7 +4267,7 @@ ACMD(do_toggle) {
         ONOFF(PRF_FLAGGED(ch, PRF_AUTOGOLD)),
         ONOFF(PRF_FLAGGED(ch, PRF_KEEPTITLE)),
         ONOFF(!PRF_FLAGGED(ch, PRF_NOIC)),
-        ctypes[COLOR_LEV(ch)],
+        ctypes[COLOUR_LEV(ch)],
         ONOFF(PRF_FLAGGED(ch, PRF_BATTLESPAM)),
         ONOFF(PRF_FLAGGED(ch, PRF_MAIL)),
         ONOFF(PRF_FLAGGED(ch, PRF_NOCTALK)),

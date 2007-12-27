@@ -167,7 +167,7 @@ void parse_caster_commands(Character *ch) {
                 break;
             case 9:
                 if (!ch->master)
-                    spl = (SPELL_COLOR_SPRAY);
+                    spl = (SPELL_COLOUR_SPRAY);
                 break;
             case 10:
                 spl = (SPELL_FIREBALL);
@@ -387,7 +387,7 @@ void parse_fighter_commands(Character *ch) {
                 break;
             case 9:
                 if (!ch->master)
-                    spl = (SPELL_COLOR_SPRAY);
+                    spl = (SPELL_COLOUR_SPRAY);
                 break;
             case 10:
                 spl = (SPELL_FIREBALL);
@@ -536,7 +536,7 @@ void parse_animal_commands(Character *ch) {
                 break;
             case 9:
                 if (!ch->master)
-                    spl = (SPELL_COLOR_SPRAY);
+                    spl = (SPELL_COLOUR_SPRAY);
                 break;
             case 10:
                 spl = (SPELL_FIREBALL);
@@ -684,7 +684,7 @@ void parse_undead_commands(Character *ch) {
                 break;
             case 9:
                 if (!ch->master)
-                    spl = (SPELL_COLOR_SPRAY);
+                    spl = (SPELL_COLOUR_SPRAY);
                 break;
             case 10:
                 spl = (SPELL_FIREBALL);

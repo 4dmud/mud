@@ -403,7 +403,7 @@ int buildwalk(Character *ch, int dir) {
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_BUILDWALK) &&
       GET_LEVEL(ch) >= LVL_BUILDER) {
  
-    get_char_colors(ch);
+    get_char_colours(ch);
 
     if (!can_edit_zone(ch, IN_ROOM(ch)->zone)) {
       ch->Send( "You do not have build permissions in this zone.\r\n");

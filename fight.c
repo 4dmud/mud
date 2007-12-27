@@ -10,6 +10,9 @@
 ***************************************************************************/
 /*
  * $Log: fight.c,v $
+ * Revision 1.65  2007/06/10 02:18:39  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.64  2007/06/08 10:19:05  w4dimenscor
  * Added a way to check for real time, and time passed in dgscripts, REALDAY and REALHOUR and NOW are all variables, and also made it so tha the newbie channel doesnt sound drunk, also, practicing spells and skills need more practices
  *
@@ -5780,7 +5783,7 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
             dam = 1.4;
         break;
         break;
-    case SPELL_COLOR_SPRAY:
+    case SPELL_COLOUR_SPRAY:
         if (inside)
             dam = 1.4;
         else if (day)

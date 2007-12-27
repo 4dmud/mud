@@ -414,7 +414,7 @@ void redit_disp_exit_menu(Descriptor *d)
   else
     strncpy(door_buf, "No door", sizeof(door_buf)-1);
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   d->Output(
                   "%s1%s) Exit to     : %s%d - %s\r\n"
@@ -441,7 +441,7 @@ void redit_disp_exit_menu(Descriptor *d)
  */
 void redit_disp_exit_flag_menu(Descriptor *d)
 {
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   d->Output( "%s0%s) No door\r\n"
                   "%s1%s) Closeable door\r\n"
                   "%s2%s) Pickproof\r\n"
@@ -456,7 +456,7 @@ void redit_disp_flag_menu(Descriptor *d)
   char bits[MAX_STRING_LENGTH];
   int counter, columns = 0;
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   for (counter = 0; counter < NUM_ROOM_FLAGS; counter++)
   {
@@ -496,7 +496,7 @@ void redit_disp_menu(Descriptor *d)
   char buf2[MAX_STRING_LENGTH];
   Room *room;
 
-  get_char_colors(d->character);
+  get_char_colours(d->character);
   clear_screen(d);
   room = OLC_ROOM(d);
   sprintbitarray(room->room_flags, room_bits, RF_ARRAY_MAX, buf1, sizeof(buf1));

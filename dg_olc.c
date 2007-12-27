@@ -203,7 +203,7 @@ void trigedit_disp_menu(Descriptor *d) {
     char *attach_type;
     char trgtypes[256];
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
 
     if (trig->attach_type==OBJ_TRIGGER) {
         attach_type = "Objects";
@@ -236,7 +236,7 @@ void trigedit_disp_menu(Descriptor *d) {
         grn, nrm, yel, trig->narg,			/* numeric arg            */
         grn, nrm, yel, trig->arglist?trig->arglist:"",/* strict arg             */
         grn, nrm, cyn, OLC_STORAGE(d),		/* the command list       */
-        grn, nrm);                                    /* quit colors            */
+        grn, nrm);                                    /* quit colours            */
 
     OLC_MODE(d) = TRIGEDIT_MAIN_MENU;
 }
@@ -259,7 +259,7 @@ void trigedit_disp_types(Descriptor *d) {
         break;
     }
 
-    get_char_colors(d->character);
+    get_char_colours(d->character);
     clear_screen(d);
 
     for (i = 0; i < NUM_TRIG_TYPE_FLAGS; i++) {

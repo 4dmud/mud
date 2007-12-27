@@ -40,7 +40,7 @@ extern struct time_info_data time_info;
 
 /* Global variables.          */
 struct date_event_data *calender_events = NULL;
-char event_day_color[10];
+char event_day_colour[10];
 int days_in_month[]={0,31,28,31,30,31,30,31,31,30,31,30,31};
 
 

@@ -32,7 +32,7 @@ extern const char *apply_types[];
 extern const char *container_bits[];
 extern const char *drinks[];
 extern const char *drinknames[];
-extern const char *color_liquid[];
+extern const char *colour_liquid[];
 extern const char *fullness[];
 extern const char *spell_wear_off_msg[];
 extern const char *npc_class_types[];

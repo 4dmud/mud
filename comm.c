@@ -252,7 +252,7 @@ void weather_and_time(int mode);
 int id_init(void);
 void id_kill(void);
 void init_intermud_socket(void);
-size_t proc_color(char *inbuf, int color_lvl, size_t len);
+size_t proc_colour(char *inbuf, int colour_lvl, size_t len);
 void redit_save_to_disk(int zone_num);
 void oedit_save_to_disk(int zone_num);
 void medit_save_to_disk(int zone_num);
@@ -1743,7 +1743,7 @@ char *make_prompt(Descriptor *d)
 
     if (PRF_FLAGGED(d->character, PRF_DISPHP)&& len < sizeof(prompt))
     {
-      if (COLOR_LEV(d->character) >= C_CMP)
+      if (COLOUR_LEV(d->character) >= C_CMP)
       {
         if (GET_MAX_HIT(d->character) > 0)
           percent =
@@ -1777,7 +1777,7 @@ char *make_prompt(Descriptor *d)
 
     if (PRF_FLAGGED(d->character, PRF_DISPMANA)&& len < sizeof(prompt))
     {
-      if (COLOR_LEV(d->character) >= C_CMP)
+      if (COLOUR_LEV(d->character) >= C_CMP)
       {
         if (GET_MAX_MANA(d->character) > 0)
           percent =
@@ -1802,7 +1802,7 @@ char *make_prompt(Descriptor *d)
 
     if (PRF_FLAGGED(d->character, PRF_DISPMOVE)&& len < sizeof(prompt))
     {
-      if (COLOR_LEV(d->character) >= C_CMP)
+      if (COLOUR_LEV(d->character) >= C_CMP)
       {
         if (GET_MAX_MOVE(d->character) > 0)
           percent =
@@ -4206,12 +4206,12 @@ void brag(Character *ch, Character *vict)
         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF))
     {
 
-      if (COLOR_LEV(i->character) >= C_NRM)
+      if (COLOUR_LEV(i->character) >= C_NRM)
         i->Output("%s", CCRED(i->character, C_NRM));
 
       act(buf, FALSE, i->character, 0, vict, TO_CHAR | TO_SLEEP);
 
-      if (COLOR_LEV(i->character) >= C_NRM)
+      if (COLOUR_LEV(i->character) >= C_NRM)
         i->Output( "%s", CCNRM(i->character, C_NRM));
     }
   }
@@ -4312,14 +4312,14 @@ void make_who2html(void)
   fprintf(opf, "}\n");
   fprintf(opf, "body {\n");
   fprintf(opf, "margin:0;\n");
-  fprintf(opf, "color: #000;\n");
+  fprintf(opf, "colour: #000;\n");
   fprintf(opf, "font-family: \"Arial\";\n");
   fprintf(opf, "font-size: 11px;\n");
   fprintf(opf, "line-height: 175%%;\n");
   fprintf(opf, "}\n");
   fprintf(opf, "h1 {\n");
   fprintf(opf, "text-decoration: none;\n");
-  fprintf(opf, "color: #BE7373;\n");
+  fprintf(opf, "colour: #BE7373;\n");
   fprintf(opf, "font-weight: bold;\n");
   fprintf(opf, "}\n");
   fprintf(opf, "</style>\n");
@@ -4379,7 +4379,7 @@ char * parse_prompt(Character *ch, char *str, size_t lenn)
   if (*msg && **msg)
   {
     strcpy(ptemp, *msg);
-    proc_color(ptemp, IRANGE(0, COLOR_LEV(ch), 3), sizeof(ptemp));
+    proc_colour(ptemp, IRANGE(0, COLOUR_LEV(ch), 3), sizeof(ptemp));
     ptemp[MAX_PROMPT_LENGTH-1] = '\0';
   }
   else
@@ -4735,7 +4735,7 @@ string wordwrap(const char *cmd, size_t width, size_t maxlen)
     *buf = '\0';
   }
   /*
-   This switch block stops color from being split onto different lines.
+   This switch block stops colour from being split onto different lines.
    as well as if a line has a \r\n before the width of the line,
    just stop there and start on the next line.
   */

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.59  2007/06/10 02:18:40  w4dimenscor
+ * changed all entries in the code of 'color' to 'colour', but i now regret it.
+ *
  * Revision 1.58  2007/05/24 20:25:16  w4dimenscor
  * lots of hunt changes. Should all work now.
  *
@@ -566,8 +569,8 @@ class Room;
 #define PRF_SUMMONABLE  10    /* Can be summoned                           */
 #define PRF_NOREPEAT    11    /* No repetition of comm commands            */
 #define PRF_HOLYLIGHT   12    /* Can see in dark                           */
-#define PRF_COLOR_1     13    /* Color (low bit)                           */
-#define PRF_COLOR_2     14    /* Color (high bit)                          */
+#define PRF_COLOUR_1     13    /* Colour (low bit)                           */
+#define PRF_COLOUR_2     14    /* Colour (high bit)                          */
 #define PRF_NOWIZ       15    /* Can't hear wizline                        */
 #define PRF_LOG1        16    /* On-line System Log (low bit)              */
 #define PRF_LOG2        17    /* On-line System Log (high bit)             */
@@ -1266,7 +1269,7 @@ class Room;
 #define MAX_TREE_TYPES 9
 
 #define TOP_ORE_DEFINE        76
-#define MAX_COLOR_OPTIONS       134
+#define MAX_COLOUR_OPTIONS       134
 #define MAX_COMM_BUF          10
 /* define the largest set of commands for a trigger */
 #define MAX_CMD_LENGTH          24576 /* 24k should be plenty and then some */
@@ -2373,8 +2376,8 @@ struct familiar_info {
     int home;
     int ear_size;
     int fur_length;
-    int fur_color;
-    int eye_color;
+    int fur_colour;
+    int eye_colour;
     int aura;
     int tail;
 
