@@ -92,7 +92,6 @@ void free_followers(struct follow_type *k);
 void damage_count_free(Character *vict);
 void extract_all_in_list(OBJ_DATA *obj);
 void free_alias(struct alias_data *a);
-void free_ignore(struct ignore *i);
 void affect_modify_ar(Character *ch, byte loc, sbyte mod, int bitv[], bool add
                          );
 extern long top_idnum;
@@ -270,7 +269,8 @@ void Character::freeself() {
     followers = NULL;
     free_note(pnote, -1);
 
-    free_ignore(SPECIALS(this)->ignorelist);
+	GET_IGNORELIST(this).clear();
+    //free_ignore(SPECIALS(this)->ignorelist);
 
     if (player_specials != NULL && player_specials != &dummy_mob) {
         while ((a = GET_ALIASES(this)) != NULL) {
@@ -432,7 +432,6 @@ void Character::reset() {
     MINE_DAMAGE(this)         = 0;
     HAS_MAIL(this)            = -1;
     IS_SAVING(this)           = FALSE;
-    GET_IGNORELIST(this)      = NULL;
     hitched                   = NULL;
 
     if (GET_HIT(this) <= 0)
@@ -471,7 +470,7 @@ void Character::init() {
 
     /* *** if this is our first player --- he be God *** */
 
-    if (top_of_p_table == 0) {
+    if (player_table.size() == 0) {
 
         GET_LEVEL(this) = LVL_IMPL;
         GET_EXP(this) = exp_needed(this);
@@ -542,17 +541,12 @@ void Character::init() {
 
 
     //TODO: check this
-    if ((i = get_ptable_by_name(GET_NAME(this))) != -1) {
-        while (!valid_id_num(++top_idnum))
-            log("Error new id %ld being assigned to %s already exists!",top_idnum, GET_NAME(this));
-        player_table[i].id = GET_IDNUM(this) = GET_ID(this) =  top_idnum;
-
-        player_table[i].account = GET_IDNUM(this);
+    if ((i = get_ptable_by_name(player.name)) != -1)
+		while (valid_id_num(++top_idnum) == FALSE)
+			log("Error new id %ld being assigned to %s already exists!",top_idnum, player.name);
+			
+        player_table[i].account = player_table[i].id = GET_IDNUM(this) = GET_ID(this) = top_idnum;
         add_to_lookup_table(GET_ID(this), (void *)this);
-    } else
-        log("SYSERR: init_char: Character '%s' not found in player table.",
-            GET_NAME(this));
-
 
 
     for (taeller = 0; taeller < AF_ARRAY_MAX; taeller++)

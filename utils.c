@@ -1532,7 +1532,6 @@ if (levels.size() == 0 )
 void wiz_read_file(void) {
     void wiz_add_name(byte level,const char *name);
     int i;
-    extern struct player_index_element *player_table;    /* index to plr file     */
     extern int top_of_p_table;
     
     vector<level_rec>::iterator curr_level;

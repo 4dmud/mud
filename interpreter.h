@@ -72,12 +72,6 @@ struct command_info
   long cmd_bits;
 };
 
-struct ignore
-{
-  char *ignore;
-  struct ignore *next;
-};
-
 /*
  * Necessary for CMD_IS macro.  Borland needs the structure defined first
  * so it has been moved down here.

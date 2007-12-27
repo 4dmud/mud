@@ -432,6 +432,9 @@ struct player_index_element {
     long account;
     short clan;
     short rank;
+    bool repair;
+    gold_int gc_amount;
+    short gt_amount;
 
     player_index_element() {
             name=NULL;
@@ -442,9 +445,14 @@ struct player_index_element {
             account=0;
             clan=0;
     		  rank=0;
+    		  repair = (bool)0;
+    		  gc_amount = 0;
+    		  gt_amount = 0;
     }
 }
 ;
+typedef vector<player_index_element>::iterator plrindex_it;
+void remove_player(plrindex_it pfilepos);
 
 struct help_index_element {
     char	*keywords;
@@ -519,7 +527,7 @@ extern struct obj_data *dead_obj;	/* delayed obj removal   */
 #endif /* __DB_C__ */
 extern Descriptor *descriptor_list;
 extern Character *character_list;
-extern struct player_index_element *player_table;
+extern vector<player_index_element> player_table;
 extern int top_of_p_table;
 
 

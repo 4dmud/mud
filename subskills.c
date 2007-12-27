@@ -1077,7 +1077,7 @@ void improve_sub(Character *ch, subskill_list sub, int amount) {
         }
     }
 
-    sub_list s;
+    sub_list s = sub_list();
     s.subskill = (sub);
     s.learn = amount;
     s.status = (sub_status_toggle)0;

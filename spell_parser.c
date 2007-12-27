@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: spell_parser.c,v $
+ * Revision 1.27  2006/08/20 12:12:33  w4dimenscor
+ * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
+ *
  * Revision 1.26  2006/08/18 11:09:59  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -368,8 +371,10 @@ int Character::get_skill(int i) {
 
         return (*it).learn;
 }
-
 void set_skill(Character *ch, int skill, int amount) {
+set_skill(ch, skill, amount, TRUE);
+}
+void set_skill(Character *ch, int skill, int amount, bool do_sort) {
     vector<skillspell_data>::iterator it;
 
     if (IS_NPC(ch))
@@ -383,11 +388,12 @@ void set_skill(Character *ch, int skill, int amount) {
     if (it != GET_SKILLS(ch).end()) {
         (*it).learn = amount;
     } else {
-        skillspell_data s;
-        s.skill = (skill);
+        skillspell_data s = skillspell_data();
+        s.skill = skill;
         s.learn = amount;
         s.wait = 0;
         GET_SKILLS(ch).push_back(s);
+        if (do_sort == TRUE)
         sort(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end());
     }
 }
@@ -395,9 +401,8 @@ void set_skill(Character *ch, int skill, int amount) {
 int get_skill_wait(Character *ch, int skill) {
     vector<skillspell_data>::iterator it;
     it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
-    if (it != GET_SKILLS(ch).end()) {
+    if (it != GET_SKILLS(ch).end())
         return (*it).wait;
-    }
     return 0;
 }
 
@@ -409,7 +414,7 @@ vector<skillspell_data>::iterator it;
         
     it = find(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end(), skill);
     if (it != GET_SKILLS(ch).end())
-        (*it).wait = skill;
+        (*it).wait = w;
 }
 
 

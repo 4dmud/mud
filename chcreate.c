@@ -131,7 +131,7 @@ void con_character_creation(Descriptor *d, char *arg)
     d->Output("\r\n");
     
     do_help(d->character, race_selection, 0, 0);
-    d->Output("Are you sure you want %s? ", race_selection);
+    d->Output("\r\nAre you sure you want %s? ", race_selection);
     SUB_STATE(d) = STATE_CONFIRM_QRACE;
     break;
     

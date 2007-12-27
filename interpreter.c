@@ -70,7 +70,6 @@ void aedit_parse(Descriptor *d, char *arg);
 void read_aliases(Character *ch);
 void read_poofs(Character *ch);
 int Crash_load(Character *ch);
-void remove_player(int pfilepos);
 void load_locker(Character *ch);
 int count_locker(Character *ch);
 long get_acc_by_name(char *name);
@@ -1765,13 +1764,9 @@ int special(Character *ch, int cmd, char *arg)
 /* locate entry in p_table with entry->name == name. -1 mrks failed search */
 int find_name(const char *name)
 {
-  int i;
-
-  for (i = 0; i <= top_of_p_table; i++)
-  {
-    if (!str_cmp((player_table + i)->name, name))
+  for (int i = 0; i < player_table.size(); i++)
+    if (!str_cmp(player_table[i].name, name))
       return (i);
-  }
 
   return (-1);
 }
@@ -2152,8 +2147,8 @@ int enter_player_game(Descriptor *d)
   read_aliases(ch);
   ch->next = NULL;  // -- kalten
 
-  if (!valid_id_num( GET_ID(ch)))
-    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
+// if (!valid_id_num( GET_ID(ch)))
+//    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
   GET_ID(ch) = GET_IDNUM(ch);// = player_table[id].id;
   add_to_lookup_table(GET_IDNUM(ch), (void *)ch);
 
@@ -2487,7 +2482,7 @@ void nanny(Descriptor *d, char *arg)
               d->Output("Invalid name, please try another.\r\nName: ");
               return;
             }
-          remove_player(player_i);
+          remove_player(player_table.begin() + player_i);
           /* We get a false positive from the original deleted character. */
           delete d->character;
           /* Check for multiple creations... */
@@ -2954,7 +2949,7 @@ void nanny(Descriptor *d, char *arg)
         {
           SET_BIT(player_table[player_i].flags,
                   PINDEX_SELFDELETE);
-          remove_player(player_i);
+          remove_player(player_table.begin() + player_i);
         }
       d->Output( "Character '%s' deleted!\r\n"
                       "Goodbye.\r\n", GET_NAME(d->character));

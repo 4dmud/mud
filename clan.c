@@ -343,8 +343,6 @@ void do_clan_destroy(Character *ch, char *arg)
 {
 
   int i, j;
-  extern int top_of_p_table;
-  extern struct player_index_element *player_table;
   Character *victim = NULL, *cbuf = NULL;
 
   if (!*arg)
@@ -365,9 +363,9 @@ void do_clan_destroy(Character *ch, char *arg)
     return;
   }
 
-  for (j = 0; j <= top_of_p_table; j++)
+  for (j = 0; j < player_table.size(); j++)
   {
-    if ((victim = is_playing((player_table + j)->name)))
+    if ((victim = is_playing(player_table[j].name)) != NULL)
     {
       if (GET_CLAN(victim) == clan[i].id)
       {
@@ -379,7 +377,7 @@ void do_clan_destroy(Character *ch, char *arg)
     else
     {
       cbuf = new Character(FALSE);
-      if (load_char((player_table + j)->name, cbuf) >= 0)
+      if (load_char(player_table[j].name, cbuf) >= 0)
       {
         if (GET_CLAN(cbuf) == clan[i].id)
         {
@@ -387,10 +385,8 @@ void do_clan_destroy(Character *ch, char *arg)
           GET_CLAN_RANK(cbuf) = 0;
           cbuf->save();
         }
-        delete (victim);
       }
-      else
-        delete (victim);
+      delete (victim);
     }
   }
 
@@ -1362,7 +1358,6 @@ void init_clans()
   int i, j;
   clan_rec tmp;
   extern int top_of_p_table;
-  extern struct player_index_element *player_table;
 
   init_clan_index();
 
@@ -1676,8 +1671,6 @@ void do_clan_ranks(Character *ch, char *arg)
   int new_ranks;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  extern int top_of_p_table;
-  extern struct player_index_element *player_table;
   Character *victim = NULL;
 
   if (!(*arg))
@@ -1755,9 +1748,9 @@ void do_clan_ranks(Character *ch, char *arg)
   if (!immcom)
     ch->Gold( -7500000, GOLD_ALL);
 
-  for (j = 0; j <= top_of_p_table; j++)
+  for (j = 0; j < player_table.size(); j++)
   {
-    if ((victim = is_playing((player_table + j)->name)))
+    if ((victim = is_playing(player_table[j].name)))
     {
       if (GET_CLAN(victim) == clan[clan_num].id)
       {
@@ -1772,7 +1765,7 @@ void do_clan_ranks(Character *ch, char *arg)
     else
     {
       victim = new Character(FALSE);
-      if (load_char((player_table + j)->name, victim) >= 0)
+      if (load_char(player_table[j].name, victim) >= 0)
       {
         if (GET_CLAN(victim) == clan[clan_num].id)
         {
@@ -1783,9 +1776,7 @@ void do_clan_ranks(Character *ch, char *arg)
             GET_CLAN_RANK(victim) = new_ranks;
           victim->save();
         }
-        delete (victim);
       }
-      else
         delete (victim);
     }
   }

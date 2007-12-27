@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.58  2006/08/20 12:12:32  w4dimenscor
+ * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
+ *
  * Revision 1.57  2006/08/19 00:09:36  w4dimenscor
  * found more issues with uninitialised values. Hopefully fixed them. gah
  *
@@ -273,7 +276,6 @@ extern const char *pc_race_types[];
 /* extern functions */
 
 char *one_arg(char *arg, char *first_arg);
-void remove_player(int pfilepos);
 int find_name(const char *name);
 void weight_to_object(struct obj_data *obj, int weight);
 char *getline( char *str, char *buf, size_t len );
@@ -382,12 +384,6 @@ ACMD(do_search_triggers);
 ACMD(do_ctellsnoop);
 ACMD(do_addtp);
 ACMD(do_wizsplit);
-
-struct player_gold_info
-{
-  int p_id;
-  gold_int amount;
-};
 
 #define PC   1
 #define NPC 2
@@ -2366,7 +2362,6 @@ ACMD(do_account)
 {
   char name[MAX_INPUT_LENGTH];
   int acc, pos, i = 0;
-  extern struct player_index_element *player_table;
   one_argument(argument, name);
   if (!*name || GET_LEVEL(ch) < LVL_IMMORT)
   {
@@ -4137,75 +4132,52 @@ int silence_affect(Character *ch, Character *vict, char *argument)
   affect_to_char(vict, &af);
   return 1;
 }
-
-
-int gsort(const void *a, const void *b)
+struct goldSort
 {
-  const struct player_gold_info *a1, *b1;
-
-  a1 = (const struct player_gold_info *) a;
-  b1 = (const struct player_gold_info *) b;
-
-  return (a1->amount - b1->amount);
-}
+     bool operator()(const player_index_element &a, const player_index_element &b)
+     {
+          return a.gc_amount > b.gc_amount;
+     }
+};
+struct tokenSort
+{
+     bool operator()(const player_index_element &a, const player_index_element &b)
+     {
+          return a.gt_amount > b.gt_amount;
+     }
+};
 
 ACMD(do_topgold)
 {
-  int i, j;
-  extern int top_of_p_table;
-  extern struct player_index_element *player_table;
-  Character *victim = NULL;
+  int i,j = 20;
+ plrindex_it piei;
+ vector<player_index_element> pindex(player_table);
+ skip_spaces(&argument);
+ if (*argument)
+ j = atoi(argument);
+ if (j < 1 || j > 100)
+ j = 20;
+ 
+  ch->Send( "Members of the top %d Gold Coin Tycoons\r\n", j);
+  ch->Send( "------------------------------------------\r\n");
+  sort(pindex.begin(), pindex.end(), goldSort());
+  
+  for (i = 0; i < pindex.size() && i < j; i++)
+    ch->Send( "%-20s -- Gold Coins: %5lld million.\r\n", pindex[i].name,  pindex[i].gc_amount/1000000);
 
+  ch->Send( "\r\nMembers of the top %d Gold Token Tycoons\r\n", j);
+  ch->Send( "------------------------------------------\r\n");
+  sort(pindex.begin(), pindex.end(), tokenSort());
+  
+  for (i = 0; i < pindex.size() && i < j; i++)
+    ch->Send( "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount);
 
-  struct player_gold_info player_gold[top_of_p_table + 1];
-
-  for (j = 0; j <= top_of_p_table; j++)
-  {
-    player_gold[j].amount = 0;
-    player_gold[j].p_id = 0;
-  }
-  TEMP_LOAD_CHAR = TRUE;
-  for (j = 0; j <= top_of_p_table; j++)
-  {
-    victim = new Character(FALSE);
-    
-    if (store_to_char((player_table + j)->name, victim) > -1)
-    {
-      if (GET_LEVEL(victim) < LVL_HERO)
-        player_gold[j].amount = ((GET_GOLD(victim)+GET_BANK_GOLD(victim))/1000000);
-      player_gold[j].p_id = (player_table + j)->id;
-      delete (victim);
-    }
-    else
-    {
-      delete (victim);
-      continue;
-    }
-
-
-  }
-  TEMP_LOAD_CHAR = FALSE;
-
-  qsort(player_gold, top_of_p_table, sizeof(struct player_gold_info),   gsort);
-
-  ch->Send( "Members of the top 10 Gold Tycoons\r\n");
-  send_to_char("------------------------------------------\r\n", ch);
-
-  for (i = top_of_p_table - 1; i > (top_of_p_table - 16); i--)
-    ch->Send( "%-20s -- gold: %lld million.\r\n",
-                     get_name_by_id(player_gold[i].p_id),  player_gold[i].amount);
-
-
-  return;
 }
 
 ACMD(do_hostfind)
 {
-  int  j;
-  extern int top_of_p_table;
-  extern struct player_index_element *player_table;
+  int j;
   Character *victim = NULL;
-
   skip_spaces(&argument);
   if (!argument || !*argument)
   {
@@ -4213,21 +4185,15 @@ ACMD(do_hostfind)
     return;
   }
   TEMP_LOAD_CHAR = TRUE;
-  for (j = 0; j <= top_of_p_table; j++)
+  for (j = 0; j < player_table.size(); j++)
   {
     victim = new Character(FALSE);
 
-    if (store_to_char((player_table + j)->name, victim) > -1)
-    {
+    if (store_to_char(player_table[j].name, victim) > -1)
       if (stristr(victim->player_specials->host, argument) != NULL)
         ch->Send( "%-10s -- %s\r\n", GET_NAME(victim), victim->player_specials->host);
+
       delete (victim);
-    }
-    else
-    {
-      delete (victim);
-      continue;
-    }
   }
   TEMP_LOAD_CHAR = FALSE;
   return;
@@ -5706,7 +5672,6 @@ ACMD(do_objconv)
   int counter;
   float percent;
   Character *victim;
-  extern struct player_index_element *player_table;
   int flag25 = 0, flag50 = 0, flag75 = 0, flag100 = 0;
   int process_output(Descriptor *t);
   Descriptor *d;
@@ -5725,10 +5690,10 @@ ACMD(do_objconv)
   }
   /* okay, this is where we load every char, apparently.. but we'll
      do it one at a time, thank you very much */
-  for (counter = 0; counter <= top_of_p_table; counter++)
+  for (counter = 0; counter < player_table.size(); counter++)
   {
     victim = new Character(FALSE);
-    if (load_char((player_table + counter)->name, victim) > -1)
+    if (load_char(player_table[counter].name, victim) > -1)
       out_rent(GET_NAME(victim));
     delete (victim);
     percent = (float) ((float) counter / (float) top_of_p_table);
@@ -6765,13 +6730,14 @@ void change_plrindex_name(long id, char *change)
 
   if (!change)
     return;
-  for (tp = 0; tp <= top_of_p_table; tp++)
+  for (tp = 0; tp < player_table.size(); tp++)
   {
     if (player_table[tp].id == id)
     {
       if (player_table[tp].name)
-        free(player_table[tp].name);
-      player_table[tp].name = strdup(change);
+        delete(player_table[tp].name);
+      player_table[tp].name = new char[strlen(change) +1];
+      strcpy(player_table[tp].name, change);
       save_player_index();
       return;
     }
@@ -6967,7 +6933,7 @@ void perform_delete_player(const char *charname)
   if ((player_i = find_name(charname)) >= 0)
   {
     SET_BIT(player_table[player_i].flags, PINDEX_SELFDELETE);
-    remove_player(player_i);
+    remove_player(player_table.begin() + player_i);
   }
 
 }

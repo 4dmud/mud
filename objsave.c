@@ -35,8 +35,6 @@
 #define LOC_INVENTORY    0
 #define MAX_BAG_ROWS     5
 
-extern struct player_index_element *player_table;
-extern int top_of_p_table;
 extern int qic_items;              /* Number of items in database */
 extern int qic_vnums[];
 void add_owner(int nr, long id);
@@ -352,14 +350,12 @@ int Crash_clean_qic(FILE * fl, char *name)
 
 void update_obj_file(void)
 {
-  int i;
-
-  for (i = 0; i <= top_of_p_table; i++)
+  for (int i = 0; i < player_table.size(); i++)
   {
     //    sprintf(buf, "Cleaning objfile for %s.", (player_table+i)->name);
     //    log(buf);
     if (*player_table[i].name)
-      Crash_clean_file((player_table + i)->name);
+      Crash_clean_file(player_table[i].name);
   }
   return;
 }

@@ -9,6 +9,9 @@
 ************************************************************************ */
 /*
  * $Log: structs.h,v $
+ * Revision 1.50  2006/08/20 12:12:33  w4dimenscor
+ * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
+ *
  * Revision 1.49  2006/08/19 00:09:37  w4dimenscor
  * found more issues with uninitialised values. Hopefully fixed them. gah
  *
@@ -1916,14 +1919,13 @@ struct player_special_data {
     long last_tell;      /* idnum of last tell from           */
     void *last_olc_targ; /* olc control                       */
     int last_olc_mode;        /* olc control                       */
-    struct ignore *ignorelist;
+    vector<string> ignorelist;
     char *host;               /* player host                          */
     char *afk_msg;
     char *busy_msg;
     char *pretitle;
-
-    char       *loginmsg;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
-    char       *logoutmsg;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
+    char *loginmsg;      /*THOTTER EDIT: Message displayed in the room when the char logs in     */
+    char *logoutmsg;     /*THOTTER EDIT: Message displayed in the room when the char logs out */
     int remorts;
     int conversions;
     time_t last_note;
@@ -1957,7 +1959,6 @@ struct player_special_data {
         last_tell = -1;      /* idnum of last tell from           */
         last_olc_targ = NULL; /* olc control                       */
         last_olc_mode = 0;        /* olc control                       */
-        ignorelist = NULL;
         host = NULL;               /* player host                          */
         afk_msg = NULL;
         busy_msg = NULL;

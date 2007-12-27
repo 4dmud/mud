@@ -53,10 +53,12 @@ zone_rnum real_zone_by_thing(room_vnum vznum) {
 zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, const char **error) {
     FILE *fp;
     Zone *zd;
+    /*
     Room * rd;
     Character * cd;
     struct obj_data * od;
     struct shop_data *sd;
+    */
     zone_rnum i;
     char buf[MAX_STRING_LENGTH];
 

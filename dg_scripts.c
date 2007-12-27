@@ -4,11 +4,14 @@
 *                                                                         *
 *                                                                         *
 *  $Author: w4dimenscor $
-*  $Date: 2006/08/18 11:09:58 $
-*  $Revision: 1.30 $
+*  $Date: 2006/08/20 12:12:32 $
+*  $Revision: 1.31 $
 **************************************************************************/
 /*
  * $Log: dg_scripts.c,v $
+ * Revision 1.31  2006/08/20 12:12:32  w4dimenscor
+ * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
+ *
  * Revision 1.30  2006/08/18 11:09:58  w4dimenscor
  * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
  *
@@ -1295,8 +1298,7 @@ ACMD(do_attach) {
 
         ch->Send( "Trigger %d (%s) attached to %s [%d].\r\n",
                   tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
-    }
-    else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
+    } else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
         object = get_obj_vis(ch, targ_name, NULL);
         if (!object) { /* search room for one with this vnum */
             for (object = IN_ROOM(ch)->contents;object;object=object->next_content)
@@ -1337,8 +1339,7 @@ ACMD(do_attach) {
                   (object->short_description ?
                    object->short_description : object->name),
                   GET_OBJ_VNUM(object));
-    }
-    else if (is_abbrev(arg, "room") || is_abbrev(arg, "wtr")) {
+    } else if (is_abbrev(arg, "room") || is_abbrev(arg, "wtr")) {
         if (strchr(targ_name, '.'))
             rnum = IN_ROOM(ch);
         else if (isdigit(*targ_name))
@@ -1372,8 +1373,7 @@ ACMD(do_attach) {
 
         ch->Send( "Trigger %d (%s) attached to room %d.\r\n",
                   tn, GET_TRIG_NAME(trig), rnum->number);
-    }
-    else
+    } else
         ch->Send( "Please specify 'mob', 'obj', or 'room'.\r\n");
 }
 
@@ -1484,8 +1484,7 @@ ACMD(do_detach) {
             }
         } else
             ch->Send( "That trigger was not found.\r\n");
-    }
-    else {
+    } else {
         if (is_abbrev(arg1, "mobile") || !strcasecmp(arg1, "mtr")) {
             victim = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD);
             if (!victim) { /* search room for one with this vnum */
@@ -1503,8 +1502,7 @@ ACMD(do_detach) {
                 ch->Send( "You must specify a trigger to remove.\r\n");
             else
                 trigger = arg3;
-        }
-        else if (is_abbrev(arg1, "object") || !strcasecmp(arg1, "otr")) {
+        } else if (is_abbrev(arg1, "object") || !strcasecmp(arg1, "otr")) {
             object = get_obj_vis(ch, arg2, NULL);
             if (!object) { /* search room for one with this vnum */
                 for (object = IN_ROOM(ch)->contents;object;object=object->next_content)
@@ -1563,16 +1561,14 @@ ACMD(do_detach) {
             else if (trigger && !strcasecmp(trigger, "all")) {
                 extract_script(victim, MOB_TRIGGER);
                 ch->Send( "All triggers removed from %s.\r\n", GET_SHORT(victim));
-            }
-            else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
+            } else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
                 ch->Send( "Trigger removed.\r\n");
                 if (!TRIGGERS(SCRIPT(victim))) {
                     extract_script(victim, MOB_TRIGGER);
                 }
             } else
                 ch->Send( "That trigger was not found.\r\n");
-        }
-        else if (object) {
+        } else if (object) {
             if (!SCRIPT(object))
                 ch->Send( "That object doesn't have any triggers.\r\n");
 
@@ -1588,8 +1584,7 @@ ACMD(do_detach) {
                 ch->Send( "All triggers removed from %s.\r\n",
                           object->short_description ? object->short_description :
                           object->name);
-            }
-            else if (remove_trigger(SCRIPT(object), trigger)) {
+            } else if (remove_trigger(SCRIPT(object), trigger)) {
                 ch->Send( "Trigger removed.\r\n");
                 if (!TRIGGERS(SCRIPT(object))) {
                     extract_script(object, OBJ_TRIGGER);
@@ -1715,85 +1710,71 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, size_t r_len, void *g
             E_FALSE;
         else
             E_TRUE;
-    }
-    else if (!strcmp("&&", op)) {
+    } else if (!strcmp("&&", op)) {
         if (!*lhs || (*lhs == '0') || !*rhs || (*rhs == '0'))
             E_FALSE;
         else
             E_TRUE;
-    }
-    else if (!strcmp("==", op)) {
+    } else if (!strcmp("==", op)) {
         if (is_num(lhs) && is_num(rhs))
             snprintf(result,r_len, "%d", atoi(lhs) == atoi(rhs));
         else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
             E_TRUE;
         else
             snprintf(result,r_len, "%d", !strcasecmp(lhs, rhs));
-    }
-    else if (!strcmp("!=", op)) {
+    } else if (!strcmp("!=", op)) {
         if (is_num(lhs) && is_num(rhs))
             snprintf(result,r_len, "%d", atoi(lhs) != atoi(rhs));
         else if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
             E_FALSE;
         else
             snprintf(result,r_len, "%d", strcasecmp(lhs, rhs));
+    } else if (!strcmp("<=", op)) {
+        if (is_num(lhs) && is_num(rhs))
+            snprintf(result,r_len, "%d", atoi(lhs) <= atoi(rhs));
+        else
+            snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
     }
-  else if (!strcmp("<=", op))
-  {
-    if (is_num(lhs) && is_num(rhs))
-      snprintf(result,r_len, "%d", atoi(lhs) <= atoi(rhs));
-    else
-      snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
-  }
+    else if (!strcmp(">=", op)) {
+        if (is_num(lhs) && is_num(rhs))
+            snprintf(result,r_len, "%d", atoi(lhs) >= atoi(rhs));
+        else
+            snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
+    }
+    else if (!strcmp("<", op)) {
+        if (is_num(lhs) && is_num(rhs))
+            snprintf(result,r_len, "%d", atoi(lhs) < atoi(rhs));
+        else
+            snprintf(result,r_len, "%d", strcmp(lhs, rhs) < 0);
+    }
+    else if (!strcmp(">", op)) {
+        if (is_num(lhs) && is_num(rhs))
+            snprintf(result,r_len, "%d", atoi(lhs) > atoi(rhs));
+        else
+            snprintf(result,r_len, "%d", strcmp(lhs, rhs) > 0);
+    }
+    else if (!strcmp("/=", op))
+        snprintf(result,r_len, "%c", str_str(lhs, rhs) ? '1' : '0');
 
-  else if (!strcmp(">=", op))
-  {
-    if (is_num(lhs) && is_num(rhs))
-      snprintf(result,r_len, "%d", atoi(lhs) >= atoi(rhs));
-    else
-      snprintf(result,r_len, "%d", strcmp(lhs, rhs) <= 0);
-  }
+    else if (!strcmp("*", op))
+        snprintf(result,r_len, "%d", atoi(lhs) * atoi(rhs));
 
-  else if (!strcmp("<", op))
-  {
-    if (is_num(lhs) && is_num(rhs))
-      snprintf(result,r_len, "%d", atoi(lhs) < atoi(rhs));
-    else
-      snprintf(result,r_len, "%d", strcmp(lhs, rhs) < 0);
-  }
+    else if (!strcmp("/", op))
+        snprintf(result,r_len, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
 
-  else if (!strcmp(">", op))
-  {
-    if (is_num(lhs) && is_num(rhs))
-      snprintf(result,r_len, "%d", atoi(lhs) > atoi(rhs));
-    else
-      snprintf(result,r_len, "%d", strcmp(lhs, rhs) > 0);
-  }
+    else if (!strcmp("+", op))
+        snprintf(result,r_len, "%d", atoi(lhs) + atoi(rhs));
 
-  else if (!strcmp("/=", op))
-    snprintf(result,r_len, "%c", str_str(lhs, rhs) ? '1' : '0');
+    else if (!strcmp("-", op))
+        snprintf(result,r_len, "%d", atoi(lhs) - atoi(rhs));
 
-  else if (!strcmp("*", op))
-    snprintf(result,r_len, "%d", atoi(lhs) * atoi(rhs));
-
-  else if (!strcmp("/", op))
-    snprintf(result,r_len, "%d", (n = atoi(rhs)) ? (atoi(lhs) / n) : 0);
-
-  else if (!strcmp("+", op))
-    snprintf(result,r_len, "%d", atoi(lhs) + atoi(rhs));
-
-  else if (!strcmp("-", op))
-    snprintf(result,r_len, "%d", atoi(lhs) - atoi(rhs));
-
-  else if (!strcmp("!", op))
-  {
-    if (is_num(rhs))
-      snprintf(result,r_len, "%d", !atoi(rhs));
-    else
-      snprintf(result,r_len, "%d", !*rhs);
-  }
-  else if (!strcmp("|=", op))
-      snprintf(result,r_len, "%c", is_abbrev(lhs,rhs) ? '1' : '0');
+    else if (!strcmp("!", op)) {
+        if (is_num(rhs))
+            snprintf(result,r_len, "%d", !atoi(rhs));
+        else
+            snprintf(result,r_len, "%d", !*rhs);
+    } else if (!strcmp("|=", op))
+        snprintf(result,r_len, "%c", is_abbrev(lhs,rhs) ? '1' : '0');
 }
 
 
@@ -1866,8 +1847,7 @@ void eval_expr(char *line, char *result, size_t r_len, void *go, struct script_d
         p = matching_paren(expr);
         *p = '\0';
         eval_expr(expr + 1, result, r_len, go, sc, trig, type);
-    }
-    else
+    } else
         var_subst(go, sc, trig, type, line, result, r_len);
 }
 
@@ -1877,64 +1857,62 @@ void eval_expr(char *line, char *result, size_t r_len, void *go, struct script_d
  * answer in result.  returns 1 if expr is evaluated, else 0
  */
 int eval_lhs_op_rhs(char *expr, char *result, size_t r_len, void *go, struct script_data *sc,
-                    trig_data *trig, int type)
-{
-  char *p, *tokens[MAX_INPUT_LENGTH];
-  char line[MAX_INPUT_LENGTH] = "", lhr[MAX_INPUT_LENGTH] = "", rhr[MAX_INPUT_LENGTH] = "";
-  int i = 0, j = 0;
+                    trig_data *trig, int type) {
+    char *p, *tokens[MAX_INPUT_LENGTH];
+    char line[MAX_INPUT_LENGTH] = "", lhr[MAX_INPUT_LENGTH] = "", rhr[MAX_INPUT_LENGTH] = "";
+    int i = 0, j = 0;
 
-  /*
-   * valid operands, in order of priority
-   * each must also be defined in eval_op()
-   */
-  static  char *ops[] = {
-                          "||",
-                          "&&",
-                          "==",
-                          "!=",
-                          "<=",
-                          ">=",
-                          "<",
-                          ">",
-                          "/=",
-                          "-",
-                          "+",
-                          "/",
-                          "*",
-                          "!",
-                          "|=",
-                          "\n"
-                        };
+    /*
+     * valid operands, in order of priority
+     * each must also be defined in eval_op()
+     */
+    static  char *ops[] = {
+                              "||",
+                              "&&",
+                              "==",
+                              "!=",
+                              "<=",
+                              ">=",
+                              "<",
+                              ">",
+                              "/=",
+                              "-",
+                              "+",
+                              "/",
+                              "*",
+                              "!",
+                              "|=",
+                              "\n"
+                          };
 
-  p = strcpy(line, expr);
+    p = strcpy(line, expr);
 
-  /*
-   * initialize tokens, an array of pointers to locations
-   * in line where the ops could possibly occur.
-   */
-  for (j = 0; *p; j++)
-  {
-    tokens[j] = p;
-    if (*p == '(')
-      p = matching_paren(p) + 1;
-    else if (*p == '"')
-      p = matching_quote(p) + 1;
-    else if (isalnum(*p))
-      for (p++; *p && (isalnum(*p) || isspace(*p)); p++);
-    else
-      p++;
-  }
-  tokens[j] = NULL;
-  for (i = 0; *ops[i] != '\n'; i++)
-    for (j = 0; tokens[j]; j++)
-      if (!strn_cmp(ops[i], tokens[j], strlen(ops[i])))
-      {
-        *tokens[j] = '\0';
-        p = tokens[j] + strlen(ops[i]);
+    /*
+     * initialize tokens, an array of pointers to locations
+     * in line where the ops could possibly occur.
+     */
+    for (j = 0; *p; j++) {
+        tokens[j] = p;
+        if (*p == '(')
+            p = matching_paren(p) + 1;
+        else if (*p == '"')
+            p = matching_quote(p) + 1;
+        else if (isalnum(*p))
+            for (p++; *p && (isalnum(*p) || isspace(*p)); p++)
+                ;
+        else
+            p++;
+    }
+    tokens[j] = NULL;
+    for (i = 0; *ops[i] != '\n'; i++)
+        for (j = 0; tokens[j]; j++)
+            if (!strn_cmp(ops[i], tokens[j], strlen(ops[i]))) {
+                *tokens[j] = '\0';
+                p = tokens[j] + strlen(ops[i]);
 
-        eval_expr(line, lhr, sizeof(lhr), go, sc, trig, type);
-        eval_expr(p, rhr, sizeof(rhr), go, sc, trig, type);
-        eval_op(ops[i], lhr, rhr, result, r_len, go, sc, trig);
+                eval_expr(line, lhr, sizeof(lhr), go, sc, trig, type);
+                eval_expr(p, rhr, sizeof(rhr), go, sc, trig, type);
+                eval_op(ops[i], lhr, rhr, result, r_len, go, sc, trig);
                 return 1;
             }
 
@@ -2020,12 +1998,10 @@ struct cmdlist_element *find_else_end(trig_data *trig,
                 GET_TRIG_DEPTH(trig)++;
                 return c;
             }
-        }
-        else if (!strn_cmp("else", p, 4)) {
+        } else if (!strn_cmp("else", p, 4)) {
             GET_TRIG_DEPTH(trig)++;
             return c;
-        }
-        else if (!strn_cmp("end", p, 3))
+        } else if (!strn_cmp("end", p, 3))
             return c;
 
         if(!c->next) { //rryan: this is the last line, return
@@ -2078,8 +2054,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd,
             when = (SECS_PER_MUD_DAY * PASSES_PER_SEC) - when + ntime;
         else
             when = ntime - when;
-    }
-    else {
+    } else {
         if (sscanf(arg, "%ld %c", &when, &c) == 2) {
             if (c == 't')
                 when *= PULSES_PER_MUD_HOUR;
@@ -3012,14 +2987,12 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
                  !strn_cmp(cmd, "extract ", 8) || !strn_cmp("case", p, 4) || !strn_cmp(cmd, "eval ", 5) ||
                  !strn_cmp(cmd, "nop ", 4) || !strn_cmp(cmd, "set ", 4))) {
             script_log( "Unmatched %s bracket in trigger %d!", brac < 0 ? "right" : "left", GET_TRIG_VNUM(trig));
-        }
-        else if (!strn_cmp(p, "if ", 3)) {
+        } else if (!strn_cmp(p, "if ", 3)) {
             if (process_if(p + 3, go, sc, trig, type))
                 GET_TRIG_DEPTH(trig)++;
             else
                 cl = find_else_end(trig, cl, go, sc, type);
-        }
-        else if (!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4) || !strn_cmp("else if ", p, 8)) {
+        } else if (!strn_cmp("elseif ", p, 7) || !strn_cmp("else", p, 4) || !strn_cmp("else if ", p, 8)) {
             /*
              * if not in an if-block, ignore the extra 'else[if]' and warn about it
              */
@@ -3090,10 +3063,9 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
         } else if (!strn_cmp("case", p, 4)) {
             /* Do nothing, this allows multiple cases to a single instance */
         }
-
         else {
 
-//            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
+            //            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
 
             /** dg_script functions **/
             if (!strn_cmp(cmd, "function ", 9)) {
@@ -3158,8 +3130,7 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
                 process_wait(go, trig, type, cmd, cl);
                 depth--;
                 return ret_val;
-            }
-            else if (!strn_cmp(cmd, "attach ", 7))
+            } else if (!strn_cmp(cmd, "attach ", 7))
                 process_attach(go, sc, trig, type, cmd);
 
             else if (!strn_cmp(cmd, "detach ", 7))
@@ -3545,12 +3516,21 @@ void save_char_vars(Character *ch) {
 struct lookup_table_t {
     long uid;
     void * c;
-    struct lookup_table_t *next;
-};
-struct lookup_table_t lookup_table[BUCKET_COUNT];
+    //struct lookup_table_t *next;
+    lookup_table_t() : uid(-1), c(NULL) {}
+    lookup_table_t(long u, void * v) : uid(u), c(v) {}
+    bool operator==(const long i) {return (uid == i);}
+    
+}
+;
+vector<lookup_table_t> lookup_table[BUCKET_COUNT];
+bool operator<(const lookup_table_t &a, const lookup_table_t &b)
+     {
+          return a.uid < b.uid;
+     }
 
 void init_lookup_table(void) {
-#if 1
+#if 0
     int i;
     for (i = 0; i < BUCKET_COUNT; i++) {
         lookup_table[i].uid  = UID_OUT_OF_RANGE;
@@ -3572,13 +3552,11 @@ Character *find_char_by_uid_in_lookup_table(long uid) {
 #else
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
-    struct lookup_table_t *lt = &lookup_table[bucket];
+    vector<lookup_table_t>::iterator lt;
 
-    for (;lt && lt->uid != uid ; lt = lt->next)
-        ;
-
-    if (lt) {
-        Character *ch = (Character *)(lt->c);
+    lt = find(lookup_table[bucket].begin(), lookup_table[bucket].end(), uid);
+    if (lt != lookup_table[bucket].end()) {
+        Character *ch = (Character *)((*lt).c);
 
         if (!ch)
             return NULL;
@@ -3618,13 +3596,11 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid) {
 #else
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
-    struct lookup_table_t *lt = &lookup_table[bucket];
+    vector<lookup_table_t>::iterator lt;
 
-    for (;lt && lt->uid != uid ; lt = lt->next)
-        ;
-
-    if (lt)
-        return (struct obj_data *)(lt->c);
+    lt = find(lookup_table[bucket].begin(), lookup_table[bucket].end(), uid);
+    if (lt != lookup_table[bucket].end())
+            return (struct obj_data *)((*lt).c);
 
     log("find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid);
     return NULL;
@@ -3634,22 +3610,29 @@ struct obj_data *find_obj_by_uid_in_lookup_table(long uid) {
 void add_to_lookup_table(long uid, void *c) {
 #if 1
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
-    struct lookup_table_t *lt = &lookup_table[bucket];
+    //struct lookup_table_t *lt = &lookup_table[bucket];
+    vector<lookup_table_t>::iterator lt;
 
-    for (;lt->next; lt = lt->next) {
+    if (uid < 0) {
+        log("Add_to_lookup failed. ID -1");
+        return;
+    }
+
+
+    for (lt = lookup_table[bucket].begin();lt != lookup_table[bucket].end(); lt++) {
         if (lt->uid == uid) {
             log("Add_to_lookup failed. ID - Already there. (uid = %ld)", uid);
             return;
             if (lt->c == c ) {
-                log("Add_to_lookup failed. ID and CHAR Already there. (uid = %ld)", uid);
-                return;
+                log("Add_to_lookup correcting. ID and CHAR Already there. (uid = %ld)", uid);
+                lookup_table[bucket].erase(lt);
+                break;
             }
         }
     }
-
-    CREATE(lt->next, struct lookup_table_t, 1);
-    lt->next->uid = uid;
-    lt->next->c = c;
+    lookup_table_t ltt = lookup_table_t(uid, c);
+    lookup_table[bucket].push_back(ltt);
+    sort(lookup_table[bucket].begin(), lookup_table[bucket].end());
 #endif
 }
 
@@ -3659,7 +3642,8 @@ void remove_from_lookup_table(long uid) {
 #if 1
 
     int bucket = (int) (uid & (BUCKET_COUNT - 1));
-    struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
+    //struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
+    vector<lookup_table_t>::iterator lt;
 
     /*
     * This is not supposed to happen. UID 0 is not used.
@@ -3671,19 +3655,11 @@ void remove_from_lookup_table(long uid) {
         log("Removing id 0 from lookup table");
         return;
     }
-
-    for (;lt;lt = lt->next)
-        if (lt->uid == uid) {
-            flt = lt;
-
-            if (flt) {
-                for (lt = &lookup_table[bucket];lt->next != flt;lt = lt->next)
-                    ;
-                lt->next = flt->next;
-                free(flt);
-                return;
-            }
-        }
+    lt = find(lookup_table[bucket].begin(), lookup_table[bucket].end(), uid);
+    if (lt != lookup_table[bucket].end()) {
+        lookup_table[bucket].erase(lt);
+        return;
+    }
 
 #if DEBUG
     log("remove_from_lookup. UID %ld not found.", uid);

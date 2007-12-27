@@ -24,6 +24,7 @@
 #include "constants.h"
 #include "fight.h"
 #include "descriptor.h"
+#include "strutil.h"
 
 /* extern variables */
 int can_fight(Character *ch, Character *vict, int silent);
@@ -32,7 +33,6 @@ int can_fight(Character *ch, Character *vict, int silent);
 /* extern functions */
 void raw_kill(Character *ch, Character *killer);
 int perform_move(Character *ch, int dir, int specials_check);
-struct ignore *find_ignore(struct ignore *ignore_list, char *str);
 void write_ignorelist(Character *ch);
 int compute_armor_class(Character *ch);
 void print_ignorelist(Character *ch, Character *vict);
@@ -697,8 +697,8 @@ ACMD(do_throw)
 ACMD(do_ignore)
 {
   Character *victim;
-  struct ignore *a, *temp;
   char arg[MAX_INPUT_LENGTH];
+  vector<string>::iterator a;
 
   one_argument(argument, arg);
 
@@ -708,12 +708,10 @@ ACMD(do_ignore)
     ch->Send( "Currently on your list:\r\n");
     print_ignorelist(ch, ch);
   }
-  else if ((a = find_ignore(GET_IGNORELIST(ch), arg)) != NULL)
+  else if ((a = find(GET_IGNORELIST(ch).begin(), GET_IGNORELIST(ch).end(), tolower(string(arg)))) != GET_IGNORELIST(ch).end())
   {
-    REMOVE_FROM_LIST(a, GET_IGNORELIST(ch), next);
+    GET_IGNORELIST(ch).erase(a);
     ch->Send( "You no longer ignore them.\r\n");
-    free(a->ignore);
-    free(a);
     write_ignorelist(ch);
   }
   else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
@@ -725,10 +723,8 @@ ACMD(do_ignore)
 
   else
   {
-    CREATE(a, struct ignore, 1);
-    a->ignore = str_dup(arg);
-    a->next = GET_IGNORELIST(ch);
-    GET_IGNORELIST(ch) = a;
+    GET_IGNORELIST(ch).push_back(tolower(string(GET_PC_NAME(victim))));
+    sort(GET_IGNORELIST(ch).begin(), GET_IGNORELIST(ch).end());
     ch->Send( "%s", CONFIG_OK);
     write_ignorelist(ch);
   }

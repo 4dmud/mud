@@ -1184,7 +1184,7 @@ struct player_special_data {
     long last_tell;			/* idnum of last tell from           */
     void *last_olc_targ;		/* olc control			     */
     int last_olc_mode;			/* olc control			     */
-    struct ignore *ignorelist;
+    vector<string> ignorelist;
 
 };
 

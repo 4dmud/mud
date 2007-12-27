@@ -395,6 +395,7 @@ void improve_sub(Character *ch, enum subskill_list sub, int amount);
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
 
+void set_skill(Character *ch, int skill, int amount, bool do_sort);
 void set_skill(Character *ch, int skill, int amount);
 /* basic bitvector utils *************************************************/
 
@@ -1158,7 +1159,7 @@ struct obj_data *has_vehicle(Character *ch);
 #define CONFIG_MIN_WIZLIST_LEV  config_info.autowiz.min_wizlist_lev
 
 
-int valid_id_num(long id);
+bool valid_id_num(long id);
 int fileExists (char * fileName);
 
 #define FTOI(f) ((int)((f)))

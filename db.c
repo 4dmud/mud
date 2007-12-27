@@ -137,7 +137,7 @@ vector <Zone> zone_table;
 zone_rnum top_of_zone_table = 0;   /* top element of zone tab       */
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages     */
 
-struct player_index_element *player_table = NULL; /* index to plr file     */
+vector<player_index_element> player_table; /* index to plr file     */
 FILE *player_fl = NULL;       /* file desc of player file      */
 int top_of_p_table = 0;       /* ref to top of table           */
 int top_of_p_file = 0;        /* ref of size of p file         */
@@ -425,7 +425,7 @@ int clean_dir(char *dirname) {
         for (cnt = 0; cnt < n; ++cnt) {
             if (eps[cnt]->d_type == DT_REG ) {
                 found = FALSE;
-                for (tp = 0; tp <= top_of_p_table; tp++) {
+                for (tp = 0; tp < player_table.size(); tp++) {
                     if (*player_table[tp].name == *eps[cnt]->d_name) {
                         /*if (0 && str_str(eps[cnt]->d_name, player_table[tp].name))
                           log("Checking: %s, to see if it is a substring of %s, %d", player_table[tp].name, eps[cnt]->d_name, strncmp(player_table[tp].name, eps[cnt]->d_name, strlen(player_table[tp].name)));*/
@@ -1112,18 +1112,11 @@ void save_mud_time(struct time_info_data *when) {
 }
 
 void free_player_index(void) {
-    int tp;
-
-    if (!player_table)
-        return;
-
-    for (tp = 0; tp <= top_of_p_table; tp++)
+    for (int tp = 0; tp < player_table.size(); tp++)
         if (player_table[tp].name)
-            free(player_table[tp].name);
-
-    free(player_table);
-    player_table = NULL;
-    top_of_p_table = 0;
+            delete[] player_table[tp].name;
+    player_table.clear();
+    top_of_p_table = -1;
 }
 
 
@@ -1151,33 +1144,40 @@ void build_player_index(void) {
     rewind(plr_index);
 
     if (rec_count == 0) {
-        player_table = NULL;
         top_of_p_file = top_of_p_table = -1;
         return;
     }
     log("   %d players in database.", rec_count);
 
-    CREATE(player_table, struct player_index_element, rec_count);
+    //CREATE(player_table, struct player_index_element, rec_count);
+    player_index_element pte = player_index_element();
+    int id_zero = 0;
     for (i = 0; i < rec_count; i++) {
         get_line(plr_index, line);
-        if ((retval = sscanf(line, "%ld %s %d %s %ld %ld %hd %hd", &player_table[i].id, arg2,
-                             &player_table[i].level, bits,  &player_table[i].last, &player_table[i].account,
-                             &player_table[i].clan, &player_table[i].rank)) < 8) {
+        if ((retval = sscanf(line, "%ld %s %d %s %ld %ld %hd %hd %lld %hd", &pte.id, arg2,
+                             &pte.level, bits,  &pte.last, &pte.account,
+                             &pte.clan, &pte.rank, &pte.gc_amount, &pte.gt_amount)) < 10) {
+            if (pte.id <= 0)
+                id_zero++;
+            if (id_zero >= 1) 
+                pte.repair = TRUE;
             if (retval == 5) {
-                player_table[i].account = player_table[i].id;
+                pte.account = pte.id;
                 save_index = TRUE;
-            } else if (retval == 6)
+            } else if (retval < 10)
                 save_index = TRUE;
             else {
                 log("Player Index Error! Line %d.", i);
                 exit(1);
             }
         }
-        CREATE(player_table[i].name, char, strlen(arg2) + 1);
-        strcpy(player_table[i].name, arg2);
-        *player_table[i].name = LOWER(*player_table[i].name);
-        player_table[i].flags = asciiflag_conv(bits);
-        top_idnum = MAX(top_idnum, player_table[i].id);
+        pte.name = new char[strlen(arg2) + 1];
+        //CREATE(player_table[i].name, char, strlen(arg2) + 1);
+        strcpy(pte.name, arg2);
+        *pte.name = LOWER(*pte.name);
+        pte.flags = asciiflag_conv(bits);
+        top_idnum = MAX(top_idnum, pte.id);
+        player_table.push_back(pte);
     }
     fclose(plr_index);
     top_of_p_file = top_of_p_table = i - 1;
@@ -1186,30 +1186,34 @@ void build_player_index(void) {
 
 
     if (save_index) {
-        int j;
+        plrindex_it ptv;
         Character *victim;
         log("    fixing index fields: clans");
-        for (j = 0; j <= top_of_p_table; j++) {
-            if (!IS_SET(player_table[j].flags, PINDEX_DELETED) && !IS_SET(player_table[j].flags, PINDEX_SELFDELETE)) {
-                victim = new Character(FALSE);
+        
                 TEMP_LOAD_CHAR = TRUE;
+        for (ptv = player_table.begin(); ptv != player_table.end(); ptv++) {
+            if (!IS_SET((*ptv).flags, PINDEX_DELETED) && !IS_SET((*ptv).flags, PINDEX_SELFDELETE)) {
+                victim = new Character(FALSE);
 
-                if (store_to_char((player_table + j)->name, victim) > -1) {
-                    player_table[j].clan = GET_CLAN(victim);
-                    player_table[j].rank = GET_CLAN_RANK(victim);
+                if (store_to_char((*ptv).name, victim) > -1) {
+                    (*ptv).clan = GET_CLAN(victim);
+                    (*ptv).rank = GET_CLAN_RANK(victim);
+                    (*ptv).gc_amount = GET_GOLD(victim) + GET_BANK_GOLD(victim);
+                    (*ptv).gt_amount = GET_GOLD_TOKEN_COUNT(victim);
                     delete victim;
                 } else
                     delete victim;
 
-                TEMP_LOAD_CHAR = FALSE;
             }
         }
+        
+                TEMP_LOAD_CHAR = FALSE;
         save_player_index();
     }
 }
 
 void save_player_index(void) {
-    int i, j, cnt = 0;
+    int cnt = 0;
     char bits[64];
     FILE *index_file;
     char tempname[MAX_STRING_LENGTH];
@@ -1220,28 +1224,30 @@ void save_player_index(void) {
         return;
     }
 
-    for (i = 0; i <= top_of_p_table; i++) {
+    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
         cnt = 0;
-        if (*player_table[i].name &&
-                !IS_SET(player_table[i].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[i].flags, PINDEX_SELFDELETE)) {
-            for (j = 0; j <= top_of_p_table; j++) {
-                if (cnt == 0 && *player_table[i].name && !strcmp(player_table[i].name, player_table[j].name) &&
-                        !IS_SET(player_table[i].flags, PINDEX_DELETED) &&
-                        !IS_SET(player_table[i].flags, PINDEX_SELFDELETE)) {
+        if (*(*ptvi).name &&
+                !IS_SET((*ptvi).flags, PINDEX_DELETED) &&
+                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE)) {
+            for (plrindex_it ptvj = player_table.begin(); ptvj != player_table.end(); ptvj++) {
+                if (cnt == 0 &&
+                        *(*ptvi).name == *(*ptvj).name &&
+                        !strcmp((*ptvi).name, (*ptvj).name) &&
+                        !IS_SET((*ptvi).flags, PINDEX_DELETED) &&
+                        !IS_SET((*ptvi).flags, PINDEX_SELFDELETE)) {
                     cnt++;
-                    sprintbits(player_table[i].flags, bits);
-                    *player_table[i].name = LOWER(*player_table[i].name);
-                    fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd\n",
-                            player_table[i].id, player_table[i].name,
-                            player_table[i].level, *bits ? bits : "0",
-                            player_table[i].last, player_table[i].account,
-                            player_table[i].clan, player_table[i].rank);
+                    sprintbits((*ptvi).flags, bits);
+                    *(*ptvi).name = LOWER(*(*ptvi).name);
+                    fprintf(index_file, "%ld %s %d %s %ld %ld %hd %hd %lld %hd\n",
+                            (*ptvi).id, (*ptvi).name,
+                            (*ptvi).level, *bits ? bits : "0",
+                            (*ptvi).last, (*ptvi).account,
+                            (*ptvi).clan, (*ptvi).rank, (*ptvi).gc_amount, (*ptvi).gt_amount);
                 }
             }
         }
     }
-    i = fprintf(index_file, "~\n");
+    int i = fprintf(index_file, "~\n");
     fclose(index_file);
     if (i < 0)
         remove
@@ -1250,19 +1256,19 @@ void save_player_index(void) {
         rename(tempname, PLR_INDEX_FILE);
 }
 
-void remove_player(int pfilepos) {
+void remove_player(plrindex_it ptvi) {
     char backup_name[128], pfile_name[128];
     FILE *backup_file;
 
-    if (pfilepos < 0 || !*player_table[pfilepos].name)
+    if (!*(*ptvi).name)
         return;
 
-    if (player_table[pfilepos].level >= pfile_backup_minlevel
+    if ((*ptvi).level >= pfile_backup_minlevel
             && backup_wiped_pfiles && (!selfdelete_fastwipe ||
-                                       !IS_SET(player_table[pfilepos].flags,
+                                       !IS_SET((*ptvi).flags,
                                                PINDEX_SELFDELETE))) {
         snprintf(backup_name, sizeof(backup_name), "%s/%s.%d", BACKUP_PREFIX,
-                 player_table[pfilepos].name, (int) time(0));
+                 (*ptvi).name, (int) time(0));
         if (!(backup_file = fopen(backup_name, "w"))) {
             log( "PCLEAN: Unable to open backup file %s.",
                  backup_name);
@@ -1270,10 +1276,10 @@ void remove_player(int pfilepos) {
         }
 
         fprintf(backup_file, "**\n** PFILE: %s\n**\n",
-                player_table[pfilepos].name);
+                (*ptvi).name);
         snprintf(pfile_name, sizeof(pfile_name), "%s/%c/%s%s", PLR_PREFIX,
-                 *player_table[pfilepos].name,
-                 player_table[pfilepos].name, PLR_SUFFIX);
+                 *(*ptvi).name,
+                 (*ptvi).name, PLR_SUFFIX);
         //      if(!fcat(pfile_name, backup_file))
         //              fprintf(backup_file, "** (NO FILE)\n");
         fclose(backup_file);
@@ -1282,27 +1288,27 @@ void remove_player(int pfilepos) {
             (pfile_name);
     }
     log( "PCLEAN: %s Lev: %d Last: %s",
-         player_table[pfilepos].name, player_table[pfilepos].level,
-         asctime(localtime(&player_table[pfilepos].last)));
-    player_table[pfilepos].name[0] = '\0';
+         (*ptvi).name, (*ptvi).level,
+         asctime(localtime(&(*ptvi).last)));
+    (*ptvi).name[0] = '\0';
     save_player_index();
 }
 
 void clean_pfiles(void) {
-    int i,  timeout = 0;
+    int timeout = 0;
     time_t tm = time(0);
 
-    for (i = 0; i <= top_of_p_table; i++) {
-        if (IS_SET(player_table[i].flags, PINDEX_NODELETE))
+    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
+        if (IS_SET((*ptvi).flags, PINDEX_NODELETE))
             continue;
         timeout = -1;
 
-        if ((IS_SET(player_table[i].flags, PINDEX_DELETED)) || (player_table[i].level < 40 && player_table[i].clan == 12)) {
+        if ((IS_SET((*ptvi).flags, PINDEX_DELETED)) || ((*ptvi).level < 40 && (*ptvi).clan == 12)) {
             timeout = 90;
 
             timeout *= SECS_PER_REAL_DAY;
-            if ((tm - player_table[i].last) > timeout)
-                remove_player(i);
+            if ((tm - (*ptvi).last) > timeout)
+                remove_player(ptvi);
         }
     }
 }
@@ -4301,16 +4307,15 @@ int is_empty(zone_rnum zone_nr) {
 *************************************************************************/
 
 long get_ptable_by_name(const char *name) {
-    for (int i = 0; i <= top_of_p_table; i++)
-        if (!strcmp(player_table[i].name, name))
+    for (int i = 0; i < player_table.size(); i++)
+        if (!str_cmp(player_table[i].name, name))
             return (i);
-
     return (-1);
 }
 
 
 long get_ptable_by_id(long id) {
-    for (int i = 0; i <= top_of_p_table; i++)
+    for (int i = 0; i < player_table.size(); i++)
         if (player_table[i].id == id)
             return (i);
 
@@ -4318,24 +4323,23 @@ long get_ptable_by_id(long id) {
 }
 
 long get_id_by_name(const char *name) {
-    for (int i = 0; i <= top_of_p_table; i++)
-        if (!strcmp(player_table[i].name, name))
+    for (int i = 0; i < player_table.size(); i++)
+        if (!str_cmp(player_table[i].name, name))
             return (player_table[i].id);
 
     return (-1);
 }
 
-long get_acc_by_name(char *name) {
-    for (int i = 0; i <= top_of_p_table; i++)
-        if (!strcmp(player_table[i].name, name))
+long get_acc_by_name(const char *name) {
+    for (int i = 0; i < player_table.size(); i++)
+        if (!str_cmp(player_table[i].name, name))
             return (player_table[i].account);
 
     return (-1);
 }
 
 long get_acc_by_id(long id) {
-    int i;
-    for (i = 0; i <= top_of_p_table; i++)
+    for (int i = 0; i < player_table.size(); i++)
         if (player_table[i].id == id)
             return (player_table[i].account);
 
@@ -4344,11 +4348,11 @@ long get_acc_by_id(long id) {
 
 //returns index of player num for account acc
 int get_account_num(int num, long acc) {
-    int i, n = 0;
-    for (i = 0; i <= top_of_p_table; i++)
-        if (!IS_SET(player_table[i].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[i].flags, PINDEX_SELFDELETE) &&
-                player_table[i].name[0] != '\0' && player_table[i].account == acc && n++ == num)
+    int i = 0, n = 0;
+    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++, i++)
+        if (!IS_SET((*ptvi).flags, PINDEX_DELETED) &&
+                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE) &&
+                (*ptvi).name[0] != '\0' && (*ptvi).account == acc && n++ == num)
             return (i);
 
     return (-1);
@@ -4356,11 +4360,9 @@ int get_account_num(int num, long acc) {
 
 
 char *get_name_by_id(long id) {
-    int i;
-
-    for (i = 0; i <= top_of_p_table; i++)
-        if (player_table[i].id == id)
-            return (player_table[i].name);
+    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++)
+        if ((*ptvi).id == id)
+            return ((*ptvi).name);
 
     return (NULL);
 }
@@ -4369,7 +4371,6 @@ char *get_name_by_id(long id) {
 int load_char(const char *name, Character *ch) {
     Character *tch;
     int ret_val = 0;
-    int tp;
     string chname;
 
     if (ch == NULL) {
@@ -4377,7 +4378,7 @@ int load_char(const char *name, Character *ch) {
         return -1;
     }
 
-    if (player_table == NULL)
+    if (player_table.size() == 0)
         return -1;
 
     for (tch = character_list;tch;tch = tch->next) {
@@ -4388,17 +4389,16 @@ int load_char(const char *name, Character *ch) {
     //for (k = 0; (*(name + k) = LOWER(*(name + k))); k++);
     chname = tolower(string(name));
 
-    for (tp = 0; tp <= top_of_p_table; tp++) {
-        if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
-                !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
-                (!player_table[tp].name || !*player_table[tp].name))
+    for (plrindex_it ptvi = player_table.begin(); ptvi != player_table.end(); ptvi++) {
+        if (!IS_SET((*ptvi).flags, PINDEX_DELETED) &&
+                !IS_SET((*ptvi).flags, PINDEX_SELFDELETE) &&
+                (!(*ptvi).name || !*(*ptvi).name))
             continue;
-        if (*player_table[tp].name == chname[0] && !strcmp(player_table[tp].name, chname.c_str())) {
+        if (*(*ptvi).name == chname[0] && !strcmp((*ptvi).name, chname.c_str())) {
             ret_val = store_to_char(chname.c_str(), ch);
-            if (ret_val != -1) {
-
-                return (player_table[tp].id);
-            } else
+            if (ret_val != -1)
+                return ((*ptvi).id);
+            else
                 return -2;
         }
     }
@@ -4443,6 +4443,7 @@ int store_to_char(const char *name, Character *ch) {
     char buf[MAX_INPUT_LENGTH];
     char  line[MAX_INPUT_LENGTH + 1], tag[6];
     struct affected_type tmp_aff[MAX_AFFECT];
+    plrindex_it pvti;
     int rec_count = 0;
 
     if (ch == NULL) {
@@ -4458,9 +4459,10 @@ int store_to_char(const char *name, Character *ch) {
         log("Name: '%s' unfound in player index", name);
         return -1;
     } else {
+        pvti = player_table.begin() + id;
 
         snprintf(filename, sizeof(filename), "%s/%c/%s",
-                 PLR_PREFIX, *player_table[id].name, player_table[id].name);
+                 PLR_PREFIX, *(*pvti).name, (*pvti).name);
         if (!(fl = fopen(filename, "r"))) {
 
             new_mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Player file not found %s", filename);
@@ -4473,21 +4475,21 @@ int store_to_char(const char *name, Character *ch) {
                 fclose(fl);
 #if defined(unix)
                 /* decompress if .gz file exists */
-                snprintf(filename, sizeof(filename), "%s/%c/%s%s", PLR_PREFIX, *player_table[id].name, player_table[id].name, ".bak.gz");
+                snprintf(filename, sizeof(filename), "%s/%c/%s%s", PLR_PREFIX, *(*pvti).name, (*pvti).name, ".bak.gz");
                 if ( ( fl = fopen( filename, "r" ) ) != NULL ) {
                     fclose(fl);
 
                     snprintf(buf, sizeof(buf),"gzip -dfq %s", filename);
                     system(buf);
                     snprintf(buf, sizeof(buf), "cp -f %s/%c/%s.bak %s/%c/%s"
-                             ,PLR_PREFIX, *player_table[id].name, player_table[id].name
-                             ,PLR_PREFIX, *player_table[id].name, player_table[id].name);
+                             ,PLR_PREFIX, *(*pvti).name, (*pvti).name
+                             ,PLR_PREFIX, *(*pvti).name, (*pvti).name);
                     system(buf);
                 }
 #endif
                 new_mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Player file %s empty, testing backup", filename);
                 snprintf(filename, sizeof(filename), "%s/%c/%s",
-                         PLR_PREFIX, *player_table[id].name, player_table[id].name);
+                         PLR_PREFIX, *(*pvti).name, (*pvti).name);
                 if (!(fl = fopen(filename, "r"))) {
                     new_mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Backup failed");
                     return -1;
@@ -4591,7 +4593,7 @@ int store_to_char(const char *name, Character *ch) {
             else if (!strcmp(tag, "Clan"))
                 GET_CLAN(ch) = num;
             else if (!strcmp(tag, "ClRk")) {
-                GET_CLAN_RANK(ch) =  player_table[id].rank < 0 ? player_table[id].rank : num;
+                GET_CLAN_RANK(ch) = (*pvti).rank < 0 ? (*pvti).rank : num;
             } else if (!strcmp(tag, "Clns")) {
                 if (num > 100)
                     num = 0;
@@ -4919,14 +4921,16 @@ int store_to_char(const char *name, Character *ch) {
                 if (num2 >= 100)
                     GET_MAX_STAMINA(ch) = num2;
             } else if (!strcmp(tag, "Skil")) {
+            GET_SKILLS(ch).clear();
                 do {
                     get_line(fl, line);
                     sscanf(line, "%d %d %d 0", &num, &num2, &num3);
                     if (num != 0) {
-                        set_skill(ch, num, num2);
+                        set_skill(ch, num, num2, FALSE);
                         set_skill_wait(ch, num, num3);
                     }
                 } while (num != 0);
+                sort(GET_SKILLS(ch).begin(), GET_SKILLS(ch).end());
             } else if (!strcmp(tag, "Subs")) {
                 struct sub_list s;
                 do {
@@ -5056,7 +5060,7 @@ int save_killlist(int id, struct kill_data *kills) {
     char filename[MAX_INPUT_LENGTH];
     FILE *fl;
     struct kill_data *temp = NULL;
-    if (!kills || id < 0 || id > top_of_p_table)
+    if (!kills || id < 0 || id >= player_table.size())
         return 0;
     snprintf(filename, sizeof(filename), "%s/%c/%s%s",
              PLR_PREFIX, *player_table[id].name, player_table[id].name, ".kills");
@@ -5405,7 +5409,8 @@ void char_to_store(Character *ch) {
        If it errors, bail - mord
     */
     if (i == -1) {
-        if (remove(tempname) == -1) {
+        if (remove
+                (tempname) == -1) {
             new_mudlog(NRM, LVL_GOD, TRUE, "unable to remove temp file: %s", tempname);
             log("unable to remove temp file: %s", tempname);
         }
@@ -5461,6 +5466,14 @@ void char_to_store(Character *ch) {
         save_index = TRUE;
         player_table[id].id = GET_IDNUM(ch);
         player_table[id].account = GET_IDNUM(ch);
+    }
+    if (player_table[id].gc_amount != GET_GOLD(ch) + GET_BANK_GOLD(ch)) {
+        save_index = TRUE;
+        player_table[id].gc_amount = GET_GOLD(ch) + GET_BANK_GOLD(ch);
+    }
+    if (player_table[id].gt_amount != GET_GOLD_TOKEN_COUNT(ch)) {
+        save_index = TRUE;
+        player_table[id].gt_amount = GET_GOLD_TOKEN_COUNT(ch);
     }
 
     i = player_table[id].flags;
@@ -5521,32 +5534,34 @@ void save_etext(Character *ch) {
  * we re-use the old position.
  */
 int create_entry(const char *name) {
-    int i, pos;
+    int pos;
+    bool new_entry = FALSE;
+    player_index_element pie = player_index_element();
 
     if (top_of_p_table == -1) {  /* no table */
-        CREATE(player_table, struct player_index_element, 1);
-        pos = top_of_p_table = 0;
+        new_entry = TRUE;
     } else if ((pos = get_ptable_by_name(name)) == -1) {  /* new name */
-        i = ++top_of_p_table + 1;
-
-        RECREATE(player_table, struct player_index_element, i);
         pos = top_of_p_table;
+        new_entry = TRUE;
     }
 
-    CREATE(player_table[pos].name, char, strlen(name) + 1);
+    pie.name = new char[strlen(name) + 1];
 
-    player_table[pos].id = 0;
-    player_table[pos].flags = 0;
-    player_table[pos].level = 0;
-    player_table[pos].last = 0;
-    player_table[pos].account = 0;
-    player_table[pos].clan = 0;
-    player_table[pos].rank = 0;
+    if (!new_entry) {
+        if (player_table[pos].name)
+            delete[] player_table[pos].name;
+        player_table[pos] = pie;
+    } else {
+        pos = player_table.size();
+        top_of_p_table++;
+        player_table.push_back(pie);
+    }
 
     /* copy lowercase equivalent of name to table field */
-    for (i = 0; (player_table[pos].name[i] = LOWER(name[i])); i++)
+    for (int i = 0; (player_table[pos].name[i] = LOWER(name[i])); i++)
         /* Nothing */
         ;
+
 
     return (pos);
 }
@@ -6186,7 +6201,7 @@ int read_xap_objects(FILE * fl, Character *ch) {
             get_line(fl, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {   /* then this is a Xap Obj, requires
-                                                                                                                                                                                                                                                                                                                                                                                                   special care */
+                                                                                                                                                                                                                                                                                                                                                                                                                                       special care */
                 if ((temp->name = fread_string(fl, buf2)) == NULL) {
                     temp->name = "undefined";
                 }
@@ -7354,24 +7369,24 @@ zone_rnum real_zone(zone_vnum vnum) {
             return t;
     return NOWHERE;
 #endif
+
 }
 
-int valid_id_num(long id) {
+bool valid_id_num(long id) {
     Character *tch;
     Descriptor *d;
     for (d = descriptor_list; d; d = d->next)
         if (d->character && GET_ID(d->character) == id)
-            return 0;
+            return FALSE;
 
     for (tch = character_list; tch; tch = tch->next)
         if (GET_ID(tch) == id)
-            return 0;
+            return FALSE;
 
-    return 1;
+    return TRUE;
 }
-int valid_to_save(char *name) {
-    int tp;
-    for (tp = 0; tp <= top_of_p_table; tp++) {
+int valid_to_save(const char *name) {
+    for (int tp = 0; tp < player_table.size(); tp++) {
         if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
                 !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
                 (!player_table[tp].name || !*player_table[tp].name))
