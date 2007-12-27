@@ -10,6 +10,9 @@
 ************************************************************************ */
 /*
  * $Log: act.wizard.c,v $
+ * Revision 1.64  2006/08/26 09:01:37  w4dimenscor
+ * Added a command to list logons in the last x days
+ *
  * Revision 1.63  2006/08/26 08:28:47  w4dimenscor
  * Fixed the saving of skills and subskills finally
  *
@@ -2545,7 +2548,7 @@ ACMD(do_purge) {
     one_argument(argument, buf);
 
     if (*buf) {            /* argument supplied. destroy single object
-                                                                                         * or char */
+                                                                                                         * or char */
         if ((vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
             if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict))) {
                 ch->Send("Fuuuuuuuuu!\r\n");
@@ -3869,6 +3872,22 @@ size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall)
 
 }
 
+void show_last_logons(Character *ch, int days) {
+    time_t tm = time(0) - (days * SECS_PER_REAL_DAY);
+    for (int tp = 0; tp < player_table.size(); tp++) {
+        if (!IS_SET(player_table[tp].flags, PINDEX_DELETED) &&
+                !IS_SET(player_table[tp].flags, PINDEX_SELFDELETE) &&
+                (!player_table[tp].name || !*player_table[tp].name))
+            continue;
+        if (player_table[tp].last > tm) {
+        *ch << player_table[tp].name;
+        if (IS_SET(player_table[tp].flags, PINDEX_FIXSKILLS))
+          *ch << "- Skills Flagged to be fixed";
+
+          *ch << "\r\n";
+            }
+    }
+}
 
 
 ACMD(do_show) {
@@ -3930,6 +3949,7 @@ ACMD(do_show) {
                    {"corpses",    LVL_GOD},
                    {"errors",       LVL_GOD},
                    {"assemblies",   LVL_BLD},
+                   {"logons", 	 LVL_BLD},
                    {"\n", 0}
                };
 
@@ -4236,6 +4256,12 @@ ACMD(do_show) {
     case 18:
         assemblyListToChar(ch);
         break;
+    case 19:
+    i = atoi(value);
+    if (i == 0)
+    i = 2;
+    show_last_logons(ch, i);
+    break;
         /* show what? */
     default:
         ch->Send("Sorry, I don't understand that.\r\n");
@@ -6528,6 +6554,9 @@ ACMD(do_addtp) {
 
 }
 
+
+
+
 ACMD(do_wizsplit) {
     if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (GET_LEVEL(ch)>LVL_HERO+1 && (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP))))
         do_wiznet(ch, argument, cmd, subcmd);
@@ -6539,17 +6568,17 @@ ACMD(do_wizsplit) {
 void fixskills(Character *ch, int lrn) {
     int learned = lrn;
     if (lrn <= 0)
-    learned = IRANGE(30, (20*(TIERNUM)), 80);
-    
+        learned = IRANGE(30, (20*(TIERNUM)), 80);
+
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
         if (knows_spell(ch, i))
             SAVED(ch).SetSkillLearn(i, learned);
-            /* twice over to get the pre-req's */
+    /* twice over to get the pre-req's */
     for (int i = 0;i < TOP_SPELL_DEFINE;i++)
         if (knows_spell(ch, i))
             SAVED(ch).SetSkillLearn(i, learned);
-            
-  SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+
+    SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
 }
 void fixskills(Character *ch) {
@@ -6557,8 +6586,7 @@ void fixskills(Character *ch) {
     fixskills(ch, learned);
 }
 
-void offline_fixskills(Character *ch, char *arg)
-{
+void offline_fixskills(Character *ch, char *arg) {
     string str = string(arg);
     str = tolower(str);
     int idx = 0;
@@ -6589,7 +6617,7 @@ ACMD(do_fixskills) {
         return;
     }
     if (*arg2)
-    lrn = atoi(arg2);
+        lrn = atoi(arg2);
 
     fixskills(vict, lrn);
 
