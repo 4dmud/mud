@@ -247,8 +247,10 @@ void cleanup_olc(Descriptor *d, byte cleanup_type)
    * Check for a mob.  free_mobile() makes sure strings are not in
    * the prototype.
    */
-  if (OLC_MOB(d))
+  if (OLC_MOB(d)) {
     free_mobile(OLC_MOB(d));
+    log("Freed OLC mobile");
+    }
 
   /*
    * Check for a zone.  cleanup_type is irrelevant here, free() everything.

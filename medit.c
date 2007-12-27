@@ -47,7 +47,7 @@ void smash_tilde(char *str);
 const char * race_name(Character *ch);
 const char *simple_class_name(Character *ch);
 
-struct combine_data *add_base_link_mob(Character *mob, int vnum);
+struct combine_data *add_base_link_mob(Character *mob, mob_vnum vnum);
 void free_join_list(struct combine_data *list);
 int join_count(Character *mob);
 struct combine_data *copy_proto_link(struct combine_data *proto);
@@ -790,7 +790,7 @@ void medit_parse(Descriptor *d, char *arg) {
              */
             medit_save_internally(d);
             new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE,
-                       "OLC: %s edits mob %d", GET_NAME(d->character), OLC_NUM(d));
+                       "OLC: %s finishes editing mob %d", GET_NAME(d->character), OLC_NUM(d));
             if (CONFIG_OLC_SAVE) {
                 medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);
                 d->Output( "Mobile saved to disk.\r\n");

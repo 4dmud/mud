@@ -2359,7 +2359,7 @@ struct combine_data *add_base_link(Character *mob, int vnum) {
     return blink;
 
 }
-struct combine_data *add_base_link_mob(Character *mob, int vnum) {
+struct combine_data *add_base_link_mob(Character *mob, mob_vnum vnum) {
     struct combine_data *blink = NULL;
     CREATE(blink, struct combine_data, 1);
     blink->vnum = vnum;

@@ -183,7 +183,6 @@ void extract_mobile_all(mob_vnum vnum) {
 }
 
 int delete_mobile(mob_vnum refpt) {
-    mp_iter it ;
 
 if (!MobProtoExists(refpt)) {
         log("SYSERR: GenOLC: delete_mobile: Invalid vnum %d.", refpt);
@@ -231,6 +230,7 @@ if (!MobProtoExists(refpt)) {
 }
 
 int copy_mobile_strings(Character *t, Character *f) {
+	t->free_non_proto_strings();
     if (f->player.name)
         t->player.name = strdup(f->player.name);
     if (f->player.title)
