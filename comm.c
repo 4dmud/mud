@@ -277,6 +277,20 @@ int enter_player_game(struct descriptor_data *d);
 static void get_lookup_reply(void);
 #endif
 
+
+#ifdef HAVE_ZLIB_H
+/* zlib helper functions */
+void *z_alloc(void *opaque, uInt items, uInt size)
+{
+  return calloc(items, size);
+}
+
+void z_free(void *opaque, void *address)
+{
+  return free(address);
+}
+#endif /* HAVE_ZLIB_H */
+
 #ifdef __CXREF__
 #undef FD_ZERO
 #undef FD_SET

@@ -2668,7 +2668,7 @@ void nanny(struct descriptor_data *d, char *arg)
     break;
   case CON_RMOTD:		/* read CR after printing motd   */
 #ifdef HAVE_ZLIB_H
-    if (CONFIG_ENABLE_COMPRESSION && !PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
+    if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS))
     {
       d->comp->state = 1;	/* waiting for response to offer */
       write_to_output(d, "%s", compress_offer);

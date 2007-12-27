@@ -10,7 +10,7 @@
 /* Define if your system has compression support in zlib. */
 #define HAVE_ZLIB 1
 
-
+#define HAVE_ZLIB_H 1
 /* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
 #define HAVE_SYS_WAIT_H 1
 
