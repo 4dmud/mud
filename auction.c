@@ -281,6 +281,10 @@ ACMD(do_auction)
   int i = 0;
 
   two_arguments(argument, buf1, buf2);
+  if(GET_RACE(ch) == RACE_GLADIATOR) {
+	  ch->Send( "You have no time to auction, you must fight!\r\n" );
+	  return;
+  }
 
   if (!*buf1) {
     ch->Send( "Format: auction item [min]\r\n"
