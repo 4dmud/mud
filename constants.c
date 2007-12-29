@@ -1067,6 +1067,9 @@ const char *disp_where(int pos, Character *ch)
     return (where[pos]);
 
   race = GET_RACE(ch);
+  if (race = RACE_GLADIATOR) {
+	  race = RACE_GRINGO;
+  }
 
   switch (pos)
   {
