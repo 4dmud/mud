@@ -107,9 +107,9 @@
 //#define IDEA_FILE     LIB_MISC"ideas"
 //#define TYPO_FILE       LIB_MISC"typos"
 //#define BUG_FILE        LIB_MISC"bugs"
-#define IDEA_FILE	"/home/game/mud/6000/site/ideas.html"
-#define TYPO_FILE	"/home/game/mud/6000/site/typos.html"
-#define BUG_FILE	"/home/game/mud/6000/site/bugs.html"
+#define IDEA_FILE	"/home/game/site/admin/ideas.html"
+#define TYPO_FILE	"/home/game/site/admin/typos.html"
+#define BUG_FILE	"/home/game/site/admin/bugs.html"
 #define TIME_FILE       LIB_MISC"time"	/* time file for saving time */
 #define HOST_LIST_FILE       LIB_MISC"host_list"	/* host lists file for meta server */
 #define MESS_FILE	LIB_MISC"messages"	/* damage messages               */
