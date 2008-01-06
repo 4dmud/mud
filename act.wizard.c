@@ -3441,7 +3441,8 @@ ACMD(do_wiznet) {
     skip_spaces(&argument);
     delete_doubledollar(argument);
 
-    if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (GET_LEVEL(ch)>LVL_HERO+1 && (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP)))) {
+// Removed the hero ability of hearing wiznet - Prometheus
+    if(PLR_FLAGGED(ch,PLR_IMM_MORT) || (CMD_FLAGGED(ch, WIZ_IMM1_GRP) || CMD_FLAGGED2(ch, WIZ_IMM1_GRP))) {
         if (!*argument) {
             ch->Send( "       Usage: wiznet <text> | #<level> <text> | *<emotetext> |\r\n"
                       "       wiznet @<level> *<emotetext> | wiz @  (for wiz who list) | wiz %% (for arena info)\r\n"
