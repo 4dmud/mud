@@ -2185,9 +2185,9 @@ int movement_loss[] = {
                         5,                   /*tundra*/
                         8,                   /*snow*/
                         4,                   /*ice*/
-                        5,                   /*praierie*/
-                        25,                  /*badlands*/
-                        70,                  /*rail*/
+                        2,                   /*praierie*/
+                        7,                  /*badlands*/
+                        6,                  /*rail*/
                         0
 
                       };
