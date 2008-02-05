@@ -1559,12 +1559,6 @@ ACMD(do_drop) {
         mode = SCMD_JUNK;
         break;
     case SCMD_DONATE:
-
-        if (GET_RACE(ch) == RACE_GLADIATOR) {
-          ch->Send( "You're far too busy to do that, get back to fighting.\r\n");
-          return;
-        }
-
         sname = "donate";
         mode = SCMD_DONATE;
 //        /* fail + double chance for room 1   */
