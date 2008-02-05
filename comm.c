@@ -3198,7 +3198,11 @@ void signal_setup(void) {
     struct itimerval itime;
     struct timeval interval;
 
-    my_signal(SIGSEGV, (sigfunc *)core_dump_on_crash);
+    //I disabled the SIGSEGV signal catching. It actually prevented 
+    //core-dumps from happening. The telling which command was typed 
+    //last can also be done in the script, if there is a core available.
+
+//  my_signal(SIGSEGV, (sigfunc *)core_dump_on_crash);
     /* user signal 1: reread wizlists.  Used by autowiz system. */
     my_signal(SIGUSR1, (sigfunc *)reread_wizlists);
 
