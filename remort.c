@@ -89,7 +89,7 @@ ACMD(do_remort)
   remort = GET_REMORT(ch);
   rtwo = GET_REMORT_TWO(ch);
 
-  if (IS_NPC(ch) || GET_LEVEL(ch) != 50)
+  if (IS_NPC(ch) || GET_LEVEL(ch) != 50 || GET_RACE(ch) == RACE_GLADIATOR);
   {
     ch->Send("That is not a very good idea.\r\n");
     return;
