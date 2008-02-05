@@ -95,6 +95,11 @@ ACMD(do_remort)
     return;
   }
 
+  if (GET_RACE(ch) == RACE_GLADIATOR) {
+    ch->Send("As a gladiator you're far too busy fighting to remort.\r\n");
+    return;
+  }
+
   skip_spaces(&argument);
 
   if (!argument)
