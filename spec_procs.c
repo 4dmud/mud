@@ -643,7 +643,9 @@ SPECIAL(guild) {
         return (1);
     }
 
-    pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
+    //pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
+    pp = MAX(2,((GET_INT(ch) + GET_WIS(ch) - 20)*40+5)/240 + 2);
+
     percent = GET_SKILL(ch, skill_num);
     /* Cost In Gold */
     cig = ((percent*4000) + (REMORTS(ch) * 1000) + (GET_LEVEL(ch) * 1000 * current_class_is_tier_num(ch)) + (spell_info[skill_num].min_level * 1000)) * pp;
