@@ -40,7 +40,7 @@ OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	assedit.o auction.o bsd-snprintf.o ban.o boards.o calender.c cali.o cedit.o clan.o \
 	class.o color.o comm.o config.o constants.o context_help.o corpse.o character.o \
 	col_string.o chcreate.o compressor.o \
-	descriptor.o \
+	debug.o descriptor.o \
 	damage.o db.o dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o \
 	dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o dg_variables.o dg_wldcmd.o \
 	dg_olc.o event.o familiar.o fight.o \
