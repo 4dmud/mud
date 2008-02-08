@@ -568,6 +568,8 @@ ACMD(do_title)
     *ch << "Your title is fine... go away.\r\n";
   else if (PLR_FLAGGED(ch, PLR_NOTITLE))
     *ch << "You can't title yourself -- you shouldn't have abused it!\r\n";
+  else if (GET_RACE(ch) == RACE_GLADIATOR)
+    *ch << "You're current title is just fine.\r\n"; 
   else if (strstr(argument, "(") || strstr(argument, ")"))
     *ch << "Titles can't contain the ( or ) characters.\r\n";
   else if (strlen(argument) > MAX_TITLE_LENGTH)
