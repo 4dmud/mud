@@ -254,7 +254,7 @@ void con_display_race(Descriptor *d) {
 void explain_stats(Descriptor *d) {
     line_sep(d);
     d->Output(
-        "{cyThe stats are as follows:{c0\r\n\r\n"
+        "{cyThe stats are as followed:{c0\r\n\r\n"
         "{cgWisdom (WIS){cw\r\n"
         "Gets you more practice sessions and mana when you level, and adds to magic damage.\r\n"
         "Increases the chance of becoming better at a skill/spell through practice.\r\n\r\n{c0"
@@ -281,7 +281,7 @@ void con_display_stats(Descriptor *d) {
 #if 1
     line_sep(d);
     d->Output(
-        "{ccHere you can add extra points your stats.\r\n\r\n"
+        "{ccHere you can add extra points to your stats.\r\n\r\n"
 
         "Within the game equipment is also used to increase these stats further.\r\n\r\n"
 
