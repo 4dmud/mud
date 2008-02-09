@@ -363,6 +363,7 @@ void assign_objects(void)
     ASSIGNOBJ(28705, gen_board);	/* board for vampire clan */
     ASSIGNOBJ(10031, gen_board);
     ASSIGNOBJ(10233, gen_board);
+    ASSIGNOBJ(26708, gen_board);	/* board for the gladiator school */
     
 #endif
 

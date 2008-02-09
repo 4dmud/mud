@@ -100,7 +100,8 @@ struct board_info_type board_info[NUM_OF_BOARDS] =
     {17101, 0, 0, LVL_GOD, LIB_ETC "board.house", 0},
     {17807, 0, 0, LVL_GOD, LIB_ETC "board.hero", 0},
     {28705, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0},
-    {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0}
+    {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0},
+    {26708, 0, 0, LVL_GOD, LIB_ETC "board.gladiators", 0}
 
 
   };
