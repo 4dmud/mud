@@ -542,7 +542,7 @@ bool perform_put(Character *ch, struct obj_data *obj, struct obj_data *cont) {
         ch->Send( "No matter how you try you cant fit anything else in.[%d]\r\n", value);
         return FALSE;
     }
-    if (Crash_is_unrentable(obj) && IS_NPC(ch)) {
+    if (Crash_is_unrentable(obj) && !IS_NPC(ch)) {
         ch->Send("You can't leave that here, it is too precious!\r\n");
         return FALSE;
     }
@@ -867,7 +867,7 @@ ACMD(do_meld) {
     if (!IS_OBJ_STAT(corpse, ITEM_PC_CORPSE)) {
         ch->Send( "You can't meld with that, it's not a player corpse!\r\n");
         return ;
-    }
+    } 
 
     if (!isname(GET_NAME(ch), corpse->short_description)) {
         ch->Send( "That isn't your corpse! Hands off!\r\n");
@@ -970,15 +970,6 @@ int automeld(struct obj_data *obj) {
 
 bool perform_get_from_container(Character *ch, struct obj_data *obj,
                                 struct obj_data *cont, int mode) {
-
-    if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE)) {
-
-        if (IS_NPC(ch) || GET_OBJ_VAL(cont, 6) == 0 || !IS_PK(ch)) {
-            ch->Send( "You can't take things from that players corpse.\r\n");
-            return FALSE;
-        }
-    }
-
 
     if (mode != FIND_OBJ_INV && !can_take_obj(ch, obj)) {
         return FALSE;
@@ -1127,11 +1118,18 @@ void perform_get(Character *ch, char *num, char *arg2, char *arg3) {
             act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
             return;
         }
-        if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE)) {
-            ch->Send( "You can't take things from a player corpse.\r\n"
+        if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE) && GET_OBJ_VAL(cont, 0) == GET_IDNUM(ch)) {
+            ch->Send( "You can't take things from your corpse.\r\n"
                       "Use: meld corpse\r\n");
             return;
+        } 
+    if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE)) {
+
+        if (IS_NPC(ch) || GET_OBJ_VAL(cont, 6) == 0 || !IS_PK(ch) || !IS_OBJ_STAT(cont, ITEM_PK_CORPSE)) {
+            ch->Send( "You can't take things from that player's corpse.\r\n");
+            return;
         }
+   }
     } else if (cont_dotmode == FIND_ALLDOT && !*cont_desc) {
         ch->Send("Get from all of what?\r\n");
         return;
