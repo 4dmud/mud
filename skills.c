@@ -1852,6 +1852,13 @@ ASKILL(skill_scalp)
       ch->Send( "You rip off the scalp of... nothing really! Fear your stupidity!\r\n");
       return 0;
     }
+    /* Corpses can't close anyway I can set the corpse to 'locked' after it's been scalped to prevent further scalpings. */
+    if ((GET_OBJ_VAL(obj, 2) == -1)) 
+  {
+       GET_OBJ_VAL(obj, 2) = 1;
+    } else {
+      return 0;
+ }
     if (use_stamina( ch, 80) < 0)
     {
       *ch << "You are far too exausted!";
