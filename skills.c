@@ -1840,7 +1840,7 @@ ASKILL(skill_scalp)
   
   OBJ_DATA *scalp = NULL;
   struct extra_descr_data *new_descr = NULL;
-  char /*buf1[MAX_STRING_LENGTH],*/ buf2[MAX_STRING_LENGTH];
+  char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char scalpb[MAX_STRING_LENGTH];
   char *scalpa = scalpb;
   int pc = 0;
@@ -1851,12 +1851,19 @@ ASKILL(skill_scalp)
     {
       ch->Send( "You rip off the scalp of... nothing really! Fear your stupidity!\r\n");
       return 0;
+    } 
+    if (IS_OBJ_STAT(obj, ITEM_BEHEADED_CORPSE))
+    {
+      ch->Send( "That corpse doesn't have a head to scalp...\r\n");
+      return 0;
     }
     /* Corpses can't close anyway I can set the corpse to 'locked' after it's been scalped to prevent further scalpings. */
-    if ((GET_OBJ_VAL(obj, 2) == -1)) 
+    if ((GET_OBJ_VAL(obj, 2) == 0)) 
   {
        GET_OBJ_VAL(obj, 2) = 1;
     } else {
+    act("$p has already been scalped.", FALSE, ch, obj, NULL, TO_CHAR);
+
       return 0;
  }
     if (use_stamina( ch, 80) < 0)
@@ -1877,13 +1884,16 @@ ASKILL(skill_scalp)
     scalp->in_room = NULL;
     snprintf(buf2, sizeof(buf2), "scalp %s", scalpa);
     scalp->name = str_dup(buf2);
-
+    snprintf(buf1, sizeof(buf1), "The scalpless corpse of %s is lying here.", scalpa);
     if (pc)
       snprintf(buf2, sizeof(buf2), "The scalp of %s lies here.", scalpa);
     else
       snprintf(buf2, sizeof(buf2), "The tattered scalp of %s lies here.", scalpa);
 
     scalp->description = str_dup(buf2);
+    obj->description = str_dup(buf1);
+    snprintf(buf1, sizeof(buf1), "the scalped corpse of %s", scalpa);
+    obj->short_description = str_dup(buf1);
 
     if (pc)
       sprintf(buf2, "the scalp of %s", scalpa);

@@ -4529,11 +4529,19 @@ void make_corpse(Character *ch, Character *killer) {
             GET_OBJ_TIMER(corpse) = CONFIG_MAX_NPC_CORPSE_TIME;
             SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_NPC_CORPSE);
             SET_BIT_AR(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
+            if (corpse_mod == 1)
+          {
+                SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_BEHEADED_CORPSE);
+          }
         } else {
 
             SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_PC_CORPSE);
-            if (IS_PK(ch)) {
+          if (IS_PK(ch)) {
             SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_PK_CORPSE);
+          }
+          if (corpse_mod == 1)
+          {
+            SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_BEHEADED_CORPSE);
           }
             GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(IN_ROOM(ch));
             GET_OBJ_VAL(corpse, 0) = MAX(1, get_pidx_from_name(ch));

@@ -1109,6 +1109,7 @@ class Room;
 #define ITEM_SHIFTABLE          63
 #define ITEM_KEYSTAY          64
 #define ITEM_PK_CORPSE          65
+#define ITEM_BEHEADED_CORPSE    66
 
 
 /* Modifier constants used with obj affects ('A' fields) */
