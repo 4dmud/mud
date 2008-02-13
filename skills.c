@@ -1852,11 +1852,6 @@ ASKILL(skill_scalp)
       ch->Send( "You rip off the scalp of... nothing really! Fear your stupidity!\r\n");
       return 0;
     }
-    else if (IS_OBJ_STAT(obj, ITEM_PC_CORPSE) && GET_OBJ_VAL(obj, 6) == 0)
-    {
-      ch->Send( "They aren't a PK'er!\r\n");
-      return 0;
-    }
     if (use_stamina( ch, 80) < 0)
     {
       *ch << "You are far too exausted!";
@@ -1868,7 +1863,6 @@ ASKILL(skill_scalp)
     act("$n slices the scalp from $p.", FALSE, ch, obj, NULL, TO_ROOM);
 
     strcpy(scalpa, obj->short_description);
-    crumble_obj(ch, obj);
     scalpa = scalpa+14;
     scalp = create_obj();
 
