@@ -3965,7 +3965,7 @@ void make_wholist(void) {
 
     if (port != 6000)
         return;
-    if ((fl = fopen("/home/httpd/vhosts/4dimensions.org/httpdocs/wholist.xml", "w")) == 0) {
+    if ((fl = fopen("/home/game/site/wholist.xml", "w")) == 0) {
         if (++xml_log_trys < 4)
             log("XML Who List unable to be opened (Try %d) (Ignore if this isn't on mu-host)", xml_log_trys);
         else if (xml_log_trys == 4)
