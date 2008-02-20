@@ -3975,7 +3975,6 @@ void make_wholist(void) {
     }
 
     fprintf(fl, "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n" );
-    //fprintf(fl, "<?xml-stylesheet type=\"text/xsl\" href=\"http://4dimensions.mu-host.com/who.xsl\"?>\n");
     fprintf(fl, "<wholist>\n" );
 
     fprintf(fl, "<info>\n"
@@ -3985,6 +3984,7 @@ void make_wholist(void) {
             the_uptime(buf, sizeof(buf)),
             the_date_now(buf, sizeof(buf)));
     fprintf(fl, "<players>");
+
     for (d = descriptor_list; d; d = d->next) {
         if (!IS_PLAYING(d))
             continue;
@@ -3993,8 +3993,35 @@ void make_wholist(void) {
             ch = d->original;
         else if (!(ch = d->character))
             continue;
-        if (GET_LEVEL(ch) < LVL_IMMORT
-                || (GET_LEVEL(ch) >= LVL_IMMORT && !GET_INVIS_LEV(ch))) {
+        if ((GET_LEVEL(ch) >= LVL_IMMORT && !GET_INVIS_LEV(ch))) {
+            fprintf(fl,
+                    "<player>\n"
+                    "<name>%s</name>\n"
+                    "<lev>%d</lev>\n"
+                    "<tier>%s</tier>\n"
+                    "<race>%s</race>\n"
+                    "<clan>%s</clan>\n"
+                    "<idle>%d</idle>\n"
+                    "</player>\n",
+
+                    GET_NAME(ch),
+                    GET_LEVEL(ch),
+                    class_name[(int)GET_CLASS(ch)].name[current_class_is_tier_num(ch)],
+                    RACE_ABBR(ch),
+                    clan_name(find_clan_by_id(GET_CLAN(ch)))  ,
+                    ch->char_specials.timer * SECS_PER_MUD_HOUR /
+                    SECS_PER_REAL_MIN);
+        }
+    } 
+for (d = descriptor_list; d; d = d->next) {
+        if (!IS_PLAYING(d))
+            continue;
+
+        if (d->original)
+            ch = d->original;
+        else if (!(ch = d->character))
+            continue;
+        if (GET_LEVEL(ch) < LVL_IMMORT) {
             fprintf(fl,
                     "<player>\n"
                     "<name>%s</name>\n"
