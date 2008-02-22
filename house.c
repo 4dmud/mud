@@ -1202,6 +1202,10 @@ return;
 
   }
   pet = read_mobile(mount);
+  if (pet == NULL) {
+ch->Send("Your pet has been assigned to your house incorrectly.\r\n");
+return;
+  }
   GET_EXP(pet) = 0;
   SET_BIT_AR(AFF_FLAGS(pet), AFF_CHARM);
   char_to_room(pet, IN_ROOM(ch));
