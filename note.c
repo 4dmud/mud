@@ -408,6 +408,30 @@ void append_note(NOTE_DATA *pnote)
   //fpReserve = fopen( NULL_FILE, "r" );
 }
 
+
+string list_account_names(Character *ch) {
+    int acc, pos;
+    string nlist("");
+    
+
+        try {            
+            pos = pi.TableIndexById(GET_ID(ch));            
+        } catch (MudException &e) {
+            return string(GET_NAME(ch));
+        }
+
+    acc = pi.AccByIndex(pos);
+
+    for (pos = 0; pos <= pi.TopOfTable(); pos++) {
+        if (!pi.DeletedByIndex(pos) && pi.AccByIndex(pos) == acc) {
+            nlist += pi.NameByIndex(pos);
+            nlist += " ";
+        }
+    }
+return nlist;
+
+}
+
 bool is_note_to( Character *ch, NOTE_DATA *pnote )
 {
   if ( !str_cmp( GET_NAME(ch), pnote->sender ) )
@@ -420,7 +444,7 @@ bool is_note_to( Character *ch, NOTE_DATA *pnote )
        (is_name( "immortal", pnote->to_list ) || (isname( "imm", pnote->to_list) ) ) )
     return TRUE;
 
-  if ( (IS_ADMIN(ch) || !strcasecmp(GET_NAME(ch), "Belgarion")) && isname( "admin", pnote->to_list ) )
+  if ( IS_ADMIN(ch)  && isname( "admin", pnote->to_list ) )
     return TRUE;
 
   if (GET_CLAN(ch) && isname(clan_name(find_clan_by_id(GET_CLAN(ch))),pnote->to_list))
@@ -437,8 +461,9 @@ bool is_note_to( Character *ch, NOTE_DATA *pnote )
     return TRUE;
   if (PLR_FLAGGED(ch, PLR_NEWBIE_HLPR) && isname("helper", pnote->to_list))
     return TRUE;
-
-  if ( isname( GET_NAME(ch), pnote->to_list ) )
+  if (isname(GET_NAME(ch), pnote->to_list))
+    return TRUE;
+  if ( isname(list_account_names(ch).c_str(), pnote->to_list ) )
     return TRUE;
 
   return FALSE;
