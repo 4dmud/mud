@@ -1325,8 +1325,8 @@ ASPELL(spell_knock) {
             /** lets make it so they can only open doors that are on the inside **/
 
             cnt++;
-            send_to_room(IN_ROOM(ch), "The exit %s bursts open under the force of some ethereal hand.", dirs[i]);
-            send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some ethereal hand.", dirs[rev_dir[i]]);
+            send_to_room(IN_ROOM(ch), "The exit %s bursts open under the force of some ethereal hand.\n", dirs[i]);
+            send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some ethereal hand.\n", dirs[rev_dir[i]]);
             if (ret_door && IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
                 TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED);
             if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
