@@ -1172,7 +1172,7 @@ ACTION(thing_throttle)
       GET_POS(vict) < POS_STANDING ||
       GET_POS(ch) < POS_STANDING ||
       has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD)  ||
-      ((number(0, 110) - GET_DEX(ch)) > total_chance(ch, SKILL_STRANGLE)))
+      ((number(0, 101) - (2* GET_DEX(ch))) > total_chance(ch, SKILL_STRANGLE)))
   {
     ch->Send( "You loose focus and stop strangling.\r\n");
     act("$n relaxes his grip.\r\n", FALSE, ch, 0, 0, TO_ROOM);
@@ -1250,7 +1250,7 @@ int strangle_affect(Character *ch, Character *vict, int num)
   }
 
 
-  alter_hit(vict, (GET_MAX_HIT(vict)/(get_sub_status(ch, SUB_GAROTTE) == STATUS_ON ? num : (num/2) )));
+  alter_hit(vict, 10 + (GET_MAX_HIT(vict)/(get_sub_status(ch, SUB_GAROTTE) == STATUS_ON ? num : (num/2) )));
 
   update_pos(vict);
 
