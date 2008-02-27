@@ -344,6 +344,9 @@ int mag_damage(int level, Character *ch, Character *victim,
 
     if (AFF_FLAGGED(victim, AFF_SWEET_DREAMS))
         affect_from_char(victim, SPELL_SWEET_DREAMS);
+    
+    if (GET_POS(victim) > POS_STUNNED)
+        GET_POS(victim) = POS_STANDING;
 
     if (!victim->canHuntChar(ch) && GET_SPELL_DIR(ch) != NOWHERE)
         pass = FALSE;
