@@ -2792,7 +2792,7 @@ int shield_check(Character *ch, Character *vict, int type, int w_type) {
     int lev = GET_LEVEL(vict);
     int ded = (GET_POS(vict) <= POS_STUNNED);
     int sht = is_short_wep(GET_EQ(ch, WEAR_WIELD));
-    global_dam = (ded? global_dam : global_dam/5);
+    global_dam = (global_dam/5);
     if (!HERE(ch,vict))
         return 0;
 
