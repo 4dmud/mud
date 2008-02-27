@@ -1522,7 +1522,7 @@ void mag_areas(int level, Character *ch, int spellnum, int savetype) {
     Character *tch, *next_tch;
     const char *to_char = NULL, *to_room = NULL;
     int count = 0, rounds;
-
+    bool ground_type = false;
 
     if (ch == NULL)
         return;
@@ -1534,6 +1534,7 @@ void mag_areas(int level, Character *ch, int spellnum, int savetype) {
      */
     switch (spellnum) {
     case SPELL_EARTHQUAKE:
+        ground_type = true;
         to_char =
             "You gesture and the earth begins to shake all around you!";
         to_room =
@@ -1618,6 +1619,8 @@ void mag_areas(int level, Character *ch, int spellnum, int savetype) {
             continue;
         if (!IS_NPC(ch) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
             continue;
+	if (ground_type && tch->Flying())
+	    continue;
 
         /* Doesn't matter if they die here so we don't check. -gg 6/24/98 */
         if (number(0,170) < (level + total_chance(ch, spellnum))) {
