@@ -1642,7 +1642,7 @@ void mag_assign_spells(void) {
            FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 28);
 
     spello(SPELL_MIDAS_TOUCH, "midas touch", 150 ,
-           100 , 10, POS_FIGHTING, TAR_CHAR_ROOM| TAR_FIGHT_VICT,
+           100 , 10, POS_FIGHTING, TAR_CHAR_ROOM| TAR_FIGHT_VICT| TAR_NOT_SELF,
            FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4);
 
 
@@ -1816,7 +1816,7 @@ void mag_assign_spells(void) {
 
     spello(SPELL_HOLD_PERSON, "hold person", 70 , 40 , 2,
            POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
-           300, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16);
+           120, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16);
 
     spello(SPELL_PARALYZE, "paralyze", 100 , 65 , 2,
            POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
