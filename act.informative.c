@@ -523,9 +523,9 @@ void look_at_char(Character *i, Character *ch) {
             } else if (ROMANCE(i) == 3) {
                 /* Char is married */
                 if (i == ch)
-                    ch->Send( "You have a wedding ring from %s.", pi.NameById(PARTNER(i)));
+                    ch->Send( "You have a wedding ring from %s.\r\n", pi.NameById(PARTNER(i)));
                 else
-                    ch->Send( "%s has a wedding ring from %s.",
+                    ch->Send( "%s has a wedding ring from %s.\r\n",
                               GET_NAME(i), ((PARTNER(i))==GET_IDNUM(ch)) ? "you" : pi.NameById(PARTNER(i)));
 
 
