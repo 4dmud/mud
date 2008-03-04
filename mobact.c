@@ -328,7 +328,7 @@ int hunt_location(void *thing, int type) {
 
 
     for (tlist = ttop; tlist; tlist = tlist->next) {
-        if (tlist->last_stop == TRUE) {
+        if (tlist && tlist->last_stop == TRUE) {
             dest = tlist->dest;
             break;
         }

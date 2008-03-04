@@ -11,7 +11,7 @@ CC = g++
 CXREF = cxref
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat
+MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -Wno-conversion 
 #-D NO_MAKEFILE
 # -Wnested-externs -Wshadow -m32 -Wstrict-prototypes 
 # -I/usr/src/lib/libcrypt/ 

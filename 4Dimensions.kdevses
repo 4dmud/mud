@@ -1,103 +1,25 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="32" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/room.cpp" >
-   <View0 line="195" Type="Source" />
+ <DocsAndViews NumberOfDocuments="6" >
+  <Doc0 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/4Dimensions.kdevelop" >
+   <View0 Encoding="ISO 8859-1" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/modify.c" >
-   <View0 Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/structs.h" >
+   <View0 Encoding="" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/improved-edit.c" >
-   <View0 line="0" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.comm.c" >
+   <View0 Encoding="" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/act.wizard.c" >
-   <View0 Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/mine.c" >
+   <View0 Encoding="" line="253" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/compressor.h" >
-   <View0 line="0" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/sysdep.h" >
+   <View0 Encoding="" line="271" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/compressor.cpp" >
-   <View0 line="330" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.informative.c" >
+   <View0 Encoding="" line="1866" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/redit.c" >
-   <View0 line="189" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >
-   <View0 line="42" Type="Source" />
-  </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/genolc.c" >
-   <View0 line="74" Type="Source" />
-  </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/structs.h" >
-   <View0 Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/oasis.c" >
-   <View0 Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/act.informative.c" >
-   <View0 line="1254" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/graph.c" >
-   <View0 Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/graph.h" >
-   <View0 Type="Source" />
-  </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/dg_scripts.c" >
-   <View0 line="3289" Type="Source" />
-  </Doc14>
-  <Doc15 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/mobact.c" >
-   <View0 line="0" Type="Source" />
-  </Doc15>
-  <Doc16 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/utils.h" >
-   <View0 line="228" Type="Source" />
-  </Doc16>
-  <Doc17 NumberOfViews="1" URL="file:///usr/include/c%2B%2B/4.1.2/bits/stl_map.h" >
-   <View0 line="533" Type="Source" />
-  </Doc17>
-  <Doc18 NumberOfViews="1" URL="file:///usr/include/c%2B%2B/4.1.2/bits/stl_tree.h" >
-   <View0 line="1316" Type="Source" />
-  </Doc18>
-  <Doc19 NumberOfViews="1" URL="file:///usr/include/c%2B%2B/4.1.2/bits/stl_function.h" >
-   <View0 line="226" Type="Source" />
-  </Doc19>
-  <Doc20 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/character.cpp" >
-   <View0 line="109" Type="Source" />
-  </Doc20>
-  <Doc21 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/descriptor.cpp" >
-   <View0 line="102" Type="Source" />
-  </Doc21>
-  <Doc22 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/act.item.c" >
-   <View0 line="1580" Type="Source" />
-  </Doc22>
-  <Doc23 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/comm.c" >
-   <View0 line="1954" Type="Source" />
-  </Doc23>
-  <Doc24 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/db.cpp" >
-   <View0 line="4307" Type="Source" />
-  </Doc24>
-  <Doc25 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/clan.c" >
-   <View0 line="1161" Type="Source" />
-  </Doc25>
-  <Doc26 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/playerindex.h" >
-   <View0 line="225" Type="Source" />
-  </Doc26>
-  <Doc27 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/act.other.c" >
-   <View0 line="11" Type="Source" />
-  </Doc27>
-  <Doc28 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/dg_objcmd.c" >
-   <View0 line="491" Type="Source" />
-  </Doc28>
-  <Doc29 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/interpreter.cpp" >
-   <View0 line="1905" Type="Source" />
-  </Doc29>
-  <Doc30 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/playerindex.cpp" >
-   <View0 line="240" Type="Source" />
-  </Doc30>
-  <Doc31 NumberOfViews="1" URL="file:///home/mordecai/Desktop/MudRelated/game-oasis/src/fight.c" >
-   <View0 line="765" Type="Source" />
-  </Doc31>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -112,7 +34,12 @@
      <tracedExpressions/>
     </breakpoint2>
    </breakpointList>
+   <showInternalCommands value="0" />
   </kdevdebugger>
+  <kdevastyle>
+   <Extensions ext="*.cpp *.h,*.c *.h,*.cxx *.hxx,*.c++ *.h++,*.cc *.hh,*.C *.H,*.diff,*.inl,*.java,*.moc,*.patch,*.tlh,*.xpm" />
+   <AStyle IndentPreprocessors="0" FillCount="4" PadParenthesesOut="1" IndentNamespaces="1" IndentLabels="1" Fill="Tabs" MaxStatement="40" Brackets="Break" MinConditional="-1" IndentBrackets="0" PadParenthesesUn="1" BlockBreak="0" KeepStatements="1" KeepBlocks="1" BlockIfElse="0" IndentSwitches="1" PadOperators="0" FStyle="UserDefined" IndentCases="0" FillEmptyLines="0" BracketsCloseHeaders="0" BlockBreakAll="0" PadParenthesesIn="1" IndentClasses="1" IndentBlocks="0" FillForce="0" />
+  </kdevastyle>
   <kdevbookmarks>
    <bookmarks>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >

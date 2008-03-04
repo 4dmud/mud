@@ -2029,9 +2029,13 @@ Character *get_player_room(room_rnum room, char *name, int *number,
         number = &num;
         num = get_number(&name);
     }
+	if (!name || !*name)
+	return NULL:
 
     for (i = descriptor_list; i; i = i->next) {
         ch = i->character;
+	if (!ch)
+	    continue;
         if (!IS_PLAYING(i))
             continue;
         if (inroom == FIND_CHAR_ROOM && IN_ROOM(ch) != room)

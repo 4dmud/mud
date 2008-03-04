@@ -1034,7 +1034,6 @@ void script_trigger_check(void) {
 	    obj = (i->second);
         if (SCRIPT(obj)) {
             sc = SCRIPT(obj);
-
             if (IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM))
                 random_otrigger(obj);
         }

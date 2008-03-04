@@ -3781,7 +3781,7 @@ obj_data *put_in_to(room_vnum rvn, obj_vnum ovn, objs_in_room &mm) {
     obj_list_type::iterator olit;
     oir_range oirr = mm.equal_range(rvn);
 
-    for (objs_in_room::iterator it = oirr.first;it!=oirr.second;it++) {
+    for (obj_rit it = oirr.first;it!=oirr.second;it++) {
         olit = object_list.find(it->second);
         if (olit != object_list.end())
             if (GET_OBJ_RNUM(olit->second) == ovn)
