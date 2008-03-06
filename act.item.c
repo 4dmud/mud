@@ -1125,7 +1125,7 @@ void perform_get(Character *ch, char *num, char *arg2, char *arg3) {
         } 
     if (IS_OBJ_STAT(cont, ITEM_PC_CORPSE)) {
 
-        if (IS_NPC(ch) || GET_OBJ_VAL(cont, 6) == 0 || !IS_PK(ch) || !IS_OBJ_STAT(cont, ITEM_PK_CORPSE)) {
+        if (IS_NPC(ch) || !IS_PK(ch) || !IS_OBJ_STAT(cont, ITEM_PK_CORPSE)) {
             ch->Send( "You can't take things from that player's corpse.\r\n");
             return;
         }
