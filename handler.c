@@ -2030,7 +2030,7 @@ Character *get_player_room(room_rnum room, char *name, int *number,
         num = get_number(&name);
     }
 	if (!name || !*name)
-	return NULL:
+	return NULL;
 
     for (i = descriptor_list; i; i = i->next) {
         ch = i->character;
