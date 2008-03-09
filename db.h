@@ -486,15 +486,18 @@ extern struct obj_data *obj_proto;
 //extern Zone *zone_table;
 extern vector <Zone> zone_table;
 
-extern map<long, obj_data *> object_list;
-extern map<long, obj_data *> dead_obj;  /* delayed obj removal   */
+
 #endif /* __DB_C__ */
 extern Descriptor *descriptor_list;
 extern Character *character_list;
 typedef map<long, obj_data *> obj_list_type;
+typedef obj_list_type::iterator olt_it;
 //extern struct htree_node *mob_htree;
 //extern struct htree_node *obj_htree;
 extern map<obj_vnum,obj_rnum> obj_vTor;
+
+extern obj_list_type object_list;
+extern obj_list_type dead_obj;  /* delayed obj removal   */
 
 void strip_string(char *buffer);
 int read_xap_objects(FILE * fl, Character *ch);
@@ -516,6 +519,8 @@ typedef vector <Room *>::iterator WorldIterator;
 
 typedef map<mob_vnum, Character *>::iterator mp_iter;
 typedef map<mob_vnum, struct index_data *>::iterator mi_iter;
+
+
 
 bool MobProtoExists(mob_vnum nv);
 Character * GetMobProto(mob_vnum vn);

@@ -93,7 +93,7 @@ ASUB(sub_tunneling)
 
   one_argument(argument, direction);
 
-  if ((!direction || !*direction))
+  if ((!*direction))
   {
     ch->Send( "Usage: tunnel <direction>\r\n");
     return SUB_UNDEFINED;
@@ -156,7 +156,7 @@ ASUB(sub_tunneling)
   MINE_DIR(ch) = dir;
   toggle_sub_status(ch, SUB_TUNNELING, STATUS_ON);
 
-  msg = new message_event_obj(ch, SUB_TUNNELING, THING_SUB, density, (long) (rm->number + ROOM_ID_BASE), "");
+  msg = new message_event_obj(ch, SUB_TUNNELING, THING_SUB, density, (long) (rm->number + ROOM_ID_BASE), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
   return SUB_TUNNELING;
 }

@@ -185,14 +185,14 @@ int Room::copy_room_strings(Room *source) {
 
 
 const char *Room::GetDescription() {
-    char * tmp = "";
+    char * tmp = (char *)"";
     if (DescID != -1)
         tmp = compressor.InflateFromId(DescID);
 
     if (tmp != NULL)
         return tmp;
     else
-        return "";
+        return (char *)"";
 }
 void Room::SetDescription(char *p) {
     if (!p)

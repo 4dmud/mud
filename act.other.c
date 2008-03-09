@@ -198,7 +198,7 @@ void improve_skill(Character *ch, int skill);
 void stop_auction(int type, Character *ch);
 void add_follower(Character *ch, Character *leader);
 void raw_kill(Character *ch, Character *killer);
-void ReplaceString ( char * string, char * search, char * replace , size_t len);
+void ReplaceString ( char * str, const char *search, const char *replace , size_t len);
 
 
 /* local functions */
@@ -1177,7 +1177,7 @@ new_mudlog(CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME(ch), CMD_NAME, GET_RO
 
 void parse_afk(Character *ch, char *argument)
 {
-  char *def = "Away From Keyboard";
+  char *def = (char *)"Away From Keyboard";
   char **msg;
   char buf[MAX_INPUT_LENGTH];
 
@@ -1211,7 +1211,7 @@ void parse_afk(Character *ch, char *argument)
 
 void parse_busy(Character *ch, char *argument)
 {
-  char *def = "Do not disturb.";
+  char *def = (char *)"Do not disturb.";
   char **msg;
   char buf[MAX_INPUT_LENGTH];
 
@@ -1571,9 +1571,9 @@ ACMD(do_file)
 
   struct file_struct
   {
-    char *cmd;
+    string cmd;
     char level;
-    char *file;
+    string file;
   }
   fields[] = {
                {"none",  55,  "Does Nothing"      },
@@ -1601,18 +1601,18 @@ ACMD(do_file)
                      "USAGE: file <option> <num lines>\r\n\r\nFile options:\r\n");
     for (j = 0, i = 1; fields[i].level; i++)
       if (fields[i].level <= GET_LEVEL(ch))
-        ch->Send( "%-15s%s\r\n", fields[i].cmd,
-                         fields[i].file);
+        ch->Send( "%-15s%s\r\n", fields[i].cmd.c_str(),
+                         fields[i].file.c_str());
     return;
   }
 
   two_arguments(argument, field, value);
 
-  for (l = 0; *(fields[l].cmd) != '\n'; l++)
-    if (!strncmp(field, fields[l].cmd, strlen(field)))
+  for (l = 0; *(fields[l].cmd.c_str()) != '\n'; l++)
+    if (!strncmp(field, fields[l].cmd.c_str(), strlen(field)))
       break;
 
-  if (*(fields[l].cmd) == '\n')
+  if (*(fields[l].cmd.c_str()) == '\n')
   {
     *ch << "That is not a valid option!\r\n";
     return;
@@ -1629,10 +1629,10 @@ ACMD(do_file)
   else
     req_lines = atoi(value);
 
-  if (!(req_file = fopen(fields[l].file, "r")))
+  if (!(req_file = fopen(fields[l].file.c_str(), "r")))
   {
     new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "SYSERR: Error opening file %s using 'file' command.",
-               fields[l].file);
+               fields[l].file.c_str());
     return;
   }
 

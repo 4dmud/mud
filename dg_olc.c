@@ -200,7 +200,7 @@ void trigedit_setup_existing(Descriptor *d, int rtrg_num) {
 
 void trigedit_disp_menu(Descriptor *d) {
     struct trig_data *trig = OLC_TRIG(d);
-    char *attach_type;
+    string attach_type;
     char trgtypes[256];
 
     get_char_colours(d->character);
@@ -231,7 +231,7 @@ void trigedit_disp_menu(Descriptor *d) {
 
         grn, OLC_NUM(d), nrm, 			/* vnum on the title line */
         grn, nrm, yel, GET_TRIG_NAME(trig),		/* name                   */
-        grn, nrm, yel, attach_type,			/* attach type            */
+        grn, nrm, yel, attach_type.c_str(),			/* attach type            */
         grn, nrm, yel, trgtypes,			/* greet/drop/etc         */
         grn, nrm, yel, trig->narg,			/* numeric arg            */
         grn, nrm, yel, trig->arglist?trig->arglist:"",/* strict arg             */

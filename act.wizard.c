@@ -533,49 +533,49 @@ struct trust_struct {
 }
 trust_fields[] = {
                      {
-                         "ban", LVL_IMPL, PC, BINARY},     /*  0 */
+                         (char *)"ban", LVL_IMPL, PC, BINARY},     /*  0 */
                      {
-                         "dspln", LVL_IMPL, PC, BINARY},   /*  1 */
+                         (char *)"dspln", LVL_IMPL, PC, BINARY},   /*  1 */
                      {
-                         "edit", LVL_IMPL, PC, BINARY},    /*  2 */
+                         (char *)"edit", LVL_IMPL, PC, BINARY},    /*  2 */
                      {
-                         "heal", LVL_IMPL, PC, BINARY},    /*  3 */
+                         (char *)"heal", LVL_IMPL, PC, BINARY},    /*  3 */
                      {
-                         "house", LVL_IMPL, PC, BINARY},   /*  4 */
+                         (char *)"house", LVL_IMPL, PC, BINARY},   /*  4 */
                      {
-                         "imm1", LVL_IMPL, PC, BINARY},    /*  5 */
+                         (char *)"imm1", LVL_IMPL, PC, BINARY},    /*  5 */
                      {
-                         "imm2", LVL_IMPL, PC, BINARY},    /*  6 */
+                         (char *)"imm2", LVL_IMPL, PC, BINARY},    /*  6 */
                      {
-                         "impl", LVL_IMPL, PC, BINARY},    /*  7 */
+                         (char *)"impl", LVL_IMPL, PC, BINARY},    /*  7 */
                      {
-                         "kill", LVL_IMPL, PC, BINARY},    /*  8 */
+                         (char *)"kill", LVL_IMPL, PC, BINARY},    /*  8 */
                      {
-                         "load", LVL_IMPL, PC, BINARY},    /*  9 */
+                         (char *)"load", LVL_IMPL, PC, BINARY},    /*  9 */
                      {
-                         "olc", LVL_IMPL, PC, BINARY},     /* 10 */
+                         (char *)"olc", LVL_IMPL, PC, BINARY},     /* 10 */
                      {
-                         "quest", LVL_IMPL, PC, BINARY},   /* 11 */
+                         (char *)"quest", LVL_IMPL, PC, BINARY},   /* 11 */
                      {
-                         "sen", LVL_IMPL, PC, BINARY},     /* 12 */
+                         (char *)"sen", LVL_IMPL, PC, BINARY},     /* 12 */
                      {
-                         "tele", LVL_IMPL, PC, BINARY},    /* 13 */
+                         (char *)"tele", LVL_IMPL, PC, BINARY},    /* 13 */
                      {
-                         "trig", LVL_IMPL, PC, BINARY},    /* 14 */
+                         (char *)"trig", LVL_IMPL, PC, BINARY},    /* 14 */
                      {
-                         "all", LVL_IMPL, PC, BINARY},     /* 15 */
+                         (char *)"all", LVL_IMPL, PC, BINARY},     /* 15 */
                      {
-                         "marry", LVL_IMPL, PC, BINARY},   /* 16 */
+                         (char *)"marry", LVL_IMPL, PC, BINARY},   /* 16 */
                      {
-                         "goto", LVL_IMPL, PC, BINARY},    /* 17 */
+                         (char *)"goto", LVL_IMPL, PC, BINARY},    /* 17 */
                      {
-                         "global", LVL_IMPL, PC, BINARY},  /* 18 */
+                         (char *)"global", LVL_IMPL, PC, BINARY},  /* 18 */
                      {
-                         "hedit", LVL_IMPL, PC, BINARY},   /* 19 */
+                         (char *)"hedit", LVL_IMPL, PC, BINARY},   /* 19 */
                      {
-                         "imm3", LVL_IMPL, PC, BINARY},     /* 20 */
+                         (char *)"imm3", LVL_IMPL, PC, BINARY},     /* 20 */
                      {
-                         "\n", 0, PC, MISC}
+                         (char *)"\n", 0, PC, MISC}
                  };
 
 
@@ -5687,7 +5687,7 @@ ACMD(do_innate) {
 
     half_chop(argument, arg, buf);
 
-    if (!buf) {
+    if (!*buf) {
         if (subcmd == SCMD_SINNATE)
             send_to_char
             ("You must specify WHICH spell you'd like to make innate.\r\n",

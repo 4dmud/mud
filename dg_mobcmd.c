@@ -791,9 +791,9 @@ ACMD(do_mload) {
             return;
         }
         two_arguments(target, arg1, arg2); /* recycling ... */
-        tch = (arg1 && *arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
+        tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
         if (tch) {
-            if (arg2 && *arg2 &&
+            if (*arg2 &&
                     (pos = find_eq_pos_script(arg2)) >= 0 &&
                     !GET_EQ(tch, pos) &&
                     can_wear_on_pos(object, pos)) {
@@ -809,7 +809,7 @@ ACMD(do_mload) {
             load_otrigger(object);
             return;
         }
-        cnt = (arg1 && *arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
+        cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
         if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
             if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
                 if (IN_ROOM(ch))
@@ -1604,7 +1604,7 @@ ACMD(do_mcollision) {
 
     one_argument(argument, arg);
 
-    if (!arg) {
+    if (!*arg) {
         mob_log(ch, "mcollision: called without amount of damage.");
         return;
     }

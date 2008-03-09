@@ -435,7 +435,7 @@ ASPELL(spell_locate_object) {
     DYN_CREATE;
     *dynbuf = 0;
 
-    for (obj_list_type::iterator ob = object_list.begin();(j > 0) && ob != object_list.end(); ob++) {
+    for (olt_it ob = object_list.begin();(j > 0) && ob != object_list.end(); ob++) {
         i = (ob->second);
         if (!isname_full(strarg, i->name))
             continue;
@@ -543,7 +543,7 @@ ASPELL(spell_psi_panic) {
     } else {
         act("A cold lick of fear runs down your spine!", FALSE, victim, 0, 0, TO_CHAR);
         act("A look of fear crosses $n's face!", FALSE, victim, 0, 0, TO_CHAR);
-        do_flee(victim, "", 0, 0);
+        do_flee(victim, (char *)"", 0, 0);
         GET_WAIT_STATE(ch) += 2 RL_SEC;
         GET_WAIT_STATE(victim) += 4 RL_SEC;
     }
@@ -1022,7 +1022,7 @@ ASPELL(spell_control_weather) {
 }
 
 ASPELL(spell_minor_identify) {
-    char *min_id[] = {
+    const char *min_id[] = {
                          "It would bring %s if you sold it!\r\n",    /* NONE */
                          "your physique!\r\n",   /* STR */
                          "your speed!\r\n", /* DEX */

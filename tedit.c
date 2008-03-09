@@ -80,19 +80,19 @@ ACMD(do_tedit)
     char level;
     const char **buffer;
     int  size;
-    char *filename;
+    const char *filename;
   } fields[] = {
 	/* edit the lvls to your own needs */
-	{ "credits",	LVL_IMPL,	&credits,	2400,	CREDITS_FILE},
-	{ "news",	LVL_GRGOD,	&news,		8192,	NEWS_FILE},
-	{ "motd",	LVL_GRGOD,	&motd,		2400,	MOTD_FILE},
-	{ "imotd",	LVL_IMPL,	&imotd,		2400,	IMOTD_FILE},
-	{ "help",       LVL_GRGOD,	&help,		2400,	HELP_PAGE_FILE},
-	{ "info",	LVL_GRGOD,	&info,		8192,	INFO_FILE},
-	{ "background",	LVL_IMPL,	&background,	8192,	BACKGROUND_FILE},
-	{ "handbook",   LVL_IMPL,	&handbook,	8192,   HANDBOOK_FILE},
-	{ "policies",	LVL_IMPL,	&policies,	8192,	POLICIES_FILE},
-	{ "\n",		0,		NULL,		0,	NULL }
+	{ (char *)"credits",	LVL_IMPL,	&credits,	2400,	CREDITS_FILE},
+	{ (char *)"news",	LVL_GRGOD,	&news,		8192,	NEWS_FILE},
+	{ (char *)"motd",	LVL_GRGOD,	&motd,		2400,	MOTD_FILE},
+	{ (char *)"imotd",	LVL_IMPL,	&imotd,		2400,	IMOTD_FILE},
+	{ (char *)"help",       LVL_GRGOD,	&help,		2400,	HELP_PAGE_FILE},
+	{ (char *)"info",	LVL_GRGOD,	&info,		8192,	INFO_FILE},
+	{ (char *)"background",	LVL_IMPL,	&background,	8192,	BACKGROUND_FILE},
+	{ (char *)"handbook",   LVL_IMPL,	&handbook,	8192,   HANDBOOK_FILE},
+	{ (char *)"policies",	LVL_IMPL,	&policies,	8192,	POLICIES_FILE},
+	{ (char *)"\n",		0,		NULL,		0,	NULL }
   };
 
   if (ch->desc == NULL)

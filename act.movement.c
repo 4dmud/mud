@@ -206,7 +206,7 @@ int do_simple_move(Character *ch, int dir, int need_specials_check) {
      * Check for special routines (North is 1 in command list, but 0 here) Note
      * -- only check if following; this avoids 'double spec-proc' bug
      */
-    if (need_specials_check && special(ch, dir + 1, ""))
+    if (need_specials_check && special(ch, dir + 1, (char *)""))
         return (0);
 
     if (!ch->CanMove()) {

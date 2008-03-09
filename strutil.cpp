@@ -23,7 +23,7 @@ string Trim (const string & s, const string & t) {
     string d = s;
     string::size_type i = d.find_last_not_of (t);
     if (i == string::npos)
-        return "";
+        return (char *)"";
     else
         return d.erase (i + 1).erase (0, s.find_first_not_of (t)) ;
 }

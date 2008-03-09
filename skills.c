@@ -45,9 +45,7 @@ void spello(int spl, const char *name, int max_mana, int min_mana,
 int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 void skill_attack(Character *ch, Character *vict, int skill, int pass);
 ACMD(do_gen_door);
-void send_not_to_spam(char *buf, Character *ch,
-                      Character *victim, OBJ_DATA *weap,
-                      int spam);
+void send_not_to_spam(string buf, Character *ch, Character *victim, struct obj_data *weap, int spam);
 void check_killer(Character *ch, Character *vict);
 int has_class(Character *ch, int chclass);
 int tier_level(Character *ch, int chclass);
@@ -84,7 +82,7 @@ struct follow_type *k;
 typedef struct
 {
   int dirNum;
-  char *dirCmd;
+  const char *dirCmd;
 }
 dirParseStruct;
 
@@ -2932,7 +2930,7 @@ int perform_grapple(Character *ch, int dir, int need_specials_check,
   int fail = FALSE;
 
 
-  if (need_specials_check && special(ch, dir + 1, ""))
+  if (need_specials_check && special(ch, dir + 1, (char *)""))
     fail = TRUE;
 
   if (IS_SET_AR(ROOM_FLAGS(IN_ROOM(ch)), ROOM_ATRIUM))

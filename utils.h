@@ -50,27 +50,27 @@ extern int syslogfd;
 
 
 
-void free_string(char **pt);
-char *numlineas( char *string );
-void string_append( Character *ch, char **pString );
+void free_string ( char **pt );
+char *numlineas ( char *string );
+void string_append ( Character *ch, char **pString );
 
-struct time_info_data *mud_time_passed(time_t t2, time_t t1);
-const char *race_name(Character *ch);
-int has_weapon(Character *ch);
-float has_staff(Character *ch);
-int num_dice_wep(Character *ch, short dual);
-int size_dice_wep(Character *ch, short dual);
-int highest_tier(Character *ch);
-float race_dam_mod(int race, int magic);
+struct time_info_data *mud_time_passed ( time_t t2, time_t t1 );
+const char *race_name ( Character *ch );
+int has_weapon ( Character *ch );
+float has_staff ( Character *ch );
+int num_dice_wep ( Character *ch, short dual );
+int size_dice_wep ( Character *ch, short dual );
+int highest_tier ( Character *ch );
+float race_dam_mod ( int race, int magic );
 
-void strip_colour(char *inbuf, size_t i_buf);
-size_t proc_colour(char *inbuf, int color_lvl, size_t len);
+void strip_colour ( char *inbuf, size_t i_buf );
+size_t proc_colour ( char *inbuf, int color_lvl, size_t len );
 extern int sub_success;
-int total_chance(Character *ch, int skill);
-gold_int exp_needed(Character *ch);
-gold_int group_exp_needed(Character *ch);
-gold_int level_exp(int chclass, int level, int tier, int remorts);
-int use_stamina(Character *ch, int amount);
+int total_chance ( Character *ch, int skill );
+gold_int exp_needed ( Character *ch );
+gold_int group_exp_needed ( Character *ch );
+gold_int level_exp ( int chclass, int level, int tier, int remorts );
+int use_stamina ( Character *ch, int amount );
 
 #define divide_2(a)  (a>>1)
 #define mult_2(a)     (a<<1)
@@ -101,92 +101,95 @@ int use_stamina(Character *ch, int amount);
 
 /* flags for show_list_to_char */
 
-enum {
-    eItemNothing,   /* item is not readily accessible */
-    eItemGet,     /* item on ground */
-    eItemDrop,    /* item in inventory */
-    eItemBid     /* auction item */
+enum
+{
+	eItemNothing,   /* item is not readily accessible */
+	eItemGet,     /* item on ground */
+	eItemDrop,    /* item in inventory */
+	eItemBid     /* auction item */
 };
 
 /*replace parts of strings*/
-char *strrepl(char *Str, size_t BufSiz, char *OldStr, char *NewStr);
+char *strrepl ( char *Str, size_t BufSiz, char *OldStr, char *NewStr );
 /*string concat for multiple strings*/
-char *xstrcat(char *des, char *src, ...);
+char *xstrcat ( char *des, char *src, ... );
 /* th, st, nd, rd - for numbers */
-const char *ordinal_text(int number);
-char *str_str(char *cs, char *ct);
+const char *ordinal_text ( int number );
+char *str_str ( char *cs, char *ct );
+char *str_str ( char *cs, const char *ct );
 
 #if 0
 /*quicksort a linked list*/
-void    *sortl(void *list, void *(*getnext)(void *),
-               void (*setnext)(void *, void *),
-               int (*compare)(void *, void *));          /* Ll_Qsort.C     */
+void    *sortl ( void *list, void * ( *getnext ) ( void * ),
+                 void ( *setnext ) ( void *, void * ),
+                 int ( *compare ) ( void *, void * ) );    /* Ll_Qsort.C     */
 
-typedef struct list_struct {
-    struct list_struct *next;
-    char *key;
-    /* other stuff */
+typedef struct list_struct
+{
+	struct list_struct *next;
+	char *key;
+	/* other stuff */
 }
 list;
 
-list *lsort (list *p);
+list *lsort ( list *p );
 #endif
 
 /*comma format a long*/
-size_t commafmt(char   *buf,            /* Buffer for formatted string  */
-                size_t     bufsize,        /* Size of buffer               */
-                gold_int    N);              /* Number to convert            */
+size_t commafmt ( char   *buf,          /* Buffer for formatted string  */
+                  size_t     bufsize,        /* Size of buffer               */
+                  gold_int    N );             /* Number to convert            */
 
 /* public functions in utils.c */
-bool is_prefix(const char *aStr, const char *bStr);
-bool compares(const char *aStr, const char *bStr);
-char *str_dup(const char *source);
+bool is_prefix ( const char *aStr, const char *bStr );
+bool compares ( const char *aStr, const char *bStr );
+char *str_dup ( const char *source );
 /*
  * Only provide our versions if one isn't in the C library. These macro names
  * will be defined by sysdep.h if a strcasecmp or stricmp exists.
  */
 #ifndef str_cmp
-int	str_cmp(const char *arg1, const char *arg2);
+int	str_cmp ( const char *arg1, const char *arg2 );
 #endif
 #ifndef strn_cmp
-int	strn_cmp(const char *arg1, const char *arg2, int n);
+int	strn_cmp ( const char *arg1, const char *arg2, int n );
 #endif
-void comlog(const char *format, ...)   __attribute__ ((format(printf, 1, 2)));
-void basic_mud_log(const char *format, ...)   __attribute__ ((format(printf, 1, 2)));
-int touch(const char *path);
-void mudlog(const char *str, int type, int level, int file);
-void    new_mudlog(int type, int level, int file, const char *str, ...) __attribute__ ((format (printf, 4, 5)));
-void log_death_trap(Character *ch);
-int number(int from, int to);
-float number(float from, float to);
-int dice(int number, int size);
-size_t new_sprintbit(bitvector_t vektor, const char *names[], char *result,
-                     size_t reslen);
-size_t new_sprinttype(int type, const char *names[], char *result,
-                      size_t reslen);
-void sprintbit(bitvector_t vektor, const char *names[], char *result, size_t r_len);
-void sprinttype(int type, const char *names[], char *result, size_t r_len);
-int get_line(FILE * fl, char *buf);
-int get_line(ifstream &fl, char *buf);
-int get_filename(const char *orig_name, char *filename, int mode);
-void sprintbitarray(int bitvector[], const char *name[], int maxar,
-                    char *result, size_t r_len);
-time_t mud_time_to_secs(struct time_info_data *now);
-struct time_info_data *age(Character *ch);
-int num_pc_in_room(Room *room);
-void line_input(Descriptor *d, const char *prompt,
-                C_FUNC(*callback), void *info);
-void core_dump_real(const char *, int);
-char *stristr(const char *String, const char *Pattern);
+void comlog ( const char *format, ... )   __attribute__ ( ( format ( printf, 1, 2 ) ) );
+void basic_mud_log ( const char *format, ... )   __attribute__ ( ( format ( printf, 1, 2 ) ) );
+int touch ( const char *path );
+void mudlog ( const char *str, int type, int level, int file );
+void    new_mudlog ( int type, int level, int file, const char *str, ... ) __attribute__ ( ( format ( printf, 4, 5 ) ) );
+void log_death_trap ( Character *ch );
+int number ( int from, int to );
+float number ( float from, float to );
+int dice ( int number, int size );
+size_t new_sprintbit ( bitvector_t vektor, const char *names[], char *result,
+                       size_t reslen );
+size_t new_sprinttype ( int type, const char *names[], char *result,
+                        size_t reslen );
+void sprintbit ( bitvector_t vektor, const char *names[], char *result, size_t r_len );
+void sprinttype ( int type, const char *names[], char *result, size_t r_len );
+int get_line ( FILE * fl, char *buf );
+int get_line ( ifstream &fl, char *buf );
+int get_filename ( const char *orig_name, char *filename, int mode );
+void sprintbitarray ( int bitvector[], const char *name[], int maxar,
+                      char *result, size_t r_len );
+time_t mud_time_to_secs ( struct time_info_data *now );
+struct time_info_data *age ( Character *ch );
+int num_pc_in_room ( Room *room );
+void line_input ( Descriptor *d, const char *prompt,
+                  C_FUNC ( *callback ), void *info );
+void core_dump_real ( const char *, int );
+char *stristr ( const char *String, const char *Pattern );
 
-char *stripcr(char *dest, const char *src);
-int room_is_dark(room_rnum room);
-time_t sec_to_time(int sec);
-long time_to_sec(time_t timeCheck);
-char *center_align(char *str, size_t width);
+char *stripcr ( char *dest, const char *src );
+int room_is_dark ( room_rnum room );
+time_t sec_to_time ( int sec );
+long time_to_sec ( time_t timeCheck );
+char *center_align ( char *str, size_t width );
 #define HOURS_TO_EXPIRE(num) ((time_t)(time(0) + ((num) * SECS_PER_MUD_HOUR)))
 
-void basic_mud_vlog(const char *format, va_list args);
+void basic_mud_vlog ( const char *format, va_list args );
 
 
 
@@ -194,18 +197,18 @@ void basic_mud_vlog(const char *format, va_list args);
 
 
 // m0rd
-char* print_gold(char* result, gold_int gold);
-int alter_gold(Character *ch, gold_int amount);
-void alter_stamina(Character *ch, int amount);
-int speed_update(Character *ch);
+char* print_gold ( char* result, gold_int gold );
+int alter_gold ( Character *ch, gold_int amount );
+void alter_stamina ( Character *ch, int amount );
+int speed_update ( Character *ch );
 
 //attack functions
-int accuracy_tot(Character *attacker);
-int evasion_tot(Character *vict);
+int accuracy_tot ( Character *attacker );
+int evasion_tot ( Character *vict );
 
 /* random functions in random.c */
-void circle_srandom(unsigned long initial_seed);
-unsigned long circle_random(void);
+void circle_srandom ( unsigned long initial_seed );
+unsigned long circle_random ( void );
 
 /* undefine MAX and MIN so that our functions are used instead */
 #ifdef MAX
@@ -216,83 +219,95 @@ unsigned long circle_random(void);
 #undef MIN
 #endif
 
-inline gold_int MIN(gold_int a, gold_int b) {
-    return (a < b ? a : b);
+inline gold_int MIN ( gold_int a, gold_int b )
+{
+	return ( a < b ? a : b );
 }
-inline gold_int MAX(gold_int a, gold_int b) {
-    return (a > b ? a : b);
+inline gold_int MAX ( gold_int a, gold_int b )
+{
+	return ( a > b ? a : b );
 }
-inline int MIN(int a, int b) {
-    return (a < b ? a : b);
+inline int MIN ( int a, int b )
+{
+	return ( a < b ? a : b );
 }
-inline int MAX(int a, int b) {
-    return (a > b ? a : b);
+inline int MAX ( int a, int b )
+{
+	return ( a > b ? a : b );
 }
-inline float MIN(float a, float b) {
-    return (a < b ? a : b);
+inline float MIN ( float a, float b )
+{
+	return ( a < b ? a : b );
 }
-inline float MAX(float a, float b) {
-    return (a > b ? a : b);
+inline float MAX ( float a, float b )
+{
+	return ( a > b ? a : b );
 }
-inline double MIN(double a, double b) {
-    return (a < b ? a : b);
+inline double MIN ( double a, double b )
+{
+	return ( a < b ? a : b );
 }
-inline double MAX(double a, double b) {
-    return (a > b ? a : b);
+inline double MAX ( double a, double b )
+{
+	return ( a > b ? a : b );
 }
-inline unsigned int MIN(unsigned int a, unsigned int b) {
-    return (a < b ? a : b);
+inline unsigned int MIN ( unsigned int a, unsigned int b )
+{
+	return ( a < b ? a : b );
 }
-inline unsigned int MAX(unsigned int a, unsigned int b) {
-    return (a > b ? a : b);
+inline unsigned int MAX ( unsigned int a, unsigned int b )
+{
+	return ( a > b ? a : b );
 }
-inline long MIN(long a, long b) {
-    return (a < b ? a : b);
+inline long MIN ( long a, long b )
+{
+	return ( a < b ? a : b );
 }
-inline long MAX(long a, long b) {
-    return (a > b ? a : b);
+inline long MAX ( long a, long b )
+{
+	return ( a > b ? a : b );
 }
 
 
 
 /* in class.c */
-int class_elem_weakness(int chcl);
-int class_elem_strength(int chcl);
+int class_elem_weakness ( int chcl );
+int class_elem_strength ( int chcl );
 
 /* in magic.c */
-bool circle_follow(Character *ch, Character *victim);
+bool circle_follow ( Character *ch, Character *victim );
 
 /* in act.informative.c */
-void look_at_room(Character *ch, int mode);
-Character *rand_group(Character *ch);
+void look_at_room ( Character *ch, int mode );
+Character *rand_group ( Character *ch );
 
 /* in act.movmement.c */
-int do_simple_obj_move(struct obj_data *obj, int dir, Character *ch);
-int do_simple_move(Character *ch, int dir, int following);
-int perform_move(Character *ch, int dir, int following);
+int do_simple_obj_move ( struct obj_data *obj, int dir, Character *ch );
+int do_simple_move ( Character *ch, int dir, int following );
+int perform_move ( Character *ch, int dir, int following );
 
 /* in limits.c */
-int mana_gain(Character *ch);
-int hit_gain(Character *ch);
-int move_gain(Character *ch);
-int stamina_gain(Character *ch);
-void advance_level(Character *ch);
-void set_title(Character *ch, char *title);
-void set_pretitle(Character *ch, char *title);
-void gain_exp(Character *ch, gold_int gain);
-void gain_exp_regardless(Character *ch, gold_int gain);
-void gain_condition(Character *ch, int condition, int value);
-void check_idling(Character *ch);
-void regen_update(void);
-void point_update(void);
-void update_pos(Character *victim);
-void total_perc(Character *ch);
-int group_size(Character *ch);
-void set_loginmsg(Character *ch, char *loginmsg);      /* EDIT BY THOTTER!!!*/
-void set_logoutmsg(Character *ch, char *logoutmsg);    /* ^^^^^^^^^^^^*/
+int mana_gain ( Character *ch );
+int hit_gain ( Character *ch );
+int move_gain ( Character *ch );
+int stamina_gain ( Character *ch );
+void advance_level ( Character *ch );
+void set_title ( Character *ch, char *title );
+void set_pretitle ( Character *ch, char *title );
+void gain_exp ( Character *ch, gold_int gain );
+void gain_exp_regardless ( Character *ch, gold_int gain );
+void gain_condition ( Character *ch, int condition, int value );
+void check_idling ( Character *ch );
+void regen_update ( void );
+void point_update ( void );
+void update_pos ( Character *victim );
+void total_perc ( Character *ch );
+int group_size ( Character *ch );
+void set_loginmsg ( Character *ch, char *loginmsg );   /* EDIT BY THOTTER!!!*/
+void set_logoutmsg ( Character *ch, char *logoutmsg ); /* ^^^^^^^^^^^^*/
 
 /* in comm.c */
-void    circle_exit(int r);
+void    circle_exit ( int r );
 #define exit(r)  circle_exit(r)
 
 extern const struct race_data races[NUM_RACES];
@@ -362,9 +377,10 @@ extern const struct race_data races[NUM_RACES];
 
 #define AN(string) (strchr("aeiouAEIOU", *string) ? "an" : "a")
 
-inline char *CAP(char *txt) {
-    *txt = UPPER(*txt);
-    return (txt);
+inline char *CAP ( char *txt )
+{
+	*txt = UPPER ( *txt );
+	return ( txt );
 }
 
 /* memory utils **********************************************************/
@@ -381,11 +397,12 @@ inline char *CAP(char *txt) {
 
 
 /* Create a duplicate of a string */
-inline char *str_dup(const char *source) {
-    char *new_z = NULL;
+inline char *str_dup ( const char *source )
+{
+	char *new_z = NULL;
 
-    CREATE(new_z, char, strlen(source) + 1);
-    return (strcpy(new_z, source));
+	CREATE ( new_z, char, strlen ( source ) + 1 );
+	return ( strcpy ( new_z, source ) );
 }
 
 /* Dynamic string buffer macros. */
@@ -399,7 +416,7 @@ inline char *str_dup(const char *source) {
 #define DYN_CREATE \
      dynbuf_size = MAX_STRING_LENGTH; \
      CREATE(dynbuf, char, dynbuf_size); \
-
+ 
 
 #define DYN_RESIZE(sbuf) \
      if (strlen(dynbuf) + strlen((sbuf)) >= dynbuf_size) { \
@@ -427,12 +444,12 @@ inline char *str_dup(const char *source) {
       if (temp)				\
          temp->next = (item)->next;	\
    }					\
-
+ 
 int get_sub(Character *ch, int i);
-void improve_sub(Character *ch, enum subskill_list sub, int amount);
+void improve_sub ( Character *ch, enum subskill_list sub, int amount );
 
 #define GET_SUB(ch, i)	get_sub(ch, i)
-void set_skill(Character *ch, int skill, int amount);
+void set_skill ( Character *ch, int skill, int amount );
 /* basic bitvector utils *************************************************/
 
 #define Q_FIELD(x)  ((int) (x) / 32)
@@ -502,7 +519,7 @@ void set_skill(Character *ch, int skill, int amount);
 #define ROOM_FLAGGED(loc, flag) (IS_SET_AR(ROOM_FLAGS(loc), (flag)))
 #define ZONE_FLAGGED(loc, flag) (IS_SET(ZONE_FLAGS(loc), (flag)))
 #define SECTOR(loc) ((loc)->sector_type)
-int has_body(Character *ch, int flag);
+int has_body ( Character *ch, int flag );
 #define HAS_BODY(ch, flag) (has_body(ch, flag))
 #define EXIT_FLAGGED(exit, flag) (IS_SET((exit)->exit_info, (flag)))
 #define OBJAFF_FLAGGED(obj, flag) (IS_SET(GET_OBJ_AFFECT(obj), (flag)))
@@ -699,7 +716,7 @@ int has_body(Character *ch, int flag);
 #define MINE_SPEED(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_speed))
 #define MINE_BONUS(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_bonus))
 #define MINE_DAMAGE(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_damage))
-int check_mail(Character *ch);
+int check_mail ( Character *ch );
 #define HAS_MAIL(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.has_mail))
 #define AFK_MSG(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->afk_msg))
 #define BUSY_MSG(ch)		CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->busy_msg))
@@ -764,9 +781,9 @@ int check_mail(Character *ch);
 #define DG_GOLD_IN 	9
 #define DG_GOLD_OUT 	10
 
-int get_skill_wait(Character *ch, int skill);
-void set_skill_wait(Character *ch, int skill, int wait);
-void make_wholist(void);
+int get_skill_wait ( Character *ch, int skill );
+void set_skill_wait ( Character *ch, int skill, int wait );
+void make_wholist ( void );
 
 #define GET_SKILL(ch, i)	ch->get_skill(i)
 #define SET_SKILL(ch, i, pct)	set_skill(ch, i, pct)
@@ -801,7 +818,7 @@ void make_wholist(void);
           (GET_ADD(ch) <= 90) ? 28 :( \
           (GET_ADD(ch) <= 99) ? 29 :  30 ) ) )                   \
         )
-int current_class_is_tier_num(Character *ch);
+int current_class_is_tier_num ( Character *ch );
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + (400 * ((current_class_is_tier_num(ch)/2))))
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
@@ -946,7 +963,7 @@ int current_class_is_tier_num(Character *ch);
 #define CAN_GET_OBJ(ch, obj)   \
    (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && \
     CAN_SEE_OBJ((ch),(obj)))
-const char * hidden_name(Character *ch);
+const char * hidden_name ( Character *ch );
 #define PERS(ch, vict)   (!CAN_SEE(vict, ch) ?  "someone" :  hidden_name(ch))
 #define PERS_S(ch, vict)   (!CAN_SEE(vict, ch) ?  string("someone") :  hidden_name(ch))
 
@@ -1011,7 +1028,7 @@ extern room_rnum VEHICLE_ROOM;
                                 (GET_RACE(ch) == RACE_SPACE_WOLF))
 #define IS_GLADIATOR(ch)	(!IS_NPC(ch) && \
 				(GET_RACE(ch) == RACE_GLADIATOR))
-char *print_weather(room_rnum room, char *buf, size_t len);
+char *print_weather ( room_rnum room, char *buf, size_t len );
 #define OUTSIDE(ch) (!(ROOM_FLAGGED((ch)->in_room, ROOM_INDOORS)||SECT((ch)->in_room)==SECT_INSIDE) )
 #define IS_DAY (sunlight == SUN_LIGHT)
 #define IS_NIGHT  (sunlight == SUN_DARK)
@@ -1086,7 +1103,7 @@ char *print_weather(room_rnum room, char *buf, size_t len);
 
 #define GET_IGNORELIST(ch) (SPECIALS(ch)->ignorelist)
 
-void char_from_chair(Character *ch);
+void char_from_chair ( Character *ch );
 #define SITTING(ch)          ((ch)->char_specials.chair)
 #define NEXT_SITTING(ch)     ((ch)->char_specials.next_in_chair)
 #define OBJ_SAT_IN_BY(obj)   ((obj)->sitting_here)
@@ -1117,34 +1134,34 @@ typedef unsigned long int FLAG;	/* 32bit unsigned */
 
 
 /* prototypes from regen.c */
-void alter_hit(Character *ch, int amount);
-void alter_mana(Character *ch, int amount);
-void alter_move(Character *ch, int amount);
-int sub_number(char *name);
-const char * colour_option_name(int num);
-struct obj_data *revert_object(struct obj_data *obj);
+void alter_hit ( Character *ch, int amount );
+void alter_mana ( Character *ch, int amount );
+void alter_move ( Character *ch, int amount );
+int sub_number ( char *name );
+const char * colour_option_name ( int num );
+struct obj_data *revert_object ( struct obj_data *obj );
 #define GOLD_BANK   0
 #define GOLD_HAND   1
 #define GOLD_ALL    2
-float square_root(float num);
-int get_sub_status(Character *ch, int i);
-int toggle_sub_status(Character *ch, int i, int onoff);
-int stop_task(Character *ch);
-int first_word_is_name(Character *ch, char * argument);
-int choose_real_abils(Character *ch, char select, int amount);
+float square_root ( float num );
+int get_sub_status ( Character *ch, int i );
+int toggle_sub_status ( Character *ch, int i, int onoff );
+int stop_task ( Character *ch );
+int first_word_is_name ( Character *ch, char * argument );
+int choose_real_abils ( Character *ch, char select, int amount );
 
 #define TRAVEL_LIST(thing) ((thing)->travel_list)
-int hunt_location(void *thing, int type);
-void add_travel_point_by_pointer(struct travel_point_data **tlist, room_vnum dest);
-void add_travel_point_by_thing(void *thing, int type, room_vnum dest);
-void remove_travel_point_by_dest(struct travel_point_data **tlist, room_vnum dest);
-void remove_travel_point_by_num(struct travel_point_data **tlist, int num);
-void remove_travel_point_by_pointer(struct travel_point_data **tlist, struct travel_point_data *dead);
-void free_travel_points(struct travel_point_data *t);
+int hunt_location ( void *thing, int type );
+void add_travel_point_by_pointer ( struct travel_point_data **tlist, room_vnum dest );
+void add_travel_point_by_thing ( void *thing, int type, room_vnum dest );
+void remove_travel_point_by_dest ( struct travel_point_data **tlist, room_vnum dest );
+void remove_travel_point_by_num ( struct travel_point_data **tlist, int num );
+void remove_travel_point_by_pointer ( struct travel_point_data **tlist, struct travel_point_data *dead );
+void free_travel_points ( struct travel_point_data *t );
 
-int do_simple_obj_move(struct obj_data *obj, int dir, Character *ch);
-int perform_move_obj(struct obj_data *obj, int dir, Character *ch);
-struct obj_data *has_vehicle(Character *ch);
+int do_simple_obj_move ( struct obj_data *obj, int dir, Character *ch );
+int perform_move_obj ( struct obj_data *obj, int dir, Character *ch );
+struct obj_data *has_vehicle ( Character *ch );
 
 
 /*******************  Config macros *********************/
@@ -1211,7 +1228,7 @@ struct obj_data *has_vehicle(Character *ch);
 #define CONFIG_MIN_WIZLIST_LEV  config_info.autowiz.min_wizlist_lev
 
 
-bool valid_id_num(long id);
-int fileExists (char * fileName);
+bool valid_id_num ( long id );
+int fileExists ( char * fileName );
 
 #define FTOI(f) ((int)((f)))

@@ -2662,7 +2662,7 @@ struct forest_data {
 
 /*** class name ***/
 struct class_name_data {
-    char *name[5];
+    const char* name[5];
 };
 
 /**log info**/

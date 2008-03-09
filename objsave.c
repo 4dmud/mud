@@ -2063,18 +2063,18 @@ int load_char_objects_to_char_old(Character *ch, FILE * fl)
                                                                                                      special care */
         if ((temp->name = fread_string(fl, buf2)) == NULL)
         {
-          temp->name = "undefined";
+          temp->name = (char *)"undefined";
         }
 
         if ((temp->short_description =
                fread_string(fl, buf2)) == NULL)
         {
-          temp->short_description = "undefined";
+          temp->short_description = (char *)"undefined";
         }
 
         if ((temp->description = fread_string(fl, buf2)) == NULL)
         {
-          temp->description = "undefined";
+          temp->description = (char *)"undefined";
         }
 
         if ((temp->action_description =

@@ -1,25 +1,10 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="6" >
-  <Doc0 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/4Dimensions.kdevelop" >
-   <View0 Encoding="ISO 8859-1" Type="Source" />
+ <DocsAndViews NumberOfDocuments="1" >
+  <Doc0 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/oedit.c" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/structs.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.comm.c" >
-   <View0 Encoding="" Type="Source" />
-  </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/mine.c" >
-   <View0 Encoding="" line="253" Type="Source" />
-  </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/sysdep.h" >
-   <View0 Encoding="" line="271" Type="Source" />
-  </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.informative.c" >
-   <View0 Encoding="" line="1866" Type="Source" />
-  </Doc5>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -42,15 +27,15 @@
   </kdevastyle>
   <kdevbookmarks>
    <bookmarks>
-    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >
-     <mark line="26" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.h" >
+     <mark line="566" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/genzon.c" >
      <mark line="123" />
      <mark line="127" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.h" >
-     <mark line="566" />
+    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >
+     <mark line="26" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/db.c" >
      <mark line="0" />
@@ -58,38 +43,35 @@
      <mark line="3555" />
      <mark line="2646" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/handler.c" >
-     <mark line="1344" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
+     <mark line="1109" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/zedit.c" >
      <mark line="966" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
-     <mark line="1109" />
+    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/handler.c" >
+     <mark line="1344" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/redit.c" >
      <mark line="189" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.h" >
+     <mark line="62" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/act.wizard.c" >
      <mark line="3827" />
      <mark line="3831" />
      <mark line="3900" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.h" >
-     <mark line="62" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/structs.h" >
-     <mark line="1754" />
-     <mark line="1506" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
+     <mark line="1227" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
      <mark line="3875" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
-     <mark line="1227" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/genmob.c" >
-     <mark line="85" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/structs.h" >
+     <mark line="1754" />
+     <mark line="1506" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
      <mark line="2892" />
@@ -98,17 +80,23 @@
      <mark line="842" />
      <mark line="1200" />
     </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/genmob.c" >
+     <mark line="85" />
+    </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.cpp" >
      <mark line="895" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/dg_olc.c" >
      <mark line="410" />
     </bookmark>
+    <bookmark url="/home/vmplanet/mud/6000/gamesrc/db.h" >
+     <mark line="492" />
+    </bookmark>
    </bookmarks>
   </kdevbookmarks>
   <kdevvalgrind>
    <executable path="" params="" />
-   <valgrind path="valgrind" params="--tool=memcheck --tool=memcheck --tool=memcheck --leak-check=yes" />
+   <valgrind path="valgrind" params=" --tool=memcheck --leak-check=yes" />
    <calltree path="calltree" params="" />
    <kcachegrind path="kcachegrind" />
   </kdevvalgrind>

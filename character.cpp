@@ -741,7 +741,7 @@ char * mob_name_by_vnum(mob_vnum &v) {
     if (MobProtoExists(v))
         return GetMobProto(v)->player.short_descr;
 
-    return "";
+    return (char *)"";
 }
 void Character::remove_all_affects() {
     while (affected)

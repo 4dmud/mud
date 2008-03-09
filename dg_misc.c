@@ -150,11 +150,11 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
         caster_room->people = caster;
         caster->in_room = real_room(caster_room->number);
         */
-        call_magic(caster, tch, tobj,"", spellnum, DG_SPELL_LEVEL, CAST_SPELL);
+        call_magic(caster, tch, tobj,(char *)"", spellnum, DG_SPELL_LEVEL, CAST_SPELL);
         caster->free_non_proto_strings();
         extract_char(caster);
     } else
-        call_magic(caster, tch, tobj,"", spellnum, GET_LEVEL(caster), CAST_SPELL);
+        call_magic(caster, tch, tobj,(char *)"", spellnum, GET_LEVEL(caster), CAST_SPELL);
 }
 
 
@@ -182,8 +182,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
     half_chop(cmd, value_p, duration_p);
 
     /* make sure all parameters are present */
-    if (!charname || !*charname || !property || !*property ||
-            !value_p || !*value_p || !duration_p || !*duration_p) {
+    if ( !*charname || !*property || !*value_p || !*duration_p) {
         script_log("Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>",
                    GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
         return;
@@ -300,7 +299,7 @@ void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
     half_chop(cmd, name, cmd);
 
     /* make sure all parameters are present */
-    if (!addrem || !*addrem || !dest || !*dest || !name || !*name) {
+    if ( !*addrem || !*dest || !*name) {
         script_log("Trigger: %s, VNum %d. dg_dest (add/remove) <room vnum/ALL> <target>",
                    GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
         return;

@@ -127,10 +127,9 @@ map<mob_vnum, Character *> mob_proto;  /* prototypes for mobs           */
 
 //struct obj_data *object_list = NULL;    /* global linked list of objs    */
 
-extern map<long, obj_data *> obj_lookup_table;
 map <obj_vnum,obj_rnum> obj_vTor;
-map<long, obj_data *>  object_list;
-map<long, obj_data *>  dead_obj;  /* delayed obj removal   */
+obj_list_type  object_list;
+obj_list_type  dead_obj;  /* delayed obj removal   */
 struct index_data *obj_index; /* index table for object file   */
 struct obj_data *obj_proto;   /* prototypes for objs           */
 obj_rnum top_of_objt = 0;     /* top of object index table     */
@@ -756,7 +755,7 @@ void free_objects() {
     if (object_list.empty())
         return;
     /** Find all items that need extracting **/
-    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+    for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++)
         ex_list.push_back(GET_ID((ob->second)));
     /** extract them now **/
     for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++) {
@@ -772,7 +771,7 @@ void free_pending_objects() {
     vector<long> ex_list;
     if (dead_obj.empty())
         return;
-    for (obj_list_type::iterator o = dead_obj.begin();o != dead_obj.end();o++)
+    for (olt_it o = dead_obj.begin();o != dead_obj.end();o++)
         ex_list.push_back(GET_ID((o->second)));
     for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++) {
         if (dead_obj.find(*v) != dead_obj.end())
@@ -3547,7 +3546,7 @@ struct obj_data *read_object(obj_vnum nr, int type) {                   /* and o
     return (obj);
 }
 
-bool ZonePurgeObject(obj_list_type::iterator ob, int zone) {
+bool ZonePurgeObject(olt_it ob, int zone) {
     obj_data *obj = ob->second;
     if (!(obj))
         return false;
@@ -3573,12 +3572,14 @@ int purge_zone(int zone) {
     }
 
     /** Find all items that need extracting **/
-    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+    for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++)
         if (ZonePurgeObject(ob, zone))
             ex_list.push_back(GET_ID((ob->second)));
     /** extract them now **/
-    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++)
+    for (vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++) {
+if (object_list.find(*v) != object_list.end())
         extract_obj(object_list[(*v)]);
+}
 
     return 0;
 }
@@ -3778,7 +3779,7 @@ typedef  pair<room_vnum, long>     obj_rid;
 typedef  pair<obj_rit, obj_rit>    oir_range;
 
 obj_data *put_in_to(room_vnum rvn, obj_vnum ovn, objs_in_room &mm) {
-    obj_list_type::iterator olit;
+    olt_it olit;
     oir_range oirr = mm.equal_range(rvn);
 
     for (obj_rit it = oirr.first;it!=oirr.second;it++) {
@@ -4983,7 +4984,7 @@ void char_to_store(Character *ch) {
     snprintf(outname, sizeof(outname), "%s/%c/%s%s", PLR_PREFIX, *bits, bits, PLR_SUFFIX);
 
     snprintf(tempname, sizeof(tempname), "%s%s", outname, ".tmp");
-    if (!tempname)
+    if (!*tempname)
         return;
     else if (!(fl = fopen(tempname, "w"))) {
         new_mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open temp player file %s for write",
@@ -7052,7 +7053,7 @@ void load_config( void ) {
             else if (!strcmp(tag, "dflt_dir")) {
                 if (CONFIG_DFLT_DIR)
                     free(CONFIG_DFLT_DIR);
-                if (line && *line)
+                if (*line)
                     CONFIG_DFLT_DIR = strdup(line);
                 else
                     CONFIG_DFLT_DIR = strdup(DFLT_DIR);
@@ -7064,7 +7065,7 @@ void load_config( void ) {
 	    } else if (!strcmp(tag, "dflt_ip")) {
                 if (CONFIG_DFLT_IP)
                     free(CONFIG_DFLT_IP);
-                if (line && *line)
+                if (*line)
                     CONFIG_DFLT_IP = strdup(line);
                 else
                     CONFIG_DFLT_IP = NULL;
@@ -7110,7 +7111,7 @@ void load_config( void ) {
             else if (!strcmp(tag, "logname")) {
                 if (CONFIG_LOGNAME)
                     free(CONFIG_LOGNAME);
-                if (line && *line)
+                if (*line)
                     CONFIG_LOGNAME = strdup(line);
                 else
                     CONFIG_LOGNAME = NULL;

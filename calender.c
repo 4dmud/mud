@@ -47,7 +47,7 @@ int days_in_month[]={0,31,28,31,30,31,30,31,31,30,31,30,31};
 char * event_day ( int day, int month, int year )
 {
 	/** check through a database of dates for events. - mord **/
-	return "";
+	return (char *)"";
 }
 
 ACMD ( do_calender )
@@ -93,7 +93,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 
 	/* dont forget - arrays start
 	   at zero               */
-	char *days[]=
+	const char *days[]=
 	{
 		" ",
 		"Mon",
@@ -105,7 +105,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 		"Sun"
 	};
 
-	char *months[]=
+	const char *months[]=
 	{
 		" ",
 		"January",
@@ -139,7 +139,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 		}
 	}
 	/* O/P Title bar.        */
-	ch->Send ( "\r\n%s %d\r\n",months[month], year );
+	*ch << "\r\n" << months[month] << " " << year << "\r\n";
 	/* O/P the calender      */
 	for ( j=1; j<=DAYS_IN_A_WEEK; j++ )
 	{

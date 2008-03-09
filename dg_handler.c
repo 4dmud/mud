@@ -215,7 +215,7 @@ char *sub_percent(Character *ch, char *sub) {
 
     subnum = sub_number(sub);
     if (subnum <= 0)
-        return ("unknown subskill");
+        return (char *)"unknown subskill";
 
     snprintf(retval, sizeof(retval), "%d", GET_SUB(ch, subnum));
     return retval;
@@ -227,10 +227,10 @@ char *skill_percent(Character *ch, char *skill) {
 
     skillnum = find_skill_num(skill);
     if (skillnum <= 0)
-        return ("unknown skill");
+        return ((char *)"unknown skill");
 
     if (!knows_spell(ch, skillnum))
-        return "0";
+        return (char *)"0";
 
 
     snprintf(retval, sizeof(retval), "%d", total_chance(ch, skillnum));

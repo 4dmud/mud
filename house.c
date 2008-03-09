@@ -1040,7 +1040,7 @@ void hcontrol_expand_house(Character *ch, char *argument)
   }
   argument = two_arguments(argument, arg1, arg2);
   
-  if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
+  if ( !*arg1  || !*arg2 || !is_number(arg1))
   {
   ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 200 sized units>\r\n"
                    "To remove expantions:\r\nhcontrol expand <house vnum> <-num of 200 sized units>\r\n");
@@ -1100,7 +1100,7 @@ void hcontrol_set_stable(Character *ch, char *argument)
   }
   argument = two_arguments(argument, arg1, arg2);
 
-  if (!arg1 || !*arg1  || !arg2 || !*arg2 || !is_number(arg1))
+  if ( !*arg1  || !*arg2 || !is_number(arg1))
   {
     ch->Send( "To add a stable: \r\nhcontrol stable <house vnum> add\r\n"
                      "To remove the stable:\r\nhcontrol stable <house vnum> remove\r\n");

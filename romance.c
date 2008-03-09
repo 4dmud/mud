@@ -1317,19 +1317,19 @@ char * romance_status(Character *ch)
   switch (ROMANCE(ch))
   {
   case 2:
-    return "Engaged";
+    return (char *)"Engaged";
     break;
   case 3:
-    return "Married";
+    return (char *)"Married";
     break;
   case 1:
-    return "Dating";
+    return (char *)"Dating";
     break;
   case 0:
-    return "Single";
+    return (char *)"Single";
     break;
   default:
-    return "Broken!";
+    return (char *)"Broken!";
     break;
   }
 }
@@ -1360,6 +1360,6 @@ char * baby_status(Character *i, char * buf, size_t len)
   }
   else
   {
-    return "\r\n";
+    return (char *)"\r\n";
   }
 }

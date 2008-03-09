@@ -194,7 +194,7 @@ namespace
             
 
             if (sout.str() == input)
-                return "";
+                return (char *)"";
             else
                 return sout.str();
 

@@ -209,7 +209,7 @@ int find_context_script_edit(Descriptor *d)
   }
 }
 
-char *NO_HELP = "No help available (yet)!\r\n";
+char *NO_HELP = (char *)"No help available (yet)!\r\n";
 #define FIND_HELP_CHAR '*'
 
 int context_help(Descriptor *d, char *arg)

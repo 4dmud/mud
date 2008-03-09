@@ -1358,11 +1358,16 @@ class Descriptor {
 
 
 struct msg_type {
-   char	*attacker_msg;  /* message to attacker */
-   char	*victim_msg;    /* message to victim   */
-   char	*room_msg;      /* message to room     */
+   const char	*attacker_msg;  /* message to attacker */
+   const char	*victim_msg;    /* message to victim   */
+   const char	*room_msg;      /* message to room     */
 };
 
+struct f_msg_type {
+   string attacker_msg;  /* message to attacker */
+   string victim_msg;    /* message to victim   */
+   string room_msg;      /* message to room     */
+};
 
 struct message_type {
    struct msg_type die_msg;	/* messages when death			*/

@@ -80,12 +80,12 @@ void auction_update(void)
   /*
    * Can't be static, the mob may have died. :)
    */
-  mob = get_char_auc(AUC_MOB);
+  mob = get_char_auc((char *)AUC_MOB);
 
   /* Seller with us? */
   if (!check_ch(auction->seller)) {
     if (mob)
-      do_gen_comm(mob, "The seller is no longer with us.", 0, SCMD_AUCTION);
+      do_gen_comm(mob, (char *)"The seller is no longer with us.", 0, SCMD_AUCTION);
     auction_reset();
     return;
   /* Seller's object? */
@@ -95,7 +95,7 @@ void auction_update(void)
   /* Make sure bidder exists */
   } else if (auction->bidder && !check_ch(auction->bidder)) {
     if (mob)
-      do_gen_comm(mob, "The bidder has left, restarting.", 0, SCMD_AUCTION);
+      do_gen_comm(mob, (char *)"The bidder has left, restarting.", 0, SCMD_AUCTION);
     auction->ticks = AUC_BID;
     auction->bidder = NULL;
     return;
@@ -275,7 +275,7 @@ ACMD(do_bid)
 ACMD(do_auction)
 {
   struct obj_data *obj;
-  Character *mob = get_char_auc(AUC_MOB);
+  Character *mob = get_char_auc((char *)AUC_MOB);
   struct auction_data *auc_add;
   char buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
   int i = 0;

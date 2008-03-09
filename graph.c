@@ -223,7 +223,7 @@ void hunt_victim(Character *ch) {
             found = TRUE;
 
     if (!found) {
-        do_say(ch, "Damn! My prey is gone!!", 0, 0);
+        do_say(ch, (char *)"Damn! My prey is gone!!", 0, 0);
         HUNTING(ch) = NULL;
         remove_hunter(ch);
         return;

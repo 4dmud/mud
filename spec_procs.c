@@ -782,13 +782,13 @@ SPECIAL(mayor) {
         break;
 
     case 'O':
-        do_gen_door(ch, "gate", 0, SCMD_UNLOCK);
-        do_gen_door(ch, "gate", 0, SCMD_OPEN);
+        do_gen_door(ch, (char *)"gate", 0, SCMD_UNLOCK);
+        do_gen_door(ch, (char *)"gate", 0, SCMD_OPEN);
         break;
 
     case 'C':
-        do_gen_door(ch, "gate", 0, SCMD_CLOSE);
-        do_gen_door(ch, "gate", 0, SCMD_LOCK);
+        do_gen_door(ch, (char *)"gate", 0, SCMD_CLOSE);
+        do_gen_door(ch, (char *)"gate", 0, SCMD_LOCK);
         break;
 
     case '.':
@@ -1012,16 +1012,16 @@ SPECIAL(puff) {
 
     switch (number(0, 60)) {
     case 0:
-        do_say(ch, "My god!  Its full of stars!", 0, 0);
+        do_say(ch, (char *)"My god!  Its full of stars!", 0, 0);
         return (1);
     case 1:
-        do_say(ch, "Howd all those fish get up here?", 0, 0);
+        do_say(ch, (char *)"Howd all those fish get up here?", 0, 0);
         return (1);
     case 2:
-        do_say(ch, "Im a very female dragon.", 0, 0);
+        do_say(ch, (char *)"Im a very female dragon.", 0, 0);
         return (1);
     case 3:
-        do_say(ch, "Ive got a peaceful, easy feeling.", 0, 0);
+        do_say(ch, (char *)"Ive got a peaceful, easy feeling.", 0, 0);
         return (1);
     default:
         return (0);
@@ -1507,17 +1507,17 @@ SPECIAL(guard_white) {
 
     max_evil = 300;
     ech = NULL;
-    crime = "";
+    crime = (char *)"";
 
     for (victim = IN_ROOM(ch)->people; victim != NULL;
             victim = victim->next_in_room) {
         if (!IS_NPC(victim) && PLR_FLAGGED(victim, PLR_KILLER)) {
-            crime = "KILLER";
+            crime = (char *)"KILLER";
             break;
         }
 
         if (!IS_NPC(victim) && PLR_FLAGGED(victim, PLR_THIEF)) {
-            crime = "THIEF";
+            crime = (char *)"THIEF";
             break;
         }
 
@@ -1559,17 +1559,17 @@ SPECIAL(guard_black) {
 
     max_good = -300;
     ech = NULL;
-    crime = "";
+    crime = (char *)"";
 
     for (victim = IN_ROOM(ch)->people; victim != NULL;
             victim = victim->next_in_room) {
         if (!IS_NPC(victim) && PLR_FLAGGED(victim, PLR_KILLER)) {
-            crime = "KILLER";
+            crime = (char *)"KILLER";
             break;
         }
 
         if (!IS_NPC(victim) && PLR_FLAGGED(victim, PLR_THIEF)) {
-            crime = "THIEF";
+            crime = (char *)"THIEF";
             break;
         }
 

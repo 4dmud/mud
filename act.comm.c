@@ -193,7 +193,7 @@ extern int holler_move_cost;
 
 /* extern functions */
 extern struct time_info_data time_info;
-void ReplaceString ( char * string, char * search, char * replace , size_t len);
+void ReplaceString ( char * str, const char *search, const char *replace , size_t len);
 
 /* local functions */
 void perform_tell(Character *ch, Character *vict, char *arg);
@@ -219,16 +219,16 @@ ACMD(do_qcomm);
 struct drunk_struct {
     int min_drunk_level;
     int number_of_rep;
-    char *replacement[11];
+    const char * replacement[11];
 };
 
-char *makedrunk(char *string, Character *ch);
+char *makedrunk(char *str, Character *ch);
 
 /* How to make a string look drunk... by Apex (robink@htsa.hva.nl) */
 /* Modified and enhanced for envy(2) by the Maniac from Mythran    */
 /* Ported to Stock Circle 3.0 by Haddixx (haddixx@megamed.com)     */
 
-char *makedrunk(char *string, Character *ch) {
+char *makedrunk(char *str, Character *ch) {
 
     /* This structure defines all changes for a character */
     static struct drunk_struct drunk[] = {
@@ -298,7 +298,7 @@ char *makedrunk(char *string, Character *ch) {
 
     if (GET_COND(ch, DRUNK) > 0) {	/* character is drunk */
         do {
-            temp = toupper(*string);
+            temp = toupper(*str);
             if ((temp >= 'A') && (temp <= 'Z')) {
                 if (GET_COND(ch, DRUNK) >
                         drunk[(temp - 'A')].min_drunk_level) {
@@ -309,21 +309,21 @@ char *makedrunk(char *string, Character *ch) {
                     pos +=
                         strlen(drunk[(temp - 'A')].replacement[randomnum]);
                 } else
-                    buf[pos++] = *string;
+                    buf[pos++] = *str;
             } else {
                 if ((temp >= '0') && (temp <= '9')) {
                     temp = '0' + number(0, 9);
                     buf[pos++] = temp;
                 } else
-                    buf[pos++] = *string;
+                    buf[pos++] = *str;
             }
-        } while (*string++);
+        } while (*str++);
 
         buf[pos] = '\0';	/* Mark end of the string... */
-        strcpy(string, buf);
-        return (string);
+        strcpy(str, buf);
+        return (str);
     }
-    return (string);		/* character is not drunk, just return the string */
+    return (str);		/* character is not drunk, just return the string */
 }
 
 
@@ -1092,7 +1092,7 @@ ACMD(do_gen_comm) {
     char colour_on[24];
     char buf[MAX_INPUT_LENGTH];
     char buf1[MAX_INPUT_LENGTH];
-    Character *auctioneer = get_char_auc(AUC_MOB);
+    Character *auctioneer = get_char_auc((char *)AUC_MOB);
 
     /* Array of flags which must _not_ be set in order for comm to be heard */
     int channels[] = {
@@ -1450,12 +1450,12 @@ ACMD(do_ctell) {
         *ch << CONFIG_OK;
     else
         if (GET_LEVEL(ch)<LVL_HERO || c==find_clan_by_id(GET_CLAN(ch))) {
-            if (level_string)
+            if (*level_string)
                 *ch << "You tell your clan"<< level_string << ", '" << argument << "'\r\n";
             else
                 *ch << "You tell your clan, '" << argument << "'\r\n";
         } else {
-            if (level_string)
+            if (*level_string)
                 *ch << "You tell the " << clan[c].name << level_string << ", '" << argument << "'\r\n";
             else
                 *ch << "You tell the " <<  clan[c].name << ", '" <<  argument << "'\r\n";

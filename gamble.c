@@ -28,7 +28,7 @@
 void play_slots(Character *ch)
 {
     int num1, num2, num3, win = 0;
-    char *slot_msg[] = {
+    const char *slot_msg[] = {
 	"*YOU SHOULDN'T SEE THIS*",
 	"a mithril bar",	/* 1 */
 	"a golden dragon",

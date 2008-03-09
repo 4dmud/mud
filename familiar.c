@@ -121,7 +121,7 @@ void parse_caster_commands(Character *ch) {
     if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
         if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
             make_manifest(ch, GET_EQ(ch, WEAR_WIELD));
-            do_wear(ch, "orb", 0, 0);
+            do_wear(ch, (char *)"orb", 0, 0);
         }
     }
     vict = parse_aggressive(ch);
@@ -346,7 +346,7 @@ void parse_fighter_commands(Character *ch) {
     if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
         if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
             make_manifest(ch, GET_EQ(ch, WEAR_WIELD));
-            do_wear(ch, "orb", 0, 0);
+            do_wear(ch, ( char *)"orb", 0, 0);
         }
     }
 
@@ -495,7 +495,7 @@ void parse_animal_commands(Character *ch) {
     if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
         if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
             make_manifest(ch, GET_EQ(ch, WEAR_WIELD));
-            do_wear(ch, "orb", 0, 0);
+            do_wear(ch, (char *)"orb", 0, 0);
         }
     }
 
@@ -643,7 +643,7 @@ void parse_undead_commands(Character *ch) {
     if (!GET_EQ(ch, WEAR_FOCUS) && GET_EQ(ch, WEAR_WIELD)) {
         if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
             make_manifest(ch, GET_EQ(ch, WEAR_WIELD));
-            do_wear(ch, "orb", 0, 0);
+            do_wear(ch, (char *)"orb", 0, 0);
         }
     }
 

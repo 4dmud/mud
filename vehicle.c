@@ -36,7 +36,7 @@ struct obj_data *find_vehicle(int roomNum);
 
 typedef struct {
     int dirNum;
-    char *dirCmd;
+    const char *dirCmd;
 }
 dirParseStruct;
 
@@ -49,7 +49,7 @@ dirParseStruct;
 
 struct obj_data *find_vehicle_by_vnum(int vnum) {
     struct obj_data *i;
-    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+    for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
         i = ob->second;
         if (GET_OBJ_TYPE(i) == ITEM_VEHICLE)
             if (GET_OBJ_VNUM(i) == vnum)
@@ -298,7 +298,7 @@ SPECIAL(vehicle) {
             act("$n climbs into $o.", TRUE, ch, obj, 0, TO_ROOM);
             move_char_to(ch, real_room(GET_OBJ_VAL(obj, 0)));
             act("$n climbs in.", TRUE, ch, 0, 0, TO_ROOM);
-            do_look(ch, "", 0, 0);
+            do_look(ch, (char *)"", 0, 0);
             return (1);
         }
         return 0;
@@ -337,7 +337,7 @@ SPECIAL(vehicle_hatch) {
         act("$n climbs out of $o.", TRUE, ch, v, 0, TO_ROOM);
 
         /* Now show them the room */
-        do_look(ch, "", 0, 0);
+        do_look(ch, (char *)"", 0, 0);
 
         return (1);
     }

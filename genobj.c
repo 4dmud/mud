@@ -59,7 +59,7 @@ int update_objects(struct obj_data *refobj)
   struct obj_data *obj, swap;
   int count = 0;
 
-  for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+  for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
 	  obj = (ob->second);
     if (obj->item_number != refobj->item_number)
       continue;
@@ -105,7 +105,7 @@ obj_rnum adjust_objects(obj_rnum refpt)
   /*
    * Renumber live objects.
    */
-  for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++)
+  for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++)
 	  GET_OBJ_RNUM((ob->second)) += (GET_OBJ_RNUM((ob->second)) >= refpt);
 
   /*

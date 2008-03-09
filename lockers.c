@@ -243,7 +243,7 @@ ACMD(do_locker)
 
   argument = two_arguments(argument, arg, arg1);
 
-  if (!arg || !*arg)
+  if (!*arg)
   {
     ch->Send(
                      "{cCLocker commands: - cost: %d items per bronze per 4 weeks{cy\r\n"
@@ -280,7 +280,7 @@ ACMD(do_locker)
       ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
-    if (!arg1 || !*arg1)
+    if ( !*arg1)
     {
       ch->Send( "locker put what?\r\n");
       return;
@@ -302,7 +302,7 @@ ACMD(do_locker)
       ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
-    if (!arg1 || !*arg1)
+    if ( !*arg1)
     {
       ch->Send( "locker get, what num?\r\n");
       return;
@@ -321,7 +321,7 @@ ACMD(do_locker)
       ch->Send( "You need to be at a locker to do that.\r\n");
       return;
     }
-    if (!arg1 || !*arg1 || !argument || !*argument)
+    if ( !*arg1 || !argument || !*argument)
     {
       ch->Send( "locker rent how big, how long?\r\n");
       return;

@@ -256,23 +256,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data * trig,
     const char *name;
     int num, count;
 
-    char *send_cmd[] = { "msend ", "osend ", "wsend " };
-    char *echo_cmd[] = { "mecho ", "oecho ", "wecho " };
-    char *echoaround_cmd[] = { "mechoaround ", "oechoaround ", "wechoaround " };
-    char *door[] = { "mdoor ", "odoor ", "wdoor " };
-    char *force[] = { "mforce ", "oforce ", "wforce " };
-    char *load[] = { "mload ", "oload ", "wload " };
-    char *purge[] = { "mpurge ", "opurge ", "wpurge " };
-    char *teleport[] = { "mteleport ", "oteleport ", "wteleport " };
-    char *xdamage[] = { "mdamage ", "odamage ", "wdamage " };
+    const char *send_cmd[] = { "msend ", "osend ", "wsend " };
+    const char *echo_cmd[] = { "mecho ", "oecho ", "wecho " };
+    const char *echoaround_cmd[] = { "mechoaround ", "oechoaround ", "wechoaround " };
+    const char *door[] = { "mdoor ", "odoor ", "wdoor " };
+    const char *force[] = { "mforce ", "oforce ", "wforce " };
+    const char *load[] = { "mload ", "oload ", "wload " };
+    const char *purge[] = { "mpurge ", "opurge ", "wpurge " };
+    const char *teleport[] = { "mteleport ", "oteleport ", "wteleport " };
+    const char *xdamage[] = { "mdamage ", "odamage ", "wdamage " };
     /* the x kills a 'shadow' warning in gcc. */
-    char *zecho_cmd[] = { "mzecho ", "ozecho ", "wzecho " };
-    char *zrecho_cmd[] = { "mzrecho ", "ozrecho ", "wzrecho " };
-    char *asound[] = { "masound ", "oasound ", "wasound " };
-    char *at[] = { "mat ", "oat ", "wat " };
+    const char *zecho_cmd[] = { "mzecho ", "ozecho ", "wzecho " };
+    const char *zrecho_cmd[] = { "mzrecho ", "ozrecho ", "wzrecho " };
+    const char *asound[] = { "masound ", "oasound ", "wasound " };
+    const char *at[] = { "mat ", "oat ", "wat " };
     /* there is no such thing as wtransform, thus the wecho below  */
-    char *transform[]      = {"mtransform ",  "otransform ",  "wecho"       };
-    char *lag[]      = {"mlag ",  "olag ",  "wlag"       };
+    const char *transform[]      = {"mtransform ",  "otransform ",  "wecho"       };
+    const char *lag[]      = {"mlag ",  "olag ",  "wlag"       };
 
 
     /* X.global() will have a NULL trig */
@@ -2081,7 +2081,7 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig,
                         if (*repl_str) {
                             snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
                             process_eval(go, sc, trig, type, tmp2);
-                            var = "tmpvr";
+                            var = (char *)"tmpvr";
                             field = p;
                             dots = 0;
                             continue;

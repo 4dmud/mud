@@ -1092,7 +1092,7 @@ ACMD(do_cast) {
         a = one_argument(t, arg);
         skip_spaces(&t);
         skip_spaces(&a);
-        if (arg && *arg)
+        if (*arg)
             dir = search_block(arg, dirs, FALSE);
     }
     //ch->Send( "a is %s, dir is %s, t is %s\r\n", a, dirs[dir], t);

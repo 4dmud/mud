@@ -137,7 +137,7 @@ int is_ok_char(Character *keeper, Character *ch, int shop_nr)
 
   if (!(CAN_SEE(keeper, ch)))
   {
-    do_say(keeper, MSG_NO_SEE_CHAR, cmd_say, 0);
+    do_say(keeper, (char *)MSG_NO_SEE_CHAR, cmd_say, 0);
     return (FALSE);
   }
   if (IS_GOD(ch))
@@ -145,13 +145,13 @@ int is_ok_char(Character *keeper, Character *ch, int shop_nr)
 
   if (PLR_FLAGGED(ch, PLR_KILLER))
   {
-    do_say(keeper, MSG_NO_SELL_KILLER, cmd_say, 0);
+    do_say(keeper, (char *)MSG_NO_SELL_KILLER, cmd_say, 0);
     return (FALSE);
   }
 
   if (PLR_FLAGGED(ch, PLR_THIEF))
   {
-    do_say(keeper, MSG_NO_SELL_THIEF, cmd_say, 0);
+    do_say(keeper, (char *)MSG_NO_SELL_THIEF, cmd_say, 0);
     return (FALSE);
   }
 

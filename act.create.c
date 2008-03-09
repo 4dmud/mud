@@ -353,7 +353,7 @@ ASKILL(skill_brew)
     return 0;
   }
 
-  if (!spell_name || !*spell_name)
+  if (!*spell_name)
   {
     ch->Send("Spell names must be enclosed in single quotes!\r\n");
     return 0;
@@ -531,7 +531,7 @@ ASKILL(skill_scribe)
     return 0;
   }
 
-  if (!spell_name || !*spell_name)
+  if (!*spell_name)
   {
     ch->Send("Spell names must be enclosed in single quotes!\r\n");
     return 0;
@@ -771,7 +771,7 @@ ASKILL(skill_sing_wood)
   type = SKILL_SING_WOOD;
 
   /* sanity check */
-  if (!tree_name)
+  if (!*tree_name)
   {
     ch->Send( "What do you wish to sing to?\r\n");
     return 0;
@@ -826,7 +826,7 @@ ASKILL(skill_sing_wood)
 
   GET_MSG_RUN(ch) = 1;
 
-  msg = new message_event_obj(ch, SKILL_SING_WOOD, THING_SKILL, 11, GET_ID(o), "");
+  msg = new message_event_obj(ch, SKILL_SING_WOOD, THING_SKILL, 11, GET_ID(o), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
   return SKILL_SING_WOOD;
 
@@ -880,7 +880,7 @@ ASKILL(skill_manifest)
     return 0;
   }
   GET_MSG_RUN(ch) = 1;
-  msg = new message_event_obj(ch, SKILL_MANIFEST, THING_SKILL, 8, GET_ID(obj), "");
+  msg = new message_event_obj(ch, SKILL_MANIFEST, THING_SKILL, 8, GET_ID(obj), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE);
   return SKILL_MANIFEST;
 }
@@ -1099,7 +1099,7 @@ ACMD(do_fell)
   temp1 = one_argument(argument, tree_name);
 
   /* sanity check */
-  if (!tree_name)
+  if (!*tree_name)
   {
     ch->Send( "What do you wish to fell?\r\n");
     return;
@@ -1137,7 +1137,7 @@ ACMD(do_fell)
   ch->Send( "You flex your muscles and swing your axe.\r\n");
   GET_MSG_RUN(ch) = 1;
 
-  msg= new message_event_obj(ch, SUB_LUMBERJACK, THING_SUB, 12, GET_ID(o), "");
+  msg= new message_event_obj(ch, SUB_LUMBERJACK, THING_SUB, 12, GET_ID(o), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
 
 
@@ -1153,7 +1153,7 @@ ASKILL(skill_manipulate)
 
   one_argument(argument, arg);
   /* sanity check */
-  if (!arg)
+  if (!*arg)
   {
     ch->Send( "What do you wish to manipulate?\r\n");
     return 0;

@@ -180,13 +180,13 @@ int damage(Character *ch, Character *victim, int dam,
       snprintf(local_buf, sizeof(local_buf), "%lld", local_gold);
 
       if (PRF_FLAGGED(ch, PRF_AUTOGOLD) && local_gold > 0)
-        do_get(ch, "coin corpse", 0, 0);
+        do_get(ch, (char *)"coin corpse", 0, 0);
 
       if (PRF_FLAGGED(ch, PRF_AUTOLOOT))
-        do_get(ch, "all corpse", 0, 0);
+        do_get(ch, (char *)"all corpse", 0, 0);
 
       if (PRF_FLAGGED(ch, PRF_AUTOSAC))
-        do_sac(ch, "corpse", 0, 0);
+        do_sac(ch, (char *)"corpse", 0, 0);
 
       if (IS_AFFECTED(ch, AFF_GROUP) && local_gold > 0 &&
           PRF_FLAGGED(ch, PRF_AUTOSPLIT) &&

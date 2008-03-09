@@ -221,7 +221,7 @@ void do_clan_recall(Character *ch, char *arg) {
         return;
     }
     two_arguments(arg, arg1, arg2);
-    if (!arg2 && !*arg2 && (clan_num = find_clan(arg2)) < 0) {
+    if (!*arg2 && !*arg2 && (clan_num = find_clan(arg2)) < 0) {
         send_to_char("Unknown clan.\r\n", ch);
         return;
     }
@@ -270,7 +270,7 @@ void do_clan_board(Character *ch, char *arg) {
         return;
     }
     two_arguments(arg, arg1, arg2);
-    if (arg2 && *arg2) {
+    if (*arg2) {
         if ((clan_num = find_clan(arg2)) < 0) {
             send_to_char("Unknown clan.\r\n", ch);
             return;
@@ -878,7 +878,7 @@ sh_int find_clan_by_id(int idnum) {
 
 char *clan_name(int idnum) {
     if (idnum > num_of_clans || idnum < 0)
-        return "none";
+        return (char *)"none";
 
     return clan[idnum].name;
 }

@@ -131,7 +131,7 @@ const char *compIn(int i) {
         return "Wield";
         break;
     }
-    return "";
+    return (char *)"";
 }
 
 void assemblyListToChar( Character *pCharacter ) {

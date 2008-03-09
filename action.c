@@ -774,7 +774,7 @@ ASUB(sub_juggle)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)), (vict != NULL ? GET_ID(vict) : NOBODY), "");
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)), (vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
 
 
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
@@ -1145,7 +1145,7 @@ ASUB(sub_throttle)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_THROTTLE, STATUS_ON);
 
-  msg = new message_event_obj(ch, SUB_THROTTLE, THING_SUB, 18, GET_ID(vict), "");
+  msg = new message_event_obj(ch, SUB_THROTTLE, THING_SUB, 18, GET_ID(vict), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_THROTTLE;
@@ -1273,7 +1273,7 @@ ACMD(do_struggle)
     affect_from_char(ch, SKILL_STRANGLE);
     ch->Send("You struggle free!!\r\n");
     act("$n struggles free of these mortal coils!!", FALSE, ch, 0, 0, TO_ROOM);
-    do_flee(ch, "", 0, 0);
+    do_flee(ch, (char *)"", 0, 0);
 
     return;
   }
@@ -1330,7 +1330,7 @@ ASUB(sub_tumble)
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;
@@ -1381,11 +1381,11 @@ ASUB(sub_clown)
     act("$n starts to juggle a few coloured balls to you.", FALSE, ch, 0, vict, TO_VICT);
   }
   else
-    act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
+    act((char *)"You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
   GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
-  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), "");
+  msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
   GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
 
   return SUB_JUGGLE;
