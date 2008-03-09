@@ -1736,7 +1736,6 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_EARTH_ELEM;
         pfail = 45 - GET_CHA(ch);
-        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_WATER_ELEMENTAL:
@@ -1745,7 +1744,6 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_WATER_ELEM;
         pfail = 25;
-        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_AIR_ELEMENTAL:
@@ -1754,7 +1752,6 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_AIR_ELEM;
         pfail = 25;
-        num += GET_CHA(ch)/60;
         break;
 
     case SPELL_FIRE_ELEMENTAL:
@@ -1763,7 +1760,6 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         fmsg = number(2, 6); /* Random fail message. */
         mob_num = MOB_FIRE_ELEM;
         pfail = 25;
-        num += GET_CHA(ch)/60;
         break;
 
     default:
