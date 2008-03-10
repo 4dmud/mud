@@ -362,7 +362,7 @@ char *replace_string(const char *str, const char *weapon_singular,
 void perform_violence(void);
 void improve_skill(Character *ch, int skill);
 int compute_armor_class(Character *ch);
-void send_not_to_spam(char *buf, Character *ch,
+void send_not_to_spam(const char *buf, Character *ch,
                       Character *victim, struct obj_data *weap,
                       int spam);
 
@@ -2661,16 +2661,16 @@ int fe_after_damage(Character* ch, Character* vict,
             gold_int gld = ch->Gold( 0, GOLD_HAND);
 
             if (PRF_FLAGGED(ch, PRF_AUTOGOLD) && local_gold > 0)
-                do_get(ch, "coin corpse", 0, 0);
+                do_get(ch, (char *)"coin corpse", 0, 0);
 
             if (bonus_gold)
                 ch->Send( "{cbYou pillage the corpse and find an extra %d coins!{c0\r\n",  bonus_gold);
 
             if (PRF_FLAGGED(ch, PRF_AUTOLOOT))
-                do_get(ch, "all corpse", 0, 0);
+                do_get(ch, (char *)"all corpse", 0, 0);
 
             if (PRF_FLAGGED(ch, PRF_AUTOSAC))
-                do_sac(ch, "corpse", 0, 0);
+                do_sac(ch, (char *)"corpse", 0, 0);
 
             if (IS_AFFECTED(ch, AFF_GROUP) && (ch->master || ch->followers) && local_gold > 0 &&
                     PRF_FLAGGED(ch, PRF_AUTOSPLIT) &&
@@ -2926,7 +2926,7 @@ int evade_hit_check(Character *ch, Character *vict, int w_type) {
 }
 
 
-void send_not_to_spam(char *buf, Character *ch,
+void send_not_to_spam(const char *buf, Character *ch,
                       Character *victim, struct obj_data *weap,
                       int spam) {
     Character *people;
@@ -3831,7 +3831,7 @@ char *fight_type_message(char *str, Character *attacker, Character *victim, int 
      
     } ;*/
 
-    static char * magic_msg_default[] =
+    static const char * magic_msg_default[] =
         {
             "concentrated #W of energy",
             "multiple #W of energy",
@@ -3840,7 +3840,7 @@ char *fight_type_message(char *str, Character *attacker, Character *victim, int 
 
         } ;
 
-    static char * undead_msg_default[] =
+    static const char * undead_msg_default[] =
         {
             "unholy shreaks",
             "clawing hands",
@@ -3851,7 +3851,7 @@ char *fight_type_message(char *str, Character *attacker, Character *victim, int 
 
         } ;
 
-    static char * animal_msg_default[] =
+    static const char * animal_msg_default[] =
         {
             "snapping teeth",
             "frantic headbutt",
@@ -3860,13 +3860,13 @@ char *fight_type_message(char *str, Character *attacker, Character *victim, int 
 
         };
 
-    static char *mount_melee_melee[] =
+    static const char *mount_melee_melee[] =
         {
             "supercharged combo trample attack",
             "combined crushing weight",
             "sneaky double crossover"
         };
-    static char *mount_magic_melee[] =
+    static const char *mount_magic_melee[] =
         {
             "daze of flashing blades and fireworks",
             "trample of dark magic and death",
@@ -4198,9 +4198,9 @@ void dam_message(int dam, Character *ch, Character *victim,
 
 
     static  struct dam_size_data {
-        char * sing;
-        char * plu;
-        char * other;
+        const char * sing;
+        const char * plu;
+        const char * other;
     }
     dam_size[] = {
                      {"miss", "misses", ""},//0
@@ -5197,7 +5197,7 @@ void mob_reaction(Character *ch, Character *vict, int dir) {
 
             /* can't remember so try to run away */
         } else {
-            do_flee(vict, "", 0, 0);
+            do_flee(vict, (char *)"", 0, 0);
         }
     }
 }

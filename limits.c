@@ -41,7 +41,7 @@ char *title_male ( int chclass, int level );
 char *title_female ( int chclass, int level );
 int has_space_suit ( Character *ch );
 int can_breathe_underwater ( Character *ch );
-void send_not_to_spam ( string buf, Character *ch, Character *victim, struct obj_data *weap, int spam );
+
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
 /* When age in 30..44 calculate the line between p2 & p3 */

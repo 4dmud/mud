@@ -66,7 +66,7 @@ ACMD(do_rescue);
 ACMD(do_kick);
 ACMD(do_slay);
 ACMD(do_trample);
-void send_not_to_spam(char *buf, Character *ch,
+void send_not_to_spam(const char *buf, Character *ch,
                       Character *victim, struct obj_data *weap,
                       int spam);
 void perform_assist(Character *ch, Character *helpee);

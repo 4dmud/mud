@@ -45,7 +45,6 @@ void spello(int spl, const char *name, int max_mana, int min_mana,
 int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 void skill_attack(Character *ch, Character *vict, int skill, int pass);
 ACMD(do_gen_door);
-void send_not_to_spam(string buf, Character *ch, Character *victim, struct obj_data *weap, int spam);
 void check_killer(Character *ch, Character *vict);
 int has_class(Character *ch, int chclass);
 int tier_level(Character *ch, int chclass);

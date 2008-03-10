@@ -2016,7 +2016,7 @@ void load_host_list(void) {
     }
     expire_date = time(0) - (SECS_PER_REAL_DAY * 3);
     get_line(fl, line);
-    while (line && *line && *line != '~') {
+    while (*line && *line != '~') {
         if (*line != '\n') {
             if ((retval = sscanf(line, "%s %s %ld", host_ip, host, &date)) != 3) {
                 log("Host list error: %s", line);

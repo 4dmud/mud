@@ -34,7 +34,7 @@ void spello(int spl, const char *name, int max_mana, int min_mana,
             int routines, int wait, const char *message, int pulse);
 int find_first_step(room_rnum src, room_rnum target);
 ACMD(do_gen_door);
-void send_not_to_spam(char *buf, Character *ch,
+void send_not_to_spam(const char *buf, Character *ch,
                       Character *victim, struct obj_data *weap,
                       int spam);
 void check_killer(Character *ch, Character *vict);
