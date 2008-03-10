@@ -1209,6 +1209,9 @@ break;
                     case 6:
                         snprintf(str, slen, "%s", "lolthite");
                         break;
+		    case 7:
+			snprintf(str, slen, "%s", "cthulytes");
+			break;
                     default:
                         *str = '\0';
                         break;

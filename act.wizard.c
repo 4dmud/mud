@@ -5051,6 +5051,8 @@ int perform_set(Character *ch, Character *vict, int mode,
             i = 5;
         else if (isname(val_arg, "Lolthite"))
             i = 6;
+	else if (isname(val_arg, "Cthulytes"))
+	    i = 7;
         else if (!strcmp(val_arg, "none"))
             i = 0;
         GET_RP_GROUP(vict) = i;
