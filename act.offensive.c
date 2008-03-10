@@ -66,7 +66,9 @@ ACMD(do_rescue);
 ACMD(do_kick);
 ACMD(do_slay);
 ACMD(do_trample);
-void send_not_to_spam(string buf, Character *ch, Character *victim, struct obj_data *weap, int spam);
+void send_not_to_spam(char *buf, Character *ch,
+                      Character *victim, struct obj_data *weap,
+                      int spam);
 void perform_assist(Character *ch, Character *helpee);
 
 
@@ -228,7 +230,7 @@ ACMD(do_hit) {
         ch->Send( "You engage in combat with %s!\r\n", GET_NAME(vict));
         start_fighting(ch, vict);
     } else
-        ch->Send("You do the best you can!\r\n");
+        send_to_char("You do the best you can!\r\n", ch);
 
     return;
 }
