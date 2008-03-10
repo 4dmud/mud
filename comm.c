@@ -1573,14 +1573,14 @@ const char *end_prompt(Descriptor *d) {
                                         (char) 0
                                     };
     if (!d)
-        return (char *)"";
+        return "";
     if (d->eor == 1)
         return eor_prompt;
     /** edited out for the moment - needs to check for compatability first - mord**/
     else if (d->telnet_capable == 1)
         return ga_prompt;
     else
-        return (char *)"";
+        return "";
 }
 
 char *make_prompt(Descriptor *d) {
@@ -2016,7 +2016,7 @@ void load_host_list(void) {
     }
     expire_date = time(0) - (SECS_PER_REAL_DAY * 3);
     get_line(fl, line);
-    while (*line && *line && *line != '~') {
+    while (line && *line && *line != '~') {
         if (*line != '\n') {
             if ((retval = sscanf(line, "%s %s %ld", host_ip, host, &date)) != 3) {
                 log("Host list error: %s", line);
@@ -3476,11 +3476,9 @@ void send_to_range(room_vnum start, room_vnum finish, const char *messg, ...) {
     }
 }
 
-void perform_act ( string &orig, Character *ch,
-                   struct obj_data *obj, const void *vict_obj, const Character *to ) {
-perform_act(orig.c_str(), ch, obj, vict_obj,to);
 
-}
+
+
 
 /* higher-level communication: the act() function */
 void perform_act(const char *orig, Character *ch,
@@ -3637,10 +3635,6 @@ int restrict_check(const Character *ch) {
                (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
 #endif
 */
-void act(string &str, int hide_invisible, Character *ch,
-         struct obj_data *obj, const void *vict_obj, int type) {
-		act(str.c_str(),  hide_invisible, ch, obj, vict_obj, type);
-}
 
 void act(const char *str, int hide_invisible, Character *ch,
          struct obj_data *obj, const void *vict_obj, int type) {
