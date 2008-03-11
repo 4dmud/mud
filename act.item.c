@@ -564,7 +564,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 		int plussage = 1;
 		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
 			count_items_in_list ( obj->contains, plussage );
-		int capa = house_capacity ( find_house ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		int capa = house_capacity (( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
 		if ( value >= capa )
 		{
 			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );
@@ -1695,7 +1695,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 		int plussage = 1;
 		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
 			count_items_in_list ( obj->contains, plussage );
-		int capa = house_capacity ( find_house ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		int capa = house_capacity (( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
 		if ( value >= capa )
 		{
 			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );

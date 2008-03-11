@@ -684,7 +684,7 @@ void hcontrol_list_houses(Character *ch)
 
     ch->Send(  "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-6s\r\n",
                      house_control[i].vnum, house_control[i].atrium, built_on,
-                     house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 125),
+                     house_control[i].num_of_guests, CAP(own_name), 500 + (house_control[i].expantions * 200),
                      house_item_count(house_control[i].vnum), house_control[i].stable == 0 ? "No" : "Yes");
 
     House_list_guests(ch, i, TRUE);
@@ -1050,7 +1050,7 @@ void hcontrol_expand_house(Character *ch, char *argument)
   if (!is_number(arg2))
   {
     
-  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 125 sized units>\r\n"
+  ch->Send( "To expand: \r\nhcontrol expand <house vnum> <num of 200 sized units>\r\n"
                    "To remove expantion:\r\nhcontrol expand <house vnum> <-num of 200 sized units>\r\n");
       return;
     
@@ -1073,16 +1073,17 @@ void hcontrol_expand_house(Character *ch, char *argument)
   
 
     house_control[i].expantions += (long)amount;
-ch->Send( "%d units of 200 added to house %d (owner: %s) new capacity %d\r\n", amount, house, pi.NameById(house_control[i].owner), house_capacity(i));
+ch->Send( "%d units of 200 added to house %d (owner: %s) new capacity %d\r\n", amount, house, pi.NameById(house_control[i].owner), house_capacity(house));
 
   
   House_save_control();
 }
 
 int house_capacity(room_vnum house) {
-if (house == NOWHERE)
+int h = find_house(house);
+if (h == NOWHERE)
 return 500;
-  return 500 + (200 * house_control[house].expantions);
+  return 500 + (200 * house_control[h].expantions);
 }
 void hcontrol_set_stable(Character *ch, char *argument)
 {
