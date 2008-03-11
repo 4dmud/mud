@@ -1514,12 +1514,8 @@ void new_load_corpses(void)
         }      /* exit the room scanning loop */
         if (temp)
         { /* put the corpse in the right room */
-          log("CORPSE: Corpse '%s' to room %d.",
-              temp->short_description, GET_OBJ_VROOM(temp));
-          obj_to_room(temp,
-                      real_room(GET_OBJ_VROOM(temp) !=
-                                NOWHERE ? GET_OBJ_VROOM(temp)
-                                : 3001));
+          log("CORPSE: Corpse '%s' to room %d.",temp->short_description, GET_OBJ_VROOM(temp));
+          obj_to_room(temp, IN_ROOM(temp) ? IN_ROOM(temp) : real_room(3001));
         }
       }
       else

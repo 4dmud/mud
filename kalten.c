@@ -1164,9 +1164,7 @@ ACMD ( do_smite )  				/* by Garion */
 				obj_to_room ( obj, victim->in_room );
 			}
 		}
-		send_to_char
-		( "You are blown out of your stuff and right onto your ass!\r\n",
-		  victim );
+		victim->Send( "You are blown out of your stuff and right onto your ass!\r\n");
 		act ( "$N is blown out of $S stuff and right onto $S ass!", FALSE,
 		      ch, NULL, victim, TO_NOTVICT );
 		act ( "$N is blown out of $S stuff and right onto $S ass!", FALSE,
@@ -1176,18 +1174,16 @@ ACMD ( do_smite )  				/* by Garion */
 	{
 		obj_to_char ( unequip_char ( victim, WEAR_FEET ), victim );
 		obj_from_char ( obj );
-		send_to_char
-		( "You are blown out of your shoes and right onto your ass!\r\n",
-		  victim );
+		victim->Send( "You are blown out of your shoes and right onto your ass!\r\n");
 		act ( "$N is blown out of $S shoes and right onto $S ass!", FALSE,
 		      ch, NULL, victim, TO_NOTVICT );
 		act ( "$N is blown out of $S shoes and right onto $S ass!", FALSE,
 		      ch, NULL, victim, TO_CHAR );
-		obj_to_room ( obj, victim->in_room );
+		obj_to_room ( obj, IN_ROOM(victim) );
 	}
 	else
 	{
-		send_to_char ( "You are knocked on your ass!\r\n", victim );
+		victim->Send( "You are knocked on your ass!\r\n" );
 		act ( "$N is knocked on his ass!", FALSE, ch, NULL, victim,
 		      TO_NOTVICT );
 		act ( "$N is knocked on his ass!", FALSE, ch, NULL, victim, TO_CHAR );

@@ -170,6 +170,10 @@ ASPELL(spell_recall) {
         ch->Send("You cannot recall from this zone.\r\n");
         return;
     }
+    if (FIGHTING(victim) || GET_POS(victim) == POS_FIGHTING) {
+        ch->Send("It's too busy to do that!\r\n");
+        return;
+    }
 
     act("$n disappears.", TRUE, victim, 0, 0, TO_ROOM);
     dismount_char(victim);

@@ -24,8 +24,6 @@ extern int load_qic_check(int rnum);
 extern const int xap_objs;
 extern int save_new_style;
 
-long int total_items = 0;
-
 struct obj_data *Obj_from_store(struct obj_file_elem object,
                                       int *location);
 int Obj_to_store(struct obj_data *obj, FILE * fl, int location);
@@ -34,7 +32,7 @@ struct obj_data *Obj_from_store_to(struct obj_file_elem obj, int *locate);
 struct obj_data *Obj_from_store(struct obj_file_elem object,
                                       int *location);
 void House_listrent(Character *ch, room_vnum vnum);
-void count_items_in_list(struct obj_data *obj);
+void count_items_in_list(struct obj_data *obj, int& total_items);
 int house_item_count(room_vnum vnum);
 void hcontrol_set_stable(Character *ch, char *arg);
 void house_load_mount(Character *ch, int i);
@@ -420,13 +418,13 @@ void House_crashsave(room_vnum vnum)
     //core_dump();
   }
 }
-void count_items_in_list(struct obj_data *obj)
+void count_items_in_list(struct obj_data *obj, int& total_items)
 {
   for (; obj; obj = obj->next_content)
   {
     total_items++;
     if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
-      count_items_in_list(obj->contains);
+      count_items_in_list(obj->contains, total_items);
   }
 }
 
@@ -435,12 +433,13 @@ void count_items_in_list(struct obj_data *obj)
 int house_item_count(room_vnum vnum)
 {
   room_rnum rnum;
-  if ((rnum = real_room(vnum)) == NULL)
-    return 0;
-
-  total_items = 0;
-  count_items_in_list(rnum->contents);
-  return (total_items);
+  if ((rnum = real_room(vnum)) == NULL) {
+    	return 0;
+  } else {
+	int total_items = 0;
+	count_items_in_list(rnum->contents, total_items);
+	return (total_items);
+  }
 }
 
 

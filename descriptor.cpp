@@ -232,14 +232,7 @@ void Descriptor::init_descriptor(int desc) {
         last_desc = 1;
     desc_num = last_desc;
 
-
-    CREATE(comp, struct compr, 1);
-    comp->state = 0; /* we start in normal mode */
-#ifdef HAVE_ZLIB_H
-
-    comp->stream = NULL;
-#endif /* HAVE_ZLIB_H */
-
+    comp = new compr();
 }
 
 bool Descriptor::pending_output() {
@@ -383,19 +376,9 @@ Descriptor::~Descriptor() {
         break;
     }
 
-    /* free compression structures */
-#ifdef HAVE_ZLIB_H
-    if (this->comp->stream) {
-        deflateEnd(this->comp->stream);
-        free(this->comp->stream);
-        free(this->comp->buff_out);
-        free(this->comp->buff_in);
-
-    }
-#endif /* HAVE_ZLIB_H */
     /* d->comp was still created even if there is no zlib, for comp->state) */
     if (this->comp)
-        free(this->comp);
+        delete this->comp;
 }
 
 

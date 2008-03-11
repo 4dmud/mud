@@ -5325,9 +5325,9 @@ void fire_missile(Character *ch, char arg1[MAX_INPUT_LENGTH],
                 miss_missile(ch, vict, missile, dir, attacktype);
                 if ((!number(0, 2)) || (attacktype == SKILL_THROW)) {
                     if (attacktype == SKILL_FIREARM)
-                        obj_to_room(missile, vict->in_room);
+                        obj_to_room(missile, IN_ROOM(vict));
                     else
-                        obj_to_room(unequip_char(ch, pos), vict->in_room);
+                        obj_to_room(unequip_char(ch, pos), IN_ROOM(vict));
                 } else if (attacktype != SKILL_FIREARM)
                     extract_obj(unequip_char(ch, pos));
             }

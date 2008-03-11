@@ -550,19 +550,31 @@ int perform_assemble ( obj_vnum lVnum, Character *ch, int subcmd, int cmd )
 
 bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 {
-	int value;
+
 
 	if ( drop_otrigger ( obj, ch ) <= 0 )
 		return FALSE;
 
 	if ( put_in_otrigger ( cont, obj, ch ) <= 0 )
 		return FALSE;
-
-	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) &&
-	        ( value = house_item_count ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) ) >= house_capacity ( find_house ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) ) )
+	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) && ( !cont || ( cont && IN_ROOM ( cont ) ) ) )
 	{
-		ch->Send ( "No matter how you try you cant fit anything else in.[%d]\r\n", value );
-		return FALSE;
+		void count_items_in_list ( struct obj_data *obj, int& total_items );
+		int value = house_item_count ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+		int plussage = 1;
+		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
+			count_items_in_list ( obj->contains, plussage );
+		int capa = house_capacity ( find_house ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		if ( value >= capa )
+		{
+			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );
+			return FALSE;
+		}
+		else if ( ( value + plussage ) > capa )
+		{
+			ch->Send ( "That container's items would push your house capacity of %d over it's limit by %d.\r\n",capa, capa - ( value+plussage ) );
+			return FALSE;
+		}
 	}
 	if ( Crash_is_unrentable ( obj ) && !IS_NPC ( ch ) || AFF_FLAGGED ( ch, AFF_CHARM ) )
 	{
@@ -584,7 +596,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 	if ( ( GET_OBJ_TYPE ( cont ) == ITEM_CONTAINER )
 	        && ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER ) )
 	{
-		ch->Send ( "You cant put containers inside containers.\r\n" );
+		ch->Send ( "You can't put containers inside containers.\r\n" );
 		return FALSE;
 	}
 	if ( GET_OBJ_WEIGHT ( cont ) + GET_OBJ_WEIGHT ( obj ) > GET_OBJ_VAL ( cont, 0 ) )
@@ -1670,28 +1682,30 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 	if ( ( mode == SCMD_DROP ) && !drop_wtrigger ( obj, ch ) )
 		return ( 0 );
 
-	if ( ( mode == SCMD_DROP ) && ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) ) )
-	{
-		if ( ( value =
-		            house_item_count ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) ) >=
-		        MAX_HOUSE_ITEMS )
-		{
-			ch->Send (
-			    "No matter how you try you cant fit anything else in.[%d]\r\n",
-			    value );
-			return ( 0 );
-		} /*else if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER) {
-                                                                                                                                                           ch->Send("Sorry, but you drop containers here.\r\n");
-                                                                                                                                                            return (0);
-                                                                                                                                                        }*/
-	}
-
-
 	if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
 	{
 		snprintf ( buf, sizeof ( buf ), "You can't %s $p, it must be CURSED!", sname );
 		act ( buf, FALSE, ch, obj, 0, TO_CHAR );
 		return ( 0 );
+	}
+	if ( SCMD_DROP == mode && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
+	{
+		void count_items_in_list ( struct obj_data *obj, int& total_items );
+		int value = house_item_count ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+		int plussage = 1;
+		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
+			count_items_in_list ( obj->contains, plussage );
+		int capa = house_capacity ( find_house ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		if ( value >= capa )
+		{
+			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );
+			return FALSE;
+		}
+		else if ( ( value + plussage ) > capa )
+		{
+			ch->Send ( "That container's items would push your house capacity of %d over it's limit by %d.\r\n",capa, capa - ( value+plussage ) );
+			return FALSE;
+		}
 	}
 	if ( !wearall || ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ) )
 	{

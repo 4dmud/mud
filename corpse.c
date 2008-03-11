@@ -454,10 +454,7 @@ void load_corpses(void) {
                     if (temp) {	/* put the corpse in the right room */
                         log("CORPSE: Corpse '%s' to room %d.",
                             temp->short_description, GET_OBJ_VROOM(temp));
-                        obj_to_room(temp,
-                                    real_room(GET_OBJ_VROOM(temp) !=
-                                              NOWHERE ? GET_OBJ_VROOM(temp)
-                                              : 3001));
+                        obj_to_room(temp, IN_ROOM(temp));
                     }
                 } else {
                     /* just a plain obj..send it to a temp room until we load a corpse */

@@ -2420,6 +2420,31 @@ struct compr {
 
     z_streamp stream;
 #endif /* HAVE_ZLIB_H */
+ compr() {
+state = 0;
+compression = 0;
+#ifdef HAVE_ZLIB_H
+    buff_out = NULL;
+    total_out = 0; /* size of input buffer */
+    size_out = 0; /* size of data in output buffer */
+
+    buff_in = NULL;
+    total_in = 0; /* size of input buffer */
+    size_in = 0; /* size of data in input buffer */
+    stream = NULL;
+#endif /* HAVE_ZLIB_H */
+}
+~compr() {
+    /* free compression structures */
+#ifdef HAVE_ZLIB_H
+    if (stream) {
+        deflateEnd(stream);
+        free(stream);
+        free(buff_out);
+        free(buff_in);
+    }
+#endif /* HAVE_ZLIB_H */
+}
 };
 
 
