@@ -395,7 +395,7 @@ const char *rp_group_names[] =
 	"{cbMadman{c0",
 	"{cYOrsini{c0",
 	"{cpLolthite{c0",
-	"{cGCthulytes{c0",
+	"{cGCthulyte{c0",
 	"\n"
 };
 /* (Note: strings for class definitions in class.c instead of here) */
@@ -1715,7 +1715,7 @@ const char *drinknames[] =
 
 
 /* effect of drinks on hunger, thirst, and drunkenness -- see values.doc */
-int drink_aff[][3] =
+const int drink_aff[][3] =
 {
 	{0, 1, 10},
 	{3, 2, 5},
@@ -2133,7 +2133,7 @@ const char *npc_class_types[] =
 	"\n"
 };
 
-int rev_dir[] =
+const int rev_dir[] =
 {
 	2,
 	3,
@@ -2165,7 +2165,7 @@ const char *mobprog_types[] =
 };
 #endif
 
-int movement_loss[] =
+const int movement_loss[] =
 {
 	1,                   /* Inside       */
 	1,                   /* City         */
@@ -2339,13 +2339,13 @@ const char *wiz_groups[] =
 	"\n"
 };
 
-size_t room_bits_count = sizeof ( room_bits ) / sizeof ( room_bits[0] ) - 1,
-                         action_bits_count =      sizeof ( action_bits ) / sizeof ( action_bits[0] ) - 1,
-                                                  affected_bits_count =    sizeof ( affected_bits ) / sizeof ( affected_bits[0] ) - 1,
-                                                                           extra_bits_count =       sizeof ( extra_bits ) / sizeof ( extra_bits[0] ) - 1,
-                                                                                                    wear_bits_count =        sizeof ( wear_bits ) / sizeof ( wear_bits[0] ) - 1;
+const size_t room_bits_count = 	sizeof ( room_bits ) 	 / sizeof ( room_bits[0] )	 - 1;
+const size_t action_bits_count =      sizeof ( action_bits ) 	 / sizeof ( action_bits[0] )	 - 1;
+const size_t affected_bits_count =    sizeof ( affected_bits ) / sizeof ( affected_bits[0] )	 - 1;
+const size_t extra_bits_count =       sizeof ( extra_bits ) 	 / sizeof ( extra_bits[0] )	 - 1;
+const size_t wear_bits_count =        sizeof ( wear_bits ) 	 / sizeof ( wear_bits[0] )	 - 1;
 
-struct class_name_data class_name[] =
+const struct class_name_data class_name[] =
 {
 
 	{
@@ -2532,5 +2532,7 @@ const char *AssemblyTypes[] =
 	"forge",
 	"\n"
 };
+
+const char *unused_spellname = "!UNUSED!";   /* So we can get &unused_spellname */
 
 

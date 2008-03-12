@@ -715,9 +715,12 @@ void do_clan_who(Character *ch) {
         if (!IS_PLAYING(d))
             continue;
         if ((tch = d->character)) {
-            if (CAN_SEE(ch, tch))
+            if (CAN_SEE(ch, tch)) {
                 if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) > 0 )
                     ch->Send( "%s\r\n", GET_NAME(tch));
+if (GET_CLAN(tch) == GET_CLAN(ch) && GET_CLAN_RANK(tch) == 0 )
+                    ch->Send( "%s - Applicant\r\n", GET_NAME(tch));
+}
 
         }
 

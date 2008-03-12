@@ -264,12 +264,6 @@ void strip_cr(char *);        //...
 void load_notes(void);
 void free_identifier(struct obj_data *obj);
 
-/* external vars */
-extern const char *unused_spellname;
-extern const char *unused_spellmessage;
-extern int rev_dir[];
-
-
 #define READ_SIZE 256
 
 /* make these TRUE if you want aliases and poofs saved in the pfiles

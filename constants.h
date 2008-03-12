@@ -65,19 +65,21 @@ extern const struct dex_app_type dex_app[];
 extern const struct con_app_type con_app[];
 extern const struct int_app_type int_app[];
 extern const struct wis_app_type wis_app[];
-extern int rev_dir[];
-extern int movement_loss[];
-extern int drink_aff[][3];
+extern const int rev_dir[];
+extern const int movement_loss[];
+extern const int drink_aff[][3];
 extern const char *magic_types[];
 extern const char *cast_types[];
 extern const char *target_types[];
 
-extern size_t room_bits_count;
-extern size_t action_bits_count;
-extern size_t affected_bits_count;
-extern size_t extra_bits_count;
-extern size_t wear_bits_count;
+extern const size_t room_bits_count;
+extern const size_t action_bits_count;
+extern const size_t affected_bits_count;
+extern const size_t extra_bits_count;
+extern const size_t wear_bits_count;
 
-extern struct class_name_data class_name[];
+extern const struct class_name_data class_name[];
 extern const char *AssemblyTypes[];
+extern const char *unused_spellname;
+extern const char *unused_spellmessage;
 

@@ -34,3 +34,4 @@ void House_crashsave(room_vnum vnum);
 void House_list_guests(Character *ch, int i, int quiet);
 void house_expand_house(Character *ch, int house);
 void hcontrol_expand_house(Character *ch, char *argument);
+void House_info ( Character *ch, int i, int quiet );

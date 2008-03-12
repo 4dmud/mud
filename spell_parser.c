@@ -285,8 +285,8 @@ struct syllable syls[] = {
                          };
 
 
-const char *unused_spellname = "!UNUSED!";   /* So we can get &unused_spellname */
-//const char *unused_spellmessage = "You summon the energy to change spells.";  /* So we can get &unused_spellmessage */
+
+
 
 int mag_manacost(Character *ch, int spellnum) {
     return FTOI((MAX(SINFO.mana_max - (SINFO.mana_change *
