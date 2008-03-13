@@ -285,8 +285,7 @@ void load_corpses(void) {
             }
             /* we have the number, check it, load obj. */
             if (nr == NOTHING) {	/* then it is unique */
-                temp = create_obj();
-                temp->item_number = NOTHING;
+                temp = create_obj(NOTHING);
             } else if (nr < 0) {
                 continue;
             } else {

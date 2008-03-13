@@ -204,7 +204,7 @@ Character *create_char(void);
 #endif
 Character *read_mobile(mob_vnum nr);
 int vnum_mobile(char *searchname, Character *ch);
-struct obj_data *create_obj(void);
+struct obj_data *create_obj(obj_rnum proto);
 void clear_object(struct obj_data *obj);
 void free_obj(struct obj_data *obj, int extracted);
 void obj_data_to_pool(struct obj_data *obj);

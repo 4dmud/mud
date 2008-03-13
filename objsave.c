@@ -1705,8 +1705,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   /* we have the number, check it, load obj. */
   if (nr == NOTHING)
   {  /* then it is unique */
-    temp = create_obj();
-    temp->item_number = NOTHING;
+    temp = create_obj(NOTHING);
   }
   else if (nr < NOTHING)
   {
@@ -1991,8 +1990,7 @@ int load_char_objects_to_char_old(Character *ch, FILE * fl)
       /* we have the number, check it, load obj. */
       if (nr == NOTHING)
       {   /* then it is unique */
-        temp = create_obj();
-        temp->item_number = NOTHING;
+        temp = create_obj(NOTHING);
       }
       else if (nr < NOTHING)
       {

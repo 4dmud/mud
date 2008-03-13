@@ -982,7 +982,7 @@ ACMD(do_ignite) {
         return;
     }
 
-    sabre = create_obj();
+    sabre = create_obj(NOTHING);
 
     pos = hilt->worn_on;
     if ((hilt = unequip_char(ch, pos)) == NULL)

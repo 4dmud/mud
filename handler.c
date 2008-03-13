@@ -2542,7 +2542,7 @@ struct obj_data *create_money ( gold_int gamount )
 		log ( "SYSERR: Try to create negative or 0 money, changing to 1(%lld)", gamount );
 		return ( NULL );
 	}
-	obj = create_obj();
+	obj = create_obj(NOTHING);
 	CREATE ( new_descr, struct extra_descr_data, 1 );
 
 	if ( amount == 1 )

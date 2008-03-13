@@ -63,10 +63,7 @@ struct obj_data *make_tree ( int v0, int v1, int v2 )
 			break;
 	}
 
-	final_tree = create_obj();
-
-	final_tree->item_number = NOTHING;
-	final_tree->in_room = NULL;
+	final_tree = create_obj(NOTHING);
 
 	GET_OBJ_TYPE ( final_tree ) = ITEM_TREE;
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_tree ), ITEM_GLOW );

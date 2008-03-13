@@ -3099,10 +3099,7 @@ OBJ_DATA * create_vial ( void )
 	}
 
 	type = number ( VIAL_HITP, VIAL_STAM );
-	vial = create_obj();
-
-	vial->item_number = NOTHING;
-	vial->in_room = NULL;
+	vial = create_obj(NOTHING);
 
 	GET_OBJ_TYPE ( vial ) = ITEM_VIAL;
 	SET_BIT_AR ( GET_OBJ_EXTRA ( vial ), ITEM_UNIQUE_SAVE );

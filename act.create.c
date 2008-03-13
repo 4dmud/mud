@@ -253,10 +253,8 @@ void make_potion(Character *ch, int potion,
     return;
   }
 
-  final_potion = create_obj();
+  final_potion = create_obj(NOTHING);
 
-  final_potion->item_number = NOTHING;
-  final_potion->in_room = NULL;
   snprintf(buf2, sizeof(buf2), "%s %s potion", potion_names[num], skill_name(potion));
   final_potion->name = str_dup(buf2);
 
@@ -429,10 +427,8 @@ void make_scroll(Character *ch, int scroll, struct obj_data *paper)
     return;
   }
 
-  final_scroll = create_obj();
+  final_scroll = create_obj(NOTHING);
 
-  final_scroll->item_number = NOTHING;
-  final_scroll->in_room = NULL;
   snprintf(buf2, sizeof(buf2), "%s scroll", skill_name(scroll));
   final_scroll->name = str_dup(buf2);
 
@@ -697,10 +693,8 @@ void make_focus(Character *ch, int type, struct obj_data *o)
   extract_obj(o);
   create_trees();
 
-  final_focus = create_obj();
+  final_focus = create_obj(NOTHING);
 
-  final_focus->item_number = NOTHING;
-  final_focus->in_room = NULL;
   if (final_focus->name)
     free(final_focus->name);
   snprintf(buf2, sizeof(buf2), " %s %s focus staff", age_desc_staff[v1],
@@ -894,10 +888,7 @@ void make_manifest(Character *ch,struct obj_data *obj)
   int v1 = GET_OBJ_VAL(obj, 1), v2 = GET_OBJ_VAL(obj, 2);
   int counter = 0;
   char buf2[MAX_INPUT_LENGTH];
-  final_focus = create_obj();
-
-  final_focus->item_number = NOTHING;
-  final_focus->in_room = NULL;
+  final_focus = create_obj(NOTHING);
 
   for (counter = 0; counter < MAX_OBJ_AFFECT; counter++)
     if (obj->affected[counter].modifier)

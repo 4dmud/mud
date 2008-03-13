@@ -4474,7 +4474,7 @@ void make_corpse(Character *ch, Character *killer) {
     if (!ch || DEAD(ch)) {
         return;
     } else {
-        corpse = create_obj();
+        corpse = create_obj(NOTHING);
         corpse->name = strdup("corpse");
         if (IS_NPC(ch))
             corpse->skin = MOB_SKIN(ch);
@@ -4601,10 +4601,7 @@ void make_head(Character *ch) {
     if (!ch)
         return;
 
-    corpse = create_obj();
-
-    corpse->item_number = NOTHING;
-    corpse->in_room = NULL;
+    corpse = create_obj(NOTHING);
     corpse->name = str_dup("head");
 
 
@@ -4649,10 +4646,7 @@ void make_half(Character *ch) {
     if (!ch)
         return;
 
-    corpse = create_obj();
-
-    corpse->item_number = NOTHING;
-    corpse->in_room = NULL;
+    corpse = create_obj(NOTHING);
     corpse->name = str_dup("half other");
 
 
@@ -5362,7 +5356,7 @@ void tick_grenade(void) {
        one of the extra flag bits. After the pin is pulled the grenade
        starts counting down. once it reaches zero, it explodes. */
 
-    for (obj_list_type::iterator ob = object_list.begin(); ob != object_list.end(); ob++) {
+    for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
 	    i = (ob->second);
         if (i != NULL) {
             if (IS_SET_AR(GET_OBJ_EXTRA(i), ITEM_LIVE_GRENADE)) {

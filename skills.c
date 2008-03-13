@@ -1875,10 +1875,8 @@ ASKILL(skill_scalp)
 
     strcpy(scalpa, obj->short_description);
     scalpa = scalpa+14;
-    scalp = create_obj();
+    scalp = create_obj(NOTHING);
 
-    scalp->item_number = NOTHING;
-    scalp->in_room = NULL;
     snprintf(buf2, sizeof(buf2), "scalp %s", scalpa);
     scalp->name = str_dup(buf2);
     snprintf(buf1, sizeof(buf1), "The scalpless corpse of %s is lying here.", scalpa);

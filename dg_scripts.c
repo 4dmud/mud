@@ -4240,14 +4240,12 @@ void add_to_lookup_tablex ( long uid, void *c )
 
 void removeFromChLookupTable ( long uid )
 {
-	ch_map::iterator ch = ch_lookup_table.find ( uid );
-	if ( ch != ch_lookup_table.end() )
+	if ( ch_lookup_table.find ( uid ) != ch_lookup_table.end() )
 		ch_lookup_table.erase ( uid );
 }
 void removeFromObjLookupTable ( long uid )
 {
-	obj_map::iterator obj = obj_lookup_table.find ( uid );
-	if ( obj != obj_lookup_table.end() )
+	if ( obj_lookup_table.find ( uid ) != obj_lookup_table.end() )
 		obj_lookup_table.erase ( uid );
 }
 

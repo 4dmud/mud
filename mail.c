@@ -642,8 +642,7 @@ void postmaster_receive_mail(Character *ch,
 	return;
     }
     while (has_mail(GET_IDNUM(ch))) {
-	obj = create_obj();
-	obj->item_number = NOTHING;
+	obj = create_obj(NOTHING);
 	obj->name = str_dup("mail paper letter");
 	obj->short_description = str_dup("a piece of mail");
 	obj->description =

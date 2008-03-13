@@ -150,8 +150,7 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 			if ( nr == NOTHING )
 			{
 				/* then it is unique */
-				obj = create_obj();
-				obj->item_number = NOTHING;
+				obj = create_obj(NOTHING);
 			}
 			else if ( nr < 0 )
 			{
