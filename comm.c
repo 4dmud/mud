@@ -2233,12 +2233,12 @@ int process_output(Descriptor *t) {
             if (osb.size() > MAX_SOCK_BUF)
                 osb = osb.substr(0, MAX_SOCK_BUF);
             result = write_to_descriptor(t->descriptor, osb.c_str(), t->comp);
-            if (result > 0 && result < osb.size()) {
+            if (result > 0 && result < (int)osb.size()) {
                 osb = overflow.erase(0, MAX_SOCK_BUF);
                 //result = write_to_descriptor(t->descriptor, prmpt.c_str(), t->comp);
             }
             //osb = overflow;
-        } while (result > 0 && result < osb.size());
+        } while (result > 0 && result < (int)osb.size());
         if (result >= 2)
             result -= 2;
 
@@ -2248,11 +2248,11 @@ int process_output(Descriptor *t) {
             if (osb.size() > MAX_SOCK_BUF)
                 osb = osb.substr(0, MAX_SOCK_BUF);
             result = write_to_descriptor(t->descriptor, osb.c_str(), t->comp);
-            if (result > 0 && result < osb.size())
+            if (result > 0 && result < (int)osb.size())
                 osb = overflow.erase(0, MAX_SOCK_BUF);
             //osb = overflow;
 
-        } while (result > 0 && result < osb.size());
+        } while (result > 0 && result < (int)osb.size());
 
     }
 
@@ -3485,7 +3485,7 @@ void perform_act(const char *orig, Character *ch,
                  struct obj_data *obj, const void *vict_obj, const Character *to) {
     //const char *i = "";
     string i = "";
-    char lbuf[MAX_STRING_LENGTH] = "";
+    unsigned char lbuf[MAX_STRING_LENGTH] = "";
     Character *dg_victim = NULL;
     struct obj_data *dg_target = NULL;
     char *dg_arg = NULL;
@@ -3564,7 +3564,7 @@ void perform_act(const char *orig, Character *ch,
                 if (k > 0)
                     for (j = k; j > 0 && !isspace((int) lbuf[j-1]); j--)
                         ;
-                if (j != lbuf[k])
+                if ((int)j != lbuf[k])
                     lbuf[j] = UPPER(lbuf[j]);
                 i = "";
                 break;
@@ -3582,7 +3582,7 @@ void perform_act(const char *orig, Character *ch,
                 i = "";
                 break;
             }
-            int pt = 0;
+            unsigned int pt = 0;
             while (pt < i.length() && k < sizeof(lbuf)) {
                 lbuf[k] = i[pt];
                 if (uppercasenext && !isspace((int) lbuf[k])) {
@@ -3607,10 +3607,10 @@ void perform_act(const char *orig, Character *ch,
     lbuf[k + 1] = '\0';
 
     if (to->desc)
-        to->desc->Output("%s", CAP(lbuf));
+        to->desc->Output("%s", CAP((char *)lbuf));
 
     if ((IS_NPC(to) && dg_act_check) && (to != ch))
-        act_mtrigger(to, lbuf, ch, dg_victim, obj, dg_target, dg_arg);
+        act_mtrigger(to, (char *)lbuf, ch, dg_victim, obj, dg_target, dg_arg);
 }
 
 

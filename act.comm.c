@@ -1396,7 +1396,7 @@ ACMD(do_ctell) {
             return;
         }
         c = atoi (argument);
-        if ((c < 0) || (c >= clan.size())) {
+        if ((c < 0) || ((unsigned int)c >= clan.size())) {
             *ch << "There is no clan with that number.\r\n";
             return;
         } else {

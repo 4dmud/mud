@@ -3119,7 +3119,7 @@ OBJ_DATA * create_vial ( void )
 void update_timer ( struct obj_data *obj )
 {
 	struct timer_event_data *tmr;
-	long t;
+	unsigned long t;
 	time_t ct = 0;
 
 	if ( !obj )
@@ -4815,8 +4815,8 @@ ACMD ( do_fuel )
 
 void check_timer ( obj_data *obj )
 {
-	long t;
 	time_t ct = 0;
+        unsigned long t;
 
 	if ( obj == NULL || GET_OBJ_TIMER ( obj ) == -1 )
 		return;

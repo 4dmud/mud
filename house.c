@@ -150,7 +150,7 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 			if ( nr == NOTHING )
 			{
 				/* then it is unique */
-				obj = create_obj(NOTHING);
+				obj = create_obj ( NOTHING );
 			}
 			else if ( nr < 0 )
 			{
@@ -947,7 +947,7 @@ ACMD ( do_house )
 	else if ( !str_cmp ( arg, "mount" ) )
 		house_load_mount ( ch, i );
 	else if ( GET_IDNUM ( ch ) != house_control[i].owner && GET_LEVEL ( ch ) < LVL_IMPL )
-		send_to_char ( "Only the primary owner can set guests.\r\n", ch );
+		send_to_char ( "Only the primary owner can set guests or expand the house.\r\n", ch );
 	else if ( !str_cmp ( arg, "expand" ) )
 		house_expand_house ( ch, i );
 	else if ( ( id = pi.IdByName ( arg ) ) < 0 )
@@ -1031,9 +1031,16 @@ int House_can_enter ( Character *ch, room_vnum house )
 	return ( 0 );
 }
 
-void house_expand_house ( Character *ch, int house )
+void house_expand_house ( Character *ch, int i )
 {
-	ch->Send ( "Sorry, you will be able to do this yourself soon. For now, please ask an admin.\r\n" );
+	if ( GET_GOLD_TOKEN_COUNT ( ch ) >= 1 )
+	{
+		GET_GOLD_TOKEN_COUNT ( ch ) -= 1;
+		house_control[i].expantions += ( long ) 1;
+		ch->Send ( "You expand your house by an extra 200 units for the price of 1 Gold Token.\r\n" );
+	}
+	else
+		ch->Send ( "You can't afford to expand the house at this time, it costs 1 Gold Token.\r\n" );
 }
 
 void hcontrol_expand_house ( Character *ch, char *argument )
@@ -1294,7 +1301,7 @@ void House_info ( Character *ch, int i, int quiet )
 		{
 			continue;
 		}
-		ch->Send ( "%s%-15s  %s", !(j % 2) ? "                  " : "", temp, ( j % 2 ? "\r\n" : " " ) );
+		ch->Send ( "%s%-15s  %s", ! ( j % 2 ) ? "                  " : "", temp, ( j % 2 ? "\r\n" : " " ) );
 	}
 	ch->Send ( "\r\n{cW#======================================================#{c0\r\n" );
 	ch->Send ( "\r\n" );

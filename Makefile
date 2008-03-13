@@ -11,9 +11,9 @@ CC = g++
 CXREF = cxref
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -Wno-conversion 
+MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -m32
 #-D NO_MAKEFILE
-# -Wnested-externs -Wshadow -m32 -Wstrict-prototypes 
+#  -Wshadow -m32 -Wstrict-prototypes 
 # -I/usr/src/lib/libcrypt/ 
 
 #flags for profiling (see hacker.doc for more information)
@@ -26,7 +26,7 @@ PROFILE =
 ##############################################################################
 BINDIR = ../bin
 
-CFLAGS = 
+CFLAGS = -DHW_EVENT_SUPPORT
 #-O2
 CPPFLAGS = -O1 -ggdb $(MYFLAGS) $(PROFILE)
 

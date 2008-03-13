@@ -3870,14 +3870,14 @@ ACMD(do_topgold) {
     ch->Send( "------------------------------------------\r\n");
     sort(pindex.begin(), pindex.end(), goldSort());
 
-    for (i = 0; i < pindex.size() && i < j; i++)
+    for (i = 0; i < (int)pindex.size() && i < j; i++)
         ch->Send( "%-20s -- Gold Coins: %5lld million.\r\n", pindex[i].name,  pindex[i].gc_amount/1000000);
 
     ch->Send( "\r\nMembers of the top %d Gold Token Tycoons\r\n", j);
     ch->Send( "------------------------------------------\r\n");
     sort(pindex.begin(), pindex.end(), tokenSort());
 
-    for (i = 0; i < pindex.size() && i < j; i++)
+    for (i = 0; i < (int)pindex.size() && i < j; i++)
         ch->Send( "%-20s -- Gold Tokens: %d.\r\n", pindex[i].name,  pindex[i].gt_amount);
 
 }

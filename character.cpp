@@ -845,7 +845,7 @@ void Character::affect_total() {
 void Character::check_regen_rates() {
     struct regen_event_obj *regen;
     int type, gain = 0;
-    long t;
+    unsigned long t;
 
     if (this == NULL || GET_HIT(this) <= HIT_INCAP)
         return;
