@@ -1764,7 +1764,7 @@ ACMD(do_skilllist)
 
     for (k = 0; k <= 4; k++)
     {
-      for (j = 0; j < 50; j++)
+      for (j = 0; j <= 50; j++)
       {
         for ( i = 0; i < MAX_SKILLS; i++)
         {
