@@ -588,6 +588,7 @@ class Room;
 #define MOB_HEALER       41
 #define MOB_POSTMASTER   42
 #define MOB_QUEST        43
+#define MOB_TRAINER      44
 
 /* Preference flags: used by Character.player_specials.pref           */
 #define PRF_BRIEF       0     /* Room descs won't normally be shown        */
@@ -1487,7 +1488,7 @@ struct obj_data {
     struct obj_affected_type affected[MAX_OBJ_AFFECT]; /* affects     */
 
     char *name;               /* Title of object :get etc.        */
-    vector<string> Names;
+    //vector<string> Names;
     char *description;        /* When in room                     */
     char *smell;         /* The objects smell                */
     char *taste;         /* The objects taste                */
@@ -2332,6 +2333,7 @@ struct mob_special_data {
     obj_vnum skin;
     struct combine_data *join_list;
     Character *head_join;
+    vector<int> teaches_skills;
 
     int damage_taken; /* This is the total damage that this mob has taken before they died */
     struct dam_from_list *dam_list; /* this is a list of the id nums of people who have attacked this mob */

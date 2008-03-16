@@ -18,9 +18,10 @@
     </ignoreparts>
     <projectdirectory>/home/vmplanet/mud/6000/gamesrc</projectdirectory>
     <absoluteprojectpath>true</absoluteprojectpath>
-    <description/>
+    <description></description>
     <versioncontrol>kdevcvsservice</versioncontrol>
     <projectname>4Dimensions</projectname>
+    <defaultencoding></defaultencoding>
   </general>
   <kdevcustomproject>
     <run>
@@ -31,19 +32,24 @@
       <terminal>false</terminal>
       <autocompile>true</autocompile>
       <envvars/>
+      <globaldebugarguments></globaldebugarguments>
+      <globalcwd>/home/vmplanet/mud/6000/gamesrc</globalcwd>
+      <useglobalprogram>false</useglobalprogram>
+      <autoinstall>false</autoinstall>
+      <autokdesu>false</autokdesu>
     </run>
     <build>
       <buildtool>make</buildtool>
-      <builddir/>
+      <builddir></builddir>
     </build>
     <make>
       <abortonerror>false</abortonerror>
       <numberofjobs>3</numberofjobs>
       <prio>0</prio>
       <dontact>false</dontact>
-      <makebin/>
-      <defaulttarget/>
-      <makeoptions/>
+      <makebin></makebin>
+      <defaulttarget></defaulttarget>
+      <makeoptions></makeoptions>
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default/>
@@ -66,18 +72,29 @@
       <filetype>CMakeLists.txt</filetype>
     </filetypes>
     <blacklist/>
+    <other>
+      <prio>0</prio>
+      <otherbin></otherbin>
+      <defaulttarget></defaulttarget>
+      <otheroptions></otheroptions>
+      <selectedenvironment>default</selectedenvironment>
+      <environments>
+        <default/>
+      </environments>
+    </other>
   </kdevcustomproject>
   <kdevdebugger>
     <general>
-      <dbgshell/>
+      <dbgshell></dbgshell>
       <programargs/>
-      <gdbpath/>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <gdbpath></gdbpath>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
+      <raiseGDBOnStart>false</raiseGDBOnStart>
     </general>
     <display>
       <staticmembers>false</staticmembers>
@@ -174,8 +191,8 @@
       <statusBarTypeEvaluation>false</statusBarTypeEvaluation>
       <namespaceAliases>std=_GLIBCXX_STD;__gnu_cxx=std</namespaceAliases>
       <processPrimaryTypes>true</processPrimaryTypes>
-      <processFunctionArguments>false</processFunctionArguments>
-      <preProcessAllHeaders>false</preProcessAllHeaders>
+      <processFunctionArguments>true</processFunctionArguments>
+      <preProcessAllHeaders>true</preProcessAllHeaders>
       <parseMissingHeadersExperimental>false</parseMissingHeadersExperimental>
       <resolveIncludePathsUsingMakeExperimental>false</resolveIncludePathsUsingMakeExperimental>
       <alwaysParseInBackground>true</alwaysParseInBackground>
@@ -184,7 +201,7 @@
       <includePaths>.;</includePaths>
     </codecompletion>
     <creategettersetter>
-      <prefixGet/>
+      <prefixGet></prefixGet>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>
@@ -192,6 +209,11 @@
       <inlineSet>true</inlineSet>
     </creategettersetter>
     <references/>
+    <splitheadersource>
+      <enabled>false</enabled>
+      <synchronize>true</synchronize>
+      <orientation>Vertical</orientation>
+    </splitheadersource>
   </kdevcppsupport>
   <ctagspart>
     <customArguments/>

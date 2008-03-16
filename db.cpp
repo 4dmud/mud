@@ -69,7 +69,7 @@ void assign_mob_stats ( void );
 void free_forests ( struct forest_data *this_forest );
 int check_item_hack_invis ( struct obj_data *obj, int fix );
 void free_join_list ( struct combine_data *list );
-
+void sort_all_spell_data ( void );
 void assign_skills ( void );
 void assign_subskills ( void );
 //void sprintbits(long vektor, char *outstring);
@@ -207,7 +207,9 @@ int count_hash_records ( FILE * fl );
 void parse_simple_mob ( FILE * mob_f, Character *mob, int nr );
 void interpret_espec ( const char *keyword, const char *value, int i,
                        int nr );
-void parse_espec ( char *buf, int i, int nr );
+void parse_trainer_mob(FILE * mob_f, Character *mob, int nr);
+void parse_trainer_skills ( char *buf, Character *mob, int nr );
+void parse_espec ( char *buf, Character *mob, int nr );
 void parse_enhanced_mob ( FILE * mob_f, int i, int nr );
 void get_one_line ( FILE * fl, char *buf );
 void save_etext ( Character *ch );
@@ -1098,12 +1100,17 @@ void boot_db ( void )
 	log ( "Loading spell definitions." );
 	mag_assign_spells();
 
+	log ( "Assigning spell and skill levels." );
+	init_spell_levels();
 
 	log ( "Loading skill definitions." );
 	assign_skills();
 
 	log ( "Loading SUB-skill definitions." );
 	assign_subskills();
+
+	log ( "Sorting skills and spells." );
+	sort_spells();
 
 	log ( "Booting World." );
 	boot_world();
@@ -1154,12 +1161,8 @@ void boot_db ( void )
 	log ( "Booting assembled objects." );
 	assemblyBootAssemblies();
 
-	log ( "Assigning spell and skill levels." );
-	init_spell_levels();
-
-	log ( "Sorting command list and spells." );
+	log ( "Sorting command list." );
 	sort_commands();
-	sort_spells();
 
 	log ( "Booting mail system." );
 	if ( !scan_file() )
@@ -2294,7 +2297,7 @@ void parse_simple_mob ( FILE * mob_f, Character *mob, int nr )
 	mob->char_specials.position = t[0];
 	mob->mob_specials.default_pos = t[1];
 	mob->player.sex = t[2];
-	if ( ( mob->mob_specials.race = t[3] ) != MOB_RACE_ANIMAL )
+	if ( ( mob->mob_specials.race = t[3] ) != MOB_RACE_ANIMAL || ( mob->mob_specials.race = t[3] ) != MOB_RACE_EXOTIC)
 		GET_GOLD ( mob ) = ( t[0] ? mob_stats[k].gold : 0 );
 
 	mob->player.chclass = 0;
@@ -2441,11 +2444,38 @@ void parse_espec ( char *buf, Character *mob, int nr )
 	}
 	interpret_espec ( buf, ptr, mob, nr );
 }
+void parse_trainer_skills ( char *buf, Character *mob, int nr )
+{
+	int v = spell_num(buf);
+	
+	if (v != TYPE_UNDEFINED)
+		mob->mob_specials.teaches_skills.push_back(v);
+}
+
+void parse_trainer_mob(FILE * mob_f, Character *mob, int nr) {
+char line[READ_SIZE];
+
+	while ( get_line ( mob_f, line ) )
+	{
+		if ( !strcmp ( line, "H*END" ) )   /* end of the enhanced section */
+			return;
+		else if ( *line == '#' )     /* we've hit the next mob, maybe? */
+		{
+			log ( "SYSERR: Unterminated H (Training) section in mob #%d", nr );
+			exit ( 1 );
+		}
+		else
+			parse_trainer_skills ( line, mob, nr );
+	}
+
+	log ( "SYSERR: Unexpected end of file reached after mob #%d", nr );
+	exit ( 1 );
+}
 
 
 void parse_enhanced_mob ( FILE * mob_f, Character *mob, int nr )
 {
-	char line[256];
+	char line[READ_SIZE];
 
 	parse_simple_mob ( mob_f, mob, nr );
 
@@ -2842,11 +2872,16 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 			log ( "SYSERR: Unsupported mob type '%c' in mob #%d", letter, nr );
 			exit ( 1 );
 	}
+	letter = fread_letter ( mob_f );
+	ungetc ( letter, mob_f );
+        if (UPPER ( letter ) == 'H')
+		parse_trainer_mob( mob_f, mob, nr );
+
 	mob->mob_specials.join_list = NULL;
 	mob->mob_specials.head_join = NULL;
 	letter = fread_letter ( mob_f );
 	ungetc ( letter, mob_f );
-	while ( letter == 'J' )
+	while ( UPPER ( letter ) == 'J' )
 	{
 		// assume its valid, we have to
 		get_line ( mob_f, line )
@@ -2861,10 +2896,11 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 		letter = fread_letter ( mob_f );
 		ungetc ( letter, mob_f );
 	}
+	
 	/* DG triggers -- script info follows mob S/E section */
 	letter = fread_letter ( mob_f );
 	ungetc ( letter, mob_f );
-	while ( letter == 'T' )
+	while ( UPPER ( letter ) == 'T' )
 	{
 		dg_read_trigger ( mob_f, mob, MOB_TRIGGER );
 		letter = fread_letter ( mob_f );

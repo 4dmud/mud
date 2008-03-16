@@ -654,6 +654,7 @@ const char *action_bits[] =
 	"HEALER",
 	"POSTMASTER",
 	"QUESTMOB",
+	"TRAINER",
 	"\n"
 };
 

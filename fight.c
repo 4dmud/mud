@@ -2467,7 +2467,7 @@ int fe_after_damage(Character* ch, Character* vict,
     if (dam) {
 
        if (RIDING(vict) && HERE(RIDING(vict), vict) && RIDING(vict) != ch) {
-            partial = (((dam/3) * (250 - total_chance(vict, SKILL_MOUNTED_COMBAT)))/250);
+            partial = (((dam/2) * (250 - total_chance(vict, SKILL_MOUNTED_COMBAT)))/250);
             damage(ch, RIDING(vict), partial, w_type);
             partial *= 2;
                // return -1;

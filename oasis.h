@@ -396,6 +396,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_CHA			39
 #define MEDIT_SKIN		40
 #define MEDIT_OWNER		41
+#define MEDIT_TRAINING		42
+#define MEDIT_DELETE_TRAINING	43
 
 /*
  * Submodes of SEDIT connectedness.
