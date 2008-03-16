@@ -627,10 +627,10 @@ void medit_disp_mob_trains ( Descriptor *d )
 	{
 		for ( int i = 0; i < OLC_MOB ( d )->mob_specials.teaches_skills.size();i++ )
 		{
-			d->Output ( "%s%2d%s) [%5d] %-15s%s", grn, i, nrm, OLC_MOB ( d )->mob_specials.teaches_skills[i], skill_name ( OLC_MOB ( d )->mob_specials.teaches_skills[i] ), !(i%2) ? "          " : "\r\n" );
+			d->Output ( "%s%2d%s) [%5d] %-15s%s", grn, i, nrm, OLC_MOB ( d )->mob_specials.teaches_skills[i], skill_name ( OLC_MOB ( d )->mob_specials.teaches_skills[i] ), ! ( i%2 ) ? "          " : "\r\n" );
 		}
 	}
-	d->Output ( "\r\n['d' to delete an entry, -1 to quit]\r\nType the skill/spell name that this mob should teach: " );
+	d->Output ( "\r\n['d' to delete an entry, 'q' to quit]\r\nType the skill/spell name that this mob should teach: " );
 
 }
 
@@ -1460,7 +1460,7 @@ void medit_parse ( Descriptor *d, char *arg )
 			{
 				delete_one_join ( OLC_MOB ( d ), i );
 			}
-			else
+			else if ( i != -1 )
 			{
 				d->Output ( "That number is invalid!\r\n" );
 				medit_disp_mob_joins ( d );
@@ -1471,8 +1471,12 @@ void medit_parse ( Descriptor *d, char *arg )
 			if ( ( arg[0] == 'd' || arg[0] == 'D' ) && !arg[1] )
 			{
 				d->Output ( "Delete which training ability?: " );
-				OLC_MODE ( d ) = MEDIT_DELETE_SEGMENT;
+				OLC_MODE ( d ) = MEDIT_DELETE_TRAINING;
 				return;
+			}
+			else if ( ( arg[0] == 'q' || arg[0] == 'Q' ) && !arg[1] )
+			{
+				break;
 			}
 			else
 			{
