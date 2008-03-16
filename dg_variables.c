@@ -1212,6 +1212,9 @@ break;
 		    case 7:
 			snprintf(str, slen, "%s", "cthulytes");
 			break;
+                    case 8:
+                        snprintf(str, slen, "%s", "alderisio");
+                        break;
                     default:
                         *str = '\0';
                         break;
