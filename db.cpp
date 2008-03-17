@@ -207,7 +207,7 @@ int count_hash_records ( FILE * fl );
 void parse_simple_mob ( FILE * mob_f, Character *mob, int nr );
 void interpret_espec ( const char *keyword, const char *value, int i,
                        int nr );
-void parse_trainer_mob(FILE * mob_f, Character *mob, int nr);
+void parse_trainer_mob ( FILE * mob_f, Character *mob, int nr );
 void parse_trainer_skills ( char *buf, Character *mob, int nr );
 void parse_espec ( char *buf, Character *mob, int nr );
 void parse_enhanced_mob ( FILE * mob_f, int i, int nr );
@@ -2297,7 +2297,7 @@ void parse_simple_mob ( FILE * mob_f, Character *mob, int nr )
 	mob->char_specials.position = t[0];
 	mob->mob_specials.default_pos = t[1];
 	mob->player.sex = t[2];
-	if ( ( mob->mob_specials.race = t[3] ) != MOB_RACE_ANIMAL || ( mob->mob_specials.race = t[3] ) != MOB_RACE_EXOTIC)
+	if ( ( mob->mob_specials.race = t[3] ) != MOB_RACE_ANIMAL || ( mob->mob_specials.race = t[3] ) != MOB_RACE_EXOTIC )
 		GET_GOLD ( mob ) = ( t[0] ? mob_stats[k].gold : 0 );
 
 	mob->player.chclass = 0;
@@ -2446,14 +2446,15 @@ void parse_espec ( char *buf, Character *mob, int nr )
 }
 void parse_trainer_skills ( char *buf, Character *mob, int nr )
 {
-	int v = spell_num(buf);
-	
-	if (v != TYPE_UNDEFINED)
-		mob->mob_specials.teaches_skills.push_back(v);
+	int v = spell_num ( buf );
+
+	if ( v != TYPE_UNDEFINED )
+		mob->mob_specials.teaches_skills.push_back ( v );
 }
 
-void parse_trainer_mob(FILE * mob_f, Character *mob, int nr) {
-char line[READ_SIZE];
+void parse_trainer_mob ( FILE * mob_f, Character *mob, int nr )
+{
+	char line[READ_SIZE];
 
 	while ( get_line ( mob_f, line ) )
 	{
@@ -2874,8 +2875,8 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 	}
 	letter = fread_letter ( mob_f );
 	ungetc ( letter, mob_f );
-        if (UPPER ( letter ) == 'H')
-		parse_trainer_mob( mob_f, mob, nr );
+	if ( UPPER ( letter ) == 'H' )
+		parse_trainer_mob ( mob_f, mob, nr );
 
 	mob->mob_specials.join_list = NULL;
 	mob->mob_specials.head_join = NULL;
@@ -2896,7 +2897,7 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 		letter = fread_letter ( mob_f );
 		ungetc ( letter, mob_f );
 	}
-	
+
 	/* DG triggers -- script info follows mob S/E section */
 	letter = fread_letter ( mob_f );
 	ungetc ( letter, mob_f );
@@ -3746,7 +3747,45 @@ struct help_index_element *add_to_help_index ( struct help_index_element *perent
 /*************************************************************************
 *  procedures for resetting, both play-time and boot-time         *
 *************************************************************************/
+void do_show_trainers ( Character *ch )
+{
+	int  found = 0, i;
+	char buf[MAX_INPUT_LENGTH];
+	Character *mob;
+	DYN_DEFINE;
+	*buf = 0;
+	DYN_CREATE;
+	*dynbuf = 0;
 
+	for ( mp_iter mit = mob_proto.begin(); mit != mob_proto.end(); mit++ )
+	{
+		mob = mit->second;
+
+		if ( mob != NULL && !mob->mob_specials.teaches_skills.empty() )
+		{
+			snprintf ( buf, sizeof ( buf ), "%3d. [%5d] {cy%-40s{c0 %s\r\n", ++found,
+			           mob->vnum, mob->player.short_descr,
+			           mob->proto_script ? "[TRIG]" : "" );
+			DYN_RESIZE ( buf );
+			for ( i = 0; i < mob->mob_specials.teaches_skills.size();i++ )
+			{
+				snprintf ( buf, sizeof ( buf ), "%s[%5d] {cg%-15s{c0%s", 
+				! ( i%2 ) ? "             " : " ",
+				mob->mob_specials.teaches_skills[i], 
+				skill_name ( mob->mob_specials.teaches_skills[i] ), 
+				! ( i%2 ) ? " " : "\r\n" );
+				DYN_RESIZE ( buf );
+			}
+			snprintf ( buf, sizeof ( buf ), "%s" , !( i%2 ) ? "" : "\r\n" );
+			DYN_RESIZE ( buf );
+
+		}
+	}
+	snprintf ( buf, sizeof ( buf ), "Found: %3d.\r\n" , found );
+	DYN_RESIZE ( buf );
+	page_string ( ch->desc, dynbuf, DYN_BUFFER );
+	return;
+}
 
 
 int vnum_mobile ( char *searchname, Character *ch )
@@ -3911,7 +3950,7 @@ struct obj_data *create_obj ( obj_rnum proto )
 	obj->item_number = NOTHING;
 	obj->in_room = NULL;
 	if ( proto != NOTHING && proto <= top_of_objt )
-        	*obj = obj_proto[proto];
+		*obj = obj_proto[proto];
 	GET_ID ( obj ) = max_obj_id++;
 	/* find_obj helper */
 	object_list[GET_ID ( obj ) ] = obj;
@@ -3935,7 +3974,7 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 	}
 	qic_load ( i ); //remove in free obj
 
-	obj = create_obj(i);
+	obj = create_obj ( i );
 
 	if ( obj_index[i].qic )
 		log ( "%s created", obj->short_description );
