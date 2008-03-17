@@ -186,7 +186,7 @@ extern char *class_abbrevs[];
 extern const int xap_objs;
 
 /* extern procedures */
-void list_skills(Character *ch, int skillspell);
+void list_skills(Character *ch, int skillspell, Character *mob);
 void appear(Character *ch);
 void perform_immort_vis(Character *ch);
 SPECIAL(shop_keeper);
@@ -492,12 +492,12 @@ ACMD(do_not_here)
 
 ACMD(do_prac_skills)
 {
-  list_skills(ch, 1);
+  list_skills(ch, 1, NULL);
 }
 
 ACMD(do_prac_spells)
 {
-  list_skills(ch, 0);
+  list_skills(ch, 0, NULL);
 }
 
 
@@ -524,18 +524,18 @@ ACMD(do_practice)
 
   if (isname("skills", arg))
   {
-    list_skills(ch, 0);
+    list_skills(ch, 0, NULL);
     return;
   }
   if (isname("spells", arg))
   {
-    list_skills(ch, 1);
+    list_skills(ch, 1, NULL);
     return;
   }
 
   if (is_abbrev(arg, "subskills"))
   {
-    list_skills(ch, 2);
+    list_skills(ch, 2, NULL);
     return;
   }
   ch->Send("{cCpractice skills{c0 or type {cCpractice spells{c0 or {cCpractice subs{c0\r\n\r\n");

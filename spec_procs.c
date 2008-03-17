@@ -170,7 +170,7 @@ ACMD ( do_say );
 void sort_spells ( void );
 int compare_spells ( const void *x, const void *y );
 const char *how_good ( int percent );
-void list_skills ( Character *ch, int skillspell );
+void list_skills ( Character *ch, int skillspell , Character *mob );
 void npc_steal ( Character *ch, Character *victim );
 void sort_spell_data ( void );
 void sort_skill_data ( void );
@@ -400,10 +400,22 @@ extern int prac_params[4][NUM_CLASSES];
 #define MINGAIN(ch) (prac_params[MIN_PER_PRAC][(int)GET_CLASS(ch)])
 #define MAXGAIN(ch) (prac_params[MAX_PER_PRAC][(int)GET_CLASS(ch)])
 #define SPLSKL(ch) (prac_types[prac_params[PRAC_TYPE][(int)GET_CLASS(ch)]])
+bool can_teach_skill ( Character *mob, int i )
+{
+	if ( IS_NPC ( mob ) && !mob->mob_specials.teaches_skills.empty() )
+	{
+		for ( int h = 0; h < mob->mob_specials.teaches_skills.size();h++ )
+		{
+			if ( mob->mob_specials.teaches_skills.at ( h ) == i )
+				return TRUE;
+		}
+	}
+	return FALSE;
+}
 
 #if defined(WIN32)
 
-void list_skills ( Character *ch, int skillspell )
+void list_skills ( Character *ch, int skillspell, Character *mob )
 {
 	int i, sortpos;
 	DYN_DEFINE;
@@ -442,7 +454,7 @@ void list_skills ( Character *ch, int skillspell )
 }
 
 #else
-void list_skills ( Character *ch, int skillspell )
+void list_skills ( Character *ch, int skillspell, Character *mob )
 {
 	int i, sortpos, h = 0, imm, ending, sub;
 	int count= 0;
@@ -472,20 +484,33 @@ void list_skills ( Character *ch, int skillspell )
 
 	imm = -1;
 
-	if ( GET_PRACTICES ( ch ) <= 0 )
-		strcpy ( buf, "You have no practice sessions remaining.\r\n" );
+	if ( mob == NULL )
+	{
+		if ( GET_PRACTICES ( ch ) <= 0 )
+			strcpy ( buf, "You have no practice sessions remaining.\r\n" );
+		else
+			sprintf ( buf, "You have %d practice session%s remaining.\r\n",
+			          GET_PRACTICES ( ch ), ( GET_PRACTICES ( ch ) == 1 ? "" : "s" ) );
+		if ( skillspell < 2 )
+			sprintf ( buf + strlen ( buf ), "You have the following %s:\r\n",skillspell == 1 ? "spells" : "skills" );
+		else
+			sprintf ( buf + strlen ( buf ), "You have the following extra abilities:\r\n" );
+		DYN_RESIZE ( buf );
+	}
 	else
-		sprintf ( buf, "You have %d practice session%s remaining.\r\n",
-		          GET_PRACTICES ( ch ), ( GET_PRACTICES ( ch ) == 1 ? "" : "s" ) );
-	if ( skillspell < 2 )
-		sprintf ( buf + strlen ( buf ), "You have the following %s:\r\n",skillspell == 1 ? "spells" : "skills" );
-	else
-		sprintf ( buf + strlen ( buf ), "You have the following extra abilities:\r\n" );
-	DYN_RESIZE ( buf );
+	{
+		snprintf ( buf, sizeof(buf), "%s can teach you the following %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills" );
+		DYN_RESIZE ( buf );
+	}
 	/*need to add dyn buff here*/
 	for ( ; sortpos <= ending; sortpos++ )
 	{
 		i = spell_sort_info[sortpos];
+		if ( skillspell < 2 && mob && !mob->mob_specials.teaches_skills.empty())
+		{
+			if ( !can_teach_skill ( mob, i ) )
+				continue;
+		}
 
 		if ( skillspell > 1 )
 		{
@@ -644,17 +669,17 @@ SPECIAL ( guild )
 
 	if ( is_abbrev ( "skills", argument ) )
 	{
-		list_skills ( ch, 0 );
+		list_skills ( ch, 0, mob );
 		return ( 1 );
 	}
 	if ( is_abbrev ( "spells", argument ) )
 	{
-		list_skills ( ch, 1 );
+		list_skills ( ch, 1, mob );
 		return ( 1 );
 	}
 	if ( is_abbrev ( "subskills", argument ) )
 	{
-		list_skills ( ch, 2 );
+		list_skills ( ch, 2, mob );
 		return ( 1 );
 	}
 
@@ -677,6 +702,12 @@ SPECIAL ( guild )
 		act ( "$N says 'I'm not skilled in tinker.  You must find someone else to teach you that.", FALSE, ch, 0, mob, TO_CHAR );
 		return ( 1 );
 	}
+#if 0
+if (!can_teach_skill(mob, skill_num)) {
+act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, mob, TO_CHAR );
+		return ( 1 );
+}
+#endif
 
 	if ( skill_num < 1 ||
 	        !knows_spell ( ch, skill_num ) )
