@@ -834,7 +834,9 @@ obj_data *get_obj_near_obj ( obj_data * obj, char *name )
 /* returns the object in the world with name name, or NULL if not found */
 struct obj_data *get_obj ( const char *name )
 {
-	if ( *name == UID_CHAR )
+	if ( !name || !*name )
+		return NULL;
+	else if ( *name == UID_CHAR )
 		return find_obj ( atoi ( name + 1 ) );
 	else
 	{
@@ -1083,7 +1085,7 @@ void check_time_triggers ( void )
 			sc = SCRIPT ( obj );
 
 			if ( IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_TIME ) )
-				tobjs[GET_ID(obj)] = obj;
+				tobjs[GET_ID ( obj ) ] = obj;
 		}
 	}
 	for ( olt_it i = tobjs.begin(); i != tobjs.end(); i++ )
