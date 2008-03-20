@@ -2986,33 +2986,30 @@ ACMD ( do_energize )
 		ch->Send ( "You can't energize that item!\r\n" );
 		return;
 	}
-	if ( !*arg1 )
+	
+	if ( GET_OBJ_VAL ( temp, 0 ) == VIAL_NONE )
 	{
-		if ( GET_OBJ_VAL ( temp, 0 ) == VIAL_NONE )
+		ch->Send ( "That is an empty vial - you must specify a new type for it." );
+		return;
+	}
+	else
+	{
+		if ( is_abbrev ( arg1, "hitpoints" ) || is_abbrev ( arg1, "health" ) )
+			type = VIAL_HITP;
+		else if ( is_abbrev ( arg1, "mana" ) )
+			type = VIAL_MANA;
+		else if ( is_abbrev ( arg1, "move" ) )
+			type = VIAL_MOVE;
+		else if ( is_abbrev ( arg1, "stamina" ) )
+			type = VIAL_STAM;
+
+		if ( type == VIAL_NONE )
 		{
-			ch->Send ( "That is an empty vial - you must specify a new type for it." );
+			ch->Send ( "Sorry, I don't recognise that type.\r\n" );
 			return;
 		}
-		else
-		{
-			if ( is_abbrev ( arg1, "hitpoints" ) || is_abbrev ( arg1, "health" ) )
-				type = VIAL_HITP;
-			else if ( is_abbrev ( arg1, "mana" ) )
-				type = VIAL_MANA;
-			else if ( is_abbrev ( arg1, "move" ) )
-				type = VIAL_MOVE;
-			else if ( is_abbrev ( arg1, "stamina" ) )
-				type = VIAL_STAM;
 
-			if ( type == VIAL_NONE )
-			{
-				ch->Send ( "Sorry, I don't recognise that type.\r\n" );
-				return;
-			}
-
-		}
 	}
-
 
 	type = type ? type : GET_OBJ_VAL ( temp, 0 );
 	switch ( type )
