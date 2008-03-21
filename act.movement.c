@@ -1850,7 +1850,7 @@ ACMD(do_leader) {
             return;
         }
     } else {
-        send_to_char("Whom do you wish to make the leader\r\n", ch);
+        send_to_char("Whom do you wish to make the leader?\r\n", ch);
         return;
     }
     if (leader == ch) {
