@@ -872,6 +872,7 @@ int current_class_is_tier_num ( Character *ch );
 #define GET_OBJ_VAL(obj, val)	  ((obj)->obj_flags.value[(val)])
 #define GET_FUEL(obj)           GET_OBJ_VAL(obj, 2)
 #define GET_MAX_FUEL(obj)       GET_OBJ_VAL(obj, 3)
+#define GET_FUEL_PERCENTAGE(obj)  (GET_MAX_FUEL(obj) != 0 ? 0 : GET_FUEL(obj)*100/GET_MAX_FUEL(obj))
 #define GET_GEM_FUEL(obj)	  GET_OBJ_VAL(obj, 0)
 #define GET_OBJ_MATERIAL(obj)   GET_OBJ_VAL(obj, 9)
 #define GET_WEP_BALANCE(obj)    GET_OBJ_VAL(obj, 5)

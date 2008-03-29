@@ -222,7 +222,7 @@ void show_obj_to_char ( struct obj_data *obj, Character *ch,
 				if ( !OBJ_FLAGGED ( obj, ITEM_NODISPLAY ) || ( GET_LEVEL ( ch ) > LVL_IMMORT ) )
 				{
 					if ( GET_OBJ_TYPE ( obj ) == ITEM_SPACEBIKE )
-						ch->Send ( "%s [FUEL: %d%%]",obj->description, GET_FUEL ( obj ) > 0 ? ( GET_FUEL ( obj ) * 100 ) / GET_MAX_FUEL ( obj ) : 0 );
+						ch->Send ( "%s [FUEL: %d%%]",obj->description, GET_FUEL ( obj ) > 0 ? GET_FUEL_PERCENTAGE(obj) : 0 );
 					else
 						ch->Send ( "%s", obj->description );
 				}
@@ -2443,7 +2443,7 @@ ACMD ( do_score )
 	if ( has_vehicle ( ch ) )
 	{
 		struct obj_data *v = has_vehicle ( ch );
-		ch->Send ( "Vehicle Fuel: [%d]\r\n", GET_FUEL ( v ) > 0 ? ( GET_FUEL ( v ) * 100 ) / GET_MAX_FUEL ( v ) : 0 );
+		ch->Send ( "Vehicle Fuel: [%d]\r\n", GET_FUEL ( v ) > 0 ? GET_FUEL_PERCENTAGE(v) : 0 );
 	}
 	if ( ch->pet != -1 )
 		*ch << "Pet: " << mob_name_by_vnum ( ch->pet ) << "\r\n";

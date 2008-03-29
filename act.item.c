@@ -4793,7 +4793,7 @@ ACMD ( do_fuel )
 	}
 	else
 	{
-		int filled=GET_FUEL ( spacebike ) *100/GET_MAX_FUEL ( spacebike );
+		int filled=GET_FUEL_PERCENTAGE(spacebike);
 		if ( filled <25 )
 			ch->Send ( "You fill up %s using %s, but it is still very empty.\r\n",OBJS ( spacebike,ch ),OBJS ( gemcluster,ch ) );
 		else if ( filled<50 )
