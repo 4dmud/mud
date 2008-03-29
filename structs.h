@@ -538,6 +538,12 @@ class Room;
 #define PLR_DYING       25      /* player is in the state of dying */
 #define PLR_RP_LEADER   26      /* player has echo, and award commands */
 #define PLR_IMM_MORT	27	/* Player is the mortal of an immortal, and should hear wiznet*/
+#define PLR_JESTER      28      /* Player is a rp group jester */
+#define PLR_CTHULYTE    29      /* Player is a rp group cthulyte */
+#define PLR_ALDERISIO   30      /* Player is in rp group alderisio */
+#define PLR_BITCH        31      /* Player is in rp group bitch */
+#define PLR_RIDDLER      32     /* Player is in rp group Riddler */
+#define PLR_LOLTHYTE     33    /* Player is in rp group lolthye */
 
 #define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */
