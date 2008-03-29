@@ -461,12 +461,27 @@ bool is_note_to ( Character *ch, NOTE_DATA *pnote )
 	if ( PLR_FLAGGED ( ch, PLR_RP_LEADER ) && isname ( "rpl", pnote->to_list ) )
 		return TRUE;
 
-	if ( PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) && isname ( "rp", pnote->to_list ) )
-		return TRUE;
+// Temp remove this. Prometheus
+//	if ( PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) && isname ( "rp", pnote->to_list ) )
+//		return TRUE;
 	if ( PLR_FLAGGED ( ch, PLR_PK ) && isname ( "pk", pnote->to_list ) )
 		return TRUE;
 	if ( PLR_FLAGGED ( ch, PLR_NEWBIE_HLPR ) && isname ( "helper", pnote->to_list ) )
 		return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_JESTER ) && isname ( "jester", pnote->to_list ) )
+                return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_CTHULYTE ) && isname ( "cthulyte", pnote->to_list ) )
+                return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_ALDERISIO ) && isname ( "alderisio", pnote->to_list ) )
+                return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_BITCH ) && isname ( "bitch", pnote->to_list ) )
+                return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_RIDDLER ) && isname ( "riddler", pnote->to_list ) )
+                return TRUE;
+	if ( PLR_FLAGGED ( ch, PLR_LOLTHYTE ) && isname ( "lolthyte", pnote->to_list ) )
+                return TRUE;
+
+
 	if ( isname ( GET_NAME ( ch ), pnote->to_list ) )
 		return TRUE;
 	if ( isname ( list_account_names ( ch ).c_str(), pnote->to_list ) )
