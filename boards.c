@@ -238,6 +238,12 @@ int Board_write_message(int board_type, Character *ch, char *arg,
   time_t ct;
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 
+  if (GET_LEVEL(ch) < 20 && REMORTS(ch) == 0)
+  {
+   ch->Send( "Writing messages on boards has been temporarily disabled for new players.\r\n");
+   return (1);
+  }
+
   if (GET_LEVEL(ch) < WRITE_LVL(board_type))
   {
     ch->Send( "You are not holy enough to write on this board.\r\n");
