@@ -2875,8 +2875,6 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 	}
 	letter = fread_letter ( mob_f );
 	ungetc ( letter, mob_f );
-	if ( UPPER ( letter ) == 'H' )
-		parse_trainer_mob ( mob_f, mob, nr );
 
 	mob->mob_specials.join_list = NULL;
 	mob->mob_specials.head_join = NULL;
@@ -2897,6 +2895,9 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 		letter = fread_letter ( mob_f );
 		ungetc ( letter, mob_f );
 	}
+
+	if ( UPPER ( letter ) == 'H' )
+		parse_trainer_mob ( mob_f, mob, nr );
 
 	/* DG triggers -- script info follows mob S/E section */
 	letter = fread_letter ( mob_f );
