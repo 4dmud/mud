@@ -5127,10 +5127,10 @@ void strike_missile(Character *ch, Character *tch,
 
     snprintf(buf, sizeof(buf), "Your $p strikes $N!");
     act(buf, FALSE, ch, missile, tch, TO_CHAR);
-    snprintf(buf, sizeof(buf), "$p flies in from the %s and strikes %s.",
+    snprintf(buf, sizeof(buf), "An $p flies in from the %s and strikes %s.",
              dirs[rev_dir[dir]], GET_NAME(tch));
     act(buf, FALSE, tch, missile, NULL, TO_ROOM);
-    snprintf(buf, sizeof(buf), "$p flies in from the %s and hits YOU!",
+    snprintf(buf, sizeof(buf), "An $p flies in from the %s and hits YOU!",
              dirs[rev_dir[dir]]);
     act(buf, FALSE, ch, missile, tch, TO_VICT);
     if (damage(ch, tch, dam, attacktype) != -1)
@@ -5164,7 +5164,7 @@ void miss_missile(Character *ch, Character *tch,
 
 
         snprintf(buf, sizeof(buf),
-                 "$p flies in from the %s and hits the ground!",
+                 "An $p flies in from the %s and hits the ground!",
                  dirs[rev_dir[dir]]);
         act(buf, FALSE, tch, 0, missile, TO_ROOM);
         act(buf, FALSE, tch, 0, missile, TO_CHAR);
