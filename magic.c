@@ -851,7 +851,7 @@ void mag_affects(int level, Character *ch, Character *victim,
         }
         accum_duration =FALSE;
         to_vict = "A pulsing blue shield appears around you.";
-        to_room = "A pulsing blue shield suddenly surrounds $n";
+        to_room = "A pulsing blue shield suddenly surrounds $n.";
         break;
 
     case SPELL_PROT_FIRE:
