@@ -4052,6 +4052,8 @@ void perform_immort_where ( Character *ch, char *arg )
 
 	if ( !*arg )
 	{
+		new_mudlog ( CMP, ( GET_LEVEL ( ch ) == LVL_IMPL ? GET_LEVEL ( ch ) :GET_LEVEL ( ch ) +1 ), TRUE, "(GC) %s did a \"where\".",
+		             GET_NAME ( ch ));
 		ch->Send ( "Players\r\n-------\r\n" );
 		for ( d = descriptor_list; d; d = d->next )
 		{
@@ -4078,6 +4080,8 @@ void perform_immort_where ( Character *ch, char *arg )
 	}
 	else
 	{
+		new_mudlog ( CMP, ( GET_LEVEL ( ch ) == LVL_IMPL ? GET_LEVEL ( ch ) :GET_LEVEL ( ch ) +1 ), TRUE, "(GC) %s did a \"where %s\".",
+		             GET_NAME ( ch ),arg);
 		counter = 0;
 		for ( i = character_list; i; i = i->next )
 			if ( CAN_SEE ( ch, i ) && i->in_room != NULL
