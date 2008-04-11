@@ -640,7 +640,7 @@ ASKILL(skill_tinker)
     damage(ch, ch, dam, TYPE_UNDEFINED);
     return 0;
   }
-  time = 3000;
+  time = 6000;
   if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_BLESS))
     time *= 2;
   if (IS_SET_AR(GET_OBJ_EXTRA(weapon), ITEM_HUM))
