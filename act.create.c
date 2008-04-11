@@ -565,7 +565,7 @@ ASKILL(skill_tinker)
   struct obj_data *weapon = NULL;
   struct obj_data *next_obj;
   char weapon_name[MAX_STRING_LENGTH];
-  int found = FALSE, prob = 0, dam = 0, time;
+  int found = FALSE, prob = 0, dam = 0, time = 0;
 
   one_argument(argument, weapon_name);
 
