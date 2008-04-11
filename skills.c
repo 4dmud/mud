@@ -2578,7 +2578,9 @@ ASKILL(skill_poison_weapon)
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_POISONED_4);
 
   /* Set an object timer.  Dont want proliferation of poisoned weapons */
-  GET_OBJ_TIMER(obj) = 10 + GET_LEVEL(ch);
+  // Changed this to 6000 per Molly till off-line timers can be fixed.
+  // Prometheus. Old is 10 + GET_LEVEL(ch)
+  GET_OBJ_TIMER(obj) = 6000 + GET_LEVEL(ch);
 
   if (IS_OBJ_STAT(obj, ITEM_BLESS))
     GET_OBJ_TIMER(obj) *= 2;
