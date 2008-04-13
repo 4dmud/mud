@@ -985,27 +985,14 @@ int perform_move(Character *ch, int dir, int need_specials_check) {
 
     } else {
 
-        if (IS_AFFECTED(ch, AFF_HOLD)) {
-            if (FIGHTING(ch)) {
-	    // Added Code Prometheus
-		ch->Send( "You struggle ");
-            if (number(1, 101) < total_chance(ch, SKILL_TRAP_AWARE)) {
-                ch->Send( "and manage to free yourself from the snare.\r\n");
-                affect_from_char(ch, SKILL_SNARE);
-            } else {
-                ch->Send( "but cant get free of the snare!\r\n");
-                return 0;
-            }
-                // Old Code Prometheus  
-                //send_to_char("You are stuck in a snare!\r\n", ch);
-                //return 0;
-            }
+        if (affected_by_spell(ch, SKILL_SNARE)) {            
+                
             ch->Send( "You struggle ");
             if (number(1, 101) < total_chance(ch, SKILL_TRAP_AWARE)) {
                 ch->Send( "and manage to free yourself from the snare.\r\n");
                 affect_from_char(ch, SKILL_SNARE);
 	    } else {
-                ch->Send( "but cant get free of the snare!\r\n");
+                ch->Send( "but can't get free of the snare!\r\n");
                 return 0;
             }
         }
