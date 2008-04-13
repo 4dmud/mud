@@ -2627,6 +2627,14 @@ ASKILL(skill_retreat)
     *ch << "Retreat where?\r\n";
     return 0;
   }
+// Added this check to see if you are snared. If you
+// are snared then you shouldn't be able to retreat at all
+// Prometheus.
+   if (IS_AFFECTED(ch, AFF_HOLD)) 
+   {
+        send_to_char("You are stuck in a snare!\r\n", ch);        
+	return 0;
+   }
 
   percent = total_chance(ch, SKILL_RETREAT);
   prob = number(0, 101);
