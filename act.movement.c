@@ -993,8 +993,7 @@ int perform_move(Character *ch, int dir, int need_specials_check) {
             ch->Send( "You struggle ");
             if (number(1, 101) < total_chance(ch, SKILL_TRAP_AWARE)) {
                 ch->Send( "and manage to free yourself from the snare.\r\n");
-                affect_from_char(ch, 23);
-                //affect_from_char(ch, SKILL_SNARE);
+                affect_from_char(ch, SKILL_SNARE);
 	    } else {
                 ch->Send( "but cant get free of the snare!\r\n");
                 return 0;
