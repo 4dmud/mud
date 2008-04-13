@@ -1483,6 +1483,8 @@ void medit_parse ( Descriptor *d, char *arg )
 				i = spell_num ( arg );
 				if ( i == TYPE_UNDEFINED )
 				{
+
+					d->Output ( "\r\nSorry, that skill or spell name is unrecognised.\r\n" );
 					break;
 				}
 				else

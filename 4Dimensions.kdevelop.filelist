@@ -686,6 +686,8 @@ task.c
 tedit.c
 tedit.h
 telnet.h
+trainers.cpp
+trainers.h
 trees.c
 trees.h
 util/Makefile.in

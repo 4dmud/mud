@@ -360,6 +360,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+void parse_train_group(Character *ch, Character *vict,char * val_arg);
 int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
 int bodypartname ( char *bpn );
@@ -442,7 +443,7 @@ ACMD ( do_purge );
 ACMD ( do_syslog );
 ACMD ( do_advance );
 ACMD ( do_restore );
-void perform_immort_vis ( Character *ch );
+int perform_immort_vis ( Character *ch );
 ACMD ( do_invis );
 ACMD ( do_gecho );
 ACMD ( do_poofset );
@@ -3307,18 +3308,19 @@ ACMD ( do_restore )
 }
 
 
-void perform_immort_vis ( Character *ch )
+int perform_immort_vis ( Character *ch )
 {
 	if ( GET_INVIS_LEV ( ch ) == 0
 	        && !AFF_FLAGGED ( ch, AFF_HIDE | AFF_INVISIBLE ) )
 	{
 		*ch << "You are already fully visible.\r\n";
-		return;
+		return 0;
 	}
 
 	GET_INVIS_LEV ( ch ) = 0;
 	ch->appear();
 	*ch << "You are now fully visible.\r\n";
+return 1;
 }
 
 
@@ -5010,6 +5012,7 @@ set_fields[] =
 	{"pet", LVL_SEN, PC, NUMBER},
 	{"wizmort", LVL_SEN, PC, BINARY},
 	{"body", LVL_SEN, PC, MISC},
+	{"trains", LVL_SEN, NPC, MISC},
 	{   "\n", 0, BOTH, MISC}
 };
 
@@ -5656,6 +5659,9 @@ int perform_set ( Character *ch, Character *vict, int mode,
             ch->Send("rknee floating back chest\r\n");
         }
         break;
+    case 83:
+	parse_train_group(ch, vict, val_arg);
+break;
     default:
         ch->Send( "Can't set that!\r\n");
         return (0);

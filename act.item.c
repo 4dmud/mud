@@ -3019,22 +3019,22 @@ ACMD ( do_energize )
 			return;
 			break;
 		case VIAL_HITP:
-			amount = ( int ) ( ( float ) GET_HIT ( ch ) /4.0 );
+			amount = MAX(900, ( int ) ( GET_HIT ( ch ) * 0.25 ));
 			to_char = "A million bright green sparks leave your body.";
 			to_room = "A million bright green sparks leave $n's body.";
 			break;
 		case VIAL_MANA:
-			amount = ( int ) ( ( float ) GET_MANA ( ch ) /4.0 );
+			amount = MAX(3000, ( int ) ( GET_MANA ( ch ) * 0.25 ));
 			to_char = "Dark purple flames flow out of your body.";
 			to_room = "Dark purple flames flow out of $n's body.";
 			break;
 		case VIAL_MOVE:
-			amount = ( int ) ( ( float ) GET_MANA ( ch ) /4.0 );
-			to_char = "Blue crystal sluice from your body.";
+			amount = MAX(1000, ( int ) ( GET_MOVE ( ch ) * 0.25 ));
+			to_char = "Blue crystals sluice from your body.";
 			to_room = "Blue crystals sluices from $n's body.";
 			break;
 		case VIAL_STAM:
-			amount = ( int ) ( ( float ) GET_STAMINA ( ch ) /4.0 );
+			amount = MAX(50, ( int )( GET_STAMINA ( ch ) * 0.25 ));
 			to_char = "Thousands of black shadows slide out of your body.";
 			to_room = "Thousands of black shadows slide out of $n's body.";
 			break;

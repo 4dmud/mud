@@ -28,7 +28,7 @@ BINDIR = ../bin
 
 CFLAGS = -DHW_EVENT_SUPPORT
 #-O2
-CPPFLAGS = -O1 -ggdb $(MYFLAGS) $(PROFILE)
+CPPFLAGS = -O2 -ggdb $(MYFLAGS) $(PROFILE)
 
 LIBS =  -lcrypt -lz -lm -lc -lnsl
 #-lpthread
@@ -52,7 +52,8 @@ OBJFILES = act.comm.o act.create.o act.informative.o act.item.o \
 	oasis_copy.o oasis_delete.o oasis_list.o oasis.o pk.o playerindex.o proffessions.o \
         qic.o race.o random.o regen.o remort.o redit.o romance.o room.o \
 	shop.o sedit.o skills.o spec_assign.o \
-	spec_procs.o spell_parser.o subskills.o spells.o string.o cppstring.o strutil.o task.o trees.o \
+	spec_procs.o spell_parser.o subskills.o spells.o string.o cppstring.o strutil.o \
+	trainers.o task.o trees.o \
 	utils.o vehicle.o vehicle_edit.o weather.o 4d_hedit.o tedit.o zedit.o 
 # dlib/all_console.o
 
@@ -75,7 +76,7 @@ CXREF_FILES = act.comm.c act.create.c act.informative.c act.item.c \
 	race.c random.c regen.c remort.c redit.c romance.c room.cpp \
 	shop.c sedit.c skills.c spec_assign.c \
 	spec_procs.c spell_parser.c subskills.c spells.c string.c \
-	cppstring.cpp strutil.cpp  task.c trees.c \
+	cppstring.cpp strutil.cpp trainers.cpp task.c trees.c \
 	utils.c vehicle.c vehicle_edit.c weather.c 4d_hedit.c tedit.c zedit.c
 
 SRC = *.cpp *.c 

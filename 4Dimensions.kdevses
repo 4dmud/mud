@@ -1,55 +1,52 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="16" >
+ <DocsAndViews NumberOfDocuments="15" >
   <Doc0 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/oedit.c" >
    <View0 Encoding="" Type="Source" />
   </Doc0>
   <Doc1 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.item.c" >
    <View0 Encoding="" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/fight.c" >
+  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.wizard.c" >
    <View0 Encoding="" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/constants.c" >
-   <View0 Encoding="" line="655" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/db.cpp" >
+   <View0 Encoding="" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.wizard.c" >
+  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/spell_parser.c" >
    <View0 Encoding="" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.informative.c" >
+  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/structs.h" >
    <View0 Encoding="" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/db.cpp" >
-   <View0 Encoding="" line="2870" Type="Source" />
+  <Doc6 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/genmob.h" >
+   <View0 Encoding="" Type="Source" />
   </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/genobj.c" >
+  <Doc7 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/genmob.c" >
    <View0 Encoding="" Type="Source" />
   </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/handler.h" >
+  <Doc8 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/medit.c" >
    <View0 Encoding="" Type="Source" />
   </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/db.h" >
+  <Doc9 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/dg_scripts.c" >
    <View0 Encoding="" Type="Source" />
   </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/vehicle.c" >
+  <Doc10 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/spec_procs.c" >
    <View0 Encoding="" Type="Source" />
   </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/handler.c" >
+  <Doc11 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.other.c" >
    <View0 Encoding="" Type="Source" />
   </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/spell_parser.c" >
-   <View0 Encoding="" line="450" Type="Source" />
+  <Doc12 NumberOfViews="1" URL="file:///usr/include/string.h" >
+   <View0 Encoding="" Type="Source" />
   </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/structs.h" >
-   <View0 Encoding="" line="2320" Type="Source" />
+  <Doc13 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/fight.c" >
+   <View0 Encoding="" Type="Source" />
   </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/genmob.h" >
-   <View0 Encoding="" line="0" Type="Source" />
+  <Doc14 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/utils.h" >
+   <View0 Encoding="" line="257" Type="Source" />
   </Doc14>
-  <Doc15 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/genmob.c" >
-   <View0 Encoding="" line="19" Type="Source" />
-  </Doc15>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>

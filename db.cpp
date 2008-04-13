@@ -37,11 +37,11 @@
 #include "xmlhelp.h"
 #include "assemblies.h"
 #include "trees.h"
-//#include "htree.h"
 #include "damage.h"
 #include "descriptor.h"
 #include "strutil.h"
 
+bool can_teach_skill ( Character *mob, int i );
 int load_qic_check ( int rnum );
 void qic_scan_rent ( void );
 void purge_qic ( obj_rnum rnum );
@@ -2448,7 +2448,7 @@ void parse_trainer_skills ( char *buf, Character *mob, int nr )
 {
 	int v = spell_num ( buf );
 
-	if ( v != TYPE_UNDEFINED )
+	if ( v != TYPE_UNDEFINED && !can_teach_skill(mob, v)) 
 		mob->mob_specials.teaches_skills.push_back ( v );
 }
 

@@ -115,34 +115,6 @@ void assign_mobiles(void)
     ASSIGNMOB(1202, janitor);
     ASSIGNMOB(1296, magic_user);
 
-    ASSIGNMOB(500, guild);	// guild guard in Mud School
-    ASSIGNMOB(564, guild);	// Gym master in school
-    ASSIGNMOB(899, guild);	// Hunter Guildmaster
-    ASSIGNMOB(1394, guild);	// sicilian gm
-    ASSIGNMOB(2159, guild);	// Actor trainer in Crete
-    ASSIGNMOB(2905, guild);	// Viking trainer
-    ASSIGNMOB(2933, guild);	// new clan
-    ASSIGNMOB(3007, guild);	// guild guard in Olde Yorke
-    ASSIGNMOB(3020, guild);	// Mage guildmaster in Olde Yorke
-    ASSIGNMOB(3022, guild);	// Thief gm in OY
-    ASSIGNMOB(3023, guild);	// Warrior gm in OY
-    ASSIGNMOB(3021, guild);	// Priest gm in OY
-    ASSIGNMOB(3150, guild);	// Gypsy gm in OY
-    ASSIGNMOB(6494, guild);	// Ranger gm
-    ASSIGNMOB(9404, guild);	// Chaos gm
-    ASSIGNMOB(10000, guild);	// Puff
-    ASSIGNMOB(10401, guild);	// trainer in Palp's zone
-    ASSIGNMOB(10498, guild);	// dark jedi trainer
-    ASSIGNMOB(12403, guild);
-    ASSIGNMOB(12904, guild);
-    ASSIGNMOB(27801, guild);
-     ASSIGNMOB(10204, guild);
-
-    // guildmasters that teach special skills only
-    ASSIGNMOB(7043, guild);	// scribe skill
-    ASSIGNMOB(21819, guild);	// tinker skill
-    ASSIGNMOB(26060, guild);	// brew skill
-
     ASSIGNMOB(3024, guild_guard);	// mage
     ASSIGNMOB(3026, guild_guard);	// thief
     ASSIGNMOB(3027, guild_guard);	// cleric
