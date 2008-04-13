@@ -703,6 +703,12 @@ Character *get_char ( const char *name )
 			i = find_char ( j );
 		if ( i && valid_dg_target ( i, TRUE ) )
 			return i;
+		for ( Descriptor *d = descriptor_list; d; d = d->next )
+		{
+			i = d->character;
+			if ( IS_PLAYING ( d ) && isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
+				return i;
+		}
 #else
 		for ( i = character_list; i; i = i->next )
 			if ( isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
