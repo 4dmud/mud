@@ -18,7 +18,7 @@
 #include "dg_olc.h"
 #include "htree.h"
 #include "spells.h"
-
+#include "name.map.h"
 
 int update_mobile_strings ( Character *t, Character *f );
 void check_mobile_strings ( Character *mob );
@@ -302,6 +302,7 @@ int free_mobile ( Character *mob )
 //            free_proto_script(mob, MOB_TRIGGER);
 		mob->remove_all_affects();
 		mob->free_non_proto_strings();
+		mobNames.remNamelist(GET_ID(mob));
 
 		/* free any assigned scripts */
 		if ( SCRIPT ( mob ) )

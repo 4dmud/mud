@@ -314,7 +314,7 @@ Character *find_char(long n);
 char *str_str(char *cs, char *ct);
 int find_eq_pos_script(char *arg);
 int can_wear_on_pos(struct obj_data *obj, int pos);
-Character *get_char(char *name);
+//Character *get_char(char *name);
 Character *get_char(const char *name);
 Character *get_char_near_obj(obj_data *obj, char *name);
 Character *get_char_in_room(Room *room, char *name);

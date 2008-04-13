@@ -171,6 +171,7 @@
 #include "spells.h"
 #include "oasis.h"
 #include "descriptor.h"
+#include "name.map.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define NINE_MONTHS    6000	/* 6000 realtime minutes TO GO */
@@ -683,30 +684,9 @@ Room *find_room ( long n )
  ************************************************************/
 
 /* search the entire world for a char, and return a pointer */
-Character *get_char ( char *name )
-{
-	Character *i;
-
-	if ( *name == UID_CHAR )
-	{
-		i = find_char ( atoi ( name + 1 ) );
-
-		if ( i && valid_dg_target ( i, TRUE ) )
-			return i;
-	}
-	else
-	{
-		for ( i = character_list; i; i = i->next )
-			if ( isname ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
-				return i;
-	}
-
-	return NULL;
-}
-/* search the entire world for a char, and return a pointer */
 Character *get_char ( const char *name )
 {
-	Character *i;
+	Character *i = NULL;
 
 	if ( *name == UID_CHAR )
 	{
@@ -717,9 +697,17 @@ Character *get_char ( const char *name )
 	}
 	else
 	{
+#if 1
+		long j = mobNames.nameLookup ( name );
+		if ( j != -1 )
+			i = find_char ( j );
+		if ( i && valid_dg_target ( i, TRUE ) )
+			return i;
+#else
 		for ( i = character_list; i; i = i->next )
-			if ( isname ( ( char * ) name, i->player.name ) && valid_dg_target ( i, TRUE ) )
+			if ( isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
 				return i;
+#endif
 	}
 
 	return NULL;
@@ -840,9 +828,15 @@ struct obj_data *get_obj ( const char *name )
 		return find_obj ( atoi ( name + 1 ) );
 	else
 	{
+#if 1
+		long i = objNames.nameLookup ( name );
+		if ( i != -1 )
+			return find_obj ( i );
+#else
 		for ( olt_it ob = object_list.begin(); ob != object_list.end(); ob++ )
-			if ( ob->second && isname ( ( ob->second )->name, name ) )
+			if ( ob->second && isname_hard ( ( ob->second )->name, name ) )
 				return ob->second;
+#endif
 	}
 
 	return NULL;

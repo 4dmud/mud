@@ -23,6 +23,7 @@ const char *money_desc(gold_int amount);
 struct obj_data *create_money(gold_int amount);
 int isname(const char *str, const char *namelist);
 int is_name(const char *str, const char *namelist);
+int isname_hard ( const char *str, const char *namelist );
 int isname_full(const char *strlist, const char *namelist);
 char *fname(const char *namelist);
 int get_number(char **name);
@@ -57,7 +58,7 @@ void extract_obj_q(struct obj_data *obj);
 
 Character *get_char_room(const char *name, int *number, room_rnum room);
 Character *get_char_num(mob_vnum nr);
-Character *get_char(char *name);
+//Character *get_char(char *name);
 Character *get_char(const char *name);
 
 Character *get_player_room(room_rnum room, char *name, int *number,

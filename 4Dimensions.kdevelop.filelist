@@ -641,6 +641,8 @@ mordecai.c
 mxp.cpp
 mxp.h
 mysql.c
+name.map.cpp
+name.map.h
 note.c
 oasis.c
 oasis.h

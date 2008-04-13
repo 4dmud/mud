@@ -40,6 +40,7 @@
 #include "damage.h"
 #include "descriptor.h"
 #include "strutil.h"
+#include "name.map.h"
 
 bool can_teach_skill ( Character *mob, int i );
 int load_qic_check ( int rnum );
@@ -83,6 +84,8 @@ SPECIAL ( postmaster );
 SPECIAL ( cleric );
 SPECIAL ( bank );
 
+
+
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
 **************************************************************************/
@@ -99,7 +102,8 @@ int TEMP_LOAD_CHAR = FALSE;
 extern struct mob_stat_table mob_stats[];
 
 vector <Room *> world_vnum; /* index table for room file   */
-
+NameIndexer mobNames;
+NameIndexer objNames;
 room_vnum top_of_world = 0;   /* ref to top element of world   */
 struct social_messg *soc_mess_list = NULL;      /* list of socials */
 int top_of_socialt = -1;                        /* number of socials */
@@ -898,7 +902,9 @@ void destroy_db ( void )
 	free_characters ( character_list );
 	log ( "Free corpse list" );
 	free_corpse_list ( corpse_list );
-
+log("Clearing Names Maps");
+mobNames.Clear();
+objNames.Clear();
 	/* Active Objects */
 	log ( "Freeing Objects." );
 	free_objects();
@@ -3919,6 +3925,7 @@ Character *read_mobile ( mob_vnum nr )
 	GET_ID ( mob ) = max_mob_id++;
 	/* find_char helper */
 	addChToLookupTable ( GET_ID ( mob ), mob );
+	mobNames.addNamelist(mob->player.name, GET_ID(mob));
 
 	//    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
 	assign_triggers ( mob, MOB_TRIGGER );
@@ -3984,6 +3991,7 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 	generate_weapon ( obj );
 	copy_proto_script ( &obj_proto[i], obj, OBJ_TRIGGER );
 	assign_triggers ( obj, OBJ_TRIGGER );
+	objNames.addNamelist(obj->name, GET_ID(obj));
 
 	return ( obj );
 }
@@ -6352,6 +6360,7 @@ void free_obj ( struct obj_data *obj, int extracted )
 		obj_index[obj->item_number].number--;
 
 	}
+	objNames.remNamelist(GET_ID(obj));
 	removeFromObjLookupTable ( GET_ID ( obj ) );
 	object_list.erase ( GET_ID ( obj ) );
 	free ( obj );
