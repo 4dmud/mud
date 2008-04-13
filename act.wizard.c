@@ -2163,9 +2163,22 @@ void do_stat_character ( Character *ch, Character *k )
 		if ( IS_MOB ( k ) && MobIndexExists ( GET_MOB_VNUM ( k ) ) )
 			ch->Send ( "Mob Spec-Proc: %s",
 			           ( GetMobIndex ( GET_MOB_VNUM ( k ) )->func != NULL ? "Exists" : "None" ) );
-		if ( IS_MOB ( k ) )
+		if ( IS_MOB ( k ) ) {
 			ch->Send ( ", NPC Bare Hand Dam: %dd%d\r\n",
 			           k->mob_specials.damnodice, k->mob_specials.damsizedice );
+if (!k->mob_specials.teaches_skills.empty())
+ch->Send ("It can teach these skills and spells:\r\n");
+for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
+			{
+				ch->Send ( "%s[%5d] {cg%-15s{c0%s", 
+				! ( i%2 ) ? "             " : " ",
+				k->mob_specials.teaches_skills[i], 
+				skill_name ( k->mob_specials.teaches_skills[i] ), 
+				! ( i%2 ) ? " " : "\r\n" );
+				
+			}
+			ch->Send ( "%s" , !( i%2 ) ? "" : "\r\n" );
+}
 
 		ch->Send ( "Carried: weight: %d, items: %d; ",   IS_CARRYING_W ( k ), IS_CARRYING_N ( k ) );
 

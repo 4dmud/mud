@@ -706,7 +706,7 @@ Character *get_char ( const char *name )
 		for ( Descriptor *d = descriptor_list; d; d = d->next )
 		{
 			i = d->character;
-			if ( IS_PLAYING ( d ) && isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
+			if ( IS_PLAYING ( d ) && i && IN_ROOM(i) && isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
 				return i;
 		}
 #else
