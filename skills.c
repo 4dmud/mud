@@ -2640,8 +2640,11 @@ ASKILL(skill_retreat)
           TO_ROOM);
       *ch << "You skillfully retreat from combat.\r\n";
       WAIT_STATE(ch, 2 RL_SEC);
-      halt_fighting(ch);
+      // Changing these around for snare and retreat - Prom
+      //halt_fighting(ch);
+      //do_simple_move(ch, dir, TRUE);
       do_simple_move(ch, dir, TRUE);
+      halt_fighting(ch);
       return SKILL_RETREAT;
     }
     else
