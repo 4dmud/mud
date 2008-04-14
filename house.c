@@ -1038,6 +1038,7 @@ void house_expand_house ( Character *ch, int i )
 		GET_GOLD_TOKEN_COUNT ( ch ) -= 1;
 		house_control[i].expantions += ( long ) 1;
 		ch->Send ( "You expand your house by an extra 200 units for the price of 1 Gold Token.\r\n" );
+		House_save_control();
 	}
 	else
 		ch->Send ( "You can't afford to expand the house at this time, it costs 1 Gold Token.\r\n" );
