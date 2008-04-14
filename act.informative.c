@@ -222,7 +222,7 @@ void show_obj_to_char ( struct obj_data *obj, Character *ch,
 				if ( !OBJ_FLAGGED ( obj, ITEM_NODISPLAY ) || ( GET_LEVEL ( ch ) > LVL_IMMORT ) )
 				{
 					if ( GET_OBJ_TYPE ( obj ) == ITEM_SPACEBIKE )
-						ch->Send ( "%s [FUEL: %d%%]",obj->description, GET_FUEL ( obj ) > 0 ? GET_FUEL_PERCENTAGE(obj) : 0 );
+						ch->Send ( "%s [FUEL: %d%%]",obj->description, GET_FUEL ( obj ) > 0 ? GET_FUEL_PERCENTAGE ( obj ) : 0 );
 					else
 						ch->Send ( "%s", obj->description );
 				}
@@ -810,8 +810,11 @@ void list_one_char ( Character *i, Character *ch )
 		}
 		if ( wizinvis )
 			*ch << "(wizinvis) ";
-		ch->Send ( "%s", ( i->mob_specials.join_list != NULL ? CCCYN ( ch, C_NRM ) : "" ) );
-		*ch << ( wizinvis ? GET_NAME ( i ) : i->player.long_descr );
+		if ( !i->mob_specials.teaches_skills.empty() )
+			ch->Send ( "[T] " );
+		ch->Send ( "%s%s", ( i->mob_specials.join_list != NULL ? CCCYN ( ch, C_NRM ) : "" ),
+		           ( wizinvis ? GET_NAME ( i ) : i->player.long_descr ) );
+		
 		if ( wizinvis )
 			*ch << "\r\n";
 		show_affect_to_char ( i, ch );
@@ -840,6 +843,8 @@ void list_one_char ( Character *i, Character *ch )
 			           GET_TITLE ( i ), CBCYN ( ch, C_NRM ) );
 	}
 
+	if ( IS_NPC ( i ) && !i->mob_specials.teaches_skills.empty() )
+		ch->Send ( " [Master]" );
 	if ( AFF_FLAGGED ( i, AFF_INVISIBLE ) )
 		ch->Send ( " (invis)" );
 	if ( AFF_FLAGGED ( i, AFF_HIDE ) )
@@ -2443,7 +2448,7 @@ ACMD ( do_score )
 	if ( has_vehicle ( ch ) )
 	{
 		struct obj_data *v = has_vehicle ( ch );
-		ch->Send ( "Vehicle Fuel: [%d]\r\n", GET_FUEL ( v ) > 0 ? GET_FUEL_PERCENTAGE(v) : 0 );
+		ch->Send ( "Vehicle Fuel: [%d]\r\n", GET_FUEL ( v ) > 0 ? GET_FUEL_PERCENTAGE ( v ) : 0 );
 	}
 	if ( ch->pet != -1 )
 		*ch << "Pet: " << mob_name_by_vnum ( ch->pet ) << "\r\n";
@@ -4053,7 +4058,7 @@ void perform_immort_where ( Character *ch, char *arg )
 	if ( !*arg )
 	{
 		new_mudlog ( CMP, ( GET_LEVEL ( ch ) == LVL_IMPL ? GET_LEVEL ( ch ) :GET_LEVEL ( ch ) +1 ), TRUE, "(GC) %s did a \"where\".",
-		             GET_NAME ( ch ));
+		             GET_NAME ( ch ) );
 		ch->Send ( "Players\r\n-------\r\n" );
 		for ( d = descriptor_list; d; d = d->next )
 		{
@@ -4081,7 +4086,7 @@ void perform_immort_where ( Character *ch, char *arg )
 	else
 	{
 		new_mudlog ( CMP, ( GET_LEVEL ( ch ) == LVL_IMPL ? GET_LEVEL ( ch ) :GET_LEVEL ( ch ) +1 ), TRUE, "(GC) %s did a \"where %s\".",
-		             GET_NAME ( ch ),arg);
+		             GET_NAME ( ch ),arg );
 		counter = 0;
 		for ( i = character_list; i; i = i->next )
 			if ( CAN_SEE ( ch, i ) && i->in_room != NULL
