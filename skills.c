@@ -2496,6 +2496,14 @@ ASKILL(skill_poison_weapon)
     *ch << "That weapon is already poisoned.\r\n";
     return 0;
   }
+  // Added a check for Tinker / Magic here Prometheus
+  if (IS_OBJ_STAT(obj, ITEM_TINKERED) || IS_OBJ_STAT(obj, ITEM_MAGIC))
+  {
+    ch->Send("The weapon is imbued with magical powers beyond your grasp.\r\n"
+     "You can not further affect its form.\r\n");
+    return 0;
+  }
+
   if (!skill_cost(0, 10, 150, ch))
   {
     ch->Send( "You are exausted!");
