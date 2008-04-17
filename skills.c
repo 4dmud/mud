@@ -2603,6 +2603,7 @@ ASKILL(skill_poison_weapon)
       FALSE, ch, wobj, NULL, TO_ROOM);
   extract_obj(pobj);
   extract_obj(wobj);
+  SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
   return ( SKILL_POISON_WEAPON);
 
 }
