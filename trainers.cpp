@@ -414,16 +414,17 @@ ACMD ( do_practice )
 		if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
 			mob_trainers.push_back ( p );
 
-	if ( is_abbrev ( "skills", argument ) )
+	if ( is_abbrev (argument, "skills" ) )
 		train_list = 0;
-	else if ( is_abbrev ( "spells", argument ) )
+	else if ( is_abbrev (argument, "spells" ) )
 		train_list = 1;
-	else if ( is_abbrev ( "subskills", argument ) )
+	else if ( is_abbrev (argument, "subskills") )
 		train_list = 2;
 
 	if ( train_list != -1 )
 	{
-		if ( mob_trainers.empty() )
+/** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
+		if ( train_list == 2 || mob_trainers.empty() )
 		{
 			list_skills ( ch, train_list, NULL );
 			return;
