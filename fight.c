@@ -2331,6 +2331,9 @@ int steal_affects(Character *ch, int dam, int w_type, Character *vict) {
 
     struct obj_data *shield = GET_EQ(ch, WEAR_SHIELD);
 
+    if (!((GET_ALIGNMENT(ch) > 350 && GET_ALIGNMENT(vict) < -350) || (GET_ALIGNMENT(ch) < -350 && GET_ALIGNMENT(vict) > 350)))
+    	return ret_val;
+    
     if (has_staff(ch)) {
         struct obj_data *staff = GET_EQ(ch, WEAR_FOCUS);
         if (staff) {
@@ -2489,7 +2492,7 @@ int fe_after_damage(Character* ch, Character* vict,
         } else
             GET_SWEEP_DAM(ch) = 0;
 
-        if (partial > 0 && (GET_HIT(vict) - partial) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 250)) {
+        if (partial > 0 && (GET_HIT(vict) - partial) <= 0 && GET_SUB(vict, SUB_UNDYING) > number(0, 600)) {
             act("{cGYou concentrate your energy on the on coming killing blow,\r\nand before it lands you move out of range of combat.{c0", FALSE ,vict, 0,0,TO_CHAR);
             return -1;
 
