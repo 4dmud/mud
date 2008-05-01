@@ -332,8 +332,7 @@
 extern int TEMP_LOAD_CHAR;
 extern struct time_data time_info;
 extern struct attack_hit_type attack_hit_text[];
-extern char *class_abbrevs[];
-extern char *race_abbrevs[];
+extern const char *race_abbrevs[];
 extern time_t boot_time;
 extern int circle_shutdown, circle_reboot;
 extern int circle_restrict;
@@ -3206,7 +3205,7 @@ ACMD ( do_advance )
 		log ( "(GC) %s has advanced %s to level %d (from %d)",
 		      GET_NAME ( ch ), GET_NAME ( victim ), newlevel, oldlevel );
 
-	gain_exp_regardless ( victim, level_exp ( GET_CLASS ( victim ), newlevel, current_class_is_tier_num ( victim ), REMORTS ( victim ) ) - GET_EXP ( victim ) );
+	gain_exp_regardless ( victim, level_exp ( GET_CLASS ( victim ), newlevel, current_class_is_tier_num ( victim ), REMORTS ( victim ) ) - GET_EXP ( victim ), true );
 	victim->save();
 	// log("(do_advance)Saved %s in room %d", GET_NAME(victim), victim->in_room);
 }
@@ -3685,7 +3684,6 @@ ACMD ( do_date )
 ACMD ( do_last )
 {
 	Character *vict = NULL;
-	extern char *class_abbrevs[];
 	char arg[MAX_INPUT_LENGTH];
 
 	one_argument ( argument, arg );
@@ -3718,7 +3716,7 @@ ACMD ( do_last )
 	}
 	ch->Send ( "[%5ld] [%2d %s] %-12s \r\nHost:%-*s \r\nLast: %-20s\r\n",
 	           GET_IDNUM ( vict ), ( int ) GET_LEVEL ( vict ),
-	           class_abbrevs[ ( int ) GET_CLASS ( vict ) ], GET_NAME ( vict ),
+	           CLASS_ABBR(vict), GET_NAME ( vict ),
 	           HOST_LENGTH, !vict->player_specials->host.empty() ? vict->player_specials->
 	           host.c_str() : "(NOHOST)", ctime ( &vict->player.time.logon ) );
 
@@ -4659,7 +4657,7 @@ ACMD ( do_show )
 				           GET_NAME ( vict ), genders[ ( int ) GET_SEX ( vict ) ],
 				           GET_LEVEL ( vict ),
 				           race_abbrevs[ ( int ) GET_RACE ( vict ) ],
-				           class_abbrevs[ ( int ) GET_CLASS ( vict ) ] );
+				           CLASS_ABBR(vict) );
 				ch->Send (
 				    "Au: %-8lld  Bal: %-8lld  Exp: %-8lld  Align: %-5d  Lessons: %-3d\r\n",
 				    vict->Gold ( 0, GOLD_HAND ), vict->Gold ( 0, GOLD_BANK ),
@@ -7639,3 +7637,8 @@ void list_obj_resets ( obj_data *obj, Character *ch )
 			}
 		}
 }
+
+ACMD(do_code_update) {
+system ( "" );
+}
+

@@ -544,6 +544,8 @@ class Room;
 #define PLR_BITCH        31      /* Player is in rp group bitch */
 #define PLR_RIDDLER      32     /* Player is in rp group Riddler */
 #define PLR_LOLTHYTE     33    /* Player is in rp group lolthye */
+#define PLR_NEEDS_CLASS 34  /* Player hasn't yet chosen their class     */
+#define PLR_NEEDS_STATS 35  /* Player hasn't yet chosen their stats     */
 
 #define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */
@@ -809,6 +811,8 @@ class Room;
 #define STATE_LOYAL 8
 #define STATE_QSPEC 9
 #define STATE_EMAIL 10
+#define STATE_QCLASSG 11
+#define STATE_CONFIRM_QCLASSG 12
 
 /* remember to compare con list with the con values in constatnststs
    ohh and stop getting boozy while coding.
@@ -1260,7 +1264,7 @@ class Room;
 #define LVL_SEN     	55
 #define LVL_CRT		54
 #define LVL_BLD     	53
-#define LVL_GOD    	 	52
+#define LVL_GOD    	52
 #define LVL_HERO    	51
 #define LVL_MAX_MORT   	50
 

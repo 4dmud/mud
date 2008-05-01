@@ -1279,3 +1279,42 @@ bool Character::canHuntChar(Character *vict) {
 
     return false;
 }
+
+void Character::MakeNaked() {
+/* remove affects from eq and spells (from char_to_store) */
+  /* Unaffect everything a character can be affected by */
+  for (int k = 0; k < NUM_WEARS; k++)
+  {
+    if (GET_EQ(this, k))
+    {
+      char_eq[k] = unequip_char(this, k);
+#ifndef NO_EXTRANEOUS_TRIGGERS
+      if (remove_otrigger(char_eq[k], this) == -1)
+        char_eq[k] = NULL;
+#endif
+
+    }
+    else
+      char_eq[k] = NULL;
+  }
+}
+void Character::MakeClothed() {
+#ifndef NO_EXTRANEOUS_TRIGGERS
+  int ret = 0;
+#endif
+  for (int i = 0; i < NUM_WEARS; i++)
+  {
+    if (char_eq[i])
+    {
+#ifndef NO_EXTRANEOUS_TRIGGERS
+      if ((ret = wear_otrigger(char_eq[i], ch, i)) > 0)
+#endif
+        equip_char(this, char_eq[i], i);
+#ifndef NO_EXTRANEOUS_TRIGGERS
+      else if (ret == 0)
+        obj_to_char(char_eq[i], this);
+#endif
+
+    }
+  }
+}

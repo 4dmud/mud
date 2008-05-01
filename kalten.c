@@ -24,8 +24,6 @@
 
 /*   external vars  */
 extern struct attack_hit_type attack_hit_text[];
-extern char *class_abbrevs[];
-extern char *race_abbrevs[];
 extern struct time_info_data time_info;
 extern int circle_shutdown, circle_reboot;
 

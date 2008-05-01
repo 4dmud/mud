@@ -5640,7 +5640,6 @@ void char_to_store ( Character *ch )
 	char tempname[MAX_STRING_LENGTH];
 	int i, id, save_index = FALSE, thing = 0;
 	struct affected_type *aff, tmp_aff[MAX_AFFECT];
-	struct obj_data *char_eq[NUM_WEARS];
 
 	if ( IS_NPC ( ch ) || GET_NAME ( ch ) == NULL )
 	{
@@ -5667,20 +5666,7 @@ void char_to_store ( Character *ch )
 	}
 	/* remove affects from eq and spells (from char_to_store) */
 	/* Unaffect everything a character can be affected by */
-	for ( i = 0; i < NUM_WEARS; i++ )
-	{
-		if ( GET_EQ ( ch, i ) )
-		{
-			char_eq[i] = unequip_char ( ch, i );
-#ifndef NO_EXTRANEOUS_TRIGGERS
-
-			remove_otrigger ( char_eq[i], ch );
-#endif
-
-		}
-		else
-			char_eq[i] = NULL;
-	}
+	ch->MakeNaked();
 
 	for ( aff = ch->affected, i = 0; i < MAX_AFFECT; i++ )
 	{
@@ -5974,25 +5960,7 @@ void char_to_store ( Character *ch )
 			affect_to_char ( ch, &tmp_aff[i] );
 	}
 
-	for ( i = 0; i < NUM_WEARS; i++ )
-	{
-		if ( char_eq[i] )
-		{
-#ifndef NO_EXTRANEOUS_TRIGGERS
-			if ( ( thing = wear_otrigger ( char_eq[i], ch, i ) ) > 0 )
-			{
-#endif
-				if ( !equip_char ( ch, char_eq[i], i ) )
-					new_mudlog ( NRM, LVL_GOD, TRUE, "%s : error reequiping %s", GET_NAME ( ch ), char_eq[i]->short_description );
-#ifndef NO_EXTRANEOUS_TRIGGERS
-
-			}
-			else if ( thing == 0 )
-				obj_to_char ( char_eq[i], ch );
-#endif
-
-		}
-	}
+ch->MakeClothed();
 
 	if ( GET_IDNUM ( ch ) <= 0 || GET_IDNUM ( ch ) > pi.TopIdNum )
 	{

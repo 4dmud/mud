@@ -182,7 +182,6 @@
 /* extern variables */
 extern Descriptor *descriptor_list;
 extern Character *ch_selling;
-extern char *class_abbrevs[];
 extern const int xap_objs;
 
 /* extern procedures */

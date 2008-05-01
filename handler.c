@@ -2064,8 +2064,8 @@ void extract_char_final ( Character *ch )
 
 	/* remove any pending event for/from this character */
 	clean_events2 ( ch );
-
 	char_from_room ( ch );
+
 	if ( IS_NPC ( ch ) )
 	{
 		if ( GET_MOB_VNUM ( ch ) != NOBODY && !ch->proto )    /* prototyped */
@@ -2082,6 +2082,9 @@ void extract_char_final ( Character *ch )
 	{
 		ch->save();
 	}
+
+	if ( GET_ID ( ch ) > 0 )
+		removeFromChLookupTable ( GET_ID ( ch ) );
 
 	/* If there's a descriptor, they're in the menu now. */
 	if ( IS_NPC ( ch ) || !ch->desc )
@@ -2108,7 +2111,7 @@ void extract_char_final ( Character *ch )
 
  */
 #if 1
-void extract_char ( Character *ch )
+void extract_char ( Character *ch, int e_now )
 {
 	if ( DEAD ( ch ) )
 	{
@@ -2118,8 +2121,8 @@ void extract_char ( Character *ch )
 			log ( "Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM ( ch ), GET_NAME ( ch ) );
 		return;
 	}
-	if ( GET_ID ( ch ) > 0 )
-		removeFromChLookupTable ( GET_ID ( ch ) );
+
+
 	if ( IS_NPC ( ch ) )
 	{
 		SET_BIT_AR ( MOB_FLAGS ( ch ), MOB_NOTDEADYET );
@@ -2129,6 +2132,9 @@ void extract_char ( Character *ch )
 		SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_NOTDEADYET );
 
 	extractions_pending++;
+
+	if ( e_now == 1 )
+		extract_pending_chars ();
 }
 #endif
 
@@ -2145,6 +2151,7 @@ void extract_char ( Character *ch )
 void extract_pending_chars ( void )
 {
 	Character *vict, *next_vict, *prev_vict;
+	long idnum;
 
 	if ( extractions_pending < 0 )
 		log ( "SYSERR: Negative (%d) extractions pending.",
@@ -2165,9 +2172,12 @@ void extract_pending_chars ( void )
 			prev_vict = vict;
 			continue;
 		}
-
+		idnum = GET_ID ( vict );
 		extract_char_final ( vict );
 		extractions_pending--;
+
+		if ( idnum > 0 )
+			removeFromChLookupTable ( idnum );
 
 		if ( prev_vict )
 			prev_vict->next = next_vict;
@@ -2567,7 +2577,7 @@ struct obj_data *create_money ( gold_int gamount )
 		log ( "SYSERR: Try to create negative or 0 money, changing to 1(%lld)", gamount );
 		return ( NULL );
 	}
-	obj = create_obj(NOTHING);
+	obj = create_obj ( NOTHING );
 	CREATE ( new_descr, struct extra_descr_data, 1 );
 
 	if ( amount == 1 )

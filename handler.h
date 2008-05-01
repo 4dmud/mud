@@ -68,7 +68,7 @@ Character *find_in_dir(room_rnum room, char *name, int dir, Character *ch = NULL
 int move_char_to(Character *ch, room_rnum room);
 void char_from_room(Character *ch);
 void char_to_room(Character *ch, room_rnum room);
-void extract_char(Character *ch);
+void extract_char ( Character *ch, int e_now = 0 );
 void extract_char_final(Character *ch);
 void extract_pending_chars(void);
 void remove_hunter(Character *ch);

@@ -492,6 +492,16 @@ void gain_exp ( Character *ch, gold_int gain )
 	{
 		if ( ( GET_LEVEL ( ch ) < 1 || GET_LEVEL ( ch ) >= LVL_HERO ) )
 			return;
+		if ( GET_LEVEL(ch) >= 20 && PLR_FLAGGED ( ch, PLR_NEEDS_STATS ) )
+		{
+			ch->Send ( "You need to choose your your stats. Type: choose stats\r\n" );
+			return;
+		}
+		if ( GET_LEVEL(ch) >= 20 && PLR_FLAGGED ( ch, PLR_NEEDS_CLASS ) )
+		{
+			ch->Send ( "You need to choose your your class. Type: choose class\r\n" );
+			return;
+		}
 	}
 	else
 		return;
@@ -549,7 +559,7 @@ void gain_exp ( Character *ch, gold_int gain )
 }
 
 
-void gain_exp_regardless ( Character *ch, gold_int gain )
+void gain_exp_regardless ( Character *ch, gold_int gain, bool silent )
 {
 	int is_altered = FALSE;
 	int num_levels = 0;
@@ -580,7 +590,7 @@ void gain_exp_regardless ( Character *ch, gold_int gain )
 		{
 			GET_LEVEL ( ch ) += 1;
 			num_levels++;
-			advance_level ( ch );
+			advance_level ( ch, silent );
 			is_altered = TRUE;
 		}
 
@@ -593,13 +603,16 @@ void gain_exp_regardless ( Character *ch, gold_int gain )
 			new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "%s advanced %d level%s to level %d.",
 			             GET_NAME ( ch ), num_levels, num_levels == 1 ? "" : "s",
 			             GET_LEVEL ( ch ) );
+if (!silent) {
 			if ( num_levels == 1 )
 				ch->Send ( "{cR[ You rise a level! ]{c0\r\n" );
 			else
 				ch->Send ( "{cR[ You rise %d levels! ]{c0\r\n", num_levels );
+}
 			num_hp = GET_MAX_HIT ( ch ) - num_hp;
 			num_ma = GET_MAX_MANA ( ch ) - num_ma;
 			num_mv = GET_MAX_MOVE ( ch ) - num_mv;
+if (!silent)
 			ch->Send ( "You gain: %d-HP %d-MANA %d-MOVE.\r\n", num_hp, num_ma, num_mv );
 
 			ch->save();

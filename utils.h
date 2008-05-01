@@ -291,11 +291,11 @@ int mana_gain ( Character *ch );
 int hit_gain ( Character *ch );
 int move_gain ( Character *ch );
 int stamina_gain ( Character *ch );
-void advance_level ( Character *ch );
+void advance_level ( Character *ch, bool silent = false );
 void set_title ( Character *ch, char *title );
 void set_pretitle ( Character *ch, char *title );
 void gain_exp ( Character *ch, gold_int gain );
-void gain_exp_regardless ( Character *ch, gold_int gain );
+void gain_exp_regardless ( Character *ch, gold_int gain, bool silent = false );
 void gain_condition ( Character *ch, int condition, int value );
 void check_idling ( Character *ch );
 void regen_update ( void );
@@ -990,8 +990,8 @@ extern room_rnum VEHICLE_ROOM;
 			 (EXIT(ch,door)->to_room != NULL) && \
 			 !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
-
-#define CLASS_ABBR(ch) (IS_NPC(ch) ? "---" : class_abbrevs[(int)GET_CLASS(ch)])
+const char *get_class_abbrev ( Character *ch );
+#define CLASS_ABBR(ch) (IS_NPC(ch) ? "---" : get_class_abbrev(ch))
 #define RACE_ABBR(ch) (IS_NPC(ch) ? "--" : race_abbrevs[(int)GET_RACE(ch)])
 
 #define IS_MAGE(ch)             (!IS_NPC(ch) && \

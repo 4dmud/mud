@@ -129,6 +129,7 @@ ACMD ( do_bury );
 ACMD ( do_calender );
 ACMD ( do_cast );
 ACMD ( do_chaos );
+ACMD ( do_choose );
 ACMD ( do_clan );
 ACMD ( do_climb );
 ACMD ( do_colour );
@@ -519,6 +520,7 @@ const command_info cmd_info[] =
 	{ "chaos"    , "chaos", POS_DEAD    , do_chaos    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
 	{ "check"    , "che"   , POS_STANDING, do_not_here , 1, 0, 0 },
 	{ "changes"  , "cha"   , POS_DEAD, do_changes , 1, 0, 0 },
+	{ "choose"  , "cho"   , POS_DEAD, do_choose , 1, 0, 0 },
 	{ "clan"     , "clan" , POS_SLEEPING, do_clan     , 1, 0, 0 },
 	{ "clear"    , "cle" , POS_DEAD    , do_gen_ps   , 0, SCMD_CLEAR, 0 },
 	{ "climb"    , "cli"  , POS_STANDING, do_climb    , 0, 0, 0 },

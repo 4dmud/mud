@@ -66,6 +66,8 @@ public:
     struct note_data *pnote;
     sh_int concealment;
     int has_note[NUM_NOTE_TYPES];
+  struct obj_data *char_eq[NUM_WEARS];
+
     Character *fuses[TOP_FUSE_LOCATION];
     Character *fused_to;
     struct obj_data *hitched;
@@ -148,6 +150,8 @@ public:
 	inline bool RiderHere() {return (char_specials.ridden_by && char_specials.ridden_by->in_room == in_room);}
 	inline bool MasterHere() {return (master && master->in_room == in_room);}
     bool canHuntChar(Character *vict);
+    void MakeNaked();
+    void MakeClothed();
 private:
     stringstream *send_string;
 

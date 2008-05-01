@@ -78,12 +78,9 @@ GET_WIMP_LEV(ch) = GET_MAX_HIT(ch)/2;
 
 ACMD(do_remort)
 {
-  int i = 0, k;
+  int i = 0;
   byte current, remort, rtwo;
-  struct obj_data *char_eq[NUM_WEARS];
-#ifndef NO_EXTRANEOUS_TRIGGERS
-  int ret = 0;
-#endif
+
 
   current = GET_CLASS(ch);
   remort = GET_REMORT(ch);
@@ -115,22 +112,7 @@ ACMD(do_remort)
     ch->Send( "You need more experience before you can remort.\r\n");
     return;
   }
-  /* remove affects from eq and spells (from char_to_store) */
-  /* Unaffect everything a character can be affected by */
-  for (k = 0; k < NUM_WEARS; k++)
-  {
-    if (GET_EQ(ch, k))
-    {
-      char_eq[k] = unequip_char(ch, k);
-#ifndef NO_EXTRANEOUS_TRIGGERS
-      if (remove_otrigger(char_eq[k], ch) == -1)
-        char_eq[k] = NULL;
-#endif
-
-    }
-    else
-      char_eq[k] = NULL;
-  }
+  ch->MakeNaked();
       remove_all_normal_affects(ch);
 
   /* lets make am a master of the class ifthey have done t4 already */
@@ -157,22 +139,7 @@ ACMD(do_remort)
               (grand_master(ch) ? " Grand Master!" : "!"));
   log("REMORT: %s has just remorted to %s", GET_NAME(ch), simple_class_name(ch));
   ch->Send( "Enjoy being %s.\r\n", simple_class_name(ch));
-
-  for (i = 0; i < NUM_WEARS; i++)
-  {
-    if (char_eq[i])
-    {
-#ifndef NO_EXTRANEOUS_TRIGGERS
-      if ((ret = wear_otrigger(char_eq[i], ch, i)) > 0)
-#endif
-        equip_char(ch, char_eq[i], i);
-#ifndef NO_EXTRANEOUS_TRIGGERS
-      else if (ret == 0)
-        obj_to_char(char_eq[i], ch);
-#endif
-
-    }
-  }
+ch->MakeClothed();
 
 }
 /*

@@ -66,8 +66,8 @@ extern char *wizlist;
 extern char *immlist;
 extern char *policies;
 extern char *handbook;
-extern char *class_abbrevs[];
-extern char *race_abbrevs[];
+extern const char *class_abbrevs[];
+extern const char *race_abbrevs[];
 
 
 /* MatingMod Defines -- DO NOT PLAY WITH THESE UNLESS YOU'RE SURE OF WHAT YOU'RE DOING! */
@@ -173,6 +173,7 @@ char * tertary_class ( Character *ch, char * blank );
 char * quatry_class ( Character *ch, char * blank );
 void list_damage ( Character *ch );
 int even_group ( Character *ch );
+const char *class_group_name ( Character *ch );
 /* local globals */
 int *cmd_sort_info;
 bool examine_on = FALSE;
@@ -1998,8 +1999,14 @@ char * primary_class ( Character *ch, char * blank )
 	size_t len;
 	colour_space = 1;
 	//t = (GET_CLASS_TIER(ch) ? tier_level(ch, t) : 0);
-	len = sprintf ( blank,  TIER_FORMAT,
-	                CCYEL ( ch,_clrlevel ( ch ) ), class_abbrevs[cl],CCWHT ( ch,_clrlevel ( ch ) ),
+	if (PLR_FLAGGED(ch, PLR_NEEDS_CLASS))
+		len = sprintf ( blank,  TIER_FORMAT,
+	                CCYEL ( ch,_clrlevel ( ch ) ), CLASS_ABBR(ch),CCWHT ( ch,_clrlevel ( ch ) ),
+	                CCCYN ( ch,_clrlevel ( ch ) ), class_group_name(ch),CCWHT ( ch,_clrlevel ( ch ) ),
+	                CCYEL ( ch,_clrlevel ( ch ) ),t,CCWHT ( ch,_clrlevel ( ch ) ) );
+	else
+		len = sprintf ( blank,  TIER_FORMAT,
+	                CCYEL ( ch,_clrlevel ( ch ) ), CLASS_ABBR(ch),CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCCYN ( ch,_clrlevel ( ch ) ),grand_master ( ch ) ? "Grand Master" :class_name[cl].name[t],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCYEL ( ch,_clrlevel ( ch ) ),t,CCWHT ( ch,_clrlevel ( ch ) ) );
 	blank[len--] = '\0';

@@ -4049,7 +4049,6 @@ for (d = descriptor_list; d; d = d->next) {
 void make_who2html(void) {
 
 #if 0
-    extern char *class_abbrevs[];
     FILE *opf;
     Descriptor *d;
     Character *ch;
