@@ -609,7 +609,8 @@ void readvanceplayer ( Character *ch )
 	GET_MAX_MOVE ( ch ) 		= 50;
 	GET_STAMINA ( ch ) 		= 100;
 	GET_MAX_STAMINA ( ch ) 		= 100;
-	GET_LEVEL ( ch ) 			= 1;
+	GET_LEVEL ( ch ) 		= 1;
+	GET_EXP(ch)			= 1;
 	gain_exp_regardless ( ch, cur_exp , TRUE );
 	GET_HIT ( ch ) 			= GET_MAX_HIT ( ch );
 	GET_MOVE ( ch ) 		= GET_MAX_MOVE ( ch );
