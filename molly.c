@@ -372,19 +372,12 @@ ACMD(do_climb)
   char buf[MAX_STRING_LENGTH];
 
   percent = number(1, 101);
-  chance = 50;
+  chance = 70;
 
   if (GET_CLASS(ch) == CLASS_THIEF)
     chance = 75;
-
-  if (GET_DEX(ch) > 17)
-    chance += 10;
-  else if (GET_DEX(ch) > 15)
-    chance += 7;
-  else if (GET_DEX(ch) > 13)
-    chance += 5;
-  else
-    chance -= 5;
+  
+  chance += GET_DEX(ch);
 
   one_argument(argument, buf);
 
@@ -467,19 +460,12 @@ ACMD(do_descend)
   char buf[MAX_STRING_LENGTH];
 
   percent = number(1, 101);
-  chance = 50;
+  chance = 70;
 
   if (GET_CLASS(ch) == CLASS_THIEF)
     chance = 75;
-
-  if (GET_DEX(ch) > 17)
-    chance += 10;
-  else if (GET_DEX(ch) > 15)
-    chance += 7;
-  else if (GET_DEX(ch) > 13)
-    chance += 5;
-  else
-    chance -= 5;
+  
+  chance += GET_DEX(ch);
 
   one_argument(argument, buf);
 
