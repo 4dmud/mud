@@ -2742,7 +2742,7 @@ void nanny ( Descriptor *d, char *arg )
 					if ( has_mail ( GET_IDNUM ( d->character ) ) )
 						d->Output ( "You have unreceived mail at the post office.\r\n" );
 					if ( has_note ( d->character, NOTE_NOTE ) )
-						d->Output ( "You have unread notes, to view type NOTE\r\n" );
+						d->Output ( "You have unread notes, to view type NOTE.\r\n" );
 					if ( has_note ( d->character, NOTE_NEWS ) )
 						d->Output ( "You have unread news, to view type NEWS.\r\n" );
 					if ( has_note ( d->character, NOTE_CHANGES ) )
