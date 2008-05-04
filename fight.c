@@ -6311,7 +6311,8 @@ float skill_type_multi(Character *ch, Character *vict, int type) {
     //spamcast an offensive spell at a mob, and the mob won't be able to fight
     //back, because its wait state isn't less then or equal to 0. --Thotter
     //
-    //GET_WAIT_STATE(vict) += 1 RL_SEC;
+    // It was meant to be for the ch, not vict, oops! :-P - Mord
+    GET_WAIT_STATE(ch) += 1 RL_SEC;
     return dam;
 
 }

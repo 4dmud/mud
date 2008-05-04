@@ -1,52 +1,31 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="15" >
+ <DocsAndViews NumberOfDocuments="8" >
   <Doc0 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.wizard.c" >
-   <View0 Encoding="" line="7643" Type="Source" />
+   <View0 Encoding="" line="3207" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/db.cpp" >
-   <View0 Encoding="" Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/class.c" >
+   <View0 Encoding="" line="1700" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/trainers.cpp" >
-   <View0 Encoding="" line="425" Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/dg_scripts.c" >
+   <View0 Encoding="" line="0" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/trainers.h" >
-   <View0 Encoding="" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/handler.c" >
+   <View0 Encoding="" line="2136" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/class.c" >
-   <View0 Encoding="" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/comm.c" >
+   <View0 Encoding="" line="273" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/dg_scripts.c" >
-   <View0 Encoding="" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/handler.h" >
+   <View0 Encoding="" line="70" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/handler.c" >
-   <View0 Encoding="" Type="Source" />
+  <Doc6 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.informative.c" >
+   <View0 Encoding="" line="4201" Type="Source" />
   </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/sysdep.h" >
-   <View0 Encoding="" Type="Source" />
+  <Doc7 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/fight.c" >
+   <View0 Encoding="" line="6310" Type="Source" />
   </Doc7>
-  <Doc8 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/name.map.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc8>
-  <Doc9 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/dg_scripts.h" >
-   <View0 Encoding="" Type="Source" />
-  </Doc9>
-  <Doc10 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/name.map.cpp" >
-   <View0 Encoding="" Type="Source" />
-  </Doc10>
-  <Doc11 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.informative.c" >
-   <View0 Encoding="" Type="Source" />
-  </Doc11>
-  <Doc12 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/house.c" >
-   <View0 Encoding="" Type="Source" />
-  </Doc12>
-  <Doc13 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/interpreter.cpp" >
-   <View0 Encoding="" line="1040" Type="Source" />
-  </Doc13>
-  <Doc14 NumberOfViews="1" URL="file:///home/vmplanet/mud/6000/gamesrc/act.other.c" >
-   <View0 Encoding="" line="497" Type="Source" />
-  </Doc14>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>
@@ -69,15 +48,15 @@
   </kdevastyle>
   <kdevbookmarks>
    <bookmarks>
-    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >
-     <mark line="26" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.h" >
+     <mark line="566" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/genzon.c" >
      <mark line="123" />
      <mark line="127" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.h" >
-     <mark line="566" />
+    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/genwld.c" >
+     <mark line="26" />
     </bookmark>
     <bookmark url="/home/vmplanet/mud/6000/gamesrc/spec_procs.c" >
      <mark line="201" />
@@ -89,40 +68,37 @@
      <mark line="2646" />
     </bookmark>
     <bookmark url="/home/vmplanet/mud/6000/gamesrc/act.wizard.c" >
-     <mark line="1918" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/handler.c" >
-     <mark line="1344" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/zedit.c" >
-     <mark line="966" />
+     <mark line="1917" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/dg_variables.c" >
      <mark line="1109" />
     </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/zedit.c" >
+     <mark line="966" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/handler.c" >
+     <mark line="1344" />
+    </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/redit.c" >
      <mark line="189" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.h" >
+     <mark line="62" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/MudRelated/game-oasis/src/act.wizard.c" >
      <mark line="3827" />
      <mark line="3831" />
      <mark line="3900" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.h" >
-     <mark line="62" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/structs.h" >
-     <mark line="1754" />
-     <mark line="1506" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
+     <mark line="1227" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/act.wizard.c" >
      <mark line="3875" />
     </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/spell_parser.c" >
-     <mark line="1227" />
-    </bookmark>
-    <bookmark url="/home/mordecai/Desktop/game-oasis/src/genmob.c" >
-     <mark line="85" />
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/structs.h" >
+     <mark line="1754" />
+     <mark line="1506" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/db.c" >
      <mark line="2892" />
@@ -130,6 +106,9 @@
      <mark line="790" />
      <mark line="842" />
      <mark line="1200" />
+    </bookmark>
+    <bookmark url="/home/mordecai/Desktop/game-oasis/src/genmob.c" >
+     <mark line="85" />
     </bookmark>
     <bookmark url="/home/mordecai/Desktop/game-oasis/src/character.cpp" >
      <mark line="895" />

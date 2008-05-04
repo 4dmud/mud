@@ -37,8 +37,8 @@ void update_char_objects ( Character *ch );	/* handler.c */
 void reboot_wizlists ( void );
 void symptoms ( Character *ch );
 void crumble_obj ( Character *ch, struct obj_data *obj );
-char *title_male ( int chclass, int level );
-char *title_female ( int chclass, int level );
+const char *title_male ( int chclass, int level );
+const char *title_female ( int chclass, int level );
 int has_space_suit ( Character *ch );
 int can_breathe_underwater ( Character *ch );
 
@@ -400,15 +400,13 @@ void set_title ( Character *ch, char *title )
 {
 	if ( !PRF_FLAGGED ( ch, PRF_KEEPTITLE ) )
 	{
-		if ( title == NULL )
+		if ( title == NULL && PLR_FLAGGED(ch, PLR_NEEDS_CLASS))
 		{
 			if ( GET_SEX ( ch ) == SEX_FEMALE )
-				title = title_female ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
+				title = (char *)title_female ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
 			else
-				title = title_male ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
-		}
-
-		if ( strlen ( title ) > MAX_TITLE_LENGTH )
+				title = (char *)title_male ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
+		} else if ( strlen ( title ) > MAX_TITLE_LENGTH )
 			title[MAX_TITLE_LENGTH] = '\0';
 
 		free_string ( &GET_TITLE ( ch ) );

@@ -166,9 +166,9 @@ void hedit_save_to_disk(Descriptor *d) {
     FILE *fp;
     int i;
     struct help_index_element *help;
-    char buf[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 
-    snprintf(buf, sizeof(buf), "%s/%s", HLP_PREFIX, HELP_FILE);
+    snprintf(buf, sizeof(buf), "%s/%s.tmp", HLP_PREFIX, HELP_FILE);
     if (!(fp = fopen(buf, "w+"))) {
         new_mudlog(NRM, GET_LEVEL(d->character), TRUE, "Can't open help file '%s'", buf);
         char error[MAX_STRING_LENGTH];
@@ -206,7 +206,12 @@ void hedit_save_to_disk(Descriptor *d) {
      */
     fprintf(fp, "$~\n");
     fclose(fp);
-
+    snprintf(buf2, sizeof(buf2), "%s/%s", HLP_PREFIX, HELP_FILE);
+ /*
+     * We're fubar'd if we crash between the two lines below.
+     */
+    remove(buf2);
+    rename(buf, buf2);
     remove_from_save_list(HEDIT_PERMISSION, SL_HELP);
 }
 
