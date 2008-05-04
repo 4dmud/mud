@@ -1136,6 +1136,13 @@ if (!silent) {
 				ch->Gold ( 50000, GOLD_BANK );
 			}
 			break;
+		case 11:
+		case 18:
+		case 6:
+			if ( REMORTS ( ch ) == 0 && (PLR_FLAGGED(ch, PLR_NEEDS_CLASS) || PLR_FLAGGED(ch, PLR_NEEDS_STATS)))
+				ch->Send ( "{cRYou can choose a class to be at any time till level 20.{c0\r\nTo choose your class, and then your stats, type: {cGchoose class{c0 then {cGchoose stats{c0" );
+			
+			break;
 		case 10:
 			if ( REMORTS ( ch ) < 3 )
 			{

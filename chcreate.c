@@ -545,7 +545,7 @@ void ShowClassInfo ( Descriptor *d, int typ )
 	{
 		case CLASSES:
 			d->Output ( "There are 8 classes in the Mud; \r\n" );
-			d->Output ( "Esper, Gypsy, Hunter, Warrior, Thief, Priest, Ranger.\r\n\r\n" );
+			d->Output ( "Mage, Esper, Gypsy, Hunter, Warrior, Thief, Priest, Ranger.\r\n\r\n" );
 			d->Output ( "Roughly they can be divided into three subtypes:\r\n" );
 			d->Output ( "Rogue Classes           =  Gypsy, Thief, Ranger\r\n" );
 			d->Output ( "Spell Casting Classes   =  Esper, Priest, Mage\r\n" );

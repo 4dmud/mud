@@ -3715,7 +3715,7 @@ int chance_hit_part(Character *ch, int part) {
     float l_l = 1;
     float l_r = 1;
     float total = 0;
-    float ac_tot = (float)(200 - (ch->compute_armor_class() + 100))/2;
+    float ac_tot = (float)(200 - (ch->compute_armor_class() + 100))*2;
 
     /* this can be sped up alot in future but for now
        we will just go through this each time it gets called.
