@@ -2799,12 +2799,16 @@ int shield_check(Character *ch, Character *vict, int type, int w_type) {
     if (!HERE(ch,vict))
         return 0;
 
+/**
+If the person Ch is hitting has Ice Shield, while the Ch has a shoet weapon, and hasn;t got prot from cold.
+There is a 1 in 6 chance that Ch will be affected by the freeze affect of the shield.
+- Mord**/
     if (HERE(ch, vict) && is_short_wep(GET_EQ(ch, WEAR_WIELD)) && AFF_FLAGGED(vict, AFF_SHIELD_ICE) && !affected_by_spell(ch, SPELL_PROT_COLD)) {
         if (!number(0, 5) && !AFF_FLAGGED(ch, AFF_FROZEN)) {
             //SET_BIT_AR(AFF_FLAGS(vict), AFF_FROZEN);
             act("You freeze as you touch $N's shield of ice.", FALSE, ch, 0 , vict, TO_CHAR);
-            act("$N is frozen as $E touches $N's shield of ice.", FALSE, ch, 0, vict, TO_NOTVICT);
-            act("$N is frozen as $E touches your shield of ice.", FALSE, ch, 0, vict, TO_VICT);
+            act("$n is frozen as $e touches $N's shield of ice.", FALSE, ch, 0, vict, TO_NOTVICT);
+            act("$n is frozen as $e touches your shield of ice.", FALSE, ch, 0, vict, TO_VICT);
             af.location = APPLY_SPEED;
             af.expire = HOURS_TO_EXPIRE(1);
             af.modifier = -2 * (GET_LEVEL(vict)+1);
