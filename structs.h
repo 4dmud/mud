@@ -545,8 +545,9 @@ class Room;
 #define PLR_RIDDLER      32     /* Player is in rp group Riddler */
 #define PLR_LOLTHYTE     33    /* Player is in rp group lolthye */
 #define PLR_FEARLESS     34   /* Player is in rp group Fearless */
-#define PLR_NEEDS_CLASS 35  /* Player hasn't yet chosen their class     */
-#define PLR_NEEDS_STATS 36  /* Player hasn't yet chosen their stats     */
+#define PLR_GALLIANO     35
+#define PLR_NEEDS_CLASS 36  /* Player hasn't yet chosen their class     */
+#define PLR_NEEDS_STATS 37  /* Player hasn't yet chosen their stats     */
 
 #define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */

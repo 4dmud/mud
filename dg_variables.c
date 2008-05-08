@@ -1218,6 +1218,9 @@ break;
                     case 9:
                         snprintf(str, slen, "%s", "fearless");
                         break;
+                    case 10:
+                        snprintf(str, slen, "%s", "galliano");
+                        break;
                     default:
                         *str = '\0';
                         break;

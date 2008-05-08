@@ -482,6 +482,8 @@ bool is_note_to ( Character *ch, NOTE_DATA *pnote )
                 return TRUE;
         if ( PLR_FLAGGED ( ch, PLR_FEARLESS ) && isname ( "fearless", pnote->to_list ) )
                 return TRUE;
+        if ( PLR_FLAGGED ( ch, PLR_GALLIANO ) && isname ( "galliano", pnote->to_list ) )
+                return TRUE;
 	if ( isname ( GET_NAME ( ch ), pnote->to_list ) )
 		return TRUE;
 	if ( isname ( list_account_names ( ch ).c_str(), pnote->to_list ) )
