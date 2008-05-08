@@ -4995,7 +4995,7 @@ ACMD ( do_prereq )
 							                  spell_info[spell_info[i].
 							                             second_prereq].name );
 						}
-						else
+						
 							len += snprintf ( msg1 + len, sizeof ( msg1 ) - len, "%s", "\r\n" );
 					}
 				}

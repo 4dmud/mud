@@ -1719,7 +1719,7 @@ void mag_summons(int level, Character *ch, struct obj_data *obj,
         break;
 
     case SPELL_ANIMATE_DEAD:
-        if (obj == NULL || !IS_CORPSE(obj) || IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_NPC_CORPSE)) {
+        if (obj == NULL || !IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_NPC_CORPSE)) {
             act(mag_summon_fail_msgs[7], FALSE, ch, 0, 0, TO_CHAR);
             return;
         }

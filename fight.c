@@ -1139,6 +1139,14 @@ int calc_fight_speed(Character* ch) {
         if (!number(0, 10))
             improve_skill(ch, SKILL_MELEE);
     }
+    if (total_chance(ch, SKILL_SECOND_ATTACK) > number(0, 101)) {
+            if (!number(0, 10))
+	                improve_skill(ch, SKILL_SECOND_ATTACK);
+			    }
+			        if (total_chance(ch, SKILL_THIRD_ATTACK) > number(0, 101)) {
+				        if (!number(0, 10))
+					            improve_skill(ch, SKILL_THIRD_ATTACK);
+						        }
     if (!IS_NPC(ch))
         return (int)IRANGE(-1000.0, to_ret, TOP_SPEED_VALUE);
     else

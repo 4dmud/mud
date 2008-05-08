@@ -3921,7 +3921,7 @@ ACMD ( do_wiznet )
 
 		for ( d = descriptor_list; d; d = d->next )
 		{
-			if ( ( STATE ( d ) == CON_PLAYING ) && ( ( ( GET_ORIG_LEV ( d->character ) ? GET_ORIG_LEV ( d->character ) : GET_LEVEL ( d->character ) ) >= level ) || PLR_FLAGGED ( d->character, PLR_IMM_MORT ) )
+			if ( ( STATE ( d ) == CON_PLAYING ) && ( ( ( GET_ORIG_LEV ( d->character ) ? GET_ORIG_LEV ( d->character ) : GET_LEVEL ( d->character ) ) >= level ) || ((PLR_FLAGGED ( d->character, PLR_IMM_MORT ) && level == LVL_GOD)) )
 			        && ( !PRF_FLAGGED ( d->character, PRF_NOWIZ ) )
 			        && ( !PLR_FLAGGED ( d->character, PLR_MAILING )
 			             || !PLR_FLAGGED ( d->character, PLR_WRITING ) )

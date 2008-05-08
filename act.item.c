@@ -4620,7 +4620,7 @@ int class_speed ( Character *ch )
 		case CLASS_MAGE:
 		case CLASS_PRIEST:
 		case CLASS_ESPER:
-			speed = 10;
+			speed = 40;
 			armorcost = 2.5;
 			break;
 		case CLASS_RANGER:
@@ -4659,7 +4659,7 @@ int race_speed ( Character *ch )
 	"  [M]artian\r\n"
 	"  [S]pace-wolf\r\n";
 	*/
-
+/*
 	switch ( GET_RACE ( ch ) )
 	{
 		case RACE_FAUN:
@@ -4693,6 +4693,8 @@ int race_speed ( Character *ch )
 			return 50;
 			break;
 	}
+	*/
+return 0;
 
 }
 
