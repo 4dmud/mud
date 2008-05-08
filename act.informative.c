@@ -2899,7 +2899,7 @@ void display_help_list ( Descriptor *d, char *keywords )
 	char buf[MAX_STRING_LENGTH];
 	char buf1[1024];
 	size_t len = 0;
-	strcpy ( buf, "  Help files simmilar\r\n---------------------------------------\r\n" );
+	strcpy ( buf, "  Help files similar\r\n---------------------------------------\r\n" );
 	len = strlen ( buf );
 
 	for ( i=0;i<top_of_helpt;i++ )
