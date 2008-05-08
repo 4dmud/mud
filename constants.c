@@ -397,6 +397,7 @@ const char *rp_group_names[] =
 	"{cpLolthite{c0",
 	"{cGCthulyte{c0",
         "{cWAlderisio{c0",
+        "{cwFearless{c0",
 	"\n"
 };
 /* (Note: strings for class definitions in class.c instead of here) */

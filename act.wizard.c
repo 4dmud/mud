@@ -5592,6 +5592,8 @@ int perform_set ( Character *ch, Character *vict, int mode,
 	    i = 7;
         else if (isname(val_arg, "Alderisio"))
             i = 8;
+        else if (isname(val_arg, "Fearless"))
+            i = 9;
         else if (!strcmp(val_arg, "none"))
             i = 0;
         GET_RP_GROUP(vict) = i;

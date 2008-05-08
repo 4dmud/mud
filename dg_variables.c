@@ -1215,6 +1215,9 @@ break;
                     case 8:
                         snprintf(str, slen, "%s", "alderisio");
                         break;
+                    case 9:
+                        snprintf(str, slen, "%s", "fearless");
+                        break;
                     default:
                         *str = '\0';
                         break;
