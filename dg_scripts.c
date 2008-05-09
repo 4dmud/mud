@@ -3192,12 +3192,11 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
 
 	if ( !vd )
 	{
-		script_log (
-		    "Trigger: %s, VNum %d. local var '%s' not found in global call",
+		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in global call",
 		    GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), arg1 );
 		return;
 	}
-
+	
 	add_var ( & ( sc->global_vars ), vd->name.c_str(), vd->value.c_str(), id );
 	remove_var ( &GET_TRIG_VARS ( trig ), vd->name.c_str() );
 }

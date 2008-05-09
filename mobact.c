@@ -31,10 +31,12 @@ ACMD ( do_get );
 void hunt_victim ( Character *ch );
 void parse_mob_commands ( Character *ch );
 Character * parse_aggressive ( Character *ch );
+int valid_perc ( Character *ch );
 
 /* local functions */
 void mobile_activity ( void );
 void clearMemory ( Character *ch );
+bool AggroTo ( Character *ch, Character *vict );
 
 int total_actions = 0;
 int max_actions = 0;
@@ -99,7 +101,7 @@ void mobile_activity ( void )
 			continue;
 
 		/* Scavenger (picking up objects) */
-		if ( MOB_FLAGGED ( ch, MOB_SCAVENGER ) && !FIGHTING ( ch ) && AWAKE ( ch ) )
+		if ( MOB_FLAGGED ( ch, MOB_SCAVENGER ) )
 			if ( IN_ROOM ( ch )->contents && !number ( 0, 10 ) )
 			{
 				max = 1;
@@ -142,30 +144,15 @@ void mobile_activity ( void )
 		}
 
 		/* Aggressive Mobs */
-		if ( !FIGHTING ( ch ) && ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
-		                           || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ) )
+		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
+		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ) )
 		{
 			found = FALSE;
 			Character *vnext;
 			for ( vict = IN_ROOM ( ch )->people; vict && !found; vict = vnext )
 			{
 				vnext = vict->next_in_room;
-				if ( SELF ( vict, ch ) )
-					continue;
-				if ( IS_NPC ( vict ) || !CAN_SEE ( ch, vict )
-				        || PRF_FLAGGED ( vict, PRF_NOHASSLE ) )
-					continue;
-				if ( AFF_FLAGGED ( vict, AFF_SNEAK ) && !AFF_FLAGGED ( ch, AFF_SENSE_LIFE ) )
-					continue;
-				if ( MOB_FLAGGED ( ch, MOB_WIMPY ) && AWAKE ( vict ) )
-					continue;
-				if ( vict->master != NULL && IN_ROOM ( vict->master ) == IN_ROOM ( vict ) && GET_PERC ( vict ) == 0 )
-					continue;
-
-				if ( !MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ||
-				        ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
-				        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
-				        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
+				if ( AggroTo ( ch, vict ) )
 				{
 					start_fighting ( ch, vict );
 					found = TRUE;
@@ -205,9 +192,16 @@ void mobile_activity ( void )
 			for ( vict = IN_ROOM ( ch )->people; vict && !found;
 			        vict = vict->next_in_room )
 			{
-				if ( ch == vict || !IS_NPC ( vict ) || !FIGHTING ( vict ) )
+				/** If the mob is aggro align, and someone is fighting, it will jump in and help the fighter - Mord **/
+				if ( ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
+				        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
+				        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
 					continue;
-				if ( IS_NPC ( FIGHTING ( vict ) ) || ch == FIGHTING ( vict ) )
+
+
+				if ( ch == vict || !FIGHTING ( vict ) )
+					continue;
+				if ( ch == FIGHTING ( vict ) )
 					continue;
 
 				act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict,
@@ -304,7 +298,31 @@ void clearMemory ( Character *ch )
 
 	MEMORY ( ch ) = NULL;
 }
-
+bool AggroTo ( Character *ch, Character *vict )
+{
+	if ( SELF ( vict, ch ) )
+		return false;
+	if ( IS_NPC ( vict ) && !vict->master )
+		return false;
+	if ( !CAN_SEE ( ch, vict ) )
+		return false;
+	if ( PRF_FLAGGED ( vict, PRF_NOHASSLE ) )
+		return false;
+	if ( AFF_FLAGGED ( vict, AFF_SNEAK ) && !AFF_FLAGGED ( ch, AFF_SENSE_LIFE ) )
+		return false;
+	if ( MOB_FLAGGED ( ch, MOB_WIMPY ) && AWAKE ( vict ) )
+		return false;
+	if ( valid_perc ( vict ) == 0 )
+		return false;
+	if ( !MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ||
+	        ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
+	        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
+	        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
+	{
+		return true;
+	}
+	return false;
+}
 Character * parse_aggressive ( Character *ch )
 {
 	Character *vict = NULL;
@@ -315,22 +333,9 @@ Character * parse_aggressive ( Character *ch )
 		for ( vict = IN_ROOM ( ch )->people; vict;
 		        vict = vict->next_in_room )
 		{
-			if ( IS_NPC ( vict ) || !CAN_SEE ( ch, vict )
-			        || PRF_FLAGGED ( vict, PRF_NOHASSLE ) )
-				continue;
-			if ( AFF_FLAGGED ( vict, AFF_SNEAK ) && !AFF_FLAGGED ( ch, AFF_SENSE_LIFE ) )
-				continue;
-			if ( MOB_FLAGGED ( ch, MOB_WIMPY ) && AWAKE ( vict ) )
-				continue;
-			if ( vict->master != NULL && HERE ( vict->master, vict ) )
-				continue;
-			if ( !MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ||
-			        ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
-			        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
-			        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
-			{
+			if ( AggroTo ( ch, vict ) )
 				return vict;
-			}
+
 		}
 	}
 	return NULL;

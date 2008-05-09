@@ -61,11 +61,12 @@ void add_var(struct trig_var_data **var_list,const char *name,const char *value,
 
     if (vd && (!vd->context || vd->context==id)) {
         vd->value.erase();
-    } else if (!vd) {
+    } else {
         vd = new trig_var_data();
         vd->name.assign(name);
         vd->next = *var_list;
-        vd->context = id;
+	if (id != 0)
+        	vd->context = id;
         *var_list = vd;
     }
     vd->value.assign(value);

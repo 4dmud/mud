@@ -233,7 +233,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	}
 	else
 	{
-		snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills" );
+		snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s in green:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills" );
 		DYN_RESIZE ( buf );
 	}
 
@@ -292,18 +292,18 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 		else
 		{
 
-
+			if ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
+			        && ( SECOND_PRE ( i ) != TYPE_UNDEFINED ) )
+				h = 2;
+			else if ( ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
+			            && ( SECOND_PRE ( i ) == TYPE_UNDEFINED ) ) )
+				h = 1;
+			else
+				h = 0;
 			if ( knows_spell ( ch, i ) )
 			{
 
-				if ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
-				        && ( SECOND_PRE ( i ) != TYPE_UNDEFINED ) )
-					h = 2;
-				else if ( ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
-				            && ( SECOND_PRE ( i ) == TYPE_UNDEFINED ) ) )
-					h = 1;
-				else
-					h = 0;
+
 				if ( GET_LEVEL ( ch ) == LVL_IMPL )
 				{
 					sprintf ( buf, "%-3d)", i );
@@ -311,7 +311,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				}
 
 
-				sprintf ( buf, " %s%-20s  \x1B[0m[%s] ",
+				sprintf ( buf, " %s%-20s     \x1B[0m[%s] ",
 				          ( ! ( i < MAX_SPELLS ) ? "\x1B[32m" : "\x1B[33m" ),
 				          skill_name ( i ), how_good_perc ( ch, total_chance ( ch, i ) ) );
 				DYN_RESIZE ( buf );
@@ -368,6 +368,37 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				/*if (!(GET_LEVEL(ch) >= LVL_IMMORT))
 				break;*/
 			}
+			else
+			{
+
+				sprintf ( buf, "{cr %-20s{c0                  ", skill_name ( i ) );
+				DYN_RESIZE ( buf );
+				sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
+				DYN_RESIZE ( buf );
+				if ( skillspell == 1 && elemental_type ( i ) != ELEM_NONE )
+				{
+					snprintf ( buf, sizeof ( buf ), "[{cp%-11s{c0]", elemental_types[elemental_type ( i ) ] );
+					DYN_RESIZE ( buf );
+				}
+				if ( h == 1 )
+				{
+					sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m",
+					          skill_name ( FIRST_PRE ( i ) ) );
+					DYN_RESIZE ( buf );
+				}
+				else if ( h == 2 )
+				{
+					sprintf ( buf,
+					          "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
+					          skill_name ( FIRST_PRE ( i ) ),
+					          skill_name ( SECOND_PRE ( i ) ) );
+					DYN_RESIZE ( buf );
+				}
+
+				sprintf ( buf, "\r\n" );
+				DYN_RESIZE ( buf );
+
+			}
 
 
 		}
@@ -414,16 +445,16 @@ ACMD ( do_practice )
 		if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
 			mob_trainers.push_back ( p );
 
-	if ( is_abbrev (argument, "skills" ) )
+	if ( is_abbrev ( argument, "skills" ) )
 		train_list = 0;
-	else if ( is_abbrev (argument, "spells" ) )
+	else if ( is_abbrev ( argument, "spells" ) )
 		train_list = 1;
-	else if ( is_abbrev (argument, "subskills") )
+	else if ( is_abbrev ( argument, "subskills" ) )
 		train_list = 2;
 
 	if ( train_list != -1 )
 	{
-/** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
+		/** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
 		if ( train_list == 2 || mob_trainers.empty() )
 		{
 			list_skills ( ch, train_list, NULL );
@@ -576,7 +607,7 @@ int assign_group_trains ( Character *mob, int group, int filter )
 						continue;
 					break;
 			}
-			if ( ss != TYPE_UNDEFINED && !can_teach_skill(proto, ss))
+			if ( ss != TYPE_UNDEFINED && !can_teach_skill ( proto, ss ) )
 			{
 				proto->mob_specials.teaches_skills.push_back ( ss );
 				assigned++;
@@ -588,7 +619,7 @@ int assign_group_trains ( Character *mob, int group, int filter )
 		medit_save_to_disk ( zone_table[real_zone_by_thing ( mvn ) ].number );
 		for ( mob = character_list; mob; mob = mob->next )
 		{
-			if ( mvn != GET_MOB_VNUM(mob) )
+			if ( mvn != GET_MOB_VNUM ( mob ) )
 				continue;
 			mob->mob_specials.teaches_skills = proto->mob_specials.teaches_skills;
 		}

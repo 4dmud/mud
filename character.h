@@ -66,8 +66,8 @@ public:
     struct note_data *pnote;
     sh_int concealment;
     int has_note[NUM_NOTE_TYPES];
-  struct obj_data *char_eq[NUM_WEARS];
-
+    struct obj_data *char_eq[NUM_WEARS];
+    bool IsNaked;
     Character *fuses[TOP_FUSE_LOCATION];
     Character *fused_to;
     struct obj_data *hitched;
