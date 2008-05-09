@@ -224,108 +224,51 @@ void assign_skills ( void )
 	skillo ( SKILL_HIDE, "hide", TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 8 );
 
-<<<<<<< .mine
-	skillo ( SKILL_KICK, "kick",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT, NO_FIRST, NO_SECOND, 1, 2 );
-=======
   skillo(SKILL_KICK, "kick",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT, SKILL_HANDTOHAND, NO_SECOND, 1, 2);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_TRAMPLE, "trample",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT, NO_FIRST, NO_SECOND, 3, 18 );
-=======
   skillo(SKILL_TRAMPLE, "trample",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 18);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_JOUST, "joust",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT, NO_FIRST, NO_SECOND, 3, 29 );
-=======
   skillo(SKILL_JOUST, "joust",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 29);
->>>>>>> .r551
 
 	skillo ( SKILL_PICK_LOCK, "pick lock", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 49 );
 
 	skillo ( SKILL_RESCUE, "rescue", TAR_CHAR_ROOM | TAR_NOT_SELF,
 	         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 27 );
 
-<<<<<<< .mine
-	skillo ( SKILL_SNEAK, "sneak", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 31 );
-=======
   skillo(SKILL_SNEAK, "sneak", TAR_CHAR_ROOM | TAR_SELF_ONLY,
          SK_NONE, NO_FIRST, NO_SECOND, 1, 8);
->>>>>>> .r551
-
-<<<<<<< .mine
-	skillo ( SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, NO_TIER, 4 );
-=======
   skillo(SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, 0, 31);
->>>>>>> .r551
 
 	skillo ( SKILL_TRACK, "track", TAR_CHAR_WORLD | TAR_NOT_SELF,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 27 );
 
-<<<<<<< .mine
-	skillo ( SKILL_GRAPPLE, "grapple",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT, NO_FIRST, NO_SECOND, 4, 17 );
-=======
   skillo(SKILL_GRAPPLE, "grapple",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT, SKILL_HANDTOHAND, SKILL_SECOND_ATTACK, 4, 17);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_DODGE, "dodge", TAR_IGNORE,
-	         SK_NONE, NO_FIRST, NO_SECOND, 3, 4 );
-	skillo ( SKILL_PHASE, "phase", TAR_IGNORE,
-	         SK_NONE, NO_FIRST, NO_SECOND, 3, 4 );
-=======
   skillo(SKILL_DODGE, "dodge", TAR_IGNORE,
          SK_NONE, SKILL_MELEE, NO_SECOND, 3, 4);
   skillo(SKILL_PHASE, "phase", TAR_IGNORE,
          SK_NONE, NO_FIRST, NO_SECOND, 3, 17);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_BLACKJACK, "blackjack",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 1, 7 );
-=======
   skillo(SKILL_BLACKJACK, "blackjack",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 27);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_CHARGE, "charge",
-	         TAR_IGNORE, SK_VIOLENT, NO_FIRST, NO_SECOND, 3, 26 );
-=======
   skillo(SKILL_CHARGE, "charge",
          TAR_IGNORE, SK_VIOLENT, SKILL_SECOND_ATTACK, NO_SECOND, 3, 26);
->>>>>>> .r551
 
 	skillo ( SKILL_GRIP, "grip", TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 49 );
 
-<<<<<<< .mine
-	skillo ( SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF,
-	         SK_NONE, NO_FIRST, NO_SECOND, 3, 20 );
-=======
   skillo(SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF,
          SK_NONE, SKILL_MELEE, NO_SECOND, 3, 20);
->>>>>>> .r551
 
 	skillo ( SKILL_FOCUS, "focus", TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND, 2, 24 );
@@ -333,13 +276,8 @@ void assign_skills ( void )
 	skillo ( SKILL_HOLY_STRENGTH, "holy strength",   TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND,2, 5 );
 
-<<<<<<< .mine
-	skillo ( SKILL_BESERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 3, 8 );
-=======
   skillo(SKILL_BESERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY,
          SK_NONE, SKILL_MELEE, NO_SECOND, 3, 8);
->>>>>>> .r551
 
 	skillo ( SKILL_MEDITATE, "meditate", TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND, 2, 30 );
@@ -362,25 +300,13 @@ void assign_skills ( void )
 	skillo ( SKILL_BLADE_DANCE, "bladedance",TAR_CHAR_ROOM |
 	         TAR_SELF_ONLY,     SK_NONE, NO_FIRST, NO_SECOND, 4, 29 );
 
-<<<<<<< .mine
-	skillo ( SKILL_CLEAVE, "cleave",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 38 );
-=======
   skillo(SKILL_CLEAVE, "cleave",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_GRIP, 4, 12);
->>>>>>> .r551
 
-<<<<<<< .mine
-	skillo ( SKILL_BEHEAD, "behead",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-	         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3,38 );
-=======
   skillo(SKILL_BEHEAD, "behead",
          TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
          SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_FACE, 4, 12);
->>>>>>> .r551
 
 	skillo ( SKILL_BRACE, "brace", TAR_IGNORE,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 15 );
@@ -388,21 +314,6 @@ void assign_skills ( void )
 	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
 	         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 );
 
-<<<<<<< .mine
-	skillo_static ( SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3 );
-	skillo_static ( SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8 );
-	skillo_static ( SKILL_SLING, "sling", NO_FIRST, NO_SECOND, NO_TIER,12 );
-	skillo_static ( SKILL_CROSSBOW, "crossbow", NO_FIRST, NO_SECOND,NO_TIER, 20 );
-	skillo_static ( SKILL_THROW, "throw", NO_FIRST, NO_SECOND, NO_TIER, 22 );
-	skillo_static ( SKILL_DUAL, "dual", NO_FIRST, NO_SECOND, 1, 27 );
-	skillo_static ( SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 0, 25 );
-	skillo_static ( SKILL_TRAP_AWARE, "trap aware", NO_FIRST, NO_SECOND,3, 5 );
-	skillo_static ( SKILL_PARRY, "parry", NO_FIRST, NO_SECOND, 2,30 );
-	/*mord */
-	skillo_static ( SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, NO_TIER,NO_LEVEL );
-	skillo_static ( SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14 );
-	skillo_static ( SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,1, 5 );
-=======
   skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3);
   skillo_static(SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8);
   skillo_static(SKILL_SLING, "sling", NO_FIRST, NO_SECOND, NO_TIER,12);
@@ -416,7 +327,6 @@ void assign_skills ( void )
   skillo_static(SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, 1, 24);
   skillo_static(SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14);
   skillo_static(SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,1, 5);
->>>>>>> .r551
 
 	skillo_static ( SKILL_MELEE, "melee", NO_FIRST, NO_SECOND, 1, 1 );
 
@@ -428,11 +338,7 @@ void assign_skills ( void )
 
 	skillo_static ( SKILL_SHORT_BLADE,"short blade",SKILL_HANDTOHAND,NO_SECOND, 3, 10 );
 
-<<<<<<< .mine
-	skillo_static ( SKILL_LONGARM, "longarm", NO_FIRST, NO_SECOND, 3, 10 );
-=======
   skillo_static(SKILL_LONGARM, "longarm", SKILL_HANDTOHAND, NO_SECOND, 3, 10);
->>>>>>> .r551
 
 
 }
