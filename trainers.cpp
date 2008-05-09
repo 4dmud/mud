@@ -368,7 +368,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				/*if (!(GET_LEVEL(ch) >= LVL_IMMORT))
 				break;*/
 			}
-			else
+			else if (mob)
 			{
 
 				sprintf ( buf, "{cr %-20s{c0                  ", skill_name ( i ) );
