@@ -66,7 +66,7 @@ struct wld_command_info
 void wld_log(Room *room, const char *format, ...)
 {
   va_list args;
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
 
   snprintf(buf, sizeof(buf), "Room %d :: %s", room->number, format);
 

@@ -44,7 +44,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
     Room *caster_room = NULL;
     char *s, *t;
     int spellnum, target = 0;
-    char buf2[MAX_STRING_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
+    char buf2[MAX_INPUT_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
 
     /* need to get the caster or the room of the temporary caster */
     switch (type) {

@@ -2220,7 +2220,7 @@ ASKILL(skill_blackjack) {
     //char arg[MAX_INPUT_LENGTH];
     struct affected_type af;
     int chance = 0;
-    char buf[MAX_STRING_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
     ACMD(do_say);
 
 

@@ -778,7 +778,7 @@ ACMD(do_subskill) {
     int chclass;
     bool immort = 0;
     sub_success = FALSE;
-    char arg[MAX_STRING_LENGTH];
+    char arg[MAX_INPUT_LENGTH];
 
     /* If switched, orig should point to original char */
     if (ch->desc && ch->desc->original)

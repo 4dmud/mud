@@ -228,9 +228,9 @@ void do_objstat ( Character *ch, struct obj_data *j )
 	int i, found;
 	obj_vnum vnum;
 	FILE *fp;
-	char buf[MAX_STRING_LENGTH];
-	char buf1[MAX_STRING_LENGTH];
-	char buf2[MAX_STRING_LENGTH];
+	char buf[MAX_INPUT_LENGTH];
+	char buf1[MAX_INPUT_LENGTH];
+	char buf2[MAX_INPUT_LENGTH];
 
 	fp = fopen ( DUMP_FILE, "a+" );
 
@@ -385,8 +385,8 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
 	struct trig_var_data *tv;
 	trig_data *t;
 	char name[MAX_INPUT_LENGTH];
-	char buf[MAX_STRING_LENGTH];
-	char buf1[MAX_STRING_LENGTH];
+	char buf[MAX_INPUT_LENGTH];
+	char buf1[MAX_INPUT_LENGTH];
 	char namebuf[512];
 	FILE *fp;
 
@@ -1100,7 +1100,7 @@ ACMD ( do_smite )  				/* by Garion */
 	Character *victim;
 	char arg[MAX_INPUT_LENGTH];
 	char arg2[MAX_INPUT_LENGTH];
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_INPUT_LENGTH];
 	int i;
 
 	two_arguments ( argument, arg, arg2 );
@@ -1194,7 +1194,7 @@ ACMD ( do_smite )  				/* by Garion */
 ACMD ( do_blowup )
 {
 	struct obj_data *target = NULL;
-	char arg[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 
 	one_argument ( argument, arg );
 
@@ -1267,7 +1267,7 @@ void explosion_messages ( room_rnum room, int damage, struct obj_data *target )
 ACMD ( do_jump )
 {
 	struct obj_data *obj = NULL;
-	char arg[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 
 	one_argument ( argument, arg );
 

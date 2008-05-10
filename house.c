@@ -91,7 +91,7 @@ int House_load ( room_vnum vnum )
 {
 	FILE *fl = NULL;
 	room_rnum rnum;
-	char fname1[MAX_STRING_LENGTH], fname2[MAX_STRING_LENGTH];
+	char fname1[MAX_INPUT_LENGTH], fname2[MAX_INPUT_LENGTH];
 	int retval = 0;
 
 	if ( ( rnum = real_room ( vnum ) ) == NULL )
@@ -124,7 +124,7 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 	int t[20], danger, zwei = 0;	// kalten
 	int locate = 0, j, nr, k;	// kalten
 	struct extra_descr_data *new_descr;	// kalten
-	char buf2[MAX_STRING_LENGTH];
+	char buf2[MAX_INPUT_LENGTH];
 	int retval = 0;
 
 	log ( "House loading using old format." );

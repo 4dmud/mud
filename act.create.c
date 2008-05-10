@@ -293,8 +293,8 @@ ASKILL(skill_brew)
 {
   struct obj_data *container = NULL;
   struct obj_data *next_obj;
-  char bottle_name[MAX_STRING_LENGTH];
-  char spell_name[MAX_STRING_LENGTH];
+  char bottle_name[MAX_INPUT_LENGTH];
+  char spell_name[MAX_INPUT_LENGTH];
   char *temp1, *temp2;
   int potion, found = FALSE;
 
@@ -472,8 +472,8 @@ ASKILL(skill_scribe)
 {
   struct obj_data *paper = NULL;
   struct obj_data *next_obj;
-  char paper_name[MAX_STRING_LENGTH];
-  char spell_name[MAX_STRING_LENGTH];
+  char paper_name[MAX_INPUT_LENGTH];
+  char spell_name[MAX_INPUT_LENGTH];
   char *temp1, *temp2;
   int scroll = 0, found = FALSE;
 
@@ -564,7 +564,7 @@ ASKILL(skill_tinker)
    */
   struct obj_data *weapon = NULL;
   struct obj_data *next_obj;
-  char weapon_name[MAX_STRING_LENGTH];
+  char weapon_name[MAX_INPUT_LENGTH];
   int found = FALSE, prob = 0, dam = 0, time = 0;
 
   one_argument(argument, weapon_name);
@@ -667,8 +667,7 @@ void make_focus(Character *ch, int type, struct obj_data *o)
   struct extra_descr_data *new_descr;
   int can_make = TRUE, num2 = number(0, 16);
   int v0, v1, v2, v3;
-  char *msg, *msgroom, msgbuf[MAX_STRING_LENGTH],
-  msgroombuf[MAX_STRING_LENGTH];
+  char *msg, *msgroom, msgbuf[MAX_INPUT_LENGTH],  msgroombuf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
   msg = msgbuf;
@@ -755,7 +754,7 @@ void make_focus(Character *ch, int type, struct obj_data *o)
 ASKILL(skill_sing_wood)
 {
   struct obj_data *o = NULL;
-  char tree_name[MAX_STRING_LENGTH];
+  char tree_name[MAX_INPUT_LENGTH];
   char *temp1;
   int type, found = FALSE;
   struct message_event_obj *msg = NULL;
@@ -1067,7 +1066,7 @@ EVENTFUNC(message_event)
 ACMD(do_fell)
 {
   struct obj_data *o = NULL;
-  char tree_name[MAX_STRING_LENGTH];
+  char tree_name[MAX_INPUT_LENGTH];
   char *temp1;
   int found = FALSE;
   struct message_event_obj *msg = NULL;

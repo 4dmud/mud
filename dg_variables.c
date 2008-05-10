@@ -175,8 +175,6 @@ int char_has_item(char *item, Character *ch) {
 
 int text_processed(char *field, char *subfield, struct trig_var_data *vd,
                    char *str, size_t slen) {
-    //char *p, *p2;
-    //char tmpvar[MAX_STRING_LENGTH];
 
     if (!str_cmp(field, "strlen")) {                     /* strlen    */
         snprintf(str, slen, "%d", (int)(vd->value.length()));

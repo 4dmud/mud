@@ -3869,7 +3869,7 @@ void brag(Character *ch, Character *vict) {
 
     Descriptor *i;
     Descriptor *next;
-    char buf[MAX_STRING_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
     const char *bragmsg[] = {
                                 "$N was just too easy a kill!", //0
                                 "Huh? Did you die $N? Sorry I was taking a nap!",
@@ -4119,7 +4119,7 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
     char insert_text[MAX_INPUT_LENGTH] = "";
     char *inbuf;
     //static char prompt[MAX_STRING_LENGTH + 1] = "";
-    char out_buf[MAX_STRING_LENGTH + 1] = "";
+    char out_buf[MAX_INPUT_LENGTH + 1] = "";
     char ptemp[MAX_PROMPT_LENGTH * 5] = "";
     register unsigned int inpos = 0, outpos = 0;
     Descriptor *d = NULL;

@@ -69,8 +69,8 @@ char* print_gold ( char* result, gold_int gold )
 
 char *center_align ( char *str, size_t width )
 {
-	static char retbuf[MAX_STRING_LENGTH];
-	char statbuf[MAX_STRING_LENGTH], *stptr;
+	static char retbuf[MAX_INPUT_LENGTH];
+	char statbuf[MAX_INPUT_LENGTH], *stptr;
 	size_t len;
 	if ( !str )
 		return NULL;

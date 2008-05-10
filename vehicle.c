@@ -91,8 +91,8 @@ void view_room_by_rnum(Character *ch, room_rnum is_in) {
 
 ACMD(do_drive) {
     Character *people;
-    char buf2[MAX_STRING_LENGTH];
-    char arg[MAX_STRING_LENGTH];
+    char buf2[MAX_INPUT_LENGTH];
+    char arg[MAX_INPUT_LENGTH];
     int x, dir;
     const dirParseStruct dirParse[6] = {
                                            {

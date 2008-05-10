@@ -4393,8 +4393,8 @@ int same_location ( struct obj_data *a, struct obj_data *b )
 
 ACMD ( do_compare )
 {
-	char arg1[MAX_STRING_LENGTH];
-	char arg2[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH];
 	struct obj_data *obj1;
 	struct obj_data *obj2;
 

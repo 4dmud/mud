@@ -5637,7 +5637,7 @@ void char_to_store ( Character *ch )
 {
 	FILE *fl;
 	char outname[80], bits[127], buf[MAX_STRING_LENGTH];
-	char tempname[MAX_STRING_LENGTH];
+	char tempname[MAX_INPUT_LENGTH];
 	int i, id, save_index = FALSE, thing = 0;
 	struct affected_type *aff, tmp_aff[MAX_AFFECT];
 

@@ -138,7 +138,7 @@ void PlayerIndex::Save() {
     int cnt = 0;
     char bits[64];
     FILE *index_file;
-    char tempname[MAX_STRING_LENGTH];
+    char tempname[MAX_INPUT_LENGTH];
     snprintf(tempname, sizeof(tempname), "%s%s", PLR_INDEX_FILE, ".tmp");
     if (!(index_file = fopen(tempname, "w"))) {
         log("SYSERR:  Could not write player index file");

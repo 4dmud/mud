@@ -27,9 +27,9 @@ long           g_lNumAssemblies = 0;
 ASSEMBLY       *g_pAssemblyTable = NULL;
 
 void assemblyBootAssemblies( void ) {
-    char         szLine[ MAX_STRING_LENGTH ] = { '\0' };
-    char         szTag[ MAX_STRING_LENGTH ] = { '\0' };
-    char         szType[ MAX_STRING_LENGTH ] = { '\0' };
+    char         szLine[ MAX_INPUT_LENGTH ] = { '\0' };
+    char         szTag[ MAX_INPUT_LENGTH ] = { '\0' };
+    char         szType[ MAX_INPUT_LENGTH ] = { '\0' };
     int          iExtract = 0;
     int          iInRoom = 0; /* inroom = 1, inventory = 0, hold = 2, wield = 3 */
     int          iType = 0;
@@ -135,7 +135,7 @@ const char *compIn(int i) {
 }
 
 void assemblyListToChar( Character *pCharacter ) {
-    char         szBuffer[ MAX_STRING_LENGTH ] = { '\0' };
+    char         szBuffer[ MAX_INPUT_LENGTH ] = { '\0' };
     char         szAssmType[ MAX_INPUT_LENGTH ] = { '\0' };
     long         i = 0;                  // Outer iterator.
     long         j = 0;                  // Inner iterator.

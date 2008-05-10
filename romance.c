@@ -624,7 +624,7 @@ ACMD(do_breakup)
 void marry_them(Character *ch, Character *victim,
                 Character *imm)
 {
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
   /* Do standard checks.. */
   if (crashcheck_alpha(victim, imm) == 1)
   {

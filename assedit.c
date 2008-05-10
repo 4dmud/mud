@@ -51,8 +51,8 @@ long lRnum = 0;
 ACMD (do_assedit)
 {
   Descriptor *d = ch->desc;
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
+  char buf2[MAX_INPUT_LENGTH];
   int zr;
 
   *buf = '\0';  /* If I run into problems then take this sucker out */
