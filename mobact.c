@@ -192,20 +192,20 @@ void mobile_activity ( void )
 			for ( vict = IN_ROOM ( ch )->people; vict && !found;
 			        vict = vict->next_in_room )
 			{
-				/** If the mob is aggro align, and someone is fighting, it will jump in and help the fighter - Mord **/
-				if ( ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
-				        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
-				        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
-					continue;
-
-
 				if ( ch == vict || !FIGHTING ( vict ) )
 					continue;
 				if ( ch == FIGHTING ( vict ) )
 					continue;
+				if ( IS_GOOD ( ch ) && !IS_GOOD ( vict ) )
+					continue;
+				if ( IS_EVIL ( ch ) && !IS_EVIL ( vict ) )
+					continue;
+				if (IS_EVIL(ch) && IS_EVIL(FIGHTING(ch)))
+					continue;
+				if (IS_GOOD(ch) && IS_GOOD(FIGHTING(ch)))
+					continue;
 
-				act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict,
-				      TO_ROOM );
+				act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict, TO_ROOM );
 				start_fighting ( ch, FIGHTING ( vict ) );
 				total_actions++;
 				found = TRUE;
