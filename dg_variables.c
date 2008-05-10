@@ -220,6 +220,12 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd,
 
         snprintf(str, slen, "%s", vd->value.substr(cdr, vd->value.length()).c_str());
         return TRUE;
+    } else if (!str_cmp(field, "charat")) {                 /* cdr       */
+        int c = atoi(subfield);
+	if (c > 0 && c <= vd->value.length())
+	c--;
+        snprintf(str, slen, "%c", vd->value.at(c));
+        return TRUE;
     } else if (!str_cmp(field, "mudcommand")) {
 
         int length, cmd;
