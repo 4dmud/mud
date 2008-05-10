@@ -200,9 +200,9 @@ void mobile_activity ( void )
 					continue;
 				if ( IS_EVIL ( ch ) && !IS_EVIL ( vict ) )
 					continue;
-				if (IS_EVIL(ch) && IS_EVIL(FIGHTING(ch)))
+				if (IS_EVIL(ch) && IS_EVIL(FIGHTING(vict)))
 					continue;
-				if (IS_GOOD(ch) && IS_GOOD(FIGHTING(ch)))
+				if (IS_GOOD(ch) && IS_GOOD(FIGHTING(vict)))
 					continue;
 
 				act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict, TO_ROOM );
