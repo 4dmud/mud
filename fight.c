@@ -2738,6 +2738,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 				{
 					dam_exp /= 4;
 					damage_count ( vict, IS_NPC ( RIDING ( ch ) ) ? -1 : GET_ID ( RIDING ( ch ) ), dam_exp );
+improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 					damage_count ( vict, IS_NPC ( ch ) ? -1 : GET_ID ( ch ), dam_exp * 3 );
 				}
 				else
@@ -2804,23 +2805,24 @@ int fe_after_damage ( Character* ch, Character* vict,
 					case 2:
 						if ( !is_short_wep ( GET_EQ ( ch, WEAR_WIELD_2 ) ) )
 						{
-							if ( number ( 0, 1000 ) < 2 )
+							if ( number ( 0, 10 ) < 2 )
 								improve_skill ( ch, SKILL_LONGARM );
 						}
 						else
 						{
-							if ( number ( 0, 1000 ) < 2 )
+							if ( number ( 0, 10 ) < 2 )
 								improve_skill ( ch, SKILL_SHORT_BLADE );
 						}
+improve_skill ( ch, SKILL_DUAL );
 					case 1:
 						if ( !is_short_wep ( GET_EQ ( ch, WEAR_WIELD ) ) )
 						{
-							if ( number ( 0, 1000 ) < 2 )
+							if ( number ( 0, 10 ) < 2 )
 								improve_skill ( ch, SKILL_LONGARM );
 						}
 						else
 						{
-							if ( number ( 0, 1000 ) < 2 )
+							if ( number ( 0, 10 ) < 2 )
 								improve_skill ( ch, SKILL_SHORT_BLADE );
 						}
 
@@ -3097,6 +3099,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 			af.bitvector = AFF_FROZEN;
 			af.type = SPELL_DG_AFFECT;
 			affect_to_char ( ch, &af );
+improve_skill ( ch, SPELL_SHIELD_ICE );
+improve_skill ( vict, SPELL_SHIELD_ICE );
 		}
 	}
 
@@ -3118,6 +3122,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 					act ( "$N blocks your attack with $S shield!", FALSE, ch, 0, vict, TO_CHAR );
 					act ( "You block $n's attack with your shield!", FALSE, ch, 0, vict, TO_VICT );
 				}
+improve_skill ( ch, SPELL_SHIELD_STATIC );
+improve_skill ( vict, SPELL_SHIELD_STATIC );
 			}
 			break;
 		case SHIELD_REFLECT:
@@ -3125,18 +3131,24 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 			{
 				act ( "$N scorches you with $S fire shield.", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You scorch $n with your fire shield.", FALSE, ch, 0, vict, TO_VICT );
+improve_skill ( ch, SPELL_FIRE_SHIELD );
+improve_skill ( vict, SPELL_FIRE_SHIELD );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 			else if ( AFF_FLAGGED ( vict, AFF_SHIELD_THORNS ) && ( GET_EQ ( ch, WEAR_WIELD ) && sht )  && ( number ( 1, 81 ) < lev || ded ) )
 			{
 				act ( "You are shredded by $N's whirling barrier of thorns!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You shred $n with your whirling barrier of thorns!", FALSE, ch, 0, vict, TO_VICT );
+improve_skill ( ch, SPELL_SHIELD_THORN );
+improve_skill ( vict, SPELL_SHIELD_THORN );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 			else if ( AFF_FLAGGED ( vict, AFF_SHIELD_MIRROR ) && ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( number ( 1, 81 ) < lev || ded ) )
 			{
 				act ( "$N's mirror shield reflects your magic back at you!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You bounce $n's magic right back at $m!", FALSE, ch, 0, vict, TO_VICT );
+improve_skill ( ch, SPELL_SHIELD_MIRROR );
+improve_skill ( vict, SPELL_SHIELD_MIRROR );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 
@@ -3147,6 +3159,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 				act ( "A golden light moves $N out of your reach!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "A golden light moves you out of $n's reach!", FALSE, ch, 0, vict, TO_VICT );
 				success = TRUE;
+improve_skill ( ch, SPELL_SHIELD_HOLY );
+improve_skill ( vict, SPELL_SHIELD_HOLY );
 			}
 
 			break;
@@ -3176,8 +3190,6 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 	        ( number ( 1, 30 ) < GET_DEX ( vict ) ) &&
 	        ( number ( 1, 300 ) < ( total_chance ( vict, SKILL_PARRY ) * parrychance ) ) )
 	{
-		if ( number ( 1, 100 ) < GET_LEVEL ( vict ) )
-			improve_skill ( ch, SKILL_PARRY );
 		if ( !IS_WEAPON ( v_type ) )
 		{
 			log ( "COMBAT: player %s, attacked with a weapon type of %d (%s)", GET_NAME ( vict ), v_type, skill_name ( v_type ) );
@@ -3190,6 +3202,8 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 		           PERS ( vict,ch ), attack_hit_text[v_type].singular );
 		vict->Send ( "You parry %s's attack with a swift %s.\r\n",
 		             PERS ( ch, vict ), attack_hit_text[v_type].singular );
+improve_skill ( ch, SKILL_PARRY );
+improve_skill ( vict, SKILL_PARRY );
 		return 1;
 	}
 	if ( IS_WEAPON ( w_type ) && number ( 1, 30 ) < GET_DEX ( vict ) && AFF_FLAGGED ( vict, AFF_DODGE )  && number ( 1, 200 ) < total_chance ( vict, SKILL_DODGE ) )
@@ -3198,6 +3212,8 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 		{
 			ch->Send ( "%s dodges your attack.\r\n", PERS ( vict,ch ) );
 			vict->Send ( "You dodge %s's attack.\r\n", PERS ( ch, vict ) );
+improve_skill ( ch, SKILL_DODGE );
+improve_skill ( vict, SKILL_DODGE );
 			return 1;
 		}
 		else
@@ -3216,8 +3232,11 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 	{
 		if ( skill_cost ( 0, 2, 20, vict ) )
 		{
+
 			act ( "$N phases past your attack and strikes you!", FALSE, ch, 0, vict, TO_CHAR );
 			act ( "You phase past $n's attack and strike $m.\r\n", FALSE, ch, 0, vict, TO_VICT );
+improve_skill ( ch, SKILL_PHASE );
+improve_skill ( vict, SKILL_PHASE );
 			fight_event_hit ( vict, ch, find_fe_type ( vict ), GET_NEXT_SKILL ( vict ) );
 			return 1;
 		}
@@ -3230,6 +3249,8 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 	{
 		ch->Send ( "%s weaves drunkenly out of your reach!\r\n", PERS ( vict,ch ) );
 		vict->Send ( "You weave drunkenly out of %s's reach!\r\n",  PERS ( ch, vict ) );
+improve_skill ( ch, SKILL_MARTIAL_ARTS );
+improve_skill ( vict, SKILL_MARTIAL_ARTS );
 		return 1;
 	}
 

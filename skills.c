@@ -2855,13 +2855,12 @@ void improve_skill ( Character *ch, int skill )
 	int splevel = ( spell_info[skill].min_level );
 	gold_int share;
 
-	if ( skill == TYPE_UNDEFINED )
+	if ( skill == TYPE_UNDEFINED || percent < 0)
 		return;
 
 	if ( number ( 1, 1000 ) > GET_WIS ( ch ) + GET_INT ( ch ) )
 		return;
-	if ( percent >= 97 || percent <= 0 )
-		return;
+	
 
 	if ( FIRST_PRE ( skill ) != TYPE_UNDEFINED )
 	{
@@ -2883,12 +2882,15 @@ void improve_skill ( Character *ch, int skill )
 		else
 			return;
 	}
+	if ( percent >= 98 || percent <= 0 )
+		return;
 
-	percent++;
+	percent += number(1, GET_INT(ch)/5);
 
-	if ( percent >= 97 )
+	if ( percent >= 98 ) {
 		share = ( gold_int ) ( exp_needed ( ch ) * 0.2 );
-	else
+		percent = 98;
+	} else
 		share = number ( 50, 120 ) * ( percent ) * splevel;
 
 	SET_SKILL ( ch, skill, percent );
