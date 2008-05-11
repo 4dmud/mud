@@ -2905,6 +2905,7 @@ improve_skill ( ch, SKILL_DUAL );
 		}
 		else
 		{
+#if 0
 			if ( IS_NPC ( vict ) && HERE ( vict, ch ) && GET_SUB ( ch, SUB_PILLAGE ) > number ( 1, 101 ) )
 			{
 				//mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
@@ -2915,6 +2916,7 @@ improve_skill ( ch, SKILL_DUAL );
 				if ( !number ( 0, 200 ) )
 					improve_sub ( ch, SUB_PILLAGE, 1 );
 			}
+#endif
 			local_gold = vict->Gold ( 0, GOLD_HAND );
 			snprintf ( local_buf, sizeof ( local_buf ), "%lld", local_gold );
 		}
