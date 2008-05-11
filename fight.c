@@ -2147,6 +2147,8 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 	}
 	if ( damage_ret != -1 )
 		hitprcnt_mtrigger ( vict );
+if (!number(0, 20))
+	improve_skill(vict, type);
 
 	return damage_ret;
 }
@@ -2187,6 +2189,8 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
 
 	if ( damage_ret != -1 )
 		hitprcnt_mtrigger ( vict );
+if (!number(0, 20))
+	improve_skill(vict, type);
 
 	return damage_ret;
 }
