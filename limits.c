@@ -406,11 +406,11 @@ void set_title ( Character *ch, char *title )
 				title = (char *)title_female ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
 			else
 				title = (char *)title_male ( GET_CLASS ( ch ), GET_LEVEL ( ch ) );
-		} else if ( strlen ( title ) > MAX_TITLE_LENGTH )
+		} else if ( title && strlen ( title ) > MAX_TITLE_LENGTH )
 			title[MAX_TITLE_LENGTH] = '\0';
 
 		free_string ( &GET_TITLE ( ch ) );
-		GET_TITLE ( ch ) = strdup ( title );
+		GET_TITLE ( ch ) = strdup ( title ? title : "" );
 	}
 }
 

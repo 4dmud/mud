@@ -1370,7 +1370,7 @@ int command_wtrigger(Character * actor, char *cmd, char *argument) {
     if (!valid_dg_target(actor, FALSE))
         return 0;
 
-    if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_COMMAND))
+    if (!actor || !IN_ROOM(actor) || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_COMMAND))
         return 0;
 
     room = IN_ROOM(actor);

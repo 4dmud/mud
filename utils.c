@@ -1576,13 +1576,13 @@ struct level_rec
 #define LVL_HERO    	51
 const control_rec level_params[] =
 {
-	{ LVL_HERO, 	"Heros"        },
-	{ LVL_GOD, 	"Gods"		},
+	{ LVL_HERO, 	"Heros"        	},
+	{ LVL_GOD, 	"Retired Staff"	},
 	{ LVL_BLD, 	"Builders"	},
 	{ LVL_CRT,      "Creators" 	},
 	{ LVL_SEN, 	"Senior Staff"	},
 	{ LVL_IMPL, 	"Implementors"	},
-	{ 0, 			""			}
+	{ 0, 			""	}
 };
 
 
