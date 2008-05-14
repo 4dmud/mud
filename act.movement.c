@@ -2318,8 +2318,10 @@ ACMD(do_speedwalk) {
             break;
         default:
             send_to_char("Alas, you can't go that way.\r\n", ch);
+            REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_SPEEDWALK);
+            LOOK(ch);
+            act("$n stops speedwalking.", TRUE, ch, 0, 0, TO_ROOM);
             return;
-            break;
         }
 
         r = perform_move(ch, dir, 1);
