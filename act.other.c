@@ -861,7 +861,7 @@ ACMD ( do_split )
 	if ( is_number ( buf ) )
 	{
 		amount = atol ( buf );
-		if ( amount <= 0 )
+		if ( amount <= 1 )
 		{
 			*ch << "Sorry, you can't do that.\r\n";
 			return;
