@@ -4228,7 +4228,7 @@ type is either a default message of melee, skill or magic, or a specific skill o
 w_type for weapon type
 fst is either to room, to vict or to char
 */
-char *fight_type_message ( char *str, Character *attacker, Character *victim, int type, int w_type, int fst )
+char *fight_type_message ( char *str, size_t len, Character *attacker, Character *victim, int type, int w_type, int fst )
 {
 
 	int ran = number ( 1, 1000 );
@@ -4313,13 +4313,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 				switch ( fst )
 				{
 					case FE_TO_CHAR:
-						sprintf ( str, "$M with your %s",  mount_melee_melee[ran%3] );
+						snprintf ( str, len, "$M with your %s",  mount_melee_melee[ran%3] );
 						break;
 					case FE_TO_ROOM:
-						sprintf ( str, " with $s %s", mount_melee_melee[ran%3] );
+						snprintf ( str, len, " with $s %s", mount_melee_melee[ran%3] );
 						break;
 					case FE_TO_VICT:
-						sprintf ( str, " with $s %s", mount_melee_melee[ran%3] );
+						snprintf ( str, len, " with $s %s", mount_melee_melee[ran%3] );
 						break;
 				}
 				break;
@@ -4327,13 +4327,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 				switch ( fst )
 				{
 					case FE_TO_CHAR:
-						sprintf ( str, "$M with your %s", mount_magic_melee[ran%4] );
+						snprintf ( str, len, "$M with your %s", mount_magic_melee[ran%4] );
 						break;
 					case FE_TO_ROOM:
-						sprintf ( str, " with $s %s", mount_magic_melee[ran%4] );
+						snprintf ( str, len, " with $s %s", mount_magic_melee[ran%4] );
 						break;
 					case FE_TO_VICT:
-						sprintf ( str, " with $s %s", mount_magic_melee[ran%4] );
+						snprintf ( str, len, " with $s %s", mount_magic_melee[ran%4] );
 						break;
 				}
 				break;
@@ -4350,16 +4350,16 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$S %s with your %s", body_part_name ( GET_ATTACK_POS ( attacker ) ), attack_hit_text[abs ( run_type ) ].singular );
+					snprintf ( str, len, "$S %s with your %s", body_part_name ( GET_ATTACK_POS ( attacker ) ), attack_hit_text[abs ( run_type ) ].singular );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, "'s %s with $s %s",  body_part_name ( GET_ATTACK_POS ( attacker ) ), attack_hit_text[abs ( run_type ) ].singular );
+					snprintf ( str, len, "'s %s with $s %s",  body_part_name ( GET_ATTACK_POS ( attacker ) ), attack_hit_text[abs ( run_type ) ].singular );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, "r %s with $s %s", body_part_name ( GET_ATTACK_POS ( attacker ) ),  attack_hit_text[abs ( run_type ) ].singular );
+					snprintf ( str, len, "r %s with $s %s", body_part_name ( GET_ATTACK_POS ( attacker ) ),  attack_hit_text[abs ( run_type ) ].singular );
 					break;
 				default:
-					sprintf ( str, "error" );
+					snprintf ( str, len, "error" );
 					break;
 			}
 			return str;
@@ -4371,13 +4371,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your %s", magic_msg_default[ ( ran%4 ) ] );
+					snprintf ( str, len, "$M with your %s", magic_msg_default[ ( ran%4 ) ] );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s %s", magic_msg_default[ ( ran%4 ) ] );
+					snprintf ( str, len, " with $s %s", magic_msg_default[ ( ran%4 ) ] );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s %s", magic_msg_default[ ( ran%4 ) ] );
+					snprintf ( str, len, " with $s %s", magic_msg_default[ ( ran%4 ) ] );
 					break;
 			}
 			strcpy ( str,  replace_string2 ( str, attack_hit_text[abs ( run_type ) ].plural ) ) ;
@@ -4387,13 +4387,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your %s", undead_msg_default[ran%6] );
+					snprintf ( str, len, "$M with your %s", undead_msg_default[ran%6] );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s %s", undead_msg_default[ran%6] );
+					snprintf ( str, len, " with $s %s", undead_msg_default[ran%6] );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s %s", undead_msg_default[ran%6] );
+					snprintf ( str, len, " with $s %s", undead_msg_default[ran%6] );
 					break;
 			}
 			return str;
@@ -4402,13 +4402,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your %s", animal_msg_default[ran%4] );
+					snprintf ( str, len, "$M with your %s", animal_msg_default[ran%4] );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s %s", animal_msg_default[ran%4] );
+					snprintf ( str, len, " with $s %s", animal_msg_default[ran%4] );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s %s", animal_msg_default[ran%4] );
+					snprintf ( str, len, " with $s %s", animal_msg_default[ran%4] );
 					break;
 			}
 
@@ -4421,13 +4421,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your arcing bolts of electricity" );
+					snprintf ( str, len, "$M with your arcing bolts of electricity" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s arcing bolts of electricity" );
+					snprintf ( str, len, " with $s arcing bolts of electricity" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s arcing bolts of electricity" );
+					snprintf ( str, len, " with $s arcing bolts of electricity" );
 					break;
 			}
 
@@ -4437,13 +4437,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your sizzling balls of white fire" );
+					snprintf ( str, len, "$M with your sizzling balls of white fire" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s sizzling balls of white fire" );
+					snprintf ( str, len, " with $s sizzling balls of white fire" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s sizzling balls of white fire" );
+					snprintf ( str, len, " with $s sizzling balls of white fire" );
 					break;
 			}
 
@@ -4453,13 +4453,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your whirling jets of water" );
+					snprintf ( str, len, "$M with your whirling jets of water" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s whirling jets of water" );
+					snprintf ( str, len, " with $s whirling jets of water" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s whirling jets of water" );
+					snprintf ( str, len, " with $s whirling jets of water" );
 					break;
 			}
 
@@ -4469,13 +4469,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your flying razor sharp icicles" );
+					snprintf ( str, len, "$M with your flying razor sharp icicles" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s flying razor sharp icicles" );
+					snprintf ( str, len, " with $s flying razor sharp icicles" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s flying razor sharp icicles" );
+					snprintf ( str, len, " with $s flying razor sharp icicles" );
 					break;
 			}
 			return str;
@@ -4484,13 +4484,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your furious attacks" );
+					snprintf ( str, len, "$M with your furious attacks" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s furious attacks" );
+					snprintf ( str, len, " with $s furious attacks" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s furious attacks" );
+					snprintf ( str, len, " with $s furious attacks" );
 					break;
 			}
 
@@ -4500,13 +4500,13 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 			switch ( fst )
 			{
 				case FE_TO_CHAR:
-					sprintf ( str, "$M with your wickedly sharp fangs" );
+					snprintf ( str, len, "$M with your wickedly sharp fangs" );
 					break;
 				case FE_TO_ROOM:
-					sprintf ( str, " with $s wickedly sharp fangs" );
+					snprintf ( str, len, " with $s wickedly sharp fangs" );
 					break;
 				case FE_TO_VICT:
-					sprintf ( str, " with $s wickedly sharp fangs" );
+					snprintf ( str, len, " with $s wickedly sharp fangs" );
 					break;
 			}
 
@@ -4515,7 +4515,7 @@ char *fight_type_message ( char *str, Character *attacker, Character *victim, in
 		default:
 			break;
 	}
-	sprintf ( str, "$M with attacks" );
+	snprintf ( str, len, "$M with attacks" );
 	return str;
 }
 
@@ -4777,7 +4777,7 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			act ( "You hurt $N.", FALSE, ch, NULL, victim, TO_CHAR );
 		else
 		{
-			fight_type_message ( buf, ch, victim, tt, type_save, FE_TO_CHAR );
+			fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt, type_save, FE_TO_CHAR );
 			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s.",
 			           chance_message[ ( int ) ATK_CHANCE ( ch ) ].singular, dam_size[msgnum].sing, buf );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_CHAR );
@@ -4796,7 +4796,7 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			act ( "$n hurts you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP );
 		else
 		{
-			fight_type_message ( buf, ch, victim, tt,type_save, FE_TO_VICT );
+			fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt,type_save, FE_TO_VICT );
 			snprintf ( msgbuf, sizeof ( msgbuf ), "$n %s{cr you%s.",  dam_size[msgnum].plu, buf );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP );
 		}
@@ -4812,7 +4812,7 @@ void dam_message ( int dam, Character *ch, Character *victim,
 	 */
 	if ( dam )
 	{
-		fight_type_message ( buf, ch, victim, tt, type_save, FE_TO_ROOM );
+		fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt, type_save, FE_TO_ROOM );
 		snprintf ( msgbuf, sizeof ( msgbuf ), "$n %s $N%s.", ( msgnum >=  MAX_DAM_MESSAGE ) ? dam_size[msgnum].other : dam_size[msgnum].plu , buf );
 
 		for ( people = IN_ROOM ( ch )->people; people;

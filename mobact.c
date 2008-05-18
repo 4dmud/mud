@@ -200,9 +200,9 @@ void mobile_activity ( void )
 					continue;
 				if ( IS_EVIL ( ch ) && !IS_EVIL ( vict ) )
 					continue;
-				if (IS_EVIL(ch) && IS_EVIL(FIGHTING(vict)))
+				if ( IS_EVIL ( ch ) && IS_EVIL ( FIGHTING ( vict ) ) )
 					continue;
-				if (IS_GOOD(ch) && IS_GOOD(FIGHTING(vict)))
+				if ( IS_GOOD ( ch ) && IS_GOOD ( FIGHTING ( vict ) ) )
 					continue;
 
 				act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict, TO_ROOM );
@@ -344,7 +344,7 @@ Character * parse_aggressive ( Character *ch )
 int hunt_location ( void *thing, int type )
 {
 	int dir;
-	struct travel_point_data *tlist, *ttop = NULL;
+	struct travel_point_data *tlist = NULL, *ttop = NULL;
 	room_rnum rnum, curr_room = NULL;
 	room_vnum dest = NOWHERE;
 	struct obj_data *obj = NULL;
@@ -362,6 +362,7 @@ int hunt_location ( void *thing, int type )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( mob ) ) == NULL )
 				return 0;
+			log ( "DEBUG: Mob vnum %d is hunting a location from room %d.", GET_MOB_VNUM ( mob ), IN_ROOM ( mob )->number );
 			break;
 		case STRUCT_IS_OBJ:
 			obj = * ( struct obj_data** ) thing;
@@ -369,6 +370,7 @@ int hunt_location ( void *thing, int type )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( obj ) ) == NULL )
 				return 0;
+			log ( "DEBUG: Obj vnum %d is hunting a location from room %d.", GET_OBJ_VNUM ( obj ), IN_ROOM ( obj )->number );
 			break;
 		default:
 			return 0;
