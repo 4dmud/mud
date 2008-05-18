@@ -1432,7 +1432,7 @@ void do_clan_list ( Character *ch, char *arg )
 
 	if ( i==NOTHING || i > ( MAX_CLANS-1 ) )
 	{
-		ch->Send ( "Error.\r\n" );
+		ch->Send ( "You are not in a clan.\r\n" );
 		return;
 	}
 
