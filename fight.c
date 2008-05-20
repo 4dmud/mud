@@ -156,7 +156,7 @@
  * For your evasion rating, i added some more points based on level and tier.
  *
  * Revision 1.34  2006/03/13 19:07:40  w4dimenscor
- * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ * Added a toggle for autogroup so you don't type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
  * Revision 1.33  2006/03/06 09:38:28  w4dimenscor
  * Changed it so that you can clan expel people who are offline and in another room
@@ -551,13 +551,13 @@ int spell_size_dice ( Character *ch )
 		sdice -=2;
 
 	if ( AFF_FLAGGED ( ch, AFF_MIND_ELEC ) )
-		sdice += 2;
+		sdice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_FIRE ) )
-		sdice += 3;
+		sdice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_WATER ) )
-		sdice += 2;
+		sdice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_ICE ) )
-		sdice += 3;
+		sdice += 7;
 
 	if ( AFF_FLAGGED ( ch, AFF_BATTLE_RAGE ) )
 		sdice += 1;
@@ -579,15 +579,15 @@ int spell_size_dice ( Character *ch )
 			break;
 		case CLASS_RANGER:
 		case CLASS_GYPSY:
-			sdice += ( GET_LEVEL ( ch ) /6 );
+			sdice = ( GET_LEVEL ( ch ) /6 );
 			break;
 		case CLASS_WARRIOR:
 		case CLASS_THIEF:
 		case CLASS_HUNTER:
-			sdice += ( GET_LEVEL ( ch ) /10 );
+			sdice = ( GET_LEVEL ( ch ) /10 );
 			break;
 		default:
-			log ( "ERROR: spell_dice_size cant find someone class!" );
+			log ( "ERROR: spell_dice_size can't find someone class!" );
 			return 1;
 			break;
 	}
@@ -606,13 +606,13 @@ int spell_num_dice ( Character *ch )
 		ndice -=2;
 
 	if ( AFF_FLAGGED ( ch, AFF_MIND_ELEC ) )
-		ndice += 3;
+		ndice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_FIRE ) )
-		ndice += 3;
+		ndice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_WATER ) )
-		ndice += 2;
+		ndice += 7;
 	else if ( AFF_FLAGGED ( ch, AFF_MIND_ICE ) )
-		ndice += 2;
+		ndice += 7;
 
 	if ( AFF_FLAGGED ( ch, AFF_BATTLE_RAGE ) )
 		ndice += 1;
@@ -635,22 +635,19 @@ int spell_num_dice ( Character *ch )
 			break;
 		case CLASS_RANGER:
 		case CLASS_GYPSY:
-			ndice += ( GET_LEVEL ( ch ) /8 );
+			ndice = ( GET_LEVEL ( ch ) /8 );
 			break;
 		case CLASS_WARRIOR:
 		case CLASS_THIEF:
 		case CLASS_HUNTER:
-			ndice += ( GET_LEVEL ( ch ) /11 );
+			ndice = ( GET_LEVEL ( ch ) /11 );
 			break;
 		default:
-			log ( "ERROR: spell_num_size cant find %s's class!", GET_NAME ( ch ) );
+			log ( "ERROR: spell_num_size can't find %s's class!", GET_NAME ( ch ) );
 			return 1;
 			break;
 
 	}
-	if ( ( GET_SUB ( ch, SUB_LOYALDAMAGE ) ) > 0 )
-		ndice += 3;
-
 
 	return MAX ( 0, ( ( int ) ndice ) );
 }
@@ -6079,7 +6076,7 @@ int can_fight ( Character *ch, Character *vict, int silent )
 	{
 		if ( both_pk ( ch,vict ) )
 			ret = 1;
-		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
+		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) && !ROOM_FLAGGED ( IN_ROOM ( vict ), ROOM_ARENA ) )
 		{
 			if ( !silent )
 				ch->Send ( "You can't attack %s.\r\n", GET_NAME ( vict ) );
@@ -6933,19 +6930,19 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case ELEM_FIRE:
 			if ( affected_by_spell ( ch, SPELL_MIND_FIRE ) )
-				dam += 0.25;
+				dam += 0.18;
 			break;
 		case ELEM_ICE:
 			if ( affected_by_spell ( ch, SPELL_MIND_ICE ) )
-				dam += 0.25;
+				dam += 0.18;
 			break;
 		case ELEM_ELEC:
 			if ( affected_by_spell ( ch, SPELL_MIND_ELEC ) )
-				dam += 0.25;
+				dam += 0.18;
 			break;
 		case ELEM_WATER:
 			if ( affected_by_spell ( ch, SPELL_MIND_WATER ) )
-				dam += 0.25;
+				dam += 0.18;
 			break;
 	}
 	//I have no idea why the below was in, but it has been here since before

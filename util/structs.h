@@ -1486,7 +1486,7 @@ struct social_messg {
   char *char_auto;
   char *others_auto;
 
-  /* If the char cant be found search the char's inven and do these: */
+  /* If the char can't be found search the char's inven and do these: */
   char *char_obj_found;
   char *others_obj_found;
 };

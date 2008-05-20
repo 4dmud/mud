@@ -219,13 +219,13 @@ int magic_distance ( Character *ch, int spellnum, int dir,
 	if ( ( !CAN_GO2 ( room, dir ) ) || ( dir == NOWHERE ) )
 	{
 		ch->Send ( "You can not cast magic that direction.\r\n" );
-		return NOWHERE;      //cant send magic that way.
+		return NOWHERE;      //can't send magic that way.
 	}
 	if ( ROOM_FLAGGED ( room, ROOM_PEACEFUL )
 	        || ( ( vroom != NULL ) && ROOM_FLAGGED ( vroom, ROOM_PEACEFUL ) ) )
 	{
 		if ( SINFO.violent )
-			return NOWHERE;    //cant send magic there
+			return NOWHERE;    //can't send magic there
 	}
 
 	if ( room == vroom || ( dir == NOWHERE ) )

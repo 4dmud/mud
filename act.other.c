@@ -99,13 +99,13 @@
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
  * Revision 1.16  2006/03/13 19:07:40  w4dimenscor
- * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ * Added a toggle for autogroup so you don't type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
  * Revision 1.15  2006/02/17 22:19:54  w4dimenscor
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
  * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
+ * sorry self. another. _can't remember the changes_ entry
  *
  * Revision 1.13  2005/10/30 08:37:05  w4dimenscor
  * Updated compare command and fixed mining

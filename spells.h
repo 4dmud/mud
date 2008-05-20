@@ -34,7 +34,7 @@
 * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
 *
 * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
-* sorry self. another. _cant remember the changes_ entry
+* sorry self. another. _can't remember the changes_ entry
 *
 * Revision 1.6  2005/08/07 04:12:39  w4dimenscor
 * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes

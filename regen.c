@@ -72,7 +72,7 @@ Using
   This will make sure that any point category below maximum has an event
   to regenerate it.  It also will recalculate the regeneration rate if
   the rate has been increased.  It should be called whenever there is a
-  significant change in regeneration rates, or if you want to check that all
+  significan't change in regeneration rates, or if you want to check that all
   three points types have the proper regen events.
  
  

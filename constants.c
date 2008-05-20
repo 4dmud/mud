@@ -48,7 +48,7 @@
  * Added new commands called pclean, it removes the files of anyone who is not in the player index from the lib directory.
  *
  * Revision 1.18  2006/03/13 19:07:40  w4dimenscor
- * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ * Added a toggle for autogroup so you don't type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
  * Revision 1.17  2006/02/25 04:21:30  w4dimenscor
  * Fixed crash bug, where constants.c was missing 'NOTELEPORT' string
@@ -2097,12 +2097,12 @@ const char *spell_wear_off_msg[] =
 	"Feeling returns to your mind.",
 	"The feeling of lethargy falls from your muscles.",
 	"Your wings weaken, shrivel and fall off.",
-	"The hase of red fades and you dont feel so angry.",
+	"The hase of red fades and you don't feel so angry.",
 	"ENCHANT ARMOR",
 	"Your Magic Bubble bursts.",
 	"You stop panicing.",
 	"The bad dreams stop.",
-	"You dont feel so vitalized.",
+	"You don't feel so vitalized.",
 	"DISPELL SANC",
 	"You forget the future.",
 	"MANA BLAST",

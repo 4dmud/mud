@@ -85,7 +85,7 @@ void act_to_room(char *str, Room *room)
   /*
    * since you can't use act(..., TO_ROOM) for an room, send it
    * TO_ROOM and TO_CHAR for some char in the room.
-   * (just dont use $n or you might get strange results)
+   * (just don't use $n or you might get strange results)
    */
   act(str, FALSE, room->people, 0, 0, TO_ROOM);
   act(str, FALSE, room->people, 0, 0, TO_CHAR);

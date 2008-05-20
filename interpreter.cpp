@@ -2017,7 +2017,7 @@ int parse_accounts ( Descriptor *d, char *arg )
 	}
 	if ( isbanned ( pi.NameByIndex ( pos ) ) )
 	{
-		d->Output ( "\r\n%s is banned and you cant choose that account.\r\n", name );
+		d->Output ( "\r\n%s is banned and you can't choose that account.\r\n", name );
 		account_manage_menu ( d );
 		return 0;
 	}

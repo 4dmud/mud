@@ -1060,6 +1060,10 @@ int invalid_align ( Character *ch, struct obj_data *obj )
 		return TRUE;
 	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_NEUTRAL ) && IS_NEUTRAL ( ch ) )
 		return TRUE;
+	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_FEMALE ) && GET_SEX ( ch ) == SEX_FEMALE )
+		return TRUE;
+	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_MALE ) && GET_SEX ( ch ) == SEX_MALE )
+		return TRUE;
 	return FALSE;
 }
 
@@ -1732,7 +1736,7 @@ void update_object ( Character *ch, struct obj_data *obj, int use, time_t timeno
 	if ( GET_OBJ_TIMER ( obj ) == -1 )
 		return;
 	// log("(update_obj.1) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
-	/* dont update objects with a timer trigger */
+	/* don't update objects with a timer trigger */
 
 	// log("(update_obj.2) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
 	if ( obj->next_content )

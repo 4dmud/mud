@@ -36,7 +36,7 @@
  * Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
  *
  * Revision 1.14  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
+ * sorry self. another. _can't remember the changes_ entry
  *
  * Revision 1.13  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
@@ -651,7 +651,7 @@ ASKILL(skill_tinker)
   GET_OBJ_VAL(weapon, 1) += number(-1, (GET_LEVEL(ch)/23)+(GET_DEX(ch)>17)+(TIERNUM-2)+1);
   GET_OBJ_VAL(weapon, 2) += number(-1, (GET_LEVEL(ch)/19)+(GET_DEX(ch)>16)+(TIERNUM-2)+1);
   GET_OBJ_RENT(weapon) += (GET_LEVEL(ch) << 3);
-  GET_OBJ_TIMER(weapon) = time;	// dont want tinkered weapons lasting
+  GET_OBJ_TIMER(weapon) = time;	// don't want tinkered weapons lasting
   // forever
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_MAGIC);
   SET_BIT_AR(GET_OBJ_EXTRA(weapon), ITEM_TINKERED);

@@ -139,7 +139,7 @@
  * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
  *
  * Revision 1.29  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
+ * sorry self. another. _can't remember the changes_ entry
  *
  * Revision 1.28  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
@@ -275,6 +275,9 @@
 extern bool LS_REMOVE;
 
 /* External functions */
+
+int invalid_class ( Character *ch, struct obj_data *obj );
+int invalid_race ( Character *ch, struct obj_data *obj );
 void remove_corpse_from_list ( OBJ_DATA *corpse );
 void save_corpses ( void );
 void House_crashsave ( room_vnum vnum );
@@ -564,7 +567,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 		int plussage = 1;
 		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
 			count_items_in_list ( obj->contains, plussage );
-		int capa = house_capacity (( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		int capa = house_capacity ( ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
 		if ( value >= capa )
 		{
 			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );
@@ -1695,7 +1698,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 		int plussage = 1;
 		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
 			count_items_in_list ( obj->contains, plussage );
-		int capa = house_capacity (( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
+		int capa = house_capacity ( ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) ) );
 		if ( value >= capa )
 		{
 			ch->Send ( "No matter how you try, you can't fit anything else in.[%d/%d]\r\n", value, capa );
@@ -2986,7 +2989,7 @@ ACMD ( do_energize )
 		ch->Send ( "You can't energize that item!\r\n" );
 		return;
 	}
-	
+
 	if ( GET_OBJ_VAL ( temp, 0 ) == VIAL_NONE )
 	{
 		ch->Send ( "That is an empty vial - you must specify a new type for it." );
@@ -3019,22 +3022,22 @@ ACMD ( do_energize )
 			return;
 			break;
 		case VIAL_HITP:
-			amount = MAX(900, ( int ) ( GET_HIT ( ch ) * 0.25 ));
+			amount = MAX ( 900, ( int ) ( GET_HIT ( ch ) * 0.25 ) );
 			to_char = "A million bright green sparks leave your body.";
 			to_room = "A million bright green sparks leave $n's body.";
 			break;
 		case VIAL_MANA:
-			amount = MAX(3000, ( int ) ( GET_MANA ( ch ) * 0.25 ));
+			amount = MAX ( 3000, ( int ) ( GET_MANA ( ch ) * 0.25 ) );
 			to_char = "Dark purple flames flow out of your body.";
 			to_room = "Dark purple flames flow out of $n's body.";
 			break;
 		case VIAL_MOVE:
-			amount = MAX(1000, ( int ) ( GET_MOVE ( ch ) * 0.25 ));
+			amount = MAX ( 1000, ( int ) ( GET_MOVE ( ch ) * 0.25 ) );
 			to_char = "Blue crystals sluice from your body.";
 			to_room = "Blue crystals sluices from $n's body.";
 			break;
 		case VIAL_STAM:
-			amount = MAX(50, ( int )( GET_STAMINA ( ch ) * 0.25 ));
+			amount = MAX ( 50, ( int ) ( GET_STAMINA ( ch ) * 0.25 ) );
 			to_char = "Thousands of black shadows slide out of your body.";
 			to_room = "Thousands of black shadows slide out of $n's body.";
 			break;
@@ -3096,7 +3099,7 @@ OBJ_DATA * create_vial ( void )
 	}
 
 	type = number ( VIAL_HITP, VIAL_STAM );
-	vial = create_obj(NOTHING);
+	vial = create_obj ( NOTHING );
 
 	GET_OBJ_TYPE ( vial ) = ITEM_VIAL;
 	SET_BIT_AR ( GET_OBJ_EXTRA ( vial ), ITEM_UNIQUE_SAVE );
@@ -3412,35 +3415,45 @@ void perform_wear ( Character *ch, struct obj_data *obj, int where )
 		if ( ( GET_EQ ( ch, WEAR_WIELD ) ) || ( GET_EQ ( ch, WEAR_WIELD_2 ) ) )
 		{
 			ch->Send (
-			    "You can't focus on anything while wielding a weapon.\r\n" );
+			    "You can't focus on anything while wielding something.\r\n" );
 			return;
 		}
 	}
 
 	if ( where == WEAR_WIELD )
 	{
+		obj_data *w1 = GET_EQ ( ch, WEAR_WIELD );
+		obj_data *w2 = GET_EQ ( ch, WEAR_WIELD_2 );
+		obj_data *sh = GET_EQ ( ch, WEAR_SHIELD );
+
 		if ( GET_EQ ( ch, WEAR_FOCUS ) )
 		{
 			ch->Send (
 			    "You can't wield anything while focusing on something.\r\n" );
 			return;
 		}
-		if ( ( wep_hands ( obj ) == 2 || ( GET_EQ ( ch, WEAR_WIELD ) && wep_hands ( GET_EQ ( ch, WEAR_WIELD ) ) == 2 ) ) &&
-		        ( ( GET_EQ ( ch, WEAR_SHIELD ) || ( !total_chance ( ch, SKILL_LONGARM ) && ( GET_EQ ( ch, WEAR_WIELD_2 ) || GET_EQ ( ch, WEAR_WIELD ) ) ) ) ) )
+
+		if ( wep_hands ( obj ) == 2 && w1 && wep_hands ( w1 ) == 2 )
 		{
-			*ch << "You cant wield a two handed weapon without two hands free, or the longarm skill.\r\n";
+			*ch << "You can't wield a two-handed weapon if you are already wielding one.\r\n";
+			*ch << "Two-handed weapons can only be wielded as the primary weapon.\r\n";
 			return;
 		}
-		if ( GET_EQ ( ch, where ) && total_chance ( ch, SKILL_DUAL )
-		        && ! ( GET_EQ ( ch, WEAR_SHIELD ) ) )
+
+		if ( wep_hands ( obj ) == 2 && ( !total_chance ( ch, SKILL_LONGARM ) && ( w2 || w1 ) ) )
+		{
+			*ch << "You can't wield a two-handed weapon without two hands free, or the longarm skill.\r\n";
+			return;
+		}
+
+		if ( !sh && GET_EQ ( ch, where ) && total_chance ( ch, SKILL_DUAL ) )
 			where = WEAR_WIELD_2;
-		else if ( GET_EQ ( ch, where ) && total_chance ( ch, SKILL_DUAL )
-		          && ( GET_EQ ( ch, WEAR_SHIELD ) ) )
+		else if ( sh && GET_EQ ( ch, where ) && total_chance ( ch, SKILL_DUAL ) )
 		{
 			*ch << "You can't wield a second weapon while wearing a shield.\r\n";
 			return;
 		}
-		else if ( ( GET_EQ ( ch, WEAR_WIELD ) ) && wep_hands ( GET_EQ ( ch, WEAR_WIELD ) ) )
+		else if ( w1 && wep_hands ( GET_EQ ( ch, WEAR_WIELD ) ) )
 		{
 			*ch << "You can't wield a second weapon while wielding a two handed weapon.\r\n";
 			return;
@@ -4659,42 +4672,42 @@ int race_speed ( Character *ch )
 	"  [M]artian\r\n"
 	"  [S]pace-wolf\r\n";
 	*/
-/*
-	switch ( GET_RACE ( ch ) )
-	{
-		case RACE_FAUN:
-			return 100;
-			break;
-		case RACE_CENTAUR:
-			return 150;
-			break;
-		case RACE_ELF:
-			return 150;
-			break;
-		case RACE_DWARF:
-			return 100;
-			break;
-		case RACE_INDIAN:
-			return 100;
-			break;
-		case RACE_GRINGO:
-			return 100;
-			break;
-		case RACE_MARTIAN:
-			return 180;
-			break;
-		case RACE_SPACE_WOLF:
-			return 120;
-			break;
-		case RACE_GLADIATOR:
-			return 100;
-			break;
-		default:
-			return 50;
-			break;
-	}
-	*/
-return 0;
+	/*
+		switch ( GET_RACE ( ch ) )
+		{
+			case RACE_FAUN:
+				return 100;
+				break;
+			case RACE_CENTAUR:
+				return 150;
+				break;
+			case RACE_ELF:
+				return 150;
+				break;
+			case RACE_DWARF:
+				return 100;
+				break;
+			case RACE_INDIAN:
+				return 100;
+				break;
+			case RACE_GRINGO:
+				return 100;
+				break;
+			case RACE_MARTIAN:
+				return 180;
+				break;
+			case RACE_SPACE_WOLF:
+				return 120;
+				break;
+			case RACE_GLADIATOR:
+				return 100;
+				break;
+			default:
+				return 50;
+				break;
+		}
+		*/
+	return 0;
 
 }
 
@@ -4795,7 +4808,7 @@ ACMD ( do_fuel )
 	}
 	else
 	{
-		int filled=GET_FUEL_PERCENTAGE(spacebike);
+		int filled=GET_FUEL_PERCENTAGE ( spacebike );
 		if ( filled <25 )
 			ch->Send ( "You fill up %s using %s, but it is still very empty.\r\n",OBJS ( spacebike,ch ),OBJS ( gemcluster,ch ) );
 		else if ( filled<50 )
@@ -4815,7 +4828,7 @@ ACMD ( do_fuel )
 void check_timer ( obj_data *obj )
 {
 	time_t ct = 0;
-        unsigned long t;
+	unsigned long t;
 
 	if ( obj == NULL || GET_OBJ_TIMER ( obj ) == -1 )
 		return;
@@ -4879,4 +4892,41 @@ EVENTFUNC ( timer_event )
 		crumble_obj ( NULL, obj );
 
 	return 0;
+}
+
+void zap_char ( Character *victim )
+{
+	struct obj_data *obj = NULL;
+
+	for ( int i = 0; i < NUM_WEARS; i++ )
+	{
+		obj = GET_EQ ( victim, i );
+		if ( obj )
+		{
+			if ( invalid_align ( victim, obj ) || invalid_class ( victim, obj )
+	        || invalid_race ( victim, obj ) )
+			{
+				i = 0;
+				obj = unequip_char ( victim, i );
+				act ( "You are zapped by $p and instantly let go of it.",
+				      FALSE, victim, obj, 0, TO_CHAR );
+				act ( "$n is zapped by $p and instantly lets go of it.",
+				      FALSE, victim, obj, 0, TO_ROOM );
+				obj_to_char ( obj, victim );
+			}
+			else if ( i == WEAR_WIELD_2 )
+			{
+				if ( wep_hands ( obj ) == 2 )
+				{
+					i = 0;
+					obj = unequip_char ( victim, i );
+					act ( "You fumble with $p and instantly let go of it.",
+					      FALSE, victim, obj, 0, TO_CHAR );
+					act ( "$n fumbles with $p and instantly lets go of it.",
+					      FALSE, victim, obj, 0, TO_ROOM );
+					obj_to_char ( obj, victim );
+				}
+			}
+		}
+	}
 }

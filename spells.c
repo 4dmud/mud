@@ -56,6 +56,7 @@ int has_identifier(struct obj_data *obj, long id);
 bool can_have_follower(Character *ch, mob_vnum mob_num);
 bool can_have_follower(Character *ch, Character *vict);
 float staff_multi(Character *ch, struct obj_data *staff);
+void zap_char ( Character *victim );
 /*
  * Special spells appear below.
  */
@@ -375,7 +376,7 @@ ASPELL(spell_gate) {
         return;
     }
     if (IS_NPC(victim)) {
-        ch->Send( "You cant seem to get a good focus on your target.");
+        ch->Send( "You can't seem to get a good focus on your target.\r\n");
         return;
     }
 
@@ -927,6 +928,7 @@ ASPELL(spell_remove_alignment) {
             GET_ALIGNMENT(victim) = 0;
             act("$N vibrates then becomes dull.", FALSE, ch, 0, victim, TO_ROOM);
             act("You vibrate then become dull.", FALSE, ch, 0, victim, TO_VICT);
+	    zap_char(victim);
         } else {
             act("$N smiles but nothing happens.", FALSE, ch, 0, victim, TO_ROOM);
             act("You feel a tingle in a happy place, but nothing happens.", FALSE, ch, 0, victim, TO_VICT);
@@ -1323,7 +1325,7 @@ ASPELL(spell_knock) {
             /** and from that way **/
             if (EXIT(ch, rev_dir[i]) &&
                     IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_ISDOOR) &&
-                    IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+                    !IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF) &&
                     EXIT(ch, rev_dir[i])->to_room != NULL)
                 ret_door = 1;
             /** lets make it so they can only open doors that are on the inside **/
@@ -1384,3 +1386,6 @@ bool operator<(const sub_list &a,const sub_list &b) {
 bool operator<(const skillspell_data &a, const skillspell_data &b) {
     return (a.skill < b.skill);
 }
+
+
+

@@ -856,7 +856,7 @@ int perform_push ( Character *ch, int dir, int need_specials_check,
 	{
 		ch->Send (
 		    "The thought of leaving your master makes you weep.\r\n" );
-		attacker->Send ( "You cant push charmies!\r\n" );
+		attacker->Send ( "You can't push charmies!\r\n" );
 		return 0;
 	}
 	if ( !enter_wtrigger ( EXIT ( ch, dir )->to_room, ch, dir ) )
@@ -1056,43 +1056,6 @@ ACMD ( do_zlist )
 		send_to_char ( "No mobiles were found in those parameters.\r\n", ch );
 }
 
-void zap_char ( Character *victim )
-{
-	int i;
-	struct obj_data *obj = NULL;
-
-	for ( i = 0; i < NUM_WEARS; i++ )
-	{
-		if ( GET_EQ ( victim, i )
-		        && ( invalid_align ( victim, GET_EQ ( victim, i ) ) ) )
-		{
-			//    char objname[MAX_INPUT_LENGTH];
-			int i = 0;
-			obj = unequip_char ( victim, i );
-			act ( "You are zapped by $p and instantly let go of it.",
-			      FALSE, victim, obj, 0, TO_CHAR );
-			/*if (strlen(obj->short_description) < MAX_INPUT_LENGTH) {
-			strcpy(objname, obj->short_description);
-			i = strlen(objname);
-
-			while (objname[i] == ' ') {
-			objname[i] = '\0';
-			i--;
-			}
-			if (objname[i] == 's') {
-			//check to see if it is a plural and apostrophy appropriately
-			act("$n is zapped by $p' and instantly lets go of it.",
-			       FALSE, victim, obj, 0, TO_ROOM);
-			}
-			} else */
-			{
-				act ( "$n is zapped by $p and instantly lets go of it.",
-				      FALSE, victim, obj, 0, TO_ROOM );
-			}
-			obj_to_char ( obj, victim );
-		}
-	}
-}
 
 ACMD ( do_smite )  				/* by Garion */
 {

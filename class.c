@@ -48,7 +48,7 @@
  * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
  *
  * Revision 1.7  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
+ * sorry self. another. _can't remember the changes_ entry
  *
  * Revision 1.6  2005/11/30 18:47:12  w4dimenscor
  * changed slightly some gains you get from remorts
@@ -1080,7 +1080,7 @@ void advance_level ( Character * ch , bool silent)
 
 
 	add_hp += ( con_app[GET_CON ( ch ) ].hitp * current_class_is_tier_num ( ch ) );
-	add_hp += MIN ( REMORTS ( ch ), 25 );
+	//add_hp += MIN ( REMORTS ( ch ), 25 );
 	if ( REMORTS ( ch ) > 5 )
 		add_hp += ( REMORTS ( ch ) / 6 );
 	add_mana = MIN ( REMORTS ( ch ), 25 );

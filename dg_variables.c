@@ -40,7 +40,7 @@ void die ( Character *ch, Character *killer );
 int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
 int bodypartname ( char *bpn );
-
+void zap_char ( Character *victim );
 /* Utility functions */
 
 /*
@@ -698,7 +698,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 		if ( c )
 		{
 			if ( DEAD ( c ) )
-				return; //dead - please dont screw anything up!
+				return; //dead - please don't screw anything up!
 			else if ( text_processed ( field, subfield, vd, str, slen ) )
 				return;
 
@@ -727,6 +727,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							int addition = atoi ( subfield );
 							GET_ALIGNMENT ( c ) = IRANGE ( -1000, addition, 1000 );
+							zap_char(c);
 						}
 						snprintf ( str, slen, "%d", GET_ALIGNMENT ( c ) );
 					}

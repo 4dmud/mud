@@ -1,7 +1,7 @@
 /*
  * $Log: versionlist.h,v $
  * Revision 1.2  2004/11/17 05:13:05  w4dimenscor
- * updated pets so that they dont have weight problems, updated award points
+ * updated pets so that they don't have weight problems, updated award points
  *
  * Revision 1.1.1.1  2004/11/12 02:16:19  w4dimenscor
  * Initial clean submission of 4Dimensions src code

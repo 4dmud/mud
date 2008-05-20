@@ -246,11 +246,11 @@ void save_corpses(void) {
 void load_corpses(void) {
     /* Ahh load corpses.. it was cake to write them out to a file      */
     /* it was a pain to load them back up through without a character. */
-    /* Because I dont have a character I couldnt figure out how to     */
+    /* Because I don't have a character I couldnt figure out how to     */
     /* put objects back into the corpse the exact way they came out..  */
     /* like objects back in their container, etc. So I just decided to */
     /* Dump it all in the corpse and let the character sort it out.    */
-    /* If they dont like it, screwum. They are lucky I coded this:)    */
+    /* If they don't like it, screwum. They are lucky I coded this:)    */
     /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
     FILE *fp;

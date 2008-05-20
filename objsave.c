@@ -292,7 +292,7 @@ int Crash_clean_file(const char *name)
   return (0);
 }
 
-/* Special version that is called from the QIC scanner, saves us some time since we dont
+/* Special version that is called from the QIC scanner, saves us some time since we don't
  * have to scan twice!
  */
 int Crash_clean_qic(FILE * fl, char *name)
@@ -919,7 +919,7 @@ void Crash_crashsave(Character *ch)
   //Crash_extract_objs(ch->carrying);
   if (rename(tempname, filename) == -1)
   {
-    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) cant save file: %s", tempname);
+    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", tempname);
     core_dump();
   }
   IS_SAVING(ch) = FALSE;
@@ -1018,7 +1018,7 @@ void Crash_rentsave(Character *ch, int cost)
   Crash_extract_objs(ch->carrying, ch);
   if (rename(tempname, filename) == -1)
   {
-    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) cant save file: %s", tempname);
+    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", tempname);
     core_dump();
   }
 }

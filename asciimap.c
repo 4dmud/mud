@@ -115,7 +115,7 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 				return;
 			}
 			/* end two way */
-			/* players cant see past these */
+			/* players can't see past these */
 			if ( ( prospect_room->sector_type == SECT_HILLS )
 			        || ( prospect_room->sector_type == SECT_CITY )
 			        || ( prospect_room->sector_type == SECT_INSIDE )

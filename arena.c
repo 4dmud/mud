@@ -53,7 +53,7 @@ ACMD ( do_bet )
 
 	if ( IS_NPC ( ch ) )
 	{
-		ch->Send ( "Mobs cant bet on the arena.\r\n" );
+		ch->Send ( "Mobs can't bet on the arena.\r\n" );
 		return;
 	}
 
@@ -101,7 +101,7 @@ ACMD ( do_bet )
 
 		if ( newbet == 0 )
 		{
-			ch->Send ( "Bet some gold why dont you!\r\n" );
+			ch->Send ( "Bet some gold why don't you!\r\n" );
 			return;
 		}
 		if ( newbet > ch->Gold ( 0, GOLD_ALL ) )
@@ -133,7 +133,7 @@ ACMD ( do_arena )
 
 	if ( IS_NPC ( ch ) )
 	{
-		ch->Send ( "Mobs cant play in the arena.\r\n" );
+		ch->Send ( "Mobs can't play in the arena.\r\n" );
 		return;
 	}
 	if ( in_arena == ARENA_OFF )

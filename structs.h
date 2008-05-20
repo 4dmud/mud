@@ -136,7 +136,7 @@
  * For your evasion rating, i added some more points based on level and tier.
  *
  * Revision 1.30  2006/03/13 19:07:40  w4dimenscor
- * Added a toggle for autogroup so you dont type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
+ * Added a toggle for autogroup so you don't type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
  *
  * Revision 1.29  2006/03/06 09:38:28  w4dimenscor
  * Changed it so that you can clan expel people who are offline and in another room
@@ -2358,6 +2358,7 @@ struct affected_type {
     time_t expire;       /* For how long its effects will last      */
     int modifier;        /* This is added to apropriate ability     */
     byte location;       /* Tells which ability to change(APPLY_XXX) */
+    int aura;
     bitvector_t bitvector;    /* Tells which bits to set (AFF_XXX) */
 
 

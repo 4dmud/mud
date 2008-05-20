@@ -165,7 +165,7 @@ void save_locker(Character *ch)
   fclose(fp);
   if (rename(tempname, fname) == -1)
   {
-    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) cant save file: %s", tempname);
+    new_mudlog(NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", tempname);
     core_dump();
   }
 }

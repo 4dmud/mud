@@ -24,6 +24,7 @@ assemblies.c
 assemblies.h
 auction.c
 auction.h
+auras.cpp
 ban.c
 boards.c
 boards.h

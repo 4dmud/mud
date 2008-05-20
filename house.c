@@ -420,7 +420,7 @@ void House_crashsave ( room_vnum vnum )
 	REMOVE_BIT_AR ( ROOM_FLAGS ( rnum ), ROOM_HOUSE_CRASH );
 	if ( rename ( tempname, filename ) == -1 )
 	{
-		new_mudlog ( NRM, LVL_GOD, TRUE, "Major error (no disk space) cant save file: %s", tempname );
+		new_mudlog ( NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", tempname );
 		//core_dump();
 	}
 }

@@ -144,7 +144,7 @@ ACMD ( do_remort )
 }
 /*
 Okay So,
- Now every mob in the game that is tier 0 now (if you dont know what a tier is
+ Now every mob in the game that is tier 0 now (if you don't know what a tier is
  have a look at www.timespace.co.nz/remorting.doc )
  Has a chance of randomly poping into the game as a tier 1 to 4
  chances of t4 being very slim.

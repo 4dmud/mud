@@ -91,7 +91,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 {
 	int i,j,count;              /* General Purpose variables. */
 
-	/* dont forget - arrays start
+	/* don't forget - arrays start
 	   at zero               */
 	const char *days[]=
 	{
