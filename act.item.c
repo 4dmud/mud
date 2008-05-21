@@ -4907,22 +4907,26 @@ void zap_char ( Character *victim )
 	        || invalid_race ( victim, obj ) )
 			{
 				obj = unequip_char ( victim, i );
-				act ( "You are zapped by $p and instantly let go of it.",
-				      FALSE, victim, obj, 0, TO_CHAR );
-				act ( "$n is zapped by $p and instantly lets go of it.",
-				      FALSE, victim, obj, 0, TO_ROOM );
-				obj_to_char ( obj, victim );
+				if (obj) {
+					act ( "You are zapped by $p and instantly let go of it.",
+					FALSE, victim, obj, 0, TO_CHAR );
+					act ( "$n is zapped by $p and instantly lets go of it.",
+					FALSE, victim, obj, 0, TO_ROOM );
+					obj_to_char ( obj, victim );
+				}
 			}
 			else if ( i == WEAR_WIELD_2 )
 			{
 				if ( wep_hands ( obj ) == 2 )
 				{
 					obj = unequip_char ( victim, i );
-					act ( "You fumble with $p and instantly let go of it.",
-					      FALSE, victim, obj, 0, TO_CHAR );
-					act ( "$n fumbles with $p and instantly lets go of it.",
-					      FALSE, victim, obj, 0, TO_ROOM );
-					obj_to_char ( obj, victim );
+					if (obj) {
+						act ( "You fumble with $p and instantly let go of it.",
+						FALSE, victim, obj, 0, TO_CHAR );
+						act ( "$n fumbles with $p and instantly lets go of it.",
+						FALSE, victim, obj, 0, TO_ROOM );
+						obj_to_char ( obj, victim );
+					}
 				}
 			}
 		}
