@@ -4906,7 +4906,6 @@ void zap_char ( Character *victim )
 			if ( invalid_align ( victim, obj ) || invalid_class ( victim, obj )
 	        || invalid_race ( victim, obj ) )
 			{
-				i = 0;
 				obj = unequip_char ( victim, i );
 				act ( "You are zapped by $p and instantly let go of it.",
 				      FALSE, victim, obj, 0, TO_CHAR );
@@ -4918,7 +4917,6 @@ void zap_char ( Character *victim )
 			{
 				if ( wep_hands ( obj ) == 2 )
 				{
-					i = 0;
 					obj = unequip_char ( victim, i );
 					act ( "You fumble with $p and instantly let go of it.",
 					      FALSE, victim, obj, 0, TO_CHAR );
