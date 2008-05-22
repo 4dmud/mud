@@ -3433,7 +3433,7 @@ void perform_wear ( Character *ch, struct obj_data *obj, int where )
 			return;
 		}
 
-		if ( wep_hands ( obj ) == 2 && w1 && wep_hands ( w1 ) == 2 )
+		if ( wep_hands ( obj ) == 2 && w1 )
 		{
 			*ch << "You can't wield a two-handed weapon if you are already wielding one.\r\n";
 			*ch << "Two-handed weapons can only be wielded as the primary weapon.\r\n";

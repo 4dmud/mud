@@ -727,7 +727,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							int addition = atoi ( subfield );
 							GET_ALIGNMENT ( c ) = IRANGE ( -1000, addition, 1000 );
-							zap_char(c);
 						}
 						snprintf ( str, slen, "%d", GET_ALIGNMENT ( c ) );
 					}

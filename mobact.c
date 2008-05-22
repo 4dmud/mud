@@ -314,8 +314,7 @@ bool AggroTo ( Character *ch, Character *vict )
 		return false;
 	if ( valid_perc ( vict ) == 0 )
 		return false;
-	if ( !MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ||
-	        ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
+	if ( ( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
 	        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
 	        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
 	{

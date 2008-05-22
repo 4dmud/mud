@@ -947,7 +947,7 @@ const char *where[] =
 	"<worn on horns>       ",
 	"<worn on antenna>     ",
 	"<worn on tail>        ",
-	"<wielded secondary>   ",
+	"<wielded offhand>     ",
 	"<worn on hind legs>   ",
 	"<worn on hind hooves> ",
 	"<focusing through>    ",

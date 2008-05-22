@@ -1077,6 +1077,11 @@ int equip_char ( Character *ch, struct obj_data *obj, int pos )
 		core_dump();
 		return 0;
 	}
+	if ( !obj )
+	{
+		log ( "SYSERR: NULL obj passed to equip_char." );
+		return 0;
+	}
 
 	if ( GET_EQ ( ch, pos ) )
 	{
@@ -1100,8 +1105,8 @@ int equip_char ( Character *ch, struct obj_data *obj, int pos )
 	{
 		act ( "You are zapped by $p and instantly let go of it.", FALSE, ch, obj, 0, TO_CHAR );
 		act ( "$n is zapped by $p and instantly lets go of it.", FALSE, ch, obj, 0, TO_ROOM );
-		obj_to_char ( obj, ch );  // changed to drop in inventory instead of
-		zap_char ( ch );     // ground
+		obj_to_char ( obj, ch );  // changed to drop in inventory instead of the ground
+		zap_char ( ch );
 		return 0;
 	}
 
