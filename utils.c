@@ -976,7 +976,8 @@ const char *get_dirname ( char *filename, size_t len, char oname, int mode )
 			break;
 		case IGNORE_FILE:
 			prefix = LIB_PLRALIAS;
-			suffix = "ignore";
+			// Changed this from "ignore" to SUF_IGNORE - PROM
+			suffix = SUF_IGNORE;
 			break;
 		default:
 			return NULL;
@@ -1075,7 +1076,8 @@ int get_filename ( const char *orig_name, char *filename, int mode )
 			break;
 		case IGNORE_FILE:
 			prefix = LIB_PLRALIAS;
-			suffix = "ignore";
+			// Changed this from "ignore" to SUF_IGNORE - PROM
+			suffix = SUF_IGNORE;
 			break;
 		default:
 			return ( 0 );
