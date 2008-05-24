@@ -497,7 +497,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 
 /* -------------------------------------------------------------------------- */
 #define MAX_HELP_KEYWORDS	75
-#define MAX_HELP_ENTRY		2048
+#define MAX_HELP_ENTRY		10000
 
 #define HEDIT_MAIN_MENU			0
 #define HEDIT_ENTRY			1
