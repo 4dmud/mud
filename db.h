@@ -60,6 +60,7 @@
 #define SUF_ALIAS       "alias"
 #define SUF_POOFS       "poofs"
 #define SUF_MEM		"mem"
+#define SUF_IGNORE      "ignore"
 #if defined(CIRCLE_AMIGA)
 #define FASTBOOT_FILE   "/.fastboot"	/* autorun: boot without sleep  */
 #define KILLSCRIPT_FILE "/.killscript"	/* autorun: shut mud down       */
