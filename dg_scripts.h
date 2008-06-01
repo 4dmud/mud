@@ -329,7 +329,7 @@ obj_data *get_obj_by_room(Room *room,const char *name);
 int trgvar_in_room(room_vnum vnum);
 obj_data *get_obj_in_list(char *name, struct obj_data *list);
 obj_data *get_obj_in_list(const char *name, struct obj_data *list);
-obj_data *get_object_in_equip(Character * ch, char *name);
+//obj_data *get_object_in_equip(Character * ch, char *name);
 obj_data *get_object_in_equip(Character * ch, const char *name);
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
@@ -368,7 +368,7 @@ void assign_triggers(void *i, int type);
 
 /* From dg_variables.c */
 void add_var(struct trig_var_data **var_list,const char *name,const char *value, long id);
-void add_var(struct trig_var_data **var_list, string name, string value, long id);
+void add_var(struct trig_var_data **var_list, string &name, string value, long id);
 int item_in_list(char *item, obj_data *list);
 char *skill_percent(Character *ch, char *skill);
 int char_has_item(char *item, Character *ch);

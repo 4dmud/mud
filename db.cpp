@@ -3247,12 +3247,25 @@ void load_zones ( FILE * fl, char *zonename )
 	char *ptr = NULL, buf[READ_SIZE], zname[READ_SIZE], buf2[MAX_STRING_LENGTH];
 	char t1[80], t2[80];
 	long f[5];
-	int retval;
+	int retval, st_lines = 4;
 	int zone_fix = FALSE;
 
 	//log("loading zone: (%s)", zonename);
 	strlcpy ( zname, zonename, sizeof ( zname ) );
-	for ( tmp = 0; tmp < 4; tmp++ )
+	get_line ( fl, buf );
+	if ( *buf == '@' )
+	{
+		if ( sscanf ( buf, "@Version: %d", &version ) != 1 )
+		{
+			log ( "SYSERR: Format error in %s (version)", zname );
+			log ( "SYSERR: ... Line: %s", buf );
+			exit ( 1 );
+		}
+		st_lines += 1;
+	}
+	rewind ( fl );
+
+	for ( tmp = 0; tmp < st_lines; tmp++ )
 		get_line ( fl, buf );   //mord??
 
 	/*  More accurate count. Previous was always 4 or 5 too high. -gg 2001/1/17
@@ -3261,19 +3274,20 @@ void load_zones ( FILE * fl, char *zonename )
 	 */
 	while ( get_line ( fl, buf ) )
 		if ( ( strchr ( "MOPGERDTVBZ", buf[0] ) && buf[1] == ' ' )
-		        || ( buf[0] == 'S' && buf[1] == '\0' ) )
-			num_of_cmds++;
+		        || ( buf[0] == 'S' ) )
+			num_of_cmds++; 
 
 	rewind ( fl );         //mord check strings in reset_zone()
 
 	if ( num_of_cmds == 0 )
 	{
 		log ( "SYSERR: %s is empty!", zname );
-		exit ( 1 );
+		//exit ( 1 );
 	}
 	else
 	{
-		Z.cmd.assign ( num_of_cmds, reset_com() );
+		reset_com tmpzon = reset_com();
+		Z.cmd.assign ( num_of_cmds + 1, tmpzon );
 	}
 
 
@@ -3372,9 +3386,9 @@ void load_zones ( FILE * fl, char *zonename )
 	else
 		Z.sky = SKY_CLOUDLESS;
 
-	cmd_no = 0;
+	cmd_no = tmp = 0;
 
-	for ( ;; )
+	for ( ; ; )
 	{
 		/* skip reading one line if we fixed above (line is correct already) */
 		if ( zone_fix != TRUE )
@@ -3393,7 +3407,7 @@ void load_zones ( FILE * fl, char *zonename )
 		ptr = buf;
 		skip_spaces ( &ptr );
 
-		if ( ( ZCMD.command = *ptr ) == '*' )
+		if ( ZCMD.SetCommand( *ptr ) == '*' )
 			continue;
 
 		ptr++;
@@ -3401,6 +3415,7 @@ void load_zones ( FILE * fl, char *zonename )
 		if ( ZCMD.command == 'S' || ZCMD.command == '$' )
 		{
 			ZCMD.command = 'S';
+			cmd_no ++;
 			break;
 		}
 		error = 0;
@@ -3462,9 +3477,9 @@ void load_zones ( FILE * fl, char *zonename )
 		ZCMD.line = line_num;
 		cmd_no++;
 	}
-	if ( num_of_cmds != cmd_no + 1 )
+	if ( num_of_cmds != cmd_no )
 	{
-		log ( "SYSERR: Zone command count mismatch for %s. Estimated: %d, Actual: %d", zname, num_of_cmds, cmd_no + 1 );
+		log ( "SYSERR: Zone command count mismatch for %s. Estimated: %d, Actual: %d", zname, num_of_cmds, cmd_no );
 		//exit(1);
 	}
 

@@ -256,6 +256,10 @@ struct reset_com {
      * Obj to char       * 'E': Obj to char equip * 'D': Set state of
      * door * 'T': Trigger command   *
      */
+    char SetCommand(char c) {
+	command = c;
+	return command;
+    }
     reset_com() :
             command(0),
             if_flag(0),

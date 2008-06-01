@@ -361,7 +361,7 @@ int hunt_location ( void *thing, int type )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( mob ) ) == NULL )
 				return 0;
-			log ( "DEBUG: Mob vnum %d is hunting a location from room %d.", GET_MOB_VNUM ( mob ), IN_ROOM ( mob )->number );
+//			log ( "DEBUG: Mob vnum %d is hunting a location from room %d.", GET_MOB_VNUM ( mob ), IN_ROOM ( mob )->number );
 			break;
 		case STRUCT_IS_OBJ:
 			obj = * ( struct obj_data** ) thing;
@@ -369,7 +369,7 @@ int hunt_location ( void *thing, int type )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( obj ) ) == NULL )
 				return 0;
-			log ( "DEBUG: Obj vnum %d is hunting a location from room %d.", GET_OBJ_VNUM ( obj ), IN_ROOM ( obj )->number );
+//			log ( "DEBUG: Obj vnum %d is hunting a location from room %d.", GET_OBJ_VNUM ( obj ), IN_ROOM ( obj )->number );
 			break;
 		default:
 			return 0;

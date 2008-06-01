@@ -26,9 +26,10 @@ PROFILE =
 ##############################################################################
 BINDIR = ../bin
 
-CFLAGS = -DHW_EVENT_SUPPORT
+CFLAGS =
+# -DHW_EVENT_SUPPORT
 #-O2
-CPPFLAGS = -O2 -ggdb $(MYFLAGS) $(PROFILE)
+CPPFLAGS = -O0 -ggdb $(MYFLAGS) $(PROFILE)
 
 LIBS =  -lcrypt -lz -lm -lc -lnsl
 #-lpthread

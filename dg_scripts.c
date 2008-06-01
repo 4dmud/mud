@@ -562,54 +562,14 @@ int can_wear_on_pos ( struct obj_data *obj, int pos )
 #define WEAR_KNEE_R     42
 #define WEAR_FLOATING   43
 */
-
-obj_data *get_object_in_equip ( Character * ch, char *name )
-{
-	int j, n = 0, num;
-	obj_data *obj;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-	long id;
-
-	if ( *name == UID_CHAR )
-	{
-		id = atoi ( name + 1 );
-
-		for ( j = 0; j < NUM_WEARS; j++ )
-			if ( ( obj = GET_EQ ( ch, j ) ) )
-				if ( id == GET_ID ( obj ) )
-					return ( obj );
-	}
-	else if ( is_number ( name ) )
-	{
-		obj_vnum ovnum = atoi ( name );
-		for ( j = 0; j < NUM_WEARS; j++ )
-			if ( ( obj = GET_EQ ( ch, j ) ) )
-				if ( GET_OBJ_VNUM ( obj ) == ovnum )
-					return ( obj );
-	}
-	else
-	{
-		snprintf ( tmpname, sizeof ( tmpname ), "%s", name );
-		if ( ! ( num = get_number ( &tmp ) ) )
-			return NULL;
-
-		for ( j = 0; ( j < NUM_WEARS ) && ( n <= num ); j++ )
-			if ( ( obj = GET_EQ ( ch, j ) ) )
-				if ( isname ( tmp, obj->name ) )
-					if ( ++n == num )
-						return ( obj );
-	}
-
-	return NULL;
-}
 obj_data *get_object_in_equip ( Character * ch,const char *name )
 {
-	int j, n = 0, num;
+	int j;
 	obj_data *obj;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+//	char tmpname[MAX_INPUT_LENGTH];
+//	char *tmp = tmpname;
 	long id;
+	/*int n = 0, num;*/
 
 	if ( *name == UID_CHAR )
 	{
@@ -630,14 +590,14 @@ obj_data *get_object_in_equip ( Character * ch,const char *name )
 	}
 	else
 	{
-		snprintf ( tmpname, sizeof ( tmpname ), "%s", name );
-		if ( ! ( num = get_number ( &tmp ) ) )
-			return NULL;
+		/*snprintf ( tmpname, sizeof ( tmpname ), "%s", name );
+		if ( ! ( num = get_number ( &tmpname ) ) )
+			return NULL;*/
 
-		for ( j = 0; ( j < NUM_WEARS ) && ( n <= num ); j++ )
+		for ( j = 0; ( j < NUM_WEARS ) /* && ( n <= num )*/; j++ )
 			if ( ( obj = GET_EQ ( ch, j ) ) )
-				if ( isname ( tmp, obj->name ) )
-					if ( ++n == num )
+				if ( isname ( /*tmp*/ name, obj->name ) )
+					/*if ( ++n == num )*/
 						return ( obj );
 	}
 

@@ -58,7 +58,7 @@ void add_var ( struct trig_var_data **var_list,const char *name,const char *valu
 		return;
 	}
 
-	for ( vd = *var_list; vd && vd->name.compare ( name ); vd = vd->next )
+	for ( vd = *var_list; vd && strcasecmp( vd->name.c_str(), name ); vd = vd->next )
 		;
 
 	if ( vd && ( !vd->context || vd->context==id ) )
@@ -77,7 +77,7 @@ void add_var ( struct trig_var_data **var_list,const char *name,const char *valu
 	vd->value.assign ( value );
 }
 
-void add_var ( struct trig_var_data **var_list, string name, string value, long id )
+void add_var ( struct trig_var_data **var_list, string &name, string value, long id )
 {
 	struct trig_var_data *vd;
 
@@ -87,7 +87,7 @@ void add_var ( struct trig_var_data **var_list, string name, string value, long 
 		return;
 	}
 
-	for ( vd = *var_list; vd && vd->name.compare ( name ); vd = vd->next )
+	for ( vd = *var_list; vd && strcasecmp( vd->name.c_str(), name.c_str() ); vd = vd->next )
 		;
 
 	if ( vd && ( !vd->context || vd->context==id ) )
@@ -258,6 +258,7 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
 	else if ( !str_cmp ( field, "car" ) )              /* car       */
 	{
 		int ve = 0;
+		*str = '\0';
 		while ( ve < vd->value.length() && !isspace ( vd->value[ve] ) )
 			*str++ = vd->value[ve++];
 		*str = '\0';
@@ -442,14 +443,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case MOB_TRIGGER:
 					ch = ( Character * ) go;
 
-
 					if ( ( o = get_object_in_equip ( ch, name ) ) )
 						;
-					else if ( ( o = get_obj_in_list ( name, ch->carrying ) ) )
+					else if (ch->carrying && ( o = get_obj_in_list ( name, ch->carrying ) ) )
 						;
-					else if ( ( c = get_char_room ( name, NULL, IN_ROOM ( ch ) ) ) )
+					else if ( IN_ROOM ( ch ) && ( c = get_char_room ( name, NULL, IN_ROOM ( ch ) ) ) )
 						;
-					else if ( IN_ROOM ( ch ) && ( o = get_obj_in_list ( name, IN_ROOM ( ch )->contents ) ) )
+					else if ( IN_ROOM ( ch )->contents && ( o = get_obj_in_list ( name, IN_ROOM ( ch )->contents ) ) )
 						;
 					else if ( ( c = get_char ( name ) ) )
 						;
@@ -648,6 +648,49 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%c%ld", UID_CHAR, GET_ID ( rndm ) );
 					else
 						*str = '\0';
+				}
+				else if ( !strcasecmp ( field, "dir" ) )
+				{
+					room_rnum in_room = NULL;
+
+					switch ( type )
+					{
+						case WLD_TRIGGER:
+							in_room = ( ( Room * ) go );
+							break;
+						case OBJ_TRIGGER:
+							in_room = obj_room ( ( obj_data * ) go );
+							break;
+						case MOB_TRIGGER:
+							in_room = IN_ROOM ( ( Character * ) go );
+							break;
+					}
+					if ( in_room == NULL )
+					{
+						*str = '\0';
+					}
+					else
+					{
+						int doors = 0;
+						for ( int i = 0; i < NUM_OF_DIRS ; i++ )
+							if ( R_EXIT ( in_room, i ) )
+								doors++;
+
+						if ( !doors )
+						{
+							*str = '\0';
+						}
+						else
+						{
+							for ( ; ; )
+							{
+								doors = number ( 0, NUM_OF_DIRS-1 );
+								if ( R_EXIT ( in_room, doors ) )
+									break;
+							}
+							snprintf ( str, slen, "%s", dirs[doors] );
+						}
+					}
 				}
 				else
 					snprintf ( str, slen, "%d", ( ( num = atoi ( field ) ) > 0 ) ? number ( 1, num ) : 0 );
@@ -2515,7 +2558,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field );
 				}
 			}
-		}
+		} else if (text_processed(field, subfield, vd, str, slen)) return;
 	}
 }
 

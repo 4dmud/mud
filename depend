@@ -1,3 +1,4 @@
+auras.o: auras.cpp
 character.o: character.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -185,7 +186,7 @@ db.o: db.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   character.h utils.h db.h playerindex.h comm.h handler.h spells.h mail.h \
   interpreter.h house.h constants.h oasis.h dg_scripts.h dg_event.h \
   clan.h genobj.h genmob.h genwld.h xmlhelp.h assemblies.h trees.h \
-  damage.h descriptor.h col_string.h strutil.h
+  damage.h descriptor.h col_string.h strutil.h name.map.h
 descriptor.o: descriptor.cpp conf.h sysdep.h dlib/dir_nav.h \
   dlib/platform.h dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -304,6 +305,43 @@ mxp.o: mxp.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h comm.h interpreter.h handler.h house.h dg_scripts.h \
   screen.h descriptor.h col_string.h mxp.h
+name.map.o: name.map.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
+  dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
+  dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
+  dlib/dir_nav/../assert.h dlib/dir_nav/../error.h dlib/dir_nav/../algs.h \
+  dlib/dir_nav/../platform.h dlib/queue.h dlib/queue/queue_kernel_1.h \
+  dlib/queue/queue_kernel_abstract.h dlib/queue/../algs.h \
+  dlib/queue/../interfaces/enumerable.h \
+  dlib/queue/../interfaces/remover.h dlib/queue/../serialize.h \
+  dlib/queue/../algs.h dlib/queue/../assert.h dlib/queue/../uintn.h \
+  dlib/queue/../interfaces/enumerable.h \
+  dlib/queue/../interfaces/map_pair.h dlib/queue/../memory_manager.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_1.h \
+  dlib/queue/../memory_manager/../algs.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_abstract.h \
+  dlib/queue/../memory_manager/../assert.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_2.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_3.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_2.h \
+  dlib/queue/../memory_manager/../binary_search_tree/binary_search_tree_kernel_2.h \
+  dlib/queue/../memory_manager/../binary_search_tree/binary_search_tree_kernel_abstract.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../algs.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/map_pair.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/enumerable.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/remover.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../serialize.h \
+  dlib/queue/queue_kernel_2.h dlib/queue/../assert.h \
+  dlib/queue/queue_kernel_c.h dlib/queue/queue_sort_1.h \
+  dlib/queue/queue_sort_abstract.h dlib/memory_manager.h \
+  dlib/static_set.h dlib/static_set/static_set_kernel_1.h \
+  dlib/static_set/static_set_kernel_abstract.h \
+  dlib/static_set/../interfaces/enumerable.h \
+  dlib/static_set/../interfaces/remover.h dlib/static_set/../algs.h \
+  dlib/static_set/../sort.h dlib/static_set/../algs.h \
+  dlib/static_set/../serialize.h dlib/static_set/static_set_kernel_c.h \
+  dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
+  dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
+  character.h name.map.h
 playerindex.o: playerindex.cpp conf.h sysdep.h dlib/dir_nav.h \
   dlib/platform.h dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -417,6 +455,44 @@ strutil.o: strutil.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../serialize.h dlib/static_set/static_set_kernel_c.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h strutil.h
+trainers.o: trainers.cpp conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
+  dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
+  dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
+  dlib/dir_nav/../assert.h dlib/dir_nav/../error.h dlib/dir_nav/../algs.h \
+  dlib/dir_nav/../platform.h dlib/queue.h dlib/queue/queue_kernel_1.h \
+  dlib/queue/queue_kernel_abstract.h dlib/queue/../algs.h \
+  dlib/queue/../interfaces/enumerable.h \
+  dlib/queue/../interfaces/remover.h dlib/queue/../serialize.h \
+  dlib/queue/../algs.h dlib/queue/../assert.h dlib/queue/../uintn.h \
+  dlib/queue/../interfaces/enumerable.h \
+  dlib/queue/../interfaces/map_pair.h dlib/queue/../memory_manager.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_1.h \
+  dlib/queue/../memory_manager/../algs.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_abstract.h \
+  dlib/queue/../memory_manager/../assert.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_2.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_3.h \
+  dlib/queue/../memory_manager/memory_manager_kernel_2.h \
+  dlib/queue/../memory_manager/../binary_search_tree/binary_search_tree_kernel_2.h \
+  dlib/queue/../memory_manager/../binary_search_tree/binary_search_tree_kernel_abstract.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../algs.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/map_pair.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/enumerable.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../interfaces/remover.h \
+  dlib/queue/../memory_manager/../binary_search_tree/../serialize.h \
+  dlib/queue/queue_kernel_2.h dlib/queue/../assert.h \
+  dlib/queue/queue_kernel_c.h dlib/queue/queue_sort_1.h \
+  dlib/queue/queue_sort_abstract.h dlib/memory_manager.h \
+  dlib/static_set.h dlib/static_set/static_set_kernel_1.h \
+  dlib/static_set/static_set_kernel_abstract.h \
+  dlib/static_set/../interfaces/enumerable.h \
+  dlib/static_set/../interfaces/remover.h dlib/static_set/../algs.h \
+  dlib/static_set/../sort.h dlib/static_set/../algs.h \
+  dlib/static_set/../serialize.h dlib/static_set/static_set_kernel_c.h \
+  dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
+  dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
+  character.h utils.h comm.h interpreter.h handler.h db.h playerindex.h \
+  spells.h dg_scripts.h constants.h trainers.h genmob.h genzon.h oasis.h
 4d_hedit.o: 4d_hedit.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -2065,7 +2141,7 @@ dg_scripts.o: dg_scripts.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h dg_scripts.h utils.h comm.h interpreter.h handler.h \
   dg_event.h db.h playerindex.h screen.h constants.h spells.h oasis.h \
-  descriptor.h col_string.h
+  descriptor.h col_string.h name.map.h
 dg_triggers.o: dg_triggers.c conf.h sysdep.h dlib/dir_nav.h \
   dlib/platform.h dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -2448,7 +2524,7 @@ genmob.o: genmob.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/../assert.h dlib/static_set/static_set_compare_1.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h db.h playerindex.h shop.h handler.h genolc.h \
-  genmob.h genzon.h dg_olc.h dg_scripts.h htree.h
+  genmob.h genzon.h dg_olc.h dg_scripts.h htree.h spells.h name.map.h
 genobj.o: genobj.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
@@ -3403,7 +3479,7 @@ modify.o: modify.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/static_set/static_set_compare_abstract.h structs.h subskills.h \
   character.h utils.h interpreter.h handler.h db.h playerindex.h comm.h \
   spells.h mail.h boards.h improved-edit.h oasis.h tedit.h descriptor.h \
-  col_string.h
+  col_string.h constants.h
 molly.o: molly.c conf.h sysdep.h dlib/dir_nav.h dlib/platform.h \
   dlib/dir_nav/posix.h dlib/dir_nav/dir_nav_kernel_2.h \
   dlib/dir_nav/dir_nav_kernel_abstract.h dlib/dir_nav/../uintn.h \
