@@ -183,6 +183,7 @@ extern unsigned long pulse;
 extern struct time_info_data time_info;
 
 /* external functions */
+void view_room_by_rnum ( Character *ch, room_rnum is_in );
 void free_varlist ( struct trig_var_data *vd );
 void extract_trigger ( struct trig_data *trig );
 int eval_lhs_op_rhs ( char *expr, char *result, size_t r_len,void *go,
@@ -598,7 +599,7 @@ obj_data *get_object_in_equip ( Character * ch,const char *name )
 			if ( ( obj = GET_EQ ( ch, j ) ) )
 				if ( isname ( /*tmp*/ name, obj->name ) )
 					/*if ( ++n == num )*/
-						return ( obj );
+					return ( obj );
 	}
 
 	return NULL;
@@ -666,7 +667,7 @@ Character *get_char ( const char *name )
 		for ( Descriptor *d = descriptor_list; d; d = d->next )
 		{
 			i = d->character;
-			if ( IS_PLAYING ( d ) && i && IN_ROOM(i) && isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
+			if ( IS_PLAYING ( d ) && i && IN_ROOM ( i ) && isname_hard ( name, i->player.name ) && valid_dg_target ( i, TRUE ) )
 				return i;
 		}
 #else
@@ -2424,6 +2425,49 @@ void process_eval ( void *go, struct script_data *sc, trig_data *trig,
 	add_var ( &GET_TRIG_VARS ( trig ), name, result, sc ? sc->context : 0 );
 }
 
+/* script attaching a trigger to something */
+void process_peek ( void *go, struct script_data *sc, trig_data *trig,
+                    int type, char *cmd )
+{
+	char arg[MAX_INPUT_LENGTH], *room_v ;
+	char result[MAX_INPUT_LENGTH];
+	Character *c=NULL;
+	Room *r=NULL;
+
+	room_v = two_arguments ( cmd, result, arg );
+	skip_spaces ( &room_v );
+
+	if ( !*arg )
+	{
+		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a char: '%s'",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		return;
+	}
+	else if ( !*room_v )
+	{
+		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a room to peek into: '%s'",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		return;
+	}
+
+	//eval_expr ( room_v, result, sizeof ( result ), go, sc, trig, type );
+	if ( ( r = real_room ( atoi ( room_v ) ) ) == NULL )
+	{
+		script_log ( "Trigger: %s, VNum %d. dg_peek given an invalid room: '%s'",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		return;
+	}
+	//eval_expr ( arg, result, sizeof ( result ), go, sc, trig, type );
+	if ( ( c = get_char ( arg ) ) == NULL )
+	{
+		script_log ( "Trigger: %s, VNum %d. dg_peek can't find the char to show the room to: '%s'",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		return;
+	}
+
+	view_room_by_rnum ( c, r );
+
+}
 
 
 /* script attaching a trigger to something */
@@ -3153,10 +3197,10 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
 	if ( !vd )
 	{
 		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in global call",
-		    GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), arg1 );
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), arg1 );
 		return;
 	}
-	
+
 	add_var ( & ( sc->global_vars ), vd->name.c_str(), vd->value.c_str(), id );
 	remove_var ( &GET_TRIG_VARS ( trig ), vd->name.c_str() );
 }
@@ -3560,6 +3604,9 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
 			else if ( !strn_cmp ( cmd, "dg_dest ", 8 ) )
 				do_dg_destination ( go, sc, trig, type, cmd );
+
+			else if ( !strn_cmp ( cmd, "dg_peek ", 8 ) )
+				process_peek ( go, sc, trig, type, cmd );
 
 			else if ( !strn_cmp ( cmd, "global ", 7 ) )
 				process_global ( sc, trig, cmd, sc->context );
