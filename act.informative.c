@@ -186,7 +186,8 @@ int class_disp_done = -1;
 #define MAX_NOTE_LENGTH 1024
 
 ACMD ( do_settime );
-
+int fighter_damroll ( Character *ch );
+int caster_damroll ( Character *ch );
 
 /*
  * This function screams bitvector... -gg 6/45/98
@@ -2159,6 +2160,7 @@ ACMD ( do_score )
 	float shortmulti = 1.0;
 	//  float damspeed = (DAM_SPEED_MULTI(ch));
 	float blocking = 0.0;
+bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch );
 
 	gld = goldy;
 	gld2 = goldy2;
@@ -2215,8 +2217,8 @@ ACMD ( do_score )
 			else
 				shortmulti = 1.0f;
 
-			primin += class_damroll ( ch );
-			primax += class_damroll ( ch );
+			primin += fighter_damroll ( ch );
+			primax += fighter_damroll ( ch );
 			primin = FTOI ( primin * ( ( wep_num==1 ) ? 1.1f : 1.0f ) );
 			primax = FTOI ( primax * ( ( wep_num==1 ) ? 1.1f : 1.0f ) );
 			primin = FTOI ( primin * shortmulti );
@@ -2244,8 +2246,8 @@ ACMD ( do_score )
 				shortmulti += ( ( SHORT_WEP_MULTI_ROGUE * ( ( float ) total_chance ( ch, SKILL_SHORT_BLADE ) ) ) /100.0 );
 			else
 				shortmulti = 1.0f;
-			secmin += class_damroll ( ch );
-			secmax += class_damroll ( ch );
+			secmin += fighter_damroll ( ch );
+			secmax += fighter_damroll ( ch );
 			secmin = FTOI ( secmin * shortmulti );
 			secmax = FTOI ( secmax * shortmulti );
 			secmin = FTOI ( secmin * race_dam_mod ( GET_RACE ( ch ), 0 ) );
@@ -2269,7 +2271,7 @@ ACMD ( do_score )
 		else
 			len = snprintf ( webs, sizeof ( webs ), " " );
 	}
-	else if ( GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch ) )
+	else if ( is_casting )
 	{
 		if ( ( staff = has_staff ( ch ) ) != 0.0f )
 			len = snprintf ( webs, sizeof ( webs ), " Focus Multiplier:  %3.2f", staff );
@@ -2278,9 +2280,9 @@ ACMD ( do_score )
 		else
 			len = snprintf ( webs, sizeof ( webs ), " " );
 		primin = spell_size_dice ( ch );
-		primin += class_damroll ( ch );
+		primin += caster_damroll ( ch );
 		primax = ( spell_size_dice ( ch ) + ( spell_size_dice ( ch ) *spell_num_dice ( ch ) ) );
-		primax += class_damroll ( ch );
+		primax += caster_damroll ( ch );
 		primin = FTOI ( primin * ( staff ? staff : 1.0 ) );
 		primax = FTOI ( primax * ( staff ? staff : 1.0 ) );
 		/*
@@ -2357,7 +2359,7 @@ ACMD ( do_score )
 	    "{cg| | {cwMana Points: [{cc%6d{cw][{cc%6d{cw]   Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw] {cg| |\r\n"
 	    "{cg| | {cwMove Points: [{cc%6d{cw][{cc%6d{cw]  Accuracy: [{cy%4d{cw]   Evasion: [{cy%4d{cw] {cg| |{c0\r\n",
 	    GET_HIT ( ch ), GET_MAX_HIT ( ch ),speed_update ( ch ),ch->compute_armor_class(),
-	    GET_MANA ( ch ), GET_MAX_MANA ( ch ), GET_HITROLL ( ch ),   class_damroll ( ch ) ,
+	    GET_MANA ( ch ), GET_MAX_MANA ( ch ), GET_HITROLL ( ch ),   is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ),
 	    GET_MOVE ( ch ), GET_MAX_MOVE ( ch ), accuracy_tot ( ch ), evasion_tot ( ch ) );
 
 	ch->Send (

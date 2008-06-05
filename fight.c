@@ -429,6 +429,9 @@ int get_weapon_accuracy ( OBJ_DATA *wep );
 int get_weapon_evasion ( OBJ_DATA *wep );
 int wep_hands ( OBJ_DATA *wep );
 
+int fighter_damroll ( Character *ch );
+int caster_damroll ( Character *ch );
+
 
 
 struct attack_hit_type attack_hit_text[] =
@@ -813,16 +816,18 @@ int num_dice_wep ( Character *ch, short dual )
 
 int average_damage ( Character *ch )
 {
-	float dam = class_damroll ( ch ) * 0.75;
+	float dam = 0;
 
 	if ( !IS_NPC ( ch ) )
 	{
 		switch ( find_fe_type ( ch ) )
 		{
 			case FE_TYPE_SPELL:
+				dam = caster_damroll(ch);
 				dam += 0.5 * ( ( ( spell_size_dice ( ch ) +1 ) ) * spell_num_dice ( ch ) );
 				break;
 			default:
+				dam = fighter_damroll(ch) * 0.75;
 				dam += 0.5 * ( ( ( size_dice_wep ( ch, WEAPON_PRIM_AFF ) +1 ) ) * num_dice_wep ( ch, WEAPON_PRIM_AFF ) );
 				break;
 		}
@@ -1428,9 +1433,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 	return ( int ) damage;
 }
-
-
-int class_damroll ( Character *ch )
+int fighter_damroll ( Character *ch )
 {
 	int dam = 0;
 	if ( !IS_NPC ( ch ) )
@@ -1452,6 +1455,28 @@ int class_damroll ( Character *ch )
 				else
 					dam += ( 5*GET_DAMROLL ( ch ) );
 				break;
+			default:
+				dam += GET_DAMROLL ( ch );
+		}
+	}
+	else
+		dam += GET_DAMROLL ( ch );
+	return dam;
+}
+
+int caster_damroll ( Character *ch )
+{
+	int dam = 0;
+	if ( !IS_NPC ( ch ) )
+	{
+		switch ( GET_CLASS ( ch ) )
+		{
+			default:
+			case CLASS_WARRIOR:
+			case CLASS_HUNTER:
+			case CLASS_RANGER:
+			case CLASS_THIEF:
+			case CLASS_GYPSY:
 			case CLASS_ESPER:
 			case CLASS_MAGE:
 			case CLASS_PRIEST:
@@ -1459,8 +1484,6 @@ int class_damroll ( Character *ch )
 				dam += GET_WIS ( ch );
 				dam += GET_CHA ( ch );
 				break;
-			default:
-				dam += GET_DAMROLL ( ch );
 		}
 	}
 	else
@@ -1987,7 +2010,7 @@ int melee_type_dam ( Character *ch, Character *vict, int attack_chance, int weps
 	else
 		dam += dice ( ch->mob_specials.damnodice,ch->mob_specials.damsizedice );
 
-	dam += class_damroll ( ch );
+	dam += fighter_damroll ( ch );
 
 	dam = FTOI ( dam * atk_chance_multi ( attack_chance ) );
 
@@ -2129,9 +2152,9 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 				dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
 
 
-			dam += class_damroll ( ch );
+			dam += caster_damroll ( ch );
 
-			dam += FTOI ( dam * has_staff ( ch ) );
+			dam = FTOI ( dam * has_staff ( ch ) );
 
 			dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
@@ -2173,9 +2196,9 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
 		if ( IS_NPC ( ch ) )
 			dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
 
-		dam += class_damroll ( ch );
+		dam += caster_damroll ( ch );
 
-		dam += FTOI ( dam * has_staff ( ch ) );
+		dam = FTOI ( dam * has_staff ( ch ) );
 
 		dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
