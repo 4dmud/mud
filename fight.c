@@ -2154,7 +2154,8 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 
 			dam += caster_damroll ( ch );
 
-			dam = FTOI ( dam * has_staff ( ch ) );
+			if (has_staff ( ch ) > 0)
+				dam = FTOI ( dam * has_staff ( ch ) );
 
 			dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
