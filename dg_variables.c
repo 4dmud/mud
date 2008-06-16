@@ -2087,7 +2087,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							}
 							else
 							{
-								if ( IN_ROOM ( o )->people )
+								if ( IN_ROOM ( o ) && IN_ROOM ( o )->people )
 
 									snprintf ( str, slen, "%c%ld", UID_CHAR,
 									           GET_ID ( IN_ROOM ( o )->people ) );
@@ -2558,7 +2558,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field );
 				}
 			}
-		} else if (text_processed(field, subfield, vd, str, slen)) return;
+		} else if (vd != NULL && text_processed(field, subfield, vd, str, slen)) return;
 	}
 }
 
