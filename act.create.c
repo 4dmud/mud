@@ -401,6 +401,13 @@ void make_scroll(Character *ch, int scroll, struct obj_data *paper)
     ch->Send( "That spell cannot be scribed into a scroll.\r\n");
     return;
   }
+  
+  else if (knows_spell(ch, scroll))
+  {
+    ch->Send( "You must know a spell in order to scribe it.\r\n");
+    return;
+  }
+
   else if ((number(1, 3) == 3) && (GET_LEVEL(ch) < LVL_HERO))
   {
     ch->Send("As you begin inscribing the final rune, the scroll violently explodes!\r\n");
