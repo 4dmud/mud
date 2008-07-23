@@ -1163,7 +1163,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].bitvector = AFF_SWEET_DREAMS;
 
 			accum_duration =FALSE;
-			to_vict = "Happy thoughts fill your mind as you drift off too sleep.";
+			to_vict = "Happy thoughts fill your mind as you drift off to sleep.";
 			to_room = "$n smiles and collapses.";
 			break;
 		case SPELL_DEVINE_MIND:
