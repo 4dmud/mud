@@ -402,7 +402,7 @@ void make_scroll(Character *ch, int scroll, struct obj_data *paper)
     return;
   }
   
-  else if (knows_spell(ch, scroll))
+  if (!knows_spell(ch, scroll))
   {
     ch->Send( "You must know a spell in order to scribe it.\r\n");
     return;
