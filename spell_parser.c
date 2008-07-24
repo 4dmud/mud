@@ -1892,7 +1892,7 @@ void mag_assign_spells(void) {
 
     spello(SPELL_SHIELD_MANA, "mana shield", 50 , 30 , 2,
            POS_STANDING,  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-           TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15);
+           TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 1);
 
     spello(SPELL_SHIELD_MIRROR, "mirror shield", 50 , 30 , 2,
            POS_STANDING,  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,

@@ -309,7 +309,7 @@ void assign_skills ( void )
          SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_FACE, 4, 12);
 
 	skillo ( SKILL_BRACE, "brace", TAR_IGNORE,
-	         SK_NONE, NO_FIRST, NO_SECOND, 1, 15 );
+	         SK_NONE, NO_FIRST, NO_SECOND, 3, 1 );
 
 	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
 	         SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 );
@@ -322,7 +322,7 @@ void assign_skills ( void )
   skillo_static(SKILL_DUAL, "dual", NO_FIRST, NO_SECOND, 1, 27);
   skillo_static(SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 0, 25);
   skillo_static(SKILL_TRAP_AWARE, "trap aware", NO_FIRST, NO_SECOND,3, 5);
-  skillo_static(SKILL_PARRY, "parry", SKILL_HANDTOHAND, NO_SECOND, 2, 35);
+  skillo_static(SKILL_PARRY, "parry", SKILL_HANDTOHAND, NO_SECOND, 3, 1);
   /*mord */
   skillo_static(SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, 1, 24);
   skillo_static(SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14);
