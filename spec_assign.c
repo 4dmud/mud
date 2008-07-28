@@ -350,6 +350,7 @@ void assign_objects(void)
     ASSIGNOBJ(7582, bank);
     ASSIGNOBJ(10008, bank);
     ASSIGNOBJ(10400, bank);
+    ASSIGNOBJ(12199, bank);
     ASSIGNOBJ(13056, bank);
     ASSIGNOBJ(13057, bank);
     ASSIGNOBJ(17416, bank);	/* bank in Palpatines area */
