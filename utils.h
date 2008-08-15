@@ -799,6 +799,7 @@ void make_wholist ( void );
 
 #define GET_MRACE(ch)		((ch)->mob_specials.race)
 #define IS_ANIMAL(ch)		(IS_NPC(ch) && (GET_MRACE(ch) == MOB_RACE_ANIMAL))
+#define IS_EXOTIC(ch)		(IS_NPC(ch) && (GET_MRACE(ch) == MOB_RACE_EXOTIC))
 #define GET_MTYPE(ch)		((ch)->mob_specials.type)
 #define IS_MOB_PREG(ch)		((ch)->mob_specials.pregnant)
 #define DUE_DATE(ch)		((ch)->mob_specials.due_date)
