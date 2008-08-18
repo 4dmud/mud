@@ -1315,7 +1315,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'l':
 
 					if ( !strcasecmp ( field, "level" ) )
-						snprintf ( str, slen, "%d", GET_LEVEL ( c ) );
+           					snprintf ( str, slen, "%d", GET_LEVEL ( c ) );
+                                        else if ( !strcasecmp ( field, "longdesc" ) )
+                                                snprintf ( str, slen, "%s", GET_LDESC ( c ) );
                                       break;
 				case 'm':
 					if ( !strcasecmp ( field, "maxhitp" ) )
