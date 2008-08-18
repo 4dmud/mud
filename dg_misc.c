@@ -271,7 +271,9 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
 	/* add the affect */
 	af.type = SPELL_DG_AFFECT;
 	af.expire = sec_to_time ( duration );
-	af.modifier = value;
+	/* script_log ( "Trigger: %s, Vnum %d. dg_affect: Affect Expires in %d seconds.",
+              GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), af.expire); */
+        af.modifier = value;
 	if ( type == APPLY_TYPE )
 	{
 		af.location = ( i );

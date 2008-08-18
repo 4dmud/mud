@@ -492,6 +492,7 @@ struct spell_info_type {
     int tier;
     int wait;
     int classes;
+    int gm;
 
     spell_info_type() {
     min_position = 0;		/* Position for caster   */
@@ -512,6 +513,7 @@ struct spell_info_type {
     tier = 0;
     wait = 0;
     classes = 0;
+    gm = 0;
     }
 
 };
