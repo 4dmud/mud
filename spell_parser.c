@@ -1306,12 +1306,16 @@ int knows_spell(Character *ch, int spell) {
 
     for (i = 0; i < NUM_CLASSES ; i++) {
         if (gm) {
+
+
+
+
             if (IS_SET(spell_info[spell].classes, (1 << i)) && GET_CLASS(ch) == i)
                 t = tier_level(ch, i);
             
             if (spell_info[spell].gm > 0)
               ret_val++;
-            else if (spell_info[spell].tier == t) {
+            else if (spell_info[spell].tier <= t) {
                 if (spell_info[spell].min_level <= GET_LEVEL(ch))
                     ret_val++;
             }
