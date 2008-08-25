@@ -1305,22 +1305,12 @@ int knows_spell(Character *ch, int spell) {
     gm = grand_master(ch);
 
     for (i = 0; i < NUM_CLASSES ; i++) {
-        if (gm) {
+        if (gm) {    
+          if (spell_info[spell].gm > 0)
+            ret_val++;
+          }
 
-
-
-
-            if (IS_SET(spell_info[spell].classes, (1 << i)) && GET_CLASS(ch) == i)
-                t = tier_level(ch, i);
-            
-            if (spell_info[spell].gm > 0)
-              ret_val++;
-            else if (spell_info[spell].tier <= t) {
-                if (spell_info[spell].min_level <= GET_LEVEL(ch))
-                    ret_val++;
-            }
-
-        } else if (IS_SET(spell_info[spell].classes, (1 << i))) {
+        if (IS_SET(spell_info[spell].classes, (1 << i))) {
             if (!IS_NPC(ch)) {
                 if (!has_class(ch, i))
                     continue;
