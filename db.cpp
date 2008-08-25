@@ -3928,7 +3928,7 @@ Character *read_mobile ( mob_vnum nr )
 	mob->player.time.played = 0;
 	mob->player.time.logon = time ( 0 );
 
-	if ( GET_MRACE ( mob ) == MOB_RACE_ANIMAL )
+	if ( GET_MRACE ( mob ) == MOB_RACE_ANIMAL || GET_MRACE ( mob ) == MOB_RACE_EXOTIC)
 		GET_GOLD ( mob ) = 0;
 
 	GetMobIndex ( nr )->number++;
