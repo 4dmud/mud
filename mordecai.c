@@ -198,11 +198,13 @@ ACMD ( do_convey )
 		return;
 	}
 
-	if ( GET_REMORT ( ch ) == -1 )
-	{
-		ch->Send ( "This command works for remorted players only.\r\n" );
-		return;
-	}
+//	Removed Remort check per Molly. - Prometheus.
+//
+//	if ( GET_REMORT ( ch ) == -1 )
+//	{
+//		ch->Send ( "This command works for remorted players only.\r\n" );
+//		return;
+//	}
 
 	two_arguments ( argument, arg2, arg1 );
 
