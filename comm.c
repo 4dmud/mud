@@ -1092,6 +1092,7 @@ void game_loop(socket_t s_mother_desc) {
         /* Sleep if we don't have any connections */
         if (descriptor_list == NULL) {
             log("No connections.  Going to sleep.");
+            alarm(0); //Disable watchdog.
             clearAllZones();
             make_who2html();
             FD_ZERO(&input_set);
@@ -1106,6 +1107,7 @@ void game_loop(socket_t s_mother_desc) {
             }
             gettimeofday(&last_time, (struct timezone *) 0);
         }
+        alarm(60); //Set watchdog. This alarm should reset before it expires. If this does not happen, the mud is frozen.
         /* Set up the input, output, and exception sets for select(). */
         FD_ZERO(&input_set);
         FD_ZERO(&output_set);
@@ -3155,6 +3157,14 @@ RETSIGTYPE core_dump_on_crash(void) {
     //core_dump();
 }
 
+//If we ever get in this function, it means the mud has hanged for more than 60 seconds. This function creates a file called "FROZEN" in the directory where the mud runs in and then aborts, which should  dump a core for further inspection.
+RETSIGTYPE watchdog(void) {
+        log("FROZEN! Last command typed: %s", last_command);
+        open("FROZEN", O_CREAT | O_RDWR, 0600);
+        abort(); //dump core.
+}
+    
+
 #endif                   /* CIRCLE_UNIX */
 
 /*
@@ -3232,7 +3242,7 @@ void signal_setup(void) {
     my_signal(SIGINT, (sigfunc *)hupsig);
     my_signal(SIGTERM, (sigfunc *)hupsig);
     my_signal(SIGPIPE, (sigfunc *)deadpipe);
-    my_signal(SIGALRM, (sigfunc *)SIG_IGN);
+    my_signal(SIGALRM, (sigfunc *)watchdog);
 
 #ifdef SIGCLD  /* only on SYSV */
 
