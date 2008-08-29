@@ -324,7 +324,7 @@ ACMD ( do_convey )
 	// This should be arg2 then gold not gold then arg2
 	// Changed this from "gold" to "maxmove" since the rest of the
 	// code does the next agruement. Prometheus.
-	else if ( isname ( arg2, "maxmove" ) )
+	else if ( isname ( arg2, "gold" ) )
 	{
 		if ( isname ( arg2, "maxmove" ) )
 		{
@@ -373,6 +373,7 @@ ACMD ( do_convey )
 		}
 
 	}
+
 	else if ( isname ( arg2, "award" ) )
 	{
 
