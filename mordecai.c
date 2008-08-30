@@ -324,18 +324,18 @@ ACMD ( do_convey )
 	// This should be arg2 then gold not gold then arg2
 	// Changed this from "gold" to "maxmove" since the rest of the
 	// code does the next agruement. Prometheus.
-	else if ( isname ( arg2, "gold" ) )
-	{
-		if ( isname ( arg2, "maxmove" ) )
+//	else if ( isname ( arg2, "gold" ) )
+//	{
+	else if ( isname ( arg2, "maxmove" ) )
 		{
 
-			if ( ch->Gold ( 0, GOLD_ALL ) >= 10000000 * GET_CONVERSIONS ( ch ) )
+			if ( ch->Gold ( 0, GOLD_ALL ) >= 10000000 * GET_CONVERSIONS (ch))
 			{
 				log ( "INFO: %s conveyed %lld gold into %d maxmove", GET_NAME ( ch ), ( gold_int ) ( 10000000 * GET_CONVERSIONS ( ch ) ), 100 );
 				ch->Send ( "You convey %lld gold to %d maxmove.\r\n",
-				           ( gold_int ) ( 10000000 * GET_CONVERSIONS ( ch ) ), 100 );
+				           ( gold_int ) ( 10000000 * GET_CONVERSIONS(ch)), 100 );
 				GET_MAX_MOVE ( ch ) += 100;
-				ch->Gold ( -10000000 * GET_CONVERSIONS ( ch ), GOLD_ALL );
+				ch->Gold ( -10000000 * GET_CONVERSIONS(ch), GOLD_ALL );
 				GET_CONVERSIONS ( ch ) ++;
 				ch->affect_total();
 
@@ -346,6 +346,8 @@ ACMD ( do_convey )
 			}
 			return;
 		}
+
+	else if (isname(arg2, "gold")) {
 
 		if ( ! ( amount >= 4 ) )
 		{
