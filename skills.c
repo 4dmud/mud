@@ -182,7 +182,7 @@ void assign_skills ( void )
 
 	skillo ( SKILL_SCAN, "scan", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 1, 31 ,1);
 
-	skillo ( SKILL_BREW, "brew", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 0, 29 ,1);
+	skillo ( SKILL_BREW, "brew", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 1, 1 ,1);
 
 	skillo ( SKILL_SING_WOOD, "woodsing", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 4, 25 ,0);
 
@@ -243,7 +243,7 @@ void assign_skills ( void )
 
   skillo(SKILL_SNEAK, "sneak", TAR_CHAR_ROOM | TAR_SELF_ONLY,
          SK_NONE, NO_FIRST, NO_SECOND, 1, 8, 1);
-  skillo(SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, 0, 31, 1);
+  skillo(SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, 1, 1, 1);
 
 	skillo ( SKILL_TRACK, "track", TAR_CHAR_WORLD | TAR_NOT_SELF,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 27 ,1);
@@ -320,7 +320,7 @@ void assign_skills ( void )
   skillo_static(SKILL_CROSSBOW, "crossbow", NO_FIRST, NO_SECOND,NO_TIER, 20, 1);
   skillo_static(SKILL_THROW, "throw", NO_FIRST, NO_SECOND, NO_TIER, 22, 1);
   skillo_static(SKILL_DUAL, "dual", NO_FIRST, NO_SECOND, 1, 27, 1);
-  skillo_static(SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 0, 25, 0);
+  skillo_static(SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 1, 1, 0);
   skillo_static(SKILL_TRAP_AWARE, "trap aware", NO_FIRST, NO_SECOND,3, 5, 0);
   skillo_static(SKILL_PARRY, "parry", SKILL_HANDTOHAND, NO_SECOND, 1, 30, 0);
   /*mord */
