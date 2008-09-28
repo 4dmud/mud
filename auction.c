@@ -64,7 +64,7 @@ int valid_auction(struct auction_data *ac)
 
 void auction_update(void)
 {
-  char buf2[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH], price[50];
   Character *mob = NULL;
 
   if (auction && auction->ticks == AUC_NONE)
@@ -107,9 +107,10 @@ void auction_update(void)
   case AUC_BID:
   case AUC_ONCE:
   case AUC_TWICE:
+    commafmt ( price, sizeof ( price ), auction->bid );
     if (auction->bidder)
-      snprintf(buf2, sizeof(buf2), "%s for %ld coin%sto %s.%s%s",
-          auction->obj->short_description, auction->bid,
+      snprintf(buf2, sizeof(buf2), "%s for %s coin%sto %s.%s%s",
+          auction->obj->short_description, price,
           auction->bid != 1 ? "s " : " ",
           GET_NAME(auction->bidder),
           auction->ticks == AUC_ONCE ? " ONCE!" : "",
@@ -120,9 +121,9 @@ void auction_update(void)
       auction_reset();
       auction->ticks--;
     } else
-      snprintf(buf2, sizeof(buf2), "%s%s, %ld coin%sminimum.",
+      snprintf(buf2, sizeof(buf2), "%s%s, %s coin%sminimum.",
       auction->ticks == AUC_NEW ? "New item: " : "",
-          auction->obj->short_description, auction->bid, auction->bid != 1 ?
+          auction->obj->short_description, price, auction->bid != 1 ?
           "s " : " ");
     if (mob)
       do_gen_comm(mob, buf2, 0, SCMD_AUCTION);
