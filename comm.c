@@ -3827,7 +3827,9 @@ int open_comlogfile(const char *filename, FILE * stderr_fp) {
 #if defined(CIRCLE_WINDOWS)
 
 void circle_sleep(struct timeval *timeout) {
+    alarm(0); //Disable watchdog.
     Sleep(timeout->tv_sec * 1000 + timeout->tv_usec / 1000);
+    alarm(60); //Enable watchdog.
 }
 
 #else
