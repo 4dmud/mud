@@ -141,13 +141,13 @@ void write_ban_list ( void )
 ACMD ( do_ban )
 {
 	char flag[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
-	char  timestr[16], comment[MAX_INPUT_LENGTH];
+	char  timestr[16];
 	int i;
 	struct ban_list_element *ban_node;
 
 
 
-	if ( !*argument || is_abbrev ( argument, "comments" ) )
+	if ( !*argument )
 	{
 		if ( !ban_list )
 		{
@@ -174,16 +174,13 @@ ACMD ( do_ban )
 				strcpy ( timestr, "Unknown" );
 			ch->Send ( BAN_LIST_FORMAT , ban_node->site, ban_types[ban_node->type],
 			           timestr, ban_node->name );
-                        if ( *argument )
-                           ch->Send ( comment );
 		}
 		return;
 	}
-	two_arguments ( argument, flag, one_argument ( site, comment ) );
-        half_chop ( site, site, comment );
-	if ( !*comment )
+       two_arguments ( argument, flag, site );
+       if ( !*site || !*flag )
 	{
-	        ch->Send( "Usage: ban {{all | select | new | name} site_name/playername <comment as to why you are banning them>\r\n" );
+                ch->Send( "Usage: ban {{all | select | new | name} site_name/playername\r\n" );
 		return;
 	}
 	if ( !
