@@ -3827,20 +3827,20 @@ int open_comlogfile(const char *filename, FILE * stderr_fp) {
 #if defined(CIRCLE_WINDOWS)
 
 void circle_sleep(struct timeval *timeout) {
-    alarm(0); //Disable watchdog.
     Sleep(timeout->tv_sec * 1000 + timeout->tv_usec / 1000);
-    alarm(60); //Enable watchdog.
 }
 
 #else
 
 void circle_sleep(struct timeval *timeout) {
+    alarm(0); //Disable watchdog.
     if (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, timeout) < 0) {
         if (errno != EINTR) {
             perror("SYSERR: Select sleep");
             exit(1);
         }
     }
+    alarm(60); //Enable watchdog.
 }
 
 #endif
