@@ -192,8 +192,6 @@ void mobile_activity ( void )
 			for ( vict = IN_ROOM ( ch )->people; vict && !found;
 			        vict = vict->next_in_room )
 			{
-				if (IS_NPC (vict))
-					continue;
 				if ( ch == vict || !FIGHTING ( vict ) )
 					continue;
 				if ( ch == FIGHTING ( vict ) )
