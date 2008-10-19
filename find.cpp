@@ -9,16 +9,26 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+#include "conf.h"
+#include "sysdep.h"
+
 #include "structs.h"
+#include "utils.h"
+#include "comm.h"
+#include "interpreter.h"
+#include "handler.h"
+#include "db.h"
 #include "find.h"
 
+tPlayerList playerlist;
 // returns a lower case version of the string 
-string tolower (const string & s)
+/*string tolower (const string & s)
   {
 string d = s;
   transform (d.begin (), d.end (), d.begin (), (int(*)(int)) tolower);
   return d;
-  }  // end of tolower
+  }  // end of tolower*/
 // case-independent (ci) string compare
 // returns true if strings are EQUAL
 struct ciEqualTo : binary_function <string, string, bool>
@@ -58,14 +68,14 @@ struct findCharacterName
     if (IS_NPC(p))
     return ciStringEqual (p->player.short_descr, name);
     else 
-    return ciStringEqual (p->player.name, name)
+    return ciStringEqual (p->player.name, name);
     } // end of operator()  
 };  // end of findPlayerName
 
 Character * FindPlayer (const string & name)
 {
   tPlayerListIterator i =
-    find_if (playerlist.begin (), playerlist.end (), findPlayerName (name));
+    find_if (playerlist.begin (), playerlist.end (), findCharacterName (name));
 
   if (i == playerlist.end ())
     return NULL;
