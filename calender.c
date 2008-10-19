@@ -123,7 +123,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 	};
 
 
-	int month_map[8][MAX_COLS+1]={0};     /* init array with zeros */
+	int month_map[8][MAX_COLS+1]={{0}};     /* init array with zeros */
 
 	j=start_day ( month, year );     /* Get the day the month starts */
 	/* Build the calender values  */
@@ -161,6 +161,7 @@ int calender_month ( Character *ch, int month, int year, int theday )
 
 		ch->Send ( "\r\n" );             /* puts supplies a Newline    */
 	}
+	return 1;
 }
 
 /************************************************************************/
@@ -235,9 +236,10 @@ int save_current_events()
 		log ( "SYSERR: Can't write to '%s' event file.", EVENT_FILE );
 	else
 	{
-		fprintf ( bgtime, "%ld\n", 2222 );
+		fprintf ( bgtime, "%ld\n", 2222L );
 		fclose ( bgtime );
 	}
+	return 1;
 }
 void load_current_events()
 {
