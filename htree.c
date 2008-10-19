@@ -7,7 +7,7 @@
  * Copyright (c) 7-Oct-2004                                                *
  ***************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

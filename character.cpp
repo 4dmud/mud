@@ -10,7 +10,7 @@
 //
 //
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
@@ -49,7 +49,7 @@
 
 /*
  * Note, most includes for all platforms are in sysdep.h.  The list of
- * files that is included is controlled by conf.h for that platform.
+ * files that is included is controlled by config.h for that platform.
  */
 
 #include "structs.h"

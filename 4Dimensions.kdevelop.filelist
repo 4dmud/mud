@@ -24,7 +24,6 @@ assemblies.c
 assemblies.h
 auction.c
 auction.h
-auras.cpp
 ban.c
 boards.c
 boards.h
@@ -51,6 +50,7 @@ compressor.cpp
 compressor.h
 conf.h
 config.c
+config.h
 constants.c
 constants.h
 context_help.c
@@ -606,10 +606,8 @@ genzon.c
 genzon.h
 graph.c
 graph.h
-group.c
 handler.c
 handler.h
-hedit.c
 house.c
 house.h
 htree.c
@@ -641,7 +639,6 @@ molly.c
 mordecai.c
 mxp.cpp
 mxp.h
-mysql.c
 name.map.cpp
 name.map.h
 note.c
@@ -675,7 +672,6 @@ skills.c
 spec_assign.c
 spec_procs.c
 spell_parser.c
-spelledit.c
 spells.c
 spells.h
 string.c
@@ -693,6 +689,13 @@ trainers.cpp
 trainers.h
 trees.c
 trees.h
+trialcode
+trialcode/auras.cpp
+trialcode/group.c
+trialcode/hedit.c
+trialcode/mysql.c
+trialcode/spelledit.c
+trialcode/xmlhelp.c
 util/Makefile.in
 util/autowiz.c
 util/clanlist.c
@@ -717,7 +720,5 @@ vehicle.c
 vehicle_edit.c
 versionlist.h
 weather.c
-xmlhelp.c
-xmlhelp.h
 zedit.c
 zreload.c

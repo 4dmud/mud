@@ -9,7 +9,7 @@
 #include <errno.h>
 */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "screen.h"

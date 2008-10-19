@@ -4,7 +4,7 @@
  * A graphical in-game game configuration utility for OasisOLC.         *
  ************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "comm.h"

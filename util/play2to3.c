@@ -13,7 +13,7 @@
 
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 typedef signed char sbyte;

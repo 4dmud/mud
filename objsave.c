@@ -14,7 +14,7 @@
  * AutoEQ by Burkhard Knopf <burkhard.knopf@informatik.tu-clausthal.de>
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

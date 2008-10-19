@@ -5,7 +5,7 @@
 * Copyright (C) 1996,1997 by George Greer                  *
 ************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

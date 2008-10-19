@@ -12,7 +12,7 @@
  * The entire shop rewrite for Circle 3.0 was done by Jeff Fink.  Thanks Jeff!
  ***/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

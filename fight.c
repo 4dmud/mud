@@ -285,7 +285,7 @@
 so that spell affects arent done at time of casting and damage is done at time of combat. - mord
 
 **/
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

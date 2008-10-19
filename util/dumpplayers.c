@@ -5,7 +5,7 @@
 *  Copyright (C) 1992, 1993 The Trustees of The Johns Hopkins University  *
 ************************************************************************* */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

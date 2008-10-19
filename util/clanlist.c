@@ -17,7 +17,7 @@
    -- The Management
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include <signal.h>

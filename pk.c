@@ -2,7 +2,7 @@
 This file contains most functions to do with Player Killing
 mordecai - dec - 11 - 05
  **/
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

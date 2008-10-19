@@ -9,7 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK

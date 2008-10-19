@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: sysdep.h                                      Part of CircleMUD *
-*  Usage: machine-specific defs based on values in conf.h (from configure)*
+*  Usage: machine-specific defs based on values in config.h (from configure)*
 *                                                                         *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
@@ -123,7 +123,7 @@
 
 /*
  * Set up various machine-specific things based on the values determined
- * from configure and conf.h.
+ * from configure and config.h.
  */
 
 /* Standard C headers  *************************************************/
@@ -416,7 +416,7 @@ extern void abort (), exit ();
 # endif
 
 #elif !defined(CIRCLE_MACINTOSH) && !defined(CIRCLE_UNIX) && !defined(CIRCLE_ACORN)
-# error "You forgot to include conf.h or do not have a valid system define."
+# error "You forgot to include config.h or do not have a valid system define."
 #endif
 
 /* SOCKET -- must be after the winsock.h #include. */

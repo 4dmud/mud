@@ -92,7 +92,7 @@
 
 RCSID("$Id: bsd-snprintf.c,v 1.1 2004/11/12 02:16:17 w4dimenscor Exp $");
 #else
-# include "conf.h"
+# include "config.h"
 # include "sysdep.h"
 # define MAX(a, b)	((a) < (b) ? (b) : (a))
 #endif
@@ -104,9 +104,10 @@ RCSID("$Id: bsd-snprintf.c,v 1.1 2004/11/12 02:16:17 w4dimenscor Exp $");
 
 #if !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF)
 
+#if !defined(HAVE_VSNPRINTF)
 static void
 dopr(char *buffer, size_t maxlen, const char *format, va_list args);
-
+#endif
 static void
 fmtstr(char *buffer, size_t * currlen, size_t maxlen, char *value,
        int flags, int min, int max);
@@ -359,7 +360,7 @@ dopr(char *buffer, size_t maxlen, const char *format, va_list args)
 		       max);
 		break;
 	    case 'p':
-		strvalue = va_arg(args, void *);
+		strvalue = va_arg(args, char *);
 		fmtint(buffer, &currlen, maxlen, (long) strvalue, 16, min,
 		       max, flags);
 		break;
@@ -416,7 +417,7 @@ fmtstr(char *buffer, size_t * currlen, size_t maxlen,
     int cnt = 0;
 
     if (value == 0)
-	value = "<NULL>";
+	value = (char *)"<NULL>";
 
     for (strln = 0; value[strln]; ++strln);	/* strlen */
     padlen = min - strln;

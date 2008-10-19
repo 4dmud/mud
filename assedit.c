@@ -6,7 +6,7 @@
  * 1999 July 25 caminturn@earthlink.net                                *
  * ******************************************************************** */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

@@ -1,6 +1,6 @@
 /*subskills by mordecai@xtra.co.nz */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

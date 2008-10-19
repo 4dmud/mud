@@ -50,43 +50,43 @@ split: $(BINDIR)/split
 
 wld2html: $(BINDIR)/wld2html
 
-$(BINDIR)/autowiz: autowiz.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/autowiz: autowiz.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h $(INCDIR)/db.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c
 
-$(BINDIR)/delobjs: delobjs.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/delobjs: delobjs.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/delobjs delobjs.c
 
-$(BINDIR)/listrent: listrent.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/listrent: listrent.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/listrent listrent.c
 
-$(BINDIR)/mudpasswd: mudpasswd.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/mudpasswd: mudpasswd.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/mudpasswd mudpasswd.c @CRYPTLIB@
 
-$(BINDIR)/play2to3: play2to3.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
+$(BINDIR)/play2to3: play2to3.c $(INCDIR)/config.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/play2to3 play2to3.c
 
-$(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/purgeplay: purgeplay.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/purgeplay purgeplay.c
 
-$(BINDIR)/shopconv: shopconv.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/shopconv: shopconv.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h $(INCDIR)/db.h $(INCDIR)/utils.h $(INCDIR)/shop.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/shopconv shopconv.c
 
-$(BINDIR)/showplay: showplay.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h \
+$(BINDIR)/showplay: showplay.c $(INCDIR)/config.h $(INCDIR)/sysdep.h \
 	$(INCDIR)/structs.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/showplay showplay.c
 
-$(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
+$(BINDIR)/sign: sign.c $(INCDIR)/config.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c @NETLIB@
 
-$(BINDIR)/split: split.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
+$(BINDIR)/split: split.c $(INCDIR)/config.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/split split.c
 
-$(BINDIR)/wld2html: wld2html.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
+$(BINDIR)/wld2html: wld2html.c $(INCDIR)/config.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/wld2html wld2html.c
 

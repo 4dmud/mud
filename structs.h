@@ -241,6 +241,7 @@
  *
  */
 #include <netinet/in.h>
+#include <string>
 /*
  * Intended use of this macro is to allow external packages to work with
  * a variety of CircleMUD versions without modifications.  For instance,

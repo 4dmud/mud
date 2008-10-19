@@ -5,7 +5,7 @@
     copyright            : (C) 2004 by molly
     email                : Mordecai@xtra.co.nz
  ***************************************************************************/
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

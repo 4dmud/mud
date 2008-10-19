@@ -4,7 +4,7 @@ improved-edit.c		Routines specific to the improved editor.
 
 */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

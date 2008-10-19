@@ -82,7 +82,7 @@
  *
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include <sys/stat.h>

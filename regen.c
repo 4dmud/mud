@@ -119,7 +119,7 @@ http://www.imaxx.net/~thrytis
  
 */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

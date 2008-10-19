@@ -13,7 +13,7 @@
 *  $Revision: 1.10 $
 ************************************************************************ */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

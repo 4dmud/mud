@@ -1,5 +1,5 @@
 //http://uo.stratics.com/content/reputation/pets.shtml
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

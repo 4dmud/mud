@@ -1,5 +1,5 @@
-/* src/conf.h.  Generated automatically by configure.  */
-/* src/conf.h.in.  Generated automatically from configure.in by autoheader.  */
+/* src/config.h.  Generated automatically by configure.  */
+/* src/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define to empty if the keyword does not work.  */
 /* #undef const */
@@ -7,10 +7,7 @@
 /* Define if you don't have vprintf but do have _doprnt.  */
 /* #undef HAVE_DOPRNT */
 
-/* Define if your system has compression support in zlib. */
-#define HAVE_ZLIB 1
 
-#define HAVE_ZLIB_H 1
 /* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
 #define HAVE_SYS_WAIT_H 1
 

@@ -11,7 +11,7 @@
 
 #define __INTERPRETER_C__
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

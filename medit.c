@@ -3,7 +3,7 @@
 /** Copyright 1996 Harvey Gilpin.					**/
 /************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "interpreter.h"

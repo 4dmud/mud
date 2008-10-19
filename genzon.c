@@ -4,7 +4,7 @@
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
 #include <sys/stat.h>
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

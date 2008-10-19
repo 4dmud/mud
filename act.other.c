@@ -163,7 +163,7 @@
  */
 #define __ACT_OTHER_C__
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

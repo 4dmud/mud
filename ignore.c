@@ -14,7 +14,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

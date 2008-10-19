@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "zlib.h"
 #include "compressor.h"

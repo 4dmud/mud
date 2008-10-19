@@ -36,7 +36,7 @@
 #include "db.h"
 #include "structs.h"
 #endif
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

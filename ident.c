@@ -15,7 +15,7 @@
  * $Id: ident.c,v 1.4 2007/08/23 20:41:29 w4dimenscor Exp $
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include <sys/socket.h>

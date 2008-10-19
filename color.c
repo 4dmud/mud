@@ -49,7 +49,7 @@
 
 #define _colour_c_
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

@@ -8,7 +8,7 @@
 
 #define __ASSEMBLIES_C__
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

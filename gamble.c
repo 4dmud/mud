@@ -11,7 +11,7 @@
 *                 All Modifications by Sean Mountcastle (Glasgian)        *
 \*********************************************************************** */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

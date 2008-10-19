@@ -3,7 +3,7 @@
  * If you add more olc options, be sure to add a case for it here. - Welcor
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

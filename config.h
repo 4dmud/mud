@@ -11,7 +11,10 @@
 
 /* Define to 1 if using `alloca.c'. */
 /* #undef C_ALLOCA */
+/* Define if your system has compression support in zlib. */
+#define HAVE_ZLIB 1
 
+#define HAVE_ZLIB_H 1
 /* Define to 1 if you have `alloca', as a function or macro. */
 #define HAVE_ALLOCA 1
 
@@ -161,9 +164,47 @@
 /* Define to 1 if you have the `strncasecmp' function. */
 #define HAVE_STRNCASECMP 1
 
+/* Define if you have the stricmp function.  */
+/* #undef HAVE_STRICMP */
+
+/* Define if you have the strlcpy function.  */
+#define HAVE_STRLCPY 0
+#define NEED_STRLCPY_PROTO 1
+
+/* Define if you have the strcasecmp function.  */
+#define HAVE_STRCASECMP 1
+
+/* Define if you have the strdup function.  */
+#define HAVE_STRDUP 1
+
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1
 
+/* Define if you have the snprintf function.  */
+#define HAVE_SNPRINTF 1
+/* Define if you have the vsnprintf function.  */
+#define HAVE_VSNPRINTF 1
+
+/* Define if you have the <arpa/inet.h> header file.  */
+#define HAVE_ARPA_INET_H 1
+
+/* Define if you have the <arpa/telnet.h> header file.  */
+#define HAVE_ARPA_TELNET_H 1
+
+/* Define if you have the <assert.h> header file.  */
+#define HAVE_ASSERT_H 1
+
+/* Define if you have the <crypt.h> header file.  */
+#define HAVE_CRYPT_H 1
+
+/* Define if you have the <errno.h> header file.  */
+#define HAVE_ERRNO_H 1
+
+/* Define if you have the <fcntl.h> header file.  */
+#define HAVE_FCNTL_H 1
+
+/* Define if you have the <limits.h> header file.  */
+#define HAVE_LIMITS_H 1
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
 /* #undef HAVE_SYS_DIR_H */
@@ -272,6 +313,11 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 /* #undef TM_IN_SYS_TIME */
 
+/* Define if we're compiling CircleMUD under any type of UNIX system.  */
+#define CIRCLE_UNIX 1
+
+/* Define if the system is capable of using crypt() to encrypt.  */
+#define CIRCLE_CRYPT 1 
 /* Version number of package */
 #define VERSION "@PACKAGE_VERSION@"
 

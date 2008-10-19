@@ -13,7 +13,7 @@
    usage: switch into an obj directory; type: delobjs <plrfile> <obj wildcard>
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

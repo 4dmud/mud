@@ -46,7 +46,7 @@
   - We have a ROOM_NOVIEW flag as well as a ROOM_NOENTER flag (used in act.movement.c)
 \************************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

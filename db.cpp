@@ -11,7 +11,7 @@
 
 #define __DB_C__
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include <dirent.h>
@@ -34,7 +34,6 @@
 #include "genobj.h"
 #include "genmob.h"
 #include "genwld.h"
-#include "xmlhelp.h"
 #include "assemblies.h"
 #include "trees.h"
 #include "damage.h"

@@ -9,7 +9,7 @@
  * out or worse.. Maybe I will hire Lauraina Bobbet to come visit you      *
  ************************************************************************ */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"
@@ -25,7 +25,7 @@
 #include "descriptor.h"
 
 /*  external vars  */
-extern int restrict;
+//extern int restrict;
 
 int in_arena = ARENA_OFF;
 int start_time;

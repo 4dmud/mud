@@ -122,7 +122,7 @@
  * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
  *
  */
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

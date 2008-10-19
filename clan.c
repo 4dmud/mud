@@ -6,7 +6,7 @@
  * CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
  **************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

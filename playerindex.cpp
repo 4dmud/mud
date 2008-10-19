@@ -10,7 +10,7 @@
 //
 //
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include <dirent.h>

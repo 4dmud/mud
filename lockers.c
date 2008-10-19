@@ -1,6 +1,6 @@
 /* locker code by mordecai (jamie nelson <mordecai@xtra.co.nz>) */
 /* 18 jan 2004 */
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

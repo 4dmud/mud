@@ -14,7 +14,7 @@ Written by Jeremy Elson (jelson@circlemud.org)
 
 *************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

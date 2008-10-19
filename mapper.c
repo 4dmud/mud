@@ -38,7 +38,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 #include "structs.h"

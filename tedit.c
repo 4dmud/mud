@@ -5,7 +5,7 @@
  * XXX: This needs Oasis-ifying.
  */
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"

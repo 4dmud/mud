@@ -9,7 +9,7 @@
 *  $Revision: 1.20 $
 **************************************************************************/
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 

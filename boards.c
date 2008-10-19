@@ -44,7 +44,7 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
 */
 
 
-#include "conf.h"
+#include "config.h"
 #include "sysdep.h"
 
 
