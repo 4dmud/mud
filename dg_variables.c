@@ -1109,7 +1109,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					else if ( !strcasecmp ( field, "hunt" ) )
 					{
-						if ( hunt_location ( & ( c ), STRUCT_IS_MOB ) )
+						if ( hunt_location ( GET_ID(c), STRUCT_IS_MOB ) )
 							snprintf ( str, slen, "1" );
 						else if ( HUNTING ( c ) )
 						{
@@ -2015,7 +2015,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					else if ( !strcasecmp ( field, "hunt" ) )
 					{
-						if ( hunt_location ( & ( o ), STRUCT_IS_OBJ ) )
+						if ( hunt_location ( GET_ID(o), STRUCT_IS_OBJ ) )
 							snprintf ( str, slen, "1" );
 						else
 							snprintf ( str, slen, "0" );

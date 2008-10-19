@@ -1153,7 +1153,7 @@ int first_word_is_name ( Character *ch, char * argument );
 int choose_real_abils ( Character *ch, char select, int amount );
 
 #define TRAVEL_LIST(thing) ((thing)->travel_list)
-int hunt_location ( void *thing, int type );
+int hunt_location ( long id, int type );
 void add_travel_point_by_pointer ( struct travel_point_data **tlist, room_vnum dest );
 void add_travel_point_by_thing ( void *thing, int type, room_vnum dest );
 void remove_travel_point_by_dest ( struct travel_point_data **tlist, room_vnum dest );

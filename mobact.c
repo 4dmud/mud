@@ -23,6 +23,7 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "graph.h"
+#include "dg_scripts.h"
 
 /* external structs */
 extern int no_specials;
@@ -50,18 +51,17 @@ void mobile_activity ( void )
 	struct obj_data *obj, *best_obj;
 	int door, found, max;
 	memory_rec *names;
-	obj_list_type tobjs;
+	vector<long> tobjs;
 
 	for ( olt_it ob = object_list.begin(); ob != object_list.end(); ob++ )
 	{
 		obj = ( ob->second );
 		if ( TRAVEL_LIST ( obj ) != NULL )
-			tobjs[GET_ID ( obj ) ] = obj;
+			tobjs.push_back(GET_ID ( obj ));
 	}
-	for ( olt_it ob = tobjs.begin(); ob != tobjs.end(); ob++ )
-	{
-		obj = ( ob->second );
-		hunt_location ( &obj, STRUCT_IS_OBJ );
+	while (!tobjs.empty()) {
+		hunt_location ( tobjs.back(), STRUCT_IS_OBJ );
+		tobjs.pop_back();
 	}
 
 	for ( ch = character_list; ch; ch = next_ch )
@@ -125,7 +125,7 @@ void mobile_activity ( void )
 		/* Mob Movement */
 		if ( ( GET_POS ( ch ) == POS_STANDING ) )   /* Thanks to suggestion by Geoff Hollis */
 		{
-			if ( hunt_location ( &ch, STRUCT_IS_MOB ) ) {}
+			if ( hunt_location ( GET_ID(ch), STRUCT_IS_MOB ) ) {}
 			else if ( HUNTING ( ch ) )
 			{
 				hunt_victim ( ch );
@@ -341,7 +341,7 @@ Character * parse_aggressive ( Character *ch )
 	return NULL;
 }
 
-int hunt_location ( void *thing, int type )
+int hunt_location ( long id, int type )
 {
 	int dir;
 	struct travel_point_data *tlist = NULL, *ttop = NULL;
@@ -351,13 +351,13 @@ int hunt_location ( void *thing, int type )
 	Character *mob = NULL;
 	int find_first_step ( room_rnum src, room_rnum target,bool honour_notrack=false );
 
-	if ( !thing )
-		return 0;
 
 	switch ( type )
 	{
 		case STRUCT_IS_MOB:
-			mob = * ( Character** ) thing;
+			mob = find_char(id);
+			if (mob == NULL)
+				return 0;
 			if ( ( curr_room = IN_ROOM ( mob ) ) == NULL )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( mob ) ) == NULL )
@@ -365,7 +365,9 @@ int hunt_location ( void *thing, int type )
 //			log ( "DEBUG: Mob vnum %d is hunting a location from room %d.", GET_MOB_VNUM ( mob ), IN_ROOM ( mob )->number );
 			break;
 		case STRUCT_IS_OBJ:
-			obj = * ( struct obj_data** ) thing;
+			obj = find_obj(id);
+			if (!obj)
+				return 0;
 			if ( ( curr_room = IN_ROOM ( obj ) ) == NULL )
 				return 0;
 			if ( ( ttop = TRAVEL_LIST ( obj ) ) == NULL )
