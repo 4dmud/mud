@@ -420,6 +420,7 @@ ACMD ( do_practice )
 	vector<Character *>::iterator mti;
 	Character *mob;
 	int train_list = -1;
+	int remorts = MIN(REMORTS(ch), 50);
 
 	if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
 		return;
@@ -519,8 +520,8 @@ ACMD ( do_practice )
 
 	percent = GET_SKILL ( ch, skill_num );
 	/* Cost In Gold */
-	cig = ( ( percent*4000 ) + ( REMORTS ( ch ) * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
-	if ( REMORTS ( ch ) > 2 && ch->Gold ( 0, GOLD_HAND ) < cig )
+	cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
+	if ( remorts > 2 && ch->Gold ( 0, GOLD_HAND ) < cig )
 	{
 		ch->Send ( "You need at least %lld gold coins to pay for practicing that.\r\n", cig );
 		return;

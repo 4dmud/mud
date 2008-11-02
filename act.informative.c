@@ -2160,6 +2160,7 @@ ACMD ( do_score )
 	float shortmulti = 1.0;
 	//  float damspeed = (DAM_SPEED_MULTI(ch));
 	float blocking = 0.0;
+	int remorts = MIN(REMORTS(ch), 50);
 bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch );
 
 	gld = goldy;
@@ -2226,8 +2227,8 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 
 			primin = FTOI ( primin * race_dam_mod ( GET_RACE ( ch ), 0 ) );
 			primax = FTOI ( primax * race_dam_mod ( GET_RACE ( ch ), 0 ) );
-			primin += FTOI ( ( ( float ) primin * ( ( ( float ) REMORTS ( ch ) * 0.005f ) ) ) );
-			primax += FTOI ( ( ( float ) primax * ( ( ( float ) REMORTS ( ch ) * 0.005f ) ) ) );
+			primin += FTOI ( ( ( float ) primin * ( ( ( float ) remorts * 0.005f ) ) ) );
+			primax += FTOI ( ( ( float ) primax * ( ( ( float ) remorts * 0.005f ) ) ) );
 
 			if ( GET_MASTERY ( ch, CLASS_GYPSY ) )
 			{
@@ -2252,8 +2253,8 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 			secmax = FTOI ( secmax * shortmulti );
 			secmin = FTOI ( secmin * race_dam_mod ( GET_RACE ( ch ), 0 ) );
 			secmax = FTOI ( secmax * race_dam_mod ( GET_RACE ( ch ), 0 ) );
-			secmin += FTOI ( ( float ) secmin * ( ( ( float ) REMORTS ( ch ) * 0.005f ) ) );
-			secmax += FTOI ( ( float ) secmax * ( ( ( float ) REMORTS ( ch ) * 0.005f ) ) );
+			secmin += FTOI ( ( float ) secmin * ( ( ( float ) remorts * 0.005f ) ) );
+			secmax += FTOI ( ( float ) secmax * ( ( ( float ) remorts * 0.005f ) ) );
 
 			if ( GET_MASTERY ( ch, CLASS_GYPSY ) )
 			{
@@ -2303,8 +2304,8 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 		*/
 		primin = FTOI ( primin * race_dam_mod ( GET_RACE ( ch ), TRUE ) );
 		primax = FTOI ( primax * race_dam_mod ( GET_RACE ( ch ), TRUE ) );
-		primin += FTOI ( primin * ( ( REMORTS ( ch ) * 0.005 ) ) );
-		primax += FTOI ( primax * ( ( REMORTS ( ch ) * 0.005 ) ) );
+		primin += FTOI ( primin * ( ( remorts * 0.005 ) ) );
+		primax += FTOI ( primax * ( ( remorts * 0.005 ) ) );
 		/*
 		primin *= damspeed;
 		primax *= damspeed;

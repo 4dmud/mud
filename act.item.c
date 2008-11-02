@@ -986,6 +986,7 @@ ACMD ( do_meld )
 void perform_meld ( Character *ch, OBJ_DATA *corpse )
 {
 	OBJ_DATA *item;
+	int remorts = MIN(REMORTS(ch), 50);
 	ch->Send ( "You meld with your corpse in a sudden flash of light.\r\nYou are dazed.\r\n" );
 	act ( "$n melds with $s corpse in a sudden flash of light!", FALSE, ch, 0, 0, TO_ROOM );
 	while ( ( item = corpse->contains ) )
@@ -995,12 +996,12 @@ void perform_meld ( Character *ch, OBJ_DATA *corpse )
 		get_check_money ( ch, item );
 	}
 
-	if ( REMORTS ( ch ) && !HERE ( corpse, ch ) )
+	if ( remorts != 0 && !HERE ( corpse, ch ) )
 	{
-		if ( REMORTS ( ch ) < 5 )
+		if ( remorts < 5 )
 			GET_WAIT_STATE ( ch ) = 5 RL_SEC;
 		else
-			GET_WAIT_STATE ( ch ) = REMORTS ( ch ) RL_SEC;
+			GET_WAIT_STATE ( ch ) = remorts RL_SEC;
 	}
 	extract_obj ( corpse );
 	save_corpses();

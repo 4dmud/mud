@@ -1070,21 +1070,22 @@ void do_start ( Character * ch )
  * This function controls the change to maxmove, maxmana, and maxhp for
  * each class every time they gain a level.
  */
-void advance_level ( Character * ch , bool silent)
+void advance_level ( Character * ch , bool silent )
 {
 	float add_hp = 0, add_mana = 0, add_move = 0;
 	unsigned i;
 	int num_melee_tier ( Character *ch );
 	int level = GET_LEVEL ( ch ), casttier = num_casting ( ch ), fightier = TIERS;
+int remorts = MIN(REMORTS(ch), 50);
 
 
 
 	add_hp += ( con_app[GET_CON ( ch ) ].hitp * current_class_is_tier_num ( ch ) );
 	//add_hp += MIN ( REMORTS ( ch ), 25 );
-	if ( REMORTS ( ch ) > 5 )
-		add_hp += ( REMORTS ( ch ) / 6 );
-	add_mana = MIN ( REMORTS ( ch ), 25 );
-	add_move = ( MIN ( REMORTS ( ch ), 25 ) * 0.5 );
+	if ( remorts > 5 )
+		add_hp += ( remorts / 6 );
+	add_mana = MIN ( remorts, 25 );
+	add_move = ( MIN ( remorts, 25 ) * 0.5 );
 
 	switch ( GET_CLASS ( ch ) )
 	{
@@ -1123,78 +1124,79 @@ void advance_level ( Character * ch , bool silent)
 			break;
 
 	}
-if (!silent) {
-	switch ( GET_LEVEL ( ch ) )
+	if ( !silent )
 	{
-		case 5:
-			if ( REMORTS ( ch ) == 0 )
-				ch->Send ( "{cRYou will now start to feel hungry and thirsty.\r\n"
-				           "So remember to eat and drink.\r\n{c0" );
-			if ( REMORTS ( ch ) < 2 )
-			{
-				ch->Send ( "{cYYou gain 50000 coins to your bank!{c0\r\n" );
-				ch->Gold ( 50000, GOLD_BANK );
-			}
-			break;
-		case 11:
-		case 18:
-		case 6:
-			if ( REMORTS ( ch ) == 0 && (PLR_FLAGGED(ch, PLR_NEEDS_CLASS) || PLR_FLAGGED(ch, PLR_NEEDS_STATS)))
-				ch->Send ( "{cRYou can choose a class to be at any time till level 20.{c0\r\nTo choose your class, and then your stats, type: {cGchoose class{c0 then {cGchoose stats{c0" );
-			
-			break;
-		case 10:
-			if ( REMORTS ( ch ) < 3 )
-			{
-				if ( REMORTS ( ch ) == 0 )
-					ch->Send ( "{cRYou will no longer be immune to death.\r\n"
-					           "When you die from now on you will \r\n"
-					           "need to retrieve your corpse.\r\n{c0" );
-				ch->Send ( "{cYYou gain 100000 coins to your bank!{c0\r\n" );
-				ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
-				GET_PRACTICES ( ch ) += 10;
-				ch->Gold ( 100000, GOLD_BANK );
+		switch ( GET_LEVEL ( ch ) )
+		{
+			case 5:
+				if ( remorts == 0 )
+					ch->Send ( "{cRYou will now start to feel hungry and thirsty.\r\n"
+					           "So remember to eat and drink.\r\n{c0" );
+				if ( remorts < 2 )
+				{
+					ch->Send ( "{cYYou gain 50000 coins to your bank!{c0\r\n" );
+					ch->Gold ( 50000, GOLD_BANK );
+				}
+				break;
+			case 11:
+			case 18:
+			case 6:
+				if ( remorts == 0 && ( PLR_FLAGGED ( ch, PLR_NEEDS_CLASS ) || PLR_FLAGGED ( ch, PLR_NEEDS_STATS ) ) )
+					ch->Send ( "{cRYou can choose a class to be at any time till level 20.{c0\r\nTo choose your class, and then your stats, type: {cGchoose class{c0 then {cGchoose stats{c0" );
 
-			}
-			break;
-		case 15:
-			if ( REMORTS ( ch ) < 4 )
-			{
-				ch->Send ( "{cYYou gain 1000000 coins to your bank!{c0\r\n" );
-				ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
-				GET_PRACTICES ( ch ) += 10;
-				ch->Gold ( 1000000, GOLD_BANK );
-			}
-			break;
-		case 20:
-			if ( REMORTS ( ch ) < 5 )
-			{
-				ch->Send ( "{cYYou gain 5000000 coins to your bank!{c0\r\n" );
-				ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
-				GET_PRACTICES ( ch ) += 10;
-				ch->Gold ( 5000000, GOLD_BANK );
-			}
-			break;
-		case 30:
-			if ( REMORTS ( ch ) < 6 )
-			{
-				ch->Send ( "{cYYou gain 10000000 coins to your bank!{c0\r\n" );
-				ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
-				GET_PRACTICES ( ch ) += 10;
-				ch->Gold ( 10000000, GOLD_BANK );
-			}
-			break;
-		case 45:
-			if ( REMORTS ( ch ) < 7 )
-			{
-				ch->Send ( "{cYYou gain 25000000 coins to your bank!{c0\r\n" );
-				ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
-				GET_PRACTICES ( ch ) += 20;
-				ch->Gold ( 25000000, GOLD_BANK );
-			}
-			break;
+				break;
+			case 10:
+				if ( remorts < 3 )
+				{
+					if ( remorts == 0 )
+						ch->Send ( "{cRYou will no longer be immune to death.\r\n"
+						           "When you die from now on you will \r\n"
+						           "need to retrieve your corpse.\r\n{c0" );
+					ch->Send ( "{cYYou gain 100000 coins to your bank!{c0\r\n" );
+					ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
+					GET_PRACTICES ( ch ) += 10;
+					ch->Gold ( 100000, GOLD_BANK );
+
+				}
+				break;
+			case 15:
+				if ( remorts < 4 )
+				{
+					ch->Send ( "{cYYou gain 1000000 coins to your bank!{c0\r\n" );
+					ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
+					GET_PRACTICES ( ch ) += 10;
+					ch->Gold ( 1000000, GOLD_BANK );
+				}
+				break;
+			case 20:
+				if ( remorts < 5 )
+				{
+					ch->Send ( "{cYYou gain 5000000 coins to your bank!{c0\r\n" );
+					ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
+					GET_PRACTICES ( ch ) += 10;
+					ch->Gold ( 5000000, GOLD_BANK );
+				}
+				break;
+			case 30:
+				if ( remorts < 6 )
+				{
+					ch->Send ( "{cYYou gain 10000000 coins to your bank!{c0\r\n" );
+					ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
+					GET_PRACTICES ( ch ) += 10;
+					ch->Gold ( 10000000, GOLD_BANK );
+				}
+				break;
+			case 45:
+				if ( remorts < 7 )
+				{
+					ch->Send ( "{cYYou gain 25000000 coins to your bank!{c0\r\n" );
+					ch->Send ( "{cYYou gain 10 bonus practice sessions!{c0\r\n" );
+					GET_PRACTICES ( ch ) += 20;
+					ch->Gold ( 25000000, GOLD_BANK );
+				}
+				break;
+		}
 	}
-}
 
 	GET_MAX_HIT ( ch ) += MAX ( 1, FTOI ( add_hp ) );
 	GET_MAX_MOVE ( ch ) += MAX ( 1, FTOI ( add_move ) );
@@ -1531,24 +1533,28 @@ void init_spell_levels ( void )
 
 gold_int group_exp_needed ( Character *ch )
 {
+	int remorts = MIN ( REMORTS ( ch ), 50 );
 	if ( IS_NPC ( ch ) )
 		return 0;
 	else
-		return ( gold_int ) ( ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, current_class_is_tier_num ( ch ), REMORTS ( ch ) ) * 0.2 ) ) - GET_GROUP_EXP ( ch );
+		return ( gold_int ) ( ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, current_class_is_tier_num ( ch ), remorts ) * 0.2 ) ) - GET_GROUP_EXP ( ch );
 }
 
 gold_int exp_needed ( Character *ch )
 {
+	int remorts = MIN ( REMORTS ( ch ), 50 );
 	if ( IS_NPC ( ch ) )
 		return 0;
 	else
-		return ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, current_class_is_tier_num ( ch ), REMORTS ( ch ) ) - GET_EXP ( ch ) );
+		return ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, current_class_is_tier_num ( ch ), remorts ) - GET_EXP ( ch ) );
 }
 
 /* Function to return the exp required for each class/level/tier */
 gold_int level_exp ( int chclass, int level, int tier, int remorts )
 {
 	gold_int multi, amount;
+	if ( remorts > 50 )
+		remorts = 50;
 #define mod 17
 	if ( level > MAX_MOB_LEVELS-1 || level < 0 )
 	{

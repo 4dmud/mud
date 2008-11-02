@@ -1111,6 +1111,7 @@ ACMD ( do_recover )
 	int num = 0, found = 0;
 	gold_int amt;
 	struct obj_data *obj = NULL;
+	int remorts = MIN(REMORTS(ch), 50);
 	void perform_meld ( Character *ch, OBJ_DATA *corpse );
 
 	struct corpse_list_data *temp = NULL, *tnext;
@@ -1129,7 +1130,7 @@ ACMD ( do_recover )
 	else
 		amt = GET_LEVEL ( ch ) * 50000;
 
-	amt += REMORTS ( ch ) * 500000;
+	amt += remorts * 500000;
 	/* charge the character */
 	if ( ch->Gold ( 0, GOLD_BANK ) < amt )
 	{

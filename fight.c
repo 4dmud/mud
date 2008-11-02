@@ -1315,8 +1315,9 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 	if ( !IS_NPC ( ch ) )
 	{
+		int remorts = MIN(REMORTS(ch), 50);
 		damage *= race_dam_mod ( GET_RACE ( ch ), IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) );
-		damage += ( ( float ) damage * ( ( float ) ( REMORTS ( ch ) * 0.005 ) ) );
+		damage += ( ( float ) damage * ( ( float ) ( remorts * 0.005 ) ) );
 	}
 
 	if ( wep && AFF_FLAGGED ( vict, AFF_BRACE ) && damage > 3 )
@@ -4943,6 +4944,7 @@ void make_corpse ( Character *ch, Character *killer )
 {
 	struct obj_data *corpse = NULL, *o, *next_obj;
 	struct obj_data *money;
+	int remorts = MIN(REMORTS(ch), 50);
 	int i, x, y;
 	char buf2[MAX_INPUT_LENGTH];
 
@@ -5035,7 +5037,7 @@ void make_corpse ( Character *ch, Character *killer )
 			if ( GET_LEVEL ( ch ) > LVL_IMMORT )
 				GET_OBJ_TIMER ( corpse ) = 1;
 			else
-				GET_OBJ_TIMER ( corpse ) = IRANGE ( 10, 10 + ( REMORTS ( ch ) * 4 ), 60 );
+				GET_OBJ_TIMER ( corpse ) = IRANGE ( 10, 10 + ( remorts * 4 ), 60 );
 		}
 
 		/* transfer character's inventory to the corpse */

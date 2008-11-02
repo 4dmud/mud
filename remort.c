@@ -51,13 +51,14 @@ int num_casting ( Character *ch );
 
 void remort_char ( Character *ch )
 {
+	int remorts = MIN(REMORTS(ch), 50);
 	GET_LEVEL ( ch ) = 1;
 	GET_EXP ( ch ) = 1;
 	GET_GROUP_EXP ( ch ) = 1;
 
 	REMORTS ( ch ) ++;
-	GET_MAX_HIT ( ch ) = 30 + REMORTS ( ch );
-	GET_MAX_STAMINA ( ch ) = 100 + REMORTS ( ch );
+	GET_MAX_HIT ( ch ) = 30 + remorts;
+	GET_MAX_STAMINA ( ch ) = 100 + remorts;
 	if ( GET_CLAN ( ch ) == 12 )
 	{
 		GET_CLAN ( ch ) = 0;
