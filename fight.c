@@ -471,8 +471,7 @@ struct attack_hit_type attack_hit_text[] =
 };
 struct hit_chance_type chance_message[] =
 {
-	{"", ""
-	}
+	{"", ""}
 	,               /*should never see this one */
 	{"graze", "grazes"},
 	{"strike", "strikes"},
@@ -4696,7 +4695,8 @@ void dam_message ( int dam, Character *ch, Character *victim,
 		{"do {cRSAVAGE{cy things to", "does {cRSAVAGE{cr things to", "does {cRSAVAGE{c0 things to"},//30
 		{"do {cRDISGUSTING{cy things to", "does {cRDISGUSTING{cr things to", "does {cRDISGUSTING{c0 things to"},//31
 		{"do {cRHELLISH{cy things to", "does {cRHELLISH{cr things to", "does {cRHELLISH{c0 things to"},//32
-		{"do {cRTERMINAL{cy things to", "does {cRTERMINAL{cr things to", "does {cRTERMINAL{c0 things to"}//33
+		{"do {cRTERMINAL{cy things to", "does {cRTERMINAL{cr things to", "does {cRTERMINAL{c0 things to"},//33
+		{"do {cRTERMINAL{cy things to", "does {cPTERMINAL{cr things to", "does {cPTERMINAL{c0 things to"}//34
 
 	};
 
@@ -4799,9 +4799,10 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			act ( "You hurt $N.", FALSE, ch, NULL, victim, TO_CHAR );
 		else
 		{
+			int chance_m = MAX(MIN(( int ) ATK_CHANCE ( ch ), 3), 0);
 			fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt, type_save, FE_TO_CHAR );
 			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s.",
-			           chance_message[ ( int ) ATK_CHANCE ( ch ) ].singular, dam_size[msgnum].sing, buf );
+			           chance_message[ chance_m ].singular, dam_size[msgnum].sing, buf );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_CHAR );
 		}
 
