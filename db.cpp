@@ -4362,8 +4362,10 @@ void reset_zone ( zone_rnum zone )
 					{
 						if ( !get_obj_in_list_num ( ZCMD.arg1, world_vnum[ZCMD.arg3]->contents ) )
 						{
+							bool lqc = load_qic_check ( ZCMD.arg1 );
+							/** we need to treat QIC items as if they loaded, so that the other items in the list with a QIC item can load still  - mord**/
 							obj = read_object ( ZCMD.arg1, REAL );
-							if ( obj && load_qic_check ( ZCMD.arg1 ) )
+							if ( obj && lqc )
 							{
 								obj_to_room ( obj, world_vnum[ZCMD.arg3] );
 								if ( load_otrigger ( obj ) == -1 )
@@ -4377,11 +4379,10 @@ void reset_zone ( zone_rnum zone )
 								{
 									purge_qic ( ZCMD.arg1 );
 									extract_obj ( obj );
-									obj = NULL;
-								}
-
-								tobj = obj;
-								last_cmd = false;
+									tobj = obj = NULL;
+									last_cmd = true;
+								} else
+								last_cmd = false; 
 							}
 
 						}
@@ -4415,8 +4416,9 @@ void reset_zone ( zone_rnum zone )
 						//ZCMD.command = '*';
 						break;
 					}
+					bool lqc = load_qic_check ( ZCMD.arg1 );
 					obj = read_object ( ZCMD.arg1, REAL );
-					if ( obj && load_qic_check ( ZCMD.arg1 ) )
+					if ( obj && lqc )
 					{
 						obj_to_obj ( obj, obj_to );
 						if ( load_otrigger ( obj ) == -1 )
@@ -4431,10 +4433,9 @@ void reset_zone ( zone_rnum zone )
 						{
 							purge_qic ( ZCMD.arg1 );
 							extract_obj ( obj );
-							obj = NULL;
-						}
-
-						tobj = obj;
+							tobj = obj = NULL;
+							last_cmd = true;
+						}else 
 						last_cmd = false;
 					}
 				}
@@ -4455,8 +4456,9 @@ void reset_zone ( zone_rnum zone )
 				}
 				if ( obj_index[ZCMD.arg1].number < ZCMD.arg2 )
 				{
+					bool lqc = load_qic_check ( ZCMD.arg1 );
 					obj = read_object ( ZCMD.arg1, REAL );
-					if ( obj && load_qic_check ( ZCMD.arg1 ) )
+					if ( obj && lqc )
 					{
 						obj_to_char ( obj, mob );
 						if ( load_otrigger ( obj ) == -1 )
@@ -4472,9 +4474,9 @@ void reset_zone ( zone_rnum zone )
 						{
 							purge_qic ( ZCMD.arg1 );
 							extract_obj ( obj );
-							obj = NULL;
-						}
-						tobj = obj;
+							tobj = obj = NULL;
+							last_cmd = true;
+						} else
 						last_cmd = false;
 					}
 				}
@@ -4502,8 +4504,9 @@ void reset_zone ( zone_rnum zone )
 					else
 					{
 						int ret=-1;
+						bool lqc = load_qic_check ( ZCMD.arg1 );
 						obj = read_object ( ZCMD.arg1, REAL );
-						if ( obj && load_qic_check ( ZCMD.arg1 ) )
+						if ( obj && lqc )
 						{
 							IN_ROOM ( obj ) = IN_ROOM ( mob );
 							if ( load_otrigger ( obj ) == -1 )
@@ -4535,7 +4538,7 @@ void reset_zone ( zone_rnum zone )
 							else
 							{
 								obj = NULL;
-								last_cmd = false;
+								last_cmd = !lqc;
 								tobj = NULL;
 							}
 						}
@@ -4545,8 +4548,9 @@ void reset_zone ( zone_rnum zone )
 							{
 								purge_qic ( ZCMD.arg1 );
 								extract_obj ( obj );
-								obj = NULL;
-							}
+								tobj = obj = NULL;
+								last_cmd = true;
+							} else
 							last_cmd = false;
 						}
 					}
@@ -4739,8 +4743,9 @@ void reset_zone ( zone_rnum zone )
 						if ( !get_obj_in_list_num
 						        ( ZCMD.arg1, world_vnum[ZCMD.arg3]->contents ) )
 						{
+							bool lqc = load_qic_check ( ZCMD.arg1 );
 							obj = read_object ( ZCMD.arg1, REAL );
-							if ( obj && load_qic_check ( ZCMD.arg1 ) )
+							if ( obj && lqc )
 							{
 								obj_to_room ( obj, world_vnum[ZCMD.arg3] );
 								if ( load_otrigger ( obj ) == -1 )
@@ -4755,11 +4760,11 @@ void reset_zone ( zone_rnum zone )
 							{
 								if ( obj )
 								{
-									//        purge_qic(ZCMD.arg1);
+									purge_qic(ZCMD.arg1);
 									extract_obj ( obj );
-									obj = NULL;
-									tobj = obj;
-								}
+									tobj = obj = NULL;
+									last_cmd = false;
+								} else
 								last_cmd = false;
 							}
 						}
