@@ -5344,7 +5344,7 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			SET_OR_REMOVE ( PRF_FLAGS ( vict ), PRF_COLOUR_2 );
 			break;
 		case 44:
-			if ( GET_IDNUM ( ch ) != 1 || !IS_NPC ( vict ) )
+			if ( !IS_NPC ( vict ) )
 				return ( 0 );
 			GET_IDNUM ( vict ) = value;
 			break;

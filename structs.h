@@ -1615,7 +1615,7 @@ struct room_mine_data {
     int dif;
     int tool;
     room_mine_data() {
-        num = 0;
+        num = -1;
         dif = 0;
         tool = 0;
     }
