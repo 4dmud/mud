@@ -740,7 +740,7 @@ int Crash_is_unrentable(struct obj_data *obj)
   if (GET_OBJ_TYPE(obj) == ITEM_KEY && OBJ_FLAGGED(obj, ITEM_KEYSTAY))
     return 0;
 
-  if (IS_OBJ_STAT(obj, ITEM_NORENT))
+  if (IS_OBJ_STAT(obj, ITEM_NORENT) || GET_OBJ_TYPE(obj) == ITEM_KEY)
     return 1;
 
   return 0;
