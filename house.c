@@ -589,8 +589,8 @@ void House_boot ( void )
 		if ( feof ( fl ) )
 			break;
 
-		if ( pi.NameById ( temp_house.owner ) == NULL )
-			continue;		/* owner no longer exists -- skip */
+		//if ( pi.NameById ( temp_house.owner ) == NULL )
+		//	continue;		/* owner no longer exists -- skip */
 
 		log ( "Reading house: %d.", temp_house.vnum );
 
@@ -634,8 +634,27 @@ void House_boot ( void )
 	fclose ( fl );
 	House_save_control();
 }
+void purge_room ( int vnum )
+{
+	obj_data *obj, *obj_next;
+	if ( !real_room ( vnum ) )
+		return;
+	for ( obj = real_room ( vnum )->contents; obj; obj = obj_next )
+	{
+		obj_next = obj->next_content;
+		extract_obj ( obj );
+	}
 
+}
+void Hcontrol_reload ( int vnum )
+{
+	log ( "Reloading house: %d.", vnum );
 
+	if ( ( real_room ( vnum ) ) == NULL )
+		return;		/* this vnum doesn't exist -- skip */
+	House_load ( vnum );
+
+}
 
 /* "House Control" functions */
 
@@ -645,6 +664,7 @@ const char *HCONTROL_FORMAT =
     "       hcontrol pay <house vnum>\r\n"
     "       hcontrol show\r\n"
     "       hcontrol save\r\n"
+    "       hcontrol reload <house vnum>\r\n"
     "       hcontrol listrent <house vnum>\r\n"
     "       hcontrol calc <house vnum>\r\n"
     "       hcontrol stable <house vnum>\r\n"
@@ -668,8 +688,8 @@ void hcontrol_list_houses ( Character *ch )
 	for ( i = 0; i < num_of_houses; i++ )
 	{
 		/* Avoid seeing <UNDEF> entries from self-deleted people. -gg 6/21/98 */
-		if ( ( temp = pi.NameById ( house_control[i].owner ) ) == NULL )
-			continue;
+		//if ( ( temp = pi.NameById ( house_control[i].owner ) ) == NULL )
+		//	continue;
 
 		if ( house_control[i].built_on )
 		{
@@ -919,6 +939,11 @@ ACMD ( do_hcontrol )
 	{
 		House_save_all();
 		send_to_char ( "Save complete.\r\n", ch );
+	}
+	else if ( is_abbrev ( arg1, "reload" ) )
+	{
+		Hcontrol_reload ( atoi ( arg2 ) );
+		send_to_char ( "Reload complete.\r\n", ch );
 	}
 	else if ( is_abbrev ( arg1, "listrent" ) )
 		House_listrent ( ch, atoi ( arg2 ) );
