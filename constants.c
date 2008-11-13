@@ -2093,7 +2093,7 @@ const char *spell_wear_off_msg[] =
 	"Your mind's protection crumbles away.",
 	"Your body's protection crumbles away.",
 	"You wake up from the most refreshing dream.",
-	"Your devine guidence leaves you.",
+	"Your devine guidance leaves you.",
 	"Feeling returns to your mind.",
 	"The feeling of lethargy falls from your muscles.",
 	"Your wings weaken, shrivel and fall off.",
