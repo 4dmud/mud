@@ -690,7 +690,7 @@ void hcontrol_list_houses ( Character *ch )
 		/* Avoid seeing <UNDEF> entries from self-deleted people. -gg 6/21/98 */
 		//if ( ( temp = pi.NameById ( house_control[i].owner ) ) == NULL )
 		//	continue;
-		temp = pi.NameById ( house_control[i].owner )
+		temp = pi.NameById ( house_control[i].owner );
 
 		if ( house_control[i].built_on )
 		{
