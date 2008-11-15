@@ -690,6 +690,7 @@ void hcontrol_list_houses ( Character *ch )
 		/* Avoid seeing <UNDEF> entries from self-deleted people. -gg 6/21/98 */
 		//if ( ( temp = pi.NameById ( house_control[i].owner ) ) == NULL )
 		//	continue;
+		temp = pi.NameById ( house_control[i].owner )
 
 		if ( house_control[i].built_on )
 		{
@@ -710,7 +711,7 @@ void hcontrol_list_houses ( Character *ch )
 			strcpy ( last_pay, "None" );
 
 		/* Now we need a copy of the owner's name to capitalize. -gg 6/21/98 */
-		strcpy ( own_name, temp );
+		strcpy ( own_name, temp != NULL ? temp : "<deleted>" );
 
 		ch->Send ( "%7d %7d  %-10s    %2d    %-12s %-13ld %-5d %-6s\r\n",
 		           house_control[i].vnum, house_control[i].atrium, built_on,
