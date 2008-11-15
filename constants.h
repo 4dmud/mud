@@ -48,6 +48,7 @@ extern const char *age_desc_tree[];
 extern const char *tree_names[];
 extern const char *potion_names[];
 extern const char *stance_change[];
+extern const char *fly_stance_change[];
 extern const char *zone_bits[];
 extern const char *elemental_types[];
 extern const char *tunnel_msgs[];

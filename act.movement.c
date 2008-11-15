@@ -45,6 +45,7 @@ int move_fusion ( Character *ch, int dir );
 void hit_death_trap ( Character *ch );
 void raw_kill ( Character *ch, Character * vict );
 ACMD ( do_drive );
+int even_group ( Character *ch );
 
 /* MatingMod Defines */
 #define NINE_MONTHS     6000  /* 6000 realtime minutes TO GO */
@@ -2198,6 +2199,7 @@ ACMD ( do_leader )
 			}
 
 		}
+		even_group ( leader );
 	}
 
 }

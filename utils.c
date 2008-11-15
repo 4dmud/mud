@@ -861,10 +861,15 @@ void stop_follower ( Character *ch )
 /* Called when a character that follows/is followed dies */
 void die_follower ( Character *ch )
 {
+int even_group ( Character *ch );
 	struct follow_type *j, *k;
 
 	if ( ch->master )
+	{
+		even_group ( ch->master );
 		stop_follower ( ch );
+	}
+
 
 	for ( k = ch->followers; k; k = j )
 	{
@@ -879,6 +884,7 @@ void die_follower ( Character *ch )
 /* will arise. CH will follow leader                               */
 void add_follower ( Character *ch, Character *leader )
 {
+int even_group ( Character *ch );
 	struct follow_type *k;
 
 	if ( ch->master )
@@ -895,6 +901,7 @@ void add_follower ( Character *ch, Character *leader )
 	k->next = leader->followers;
 	leader->followers = k;
 	GET_PERC ( ch ) = 0.0;
+	even_group ( leader );
 
 	act ( "You now follow $N.", FALSE, ch, 0, leader, TO_CHAR );
 	if ( CAN_SEE ( leader, ch ) )

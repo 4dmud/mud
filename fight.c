@@ -306,7 +306,7 @@ so that spell affects arent done at time of casting and damage is done at time o
 #include "descriptor.h"
 #include "strutil.h"
 
-
+#define EXP_GAIN_SYSTEM_2 1
 /* External structures */
 extern struct message_list fight_messages[MAX_MESSAGES];
 
@@ -853,9 +853,11 @@ void start_fighting ( Character* ch, Character* vict )
 	/*to stop recursion*/
 	if ( !ch || !vict )
 		return;
+#if defined(EXP_GAIN_SYSTEM_1)
 	if ( RIDDEN_BY ( vict ) )
 		victim = vict->RiderHere() ? RIDDEN_BY ( vict ) : vict;
 	else
+#endif
 		victim = vict;
 
 	if ( !victim || DEAD ( ch ) || DEAD ( victim ) || !HERE ( ch, victim ) || SELF ( ch, victim ) )
@@ -988,14 +990,15 @@ Character *find_random_victim ( Character *ch )
 
 void start_fighting_delay ( Character *ch, Character *vict )
 {
-	Character *victim;
+	Character *victim = vict;
 	/*to stop recursion*/
 	if ( !ch || !vict )
 		return;
 	if ( DEAD ( ch ) || DEAD ( vict ) )
 		return;
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	victim = vict->RiderHere() ? RIDDEN_BY ( vict ) : vict;
+#endif
 
 	if ( !HERE ( ch, victim ) || SELF ( ch, victim ) )
 		return;
@@ -1034,8 +1037,11 @@ int next_round ( Character* ch )
 		return 0;
 	if ( DEAD ( ch ) )
 		return 0;
+	victim = FIGHTING(ch);
+#if defined(EXP_GAIN_SYSTEM_1)
 	if ( ( victim = FIGHTING ( ch ) ) != NULL )
 		victim = victim->RiderHere() ? RIDDEN_BY ( victim ) : victim;
+#endif
 
 	/* check to see if there is anyone in the room fighting you however! */
 	if ( !victim )
@@ -1057,7 +1063,7 @@ int next_round ( Character* ch )
 
 	if ( GET_FIGHT_EVENT ( ch ) != NULL )
 	{
-		log ( "%s has %ld more time left till fight event", GET_NAME ( ch ), event_time ( ( struct event * ) GET_FIGHT_EVENT ( ch ) ) );
+		/*log ( "%s has %ld more time left till fight event", GET_NAME ( ch ), event_time ( ( struct event * ) GET_FIGHT_EVENT ( ch ) ) );*/
 		return 0;
 	}
 
@@ -1196,9 +1202,15 @@ void skill_attack ( Character *ch, Character *vict, int skill, int pass )
 		else if ( IS_SPELL_CAST ( skill ) && ( IS_SET ( spell_info[skill].routines, MAG_AREAS ) || GET_SPELL_DIR ( ch ) != NOWHERE ) )
 			fight_event_hit ( ch, vict, 0, skill );
 		else
-		{
+		{			
 			if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
-				ch->Send ( "%s", stance_change[number ( 0, 2 ) ] );
+			{
+				if ( ch->Flying() )
+					ch->Send ( "%s", stance_change[number ( 0, 2 ) ] );
+				else
+					ch->Send ( "%s", fly_stance_change[number ( 0, 2 ) ] );
+			}
+
 			GET_NEXT_SKILL ( ch ) = skill;
 			GET_NEXT_VICTIM ( ch ) = GET_ID ( vict );
 		}
@@ -1323,14 +1335,14 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	{
 		if ( !skill_cost ( 0, 0, 20, vict ) )
 		{
-			send_to_char ( "You try and brace but are too exausted!!\r\n", vict );
+			vict->Send( "You try and brace but are too exausted!!\r\n" );
 		}
 		else
 		{
 
 			damage -= damage/3;
 
-			send_to_char ( "You were braced against the damage!\r\n", vict );
+			vict->Send( "You were braced against the damage!\r\n" );
 		}
 	}
 	if ( !IS_NPC ( vict ) && GET_COND ( vict, DRUNK ) > 10 && damage > 5 )
@@ -1357,12 +1369,13 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 
 	/**TODO: this needs to be fixed up and finished (currently crashes us)**/
-	/*
+/** FIXED - Nov 9th 08 Mord */
+	
 	if (immune_to(vict, elemental_type(w_type)))
 	  damage = 0;
 
 	damage += (damage * (resist_elem(vict, elemental_type(w_type) * 0.01)));
-	  */
+	  
 	if ( AFF_FLAGGED ( vict, AFF_SANCTUARY ) )
 	{
 		if ( GET_CLASS ( ch ) == CLASS_WARRIOR && ( GET_SUB ( ch, SUB_REPEL_SANC ) > number ( 0, 150 ) ) )
@@ -1395,9 +1408,6 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 		damage += ( damage/6 ); //16% addition
 
 
-
-
-
 	if ( wep )
 	{
 		damage *= ( 100.0 - ( float ) chance_hit_part ( vict, GET_ATTACK_POS ( ch ) ) ) /100.0;
@@ -1424,12 +1434,12 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	{
 		int v, dist = magic_distance ( ch, w_type, GET_SPELL_DIR ( ch ), vict );
 		for ( v = 0; v < dist; v++ )
-			dam /= 2;
+			damage /= 2;
 	}
-
-	/* half of your involvement percantage is taken from the dam you do */
-	dam -= ( ( 100 - valid_perc ( ch ) ) * dam ) /200;
-
+#if defined(EXP_GAIN_SYSTEM_1)
+	/* half of your involvement percentage is taken from the dam you do */
+	damage -= ( ( 100 - valid_perc ( ch ) ) * damage ) /200;
+#endif
 
 	return ( int ) damage;
 }
@@ -1695,6 +1705,7 @@ int accuracy_tot ( Character *attacker )
 	accuracy_roll += total_chance ( attacker, SKILL_MELEE ) /2;
 	accuracy_roll += total_chance ( attacker, SKILL_SECOND_ATTACK );
 	accuracy_roll += total_chance ( attacker, SKILL_THIRD_ATTACK );
+/** This means that if you have a big group, you have more chance of hitting the victim **/
 	if ( FIGHTING ( attacker ) )
 	{
 		k = ( FIGHTING ( attacker )->master ? FIGHTING ( attacker )->master : FIGHTING ( attacker ) );
@@ -1702,6 +1713,7 @@ int accuracy_tot ( Character *attacker )
 			if ( !DEAD ( FIGHTING ( attacker ) ) && HERE ( f->follower,attacker ) && FIGHTING ( f->follower ) == attacker )
 				accuracy_roll += 10;
 	}
+
 
 
 	if ( !IS_NPC ( attacker ) )
@@ -1755,8 +1767,9 @@ int accuracy_tot ( Character *attacker )
 
 	accuracy_roll += get_weapon_accuracy ( GET_EQ ( attacker, WEAR_WIELD ) );
 	accuracy_roll += get_weapon_accuracy ( GET_EQ ( attacker, WEAR_WIELD_2 ) );
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	accuracy_roll = ( valid_perc ( attacker ) * accuracy_roll ) /100;
+#endif
 	accuracy_roll = ( accuracy_roll <= 0 ? 1 : accuracy_roll );
 
 	return accuracy_roll;
@@ -1786,10 +1799,10 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 	struct follow_type *f;
 	int perc = 0;
 	int shortwep = 0;
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	if ( vict && vict->RiderHere() )
 		vict = RIDDEN_BY ( vict );
-
+#endif
 	if ( !can_fight ( ch, vict, FALSE ) )
 		return -1;
 
@@ -1874,7 +1887,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 	}
 
 	GET_NEXT_SKILL ( ch ) = TYPE_UNDEFINED;
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	/** Make sure that:
 	    - You have group members
 	    - That are in the same room as you
@@ -1909,6 +1922,7 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 			}
 		}
 	}
+#endif
 
 
 	/* no auto assist if in same group */
@@ -1934,7 +1948,11 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 					continue; /* Skip if any of these are true */
 				if ( FIGHTING ( f->follower ) )
 					continue;
-				if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) && !RIDDEN_BY ( f->follower ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
+#if defined(EXP_GAIN_SYSTEM_1)
+				if (!RIDDEN_BY(f->follower))
+				continue
+#endif
+				if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
 				{
 					start_fighting_delay ( f->follower, vict );
 				}
@@ -2253,7 +2271,7 @@ int fe_solo_damage ( Character* ch, Character* vict,
 
 
 	damage = modify_dam ( damage, ch, vict, w_type );
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	if ( IS_NPC ( vict ) )
 		damage = IRANGE ( 0, damage, MAX_MOB_DAM );
 	else
@@ -2263,10 +2281,10 @@ int fe_solo_damage ( Character* ch, Character* vict,
 		else
 			damage = IRANGE ( 0, damage, MAX_PLAYER_DAM );
 	}
-
+#endif
 	return fe_after_damage ( ch, vict, damage, w_type );
 }
-
+#if defined(EXP_GAIN_SYSTEM_1)
 Character *find_next_target ( Character *ch )
 {
 	Character *k = ( ch->master != NULL ? ch->master : ch );
@@ -2318,6 +2336,8 @@ Character *find_next_target ( Character *ch )
 	/* somehow didn't find anything right */
 	return ch;
 }
+#endif
+#if defined(EXP_GAIN_SYSTEM_1)
 /* When we're hitting a group of actual players, this gets
    called so that we break up the damage between them.
    ch is hitting vict and all the people in his group that
@@ -2413,6 +2433,7 @@ int fe_group_damage ( Character* ch, Character* vict,
 	return to_ret;
 }
 
+#endif
 int valid_perc ( Character *ch )
 {
 
@@ -2422,7 +2443,7 @@ int valid_perc ( Character *ch )
 	room_rnum rm = IN_ROOM ( ch );
 	float total_perc = 0.0;
 
-	/* also make sure that noone that is attacked and has 0 involvement but isnt with the group is counted.
+	/* also make sure that noone that is attacked and has 0 involvement but isn't with the group is counted.
 	   if you have 0 involvement and are alone you should get full attacks.
 	   */
 
@@ -2484,6 +2505,7 @@ int fe_deal_damage ( Character* ch, Character* vict,
 	        HERE ( ch, vict ) ||
 	        ( RIDDEN_BY ( ch ) && ( HERE ( ch, RIDDEN_BY ( ch ) ) ) ) )   /* solo artest or normal damage -- no master whack em! */
 	{
+#if defined(EXP_GAIN_SYSTEM_1)
 		if ( RIDDEN_BY ( vict ) && HERE ( RIDDEN_BY ( vict ), ch ) )
 		{
 			FIGHTING ( ch ) = RIDDEN_BY ( vict );
@@ -2493,11 +2515,13 @@ int fe_deal_damage ( Character* ch, Character* vict,
 			//return 0;
 		}
 		else
+#endif
 			return fe_solo_damage ( ch, vict, dam, w_type );
 
 	}
 	else if ( master )
 	{
+#if defined(EXP_GAIN_SYSTEM_1)
 		if ( HERE ( master, vict ) )   /* victim isnt the master! -- find the master and whack em! */
 		{
 			//stop_fighting(ch);
@@ -2507,6 +2531,7 @@ int fe_deal_damage ( Character* ch, Character* vict,
 			FIGHTING ( ch ) = master;
 		}
 		else /* victim is not in the same room as their master -- whack em only */
+#endif
 			return fe_solo_damage ( ch, vict, dam, w_type );
 	}
 	/*victim is the master of the group -- so whack the group */
@@ -2655,11 +2680,11 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 	}
 	if ( GET_HIT ( ch ) < GET_MAX_HIT ( ch ) && ( hp= ( ( dam*hp ) /100.0 ) ) > 0.0 )
 	{
-		/* TODO: add ramdom message's for this */
+		/* TODO: add random message's for this */
 		act ( "$n steals your energy.", FALSE, ch, 0, vict, TO_VICT );
 		act ( "You steal $N's energy.", FALSE, ch, 0, vict, TO_CHAR );
 		damage ( vict,ch, FTOI ( -hp ), TYPE_UNDEFINED );
-		//ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
+		ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
 	}
 
 
@@ -2715,7 +2740,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 
 	if ( dam )
 	{
-
+#if defined(EXP_GAIN_SYSTEM_1)
 		if ( RIDING ( vict ) && HERE ( RIDING ( vict ), vict ) && RIDING ( vict ) != ch )
 		{
 			partial = ( ( ( dam/2 ) * ( 250 - total_chance ( vict, SKILL_MOUNTED_COMBAT ) ) ) /250 );
@@ -2724,6 +2749,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 			// return -1;
 		}
 		else
+#endif
 			partial = dam;
 
 		if ( !IS_NPC ( ch ) && GET_SUB ( ch, SUB_SWEEP_ATTACK ) > 0 && partial > 0 )
@@ -2756,6 +2782,8 @@ int fe_after_damage ( Character* ch, Character* vict,
 		update_pos ( vict );
 		if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
 		{
+
+#if defined(EXP_GAIN_SYSTEM_1)
 			if ( RIDING ( ch ) && HERE ( ch, RIDING ( ch ) ) )
 			{
 				int dam_exp = partial;
@@ -2775,6 +2803,11 @@ improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 				if ( IS_NPC ( vict ) && partial > 0 )
 					damage_count ( vict, IS_NPC ( ch ) ? -1 : GET_ID ( ch ), partial );
 			}
+#elseif defined(EXP_GAIN_SYSTEM_2)
+
+				if ( IS_NPC ( vict ) && partial > 0 )
+					damage_count ( vict, GET_ID ( ch ), partial );
+#endif
 		}
 
 		if ( !SELF ( ch, vict ) )
@@ -2977,10 +3010,11 @@ improve_skill ( ch, SKILL_DUAL );
 
 		return -1;
 	}
-
+#if defined(EXP_GAIN_SYSTEM_1)
 	/** switch targets in groups **/
 	if ( vict->master || vict->followers )
 		FIGHTING ( ch ) = find_next_target ( vict );
+#endif
 
 	if ( !FIGHTING ( vict ) && !SELF ( ch, vict ) && HERE ( ch, vict ) )
 		start_fighting_delay ( vict, ch );
@@ -5291,6 +5325,7 @@ void die ( Character *ch, Character *killer )
 	{
 		struct dam_from_list * t;
 		long idnum;
+		short counter=0;
 		Character *temp = NULL;
 		if ( killer )
 			idnum = GET_IDNUM ( killer );
@@ -5305,18 +5340,23 @@ void die ( Character *ch, Character *killer )
 			    ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1,  current_class_is_tier_num ( ch ), REMORTS ( ch ) ) - ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ),  current_class_is_tier_num ( ch ), REMORTS ( ch ) ) ) );
 			gain_exp ( ch, - ( exp / 6 ) );
 		}
-
+		/** Count the total people who did damage to the mob - mord **/
+		for ( t = MOB_DAM_LIST ( ch ); t; t = t->next )	{counter++;}
 
 		for ( t = MOB_DAM_LIST ( ch ); t; t = t->next )
 		{
 			if ( t->id != -1 )
 			{
-				temp = char_by_id_desc_list ( t->id );
+				temp = find_char ( t->id );
 				if ( !temp )
 					continue;
+#if defined(EXP_GAIN_SYSTEM_1)
 				exp = ( GET_EXP ( ch ) * t->damage ) /MOB_DAM_TAKEN ( ch );
 				if ( exp < ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 ) ) /*(16% for level 1, 1% for level 150)*/
 					exp = ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 );
+#elseif defined(EXP_GAIN_SYSTEM_2)
+				exp = ( GET_EXP ( ch )/(counter>0?counter:1));
+#endif
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
 				{
 					if ( HERE ( ch, temp ) )

@@ -910,7 +910,13 @@ const char *stance_change[] =
 	"\n"
 };
 
-
+const char *fly_stance_change[] =
+{
+	"You change your mid-air position.\r\n",
+	"You shift the air pressure around you.\r\n",
+	"You swoop slightly to the side.\r\n",
+	"\n"
+};
 
 
 /*

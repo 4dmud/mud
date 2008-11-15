@@ -5363,6 +5363,9 @@ ACMD ( set_perc )
 	char buf2[MAX_INPUT_LENGTH];
 	int amount = 0, temp;
 	/*TODO: change this to handle mutliple args for group members name */
+	
+	ch->Send("No need to use this command at the moment, all group members will be evenly involved.\r\n");
+	return;	
 
 	two_arguments ( argument, buf, buf2 );
 	if ( !*buf )
