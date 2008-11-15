@@ -1797,9 +1797,10 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 {
 	Character *k;
 	struct follow_type *f;
+
+#if defined(EXP_GAIN_SYSTEM_1)
 	int perc = 0;
 	int shortwep = 0;
-#if defined(EXP_GAIN_SYSTEM_1)
 	if ( vict && vict->RiderHere() )
 		vict = RIDDEN_BY ( vict );
 #endif
@@ -2803,7 +2804,7 @@ improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 				if ( IS_NPC ( vict ) && partial > 0 )
 					damage_count ( vict, IS_NPC ( ch ) ? -1 : GET_ID ( ch ), partial );
 			}
-#elseif defined(EXP_GAIN_SYSTEM_2)
+#else
 
 				if ( IS_NPC ( vict ) && partial > 0 )
 					damage_count ( vict, GET_ID ( ch ), partial );
@@ -5354,7 +5355,7 @@ void die ( Character *ch, Character *killer )
 				exp = ( GET_EXP ( ch ) * t->damage ) /MOB_DAM_TAKEN ( ch );
 				if ( exp < ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 ) ) /*(16% for level 1, 1% for level 150)*/
 					exp = ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 );
-#elseif defined(EXP_GAIN_SYSTEM_2)
+#else
 				exp = ( GET_EXP ( ch )/(counter>0?counter:1));
 #endif
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
@@ -5362,16 +5363,16 @@ void die ( Character *ch, Character *killer )
 					if ( HERE ( ch, temp ) )
 					{
 						if ( exp > 1 )
-							new_send_to_char ( temp, "You receive your share of experience -- %lld points.\r\n", exp );
+							temp->Send( "You receive your share of experience -- %lld points.\r\n", exp );
 						else
-							new_send_to_char ( temp, "You receive your share of experience -- one measly little point!\r\n" );
+							temp->Send( "You receive your share of experience -- one measly little point!\r\n" );
 					}
 					else
 					{
 						if ( exp > 1 )
-							new_send_to_char ( temp, "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME ( ch ), exp );
+							temp->Send( "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME ( ch ), exp );
 						else
-							new_send_to_char ( temp, "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME ( ch ) );
+							temp->Send( "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME ( ch ) );
 					}
 				}
 				gain_exp ( temp, exp );
