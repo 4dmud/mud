@@ -1442,7 +1442,7 @@ ACMD(do_mtransform) {
             }
             //ch->nr = new_rnum;
             GET_FIGHT_EVENT(m) = NULL;
-            GET_MESSAGE_EVENT(m) = NULL;
+	    ch->message_event.clear();
             for (int i = 0; i < 4; i++)
                 GET_POINTS_EVENT(m, i) = NULL;
             extract_char(m);

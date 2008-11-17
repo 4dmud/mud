@@ -594,6 +594,7 @@ ASPELL(spell_detect_poison);
 ASPELL(spell_gate);
 ASPELL(spell_polymorph);
 ASPELL(spell_control_weather);
+ASPELL ( spell_call_lightning );
 ASPELL(spell_chain_lightning);
 ASPELL(spell_recharge);
 ASPELL(spell_midas_touch);

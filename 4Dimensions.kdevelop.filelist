@@ -664,6 +664,7 @@ remort.c
 romance.c
 romance.h
 room.cpp
+room_affect.cpp
 screen.h
 sedit.c
 shop.c

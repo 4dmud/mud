@@ -55,13 +55,12 @@ public:
     byte internal_flags; /* Flags used internally - not saved */
     struct event *pts_event[4]; /* events for regening H/M/V/S     */
     struct event *fight_event;     /*events used for fighting/defending */
-    struct event *message_event; /* events used in skill/spell messages*/
+    map<int, struct event *> message_event; /* events used in skill/spell messages*/
     struct sub_task_obj *task;   /* working on a task? This will look after you!*/
     int spell_dir;       /*used for casting directional spells */
     float interact;      /*used for the percentage they land hits and get hit and gain exp in battle */
     int attack_location;
     long loader;         /*id of player who linkloaded them */
-    int msg_run;
     int on_task;
     struct note_data *pnote;
     sh_int concealment;
@@ -152,6 +151,12 @@ public:
     bool canHuntChar(Character *vict);
     void MakeNaked();
     void MakeClothed();
+    bool AddMessageEvent ( struct event *msg, int msg_id );
+    bool CancelMessageEvent ( int msg_id );
+    bool CancelMessageEvent ( struct event *ev );
+    bool ClearMessageEvent ( struct event *ev );
+    bool ClearMessageEvents();
+    bool HasMessageEvent(int msg_id);
 private:
     stringstream *send_string;
 

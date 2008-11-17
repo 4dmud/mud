@@ -154,7 +154,6 @@ ACMD ( do_toggle );
 ACMD ( do_worth );
 void sort_commands ( void );
 ACMD ( do_commands );
-void diag_char_to_char ( Character *i, Character *ch );
 void look_at_char ( Character *i, Character *ch );
 void list_one_char ( Character *i, Character *ch );
 void list_char_to_char ( Character *list, Character *ch );
@@ -415,7 +414,7 @@ void diag_char_to_char ( Character *i, Character *ch )
 		if ( percent >= diagnosis[ar_index].percent )
 			break;
 	if ( GET_LEVEL ( ch ) > LVL_IMMORT )
-		ch->Send ( "%c%s %s (at {cY%d%%{c0)\r\n", UPPER ( *pers ), pers + 1,
+		ch->Send ( "%c%s %s {cY(at %d%%){c0\r\n", UPPER ( *pers ), pers + 1,
 		           diagnosis[ar_index].text, percent );
 	else
 		ch->Send ( "%c%s %s\r\n", UPPER ( *pers ), pers + 1,

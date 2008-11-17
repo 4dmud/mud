@@ -1858,12 +1858,7 @@ void death_room ( Character *ch )
 		unhitch_mob ( ch );
 
 	/* cancel message updates */
-	if ( GET_MESSAGE_EVENT ( ch ) )
-	{
-		event_cancel ( GET_MESSAGE_EVENT ( ch ) );
-		GET_MESSAGE_EVENT ( ch ) = NULL;
-	}
-	GET_MSG_RUN ( ch ) = 0;
+	ch->ClearMessageEvents();
 	/* cancel the task */
 	stop_task ( ch );
 	remove_hunter ( ch );
@@ -2028,12 +2023,7 @@ void extract_char_final ( Character *ch )
 			GET_POINTS_EVENT ( ch, i ) = NULL;
 		}
 	/* cancel message updates */
-	if ( GET_MESSAGE_EVENT ( ch ) )
-	{
-		event_cancel ( GET_MESSAGE_EVENT ( ch ) );
-		GET_MESSAGE_EVENT ( ch ) = NULL;
-	}
-	GET_MSG_RUN ( ch ) = 0;
+	ch->ClearMessageEvents();
 	/* cancel the task */
 	stop_task ( ch );
 	if ( SCRIPT ( ch ) )

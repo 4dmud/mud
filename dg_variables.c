@@ -28,12 +28,12 @@
 #include "strutil.h"
 #include "assemblies.h"
 #include "genmob.h"
+#include "fight.h"
 
 /* External variables and functions */
 
 long long gold_data ( int type, long long amount );
 int genpreg ( void );
-void hunt_victim ( Character *ch );
 extern const char *pc_class_types[];
 extern struct time_info_data time_info;
 void die ( Character *ch, Character *killer );

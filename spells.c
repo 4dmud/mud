@@ -25,6 +25,7 @@
 #include "dg_event.h"
 #include "damage.h"
 #include "descriptor.h"
+#include "action.h"
 
 
 extern int mini_mud;
@@ -999,7 +1000,6 @@ ASPELL(spell_enchant_armor) {
 
 
 ASPELL(spell_control_weather) {
-    int i;
     struct message_event_obj *msg = NULL;
     if (!OUTSIDE(ch)) {
         ch->Send( "You are unable to concentrate enough to take control over nature.\r\n");
@@ -1014,16 +1014,33 @@ ASPELL(spell_control_weather) {
         ch->Send("You fail.\r\n");
         return;
     }
-    i = GET_ROOM_ZONE(IN_ROOM(ch));
     if (!str_cmp(strarg, "better")) {}
     else if (!str_cmp(strarg, "worse")) {}
     else {
         ch->Send( "You must specify BETTER or WORSE.\r\n");
         return;
     }
-    GET_MSG_RUN(ch) = 1;
     msg = new message_event_obj(ch, SPELL_CONTROL_WEATHER, THING_SKILL, 8,GET_EQ(ch, WEAR_FOCUS) ?  GET_ID(GET_EQ(ch, WEAR_FOCUS)) : -1, strarg );
-    GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE);
+    ch->AddMessageEvent(event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE), ME_CONTROL_WEATHER);
+    return;
+}
+
+ASPELL(spell_call_lightning) {
+    struct message_event_obj *msg = NULL;
+int times = 1;
+    if (!OUTSIDE(ch)) {
+        ch->Send( "You are unable to generate enough electrical discharge while inside.\r\n");
+        return;
+    }
+
+    if (GET_INT(ch) < number(1, 19)) {
+        ch->Send("You fail.\r\n");
+        return;
+    }
+    times += total_chance(ch, SPELL_CALL_LIGHTNING)/10;
+    
+    msg = new message_event_obj(ch, SPELL_CALL_LIGHTNING, THING_SKILL, times, ROOM_ID_BASE + IN_ROOM(ch)->number);
+    ch->AddMessageEvent(event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE), ME_CALL_LIGHTNING);
     return;
 }
 

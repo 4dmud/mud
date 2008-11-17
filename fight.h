@@ -10,6 +10,9 @@ int both_pk(Character *a, Character *b);
 void kill_list(Character *ch, Character *vict);
 int chance_hit_part(Character *ch, int part);
 
+void diag_char_to_char ( Character *i, Character *ch );
+void hunt_victim ( Character *ch );
+
 /* prototypes from fight.c */
 void set_fighting(Character *ch, Character *victim);
 void stop_fighting(Character *ch);
@@ -175,6 +178,7 @@ void solo_gain(Character *ch, Character *victim,
 void die(Character *ch, Character *killer);
 float   backstab_mult(int level, int tier);
 float   cleave_mult(int level, int tier);
+float skill_type_multi ( Character *ch, Character *vict, int type );
 
 /* Weapon attack texts */
 /* Attacktypes with grammar */

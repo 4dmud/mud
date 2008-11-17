@@ -822,11 +822,11 @@ int average_damage ( Character *ch )
 		switch ( find_fe_type ( ch ) )
 		{
 			case FE_TYPE_SPELL:
-				dam = caster_damroll(ch);
+				dam = caster_damroll ( ch );
 				dam += 0.5 * ( ( ( spell_size_dice ( ch ) +1 ) ) * spell_num_dice ( ch ) );
 				break;
 			default:
-				dam = fighter_damroll(ch) * 0.75;
+				dam = fighter_damroll ( ch ) * 0.75;
 				dam += 0.5 * ( ( ( size_dice_wep ( ch, WEAPON_PRIM_AFF ) +1 ) ) * num_dice_wep ( ch, WEAPON_PRIM_AFF ) );
 				break;
 		}
@@ -1037,7 +1037,7 @@ int next_round ( Character* ch )
 		return 0;
 	if ( DEAD ( ch ) )
 		return 0;
-	victim = FIGHTING(ch);
+	victim = FIGHTING ( ch );
 #if defined(EXP_GAIN_SYSTEM_1)
 	if ( ( victim = FIGHTING ( ch ) ) != NULL )
 		victim = victim->RiderHere() ? RIDDEN_BY ( victim ) : victim;
@@ -1202,7 +1202,7 @@ void skill_attack ( Character *ch, Character *vict, int skill, int pass )
 		else if ( IS_SPELL_CAST ( skill ) && ( IS_SET ( spell_info[skill].routines, MAG_AREAS ) || GET_SPELL_DIR ( ch ) != NOWHERE ) )
 			fight_event_hit ( ch, vict, 0, skill );
 		else
-		{			
+		{
 			if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
 			{
 				if ( ch->Flying() )
@@ -1326,7 +1326,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 	if ( !IS_NPC ( ch ) )
 	{
-		int remorts = MIN(REMORTS(ch), 50);
+		int remorts = MIN ( REMORTS ( ch ), 50 );
 		damage *= race_dam_mod ( GET_RACE ( ch ), IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) );
 		damage += ( ( float ) damage * ( ( float ) ( remorts * 0.005 ) ) );
 	}
@@ -1335,14 +1335,14 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	{
 		if ( !skill_cost ( 0, 0, 20, vict ) )
 		{
-			vict->Send( "You try and brace but are too exausted!!\r\n" );
+			vict->Send ( "You try and brace but are too exausted!!\r\n" );
 		}
 		else
 		{
 
 			damage -= damage/3;
 
-			vict->Send( "You were braced against the damage!\r\n" );
+			vict->Send ( "You were braced against the damage!\r\n" );
 		}
 	}
 	if ( !IS_NPC ( vict ) && GET_COND ( vict, DRUNK ) > 10 && damage > 5 )
@@ -1369,13 +1369,13 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 
 	/**TODO: this needs to be fixed up and finished (currently crashes us)**/
-/** FIXED - Nov 9th 08 Mord */
-	
-	if (immune_to(vict, elemental_type(w_type)))
-	  damage = 0;
+	/** FIXED - Nov 9th 08 Mord */
 
-	damage += (damage * (resist_elem(vict, elemental_type(w_type) * 0.01)));
-	  
+	if ( immune_to ( vict, elemental_type ( w_type ) ) )
+		damage = 0;
+
+	damage += ( damage * ( resist_elem ( vict, elemental_type ( w_type ) * 0.01 ) ) );
+
 	if ( AFF_FLAGGED ( vict, AFF_SANCTUARY ) )
 	{
 		if ( GET_CLASS ( ch ) == CLASS_WARRIOR && ( GET_SUB ( ch, SUB_REPEL_SANC ) > number ( 0, 150 ) ) )
@@ -1705,7 +1705,7 @@ int accuracy_tot ( Character *attacker )
 	accuracy_roll += total_chance ( attacker, SKILL_MELEE ) /2;
 	accuracy_roll += total_chance ( attacker, SKILL_SECOND_ATTACK );
 	accuracy_roll += total_chance ( attacker, SKILL_THIRD_ATTACK );
-/** This means that if you have a big group, you have more chance of hitting the victim **/
+	/** This means that if you have a big group, you have more chance of hitting the victim **/
 	if ( FIGHTING ( attacker ) )
 	{
 		k = ( FIGHTING ( attacker )->master ? FIGHTING ( attacker )->master : FIGHTING ( attacker ) );
@@ -1950,13 +1950,13 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 				if ( FIGHTING ( f->follower ) )
 					continue;
 #if defined(EXP_GAIN_SYSTEM_1)
-				if (!RIDDEN_BY(f->follower))
-				continue
+				if ( !RIDDEN_BY ( f->follower ) )
+					continue
 #endif
-				if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
-				{
-					start_fighting_delay ( f->follower, vict );
-				}
+					if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
+					{
+						start_fighting_delay ( f->follower, vict );
+					}
 			}
 		}
 	}
@@ -2173,7 +2173,7 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 
 			dam += caster_damroll ( ch );
 
-			if (has_staff ( ch ) > 0)
+			if ( has_staff ( ch ) > 0 )
 				dam = FTOI ( dam * has_staff ( ch ) );
 
 			dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
@@ -2187,8 +2187,8 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 	}
 	if ( damage_ret != -1 )
 		hitprcnt_mtrigger ( vict );
-if (!number(0, 20))
-	improve_skill(vict, type);
+	if ( !number ( 0, 20 ) )
+		improve_skill ( vict, type );
 
 	return damage_ret;
 }
@@ -2229,8 +2229,8 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
 
 	if ( damage_ret != -1 )
 		hitprcnt_mtrigger ( vict );
-if (!number(0, 20))
-	improve_skill(vict, type);
+	if ( !number ( 0, 20 ) )
+		improve_skill ( vict, type );
 
 	return damage_ret;
 }
@@ -2685,7 +2685,7 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 		act ( "$n steals your energy.", FALSE, ch, 0, vict, TO_VICT );
 		act ( "You steal $N's energy.", FALSE, ch, 0, vict, TO_CHAR );
 		damage ( vict,ch, FTOI ( -hp ), TYPE_UNDEFINED );
-		ret_val = damage(ch,vict, hp, TYPE_UNDEFINED);
+		ret_val = damage ( ch,vict, hp, TYPE_UNDEFINED );
 	}
 
 
@@ -2792,7 +2792,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 				{
 					dam_exp /= 4;
 					damage_count ( vict, IS_NPC ( RIDING ( ch ) ) ? -1 : GET_ID ( RIDING ( ch ) ), dam_exp );
-improve_skill ( ch, SKILL_MOUNTED_COMBAT );
+					improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 					damage_count ( vict, IS_NPC ( ch ) ? -1 : GET_ID ( ch ), dam_exp * 3 );
 				}
 				else
@@ -2806,8 +2806,8 @@ improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 			}
 #else
 
-				if ( IS_NPC ( vict ) && partial > 0 )
-					damage_count ( vict, GET_ID ( ch ), partial );
+			if ( IS_NPC ( vict ) && partial > 0 )
+				damage_count ( vict, GET_ID ( ch ), partial );
 #endif
 		}
 
@@ -2872,7 +2872,7 @@ improve_skill ( ch, SKILL_MOUNTED_COMBAT );
 							if ( number ( 0, 10 ) < 2 )
 								improve_skill ( ch, SKILL_SHORT_BLADE );
 						}
-improve_skill ( ch, SKILL_DUAL );
+						improve_skill ( ch, SKILL_DUAL );
 					case 1:
 						if ( !is_short_wep ( GET_EQ ( ch, WEAR_WIELD ) ) )
 						{
@@ -3161,8 +3161,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 			af.bitvector = AFF_FROZEN;
 			af.type = SPELL_DG_AFFECT;
 			affect_to_char ( ch, &af );
-improve_skill ( ch, SPELL_SHIELD_ICE );
-improve_skill ( vict, SPELL_SHIELD_ICE );
+			improve_skill ( ch, SPELL_SHIELD_ICE );
+			improve_skill ( vict, SPELL_SHIELD_ICE );
 		}
 	}
 
@@ -3184,8 +3184,8 @@ improve_skill ( vict, SPELL_SHIELD_ICE );
 					act ( "$N blocks your attack with $S shield!", FALSE, ch, 0, vict, TO_CHAR );
 					act ( "You block $n's attack with your shield!", FALSE, ch, 0, vict, TO_VICT );
 				}
-improve_skill ( ch, SPELL_SHIELD_STATIC );
-improve_skill ( vict, SPELL_SHIELD_STATIC );
+				improve_skill ( ch, SPELL_SHIELD_STATIC );
+				improve_skill ( vict, SPELL_SHIELD_STATIC );
 			}
 			break;
 		case SHIELD_REFLECT:
@@ -3193,24 +3193,24 @@ improve_skill ( vict, SPELL_SHIELD_STATIC );
 			{
 				act ( "$N scorches you with $S fire shield.", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You scorch $n with your fire shield.", FALSE, ch, 0, vict, TO_VICT );
-improve_skill ( ch, SPELL_FIRE_SHIELD );
-improve_skill ( vict, SPELL_FIRE_SHIELD );
+				improve_skill ( ch, SPELL_FIRE_SHIELD );
+				improve_skill ( vict, SPELL_FIRE_SHIELD );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 			else if ( AFF_FLAGGED ( vict, AFF_SHIELD_THORNS ) && ( GET_EQ ( ch, WEAR_WIELD ) && sht )  && ( number ( 1, 81 ) < lev || ded ) )
 			{
 				act ( "You are shredded by $N's whirling barrier of thorns!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You shred $n with your whirling barrier of thorns!", FALSE, ch, 0, vict, TO_VICT );
-improve_skill ( ch, SPELL_SHIELD_THORN );
-improve_skill ( vict, SPELL_SHIELD_THORN );
+				improve_skill ( ch, SPELL_SHIELD_THORN );
+				improve_skill ( vict, SPELL_SHIELD_THORN );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 			else if ( AFF_FLAGGED ( vict, AFF_SHIELD_MIRROR ) && ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( number ( 1, 81 ) < lev || ded ) )
 			{
 				act ( "$N's mirror shield reflects your magic back at you!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You bounce $n's magic right back at $m!", FALSE, ch, 0, vict, TO_VICT );
-improve_skill ( ch, SPELL_SHIELD_MIRROR );
-improve_skill ( vict, SPELL_SHIELD_MIRROR );
+				improve_skill ( ch, SPELL_SHIELD_MIRROR );
+				improve_skill ( vict, SPELL_SHIELD_MIRROR );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
 
@@ -3221,8 +3221,8 @@ improve_skill ( vict, SPELL_SHIELD_MIRROR );
 				act ( "A golden light moves $N out of your reach!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "A golden light moves you out of $n's reach!", FALSE, ch, 0, vict, TO_VICT );
 				success = TRUE;
-improve_skill ( ch, SPELL_SHIELD_HOLY );
-improve_skill ( vict, SPELL_SHIELD_HOLY );
+				improve_skill ( ch, SPELL_SHIELD_HOLY );
+				improve_skill ( vict, SPELL_SHIELD_HOLY );
 			}
 
 			break;
@@ -3264,8 +3264,8 @@ int evade_hit_check ( Character *ch, Character *vict, int w_type )
 		           PERS ( vict,ch ), attack_hit_text[v_type].singular );
 		vict->Send ( "You parry %s's attack with a swift %s.\r\n",
 		             PERS ( ch, vict ), attack_hit_text[v_type].singular );
-improve_skill ( ch, SKILL_PARRY );
-improve_skill ( vict, SKILL_PARRY );
+		improve_skill ( ch, SKILL_PARRY );
+		improve_skill ( vict, SKILL_PARRY );
 		return 1;
 	}
 	if ( IS_WEAPON ( w_type ) && number ( 1, 30 ) < GET_DEX ( vict ) && AFF_FLAGGED ( vict, AFF_DODGE )  && number ( 1, 200 ) < total_chance ( vict, SKILL_DODGE ) )
@@ -3274,8 +3274,8 @@ improve_skill ( vict, SKILL_PARRY );
 		{
 			ch->Send ( "%s dodges your attack.\r\n", PERS ( vict,ch ) );
 			vict->Send ( "You dodge %s's attack.\r\n", PERS ( ch, vict ) );
-improve_skill ( ch, SKILL_DODGE );
-improve_skill ( vict, SKILL_DODGE );
+			improve_skill ( ch, SKILL_DODGE );
+			improve_skill ( vict, SKILL_DODGE );
 			return 1;
 		}
 		else
@@ -3297,8 +3297,8 @@ improve_skill ( vict, SKILL_DODGE );
 
 			act ( "$N phases past your attack and strikes you!", FALSE, ch, 0, vict, TO_CHAR );
 			act ( "You phase past $n's attack and strike $m.\r\n", FALSE, ch, 0, vict, TO_VICT );
-improve_skill ( ch, SKILL_PHASE );
-improve_skill ( vict, SKILL_PHASE );
+			improve_skill ( ch, SKILL_PHASE );
+			improve_skill ( vict, SKILL_PHASE );
 			fight_event_hit ( vict, ch, find_fe_type ( vict ), GET_NEXT_SKILL ( vict ) );
 			return 1;
 		}
@@ -3311,8 +3311,8 @@ improve_skill ( vict, SKILL_PHASE );
 	{
 		ch->Send ( "%s weaves drunkenly out of your reach!\r\n", PERS ( vict,ch ) );
 		vict->Send ( "You weave drunkenly out of %s's reach!\r\n",  PERS ( ch, vict ) );
-improve_skill ( ch, SKILL_MARTIAL_ARTS );
-improve_skill ( vict, SKILL_MARTIAL_ARTS );
+		improve_skill ( ch, SKILL_MARTIAL_ARTS );
+		improve_skill ( vict, SKILL_MARTIAL_ARTS );
 		return 1;
 	}
 
@@ -4834,8 +4834,8 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			act ( "You hurt $N.", FALSE, ch, NULL, victim, TO_CHAR );
 		else
 		{
-			int chance_m = MAX(MIN(( int ) ATK_CHANCE ( ch ), 3), 0);
-			fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt, type_save, FE_TO_CHAR );
+			int chance_m = MAX ( MIN ( ( int ) ATK_CHANCE ( ch ), 3 ), 0 );
+			fight_type_message ( buf, sizeof ( buf )-1, ch, victim, tt, type_save, FE_TO_CHAR );
 			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s.",
 			           chance_message[ chance_m ].singular, dam_size[msgnum].sing, buf );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_CHAR );
@@ -4854,7 +4854,7 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			act ( "$n hurts you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP );
 		else
 		{
-			fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt,type_save, FE_TO_VICT );
+			fight_type_message ( buf, sizeof ( buf )-1, ch, victim, tt,type_save, FE_TO_VICT );
 			snprintf ( msgbuf, sizeof ( msgbuf ), "$n %s{cr you%s.",  dam_size[msgnum].plu, buf );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP );
 		}
@@ -4870,7 +4870,7 @@ void dam_message ( int dam, Character *ch, Character *victim,
 	 */
 	if ( dam )
 	{
-		fight_type_message ( buf, sizeof(buf)-1, ch, victim, tt, type_save, FE_TO_ROOM );
+		fight_type_message ( buf, sizeof ( buf )-1, ch, victim, tt, type_save, FE_TO_ROOM );
 		snprintf ( msgbuf, sizeof ( msgbuf ), "$n %s $N%s.", ( msgnum >=  MAX_DAM_MESSAGE ) ? dam_size[msgnum].other : dam_size[msgnum].plu , buf );
 
 		for ( people = IN_ROOM ( ch )->people; people;
@@ -4894,9 +4894,9 @@ void dam_message ( int dam, Character *ch, Character *victim,
 
 	if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
 	{
-		send_to_char ( "{cc", ch );
+		ch->Send ( "{cc" );
 		diag_char_to_char ( victim, ch );
-		send_to_char ( "{c0", ch );
+		ch->Send ( "{c0" );
 	}
 
 }
@@ -4980,7 +4980,7 @@ void make_corpse ( Character *ch, Character *killer )
 {
 	struct obj_data *corpse = NULL, *o, *next_obj;
 	struct obj_data *money;
-	int remorts = MIN(REMORTS(ch), 50);
+	int remorts = MIN ( REMORTS ( ch ), 50 );
 	int i, x, y;
 	char buf2[MAX_INPUT_LENGTH];
 
@@ -5356,23 +5356,23 @@ void die ( Character *ch, Character *killer )
 				if ( exp < ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 ) ) /*(16% for level 1, 1% for level 150)*/
 					exp = ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 );
 #else
-				exp = ( GET_EXP ( ch )/(counter>0?counter:1));
+				exp = ( GET_EXP ( ch ) / ( counter>0?counter:1 ) );
 #endif
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
 				{
 					if ( HERE ( ch, temp ) )
 					{
 						if ( exp > 1 )
-							temp->Send( "You receive your share of experience -- %lld points.\r\n", exp );
+							temp->Send ( "You receive your share of experience -- %lld points.\r\n", exp );
 						else
-							temp->Send( "You receive your share of experience -- one measly little point!\r\n" );
+							temp->Send ( "You receive your share of experience -- one measly little point!\r\n" );
 					}
 					else
 					{
 						if ( exp > 1 )
-							temp->Send( "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME ( ch ), exp );
+							temp->Send ( "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME ( ch ), exp );
 						else
-							temp->Send( "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME ( ch ) );
+							temp->Send ( "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME ( ch ) );
 					}
 				}
 				gain_exp ( temp, exp );

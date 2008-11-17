@@ -18,6 +18,7 @@
 #include "dg_scripts.h"
 #include "constants.h"
 #include "dg_event.h"
+#include "action.h"
 
 extern struct time_info_data time_info;
 EVENTFUNC(message_event);
@@ -129,17 +130,12 @@ ASUB(sub_tunneling)
     return SUB_UNDEFINED;
   }
 
-  if (GET_MESSAGE_EVENT(ch)!=NULL)
+  if (ch->HasMessageEvent(ME_TUNNELING))
   {
-    ch->Send( "You are in the middle of something else!\r\n");
+    ch->Send( "You are tunneling!\r\n");
     return  SUB_UNDEFINED;
   }
-  if (GET_MSG_RUN(ch))
-  {
-    ch->Send( "You are already working on something else!\r\n");
-    return  SUB_UNDEFINED;
-  }
-
+ 
   if (rm == NULL)
   {
     ch->Send( "Error! Invalid room\r\n");
@@ -152,12 +148,11 @@ ASUB(sub_tunneling)
 
   ch->Send( "You begin to tunnel %s.\r\n", dirs[dir]);
 
-  GET_MSG_RUN(ch) = TRUE;
   MINE_DIR(ch) = dir;
   toggle_sub_status(ch, SUB_TUNNELING, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_TUNNELING, THING_SUB, density, (long) (rm->number + ROOM_ID_BASE), (char *)"");
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE);
+  ch->AddMessageEvent( event_create(message_event, msg, (1 RL_SEC), EVENT_TYPE_MESSAGE), ME_TUNNELING);
   return SUB_TUNNELING;
 }
 

@@ -748,9 +748,9 @@ ASUB(sub_juggle)
     return SUB_UNDEFINED;
   }
 
-  if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
+  if (ch->HasMessageEvent(ME_JUGGLE))
   {
-    ch->Send( "You are in the middle of something else!\r\n");
+    ch->Send( "You are juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -771,13 +771,13 @@ ASUB(sub_juggle)
   }
   else
     act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
-  GET_MSG_RUN(ch) = 1;
+
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)), (vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
 
 
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
+  ch->AddMessageEvent( event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE), ME_JUGGLE);
 
   return SUB_JUGGLE;
 }
@@ -1120,7 +1120,7 @@ ASUB(sub_throttle)
   struct message_event_obj *msg = NULL;
   struct affected_type af;
 
-  if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
+  if (ch->HasMessageEvent(ME_JUGGLE))
   {
     ch->Send( "You are in the middle of something else!\r\n");
     toggle_sub_status(ch, SUB_GAROTTE, STATUS_OFF);
@@ -1141,12 +1141,10 @@ ASUB(sub_throttle)
     affect_to_char(vict, &af);
   }
 
-
-  GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_THROTTLE, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_THROTTLE, THING_SUB, 18, GET_ID(vict), (char *)"");
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
+  ch->AddMessageEvent(event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE), ME_THROTTLE);
 
   return SUB_THROTTLE;
 }
@@ -1304,7 +1302,7 @@ ASUB(sub_tumble)
     return SUB_UNDEFINED;
   }
 
-  if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
+  if (ch->HasMessageEvent(ME_JUGGLE))
   {
     ch->Send( "You are in the middle of something else!\r\n");
     return SUB_UNDEFINED;
@@ -1314,7 +1312,7 @@ ASUB(sub_tumble)
 
   if (vict != NULL && get_sub_status(vict, SUB_JUGGLE) == STATUS_OFF)
   {
-    ch->Send( "They arent even juggling!\r\n");
+    ch->Send( "They aren't even juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1327,11 +1325,11 @@ ASUB(sub_tumble)
   }
   else
     act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
-  GET_MSG_RUN(ch) = 1;
+  
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
+  ch->AddMessageEvent( event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE), ME_JUGGLE);
 
   return SUB_JUGGLE;
 }
@@ -1359,9 +1357,9 @@ ASUB(sub_clown)
     return SUB_UNDEFINED;
   }
 
-  if (GET_MSG_RUN(ch) || GET_MESSAGE_EVENT(ch)!=NULL)
+  if (ch->HasMessageEvent(ME_JUGGLE))
   {
-    ch->Send( "You are in the middle of something else!\r\n");
+    ch->Send( "You are juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1369,7 +1367,7 @@ ASUB(sub_clown)
 
   if (vict != NULL && get_sub_status(vict, SUB_JUGGLE) == STATUS_OFF)
   {
-    ch->Send( "They arent even juggling!\r\n");
+    ch->Send( "They aren't even juggling!\r\n");
     return SUB_UNDEFINED;
   }
 
@@ -1382,11 +1380,10 @@ ASUB(sub_clown)
   }
   else
     act((char *)"You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
-  GET_MSG_RUN(ch) = 1;
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");
-  GET_MESSAGE_EVENT(ch) = event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE);
+  ch->AddMessageEvent(event_create(message_event, msg, 1 RL_SEC, EVENT_TYPE_MESSAGE), ME_JUGGLE);
 
   return SUB_JUGGLE;
 }

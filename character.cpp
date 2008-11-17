@@ -272,12 +272,7 @@ void Character::freeself()
 			event_cancel ( GET_POINTS_EVENT ( this, i ) );
 			GET_POINTS_EVENT ( this, i ) = NULL;
 		}
-	/* cancel message updates */
-	if ( GET_MESSAGE_EVENT ( this ) )
-	{
-		event_cancel ( GET_MESSAGE_EVENT ( this ) );
-		GET_MESSAGE_EVENT ( this ) = NULL;
-	}
+
 	if ( GET_FIGHT_EVENT ( this ) )
 	{
 		event_cancel ( GET_FIGHT_EVENT ( this ) );
@@ -399,9 +394,8 @@ void Character::clear()
 	GET_POINTS_EVENT ( this,2 ) = NULL;
 	GET_POINTS_EVENT ( this,3 ) = NULL;
 	GET_FIGHT_EVENT ( this )  = NULL;
-	GET_MESSAGE_EVENT ( this ) = NULL;
+	message_event.clear();
 	GET_TASK ( this )  = NULL;
-	GET_MSG_RUN ( this ) = 0;
 	GET_AC ( this ) = 100;
 	points.max_mana = 100;
 	IsNaked = false;
@@ -439,9 +433,8 @@ void Character::reset()
 	GET_POINTS_EVENT ( this, 2 ) = NULL;
 	GET_POINTS_EVENT ( this, 3 ) = NULL;
 	GET_FIGHT_EVENT ( this )     = NULL;
-	GET_MESSAGE_EVENT ( this )   = NULL;
+	message_event.clear();
 	GET_TASK ( this )            = NULL;
-	GET_MSG_RUN ( this )         = 0;
 	char_specials.position    = POS_STANDING;
 	mob_specials.default_pos  = POS_STANDING;
 	mob_specials.join_list    = NULL;
@@ -715,7 +708,7 @@ void Character::default_char()
 	IMMTITLE ( this ) 			= NULL;
 	REMORTS ( this ) 			= 0;
 	GET_FIGHT_EVENT ( this ) 	= NULL;
-	GET_MESSAGE_EVENT ( this ) 	= NULL;
+	message_event.clear();
 	GET_POINTS_EVENT ( this, 0 ) = NULL;
 	GET_POINTS_EVENT ( this, 1 ) = NULL;
 	GET_POINTS_EVENT ( this, 2 ) = NULL;
@@ -1422,3 +1415,86 @@ void Character::MakeClothed()
 	}
 	IsNaked = false;
 }
+
+bool Character::AddMessageEvent ( struct event *msg, int msg_id )
+{
+	map<int, struct event *>::iterator it;
+	it = message_event.find ( msg_id );
+	if ( it == message_event.end() )
+		message_event[msg_id] = ( ( struct event* ) msg );
+	else
+	{
+		CancelMessageEvent ( msg_id );
+		message_event[msg_id] = ( ( struct event* ) msg );
+	}
+
+	return true;
+}
+bool Character::ClearMessageEvents()
+{
+	/* cancel message updates */
+	if ( message_event.size() > 0 )
+	{
+		map<int, struct event *>::iterator it;
+		for ( it = message_event.begin(); it != message_event.end(); it++ )
+		{
+			event_cancel (( *it).second );
+		}
+		message_event.clear();
+	}
+	return message_event.size() == 0;
+}
+bool Character::CancelMessageEvent ( int msg_id )
+{
+	map<int, struct event *>::iterator it;
+	it = message_event.find ( msg_id );
+	if ( it == message_event.end() )
+		return false;
+
+	event_cancel ( ( *it).second );
+	message_event.erase ( it );
+	return true;
+}
+
+bool Character::CancelMessageEvent ( struct event *ev )
+{
+	if ( message_event.size() > 0 )
+	{
+		map<int, struct event *>::iterator it;
+		for ( it = message_event.begin(); it != message_event.end(); it++ )
+		{
+			if ( ( *it).second == ev )
+			{
+				event_cancel ( ( *it).second );
+				message_event.erase ( it );
+			}
+		}
+
+	}
+	return true;
+}
+bool Character::ClearMessageEvent ( struct event *ev )
+{
+	if ( message_event.size() > 0 )
+	{
+		map<int, struct event *>::iterator it;
+		for ( it = message_event.begin(); it != message_event.end(); it++ )
+		{
+			if ( ( *it).second == ev )
+			{
+				message_event.erase ( it );
+			}
+		}
+
+	}
+	return true;
+}
+bool Character::HasMessageEvent ( int msg_id )
+{
+	map<int, struct event *>::iterator it;
+	it = message_event.find ( msg_id );
+	if ( it == message_event.end() )
+		return false;
+	return true;
+}
+

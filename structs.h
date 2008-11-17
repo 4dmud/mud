@@ -2726,6 +2726,7 @@ struct ore_info_data {
 /*event objects */
 struct message_event_obj {
     Character* ch;
+Room* rm;
     int skill;
     int type; //0 = skill-spell : 1 = subskill
     int msg_num; // iterative number for what part of the skill it is in
@@ -2734,13 +2735,14 @@ struct message_event_obj {
 
     message_event_obj() {}
 
-    message_event_obj(Character *c, int s, int t, int m, long i, char *a) {
+    message_event_obj(Character *c, int s, int t, int m, long i, char *a = (char *)"", Room *r = NULL) {
         ch = c;
         skill = s;
         type = t;
         msg_num = m;
         id = i;
         strlcpy(args, a, sizeof(args));
+ 	rm = r;
 
     }
 

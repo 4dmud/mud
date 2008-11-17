@@ -33,9 +33,7 @@ extern int syslogfd;
 
 #define GET_POINTS_EVENT(ch, i) ((ch)->pts_event[i])
 #define GET_FIGHT_EVENT(ch)   ((ch)->fight_event)
-#define GET_MESSAGE_EVENT(ch) ((ch)->message_event)
 #define GET_TASK(ch)    ((ch)->task)
-#define GET_MSG_RUN(ch) 	((ch)->msg_run)
 #define GET_TASK_NUM(ch)	((ch)->on_task)
 #define GET_ACC(ch)  (pi.GetAccById(GET_IDNUM((ch))))
 
