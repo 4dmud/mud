@@ -1424,7 +1424,7 @@ bool Character::AddMessageEvent ( struct event *msg, int msg_id )
 		message_event[msg_id] = ( ( struct event* ) msg );
 	else
 	{
-		CancelMessageEvent ( msg_id );
+		ClearMessageEvent ( (event *)msg );
 		message_event[msg_id] = ( ( struct event* ) msg );
 	}
 

@@ -93,7 +93,7 @@ ACTION ( thing_call_lightning )
 
 	if ( ch == rndm )
 		rndm = NULL;
-	else if ( ch && rndm )
+	else if ( ch && rndm && HERE(rndm, ch))
 	{
 		to_char = "You are struck by a controlled bolt of lightning!";
 		to_room = "$n is struck by a controlled bolt of lightning!";
@@ -111,7 +111,7 @@ ACTION ( thing_call_lightning )
 	if ( to_char!=NULL )
 		act ( to_char, FALSE, rndm, obj, vict, TO_CHAR );
 
-	if ( ch && rndm )
+	if ( ch && rndm && HERE(rndm, ch))
 		multi = skill_type_multi ( ch, rndm, SPELL_CALL_LIGHTNING );
 	else
 		multi = 1;
