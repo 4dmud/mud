@@ -58,7 +58,7 @@ void add_var ( struct trig_var_data **var_list,const char *name,const char *valu
 		return;
 	}
 
-	for ( vd = *var_list; vd && strcasecmp( vd->name.c_str(), name ); vd = vd->next )
+	for ( vd = *var_list; vd && strcasecmp ( vd->name.c_str(), name ); vd = vd->next )
 		;
 
 	if ( vd && ( !vd->context || vd->context==id ) )
@@ -87,7 +87,7 @@ void add_var ( struct trig_var_data **var_list, string &name, string value, long
 		return;
 	}
 
-	for ( vd = *var_list; vd && strcasecmp( vd->name.c_str(), name.c_str() ); vd = vd->next )
+	for ( vd = *var_list; vd && strcasecmp ( vd->name.c_str(), name.c_str() ); vd = vd->next )
 		;
 
 	if ( vd && ( !vd->context || vd->context==id ) )
@@ -445,7 +445,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					if ( ( o = get_object_in_equip ( ch, name ) ) )
 						;
-					else if (ch->carrying && ( o = get_obj_in_list ( name, ch->carrying ) ) )
+					else if ( ch->carrying && ( o = get_obj_in_list ( name, ch->carrying ) ) )
 						;
 					else if ( IN_ROOM ( ch ) && ( c = get_char_room ( name, NULL, IN_ROOM ( ch ) ) ) )
 						;
@@ -1109,7 +1109,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					else if ( !strcasecmp ( field, "hunt" ) )
 					{
-						if ( hunt_location ( GET_ID(c), STRUCT_IS_MOB ) )
+						if ( hunt_location ( GET_ID ( c ), STRUCT_IS_MOB ) )
 							snprintf ( str, slen, "1" );
 						else if ( HUNTING ( c ) )
 						{
@@ -1315,10 +1315,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'l':
 
 					if ( !strcasecmp ( field, "level" ) )
-           					snprintf ( str, slen, "%d", GET_LEVEL ( c ) );
-                                        else if ( !strcasecmp ( field, "longdesc" ) )
-                                                snprintf ( str, slen, "%s", GET_LDESC ( c ) );
-                                      break;
+						snprintf ( str, slen, "%d", GET_LEVEL ( c ) );
+					else if ( !strcasecmp ( field, "longdesc" ) )
+						snprintf ( str, slen, "%s", GET_LDESC ( c ) );
+					break;
 				case 'm':
 					if ( !strcasecmp ( field, "maxhitp" ) )
 						snprintf ( str, slen, "%d", GET_MAX_HIT ( c ) );
@@ -1439,8 +1439,18 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", GET_PK_CNT ( c ) );
 
 
-					else if ( !strcasecmp ( field, "position" ) )
+					else if ( !strcasecmp ( field, "position" ) || !strcasecmp ( field, "pos" ) )
 					{
+						if ( subfield && *subfield )
+						{
+							for ( i = 0; *position_types[i] != '\n'; i++ )
+							{
+								if ( is_name ( subfield, position_types[i] ) )
+								{
+									GET_POS ( c ) = i;
+								}
+							}
+						}
 						if ( GET_POS ( c ) >= 0 && GET_POS ( c ) <=POS_STANDING )
 							snprintf ( str, slen, "%s", position_types[ ( int ) GET_POS ( c ) ] );
 						else
@@ -2015,7 +2025,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					else if ( !strcasecmp ( field, "hunt" ) )
 					{
-						if ( hunt_location ( GET_ID(o), STRUCT_IS_OBJ ) )
+						if ( hunt_location ( GET_ID ( o ), STRUCT_IS_OBJ ) )
 							snprintf ( str, slen, "1" );
 						else
 							snprintf ( str, slen, "0" );
@@ -2557,7 +2567,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field );
 				}
 			}
-		} else if (vd != NULL && text_processed(field, subfield, vd, str, slen)) return;
+		}
+		else if ( vd != NULL && text_processed ( field, subfield, vd, str, slen ) ) return;
 	}
 }
 

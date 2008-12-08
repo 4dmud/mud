@@ -2960,12 +2960,12 @@ int fe_after_damage ( Character* ch, Character* vict,
 		}
 		else
 		{
-#if 0
+#if 1
 			if ( IS_NPC ( vict ) && HERE ( vict, ch ) && GET_SUB ( ch, SUB_PILLAGE ) > number ( 1, 101 ) )
 			{
 				//mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
 				if ( MobProtoExists ( GET_MOB_VNUM ( vict ) ) )
-					bonus_gold = ( int ) ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( vict ) ) ) * 0.25 );
+					bonus_gold = ( int ) ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( vict ) ) ) * 0.25 )/number(1, 10);
 
 				ch->Gold ( bonus_gold, GOLD_HAND );
 				if ( !number ( 0, 200 ) )
