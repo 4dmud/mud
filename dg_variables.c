@@ -1443,7 +1443,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					{
 						if ( subfield && *subfield )
 						{
-							for ( i = 0; *position_types[i] != '\n'; i++ )
+							for (int i = 0; *position_types[i] != '\n'; i++ )
 							{
 								if ( is_name ( subfield, position_types[i] ) )
 								{
