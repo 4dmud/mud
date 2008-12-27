@@ -3760,10 +3760,14 @@ void setup_log(const char *filename, int fd) {
 }
 
 int open_logfile(const char *filename, FILE * stderr_fp) {
+    char* mode = "w";
+    if (fCopyOver) 
+	mode = "a";
+
     if (stderr_fp)         /* freopen() the descriptor. */
-        logfile = freopen(filename, "w", stderr_fp);
+        logfile = freopen(filename, mode, stderr_fp);
     else
-        logfile = fopen(filename, "w");
+        logfile = fopen(filename, mode);
 
     syslogfd = fileno(logfile);
     if (logfile) {
