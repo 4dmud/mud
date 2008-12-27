@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "house.h"
 #include "constants.h"
+#include "descriptor.h"
 
 extern int load_qic_check ( int rnum );
 extern const int xap_objs;
@@ -1057,17 +1058,28 @@ int House_can_enter ( Character *ch, room_vnum house )
 	return ( 0 );
 }
 
+C_FUNC( house_expand_house_callback ) {
+	Character* ch = d->character;
+	long i = (long) cinfo;
+	if (toupper(*arg) == 'Y') {
+		if ( GET_GOLD_TOKEN_COUNT ( ch ) >= 1 )
+		{
+			GET_GOLD_TOKEN_COUNT ( ch ) -= 1;
+			house_control[i].expantions += ( long ) 1;
+			ch->Send ( "You expand your house by an extra 200 units for the price of 1 Gold Token.\r\n" );
+			House_save_control();
+		}
+		else
+			ch->Send ( "You can't afford to expand the house at this time, it costs 1 Gold Token.\r\n" );
+	}
+	else {
+		ch->Send ( "You decide to not expand your house.\r\n" );
+	}
+}
+
 void house_expand_house ( Character *ch, int i )
 {
-	if ( GET_GOLD_TOKEN_COUNT ( ch ) >= 1 )
-	{
-		GET_GOLD_TOKEN_COUNT ( ch ) -= 1;
-		house_control[i].expantions += ( long ) 1;
-		ch->Send ( "You expand your house by an extra 200 units for the price of 1 Gold Token.\r\n" );
-		House_save_control();
-	}
-	else
-		ch->Send ( "You can't afford to expand the house at this time, it costs 1 Gold Token.\r\n" );
+	line_input ( ch->desc, "[For one gold token, you'll expand 200 more storage space. Continue? (Type: Y | N )", house_expand_house_callback, (void *) i);
 }
 
 void hcontrol_expand_house ( Character *ch, char *argument )
