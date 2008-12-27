@@ -1048,7 +1048,7 @@ int cast_spell ( Character *ch, Character *tch,
 		ch->Send ( "You can not cast this spell upon yourself!\r\n" );
 		return ( 0 );
 	}
-	if ( IS_SET ( SINFO.routines, MAG_GROUPS ) && ( !ch->master || !ch->followers ) )
+	if ( IS_SET ( SINFO.routines, MAG_GROUPS ) && ( !ch->master && !ch->followers ) )
 	{
 		ch->Send ( "You can not cast this spell if you are not in a group!\r\n" );
 		return ( 0 );
