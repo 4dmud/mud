@@ -1118,7 +1118,7 @@ void hcontrol_expand_house ( Character *ch, char *argument )
 
 	house_control[i].expantions += ( long ) amount;
 
-	ch->Send ( "%d units of 200 %s to house %d (owner: %s) new capacity %d\r\n", (amount > 0 ? amount : -amount), (amount > 0 ? "added" : "removed"), house, pi.NameById ( house_control[i].owner ), house_capacity ( house ) );
+	ch->Send ( "%d units of 200 %s house %d (owner: %s) new capacity %d\r\n", (amount > 0 ? amount : -amount), (amount > 0 ? "added to" : "removed from"), house, pi.NameById ( house_control[i].owner ), house_capacity ( house ) );
 
 	House_save_control();
 }
