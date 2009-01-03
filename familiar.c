@@ -283,6 +283,9 @@ void parse_rogue_commands(Character *ch) {
         if (number(0, 200) <= GET_LEVEL(ch)) {
             switch (number(0, GET_LEVEL(ch)/20)) {
             case 0:
+		if (GET_POS(master) == POS_SITTING)
+		    return;
+
                 act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
                 act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
                 GET_POS(master) = POS_SITTING;
@@ -313,6 +316,9 @@ void parse_rogue_commands(Character *ch) {
             return;
         switch (number(0, GET_LEVEL(ch)/20)) {
         case 0:
+	    if (GET_POS(master) == POS_SITTING)
+		return;
+
             act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
             act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
             GET_POS(vict) = POS_SITTING;
