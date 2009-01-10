@@ -53,8 +53,8 @@ TO ADD A NEW BOARD, simply follow our easy 4-step program:
 #include "comm.h"
 #include "db.h"
 #include "boards.h"
- #include "interpreter.h"
- #include "handler.h"
+#include "interpreter.h"
+#include "handler.h"
 #include "improved-edit.h"
 #include "clan.h"
 #include "descriptor.h"
@@ -70,39 +70,10 @@ Be sure to also change NUM_OF_BOARDS in board.h
 */
 struct board_info_type board_info[NUM_OF_BOARDS] =
   {
-    {590, 0, 0, LVL_GOD, LIB_ETC "board.newbie", 0},
-    {1315, 0, 0, LVL_GOD, LIB_ETC "board.sicilian", 0},
-    {1360, 0, 0, LVL_GOD, LIB_ETC "board.sicilian2", 0},
-    {2914, 0, 0, LVL_GOD, LIB_ETC "board.table_round", 0},
-    {2917, 0, 0, LVL_GOD, LIB_ETC "board.viking", 0},
-    {2999, 0, 0, LVL_GOD, LIB_ETC "board.rt", 0},
     {3079, 0, 0, LVL_GOD, LIB_ETC "board.rp5", 0},
     {3080, 0, LVL_GOD, LVL_GOD, LIB_ETC "board.mort", 0},
     {3089, 0, 0, LVL_GOD, LIB_ETC "board.ideas", 0},
     {3098, LVL_GOD, LVL_GOD, LVL_GRGOD, LIB_ETC "board.immort", 0},
-    {3399, 0, 0, LVL_GOD, LIB_ETC "board.mort1", 0},
-    {3201, 0, LVL_GOD, LVL_SEN, LIB_ETC "board.announce", 0},
-    {8400, 0, 0, LVL_GOD, LIB_ETC "board.rp1", 0},
-    {8401, 0, 0, LVL_GOD, LIB_ETC "board.rp2", 0},
-    {8402, 0, 0, LVL_GOD, LIB_ETC "board.rp3", 0},
-    {8403, 0, 0, LVL_GOD, LIB_ETC "board.rp4", 0},
-    {8449, 0, 0, LVL_GOD, LIB_ETC "board.spy", 0},
-    {8470, 0, 0, LVL_GOD, LIB_ETC "board.bitch", 0},
-    {8477, 0, 0, LVL_GOD, LIB_ETC "board.rpl", 0},
-    {9421, 0, 0, LVL_GOD, LIB_ETC "board.chaos", 0},
-    {9435, 0, 0, LVL_GOD, LIB_ETC "board.chaos2", 0},
-    {10026, 0, 0, LVL_GOD, LIB_ETC "board.dragon", 0},    
-    {10031, 0, 0, LVL_GOD, LIB_ETC "board.dragon2", 0},
-    {10402, 0, 0, LVL_GOD, LIB_ETC "board.dj", 0},
-    {12000, 0, 0, LVL_GOD, LIB_ETC "board.zaade", 0},
-    {12422, 0, 0, LVL_GOD, LIB_ETC "board.saints", 0},
-    {12902, 0, 0, LVL_GOD, LIB_ETC "board.seekers", 0},
-    {17101, 0, 0, LVL_GOD, LIB_ETC "board.house", 0},
-    {17807, 0, 0, LVL_GOD, LIB_ETC "board.hero", 0},
-    {28736, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0},
-    {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0},
-    {26708, 0, 0, LVL_GOD, LIB_ETC "board.gladiators", 0}
-
 
   };
 

@@ -1418,8 +1418,19 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					break;
 				case 'p':
 
-
-					if ( !strcasecmp ( field, "prac" ) )
+                                        if ( !strcasecmp ( field, "pos" ) ) 
+                                        {  
+                                           int i;
+                                           if (subfield && *subfield) {
+                                              for (i = POS_SLEEPING; i <= POS_STANDING; i++) {
+                                                if (!strn_cmp(subfield, position_types[i], strlen(subfield))) {
+                                                  GET_POS(c) = i;
+                                                  break;
+                                                }
+                                              } 
+                                           }
+                                        }
+					else if ( !strcasecmp ( field, "prac" ) )
 					{
 						if ( subfield && *subfield )
 						{

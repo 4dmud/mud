@@ -881,7 +881,7 @@ void char_to_room ( Character *ch, room_rnum room )
 	if ( ch == NULL || room == NULL || room->number < 0 || room->number > top_of_world )
 	{
 		log ( "SYSERR: Illegal value(s) passed to char_to_room. (Room: %d/%d Ch: %p)", room != NULL ? room->number : -1, top_of_world, ch );
-		//send_to_all("{cRALERT: Stability issue!\r\n");
+		send_to_all("{cRALERT: Stability issue!\r\n");
 		room = real_room ( 3001 );
 	}
 	if ( room == NULL )

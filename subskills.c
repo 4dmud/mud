@@ -31,7 +31,7 @@ void improve_skill(Character *ch, int skill);
 int compute_armor_class(Character *ch);
 void spello(int spl, const char *name, int max_mana, int min_mana,
             int mana_change, int minpos, int targets, int violent,
-            int routines, int wait, const char *message, int pulse);
+            int routines, int wait, const char *message, int pulse, int gm);
 int find_first_step(room_rnum src, room_rnum target);
 ACMD(do_gen_door);
 void send_not_to_spam(const char *buf, Character *ch,

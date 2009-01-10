@@ -3460,37 +3460,20 @@ int allowed_pretitle ( Character *ch )
 
 ACMD ( do_pretitle )
 {
-	char **msg;
+   if ( !allowed_pretitle ( ch ) )
+   {
+      ch->Send ( "Sorry, but you don't deserve a pretitle yet.\r\n" );
+      return;
+   }
+   if ( strlen ( argument ) > 14 ) {
+      ch->Send ( "Your pretitle must be fewer than 15 characters.\r\n" );
+      return;
+   }
 
-	if ( !allowed_pretitle ( ch ) )
-	{
-		ch->Send ( "Sorry, but you don't deserve a pretitle yet.\r\n" );
-		return;
-	}
-
-	msg = & ( PRETITLE ( ch ) );
-
-	strip_colour ( argument, strlen ( argument ) );
-	skip_spaces ( &argument );
-
-	if ( strlen ( argument ) > 14 )
-	{
-		ch->Send ( "You pretitle must be shorter than 15 characters.\r\n" );
-		return;
-	}
-
-	if ( *msg )
-		free ( *msg );
-
-	if ( !*argument )
-		*msg = NULL;
-	else
-		*msg = str_dup ( argument );
-
-	ch->Send ( "%s", CONFIG_OK );
+   free_string ( &PRETITLE ( ch ) );
+   PRETITLE ( ch ) = strdup ( argument );
+   ch->Send ( "Your pretitle has been set to: %s\r\n", PRETITLE ( ch ) );
 }
-
-
 
 ACMD ( do_dc )
 {

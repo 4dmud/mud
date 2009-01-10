@@ -118,7 +118,7 @@ ACTION ( thing_call_lightning )
 
 	if ( rndm )
 	{
-		room_affect_damage ( ch, rndm, 150 * multi );
+		room_affect_damage ( ch, rndm, int ( 150 * multi )  );
 		if ( HERE ( ch, rndm ) )
 		{
 			if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )

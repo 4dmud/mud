@@ -1374,7 +1374,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	if ( immune_to ( vict, elemental_type ( w_type ) ) )
 		damage = 0;
 
-	damage += ( damage * ( resist_elem ( vict, elemental_type ( w_type ) * 0.01 ) ) );
+	damage += ( damage * ( resist_elem ( vict, elemental_type ( w_type ) / 100 ) ) );
 
 	if ( AFF_FLAGGED ( vict, AFF_SANCTUARY ) )
 	{
@@ -2684,8 +2684,8 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 		/* TODO: add random message's for this */
 		act ( "$n steals your energy.", FALSE, ch, 0, vict, TO_VICT );
 		act ( "You steal $N's energy.", FALSE, ch, 0, vict, TO_CHAR );
-		damage ( vict,ch, FTOI ( -hp ), TYPE_UNDEFINED );
-		ret_val = damage ( ch,vict, hp, TYPE_UNDEFINED );
+		damage ( vict, ch, FTOI ( -hp ), TYPE_UNDEFINED );
+		ret_val = damage ( ch, vict, int ( hp ), TYPE_UNDEFINED );
 	}
 
 
