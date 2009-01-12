@@ -3469,9 +3469,13 @@ ACMD ( do_pretitle )
       ch->Send ( "Your pretitle must be fewer than 15 characters.\r\n" );
       return;
    }
-
+   if ( !*argument ) {
+      ch->Send ( "Your preitle has been removed.\r\n" );
+      free_string ( &PRETITLE ( ch ) );
+      return;
+   }
    free_string ( &PRETITLE ( ch ) );
-   PRETITLE ( ch ) = strdup ( argument );
+   PRETITLE ( ch ) = strdup ( argument+1 );
    ch->Send ( "Your pretitle has been set to: %s\r\n", PRETITLE ( ch ) );
 }
 
