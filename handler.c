@@ -1585,16 +1585,14 @@ void extract_obj ( struct obj_data *obj )
 							obj_from_room ( tobj );
 							if ( GET_OBJ_TYPE ( tobj ) != ITEM_V_CONTROLS &&
 							        GET_OBJ_TYPE ( tobj ) != ITEM_V_HATCH &&
-							        GET_OBJ_TYPE ( tobj ) != ITEM_V_WINDOW )
+							        GET_OBJ_TYPE ( tobj ) != ITEM_V_WINDOW &&
+								number ( 1, 100) < chance)
 							{
-								if ( chance < number ( 1, 100 ) )
-								{
-									obj_to_room ( tobj, target );
-								}
-								else
-								{
-									extract_obj ( tobj );
-								}
+								obj_to_room ( tobj, target );
+							}
+							else
+							{
+								extract_obj ( tobj );
 							}
 						}
 					}
