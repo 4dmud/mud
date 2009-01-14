@@ -5,7 +5,7 @@
 CC = g++
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -m32
+MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -O0 -ggdb -fno-inline
 
 #flags for profiling (see hacker.doc for more information)
 PROFILE = 
@@ -16,7 +16,7 @@ PROFILE =
 
 BINDIR = ../bin
 
-CFLAGS = -O0 -ggdb $(MYFLAGS) $(PROFILE)
+CFLAGS = $(MYFLAGS) $(PROFILE)
 
 LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 
