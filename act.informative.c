@@ -4057,12 +4057,6 @@ void perform_immort_where ( Character *ch, char *arg )
 	register struct obj_data *k;
 	Descriptor *d;
 	int num = 0, counter = 0, found = 0;
-	char buf[ MAX_STRING_LENGTH];
-	DYN_DEFINE;
-	*buf = 0;
-
-	DYN_CREATE;
-	*dynbuf = 0;
 
 	if ( !*arg )
 	{
@@ -4094,6 +4088,13 @@ void perform_immort_where ( Character *ch, char *arg )
 	}
 	else
 	{
+		char buf[ MAX_STRING_LENGTH];
+		DYN_DEFINE;
+		*buf = 0;
+
+		DYN_CREATE;
+		*dynbuf = 0;
+
 		new_mudlog ( CMP, ( GET_LEVEL ( ch ) == LVL_IMPL ? GET_LEVEL ( ch ) :GET_LEVEL ( ch ) +1 ), TRUE, "(GC) %s did a \"where %s\".",
 		             GET_NAME ( ch ),arg );
 		counter = 0;
