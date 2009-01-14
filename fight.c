@@ -6553,17 +6553,18 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SKILL_KICK:
 		{
 			float spd = GET_SPEED ( ch ) - GET_SPEED ( vict );
-			if ( spd < 0 )
+			if (spd < 0) {
 				dam = 0.2;
-			else
-			{
+			}
+			else {
 				spd *= 0.001;
 				spd += 1.3;
+
+				dam = spd;
 			}
-			dam = spd;
+			return dam;
+			break;
 		}
-		return dam;
-		break;
 		case SKILL_BASH:
 			GET_POS ( vict ) = POS_SITTING;
 			GET_WAIT_STATE ( vict ) += 2 RL_SEC;
