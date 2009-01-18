@@ -2901,15 +2901,15 @@ struct comm_data {
 
 /**
 Tree      Affect    Max  Chance    Start Age
-Willow    speed     240  1 in 20   5
-elder     speed     110  1 in 5    1
-pine      cha       9    1 in 10   1
+pine      speed     240  1 in 20   5
+oak       speed     110  1 in 5    1
+willow    cha       9    1 in 10   1
 dogwood   wis       3    1 in 15   6
 ironwood  hp        600  1 in 15   3
 fir       mana      2000 1 in 20   1
 maple     int       3    1 in 10   3
-elm       mana      1000 1 in 10   1
-Oak       hp        400  1 in 5    2
+elder     mana      1000 1 in 10   1
+elm       hp        400  1 in 5    2
  
 **/
 struct stave_stat_table {
