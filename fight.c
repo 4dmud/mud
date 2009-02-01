@@ -5342,21 +5342,34 @@ void die ( Character *ch, Character *killer )
 			gain_exp ( ch, - ( exp / 6 ) );
 		}
 		/** Count the total people who did damage to the mob - mord **/
-		for ( t = MOB_DAM_LIST ( ch ); t; t = t->next )	{counter++;}
+		int player_damage_done = 0;
+		for ( t = MOB_DAM_LIST ( ch ); t; t = t->next )	{
+			if (t->id == -1)
+				continue;
+			temp = find_char (t->id);
+			if (IS_NPC(temp))
+				continue;
+			if (IN_ROOM(temp) != IN_ROOM(ch))
+				continue;
+
+			player_damage_done += t->damage;
+			counter++;
+		}
 
 		for ( t = MOB_DAM_LIST ( ch ); t; t = t->next )
 		{
 			if ( t->id != -1 )
 			{
 				temp = find_char ( t->id );
-				if ( !temp )
+				if ( !temp || IN_ROOM(temp) != IN_ROOM(ch))
 					continue;
+
 #if defined(EXP_GAIN_SYSTEM_1)
 				exp = ( GET_EXP ( ch ) * t->damage ) /MOB_DAM_TAKEN ( ch );
 				if ( exp < ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 ) ) /*(16% for level 1, 1% for level 150)*/
 					exp = ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 );
 #else
-				exp = ( GET_EXP ( ch ) / ( counter>0?counter:1 ) );
+				exp = ( (GET_EXP ( ch ) * player_damage_done / MOB_DAM_TAKEN (ch) ) / ( counter>0?counter:1 ) );
 #endif
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
 				{
