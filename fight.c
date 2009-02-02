@@ -5347,6 +5347,8 @@ void die ( Character *ch, Character *killer )
 			if (t->id == -1)
 				continue;
 			temp = find_char (t->id);
+			if (!temp)
+				continue;
 			if (IS_NPC(temp))
 				continue;
 			if (IN_ROOM(temp) != IN_ROOM(ch))
