@@ -2906,9 +2906,9 @@ oak       speed     110  1 in 5    1
 willow    cha       9    1 in 10   1
 dogwood   wis       3    1 in 15   6
 ironwood  hp        600  1 in 15   3
-fir       mana      2000 1 in 20   1
+fir       mana      2500 1 in 20   1
 maple     int       3    1 in 10   3
-elder     mana      1000 1 in 10   1
+elder     mana      1500 1 in 10   1
 elm       hp        400  1 in 5    2
  
 **/

@@ -40,9 +40,9 @@ struct stave_stat_table stave_table[MAX_TREE_TYPES] =
 	{APPLY_CHA,   9,     35,   0},
 	{APPLY_WIS,   3,     42,   5},
 	{APPLY_HIT,   1000,  47,   2},
-	{APPLY_MANA,  2200,  52,   0},
+	{APPLY_MANA,  2500,  52,   0},
 	{APPLY_INT,   3,     62,   2},
-	{APPLY_MANA,  1200,  72,   0},
+	{APPLY_MANA,  1500,  72,   0},
 	{APPLY_HIT,   500,   28,   1}
 } ;
 struct obj_data *make_tree ( int v0, int v1, int v2 )
