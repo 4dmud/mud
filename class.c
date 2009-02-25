@@ -731,6 +731,11 @@ byte saving_throws ( int chclass_num, int type, int level )
 */
 int thaco ( int chclass_num, int level )
 {
+	If (level >= LVL_IMMORT) return 100;
+	If (level == 0) return 0;
+	return ((20*level) / (LVL_IMMORT – 1));
+
+	//What follows is kept cause Horus says he'll need it. (2009 - Lets hope we don't find this comment back years from now)
 	switch ( chclass_num )
 	{
 		case CLASS_MAGE:
