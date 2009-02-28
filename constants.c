@@ -2103,7 +2103,7 @@ const char *spell_wear_off_msg[] =
 	"Feeling returns to your mind.",
 	"The feeling of lethargy falls from your muscles.",
 	"Your wings weaken, shrivel and fall off.",
-	"The hase of red fades and you don't feel so angry.",
+	"The haze of red fades and you don't feel so angry.",
 	"ENCHANT ARMOR",
 	"Your Magic Bubble bursts.",
 	"You stop panicing.",
