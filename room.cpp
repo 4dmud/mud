@@ -70,9 +70,11 @@ Room::Room() {
     people = NULL;   /* List of NPC / PC in room             */
     affects = NULL;
     ores = NULL;
-
 }
 Room::~Room() {
+    // Adding this per Horus
+    struct room_ores *tmp, *tmp_next;
+    
     free_room_strings();
 
     /* free any assigned scripts */
@@ -81,6 +83,14 @@ Room::~Room() {
     /* free script proto list */
     if (proto_script)
         free_proto_script(this, WLD_TRIGGER);
+    
+    // Added per Horus
+    for (tmp = ores; tmp; tmp = tmp_next) {
+	tmp_next = tmp->next;
+	free(tmp);
+	}
+	ores = NULL;
+
 }
 
 int Room::free_room_strings() {
