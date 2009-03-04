@@ -1166,7 +1166,7 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 	else
 	{
 
-		if ( affected_by_spell ( ch, SKILL_SNARE ) )
+		if ( affected_by_spell ( ch, SKILL_SNARE ) || affected_by_spell ( ch, AFF_HOLD) )
 		{
 
 			ch->Send ( "You struggle " );
