@@ -438,6 +438,11 @@ ACMD ( do_flee )
 
 	if ( AFF_FLAGGED ( ch, AFF_HOLD ) )
 	{
+	// Adding back old code for trap aware vs snare. It 
+	// Got deleted somehow from base code.
+	//Prometheus
+		was_fighting = FIGHTING(ch);
+		i = GET_SKILL (ch, SKILL_TRAP_AWARE) - GET_SKILL (was_fighting, SKILL_SNARE) + GET_LEVEL(ch) - GET_LEVEL(was_fighting) + number (1, 100);
 		ch->Send ( "You have been snared and can't flee.\r\n" );
 		return;
 	}
