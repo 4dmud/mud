@@ -443,7 +443,7 @@ ACMD ( do_flee )
 	//Prometheus
 		was_fighting = FIGHTING(ch);
 		i = GET_SKILL (ch, SKILL_TRAP_AWARE) - GET_SKILL (was_fighting, SKILL_SNARE) + GET_LEVEL(ch) - GET_LEVEL(was_fighting) + number (1, 100);
-		if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || i < 40) {
+		if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || (i < 40 && number(1,100) < 95)) {
 		ch->Send ( "You have been snared and can't flee.\r\n" );
 		return;
 		}
