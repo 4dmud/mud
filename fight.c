@@ -1419,8 +1419,6 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	{
 		if ( wep && GET_MASTERY ( ch, CLASS_GYPSY ) )
 			damage += ( damage/5 );
-		if ( !wep && GET_MASTERY ( ch, CLASS_MAGE ) )
-			damage += ( damage/5 );
 	}
 	if ( IS_NPC ( vict ) )
 	{
@@ -7005,7 +7003,10 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 	}
 
 	if ( GET_MASTERY ( ch, CLASS_ESPER ) )
-		dam += 0.25;
+		dam *= 1.25;
+        if ( GET_MASTERY ( ch, CLASS_MAGE ) )
+                dam *= 1.20;
+
 	if ( affected_by_spell ( ch, SPELL_DEVINE_MIND ) )
 		dam += 0.15;
 	switch ( elemental_type ( type ) )
