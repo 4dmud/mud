@@ -11,7 +11,7 @@
 //
 
 #define CHUNK 16384
-typedef struct compress_map_data {
+struct compress_map_data {
  unsigned char *saved;
  unsigned char *inflated;
  bool parsed;
