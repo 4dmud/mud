@@ -20,9 +20,8 @@ CFLAGS = $(MYFLAGS) $(PROFILE)
 
 LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 
-SRCFILES := $(wildcard *.c) $(wildcard *.cpp)
-OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
-OBJFILES := $(patsubst %.c,%.o,$(SRCFILES))  
+SRCFILES := $(wildcard *.cpp)
+OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))  
 
 default: all
 
@@ -35,7 +34,7 @@ circle:
 $(BINDIR)/circle : $(OBJFILES)
 	$(CC) -o $(BINDIR)/circle $(PROFILE) $(OBJFILES) $(LIBS)
 
-$%.o: %.c
+$%.o: %.cpp
 	$(CC) $< $(CFLAGS) -c -o $@ 
 
 clean:
@@ -45,6 +44,6 @@ clean:
 # gcc -MM)
 
 depend:
-	$(CC) -MM *.c > depend
+	$(CC) -MM *.cpp > depend
 
 -include depend
