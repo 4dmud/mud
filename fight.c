@@ -7002,11 +7002,6 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 
 	}
 
-	if ( GET_MASTERY ( ch, CLASS_ESPER ) )
-		dam *= 1.25;
-        if ( GET_MASTERY ( ch, CLASS_MAGE ) )
-                dam *= 1.20;
-
 	if ( affected_by_spell ( ch, SPELL_DEVINE_MIND ) )
 		dam += 0.15;
 	switch ( elemental_type ( type ) )
@@ -7030,6 +7025,12 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam += 0.18;
 			break;
 	}
+
+        if ( GET_MASTERY ( ch, CLASS_ESPER ) )
+                dam *= 1.25;
+        if ( GET_MASTERY ( ch, CLASS_MAGE ) )
+                dam *= 1.20;
+
 	//I have no idea why the below was in, but it has been here since before
 	//I started coding here. It is pretty nasty, since it allows a player to
 	//spamcast an offensive spell at a mob, and the mob won't be able to fight
