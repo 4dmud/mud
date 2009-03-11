@@ -815,7 +815,8 @@ const char *affected_bits[] =
 	"POLY_TOAD",
 	"IMMFREEZE",
 	"SILENCED",
-	"\n"
+	"SNARE",
+        "\n"
 };
 
 

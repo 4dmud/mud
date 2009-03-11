@@ -2575,7 +2575,7 @@ ASKILL ( skill_snare )
 		af.expire = HOURS_TO_EXPIRE ( 3 );
 		af.modifier = 0;
 		af.location = APPLY_NONE;
-		af.bitvector = AFF_HOLD;
+		af.bitvector = AFF_SNARE;
 
 		affect_join ( vict, &af, FALSE, FALSE, FALSE, FALSE );
 
