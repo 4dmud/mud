@@ -756,7 +756,9 @@ class Room;
 #define AFF_IMMFREEZE          88
 #define AFF_SILENCED           89
 
-#define MAX_AFF_APPLY         90
+// Changed / added per Horus
+#define AFF_SNARE	      90	
+#define MAX_AFF_APPLY         91
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \

@@ -436,16 +436,24 @@ ACMD ( do_flee )
 	Character *was_fighting;
 	void halt_fighting ( Character *ch );
 
-	if ( AFF_FLAGGED ( ch, AFF_HOLD ) )
+	if ( AFF_FLAGGED ( ch, AFF_SNARE ) )
 	{
 	// Horus code fix. I will see if I can
 	// find my old code fix I had
 	//Prometheus
 		was_fighting = FIGHTING(ch);
+		if (!was_fighting) {
+                        if (number(1,100) > GET_SKILL(ch, SKILL_TRAP_AWARE)){
+                        ch->Send("You have been snared and can't flee. \r\n");
+			return;
+		}
+		}
+		else {
 		i = GET_SKILL (ch, SKILL_TRAP_AWARE) - GET_SKILL (was_fighting, SKILL_SNARE) + GET_LEVEL(ch) - GET_LEVEL(was_fighting) + number (1, 100);
 		if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || (i < 40 && number(1,100) < 95)) {
 		ch->Send ( "You have been snared and can't flee.\r\n" );
 		return;
+		}
 		}
 	}
 
@@ -476,6 +484,11 @@ ACMD ( do_flee )
 
 
 				ch->Send ( "You flee head over heels.\r\n" );
+				// Added per Horus
+				if (IS_AFFECTED(ch, AFF_SNARE)) {
+				affect_from_char(ch, SKILL_SNARE);
+				ch->Send("You break free from your snare!\r\n");
+				}
 				if ( was_fighting && !DEAD ( was_fighting ) && !IS_NPC ( ch ) && IS_NPC ( was_fighting ) &&
 				        ! ( GET_LEVEL ( ch ) <= 20 && REMORTS ( ch ) == 0 ) )
 				{
@@ -494,7 +507,6 @@ ACMD ( do_flee )
 	}
 	ch->Send ( "PANIC!  You couldn't escape!\r\n" );
 }
-
 
 
 
