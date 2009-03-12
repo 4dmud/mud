@@ -6159,9 +6159,9 @@ int can_fight ( Character *ch, Character *vict, int silent )
 			ret = 1;
 		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) && !ROOM_FLAGGED ( IN_ROOM ( vict ), ROOM_ARENA ) )
 		{
-			if ( !silent )
-				ch->Send ( "You can't attack %s.\r\n", GET_NAME ( vict ) );
-			ret = 0;
+                                SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_KILLER );
+				ch->Send ( "Attacking %s. has now flagged you as a player killer.\r\n", GET_NAME ( vict ) );
+			        ret = 1;
 		}
 	}
 	if ( ret && !ok_damage_shopkeeper ( ch, vict ) )
