@@ -6157,7 +6157,7 @@ int can_fight ( Character *ch, Character *vict, int silent )
 	{
 		if ( both_pk ( ch,vict ) )
 			ret = 1;
-		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) && !ROOM_FLAGGED ( IN_ROOM ( vict ), ROOM_ARENA ) )
+		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) && !ROOM_FLAGGED ( IN_ROOM ( vict ), ROOM_ARENA ) && !PLR_FLAGGED(vict, PLR_KILLER))
 		{
                                 SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_KILLER );
 				ch->Send ( "Attacking %s. has now flagged you as a player killer.\r\n", GET_NAME ( vict ) );
