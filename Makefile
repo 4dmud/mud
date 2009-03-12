@@ -16,7 +16,7 @@ PROFILE =
 
 BINDIR = ../bin
 
-CFLAGS = $(MYFLAGS) $(PROFILE)
+CPPFLAGS = $(MYFLAGS) $(PROFILE)
 
 LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 
