@@ -1023,6 +1023,7 @@ EVENTFUNC ( message_event )
 					time = 0;
 					ch->Send ( "You need to specify, 'better' or 'worse'.\r\n" );
 				}
+				break;
 			case SKILL_PICK_LOCK:
 				msg_id = ME_PICK_LOCK;
 				break;
