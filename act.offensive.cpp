@@ -435,25 +435,20 @@ ACMD ( do_flee )
 	int i, attempt, loss;
 	Character *was_fighting;
 	void halt_fighting ( Character *ch );
+        struct affected_type *af;
 
-	if ( AFF_FLAGGED ( ch, AFF_SNARE ) )
+	if ( affected_by_spell ( ch, SKILL_SNARE ) )
 	{
 	// Horus code fix. I will see if I can
 	// find my old code fix I had
 	//Prometheus
-		was_fighting = FIGHTING(ch);
-		if (!was_fighting) {
-                        if (number(1,100) > GET_SKILL(ch, SKILL_TRAP_AWARE)){
-                        ch->Send("You have been snared and can't flee. \r\n");
-			return;
-		}
-		}
-		else {
-		i = GET_SKILL (ch, SKILL_TRAP_AWARE) - GET_SKILL (was_fighting, SKILL_SNARE) + GET_LEVEL(ch) - GET_LEVEL(was_fighting) + number (1, 100);
-		if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || (i < 40 && number(1,100) < 95)) {
+            for (af = ch->affected; af; af = af->next)
+              if (af->type == SKILL_SNARE) break;
+
+	    i = total_chance(ch, SKILL_TRAP_AWARE) - af->modifier + GET_LEVEL(ch);
+	    if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || (number(1, 110) > i  && number(1,100) < 95)) {
 		ch->Send ( "You have been snared and can't flee.\r\n" );
 		return;
-		}
 		}
 	}
 
