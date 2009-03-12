@@ -1168,7 +1168,6 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 
 		if ( affected_by_spell ( ch, SKILL_SNARE ))
 		{
-
 			ch->Send ( "You struggle " );
 			if ( number ( 1, 101 ) < total_chance ( ch, SKILL_TRAP_AWARE ) )
 			{
@@ -2573,7 +2572,7 @@ ASKILL ( skill_snare )
 	{
 		af.type = SKILL_SNARE;
 		af.expire = HOURS_TO_EXPIRE ( 3 );
-		af.modifier = 0;
+		af.modifier = GET_LEVEL(ch);
 		af.location = APPLY_NONE;
 		af.bitvector = AFF_SNARE;
 
