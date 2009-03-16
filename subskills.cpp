@@ -37,7 +37,8 @@ ACMD(do_gen_door);
 void send_not_to_spam(const char *buf, Character *ch,
                       Character *victim, struct obj_data *weap,
                       int spam);
-void check_killer(Character *ch, Character *vict);
+// Horus - I dont think check_killer is used here.
+// void check_killer(Character *ch, Character *vict);
 int has_class(Character *ch, int chclass);
 int tier_level(Character *ch, int chclass);
 int perform_push(Character *ch, int dir, int need_specials_check,

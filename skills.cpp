@@ -45,7 +45,8 @@ void spello ( int spl, const char *name, int max_mana, int min_mana,
 int find_first_step ( room_rnum src, room_rnum target,bool honour_notrack=false );
 void skill_attack ( Character *ch, Character *vict, int skill, int pass );
 ACMD ( do_gen_door );
-void check_killer ( Character *ch, Character *vict );
+// Horus - I dont think check_killer is used here.
+// void check_killer ( Character *ch, Character *vict );
 int has_class ( Character *ch, int chclass );
 int tier_level ( Character *ch, int chclass );
 int perform_push ( Character *ch, int dir, int need_specials_check,

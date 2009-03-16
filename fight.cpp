@@ -4935,10 +4935,10 @@ void check_killer ( Character *ch, Character *vict )
 	{
 
 		if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
-			return;
+			return ;
 
 		if ( both_pk ( ch,vict ) )
-			return;
+			return ;
 
 		SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_KILLER );
 		new_mudlog ( BRF, LVL_GOD, TRUE,
@@ -6115,7 +6115,6 @@ void tick_grenade ( void )
 
 int can_fight ( Character *ch, Character *vict, int silent )
 {
-	int ret = 1;
 
 	if ( !ch || !vict )
 		return 0;
@@ -6149,28 +6148,21 @@ int can_fight ( Character *ch, Character *vict, int silent )
 	{
 		if ( FIGHTING ( ch ) && FIGHTING ( ch ) == vict )
 			stop_fighting ( ch );
-		ret = 0;
+                return 0;
 	}
 
-
-	if ( ret && !IS_NPC ( ch ) && !IS_NPC ( vict ) )
+        /* Horus - fixed the mess that was here */
+	if ( !CONFIG_PK_ALLOWED && !arena_ok (ch,  vict ) )
 	{
-		if ( both_pk ( ch,vict ) )
-			ret = 1;
-		else if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) && !ROOM_FLAGGED ( IN_ROOM ( vict ), ROOM_ARENA ) && !PLR_FLAGGED(vict, PLR_KILLER))
-		{
-                                SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_KILLER );
-				ch->Send ( "Attacking %s. has now flagged you as a player killer.\r\n", GET_NAME ( vict ) );
-			        ret = 1;
-		}
+                return 0;
 	}
-	if ( ret && !ok_damage_shopkeeper ( ch, vict ) )
+	if ( !ok_damage_shopkeeper ( ch, vict ) )
 	{
 		stop_fighting ( ch );
-		ret = 0;
+                return 0;
 	}
 
-	return ret;
+	return 1;
 
 }
 
