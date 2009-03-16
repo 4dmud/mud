@@ -6161,10 +6161,10 @@ int can_fight ( Character *ch, Character *vict, int silent )
 	{
                 if (IS_NPC(ch) || IS_NPC(vict))
                   return 1;
-                if (!arena_ok(ch, vict))
-                  return 0;
                 if (PLR_FLAGGED(vict, PLR_KILLER))
                   return 1;
+                if (!arena_ok(ch, vict))
+                  return 0;
 	}
 
 	return 1;
