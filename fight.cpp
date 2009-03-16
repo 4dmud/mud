@@ -6151,15 +6151,20 @@ int can_fight ( Character *ch, Character *vict, int silent )
                 return 0;
 	}
 
-        /* Horus - fixed the mess that was here */
-	if ( !CONFIG_PK_ALLOWED && !arena_ok (ch,  vict ) )
-	{
-                return 0;
-	}
 	if ( !ok_damage_shopkeeper ( ch, vict ) )
 	{
 		stop_fighting ( ch );
                 return 0;
+	}
+        /* Horus - fixed the mess that was here */
+	if ( !CONFIG_PK_ALLOWED )
+	{
+                if (IS_NPC(ch) || IS_NPC(vict))
+                  return 1;
+                if (!arena_ok(ch, vict))
+                  return 0;
+                if (PLR_FLAGGED(vict, PLR_KILLER))
+                  return 1;
 	}
 
 	return 1;
