@@ -1217,7 +1217,7 @@ return MIN(100, SAVED(ch).GetSubLearn((subskill_list)i));
 }
 
 int get_sub_status(Character *ch, int i) {
-    if (IS_NPC(ch) && MOB_SUBSKILL(ch) == 1)
+    if (IS_NPC(ch) && MOB_SUBSKILL(ch) == i)
         return STATUS_ON;
     return SAVED(ch).GetSubStatus((subskill_list)i);
 
