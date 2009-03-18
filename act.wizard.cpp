@@ -3047,6 +3047,7 @@ ACMD ( do_copyover )
 		return;
 	}
 
+	alarm(0);
 	save_all(); //done
 	/* For each playing descriptor, save its state */
 	for ( d = descriptor_list; d; d = d_next )
@@ -3110,6 +3111,7 @@ ACMD ( do_copyover )
 	/* Ugh, seems it is expected we are 1 step above lib - this may be dangerous! */
 	chdir ( ".." );
 	execl ( EXE_FILE, "circle", buf2, buf, ( char * ) NULL );
+	alarm(60);
 
 	/* Failed - sucessful exec will not return */
 	perror ( "do_copyover: execl" );
