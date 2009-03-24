@@ -850,7 +850,8 @@ ASKILL ( skill_rescue )
         { 
             if (tmp_ch == vict) continue;
             if (tmp_ch == ch) continue;
-            found++;
+            if (FIGHTING(tmp_ch) == vict)
+              found++;
         }
 
 	if ( !found )
