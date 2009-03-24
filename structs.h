@@ -1206,6 +1206,15 @@ class Room;
 #define SUN_LIGHT   2
 #define SUN_SET          3
 
+/* Moon phases for weather_data */
+#define MOON_WANING_GIBBOUS       0
+#define MOON_LAST_QUARTER         1
+#define MOON_WANING_CRESCENT      2
+#define MOON_NEW_MOON             3
+#define MOON_WAXING_CRESCENT      4
+#define MOON_FIRST_QUARTER        5
+#define MOON_WAXING_GIBBOUS       6
+#define MOON_FULL_MOON            7
 
 /* Sky conditions for weather_data */
 #define SKY_CLOUDLESS    0
@@ -1717,6 +1726,7 @@ typedef struct memory_rec_struct memory_rec;
 struct time_info_data {
     int hours, day, month;
     sh_int year;
+    sh_int moon;
 };
 
 

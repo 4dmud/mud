@@ -825,6 +825,7 @@ ASKILL ( skill_rescue )
 
 	Character *tmp_ch;
 	int percent, prob;
+        int found = 0;
 
 	if ( !skill_cost ( 0, 10, 40, ch ) )
 	{
@@ -837,34 +838,53 @@ ASKILL ( skill_rescue )
 		*ch << "How can you rescue someone you are trying to kill?\r\n";
 		return 0;
 	}
-	for ( tmp_ch = IN_ROOM ( ch )->people; tmp_ch &&
-	        ( FIGHTING ( tmp_ch ) != vict ); tmp_ch = tmp_ch->next_in_room );
 
-	if ( !tmp_ch )
+        /* Hey, lets not rescue the person who is killing you */
+        if (FIGHTING(vict) == ch) {
+                *ch << "But that person is attacking you!\r\n";
+                return 0;
+        }
+
+        /* Lets count how many people are fighting the person being rescued */
+	for ( tmp_ch = IN_ROOM ( ch )->people; tmp_ch; tmp_ch = tmp_ch->next_in_room )
+        { 
+            if (tmp_ch == vict) continue;
+            if (tmp_ch == ch) continue;
+            found++;
+        }
+
+	if ( !found )
 	{
 		act ( "But nobody is fighting $M!", FALSE, ch, 0, vict, TO_CHAR );
 		return 0;
 	}
+
+        /* Lets make it slightly harder to rescue when more mobs are fighting*/
 	percent = number ( 1, 101 );   /* 101% is a complete failure */
-	prob = total_chance ( ch, SKILL_RESCUE );
+	prob = total_chance ( ch, SKILL_RESCUE ) - (found * 3);
 
 	if ( percent > prob )
 	{
 		*ch << "You fail the rescue!\r\n";
 		return 0;
 	}
+
+        /* SUCCESS!! */
+	for ( tmp_ch = IN_ROOM ( ch )->people; tmp_ch; tmp_ch = tmp_ch->next_in_room )
+        { 
+            if (tmp_ch == vict) continue;
+            if (tmp_ch == ch) continue;
+            if (FIGHTING(tmp_ch) == vict) {
+                stop_fighting(tmp_ch);
+                start_fighting(tmp_ch, ch);
+            }
+        }
+
+        stop_fighting(vict);
+
 	*ch << "Banzai!  To the rescue...\r\n";
 	act ( "You are rescued by $N, you are confused!", FALSE, vict, 0, ch,TO_CHAR );
 	act ( "$n heroically rescues $N!", FALSE, ch, 0, vict, TO_NOTVICT );
-	if ( FIGHTING ( vict ) == tmp_ch )
-		stop_fighting ( vict );
-	if ( FIGHTING ( tmp_ch ) )
-		stop_fighting ( tmp_ch );
-	if ( FIGHTING ( ch ) )
-		stop_fighting ( ch );
-
-	start_fighting ( ch, tmp_ch );
-	start_fighting ( tmp_ch, ch );
 
 	WAIT_STATE ( vict, PULSE_VIOLENCE );
 	return SKILL_RESCUE;

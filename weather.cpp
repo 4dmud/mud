@@ -27,6 +27,20 @@ void another_hour(int mode);
 void weather_change(int zon);
 int find_month(void);
 int get_temperature(room_rnum room);
+
+const char *moon_types[] =
+{
+  "waning gibbous",
+  "last quarter",
+  "waning crescent",
+  "new",
+  "waxing crescent",
+  "first quarter",
+  "waxing gibbous",
+  "full",
+  ""
+};
+
 /*
 static struct sect_temperature_data {
 int min;
@@ -105,6 +119,7 @@ return time_info.month;
 
 void another_hour(int mode)
 {
+    char buf[256];
     time_info.hours++;
 
     if (mode) {
@@ -123,7 +138,8 @@ void another_hour(int mode)
 	    break;
 	case 22:
 	    sunlight = SUN_DARK;
-	    send_to_outdoor("The night has begun.\r\n");
+            sprintf(buf, "The %s moon rises up in the night sky.\r\n", moon_types[time_info.moon]);
+	    send_to_outdoor(buf);
 	    break;
 	default:
 	    break;
@@ -143,6 +159,23 @@ void another_hour(int mode)
 	    }
 	}
     }
+
+    if (time_info.day > 29) 
+      time_info.moon = MOON_FULL_MOON;
+    else if (time_info.day > 25)
+      time_info.moon = MOON_WANING_GIBBOUS;
+    else if (time_info.day > 21)
+      time_info.moon = MOON_LAST_QUARTER;
+    else if (time_info.day > 16)
+      time_info.moon = MOON_WANING_CRESCENT;
+    else if (time_info.day > 12)
+      time_info.moon = MOON_NEW_MOON;
+    else if (time_info.day > 7)
+      time_info.moon = MOON_WAXING_CRESCENT;
+    else if (time_info.day > 3)
+      time_info.moon = MOON_FIRST_QUARTER;
+    else
+      time_info.moon = MOON_WAXING_GIBBOUS;
 }
 
 
