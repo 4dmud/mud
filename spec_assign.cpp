@@ -19,6 +19,7 @@
 
 extern int mini_mud;
 
+SPECIAL(antidt);
 SPECIAL(bank);
 SPECIAL(bottle);
 SPECIAL(cityguard);
@@ -387,6 +388,8 @@ void assign_rooms(void)
 
     ASSIGNROOM(201, door_down);
     ASSIGNROOM(7377, door_down_7377);
+
+    ASSIGNROOM(4, antidt);
 
     ASSIGNROOM(280, fire);
     ASSIGNROOM(2499, fire);

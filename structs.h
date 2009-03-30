@@ -549,6 +549,7 @@ class Room;
 #define PLR_GALLIANO     35
 #define PLR_NEEDS_CLASS 36  /* Player hasn't yet chosen their class     */
 #define PLR_NEEDS_STATS 37  /* Player hasn't yet chosen their stats     */
+#define PLR_ANTI_DT     38  /* Horus - has a life against DTs */
 
 #define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */

@@ -1010,13 +1010,30 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	/* DEATHTRAPS */
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_DEATH ) )
 	{
-		if ( RIDING ( ch ) )
+		if ( RIDING ( ch ) ) {
+                    if (!PLR_FLAGGED(ch, PLR_ANTI_DT))
 			hit_death_trap ( RIDING ( ch ) );
+                    else {
+                        REMOVE_BIT_AR(PLR_FLAGS(RIDING(ch)), PLR_ANTI_DT);
+                        raw_kill(RIDING(ch), NULL);
+                    }
+                }
 
-		if ( RIDDEN_BY ( ch ) )
+		if ( RIDDEN_BY ( ch ) ) {
+                    if (!PLR_FLAGGED(ch, PLR_ANTI_DT)) 
 			hit_death_trap ( RIDDEN_BY ( ch ) );
+                    else {
+                        REMOVE_BIT_AR(PLR_FLAGS(RIDDEN_BY(ch)), PLR_ANTI_DT);
+                        raw_kill(RIDDEN_BY(ch), NULL);
+                    }
+                }
 
-		hit_death_trap ( ch );
+                if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
+                    REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
+                    raw_kill(ch, NULL);
+                }
+                else
+		    hit_death_trap ( ch );
 		return ( 0 );
 	}
 

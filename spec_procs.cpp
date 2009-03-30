@@ -173,6 +173,7 @@ void npc_steal ( Character *ch, Character *victim );
 void sort_spell_data ( void );
 void sort_skill_data ( void );
 
+SPECIAL (antidt);
 SPECIAL ( bank );
 SPECIAL ( bottle );
 SPECIAL ( cityguard );
@@ -252,6 +253,19 @@ void sort_spells_to_list()
 
 */
 
+SPECIAL(antidt)
+{
+
+  if (!CMD_IS("booga"))
+    return 0;
+
+  SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
+  act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
+  act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
+  return 1;
+  
+
+}
 
 SPECIAL ( dump )
 {

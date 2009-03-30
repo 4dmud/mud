@@ -604,6 +604,17 @@ const char *player_bits[] =
 	"HERO",
 	"DYING",
 	"RPL",
+        "IMM",
+        "JESTER",
+        "ALDERISIO",
+        "BITCH",
+        "RIDDLER",
+        "LOLTHYTE",
+        "FEARLESS",
+        "GALLIANO",
+        "CLASSLESS",
+        "STATSLESS",
+        "!DT",
 	"\n"
 };
 
