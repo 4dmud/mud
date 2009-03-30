@@ -256,7 +256,7 @@ void sort_spells_to_list()
 SPECIAL(antidt)
 {
 
-  if (!CMD_IS("booga"))
+  if (!CMD_IS("jump"))
     return 0;
 
   SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
