@@ -1967,6 +1967,7 @@ ACMD ( do_gold )
 	           GET_SILVER_TOKEN_COUNT ( ch ), GET_GOLD_TOKEN_COUNT ( ch ) );
 	ch->Send ( "                {cw-------------------------------------------{c0\r\n" );
 	ch->Send ( "                {ccTradepoints   {cW: %5d  {c0\r\n",TRADEPOINTS ( ch ) );
+	ch->Send ( "                {ccCredits       {cW: 0    {c0\r\n");
 
 }
 
