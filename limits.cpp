@@ -524,9 +524,7 @@ void gain_exp ( Character *ch, gold_int gain )
 		}
 
 		if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
-//APRIL FOOLS 2009
-//			ch->Send ( "You receive %s%lld experience points.\r\n", CONFIG_DOUBLE_EXP ? "a massive double " : "", CONFIG_DOUBLE_EXP ? ( gain/2 ) : gain );
-			ch->Send ( "You receive %s%lld experience points.\r\n", "a massive triple ", CONFIG_DOUBLE_EXP ? ( gain/2 ) : gain );
+			ch->Send ( "You receive %s%lld experience points.\r\n", CONFIG_DOUBLE_EXP ? "a massive double " : "", CONFIG_DOUBLE_EXP ? ( gain/2 ) : gain );
 
 		if ( is_altered && ( GET_LEVEL ( ch ) < LVL_HERO ) )
 		{
@@ -534,8 +532,6 @@ void gain_exp ( Character *ch, gold_int gain )
 			             GET_NAME ( ch ), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL ( ch ) );
 			GET_GROUP_EXP ( ch ) = FTOI ( level_exp ( GET_CLASS ( ch ), GET_LEVEL ( ch ), current_class_is_tier_num ( ch ), REMORTS ( ch ) ) * 0.2 );
 
-			//APRIL FOOLS 2009
-			ch->Send ( "{cy+-+-+TRIPLE EXP DAY+-+-+{c0\r\n" );
 			if ( CONFIG_DOUBLE_EXP )
 				ch->Send ( "{cy+-+-+DOUBLE EXP DAY+-+-+{c0\r\n" );
 			if ( num_levels == 1 )
