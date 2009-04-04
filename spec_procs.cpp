@@ -252,17 +252,61 @@ void sort_spells_to_list()
 
 
 */
+int calc_tp(Character *ch, int type) 
+{
+  if (type == 0) {
+    if (REMORTS(ch) < 1)
+      return 500;
+    else if (REMORTS(ch) <= 3)
+      return 2500;
+    return 5000;
+  }
+  if (REMORTS(ch) < 1)
+    return 1;
+  else if (REMORTS(ch) <= 3)
+    return 5;
+  return 10;
+}
 
 SPECIAL(antidt)
 {
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
-  if (!CMD_IS("jump"))
-    return 0;
+  if (CMD_IS("buy")) {
+    if (!*argument) {
+      ch->Send("You can either buy full protection or item protection:\r\n");
+      ch->Send("buy full <tradepoints/tokens>\r\n");
+      ch->Send("buy item <item name>\r\n");
+      return 1;
+    }
 
-  SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
-  act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
-  act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
-  return 1;
+    argument = one_argument(argument, arg1);
+    one_argument(argument, arg2);
+    if (!str_cmp(arg1, "full")) {
+      if (!*arg2 || (!is_abbrev(arg2, "tradepoints") && !is_abbrev(arg2, "tokens"))) {
+        ch->Send("Please type either buy full tradepoints or buy full tokens.\r\n");
+        return 1;
+      }
+      if (is_abbrev(arg2, "tradepoints")) {
+        if (TRADEPOINTS(ch) < calc_tp(ch, 0)) {
+          ch->Send("You do not have enough tradepoints for a full protection.|r\n");
+          return 1;
+        }
+        TRADEPOINTS(ch) -= calc_tp(ch, 0);
+      }
+      else if (is_abbrev(arg2, "tokens")) {
+      }
+
+      SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
+      act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
+      act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
+      return 1;
+    }
+  }
+  else if (CMD_IS("cost")) {
+  }
+
+  return 0;
   
 
 }

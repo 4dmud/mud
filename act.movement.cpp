@@ -1011,29 +1011,14 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_DEATH ) )
 	{
 		if ( RIDING ( ch ) ) {
-                    if (!PLR_FLAGGED(ch, PLR_ANTI_DT))
-			hit_death_trap ( RIDING ( ch ) );
-                    else {
-                        REMOVE_BIT_AR(PLR_FLAGS(RIDING(ch)), PLR_ANTI_DT);
-                        raw_kill(RIDING(ch), NULL);
-                    }
+		    hit_death_trap ( RIDING ( ch ) );
                 }
 
 		if ( RIDDEN_BY ( ch ) ) {
-                    if (!PLR_FLAGGED(ch, PLR_ANTI_DT)) 
-			hit_death_trap ( RIDDEN_BY ( ch ) );
-                    else {
-                        REMOVE_BIT_AR(PLR_FLAGS(RIDDEN_BY(ch)), PLR_ANTI_DT);
-                        raw_kill(RIDDEN_BY(ch), NULL);
-                    }
+		    hit_death_trap ( RIDDEN_BY ( ch ) );
                 }
 
-                if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
-                    REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
-                    raw_kill(ch, NULL);
-                }
-                else
-		    hit_death_trap ( ch );
+		hit_death_trap ( ch );
 		return ( 0 );
 	}
 
@@ -1066,24 +1051,78 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 
 void hit_death_trap ( Character *ch )
 {
-	obj_data *obj, *next_o;
+	obj_data *obj, *next_o, *tobj, *tobj_next;
+        int i;
 	if ( !ch )
 		return;
 	if ( ( GET_LEVEL ( ch ) < LVL_IMMORT ) || IS_NPC ( ch ) )
 	{
 		log_death_trap ( ch );
-		eq_to_room ( ch );
+                if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
+		    REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_ANTI_DT );
+                    raw_kill(ch, NULL);
+                    return;
+                }
+
+                /* Checking for what the character is carrying */
+                /* If container is not anti_dt, then all contents go as well */
+                while (ch->carrying) {
+                    obj = ch->carrying;
+                    /* Lets check if the object is a container */
+                    for (tobj = obj->contains; tobj; tobj = tobj_next) {
+                        tobj_next = tobj->next_content;
+                        if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
+                            extract_obj(tobj);
+                        else
+                            REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                    }
+                    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
+                      obj_from_char(obj);
+                      extract_obj(obj);
+                    }
+                    else
+                        REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                }
+
+                /* Now check for equipped items */
+                for (i = 0; i < NUM_WEARS; i++) 
+                    if (GET_EQ(ch, i)) {
+                        obj = unequip_char(ch, i);
+                        if (IN_ROOM(ch) == NULL)
+                            extract_obj(obj);
+                        else {
+                            for (tobj = obj->contains; tobj; tobj = tobj_next) {
+                                tobj_next = tobj->next_content;
+                                if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
+                                    extract_obj(tobj);
+                               else
+                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                            }
+                            if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
+                                obj_from_char(obj);
+                                extract_obj(obj);
+                            }
+                            else
+                                REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                        }
+                    }
+                       
+                        
+
+	// 	eq_to_room ( ch );
 		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
 		{
 			next_o = obj->next_content;
 			extract_obj ( obj );
 		}
 		/* Purge twice to clear the room */
+                /* Really becomes redundant since obj is already extracted 
 		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
 		{
 			next_o = obj->next_content;
 			extract_obj ( obj );
 		}
+                */
 		raw_kill ( ch, NULL );
 		if ( !IS_NPC ( ch ) )
 			GET_DT_CNT ( ch ) += 1;

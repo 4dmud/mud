@@ -1127,6 +1127,7 @@ class Room;
 #define ITEM_KEYSTAY          64
 #define ITEM_PK_CORPSE          65
 #define ITEM_BEHEADED_CORPSE    66
+#define ITEM_ANTI_DT            67  /* Item is immune to DT */
 
 
 /* Modifier constants used with obj affects ('A' fields) */
