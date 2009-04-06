@@ -302,6 +302,7 @@ ACMD ( do_trans );
 ACMD ( do_transfer );
 ACMD ( do_search_triggers );
 ACMD ( do_trust );
+ACMD ( do_trade );
 ACMD ( do_unban );
 ACMD ( do_ungroup );
 ACMD ( do_use );
@@ -1027,6 +1028,8 @@ const command_info cmd_info[] =
 	{ "abort"    , "abor"          , POS_RESTING , do_abort    , LVL_SEN, 0, WIZ_IMPL_GRP },
 	{ "nomating" , "nomat"    , POS_SLEEPING, mate_toggle , 1, 0, 0 },
 	/* End Mating Module Command List */
+        /* Horus - blank commands for spec_procs */
+        { "trade"    , "trade"     , POS_STANDING,   do_trade, 0, 0, 0 },
 
 	{ "\n", "zzzzzzz", 0, 0, 0, 0, 0 }
 }

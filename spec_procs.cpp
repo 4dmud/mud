@@ -252,6 +252,10 @@ void sort_spells_to_list()
 
 
 */
+
+#define BRONZE_TOKEN       3301
+#define SILVER_TOKEN       3302
+
 int calc_tp(Character *ch, int type) 
 {
   if (type == 0) {
@@ -271,36 +275,41 @@ int calc_tp(Character *ch, int type)
 SPECIAL(antidt)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
 
-  if (CMD_IS("buy")) {
+  if (CMD_IS("trade")) {
     if (!*argument) {
       ch->Send("You can either buy full protection or item protection:\r\n");
-      ch->Send("buy full <tradepoints/tokens>\r\n");
-      ch->Send("buy item <item name>\r\n");
+      ch->Send("trade full\r\n");
+      ch->Send("trade <item name>\r\n");
       return 1;
     }
 
-    argument = one_argument(argument, arg1);
-    one_argument(argument, arg2);
-    if (!str_cmp(arg1, "full")) {
-      if (!*arg2 || (!is_abbrev(arg2, "tradepoints") && !is_abbrev(arg2, "tokens"))) {
-        ch->Send("Please type either buy full tradepoints or buy full tokens.\r\n");
-        return 1;
-      }
-      if (is_abbrev(arg2, "tradepoints")) {
+    if (!str_cmp(argument, "full")) {
         if (TRADEPOINTS(ch) < calc_tp(ch, 0)) {
-          ch->Send("You do not have enough tradepoints for a full protection.|r\n");
+          ch->Send("You do not have enough tradepoints for a full protection.\r\n");
           return 1;
         }
         TRADEPOINTS(ch) -= calc_tp(ch, 0);
-      }
-      else if (is_abbrev(arg2, "tokens")) {
-      }
 
-      SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
-      act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
-      act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
-      return 1;
+        SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
+        act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
+        act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
+        return 1;
+    }
+    else {
+        if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
+            ch->Send("You do not seem to be carrying any %s.\r\n", argument);
+            return 1;
+        }
+        if (TRADEPOINTS(ch) < calc_tp(ch, 0)/10) {
+          ch->Send("You do not have enough tradepoints to protect your item.\r\n");
+          return 1;
+        }
+        TRADEPOINTS(ch) -= calc_tp(ch, 0)/10;
+        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+        act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
+        return 1;
     }
   }
   else if (CMD_IS("cost")) {

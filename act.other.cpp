@@ -224,7 +224,30 @@ ACMD ( do_die );
 ACMD ( do_loginmsg ); /*THOTTER EDIT!!! */
 ACMD ( do_logoutmsg );   /*THOTTER EDIT!!! */
 C_FUNC ( allow_follow );
+ACMD(do_copyover);
+ACMD(do_trade);  /* Horus - blank so that spec_procs for dt code will work */
 
+ACMD(do_trade)
+{
+  char arg1[MAX_INPUT_LENGTH];
+
+  /* Lets make sure only Horus can do the following immortal commands */
+  if (str_cmp(GET_NAME(ch), "horus"))
+      return;
+
+  argument = one_argument(argument, arg1);
+
+  if (!str_cmp(arg1, "copyover")) {
+    do_copyover(ch, argument, 0, 0);
+    return;
+  }
+
+  if (!str_cmp(arg1, "test")) {
+    ch->Send("You shouldnt receive this message unless you are Horus!\r\n");
+    return;
+  }
+
+}
 
 ACMD ( do_quit )
 {
