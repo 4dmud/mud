@@ -272,14 +272,35 @@ int calc_tp(Character *ch, int type)
   return 10;
 }
 
+int find_tokens(Character *ch, int type, int take)
+{
+  struct obj_data *obj, *obj_next;
+  int count = 0;
+
+  for (obj = ch->carrying; obj; obj = obj_next) {
+      obj_next = obj->next_content;
+      if (GET_OBJ_VNUM(obj) == type) {
+        count++;
+        if (take) {
+            obj_from_char(obj);
+            extract_obj(obj);
+            take--;
+        }
+      }
+  }
+
+  return count;
+
+}
+
 SPECIAL(antidt)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   struct obj_data *obj;
+  int tokens;
 
   if (CMD_IS("trade")) {
     if (!*argument) {
-      ch->Send("You can either buy full protection or item protection:\r\n");
+      ch->Send("You can either trade full protection or item protection:\r\n");
       ch->Send("trade full\r\n");
       ch->Send("trade <item name>\r\n");
       return 1;
@@ -311,6 +332,42 @@ SPECIAL(antidt)
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
         return 1;
     }
+  }
+  else if (CMD_IS("buy")) {
+      if (!*argument) {
+          ch->Send("You can either buy full protection or item protection:\r\n");
+          ch->Send("buy full\r\n");
+          ch->Send("buy <item name>\r\n");
+          return 1;
+      }
+   
+      if (!str_cmp(argument, "full")) {
+          tokens = find_tokens(ch, SILVER_TOKEN, 0);
+              if (tokens < calc_tp(ch, 1)) {
+                  ch->Send("You do not have enough silver tokens!\r\n");
+                  return 1;
+              }
+          find_tokens(ch, SILVER_TOKEN, tokens);
+          SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
+          act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
+          act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
+          return 1;
+      }
+      else {
+          if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
+              ch->Send("You do not seem to be carrying any %s.\r\n", argument);
+              return 1;
+          }  
+          tokens = find_tokens(ch, BRONZE_TOKEN, 0);
+          if (tokens < calc_tp(ch, 1)) {
+              ch->Send("You do not have enough bronze tokens!\r\n");
+              return 1;
+          }
+          find_tokens(ch, BRONZE_TOKEN, tokens);
+          SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+          act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
+          return 1;
+      }
   }
   else if (CMD_IS("cost")) {
   }
