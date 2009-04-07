@@ -1074,7 +1074,7 @@ void hit_death_trap ( Character *ch )
                         if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
                             extract_obj(tobj);
                         else
-                            REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                            REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                     }
                     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
                       obj_from_char(obj);
@@ -1096,7 +1096,7 @@ void hit_death_trap ( Character *ch )
                                 if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
                                     extract_obj(tobj);
                                else
-                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                             }
                             if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
                                 obj_from_char(obj);
