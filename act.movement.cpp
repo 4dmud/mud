@@ -1066,14 +1066,17 @@ void hit_death_trap ( Character *ch )
 
                 /* Checking for what the character is carrying */
                 /* If container is not anti_dt, then all contents go as well */
-                while (ch->carrying) {
-                    obj = ch->carrying;
+                for (obj = ch->carrying; obj; obj = next_o) {
+                    next_o = obj->next_content;
                     /* Lets check if the object is a container */
                     for (tobj = obj->contains; tobj; tobj = tobj_next) {
                         tobj_next = tobj->next_content;
-                        if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
+                        if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT)) {
+                            obj_from_obj(tobj);
+                            obj_from_char(tobj);
                             extract_obj(tobj);
-                        else
+                        }
+                        else 
                             REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                     }
                     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
@@ -1086,19 +1089,25 @@ void hit_death_trap ( Character *ch )
 
                 /* Now check for equipped items */
                 for (i = 0; i < NUM_WEARS; i++) 
-                    if (GET_EQ(ch, i)) {
-                        obj = unequip_char(ch, i);
-                        if (IN_ROOM(ch) == NULL)
+                    if ((obj =GET_EQ(ch, i))) {
+                        if (IN_ROOM(ch) == NULL) {
+                            unequip_char(ch, i);
+                            obj_from_char(obj); 
                             extract_obj(obj);
+                        }
                         else {
                             for (tobj = obj->contains; tobj; tobj = tobj_next) {
                                 tobj_next = tobj->next_content;
-                                if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT))
+                                if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT)) {
+                                    obj_from_obj(tobj);
+                                    obj_from_char(tobj);
                                     extract_obj(tobj);
-                               else
+                                }
+                                else
                                     REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                             }
                             if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
+                                unequip_char(ch, i);
                                 obj_from_char(obj);
                                 extract_obj(obj);
                             }
@@ -1110,11 +1119,11 @@ void hit_death_trap ( Character *ch )
                         
 
 	// 	eq_to_room ( ch );
-		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
+/*		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
 		{
 			next_o = obj->next_content;
 			extract_obj ( obj );
-		}
+		} */
 		/* Purge twice to clear the room */
                 /* Really becomes redundant since obj is already extracted 
 		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )

@@ -298,8 +298,10 @@ SPECIAL(antidt)
   struct obj_data *obj;
   int tokens;
 
+  if (argument[0] == ' ')
+    argument++;
   if (CMD_IS("trade")) {
-    if (!*argument) {
+    if (argument[0] == '\0') {
       ch->Send("You can either trade full protection or item protection:\r\n");
       ch->Send("trade full\r\n");
       ch->Send("trade <item name>\r\n");

@@ -5268,7 +5268,7 @@ void raw_kill ( Character *ch, Character *killer )
 	update_pos ( ch );
 	make_corpse ( ch, killer );
 	// clears out eq
-	if ( IS_NPC ( ch ) )
+	if ( !IS_NPC ( ch ) )
 		Crash_crashsave ( ch );
 	death_room ( ch );
 }

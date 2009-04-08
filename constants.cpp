@@ -1492,6 +1492,9 @@ const char *extra_bits[] =
 	"extracting-(CODE)",
 	"shiftable",
 	"key-rent",
+        "pk-corpse",
+        "beheaded-corpse",
+        "anti-dt",
 	"\n"
 };
 
