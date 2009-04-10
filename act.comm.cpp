@@ -1364,7 +1364,7 @@ ACMD(do_qcomm) {
                 if (STATE(i) == CON_PLAYING && i != ch->desc &&
                         PRF_FLAGGED(i->character, PRF_QUEST) &&
                         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF) &&
-                        (is_ignoring(ch, i->character) && (GET_LEVEL(ch) <= LVL_GOD)))
+                        (is_ignoring(ch, i->character) ))
                     act(buf, 0, ch, 0, i->character, TO_VICT | TO_SLEEP);
 
         }
