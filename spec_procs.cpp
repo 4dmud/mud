@@ -349,7 +349,7 @@ SPECIAL(antidt)
                   ch->Send("You do not have enough silver tokens!\r\n");
                   return 1;
               }
-          find_tokens(ch, SILVER_TOKEN, tokens);
+          find_tokens(ch, SILVER_TOKEN, calc_tp(ch, 1));
           SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
           act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
           act("an aura of protection surrounds $n!", FALSE, ch, 0, 0, TO_ROOM);
@@ -365,13 +365,16 @@ SPECIAL(antidt)
               ch->Send("You do not have enough bronze tokens!\r\n");
               return 1;
           }
-          find_tokens(ch, BRONZE_TOKEN, tokens);
+          find_tokens(ch, BRONZE_TOKEN, calc_tp(ch, 1));
           SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
           act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
           return 1;
       }
   }
   else if (CMD_IS("cost")) {
+      ch->Send("For full protection, you need %d tradepoints or %d silver tokens.\r\n", calc_tp(ch, 0), calc_tp(ch, 1));
+      ch->Send("For each item protection, you need %d tradepoints or %d bronze tokens.\r\n", calc_tp(ch, 0)/10, calc_tp(ch, 1));
+      return 1;
   }
 
   return 0;
