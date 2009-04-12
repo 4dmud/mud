@@ -1389,7 +1389,7 @@ ACMD ( do_cast )
 		if ( mana > 0 )
 			alter_mana ( ch, mana / 2 );
 
-		if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) )
+		if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && !FIGHTING(tch) )
 			start_fighting_delay ( tch, ch );
 
 	}
