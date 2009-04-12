@@ -1409,7 +1409,7 @@ ACMD ( do_cast )
 					alter_mana ( ch, mana );
 			}
 		}
-		else if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) || !FIGHTING(tch))
+		else if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && !FIGHTING(tch))
 			start_fighting_delay ( tch, ch );
 	}
 }
