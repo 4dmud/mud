@@ -164,6 +164,8 @@ ACMD ( do_drop );
 ACMD ( do_gen_door );
 ACMD ( do_say );
 
+bool check_token(OBJ_DATA *obj);
+
 /* local functions */
 void sort_spells ( void );
 int compare_spells ( const void *x, const void *y );
@@ -293,6 +295,19 @@ int find_tokens(Character *ch, int type, int take)
 
 }
 
+bool check_owner(Character *ch, struct obj_data *obj)
+{
+    if (obj->owner <= 0) {
+        obj->owner = GET_IDNUM(ch);
+        return TRUE;
+    }
+
+    if (obj->owner == GET_IDNUM(ch))
+        return TRUE;
+
+    return FALSE;
+}
+
 SPECIAL(antidt)
 {
   struct obj_data *obj;
@@ -325,10 +340,21 @@ SPECIAL(antidt)
             ch->Send("You do not seem to be carrying any %s.\r\n", argument);
             return 1;
         }
+        if (check_token(obj)) {
+          ch->Send("You cannot protect tokens.\r\n");
+          return 1;
+        }
+
         if (TRADEPOINTS(ch) < calc_tp(ch, 0)/10) {
           ch->Send("You do not have enough tradepoints to protect your item.\r\n");
           return 1;
         }
+     
+        if (!check_owner(ch, obj)) {
+           act("You are not the original owner of $p!", FALSE, ch, obj, 0, TO_CHAR);
+           return 1;
+        }
+ 
         TRADEPOINTS(ch) -= calc_tp(ch, 0)/10;
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
@@ -360,10 +386,18 @@ SPECIAL(antidt)
               ch->Send("You do not seem to be carrying any %s.\r\n", argument);
               return 1;
           }  
+          if (check_token(obj)) {
+              ch->Send("You cannot protect tokens.\r\n");
+              return 1;
+          }
           tokens = find_tokens(ch, BRONZE_TOKEN, 0);
           if (tokens < calc_tp(ch, 1)) {
               ch->Send("You do not have enough bronze tokens!\r\n");
               return 1;
+          }
+          if (!check_owner(ch, obj)) {
+             act("You are not the original owner of $p!", FALSE, ch, obj, 0, TO_CHAR);
+             return 1;
           }
           find_tokens(ch, BRONZE_TOKEN, calc_tp(ch, 1));
           SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);

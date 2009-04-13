@@ -1049,6 +1049,54 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	return ( 1 );
 }
 
+bool check_token(obj_data *obj)
+{
+  if (GET_OBJ_VNUM(obj) >= 3300 && GET_OBJ_VNUM(obj) <= 3312)
+    return TRUE;
+
+  return FALSE;
+}
+
+void extract_tokens(Character *ch)
+{
+    obj_data *obj, *obj_next, *tobj, *tobj_next;
+    int i;
+
+    for (obj = ch->carrying; obj; obj = obj_next) {
+        obj_next = obj->next_content;
+        for (tobj = obj->contains; tobj; tobj = tobj_next) {
+            tobj_next = tobj->next_content;
+            if (check_token(tobj)) {
+                obj_from_obj(tobj);
+                obj_from_char(tobj);
+                extract_obj(tobj);
+            }
+         }
+         if (check_token(obj)) {
+             obj_from_char(obj);
+             extract_obj(obj);
+         }
+    }
+                
+    for (i = 0; i < NUM_WEARS; i++) 
+        if ((obj =GET_EQ(ch, i))) {
+            for (tobj = obj->contains; tobj; tobj = tobj_next) {
+                tobj_next = tobj->next_content;
+                if (check_token(tobj)) {
+                    obj_from_obj(tobj);
+                    obj_from_char(tobj);
+                    extract_obj(tobj);
+                }
+             } 
+             if (check_token(obj)) {
+                 unequip_char(ch, i);
+                 obj_from_char(obj);
+                 extract_obj(obj);
+             }
+        }
+
+}
+
 void hit_death_trap ( Character *ch )
 {
 	obj_data *obj, *next_o, *tobj, *tobj_next;
@@ -1058,12 +1106,18 @@ void hit_death_trap ( Character *ch )
 	if ( ( GET_LEVEL ( ch ) < LVL_IMMORT ) || IS_NPC ( ch ) )
 	{
 		log_death_trap ( ch );
+
+                /* Lets get rid of all tokens, regardless of protection */
+                extract_tokens(ch);
+
+                /* Player has full protection */
                 if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
 		    REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_ANTI_DT );
                     raw_kill(ch, NULL);
                     return;
                 }
 
+                /* Player has no full protection, check for item protection */
                 /* Checking for what the character is carrying */
                 /* If container is not anti_dt, then all contents go as well */
                 for (obj = ch->carrying; obj; obj = next_o) {
@@ -1071,20 +1125,21 @@ void hit_death_trap ( Character *ch )
                     /* Lets check if the object is a container */
                     for (tobj = obj->contains; tobj; tobj = tobj_next) {
                         tobj_next = tobj->next_content;
-                        if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT)) {
+                        if (IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT) && tobj->owner == GET_IDNUM(ch))
+                            REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
+                        else {
                             obj_from_obj(tobj);
                             obj_from_char(tobj);
                             extract_obj(tobj);
                         }
-                        else 
-                            REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                     }
-                    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
-                      obj_from_char(obj);
-                      extract_obj(obj);
-                    }
-                    else
+                    if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && obj->owner == GET_IDNUM(ch))
                         REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                    else {
+                        obj_from_obj(obj);
+                        obj_from_char(obj);
+                        extract_obj(obj);
+                    }
                 }
 
                 /* Now check for equipped items */
@@ -1098,21 +1153,21 @@ void hit_death_trap ( Character *ch )
                         else {
                             for (tobj = obj->contains; tobj; tobj = tobj_next) {
                                 tobj_next = tobj->next_content;
-                                if (!IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT)) {
+                                if (IS_SET_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT) && tobj->owner == GET_IDNUM(ch))
+                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
+                                else {
                                     obj_from_obj(tobj);
                                     obj_from_char(tobj);
                                     extract_obj(tobj);
                                 }
-                                else
-                                    REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                             }
-                            if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
-                                unequip_char(ch, i);
+                            if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && obj->owner == GET_IDNUM(ch))
+                                REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+                            else {
+                                obj_from_obj(obj);
                                 obj_from_char(obj);
                                 extract_obj(obj);
                             }
-                            else
-                                REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
                         }
                     }
                        
