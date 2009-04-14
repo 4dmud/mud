@@ -531,7 +531,7 @@ OCMD ( do_oteleport )
 			next_ch = ch ? ch->next_in_room : NULL;
 			if ( !valid_dg_target ( ch, TRUE ) )
 				continue;
-			if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_NORECALL ) )
+			if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_NORECALL ) && str_cmp(argument, "override") )
 			{
 				ch->Send ( "The magic fizzles out leaving you stranded.\r\n" );
 				break;
@@ -550,7 +550,7 @@ OCMD ( do_oteleport )
 			was_in = IN_ROOM ( ch );
 			if ( valid_dg_target ( ch, TRUE ) )
 			{
-				if ( ROOM_FLAGGED ( ch->in_room, ROOM_NORECALL ) )
+				if ( ROOM_FLAGGED ( ch->in_room, ROOM_NORECALL ) && str_cmp(argument, "override") )
 				{
 					ch->Send ( "The magic fizzles out leaving you stranded.\r\n" );
 					return;
