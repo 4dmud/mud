@@ -263,15 +263,21 @@ int calc_tp(Character *ch, int type)
   if (type == 0) {
     if (REMORTS(ch) < 1)
       return 500;
-    else if (REMORTS(ch) <= 3)
+    else if (REMORTS(ch) <= 4)
       return 2500;
-    return 5000;
+    else if (REMORTS(ch) <= 10)
+      return 5000;
+    else
+      return 7500;
   }
   if (REMORTS(ch) < 1)
     return 1;
-  else if (REMORTS(ch) <= 3)
+  else if (REMORTS(ch) <= 4)
     return 5;
-  return 10;
+  else if (REMORTS(ch) <= 10)
+    return 10;
+  else
+    return 15;
 }
 
 int find_tokens(Character *ch, int type, int take)
@@ -405,7 +411,7 @@ SPECIAL(antidt)
           return 1;
       }
   }
-  else if (CMD_IS("cost")) {
+  else if (CMD_IS("list")) {
       ch->Send("For full protection, you need %d tradepoints or %d silver tokens.\r\n", calc_tp(ch, 0), calc_tp(ch, 1));
       ch->Send("For each item protection, you need %d tradepoints or %d bronze tokens.\r\n", calc_tp(ch, 0)/10, calc_tp(ch, 1));
       return 1;
