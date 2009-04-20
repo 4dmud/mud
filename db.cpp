@@ -3987,6 +3987,8 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 {
 	struct obj_data *obj = NULL;
 	obj_rnum i;
+        Room *vroom;
+
 	i = ( ( type == VIRTUAL ) ? real_object ( nr ) : nr );
 
 	if ( i == NOTHING || i > top_of_objt )
@@ -4007,6 +4009,20 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 	assign_triggers ( obj, OBJ_TRIGGER );
 	objNames.addNamelist(obj->name, GET_ID(obj));
 
+        /* New vehicle code by Horus                     *
+         * If its vehicle, load the room for the vehicle */
+        /*
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) {
+            tt = find_new_vehicle_room();
+            if (!tt) {
+                log("ERROR: Ran out of reserved rooms for vehicle");
+                extract_obj(obj);
+                return NULL;
+            }
+            CREATE(vroom, Room, 1);
+            GET_OBJ_VAL(obj, 1) = tt;
+        }
+        */ 
 	return ( obj );
 }
 

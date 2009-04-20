@@ -1813,6 +1813,7 @@ ACMD ( do_enter )
 			{
 				switch ( GET_OBJ_TYPE ( obj ) )
 				{
+                                        case ITEM_VEHICLE2:
 					case ITEM_PORTAL:
 						to_room = "$n enters $p.";
 						to_char = "You enter $p.";

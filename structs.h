@@ -1502,7 +1502,7 @@ struct obj_flag_data {
 /* Used in obj_file_elem *DO*NOT*CHANGE* */
 struct obj_affected_type {
     byte location;       /* Which ability to change (APPLY_XXX) */
-    sbyte modifier;      /* How much it changes by              */
+    short int modifier;      /* How much it changes by              */
 };
 
 

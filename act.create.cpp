@@ -752,9 +752,9 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	{
 		final_focus->affected[0].location = stave_table[v2].affect;
 		final_focus->affected[0].modifier =
-		    ( stave_table[v2].max ) * ( v1 - stave_table[v2].start ) / ( 9 - stave_table[v2].start );
+     stave_table[v2].max  * ( v1 - stave_table[v2].start ) / 
+    ( 9 - stave_table[v2].start );
 	}
-
 	obj_to_char ( final_focus, ch );
 	if ( type == SKILL_SING_WOOD )
 		improve_skill ( ch, SKILL_SING_WOOD );

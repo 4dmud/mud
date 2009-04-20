@@ -651,3 +651,24 @@ void assign_vehicles(void) {
     ASSIGNOBJ(54162, vehicle_hatch);
 
 }
+
+/*************************************************************
+* New Vehicle code by Horus  *********************************
+*************************************************************/
+
+#define UPPER_V_ROOM      199
+#define LOWER_V_ROOM      100
+
+int find_new_vehicle_room()
+{
+  int i;
+
+  for (i = LOWER_V_ROOM; i <= UPPER_V_ROOM; i++) {
+      if (real_room(i) == NULL)
+          return i;
+  }
+
+  return 0;
+
+}
+
