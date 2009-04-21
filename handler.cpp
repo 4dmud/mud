@@ -604,7 +604,7 @@ void affect_modify(Character * ch, byte loc, sbyte mod,
 
 
 
-void affect_modify_ar ( Character *ch, byte loc, sbyte mod,
+void affect_modify_ar ( Character *ch, byte loc, int mod,
                         int bitv[], bool add
                       )
 {

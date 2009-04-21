@@ -91,7 +91,7 @@ void free_followers ( struct follow_type *k );
 void damage_count_free ( Character *vict );
 void extract_all_in_list ( OBJ_DATA *obj );
 void free_alias ( struct alias_data *a );
-void affect_modify_ar ( Character *ch, byte loc, sbyte mod, int bitv[], bool add
+void affect_modify_ar ( Character *ch, byte loc, int mod, int bitv[], bool add
                       );
 int find_eq_pos ( Character *ch, struct obj_data *obj, char *arg );
 
