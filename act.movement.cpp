@@ -1946,11 +1946,22 @@ ACMD ( do_enter )
 ACMD ( do_leave )
 {
 	int door;
+        Room *vroom;
+        struct obj_data *obj;
 
 	if ( OUTSIDE ( ch ) )
 		send_to_char ( "You are outside.. where do you want to go?\r\n", ch );
 	else
 	{
+            if ((vroom = IN_ROOM(ch)) && (obj = vroom->vehicle) && obj->in_room) {
+                act("$n leaves $p.", FALSE, ch, obj, 0, TO_ROOM);
+                act("You leave $p.", FALSE, ch, obj, 0, TO_CHAR);
+                char_from_room(ch);
+                char_to_room(ch, obj->in_room);
+                act("$n enters the room.", FALSE, ch, 0, 0, TO_ROOM);
+                look_at_room(ch, 0);
+                return;
+            }
 		for ( door = 0; door < NUM_OF_DIRS; door++ )
 			if ( EXIT ( ch, door ) )
 				if ( EXIT ( ch, door )->to_room != NULL )

@@ -1373,6 +1373,7 @@ const char *item_types[] =
 	"vial",
 	"bankbook",
 	"spacebike",
+        "vehicle2",
 	"\n"
 };
 

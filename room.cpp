@@ -67,6 +67,7 @@ Room::Room() {
     proto_script = NULL;    /* list of default triggers    */
     script = NULL;    /* script info for the object           */
     contents = NULL;     /* List of items in room                */
+    vehicle = NULL;   /* Room is inside a vehicle */
     people = NULL;   /* List of NPC / PC in room             */
     affects = NULL;
     ores = NULL;

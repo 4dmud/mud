@@ -77,6 +77,7 @@ void tag_argument ( char *argument, char *tag );
 int is_aggro ( Character *ch );
 void generate_weapon ( OBJ_DATA *obj );
 
+int create_vehicle_room(struct obj_data *obj);
 void ASSIGNMOB ( mob_vnum mob, SPECIAL ( fname ) );
 void ASSIGNOBJ ( obj_vnum obj, SPECIAL ( fname ) );
 SPECIAL ( postmaster );
@@ -3987,7 +3988,6 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 {
 	struct obj_data *obj = NULL;
 	obj_rnum i;
-        Room *vroom;
 
 	i = ( ( type == VIRTUAL ) ? real_object ( nr ) : nr );
 
@@ -4011,18 +4011,10 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 
         /* New vehicle code by Horus                     *
          * If its vehicle, load the room for the vehicle */
-        /*
-        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) {
-            tt = find_new_vehicle_room();
-            if (!tt) {
-                log("ERROR: Ran out of reserved rooms for vehicle");
-                extract_obj(obj);
-                return NULL;
-            }
-            CREATE(vroom, Room, 1);
-            GET_OBJ_VAL(obj, 1) = tt;
-        }
-        */ 
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) 
+            if (!create_vehicle_room(obj)) 
+                GET_OBJ_VAL(obj, 1) = -1;
+
 	return ( obj );
 }
 

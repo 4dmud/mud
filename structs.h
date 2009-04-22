@@ -1670,6 +1670,7 @@ public:
     struct script_data *script;    /* script info for the object           */
 
     struct obj_data *contents;     /* List of items in room                */
+    struct obj_data *vehicle;      /* Interior room of the vehicle */
     Character *people;   /* List of NPC / PC in room             */
 
     struct room_affected_type *affects;

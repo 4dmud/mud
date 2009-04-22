@@ -30,7 +30,8 @@ int enter_wtrigger(Room *room, Character *actor,
 
 ACMD(do_look);
 
-
+room_rnum add_room(Room *room);
+int delete_room(room_rnum rnum);
 
 struct obj_data *find_vehicle(int roomNum);
 
@@ -656,19 +657,90 @@ void assign_vehicles(void) {
 * New Vehicle code by Horus  *********************************
 *************************************************************/
 
-#define UPPER_V_ROOM      199
-#define LOWER_V_ROOM      100
+#define UPPER_V_ROOM      55999 
+#define LOWER_V_ROOM      55501 
+#define ZONE_V_ROOM       555
 
-int find_new_vehicle_room()
+room_vnum find_new_vehicle_room()
 {
-  int i;
+  room_vnum i;
 
   for (i = LOWER_V_ROOM; i <= UPPER_V_ROOM; i++) {
       if (real_room(i) == NULL)
           return i;
   }
 
-  return 0;
+  return -1;
 
 }
 
+int create_vehicle_room(struct obj_data *obj)
+{
+  Room *vroom;
+  char buf[MAX_STRING_LENGTH];
+  room_vnum vnum;
+  
+  vnum = find_new_vehicle_room();
+  if (vnum == -1) return 0;
+
+  vroom = new Room();
+  vroom->number = vnum; 
+  vroom->vehicle = obj;
+  if (obj->ex_description) {
+      vroom->name = strdup(obj->ex_description->keyword);
+      vroom->t_description = strdup(obj->ex_description->description);
+  }
+  else {
+      sprintf(buf, "Inside %s", obj->short_description);
+      vroom->name = strdup(buf);
+      vroom->t_description = strdup("It is very plain and boring in here.");
+  } 
+ 
+  vroom->AssignTempDesc();
+
+  if (add_room(vroom) == NULL) {
+      log("SYSERR: create_vehicle_room: Something failed!");
+      return 0;
+  }
+
+  GET_OBJ_VAL(obj, 1) = vnum;
+
+  return 1; 
+}
+
+void delete_vehicle(struct obj_data *obj)
+{
+  Character *ch, *ch_next;
+  Room *vroom;
+  struct obj_data *tobj, *tobj_next;
+
+  /* What the? This vehicle does not have a room associated with it */
+  if ((vroom = real_room(GET_OBJ_VAL(obj, 1))) == NULL) {
+      log("SYSERR: vehicle2 does not have a room");
+      return;
+  }
+
+  /* Lets boot players into RECALL and extract mobs */
+  for (ch = vroom->people; ch; ch = ch_next) {
+      ch_next = ch->next_in_room;
+      if (IS_NPC(ch)) {
+          char_from_room(ch);
+          extract_char(ch);
+      }
+      else {
+          move_char_to(ch, CONFIG_MORTAL_START);
+          act("$n appears in the middle of the room.", TRUE, ch, 0, 0, TO_ROOM);
+          look_at_room(ch, 0);
+      }
+  }
+
+  for (tobj = vroom->contents; tobj; tobj = tobj_next) {
+      tobj_next = tobj->next_content;
+      obj_from_room(tobj);
+      extract_obj(tobj);
+  }
+
+  /* Now delete the room associated with this vehicle */
+  delete_room(world_vnum[vroom->number]);
+
+}

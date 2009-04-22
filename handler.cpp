@@ -78,6 +78,7 @@ void eq_to_room ( Character *ch );
 //void extract_obj_final(struct obj_data *obj);
 
 void unhitch_mob ( Character *ch );
+void delete_vehicle(struct obj_data *obj);
 
 char *fname ( const char *namelist )
 {
@@ -1514,6 +1515,10 @@ void extract_obj ( struct obj_data *obj )
 	}
 	if ( obj->in_locker )
 		item_from_locker ( obj->in_locker, obj );
+
+        /* vehicle2 code by Horus */
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) 
+            delete_vehicle(obj);
 
 	unhitch_item ( obj );
 
