@@ -5488,6 +5488,10 @@ void group_gain ( Character *ch, Character *victim )
 	/* add it as normal exp */
 	tot_gain += group_bonus * 0.50;
 
+        /* Group xp bonus */
+        if (count > 1)
+          tot_gain *= 1.15;
+
 	/* prevent illegal xp creation when killing players */
 	if ( !IS_NPC ( victim ) )
 		tot_gain = MIN ( CONFIG_MAX_EXP_LOSS * 0.66, tot_gain );
