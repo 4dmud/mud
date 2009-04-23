@@ -298,7 +298,16 @@ continue;
 
     }
 }
-void check_sky(void) {
+ACMD(do_check_sky) {
+
+  if (IN_ROOM(ch)->sector_type <= SECT_INSIDE) {
+      ch->Send("You cannot see the moon from here.\r\n");
+      return;
+  }
+
+  act("$n scans the sky, searching for the moon.", FALSE, ch, 0, 0, TO_ROOM);
+  ch->Send("You scan the sky and find the phase of the moon is %s.\r\n", moon_types[time_info.moon]);
+  
 
 }
 
