@@ -385,7 +385,7 @@ return 0;
       break;
     case 7:
       to_char = "A slow pressure works its way along your spine as a gust of wind blows past, chilling exposed skin.";
-      to_room = "A slow pressure works its way along $ns spine as a gust of wind blows past, chilling exposed skin..";
+      to_room = "A slow pressure works its way along $n's spine as a gust of wind blows past, chilling exposed skin..";
       zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
       weather_change(i);
       time = (3 RL_SEC);
@@ -489,7 +489,7 @@ return 0;
       break;
     case 6:
       to_char = "You concentrate and the air around your body starts to expand.";
-      to_room = "$n concentrates and the air around $s body starts to expand.";
+      to_room = "$n concentrates and the air around $'s body starts to expand.";
       zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
       weather_change(i);
       time = (2 RL_SEC);
@@ -520,7 +520,7 @@ return 0;
       break;
     case 1:
       to_char = "You lower your arms.";
-      to_room = "$n lowers $s arms.";
+      to_room = "$n lowers $'s arms.";
       *num = 0;
       zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
       weather_change(i);
