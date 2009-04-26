@@ -5370,6 +5370,7 @@ void die ( Character *ch, Character *killer )
 					exp = ( ( GET_EXP ( ch ) * ( ( 160 - GET_LEVEL ( ch ) ) /10 ) ) /100 );
 #else
 				exp = ( (GET_EXP ( ch ) * player_damage_done / MOB_DAM_TAKEN (ch) ) / ( counter>0?counter:1 ) );
+                                if (counter > 1) exp = exp * 12 / 10;
 #endif
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
 				{

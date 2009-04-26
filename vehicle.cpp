@@ -693,7 +693,7 @@ int create_vehicle_room(struct obj_data *obj)
   else {
       sprintf(buf, "Inside %s", obj->short_description);
       vroom->name = strdup(buf);
-      vroom->t_description = strdup("It is very plain and boring in here.");
+      vroom->t_description = strdup("It is very plain and boring in here.\r\n");
   } 
  
   vroom->AssignTempDesc();
