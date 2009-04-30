@@ -16,6 +16,7 @@ struct obj_data *get_obj_in_list_type(int type,
                                                   struct obj_data *list);
 
 room_rnum VEHICLE_ROOM = NULL;
+void ASSIGNROOM(room_vnum room, SPECIAL(fname));
 
 void view_room_by_rnum(Character *ch, room_rnum is_in);
 void parse_room_name(int in_room, char *bufptr);
@@ -661,6 +662,64 @@ void assign_vehicles(void) {
 #define LOWER_V_ROOM      55501 
 #define ZONE_V_ROOM       555
 
+#define SPACE_START_ROOM  60051
+
+SPECIAL(vehicle2)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  int xord, yord, zord;
+  room_vnum vroom;
+  Room *dest;
+  struct obj_data *vehicle;
+  
+  if (!CMD_IS("fly"))
+      return FALSE;
+ 
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  one_argument(argument, arg3);
+
+  if (arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0') {
+      ch->Send("Please type: fly <x-coord> <y-coord> <z-coord>.\r\n");
+      return TRUE;
+  }
+
+  if (!is_number(arg1) || !is_number(arg2) || !is_number(arg3)) {
+      ch->Send("Please use a number between 0 - 500 for each coordinate.\r\n");
+      return TRUE;
+  }
+
+  xord = atoi(arg1);
+  yord = atoi(arg2);
+  zord = atoi(arg3);
+
+  if (xord < 1 || yord < 1 || zord != 0) {
+      ch->Send("Those space coordinates do not exist!\r\n");
+      return TRUE;
+  }
+
+  /* Lets calculate the actual vnum of the room, based on the coords */
+  vroom = SPACE_START_ROOM;
+  vroom += xord - 1 + ((yord - 1) * 50);
+
+  if ((dest = real_room(vroom)) == NULL) {
+      ch->Send("That room does not exist!\r\n");
+      return TRUE;
+  }
+
+  if (!IN_ROOM(ch)->vehicle) {
+      log("SYSERR: Room is not part of a vehicle");
+      ch->Send("This room isnt part of a vehicle. Please bug this error.\r\n");
+      return TRUE;
+  }
+  vehicle = IN_ROOM(ch)->vehicle;
+  obj_from_room(vehicle);
+  obj_to_room(vehicle, dest);
+  
+  ch->Send("Success\r\n");
+  return TRUE;
+}
+
 room_vnum find_new_vehicle_room()
 {
   room_vnum i;
@@ -704,7 +763,7 @@ int create_vehicle_room(struct obj_data *obj)
   }
 
   GET_OBJ_VAL(obj, 1) = vnum;
-
+  ASSIGNROOM(vnum, vehicle2);
   return 1; 
 }
 
