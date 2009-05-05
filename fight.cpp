@@ -6614,9 +6614,9 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			else if ( ( !inside && raining ) || cold )
 				dam = 0.5;
 			else if ( hot )
-				dam = 1.7;
+				dam = 1.25;
 			else
-				dam = 1.4;
+				dam = 1.25;
 			break;
 			break;
 		case SPELL_COLOUR_SPRAY:
@@ -6629,13 +6629,13 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case SPELL_FIREBALL:
 			if ( inside )
-				dam = 1.6;
+				dam = 1.5;
 			else if ( hot )
-				dam = 1.9;
+				dam = 1.75;
 			else if ( cold )
 				dam = 0.5;
 			else if ( day )
-				dam = 1.6;
+				dam = 1.4;
 			else
 				dam = 1.3;
 
@@ -6857,7 +6857,9 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam *= 0.25;
 			break;
 		case SPELL_ELECTRIC_BLAST:
-			dam = 0.8;
+			// Changed Damage from 0.8 to 1.8 since it is an 
+			// t4 spell. Prometheus
+			dam = 1.8;
 			if ( sky == SKY_LIGHTNING )
 				dam *= 2;
 			else if ( sky == SKY_CLOUDLESS )
@@ -6945,22 +6947,25 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case  SPELL_INFERNO:
 			if ( inside )
-				dam = 1.6;
+				dam = 1.75;
 			else if ( hot )
-				dam = 1.8;
+				dam = 1.95;
 			else if ( cold )
-				dam = 0.5;
+				dam = 0.75;
 			else if ( day )
-				dam = 1.4;
+				dam = 1.5;
 			else
-				dam = 1.3;
+				dam = 1.4;
 
 			if ( !inside && raining )
-				dam *= 0.5;
+				dam *= 0.75;
 			else if ( underwater )
-				dam *= 0.01;
+				dam *= 0.03;
 			break;
 		case SPELL_MANA_BLAST:
+			// Changing Mana Blast to hopefully
+			// making it an area spell. Prometheus
+			if ( SECT ( IN_ROOM ( vict )))
 			dam = ( ( float ) GET_MANA ( ch ) * 2.0 ) / ( float ) GET_MAX_MANA ( ch );
 			break;
 		case SPELL_EARTHQUAKE:
