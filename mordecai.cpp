@@ -426,7 +426,10 @@ ACMD ( do_convey )
 			return;
 		}
 		ch->Send ( "You convey tradepoints for exp \r\nat the rate of 1 tradepoint per level 30 mob's exp equivilent.\r\n" );
-		gain_exp ( ch, amount * mob_stats[30].exp );
+		// Changed this to fixed value
+		// Since code isn't getting value.
+		//gain_exp ( ch, amount * mob_stats[30].exp );
+		gain_exp (ch, amount * 550000);
 		TRADEPOINTS ( ch ) -= amount;
 
 	}
