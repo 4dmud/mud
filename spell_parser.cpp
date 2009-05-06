@@ -1783,8 +1783,9 @@ void mag_assign_spells ( void )
 	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 100,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0 );
 
+	// Changing the delay in Inferno to a shorter delay - Prom
 	spello ( SPELL_INFERNO, "inferno", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 100,
+	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 30,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0 );
 
 

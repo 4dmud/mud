@@ -6946,7 +6946,8 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			}
 			break;
 		case  SPELL_INFERNO:
-			if ( inside )
+			if (( SECT ( IN_ROOM ( vict ))) && (inside))
+			//if ( inside )
 				dam = 1.75;
 			else if ( hot )
 				dam = 1.95;
