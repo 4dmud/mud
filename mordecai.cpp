@@ -429,7 +429,7 @@ ACMD ( do_convey )
 		// Changed this to fixed value
 		// Since code isn't getting value.
 		//gain_exp ( ch, amount * mob_stats[30].exp );
-		gain_exp (ch, amount * 550000);
+		gain_exp (ch, amount * 1100000);
 		TRADEPOINTS ( ch ) -= amount;
 
 	}

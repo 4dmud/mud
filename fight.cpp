@@ -6850,18 +6850,19 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam *= 1.8;
 			break;
 		case SPELL_LIGHTNING_BOLT:
-			dam = 1.7;
+			dam = 1.75;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2;
+				dam *= 2.10;
 			else if ( sky == SKY_CLOUDLESS )
 				dam *= 0.25;
 			break;
 		case SPELL_ELECTRIC_BLAST:
-			// Changed Damage from 0.8 to 1.8 since it is an 
-			// t4 spell. Prometheus
-			dam = 1.8;
+			// Changed Damage from 0.8 to 1.95 since it is an 
+			// t4 spell. Changed sky to higher as well 
+			//Prometheus
+			dam = 1.95;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2;
+				dam *= 2.25;
 			else if ( sky == SKY_CLOUDLESS )
 				dam *= 0.25;
 			if ( underwater )
@@ -6892,7 +6893,6 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam = 2.0;
 			else
 				dam = 1.40;
-
 			break;
 		case SPELL_FLAME_ARROW:
 			if ( hot )
