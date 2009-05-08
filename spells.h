@@ -347,7 +347,7 @@ enum skill_list {
     SKILL_LONGARM,
     SKILL_CLEAVE,//199
     SKILL_SMASH,
-
+    // Changed this to a max value. Prom
     MAX_SKILLS
 };
 

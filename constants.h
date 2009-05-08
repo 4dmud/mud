@@ -35,6 +35,7 @@ extern const char *drinknames[];
 extern const char *colour_liquid[];
 extern const char *fullness[];
 extern const char *spell_wear_off_msg[];
+extern const char *skill_wear_off_msg[];
 extern const char *npc_class_types[];
 extern const char *weekdays[];
 extern const char *month_name[];

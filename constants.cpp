@@ -2144,7 +2144,79 @@ const char *spell_wear_off_msg[] =
 	"\n"
 };
 
-
+// Added this for Skills wear off messages Skeleton. Prom
+const char *skill_wear_off_msg[] =
+{
+// Add wear off messages here. Prom
+	"Reserved",	
+	"!Backstab!",	//131
+	"!Bash!",
+	"!Hide!",
+	"!Kick!",
+	"!Pick_Lock!",
+	"!Flank!",
+	"!Sneak!",
+	"!Track!",
+	"!Mount!",
+	"!Riding!",	//140
+	"!Tame!",
+	"!Snare!",
+	"!Throw!",
+	"!Bow!",
+	"!Sling!",		//145
+	"!Crossbow!",
+	"!Dual!",
+	"!Circle!",
+	"!Blackjack!",
+	"!Second_Attack!",	//150
+        "!Firearm!",
+        "!Push!",
+        "!Scan!",
+        "!Brew!",
+        "!Scribe!",		//155
+        "!Tinker!",
+        "!Poison_Weapon!",
+        "!Retreat!",
+        "!Filet!",
+        "!Disarm!",		//160
+        "!Forage!",
+        "!Trap_Aware!",
+        "!Mounted_Combat!",
+        "!Trample!",
+        "!Joust!",		//165
+        "!Grapple!",
+        "!Drunk!",
+        "!HandtoHand!",
+        "!Melee!",
+        "!Third_Attack!",		//170
+        "!Hamstring!",
+        "!Short_Blade!",
+        "!Dodge!",
+        "!Phase!",
+        "!Charge!",		//175
+        "You grip lossens.",		
+        "!Face!",
+        "You loose your focus.",
+        "You feel less martial.",
+        "!Slip!",		//180
+        "!Holy_Strength!",
+        "You visions clears from seeing red.",
+        "!Meditate!",
+        "!Sing_Wood!",
+        "Your hyeractivity returns to normal",		//185
+        "!True_Strike!",
+        "!Strangle!",
+        "You feel less Fortified",
+        "!Manifest!",
+        "!Scalp!",		//190
+        "Your braces wears off.",
+        "!Behead!",
+        "!BladE_Dance!",
+        "!LongArm!",
+        "!Cleave!",		//200
+	"!Smash!",
+	"\n"
+};
 
 
 
