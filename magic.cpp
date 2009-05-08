@@ -118,7 +118,7 @@ void affect_update ( void )
 				if ( ( af->type > 0 ) && ( af->type <= MAX_SKILLS ) )
                                         if ( !af->next || ( af->next->type != af->type ) ||
                                                 ( af->next->expire > t ) )
-                                                if ( *skill_wear_off_msg[af->type] )
+                                                if ( *skill_wear_off_msg[af->type-130] )
                                                 i->Send ( "%s\r\n",skill_wear_off_msg[af->type] );
                                 i->affect_remove ( af );
 
