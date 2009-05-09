@@ -112,15 +112,15 @@ void affect_update ( void )
 					if ( !af->next || ( af->next->type != af->type ) ||
 					        ( af->next->expire > t ) )
 						if ( *spell_wear_off_msg[af->type] )
-						i->Send ( "%s\r\n",spell_wear_off_msg[af->type] );
+							i->Send ( "%s\r\n",spell_wear_off_msg[af->type] );
 				i->affect_remove ( af );
-				
-				if ( ( af->type > 0 ) && ( af->type <= MAX_SKILLS ) )
-                                        if ( !af->next || ( af->next->type != af->type ) ||
-                                                ( af->next->expire > t ) )
-                                                if ( *skill_wear_off_msg[af->type-130] )
-                                                i->Send ( "%s\r\n",skill_wear_off_msg[af->type] );
-                                i->affect_remove ( af );
+			// Removing this till issues are fixed. Prom	
+			//	if ( ( af->type > 0 ) && ( af->type <= MAX_SKILLS ) )
+                        //                if ( !af->next || ( af->next->type != af->type ) ||
+                        //                        ( af->next->expire > t ) )
+                        //              		if (*skill_wear_off_msg[af->type-MAX_SPELLS] )
+                        //                        	i->Send ( "%s\r\n",skill_wear_off_msg[af->type] );
+                        //        i->affect_remove ( af );
 
 			}
 		}
