@@ -94,36 +94,32 @@ int mag_savingthrow ( Character *ch, int type, int modifier )
 /* affect_update: called from comm.c (causes spells to wear off) */
 void affect_update ( void )
 {
-	struct affected_type *af, *next;
-	Character *i;
-	time_t t = time ( 0 );
+  struct affected_type *af, *next;
+  Character *i;
+  time_t t = time ( 0 );
 
-	for ( i = character_list; i; i = i->next )
-		for ( af = i->affected; af; af = next )
-		{
-			next = af->next;
-			if ( af->expire > t ) /* hasnt reached "time" yet.*/
-				continue;
-			if ( af->expire == -2 ) /* No action */
-				continue;
-			else
-			{
-				if ( ( af->type > 0 ) && ( af->type <= MAX_SPELLS ) )
-					if ( !af->next || ( af->next->type != af->type ) ||
+  for ( i = character_list; i; i = i->next )
+      for ( af = i->affected; af; af = next )
+      {
+          next = af->next;
+	  if ( af->expire > t ) /* hasnt reached "time" yet.*/
+	      continue;
+	  if ( af->expire == -2 ) /* No action */
+	      continue;
+	  else
+	  {
+	      if ( af->type > 0 ) {
+		  if ( !af->next || ( af->next->type != af->type ) ||
 					        ( af->next->expire > t ) )
-						if ( *spell_wear_off_msg[af->type] )
-							i->Send ( "%s\r\n",spell_wear_off_msg[af->type] );
-				i->affect_remove ( af );
-			// Removing this till issues are fixed. Prom	
-			//	if ( ( af->type > 0 ) && ( af->type <= MAX_SKILLS ) )
-                        //                if ( !af->next || ( af->next->type != af->type ) ||
-                        //                        ( af->next->expire > t ) )
-                        //              		if (*skill_wear_off_msg[af->type-MAX_SPELLS] )
-                        //                        	i->Send ( "%s\r\n",skill_wear_off_msg[af->type] );
-                        //        i->affect_remove ( af );
+                      if (af->type <= MAX_SPELLS)
+			  i->Send ( "%s\r\n",spell_wear_off_msg[af->type] );
+                      else if (af->type <= MAX_SKILLS)
+			  i->Send ( "%s\r\n",skill_wear_off_msg[af->type - MAX_SPELLS] );
+		  i->affect_remove ( af );
+              }
 
-			}
-		}
+	  }
+      }
 }
 
 

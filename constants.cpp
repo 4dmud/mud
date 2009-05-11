@@ -2155,10 +2155,12 @@ const char *skill_wear_off_msg[] =
 	"!Kick!",
 	"!Pick_Lock!",
 	"!Flank!",
-	"!Sneak!",
+        "!Rescue",
+	"You are no longer feeling sneaky.",
+        "!Steal",
 	"!Track!",
 	"!Mount!",
-	"!Riding!",	//140
+	"!Riding!",	
 	"!Tame!",
 	"!Snare!",
 	"!Throw!",
@@ -2181,11 +2183,12 @@ const char *skill_wear_off_msg[] =
         "!Disarm!",		//160
         "!Forage!",
         "!Trap_Aware!",
+        "!Parry!",
         "!Mounted_Combat!",
         "!Trample!",
         "!Joust!",		//165
         "!Grapple!",
-        "!Drunk!",
+        "You sober up.",
         "!HandtoHand!",
         "!Melee!",
         "!Third_Attack!",		//170
@@ -2194,24 +2197,25 @@ const char *skill_wear_off_msg[] =
         "!Dodge!",
         "!Phase!",
         "!Charge!",		//175
-        "You grip lossens.",		
+        "Your grip lossens.",		
         "!Face!",
-        "You loose your focus.",
-        "You feel less martial.",
+        "You lose your focus.",
+        "You relax your martial arts stance.",
         "!Slip!",		//180
+        "!Manipulate!",
         "!Holy_Strength!",
-        "You visions clears from seeing red.",
-        "!Meditate!",
+        "You calm down from your battle rage.",
+        "You no longer have the patience to meditate.",
         "!Sing_Wood!",
         "Your hyeractivity returns to normal",		//185
-        "!True_Strike!",
+        "Your intensity for true strike has returned to normal.",
         "!Strangle!",
-        "You feel less Fortified",
+        "You feel less fortified",
         "!Manifest!",
         "!Scalp!",		//190
-        "Your braces wears off.",
+        "You no longer brace for damage.",
         "!Behead!",
-        "!BladE_Dance!",
+        "You slow down the whirr of your blades.",
         "!LongArm!",
         "!Cleave!",		//200
 	"!Smash!",

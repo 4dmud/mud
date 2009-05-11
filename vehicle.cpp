@@ -126,7 +126,7 @@ ACMD(do_drive) {
         return;
     }
 
-    two_arguments(argument, arg, buf2);
+  two_arguments(argument, arg, buf2);
 
     /* Gotta give us a direction... */
     if (!*arg) {
@@ -672,9 +672,23 @@ SPECIAL(vehicle2)
   Room *dest;
   struct obj_data *vehicle;
   
-  if (!CMD_IS("fly"))
+  /* some insanity checks */
+  if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
+    return FALSE;
+
+  if (!CMD_IS("fly") && !CMD_IS("look"))
       return FALSE;
  
+  /* Look out command */
+  if (CMD_IS("look")) {
+      skip_spaces(&argument);
+      if (!is_abbrev(argument, "out"))
+          return FALSE;
+      dest = vehicle->in_room;
+      view_room_by_rnum(ch, dest);
+      return TRUE; 
+  }
+      
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
   one_argument(argument, arg3);
