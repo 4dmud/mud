@@ -2207,10 +2207,10 @@ const char *skill_wear_off_msg[] =
         "You calm down from your battle rage.",
         "You no longer have the patience to meditate.",
         "!Sing_Wood!",
-        "Your hyeractivity returns to normal",		//185
+        "Your hyperactivity returns to normal.",	//185
         "Your intensity for true strike has returned to normal.",
         "!Strangle!",
-        "You feel less fortified",
+        "You feel less fortified.",
         "!Manifest!",
         "!Scalp!",		//190
         "You no longer brace for damage.",
