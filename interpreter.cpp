@@ -95,7 +95,8 @@ int class_val = 0;
 int total_commands_typed = 0;
 int total_pcommands_typed = 0;
 int total_trig_commands_typed = 0;
-
+// Added thie to hold name - Prom
+char *char_name;
 
 
 void line_sep ( Descriptor *d );
@@ -2589,7 +2590,8 @@ void nanny ( Descriptor *d, char *arg )
 					else
 					{
 						//d->Output ( "Wrong password.\r\nPassword: " );
-						d->Output ("Wrong password for %s.\r\nPassword: ");
+						 char_name = GET_NAME(d->character);
+						d->Output ("Wrong password for char_name.\r\nPassword: ");
 						echo_off ( d );
 					}
 					return;
