@@ -1662,8 +1662,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, sub_percent ( c, subfield ) );
 					else if ( !strcasecmp ( field, "subincrease" ) )
 					{
-                                                count = sub_number ( subfield );
-						if ( count > 0 && count < 98 )
+						if((count = sub_number(subfield)) > 0)
+                                                //count = sub_number ( subfield );
+						//if ( count > 0 && count < 98 )
 							improve_sub ( c, ( enum subskill_list ) count, 2 );
 						snprintf ( str, slen, "%d", count );
 					}

@@ -2941,10 +2941,10 @@ Tree      Affect    Max  Chance    Start Age
 pine      speed     240  1 in 20   5
 oak       speed     110  1 in 5    1
 willow    cha       9    1 in 10   1
-dogwood   wis       3    1 in 15   6
+dogwood   wis       5    1 in 15   6
 ironwood  hp        600  1 in 15   3
 fir       mana      2500 1 in 20   1
-maple     int       3    1 in 10   3
+maple     int       5    1 in 10   3
 elder     mana      1500 1 in 10   1
 elm       hp        400  1 in 5    2
  
