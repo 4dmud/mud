@@ -2197,7 +2197,7 @@ const char *skill_wear_off_msg[] =
         "!Dodge!",
         "!Phase!",
         "!Charge!",		//175
-        "Your grip lossens.",		
+        "Your grip loosens.",		
         "!Face!",
         "You lose your focus.",
         "You relax your martial arts stance.",

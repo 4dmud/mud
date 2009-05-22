@@ -831,17 +831,8 @@ ACMD ( do_ungroup )
 ACMD ( do_report )
 {
 	char buf[MAX_INPUT_LENGTH];
-	/*   Character *k;
-	   struct follow_type *f;*/
 
-	/*if (!AFF_FLAGGED(ch, AFF_GROUP)) {
-	send_to_char("But you are not a member of any group!\r\n", ch);
-	return;
-	}*/
-
-	return;
-
-	snprintf ( buf, sizeof ( buf ), "$n reports: %d/%dH, %d/%dM, %d/%dV\r\n",
+	sprintf ( buf, "$n reports: %d/%dH, %d/%dM, %d/%dV\r\n",
 	           GET_HIT ( ch ), GET_MAX_HIT ( ch ),
 	           GET_MANA ( ch ), GET_MAX_MANA ( ch ),
 	           GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
@@ -853,15 +844,12 @@ ACMD ( do_report )
 		return;
 	}
 
-	/*  k = (ch->master ? ch->master : ch);
-
-	  for (f = k->followers; f; f = f->next)
-	if (AFF_FLAGGED(f->follower, AFF_GROUP) && f->follower != ch)
-	   send_to_char(buf, f->follower);
-	  if (k != ch)*/
-
 	act ( buf, FALSE, ch, 0, 0, TO_ROOM );
-	*ch << "You report to the room.\r\n";
+	sprintf ( buf, "You report: %d/%dH, %d/%dM, %d/%dV\r\n",
+	           GET_HIT ( ch ), GET_MAX_HIT ( ch ),
+	           GET_MANA ( ch ), GET_MAX_MANA ( ch ),
+	           GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
+	*ch << buf;
 }
 
 
