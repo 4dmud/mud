@@ -2010,6 +2010,8 @@ public:
             subs[ss]->learn = l;
         } else {
             subs[ss]->learn += l;
+            if (subs[ss]->learn >= 98)
+              subs[ss]->learn = 98;
         }
         return subs[ss]->learn;
     }
