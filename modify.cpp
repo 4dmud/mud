@@ -563,7 +563,9 @@ ACMD ( do_subskillset )
 	new_mudlog ( BRF, -1, TRUE, "%s changed %s's %s to %d.", GET_NAME ( ch ),
 	             GET_NAME ( vict ), sub_name ( skill ), value );
 
-	improve_sub ( vict, ( enum subskill_list ) skill, value - GET_SUB ( vict, skill ) );
+//	improve_sub ( vict, ( enum subskill_list ) skill, value - GET_SUB ( vict, skill ) );
+        SAVED(ch).SetSubLearn((enum subskill_list) skill, value);
+        SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 
 	ch->Send ( "You change %s's %s to %d.\r\n", GET_NAME ( vict ),
 	           sub_name ( skill ), value );
