@@ -6613,7 +6613,7 @@ int check_object_spell_number ( struct obj_data *obj, int val, int nr )
 		      nr, obj->short_description, TOP_SPELL_DEFINE, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
-	if ( IS_SPELL_CAST(GET_OBJ_VAL ( obj, val ))) 
+	if ( !IS_SPELL_CAST(GET_OBJ_VAL ( obj, val ))) 
 	{
 		log ( "SYSERR: Object #%d (%s) has out of range spell (assigning a skill!) (%s) #%d.",
 		      nr, obj->short_description, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );

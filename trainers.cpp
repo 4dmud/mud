@@ -219,8 +219,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	DYN_DEFINE;
 	*buf = 0;
 
-      ch->Send("%d %d %d\r\n", start_skill, start_sub, end_sub);
-
 	if ( skillspell == 0 )
 	{
 		sortpos = start_skill +1; 

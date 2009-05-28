@@ -89,7 +89,7 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 
 	/* spellnum = search_block(s, spells, 0); */
 	spellnum = find_skill_num ( s );
-	if ( IS_SPELL_CAST(spellnum) )
+	if ( !IS_SPELL_CAST(spellnum) )
 	{
 		script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (%s)",
 		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );
