@@ -25,8 +25,8 @@ void start_fighting_delay(Character *vict, Character *ch);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
 #define IS_SPELL_ATK(type) (((type) >= TYPE_ATK_ORB) && ((type) <= TYPE_ATK_TORPEDO))
-#define IS_SPELL_CAST(type) (((type) > 0) && ((type) < MAX_SPELLS))
-#define IS_SKILL(type) (((type) > MAX_SPELLS) && ((type) < MAX_SKILLS))
+#define IS_SPELL_CAST(tt) (((tt) > 0) && ((tt) < MAX_SKILLS) && (spell_info[tt].type == 1))
+#define IS_SKILL(tt) (((tt) >= 0) && ((tt) < MAX_SKILLS) && (spell_info[tt].type == 2))
 #define IS_SUBSKILL(type) (((type) > TYPE_SUFFERING) && ((type) < (TOP_SUB_DEFINE + TYPE_SUFFERING)))
 #define IS_OTHERDAM(type) (((type) == TYPE_SUFFERING) || (((type) >= SPELL_BURN) && ((type) <= SPELL_ACID)) \
 			|| (((type)>= TYPE_UNDERWATER) && ((type) < TOP_SPELL_DEFINE)))

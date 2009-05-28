@@ -40,6 +40,7 @@
 #include "descriptor.h"
 #include "strutil.h"
 #include "name.map.h"
+#include "fight.h"
 
 bool can_teach_skill ( Character *mob, int i );
 int load_qic_check ( int rnum );
@@ -6612,8 +6613,7 @@ int check_object_spell_number ( struct obj_data *obj, int val, int nr )
 		      nr, obj->short_description, TOP_SPELL_DEFINE, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
-	if ( GET_OBJ_VAL ( obj, val ) > MAX_SPELLS
-	        && GET_OBJ_VAL ( obj, val ) < MAX_SKILLS )
+	if ( IS_SPELL_CAST(GET_OBJ_VAL ( obj, val ))) 
 	{
 		log ( "SYSERR: Object #%d (%s) has out of range spell (assigning a skill!) (%s) #%d.",
 		      nr, obj->short_description, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );

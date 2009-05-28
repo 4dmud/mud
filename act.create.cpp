@@ -361,7 +361,7 @@ ASKILL ( skill_brew )
 
 	potion = find_skill_num ( spell_name );
 
-	if ( ( potion < 1 ) || ( potion > MAX_SPELLS ) )
+	if ( ( potion < 1 ) || ( potion > MAX_SKILLS ) || spell_info[potion].type != 1 )
 	{
 		ch->Send ( "Mix what spell?!?\r\n" );
 		return 0;
@@ -545,7 +545,7 @@ ASKILL ( skill_scribe )
 
 	scroll = find_skill_num ( spell_name );
 
-	if ( ( scroll < 1 ) || ( scroll > MAX_SPELLS ) )
+	if ( ( scroll < 1 ) || ( scroll > MAX_SKILLS ) || spell_info[scroll].type != 1 )
 	{
 		ch->Send ( "Scribe what spell?!?\r\n" );
 		return 0;

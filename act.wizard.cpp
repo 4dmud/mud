@@ -6132,19 +6132,22 @@ int check_potion_price ( struct obj_data *obj )
 
 int spell_weight ( struct obj_data *obj, int val )
 {
-	if ( GET_OBJ_VAL ( obj, val ) == -1 ) /* i.e.: no spell */
-		return 0;
+  int i;
+ 
+  i = GET_OBJ_VAL(obj, val);
+
+  if ( i == -1 ) /* i.e.: no spell */
+	return 0;
 
 	/*
 	 * Check for negative spells, spells beyond the top define, and any
 	 * spell which is actually a skill.
 	 */
-	if ( GET_OBJ_VAL ( obj, val ) <= 0 )
+	if ( i <= 0 )
 		return 0;
-	if ( GET_OBJ_VAL ( obj, val ) > TOP_SPELL_DEFINE )
+	if ( i > TOP_SPELL_DEFINE )
 		return 1;
-	if ( GET_OBJ_VAL ( obj, val ) > MAX_SPELLS
-	        && GET_OBJ_VAL ( obj, val ) <= MAX_SKILLS )
+	if ( i <= MAX_SKILLS && spell_info[i].type != 1) 
 		return 1;
 
 	switch ( GET_OBJ_VAL ( obj, val ) )
@@ -6170,22 +6173,25 @@ int spell_weight ( struct obj_data *obj, int val )
 
 int spell_price ( struct obj_data *obj, int val )
 {
-	if ( GET_OBJ_VAL ( obj, val ) == TYPE_UNDEFINED )    /* i.e.: no spell */
+  int i;
+
+  i = GET_OBJ_VAL(obj, val);
+
+  if ( i == TYPE_UNDEFINED )    /* i.e.: no spell */
 		return 0;
 
 	/*
 	 * Check for negative spells, spells beyond the top define, and any
 	 * spell which is actually a skill.
 	 */
-	if ( GET_OBJ_VAL ( obj, val ) == 0 )
+	if ( i <= 0 )
 		return 0;
-	if ( GET_OBJ_VAL ( obj, val ) > TOP_SPELL_DEFINE )
+	if ( i > TOP_SPELL_DEFINE )
 		return 1;
-	if ( GET_OBJ_VAL ( obj, val ) > MAX_SPELLS
-	        && GET_OBJ_VAL ( obj, val ) <= MAX_SKILLS )
+	if ( i <= MAX_SKILLS && spell_info[i].type != 1) 
 		return 1;
 
-	switch ( GET_OBJ_VAL ( obj, val ) )
+	switch ( i )
 	{
 		case SPELL_GROUP_HEAL:
 			return 7;

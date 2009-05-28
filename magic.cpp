@@ -111,10 +111,12 @@ void affect_update ( void )
 	      if ( af->type > 0 ) {
 		  if ( !af->next || ( af->next->type != af->type ) ||
 					        ( af->next->expire > t ) )
-                      if (af->type <= MAX_SPELLS)
+       /*               if (af->type <= MAX_SPELLS)
 			  i->Send ( "%s\r\n",spell_wear_off_msg[af->type] );
                       else if (af->type <= MAX_SKILLS)
-			  i->Send ( "%s\r\n",skill_wear_off_msg[af->type - MAX_SPELLS] );
+			  i->Send ( "%s\r\n",skill_wear_off_msg[af->type - MAX_SPELLS] ); */
+                      if (spell_info[af->type].wear_off_msg && spell_info[af->type].wear_off_msg[0] != '\0')
+                          i->Send("%s\r\n", spell_info[af->type].wear_off_msg);
 		  i->affect_remove ( af );
               }
 

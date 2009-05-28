@@ -216,7 +216,11 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
                  struct obj_data *tobj );
 void spello ( int spl, const char *name, int max_mana, int min_mana,
               int mana_change, int minpos, int targets, int violent,
-              int routines, int wait, int first_prereq, int second_prereq, int tier, int level, int gm );
+              int routines, int wait, int first_prereq, int second_prereq, int tier, int level, int gmi, const char *wear_off_msg );
+
+void spello_system ( int spl, const char *name, int max_mana, int min_mana,
+              int mana_change, int minpos, int targets, int violent,
+              int routines, int wait, int first_prereq, int second_prereq, int tier, int level, int gmi, const char *wear_off_msg );
 
 int mag_manacost ( Character *ch, int spellnum );
 char * print_elemental ( int chcl, int weak, char * buf, size_t len );
@@ -1162,7 +1166,7 @@ ACMD ( do_cast )
 	/* spellnum = search_block(s, spells, 0); */
 	spellnum = find_skill_num ( s );
 
-	if ( ( spellnum < 1 ) || ( spellnum > MAX_SPELLS ) )
+	if ( !IS_SPELL_CAST(spellnum))
 	{
 		ch->Send ( "Cast what?!?\r\n" );
 		return;
@@ -1531,7 +1535,7 @@ void assign_class ( int spell, int chclass )
 /* Assign the spells on boot up */
 void spello ( int spl, const char *name, int max_mana, int min_mana,
               int mana_change, int minpos, int targets, int violent,
-              int routines, int w, int first_prereq, int second_prereq, int tier, int level, int gm )
+              int routines, int w, int first_prereq, int second_prereq, int tier, int level, int gm , const char *wear_off_msg)
 {
 	spell_info[spl].mana_max = max_mana;
 	spell_info[spl].mana_min = min_mana;
@@ -1547,6 +1551,30 @@ void spello ( int spl, const char *name, int max_mana, int min_mana,
 	spell_info[spl].tier = tier;
 	spell_info[spl].min_level = level;
 	spell_info[spl].gm = gm;
+        spell_info[spl].wear_off_msg = wear_off_msg;
+        spell_info[spl].type = 1;   //1 for spells
+}
+
+void spello_system ( int spl, const char *name, int max_mana, int min_mana,
+              int mana_change, int minpos, int targets, int violent,
+              int routines, int w, int first_prereq, int second_prereq, int tier, int level, int gm , const char *wear_off_msg)
+{
+	spell_info[spl].mana_max = max_mana;
+	spell_info[spl].mana_min = min_mana;
+	spell_info[spl].mana_change = mana_change;
+	spell_info[spl].min_position = minpos;
+	spell_info[spl].targets = targets;
+	spell_info[spl].violent = violent;
+	spell_info[spl].routines = routines;
+	spell_info[spl].name = name;
+	spell_info[spl].wait = w;
+	spell_info[spl].first_prereq = first_prereq;
+	spell_info[spl].second_prereq = second_prereq;
+	spell_info[spl].tier = tier;
+	spell_info[spl].min_level = level;
+	spell_info[spl].gm = gm;
+        spell_info[spl].wear_off_msg = wear_off_msg;
+        spell_info[spl].type = 0;   //0 for non-castable spells
 }
 
 
@@ -1603,6 +1631,10 @@ void unused_spell ( int spl )
  *
  * routines:  A list of magic routines which are associated with this spell
  * if the spell uses spell templates.  Also joined with bitwise OR ('|').
+ * 
+ * gm : GMs can get these skills or not?
+ *
+ * wear_off_msg : Moved to here for easy declaration.
  *
  * See the CircleMUD documentation for a more detailed description of these
  * fields.
@@ -1620,556 +1652,623 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_VITALIZE, "vitalize", 60 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_AREA_DIR, FALSE, MAG_POINTS, 1,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
 
 	spello ( SPELL_ABSOLVE, "absolve", 60 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 100,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1, "" );
 
 	spello ( SPELL_ANIMATE_DEAD, "animate dead", 35 , 10 , 3,
 	         POS_STANDING, TAR_OBJ_ROOM, FALSE, MAG_SUMMONS, 120,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
 	spello ( SPELL_ARMOR, "armor", 30 , 15 , 3, POS_FIGHTING,
 	         TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 30,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1,
+                 "Your magical armor dissipates." );
 
 	spello ( SPELL_BLESS, "bless", 35 , 5 , 3, POS_STANDING,
 	         TAR_CHAR_ROOM | TAR_OBJ_INV, FALSE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 20, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 15, 1 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 20, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 15, 1,
+                 "You feel less righteous!" );
 
 	spello ( SPELL_SUFFOCATE, "suffocate", 35 , 5 , 3, POS_STANDING,
 	         TAR_CHAR_ROOM, TRUE,
-	         MAG_AFFECTS , 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 41, 0 );
+	         MAG_AFFECTS , 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 41, 0,
+                 "You gasp and feel fresh air flood into your lungs!" );
 
 	spello ( SPELL_BLINDNESS, "blindness", 35 , 25 , 1,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF, FALSE, MAG_AFFECTS,
-	         30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 50, 1 );
+	         30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 50, 1,
+                 "Your vision returns." );
 
 	spello ( SPELL_BURNING_HANDS, "burning hands", 30 , 10 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1 );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1,
+                 "Magical flames stop burning your skin." );
 
 	spello ( SPELL_CALL_LIGHTNING, "call lightning", 40 , 25 ,
 	         3, POS_FIGHTING, TAR_IGNORE, TRUE,
-	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1 );
+	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1, "" );
 
 	spello ( SPELL_CHAIN_LIGHTNING, "chain lightning", 60 ,
 	         30 , 3, POS_FIGHTING,
 	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
-	         30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 34, 0 );
+	         30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 34, 0, "" );
 
 	spello ( SPELL_CHARM, "charm", 75 , 50 , 2, POS_FIGHTING,
 	         TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0,
+                 "You feel more self-confident." );
 
 	spello ( SPELL_CHILL_TOUCH, "chill touch", 30 , 10 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1 );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1, "" );
 
 	spello ( SPELL_CLONE, "clone", 80 , 65 , 5, POS_STANDING,
 	         TAR_CHAR_ROOM | TAR_IGNORE, FALSE, MAG_SUMMONS, 180,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1 , "");
 
 	spello ( SPELL_COLOUR_SPRAY, "colour spray", 30 , 15 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1 , "");
 
 	spello ( SPELL_CONTROL_WEATHER, "control weather", 75 ,
 	         25 , 5, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 20, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 20, 0, "" );
 
 	spello ( SPELL_CREATE_FOOD, "create food", 30 , 5 , 4,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1, "" );
 
 	spello ( SPELL_CREATE_WATER, "create water", 30 , 5 , 4,
 	         POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 28, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 28, 1, "" );
 
 	spello ( SPELL_CURE_BLIND, "cure blind", 30 , 5 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 5, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 5, 1, "" );
 
 	spello ( SPELL_CURE_CRITIC, "cure critic", 50 , 20 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_POINTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10, 1, "" );
 
 	spello ( SPELL_CURE_LIGHT, "cure light", 30 , 10 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_POINTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 5, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 5, 1, "" );
 
 	spello ( SPELL_CURSE, "curse", 80 , 50 , 2, POS_STANDING,
 	         TAR_CHAR_ROOM | TAR_OBJ_INV, TRUE, MAG_AFFECTS | MAG_ALTER_OBJS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 9, 0 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 9, 0, 
+                 "You feel more optimistic." );
 
 	spello ( SPELL_DETECT_ALIGN, "detect alignment", 20 , 10 ,
 	         2, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE,
-	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1 );
+	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1,
+                 "You no longer are attuned to the alignment of others." );
 
 	spello ( SPELL_DETECT_INVIS, "detect invisibility", 20 ,
 	         10 , 2, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1 );
+	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
+                 "Your eyes stop tingling." );
 
 	spello ( SPELL_DETECT_MAGIC, "detect magic", 20 , 10 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1,
+                 "You have lost your sensitivity to magic." );
 
 	spello ( SPELL_DETECT_POISON, "detect poison", 15 , 5 , 1,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE,
-	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1 );
+	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1,
+                 "You no longer can detect poison." );
 
 	spello ( SPELL_DISPEL_EVIL, "dispel evil", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 30, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 30, 1, "" );
 
 	spello ( SPELL_DISPEL_GOOD, "dispel good", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
 
 	spello ( SPELL_EARTHQUAKE, "earthquake", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 24, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 24, 1, "" );
 
 	spello ( SPELL_ENCHANT_WEAPON, "enchant weapon", 150 ,
 	         100 , 10, POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP,
-	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0 );
+	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
 	spello ( SPELL_MINOR_IDENTIFY, "minor identify", 75 , 30 ,
 	         5, POS_RESTING, TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1, "" );
 
 	spello ( SPELL_ENERGY_DRAIN, "energy drain", 40 , 25 , 1,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0 );
+	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
 
 	spello ( SPELL_EVIL_EYE, "evil eye", 60 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 200,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
 	spello ( SPELL_GROUP_ARMOR, "group armor", 50 , 30 , 2,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 20,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 20, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 20, 0, "" );
 
 	spello ( SPELL_FIREBALL, "fireball", 30 , 20 , 5,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1, "" );
 
 	spello ( SPELL_SOULSMASH, "soulsmash", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 31, 0 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 31, 0, "" );
 
 	spello ( SPELL_DEMONSHREAK, "demonshreak", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0, "" );
 
 	spello ( SPELL_LIFESUCK, "lifesuck", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 48, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 48, 1, "" );
 
 	spello ( SPELL_BURNINGSKULL, "burning skull", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         5, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 24, 0 );
+	         5, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 24, 0, "" );
 
 	spello ( SPELL_HEARTSQUEEZE, "heart squeeze", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 7, 0 );
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 7, 0, "" );
 
 	spello ( SPELL_FACEMELT, "facemelt", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0 );
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_ELECTRIC_BLAST, "electric blast", 140 , 125 , 3,
 	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 100,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 	// Changing the delay in Inferno to a shorter delay - Prom
 	spello ( SPELL_INFERNO, "inferno", 140 , 125 , 3,
 	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 30,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 
 	spello ( SPELL_WATER_TO_WINE, "water to wine", 150 ,
 	         100 , 10, POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP,
-	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 28, 1 );
+	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 28, 1, "" );
 
 	spello ( SPELL_MIDAS_TOUCH, "midas touch", 150 ,
 	         100 , 10, POS_FIGHTING, TAR_CHAR_ROOM| TAR_FIGHT_VICT| TAR_NOT_SELF,
-	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0 );
+	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0, "" );
 
 
 	spello ( SPELL_GROUP_HEAL, "group heal", 80 , 40 , 5,
 	         POS_FIGHTING, TAR_IGNORE, FALSE, MAG_GROUPS, 0,
-	         SPELL_HEAL, TYPE_UNDEFINED, 4, 3, 0 );
+	         SPELL_HEAL, TYPE_UNDEFINED, 4, 3, 0, "" );
 
 	spello ( SPELL_GROUP_RECALL, "group recall", 90 , 30 , 2,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 20,
-	         SPELL_WORD_OF_RECALL, TYPE_UNDEFINED, 3, 24, 0 );
+	         SPELL_WORD_OF_RECALL, TYPE_UNDEFINED, 3, 24, 0, "" );
 
 	spello ( SPELL_HARM, "harm", 75 , 45 , 3, POS_FIGHTING,
 	         TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1, "" );
 
 	spello ( SPELL_HEAL, "heal", 70 , 35 , 3, POS_FIGHTING,
 	         TAR_CHAR_ROOM, FALSE, MAG_POINTS | MAG_UNAFFECTS, 1,
-	         SPELL_CURE_CRITIC, TYPE_UNDEFINED, 3, 32, 0 );
+	         SPELL_CURE_CRITIC, TYPE_UNDEFINED, 3, 32, 0, "" );
 
 	spello ( SPELL_INFRAVISION, "infravision", 25 , 10 , 1,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1, 
+                 "Your night vision seems to fade." );
 
 	spello ( SPELL_INVISIBLE, "invisibility", 35 , 25 , 1,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 20, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 20, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1,
+                 "You feel yourself exposed." );
 
 	spello ( SPELL_LIGHTNING_BOLT, "lightning bolt", 40 , 15 ,
 	         1, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 37, 0 );
+	         MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 37, 0, "" );
 
 	spello ( SPELL_LOCATE_OBJECT, "locate object", 25 , 20 , 1,
 	         POS_STANDING, TAR_OBJ_WORLD, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 6, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 6, 0, "" );
 
 	spello ( SPELL_MAGIC_MISSILE, "magic missile", 70 , 30 , 4,
 	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1, "" );
 
 	spello ( SPELL_POISON, "poison", 50 , 20 , 3, POS_STANDING,
 	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_OBJ_INV, TRUE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1,
+                 "You feel less sick." );
 
 	spello ( SPELL_POISON_2, "poison 2", 50 , 20 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_OBJ_INV, TRUE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 45, 0 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 45, 0,
+                 "You feel less sick!!" );
 
 	spello ( SPELL_POISON_3, "poison 3", 50 , 20 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_OBJ_INV, TRUE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 48, 0 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 48, 0, 
+                 "You feel less sick!!!" );
 
 	spello ( SPELL_POISON_4, "poison 4", 50 , 20 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_OBJ_INV, TRUE,
-	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 0 );
+	         MAG_AFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 0,
+                 "You feel less sick!!!!" );
 
 	spello ( SPELL_LOCATE_PERSON, "locate person", 100 , 50 , 3,
 	         POS_STANDING, TAR_CHAR_WORLD, FALSE, MAG_MANUAL,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 4, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 4, 1, "" );
 
 	spello ( SPELL_PROT_FROM_EVIL, "protection from evil", 40 ,
 	         10 , 3, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1 );
+	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1,
+                 "Your ward against evil dissipates." );
 
 	spello ( SPELL_PROT_FROM_GOOD, "protection from good", 40 ,
 	         10 , 3, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 2, 0 );
+	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 2, 0,
+                 "You feel your shell of warmth dissipate." );
 
 	spello ( SPELL_REMOVE_CURSE, "remove curse", 45 , 25 , 5,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP,
-	         FALSE, MAG_UNAFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1 );
+	         FALSE, MAG_UNAFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1, "" );
 
 	spello ( SPELL_SANCTUARY, "sanctuary", 110 , 50 , 5,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 20,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 10, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 10, 0,
+                 "The glowing white aura around your body fades." );
 
 	spello ( SPELL_SHOCKING_GRASP, "shocking grasp", 30 , 15 ,
 	         3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1 );
+	         MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1,"" );
 
 	spello ( SPELL_SLEEP, "sleep", 40 , 25 , 5, POS_STANDING,
-	         TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 180, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1 );
+	         TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 180, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1,
+                 "You feel less tired." );
 
 	spello ( SPELL_STRENGTH, "strength", 60 , 40 , 1,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1,
+                 "You lose your magical strength boost." );
 
 	spello ( SPELL_SUMMON, "summon", 75 , 50 , 3, POS_STANDING,
 	         TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, 30,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 5, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 5, 0, "" );
 
 	spello ( SPELL_TELEPORT, "teleport", 75 , 50 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10, 1, "" );
 
 	spello ( SPELL_WATERWALK, "waterwalk", 80 , 20 , 2,
 	         POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 15, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 15, 0,
+                 "Your feet seem less buoyant." );
 
 	spello ( SPELL_MIND_FIRE, "mind fire", 80 , 20 , 2,
 	         POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 400,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 4, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 4, 0,
+                 "The burning sensation in your skull fades away." );
+
 	spello ( SPELL_MIND_ELEC, "mind electricity", 80 , 20 , 2,
 	         POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 500,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8, 0,
+                 "Your mind stops crackling." );
+
 	spello ( SPELL_MIND_WATER, "mind water", 80 , 20 , 2,
 	         POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 300,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 8, 0, 
+                 "Your mind dries out." );
+
 	spello ( SPELL_MIND_ICE, "mind ice", 80 , 20 , 2,
 	         POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 500,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 12, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 12, 0 ,
+                 "Your mind thaws out.");
 
 	spello ( SPELL_WORD_OF_RECALL, "word of recall", 20 , 10 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1, "" );
 
 	spello ( SPELL_ANTIDOTE_1, "antidote 1", 40 , 8 , 4,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE,
-	         MAG_UNAFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 34, 1 );
+	         MAG_UNAFFECTS | MAG_ALTER_OBJS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 34, 1, "" );
 
 	spello ( SPELL_ANTIDOTE_2, "antidote 2", 80 , 16 , 8,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 34, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 34, 1, "" );
 
 	spello ( SPELL_ANTIDOTE_3, "antidote 3", 160 , 32 , 16,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 34, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 34, 0, "" );
 
 	spello ( SPELL_SENSE_LIFE, "sense life", 20 , 10 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
-	         140, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 41, 1 );
+	         140, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 41, 1,
+                 "You feel less aware of your surroundings." );
 
 	spello ( SPELL_GATE, "gate", 50 , 50 , 0, POS_STANDING,
 	         TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, 30,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
 	spello ( SPELL_REMOVE_ALIGNMENT, "remove alignment", 75 ,
 	         25 , 5, POS_STANDING, TAR_OBJ_INV, FALSE,
-	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 46, 1 );
+	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 46, 1, "" );
 
 	spello ( SPELL_EARTH_ELEMENTAL, "earth elemental", 120 ,
 	         60 , 2, POS_STANDING, TAR_IGNORE, FALSE, MAG_SUMMONS, 600,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 25, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 25, 0 ,
+                 "The earth elemental disappears.");
 
 	spello ( SPELL_WATER_ELEMENTAL, "water elemental", 100 ,
 	         60 , 2, POS_STANDING, TAR_IGNORE, FALSE, MAG_SUMMONS, 600,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 22, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 22, 1,
+                 "The water elemental disappears." );
 
 	spello ( SPELL_AIR_ELEMENTAL, "air elemental", 90 , 60 , 2,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_SUMMONS, 600,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 25, 1,
+                 "The air elemental disappears." );
 
 	spello ( SPELL_FIRE_ELEMENTAL, "fire elemental", 130 , 60 ,
 	         2, POS_STANDING, TAR_IGNORE, FALSE, MAG_SUMMONS, 600,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 25, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 25, 0,
+                 "The fire elemental disappears." );
 
 	spello ( SPELL_RECHARGE, "recharge", 100 , 80 , 2,
 	         POS_RESTING, TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL, 600,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 43, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 43, 1, "" );
 
 	spello ( SPELL_METEOR_SHOWER, "meteor shower", 60 , 40 , 2,
 	         POS_STANDING, TAR_IGNORE, TRUE, MAG_AREAS, 40,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_STONESKIN, "stoneskin", 35 , 15 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 47, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 47, 1,
+                 "Your skin of rock crumbles." );
 
 	spello ( SPELL_STEELSKIN, "steelskin", 45 , 20 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 48, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 48, 0, 
+                 "Your skin of steel becomes more supple." );
 
 	spello ( SPELL_HOLD_PERSON, "hold person", 70 , 40 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
-	         120, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16, 0 );
+	         120, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16, 0,
+                 "You are freed of your bindings!" );
 
 	spello ( SPELL_PARALYZE, "paralyze", 100 , 65 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
-	         300, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 29, 0 );
+	         300, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 29, 0,
+                 "You regain control of your muscles!" );
 
 	spello ( SPELL_HOLY_WORD, "holy word", 25 , 15 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 13, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 13, 1, "" );
 
 	spello ( SPELL_HOLY_SHOUT, "holy shout", 65 , 45 , 2,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
-	         SPELL_HOLY_WORD, TYPE_UNDEFINED, 3, 13, 0 );
+	         SPELL_HOLY_WORD, TYPE_UNDEFINED, 3, 13, 0, "" );
 
 	spello ( SPELL_HASTE, "haste", 50 , 35 , 1, POS_STANDING,
 	         TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 70,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 16, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 16, 1, 
+                 "You feel sluggish again." );
 
 	spello ( SPELL_SHIELD, "shield", 30 , 20 , 2, POS_STANDING,
-	         TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 7, 1 );
+	         TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 7, 1,
+                 "Your shield of force crumbles to dust." );
 
 	spello ( SPELL_GROUP_SHIELD, "group shield", 50 , 35 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_GROUPS, 0,
-	         SPELL_SHIELD, TYPE_UNDEFINED, 3, 12, 0 );
+	         SPELL_SHIELD, TYPE_UNDEFINED, 3, 12, 0, "" );
 
 	spello ( SPELL_ACID_ARROW, "acid arrow", 30 , 20 , 3,
 	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 50, 1 );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 50, 1, "" );
 
 	spello ( SPELL_FLAME_ARROW, "flame arrow", 35 , 20 , 3,
 	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 43, 0 );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 43, 0, "" );
 
 	spello ( SPELL_CONE_OF_COLD, "cone of cold", 30 , 10 , 3,
 	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1 );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1, "" );
 
 	spello ( SPELL_KNOCK, "knock", 30 , 10 , 3, POS_FIGHTING,
 	         TAR_IGNORE | TAR_OBJ_INV | TAR_OBJ_ROOM, TRUE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 43, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 43, 1, "" );
 
 	spello ( SPELL_PROT_FIRE, "protection from fire", 20 , 10 ,
 	         2, POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1, 
+                 "You feel less insulated." );
 
 	spello ( SPELL_PROT_COLD, "protection from cold", 20 , 10 ,
 	         2, POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 16, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 16, 1, 
+                 "You feel your shell of warmth dissipate." );
 
 	spello ( SPELL_FIRE_SHIELD, "fire shield", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 37, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 37, 0,
+                 "Your protective shield of fire fades." );
 
 	spello ( SPELL_LIFE_TRANSFER, "life transfer", 30 , 15 , 3,
 	         POS_STANDING, TAR_AREA_DIR|TAR_CHAR_ROOM | TAR_NOT_SELF, FALSE, MAG_POINTS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 1, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 1, 1, "" );
 
 	spello ( SPELL_MANA_TRANSFER, "mana transfer", 20 , 10 , 2,
 	         POS_STANDING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_NOT_SELF, FALSE, MAG_POINTS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 30, 1, "" );
 
 
 	spello ( SPELL_PROT_FROM_GOOD, "protection from good", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0,
+                 "Your unholy aura dissipates." );
 
 	spello ( SPELL_SHIELD_ICE, "ice shield", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 16, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 16, 0,
+                 "Your shield of ice melts." );
 
 	spello ( SPELL_SHIELD_THORN, "thorn shield", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 13, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 13, 1,
+                 "The thorns around you wither and die." );
 
 	spello ( SPELL_SHIELD_MANA, "mana shield", 50 , 30 , 2,
 	         POS_STANDING,  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 10, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 10, 0,
+                 "Your pulsating mana shield dissipates." );
 
 	spello ( SPELL_SHIELD_MIRROR, "mirror shield", 50 , 30 , 2,
 	         POS_STANDING,  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1,
+                 "Your mirror shield shatters." );
 
 	spello ( SPELL_SHIELD_HOLY, "holy shield", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 22, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 22, 1,
+                 "The geas is lifted." );
 
 	spello ( SPELL_SHIELD_STATIC, "static shield", 50 , 30 , 2,
 	         POS_STANDING,  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1,
+                 "Your static shield fizzles out." );
 
 	spello ( SPELL_FORTIFY_MIND, "fortify mind", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1,
+                 "Your mind's protection crumbles away." );
+
 	spello ( SPELL_FORTIFY_BODY, "fortify body", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1,
+                 "Your body's protection crumbles away." );
 
 	spello ( SPELL_SWEET_DREAMS, "sweet dreams", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 240,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 23, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 23, 1,
+                 "You wake up from the most refreshing dream." );
 
 	spello ( SPELL_DEVINE_MIND, "devine mind", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1,
+                 "Your devine guidance leaves you." );
 
 	spello ( SPELL_NUMB_MIND, "numb mind", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 1, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 1, 0,
+                 "Your mind tingles as feelings returns to it." );
 
 	spello ( SPELL_SLOW, "slowness", 50 , 30 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 48, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 48, 0,
+                 "The feelings of lethargy is lifted." );
 
 	spello ( SPELL_FLIGHT, "flight", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 3, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 3, 0,
+                 "Your magical wings shrivel and fall off." );
 
 	spello ( SPELL_BATTLE_RAGE, "battle rage", 50 , 30 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1,
+                 "You calm down from your battle rage." );
 
 	spello ( SPELL_ENCHANT_ARMOR, "embue armor", 100 , 80 , 2,
 	         POS_RESTING, TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 30, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 30, 1, "" );
 
 	spello ( SPELL_MAGIC_BUBBLE, "magic bubble", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 14, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 14, 0,
+                 "The magic bubble bursts!" );
 
 
 	spello ( SPELL_PSI_PANIC, "psi panic", 100 , 80 , 2,
 	         POS_RESTING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 19, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 19, 0,
+                 "You stop panicking." );
 
 	spello ( SPELL_NIGHTMARE, "nightmare", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_DAMAGE, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 26, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 26, 0,
+                 "Reality chases your nightmares away." );
 
 	spello ( SPELL_DISPELL_SANCTURY, "dispel sanctuary", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_UNAFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 21, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 21, 0, "" );
 
 
 	spello ( SPELL_FORSEE, "forsee", 50 , 30 , 2,
 	         POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1,
+                 "You lose your sense of anticipation." );
 
 	spello ( SPELL_MANA_BLAST, "mana blast", 900 , 450 , 30,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 50, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 50, 0 , "");
 
 	spello ( SPELL_CONFUSE, "confuse", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 10, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 10, 1,
+                 "You feel less confused." );
 
 	spello ( SPELL_CORRUPT_ARMOR, "corrupt armor", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 12, 1,
+                 "The aura of corruption fades." );
 
 	spello ( SPELL_WEAKEN, "weaken", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 17, 1 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 17, 1,
+                 "You feel your strength return." );
 
 
 	/* NON-castable spells should appear here */
-	spello ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
+	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
 	         TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_FIRE_BREATH, "fire breath", 0, 0, 0, POS_FIGHTING,
-	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
-	spello ( SPELL_GAS_BREATH, "gas breath", 0, 0, 0, POS_FIGHTING,
-	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_FIRE_BREATH, "fire breath", 0, 0, 0, POS_FIGHTING,
+	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+	spello_system ( SPELL_GAS_BREATH, "gas breath", 0, 0, 0, POS_FIGHTING,
+	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_FROST_BREATH, "frost breath", 0, 0, 0, POS_FIGHTING,
-	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_FROST_BREATH, "frost breath", 0, 0, 0, POS_FIGHTING,
+	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_ACID_BREATH, "acid breath", 0, 0, 0, POS_FIGHTING,
-	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_ACID_BREATH, "acid breath", 0, 0, 0, POS_FIGHTING,
+	         TAR_IGNORE, TRUE, MAG_AREAS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_LIGHTNING_BREATH, "lightning breath", 0, 0, 0,
+	spello_system ( SPELL_LIGHTNING_BREATH, "lightning breath", 0, 0, 0,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 , "");
 
-	spello ( SPELL_ACID, "acid", 0, 0, 0, 0,
-	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_ACID, "acid", 0, 0, 0, 0,
+	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_BURN, "burn", 0, 0, 0, 0,
-	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_BURN, "burn", 0, 0, 0, 0,
+	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_FREEZE, "freeze", 0, 0, 0, 0,
-	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_FREEZE, "freeze", 0, 0, 0, 0,
+	         TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 , "");
 
-	spello ( SPELL_POLYMORPH, "polymorph", 0, 0, 0, 0,
-	         TAR_CHAR_ROOM, TRUE, MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_POLYMORPH, "polymorph", 0, 0, 0, 0,
+	         TAR_CHAR_ROOM, TRUE, MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
-	spello ( SPELL_DG_AFFECT, "Malactation", 0, 0, 0, POS_SITTING,
-	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
-	spello ( SPELL_IMMFREEZE, "Imm Freeze", 0, 0, 0, POS_SITTING,
-	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
-	spello ( SPELL_SILENCED, "Silenced", 0, 0, 0, POS_SITTING,
-	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0 );
+	spello_system ( SPELL_DG_AFFECT, "Malactation", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+	spello_system ( SPELL_IMMFREEZE, "Imm Freeze", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+	spello_system ( SPELL_SILENCED, "Silenced", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 
 	/*
 	 * Declaration of skills - this actually doesn't do anything except

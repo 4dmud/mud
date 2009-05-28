@@ -25,6 +25,7 @@
 #include "genmob.h"
 #include "genzon.h"
 #include "oasis.h"
+#include "fight.h"
 
 /*
     ASSIGNMOB(500, guild);	// guild guard in Mud School
@@ -55,12 +56,25 @@
     ASSIGNMOB(21819, guild);	// tinker skill
     ASSIGNMOB(26060, guild);	// brew skill
 */
+int total_spells(int type)
+{
+  int i, retval = 0;
+  for (i = 0; i < MAX_SKILLS; i++)
+    if (spell_info[i].type == type)
+      retval++;
+  return retval;
+}
+
 int spell_num ( const char *name );
 int spell_sorted_info[TOP_SPELL_DEFINE + 2];
 int spell_sort_info[MAX_SKILLS + TOP_SUB_DEFINE + 1];
-int spell_sort_data[MAX_SPELLS + 1];
-int skill_sort_data[MAX_SKILLS - MAX_SPELLS + 2];
+int spell_sort_data[MAX_SKILLS + 1];
+int skill_sort_data[MAX_SKILLS + 1];
 int sub_sort_data[TOP_SUB_DEFINE +1];
+
+int start_skill = 0;
+int start_sub = 0;
+int end_sub = 0;
 
 int compare_spells ( const void *x, const void *y )
 {
@@ -98,23 +112,25 @@ void sort_sub_data ( void )
 }
 void sort_spell_data ( void )
 {
-	int a;
+	int a, b = 0;
 
 	/* initialize array, avoiding reserved. */
-	for ( a = 1; a <= MAX_SPELLS; a++ )
-		spell_sort_data[a] = a;
-
-	qsort ( &spell_sort_data[0], MAX_SPELLS, sizeof ( int ), compare_spells );
+	for ( a = 1; a <= MAX_SKILLS; a++ )
+          if (IS_SPELL_CAST(a))
+		spell_sort_data[++b] = a;
+        start_skill = b;
+	qsort ( &spell_sort_data[0], b + 1, sizeof ( int ), compare_spells );
 }
 void sort_skill_data ( void )
 {
 	int a, b = 0;
 
 	/* initialize array, avoiding reserved. */
-	for ( a = MAX_SPELLS + 1; a <= MAX_SKILLS; a++ )
+	for ( a = 1; a <= MAX_SKILLS; a++ )
+          if (IS_SKILL(a))
 		skill_sort_data[++b] = a;
 
-	qsort ( &skill_sort_data[0], b, sizeof ( int ), compare_spells );
+	qsort ( &skill_sort_data[0], b +1, sizeof ( int ), compare_spells );
 }
 
 
@@ -128,15 +144,19 @@ void sort_spells ( void )
 	sort_all_spell_data();
 
 	/* initialize array, avoiding reserved. */
-	for ( a = 1; a <= MAX_SPELLS; a++ )
+	for ( a = 1; a <= start_skill; a++) 
 		spell_sort_info[a] = spell_sort_data[a];
 
-	for ( ; a <= MAX_SKILLS; a++ )
-		spell_sort_info[a] = skill_sort_data[b++];
 
-	for ( b = 0; a <= ( TOP_SUB_DEFINE + MAX_SKILLS ); a++ )
-		spell_sort_info[a] = sub_sort_data[b++];
+	for ( ; skill_sort_data[b] != 0; a++, b++ )
+		spell_sort_info[a] = skill_sort_data[b];
 
+        start_sub = a;
+
+	for ( b = 0; b < TOP_SUB_DEFINE; a++, b++ )
+		spell_sort_info[a] = sub_sort_data[b];
+
+        end_sub = a;
 
 }
 
@@ -199,20 +219,22 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	DYN_DEFINE;
 	*buf = 0;
 
+      ch->Send("%d %d %d\r\n", start_skill, start_sub, end_sub);
+
 	if ( skillspell == 0 )
 	{
-		sortpos = MAX_SPELLS + 1;
-		ending = MAX_SKILLS;
+		sortpos = start_skill +1; 
+		ending = start_sub - 1;
 	}
 	else if ( skillspell == 1 )
 	{
 		sortpos = 1;
-		ending = MAX_SPELLS;
+		ending = start_skill;
 	}
 	else
 	{
-		sortpos = MAX_SKILLS + 1;
-		ending = MAX_SKILLS + TOP_SUB_DEFINE;
+		sortpos = start_sub;
+		ending = end_sub;
 	}
 	DYN_CREATE;
 	*dynbuf = 0;
@@ -312,7 +334,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 
 
 				sprintf ( buf, " %s%-20s     \x1B[0m[%s] ",
-				          ( ! ( i < MAX_SPELLS ) ? "\x1B[32m" : "\x1B[33m" ),
+				          ( ! ( IS_SPELL_CAST(i) ) ? "\x1B[32m" : "\x1B[33m" ),
 				          skill_name ( i ), how_good_perc ( ch, total_chance ( ch, i ) ) );
 				DYN_RESIZE ( buf );
 

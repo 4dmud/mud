@@ -27,6 +27,7 @@
 /* external vars */
 void die ( Character *ch, Character * killer );
 
+#define IS_SPELL_CAST(tt) (((tt) > 0) && ((tt) < MAX_SKILLS) && (spell_info[tt].type == 1))
 
 /* cast a spell; can be called by mobiles, objects and rooms, and no   */
 /* level check is required. Note that mobs should generally use the    */
@@ -88,7 +89,7 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 
 	/* spellnum = search_block(s, spells, 0); */
 	spellnum = find_skill_num ( s );
-	if ( ( spellnum < 1 ) || ( spellnum > MAX_SPELLS ) )
+	if ( IS_SPELL_CAST(spellnum) )
 	{
 		script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (%s)",
 		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );

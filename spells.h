@@ -265,17 +265,180 @@ enum spell_list {
     SPELL_WATER_TO_WINE,
     SPELL_MIDAS_TOUCH,//127
     SPELL_POLYMORPH,
-
-
-
-
-
-    /* Insert new spells here, up to MAX_SPELLS */
-    MAX_SPELLS = 130
+    SPARE129, 
+    SPARE130,
+    SKILL_BACKSTAB, // 131
+    SKILL_BASH,
+    SKILL_HIDE,
+    SKILL_KICK,
+    SKILL_PICK_LOCK,//135
+    SKILL_FLANK,
+    SKILL_RESCUE,
+    SKILL_SNEAK,
+    SKILL_STEAL,
+    SKILL_TRACK,//140
+    SKILL_MOUNT,
+    SKILL_RIDING,
+    SKILL_TAME,
+    SKILL_SNARE ,
+    SKILL_THROW ,//145
+    SKILL_BOW,
+    SKILL_SLING,
+    SKILL_CROSSBOW,
+    SKILL_DUAL,
+    SKILL_CIRCLE,//150
+    SKILL_BLACKJACK,
+    SKILL_SECOND_ATTACK,
+    SKILL_FIREARM,
+    SKILL_PUSH,
+    SKILL_SCAN,//155
+    SKILL_BREW,
+    SKILL_SCRIBE,
+    SKILL_TINKER,
+    SKILL_POISON_WEAPON,
+    SKILL_RETREAT,//160
+    SKILL_FILET,
+    SKILL_DISARM,
+    SKILL_FORAGE,
+    SKILL_TRAP_AWARE,
+    SKILL_PARRY,//165
+    SKILL_MOUNTED_COMBAT,
+    SKILL_TRAMPLE,
+    SKILL_JOUST,
+    SKILL_GRAPPLE,
+    SKILL_DRUNK,//170
+    SKILL_HANDTOHAND,
+    SKILL_MELEE ,
+    SKILL_THIRD_ATTACK,
+    SKILL_HAMSTRING,
+    SKILL_SHORT_BLADE,//175
+    SKILL_DODGE,
+    SKILL_PHASE,
+    SKILL_CHARGE,
+    SKILL_GRIP,
+    SKILL_FACE,//180
+    SKILL_FOCUS,
+    SKILL_MARTIAL_ARTS,
+    SKILL_SLIP,
+    SKILL_MANIPULATE,
+    SKILL_HOLY_STRENGTH,//185
+    SKILL_BESERK,
+    SKILL_MEDITATE,
+    SKILL_SING_WOOD	,
+    SKILL_HYPERACTIVITY,
+    SKILL_TRUE_STRIKE,//190
+    SKILL_STRANGLE,
+    SKILL_FORTIFY,
+    SKILL_MANIFEST,
+    SKILL_SCALP,
+    SKILL_BRACE,//195
+    SKILL_BEHEAD,
+    SKILL_BLADE_DANCE,
+    SKILL_LONGARM,
+    SKILL_CLEAVE,//199
+    SKILL_SMASH,  // 200
+    SPELL_IDENTIFY, 
+    SPELL_FIRE_BREATH,  
+    SPELL_GAS_BREATH, 
+    SPELL_FROST_BREATH, 
+    SPELL_ACID_BREATH,  
+    SPELL_LIGHTNING_BREATH, 
+    SPELL_BURN,
+    SPELL_FREEZE,
+    SPELL_ACID,            // 209
+    SPARE210,
+    SPARE211,
+    SPARE212,
+    SPARE213,
+    SPARE214,
+    SPARE215,
+    SPARE216,
+    SPARE217,
+    SPARE218,
+    SPARE219,
+    SPARE220,
+    SPARE221,
+    SPARE222,
+    SPARE223,
+    SPARE224,
+    SPARE225,
+    SPARE226,
+    SPARE227,
+    SPARE228,
+    SPARE229,
+    SPARE230,
+    SPARE231,
+    SPARE232,
+    SPARE233,
+    SPARE234,
+    SPARE235,
+    SPARE236,
+    SPARE237,
+    SPARE238,
+    SPARE239,
+    SPARE240,
+    SPARE241,
+    SPARE242,
+    SPARE243,
+    SPARE244,
+    SPARE245,
+    SPARE246,
+    SPARE247,
+    SPARE248,
+    SPARE249,
+    SPARE250,
+    SPARE251,
+    SPARE252,
+    SPARE253,
+    SPARE254,
+    SPARE255,
+    SPARE256,
+    SPARE257,
+    SPARE258,
+    SPARE259,
+    SPARE260,
+    SPARE261,
+    SPARE262,
+    SPARE263,
+    SPARE264,
+    SPARE265,
+    SPARE266,
+    SPARE267,
+    SPARE268,
+    SPARE269,
+    SPARE270,
+    SPARE271,
+    SPARE272,
+    SPARE273,
+    SPARE274,
+    SPARE275,
+    SPARE276,
+    SPARE277,
+    SPARE278,
+    SPARE279,
+    SPARE280,
+    SPARE281,
+    SPARE282,
+    SPARE283,
+    SPARE284,
+    SPARE285,
+    SPARE286,
+    SPARE287,
+    SPARE288,
+    SPARE289,
+    SPARE290,
+    SPARE291,
+    SPARE292, 
+    SPELL_SILENCED , 
+    SPELL_IMMFREEZE,
+    SPELL_DG_AFFECT,
+    // Changed this to a max value. Prom
+    MAX_SKILLS
 };
 
+/* Horus - not required now, all in spell_list */
+/*
 enum skill_list {
-    /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
     SKILL_UNDEFINED = MAX_SPELLS,
     SKILL_BACKSTAB, // 131
     SKILL_BASH,
@@ -350,6 +513,7 @@ enum skill_list {
     // Changed this to a max value. Prom
     MAX_SKILLS
 };
+*/
 
 /*
  * NON-PLAYER AND OBJECT SPELLS AND SKILLS The practice levels for the spells
@@ -359,6 +523,7 @@ enum skill_list {
  * NPC-only spells).
  */
 
+/*
 #define SPELL_IDENTIFY               	201
 #define SPELL_FIRE_BREATH            	202
 #define SPELL_GAS_BREATH             	203
@@ -371,7 +536,7 @@ enum skill_list {
 
 #define SPELL_SILENCED               293
 #define SPELL_IMMFREEZE              294
-#define SPELL_DG_AFFECT              295	/* to make an affect induced \
+#define SPELL_DG_AFFECT              295	// to make an affect induced \
 * by dg_affect look correct \
 * on 'stat' we need to \
 * define it with a \
@@ -493,6 +658,8 @@ struct spell_info_type {
     int wait;
     int classes;
     int gm;
+    const char *wear_off_msg;   /* Easier to declare everything here */
+    int type;                   /* skill/spell or other */
 
     spell_info_type() {
     min_position = 0;		/* Position for caster   */
@@ -514,6 +681,8 @@ struct spell_info_type {
     wait = 0;
     classes = 0;
     gm = 0;
+    wear_off_msg = "";
+    type = 0;
     }
 
 };
