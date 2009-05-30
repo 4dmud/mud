@@ -1211,10 +1211,16 @@ int remorts = MIN(REMORTS(ch), 50);
 
 	GET_MAX_STAMINA ( ch ) += current_class_is_tier_num ( ch ) + ( GET_DEX ( ch ) > 20 );
 
-	if ( IS_MAGE ( ch ) || IS_PRIEST ( ch ) || IS_ESPER ( ch ) )
+        if (remorts > 35) {
+            if ((GET_LEVEL(ch) % 5) == 0)
+                GET_PRACTICES(ch) += 1;
+        }
+        else {
+	    if ( IS_MAGE ( ch ) || IS_PRIEST ( ch ) || IS_ESPER ( ch ) )
 		GET_PRACTICES ( ch ) += MAX ( 2, ( int ) wis_app[GET_WIS ( ch ) ].bonus );
-	else
+	    else
 		GET_PRACTICES ( ch ) += MIN ( 2, MAX ( 1, ( int ) wis_app[GET_WIS ( ch ) ].bonus ) );
+        }
 
 	if ( GET_LEVEL ( ch ) >= LVL_GOD )
 	{
