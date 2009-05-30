@@ -50,7 +50,6 @@ Which will be changed so that each time the event is reached, a random enemy in 
 
 ACTION ( thing_call_lightning )
 {
-	long time = 0;
 	const char *to_char = NULL;
 	const char *to_room = NULL;
 	const char *to_room_miss = NULL;

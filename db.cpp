@@ -5444,7 +5444,7 @@ int store_to_char ( const char *name, Character *ch )
 					if ( num2 >= 100 )
 						GET_MAX_STAMINA ( ch ) = num2;
 				}
-				else if ( !strcmp ( tag, "Skil" ) )
+				else if ( !strcmp ( tag, "Skil" ) || !strcmp(tag, "Skills") )
 				{
 					do
 					{
@@ -5776,10 +5776,12 @@ void char_to_store ( Character *ch )
 	{
 		if ( SAVED ( ch ).CountSkills() > 0 )
 		{
-			fprintf ( fl, "Skil:\n" );
+		//	fprintf ( fl, "Skil:\n" );
+			fprintf ( fl, "Skills:\n" );
 			for ( skills_map::iterator it = SAVED ( ch ).SkillsBegin(); it != SAVED ( ch ).SkillsEnd();it++ )
 			{
-				if ( knows_spell ( ch, ( it->second )->skill ) && ( it->second )->learn > 0 )
+//				if ( knows_spell ( ch, ( it->second )->skill ) && ( it->second )->learn > 0 )
+				if ( ( it->second )->learn > 0 )
 					fprintf ( fl, "%d %d %d 0\n", ( it->second )->skill, ( it->second )->learn, ( it->second )->wait );
 			}
 			fprintf ( fl, "0 0 0 0\n" );

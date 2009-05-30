@@ -1442,7 +1442,7 @@ int knows_spell ( Character *ch, int spell )
 
 	if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
 		return 1;
-	if ( spell < 0 && spell < TOP_SPELL_DEFINE )
+	if ( spell < 0 || spell > TOP_SPELL_DEFINE )
 		return 0;
 	if ( spell_info[spell].min_level >= LVL_IMMORT )
 		return 0;
