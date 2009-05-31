@@ -5002,7 +5002,7 @@ int store_to_char ( const char *name, Character *ch )
 						get_line ( fl, line );
 						if ( sscanf ( line, "%d %lld %d %d %d", &num, &num6, &num3, &num4, &num5 ) == 5 )
 						{
-							tmp_aff[i].type = IRANGE ( TYPE_UNDEFINED, num, TOP_SPELL_DEFINE );
+							tmp_aff[i].type = IRANGE ( TYPE_UNDEFINED, num, MAX_SKILLS );
 							tmp_aff[i].expire = ( sec_to_time ( ( long ) num6 ) );
 							tmp_aff[i].modifier = IRANGE ( -1000, num3, 1000 );
 							tmp_aff[i].location = IRANGE ( 0, num4, MAX_APPLY );
@@ -6609,10 +6609,10 @@ int check_object_spell_number ( struct obj_data *obj, int val, int nr )
 		      nr, obj->short_description, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
-	if ( GET_OBJ_VAL ( obj, val ) > TOP_SPELL_DEFINE )
+	if ( GET_OBJ_VAL ( obj, val ) > MAX_SKILLS )
 	{
 		log ( "SYSERR: Object #%d (%s) has out of range spell (bigger then %d) (%s) #%d.",
-		      nr, obj->short_description, TOP_SPELL_DEFINE, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
+		      nr, obj->short_description, MAX_SKILLS, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
 	if ( !IS_SPELL_CAST(GET_OBJ_VAL ( obj, val ))) 

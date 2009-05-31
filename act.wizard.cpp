@@ -6145,10 +6145,10 @@ int spell_weight ( struct obj_data *obj, int val )
 	 */
 	if ( i <= 0 )
 		return 0;
-	if ( i > TOP_SPELL_DEFINE )
-		return 1;
-	if ( i <= MAX_SKILLS && spell_info[i].type != 1) 
-		return 1;
+	if ( i >= MAX_SKILLS )
+		return 0;
+	if ( spell_info[i].type != 1) 
+		return 0;
 
 	switch ( GET_OBJ_VAL ( obj, val ) )
 	{
@@ -6186,10 +6186,10 @@ int spell_price ( struct obj_data *obj, int val )
 	 */
 	if ( i <= 0 )
 		return 0;
-	if ( i > TOP_SPELL_DEFINE )
-		return 1;
-	if ( i <= MAX_SKILLS && spell_info[i].type != 1) 
-		return 1;
+	if ( i >= MAX_SKILLS )
+		return 0;
+	if ( spell_info[i].type != 1) 
+		return 0;
 
 	switch ( i )
 	{
@@ -7530,11 +7530,11 @@ void fixskills ( Character *ch, int lrn )
 	if ( lrn <= 0 )
 		learned = IRANGE ( 30, ( 20* ( TIERNUM ) ), 80 );
 
-	for ( int i = 0;i < TOP_SPELL_DEFINE;i++ )
+	for ( int i = 0;i < MAX_SKILLS;i++ )
 		if ( knows_spell ( ch, i ) )
 			SAVED ( ch ).SetSkillLearn ( i, learned );
 	/* twice over to get the pre-req's */
-	for ( int i = 0;i < TOP_SPELL_DEFINE;i++ )
+	for ( int i = 0;i < MAX_SKILLS;i++ )
 		if ( knows_spell ( ch, i ) )
 			if ( SAVED ( ch ).GetSkillLearn ( i ) < learned )
 				SAVED ( ch ).SetSkillLearn ( i, learned );

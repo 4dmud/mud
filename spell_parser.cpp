@@ -203,7 +203,7 @@
 #include "action.h"
 #include "descriptor.h"
 
-vector<spell_info_type> spell_info ( TOP_SPELL_DEFINE + 1 );
+vector<spell_info_type> spell_info ( MAX_SKILLS + 1 );
 
 extern int spell_sorted_info[];
 
@@ -430,11 +430,11 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
 /*
  * This function should be used anytime you are not 100% sure that you have
  * a valid spell/skill number.  A typical for() loop would not need to use
- * this because you can guarantee > 0 and <= TOP_SPELL_DEFINE.
+ * this because you can guarantee > 0 and <= MAX_SKILLS.
  */
 const char *skill_name ( int num )
 {
-	if ( num > 0 && num <= TOP_SPELL_DEFINE )
+	if ( num > 0 && num <= MAX_SKILLS )
 		return ( spell_info[num].name );
 	else if ( num == -1 )
 		return ( "UNUSED" );
@@ -488,7 +488,7 @@ int spell_num ( const char *name )
 	int bot, top, mid;
 
 	bot = 0;
-	top = TOP_SPELL_DEFINE;
+	top = MAX_SKILLS;
 
 	for ( ;; )
 	{
@@ -504,7 +504,7 @@ int spell_num ( const char *name )
 			bot = mid + 1;
 	}
 	bot = 0;
-	top = TOP_SPELL_DEFINE;
+	top = MAX_SKILLS;
 
 	/* perform binary search on spells */
 	for ( ;; )
@@ -531,11 +531,11 @@ int find_skill_num ( char *name )
 	return ( spell_num ( ( const char * ) name ) );
 	/*
 
-	for (skindex = 1; skindex <= TOP_SPELL_DEFINE; skindex++)
+	for (skindex = 1; skindex <= MAX_SKILLS; skindex++)
 	if (*spell_info[spell_sorted_info[skindex]].name == *name)
 	break;
 
-	for (; skindex <= TOP_SPELL_DEFINE; skindex++) {
+	for (; skindex <= MAX_SKILLS; skindex++) {
 	if (is_abbrev(name, spell_info[spell_sorted_info[skindex]].name))
 	 return (spell_sorted_info[skindex]);
 
@@ -571,8 +571,10 @@ int call_magic ( Character *caster, Character *cvict,
 {
 	int savetype;
 
-	if ( spellnum < 1 || spellnum > TOP_SPELL_DEFINE )
+	if ( spellnum < 1 || spellnum > MAX_SKILLS )
 		return ( 0 );
+        if (spell_info[spellnum].type != 1)
+                return ( 0 );
 
 	if ( !cast_wtrigger ( caster, cvict, ovict, spellnum ) )
 		return 0;
@@ -1008,10 +1010,10 @@ int cast_spell ( Character *ch, Character *tch,
 
 
 
-	if ( spellnum < 0 || spellnum > TOP_SPELL_DEFINE )
+	if ( !IS_SPELL_CAST(spellnum))
 	{
 		log ( "SYSERR: cast_spell trying to call spellnum %d/%d.\n",
-		      spellnum, TOP_SPELL_DEFINE );
+		      spellnum, MAX_SKILLS );
 		return ( 0 );
 	}
 
@@ -1442,7 +1444,7 @@ int knows_spell ( Character *ch, int spell )
 
 	if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
 		return 1;
-	if ( spell < 0 || spell > TOP_SPELL_DEFINE )
+	if ( !IS_SPELL_CAST(spell) )
 		return 0;
 	if ( spell_info[spell].min_level >= LVL_IMMORT )
 		return 0;
@@ -1513,9 +1515,9 @@ int knows_spell ( Character *ch, int spell )
 
 void assign_class ( int spell, int chclass )
 {
-	if ( spell < 0 || spell > TOP_SPELL_DEFINE )
+	if ( spell  < 0 || spell > MAX_SKILLS || spell_info[spell].type == 0)
 	{
-		log ( "SYSERR: attempting assign to illegal spellnum %d/%d", spell, TOP_SPELL_DEFINE );
+		log ( "SYSERR: attempting assign to illegal spellnum %d/%d", spell, MAX_SKILLS );
 		return;
 	}
 
@@ -1646,7 +1648,7 @@ void mag_assign_spells ( void )
 	int i;
 
 	/* Do not change the loop below */
-	for ( i = 0; i <= TOP_SPELL_DEFINE; i++ )
+	for ( i = 0; i <= MAX_SKILLS; i++ )
 		spell_info[i] = spell_info_type();
 	/* Do not change the loop above */
 

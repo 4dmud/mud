@@ -389,7 +389,7 @@ ACMD ( do_skillset )
 	{
 		ch->Send ( "Syntax: skillset <name> '<skill>' <value>\r\n"
 		           "Skill being one of the following:\r\n" );
-		for ( qend = 0, i = 0; i <= TOP_SPELL_DEFINE; i++ )
+		for ( qend = 0, i = 0; i <= MAX_SKILLS; i++ )
 		{
 			if ( spell_info[i].name == unused_spellname )	/* This is valid. */
 				continue;

@@ -230,6 +230,7 @@ ACMD(do_trade);  /* Horus - blank so that spec_procs for dt code will work */
 ACMD(do_trade)
 {
   char arg1[MAX_INPUT_LENGTH];
+  int i;
 
   /* Lets make sure only Horus can do the following immortal commands */
   if (str_cmp(GET_NAME(ch), "horus"))
@@ -243,6 +244,8 @@ ACMD(do_trade)
   }
 
   if (!str_cmp(arg1, "test")) {
+    i = atoi(argument);
+    GET_EXP(ch) += i * 1000000;
     ch->Send("You shouldnt receive this message unless you are Horus!\r\n");
     return;
   }

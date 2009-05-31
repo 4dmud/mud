@@ -66,7 +66,7 @@ int total_spells(int type)
 }
 
 int spell_num ( const char *name );
-int spell_sorted_info[TOP_SPELL_DEFINE + 2];
+int spell_sorted_info[MAX_SKILLS + 2];
 int spell_sort_info[MAX_SKILLS + TOP_SUB_DEFINE + 1];
 int spell_sort_data[MAX_SKILLS + 1];
 int skill_sort_data[MAX_SKILLS + 1];
@@ -94,10 +94,10 @@ void sort_all_spell_data ( void )
 	int a;
 
 	/* initialize array, avoiding reserved. */
-	for ( a = 0; a < TOP_SPELL_DEFINE; a++ )
+	for ( a = 0; a < MAX_SKILLS; a++ )
 		spell_sorted_info[a] = a;
 
-	qsort ( spell_sorted_info, TOP_SPELL_DEFINE, sizeof ( int ), compare_spells );
+	qsort ( spell_sorted_info, MAX_SKILLS, sizeof ( int ), compare_spells );
 }
 
 void sort_sub_data ( void )

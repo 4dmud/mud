@@ -1878,7 +1878,6 @@ struct skillspell_data {
     int skill; // which skill/spell it is
     int learn; // what percent it is at
     int wait; // recast delay left
-    int status; // is it currently being used
 
     skillspell_data() : skill(-1), learn(0), wait(0) {}
 }
