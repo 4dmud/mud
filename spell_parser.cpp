@@ -1008,7 +1008,7 @@ int cast_spell ( Character *ch, Character *tch,
 
 
 
-	if ( !IS_SPELL_CAST(spellnum))
+	if ( spellnum < 0 || spellnum >= MAX_SKILLS)
 	{
 		log ( "SYSERR: cast_spell trying to call spellnum %d/%d.\n",
 		      spellnum, MAX_SKILLS );

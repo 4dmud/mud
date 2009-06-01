@@ -6189,7 +6189,7 @@ int spell_price ( struct obj_data *obj, int val )
 	if ( i >= MAX_SKILLS )
 		return 0;
 	if ( spell_info[i].type != 1) 
-		return 0;
+		return 2;
 
 	switch ( i )
 	{
