@@ -218,7 +218,6 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	char buf[MAX_INPUT_LENGTH];
 	DYN_DEFINE;
 	*buf = 0;
-
 	if ( skillspell == 0 )
 	{
 		sortpos = start_skill +1; 

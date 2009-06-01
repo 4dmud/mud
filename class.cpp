@@ -1867,7 +1867,6 @@ ACMD ( do_skilllist )
 	else
 	{
 
-
 		the_class = parse_class ( *argument );
 		if ( the_class == CLASS_UNDEFINED )
 		{

@@ -6615,7 +6615,7 @@ int check_object_spell_number ( struct obj_data *obj, int val, int nr )
 		      nr, obj->short_description, MAX_SKILLS, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
-	if ( !IS_SPELL_CAST(GET_OBJ_VAL ( obj, val ))) 
+	if ( GET_OBJ_VAL ( obj, val ) < 0 || GET_OBJ_VAL(obj, val) > MAX_SKILLS) 
 	{
 		log ( "SYSERR: Object #%d (%s) has out of range spell (assigning a skill!) (%s) #%d.",
 		      nr, obj->short_description, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );

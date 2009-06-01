@@ -1446,6 +1446,8 @@ int knows_spell ( Character *ch, int spell )
 		return 1;
 	if ( spell < 0 || spell >= MAX_SKILLS )
 		return 0;
+        if (spell_info[spell].type == 0)
+               return 0;
 	if ( spell_info[spell].min_level >= LVL_IMMORT )
 		return 0;
 
@@ -1515,7 +1517,7 @@ int knows_spell ( Character *ch, int spell )
 
 void assign_class ( int spell, int chclass )
 {
-	if ( spell  < 0 || spell > MAX_SKILLS || spell_info[spell].type == 0)
+	if ( spell  < 0 || spell > MAX_SKILLS )
 	{
 		log ( "SYSERR: attempting assign to illegal spellnum %d/%d", spell, MAX_SKILLS );
 		return;
