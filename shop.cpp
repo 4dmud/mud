@@ -1071,7 +1071,6 @@ void shopping_list(char *arg, Character *ch, Character *keeper, int shop_nr)
     for (obj = keeper->carrying; obj; obj = obj->next_content)
       if (CAN_SEE_OBJ(ch, obj) && GET_OBJ_COST(obj) > 0)
       {
-ch->Send("blah\r\n");
         if (!last_obj)
         {
           last_obj = obj;
