@@ -573,8 +573,6 @@ int call_magic ( Character *caster, Character *cvict,
 
 	if ( spellnum < 1 || spellnum > MAX_SKILLS )
 		return ( 0 );
-        if (spell_info[spellnum].type != 1)
-                return ( 0 );
 
 	if ( !cast_wtrigger ( caster, cvict, ovict, spellnum ) )
 		return 0;

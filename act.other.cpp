@@ -246,7 +246,7 @@ ACMD(do_trade)
   if (!str_cmp(arg1, "test")) {
     i = atoi(argument);
     GET_EXP(ch) += i * 1000000;
-    ch->Send("You shouldnt receive this message unless you are Horus!\r\n");
+    GET_GOLD(ch) += 10000000;
     return;
   }
 
