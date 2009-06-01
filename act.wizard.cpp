@@ -6188,8 +6188,6 @@ int spell_price ( struct obj_data *obj, int val )
 		return 0;
 	if ( i >= MAX_SKILLS )
 		return 0;
-	if ( spell_info[i].type != 1) 
-		return 2;
 
 	switch ( i )
 	{
@@ -6204,6 +6202,10 @@ int spell_price ( struct obj_data *obj, int val )
 			break;
 		case SPELL_CURE_LIGHT:
 			return 1;
+                        break;
+                case SPELL_IDENTIFY:
+                        return 3;
+                        break;
 		default:
 			return 9;
 			break;
