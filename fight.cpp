@@ -6843,11 +6843,11 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_SHOCKING_GRASP:
 			dam = 1.1;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2;
+				dam *= 1.65;
 			else if ( sky == SKY_CLOUDLESS )
 				dam *= 0.25;
 			if ( underwater )
-				dam *= 1.8;
+				dam *= 1.5;
 			break;
 		case SPELL_LIGHTNING_BOLT:
 			dam = 1.75;
@@ -6871,7 +6871,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_CALL_LIGHTNING:
 			dam = 1.4;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2;
+				dam *= 1.75;
 			else if ( sky == SKY_CLOUDLESS )
 				dam *= 0.25;
 			break;
