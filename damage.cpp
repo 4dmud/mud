@@ -140,10 +140,10 @@ int room_affect_damage ( Character *ch, Character *vict, int dam )
 	if ( GET_POS ( vict ) == POS_DEAD )
 	{
 		if ( !IS_NPC ( vict ) && ch )
-			new_mudlog ( BRF, 0, TRUE, "%s killed by %s's room affect at %s [%d]",
+			new_mudlog ( BRF, 0, TRUE, "%s killed by %s's room effect at %s [%d]",
 			             GET_NAME ( vict ), GET_NAME ( ch ), IN_ROOM ( vict )->name, GET_ROOM_VNUM ( IN_ROOM ( vict ) ) );
 		else
-			new_mudlog ( BRF, 0, TRUE, "%s killed by room affect at %s [%d]",
+			new_mudlog ( BRF, 0, TRUE, "%s killed by room effect at %s [%d]",
 			             GET_NAME ( vict ), IN_ROOM ( vict )->name, GET_ROOM_VNUM ( IN_ROOM ( vict ) ) );
 		die ( vict, NULL );
 		return -1;

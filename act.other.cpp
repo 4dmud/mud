@@ -1299,7 +1299,7 @@ ACMD ( do_gen_tog )
 		 "The Hero channel is now Off.\r\n"},
 		{"You put time on your prompt.\r\n",
 		 "You take time off your prompt.\r\n"},
-		{"You will not automaticly sacrifice corpses.\r\n",
+		{"You will not automatically sacrifice corpses.\r\n",
 		 "You will now auto-sacrifice corpses.\r\n"},
 		{"Will no longer clear screen in OLC.\r\n",
 		 "Will now clear screen in OLC.\r\n"},
