@@ -29,7 +29,7 @@ void start_fighting_delay(Character *vict, Character *ch);
 #define IS_SKILL(tt) (((tt) >= 0) && ((tt) < MAX_SKILLS) && (spell_info[tt].type == 2))
 #define IS_SUBSKILL(type) (((type) > TYPE_SUFFERING) && ((type) < (TOP_SUB_DEFINE + TYPE_SUFFERING)))
 #define IS_OTHERDAM(type) (((type) == TYPE_SUFFERING) || (((type) >= SPELL_BURN) && ((type) <= SPELL_ACID)) \
-			|| (((type)>= TYPE_UNDERWATER) && ((type) < TOP_SPELL_DEFINE)))
+			|| (((type)>= TYPE_UNDERWATER) && ((type) <= TYPE_DESERT)))
 
 
 

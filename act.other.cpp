@@ -246,7 +246,7 @@ ACMD(do_trade)
   if (!str_cmp(arg1, "test")) {
     i = atoi(argument);
     GET_EXP(ch) += i * 1000000;
-    GET_GOLD(ch) += 10000000;
+    GET_MAX_HIT(ch) += 10;
     return;
   }
 

@@ -954,7 +954,6 @@ ASKILL ( skill_sneak )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-		*ch << "Okay, you'll try to move silently for a while.\r\n";
 
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
@@ -965,6 +964,7 @@ ASKILL ( skill_sneak )
 			return 0;
 		}
 
+		*ch << "Okay, you'll try to move silently for a while.\r\n";
 		af.type = SKILL_SNEAK;
 		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) );
 		af.modifier = 0;
@@ -994,13 +994,13 @@ ASKILL ( skill_hide )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-		*ch << "You attempt to hide yourself.\r\n";
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
 		if ( percent >
 		        total_chance ( ch, SKILL_HIDE ) + dex_app_skill[GET_DEX ( ch ) ].hide )
 			return 0;
 
+		*ch << "You attempt to hide yourself.\r\n";
 		SET_BIT_AR ( AFF_FLAGS ( ch ), AFF_HIDE );
 	}
 	return SKILL_HIDE;
@@ -1571,11 +1571,6 @@ ASKILL ( skill_grip )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-		*ch << "You clench your hand on your weapon.\r\n";
-
-		act ( "$n clenches $s hand on $s weapon.", FALSE, ch, obj, vict, TO_ROOM );
-
-
 
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
@@ -1586,6 +1581,8 @@ ASKILL ( skill_grip )
 			return 0;
 		}
 
+		*ch << "You clench your hand on your weapon.\r\n";
+		act ( "$n clenches $s hand on $s weapon.", FALSE, ch, obj, vict, TO_ROOM );
 		af.type = SKILL_GRIP;
 		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
 		af.modifier = 0;
@@ -1646,9 +1643,6 @@ ASKILL ( skill_focus )
 	}
 	else
 	{
-		*ch << "You block out the sounds around you and focus.\r\n";
-		act ( "$n gets a focused look on $s face.", FALSE, ch, 0, NULL, TO_ROOM );
-
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
 		if ( percent >
@@ -1658,6 +1652,8 @@ ASKILL ( skill_focus )
 			return 0;
 		}
 
+		*ch << "You block out the sounds around you and focus.\r\n";
+		act ( "$n gets a focused look on $s face.", FALSE, ch, 0, NULL, TO_ROOM );
 		af.type = SKILL_FOCUS;
 		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
 		af.modifier = 0;
@@ -1736,9 +1732,6 @@ ASKILL ( skill_beserk )
 	}
 	else
 	{
-		*ch << "Your eyes grow wide and a red haze blurs your vision.\r\n";
-		act ( "$n's eyes grow wide, and $e look out of control!", FALSE, ch, 0, NULL, TO_ROOM );
-
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
 		if ( percent >
@@ -1748,6 +1741,8 @@ ASKILL ( skill_beserk )
 			return 0;
 		}
 
+		*ch << "Your eyes grow wide and a red haze blurs your vision.\r\n";
+		act ( "$n's eyes grow wide, and $e look out of control!", FALSE, ch, 0, NULL, TO_ROOM );
 		af.type = SKILL_BESERK;
 		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
 		af.modifier = 0;
@@ -1772,8 +1767,6 @@ ASKILL ( skill_meditate )
 	}
 	else
 	{
-		*ch << "You clear your mind..\r\n";
-
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 		if ( percent >
 		        total_chance ( ch, SKILL_MEDITATE ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
@@ -1781,6 +1774,7 @@ ASKILL ( skill_meditate )
 			ch->Send ( "You can not seem to clear your thoughts.\r\n" );
 			return 0;
 		}
+		*ch << "You clear your mind..\r\n";
 		act ( "$n closes $s eyes and starts meditating.", FALSE, ch, 0, NULL, TO_ROOM );
 
 		GET_POS ( ch ) = POS_RESTING;
@@ -1814,8 +1808,6 @@ ASKILL ( skill_true_strike )
 	}
 	else
 	{
-		*ch << "You chant battlesong to your weapons.\r\n";
-
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
 		if ( percent >
@@ -1826,6 +1818,7 @@ ASKILL ( skill_true_strike )
 		}
 
 
+		*ch << "You chant battlesong to your weapons.\r\n";
 		act ( "$n chants battlesong to $s weapons.", FALSE, ch, 0, NULL, TO_ROOM );
 		af.type = SKILL_TRUE_STRIKE;
 		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
@@ -1862,7 +1855,6 @@ ASKILL ( skill_fortify )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-		*ch << "You clench your muscles and focus your energy.\r\n";
 
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
@@ -1872,6 +1864,7 @@ ASKILL ( skill_fortify )
 			ch->Send ( "You can't seem to concentrate.\r\n" );
 			return 0;
 		}
+		*ch << "You clench your muscles and focus your energy.\r\n";
 		act ( "$n clenches $s muscles and fortifies $s energy.", FALSE, ch, 0, NULL, TO_ROOM );
 
 		af.type = SKILL_FORTIFY;
@@ -1997,7 +1990,6 @@ ASKILL ( skill_blade_dance )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-		*ch << "You spin your weapons around in your fingers.\r\n";
 
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 
@@ -2016,6 +2008,7 @@ ASKILL ( skill_blade_dance )
 		af.location = APPLY_HITROLL;
 		af.bitvector = AFF_BLADEDANCE;
 		affect_to_char ( ch, &af );
+		*ch << "You spin your weapons around in your fingers.\r\n";
 		return SKILL_BLADE_DANCE;
 	}
 }
@@ -2082,7 +2075,6 @@ ASKILL ( skill_martial_arts )
 	}
 	else
 	{
-		*ch << "You stretch your arms and legs limbering up for a fight.\r\n";
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 		if ( use_stamina ( ch, 15 ) < 0 )
 		{
@@ -2102,6 +2094,7 @@ ASKILL ( skill_martial_arts )
 			af[i].modifier = 0;
 			af[i].location = APPLY_NONE;
 		}
+		*ch << "You stretch your arms and legs limbering up for a fight.\r\n";
 		act ( "$n stretches $s arms and legs, ready for a fight.", FALSE, ch, 0, NULL, TO_ROOM );
 
 		af[0].expire = HOURS_TO_EXPIRE ( ( ( GET_LEVEL ( ch ) /5 ) +TIERNUM ) );
@@ -2173,8 +2166,6 @@ ASKILL ( skill_hyperactivity )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-	*ch << "Okay, you start to spin out!!\r\n";
-
 
 	percent = number ( 1, 101 );   /* 101% is a complete failure */
 
@@ -2184,6 +2175,7 @@ ASKILL ( skill_hyperactivity )
 		return 0;
 	}
 
+	*ch << "Okay, you start to spin out!!\r\n";
 	act ( "$n spins out, bouncing off the walls!", FALSE, ch, 0, NULL, TO_ROOM );
 
 	af.type = SKILL_HYPERACTIVITY;
@@ -2212,9 +2204,6 @@ ASKILL ( skill_holy_strength )
 			*ch << "You are far too exausted!";
 			return 0;
 		}
-	*ch << "Your muscles bulge!!\r\n";
-
-
 	percent = number ( 1, 101 );   /* 101% is a complete failure */
 
 	if ( percent > total_chance ( ch, SKILL_HOLY_STRENGTH ) )
@@ -2223,6 +2212,7 @@ ASKILL ( skill_holy_strength )
 		return 0;
 	}
 
+	*ch << "Your muscles bulge!!\r\n";
 	act ( "$n's muscles bulge with strength!", FALSE, ch, 0, NULL, TO_ROOM );
 
 	af.type = SKILL_HOLY_STRENGTH;
@@ -2239,7 +2229,6 @@ ASKILL ( skill_brace )
 	byte percent;
 	struct affected_type af;
 
-	*ch << "You attempt to brace yourself.\r\n";
 	WAIT_STATE ( ch, 3 RL_SEC );
 	if ( AFF_FLAGGED ( ch, AFF_BRACE ) )
 	{
@@ -2259,6 +2248,7 @@ ASKILL ( skill_brace )
 		*ch << "You didn't manage to brace yourself.\r\n";
 		return 0;
 	}
+	*ch << "You attempt to brace yourself.\r\n";
 	af.type = SKILL_BRACE;
 	af.expire = -2;
 	af.modifier = 0;

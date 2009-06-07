@@ -1444,7 +1444,11 @@ int knows_spell ( Character *ch, int spell )
 		return 1;
 	if ( spell < 0 || spell >= MAX_SKILLS )
 		return 0;
+        /* only allow players to have access to skills and spells */
+        /* system TYPE_HIT == 0 and system spells == 3 */
         if (spell_info[spell].type == 0)
+               return 0;
+        if (spell_info[spell].type > 2)
                return 0;
 	if ( spell_info[spell].min_level >= LVL_IMMORT )
 		return 0;
@@ -1576,7 +1580,7 @@ void spello_system ( int spl, const char *name, int max_mana, int min_mana,
 	spell_info[spl].min_level = level;
 	spell_info[spl].gm = gm;
         spell_info[spl].wear_off_msg = wear_off_msg;
-        spell_info[spl].type = 0;   //0 for non-castable spells
+        spell_info[spl].type = 3;   //0 for non-castable spells
 }
 
 
