@@ -2195,6 +2195,12 @@ void mag_creations ( int level, Character *ch, int spellnum )
 		      spellnum, z );
 		return;
 	}
+	if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+		ch->Send ("You can't carry any more items!\r\n");
+		extract_obj(tobj);
+		return;
+	}
+
 	obj_to_char ( tobj, ch );
 	act ( "$n creates $p.", FALSE, ch, tobj, 0, TO_ROOM );
 	act ( "You create $p.", FALSE, ch, tobj, 0, TO_CHAR );
