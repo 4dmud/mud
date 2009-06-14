@@ -3547,6 +3547,9 @@ ACMD ( do_who )
 			                  ( ( GET_LEVEL ( wch ) >= LVL_HERO ) ? CCYEL ( ch,C_NRM ) : CCNRM ( ch, C_NRM ) ) );
 		}
 
+		if ( AFF_FLAGGED ( wch, AFF_OUTCAST ) )
+			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sOutcast%s)", CCRED ( ch, C_NRM ), CCNRM ( ch, C_NRM ) ) ;  
+
 		if ( PLR_FLAGGED ( wch, PLR_NEWBIE_HLPR ) )
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sHelper%s)", CCGRN ( ch, C_NRM ), ( ( GET_LEVEL ( wch ) >= LVL_HERO ) ? CCYEL ( ch, C_NRM ) : CCNRM ( ch, C_NRM ) ) );   //not displaying helper flag yet
 		if ( PLR_FLAGGED ( wch, PLR_RP_LEADER ) )

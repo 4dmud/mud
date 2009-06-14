@@ -477,113 +477,121 @@ void do_clan_enroll ( Character *ch, char *arg )
 	return;
 }
 
+void do_clan_leave (Character *ch, char *arg)
+{
+  struct obj_data *obj;
+  bool found = FALSE;
+  int clan_num;
+  struct affected_type af;
+
+  if (!*arg) {
+      ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
+      return;
+  }
+
+  if ((clan_num = find_clan_by_id(GET_CLAN(ch)) < 0)) {
+      ch->Send("You are not in any clan!\r\n");
+      return;
+  }
+  
+  for (obj = ch->carrying; obj; obj = obj->next_content)
+      if (GET_OBJ_VNUM(obj) == 3302) {
+          obj_from_char(obj);
+          extract_obj(obj);
+          found = TRUE;
+      }
+
+  if (!found) {
+      ch->Send("You need to be carrying a silver token to leave your clan.\r\n");
+      return;
+  }
+
+  clan[clan_num].members--;
+  clan[clan_num].power -= GET_LEVEL ( ch );
+  remove_clan_member ( GET_NAME ( ch ), clan_num );
+  GET_CLAN ( ch ) = 0;
+  GET_CLAN_RANK ( ch ) = 0;
+
+  af.type = 0;
+  af.expire = HOURS_TO_EXPIRE(24*14);  // two RL weeks 
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = AFF_OUTCAST;
+  affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+  ch->save();
+
+}
 void do_clan_expel ( Character *ch, char *arg )
 {
-	Character *vict = NULL;
-	int clan_num, immcom = 0;
-	char arg1[MAX_INPUT_LENGTH];
-	char arg2[MAX_INPUT_LENGTH];
-	int ids = -1;
+  Character *vict = NULL;
+  Descriptor *d = NULL;
+  int clan_num = 0;
 
-	if ( ! ( *arg ) )
-	{
-		send_clan_format ( ch );
-		return;
-	}
+  if ( ! ( *arg ) )
+  {
+      send_clan_format ( ch );
+      return;
+  }
 
-	//ch->Send( "Sorry, this command is disabled for a few days! Sorry! Mordecai\r\n");
-	//return;
+  if ( GET_LEVEL ( ch ) < LVL_GOD )
+  {
+      if ( ( clan_num = find_clan_by_id ( GET_CLAN ( ch ) ) ) < 0 )
+      {
+          ch->Send ( "You don't belong to any clan!\r\n" );
+	  return;
+      }
+      if (GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_EXPEL]) {
+          ch->Send("You do not have clan expel privileges!\r\n");
+          return;
+      }
+  }
 
-	if ( GET_LEVEL ( ch ) < LVL_GOD )
-	{
-		if ( ( clan_num = find_clan_by_id ( GET_CLAN ( ch ) ) ) < 0 )
-		{
-			ch->Send ( "You don't belong to any clan!\r\n" );
-			return;
-		}
-	}
-	else
-	{
-		if ( GET_LEVEL ( ch ) < LVL_CLAN_GOD )
-		{
-			ch->Send ( "You do not have clan privileges.\r\n" );
-			return;
-		}
-		immcom = 1;
-		half_chop ( arg, arg1, arg2 );
-		strcpy ( arg, arg1 );
-		if ( ( clan_num = find_clan ( arg2 ) ) < 0 )
-		{
-			ch->Send ( "Unknown clan.\r\n" );
-			return;
-		}
-	}
+  /* Lets check if player is online */
+  for (d = descriptor_list; d; d = d->next) 
+    if (!str_cmp(d->character->player.name, arg)) {
+        vict = d->character;
+        break;
+    }
 
-	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_EXPEL] && !immcom )
-	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
-		return;
-	}
+  /* player isnt online, so lets check the file */
+  if (!vict) {
+      vict = new Character(FALSE);
+      if (store_to_char(arg, vict) == -1) {
+        ch->Send("Player does not exist.\r\n");
+        delete(vict);
+        return;
+      }
+  }
 
-	if ( ! ( vict = get_char_vis ( ch, arg, NULL, FIND_CHAR_WORLD ) ) )
-	{
-		try
-		{
-			ids = pi.TableIndexByName ( arg );
-		}
-		catch ( MudException &e )
-		{
-			ch->Send ( "%s%s", e.Message(), "\r\n" );
-			return;
-		}
-	}
-	if ( ids == -1 )
-	{
-		if ( GET_CLAN ( vict ) != clan[clan_num].id )
-		{
-			ch->Send ( "They're not in your clan.\r\n" );
-			return;
-		}
-		else
-		{
-			if ( GET_CLAN_RANK ( vict ) >= GET_CLAN_RANK ( ch ) && !immcom )
-			{
-				ch->Send ( "You cannot kick out that person.\r\n" );
-				return;
-			}
-		}
+  if ((clan_num = find_clan_by_id(GET_CLAN(vict) < 0))) {
+      ch->Send("That player does not belong in any clan.\r\n");
+      return;
+  }
 
+  if (GET_LEVEL(ch) < LVL_GOD) {
+      if (GET_CLAN(vict) != GET_CLAN(ch)) {
+          ch->Send("That player does not belong in your clan.\r\n");
+          return;
+      }
+      if (GET_CLAN_RANK(ch) < GET_CLAN_RANK(vict)) {
+          ch->Send("Your rank is not high enough to expel this player.\r\n");
+          return;
+      }
+  }
 
-		GET_CLAN ( vict ) = 0;
-		GET_CLAN_RANK ( vict ) = 0;
-		vict->save();
-		clan[clan_num].members--;
-		clan[clan_num].power -= GET_LEVEL ( vict );
-		remove_clan_member ( GET_NAME ( vict ), clan_num );
-		vict->Send ( "You've been kicked out of your clan!\r\n" );
-		ch->Send ( "Done.\r\n" );
+  clan[clan_num].members--;
+  clan[clan_num].power -= GET_LEVEL ( vict );
+  remove_clan_member ( GET_NAME ( vict ), clan_num );
+  GET_CLAN ( vict ) = 0;
+  GET_CLAN_RANK ( vict ) = 0;
+  vict->save();
+  if (!d) 
+      delete(vict);
+  else
+      vict->Send ( "You've been kicked out of your clan!\r\n" );
 
-	}
-	else
-	{
-		if ( immcom || ( ( pi.RankByIndex ( ids ) >= 0 ) && ( pi.ClanByIndex ( ids ) == GET_CLAN ( ch ) ) && ( pi.RankByIndex ( ids ) < GET_CLAN_RANK ( ch ) ) ) )
-		{
-			ch->Send ( "%s is kicked out of your clan!\r\n", pi.NameByIndex ( ids ) );
-
-			pi.SetRank ( ids, -1 );
-			clan[clan_num].members--;
-			clan[clan_num].power -= pi.LevelByIndex ( ids );
-
-			remove_clan_member ( pi.NameByIndex ( ids ), clan_num );
-			pi.Save();
-		}
-		else
-		{
-			ch->Send ( "%s cannot be kicked out.\r\n", pi.NameByIndex ( ids ) );
-		}
-	}
-
-	return;
+  act("You have kicked $n out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
+  return;
 }
 
 int at_war ( int cln, int war_clan )
@@ -899,6 +907,11 @@ void do_clan_apply ( Character *ch, char *arg )
 			return;
 		}
 	}
+
+        if (AFF_FLAGGED(ch, AFF_OUTCAST)) {
+               ch->Send("Outcasts cannot join any clan!\r\n");
+               return;
+        }
 
 	if ( GET_LEVEL ( ch ) < clan[clan_num].app_level )
 	{
@@ -2234,6 +2247,11 @@ ACMD ( do_clan )
 		do_clan_list ( ch, arg2 );
 		return;
 	}
+        if (!str_cmp(arg1, "leave"))
+        {
+                do_clan_leave(ch, arg2);
+                return;
+        }
 	send_clan_format ( ch );
 }
 bool operator< ( const clan_list_data &a, const clan_list_data &b )
