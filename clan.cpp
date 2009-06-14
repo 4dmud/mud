@@ -512,7 +512,7 @@ void do_clan_leave (Character *ch, char *arg)
   GET_CLAN ( ch ) = 0;
   GET_CLAN_RANK ( ch ) = 0;
 
-  af.type = 0;
+  af.type = SPELL_RESERVE;
   af.expire = HOURS_TO_EXPIRE(24*14);  // two RL weeks 
   af.modifier = 0;
   af.location = APPLY_NONE;
@@ -555,7 +555,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
     }
 
   /* player isnt online, so lets check the file */
-  if (!vict) {
+  if (!d) {
       vict = new Character(FALSE);
       if (store_to_char(arg, vict) == -1) {
         ch->Send("Player does not exist.\r\n");
@@ -566,32 +566,74 @@ void do_clan_expel ( Character *ch, char *arg, int type )
 
   if ((clan_num = find_clan_by_id(GET_CLAN(vict))  < 0)) {
       ch->Send("That player does not belong in any clan.\r\n");
+      if (!d)
+          delete(vict);
       return;
   }
 
   if (GET_LEVEL(ch) < LVL_GOD) {
       if (GET_CLAN(vict) != GET_CLAN(ch)) {
           ch->Send("That player does not belong in your clan.\r\n");
+          if (!d)
+              delete(vict);
           return;
       }
       if (GET_CLAN_RANK(ch) < GET_CLAN_RANK(vict)) {
-          ch->Send("Your rank is not high enough to expel this player.\r\n");
+          act("Your rank is below $N!", FALSE, ch, 0, vict, TO_CHAR);
+          if (!d)
+              delete(vict);
           return;
       }
   }
 
-  clan[clan_num].members--;
-  clan[clan_num].power -= GET_LEVEL ( vict );
-  remove_clan_member ( GET_NAME ( vict ), clan_num );
-  GET_CLAN ( vict ) = 0;
-  GET_CLAN_RANK ( vict ) = 0;
+  if (type == CP_EXPEL) {
+      clan[clan_num].members--;
+      clan[clan_num].power -= GET_LEVEL ( vict );
+      remove_clan_member ( GET_NAME ( vict ), clan_num );
+      GET_CLAN ( vict ) = 0;
+      GET_CLAN_RANK ( vict ) = 0;
+      act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
+      if (d)
+          vict->Send("You've been kicked out of your clan!\r\n");
+  }
+  else if (type == CP_PROMOTE) {
+      if (GET_CLAN_RANK(vict) + 1 > GET_CLAN_RANK(ch)) {
+          act("You cannot promote $N above your rank!", FALSE, ch, 0, vict, TO_CHAR);
+          if (!d)
+              delete(vict);
+          return;
+      }
+      if ( GET_CLAN_RANK ( vict ) == clan[clan_num].ranks ) {
+          act("$n cannot be promoted above the highest rank!", FALSE, ch, 0, vict, TO_CHAR);
+          if (!d)
+              delete(vict);
+          return;
+      }
+      GET_CLAN_RANK ( vict ) ++;
+      update_clan_member ( GET_NAME ( vict ), GET_CLAN_RANK ( vict ), clan_num );
+      if (d)
+          vict->Send("You have been promoted in your clan!\r\n");
+  }
+  else if (type == CP_DEMOTE) {
+      if (GET_CLAN_RANK(vict) == GET_CLAN_RANK(ch)) {
+          ch->Send("You cannot demote someone of equal rank!\r\n");
+          if (!d)
+              delete(vict);
+          return;
+      }
+      if (GET_CLAN_RANK(vict) == 1) {
+         act("$N cannot be demoted any further.", FALSE, ch, 0, vict, TO_CHAR);
+          if (!d)
+              delete(vict);
+          return;
+      }  
+      GET_CLAN_RANK ( vict )--;
+      update_clan_member ( GET_NAME ( vict ), GET_CLAN_RANK ( vict ), clan_num );
+  }
   vict->save();
   if (!d) 
       delete(vict);
-  else
-      vict->Send ( "You've been kicked out of your clan!\r\n" );
 
-  act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
   return;
 }
 
@@ -2220,12 +2262,12 @@ ACMD ( do_clan )
 	}
 	if ( is_abbrev ( arg1, "demote" ) )
 	{
-		do_clan_demote ( ch, arg2 );
+		do_clan_expel ( ch, arg2, CP_DEMOTE );
 		return;
 	}
 	if ( is_abbrev ( arg1, "promote" ) )
 	{
-		do_clan_promote ( ch, arg2 );
+		do_clan_expel ( ch, arg2, CP_PROMOTE );
 		return;
 	}
 	if ( is_abbrev ( arg1, "set" ) )
