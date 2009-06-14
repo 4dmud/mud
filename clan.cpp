@@ -484,7 +484,7 @@ void do_clan_leave (Character *ch, char *arg)
   int clan_num;
   struct affected_type af;
 
-  if (!*arg) {
+  if (!*arg || !str_cmp(arg, "yes")) {
       ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
       return;
   }
@@ -517,7 +517,7 @@ void do_clan_leave (Character *ch, char *arg)
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_OUTCAST;
-  affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+  affect_to_char(ch, &af);
   ch->save();
 
 }
@@ -590,7 +590,7 @@ void do_clan_expel ( Character *ch, char *arg )
   else
       vict->Send ( "You've been kicked out of your clan!\r\n" );
 
-  act("You have kicked $n out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
+  act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
   return;
 }
 
