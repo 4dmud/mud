@@ -519,9 +519,10 @@ void do_clan_leave (Character *ch, char *arg)
   af.bitvector = AFF_OUTCAST;
   affect_to_char(ch, &af);
   ch->save();
+  ch->Send("You have now left the clan!\r\n");
 
 }
-void do_clan_expel ( Character *ch, char *arg )
+void do_clan_expel ( Character *ch, char *arg, int type )
 {
   Character *vict = NULL;
   Descriptor *d = NULL;
@@ -540,8 +541,8 @@ void do_clan_expel ( Character *ch, char *arg )
           ch->Send ( "You don't belong to any clan!\r\n" );
 	  return;
       }
-      if (GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_EXPEL]) {
-          ch->Send("You do not have clan expel privileges!\r\n");
+      if (GET_CLAN_RANK(ch) < clan[clan_num].privilege[type]) {
+          ch->Send("You are not high enough ranked to have that command!\r\n");
           return;
       }
   }
@@ -2194,7 +2195,7 @@ ACMD ( do_clan )
 	}
 	if ( is_abbrev ( arg1, "expel" ) )
 	{
-		do_clan_expel ( ch, arg2 );
+		do_clan_expel ( ch, arg2, CP_EXPEL );
 		return;
 	}
 	if ( is_abbrev ( arg1, "who" ) )

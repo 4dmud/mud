@@ -115,8 +115,6 @@ void affect_update ( void )
                           i->Send("%s\r\n", spell_info[af->type].wear_off_msg);
 		  i->affect_remove ( af );
               }
-             if (af->type == 0)
-                 i->affect_remove(af);
 
 	  }
       }
