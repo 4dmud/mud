@@ -416,9 +416,9 @@ ACMD(do_say) {
                    argument[strlen(argument) - 2] == ':' &&
                    argument[strlen(argument) - 3] == ' ') {
             argument[strlen(argument) - 3] = '\0';
-            snprintf(buf, sizeof(buf), "You look surprized as you say, '%s'",
+            snprintf(buf, sizeof(buf), "You look surprised as you say, '%s'",
                      argument);
-            snprintf(buf2, sizeof(buf2), "$n looks surprized as $e says, '%s'",
+            snprintf(buf2, sizeof(buf2), "$n looks surprised as $e says, '%s'",
                      argument);
         } else if (argument[strlen(argument) - 1] == '>'
                    && argument[strlen(argument) - 2] == ':'

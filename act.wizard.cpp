@@ -1,4 +1,5 @@
 
+
 /* ************************************************************************
 *   File: act.wizard.c                                  Part of CircleMUD *
 *  Usage: Player-level god commands and other goodies                     *
@@ -3472,7 +3473,7 @@ ACMD ( do_pretitle )
       return;
    }
    if ( !*argument ) {
-      ch->Send ( "Your preitle has been removed.\r\n" );
+      ch->Send ( "Your pretitle has been removed.\r\n" );
       free_string ( &PRETITLE ( ch ) );
       return;
    }
