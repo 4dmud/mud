@@ -1287,7 +1287,7 @@ ACMD ( do_gen_tog )
 		 "You will now see battle spam when not fighting.\r\n"},
 		{"You will no longer see a message when you receive mail.\r\n",
 		 "You will now see a message when you receive mail.\r\n"},
-		{"You can now hear your clan\r\n",
+		{"You can now hear your clan.\r\n",
 		 "You will no longer hear your clan.\r\n"},
 		{"You will no longer hear tells when afk.\r\n",
 		 "You will now hear tells when afk.\r\n"},
