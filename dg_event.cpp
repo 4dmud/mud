@@ -56,7 +56,7 @@ void event_cancel(struct event *event) {
         return;
     }
 
-    if (!event->q_el) {
+    if (!event->q_el || !event->q_el->key) {
         /** this happens when the event is being canceled within the event function **/
         log("SYSERR: (dg_events) Attempting to cancel a non-NULL unqueued event!!");
         //ALERT_2;

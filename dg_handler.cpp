@@ -189,6 +189,8 @@ void free_proto_script(void *thing, int type) {
         obj = (struct obj_data *) thing;
         if (obj->proto_script == NULL)
             return;
+        if (!obj->proto_script)
+            return;
         proto = obj->proto_script;
         obj->proto_script = NULL;
         break;

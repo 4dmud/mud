@@ -243,13 +243,6 @@ ACMD(do_trade)
     return;
   }
 
-  if (!str_cmp(arg1, "test")) {
-    i = atoi(argument);
-    GET_EXP(ch) += i * 1000000;
-    GET_MAX_HIT(ch) += 10;
-    return;
-  }
-
 }
 
 ACMD ( do_quit )
