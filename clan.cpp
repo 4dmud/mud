@@ -33,6 +33,8 @@ void remove_clan_member ( const char * name, int clan );
 void add_clan_member ( const char * name, int rank, int clan );
 void free_clan_lists ( void );
 
+ACMD(do_ctell);
+
 extern int TEMP_LOAD_CHAR;
 
 vector<clan_list_data> clan_list[MAX_CLANS];
@@ -51,7 +53,9 @@ void send_clan_format ( Character *ch )
 	ch->Send ( "Clan commands available to you:\r\n"
 	           "   clan who\r\n"
 	           "   clan status\r\n"
-	           "   clan list\r\n" "   clan info <clan>\r\n" );
+	           "   clan list\r\n" 
+                   "   clan info <clan>\r\n" 
+                   "   clan leave\r\n");
 	if ( GET_LEVEL ( ch ) >= LVL_CLAN_GOD )
 		ch->Send ( "   clan create     <leader> <clan name>\r\n"
 		           "   clan destroy    <clan>\r\n"
@@ -477,6 +481,38 @@ void do_clan_enroll ( Character *ch, char *arg )
 	return;
 }
 
+void do_clan_retire (Character *ch, char *arg)
+{
+  int clan_num;
+  char buf[MAX_STRING_LENGTH];
+  
+  if (!*arg || str_cmp(arg, "yes")) {
+      ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
+      return;
+  }
+
+  if ((clan_num = find_clan_by_id(GET_CLAN(ch)) < 0)) {
+      ch->Send("You are not in any clan!\r\n");
+      return;
+  }
+
+  if (PRF_FLAGGED(ch, PRF_RETIRED)) {
+      ch->Send("You old fool, you are already retired!\r\n");
+      return;
+  }
+
+  if ( GET_CLAN_RANK ( ch ) < clan[clan_num].ranks ) {
+      ch->Send("Only clan leaders can retire.\r\n");
+      return;
+  }
+
+  SET_BIT_AR(PRF_FLAGS(ch), PRF_RETIRED);
+  GET_CLAN_RANK(ch)--;
+  sprintf(buf, "{cMI have now officially retired as clan leader.{cx");
+  do_ctell(ch, buf, 0, 0);
+
+}
+
 void do_clan_leave (Character *ch, char *arg)
 {
   struct obj_data *obj;
@@ -484,7 +520,7 @@ void do_clan_leave (Character *ch, char *arg)
   int clan_num;
   struct affected_type af;
 
-  if (!*arg || !str_cmp(arg, "yes")) {
+  if (!*arg || str_cmp(arg, "yes")) {
       ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
       return;
   }
@@ -2293,6 +2329,11 @@ ACMD ( do_clan )
         if (!str_cmp(arg1, "leave"))
         {
                 do_clan_leave(ch, arg2);
+                return;
+        }
+        if (!str_cmp(arg1, "retire"))
+        {
+                do_clan_retire(ch, arg2);
                 return;
         }
 	send_clan_format ( ch );

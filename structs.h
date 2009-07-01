@@ -658,6 +658,7 @@ class Room;
 #define PRF_FISHPROMPT  52
 #define PRF_TELEPORTABLE  53
 #define PRF_AUTOGROUP   54
+#define PRF_RETIRED     55    /* For retired clan leaders */
 
 /* Descriptor flags */
 #define DESC_CANZLIB     (1 << 0)  /* Client says compression capable.   */

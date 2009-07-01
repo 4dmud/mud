@@ -3543,7 +3543,7 @@ ACMD ( do_who )
 			                  ( GET_LEVEL ( wch ) >= LVL_HERO ? CCYEL ( ch, C_SPR ) :CCNRM ( ch, C_NRM ) ), CCCYN ( ch, C_NRM ),
 			                  clan_name ( find_clan_by_id ( GET_CLAN ( wch ) ) ),
 			                  ( ( clan[find_clan_by_id ( GET_CLAN ( wch ) ) ].ranks ==
-			                      ( GET_CLAN_RANK ( wch ) ) ) ? " Leader" : "" ),
+			                      ( GET_CLAN_RANK ( wch ) ) ) ? " Leader" : PRF_FLAGGED(wch, PRF_RETIRED) ? "Retired CL" : "" ),
 			                  ( ( GET_LEVEL ( wch ) >= LVL_HERO ) ? CCYEL ( ch,C_NRM ) : CCNRM ( ch, C_NRM ) ) );
 		}
 
