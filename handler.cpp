@@ -2026,7 +2026,7 @@ void extract_char_final ( Character *ch )
 			GET_POINTS_EVENT ( ch, i ) = NULL;
 		}
 	/* cancel message updates */
-	ch->ClearMessageEvents();
+//HORUS	ch->ClearMessageEvents();
 	/* cancel the task */
 	stop_task ( ch );
 	if ( SCRIPT ( ch ) )
