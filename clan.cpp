@@ -487,7 +487,7 @@ void do_clan_retire (Character *ch, char *arg)
   char buf[MAX_STRING_LENGTH];
   
   if (!*arg || str_cmp(arg, "yes")) {
-      ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
+      ch->Send("You must type <clan retire yes> to confirm you want to retire.\r\n");
       return;
   }
 
@@ -549,7 +549,7 @@ void do_clan_leave (Character *ch, char *arg)
   GET_CLAN_RANK ( ch ) = 0;
 
   af.type = SPELL_RESERVE;
-  af.expire = HOURS_TO_EXPIRE(24*14);  // two RL weeks 
+  af.expire = 60*24*14;  // two RL weeks 
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_OUTCAST;
