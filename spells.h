@@ -435,7 +435,7 @@ enum spell_list {
     TYPE_UNDERWATER,
     TYPE_SPACE,	
     TYPE_DESERT,
-    SPARE299, 
+    SPELL_OUTCAST, 
     /* 300 - 399 are reserved for attack types only */
     TYPE_HIT,    /* 300 */
     TYPE_STING, 

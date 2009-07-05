@@ -563,8 +563,12 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   Character *vict = NULL;
   Descriptor *d = NULL;
   int clan_num = 0;
+  char buf[MAX_INPUT_LENGTH];
+  struct affected_type af;
 
-  if ( ! ( *arg ) )
+  arg = one_argument(arg, buf);
+
+  if ( buf[0] == '\0' )
   {
       send_clan_format ( ch );
       return;
@@ -585,7 +589,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
 
   /* Lets check if player is online */
   for (d = descriptor_list; d; d = d->next) 
-    if (!str_cmp(d->character->player.name, arg)) {
+    if (!str_cmp(d->character->player.name, buf)) {
         vict = d->character;
         break;
     }
@@ -593,7 +597,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   /* player isnt online, so lets check the file */
   if (!d) {
       vict = new Character(FALSE);
-      if (store_to_char(arg, vict) == -1) {
+      if (store_to_char(buf, vict) == -1) {
         ch->Send("Player does not exist.\r\n");
         delete(vict);
         return;
@@ -623,11 +627,23 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   }
 
   if (type == CP_EXPEL) {
+      if (arg[0] == '\0' || str_cmp(arg, "outcast") || str_cmp(arg, "noflag")) {
+          ch->Send("Format: clan expel <player name> <outcast/noflag>\r\n");
+          return;
+      }
       clan[clan_num].members--;
       clan[clan_num].power -= GET_LEVEL ( vict );
       remove_clan_member ( GET_NAME ( vict ), clan_num );
       GET_CLAN ( vict ) = 0;
       GET_CLAN_RANK ( vict ) = 0;
+      if (!str_cmp(arg, "outcast")) {
+          af.type = SPELL_RESERVE;
+          af.expire = 60*24*14;  // two RL weeks 
+          af.modifier = 0;
+          af.location = APPLY_NONE;
+          af.bitvector = AFF_OUTCAST;
+          affect_to_char(ch, &af);
+      }
       act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
       if (d)
           vict->Send("You've been kicked out of your clan!\r\n");
