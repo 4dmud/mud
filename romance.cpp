@@ -24,6 +24,7 @@
 #include "damage.h"
 #include "event.h"
 #include "romance.h"
+#include "descriptor.h"
 
 /* local functions */
 int genpreg(void);
@@ -462,6 +463,8 @@ ACMD(do_breakup)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH];
+  Descriptor *d = NULL;
+
   /* First, standard checks: Are you in a relationship? */
   if (ROMANCE(ch) == 0)
   {
@@ -475,149 +478,106 @@ ACMD(do_breakup)
                      pi.NameById(PARTNER(ch)));
     return;
   }
-  else
-  {
-    /* Okay, you're involved.. */
-    one_argument(argument, arg);
-    if (!*arg)
-    {          /* Break up with noone? */
+
+  /* Okay, you're involved.. */
+  one_argument(argument, arg);
+  if (!*arg)
+  {          /* Break up with noone? */
       send_to_char("Whom do you want to break up with?\r\n", ch);
       return;
-    }
-    else if (!(victim = get_char_room_vis(ch, arg, NULL)))
-    {
-      /* Are they here? No! */
-      ch->Send( "%s", CONFIG_NOPERSON);
-      return;
-    }
-    else if (victim == ch)
-    {     /* Break up with yourself? */
-      send_to_char("You can't break up with yourself!\r\n", ch);
-      return;
-    }
-    else if (crashcheck_alpha(victim, ch) == 1)
-    {
-      return;
-    }
-    else if (ROMANCE(victim) == 0)
-    {
-      send_to_char("But they're not romantically involved!\r\n", ch);
-      return;
-    }
-    else if ((ROMANCE(victim) == 1)
-             && (PARTNER(victim) != GET_IDNUM(ch)))
-    {
-      ch->Send( "But they're dating %s, not you!\r\n",
-                       pi.NameById(PARTNER(victim)));
-      return;
-    }
-    else if ((ROMANCE(victim) == 2)
-             && (PARTNER(victim) != GET_IDNUM(ch)))
-    {
-      ch->Send( "But they're engaged to %s, not you!\r\n",
-                       pi.NameById(PARTNER(victim)));
-      return;
-    }
-    else if ((ROMANCE(victim) == 3)
-             && (PARTNER(victim) != GET_IDNUM(ch)))
-    {
-      ch->Send( "But they're married to %s, not you!\r\n",
-                       pi.NameById(PARTNER(victim)));
-      return;
-    }
-    else if ((ROMANCE(victim) == 3)
-             && (PARTNER(victim) == GET_IDNUM(ch)))
-    {
-      ch->Send(
-                       "They're already married to you! You have to DIVORCE %s!\r\n",
-                       pi.NameById(PARTNER(victim)));
-      return;
-    }
-    else if (PARTNER(victim) != GET_IDNUM(ch))
-    {
-      ch->Send( "But %s isn't involved with you!\r\n",
-                       GET_NAME(victim));
-      return;
-    }
-    else
-    {
-      /* Okay, they're involved and with you... */
-      /* Now we break them up! How FUN! */
-      if ((ROMANCE(ch) == 1) && (ROMANCE(victim) == 1))
-      {
-        /* For dating */
-        act("You inform $N that you will no longer date $M!\r\n",
-            TRUE, ch, 0, victim, TO_CHAR);
-        act("$n dumps you, tearing your heart out in the process!\r\n", TRUE, ch, 0, victim, TO_VICT);
-        act("$n sends $s relationship with $N to Splitsville!\r\n",
-            TRUE, ch, 0, victim, TO_NOTVICT);
-        /* Now set the variables to 0 */
-        PARTNER(ch) = 0;
-        PARTNER(victim) = 0;
-        ROMANCE(ch) = 0;
-        ROMANCE(victim) = 0;
-        namesave(ch, victim);
-        /* Done. You've dumped them. */
-        return;
-      }
-      else if ((ROMANCE(ch) == 2) && (ROMANCE(victim) == 2))
-      {
-        /* For engagements */
-        act("You call off your wedding with $N.\r\n", TRUE, ch, 0,
-            victim, TO_CHAR);
-        act("$n doesn't want to marry you anymore! The wedding's off!\r\n", TRUE, ch, 0, victim, TO_VICT);
-        act("$n nullifies $s engagement with $N! The wedding's off!\r\n", TRUE, ch, 0, victim, TO_NOTVICT);
-        /* Now set the variables to 0 */
-        PARTNER(ch) = 0;
-        PARTNER(victim) = 0;
-        ROMANCE(ch) = 0;
-        ROMANCE(victim) = 0;
-        namesave(ch, victim);
-        /* Done. You've dumped them. */
-        return;
-      }
-      else if ((ROMANCE(ch) == 4) && (ROMANCE(victim) == 4))
-      {
-        /* For dating/askouts */
-        act("You inform $N that you no longer wish to date $S!\r\n", TRUE, ch, 0, victim, TO_CHAR);
-        act("$n doesn't feel like dating you anymore!\r\n", TRUE,
-            ch, 0, victim, TO_VICT);
-        act("$n decides not to date $N.\r\n", TRUE, ch, 0, victim,
-            TO_NOTVICT);
-        /* Now set the variables to 0 */
-        PARTNER(ch) = 0;
-        PARTNER(victim) = 0;
-        ROMANCE(ch) = 0;
-        ROMANCE(victim) = 0;
-        namesave(ch, victim);
-        /* Done. You've dumped them. */
-        return;
-      }
-      else if ((ROMANCE(ch) == 5) && (ROMANCE(victim) == 5))
-      {
-        /* For engagements/proposals */
-        act("You cancel your wedding proposal to $N.\r\n", TRUE,
-            ch, 0, victim, TO_CHAR);
-        act("$n doesn't want to marry you anymore!\r\n", TRUE, ch,
-            0, victim, TO_VICT);
-        act("$n nullifies $s engagement proposal with $N!\r\n",
-            TRUE, ch, 0, victim, TO_NOTVICT);
-        /* Now set the variables to back to Dating */
-        /* This is the only exception. You can change it to cancel
-           Dating status as well. */
-        ROMANCE(ch) = 1;
-        ROMANCE(victim) = 1;
-        /* Done. You've cancelled your proposal them. */
-        return;
-      }
-      else
-      {        /* Guess you're not involved after all. */
-        ch->Send( "But you're not involved with %s!",
-                         GET_NAME(victim));
-        return;
-      }
-    }
   }
+
+  for (d = descriptor_list; d; d = d->next)
+      if (!str_cmp(d->character->player.name, arg)) {
+          victim = d->character;
+          break;
+      }
+
+  if (!d) 
+  {
+      victim = new Character(FALSE);
+      if (store_to_char(arg, victim) == -1) {
+          ch->Send("This person does not exist!\r\n");
+          delete(victim);
+          return;
+      }
+  }
+
+  if (victim == ch)
+  {     /* Break up with yourself? */
+      send_to_char("You can't break up with yourself!\r\n", ch);
+      if (!d) delete(victim);
+      return;
+  }
+
+  if (crashcheck_alpha(victim, ch) == 1)
+  {
+      if (!d) delete(victim);
+      return;
+  }
+
+  if (ROMANCE(victim) == 0)
+  {
+      send_to_char("But they're not romantically involved!\r\n", ch);
+      if (!d) delete(victim);
+      return;
+  }
+
+  if (PARTNER(victim) != GET_IDNUM(ch))
+  {
+      if (ROMANCE(victim) == 1)
+          ch->Send( "But they're dating %s, not you!\r\n",
+                       pi.NameById(PARTNER(victim)));
+      else if (ROMANCE(victim) == 2)
+          ch->Send( "But they're engaged to %s, not you!\r\n",
+                       pi.NameById(PARTNER(victim)));
+      else if (ROMANCE(victim) == 3)
+          ch->Send( "But they're married to %s, not you!\r\n",
+                       pi.NameById(PARTNER(victim)));
+      else 
+          ch->Send( "But %s isn't involved with you!\r\n",
+                       GET_NAME(victim));
+      if (!d) delete(victim);
+      return;
+  }
+      
+  /* Okay, they're involved and with you... */
+  /* Now we break them up! How FUN! */
+  if (ROMANCE(ch) == 1 || ROMANCE(ch) == 4) 
+  {
+      /* For dating */
+      act("You inform $N that you will no longer date $M!\r\n",
+            TRUE, ch, 0, victim, TO_CHAR);
+      if (d) 
+          victim->Send("%s dumps you, tearing your heart out in the process!\r\n", GET_NAME(ch));
+      act("$n sends $s relationship with $N to Splitsville!\r\n",
+            TRUE, ch, 0, victim, TO_NOTVICT);
+  }
+  else if (ROMANCE(ch) == 2 || ROMANCE(ch) == 5)
+  {
+      /* For engagements */
+      act("You call off your wedding with $N.\r\n", TRUE, ch, 0,
+            victim, TO_CHAR);
+      if (d)
+          victim->Send("%s doesn't want to marry you anymore! The wedding is off!\r\n", GET_NAME(ch));
+      act("$n nullifies $s engagement with $N! The wedding's off!\r\n", TRUE, ch, 0, victim, TO_NOTVICT);
+  }
+
+  if (ROMANCE(ch) == 5) {
+      /* Now set the variables to back to Dating */
+      /* This is the only exception. You can change it to cancel
+         Dating status as well. */
+      ROMANCE(ch) = 1;
+      ROMANCE(victim) = 1;
+  }
+  else {
+      PARTNER(ch) = 0;
+      PARTNER(victim) = 0;
+      ROMANCE(ch) = 0;
+      ROMANCE(victim) = 0;
+      namesave(ch, victim);
+  }
+  if (!d) delete(victim);
 }
 
 /* Function for the actual marriage */

@@ -198,6 +198,7 @@ void stop_auction ( int type, Character *ch );
 void add_follower ( Character *ch, Character *leader );
 void raw_kill ( Character *ch, Character *killer );
 void ReplaceString ( char * str, const char *search, const char *replace , size_t len );
+int perf_balance(int weapon_type);
 
 
 /* local functions */
@@ -229,8 +230,9 @@ ACMD(do_trade);  /* Horus - blank so that spec_procs for dt code will work */
 
 ACMD(do_trade)
 {
-  char arg1[MAX_INPUT_LENGTH];
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int i;
+  struct obj_data *obj;
 
   /* Lets make sure only Horus can do the following immortal commands */
   if (str_cmp(GET_NAME(ch), "horus"))
@@ -241,6 +243,25 @@ ACMD(do_trade)
   if (!str_cmp(arg1, "copyover")) {
     do_copyover(ch, argument, 0, 0);
     return;
+  }
+
+  if (!str_cmp(arg1, "obj")) {
+      one_argument(argument, arg2);
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      if (obj == NULL) return;
+      load_otrigger(obj);
+      GET_OBJ_VAL(obj, 1) += 6;
+      GET_OBJ_VAL(obj, 2) += 6;
+      GET_OBJ_RENT(obj) += (GET_LEVEL(ch) << 3);
+      GET_OBJ_TIMER(obj) = 12000;
+      GET_WEP_BALANCE(obj) = perf_balance(GET_WEP_TYPE(obj));
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_TINKERED);
+      obj_to_char(obj, ch);
+      return;
   }
 
 }
