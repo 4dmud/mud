@@ -283,9 +283,8 @@ ACMD(do_trade)
   }
 
   if (!str_cmp(arg1, "blah")) {
-      GET_DEX(ch) += 2;
-      GET_MAX_STAMINA(ch) += 50;
-      AFF_SPEED(ch) += 100;
+      ch->real_abils.dex += 2;
+      AFF_SPEED(ch) -= 100;
       return;
   }
 }

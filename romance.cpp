@@ -465,6 +465,13 @@ ACMD(do_breakup)
   char arg[MAX_INPUT_LENGTH];
   Descriptor *d = NULL;
 
+  /* bug fix for NULL partners */
+  if (!PARTNER(ch) && ROMANCE(ch)) {
+    ROMANCE(ch) = 0;
+    ch->Send("You are now fixed.\r\n");
+    return;
+  }
+
   /* First, standard checks: Are you in a relationship? */
   if (ROMANCE(ch) == 0)
   {
