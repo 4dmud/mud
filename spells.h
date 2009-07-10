@@ -537,6 +537,7 @@ enum spell_list {
     SPARE_ATT_TYPE397,
     SPARE_ATT_TYPE398,
     TYPE_SUFFERING,      /* 399 */
+    /* add all new skills/spells above here */
     MAX_SKILLS
 };
 

