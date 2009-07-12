@@ -384,7 +384,7 @@ ACMD ( do_die )
 	}
 	else
 	{
-		ch->Send ( "You are far to healthy! Get deader!\r\n" );
+		ch->Send ( "You are far too healthy! Get deader!\r\n" );
 	}
 }
 

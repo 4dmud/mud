@@ -212,7 +212,7 @@ ACMD(do_skin)
     }
     if (!skill_cost(0, 0, 10, ch))
     {
-      ch->Send( "You are exausted!");
+      ch->Send( "You are exhausted!");
       return;
     }
     pc = IS_OBJ_STAT(obj, ITEM_PC_CORPSE);

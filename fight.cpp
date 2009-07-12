@@ -1335,7 +1335,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	{
 		if ( !skill_cost ( 0, 0, 20, vict ) )
 		{
-			vict->Send ( "You try and brace but are too exausted!!\r\n" );
+			vict->Send ( "You try and brace but are too exhausted!!\r\n" );
 		}
 		else
 		{

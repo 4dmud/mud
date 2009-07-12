@@ -121,7 +121,7 @@ ASPELL(spell_midas_touch) {
     struct affected_type af;
     WAIT_STATE(ch, 1 RL_SEC);
     if (use_stamina(ch, 5) < 0) {
-        ch->Send( "You are too exausted!");
+        ch->Send( "You are too exhausted!");
         return;
     }
 

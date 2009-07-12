@@ -777,7 +777,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 
 	if ( use_stamina ( ch, 3 ) < 0 )
 	{
-		ch->Send ( "You are far too exausted!" );
+		ch->Send ( "You are far too exhausted!" );
 		return;
 	}
 

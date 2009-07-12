@@ -487,7 +487,7 @@ ACMD ( do_skills )
 			}
 			if ( !skill_cost ( 0, 0, 4, ch ) )
 			{
-				ch->Send ( "You are exausted!" );
+				ch->Send ( "You are exhausted!" );
 				return;
 			}
 			switch ( subcmd )
@@ -676,12 +676,12 @@ ASKILL ( skill_backstab )
 
 	if ( use_stamina ( ch, 12 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	if ( !skill_cost ( 0, 0, 40, ch ) )
 	{
-		ch->Send ( "You are exausted!" );
+		ch->Send ( "You are exhausted!" );
 		return 0;
 	}
 
@@ -726,7 +726,7 @@ ASKILL ( skill_charge )
 	int ret = 0;
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -806,12 +806,12 @@ ASKILL ( skill_bash )
 	}
 	if ( use_stamina ( ch, 25 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	if ( !skill_cost ( 0, 0, 25, ch ) )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -853,7 +853,7 @@ ASKILL ( skill_rescue )
 
 	if ( !skill_cost ( 0, 10, 40, ch ) )
 	{
-		ch->Send ( "You are exausted!" );
+		ch->Send ( "You are exhausted!" );
 		return 0;
 	}
 
@@ -922,7 +922,7 @@ ASKILL ( skill_kick )
 	int percent, prob;
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	/* 101% is a complete failure */
@@ -951,7 +951,7 @@ ASKILL ( skill_sneak )
 	{
 		if ( use_stamina ( ch, 10 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 
@@ -991,7 +991,7 @@ ASKILL ( skill_hide )
 
 		if ( use_stamina ( ch, 10 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
@@ -1020,7 +1020,7 @@ ASKILL ( skill_steal )
 
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1205,7 +1205,7 @@ ASKILL ( skill_track )
 	}
 	if ( use_stamina ( ch, 10 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	/* 101 is a complete failure, no matter what the proficiency. */
@@ -1256,7 +1256,7 @@ ASKILL ( skill_disarm )
 	}
 	if ( use_stamina ( ch, 15 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1319,7 +1319,7 @@ ASKILL ( skill_smash )
 	}
 	if ( use_stamina ( ch, 15 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1386,7 +1386,7 @@ ASKILL ( skill_trample )
 	}
 	if ( use_stamina ( ch, 20 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1445,7 +1445,7 @@ ASKILL ( skill_joust )
 	}
 	if ( use_stamina ( ch, 10 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	/* knocks vict off horse and onto ground, small damage.
@@ -1483,7 +1483,7 @@ ASKILL ( skill_dodge )
 
 	if ( use_stamina ( ch, 15 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	if ( AFF_FLAGGED ( ch, AFF_DODGE ) )
@@ -1521,7 +1521,7 @@ ASKILL ( skill_phase )
 
 	if ( use_stamina ( ch, 15 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	if ( AFF_FLAGGED ( ch, AFF_PHASE ) )
@@ -1568,7 +1568,7 @@ ASKILL ( skill_grip )
 	{
 		if ( use_stamina ( ch, 25 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 
@@ -1609,7 +1609,7 @@ ASKILL ( skill_face )
 	}
 	if ( use_stamina ( ch, 8 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	WAIT_STATE ( ch, 1 RL_SEC );
@@ -1631,7 +1631,7 @@ ASKILL ( skill_focus )
 	byte percent;
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1677,7 +1677,7 @@ ASKILL ( skill_grapple )
 	}
 	if ( use_stamina ( ch, 10 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	to = number ( 0, 5 );
@@ -1720,7 +1720,7 @@ ASKILL ( skill_beserk )
 
 	if ( use_stamina ( ch, 20 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -1797,7 +1797,7 @@ ASKILL ( skill_true_strike )
 
 	if ( use_stamina ( ch, 25 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	if ( AFF_FLAGGED ( ch, AFF_TRUE_STRIKING ) )
@@ -1852,7 +1852,7 @@ ASKILL ( skill_fortify )
 
 		if ( use_stamina ( ch, 25 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 
@@ -1912,7 +1912,7 @@ ASKILL ( skill_scalp )
 		}
 		if ( use_stamina ( ch, 80 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 		pc = IS_OBJ_STAT ( obj, ITEM_PC_CORPSE );
@@ -1987,7 +1987,7 @@ ASKILL ( skill_blade_dance )
 	{
 		if ( use_stamina ( ch, 30 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 
@@ -2025,7 +2025,7 @@ ASKILL ( skill_cleave )
 	}
 	if ( use_stamina ( ch, 25 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -2048,7 +2048,7 @@ ASKILL ( skill_behead )
 	}
 	if ( use_stamina ( ch, 25 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	/* Only appropriately skilled PCs and uncharmed mobs */
@@ -2078,7 +2078,7 @@ ASKILL ( skill_martial_arts )
 		percent = number ( 1, 101 ); /* 101% is a complete failure */
 		if ( use_stamina ( ch, 15 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 		if ( percent >
@@ -2163,7 +2163,7 @@ ASKILL ( skill_hyperactivity )
 	else
 		if ( use_stamina ( ch, 5 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 
@@ -2201,7 +2201,7 @@ ASKILL ( skill_holy_strength )
 	else
 		if ( use_stamina ( ch, 15 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 	percent = number ( 1, 101 );   /* 101% is a complete failure */
@@ -2238,7 +2238,7 @@ ASKILL ( skill_brace )
 	}
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	percent = number ( 1, 101 );   /* 101% is a complete failure */
@@ -2291,7 +2291,7 @@ ASKILL ( skill_push )
 		GET_WAIT_STATE ( ch ) += 3 RL_SEC;
 		if ( use_stamina ( ch, 20 ) < 0 )
 		{
-			*ch << "You are far too exausted!";
+			*ch << "You are far too exhausted!";
 			return 0;
 		}
 		strcpy ( todir, dirs[to] );
@@ -2390,7 +2390,7 @@ ASKILL ( skill_scan )
 
 	if ( use_stamina ( ch, 3 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	WAIT_STATE ( ch, 1 RL_SEC );
@@ -2550,7 +2550,7 @@ ASKILL ( skill_poison_weapon )
 
 	if ( !skill_cost ( 0, 10, 150, ch ) )
 	{
-		ch->Send ( "You are exausted!" );
+		ch->Send ( "You are exhausted!" );
 		return 0;
 	}
 	/* Now we have a valid weapon...check to see if we have the powder. */
@@ -2758,7 +2758,7 @@ ASKILL ( skill_filet )
 	}
 	if ( use_stamina ( ch, 15 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	prob = number ( 1, 101 );
@@ -2802,7 +2802,7 @@ ASKILL ( skill_forage )
 	}
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
@@ -2859,13 +2859,13 @@ ASKILL ( skill_circle )
 	}
 	if ( use_stamina ( ch, 20 ) < 0 )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
 	if ( !skill_cost ( 0, 0, 25, ch ) )
 	{
-		*ch << "You are far too exausted!";
+		*ch << "You are far too exhausted!";
 		return 0;
 	}
 
