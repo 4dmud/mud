@@ -5028,6 +5028,9 @@ int store_to_char ( const char *name, Character *ch )
 					         & ( ch->char_specials.saved.affected_by[3] ) );
 				else if ( !strcmp ( tag, "AfkM" ) )
 					AFK_MSG ( ch ) = str_dup ( line );
+				else if ( !strcmp ( tag, "Age " ) )
+					SPECIALS(ch)->age = num;
+		
 				break;
 
 			case 'B':
@@ -5941,6 +5944,8 @@ void char_to_store ( Character *ch )
 		fprintf ( fl, "Csnp: %d\n", GET_CSNP_LVL ( ch ) );
 	/* the end! *bows to the massive cheering from the audience* Read 1984! */
 	/** hoho thots :-P - mord**/
+	if ( SPECIALS(ch)->age != -1)
+		fprintf ( fl, "Age : %d\n", SPECIALS(ch)->age);
 	if ( CREATE_POINTS ( ch ) )
 		fprintf ( fl, "CrPt: %d\n", CREATE_POINTS ( ch ) );
 	{

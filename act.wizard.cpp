@@ -5369,10 +5369,13 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			 * NOTE: May not display the exact age specified due to the integer
 			 * division used elsewhere in the code.  Seems to only happen for
 			 * some values below the starting age (17) anyway. -gg 5/27/98
+			 * 
+			 * NOTE2: new code which doesn't care about this -Thotter
 			 */
-			vict->player.time.birth =
-			    time ( 0 ) - ( value - 17 * SECS_PER_MUD_YEAR );
-			vict->check_regen_rates();
+			//vict->player.time.birth =
+			//    time ( 0 ) - ( value - 17 * SECS_PER_MUD_YEAR );
+			//vict->check_regen_rates();
+			SPECIALS(vict)->age = value;
 			break;
 		case 49:
 			if ( ( i = parse_class ( *val_arg ) ) == CLASS_UNDEFINED )

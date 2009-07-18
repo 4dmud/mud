@@ -763,12 +763,18 @@ time_t mud_time_to_secs ( struct time_info_data * now )
 
 struct time_info_data *age ( Character *ch )
 {
-	static struct time_info_data player_age;
+	static struct time_info_data player_age;//Thotter: I just encountered this construct, am speechless about it but I am too lazy to make it any better now.
+	int age = SPECIALS(ch)->age;
 
-	player_age = *mud_time_passed ( time ( 0 ), ch->player.time.birth );
+	if (age != -1) {
+		player_age.year = age;
+	}
+	else {
 
-	player_age.year += 17; /* All players start at 17 */
+		player_age = *mud_time_passed ( time ( 0 ), ch->player.time.birth );
 
+		player_age.year += 17; /* All players start at 17 */
+	}
 	return ( &player_age );
 }
 

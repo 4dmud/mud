@@ -2262,6 +2262,7 @@ public:
     char *email;
     short newbie_status;
     struct help_index_element *help;
+    int age; //age override
 
     player_special_data() {
         saved = player_special_data_saved();
@@ -2302,6 +2303,7 @@ public:
         newbie_status = 0;
         help  = NULL;
         kills.clear();
+	age = -1;
 
     }
     kill_map::iterator KillsBegin() {
