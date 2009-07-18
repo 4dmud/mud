@@ -5360,9 +5360,9 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			GET_SEX ( vict ) = i;
 			break;
 		case 48:               /* set age */
-			if ( value < 2 || value > 200 )     /* Arbitrary limits. */
+			if ( (value < 2 || value > 200) && value != -1 )     /* Arbitrary limits. */
 			{
-				ch->Send ( "Ages 2 to 200 accepted.\r\n" );
+				ch->Send ( "Ages 2 to 200 accepted, or -1 to remove fixed age.\r\n" );
 				return ( 0 );
 			}
 			/*
