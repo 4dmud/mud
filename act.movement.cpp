@@ -2548,7 +2548,7 @@ ASKILL ( skill_mount )
 	}
 	else if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		ch->Send ( "You are too exausted!" );
+		ch->Send ( "You are too exhausted!" );
 		return 0;
 	}
 	else if ( total_chance ( ch, SKILL_MOUNT ) <= number ( 1, 101 ) )
@@ -2668,7 +2668,7 @@ ASKILL ( skill_tame )
 	}
 	if ( use_stamina ( ch, 10 ) < 0 )
 	{
-		ch->Send ( "You are too exausted!" );
+		ch->Send ( "You are too exhausted!" );
 		return 0;
 	}
 	if ( ( GET_LEVEL ( ch ) +3 ) < GET_LEVEL ( vict ) )
@@ -2698,7 +2698,7 @@ ASKILL ( skill_snare )
 	GET_WAIT_STATE ( ch ) += ( 1 RL_SEC );
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
-		ch->Send ( "You are too exausted!" );
+		ch->Send ( "You are too exhausted!" );
 		return 0;
 	}
 
@@ -2708,7 +2708,9 @@ ASKILL ( skill_snare )
 	             && ( number ( 1, 101 ) < total_chance ( ch, SKILL_SNARE ) ) ) )
 	{
 		af.type = SKILL_SNARE;
-		af.expire = HOURS_TO_EXPIRE ( 3 );
+		// Changed this from 3 to 5. If this is too affecting
+		// it can be changed back. Prom
+		af.expire = HOURS_TO_EXPIRE ( 5 );
 		af.modifier = GET_LEVEL(ch) + IS_NPC(ch) ? GET_LEVEL(ch) / 2: GET_SKILL(ch, SKILL_SNARE);
 		af.location = APPLY_NONE;
 		af.bitvector = AFF_SNARE;
@@ -2746,7 +2748,7 @@ ASKILL ( skill_blackjack )
 
 	if ( use_stamina ( ch, 10 ) < 0 )
 	{
-		ch->Send ( "You are exausted!" );
+		ch->Send ( "You are exhausted!" );
 		return 0;
 	}
 
