@@ -1215,7 +1215,10 @@ ASKILL ( skill_manipulate )
 		GET_WEP_BALANCE ( o ) = ( curr_balance ( o ) + perf_balance ( GET_WEP_TYPE ( o ) ) ) /2;
 		ch->Send ( "You pour all your energy into changing the balance of the weapon by re-weighting it.\r\n" );
 	}
-	alter_mana ( ch, GET_MANA ( ch ) /2 );
+	// Changing this from 1/2 mana to 1/12 of mana
+	// Prom 
+	// Old -> alter_mana( ch, GET_MANA( ch) /2)
+	alter_mana ( ch, GET_MANA ( ch ) /12 );
 
 	return SKILL_MANIPULATE;
 }
