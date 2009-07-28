@@ -759,7 +759,10 @@ class Room;
 #define AFF_SILENCED           89
 #define AFF_SNARE	      90	
 #define AFF_OUTCAST           91
-#define MAX_AFF_APPLY         92
+#define AFF_RESIST_FIRE       92
+#define AFF_RESIST_COLD       93
+#define AFF_RESIST_ELEC       94
+#define MAX_AFF_APPLY         95
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \

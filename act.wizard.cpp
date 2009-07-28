@@ -1502,9 +1502,10 @@ ACMD ( do_vnum )
 	strlcpy ( buf2, argument, sizeof ( buf2 ) );
 
 	if ( !*buf || !*buf2
-	        || ( !is_abbrev ( buf, "mob" ) && !is_abbrev ( buf, "obj" ) ) )
+	        || ( !is_abbrev ( buf, "mob" ) && !is_abbrev ( buf, "obj" )
+                      && !is_abbrev ( buf, "prot") ) )
 	{
-		send_to_char ( "Usage: vnum { obj | mob } <name>\r\n", ch );
+		send_to_char ( "Usage: vnum { obj | mob | prot } <name>\r\n", ch );
 		return;
 	}
 	if ( is_abbrev ( buf, "mob" ) )
@@ -1512,7 +1513,11 @@ ACMD ( do_vnum )
 			send_to_char ( "No mobiles by that name.\r\n", ch );
 
 	if ( is_abbrev ( buf, "obj" ) )
-		if ( !vnum_object ( buf2, ch ) )
+		if ( !vnum_object ( buf2, ch, 0 ) )
+			send_to_char ( "No objects by that name.\r\n", ch );
+
+	if ( is_abbrev ( buf, "prot" ) )
+		if ( !vnum_object ( buf2, ch, 1 ) )
 			send_to_char ( "No objects by that name.\r\n", ch );
 }
 

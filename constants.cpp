@@ -827,6 +827,10 @@ const char *affected_bits[] =
 	"IMMFREEZE",
 	"SILENCED",
 	"SNARE",
+        "OUTCAST",
+        "RESIST_FIRE",
+        "RESIST_COLD",
+        "RESIST_ELEC",
         "\n"
 };
 

@@ -270,6 +270,23 @@ ACMD(do_trade)
       obj = read_object(real_object(i), REAL);
       load_otrigger(obj);
       obj_to_char(obj, ch);
+      return;
+  }
+
+  if (!str_cmp(arg1, "objw")) {
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      load_otrigger(obj);
+      GET_WEP_BALANCE(obj) = perf_balance(GET_WEP_TYPE(obj));
+      obj_to_char(obj, ch);
+      return;
+  }
+
+  if (!str_cmp(arg1, "exp")) {
+      i = atoi(arg2);
+      GET_EXP(ch) += i * 1000000;
+      return;
   }
 
   if (!str_cmp(arg1, "hp")) {
@@ -282,9 +299,28 @@ ACMD(do_trade)
       return;
   }
 
-  if (!str_cmp(arg1, "blah")) {
-      ch->real_abils.dex += 2;
-      AFF_SPEED(ch) -= 100;
+  if (!str_cmp(arg1, "speed")) {
+      i = atoi(arg2);
+      AFF_SPEED(ch) += i;
+      return;
+  }
+
+  if (!str_cmp(arg1, "embue")) {
+      obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying);
+      if (!obj) return;
+      GET_OBJ_VAL(obj, 0) *= 2;
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
+      return;
+  }
+
+  if (!str_cmp(arg1, "remove")) {
+      obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying);
+      if (!obj) return;
+      GET_OBJ_VAL(obj, 0) *= 2;
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_GOOD);
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_EVIL);
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_NEUTRAL);
       return;
   }
 }

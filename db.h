@@ -213,7 +213,7 @@ void free_obj_q(struct obj_data *obj);
 void free_obj_q_delayed(struct obj_data *obj);
 void free_obj_forget(struct obj_data *obj);
 struct obj_data *read_object(obj_vnum nr, int type);
-int vnum_object(char *searchname, Character *ch);
+int vnum_object(char *searchname, Character *ch, int type);
 int my_obj_save_to_disk(FILE * fp, struct obj_data *obj, int locate);
 bool str_prefix( const char *astr, const char *bstr );
 void fixskills(Character *ch);

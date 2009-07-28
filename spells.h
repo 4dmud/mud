@@ -346,9 +346,9 @@ enum spell_list {
     SPELL_BURN,
     SPELL_FREEZE,
     SPELL_ACID,            // 209
-    SPARE210,
-    SPARE211,
-    SPARE212,
+    SPELL_RESIST_FIRE,
+    SPELL_RESIST_COLD,
+    SPELL_RESIST_ELEC,
     SPARE213,
     SPARE214,
     SPARE215,

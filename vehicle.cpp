@@ -662,59 +662,90 @@ void assign_vehicles(void) {
 #define LOWER_V_ROOM      55501 
 #define ZONE_V_ROOM       555
 
-#define SPACE_START_ROOM  60051
 
-SPECIAL(vehicle2)
+#define MAIN_SPACE             1
+#define CORELLIAN_SPACE        2
+#define EARTH_SPACE            3
+#define ALPHA_SPACE            4
+#define GRID1_SPACE            5
+#define GRID2_SPACE            6
+
+bool vehicle_jump(Character *ch, char *argument)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-  int xord, yord, zord;
-  room_vnum vroom;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  int sector = 0;
+  int xord, yord, multi;
+  room_vnum vroom, start_room, curr;
   Room *dest;
   struct obj_data *vehicle;
-  
-  /* some insanity checks */
-  if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
-    return FALSE;
 
-  if (!CMD_IS("fly") && !CMD_IS("look"))
-      return FALSE;
- 
-  /* Look out command */
-  if (CMD_IS("look")) {
-      skip_spaces(&argument);
-      if (!is_abbrev(argument, "out"))
-          return FALSE;
-      dest = vehicle->in_room;
-      view_room_by_rnum(ch, dest);
-      return TRUE; 
-  }
-      
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
-  one_argument(argument, arg3);
 
-  if (arg1[0] == '\0' || arg2[0] == '\0' || arg3[0] == '\0') {
-      ch->Send("Please type: fly <x-coord> <y-coord> <z-coord>.\r\n");
+  if (arg1[0] == '\0' || arg2[0] == '\0' ) {
+      ch->Send("Please type: jump <x-coord> <y-coord>\r\n");
       return TRUE;
   }
 
-  if (!is_number(arg1) || !is_number(arg2) || !is_number(arg3)) {
-      ch->Send("Please use a number between 0 - 500 for each coordinate.\r\n");
+  if (!is_number(arg1) || !is_number(arg2)) {
+      ch->Send("Please use a number between 0 - 50 for each coordinate.\r\n");
       return TRUE;
   }
 
   xord = atoi(arg1);
   yord = atoi(arg2);
-  zord = atoi(arg3);
 
-  if (xord < 1 || yord < 1 || zord != 0) {
+  if (xord < 1 || yord < 1 ) {
       ch->Send("Those space coordinates do not exist!\r\n");
       return TRUE;
   }
 
+  /* Which sector is the player in */
+  curr = IN_ROOM(ch)->vehicle->in_room->number;
+  if (curr >= 60000 && curr <= 62499) {
+      start_room = 60051;
+      sector = MAIN_SPACE;
+  }
+  else if (curr >= 50500 && curr <= 50599) {
+      start_room = 50500;
+      sector = CORELLIAN_SPACE;
+  }
+  else if (curr >= 51100 && IN_ROOM(ch)->number <= 51199) {
+      start_room = 51100;
+      sector = ALPHA_SPACE;
+  }
+  else if (curr >= 56000 && curr <= 56099) {
+      start_room = 56000;
+      sector = GRID1_SPACE;
+  }
+  else if (curr >= 56100 && curr <= 56199) {
+      start_room = 56100;
+      sector = GRID2_SPACE;
+  }
+  else {
+      ch->Send("You are in a strange location - you cannot jump from here.\r\n");
+      return TRUE;
+  }
+ 
+  /* only MAIN_SPACE has a 50x50 grid */
+  if (sector != MAIN_SPACE) {
+      if (xord > 10 || yord > 10) {
+          ch->Send("Your x and y coordinates must be 10 or less.\r\n");
+          return TRUE;
+      }
+      multi = 10;
+  }
+  else {
+      if (xord > 50 || yord > 50) {
+          ch->Send("Your x and y coordinates must be 50 or less.\r\n");
+          return TRUE;
+      }   
+      multi = 50;
+  }
+
   /* Lets calculate the actual vnum of the room, based on the coords */
-  vroom = SPACE_START_ROOM;
-  vroom += xord - 1 + ((yord - 1) * 50);
+  vroom = start_room;
+  vroom += xord - 1 + ((yord - 1) * multi);
 
   if ((dest = real_room(vroom)) == NULL) {
       ch->Send("That room does not exist!\r\n");
@@ -729,9 +760,32 @@ SPECIAL(vehicle2)
   vehicle = IN_ROOM(ch)->vehicle;
   obj_from_room(vehicle);
   obj_to_room(vehicle, dest);
-  
-  ch->Send("Success\r\n");
+
   return TRUE;
+}
+
+SPECIAL(vehicle2)
+{
+  struct obj_data *vehicle;
+  Room *dest;
+  
+  /* some insanity checks */
+  if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
+    return FALSE;
+
+  /* Look out command */
+  if (CMD_IS("look")) {
+      skip_spaces(&argument);
+      if (!is_abbrev(argument, "out"))
+          return FALSE;
+      dest = vehicle->in_room;
+      view_room_by_rnum(ch, dest);
+      return TRUE; 
+  }
+
+  if (CMD_IS("jump")) return vehicle_jump(ch, argument);
+      
+  return FALSE;
 }
 
 room_vnum find_new_vehicle_room()

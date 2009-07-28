@@ -2278,6 +2278,16 @@ void mag_assign_spells ( void )
 
 	spello_system ( SPELL_OUTCAST, "OUTCAST", 0, 0, 0, POS_SITTING,
 	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+
+	spello_system ( SPELL_RESIST_FIRE, "resist fire", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "The flow of water around your body evaporates into the air." );
+
+	spello_system ( SPELL_RESIST_COLD, "resist cold", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "The flow of flames around your body flicker out." );
+
+	spello_system ( SPELL_RESIST_ELEC, "resist electricity", 0, 0, 0, POS_SITTING,
+	         TAR_IGNORE, TRUE, 0, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "Your glass-coated skin shatters into a million pieces." );
+
 	/*
 	 * Declaration of skills - this actually doesn't do anything except
 	 * set it up so that immortals can use these skills by default.  The

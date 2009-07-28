@@ -3838,7 +3838,7 @@ int vnum_mobile ( char *searchname, Character *ch )
 
 
 
-int vnum_object ( char *searchname, Character *ch )
+int vnum_object ( char *searchname, Character *ch , int type)
 {
 	int nr, found = 0;
 	char buf[MAX_INPUT_LENGTH];
@@ -3849,7 +3849,9 @@ int vnum_object ( char *searchname, Character *ch )
 
 	for ( nr = 0; nr <= top_of_objt; nr++ )
 	{
-		if ( isname_full ( searchname, obj_proto[nr].name ) )
+		if ( (!type &&  isname_full ( searchname, obj_proto[nr].name ))
+      || (type && (IS_SET_AR(obj_proto[nr].obj_flags.bitvector, AFF_PROT_FIRE) 
+      || IS_SET_AR(obj_proto[nr].obj_flags.bitvector, AFF_PROT_COLD))) )
 		{
 			snprintf ( buf, sizeof ( buf ), "%3d. [%5d] %-40s %s\r\n", ++found,
 			           obj_index[nr].vnum,

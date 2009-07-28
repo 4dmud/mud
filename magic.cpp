@@ -927,6 +927,31 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_vict = "You feel a shell of warmth form around your body.";
 			break;
 
+                case SPELL_RESIST_COLD:
+                    if (OBJ_INNATE) af[0].expire = -2;
+                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
+                    af[0].bitvector = AFF_RESIST_COLD;
+                    accum_duration = FALSE;
+                    to_vict = "Your body suddenly erupts with thousands of tiny flames.";
+                    to_room = "$n's body suddenly erupts with thousands of tiny flames.";
+                    break;
+                case SPELL_RESIST_FIRE:
+                    if (OBJ_INNATE) af[0].expire = -2;
+                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
+                    af[0].bitvector = AFF_RESIST_FIRE;
+                    accum_duration = FALSE;
+                    to_vict = "Water begins to continuously flow around your body.";
+                    to_room = "Water begins to flow continuously around $n's body.";
+                    break;
+                case SPELL_RESIST_ELEC:
+                    if (OBJ_INNATE) af[0].expire = -2;
+                    else            af[0].expire = HOURS_TO_EXPIRE(10 + level);
+                    af[0].bitvector = AFF_RESIST_ELEC;
+                    accum_duration = FALSE;
+                    to_vict = "Your skin takes on a glass-like quality.";
+                    to_room = "$n's skin takes on a glass-like quality.";
+                    break;
+
 		case SPELL_CONE_OF_COLD:
 			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
 			        && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
