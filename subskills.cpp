@@ -181,9 +181,9 @@ void assign_subskills(void) {
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, PROF_COMBATANT);
 
     /* your ability to control living animals */
-    subo(SUB_BRICKMAKING, "BrickMaking", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BRICKMAKER);
+//    subo(SUB_BRICKMAKING, "BrickMaking", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BRICKMAKER);
     /*
     3. TRIP could be a nice thief skill too, a bit like bash, but not as effective. */
     subo(SUB_TRIP, "Trip", 0, 0,
@@ -419,22 +419,22 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MINER);
     /* skill to shapen weapons, increase their damage*/
-    subo(SUB_SHARPENING, "Sharpening", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, SKILL_TINKER);
+//    subo(SUB_SHARPENING, "Sharpening", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, SKILL_TINKER);
     /* ability to refine skins to leather, manipulate leather */
-    subo(SUB_LEATHERWORK, "LeatherWork", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TANNER);
+//    subo(SUB_LEATHERWORK, "LeatherWork", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TANNER);
     /* ability to make clothing from materials*/
-    subo(SUB_TAILORING, "Tailoring", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TAILOR);
+//    subo(SUB_TAILORING, "Tailoring", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TAILOR);
     /* ability to survey a room to check what types of minerals are abundant,
        also counts as special bonus in new mine code */
-    subo(SUB_SURVEYING, "Surveying", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MINER);
+//    subo(SUB_SURVEYING, "Surveying", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MINER);
     /* ability to create/work with electronic equipment */
     subo(SUB_ELECTRONICS, "Electronics", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
@@ -460,9 +460,9 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_COMBATANT);
     /* ability to make beer/wine from raw materials */
-    subo(SUB_BREWING, "Brewing", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
+//    subo(SUB_BREWING, "Brewing", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
     /* ability to watch a group, letting them perform a task with greater efficency */
     subo(SUB_SUPERVISING, "Supervising", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
@@ -524,9 +524,9 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
     /* Mill lumber into planks/posts/pulp */
-    subo(SUB_MILLING, "Milling", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MILLER);
+//    subo(SUB_MILLING, "Milling", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MILLER);
     /* create writing paper from pulp*/
     subo(SUB_PAPERMAKING, "Papermaking", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
@@ -536,21 +536,21 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_SCRIBE);
     /* control the heat of a furnace */
-    subo(SUB_HEAT_MANAGEMENT, "HeatManagement", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);
+//    subo(SUB_HEAT_MANAGEMENT, "HeatManagement", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);
     /* create armor and items from glass */
-    subo(SUB_GLASSWORK, "Glasswork", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
+//    subo(SUB_GLASSWORK, "Glasswork", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
     /* create liquid containers from glass */
-    subo(SUB_BOTTLEMAKING, "BottleMaking", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
+//    subo(SUB_BOTTLEMAKING, "BottleMaking", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
     /* Create vials for potions from glass bottles */
-    subo(SUB_VIALMAKING, "VialMaking", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
+//    subo(SUB_VIALMAKING, "VialMaking", 0, 0,
+//         0, POS_SLEEPING, 0 , PEAC,
+//         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLAZIER);
     /* chop down magic trees to make lumber */
     subo(SUB_LUMBERJACK, "Lumberjack", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
@@ -704,9 +704,9 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
-    subo(SUB_GOLDSMITH, "Gold Smith", 0, 0,
-        0, POS_SLEEPING, 0, PEAC,
-        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
+//    subo(SUB_GOLDSMITH, "Gold Smith", 0, 0,
+//        0, POS_SLEEPING, 0, PEAC,
+//        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
     subo(SUB_WEAPONSMITH, "Weapon Smith", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
@@ -736,9 +736,9 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TEXTILEWORK);
 
-     subo(SUB_ROPEMAKER, "Rope Maker", 0, 0,
-        0, POS_SLEEPING, 0, PEAC,
-        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TEXTILEWORK);
+//     subo(SUB_ROPEMAKER, "Rope Maker", 0, 0,
+//        0, POS_SLEEPING, 0, PEAC,
+//        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_TEXTILEWORK);
 
      subo(SUB_TAILOR, "Tailor", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
