@@ -1355,9 +1355,13 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	else if ( ( GET_ALIGNMENT ( ch ) < -350 ) && affected_by_spell ( vict, SPELL_PROT_FROM_EVIL ) )
 		damage -= damage/4;
 
-	if ( ( elemental_type ( w_type ) == ELEM_FIRE || affected_by_spell ( ch, SPELL_MIND_FIRE ) ) && affected_by_spell ( vict, SPELL_PROT_FIRE ) )
+	if ( ( elemental_type ( w_type ) == ELEM_FIRE || affected_by_spell ( ch, SPELL_MIND_FIRE ) ) && 
+        (AFF_FLAGGED(vict, AFF_RESIST_FIRE) || affected_by_spell ( vict, SPELL_PROT_FIRE )) )
 		damage -= damage/4;
-	else if ( ( elemental_type ( w_type ) == ELEM_ICE || affected_by_spell ( ch, SPELL_MIND_ICE ) ) && affected_by_spell ( vict, SPELL_PROT_COLD ) )
+	else if ( ( elemental_type ( w_type ) == ELEM_ICE || affected_by_spell ( ch, SPELL_MIND_ICE ) ) && (AFF_FLAGGED(vict, AFF_RESIST_COLD) || 
+            affected_by_spell ( vict, SPELL_PROT_COLD )) )
+		damage -= damage/4;
+        else if (elemental_type (w_type) == ELEM_ELEC && AFF_FLAGGED(vict, AFF_RESIST_ELEC))
 		damage -= damage/4;
 
 
