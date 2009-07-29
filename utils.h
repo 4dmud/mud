@@ -443,6 +443,16 @@ inline char *str_dup ( const char *source )
          temp->next = (item)->next;	\
    }					\
  
+/* Horus macro */
+#define ADD_TO_LIST(item, head)    \
+   if ((head)) {                   \
+      (item)->next = head;         \
+      head = item;                 \
+   }                               \
+   else                            \
+      head = item;                 \
+
+      
 int get_sub(Character *ch, int i);
 void improve_sub ( Character *ch, enum subskill_list sub, int amount );
 

@@ -1609,7 +1609,7 @@ struct qic_data {
 
 struct vehicle2_data {
   struct obj_data *vehicle;
-  Room *orig;
+  Character *ch;
   Room *dest;
   int type;
   int stage;

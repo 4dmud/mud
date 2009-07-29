@@ -11,6 +11,7 @@
 #include "screen.h"
 #include "house.h"
 #include "constants.h"
+#include "graph.h"
 
 struct obj_data *get_obj_in_list_type(int type,
                                                   struct obj_data *list);
@@ -670,6 +671,56 @@ void assign_vehicles(void) {
 #define GRID1_SPACE            5
 #define GRID2_SPACE            6
 
+struct vehicle2_data *vehicle_queue;
+
+void process_vehicle()
+{
+  struct vehicle2_data *vh, *vh_next, *temp;
+  int dir;
+  Room *dest;
+  char buf[MAX_STRING_LENGTH];
+
+  for (vh = vehicle_queue; vh; vh = vh_next) {
+      vh_next = vh->next;
+      /*Lets check for some weird crap */
+      if (!(vh->vehicle) || !(vh->ch)) {
+          REMOVE_FROM_LIST(vh, vehicle_queue, next);
+          free(vh);
+          continue;
+      }
+      vh->stage--;
+      if (vh->stage <= 0) {
+          vh->stage = vh->value;
+          dir = graph.find_first_step(vh->vehicle->in_room, vh->dest);
+          if (dir == BFS_ERROR || dir == BFS_ALREADY_THERE || 
+                  dir == BFS_NO_PATH) {
+              log("Weird problem with vehicle queue.\r\n");
+              REMOVE_FROM_LIST(vh, vehicle_queue, next);
+              free(vh);
+              continue;
+          }
+          dest = vh->vehicle->in_room->dir_option[dir]->to_room; 
+          
+          /* Lets move the vehicle */
+          obj_from_room(vh->vehicle);
+          obj_to_room(vh->vehicle, dest);
+
+          if (dest == vh->dest) {
+              act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
+              act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
+              REMOVE_FROM_LIST(vh, vehicle_queue, next);
+              free(vh);
+          }
+          else {
+              sprintf(buf, "$p flies to the %s.", dirs[dir]);
+              act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
+              act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
+          }
+      } 
+  }
+
+}
+
 bool vehicle_jump(Character *ch, char *argument)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -677,7 +728,7 @@ bool vehicle_jump(Character *ch, char *argument)
   int xord, yord, multi;
   room_vnum vroom, start_room, curr;
   Room *dest;
-  struct obj_data *vehicle;
+  struct vehicle2_data *vh;
 
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -757,10 +808,23 @@ bool vehicle_jump(Character *ch, char *argument)
       ch->Send("This room isnt part of a vehicle. Please bug this error.\r\n");
       return TRUE;
   }
+  CREATE(vh, struct vehicle2_data, 1);
+  vh->vehicle = IN_ROOM(ch)->vehicle;
+  vh->ch = ch;
+  vh->dest = dest;
+  vh->type = V_ACTION_JUMP;
+  vh->stage = 2;
+  vh->value = 2;
+  ADD_TO_LIST(vh, vehicle_queue);
+
+  act("You rev up the $n's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_CHAR);
+  act("$n revs up the $n's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_ROOM);
+
+/*
   vehicle = IN_ROOM(ch)->vehicle;
   obj_from_room(vehicle);
   obj_to_room(vehicle, dest);
-
+*/
   return TRUE;
 }
 

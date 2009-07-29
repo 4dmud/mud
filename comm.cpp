@@ -272,6 +272,8 @@ void thefree_social_messages(void);
 void free_ban_list(void);
 void free_vehicles(void);
 int enter_player_game(Descriptor *d);
+void process_vehicle(void);
+
 #if RUNNING_IDENT
 static void get_lookup_reply(void);
 #endif
@@ -1372,6 +1374,7 @@ void heartbeat(int heart_pulse) {
     if (!(heart_pulse % (PASSES_PER_SEC))) {
         update_spell_wait(); /* this includes a check for the tasks */
         check_for_dead();
+        process_vehicle();
     }
 
     if (!(heart_pulse % (30 * PASSES_PER_SEC)))
