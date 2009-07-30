@@ -209,6 +209,8 @@ enum sub_professions_list {
     PROF_JEDI,
     PROF_BRAVO,
     PROF_SPACEPILOT,
+    AFFLICATION_VAMPIRE,
+    AFFLICATION_WEREWOLF,
 
     PROF_MAX
 };
