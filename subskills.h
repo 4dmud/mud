@@ -166,7 +166,7 @@ enum sub_professions_list {
     PROF_BUSINESS,
     PROF_COMMERCE,
     PROF_MINER,
-    PROF_VAMPIRE,
+//    PROF_VAMPIRE,
     PROF_BREWER,
     PROF_COMBATANT,
     PROF_TANNER,
@@ -226,6 +226,7 @@ enum prof_group_list {
     PGRP_FERMENTER,
     PGRP_GLASSWORKER,
     PGRP_COMBAT,
+    PGRP_AFFLICATION,
     PGRP_MAX
 };
 
