@@ -227,6 +227,7 @@ enum prof_group_list {
     PGRP_GLASSWORKER,
     PGRP_COMBAT,
     PGRP_AFFLICATION,
+    PGRP_BUISNESS,
     PGRP_MAX
 };
 
