@@ -353,11 +353,10 @@ void assign_subskills(void) {
     /*enables use of stun weapons -- wolfsbane*/
     subo(SUB_STUN_PHASER, "StunPhaser",STAT_SUB_HP | STAT_SUB_MV, 100 ,
          10, POS_FIGHTING, TAR_FIGHT_SELF, PEAC,
-         SK_VIOLENT,STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);
+         SK_VIOLENT,STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /*causes an affect on self when full moon*/
-    subo(SUB_LYCAN, "Lycanthropy", 0, 0,
-         0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_VAMPIRE);
+    subo(SUB_LYCAN, "Lycanthropy", 0, 0, 0, POS_SLEEPING, 0 , 
+         PEAC,SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_AFFLICTION_WEREWOLF);
 
     /*causes an affect on self when fighting*/
     subo(SUB_FURY_ATTACKS, "FuryAttack", STAT_SUB_HP | STAT_SUB_MV, 100 ,
@@ -367,12 +366,12 @@ void assign_subskills(void) {
     /*increases regen rate at night */
     subo(SUB_NIGHT_REGEN, "NightRegen", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_VAMPIRE);
+         SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_AFFLICTION_VAMPIRE);
 
     /*causes an affect on self when fighting*/
     subo(SUB_DRAIN_BLOOD, "DrainBlood", STAT_SUB_HP | STAT_SUB_MV | STAT_SUB_MA, 100 ,
          10, POS_FIGHTING, TAR_FIGHT_SELF, PEAC,
-         SK_VIOLENT, STATUS_TYPE_ONOFF, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_VAMPIRE);
+         SK_VIOLENT, STATUS_TYPE_ONOFF, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_AFFLICTION_VAMPIRE);
 
     /*chance of getting extra gold when killing someone */
     subo(SUB_PILLAGE, "Pillage", 0, 0,
@@ -494,11 +493,11 @@ void assign_subskills(void) {
     /*ability to ignite a lightsaber*/
     subo(SUB_LIGHTSABER_PROF, "Lightsaber proficency", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);
+         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /*ability to ignite both ends of a lightsaber*/
     subo(SUB_LIGHTSABER_DOUBLE, "Lightsaber Double-ended", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_MISC);
+         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /* reduction in speed when fighting in ships */
     subo(SUB_DOGFIGHTING, "Dogfighting", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
