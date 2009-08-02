@@ -35,9 +35,9 @@ static int prof_group_data[] = {
                                  PGRP_MISC, //PROF_BUSINESS,
                                  PGRP_MISC, //PROF_COMMERCE,
                                  PGRP_STONEWORKER, //PROF_MINER,
-                                 PGRP_MISC, //PROF_VAMPIRE,
+                                 PGRP_AFFLICTION, //PROF_VAMPIRE,
 //                               PGRP_MISC, //PROF_BREWER,
-                                 PGRP_MISC, //PROF_COMBATANT,
+                                 PGRP_COMBAT, //PROF_COMBATANT,
                                  PGRP_LEATHERWORKER, //PROF_TANNER,
                                  PGRP_WOODWORKER, //PROF_MILLER,
                                  PGRP_TEXTILEWORKER, //PROF_WEAVER,
@@ -70,7 +70,8 @@ static int prof_group_data[] = {
 				 PGRP_FERMENTER, //PROF_BREWER,
 				 PGRP_GLASSWORKER, //PROF_GLASSWORK,
 				 PGRP_METALWORKER, //PROF_METALWORK,
-                                 PGRP_MISC //PROF_PALADIN
+                                 PGRP_MISC, //PROF_PALADIN,
+				 PGRP_AFFLICTION //PROF_WEREWOLF
                                };
 
 const char * prof_name(int pro)
