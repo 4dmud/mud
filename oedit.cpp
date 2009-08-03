@@ -593,6 +593,9 @@ void oedit_disp_val1_menu ( Descriptor *d )
 		case ITEM_VEHICLE:
 			d->Output ( "Vnum of vehicle room : " );
 			break;
+                case ITEM_VEHICLE2:
+                        d->Output("Speed (1 - fastest, 20 - slowest) : ");
+                        break;
 		case ITEM_V_WINDOW:
 		case ITEM_V_CONTROLS:
 		case ITEM_V_HATCH:
@@ -679,6 +682,10 @@ void oedit_disp_val2_menu ( Descriptor *d )
 		case ITEM_VEHICLE:
 			d->Output ( "Can it fly? 0 = no, 1 = yes : " );
 			break;
+                case ITEM_VEHICLE2:
+                        /* Reserved for enter into room vnum */
+                        oedit_disp_val3_menu(d);
+                        break;
 		case ITEM_CLIMBABLE:
 		case ITEM_DESCENDABLE:
 		case ITEM_PORTAL:
@@ -732,6 +739,9 @@ void oedit_disp_val3_menu ( Descriptor *d )
 		case ITEM_VEHICLE:
 			d->Output ( "How many hits to destroy vehicle (1-5): " );
 			break;
+                case ITEM_VEHICLE2:
+                        d->Output("Shield (1 - weakest, 100 - toughest) : ");
+                        break;
 		case ITEM_CLIMBABLE:
 		case ITEM_DESCENDABLE:
 		case ITEM_PORTAL:
@@ -777,6 +787,9 @@ void oedit_disp_val4_menu ( Descriptor *d )
 		case ITEM_FOOD:
 			d->Output ( "Poisoned (0 = not poison) : " );
 			break;
+                case ITEM_VEHICLE2:
+                        d->Output("Vehicle HP (1-100) : ");
+                        break;
 		case ITEM_SPACEBIKE:
 			d->Output ( "It costs 1 fuel per room in space to move.\r\nMax Fuel:" );
 			break;
@@ -796,6 +809,9 @@ void oedit_disp_val5_menu ( Descriptor *d )
 		case ITEM_TREE:
 			d->Output ( "Give the VNUM of the log that this tree loads (or -1 for a default log): " );
 			break;
+                case ITEM_VEHICLE2:
+                        d->Output("It costs 1 fuel per room in space to move.\r\nMax Fuel: " );
+                        break;
 		default:
 			oedit_disp_menu ( d );
 	}

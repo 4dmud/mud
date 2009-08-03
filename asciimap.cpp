@@ -331,6 +331,8 @@ ACMD ( do_map )
 		}
 		IN_ROOM ( ch ) = IN_ROOM ( vehicle );
 	}
+        else if (IN_ROOM(ch)->vehicle)
+            IN_ROOM(ch) = IN_ROOM(IN_ROOM(ch)->vehicle);
 
 	for ( x = 0; x < MAX_MAP; ++x )
 		for ( y = 0; y < MAX_MAP; ++y )

@@ -4081,7 +4081,7 @@ void perform_immort_where ( Character *ch, char *arg )
 						           d->character->in_room->name,
 						           GET_NAME ( d->character ) );
 					else
-						ch->Send ( "%-15s - [%5d] %-25s - {cC%s{c0\r\n", GET_NAME ( i ),
+						ch->Send ( "%-15s - [%5d] %-25s - {cC%s{cx\r\n", GET_NAME ( i ),
 						           GET_ROOM_VNUM ( IN_ROOM ( i ) ),
 						           i->in_room->name,  zone_table[ ( i->in_room )->zone].name );
 				}

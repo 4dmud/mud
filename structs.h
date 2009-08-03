@@ -1603,9 +1603,6 @@ struct qic_data {
    stage - what tick they are at 
    value - data value
 *******************************************/
-#define V_ACTION_JUMP     1
-#define V_ACTION_FIRE     2
-#define V_ACTION_TRACK    3
 
 struct vehicle2_data {
   struct obj_data *vehicle;

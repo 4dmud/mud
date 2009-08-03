@@ -663,7 +663,7 @@ void assign_vehicles(void) {
 #define LOWER_V_ROOM      55501 
 #define ZONE_V_ROOM       555
 
-
+/* For space jumping */
 #define MAIN_SPACE             1
 #define CORELLIAN_SPACE        2
 #define EARTH_SPACE            3
@@ -671,14 +671,52 @@ void assign_vehicles(void) {
 #define GRID1_SPACE            5
 #define GRID2_SPACE            6
 
+/* For all queues */
+#define V_ACTION_JUMP          1
+#define V_ACTION_FIRE          2
+#define V_ACTION_MOVE          3
+
+
 struct vehicle2_data *vehicle_queue;
+
+void process_v_jump(struct vehicle2_data *vh)
+{
+  int dir;
+  Room *dest;
+  struct vehicle2_data *temp;
+  char buf[MAX_STRING_LENGTH];
+
+  dir = graph.find_first_step(vh->vehicle->in_room, vh->dest);
+  if (dir == BFS_ERROR || dir == BFS_ALREADY_THERE || 
+      dir == BFS_NO_PATH) {
+      log("Weird problem with vehicle queue.\r\n");
+      REMOVE_FROM_LIST(vh, vehicle_queue, next);
+      free(vh);
+      return;
+      }
+
+  dest = vh->vehicle->in_room->dir_option[dir]->to_room; 
+          
+  /* Lets move the vehicle */
+  obj_from_room(vh->vehicle);
+  obj_to_room(vh->vehicle, dest);
+
+  if (dest == vh->dest) {
+      act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
+      act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
+      REMOVE_FROM_LIST(vh, vehicle_queue, next);
+      free(vh);
+  }
+  else {
+      sprintf(buf, "$p flies to the %s.", dirs[dir]);
+      act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
+      act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
+  }
+}
 
 void process_vehicle()
 {
   struct vehicle2_data *vh, *vh_next, *temp;
-  int dir;
-  Room *dest;
-  char buf[MAX_STRING_LENGTH];
 
   for (vh = vehicle_queue; vh; vh = vh_next) {
       vh_next = vh->next;
@@ -691,32 +729,14 @@ void process_vehicle()
       vh->stage--;
       if (vh->stage <= 0) {
           vh->stage = vh->value;
-          dir = graph.find_first_step(vh->vehicle->in_room, vh->dest);
-          if (dir == BFS_ERROR || dir == BFS_ALREADY_THERE || 
-                  dir == BFS_NO_PATH) {
-              log("Weird problem with vehicle queue.\r\n");
-              REMOVE_FROM_LIST(vh, vehicle_queue, next);
-              free(vh);
-              continue;
+          switch (vh->type) {
+              case V_ACTION_JUMP:
+                  process_v_jump(vh);
+                  break;
+              default:
+                  break;
           }
-          dest = vh->vehicle->in_room->dir_option[dir]->to_room; 
-          
-          /* Lets move the vehicle */
-          obj_from_room(vh->vehicle);
-          obj_to_room(vh->vehicle, dest);
-
-          if (dest == vh->dest) {
-              act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
-              act("$p slows down to a complete stop as it reaches its destination.", FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
-              REMOVE_FROM_LIST(vh, vehicle_queue, next);
-              free(vh);
-          }
-          else {
-              sprintf(buf, "$p flies to the %s.", dirs[dir]);
-              act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_ROOM);
-              act(buf, FALSE, vh->ch, vh->vehicle, 0, TO_CHAR);
-          }
-      } 
+      }
   }
 
 }
@@ -813,18 +833,16 @@ bool vehicle_jump(Character *ch, char *argument)
   vh->ch = ch;
   vh->dest = dest;
   vh->type = V_ACTION_JUMP;
-  vh->stage = 2;
-  vh->value = 2;
+  vh->stage = GET_V_SPEED(vh->vehicle);
+  /* Vehicle speed shouldnt be quicker than 1, so set to slowest speed */
+  if (vh->stage <= 0) 
+      vh->stage = 20;
+  vh->value = vh->stage;
   ADD_TO_LIST(vh, vehicle_queue);
 
-  act("You rev up the $n's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_CHAR);
-  act("$n revs up the $n's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_ROOM);
+  act("You rev up $p's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_CHAR);
+  act("$n revs up $p's engine.", FALSE, ch, IN_ROOM(ch)->vehicle, 0, TO_ROOM);
 
-/*
-  vehicle = IN_ROOM(ch)->vehicle;
-  obj_from_room(vehicle);
-  obj_to_room(vehicle, dest);
-*/
   return TRUE;
 }
 
@@ -879,15 +897,21 @@ int create_vehicle_room(struct obj_data *obj)
   vroom->vehicle = obj;
   if (obj->ex_description) {
       vroom->name = strdup(obj->ex_description->keyword);
-      vroom->t_description = strdup(obj->ex_description->description);
+      vroom->SetDescription(obj->ex_description->description);
   }
   else {
       sprintf(buf, "Inside %s", obj->short_description);
       vroom->name = strdup(buf);
-      vroom->t_description = strdup("It is very plain and boring in here.\r\n");
+      vroom->SetDescription("It is very plain and boring in here.\r\n");
   } 
  
-  vroom->AssignTempDesc();
+  vroom->zone = 555;
+  vroom->smell = strdup("You smell nothing interesting.\r\n");
+  vroom->listen = strdup("You hear the hum of the engines.\r\n");
+  vroom->mine.num = -1;
+  vroom->mine.dif = -1;
+  vroom->mine.tool = 0;
+  vroom->proto_script = NULL;
 
   if (add_room(vroom) == NULL) {
       log("SYSERR: create_vehicle_room: Something failed!");
