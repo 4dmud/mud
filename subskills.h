@@ -166,7 +166,7 @@ enum sub_professions_list {
     PROF_BUSINESS,
     PROF_COMMERCE,
     PROF_MINER,
-    PROF_VAMPIRE,
+//    PROF_VAMPIRE,
     PROF_BREWER,
     PROF_COMBATANT,
     PROF_TANNER,
