@@ -361,7 +361,7 @@ void assign_subskills(void) {
     /*causes an affect on self when fighting*/
     subo(SUB_FURY_ATTACKS, "FuryAttack", STAT_SUB_HP | STAT_SUB_MV, 100 ,
          10, POS_FIGHTING, TAR_FIGHT_SELF, PEAC,
-         SK_VIOLENT,STATUS_TYPE_ONOFF, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_VAMPIRE);
+         SK_VIOLENT,STATUS_TYPE_ONOFF, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF__AFFLICTION_VAMPIRE);
 
     /*increases regen rate at night */
     subo(SUB_NIGHT_REGEN, "NightRegen", 0, 0,
