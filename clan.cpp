@@ -627,7 +627,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   }
 
   if (type == CP_EXPEL) {
-      if (arg[0] == '\0' || str_cmp(arg, "outcast") || str_cmp(arg, "noflag")) {
+      if (arg[0] == '\0' || (str_cmp(arg, "outcast") && str_cmp(arg, "noflag"))) {
           ch->Send("Format: clan expel <player name> <outcast/noflag>\r\n");
           return;
       }

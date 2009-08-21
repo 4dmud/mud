@@ -1614,6 +1614,12 @@ struct vehicle2_data {
   struct vehicle2_data *next;
 };
 
+struct vehicle_attachment_data {
+  int type;
+  int value;
+  int max_value;
+  struct vehicle_attachment_data *next;
+};
 
 /* ======================================================================= */
 
