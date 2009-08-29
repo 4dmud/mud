@@ -1010,7 +1010,7 @@ const command_info cmd_info[] =
 	{ "mzreset"  , "mzreset"      , POS_DEAD    , do_mzreset  , 0, 0, 0 },
 	{ "tlist"    , "tli"         , POS_DEAD    , do_oasis    , LVL_IMMORT, SCMD_OASIS_TLIST, WIZ_TRIG_GRP },
 	{ "tstat"    , "tst"         , POS_DEAD    , do_tstat    , LVL_IMMORT, 0, WIZ_TRIG_GRP },
-	{ "vdelete"  , "vdel"         , POS_DEAD    , do_vdelete  , -1, 0, 0 },
+	{ "vdelete"  , "vdel"         , POS_DEAD    , do_vdelete  , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
 	/* Romance Module Command List */
 	{ "askout"   , "asko"         , POS_RESTING , do_askout   , 1, 0 , 0 },
