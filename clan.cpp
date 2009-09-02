@@ -63,6 +63,7 @@ void send_clan_format ( Character *ch )
 		           "   clan expel      <player> <clan>\r\n"
 		           "   clan promote    <player> <clan>\r\n"
 		           "   clan demote     <player> <clan>\r\n"
+                           "   clan retire     <yes>\r\n"
 		           "   clan withdraw   <amount> <clan>\r\n"
 		           "   clan deposit    <amount> <clan>\r\n"
 		           "   clan set ranks  <rank>   <clan>\r\n"
