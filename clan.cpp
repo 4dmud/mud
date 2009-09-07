@@ -650,14 +650,14 @@ void do_clan_expel ( Character *ch, char *arg, int type )
           vict->Send("You've been kicked out of your clan!\r\n");
   }
   else if (type == CP_PROMOTE) {
-      if (GET_CLAN_RANK(vict) + 1 > GET_CLAN_RANK(ch)) {
+      if (!IS_IMM(ch) && GET_CLAN_RANK(vict) + 1 > GET_CLAN_RANK(ch)) {
           act("You cannot promote $N above your rank!", FALSE, ch, 0, vict, TO_CHAR);
           if (!d)
               delete(vict);
           return;
       }
       if ( GET_CLAN_RANK ( vict ) == clan[clan_num].ranks ) {
-          act("$n cannot be promoted above the highest rank!", FALSE, ch, 0, vict, TO_CHAR);
+          act("$N cannot be promoted above the highest rank!", FALSE, ch, 0, vict, TO_CHAR);
           if (!d)
               delete(vict);
           return;
@@ -668,7 +668,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
           vict->Send("You have been promoted in your clan!\r\n");
   }
   else if (type == CP_DEMOTE) {
-      if (GET_CLAN_RANK(vict) == GET_CLAN_RANK(ch)) {
+      if (!IS_IMM(ch) && GET_CLAN_RANK(vict) == GET_CLAN_RANK(ch)) {
           ch->Send("You cannot demote someone of equal rank!\r\n");
           if (!d)
               delete(vict);
