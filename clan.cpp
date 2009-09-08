@@ -605,7 +605,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
       }
   }
 
-  if (find_clan_by_id(GET_CLAN(vict))  < 0) {
+  if ((clan_num = find_clan_by_id(GET_CLAN(vict)))  < 0) {
       ch->Send("That player does not belong in any clan.\r\n");
       if (!d)
           delete(vict);
