@@ -590,7 +590,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
 
   /* Lets check if player is online */
   for (d = descriptor_list; d; d = d->next) 
-    if (!str_cmp(d->character->player.name, buf)) {
+    if (d->character && !str_cmp(d->character->player.name, buf)) {
         vict = d->character;
         break;
     }
