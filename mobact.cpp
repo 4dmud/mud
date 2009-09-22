@@ -45,6 +45,8 @@ int min_actions = -1;
 
 #define MOB_AGGR_TO_ALIGN (MOB_AGGR_EVIL | MOB_AGGR_NEUTRAL | MOB_AGGR_GOOD)
 
+#define MOB_AGGR_TO_SEX (MOB_AGGR_MALE | MOB_AGGR_FEMALE)
+
 void mobile_activity ( void )
 {
 	Character *ch, *next_ch, *vict;
@@ -145,7 +147,8 @@ void mobile_activity ( void )
 
 		/* Aggressive Mobs */
 		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
-		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ) )
+		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) 
+			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX) ) )
 		{
 			found = FALSE;
 			Character *vnext;

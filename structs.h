@@ -601,7 +601,8 @@ class Room;
 #define MOB_POSTMASTER   42
 #define MOB_QUEST        43
 #define MOB_TRAINER      44
-
+#define MOB_AGGR_FEMALE  45 // Added these per Kvetch - Prom
+#define MOB_AGGR_MALE    46 // Added these per Kvetch - Prom
 /* Preference flags: used by Character.player_specials.pref           */
 #define PRF_BRIEF       0     /* Room descs won't normally be shown        */
 #define PRF_COMPACT     1     /* No extra CRLF pair before prompts         */
