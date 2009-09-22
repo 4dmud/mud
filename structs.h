@@ -1547,6 +1547,8 @@ struct obj_data {
     obj_vnum skin; /* for if it is a corpse */
     struct travel_point_data *travel_list;
     struct ident_list *idents;
+    struct vehicle_attachment_data *attachment;   /* attachments for vehicle */
+    Character *following;    /* for floating discs, carts, etc */
 
    
 };

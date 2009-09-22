@@ -564,12 +564,12 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   Character *vict = NULL;
   Descriptor *d = NULL;
   int clan_num = 0;
-  char buf[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   struct affected_type af;
 
-  arg = one_argument(arg, buf);
+  two_arguments(arg, buf, buf2);
 
-  if ( buf[0] == '\0' )
+  if ( buf[0] == '\0' || buf2[0] == '\0' )
   {
       send_clan_format ( ch );
       return;
@@ -589,11 +589,13 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   }
 
   /* Lets check if player is online */
-  for (d = descriptor_list; d; d = d->next) 
+  for (d = descriptor_list; d; d = d->next)  {
+    if (!d->character) continue;
     if (d->character && !str_cmp(d->character->player.name, buf)) {
         vict = d->character;
         break;
     }
+  }
 
   /* player isnt online, so lets check the file */
   if (!d) {
@@ -628,7 +630,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   }
 
   if (type == CP_EXPEL) {
-      if (arg[0] == '\0' || (str_cmp(arg, "outcast") && str_cmp(arg, "noflag"))) {
+      if (str_cmp(buf2, "outcast") && str_cmp(buf2, "noflag")) {
           ch->Send("Format: clan expel <player name> <outcast/noflag>\r\n");
           return;
       }
@@ -637,13 +639,14 @@ void do_clan_expel ( Character *ch, char *arg, int type )
       remove_clan_member ( GET_NAME ( vict ), clan_num );
       GET_CLAN ( vict ) = 0;
       GET_CLAN_RANK ( vict ) = 0;
-      if (!str_cmp(arg, "outcast")) {
-          af.type = SPELL_RESERVE;
-          af.expire = 60*24*14;  // two RL weeks 
+      if (!str_cmp(buf2, "outcast")) {
+          af.type = SPELL_OUTCAST;
+          af.expire = 10;  // two RL weeks 
           af.modifier = 0;
           af.location = APPLY_NONE;
           af.bitvector = AFF_OUTCAST;
-          affect_to_char(ch, &af);
+          SET_BIT_AR(AFF_FLAGS(vict), AFF_OUTCAST);
+          affect_to_char(vict, &af);
       }
       act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
       if (d)

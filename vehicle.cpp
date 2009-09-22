@@ -18,7 +18,7 @@ struct obj_data *get_obj_in_list_type(int type,
 
 room_rnum VEHICLE_ROOM = NULL;
 void ASSIGNROOM(room_vnum room, SPECIAL(fname));
-
+struct vehicle_attachment_data *find_attachment(struct obj_data *obj, int type);
 void view_room_by_rnum(Character *ch, room_rnum is_in);
 void parse_room_name(int in_room, char *bufptr);
 void parse_room_description(int in_room, char *bufptr);
@@ -677,6 +677,7 @@ void assign_vehicles(void) {
 #define V_ACTION_MOVE          3
 
 /* For attachments to vehicles */
+/* in vehicle_attachment_data->type */
 #define V_ATT_HYPERJUMP        1
 #define V_ATT_LASER            2
 #define V_ATT_MISSILE_LOCK     3
@@ -686,6 +687,14 @@ void assign_vehicles(void) {
 
 
 struct vehicle2_data *vehicle_queue;
+
+void process_v_move(struct vehicle2_data *vh)
+{
+}
+
+void process_v_fire(struct vehicle2_data *vh)
+{
+}
 
 void process_v_jump(struct vehicle2_data *vh)
 {
@@ -741,6 +750,12 @@ void process_vehicle()
               case V_ACTION_JUMP:
                   process_v_jump(vh);
                   break;
+              case V_ACTION_MOVE:
+                  process_v_move(vh);
+                  break;
+              case V_ACTION_FIRE:
+                  process_v_fire(vh);
+                  break;
               default:
                   break;
           }
@@ -757,6 +772,7 @@ bool vehicle_jump(Character *ch, char *argument)
   room_vnum vroom, start_room, curr;
   Room *dest;
   struct vehicle2_data *vh;
+  struct vehicle_attachment_data *attach;
 
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -841,10 +857,14 @@ bool vehicle_jump(Character *ch, char *argument)
   vh->ch = ch;
   vh->dest = dest;
   vh->type = V_ACTION_JUMP;
+  /* If there is a hyperjump attachment, speed boost the vehicle */
   vh->stage = GET_V_SPEED(vh->vehicle);
-  /* Vehicle speed shouldnt be quicker than 1, so set to slowest speed */
+  if ((attach = find_attachment(IN_ROOM(ch)->vehicle, V_ATT_HYPERJUMP)))
+    vh->stage -= attach->value;
+
+  /* Vehicle speed shouldnt be quicker than 1, so set to fastest speed */
   if (vh->stage <= 0) 
-      vh->stage = 20;
+      vh->stage = 1;
   vh->value = vh->stage;
   ADD_TO_LIST(vh, vehicle_queue);
 
@@ -854,10 +874,24 @@ bool vehicle_jump(Character *ch, char *argument)
   return TRUE;
 }
 
+struct vehicle_attachment_data *find_attachment(struct obj_data *obj, int type)
+{
+  struct vehicle_attachment_data *attach;
+
+  if (!obj->attachment) return NULL;
+
+  for (attach = obj->attachment; attach; attach = attach->next)
+    if (attach->type == type) return attach;
+
+  return NULL;
+}
+
+/* This is the main command parser for vehicles */
 SPECIAL(vehicle2)
 {
   struct obj_data *vehicle;
   Room *dest;
+  struct vehicle_attachment_data *attach;
   
   /* some insanity checks */
   if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
@@ -873,7 +907,12 @@ SPECIAL(vehicle2)
       return TRUE; 
   }
 
-  if (CMD_IS("jump")) return vehicle_jump(ch, argument);
+  /* all of these commands depend on what attachments are made */
+  if (CMD_IS("jump")) {
+       attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
+       if (!attach) return FALSE;
+       return vehicle_jump(ch, argument);
+  }
       
   return FALSE;
 }
@@ -913,7 +952,7 @@ int create_vehicle_room(struct obj_data *obj)
       vroom->SetDescription("It is very plain and boring in here.\r\n");
   } 
  
-  vroom->zone = 555;
+  vroom->zone = real_zone(555);
   vroom->smell = strdup("You smell nothing interesting.\r\n");
   vroom->listen = strdup("You hear the hum of the engines.\r\n");
   vroom->mine.num = -1;
