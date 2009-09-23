@@ -45,7 +45,7 @@ int min_actions = -1;
 
 #define MOB_AGGR_TO_ALIGN (MOB_AGGR_EVIL | MOB_AGGR_NEUTRAL | MOB_AGGR_GOOD)
 
-#define MOB_AGGR_TO_SEX (MOB_AGGR_MALE | MOB_AGGR_FEMALE)
+#define MOB_AGGR_TO_SEX (MOB_AGGR_MALE | MOB_AGGR_FEMALE | MOB_AGGR_SEX_NEUTRAL)
 
 void mobile_activity ( void )
 {

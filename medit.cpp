@@ -1171,6 +1171,7 @@ void medit_parse ( Descriptor *d, char *arg )
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_MALE );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_FEMALE );
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_SEX_NEUTRAL );
 						}
 
 						break;

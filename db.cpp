@@ -2868,8 +2868,9 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
         // If mob is aggr to sex is ifnored if mob is Aggressive
         if ( MOB_FLAGGED ( mob, MOB_AGGRESSIVE ) &&
                 ( MOB_FLAGGED ( mob, MOB_AGGR_FEMALE ) ||
-                  MOB_FLAGGED ( mob, MOB_AGGR_MALE )))
-               log ( "SYSERR: Mob #%d both Aggressive and Aggressive_to_sex.", nr );
+                  MOB_FLAGGED ( mob, MOB_AGGR_MALE ) ||
+                  MOB_FLAGGED ( mob, MOB_AGGR_SEX_NEUTRAL)))
+		log ( "SYSERR: Mob #%d both Aggressive and Aggressive_to_sex.", nr );
 
 	switch ( UPPER ( letter ) )
 	{
