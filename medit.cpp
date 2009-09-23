@@ -1169,7 +1169,10 @@ void medit_parse ( Descriptor *d, char *arg )
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_GOOD );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_EVIL );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_MALE );
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_FEMALE );
 						}
+
 						break;
 					case MOB_QUEST:
 						if ( !IS_SET_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_QUEST ) )
