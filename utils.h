@@ -841,6 +841,7 @@ int current_class_is_tier_num ( Character *ch );
 #define IS_PK(ch)	(PLR_FLAGGED(ch, PLR_PK))
 #define IS_MALE(ch)	(GET_SEX(ch) == SEX_MALE)
 #define IS_FEMALE(ch)	(GET_SEX(ch) == SEX_FEMALE)
+#define IS_SEX_NEUTRAL(ch) (GET_SEX(ch) == SEX_NEUTRAL)
 #define HAS_SCRIPT(ch)  (ch->script)
 
 /* These three deprecated. */

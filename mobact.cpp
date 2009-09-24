@@ -321,6 +321,10 @@ bool AggroTo ( Character *ch, Character *vict )
 		( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
 	        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
 	        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
+	if ( !MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX) ||
+		( MOB_FLAGGED ( ch, MOB_AGGR_MALE) && IS_MALE ( vict ) ) ||
+		( MOB_FLAGGED ( ch, MOB_AGGR_FEMALE) && IS_FEMALE ( vict ) ) ||
+		( MOB_FLAGGED ( ch, MOB_AGGR_SEX_NEUTRAL) && IS_SEX_NEUTRAL ( vict ) ) )
 	{
 		return true;
 	}

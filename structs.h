@@ -593,7 +593,7 @@ class Room;
 #define MOB_ELEM_WATER   34
 #define MOB_ELEM_FIRE    35
 #define MOB_ELEM_EARTH   36
-#define MOB_HERD     37
+#define MOB_HERD     	 37
 #define MOB_SWIMS        38
 #define MOB_WIZINVIS     39
 #define MOB_STAY_SECTOR  40

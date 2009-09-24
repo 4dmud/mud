@@ -2954,7 +2954,10 @@ int is_aggro ( Character *ch )
 	if ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE ) ||
 	        ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) ||
 	          MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) ||
-	          MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) ) )
+	          MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) ||
+		  MOB_FLAGGED ( ch, MOB_AGGR_MALE ) ||
+		  MOB_FLAGGED ( ch, MOB_AGGR_FEMALE ) ||
+		  MOB_FLAGGED ( ch, MOB_AGGR_SEX_NEUTRAL ) ) )
 		return 1;
 	return 0;
 }
