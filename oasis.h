@@ -37,7 +37,7 @@
 #define NUM_ROOM_SECTORS	26
 
 
-#define NUM_MOB_FLAGS		44
+#define NUM_MOB_FLAGS		47
 #define NUM_AFF_FLAGS		88
 #define NUM_ATTACK_TYPES	17
 
@@ -46,7 +46,7 @@
 #define NUM_ITEM_WEARS 		29  //44
 #define NUM_APPLIES		32
 #define NUM_LIQ_TYPES 		16
-#define NUM_POSITIONS  44
+#define NUM_POSITIONS  		44
 #define NUM_SPELLS		300
 
 #define NUM_GENDERS		3
@@ -390,14 +390,14 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_RACE			33
 #define MEDIT_CLASS			34
 #define MEDIT_TIER			35
-#define MEDIT_SUBSKILL		36
-#define MEDIT_SEGMENTS              37
-#define MEDIT_DELETE_SEGMENT        38
+#define MEDIT_SUBSKILL			36
+#define MEDIT_SEGMENTS              	37
+#define MEDIT_DELETE_SEGMENT        	38
 #define MEDIT_CHA			39
-#define MEDIT_SKIN		40
-#define MEDIT_OWNER		41
-#define MEDIT_TRAINING		42
-#define MEDIT_DELETE_TRAINING	43
+#define MEDIT_SKIN			40
+#define MEDIT_OWNER			41
+#define MEDIT_TRAINING			42
+#define MEDIT_DELETE_TRAINING		43
 
 /*
  * Submodes of SEDIT connectedness.
