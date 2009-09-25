@@ -37,7 +37,7 @@
 #define NUM_ROOM_SECTORS	26
 
 
-#define NUM_MOB_FLAGS		47
+#define NUM_MOB_FLAGS		44
 #define NUM_AFF_FLAGS		88
 #define NUM_ATTACK_TYPES	17
 

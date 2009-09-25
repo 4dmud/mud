@@ -576,13 +576,13 @@ class Room;
 #define MOB_NOBLIND  17  /* Mob can't be blinded                     */
 #define MOB_MOUNTABLE     18  /* Is the mob mountable? (DAK)              */
 #define MOB_NOPUSH   19  /* Mob can't be pushed                      */
-#define MOB_UNUSED        20  /* Mob is part of a herd or group     --moved      */
+#define MOB_AGGR_FEMALE 20  /* Aggro to female     */
 #define MOB_NOSHOOT  21  /* Mob can't be shot                        */
 #define MOB_NOPOISON      22  /* Mob can't be poisoned                    */
 #define MOB_EDIBLE   23  /* Can eat the mob's corpse                 */
 #define MOB_SKINABLE      24  /* Can skin the mob                         */
-#define MOB_USABLE01     25   /* Mob can be mated with other animals      */
-#define MOB_USABLE02      26  /*                                          */
+#define MOB_AGGR_MALE     25   /* Mob aggro to males  */
+#define MOB_AGGR_SEX_NEUTRAL      26  /* Mob Aggro to neutral sex    */
 #define MOB_UNDEAD   27  /* Mob is undead                            */
 #define MOB_NOFREEZE      28  /* Mob can't be frozen                      */
 #define MOB_CAN_MATE      29  /* Mob can be mated with other animals      */
@@ -601,9 +601,9 @@ class Room;
 #define MOB_POSTMASTER   42
 #define MOB_QUEST        43
 #define MOB_TRAINER      44
-#define MOB_AGGR_FEMALE  45 // Added these per Kvetch - Prom
-#define MOB_AGGR_MALE    46 // Added these per Kvetch - Prom
-#define MOB_AGGR_SEX_NEUTRAL 47 // Added these per Kvetch - Prom
+//#define MOB_AGGR_FEMALE  45 // Added these per Kvetch - Prom
+//#define MOB_AGGR_MALE    46 // Added these per Kvetch - Prom
+//#define MOB_AGGR_SEX_NEUTRAL 47 // Added these per Kvetch - Prom
 /* Preference flags: used by Character.player_specials.pref           */
 #define PRF_BRIEF       0     /* Room descs won't normally be shown        */
 #define PRF_COMPACT     1     /* No extra CRLF pair before prompts         */
