@@ -148,7 +148,7 @@ void mobile_activity ( void )
 		/* Aggressive Mobs */
 		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
 		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) 
-			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX) ) )
+			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) )
 		{
 			found = FALSE;
 			Character *vnext;
@@ -335,7 +335,8 @@ Character * parse_aggressive ( Character *ch )
 	Character *vict = NULL;
 	/* Aggressive Mobs */
 	if ( !FIGHTING ( ch ) && ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
-	                           || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) ) )
+	                           || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN )
+				   || MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) )
 	{
 		for ( vict = IN_ROOM ( ch )->people; vict;
 		        vict = vict->next_in_room )
