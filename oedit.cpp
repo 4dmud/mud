@@ -33,6 +33,7 @@
 
 extern struct attack_hit_type attack_hit_text[];
 extern struct board_info_type board_info[];
+extern const char *attachment_types[];
 
 /*------------------------------------------------------------------------*/
 extern zone_rnum real_zone_by_thing ( room_vnum vznum );
@@ -419,6 +420,60 @@ void oedit_disp_extradesc_menu ( Descriptor *d )
 	    grn, nrm, !extra_desc->next ? "<Not set>\r\n" : "Set.", grn, nrm );
 	OLC_MODE ( d ) = OEDIT_EXTRADESC_MENU;
 }
+
+/* Horus - attachments for vehicles */
+void oedit_disp_attachment_type(Descriptor *d)
+{
+  int i;
+
+  for (i = 0; ; i++) {
+      if (attachment_types[i][0] == '\n')
+          break;
+  }
+}
+
+void oedit_disp_attachment_menu(Descriptor *d)
+{
+  struct vehicle_attachment_data *attach = OLC_ATTACHMENT(d);
+  char buf1[50], buf2[50], buf3[50];
+
+  if (!attach) {
+      sprintf(buf1, "<NONE>");
+      sprintf(buf2, "value");
+      sprintf(buf3, "max value");
+  }
+  else {
+      switch (attach->type) {
+          case V_ATT_HYPERJUMP:
+              sprintf(buf1, "hyperjump");
+              sprintf(buf2, "speed boost");
+              sprintf(buf3, "max speed");
+              break;
+          default:
+              sprintf(buf1, "<NONE>");
+              sprintf(buf2, "value");
+              sprintf(buf3, "max value");
+      }
+  }
+        
+
+  get_char_colours ( d->character );
+  clear_screen ( d );
+  d->Output (
+      "Attachment menu\r\n"
+      "%s1%s) Type: %s%s\r\n"
+      "%s2%s) %s: %s%d\r\n"  
+      "%s3%s) %s: %s%d\r\n" 
+      "%s4%s) Goto next attachment: %s%s\r\n"
+      "%s0%s) Quit\r\n"
+      "Enter choice : ",
+      grn, nrm, yel, buf1, 
+      grn, nrm, buf2, yel, attach ? attach->value : 0, 
+      grn, nrm, buf3, yel, attach ? attach->max_value : 0, 
+      grn, nrm, yel, (attach && attach->next) ? "Set" : "<Not set>",
+      grn, nrm);
+}
+
 
 /*
  * Ask for *which* apply to edit.
@@ -934,6 +989,7 @@ void oedit_disp_menu ( Descriptor *d )
 {
 	char buf1[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
+        char buf3[MAX_STRING_LENGTH];
 	struct obj_data *obj;
 
 	obj = OLC_OBJ ( d );
@@ -949,6 +1005,13 @@ void oedit_disp_menu ( Descriptor *d )
 	/*
 	 * Build first half of menu.
 	 */
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2)
+            sprintf(buf3, 
+                  "%sK%s) Attachments : %s%s\r\n", 
+                  grn, nrm, yel, obj->attachment ? "Set" : "<Not set>");
+        else
+            sprintf(buf3, "  ");
+
 	d->Output (
 	    "-- Item number : [%s%d%s]\r\n"
 	    "%s1%s) Namelist : %s%s\r\n"
@@ -990,8 +1053,8 @@ void oedit_disp_menu ( Descriptor *d )
 	    "%sH%s) Taste Desc  :\r\n%s%s\r\n"
 	    "%sI%s) Feel Desc   :\r\n%s%s\r\n"
 	    "%sJ%s) Material    : %s%s\r\n"
+            "%s"
 	    "%sM%s) Min Level   : %s%d\r\n"
-	    // "%sP%s) Perm Affects: %s%s\r\n"
 	    "%sS%s) Script      : %s%s\r\n"
 	    "%sQ%s) Quit\r\n"
 	    "Enter choice : ",
@@ -1015,8 +1078,8 @@ void oedit_disp_menu ( Descriptor *d )
 	    grn, nrm, yel, ( obj->taste && *obj->taste ) ? obj->taste : "<not set>\r\n",
 	    grn, nrm, yel, ( obj->feel  && *obj->feel ) ? obj->feel  : "<not set>\r\n",
 	    grn, nrm, cyn, material_name ( GET_OBJ_VAL ( obj, 9 ) ),
+            buf3, 
 	    grn, nrm, cyn, GET_OBJ_LEVEL ( obj ),
-	    // grn, nrm, cyn, buf2,
 	    grn, nrm, cyn, OLC_SCRIPT ( d ) ? "Set." : "Not Set.",
 	    grn, nrm
 	);
@@ -1223,6 +1286,20 @@ void oedit_parse ( Descriptor *d, char *arg )
 					oedit_disp_material_menu ( d );
 					OLC_MODE ( d ) = OEDIT_MATERIAL;
 					break;
+                                case 'k':
+                                case 'K':
+                                        if (GET_OBJ_TYPE(OLC_OBJ(d)) == ITEM_VEHICLE2)
+                                        {
+                                            if (OLC_OBJ(d)->attachment == NULL)
+                                            {
+						CREATE ( OLC_OBJ(d)->attachment, struct vehicle_attachment_data, 1 );
+                                                OLC_OBJ(d)->attachment->next = NULL;
+                                            }
+                                            OLC_ATTACHMENT(d) = OLC_OBJ(d)->attachment;
+                                            oedit_disp_attachment_menu(d);
+                                            OLC_MODE(d) = OEDIT_ATTACHMENT_MENU;
+                                        }
+                                        break;
 				case 'm':
 				case 'M':
 					d->Output ( "Enter new minimum level: " );
@@ -1626,6 +1703,34 @@ void oedit_parse ( Descriptor *d, char *arg )
 			oedit_disp_extradesc_menu ( d );
 			return;
 
+                case OEDIT_ATTACHMENT_MENU:
+                        switch ((num = atoi(arg)))
+                        {
+                               case 0:
+                                   if (OLC_ATTACHMENT(d)->type == 0)
+                                   {
+                                       struct vehicle_attachment_data *temp;
+                                       REMOVE_FROM_LIST(OLC_ATTACHMENT(d), OLC_OBJ(d)->attachment, next);
+                                       free(OLC_ATTACHMENT(d));
+                                       OLC_ATTACHMENT(d) = NULL;
+                                   }
+                                   break;
+                               case 1:
+                                   OLC_MODE(d) = OEDIT_ATTACHMENT_TYPE;
+                                   oedit_disp_attachment_type(d);
+                                   return;
+                               case 2:
+                                   OLC_MODE(d) = OEDIT_ATTACHMENT_VALUE;
+                                   return;
+                               case 3:
+                                   OLC_MODE(d) = OEDIT_ATTACHMENT_MAX_VALUE;
+                                   return;
+                               case 4:
+                               default:
+                                   oedit_disp_attachment_menu(d);
+                                   break;
+                        }
+                        break;
 		case OEDIT_EXTRADESC_MENU:
 			switch ( ( num = atoi ( arg ) ) )
 			{

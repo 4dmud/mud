@@ -323,6 +323,11 @@ ACMD(do_trade)
       REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_NEUTRAL);
       return;
   }
+
+  if (!str_cmp(arg1, "steel")) {
+      mag_affects(100, ch, ch, SPELL_STEELSKIN, 0);
+      return;
+  }
 }
 
 ACMD ( do_quit )

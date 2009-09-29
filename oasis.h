@@ -150,6 +150,7 @@ struct oasis_olc_data {
   struct extra_descr_data *above; /* used in '[r|o|m]edit'    */
   struct extra_descr_data *behind; /* used in '[r|o|m]edit'    */
   struct extra_descr_data *under; /* used in '[r|o|m]edit'    */
+  struct vehicle_attachment_data *attachment;
   struct help_index_element *help;
 #if CONFIG_OASIS_MPROG           /*                          */
   int total_mprogs;              /*                          */
@@ -196,6 +197,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OLC_TRIG(d)     (OLC(d)->trig)          /* Trigger structure.   */
 #define OLC_VEHICLE(d)  (OLC(d)->vehicle)
 #define OLC_ASSEDIT(d)  (OLC(d)->OlcAssembly)   /* assembly olc        */
+#define OLC_ATTACHMENT(d)   (OLC(d)->attachment)    /* vehicle attachments */
 
 #if CONFIG_OASIS_MPROG
 #define OLC_MPROG(d)	(OLC(d)->mprog)		/* Temporary MobProg.	*/
@@ -283,6 +285,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_TASTE_DESCRIPTION		35
 #define OEDIT_FEEL_DESCRIPTION		36
 #define OEDIT_MATERIAL			37
+#define OEDIT_ATTACHMENT_MENU           38
+#define OEDIT_ATTACHMENT_VALUE          39
+#define OEDIT_ATTACHMENT_MAX_VALUE      40
+#define OEDIT_ATTACHMENT_TYPE           41
 
 /*
  * Submodes of REDIT connectedness.

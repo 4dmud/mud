@@ -676,15 +676,17 @@ void assign_vehicles(void) {
 #define V_ACTION_FIRE          2
 #define V_ACTION_MOVE          3
 
-/* For attachments to vehicles */
-/* in vehicle_attachment_data->type */
-#define V_ATT_HYPERJUMP        1
-#define V_ATT_LASER            2
-#define V_ATT_MISSILE_LOCK     3
-#define V_ATT_RADAR_LOCK       4
-#define V_ATT_GRAPPLE          5
-#define V_ATT_SENSOR           6
 
+const char *attachment_types[] =
+{
+    "hyperjump",
+    "laser/canon",
+    "missile lock",
+    "radar lock",
+    "grapple",
+    "sensor",
+    "\n"
+};
 
 struct vehicle2_data *vehicle_queue;
 
