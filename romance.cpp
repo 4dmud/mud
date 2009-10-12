@@ -850,6 +850,12 @@ ACMD(do_seduce)
   
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
+
+  if (REMORTS(ch) < 1) {
+      ch->Send("You are too inexperienced to use this command.\r\n");
+      return;
+  }
+
   victim = get_char_room_vis(ch, arg, NULL);
   if (PREG(ch) < 0)
   {
