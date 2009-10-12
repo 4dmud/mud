@@ -569,7 +569,7 @@ void do_clan_expel ( Character *ch, char *arg, int type )
 
   two_arguments(arg, buf, buf2);
 
-  if ( buf[0] == '\0' || buf2[0] == '\0' )
+  if ( buf[0] == '\0' || (type == CP_EXPEL && buf2[0] == '\0') )
   {
       send_clan_format ( ch );
       return;
