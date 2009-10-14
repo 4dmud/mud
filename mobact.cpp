@@ -43,9 +43,6 @@ int total_actions = 0;
 int max_actions = 0;
 int min_actions = -1;
 
-#define MOB_AGGR_TO_ALIGN (MOB_AGGR_EVIL | MOB_AGGR_NEUTRAL | MOB_AGGR_GOOD)
-
-#define MOB_AGGR_TO_SEX (MOB_AGGR_MALE | MOB_AGGR_FEMALE | MOB_AGGR_SEX_NEUTRAL)
 
 void mobile_activity ( void )
 {
@@ -146,9 +143,6 @@ void mobile_activity ( void )
 		}
 
 		/* Aggressive Mobs */
-/*		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
-		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) 
-			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) ) */
                 if (MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
                     MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
                     MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
@@ -342,9 +336,13 @@ Character * parse_aggressive ( Character *ch )
 {
 	Character *vict = NULL;
 	/* Aggressive Mobs */
-	if ( !FIGHTING ( ch ) && ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
-	                           || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN )
-				   || MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) )
+	if ( !FIGHTING ( ch ) && ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE ) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_FEMALE) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_MALE) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_SEX_NEUTRAL)))
 	{
 		for ( vict = IN_ROOM ( ch )->people; vict;
 		        vict = vict->next_in_room )
