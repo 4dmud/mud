@@ -146,15 +146,24 @@ void mobile_activity ( void )
 		}
 
 		/* Aggressive Mobs */
-		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
+/*		if ( ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE )
 		        || MOB_FLAGGED ( ch, MOB_AGGR_TO_ALIGN ) 
-			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) )
+			|| MOB_FLAGGED ( ch, MOB_AGGR_TO_SEX ) ) ) */
+                if (MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_FEMALE) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_MALE) ||
+                    MOB_FLAGGED(ch, MOB_AGGR_SEX_NEUTRAL))
+              
 		{
 			found = FALSE;
 			Character *vnext;
 			for ( vict = IN_ROOM ( ch )->people; vict && !found; vict = vnext )
 			{
 				vnext = vict->next_in_room;
+                                if (vict == ch) continue;
 				if ( AggroTo ( ch, vict ) )
 				{
 					start_fighting ( ch, vict );
