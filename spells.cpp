@@ -236,7 +236,8 @@ ASPELL(spell_teleport) {
              ROOM_FLAGGED(to_room, ROOM_HOUSE) ||
              ROOM_FLAGGED(to_room, ROOM_DEATH) ||
              ROOM_FLAGGED(to_room, ROOM_NOTELEPORT_IN) ||
-             ZONE_FLAGGED(to_room->zone, ZONE_NOTELEPORT_IN));
+             ZONE_FLAGGED(to_room->zone, ZONE_NOTELEPORT_IN) ||
+             ZONE_FLAGGED(to_room->zone, ZONE_CLOSED));
     if (RIDING(victim) && HERE(RIDING(victim), victim)) {
         act("$n and $N slowly fade out of existence and are gone.",  FALSE, victim, 0, RIDING(victim), TO_ROOM);
         move_char_to(RIDING(victim), to_room);
