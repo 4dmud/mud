@@ -298,6 +298,14 @@ ASPELL(spell_summon) {
         return;
     }
 
+    if (ZONE_FLAGGED(victim->in_room->zone, ZONE_CLOSED) ||
+        ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)) {
+        ch->Send(
+            "A magical barrier prevents you from summoning %s to this room.\r\n",
+            GET_NAME(victim));
+        return;
+    }
+
     if (!CONFIG_PK_ALLOWED) {
         if (MOB_FLAGGED(victim, MOB_AGGRESSIVE)) {
             act("As the words escape your lips and $N travels\r\n"
