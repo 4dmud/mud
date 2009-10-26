@@ -1382,7 +1382,11 @@ void look_at_room ( Character *ch, int ignore_brief )
 		}
 		else
 		{
+                    if (time_info.hours >= 6 && time_info.hours <= 21) {
 			ch->Send ( "%s", view_room->GetDescription() );
+                    }
+                    else if (view_room->n_description)
+                        page_string(ch->desc, view_room->n_description, FALSE);
 			//if (ch->Flying())
 			//ch->Send( "You are flying a few feet up in the air.\r\n");
 		}

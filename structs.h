@@ -1686,6 +1686,7 @@ public:
     int sector_type;          /* sector type (move/hide)              */
     char *name;               /* Rooms name 'You are ...'             */
     char * t_description; /* temporary buffer for writing strings */
+    char *n_description;   /* night description */
     long GetDesc();
     void SetDesc(long id);
     

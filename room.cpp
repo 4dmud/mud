@@ -48,6 +48,7 @@ Room::Room() {
     sector_type = 0;
     name = NULL;
     description = NULL;
+    n_description = NULL;
     t_description = NULL;
     DescID = -1;
     smell = NULL;
@@ -102,6 +103,8 @@ int Room::free_room_strings() {
     free_string(&name);
     free_string(&t_description);
 
+    if (n_description)
+        free_string(&n_description);
     FreeDescription();
     free_string(&smell);
     free_string(&listen);
@@ -166,6 +169,9 @@ int Room::copy_room_strings(Room *source) {
     t_description = strdup(source->GetDescription());
     AssignTempDesc();
     
+    if (source->n_description)
+        n_description = strdup(source->n_description);
+
     name = str_udup(source->name);
 
     smell = str_udup(source->smell);

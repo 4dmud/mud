@@ -1837,6 +1837,7 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	room_nr->look_above_description = NULL;
 	room_nr->look_behind_description = NULL;
 	room_nr->look_under_description = NULL;
+        room_nr->n_description = NULL;
 
 	for ( ;; )
 	{
@@ -1847,6 +1848,10 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 		}
 		switch ( *line )
 		{
+                        case 'N':
+                          if ((room_nr->n_description = fread_string(fl, buf2)) == NULL)
+                              room_nr->n_description = NULL;
+                            break;
 			case 'D':
 
 				setup_dir ( fl, room_nr, atoi ( line + 1 ) );

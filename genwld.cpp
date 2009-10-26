@@ -458,6 +458,13 @@ int save_rooms(zone_rnum rzone)
 
         }
       }
+    
+      if (room->n_description)
+      {
+          strlcpy(buf, room->n_description, sizeof(buf));
+          strip_cr(buf);
+          fprintf(sf, "N\n%s~\n", room->n_description);
+      }
 
       if (room->ex_description)
       {

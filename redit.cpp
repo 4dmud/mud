@@ -172,6 +172,7 @@ void redit_setup_new(Descriptor *d)
 
   OLC_ROOM(d)->name = strdup("An unfinished room");
   OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
+  OLC_ROOM(d)->n_description = NULL;
   OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
   OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   OLC_ROOM(d)->number = NOWHERE;
@@ -515,6 +516,7 @@ void redit_disp_menu(Descriptor *d)
                   "%sA%s) Exit down    : %s%-6d - %s\r\n"
                   "%sB%s) Descriptions :%s Extra\r\n"
                   /*---4d--------------------------------------*/
+                  "%sC%s) Descriptions : Room description at NIGHT\r\n%s%s"
                   "%sE%s) Descriptions :%s Look under\r\n"
                   "%sF%s) Descriptions :%s Look behind\r\n"
                   "%sG%s) Descriptions :%s Look above\r\n"
@@ -565,6 +567,7 @@ void redit_disp_menu(Descriptor *d)
                   room->dir_option[DOWN] && room->dir_option[DOWN]->to_room != NULL ?
                   room->dir_option[DOWN]->to_room->name : "Nowhere",
                   grn, nrm, cyn,/*extra desc */
+                  grn, nrm, yel, room->n_description ? room->n_description : "Not Set.\r\n",
                   grn, nrm, cyn,/* under */
                   grn, nrm, cyn,/* behind */
                   grn, nrm, cyn,/* above */
@@ -705,6 +708,21 @@ void redit_parse(Descriptor *d, char *arg)
       }
       OLC_DESC(d) = OLC_ROOM(d)->ex_description;
       redit_disp_extradesc_menu(d);
+      break;
+    case 'c':
+    case 'C':
+      OLC_MODE(d) = REDIT_N_DESCRIPTION;
+      clear_screen(d);
+      send_editor_help(d);
+      d->Output( "Enter room NIGHT description:\r\n\r\n");
+
+      if (OLC_ROOM(d)->n_description)
+      {
+	      d->Output( "%s", OLC_ROOM(d)->n_description); 
+	      oldtext = strdup(OLC_ROOM(d)->n_description);
+      }
+      string_write(d, &OLC_ROOM(d)->n_description, MAX_ROOM_DESC, 0, oldtext);
+      OLC_VAL(d) = 1;
       break;
     case 'e':
     case 'E':
@@ -875,6 +893,7 @@ void redit_parse(Descriptor *d, char *arg)
     OLC_ROOM(d)->name = str_udup(arg);
     break;
 
+  case REDIT_N_DESCRIPTION:
   case REDIT_DESC:
     /*
      * We will NEVER get here, we hope.
@@ -1381,6 +1400,7 @@ void redit_string_cleanup(Descriptor *d, int terminator)
   switch (OLC_MODE(d))
   {
   case REDIT_SMELL:
+  case REDIT_N_DESCRIPTION:
   case REDIT_LISTEN:
 	  redit_disp_menu(d);
 	  break;
