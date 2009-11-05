@@ -2588,7 +2588,7 @@ void nanny ( Descriptor *d, char *arg )
 					}
 					else
 					{
-						d->Output ( "Wrong password.\r\nPassword: " );
+						d->Output ( "Wrong password for GET_NAME(d->character) \r\nPassword: " );
 						echo_off ( d );
 					}
 					return;
