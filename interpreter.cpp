@@ -733,6 +733,7 @@ const command_info cmd_info[] =
 
 	{ "pclean"    , "pclean"  , POS_DEAD    , do_pclean    , LVL_SEN, 0, WIZ_IMPL_GRP },
 	{ "peace"    , "pea"  , POS_DEAD    , do_peace    , LVL_IMMORT, 0, WIZ_KILL_GRP },
+	{ "pemote"   , "pem"  , POS_RESTING , do_echo     , 1, SCMD_EMOTE, 0},
 	{ "policy"   , "pol" , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES, 0 },
 	{ "poofin"   , "poofi", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFIN, WIZ_IMM1_GRP },
 	{ "poofout"  , "poofo", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFOUT, WIZ_IMM1_GRP },
