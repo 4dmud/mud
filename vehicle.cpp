@@ -911,8 +911,8 @@ SPECIAL(vehicle2)
 
   /* all of these commands depend on what attachments are made */
   if (CMD_IS("jump")) {
-       attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
-       if (!attach) return FALSE;
+      // attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
+       // if (!attach) return FALSE;
        return vehicle_jump(ch, argument);
   }
       

@@ -426,10 +426,16 @@ void oedit_disp_attachment_type(Descriptor *d)
 {
   int i;
 
+  d->Output("Attachment Types\r\n");
+
   for (i = 0; ; i++) {
       if (attachment_types[i][0] == '\n')
           break;
+      d->Output(
+          "%s%d%s) %s%s\r\n",
+          grn, i + 1, nrm, yel, attachment_types[i]);
   }
+  d->Output("%s0%s) Quit\r\n", grn, nrm);
 }
 
 void oedit_disp_attachment_menu(Descriptor *d)
@@ -444,10 +450,22 @@ void oedit_disp_attachment_menu(Descriptor *d)
   }
   else {
       switch (attach->type) {
+          /* Hyperjump allows ships to autopilot to a destination */
           case V_ATT_HYPERJUMP:
               sprintf(buf1, "hyperjump");
-              sprintf(buf2, "speed boost");
-              sprintf(buf3, "max speed");
+              sprintf(buf2, "speed boost"); /* adds speed to the ship */
+              sprintf(buf3, "max speed");  /* maximum speed can be increased */
+              break;
+          case V_ATT_LASER:
+              sprintf(buf1, "laser/cannon");
+              sprintf(buf2, "firepower");   /* How much damage it can do */
+              sprintf(buf3, "firing speed"); /* how quickly can it fire */
+              break;
+        /* locks into target ship, so lasers can fire even if they run away */
+          case V_ATT_MISSILE_LOCK:
+              sprintf(buf1, "missile lock");
+              sprintf(buf2, "speed");  /* how quickly does it lock onto targ */
+              sprintf(buf3, "range"); /* how many rooms away before it drops */
               break;
           default:
               sprintf(buf1, "<NONE>");
@@ -472,6 +490,8 @@ void oedit_disp_attachment_menu(Descriptor *d)
       grn, nrm, buf3, yel, attach ? attach->max_value : 0, 
       grn, nrm, yel, (attach && attach->next) ? "Set" : "<Not set>",
       grn, nrm);
+
+  OLC_MODE(d) = OEDIT_ATTACHMENT_MENU; 
 }
 
 
@@ -1297,7 +1317,6 @@ void oedit_parse ( Descriptor *d, char *arg )
                                             }
                                             OLC_ATTACHMENT(d) = OLC_OBJ(d)->attachment;
                                             oedit_disp_attachment_menu(d);
-                                            OLC_MODE(d) = OEDIT_ATTACHMENT_MENU;
                                         }
                                         break;
 				case 'm':
@@ -1718,19 +1737,55 @@ void oedit_parse ( Descriptor *d, char *arg )
                                case 1:
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_TYPE;
                                    oedit_disp_attachment_type(d);
-                                   return;
+                                   break;
                                case 2:
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_VALUE;
-                                   return;
+                                   break;
                                case 3:
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_MAX_VALUE;
-                                   return;
+                                   break;
                                case 4:
+                                   if (OLC_ATTACHMENT(d)->type != 0) {
+                                       if (OLC_ATTACHMENT(d)->next)
+                                           OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
+                                       else {
+                                           struct vehicle_attachment_data *nv;
+                                           CREATE(nv, struct vehicle_attachment_data, 1);
+                                           OLC_ATTACHMENT(d)->next = nv;
+                                           OLC_ATTACHMENT(d) = OLC_ATTACHMENT(d)->next;
+                                       }
+                                    }
+                                      /* No break required here */ 
                                default:
                                    oedit_disp_attachment_menu(d);
                                    break;
                         }
-                        break;
+                        return;
+
+                case OEDIT_ATTACHMENT_TYPE:
+                    int i;
+                    for (i = 0; ; i++)
+                        if (attachment_types[i][0] == '\n') break;
+                    num = atoi(arg);
+                    if (num < 0 || num > i) {
+                        d->Output("Wrong choice.\r\n");
+                        oedit_disp_attachment_type(d);
+                        return;
+                    }
+                    OLC_ATTACHMENT(d)->type = num;
+                    oedit_disp_attachment_menu(d); 
+                    break;
+
+                case OEDIT_ATTACHMENT_VALUE:
+                    OLC_ATTACHMENT(d)->value = atoi(arg);
+                    oedit_disp_attachment_type(d);
+                    break;
+                    
+                case OEDIT_ATTACHMENT_MAX_VALUE:
+                    OLC_ATTACHMENT(d)->max_value = atoi(arg);
+                    oedit_disp_attachment_type(d);
+                    break;
+
 		case OEDIT_EXTRADESC_MENU:
 			switch ( ( num = atoi ( arg ) ) )
 			{
