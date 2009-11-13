@@ -499,7 +499,7 @@ ACMD ( do_practice )
 	else if ( mob_trainers.size() == 1 )
 	{
 		mob = mob_trainers[0];
-		if ( !can_teach_skill ( mob, skill_num ) )
+		if ( (GET_MOB_VNUM(mob) == 3007 && GET_SKILL(ch, skill_num) < 2) || (GET_MOB_VNUM(mob) != 3007 && !can_teach_skill ( mob, skill_num ) ))
 		{
 			act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob, TO_CHAR );
 			return;
@@ -511,7 +511,8 @@ ACMD ( do_practice )
 		for ( mti = mob_trainers.begin();can == false && mti != mob_trainers.end();mti++ )
 			if ( can_teach_skill ( *mti, skill_num ) )
 				can = true;
-		if ( can == false )
+                mob = *mti;
+		if ( (GET_MOB_VNUM(mob) == 3007 && GET_SKILL(ch, skill_num) < 2) || (GET_MOB_VNUM(mob) != 3007 && can == false ))
 		{
 			act ( "Nobody here is skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, NULL, TO_CHAR );
 			return;
