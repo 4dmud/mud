@@ -368,8 +368,12 @@ void auction_forfeit(Character *mob)
   auction->seller->Send("A small daemon pops in, takes some gold, and taunts you.\r\n" );
   act("A small daemon pops in, takes some gold from $n, and sticks its tongue out at $m.",
     FALSE, auction->seller, auction->obj, 0, TO_ROOM);
-  GET_GOLD(auction->seller) -= auction->bid;
-  auction_reset();
+    // New code from Fizban changed by Prometheus
+    if (GET_GOLD(auction->seller) >= auction->bid)
+	GET_GOLD(auction->seller) -= auction->bid;
+    else
+        GET_GOLD(auction->seller) = 0;  
+	auction_reset();
 }
 
 void show_auction_status(Character *ch)
