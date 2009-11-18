@@ -1918,6 +1918,8 @@ void extract_char_final ( Character *ch )
 	Descriptor *d = NULL;
 	struct hunter_data *hunt = NULL, *hnext;
 	int i;
+        Character *temp;
+        struct obj_data *obj;
 	if ( !ch )
 		return;
 	if ( IN_ROOM ( ch ) == NULL )
@@ -2008,6 +2010,19 @@ void extract_char_final ( Character *ch )
 	if ( ch->followers || ch->master )
 		die_follower ( ch );
 
+        /* Horus bug fix - lets fix the list of players sitting on furniture */
+        if ((obj = SITTING(ch))) {
+            if (OBJ_SAT_IN_BY(obj) == ch) {
+                if (NEXT_SITTING(ch))
+                    OBJ_SAT_IN_BY(obj) = NEXT_SITTING(ch);
+                else
+                    OBJ_SAT_IN_BY(obj) = NULL;
+            }
+            else
+                REMOVE_FROM_LIST(ch, OBJ_SAT_IN_BY(obj), char_specials.next_in_chair);
+            SITTING(ch) = NULL;
+        }
+ 
 	eq_to_room ( ch );
 
 	/* remove the locker memory*/
