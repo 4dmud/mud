@@ -257,7 +257,7 @@ void con_character_creation ( Descriptor *d, char *arg )
 
 			new_mudlog ( NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME ( d->character ), d->host.c_str() );
 			//added this for test - Prometheus
-			new_mudlog ( NRM, PLR_NEWBIE_HLPR, TRUE, "%s [%s] new player.", GET_NAME( d->character ));
+			//new_mudlog ( NRM, PLR_NEWBIE_HLPR, TRUE, "%s [%s] new player.", GET_NAME( d->character ));
 			break;
 			/** These two, Stats and Class are now outside of the basic char creation process **/
 		case STATE_QCLASS:
