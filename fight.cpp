@@ -2774,12 +2774,13 @@ int fe_after_damage ( Character* ch, Character* vict,
 		else
 			GET_SWEEP_DAM ( ch ) = 0;
 
-		if ( partial > 0 && ( GET_HIT ( vict ) - partial ) <= 0 && GET_SUB ( vict, SUB_UNDYING ) > number ( 0, 600 ) )
+/* Horus - disabling this ridiculous subskill */
+/*		if ( partial > 0 && ( GET_HIT ( vict ) - partial ) <= 0 && GET_SUB ( vict, SUB_UNDYING ) > number ( 0, 600 ) )
 		{
 			act ( "{cGYou concentrate your energy on the on coming killing blow,\r\nand before it lands you move out of range of combat.{c0", FALSE ,vict, 0,0,TO_CHAR );
 			return -1;
 
-		}
+		} */
 
 		alter_hit ( vict, partial );
 		update_pos ( vict );
