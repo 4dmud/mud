@@ -440,6 +440,7 @@ ACMD ( do_practice )
 	Character *mob;
 	int train_list = -1;
 	int remorts = MIN(REMORTS(ch), 50);
+        bool is_mikey = FALSE;
 
 	if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
 		return;
@@ -461,9 +462,11 @@ ACMD ( do_practice )
 		return;
 	}
 
-	for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room )
+	for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room ) {
+                if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
 		if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
 			mob_trainers.push_back ( p );
+        }
 
 	if ( is_abbrev ( argument, "skills" ) )
 		train_list = 0;
@@ -499,7 +502,7 @@ ACMD ( do_practice )
 	else if ( mob_trainers.size() == 1 )
 	{
 		mob = mob_trainers[0];
-		if ( (GET_MOB_VNUM(mob) == 3007 && GET_SKILL(ch, skill_num) < 2) || (GET_MOB_VNUM(mob) != 3007 && !can_teach_skill ( mob, skill_num ) ))
+		if ((is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey &&  !can_teach_skill ( mob, skill_num ) ))
 		{
 			act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob, TO_CHAR );
 			return;
@@ -511,8 +514,7 @@ ACMD ( do_practice )
 		for ( mti = mob_trainers.begin();can == false && mti != mob_trainers.end();mti++ )
 			if ( can_teach_skill ( *mti, skill_num ) )
 				can = true;
-                mob = *mti;
-		if ( (GET_MOB_VNUM(mob) == 3007 && GET_SKILL(ch, skill_num) < 2) || (GET_MOB_VNUM(mob) != 3007 && can == false ))
+		if ( (is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey && can == false ))
 		{
 			act ( "Nobody here is skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, NULL, TO_CHAR );
 			return;
