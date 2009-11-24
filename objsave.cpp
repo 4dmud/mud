@@ -1690,6 +1690,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   int t[4];
   int orig_timer = 0;
   int dup_strings = FALSE;
+  struct ident_list *tmp_idents = NULL;
 
   if (feof(fl))
     return NULL;
@@ -1790,6 +1791,8 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
           add_identifier(temp, t[0]);
         }
         while (*line != '-');
+        if (temp->idents)
+            tmp_idents = temp->idents;
       }
       break;
     case 'l':
@@ -1880,8 +1883,12 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
   /* Horus - all eq will be updated automatically */
   if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
+      if (tmp_idents) 
+          temp->idents = NULL;
       free_obj(temp, TRUE);
       temp = read_object(onr, VIRTUAL);
+      if (tmp_idents)
+          temp->idents = tmp_idents;
       if (orig_timer)
           GET_OBJ_TIMER(temp) = orig_timer;
   } 
