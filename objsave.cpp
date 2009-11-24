@@ -1682,12 +1682,13 @@ void tag_read(char *tag, char *buf)
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
   int rv;
-  obj_vnum nr, nrr = 0;
+  obj_vnum nr, onr, nrr = 0;
   char buf[MAX_INPUT_LENGTH];
   char line[READ_SIZE] = "";
   char tag[READ_SIZE] = "";
   int num;
   int t[4];
+  int orig_timer = 0;
   int dup_strings = FALSE;
 
   if (feof(fl))
@@ -1704,6 +1705,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   if ((rv = sscanf(line, "#%d OBJ", &nr)) != 1)
     return NULL;
 
+  onr = nr;
   /* we have the number, check it, load obj. */
   if (nr == NOTHING)
   {  /* then it is unique */
@@ -1829,8 +1831,10 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       }
       break;
     case 't':
-      if (!strcmp(tag, "Timer"))
-        GET_OBJ_TIMER(temp) = atoi(line);
+      if (!strcmp(tag, "Timer")) {
+        orig_timer = atoi(line);
+        GET_OBJ_TIMER(temp) = orig_timer;
+      }
       else if (!strcmp(tag, "Type"))
         GET_OBJ_TYPE(temp) = atoi(line);
       else if (!strcmp(tag, "Taste"))
@@ -1873,6 +1877,15 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
     get_line(fl, line);
   }
+
+  /* Horus - all eq will be updated automatically */
+  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
+      free_obj(temp, TRUE);
+      temp = read_object(onr, VIRTUAL);
+      if (orig_timer)
+          GET_OBJ_TIMER(temp) = orig_timer;
+  } 
+
   return temp;
 }
 
