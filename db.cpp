@@ -3197,6 +3197,32 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 		}
 		switch ( *line )
 		{
+                        /* New vehicle attachments */
+                        case 'V':
+                            struct vehicle_attachment_data *att;
+                            CREATE(att, struct vehicle_attachment_data, 1);
+		            if ( !get_line ( obj_f, line ) )
+			    {
+				log ( "SYSERR: Format error in 'A' field, %s\n"
+			      "...expecting 2 numeric constants but file ended!",
+					      buf2 );
+					exit ( 1 );
+			    }
+
+			    if ( ( retval = sscanf ( line, " %d %d %d", t, t + 1, t+2 ) ) != 3 )
+			    {
+				log ( "SYSERR: Format error in 'A' field, %s\n"
+			      "...expecting 3 numeric arguments, got %d\n"
+			      "...offending line: '%s'", buf2, retval, line );
+				exit ( 1 );
+			    }
+                            att->type = t[0];
+                            att->value = t[1];
+                            att->max_value = t[2];
+                            if (obj_proto[i].attachment) 
+                                att->next = obj_proto[i].attachment;
+                            obj_proto[i].attachment = att;
+                            break;
 			case 'E':
 				CREATE ( new_descr, struct extra_descr_data, 1 );
 				if ( ( new_descr->keyword = fread_string ( obj_f, buf2 ) ) == NULL )

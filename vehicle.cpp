@@ -912,8 +912,8 @@ SPECIAL(vehicle2)
 
   /* all of these commands depend on what attachments are made */
   if (CMD_IS("jump")) {
-      // attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
-       // if (!attach) return FALSE;
+       attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
+       if (!attach) return FALSE;
        return vehicle_jump(ch, argument);
   }
       
@@ -985,24 +985,18 @@ void delete_vehicle(struct obj_data *obj)
       return;
   }
 
-  /* Lets boot players into RECALL and extract mobs */
+  /* Let's dump everything into the room, with random eq disappearing */
   for (ch = vroom->people; ch; ch = ch_next) {
       ch_next = ch->next_in_room;
-      if (IS_NPC(ch)) {
-          char_from_room(ch);
-          extract_char(ch);
-      }
-      else {
-          move_char_to(ch, CONFIG_MORTAL_START);
-          act("$n appears in the middle of the room.", TRUE, ch, 0, 0, TO_ROOM);
-          look_at_room(ch, 0);
-      }
+      move_char_to(ch, obj->in_room);
+      act("$n appears in the middle of the room.", TRUE, ch, 0, 0, TO_ROOM);
+      look_at_room(ch, 0);
   }
 
   for (tobj = vroom->contents; tobj; tobj = tobj_next) {
       tobj_next = tobj->next_content;
       obj_from_room(tobj);
-      extract_obj(tobj);
+      obj_to_room(tobj, obj->in_room);
   }
 
   /* Now delete the room associated with this vehicle */

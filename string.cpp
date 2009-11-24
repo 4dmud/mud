@@ -10,6 +10,7 @@
 #include "constants.h"
 #include "oasis.h"
 //TODO: this string function has a memory leak if reused on a strung object
+/* Horus - freeing up the strings to fix memory leak */
 ACMD(do_string)
 {
   struct obj_data *obj;
@@ -37,18 +38,21 @@ ACMD(do_string)
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    free(obj->name);
     obj->name = strdup(buf2);
   }
   else if (!str_cmp("short", buf1))
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    free(obj->short_description);
     obj->short_description = strdup(buf2);
   }
   else if (!str_cmp("long", buf1))
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    free(obj->description);
     obj->description = strdup(buf2);
   }
   else if (!str_cmp("weight", buf1))

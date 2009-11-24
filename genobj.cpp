@@ -219,6 +219,7 @@ int save_objects(zone_rnum zone_num)
   FILE *fp;
   struct obj_data *obj;
   struct extra_descr_data *ex_desc;
+  struct vehicle_attachment_data *att;
 
 #if CIRCLE_UNSIGNED_INDEX
   if (zone_num == NOWHERE || zone_num > top_of_zone_table) {
@@ -331,6 +332,11 @@ GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(
 	  fprintf(fp, "A\n"
 		  "%d %d\n", obj->affected[counter2].location,
 		  obj->affected[counter2].modifier);
+
+      /* New vehicle attachments */
+      for (att = obj->attachment; att; att = att->next) 
+          fprintf(fp, "V\n"
+                      "%d %d %d\n", att->type, att->value, att->max_value);
     }
   }
 
