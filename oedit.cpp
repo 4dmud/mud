@@ -443,12 +443,6 @@ void oedit_disp_attachment_menu(Descriptor *d)
   struct vehicle_attachment_data *attach = OLC_ATTACHMENT(d);
   char buf1[50], buf2[50], buf3[50];
 
-  if (!attach) {
-      sprintf(buf1, "<NONE>");
-      sprintf(buf2, "value");
-      sprintf(buf3, "max value");
-  }
-  else {
       switch (attach->type) {
           /* Hyperjump allows ships to autopilot to a destination */
           case V_ATT_HYPERJUMP:
@@ -472,9 +466,7 @@ void oedit_disp_attachment_menu(Descriptor *d)
               sprintf(buf2, "value");
               sprintf(buf3, "max value");
       }
-  }
         
-
   get_char_colours ( d->character );
   clear_screen ( d );
   d->Output (
@@ -1761,7 +1753,7 @@ void oedit_parse ( Descriptor *d, char *arg )
                                    break;
                         }
                         return;
-
+                        break;
                 case OEDIT_ATTACHMENT_TYPE:
                     int i;
                     for (i = 0; ; i++)
@@ -1778,11 +1770,14 @@ void oedit_parse ( Descriptor *d, char *arg )
                     break;
 
                 case OEDIT_ATTACHMENT_VALUE:
+                    d->Output("Enter value : ");
                     OLC_ATTACHMENT(d)->value = atoi(arg);
                     oedit_disp_attachment_menu(d);
+                    return;
                     break;
                     
                 case OEDIT_ATTACHMENT_MAX_VALUE:
+                    d->Output("Enter value : ");
                     OLC_ATTACHMENT(d)->max_value = atoi(arg);
                     oedit_disp_attachment_menu(d);
                     break;
