@@ -1772,18 +1772,19 @@ void oedit_parse ( Descriptor *d, char *arg )
                         oedit_disp_attachment_type(d);
                         return;
                     }
-                    OLC_ATTACHMENT(d)->type = num;
+                    if (num) 
+                        OLC_ATTACHMENT(d)->type = num;
                     oedit_disp_attachment_menu(d); 
                     break;
 
                 case OEDIT_ATTACHMENT_VALUE:
                     OLC_ATTACHMENT(d)->value = atoi(arg);
-                    oedit_disp_attachment_type(d);
+                    oedit_disp_attachment_menu(d);
                     break;
                     
                 case OEDIT_ATTACHMENT_MAX_VALUE:
                     OLC_ATTACHMENT(d)->max_value = atoi(arg);
-                    oedit_disp_attachment_type(d);
+                    oedit_disp_attachment_menu(d);
                     break;
 
 		case OEDIT_EXTRADESC_MENU:
