@@ -1725,15 +1725,18 @@ void oedit_parse ( Descriptor *d, char *arg )
                                        free(OLC_ATTACHMENT(d));
                                        OLC_ATTACHMENT(d) = NULL;
                                    }
+                                   oedit_disp_menu(d);
                                    break;
                                case 1:
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_TYPE;
                                    oedit_disp_attachment_type(d);
                                    break;
                                case 2:
+                                   d->Output("Enter value : ");
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_VALUE;
                                    break;
                                case 3:
+                                   d->Output("Enter value : ");
                                    OLC_MODE(d) = OEDIT_ATTACHMENT_MAX_VALUE;
                                    break;
                                case 4:
@@ -1767,20 +1770,17 @@ void oedit_parse ( Descriptor *d, char *arg )
                     if (num) 
                         OLC_ATTACHMENT(d)->type = num;
                     oedit_disp_attachment_menu(d); 
-                    break;
+                    return;
 
                 case OEDIT_ATTACHMENT_VALUE:
-                    d->Output("Enter value : ");
                     OLC_ATTACHMENT(d)->value = atoi(arg);
                     oedit_disp_attachment_menu(d);
                     return;
-                    break;
                     
                 case OEDIT_ATTACHMENT_MAX_VALUE:
-                    d->Output("Enter value : ");
                     OLC_ATTACHMENT(d)->max_value = atoi(arg);
                     oedit_disp_attachment_menu(d);
-                    break;
+                    return;
 
 		case OEDIT_EXTRADESC_MENU:
 			switch ( ( num = atoi ( arg ) ) )
