@@ -1769,16 +1769,19 @@ void oedit_parse ( Descriptor *d, char *arg )
                     }
                     if (num) 
                         OLC_ATTACHMENT(d)->type = num;
+                    OLC_VAL(d) = 1;
                     oedit_disp_attachment_menu(d); 
                     return;
 
                 case OEDIT_ATTACHMENT_VALUE:
                     OLC_ATTACHMENT(d)->value = atoi(arg);
+                    OLC_VAL(d) = 1;
                     oedit_disp_attachment_menu(d);
                     return;
                     
                 case OEDIT_ATTACHMENT_MAX_VALUE:
                     OLC_ATTACHMENT(d)->max_value = atoi(arg);
+                    OLC_VAL(d) = 1;
                     oedit_disp_attachment_menu(d);
                     return;
 
