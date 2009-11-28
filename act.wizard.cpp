@@ -2661,6 +2661,10 @@ ACMD ( do_snoop )
 		}
 		ch->Send ( "%s", CONFIG_OK );
 
+                if (GET_LEVEL(ch) < LVL_IMPL || !str_cmp(argument, "yes")) 
+                    act("$n begins snooping you!", FALSE, ch, 0, tch, TO_VICT);
+                    
+
 		if ( ch->desc->snooping )
 			ch->desc->snooping->snoop_by = NULL;
 

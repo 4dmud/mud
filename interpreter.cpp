@@ -834,7 +834,7 @@ const command_info cmd_info[] =
 	{ "slowns"   , "slown", POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_SLOWNS, WIZ_SEN_GRP },
 	{ "smell"    , "smell", POS_SITTING , do_smell    , 0, 0, 0 },
 	{ "smite"    , "smite", POS_DEAD    , do_smite    , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
-	{ "snoop"    , "sno" , POS_DEAD    , do_snoop    , LVL_SEN, 0, WIZ_IMPL_GRP },
+	{ "snoop"    , "sno" , POS_DEAD    , do_snoop    , LVL_CRT, 0, WIZ_IMM3_GRP },
 	{ "socials"  , "soc" , POS_DEAD    , do_commands , 0, SCMD_SOCIALS, 0 },
 	{ "speedwalk", "sp"  , POS_STANDING, do_speedwalk    , 1, 0, 0 },
 	{ "spellinfo", "spell", POS_DEAD    , do_spellinfo    , 1, 0, 0 },
