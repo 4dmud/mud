@@ -695,6 +695,43 @@ C_FUNC ( allow_follow )
 	d->character->loader = -1;
 }
 
+void perform_snoop(Character *ch, Character *vict)
+{
+  char buf[MAX_INPUT_LENGTH];
+
+  sprintf(buf, "%s has agreed to being snooped by you", GET_NAME(vict));
+  ch->desc->Output(buf);
+
+  sprintf(buf, "You have agreed to being snooped by %s", GET_NAME(ch));
+  vict->desc->Output(buf);
+
+  if (ch->desc->snooping)
+      ch->desc->snooping->snoop_by = NULL;
+
+  ch->desc->snooping = vict->desc;
+  vict->desc->snoop_by = ch->desc;
+  
+}
+
+C_FUNC(allow_snoop)
+{
+  Character *tch = find_char(d->character->loader);
+
+  if (!tch)
+  {
+      d->Output ( "%s isn't in the game any longer.\r\n", pi.NameById ( d->character->loader ) );
+      return;
+  }
+
+  if ( 'Y' == toupper ( *arg ) )
+      perform_snoop ( tch, d->character );
+  else
+  {
+      d->Output ( "You disallow %s to snoop you.\r\n", pi.NameById ( d->character->loader ) );
+      *tch << GET_NAME ( d->character ) << " disallows you to snoop " << HMHR ( d->character ) << " .\r\n";
+  }
+  d->character->loader = -1;
+}
 
 void print_group ( Character *ch )
 {

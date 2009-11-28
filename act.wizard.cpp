@@ -412,6 +412,7 @@ ACMD ( do_gen_ps );
 int spell_price ( struct obj_data *obj, int val );
 void show_door_errors ( Character *ch );
 C_FUNC ( delete_player );
+C_FUNC(allow_snoop);
 void perform_delete_player ( const char *charname );
 const char *balance_display ( int balance );
 ACMD ( do_potionweight );
@@ -2626,12 +2627,16 @@ ACMD ( do_snoop )
 {
 	Character *victim, *tch;
 	char arg[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH];
+	char buf[MAX_INPUT_LENGTH];
 
 
 	if ( !ch->desc )
 		return;
 
-	one_argument ( argument, arg );
+	argument = one_argument ( argument, arg );
+        one_argument(argument, arg2);
+        
 
 	if ( !*arg )
 		stop_snooping ( ch );
@@ -2659,17 +2664,21 @@ ACMD ( do_snoop )
 			ch->Send ( "You can't.\r\n" );
 			return;
 		}
-		ch->Send ( "%s", CONFIG_OK );
 
-                if (GET_LEVEL(ch) < LVL_IMPL || !str_cmp(argument, "yes")) 
-                    act("$n begins snooping you!", FALSE, ch, 0, tch, TO_VICT);
-                    
+                if (GET_LEVEL(ch) < LVL_IMPL || !str_cmp(arg2, "yes")) {
+                    sprintf(buf, "%s wishes to snoop you: Allow? (Type: Y | N)", GET_NAME(ch));
+                    victim->loader = GET_IDNUM(ch);
+                    line_input(victim->desc, buf, allow_snoop, NULL); 
+		    ch->Send ( "%s", CONFIG_OK );
+                    return;
+                }
 
 		if ( ch->desc->snooping )
 			ch->desc->snooping->snoop_by = NULL;
 
 		ch->desc->snooping = victim->desc;
 		victim->desc->snoop_by = ch->desc;
+		ch->Send ( "%s", CONFIG_OK );
 	}
 }
 
