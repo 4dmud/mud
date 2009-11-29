@@ -6678,7 +6678,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			else
 				return 0.0;
 			break;
-		case SPELL_DEMONSHREAK:
+		case SPELL_DEMONSHRIEK:
 			if ( evil )
 			{
 				if ( IS_NPC ( vict ) )

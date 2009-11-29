@@ -1808,7 +1808,7 @@ void mag_assign_spells ( void )
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 31, 0, "" );
 
-	spello ( SPELL_DEMONSHREAK, "demonshreak", 70 , 60 , 2,
+	spello ( SPELL_DEMONSHRIEK, "demonshriek", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0, "" );
 
@@ -2657,7 +2657,7 @@ int elemental_type ( int spell )
 		case SPELL_SOULSMASH:
 			retval = ELEM_DEATH;
 			break;
-		case SPELL_DEMONSHREAK:
+		case SPELL_DEMONSHRIEK:
 			retval = ELEM_DEATH;
 			break;
 		case SPELL_LIFESUCK:

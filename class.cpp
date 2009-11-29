@@ -1395,7 +1395,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_FORTIFY_MIND,     MAG | ESP );
 	assign_class ( SPELL_HASTE,          MAG | ESP );
 	assign_class ( SPELL_KNOCK,          PRI );
-	assign_class ( SPELL_DEMONSHREAK,      ESP | PRI );
+	assign_class ( SPELL_DEMONSHRIEK,      ESP | PRI );
 	assign_class ( SPELL_SHIELD_ICE,      MAG | PRI | ESP | RAN );
 	assign_class ( SPELL_CLONE,            ESP | PRI );
 	assign_class ( SPELL_MINOR_IDENTIFY,   ESP | GYP | PRI );

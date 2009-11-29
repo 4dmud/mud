@@ -327,7 +327,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
 	switch ( spellnum )
 	{
 		case  SPELL_SOULSMASH:
-		case  SPELL_DEMONSHREAK:
+		case  SPELL_DEMONSHRIEK:
 		case  SPELL_LIFESUCK:
 		case  SPELL_BURNINGSKULL:
 		case  SPELL_HEARTSQUEEZE:
