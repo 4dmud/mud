@@ -1337,9 +1337,12 @@ ACMD(do_qcomm) {
 
         argument = fix_typos(argument, MAX_INPUT_LENGTH);
 
-        if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF))
+        if (ROOM_FLAGGED(ch->in_room, ROOM_SOUNDPROOF)) {
             *ch << "The walls seem to absorb your words.\r\n";
-        else if (PRF_FLAGGED(ch, PRF_NOREPEAT))
+            return;
+        }
+
+        if (PRF_FLAGGED(ch, PRF_NOREPEAT))
             *ch << CONFIG_OK;
         else {
             if (subcmd == SCMD_QSAY)
@@ -1364,8 +1367,8 @@ ACMD(do_qcomm) {
                 if (STATE(i) == CON_PLAYING && i != ch->desc &&
                         PRF_FLAGGED(i->character, PRF_QUEST) &&
                         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF) &&
-                        (is_ignoring(ch, i->character) ))
-                    act(buf, 0, ch, 0, i->character, TO_VICT | TO_SLEEP);
+                        !is_ignoring(ch, i->character) )
+                    act(buf, 0, ch, 0, i->character, TO_VICT);
 
         }
     }
