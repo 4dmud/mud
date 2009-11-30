@@ -1190,10 +1190,6 @@ ACMD(do_gen_comm) {
         send_to_char("This channel reserved for roleplay use only.\r\n", ch);
         return;
     }
-    if (PRF_FLAGGED(ch, PRF_RP) && ( subcmd != SCMD_SHOUT)) {
-        send_to_char("You are roleplaying, please use the IC channel.\r\n", ch);
-        return;
-    }
     if (GET_LEVEL(ch) < LVL_HERO)
         if (!PLR_FLAGGED(ch, PLR_HERO) && subcmd == SCMD_HERO) {
             send_to_char("This channel reserved for hero use only.\r\n",                   ch);
