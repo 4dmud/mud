@@ -680,56 +680,57 @@ const char *preference_bits[] =
 	"DEAF",
 	"!TELL",
 	"D_HP",
-	"D_MANA",
+	"D_MANA",   // 5
 	"D_MOVE",
 	"AUTOEX",
 	"!HASS",
 	"QUEST",
-	"SUMN",
+	"SUMN",     // 10
 	"!REP",
 	"LIGHT",
 	"C1",
 	"C2",
-	"!WIZ",
+	"!WIZ",     // 15
 	"L1",
 	"L2",
 	"!AUC",
 	"!GOS",
-	"!GTZ",
+	"!GTZ",     // 20
 	"RMFLG",
 	"ASSIST",
 	"AFK",
 	"AUTOSPLIT",
-	"AUTOLOOT",
+	"AUTOLOOT", // 25
 	"AUTOGOLD",
 	"ARENA",
 	"!NEWBIE",
 	"KEEPTITLE",
-	"!IC",
+	"!IC",      // 30
 	"BATTLESPAM",
 	"MAIL_NOTICE",
 	"!CTALK",
 	"AFKTELL",
-	"!MOVEMSG",
+	"!MOVEMSG", // 35
 	"MOUNTABLE",
 	"!HERO",
 	"T1",
-	"D_AUTO",
+        "AUTOSAC",
+	"D_AUTO",   // 40
 	"CLS",
 	"BLDWLK",
 	"ZLIB",
 	"!OOC",
-	"PAGEWRAP",
+	"PAGEWRAP",  // 45
 	"REPLYLOCK",
 	"BUSY",
 	"AGGRO",
 	"!BRAG",
-	"GATE",
+	"GATE",      // 50
 	"RP",
 	"FISHTALLY",
 	"NOTELEPORT",
 	"AUTOGROUP",
-        "RETIRED",
+        "RETIRED",   // 55
 	"\n"
 };
 
