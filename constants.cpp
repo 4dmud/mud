@@ -729,6 +729,7 @@ const char *preference_bits[] =
 	"FISHTALLY",
 	"NOTELEPORT",
 	"AUTOGROUP",
+        "RETIRED",
 	"\n"
 };
 
