@@ -6468,6 +6468,42 @@ ACMD ( do_statinnate )
 
 }
 
+void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
+{
+  char arg2[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH];
+  int die_num, die_size, object, count = 0;
+  DYN_DEFINE;
+
+  one_argument(argument, arg2);
+
+  if (!*arg1 || !*arg2 || !is_number(arg1) || !is_number(arg2)) {
+      ch->Send("Format: statlist weapon <num of die> <size of die> %s %s\r\n", arg1, arg2);
+      return;
+  }
+
+  die_num = atoi(arg1);
+  die_size = atoi(arg2);
+  sprintf(buf, "Weapons with %dd%d :\r\n", die_num, die_size);
+  ch->Send(buf);
+ 
+  DYN_CREATE;
+  *dynbuf = 0;
+  for ( object = 0; object <= top_of_objt; object++ ) {
+      if (GET_OBJ_TYPE(&obj_proto[object]) != ITEM_WEAPON) continue;
+      if (GET_OBJ_VAL(&obj_proto[object], 1) != die_num ||
+          GET_OBJ_VAL(&obj_proto[object], 2) != die_size) continue;
+      snprintf(buf, sizeof(buf), "%6d %s\r\n", obj_index[object].vnum, obj_proto[object].short_description);
+      DYN_RESIZE(buf);
+      count++;
+  }
+  if (!count)
+      ch->Send("No weapons with that dam dice.\r\n");
+  else
+      page_string(ch->desc, dynbuf, DYN_BUFFER);
+  
+}
+
 ACMD ( do_statlist )
 {
 	char arg1[MAX_INPUT_LENGTH];
@@ -6480,7 +6516,7 @@ ACMD ( do_statlist )
 
 	*buf = '\0';
 
-	two_arguments ( argument, arg1, arg2 );
+	argument = two_arguments ( argument, arg1, arg2 );
 
 	if ( !*arg1 )
 	{
@@ -6490,6 +6526,10 @@ ACMD ( do_statlist )
 		olc_list_flags ( ch, apply_types );
 		return;
 	}
+        else if (is_abbrev(arg1, "weapon")) {
+            do_statlist_weaponsearch(ch, arg2, argument);
+            return;
+        }
 
 	for ( aff = 0; *apply_types[aff] != '\n'; aff++ )
 		if ( is_abbrev ( arg1, apply_types[aff] ) )

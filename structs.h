@@ -2809,7 +2809,14 @@ Room* rm;
 }
 ;
 
+/* Horus - things that affect rooms */
+struct room_affects_data {
+    Room *in_room;
+    sh_int spell_type;
+    int timer;
 
+};
+  
 
 
 /*
