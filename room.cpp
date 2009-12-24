@@ -50,6 +50,8 @@ Room::Room() {
     description = NULL;
     n_description = NULL;
     t_description = NULL;
+    tmp_description = NULL;
+    tmp_n_description = NULL;
     DescID = -1;
     smell = NULL;
     listen = NULL;
