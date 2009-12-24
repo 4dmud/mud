@@ -2264,10 +2264,14 @@ void process_room_affect_queue(void)
       if (aff->duration <= 0) {
           REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
           REMOVE_FROM_LIST(aff, room_affect_list, next);
-          if (aff->room->tmp_description) 
+          if (aff->room->tmp_description) {
               free(aff->room->tmp_description);
-          if (aff->room->tmp_n_description)
+              aff->room->tmp_description = NULL;
+          }
+          if (aff->room->tmp_n_description) {
               free(aff->room->tmp_n_description);
+              aff->room->tmp_n_description = NULL;
+          }
           free(aff);
           continue;
       }
