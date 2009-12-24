@@ -1688,6 +1688,8 @@ public:
     char *name;               /* Rooms name 'You are ...'             */
     char * t_description; /* temporary buffer for writing strings */
     char *n_description;   /* night description */
+    char *tmp_n_description;   /* temp night description */
+    char *tmp_description;     /* temp day description */
     long GetDesc();
     void SetDesc(long id);
     

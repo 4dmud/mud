@@ -385,7 +385,11 @@ int mag_damage ( int level, Character *ch, Character *victim,
                          affr.bitvector = ROOM_BURNING;
                          add_room_affect_queue(&affr);              
                          sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", ch->in_room->GetDescription());
-                         ch->in_room->t_description = str_dup(buf);
+                         ch->in_room->tmp_description = str_dup(buf);
+                         if (ch->in_room->n_description) {
+                             sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", ch->in_room->n_description);
+                             ch->in_room->tmp_n_description = str_dup(buf);
+                         }
                          send_to_room(IN_ROOM(ch), "{cRThe trees catch fire!\r\n{cx");
                      }
                      break;
@@ -2260,8 +2264,10 @@ void process_room_affect_queue(void)
       if (aff->duration <= 0) {
           REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
           REMOVE_FROM_LIST(aff, room_affect_list, next);
-          if (aff->room->t_description) 
-              free(aff->room->t_description);
+          if (aff->room->tmp_description) 
+              free(aff->room->tmp_description);
+          if (aff->room->tmp_n_description)
+              free(aff->room->tmp_n_description);
           free(aff);
           continue;
       }
