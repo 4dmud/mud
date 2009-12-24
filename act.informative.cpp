@@ -1382,20 +1382,24 @@ void look_at_room ( Character *ch, int ignore_brief )
 		}
 		else
 		{
-                    if (view_room->n_description && time_info.hours < 6 && time_info.hours >21)
-                        ch->Send("%s", view_room->tmp_n_description ? view_room->tmp_n_description : view_room->n_description);
-                    else
-			ch->Send ( "%s", view_room->tmp_description ? view_room->tmp_description : view_room->GetDescription() );
+                    if (view_room->n_description && time_info.hours < 6 && time_info.hours >21) {
+                        if (view_room->tmp_n_description)
+                            ch->Send("%s", view_room->tmp_n_description);
+                        else
+                            ch->Send("%s", view_room->n_description);
+                    }
+                    else {
+                        if (view_room->tmp_description)
+                            ch->Send("%s", view_room->tmp_description);
+                        else
+			    ch->Send ( "%s", view_room->GetDescription() );
+                    }
 			//if (ch->Flying())
 			//ch->Send( "You are flying a few feet up in the air.\r\n");
 		}
 
 		ch->Send ( "%s", CCNRM ( ch, C_NRM ) );
 	}
-        if (view_room->t_description) {
-            ch->Send(view_room->t_description);
-            ch->Send("\r\n");
-        }
 
 	/* now list characters & objects */
 	ch->Send ( "%s", CCYEL ( ch, C_NRM ) );
