@@ -1794,6 +1794,7 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	else
 		room_nr->AssignTempDesc();
 
+        room_nr->t_description = NULL;
 	if ( ( room_nr->smell = fread_string ( fl, buf2 ) ) == NULL )
 		room_nr->smell  = strdup ( "Undefined" );
 	if ( ( room_nr->listen = fread_string ( fl, buf2 ) ) == NULL )
