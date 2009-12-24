@@ -380,9 +380,10 @@ int mag_damage ( int level, Character *ch, Character *victim,
                      if (SECT(IN_ROOM(ch)) == SECT_FOREST && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_BURNING)) {
                          affr.room = ch->in_room;
                          affr.type = ROOM_AFF_FIRE;
-                         affr.duration = 2;
+                         affr.duration = 5;
                          affr.bitvector = ROOM_BURNING;
                          add_room_affect_queue(&affr);              
+                         ch->in_room->t_description = str_dup("{cRThis area is on FIRE!");
                          send_to_room(IN_ROOM(ch), "{cRThe trees catch fire!\r\n{cx");
                      }
                      break;
@@ -2257,7 +2258,8 @@ void process_room_affect_queue(void)
       if (aff->duration <= 0) {
           REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
           REMOVE_FROM_LIST(aff, room_affect_list, next);
-          free(aff->room->t_description);
+          if (aff->room->t_description)
+              free(aff->room->t_description);
           free(aff);
           continue;
       }

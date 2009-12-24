@@ -485,6 +485,7 @@ const char *room_bits[] =
 	"DRAGONPORT",
 	"TIN DEPOSIT",
 	"PLASTONIUM DEPOSIT",
+        "BURNING",
 	"\n"
 };
 

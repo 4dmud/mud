@@ -1394,6 +1394,8 @@ void look_at_room ( Character *ch, int ignore_brief )
 
 		ch->Send ( "%s", CCNRM ( ch, C_NRM ) );
 	}
+        if (view_room->t_description)
+            ch->Send(view_room->t_description);
 
 	/* now list characters & objects */
 	ch->Send ( "%s", CCYEL ( ch, C_NRM ) );
