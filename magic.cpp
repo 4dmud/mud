@@ -42,6 +42,7 @@ void change_alignment ( Character *ch, Character *victim );
 void zap_char ( Character *victim );
 int find_first_step ( room_rnum src, room_rnum target );
 
+int damage(Character *ch, Character *vict, int dam, int attacktype);
 
 /* local functions */
 int mag_materials ( Character *ch, int item0, int item1, int item2,
@@ -54,6 +55,7 @@ int perform_mag_direction ( int level, room_rnum room, Character *ch, Character 
 void affect_update ( void );
 bool can_have_follower ( Character *ch, mob_vnum mob_num );
 bool can_have_follower ( Character *ch, Character *vict );
+void add_room_affect_queue(struct room_affected_type *aff);
 
 /*
  * Saving throws are now in class.c as of bpl13.
@@ -306,6 +308,7 @@ int mag_damage ( int level, Character *ch, Character *victim,
 	int evil = 1;
 	int pass = TRUE;
 	long pvict = -1;
+        struct room_affected_type affr;
 
 
 	if ( ch )
@@ -373,6 +376,16 @@ int mag_damage ( int level, Character *ch, Character *victim,
 				return 0;
 			}
 			break;
+                 case SPELL_FIREBALL:
+                     if (SECT(IN_ROOM(ch)) == SECT_FOREST && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_BURNING)) {
+                         affr.room = ch->in_room;
+                         affr.type = ROOM_AFF_FIRE;
+                         affr.duration = 2;
+                         affr.bitvector = ROOM_BURNING;
+                         add_room_affect_queue(&affr);              
+                         send_to_room(IN_ROOM(ch), "{cRThe trees catch fire!\r\n{cx");
+                     }
+                     break;
 
 	}                 /* switch(spellnum) */
 
@@ -2228,4 +2241,60 @@ void mag_creations ( int level, Character *ch, int spellnum )
 	load_otrigger ( tobj );
 }
 
+/*********************************************************************
+** HORUS - Spells that manipulate room settings **********************
+*********************************************************************/
+struct room_affected_type *room_affect_list;
+
+void process_room_affect_queue(void)
+{
+  struct room_affected_type *aff, *aff_next, *temp;
+  Character *tch;
+
+  for (aff = room_affect_list; aff; aff = aff_next) {
+      aff_next = aff->next;
+      aff->duration--;
+      if (aff->duration <= 0) {
+          REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
+          REMOVE_FROM_LIST(aff, room_affect_list, next);
+          free(aff->room->t_description);
+          free(aff);
+          continue;
+      }
+      else switch (aff->type) {
+          case ROOM_AFF_FIRE:
+              /* lets burn everyone in the room */
+              for (tch = aff->room->people; tch; tch = tch->next_in_room) 
+                  damage(tch, tch, MAX(20, GET_MAX_HIT(tch) / 20), TYPE_DESERT);
+              break;
+          default:
+              break;
+      }
+  }
+
+}
+
+void add_room_affect_queue(struct room_affected_type *aff)
+{
+  struct room_affected_type *raf;
+  
+
+  /* lets see if there is already a same affectation */
+  for (raf = room_affect_list; raf; raf = raf->next) 
+      if (raf->type == aff->type && raf->room == aff->room) {
+          raf->duration = aff->duration;
+          return;
+      }
+  
+  CREATE(raf, struct room_affected_type, 1);
+  *raf = *aff;
+  if (raf->bitvector)
+      SET_BIT_AR(ROOM_FLAGS(raf->room), raf->bitvector);
+
+  if (!room_affect_list)
+      raf->next = room_affect_list;
+  room_affect_list = raf;
+
+
+}
 

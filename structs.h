@@ -374,6 +374,7 @@ class Room;
 #define ROOM_DRAGONPORT       42
 #define ROOM_TIN_DEPOSIT      43
 #define ROOM_PLASTONIUM_DEPOSIT 44
+#define ROOM_BURNING          45 /* Room is burning */
 
 #define ZONE_OPEN        (1 <<  0)
 #define ZONE_CLOSED      (1 <<  1)
@@ -2425,11 +2426,18 @@ struct affected_type {
 };
 
 struct room_affected_type {
+    Room *room; 
     sh_int type;         /* The type of spell that caused this      */
     sh_int duration;          /* For how long its effects will last      */
+    int value;
+    bitvector_t bitvector;
 
     struct room_affected_type *next;
 };
+
+#define ROOM_AFF_FIRE               1
+#define ROOM_AFF_DARK               2
+
 
 struct sub_task_obj {
     int sub;

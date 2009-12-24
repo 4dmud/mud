@@ -273,6 +273,7 @@ void free_ban_list(void);
 void free_vehicles(void);
 int enter_player_game(Descriptor *d);
 void process_vehicle(void);
+void process_room_affect_queue(void);
 
 #if RUNNING_IDENT
 static void get_lookup_reply(void);
@@ -1359,8 +1360,10 @@ void heartbeat(int heart_pulse) {
         zone_update();
     }
 
-    if (!(heart_pulse % (15 * PASSES_PER_SEC)))
+    if (!(heart_pulse % (15 * PASSES_PER_SEC))) {
         check_idle_passwords();
+        process_room_affect_queue();
+    }
 
     if (!(heart_pulse % (PULSE_MOBILE)))
         mobile_activity();
