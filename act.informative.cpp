@@ -1382,7 +1382,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 		}
 		else
 		{
-                    if (view_room->n_description && time_info.hours < 6 && time_info.hours >21) {
+                    if (view_room->n_description && (time_info.hours < 6 || time_info.hours >21)) {
                         if (view_room->tmp_n_description)
                             ch->Send("%s", view_room->tmp_n_description);
                         else
