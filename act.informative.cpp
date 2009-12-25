@@ -1402,10 +1402,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 	}
 
 	/* now list characters & objects */
-        if (ROOM_FLAGGED(view_room, ROOM_BURNING))
-            ch->Send("%s", CCRED(ch, C_NRM));
-        else
-	    ch->Send ( "%s", CCYEL ( ch, C_NRM ) );
+	ch->Send ( "%s", CCYEL ( ch, C_NRM ) );
 	list_obj_to_char ( view_room->contents, ch, 0, FALSE );
 	ch->Send ( "%s", CBCYN ( ch, C_NRM ) );
 	list_char_to_char ( view_room->people, ch );

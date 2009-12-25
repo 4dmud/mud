@@ -2439,6 +2439,7 @@ struct room_affected_type {
 
 #define ROOM_AFF_FIRE               1
 #define ROOM_AFF_DARK               2
+#define ROOM_AFF_CINDER             3
 
 
 struct sub_task_obj {

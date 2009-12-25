@@ -42,6 +42,8 @@ void change_alignment ( Character *ch, Character *victim );
 void zap_char ( Character *victim );
 int find_first_step ( room_rnum src, room_rnum target );
 
+extern const char *opp_dirs[];
+
 int damage(Character *ch, Character *vict, int dam, int attacktype);
 
 /* local functions */
@@ -56,6 +58,7 @@ void affect_update ( void );
 bool can_have_follower ( Character *ch, mob_vnum mob_num );
 bool can_have_follower ( Character *ch, Character *vict );
 void add_room_affect_queue(struct room_affected_type *aff);
+void set_room_on_fire(Room *room);
 
 /*
  * Saving throws are now in class.c as of bpl13.
@@ -308,8 +311,6 @@ int mag_damage ( int level, Character *ch, Character *victim,
 	int evil = 1;
 	int pass = TRUE;
 	long pvict = -1;
-        struct room_affected_type affr;
-        char buf[MAX_STRING_LENGTH];
 
 
 	if ( ch )
@@ -378,20 +379,9 @@ int mag_damage ( int level, Character *ch, Character *victim,
 			}
 			break;
                  case SPELL_FIREBALL:
-                     if (IS_IMM(ch) && SECT(IN_ROOM(ch)) == SECT_FOREST && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_BURNING)) {
-                         affr.room = ch->in_room;
-                         affr.type = ROOM_AFF_FIRE;
-                         affr.duration = 5;
-                         affr.bitvector = ROOM_BURNING;
-                         add_room_affect_queue(&affr);              
-                         sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", ch->in_room->GetDescription());
-                         ch->in_room->tmp_description = str_dup(buf);
-                         if (ch->in_room->n_description) {
-                             sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", ch->in_room->n_description);
-                             ch->in_room->tmp_n_description = str_dup(buf);
-                         }
-                         send_to_room(IN_ROOM(ch), "{cRThe trees catch fire!\r\n{cx");
-                     }
+                     /* Add chance of setting on fire later */
+                     if (IS_IMM(ch)) 
+                         set_room_on_fire(ch->in_room);
                      break;
 
 	}                 /* switch(spellnum) */
@@ -2252,17 +2242,22 @@ void mag_creations ( int level, Character *ch, int spellnum )
 ** HORUS - Spells that manipulate room settings **********************
 *********************************************************************/
 struct room_affected_type *room_affect_list;
+#define OBJ_VNUM_CINDER    11
 
 void process_room_affect_queue(void)
 {
-  struct room_affected_type *aff, *aff_next, *temp;
+  struct room_affected_type *aff, *aff_next, *temp, taf;
   Character *tch;
+  int door, found;
+  struct obj_data *obj;
+  Room *new_room;
 
   for (aff = room_affect_list; aff; aff = aff_next) {
       aff_next = aff->next;
       aff->duration--;
       if (aff->duration <= 0) {
-          REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
+          if (aff->bitvector)
+              REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
           REMOVE_FROM_LIST(aff, room_affect_list, next);
           if (aff->room->tmp_description) {
               free(aff->room->tmp_description);
@@ -2280,9 +2275,45 @@ void process_room_affect_queue(void)
               /* lets burn everyone in the room */
               for (tch = aff->room->people; tch; tch = tch->next_in_room) 
                   damage(tch, tch, MAX(20, GET_MAX_HIT(tch) / 20), TYPE_DESERT);
-              break;
+              /* will ashes/cinder spread to the next room? */
+              for (door = 0; door < NUM_OF_DIRS; door++) {
+                  if (!aff->room->dir_option[door]) continue;
+                  if (!(new_room = aff->room->dir_option[door]->to_room)) continue;
+                  // if (number(1, 20) > 1) continue;
+                  /* cinder is now spreading */    
+                  obj = read_object(OBJ_VNUM_CINDER, VIRTUAL);
+                  obj_to_room(obj, new_room);
+                  send_to_room(new_room, "%s blows in from the %s.\r\n", obj->short_description, opp_dirs[door]);
+                  taf.room = new_room;
+                  taf.type = ROOM_AFF_CINDER;
+                  taf.duration = 5;
+                  taf.bitvector = 0;
+                  taf.value = 0;
+                  add_room_affect_queue(&taf);
+              } 
+          break;
+          case ROOM_AFF_CINDER:
+              /* only forests burn */
+              if (SECT(aff->room) != SECT_FOREST) {
+                  aff->duration = 0;
+                  continue;
+              }
+              /* check if there are any cinder in the room */
+              found = 0;
+              for (obj = aff->room->contents; obj; obj = obj->next_content)
+                  if (GET_OBJ_VNUM(obj) == 11) found++;
+              /* no ashes, get rid of this room affect */
+              if (!found) {
+                  aff->duration = 0;
+                  continue;
+              }
+              // if (number(1, 20) > found) continue;
+              /* Burn baby burn!! */
+              set_room_on_fire(aff->room);
+              aff->duration = 0;
+          break;
           default:
-              break;
+          break;
       }
   }
 
@@ -2312,3 +2343,24 @@ void add_room_affect_queue(struct room_affected_type *aff)
 
 }
 
+void set_room_on_fire(Room *room)
+{
+  struct room_affected_type affr;
+  char buf[MAX_STRING_LENGTH];
+
+  if (SECT(room) != SECT_FOREST || !ROOM_FLAGGED(room, ROOM_BURNING)) return; 
+
+  affr.room = room;
+  affr.type = ROOM_AFF_FIRE;
+  affr.duration = 5;
+  affr.bitvector = ROOM_BURNING;
+  add_room_affect_queue(&affr);              
+  sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", room->GetDescription());
+  room->tmp_description = str_dup(buf);
+  if (room->n_description) {
+      sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", room->n_description);
+      room->tmp_n_description = str_dup(buf);
+  }
+  send_to_room(room, "{cRThe trees catch fire!\r\n{cx");
+
+}

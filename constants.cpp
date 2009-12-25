@@ -416,6 +416,18 @@ const char *dirs[] =
 	"\n"
 };
 
+
+const char *opp_dirs[] =
+{
+	"south",
+	"west",
+	"north",
+	"east",
+	"down",
+	"up",
+	"\n"
+};
+
 const char *zone_bits[] =
 {
 	"OPEN",
