@@ -2258,7 +2258,6 @@ void process_room_affect_queue(void)
       if (aff->duration <= 0) {
           if (aff->bitvector)
               REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
-          REMOVE_FROM_LIST(aff, room_affect_list, next);
           if (aff->room->tmp_description) {
               free(aff->room->tmp_description);
               aff->room->tmp_description = NULL;
@@ -2267,6 +2266,7 @@ void process_room_affect_queue(void)
               free(aff->room->tmp_n_description);
               aff->room->tmp_n_description = NULL;
           }
+          REMOVE_FROM_LIST(aff, room_affect_list, next);
           free(aff);
           continue;
       }
@@ -2276,12 +2276,13 @@ void process_room_affect_queue(void)
               for (tch = aff->room->people; tch; tch = tch->next_in_room) 
                   damage(tch, tch, MAX(20, GET_MAX_HIT(tch) / 20), TYPE_DESERT);
               /* will ashes/cinder spread to the next room? */
-              for (door = 0; door < NUM_OF_DIRS; door++) {
+    /*          for (door = 0; door < NUM_OF_DIRS; door++) {
                   if (!aff->room->dir_option[door]) continue;
                   if (!(new_room = aff->room->dir_option[door]->to_room)) continue;
+*/
                   // if (number(1, 20) > 1) continue;
                   /* cinder is now spreading */    
-                  obj = read_object(OBJ_VNUM_CINDER, VIRTUAL);
+ /*                 obj = read_object(OBJ_VNUM_CINDER, VIRTUAL);
                   obj_to_room(obj, new_room);
                   send_to_room(new_room, "%s blows in from the %s.\r\n", obj->short_description, opp_dirs[door]);
                   taf.room = new_room;
@@ -2291,26 +2292,30 @@ void process_room_affect_queue(void)
                   taf.value = 0;
                   add_room_affect_queue(&taf);
               } 
+*/
           break;
           case ROOM_AFF_CINDER:
               /* only forests burn */
-              if (SECT(aff->room) != SECT_FOREST) {
+   /*           if (SECT(aff->room) != SECT_FOREST) {
                   aff->duration = 0;
                   continue;
               }
+*/
               /* check if there are any cinder in the room */
-              found = 0;
+ /*             found = 0;
               for (obj = aff->room->contents; obj; obj = obj->next_content)
                   if (GET_OBJ_VNUM(obj) == 11) found++;
+*/
               /* no ashes, get rid of this room affect */
-              if (!found) {
+ /*             if (!found) {
                   aff->duration = 0;
                   continue;
               }
+*/
               // if (number(1, 20) > found) continue;
               /* Burn baby burn!! */
-              set_room_on_fire(aff->room);
-              aff->duration = 0;
+ //             set_room_on_fire(aff->room);
+   //           aff->duration = 0;
           break;
           default:
           break;
@@ -2321,7 +2326,7 @@ void process_room_affect_queue(void)
 
 void add_room_affect_queue(struct room_affected_type *aff)
 {
-  struct room_affected_type *raf;
+  struct room_affected_type *raf, *taf;
   
 
   /* lets see if there is already a same affectation */
@@ -2331,14 +2336,15 @@ void add_room_affect_queue(struct room_affected_type *aff)
           return;
       }
   
-  CREATE(raf, struct room_affected_type, 1);
-  *raf = *aff;
-  if (raf->bitvector)
-      SET_BIT_AR(ROOM_FLAGS(raf->room), raf->bitvector);
+  CREATE(taf, struct room_affected_type, 1);
+  *taf = *aff;
+  taf->next = NULL;
+  if (taf->bitvector)
+      SET_BIT_AR(ROOM_FLAGS(taf->room), taf->bitvector);
 
   if (!room_affect_list)
-      raf->next = room_affect_list;
-  room_affect_list = raf;
+      taf->next = room_affect_list;
+  room_affect_list = taf;
 
 
 }
