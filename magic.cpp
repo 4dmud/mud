@@ -2348,7 +2348,8 @@ void set_room_on_fire(Room *room)
   struct room_affected_type affr;
   char buf[MAX_STRING_LENGTH];
 
-  if (SECT(room) != SECT_FOREST || !ROOM_FLAGGED(room, ROOM_BURNING)) return; 
+  if (SECT(room) != SECT_FOREST) return;
+  if (!ROOM_FLAGGED(room, ROOM_BURNING)) return; 
 
   affr.room = room;
   affr.type = ROOM_AFF_FIRE;
