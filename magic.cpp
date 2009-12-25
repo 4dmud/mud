@@ -2349,7 +2349,7 @@ void set_room_on_fire(Room *room)
   char buf[MAX_STRING_LENGTH];
 
   if (SECT(room) != SECT_FOREST) return;
-  if (!ROOM_FLAGGED(room, ROOM_BURNING)) return; 
+  if (ROOM_FLAGGED(room, ROOM_BURNING)) return; 
 
   affr.room = room;
   affr.type = ROOM_AFF_FIRE;
