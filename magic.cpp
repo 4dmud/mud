@@ -2283,6 +2283,7 @@ void process_room_affect_queue(void)
                   /* cinder is now spreading */    
                   obj = read_object(OBJ_VNUM_CINDER, VIRTUAL);
                   obj_to_room(obj, new_room);
+                  load_otrigger(obj);
                   send_to_room(new_room, "%s blows in from the %s.\r\n", obj->short_description, opp_dirs[door]);
                   taf.room = new_room;
                   taf.type = ROOM_AFF_CINDER;
