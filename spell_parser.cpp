@@ -668,7 +668,10 @@ int call_magic ( Character *caster, Character *cvict,
 		mag_summons ( level, caster, ovict, spellnum, savetype );
 
 	if ( IS_SET ( SINFO.routines, MAG_CREATIONS ) )
-		mag_creations ( level, caster, spellnum );
+		mag_creations ( level, caster, spellnum, tar_str );
+
+        if (IS_SET (SINFO.routines, MAG_ROOM_AFFECTS))
+                mag_room_affects(level, caster, spellnum);
 
 	if ( IS_SET ( SINFO.routines, MAG_MANUAL ) )
 		switch ( spellnum )
@@ -1726,6 +1729,14 @@ void mag_assign_spells ( void )
 	spello ( SPELL_CREATE_FOOD, "create food", 30 , 5 , 4,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1, "" );
+
+	spello ( SPELL_WALL_FORCE, "wall of force", 30 , 5 , 4,
+	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
+
+	spello ( SPELL_WALL_FIRE, "wall of fire", 30 , 5 , 4,
+	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
 
 	spello ( SPELL_CREATE_WATER, "create water", 30 , 5 , 4,
 	         POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, 0,

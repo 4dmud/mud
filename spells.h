@@ -102,6 +102,7 @@
 #define MAG_MANUAL	(1 << 10)
 #define MAG_ROOM	(1 << 11)
 #define MAG_STANCE      (1 << 12)
+#define MAG_ROOM_AFFECTS (1 << 13)
 
 #define BURN_DAMAGE	15
 
@@ -265,7 +266,7 @@ enum spell_list {
     SPELL_WATER_TO_WINE,
     SPELL_MIDAS_TOUCH,//127
     SPELL_POLYMORPH,
-    SPARE129, 
+    SPELL_DARKNESS, 
     SPELL_RESERVE,   // SYSTEM STUFF
     SKILL_BACKSTAB, // 131
     SKILL_BASH,
@@ -346,11 +347,11 @@ enum spell_list {
     SPELL_BURN,
     SPELL_FREEZE,
     SPELL_ACID,            // 209
-    SPELL_RESIST_FIRE,
+    SPELL_RESIST_FIRE,     //210
     SPELL_RESIST_COLD,
     SPELL_RESIST_ELEC,
-    SPARE213,
-    SPARE214,
+    SPELL_WALL_FIRE,
+    SPELL_WALL_FORCE,
     SPARE215,
     SPARE216,
     SPARE217,
@@ -814,7 +815,8 @@ void
 mag_alter_objs(int level, Character *ch, struct obj_data *obj,
                int spellnum, int type);
 
-void mag_creations(int level, Character *ch, int spellnum);
+void mag_creations(int level, Character *ch, int spellnum, char *tar_str);
+void mag_room_affects(int level, Character *ch, int spellnum);
 
 int
 call_magic(Character *caster, Character *cvict,

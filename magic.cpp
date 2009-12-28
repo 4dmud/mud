@@ -2198,44 +2198,79 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 
 }
 
-
-
-void mag_creations ( int level, Character *ch, int spellnum )
+/* Spells that affect rooms */
+void mag_room_affects(int level, Character *ch, int spellnum)
 {
-	struct obj_data *tobj;
-	obj_vnum z;
 
-	if ( ch == NULL )
-		return;
-	/* level = MAX(MIN(level, LVL_IMPL), 1); - Hm, not used. */
+}
 
-	switch ( spellnum )
-	{
-		case SPELL_CREATE_FOOD:
-			z = 10;
-			break;
-		default:
-			ch->Send ( "Spell unimplemented, it would seem.\r\n" );
-			return;
-	}
+#define OBJ_VNUM_WALL_FORCE      12
+#define OBJ_VNUM_WALL_FIRE       13
+void mag_creations ( int level, Character *ch, int spellnum, char *tar_str )
+{
+  struct obj_data *tobj;
+  obj_vnum z;
+  char to_room[MAX_STRING_LENGTH], to_char[MAX_STRING_LENGTH];
+  int val0 = 0, val1 = 0, val2 = 0, val3 = 0, value = 0;
+  bool change_val = FALSE;
 
-	if ( ! ( tobj = read_object ( z, VIRTUAL ) ) )
-	{
-		ch->Send ( "I seem to have goofed.\r\n" );
-		log ( "SYSERR: spell_creations, spell %d, obj %d: obj not found",
+  if ( ch == NULL )
+	return;
+
+  if (tar_str)
+      value = search_block(tar_str, dirs, 0);
+
+  switch ( spellnum )
+  {
+      case SPELL_CREATE_FOOD:
+	  if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+	      ch->Send ("You can't carry any more items!\r\n");
+	      return;
+	  } 
+          z = 10;
+	  break;
+      case SPELL_WALL_FORCE:
+          z = OBJ_VNUM_WALL_FORCE;
+          sprintf(to_room, "$n summons forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          sprintf(to_char, "You summon forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          change_val = TRUE;
+          val0 = level;   // duration of the wall before purge
+          val1 = value;   // direction the wall is affecting 
+          break;
+      case SPELL_WALL_FIRE:
+          z = OBJ_VNUM_WALL_FIRE;
+          sprintf(to_room, "$n summons forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          sprintf(to_char, "You summon forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          change_val = TRUE;
+          val0 = level;   // duration of the wall before purge
+          val1 = value;   // direction the wall is affecting 
+          val2 = level;   // damage dice val2 d val3
+          val3 = 8;       // setting temporarily level d 8
+          break;
+      default:
+     	  ch->Send ( "Spell unimplemented, it would seem.\r\n" );
+	  return;
+  }
+
+  if ( ! ( tobj = read_object ( z, VIRTUAL ) ) )
+  {
+      ch->Send ( "I seem to have goofed.\r\n" );
+      log ( "SYSERR: spell_creations, spell %d, obj %d: obj not found",
 		      spellnum, z );
-		return;
-	}
-	if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
-		ch->Send ("You can't carry any more items!\r\n");
-		extract_obj(tobj);
-		return;
-	}
+      return;
+  }
 
-	obj_to_char ( tobj, ch );
-	act ( "$n creates $p.", FALSE, ch, tobj, 0, TO_ROOM );
-	act ( "You create $p.", FALSE, ch, tobj, 0, TO_CHAR );
-	load_otrigger ( tobj );
+  if (change_val) {
+      GET_OBJ_VAL(tobj, 0) = val0;
+      GET_OBJ_VAL(tobj, 1) = val1;
+      GET_OBJ_VAL(tobj, 2) = val2;
+      GET_OBJ_VAL(tobj, 3) = val3;
+  }
+
+  obj_to_char ( tobj, ch );
+  act ( to_room, FALSE, ch, tobj, 0, TO_ROOM );
+  act ( to_char, FALSE, ch, tobj, 0, TO_CHAR );
+  load_otrigger ( tobj );
 }
 
 /*********************************************************************
