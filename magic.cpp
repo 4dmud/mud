@@ -2228,19 +2228,21 @@ void mag_creations ( int level, Character *ch, int spellnum, char *tar_str )
 	      return;
 	  } 
           z = 10;
+          sprintf(to_room, "$n creates $p.");
+          sprintf(to_char, "You create $p.");
 	  break;
       case SPELL_WALL_FORCE:
           z = OBJ_VNUM_WALL_FORCE;
-          sprintf(to_room, "$n summons forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", opp_dirs[value]);
-          sprintf(to_char, "You summon forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          sprintf(to_room, "$n summons forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", dirs[value]);
+          sprintf(to_char, "You summon forth a {cbblue opaque {cxwall of {cBforce{cx, blocking the %s exit!\r\n", dirs[value]);
           change_val = TRUE;
           val0 = level;   // duration of the wall before purge
           val1 = value;   // direction the wall is affecting 
           break;
       case SPELL_WALL_FIRE:
           z = OBJ_VNUM_WALL_FIRE;
-          sprintf(to_room, "$n summons forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", opp_dirs[value]);
-          sprintf(to_char, "You summon forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", opp_dirs[value]);
+          sprintf(to_room, "$n summons forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", dirs[value]);
+          sprintf(to_char, "You summon forth a {cRblazing{cx wall of {cRfire{cx, blocking the %s exit!\r\n", dirs[value]);
           change_val = TRUE;
           val0 = level;   // duration of the wall before purge
           val1 = value;   // direction the wall is affecting 

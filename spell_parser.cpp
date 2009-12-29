@@ -1731,11 +1731,11 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1, "" );
 
 	spello ( SPELL_WALL_FORCE, "wall of force", 30 , 5 , 4,
-	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
+	         POS_STANDING, TAR_IGNORE, TRUE, MAG_CREATIONS, 1,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
 
 	spello ( SPELL_WALL_FIRE, "wall of fire", 30 , 5 , 4,
-	         POS_STANDING, TAR_IGNORE, FALSE, MAG_CREATIONS, 1,
+	         POS_STANDING, TAR_IGNORE, TRUE, MAG_CREATIONS, 1,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
 
 	spello ( SPELL_CREATE_WATER, "create water", 30 , 5 , 4,
