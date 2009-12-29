@@ -70,6 +70,8 @@ gold_int group_exp_needed ( Character *ch );
 gold_int level_exp ( int chclass, int level, int tier, int remorts );
 int use_stamina ( Character *ch, int amount );
 
+struct room_affected_type *is_room_affected(Room *rm, int type);
+
 #define divide_2(a)  (a>>1)
 #define mult_2(a)     (a<<1)
 
@@ -832,7 +834,9 @@ int current_class_is_tier_num ( Character *ch );
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
 #define CAN_SEE_IN_DARK(ch) \
-(AFF_FLAGGED(ch, AFF_INFRAVISION) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || GET_RACE(ch) == RACE_DWARF)))
+(PRF_FLAGGED(ch, PRF_HOLYLIGHT) || \
+(!is_room_affected(IN_ROOM(ch), ROOM_AFF_DARK) \
+&& (AFF_FLAGGED(ch, AFF_INFRAVISION) || GET_RACE(ch) == RACE_DWARF)))
 #define CAN_HUNT(ch) (!MOB_FLAGGED(ch, MOB_NOPUSH) && !MOB_FLAGGED(ch, MOB_SENTINEL))
 
 #define IS_GOOD(ch)    	(GET_ALIGNMENT(ch) >= 350)

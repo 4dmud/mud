@@ -1321,7 +1321,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 	if ( !ch->desc )
 		return;
 
-	if ( IS_DARK ( view_room ) && !CAN_SEE_IN_DARK ( ch ) )
+	if ( (is_room_affected(view_room, ROOM_AFF_DARK) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) || (IS_DARK ( view_room ) && !CAN_SEE_IN_DARK ( ch )) )
 	{
 		ch->Send ( "It is %s...\r\n", number ( 0,1 ) ? "dark in here" : "pitch black" );
 		return;

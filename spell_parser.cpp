@@ -1738,6 +1738,10 @@ void mag_assign_spells ( void )
 	         POS_STANDING, TAR_IGNORE, TRUE, MAG_CREATIONS, 1,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
 
+	spello ( SPELL_DARKNESS, "darkness", 30 , 5 , 4,
+	         POS_STANDING, TAR_IGNORE, TRUE, MAG_ROOM_AFFECTS, 1,
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 0, "" );
+
 	spello ( SPELL_CREATE_WATER, "create water", 30 , 5 , 4,
 	         POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 28, 1, "" );
@@ -1812,7 +1816,8 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 20, 0, "" );
 
 	spello ( SPELL_FIREBALL, "fireball", 30 , 20 , 5,
-	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
+	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, 
+                 MAG_DAMAGE | MAG_ROOM_AFFECTS,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 1, "" );
 
 	spello ( SPELL_SOULSMASH, "soulsmash", 70 , 60 , 2,

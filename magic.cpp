@@ -378,11 +378,6 @@ int mag_damage ( int level, Character *ch, Character *victim,
 				return 0;
 			}
 			break;
-                 case SPELL_FIREBALL:
-                     /* Add chance of setting on fire later */
-                     if (IS_IMM(ch)) 
-                         set_room_on_fire(ch->in_room);
-                     break;
 
 	}                 /* switch(spellnum) */
 
@@ -2201,7 +2196,39 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 /* Spells that affect rooms */
 void mag_room_affects(int level, Character *ch, int spellnum)
 {
+  struct room_affected_type aff;
+  char to_room[MAX_STRING_LENGTH], to_char[MAX_STRING_LENGTH];
 
+  to_room[0] = '\0';
+  to_char[0] = '\0';
+
+  if (ch == NULL) return;
+
+  switch (spellnum) {
+      case SPELL_DARKNESS:
+          aff.type = ROOM_AFF_DARK;
+          aff.room = ch->in_room;
+          aff.duration = level / 20;
+          aff.value = 0;
+          aff.bitvector = 0;
+          aff.wear_off_msg = str_dup("The veil of darkness lifts!\r\n");
+          add_room_affect_queue(&aff);
+          sprintf(to_room, "A dark globe emanates from $n, filling the entire area!");
+          sprintf(to_char, "A dark globe emanates from your hands, filling the entire area!");
+        
+      break;
+      case SPELL_FIREBALL:
+          if (IS_IMM(ch)) 
+              set_room_on_fire(ch->in_room);
+      break;
+      default:
+      break;
+  }
+
+  if (to_room[0] != '\0') {
+      act ( to_room, FALSE, ch, NULL, 0, TO_ROOM );
+      act ( to_char, FALSE, ch, NULL, 0, TO_CHAR );
+  }
 }
 
 #define OBJ_VNUM_WALL_FORCE      12
@@ -2303,6 +2330,10 @@ void process_room_affect_queue(void)
               free(aff->room->tmp_n_description);
               aff->room->tmp_n_description = NULL;
           }
+          if (aff->wear_off_msg) {
+              send_to_room(aff->room, aff->wear_off_msg);
+              free(aff->wear_off_msg);
+          }
           REMOVE_FROM_LIST(aff, room_affect_list, next);
           free(aff);
           continue;
@@ -2384,18 +2415,30 @@ void add_room_affect_queue(struct room_affected_type *aff)
 
 }
 
+struct room_affected_type *is_room_affected(Room *rm, int type)
+{
+  struct room_affected_type *aff;
+
+  for (aff = room_affect_list; aff; aff = aff->next)
+      if (aff->room == rm && aff->type == type)
+          return aff;
+
+  return NULL;
+}
+
 void set_room_on_fire(Room *room)
 {
   struct room_affected_type affr;
   char buf[MAX_STRING_LENGTH];
 
   if (SECT(room) != SECT_FOREST) return;
-  if (ROOM_FLAGGED(room, ROOM_BURNING)) return; 
+  if (is_room_affected(room, ROOM_AFF_FIRE)) return; 
 
   affr.room = room;
   affr.type = ROOM_AFF_FIRE;
   affr.duration = 5;
   affr.bitvector = ROOM_BURNING;
+  affr.wear_off_msg = str_dup("The fire completely burns itself out.\r\n");
   add_room_affect_queue(&affr);              
   sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", room->GetDescription());
   room->tmp_description = str_dup(buf);

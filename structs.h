@@ -2433,6 +2433,7 @@ struct room_affected_type {
     sh_int duration;          /* For how long its effects will last      */
     int value;
     bitvector_t bitvector;
+    char *wear_off_msg;
 
     struct room_affected_type *next;
 };
