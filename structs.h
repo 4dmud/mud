@@ -3003,9 +3003,42 @@ struct timer_event_data {
         obj = o;
     }
     ~timer_event_data() {}
-}
-;
+};
 
 #include "character.h"
 
+struct skill_data {
+    const char *name;
+    int spell_num;
+    int max_mana;
+    int min_mana;
+    int mana_cange;
+    int minpos;
+    int violent;
+    int routines;
+    int wait;
+    int first_prereq;
+    int second_prereq;
+    int tier;
+    int level;
+    int gmi;
+    const char *wear_off_msg;
+};
+
+struct skill_tree_node {
+    struct skill_data *skill;
+    struct skill_tree_node *next;
+};
+
+struct skill_prereqs {
+    struct skill_data *skill;
+    int min_rank;
+    struct skill_prereqs *next;
+};
+
+struct skill_tree_type {
+    struct skill_data *skill;
+    struct skill_tree_node *next;
+    struct skill_prereq *prereqs;
+};
 
