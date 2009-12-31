@@ -3010,6 +3010,7 @@ struct timer_event_data {
 struct skill_data {
     const char *name;
     int spell_num;
+    sh_int type;      // skill = 0, spell = 1, system = 2
     int max_mana;
     int min_mana;
     int mana_cange;
