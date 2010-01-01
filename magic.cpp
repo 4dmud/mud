@@ -2196,7 +2196,7 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 /* Spells that affect rooms */
 void mag_room_affects(int level, Character *ch, int spellnum)
 {
-  struct room_affected_type aff;
+  struct room_affected_type *aff;
   char to_room[MAX_STRING_LENGTH], to_char[MAX_STRING_LENGTH];
 
   to_room[0] = '\0';
@@ -2206,13 +2206,14 @@ void mag_room_affects(int level, Character *ch, int spellnum)
 
   switch (spellnum) {
       case SPELL_DARKNESS:
-          aff.type = ROOM_AFF_DARK;
-          aff.room = ch->in_room;
-          aff.duration = level / 20;
-          aff.value = 0;
-          aff.bitvector = 0;
-          aff.wear_off_msg = str_dup("The veil of darkness lifts!\r\n");
-          add_room_affect_queue(&aff);
+          CREATE(aff, struct room_affected_type, 1);
+          aff->type = ROOM_AFF_DARK;
+          aff->room = ch->in_room;
+          aff->duration = level / 20;
+          aff->value = 0;
+          aff->bitvector = 0;
+          aff->wear_off_msg = str_dup("The veil of darkness lifts!\r\n");
+          add_room_affect_queue(aff);
           sprintf(to_room, "A dark globe emanates from $n, filling the entire area!");
           sprintf(to_char, "A dark globe emanates from your hands, filling the entire area!");
         
@@ -2308,9 +2309,17 @@ void mag_creations ( int level, Character *ch, int spellnum, char *tar_str )
 struct room_affected_type *room_affect_list;
 #define OBJ_VNUM_CINDER    11
 
+void free_room_affected_data(struct room_affected_type *aff)
+{
+  if (aff->wear_off_msg)
+      free(aff->wear_off_msg);
+
+  free(aff);
+}
+
 void process_room_affect_queue(void)
 {
-  struct room_affected_type *aff, *aff_next, *temp, taf;
+  struct room_affected_type *aff, *aff_next, *temp, *taf;
   Character *tch;
   int door, found;
   struct obj_data *obj;
@@ -2320,8 +2329,6 @@ void process_room_affect_queue(void)
       aff_next = aff->next;
       aff->duration--;
       if (aff->duration <= 0) {
-          if (aff->bitvector)
-              REMOVE_BIT_AR(ROOM_FLAGS(aff->room), aff->bitvector);
           if (aff->room->tmp_description) {
               free(aff->room->tmp_description);
               aff->room->tmp_description = NULL;
@@ -2330,12 +2337,11 @@ void process_room_affect_queue(void)
               free(aff->room->tmp_n_description);
               aff->room->tmp_n_description = NULL;
           }
-          if (aff->wear_off_msg) {
+          if (aff->wear_off_msg) 
               send_to_room(aff->room, aff->wear_off_msg);
-              free(aff->wear_off_msg);
-          }
+
           REMOVE_FROM_LIST(aff, room_affect_list, next);
-          free(aff);
+          free_room_affected_data(aff);
           continue;
       }
       else switch (aff->type) {
@@ -2353,12 +2359,14 @@ void process_room_affect_queue(void)
                   obj_to_room(obj, new_room);
                   load_otrigger(obj);
                   send_to_room(new_room, "%s blows in from the %s.\r\n", obj->short_description, opp_dirs[door]);
-                  taf.room = new_room;
-                  taf.type = ROOM_AFF_CINDER;
-                  taf.duration = 5;
-                  taf.bitvector = 0;
-                  taf.value = 0;
-                  add_room_affect_queue(&taf);
+                  CREATE(taf, struct room_affected_type, 1);
+                  taf->room = new_room;
+                  taf->type = ROOM_AFF_CINDER;
+                  taf->duration = 5;
+                  taf->bitvector = 0;
+                  taf->value = 0;
+                  taf->wear_off_msg = NULL;
+                  add_room_affect_queue(taf);
               } 
           break;
           case ROOM_AFF_CINDER:
@@ -2392,25 +2400,22 @@ void process_room_affect_queue(void)
 
 void add_room_affect_queue(struct room_affected_type *aff)
 {
-  struct room_affected_type *raf, *taf;
+  struct room_affected_type *raf;
   
 
   /* lets see if there is already a same affectation */
   for (raf = room_affect_list; raf; raf = raf->next) 
       if (raf->type == aff->type && raf->room == aff->room) {
           raf->duration = aff->duration;
+          free_room_affected_data(aff);
           return;
       }
   
-  CREATE(taf, struct room_affected_type, 1);
-  *taf = *aff;
-  taf->next = NULL;
-  if (taf->bitvector)
-      SET_BIT_AR(ROOM_FLAGS(taf->room), taf->bitvector);
+  aff->next = NULL;
 
   if (room_affect_list)
-      taf->next = room_affect_list;
-  room_affect_list = taf;
+      aff->next = room_affect_list;
+  room_affect_list = aff;
 
 
 }
@@ -2428,18 +2433,19 @@ struct room_affected_type *is_room_affected(Room *rm, int type)
 
 void set_room_on_fire(Room *room)
 {
-  struct room_affected_type affr;
+  struct room_affected_type *affr;
   char buf[MAX_STRING_LENGTH];
 
   if (SECT(room) != SECT_FOREST) return;
   if (is_room_affected(room, ROOM_AFF_FIRE)) return; 
 
-  affr.room = room;
-  affr.type = ROOM_AFF_FIRE;
-  affr.duration = 5;
-  affr.bitvector = ROOM_BURNING;
-  affr.wear_off_msg = str_dup("The fire completely burns itself out.\r\n");
-  add_room_affect_queue(&affr);              
+  CREATE(affr, struct room_affected_type, 1);
+  affr->room = room;
+  affr->type = ROOM_AFF_FIRE;
+  affr->duration = 5;
+  affr->bitvector = ROOM_BURNING;
+  affr->wear_off_msg = str_dup("The fire completely burns itself out.\r\n");
+  add_room_affect_queue(affr);              
   sprintf(buf, "{cR%s\r\nThis room is on FIRE!!!\r\n{cx", room->GetDescription());
   room->tmp_description = str_dup(buf);
   if (room->n_description) {
