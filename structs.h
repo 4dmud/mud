@@ -3007,14 +3007,16 @@ struct timer_event_data {
 
 #include "character.h"
 
+#define MAX_SKILL_NODE      5
 struct skill_data {
     const char *name;
     int spell_num;
     sh_int type;      // skill = 0, spell = 1, system = 2
     int max_mana;
     int min_mana;
-    int mana_cange;
+    int mana_change;
     int minpos;
+    int targets;
     int violent;
     int routines;
     int wait;
@@ -3022,13 +3024,14 @@ struct skill_data {
     int second_prereq;
     int tier;
     int level;
-    int gmi;
+    int gm;
     const char *wear_off_msg;
 };
 
-struct skill_tree_node {
-    struct skill_data *skill;
-    struct skill_tree_node *next;
+/* main skill trunk for each class */
+struct class_skill_tree_data {
+    struct skill_tree_type *skill;
+    struct class_skill_tree *next;
 };
 
 struct skill_prereqs {
@@ -3037,9 +3040,16 @@ struct skill_prereqs {
     struct skill_prereqs *next;
 };
 
+/* each skill branch */
 struct skill_tree_type {
     struct skill_data *skill;
-    struct skill_tree_node *next;
+    struct skill_tree_type *node[MAX_SKILL_NODE];
     struct skill_prereq *prereqs;
+};
+
+/* skill prototypes list */
+struct skill_proto_data {
+    struct skill_data *skill;
+    struct skill_proto_data *next;
 };
 

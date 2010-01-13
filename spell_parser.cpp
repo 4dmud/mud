@@ -233,6 +233,10 @@ int sp_dist = -1;
 
 int tier_level ( Character *ch, int chclass );
 int has_class ( Character *ch, int chclass );
+
+/* entire list of all skills/spells */
+struct skill_proto_data *skill_prototypes;
+
 /*
  * This arrangement is pretty stupid, but the number of skills is limited by
  * the playerfile.  We can arbitrarily increase the number of skills by
@@ -1546,6 +1550,11 @@ void spello ( int spl, const char *name, int max_mana, int min_mana,
               int mana_change, int minpos, int targets, int violent,
               int routines, int w, int first_prereq, int second_prereq, int tier, int level, int gm , const char *wear_off_msg)
 {
+    struct skill_data *tmp;
+    struct skill_proto_data *proto;
+
+    CREATE(tmp, struct skill_data, 1);
+
 	spell_info[spl].mana_max = max_mana;
 	spell_info[spl].mana_min = min_mana;
 	spell_info[spl].mana_change = mana_change;
@@ -1562,12 +1571,39 @@ void spello ( int spl, const char *name, int max_mana, int min_mana,
 	spell_info[spl].gm = gm;
         spell_info[spl].wear_off_msg = wear_off_msg;
         spell_info[spl].type = 1;   //1 for spells
+        tmp->spell_num = spl;
+	tmp->max_mana = max_mana;
+	tmp->min_mana = min_mana;
+	tmp->mana_change = mana_change;
+	tmp->minpos = minpos;
+	tmp->targets = targets;
+	tmp->violent = violent;
+	tmp->routines = routines;
+	tmp->name = str_dup(name);
+	tmp->wait = w;
+	tmp->first_prereq = first_prereq;
+	tmp->second_prereq = second_prereq;
+	tmp->tier = tier;
+	tmp->level = level;
+	tmp->gm = gm;
+        tmp->wear_off_msg = str_dup(wear_off_msg);
+        tmp->type = 1;   //1 for spells
+        CREATE(proto, struct skill_proto_data, 1);
+        proto->skill = tmp;
+        if (skill_prototypes) 
+            proto->next = skill_prototypes; 
+        else
+            proto->next = NULL;
+        skill_prototypes = proto;
 }
 
 void spello_system ( int spl, const char *name, int max_mana, int min_mana,
               int mana_change, int minpos, int targets, int violent,
               int routines, int w, int first_prereq, int second_prereq, int tier, int level, int gm , const char *wear_off_msg)
 {
+    struct skill_data *tmp;
+    struct skill_proto_data *proto;
+
 	spell_info[spl].mana_max = max_mana;
 	spell_info[spl].mana_min = min_mana;
 	spell_info[spl].mana_change = mana_change;
@@ -1584,6 +1620,31 @@ void spello_system ( int spl, const char *name, int max_mana, int min_mana,
 	spell_info[spl].gm = gm;
         spell_info[spl].wear_off_msg = wear_off_msg;
         spell_info[spl].type = 3;   //0 for non-castable spells
+    CREATE(tmp, skill_data, 1);
+        tmp->spell_num = spl;
+	tmp->max_mana = max_mana;
+	tmp->min_mana = min_mana;
+	tmp->mana_change = mana_change;
+	tmp->minpos = minpos;
+	tmp->targets = targets;
+	tmp->violent = violent;
+	tmp->routines = routines;
+	tmp->name = str_dup(name);
+	tmp->wait = w;
+	tmp->first_prereq = first_prereq;
+	tmp->second_prereq = second_prereq;
+	tmp->tier = tier;
+	tmp->level = level;
+	tmp->gm = gm;
+        tmp->wear_off_msg = str_dup(wear_off_msg);
+        tmp->type = 3;   
+    CREATE(proto, struct skill_proto_data, 1);
+        proto->skill = tmp;
+        if (skill_prototypes) 
+            proto->next = skill_prototypes; 
+        else
+            proto->next = NULL;
+        skill_prototypes = proto;
 }
 
 
