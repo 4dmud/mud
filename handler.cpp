@@ -771,8 +771,8 @@ int move_char_to ( Character *ch, room_rnum room )
 void char_from_chair ( Character *ch )
 {
 	struct obj_data *chair;
-	Character *tempch;
-	int i, found = 0;
+	Character *tempch, *firstch, *nextch;
+	int found = 0;
 
 	if ( !ch )
 		return;
@@ -806,18 +806,19 @@ void char_from_chair ( Character *ch )
 		return;
 	}
 
-	for ( i = 0; i < GET_OBJ_VAL ( chair, 1 ) && found == 0; i++ )
+        for (firstch = tempch; firstch; firstch = nextch)
 	{
-		if ( NEXT_SITTING ( tempch ) == ch )
-		{
-			NEXT_SITTING ( tempch ) = NEXT_SITTING ( ch );
-			found = 1;
-		}
+            nextch = NEXT_SITTING(firstch);
+            if (nextch && nextch == ch)
+	    {
+                NEXT_SITTING(firstch) = NEXT_SITTING(ch);
+                GET_OBJ_VAL(chair, 1) -= 1;
+		found = 1;
+                break;
+            }
 	}
 	if ( found == 0 )
 		log ( "SYSERR: Char flagged as sitting, but not in chair" );
-	else
-		GET_OBJ_VAL ( chair, 1 ) -= 1;
 
 	SITTING ( ch ) = NULL;
 	NEXT_SITTING ( ch ) = NULL;
