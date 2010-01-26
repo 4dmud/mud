@@ -598,6 +598,50 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					snprintf ( str, slen, "%d", time_info.month + 1 );
 				else if ( !strcasecmp ( field, "year" ) )
 					snprintf ( str, slen, "%d", time_info.year );
+				else if ( !strcasecmp ( field, "season" ) ) {
+					if (time_info.month >= 0 && time_info.month < 4) {
+						snprintf ( str, slen, "winter");
+					}
+					else if (time_info.month >= 4 && time_info.month < 8) {
+						snprintf ( str, slen, "spring");
+					}
+					else if (time_info.month >= 8 && time_info.month < 13) {
+						snprintf ( str, slen, "summer");
+					}
+					else if (time_info.month >= 13 && time_info.month < 16) {
+						snprintf ( str, slen, "autumn");
+					}
+				}
+				else if ( !strcasecmp ( field, "moon" ) ) {
+					switch (time_info.moon) {
+						case MOON_FULL_MOON:
+							snprintf ( str, slen, "full" );
+							break;
+						case MOON_WANING_GIBBOUS:
+							snprintf ( str, slen, "waning gibbous" );
+							break;
+						case MOON_LAST_QUARTER:
+							snprintf ( str, slen, "last quarter" );
+							break;
+						case MOON_WANING_CRESCENT:
+							snprintf ( str, slen, "waning crescent" );
+							break;
+						case MOON_NEW_MOON:
+							snprintf ( str, slen, "new" );
+							break;
+						case MOON_WAXING_CRESCENT:
+							snprintf ( str, slen, "waxing crescent" );
+							break;
+						case MOON_FIRST_QUARTER:
+							snprintf ( str, slen, "first quarter" );
+							break;
+						case MOON_WAXING_GIBBOUS:
+							snprintf ( str, slen, "waxing gibbous" );
+							break;
+						default:
+							snprintf ( str, slen, "unknown moon type" );
+					}
+				}
 				else
 					*str = '\0';
 				return;
