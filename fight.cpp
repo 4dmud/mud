@@ -5330,6 +5330,7 @@ void die ( Character *ch, Character *killer )
 		struct dam_from_list * t;
 		long idnum;
 		short counter=0;
+                char displayexp[50];
 		Character *temp = NULL;
 		if ( killer )
 			idnum = GET_IDNUM ( killer );
@@ -5377,19 +5378,20 @@ void die ( Character *ch, Character *killer )
 				exp = ( (GET_EXP ( ch ) * player_damage_done / MOB_DAM_TAKEN (ch) ) / ( counter>0?counter:1 ) );
                                 if (counter > 1) exp = exp * 12 / 10;
 #endif
+                                commafmt ( displayexp, sizeof ( displayexp ), exp );
 				if ( !PRF_FLAGGED ( temp, PRF_BATTLESPAM ) )
 				{
 					if ( HERE ( ch, temp ) )
 					{
 						if ( exp > 1 )
-							temp->Send ( "You receive your share of experience -- %lld points.\r\n", exp );
+							temp->Send ( "You receive your share of experience -- %s points.\r\n", displayexp );
 						else
 							temp->Send ( "You receive your share of experience -- one measly little point!\r\n" );
 					}
 					else
 					{
 						if ( exp > 1 )
-							temp->Send ( "As %s dies you receive your share of experience -- %lld points.\r\n", GET_NAME ( ch ), exp );
+							temp->Send ( "As %s dies you receive your share of experience -- %s points.\r\n", GET_NAME ( ch ), displayexp );
 						else
 							temp->Send ( "As %s dies you receive your share of experience -- one measly little point!\r\n", GET_NAME ( ch ) );
 					}
