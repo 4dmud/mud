@@ -211,8 +211,7 @@ ACMD ( do_convey )
 
 	if ( !*arg1 || !*arg2 )
 	{
-		// Removing award from convey. Prometheus
-		ch->Send ( "Usage: convey <token|gold|maxmove|tradepoints> <amount>.\r\n" );
+		ch->Send ( "Usage: convey <award|token|gold|maxmove|tradepoints> <amount>.\r\n" );
 		ch->Send ( "see HELP CONVEY for more info.\r\n"
 		           "CONVEY gold <amount>, turns gold coins into exp points at 4 to 1 ratio\r\n"
 		           "CONVEY maxmove 1, turns (num of times used x ) 10 mill into 100 maxmove\r\n" );
@@ -376,12 +375,11 @@ ACMD ( do_convey )
 		}
 
 	}
-	/* Removed this because of abuse - Prometheus
 	else if ( isname ( arg2, "award" ) )
 	{
 
 
-		if ( PLR_FLAGGED ( ch, PLR_HERO ) )
+		if ( PLR_FLAGGED ( ch, PLR_HERO ) || PLR_FLAGGED ( ch, PLR_RP_LEADER ) )
 		{
 			ch->Send ( "Sorry, can't do that.\r\n" );
 			return;
@@ -412,7 +410,7 @@ ACMD ( do_convey )
 		GET_AWARD ( ch ) -= amount;
 		convert_tokens ( ch );
 
-	} */
+	}
 	else if ( isname ( arg2, "tradepoints" ) )
 	{
 		if ( amount < 1 )
