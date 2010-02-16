@@ -211,7 +211,7 @@ ACMD ( do_convey )
 
 	if ( !*arg1 || !*arg2 )
 	{
-		ch->Send ( "Usage: convey <award|token|gold|maxmove|award|tradepoints> <amount>.\r\n" );
+		ch->Send ( "Usage: convey <award|token|gold|maxmove|tradepoints> <amount>.\r\n" );
 		ch->Send ( "see HELP CONVEY for more info.\r\n"
 		           "CONVEY gold <amount>, turns gold coins into exp points at 4 to 1 ratio\r\n"
 		           "CONVEY maxmove 1, turns (num of times used x ) 10 mill into 100 maxmove\r\n" );
