@@ -1322,7 +1322,7 @@ class Room;
 #define LARGE_BUFSIZE       (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH - MAX_MXP_STATUS)
 
 #define HISTORY_SIZE          5    /* Keep last 5 commands. */
-#define MAX_STRING_LENGTH     (2 * 8192)
+#define MAX_STRING_LENGTH     (3 * 8192)  // Increasing this size from 2 to 3 * 8192 - Prom
 #define MAX_INPUT_LENGTH 512  /* Max length per *line* of input */
 #define MAX_RAW_INPUT_LENGTH  1024 /* Max size of *raw* input */
 #define MAX_MESSAGES          400
