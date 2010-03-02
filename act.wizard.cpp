@@ -7321,12 +7321,12 @@ buflen: the size of the buf
 #define CYN "\x1B[0;36m"
 int hilite ( const char *regex, const char *str, char *buf, size_t buflen )
 {
-	char *p, *s = ( char * ) str;
+	const char *p, *s = /*( char * )*/ str;
 	size_t tmp = 0;
 	size_t u = strlen ( UND );
 	bool found = FALSE;
 	int cnt = strlen ( regex );
-	if ( ( p = strstr ( str, regex ) ) == NULL )
+	if ( ( p = strstr ( str, regex ) ) == 0 )
 		return 0;
 
 	while ( *s  && tmp < buflen )
