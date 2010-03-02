@@ -2316,6 +2316,13 @@ int enter_player_game ( Descriptor *d )
 	/*end new*/
 	ch->check_regen_rates();
 	read_saved_vars ( ch );
+
+	//Return an imm to their original level. This prevents accidental lockouts because of command triggers.
+	if (GET_ORIG_LEV (ch)) {
+		GET_LEVEL (ch) = GET_ORIG_LEV (ch);
+		GET_ORIG_LEV (ch) = 0;
+	}
+
 	return load_result;
 }
 
