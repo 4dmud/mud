@@ -1318,7 +1318,7 @@ ACMD(do_qcomm) {
     char buf[MAX_INPUT_LENGTH];
     char buf1[MAX_INPUT_LENGTH];
 
-    if (!PRF_FLAGGED(ch, PRF_QUEST)) {
+    if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_QUEST)) {
         *ch << "You aren't even part of the quest!\r\n";
         return;
     }
