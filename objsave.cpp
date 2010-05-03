@@ -1890,7 +1890,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       if (tmp_idents) 
           temp->idents = NULL;
       tmp_wep_bal = GET_OBJ_VAL(temp, 5); 
-      free_obj(temp, TRUE);
+      extract_obj(temp);
       temp = NULL;
       temp = read_object(onr, VIRTUAL);
       if (tmp_idents)
