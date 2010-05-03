@@ -1688,9 +1688,11 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   char tag[READ_SIZE] = "";
   int num;
   int t[4];
-  int orig_timer = 0;
+  int orig_timer = -1;
+  int orig_expir = -1;
   int dup_strings = FALSE;
   struct ident_list *tmp_idents = NULL;
+  int tmp_wep_bal;
 
   if (feof(fl))
     return NULL;
@@ -1768,6 +1770,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         read_extra_descs(fl, temp);
       else if (!strcmp(tag, "Expir"))
         GET_OBJ_EXPIRE(temp) = atol(line);
+        orig_expir = GET_OBJ_EXPIRE(temp);
       break;
     case 'f':
       if (!strcmp(tag, "Feel"))
@@ -1886,13 +1889,18 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
       if (tmp_idents) 
           temp->idents = NULL;
+      tmp_wep_bal = GET_OBJ_VAL(temp, 5); 
       free_obj(temp, TRUE);
       temp = NULL;
       temp = read_object(onr, VIRTUAL);
       if (tmp_idents)
           temp->idents = tmp_idents;
-      if (orig_timer)
+      if (orig_timer != -1)
           GET_OBJ_TIMER(temp) = orig_timer;
+      if (orig_expir != -1)
+          GET_OBJ_EXPIRE(temp) = orig_expir;
+      if (GET_OBJ_TYPE(temp) == ITEM_WEAPON)
+          GET_OBJ_VAL(temp, 5) = tmp_wep_bal;
   } 
 
   return temp;
