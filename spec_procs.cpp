@@ -1472,7 +1472,7 @@ SPECIAL(blowup_doll)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
   argument = one_argument(argument, arg1);
-  one_argument(argument, arg2);
+  argument = one_argument(argument, arg2);
 
   if (!isname_full(arg1, obj->name)) return 0;
 
@@ -1489,7 +1489,7 @@ SPECIAL(blowup_doll)
   else if (CMD_IS("poke")) {
       if (!str_cmp(arg2, "cucumber")) {
           act("'OMFG! OMFG!' screeches $p as she humps the cucumber vigorously, spraying juices all over your face. 'That's it! Faster, man, FASTER!!!!'", FALSE, ch, obj, NULL, TO_CHAR);
-          act("'OMFG! OMFG!' screeches $p as she humps the cucumber vigorously, spraying juices all over $n's face. 'That's it! Faster, man, FASTER!!!!'", FALSE, ch, obj, NULL, TO_CHAR);
+          act("'OMFG! OMFG!' screeches $p as she humps the cucumber vigorously, spraying juices all over $n's face. 'That's it! Faster, man, FASTER!!!!'", FALSE, ch, obj, NULL, TO_ROOM);
       }
       else {
           act("$p eyes you down there and gasps, 'Can't you use anything bigger than that?'", FALSE, ch, obj, NULL, TO_CHAR);
@@ -1497,7 +1497,34 @@ SPECIAL(blowup_doll)
       }
       return 1;
   }
-
+  else if (CMD_IS("sayto")) {
+      if (!str_cmp(arg2, "love")) {
+          act("$p smiles and says, 'Love is the iressistible desire to be iressistibly desired.'", FALSE, ch, obj, NULL, TO_ROOM);
+          act("$p smiles and says, 'Love is the iressistible desire to be iressistibly desired.'", FALSE, ch, obj, NULL, TO_CHAR);
+      }
+      else if (!str_cmp(arg2, "sex")) {
+          act("$p shyly says, 'I'm too shy to express my sexual needs except over the phone and to people I don't know.'", FALSE, ch, obj, NULL, TO_ROOM);
+          act("$p shyly says, 'I'm too shy to express my sexual needs except over the phone and to people I don't know.'", FALSE, ch, obj, NULL, TO_CHAR);
+      }
+      else if (!str_cmp(arg2, "score")) {
+          act("$p exclaims, 'Well, you aren't going to score with me!'", FALSE, ch, obj, NULL, TO_ROOM);
+          act("$p exclaims, 'Well, you aren't going to score with me!'", FALSE, ch, obj, NULL, TO_CHAR);
+      }
+      return 1;
+  }
+  else if (CMD_IS("finger")) {
+      act("$n sticks $m's fingers into $p only to find messy, gooey sperm dripping out of it.", FALSE, ch, obj, NULL, TO_ROOM);
+      act("You stick your fingers into $p only to find messy, gooey sperm dripping out of it.", FALSE, ch, obj, NULL, TO_CHAR);
+      return 1;
+  }
+  else if (CMD_IS("fist")) {
+      act("$p shrieks in pure ecstacy as she gyrates her hips around your fist!", FALSE, ch, obj, NULL, TO_CHAR);
+      act("$p whisks $n away to heaven!", FALSE, ch, obj, NULL, TO_ROOM);
+      char_from_room(ch);
+      char_to_room(ch, real_room(55500));
+      LOOK(ch);
+      return 1;
+  }
   return 0;
 }
 
