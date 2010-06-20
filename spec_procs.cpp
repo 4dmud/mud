@@ -1465,6 +1465,43 @@ SPECIAL ( guard_black )
 	return FALSE;
 }
 
+
+SPECIAL(blowup_doll)
+{
+  struct obj_data *obj = (struct obj_data *)me;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+
+  argument = one_argument(argument, arg1);
+  one_argument(argument, arg2);
+
+  if (!isname_full(arg1, obj->name)) return 0;
+
+  if (CMD_IS("tickle")) {
+      if (arg2[0] == '\0' || str_cmp(arg2, "fancy")) {
+          act("$p winks at you and squeals in delight, 'Next time, why dont you tickle my fancy?'", FALSE, ch, obj, NULL, TO_CHAR);
+          act("$p winks at $n and squeals in delight, 'Next time, why dont you tickle my fancy?'", FALSE, ch, obj, NULL, TO_ROOM);
+          return 1;
+      }
+      act("$p hops onto your lap and squeals in absolute delight, 'Oh YES! YES! YES! YES! That's the SPOT!", FALSE, ch, obj, NULL, TO_CHAR);
+      act("$p hops onto $n's lap and squeals in absolute delight, 'Oh YES! YES! YES! YES! That's the SPOT!", FALSE, ch, obj, NULL, TO_ROOM);
+      return 1;
+  }
+  else if (CMD_IS("poke")) {
+      if (!str_cmp(arg2, "cucumber")) {
+          act("'OMFG! OMFG!' screeches $p as she humps the cucumber vigorously, spraying juices all over your face. 'That's it! Faster, man, FASTER!!!!'", FALSE, ch, obj, NULL, TO_CHAR);
+          act("'OMFG! OMFG!' screeches $p as she humps the cucumber vigorously, spraying juices all over $n's face. 'That's it! Faster, man, FASTER!!!!'", FALSE, ch, obj, NULL, TO_CHAR);
+      }
+      else {
+          act("$p eyes you down there and gasps, 'Can't you use anything bigger than that?'", FALSE, ch, obj, NULL, TO_CHAR);
+          act("$p eyes $n down there and gasps, 'Can't you use anything bigger than that?'", FALSE, ch, obj, NULL, TO_ROOM);
+      }
+      return 1;
+  }
+
+  return 0;
+}
+
+
 SPECIAL ( bottle )
 {
 	struct obj_data *obj = ( struct obj_data * ) me;
