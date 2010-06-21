@@ -21,7 +21,6 @@ extern int mini_mud;
 
 SPECIAL(antidt);
 SPECIAL(bank);
-SPECIAL(blowup_doll);
 SPECIAL(bottle);
 SPECIAL(cityguard);
 SPECIAL(cleric);
@@ -346,7 +345,6 @@ void assign_objects(void)
     ASSIGNOBJ(7563, bottle);
     ASSIGNOBJ(11244, bottle);
     ASSIGNOBJ(11245, bottle);
-    ASSIGNOBJ(55502, blowup_doll);
 
     ASSIGNOBJ(1317, bank);	/* sicilian */
     ASSIGNOBJ(3090, bank);	/* atm */
