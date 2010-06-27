@@ -5672,8 +5672,9 @@ int perform_set ( Character *ch, Character *vict, int mode,
     case 83:
 		parse_train_group(ch, vict, val_arg);
 		break;
-	case 84:
+    case 84:
 		SET_OR_REMOVE_AR(AFF_FLAGS(vict), AFF_OUTCAST);
+		break;
     default:
         ch->Send( "Can't set that!\r\n");
         return (0);
