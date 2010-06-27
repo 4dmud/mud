@@ -4931,99 +4931,82 @@ struct set_struct
 }
 set_fields[] =
 {
-	{
-		"brief", LVL_GOD, PC, BINARY}, /* 0 */
-	{
-		"invstart", LVL_GOD, PC, BINARY},   /* 1 */
-	{
-		"title", LVL_GOD, PC, MISC}, {
-		"nosummon", LVL_GRGOD, PC, BINARY}, {
-		"maxhit", LVL_GRGOD, BOTH, NUMBER}, {
-		"maxmana", LVL_GRGOD, BOTH, NUMBER},     /* 5 */
-	{
-		"maxmove", LVL_GRGOD, BOTH, NUMBER}, {
-		"hit", LVL_GRGOD, BOTH, NUMBER}, {
-		"mana", LVL_GRGOD, BOTH, NUMBER}, {
-		"move", LVL_GRGOD, BOTH, NUMBER}, {
-		"align", LVL_GOD, BOTH, NUMBER},    /* 10 */
-	{
-		"str", LVL_GRGOD, BOTH, NUMBER}, {
-		"stradd", LVL_GRGOD, BOTH, NUMBER}, {
-		"int", LVL_GRGOD, BOTH, NUMBER}, {
-		"wis", LVL_GRGOD, BOTH, NUMBER}, {
-		"dex", LVL_GRGOD, BOTH, NUMBER},    /* 15 */
-	{
-		"con", LVL_GRGOD, BOTH, NUMBER}, {
-		"cha", LVL_GRGOD, BOTH, NUMBER}, {
-		"ac", LVL_GRGOD, BOTH, NUMBER}, {
-		"gold", LVL_GOD, BOTH, NUMBER}, {
-		"bank", LVL_GOD, PC, NUMBER},  /* 20 */
-	{
-		"exp", LVL_GRGOD, BOTH, NUMBER}, {
-		"hitroll", LVL_GRGOD, BOTH, NUMBER}, {
-		"damroll", LVL_GRGOD, BOTH, NUMBER}, {
-		"invis", LVL_IMPL, PC, NUMBER}, {
-		"nohassle", LVL_GRGOD, PC, BINARY}, /* 25 */
-	{
-		"frozen", LVL_FREEZE, PC, BINARY}, {
-		"practices", LVL_GRGOD, PC, NUMBER}, {
-		"lessons", LVL_GRGOD, PC, NUMBER}, {
-		"drunk", LVL_GRGOD, BOTH, MISC}, {
-		"hunger", LVL_GRGOD, BOTH, MISC},   /* 30 */
-	{
-		"thirst", LVL_GRGOD, BOTH, MISC}, {
-		"killer", LVL_GOD, PC, BINARY}, {
-		"thief", LVL_GOD, PC, BINARY}, {
-		"level", LVL_IMPL, BOTH, NUMBER}, {
-		"room", LVL_IMPL, BOTH, NUMBER},    /* 35 */
-	{
-		"roomflag", LVL_GRGOD, PC, BINARY}, {
-		"siteok", LVL_GRGOD, PC, BINARY}, {
-		"deleted", LVL_IMPL, PC, BINARY}, {
-		"class", LVL_GRGOD, BOTH, MISC}, {
-		"nowizlist", LVL_GOD, PC, BINARY},  /* 40 */
-	{
-		"quest", LVL_GOD, PC, BINARY}, {
-		"loadroom", LVL_GRGOD, PC, MISC}, {
-		"colour", LVL_GOD, PC, BINARY}, {
-		"idnum", LVL_IMPL, PC, NUMBER}, {
-		"passwd", LVL_IMPL, PC, MISC}, /* 45 */
-	{
-		"nodelete", LVL_GOD, PC, BINARY}, {
-		"sex", LVL_GRGOD, BOTH, MISC}, {
-		"age", LVL_GRGOD, BOTH, NUMBER}, {
-		"remort", LVL_IMPL, PC, MISC}, {
-		"rtwo", LVL_IMPL, PC, MISC},   /* 50 */
-	{
-		"rthree", LVL_IMPL, PC, MISC}, {
-		"race", LVL_GRGOD, BOTH, MISC}, {
-		"pregnant", LVL_IMPL, PC, NUMBER}, {
-		"breakup", LVL_SEN, PC, MISC}, {
-		"rp", LVL_SEN, PC, BINARY},    /* 55 */
-	{
-		"pk", LVL_SEN, PC, BINARY}, {
-		"brasst", LVL_SEN, PC, NUMBER}, {
-		"bronzet", LVL_SEN, PC, NUMBER}, {
-		"silvert", LVL_SEN, PC, NUMBER}, {
-		"goldt", LVL_SEN, PC, NUMBER}, /* 60 */
-	{
-		"clan", LVL_SEN, PC, NUMBER}, {
-		"rank", LVL_SEN, PC, NUMBER}, {
-		"height", LVL_GOD, BOTH, NUMBER}, {
-		"weight", LVL_GOD, BOTH, NUMBER}, {
-		"helper", LVL_SEN, PC, BINARY},     /* 65 */
-	{
-		"spec01", LVL_SEN, PC, BINARY}, {
-		"spec02", LVL_SEN, PC, BINARY}, {
-		"spec03", LVL_SEN, PC, BINARY}, {
-		"spec04", LVL_SEN, PC, BINARY},     /* 69 */
-
+	{"brief", LVL_GOD, PC, BINARY}, /* 0 */
+	{"invstart", LVL_GOD, PC, BINARY},   /* 1 */
+	{"title", LVL_GOD, PC, MISC}, 
+	{"nosummon", LVL_GRGOD, PC, BINARY}, 
+	{"maxhit", LVL_GRGOD, BOTH, NUMBER}, 
+	{"maxmana", LVL_GRGOD, BOTH, NUMBER},     /* 5 */
+	{"maxmove", LVL_GRGOD, BOTH, NUMBER}, 
+	{"hit", LVL_GRGOD, BOTH, NUMBER}, 
+	{"mana", LVL_GRGOD, BOTH, NUMBER}, 
+	{"move", LVL_GRGOD, BOTH, NUMBER}, 
+	{"align", LVL_GOD, BOTH, NUMBER},    /* 10 */
+	{"str", LVL_GRGOD, BOTH, NUMBER}, 
+	{"stradd", LVL_GRGOD, BOTH, NUMBER}, 
+	{"int", LVL_GRGOD, BOTH, NUMBER}, 
+	{"wis", LVL_GRGOD, BOTH, NUMBER}, 
+	{"dex", LVL_GRGOD, BOTH, NUMBER},    /* 15 */
+	{"con", LVL_GRGOD, BOTH, NUMBER}, 
+	{"cha", LVL_GRGOD, BOTH, NUMBER}, 
+	{"ac", LVL_GRGOD, BOTH, NUMBER}, 
+	{"gold", LVL_GOD, BOTH, NUMBER}, 
+	{"bank", LVL_GOD, PC, NUMBER},  /* 20 */
+	{"exp", LVL_GRGOD, BOTH, NUMBER}, 
+	{"hitroll", LVL_GRGOD, BOTH, NUMBER}, 
+	{"damroll", LVL_GRGOD, BOTH, NUMBER}, 
+	{"invis", LVL_IMPL, PC, NUMBER}, \
+	{"nohassle", LVL_GRGOD, PC, BINARY}, /* 25 */
+	{"frozen", LVL_FREEZE, PC, BINARY}, 
+	{"practices", LVL_GRGOD, PC, NUMBER}, 
+	{"lessons", LVL_GRGOD, PC, NUMBER}, 
+	{"drunk", LVL_GRGOD, BOTH, MISC}, 
+	{"hunger", LVL_GRGOD, BOTH, MISC},   /* 30 */
+	{"thirst", LVL_GRGOD, BOTH, MISC}, 
+	{"killer", LVL_GOD, PC, BINARY}, 
+	{"thief", LVL_GOD, PC, BINARY}, 
+	{"level", LVL_IMPL, BOTH, NUMBER}, 
+	{"room", LVL_IMPL, BOTH, NUMBER},    /* 35 */
+	{"roomflag", LVL_GRGOD, PC, BINARY}, 
+	{"siteok", LVL_GRGOD, PC, BINARY}, 
+	{"deleted", LVL_IMPL, PC, BINARY}, 
+	{"class", LVL_GRGOD, BOTH, MISC}, 
+	{"nowizlist", LVL_GOD, PC, BINARY},  /* 40 */
+	{"quest", LVL_GOD, PC, BINARY}, 
+	{"loadroom", LVL_GRGOD, PC, MISC}, 
+	{"colour", LVL_GOD, PC, BINARY}, 
+	{"idnum", LVL_IMPL, PC, NUMBER}, 
+	{"passwd", LVL_IMPL, PC, MISC}, /* 45 */
+	{"nodelete", LVL_GOD, PC, BINARY}, 
+	{"sex", LVL_GRGOD, BOTH, MISC}, 
+	{"age", LVL_GRGOD, BOTH, NUMBER}, 
+	{"remort", LVL_IMPL, PC, MISC}, 
+	{"rtwo", LVL_IMPL, PC, MISC},   /* 50 */
+	{"rthree", LVL_IMPL, PC, MISC}, 
+	{"race", LVL_GRGOD, BOTH, MISC}, 
+	{"pregnant", LVL_IMPL, PC, NUMBER}, 
+	{"breakup", LVL_SEN, PC, MISC}, 
+	{"rp", LVL_SEN, PC, BINARY},    /* 55 */
+	{"pk", LVL_SEN, PC, BINARY}, 
+	{"brasst", LVL_SEN, PC, NUMBER}, 
+	{"bronzet", LVL_SEN, PC, NUMBER}, 
+	{"silvert", LVL_SEN, PC, NUMBER}, 
+	{"goldt", LVL_SEN, PC, NUMBER}, /* 60 */
+	{"clan", LVL_SEN, PC, NUMBER}, 
+	{"rank", LVL_SEN, PC, NUMBER}, 
+	{"height", LVL_GOD, BOTH, NUMBER}, 
+	{"weight", LVL_GOD, BOTH, NUMBER}, 
+	{"helper", LVL_SEN, PC, BINARY},     /* 65 */
+	{"spec01", LVL_SEN, PC, BINARY}, 
+	{"spec02", LVL_SEN, PC, BINARY}, 
+	{"spec03", LVL_SEN, PC, BINARY}, 
+	{"spec04", LVL_SEN, PC, BINARY},     /* 69 */
 	{"speed", LVL_SEN, BOTH, NUMBER},
 	{"coventry", LVL_SEN, PC, BINARY},
 	{"pretitle", LVL_SEN, PC, MISC},
 	{"rpgroup", LVL_SEN, PC, MISC},
-	{ "olc",          LVL_IMPL, PC,  MISC },
-	{ "hero",         LVL_SEN,  PC,  BINARY }, /* 75 */
+	{ "olc", LVL_IMPL, PC,  MISC },
+	{ "hero", LVL_SEN,  PC,  BINARY }, /* 75 */
 	{"immtitle", LVL_IMPL, PC, MISC},
 	{"mastery", LVL_IMPL, PC, MISC}, /* 77 */
 	{"rpl", LVL_GOD, PC, BINARY},
@@ -5032,6 +5015,7 @@ set_fields[] =
 	{"wizmort", LVL_SEN, PC, BINARY},
 	{"body", LVL_SEN, PC, MISC},
 	{"trains", LVL_SEN, NPC, MISC},
+	{"outcast", LVL_SEN, PC, BINARY}, /* 84 */
 	{   "\n", 0, BOTH, MISC}
 };
 
@@ -5686,8 +5670,10 @@ int perform_set ( Character *ch, Character *vict, int mode,
         }
         break;
     case 83:
-	parse_train_group(ch, vict, val_arg);
-break;
+		parse_train_group(ch, vict, val_arg);
+		break;
+	case 84:
+		SET_OR_REMOVE_AR(AFF_FLAGS(vict), AFF_OUTCAST);
     default:
         ch->Send( "Can't set that!\r\n");
         return (0);
