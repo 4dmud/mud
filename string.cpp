@@ -34,25 +34,26 @@ ACMD(do_string)
     return;
   }
 
+/* whoever is doing the freeing, STOP! this frees the prototypes */
   if (!strcmp("name", buf1))
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    free(obj->name);
+   // free(obj->name);
     obj->name = strdup(buf2);
   }
   else if (!str_cmp("short", buf1))
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    free(obj->short_description);
+  //  free(obj->short_description);
     obj->short_description = strdup(buf2);
   }
   else if (!str_cmp("long", buf1))
   {
     if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
       SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    free(obj->description);
+  //  free(obj->description);
     obj->description = strdup(buf2);
   }
   else if (!str_cmp("weight", buf1))
