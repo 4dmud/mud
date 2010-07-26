@@ -359,8 +359,8 @@ ACMD ( do_slay )
 		else if ( !str_cmp ( arg2, "phoenix" ) )
 		{
 			act ("You summon a fiery phoenix to crush $N to ashes!", FALSE, ch, NULL, vict, TO_CHAR);
-			act ("$N sees a large fiery phoenix before transforming into ashes.", FALSE, ch, NULL, vict, TO_VICT);
-			act ("$n sees a large fiery phoenix crashes into $N making them ash.", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act ("You see a large fiery Phoenix before transforming into ashes.", FALSE, ch, NULL, vict, TO_VICT);
+			act ("A large fiery Phoenix crashs into $N making them ash.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		else
 		{
