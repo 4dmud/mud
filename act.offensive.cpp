@@ -352,7 +352,7 @@ ACMD ( do_slay )
 		}
 	        else if ( !str_cmp( arg2, "bitch" ) )
 		{
-			act ("You bitches $N to death.", FALSE, ch, NULL, vict, TO_CHAR);
+			act ("You bitch $N to death.", FALSE, ch, NULL, vict, TO_CHAR);
 			act ("$n loudly bitches you to death!", FALSE, ch, NULL, vict, TO_VICT);
 			act ("$n shakes the room with a loud bitching voice causing $N to die!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		} 
