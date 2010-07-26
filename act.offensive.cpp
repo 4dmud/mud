@@ -350,6 +350,18 @@ ACMD ( do_slay )
 			act ( "$n holds you down and gives you a bikini wax to die for.", FALSE, ch, NULL, vict, TO_VICT );
 			act ( "$n holds $N down and gives $M a bikini wax to die for.", FALSE, ch, NULL, vict, TO_NOTVICT );
 		}
+	        else if ( !str_cmp( arg2, "bitch" ) )
+		{
+			act ("You bitches $N to death.", FALSE, ch, NULL, vict, TO_CHAR);
+			act ("$n loudly bitches you to death!", FALSE, ch, NULL, vict, TO_VICT);
+			act ("$n shakes the room with a loud bitching voice causing $N to die!", FALSE, ch, NULL, vict, TO_NOTVICT);
+		} 
+		else if ( !str_cmp ( arg2, "phoenix" ) )
+		{
+			act ("You summon a fiery phoenix to crush $N to ashes!", FALSE, ch, NULL, vict, TO_CHAR);
+			act ("$n sees a large fiery phoenix before transforming into ashes.", FALSE, ch, NULL, vict, TO_VICT);
+			act ("$n sees a large fiery phoenix crashes into $N making them ash.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		}
 		else
 		{
 			act ( "You chop $M to pieces!  Ah!  The blood!", FALSE, ch, 0, vict, TO_CHAR );
