@@ -268,7 +268,11 @@ ACMD ( do_slay )
 	char arg2[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH];
 
+ch->Send("Until this command is used properly, it shall remain banned!\r\n");
+return;
+
 	two_arguments ( argument, arg, arg2 );
+        
 
 	if ( !*arg )
 	{
