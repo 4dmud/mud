@@ -911,8 +911,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					break;
 				case 'c':
+				        if ( !strcasecmp ( field, "carriedweight" ))
+					  snprintf ( str, slen, "%u", IS_CARRYING_W(c));
 
-					if ( !strcasecmp ( field, "class" ) )
+					else if ( !strcasecmp ( field, "carriedamount" ))
+					  snprintf ( str, slen, "%u", IS_CARRYING_N(c));
+					 
+				    
+					else if ( !strcasecmp ( field, "class" ) )
 						snprintf ( str, slen, "%s", simple_class_name ( c ) );
 
 					else if ( !strcasecmp ( field, "canbeseen" ) )
@@ -1363,8 +1369,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp ( field, "longdesc" ) )
 						snprintf ( str, slen, "%s", GET_LDESC ( c ) );
 					break;
-				case 'm':
-					if ( !strcasecmp ( field, "maxhitp" ) )
+			        case 'm':
+					if ( !strcasecmp ( field, "maxcarriedweight" ))
+					  snprintf ( str, slen, "%u", CAN_CARRY_W(c));
+				
+					else if ( !strcasecmp ( field, "maxcarriedamount" ))
+					  snprintf ( str, slen, "%u", CAN_CARRY_N(c));
+
+					else if ( !strcasecmp ( field, "maxhitp" ) )
 						snprintf ( str, slen, "%d", GET_MAX_HIT ( c ) );
 					else if ( !strcasecmp ( field, "mid" ) )
 						snprintf ( str, slen, "%ld", GET_ID ( MASTER ( c ) ) );
