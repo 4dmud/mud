@@ -700,7 +700,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     check_timer(obj);
     if (GET_OBJ_EXPIRE(obj) > time(0)) {
         time_t diff = (GET_OBJ_EXPIRE(obj) - time(0));
-        ch->Send( "{cyIt has {cC%ld{cy Min and {cY%ld{cy seconds left till it disintergrates{c0\r\n",   diff/60, diff%60);
+        ch->Send( "{cyIt has {cC%ld{cy Min and {cY%ld{cy seconds left till it disintegrates{c0\r\n",   diff/60, diff%60);
     }
 
     found = FALSE;
