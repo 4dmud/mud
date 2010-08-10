@@ -1104,7 +1104,9 @@ int remorts = MIN(REMORTS(ch), 50);
 			break;
 
 		case CLASS_THIEF:
-			add_hp += number ( ( 11 * TIERS ), ( 15 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
+			// Tweaking this formula from 11 * TIERS to 13 * tiers.
+			// This is a WIP -> Prometheus
+			add_hp += number ( ( 13 * TIERS ), ( 15 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
 			add_mana += num_casting ( ch );
 			add_move += number ( 2 * TIERS, 4 * TIERS );
 			break;
@@ -1352,7 +1354,7 @@ void init_spell_levels ( void )
 
 	assign_class ( SPELL_ANIMATE_DEAD,      PRI );
 	assign_class ( SPELL_MAGIC_MISSILE,    ALL_CASTERS );
-	assign_class ( SKILL_MANIFEST,         ALL_CASTERS );
+	assign_class ( SKILL_MANIFEST,         ALL_CASTERS);
 	assign_class ( SPELL_DETECT_INVIS,     MAG | ESP | RAN );
 	assign_class ( SPELL_DETECT_MAGIC,     ALL_CASTERS );
 	assign_class ( SPELL_MIND_WATER,       ALL_CASTERS );
