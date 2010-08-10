@@ -812,7 +812,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         ch->Send("gives a multiplier of %f\r\n", staff_multi(ch, obj));
         break;
     case ITEM_LIGHTSABRE_HILT:
-        ch->Send( "{cyPossable Saber blades: {cC%d{c0\r\n"
+        ch->Send( "{cyPossible Saber blades: {cC%d{c0\r\n"
                   "{cyDamage dice: {cC%d{cyD{cC%d{c0\r\n"
                   "{cySaber Color: {cc%s{c0\r\n",
                   (int) GET_OBJ_VAL(obj, 0),(int) GET_OBJ_VAL(obj, 1), (int) GET_OBJ_VAL(obj, 2),
