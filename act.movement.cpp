@@ -2725,7 +2725,8 @@ ASKILL ( skill_snare )
 	}
 	else
 	{
-		act ( "You failed to ensnare $M.  Uh oh!(3)",
+		// Removing the Uh oh! (3) <- removing the (3)	
+		act ( "You failed to ensnare $M.  Uh oh!",
 		      FALSE, ch, NULL, vict, TO_CHAR );
 		act ( "$n tried to ensnare you!  Get $m!",
 		      FALSE, ch, NULL, vict, TO_VICT );
