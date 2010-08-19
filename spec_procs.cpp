@@ -1086,7 +1086,7 @@ SPECIAL ( bank )
 			return ( 1 );
 		}
 		if ( ch->Gold ( 0, GOLD_BANK ) + amount > 100000000 )
-			ch->Send ( "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawl. Thank you.\r\n" );
+			ch->Send ( "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
 		ch->Gold ( -amount, GOLD_HAND );
 		ch->Gold ( amount, GOLD_BANK );
 		ch->Send ( "You deposit %lld coins.\r\n", amount );
