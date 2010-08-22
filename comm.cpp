@@ -3924,7 +3924,7 @@ void brag(Character *ch, Character *vict) {
                                 "Is that ALL you can do $N? Muhaha!",
                                 "Damnit $N! You got my weapon all bloody!",
                                 "OOOooooooo more of $N's fingerpaint!",
-                                "$N's ugly and $S mother dresses him.. dead.",
+                                "$N's ugly and $S mother dresses them.. dead.",
                                 "$N, your tombstone's gonna read: 'Here lies the body of a pansy!'",
                                 "$N, may you rest in pieces!",
                                 "You look good in red, $N!",
