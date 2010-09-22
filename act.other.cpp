@@ -1436,8 +1436,11 @@ ACMD ( do_gen_tog )
 		 "Aggro mode enabled.\r\n"},
 		{"Nobrag on.\r\n",
 		 "Nobrag off.\r\n"},
-		{"You may now be gated to by other players.\r\n",
-		 "You are now safe from gating by other players.\r\n"    },
+		{"You are now safe from gating by other players.\r\n",
+		"You may now be gated to by other players.\r\n"      },
+		// Flipped these messages -> Prom
+		//{"You may now be gated to by other players.\r\n",
+		// "You are now safe from gating by other players.\r\n"    },
 		{"You are not roleplaying anymore.\r\n",
 		 "You are now roleplaying.\r\n"},
 		{"You will no longer see a tally of how many fish you have caught.\r\n",
