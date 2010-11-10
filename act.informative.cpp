@@ -69,6 +69,7 @@ extern char *handbook;
 extern const char *class_abbrevs[];
 extern const char *race_abbrevs[];
 extern const char *moon_types[];
+extern const char *season_types[];
 
 /* MatingMod Defines -- DO NOT PLAY WITH THESE UNLESS YOU'RE SURE OF WHAT YOU'RE DOING! */
 #define NINE_MONTHS    6000   /* 6000 realtime minutes TO GO */
@@ -2834,8 +2835,10 @@ ACMD ( do_time )
 	ch->Send ( "The %d%s Day of the %s, Year %d.\r\n",
 	           day, suf, month_name[time_info.month],
 	           time_info.year );
-	// Added this to see if moon phase will disply - Prom
+	// Added this to see if moon phase will display - Prom
 	ch->Send ( "The moon is %s. \r\n", moon_types[time_info.moon]);
+	// Added this for season display - Prom
+	ch->Send ( "The season is %s. \r\n", season_types[time_info.season]);
 }
 
 
