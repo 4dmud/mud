@@ -1222,11 +1222,18 @@ class Room;
 #define MOON_WAXING_GIBBOUS       6
 #define MOON_FULL_MOON            7
 
+// Seasons for weather data
+#define SEASON_WINTER		0
+#define SEASON_SPRING		1
+#define SEASON_SUMMER		2
+#define SEASON_FALL		3
+
+
 /* Sky conditions for weather_data */
-#define SKY_CLOUDLESS    0
-#define SKY_CLOUDY  1
-#define SKY_RAINING 2
-#define SKY_LIGHTNING    3
+#define SKY_CLOUDLESS   	0
+#define SKY_CLOUDY  		1
+#define SKY_RAINING 		2
+#define SKY_LIGHTNING    	3
 
 
 /* Rent codes */
@@ -1772,6 +1779,7 @@ struct time_info_data {
     int hours, day, month;
     sh_int year;
     sh_int moon;
+    sh_int season;
 };
 
 
