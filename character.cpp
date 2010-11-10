@@ -684,8 +684,11 @@ void Character::default_char()
 	GET_MAX_HIT ( this ) 		= 25;
 	GET_MANA ( this ) 			= 100;
 	GET_MAX_MANA ( this ) 		= 100;
-	GET_MOVE ( this ) 			= 50;
-	GET_MAX_MOVE ( this ) 		= 50;
+	// Tweaking these base values to 
+	// Give newbies more base movement. 50 to 500
+	//Prometheus
+	GET_MOVE ( this ) 			= 500;
+	GET_MAX_MOVE ( this ) 		= 500;
 	GET_STAMINA ( this ) 		= 100;
 	GET_MAX_STAMINA ( this ) 	= 100;
 	if ( player_specials )
