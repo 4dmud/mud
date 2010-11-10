@@ -41,6 +41,19 @@ const char *moon_types[] =
   ""
 };
 
+// Adding Seasons skeleton here
+// Prometheus
+const char *season_types[] = 
+{
+	"Winter",
+	"Spring",
+	"Summer",
+	"Fall",
+	""
+};
+
+
+
 /*
 static struct sect_temperature_data {
 int min;
