@@ -607,8 +607,10 @@ void readvanceplayer ( Character *ch )
 	GET_MAX_HIT ( ch ) 		= 25;
 	GET_MANA ( ch ) 		= 100;
 	GET_MAX_MANA ( ch ) 		= 100;
-	GET_MOVE ( ch ) 		= 50;
-	GET_MAX_MOVE ( ch ) 		= 50;
+	// Going to change these volues from 50 to 500 for GET_MOVE
+	// and GET_MAX_MOVE -> Prometheus
+	GET_MOVE ( ch ) 		= 500;
+	GET_MAX_MOVE ( ch ) 		= 500;
 	GET_STAMINA ( ch ) 		= 100;
 	GET_MAX_STAMINA ( ch ) 		= 100;
 	GET_LEVEL ( ch ) 		= 1;
