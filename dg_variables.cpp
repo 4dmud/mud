@@ -605,11 +605,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if (time_info.month >= 4 && time_info.month < 8) {
 						snprintf ( str, slen, "spring");
 					}
-					else if (time_info.month >= 8 && time_info.month < 13) {
+					else if (time_info.month >= 8 && time_info.month < 12) {
 						snprintf ( str, slen, "summer");
 					}
-					else if (time_info.month >= 13 && time_info.month < 16) {
-						snprintf ( str, slen, "autumn");
+					else if (time_info.month >= 12 && time_info.month <= 16) {
+						snprintf ( str, slen, "fall");
 					}
 				}
 				else if ( !strcasecmp ( field, "moon" ) ) {

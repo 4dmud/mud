@@ -48,7 +48,7 @@ const char *season_types[] =
 	"Winter",
 	"Spring",
 	"Summer",
-	"Fall",
+	"Autumn",
 	""
 };
 
@@ -177,10 +177,10 @@ void another_hour(int mode)
 	time_info.season = SEASON_WINTER;
     else if (time_info.month >= 4 && time_info.month < 8)
 	time_info.season = SEASON_SPRING;
-    else if (time_info.month >= 8 && time_info.month < 13)
+    else if (time_info.month >= 8 && time_info.month < 12)
 	time_info.season = SEASON_SUMMER;
-    else if (time_info.month >= 13 && time_info.month < 16)
-	time_info.season = SEASON_FALL;
+    else if (time_info.month >= 12 && time_info.month <= 16)
+	time_info.season = SEASON_FALL;;
 	
     if (time_info.day > 29) 
       time_info.moon = MOON_FULL_MOON;
