@@ -2334,12 +2334,12 @@ const char *weekdays[] =
 /* Not used in sprinttype(). */
 const char *month_name[] =
 {
-	"Month of Winter",        /* 0 */
-	"Month of the Winter Wolf",
+	"Month of Snow",        // 0 Changed from Month of Winter
+	"Month of the Wolf", // Changed from Month of Winter Wolf
 	"Month of the Frost Giant",
 	"Month of the Old Forces",
 	"Month of the Grand Struggle",
-	"Month of the Spring",
+	"Month of the Buds", // Changed from Month of Spring
 	"Month of Nature",
 	"Month of Futility",
 	"Month of the Dragon",

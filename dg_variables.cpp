@@ -608,7 +608,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if (time_info.month >= 8 && time_info.month < 13) {
 						snprintf ( str, slen, "summer");
 					}
-					else if (time_info.month >= 13 && time_info.month <= 16) {
+					else if (time_info.month >= 13 && time_info.month < 16) {
 						snprintf ( str, slen, "autumn");
 					}
 				}
