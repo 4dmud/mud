@@ -1087,7 +1087,7 @@ void advance_level ( Character * ch , bool silent )
 	// Added an loop for level 1 to get more movement points 
 	// at character creation -> Prometheus
 
-	if (level == 1)
+	if (level <= 1)
 	{
 	add_move = 100;
 	}
