@@ -1038,7 +1038,8 @@ void do_start ( Character * ch )
 	set_title ( ch, NULL );
 	ch->points.max_hit = 10;
 
-
+	//Another test -> Prom
+	GET_MAX_MOVE(ch) = 250;
 
 	advance_level ( ch );
 
@@ -1083,14 +1084,6 @@ void advance_level ( Character * ch , bool silent )
 	int level = GET_LEVEL ( ch ), casttier = num_casting ( ch ), fightier = TIERS;
 	int remorts = MIN(REMORTS(ch), 50);
 
-
-	// Added an loop for level 1 to get more movement points 
-	// at character creation -> Prometheus
-
-	if (level <= 1)
-	{
-	add_move = 100;
-	}
 
 	add_hp += ( con_app[GET_CON ( ch ) ].hitp * current_class_is_tier_num ( ch ) );
 	//add_hp += MIN ( REMORTS ( ch ), 25 );
