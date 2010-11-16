@@ -569,7 +569,7 @@ ACMD ( do_practice )
 	return;
 }
 
-void parse_train_group ( Character *ch, Character *vict,char * val_arg )
+void parse_train_group ( Character *ch, Character *vict,char *val_arg )
 {
 	char arg1[MAX_INPUT_LENGTH];
 	char arg2[MAX_INPUT_LENGTH];
