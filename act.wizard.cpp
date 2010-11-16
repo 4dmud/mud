@@ -360,7 +360,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
-void parse_train_group(Character *ch, Character *vict,char * val_arg);
+void parse_train_group(Character *ch, Character *vict,char *val_arg);
 int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
 int bodypartname ( char *bpn );
