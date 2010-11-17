@@ -463,7 +463,9 @@ ACMD ( do_practice )
 	}
 
 	for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room ) {
-                if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
+                // Going to try to remark this out and see if Mikey gets wierd or not
+		// Prom
+		//if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
 		if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
 			mob_trainers.push_back ( p );
         }
