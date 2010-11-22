@@ -3713,9 +3713,7 @@ ACMD ( do_who )
 
 ACMD ( do_users )
 {
-	// Increasing line[200] to [207]
-	//Prometheus
-	char line[207], line2[227], idletime[10], classname[20];
+	char line[200], line2[220], idletime[10], classname[20];
 	char state[30], *timeptr, mode;
 	char name_search[MAX_INPUT_LENGTH], host_search[MAX_INPUT_LENGTH];
 	Character *tch;
@@ -3867,7 +3865,7 @@ ACMD ( do_users )
 		else
 			strcpy ( idletime, "" );
 
-		snprintf ( line, sizeof ( line ), "%3d %-7s %-12s %-14s %-3s %-8s ", d->desc_num, classname,
+		snprintf ( line, sizeof ( line ), "%3d %-7s %-17s %-14s %-3s %-8s ", d->desc_num, classname,
 		           d->original && d->original->player.name ? d->original->player.name :
 		           d->character && d->character->player.name ? d->character->player.name :
 		           "UNDEFINED",
