@@ -3793,8 +3793,8 @@ ACMD ( do_users )
 	// Tweaking this for longer names.
 	// Prometheus
 	ch->Send (
-	    "Num Class       Name              State          Idl Login@   Site\r\n"
-	    "--- ----------- ----------------- -------------- --- -------- -------------------\r\n" );
+	    "Num Class       Name         State          Idl Login@   Site\r\n"
+	    "--- ----------- ------------ -------------- --- -------- ------------------------\r\n" );
 
 
 	one_argument ( argument, arg );
@@ -3865,7 +3865,7 @@ ACMD ( do_users )
 		else
 			strcpy ( idletime, "" );
 
-		snprintf ( line, sizeof ( line ), "%3d %-7s %-12s %-19s %-3s %-8s ", d->desc_num, classname,
+		snprintf ( line, sizeof ( line ), "%3d %-7s %-12s %-14s %-3s %-8s ", d->desc_num, classname,
 		           d->original && d->original->player.name ? d->original->player.name :
 		           d->character && d->character->player.name ? d->character->player.name :
 		           "UNDEFINED",
