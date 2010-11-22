@@ -3713,7 +3713,9 @@ ACMD ( do_who )
 
 ACMD ( do_users )
 {
-	char line[200], line2[220], idletime[10], classname[20];
+	// Increasing line[200] to [207]
+	//Prometheus
+	char line[207], line2[220], idletime[10], classname[20];
 	char state[30], *timeptr, mode;
 	char name_search[MAX_INPUT_LENGTH], host_search[MAX_INPUT_LENGTH];
 	Character *tch;
