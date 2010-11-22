@@ -3790,9 +3790,11 @@ ACMD ( do_users )
 			return;
 		}
 	}                 /* end while (parser) */
+	// Tweaking this for longer names.
+	// Prometheus
 	ch->Send (
-	    "Num Class       Name         State          Idl Login@   Site\r\n"
-	    "--- ----------- ------------ -------------- --- -------- ------------------------\r\n" );
+	    "Num Class       Name              State          Idl Login@   Site\r\n"
+	    "--- ----------- ----------------- -------------- --- -------- ------------------------\r\n" );
 
 
 	one_argument ( argument, arg );
