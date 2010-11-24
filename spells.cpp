@@ -462,7 +462,7 @@ ASPELL(spell_locate_object) {
         if (i->worn_by && !IS_NPC(i->worn_by) && GET_LEVEL(i->worn_by) >= LVL_IMMORT)
             continue;
         else if (IS_OBJ_STAT(i, ITEM_NO_LOCATE))
-            sprintf(buf, "You can not devine the location of %s.\r\n",
+            sprintf(buf, "You can not divine the location of %s.\r\n",
                     i->short_description);
         else if (i->carried_by)
             sprintf(buf, "%s is being carried by %s.\r\n",

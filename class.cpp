@@ -1457,7 +1457,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_PARALYZE,          ESP );
 	assign_class ( SKILL_BREW,         PRI );
 	assign_class ( SPELL_ABSOLVE,      PRI );
-	assign_class ( SPELL_DEVINE_MIND,       PRI | ESP );
+	assign_class ( SPELL_DIVINE_MIND,       PRI | ESP );
 	assign_class ( SPELL_LIFE_TRANSFER,     ESP );
 	assign_class ( SPELL_ELECTRIC_BLAST,    PRI );
 	assign_class ( SPELL_SHIELD_HOLY,       PRI );

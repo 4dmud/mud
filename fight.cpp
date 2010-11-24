@@ -7017,7 +7017,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 
 	}
 
-	if ( affected_by_spell ( ch, SPELL_DEVINE_MIND ) )
+	if ( affected_by_spell ( ch, SPELL_DIVINE_MIND ) )
 		dam += 0.15;
 	switch ( elemental_type ( type ) )
 	{

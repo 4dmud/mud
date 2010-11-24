@@ -1198,12 +1198,12 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_vict = "Happy thoughts fill your mind as you drift off to sleep.";
 			to_room = "$n smiles and collapses.";
 			break;
-		case SPELL_DEVINE_MIND:
+		case SPELL_DIVINE_MIND:
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else
 				af[0].expire = HOURS_TO_EXPIRE ( 24 );
-			af[0].bitvector = AFF_DEVINE_MIND;
+			af[0].bitvector = AFF_DIVINE_MIND;
 			af[0].location = APPLY_CHA;
 			af[0].modifier = FTOI ( 5*staff );
 

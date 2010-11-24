@@ -730,7 +730,7 @@ class Room;
 #define AFF_SHIELD_STATIC     60        /*lowers melee hit chance */
 #define AFF_BLUR          61        /*lowers melee hit chance */
 #define AFF_MARTIAL_ARTS      62        /*increases damage and hitchance */
-#define AFF_DEVINE_MIND       63        /*increases int*/
+#define AFF_DIVINE_MIND       63        /*increases int*/
 #define AFF_SWEET_DREAMS      64        /*increases regen rate when asleep*/
 #define AFF_SHIELD_THORNS     65        /*like Fire Shield - for skill attacks*/
 #define AFF_SHIELD_MANA        66  /*increases spell resistence*/

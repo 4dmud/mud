@@ -2239,10 +2239,10 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 23, 1,
                  "You wake up from the most refreshing dream." );
 
-	spello ( SPELL_DEVINE_MIND, "devine mind", 50 , 30 , 2,
+	spello ( SPELL_DIVINE_MIND, "divine mind", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 5, 1,
-                 "Your devine guidance leaves you." );
+                 "Your divine guidance leaves you." );
 
 	spello ( SPELL_NUMB_MIND, "numb mind", 50 , 30 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
@@ -2683,7 +2683,7 @@ int elemental_type ( int spell )
 		case SPELL_SWEET_DREAMS:
 			retval = ELEM_MIND;
 			break;
-		case SPELL_DEVINE_MIND:
+		case SPELL_DIVINE_MIND:
 			retval = ELEM_MIND;
 			break;
 		case SPELL_NUMB_MIND:
