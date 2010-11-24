@@ -619,7 +619,7 @@ void look_at_char ( Character *i, Character *ch )
 				    i == ch ? "You" : GET_NAME ( i ), i == ch ? "have" : "has", i == ch ? "you" : "her" );
 			else if ( PREG ( i ) < ( MONTHS_4 ) )    // Month 7
 				ch->Send ( "%s %s already had to let out %s armor.\r\n",
-				           i == ch ? "You" : GET_NAME ( i ), i == ch ? "have" : "has", i == ch ? "you" : "her" );
+				           i == ch ? "You" : GET_NAME ( i ), i == ch ? "have" : "has", i == ch ? "your" : "her" );
 			else if ( PREG ( i ) < ( MONTHS_5 ) )    // Month 6
 				ch->Send ( "%s %s a small bulge in %s midsection.\r\n",
 				           i == ch ? "You" : GET_NAME ( i ), i == ch ? "have" : "has", i == ch ? "you" : "her" );
