@@ -1315,7 +1315,7 @@ char * baby_status(Character *i, char * buf, size_t len)
     if (PREG(i) < 7)
       snprintf(buf, len, "%s %s giving birth!\r\n", GET_NAME(i), "is");
     else if (PREG(i) < (MONTHS_2)) // Customize these messages, if you want.
-      snprintf(buf, len, "%s look%s as if %s may give birth to a healthy, baby sometime soon.\r\n",
+      snprintf(buf, len, "%s look%s as if %s may give birth to a healthy baby sometime soon.\r\n",
                GET_NAME(i), "s","she"); // They're pretty cheesy.
     else if (PREG(i) < (MONTHS_3)) // Month 8
       snprintf(buf, len,   "%s %s a large, cumbersome bulge in %s waist.\r\n", GET_NAME(i),  "has", "her");

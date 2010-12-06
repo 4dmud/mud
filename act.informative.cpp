@@ -611,7 +611,7 @@ void look_at_char ( Character *i, Character *ch )
 				ch->Send ( "%s %s giving birth!\r\n",
 				           i == ch ? "You" : GET_NAME ( i ), i == ch ? "are" : "is" );
 			else if ( PREG ( i ) < ( MONTHS_2 ) )    // Customize these messages, if you want.
-				ch->Send ( "%s look%s as if %s may give birth to a healthy, baby sometime soon.\r\n",
+				ch->Send ( "%s look%s as if %s may give birth to a healthy baby sometime soon.\r\n",
 				           i == ch ? "You" : GET_NAME ( i ), i == ch ? "" : "s", i == ch ? "you" : "she" );    // They're pretty cheesy.
 			else if ( PREG ( i ) < ( MONTHS_3 ) )    // Month 8
 				ch->Send (
