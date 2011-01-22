@@ -613,34 +613,30 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 				}
 				else if ( !strcasecmp ( field, "moon" ) ) {
-					switch (time_info.moon) {
-						case MOON_FULL_MOON:
-							snprintf ( str, slen, "full" );
-							break;
-						case MOON_WANING_GIBBOUS:
-							snprintf ( str, slen, "waning gibbous" );
-							break;
-						case MOON_LAST_QUARTER:
-							snprintf ( str, slen, "last quarter" );
-							break;
-						case MOON_WANING_CRESCENT:
-							snprintf ( str, slen, "waning crescent" );
-							break;
-						case MOON_NEW_MOON:
-							snprintf ( str, slen, "new" );
-							break;
-						case MOON_WAXING_CRESCENT:
-							snprintf ( str, slen, "waxing crescent" );
-							break;
-						case MOON_FIRST_QUARTER:
-							snprintf ( str, slen, "first quarter" );
-							break;
-						case MOON_WAXING_GIBBOUS:
-							snprintf ( str, slen, "waxing gibbous" );
-							break;
-						default:
-							snprintf ( str, slen, "unknown moon type" );
+					if (time_info.moon == MOON_FULL_MOON){
+						snprintf ( str, slen, "full" );
 					}
+					else if (time_info.moon == MOON_WANING_GIBBOUS){
+						snprintf ( str, slen, "waning gibbous");
+					}
+					else if (time_info.moon == MOON_LAST_QUARTER){
+						snprintf ( str, slen, "last quarter");
+					}
+					else if (time_info.moon == MOON_WANING_CRESCENT){
+                                                snprintf ( str, slen, "waning crescent");
+					}
+					else if (time_info.moon == MOON_NEW_MOON){
+                                                snprintf ( str, slen, "new");
+					}	
+					else if (time_info.moon == MOON_WAXING_CRESCENT){
+                                                snprintf ( str, slen, "waning crescent");
+                                        }
+					else if (time_info.moon == MOON_FIRST_QUARTER){
+                                                snprintf ( str, slen, "first quarter");
+                                        }
+					else if (time_info.moon == MOON_WAXING_GIBBOUS){
+                                                snprintf ( str, slen, "waxing gibbous");
+                                        }
 				}
 				else
 					*str = '\0';
