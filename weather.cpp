@@ -182,17 +182,17 @@ void another_hour(int mode)
     else if (time_info.month >= 12 && time_info.month <= 16)
 	time_info.season = SEASON_FALL;;
 	
-    if (time_info.day > 29) 
+    if (time_info.day > 29 && time_info.day <=34) 
       time_info.moon = MOON_FULL_MOON;
-    else if (time_info.day > 25)
+    else if (time_info.day > 25 && time_info.day <=29)
       time_info.moon = MOON_WANING_GIBBOUS;
-    else if (time_info.day > 21)
+    else if (time_info.day > 21 && time_info.day <=25)
       time_info.moon = MOON_LAST_QUARTER;
-    else if (time_info.day > 16)
+    else if (time_info.day > 16 && time_info.day <=12)
       time_info.moon = MOON_WANING_CRESCENT;
-    else if (time_info.day > 12)
+    else if (time_info.day > 12 && time_info.day <=7)
       time_info.moon = MOON_NEW_MOON;
-    else if (time_info.day > 7)
+    else if (time_info.day > 7 && time_info.day <=3)
       time_info.moon = MOON_WAXING_CRESCENT;
     else if (time_info.day > 3)
       time_info.moon = MOON_FIRST_QUARTER;
