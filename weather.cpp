@@ -182,7 +182,7 @@ void another_hour(int mode)
     else if (time_info.month >= 12 && time_info.month <= 16)
 	time_info.season = SEASON_FALL;;
 	
-    if (time_info.day > 29 && time_info.day <=34) 
+    if (time_info.day > 29 && time_info.day <=35) 
       time_info.moon = MOON_FULL_MOON;
     else if (time_info.day > 25 && time_info.day <=29)
       time_info.moon = MOON_WANING_GIBBOUS;
