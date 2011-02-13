@@ -182,7 +182,7 @@ void another_hour(int mode)
     else if (time_info.month >= 12 && time_info.month <= 16)
 	time_info.season = SEASON_FALL;;
 	
-    if (time_info.day > 1 && time_info.day <=4)
+    if (time_info.day > 0 && time_info.day <=4)
 	 time_info.moon = MOON_WAXING_GIBBOUS;
     else if (time_info.day > 4 && time_info.day <=8)
 	time_info.moon = MOON_FIRST_QUARTER;
