@@ -101,6 +101,8 @@
 #define INVALID_SOCKET -1
 #endif
 
+#define WATCHDOG 120
+
 void delete_descriptor_list();
 /* externs */
 extern struct ban_list_element *ban_list;
@@ -1110,7 +1112,7 @@ void game_loop(socket_t s_mother_desc) {
             }
             gettimeofday(&last_time, (struct timezone *) 0);
         }
-        alarm(60); //Set watchdog. This alarm should reset before it expires. If this does not happen, the mud is frozen.
+        alarm(WATCHDOG); //Set watchdog. This alarm should reset before it expires. If this does not happen, the mud is frozen.
         /* Set up the input, output, and exception sets for select(). */
         FD_ZERO(&input_set);
         FD_ZERO(&output_set);
@@ -3850,7 +3852,7 @@ void circle_sleep(struct timeval *timeout) {
             exit(1);
         }
     }
-    alarm(60); //Enable watchdog.
+    alarm(WATCHDOG); //Enable watchdog.
 }
 
 #endif

@@ -2,7 +2,7 @@
 # Clean-up provided by seqwith.
 
 # C compiler to use
-CC = g++-4.3
+CC = g++
 
 # Any special flags you want to pass to the compiler
 MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -O0 -ggdb -fno-inline
