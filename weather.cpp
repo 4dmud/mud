@@ -182,22 +182,22 @@ void another_hour(int mode)
     else if (time_info.month >= 12 && time_info.month <= 16)
 	time_info.season = SEASON_FALL;;
 	
-    if (time_info.day == 0 && time_info.day <=3)
-	 time_info.moon = MOON_WAXING_GIBBOUS;
-    else if (time_info.day > 3 && time_info.day <=7)
-	time_info.moon = MOON_FIRST_QUARTER;
-    else if (time_info.day > 7 && time_info.day <=12)
+    if (time_info.day >1 && time_info.day <=4)
+	 time_info.moon = MOON_NEW_MOON;
+    else if (time_info.day > 5 && time_info.day <=7)
 	time_info.moon = MOON_WAXING_CRESCENT;
-    else if (time_info.day > 12 && time_info.day <=16)
-	time_info.moon = MOON_NEW_MOON;
-    else if (time_info.day > 16 && time_info.day <=21)
-	time_info.moon = MOON_WANING_CRESCENT;
-    else if (time_info.day > 21 && time_info.day <=25)
-	time_info.moon = MOON_LAST_QUARTER;
-    else if (time_info.day > 25 && time_info.day <=29)
-	time_info.moon = MOON_WANING_GIBBOUS;
-    else if (time_info.day > 29 && time_info.day <=34)
+    else if (time_info.day > 8 && time_info.day <=13)
+	time_info.moon = MOON_FIRST_QUARTER;
+    else if (time_info.day > 14 && time_info.day <=17)
+	time_info.moon = MOON_WAXING_GIBBOUS;
+    else if (time_info.day > 18 && time_info.day <=22)
 	time_info.moon = MOON_FULL_MOON;
+    else if (time_info.day > 23 && time_info.day <=26)
+	time_info.moon = MOON_LAST_QUARTER;
+    else if (time_info.day > 27 && time_info.day <=30)
+	time_info.moon = MOON_WANING_GIBBOUS;
+    else if (time_info.day > 31 && time_info.day <=35)
+	time_info.moon = MOON_WANING_CRESCENT;
 }
 
 
