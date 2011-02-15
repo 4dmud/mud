@@ -1795,6 +1795,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						}
 						snprintf ( str, slen, "%s", GET_TITLE ( c ) );
 					}
+					else if ( !strcasecmp (field, "thirst" ) )
+					  {
+					    if ( subfield && *subfield ) {
+					      GET_COND(c, THIRST) = atoi(subfield);
+					    }
+					    snprintf ( str, slen, "%d", GET_COND(c, FULL));
+					  }
+
 					else if ( !strcasecmp ( field, "trade" ) )
 					{
 						if ( subfield && *subfield && ( is_number ( subfield ) || *subfield=='-' ) )
@@ -2200,14 +2208,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						}
 						snprintf ( str, slen, "%d", GET_OBJ_TIMER ( o ) );
 					}
-					else if ( !strcasecmp (field, "thirst" ) )
-					  {
-					    if ( subfield && *subfield ) {
-					      GET_COND(c, THIRST) = atoi(subfield);
-					    }
-					    snprintf ( str, slen, "%d", GET_COND(c, FULL));
-					  }
-
 					break;
 				case 'v':
 					if ( !strcasecmp ( field, "vnum" ) )
