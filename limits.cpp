@@ -678,49 +678,14 @@ void gain_group_exp ( Character *ch, gold_int gain )
 		}
 	}
 }
-#if 0
+
 void gain_condition ( Character *ch, int condition, int value )
 {
 	bool intoxicated;
 
-	if ( IS_NPC ( ch ) || GET_COND ( ch, condition ) == -1 )	/* No change */
-		return;
-
-	intoxicated = ( GET_COND ( ch, DRUNK ) > 0 );
-
-	GET_COND ( ch, condition ) += value;
-
-	GET_COND ( ch, condition ) = MAX ( 0, GET_COND ( ch, condition ) );
-	GET_COND ( ch, condition ) = MIN ( 24, GET_COND ( ch, condition ) );
-
-	if ( GET_COND ( ch, condition ) || PLR_FLAGGED ( ch, PLR_WRITING ) )
-		return;
-
-	switch ( condition )
-	{
-		case FULL:
-			send_to_char ( ch, "You are hungry.\r\n" );
-			break;
-		case THIRST:
-			send_to_char ( ch, "You are thirsty.\r\n" );
-			break;
-		case DRUNK:
-			if ( intoxicated )
-				send_to_char ( ch, "You are now sober.\r\n" );
-			break;
-		default:
-			break;
-	}
-
-}
-#endif
-void gain_condition ( Character *ch, int condition, int value )
-{
-	bool intoxicated;
-
-	if ( IS_NPC ( ch ) )	/* No change */
-		return;
-	if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
+	if ( IS_NPC ( ch )
+	     || GET_COND ( ch, condition ) == -1
+	     || GET_LEVEL ( ch ) >= LVL_IMMORT )
 		return;
 
 
