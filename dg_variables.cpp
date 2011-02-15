@@ -1199,9 +1199,18 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 							*str = '\0';
 					}
+					else if ( !strcasecmp (field, "hunger" ) )
+					  {
+					    if ( subfield && *subfield) {
+					      GET_COND(ch, FULL) = atoi(subfield);
+					    }
+					    snprintf ( str, slen, "%d", GET_COND(ch, FULL));
+					  }
+
+					      
 
 
-
+				       
 				case 'i':
 
 					if ( !strcasecmp ( field, "inventory" ) )
@@ -2191,6 +2200,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						}
 						snprintf ( str, slen, "%d", GET_OBJ_TIMER ( o ) );
 					}
+					else if ( !strcasecmp (field, "thirst" ) )
+					  {
+					    if ( subfield && *subfield) {
+					      GET_COND(ch, THIRST) = atoi(subfield);
+					    }
+					    snprintf ( str, slen, "%d", GET_COND(ch, FULL));
+					  }
 
 					break;
 				case 'v':
