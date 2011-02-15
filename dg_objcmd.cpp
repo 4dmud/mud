@@ -204,7 +204,7 @@ OCMD ( do_oforce )
 	{
 		if ( ( ch = get_char_by_obj ( obj, arg1 ) ) )
 		{
-			if ( GET_LEVEL ( ch ) < LVL_IMMORT )
+		        if ( IS_NPC(ch) || GET_LEVEL ( ch ) < LVL_IMMORT )
 			{
 				command_interpreter ( ch, line );
 			}
