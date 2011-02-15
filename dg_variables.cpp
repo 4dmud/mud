@@ -1202,7 +1202,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp (field, "hunger" ) )
 					  {
 					    if ( subfield && *subfield ) {
-					      GET_COND(c, FULL) = atoi(subfield);
+					      GET_COND(c, FULL) = (char) atoi(subfield);
 					    }
 					    snprintf ( str, slen, "%d", GET_COND(c, FULL));
 					  }
@@ -1798,7 +1798,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp (field, "thirst" ) )
 					  {
 					    if ( subfield && *subfield ) {
-					      GET_COND(c, THIRST) = atoi(subfield);
+					      GET_COND(c, THIRST) = (char) atoi(subfield);
 					    }
 					    snprintf ( str, slen, "%d", GET_COND(c, FULL));
 					  }
