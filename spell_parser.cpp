@@ -1986,15 +1986,18 @@ void mag_assign_spells ( void )
 	         POS_STANDING, TAR_CHAR_WORLD, FALSE, MAG_MANUAL,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 4, 1, "" );
 
+	// Changed pro from good and evil delay from 200 to 0 and
+	// removed the redundant pro from good -> Prom
+
 	spello ( SPELL_PROT_FROM_EVIL, "protection from evil", 40 ,
 	         10 , 3, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1,
+	         FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 2, 1,
                  "Your ward against evil dissipates." );
 
-	spello ( SPELL_PROT_FROM_GOOD, "protection from good", 40 ,
-	         10 , 3, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         FALSE, MAG_AFFECTS, 200, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 2, 0,
-                 "You feel your shell of warmth dissipate." );
+//	spello ( SPELL_PROT_FROM_GOOD, "protection from good", 40 ,
+//	         10 , 3, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY,
+//	         FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 2, 0,
+//               "You feel your shell of warmth dissipate." );
 
 	spello ( SPELL_REMOVE_CURSE, "remove curse", 45 , 25 , 5,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP,
