@@ -2764,6 +2764,12 @@ int elemental_type ( int spell )
 		case SPELL_MIDAS_TOUCH:
 			retval = ELEM_EARTH;
 			break;
+		case SPELL_WALL_FORCE:
+			retval = ELEM_SPIRIT;
+			break;
+		case SPELL_WALL_FIRE:
+			retval = ELEM_FIRE;
+			break;
 		case SPELL_POLYMORPH:
 			retval = ELEM_SPIRIT;
 			break;

@@ -326,10 +326,10 @@ void z_free(void *opaque, void *address) {
  *  It uses the equally arbitrary COMPRESS2 option 86,
  *  It properly terminates the subnegotiation sequence.
  */
-#define TELOPT_COMPRESS        85
-#define TELOPT_COMPRESS2       86
-#define COMPRESS        85
-#define COMPRESS2       86
+#define TELOPT_COMPRESS         85
+#define TELOPT_COMPRESS2        86
+#define COMPRESS        	85
+#define COMPRESS2       	86
 
 /* first compression neg. string */
 static const char compress_offer[] = {
