@@ -2764,6 +2764,9 @@ int elemental_type ( int spell )
 		case SPELL_MIDAS_TOUCH:
 			retval = ELEM_EARTH;
 			break;
+		case SPELL_DARKNESS:
+			retval = ELEM_DARK;
+			break;
 		case SPELL_WALL_FORCE:
 			retval = ELEM_SPIRIT;
 			break;
