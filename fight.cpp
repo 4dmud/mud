@@ -1419,12 +1419,14 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	}
 
 	/* mastery */
-	if ( IS_NPC ( ch ) )
+	// Changing this per Horus from IS_NPC(ch) to !IS_NPC(ch) - Prom
+	if ( !IS_NPC(ch) )
 	{
 		if ( wep && GET_MASTERY ( ch, CLASS_GYPSY ) )
 			damage += ( damage/5 );
 	}
-	if ( IS_NPC ( vict ) )
+	// Changing this from IS_NPC(vict) to !IS_NPC(vict) - Prom
+	if ( !IS_NPC(vict) )
 	{
 		if ( wep && GET_MASTERY ( vict, CLASS_RANGER ) )
 			damage -= ( damage/5 );
