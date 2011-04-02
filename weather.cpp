@@ -193,9 +193,9 @@ void another_hour(int mode)
     else if (time_info.day >= 18 && time_info.day <= 22)
 	time_info.moon = MOON_FULL_MOON;
     else if (time_info.day >= 23 && time_info.day <= 26)
-	time_info.moon = MOON_LAST_QUARTER;
-    else if (time_info.day >= 27 && time_info.day <= 30)
 	time_info.moon = MOON_WANING_GIBBOUS;
+    else if (time_info.day >= 27 && time_info.day <= 30)
+	time_info.moon = MOON_LAST_QUARTER;
     else if (time_info.day >= 31 && time_info.day <= 35)
 	time_info.moon = MOON_WANING_CRESCENT;
 }
