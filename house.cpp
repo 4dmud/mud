@@ -973,7 +973,10 @@ ACMD ( do_house )
 		House_info ( ch, i, FALSE );
 	else if ( !str_cmp ( arg, "mount" ) )
 		house_load_mount ( ch, i );
-	else if ( GET_IDNUM ( ch ) != house_control[i].owner && GET_LEVEL ( ch ) < LVL_IMPL )
+	// Changed this from LVL_IMPL to LVL_SEN since lots of people
+	// need to be added to houses and Imp level aren't on.
+	// Prom
+	else if ( GET_IDNUM ( ch ) != house_control[i].owner && GET_LEVEL ( ch ) < LVL_SEN )
 		send_to_char ( "Only the primary owner can set guests or expand the house.\r\n", ch );
 	else if ( !str_cmp ( arg, "expand" ) )
 		house_expand_house ( ch, i );
