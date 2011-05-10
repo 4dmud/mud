@@ -173,6 +173,7 @@ void redit_setup_new(Descriptor *d)
   OLC_ROOM(d)->name = strdup("An unfinished room");
   OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
   OLC_ROOM(d)->n_description = NULL;
+  OLC_ROOM(d)->q_description = NULL;
   OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
   OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   OLC_ROOM(d)->number = NOWHERE;
@@ -333,6 +334,41 @@ void redit_disp_extradesc_menu(Descriptor *d)
   d->Output( "Enter choice (0 to quit) : ");
   OLC_MODE(d) = REDIT_EXTRADESC_MENU;
 }
+
+void redit_disp_questdesc_menu(Descriptor *d)
+{
+
+  struct q_descr_data *q_data = OLC_QDESC(d);
+
+  clear_screen(d);
+  d->Output("\r\n");
+  d->Output(
+                  "%s1%s) Quest Type: %s%i\r\n"
+                  "%s2%s) Quest Keywords:\r\n%s%s\r\n"
+                  "%s3%s) Room Description:\r\n%s%s\r\n "
+                  "%s4%s) Goto next quest description: ",
+                  grn, nrm, yel, q_data->type,
+                  grn, nrm, yel, q_data->flag ? q_data->flag : "<NONE>",
+                  grn, nrm, yel, q_data->description ? q_data->description : "<NONE>",
+                  grn, nrm
+                 );
+  d->Output( !q_data->next ? "<NOT SET>\r\n" : "Set.\r\n");
+  d->Output( "Enter choice (0 to quit) : ");
+  OLC_MODE(d) = REDIT_QUEST_MENU;
+}
+
+void redit_disp_questtype_menu(Descriptor *d)
+{
+  clear_screen(d);
+  d->Output("\r\n");
+  d->Output(
+      "%s1%s) Zone wide quest flag\r\n"
+      "%s2%s) Player only quest flag\r\n",
+      grn, nrm, grn, nrm);
+  d->Output("Enter choice : ");
+  OLC_MODE(d) = REDIT_QUEST_TYPE;
+}
+
 void redit_disp_look_above_menu(Descriptor *d)
 {
   struct extra_descr_data *extra_desc = OLC_LADESC(d);
@@ -516,13 +552,14 @@ void redit_disp_menu(Descriptor *d)
                   "%sA%s) Exit down    : %s%-6d - %s\r\n"
                   "%sB%s) Descriptions :%s Extra\r\n"
                   /*---4d--------------------------------------*/
-                  "%sC%s) Descriptions : Room description at NIGHT\r\n%s%s"
+                  "%sC%s) Descriptions : night description\r\n%s%s"
                   "%sE%s) Descriptions :%s Look under\r\n"
                   "%sF%s) Descriptions :%s Look behind\r\n"
                   "%sG%s) Descriptions :%s Look above\r\n"
                   "%sH%s) Smell        :\r\n%s%s"
                   "%sI%s) Listen       :\r\n%s%s"
                   "%sJ%s) Mine         : %sNum: %d Level: %d Tool: %s\r\n"
+                  "%sR%s) Descriptions : Quests flagged - %s%s\r\n"
 
                   /*---end-------------------------------------*/
                   "%sS%s) Script       : %s%s\r\n"
@@ -574,6 +611,7 @@ void redit_disp_menu(Descriptor *d)
                   grn, nrm, cyn, room->smell,/* smell */
                   grn, nrm, cyn, room->listen,/* listen */
                   grn, nrm, cyn, room->mine.num, room->mine.dif, room->mine.num == -1 ? "None" : room->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe",
+                  grn, nrm, yel, room->q_description ? "SET" : "NOT SET",
                   grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
 //                  grn, nrm,/*delete*/
                   grn, nrm /*quit*/
@@ -802,6 +840,19 @@ void redit_parse(Descriptor *d, char *arg)
       d->Output( "Room deleting is disabled!\r\n");
       redit_disp_menu(d);
       break;
+    case 'r':
+    case 'R':
+// Quest room descriptions 
+      if (!OLC_ROOM(d)->q_description) {
+          CREATE(OLC_ROOM(d)->q_description, struct q_descr_data, 1);  
+          OLC_ROOM(d)->q_description->next = NULL;
+          OLC_ROOM(d)->q_description->type = 0;
+          OLC_ROOM(d)->q_description->flag = NULL;
+          OLC_ROOM(d)->q_description->description = NULL;
+      }
+      OLC_QDESC(d) = OLC_ROOM(d)->q_description;
+      redit_disp_questdesc_menu(d);
+      break;
     case 's':
     case 'S':
       OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
@@ -893,6 +944,10 @@ void redit_parse(Descriptor *d, char *arg)
     OLC_ROOM(d)->name = str_udup(arg);
     break;
 
+  case REDIT_QUEST_FLAG:
+  case REDIT_QUEST_DESCRIPTION:
+      redit_disp_questdesc_menu(d);
+      break;
   case REDIT_N_DESCRIPTION:
   case REDIT_DESC:
     /*
@@ -947,6 +1002,54 @@ void redit_parse(Descriptor *d, char *arg)
     OLC_ROOM(d)->sector_type = num;
     break;
 
+  case REDIT_QUEST_TYPE:
+    num = atoi(arg);
+    if (num < 0 || num > 2)
+    {
+        d->Output("Invalid choice!");
+        redit_disp_questtype_menu(d);
+        return;
+    }
+    OLC_QDESC(d)->type = num;
+    redit_disp_questdesc_menu(d);
+    return;
+
+  case REDIT_QUEST_MENU:
+    switch(*arg) {
+      case '0':
+          break;
+      case '1':
+          OLC_MODE(d) = REDIT_QUEST_TYPE;
+          redit_disp_questtype_menu(d); 
+          return;
+      case '2':
+          clear_screen(d);
+          send_editor_help(d);
+          d->Output( "Enter room QUEST flags:\r\n\r\n");
+
+          if (OLC_QDESC(d)->flag)
+          {
+	      d->Output( "%s", OLC_QDESC(d)->flag); 
+	      oldtext = strdup(OLC_QDESC(d)->flag);
+          }
+          string_write(d, &OLC_QDESC(d)->flag, MAX_ROOM_DESC, 0, oldtext);
+          OLC_VAL(d) = 1;
+          return;
+      case '3':
+          clear_screen(d);
+          send_editor_help(d);
+          d->Output( "Enter room QUEST description:\r\n\r\n");
+
+          if (OLC_QDESC(d)->description)
+          {
+	      d->Output( "%s", OLC_QDESC(d)->description); 
+	      oldtext = strdup(OLC_QDESC(d)->description);
+          }
+          string_write(d, &OLC_QDESC(d)->description, MAX_ROOM_DESC, 0, oldtext);
+          OLC_VAL(d) = 1;
+          return;
+    }
+    break;
   case REDIT_EXIT_MENU:
     switch (*arg)
     {

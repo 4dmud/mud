@@ -1745,6 +1745,7 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	int t[10], i;
 	char line[256], flags[128], flags2[128], flags3[128], flags4[128];
 	struct extra_descr_data *new_descr;
+        struct q_descr_data *new_q_descr;
 	struct forest_data *new_forest = NULL;
 	char buf2[MAX_INPUT_LENGTH];
 	char letter;
@@ -1839,6 +1840,7 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	room_nr->look_behind_description = NULL;
 	room_nr->look_under_description = NULL;
         room_nr->n_description = NULL;
+        room_nr->q_description = NULL;
 
 	for ( ;; )
 	{
@@ -1849,21 +1851,30 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 		}
 		switch ( *line )
 		{
-                        case 'N':
-                          if ((room_nr->n_description = fread_string(fl, buf2)) == NULL)
-                              room_nr->n_description = NULL;
-                            break;
-			case 'D':
-
-				setup_dir ( fl, room_nr, atoi ( line + 1 ) );
-
-				break;
-			case 'E':
-				CREATE ( new_descr, struct extra_descr_data, 1 );
-				if ( ( new_descr->keyword = fread_string ( fl, buf2 ) ) == NULL )
-					new_descr->keyword  = strdup ( "Undefined" );
-				if ( ( new_descr->description = fread_string ( fl, buf2 ) ) == NULL )
-					new_descr->description = strdup ( "Undefined" );
+                    case 'N':
+                        if ((room_nr->n_description = fread_string(fl, buf2)) == NULL)
+                        room_nr->n_description = NULL;
+                    break;
+		    case 'D':
+		        setup_dir ( fl, room_nr, atoi ( line + 1 ) );
+	    	    break;
+                    case 'Q':
+                        CREATE(new_q_descr, struct q_descr_data, 1);
+                        new_q_descr->type = fread_number(fl);
+                        if ((new_q_descr->flag = fread_string(fl, buf2)) == NULL)
+                            new_q_descr->flag = strdup("Undefined");
+                        if ((new_q_descr->description = fread_string(fl, buf2)) == NULL)
+                            new_q_descr->description = strdup("Undefined");
+                        if (room_nr->q_description) 
+                            new_q_descr->next = room_nr->q_description;
+                        room_nr->q_description = new_q_descr;
+                    break;    
+		    case 'E':
+		        CREATE ( new_descr, struct extra_descr_data, 1 );
+			if ( ( new_descr->keyword = fread_string ( fl, buf2 ) ) == NULL )
+		    	    new_descr->keyword  = strdup ( "Undefined" );
+			    if ( ( new_descr->description = fread_string ( fl, buf2 ) ) == NULL )
+				new_descr->description = strdup ( "Undefined" );
 				/* fix for crashes in the editor when formatting
 				 * - e-descs are assumed to end with a \r\n
 				 * -- Welcor 09/03

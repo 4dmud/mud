@@ -150,6 +150,7 @@ struct oasis_olc_data {
   struct extra_descr_data *above; /* used in '[r|o|m]edit'    */
   struct extra_descr_data *behind; /* used in '[r|o|m]edit'    */
   struct extra_descr_data *under; /* used in '[r|o|m]edit'    */
+  struct q_descr_data *q_description;
   struct vehicle_attachment_data *attachment;
   struct help_index_element *help;
 #if CONFIG_OASIS_MPROG           /*                          */
@@ -193,6 +194,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OLC_LADESC(d) 	(OLC(d)->above)		/* Extra description.	*/
 #define OLC_LBDESC(d) 	(OLC(d)->behind)	/* Extra description.	*/
 #define OLC_HELP(d)	(OLC(d)->help)		/* help structure */
+#define OLC_QDESC(d)    (OLC(d)->q_description)
 #define OLC_CONFIG(d)	(OLC(d)->config)	/* Config structure.	*/
 #define OLC_TRIG(d)     (OLC(d)->trig)          /* Trigger structure.   */
 #define OLC_VEHICLE(d)  (OLC(d)->vehicle)
@@ -326,6 +328,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define REDIT_MINE_DIFFICULTY			31
 #define REDIT_MINE_TOOL			32
 #define REDIT_N_DESCRIPTION             33
+#define REDIT_QUEST_MENU                34
+#define REDIT_QUEST_TYPE                35
+#define REDIT_QUEST_FLAG                36
+#define REDIT_QUEST_DESCRIPTION         37
 
 /*
  * Submodes of ZEDIT connectedness.

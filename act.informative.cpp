@@ -1383,20 +1383,36 @@ void look_at_room ( Character *ch, int ignore_brief )
 		}
 		else
 		{
-                    if (view_room->n_description && (time_info.hours < 6 || time_info.hours >21)) {
+                    bool found = FALSE;
+                    if (view_room->q_description && ch->script && ch->script->global_vars) 
+                    {
+                       struct trig_var_data *tv;
+                       struct q_descr_data *qv;
+                       for (tv = ch->script->global_vars; tv; tv = tv->next) {
+                           if (found) break;
+                       for (qv = view_room->q_description; qv; qv = qv->next){
+                           if (!strncmp(tv->name.c_str(), &qv->flag[2], strlen(tv->name.c_str()))) {
+                               found = TRUE;
+                               ch->Send("%s\r\n", qv->description);
+                               break;
+                           }
+                       }
+                       }
+                    }
+                    if (!found) {
+                      if (view_room->n_description && (time_info.hours < 6 || time_info.hours >21)) {
                         if (view_room->tmp_n_description)
                             ch->Send("%s", view_room->tmp_n_description);
                         else
                             ch->Send("%s", view_room->n_description);
-                    }
-                    else {
+                      }
+                      else {
                         if (view_room->tmp_description)
                             ch->Send("%s", view_room->tmp_description);
                         else
 			    ch->Send ( "%s", view_room->GetDescription() );
                     }
-			//if (ch->Flying())
-			//ch->Send( "You are flying a few feet up in the air.\r\n");
+                    }
 		}
 
 		ch->Send ( "%s", CCNRM ( ch, C_NRM ) );

@@ -336,6 +336,7 @@ int save_rooms(zone_rnum rzone)
   int i;
   Room *room;
   struct extra_descr_data *ex_desc = NULL;;
+  struct q_descr_data *q_descr = NULL, *q_descr_next = NULL;
   FILE *sf;
   char filename[128];
   char buf[MAX_STRING_LENGTH];
@@ -477,6 +478,23 @@ int save_rooms(zone_rnum rzone)
                   "%s~\n", ex_desc->keyword, buf);
         }
       }
+
+      if (room->q_description) {
+        for (q_descr = room->q_description; q_descr; q_descr = q_descr_next) {
+          q_descr_next = q_descr->next;
+          if (!q_descr->flag || !q_descr->description) continue; 
+          strlcpy(buf, q_descr->flag, sizeof(buf));
+          strip_cr(buf);
+          strlcpy(buf1, q_descr->description, sizeof(buf1));
+          strip_cr(buf1);
+          fprintf(sf, "Q\n"
+                      "%i\n"
+                      "%s~\n"
+                      "%s~\n", 
+                      q_descr->type, buf, buf1);
+        }
+      }
+
       if (room->look_above_description)
       {
         for (ex_desc = room->look_above_description; ex_desc; ex_desc = ex_desc->next)

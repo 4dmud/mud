@@ -1686,6 +1686,14 @@ struct room_ores {
     struct room_ores *next;
 };
 
+struct q_descr_data {
+    int type;
+    char *description;
+    char *flag;
+    struct q_descr_data *next;
+};
+
+
 /* ================== Memory Structure for room ======================= */
 class Room {
 public:
@@ -1700,6 +1708,7 @@ public:
     long GetDesc();
     void SetDesc(long id);
     
+    struct q_descr_data *q_description;
 
     char *smell;         /* smell description                    */
     char *listen;        /* listen description                   */
