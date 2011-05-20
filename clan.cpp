@@ -39,6 +39,23 @@ extern int TEMP_LOAD_CHAR;
 
 vector<clan_list_data> clan_list[MAX_CLANS];
 
+const char *clan_commands[] =
+{
+    "who",
+    "status",
+    "list",
+    "info",
+    "leave",
+    "setplan",
+    "enroll",
+    "expel",
+    "promote",
+    "demote",
+    "setfees",
+    "withdraw",
+    "setapplev",
+    ""
+};
 
 char clan_privileges[NUM_CP + 1][20] =
 {
@@ -91,7 +108,7 @@ void send_clan_format ( Character *ch )
 			if ( r >= clan[c].privilege[CP_ENROLL] )
 				ch->Send ( "   clan enroll     <player>\r\n" );
 			if ( r >= clan[c].privilege[CP_EXPEL] )
-				ch->Send ( "   clan expel      <player>\r\n" );
+				ch->Send ( "   clan expel      <player> noflag/outcast\r\n" );
 			if ( r >= clan[c].privilege[CP_PROMOTE] )
 				ch->Send ( "   clan promote    <player>\r\n" );
 			if ( r >= clan[c].privilege[CP_DEMOTE] )
@@ -1069,18 +1086,17 @@ void do_clan_info ( Character *ch, char *arg )
 	    "\r\n   <----------------[%-14s]--------------->\r\n"
 	    "   O-----------------------------------------------O\r\n"
 	    "   |    Ranks  : %-3d    |    Power   : %-5d       |\r\n"
-	    "   |    Members: %-3d    |    Treasure: {cy%-10lld{c0  |\r\n"
+	    "   |    Members: %-3d    |    Treasure: {cy%-12lld{c0|\r\n"
 	    "   O-----------------------------------------------O\r\n",
 	    clan[i].name, clan[i].ranks, clan[i].power,
-	    clan[i].members, clan[i].treasure );
-	if ( 0 )
-	{
-		ch->Send (
-		    "   |         Points          |      Tokens         |\r\n"
-		    "   |   Quartz 0  Amethyst 0  |  Brass 0 Bronze 0   |\r\n"
-		    "   | Sapphire 0      Ruby 0  | Silver 0   Gold 0   |\r\n"
-		    "   O-----------------------------------------------O\r\n" );
-	}
+	    clan[i].members, clan[i].treasury.coins );
+	ch->Send (
+	    "   | Gold Tokens      : %-10d                  |\r\n"
+	    "   | Silver Tokens    : %-10d                  |\r\n"
+	    "   | Bronze Tokens    : %-10d                  |\r\n"
+	    "   O-----------------------------------------------O\r\n",
+            clan[i].treasury.gold, clan[i].treasury.silver,
+            clan[i].treasury.bronze );
 
 	ch->Send (
 	    "   |    Enroll   : %-3d  |    Expel       : %-3d     |\r\n"
@@ -1222,7 +1238,11 @@ void clan_to_store ( int i )
 	}
 	fprintf ( fl, "-1: none\n" );
 
-	fprintf ( fl, "Tres: %lld\n", clan[i].treasure );
+//	fprintf ( fl, "Tres: %lld\n", clan[i].treasure );
+        fprintf ( fl, "Coin: %lld\n", clan[i].treasury.coins);
+        fprintf ( fl, "Gold: %d\n", clan[i].treasury.gold);
+        fprintf ( fl, "Silv: %d\n", clan[i].treasury.silver);
+        fprintf ( fl, "Bron: %d\n", clan[i].treasury.bronze);
 	fprintf ( fl, "Memb: %d\n", clan[i].members );
 	fprintf ( fl, "Powr: %d\n", clan[i].power );
 	fprintf ( fl, "Appf: %lld\n", clan[i].app_fee );
@@ -1317,8 +1337,14 @@ int store_to_clan ( int i )
 			case 'B':
 				if ( !strcmp ( tag, "Bord" ) )
 					clan[i].board = num;
+                                else if (!strcmp(tag, "Bron"))
+                                        clan[i].treasury.bronze = num;
 				break;
 
+                        case 'C':
+                                if (!strcmp(tag, "Coin"))
+                                        clan[i].treasury.coins += num6;
+                                break;
 			case 'D':
 				if ( !strcmp ( tag, "Desc" ) )
 				{
@@ -1348,6 +1374,10 @@ int store_to_clan ( int i )
 					while ( num != -1 );
 				}
 				break;
+                        case 'G':
+                                if (!strcmp(tag, "Gold"))
+                                        clan[i].treasury.gold = num;
+                                break;
 			case 'I':
 				if ( !strcmp ( tag, "Id  " ) )
 					clan[i].id = num;
@@ -1355,47 +1385,41 @@ int store_to_clan ( int i )
 
 			case 'M':
 				if ( !strcmp ( tag, "Memb" ) )
-				{
 					clan[i].members = num;
-					break;
-				case 'N':
-					if ( !strcmp ( tag, "Name" ) )
-						strcpy ( clan[i].name, line );
-					break;
+				break;
+			case 'N':
+				if ( !strcmp ( tag, "Name" ) )
+					strcpy ( clan[i].name, line );
+				break;
 
-				case 'P':
-					if ( !strcmp ( tag, "Powr" ) )
-						clan[i].power = num;
-					else if ( !strcmp ( tag, "Priv" ) )
+			case 'P':
+				if ( !strcmp ( tag, "Powr" ) )
+					clan[i].power = num;
+				else if ( !strcmp ( tag, "Priv" ) )
+				{
+					do
 					{
-						do
-						{
-							get_line ( fl, line );
-							sscanf ( line, "%d %d", &num, &num2 );
-							if ( num != -1 )
-							{
-								clan[i].privilege[num] = num2;
-							}
-						}
-						while ( num != -1 );
+					get_line ( fl, line );
+					sscanf ( line, "%d %d", &num, &num2 );
+					if ( num != -1 )
+					  clan[i].privilege[num] = num2;
 					}
-
+					while ( num != -1 );
+				}
 					break;
 
-				case 'R':
-
-
-					if ( !strcmp ( tag, "Rnks" ) )
-						clan[i].ranks = num;
-					else if ( !strcmp ( tag, "Reca" ) )
-						clan[i].recall = num;
-					else if ( !strcmp ( tag, "RnkN" ) )
+			case 'R':
+				if ( !strcmp ( tag, "Rnks" ) )
+					clan[i].ranks = num;
+				else if ( !strcmp ( tag, "Reca" ) )
+					clan[i].recall = num;
+				else if ( !strcmp ( tag, "RnkN" ) )
+				{
+					do
 					{
-						do
-						{
-							get_line ( fl, line );
-							sscanf ( line, "%d: %20[^\f\n\r\t\v]", &num, ( char * ) &buffer );
-							if ( num != -1 )
+					get_line ( fl, line );
+					sscanf ( line, "%d: %20[^\f\n\r\t\v]", &num, ( char * ) &buffer );
+					if ( num != -1 )
 							{
 								strcpy ( clan[i].rank_name[num],  buffer );
 							}
@@ -1418,11 +1442,13 @@ int store_to_clan ( int i )
 						}
 						while ( num != -1 );
 					}
+                                        else if (!strcmp(tag, "Silv"))
+                                            clan[i].treasury.silver = num;
 					break;
 
 				case 'T':
 					if ( !strcmp ( tag, "Tres" ) )
-						clan[i].treasure = num6;
+						clan[i].treasury.coins += num6;
 					break;
 
 				case 'W':
@@ -1444,7 +1470,6 @@ int store_to_clan ( int i )
 				default:
 					sprintf ( buffer, "SYSERR: Unknown tag %s in clan %d", tag, i );
 				}
-		}
 	}
 
 	fclose ( fl );
@@ -1570,6 +1595,104 @@ void do_clan_list ( Character *ch, char *arg )
 
 }
 
+#define DEP_COINS     1
+#define DEP_GOLD      2
+#define DEP_SILVER    3
+#define DEP_BRONZE    4
+void do_clan_deposit(Character *ch, char *arg)
+{
+  int clan_num = 0;
+  gold_int amount = 0;
+  int type = 0;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+
+  if (!(*arg)) {
+      send_clan_format(ch);
+      return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_GOD) {
+      if ( ( clan_num = find_clan_by_id ( GET_CLAN ( ch ) ) ) < 0 ) {
+       	  ch->Send ( "You don't belong to any clan!\r\n" );
+	  return;
+      }
+  }
+  else if (GET_LEVEL(ch) < LVL_CLAN_GOD) {
+      ch->Send("You do not have clan privileges.\r\n");
+      return;
+  }
+
+  arg = two_arguments(arg, arg1, arg2);
+  skip_spaces(&arg);
+  
+  if (!is_number(arg1)) {
+      if (is_abbrev(arg1, "gold")) 
+          type = DEP_GOLD;
+      else if (is_abbrev(arg1, "silver"))
+          type = DEP_SILVER; 
+      else if (is_abbrev(arg1, "bronze"))
+          type = DEP_BRONZE; 
+      else {
+          ch->Send("FORMAT: clan deposit <gold/silver/bronze> <amount>\r\n");
+          return;
+      }
+      if (GET_LEVEL(ch) >= LVL_GOD) 
+          clan_num = find_clan(arg);
+
+      amount = atoll(arg2);
+  }
+  else {
+      type = DEP_COINS;
+      amount = atoll(arg1);
+      if (GET_LEVEL(ch) >= LVL_GOD)
+          clan_num = find_clan(arg2);
+  }
+
+  if (clan_num < 0) {
+      ch->Send("This clan does not exist!\r\n");
+      return;
+  }
+
+  if (type == DEP_COINS) {
+      if (GET_LEVEL(ch) < LVL_GOD && ch->Gold(0, GOLD_BANK) < amount) {
+          ch->Send("You do not have enough gold coins to deposit into the treasury!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.coins += amount;
+      ch->Gold( -amount, GOLD_BANK);
+  }
+  else if (type == DEP_GOLD) {
+      if (GET_LEVEL(ch) < LVL_GOD && GET_GOLD_TOKEN_COUNT(ch) < amount) {
+          ch->Send("You do not have enough gold tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.gold += amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_GOLD_TOKEN_COUNT(ch) -= amount;
+  }
+  else if (type == DEP_SILVER) {
+      if (GET_LEVEL(ch) < LVL_GOD && GET_SILVER_TOKEN_COUNT(ch) < amount) {
+          ch->Send("You do not have enough silver tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.silver += amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_SILVER_TOKEN_COUNT(ch) -= amount;
+  }
+  else if (type == DEP_BRONZE) {
+      if (GET_LEVEL(ch) < LVL_GOD && GET_BRONZE_TOKEN_COUNT(ch) < amount) {
+          ch->Send("You do not have enough gold tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.bronze += amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_BRONZE_TOKEN_COUNT(ch) -= amount;
+  }
+  ch->Send("You add to the clan's treasury.\r\n");
+  save_clans();
+}
+
 void do_clan_bank ( Character *ch, char *arg, int action )
 {
 	int clan_num, immcom = 0;
@@ -1611,7 +1734,7 @@ void do_clan_bank ( Character *ch, char *arg, int action )
 	if ( ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_WITHDRAW]
 	        && !immcom && action == CB_WITHDRAW ) )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -1727,7 +1850,7 @@ void do_clan_money ( Character *ch, char *arg, int action )
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_FEES]
 	        && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -2338,7 +2461,7 @@ ACMD ( do_clan )
 	}
 	if ( is_abbrev ( arg1, "deposit" ) )
 	{
-		do_clan_bank ( ch, arg2, CB_DEPOSIT );
+		do_clan_deposit ( ch, arg2 );
 		return;
 	}
 	if ( is_abbrev ( arg1, "list" ) )

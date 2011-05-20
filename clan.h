@@ -23,7 +23,7 @@
 #define CB_DEPOSIT  1
 #define CB_WITHDRAW 2
 #define MAX_CLAN_SPELLS 5
-#define NUM_CLAN_PRIVILEGE 20
+#define NUM_CLAN_PRIVILEGE 20  /* Max clan privileges */
 #define NUM_AT_CLAN_WAR 4
 #define NUM_CLAN_EQ 3
 
@@ -35,12 +35,20 @@ char *clan_name(int idnum);
 
 extern int num_of_clans;
 
+struct clan_gold_type {
+    gold_int coins;
+    int gold;
+    int silver;
+    int bronze;
+};
+
 struct clan_rec {
     int id;
     char name[32];
     int ranks;
     char rank_name[20][20];
     gold_int treasure;
+    struct clan_gold_type treasury;
     int members;
     int power;
     gold_int app_fee;
@@ -56,3 +64,29 @@ struct clan_rec {
 };
 
 extern vector<clan_rec> clan;
+
+// HORUS NEW CLAN CODE
+#define MAX_CLAN_RANKS     20
+#define MAX_CLAN_COMMANDS  20
+#define MAX_CLAN_EQ        5
+
+struct clan_data_type {
+    int id;
+    char *name;
+    char *description;
+    int ranks;
+    char *rank_name[MAX_CLAN_RANKS];
+    struct clan_gold_type treasure;
+    int members;
+    int power;
+    int app_level;
+    gold_int app_fee;
+    gold_int app_dues;
+    int commands[MAX_CLAN_COMMANDS];
+    room_vnum recall;
+    obj_vnum board;
+    int clan_eq[MAX_CLAN_EQ];
+    int spells[MAX_CLAN_SPELLS];
+    int at_war[NUM_AT_CLAN_WAR];
+};
+
