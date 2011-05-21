@@ -16,7 +16,7 @@
 
 #include <dirent.h>
 
-// test 1
+// test 2
 
 #include "structs.h"
 #include "utils.h"
