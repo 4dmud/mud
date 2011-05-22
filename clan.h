@@ -21,7 +21,7 @@
 #define CM_APPFEE 2
 
 #define CB_DEPOSIT  1
-#define CB_WITHDRAW 2
+#define CB_WITHDRAW 2 
 #define MAX_CLAN_SPELLS 5
 #define NUM_CLAN_PRIVILEGE 20  /* Max clan privileges */
 #define NUM_AT_CLAN_WAR 4

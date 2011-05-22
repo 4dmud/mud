@@ -82,7 +82,9 @@ void send_clan_format ( Character *ch )
 		           "   clan demote     <player> <clan>\r\n"
                            "   clan retire     <yes>\r\n"
 		           "   clan withdraw   <amount> <clan>\r\n"
+                           "   clan withdraw   <gold/silver/bronze> <amount> <clan>\r\n"
 		           "   clan deposit    <amount> <clan>\r\n"
+                           "   clan deposit    <gold/silver/bronze> <amount> <clan>\r\n"
 		           "   clan set ranks  <rank>   <clan>\r\n"
 		           "   clan set appfee <amount> <clan>\r\n"
 		           "   clan set dues   <amount> <clan>\r\n"
@@ -103,8 +105,11 @@ void send_clan_format ( Character *ch )
 		if ( c >= 0 )
 		{
 			ch->Send ( "   clan deposit    <amount>\r\n" );
-			if ( r >= clan[c].privilege[CP_WITHDRAW] )
+                        ch->Send ( "   clan deposit    <gold/silver/bronze> <amount>\r\n");
+			if ( r >= clan[c].privilege[CP_WITHDRAW] ) {
 				ch->Send ( "   clan withdraw   <amount>\r\n" );
+                                ch->Send ( "   clan withdraw   <gold/silver/bronze> <amount>\r\n");
+                        }
 			if ( r >= clan[c].privilege[CP_ENROLL] )
 				ch->Send ( "   clan enroll     <player>\r\n" );
 			if ( r >= clan[c].privilege[CP_EXPEL] )
@@ -1599,7 +1604,7 @@ void do_clan_list ( Character *ch, char *arg )
 #define DEP_GOLD      2
 #define DEP_SILVER    3
 #define DEP_BRONZE    4
-void do_clan_deposit(Character *ch, char *arg)
+void do_clan_withdraw(Character *ch, char *arg)
 {
   int clan_num = 0;
   gold_int amount = 0;
@@ -1621,6 +1626,102 @@ void do_clan_deposit(Character *ch, char *arg)
   else if (GET_LEVEL(ch) < LVL_CLAN_GOD) {
       ch->Send("You do not have clan privileges.\r\n");
       return;
+  }
+
+  arg = two_arguments(arg, arg1, arg2);
+  skip_spaces(&arg);
+  
+  if (!is_number(arg1)) {
+      if (is_abbrev(arg1, "gold")) 
+          type = DEP_GOLD;
+      else if (is_abbrev(arg1, "silver"))
+          type = DEP_SILVER; 
+      else if (is_abbrev(arg1, "bronze"))
+          type = DEP_BRONZE; 
+      else {
+          ch->Send("FORMAT: clan withdraw <gold/silver/bronze> <amount>\r\n");
+          return;
+      }
+      if (GET_LEVEL(ch) >= LVL_GOD) 
+          clan_num = find_clan(arg);
+
+      amount = atoll(arg2);
+  }
+  else {
+      type = DEP_COINS;
+      amount = atoll(arg1);
+      if (GET_LEVEL(ch) >= LVL_GOD)
+          clan_num = find_clan(arg2);
+  }
+
+  if (clan_num < 0) {
+      ch->Send("This clan does not exist!\r\n");
+      return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_GOD && GET_CLAN_RANK(ch) < clan[clan_num].ranks) {
+     ch->Send("You do not have permission to withdraw from the treasury.\r\n");
+     return;
+  }
+      
+
+  if (type == DEP_COINS) {
+      if (clan[clan_num].treasury.coins < amount) {
+          ch->Send("The clan treasury does not have that much gold coins!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.coins -= amount;
+      ch->Gold( amount, GOLD_BANK);
+  }
+  else if (type == DEP_GOLD) {
+      if (clan[clan_num].treasury.gold < amount) {
+          ch->Send("The treasury does not have that much gold tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.gold -= amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_GOLD_TOKEN_COUNT(ch) += amount;
+  }
+  else if (type == DEP_SILVER) {
+      if (clan[clan_num].treasury.silver < amount) {
+          ch->Send("The treasury does not have that much silver tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.silver -= amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_SILVER_TOKEN_COUNT(ch) += amount;
+  }
+  else if (type == DEP_BRONZE) {
+      if (clan[clan_num].treasury.bronze < amount) {
+          ch->Send("The treasury does not have that much bronze tokens!\r\n");
+          return;
+      }
+      clan[clan_num].treasury.bronze -= amount;
+      if (GET_LEVEL(ch) < LVL_GOD)
+          GET_BRONZE_TOKEN_COUNT(ch) += amount;
+  }
+  ch->Send("You withdraw from the clan's treasury.\r\n");
+  save_clans();
+}
+
+void do_clan_deposit(Character *ch, char *arg)
+{
+  int clan_num = 0;
+  gold_int amount = 0;
+  int type = 0;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+
+  if (!(*arg)) {
+      send_clan_format(ch);
+      return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_GOD) {
+      if ( ( clan_num = find_clan_by_id ( GET_CLAN ( ch ) ) ) < 0 ) {
+       	  ch->Send ( "You don't belong to any clan!\r\n" );
+	  return;
+      }
   }
 
   arg = two_arguments(arg, arg1, arg2);
@@ -2456,7 +2557,7 @@ ACMD ( do_clan )
 	}
 	if ( is_abbrev ( arg1, "withdraw" ) )
 	{
-		do_clan_bank ( ch, arg2, CB_WITHDRAW );
+		do_clan_withdraw ( ch, arg2 );
 		return;
 	}
 	if ( is_abbrev ( arg1, "deposit" ) )
