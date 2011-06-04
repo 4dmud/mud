@@ -508,6 +508,7 @@ SPECIAL(clan_deeds)
   sprintf(arg1, "%s claimed by %s.", deed->short_description, clan[i].name);
   free(deed->short_description);
   deed->short_description = strdup(arg1);
+  GET_OBJ_TIMER(deed) = -1;
   for (box = deed_room->contents; box; box = box->next_content)
       if (box->item_number == 9) break;
   if (!box) return TRUE;
