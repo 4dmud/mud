@@ -162,6 +162,7 @@ bool can_have_follower ( Character *ch, mob_vnum mob_num );
 bool can_have_follower ( Character *ch, Character *vict );
 room_rnum find_target_room(Character *ch, char *rawroomstr);
 void look_in_obj(Character *ch, char *arg, struct obj_data *item);
+bool is_same_zone(int dv, int cv);
 
 ACMD ( do_drop );
 ACMD ( do_gen_door );
@@ -460,6 +461,7 @@ SPECIAL(clan_deeds)
 {
   struct obj_data *box = NULL;
   struct obj_data *deed = (struct obj_data *)me;
+  struct obj_data *tdeed, *tdeed_next;
   char arg1[256], arg2[256];
   room_rnum deed_room = NULL;
   struct clan_deed_type *cd, *cd_next, *temp;
@@ -489,8 +491,7 @@ SPECIAL(clan_deeds)
   }
   for (cd = clan[i].deeds; cd; cd = cd_next) {
       cd_next = cd->next;
-      if (cd->zone == GET_OBJ_VAL(deed, 0)) {
-          REMOVE_FROM_LIST(cd, clan[i].deeds, next);
+      if (is_same_zone(cd->zone, GET_OBJ_VAL(deed, 0))) {
           obj_from_char(deed);
           extract_obj(deed);
           ch->Send("Your clan already has claimed this deed.\r\n");
@@ -510,6 +511,26 @@ SPECIAL(clan_deeds)
   for (box = deed_room->contents; box; box = box->next_content)
       if (box->item_number == 9) break;
   if (!box) return TRUE;
+
+  /* Lets check if some other clan has claims to this deed */
+  /* Remove the clan deed from the deed box                */
+  for (tdeed = box->contains; tdeed; tdeed = tdeed_next) {
+      tdeed_next = tdeed->next_content;
+      if (is_same_zone(GET_OBJ_VAL(tdeed, 0), GET_OBJ_VAL(deed, 0))) {
+          obj_from_obj(tdeed);
+          extract_obj(tdeed);
+      }
+  }
+  for (i = 0; i < num_of_clans; i++) {
+      for (cd = clan[i].deeds; cd; cd = cd_next) {
+          cd_next = cd->next;
+          if (is_same_zone(cd->zone, GET_OBJ_VAL(deed, 0))) {
+              REMOVE_FROM_LIST(cd, clan[i].deeds, next);
+              free(cd);
+          }
+      }
+  }
+
   obj_from_char(deed);
   obj_to_obj(deed, box);
   ch->Send("You have now claimed a new deed for your clan!\r\n");
