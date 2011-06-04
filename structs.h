@@ -1805,6 +1805,12 @@ struct pclean_criteria_data {
     int days;            /* time limit (in days)          */
 };
 
+struct clan_deed_data {
+    int zone;
+    time_t time_in;       // time spent in the zone
+    time_t time_out;      // time spent away from the zone
+    int kills;
+};
 
 /* general player-related info, usually PC's and NPC's */
 struct char_player_data {
@@ -1828,6 +1834,7 @@ struct char_player_data {
     int romance;         /* Romance Involvement Variable         */
     long partner;        /* id of Romance Partner     (was char pointer, but meh, why bother with the freeing?)         */
     int ticks_left;      /* Timer variable                       */
+    struct clan_deed_data deeds;
 
 };
 

@@ -866,11 +866,80 @@ void char_from_room ( Character *ch )
 
 }
 
+bool is_same_zone(int dv, int cv)
+{
+
+    if (dv == cv)
+        return TRUE;
+    if (cv == 18 || cv == 20)
+        if (dv == 18 || dv == 20)
+            return TRUE;
+    if (cv == 24 || cv == 34)
+        if (dv == 24 || dv == 34)
+            return TRUE;
+    if (cv == 63 || cv == 82)
+        if (dv == 63 || dv == 82)
+            return TRUE;
+    if (cv == 96 || cv == 97)
+        if (dv == 96 || dv == 97)
+            return TRUE;
+    if (cv == 110 || cv == 112)
+        if (dv == 110 || dv == 112)
+            return TRUE;
+    if (cv == 118 || cv == 119)
+        if (dv == 118 || dv == 119)
+            return TRUE;
+    if (cv == 145 || cv == 232)
+        if (dv == 145 || dv == 232)
+            return TRUE;
+    if (cv == 180 || cv == 314)
+        if (dv == 180 || dv == 314)
+            return TRUE;
+    if (cv == 187 || cv == 237)
+        if (dv == 187 || dv == 237)
+            return TRUE;
+    if (cv == 189 || cv == 203)
+        if (dv == 189 || dv == 203)
+            return TRUE;
+    if (cv == 219 || cv == 270)
+        if (dv == 219 || dv == 270)
+            return TRUE;
+    if (cv == 40 || cv == 500 || cv == 550)
+        if (dv == 40 || dv == 500 || dv == 550)
+            return TRUE;
+    if (cv == 43 || cv == 115 || cv == 116)
+        if (dv == 43 || dv == 115 || dv == 116)
+            return TRUE;
+    if (cv == 58 || cv == 220 || cv == 383)
+        if (dv == 58 || dv == 220 || dv == 383)
+            return TRUE;
+    if (cv == 70 || cv == 71 || cv == 72)
+        if (dv == 70 || dv == 71 || dv == 72)
+            return TRUE;
+    if (cv == 74 || cv == 126 || cv == 160)
+        if (dv == 74 || dv == 126 || dv == 160)
+            return TRUE;
+    if (cv == 62 || cv == 520 || cv == 521 || cv == 522)
+        if (dv == 62 || dv == 520 || dv == 521 || dv == 522)
+            return TRUE;
+    if (cv == 123 || cv == 142 || cv == 146 || cv == 233)
+        if (dv == 123 || dv == 142 || dv == 146 || dv == 233)
+            return TRUE;
+    if (cv == 132 || cv == 133 || cv == 134 || cv == 143)
+        if (dv == 132 || dv == 133 || dv == 134 || dv == 143)
+            return TRUE;
+    if (cv == 560 || cv == 561 || cv == 562 || cv == 563 || cv == 600)
+        if (dv == 560 || dv == 561 || dv == 562 || dv == 563 || dv == 600)
+            return TRUE;
+
+    return FALSE;
+
+}
 
 /* place a character in a room */
 void char_to_room ( Character *ch, room_rnum room )
 {
-
+  int zone_num;
 	if ( IN_ROOM ( ch ) != NULL )
 	{
 		log ( "char_to_room called when current room doesnt equal null" );
@@ -909,6 +978,36 @@ void char_to_room ( Character *ch, room_rnum room )
 		stop_fighting ( FIGHTING ( ch ) );
 		stop_fighting ( ch );
 	}
+
+    /* HORUS - clan deeds
+         - For any given zone, they have to be in that zone for at least
+         - five minutes before their time_in starts.
+         - If they leave any zone for more than five minutes, their
+         - current zone gets saved. They then cant leave this zone for
+         - more than fives minutes or it gets overwritten by the next zone
+    ************************************************************/
+  if (!IS_NPC(ch)) {
+    zone_num = zone_table[room->zone].number;
+    if (ch->player.deeds.zone == 0) {
+        ch->player.deeds.zone = zone_num;
+        ch->player.deeds.time_in = time(0);
+        ch->player.deeds.time_out = 0;
+        ch->player.deeds.kills = 0;
+    }
+    else if (!is_same_zone(ch->player.deeds.zone, zone_num)) {
+        if (ch->player.deeds.time_out == 0)  {
+            ch->player.deeds.time_out = time(0);
+        }
+        else if (time(0) - ch->player.deeds.time_out > 3) {
+            ch->player.deeds.zone = zone_num;
+            ch->player.deeds.time_in = time(0);
+            ch->player.deeds.time_out = 0;
+            ch->player.deeds.kills = 0;
+        }
+    }
+    else if (is_same_zone(ch->player.deeds.zone, zone_num))
+        ch->player.deeds.time_out = 0;
+  }            
 
 }
 

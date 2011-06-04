@@ -30,7 +30,7 @@
  * - added a new dlib library.
  *
  * Revision 1.74  2007/06/26 10:48:05  w4dimenscor
- * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds player one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
+ * Fixed context in scripts so that it works again, changed mounted combat so that it is about 2/3rds  one third mount damage, updated the way skills get read using total_chance, stopped things with a PERC of 0 assisting, made it so that the ungroup command disbanded charmies
  *
  * Revision 1.73  2007/06/17 10:44:53  w4dimenscor
  * Fixed a bug in a mounted persons movepoints going below 0, fixed abuse of animate dead, fixed group spells to allow for inclusion of charmies, and set a limit on total charmies in a group.
@@ -294,6 +294,7 @@ so that spell affects arent done at time of casting and damage is done at time o
 #include "comm.h"
 #include "handler.h"
 #include "interpreter.h"
+#include "clan.h"
 #include "db.h"
 #include "spells.h"
 #include "screen.h"
@@ -381,6 +382,7 @@ int speed_update ( Character *ch );
 void kill_list ( Character *ch, Character *vict );
 int attack_group = 1;
 
+bool is_same_zone(int dv, int cv);
 
 /*mord*/
 void check_timer ( obj_data *obj );
@@ -5100,6 +5102,22 @@ void make_corpse ( Character *ch, Character *killer )
 		/* transfer gold */
 		if ( ch->Gold ( 0, GOLD_HAND ) > 0 )
 		{
+                /* Clan deeds - lets check if the clan gets a bonus */
+                    if (IS_NPC(ch) && killer && !IS_NPC(killer)) {
+                        struct clan_deed_type *cl;
+                        int clan_num, zone_num;
+                        zone_num = zone_table[IN_ROOM(ch)->zone].number;
+                        if ((clan_num = find_clan_by_id(GET_CLAN(killer))) >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
+                            for (cl = clan[clan_num].deeds; cl; cl = cl->next){
+                                if (is_same_zone(cl->zone, zone_num)) {
+                                    clan[clan_num].treasury.coins += ch->Gold(0, GOLD_HAND)/100;
+                                    killer->Send("Clan Deed: You have added %lld gold coins into the treasury.\r\n", ch->Gold(0, GOLD_HAND)/100);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
 			/* following 'if' clause added to fix gold duplication loophole */
 			if ( IS_NPC ( ch ) || ( !IS_NPC ( ch ) && ch->desc ) )
 			{
@@ -5257,8 +5275,45 @@ void death_cry ( Character *ch )
 
 void raw_kill ( Character *ch, Character *killer )
 {
+  float ct = 0;
+  struct obj_data *obj;
+  char buf[256];
+  int zone_num;
+
 	if ( !ch || DEAD ( ch ) )
 		return;
+
+  /* Clan deeds - count the kills in the zone */
+  /* Then check if the player has a good kill/time ratio so
+     they dont cheat on just idling in the zone to get the deeds */
+  if (ch && killer && !IS_NPC(killer) && IS_NPC(ch)) {
+      zone_num = zone_table[IN_ROOM(ch)->zone].number;      
+      if (is_same_zone(killer->player.deeds.zone, zone_num) && is_same_zone(ch->vnum/100, killer->player.deeds.zone))  {
+          killer->player.deeds.kills++;
+          ct = (time(0) - killer->player.deeds.time_in)/300.00;
+          ct = (float)killer->player.deeds.kills/ct;
+          /* Reset timers and kills since they idled */
+          if (ct < 5) {
+              killer->player.deeds.time_in = time(0);
+              killer->player.deeds.kills = 0;
+          }
+
+          /* Now lets check percentage chance for deed to load */
+          /* Percentage chance increases every 20 minutes      */
+          ct = (time(0) - killer->player.deeds.time_in)/1200.00;
+          ct += 2;     // Always 2 percentage chance anyways
+          if (number(0, 100) < (int)ct) {
+              obj = read_object(7, VIRTUAL);
+              sprintf(buf, "Clan deed for %s!\r\n", zone_table[IN_ROOM(killer)->zone].name);
+              obj->short_description = strdup(buf);
+              sprintf(buf, "Clan deed for %s is lying here!\r\n", zone_table[IN_ROOM(killer)->zone].name);
+              obj->description = strdup(buf);
+              GET_OBJ_VAL(obj, 0) = zone_num;
+              obj_to_char(obj, ch);
+              load_otrigger(obj);
+          }    
+      }
+  }
 
 	remove_all_normal_affects ( ch );
 	/* To make ordinary commands work in scripts.  welcor */
@@ -5399,6 +5454,22 @@ void die ( Character *ch, Character *killer )
 					}
 				}
 				gain_exp ( temp, exp );
+                    if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
+                        struct clan_deed_type *cl;
+                        int clan_num, zone_num;
+                        zone_num = zone_table[IN_ROOM(ch)->zone].number;
+                        clan_num = find_clan_by_id(GET_CLAN(temp));
+                        if (is_same_zone(ch->vnum/100, zone_num)) {
+                            for (cl = clan[clan_num].deeds; cl; cl = cl->next){
+                                if (is_same_zone(cl->zone, zone_num)) {
+                                    gain_exp(temp, exp/10);
+                                    killer->Send("Clan Deed Bonus XP: %lld.\r\n", exp);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
 			}
 		}
 

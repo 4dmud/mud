@@ -42,6 +42,11 @@ struct clan_gold_type {
     int bronze;
 };
 
+struct clan_deed_type {
+    int zone;
+    struct clan_deed_type *next;
+};
+
 struct clan_rec {
     int id;
     char name[32];
@@ -61,6 +66,7 @@ struct clan_rec {
     room_vnum recall;
     int clan_eq[NUM_CLAN_EQ];
     obj_vnum board;
+    struct clan_deed_type *deeds;
 };
 
 extern vector<clan_rec> clan;

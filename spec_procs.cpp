@@ -118,6 +118,7 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
+#include "clan.h"
 #include "spells.h"
 #include "dg_scripts.h"
 #include "constants.h"
@@ -159,6 +160,8 @@ int tier_level ( Character *ch, int chclass );
 void remove_corpse_from_list ( OBJ_DATA *corpse );
 bool can_have_follower ( Character *ch, mob_vnum mob_num );
 bool can_have_follower ( Character *ch, Character *vict );
+room_rnum find_target_room(Character *ch, char *rawroomstr);
+void look_in_obj(Character *ch, char *arg, struct obj_data *item);
 
 ACMD ( do_drop );
 ACMD ( do_gen_door );
@@ -179,6 +182,7 @@ SPECIAL (antidt);
 SPECIAL ( bank );
 SPECIAL ( bottle );
 SPECIAL ( cityguard );
+SPECIAL ( clan_deeds);
 SPECIAL ( cleric );
 SPECIAL ( craps );
 SPECIAL ( door_down );
@@ -420,6 +424,96 @@ SPECIAL(antidt)
   return 0;
   
 
+}
+
+/* Clan deed boxes in each clan hall are fakes. They are just there so
+   this spec_proc can run, transferring the PC to room 5 and make them
+   look at the real box.                            
+*/
+SPECIAL(deed_box)
+{
+  struct obj_data *box = NULL;
+  struct obj_data *deed;
+  char arg1[256];
+  room_rnum deed_room;
+
+  if (!CMD_IS("look")) return FALSE;
+
+  one_argument(argument, arg1);
+
+  if (strcmp(arg1, "box"))  return FALSE;
+
+  deed_room = real_room(5);
+
+  for (box = deed_room->contents; box; box = box->next_content) 
+      if (box->item_number == 9) break;
+
+  if (!box) return TRUE;  // bugged! the deed box should be there!
+
+  for (deed = box->contains; deed; deed = deed->next_content) 
+      ch->Send(deed->short_description);
+
+  return TRUE;
+}
+
+SPECIAL(clan_deeds)
+{
+  struct obj_data *box = NULL;
+  struct obj_data *deed = (struct obj_data *)me;
+  char arg1[256], arg2[256];
+  room_rnum deed_room = NULL;
+  struct clan_deed_type *cd, *cd_next, *temp;
+  int i = 0;
+
+  if (!CMD_IS("put"))
+      return FALSE;
+
+  argument = two_arguments(argument, arg1, arg2);
+
+  if (strcmp(arg1, "deed") || strcmp(arg2, "box"))
+      return FALSE;
+
+  deed_room = real_room(5);
+
+  /* Check if there is a deed box here */
+  for (box = IN_ROOM(ch)->contents; box; box = box->next_content)
+      if (box->item_number == 8) break;
+
+  if (!box) return FALSE;  // Maybe put in a different box?
+
+  /* Lets now check if clan already has deed */
+  i = find_clan_by_id(GET_CLAN(ch));
+  if (1 < 0) {
+      ch->Send("You are not in any clan!\r\n");
+      return TRUE;
+  }
+  for (cd = clan[i].deeds; cd; cd = cd_next) {
+      cd_next = cd->next;
+      if (cd->zone == GET_OBJ_VAL(deed, 0)) {
+          REMOVE_FROM_LIST(cd, clan[i].deeds, next);
+          obj_from_char(deed);
+          extract_obj(deed);
+          ch->Send("Your clan already has claimed this deed.\r\n");
+          return TRUE;
+      }
+  }
+          
+  /* Assume the clan does not have this deed, lets put the deed */
+  /* in the box and give the clan the bonuses.                  */
+  CREATE(cd, struct clan_deed_type, 1);
+  cd->zone = GET_OBJ_VAL(deed, 0);
+  cd->next = clan[i].deeds;
+  clan[i].deeds = cd;  
+  sprintf(arg1, "%s claimed by %s.", deed->short_description, clan[i].name);
+  free(deed->short_description);
+  deed->short_description = strdup(arg1);
+  for (box = deed_room->contents; box; box = box->next_content)
+      if (box->item_number == 9) break;
+  if (!box) return TRUE;
+  obj_from_char(deed);
+  obj_to_obj(deed, box);
+  ch->Send("You have now claimed a new deed for your clan!\r\n");
+  return TRUE;
 }
 
 SPECIAL ( dump )

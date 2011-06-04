@@ -27,6 +27,8 @@ SPECIAL(cleric);
 SPECIAL(cow_mating);
 SPECIAL(craps);
 SPECIAL(cryogenicist);
+SPECIAL(deed_box);
+SPECIAL(clan_deeds);
 SPECIAL(door_down);
 SPECIAL(door_down_7377);
 SPECIAL(dragon_acid);
@@ -306,6 +308,8 @@ void assign_objects(void)
 {
 
 #if !defined(WIN32)
+    ASSIGNOBJ(8, deed_box);
+    ASSIGNOBJ(7, clan_deeds);
     ASSIGNOBJ(590, gen_board);	/* board in mud school */
     ASSIGNOBJ(1315, gen_board);	/* board in sicilian hq */
   ASSIGNOBJ(1360, gen_board);  /* board in sicilian hq 2*/

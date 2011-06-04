@@ -1223,6 +1223,7 @@ void clan_to_store ( int i )
 	FILE *fl;
 	char outname[40], buf[MAX_STRING_LENGTH];
 	int thing = 0;
+        struct clan_deed_type *cl;
 
 
 	snprintf ( outname, sizeof ( outname ), "%s/clan.%d", CLAN_DIR, i );
@@ -1254,6 +1255,8 @@ void clan_to_store ( int i )
 	fprintf ( fl, "Dues: %lld\n", clan[i].dues );
 	fprintf ( fl, "Reca: %d\n", clan[i].recall );
 	fprintf ( fl, "Bord: %d\n", clan[i].board );
+        for (cl = clan[i].deeds; cl; cl = cl->next) 
+            fprintf(fl, "Deed: %d\n", cl->zone);
 	fprintf ( fl, "Spel:\n" );
 	for ( thing = 0; thing < MAX_CLAN_SPELLS; thing++ )
 		fprintf ( fl, "%d %d\n", thing, clan[i].spells[thing] );
@@ -1361,6 +1364,13 @@ int store_to_clan ( int i )
 					strcpy ( clan[i].description, tmpd );
 					free_string ( &tmpd );
 				}
+                                else if (!strcmp(tag, "Deed")) {
+                                    struct clan_deed_type *cl;
+                                    CREATE(cl, struct clan_deed_type, 1);
+                                    cl->zone = num;
+                                    cl->next = clan[i].deeds;
+                                    clan[i].deeds = cl;
+                                }
 				else if ( !strcmp ( tag, "Dues" ) )
 					clan[i].dues = num;
 				break;
