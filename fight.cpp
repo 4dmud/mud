@@ -5456,21 +5456,21 @@ void die ( Character *ch, Character *killer )
 					}
 				}
 				gain_exp ( temp, exp );
-                   // if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
-                   //     struct clan_deed_type *cl;
-                   //     int clan_num, zone_num;
-                   //     zone_num = zone_table[IN_ROOM(ch)->zone].number;
-                   //     clan_num = find_clan_by_id(GET_CLAN(temp));
-                   //     if (is_same_zone(ch->vnum/100, zone_num)) {
-                   //         for (cl = clan[clan_num].deeds; cl; cl = cl->next){
-                   //             if (is_same_zone(cl->zone, zone_num)) {
-                   //                 gain_exp(temp, exp/10);
-                   //                 killer->Send("Clan Deed Bonus XP: %lld.\r\n", exp);
-                   //                 break;
-                   //             }
-                   //         }
-                   //     }
-                   // }
+                    if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
+                        struct clan_deed_type *cl;
+                        int clan_num, zone_num;
+                        zone_num = zone_table[IN_ROOM(ch)->zone].number;
+                        clan_num = find_clan_by_id(GET_CLAN(temp));
+                        if (clan_num >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
+                            for (cl = clan[clan_num].deeds; cl; cl = cl->next){
+                                if (is_same_zone(cl->zone, zone_num)) {
+                                    gain_exp(temp, exp/10);
+                                    killer->Send("Clan Deed Bonus XP: %lld.\r\n", exp);
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
 			}
 		}
