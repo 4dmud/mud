@@ -534,6 +534,7 @@ SPECIAL(clan_deeds)
   obj_from_char(deed);
   obj_to_obj(deed, box);
   ch->Send("You have now claimed a new deed for your clan!\r\n");
+  save_clans();
   return TRUE;
 }
 
