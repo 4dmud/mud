@@ -435,10 +435,7 @@ SPECIAL(deed_box)
 {
   char arg1[256], buf[MAX_STRING_LENGTH];
   struct clan_deed_type *cl;
-  struct obj_data *deed, *box;
-  room_rnum deed_room;
-  int i, zone_vnum;
-  bool found;
+  int i;
 
   if (!CMD_IS("look")) return FALSE;
 
@@ -451,32 +448,14 @@ SPECIAL(deed_box)
   DYN_CREATE;
   *dynbuf = 0;
 
-  deed_room = real_room(5);
-  for (box = deed_room->contents; box; box = box->next_content)
-      if (box->item_number == 9) break;
-
-  if (!box) return FALSE;  // Maybe put in a different box?
-  
   ch->Send("You look inside the Ultimate Deed Box:\r\n");
-  for (deed = box->contains; deed; deed = deed->next_content) {
-      if ((zone_vnum = real_zone(GET_OBJ_VAL(deed, 0))) < 0) {
-          snprintf(buf, sizeof(buf), "UNDEFINED ERROR FOR ONE DEED\r\n");
-          continue;
+
+  for (i = 0; i < num_of_clans; i++) {
+      if (!clan[i].deeds) continue;
+      for (cl = clan[i].deeds; cl; cl = cl->next) {
+          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, clan[i].name);
+          DYN_RESIZE(buf);
       }
-      found = FALSE;
-      for (i = 0; i < num_of_clans; i++) {
-          if (found) break;
-          for (cl = clan[i].deeds; cl; cl = cl->next) {
-              if (is_same_zone(GET_OBJ_VAL(deed, 0), cl->zone)) {
-                  snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[zone_vnum].name, clan[i].name);
-                  found = TRUE;
-                  break;
-              }
-          }
-      }
-      if (!found)
-          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: UNKNOWN{cx\r\n", zone_table[zone_vnum].name);
-      DYN_RESIZE(buf);
   }
 
   page_string(ch->desc, dynbuf, DYN_BUFFER);
