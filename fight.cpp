@@ -5299,10 +5299,10 @@ void raw_kill ( Character *ch, Character *killer )
           }
 
           /* Now lets check percentage chance for deed to load */
-          /* Percentage chance increases every 20 minutes      */
-          ct = (time(0) - killer->player.deeds.time_in)/1200.00;
+          /* Percentage chance increases every 30 minutes      */
+          ct = (time(0) - killer->player.deeds.time_in)/1800.00;
           ct += 2;     // Always 2 percentage chance anyways
-          if (number(0, 100) < (int)ct) {
+          if (number(0, 150) < (int)ct) {
               obj = read_object(7, VIRTUAL);
               sprintf(buf, "Clan deed for %s!\r\n", zone_table[IN_ROOM(killer)->zone].name);
               obj->short_description = strdup(buf);

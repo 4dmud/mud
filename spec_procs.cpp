@@ -460,11 +460,9 @@ SPECIAL(clan_deeds)
 {
   struct obj_data *box = NULL;
   struct obj_data *deed = (struct obj_data *)me;
-  struct obj_data *tdeed, *tdeed_next;
   char arg1[256], arg2[256];
-  room_rnum deed_room = NULL;
-  struct clan_deed_type *cd, *cd_next, *temp;
-  int i = 0;
+  struct clan_deed_type *cd, *cl, *cl_next, *temp;
+  int i = 0, j = 0;
 
   if (!CMD_IS("put"))
       return FALSE;
@@ -473,8 +471,6 @@ SPECIAL(clan_deeds)
 
   if (strcmp(arg1, "deed") || strcmp(arg2, "box"))
       return FALSE;
-
-  deed_room = real_room(5);
 
   /* Check if there is a deed box here */
   for (box = IN_ROOM(ch)->contents; box; box = box->next_content)
@@ -488,9 +484,9 @@ SPECIAL(clan_deeds)
       ch->Send("You are not in any clan!\r\n");
       return TRUE;
   }
-  for (cd = clan[i].deeds; cd; cd = cd_next) {
-      cd_next = cd->next;
-      if (is_same_zone(cd->zone, GET_OBJ_VAL(deed, 0))) {
+  for (cl = clan[i].deeds; cl; cl = cl_next) {
+      cl_next = cl->next;
+      if (is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) {
           obj_from_char(deed);
           extract_obj(deed);
           ch->Send("Your clan already has claimed this deed.\r\n");
@@ -504,35 +500,20 @@ SPECIAL(clan_deeds)
   cd->zone = GET_OBJ_VAL(deed, 0);
   cd->next = clan[i].deeds;
   clan[i].deeds = cd;  
-  sprintf(arg1, "%s claimed by %s.", deed->short_description, clan[i].name);
-  free(deed->short_description);
-  deed->short_description = strdup(arg1);
-  GET_OBJ_TIMER(deed) = -1;
-  for (box = deed_room->contents; box; box = box->next_content)
-      if (box->item_number == 9) break;
-  if (!box) return TRUE;
 
-  /* Lets check if some other clan has claims to this deed */
-  /* Remove the clan deed from the deed box                */
-  for (tdeed = box->contains; tdeed; tdeed = tdeed_next) {
-      tdeed_next = tdeed->next_content;
-      if (is_same_zone(GET_OBJ_VAL(tdeed, 0), GET_OBJ_VAL(deed, 0))) {
-          obj_from_obj(tdeed);
-          extract_obj(tdeed);
-      }
-  }
-  for (i = 0; i < num_of_clans; i++) {
-      for (cd = clan[i].deeds; cd; cd = cd_next) {
-          cd_next = cd->next;
-          if (is_same_zone(cd->zone, GET_OBJ_VAL(deed, 0))) {
-              REMOVE_FROM_LIST(cd, clan[i].deeds, next);
-              free(cd);
+  for (j = 0; j < num_of_clans; j++) {
+      if (j == i) continue;
+      for (cl = clan[j].deeds; cl; cl = cl_next) {
+          cl_next = cl->next;
+          if (is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) {
+              REMOVE_FROM_LIST(cl, clan[j].deeds, next);
+              free(cl);
           }
       }
   }
 
   obj_from_char(deed);
-  obj_to_obj(deed, box);
+  extract_obj(deed);
   ch->Send("You have now claimed a new deed for your clan!\r\n");
   save_clans();
   return TRUE;
