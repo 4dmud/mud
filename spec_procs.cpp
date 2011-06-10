@@ -442,17 +442,23 @@ SPECIAL(deed_box)
   one_argument(argument, arg1);
 
   if (strcmp(arg1, "box"))  return FALSE;
+  
+  DYN_DEFINE;
+  *buf = '\0';
+  DYN_CREATE;
+  *dynbuf = 0;
 
   ch->Send("You look inside the Ultimate Deed Box:\r\n");
 
   for (i = 0; i < num_of_clans; i++) {
       if (!clan[i].deeds) continue;
       for (cl = clan[i].deeds; cl; cl = cl->next) {
-          sprintf(buf, "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, clan[i].name);
-          ch->Send(buf);
+          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, clan[i].name);
+          DYN_RESIZE(buf);
       }
   }
 
+  page_string(ch->desc, dynbuf, DYN_BUFFER);
   return TRUE;
 }
 
