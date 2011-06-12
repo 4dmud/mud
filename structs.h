@@ -284,7 +284,7 @@ class Room;
 #define NOBODY    -1          /* nil reference for mobiles           */
 
 #define SPECIAL(name) \
-   int (name)(Character *ch, void *me, int cmd, char *argument)
+   int (name)(Character *ch, void *me, int cmd, char *argument, char *cmd_arg)
 
 #define C_FUNC(name) \
      void (name) (Descriptor *d, char *arg, void *cinfo)

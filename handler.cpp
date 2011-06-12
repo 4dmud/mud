@@ -877,6 +877,9 @@ bool is_same_zone(int dv, int cv)
     if (cv == 24 || cv == 34)
         if (dv == 24 || dv == 34)
             return TRUE;
+    if (cv == 27 || cv == 167)
+        if (dv == 27 || dv == 167)
+            return TRUE;
     if (cv == 63 || cv == 82)
         if (dv == 63 || dv == 82)
             return TRUE;
@@ -891,6 +894,9 @@ bool is_same_zone(int dv, int cv)
             return TRUE;
     if (cv == 145 || cv == 232)
         if (dv == 145 || dv == 232)
+            return TRUE;
+    if (cv == 172 || cv == 199)
+        if (dv == 172 || dv == 199)
             return TRUE;
     if (cv == 180 || cv == 314)
         if (dv == 180 || dv == 314)
@@ -2971,3 +2977,14 @@ Character *check_ch ( Character *ch )
 	return NULL;
 }
 
+bool is_same_command(char *arg1, char *arg2)
+{
+  int length = 0;
+
+  length = strlen(arg1);
+
+  if (!strncmp(arg1, arg2, length))
+      return TRUE;
+  return FALSE;
+
+}

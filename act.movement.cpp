@@ -34,7 +34,7 @@ void death_cry ( Character *ch );
 void dismount_char ( Character *ch );
 void mount_char ( Character *ch, Character *mount );
 void improve_skill ( Character *ch, int skill );
-int special ( Character *ch, int cmd, char *arg );
+int special ( Character *ch, int cmd, char *arg , char *cmd_arg);
 int find_eq_pos ( Character *ch, struct obj_data *obj, char *arg );
 int ok_damage_shopkeeper ( Character *ch, Character *victim );
 int has_metal_detector ( Character *ch );
@@ -218,8 +218,6 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	/*    Character *herd, *next;
 	    bool FOUND = FALSE;*/
 
-	int special ( Character *ch, int cmd, char *arg );
-
 	if ( !IN_ROOM ( ch ) )
 		return 0;
 
@@ -227,7 +225,7 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	 * Check for special routines (North is 1 in command list, but 0 here) Note
 	 * -- only check if following; this avoids 'double spec-proc' bug
 	 */
-	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "" ) )
+	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "", (char *) "" ) )
 		return ( 0 );
 
 	if ( !ch->CanMove() )

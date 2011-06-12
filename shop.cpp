@@ -1132,7 +1132,7 @@ SPECIAL(shop_keeper)
     return (FALSE);
 
   if (SHOP_FUNC(shop_nr))	/* Check secondary function */
-    if ((SHOP_FUNC(shop_nr)) (ch, me, cmd, argument))
+    if ((SHOP_FUNC(shop_nr)) (ch, me, cmd, argument, cmd_arg))
       return (TRUE);
 
   if (keeper == ch)

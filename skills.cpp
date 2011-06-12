@@ -2991,11 +2991,11 @@ int perform_grapple ( Character *ch, int dir, int need_specials_check,
 	room_rnum was_in;
 	int House_can_enter ( Character *ch, room_vnum house );
 	void death_cry ( Character *ch );
-	int special ( Character *ch, int cmd, char *arg );
+	int special ( Character *ch, int cmd, char *arg, char *cmd_arg );
 	int fail = FALSE;
 
 
-	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "" ) )
+	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "", (char *) "" ) )
 		fail = TRUE;
 
 	if ( IS_SET_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_ATRIUM ) )

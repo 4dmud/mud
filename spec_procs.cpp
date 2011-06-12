@@ -163,6 +163,7 @@ bool can_have_follower ( Character *ch, Character *vict );
 room_rnum find_target_room(Character *ch, char *rawroomstr);
 void look_in_obj(Character *ch, char *arg, struct obj_data *item);
 bool is_same_zone(int dv, int cv);
+void perform_wear(Character *ch, struct obj_data *obj, int where);
 
 ACMD ( do_drop );
 ACMD ( do_gen_door );
@@ -433,16 +434,48 @@ SPECIAL(antidt)
 */
 SPECIAL(deed_box)
 {
-  char arg1[256], buf[MAX_STRING_LENGTH];
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   struct clan_deed_type *cl;
-  int i;
+  int i, clan_num;
 
-  if (!CMD_IS("look")) return FALSE;
+  skip_spaces(&argument);
+  two_arguments(argument, arg1, arg2);
 
-  one_argument(argument, arg1);
+  if (!strcmp(cmd_arg, "freaking")) {
+      save_clans();
+      ch->Send("Saving clans.\r\n");
+      return TRUE;
+  }
 
-  if (strcmp(arg1, "box"))  return FALSE;
-  
+  if (CMD_IS("look") && !strcmp(arg1, "box")) {
+      ch->Send("You look examine the Ultimate Deed Box\r\n");
+      ch->Send("Special Commands:\r\n");
+      ch->Send("{cYdeed                - {cxlist all deeds claimed\r\n");
+      ch->Send("{cYdeed clan <clan name>    - {cxlist all deeds claimed by clan\r\n");
+      ch->Send("{cYdeed player <player name>  - {cxlist all deeds claimed by player\r\n");
+      return TRUE;
+  }
+
+  if (strcmp(cmd_arg, "deed")) return FALSE;
+
+  if (arg1[0] != '\0' && strcmp(arg1, "clan") && strcmp(arg1, "player")) {
+      ch->Send("Type look box to see the correct commands\r\n");
+      return TRUE;
+  }
+
+  if (arg1[0] != '\0' && arg2[0] == '\0') {
+      ch->Send("You need to specify a name.\r\n");
+      return TRUE;
+  }
+
+  if (arg1[0] != '\0' && !strcmp(arg1, "clan")) {
+      clan_num = find_clan(arg2);
+      if (clan_num < 0) {
+          ch->Send("This clan does not exist!\r\n");
+          return TRUE;
+      }
+  }
+
   DYN_DEFINE;
   *buf = '\0';
   DYN_CREATE;
@@ -452,8 +485,15 @@ SPECIAL(deed_box)
 
   for (i = 0; i < num_of_clans; i++) {
       if (!clan[i].deeds) continue;
+      if (arg1[0] != '\0' && !strcmp(arg1, "clan") && i != clan_num) continue;
+      if (arg1[0] == '\0' || !strcmp(arg1, "clan")) {
+          snprintf(buf, sizeof(buf), "{cYClan: %s{cx\r\n", clan[i].name);
+          DYN_RESIZE(buf);
+      }
       for (cl = clan[i].deeds; cl; cl = cl->next) {
-          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, clan[i].name);
+          if (arg1[0] != '\0' && !strcmp(arg1, "player") && 
+          strcmp(cl->name, arg2)) continue;
+          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, cl->name);
           DYN_RESIZE(buf);
       }
   }
@@ -504,6 +544,7 @@ SPECIAL(clan_deeds)
   /* in the box and give the clan the bonuses.                  */
   CREATE(cd, struct clan_deed_type, 1);
   cd->zone = GET_OBJ_VAL(deed, 0);
+  cd->name = GET_NAME(ch);
   cd->next = clan[i].deeds;
   clan[i].deeds = cd;  
 
@@ -2245,6 +2286,52 @@ SPECIAL ( radar )
 		*ch << "Nobody anywhere near you.";
 	IN_ROOM ( ch ) = was_in;
 	return ( 1 ); /** this function doesnt updatethe zones num_players value, watch for this if getting fancy - mord**/
+}
+
+/* Slave collar for the Saints Clan
+   Val 0 - AC of the item
+   Val 1 - ID of the Mistress
+   Val 2 - ID of the Slave
+*/
+SPECIAL(slave_collar)
+{
+  struct obj_data *obj = (struct obj_data *)me;
+
+  if (!obj->carried_by)
+      return FALSE;
+
+  if (!strcmp(cmd_arg, "submit")) {
+      if (obj->worn_by) {
+          ch->Send("You are already wearing the collar!\r\n");
+          return TRUE;
+      }
+      if (GET_OBJ_VAL(obj, 1) == 0 || GET_OBJ_VAL(obj, 2) != GET_IDNUM(ch)) {
+          ch->Send("This collar needs to be RESET before you can submit to it.\r\n");
+          return TRUE;
+      }     
+      GET_OBJ_VAL(obj, 2) = GET_IDNUM(ch);
+      act("$n has submitted to the slave collar.", FALSE, ch, NULL, NULL, TO_ROOM);
+      ch->Send("You have submitted to the slave collar!\r\n");
+      return TRUE;
+  }
+  else if (!strcmp(cmd_arg, "strap")) {
+      if (obj->worn_by) {
+          ch->Send("You are already wearing the collar!\r\n");
+          return TRUE;
+      }
+      if (GET_OBJ_VAL(obj, 2) != GET_IDNUM(ch)) {
+          ch->Send("This slave collar does not belong to you.\r\n");
+          return TRUE;
+      }
+      perform_wear(ch, obj, WEAR_NECK_1);
+      return TRUE;
+  }
+  else if (GET_EQ(ch, WEAR_NECK_1) == obj && (CMD_IS("north") || 
+  CMD_IS("south") || CMD_IS("west") || CMD_IS("east") || CMD_IS("up") ||
+  CMD_IS("down"))) {
+      if (GET_OBJ_VAL(obj, 3) == 0) return FALSE;
+      }
+  return FALSE;
 }
 
 

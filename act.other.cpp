@@ -2192,3 +2192,9 @@ ACMD ( do_pagewidth )
 	PAGEWIDTH ( ch ) = num;
 	ch->save();
 }
+
+// System use only!!!
+ACMD(do_fake_cmd)
+{
+  return;
+}

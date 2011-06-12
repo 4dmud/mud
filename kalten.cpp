@@ -47,7 +47,7 @@ int has_sun_protection ( Character *ch );
 int invalid_align ( Character *ch, struct obj_data *obj );
 int zdelete_check ( int zone );
 void perform_remove ( Character *ch, int pos );
-
+int special(Character *ch, int cmd, char *argument, char *cmd_arg);
 
 
 
@@ -844,10 +844,9 @@ int perform_push ( Character *ch, int dir, int need_specials_check,
 	room_rnum was_in;
 	int House_can_enter ( Character *ch, room_vnum house );
 	void death_cry ( Character *ch );
-	int special ( Character *ch, int cmd, char *arg );
 	char buf2[MAX_INPUT_LENGTH];
 
-	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "" ) )
+	if ( need_specials_check && special ( ch, dir + 1, ( char * ) "" , (char *) "") )
 		return 0;
 
 	/* charmed? */

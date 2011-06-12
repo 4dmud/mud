@@ -44,6 +44,7 @@ struct clan_gold_type {
 
 struct clan_deed_type {
     int zone;
+    char *name;
     struct clan_deed_type *next;
 };
 

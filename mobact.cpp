@@ -90,7 +90,7 @@ void mobile_activity ( void )
 			else
 			{
 				/* TODO: Need to see if they can handle NULL instead of "". */
-				if ( ( GetMobIndex ( GET_MOB_VNUM ( ch ) )->func ) ( ch, ch, 0, ( char * ) "" ) )
+				if ( ( GetMobIndex ( GET_MOB_VNUM ( ch ) )->func ) ( ch, ch, 0, ( char * ) "", (char *)"" ) )
 					continue;	/* go to next char */
 			}
 		}

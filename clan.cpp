@@ -203,7 +203,7 @@ void do_clan_create ( Character *ch, char *arg )
 
 	if ( find_clan ( arg2 ) != -1 )
 	{
-		ch->Send ( "That clan name alread exists!\r\n" );
+		ch->Send ( "That clan name already exists!\r\n" );
 		return;
 	}
 
@@ -1255,8 +1255,14 @@ void clan_to_store ( int i )
 	fprintf ( fl, "Dues: %lld\n", clan[i].dues );
 	fprintf ( fl, "Reca: %d\n", clan[i].recall );
 	fprintf ( fl, "Bord: %d\n", clan[i].board );
-        for (cl = clan[i].deeds; cl; cl = cl->next) 
+        for (cl = clan[i].deeds; cl; cl = cl->next) {
             fprintf(fl, "Deed: %d\n", cl->zone);
+            buf[0] = '\0';
+	    strcpy ( buf, cl->name );
+	    strip_cr ( buf );
+	    smash_tilde ( buf );
+	    fprintf ( fl, "%s\n", buf );
+        }
 	fprintf ( fl, "Spel:\n" );
 	for ( thing = 0; thing < MAX_CLAN_SPELLS; thing++ )
 		fprintf ( fl, "%d %d\n", thing, clan[i].spells[thing] );
@@ -1368,6 +1374,9 @@ int store_to_clan ( int i )
                                     struct clan_deed_type *cl;
                                     CREATE(cl, struct clan_deed_type, 1);
                                     cl->zone = num;
+                                    cl->name = strdup("unknown");
+                                   // get_line(fl, line);
+                                   //  cl->name = strdup(line);
                                     cl->next = clan[i].deeds;
                                     clan[i].deeds = cl;
                                 }

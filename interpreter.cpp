@@ -53,7 +53,7 @@ int delete_pobj_file ( const char *name );
 void echo_on ( Descriptor *d );
 void echo_off ( Descriptor *d );
 void do_start ( Character *ch );
-int special ( Character *ch, int cmd, char *arg );
+int special ( Character *ch, int cmd, char *arg , char *cmd_arg);
 int isbanned ( char *hostname );
 void read_saved_vars ( Character *ch );
 int Valid_Name ( char *newname );
@@ -436,6 +436,7 @@ ACMD ( do_account );
 ACMD ( do_fightmsg );
 ACMD ( do_killlist );
 ACMD ( do_recall );
+ACMD ( do_fake_cmd);  // SYSTEM USE ONLY
 
 /* This is the Master Command List(tm).
 
@@ -1032,6 +1033,7 @@ const command_info cmd_info[] =
 	/* End Mating Module Command List */
         /* Horus - blank commands for spec_procs */
         { "trade"    , "trade"     , POS_STANDING,   do_trade, 0, 0, 0 },
+        { "zzzzzsystem", "zzzzzsystem", POS_STANDING, do_fake_cmd, 0, 0, 0 },
 
 	{ "\n", "zzzzzzz", 0, 0, 0, 0, 0 }
 }
@@ -1072,7 +1074,7 @@ const char *reserved[] =
  */
 void command_interpreter ( Character *ch, char *argument )
 {
-	int cmd, length;
+	int cmd, length, fake_cmd;
 	char *line;
 	char arg[MAX_INPUT_LENGTH];
 
@@ -1139,19 +1141,29 @@ void command_interpreter ( Character *ch, char *argument )
 
 	for ( length = strlen ( arg ), cmd = 0; *complete_cmd_info[cmd].command != '\n'; cmd++ )
 	{
+		if ( !strcmp ( complete_cmd_info[cmd].command, "zzzzzsystem") )
+                    fake_cmd = cmd;
 		if ( !strncmp ( complete_cmd_info[cmd].command, arg, length ) )
 			if ( GET_LEVEL ( ch ) >= complete_cmd_info[cmd].minimum_level )
 				break;
 	}
 
-	if ( *complete_cmd_info[cmd].command == '\n' )
-		ch->Send ( "Huh?!?\r\n" );
-	else if ( !IS_NPC ( ch ) && PLR_FLAGGED ( ch, PLR_FROZEN ) && GET_LEVEL ( ch ) < LVL_IMPL && frozen_time ( ch ) > 0 )
+        /* Moving frozen check to the front of the queue as well */
+	if ( !IS_NPC ( ch ) && PLR_FLAGGED ( ch, PLR_FROZEN ) && GET_LEVEL ( ch ) < LVL_IMPL && frozen_time ( ch ) > 0 )
 	{
 		ch->Send ( "Unfrozen in %d seconds.\r\n", frozen_time ( ch ) );
 		ch->Send ( "You try, but the mind-numbing cold prevents you...\r\n" );
+                return;
 
 	}
+        /* Moving spec_procs to the front of the queue */
+	if ( *complete_cmd_info[cmd].command != '\n' )
+            fake_cmd = cmd;
+	if ( !no_specials && special ( ch, fake_cmd, line, arg ) )
+            return;
+
+	if ( *complete_cmd_info[cmd].command == '\n' )
+		ch->Send ( "Huh?!?\r\n" );
 	else if ( complete_cmd_info[cmd].command_pointer == NULL )
 		ch->Send ( "Sorry, that command hasn't been implemented yet.\r\n" );
 	else if ( ( complete_cmd_info[cmd].cmd_bits > 0 )
@@ -1187,7 +1199,7 @@ void command_interpreter ( Character *ch, char *argument )
 				ch->Send ( "No way!  You're fighting for your life!\r\n" );
 				break;
 		}
-	else if ( no_specials || !special ( ch, cmd, line ) )
+	else 
 	{
 		total_commands_typed++;
 		if ( !IS_NPC ( ch ) )
@@ -1689,7 +1701,7 @@ int find_command ( const char *command )
 }
 
 
-int special ( Character *ch, int cmd, char *arg )
+int special ( Character *ch, int cmd, char *arg, char *cmd_arg )
 {
 	register struct obj_data *i;
 	register Character *k;
@@ -1697,20 +1709,20 @@ int special ( Character *ch, int cmd, char *arg )
 
 	/* special in room? */
 	if ( GET_ROOM_SPEC ( IN_ROOM ( ch ) ) != NULL )
-		if ( GET_ROOM_SPEC ( IN_ROOM ( ch ) ) ( ch, IN_ROOM ( ch ), cmd, arg ) )
+		if ( GET_ROOM_SPEC ( IN_ROOM ( ch ) ) ( ch, IN_ROOM ( ch ), cmd, arg , cmd_arg) )
 			return ( 1 );
 
 	/* special in equipment list? */
 	for ( j = 0; j < NUM_WEARS; j++ )
 		if ( HAS_BODY ( ch, j ) && GET_EQ ( ch, j )
 		        && GET_OBJ_SPEC ( GET_EQ ( ch, j ) ) != NULL )
-			if ( GET_OBJ_SPEC ( GET_EQ ( ch, j ) ) ( ch, GET_EQ ( ch, j ), cmd, arg ) )
+			if ( GET_OBJ_SPEC ( GET_EQ ( ch, j ) ) ( ch, GET_EQ ( ch, j ), cmd, arg , cmd_arg) )
 				return ( 1 );
 
 	/* special in inventory? */
 	for ( i = ch->carrying; i; i = i->next_content )
 		if ( GET_OBJ_SPEC ( i ) != NULL )
-			if ( GET_OBJ_SPEC ( i ) ( ch, i, cmd, arg ) )
+			if ( GET_OBJ_SPEC ( i ) ( ch, i, cmd, arg, cmd_arg ) )
 				return ( 1 );
 
 	/* special in mobile present? */
@@ -1718,14 +1730,14 @@ int special ( Character *ch, int cmd, char *arg )
 	{
 		if ( !MOB_FLAGGED ( k, MOB_NOTDEADYET ) )
 			if ( GET_MOB_SPEC ( k ) != NULL )
-				if ( GET_MOB_SPEC ( k ) ( ch, k, cmd, arg ) )
+				if ( GET_MOB_SPEC ( k ) ( ch, k, cmd, arg, cmd_arg ) )
 					return ( 1 );
 	}
 
 	/* special in object present? */
 	for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
 		if ( GET_OBJ_SPEC ( i ) != NULL )
-			if ( GET_OBJ_SPEC ( i ) ( ch, i, cmd, arg ) )
+			if ( GET_OBJ_SPEC ( i ) ( ch, i, cmd, arg, cmd_arg ) )
 				return ( 1 );
 
 	return ( 0 );
