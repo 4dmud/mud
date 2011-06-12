@@ -441,12 +441,6 @@ SPECIAL(deed_box)
   skip_spaces(&argument);
   two_arguments(argument, arg1, arg2);
 
-  if (!strcmp(cmd_arg, "freaking")) {
-      save_clans();
-      ch->Send("Saving clans.\r\n");
-      return TRUE;
-  }
-
   if (CMD_IS("look") && !strcmp(arg1, "box")) {
       ch->Send("You look examine the Ultimate Deed Box\r\n");
       ch->Send("Special Commands:\r\n");

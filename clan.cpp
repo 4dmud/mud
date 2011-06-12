@@ -1374,9 +1374,9 @@ int store_to_clan ( int i )
                                     struct clan_deed_type *cl;
                                     CREATE(cl, struct clan_deed_type, 1);
                                     cl->zone = num;
-                                    cl->name = strdup("unknown");
-                                   // get_line(fl, line);
-                                   //  cl->name = strdup(line);
+                                //    cl->name = strdup("unknown");
+                                    get_line(fl, line);
+                                    cl->name = strdup(line);
                                     cl->next = clan[i].deeds;
                                     clan[i].deeds = cl;
                                 }
