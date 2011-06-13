@@ -538,7 +538,7 @@ SPECIAL(clan_deeds)
   /* in the box and give the clan the bonuses.                  */
   CREATE(cd, struct clan_deed_type, 1);
   cd->zone = GET_OBJ_VAL(deed, 0);
-  cd->name = GET_NAME(ch);
+  cd->name = strdup(GET_NAME(ch));
   cd->next = clan[i].deeds;
   clan[i].deeds = cd;  
 
@@ -548,6 +548,7 @@ SPECIAL(clan_deeds)
           cl_next = cl->next;
           if (is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) {
               REMOVE_FROM_LIST(cl, clan[j].deeds, next);
+              free(cl->name);
               free(cl);
           }
       }
