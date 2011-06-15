@@ -570,6 +570,7 @@ void do_clan_leave (Character *ch, char *arg)
   remove_clan_member ( GET_NAME ( ch ), clan_num );
   GET_CLAN ( ch ) = 0;
   GET_CLAN_RANK ( ch ) = 0;
+  REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_RETIRED);
 
   af.type = SPELL_RESERVE;
   af.expire = 60*24*14;  // two RL weeks 
