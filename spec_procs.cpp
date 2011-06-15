@@ -486,7 +486,7 @@ SPECIAL(deed_box)
       }
       for (cl = clan[i].deeds; cl; cl = cl->next) {
           if (arg1[0] != '\0' && !strcmp(arg1, "player") && 
-          strncmp(cl->name, arg2, sizeof(arg2))) continue;
+          strncasecmp(cl->name, arg2, sizeof(arg2))) continue;
           snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, cl->name);
           DYN_RESIZE(buf);
       }
