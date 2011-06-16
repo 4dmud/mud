@@ -520,7 +520,7 @@ SPECIAL(clan_deeds)
 
   /* Lets now check if clan already has deed */
   i = find_clan_by_id(GET_CLAN(ch));
-  if (1 < 0) {
+  if (i < 0) {
       ch->Send("You are not in any clan!\r\n");
       return TRUE;
   }
