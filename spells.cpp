@@ -1242,7 +1242,9 @@ ASPELL(spell_chain_lightning) {
             v[0], 0, ch, TO_CHAR);
         act("$n's chain lightning strikes $N with full power!", FALSE, ch,
             0, v[0], TO_NOTVICT);
-        dam = dice(7, 8 + GET_LEVEL(ch) / 9) + 8;
+        // Going to tweaking the damage formula - Prom 
+	// dam = dice(7, 8 + GET_LEVEL(ch) / 9) + 8;
+	dam = dice(6, 8 + GET_LEVEL(ch) / 9) + 8;
         if (mag_savingthrow(v[0], 1, 0))
             dam = dam / 2;
         damage(ch, v[0], dam, TYPE_UNDEFINED);
