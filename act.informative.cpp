@@ -305,8 +305,10 @@ void show_obj_to_char ( struct obj_data *obj, Character *ch,
 
 }
 
-#define TIER_COLOUR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cc|" : (tier == 3 ? "{cB|" : "{cr|"))))
-#define TIER_COLOUR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cc" : (tier == 3 ? "{cB" : "{cr"))))
+// Changing t2 to a different color so it is easier to tell -- Prom
+// tier == 2 ? "{cc|" to "{cG|"
+#define TIER_COLOUR_LIST(tier) (tier == 0 ? " " : (tier == 1 ? "{cC|" : (tier == 2 ? "{cG|" : (tier == 3 ? "{cB|" : "{cr|"))))
+#define TIER_COLOUR_WHO(tier) (tier == 0 ? " " : (tier == 1 ? "{cC" : (tier == 2 ? "{cG" : (tier == 3 ? "{cB" : "{cr"))))
 
 void show_obj_modifiers ( struct obj_data *obj, Character *ch )
 {
