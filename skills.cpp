@@ -2307,7 +2307,8 @@ ASKILL ( skill_push )
 		}
 		sprintf ( buf, "$n is trying to push you %s!", todir );
 		act ( buf, FALSE, ch, 0, victim, TO_VICT );
-		act ( "$n is trying to push $N.", FALSE, ch, 0, victim, TO_NOTVICT );
+		// Changing victum to vict since rest of code matches this -- Prom
+		act ( "$n is trying to push $N.", FALSE, ch, 0, vict, TO_NOTVICT );
 		if ( !CAN_GO ( victim, to ) )
 		{
 			ch->Send ( "Can't push %s there\r\n", HMHR ( ch ) );
