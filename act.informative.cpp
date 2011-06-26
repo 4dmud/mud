@@ -837,9 +837,9 @@ void list_one_char ( Character *i, Character *ch )
 	else
 	{
 		if ( !PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
-			ch->Send ( "{cY@ {cC%s%s%s%s%s",
+			ch->Send ( "{cY@ {cC%s%s%s%s%s%s",
 			           ( PRETITLE ( i ) == NULL ? "{cC" : PRETITLE ( i ) ), ( PRETITLE ( i ) == NULL ? "{cC" : " " ) ,
-			           GET_NAME ( i ), CBCYN ( ch, C_NRM ), CBCYN ( ch, C_NRM ) );
+            CBCYN(ch, C_NRM), GET_NAME ( i ), CBCYN ( ch, C_NRM ), CBCYN ( ch, C_NRM ) );
 		else
 			ch->Send ( "%s%s%s%s%s",
 			           CBCYN ( ch, C_NRM ), i->player.name,
