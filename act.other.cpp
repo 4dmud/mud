@@ -1448,7 +1448,9 @@ ACMD ( do_gen_tog )
 		{"You can now have the teleport spell cast on you.\r\n",
 		 "You can now no longer have the teleport spell cast on you.\r\n"},
 		{   "You will NOT automaticly agree to group people when they request to follow.\r\n",
-		    "You will automaticly agree to group people when they request to follow.\r\n"}
+		    "You will automaticly agree to group people when they request to follow.\r\n"},
+		{"You will no longer see players' full titles.\r\n",
+		 "You can now see players' full titles.\r\n"}
 
 
 	};
@@ -1639,6 +1641,9 @@ ACMD ( do_gen_tog )
 			break;
 		case SCMD_FISHTALLY:
 			result = PRF_TOG_CHK ( ch, PRF_FISHPROMPT );
+			break;
+		case SCMD_NOTITLE1:
+			result = PRF_TOG_CHK ( ch, PRF_NOTITLE );
 			break;
 		default:
 			log ( "SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd );

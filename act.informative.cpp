@@ -3538,7 +3538,7 @@ ACMD ( do_who )
 			}
 			else
 			{
-				if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
+				if ( PRF_FLAGGED ( ch, PRF_NOTITLE ) )
 				{
 					snprintf ( buf, sizeof ( buf ), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",
 					           TIER_COLOUR_WHO ( current_class_is_tier_num ( wch ) ),

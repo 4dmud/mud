@@ -701,6 +701,7 @@ const command_info cmd_info[] =
 	{ "nomount"   , "nomou"  , POS_DEAD    , do_gen_tog  , 0, SCMD_MOUNTABLE, 0 },
 	{ "norepeat" , "nor" , POS_DEAD    , do_gen_tog  , 0, SCMD_NOREPEAT, 0 },
 	{ "noshout"  , "nosh"     , POS_SLEEPING, do_gen_tog  , 1, SCMD_DEAF, 0 },
+	{ "nodisplaytitle"  , "nosh"     , POS_SLEEPING, do_gen_tog  , 1, SCMD_NOTITLE1, 0 },
 	{ "nosummon" , "nosu"     , POS_DEAD    , do_gen_tog  , 1, SCMD_NOSUMMON, 0 },
 	{ "nogate" , "noga"  , POS_DEAD    , do_gen_tog  , 1, SCMD_NOGATE, 0 },
 	{ "note"    , "note"   , POS_DEAD, do_note , 1, 0, 0 },

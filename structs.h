@@ -602,6 +602,7 @@ class Room;
 #define MOB_POSTMASTER   42
 #define MOB_QUEST        43
 #define MOB_TRAINER      44
+
 /* Preference flags: used by Character.player_specials.pref           */
 #define PRF_BRIEF       0     /* Room descs won't normally be shown        */
 #define PRF_COMPACT     1     /* No extra CRLF pair before prompts         */
@@ -659,6 +660,7 @@ class Room;
 #define PRF_TELEPORTABLE  53
 #define PRF_AUTOGROUP   54
 #define PRF_RETIRED     55    /* For retired clan leaders */
+#define PRF_NOTITLE     56
 
 /* Descriptor flags */
 #define DESC_CANZLIB     (1 << 0)  /* Client says compression capable.   */

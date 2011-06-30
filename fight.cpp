@@ -5466,7 +5466,7 @@ void die ( Character *ch, Character *killer )
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next){
                                 if (is_same_zone(cl->zone, zone_num)) {
                                     gain_exp(temp, exp/10);
-                                    killer->Send("Clan Deed Bonus XP: %lld.\r\n", exp);
+                                    temp->Send("Clan Deed Bonus XP: %lld.\r\n", exp/10);
                                     break;
                                 }
                             }
