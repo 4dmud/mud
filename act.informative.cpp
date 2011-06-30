@@ -4767,7 +4767,7 @@ ACMD ( do_toggle )
 	    "     Keep Title: %-3s    "
 	    "     IC Channel: %-3s\r\n"
 	    "    Color Level: %-8s"
-	    "  NoBattlespam: %-3s    "
+	    "  NoBattlespam: %-3s     "
 	    "  NoMail Prompt: %-3s\r\n"
 	    "        NOCTalk: %-3s    "
 	    "        AFKTELL: %-3s    "
@@ -4786,7 +4786,8 @@ ACMD ( do_toggle )
 	    "          Brags: %-3s\r\n"
 	    "         NOGATE: %-3s    "
 	    "      FishTally: %-3s    "
-	    "     NOTELEPORT: %-3s\r\n",
+	    "     NOTELEPORT: %-3s\r\n"
+	    "     DisplayTitle: %-3s   ",
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_DISPHP ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_BRIEF ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_SUMMONABLE ) ),
@@ -4832,8 +4833,9 @@ ACMD ( do_toggle )
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOBRAG ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_GATEABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
-	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) )
-	);
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE1) )
+	    );
 
 }
 
