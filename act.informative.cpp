@@ -4834,7 +4834,7 @@ ACMD ( do_toggle )
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_GATEABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
-	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE1) )
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE) )
 	    );
 
 }
