@@ -4787,7 +4787,7 @@ ACMD ( do_toggle )
 	    "         NOGATE: %-3s    "
 	    "      FishTally: %-3s    "
 	    "     NOTELEPORT: %-3s\r\n"
-	    "     DisplayTitle: %-3s   ",
+	    " NoDisplayTitle: %-3s    ",
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_DISPHP ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_BRIEF ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_SUMMONABLE ) ),
