@@ -836,15 +836,15 @@ void list_one_char ( Character *i, Character *ch )
 	}
 	else
 	{
-		if ( PRF_FLAGGED ( ch, PRF_NOTITLE ) )
-			ch->Send ( "{cY@ {cC%s%s%s%s%s%s",
+		if ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) )
+			ch->Send ( "{cY@ {cC%s%s%s%s%s%s%s%s",
 			           ( PRETITLE ( i ) == NULL ? "{cC" : PRETITLE ( i ) ), ( PRETITLE ( i ) == NULL ? "{cC" : " " ) ,
-            CBCYN(ch, C_NRM), GET_NAME ( i ), CBCYN ( ch, C_NRM ), CBCYN ( ch, C_NRM ) );
+            CBCYN(ch, C_NRM), GET_NAME ( i ), CBCYN ( ch, C_NRM ), 
+        (GET_TITLE(i) == NULL ? "" : " "), GET_TITLE(i), CBCYN ( ch, C_NRM ) );
 		else
-			ch->Send ( "%s%s%s%s%s",
+			ch->Send ( "%s%s%s",
 			           CBCYN ( ch, C_NRM ), i->player.name,
-			           ( GET_TITLE ( i ) == NULL ? "" : " " ),
-			           GET_TITLE ( i ), CBCYN ( ch, C_NRM ) );
+			            CBCYN ( ch, C_NRM ) );
 	}
 
 	if ( IS_NPC ( i ) && !i->mob_specials.teaches_skills.empty() )
