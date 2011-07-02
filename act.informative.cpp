@@ -836,7 +836,7 @@ void list_one_char ( Character *i, Character *ch )
 	}
 	else
 	{
-		if ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) )
+		if ( PRF_FLAGGED ( ch, PRF_NOTITLE ) )
 			ch->Send ( "{cY@ {cC%s%s%s%s%s%s%s%s",
 			           ( PRETITLE ( i ) == NULL ? "{cC" : PRETITLE ( i ) ), ( PRETITLE ( i ) == NULL ? "{cC" : " " ) ,
             CBCYN(ch, C_NRM), GET_NAME ( i ), CBCYN ( ch, C_NRM ), 
