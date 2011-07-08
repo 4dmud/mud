@@ -325,6 +325,7 @@ void assign_objects(void)
     ASSIGNOBJ(8401, gen_board);	/* rp */
     ASSIGNOBJ(8402, gen_board);	/* rp */
     ASSIGNOBJ(8403, gen_board);	/* rp */
+    ASSIGNOBJ(8481, gen_board); /* Riddler board */
     ASSIGNOBJ(8449, gen_board);	/* rp */
     ASSIGNOBJ(8470, gen_board); /* bitches*/
     ASSIGNOBJ(8477, gen_board); /* roleplay leaders */
