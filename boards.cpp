@@ -86,6 +86,7 @@ Be sure to also change NUM_OF_BOARDS in board.h
     {8401, 0, 0, LVL_GOD, LIB_ETC "board.rp2", 0},
     {8402, 0, 0, LVL_GOD, LIB_ETC "board.rp3", 0},
     {8403, 0, 0, LVL_GOD, LIB_ETC "board.rp4", 0},
+    {8481, 0, 0, LVL_GOD, LIB_ETC "board.riddler", 0},
     {8449, 0, 0, LVL_GOD, LIB_ETC "board.spy", 0},
     {8470, 0, 0, LVL_GOD, LIB_ETC "board.bitch", 0},
     {8477, 0, 0, LVL_GOD, LIB_ETC "board.rpl", 0},
