@@ -2316,6 +2316,9 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 17, 1,
                  "You feel your strength return." );
 
+	spello (SPELL_DISPEL_BUBBLE, "dispel bubble", 75, 50, 2, 
+		POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
+		TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, " " );
 
 	/* NON-castable spells should appear here */
 	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
@@ -2778,6 +2781,9 @@ int elemental_type ( int spell )
 			break;
 		case SPELL_IDENTIFY:
 			retval = ELEM_MIND;
+			break;
+		case SPELL_DISPEL_BUBBLE:
+			retval = ELEM_SPIRIT;
 			break;
 		case SPELL_FIRE_BREATH:
 			retval = ELEM_FIRE;
