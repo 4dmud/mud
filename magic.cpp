@@ -1321,7 +1321,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_room = "$n sags under the weight.";
 			break;
 
-
+	      case SPELL_DISPEL_BUBBLE:
+			break; 
 
 	}
 
