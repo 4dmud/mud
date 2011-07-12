@@ -1321,9 +1321,6 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_room = "$n sags under the weight.";
 			break;
 
-	      case SPELL_DISPEL_BUBBLE:
-			break; 
-
 	}
 
 	if ( spellnum == SPELL_MIND_FIRE ||spellnum == SPELL_MIND_WATER ||spellnum == SPELL_MIND_ICE ||spellnum == SPELL_MIND_ELEC )
@@ -2084,6 +2081,12 @@ void mag_unaffects ( int level, Character *ch,
 			to_vict = "Your sanctury flickers and fades.";
 			to_room = "$n's white aura flickers and fades.";
 			break;
+		case SPELL_DISPEL_BUBBLE:
+                        spell = SPELL_MAGIC_BUBBLE;
+			to_vict = "YOur magic bubble bursts and vanishes.";
+			to_room = "$n's magic bubble pops and disappears.";
+			break;
+		
 		default:
 			log ( "SYSERR: unknown spellnum %d passed to mag_unaffects.",
 			      spellnum );
