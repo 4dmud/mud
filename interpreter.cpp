@@ -972,6 +972,7 @@ const command_info cmd_info[] =
 	{ "tame"     , "tam"  , POS_RESTING , do_skills     , 0, SKILL_TAME, 0 },
 	{ "tinker"   , "tink" , POS_STANDING, do_skills   , 1, SKILL_TINKER, 0 },
 	{ "trample"  , "tram" , POS_FIGHTING    , do_skills  , 0, SKILL_TRAMPLE, 0 },
+	{ "trip"     , "tri"  , POS_FIGHTING,    do_skills, 0, SKILL_TRIP, 0 },
 	{ "truestrike"   , "true" , POS_STANDING, do_skills   , 0, SKILL_TRUE_STRIKE, 0 },
 	{ "woodsing" , "woo"  , POS_STANDING, do_skills    , 0, SKILL_SING_WOOD, 0 },
 

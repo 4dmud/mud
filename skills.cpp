@@ -144,7 +144,7 @@ ASKILL ( skill_manipulate );
 ASKILL ( skill_phase );
 ASKILL ( skill_martial_arts );
 ASKILL ( skill_slip );
-
+ASKILL ( skill_trip );
 
 ACMD ( do_skills );
 
@@ -337,7 +337,11 @@ void assign_skills ( void )
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 40 ,0,
         "You no longer brace for damage.");
 
-	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 ,0, "");
+	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, 
+		NO_FIRST, NO_SECOND, 3, 48 ,0, "");
+
+	skillo ( SKILL_TRIP, "trip", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 45 ,1, "");
 
   skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
   skillo_static(SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8, 1);
@@ -649,6 +653,10 @@ ACMD ( do_skills )
 				case SKILL_PICK_LOCK:
 					do_gen_door ( ch, argument, cmd, SCMD_PICK );
 					break;
+				case SKILL_TRIP:
+					CALL_SKILL ( skill_trip);
+					break;
+
 				default:
 					log ( "SYSERR: Skill #%d is unknown to do_skills", subcmd );
 			}
@@ -2121,6 +2129,15 @@ ASKILL ( skill_martial_arts )
 ASKILL ( skill_punch )
 {
 	ch->Send ( "This Skill Is Unfinished.\r\n" );
+	return 0;
+}
+
+// WIP
+// Prometheus
+
+ASKILL ( skill_trip )
+{
+
 	return 0;
 }
 

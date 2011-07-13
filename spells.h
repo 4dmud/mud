@@ -353,7 +353,7 @@ enum spell_list {
     SPELL_WALL_FIRE,
     SPELL_WALL_FORCE,
     SPELL_DISPEL_BUBBLE,
-    SPARE216,
+    SKILL_TRIP,
     SPARE217,
     SPARE218,
     SPARE219,
