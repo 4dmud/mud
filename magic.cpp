@@ -2083,7 +2083,7 @@ void mag_unaffects ( int level, Character *ch,
 			break;
 		case SPELL_DISPEL_BUBBLE:
                         spell = SPELL_MAGIC_BUBBLE;
-			to_vict = "YOur magic bubble bursts and vanishes.";
+			to_vict = "Your magic bubble bursts and vanishes.";
 			to_room = "$n's magic bubble pops and disappears.";
 			break;
 		
