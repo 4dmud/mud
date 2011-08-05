@@ -928,10 +928,18 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp ( field, "class_tier" ) )
 						snprintf ( str, slen, "%d", current_class_is_tier_num ( c ) );
 
-					else if ( !strcasecmp ( field, "clan" ) )
+					else if ( !strcasecmp ( field, "clan" ) ) {
+                                                if ( subfield && *subfield ) 
+                                                {
+                                                   GET_CLAN ( c ) = atoi ( subfield );
+                                                }   
 						snprintf ( str, slen, "%d", IS_NPC ( c ) ? -1 : GET_CLAN ( c ) );
 
 					else if ( !strcasecmp ( field, "clanrank" ) )
+                                                 if ( subfield && *subfield )
+                                                 {
+                                                   GET_CLAN_RANK ( c ) = atoi ( subfield );
+                                                 }
 						snprintf ( str, slen, "%d", IS_NPC ( c ) ? -1 : GET_CLAN_RANK ( c ) );
 
 					else if ( !strcasecmp ( field, "clanname" ) )
