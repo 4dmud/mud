@@ -59,7 +59,7 @@ void remort_char ( Character *ch )
 	REMORTS ( ch ) ++;
 	GET_MAX_HIT ( ch ) = 30 + remorts;
 	GET_MAX_STAMINA ( ch ) = 100 + remorts;
-	if ( GET_CLAN ( ch ) == 12 )
+	if ( GET_CLAN ( ch ) == 12 && ( GET_CLAN_RANK < 2 ) )
 	{
 		GET_CLAN ( ch ) = 0;
 		GET_CLAN_RANK ( ch ) = 0;
