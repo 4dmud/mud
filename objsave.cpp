@@ -904,7 +904,7 @@ void Crash_crashsave(Character *ch)
       new_mudlog(NRM, LVL_GOD, TRUE, "unable to remove temp file: %s", tempname);
       log("unable to remove temp file: %s", tempname);
     }
-    free(tempname);
+
     IS_SAVING(ch) = FALSE;
     return;
   }
