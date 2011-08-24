@@ -682,6 +682,7 @@ int has_body ( Character *ch, int flag );
 #define TALLY_FISH(ch)	  ((ch)->char_specials.tally[0])
 #define TALLY_FOBJ(ch)	  ((ch)->char_specials.tally[1])
 #define TALLY_DEBRIS(ch)  ((ch)->char_specials.tally[2])
+#define GET_ETHOS(ch) ((ch)->char_specials.declared_align)
 
 #define SPECIALS(ch)          ((ch)->player_specials)
 #define SAVED(ch)            	(SPECIALS(ch)->saved)

@@ -1914,6 +1914,7 @@ struct char_special_data {
     int carry_weight;         /* Carried weight                       */
     int carry_items;          /* Number of items carried              */
     int timer;           /* Timer for update                     */
+    int declared_align;
 
     struct char_special_data_saved saved;    /* constants saved in plrfile  */
     struct obj_data *chair;   /* object the char is sitting in        */

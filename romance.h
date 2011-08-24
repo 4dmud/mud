@@ -23,13 +23,13 @@
 #define WIS_REWARD     0
 #define DEX_REWARD     0
 #define ABORT_ALLOWED  TRUE   /* T/F */
-#define NINE_MONTHS    6000   /* 6000 realtime minutes TO GO */
-#define MONTHS_8        5333
+#define NINE_MONTHS    6000   /* 6000 ticks TO GO */
+#define MONTHS_8        5333   /* 5333 ticks to go */
 #define MONTHS_7        4666  /* Note: These are MONTHS REMAINING */
 #define MONTHS_6        4000
 #define MONTHS_5        3333
 #define MONTHS_4        2666
-#define MONTHS_3        2000
+#define MONTHS_3        2000  /* 2000 ticks to go */
 #define MONTHS_2        1333
 #define MONTH_1         666
 

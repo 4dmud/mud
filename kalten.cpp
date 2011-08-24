@@ -645,7 +645,7 @@ int check_dam_affects ( Character *ch )
 
 		if ( AFF_FLAGGED ( ch, AFF_POISON_4 ) )
 		{
-			if ( damage ( ch, ch, FTOI ( 200 + ( GET_MAX_HIT ( ch ) * 0.0004 ) ), SPELL_POISON ) == -1 )
+			if ( damage ( ch, ch, FTOI ( 200 + (GET_MAX_HIT ( ch ) * 0.0004 ) ), SPELL_POISON ) == -1 )
 				return -1;
 
 			alter_mana ( ch, FTOI ( ( GET_MANA ( ch ) /6.0 ) +2 ) );

@@ -25,7 +25,7 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "compressor.h"
-
+#include "romance.h"
 
 /*
 New layout for commands
@@ -71,22 +71,6 @@ extern const char *race_abbrevs[];
 extern const char *moon_types[];
 extern const char *season_types[];
 
-/* MatingMod Defines -- DO NOT PLAY WITH THESE UNLESS YOU'RE SURE OF WHAT YOU'RE DOING! */
-#define NINE_MONTHS    6000   /* 6000 realtime minutes TO GO */
-#define MONTHS_8        5333
-#define MONTHS_7        4666  /* Note: These are MONTHS REMAINING */
-#define MONTHS_6        4000
-#define MONTHS_5        3333
-#define MONTHS_4        2666
-#define MONTHS_3        2000
-#define MONTHS_2        1333
-#define MONTH_1         666
-/* Modification of the above will change pregnancy times
- *  If you WANT to modify the times, make sure that NINE_MONTHS
- * is the HIGHEST number and MONTH_1 is the lowest!
- * All the numbers should be in DESCENDING order, from NINE_MONTHS
- * to MONTH_1.
- */
 
 /* global */
 
@@ -5126,6 +5110,7 @@ O===================================================================O
 ACMD ( do_worth )
 {
 	char buf[40] = "", buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+        const char *ethos[MAX_INPUT_LENGTH];
 	size_t len = 0;
 	int i;
 	static const char *moonage[] =
@@ -5169,6 +5154,13 @@ ACMD ( do_worth )
 	if ( IS_NPC ( ch ) )
 		return;
 
+	  *ethos = ("None.");
+        if (GET_ETHOS(ch) == 1)
+           *ethos = ("{cWGood{cn");
+   
+        if (GET_ETHOS(ch) == 3)
+           *ethos = ("{cREvil{cn");
+
 	for ( i = 0; i < NUM_CLASSES; i++ )
 		if ( GET_MASTERY ( ch, i ) )
 			len += snprintf ( buf+len, sizeof ( buf ) - len, "%c ", UPPER ( *pc_class_types[i] ) );
@@ -5189,7 +5181,7 @@ ACMD ( do_worth )
 	           "|%-32s{cy|#|    {cwLower Left Body Armor: {cL%%%-3d{cy        \r\n"
 	           "|%-32s{cy|#|   {cwLower Right Body Armor: {cL%%%-3d{cy        \r\n"
 	           "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
-	           "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw      \r\n"
+	           "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw   | Ethos: {cg%-3s{cy   \r\n"
 	           "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
 	           "|%-32s{cy|#| {cw         Stamina: {cC%d/%d{cy\r\n"
 	           "|%-32s{cy|#| {cw Elemental Weakness: {cr%s{cy\r\n"
@@ -5212,7 +5204,7 @@ ACMD ( do_worth )
 	           SUNNY ? sunnage[11] : moonage[11], chance_hit_part ( ch, PART_LEFT_LEG ),
 	           SUNNY ? sunnage[12] : moonage[12], chance_hit_part ( ch, PART_LEFT_LEG ),
 	           SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS ( ch ),
-	           SUNNY ? sunnage[14] : moonage[14], update_award ( ch ),
+	           SUNNY ? sunnage[14] : moonage[14], update_award ( ch ), *ethos,
 	           SUNNY ? sunnage[14] : moonage[14], buf,
 	           SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ),
 	           SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),

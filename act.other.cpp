@@ -228,6 +228,37 @@ C_FUNC ( allow_follow );
 ACMD(do_copyover);
 ACMD(do_trade);  /* blank so that spec_procs for dt code will work */
 
+
+
+ACMD(do_ethos)
+{
+  char arg1[MAX_INPUT_LENGTH];
+
+
+  argument = one_argument(argument, arg1);
+
+  if (!*arg1) {
+   ch->Send( "What do you wish to set your Ethos as? Good or Evil?\r\n");
+   return;
+   }
+ 
+
+   if (!str_cmp(arg1, "good")) {
+   ch->Send( "You set your ethos as {cWGood{cn.\r\n");
+   GET_ETHOS(ch) = 1;
+   return; 
+   }
+  
+   if (!str_cmp(arg1, "evil")) {
+   ch->Send( "You set your ethos as {cREvil{cn.\r\n");
+   GET_ETHOS(ch) = 3;
+   return;
+   }
+
+   ch->Send( "What do you wish to set your Ethos as? Good or Evil?\r\n");
+   return;
+}
+
 ACMD(do_trade)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];

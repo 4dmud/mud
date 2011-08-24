@@ -1357,6 +1357,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	else if ( ( GET_ALIGNMENT ( ch ) < -350 ) && affected_by_spell ( vict, SPELL_PROT_FROM_EVIL ) )
 		damage -= damage/4;
 
+
 	if ( ( elemental_type ( w_type ) == ELEM_FIRE || affected_by_spell ( ch, SPELL_MIND_FIRE ) ) && 
         (AFF_FLAGGED(vict, AFF_RESIST_FIRE) || affected_by_spell ( vict, SPELL_PROT_FIRE )) )
 		damage -= damage/4;
@@ -1446,6 +1447,34 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 	/* half of your involvement percentage is taken from the dam you do */
 	damage -= ( ( 100 - valid_perc ( ch ) ) * damage ) /200;
 #endif
+
+		/* Ethos System, provides bonuses for being in alignment and penalites 
+ 		   for being out of alignment. in_align is a variable to easily handle the "alignment"
+                   logic. Not globalizing this because currently in_align is only really being considered
+                   in the fight code. */
+
+		 sh_int  in_align = 0;
+        if (( ( GET_ALIGNMENT ( ch ) > 350) && (GET_ETHOS(ch) == 1))  && (GET_ALIGNMENT(vict) < -350))
+ 	            in_align = 1; //good
+
+        if (((GET_ALIGNMENT(ch) < -350) && (GET_ETHOS(ch) == 3))  && (GET_ALIGNMENT(vict) > 350)) 
+                    in_align = 2; //evil
+
+
+               /* Here we check if in_align is greater than zero so that we know their align actually matches
+                  but we aren't checking whether they're good or evil. If we wanted to though we could query
+                  if in_align == 2 and provide bonuses for evil and bonuses for good (say holy vs unholy attack
+                  types or the like. */
+
+		if (in_align)
+                damage += damage/10;
+
+		if (!in_align)
+                damage -= damage/10;
+
+
+       
+
 
 	return ( int ) damage;
 }
@@ -2095,7 +2124,7 @@ int fe_melee_hit ( Character* ch, Character* vict,
 
 		/* Find the wielded weapon's type */
 		if ( !IS_NPC ( ch ) )
-		{
+		{ 
 			if ( weps )
 			{
 				w_type = GET_OBJ_VAL ( wielded, 3 ) + TYPE_HIT;
@@ -2109,7 +2138,7 @@ int fe_melee_hit ( Character* ch, Character* vict,
 			else
 				w_type = TYPE_HIT;
 
-		}
+		} 
 		else
 		{
 			if ( IS_NPC ( ch ) && ( ch->mob_specials.attack_type != 0 ) )
@@ -3043,27 +3072,25 @@ void poison_wep_check ( Character *ch, Character *vict, int w_type, int dam )
 	   everyone else, sure! But not quite as good - mord*/
 	if ( IS_NPC ( ch ) )
 	{
-		if ( GET_CLASS ( ch ) == CLASS_THIEF )
+		if ( (GET_CLASS ( ch ) == CLASS_THIEF) ||( GET_CLASS(ch) == CLASS_ROGUE))
 		{
-			if ( number ( 0, 250 ) > 5 )
+			if ( number ( 0, 200 ) > 5 )
 				return; //Failed to poison.
 		}
+
 		else
+
+
 		{
-			if ( number ( 0, 450 ) > 5 )
+			if ( number ( 0, 300 ) > 5 )
 				return; //Failed to poison.
 		}
 	}
 	else
 	{
-		if ( GET_CLASS ( ch ) == CLASS_ROGUE )
+	
 		{
-			if ( number ( 0, 250 ) > 5 )
-				return; //Failed to poison.
-		}
-		else
-		{
-			if ( number ( 0, 450 ) > 5 )
+			if ( number ( 0, 10 ) > 5 )
 				return; //Failed to poison.
 		}
 	}
@@ -4843,8 +4870,8 @@ void dam_message ( int dam, Character *ch, Character *victim,
 		{
 			int chance_m = MAX ( MIN ( ( int ) ATK_CHANCE ( ch ), 3 ), 0 );
 			fight_type_message ( buf, sizeof ( buf )-1, ch, victim, tt, type_save, FE_TO_CHAR );
-			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s.",
-			           chance_message[ chance_m ].singular, dam_size[msgnum].sing, buf );
+			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s. (%d)",
+			           chance_message[ chance_m ].singular, dam_size[msgnum].sing, buf, dam );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_CHAR );
 		}
 

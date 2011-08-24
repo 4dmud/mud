@@ -1815,7 +1815,7 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 			obj_from_obj ( loop );
 			obj_to_char ( loop, ch );
 		}
-		if ( !obj->carried_by )     /* Equipped */
+		if (!obj->carried_by)     /* Equipped */ 
 		{
 			for ( index = 0; index < NUM_WEARS; index++ )
 				if ( GET_EQ ( ch, index ) == obj )
@@ -1823,9 +1823,10 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 					obj = unequip_char ( ch, index );
 					act ( "$p decays in your hands.", FALSE, ch, obj, 0,              TO_CHAR );
 					act ( "$p decays in $n's hands.", FALSE, ch, obj, 0,              TO_ROOM );
+					obj_from_char(obj); // Once's fix for decaying items
 				}
 		}
-		else
+		else  
 		{
 			act ( "$p crumbles into dust.", FALSE, ( obj->carried_by ), obj, 0, TO_CHAR );
 			obj_from_char ( obj );
@@ -1860,7 +1861,9 @@ void update_object ( Character *ch, struct obj_data *obj, int use, time_t timeno
 		update_object ( ch, obj->contains, use, timenow );
 	// log("(update_obj.4) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
 
-	if ( timenow <= GET_OBJ_EXPIRE ( obj ) )
+//	if ( timenow <= GET_OBJ_EXPIRE ( obj ) )
+      if ( GET_OBJ_EXPIRE ( obj ) > time ( 0 ) )
+
 	{
 		if ( timer_otrigger ( obj ) == -1 )
 			return;
@@ -1894,10 +1897,14 @@ void update_char_objects ( Character *ch )
 			}
 #if 0
 	/* this is just doubling up the full object scan done in point update */
-	for ( i = 0; i < NUM_WEARS; i++ )
-		if ( GET_EQ ( ch, i ) )
-			update_object ( ch, GET_EQ ( ch, i ), 1 );
+	for ( i = 0; i < NUM_WEARS; i++ ) {
+		
+			if (GET_EQ(ch, i) == NULL)
+                           continue;
 
+			if ( GET_EQ ( ch, i ) ) 
+			update_object ( ch, GET_EQ ( ch, i ), 1 );
+}                       
 	if ( ch->carrying )
 		update_object ( ch, ch->carrying, 0 );
 #endif

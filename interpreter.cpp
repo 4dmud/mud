@@ -31,6 +31,7 @@
 #include "tedit.h"
 #include "improved-edit.h"
 #include "descriptor.h"
+#include "strutil.h"
 
 extern const char *MENU;
 
@@ -99,6 +100,7 @@ int total_trig_commands_typed = 0;
 
 void line_sep ( Descriptor *d );
 void con_disp_menu ( Descriptor *d );
+extern void crumble_obj ( Character *ch, struct obj_data *obj );
 
 
 /* prototypes for all do_x functions. */
@@ -164,6 +166,7 @@ ACMD ( do_echo );
 ACMD ( do_edit );   /* Mainly intended as a test function. */
 ACMD ( do_enter );
 ACMD ( do_equipment );
+ACMD ( do_ethos );
 ACMD ( do_examine );
 ACMD ( do_energize );
 ACMD ( do_exit );
@@ -576,6 +579,7 @@ const command_info cmd_info[] =
 	{ "enter"    , "en"  , POS_STANDING, do_enter    , 0, 0, 0 },
 	{ "energize"    , "en"    , POS_STANDING, do_energize    , 0, 0, 0 },
 	{ "equipment", "eq"  , POS_RESTING, do_equipment, 0, 0, 0 },
+        { "ethos"    , "ethos", POS_DEAD   , do_ethos    , 0, 0, 0 },
 	{ "exits"    , "exi" , POS_RESTING , do_exits    , 0, 0, 0 },
 	{ "examine"  , "exa" , POS_SITTING , do_examine  , 0, 0, 0 },
 
@@ -1022,7 +1026,7 @@ const command_info cmd_info[] =
 	{ "reject"   , "rej"      , POS_RESTING , do_reject   , 1, 0 , 0 },
 	{ "propose"  , "prop"          , POS_STANDING, do_propose  , 1, 0 , 0 },
 	{ "breakup"  , "break"    , POS_STANDING, do_breakup  , 1, 0 , 0 },
-	{ "marry"    , "marry"    , POS_STANDING, do_marry    , LVL_IMMORT, 0, WIZ_MARRY_GRP },
+	{ "marry"    , "marry"    , POS_STANDING, do_marry    , 1, 0, 0 },
 	{ "divorce"  , "divor"    , POS_STANDING, do_divorce  , LVL_IMMORT, 0, WIZ_MARRY_GRP },
 	/* End Romance Module Command List */
 
@@ -2120,7 +2124,7 @@ int enter_player_game ( Descriptor *d )
 	struct obj_data *obj = NULL;
 	room_rnum load_room = NULL;
 	Character *ch = d->character;
-	int load_result;
+	int load_result, j;
 	void reset_default_status ( Character *ch );
 
 	ch->reset();
@@ -2197,6 +2201,23 @@ int enter_player_game ( Descriptor *d )
 
 	if ( LOCKER ( ch ) )
 		new_mudlog ( NRM, GET_LEVEL ( ch ), TRUE, "  -- with %d items in locker", count_locker ( ch ) );
+
+
+	  for (j = 0; j < NUM_WEARS; j++)
+  	{
+  	  if (GET_EQ(ch, j) == NULL)
+  	    continue;
+
+  	  if (!(GET_OBJ_EXPIRE(GET_EQ(ch, j)) > time ( 0 ))) {
+		if (GET_OBJ_EXPIRE(GET_EQ(ch, j)) == 0)
+                 continue;
+
+ /*      		ch->Send ( "A piece of expired equipment disintegates into nothingness.\r\n");
+	 	crumble_obj(ch, GET_EQ(ch,j));  */
+               }
+  }
+
+
 
 	if ( GET_CLAN_RANK ( ch ) < 0 )
 	{

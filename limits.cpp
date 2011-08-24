@@ -225,6 +225,9 @@ int hit_gain ( Character *ch )
 		gain *=2;
 	if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
 		gain *=2;
+
+        if ( AFF_FLAGGED(ch, AFF_POISON_4))
+                gain = 0;
 	return ( abs ( gain ) );
 }
 

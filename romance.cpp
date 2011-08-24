@@ -597,7 +597,7 @@ void marry_them(Character *ch, Character *victim,
   {
     return;
   }
-  else if (crashcheck_alpha(ch, imm) == 1)
+  if (crashcheck_alpha(ch, imm) == 1)
   {
     return;
   }
@@ -607,32 +607,43 @@ void marry_them(Character *ch, Character *victim,
     imm->Send("But %s isn't engaged!\r\n", GET_NAME(ch));
     return;
   }
-  else if (ROMANCE(victim) != 2)
+  if (ROMANCE(victim) != 2)
   {
     /* Bride isn't engaged */
     imm->Send( "But %s isn't engaged!\r\n", GET_NAME(victim));
     return;
   }
-  else if (PARTNER(ch) != GET_IDNUM(victim))
+  if (PARTNER(ch) != GET_IDNUM(victim))
   {
     /* Not engaged to each other */
     send_to_char("But they're not engaged to each other!\r\n", imm);
     return;
   }
-  else if (PARTNER(victim) != GET_IDNUM(ch))
+  if (PARTNER(victim) != GET_IDNUM(ch))
   {
     /* Not engaged to each other */
     send_to_char("But they're not engaged to each other!\r\n", imm);
     return;
   }
-  else if (check_samesex(ch, victim) == 1)
+/*  if (check_samesex(ch, victim) == 1)
   {
-    /* Same Sex Marriages? */
     send_to_char("Same-sex marriages are not allowed.\r\n", imm);
     return;
-  }
-  else
+  } */
+
+
+  if (GET_GOLD_TOKEN_COUNT(imm) < 1)
+   {
+    send_to_char("You need atleast a gold token to marry this couple.\r\n", imm);
+    return;
+   }
+
+   GET_GOLD_TOKEN_COUNT(imm) -= 1;
   {
+
+
+
+
     if (GET_SEX(ch) != GET_SEX(victim))
     {
       /* Regular Marriage */
@@ -646,13 +657,13 @@ void marry_them(Character *ch, Character *victim,
     }
     else
     {          /* Same-sex Marriage */
-      ch->Send( "%s declares you married to %s!\r\n",
+      ch->Send( "%s declares you to be in a civil union with %s!\r\n",
                        GET_NAME(imm), pi.NameById(PARTNER(ch)));
-      victim->Send( "%s declares you married to %s!\r\n",
+      victim->Send( "%s declares you to be in a civil union with %s!\r\n",
                        GET_NAME(imm), pi.NameById(PARTNER(victim)));
-      imm->Send("You declare %s and %s married!\r\n",
+      imm->Send("You declare %s and %s to be in a civil union!\r\n",
                        GET_NAME(ch), GET_NAME(victim));
-      snprintf(buf, sizeof(buf), "%s declares %s and %s married!\r\n",
+      snprintf(buf, sizeof(buf), "%s declares %s and %s to be in a civil union!\r\n",
                GET_NAME(imm), GET_NAME(ch), GET_NAME(victim));
       act(buf, TRUE, 0, 0, 0, TO_NOTVICT);
     }
@@ -678,13 +689,29 @@ ACMD(do_marry)
   char bride_name[MAX_INPUT_LENGTH];
   argument = one_argument(argument, groom_name);
   one_argument(argument, bride_name);
+
+
+   // Once's Hero Marriage code Here..
+  if (!(( PLR_FLAGGED ( ch, PLR_RP_LEADER )) || ( PLR_FLAGGED ( ch, PLR_HERO )) || (GET_LEVEL(ch) > 50)))
+  {
+    send_to_char("Only Heroes, Roleplay Leaders, and Immortals hold Marriage Certificates.\r\n", ch);
+    return;
+  }
+  if (GET_GOLD_TOKEN_COUNT ( ch ) < 1)
+  {
+    send_to_char("Weddings are costly business. You must have at least 1 gold token in your account to marry two people. Preferably the groom's.\r\n", ch);
+    return;
+  }
+
+
+
   if (!(groom = get_char_room_vis(ch, groom_name, NULL)))
   {
     /* Are they here? No! */
     ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
-  else if (!(bride = get_char_room_vis(ch, bride_name, NULL)))
+  if (!(bride = get_char_room_vis(ch, bride_name, NULL)))
   {
     /* Are they here? No! */
     ch->Send( "%s", CONFIG_NOPERSON);
@@ -696,7 +723,7 @@ ACMD(do_marry)
     send_to_char("You can't marry someone to themself!\r\n", ch);
     return;
   }
-  else if (groom == ch)
+   if (groom == ch)
   {
     /* Can't perform a ceremony on yourself. */
     send_to_char
@@ -704,7 +731,7 @@ ACMD(do_marry)
        ch);
     return;
   }
-  else if (bride == ch)
+  if (bride == ch)
   {
     /* Can't perform a ceremony on yourself. */
     send_to_char
@@ -712,12 +739,13 @@ ACMD(do_marry)
        ch);
     return;
   }
-  else if ((!groom) || (!bride))
+  if ((!groom) || (!bride))
   {
     send_to_char("Which couple do you wish to marry?\r\n", ch);
     return;
   }
-  else
+
+
   {            /* Let the marry function check the rest. */
     marry_them(groom, bride, ch);
   }

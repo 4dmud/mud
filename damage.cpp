@@ -79,7 +79,7 @@ void damage_count_free ( Character *vict )
 
 void damage_vict ( Character *vict, int dam )
 {
-	if ( GET_LEVEL ( vict ) >=LVL_IMMORT && ( dam > 0 ) )
+	if (!IS_NPC(vict) && GET_LEVEL ( vict ) >=LVL_IMMORT && ( dam > 0 ) )
 	{
 		vict->Send ( "Being the cool immortal you are, you sidestep a trap,\r\n"
 		             "obviously placed to kill you.\r\n" );

@@ -3958,7 +3958,7 @@ void brag(Character *ch, Character *vict) {
     //  if (IS_NPC(ch))
     // snprintf(buf, sizeof(buf), "Someone brags, '%s'", brag[number(0, 53)]);
     // else
-    snprintf(buf, sizeof(buf), "%s brags, '%s'", GET_NAME(ch),  bragmsg[number(0, 53)]);
+    snprintf(buf, sizeof(buf), "%s brags, '%s' ({cW%d%%{cr)", GET_NAME(ch),  bragmsg[number(0, 53)], (int)((float)GET_HIT(ch)/(float)GET_MAX_HIT(ch)*100));
 
     for (i = descriptor_list; i; i = next) {
         next = i->next;

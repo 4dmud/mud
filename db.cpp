@@ -2233,13 +2233,12 @@ void parse_simple_mob ( FILE * mob_f, Character *mob, int nr )
 	int j, t[10];
 	char line[256];
 	int k = 1;
-
 	//mob_proto[i].real_abils.str = (number(3, 20));
-	mob->real_abils.intel = ( number ( 3, 20 ) );
-	mob->real_abils.wis = ( number ( 3, 20 ) );
-	mob->real_abils.dex = ( number ( 3, 20 ) );
-	mob->real_abils.con = ( number ( 3, 20 ) );
-	mob->real_abils.cha = ( number ( 3, 20 ) );
+         mob->real_abils.intel = ( number ( 3, 20 ) );
+ 	 mob->real_abils.wis = ( number ( 3, 20 ) );
+	 mob->real_abils.dex = ( number ( 3, 20 ) );
+	 mob->real_abils.con = ( number ( 3, 20 ) );
+	 mob->real_abils.cha = ( number ( 3, 20 ) );
 
 	if ( !get_line ( mob_f, line ) )
 	{
@@ -2257,25 +2256,24 @@ void parse_simple_mob ( FILE * mob_f, Character *mob, int nr )
 		exit ( 1 );
 	}
 
-	GET_LEVEL ( mob ) = k = IRANGE ( 1, t[0], MAX_MOB_LEVELS -1 ) ;
-	mob->points.hitroll = mob_stats[k].hitroll;
-	mob->points.armor = mob_stats[k].ac;
+	 GET_LEVEL ( mob ) = k = IRANGE ( 1, t[0], MAX_MOB_LEVELS -1 ) ;
+	 mob->points.hitroll = mob_stats[k].hitroll;
+	 mob->points.armor = mob_stats[k].ac;
 
 	// For when we are going to change this, this stuff is also done after a medit, in medit_save_internally.
 	// if you change it here, change it there too.
 	/* max hit = 0 is a flag that H, M, V is xdy+z */
-	mob->points.max_hit = ( dice ( mob_stats[k].hp_dice, mob_stats[k].hp_sides ) + mob_stats[k].hp_bonus );
-	mob->points.hit = mob->points.max_hit;
-	mob->points.mana = 10;
-	mob->points.move = 5000;
-	mob->points.stamina = 150 + ( k*2 );
-
-	mob->points.max_mana = 10;
-	mob->points.max_move = 5000;
-	mob->points.max_stamina = 100;
-
+	 mob->points.max_hit = ( dice ( mob_stats[k].hp_dice, mob_stats[k].hp_sides ) + mob_stats[k].hp_bonus );
+	 mob->points.hit = mob->points.max_hit;
+	 mob->points.mana = 10;
+	 mob->points.move = 5000;
+	 mob->points.stamina = 150 + ( k*2 );
+	 mob->points.max_mana = 10;
+	 mob->points.max_move = 5000;
+	 mob->points.max_stamina = 100;
+	
 	mob->mob_specials.damnodice = mob_stats[k].dam_dice;
-	mob->mob_specials.damsizedice = mob_stats[k].dam_sides;
+	 mob->mob_specials.damsizedice = mob_stats[k].dam_sides;
 	mob->points.damroll = mob_stats[k].dam_bonus;
 	mob->mob_specials.tier = 0;
 	mob->mob_specials.subskill = TYPE_UNDEFINED;
@@ -2873,7 +2871,7 @@ void parse_mobile ( FILE * mob_f, int nr, zone_vnum zon )
 	AFF_FLAGS ( mob ) [1] = asciiflag_conv ( f6 );
 	AFF_FLAGS ( mob ) [2] = asciiflag_conv ( f7 );
 	AFF_FLAGS ( mob ) [3] = asciiflag_conv ( f8 );
-	GET_ALIGNMENT ( mob ) = t[2];
+        GET_ALIGNMENT ( mob ) = t[2];
 	//check_bitvector_names(AFF_FLAGS(mob_proto[i]), affected_bits_count, buf2, "mobile affect");
 
 	/* AGGR_TO_ALIGN is ignored if the mob is AGGRESSIVE. */
@@ -5190,7 +5188,9 @@ int store_to_char ( const char *name, Character *ch )
 					strcpy ( buf2, "email: store to char" );
 					if ( ( GET_EMAIL ( ch ) = fread_string ( fl, buf2 ) ) == NULL )
 						GET_EMAIL ( ch ) = strdup ( "Undefined" );
-				}
+				} 
+                                else if ( !strcmp ( tag, "Etho"))
+                                        GET_ETHOS(ch) = num;
 				break;
 
 			case 'F':
@@ -5989,6 +5989,8 @@ void char_to_store ( Character *ch )
 		fprintf ( fl, "NewL: %d\n", GET_NEWBIE_STATUS ( ch ) );
 	if ( GET_EMAIL ( ch ) && *GET_EMAIL ( ch ) )
 		fprintf ( fl, "Emai: \n%s~\n", GET_EMAIL ( ch ) );
+        if ( GET_ETHOS (ch))
+                fprintf ( fl, "Etho: %d\n", GET_ETHOS(ch));
 	/*Here follows a little something made by Thotter */
 	if ( GET_LOGINMSG ( ch ) )
 		fprintf ( fl, "Lgim: %s\n", GET_LOGINMSG ( ch ) );

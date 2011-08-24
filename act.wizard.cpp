@@ -5016,6 +5016,7 @@ set_fields[] =
 	{"body", LVL_SEN, PC, MISC},
 	{"trains", LVL_SEN, NPC, MISC},
 	{"outcast", LVL_SEN, PC, BINARY}, /* 84 */
+        {"ethos", LVL_SEN, PC, NUMBER},
 	{   "\n", 0, BOTH, MISC}
 };
 
@@ -5675,6 +5676,10 @@ int perform_set ( Character *ch, Character *vict, int mode,
     case 84:
 		SET_OR_REMOVE_AR(AFF_FLAGS(vict), AFF_OUTCAST);
 		break;
+    case 85:
+                GET_ETHOS(vict) = value;
+	        break;
+
     default:
         ch->Send( "Can't set that!\r\n");
         return (0);
