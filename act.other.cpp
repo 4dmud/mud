@@ -244,14 +244,19 @@ ACMD(do_ethos)
  
 
    if (!str_cmp(arg1, "good")) {
-   ch->Send( "You set your ethos as {cWGood{cn.\r\n");
+   ch->Send( "You dream of being a knight in shining armor as you set your ethos as {cWGood{cn.\r\n");
    GET_ETHOS(ch) = 1;
    return; 
    }
   
    if (!str_cmp(arg1, "evil")) {
-   ch->Send( "You set your ethos as {cREvil{cn.\r\n");
+   ch->Send( "You dream of murdering kittens as you set your ethos as {cREvil{cn.\r\n");
    GET_ETHOS(ch) = 3;
+   return;
+   }
+   if (!str_cmp(arg1, "apathy")) {
+   ch->Send( "You realize you don't care about ethos...or anything else for that matter.\r\n");
+   GET_ETHOS(ch) = 0;
    return;
    }
 

@@ -2212,8 +2212,8 @@ int enter_player_game ( Descriptor *d )
 		if (GET_OBJ_EXPIRE(GET_EQ(ch, j)) == 0)
                  continue;
 
- /*      		ch->Send ( "A piece of expired equipment disintegates into nothingness.\r\n");
-	 	crumble_obj(ch, GET_EQ(ch,j));  */
+       		ch->Send ( "A piece of expired equipment disintegates into nothingness.\r\n");
+	 	crumble_obj(ch, GET_EQ(ch,j));  
                }
   }
 

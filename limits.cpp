@@ -228,6 +228,11 @@ int hit_gain ( Character *ch )
 
         if ( AFF_FLAGGED(ch, AFF_POISON_4))
                 gain = 0;
+        if ( AFF_FLAGGED(ch, AFF_POISON_3))
+                gain = 0;
+        if ( AFF_FLAGGED(ch, AFF_POISON_2))
+                gain = 0;
+
 	return ( abs ( gain ) );
 }
 
