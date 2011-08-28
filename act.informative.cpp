@@ -5157,7 +5157,8 @@ ACMD ( do_worth )
 	  *ethos = ("None.");
         if (GET_ETHOS(ch) == 1)
            *ethos = ("{cWGood{cn");
-   
+        if (GET_ETHOS(ch) == 2)
+           *ethos = ("{cBNeutral{cn");
         if (GET_ETHOS(ch) == 3)
            *ethos = ("{cREvil{cn");
 

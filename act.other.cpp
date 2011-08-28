@@ -233,7 +233,7 @@ ACMD(do_trade);  /* blank so that spec_procs for dt code will work */
 ACMD(do_ethos)
 {
   char arg1[MAX_INPUT_LENGTH];
-
+  int ethos_cost = 0;
 
   argument = one_argument(argument, arg1);
 
@@ -243,20 +243,36 @@ ACMD(do_ethos)
    }
  
 
+   if ((TRADEPOINTS(ch) < 15)) {
+   ch->Send( "You do not have enough tradepoints to switch your Ethos.\r\n");
+   return;
+   }
+   if (GET_ETHOS(ch) > 0)
+   ethos_cost = 15;
+
    if (!str_cmp(arg1, "good")) {
    ch->Send( "You dream of being a knight in shining armor as you set your ethos as {cWGood{cn.\r\n");
    GET_ETHOS(ch) = 1;
+   TRADEPOINTS(ch) -= ethos_cost;
    return; 
    }
   
    if (!str_cmp(arg1, "evil")) {
    ch->Send( "You dream of murdering kittens as you set your ethos as {cREvil{cn.\r\n");
    GET_ETHOS(ch) = 3;
+   TRADEPOINTS(ch) -= ethos_cost;
+   return;
+   }
+   if (!str_cmp(arg1, "neutral")) {
+   ch->Send( "You contemplate existence as you set your ethos as {cBNeutral{cn.\r\n");
+   GET_ETHOS(ch) = 2;
+   TRADEPOINTS(ch) -= ethos_cost;
    return;
    }
    if (!str_cmp(arg1, "apathy")) {
    ch->Send( "You realize you don't care about ethos...or anything else for that matter.\r\n");
    GET_ETHOS(ch) = 0;
+   TRADEPOINTS(ch) -= ethos_cost;
    return;
    }
 

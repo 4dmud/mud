@@ -1457,8 +1457,11 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
         if (( ( GET_ALIGNMENT ( ch ) > 350) && (GET_ETHOS(ch) == 1))  && (GET_ALIGNMENT(vict) < -350))
  	            in_align = 1; //good
 
+	if (((GET_ALIGNMENT(ch) < 350) && (GET_ALIGNMENT(ch) > -350)) && ((GET_ALIGNMENT(vict) > 350) || (GET_ALIGNMENT(vict) < -350)))
+		    in_align = 2; //neutral
+
         if (((GET_ALIGNMENT(ch) < -350) && (GET_ETHOS(ch) == 3))  && (GET_ALIGNMENT(vict) > 350)) 
-                    in_align = 2; //evil
+                    in_align = 3; //evil
 
 
                /* Here we check if in_align is greater than zero so that we know their align actually matches

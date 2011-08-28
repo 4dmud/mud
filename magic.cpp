@@ -1598,7 +1598,7 @@ void mag_groups ( int level, Character *ch, int spellnum,
 		perform_mag_groups ( level, ch, tch, spellnum, savetype );
 	}
 
-	if ( ( k != ch ) && AFF_FLAGGED ( k, AFF_GROUP ) )
+	if ( ( k != ch ) && AFF_FLAGGED ( k, AFF_GROUP )  && HERE(ch, k) )
 		perform_mag_groups ( level, ch, k, spellnum, savetype );
 	perform_mag_groups ( level, ch, ch, spellnum, savetype );
 }
