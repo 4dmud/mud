@@ -2455,8 +2455,9 @@ void do_clan_privilege ( Character *ch, char *arg )
 	}
 	ch->Send ( "\r\nClan privileges:\r\n" );
 	for ( i = 0; i < NUM_CP; i++ )
-		ch->Send ( "\t%s\r\n", clan_privileges[i] );
-
+//@TODO:PROTOCOL: We can't use tabs any more!
+//		ch->Send ( "\t%s\r\n", clan_privileges[i] );
+		ch->Send ( "  %s\r\n", clan_privileges[i] );
 }
 
 void do_clan_set ( Character *ch, char *arg )

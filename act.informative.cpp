@@ -127,6 +127,7 @@ ACMD ( do_weather );
 ACMD ( do_help );
 ACMD ( do_who );
 ACMD ( do_users );
+ACMD ( do_clients );
 ACMD ( do_gen_ps );
 void perform_mortal_where ( Character *ch, char *arg );
 void perform_immort_where ( Character *ch, char *arg );
@@ -962,18 +963,22 @@ void do_auto_exits ( Character *ch )
 
 			if ( EXIT_FLAGGED ( W_EXIT ( view_room, door ), EX_CLOSED ) )
 			{
+//@TODO:PROTOCOL: MXP is much easier to do now.  See below 3 commented sections.
 				if ( GET_LEVEL ( ch ) > LVL_IMMORT )
 				{
 					if ( IS_SET ( W_EXIT ( view_room, door )->exit_info, EX_HIDDEN ) )
+//						ch->Send ( "{cg{cu%c{c0 {cW", UPPER ( *dirs[door] ) );
 						ch->Send ( "{cg{cu%c{c0 {cW", UPPER ( *dirs[door] ) );
 					else
-						ch->Send ( "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER ( *dirs[door] ), MXP_BEG, tag_close, MXP_END );
+//						ch->Send ( "{cg%s%s %s%s%c%s%s%s {cW", MXP_BEG, tag_open, dirs[door], MXP_END, UPPER ( *dirs[door] ), MXP_BEG, tag_close, MXP_END );
+						ch->Send ( "{cg\t(%c\t){cW ", toupper( *dirs[door] ) );
 					slen++;
 				}
 			}
 			else
 			{
-				ch->Send ( "%s%s %s%s%c%s%s%s ", MXP_BEG, tag_open, dirs[door], MXP_END, LOWER ( *dirs[door] ), MXP_BEG, tag_close, MXP_END );
+//				ch->Send ( "%s%s %s%s%c%s%s%s ", MXP_BEG, tag_open, dirs[door], MXP_END, LOWER ( *dirs[door] ), MXP_BEG, tag_close, MXP_END );
+				ch->Send ( "\t(%c\t) ", tolower( *dirs[door] ) );
 				slen++;
 			}
 
@@ -2182,7 +2187,6 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 
 	if ( IS_NPC ( ch ) )
 		return;
-
 
 	if ( AFF_FLAGGED ( ch, AFF_POLY_TOAD ) )
 	{
@@ -3897,6 +3901,29 @@ ACMD ( do_users )
 
 }
 
+ACMD ( do_clients )
+{
+	for ( Descriptor *d = descriptor_list; d; d = d->next )
+	{
+		if ( IS_PLAYING ( d ) )
+		{
+			ch->Send ( "\tO%-15s\tn %s (%s)%s%s%s%s%s%s%s%s%s\r\n", 
+				GET_NAME( d->character ), 
+				d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString, 
+				d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString, 
+				d->pProtocol->bTTYPE ? " TTYPE" : "", 
+				d->pProtocol->bNAWS ? " NAWS" : "", 
+				d->pProtocol->bCHARSET ? " CHARSET" : "", 
+				d->pProtocol->bMSDP ? " MSDP" : "", 
+				d->pProtocol->bATCP ? " ATCP" : "", 
+				d->pProtocol->bMSP ? " MSP" : "", 
+				d->pProtocol->bMXP ? " MXP" : "",
+				d->pProtocol->bMCCP ? " MCCP" : "",
+				d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt ? " 256-COLORS" : "" );
+		}
+	}
+}
+
 ACMD ( do_ipstat )
 {
 
@@ -3910,6 +3937,27 @@ ACMD ( do_ipstat )
 	else
 		ch->Send ( "{cGYour ip is [Hostname unknown]{c0\r\n" );
 
+	ch->Send ( "\tOYour client is [%s] version [%s]\tn\r\n", 
+		ch->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString, 
+		ch->desc->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString );
+
+	ch->Send ( "\t[F210]Your protocols are %s%s%s%s%s%s%s%s%s\tn\r\n", 
+		ch->desc->pProtocol->bTTYPE ? "[TTYPE] " : "", 
+		ch->desc->pProtocol->bNAWS ? "[NAWS] " : "", 
+		ch->desc->pProtocol->bCHARSET ? "[CHARSET] " : "", 
+		ch->desc->pProtocol->bMSDP ? "[MSDP] " : "", 
+		ch->desc->pProtocol->bATCP ? "[ATCP] " : "", 
+		ch->desc->pProtocol->bMSP ? "[MSP] " : "", 
+		ch->desc->pProtocol->bMXP ? "[MXP] " : "",
+		ch->desc->pProtocol->bMCCP ? "[MCCP] " : "",
+		ch->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt ? "[256-COLORS] " : "" );
+
+	if ( ch->desc->pProtocol->bNAWS )
+	{
+		ch->Send ( "\t[F245]Your screen is %d characters wide and %d characters high.\tn\r\n", 
+		ch->desc->pProtocol->ScreenWidth, 
+		ch->desc->pProtocol->ScreenHeight );
+	}
 }
 
 /* Generic page_string function for displaying text */

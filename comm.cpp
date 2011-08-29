@@ -27,6 +27,7 @@
 
 #include "config.h"
 #include "sysdep.h"
+#include "protocol.h" //@TODO:PROTOCOL
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
 # include <mcheck.h>
@@ -240,6 +241,7 @@ void clear_free_list(void);
 void reboot_wizlists(void);
 void boot_world(void);
 void regen_update(void);
+void msdp_update(void); //@TODO:PROTOCOL
 void affect_update(void);     /* In spells.c */
 void mobile_activity(void);
 void perform_violence(void);
@@ -655,9 +657,12 @@ void copyover_recover(void) {
     Descriptor *d;
     FILE *fp;
     char host[1024];
-    int desc, player_i, mxpon;
+    int desc, player_i;
     bool fOld;
     char name[MAX_INPUT_LENGTH];
+    char client_name[MAX_INPUT_LENGTH];
+    char client_version[MAX_INPUT_LENGTH];
+    char protocol_data[MAX_STRING_LENGTH];
 
     int saved_loadroom = NOWHERE, varcnt = 0;
 
@@ -675,10 +680,10 @@ void copyover_recover(void) {
 
     for (;;) {
         fOld = TRUE;
-        varcnt = fscanf(fp, "%d %s %s %d %d\n", &desc, name, host, &saved_loadroom, &mxpon);
+        varcnt = fscanf(fp, "%d %s %s %d %s %s %s\n", &desc, name, host, &saved_loadroom, client_name, client_version, protocol_data);
         if (desc == -1)
             break;
-        if (varcnt !=5)
+        if (varcnt != 7)
             continue;
 
         /* Write something, and check if it goes error-free */
@@ -692,12 +697,16 @@ void copyover_recover(void) {
 #else
         /* create a new descriptor */
         d = new Descriptor();
+        d->pProtocol->bNegotiated = true; //@TODO:PROTOCOL: Don't renegotiate.
         d->init_descriptor(desc);
         d->next = descriptor_list;
         descriptor_list = d;
 #endif
 
-        d->mxp = mxpon;
+	MSDPSetString( d, eMSDP_CLIENT_ID, client_name );
+	MSDPSetString( d, eMSDP_CLIENT_VERSION, client_version );
+        CopyoverSet( d, protocol_data );
+
         d->host = host;
 
 
@@ -726,10 +735,12 @@ void copyover_recover(void) {
             write_to_descriptor (desc, "\n\rColor floods back into the world.\r\n", NULL);
 #ifdef HAVE_ZLIB_H
 
-            if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS) && !d->mxp) {
-                d->comp->state = 1; /* indicates waiting for comp negotiation */
-                send_compress_offer(d);
-            }
+//@TODO:PROTOCOL
+//            if (!PRF_FLAGGED(d->character, PRF_NOCOMPRESS) && !d->mxp) {
+//                d->comp->state = 1; /* indicates waiting for comp negotiation */
+//                send_compress_offer(d);
+//            }
+
 #endif /* HAVE_ZLIB_H */
             send_out_signals(d);
             d->connected = CON_PLAYING;
@@ -1366,6 +1377,9 @@ void heartbeat(int heart_pulse) {
         check_idle_passwords();
         process_room_affect_queue();
     }
+
+    if (!(heart_pulse % PASSES_PER_SEC)) //@TODO:PROTOCOL
+        msdp_update();                   //@TODO:PROTOCOL
 
     if (!(heart_pulse % (PULSE_MOBILE)))
         mobile_activity();
@@ -2179,16 +2193,18 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
 }
 void send_compress_offer(Descriptor *d) {
 #ifdef HAVE_ZLIB_H
-    d->Output( "%s", will_sig);
-    d->Output( "%s", will_sig2);
+//@TODO:PROTOCOL
+//    d->Output( "%s", will_sig);
+//    d->Output( "%s", will_sig2);
 #endif
 
     return;
 }
 void send_out_signals(Descriptor *d) {
-    d->Output( "%s", eor_offer);
-    d->Output( "%s", ga_offer);
-    d->Output( "%s", will_mxp_str);
+//@TODO:PROTOCOL
+//    d->Output( "%s", eor_offer);
+//    d->Output( "%s", ga_offer);
+//    d->Output( "%s", will_mxp_str);
 }
 
 /*
@@ -2215,7 +2231,8 @@ int process_output(Descriptor *t) {
 
     /* add the extra CRLF if the person isn't in compact mode */
     if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
-        osb += string("\r\n");
+        if ( !t->pProtocol->WriteOOB ) //@TODO:PROTOCOL
+            osb += string("\r\n");
 
     /* add a prompt */
 #if 0
@@ -2224,7 +2241,8 @@ int process_output(Descriptor *t) {
         t->send_mxp_status();
 #endif
 
-    prmpt = make_prompt(t);
+    if ( !t->pProtocol->WriteOOB )
+        prmpt = make_prompt(t);
 
     /* make sure there is room on the SOCK buf */
     if ((osb.length() + prmpt.length()) < MAX_SOCK_BUF)
@@ -2235,7 +2253,8 @@ int process_output(Descriptor *t) {
     * CRLF, otherwise send the straight output sans CRLF.
     */
 
-    if (t->has_prompt) {
+    if (t->has_prompt && !t->pProtocol->WriteOOB) { //@TODO:PROTOCOL
+//    if (t->has_prompt) {
         t->has_prompt = 0;
         osb = s + osb;
         do {
@@ -2460,7 +2479,6 @@ exitzlibdo:
         comp->size_in = comp->stream->avail_in;
         /* the above as taken out because I don't think its necessary.. this is faster too */
         /*comp->size_in = 0;*/
-
         if (result > 0)
             result = bytes_copied;
     } else
@@ -2631,7 +2649,6 @@ int toggle_compression(Descriptor *t) {
     if (!t->comp)
         return 0;
 
-
     /* Notify client. */
     switch(t->comp->compression) {
     case 1:
@@ -2643,11 +2660,13 @@ int toggle_compression(Descriptor *t) {
     }
 
     CREATE(t->comp->stream, z_stream, 1);
+    t->comp->stream->next_in = NULL;
+    t->comp->stream->avail_in = NULL;
+    t->comp->stream->next_out = NULL;
+    t->comp->stream->avail_out = NULL;
     t->comp->stream->zalloc = z_alloc;
     t->comp->stream->zfree = z_free;
     t->comp->stream->opaque = Z_NULL;
-    if ((derr = deflateInit(t->comp->stream, Z_DEFAULT_COMPRESSION)) != 0)
-        log("SYSERR: deflateEnd returned %d.", derr);
 
     /* init the state structure */
     /* first the output component */
@@ -2659,8 +2678,21 @@ int toggle_compression(Descriptor *t) {
     t->comp->total_in = SMALL_BUFSIZE;
     t->comp->size_in = 0;
 
-#endif
+    if ((derr = deflateInit(t->comp->stream, Z_BEST_COMPRESSION)) != Z_OK)
+    {
+        log("SYSERR: deflateInit returned %d.", derr);
 
+        delete t->comp->stream;
+        delete t->comp->buff_out;
+        delete t->comp->buff_in;
+        t->comp->stream = NULL;
+        t->comp->buff_out = NULL;
+        t->comp->buff_in = NULL;
+
+        t->comp->state = 0;
+        t->comp->compression = 0;
+    }
+#endif
     return 0;
 }
 
@@ -2686,7 +2718,7 @@ int Descriptor::process_input() {
     char  *read_point, *write_point, *nl_pos = NULL;
     char tmp[MAX_INPUT_LENGTH];
     char *ptr;
-
+/*TODO:PROTOCOL: No longer needed
     const unsigned char do_eor[] = {
                                        IAC,DO,EOR,0
                                    };
@@ -2697,6 +2729,9 @@ int Descriptor::process_input() {
                                        IAC,DO,TELOPT_ECHO,0
                                    };
 #define  TELOPT_MXP        '\x5B'
+*/
+    static char read_buf[MAX_PROTOCOL_BUFFER]; // @TODO:PROTOCOL
+    read_buf[0] = '\0';                        // @TODO:PROTOCOL
 
     if (close_me)
         return 0;
@@ -2712,7 +2747,16 @@ int Descriptor::process_input() {
             return (-1);
         }
 
+/*@TODO:PROTOCOL
         bytes_read = perform_socket_read(descriptor, read_point, space_left);
+*/
+        bytes_read = perform_socket_read(descriptor, read_buf, MAX_PROTOCOL_BUFFER );
+        if ( bytes_read >= 0 )
+        {
+            read_buf[bytes_read] = '\0';
+            ProtocolInput( this, read_buf, bytes_read, read_point );
+            bytes_read = strlen(read_point);
+        }
 
         if (bytes_read < 0)  /* Error, disconnect them. */
             return (-1);
@@ -2752,8 +2796,8 @@ int Descriptor::process_input() {
                 //else if (*(unsigned char *)(ptr+2) == EOR)
                 //log("END-OF-RECORD found");
 
+#if 0 //TODO:PROTOCOL: No longer needed.
 #if defined(HAVE_ZLIB)
-
                 if (memcmp (ptr, do_sig2, strlen ((const char *)do_sig2)) == 0) {
                     telnet_capable = 1;
                     //log("MCCP found on");
@@ -2823,8 +2867,7 @@ int Descriptor::process_input() {
                     memmove (ptr, &ptr [strlen ((const char *)dont_mxp_str)], strlen (&ptr [strlen ((const char *)dont_mxp_str)]) + 1);
                     ptr--; /* adjust to allow for discarded bytes */
                 } /* end of turning off MXP */
-
-
+#endif //TODO:PROTOCOL No longer needed.
 
                 /*
                  * Convert the IAC string so that it is filtered out. This
@@ -3768,7 +3811,7 @@ void setup_log(const char *filename, int fd) {
 }
 
 int open_logfile(const char *filename, FILE * stderr_fp) {
-    char* mode = "w";
+    const char* mode = "w";
     if (fCopyOver) 
 	mode = "a";
 
@@ -4614,3 +4657,127 @@ void mccp_off(Descriptor *d) {
 #include "dlib/dir_nav/dir_nav_kernel_1.cpp"
 #include "dlib/dir_nav/dir_nav_kernel_2.cpp"
 //#include "dlib/linker/linker_kernel_1.cpp"
+
+
+
+//@TODO:PROTOCOL: You may want to move this elsewhere.
+
+int fighter_damroll ( Character *ch );
+int caster_damroll ( Character *ch );
+const char *simple_class_name ( Character *ch );
+char *msdp_map (Character *ch);
+const char *skill_name(int num);
+
+void msdp_update( void )
+{
+    Descriptor *d;
+    int PlayerCount = 0;
+
+    for (d = descriptor_list; d; d = d->next)
+    {
+        Character *ch = d->character;
+        if ( ch && !IS_NPC(ch) && d->connected == CON_PLAYING )
+        {
+            Character *pOpponent = FIGHTING(ch);
+            ++PlayerCount;
+
+            bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
+               GET_CLASS( ch ) == CLASS_MAGE || 
+               GET_CLASS( ch ) == CLASS_ESPER || has_staff( ch );
+
+            MSDPSetString( d, eMSDP_CHARACTER_NAME, GET_NAME(ch) );
+            MSDPSetNumber( d, eMSDP_ALIGNMENT, GET_ALIGNMENT(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE, GET_EXP(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_MAX, level_exp ( 
+               GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, 
+               current_class_is_tier_num ( ch ), 
+               MIN ( REMORTS ( ch ), 50 ) ) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_TNL, exp_needed(ch) );
+
+            MSDPSetNumber( d, eMSDP_HEALTH, GET_HIT(ch) );
+            MSDPSetNumber( d, eMSDP_HEALTH_MAX, GET_MAX_HIT(ch) );
+            MSDPSetNumber( d, eMSDP_LEVEL, GET_LEVEL(ch) );
+
+            MSDPSetString( d, eMSDP_RACE, race_name(ch) );
+            MSDPSetString( d, eMSDP_CLASS, simple_class_name(ch) );
+
+            MSDPSetNumber( d, eMSDP_MANA, GET_MANA(ch) );
+            MSDPSetNumber( d, eMSDP_MANA_MAX, GET_MAX_MANA(ch) );
+            MSDPSetNumber( d, eMSDP_WIMPY, GET_WIMP_LEV(ch) );
+            MSDPSetNumber( d, eMSDP_PRACTICE, GET_PRACTICES(ch) );
+            MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
+            MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );
+            MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch) );
+            MSDPSetNumber( d, eMSDP_HITROLL, GET_HITROLL(ch) );
+            MSDPSetNumber( d, eMSDP_DAMROLL, is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ) );
+            MSDPSetNumber( d, eMSDP_AC, ch->compute_armor_class() );
+
+            MSDPSetNumber( d, eMSDP_STR, GET_STR(ch) );
+            MSDPSetNumber( d, eMSDP_STR_ADD, GET_ADD(ch) );
+            MSDPSetNumber( d, eMSDP_INT, GET_INT(ch) );
+            MSDPSetNumber( d, eMSDP_WIS, GET_WIS(ch) );
+            MSDPSetNumber( d, eMSDP_CON, GET_CON(ch) );
+            MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
+            MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
+
+            MSDPSetNumber( d, eMSDP_STR, ch->real_abils.str );
+            MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
+            MSDPSetNumber( d, eMSDP_INT, ch->real_abils.intel );
+            MSDPSetNumber( d, eMSDP_WIS, ch->real_abils.wis );
+            MSDPSetNumber( d, eMSDP_CON, ch->real_abils.con );
+            MSDPSetNumber( d, eMSDP_DEX, ch->real_abils.dex );
+            MSDPSetNumber( d, eMSDP_CHA, ch->real_abils.cha );
+
+            /* This would be better moved elsewhere */
+            if ( pOpponent != NULL )
+            {
+                int hit_points = (GET_HIT(pOpponent) * 100) / GET_MAX_HIT(pOpponent);
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, hit_points );
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH_MAX, 100 );
+                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, GET_LEVEL(pOpponent) );
+                MSDPSetString( d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch) );
+            }
+            else /* Clear the values */
+            {
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, 0 );
+                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, 0 );
+                MSDPSetString( d, eMSDP_OPPONENT_NAME, "" );
+            }
+
+            Room *pRoom = ch->in_room;
+            if ( pRoom && pRoom->number != d->pProtocol->LastRoomVnum )
+            {
+                d->pProtocol->LastRoomVnum = pRoom->number;
+                MSDPSetString( d, eMSDP_LOCATION_MAP, msdp_map(ch) );
+            }
+
+            char buf[MAX_STRING_LENGTH] = {'\0'};
+            if ( ch->affected )
+            {
+                char skill_buf[MAX_STRING_LENGTH];
+                struct affected_type *aff;
+
+                for ( aff = ch->affected; aff != NULL; aff = aff->next )
+                {
+                    int minsec = time_to_sec(aff->expire+1);
+                    sprintf( skill_buf, "001,1,%s,%d", 
+                        skill_name(aff->type), minsec >= 0 ? minsec : -1 );
+
+                    if ( buf[0] != '\0' )
+                        strcat( buf, "\a" );
+
+                    strcat( buf, skill_buf );
+                }
+            }
+            MSDPSetString( d, eMSDP_AFFECTS, buf );
+
+            MSDPUpdate( d );
+        }
+
+        /* Ideally this should be called once at startup, and again whenever
+         * someone leaves or joins the mud.  But this works, and it keeps the
+         * snippet simple.  Optimise as you see fit.
+         */
+        MSSPSetPlayers( PlayerCount );
+    }
+}

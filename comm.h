@@ -68,7 +68,7 @@ void string_add ( Descriptor *d, char *str );
 void string_write ( Descriptor *d, char **txt, size_t len, long mailto, void *data );
 void string_write ( Descriptor *d, string *writeto, size_t len, long mailto, void *data );
 int toggle_compression ( Descriptor *t );
-
+void mccp_off(Descriptor *d);
 
 #define SEND_TO_SOCKET(messg, desc)	write_to_descriptor((desc), (messg), strlen(messg))
 

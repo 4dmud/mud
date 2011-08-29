@@ -11,6 +11,7 @@
 
 
 #include "col_string.h"
+#include "protocol.h"
 
 string wordwrap(const char *cmd, size_t width, size_t maxlen);
 extern Descriptor *descriptor_list;
@@ -98,6 +99,7 @@ public:
         }
         return this;
     };
+    protocol_t *pProtocol; /* @TODO:PROTOCOL */
     /*private:*/
     string output;
     string cstr;

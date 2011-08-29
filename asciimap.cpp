@@ -77,7 +77,7 @@ int offsets[4][2] = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
 
 /* Heavily modified - Edward */
 void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
-               int max )
+               int max, bool show_vehicles )
 {
 	room_rnum prospect_room;
 	struct room_direction_data *pexit;
@@ -88,9 +88,12 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 	mapgrid[x][y] = room->sector_type;
 
 	/* mark vehicles on the map */
-	for ( obj = room->contents; obj; obj = obj->next_content )
-		if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE )
-			mapgrid[x][y] = SECT_VEHICLE;
+	if ( show_vehicles )
+	{
+		for ( obj = room->contents; obj; obj = obj->next_content )
+			if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE )
+				mapgrid[x][y] = SECT_VEHICLE;
+	}
 
 	/* Otherwise we get a nasty crash */
 	if ( !IS_SET_AR ( IN_ROOM ( ch )->room_flags, ROOM_WILDERNESS ) )
@@ -131,7 +134,7 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 			        NUM_ROOM_SECTORS )
 			{
 				MapArea ( pexit->to_room, ch, x + offsets[door][0],
-				          y + offsets[door][1], min, max );
+				          y + offsets[door][1], min, max, show_vehicles );
 			}
 		}			/* end if exit there */
 	}
@@ -339,7 +342,7 @@ ACMD ( do_map )
 			mapgrid[x][y] = NUM_ROOM_SECTORS;
 
 	/* starts the mapping with the center room */
-	MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1 );
+	MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, true );
 
 	/* marks the center, where ch is */
 	mapgrid[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */

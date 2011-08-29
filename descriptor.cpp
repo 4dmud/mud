@@ -11,6 +11,7 @@
 //
 #include "config.h"
 #include "sysdep.h"
+#include "protocol.h" // @TODO:PROTOCOL
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
 # include <mcheck.h>
@@ -112,6 +113,16 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     txt = (char *)malloc(len);
 
     size = vsnprintf(txt, len - 1, format, args);
+
+    //@TODO:PROTOCOL: Parse the string, store it if there's enough space.
+    const char *parsed_txt = ProtocolOutput( this, txt, (int*)&size );
+    if ( size > 0 && size < (int)len )
+        strcpy(txt, parsed_txt);
+
+    //@TODO:PROTOCOL: This isn't OOB, so decrement the counter.
+    if ( this->pProtocol->WriteOOB > 0 )
+        --this->pProtocol->WriteOOB;
+
     /** too big for buffer! Overflow! lets reallocate! - Mord **/
     while (size == -1 || size >= (int)len) {
 	args=args_bak;
@@ -128,6 +139,10 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
         //strlcpy(tmp, txt, len);
         //free( txt );
         //txt = tmp;
+
+        //@TODO:PROTOCOL: We now have enough space to store the parsed string.
+        strcpy(txt, parsed_txt);
+
         size = vsnprintf(txt, len, format, args);
     }
 
@@ -234,6 +249,9 @@ void Descriptor::init_descriptor(int desc) {
     desc_num = last_desc;
 
     comp = new compr();
+
+    if ( !this->pProtocol->bNegotiated ) // @TODO:PROTOCOL
+        ProtocolNegotiate(this);         // @TODO:PROTOCOL
 }
 
 bool Descriptor::pending_output() {
@@ -291,6 +309,7 @@ Descriptor::Descriptor() {
     for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
         history[cnt] = NULL;
 
+    pProtocol = ProtocolCreate(); // @TODO:PROTOCOL
 }
 
 
@@ -376,6 +395,8 @@ Descriptor::~Descriptor() {
     default:
         break;
     }
+
+    ProtocolDestroy(this->pProtocol); // @TODO:PROTOCOL
 
     /* d->comp was still created even if there is no zlib, for comp->state) */
     if (this->comp)

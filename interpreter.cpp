@@ -310,6 +310,7 @@ ACMD ( do_unban );
 ACMD ( do_ungroup );
 ACMD ( do_use );
 ACMD ( do_users );
+ACMD ( do_clients );
 ACMD ( do_unhitch );
 ACMD ( do_visible );
 ACMD ( do_vnum );
@@ -886,6 +887,7 @@ const command_info cmd_info[] =
 	{ "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
 	{ "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
 	{ "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
+	{ "clients"  , "client"   , POS_DEAD    , do_clients  , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
 	{ "value"    , "val" , POS_STANDING, do_not_here , 0, 0, 0 },
 	{ "version"  , "ver" , POS_DEAD    , do_gen_ps   , 0, SCMD_VERSION, 0 },
@@ -1928,6 +1930,9 @@ int perform_dupe_check ( Descriptor *d )
 			break;
 	}
 
+	MXPSendTag( d, "<VERSION>" ); //@TODO:PROTOCOL
+        MCCPBegin( d ); //@TODO:PROTOCOL
+
 	return ( 1 );
 }
 
@@ -2357,6 +2362,9 @@ int enter_player_game ( Descriptor *d )
 		GET_LEVEL (ch) = GET_ORIG_LEV (ch);
 		GET_ORIG_LEV (ch) = 0;
 	}
+
+        MXPSendTag( d, "<VERSION>" ); //@TODO:PROTOCOL
+        MCCPBegin( d ); //@TODO:PROTOCOL
 
 	return load_result;
 }

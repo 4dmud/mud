@@ -533,6 +533,94 @@ void draw_map( Character *ch)
 
   show_map(ch, FALSE);
 }
+
+
+
+//@TODO:KAVIR: This should be rewritten, it's not very nice.  It's cobbled 
+//together from the old map code and it works, but the whole thing could really 
+//use a redesign and cleanup.
+
+void MapArea ( room_rnum room, Character *ch, int x, int y, int min, int max, bool show_vehicles );
+
+/* Clear, generate and store the map in an MSDP variable */
+char *msdp_map( Character *ch )
+{
+  int x, y;
+  static char buf[MAX_STRING_LENGTH];
+  buf[0] = '\0';
+  room_rnum was_in = IN_ROOM(ch);
+
+  #define MAX_MAP 72
+
+  if ( IS_SET_AR( IN_ROOM(ch)->room_flags, ROOM_WILDERNESS ) )
+  {
+    int size = 10; // URANGE ( 10, 0, MAX_MAP );
+    int center = MAX_MAP/2;
+    int min = MAX_MAP / 2 - size / 2;
+    int max = MAX_MAP / 2 + size / 2;
+    extern int mapgrid[MAX_MAP][MAX_MAP];
+
+    for ( x = 0; x < MAX_MAP; ++x )
+      for ( y = 0; y < MAX_MAP; ++y )
+        mapgrid[x][y] = NUM_ROOM_SECTORS;
+
+    /* starts the mapping with the center room */
+    MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, false );
+
+    for( x = min; x <= max; x++ )
+    {
+      for( y = min; y <= max; y++ )
+      {
+        char num_buf[64];
+        sprintf( num_buf, "%d", mapgrid[x][y] );
+
+        if ( buf[0] != '\0' )
+           strcat( buf, " " );
+
+        strcat( buf, num_buf );
+      }
+    }
+    IN_ROOM(ch) = was_in;
+    return buf;
+  }
+
+  /* Clear map */
+  for( y = 0; y <= MAPY; y++ )
+  {
+    for( x = 0; x <= MAPX; x++ )
+      clear_coord( x, y );
+  }
+
+  /* Start with players pos at centre of map */
+  x = MAPX / 2;
+  y = MAPY / 2;
+
+  amap[x][y].vnum = ch->in_room->number;
+  amap[x][y].depth = 0;
+
+  /* Generate the map */
+  map_exits( ch, ch->in_room, x, y, 0 );
+
+  /* Store the map */
+  strcat(buf, "X X X X X X X X X X X");
+  for( y = 0; y <= MAPY; y++ )
+  {
+    for( x = 0; x <= MAPX; x++ )
+    {
+      if ( buf[0] != '\0' )
+         strcat( buf, " " );
+
+      if ( amap[x][y].tegn[0] == ' ' )
+         strcat(buf, "X");
+      else
+         strcat(buf, amap[x][y].tegn);
+    }
+  }
+  strcat(buf, "X X X X X X X X X X X");
+  
+  IN_ROOM(ch) = was_in;
+  return buf;
+}
 void update_mxp_map(Character *ch)
 {
   int x, y;

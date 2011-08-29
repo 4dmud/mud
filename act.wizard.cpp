@@ -305,6 +305,8 @@
  *
  */
 
+#include <arpa/telnet.h>
+
 #include "config.h"
 #include "sysdep.h"
 
@@ -3081,8 +3083,28 @@ ACMD ( do_copyover )
 		}
 		else
 		{
+			char client_name[MAX_INPUT_LENGTH];
+			char client_version[MAX_INPUT_LENGTH];
+
+                        strcpy( client_name, d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString );
+                        strcpy( client_version, d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString );
+
+                        // Make sure there are no spaces.
+
+			int i; // Loop counter.
+			for ( i = 0; client_name[i] != '\0'; ++i )
+			{
+				if ( client_name[i] == ' ' )
+					client_name[i] = '_';
+			}
+			for ( i = 0; client_version[i] != '\0'; ++i )
+			{
+				if ( client_version[i] == ' ' )
+					client_version[i] = '_';
+			}
+                           
 			room_rnum rm = GET_WAS_IN ( d->character ) ? GET_WAS_IN ( d->character ) : IN_ROOM ( d->character );
-			fprintf ( fp, "%d %s %s %d %d\n", d->descriptor, GET_NAME ( och ), d->host.c_str(), rm->number, d->mxp );
+			fprintf ( fp, "%d %s %s %d %s %s %s\n", d->descriptor, GET_NAME ( och ), d->host.c_str(), rm->number, client_name, client_version, CopyoverGet(d) );
 
 			/* save och */
 			if ( !IS_IMM ( och ) )
@@ -3097,14 +3119,15 @@ ACMD ( do_copyover )
 			write_aliases ( och );
 			snprintf ( buf, sizeof ( buf ), "Colors drain away and the world slowly grinds to a halt...\r\n" );
 #ifdef HAVE_ZLIB_H
-
 			if ( d->comp->state == 2 )
 			{
 				d->comp->state = 3; /* Code to use Z_FINISH for deflate */
 			}
 #endif /* HAVE_ZLIB_H */
+
 			write_to_descriptor ( d->descriptor, buf, d->comp );
 			d->comp->state = 0;
+
 #ifdef HAVE_ZLIB_H
 
 			if ( d->comp->stream )
@@ -3114,8 +3137,8 @@ ACMD ( do_copyover )
 				free ( d->comp->buff_out );
 				free ( d->comp->buff_in );
 			}
-#endif /* HAVE_ZLIB_H */
 
+#endif /* HAVE_ZLIB_H */
 		}
 	}
 	fprintf ( fp, "-1\n" );
@@ -3162,7 +3185,6 @@ ACMD ( do_advance )
 		ch->Send ( "Advance who?\r\n" );
 		return;
 	}
-
 	if ( GET_LEVEL ( ch ) <= GET_LEVEL ( victim ) )
 	{
 		ch->Send ( "Maybe that's not such a great idea.\r\n" );
