@@ -782,7 +782,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
    Result[i] = '\0';
 
    /* Store the length */
-   if ( apLength )
+   if ( apLength && *apLength < i )
       *apLength = i;
 
    /* Return the string */
