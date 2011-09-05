@@ -1158,6 +1158,13 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
 			case SECT_SNOW:
 				snprintf ( bufptr, len, "Snowy Terrain" );
 				break;
+			case SECT_BADLANDS:
+				snprintf ( bufptr, len, "Badlands" );
+				break;
+			case SECT_RAIL:
+				snprintf ( bufptr, len, "Rail" );
+				break;
+
 			default:
 				snprintf ( bufptr, len,
 				           "Unknown sector type. Fix parse_room_name function." );
@@ -1285,6 +1292,12 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
 				           "Sometimes jagged blocks of expanded ice surge up through cracks and break the\r\n"
 				           "otherwise monotonous surroundings. During the day the ice can be blinding,\r\n"
 				           "the night is no better as the temperatures drastically fall.\r\n" );
+				break;
+			case SECT_BADLANDS:
+				snprintf ( bufptr, len, "Badlands Desc goes here. \r\n" );
+				break;
+			case SECT_RAIL:
+				snprintf ( bufptr, len, "Rail Desc goes here. \r\n" );
 				break;
 			default:
 				snprintf ( bufptr, len,
