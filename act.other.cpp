@@ -2095,7 +2095,9 @@ const char *msgs[][2] =
 	//SECT_BADLANDS 24
 	{"You start moving glowing rocks out of the way.\r\n",
 	 "$n starts moving glowing rocks out of the way.\r\n"},
-#define SECT_RAIL     25
+/* Not sure why this is done like this compared to the others -Prom */
+/* #define SECT_RAIL     25 */
+	//SECT_RAIL 25
 	{"You start moving huge metal rails out of the way.\r\n",
 	 "$n starts moving huge metal rails out of the way.\r\n"},
 
