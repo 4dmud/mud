@@ -230,7 +230,6 @@ void ShowMap ( Character *ch, int min, int max )
 						case SECT_SUN:
 						case SECT_BLACKHOLE:
 						case SECT_VEHICLE:
-
 						case SECT_SWAMP:
 						case SECT_REEF:
 						case SECT_TUNDRA:
