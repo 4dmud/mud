@@ -2884,6 +2884,7 @@ struct game_data {
     int track_through_doors;/* Track through doors while closed?    */
     int immort_level_ok;    /* Automatically level mortals to imm?  */
     int double_exp;	    /* Is it double experience time?		*/
+    long pk_champion;         /* The current Champion */
     
     char *LAST_PK_WIN;       /* Last Player to win in PK */
     char *OK;               /* When player receives 'Okay.' text.       */

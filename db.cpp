@@ -794,6 +794,7 @@ void boot_world ( void )
 	//check_start_rooms();
 	log ( "Resetting PK Leader." );
         LAST_PK = strdup("Nobody");
+        CHAMPION = 0;
 
 	log ( "Seting mob stats..." );
 	assign_mob_stats();

@@ -1212,6 +1212,7 @@ struct obj_data *has_vehicle ( Character *ch );
 #define CONFIG_NOPERSON         config_info.play.NOPERSON
 #define CONFIG_NOEFFECT         config_info.play.NOEFFECT
 #define LAST_PK			config_info.play.LAST_PK_WIN
+#define CHAMPION		config_info.play.pk_champion
 
 /** Crash Saves **/
 #define CONFIG_FREE_RENT        config_info.csd.free_rent

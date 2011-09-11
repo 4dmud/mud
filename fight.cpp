@@ -1476,6 +1476,10 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
                 damage -= damage/10;
 
 
+	     /* Champion System (BBV Replacement) by Once.  Here we're going to give the Champion 10% more damage
+                while he still holds the throne. */
+                if (GET_IDNUM(ch) == CHAMPION)
+                damage += damage/10;
        
 
 

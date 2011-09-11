@@ -106,7 +106,16 @@ void kill_points(Character *ch, Character *vict)
     diff = ((current_class_is_tier_num(vict) * GET_LEVEL(vict)) - (current_class_is_tier_num(ch) * GET_LEVEL(ch)));
 
 
+   if (CHAMPION == 0) {
     LAST_PK = GET_NAME(ch);
+    CHAMPION = GET_IDNUM(ch);
+    }
+
+   if  (CHAMPION == GET_IDNUM(vict)) {
+
+    LAST_PK = GET_NAME(ch);
+    CHAMPION = GET_IDNUM(ch);
+   }
 
     if (diff > -10)
     {

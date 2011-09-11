@@ -4017,6 +4017,11 @@ void brag(Character *ch, Character *vict) {
 
             if (COLOUR_LEV(i->character) >= C_NRM)
                 i->Output( "%s", CCNRM(i->character, C_NRM));
+
+	   if  (CHAMPION == GET_IDNUM(vict))
+                i->character->Send("%s just lost his title to %s!\r\n", GET_NAME(vict), GET_NAME(ch));
+
+
         }
     }
 }
