@@ -230,6 +230,35 @@ ACMD(do_trade);  /* blank so that spec_procs for dt code will work */
 
 
 
+ACMD(do_detector)
+{
+  char arg1[MAX_INPUT_LENGTH];
+
+  argument = one_argument(argument, arg1);
+ 
+  if (!*arg1) {
+  ch->Send( "How would you like to set your detector? High or Low?\r\n");
+  return;
+  }
+
+  if (!str_cmp(arg1, "high")) {
+  ch->Send( "You turn your Artifact Detector on {cGHigh{cn.\r\n");
+  GET_DETECTOR(ch) = 1;
+  return;
+  }
+  if (!str_cmp(arg1, "low")) { 
+  ch->Send( "You turn your Artifact Detector to {crLow{cn.\r\n");
+  GET_DETECTOR(ch) = 0;
+  return;
+  }
+
+  if (!*arg1) {
+  ch->Send( "How would you like to set your detector? High or Low?\r\n");
+  return;
+  }
+
+}
+
 ACMD(do_ethos)
 {
   char arg1[MAX_INPUT_LENGTH];
@@ -241,14 +270,15 @@ ACMD(do_ethos)
    ch->Send( "What do you wish to set your Ethos as? Good or Evil?\r\n");
    return;
    }
+
+   if (GET_ETHOS(ch) > 0)
+   ethos_cost = 15;
  
 
-   if ((TRADEPOINTS(ch) < 15)) {
+   if ((TRADEPOINTS(ch) < ethos_cost)) {
    ch->Send( "You do not have enough tradepoints to switch your Ethos.\r\n");
    return;
    }
-   if (GET_ETHOS(ch) > 0)
-   ethos_cost = 15;
 
    if (!str_cmp(arg1, "good")) {
    ch->Send( "You dream of being a knight in shining armor as you set your ethos as {cWGood{cn.\r\n");

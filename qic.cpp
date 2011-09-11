@@ -19,6 +19,7 @@
 #include "db.h"
 #include "interpreter.h"
 #include "handler.h"
+#include "descriptor.h"
 
 /* External Structures */
 extern const int xap_objs;
@@ -130,6 +131,8 @@ void save_qic(void) {				/* save the whole qic database */
  * and doesnt touch any counter at all. */
 
 int load_qic_check(obj_rnum rnum) {
+
+
     // sanity check here, fix the bug in the calling routine instead..
     if (rnum < 0) {
         log("Negative RNUM passed to load_qic_check");
@@ -152,7 +155,7 @@ int load_qic_check(obj_rnum rnum) {
     }
 
     /* Otherwise, QIC number acts like %load */
-    if (number(0, 199) > obj_index[rnum].qic->limit) {
+    if (number(0, 101) > obj_index[rnum].qic->limit) {
         new_mudlog(CMP, LVL_SEN, TRUE , "(QIC) '%s' failed load check (limit %d, exist %d)",
                    obj_proto[rnum].short_description, obj_index[rnum].qic->limit, obj_index[rnum].qic->items - 1);
         return (0);		/* didn't make the %load */
@@ -164,7 +167,8 @@ int load_qic_check(obj_rnum rnum) {
 
     //obj_index[rnum].qic->items++;	/* okay.. increase items counter */
     new_mudlog(CMP, LVL_SEN, TRUE, "(QIC) %s loaded.", obj_proto[rnum].short_description);
-    return (1);			/* and return true */
+
+   return (1);			/* and return true */
 }
 
 void purge_qic(int rnum) {
@@ -185,6 +189,7 @@ void qic_load(int rnum) {
         return;
     } else {
         obj_index[rnum].qic->items++;
+
     }
 }
 
@@ -451,4 +456,5 @@ ACMD(do_qload) {
     act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
     new_mudlog(NRM, LVL_SEN, TRUE, "%s QIC created %s", GET_NAME(ch),
                obj->short_description);
+
 }

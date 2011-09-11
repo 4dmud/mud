@@ -61,6 +61,8 @@ int generate_wep_type ( char *name );
 int fuzzy_balance ( OBJ_DATA *wep );
 int generate_wep_length ( OBJ_DATA *wep );
 int OBJ_INNATE_MESSAGE = TRUE;
+void ripple_detect(room_vnum location, int object);
+
 
 int gen_wep_type_from_attack ( OBJ_DATA *obj );
 void renumber_zones ( void );
@@ -790,6 +792,8 @@ void boot_world ( void )
 
 	//log("Checking start rooms.");
 	//check_start_rooms();
+	log ( "Resetting PK Leader." );
+        LAST_PK = strdup("Nobody");
 
 	log ( "Seting mob stats..." );
 	assign_mob_stats();
@@ -4055,8 +4059,9 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 
 	obj = create_obj ( i );
 
-	if ( obj_index[i].qic )
-		log ( "%s created", obj->short_description );
+	if ( obj_index[i].qic )  {
+ 		log ( "%s created", obj->short_description );
+  } 
 
 	obj_index[i].number++;
 	generate_weapon ( obj );
@@ -4351,7 +4356,6 @@ void reset_zone ( zone_rnum zone )
 	Character *tmob = NULL;   /* for trigger assignment */
 	struct obj_data *tobj = NULL;    /* for trigger assignment */
 	objs_in_room oir; /* objects in rooms */
-
 	room_rnum rm;
 	room_vnum vrm, cmd_room = 0;
 	char er_msg[MAX_INPUT_LENGTH];
@@ -4419,6 +4423,7 @@ void reset_zone ( zone_rnum zone )
 					log ( "Zone: %d - '%c' zone command at command %d invalid number for room vnum %d!", zone_table[zone].number,ZCMD.command, cmd_no, ZCMD.arg3 );
 					exit ( 1 );
 				}
+
 				if ( obj_index[ZCMD.arg1].number < ZCMD.arg2 )
 				{
 					if ( ZCMD.arg3 != NOWHERE )
@@ -4431,10 +4436,12 @@ void reset_zone ( zone_rnum zone )
 							if ( obj && lqc )
 							{
 								obj_to_room ( obj, world_vnum[ZCMD.arg3] );
+		                                                ripple_detect(cmd_room, ZCMD.arg1);
 								if ( load_otrigger ( obj ) == -1 )
 									obj = NULL;
 								tobj = obj;
 								last_cmd = obj ? true : false;
+
 							}
 							else
 							{
@@ -4484,11 +4491,15 @@ void reset_zone ( zone_rnum zone )
 					if ( obj && lqc )
 					{
 						obj_to_obj ( obj, obj_to );
+						ripple_detect(cmd_room, ZCMD.arg1);
 						if ( load_otrigger ( obj ) == -1 )
 							obj = NULL;
 						tobj = obj;
 
 						last_cmd = obj ? true : false;
+
+
+
 					}
 					else
 					{
@@ -4524,12 +4535,18 @@ void reset_zone ( zone_rnum zone )
 					if ( obj && lqc )
 					{
 						obj_to_char ( obj, mob );
+                                                ripple_detect(cmd_room, ZCMD.arg1);
 						if ( load_otrigger ( obj ) == -1 )
 							obj = NULL;
+
+
 
 						tobj = obj;
 
 						last_cmd = obj ? true : false;
+
+
+
 					}
 					else
 					{
@@ -4571,7 +4588,11 @@ void reset_zone ( zone_rnum zone )
 						obj = read_object ( ZCMD.arg1, REAL );
 						if ( obj && lqc )
 						{
-							IN_ROOM ( obj ) = IN_ROOM ( mob );
+
+                                                ripple_detect(cmd_room, ZCMD.arg1);
+	
+
+						IN_ROOM ( obj ) = IN_ROOM ( mob );
 							if ( load_otrigger ( obj ) == -1 )
 								obj = NULL;
 							if ( obj && ( ret = wear_otrigger ( obj, mob, ZCMD.arg3 ) ) > 0 )
@@ -4579,6 +4600,7 @@ void reset_zone ( zone_rnum zone )
 								IN_ROOM ( obj ) = NULL;
 								if ( equip_char ( mob, obj, ZCMD.arg3 ) )
 								{
+
 									last_cmd = true;
 									tobj = obj;
 								}
@@ -4811,11 +4833,13 @@ void reset_zone ( zone_rnum zone )
 							if ( obj && lqc )
 							{
 								obj_to_room ( obj, world_vnum[ZCMD.arg3] );
+		                                                ripple_detect(cmd_room, ZCMD.arg1);
 								if ( load_otrigger ( obj ) == -1 )
 									obj = NULL;
 								tobj = obj;
 								if ( obj )
 									SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
+
 
 								last_cmd = obj ? true : false;
 							}
@@ -5165,6 +5189,8 @@ int store_to_char ( const char *name, Character *ch )
 				}
 				else if ( !strcmp ( tag, "Dex " ) )
 					ch->real_abils.dex = num;
+				else if ( !strcmp ( tag, "Drip" ) )
+					GET_DETECTOR(ch) = num; 
 				else if ( !strcmp ( tag, "Drnk" ) )
 					GET_COND ( ch, DRUNK ) = num;
 				else if ( !strcmp ( tag, "Drol" ) )
@@ -5637,6 +5663,25 @@ int store_to_char ( const char *name, Character *ch )
 	return 1;
 }
 
+void ripple_detect(room_vnum location, int object) 
+{
+Descriptor *r;
+Descriptor *next;
+
+				for (r = descriptor_list; r; r = next) {
+                                  next = r->next;
+                                  if (!r->connected && r->character &&
+                                  !PLR_FLAGGED(r->character, PLR_WRITING) && obj_index[object].qic) {
+                                  r->character->Send( "A new artifact sends ripples across the %s Era. ",  dimension_types[zone_table[GET_ROOM_ZONE(world_vnum[location])].dimension]);
+                                  if ((GET_DETECTOR(r->character) > 0) && (TRADEPOINTS(r->character) >= 15))  {
+     				  TRADEPOINTS(r->character) -= 15;
+                                  r->character->Send( "[%s] [%d TP Left]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name, TRADEPOINTS(r->character));
+           }
+				  r->character->Send( "\r\n");
+
+      }
+    } 
+}
 void Character::LoadKillList()
 {
 	char filename[MAX_INPUT_LENGTH], line[READ_SIZE];
@@ -5989,8 +6034,13 @@ void char_to_store ( Character *ch )
 		fprintf ( fl, "NewL: %d\n", GET_NEWBIE_STATUS ( ch ) );
 	if ( GET_EMAIL ( ch ) && *GET_EMAIL ( ch ) )
 		fprintf ( fl, "Emai: \n%s~\n", GET_EMAIL ( ch ) );
+	//Ethos and Arti Detection by Once 
+
         if ( GET_ETHOS (ch))
                 fprintf ( fl, "Etho: %d\n", GET_ETHOS(ch));
+	if (GET_DETECTOR(ch))
+		fprintf ( fl, "Drip: %d\n", GET_DETECTOR(ch));
+
 	/*Here follows a little something made by Thotter */
 	if ( GET_LOGINMSG ( ch ) )
 		fprintf ( fl, "Lgim: %s\n", GET_LOGINMSG ( ch ) );

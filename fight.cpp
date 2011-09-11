@@ -2852,6 +2852,11 @@ int fe_after_damage ( Character* ch, Character* vict,
 
 		if ( !SELF ( ch, vict ) )
 		{
+		        if ( !IS_NPC ( vict ) )
+                                GET_LAST_DAM_T ( vict ) = partial;
+                        if ( !IS_NPC ( ch ) )
+                                GET_LAST_DAM_D ( ch )   = partial;
+
 			if ( partial > 5 && steal_affects ( ch, partial, w_type, vict ) == -1 )
 				return -1;
 		}
@@ -4872,10 +4877,6 @@ void dam_message ( int dam, Character *ch, Character *victim,
 			snprintf ( msgbuf, sizeof ( msgbuf ), "You %s $N and %s {cy%s. (%d)",
 			           chance_message[ chance_m ].singular, dam_size[msgnum].sing, buf, dam );
 			act ( msgbuf, FALSE, ch, NULL, victim, TO_CHAR );
-		       if ( !IS_NPC ( ch ) )
-                                GET_LAST_DAM_D ( ch )   = dam;
- 		       if ( !IS_NPC(victim))
- 				GET_LAST_DAM_T(victim) 	= dam;
 
 		}
 
@@ -5771,7 +5772,7 @@ int skill_message ( int dam, Character *ch, Character *vict, int attacktype )
 				{
 					ch->Send ( "%s", CCYEL ( ch, C_CMP ) );
 					act ( msg->die_msg.attacker_msg.c_str(), FALSE, ch, weap, vict, TO_CHAR );
-					ch->Send ( "%s", CCNRM ( ch, C_CMP ) );
+					ch->Send ( "(%d) %s", dam,  CCNRM ( ch, C_CMP ) );
 
 					vict->Send ( "%s", CCRED ( vict, C_CMP ) );
 					act ( msg->die_msg.victim_msg.c_str(), FALSE, ch, weap, vict, TO_VICT | TO_SLEEP );
@@ -5790,7 +5791,7 @@ int skill_message ( int dam, Character *ch, Character *vict, int attacktype )
 				{
 					ch->Send ( "%s", CCYEL ( ch, C_CMP ) );
 					act ( msg->hit_msg.attacker_msg.c_str(), FALSE, ch, weap, vict, TO_CHAR );
-					ch->Send ( "%s", CCNRM ( ch, C_CMP ) );
+					ch->Send ( "(%d) %s", dam, CCNRM ( ch, C_CMP ) );
 
 					vict->Send ( "%s", CCRED ( vict, C_CMP ) );
 					act ( msg->hit_msg.victim_msg.c_str(), FALSE, ch, weap, vict, TO_VICT | TO_SLEEP );

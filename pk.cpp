@@ -12,6 +12,9 @@ mordecai - dec - 11 - 05
 #include "handler.h"
 #include "db.h"
 #include "fight.h"
+#include "config.h"
+
+
 
 ACMD(do_register)
 {
@@ -89,6 +92,8 @@ void kill_points(Character *ch, Character *vict)
   int points = 50;
   int diff;
 
+
+
   if (!IS_NPC(vict))
     GET_RIP_CNT(vict) += 1;
   if (!IS_NPC(ch))
@@ -99,6 +104,9 @@ void kill_points(Character *ch, Character *vict)
     if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
       points = 25;
     diff = ((current_class_is_tier_num(vict) * GET_LEVEL(vict)) - (current_class_is_tier_num(ch) * GET_LEVEL(ch)));
+
+
+    LAST_PK = GET_NAME(ch);
 
     if (diff > -10)
     {

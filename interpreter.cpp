@@ -153,6 +153,7 @@ ACMD ( do_deduct );
 ACMD ( do_deleteplayer );
 ACMD ( do_delay );
 ACMD ( do_descend );
+ACMD ( do_detector );
 ACMD ( do_diagnose );
 ACMD ( do_dig );
 ACMD ( do_dig_ground );
@@ -563,6 +564,7 @@ const command_info cmd_info[] =
 	{ "deduct"   , "ded"  , POS_RESTING , do_deduct   , 1, 0, 0 },
 	{ "descend"  , "desc" , POS_STANDING, do_descend  , 1, 0, 0 },
 	{ "deposit"  , "dep" , POS_STANDING, do_not_here , 1, 0, 0 },
+	{ "detector" , "det" , POS_DEAD, do_detector , 0, 0, 0 },
 	{ "diagnose" , "dia" , POS_RESTING , do_diagnose , 0, 0, 0 },
 	{ "dig"      , "dig"  , POS_STANDING, do_dig_ground      , 0, 0, 0 },
 	{ "dismount" , "dism" , POS_STANDING, do_dismount , 0, 0, 0 },
@@ -2274,6 +2276,11 @@ int enter_player_game ( Descriptor *d )
 		//Mini-quest leaflet
 		if ( ( obj = read_object ( 12992, VIRTUAL ) ) != NULL )
 			obj_to_char ( obj, ch );
+
+		for (sh_int potion_count = 0; potion_count < 3; potion_count++)  {
+		if (( obj = read_object ( 12913, VIRTUAL)) != NULL) 
+ 			obj_to_char(obj, ch);
+               }
 
 		switch ( GET_CLASS ( ch ) )
 		{

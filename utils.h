@@ -683,6 +683,7 @@ int has_body ( Character *ch, int flag );
 #define TALLY_FOBJ(ch)	  ((ch)->char_specials.tally[1])
 #define TALLY_DEBRIS(ch)  ((ch)->char_specials.tally[2])
 #define GET_ETHOS(ch) ((ch)->char_specials.declared_align)
+#define GET_DETECTOR(ch) ((ch)->char_specials.arti_detector)
 
 #define SPECIALS(ch)          ((ch)->player_specials)
 #define SAVED(ch)            	(SPECIALS(ch)->saved)
@@ -1210,6 +1211,7 @@ struct obj_data *has_vehicle ( Character *ch );
 #define CONFIG_OK               config_info.play.OK
 #define CONFIG_NOPERSON         config_info.play.NOPERSON
 #define CONFIG_NOEFFECT         config_info.play.NOEFFECT
+#define LAST_PK			config_info.play.LAST_PK_WIN
 
 /** Crash Saves **/
 #define CONFIG_FREE_RENT        config_info.csd.free_rent

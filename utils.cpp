@@ -24,7 +24,7 @@
 #include "strutil.h"
 
 extern struct time_data time_info;
-
+extern struct track_data track_fights;
 
 /* local functions */
 struct time_info_data *real_time_passed ( time_t t2, time_t t1 );

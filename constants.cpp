@@ -147,7 +147,7 @@ const char * fusion_locations[] =
 
 const char * dimension_types[] =
 {
-	"All Dimensions",
+	"General",
 	"Medieval",
 	"Future",
 	"Old West",
@@ -1994,7 +1994,6 @@ const struct int_app_type int_app[] =
 	{65}            /* int = 25 */
 };
 
-
 /* [wis] apply (all) */
 const struct wis_app_type wis_app[] =
 {
@@ -2482,7 +2481,7 @@ const struct class_name_data class_name[] =
 	{ {
 			"Priest",
 			"Protector",
-			"DevineKnight",
+			"DivineKnight",
 			"HighPriest",
 			"SoulReaver"
 		}

@@ -1915,6 +1915,7 @@ struct char_special_data {
     int carry_items;          /* Number of items carried              */
     int timer;           /* Timer for update                     */
     int declared_align;
+    int arti_detector;  /* Detector for Arifacts */
 
     struct char_special_data_saved saved;    /* constants saved in plrfile  */
     struct obj_data *chair;   /* object the char is sitting in        */
@@ -2669,8 +2670,6 @@ struct weather_data {
 };
 
 
-
-
 /* element in monster and object index-tables   */
 struct index_data {
     int	vnum;	/* virtual number of this mob/obj		*/
@@ -2885,7 +2884,8 @@ struct game_data {
     int track_through_doors;/* Track through doors while closed?    */
     int immort_level_ok;    /* Automatically level mortals to imm?  */
     int double_exp;	    /* Is it double experience time?		*/
-
+    
+    char *LAST_PK_WIN;       /* Last Player to win in PK */
     char *OK;               /* When player receives 'Okay.' text.       */
     char *NOPERSON;         /* 'No-one by that name here.'    */
     char *NOEFFECT;         /* 'Nothing seems to happen.'             */
@@ -2939,6 +2939,7 @@ struct game_operation {
     char *MENU;               /* The MAIN MENU.               */
     char *WELC_MESSG;        /* The welcome message.          */
     char *START_MESSG;        /* The start msg for new characters.  */
+    char *LAST_PK_WIN;        /* Last PK Winner */
 };
 
 /*

@@ -3721,6 +3721,8 @@ ACMD ( do_who )
 	len += snprintf ( buf + len, sizeof ( buf ) - len, "There is a boot time high of %d player%s.\r\n",
 	                  boot_high, ( boot_high == 1 ? "" : "s" ) );
 
+        len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n", 
+                          LAST_PK);
 
 	len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
 	DYN_RESIZE ( buf );
@@ -5171,7 +5173,7 @@ O===================================================================O
 ACMD ( do_worth )
 {
 	char buf[40] = "", buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
-        const char *ethos[MAX_INPUT_LENGTH];
+        const char *ethos[MAX_INPUT_LENGTH], *detector[MAX_INPUT_LENGTH];
 	size_t len = 0;
 	int i;
 	static const char *moonage[] =
@@ -5223,6 +5225,10 @@ ACMD ( do_worth )
         if (GET_ETHOS(ch) == 3)
            *ethos = ("{cREvil{cn");
 
+	   *detector = ("{crLow{cn");
+        if (GET_DETECTOR(ch) == 1)
+           *detector = ("{cGHigh{cn");
+
 	for ( i = 0; i < NUM_CLASSES; i++ )
 		if ( GET_MASTERY ( ch, i ) )
 			len += snprintf ( buf+len, sizeof ( buf ) - len, "%c ", UPPER ( *pc_class_types[i] ) );
@@ -5245,7 +5251,7 @@ ACMD ( do_worth )
 	           "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
 	           "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw   | Ethos: {cg%-3s{cy   \r\n"
 	           "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
-	           "|%-32s{cy|#| {cw         Stamina: {cC%d/%d{cy\r\n"
+	           "|%-32s{cy|#| {cwStamina: {cC%d/%d{cw   | Detector: {cg%-3s{cy \r\n"
 	           "|%-32s{cy|#| {cw Elemental Weakness: {cr%s{cy\r\n"
 	           "|%-32s{cy|#| {cw Elemental Strength: {cc%s{cy\r\n"
 	           "O=====================================================================O{c0\r\n",
@@ -5268,7 +5274,7 @@ ACMD ( do_worth )
 	           SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS ( ch ),
 	           SUNNY ? sunnage[14] : moonage[14], update_award ( ch ), *ethos,
 	           SUNNY ? sunnage[14] : moonage[14], buf,
-	           SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ),
+	           SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
 	           SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),
 	           SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), FALSE, buf2, sizeof ( buf2 ) ) );
 

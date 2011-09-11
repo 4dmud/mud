@@ -118,6 +118,8 @@
  #define SOCMESS_FILE	LIB_MISC"socials"  /* messages for social acts	*/
 #define XNAME_FILE	LIB_MISC"xnames"	/* invalid name substrings       */
 #define FOREST_FILE     LIB_MISC"forest"
+#define TP_FILE         LIB_MISC"tradepoints" /* Tradepoints File */
+#define GOLD_FILE       LIB_MISC"gold_count" /* File for tallying Gold across days */
 
 
 #define CONFIG_FILE	LIB_ETC"config"    /* OasisOLC * GAME CONFIG FL */

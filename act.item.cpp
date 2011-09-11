@@ -4550,6 +4550,9 @@ int speed_update ( Character *ch )
 		speed += ( ( GET_LEVEL ( ch )- ( 30 - ( 2 * MOB_TIER ( ch ) ) ) ) * ( 5 + ( 2 *  MOB_TIER ( ch ) ) ) );
 	else   // start of player speed
 	{
+			speed = 50;  /* Beginning of Base Speed, as move modifier (which was a penalty more than it was a bonus and makes
+					no sense from a combat design standpoint) was removed in lieu of not encouraging players to sit around
+					without ever typing any commands. */
 
 
 		if ( 0 < total_chance ( ch, SKILL_SECOND_ATTACK ) )
@@ -4564,7 +4567,6 @@ int speed_update ( Character *ch )
 
 		speed += class_speed ( ch );
 		speed += race_speed ( ch );
-		speed += ( ( GET_MOVE ( ch ) *300 ) /GET_MAX_MOVE ( ch ) )- 200;
 
 
 		speed += ( ( ( GET_DEX ( ch ) * 200 ) / 22 )-130 );
@@ -4581,7 +4583,10 @@ int speed_update ( Character *ch )
 				var = -200;
 
 		}
-		speed += var;
+		if (REMORTS(ch) == 0) 
+                speed += 200;
+                else
+           	speed += var;
 
 
 		if ( RIDING ( ch ) && HERE ( RIDING ( ch ), ch ) && total_chance ( ch, SKILL_MOUNTED_COMBAT ) )
