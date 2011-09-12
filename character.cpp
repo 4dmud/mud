@@ -765,6 +765,8 @@ void Character::default_char()
 	GET_SPEED ( this ) 		= 0;
 	GET_OLC_ZONE ( this ) 		= 0;
 	GET_MRACE ( this ) 		= 0;
+	GET_ETHOS(this)			= 0;
+	GET_DETECTOR(this)		= 0;
 	MOB_SKIN ( this )         	= -1;
 	char_specials.next_in_chair = NULL;
 	last_move = 0;
