@@ -3633,6 +3633,8 @@ ACMD ( do_who )
 		{
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (idle)" );
 		}
+                if ( GET_IDNUM(wch) == CHAMPION) 
+                        len += snprintf (buf + len, sizeof (buf) - len, " [{cW%s{c0]", dimension_types[zone_table[IN_ROOM ( wch )->zone].dimension]);
 
 
 		if ( GET_LEVEL ( wch ) >= LVL_HERO )
@@ -3720,9 +3722,8 @@ ACMD ( do_who )
 		boot_high = Wizards + Mortals;
 	len += snprintf ( buf + len, sizeof ( buf ) - len, "There is a boot time high of %d player%s.\r\n",
 	                  boot_high, ( boot_high == 1 ? "" : "s" ) );
-
-        len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n", 
-                          LAST_PK);
+	len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n", 
+                          CHAMPION  <= 0 ? "Nobody yet" :  LAST_PK); // Name of the Champion
 
 	len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
 	DYN_RESIZE ( buf );

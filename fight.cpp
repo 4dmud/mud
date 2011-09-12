@@ -5102,7 +5102,7 @@ void make_corpse ( Character *ch, Character *killer )
 		{
 
 			SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_PC_CORPSE );
-			if ( IS_PK ( ch ) )
+			if (( IS_PK ( ch ) ) && CHAMPION != GET_IDNUM(ch))
 			{
 				SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_PK_CORPSE );
 			}

@@ -107,13 +107,13 @@ void kill_points(Character *ch, Character *vict)
 
 
    if (CHAMPION == 0) {
-    LAST_PK = GET_NAME(ch);
+    LAST_PK = strdup(GET_NAME(ch));
     CHAMPION = GET_IDNUM(ch);
     }
 
    if  (CHAMPION == GET_IDNUM(vict)) {
 
-    LAST_PK = GET_NAME(ch);
+    LAST_PK = strdup(GET_NAME(ch));
     CHAMPION = GET_IDNUM(ch);
    }
 
