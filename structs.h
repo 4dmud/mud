@@ -1325,41 +1325,44 @@ class Room;
 #define MAX_SOCK_BUF            (12 * 1024)  /* Size of kernel's sock buf   */
 #define MAX_PROMPT_LENGTH       256     /* Max length of prompt        */
 #define MAX_MXP_STATUS          1024
-#define GARBAGE_SPACE         32   /* Space for **OVERFLOW** etc  */
-#define SMALL_BUFSIZE         1024 /* Static output buffer size   */
+#define GARBAGE_SPACE           32   /* Space for **OVERFLOW** etc  */
+#define SMALL_BUFSIZE           1024 /* Static output buffer size   */
 /* Max amount of output that can be buffered */
-#define LARGE_BUFSIZE       (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH - MAX_MXP_STATUS)
+#define LARGE_BUFSIZE           (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH - MAX_MXP_STATUS)
 
-#define HISTORY_SIZE          5    /* Keep last 5 commands. */
-#define MAX_STRING_LENGTH     (3 * 8192)  // Increasing this size from 2 to 3 * 8192 - Prom
-#define MAX_INPUT_LENGTH 512  /* Max length per *line* of input */
-#define MAX_RAW_INPUT_LENGTH  1024 /* Max size of *raw* input */
-#define MAX_MESSAGES          400
-#define MAX_NAME_LENGTH       20   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define MAX_PWD_LENGTH        10   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define MAX_TITLE_LENGTH 80   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define HOST_LENGTH      50   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define EXDSCR_LENGTH         1024 /* Used in char_file_u *DO*NOT*CHANGE* */
-#define MAX_TONGUE       3    /* Used in char_file_u *DO*NOT*CHANGE* */
-//#define MAX_SKILLS          200 /* Used in char_file_u *DO*NOT*CHANGE* */     //changed
-#define MAX_AFFECT       46   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define MAX_OBJ_AFFECT        6    /* Used in obj_file_elem *DO*NOT*CHANGE* */
-#define MAX_GROUP        10   /*used for defining group size max */
-#define TREE_MAX         50
-#define MAX_TREE_AGE          8
-#define MAX_TREE_TYPES 9
+#define HISTORY_SIZE            5    /* Keep last 5 commands. */
+#define MAX_STRING_LENGTH       (3 * 8192)  // Increasing this size from 2 to 3 * 8192 - Prom
+#define MAX_INPUT_LENGTH        512  /* Max length per *line* of input */
+#define MAX_RAW_INPUT_LENGTH    1024 /* Max size of *raw* input */
+#define MAX_MESSAGES            400
+#define MAX_NAME_LENGTH         20   /* Used in char_file_u *DO*NOT*CHANGE* */
+#define MAX_PWD_LENGTH          10   /* Used in char_file_u *DO*NOT*CHANGE* */
+#define MAX_TITLE_LENGTH        80   /* Used in char_file_u *DO*NOT*CHANGE* */
+#define HOST_LENGTH             50   /* Used in char_file_u *DO*NOT*CHANGE* */
+#define EXDSCR_LENGTH           1024 /* Used in char_file_u *DO*NOT*CHANGE* */
+#define MAX_TONGUE              3    /* Used in char_file_u *DO*NOT*CHANGE* */
+//#define MAX_SKILLS            200 /* Used in char_file_u *DO*NOT*CHANGE* */     //changed
+#define MAX_AFFECT              46   /* Used in char_file_u *DO*NOT*CHANGE* */
+#define MAX_OBJ_AFFECT          6    /* Used in obj_file_elem *DO*NOT*CHANGE* */
+#define MAX_GROUP               10   /*used for defining group size max */
+#define TREE_MAX                50
+#define MAX_TREE_AGE            8
+#define MAX_TREE_TYPES          9
 
-#define TOP_ORE_DEFINE        76
-#define MAX_COLOUR_OPTIONS       134
-#define MAX_COMM_BUF          10
+#define TOP_ORE_DEFINE          76
+#define MAX_COLOUR_OPTIONS      134
+#define MAX_COMM_BUF            10
 /* define the largest set of commands for a trigger */
-#define MAX_CMD_LENGTH          24576 /* 24k should be plenty and then some */
-#define NUM_NOTE_TYPES 5
-#define TOP_FUSE_LOCATION 6
-#define NUM_MATERIAL_TYPES 21
-#define NUM_ELEM_TYPES 12
-#define MAX_HELPS 10000
-#define MAX_MAGIC_ITEMS 45
+// Increasing this to see if it helps with longer scripts or not --> Prom
+// Old value is 24576 --> New value is 32768
+//#define MAX_CMD_LENGTH        24576 /* 24k should be plenty and then some */
+#define MAX_CMD_LENGTH          32768 /* 32k */
+#define NUM_NOTE_TYPES          5
+#define TOP_FUSE_LOCATION       6
+#define NUM_MATERIAL_TYPES      21
+#define NUM_ELEM_TYPES          12
+#define MAX_HELPS               10000
+#define MAX_MAGIC_ITEMS         45
 
 
 
