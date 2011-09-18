@@ -1294,10 +1294,14 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
 				           "the night is no better as the temperatures drastically fall.\r\n" );
 				break;
 			case SECT_BADLANDS:
-				snprintf ( bufptr, len, "Badlands Desc goes here. \r\n" );
+				snprintf ( bufptr, len, 
+					   "Dry terrian where softer sedimentary rocks and clay-rich \r\n"
+					   "soils have been erroded by water and wind. \r\n");
 				break;
 			case SECT_RAIL:
-				snprintf ( bufptr, len, "Rail Desc goes here. \r\n" );
+				snprintf ( bufptr, len, 
+					   "Two parralel rails track through the land forming \r\n" 
+					   "a system of transportation.\r\n");
 				break;
 			default:
 				snprintf ( bufptr, len,
