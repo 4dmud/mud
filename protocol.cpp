@@ -46,12 +46,12 @@ static void Write( descriptor_t *apDescriptor, const char *apData )
       }
    }
 
-   apDescriptor->Output(apData);
+   apDescriptor->Output("%s", apData);
 }
 
 static void ReportBug( const char *apText )
 {
-   log( apText );
+  log( "%s", apText );
 }
 
 static void InfoMessage( descriptor_t *apDescriptor, const char *apData )
@@ -333,7 +333,7 @@ void ProtocolDestroy( protocol_t *apProtocol )
    free(apProtocol);
 }
 
-void ProtocolInput( descriptor_t *apDescriptor, char *apData, int aSize, char *apOut )
+void ProtocolInput( descriptor_t *apDescriptor, char *apData, int aSize, char *apOut, size_t apOutSize )
 {
    static char CmdBuf[MAX_PROTOCOL_BUFFER+1];
    static char IacBuf[MAX_PROTOCOL_BUFFER+1];
@@ -493,7 +493,7 @@ void ProtocolInput( descriptor_t *apDescriptor, char *apData, int aSize, char *a
    CmdBuf[CmdIndex] = '\0';
 
    /* Copy the input buffer back to the player. */
-   strcat( apOut, CmdBuf );
+   strncat( apOut, CmdBuf, apOutSize );
 }
 
 const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int *apLength )

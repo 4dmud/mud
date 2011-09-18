@@ -2754,7 +2754,7 @@ int Descriptor::process_input() {
         if ( bytes_read >= 0 )
         {
             read_buf[bytes_read] = '\0';
-            ProtocolInput( this, read_buf, bytes_read, read_point );
+            ProtocolInput( this, read_buf, bytes_read, read_point, space_left );
             bytes_read = strlen(read_point);
         }
 
