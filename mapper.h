@@ -32,7 +32,7 @@ static struct map_bit_data {
     } map_bit[] = {
 {"%", "{cW", "Inside"      },//SECT_INSIDE         
 {"#", "{cW", "City"        },//SECT_CITY           
-{"|", "{cG", "Field"       },//SECT_FIELD          
+{"\"", "{cG", "Field"      },//SECT_FIELD          
 {"@", "{cg", "Forest"      },//SECT_FOREST         
 {"^", "{cG", "Hills"       },//SECT_HILLS          
 {"^", "{cy", "Mountain"    },//SECT_MOUNTAIN       
@@ -48,12 +48,12 @@ static struct map_bit_data {
 {"*", "{cY", "Sun"         },//SECT_SUN	
 {"O", "{cL", "Blackhole"   },//SECT_BLACKHOLE	
 {"<", "{cM", "Vehicle"     },//SECT_VEHICLE	
-{"|", "{cg", "Swamp"       },//SECT_SWAMP
+{"\"", "{cg", "Swamp"      },//SECT_SWAMP
 {";", "{cM", "Reef"        },//SECT_REEF  
-{"|", "{cW", "Tundra"      },//SECT_TUNDRA
+{"\"", "{cW", "Tundra"     },//SECT_TUNDRA
 {"o", "{cW", "Snow"        },//SECT_SNOW
 {":", "{cC", "Ice"         },//SECT_ICE
-{"|", "{cy", "Praire"      },//SECT_PRAIRIE
+{"\"", "{cy", "Praire"     },//SECT_PRAIRIE
 {"'", "{cr", "Badlands"    },//SECT_BADLANDS
 {"+", "{cy", "Rail"        },//SECT_RAIL
 
