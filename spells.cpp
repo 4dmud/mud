@@ -205,7 +205,6 @@ ASPELL(spell_teleport) {
         victim->Send("A magical barrier prevents you from leaving.\r\n");
         return;
     }
-    if (!IS_NPC(ch) && !IS_NPC(victim) && CHAMPION != GET_IDNUM(victim)) {
     if (!SELF(ch, victim) && !IS_NPC(ch) && ((!PRF_FLAGGED(victim, PRF_TELEPORTABLE) &&
             !PLR_FLAGGED(victim, PLR_KILLER)) || both_pk(ch,victim))) {
         victim->Send( "%s just tried to cast teleport on you but\r\n"
@@ -220,9 +219,9 @@ ASPELL(spell_teleport) {
 
         new_mudlog( BRF, LVL_GOD, TRUE, "%s failed casting teleport on %s",
                     GET_NAME(ch), GET_NAME(victim));
-      }
         return;
     }
+
     /*possible infinite loop here*/
     int cnt = 0;
     do {
