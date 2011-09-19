@@ -1759,7 +1759,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_CALL_LIGHTNING, "call lightning", 40 , 25 ,
 	         3, POS_FIGHTING, TAR_IGNORE, TRUE,
-	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1, "" );
+	         MAG_MANUAL, 15, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 32, 1, "" );
 
 	spello ( SPELL_CHAIN_LIGHTNING, "chain lightning", 60 ,
 	         30 , 3, POS_FIGHTING,
