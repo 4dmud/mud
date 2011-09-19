@@ -1048,7 +1048,9 @@ int times = 1;
         ch->Send("You fail.\r\n");
         return;
     }
-    times += total_chance(ch, SPELL_CALL_LIGHTNING)/10;
+    // Tweaking this to see if I can reduce how potent it is. --> Prom
+    // /10 changed to /12
+    times += total_chance(ch, SPELL_CALL_LIGHTNING)/12;
     
     msg = new message_event_obj(ch, SPELL_CALL_LIGHTNING, THING_SKILL, times, ROOM_ID_BASE + IN_ROOM(ch)->number);
     ch->AddMessageEvent(event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE), ME_CALL_LIGHTNING);
