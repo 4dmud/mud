@@ -1361,7 +1361,7 @@ ACMD(do_qcomm) {
 
             for (i = descriptor_list; i; i = i->next)
                 if (STATE(i) == CON_PLAYING && i != ch->desc &&
-                        PRF_FLAGGED(i->character, PRF_QUEST) &&
+                        (PRF_FLAGGED(i->character, PRF_QUEST) || IS_NPC(i->character)) &&
                         !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF) &&
                         !is_ignoring(ch, i->character) )
                     act(buf, 0, ch, 0, i->character, TO_VICT);
