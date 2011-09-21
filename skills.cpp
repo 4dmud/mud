@@ -145,6 +145,8 @@ ASKILL ( skill_phase );
 ASKILL ( skill_martial_arts );
 ASKILL ( skill_slip );
 ASKILL ( skill_trip );
+ASKILL ( skill_slit );
+ASKILL ( skill_thrust );
 
 ACMD ( do_skills );
 
