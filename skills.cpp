@@ -338,13 +338,13 @@ void assign_skills ( void )
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 40 ,0,
         "You no longer brace for damage.");
 
-	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, 
-		NO_FIRST, NO_SECOND, 3, 48 ,0, "");
+	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT |
+ 		SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 ,0, "");
 
 	skillo ( SKILL_SLIT, "slit", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 45 ,1, "");
+                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 4, 12 ,1, "");
 
-	skillo (SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT)VICT, 
+	skillo (SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, 
 		SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 4, 12, 1, "");
 
   skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
@@ -658,10 +658,10 @@ ACMD ( do_skills )
 					do_gen_door ( ch, argument, cmd, SCMD_PICK );
 					break;
 				case SKILL_SLIT:
-					CALL_SKILL ( skill_slit);
+					CALL_SKILL ( skill_slit );
 					break;
 				case SKILL_THRUST:
-					CALL_SKILL ( skill_thrust);
+					CALL_SKILL ( skill_thrust );
 					break;
 
 				default:
@@ -2142,9 +2142,15 @@ ASKILL ( skill_punch )
 // WIP
 // Prometheus
 
-ASKILL ( skill_trip )
+ASKILL ( skill_slit )
 {
+	ch->Send ( "This Skill is WIP.\r\n" );
+	return 0;
+}
 
+ASKILL ( skill_thrust )
+{
+	ch->Send ( "This Skill is a WIP.\r\n" );
 	return 0;
 }
 
