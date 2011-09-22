@@ -982,7 +982,6 @@ const command_info cmd_info[] =
 	{ "tinker"   , "tink" , POS_STANDING, do_skills   , 1, SKILL_TINKER, 0 },
 	{ "thrust"   , "thru" , POS_FIGHTING, do_skills   , 0, SKILL_THRUST, 0 },
 	{ "trample"  , "tram" , POS_FIGHTING    , do_skills  , 0, SKILL_TRAMPLE, 0 },
-	{ "trip"     , "tri"  , POS_FIGHTING,    do_skills, 0, SKILL_TRIP, 0 },
 	{ "truestrike"   , "true" , POS_STANDING, do_skills   , 0, SKILL_TRUE_STRIKE, 0 },
 	{ "woodsing" , "woo"  , POS_STANDING, do_skills    , 0, SKILL_SING_WOOD, 0 },
 

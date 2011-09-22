@@ -144,7 +144,6 @@ ASKILL ( skill_manipulate );
 ASKILL ( skill_phase );
 ASKILL ( skill_martial_arts );
 ASKILL ( skill_slip );
-ASKILL ( skill_trip );
 ASKILL ( skill_slit );
 ASKILL ( skill_thrust );
 
@@ -342,8 +341,11 @@ void assign_skills ( void )
 	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, 
 		NO_FIRST, NO_SECOND, 3, 48 ,0, "");
 
-	skillo ( SKILL_TRIP, "trip", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+	skillo ( SKILL_SLIT, "slit", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                  SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 45 ,1, "");
+
+	skillo (SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT)VICT, 
+		SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 4, 12, 1, "");
 
   skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
   skillo_static(SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8, 1);
@@ -655,8 +657,11 @@ ACMD ( do_skills )
 				case SKILL_PICK_LOCK:
 					do_gen_door ( ch, argument, cmd, SCMD_PICK );
 					break;
-				case SKILL_TRIP:
-					CALL_SKILL ( skill_trip);
+				case SKILL_SLIT:
+					CALL_SKILL ( skill_slit);
+					break;
+				case SKILL_THRUST:
+					CALL_SKILL ( skill_thrust);
 					break;
 
 				default:
