@@ -23,7 +23,6 @@ void  draw_map (Character *ch);
 char *get_exits(Character *ch);
 char *msdp_map (Character *ch);
 
-// Changing "/"" to "|" for relevant Sectors --> Prom
 
 static struct map_bit_data {
     char bit[2];
