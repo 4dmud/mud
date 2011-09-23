@@ -301,65 +301,65 @@ class Room;
 #define WHITESPACE " \t"
 /* room-related defines *************************************************/
 
-#define TAFF_DEATHLY_COLD      0
-#define TAFF_DIRE_FREEZE       1
-#define TAFF_FREEZE            2
-#define TAFF_CHILL        3
-#define TAFF_OPTIMAL           4
-#define TAFF_WARM         5
-#define TAFF_HOT          6
-#define TAFF_DIRE_HEAT         7
-#define TAFF_DEATHLY_HOT       8
+#define TAFF_DEATHLY_COLD      	0
+#define TAFF_DIRE_FREEZE       	1
+#define TAFF_FREEZE            	2
+#define TAFF_CHILL        	3
+#define TAFF_OPTIMAL           	4
+#define TAFF_WARM         	5
+#define TAFF_HOT          	6
+#define TAFF_DIRE_HEAT         	7
+#define TAFF_DEATHLY_HOT       	8
 
 /* The cardinal directions: used as index to Room.dir_option[] */
-#define NORTH          0
-#define EAST           1
-#define SOUTH          2
-#define WEST           3
-#define UP             4
-#define DOWN           5
+#define NORTH          		0
+#define EAST           		1
+#define SOUTH          		2
+#define WEST           		3
+#define UP             		4
+#define DOWN           		5
 
 /* weapon checks*/
-#define WEAPON_PRIM_AFF 0
-#define WEAPON_SECO_AFF 1
-#define WEAPON_PRIM_NOAFF 2
-#define WEAPON_SECO_NOAFF 3
+#define WEAPON_PRIM_AFF 	0
+#define WEAPON_SECO_AFF 	1
+#define WEAPON_PRIM_NOAFF 	2
+#define WEAPON_SECO_NOAFF 	3
 
-#define KILL_ALL_ENABLED 1
+#define KILL_ALL_ENABLED 	1
 
 /* Room flags: used in Room.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
-#define ROOM_DARK        0    /* Dark                             */
-#define ROOM_DEATH       1    /* Death trap                       */
-#define ROOM_NOMOB       2    /* MOBs not allowed                 */
-#define ROOM_INDOORS          3    /* Indoors                          */
-#define ROOM_PEACEFUL         4    /* Violence not allowed             */
-#define ROOM_SOUNDPROOF       5    /* Shouts, gossip blocked           */
-#define ROOM_NOTRACK          6    /* Track won't go through           */
-#define ROOM_NOMAGIC          7    /* Magic not allowed                */
-#define ROOM_TUNNEL      8    /* room for only 1 pers             */
-#define ROOM_PRIVATE          9    /* Can't teleport in                */
-#define ROOM_GODROOM          10   /* LVL_GOD+ only allowed            */
-#define ROOM_HOUSE       11   /* (R) Room is a house              */
-#define ROOM_HOUSE_CRASH 12   /* (R) House needs saving           */
-#define ROOM_ATRIUM      13   /* (R) The door to a house          */
-#define ROOM_OLC         14   /* (R) Modifyable/!compress         */
-#define ROOM_BFS_MARK         15   /* (R) breath-first srch mrk        */
-#define ROOM_VEHICLE          16   /* Vehicles are allowed             */
+#define ROOM_DARK        	0    /* Dark                             */
+#define ROOM_DEATH       	1    /* Death trap                       */
+#define ROOM_NOMOB       	2    /* MOBs not allowed                 */
+#define ROOM_INDOORS          	3    /* Indoors                          */
+#define ROOM_PEACEFUL         	4   /* Violence not allowed             */
+#define ROOM_SOUNDPROOF       	5    /* Shouts, gossip blocked           */
+#define ROOM_NOTRACK          	6    /* Track won't go through           */
+#define ROOM_NOMAGIC          	7    /* Magic not allowed                */
+#define ROOM_TUNNEL      	8    /* room for only 1 pers             */
+#define ROOM_PRIVATE          	9    /* Can't teleport in                */
+#define ROOM_GODROOM          	10   /* LVL_GOD+ only allowed            */
+#define ROOM_HOUSE       	11   /* (R) Room is a house              */
+#define ROOM_HOUSE_CRASH 	12   /* (R) House needs saving           */
+#define ROOM_ATRIUM      	13   /* (R) The door to a house          */
+#define ROOM_OLC         	14   /* (R) Modifyable/!compress         */
+#define ROOM_BFS_MARK         	15   /* (R) breath-first srch mrk        */
+#define ROOM_VEHICLE          	16   /* Vehicles are allowed             */
 #define ROOM_NORECALL           17 /* Can't recall out                 */
-#define ROOM_ARENA          18     /* Arena                            */
-#define ROOM_GOOD        19   /* Room is good to player           */
-#define ROOM_EVIL        20   /* Room is evil to player           */
-#define ROOM_HP               21   /* HP   Gain                        */
-#define ROOM_MANA        22   /* Mana Gain                        */
-#define ROOM_MOVE        23   /* Move Gain                        */
-#define ROOM_ROLEPLAY         24   /* Allow only Role Players          */
-#define ROOM_NOTELEPORT_IN    25   /* Can't teleport into the room     */
-#define ROOM_NOTELEPORT_OUT   26   /* Can't teleport out of the room   */
-#define ROOM_NOSUMMON_IN 27   /* Cant summon players into the room */
-#define ROOM_NOSUMMON_OUT     28   /* Cant summon players out of the room */
-#define ROOM_WILDERNESS       29   /* Wilderness room, used for automapping */
-#define ROOM_NOVIEW      30   /* Dont display the room on the map */
+#define ROOM_ARENA          	18     /* Arena                            */
+#define ROOM_GOOD        	19   /* Room is good to player           */
+#define ROOM_EVIL        	20   /* Room is evil to player           */
+#define ROOM_HP               	21   /* HP   Gain                        */
+#define ROOM_MANA        	22   /* Mana Gain                        */
+#define ROOM_MOVE        	23   /* Move Gain                        */
+#define ROOM_ROLEPLAY         	24   /* Allow only Role Players          */
+#define ROOM_NOTELEPORT_IN    	25   /* Can't teleport into the room     */
+#define ROOM_NOTELEPORT_OUT   	26   /* Can't teleport out of the room   */
+#define ROOM_NOSUMMON_IN 	27   /* Cant summon players into the room */
+#define ROOM_NOSUMMON_OUT     	28   /* Cant summon players out of the room */
+#define ROOM_WILDERNESS       	29   /* Wilderness room, used for automapping */
+#define ROOM_NOVIEW      	30   /* Dont display the room on the map */
 #define ROOM_DO_NOT_USE         31 /* DO NOT USE                       */
 #define ROOM_GOLD_DEPOSIT       32 /* Room has gold in it              */
 #define ROOM_SILVER_DEPOSIT     33 /* Room has silver in it            */
@@ -370,297 +370,297 @@ class Room;
 #define ROOM_QUARRY             38 /* Room is a stone quarry           */
 #define ROOM_COAL_MINE          39 /* Room has coal in it              */
 #define ROOM_SPRING             40 /* Room has underground spring      */
-#define ROOM_PASTURE          41      /* Herd animals can graze here, and you can fence off exits in these rooms*/
-#define ROOM_DRAGONPORT       42
-#define ROOM_TIN_DEPOSIT      43
+#define ROOM_PASTURE          	41      /* Herd animals can graze here, and you can fence off exits in these rooms*/
+#define ROOM_DRAGONPORT       	42
+#define ROOM_TIN_DEPOSIT      	43
 #define ROOM_PLASTONIUM_DEPOSIT 44
-#define ROOM_BURNING          45 /* Room is burning */
+#define ROOM_BURNING         	45 /* Room is burning */
 
-#define ZONE_OPEN        (1 <<  0)
-#define ZONE_CLOSED      (1 <<  1)
-#define ZONE_NORECALL         (1 <<  2)
-#define ZONE_NOSUMMON_OUT     (1 <<  3)
-#define ZONE_NOTELEPORT_IN    (1 <<  4)
-#define ZONE_NOSUMMON_IN (1 <<  5)
-#define ZONE_NOTELEPORT_OUT   (1 <<  6)
-#define ZONE_HEALING_WIND     (1 <<  7)  //for spells
-#define ZONE_ACID_RAIN        (1 <<  8)
-#define ZONE_DARKNESS         (1 <<  9)
-#define ZONE_LIGHT       (1 << 10)
-#define ZONE_SANDSTORM        (1 << 11)
-#define ZONE_PK_ONLY          (1 << 12)
-#define ZONE_RP_ONLY          (1 << 13)
-#define ZONE_REMORTS_ONLY     (1 << 14)
-#define ZONE_NOCHEATER        (1 << 15)
+#define ZONE_OPEN        	(1 <<  0)
+#define ZONE_CLOSED      	(1 <<  1)
+#define ZONE_NORECALL         	(1 <<  2)
+#define ZONE_NOSUMMON_OUT     	(1 <<  3)
+#define ZONE_NOTELEPORT_IN    	(1 <<  4)
+#define ZONE_NOSUMMON_IN 	(1 <<  5)
+#define ZONE_NOTELEPORT_OUT   	(1 <<  6)
+#define ZONE_HEALING_WIND     	(1 <<  7)  //for spells
+#define ZONE_ACID_RAIN        	(1 <<  8)
+#define ZONE_DARKNESS         	(1 <<  9)
+#define ZONE_LIGHT       	(1 << 10)
+#define ZONE_SANDSTORM        	(1 << 11)
+#define ZONE_PK_ONLY          	(1 << 12)
+#define ZONE_RP_ONLY          	(1 << 13)
+#define ZONE_REMORTS_ONLY     	(1 << 14)
+#define ZONE_NOCHEATER        	(1 << 15)
 #define ZONE_PURGE_EMPTY        (1 << 16)
 
-#define D_ALL      0
-#define D_MEDIEVAL 1
-#define D_FUTURE   2
-#define D_OLD_WEST 3
-#define D_PRE_HIST 4
+#define D_ALL      		0
+#define D_MEDIEVAL 		1
+#define D_FUTURE   		2
+#define D_OLD_WEST 		3
+#define D_PRE_HIST 		4
 
 
 /* Exit info: used in Room.dir_option.exit_info */
-#define EX_ISDOOR        (1 << 0)  /* Exit is a door            */
-#define EX_CLOSED        (1 << 1)  /* The door is closed        */
-#define EX_LOCKED        (1 << 2)  /* The door is locked        */
-#define EX_PICKPROOF          (1 << 3)  /* Lock can't be picked      */
-#define EX_HIDDEN        (1 << 4)  /* Exit is hidden            */
-#define EX_FENCE_WIRE         (1 << 5)  /* herd animals cant pass, only 70% chance others can*/
-#define EX_FENCE_WOOD         (1 << 6)  /* herd animals cant pass, only 50% chance others can */
-#define EX_FENCE_MESH         (1 << 7)  /* herd animals cant pass, only 20% chance others can */
-#define EX_FENCE_GATE_CLOSED  (1 << 8)  /* This exit is also a gate */
-#define EX_FENCE_GATE_OPEN    (1 << 9)  /* This exit lets herd animals pass */
+#define EX_ISDOOR        	(1 << 0)  /* Exit is a door            */
+#define EX_CLOSED        	(1 << 1)  /* The door is closed        */
+#define EX_LOCKED        	(1 << 2)  /* The door is locked        */
+#define EX_PICKPROOF          	(1 << 3)  /* Lock can't be picked      */
+#define EX_HIDDEN        	(1 << 4)  /* Exit is hidden            */
+#define EX_FENCE_WIRE         	(1 << 5)  /* herd animals cant pass, only 70% chance others can*/
+#define EX_FENCE_WOOD         	(1 << 6)  /* herd animals cant pass, only 50% chance others can */
+#define EX_FENCE_MESH         	(1 << 7)  /* herd animals cant pass, only 20% chance others can */
+#define EX_FENCE_GATE_CLOSED  	(1 << 8)  /* This exit is also a gate */
+#define EX_FENCE_GATE_OPEN    	(1 << 9)  /* This exit lets herd animals pass */
 
 
 /* Sector types: used in Room.sector_type */
-#define SECT_INSIDE            0   /* Indoors                         */
-#define SECT_CITY              1   /* In a city                       */
-#define SECT_FIELD             2   /* In a field                      */
-#define SECT_FOREST            3   /* In a forest                     */
-#define SECT_HILLS             4   /* In the hills                    */
-#define SECT_MOUNTAIN          5   /* On a mountain                   */
-#define SECT_WATER_SWIM        6   /* Swimmable water                 */
-#define SECT_WATER_NOSWIM      7   /* Water - need a boat             */
-#define SECT_UNDERWATER        8   /* Underwater                      */
-#define SECT_FLYING            9   /* Wheee!                          */
-#define SECT_DESERT           10   /* In a Desert                     */
-#define SECT_SPACE       11   /* In outer space                  */
-#define SECT_ROAD        12   /* On a Road                       */
-#define SECT_ENTRANCE         13   /* Entrance to a zone              */
-#define SECT_ATMOSPHERE       14   /* Entrance to a planet            */
-#define SECT_SUN         15   /* Into the Sun                    */
-#define SECT_BLACKHOLE        16   /* Into a Black Hole               */
-#define SECT_VEHICLE          17   /* Internal use only               */
-#define SECT_SWAMP       18
+#define SECT_INSIDE            	0   /* Indoors                         */
+#define SECT_CITY              	1   /* In a city                       */
+#define SECT_FIELD             	2   /* In a field                      */
+#define SECT_FOREST            	3   /* In a forest                     */
+#define SECT_HILLS             	4   /* In the hills                    */
+#define SECT_MOUNTAIN          	5   /* On a mountain                   */
+#define SECT_WATER_SWIM        	6   /* Swimmable water                 */
+#define SECT_WATER_NOSWIM      	7   /* Water - need a boat             */
+#define SECT_UNDERWATER        	8   /* Underwater                      */
+#define SECT_FLYING            	9   /* Wheee!                          */
+#define SECT_DESERT           	10   /* In a Desert                     */
+#define SECT_SPACE       	11   /* In outer space                  */
+#define SECT_ROAD        	12   /* On a Road                       */
+#define SECT_ENTRANCE         	13   /* Entrance to a zone              */
+#define SECT_ATMOSPHERE       	14   /* Entrance to a planet            */
+#define SECT_SUN         	15   /* Into the Sun                    */
+#define SECT_BLACKHOLE        	16   /* Into a Black Hole               */
+#define SECT_VEHICLE          	17   /* Internal use only               */
+#define SECT_SWAMP       	18
 #define SECT_REEF               19
-#define SECT_TUNDRA         20
-#define SECT_SNOW        21
-#define SECT_ICE         22
-#define SECT_PRAIRIE 23
-#define SECT_BADLANDS 24
-#define SECT_RAIL     25
+#define SECT_TUNDRA         	20
+#define SECT_SNOW        	21
+#define SECT_ICE         	22
+#define SECT_PRAIRIE 		23
+#define SECT_BADLANDS 		24
+#define SECT_RAIL     		25
 
 
 /* char and mob-related defines *****************************************/
 
 
 /* PC classes */
-#define CLASS_UNDEFINED   -1
-#define CLASS_MAGE        0
-#define CLASS_PRIEST      1
-#define CLASS_THIEF       2
-#define CLASS_WARRIOR     3
-#define CLASS_HUNTER      4
-#define CLASS_RANGER      5
-#define CLASS_GYPSY       6
-#define CLASS_ESPER       7
+#define CLASS_UNDEFINED   	-1
+#define CLASS_MAGE        	0
+#define CLASS_PRIEST     	1
+#define CLASS_THIEF       	2
+#define CLASS_WARRIOR     	3
+#define CLASS_HUNTER      	4
+#define CLASS_RANGER      	5
+#define CLASS_GYPSY       	6
+#define CLASS_ESPER       	7
 
-#define NUM_CLASSES       8   /* This must be the number of classes!! */
+#define NUM_CLASSES       	8   /* This must be the number of classes!! */
 
 /* NPC classes */
-#define CLASS_NORMAL    0
-#define CLASS_UNDEAD    1
-#define CLASS_CASTER     2
-#define CLASS_FIGHTER    3
-#define CLASS_ROGUE 4
-#define CLASS_ANIMAL     5
+#define CLASS_NORMAL    	0
+#define CLASS_UNDEAD    	1
+#define CLASS_CASTER     	2
+#define CLASS_FIGHTER    	3
+#define CLASS_ROGUE 		4
+#define CLASS_ANIMAL     	5
 
-#define NUM_MOB_CLASSES 6
+#define NUM_MOB_CLASSES 	6
 
 /* Races */
-#define RACE_UNDEFINED  -1
-#define RACE_FAUN        0
-#define RACE_CENTAUR     1
-#define RACE_ELF         2
-#define RACE_DWARF       3
-#define RACE_INDIAN      4
-#define RACE_GRINGO      5
-#define RACE_MARTIAN     6
-#define RACE_SPACE_WOLF  7
-#define RACE_GLADIATOR	 8
-#define RACE_WORM        9
-#define RACE_TOAD       10
-#define RACE_BOAR       11
-#define RACE_WOLF       12
-#define RACE_LION       13
+#define RACE_UNDEFINED  	-1
+#define RACE_FAUN        	0
+#define RACE_CENTAUR     	1
+#define RACE_ELF         	2
+#define RACE_DWARF       	3
+#define RACE_INDIAN      	4
+#define RACE_GRINGO      	5
+#define RACE_MARTIAN     	6
+#define RACE_SPACE_WOLF  	7
+#define RACE_GLADIATOR	 	8
+#define RACE_WORM        	9
+#define RACE_TOAD       	10
+#define RACE_BOAR       	11
+#define RACE_WOLF       	12
+#define RACE_LION       	13
 
-#define NUM_RACES       14
+#define NUM_RACES       	14
 
 /* Sex */
-#define SEX_NEUTRAL   0
-#define SEX_MALE      1
-#define SEX_FEMALE    2
+#define SEX_NEUTRAL   		0
+#define SEX_MALE      		1
+#define SEX_FEMALE    		2
 
 
 /* Positions */
-#define POS_DEAD       0 /* dead                 */
-#define POS_MORTALLYW  1 /* mortally wounded     */
-#define POS_INCAP      2 /* incapacitated        */
-#define POS_STUNNED    3 /* stunned              */
-#define POS_SLEEPING   4 /* sleeping             */
-#define POS_RESTING    5 /* resting              */
-#define POS_SITTING    6 /* sitting              */
-#define POS_FIGHTING   7 /* fighting             */
-#define POS_STANDING   8 /* standing             */
+#define POS_DEAD       		0 /* dead                 */
+#define POS_MORTALLYW  		1 /* mortally wounded     */
+#define POS_INCAP      		2 /* incapacitated        */
+#define POS_STUNNED    		3 /* stunned              */
+#define POS_SLEEPING   		4 /* sleeping             */
+#define POS_RESTING    		5 /* resting              */
+#define POS_SITTING    		6 /* sitting              */
+#define POS_FIGHTING   		7 /* fighting             */
+#define POS_STANDING   		8 /* standing             */
 
 /* Hitpoint levels */
-#define HIT_INCAP      -3     /* The hit level for incapacitation   */
-#define HIT_MORTALLYW  -6     /* The hit level for mortally wounded */
-#define HIT_DEAD       -11    /* The point you never want to get to */
+#define HIT_INCAP      		-3     /* The hit level for incapacitation   */
+#define HIT_MORTALLYW  		-6     /* The hit level for mortally wounded */
+#define HIT_DEAD       		-11    /* The point you never want to get to */
 
 
 /* Player flags: used by Character.char_specials.act */
-#define PLR_KILLER  0    /* Player is a player-killer                */
-#define PLR_THIEF   1    /* Player is a player-thief                 */
-#define PLR_FROZEN  2    /* Player is frozen                         */
-#define PLR_DONTSET     3     /* Don't EVER set (ISNPC bit)               */
-#define PLR_WRITING 4    /* Player writing (board/mail/olc)          */
-#define PLR_MAILING 5    /* Player is writing mail                   */
-#define PLR_CRASH   6    /* Player needs to be crash-saved           */
-#define PLR_SITEOK  7    /* Player has been site-cleared             */
-#define PLR_NOSHOUT 8    /* Player not allowed to shout/goss         */
-#define PLR_NOTITLE 9    /* Player not allowed to set title          */
-#define PLR_DELETED 10   /* Player deleted - space reusable          */
-#define PLR_LOADROOM     11   /* Player uses nonstandard loadroom         */
-#define PLR_NOWIZLIST    12   /* Player shouldn't be on wizlist           */
-#define PLR_NODELETE     13   /* Player shouldn't be deleted              */
-#define PLR_INVSTART     14   /* Player should enter game wizinvis        */
-#define PLR_CRYO    15   /* Player is cryo-saved (purge prog)        */
-#define PLR_ROLEPLAYER  16    /* Player is a Role Player                  */
-#define PLR_PK      17   /* Player participates in PK activites      */
-#define PLR_NEWBIE_HLPR  18   /* Player is a designated newbie helper     */
-#define PLR_NOTDEADYET  19    /*pending extraction */
-#define PLR_COVENTRY    20      /*player can hear and talk but noone can hear them*/
-#define PLR_CHEATER     21      /*player is a known cheater*/
-#define PLR_SPEEDWALK   22      /*player is speedwalking*/
-#define PLR_LOYAL   23      /* player has selected a loyalty reward */
-#define PLR_HERO        24      /* player is a hero type */
-#define PLR_DYING       25      /* player is in the state of dying */
-#define PLR_RP_LEADER   26      /* player has echo, and award commands */
-#define PLR_IMM_MORT	27	/* Player is the mortal of an immortal, and should hear wiznet*/
-#define PLR_JESTER      28      /* Player is a rp group jester */
-#define PLR_CTHULYTE    29      /* Player is a rp group cthulyte */
-#define PLR_ALDERISIO   30      /* Player is in rp group alderisio */
-#define PLR_BITCH        31      /* Player is in rp group bitch */
-#define PLR_RIDDLER      32     /* Player is in rp group Riddler */
-#define PLR_LOLTHYTE     33    /* Player is in rp group lolthye */
-#define PLR_FEARLESS     34   /* Player is in rp group Fearless */
-#define PLR_GALLIANO     35
-#define PLR_NEEDS_CLASS 36  /* Player hasn't yet chosen their class     */
-#define PLR_NEEDS_STATS 37  /* Player hasn't yet chosen their stats     */
-#define PLR_ANTI_DT     38  /* Horus - has a life against DTs */
+#define PLR_KILLER  		0    /* Player is a player-killer                */
+#define PLR_THIEF   		1    /* Player is a player-thief                 */
+#define PLR_FROZEN  		2    /* Player is frozen                         */
+#define PLR_DONTSET     	3     /* Don't EVER set (ISNPC bit)               */
+#define PLR_WRITING 		4    /* Player writing (board/mail/olc)          */
+#define PLR_MAILING 		5    /* Player is writing mail                   */
+#define PLR_CRASH   		6    /* Player needs to be crash-saved           */
+#define PLR_SITEOK  		7    /* Player has been site-cleared             */
+#define PLR_NOSHOUT 		8    /* Player not allowed to shout/goss         */
+#define PLR_NOTITLE 		9    /* Player not allowed to set title          */
+#define PLR_DELETED 		10   /* Player deleted - space reusable          */
+#define PLR_LOADROOM    	11   /* Player uses nonstandard loadroom         */
+#define PLR_NOWIZLIST   	12   /* Player shouldn't be on wizlist           */
+#define PLR_NODELETE    	13   /* Player shouldn't be deleted              */
+#define PLR_INVSTART    	14   /* Player should enter game wizinvis        */
+#define PLR_CRYO    		15   /* Player is cryo-saved (purge prog)        */
+#define PLR_ROLEPLAYER  	16    /* Player is a Role Player                  */
+#define PLR_PK      		17   /* Player participates in PK activites      */
+#define PLR_NEWBIE_HLPR 	18   /* Player is a designated newbie helper     */
+#define PLR_NOTDEADYET  	19    /*pending extraction */
+#define PLR_COVENTRY    	20      /*player can hear and talk but noone can hear them*/
+#define PLR_CHEATER     	21      /*player is a known cheater*/
+#define PLR_SPEEDWALK   	22      /*player is speedwalking*/
+#define PLR_LOYAL   		23      /* player has selected a loyalty reward */
+#define PLR_HERO        	24      /* player is a hero type */
+#define PLR_DYING       	25      /* player is in the state of dying */
+#define PLR_RP_LEADER   	26      /* player has echo, and award commands */
+#define PLR_IMM_MORT		27	/* Player is the mortal of an immortal, and should hear wiznet*/
+#define PLR_JESTER      	28      /* Player is a rp group jester */
+#define PLR_CTHULYTE    	29      /* Player is a rp group cthulyte */
+#define PLR_ALDERISIO   	30      /* Player is in rp group alderisio */
+#define PLR_BITCH       	31      /* Player is in rp group bitch */
+#define PLR_RIDDLER     	32     /* Player is in rp group Riddler */
+#define PLR_LOLTHYTE    	33    /* Player is in rp group lolthye */
+#define PLR_FEARLESS   		34   /* Player is in rp group Fearless */
+#define PLR_GALLIANO    	35
+#define PLR_NEEDS_CLASS 	36  /* Player hasn't yet chosen their class     */
+#define PLR_NEEDS_STATS 	37  /* Player hasn't yet chosen their stats     */
+#define PLR_ANTI_DT     	38  /* Horus - has a life against DTs */
 
-#define MOB_RACE_HUMANOID 0   /* Mob carries money                    */
-#define MOB_RACE_ANIMAL   1   /* Mob doesn't carry money              */
-#define MOB_RACE_EXOTIC   2   /* Mob could carry money                */
+#define MOB_RACE_HUMANOID 	0   /* Mob carries money                    */
+#define MOB_RACE_ANIMAL   	1   /* Mob doesn't carry money              */
+#define MOB_RACE_EXOTIC   	2   /* Mob could carry money                */
 
 /* Mobile flags: used by Character.char_specials.act */
-#define MOB_SPEC         0    /* Mob has a callable spec-proc             */
-#define MOB_SENTINEL     1    /* Mob should not move                      */
-#define MOB_SCAVENGER    2    /* Mob picks up stuff on the ground         */
-#define MOB_ISNPC        3    /* (R) Automatically set on all Mobs        */
-#define MOB_AWARE    4   /* Mob can't be backstabbed                 */
-#define MOB_AGGRESSIVE   5    /* Mob hits players in the room             */
-#define MOB_STAY_ZONE    6    /* Mob shouldn't wander out of zone         */
-#define MOB_WIMPY        7    /* Mob flees if severely injured            */
-#define MOB_AGGR_EVIL     8   /* auto attack evil PC's                    */
-#define MOB_AGGR_GOOD     9   /* auto attack good PC's                    */
-#define MOB_AGGR_NEUTRAL 10   /* auto attack neutral PC's                 */
-#define MOB_MEMORY   11  /* remember attackers if attacked           */
-#define MOB_HELPER   12  /* attack PCs fighting other NPCs           */
-#define MOB_NOCHARM  13  /* Mob can't be charmed                     */
-#define MOB_NOSUMMON      14  /* Mob can't be summoned                    */
-#define MOB_NOSLEEP  15  /* Mob can't be slept                       */
-#define MOB_NOBASH   16  /* Mob can't be bashed (e.g. trees)         */
-#define MOB_NOBLIND  17  /* Mob can't be blinded                     */
-#define MOB_MOUNTABLE     18  /* Is the mob mountable? (DAK)              */
-#define MOB_NOPUSH   19  /* Mob can't be pushed                      */
-#define MOB_AGGR_FEMALE 20  /* Aggro to female     */
-#define MOB_NOSHOOT  21  /* Mob can't be shot                        */
-#define MOB_NOPOISON      22  /* Mob can't be poisoned                    */
-#define MOB_EDIBLE   23  /* Can eat the mob's corpse                 */
-#define MOB_SKINABLE      24  /* Can skin the mob                         */
-#define MOB_AGGR_MALE     25   /* Mob aggro to males  */
-#define MOB_AGGR_SEX_NEUTRAL      26  /* Mob Aggro to neutral sex    */
-#define MOB_UNDEAD   27  /* Mob is undead                            */
-#define MOB_NOFREEZE      28  /* Mob can't be frozen                      */
-#define MOB_CAN_MATE      29  /* Mob can be mated with other animals      */
-#define MOB_NOTDEADYET   30   /*pending death */
-#define MOB_POISONS_1    31     /*inflicts poison*/
-#define MOB_POISONS_2    32     /*inflicts poison 2*/
-#define MOB_ELEM_AIR     33
-#define MOB_ELEM_WATER   34
-#define MOB_ELEM_FIRE    35
-#define MOB_ELEM_EARTH   36
-#define MOB_HERD     	 37
-#define MOB_SWIMS        38
-#define MOB_WIZINVIS     39
-#define MOB_STAY_SECTOR  40
-#define MOB_HEALER       41
-#define MOB_POSTMASTER   42
-#define MOB_QUEST        43
-#define MOB_TRAINER      44
+#define MOB_SPEC         	0    /* Mob has a callable spec-proc             */
+#define MOB_SENTINEL     	1    /* Mob should not move                      */
+#define MOB_SCAVENGER    	2    /* Mob picks up stuff on the ground         */
+#define MOB_ISNPC        	3    /* (R) Automatically set on all Mobs        */
+#define MOB_AWARE    	 	4   /* Mob can't be backstabbed                 */
+#define MOB_AGGRESSIVE   	5    /* Mob hits players in the room             */
+#define MOB_STAY_ZONE    	6    /* Mob shouldn't wander out of zone         */
+#define MOB_WIMPY        	7    /* Mob flees if severely injured            */
+#define MOB_AGGR_EVIL    	8   /* auto attack evil PC's                    */
+#define MOB_AGGR_GOOD    	9   /* auto attack good PC's                    */
+#define MOB_AGGR_NEUTRAL 	10   /* auto attack neutral PC's                 */
+#define MOB_MEMORY       	11  /* remember attackers if attacked           */
+#define MOB_HELPER       	12  /* attack PCs fighting other NPCs           */
+#define MOB_NOCHARM      	13  /* Mob can't be charmed                     */
+#define MOB_NOSUMMON     	14  /* Mob can't be summoned                    */
+#define MOB_NOSLEEP      	15  /* Mob can't be slept                       */
+#define MOB_NOBASH       	16  /* Mob can't be bashed (e.g. trees)         */
+#define MOB_NOBLIND  	 	17  /* Mob can't be blinded                     */
+#define MOB_MOUNTABLE    	18  /* Is the mob mountable? (DAK)              */
+#define MOB_NOPUSH    	 	19  /* Mob can't be pushed                      */
+#define MOB_AGGR_FEMALE  	20  /* Aggro to female     */
+#define MOB_NOSHOOT  	 	21  /* Mob can't be shot                        */
+#define MOB_NOPOISON     	22  /* Mob can't be poisoned                    */
+#define MOB_EDIBLE   	 	23  /* Can eat the mob's corpse                 */
+#define MOB_SKINABLE     	24  /* Can skin the mob                         */
+#define MOB_AGGR_MALE    	25   /* Mob aggro to males  */
+#define MOB_AGGR_SEX_NEUTRAL    26  /* Mob Aggro to neutral sex    */
+#define MOB_UNDEAD   		 27  /* Mob is undead                            */
+#define MOB_NOFREEZE     	28  /* Mob can't be frozen                      */
+#define MOB_CAN_MATE     	29  /* Mob can be mated with other animals      */
+#define MOB_NOTDEADYET   	30   /*pending death */
+#define MOB_POISONS_1    	31     /*inflicts poison*/
+#define MOB_POISONS_2    	32     /*inflicts poison 2*/
+#define MOB_ELEM_AIR     	33
+#define MOB_ELEM_WATER   	34
+#define MOB_ELEM_FIRE    	35
+#define MOB_ELEM_EARTH   	36
+#define MOB_HERD     	 	37
+#define MOB_SWIMS        	38
+#define MOB_WIZINVIS     	39
+#define MOB_STAY_SECTOR  	40
+#define MOB_HEALER       	41
+#define MOB_POSTMASTER   	42
+#define MOB_QUEST        	43
+#define MOB_TRAINER      	44
 
 /* Preference flags: used by Character.player_specials.pref           */
-#define PRF_BRIEF       0     /* Room descs won't normally be shown        */
-#define PRF_COMPACT     1     /* No extra CRLF pair before prompts         */
-#define PRF_DEAF        2     /* Can't hear shouts                         */
-#define PRF_NOTELL      3     /* Can't receive tells                       */
-#define PRF_DISPHP      4     /* Display hit points in prompt              */
-#define PRF_DISPMANA    5     /* Display mana points in prompt             */
-#define PRF_DISPMOVE    6     /* Display move points in prompt             */
-#define PRF_AUTOEXIT    7     /* Display exits in a room                   */
-#define PRF_NOHASSLE    8     /* Aggr mobs won't attack                    */
-#define PRF_QUEST       9     /* On quest                                  */
-#define PRF_SUMMONABLE  10    /* Can be summoned                           */
-#define PRF_NOREPEAT    11    /* No repetition of comm commands            */
-#define PRF_HOLYLIGHT   12    /* Can see in dark                           */
-#define PRF_COLOUR_1     13    /* Colour (low bit)                           */
-#define PRF_COLOUR_2     14    /* Colour (high bit)                          */
-#define PRF_NOWIZ       15    /* Can't hear wizline                        */
-#define PRF_LOG1        16    /* On-line System Log (low bit)              */
-#define PRF_LOG2        17    /* On-line System Log (high bit)             */
-#define PRF_NOAUCT      18    /* Can't hear auction channel                */
-#define PRF_NOGOSS      19    /* Can't hear gossip channel                 */
-#define PRF_NOGRATZ     20    /* Can't hear grats channel                  */
-#define PRF_ROOMFLAGS   21    /* Can see room flags (ROOM_x)               */
-#define PRF_AUTOASSIST  22    /* Autoassists in a fight                    */
-#define PRF_AFK         23    /* Player is afk                             */
-#define PRF_AUTOSPLIT   24    /* Player autosplits                         */
-#define PRF_AUTOLOOT    25    /* Player autloots                           */
-#define PRF_AUTOGOLD    26    /* Player gets gold automatically            */
-#define PRF_ARENA       27    /* can see arena messages                    */
-#define PRF_NONEWBIE    28    /* Can't hear the newbie channel             */
-#define PRF_KEEPTITLE   29    /* Player keeps title upon levelling         */
-#define PRF_NOIC        30    /* Player can't use this channel             */
-#define PRF_BATTLESPAM  31    /* Player will not see battlespam            */
-#define PRF_MAIL        32    /* Player will not see mail message in prompt */
-#define PRF_NOCTALK     33
-#define PRF_AFKTELL     34      /* player gets a message that someone sent a tell while afk*/
-#define PRF_MOVEMSG     35      /* toggle to turn on seeing movement messages */
-#define PRF_MOUNTABLE   36
-#define PRF_NOHERO      37
-#define PRF_TIME        38
-#define PRF_AUTOSAC     39
-#define PRF_DISPAUTO    40 /* Show prompt HP, MP, MV when < 25%. */
-#define PRF_CLS         41 /* Clear screen in OLC                */
-#define PRF_BUILDWALK   42 /* Build new rooms while walking ?    */
-#define PRF_NOCOMPRESS  43 /* If you want to force MCCP2 off          */
-#define PRF_OOC         44
-#define PRF_PAGEWRAP    45
-#define PRF_REPLYLOCK   46
-#define PRF_BUSY        47    /* Player is busy                             */
-#define PRF_AGGRO       48    /* Player is aggro                            */
-#define PRF_NOBRAG      49
-#define PRF_GATEABLE    50
-#define PRF_RP          51    /* Player is roleplaying */
-#define PRF_FISHPROMPT  52
-#define PRF_TELEPORTABLE  53
-#define PRF_AUTOGROUP   54
-#define PRF_RETIRED     55    /* For retired clan leaders */
-#define PRF_NOTITLE     56
+#define PRF_BRIEF       	0     /* Room descs won't normally be shown        */
+#define PRF_COMPACT     	1     /* No extra CRLF pair before prompts         */
+#define PRF_DEAF        	2     /* Can't hear shouts                         */
+#define PRF_NOTELL      	3     /* Can't receive tells                       */
+#define PRF_DISPHP      	4     /* Display hit points in prompt              */
+#define PRF_DISPMANA    	5     /* Display mana points in prompt             */
+#define PRF_DISPMOVE    	6     /* Display move points in prompt             */
+#define PRF_AUTOEXIT   		7     /* Display exits in a room                   */
+#define PRF_NOHASSLE    	8     /* Aggr mobs won't attack                    */
+#define PRF_QUEST       	9     /* On quest                                  */
+#define PRF_SUMMONABLE  	10    /* Can be summoned                           */
+#define PRF_NOREPEAT    	11    /* No repetition of comm commands            */
+#define PRF_HOLYLIGHT   	12    /* Can see in dark                           */
+#define PRF_COLOUR_1    	13    /* Colour (low bit)                           */
+#define PRF_COLOUR_2    	14    /* Colour (high bit)                          */
+#define PRF_NOWIZ       	15    /* Can't hear wizline                        */
+#define PRF_LOG1        	16    /* On-line System Log (low bit)              */
+#define PRF_LOG2        	17    /* On-line System Log (high bit)             */
+#define PRF_NOAUCT      	18    /* Can't hear auction channel                */
+#define PRF_NOGOSS      	19    /* Can't hear gossip channel                 */
+#define PRF_NOGRATZ     	20    /* Can't hear grats channel                  */
+#define PRF_ROOMFLAGS   	21    /* Can see room flags (ROOM_x)               */
+#define PRF_AUTOASSIST  	22    /* Autoassists in a fight                    */
+#define PRF_AFK         	23    /* Player is afk                             */
+#define PRF_AUTOSPLIT   	24    /* Player autosplits                         */
+#define PRF_AUTOLOOT    	25    /* Player autloots                           */
+#define PRF_AUTOGOLD    	26    /* Player gets gold automatically            */
+#define PRF_ARENA       	27    /* can see arena messages                    */
+#define PRF_NONEWBIE    	28    /* Can't hear the newbie channel             */
+#define PRF_KEEPTITLE   	29    /* Player keeps title upon levelling         */
+#define PRF_NOIC        	30    /* Player can't use this channel             */
+#define PRF_BATTLESPAM  	31    /* Player will not see battlespam            */
+#define PRF_MAIL        	32    /* Player will not see mail message in prompt */
+#define PRF_NOCTALK     	33
+#define PRF_AFKTELL     	34      /* player gets a message that someone sent a tell while afk*/
+#define PRF_MOVEMSG     	35      /* toggle to turn on seeing movement messages */
+#define PRF_MOUNTABLE   	36
+#define PRF_NOHERO      	37
+#define PRF_TIME        	38
+#define PRF_AUTOSAC     	39
+#define PRF_DISPAUTO    	40 /* Show prompt HP, MP, MV when < 25%. */
+#define PRF_CLS         	41 /* Clear screen in OLC                */
+#define PRF_BUILDWALK   	42 /* Build new rooms while walking ?    */
+#define PRF_NOCOMPRESS  	43 /* If you want to force MCCP2 off          */
+#define PRF_OOC         	44
+#define PRF_PAGEWRAP    	45
+#define PRF_REPLYLOCK   	46
+#define PRF_BUSY        	47    /* Player is busy                             */
+#define PRF_AGGRO       	48    /* Player is aggro                            */
+#define PRF_NOBRAG      	49
+#define PRF_GATEABLE    	50
+#define PRF_RP          	51    /* Player is roleplaying */
+#define PRF_FISHPROMPT  	52
+#define PRF_TELEPORTABLE  	53
+#define PRF_AUTOGROUP   	54
+#define PRF_RETIRED     	55    /* For retired clan leaders */
+#define PRF_NOTITLE    		56
 
 /* Descriptor flags */
 #define DESC_CANZLIB     (1 << 0)  /* Client says compression capable.   */
@@ -676,7 +676,7 @@ class Room;
 #define AFF_DETECT_INVIS      4    /* Char can see invis chars  */
 #define AFF_DETECT_MAGIC      5    /* Char is sensitive to magic */
 #define AFF_SENSE_LIFE        6    /* Char can sense hidden life */
-#define AFF_WATERWALK          7   /* Char can walk on water    */
+#define AFF_WATERWALK         7   /* Char can walk on water    */
 #define AFF_SANCTUARY         8    /* Char protected by sanct.  */
 #define AFF_GROUP             9    /* (R) Char is grouped       */
 #define AFF_CURSE             10   /* Char is cursed            */
@@ -685,29 +685,29 @@ class Room;
 #define AFF_PROTECT_EVIL      13   /* Char protected from evil  */
 #define AFF_PROTECT_GOOD      14   /* Char protected from good  */
 #define AFF_SLEEP             15   /* (R) Char magically asleep */
-#define AFF_NOTRACK       16  /* Char can't be tracked     */
-#define AFF_TAMED              17  /* Char has been tamed (DAK) */
-#define AFF_POLYMORPH          18  /* Char is polymorphed       */
+#define AFF_NOTRACK           16  /* Char can't be tracked     */
+#define AFF_TAMED             17  /* Char has been tamed (DAK) */
+#define AFF_POLYMORPH         18  /* Char is polymorphed       */
 #define AFF_SNEAK             19   /* Char can move quietly     */
 #define AFF_HIDE              20   /* Char is hidden            */
 #define AFF_FLY               21   /* Room for future expansion */
 #define AFF_CHARM             22   /* Char is charmed           */
 #define AFF_HOLD              23   /* Char is snared            */
-#define AFF_GILLS         24  /* Char can breath underwater */
-#define AFF_UNUSED             25  /* Unused                    */
-#define AFF_POISON_2           26  /* Char is poisoned level 2  */
-#define AFF_POISON_3           27  /* Char is poisoned level 3  */
-#define AFF_POISON_4           28  /* Char is poisoned level 4  */
-#define AFF_FIRE_SHIELD        29  /* Fire Shield               */
-#define AFF_STONESKIN          30  /* Skin is stone             */
+#define AFF_GILLS             24  /* Char can breath underwater */
+#define AFF_UNUSED            25  /* Unused                    */
+#define AFF_POISON_2          26  /* Char is poisoned level 2  */
+#define AFF_POISON_3          27  /* Char is poisoned level 3  */
+#define AFF_POISON_4          28  /* Char is poisoned level 4  */
+#define AFF_FIRE_SHIELD       29  /* Fire Shield               */
+#define AFF_STONESKIN         30  /* Skin is stone             */
 //#define AFF_DONOTUSE        31           /* DO NOT USE                */
-#define AFF_HASTE         32  /* Char moves faster         */
-#define AFF_SHIELD        33  /* dam/2 from missiles       */
-#define AFF_PROT_FIRE          34  /* Char is prot from fire    */
-#define AFF_FREEZING           35  /* Char is freezing          */
-#define AFF_ACIDED        36  /* Char is covered with acid */
-#define AFF_BURNING       37  /* Char is on fire           */
-#define AFF_PROT_COLD          38  /* Char is prot from cold    */
+#define AFF_HASTE             32  /* Char moves faster         */
+#define AFF_SHIELD            33  /* dam/2 from missiles       */
+#define AFF_PROT_FIRE         34  /* Char is prot from fire    */
+#define AFF_FREEZING          35  /* Char is freezing          */
+#define AFF_ACIDED            36  /* Char is covered with acid */
+#define AFF_BURNING           37  /* Char is on fire           */
+#define AFF_PROT_COLD         38  /* Char is prot from cold    */
 #define AFF_HYPERACTIVITY     39   /* Char is hyperactivity     */
 #define AFF_FORTIFY_MIND      40   /* Char has fortified their mind - spell prot*/
 #define AFF_FORTIFY_BODY      41   /* Char has Fortified their body - damage res*/
@@ -715,50 +715,50 @@ class Room;
 #define AFF_BLADEDANCE        43   /* Char is dancing the blades */
 #define AFF_BRACE             44   /* Char is bracing against attack */
 #define AFF_HOLY_STRENGTH     45   /* Char is super strong */
-#define AFF_MIND_FIRE          46        /* char does fire spells in combat - m/p/e*/
-#define AFF_MIND_WATER         47        /* char does water spells in combat*/
-#define AFF_MIND_ICE           48        /* char does ice spells in combat*/
-#define AFF_SLOW          49        /* -20% speed*/
+#define AFF_MIND_FIRE         46        /* char does fire spells in combat - m/p/e*/
+#define AFF_MIND_WATER        47        /* char does water spells in combat*/
+#define AFF_MIND_ICE          48        /* char does ice spells in combat*/
+#define AFF_SLOW              49        /* -20% speed*/
 #define AFF_PROCRASTINATE     50        /* -15% speed*/
-#define AFF_FROZEN        51        /* -50% speed*/
-#define AFF_MIND_ELEC          52        /*electric type spells - m/p/e*/
-#define AFF_JUDO          53  /*fighting style - rogue*/
+#define AFF_FROZEN            51        /* -50% speed*/
+#define AFF_MIND_ELEC         52        /*electric type spells - m/p/e*/
+#define AFF_JUDO              53  /*fighting style - rogue*/
 #define AFF_GODLY_BLESSING    54        /*power attacks for priest*/
 #define AFF_SHIELD_HOLY       55        /*lowers chance to be hit*/
-#define AFF_PHASE         56        /*phases between attacks to strike back - esper*/
+#define AFF_PHASE             56        /*phases between attacks to strike back - esper*/
 #define AFF_NUMB_MIND         57        /*lowers chance of hitting, and dex*/
 #define AFF_TRUE_STRIKING     58        /*increases chance of landing a hit*/
 #define AFF_SHIELD_ICE        59        /*lowers hit chance with chance to affect slow */
 #define AFF_SHIELD_STATIC     60        /*lowers melee hit chance */
-#define AFF_BLUR          61        /*lowers melee hit chance */
+#define AFF_BLUR              61        /*lowers melee hit chance */
 #define AFF_MARTIAL_ARTS      62        /*increases damage and hitchance */
 #define AFF_DIVINE_MIND       63        /*increases int*/
 #define AFF_SWEET_DREAMS      64        /*increases regen rate when asleep*/
 #define AFF_SHIELD_THORNS     65        /*like Fire Shield - for skill attacks*/
-#define AFF_SHIELD_MANA        66  /*increases spell resistence*/
+#define AFF_SHIELD_MANA       66  /*increases spell resistence*/
 #define AFF_SHIELD_MIRROR     67        /*like fire shield for magic attacks */
-#define AFF_FORSEE        68  /*anticipate opponents next move in order to avoid it*/
-#define AFF_CONFUSED           69  /*random movement when moving, chance of hurting self instead of fighting*/
+#define AFF_FORSEE            68  /*anticipate opponents next move in order to avoid it*/
+#define AFF_CONFUSED          69  /*random movement when moving, chance of hurting self instead of fighting*/
 #define AFF_MAGIC_BUBBLE      70   /*slilences player*/
-#define AFF_CORRUPTED          71  /*player has +ac added */
-#define AFF_WEAKENED           72  /*player has -str*/
-#define AFF_DODGE         73  /*chance to dodge next attack*/
-#define AFF_DRAIN_BLOOD        74        /*SUB: fight style dam mod*/
+#define AFF_CORRUPTED         71  /*player has +ac added */
+#define AFF_WEAKENED          72  /*player has -str*/
+#define AFF_DODGE             73  /*chance to dodge next attack*/
+#define AFF_DRAIN_BLOOD       74        /*SUB: fight style dam mod*/
 #define AFF_FURY_ATTACKS      75        /*SUB: fight style dam mod*/
-#define AFF_GRIP          76
-#define AFF_MEDITATE           77
-#define AFF_FOCUS         78
-#define AFF_BATTLE_RAGE        79
-#define AFF_SUFFOCATING        80
+#define AFF_GRIP              76
+#define AFF_MEDITATE          77
+#define AFF_FOCUS             78
+#define AFF_BATTLE_RAGE       79
+#define AFF_SUFFOCATING       80
 #define AFF_STUCK             81
 #define AFF_DRUNKEN_MASTER    82
-#define AFF_POLY_LION          83
-#define AFF_POLY_WOLF          84
-#define AFF_POLY_BEAR          85
-#define AFF_POLY_BOAR          86
-#define AFF_POLY_TOAD          87
-#define AFF_IMMFREEZE          88
-#define AFF_SILENCED           89
+#define AFF_POLY_LION         83
+#define AFF_POLY_WOLF         84
+#define AFF_POLY_BEAR         85
+#define AFF_POLY_BOAR         86
+#define AFF_POLY_TOAD         87
+#define AFF_IMMFREEZE         88
+#define AFF_SILENCED          89
 #define AFF_SNARE	      90	
 #define AFF_OUTCAST           91
 #define AFF_RESIST_FIRE       92
@@ -773,57 +773,57 @@ class Room;
 
 
 /* Modes of connectedness: used by descriptor_data.state */
-#define CON_PLAYING     0     /* Playing - Nominal state      */
-#define CON_CLOSE       1     /* Disconnecting                */
-#define CON_GET_NAME         2     /* By what name ..?             */
-#define CON_NAME_CNFRM       3     /* Did I get that right, x?     */
-#define CON_PASSWORD         4     /* Password:                    */
-#define CON_NEWPASSWD        5     /* Give me a password for x     */
-#define CON_CNFPASSWD        6     /* Please retype password:      */
-#define CON_RMOTD       9     /* PRESS RETURN after MOTD      */
-#define CON_MENU       10     /* Your choice: (main menu)     */
-#define CON_EXDESC     11     /* Enter a new description:     */
-#define CON_CHPWD_GETOLD   12 /* Changing passwd: get old     */
-#define CON_CHPWD_GETNEW   13 /* Changing passwd: get new     */
-#define CON_CHPWD_VRFY     14 /* Verify new password          */
-#define CON_DELCNF1    15     /* Delete confirmation 1        */
-#define CON_DELCNF2    16     /* Delete confirmation 2        */
-#define CON_DISCONNECT      17     /* In-game disconnection        */
-#define CON_OEDIT    18  /* OLC mode - object editor        */
-#define CON_REDIT    19  /* OLC mode - room editor          */
-#define CON_ZEDIT    20  /* OLC mode - zone info editor          */
-#define CON_MEDIT    21  /* OLC mode - mobile editor        */
-#define CON_SEDIT    22  /* OLC mode - shop editor          */
-#define CON_TEDIT    23  /* OLC mode - text editor          */
-#define CON_CEDIT    24  /* OLC mode - conf editor          */
-#define CON_AEDIT        25     /* OLC mode - social (action) edit      */
-#define CON_TRIGEDIT       26 /*. OLC mode - trigger edit    . */
-#define CON_HEDIT          27
-#define CON_LINE_INPUT     32 /* line input */
-#define CON_NOTE_EDIT      35
-#define CON_IDENT          36
-#define CON_ACCOUNT_REMOVE 38
-#define CON_ACCOUNT_CHOOSE 39
-#define CON_ACCOUNT_JOIN   40
-#define CON_ACCOUNT_MANAGE 41
-#define CON_CREATE_NEW 42
-#define CON_VEDIT      43
-#define CON_FIND_HELP  44
-#define CON_ASSEDIT      45     /* OLC mode - Assemblies                */
+#define CON_PLAYING     	0     /* Playing - Nominal state      */
+#define CON_CLOSE       	1     /* Disconnecting                */
+#define CON_GET_NAME         	2     /* By what name ..?             */
+#define CON_NAME_CNFRM       	3   /* Did I get that right, x?     */
+#define CON_PASSWORD         	4     /* Password:                    */
+#define CON_NEWPASSWD        	5     /* Give me a password for x     */
+#define CON_CNFPASSWD        	6     /* Please retype password:      */
+#define CON_RMOTD       	9     /* PRESS RETURN after MOTD      */
+#define CON_MENU       		10     /* Your choice: (main menu)     */
+#define CON_EXDESC     		11     /* Enter a new description:     */
+#define CON_CHPWD_GETOLD   	12 /* Changing passwd: get old     */
+#define CON_CHPWD_GETNEW   	13 /* Changing passwd: get new     */
+#define CON_CHPWD_VRFY     	14 /* Verify new password          */
+#define CON_DELCNF1    		15     /* Delete confirmation 1        */
+#define CON_DELCNF2    		16     /* Delete confirmation 2        */
+#define CON_DISCONNECT      	17     /* In-game disconnection        */
+#define CON_OEDIT    		18  /* OLC mode - object editor        */
+#define CON_REDIT    		19  /* OLC mode - room editor          */
+#define CON_ZEDIT    		20  /* OLC mode - zone info editor          */
+#define CON_MEDIT    		21  /* OLC mode - mobile editor        */
+#define CON_SEDIT    		22  /* OLC mode - shop editor          */
+#define CON_TEDIT    		23  /* OLC mode - text editor          */
+#define CON_CEDIT    		24  /* OLC mode - conf editor          */
+#define CON_AEDIT        	25     /* OLC mode - social (action) edit      */
+#define CON_TRIGEDIT       	26 /*. OLC mode - trigger edit    . */
+#define CON_HEDIT          	27
+#define CON_LINE_INPUT     	32 /* line input */
+#define CON_NOTE_EDIT      	35
+#define CON_IDENT          	36
+#define CON_ACCOUNT_REMOVE 	38
+#define CON_ACCOUNT_CHOOSE 	39
+#define CON_ACCOUNT_JOIN   	40
+#define CON_ACCOUNT_MANAGE 	41
+#define CON_CREATE_NEW 		42
+#define CON_VEDIT      		43
+#define CON_FIND_HELP  		44
+#define CON_ASSEDIT      	45     /* OLC mode - Assemblies                */
 
-#define STATE_ANSI    0
-#define STATE_NEW_HERE 1
-#define STATE_QSEX 2
-#define STATE_QCLASS 3
-#define STATE_CONFIRM_QCLASS 4
-#define STATE_QRACE 5
-#define STATE_CONFIRM_QRACE 6
-#define STATE_CONFIRM_STATS 7
-#define STATE_LOYAL 8
-#define STATE_QSPEC 9
-#define STATE_EMAIL 10
-#define STATE_QCLASSG 11
-#define STATE_CONFIRM_QCLASSG 12
+#define STATE_ANSI    		0
+#define STATE_NEW_HERE 		1
+#define STATE_QSEX 		2
+#define STATE_QCLASS 		3
+#define STATE_CONFIRM_QCLASS 	4
+#define STATE_QRACE 		5
+#define STATE_CONFIRM_QRACE 	6
+#define STATE_CONFIRM_STATS 	7
+#define STATE_LOYAL 		8
+#define STATE_QSPEC 		9
+#define STATE_EMAIL 		10
+#define STATE_QCLASSG 		11
+#define STATE_CONFIRM_QCLASSG 	12
 
 /* remember to compare con list with the con values in constatnststs
    ohh and stop getting boozy while coding.
@@ -905,23 +905,23 @@ class Room;
 #define BODY_WRIST_L    (1 << 15)
 #define BODY_WIELD      (1 << 16)
 #define BODY_HOLD       (1 << 17)
-#define BODY_FACE   (1 << 18)
-#define BODY_EYES   (1 << 19)
-#define BODY_HIPS   (1 << 20)
-#define BODY_EAR_R  (1 << 21)
-#define BODY_EAR_L  (1 << 22)
-#define BODY_ANKLE_R     (1 << 23)
-#define BODY_ANKLE_L     (1 << 24)
+#define BODY_FACE   	(1 << 18)
+#define BODY_EYES   	(1 << 19)
+#define BODY_HIPS   	(1 << 20)
+#define BODY_EAR_R  	(1 << 21)
+#define BODY_EAR_L  	(1 << 22)
+#define BODY_ANKLE_R    (1 << 23)
+#define BODY_ANKLE_L    (1 << 24)
 #define BODY_HORNS      (1 << 25)
 #define BODY_ANTENNA    (1 << 26)
 #define BODY_TAIL       (1 << 27)
 #define BODY_WIELD_2    (1 << 28)
-#define BODY_LEGS_2 (1 << 29)
-#define BODY_FEET_2 (1 << 30)
+#define BODY_LEGS_2 	(1 << 29)
+#define BODY_FEET_2 	(1 << 30)
 #define BODY_FOCUS      (1 << 31)
 /* extra body positions */
-#define BODY_THUMB_R   (1 << 0)
-#define BODY_THUMB_L   (1 << 1)
+#define BODY_THUMB_R    (1 << 0)
+#define BODY_THUMB_L    (1 << 1)
 #define BODY_SADDLE     (1 << 2)
 #define BODY_EAR_TIP    (1 << 3)
 #define BODY_SHOULDER_L (1 << 4)
@@ -932,12 +932,12 @@ class Room;
 #define BODY_KNEE_L     (1 << 9)
 #define BODY_KNEE_R     (1 << 10)
 #define BODY_FLOATING   (1 << 11)
-#define BODY_BACK   (1 << 12)
-#define BODY_CHEST   (1 << 13)
+#define BODY_BACK   	(1 << 12)
+#define BODY_CHEST   	(1 << 13)
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */
 #define ITEM_WEAR_TAKE        0    /* Item can be taken         */
-#define ITEM_WEAR_FINGER 1    /* Can be worn on finger     */
+#define ITEM_WEAR_FINGER      1    /* Can be worn on finger     */
 #define ITEM_WEAR_NECK        2    /* Can be worn around neck   */
 #define ITEM_WEAR_BODY        3    /* Can be worn on body       */
 #define ITEM_WEAR_HEAD        4    /* Can be worn on head       */
@@ -945,28 +945,28 @@ class Room;
 #define ITEM_WEAR_FEET        6    /* Can be worn on feet       */
 #define ITEM_WEAR_HANDS       7    /* Can be worn on hands      */
 #define ITEM_WEAR_ARMS        8    /* Can be worn on arms       */
-#define ITEM_WEAR_SHIELD 9    /* Can be used as a shield   */
+#define ITEM_WEAR_SHIELD      9    /* Can be used as a shield   */
 #define ITEM_WEAR_ABOUT       10   /* Can be worn about body    */
-#define ITEM_WEAR_WAIST  11   /* Can be worn around waist  */
+#define ITEM_WEAR_WAIST       11   /* Can be worn around waist  */
 #define ITEM_WEAR_WRIST       12   /* Can be worn on wrist      */
 #define ITEM_WEAR_WIELD       13   /* Can be wielded            */
 #define ITEM_WEAR_HOLD        14   /* Can be held               */
-#define ITEM_WEAR_FACE          15
+#define ITEM_WEAR_FACE        15
 #define ITEM_WEAR_EYES        16
-#define ITEM_WEAR_HIPS          17
-#define ITEM_WEAR_EAR           18
-#define ITEM_WEAR_ANKLE         19
-#define ITEM_WEAR_HORNS         20
-#define ITEM_WEAR_ANTENNA       21
-#define ITEM_WEAR_TAIL          22
+#define ITEM_WEAR_HIPS        17
+#define ITEM_WEAR_EAR         18
+#define ITEM_WEAR_ANKLE       19
+#define ITEM_WEAR_HORNS       20
+#define ITEM_WEAR_ANTENNA     21
+#define ITEM_WEAR_TAIL        22
 #define ITEM_WEAR_FOCUS       23   // only focus items can be used here
-#define ITEM_WEAR_SHOULDER      24
-#define ITEM_WEAR_CREST              25
-#define ITEM_WEAR_THIGH              26
-#define ITEM_WEAR_KNEE               27
-#define ITEM_WEAR_FLOATING           28
-#define ITEM_WEAR_BACK           29
-#define ITEM_WEAR_CHEST           30
+#define ITEM_WEAR_SHOULDER    24
+#define ITEM_WEAR_CREST       25
+#define ITEM_WEAR_THIGH       26
+#define ITEM_WEAR_KNEE        27
+#define ITEM_WEAR_FLOATING    28
+#define ITEM_WEAR_BACK        29
+#define ITEM_WEAR_CHEST       30
 /* object-related defines ********************************************/
 
 /* Item types: used by obj_data.obj_flags.type_flag */
@@ -1008,7 +1008,7 @@ class Room;
 #define ITEM_PORTAL           36   /* item is a portal(ROOM)       */
 #define ITEM_GUN              37   /* item is a firearm            */
 #define ITEM_AMMO             38   /* item is ammo for a firearm   */
-#define ITEM_WINGS       39   /* item allows you to fly       */
+#define ITEM_WINGS            39   /* item allows you to fly       */
 #define ITEM_SPACESUIT        40   /* item is a spacesuit          */
 #define ITEM_AQUALUNG         41   /* item is an aqualung          */
 #define ITEM_CLIMBABLE        42   /* can climb item               */
@@ -1022,7 +1022,7 @@ class Room;
 #define ITEM_DESCENDABLE      50   /* can climb down object        */
 #define ITEM_PORTAL_BUSH      51   /* item is a portal (bush)      */
 #define ITEM_PORTAL_WATER     52   /* item is a portal (water)     */
-#define ITEM_PORTAL_HOLE 53   /* item is a portal (hole)      */
+#define ITEM_PORTAL_HOLE 	53   /* item is a portal (hole)      */
 #define ITEM_MEAT               54 /* item is meat                 */
 #define ITEM_NUGGET             55 /* item is a gold nugger        */
 #define ITEM_METAL_DETECTOR     56 /* a metal detector             */
@@ -1041,27 +1041,27 @@ class Room;
 #define ITEM_MACHINE            69 /* machine for automating processes  */
 #define ITEM_PICKAXE            70 /* a pickaxe for mining         */
 #define ITEM_GALL_NUT           71 /* gall nuts???                 */
-#define ITEM_SKIN             72   /* mobs skin?                   */
+#define ITEM_SKIN             	72   /* mobs skin?                   */
 #define ITEM_FURNITURE          73 /* item is furniture            */
-#define ITEM_PORTAL_HURDLE    74   /* item is a portal (hurdle)    */
-#define ITEM_THERMAL_PROT     75   /* item protects from heat      */
-#define ITEM_RADIO       76   /* item works like a channel    */
-#define ITEM_FOCUS_MINOR 77   /* item wielded by MAGIC classes to focus */
-#define ITEM_FOCUS_MAJOR 78   /* item used to focus           */
+#define ITEM_PORTAL_HURDLE   	74   /* item is a portal (hurdle)    */
+#define ITEM_THERMAL_PROT     	75   /* item protects from heat      */
+#define ITEM_RADIO       	76   /* item works like a channel    */
+#define ITEM_FOCUS_MINOR 	77   /* item wielded by MAGIC classes to focus */
+#define ITEM_FOCUS_MAJOR 	78   /* item used to focus           */
 #define ITEM_LIGHTSABRE_HILT    79      /* item can be made into a lightsaber*/
 #define ITEM_ZONE_FLAG          80
 #define ITEM_LOCKER             81
 #define ITEM_GAROTTE            82
-#define ITEM_VIAL        83
-#define ITEM_BANKBOOK         84
+#define ITEM_VIAL        	83
+#define ITEM_BANKBOOK         	84
 #define ITEM_SPACEBIKE          85
 #define ITEM_VEHICLE2           86 /* Horus new vehicle code */
 
-#define VIAL_NONE      -1
-#define VIAL_HITP   0
-#define VIAL_MANA   1
-#define VIAL_MOVE   2
-#define VIAL_STAM   3
+#define VIAL_NONE      		-1
+#define VIAL_HITP   		0
+#define VIAL_MANA  		1
+#define VIAL_MOVE   		2
+#define VIAL_STAM   		3
 
 
 
@@ -1082,7 +1082,7 @@ class Room;
 #define ITEM_ANTI_PRIEST      13   /* Not usable by clerics            */
 #define ITEM_ANTI_THIEF       14   /* Not usable by thieves            */
 #define ITEM_ANTI_WARRIOR     15   /* Not usable by warriors           */
-#define ITEM_NOSELL      16   /* Shopkeepers won't touch it       */
+#define ITEM_NOSELL           16   /* Shopkeepers won't touch it       */
 #define ITEM_ANTI_FAUN        17   /* Not usable by fauns              */
 #define ITEM_ANTI_CENTAUR     18   /* Not usable by centaurs           */
 #define ITEM_ANTI_ELF         19   /* Not usable by elves              */
@@ -1093,7 +1093,7 @@ class Room;
 #define ITEM_ANTI_MARTIAN     24   /* Not usable by Martians           */
 #define ITEM_ANTI_SPACE_WOLF  25   /* Not usable by Space Wolves       */
 #define ITEM_ANTI_HUNTER      26   /* Not usable by Hunters            */
-#define ITEM_ANTI_RANGER        27 /* Not usable by Rangers            */
+#define ITEM_ANTI_RANGER      27 /* Not usable by Rangers            */
 #define ITEM_ANTI_GYPSY       28   /* Not usable by Gypsys             */
 #define ITEM_ANTI_ESPER       29   /* Not usable by Espers             */
 #define ITEM_MELT_DROP        30   /* Disappears if dropped            */
@@ -1103,37 +1103,37 @@ class Room;
 #define ITEM_ARTIFACT         34   /* Item is an Artifact - QIC        */
 #define   ITEM_UNIQUE_SAVE    35   /* Item is unique                   */
 #define ITEM_NO_LOCATE        36   /* Item can't be located with spell */
-#define ITEM_HIDDEN      37   /* Item is hidden                   */
+#define ITEM_HIDDEN           37   /* Item is hidden                   */
 #define ITEM_POISONED_1       38   /* Item has been poisoned           */
 #define ITEM_POISONED_2       39   /* Item has been poisoned level 2   */
 #define ITEM_POISONED_3       40   /* Item has been poisoned level 3   */
 #define ITEM_POISONED_4       41   /* Item has been poisoned level 4   */
-#define ITEM_EDIBLE      42   /* Item is edible                   */
+#define ITEM_EDIBLE           42   /* Item is edible                   */
 #define ITEM_MOB_SKIN         43   /* Item is a skin                   */
 #define ITEM_NO_DISARM        44   /* Item can't be disarmed if wielded */
 #define ITEM_ANTI_MALE        45   /* Item can't be used by a male     */
-#define ITEM_ANTI_FEMALE 46   /* Item can't be used by a female   */
+#define ITEM_ANTI_FEMALE      46   /* Item can't be used by a female   */
 #define ITEM_CONTRACEPTIVE    47   /* Item is a contraceptive          */
 #define ITEM_ANTI_MEXICAN     48   /* Item can't be used by a Mexican  */
-#define ITEM_ANTI_CYBORG 49   /* Item can't be used by a Cyborg   */
+#define ITEM_ANTI_CYBORG      49   /* Item can't be used by a Cyborg   */
 #define ITEM_TINKERED         50   /*Item has been tinkered */
-#define ITEM_RANDOMIZED          51     /*item has affects between 0 and the affect number */
+#define ITEM_RANDOMIZED       51     /*item has affects between 0 and the affect number */
 #define ITEM_ENHANCED         52   /*magicly enhanced */
 #define ITEM_MODIFIED         53   /*Item is not the origional */
 #define ITEM_LIGHTSABRE       54      /* item is a weapon-lightsaber*/
 #define ITEM_TWOHANDED        55   /* item needs both hands free to use */
 #define ITEM_LONG_WEP         56
 #define ITEM_SHORT_WEP        57
-#define ITEM_LIFESTEAL          58
-#define ITEM_MANASTEAL          59
-#define ITEM_MOVESTEAL          60
-#define ITEM_NODISPLAY          61
-#define ITEM_NOTDEADYET         62
-#define ITEM_SHIFTABLE          63
+#define ITEM_LIFESTEAL        58
+#define ITEM_MANASTEAL        59
+#define ITEM_MOVESTEAL        60
+#define ITEM_NODISPLAY        61
+#define ITEM_NOTDEADYET       62
+#define ITEM_SHIFTABLE        63
 #define ITEM_KEYSTAY          64
-#define ITEM_PK_CORPSE          65
-#define ITEM_BEHEADED_CORPSE    66
-#define ITEM_ANTI_DT            67  /* Item is immune to DT */
+#define ITEM_PK_CORPSE        65
+#define ITEM_BEHEADED_CORPSE  66
+#define ITEM_ANTI_DT          67  /* Item is immune to DT */
 
 
 /* Modifier constants used with obj affects ('A' fields) */
@@ -1143,7 +1143,7 @@ class Room;
 #define APPLY_INT               3  /* Apply to constitution        */
 #define APPLY_WIS               4  /* Apply to wisdom              */
 #define APPLY_CON               5  /* Apply to constitution        */
-#define APPLY_CHA        6    /* Apply to charisma            */
+#define APPLY_CHA               6    /* Apply to charisma            */
 #define APPLY_REGEN_HIT         7  /* Reserved                     */
 #define APPLY_REGEN_MOVE        8  /* Reserved              #define BODY_QUADRAPED         */
 #define APPLY_AGE               9  /* Apply to age                 */
@@ -1164,13 +1164,13 @@ class Room;
 #define APPLY_SAVING_SPELL     24  /* Apply to save throw: spells  */
 #define APPLY_RACE             25  /* Apply to race                */
 #define APPLY_SPEED            26  /* apply to their speed         */
-#define APPLY_COOLNESS          27 /*some bogus apply that is for rp only */
+#define APPLY_COOLNESS         27 /*some bogus apply that is for rp only */
 #define APPLY_MINE_SPEED       28
 #define APPLY_MINE_BONUS       29
 #define APPLY_MINE_STEALTH     30
 #define APPLY_MINE_DAMAGE      31
 
-#define MAX_APPLY          32
+#define MAX_APPLY              32
 
 
 /* Container flags - value[1] */
