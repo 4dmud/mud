@@ -6684,6 +6684,10 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_CLEAVE ) /100.0f );
 		case SKILL_BEHEAD:
 			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_BEHEAD ) /100.0f );
+		case SKILL_THRUST:
+			return backstab_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_THRUST ) /100.0f );
+		case SKILL_SLIT:
+			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_SLIT ) / 100.0f );
 		case SKILL_KICK:
 		{
 			float spd = GET_SPEED ( ch ) - GET_SPEED ( vict );
@@ -6988,9 +6992,12 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam *= 1.5;
 			break;
 		case SPELL_CALL_LIGHTNING:
-			dam = 1.4;
+			// Tweaking damage of this spell
+			// Base dam to 1.0 from 1.4 since this is a t2 spell
+			// Lightning damage from 1.75 to 1.30 --> Prom
+			dam = 1.0;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 1.75;
+				dam *= 1.30;
 			else if ( sky == SKY_CLOUDLESS )
 				dam *= 0.25;
 			break;
