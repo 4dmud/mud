@@ -343,6 +343,12 @@ void ProtocolInput( descriptor_t *apDescriptor, char *apData, int aSize, char *a
 
    protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 
+   if ( pProtocol == NULL )
+   {
+      ReportBug("ProtocolInput: pProtocol is NULL.\n");
+      return;
+   }
+
    for ( Index = 0; Index < aSize; ++Index )
    {
       /* If we'd overflow the buffer, we just ignore the input */

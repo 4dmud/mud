@@ -397,6 +397,7 @@ Descriptor::~Descriptor() {
     }
 
     ProtocolDestroy(this->pProtocol); // @TODO:PROTOCOL
+    this->pProtocol = NULL;
 
     /* d->comp was still created even if there is no zlib, for comp->state) */
     if (this->comp)

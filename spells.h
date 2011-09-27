@@ -854,3 +854,29 @@ bool operator<(const skillspell_data &a,const skillspell_data &b);
 extern vector<spell_info_type> spell_info;
 
 
+/***************************************************************
+* SKILL TREES - HORUS 2011 *************************************
+****************************************************************/
+
+struct skill_prereq_tye {
+  int skill_num;
+  int min_rank;
+  struct skill_prereq_type *next;
+};
+
+struct sub_node_type {
+  struct head_node_type *head_node;
+  struct sub_node_type *next;
+};
+
+struct head_node_type {
+  int skill_num;
+  struct skill_prereq_type *prereqs; 
+  struct sub_node_type *branches;
+};
+
+struct root_node_type {
+  struct head_node_type *head_node;
+  struct root_node_type *next;
+};
+
