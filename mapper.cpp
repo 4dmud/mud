@@ -397,6 +397,8 @@ void show_map( Character *ch, int mxp/*, char *text */)
         case SECT_PRAIRIE:
         case SECT_BADLANDS:
         case SECT_RAIL:
+	case SECT_DEATHTRAP:
+
           sprintf(buf + strlen(buf), "%s%s", map_bit[sec].colour, map_bit[sec].bit);
           break;
         default:

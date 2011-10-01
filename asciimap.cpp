@@ -196,6 +196,7 @@ void ShowMap ( Character *ch, int min, int max )
 						case SECT_PRAIRIE:
 						case SECT_BADLANDS:
 						case SECT_RAIL:
+						case SECT_DEATHTRAP:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
@@ -238,6 +239,8 @@ void ShowMap ( Character *ch, int min, int max )
 						case SECT_PRAIRIE:
 						case SECT_BADLANDS:
 						case SECT_RAIL:
+						case SECT_DEATHTRAP:
+						
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :

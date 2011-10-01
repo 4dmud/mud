@@ -57,6 +57,7 @@ static struct map_bit_data {
 {"\"", "{cy", "Praire"     },//SECT_PRAIRIE
 {"'", "{cr", "Badlands"    },//SECT_BADLANDS
 {"+", "{cy", "Rail"        },//SECT_RAIL
+{"D", "{cR", "DeathTrap"    },//SECT_DEATHTRAP
 
 {"X", "{cx", "Unknown"     } //NUM_ROOM_SECTORS
     };

@@ -441,7 +441,7 @@ class Room;
 #define SECT_PRAIRIE 		23
 #define SECT_BADLANDS 		24
 #define SECT_RAIL     		25
-
+#define SECT_DEATHTRAP		26
 
 /* char and mob-related defines *****************************************/
 
