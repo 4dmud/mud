@@ -23,14 +23,16 @@ void  draw_map (Character *ch);
 char *get_exits(Character *ch);
 char *msdp_map (Character *ch);
 
-
+// Making some changes per Molly
+// Inside from "{cW" to "{cWH" and City from "{cw" to "cW#"
+// Prom
 static struct map_bit_data {
     char bit[2];
     char colour[5];
     char name[15];
     } map_bit[] = {
-{"%", "{cW", "Inside"      },//SECT_INSIDE         
-{"#", "{cW", "City"        },//SECT_CITY           
+{"%", "{cWH", "Inside"      },//SECT_INSIDE         
+{"#", "{cW#", "City"        },//SECT_CITY           
 {"\"", "{cG", "Field"      },//SECT_FIELD          
 {"@", "{cg", "Forest"      },//SECT_FOREST         
 {"^", "{cG", "Hills"       },//SECT_HILLS          
