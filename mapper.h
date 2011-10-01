@@ -23,22 +23,22 @@ void  draw_map (Character *ch);
 char *get_exits(Character *ch);
 char *msdp_map (Character *ch);
 
-// Making some changes per Molly
-// Inside from "{cW" to "{cWH" and City from "{cw" to "cW#"
+// Making changes suggested by Molly's email.
+// Read that email to see the changes.
 // Prom
 static struct map_bit_data {
     char bit[2];
     char colour[5];
     char name[15];
     } map_bit[] = {
-{"%", "{cWH", "Inside"      },//SECT_INSIDE         
-{"#", "{cW#", "City"        },//SECT_CITY           
+{"H", "{cW", "Inside"      },//SECT_INSIDE         
+{"#", "{cW", "City"        },//SECT_CITY           
 {"\"", "{cG", "Field"      },//SECT_FIELD          
 {"@", "{cg", "Forest"      },//SECT_FOREST         
 {"^", "{cG", "Hills"       },//SECT_HILLS          
 {"^", "{cy", "Mountain"    },//SECT_MOUNTAIN       
-{":", "{cC", "Water-Swim"  },//SECT_WATER_SWIM     
-{":", "{cB", "Water-Boat"  },//SECT_WATER_NOSWIM   
+{"=", "{cc", "Water-Swim"  },//SECT_WATER_SWIM     
+{"=", "{cb", "Water-Boat"  },//SECT_WATER_NOSWIM   
 {"~", "{cb", "Underwater"  },//SECT_UNDERWATER	    
 {"%", "{cC", "Flying"      },//SECT_FLYING         
 {"~", "{cY", "Desert"      },//SECT_DESERT         
@@ -47,10 +47,10 @@ static struct map_bit_data {
 {"@", "{cY", "Entrance"    },//SECT_ENTRANCE	
 {"@", "{cC", "Atmosphere"  },//SECT_ATMOSPHERE 
 {"*", "{cY", "Sun"         },//SECT_SUN	
-{"O", "{cL", "Blackhole"   },//SECT_BLACKHOLE	
+{"0", "{cL", "Blackhole"   },//SECT_BLACKHOLE	
 {"<", "{cM", "Vehicle"     },//SECT_VEHICLE	
 {"\"", "{cg", "Swamp"      },//SECT_SWAMP
-{";", "{cM", "Reef"        },//SECT_REEF  
+{";", "{cL", "Reef"        },//SECT_REEF  
 {"\"", "{cW", "Tundra"     },//SECT_TUNDRA
 {"o", "{cW", "Snow"        },//SECT_SNOW
 {":", "{cC", "Ice"         },//SECT_ICE
