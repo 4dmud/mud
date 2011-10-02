@@ -1152,6 +1152,9 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
 			case SECT_REEF:
 				snprintf ( bufptr, len, "A Reef" );
 				break;
+			case SECT_TUNDRA:
+				snprintf ( bufptr, len, "Tundra Field" );
+				break;
 			case SECT_SNOW:
 				snprintf ( bufptr, len, "Snowy Terrain" );
 				break;
@@ -1267,6 +1270,14 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
 				snprintf ( bufptr, len,
 				           "The waves are breaking over some submerged rocks closed to the surface. In\r\n"
 				           "the swirling, white foam you get glimpses of sharp-toothed, jagged rocks.\r\n" );
+				break;
+			case SECT_TUNDRA:
+				snprintf ( bufptr, len,
+				           "This hard land of permanently frozen subsoil is almost barren, but not quite.\r\n"
+				           "Only the hardiest of lifeforms can survive here. Sometimes the freezing\r\n"
+				           "temperatures of the night cracks the land and offers a place for lichens,\r\n"
+				           "mosses, and even an occasional shrub that becomes stunted by the bitter cold,\r\n"
+				           "manages to spring to life here.\r\n" );
 				break;
 			case SECT_SNOW:
 				snprintf ( bufptr, len,
