@@ -81,9 +81,9 @@ int average;
 {  0,  0, 0,  0},//SECT_VEHICLE	
 {  0,  0, 0,  0},//SECT_SWAMP
 {  0,  0, 0,  0},//SECT_REEF  
-{  0,  0, 0,  0},//SECT_TUNDRA
 {  0,  0, 0,  0},//SECT_SNOW
 {  0,  0, 0,  0},//SECT_ICE
+{  0,  0, 0,  0},//SECT_DT
 };
 */
 int get_temperature(room_rnum room) {

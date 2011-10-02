@@ -1056,7 +1056,7 @@ char *print_weather ( room_rnum room, char *buf, size_t len );
 #define IS_DAY (sunlight == SUN_LIGHT)
 #define IS_NIGHT  (sunlight == SUN_DARK)
 #define IS_HOT(room) ((IS_DAY && SECT(room) == SECT_DESERT) || (SECT(room) == SECT_SUN) || (SECT(room) == SECT_BADLANDS))
-#define IS_COLD(room) ((IS_NIGHT && SECT(room) == SECT_DESERT) || SECT(room) == SECT_ICE || SECT(room) == SECT_SNOW || SECT(room) == SECT_TUNDRA)
+#define IS_COLD(room) ((IS_NIGHT && SECT(room) == SECT_DESERT) || SECT(room) == SECT_ICE || SECT(room) == SECT_SNOW)
 #define IS_IN_WATER(room) (SECT(room) == SECT_UNDERWATER || SECT(room) == SECT_WATER_SWIM || SECT(room) == SECT_WATER_NOSWIM)
 /* OS compatibility ******************************************************/
 

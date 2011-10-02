@@ -51,7 +51,6 @@ static struct map_bit_data {
 {"<", "{cM", "Vehicle"     },//SECT_VEHICLE	
 {"\"", "{cg", "Swamp"      },//SECT_SWAMP
 {";", "{cL", "Reef"        },//SECT_REEF  
-{"\"", "{cW", "Tundra"     },//SECT_TUNDRA
 {"o", "{cW", "Snow"        },//SECT_SNOW
 {":", "{cC", "Ice"         },//SECT_ICE
 {"\"", "{cy", "Praire"     },//SECT_PRAIRIE
