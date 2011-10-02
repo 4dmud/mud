@@ -713,9 +713,9 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 				case SECT_REEF:
 					snprintf ( buf2, sizeof ( buf2 ), "$n clambers %s%s", dirs[dir], local_buf );
 					break;
-				case SECT_TUNDRA:
-					snprintf ( buf2, sizeof ( buf2 ), "$n lopes %s%s", dirs[dir], local_buf );
-					break;
+//				case SECT_TUNDRA:
+//					snprintf ( buf2, sizeof ( buf2 ), "$n lopes %s%s", dirs[dir], local_buf );
+//					break;
 				case SECT_SNOW:
 					snprintf ( buf2, sizeof ( buf2 ), "$n clambers %s%s", dirs[dir], local_buf );
 					break;
@@ -2976,9 +2976,9 @@ int do_simple_obj_move ( struct obj_data *obj, int dir, Character *ch )
 		case SECT_ROAD:
 		case SECT_DESERT:
 		case SECT_ENTRANCE:
-		case SECT_TUNDRA:
-			send_to_room ( IN_ROOM ( obj ), "%s trundles %s.\r\n",obj->short_description, dirs[dir] );
-			break;
+//		case SECT_TUNDRA:
+//			send_to_room ( IN_ROOM ( obj ), "%s trundles %s.\r\n",obj->short_description, dirs[dir] );
+//			break;
 		case SECT_WATER_SWIM:
 		case SECT_UNDERWATER:
 		case SECT_WATER_NOSWIM:

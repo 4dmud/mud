@@ -435,13 +435,12 @@ class Room;
 #define SECT_VEHICLE          	17   /* Internal use only               */
 #define SECT_SWAMP       	18
 #define SECT_REEF               19
-#define SECT_TUNDRA         	20
+#define SECT_DEATHTRAP         	20
 #define SECT_SNOW        	21
 #define SECT_ICE         	22
 #define SECT_PRAIRIE 		23
 #define SECT_BADLANDS 		24
 #define SECT_RAIL     		25
-#define SECT_DEATHTRAP		26
 
 /* char and mob-related defines *****************************************/
 

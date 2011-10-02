@@ -34,7 +34,7 @@
  */
 #define NUM_ZONE_FLAGS 		16
 #define NUM_ROOM_FLAGS 		46
-#define NUM_ROOM_SECTORS	27
+#define NUM_ROOM_SECTORS	26
 
 
 #define NUM_MOB_FLAGS		44
