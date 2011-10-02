@@ -548,6 +548,7 @@ const char *sector_types[] =
 	"Prairie",
 	"Badlands",
 	"Rail",
+	"DeathTrap",
 	"\n"
 };
 
