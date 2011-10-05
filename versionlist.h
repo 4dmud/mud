@@ -21,6 +21,11 @@ a: TODO list completed.
 */
 /* added this file because it will mean easier changes to it via cvs */
 
-cpp_extern const char *fourdimensions_version = "4Dimensions, Version 3.9.8.706";
-cpp_extern const char *circlemud_version = "CircleMUD, version 3.1 patchlevel 21";
-cpp_extern const char *oasisolc_version = "OasisOLC 2.0.6";
+cpp_extern const char *fourdimensions_version;
+cpp_extern const char *circlemud_version;
+cpp_extern const char *oasisolc_version;
+
+const char *fourdimensions_version = "4Dimensions, Version 3.9.8.706";
+const char *circlemud_version = "CircleMUD, version 3.1 patchlevel 21";
+const char *oasisolc_version = "OasisOLC 2.0.6";
+
