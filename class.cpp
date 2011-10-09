@@ -1540,7 +1540,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_NIGHTMARE,       ESP );
 	assign_class ( SPELL_CONFUSE,         ESP | MAG );
 	assign_class ( SPELL_EVIL_EYE,        ESP );
-
+	assign_class ( SKILL_THRUST,	      RAN );
 }
 
 

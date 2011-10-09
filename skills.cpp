@@ -2150,8 +2150,24 @@ ASKILL ( skill_slit )
 
 ASKILL ( skill_thrust )
 {
-	ch->Send ( "This Skill is a WIP.\r\n" );
-	return 0;
+	OBJ_DATA *wep = GET_EQ ( ch, WEAR_WIELD );
+
+	if ( GET_OBJ_VAL ( wep, 3 ) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL ( wep, 3 ) != TYPE_BITE - TYPE_HIT )
+	{
+		*ch << "You need to wield a slashing or biting weapon to thrust.\r\n";
+                return 0;
+	}
+	if ( use_stamina ( ch, 30 ) < 0 )
+        {
+                *ch << "You are far too exhausted!";
+                return 0;
+        }
+        /* Only appropriately skilled PCs and uncharmed mobs */
+        corpse_mod = 1;
+	skill_attack ( ch, vict, SKILL_THRUST, ( IS_NPC ( ch ) ? GET_LEVEL ( ch ) : total_chance ( ch, SKILL_THRUST ) ) > number ( 0, 120 ) );
+	corpse_mod = 0;
+        WAIT_STATE ( ch, 2 RL_SEC );
+        return SKILL_THRUST;
 }
 
 
