@@ -22,9 +22,9 @@
 
 #define EVENT_FILE "blah"
 
-#define DAYS_IN_A_WEEK   7
-#define MAX_COLS         6
-#define BASE_YEAR   1990      /* Year from which all calculations are done.     */
+#define DAYS_IN_A_WEEK  7
+#define MAX_COLS        6
+#define BASE_YEAR   	1990      /* Year from which all calculations are done.     */
 
 /* Function declatations */
 int calender_month ( Character *ch, int month, int year, int theday );
@@ -52,11 +52,11 @@ char * event_day ( int day, int month, int year )
 
 ACMD ( do_calender )
 {
-	int i;                 /* General purpose var        */
-	int year;                   /* year to start display */
-	int num_of_months;               /* Number of months      */
-	int start_month;            /* Start month           */
-	int month;                  /* Current month         */
+	int i;                 		/* General purpose var        */
+	int year;                   	/* year to start display */
+	int num_of_months;              /* Number of months      */
+	int start_month;            	/* Start month           */
+	int month;                  	/* Current month         */
 	int theday;
 	time_t timer1 = time ( 0 );
 	struct tm *tme = localtime ( &timer1 );

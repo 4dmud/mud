@@ -2160,7 +2160,7 @@ ASKILL ( skill_slit )
 	//skill_attack ( ch, vict, SKILL_SLIT, ( IS_NPC ( ch ) ? GET_LEVEL ( ch ) : total_chance ( ch, SKILL_SLIT  ) ) > number ( 0, 120 ) );
         //corpse_mod = 0;
         //WAIT_STATE ( ch, 2 RL_SEC );
-        //return SKILL_THRUST;
+        //return SKILL_SLIT;
 
 
 	ch->Send ( "This Skill is WIP.\r\n" );
@@ -2171,7 +2171,7 @@ ASKILL ( skill_thrust )
 {
 	OBJ_DATA *wep = GET_EQ ( ch, WEAR_WIELD );
 
-	if ( GET_OBJ_VAL ( wep, 3 ) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL ( wep, 3 ) != TYPE_BITE - TYPE_HIT )
+	if ( GET_OBJ_VAL ( wep, 3 ) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL ( wep, 3 ) != TYPE_PIERCE - TYPE_HIT )
 	{
 		*ch << "You need to wield a slashing or biting weapon to thrust.\r\n";
                 return 0;
