@@ -6685,9 +6685,9 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SKILL_BEHEAD:
 			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_BEHEAD ) /100.0f );
 		case SKILL_THRUST:
-			return backstab_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_THRUST ) /100.0f );
+			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_THRUST ) /100.0f );
 		case SKILL_SLIT:
-			return cleave_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_SLIT ) / 100.0f );
+			return backstab_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_SLIT ) / 100.0f );
 		case SKILL_KICK:
 		{
 			float spd = GET_SPEED ( ch ) - GET_SPEED ( vict );

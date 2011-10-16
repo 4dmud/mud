@@ -342,10 +342,10 @@ void assign_skills ( void )
  		SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 ,0, "");
 
 	skillo ( SKILL_SLIT, "slit", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, SKILL_BACKSTAB, 4, 12 ,1, "");
+                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, SKILL_BACKSTAB, 4, 12, 0, "");
 
 	skillo (SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, 
-		SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, SKILL_LONGARM, 4, 12, 1, "");
+		SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, SKILL_LONGARM, 4, 12, 0, "");
 
   skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
   skillo_static(SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8, 1);
@@ -2173,7 +2173,7 @@ ASKILL ( skill_thrust )
 
 	if ( GET_OBJ_VAL ( wep, 3 ) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL ( wep, 3 ) != TYPE_PIERCE - TYPE_HIT )
 	{
-		*ch << "You need to wield a slashing or biting weapon to thrust.\r\n";
+		*ch << "You need to wield a slashing or piercing weapon to thrust.\r\n";
                 return 0;
 	}
 	if ( use_stamina ( ch, 30 ) < 0 )
