@@ -2182,7 +2182,8 @@ ASKILL ( skill_thrust )
                 return 0;
         }
 	// Attack message for thrust --> Prom
-	*ch << "You twirl your weapon and thrusts into your enemy\r\n";
+	*ch << "You twirl your weapon and thrusts it into your enemy\r\n";
+	act ("$e staggers as $n's weapon thrusts into it.\r\n", FALSE, ch, 0, NULL, TO_VICT);
         /* Only appropriately skilled PCs and uncharmed mobs */
         corpse_mod = 1;
 	skill_attack ( ch, vict, SKILL_THRUST, ( IS_NPC ( ch ) ? GET_LEVEL ( ch ) : total_chance ( ch, SKILL_THRUST ) ) > number ( 0, 120 ) );
