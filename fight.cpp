@@ -469,7 +469,8 @@ struct attack_hit_type attack_hit_text[] =
 	{"discharge", "discharge"},
 	{"eruption", "eruption"},
 	{"torrent", "torrent"},
-	{"torpedo", "torpedo"}
+	{"torpedo", "torpedo"},
+	{"thrust", "thrusts"}
 };
 struct hit_chance_type chance_message[] =
 {
