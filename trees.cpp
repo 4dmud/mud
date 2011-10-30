@@ -33,17 +33,18 @@ int tree_total = 0;
 int forest_room;
 struct forest_data *forest = NULL;
 
+//Added on to some of the values since the code is num-1(not cha) -- Prom
 struct stave_stat_table stave_table[MAX_TREE_TYPES] =
 {
-	{APPLY_SPEED, 240,   5,    4},
-	{APPLY_SPEED, 110,   25,   0},
+	{APPLY_SPEED, 241,   5,    4},
+	{APPLY_SPEED, 111,   25,   0},
 	{APPLY_CHA,   9,     35,   0},
-	{APPLY_WIS,   3,     42,   5},
-	{APPLY_HIT,   1000,  47,   2},
-	{APPLY_MANA,  2500,  52,   0},
-	{APPLY_INT,   3,     62,   2},
-	{APPLY_MANA,  1500,  72,   0},
-	{APPLY_HIT,   500,   28,   1}
+	{APPLY_WIS,   4,     42,   5},
+	{APPLY_HIT,   1001,  47,   2},
+	{APPLY_MANA,  2501,  52,   0},
+	{APPLY_INT,   4,     62,   2},
+	{APPLY_MANA,  1501,  72,   0},
+	{APPLY_HIT,   501,   28,   1}
 } ;
 struct obj_data *make_tree ( int v0, int v1, int v2 )
 {
