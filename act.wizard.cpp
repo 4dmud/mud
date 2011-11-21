@@ -2659,7 +2659,7 @@ ACMD ( do_snoop )
 		else
 			tch = victim;
 
-		if ( ( GET_ORIG_LEV ( tch ) ? GET_ORIG_LEV ( tch ) : GET_LEVEL ( tch ) ) >= GET_LEVEL ( ch ) )
+		if ( ( GET_ORIG_LEV ( tch ) ? GET_ORIG_LEV ( tch ) : GET_LEVEL ( tch ) ) > GET_LEVEL ( ch ) )
 		{
 			if ( GET_ORIG_LEV ( tch ) )
 				new_send_to_char ( tch, "%s tried to snoop you but couldn't.\r\n", GET_NAME ( ch ) );

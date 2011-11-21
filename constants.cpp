@@ -522,32 +522,32 @@ const char *exit_bits[] =
 /* SECT_ */
 const char *sector_types[] =
 {
-	"Inside",
+	"Inside",   //0
 	"City",
 	"Field",
 	"Forest",
 	"Hills",
-	"Mountains",
+	"Mountains",  //5
 	"Water (Swim)",
 	"Water (No Swim)",
 	"Underwater",
 	"Air",
-	"Desert",
+	"Desert",  //10
 	"Space",
 	"Road",
 	"Entrance",
 	"Atmosphere",
-	"Sun",
+	"Sun",  //15
 	"Black Hole",
 	"Vehicle(coded)",
 	"Swamp",
 	"Reef",
-	"Tundra",
+	"Tundra",  //20
 	"Snow",
 	"Ice",
 	"Prairie",
-	"Badlands",
-	"Rail",
+	"Badlands", 
+	"Rail",   //25
 	"DeathTrap",
 	"\n"
 };

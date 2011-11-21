@@ -119,11 +119,11 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 			}
 			/* end two way */
 			/* players can't see past these */
-			if ( ( prospect_room->sector_type == SECT_HILLS )
+			if ( /*( prospect_room->sector_type == SECT_HILLS )
 			        || ( prospect_room->sector_type == SECT_CITY )
 			        || ( prospect_room->sector_type == SECT_INSIDE )
 			        || ( prospect_room->sector_type == SECT_FOREST )
-			        || IS_SET_AR ( prospect_room->room_flags, ROOM_NOVIEW ) )
+			        || */ IS_SET_AR ( prospect_room->room_flags, ROOM_NOVIEW ) )
 			{
 				mapgrid[x + offsets[door][0]][y + offsets[door][1]] =
 				    prospect_room->sector_type;
@@ -153,11 +153,11 @@ void ShowMap ( Character *ch, int min, int max )
 	sect = 0;
 
 	/* every row */
-	for ( x = min; x < ( min + 12 ); ++x )
+	for ( x = min; x < ( min + 13 ); ++x )
 	{
 		len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   |   ",
-		                  MDIS ( 0 ) ? map_bit[sect].colour : "", MDIS ( 0 ) ? map_bit[sect].bit : "", MDIS ( 0 ) ? '-' : ' ', MDIS ( 0 ) ? map_bit[sect].name : "",
-		                  MDIS ( 1 ) ? map_bit[sect+1].colour : "", MDIS ( 1 ) ? map_bit[sect+1].bit : "", MDIS ( 1 ) ? '-' : ' ', MDIS ( 1 ) ? map_bit[sect+1].name : "" );
+		                  MDIS ( 0 ) ? map_bit[sect].colour : "", MDIS ( 0 ) ? map_bit[sect].bit : "", MDIS ( 0 ) ? ' ' : ' ', MDIS ( 0 ) ? map_bit[sect].name : "",
+		                  MDIS ( 1 ) ? map_bit[sect+1].colour : "", MDIS ( 1 ) ? map_bit[sect+1].bit : "", MDIS ( 1 ) ? ' ' : ' ', MDIS ( 1 ) ? map_bit[sect+1].name : "" );
 		sect += 2;
 
 		if ( x < max )
@@ -199,7 +199,7 @@ void ShowMap ( Character *ch, int min, int max )
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cM?" );
+										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len," " );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
@@ -242,7 +242,7 @@ void ShowMap ( Character *ch, int min, int max )
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cM?" );
+										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len," " );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );

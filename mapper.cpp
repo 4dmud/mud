@@ -412,8 +412,8 @@ void show_map( Character *ch, int mxp/*, char *text */)
     {
       ch->Send( "%s", buf);
       ch->Send( "{cy|{c0  %s%1s{cx%c%-10s   %s%1s{cx%c%-10s   \r\n",
-                       MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? '-' : ' ', MDIS(0) ? map_bit[sect].name : "",
-                       MDIS(1) ? map_bit[sect+1].colour : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? '-' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
+                       MDIS(0) ? map_bit[sect].colour : "", MDIS(0) ? map_bit[sect].bit : "", MDIS(0) ? ' ' : ' ', MDIS(0) ? map_bit[sect].name : "",
+                       MDIS(1) ? map_bit[sect+1].colour : "", MDIS(1) ? map_bit[sect+1].bit : "", MDIS(1) ? ' ' : ' ', MDIS(1) ? map_bit[sect+1].name : "");
       sect+=2;
 
     }

@@ -5260,8 +5260,9 @@ ACMD ( do_worth )
 	           "|%-32s{cy|#|   {cwLower Right Body Armor: {cL%%%-3d{cy        \r\n"
 	           "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
 	           "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw   | Ethos: {cg%-3s{cy   \r\n"
-	           "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
-	           "|%-32s{cy|#| {cwStamina: {cC%d/%d{cw   | Detector: {cg%-3s{cy \r\n"
+	           "|%-32s{cy|#| {cwStamina: {cC%d/%d{cw    | Detector: {cg%-3s{cy \r\n"
+
+                   "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
 	           "|%-32s{cy|#| {cw Elemental Weakness: {cr%s{cy\r\n"
 	           "|%-32s{cy|#| {cw Elemental Strength: {cc%s{cy\r\n"
 	           "O=====================================================================O{c0\r\n",
@@ -5283,8 +5284,8 @@ ACMD ( do_worth )
 	           SUNNY ? sunnage[12] : moonage[12], chance_hit_part ( ch, PART_LEFT_LEG ),
 	           SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS ( ch ),
 	           SUNNY ? sunnage[14] : moonage[14], update_award ( ch ), *ethos,
-	           SUNNY ? sunnage[14] : moonage[14], buf,
 	           SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
+                   SUNNY ? sunnage[14] : moonage[14], buf,
 	           SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),
 	           SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), FALSE, buf2, sizeof ( buf2 ) ) );
 

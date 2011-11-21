@@ -1,7 +1,7 @@
 /* Defines for ASCII Automapper */
 
-#define MAPX     10
-#define MAPY     8 
+#define MAPX     11
+#define MAPY     12
 /* You can change MAXDEPTH to 1 if the diagonal directions are confusing */
 #define MAXDEPTH  2
 #define MDIS(num)  ((sect + (num)) <= NUM_ROOM_SECTORS)
@@ -58,7 +58,7 @@ static struct map_bit_data {
 {"'", "{cr", "Badlands"    },//SECT_BADLANDS
 {"+", "{cy", "Rail"        },//SECT_RAIL
 
-{"X", "{cx", "Unknown"     } //NUM_ROOM_SECTORS
+{" ", "{cx", "Unknown"     } //NUM_ROOM_SECTORS
     };
 
 
