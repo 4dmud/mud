@@ -119,11 +119,11 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 			}
 			/* end two way */
 			/* players can't see past these */
-			if ( ( prospect_room->sector_type == SECT_HILLS )
+			if (/* ( prospect_room->sector_type == SECT_HILLS )
 			        || ( prospect_room->sector_type == SECT_CITY )
 			        || ( prospect_room->sector_type == SECT_INSIDE )
 			        || ( prospect_room->sector_type == SECT_FOREST )
-			        ||  IS_SET_AR ( prospect_room->room_flags, ROOM_NOVIEW ) )
+			        ||   */  IS_SET_AR ( prospect_room->room_flags, ROOM_NOVIEW ) )
 			{
 				mapgrid[x + offsets[door][0]][y + offsets[door][1]] =
 				    prospect_room->sector_type;

@@ -360,7 +360,7 @@ ASPELL(spell_gate) {
     if (ch == NULL || victim == NULL)
         return;
 
-    if (GET_LEVEL(victim) > MIN(LVL_GOD - 1, level + 3)) {
+    if (GET_LEVEL(victim) > MIN(LVL_IMPL - 1, level + 10)) {
         ch->Send( "%s", SUMMON_FAIL);
         return;
     }
