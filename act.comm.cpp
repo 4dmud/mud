@@ -491,7 +491,6 @@ ACMD(do_say) {
                 if (GET_RACE(ch) == GET_RACE(people))
                     perform_act(buf4, ch, NULL, NULL, people);
                 else {
-		  people->Send("[RSay] ");
 		if (GET_RACE(ch) == RACE_CENTAUR)
 		  perform_act("$n communicates in a series of neighs and whinnies.", ch, NULL, NULL, people);
                 else if (GET_RACE(ch) == RACE_ELF)
