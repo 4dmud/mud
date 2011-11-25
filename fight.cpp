@@ -413,7 +413,7 @@ int steal_affects ( Character *ch,int dam, int w_type, Character *vict );
 int valid_perc ( Character *ch );
 void gain_group_exp ( Character *ch, gold_int gain );
 int fe_special_hit ( Character* ch, Character* vict, int type );
-float skill_type_multi ( Character *ch, Character *vict,int type );
+float skill_type_multi ( Character *ch, Character *vict, int type );
 float atk_chance_multi ( int acm );
 int num_casting ( Character *ch );
 void death_room ( Character *ch );
