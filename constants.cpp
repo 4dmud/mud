@@ -1469,7 +1469,7 @@ const char *extra_bits[] =
 	"anti-centaur",
 	"anti-elf",
 	"anti-dwarf",
-	"<UNUSED>",
+	"Live Grenade",
 	"anti-indian",
 	"anti-gringo",
 	"anti-martian",

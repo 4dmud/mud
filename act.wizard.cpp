@@ -3117,7 +3117,7 @@ ACMD ( do_copyover )
 			REMOVE_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
 
 			write_aliases ( och );
-			snprintf ( buf, sizeof ( buf ), "Colors drain away and the world slowly grinds to a halt...\r\n" );
+			snprintf ( buf, sizeof ( buf ), "The world is engulfed in flames....\r\n" );
 #ifdef HAVE_ZLIB_H
 			if ( d->comp->state == 2 )
 			{

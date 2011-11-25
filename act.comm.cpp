@@ -490,9 +490,27 @@ ACMD(do_say) {
                     continue;
                 if (GET_RACE(ch) == GET_RACE(people))
                     perform_act(buf4, ch, NULL, NULL, people);
-                else
-                    perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
-
+                else {
+		  people->Send("[RSay] ");
+		if (GET_RACE(ch) == RACE_CENTAUR)
+		  perform_act("$n communicates in a series of neighs and whinnies.", ch, NULL, NULL, people);
+                else if (GET_RACE(ch) == RACE_ELF)
+                 perform_act("$n chimes in with a sing-song statement in an ancient language.", ch, NULL, NULL, people);
+		else if (GET_RACE(ch) == RACE_DWARF)
+                 perform_act("$n grunts a bunch of gutteral noises which make no sense to you.", ch, NULL, NULL, people);
+		else if (GET_RACE(ch) == RACE_GRINGO)
+		 perform_act(buf4, ch, NULL, NULL, people);
+		else if (GET_RACE(ch) == RACE_INDIAN)
+		perform_act("$n sings hymns to the sky and uses ancient hand signals.", ch, NULL, NULL, people);
+		else if ( GET_RACE(ch) == RACE_SPACE_WOLF)
+                perform_act("$n barks loudly.", ch, NULL, NULL, people);
+		else if ( GET_RACE(ch) == RACE_MARTIAN)
+                perform_act("$n's antennas begin to glow brightly.", ch, NULL, NULL, people);
+		else if ( GET_RACE(ch) == RACE_FAUN)
+                perform_act("$n whistles a flute-like tune.", ch, NULL, NULL, people);
+		else 
+                perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
+}
             }
             act(buf3, FALSE, ch, NULL, NULL, TO_CHAR);
         } else {

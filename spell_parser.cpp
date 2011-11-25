@@ -1202,6 +1202,9 @@ ACMD ( do_cast )
 
 	GET_WAIT_STATE ( ch ) += ( 1 RL_SEC );
 
+
+	//	ch->Send ( "With the new system this spell would cost %d stamina.\r\n", SINFO.min_level * SINFO.tier / 2 + 1);
+
 	/* Find the target */
 	if ( t != NULL )
 	{

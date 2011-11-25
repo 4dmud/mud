@@ -1934,7 +1934,7 @@ int perform_dupe_check ( Descriptor *d )
 	}
 
 	MXPSendTag( d, "<VERSION>" ); //@TODO:PROTOCOL
-        MCCPBegin( d ); //@TODO:PROTOCOL
+      //  MCCPBegin( d ); //@TODO:PROTOCOL
 
 	return ( 1 );
 }
@@ -2372,7 +2372,7 @@ int enter_player_game ( Descriptor *d )
 	}
 
         MXPSendTag( d, "<VERSION>" ); //@TODO:PROTOCOL
-        MCCPBegin( d ); //@TODO:PROTOCOL
+        // MCCPBegin( d ); //@TODO:PROTOCOL
 
 	return load_result;
 }

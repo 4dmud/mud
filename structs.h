@@ -2150,6 +2150,7 @@ public:
 
     int has_mail;
     int tradepoints;
+    sh_int explorepoints;
 
     /*Thotts: ctell snoop flags */
     int ctellsnoop;

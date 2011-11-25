@@ -687,7 +687,7 @@ void copyover_recover(void) {
             continue;
 
         /* Write something, and check if it goes error-free */
-        if (write_to_descriptor(desc,"\n\r...the hourglass turns over and the sand starts flowing again...\r\n", NULL) == 0) {
+        if (write_to_descriptor(desc,"\n\r...the flames begin to subside and the world brightens...\r\n", NULL) == 0) {
             close(desc);  /* nope */
             continue;
         }
@@ -732,7 +732,7 @@ void copyover_recover(void) {
             delete d;
         } else {          /* ok! */
 
-            write_to_descriptor (desc, "\n\rColor floods back into the world.\r\n", NULL);
+            write_to_descriptor (desc, "\n\rThe world has been reborn.\r\n", NULL);
 #ifdef HAVE_ZLIB_H
 
 //@TODO:PROTOCOL
@@ -1378,10 +1378,12 @@ void heartbeat(int heart_pulse) {
         process_room_affect_queue();
     }
 
-    if (!(heart_pulse % PASSES_PER_SEC)) //@TODO:PROTOCOL
+    if (!(heart_pulse % PASSES_PER_SEC)) {  //@TODO:PROTOCOL
         msdp_update();                   //@TODO:PROTOCOL
+        tick_grenade();
+    }
 
-    if (!(heart_pulse % (PULSE_MOBILE)))
+    if (!(heart_pulse % (PULSE_MOBILE))) 
         mobile_activity();
 
     if (!(heart_pulse % PULSE_AUCTION))

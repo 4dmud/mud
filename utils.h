@@ -723,6 +723,7 @@ int has_body ( Character *ch, int flag );
 #define GET_REGEN_STAMINA(ch)      CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.reg_stamina))
 #define GET_RP_GROUP(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.rp_group))
 #define TRADEPOINTS(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.tradepoints))
+#define EXPLOREPOINTS(ch)      CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.explorepoints))
 #define MINE_DIR(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_dir))
 #define MINE_STEALTH(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_stealth))
 #define MINE_SPEED(ch)        CHECK_PLAYER_SPECIAL((ch), (SPECIALS(ch)->saved.mine_speed))

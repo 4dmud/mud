@@ -639,8 +639,10 @@ int spell_num_dice ( Character *ch )
 			ndice += ( GET_INT ( ch ) > 21 );
 			break;
 		case CLASS_RANGER:
+			ndice = ( GET_LEVEL ( ch ) /  8);
+                        break;
 		case CLASS_GYPSY:
-			ndice = ( GET_LEVEL ( ch ) /8 );
+			ndice = ( GET_LEVEL ( ch ) / 6 );
 			break;
 		case CLASS_WARRIOR:
 		case CLASS_THIEF:
@@ -6210,7 +6212,7 @@ void tick_grenade ( void )
 							}
 
 							/* You can't damage an immortal! */
-							if ( IS_NPC ( tch ) || ( GET_LEVEL ( tch ) < LVL_GOD ) )
+							if ( IS_NPC ( tch ) || ( GET_LEVEL ( tch ) < 58 ) )
 							{
 								act ( "$n is blasted!", TRUE, tch, 0, 0,
 								      TO_ROOM );
@@ -6672,7 +6674,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 	underwater = IS_IN_WATER ( IN_ROOM ( vict ) );
 	raining = ( sky == SKY_RAINING || sky== SKY_LIGHTNING );
 
-
+	ch->Send("{cg(");
 	switch ( type )
 	{
 		default:
@@ -6726,51 +6728,52 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		break;
 		case SPELL_CHILL_TOUCH:     /* chill touch also has an affect */
 			if ( cold )
-				dam = 1.8;
+			{	dam = 1.8; ch->Send("+Cold "); }
 			else if ( hot )
-				dam = 0.5;
+			{	dam = 0.5; ch->Send("-Hot "); }
 			else
 				dam = 1.2;
 			break;
 		case SPELL_BURNING_HANDS:
 			if ( underwater )
-				dam = 0.25;
+			{	dam = 0.25; ch->Send("-Underwater "); }
 			else if ( ( !inside && raining ) || cold )
-				dam = 0.5;
+			{	dam = 0.5; ch->Send("-Cold "); }
 			else if ( hot )
-				dam = 1.25;
+			{	dam = 1.25; ch->Send("+Hot "); }
 			else
 				dam = 1.25;
 			break;
 			break;
 		case SPELL_COLOUR_SPRAY:
 			if ( inside )
-				dam = 1.4;
+			{	dam = 1.4; ch->Send("+Inside "); }
 			else if ( day )
-				dam = 1.51;
+			{	dam = 1.51; ch->Send("+Day "); }
 			else if ( night )
-				dam = 0.75;
+			{	dam = 0.75; ch->Send("-Night "); }
 			break;
 		case SPELL_FIREBALL:
-			if ( inside )
-				dam = 1.5;
+			if ( inside )  
+			{	ch->Send("+Inside ");  dam = 1.5; }
 			else if ( hot )
-				dam = 1.75;
+			{ 	ch->Send("+Hot "); dam = 1.75; }
 			else if ( cold )
-				dam = 0.5;
+			{	ch->Send("-Cold "); dam = 0.5; }
 			else if ( day )
-				dam = 1.4;
+			{	ch->Send("+Day "); dam = 1.4; }
 			else
 				dam = 1.3;
 
 			if ( raining && !inside )
-				dam *= 0.5;
+			{	ch->Send("-Rain "); dam *= 0.5; }
 			else if ( underwater )
-				dam *= 0.01;
+			{	ch->Send("-Underwater "); dam *= 0.01; }
 			break;
 		case SPELL_SOULSMASH:
 			if ( evil )
 			{
+				ch->Send("+Evil ");
 				if ( IS_NPC ( vict ) )
 				{
 					switch ( GET_CLASS ( vict ) )
@@ -6780,6 +6783,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 							break;
 						case CLASS_ANIMAL:
 							dam = 2.0;
+							ch->Send("+Animal ");
 							break;
 						default:
 							dam = 1.6;
@@ -6800,6 +6804,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_DEMONSHRIEK:
 			if ( evil )
 			{
+				ch->Send("+Evil ");
 				if ( IS_NPC ( vict ) )
 				{
 					switch ( GET_CLASS ( vict ) )
@@ -6809,6 +6814,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 							break;
 						case CLASS_ROGUE:
 							dam = 2.0;
+							ch->Send("+Rogue ");
 							break;
 						default:
 							dam = 1.6;
@@ -6829,6 +6835,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_LIFESUCK:
 			if ( evil )
 			{
+			ch->Send("+Evil ");
 				if ( IS_NPC ( vict ) )
 				{
 					switch ( GET_CLASS ( vict ) )
@@ -6838,6 +6845,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 							break;
 						case CLASS_FIGHTER:
 							dam = 2.0;
+							ch->Send("+Fighter ");
 							break;
 						default:
 							dam = 1.5;
@@ -6858,6 +6866,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_BURNINGSKULL:
 			if ( evil )
 			{
+				ch->Send("+Evil ");
 				if ( IS_NPC ( vict ) )
 				{
 					switch ( GET_CLASS ( vict ) )
@@ -6866,6 +6875,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 							return 0.0;
 							break;
 						case CLASS_CASTER:
+							ch->Send("+Caster ");
 							dam = 2.0;
 							break;
 						default:
@@ -6875,19 +6885,19 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				else
 					dam = 1.4;
 				if ( hot )
-					dam *= 1.5;
+				{	dam *= 1.5; ch->Send("+Hot "); }
 				else if ( cold )
-					dam *= 0.5;
+				{	dam *= 0.5; ch->Send("-Cold "); }
 
 				if ( underwater )
-					dam *= 0.5;
+				{	dam *= 0.5; ch->Send("-Underwater "); }
 				else if ( raining )
-					dam *= 0.9;
+				{	dam *= 0.9; ch->Send("-Rain "); }
 
 				if ( IS_EVIL ( vict ) )
 					dam *= 0.5;
 				else if ( IS_GOOD ( vict ) )
-					dam += 1.0;
+				{	dam += 1.0; ch->Send("+Good "); }
 
 			}
 			else
@@ -6896,6 +6906,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_HEARTSQUEEZE:
 			if ( evil )
 			{
+				ch->Send("+Evil ");
 				if ( IS_NPC ( vict ) )
 				{
 					switch ( GET_CLASS ( vict ) )
@@ -6904,6 +6915,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 							return 0.0;
 							break;
 						case CLASS_ANIMAL:
+							ch->Send("+Animal ");
 							dam = 3.5;
 							break;
 						default:
@@ -6931,14 +6943,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				dam = 1.8;
 
 				if ( hot )
-					dam *= 1.5;
+				{	dam *= 1.5; ch->Send("+Hot "); }
 				else if ( cold )
-					dam *= 0.5;
+				{	dam *= 0.5; ch->Send("+Cold "); }
 
 				if ( IS_EVIL ( vict ) )
-					dam *= 0.5;
+				{	dam *= 0.5; ch->Send("-Evil "); }
 				else if ( IS_GOOD ( vict ) )
-					dam += 1.0;
+				{	dam += 1.0; ch->Send("+Good "); }
 
 			}
 			else
@@ -6967,18 +6979,18 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case SPELL_SHOCKING_GRASP:
 			dam = 1.1;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 1.65;
+			{	dam *= 1.65; ch->Send("+Lightning "); }
 			else if ( sky == SKY_CLOUDLESS )
-				dam *= 0.25;
+			{	dam *= 0.25; ch->Send("-Cloudless "); }
 			if ( underwater )
-				dam *= 1.5;
+			{	dam *= 1.5; ch->Send("+Underwater "); }
 			break;
 		case SPELL_LIGHTNING_BOLT:
 			dam = 1.75;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2.10;
+			{	dam *= 2.10; ch->Send("+Lightning "); }
 			else if ( sky == SKY_CLOUDLESS )
-				dam *= 0.25;
+			{	dam *= 0.25; ch->Send("-Cloudless "); }
 			break;
 		case SPELL_ELECTRIC_BLAST:
 			// Changed Damage from 0.8 to 1.95 since it is an 
@@ -6986,73 +6998,73 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			//Prometheus
 			dam = 1.95;
 			if ( sky == SKY_LIGHTNING )
-				dam *= 2.25;
+			{	dam *= 2.25; ch->Send("+Lightning "); }
 			else if ( sky == SKY_CLOUDLESS )
-				dam *= 0.25;
+			{	dam *= 0.25; ch->Send("-Cloudless "); }
 			if ( underwater )
-				dam *= 1.5;
+			{	dam *= 1.5; ch->Send("+Underwater "); }
 			break;
 		case SPELL_CALL_LIGHTNING:
 			// Tweaking damage of this spell
 			// Base dam to 1.0 from 1.4 since this is a t2 spell
 			// Lightning damage from 1.75 to 1.30 --> Prom
 			dam = 1.0;
-			if ( sky == SKY_LIGHTNING )
-				dam *= 1.30;
+			if ( sky == SKY_LIGHTNING ) 
+			{	dam *= 1.30; ch->Send("+Lightning "); }
 			else if ( sky == SKY_CLOUDLESS )
-				dam *= 0.25;
+			{	dam *= 0.25; ch->Send("-Cloudless "); }
 			break;
 		case SPELL_HARM:
 			if ( good )
 				return 0.0;
 			dam = 1.7;
 			if ( evil )
-				dam += 1;
+			{	dam += 1; ch->Send("+Evil "); }
 			if ( IS_GOOD ( vict ) )
-				dam *= 1.3;
+			{	dam *= 1.3; ch->Send("+Good Vict "); }
 			else if ( IS_EVIL ( vict ) )
-				dam *= 0.8;
+			{	dam *= 0.8; ch->Send("-Evil Vict "); }
 			break;
 		case SPELL_ACID_ARROW:
 			if ( underwater )
-				dam = 1.0;
+			{	dam = 1.0; ch->Send("+Underwater "); }
 			else if ( raining )
-				dam = 2.0;
+			{	dam = 2.0; ch->Send("+Rain "); }
 			else
-				dam = 1.40;
+				dam = 1.40; 
 			break;
 		case SPELL_FLAME_ARROW:
 			if ( hot )
-				dam = 1.9;
+			{	dam = 1.9; ch->Send("+Hot "); }
 			else if ( cold )
-				dam = 0.7;
+			{	dam = 0.7; ch->Send("-Cold "); }
 			else if ( day )
-				dam = 1.4;
+			{	dam = 1.4; ch->Send("+Day "); }
 			else
 				dam = 1.35;
 
 			if ( raining && !inside )
-				dam *= 0.5;
+			{	dam *= 0.5;  ch->Send("-Rain "); }
 			else if ( underwater )
-				dam *= 0.02;
+			{	dam *= 0.02; ch->Send("-Underwater "); }
 			break;
 		case SPELL_CONE_OF_COLD:
 			if ( cold )
-				dam = 1.7;
+			{	dam = 1.7; ch->Send("+Cold "); }
 			else if ( hot )
-				dam = 0.5;
-			else if ( day )
-				dam = 1.0;
+			{	dam = 0.5; ch->Send("-Hot "); }
+			else if ( night )
+			{	dam = 1.0;  ch->Send("+Night "); }
 			else
 				dam = 1.5;
 
 			if ( underwater || ( !inside && raining ) )
-				dam += 0.5;
+			{	dam += 0.5; ch->Send("+Rain "); }
 
 			break;
 		case SPELL_HOLY_SHOUT:
 			if ( good )
-				dam = 1.8;
+			{	dam = 1.8;  ch->Send("+Good "); }
 			else
 				dam = 1.0;
 			if ( IS_EVIL ( vict ) && !number ( 0, 3 ) )
@@ -7063,7 +7075,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case SPELL_HOLY_WORD:
 			if ( good )
-				dam = 1.6;
+			{	dam = 1.6; ch->Send("+Good "); }
 			else
 				dam = 1.0;
 			if ( IS_EVIL ( vict ) && !number ( 0, 2 ) )
@@ -7075,20 +7087,20 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case  SPELL_INFERNO:
 			if (( SECT ( IN_ROOM ( vict ))) && (inside))
 			//if ( inside )
-				dam = 1.75;
+			{	dam = 1.75; ch->Send("+Inside "); }
 			else if ( hot )
-				dam = 1.95;
+			{	dam = 1.95; ch->Send("+Hot "); }
 			else if ( cold )
-				dam = 0.75;
+			{	dam = 0.75; ch->Send("-Cold "); }
 			else if ( day )
-				dam = 1.5;
+			{	dam = 1.5; ch->Send("+Day "); }
 			else
 				dam = 1.4;
 
 			if ( !inside && raining )
-				dam *= 0.75;
+			{	dam *= 0.75; ch->Send("-Rain "); }
 			else if ( underwater )
-				dam *= 0.03;
+			{	dam *= 0.03; ch->Send("-Underwater "); }
 			break;
 		case SPELL_MANA_BLAST:
 			// Changing Mana Blast to hopefully
@@ -7104,18 +7116,18 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 					break;
 				case SECT_MOUNTAIN:
 				case SECT_ICE:
-					dam = 1.3;
+				{	dam = 1.3; ch->Send("+Ice "); }
 					break;
 				case SECT_WATER_SWIM:
 				case SECT_WATER_NOSWIM:
 				case SECT_UNDERWATER:
-					dam = 1.6;
+				{	dam = 1.6; ch->Send("+Underwater "); }
 					break;
 				case SECT_FLYING:
 					return 0.0;
 					break;
 				case SECT_SNOW:
-					dam = 0.5;
+				{	dam = 0.5;  ch->Send("-Snow "); }
 					break;
 			}
 			break;
@@ -7123,7 +7135,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			if ( inside )
 				return 0;
 			if ( SECT ( IN_ROOM ( vict ) ) == SECT_CITY )
-				dam = 1.5;
+			{	dam = 1.5;  ch->Send("+City "); }
 			else
 				dam = 1.0;
 			break;
@@ -7145,19 +7157,19 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case ELEM_FIRE:
 			if ( affected_by_spell ( ch, SPELL_MIND_FIRE ) )
-				dam += 0.18;
+			{	dam += 0.18;  ch->Send("+MindFire "); }
 			break;
 		case ELEM_ICE:
 			if ( affected_by_spell ( ch, SPELL_MIND_ICE ) )
-				dam += 0.18;
+			{	dam += 0.18; ch->Send("+MindIce "); }
 			break;
 		case ELEM_ELEC:
 			if ( affected_by_spell ( ch, SPELL_MIND_ELEC ) )
-				dam += 0.18;
+			{	dam += 0.18; ch->Send("+MindElec "); }
 			break;
 		case ELEM_WATER:
 			if ( affected_by_spell ( ch, SPELL_MIND_WATER ) )
-				dam += 0.18;
+			{	dam += 0.18;  ch->Send("+MindWater "); }
 			break;
 	}
 

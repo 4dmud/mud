@@ -367,7 +367,7 @@ string & Descriptor::convert_mxp_tags (const int bMXP, string &src)
 void Descriptor::turn_on_mxp ()
 {
   this->mxp = TRUE;  /* turn it on now */
-  //mccp_off(d);
+  mccp_off(this);
   this->Output( "%s", start_mxp_str);
   this->Output( "%s", MXPTAG("support"));
   this->Output( "%s", MXPMODE(6) );   // permanent secure mode

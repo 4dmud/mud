@@ -498,6 +498,9 @@ ACMD ( do_skills )
 				ch->Send ( "You are exhausted!" );
 				return;
 			}
+
+			//	ch->Send ( "The new system would make this cost %d stamina.\r\n", (SINFO.tier * SINFO.min_level / 2)+1);
+
 			switch ( subcmd )
 			{
 				case SKILL_BACKSTAB:

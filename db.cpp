@@ -5674,8 +5674,8 @@ Descriptor *next;
                                   if (!r->connected && r->character &&
                                   !PLR_FLAGGED(r->character, PLR_WRITING) && obj_index[object].qic) {
                                   r->character->Send( "A new artifact sends ripples across the %s Era. ",  dimension_types[zone_table[GET_ROOM_ZONE(world_vnum[location])].dimension]);
-                                  if ((GET_DETECTOR(r->character) == 1) && (TRADEPOINTS(r->character) >= 15))  {
-     				  TRADEPOINTS(r->character) -= 15;
+                                  if ((GET_DETECTOR(r->character) == 1) && (TRADEPOINTS(r->character) >= 100))  {
+     				  TRADEPOINTS(r->character) -= 100;
                                   r->character->Send( "[%s] [%d TP Left]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name, TRADEPOINTS(r->character));
            }
 				  r->character->Send( "\r\n");
