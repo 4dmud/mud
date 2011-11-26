@@ -7050,11 +7050,11 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case SPELL_CONE_OF_COLD:
 			if ( cold )
-			{	dam = 1.7; ch->Send("+Cold "); }
+			{	dam = 2.5; ch->Send("+Cold "); }
 			else if ( hot )
 			{	dam = 0.5; ch->Send("-Hot "); }
 			else if ( night )
-			{	dam = 1.0;  ch->Send("+Night "); }
+			{	dam = 2.0;  ch->Send("+Night "); }
 			else
 				dam = 1.5;
 
