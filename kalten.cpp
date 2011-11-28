@@ -682,6 +682,10 @@ int check_dam_affects ( Character *ch )
 	if ( AFF_FLAGGED ( ch, AFF_BURNING ) )
 		if ( damage ( ch, ch, 100, SPELL_BURN ) == -1 )
 			return -1;
+	if ( AFF_FLAGGED ( ch, AFF_BLEEDING ) )
+		if ( damage ( ch, ch, 100, SPELL_BLEED ) == -1 )
+                        return -1;
+
 	if ( !ch->zone_empty() )
 	{
 		if ( AFF_FLAGGED ( ch, AFF_FLY ) && GET_POS ( ch ) == POS_STANDING )
