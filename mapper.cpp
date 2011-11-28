@@ -604,7 +604,7 @@ char *msdp_map( Character *ch )
 
   /* Store the map */
   strcat(buf, "X X X X X X X X X X X");
-  for( y = 0; y <= MAPY; y++ )
+  for( y = 2; y <= MAPY-2; y++ )
   {
     for( x = 0; x <= MAPX; x++ )
     {
@@ -617,7 +617,7 @@ char *msdp_map( Character *ch )
          strcat(buf, amap[x][y].tegn);
     }
   }
-  strcat(buf, "X X X X X X X X X X X");
+  strcat(buf, " X X X X X X X X X X X");
   
   IN_ROOM(ch) = was_in;
   return buf;

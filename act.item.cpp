@@ -3302,8 +3302,6 @@ void wear_message ( Character *ch, struct obj_data *obj, int where )
 
 void perform_wear ( Character *ch, struct obj_data *obj, int where )
 {
-
-
 	/*
 	 * ITEM_WEAR_TAKE is used for objects that do not require special bits
 	 * to be put into that position (e.g. you can hold any object, not just

@@ -1,6 +1,6 @@
 /* Defines for ASCII Automapper */
 
-#define MAPX     11
+#define MAPX     10
 #define MAPY     12
 /* You can change MAXDEPTH to 1 if the diagonal directions are confusing */
 #define MAXDEPTH  2
