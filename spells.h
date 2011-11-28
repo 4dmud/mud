@@ -355,7 +355,7 @@ enum spell_list {
     SPELL_DISPEL_BUBBLE,
     SKILL_SLIT,
     SKILL_THRUST,
-    SPARE218,
+    SPELL_BLEED, // Affect for slit - Prom
     SPARE219,
     SPARE220,
     SPARE221,

@@ -763,7 +763,8 @@ class Room;
 #define AFF_RESIST_FIRE       92
 #define AFF_RESIST_COLD       93
 #define AFF_RESIST_ELEC       94
-#define MAX_AFF_APPLY         95
+#define AFF_BLEEDING	      95 // Bleeding affect for slit 
+#define MAX_AFF_APPLY         96
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \
