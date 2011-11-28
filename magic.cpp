@@ -1326,6 +1326,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 		case SPELL_BLEED:
 			af[0].expire = HOURS_TO_EXPIRE ( 1 );
 			af[0].bitvector = AFF_BLEEDING;
+			af[0].bitvector = AFF_SLOW;
 			break;
 	}
 
