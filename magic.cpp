@@ -1324,9 +1324,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
 		// Skeleton for slit affect bleed. It will not be
 		// a spell to cast. Sort of like Poison -- Prom
 		case SPELL_BLEED:
-			af[0].expire = HOURS_TO_EXPIRE ( 1 );
+			af[0].expire = HOURS_TO_EXPIRE ( 5 );
 			af[0].bitvector = AFF_BLEEDING;
-			af[0].bitvector = AFF_SLOW;
 			break;
 	}
 
