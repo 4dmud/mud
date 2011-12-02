@@ -2376,6 +2376,8 @@ void mag_assign_spells ( void )
 
 	spello_system ( SPELL_BLEED, "bleed", 0, 0, 0, 0,
                  TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+	spello_system ( SPELL_BOWEL, "embowel", 0, 0, 0, 0,
+                 TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 	/*
 	 * Declaration of skills - this actually doesn't do anything except
 	 * set it up so that immortals can use these skills by default.  The

@@ -1327,6 +1327,10 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].expire = HOURS_TO_EXPIRE ( 5 );
 			af[0].bitvector = AFF_BLEEDING;
 			break;
+		case SPELL_BOWEL:
+			af[0].expire = HOURS_TO_EXPIRE ( 5);
+			af[0].bitvector = AFF_DISEMBOWEL;
+			break;
 	}
 
 	if ( spellnum == SPELL_MIND_FIRE ||spellnum == SPELL_MIND_WATER ||spellnum == SPELL_MIND_ICE ||spellnum == SPELL_MIND_ELEC )

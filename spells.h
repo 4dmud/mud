@@ -356,7 +356,7 @@ enum spell_list {
     SKILL_SLIT,
     SKILL_THRUST,
     SPELL_BLEED, // Affect for slit - Prom
-    SPARE219,
+    SPELL_BOWEL, // Possible affect for thrust - Prom
     SPARE220,
     SPARE221,
     SPARE222,
