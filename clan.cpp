@@ -1679,7 +1679,7 @@ void do_clan_withdraw(Character *ch, char *arg)
       return;
   }
 
-  if (GET_LEVEL(ch) < LVL_GOD && GET_CLAN_RANK(ch) < clan[clan_num].ranks) {
+  if (GET_LEVEL(ch) < LVL_GOD && GET_CLAN_RANK(ch) < clan[clan_num].privilege[CP_WITHDRAW]) {
      ch->Send("You do not have permission to withdraw from the treasury.\r\n");
      return;
   }
