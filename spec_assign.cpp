@@ -342,6 +342,7 @@ void assign_objects(void)
     ASSIGNOBJ(10031, gen_board);
     ASSIGNOBJ(10233, gen_board);
     ASSIGNOBJ(26708, gen_board);	/* board for the gladiator school */
+    ASSIGNOBJ(28703, gen_board);	// Vampire elder board
     
 #endif
 
@@ -361,7 +362,7 @@ void assign_objects(void)
     ASSIGNOBJ(13057, bank);
     ASSIGNOBJ(17416, bank);	/* bank in Palpatines area */
     ASSIGNOBJ(21615, bank);
-  ASSIGNOBJ(9436, bank); //chaos
+    ASSIGNOBJ(9436, bank); //chaos
 
     ASSIGNOBJ(284, radar);
     ASSIGNOBJ(8282, radar);
