@@ -103,7 +103,7 @@ Be sure to also change NUM_OF_BOARDS in board.h
     {28736, 0, 0, LVL_GOD, LIB_ETC "board.vampire", 0},
     {10233, 0, 0, LVL_GOD, LIB_ETC "board.qual", 0},
     {26708, 0, 0, LVL_GOD, LIB_ETC "board.gladiators", 0},
-    {28703, 0, 0, LVL_GOD, LIB_ETC "board.vampire2", 0}
+    {28799, 0, 0, LVL_GOD, LIB_ETC "board.vampire2", 0}
   };
 
 /* local functions */
