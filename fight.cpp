@@ -6658,8 +6658,8 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 	int good = FALSE, evil = FALSE;
 	float dam = 1.0;
 	int inside, hot, cold, underwater, sky, raining, day, night;
-
-	m_user = ( IS_MAGE ( ch ) || IS_ESPER ( ch ) || IS_PRIEST ( ch ) || IS_NPC ( ch ) );   /*The main magic users */
+	// Main Magic users line below.
+	m_user = ( IS_MAGE ( ch ) || IS_ESPER ( ch ) || IS_PRIEST ( ch ) || IS_NPC ( ch ) );
 	chclass = GET_CLASS ( ch );
 	chcha = GET_CHA ( ch );
 	tier = current_class_is_tier_num ( ch );

@@ -2185,7 +2185,7 @@ ASKILL ( skill_thrust )
                 return 0;
         }
 	// Attack message for thrust --> Prom
-	*ch << "You twirl your weapon and thrusts it into your enemy\r\n";
+	*ch << "You twirl your weapon and thrusts it into your enemy.\r\n";
 	// Messages to room and others (not pc) -- Prom
 	//act ("$e staggers as $n's weapon thrusts into it.", FALSE, ch, 0, NULL, TO_NOTVICT);
         //
