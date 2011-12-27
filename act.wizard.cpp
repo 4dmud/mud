@@ -409,6 +409,8 @@ void write_ignorelist ( Character *ch );
 void Crash_rentsave ( Character *ch, int cost );
 void read_ignorelist ( Character *ch );
 ACMD ( do_gen_ps );
+obj_data* find_corpse(Character* ch);
+int automeld ( OBJ_DATA *corpse );
 
 /* local functions */
 int spell_price ( struct obj_data *obj, int val );
@@ -1489,7 +1491,7 @@ void list_zone_commands_room ( Character *ch, room_vnum rvnum )
 		}
 		subcmd++;
 	}
-	ch->Send ( nrm );
+	ch->Send ("%s", nrm );
 	if ( !count )
 		ch->Send ( "None!\r\n" );
 
@@ -5039,9 +5041,9 @@ set_fields[] =
 	{"trains", LVL_SEN, NPC, MISC},
 	{"outcast", LVL_SEN, PC, BINARY}, /* 84 */
         {"ethos", LVL_SEN, PC, NUMBER},
+	{"automeld", LVL_CRT, PC, NUMBER},
 	{   "\n", 0, BOTH, MISC}
 };
-
 
 int perform_set ( Character *ch, Character *vict, int mode,
                   char *val_arg )
@@ -5052,6 +5054,7 @@ int perform_set ( Character *ch, Character *vict, int mode,
 	char buf[MAX_STRING_LENGTH];
 	int parse_race ( char* arg, bool consider_gladiator );
 	void set_race ( Character *ch, int race );
+	obj_data* tmp_obj;
 
 	/* Check to make sure all the levels are correct */
 	if ( GET_LEVEL ( ch ) != LVL_IMPL )
@@ -5701,6 +5704,21 @@ int perform_set ( Character *ch, Character *vict, int mode,
     case 85:
                 GET_ETHOS(vict) = value;
 	        break;
+    case 86:
+	        tmp_obj = find_corpse(vict);
+		if (!tmp_obj) {
+			ch->Send("Corpse not found.\r\n");
+			return 0;
+		}
+		else if (value <= 0) {
+			automeld(tmp_obj);
+		}
+		else {
+			GET_OBJ_TIMER(tmp_obj) = value;
+			GET_OBJ_EXPIRE ( tmp_obj ) = ( GET_OBJ_TIMER ( tmp_obj ) * SECS_PER_MUD_HOUR ) + time ( 0 );
+			save_corpses();
+		}
+		break;
 
     default:
         ch->Send( "Can't set that!\r\n");
@@ -6498,8 +6516,7 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
 
   die_num = atoi(arg1);
   die_size = atoi(arg2);
-  sprintf(buf, "Weapons with %dd%d :\r\n", die_num, die_size);
-  ch->Send(buf);
+  ch->Send(buf, "Weapons with %dd%d :\r\n", die_num, die_size);
  
   DYN_CREATE;
   *dynbuf = 0;
@@ -7542,12 +7559,13 @@ ACMD ( do_ctellsnoop )
 	else
 	{
 		char buf3[50];
+		int len=50;
 		if ( GET_CSNP_LVL ( ch ) ==-2 )
-			snprintf ( buf3,50,"None" );
+			len-=snprintf ( buf3,50,"None" );
 		else if ( GET_CSNP_LVL ( ch ) ==-1 )
-			snprintf ( buf3,50,"All" );
+			len-=snprintf ( buf3,50,"All" );
 		else if ( GET_CSNP_LVL ( ch ) >=0 && GET_CSNP_LVL ( ch ) <=num_of_clans )
-			sprintf ( buf3,clan[GET_CSNP_LVL ( ch ) ].name );
+			snprintf ( buf3,len,"%s",clan[GET_CSNP_LVL ( ch ) ].name );
 		ch->Send ( "Usage: csnoop clannumber/none/all.\r\nCurrent setting: %s.\r\n",buf3 );
 	}
 }

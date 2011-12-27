@@ -75,6 +75,14 @@ void clean_string(char *buffer) {
 void add_corpse_to_list(OBJ_DATA *corpse);
 void remove_corpse_from_list(OBJ_DATA *corpse);
 
+obj_data* find_corpse(Character* ch) {
+	for (struct corpse_list_data* ce = corpse_list;ce != NULL;ce = ce->next) 
+		if (GET_OBJ_VAL(ce->corpse, 0) == get_pidx_from_name(ch))
+			return ce->corpse;
+
+	return NULL;
+}
+
 int corpse_save(struct obj_data *obj, FILE * fp, int location,
                 bool recurse_this_tree) {
     /* This function basically is responsible for taking the    */
