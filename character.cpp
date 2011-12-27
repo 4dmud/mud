@@ -574,7 +574,7 @@ void Character::init()
 	}
 	catch ( MudException &e )
 	{
-		log ( e.Message() );
+	  log ( "%s", e.Message() );
 	}
 
 	pi.SetAcc ( i, pi.TopIdNum );

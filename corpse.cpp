@@ -24,6 +24,7 @@
 #include "utils.h"
 #include "spells.h"
 #include "graph.h"
+#include "descriptor.h"
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE LIB_MISC"corpse.save"
@@ -45,6 +46,7 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate);
 int new_write_corpse(FILE * fp, struct obj_data *obj, int locate);
 void new_load_corpses(void);
 void check_timer(obj_data *obj);
+int automeld(obj_data *corpse);
 /* Local Function Declerations */
 void do_show_corpses(Character *ch);
 void remove_corpse_from_list(OBJ_DATA *corpse);
@@ -602,3 +604,17 @@ ACMD(do_corpse) {
 
 }
 
+Character *find_char_by_uid_in_lookup_table ( long uid ); //this is from dg_scripts.cpp
+void restore_all_corpses() {
+	corpse_list_data* next = NULL;
+	for (struct corpse_list_data* ce = corpse_list;ce;ce=next) {
+		next = ce->next;
+		if (ce->corpse) {
+			int id = GET_OBJ_VAL(ce->corpse,0);
+			automeld(ce->corpse);
+			Character* ch = find_char_by_uid_in_lookup_table(id);
+			if (ch)
+				write_to_descriptor(ch->desc->descriptor, "You meld in a sudden flash of light!\r\n", ch->desc->comp);
+		}
+	}
+}

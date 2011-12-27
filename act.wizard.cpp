@@ -411,7 +411,7 @@ void read_ignorelist ( Character *ch );
 ACMD ( do_gen_ps );
 obj_data* find_corpse(Character* ch);
 int automeld ( OBJ_DATA *corpse );
-
+void restore_all_corpses();
 /* local functions */
 int spell_price ( struct obj_data *obj, int val );
 void show_door_errors ( Character *ch );
@@ -3069,6 +3069,8 @@ ACMD ( do_copyover )
 		ch->Send ( "Copyover file not writeable, aborted.\r\n" );
 		return;
 	}
+
+	restore_all_corpses();
 
 	alarm(0);
 	save_all(); //done
