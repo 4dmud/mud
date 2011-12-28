@@ -1913,8 +1913,10 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 	// Changing the delay in Inferno to a shorter delay - Prom
+	// Also removing directional and shortening delay again 
+	// Changed TAR_IGNORE | TAR_AREA_DIR to TAR_IGNORE and delay of 10 -- Prom
 	spello ( SPELL_INFERNO, "inferno", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 30,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 
