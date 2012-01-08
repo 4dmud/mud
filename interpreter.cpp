@@ -2288,7 +2288,7 @@ int enter_player_game ( Descriptor *d )
 			case CLASS_MAGE:
 				//magic glasses
 				if ( ( obj = read_object ( 3186, VIRTUAL ) ) != NULL )
-					perform_wear ( ch, obj, WEAR_EYES );
+					perform_wear ( ch, obj, WEAR_ABOUT );
 				break;
 			case CLASS_PRIEST:
 				//ring of light
