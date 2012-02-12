@@ -1400,7 +1400,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_DEMONSHRIEK,      ESP | PRI );
 	assign_class ( SPELL_SHIELD_ICE,      MAG | PRI | ESP | RAN );
 	assign_class ( SPELL_CLONE,            ESP | PRI );
-	assign_class ( SPELL_MINOR_IDENTIFY,   ESP | GYP | PRI );
+	//assign_class ( SPELL_MINOR_IDENTIFY,   ESP | GYP | PRI );
 	assign_class ( SPELL_AIR_ELEMENTAL,    MAG );
 	assign_class ( SPELL_STEELSKIN,           PRI | ESP );
 	assign_class ( SPELL_FLIGHT,           MAG );
