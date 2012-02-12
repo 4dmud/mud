@@ -1060,7 +1060,8 @@ int times = 1;
 
 // Remarking this spell out till we can figure out what is wrong -- Prom
 
-//ASPELL(spell_minor_identify) {
+ASPELL(spell_minor_identify) {
+	ch->Send( "Don't use I crash the mud \r\n" );
 //    const char *min_id[] = {
 //                         "It would bring %s if you sold it!\r\n",    /* NONE */
 //                         "your physique!\r\n",   /* STR */
@@ -1149,7 +1150,7 @@ int times = 1;
 //  }
 
 
-//}
+}
 
 
 void fchar_init_flags_room(Character *ch, int *numtargets) {
