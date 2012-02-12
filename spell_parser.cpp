@@ -692,9 +692,9 @@ int call_magic ( Character *caster, Character *cvict,
 			case SPELL_ENCHANT_WEAPON:
 				MANUAL_SPELL ( spell_enchant_weapon );
 				break;
-			case SPELL_MINOR_IDENTIFY:
-				MANUAL_SPELL ( spell_minor_identify );
-				break;
+			//case SPELL_MINOR_IDENTIFY:
+			//	MANUAL_SPELL ( spell_minor_identify );
+			//	break;
 			case SPELL_LOCATE_OBJECT:
 				MANUAL_SPELL ( spell_locate_object );
 				break;
@@ -1863,9 +1863,9 @@ void mag_assign_spells ( void )
 	         100 , 10, POS_STANDING, TAR_OBJ_INV | TAR_OBJ_EQUIP,
 	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
-	spello ( SPELL_MINOR_IDENTIFY, "minor identify", 75 , 30 ,
-	         5, POS_RESTING, TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1, "" );
+	//spello ( SPELL_MINOR_IDENTIFY, "minor identify", 75 , 30 ,
+	//         5, POS_RESTING, TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL,
+	//         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 4, 1, "" );
 
 	spello ( SPELL_ENERGY_DRAIN, "energy drain", 40 , 25 , 1,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
@@ -2551,9 +2551,9 @@ int elemental_type ( int spell )
 		case SPELL_GATE:
 			retval = ELEM_MIND;
 			break;
-		case SPELL_MINOR_IDENTIFY:
-			retval = ELEM_MIND;
-			break;
+		//case SPELL_MINOR_IDENTIFY:
+		//	retval = ELEM_MIND;
+		//	break;
 		case SPELL_REMOVE_ALIGNMENT:
 			retval = ELEM_SPIRIT;
 			break;

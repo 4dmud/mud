@@ -1058,96 +1058,99 @@ int times = 1;
     return;
 }
 
-ASPELL(spell_minor_identify) {
-    const char *min_id[] = {
-                         "It would bring %s if you sold it!\r\n",    /* NONE */
-                         "your physique!\r\n",   /* STR */
-                         "your speed!\r\n", /* DEX */
-                         "your thoughts!\r\n",   /* INT */
-                         "your knowledge of things!\r\n",  /* WIS */
-                         "your endurance!\r\n",  /* CON */
-                         "your appearance!\r\n", /* CHA */
-                         "!CLASS!\r\n",          /* CLASS */
-                         "!LEVEL!\r\n",          /* LEVEL */
-                         "the time!\r\n",   /* AGE */
-                         "your burden of life!\r\n",  /* WEIGHT */
-                         "your vertical stance!\r\n", /* HEIGHT */
-                         "your magical aura!\r\n",    /* MANA */
-                         "your physical resistance!\r\n",  /* HIT */
-                         "your ability to move!\r\n", /* MOVE */
-                         "your wealth!\r\n",     /* GOLD */
-                         "your conscious perception!\r\n", /* EXP */
-                         "your armor!\r\n", /* AC */
-                         "the way you hit!\r\n", /* HITROLL */
-                         "the damage you give!\r\n",  /* DAMROLL */
-                         "your ability to withstand paralysis!\r\n", /* PARA */
-                         "your ability to withstand rod attacks!\r\n",    /* ROD */
-                         "your ability to withstand petrification!\r\n",  /* PETRI */
-                         "your ability to withstand breath Attacks!\r\n", /* BREATH */
-                         "your ability to withstand spells!\r\n",    /* SPELL */
-                         "!RACES!\r\n"      /* RACE */
-                         "\n"
-                     };
+// Remarking this spell out till we can figure out what is wrong -- Prom
 
-    int cost, i, x, mes_get = 0;
-    bool found = FALSE, sent = FALSE;
+//ASPELL(spell_minor_identify) {
+//    const char *min_id[] = {
+//                         "It would bring %s if you sold it!\r\n",    /* NONE */
+//                         "your physique!\r\n",   /* STR */
+//                         "your speed!\r\n", /* DEX */
+//                         "your thoughts!\r\n",   /* INT */
+//                         "your knowledge of things!\r\n",  /* WIS */
+//                         "your endurance!\r\n",  /* CON */
+//                         "your appearance!\r\n", /* CHA */
+//                         "!CLASS!\r\n",          /* CLASS */
+//                         "!LEVEL!\r\n",          /* LEVEL */
+//                         "the time!\r\n",   /* AGE */
+//                         "your burden of life!\r\n",  /* WEIGHT */
+//                         "your vertical stance!\r\n", /* HEIGHT */
+//                         "your magical aura!\r\n",    /* MANA */
+//                         "your physical resistance!\r\n",  /* HIT */
+//                         "your ability to move!\r\n", /* MOVE */
+//                         "your wealth!\r\n",     /* GOLD */
+//                         "your conscious perception!\r\n", /* EXP */
+//                         "your armor!\r\n", /* AC */
+//                         "the way you hit!\r\n", /* HITROLL */
+//                         "the damage you give!\r\n",  /* DAMROLL */
+//                         "your ability to withstand paralysis!\r\n", /* PARA */
+//                         "your ability to withstand rod attacks!\r\n",    /* ROD */
+//                         "your ability to withstand petrification!\r\n",  /* PETRI */
+//                         "your ability to withstand breath Attacks!\r\n", /* BREATH */
+//                         "your ability to withstand spells!\r\n",    /* SPELL */
+//                         "!RACES!\r\n"      /* RACE */
+//                         "\n"
+//                     };
 
-    if (!obj) {
-        ch->Send("You can only cast this on objects.\r\n");
-        return;
-    }
+//    int cost, i, x, mes_get = 0;
+//    bool found = FALSE, sent = FALSE;
 
-    cost = GET_OBJ_COST(obj);
+//    if (!obj) {
+//        ch->Send("You can only cast this on objects.\r\n");
+//        return;
+//    }
 
-    if (cost == 0)
-        cost = number(1, 1000);
+//    cost = GET_OBJ_COST(obj);
 
-    if (!obj->affected[0].modifier) {
-        ch->Send( "%s cannot help you in any special way.\r\nBut it might \
-                  bring %s if you sold it.\r\n", obj->short_description,
-                  money_desc(cost));
-        return;
-    }
-    ch->Send("%s can help you in the following way:\r\n",
-             obj->short_description);
-    for (i = 0; i < MAX_OBJ_AFFECT; i++)
-        if (obj->affected[i].modifier) {
-            if (number(0, 20) > GET_INT(ch) && GET_LEVEL(ch) < LVL_GOD)
-                continue;
+//    if (cost == 0)
+//        cost = number(1, 1000);
 
-            switch (obj->affected[i].location) {
-            case APPLY_NONE:
+//    if (!obj->affected[0].modifier) {
+//        ch->Send( "%s cannot help you in any special way.\r\nBut it might \
+//                  bring %s if you sold it.\r\n", obj->short_description,
+//                  money_desc(cost));
+//        return;
+//    }
+//    ch->Send("%s can help you in the following way:\r\n",
+//             obj->short_description);
+//    for (i = 0; i < MAX_OBJ_AFFECT; i++)
+//        if (obj->affected[i].modifier) {
+//            if (number(0, 20) > GET_INT(ch) && GET_LEVEL(ch) < LVL_GOD)
+//                continue;
+
+//            switch (obj->affected[i].location) {
+//            case APPLY_NONE:
                 // case APPLY_RACE:
                 //         case APPLY_CLASS:
                 //         case APPLY_LEVEL:
-                if (!found) {
-                    ch->Send( min_id[0], money_desc(cost));
-                    found = TRUE;
-                    sent = TRUE;
-                }
-                break;
-            default:
-                mes_get = obj->affected[i].location;
-                x = number(0, 1);
-                ch->Send( "%s%s",
-                          (x ? "it might do something about " :
-                           "It could do something about "), min_id[mes_get]);
-                sent = TRUE;
-                break;
-            }
-        }
+//                if (!found) {
+//                    ch->Send( min_id[0], money_desc(cost));
+//                    found = TRUE;
+//                    sent = TRUE;
+//                }
+//                break;
+//            default:
+//                mes_get = obj->affected[i].location;
+//                x = number(0, 1);
+//               ch->Send( "%s%s",
+//                          (x ? "it might do something about " :
+//                           "It could do something about "), min_id[mes_get]);
+//                sent = TRUE;
+//                break;
+//            }
+//        }
 
 
-    if (!sent) {
-        ch->Send(
-            "It seems to you that %s cannot help you in any special way.\r\n",
-            obj->short_description);
+//    if (!sent) {
+//        ch->Send(
+//            "It seems to you that %s cannot help you in any special way.\r\n",
+//           obj->short_description);
 
-        return;
-    }
+//        return;
+//  }
 
 
-}
+//}
+
 
 void fchar_init_flags_room(Character *ch, int *numtargets) {
     Character *vict;
