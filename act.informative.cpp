@@ -4378,7 +4378,7 @@ const char * speed_consider[] =
 const char * hitp_consider[] =
 {
 	"$E has so few hitpoints that they should be legally dead.",
-	"$E has so few hitpoints that it's almost ridiculus.",
+	"$E has so few hitpoints that it's almost ridiculous.",
 	"$S hitpoints are in the hundreds.",
 	"$S hitpoints are in the thousands.",
 	"$S hitpoints are in the tens of thousands.",
