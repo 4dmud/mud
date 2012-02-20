@@ -5349,7 +5349,7 @@ void raw_kill ( Character *ch, Character *killer )
               sprintf(buf, "Clan deed for %s is lying here!\r\n", zone_table[IN_ROOM(killer)->zone].name);
               obj->description = strdup(buf);
               GET_OBJ_VAL(obj, 0) = zone_num;
-              GET_OBJ_TIMER(obj) = 5;
+              GET_OBJ_TIMER(obj) = 50;
               check_timer(obj);
               obj_to_char(obj, ch);
               load_otrigger(obj);

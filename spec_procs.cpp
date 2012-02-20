@@ -548,6 +548,7 @@ SPECIAL(clan_deeds)
           cl_next = cl->next;
           if (is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) {
               REMOVE_FROM_LIST(cl, clan[j].deeds, next);
+    	      send_to_all("{cY%s just lost the %s to %s!\r\n{cn", clan[j].name, deed->short_description, clan[i].name);
               free(cl->name);
               free(cl);
           }
