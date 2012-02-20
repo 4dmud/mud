@@ -2669,6 +2669,60 @@ ACMD ( do_eat )
 }
 
 
+ACMD ( do_analyze )
+{
+	struct obj_data *item;
+	struct obj_data *item2;
+	char arg[MAX_INPUT_LENGTH];
+        char gemname[MAX_INPUT_LENGTH];
+	int i;
+
+	one_argument ( argument, arg );
+
+	if ( IS_NPC ( ch ) )   /* Cannot use GET_COND() on mobs. */
+		return;
+
+	if ( !*arg )
+	{
+		ch->Send ( "Analyze what exactly?\r\n" );
+		return;
+	}
+	if ( ! ( item = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+	{
+		ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
+		return;
+	}	
+	if (OBJ_FLAGGED(item, ITEM_NORENT) || OBJ_FLAGGED(item, ITEM_ARTIFACT))
+     {
+		ch->Send ( "You can not analyze that.\r\n");
+		return;
+	}
+	ch->Send ( "You begin to analyze the object.\r\n");
+	if (!number(0, 10))
+	{
+	ch->Send ( "Your analysis returns a breakthrough!\r\n");
+        item2 = create_obj ( NOTHING );
+                        snprintf ( gemname, sizeof ( gemname ), "a template of %s", item->short_description );
+                        item2->name = strdup("template");
+                        item2->short_description = str_dup ( gemname );
+                        item2->description = strdup("A crafting template is lying upon the ground here.");
+                        GET_OBJ_TYPE(item2) = ITEM_TEMPLATE;
+                        SET_BIT_AR ( GET_OBJ_WEAR ( item2 ), ITEM_WEAR_TAKE);
+			SET_BIT_AR ( GET_OBJ_EXTRA ( item2 ), ITEM_NORENT);
+	   for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+        if ((item->affected[i].location != APPLY_NONE) &&
+                (item->affected[i].modifier != 0)) { 
+	item2->affected[i].location = item->affected[i].location;
+	item2->affected[i].modifier = item->affected[i].modifier;
+     }
+    }
+	obj_to_char(item2, ch);
+   }
+    ch->Send("%s crumbles into dust.\r\n", item->short_description);
+	extract_obj(item);
+
+}
+
 ACMD ( do_pour )
 {
 	char arg1[MAX_INPUT_LENGTH];

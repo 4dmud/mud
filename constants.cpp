@@ -682,6 +682,7 @@ const char *action_bits[] =
 	"POSTMASTER",
 	"QUESTMOB",
 	"TRAINER",
+	"BOSS",
 	"\n"
 };
 
@@ -1394,6 +1395,9 @@ const char *item_types[] =
 	"bankbook",
 	"spacebike",
         "vehicle2",
+	"crafting gem",
+	"template",
+	"crafting base",
 	"\n"
 };
 

@@ -37,11 +37,11 @@
 #define NUM_ROOM_SECTORS	26
 
 
-#define NUM_MOB_FLAGS		44
+#define NUM_MOB_FLAGS		46
 #define NUM_AFF_FLAGS		88
 #define NUM_ATTACK_TYPES	17
 
-#define NUM_ITEM_TYPES		87
+#define NUM_ITEM_TYPES		90
 #define NUM_ITEM_FLAGS		65
 #define NUM_ITEM_WEARS 		29  //44
 #define NUM_APPLIES		32

@@ -694,9 +694,9 @@ int check_dam_affects ( Character *ch )
 			{
 				if ( number ( 0, 1 ) )
 				{
-					if ( !IS_NPC ( ch ) )
+/*					if ( !IS_NPC ( ch ) )
 					{
-						char buf[MAX_INPUT_LENGTH];
+						char buf[MAX_INPUT_LENGTH]; 
 						snprintf ( buf,sizeof ( buf ), "You flap your %s wings and lift yourself a little higher.", wing_colour ( GET_ALIGNMENT ( ch ) ) );
 						act ( buf, FALSE, ch, 0, 0, TO_CHAR );
 						snprintf ( buf,sizeof ( buf ), "$n flaps $s %s wings and lifts $mself a little higher.",  wing_colour ( GET_ALIGNMENT ( ch ) ) );
@@ -705,7 +705,7 @@ int check_dam_affects ( Character *ch )
 					else
 					{
 						act ( "$n flaps $s wings and lifts $mself a little higher.", FALSE, ch, 0, 0, TO_ROOM );
-					}
+					} */
 				}
 				else
 				{
@@ -719,7 +719,7 @@ int check_dam_affects ( Character *ch )
 					}
 					else
 					{
-						act ( "$n stills $s wings and swoops a little closer to the ground.", FALSE, ch, 0, 0, TO_ROOM );
+				//		act ( "$n stills $s wings and swoops a little closer to the ground.", FALSE, ch, 0, 0, TO_ROOM );
 					}
 				}
 			}

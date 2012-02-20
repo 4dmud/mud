@@ -5342,7 +5342,7 @@ void raw_kill ( Character *ch, Character *killer )
           /* Percentage chance increases every 30 minutes      */
           ct = (time(0) - killer->player.deeds.time_in)/1800.00;
           ct += 2;     // Always 2 percentage chance anyways
-          if (number(0, 150) < (int)ct) {
+          if (number(0, 100) < (int)ct) {
               obj = read_object(7, VIRTUAL);
               sprintf(buf, "Clan deed for %s!\r\n", zone_table[IN_ROOM(killer)->zone].name);
               obj->short_description = strdup(buf);
@@ -5353,7 +5353,9 @@ void raw_kill ( Character *ch, Character *killer )
               check_timer(obj);
               obj_to_char(obj, ch);
               load_otrigger(obj);
-          }    
+        
+	      send_to_all("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));  
+	  }
       }
   }
 
@@ -5498,11 +5500,22 @@ void die ( Character *ch, Character *killer )
 				gain_exp ( temp, exp );
                     if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
                         struct clan_deed_type *cl;
-                        int clan_num, zone_num;
+                        int clan_num, zone_num, deeds_amt = 0;
                         zone_num = zone_table[IN_ROOM(ch)->zone].number;
                         clan_num = find_clan_by_id(GET_CLAN(temp));
+			if (clan_num >= 0) {
+			      for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
+                                deeds_amt += 1;
+			} 
+
+			if (deeds_amt > 0) {
+			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds.\r\n", deeds_amt, (int)((float)exp*((float)deeds_amt/(float)100)));
+			  gain_exp(temp, (int)((float)exp*((float)deeds_amt/(float)100)));
+                         }
+			}
                         if (clan_num >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
-                            for (cl = clan[clan_num].deeds; cl; cl = cl->next){
+                            for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
+
                                 if (is_same_zone(cl->zone, zone_num)) {
                                     gain_exp(temp, exp/10);
                                     temp->Send("Clan Deed Bonus XP: %lld.\r\n", exp/10);

@@ -2153,7 +2153,8 @@ void do_clan_titles ( Character *ch, char *arg )
 			ch->Send ( "You don't belong to any clan!\r\n" );
 			return;
 		}
-		if ( GET_CLAN_RANK ( ch ) != clan[clan_num].ranks )
+		if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_PLAN])
+
 		{
 			ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
 			return;

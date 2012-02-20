@@ -1057,6 +1057,7 @@ class Room;
 #define ITEM_BANKBOOK         	84
 #define ITEM_SPACEBIKE          85
 #define ITEM_VEHICLE2           86 /* Horus new vehicle code */
+#define ITEM_TEMPLATE		87
 
 #define VIAL_NONE      		-1
 #define VIAL_HITP   		0

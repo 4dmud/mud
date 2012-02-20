@@ -1004,7 +1004,7 @@ void char_to_room ( Character *ch, room_rnum room )
         if (ch->player.deeds.time_out == 0)  {
             ch->player.deeds.time_out = time(0);
         }
-        else if (time(0) - ch->player.deeds.time_out > 300) {
+        else if (time(0) - ch->player.deeds.time_out > 1) {
             ch->player.deeds.zone = zone_num;
             ch->player.deeds.time_in = time(0);
             ch->player.deeds.time_out = 0;

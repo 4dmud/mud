@@ -111,6 +111,7 @@ ACMD ( do_aedit );
 ACMD ( do_ahall );
 ACMD ( do_affects );
 ACMD ( do_alias );
+ACMD ( do_analyze);
 ACMD ( do_arena );
 ACMD ( do_assist );
 ACMD ( do_assemble );
@@ -482,6 +483,7 @@ const command_info cmd_info[] =
 	{ "autogroup"      , "autogroup"  , POS_DEAD    , do_gen_tog  , 0, SCMD_AUTOGROUP, 0 },
 	{ "ahall"    , "ahall", POS_DEAD    , do_ahall    , 0, 0, 0 },
 	{ "alias"    , "ali" , POS_DEAD    , do_alias    , 0, 0, 0 },
+	{ "analyze"  , "analyze", POS_STANDING, do_analyze, 0, 0, 0 },
 	{ "answer"   , "answ" , POS_SLEEPING, do_gen_comm , 0, SCMD_NEWBIE1, 0 },
 	{ "arena"    , "arena", POS_STANDING, do_arena    , 0, 0, 0 },
 	{ "arinfo"   , "arinf", POS_SLEEPING, do_gen_tog  , 0, SCMD_ARENA, 0 },
