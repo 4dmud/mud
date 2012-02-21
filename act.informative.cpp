@@ -1982,7 +1982,6 @@ void look_around ( Character *ch )
 		ch->Send ( "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM ( ch )->zone].dimension] );
 	ch->Send ( "\r\n{cyYou are in %s{c0\r\n", zonename );
 	ch->Send ( "{cc%s{C0\r\n", scan_zone_mobs ( IN_ROOM ( ch )->zone, zonename, sizeof ( zonename ) ) );
-
 }
 
 ACMD ( do_gold )

@@ -5359,7 +5359,7 @@ void raw_kill ( Character *ch, Character *killer )
           ct = (time(0) - killer->player.deeds.time_in)/150.00;
           ct += 2;     // Always 2 percentage chance anyways
           if (GET_CLAN(killer) != highest_clan) {
-	  ct += 3;
+	  ct += 8;
           }
 
           if (number(0, 100) < (int)ct) {
