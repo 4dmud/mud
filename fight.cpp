@@ -5340,7 +5340,7 @@ void raw_kill ( Character *ch, Character *killer )
 
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 30 minutes      */
-          ct = (time(0) - killer->player.deeds.time_in)/300.00;
+          ct = (time(0) - killer->player.deeds.time_in)/150.00;
           ct += 2;     // Always 2 percentage chance anyways
           if (number(0, 100) < (int)ct) {
               obj = read_object(7, VIRTUAL);
