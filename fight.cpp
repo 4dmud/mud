@@ -5340,7 +5340,7 @@ void raw_kill ( Character *ch, Character *killer )
 
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 30 minutes      */
-          ct = (time(0) - killer->player.deeds.time_in)/1800.00;
+          ct = (time(0) - killer->player.deeds.time_in)/300.00;
           ct += 2;     // Always 2 percentage chance anyways
           if (number(0, 100) < (int)ct) {
               obj = read_object(7, VIRTUAL);
@@ -5509,8 +5509,8 @@ void die ( Character *ch, Character *killer )
 			} 
 
 			if (deeds_amt > 0) {
-			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds.\r\n", deeds_amt, (int)((float)exp*((float)deeds_amt/(float)100)));
-			  gain_exp(temp, (int)((float)exp*((float)deeds_amt/(float)100)));
+			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds.\r\n", MIN(15, deeds_amt), (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
+			  gain_exp(temp, (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
                          }
 			}
                         if (clan_num >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
