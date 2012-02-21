@@ -5332,19 +5332,39 @@ void raw_kill ( Character *ch, Character *killer )
           ct = (time(0) - killer->player.deeds.time_in)/300.00;
           ct = (float)killer->player.deeds.kills/ct;
           /* Reset timers and kills since they idled */
-          if (ct < 5) {
+          if (ct < 25) {
               killer->player.deeds.time_in = time(0);
               killer->player.deeds.kills = 0;
           }
+
+
+                        struct clan_deed_type *cl;
+                        int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
+                        clan_num = 1;
+                        while ((clan_num >= 0) &&  (clan_num <= num_of_clans)) {
+                              for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
+                                deeds_amt += 1;
+                        }
+                        if (deeds_amt > winner_amt) {
+                        highest_clan = clan_num;
+                        winner_amt = deeds_amt;
+                        }
+                        deeds_amt = 0;
+                        clan_num += 1;
+                     }
 
 
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 30 minutes      */
           ct = (time(0) - killer->player.deeds.time_in)/150.00;
           ct += 2;     // Always 2 percentage chance anyways
+          if (GET_CLAN(killer) != highest_clan) {
+	  ct += 3;
+          }
+
           if (number(0, 100) < (int)ct) {
               obj = read_object(7, VIRTUAL);
-              sprintf(buf, "Clan deed for %s!\r\n", zone_table[IN_ROOM(killer)->zone].name);
+              sprintf(buf, "Clan deed for %s", zone_table[IN_ROOM(killer)->zone].name);
               obj->short_description = strdup(buf);
               sprintf(buf, "Clan deed for %s is lying here!\r\n", zone_table[IN_ROOM(killer)->zone].name);
               obj->description = strdup(buf);
@@ -5509,7 +5529,7 @@ void die ( Character *ch, Character *killer )
 			} 
 
 			if (deeds_amt > 0) {
-			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds.\r\n", MIN(15, deeds_amt), (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
+			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", MIN(15, deeds_amt), (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)), deeds_amt);
 			  gain_exp(temp, (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
                          }
 			}
