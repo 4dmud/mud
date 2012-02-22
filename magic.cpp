@@ -635,6 +635,15 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 			
 		case SPELL_DETECT_INVIS:
+                    if ( OBJ_INNATE )
+                                af[0].expire = -2;
+                        else
+                                af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
+                        af[0].bitvector = AFF_DETECT_INVIS;
+                        accum_duration =FALSE;
+                        to_vict = "You start to see things that never use to be there.";
+                        break;
+
 	        case SPELL_DETECT_INVIS_OTHER:
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
