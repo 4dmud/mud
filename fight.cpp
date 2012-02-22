@@ -5332,10 +5332,10 @@ void raw_kill ( Character *ch, Character *killer )
           ct = (time(0) - killer->player.deeds.time_in)/300.00;
           ct = (float)killer->player.deeds.kills/ct;
           /* Reset timers and kills since they idled */
-          if (ct < 25) {
+/*          if (ct < 25) {
               killer->player.deeds.time_in = time(0);
               killer->player.deeds.kills = 0;
-          }
+          }   */
 
 
                         struct clan_deed_type *cl;

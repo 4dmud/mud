@@ -143,7 +143,7 @@ int is_ok_char(Character *keeper, Character *ch, int shop_nr)
   if (IS_GOD(ch))
     return (TRUE);
 
-  if (PLR_FLAGGED(ch, PLR_KILLER))
+/*  if (PLR_FLAGGED(ch, PLR_KILLER))
   {
     do_say(keeper, (char *)MSG_NO_SELL_KILLER, cmd_say, 0);
     return (FALSE);
@@ -154,7 +154,7 @@ int is_ok_char(Character *keeper, Character *ch, int shop_nr)
     do_say(keeper, (char *)MSG_NO_SELL_THIEF, cmd_say, 0);
     return (FALSE);
   }
-
+*/
   if ((IS_GOOD(ch) && NOTRADE_GOOD(shop_nr)) ||
       (IS_EVIL(ch) && NOTRADE_EVIL(shop_nr)) ||
       (IS_NEUTRAL(ch) && NOTRADE_NEUTRAL(shop_nr)))
