@@ -2702,7 +2702,6 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 
 }
 
-
 ACMD ( do_inventory )
 {
 	ch->Send (

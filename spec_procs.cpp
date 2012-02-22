@@ -527,8 +527,6 @@ SPECIAL(clan_deeds)
   for (cl = clan[i].deeds; cl; cl = cl_next) {
       cl_next = cl->next;
       if (is_same_zone(cl->zone, GET_OBJ_VAL(deed, 0))) {
-          obj_from_char(deed);
-          extract_obj(deed);
           ch->Send("Your clan already has claimed this deed.\r\n");
           return TRUE;
       }
@@ -1290,7 +1288,9 @@ SPECIAL ( cleric )
 	prices[] =
 	{
 		/* Spell Num (defined)      Name shown        Price  */
-		{
+ 		{
+		      SPELL_VITALIZE, "vitalize", 500}, {
+			SPELL_DETECT_INVIS, "detect invis", 2500}, {
 			SPELL_ARMOR, "armor", 5000}, {
 			SPELL_BLESS, "bless", 5000}, {
 			SPELL_ANTIDOTE_1, "remove poison", 5000}, {
@@ -1300,7 +1300,6 @@ SPECIAL ( cleric )
 		{SPELL_HEAL, "heal", 10000},
 		{SPELL_SHIELD, "shield", 500000},
 		{SPELL_STONESKIN, "stoneskin", 1000000},
-		{SPELL_VITALIZE, "vitalize", 5000000},
 		/* The next line must be last, add new spells above. */
 		{-1, "\r\n", 0}
 	};
