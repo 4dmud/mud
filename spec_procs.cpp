@@ -1293,6 +1293,7 @@ SPECIAL ( cleric )
 			SPELL_DETECT_INVIS_OTHER, "detect invis", 2500}, {
 			SPELL_ARMOR, "armor", 5000}, {
 			SPELL_BLESS, "bless", 5000}, {
+			SPELL_MANA_REGEN, "mana regen", 5000}, {
 			SPELL_ANTIDOTE_1, "remove poison", 5000}, {
 			SPELL_CURE_BLIND, "cure blindness", 5000}, {
 			SPELL_CURE_CRITIC, "critic", 7000},

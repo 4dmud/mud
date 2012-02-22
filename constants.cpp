@@ -848,6 +848,9 @@ const char *affected_bits[] =
         "RESIST_FIRE",
         "RESIST_COLD",
         "RESIST_ELEC",
+	"Prom's stuff",
+	"Prom's stuff",
+	"Mana Regen",
         "\n"
 };
 

@@ -580,6 +580,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_vict = "You have been blinded!";
 			break;
 
+
 		case SPELL_CURSE:
 			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
 			{
@@ -619,6 +620,20 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			    "Your eyes tingle and people move into a different focus.";
 			break;
 
+		case SPELL_MANA_REGEN:
+			if ( OBJ_INNATE )
+				af[0].expire = 1; //we don't want this on innate
+			else
+				af[0].expire = HOURS_TO_EXPIRE (12 + level );		
+                        af[0].location = APPLY_REGEN_MANA;
+                        af[0].modifier = 25;
+			af[0].bitvector = AFF_MANA_REGEN;
+			accum_duration = FALSE;
+			accum_affect = FALSE;
+			to_vict = 
+			    "You ask for the blessings of Kellindil and feel the mana flowing through you.";
+			break;
+			
 		case SPELL_DETECT_INVIS:
 	        case SPELL_DETECT_INVIS_OTHER:
 			if ( OBJ_INNATE )
