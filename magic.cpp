@@ -620,6 +620,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_DETECT_INVIS:
+	        case SPELL_DETECT_INVIS_OTHER:
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else

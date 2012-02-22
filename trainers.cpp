@@ -80,7 +80,12 @@ int compare_spells ( const void *x, const void *y )
 {
 	int a = * ( const int * ) x, b = * ( const int * ) y;
 
-	return strcmp ( skill_name ( a ), skill_name ( b ) );
+	//if spells match, sort in number order
+	int result = strcmp ( skill_name ( a ), skill_name ( b ) );
+	if (result)
+	  return result;
+	else
+	  return b - a;
 }
 int compare_sub ( const void *x, const void *y )
 {

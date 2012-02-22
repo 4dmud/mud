@@ -1290,7 +1290,7 @@ SPECIAL ( cleric )
 		/* Spell Num (defined)      Name shown        Price  */
  		{
 		      SPELL_VITALIZE, "vitalize", 500}, {
-			SPELL_DETECT_INVIS, "detect invis", 2500}, {
+			SPELL_DETECT_INVIS_OTHER, "detect invis", 2500}, {
 			SPELL_ARMOR, "armor", 5000}, {
 			SPELL_BLESS, "bless", 5000}, {
 			SPELL_ANTIDOTE_1, "remove poison", 5000}, {

@@ -1837,6 +1837,11 @@ void mag_assign_spells ( void )
 	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
                  "Your eyes stop tingling." );
 
+	spello ( SPELL_DETECT_INVIS_OTHER, "detect invisibility", 20 ,
+	         10 , 2, POS_STANDING, TAR_CHAR_ROOM,
+	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
+                 "Your eyes stop tingling." );
+
 	spello ( SPELL_DETECT_MAGIC, "detect magic", 20 , 10 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1,
@@ -2450,6 +2455,7 @@ int elemental_type ( int spell )
 			retval = ELEM_DARK;
 			break;
 		case SPELL_DETECT_INVIS:
+		case SPELL_DETECT_INVIS_OTHER:
 			retval = ELEM_DARK;
 			break;
 		case SPELL_DETECT_MAGIC:
