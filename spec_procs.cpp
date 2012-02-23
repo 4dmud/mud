@@ -436,7 +436,7 @@ SPECIAL(deed_box)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   struct clan_deed_type *cl;
-  int i, clan_num;
+  int i, clan_num, count=0;
 
   skip_spaces(&argument);
   two_arguments(argument, arg1, arg2);
@@ -481,15 +481,22 @@ SPECIAL(deed_box)
       if (!clan[i].deeds) continue;
       if (arg1[0] != '\0' && !strcmp(arg1, "clan") && i != clan_num) continue;
       if (arg1[0] == '\0' || !strcmp(arg1, "clan")) {
+
           snprintf(buf, sizeof(buf), "{cYClan: %s{cx\r\n", clan[i].name);
           DYN_RESIZE(buf);
-      }
+	  count = 0; 
+     }
       for (cl = clan[i].deeds; cl; cl = cl->next) {
+	  count += 1;
           if (arg1[0] != '\0' && !strcmp(arg1, "player") && 
           strncasecmp(cl->name, arg2, sizeof(arg2))) continue;
-          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx\r\n", zone_table[real_zone(cl->zone)].name, cl->name);
+          snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx  \r\n", zone_table[real_zone(cl->zone)].name, cl->name);
           DYN_RESIZE(buf);
       }
+	if (count > 0) {
+         snprintf(buf, sizeof(buf), "Total: %d\r\n", count);
+	 DYN_RESIZE(buf);
+	}
   }
 
   page_string(ch->desc, dynbuf, DYN_BUFFER);

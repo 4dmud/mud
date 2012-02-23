@@ -5361,6 +5361,10 @@ void raw_kill ( Character *ch, Character *killer )
           if (GET_CLAN(killer) != highest_clan) {
 	  ct += 9;
           }
+	  ct += (killer->player.deeds.kills)/7;
+
+	//	killer->Send("Count = %d, kills = %d, time = %d\r\n", (int)ct, (int)killer->player.deeds.kills, (int)((time(0) - killer->player.deeds.time_in)/900.00));
+
 
           if (number(0, 100) < (int)ct) {
               obj = read_object(7, VIRTUAL);
@@ -5370,10 +5374,11 @@ void raw_kill ( Character *ch, Character *killer )
               obj->description = strdup(buf);
               GET_OBJ_VAL(obj, 0) = zone_num;
               GET_OBJ_TIMER(obj) = 50;
-              check_timer(obj);
-              obj_to_char(obj, ch);
+              SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+	      check_timer(obj);
+              obj_to_char(obj, killer);
               load_otrigger(obj);
-        
+              killer->player.deeds.kills = -100;
 	      send_to_all("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));  
 	  }
       }
