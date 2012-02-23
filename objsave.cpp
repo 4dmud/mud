@@ -1769,11 +1769,11 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         sscanf(line, "%d %d %d %d", &GET_OBJ_EXTRA(temp)[0], &GET_OBJ_EXTRA(temp)[1],  &GET_OBJ_EXTRA(temp)[2], &GET_OBJ_EXTRA(temp)[3]);
       else if (!strcmp(tag, "ExDescr"))
         read_extra_descs(fl, temp);
-      else if (!strcmp(tag, "Expir")) {
+      else if (!strcmp(tag, "Expir") && GET_OBJ_EXPIRE(temp) == 0) {
         GET_OBJ_EXPIRE(temp) = atol(line);
         orig_expir = GET_OBJ_EXPIRE(temp);
       }
-      else if (!strcmp(tag, "Exrem")) {
+      else if (!strcmp(tag, "Exrem") && GET_OBJ_EXPIRE(temp) == 0) {
 	GET_OBJ_EXPIRE(temp) = time(0) + atol(line);
         orig_expir = GET_OBJ_EXPIRE(temp);
       }
