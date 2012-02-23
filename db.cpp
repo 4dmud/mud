@@ -1467,7 +1467,7 @@ void index_boot ( int mode )
 		while ( *buf1 != '$' )
 		{
 			snprintf ( buf2, sizeof ( buf2 ), "%s%s", prefix, buf1 );
-			log ( buf2 );
+			log ( "%s", buf2 );
 			if ( ! ( db_file = fopen ( buf2, "rb" ) ) )
 			{
 				log ( "SYSERR: File '%s' listed in '%s/%s': %s", buf2, prefix,
@@ -8392,7 +8392,7 @@ void load_artifact_file (char* name) {
   
   struct obj_data *obj = NULL;
   int location;
-  while (obj = read_one_item(fd, obj, &location)) {
+  while ((obj = read_one_item(fd, obj, &location))) {
     obj_to_room(obj,room);
     obj = NULL;
   }
@@ -8413,7 +8413,7 @@ void load_saved_artifacts () {
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
     chdir(ARTI_DIR);
-    while (ep = readdir (dp)) {
+    while ((ep = readdir (dp))) {
       int pos = strlen(ep->d_name) - 5;
       if (strcmp(ep->d_name+pos,".arti"))
 	continue;
