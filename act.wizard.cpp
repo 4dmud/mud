@@ -1701,8 +1701,11 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		ch->Send ( "ZONE: (%-3d) %-30s [%s]\r\n",
 		           zone_table[zone].number, zone_table[zone].name,zone_table[zone].builders );
 	}
+
 	ch->Send ( "Timer: %d mud hours. ", GET_OBJ_TIMER ( j ) );
-	if ( GET_OBJ_EXPIRE ( j ) == 0 )
+	if ( GET_OBJ_SAVED_REMAINING_EXPIRE ( j ) != 0)
+	  ch->Send ("Timer paused at: {cC%ld{c0 min and {cY%ld{c0 seconds\r\n", GET_OBJ_SAVED_REMAINING_EXPIRE(j)/60, GET_OBJ_SAVED_REMAINING_EXPIRE(j)%60);
+	else if ( GET_OBJ_EXPIRE ( j ) == 0 )
 		ch->Send ( "Expires in: Timer hasn't been started yet!\r\n" );
 	else
 	{

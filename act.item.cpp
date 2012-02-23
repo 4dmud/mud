@@ -1376,6 +1376,7 @@ bool perform_get_from_room ( Character *ch, struct obj_data *obj )
 			remove_corpse_from_list ( obj );
 			save_corpses();
 		}
+
 		if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
 			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_HOUSE_CRASH );
 		return TRUE;

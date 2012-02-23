@@ -904,7 +904,9 @@ int current_class_is_tier_num ( Character *ch );
 #define TRAP_IS_SET(obj)        GET_OBJ_VAL(obj, 3)
 #define GET_OBJ_WEIGHT(obj)	  ((obj)->obj_flags.weight)
 #define GET_OBJ_TIMER(obj)	  ((obj)->obj_flags.timer)
+#define GET_OBJ_SAVED_TIMER(obj)  ((obj)->obj_flags.saved_timer)
 #define GET_OBJ_EXPIRE(obj)	  ((obj)->obj_flags.expire)
+#define GET_OBJ_SAVED_REMAINING_EXPIRE(obj)	  ((obj)->obj_flags.saved_remaining_expire)
 #define GET_TIMER_EVENT(obj)    ((obj)->obj_flags.timer_event)
 #define GET_OBJ_RNUM(obj)	  ((obj)->item_number)
 #define GET_OBJ_VNUM(obj)	  (VALID_OBJ_RNUM(obj) ? \

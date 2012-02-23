@@ -701,7 +701,9 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     //if (GET_TIMER_EVENT(obj) != NULL) {
     //time_t diff = (event_time(GET_TIMER_EVENT(obj))/PASSES_PER_SEC) - time(0);
     check_timer(obj);
-    if (GET_OBJ_EXPIRE(obj) > time(0)) {
+    if (GET_OBJ_SAVED_REMAINING_EXPIRE(obj))
+      ch->Send( "{cyIts timer has been paused at {cC%ld{cy Min and {cY%ld{cy seconds{c0\r\n", GET_OBJ_SAVED_REMAINING_EXPIRE(obj)/60, GET_OBJ_SAVED_REMAINING_EXPIRE(obj)%60);
+    else if (GET_OBJ_EXPIRE(obj) > time(0)) {
         time_t diff = (GET_OBJ_EXPIRE(obj) - time(0));
         ch->Send( "{cyIt has {cC%ld{cy Min and {cY%ld{cy seconds left till it disintegrates{c0\r\n",   diff/60, diff%60);
     }

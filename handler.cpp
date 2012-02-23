@@ -79,6 +79,7 @@ void eq_to_room ( Character *ch );
 
 void unhitch_mob ( Character *ch );
 void delete_vehicle(struct obj_data *obj);
+void save_artifacts(Room* room);
 
 char *fname ( const char *namelist )
 {
@@ -1480,6 +1481,15 @@ void obj_to_room ( struct obj_data *object, room_rnum room )
 			             object->short_description, GET_OBJ_VNUM ( object ),
 			             room->name );
 		}
+
+		if ( IS_OBJ_STAT ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
+		  // save that artifact and make sure the timer doesn't run
+		  GET_OBJ_SAVED_REMAINING_EXPIRE(object) = GET_OBJ_EXPIRE(object) - time(0);
+		  GET_OBJ_EXPIRE(object) = 0;
+		  save_artifacts(IN_ROOM(object));
+		  
+		}
+
 	}
 }
 
@@ -1513,7 +1523,12 @@ void obj_from_room ( struct obj_data *object )
 	if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[GET_OBJ_RNUM ( object ) ].qic )
 		new_mudlog ( CMP, LVL_SEN, TRUE, "%s from room %s.", object->short_description, IN_ROOM ( object )->name );
 
-
+	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
+	  //remove from save list and make timer run again
+	  GET_OBJ_EXPIRE(object) = time(0) + GET_OBJ_SAVED_REMAINING_EXPIRE(object);
+	  GET_OBJ_SAVED_REMAINING_EXPIRE(object) = 0;
+	  save_artifacts(IN_ROOM(object));
+	}
 
 	IN_ROOM ( object ) = NULL;
 	object->next_content = NULL;
@@ -1848,7 +1863,7 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 void update_object ( Character *ch, struct obj_data *obj, int use, time_t timenow )
 {
 
-	if ( GET_OBJ_TIMER ( obj ) == -1 )
+        if ( GET_OBJ_TIMER ( obj ) == -1 || GET_OBJ_SAVED_REMAINING_EXPIRE(obj) != 0)
 		return;
 	// log("(update_obj.1) obj: %s, timer: %d.", obj->name, GET_OBJ_TIMER(obj));
 	/* don't update objects with a timer trigger */

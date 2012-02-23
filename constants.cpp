@@ -498,6 +498,7 @@ const char *room_bits[] =
 	"TIN DEPOSIT",
 	"PLASTONIUM DEPOSIT",
         "BURNING",
+	"ARTISAVE",
 	"\n"
 };
 

@@ -87,7 +87,7 @@ void ASSIGNOBJ ( obj_vnum obj, SPECIAL ( fname ) );
 SPECIAL ( postmaster );
 SPECIAL ( cleric );
 SPECIAL ( bank );
-
+void load_saved_artifacts ();
 
 
 /**************************************************************************
@@ -826,6 +826,9 @@ void boot_world ( void )
 	else
 		load_corpses();
 #endif
+
+	log ( "Loading saved artifacts" );
+	load_saved_artifacts();
 
 	log ( "Loading Notes" );
 	load_notes();
@@ -6842,7 +6845,9 @@ int my_obj_save_to_disk ( FILE * fp, struct obj_data *obj, int locate )
 	          GET_OBJ_EXTRA ( obj ) [0],
 	          GET_OBJ_EXTRA ( obj ) [1],
 	          GET_OBJ_EXTRA ( obj ) [2],
-	          GET_OBJ_EXTRA ( obj ) [3], GET_OBJ_TIMER ( obj ), GET_OBJ_INNATE ( obj ) );
+	          GET_OBJ_EXTRA ( obj ) [3],
+		  GET_OBJ_TIMER ( obj), // make sure the right timer is saved
+		  GET_OBJ_INNATE ( obj ) );
 
 	if ( ! ( IS_OBJ_STAT ( obj, ITEM_UNIQUE_SAVE ) ) )
 	{
@@ -6942,7 +6947,7 @@ int read_xap_objects ( FILE * fl, Character *ch )
 			get_line ( fl, line );
 			retval = sscanf ( line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
 			                  t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7,
-			                  t + 8, t + 9, t + 10, t + 11, t + 12, t + 13, t + 14, t + 15, t + 16 );
+			                  t + 8, t + 9, t + 10, t + 11, t + 12, t + 13, t + 14, t + 15, t + 16);
 
 			if ( retval == 10 )
 			{
@@ -8373,3 +8378,73 @@ mob_vnum DeleteMobIndex ( mob_vnum vn )
 	return NOBODY;
 }
 
+struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate);
+void load_artifact_file (char* name) {
+  room_vnum vnum = atol(name);
+  if (vnum <= 0) {
+    log ("Illegal artifact file name: %s", name);
+    return;
+  }
+  Room* room = world_vnum[vnum];
+  log ("Loading artifacts for room %s", room->name);
+  FILE* fd = fopen(name, "r");
+
+  
+  struct obj_data *obj = NULL;
+  int location;
+  while (obj = read_one_item(fd, obj, &location)) {
+    obj_to_room(obj,room);
+    obj = NULL;
+  }
+
+  fclose(fd);
+  log ("Done reading artifact file %s", name);
+}
+
+void load_saved_artifacts () {
+  DIR *dp;
+  struct dirent *ep;
+  struct stat st_buf;
+
+  dp = opendir(ARTI_DIR);
+  if (!dp)
+    mkdir(ARTI_DIR, 0777);
+  else {
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    chdir(ARTI_DIR);
+    while (ep = readdir (dp)) {
+      int pos = strlen(ep->d_name) - 5;
+      if (strcmp(ep->d_name+pos,".arti"))
+	continue;
+
+      if (stat(ep->d_name, &st_buf)) {
+	log ( "Error reading artifact file %s: %s", ep->d_name, strerror(errno));
+	continue;
+      }
+      if (S_ISREG(st_buf.st_mode))
+	load_artifact_file(ep->d_name);
+    }
+    chdir(cwd);
+  }
+}
+
+int save_one_item( OBJ_DATA *obj,FILE *fl, int locate);
+void save_artifacts (Room* room) {
+  if (!ROOM_FLAGGED(room, ROOM_ARTISAVE))
+    return;
+
+  char cwd[1024];
+  getcwd(cwd, sizeof(cwd));
+  chdir(ARTI_DIR);
+
+  char filename[10]; //hopefully no room will be created with an 11-digit zone num..
+  snprintf(filename, sizeof(filename), "%d.arti", room->number);
+  FILE* fd = fopen(filename, "w");
+  for (struct obj_data *obj = room->contents;obj;obj = obj->next_content)
+    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT))
+      save_one_item(obj, fd, room->number);
+  
+  fclose(fd);
+  chdir(cwd);
+}

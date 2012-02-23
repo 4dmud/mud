@@ -48,6 +48,8 @@
 #error "Unknown path components."
 #endif
 
+#define ARTI_DIR       LIB_MISC"arti/"
+
 #define ZON_SUFFIX	".zon"
 #define MOB_SUFFIX	".mob"
 #define OBJ_SUFFIX	".obj"
@@ -103,7 +105,6 @@
 #define HANDBOOK_FILE	LIB_TEXT"handbook"	/* handbook for new immorts      */
 #define CONTEXT_HELP_FILE LIB_TEXT"contexthelp"	/* context help for olc	*/
 #define VEHICLE_FILE   LIB_TEXT"vehicles"
-
 
 //#define IDEA_FILE     LIB_MISC"ideas"
 //#define TYPO_FILE       LIB_MISC"typos"

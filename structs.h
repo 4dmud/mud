@@ -375,6 +375,7 @@ class Room;
 #define ROOM_TIN_DEPOSIT      	43
 #define ROOM_PLASTONIUM_DEPOSIT 44
 #define ROOM_BURNING         	45 /* Room is burning */
+#define ROOM_ARTISAVE           46
 
 #define ZONE_OPEN        	(1 <<  0)
 #define ZONE_CLOSED      	(1 <<  1)
@@ -1510,6 +1511,7 @@ struct obj_flag_data {
     int cost_per_day;         /* Cost to keep pr. real day     */
     int timer;           /* Timer for object              */
     time_t expire;
+    time_t saved_remaining_expire;
     struct event *timer_event;
     int bitvector[AF_ARRAY_MAX];   /* To set chars bits             */
     int obj_innate;      /* Variable to hold the spell    */
