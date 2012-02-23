@@ -238,9 +238,9 @@ void redit_save_internally(Descriptor *d)
   /* Update triggers */
   /* Free old proto list */
   if (GET_ROOM_VNUM(room_num) != NOWHERE && world_vnum[GET_ROOM_VNUM(room_num)] &&
-  world_vnum[GET_ROOM_VNUM(room_num)]->proto_script != room_num->proto_script)
-  if (room_num->proto_script && room_num->proto_script != OLC_SCRIPT(d))
-  free_proto_script(room_num, WLD_TRIGGER);
+      world_vnum[GET_ROOM_VNUM(room_num)]->proto_script != room_num->proto_script)
+    if (room_num->proto_script && room_num->proto_script != OLC_SCRIPT(d))
+      free_proto_script(room_num, WLD_TRIGGER);
   room_num->proto_script = OLC_SCRIPT(d);
   assign_triggers(room_num, WLD_TRIGGER);
   OLC_SCRIPT(d) = NULL;

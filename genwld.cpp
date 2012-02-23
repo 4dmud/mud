@@ -18,7 +18,8 @@
 #include "genzon.h"
 #include "dg_olc.h"
 #include "shop.h"
-
+void pause_timer(struct obj_data* obj);
+void resume_timer(struct obj_data* obj);
 void update_wait_events(Room *to, Room *from);
 /*
  * This function will copy the strings so be sure you free your own
@@ -43,6 +44,27 @@ room_rnum add_room(Room *room)
 	 // log("Room Desc 1: %s", room->GetDescription());
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
+
+    //pause timers if the artisave flag is added
+    if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE))
+      for(struct obj_data* obj = world_vnum[i]->contents;obj;obj = obj->next_content)
+	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
+	  pause_timer(obj);
+
+    //remove arti save file if the artisave flag is removed, and restart timers
+    if (ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && !ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
+      char filename[70];
+      char cwd[1024];
+      getcwd(cwd, sizeof(cwd));
+
+      snprintf(filename, 70, "%s%d.arti", ARTI_DIR, room->number);
+      log("deleting %s, from dir %s", filename, cwd);
+      remove(filename);
+      for(struct obj_data* obj = world_vnum[i]->contents;obj;obj = obj->next_content)
+	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
+	  resume_timer(obj);
+    }
+
     /** save the new string **/
     //world_vnum[i]->t_description = strdup(room->GetDescription());
     

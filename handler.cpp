@@ -1460,6 +1460,19 @@ Character *get_char_num ( mob_vnum nr )
 }
 
 
+void pause_timer(struct obj_data* object) {
+  if (GET_OBJ_EXPIRE(object)) {
+    GET_OBJ_SAVED_REMAINING_EXPIRE(object) = GET_OBJ_EXPIRE(object) - time(0);
+    GET_OBJ_EXPIRE(object) = 0;
+  }
+}
+
+void resume_timer(struct obj_data* object) {
+  if (GET_OBJ_SAVED_REMAINING_EXPIRE(object)) {
+    GET_OBJ_EXPIRE(object) = time(0) + GET_OBJ_SAVED_REMAINING_EXPIRE(object);
+    GET_OBJ_SAVED_REMAINING_EXPIRE(object) = 0;
+  }
+}
 
 /* put an object in a room */
 void obj_to_room ( struct obj_data *object, room_rnum room )
@@ -1484,10 +1497,8 @@ void obj_to_room ( struct obj_data *object, room_rnum room )
 
 		if ( IS_OBJ_STAT ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
 		  // save that artifact and make sure the timer doesn't run
-		  GET_OBJ_SAVED_REMAINING_EXPIRE(object) = GET_OBJ_EXPIRE(object) - time(0);
-		  GET_OBJ_EXPIRE(object) = 0;
+		  pause_timer(object);
 		  save_artifacts(IN_ROOM(object));
-		  
 		}
 
 	}
@@ -1525,8 +1536,7 @@ void obj_from_room ( struct obj_data *object )
 
 	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
 	  //remove from save list and make timer run again
-	  GET_OBJ_EXPIRE(object) = time(0) + GET_OBJ_SAVED_REMAINING_EXPIRE(object);
-	  GET_OBJ_SAVED_REMAINING_EXPIRE(object) = 0;
+	  resume_timer(object);
 	  save_artifacts(IN_ROOM(object));
 	}
 
