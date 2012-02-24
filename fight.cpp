@@ -5381,7 +5381,7 @@ void raw_kill ( Character *ch, Character *killer )
               obj_to_char(obj, killer);
               load_otrigger(obj);
               killer->player.deeds.kills = -100;
-//	      send_to_all("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));  
+	      killer->Send("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));  
 	  }
       }
   }
