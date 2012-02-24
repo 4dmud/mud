@@ -4063,7 +4063,7 @@ void perform_mortal_where ( Character *ch, char *arg )
 
 	if ( !*arg )
 	{
-		ch->Send ( "Players in your Zone\r\n--------------------\r\n" );
+		ch->Send ( "Players in your Zone [%s]\r\n--------------------\r\n", zone_table[IN_ROOM ( ch )->zone].name );
 		for ( d = descriptor_list; d; d = d->next )
 		{
 			if ( STATE ( d ) != CON_PLAYING || d->character == ch )

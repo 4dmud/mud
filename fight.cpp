@@ -5115,6 +5115,8 @@ void make_corpse ( Character *ch, Character *killer )
 			}
 			GET_OBJ_VROOM ( corpse ) = GET_ROOM_VNUM ( IN_ROOM ( ch ) );
 			GET_OBJ_VAL ( corpse, 0 ) = MAX ( 1, get_pidx_from_name ( ch ) );
+			GET_OBJ_VAL ( corpse, 1) = (GET_LEVEL(ch));
+			GET_OBJ_VAL ( corpse, 4) = (REMORTS(ch));
 			GET_OBJ_VAL ( corpse, 6 ) = ( killer && ( !IS_NPC ( ch ) && !IS_NPC ( killer ) ) && IS_PK ( ch ) && IS_PK ( killer ) && GET_LEVEL ( killer ) < LVL_IMMORT );
 			if ( GET_LEVEL ( ch ) > LVL_IMMORT )
 				GET_OBJ_TIMER ( corpse ) = 1;
