@@ -20,6 +20,7 @@
 #include "shop.h"
 void pause_timer(struct obj_data* obj);
 void resume_timer(struct obj_data* obj);
+void save_artifacts(Room* room);
 void update_wait_events(Room *to, Room *from);
 /*
  * This function will copy the strings so be sure you free your own
@@ -45,11 +46,22 @@ room_rnum add_room(Room *room)
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
 
+
+    /** save the new string **/
+    //world_vnum[i]->t_description = strdup(room->GetDescription());
+    
+    //log("Room Desc 2: %s", room->GetDescription());
+    room->contents = world_vnum[i]->contents;
+    room->people = world_vnum[i]->people;
+    world_vnum[i]->free_room_strings();
+
     //pause timers if the artisave flag is added
-    if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE))
-      for(struct obj_data* obj = world_vnum[i]->contents;obj;obj = obj->next_content)
+    if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
+      for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
 	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
 	  pause_timer(obj);
+      save_artifacts(room);
+    }
 
     //remove arti save file if the artisave flag is removed, and restart timers
     if (ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && !ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
@@ -60,18 +72,12 @@ room_rnum add_room(Room *room)
       snprintf(filename, 70, "%s%d.arti", ARTI_DIR, room->number);
       log("deleting %s, from dir %s", filename, cwd);
       remove(filename);
-      for(struct obj_data* obj = world_vnum[i]->contents;obj;obj = obj->next_content)
+      for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
 	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
 	  resume_timer(obj);
     }
 
-    /** save the new string **/
-    //world_vnum[i]->t_description = strdup(room->GetDescription());
-    
-    //log("Room Desc 2: %s", room->GetDescription());
-    room->contents = world_vnum[i]->contents;
-    room->people = world_vnum[i]->people;
-    world_vnum[i]->free_room_strings();
+
     *world_vnum[i] = *room;
     world_vnum[i]->SetDesc(-1);
     world_vnum[i]->mine = room->mine;
