@@ -1108,7 +1108,7 @@ ASPELL(spell_minor_identify) {
 //        cost = number(1, 1000);
 
 //    if (!obj->affected[0].modifier) {
-//        ch->Send( "%s cannot help you in any special way.\r\nBut it might \
+//        ch->Send( "%s cannot help you in any special way.\r\nBut it might
 //                  bring %s if you sold it.\r\n", obj->short_description,
 //                  money_desc(cost));
 //        return;
