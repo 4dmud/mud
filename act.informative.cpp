@@ -4060,10 +4060,25 @@ void perform_mortal_where ( Character *ch, char *arg )
 {
 	register Character *i;
 	register Descriptor *d;
-
-	if ( !*arg )
+        struct clan_deed_type *cl;
+        int found = 0, clan_num;
+	
+        if ( !*arg )
 	{
 		ch->Send ( "Players in your Zone [%s]\r\n--------------------\r\n", zone_table[IN_ROOM ( ch )->zone].name );
+                for (clan_num = 0; clan_num < num_of_clans; clan_num++ ) {
+                        if (!clan[clan_num].deeds || found > 0)
+                                continue;
+                        found = 0;
+                        for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
+                                if ( !strcmp(zone_table[real_zone(cl->zone)].name, zone_table[IN_ROOM ( ch )->zone].name ) )
+                                        found = clan_num;
+                                continue;
+                        }
+                }
+                if ( found > 0 )
+                        ch->Send ( "The deed to this zone is currently controlled by %s{cx\r\n", clan[found].name );
+
 		for ( d = descriptor_list; d; d = d->next )
 		{
 			if ( STATE ( d ) != CON_PLAYING || d->character == ch )
