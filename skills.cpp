@@ -1947,14 +1947,14 @@ ASKILL ( skill_scalp )
 		snprintf ( buf1, sizeof ( buf1 ), "The scalpless corpse of %s is lying here.", scalpa );
 		if ( pc ) {
 			snprintf ( buf2, sizeof ( buf2 ), "The scalp of %s lies here.", scalpa );
-		scalp->affected[0].location = APPLY_REGEN_HIT;
+		scalp->affected[0].location = APPLY_REGEN_MOVE;
 		scalp->affected[0].modifier = ((sbyte)(MIN(20+number(0, 10), (number(0, (GET_OBJ_VAL(obj, 1)/2))))));  //levels
 
     		scalp->affected[1].location = APPLY_SPEED;
-		scalp->affected[1].modifier = ((sbyte)(MIN(100, (number(0, (GET_OBJ_VAL(obj, 4)/number(1, 3))))))); // Remorts
+		scalp->affected[1].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3))))))); // Remorts
 
 		scalp->affected[2].location = APPLY_COOLNESS;
-		scalp->affected[2].modifier = ((sbyte)(MIN(100, (number(0, (GET_OBJ_VAL(obj, 4)/number(1, 3)))))));   // Remorts
+		scalp->affected[2].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3)))))));   // Remorts
 
 		}
 
