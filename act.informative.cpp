@@ -4076,7 +4076,7 @@ void perform_mortal_where ( Character *ch, char *arg )
                                 continue;
                         }
                 }
-                        ch->Send ( "The deed to this zone is currently controlled by %s{cx. \r\n", (found > -1) ? clan[found].name   : "no clan");
+                        ch->Send ( "This zone is currently controlled by %s{cx. \r\n", (found > -1) ? clan[found].name   : "no clan");
 
 		for ( d = descriptor_list; d; d = d->next )
 		{

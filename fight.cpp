@@ -5320,6 +5320,7 @@ void raw_kill ( Character *ch, Character *killer )
   struct obj_data *obj;
   char buf[256];
   int zone_num;
+  int legit = 0;
 
 	if ( !ch || DEAD ( ch ) )
 		return;
@@ -5329,8 +5330,14 @@ void raw_kill ( Character *ch, Character *killer )
      they dont cheat on just idling in the zone to get the deeds */
   if (ch && killer && !IS_NPC(killer) && IS_NPC(ch)) {
       zone_num = zone_table[IN_ROOM(ch)->zone].number;      
-      if (is_same_zone(killer->player.deeds.zone, zone_num) && is_same_zone(ch->vnum/100, killer->player.deeds.zone))  {
+	if ((ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1)))
+	legit = 1;	
+
+
+     
+	 if (legit == 1)  {
           killer->player.deeds.kills++;
+	
           ct = (time(0) - killer->player.deeds.time_in)/300.00;
           ct = (float)killer->player.deeds.kills/ct;
           /* Reset timers and kills since they idled */
@@ -5355,13 +5362,12 @@ void raw_kill ( Character *ch, Character *killer )
                         clan_num += 1;
                      }
 
-
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 15 minutes      */
           ct = (time(0) - killer->player.deeds.time_in)/900.00;
           ct += 1;     // Always 1 percentage chance anyways
           if (GET_CLAN(killer) != highest_clan) {
-	  ct += 9;
+	  ct += 4;
           }
 	  ct += (killer->player.deeds.kills)/7;
 

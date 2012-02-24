@@ -1002,10 +1002,13 @@ void char_to_room ( Character *ch, room_rnum room )
         ch->player.deeds.kills = 0;
     }
     else if (!is_same_zone(ch->player.deeds.zone, zone_num)) {
+	ch->player.deeds.zone = zone_num;
+	ch->player.deeds.kills = 0;
+	ch->player.deeds.time_in = time(0);
         if (ch->player.deeds.time_out == 0)  {
             ch->player.deeds.time_out = time(0);
         }
-        else if (time(0) - ch->player.deeds.time_out > 1) {
+        else if (time(0) - ch->player.deeds.time_out > 0) {
             ch->player.deeds.zone = zone_num;
             ch->player.deeds.time_in = time(0);
             ch->player.deeds.time_out = 0;
