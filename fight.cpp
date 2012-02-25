@@ -5367,7 +5367,7 @@ void raw_kill ( Character *ch, Character *killer )
           ct = (time(0) - killer->player.deeds.time_in)/900.00;
           ct += 1;     // Always 1 percentage chance anyways
           if (GET_CLAN(killer) != highest_clan) {
-	  ct += 4;
+	  ct += 7;
           }
 	  ct += (killer->player.deeds.kills)/7;
 
@@ -5545,6 +5545,19 @@ void die ( Character *ch, Character *killer )
 			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", MIN(15, deeds_amt), (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)), deeds_amt);
 			  gain_exp(temp, (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
                          }
+
+
+
+
+                        if (deeds_amt > 99) {
+                          temp->Send("{cCDue to your awesomeness your clan gains you an additional 75%% exp! [%d exp bonus]{cn\r\n",  (int)(exp*(float)((float)75/(float)100)));
+                          gain_exp(temp, (int)(exp*(float)((float)75/(float)100)));
+
+                        }
+
+
+
+
 			}
                         if (clan_num >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
