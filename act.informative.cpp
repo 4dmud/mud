@@ -3734,7 +3734,7 @@ ACMD ( do_who )
 
 			struct clan_deed_type *cl;
                         int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
-                        clan_num = 1;
+                        clan_num = 0;
                         while ((clan_num >= 0) &&  (clan_num <= num_of_clans)) {
                               for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
                                 deeds_amt += 1;
@@ -4077,6 +4077,7 @@ void perform_mortal_where ( Character *ch, char *arg )
                         }
                 }
                         ch->Send ( "This zone is currently controlled by %s{cx. \r\n", (found > -1) ? clan[found].name   : "no clan");
+			ch->Send ( "You have %d tracked kills in this zone at the moment. \r\n", ch->player.deeds.kills);
 
 		for ( d = descriptor_list; d; d = d->next )
 		{

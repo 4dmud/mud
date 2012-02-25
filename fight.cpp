@@ -5148,7 +5148,10 @@ void make_corpse ( Character *ch, Character *killer )
                         struct clan_deed_type *cl;
                         int clan_num, zone_num;
                         zone_num = zone_table[IN_ROOM(ch)->zone].number;
-                        if ((clan_num = find_clan_by_id(GET_CLAN(killer))) >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
+                       
+
+		    if (( clan_num = find_clan_by_id(GET_CLAN(killer)) >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
+
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next){
                                 if (is_same_zone(cl->zone, zone_num)) {
                                     clan[clan_num].treasury.coins += ch->Gold(0, GOLD_HAND)/100;
@@ -5349,7 +5352,7 @@ void raw_kill ( Character *ch, Character *killer )
 
                         struct clan_deed_type *cl;
                         int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
-                        clan_num = 1;
+                        clan_num = 0;
                         while ((clan_num >= 0) &&  (clan_num <= num_of_clans)) {
                               for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
                                 deeds_amt += 1;
@@ -5559,7 +5562,8 @@ void die ( Character *ch, Character *killer )
 
 
 			}
-                        if (clan_num >= 0 && is_same_zone(ch->vnum/100, zone_num)) {
+     			if (( clan_num  >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) &&(ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
+
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
 
                                 if (is_same_zone(cl->zone, zone_num)) {

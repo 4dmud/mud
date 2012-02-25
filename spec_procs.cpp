@@ -493,7 +493,7 @@ SPECIAL(deed_box)
           snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx  \r\n", zone_table[real_zone(cl->zone)].name, cl->name);
           DYN_RESIZE(buf);
       }
-	if (count > 0) {
+	if (count > 0 && strcmp(arg1, "player")) {
          snprintf(buf, sizeof(buf), "Total: %d\r\n", count);
 	 DYN_RESIZE(buf);
 	}
