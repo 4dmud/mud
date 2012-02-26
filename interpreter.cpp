@@ -585,7 +585,7 @@ const command_info cmd_info[] =
 	{ "energize"    , "en"    , POS_STANDING, do_energize    , 0, 0, 0 },
 	{ "equipment", "eq"  , POS_RESTING, do_equipment, 0, 0, 0 },
         { "ethos"    , "ethos", POS_DEAD   , do_ethos    , 0, 0, 0 },
-	{ "exits"    , "exi" , POS_RESTING , do_exits    , 0, 0, 0 },
+	{ "exits"    , "ex" , POS_RESTING , do_exits    , 0, 0, 0 },
 	{ "examine"  , "exa" , POS_SITTING , do_examine  , 0, 0, 0 },
 
 	{ "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
