@@ -5151,11 +5151,10 @@ void make_corpse ( Character *ch, Character *killer )
                        
 
 		    if (( clan_num = find_clan_by_id(GET_CLAN(killer)) >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
-
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next){
                                 if (is_same_zone(cl->zone, zone_num)) {
-                                    clan[clan_num].treasury.coins += ch->Gold(0, GOLD_HAND)/100;
-                                    killer->Send("Clan Deed: You have added %lld gold coins into the treasury.\r\n", ch->Gold(0, GOLD_HAND)/100);
+                               //     clan[clan_num].treasury.coins += ch->Gold(0, GOLD_HAND)/100;
+                                 //   killer->Send("Clan Deed: You have added %lld gold coins into the treasury.\r\n", ch->Gold(0, GOLD_HAND)/100);
                                     break;
                                 }
                             }
