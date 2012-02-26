@@ -629,6 +629,8 @@ void look_at_char ( Character *i, Character *ch )
 
 		if ( i->player.description && IS_NPC ( i ) )
 			*ch << i->player.description;
+		                diag_char_to_char ( i, ch );
+
 
 		if ( RIDING ( i ) && RIDING ( i )->in_room == i->in_room )
 		{

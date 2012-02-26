@@ -872,6 +872,7 @@ bool is_same_zone(int dv, int cv)
 
     if (dv == cv)
         return TRUE;
+/*
     if (cv == 18 || cv == 20)
         if (dv == 18 || dv == 20)
             return TRUE;
@@ -938,7 +939,7 @@ bool is_same_zone(int dv, int cv)
     if (cv == 560 || cv == 561 || cv == 562 || cv == 563 || cv == 600)
         if (dv == 560 || dv == 561 || dv == 562 || dv == 563 || dv == 600)
             return TRUE;
-
+*/
     return FALSE;
 
 }
