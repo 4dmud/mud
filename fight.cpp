@@ -5367,7 +5367,7 @@ void raw_kill ( Character *ch, Character *killer )
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 15 minutes      */
           ct = (time(0) - killer->player.deeds.time_in)/900.00;
-          ct += 1;     // Always 1 percentage chance anyways
+          ct += 1;     // Always 1 percentage chance anyway
           if (GET_CLAN(killer) != highest_clan) {
 	  ct += 7;
           }
@@ -5535,7 +5535,7 @@ void die ( Character *ch, Character *killer )
 				gain_exp ( temp, exp );
                     if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
                         struct clan_deed_type *cl;
-                        int clan_num, zone_num, deeds_amt = 0;
+                        int clan_num, zone_num, deeds_amt = 0, deeds_bonus = 0, deeds_total;
                         zone_num = zone_table[IN_ROOM(ch)->zone].number;
                         clan_num = find_clan_by_id(GET_CLAN(temp));
 			if (clan_num >= 0) {
@@ -5544,18 +5544,39 @@ void die ( Character *ch, Character *killer )
 			} 
 
 			if (deeds_amt > 0) {
-			  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", MIN(15, deeds_amt), (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)), deeds_amt);
-			  gain_exp(temp, (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100)));
+			if (deeds_amt < 30){
+			deeds_bonus = (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100));
+			deeds_total = MIN(15, deeds_amt);
+		}
+			if (deeds_amt > 29){
+			deeds_bonus = (int)((float)exp*((float)MIN(25, deeds_amt)/(float)100));
+			deeds_total = 25;
+		}
+
+			if (deeds_amt > 39){
+			deeds_bonus = (int)((float)exp*((float)MIN(35, deeds_amt)/(float)100));
+			deeds_total = 35;
+		}
+			if (deeds_amt > 49){
+			deeds_bonus = (int)((float)exp*((float)MIN(45, deeds_amt)/(float)100));
+			deeds_total = 45;
+		}
+			if (deeds_amt > 59){
+			deeds_bonus = (int)((float)exp*((float)MIN(55, deeds_amt)/(float)100));
+			deeds_total = 55;
+		}	
+
+			if (deeds_amt > 99){
+			deeds_bonus = (int)((float)exp*((float)MIN(85, deeds_amt)/(float)100));
+			deeds_total = 85;
+
+		}	  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", deeds_total, deeds_bonus, deeds_amt);
+			  gain_exp(temp, deeds_bonus);
                          }
 
 
 
 
-                        if (deeds_amt > 99) {
-                          temp->Send("{cCDue to your awesomeness your clan gains you an additional 75%% exp! [%d exp bonus]{cn\r\n",  (int)(exp*(float)((float)75/(float)100)));
-                          gain_exp(temp, (int)(exp*(float)((float)75/(float)100)));
-
-                        }
 
 
 
