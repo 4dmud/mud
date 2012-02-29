@@ -5121,7 +5121,7 @@ void make_corpse ( Character *ch, Character *killer )
 			if ( GET_LEVEL ( ch ) > LVL_IMMORT )
 				GET_OBJ_TIMER ( corpse ) = 1;
 			else
-				GET_OBJ_TIMER ( corpse ) = IRANGE ( 10, 10 + ( remorts * 4 ), 60 );
+				GET_OBJ_TIMER ( corpse ) = IRANGE ( 10, 10 + ( remorts * 2 ), 20 );
 		}
 
 		/* transfer character's inventory to the corpse */
