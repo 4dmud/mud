@@ -684,6 +684,7 @@ int has_body ( Character *ch, int flag );
 #define TALLY_DEBRIS(ch)  ((ch)->char_specials.tally[2])
 #define GET_ETHOS(ch) ((ch)->char_specials.declared_align)
 #define GET_DETECTOR(ch) ((ch)->char_specials.arti_detector)
+#define GET_DEED_COUNT(ch) ((ch)->char_specials.deed_count)
 
 #define SPECIALS(ch)          ((ch)->player_specials)
 #define SAVED(ch)            	(SPECIALS(ch)->saved)

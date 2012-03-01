@@ -1924,6 +1924,8 @@ struct char_special_data {
     int timer;           /* Timer for update                     */
     int declared_align;
     int arti_detector;  /* Detector for Arifacts */
+    int deed_count;
+
 
     struct char_special_data_saved saved;    /* constants saved in plrfile  */
     struct obj_data *chair;   /* object the char is sitting in        */

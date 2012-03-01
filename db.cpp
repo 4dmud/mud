@@ -5199,6 +5199,8 @@ int store_to_char ( const char *name, Character *ch )
 					GET_COND ( ch, DRUNK ) = num;
 				else if ( !strcmp ( tag, "Drol" ) )
 					GET_DAMROLL ( ch ) = num;
+				else if ( !strcmp ( tag, "Deed" ) )
+					GET_DEED_COUNT ( ch) = num;
 				else if ( !strcmp ( tag, "DTC " ) )
 				{
 					if ( num > 100 )
@@ -6039,6 +6041,9 @@ void char_to_store ( Character *ch )
 	if ( GET_EMAIL ( ch ) && *GET_EMAIL ( ch ) )
 		fprintf ( fl, "Emai: \n%s~\n", GET_EMAIL ( ch ) );
 	//Ethos and Arti Detection by Once 
+
+	if ( GET_DEED_COUNT (ch))
+		fprintf ( fl, "Deed: %d\n", GET_DEED_COUNT(ch));
 
         if ( GET_ETHOS (ch))
                 fprintf ( fl, "Etho: %d\n", GET_ETHOS(ch));

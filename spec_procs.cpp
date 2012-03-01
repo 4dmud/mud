@@ -562,6 +562,8 @@ SPECIAL(clan_deeds)
 
   obj_from_char(deed);
   extract_obj(deed);
+  GET_DEED_COUNT(ch) += 1;
+
   ch->Send("You have now claimed a new deed for your clan!\r\n");
   save_clans();
   return TRUE;

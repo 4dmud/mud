@@ -985,7 +985,7 @@ ACMD ( do_finger )
 	    "  {ccRemorts: {cg%-3d           {ccLevel: {cg%-2d       {ccCurrent Tier: {cg%d\r\n"
 	    "    {ccKills: {cg%-8d     {ccDeaths: {cg%-5d        {ccPK Kills: {cg%-3d\r\n"
 	    "      {ccAge: {cg%-3d          {ccHeight: {cg%-3d            {ccWeight: {cg%-3d\r\n"
-	    "     {ccClan: {cg%-15s\r\n"
+	    "     {ccClan: {cg%-15s                      {ccDeeds: {cg%-5d\r\n"
 	    "  {ccPartner:{cg %s - %-15s \r\n"
 	    "  {cg%s"
 	    " {cyO-----------------------------------------------------------O{c0\r\n\r\n"
@@ -999,7 +999,7 @@ ACMD ( do_finger )
 	    REMORTS ( vict ), GET_LEVEL ( vict ), current_class_is_tier_num ( vict ),
 	    GET_KILL_CNT ( vict ), GET_RIP_CNT ( vict ), GET_PK_CNT ( vict ),
 	    GET_AGE ( vict ), GET_HEIGHT ( vict ), GET_WEIGHT ( vict ),
-	    ( ( !GET_CLAN ( vict ) ) ? "<none>" : clan[find_clan_by_id ( GET_CLAN ( vict ) ) ].name ),
+	    ( ( !GET_CLAN ( vict ) ) ? "<none>" : clan[find_clan_by_id ( GET_CLAN ( vict ) ) ].name ), GET_DEED_COUNT(vict),
 	    romance_status ( vict ), PARTNER ( vict ) <= 0 ? "<none>" : pi.NameById ( PARTNER ( vict ) ),
 	    baby_status ( vict, buf, sizeof ( buf ) ),
 	    vict->player.description ? vict->player.description: "They are unremarkable",
