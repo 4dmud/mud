@@ -564,6 +564,47 @@ SPECIAL(clan_deeds)
   extract_obj(deed);
   GET_DEED_COUNT(ch) += 1;
 
+  if (GET_DEED_COUNT(ch) == 1) {
+  ch->Send("{ccYou gain {cC29925{cc exp and {cC100,000{cc gold for turning in your first deed!\r\n{cn");
+  gain_exp(ch, 29925);
+  GET_GOLD(ch) += 100000;
+  }
+  if (GET_DEED_COUNT(ch) == 10) {
+  ch->Send("{ccYou gain {cC2621804{cc exp and {cC1,000,000{cc gold for reaching the milestone of 10 deeds!\r\n{cn");
+  gain_exp(ch, 2621804);
+  GET_GOLD(ch) += 1000000;
+  }
+  if (GET_DEED_COUNT(ch) == 25) {
+  ch->Send("{ccYou gain {cC4497732{cc exp and {cC2,000,000{cc gold for reaching the milestone of 25 deeds!\r\n{cn");
+  send_to_all("{cY%s just reached the deed milestone of 25 deeds!\r\n{cn", GET_NAME(ch));
+  gain_exp(ch, 4497732);
+  GET_GOLD(ch) += 2000000;
+  }
+  if (GET_DEED_COUNT(ch) == 50) {
+  ch->Send("{ccYou gain {cC7561352{cc exp and {cC5,000,000{cc gold for reaching the milestone of 50 deeds!\r\n");
+  send_to_all("{cY%s just reached the deed milestone of 50 deeds!\r\n{cn", GET_NAME(ch));
+  gain_exp(ch, 7561352);
+  GET_GOLD(ch) += 5000000;
+  }
+  if (GET_DEED_COUNT(ch) == 100) {
+  ch->Send("{{ccYou gain {cC24322978{cc exp and {cC5,000,000{cc gold for reaching the milestone of 100 deeds!\r\n");
+  send_to_all("{cY%s just reaached the deed milestone of 100 deeds!\r\n{cn", GET_NAME(ch));
+  gain_exp(ch, 24322978);
+  GET_GOLD(ch) += 5000000;
+  }
+  if (GET_DEED_COUNT(ch) == 500) {
+  ch->Send("{ccYou gain {cC331498092{cc exp and {cC10,000,000{cc gold for reaching the milestone of 500 deeds!\r\n");
+  send_to_all("{cYAmazing! %s just reached the deed milestone of 500 deeds!\r\n{cn", GET_NAME(ch));
+  gain_exp(ch, 331498092);
+  GET_GOLD(ch) += 10000000;
+  }
+  if (GET_DEED_COUNT(ch) == 1000) {
+  ch->Send("{ccYou gain {cC500000000 exp and {cC20,000,000{cc gold for reaching the milestone of 1000 deeds!!\r\n");
+  send_to_all("{cc%s has just become a {cCDeed Master{cc with {cC1000{cc deeds collected!!{cn\r\n", GET_NAME(ch));
+  gain_exp(ch, 500000000);
+  GET_GOLD(ch) += 20000000;
+  }
+
   ch->Send("You have now claimed a new deed for your clan!\r\n");
   save_clans();
   return TRUE;
