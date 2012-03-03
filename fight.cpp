@@ -5367,9 +5367,9 @@ void raw_kill ( Character *ch, Character *killer )
           /* Now lets check percentage chance for deed to load */
           /* Percentage chance increases every 15 minutes      */
           ct = (time(0) - killer->player.deeds.time_in)/900.00;
-          ct += 1;     // Always 1 percentage chance anyway
+          ct += 0;     // Always 1 percentage chance anyway
           if (GET_CLAN(killer) != highest_clan) {
-	  ct += 7;
+	  ct += 9;
           }
 	  ct += (killer->player.deeds.kills)/7;
 
