@@ -551,6 +551,8 @@ class Room;
 #define PLR_NEEDS_CLASS 	36  /* Player hasn't yet chosen their class     */
 #define PLR_NEEDS_STATS 	37  /* Player hasn't yet chosen their stats     */
 #define PLR_ANTI_DT     	38  /* Horus - has a life against DTs */
+#define PLR_TEMP1		39  // Temp player flag 1
+#define PLR_TEMP2		40  // Temp player flag 2
 
 #define MOB_RACE_HUMANOID 	0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   	1   /* Mob doesn't carry money              */
