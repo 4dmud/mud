@@ -1799,7 +1799,7 @@ ASKILL ( skill_meditate )
 		update_pos ( ch );
 
 		af.type = SKILL_MEDITATE;
-		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
+		af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) / 10 + TIERNUM );
 		af.modifier = 0;
 		af.location = APPLY_NONE;
 		af.bitvector = AFF_MEDITATE;
