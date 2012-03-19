@@ -79,7 +79,7 @@ int mana_gain ( Character *ch )
 	if ( ch == NULL )
 		return ( 0 );
 
-	if ( IN_ROOM ( ch ) ==NULL )
+	if ( IN_ROOM ( ch ) == NULL )
 		return 0;
 	if ( DEAD ( ch ) )
 		return 0;
@@ -139,9 +139,9 @@ int mana_gain ( Character *ch )
 		gain *= 2;
 
 	if ( AFF_FLAGGED ( ch, AFF_MEDITATE ) )
-		gain *=3;
+		gain *= 3;
 	if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
-		gain *=2;
+		gain *= 2;
 
 	return ( abs ( gain ) );
 }
@@ -222,9 +222,9 @@ int hit_gain ( Character *ch )
 	}
 
 	if ( AFF_FLAGGED ( ch, AFF_MEDITATE ) )
-		gain *=2;
+		gain *= 2;
 	if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
-		gain *=2;
+		gain *= 2;
 
         if ( AFF_FLAGGED(ch, AFF_POISON_4))
                 gain = 0;
@@ -247,7 +247,7 @@ int move_gain ( Character *ch )
 	if ( ch == NULL )
 		return 0;
 
-	if ( IN_ROOM ( ch ) ==NULL )
+	if ( IN_ROOM ( ch ) == NULL )
 		return 0;
 	if ( DEAD ( ch ) )
 		return 0;
@@ -305,9 +305,9 @@ int move_gain ( Character *ch )
 		gain *= 2;
 
 	if ( AFF_FLAGGED ( ch, AFF_MEDITATE ) )
-		gain *=2;
+		gain *= 2;
 	if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
-		gain *=2;
+		gain *= 2;
 	return ( abs ( gain ) );
 }
 
@@ -377,9 +377,9 @@ int stamina_gain ( Character *ch )
 		gain *= 2;
 
 	if ( AFF_FLAGGED ( ch, AFF_MEDITATE ) )
-		gain *=2;
+		gain *= 2;
 	if ( get_sub_status ( ch, SUB_NIGHT_REGEN ) )
-		gain *=2;
+		gain *= 2;
 	return ( abs ( gain ) );
 }
 void set_loginmsg ( Character *ch, char *loginmsg )
