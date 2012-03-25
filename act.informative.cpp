@@ -1154,8 +1154,10 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
 			case SECT_REEF:
 				snprintf ( bufptr, len, "A Reef" );
 				break;
+			// Removing the trailing ! since nothing else
+			// has an none alphanumeric symbol. --> Prom
 			case SECT_DEATHTRAP:
-				snprintf ( bufptr, len, "Death Trap!" );
+				snprintf ( bufptr, len, "Death Trap" );
 				break;
 			case SECT_SNOW:
 				snprintf ( bufptr, len, "Snowy Terrain" );

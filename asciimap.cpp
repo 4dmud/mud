@@ -199,7 +199,7 @@ void ShowMap ( Character *ch, int min, int max )
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
+							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
@@ -238,11 +238,10 @@ void ShowMap ( Character *ch, int min, int max )
 						case SECT_PRAIRIE:
 						case SECT_BADLANDS:
 						case SECT_RAIL:
-						
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-										len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
+							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
