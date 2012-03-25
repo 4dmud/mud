@@ -543,13 +543,13 @@ const char *sector_types[] =
 	"Vehicle(coded)",
 	"Swamp",
 	"Reef",
-	"Tundra",  //20
+	"DeathTrap",  //20
 	"Snow",
 	"Ice",
 	"Prairie",
 	"Badlands", 
 	"Rail",   //25
-	"DeathTrap",
+	//"DeathTrap", -- Seeing if this fixes the issue with DT showing up as Tundra (Prom)
 	"\n"
 };
 
