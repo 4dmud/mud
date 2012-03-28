@@ -1290,6 +1290,24 @@ float cleave_mult ( int level, int tier )
 	}
 }
 
+float thrust_mult ( int level, int tier )
+{
+ 
+        switch ( tier )
+        {
+                default:
+                        return 1.15f + ( level < 10 );
+		case 1:
+			return 1.6f + ( level < 10 );
+		case 2:
+			return 1.75f + ( level < 10 );
+		case 3:
+			return 1.95f + ( level < 10 );
+		case 4:
+			return 2.05f + ( level < 10 );
+	}
+}
+
 ACMD ( do_dam_dice )
 {
 	int i, j;
