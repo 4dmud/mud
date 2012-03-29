@@ -178,7 +178,6 @@ void solo_gain(Character *ch, Character *victim,
 void die(Character *ch, Character *killer);
 float backstab_mult(int level, int tier);
 float cleave_mult(int level, int tier);
-float thrust_mult(int level, int tier);
 float skill_type_multi ( Character *ch, Character *vict, int type );
 
 /* Weapon attack texts */
