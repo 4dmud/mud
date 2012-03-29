@@ -1542,6 +1542,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_CONFUSE,         ESP | MAG );
 	assign_class ( SPELL_EVIL_EYE,        ESP );
 	assign_class ( SKILL_THRUST,	      RAN );
+	assign_class ( SKILL_SLIT,	      GYP );
 }
 
 
