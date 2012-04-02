@@ -1192,9 +1192,9 @@ void improveallsubs(Character *ch) {
 /* valgrind throws an error when sort reaches cockfighting for some reason. when adding entries one by one*/
 void improve_sub(Character *ch, subskill_list sub, int amount) {
 
-// Undoing this since it seems subskills don't work - Prom
-//    if (IS_NPC(ch) && sub < 99 ) 
-	if (IS_NPC(ch)) {
+    if (IS_NPC(ch) && sub < 99 ) { 
+// 	I removed the above line for some odd reason. Putting it back in -> Prom
+//	if (IS_NPC(ch)) {
         MOB_SUBSKILL(ch) = sub;
     	return;
 	}
