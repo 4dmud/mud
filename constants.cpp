@@ -333,13 +333,12 @@ const char * profession_names[] =
 	"combatant",
 	"tanner",
 	"miller",
-	"craftsman",
+	"weaver",  // Changing this from craftsman to weaver -> Prom
 	"blacksmith",
 	"tailor",
 	"tech",
 	"management",
 	"pilot",
-
 	"farrier",
 	"goldsmith",
 	"metallurgist",
@@ -367,6 +366,11 @@ const char * profession_names[] =
 	"stonework",
 	"textilework",
 	"woodwork",
+	"paladin",      	// Added this since it is in Proffessions.cpp
+	"werewolf",		// See above comment
+	"jedi",			// See above
+	"bravo",		// See above
+	"spacepilot",		// See Above -> Prom
 	"\n"
 
 };
@@ -380,8 +384,12 @@ const char * profession_group_names[] =
 	"woodworker",
 	"stoneworker",
 	"artist",
-	"brewery",
+	"fermenter", // Changing this from brewery to fermenter -> Prom
 	"glassworker",
+	"combat",	// The next 4 added from subskills.h -> Prom
+	"affliction",
+	"summoning",
+	"control",
 	"\n"
 
 };
