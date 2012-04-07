@@ -35,7 +35,6 @@ static int prof_group_data[] = {
                                  PGRP_MISC, //PROF_BUSINESS,
                                  PGRP_MISC, //PROF_COMMERCE,
                                  PGRP_STONEWORKER, //PROF_MINER,
-                                 PGRP_AFFLICTION, //PROF_AFFLICATION_VAMPIRE,
 				 PGRP_FERMENTER, //PROF_BREWER,
                                  PGRP_COMBAT, //PROF_COMBATANT,
                                  PGRP_LEATHERWORKER, //PROF_TANNER,
@@ -73,6 +72,10 @@ static int prof_group_data[] = {
 				 PGRP_TEXTILEWORKER, // PROF_TEXTILEWORK,
 				 PGRP_WOODWORKER, // PROF_WOODWORK,
                                  PGRP_MISC, //PROF_PALADIN,
+               			 PGRP_MISC, //PROF_JEDI,
+				 PGRP_MISC, //PROF_BRAVO,
+				 PGRP_MISC, //PROF_SPACEPILOT,
+	                         PGRP_AFFLICTION, //PROF_AFFLICATION_VAMPIRE,
 				 PGRP_AFFLICTION //PROF_AFFLICTION_WEREWOLF
                                };
 
