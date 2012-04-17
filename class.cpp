@@ -1498,7 +1498,7 @@ void init_spell_levels ( void )
 	assign_class ( SKILL_JOUST,              ALL_ROGUE | ALL_FIGHTER );
 	assign_class ( SKILL_GRAPPLE,            ALL_ROGUE | ALL_FIGHTER );
 	assign_class ( SKILL_MELEE,        ALL_FIGHTER | ALL_ROGUE );
-	assign_class ( SKILL_KICK,              ALL_FIGHTER | RAN );
+	assign_class ( SKILL_KICK,              ALL_FIGHTER | ALL_ROGUE ); // Ran -> all thief classes - Prom
 	assign_class ( SKILL_RESCUE,            WAR );
 	assign_class ( SKILL_BASH,              ALL_FIGHTER );
 	assign_class ( SKILL_SECOND_ATTACK,     ALL_FIGHTER | ALL_ROGUE );
