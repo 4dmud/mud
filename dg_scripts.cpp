@@ -1031,9 +1031,9 @@ void check_time_triggers ( void )
 		{
 			sc = SCRIPT ( ch );
 
-			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_TIME ) &&
+			if ( IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_TIME ) &&
 			        ( !is_empty ( IN_ROOM ( ch )->zone ) ||
-			          IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_GLOBAL ) ) )
+			          IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_GLOBAL ) ) )
 				time_mtrigger ( ch );
 		}
 	}
