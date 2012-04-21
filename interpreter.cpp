@@ -634,7 +634,7 @@ const command_info cmd_info[] =
 	{ "hgossip"  , "hgos"  , POS_SLEEPING, do_gen_comm ,0, SCMD_HERO, 0 },
 	{ "hire"     , "hire" , POS_STANDING, do_not_here , LVL_SEN, 0, WIZ_IMPL_GRP },
 	{ "hit"      , "h"   , POS_FIGHTING, do_hit      , 0, SCMD_HIT, 0 },
-	{ "hitch"      , "hitch"   , POS_STANDING, do_hitch      , 0, 0, 0 },
+	//	{ "hitch"      , "hitch"   , POS_STANDING, do_hitch      , 0, 0, 0 },
 	{ "hold"     , "ho"  , POS_RESTING , do_grab     , 1, 0, 0 },
 	{ "holler"   , "hol" , POS_RESTING , do_gen_comm , 1, SCMD_HOLLER, 0 },
 	{ "holylight", "holy"     , POS_DEAD    , do_gen_tog  , LVL_HERO, SCMD_HOLYLIGHT, 0 },
@@ -885,7 +885,7 @@ const command_info cmd_info[] =
 	{ "ungroup"  , "ung" , POS_DEAD    , do_ungroup  , 0, 0, 0 },
 	{ "unban"    , "unb" , POS_DEAD    , do_unban    , LVL_IMMORT, 0, WIZ_BAN_GRP },
 	{ "unaffect" , "una" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_UNAFFECT, WIZ_HEAL_GRP },
-	{ "unhitch"      , "unhitch"   , POS_STANDING, do_unhitch      , 0, 0, 0 },
+	//	{ "unhitch"      , "unhitch"   , POS_STANDING, do_unhitch      , 0, 0, 0 },
 	{ "unregister" , "unreg"  , POS_STANDING, do_register , 0, SCMD_UNREGISTER, 0 },
 
 	{ "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
