@@ -550,7 +550,7 @@ int has_body ( Character *ch, int flag );
 #define PRF_TOG_CHK(ch,flag) ((TOGGLE_BIT_AR(PRF_FLAGS(ch), (flag))) && \
 				  (IS_SET_AR(PRF_FLAGS(ch), (flag))))
 
-#define INTERNAL(ch)	((ch)->internal_flags)
+#define INTERNAL_FLAGS(ch)	((ch)->internal_flags)
 
 /* room utils ************************************************************/
 #define GET_ROOM_ZONE(room)	((room)->zone)

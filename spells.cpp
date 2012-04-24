@@ -1162,9 +1162,9 @@ void fchar_init_flags_room(Character *ch, int *numtargets) {
             vict = vict->next_in_room) {
         if (vict == ch || (!IS_NPC(ch) && GET_LEVEL(ch) >= LVL_GOD)
                 || (!IS_NPC(ch) && !IS_NPC(vict) && !CONFIG_PK_ALLOWED))
-            SET_BIT(INTERNAL(vict), INT_MARK);
+            SET_BIT(INTERNAL_FLAGS(vict), INT_MARK);
         else {
-            REMOVE_BIT(INTERNAL(vict), INT_MARK);
+            REMOVE_BIT(INTERNAL_FLAGS(vict), INT_MARK);
             (*numtargets)++;
         }
     }
@@ -1179,13 +1179,13 @@ Character *fchar_next(Character *ch, int *numtargets) {
         return NULL;
     for (vict = IN_ROOM(ch)->people; (vict);) {
         if (i == 0) {
-            SET_BIT(INTERNAL(vict), INT_MARK);
+            SET_BIT(INTERNAL_FLAGS(vict), INT_MARK);
             (*numtargets)--;
             return vict;
         }
         do {
             vict = vict->next_in_room;
-        } while (vict && IS_SET(INTERNAL(vict), INT_MARK));
+        } while (vict && IS_SET(INTERNAL_FLAGS(vict), INT_MARK));
     }
     return NULL;
 }

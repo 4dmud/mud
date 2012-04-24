@@ -231,12 +231,12 @@ void hunt_victim(Character *ch) {
     if ((dir = graph.find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
 	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB)) {
         if (dir != BFS_ALREADY_THERE) {
-	    if (!IS_SET(INTERNAL(ch), INT_LOSTPREY)) {
+	    if (!IS_SET(INTERNAL_FLAGS(ch), INT_LOSTPREY)) {
                 snprintf(tbuf, sizeof(tbuf), "Damn! I lost %s!", HMHR(HUNTING(ch)));
                 do_say(ch, tbuf, 0, 0);
 	        //now that the world knows that, we don't have to repeat it all the time.
 		//Continue hunting though.
-	        SET_BIT(INTERNAL(ch), INT_LOSTPREY);
+	        SET_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
 	    }
         } else {
             HUNTING(ch) = NULL;
@@ -244,7 +244,7 @@ void hunt_victim(Character *ch) {
         }
     } else {
         if (IN_ROOM(ch) && HUNTING(ch) && IN_ROOM(HUNTING(ch)) && IN_ROOM(HUNTING(ch))->zone == IN_ROOM(ch)->zone) {
-	    REMOVE_BIT(INTERNAL(ch), INT_LOSTPREY);
+	    REMOVE_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
             switch (number(0, 20)) {
             case 0:
                 HUNTING(ch)->Send("You sense something nearby, coming for you.\r\n");

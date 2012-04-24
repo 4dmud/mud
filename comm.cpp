@@ -70,6 +70,12 @@
 #else
 #include "telnet.h"
 #endif
+
+#if ECL
+#include <ecl/ecl.h>
+#include "lisp.h"
+#endif
+
 /*
  * Note, most includes for all platforms are in sysdep.h.  The list of
  * files that is included is controlled by config.h for that platform.
@@ -399,6 +405,18 @@ void gettimeofday(struct timeval *t, struct timezone *dummy) {
 #define plant_magic(x)   do { (x)[sizeof(x) - 1] = MAGIC_NUMBER; } while (0)
 #define test_magic(x)    ((x)[sizeof(x) - 1])
 
+#if ECL
+int start_argc;
+char **start_argv;
+
+void boot_lisp (int argc, char **argv) {
+  ecl_set_option(ECL_OPT_TRAP_SIGSEGV, FALSE);
+  ecl_set_option(ECL_OPT_TRAP_SIGINT, FALSE);
+  cl_boot(argc, argv);
+  ecl_init_module(OBJNULL, init_4d_lisp);
+}
+#endif
+
 int main(int argc, char **argv) {
     //ush_int port;
     int pos = 1;
@@ -425,6 +443,35 @@ int main(int argc, char **argv) {
     argc = ccommand(&argv);
     /* Initialize the GUSI library calls.  */
     GUSIDefaultSetup();
+#endif
+
+#if ECL
+    const char* shell_flag = "--shell";
+    const char *const_string;
+    if (argc >= 2 && !strncmp(shell_flag,argv[1],strlen(shell_flag))) {
+      boot_lisp(argc,argv);
+      ecl_init_module(OBJNULL, init_4d_lisp);
+
+      if (argc == 3) {
+	const_string = "(handler-case (load \"%s\") (error (e) (format t \"error: ~a~%\" e)))";
+	int es_size = strlen(const_string) + strlen(argv[2]);
+	char* eval_string = (char *)malloc(es_size);
+	snprintf(eval_string, es_size, const_string, argv[2]);
+	cl_safe_eval(c_string_to_object(eval_string), Cnil, Cnil);
+	free(eval_string);
+
+      }
+      else {
+	printf("No file argument detected. starting interactive repl.\n");
+	const_string = "(handler-case (loop (write-string \"> \") (princ (eval (read))) (terpri)) (error (e) (format t \"error: ~a~%\" e)))";
+	cl_safe_eval(c_string_to_object(const_string), Cnil, Cnil);
+      }
+
+      cl_shutdown();
+      exit(0);
+    }
+
+       
 #endif
 
     /****************************************************************************/
@@ -584,6 +631,10 @@ int main(int argc, char **argv) {
         log("Done.");
     } else {
         log("Running game on port %d.", port);
+#if ECL
+	start_argc = argc;
+	start_argv = argv;
+#endif
         init_game(port);
     }
 
@@ -792,9 +843,25 @@ void init_game(ush_int s_port) {
     if (fCopyOver)         /* reload players */
         copyover_recover();
 
+#if ECL
+    // start lisp
+    boot_lisp(start_argc, start_argv);
+    
+    ecl_init_module(OBJNULL, init_4d_lisp);
+    //read_VV(OBJNULL, init_lib_4D_LISP);
+    cl_safe_eval(c_string_to_object("(handler-case (4d:init) (error (e) (format t \"error: ~a~%\" e)))"), Cnil, Cnil);
+    //start_swank(s_port+100);
+#endif
     log("Entering game loop.");
 
     game_loop(mother_desc);
+
+#if ECL
+    //stop lisp
+    //    stop_swank();
+    cl_shutdown();
+#endif
+
     log("Crash saving all.");
     Crash_save_all();
 

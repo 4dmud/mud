@@ -10,6 +10,9 @@
 ************************************************************************ */
 
 #define __INTERPRETER_C__
+#if ECL
+#include <ecl/ecl.h>
+#endif
 
 #include "config.h"
 #include "sysdep.h"
@@ -216,8 +219,8 @@ ACMD ( do_levels );
 ACMD ( do_linkload );
 ACMD ( do_listen );
 ACMD ( do_load );
-ACMD ( do_loginmsg ); /* THOTTER EDIT!!! */
-ACMD ( do_logoutmsg );   /* THOTTER EDIT!!! */
+ACMD ( do_loginmsg );
+ACMD ( do_logoutmsg );
 ACMD ( do_landscape );
 ACMD ( do_look );
 ACMD ( do_map );
@@ -444,6 +447,9 @@ ACMD ( do_killlist );
 ACMD ( do_recall );
 ACMD ( do_fake_cmd);  // SYSTEM USE ONLY
 
+#if ECL
+ACMD ( do_lisp);
+#endif
 /* This is the Master Command List(tm).
 
  * You can put new commands in, take commands out, change the order
@@ -663,7 +669,6 @@ const command_info cmd_info[] =
 	{ "keeptitle", "keep" , POS_RESTING , do_gen_tog  , 1, SCMD_KEEPTITLE, 0 },
 
 	{ "knit"     , "knit"     , POS_SITTING , do_assemble , 0, SUB_KNIT, 0 },
-
 	{ "look"     , "l"   , POS_RESTING , do_look     , 0, SCMD_LOOK, 0 },
 	{ "last"     , "la"  , POS_DEAD    , do_last     , LVL_IMMORT, 0, WIZ_IMM2_GRP },
 	{ "leader"   , "lead"     , POS_STANDING    , do_leader   , 0, 0, 0 },
@@ -677,10 +682,9 @@ const command_info cmd_info[] =
 	{ "lock"     , "loc" , POS_SITTING , do_gen_door , 0, SCMD_LOCK, 0 },
 	{ "locker"   , "locker"  , POS_RESTING , do_locker   , 0, 0, 0 },
 	{ "load"     , "loa" , POS_DEAD    , do_load     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
-	{ "loginmsg"        , "loginm"      , POS_DEAD      , do_loginmsg   , 0, 0, 0 },      /*EDITED BY THOTTER!!! */
-	{ "logoutmsg"       , "logoutm"     , POS_DEAD      , do_logoutmsg  , 0, 0, 0 },      /*EDITED BY THOTTER!!! */
+	{ "loginmsg"        , "loginm"      , POS_DEAD      , do_loginmsg   , 0, 0, 0 },
+	{ "logoutmsg"       , "logoutm"     , POS_DEAD      , do_logoutmsg  , 0, 0, 0 },
 	{ "landscape"     , "landscape"     , POS_DEAD    , do_landscape     , LVL_IMMORT, 0, WIZ_LOAD_GRP },
-
 	{ "medit"    , "med" , POS_DEAD    , do_oasis      , LVL_BUILDER, SCMD_OASIS_MEDIT, WIZ_OLC_GRP },
 	{ "movemsg" , "mov"  , POS_DEAD    , do_gen_tog  , 0, SCMD_MOVEMSG, 0 },
 	{ "motd"     , "motd" , POS_DEAD    , do_gen_ps   , 0, SCMD_MOTD, 0 },
@@ -1046,6 +1050,9 @@ const command_info cmd_info[] =
 	/* End Mating Module Command List */
         /* Horus - blank commands for spec_procs */
         { "trade"    , "trade"     , POS_STANDING,   do_trade, 0, 0, 0 },
+#if ECL
+	{ "#"        , "#"        , POS_DEAD        , do_lisp, LVL_SEN, 0, WIZ_IMPL_GRP },
+#endif
         { "zzzzzsystem", "zzzzzsystem", POS_STANDING, do_fake_cmd, 0, 0, 0 },
 
 	{ "\n", "zzzzzzz", 0, 0, 0, 0, 0 }
@@ -3076,5 +3083,3 @@ void con_disp_menu ( Descriptor *d )
 	d->Output ( "%s",MENU );
 	STATE ( d ) = CON_MENU;
 }
-
-

@@ -1,0 +1,10 @@
+(require 'cmp)
+
+(c:build-static-library "4d-lisp.a"
+			:init-name "init_4d_lisp"
+			:lisp-files (let ((files 
+					   (loop for file = (read-line t nil)
+					      while file
+					      collect file)))
+				      (format t "files: ~s~%" files)
+				      files))
