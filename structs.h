@@ -663,6 +663,7 @@ class Room;
 #define PRF_AUTOGROUP   	54
 #define PRF_RETIRED     	55    /* For retired clan leaders */
 #define PRF_NOTITLE    		56
+#define PRF_DEED_MASTER		57
 
 /* Descriptor flags */
 #define DESC_CANZLIB     (1 << 0)  /* Client says compression capable.   */

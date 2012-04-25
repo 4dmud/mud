@@ -592,6 +592,13 @@ SPECIAL(clan_deeds)
   gain_exp(ch, 24322978);
   GET_GOLD(ch) += 5000000;
   }
+  if (GET_DEED_COUNT(ch) == 250) {
+  ch->Send("{{ccYou gain {cC30000000{cc exp and {cC7,500,000{cc gold for reaching the milestone of 250 deeds!\r\n");
+  send_to_all("{cY%s just reached the deed milestone of 250 deeds!\r\n{cn", GET_NAME(ch));
+  gain_exp(ch, 30000000);
+  GET_GOLD(ch) += 7500000;
+  }
+
   if (GET_DEED_COUNT(ch) == 500) {
   ch->Send("{ccYou gain {cC331498092{cc exp and {cC10,000,000{cc gold for reaching the milestone of 500 deeds!\r\n");
   send_to_all("{cYAmazing! %s just reached the deed milestone of 500 deeds!\r\n{cn", GET_NAME(ch));
@@ -600,9 +607,17 @@ SPECIAL(clan_deeds)
   }
   if (GET_DEED_COUNT(ch) == 1000) {
   ch->Send("{ccYou gain {cC500000000 exp and {cC20,000,000{cc gold for reaching the milestone of 1000 deeds!!\r\n");
-  send_to_all("{cc%s has just become a {cCDeed Master{cc with {cC1000{cc deeds collected!!{cn\r\n", GET_NAME(ch));
+  send_to_all("{cc%s has just become a {cCminor Deed Master{cc with {cC1000{cc deeds collected!!{cn\r\n", GET_NAME(ch));
   gain_exp(ch, 500000000);
   GET_GOLD(ch) += 20000000;
+  }
+  if (GET_DEED_COUNT(ch) == 2000) {
+
+  ch->Send("{{ccYou gain {cC1 BILLION{cc exp and {cC50,000,000{cc gold for reaching the milestone of 2000 deeds!\r\n");
+  send_to_all("{cc%s is a true {cCDeed Master{cc with {cC2000{cc deeds collected!!\r\n{cn", GET_NAME(ch));
+  SET_BIT_AR(PRF_FLAGS(ch) , PRF_DEED_MASTER);
+  gain_exp(ch, 1000000000);
+  GET_GOLD(ch) += 50000000;
   }
 
   ch->Send("You have now claimed a new deed for your clan!\r\n");
