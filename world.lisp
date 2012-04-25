@@ -22,6 +22,9 @@
 (defmethod name ((zone zone))
   (oneliner ((rnum zone)) (:int) :cstring "zone_table[#0].name"))
 
+(defmethod builders ((zone zone))
+  (oneliner ((rnum zone)) (:int) :cstring "zone_table[#0].builders"))
+
 (defun zone (znum)
   (let ((rnum
 	 (ffi:c-inline (znum) (:int) :int
@@ -54,6 +57,15 @@
 (defmethod title ((room room))
   (oneliner ((vnum room)) (:int) :cstring "world_vnum[#0]->name"))
 
+(defmethod zone-of ((room room))
+  (declare (type room room))
+  (let* ((rnum (oneliner ((vnum room)) (:int) :int
+			 "world_vnum[#0]->zone"))
+	 (znum (oneliner (rnum) (:int) :int
+			 "zone_table[#0].number")))
+    (make-instance 'zone :rnum rnum :znum znum)))
+    
+
 (defun room (vnum)
   (if (ffi:null-pointer-p (oneliner (vnum) (:int) :pointer-void
 				    "world_vnum[#0]"))
@@ -69,3 +81,13 @@
    (loop for vnum from bottom to top nconc
 	 (handler-case (list (room vnum))
 	   (error () nil)))))
+
+(defun all-rooms ()
+  (let ((size (oneliner () () :int "world_vnum.size()")))
+    (loop for vnum in 
+	 (remove-if #'(lambda (vnum)
+			(ffi:null-pointer-p (oneliner (vnum) (:int) :pointer-void "world_vnum[#0]")))
+		    (loop for vnum from 0 to (1- size)
+		       collect vnum))
+	 collect (make-instance 'room :vnum vnum))))
+	 

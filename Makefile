@@ -13,7 +13,7 @@ LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 SRCFILES := $(wildcard *.cpp)
 OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
 ifeq ($(ECL),1)
-	LISPFILES := init.lisp helpers.lisp
+	LISPFILES := $(wildcard *.lisp)
 	LISPOBJS := $(patsubst %.lisp,%.obj,$(LISPFILES))
 	MYFLAGS += -DECL=1 $(shell ecl-config --cflags)
 	LIBS += $(shell ecl-config --ldflags)
@@ -56,15 +56,15 @@ lisp/lib4d-lisp.a: $(BINDIR)/circle
 
 clean:
 	rm -f *.o depend
-	rm -f lisp/lib4d-lisp.a
+	rm -f *.obj lisp/lib4d-lisp.a
 
 # Dependencies for the object files (automagically generated with
 # gcc -MM)
 
-depend:
-	$(CC) -MM *.cpp > depend
+#depend:
+#	$(CC) -MM *.cpp > depend
 
 force-look:
 	true
 
--include depend
+#-include depend
