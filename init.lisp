@@ -9,6 +9,7 @@
 (defun init ()
   (format t "initializing lisp.~%")
   (in-package :4d)
+  (defvar *started* t)
   (if (probe-file +startup-file+)
       (load +startup-file+)
       (format t "No startup lisp file found. continuing..~%")))
