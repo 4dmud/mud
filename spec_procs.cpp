@@ -613,7 +613,7 @@ SPECIAL(clan_deeds)
   }
   if (GET_DEED_COUNT(ch) == 2000) {
 
-  ch->Send("{{ccYou gain {cC1 BILLION{cc exp and {cC50,000,000{cc gold for reaching the milestone of 2000 deeds!\r\n");
+  ch->Send("{ccYou gain {cC1 BILLION{cc exp and {cC50,000,000{cc gold for reaching the milestone of 2000 deeds!\r\n");
   send_to_all("{cc%s is a true {cCDeed Master{cc with {cC2000{cc deeds collected!!\r\n{cn", GET_NAME(ch));
   SET_BIT_AR(PRF_FLAGS(ch) , PRF_DEED_MASTER);
   gain_exp(ch, 1000000000);
