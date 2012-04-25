@@ -83,7 +83,7 @@ void remort_char ( Character *ch )
 ACMD ( do_remort )
 {
 	int i = 0;
-	byte current, remort, rtwo;
+	sbyte current, remort, rtwo;
 
 
 	current = GET_CLASS ( ch );

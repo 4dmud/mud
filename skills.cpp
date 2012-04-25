@@ -958,7 +958,7 @@ ASKILL ( skill_sneak )
 {
 
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 	if ( AFF_FLAGGED ( ch, AFF_SNEAK ) )
 	{
@@ -997,7 +997,7 @@ ASKILL ( skill_sneak )
 ASKILL ( skill_hide )
 {
 
-	byte percent;
+	sbyte percent;
 
 	if ( AFF_FLAGGED ( ch, AFF_HIDE ) )
 	{
@@ -1573,7 +1573,7 @@ ASKILL ( skill_phase )
 ASKILL ( skill_grip )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 
 	if ( AFF_FLAGGED ( ch, AFF_GRIP ) )
@@ -1646,7 +1646,7 @@ ASKILL ( skill_face )
 ASKILL ( skill_focus )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
 		*ch << "You are far too exhausted!";
@@ -1734,7 +1734,7 @@ ASKILL ( skill_grapple )
 ASKILL ( skill_beserk )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 	if ( use_stamina ( ch, 20 ) < 0 )
 	{
@@ -1774,7 +1774,7 @@ ASKILL ( skill_beserk )
 ASKILL ( skill_meditate )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 
 	if ( AFF_FLAGGED ( ch, AFF_MEDITATE ) )
@@ -1811,7 +1811,7 @@ ASKILL ( skill_meditate )
 ASKILL ( skill_true_strike )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 	if ( use_stamina ( ch, 25 ) < 0 )
 	{
@@ -1857,7 +1857,7 @@ ASKILL ( skill_flank )
 ASKILL ( skill_fortify )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 	if ( AFF_FLAGGED ( ch, AFF_FORTIFY_BODY ) )
 	{
@@ -2004,7 +2004,7 @@ ASKILL ( skill_scalp )
 ASKILL ( skill_blade_dance )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 
 
 	if ( AFF_FLAGGED ( ch, AFF_BLADEDANCE ) )
@@ -2093,7 +2093,7 @@ ASKILL ( skill_martial_arts )
 {
 
 	struct affected_type af[2];
-	byte percent;
+	sbyte percent;
 	int i;
 
 	WAIT_STATE ( ch, 3 RL_SEC );
@@ -2232,7 +2232,7 @@ ASKILL ( skill_slip )
 ASKILL ( skill_hyperactivity )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 	WAIT_STATE ( ch, 3 RL_SEC );
 	if ( AFF_FLAGGED ( ch, AFF_HYPERACTIVITY ) )
 	{
@@ -2270,7 +2270,7 @@ ASKILL ( skill_hyperactivity )
 ASKILL ( skill_holy_strength )
 {
 	struct affected_type af;
-	byte percent;
+	sbyte percent;
 	WAIT_STATE ( ch, 3 RL_SEC );
 	if ( AFF_FLAGGED ( ch, AFF_HOLY_STRENGTH ) )
 	{
@@ -2306,7 +2306,7 @@ ASKILL ( skill_holy_strength )
 
 ASKILL ( skill_brace )
 {
-	byte percent;
+	sbyte percent;
 	struct affected_type af;
 
 	WAIT_STATE ( ch, 3 RL_SEC );

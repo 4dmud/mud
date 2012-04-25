@@ -1618,7 +1618,7 @@ void wiz_initialize ( void )
 
 void wiz_read_file ( void )
 {
-	void wiz_add_name ( byte level,const char *name );
+	void wiz_add_name ( sbyte level,const char *name );
 	int i;
 
 	vector<level_rec>::iterator curr_level;
@@ -1639,7 +1639,7 @@ void wiz_read_file ( void )
 
 
 
-void wiz_add_name ( byte level,const char *name )
+void wiz_add_name ( sbyte level,const char *name )
 {
 	string tmp = tocapitals ( string ( name ) );
 	vector<level_rec>::iterator curr_level;

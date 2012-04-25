@@ -21,8 +21,8 @@ class Descriptor {
 public:
     socket_t descriptor; /* file descriptor for socket           */
     //char host[HOST_LENGTH + 1];    /* hostname                             */
-    byte bad_pws;        /* number of bad pw attemps this login  */
-    byte idle_tics;      /* tics idle at password prompt         */
+    sbyte bad_pws;        /* number of bad pw attemps this login  */
+    sbyte idle_tics;      /* tics idle at password prompt         */
     int connected;       /* mode of 'connectedness'              */
     int orig_connected;
     int sub_state;

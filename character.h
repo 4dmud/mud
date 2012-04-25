@@ -52,7 +52,7 @@ public:
     struct follow_type *followers; /* List of chars followers       */
     Character *master;   /* Who is char following?        */
     long cmd2;           /* These wizcmds aren't saved     */
-    byte internal_flags; /* Flags used internally - not saved */
+    sbyte internal_flags; /* Flags used internally - not saved */
     struct event *pts_event[4]; /* events for regening H/M/V/S     */
     struct event *fight_event;     /*events used for fighting/defending */
     map<int, struct event *> message_event; /* events used in skill/spell messages*/
@@ -73,7 +73,7 @@ public:
     time_t last_move;
     int sweep_damage;
     int body;                   /* body positions aquired */
-    byte atk;
+    sbyte atk;
     long pulling;
     mob_vnum pet;
     struct travel_point_data *travel_list;

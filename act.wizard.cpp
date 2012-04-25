@@ -4528,7 +4528,7 @@ ACMD ( do_show )
 	size_t len, nlen;
 	zone_rnum zrn = NOWHERE;
 	zone_vnum zvn = NOWHERE;
-	byte self = FALSE;
+	sbyte self = FALSE;
 	Character *vict = NULL;
 	Descriptor *d;
 	char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH];
@@ -5301,7 +5301,7 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			}
 			RANGE ( 0, LVL_IMPL );
 			GET_ORIG_LEV ( vict ) = 0;
-			vict->player.level = ( byte ) value;
+			vict->player.level = ( sbyte ) value;
 			break;
 		case 35:
 			if ( ( rnum = real_room ( value ) ) != NULL )

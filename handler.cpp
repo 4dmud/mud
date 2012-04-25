@@ -35,7 +35,7 @@ extern const char *MENU;
 struct hunter_data *hunter_list = NULL;
 
 /* local functions */
-void affect_modify_ar ( Character *ch, byte loc, sbyte mod,
+void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod,
                         int bitv[], bool add
                       );
 int apply_ac ( Character *ch, int eq_pos );
@@ -306,7 +306,7 @@ int is_name ( const char *str, const char *namelist )
 
 
 
-void affect_modify ( Character *ch, byte loc, int mod,
+void affect_modify ( Character *ch, sbyte loc, int mod,
                      bitvector_t bitv, bool add
                    )
 {
@@ -446,7 +446,7 @@ void affect_modify ( Character *ch, byte loc, int mod,
 }
 
 
-void aff_apply_modify ( Character *ch, byte loc, int mod, char *msg )
+void aff_apply_modify ( Character *ch, sbyte loc, int mod, char *msg )
 {
 
 
@@ -606,7 +606,7 @@ void affect_modify(Character * ch, byte loc, sbyte mod,
 
 
 
-void affect_modify_ar ( Character *ch, byte loc, int mod,
+void affect_modify_ar ( Character *ch, sbyte loc, int mod,
                         int bitv[], bool add
                       )
 {

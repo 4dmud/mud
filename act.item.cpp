@@ -329,7 +329,7 @@ int where_to_worn ( int where );
 void update_timer ( struct obj_data *obj );
 bool can_take_obj ( Character *ch, struct obj_data *obj );
 bool perform_get_from_room ( Character *ch, struct obj_data *obj );
-int perform_drop ( Character *ch, struct obj_data *obj, byte mode,
+int perform_drop ( Character *ch, struct obj_data *obj, sbyte mode,
                    const char *sname, Room * RDR );
 int find_eq_pos ( Character *ch, struct obj_data *obj, char *arg );
 Character *give_find_vict ( Character *ch, char *arg );
@@ -338,7 +338,7 @@ void perform_give_gold ( Character *ch, Character *vict,
                          gold_int amount );
 void perform_give ( Character *ch, Character *vict,
                     struct obj_data *obj );
-void perform_drop_gold ( Character *ch, gold_int amount, byte mode,
+void perform_drop_gold ( Character *ch, gold_int amount, sbyte mode,
                          Room *  RDR );
 void get_check_money ( Character *ch, struct obj_data *obj );
 void weight_change_object ( struct obj_data *obj, int weight );
@@ -1585,7 +1585,7 @@ ACMD ( do_get )
 
 
 void perform_drop_gold ( Character *ch, gold_int amount,
-                         byte mode, Room *  RDR )
+                         sbyte mode, Room *  RDR )
 {
 	struct obj_data *obj;
 	char buf[MAX_INPUT_LENGTH];
@@ -1676,7 +1676,7 @@ void perform_drop_gold ( Character *ch, gold_int amount,
                       "  It vanishes in a puff of smoke!" : "")
 
 int perform_drop ( Character *ch, struct obj_data *obj,
-                   byte mode, const char *sname, Room *  RDR )
+                   sbyte mode, const char *sname, Room *  RDR )
 {
 	int value;
 	char buf[MAX_INPUT_LENGTH];
@@ -1781,7 +1781,7 @@ ACMD ( do_drop )
 {
 	struct obj_data *obj, *next_obj;
 	Room *  RDR = NULL;
-	byte mode = SCMD_DROP;
+	sbyte mode = SCMD_DROP;
 	int dotmode, amount = 0, multi, num_don_rooms = 0;
 	const char *sname;
 	char buf[MAX_INPUT_LENGTH];

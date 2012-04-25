@@ -160,8 +160,8 @@ FILE *comfile = NULL; /* where to send communications */
 struct comm_data *commlist = NULL;
 int intermud_desc;
 int connected_to_intermud;
-byte reread_wizlist;          /* signal: SIGUSR1 */
-byte emergency_unban;         /* signal: SIGUSR2 */
+sbyte reread_wizlist;          /* signal: SIGUSR1 */
+sbyte emergency_unban;         /* signal: SIGUSR2 */
 
 void free_host_list();
 void add_ip_to_host_list(string &host_ip, string &host, time_t date);

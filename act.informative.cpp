@@ -374,7 +374,7 @@ void diag_char_to_char ( Character *i, Character *ch )
 {
 	static struct
 	{
-		byte percent;
+		sbyte percent;
 		const char *text;
 	}
 	diagnosis[] =

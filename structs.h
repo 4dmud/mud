@@ -1407,10 +1407,6 @@ typedef unsigned short int ush_int;
 typedef char bool;
 #endif
 
-#if !defined(CIRCLE_WINDOWS) || defined(LCC_WIN32)     /* Hm, sysdep.h? */
-typedef unsigned char byte;
-#endif
-
 typedef int room_vnum;        /* A room's vnum type                   */
 typedef int obj_vnum;         /* An object's vnum type                */
 typedef int mob_vnum;         /* A mob's vnum type                    */
@@ -1505,7 +1501,7 @@ struct ident_list {
 /* object flags; used in obj_data */
 struct obj_flag_data {
     int value[NUM_OBJ_VAL_POSITIONS];   /* Values of the item (see list) */
-    byte type_flag;      /* Type of item                  */
+    sbyte type_flag;      /* Type of item                  */
     int level;      /* Minimum level of object.        */
     int wear_flags[TW_ARRAY_MAX];  /* Where you can wear it         */
     int extra_flags[EF_ARRAY_MAX]; /* If it hums, glows, etc.       */
@@ -1524,7 +1520,7 @@ struct obj_flag_data {
 
 /* Used in obj_file_elem *DO*NOT*CHANGE* */
 struct obj_affected_type {
-    byte location;       /* Which ability to change (APPLY_XXX) */
+    sbyte location;       /* Which ability to change (APPLY_XXX) */
     short int modifier;      /* How much it changes by              */
 };
 
@@ -1733,7 +1729,7 @@ public:
     int room_flags[RF_ARRAY_MAX];  /* DEATH,DARK ... etc           */
     struct room_mine_data mine;
 
-    byte light;               /* Number of lightsources in room       */
+    sbyte light;               /* Number of lightsources in room       */
     SPECIAL(*func);
 
     vector<int> *proto_script;    /* list of default triggers    */
@@ -1833,17 +1829,17 @@ struct char_player_data {
     char *long_descr;         /* for 'look'                           */
     char *description;        /* Extra descriptions                   */
     char *title;         /* PC / NPC's title                     */
-    byte sex;            /* PC / NPC's sex                       */
-    byte chclass;        /* PC / NPC's class                     */
+    sbyte sex;            /* PC / NPC's sex                       */
+    sbyte chclass;        /* PC / NPC's class                     */
     int race;            /* PC / NPC's race                      */
     //unsigned long body_bits;          /* Which body parts do you have              */
     int level;           /* PC / NPC's level                     */
     struct time_data time;    /* PC's AGE in days                 */
     ubyte weight;        /* PC / NPC's weight                    */
     ubyte height;        /* PC / NPC's height                    */
-    byte was_class;      /* PC's Previous class                   */
-    byte was_class1;          /* PC's Previous class                   */
-    byte was_class2;          /* PC's Previous class                   */
+    sbyte was_class;      /* PC's Previous class                   */
+    sbyte was_class1;          /* PC's Previous class                   */
+    sbyte was_class2;          /* PC's Previous class                   */
     int romance;         /* Romance Involvement Variable         */
     long partner;        /* id of Romance Partner     (was char pointer, but meh, why bother with the freeing?)         */
     int ticks_left;      /* Timer variable                       */
@@ -1919,7 +1915,7 @@ struct char_special_data {
     Character *hunting;  /* Char hunted by this char             */
     Character *riding;   // Who are they riding? (DAK)
     Character *ridden_by;     // Who is riding them? (DAK)
-    byte position;       /* Standing, fighting, sleeping, etc.   */
+    sbyte position;       /* Standing, fighting, sleeping, etc.   */
     int hunt_count;
     int tally[3];
     int carry_weight;         /* Carried weight                       */
@@ -1949,7 +1945,7 @@ typedef map<int,struct skillspell_data*> skills_map;
 class player_special_data_saved {
 public:
     int wimp_level;      /* Below this # of hit points, flee!    */
-    byte freeze_level;        /* Level of god who froze char, if any  */
+    sbyte freeze_level;        /* Level of god who froze char, if any  */
     int invis_level;          /* level of invisibility                */
     int pref[PR_ARRAY_MAX];   /* preference flags for PC's.           */
     ubyte bad_pws;       /* number of bad password attempts      */
@@ -2433,17 +2429,17 @@ struct dam_from_list {
 
 /* Specials used by NPCs, not PCs */
 struct mob_special_data {
-    byte last_direction; /* The last direction the monster went      */
+    sbyte last_direction; /* The last direction the monster went      */
     int attack_type;          /* The Attack Type Bitvector for NPC's      */
-    byte default_pos;         /* Default position for NPC                 */
+    sbyte default_pos;         /* Default position for NPC                 */
     memory_rec *memory;       /* List of attackers to remember            */
-    byte damnodice;      /* The number of damage dice's              */
-    byte damsizedice;         /* The size of the damage dice's            */
+    sbyte damnodice;      /* The number of damage dice's              */
+    sbyte damsizedice;         /* The size of the damage dice's            */
     int race;            /* The mobs race - seperate from PC's       */
     int type;            /* The type of animal ... bird, cat, dog??? */
     bool pregnant;       /* Is the mob pregnant                      */
     int due_date;        /* How long until it gives birth            */
-    byte tier;
+    sbyte tier;
     int subskill;
     long owner; /* the owner of this beast! */
     obj_vnum skin;
@@ -2461,7 +2457,7 @@ struct affected_type {
     sh_int type;         /* The type of spell that caused this      */
     time_t expire;       /* For how long its effects will last      */
     int modifier;        /* This is added to apropriate ability     */
-    byte location;       /* Tells which ability to change(APPLY_XXX) */
+    sbyte location;       /* Tells which ability to change(APPLY_XXX) */
     int aura;
     bitvector_t bitvector;    /* Tells which bits to set (AFF_XXX) */
 
@@ -2589,7 +2585,7 @@ struct familiar_info {
     int level;           /*level of familiar */
     long long exp;
     bitvector_t abilities;    /*special abilities, ie: scout */
-    byte type;           /*equine, feline, canine */
+    sbyte type;           /*equine, feline, canine */
     int maxmana;
     int mana;
     int maxmove;
@@ -2655,12 +2651,12 @@ struct str_app_type {
 
 
 struct wis_app_type {
-    byte bonus;               /* how many practices player gains per lev */
+    sbyte bonus;               /* how many practices player gains per lev */
 };
 
 
 struct int_app_type {
-    byte learn;               /* how many % a player learns a spell/skill */
+    sbyte learn;               /* how many % a player learns a spell/skill */
 };
 
 

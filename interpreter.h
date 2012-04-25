@@ -65,7 +65,7 @@ void delete_aliases(const char *charname);
 struct command_info {
     const char *command;
     const char *sort_as;
-    byte minimum_position;
+    sbyte minimum_position;
     void (*command_pointer) (Character * ch, char *argument, int cmd, int subcmd);
     sh_int minimum_level;
     int subcmd;

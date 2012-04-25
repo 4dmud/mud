@@ -203,7 +203,7 @@ ACMD(do_track) {
 
 void hunt_victim(Character *ch) {
     int dir;
-    byte found;
+    sbyte found;
     Character *tmp;
     char tbuf[MAX_STRING_LENGTH];
 

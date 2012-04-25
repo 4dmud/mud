@@ -111,7 +111,7 @@ void sub_write_to_char(Character * ch, char *tokens[],
 }
 
 
-void sub_write(char *arg, Character * ch, byte find_invis, int targets)
+void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
 {
   char str[MAX_INPUT_LENGTH * 2];
   char type[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];

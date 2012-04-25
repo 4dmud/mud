@@ -62,7 +62,7 @@ int total_sub_chance(Character *ch, enum subskill_list  sub);
 void unused_sub(enum subskill_list subcmd);
 
 void subo(enum subskill_list subcmd, const char *name, int stat, int cost,
-          int percent, int minpos, int targets, byte violent, int routines,
+          int percent, int minpos, int targets, sbyte violent, int routines,
           int stat_type, int flags, int cl_type, int perent);
 
 const char *sub_name(int num);
@@ -1116,7 +1116,7 @@ struct obj_data * revert_object(struct obj_data *hilt) {
 
 
 void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
-          int percent, int minpos, int targets, byte violent, int routines,
+          int percent, int minpos, int targets, sbyte violent, int routines,
           int stat_type, int flags, int cl_type, int perent) {
     SINFO.min_position = minpos;		/* Position for caster   */
     SINFO.stat = sta;		/* uses hitp, mana, or move points */

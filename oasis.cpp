@@ -195,7 +195,7 @@ void get_char_colours(Character *ch)
  * attatched to a descriptor, sets all flags back to how they
  * should be.
  */
-void cleanup_olc(Descriptor *d, byte cleanup_type)
+void cleanup_olc(Descriptor *d, sbyte cleanup_type)
 {
   /*
    * Clean up WHAT?

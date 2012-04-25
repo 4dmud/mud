@@ -36,7 +36,7 @@ void hit_death_trap ( Character *ch );
 void do_objstat ( Character *ch, struct obj_data *j );
 void do_sstat_objdump ( Character * ch, obj_data * j );
 void script_stat_dump ( Character * ch, struct script_data *sc );
-void affect_modify_ar ( Character *ch, byte loc, sbyte mod,
+void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod,
                         int bitv[], bool add
                       );
 void improve_skill ( Character *ch, int skill );

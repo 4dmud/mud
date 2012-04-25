@@ -54,7 +54,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
 
     get_line(trig_f, line);
     k = sscanf(line, "%d %s %d", &attach_type, flags, t);
-    trig->attach_type = (byte)attach_type;
+    trig->attach_type = (sbyte)attach_type;
     trig->trigger_type = (long)asciiflag_conv(flags);
     trig->narg = (k == 3) ? t[0] : 0;
 

@@ -108,7 +108,7 @@ int   thaco ( int chclass_num, int level );
 
 int   invalid_class ( Character *ch, struct obj_data *obj );
 long find_class_bitvector ( char arg );
-byte  saving_throws ( int chclass_num, int type, int level );
+sbyte  saving_throws ( int chclass_num, int type, int level );
 void  roll_real_abils ( Character * ch );
 void  do_start ( Character * ch );
 const char *title_male ( int chclass, int level );
@@ -456,7 +456,7 @@ int guild_info[][3] =
  * Do not forget to change extern declaration in magic.c if you add to this.
  */
 
-byte saving_throws ( int chclass_num, int type, int level )
+sbyte saving_throws ( int chclass_num, int type, int level )
 {
 	switch ( chclass_num )
 	{

@@ -643,7 +643,7 @@ int magic_distance(Character *ch, int spellnum, int dir, Character *victim);
 
 
 struct spell_info_type {
-    byte min_position;		/* Position for caster   */
+    sbyte min_position;		/* Position for caster   */
     int mana_min;		/* Min amount of mana used by a spell
       				 * (highest lev) */
     int mana_max;		/* Max amount of mana used by a spell
@@ -653,7 +653,7 @@ struct spell_info_type {
 
     int min_level;
     int routines;
-    byte violent;
+    sbyte violent;
     int targets;		/* See below for use with TAR_XXX  */
     const char *name;
     int first_prereq;	/* prerequisite
@@ -696,7 +696,7 @@ struct spell_info_type {
 
 
 struct sub_skill_info_type {
-    byte min_position;		/* Position for caster   */
+    sbyte min_position;		/* Position for caster   */
     int stat;		/* uses hitp, mana, or move points */
     int cost;		        /* the cost in units */
     int percentage;		/* the cost in percentage */
@@ -708,7 +708,7 @@ struct sub_skill_info_type {
        is lower then the cost value -- mordipie
     */
     int routines;
-    byte violent;
+    sbyte violent;
     int targets;		/* See below for use with TAR_XXX  */
     const char *name; /*the name of the subskill*/
     int perent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */

@@ -174,8 +174,8 @@ struct trig_var_data {
 /* structure for triggers */
 struct trig_data {
     int nr;			/* trigger's rnum                  */
-    byte attach_type;		/* mob/obj/wld intentions          */
-    byte data_type;		/* type of game_data for trig      */
+    sbyte attach_type;		/* mob/obj/wld intentions          */
+    sbyte data_type;		/* type of game_data for trig      */
     char *name;			/* name of trigger                 */
     long trigger_type;		/* type of trigger (for bitvector) */
     struct cmdlist_element *cmdlist;	/* top of command list             */
@@ -400,7 +400,7 @@ void update_wait_events(Room *to, Room *from);
 char *any_one_name(char *argument, char *first_arg);
 void sub_write_to_char(Character *ch, char *tokens[],
                        void *otokens[], char type[]);
-void sub_write(char *arg, Character *ch, byte find_invis, int targets);
+void sub_write(char *arg, Character *ch, sbyte find_invis, int targets);
 void send_to_zone(char *messg, zone_rnum zone);
 void send_to_zone_range(char *messg, int zone_rnum, int lower_vnum,
                         int upper_vnum);
