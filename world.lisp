@@ -1,14 +1,11 @@
-(defpackage :4d
-  (:use :cl)
-  (:shadow room))
-(in-package :4d)
-
 ;;unfortunately the current compile method does not allow automatic dependency loading.
 ;;therefore we load util.lisp upon detecting that a compile is happening.
 ;;this allows compilation at compile- and runtime
 (eval-when (:compile-toplevel)
   (unless (boundp '*started*)
     (load "util.lisp")))
+
+(in-package :4d)
 
 (ffi:clines "#include \"lisp-internal.h\"")
 
@@ -90,4 +87,3 @@
 		    (loop for vnum from 0 to (1- size)
 		       collect vnum))
 	 collect (make-instance 'room :vnum vnum))))
-	 

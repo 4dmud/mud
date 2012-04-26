@@ -8,6 +8,7 @@
   (ffi:c-inline ((apply #'format nil args)) (:cstring) :void
 		"basic_mud_log(#0);"))
 
-(defun eval-string (form-string)
-  (princ-to-string (handler-case (eval (read-from-string form-string))
-		     (error (e) (format nil "error: ~a" e)))))
+(defun eval-string (player-name form-string)
+  (let ((*standard-output* (player player-name)))
+    (princ-to-string (handler-case (eval (read-from-string form-string))
+		       (error (e) (format nil "error: ~a" e))))))
