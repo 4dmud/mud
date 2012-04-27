@@ -2465,6 +2465,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 							*str = '\0';
 					}
+					else if ( !strcasecmp ( field, "no_teleport_in" )) {
+					  snprintf(str, slen, ROOM_FLAGGED(r, ROOM_NOTELEPORT_IN) ? "1" : "0");
+					}
+
 
 					break;
 				case 'o':
