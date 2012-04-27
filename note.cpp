@@ -1364,10 +1364,13 @@ void parse_note ( Character *ch, char *argument, int type )
 	           "=============DELETING===================\r\n"
 	           "%s DELETE\r\n"
 	           "Will let you delete any message that has been sent to you\r\n"
-	           "that has your NAME in the recipient list.\r\n",
+	           "that has your NAME in the recipient list.\r\n"
+		   "=============FORWARDING=================\r\n"
+		   "%s FORWARD <num> <recipients>\r\n"
+	           "Will let you forward any message that has been sent to you.\r\n",
 	           list_name,list_name,list_name,list_name,list_name,list_name,list_name,list_name,
 	           list_name,list_name,list_name,list_name,list_name,list_name,list_name,list_name,
-	           list_name,list_name
+	           list_name,list_name,list_name
 	         );
 	return;
 }
