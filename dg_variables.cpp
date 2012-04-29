@@ -629,7 +629,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                                                 snprintf ( str, slen, "new");
 					}	
 					else if (time_info.moon == MOON_WAXING_CRESCENT){
-                                                snprintf ( str, slen, "waning crescent");
+                                                snprintf ( str, slen, "waxing crescent");
                                         }
 					else if (time_info.moon == MOON_FIRST_QUARTER){
                                                 snprintf ( str, slen, "first quarter");
