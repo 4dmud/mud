@@ -587,13 +587,13 @@ SPECIAL(clan_deeds)
   GET_GOLD(ch) += 5000000;
   }
   if (GET_DEED_COUNT(ch) == 100) {
-  ch->Send("{{ccYou gain {cC24322978{cc exp and {cC5,000,000{cc gold for reaching the milestone of 100 deeds!\r\n");
+  ch->Send("{ccYou gain {cC24322978{cc exp and {cC5,000,000{cc gold for reaching the milestone of 100 deeds!\r\n");
   send_to_all("{cY%s just reached the deed milestone of 100 deeds!\r\n{cn", GET_NAME(ch));
   gain_exp(ch, 24322978);
   GET_GOLD(ch) += 5000000;
   }
   if (GET_DEED_COUNT(ch) == 250) {
-  ch->Send("{{ccYou gain {cC30000000{cc exp and {cC7,500,000{cc gold for reaching the milestone of 250 deeds!\r\n");
+  ch->Send("{ccYou gain {cC30000000{cc exp and {cC7,500,000{cc gold for reaching the milestone of 250 deeds!\r\n");
   send_to_all("{cY%s just reached the deed milestone of 250 deeds!\r\n{cn", GET_NAME(ch));
   gain_exp(ch, 30000000);
   GET_GOLD(ch) += 7500000;
