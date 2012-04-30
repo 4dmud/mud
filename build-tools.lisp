@@ -5,11 +5,19 @@
 
 (in-package :4d)
 
-(defcommand find-resets (:min-level 52 :trust-groups (:sen))
+(defcommand find (:min-level 52 :trust-groups (:sen))
+  (handler-case 
+      (let* ((stream (make-string-input-stream argument))
+	     (type (read stream)))
+	(case type
+	  (resets (find-resets stream))
+	  (t (error "no good."))))
+    (error () (format t "usage: find find-type arguments~%Available finders: resets~%"))))
+
+(defun find-resets (stream)
     (handler-case
-	(let* ((stream (make-string-input-stream argument))
-	       (type (read stream))
-	       (vnum (read stream)))
+	(let ((type (read stream))
+	      (vnum (read stream)))
 	  (assert (typep type 'symbol))
 	  (assert (typep vnum 'integer))
 
@@ -41,9 +49,8 @@
 		  (format t "in room ~d, ~a: ~a~%" (vnum (room-of reset)) (title (room-of reset)) msg)))))
       (object-prototype-not-found (e) (format t "No object found with vnum ~d.~%" (vnum e)))
       (mobile-prototype-not-found (e) (format t "No mobile found with vnum ~d.~%" (vnum e)))
-      (error () (format t "usage: find-resets [obj|mob] vnum.~%"))))
-
-
+      (error () (format t "usage: find resets [obj|mob] vnum.~%"))))
+	
 (defun find-object-resets (vnum)
   (remove-if-not #'(lambda (reset)
 		     (handler-case 
