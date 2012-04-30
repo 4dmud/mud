@@ -32,6 +32,7 @@
   (and command
        (>= (level character) (min-level command))
        (or (= (level character) (oneliner () () :int "LVL_IMPL"))
+	   (= 0 (trust-value command))
 	   (/= 0 (logand (trust-value command)
 			 (cmd-flags character))))))
 
@@ -56,3 +57,6 @@
   (format t "The following lisp commands are available to you:~%")
   (dolist (command (commands-for ch))
     (format t "~a~%" (string-downcase command))))
+
+(defun remove-command (name)
+  (remhash (string-upcase name) *commands*))

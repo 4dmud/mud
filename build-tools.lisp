@@ -1,6 +1,7 @@
 ;;search for all mob or object prototypes with a certain trigger
 (eval-when (:compile-toplevel)
-  (load "util.lisp"))
+  (unless (boundp '*started*)
+    (load "util.lisp")))
 
 (in-package :4d)
 
@@ -13,14 +14,14 @@
 	  (assert (typep vnum 'integer))
 
 	  (case type
-	    (mobile (format t "Resets for mobile ~d, ~a:~%" vnum (name (mobile-prototype vnum))))
-	    (object (format t "Resets for object ~d, ~a:~%" vnum (short-description (object-prototype vnum))))
+	    (mob (format t "Resets for mobile ~d, ~a:~%" vnum (name (mobile-prototype vnum))))
+	    (obj (format t "Resets for object ~d, ~a:~%" vnum (short-description (object-prototype vnum))))
 	    (t (error "no such type.")))
 	  
 
 	  (dolist (reset (case type
-			   (mobile (find-mobile-resets vnum))
-			   (object (find-object-resets vnum))
+			   (mob (find-mobile-resets vnum))
+			   (obj (find-object-resets vnum))
 			   (t (error "no such type."))))
 	    (let ((msg 
 		   (typecase reset
@@ -40,7 +41,7 @@
 		  (format t "in room ~d, ~a: ~a~%" (vnum (room-of reset)) (title (room-of reset)) msg)))))
       (object-prototype-not-found (e) (format t "No object found with vnum ~d.~%" (vnum e)))
       (mobile-prototype-not-found (e) (format t "No mobile found with vnum ~d.~%" (vnum e)))
-      (error () (format t "usage: find-resets [object|mobile] vnum.~%"))))
+      (error () (format t "usage: find-resets [obj|mob] vnum.~%"))))
 
 
 (defun find-object-resets (vnum)
