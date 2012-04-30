@@ -31,12 +31,15 @@
 (defvar *commands* (make-hash-table :test 'equal))
 
 (defmacro defcommand (name (&key (min-level 0) (trust-groups nil)) &body code)
-  `(setf (gethash ,(symbol-name name) *commands*)
-	 (make-instance 'command
-			:fn #'(lambda (ch argument)
-				(declare (ignorable ch argument))
-				(handler-case (progn
-						,@code)
-				  (error (e) (format t "error: ~a~%" e))))
-			:min-level ,min-level
-			:trust-groups ',trust-groups)))
+  `(eval-when (:load-toplevel)
+     (handler-case
+	 (setf (gethash ,(symbol-name name) *commands*)
+	       (make-instance 'command
+			      :fn #'(lambda (ch argument)
+				      (declare (ignorable ch argument))
+				      (handler-case (progn
+						      ,@code)
+					(error (e) (format t "error: ~a~%" e))))
+			      :min-level ,min-level
+			      :trust-groups ',trust-groups))
+       (error (e) (error "error while compiling ~a: ~a" ',name e)))))

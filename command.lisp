@@ -7,6 +7,8 @@
 (in-package :4d)
 (ffi:clines "#include \"lisp-internal.h\"")
 
+(defvar *commands* (make-hash-table :test 'equal)) ;;hax
+
 (defclass command ()
   ((fn :initarg :fn :reader fn)
    (min-level :initarg :min-level :initform 0 :reader min-level)

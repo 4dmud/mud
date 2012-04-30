@@ -7,6 +7,7 @@
   (:use :cl)
   (:shadow room))
 
+(defpackage :4d-internal (:use :cl))
 
 (in-package :4d)
 
