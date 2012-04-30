@@ -13,3 +13,4 @@
   (if (probe-file +startup-file+)
       (load +startup-file+)
       (format t "No startup lisp file found. continuing..~%")))
+  

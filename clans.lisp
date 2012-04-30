@@ -18,6 +18,10 @@
 (defmethod name ((clan clan))
   (oneliner ((id clan)) (:int) :cstring "clan[#0].name"))
 
+(defmethod ranks ((clan clan))
+  (oneliner ((id clan)) (:int) :int "clan[#0].ranks"))
+
+
 (defmethod clan ((id integer))
   (if (oneliner (id) (:int) :bool "#0 < num_of_clans")
       (make-instance 'clan :id id)

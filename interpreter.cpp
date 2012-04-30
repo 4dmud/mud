@@ -1154,6 +1154,15 @@ void command_interpreter ( Character *ch, char *argument )
 			cont = command_mtrigger ( ch, arg, line );   /* any mobile triggers ? */
 		if ( !cont )
 			cont = command_otrigger ( ch, arg, line );   /* any object triggers ? */
+#if ECL
+
+		if ( !cont )
+		        cont = fix(cl_funcall(4,
+					      c_string_to_object("4D::COMMAND-TRIGGER"),
+					      ecl_make_pointer(ch),
+					      ecl_cstring_to_base_string_or_nil(arg),
+					      ecl_cstring_to_base_string_or_nil(line)));
+#endif
 		if ( cont )
 			return;                                    /* yes, command trigger took over */
 	}

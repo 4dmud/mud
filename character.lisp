@@ -3,10 +3,16 @@
     (load "util.lisp")))
 (ffi:clines "#include \"lisp-internal.h\"")
 
+(defpackage :4d
+  (:use :cl)
+  (:shadow room))
+
+
 (in-package :4d)
 
 (defclass mobile (gray:fundamental-character-output-stream)
-   ((pointer :initarg :pointer :reader pointer)))
+   ((pointer :initarg :pointer :reader pointer)
+    (buffer :initform nil :accessor mobile-buffer)))
 
 (defmethod id ((mobile mobile))
   (oneliner ((pointer mobile)) (:pointer-void) :int "((Character*)#0)->id"))
@@ -14,16 +20,42 @@
 (defmethod name ((mobile mobile))
   (oneliner ((pointer mobile)) (:pointer-void) :cstring "GET_NAME((Character*)#0)"))
 
+(defmethod vnum ((mobile mobile))
+  (oneliner ((pointer mobile)) (:pointer-void) :int "((Character*)#0)->vnum"))
+
+(defmethod level ((mobile mobile))
+  (oneliner ((pointer mobile)) (:pointer-void) :int "GET_LEVEL((Character*)#0)"))
+
 (defmethod print-object ((mobile mobile) s)
   (format s "#<mobile ~a>" (name mobile)))
 
 (defconstant +crlf+ (format nil "~c~c" (code-char 13) (code-char 10)))
 
 (defmethod gray:stream-write-char ((mobile mobile) c)
-  (4d-internal::send-to-char (pointer mobile)
-			     (if (char= #\Newline c)
-				 +crlf+
-				 (princ-to-string c))))
+  (case (length (mobile-buffer mobile))
+    (0
+     (if (char= c #\{)
+	 (push c (mobile-buffer mobile))
+	 (4d-internal::send-to-char (pointer mobile)
+				    (case c
+				      (#\Newline +crlf+)
+				      (t (princ-to-string c))))))
+
+    (1
+     (if (char= c #\{)
+	 (progn
+	   (setf (mobile-buffer mobile) nil)
+	   (4d-internal::send-to-char (pointer mobile) "{{"))
+	 (push c (mobile-buffer mobile))))
+    (2
+     (push c (mobile-buffer mobile))
+     (4d-internal::send-to-char (pointer mobile) (concatenate 'string
+							      (reverse (mobile-buffer mobile))))
+     (setf (mobile-buffer mobile) nil))))
+
+(defmethod gray:stream-finish-output ((mobile mobile))
+  (setf (mobile-buffer mobile) nil))
+
 
 ;;very inefficient
 (defun crlfize (string)
@@ -38,19 +70,46 @@
   (4d-internal::send-to-char (pointer mobile)
 			     (crlfize (subseq s start end))))
 
+
+(defclass mobile-prototype (mobile) ())
+
+(defmethod print-object ((mobile mobile-prototype) s)
+  (format s "#<mobile-prototype ~d: ~a>" (vnum mobile) (name mobile)))
+
+(define-condition mobile-prototype-not-found (error)
+  ((vnum :initarg :vnum :reader vnum)))
+
+(defmethod mobile-prototype ((vnum integer))
+  (let ((pointer (oneliner (vnum) (:int) :Pointer-void
+			   "mob_proto[#0]")))
+    (if (ffi:null-pointer-p pointer)
+	(error 'mobile-prototype-not-found :vnum vnum)
+	(make-instance 'mobile-prototype
+		       :pointer pointer))))
+
+
+(defmethod mobile-prototype ((mobile mobile))
+  (mobile-prototype (vnum mobile)))
+
 (defclass player (mobile) ())
 
 (defmethod print-object ((player player) s)
   (format s "#<player ~a>" (name player)))
 
 
+(defun ptr-to-character (ptr)
+  (make-instance (if (oneliner (ptr) (:pointer-void) :bool
+			       "IS_NPC((Character*) #0)")
+		     'mobile
+		     'player)
+		 :pointer ptr))
+
 (defun for-each-character-fn (fn)
   (loop with character = (oneliner () () :pointer-void "character_list")
-     do (funcall fn (make-instance (if (oneliner (character) (:pointer-void) :bool "IS_NPC((Character*)#0)")
-				       'mobile
-				       'player)
-				   :pointer character))
-     until (ffi:null-pointer-p (setf character (oneliner (character) (:pointer-void) :pointer-void "((Character*)#0)->next")))))
+     until (ffi:null-pointer-p character)
+     do (funcall fn (ptr-to-character character))
+       (setf character (oneliner (character) (:pointer-void) :pointer-void "((Character*)#0)->next"))))
+
 
 (defmacro for-each-character ((character) &body body)
   (declare (type symbol character))
@@ -66,10 +125,12 @@
 
 (defun for-each-player-fn (fn)
   (loop with descriptor = (oneliner () () :pointer-void "descriptor_list")
+     until (ffi:null-pointer-p descriptor)
      when (oneliner (descriptor) (:pointer-void) :bool "IS_PLAYING((Descriptor*)#0) && ((Descriptor*)#0)->character")
      do (funcall fn (make-instance 'player
 				   :pointer (oneliner (descriptor) (:pointer-void) :pointer-void "((Descriptor*)#0)->character")))
-      until (ffi:null-pointer-p (setf descriptor (oneliner (descriptor) (:pointer-void) :pointer-void "((Descriptor*)#0)->next")))))
+       (setf descriptor (oneliner (descriptor) (:pointer-void) :pointer-void "((Descriptor*)#0)->next"))))
+
 
 (defmacro for-each-player ((player) &body body)
   (declare (type symbol player))
@@ -94,3 +155,22 @@
 		       (if (string= (string-upcase name) (string-upcase (name p)))
 			   (return p)))
       (error "No such player.")))
+
+(defmethod page-string ((mobile mobile) string)
+  (4d-internal::page-string (pointer mobile) string))
+
+(defmethod cmd-flags ((player player))
+  (oneliner ((pointer player)) (:pointer-void) :int
+	    "CMD_FLAGS((Character*)#0)"))
+
+(defmethod cmd-flags ((mobile mobile))
+  (declare (ignore mobile))
+  0)
+
+(defmethod lisp-commands-for ((character player))
+  (apply #'nconc
+	 (maphash #'(lambda (k v)
+		      (if (can-run-command character v)
+			  (list k)
+			  nil))
+		  *commands*)))

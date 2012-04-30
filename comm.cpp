@@ -824,24 +824,12 @@ void init_game(ush_int s_port) {
     }
     log("Initiating events.");
     event_init();
-    //  log("Setting hash table");
-    /* set up hash table for find_char() */
-    //  init_lookup_table();
-    log("Booting database.");
-    boot_db();
 
 #if defined(CIRCLE_UNIX) || defined(CIRCLE_MACINTOSH)
 
     log("Signal trapping.");
     signal_setup();
 #endif
-
-    /* If we made it this far, we will be able to restart without problem. */
-    remove
-        (KILLSCRIPT_FILE);
-
-    if (fCopyOver)         /* reload players */
-        copyover_recover();
 
 #if ECL
     // start lisp
@@ -852,6 +840,21 @@ void init_game(ush_int s_port) {
     cl_safe_eval(c_string_to_object("(handler-case (4d:init) (error (e) (format t \"error: ~a~%\" e)))"), Cnil, Cnil);
     //start_swank(s_port+100);
 #endif
+
+
+    //  log("Setting hash table");
+    /* set up hash table for find_char() */
+    //  init_lookup_table();
+    log("Booting database.");
+    boot_db();
+
+    /* If we made it this far, we will be able to restart without problem. */
+    remove
+        (KILLSCRIPT_FILE);
+
+    if (fCopyOver)         /* reload players */
+        copyover_recover();
+
     log("Entering game loop.");
 
     game_loop(mother_desc);

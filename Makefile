@@ -56,7 +56,7 @@ lisp/lib4d-lisp.a: $(BINDIR)/circle
 
 clean:
 	rm -f *.o depend
-	rm -f *.obj lisp/lib4d-lisp.a
+	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a
 
 # Dependencies for the object files (automagically generated with
 # gcc -MM)
