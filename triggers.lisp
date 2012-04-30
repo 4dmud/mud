@@ -15,8 +15,6 @@
 (defun command-trigger (ch-ptr command argument &aux (character (ptr-to-character ch-ptr)))
   "run for each command typed by both mobiles and characters."
   (declare (type string command argument))
-  (if (typep character 'player)
-      (format t "~a typed ~a ~a.~%" (name character) command argument))
   (dolist (fn *command-hook*)
     (funcall fn character command argument))
 

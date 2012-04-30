@@ -1,7 +1,6 @@
 ;;search for all mob or object prototypes with a certain trigger
 (eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
+  (load "util.lisp"))
 
 (in-package :4d)
 
