@@ -1685,6 +1685,11 @@ void do_clan_withdraw(Character *ch, char *arg)
   }
       
 
+   if (amount < 0) {
+     ch->Send("You can't withdraw negative amounts!\r\n");
+     return;
+  }
+
   if (type == DEP_COINS) {
       if (clan[clan_num].treasury.coins < amount) {
           ch->Send("The clan treasury does not have that much gold coins!\r\n");
@@ -1774,6 +1779,12 @@ void do_clan_deposit(Character *ch, char *arg)
       ch->Send("This clan does not exist!\r\n");
       return;
   }
+
+  if (amount < 0) {
+     ch->Send("You can't deposit negative amounts!\r\n");
+     return;
+  }
+
 
   if (type == DEP_COINS) {
       if (GET_LEVEL(ch) < LVL_GOD && ch->Gold(0, GOLD_BANK) < amount) {
