@@ -64,3 +64,7 @@
 
 (defun all-deeds ()
   (mapcan #'deeds (clans)))
+
+(defun set-gold-tokens (clan amount)
+  (ffi:c-inline ((id clan) amount) (:int :int) :void
+		"clan[#0].treasury.gold = #1;" :side-effects t))
