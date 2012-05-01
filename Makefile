@@ -46,17 +46,18 @@ $%.o: %.cpp
 	$(CC) $< $(CFLAGS) -c -o $@ 
 
 %.obj: %.lisp
-	ecl -q -s -o $@ -compile $<
+	echo compiling $< >>lisp-output.txt
+	ecl -q -s -o $@ -compile $<|tee -a lisp-output.txt
 
 lib4d-lisp.a: $(LISPOBJS)
-	(for f in $(LISPOBJS);do echo $$f;done)|ecl -shell make-4d-lisp
+	(for f in $(LISPOBJS);do echo $$f;done)|ecl -shell make-4d-lisp|tee -a lisp-output.txt
 
 lisp/lib4d-lisp.a: $(BINDIR)/circle
 	cd lisp;rm lisp/lib4d-lisp.a;$(BINDIR)/circle --shell build.lisp
 
 clean:
 	rm -f *.o depend
-	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a
+	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a lisp-output.txt
 
 # Dependencies for the object files (automagically generated with
 # gcc -MM)
