@@ -28,3 +28,6 @@ typedef  map<long, obj_data *> obj_map;
 extern ch_map ch_lookup_table;
 extern obj_map obj_lookup_table;
 extern struct index_data *obj_index;
+
+//extern struct index_data **trig_index;
+//extern unsigned int top_of_trigt = 0;

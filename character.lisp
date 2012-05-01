@@ -15,14 +15,21 @@
    ((pointer :initarg :pointer :reader pointer)
     (buffer :initform nil :accessor mobile-buffer)))
 
+(defmacro mobile-field (mobile name type)
+  (declare (type symbol type)
+	   (type string name))
+  `(oneliner ((pointer ,mobile)) (:pointer-void) ,type
+	     ,(format nil "((Character *)#0)->~a" name)))
+
+
 (defmethod id ((mobile mobile))
-  (oneliner ((pointer mobile)) (:pointer-void) :int "((Character*)#0)->id"))
+  (mobile-field mobile "id" :int))
 
 (defmethod name ((mobile mobile))
   (oneliner ((pointer mobile)) (:pointer-void) :cstring "GET_NAME((Character*)#0)"))
 
 (defmethod vnum ((mobile mobile))
-  (oneliner ((pointer mobile)) (:pointer-void) :int "((Character*)#0)->vnum"))
+  (mobile-field mobile "vnum" :int))
 
 (defmethod level ((mobile mobile))
   (oneliner ((pointer mobile)) (:pointer-void) :int "GET_LEVEL((Character*)#0)"))
