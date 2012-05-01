@@ -133,11 +133,12 @@
 
 (defun for-each-player-fn (fn)
   (loop with descriptor = (oneliner () () :pointer-void "descriptor_list")
+       with d
      until (ffi:null-pointer-p descriptor)
-     when (oneliner (descriptor) (:pointer-void) :bool "IS_PLAYING((Descriptor*)#0) && ((Descriptor*)#0)->character")
+     do (setf d descriptor) (setf descriptor (oneliner (d) (:pointer-void) :pointer-void "((Descriptor*)#0)->next"))
+     when (oneliner (d) (:pointer-void) :bool "IS_PLAYING((Descriptor*)#0) && ((Descriptor*)#0)->character")
      do (funcall fn (make-instance 'player
-				   :pointer (oneliner (descriptor) (:pointer-void) :pointer-void "((Descriptor*)#0)->character")))
-       (setf descriptor (oneliner (descriptor) (:pointer-void) :pointer-void "((Descriptor*)#0)->next"))))
+				   :pointer (oneliner (d) (:pointer-void) :pointer-void "((Descriptor*)#0)->character")))))
 
 
 (defmacro for-each-player ((player) &body body)
