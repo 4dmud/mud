@@ -663,6 +663,9 @@ ASKILL ( skill_tinker )
 	GET_OBJ_RENT ( weapon ) += ( GET_LEVEL ( ch ) << 3 );
 	GET_OBJ_TIMER ( weapon ) = time;	// don't want tinkered weapons lasting
 	// forever
+	// Putting this skeleton in for possible future changes
+	// This is from woodsing but it will be changed -- Prom
+	//GET_OBJ_TIMER ( weapon ) = GET_LEVEL ( ch ) * 300;
 	SET_BIT_AR ( GET_OBJ_EXTRA ( weapon ), ITEM_MAGIC );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( weapon ), ITEM_TINKERED );
 
