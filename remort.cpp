@@ -69,7 +69,7 @@ void remort_char ( Character *ch )
 		  ch->Send("You were removed from the Seekers clan.\r\n");
 	}
         if ( GET_CLAN ( ch ) == 12 )
-           ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n", GET_CLAN_RANK ( ch ) );
+	  ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n");
 
 
 
