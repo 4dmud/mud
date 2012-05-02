@@ -59,14 +59,17 @@ void remort_char ( Character *ch )
 	REMORTS ( ch ) ++;
 	GET_MAX_HIT ( ch ) = 30 + remorts;
 	GET_MAX_STAMINA ( ch ) = 100 + remorts;
-	if ( GET_CLAN ( ch ) == 12 && ( GET_CLAN_RANK  ( ch ) < 2 ) )
+	if ( GET_CLAN ( ch ) == 12 && !PLR_FLAGGED(ch, PLR_NEWBIE_HLPR))
 	{
 		GET_CLAN ( ch ) = 0;
 		GET_CLAN_RANK ( ch ) = 0;
-                ch->Send("You were removed from the Seekers clan, if you wish to rejoin go 2 south from recall and say, 'I want to be a Seeker'.\r\n");
+		if (REMORTS(ch) <= 1)
+		  ch->Send("You were removed from the Seekers clan, if you wish to rejoin go 2 south from recall and say, 'I want to be a Seeker'.\r\n");
+		else
+		  ch->Send("You were removed from the Seekers clan.\r\n");
 	}
         if ( GET_CLAN ( ch ) == 12 )
-           ch->Send("Because you were rank %d in Seekers, you were not booted upon remorting like people who are rank 1 or below are.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n", GET_CLAN_RANK ( ch ) );
+           ch->Send("Because you were a helper in Seekers, you were not booted upon remorting like non-helpers.\r\nIf you wish to leave Seekers you can go 2 south from recall and say, 'I want to leave Seekers'.\r\n", GET_CLAN_RANK ( ch ) );
 
 
 
