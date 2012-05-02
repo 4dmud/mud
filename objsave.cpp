@@ -1895,6 +1895,9 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
   /* Horus - all eq will be updated automatically */
   if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
+      ubyte dt_save = 0;
+      if (IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_ANTI_DT))
+          dt_save = 1;
 
       if (tmp_idents) 
           temp->idents = NULL;
@@ -1910,7 +1913,11 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
           GET_OBJ_EXPIRE(temp) = orig_expir;
       if (GET_OBJ_TYPE(temp) == ITEM_WEAPON)
           GET_OBJ_VAL(temp, 5) = tmp_wep_bal;
-  } 
+
+      if (dt_save)
+	  SET_BIT_AR(GET_OBJ_EXTRA(temp), ITEM_ANTI_DT);
+
+  }
 
   return temp;
 }
