@@ -4561,7 +4561,9 @@ ACMD ( do_consider )
 	act ( speed_consider[diff], FALSE, ch, 0, victim, TO_CHAR );
 
 	ch->Send ( "%s would land about %.1f%% of %s attacks on you.\r\n",
-	           GET_NAME ( victim ),100 - ( float ) ( ( evasion_tot ( ch ) *100 ) / ( evasion_tot ( ch ) + accuracy_tot ( victim ) ) ), GET_SEX ( victim ) == SEX_MALE ? "his" : "her" );
+		   // Changing the sex check to HSHR(victim) instead of 
+		   //GET_SEX ( victim ) == SEX_MALE ? "his" : "her" -- Prom
+	           GET_NAME ( victim ),100 - ( float ) ( ( evasion_tot ( ch ) *100 ) / ( evasion_tot ( ch ) + accuracy_tot ( victim ) ) ), HSHR(victim) );
 	ch->Send ( "You would land about %.1f%% of your attacks on %s.\r\n",
 	           100- ( float ) ( ( evasion_tot ( victim ) *100 ) / ( evasion_tot ( victim ) + accuracy_tot ( ch ) ) ), GET_NAME ( victim ) );
 
