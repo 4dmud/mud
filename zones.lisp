@@ -158,7 +158,9 @@
 (defmethod room-of ((reset reset-object))
   (room (reset-arg3 reset)))
 (defmethod room-of ((reset reset-attach-trigger))
-  (room (reset-arg3 reset)))
+  (if (= 0 (reset-arg3 reset))
+      (call-next-method)
+      (room (reset-arg3 reset))))
 (defmethod room-of ((reset reset-set-variable))
   (room (reset-arg3 reset)))
 (defmethod room-of ((reset reset-bury))
@@ -177,3 +179,12 @@
 
 (defmethod container-of ((reset reset-put))
   (object-prototype (obj-rnum-to-vnum (reset-arg3 reset))))
+
+(defmethod trigger-of ((reset reset-attach-trigger))
+  (make-instance 'trigger :rnum (reset-arg2 reset)))
+
+(defmethod attach-type ((reset reset-attach-trigger))
+  (case (reset-arg1 reset)
+    (0 :mobile)
+    (1 :object)
+    (2 :room)))

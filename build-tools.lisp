@@ -11,8 +11,9 @@
 	     (type (read stream)))
 	(case type
 	  (resets (find-resets stream))
+	  (trigger (find-trigger stream))
 	  (t (error "no good."))))
-    (error () (format t "usage: find find-type arguments~%Available finders: resets~%"))))
+    (error () (format t "usage: find find-type arguments~%Available finders: resets trigger~%"))))
 
 (defun find-resets (stream)
     (handler-case
@@ -52,7 +53,7 @@
       (error () (format t "usage: find resets [obj|mob] vnum.~%"))))
 	
 (defun find-object-resets (vnum)
-  (remove-if-not #'(lambda (reset)
+  (delete-if-not #'(lambda (reset)
 		     (handler-case 
 			 (and (object-of reset)
 			      (eql vnum (vnum (object-of reset))))
@@ -60,10 +61,39 @@
 		     (mapcan #'zone-resets (zones))))
 
 (defun find-mobile-resets (vnum)
-  (remove-if-not #'(lambda (reset)
+  (delete-if-not #'(lambda (reset)
 		     (handler-case
 			 (and (mobile-of reset)
 			      (eql vnum (vnum (mobile-of reset)))
 			      (typep reset 'reset-mobile)) ;;only mobile type
 		       (error () nil)))
 		 (mapcan #'zone-resets (zones))))
+
+(defun find-trigger (stream)
+  (handler-case
+      (let ((vnum (read stream)))
+	(assert (typep vnum 'integer))
+	(dolist (item (delete-if-not #'(lambda (item)
+					 (member vnum (mapcar #'vnum (triggers item))))
+				     (nconc (all-rooms) (all-mobile-prototypes) (all-object-prototypes))))
+	  (typecase item
+	    (room (format t "Room ~d, ~a.~%" (vnum item) (title item)))
+	    (mobile-prototype (format t "Mobile ~d, ~a.~%" (vnum item) (name item)))
+	    (object-prototype (format t "Object ~d, ~a.~%" (vnum item) (name item)))))
+	(dolist (reset (delete-if-not #'(lambda (reset)
+					  (and 
+					   (typep reset 'reset-attach-trigger)
+					   (= vnum (vnum (trigger-of reset)))))
+				      (mapcan #'zone-resets (zones))))
+	  (if (eq :room (attach-type reset))
+	      (format t "In room ~d, ~a: attached by zone reset.~%"
+		      (vnum (room-of reset))
+		      (title (room-of reset)))
+	      (format t "In room ~d, ~a: Attached to ~a ~d, ~a by zone reset.~%"
+		      (vnum (room-of reset))
+		      (title (room-of reset))
+		      (string-downcase (symbol-name (attach-type reset)))
+		      (vnum (mobile-of reset))
+		      (name (mobile-of reset))))))
+    (error (e) (format t "usage: find trigger vnum~%~a~%" e))))
+		     

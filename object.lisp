@@ -72,3 +72,15 @@
 "for (olt_it ob = object_list.begin();ob != object_list.end(); ob++)
 cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
     (reverse objects)))
+
+(defmethod triggers ((object object-prototype))
+  (unless (ffi:null-pointer-p (object-field object "proto_script" :pointer-void))
+    (loop for i from 0 to (1- (object-field object "proto_script->size()" :int))
+       collect (trigger (oneliner ((pointer object) i) (:pointer-void :int) :int
+				  "((struct obj_data *)#0)->proto_script->at(#1)")))))
+
+(defun all-object-prototypes ()
+  (loop for i from 1 to (1- (oneliner () () :int "top_of_objt"))
+       for vnum = (oneliner (i) (:int) :int
+					   "obj_index[#0].vnum")
+       collect (object-prototype vnum)))

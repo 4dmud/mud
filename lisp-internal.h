@@ -7,6 +7,7 @@
 #include "clan.h"
 #include "descriptor.h"
 #include "interpreter.h"
+#include "dg_scripts.h"
 extern vector <Room *> world_vnum;
 extern zone_rnum top_of_zone_table;
 extern vector <Zone> zone_table;
@@ -29,5 +30,7 @@ extern ch_map ch_lookup_table;
 extern obj_map obj_lookup_table;
 extern struct index_data *obj_index;
 
-//extern struct index_data **trig_index;
-//extern unsigned int top_of_trigt = 0;
+extern struct index_data **trig_index;
+extern unsigned int top_of_trigt;
+
+extern obj_rnum top_of_objt;

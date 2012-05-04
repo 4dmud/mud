@@ -87,3 +87,11 @@
 		    (loop for vnum from 0 to (1- size)
 		       collect vnum))
 	 collect (make-instance 'room :vnum vnum))))
+
+(defmethod triggers ((room room))
+  (unless (ffi:null-pointer-p (oneliner ((vnum room)) (:int) :pointer-void
+					"world_vnum[#0]->proto_script"))
+    (loop for i from 0 to (1- (oneliner ((vnum room)) (:int) :int
+					"world_vnum[#0]->proto_script->size()"))
+       collect (trigger (oneliner ((vnum room) i) (:int :int) :int
+				  "world_vnum[#0]->proto_script->at(#1)")))))

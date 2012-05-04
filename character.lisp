@@ -183,3 +183,19 @@
 			  (list k)
 			  nil))
 		  *commands*)))
+
+(defmethod triggers ((mobile mobile-prototype))
+  (unless (ffi:null-pointer-p (mobile-field mobile "proto_script" :pointer-void))
+    (loop for i from 0 to (1- (mobile-field mobile "proto_script->size()" :int))
+       collect (trigger (oneliner ((pointer mobile) i) (:pointer-void :int) :int
+				  "((Character *)#0)->proto_script->at(#1)")))))
+
+(defun all-mobile-prototypes ()
+  (let* ((protos nil)
+	 (fn #'(lambda (vnum pointer)
+		 (unless (ffi:null-pointer-p pointer)
+		   (push (mobile-prototype vnum) protos)))))
+    (ffi:c-inline (fn) (:function) :void
+		  "for (map<mob_vnum, Character *>::iterator it = mob_proto.begin(); it != mob_proto.end(); it++)
+  cl_funcall(3, #0, MAKE_FIXNUM(it->first), ecl_make_pointer(it->second));")
+    (reverse protos)))
