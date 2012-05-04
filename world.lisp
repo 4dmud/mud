@@ -93,5 +93,7 @@
 					"world_vnum[#0]->proto_script"))
     (loop for i from 0 to (1- (oneliner ((vnum room)) (:int) :int
 					"world_vnum[#0]->proto_script->size()"))
-       collect (trigger (oneliner ((vnum room) i) (:int :int) :int
-				  "world_vnum[#0]->proto_script->at(#1)")))))
+       nconc (handler-case
+		 (list (trigger (oneliner ((vnum room) i) (:int :int) :int
+					  "world_vnum[#0]->proto_script->at(#1)")))
+	       (trigger-not-found (e) (warn "trigger not found: ~d" (vnum e)) nil)))))

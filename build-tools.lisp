@@ -73,6 +73,10 @@
   (handler-case
       (let ((vnum (read stream)))
 	(assert (typep vnum 'integer))
+
+	(format t "Trigger ~d, ~a is attached to the following entities:~%"
+		vnum (name (trigger vnum)))
+
 	(dolist (item (delete-if-not #'(lambda (item)
 					 (member vnum (mapcar #'vnum (triggers item))))
 				     (nconc (all-rooms) (all-mobile-prototypes) (all-object-prototypes))))
@@ -83,7 +87,9 @@
 	(dolist (reset (delete-if-not #'(lambda (reset)
 					  (and 
 					   (typep reset 'reset-attach-trigger)
-					   (= vnum (vnum (trigger-of reset)))))
+					   (handler-case 
+					       (= vnum (vnum (trigger-of reset)))
+					     (trigger-not-found () nil))))
 				      (mapcan #'zone-resets (zones))))
 	  (format t "In room ~d, ~a: "
 		  (vnum (room-of reset)
@@ -97,5 +103,6 @@
 	      (format t "Attached to mobile ~d, ~a by zone reset.~%"
 		      (vnum (mobile-of reset))
 		      (name (mobile-of reset)))))))
+    (trigger-not-found (e) (format t "No trigger with vnum ~d.~%" (vnum e)))
     (error (e) (format t "usage: find trigger vnum~%~a~%" e))))
 		     

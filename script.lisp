@@ -20,7 +20,8 @@
 (defmethod print-object ((trigger trigger) s)
   (format s "#<trigger ~d: ~a>" (vnum trigger) (name trigger)))
 
-(define-condition trigger-not-found (error) ())
+(define-condition trigger-not-found (error)
+  ((vnum :initarg :vnum :reader vnum)))
 
 (defun for-each-trig-fn (fn)
   (loop for rnum from 0 to (1- (oneliner () () :int "top_of_trigt")) do
@@ -42,11 +43,10 @@
      with rnum = (floor (/ top_of_trigt 2))
      for trig = (make-instance 'trigger :rnum rnum)
      do
-       (cond ((or (= rnum -1)
-		  (= rnum top_of_trigt))
-	      (error 'trigger-not-found))
-	     ((= vnum (vnum trig))
+       (cond ((= vnum (vnum trig))
 	      (return trig))
+	     ((= top bot)
+	      (error 'trigger-not-found :vnum vnum))
 	     ((< vnum (vnum trig))
 	      (setf top (1- rnum)))
 	     ((> vnum (vnum trig))

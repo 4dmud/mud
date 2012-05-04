@@ -76,8 +76,10 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
 (defmethod triggers ((object object-prototype))
   (unless (ffi:null-pointer-p (object-field object "proto_script" :pointer-void))
     (loop for i from 0 to (1- (object-field object "proto_script->size()" :int))
-       collect (trigger (oneliner ((pointer object) i) (:pointer-void :int) :int
-				  "((struct obj_data *)#0)->proto_script->at(#1)")))))
+       nconc (handler-case
+		 (list (trigger (oneliner ((pointer object) i) (:pointer-void :int) :int
+				  "((struct obj_data *)#0)->proto_script->at(#1)")))
+	       (trigger-not-found (e) (warn "trigger not found: ~d" (vnum e)) nil)))))
 
 (defun all-object-prototypes ()
   (loop for i from 1 to (1- (oneliner () () :int "top_of_objt"))

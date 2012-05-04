@@ -187,8 +187,10 @@
 (defmethod triggers ((mobile mobile-prototype))
   (unless (ffi:null-pointer-p (mobile-field mobile "proto_script" :pointer-void))
     (loop for i from 0 to (1- (mobile-field mobile "proto_script->size()" :int))
-       collect (trigger (oneliner ((pointer mobile) i) (:pointer-void :int) :int
-				  "((Character *)#0)->proto_script->at(#1)")))))
+       nconc (handler-case
+		   (list (trigger (oneliner ((pointer mobile) i) (:pointer-void :int) :int
+					    "((Character *)#0)->proto_script->at(#1)")))
+		 (trigger-not-found (e) (warn "trigger not found: ~d" (vnum e)) nil)))))
 
 (defun all-mobile-prototypes ()
   (let* ((protos nil)
