@@ -13,7 +13,7 @@ LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 SRCFILES := $(wildcard *.cpp)
 OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
 ifeq ($(ECL),1)
-	LISPFILES := functions.lisp util.lisp init.lisp hooks.lisp helpers.lisp command.lisp character.lisp world.lisp zones.lisp object.lisp script.lisp clans.lisp build-tools.lisp
+	LISPFILES := functions.lisp util.lisp init.lisp hooks.lisp helpers.lisp command.lisp character.lisp world.lisp zones.lisp object.lisp script.lisp clans.lisp build-tools.lisp cowsay.lisp
 	LISPOBJS := $(patsubst %.lisp,%.obj,$(LISPFILES))
 	MYFLAGS += -DECL=1 $(shell ecl-config --cflags)
 	LIBS += $(shell ecl-config --ldflags)

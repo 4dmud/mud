@@ -837,7 +837,7 @@ void init_game(ush_int s_port) {
     
     ecl_init_module(OBJNULL, init_4d_lisp);
     //read_VV(OBJNULL, init_lib_4D_LISP);
-    cl_safe_eval(c_string_to_object("(handler-case (4d:init) (error (e) (format t \"error: ~a~%\" e)))"), Cnil, Cnil);
+    cl_safe_eval(c_string_to_object("(handler-case (4d::init) (error (e) (format t \"error: ~a~%\" e)))"), Cnil, Cnil);
     //start_swank(s_port+100);
 #endif
 
