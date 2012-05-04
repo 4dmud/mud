@@ -79,21 +79,23 @@
 	  (typecase item
 	    (room (format t "Room ~d, ~a.~%" (vnum item) (title item)))
 	    (mobile-prototype (format t "Mobile ~d, ~a.~%" (vnum item) (name item)))
-	    (object-prototype (format t "Object ~d, ~a.~%" (vnum item) (name item)))))
+	    (object-prototype (format t "Object ~d, ~a.~%" (vnum item) (short-description item)))))
 	(dolist (reset (delete-if-not #'(lambda (reset)
 					  (and 
 					   (typep reset 'reset-attach-trigger)
 					   (= vnum (vnum (trigger-of reset)))))
 				      (mapcan #'zone-resets (zones))))
-	  (if (eq :room (attach-type reset))
-	      (format t "In room ~d, ~a: attached by zone reset.~%"
-		      (vnum (room-of reset))
-		      (title (room-of reset)))
-	      (format t "In room ~d, ~a: Attached to ~a ~d, ~a by zone reset.~%"
-		      (vnum (room-of reset))
-		      (title (room-of reset))
-		      (string-downcase (symbol-name (attach-type reset)))
+	  (format t "In room ~d, ~a: "
+		  (vnum (room-of reset)
+			(title (room-of reset))))
+	  (case (attach-type reset)
+	    (:object
+	      (format t "Attached to object ~d, ~a by zone reset.~%"
+		      (vnum (object-of reset))
+		      (short-description (object-of reset))))
+	    (:mobile
+	      (format t "Attached to mobile ~d, ~a by zone reset.~%"
 		      (vnum (mobile-of reset))
-		      (name (mobile-of reset))))))
+		      (name (mobile-of reset)))))))
     (error (e) (format t "usage: find trigger vnum~%~a~%" e))))
 		     
