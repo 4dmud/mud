@@ -1274,16 +1274,17 @@ ACMD(do_gen_comm) {
         else
             return;
     } else {
+        delete_doubledollar(argument); /* this was needed! - mord */
 
         /* first, set up strings to be given to the communicator */
         if (PRF_FLAGGED(ch, PRF_NOREPEAT))
             ch->Send( "%s", CONFIG_OK);
         else
-            ch->Send( "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], colour_on, argument, CCNRM(ch, C_CMP));
+	    snprintf(buf, sizeof(buf), "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], colour_on, argument, CCNRM(ch, C_CMP));
+            ch->Send("%s", buf);
 
         if (!PLR_FLAGGED(ch, PLR_COVENTRY)) {
-            snprintf(buf, sizeof(buf), "%s$n %ss, '%s'", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1], argument);
-            delete_doubledollar(buf); /* this was needed! - mord */
+            snprintf(buf, sizeof(buf), "%s%%s %ss, '%%s'\r\n", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1]);
         } else {
             return;
         }
@@ -1320,8 +1321,8 @@ ACMD(do_gen_comm) {
                 continue;
 
             if (COLOUR_LEV(i->character) >= C_NRM)
-                i->Output(colour_on);
-            act(buf, FALSE, ch, 0, i->character, TO_VICT | TO_SLEEP);
+	      i->Output("%s",colour_on);
+	    i->character->Send(buf, (!CAN_SEE(i->character, ch) ?  "Someone" :  hidden_name(ch)), argument);
             if (COLOUR_LEV(i->character) >= C_NRM)
                 i->Output(KNRM);
         }
