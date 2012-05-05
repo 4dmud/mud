@@ -951,6 +951,8 @@ void start_fighting ( Character* ch, Character* vict )
 				continue;
 			if ( IS_NPC ( f->follower ) && !AFF_FLAGGED ( f->follower, AFF_CHARM ) )
 				continue;
+			if ( IS_NPC ( f->follower ) && RIDDEN_BY ( f->follower ))
+			        continue;
 
 			perform_assist ( f->follower, ch );
 		}
@@ -1994,14 +1996,12 @@ int fight_event_hit ( Character* ch, Character* vict, short type, short num )
 					continue; /* Skip if any of these are true */
 				if ( FIGHTING ( f->follower ) )
 					continue;
-#if defined(EXP_GAIN_SYSTEM_1)
-				if ( !RIDDEN_BY ( f->follower ) )
-					continue
-#endif
-					if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
-					{
-						start_fighting_delay ( f->follower, vict );
-					}
+				if ( RIDDEN_BY ( f->follower ) )
+				        continue;
+				if ( ( ( AFF_FLAGGED ( f->follower, AFF_CHARM ) ) || PRF_FLAGGED ( f->follower, PRF_AUTOASSIST ) ) && HERE ( f->follower,vict ) )
+				  {
+				    start_fighting_delay ( f->follower, vict );
+				  }
 			}
 		}
 	}
