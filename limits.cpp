@@ -757,6 +757,8 @@ void check_idling ( Character *ch )
 			if ( IN_ROOM ( ch ) != NULL )
 				char_from_room ( ch );
 			char_to_room ( ch, world_vnum[3] );
+			Crash_rentsave ( ch, 0 );
+
 			if ( ch->desc )
 			{
 				STATE ( ch->desc ) = CON_DISCONNECT;
@@ -768,7 +770,6 @@ void check_idling ( Character *ch )
 				ch->desc = NULL;
 			}
 
-			Crash_rentsave ( ch, 0 );
 			new_mudlog ( CMP, LVL_GOD, TRUE, "%s force-rented and extracted (idle).", GET_NAME ( ch ) );
 			extract_char ( ch );
 			if ( real_room ( 3 ) )
