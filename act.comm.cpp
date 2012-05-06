@@ -1270,7 +1270,7 @@ ACMD(do_gen_comm) {
             ch->Send( "%s%s%s: %s%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "",  com_msgs[subcmd][1], CAP(argument), CCNRM(ch, C_CMP));
 
         if (!PLR_FLAGGED(ch, PLR_COVENTRY))
-            snprintf(buf, sizeof(buf), "%s%s: %s", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
+            snprintf(buf, sizeof(buf), "%s%s: %s\r\n", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", com_msgs[subcmd][1],CAP( argument));
         else
             return;
     } else {
