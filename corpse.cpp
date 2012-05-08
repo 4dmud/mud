@@ -613,7 +613,7 @@ void restore_all_corpses() {
 			int id = GET_OBJ_VAL(ce->corpse,0);
 			automeld(ce->corpse);
 			Character* ch = find_char_by_uid_in_lookup_table(id);
-			if (ch)
+			if (ch && ch->desc)
 				write_to_descriptor(ch->desc->descriptor, "You meld in a sudden flash of light!\r\n", ch->desc->comp);
 		}
 	}
