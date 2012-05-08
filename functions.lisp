@@ -1,3 +1,6 @@
+;;;when there's an inline function call, ecl can't recompile the file.
+;;;Therefore, all inline function calls are put here, making sure everything else remains recompilable.
+
 (eval-when (:compile-toplevel)
   (unless (boundp '*started*)
     (load "util.lisp")))
@@ -26,3 +29,14 @@
 (defun mud-log (&rest args)
   (ffi:c-inline ((apply #'format nil args)) (:cstring) :void
 		"basic_mud_log(#0);"))
+
+(ffi:clines "void add_var ( struct trig_var_data **var_list,const char *name,const char *value, long id );")
+(defun dg-add-global-var (script-ptr name value context)
+  (ffi:c-inline (script-ptr name value context) (:pointer-void :cstring :cstring :long) :void
+		"add_var(&(((struct script_data*)#0)->global_vars),#1,#2,#3);"
+		:side-effects t))
+
+(defun dg-add-local-var (trig-ptr name value context)
+  (ffi:c-inline (script-ptr name value context) (:pointer-void :cstring :cstring :long) :void
+		"add_var(&(((struct trig_data*)#0)->var_list),#1,#2,#3);"
+		:side-effects t))

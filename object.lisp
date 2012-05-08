@@ -28,7 +28,7 @@
 (defmethod short-description ((object obj))
   (object-field object "short_description" :cstring))
 
-(defclass object-instance (obj)
+(defclass object-instance (obj entity)
   ((id :initarg :id :reader id)))
 
 (defun obj-rnum-to-vnum (rnum)
@@ -86,3 +86,8 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
        for vnum = (oneliner (i) (:int) :int
 					   "obj_index[#0].vnum")
        collect (object-prototype vnum)))
+
+(defmethod script-pointer ((object object-instance))
+  (let ((ptr (object-field object "script" :pointer-void)))
+    (unless (ffi:null-pointer-p ptr)
+      ptr)))

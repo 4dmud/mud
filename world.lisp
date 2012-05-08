@@ -45,7 +45,7 @@
 
 
 
-(defclass room ()
+(defclass room (entity)
   ((vnum :type :integer :reader vnum :initarg :vnum)))
 
 (defmethod print-object ((room room) s)
@@ -97,3 +97,10 @@
 		 (list (trigger (oneliner ((vnum room) i) (:int :int) :int
 					  "world_vnum[#0]->proto_script->at(#1)")))
 	       (trigger-not-found (e) (warn "trigger not found: ~d" (vnum e)) nil)))))
+
+
+(defmethod script-pointer ((room room))
+  (let ((ptr (oneliner ((vnum room)) (:int) :pointer-void
+		       "SCRIPT(world_vnum[#0])")))
+    (unless (ffi:null-pointer-p ptr)
+      ptr)))

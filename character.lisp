@@ -11,7 +11,7 @@
 
 (in-package :4d)
 
-(defclass mobile (gray:fundamental-character-output-stream)
+(defclass mobile (gray:fundamental-character-output-stream entity)
    ((pointer :initarg :pointer :reader pointer)
     (buffer :initform nil :accessor mobile-buffer)))
 
@@ -201,3 +201,9 @@
 		  "for (map<mob_vnum, Character *>::iterator it = mob_proto.begin(); it != mob_proto.end(); it++)
   cl_funcall(3, #0, MAKE_FIXNUM(it->first), ecl_make_pointer(it->second));")
     (reverse protos)))
+
+(defmethod script-pointer ((mobile mobile))
+  (let ((ptr (oneliner ((pointer mobile)) (:pointer-void) :pointer-void
+		       "SCRIPT((Character *)#0)")))
+    (unless (ffi:null-pointer-p ptr)
+      ptr)))

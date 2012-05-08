@@ -1,4 +1,4 @@
-;;;utils.lisp: utility macros necessary at compile time
+;;;utils.lisp: utility macros and various other things necessary at compile time
 (defpackage :4d
   (:use :cl)
   (:shadow room))
@@ -42,3 +42,5 @@
 			    :min-level ,min-level
 			    :trust-groups ',trust-groups))
      (error (e) (error "error while compiling ~a: ~a" ',name e))))
+
+(defclass entity () () (:documentation "scriptable entity."))
