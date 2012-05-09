@@ -2402,8 +2402,8 @@ ASKILL ( skill_push )
 		else if ( GET_LEVEL ( victim ) - GET_LEVEL ( ch ) > 4 )
 		{
 			ch->Send ( "You can't push %s.\r\n", HMHR ( victim ) );
-
-			ch->Send ( "%s can't push you.\r\n", GET_NAME ( ch ) );
+			// I think this should be victum->Send not ch->Send --> Prom
+			vict->Send ( "%s can't push you.\r\n", GET_NAME ( ch ) );
 		}
 		else if ( MOB_FLAGGED ( victim, MOB_NOBASH ) )
 		{
