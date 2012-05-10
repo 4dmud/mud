@@ -978,7 +978,7 @@ ASKILL ( skill_sneak )
 		if ( percent >
 		        total_chance ( ch, SKILL_SNEAK ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
 		{
-			*ch << "You stumble over your own feet\r\n";
+			*ch << "You stumble over your own feet.\r\n";
 			return 0;
 		}
 
@@ -1755,7 +1755,7 @@ ASKILL ( skill_beserk )
 		if ( percent >
 		        total_chance ( ch, SKILL_BESERK ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
 		{
-			ch->Send ( "You stumble over your own feet\r\n" );
+			ch->Send ( "You stumble over your own feet.\r\n" );
 			return 0;
 		}
 
@@ -2026,7 +2026,7 @@ ASKILL ( skill_blade_dance )
 		if ( percent >
 		        total_chance ( ch, SKILL_BLADE_DANCE ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
 		{
-			ch->Send ( "You stumble over your own feet\r\n" );
+			ch->Send ( "You stumble over your own feet.\r\n" );
 			return 0;
 		}
 
@@ -2114,7 +2114,7 @@ ASKILL ( skill_martial_arts )
 		if ( percent >
 		        total_chance ( ch, SKILL_MARTIAL_ARTS ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
 		{
-			ch->Send ( "You stumble over your own feet\r\n" );
+			ch->Send ( "You stumble over your own feet.\r\n" );
 			return 0;
 		}
 		for ( i = 0; i < 2; i++ )
