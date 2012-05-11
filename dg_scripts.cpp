@@ -2985,6 +2985,9 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 		return; /* no script to assign */
 
 	add_var ( & ( sc_remote->global_vars ), vd->name, vd->value, context );
+	if (mob && !IS_NPC(mob))
+	  //this is a player. lets save the character right now
+	  save_char_vars(mob);
 }
 
 
@@ -3079,6 +3082,10 @@ ACMD ( do_vdelete )
 	/* and free up the space */
 	delete vd;
 
+	if (mob && !IS_NPC(mob))
+	  //this is a player. lets save the character right now
+	  save_char_vars(mob);
+
 	ch->Send ( "Deleted.\r\n" );
 }
 
@@ -3167,6 +3174,11 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	/* and free up the space */
 	delete vd;
+
+	if (mob && !IS_NPC(mob))
+	  //this is a player. lets save the character right now
+	  save_char_vars(mob);
+
 }
 
 
