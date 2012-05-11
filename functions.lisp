@@ -40,3 +40,10 @@
   (ffi:c-inline (script-ptr name value context) (:pointer-void :cstring :cstring :long) :void
 		"add_var(&(((struct trig_data*)#0)->var_list),#1,#2,#3);"
 		:side-effects t))
+
+(ffi:clines "void save_char_vars ( Character *ch );")
+
+(defun player-save-vars (player-ptr)
+  (ffi:c-inline (player-ptr) (:pointer-void) :void
+		"save_char_vars((Character*)#0);"
+		:side-effects t))

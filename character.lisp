@@ -207,3 +207,10 @@
 		       "SCRIPT((Character *)#0)")))
     (unless (ffi:null-pointer-p ptr)
       ptr)))
+
+(defmethod dg-set-value ((entity player) name &optional context (value ""))
+  (declare (type string name value)
+	   (type integer context))
+  "players only have context 0, so any context given here should be forcibly set to 0"
+  (call-next-method entity name 0 value)
+  (4d-internal::player-save-vars (pointer entity)))

@@ -8,31 +8,16 @@
 (defclass trigger ()
   ((rnum :type :integer :initarg :rnum :reader rnum)))
 
-(defmethod vnum ((trigger trigger))
-  (oneliner ((rnum trigger)) (:int) :int "trig_index[#0]->vnum"))
-
-(defmethod pointer ((trigger trigger))
-  (oneliner ((rnum trigger)) (:int) :pointer-void "trig_index[#0]->proto"))
-
-(defmethod name ((trigger trigger))
-  (oneliner ((rnum trigger)) (:int) :cstring "trig_index[#0]->proto->name"))
+(with-c-struct (trigger (rnum trigger) "trig_index[#0]->~a" :int)
+  (field vnum :int)
+  (field pointer :pointer-void "proto")
+  (field name :cstring "proto->name"))
 
 (defmethod print-object ((trigger trigger) s)
   (format s "#<trigger ~d: ~a>" (vnum trigger) (name trigger)))
 
 (define-condition trigger-not-found (error)
   ((vnum :initarg :vnum :reader vnum)))
-
-(defun for-each-trig-fn (fn)
-  (loop for rnum from 0 to (1- (oneliner () () :int "top_of_trigt")) do
-       (funcall fn (make-instance 'trigger :rnum rnum))))
-
-(defmacro for-each-trigger ((trigger) &body body)
-  `(for-each-trig-fn #'(lambda (,trigger)
-			   ,@body)))
-
-(defun top-of-trigt ()
-  (oneliner () () :int "top_of_trigt"))
 
 (defmethod trigger ((vnum integer))
 ;;logarithmic search

@@ -44,3 +44,12 @@
      (error (e) (error "error while compiling ~a: ~a" ',name e))))
 
 (defclass entity () () (:documentation "scriptable entity."))
+
+(defmacro with-c-struct ((class accessor c-accessor accessor-type) &body body)
+  `(macrolet ((field (field type &optional ref)
+		(declare (type symbol field type)
+			 (type (or nil string ref)))
+		`(defmethod ,field (,'(,class ,class))
+		   (oneliner (,',accessor) (,',accessor-type) ,type
+			     ,(format nil ,c-accessor (or ref (string-downcase (symbol-name field))))))))
+     ,@body))
