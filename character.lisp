@@ -214,3 +214,16 @@
   "players only have context 0, so any context given here should be forcibly set to 0"
   (call-next-method entity name 0 value)
   (4d-internal::player-save-vars (pointer entity)))
+
+(defun find-player-by-incomplete-name (name)
+  (declare (type string name))
+  (if (= 0 (length name))
+      (error "Please give a name."))
+  (dolist (p (sort (players) #'(lambda (x y)
+				 (string< (name x) (name y)))))
+    (if (and (> (length (name p))
+		(length name))
+	     (string= (string-upcase name)
+		      (string-upcase (subseq (name p) 0 (length name)))))
+	(return p))))
+    

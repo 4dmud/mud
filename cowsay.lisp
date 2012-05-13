@@ -21,5 +21,5 @@
 	     `(progn ,@(loop for command in commands collect
 			    `(defcommand ,(car command) (:min-level 55)
 			       (let ((pos (position #\Space argument :start 1)))
-				 (animalsay ,(cadr command) ch (player (subseq argument 1 pos)) (subseq argument (1+ pos)))))))))
+				 (animalsay ,(cadr command) ch (find-player-by-incomplete-name (subseq argument 1 pos)) (subseq argument (1+ pos)))))))))
   (make-animal-commands (cowsay "default") (dragonsay "dragon-and-cow") (bunnysay "bunny")))
