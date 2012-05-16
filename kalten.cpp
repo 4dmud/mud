@@ -884,7 +884,9 @@ int perform_push ( Character *ch, int dir, int need_specials_check,
 		               ch );
 		return 0;
 	}
-	sprintf ( buf2, "$n is pushed to the %s by $N.", dirs[dir] );
+	// Changed this around so it makes sense english wise. --> Prom
+	//sprintf ( buf2, "$n is pushed to the %s by $N.", dirs[dir] );
+	sprintf ( buf2, "$n is pushed %s by $N.", dirs[dir] );
 	act ( buf2, TRUE, ch, 0, attacker, TO_NOTVICT );
 	was_in = IN_ROOM ( ch );
 	char_from_room ( ch );
