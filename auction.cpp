@@ -161,7 +161,8 @@ void auction_update(void)
          FALSE, auction->seller, auction->obj, auction->bidder,
          TO_NOTVICT);
       else {
-        act("A small daemon pops in, takes $p and gives some gold from $n, and leaves.",
+	// Changing the wording of the message to make more sense (from - to) --> Prom
+        act("A small daemon pops in, takes $p and gives some gold to $n, and leaves.",
          FALSE, auction->seller, auction->obj, auction->bidder,
          TO_ROOM);
         act("A small daemon pops in, takes some gold and gives $p to $n, and leaves.",
