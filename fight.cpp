@@ -7222,6 +7222,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			else
 				dam = 1.0;
 			break;
+		case SPELL_ACID_GRASP:
+                        if ( underwater )
+                        {       dam = 1.0; ch->Send("+Underwater "); }
+                        else if ( raining )
+                        {       dam = 2.0; ch->Send("+Rain "); }
+                        else
+                                dam = 1.40;
+                        break;
 		case SPELL_FIRE_BREATH:
 		case SPELL_GAS_BREATH:
 		case SPELL_FROST_BREATH:

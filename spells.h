@@ -359,7 +359,7 @@ enum spell_list {
     SPELL_BOWEL, // Possible affect for thrust - Prom
     SPELL_DETECT_INVIS_OTHER,
     SPELL_MANA_REGEN, // if you don't know what this does you shouldn't be in this file - Once
-    SPARE222,
+    SPELL_ACID_GRASP,
     SPARE223,
     SPARE224,
     SPARE225,
