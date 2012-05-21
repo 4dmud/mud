@@ -7112,7 +7112,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			if ( underwater )
 			{	dam = 1.5; ch->Send("+Underwater "); }
 			else if ( raining )
-			{	dam = 2.0; ch->Send("+Rain "); }
+			{	dam = 1.75; ch->Send("+Rain "); }
 			else
 				dam = 1.40; 
 			break;
@@ -7226,9 +7226,17 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
                         if ( underwater )
                         {       dam = 1.25; ch->Send("+Underwater "); }
                         else if ( raining )
-                        {       dam = 2.0; ch->Send("+Rain "); }
+                        {       dam = 1.75; ch->Send("+Rain "); }
                         else
                                 dam = 1.00;
+                        break;
+		case SPELL_ACIDBALL:
+			if ( underwater )
+                        {       dam = 1.5; ch->Send("+Underwater "); }
+                        else if ( raining )
+                        {       dam = 2.0; ch->Send("+Rain "); }
+                        else
+                                dam = 1.25;
                         break;
 		case SPELL_FIRE_BREATH:
 		case SPELL_GAS_BREATH:

@@ -2339,6 +2339,11 @@ void mag_assign_spells ( void )
                  3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
                  MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1,"" );
 
+	spello ( SPELL_ACIDBALL, "acidball", 30 , 20 , 5,
+                 POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
+                 MAG_DAMAGE | MAG_ROOM_AFFECTS,
+                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 3, "" );
+
 	/* NON-castable spells should appear here */
 	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
 	         TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL,
@@ -2806,6 +2811,9 @@ int elemental_type ( int spell )
 			retval = ELEM_FIRE;
 			break;
 		case SPELL_ACID_FIST:
+			retval = ELEM_WATER;
+			break;
+		case SPELL_ACIDBALL:
 			retval = ELEM_WATER;
 			break;
 		case SPELL_POLYMORPH:
