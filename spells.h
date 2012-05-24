@@ -360,7 +360,7 @@ enum spell_list {
     SPELL_DETECT_INVIS_OTHER,
     SPELL_MANA_REGEN, // if you don't know what this does you shouldn't be in this file - Once
     SPELL_ACID_FIST,
-    SPELL_ACIDBALL,
+    SPELL_ACIDBURST,
     SPARE224,
     SPARE225,
     SPARE226,

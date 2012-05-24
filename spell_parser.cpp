@@ -2339,7 +2339,7 @@ void mag_assign_spells ( void )
                  3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
                  MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1,"" );
 
-	spello ( SPELL_ACIDBALL, "acidball", 30 , 20 , 5,
+	spello ( SPELL_ACIDBURST, "acid burst", 30 , 20 , 5,
                  POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
                  MAG_DAMAGE | MAG_ROOM_AFFECTS,
                  0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 3, "" );
@@ -2813,7 +2813,7 @@ int elemental_type ( int spell )
 		case SPELL_ACID_FIST:
 			retval = ELEM_WATER;
 			break;
-		case SPELL_ACIDBALL:
+		case SPELL_ACIDBURST:
 			retval = ELEM_WATER;
 			break;
 		case SPELL_POLYMORPH:
