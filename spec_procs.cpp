@@ -647,7 +647,7 @@ SPECIAL ( dump )
 	        k = IN_ROOM ( ch )->contents )
 	{
 		act ( "$p vanishes in a puff of smoke!", FALSE, 0, k, 0, TO_ROOM );
-		value += MAX ( 1, MIN ( 50, GET_OBJ_COST ( k ) / 10 ) );
+		value += MAX ( 1, (int)MIN ( (gold_int)50, GET_OBJ_COST ( k ) / 10 ) );
 		obj_from_room ( k );
 		extract_obj ( k );
 	}

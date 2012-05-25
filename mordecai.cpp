@@ -285,7 +285,7 @@ ACMD ( do_convey )
 				bufpointer += snprintf ( bufpointer, ( size_t ) ( 98 - ( bufpointer - buf ) ), " to %d training session%s.\r\n",
 				                         sessions,
 				                         sessions > 1 ? "s":"" );
-				ch->Send ( buf );
+				ch->Send ( "%s", buf );
 				GET_GOLD_TOKEN_COUNT ( ch )   = new_gold_tokencount;
 				GET_SILVER_TOKEN_COUNT ( ch ) = new_silver_tokencount;
 				GET_BRONZE_TOKEN_COUNT ( ch ) = new_bronze_tokencount;

@@ -691,7 +691,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     if (strncmp(buf, "NOBITS", 6))
         ch->Send( "{cyIt is {cc%s{c0\r\n", buf);
 
-    ch->Send( "{cyIts weight is {cC%d{cy and its valued at {cC%d{cy coins",
+    ch->Send( "{cyIts weight is {cC%d{cy and its valued at {cC%lld{cy coins",
               GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj));
     if (GET_OBJ_LEVEL(obj))
         ch->Send( ", and its Min-level is {cC%d{c0\r\n" ,GET_OBJ_LEVEL(obj));

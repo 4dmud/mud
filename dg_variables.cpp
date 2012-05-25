@@ -1658,7 +1658,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							else if ( !strcasecmp ( subfield, "neutral" ) )
 								GET_SEX ( c ) = SEX_NEUTRAL;
 						}
-						snprintf ( str, slen, genders[ ( int ) GET_SEX ( c ) ] );
+						snprintf ( str, slen, "%s", genders[ ( int ) GET_SEX ( c ) ] );
 					}
 					else if ( !strcasecmp ( field, "str" ) )
 					{
@@ -1693,7 +1693,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							snprintf ( str, slen, "0" );
 					}
 					else if ( !strcasecmp ( field, "skill" ) )
-						snprintf ( str, slen, skill_percent ( c, subfield ) );
+					  snprintf ( str, slen, "%s", skill_percent ( c, subfield ) );
 					else if ( !strcasecmp ( field, "skillset" ) )
 					{
 						if ( !IS_NPC ( c ) && subfield && *subfield )
@@ -1730,7 +1730,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", GET_STAMINA ( c ) );
 					}
 					else if ( !strcasecmp ( field, "subskill" ) )
-						snprintf ( str, slen, sub_percent ( c, subfield ) );
+					  snprintf ( str, slen, "%s", sub_percent ( c, subfield ) );
 					else if ( !strcasecmp ( field, "subincrease" ) )
 					{
 						if((count = sub_number(subfield)) > 0)
@@ -1925,7 +1925,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 							strcpy ( str, "" );
 					else if ( !strcasecmp ( field, "cost" ) )
-						snprintf ( str, slen, "%d", GET_OBJ_COST ( o ) );
+						snprintf ( str, slen, "%lld", GET_OBJ_COST ( o ) );
 
 					else if ( !strcasecmp ( field, "cost_per_day" ) )
 						snprintf ( str, slen, "%d", GET_OBJ_RENT ( o ) );

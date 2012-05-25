@@ -1745,7 +1745,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	sprintbitarray ( GET_OBJ_EXTRA ( j ), extra_bits, EF_ARRAY_MAX, buf, sizeof ( buf ) );
 	ch->Send ( "%s\r\n",buf );
 
-	ch->Send ( "Weight: %d, Value: %d, Cost/day: %d, Timer: %d, Min level: %d\r\n",
+	ch->Send ( "Weight: %d, Value: %lld, Cost/day: %d, Timer: %d, Min level: %d\r\n",
 	           GET_OBJ_WEIGHT ( j ), GET_OBJ_COST ( j ), GET_OBJ_RENT ( j ), GET_OBJ_TIMER ( j ), GET_OBJ_LEVEL ( j ) );
 
 	ch->Send ( "In room: " );
@@ -1852,7 +1852,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 			           ( int ) GET_OBJ_VAL ( j, 0 ), YESNO ( ( int ) GET_OBJ_VAL ( j, 3 ) ), skill_name ( GET_OBJ_VAL ( j, 4 ) ) );
 			break;
 		case ITEM_MONEY:
-			ch->Send ( "Coins: %d", GET_OBJ_VAL ( j, 0 ) );
+			ch->Send ( "Coins: %lld", MONEY ( j ) );
 			break;
 		case ITEM_FURNITURE:
 			ch->Send ( "Can hold: [%d] Num. of People in Chair: [%d]\r\n",
@@ -6113,7 +6113,7 @@ ACMD ( do_potionweight )
 	{
 		if ( GET_OBJ_TYPE ( &obj_proto[nr] ) == ITEM_POTION )
 		{
-			snprintf ( buf, sizeof ( buf ), "%5d. [%5d][L:%2d][W: %2d][Cst: %6d] %s\r\n", ++found,
+			snprintf ( buf, sizeof ( buf ), "%5d. [%5d][L:%2d][W: %2d][Cst: %6lld] %s\r\n", ++found,
 			           obj_index[nr].vnum, GET_OBJ_VAL ( &obj_proto[nr], 0 ),GET_OBJ_WEIGHT ( &obj_proto[nr] ),
 			           GET_OBJ_COST ( &obj_proto[nr] ), obj_proto[nr].short_description );
 			DYN_RESIZE ( buf );

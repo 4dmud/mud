@@ -1288,7 +1288,7 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
     fprintf(fl, "Type: %d\n", GET_OBJ_TYPE(obj));
     fprintf(fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3]);
     fprintf(fl, "Weight: %d\n", GET_OBJ_WEIGHT(obj));
-    fprintf(fl, "Cost: %d\n", GET_OBJ_COST(obj));
+    fprintf(fl, "Cost: %lld\n", GET_OBJ_COST(obj));
     fprintf(fl, "Rent: %d\n", GET_OBJ_RENT(obj));
     fprintf(fl, "Innate: %d\n", GET_OBJ_INNATE(obj));
     fprintf(fl, "Level: %d\n", GET_OBJ_LEVEL(obj));

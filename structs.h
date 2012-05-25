@@ -1506,7 +1506,7 @@ struct obj_flag_data {
     int wear_flags[TW_ARRAY_MAX];  /* Where you can wear it         */
     int extra_flags[EF_ARRAY_MAX]; /* If it hums, glows, etc.       */
     int weight;               /* Weight what else              */
-    int cost;            /* Value when sold (gp.)         */
+    gold_int cost;            /* Value when sold (gp.)         */
     int cost_per_day;         /* Cost to keep pr. real day     */
     int timer;           /* Timer for object              */
     time_t expire;

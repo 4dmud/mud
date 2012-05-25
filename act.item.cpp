@@ -928,7 +928,7 @@ bool can_take_obj ( Character *ch, struct obj_data *obj )
 
 void get_check_money ( Character *ch, struct obj_data *obj )
 {
-	gold_int value = GET_OBJ_VAL ( obj, 0 );
+	gold_int value = MONEY ( obj );
 
 	if ( GET_OBJ_TYPE ( obj ) != ITEM_MONEY || value <= 0 )
 		return;
@@ -1594,8 +1594,8 @@ void perform_drop_gold ( Character *ch, gold_int amount,
 		ch->Send ( "Heh heh heh.. we are jolly funny today, eh?\r\n" );
 	else if ( ch->Gold ( 0, GOLD_HAND ) < amount )
 		ch->Send ( "You don't have that many coins!\r\n" );
-	else if ( amount > 2000000000 )
-		ch->Send ( "You can't drop more then 2 billion.\r\n" );
+	//	else if ( amount > 2000000000 )
+	//		ch->Send ( "You can't drop more then 2 billion.\r\n" );
 	else
 	{
 		/*for the gold tally code */
@@ -1763,7 +1763,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 				if ( IN_ROOM ( ch ) )
 					new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TOKEN] %s junks %s in room %d",  GET_NAME ( ch ), obj->short_description, GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
 			}
-			value = MAX ( 1, MIN ( 200, GET_OBJ_COST ( obj ) / 16 ) );
+			value = MAX ( 1, (int) MIN ( (gold_int) 200, GET_OBJ_COST ( obj ) / 16 ) );
 			extract_obj ( obj );
 			ch->Gold ( value, GOLD_BANK );
 			return ( value );
@@ -1783,6 +1783,7 @@ ACMD ( do_drop )
 	Room *  RDR = NULL;
 	sbyte mode = SCMD_DROP;
 	int dotmode, amount = 0, multi, num_don_rooms = 0;
+	gold_int multig;
 	const char *sname;
 	char buf[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH];
@@ -1855,10 +1856,11 @@ ACMD ( do_drop )
 	}
 	else if ( is_number ( arg ) )
 	{
-		multi = atoi ( arg );
+  	        multi = atoi (arg);
+		multig = atol ( arg );
 		one_argument ( argument, arg );
 		if ( !str_cmp ( "coins", arg ) || !str_cmp ( "coin", arg ) )
-			perform_drop_gold ( ch, multi, mode, RDR );
+			perform_drop_gold ( ch, multig, mode, RDR );
 		else if ( multi <= 0 )
 			ch->Send ( "Yeah, that makes sense.\r\n" );
 		else if ( !*arg )
@@ -2050,11 +2052,11 @@ void perform_give_gold ( Character *ch, Character *vict,
 		ch->Send ( "Heh heh heh ... we are jolly funny today, eh?\r\n" );
 		return;
 	}
-	else if ( amount > 2000000000 )
-	{
-		ch->Send ( "You can't give more then 2 billion.\r\n" );
-		return;
-	}
+	//	else if ( amount > 2000000000 )
+	//	{
+	//		ch->Send ( "You can't give more then 2 billion.\r\n" );
+	//		return;
+	//	}
 
 	if ( ( ch->Gold ( 0, GOLD_HAND ) < amount )
 	        && ( IS_NPC ( ch ) || ( GET_LEVEL ( ch ) < LVL_GOD ) ) )

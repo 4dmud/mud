@@ -180,7 +180,7 @@ int old_write_corpse(FILE * fp, struct obj_data *obj, int locate) {
             "%s~\n"
             "%s~\n"
             "%s~\n"
-            "%d %d %d %d %d %d %d %d\n",
+            "%d %d %d %d %d %d %lld %d\n",
             obj->name ? obj->name : "undefined",
             obj->short_description ? obj->short_description : "undefined",
             obj->description ? obj->description : "undefined",

@@ -152,7 +152,7 @@ void another_hour(int mode)
 	case 22:
 	    sunlight = SUN_DARK;
             sprintf(buf, "The %s moon rises up in the night sky.\r\n", moon_types[time_info.moon]);
-	    send_to_outdoor(buf);
+	    send_to_outdoor("%s", buf);
 	    break;
 	default:
 	    break;

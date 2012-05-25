@@ -3148,7 +3148,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 	}
 
 	if ( ( retval =
-	            sscanf ( line, "%d %d %d %d %d %d %s %s %s %s", t, t + 1, t + 2, t + 3,
+	       sscanf ( line, "%d %lld %d %d %d %d %s %s %s %s", t, &GET_OBJ_COST(obj_proto+i), t + 2, t + 3,
 	                     t + 4, t + 5, f1, f2, f3, f4 ) ) != 10 )
 	{
 		if ( retval == 5 )
@@ -3167,7 +3167,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 	}
 
 	GET_OBJ_WEIGHT ( obj_proto + i ) = t[0];
-	GET_OBJ_COST ( obj_proto + i ) = t[1];
+	//	GET_OBJ_COST ( obj_proto + i ) = t[1];
 	GET_OBJ_RENT ( obj_proto + i ) = t[2];
 	obj_proto[i].obj_flags.obj_innate = t[3];
 	obj_proto[i].obj_flags.timer = t[4];
@@ -6864,7 +6864,7 @@ int my_obj_save_to_disk ( FILE * fp, struct obj_data *obj, int locate )
 	          "%s~\n"
 	          "%s~\n"
 	          "%s~\n"
-	          "%d %d %d %d %d %d %d %d\n",
+	          "%d %d %d %d %d %d %lld %d\n",
 	          obj->name ? obj->name : "undefined",
 	          obj->short_description ? obj->short_description : "undefined",
 	          obj->description ? obj->description : "undefined",

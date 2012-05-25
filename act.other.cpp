@@ -782,10 +782,10 @@ void perform_snoop(Character *ch, Character *vict)
   char buf[MAX_INPUT_LENGTH];
 
   sprintf(buf, "%s has agreed to being snooped by you", GET_NAME(vict));
-  ch->desc->Output(buf);
+  ch->desc->Output("%s", buf);
 
   sprintf(buf, "You have agreed to being snooped by %s", GET_NAME(ch));
-  vict->desc->Output(buf);
+  vict->desc->Output("%s", buf);
 
   if (ch->desc->snooping)
       ch->desc->snooping->snoop_by = NULL;

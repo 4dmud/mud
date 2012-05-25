@@ -160,7 +160,7 @@ void assemblyListToChar( Character *pCharacter ) {
             sprinttype(g_pAssemblyTable[ i ].uchAssemblyType, AssemblyTypes, szAssmType, sizeof(szAssmType));
             sprintf( szBuffer, "[%5ld] %s (%s)\r\n", g_pAssemblyTable[ i ].lVnum,
                      obj_proto[ lRnum ].short_description, szAssmType );
-            pCharacter->Send( szBuffer);
+            pCharacter->Send( "%s", szBuffer);
 
             for( j = 0; j < g_pAssemblyTable[ i ].lNumComponents; j++ ) {
                 if( (lRnum = real_object( g_pAssemblyTable[ i ].pComponents[ j ].lVnum )) < 0 ) {

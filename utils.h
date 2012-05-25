@@ -1261,3 +1261,5 @@ bool valid_id_num ( long id );
 int fileExists ( char * fileName );
 
 #define FTOI(f) ((int)((f)))
+
+#define MONEY(obj) ((gold_int)MAX((gold_int)GET_OBJ_VAL(obj,0), GET_OBJ_COST(obj)))

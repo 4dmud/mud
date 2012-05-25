@@ -1054,7 +1054,7 @@ void oedit_disp_menu ( Descriptor *d )
 	d->Output (
 	    "%s7%s) Wear flags  : %s%s\r\n"
 	    "%s8%s) Weight      : %s%d\r\n"
-	    "%s9%s) Cost        : %s%d\r\n"
+	    "%s9%s) Cost        : %s%lld\r\n"
 	    "%sA%s) Cost/Day    : %s%d\r\n"
 	    "%sB%s) Timer       : %s%d\r\n"
 	    "%sC%s) Values      : %s%d %d %d %d %d %d\r\n"

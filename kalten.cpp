@@ -248,26 +248,26 @@ void do_objstat ( Character *ch, struct obj_data *j )
 		GET_OBJ_VAL(j,3) == 28) { -- uncomment to pick heal potions */
 	sprintf ( buf, "\r\nName: '%s'\n",
 	          ( ( j->short_description ) ? j->short_description : "<None>" ) );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 	sprinttype ( GET_OBJ_TYPE ( j ), item_types, buf1, sizeof ( buf1 ) );
 	sprintf ( buf, "VNum: [%5d], Type: %s\n", vnum, buf1 );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 
 	fprintf ( fp, "Can be worn on: " );
 	sprintbitarray ( j->obj_flags.wear_flags, wear_bits, TW_ARRAY_MAX, buf, sizeof ( buf1 ) );
 	strcat ( buf, "\n" );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 
 	fprintf ( fp, "Set char bits : " );
 	sprintbitarray ( j->obj_flags.bitvector, affected_bits, AF_ARRAY_MAX,
 	                 buf, sizeof ( buf1 ) );
 	strcat ( buf, "\n" );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 
 	fprintf ( fp, "Extra flags   : " );
 	sprintbitarray ( GET_OBJ_EXTRA ( j ), extra_bits, EF_ARRAY_MAX, buf, sizeof ( buf1 ) );
 	strcat ( buf, "\n" );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 
 
 	switch ( GET_OBJ_TYPE ( j ) )
@@ -328,7 +328,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
 			          YESNO ( GET_OBJ_VAL ( j, 3 ) ) );
 			break;
 		case ITEM_MONEY:
-			sprintf ( buf, "Coins: %d", GET_OBJ_VAL ( j, 0 ) );
+			sprintf ( buf, "Coins: %lld", MONEY ( j ) );
 			break;
 		default:
 			sprintf ( buf, "Values 0-3: [%d] [%d] [%d] [%d]",
@@ -336,7 +336,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
 			          GET_OBJ_VAL ( j, 2 ), GET_OBJ_VAL ( j, 3 ) );
 			break;
 	}
-	fprintf ( fp, ( strcat ( buf, "\n" ) ) );
+	fprintf ( fp, "%s", ( strcat ( buf, "\n" ) ) );
 
 	found = 0;
 	fprintf ( fp, "Affections:" );
@@ -346,7 +346,7 @@ void do_objstat ( Character *ch, struct obj_data *j )
 			sprinttype ( j->affected[i].location, apply_types, buf2, sizeof ( buf2 ) );
 			sprintf ( buf, "%s %+d to %s", found++ ? "," : "",
 			          j->affected[i].modifier, buf2 );
-			fprintf ( fp, buf );
+			fprintf ( fp, "%s", buf );
 		}
 	if ( !found )
 		fprintf ( fp, " None" );
@@ -393,9 +393,9 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
 	fp = fopen ( DUMP_FILE, "a+" );
 
 	sprintf ( buf, "Global Variables: %s\n", sc->global_vars ? "" : "None" );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 	sprintf ( buf, "Global context: %ld\n", sc->context );
-	fprintf ( fp, buf );
+	fprintf ( fp, "%s", buf );
 
 	for ( tv = sc->global_vars; tv; tv = tv->next )
 	{
@@ -409,14 +409,14 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
 		else
 			sprintf ( buf, "    %20s:  %20s\n",
 			          tv->context ? namebuf : tv->name.c_str(), tv->value.c_str() );
-		fprintf ( fp, buf );
+		fprintf ( fp, "%s", buf );
 	}
 
 	for ( t = TRIGGERS ( sc ); t; t = t->next )
 	{
 		sprintf ( buf, "\n  Trigger: %s, VNum: [%5d], RNum: [%5d]\n",
 		          GET_TRIG_NAME ( t ), GET_TRIG_VNUM ( t ), GET_TRIG_RNUM ( t ) );
-		fprintf ( fp, buf );
+		fprintf ( fp, "%s", buf );
 
 		if ( t->attach_type == OBJ_TRIGGER )
 		{
@@ -438,7 +438,7 @@ void script_stat_dump ( Character * ch, struct script_data *sc )
 		          buf1, GET_TRIG_NARG ( t ),
 		          ( ( GET_TRIG_ARG ( t ) && *GET_TRIG_ARG ( t ) ) ? GET_TRIG_ARG ( t ) :
 		            "None" ) );
-		fprintf ( fp, buf );
+		fprintf ( fp, "%s", buf );
 	}
 	fclose ( fp );
 }

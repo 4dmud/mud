@@ -2377,7 +2377,7 @@ void process_room_affect_queue(void)
               aff->room->tmp_n_description = NULL;
           }
           if (aff->wear_off_msg) 
-              send_to_room(aff->room, aff->wear_off_msg);
+	    send_to_room(aff->room, "%s", aff->wear_off_msg);
 
           REMOVE_FROM_LIST(aff, room_affect_list, next);
           free_room_affected_data(aff);

@@ -2901,7 +2901,7 @@ void nanny ( Descriptor *d, char *arg )
 				}
 				catch ( MudException &e )
 				{
-					d->Output ( e.Message() );
+				        d->Output ( "%s", e.Message() );
 					con_disp_menu ( d );
 					return;
 				}

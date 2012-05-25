@@ -1374,7 +1374,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 	else if ( ROOM_FLAGGED ( view_room, ROOM_WILDERNESS ) )
 	{
 		parse_room_name ( view_room, tbuf, sizeof ( tbuf ) );
-		ch->Send ( tbuf );
+		ch->Send ( "%s", tbuf );
 	}
 	else if ( ROOM_FLAGGED ( view_room, ROOM_ARENA ) )
 	{
@@ -4822,7 +4822,7 @@ ACMD ( do_toggle )
 		else if ( GET_CSNP_LVL ( ch ) ==-1 )
 			snprintf ( buf3,50,"All" );
 		else if ( GET_CSNP_LVL ( ch ) >=0 && GET_CSNP_LVL ( ch ) <=num_of_clans )
-			sprintf ( buf3,clan[GET_CSNP_LVL ( ch ) ].name );
+		  sprintf ( buf3,"%s", clan[GET_CSNP_LVL ( ch ) ].name );
 
 		ch->Send (
 		    "      Buildwalk: %-3s    "
@@ -5170,7 +5170,7 @@ ACMD ( do_prereq )
 				len += snprintf ( msg1 + len, sizeof ( msg1 ) - len,  "   %s",
 				                  spell_info[spell_info[skill_num].second_prereq].name );
 			}
-			ch->Send ( msg1 );
+			ch->Send ( "%s", msg1 );
 		}
 		else
 		{
@@ -5388,7 +5388,7 @@ ACMD ( do_affects )
 					ch->Send ( ", sets " );
 				else
 					ch->Send ( " sets " );
-				ch->Send ( affected_bits[aff->bitvector] );
+				ch->Send ( "%s", affected_bits[aff->bitvector] );
 			}
 			ch->Send ( "\r\n" );
 		}

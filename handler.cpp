@@ -2725,11 +2725,10 @@ struct obj_data *create_money ( gold_int gamount )
 	struct extra_descr_data *new_descr;
 	char buf[200];
 	int amount;
-
 	if ( gamount > 2000000000 )
-		amount = 2000000000;
+	  amount = 2000000000;
 	else
-		amount = ( int ) gamount;
+	  amount = ( int ) gamount;
 
 	if ( amount <= 0 )
 	{
@@ -2793,7 +2792,7 @@ struct obj_data *create_money ( gold_int gamount )
 		obj->obj_flags.wear_flags[y] = 0;
 	SET_BIT_AR ( GET_OBJ_WEAR ( obj ), ITEM_WEAR_TAKE );
 	GET_OBJ_VAL ( obj, 0 ) = ( int ) amount;
-	GET_OBJ_COST ( obj ) = ( int ) amount;
+	GET_OBJ_COST ( obj ) = gamount;//MONEY macro will return cost instead of val0 if cost is higher. Ugly hack to get piles larger than 2bil working.
 	obj->item_number = NOTHING;
 	if ( GET_OBJ_RNUM ( obj ) != NOTHING ) //this is because it has a negitive rnum.
 		obj_index[GET_OBJ_RNUM ( obj ) ].qic = NULL;

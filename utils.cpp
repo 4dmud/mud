@@ -543,7 +543,7 @@ void mudlog ( const char *str, int type, int level, int file )
 	if ( str == NULL )
 		return;              /* eh, oh well. */
 	if ( file )
-		log ( str );
+	  log ( "%s", str );
 	if ( level < 0 )
 		return;
 
@@ -1703,14 +1703,14 @@ void write_wizlist ( FILE * out, int minlev, int maxlev )
 			if ( ( *curr_name ).length() + buf.length() > 75 )
 			{
 				snprintf ( line, sizeof ( line )-1, "%*s%s\n", ( int ) ( ( 80 - buf.length() ) /2 ), "", buf.c_str() );
-				fprintf ( out, line );
+				fprintf ( out, "%s", line );
 				buf = "";
 			}
 			buf += ( *curr_name );
 			buf += "  ";
 		}
 		snprintf ( line, sizeof ( line )-1, "%*s%s\n\n", ( int ) ( ( 80 - buf.length() ) /2 ), "", buf.c_str() );
-		fprintf ( out, line );
+		fprintf ( out, "%s", line );
 	}
 #if 0
 	buf += ( *curr_name );

@@ -287,7 +287,7 @@ int save_objects(zone_rnum zone_num)
       fprintf(fp,
 	      "%d %d %d %d %d %d %d %d %d\n"	      
 	      "%d %d %d %d %d %d %d %d %d %d\n"
-	      "%d %d %d %d %d %d %d %d %d %d\n",
+	      "%d %lld %d %d %d %d %d %d %d %d\n",
 
 GET_OBJ_TYPE(obj), GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3],
 GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3],/*row 1*/
