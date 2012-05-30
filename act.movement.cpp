@@ -2368,7 +2368,7 @@ ACMD ( do_follow )
 
 	if ( leader->master && ( leader != ch ) )
 	{
-		*ch << GET_NAME ( leader ) << "'s master is "<< GET_NAME ( leader->master ) <<", so you ask to follow " << HMHR ( leader->master ) << " insead.\r\n";
+		*ch << GET_NAME ( leader ) << "'s master is "<< GET_NAME ( leader->master ) <<", so you ask to follow " << HMHR ( leader->master ) << " instead.\r\n";
 		leader = leader->master;
 	}
 
