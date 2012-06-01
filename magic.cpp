@@ -887,7 +887,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_SENSE_LIFE:
-			to_vict = "Your feel your awareness improve.";
+			to_vict = "You feel your awareness improve.";
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else
