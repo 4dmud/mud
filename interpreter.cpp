@@ -966,7 +966,7 @@ const command_info cmd_info[] =
 	{ "manifest"  , "man"  , POS_STANDING, do_skills  , 0, SKILL_MANIFEST, 0 },
 	{ "manipulate", "manip", POS_STANDING, do_skills    , 0, SKILL_MANIPULATE, 0 },
 	{ "martialarts" , "mart", POS_STANDING, do_skills    , 1, SKILL_MARTIAL_ARTS, 0 },
-	{ "meditate"   , "medi" , POS_STANDING, do_skills   , 0, SKILL_MEDITATE, 0 },
+	{ "meditate"   , "medi" , POS_RESTING, do_skills   , 0, SKILL_MEDITATE, 0 },
 	{ "mount"    , "mou"  , POS_STANDING, do_skills    , 0, SKILL_MOUNT, 0 },
 	{ "pick"     , "pi"  , POS_STANDING, do_skills , 1, SKILL_PICK_LOCK, 0 },
 	{ "phase"    , "ph"  , POS_STANDING, do_skills    , 1, SKILL_PHASE, 0 },
