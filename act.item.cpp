@@ -4315,6 +4315,7 @@ int get_obj_aff ( struct obj_data *obj, int location )
 }
 
 
+// Changing the compares to use than instead of and -- Prom
 
 void compare_weapons ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
@@ -4340,7 +4341,7 @@ void compare_weapons ( Character *ch,struct obj_data *item, struct obj_data *com
 	value2 = FTOI ( ( ( comp->obj_flags.value[1]+1 ) * comp->obj_flags.value[2] * wep_multi[1] ) /2 );
 
 	ch->Send ( "      {cgYou would do %s damage with ({cRB{cg) %s ({cGA{cg).{c0\r\n",
-	           value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "and" : "then" );
+	           value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "than" : "then" );
 }
 void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
@@ -4353,7 +4354,7 @@ void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp
 	}
 	else if ( staff_multi ( ch, comp ) == staff_multi ( ch, item ) )
 	{
-		ch->Send ( "      {cgYou would get the same multiplyer from ({cRB{cg) and ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get the same multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 	else
 	{
@@ -4375,7 +4376,7 @@ void compare_armor ( Character *ch,struct obj_data *item, struct obj_data *comp 
 	}
 	else
 	{
-		ch->Send ( "      {cgYou would get less armor from ({cRB{cg) and ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get less armor from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 
 }
@@ -4394,7 +4395,7 @@ void compare_food ( Character *ch,struct obj_data *item, struct obj_data *comp )
 	}
 	else
 	{
-		ch->Send ( "      {cgYou would get less food from ({cRB{cg) and ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get less food from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 
 }
