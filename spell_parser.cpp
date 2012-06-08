@@ -1899,7 +1899,7 @@ void mag_assign_spells ( void )
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 31, 0, "" );
 
 	spello ( SPELL_DEMONSHRIEK, "demonshriek", 70 , 60 , 2,
-	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0, "" );
 
 	spello ( SPELL_LIFESUCK, "lifesuck", 70 , 60 , 2,
@@ -2176,7 +2176,7 @@ void mag_assign_spells ( void )
 	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 43, 0, "" );
 
 	spello ( SPELL_CONE_OF_COLD, "cone of cold", 30 , 10 , 3,
-	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
+	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
 	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 35, 1, "" );
 
 	spello ( SPELL_KNOCK, "knock", 30 , 10 , 3, POS_FIGHTING,
@@ -2336,13 +2336,12 @@ void mag_assign_spells ( void )
 		TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, " " );
 
 	spello ( SPELL_ACID_HOLD, "acid hold", 30 , 15 ,
-                 3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-                 MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1,"" );
+               3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
+               MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1,"" );
 
 	spello ( SPELL_ACIDBURST, "acid burst", 30 , 20 , 5,
-                 POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-                 MAG_DAMAGE | MAG_ROOM_AFFECTS,
-                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 40, 3, "" );
+               POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
+               TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
 
 	/* NON-castable spells should appear here */
 	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,

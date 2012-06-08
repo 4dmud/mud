@@ -337,9 +337,9 @@ int mag_damage ( int level, Character *ch, Character *victim,
 		case  SPELL_BURNINGSKULL:
 		case  SPELL_HEARTSQUEEZE:
 		case  SPELL_FACEMELT:
-			if ( !evil )
+			if ( good )
 			{
-				act ( "You aren't evil enough to cast this spell!", FALSE, ch, 0, victim, TO_CHAR );
+				act ( "You are much too good to cast this spell!", FALSE, ch, 0, victim, TO_CHAR );
 				return ( 0 );
 			}
 			break;
@@ -376,6 +376,11 @@ int mag_damage ( int level, Character *ch, Character *victim,
 				ch->Send ( "They seem to be healing!\r\n" );
 				alter_hit ( victim, dam );
 				return 0;
+			}
+			else if ( good )
+			{
+				act ( "Casting this spell in your state would only harm yourself!", FALSE, ch, 0, victim, TO_CHAR );
+				return ( 0 );
 			}
 			break;
 
@@ -493,7 +498,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
 		case SPELL_ABSOLVE:
 			if ( !OBJ_INNATE )
-				GET_ALIGNMENT ( victim ) = IRANGE ( -1000, GET_ALIGNMENT ( ch ) + ( 200 ), 1000 );
+				GET_ALIGNMENT ( victim ) = IRANGE ( -1000, GET_ALIGNMENT ( victim ) + ( ( 200 + ( chcha*2) ) ), 1000 );
 
 			to_vict = "All of your sins have been forgiven.";
 			to_room = "A halo appears above $n's head for a moment.";
@@ -1715,6 +1720,16 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 		case SPELL_METEOR_SHOWER:
 			to_char = "You call the iron meteors with your magic!";
 			to_room = "$n glows and a rain of iron meteors comes suddenly!";
+			break;
+
+		case SPELL_DEMONSHRIEK:
+			to_char = "You issue a demonic shriek that shakes the universe!";
+			to_room = "$n opens $s mouth and lets out an unworldly shriek!";
+			break;
+
+		case SPELL_ACIDBURST:
+			to_char = "You call forth a burst of acid from your fingertips!";
+			to_room = "$n gestures and liquid acid bursts forth from $s fingertips!";
 			break;
 
 		case SPELL_FIRE_BREATH:
