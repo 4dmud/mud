@@ -1440,7 +1440,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_EARTHQUAKE,        PRI );
 	assign_class ( SPELL_CONE_OF_COLD, PRI | ESP );
 	assign_class ( SPELL_DISPEL_EVIL,       PRI );
-	assign_class ( SPELL_DISPEL_GOOD,       PRI );
+	assign_class ( SPELL_DISPEL_GOOD,       ESP );
 	assign_class ( SPELL_SANCTUARY,         PRI );
 	assign_class ( SPELL_HOLY_WORD,         PRI );
 	assign_class ( SPELL_HOLY_SHOUT,   PRI );
@@ -1543,6 +1543,8 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_EVIL_EYE,        ESP );
 	assign_class ( SKILL_THRUST,	      RAN );
 	assign_class ( SKILL_SLIT,	      GYP );
+	assign_class ( SPELL_ACID_HOLD,	      ESP | MAG);
+	assign_class ( SPELL_ACIDBURST,      ESP);
 }
 
 

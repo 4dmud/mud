@@ -1859,7 +1859,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_DISPEL_EVIL, "dispel evil", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 30, 1, "" );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 1, "" );
 
 	spello ( SPELL_DISPEL_GOOD, "dispel good", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
