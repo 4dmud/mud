@@ -2335,7 +2335,7 @@ void mag_assign_spells ( void )
 		POS_STANDING, TAR_CHAR_ROOM, TRUE, MAG_AFFECTS, 0,
 		TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, " " );
 
-	spello ( SPELL_ACID_FIST, "acid fist", 30 , 15 ,
+	spello ( SPELL_ACID_HOLD, "acid hold", 30 , 15 ,
                  3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
                  MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 31, 1,"" );
 
@@ -2810,7 +2810,7 @@ int elemental_type ( int spell )
 		case SPELL_WALL_FIRE:
 			retval = ELEM_FIRE;
 			break;
-		case SPELL_ACID_FIST:
+		case SPELL_ACID_HOLD:
 			retval = ELEM_WATER;
 			break;
 		case SPELL_ACIDBURST:
