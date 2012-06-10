@@ -38,8 +38,9 @@ int dg_script_edit_parse(Descriptor *d, char *arg);
 #define TRIGEDIT_ARGUMENT		8
 
 
-
-#define OLC_SCRIPT_EDIT		    82766
+// Molly is saying the buffer isn't big enough. Going to increase this
+// from 82766 to 92160 (90kb) --> Prom
+#define OLC_SCRIPT_EDIT		        91260
 #define SCRIPT_MAIN_MENU		0
 #define SCRIPT_NEW_TRIGGER		1
 #define SCRIPT_DEL_TRIGGER		2

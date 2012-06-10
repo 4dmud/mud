@@ -16,7 +16,7 @@
 #define    MOB_TRIGGER   0
 #define    OBJ_TRIGGER   1
 #define    WLD_TRIGGER   2
-#define 	 ASS_TRIGGER	3
+#define    ASS_TRIGGER	 3
 
 
 /* unless you change this, Puff casts all your dg spells */
@@ -57,48 +57,48 @@
 
 
 /* mob trigger types */
-#define MTRIG_GLOBAL           (1 << 0)	/* check even if zone empty   */
-#define MTRIG_RANDOM           (1 << 1)	/* checked randomly           */
-#define MTRIG_COMMAND          (1 << 2)	/* character types a command  */
-#define MTRIG_SPEECH           (1 << 3)	/* a char says a word/phrase  */
-#define MTRIG_ACT              (1 << 4)	/* word or phrase sent to act */
-#define MTRIG_DEATH            (1 << 5)	/* character dies             */
-#define MTRIG_GREET            (1 << 6)	/* something enters room seen */
-#define MTRIG_GREET_ALL        (1 << 7)	/* anything enters room       */
-#define MTRIG_ENTRY            (1 << 8)	/* the mob enters a room      */
-#define MTRIG_RECEIVE          (1 << 9)	/* character is given obj     */
-#define MTRIG_FIGHT            (1 << 10)	/* each pulse while fighting  */
-#define MTRIG_HITPRCNT         (1 << 11)	/* fighting and below some hp */
-#define MTRIG_BRIBE	           (1 << 12)	/* coins are given to mob     */
-#define MTRIG_LOAD             (1 << 13)	/* the mob is loaded          */
-#define MTRIG_MEMORY           (1 << 14)	/* mob see's someone remembered */
-#define MTRIG_TIME	           (1 << 15)	/* mob is on a time prog      */
-#define MTRIG_CAST             (1 << 16)	/* mob targetted by spell     */
-#define MTRIG_LEAVE            (1 << 17)	/* someone leaves room seen   */
-#define MTRIG_DOOR             (1 << 18)	/* door manipulated in room   */
+#define MTRIG_GLOBAL           (1 << 0)	 /* check even if zone empty   */
+#define MTRIG_RANDOM           (1 << 1)	 /* checked randomly           */
+#define MTRIG_COMMAND          (1 << 2)	 /* character types a command  */
+#define MTRIG_SPEECH           (1 << 3)	 /* a char says a word/phrase  */
+#define MTRIG_ACT              (1 << 4)	 /* word or phrase sent to act */
+#define MTRIG_DEATH            (1 << 5)	 /* character dies             */
+#define MTRIG_GREET            (1 << 6)	 /* something enters room seen */
+#define MTRIG_GREET_ALL        (1 << 7)	 /* anything enters room       */
+#define MTRIG_ENTRY            (1 << 8)	 /* the mob enters a room      */
+#define MTRIG_RECEIVE          (1 << 9)	 /* character is given obj     */
+#define MTRIG_FIGHT            (1 << 10) /* each pulse while fighting  */
+#define MTRIG_HITPRCNT         (1 << 11) /* fighting and below some hp */
+#define MTRIG_BRIBE	       (1 << 12) /* coins are given to mob     */
+#define MTRIG_LOAD             (1 << 13) /* the mob is loaded          */
+#define MTRIG_MEMORY           (1 << 14) /* mob see's someone remembered */
+#define MTRIG_TIME	       (1 << 15) /* mob is on a time prog      */
+#define MTRIG_CAST             (1 << 16) /* mob targetted by spell     */
+#define MTRIG_LEAVE            (1 << 17) /* someone leaves room seen   */
+#define MTRIG_DOOR             (1 << 18) /* door manipulated in room   */
 #define MTRIG_FUNCTION         (1 << 19)
 
 /* obj trigger types */
-#define OTRIG_GLOBAL           (1 << 0)	/* unused                     */
-#define OTRIG_RANDOM           (1 << 1)	/* checked randomly           */
-#define OTRIG_COMMAND          (1 << 2)	/* character types a command  */
-#define OTRIG_SPEECH	      (1 << 3)	/* character speaks          */
-#define OTRIG_ENTER	       (1 << 4) /* object enters the room     */
-#define OTRIG_TIMER            (1 << 5)	/* item's timer expires       */
-#define OTRIG_GET              (1 << 6)	/* item is picked up          */
-#define OTRIG_DROP             (1 << 7)	/* character trys to drop obj */
-#define OTRIG_GIVE             (1 << 8)	/* character trys to give obj */
-#define OTRIG_WEAR             (1 << 9)	/* character trys to wear obj */
-#define OTRIG_ASSEMBLE         (1 << 10)/* attached to the assembly command group */
-#define OTRIG_REMOVE           (1 << 11)/* character trys to remove obj */
-#define OTRIG_PUT_IN	       (1 << 12)/* character tries to put something into a container */
+#define OTRIG_GLOBAL           (1 << 0)	 /* unused                     */
+#define OTRIG_RANDOM           (1 << 1)	 /* checked randomly           */
+#define OTRIG_COMMAND          (1 << 2)	 /* character types a command  */
+#define OTRIG_SPEECH	       (1 << 3)	 /* character speaks          */
+#define OTRIG_ENTER	       (1 << 4)  /* object enters the room     */
+#define OTRIG_TIMER            (1 << 5)	 /* item's timer expires       */
+#define OTRIG_GET              (1 << 6)	 /* item is picked up          */
+#define OTRIG_DROP             (1 << 7)	 /* character trys to drop obj */
+#define OTRIG_GIVE             (1 << 8)	 /* character trys to give obj */
+#define OTRIG_WEAR             (1 << 9)	 /* character trys to wear obj */
+#define OTRIG_ASSEMBLE         (1 << 10) /* attached to the assembly command group */
+#define OTRIG_REMOVE           (1 << 11) /* character trys to remove obj */
+#define OTRIG_PUT_IN	       (1 << 12) /* character tries to put something into a container */
 
-#define OTRIG_LOAD             (1 << 13)/* the object is loaded       */
-#define OTRIG_GET_OUT          (1 << 14)/* character tries to get something out of a container */
-#define OTRIG_TIME             (1 << 15)/* time prog */
-#define OTRIG_CAST             (1 << 16)/* object targetted by spell */
-#define OTRIG_LEAVE            (1 << 17)     /* someone leaves room seen    */
-#define OTRIG_CONSUME          (1 << 18)    /* char tries to eat/drink obj */
+#define OTRIG_LOAD             (1 << 13) /* the object is loaded       */
+#define OTRIG_GET_OUT          (1 << 14) /* character tries to get something out of a container */
+#define OTRIG_TIME             (1 << 15) /* time prog */
+#define OTRIG_CAST             (1 << 16) /* object targetted by spell */
+#define OTRIG_LEAVE            (1 << 17) /* someone leaves room seen    */
+#define OTRIG_CONSUME          (1 << 18) /* char tries to eat/drink obj */
 #define OTRIG_FUNCTION         (1 << 19)
 
 /* wld trigger types */
