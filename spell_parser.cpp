@@ -1919,7 +1919,7 @@ void mag_assign_spells ( void )
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_ELECTRIC_BLAST, "electric blast", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 10,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 	// Changing the delay in Inferno to a shorter delay - Prom
