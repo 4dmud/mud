@@ -1787,7 +1787,7 @@ void mag_assign_spells ( void )
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 20, 1 , "");
 
 	spello ( SPELL_CONTROL_WEATHER, "control weather", 75 ,
-	         25 , 5, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, 0,
+	         25 , 5, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, 15,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 20, 0, "" );
 
 	spello ( SPELL_CREATE_FOOD, "create food", 30 , 5 , 4,
@@ -1857,13 +1857,13 @@ void mag_assign_spells ( void )
 	         MAG_MANUAL, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1,
                  "You no longer can detect poison." );
 
-	spello ( SPELL_DISPEL_EVIL, "dispel evil", 40 , 25 , 3,
-	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 1, "" );
-
-	spello ( SPELL_DISPEL_GOOD, "dispel good", 40 , 25 , 3,
+	spello ( SPELL_DISPEL_EVIL, "dispel evil", 80 , 40 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
+
+	spello ( SPELL_DISPEL_GOOD, "dispel good", 80 , 40 , 2,
+	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 32, 0, "" );
 
 	spello ( SPELL_EARTHQUAKE, "earthquake", 40 , 25 , 3,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
@@ -1879,11 +1879,11 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_ENERGY_DRAIN, "energy drain", 40 , 25 , 1,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
+	         MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 35, 0, "" );
 
-	spello ( SPELL_EVIL_EYE, "evil eye", 60 , 30 , 2,
+	spello ( SPELL_EVIL_EYE, "evil eye", 120 , 60 , 3,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, 200,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_GROUP_ARMOR, "group armor", 50 , 30 , 2,
 	         POS_STANDING, TAR_IGNORE, FALSE, MAG_GROUPS, 20,
@@ -1898,9 +1898,9 @@ void mag_assign_spells ( void )
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
 	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 31, 0, "" );
 
-	spello ( SPELL_DEMONSHRIEK, "demonshriek", 70 , 60 , 2,
+	spello ( SPELL_DEMONSHRIEK, "demonshriek", 140 , 100 , 4,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0, "" );
+	         5, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 32, 0, "" );
 
 	spello ( SPELL_LIFESUCK, "lifesuck", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
@@ -1908,7 +1908,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_BURNINGSKULL, "burning skull", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         5, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 24, 0, "" );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 24, 0, "" );
 
 	spello ( SPELL_HEARTSQUEEZE, "heart squeeze", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
@@ -1916,12 +1916,10 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_FACEMELT, "facemelt", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
-
-	// Changing the following TAR_IGNORE | TAR_AREA_DIR to TAR_IGNORE --> Prom
 	spello ( SPELL_ELECTRIC_BLAST, "electric blast", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 100,
+	         POS_FIGHTING, TAR_IGNORE | TAR_AREA_DIR, TRUE, MAG_AREAS, 10,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
 
 	// Changing the delay in Inferno to a shorter delay - Prom
@@ -1929,7 +1927,7 @@ void mag_assign_spells ( void )
 	// Changed TAR_IGNORE | TAR_AREA_DIR to TAR_IGNORE and delay of 10 -- Prom
 	spello ( SPELL_INFERNO, "inferno", 140 , 125 , 3,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 18, 0, "" );
 
 
 	spello ( SPELL_WATER_TO_WINE, "water to wine", 150 ,
@@ -2125,7 +2123,7 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 43, 1, "" );
 
 	spello ( SPELL_METEOR_SHOWER, "meteor shower", 60 , 40 , 2,
-	         POS_STANDING, TAR_IGNORE, TRUE, MAG_AREAS, 40,
+	         POS_STANDING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_STONESKIN, "stoneskin", 35 , 15 , 3,
@@ -2341,9 +2339,26 @@ void mag_assign_spells ( void )
                3, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
                MAG_DAMAGE, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 21, 1,"" );
 
-	spello ( SPELL_ACIDBURST, "acid burst", 30 , 20 , 5,
+	spello ( SPELL_ACIDBURST, "acid burst", 60 , 30 , 3,
                POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
-               TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 40, 0, "" );
+               TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 41, 0, "" );
+
+	spello ( SPELL_FROST_ARROW, "frost arrow", 40 , 25 , 2,
+	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 50, 0, "" );
+
+	spello ( SPELL_HAIL_STORM, "hail storm", 140 , 125 , 3,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 36, 0, "" );
+
+	spello ( SPELL_EXORCISE, "exorcise", 30 , 20 , 2,
+	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 19, 1, "" );
+
+	spello ( SPELL_HOLY_JUDGEMENT, "holy judgement", 100 , 80 , 2,
+	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 36, 0, "" );
+
 
 	/* NON-castable spells should appear here */
 	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
@@ -2614,7 +2629,7 @@ int elemental_type ( int spell )
 			retval = ELEM_ELEC;
 			break;
 		case SPELL_METEOR_SHOWER:
-			retval = ELEM_AIR;
+			retval = ELEM_EARTH;
 			break;
 		case SPELL_STONESKIN:
 			retval = ELEM_EARTH;
@@ -2816,6 +2831,18 @@ int elemental_type ( int spell )
 			break;
 		case SPELL_ACIDBURST:
 			retval = ELEM_WATER;
+			break;
+		case SPELL_FROST_ARROW:
+			retval = ELEM_ICE;
+			break;
+		case SPELL_HAIL_STORM:
+			retval = ELEM_ICE;
+			break;
+		case SPELL_EXORCISE:
+			retval = ELEM_SPIRIT;
+			break;
+		case SPELL_HOLY_JUDGEMENT:
+			retval = ELEM_SPIRIT;
 			break;
 		case SPELL_POLYMORPH:
 			retval = ELEM_SPIRIT;

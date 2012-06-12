@@ -380,7 +380,15 @@ int mag_damage ( int level, Character *ch, Character *victim,
 			else if ( good )
 			{
 				act ( "Casting this spell in your state would only harm yourself!", FALSE, ch, 0, victim, TO_CHAR );
-				return ( 0 );
+				return 0;
+		}
+			break;
+		case SPELL_CONE_OF_COLD:
+		case SPELL_HAIL_STORM:
+			if ( !OUTSIDE ( victim ) )
+			{
+				act ( "You are unable to control the forces of nature from here!", FALSE, ch, 0, victim, TO_CHAR );
+				return 0;
 			}
 			break;
 
@@ -465,7 +473,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
 	switch ( spellnum )
 	{
-		case  SPELL_INFERNO:
+		case SPELL_INFERNO:
 		case SPELL_BURNING_HANDS:
 			if ( number ( 1, 50 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
 			        && !mag_savingthrow ( victim, savetype, 0 ) )
@@ -988,11 +996,13 @@ void mag_affects ( int level, Character *ch, Character *victim,
                     break;
 
 		case SPELL_CONE_OF_COLD:
-			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
+		case SPELL_FROST_ARROW:
+		case SPELL_HAIL_STORM:
+			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_COLD )
 			        && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
 			        && !mag_savingthrow ( victim, savetype, 0 ) )
 			{
-				af[0].expire = HOURS_TO_EXPIRE ( 1 );
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
 				af[0].bitvector = AFF_FREEZING;
 				accum_duration =TRUE;
 				to_vict = "You are consumed with coldness.";
@@ -1699,7 +1709,12 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 			to_room =
 			    "$n gracefully gestures and the earth begins to shake violently!";
 			break;
-
+		case  SPELL_ELECTRIC_BLAST:
+			to_char =
+			    "You gesture and release electrical energy all around you!";
+			to_room =
+			    "$n gesture and release electrical energy all around $m!";
+			break;
 		case  SPELL_INFERNO:
 			to_char =
 			    "You gesture and the world blazes into an inferno!";
@@ -1713,8 +1728,8 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 			    "$n concentrates and summons all $s magical energy!";
 			break;
 		case SPELL_HOLY_SHOUT:
-			to_char = "The world shook as you issue holy shout!";
-			to_room = "$n opens the holy bible and said the holy words!";
+			to_char = "The world shakes as you issue holy shout!";
+			to_room = "$n opens the holy bible and shouts the holy words!";
 			break;
 
 		case SPELL_METEOR_SHOWER:
@@ -1728,8 +1743,8 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 			break;
 
 		case SPELL_ACIDBURST:
-			to_char = "You call forth a burst of acid from your fingertips!";
-			to_room = "$n gestures and liquid acid bursts forth from $s fingertips!";
+			to_char = "You call forth a burst of acid from your hands!";
+			to_room = "$n gestures and liquid acid bursts forth from $s hands!";
 			break;
 
 		case SPELL_FIRE_BREATH:
