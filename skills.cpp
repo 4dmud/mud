@@ -2154,8 +2154,6 @@ ASKILL ( skill_punch )
 	return 0;
 }
 
-// WIP
-// Prometheus
 
 ASKILL ( skill_slit )
 {
@@ -2178,7 +2176,6 @@ ASKILL ( skill_slit )
         return SKILL_SLIT;
 
 
-	//ch->Send ( "This Skill is WIP.\r\n" );
 	return 0;
 }
 
