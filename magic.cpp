@@ -2086,7 +2086,9 @@ void mag_points ( int level, Character *ch, Character *victim,
 		case SPELL_VITALIZE:
 			move = dice ( FTOI ( spell_lvl * 0.5 ), FTOI ( spell_lvl * 0.5 ) );
 			stam = spell_lvl;
-			act ( "Your mind scans $N's body, revitalizing them.", FALSE, ch, 0, victim, TO_CHAR );
+			// Remarking out the to_char since most players vitalize themselves don't
+			// double spam --> Prom
+			//act ( "Your mind scans $N's body, revitalizing them.", FALSE, ch, 0, victim, TO_CHAR );
 			act ( "$n's mind scans your body, revitalizing you.", FALSE, ch, 0, victim, TO_VICT );
 			break;
 	}
