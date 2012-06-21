@@ -2077,7 +2077,8 @@ void mag_points ( int level, Character *ch, Character *victim,
 			victim->Send ( "Your life essence returns.\r\n" );
 			break;
 		case SPELL_MANA_TRANSFER:
-			mana = MIN ( dice ( 1, 6 ) + GET_LEVEL ( ch ), GET_MANA ( ch ) - 1 );
+			// Changing the dice around from 1,6 to 1,10 --> Prom
+			mana = MIN ( dice ( 1, 10 ) + GET_LEVEL ( ch ), GET_MANA ( ch ) - 1 );
 			alter_mana ( ch, mana );
 			mana = MAX ( 0, mana - dice ( 1, 3 ) );
 			ch->Send ( "Your head aches as your magic flows away.\r\n" );
