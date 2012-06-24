@@ -967,7 +967,7 @@ void parse_note ( Character *ch, char *argument, int type )
 	/* below this point only certain people can edit notes */
 	if ( ( type == NOTE_NEWS && !IS_TRUSTED ( ch,ANGEL ) )
 	        || ( type == NOTE_CHANGES && !IS_TRUSTED ( ch,CREATOR ) ) ||
-		   ( type == NOTE_CHANGES && !IS_TRUSTED ( ch, WIZ_SEN_GRP)) )
+		   ( type == NOTE_CHANGES && !CMD_FLAGGED ( ch, WIZ_SEN_GRP)) )
 	{
 		ch->Send ( "You aren't high enough level to write %ss.",list_name );
 		return;
