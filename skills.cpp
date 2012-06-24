@@ -2170,7 +2170,7 @@ ASKILL ( skill_slit )
         }
         /* Only appropriately skilled PCs and uncharmed mobs */
         corpse_mod = 1;
-	skill_attack ( ch, vict, SKILL_SLIT, ( IS_NPC ( ch ) ? GET_LEVEL ( ch ) : total_chance ( ch, SKILL_SLIT  ) ) > number ( 0, 120 ) );
+	skill_attack ( ch, vict, SKILL_SLIT, ( IS_NPC ( ch ) ? GET_LEVEL ( ch ) : total_chance ( ch, SKILL_SLIT  ) ) > number ( 0, 135 ) );
         corpse_mod = 0;
         WAIT_STATE ( ch, 2 RL_SEC );
         return SKILL_SLIT;

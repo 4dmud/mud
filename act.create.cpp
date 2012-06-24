@@ -750,7 +750,7 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	GET_OBJ_COST ( final_focus ) = GET_LEVEL ( ch ) * 500;
 	GET_OBJ_WEIGHT ( final_focus ) = 3;
 
-	GET_OBJ_RENT ( final_focus ) = number(100+(v1*number(4,10)), 240+(MIN(REMORTS(ch)/2, 50)));
+	GET_OBJ_RENT ( final_focus ) = number(100+(v1*number(7,10)), 240+(MIN(REMORTS(ch)/2, 50)));
 
         if (v2 == 0)
         SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ELEC_FOCUS);
