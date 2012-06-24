@@ -556,7 +556,7 @@ const command_info cmd_info[] =
 	{ "compress"  , "compress"     , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPRESS, 0 },
 //					   { "ctest"  , "ctest"     , POS_DEAD    , do_compresstest  , 0, SCMD_COMPRESS, 0 },
 	{ "compare"  , "compa", POS_RESTING , do_compare  , 0, 0, 0 },
-	{ "copyover" , "copyo", POS_DEAD    , do_copyover , 50, 0, WIZ_SEN_GRP },
+	{ "copyover" , "copyo", POS_DEAD    , do_copyover , 20, 0, WIZ_SEN_GRP },
 	{ "credits"  , "cre" , POS_DEAD    , do_gen_ps   , 0, SCMD_CREDITS, 0 },
 	{ "craft"    , "craft"    , POS_SITTING , do_assemble , 0, SUB_CRAFT, 0 },
 	{ "csnoop"    , "csn"   , POS_DEAD, do_ctellsnoop    , LVL_SEN, 0, WIZ_IMPL_GRP },
