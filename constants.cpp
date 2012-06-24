@@ -1532,6 +1532,14 @@ const char *extra_bits[] =
         "pk-corpse",
         "beheaded-corpse",
         "anti-dt",
+        "fire-focus",
+        "ice-focus",
+        "earth-focus",
+        "water-focus",
+        "electric-focus",
+        "air-focus",
+        "spirit-focus",
+        "death-focus",
 	"\n"
 };
 

@@ -814,7 +814,16 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
             ch->Send("Uh, there is something wrong with this item.\r\n");
             return;
         }
-        ch->Send("gives a multiplier of %f\r\n", staff_multi(ch, obj));
+        ch->Send("gives a multiplier of %f", staff_multi(ch, obj));
+        if ( IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_FIRE_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ICE_FOCUS ) || 
+        IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) || 
+        IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_WATER_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ELEC_FOCUS ) ||
+	IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_AIR_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_SPIRIT_FOCUS )  ||
+	IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_DEATH_FOCUS ) )  {
+	ch->Send(" with an elemental bonus of %f", float(((float)GET_OBJ_RENT(obj)/(float)100.0)));
+         }
+ 
+        ch->Send("\r\n");
         break;
     case ITEM_LIGHTSABRE_HILT:
         ch->Send( "{cyPossible Saber blades: {cC%d{c0\r\n"

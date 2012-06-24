@@ -546,6 +546,46 @@ float has_staff ( Character *ch )
 }
 /*Affects from spells should change these dice*/
 
+float has_staff_multi ( Character *ch, int wtype)
+{
+	if (!ch) 
+		return 1.0;
+       // Insert Logic here for elemental_type(wtype) vs staff's var for elements 
+          if (GET_EQ(ch, WEAR_FOCUS)) {
+	if ((elemental_type(wtype) == ELEM_FIRE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_FIRE_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+ 
+        if ((elemental_type(wtype) == ELEM_ICE) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ICE_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+        if ((elemental_type(wtype) == ELEM_EARTH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_EARTH_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       if ((elemental_type(wtype) == ELEM_WATER) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_WATER_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       if ((elemental_type(wtype) == ELEM_ELEC) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_ELEC_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       if ((elemental_type(wtype) == ELEM_AIR) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_AIR_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       if ((elemental_type(wtype) == ELEM_SPIRIT) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_SPIRIT_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       if ((elemental_type(wtype) == ELEM_DEATH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_DEATH_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
+       else 
+	return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
+
+
+
+     }
+       else 
+       return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS));
+}
+
 int spell_size_dice ( Character *ch )
 {
 	int chclass = GET_CLASS ( ch );
@@ -2218,8 +2258,8 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 
 			dam += caster_damroll ( ch );
 
-			if ( has_staff ( ch ) > 0 )
-				dam = FTOI ( dam * has_staff ( ch ) );
+			if ( has_staff_multi ( ch, type ) > 0 )
+				dam = FTOI ( dam * has_staff_multi ( ch, type ) );
 
 			dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
@@ -2263,7 +2303,7 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
 
 		dam += caster_damroll ( ch );
 
-		dam = FTOI ( dam * has_staff ( ch ) );
+		dam = FTOI ( dam * has_staff_multi ( ch, type ) );
 
 		dam = FTOI ( dam * pos_multi ( GET_POS ( vict ) ) );
 
@@ -2636,7 +2676,7 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 	if ( ! ( ( GET_ALIGNMENT ( ch ) > 350 && GET_ALIGNMENT ( vict ) < -350 ) || ( GET_ALIGNMENT ( ch ) < -350 && GET_ALIGNMENT ( vict ) > 350 ) ) )
 		return ret_val;
 
-	if ( has_staff ( ch ) )
+	if ( has_staff_multi ( ch, w_type ) )
 	{
 		struct obj_data *staff = GET_EQ ( ch, WEAR_FOCUS );
 		if ( staff )
@@ -4643,7 +4683,7 @@ int find_fe_type ( Character *ch )
 			return FE_TYPE_ANIMAL;
 
 
-		if ( ( attack_type ( chcl ) == ATTACK_MAGIC && !has_weapon ( ch ) ) || ( has_staff ( ch ) ) )
+		if ( ( attack_type ( chcl ) == ATTACK_MAGIC && !has_weapon ( ch ) ) || ( has_staff (ch) ) ) 
 			return FE_TYPE_SPELL;
 		else if ( attack_type ( chcl ) == ATTACK_SKILL )
 			return FE_TYPE_SKILL;

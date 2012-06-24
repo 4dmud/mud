@@ -749,7 +749,33 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	GET_OBJ_VAL ( final_focus, 3 ) = GET_LEVEL ( ch ) *TIER*2000;
 	GET_OBJ_COST ( final_focus ) = GET_LEVEL ( ch ) * 500;
 	GET_OBJ_WEIGHT ( final_focus ) = 3;
-	GET_OBJ_RENT ( final_focus ) = 0;
+
+	GET_OBJ_RENT ( final_focus ) = number(100+(v1*number(4,10)), 240);
+
+        if (v2 == 0)
+        SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ELEC_FOCUS);
+        if (v2 == 1)
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus),  ITEM_FIRE_FOCUS);
+        if (v2 == 2)
+	SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_WATER_FOCUS);
+	if (v2 == 3)	
+	SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS);
+	if (v2 == 4)
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_EARTH_FOCUS);
+	if (v2 == 5)
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS);
+	if (v2 == 6)
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_DEATH_FOCUS);
+	if (v2 == 7)
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_SPIRIT_FOCUS);
+	if (v2 == 8) 
+        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_ICE_FOCUS);
+
+
+
+
+
+
 	GET_OBJ_TIMER ( final_focus ) = GET_LEVEL ( ch ) * 300;
 	/** new affect addition - mord (from discussion with Azreal)**/
 	if ( v1 >= stave_table[v2].start )

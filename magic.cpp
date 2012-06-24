@@ -41,6 +41,7 @@ int arena_ok ( Character *ch, Character *victim );
 void change_alignment ( Character *ch, Character *victim );
 void zap_char ( Character *victim );
 int find_first_step ( room_rnum src, room_rnum target );
+float has_staff_multi ( Character *ch, int wtype);
 
 extern const char *opp_dirs[];
 
@@ -449,7 +450,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 	int chlevel = level;
 	int tier = 4;
 	int suc_val = 0;
-	float staff = ( has_staff ( ch ) ? has_staff ( ch ) : 1 );
+	float staff = ( has_staff_multi ( ch, spellnum ) ? has_staff_multi ( ch, spellnum ) : 1 );
 	int m_user = ( ch ? GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_ESPER : 0 );
 
 

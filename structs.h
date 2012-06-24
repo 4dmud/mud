@@ -1141,7 +1141,14 @@ class Room;
 #define ITEM_PK_CORPSE        65
 #define ITEM_BEHEADED_CORPSE  66
 #define ITEM_ANTI_DT          67  /* Item is immune to DT */
-
+#define ITEM_FIRE_FOCUS       68 /* Item is a fire focus */
+#define ITEM_ICE_FOCUS        69
+#define ITEM_EARTH_FOCUS      70
+#define ITEM_WATER_FOCUS      71
+#define ITEM_ELEC_FOCUS       72
+#define ITEM_AIR_FOCUS        73
+#define ITEM_SPIRIT_FOCUS     74
+#define ITEM_DEATH_FOCUS      75
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0  /* No effect                    */

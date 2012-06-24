@@ -3641,7 +3641,7 @@ ACMD ( do_who )
 		if ( PRF_FLAGGED ( wch, PRF_BUSY ) )
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (BUSY)" );
 		if ( PRF_FLAGGED ( wch, PRF_DEED_MASTER ) ) 
-			len += snprintf ( buf + len, sizeof ( buf ) - len, " ({cCDEED MASTER{c0)" );
+			len += snprintf ( buf + len, sizeof ( buf ) - len, " ({cYDM{c0)" );
 		if ( wch->char_specials.timer > 15 && !GET_INVIS_LEV ( wch ) )
 		{
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (idle)" );
