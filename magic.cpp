@@ -1220,7 +1220,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 				af[0].expire = HOURS_TO_EXPIRE ( 24 );
 			af[0].bitvector = AFF_FORTIFY_BODY;
 			af[0].location = APPLY_HIT;
-			af[0].modifier = FTOI ( 30*staff );
+			af[0].modifier = FTOI ( 30*(MAX(1,  (int)(staff*4-4))));
 
 			accum_duration =FALSE;
 			to_vict = "You feel more sure of your actions.";

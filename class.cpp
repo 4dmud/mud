@@ -1272,6 +1272,31 @@ float backstab_mult ( int level, int tier )
 	return mt;
 
 }
+
+float slit_mult ( int level, int tier )
+{
+        float mt = 1.55f;
+        if ( level > 50 )
+                mt += 0.5f;
+        switch ( tier )
+        {
+                case 1:
+                        mt += 0.35f;
+                        break;
+                case 2:
+                        mt += 0.85f;
+                        break;
+                case 3:
+                        mt += 1.35f;
+                        break;
+                case 4:
+                        mt += 1.85f;
+                        break;
+        }
+        return mt;
+
+}
+
 float cleave_mult ( int level, int tier )
 {
 

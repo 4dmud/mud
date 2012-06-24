@@ -1072,7 +1072,7 @@ void parse_note ( Character *ch, char *argument, int type )
 
 	if ( is_abbrev ( arg, "to" ) )
 	{
-		if ( GET_LEVEL ( ch ) < LVL_IMMORT )
+		if (( GET_LEVEL ( ch ) < LVL_IMMORT) && !CMD_FLAGGED(ch, WIZ_SEN_GRP))
 		{
 			if ( isname ( "all", argument ) )
 			{
