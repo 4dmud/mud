@@ -1251,7 +1251,7 @@ void advance_level ( Character * ch , bool silent )
  */
 float backstab_mult ( int level, int tier )
 {
-	float mt = 1.5f;
+	float mt = 1.65f;
 	if ( level > 50 )
 		mt += 0.5f;
 	switch ( tier )
@@ -1476,8 +1476,8 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_STONESKIN,    MAG );
 	assign_class ( SKILL_SNEAK,        ALL_ROGUE );
 	assign_class ( SKILL_THROW,        ALL_ROGUE | ALL_FIGHTER );
-	assign_class ( SKILL_PICK_LOCK,    ALL_ROGUE );
-	assign_class ( SKILL_BACKSTAB,     ALL_ROGUE );
+	assign_class ( SKILL_PICK_LOCK,    THI | RAN );
+	assign_class ( SKILL_BACKSTAB,     THI | RAN );
 	assign_class ( SKILL_TAME,         ALL_ROGUE | ALL_FIGHTER );
 	assign_class ( SKILL_STEAL,        ALL_ROGUE );
 	assign_class ( SKILL_FIREARM,      ALL_ROGUE | ALL_FIGHTER );
@@ -1509,7 +1509,7 @@ void init_spell_levels ( void )
 	assign_class ( SKILL_THIRD_ATTACK,      ALL_FIGHTER );
 	assign_class ( SKILL_HAMSTRING,     WAR | HUN );
 	assign_class ( SKILL_SHORT_BLADE,      ALL_ROGUE );
-	assign_class ( SKILL_DODGE,        ALL_ROGUE );
+	assign_class ( SKILL_DODGE,        THI | RAN );
 	assign_class ( SKILL_PHASE,        ESP | ALL_ROGUE );
 	assign_class ( SKILL_CHARGE,       WAR );
 	assign_class ( SKILL_GRIP,         WAR );
