@@ -1540,6 +1540,7 @@ const char *extra_bits[] =
         "air-focus",
         "spirit-focus",
         "death-focus",
+	"mind-focus",
 	"\n"
 };
 

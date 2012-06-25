@@ -573,6 +573,9 @@ float has_staff_multi ( Character *ch, int wtype)
        if ((elemental_type(wtype) == ELEM_SPIRIT) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_SPIRIT_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
+      if ((elemental_type(wtype) == ELEM_MIND) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_MIND_FOCUS))) {
+        return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
+
        if ((elemental_type(wtype) == ELEM_DEATH) &&  (IS_SET_AR(GET_OBJ_EXTRA(GET_EQ(ch, WEAR_FOCUS)), ITEM_DEATH_FOCUS))) {
         return staff_multi (ch, GET_EQ(ch, WEAR_FOCUS))+float(((float)GET_OBJ_RENT(GET_EQ(ch, WEAR_FOCUS))/(float)100.0));  }
 
