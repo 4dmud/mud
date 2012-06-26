@@ -1112,13 +1112,13 @@ void advance_level ( Character * ch , bool silent )
 			break;
 
 		case CLASS_GYPSY:
-			add_hp += number ( ( 12 * TIERS ), ( 15 * TIERS ) ) + ( GET_CHA ( ch ) /7 );
+			add_hp += number ( ( 11 * TIERS ), ( 14 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
 			add_mana += number ( FTOI ( GET_LEVEL ( ch ) * 0.34 ), FTOI ( ( 1.5 * GET_LEVEL ( ch ) ) ) ) + num_casting ( ch );
 			add_move += number ( 2 * TIERS, 4 * TIERS );
 			break;
 
 		case CLASS_RANGER:
-			add_hp += number ( ( 13 * TIERS ), ( 16 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
+			add_hp += number ( ( 14 * TIERS ), ( 17 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
 			add_mana += num_casting ( ch );
 			add_move += number ( 2 * TIERS, 4 * TIERS );
 			break;
@@ -1251,7 +1251,7 @@ void advance_level ( Character * ch , bool silent )
  */
 float backstab_mult ( int level, int tier )
 {
-	float mt = 1.65f;
+	float mt = 1.75f;
 	if ( level > 50 )
 		mt += 0.5f;
 	switch ( tier )
@@ -1275,7 +1275,7 @@ float backstab_mult ( int level, int tier )
 
 float slit_mult ( int level, int tier )
 {
-        float mt = 1.55f;
+        float mt = 1.50f;
         if ( level > 50 )
                 mt += 0.5f;
         switch ( tier )
