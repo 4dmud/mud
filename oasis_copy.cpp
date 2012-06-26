@@ -394,6 +394,7 @@ room_vnum redit_find_new_vnum(zone_rnum zone)
 
 }
 
+void redit_init_room(Descriptor* d);
 int buildwalk(Character *ch, int dir) {
   char buf[MAX_STRING_LENGTH];
   room_vnum vnum;
@@ -423,7 +424,7 @@ int buildwalk(Character *ch, int dir) {
       CREATE(d->olc, struct oasis_olc_data, 1);
       OLC_ZNUM(d) = IN_ROOM(ch)->zone;
       OLC_NUM(d) = vnum;
-      OLC_ROOM(d) = new Room();
+      redit_init_room(d);
 
       OLC_ROOM(d)->name = strdup("New BuildWalk Room");
       snprintf(buf, sizeof(buf), "This unfinished room was created by %s.\r\n", GET_NAME(ch));
@@ -431,8 +432,6 @@ int buildwalk(Character *ch, int dir) {
       OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
       OLC_ROOM(d)->listen = strdup("You hear nothing that attracts your attention.\r\n");
       OLC_ROOM(d)->zone = OLC_ZNUM(d);
-      OLC_ROOM(d)->number = NOWHERE;
-
       /*
        * Save the new room to memory.
        * redit_save_internally handles adding the room in the right place, etc.

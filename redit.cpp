@@ -166,23 +166,31 @@ ACMD(do_oasis_redit)
              GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
 
-void redit_setup_new(Descriptor *d)
-{
+void redit_init_room(Descriptor* d) {
   OLC_ROOM(d) = new Room();
-
-  OLC_ROOM(d)->name = strdup("An unfinished room");
-  OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
   OLC_ROOM(d)->n_description = NULL;
   OLC_ROOM(d)->q_description = NULL;
-  OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
-  OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
+
   OLC_ROOM(d)->number = NOWHERE;
+  OLC_ROOM(d)->proto_script = NULL;
+  
   OLC_ROOM(d)->mine.num = -1;
   OLC_ROOM(d)->mine.dif = -1;
   OLC_ROOM(d)->mine.tool = 0;
   OLC_ITEM_TYPE(d) = WLD_TRIGGER;
   OLC_ROOM(d)->proto_script = NULL;
   OLC_SCRIPT(d) = NULL;
+}
+
+
+void redit_setup_new(Descriptor *d)
+{
+  redit_init_room(d);
+
+  OLC_ROOM(d)->name = strdup("An unfinished room");
+  OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
+  OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
+  OLC_ROOM(d)->listen = strdup("You hear nothing interesting.\r\n");
   redit_disp_menu(d);
   OLC_VAL(d) = 0;
 }
