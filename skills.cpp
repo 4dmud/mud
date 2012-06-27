@@ -2160,7 +2160,7 @@ ASKILL ( skill_slit )
 	 OBJ_DATA *wep = GET_EQ ( ch, WEAR_WIELD );
 	 if ( GET_OBJ_VAL ( wep, 3 ) != TYPE_SLASH - TYPE_HIT && GET_OBJ_VAL ( wep, 3 ) != TYPE_PIERCE - TYPE_HIT )
         {  
-                *ch << "You need to wield a slashing or biting weapon to slit.\r\n";
+                *ch << "You need to wield a slashing or piercing weapon to slit.\r\n";
                 return 0;
         }
 	if ( use_stamina ( ch, 25 ) < 0 )
