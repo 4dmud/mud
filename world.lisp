@@ -68,6 +68,8 @@
      collect (ptr-to-object-instance object)
      do (setf object (oneliner (object) (:pointer-void) :pointer-void "((struct obj_data*)#0)->next_content"))))
 
+(defmethod contents ((room room))
+  (objects room))
 
 (defmethod zone-of ((room room))
   (declare (type room room))

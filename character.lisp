@@ -227,3 +227,12 @@
 		      (string-upcase (subseq (name p) 0 (length name)))))
 	(return p))))
     
+(defmethod inventory ((mobile mobile))
+  (loop with ptr = (mobile-field mobile "carrying" :pointer-void)
+       until (ffi:null-pointer-p ptr)
+       collect (ptr-to-object-instance ptr)
+       do (setf ptr (oneliner (ptr) (:pointer-void) :pointer-void
+			      "((struct obj_data *)#0)->next_content"))))
+       
+(defmethod contents ((mobile mobile))
+  (inventory mobile))

@@ -64,7 +64,7 @@
 	(make-instance 'object-prototype :vnum vnum))))
 
 (defmethod object-prototype ((object object-instance))
-  (object-field object "was_vnum" :int))
+  (object-prototype (vnum object)))
 
 (defun object-prototype-by-rnum (rnum)
   (make-instance 'object-prototype
@@ -102,3 +102,14 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
   (make-instance 'object-instance
 		 :id (oneliner (ptr) (:pointer-void) :int
 			       "((struct obj_data *)#0)->id")))
+
+(defmethod contents ((object object-instance))
+  (let ((contains
+	 (object-field object "contains" :pointer-void)))
+    (when contains
+      (loop with c = contains
+	   until (ffi:null-pointer-p c)
+	   collect (ptr-to-object-instance c)
+	   do
+	   (setf c (oneliner (c) (:pointer-void) :pointer-void
+			     "((struct obj_data *)#0)->next_content"))))))
