@@ -6513,6 +6513,8 @@ int generate_wep_length ( OBJ_DATA *wep )
 			return 25;
 		case WEP_PROJECTILE:
 			return 25;
+		case WEP_GREATSWORD:
+			return 140;
 	}
 
 }
@@ -6687,6 +6689,8 @@ int generate_wep_type ( char *name )
 				return WEP_HALFAXE;
 			break;
 		case 'g':
+			if CHNAME (" greatsword" )
+				return WEP_GREATSWORD;
 			if CHNAME ( "gun" )
 				return WEP_PROJECTILE;
 			break;

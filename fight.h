@@ -130,8 +130,10 @@ PART_AREA_MAX
 #define WEP_TEETH       17
 #define WEP_CLAWS       18
 #define WEP_PROJECTILE  19
-
-#define MAX_WEAPON_TYPES 21
+//Adding greatsword as a weapon type --> Prom
+#define WEP_GREATSWORD  20
+// Increasing this by 1 just in case (21 to 22)--> Prom
+#define MAX_WEAPON_TYPES 22
 
 #define ONE_HANDED 1
 #define TWO_HANDED 2
