@@ -494,7 +494,7 @@ struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES] =
 	{ONE_HANDED, 15, -70, 10, -30, 40, -80, 20, "Rapier"},
 	{ONE_HANDED, 15, -70, 20, -50, 35, -70, 30, "Cutlass"},
 	{TWO_HANDED, 30, -130, 55, -120, 140, -180, 45, "Broadsword"},
-	{TWO_HANDED, 40, -130, 60, -90, 120, -160, 60, "Greatsword"}, 
+	//{TWO_HANDED, 40, -130, 60, -90, 120, -160, 60, "Greatsword"}, 
 	{ONE_HANDED, 20, -90,  5, -20, 40, -80, 60, "HalfAxe"},
 	{TWO_HANDED, 25, -110, 35, -80, 80, -100, 60, "Axe"},
 	{ONE_HANDED, 15, -70,  5, -20, 40, -80, 60, "WarHammer"},
@@ -6514,8 +6514,8 @@ int generate_wep_length ( OBJ_DATA *wep )
 			return 25;
 		case WEP_PROJECTILE:
 			return 25;
-		case WEP_GREATSWORD:
-			return 140;
+		//case WEP_GREATSWORD:
+		//	return 140;
 	}
 
 }
@@ -6690,8 +6690,8 @@ int generate_wep_type ( char *name )
 				return WEP_HALFAXE;
 			break;
 		case 'g':
-			if CHNAME (" greatsword" )
-				return WEP_GREATSWORD;
+			//if CHNAME (" greatsword" )
+			//	return WEP_GREATSWORD;
 			if CHNAME ( "gun" )
 				return WEP_PROJECTILE;
 			break;
