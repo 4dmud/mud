@@ -1124,6 +1124,11 @@ void advance_level ( Character * ch , bool silent )
 			break;
 
 		case CLASS_WARRIOR:
+			add_hp += number ( ( 15 * TIERS ), ( 20 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
+                        add_mana +=  num_casting ( ch );
+                        add_move += number ( 2 * TIERS, 4 * TIERS );
+                        break;
+
 		case CLASS_HUNTER:
 			add_hp += number ( ( 15 * TIERS ), ( 18 * TIERS ) ) + ( GET_CHA ( ch ) /10 );
 			add_mana +=  num_casting ( ch );

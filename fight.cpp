@@ -683,8 +683,6 @@ int spell_num_dice ( Character *ch )
 			ndice += ( GET_INT ( ch ) > 21 );
 			break;
 		case CLASS_RANGER:
-			ndice = ( GET_LEVEL ( ch ) /  8);
-                        break;
 		case CLASS_GYPSY:
 			ndice = ( GET_LEVEL ( ch ) / 6 );
 			break;
@@ -1799,6 +1797,9 @@ int accuracy_tot ( Character *attacker )
 
 	if ( AFF_FLAGGED(attacker, AFF_BESERK) && (GET_CLASS(attacker) == CLASS_WARRIOR))
 		accuracy_roll += 10;
+
+	if (GET_CLASS(attacker) == CLASS_RANGER)
+		accuracy_roll += 25;
 
 	if ( GET_SUB ( attacker, SUB_LOYALATTACK ) )
 		accuracy_roll += 50;
