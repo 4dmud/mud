@@ -1,0 +1,5 @@
+(require 'asdf)
+
+(load "4d-lisp.asd")
+(asdf:disable-output-translations)
+(asdf:make-build :4d-lisp :init-name "init_4d_lisp" :type :lib)

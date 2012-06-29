@@ -1,10 +1,6 @@
 ;;;triggers.lisp: the 4d c++ code calls these when events happen, much like it does for dg.
 ;;;each trigger function does a bunch of things pre-defined at compile time, and also runs hooks that can be set at runtime for maximum flexibility.
 
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-
 (defpackage :4d
   (:use :cl))
 

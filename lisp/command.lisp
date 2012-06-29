@@ -1,11 +1,5 @@
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-(defpackage :4d
-  (:use :cl))
-
 (in-package :4d)
-(ffi:clines "#include \"lisp-internal.h\"")
+(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
 
 (defvar *commands* (make-hash-table :test 'equal)) ;;hax
 

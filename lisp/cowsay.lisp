@@ -1,7 +1,4 @@
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-
+(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
 (in-package :4d)
 
 (defun animalsay (animal ch victim text)

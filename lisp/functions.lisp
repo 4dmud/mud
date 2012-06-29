@@ -1,17 +1,9 @@
 ;;;when there's an inline function call, ecl can't recompile the file.
 ;;;Therefore, all inline function calls are put here, making sure everything else remains recompilable.
-
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-
-(defpackage :4d-internal
-  (:use :cl))
-
 (in-package :4d-internal)
 
-
-(ffi:clines "#include \"lisp-internal.h\""
+(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
+(ffi:clines 
 	    "void send_to_char(const char*, Character*);"
 	    "void page_string (Descriptor*, char*, int);")
 
@@ -37,7 +29,7 @@
 		:side-effects t))
 
 (defun dg-add-local-var (trig-ptr name value context)
-  (ffi:c-inline (script-ptr name value context) (:pointer-void :cstring :cstring :long) :void
+  (ffi:c-inline (trig-ptr name value context) (:pointer-void :cstring :cstring :long) :void
 		"add_var(&(((struct trig_data*)#0)->var_list),#1,#2,#3);"
 		:side-effects t))
 

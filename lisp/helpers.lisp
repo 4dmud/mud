@@ -3,10 +3,6 @@
   (:export mud-log eval-string))
 (in-package :4d)
 
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-
 (defvar *current-character*)
 
 (defun eval-string (player-name form-string)

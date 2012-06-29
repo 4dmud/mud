@@ -1,8 +1,4 @@
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-(ffi:clines "#include \"lisp-internal.h\"")
-
+(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
 (in-package :4d)
 
 (defclass obj () ())
@@ -10,27 +6,28 @@
 (defclass object-prototype (obj)
   ((vnum :initarg :vnum :reader vnum)))
 
-(defmethod print-object ((obj obj) s)
-  (format s "#<~a ~d: ~a>"
-	  (string-downcase (symbol-name (type-of obj)))
-	  (vnum obj)
-	  (short-description obj)))
-
 (defmacro object-field (object name type)
   (declare (type symbol type)
 	   (type string name))
   `(oneliner ((pointer ,object)) (:pointer-void) ,type
 	     ,(format nil "((struct obj_data *)#0)->~a" name)))
 
+(defclass object-instance (obj entity)
+  ((id :initarg :id :reader id)))
+
+
+
+(defmethod print-object ((obj obj) s)
+  (format s "#<~a ~d: ~a>"
+	  (string-downcase (symbol-name (type-of obj)))
+	  (vnum obj)
+	  (short-description obj)))
+
 (defmethod name ((object obj))
   (object-field object "name" :cstring))
 
-
 (defmethod short-description ((object obj))
   (object-field object "short_description" :cstring))
-
-(defclass object-instance (obj entity)
-  ((id :initarg :id :reader id)))
 
 (defun obj-rnum-to-vnum (rnum)
   (oneliner (rnum) (:int) :int
@@ -57,12 +54,6 @@
 
 (define-condition object-prototype-not-found (error) ((vnum :initarg :vnum :reader vnum)))
 
-(defmethod object-prototype ((vnum integer))
-  (let ((rnum (obj-vnum-to-rnum vnum)))
-    (if (= 0 rnum)
-	(error 'object-prototype-not-found :vnum vnum)
-	(make-instance 'object-prototype :vnum vnum))))
-
 (defmethod object-prototype ((object object-instance))
   (object-prototype (vnum object)))
 
@@ -70,16 +61,14 @@
   (object-prototype object))
 
 (defun object-prototype-by-rnum (rnum)
-  (make-instance 'object-prototype
-		 :vnum (obj-rnum-to-vnum rnum)))
+  (object-prototype (obj-rnum-to-vnum rnum)))
 
 (defun all-objects ()
   (let ((objects nil))
     (ffi:c-inline (#'(lambda (id)
-		       (push (make-instance 'object-instance :id id) objects))) (:function) :void
+		       (push (object-instance id) objects))) (:function) :void
 "for (olt_it ob = object_list.begin();ob != object_list.end(); ob++)
 cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
-    (break)
     (reverse objects)))
 
 (defmethod triggers ((object object-prototype))
@@ -102,9 +91,9 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
       ptr)))
 
 (defmethod ptr-to-object-instance (ptr)
-  (make-instance 'object-instance
-		 :id (oneliner (ptr) (:pointer-void) :int
-			       "((struct obj_data *)#0)->id")))
+  (object-instance
+   (oneliner (ptr) (:pointer-void) :int
+	     "((struct obj_data *)#0)->id")))
 
 (defmethod contents ((object object-instance))
   (let ((contains
@@ -116,3 +105,52 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
 	   do
 	   (setf c (oneliner (c) (:pointer-void) :pointer-void
 			     "((struct obj_data *)#0)->next_content"))))))
+
+(defmethod object-val ((object obj) num)
+  (when (< num 0)
+    (error "num can not be negative."))
+
+  (when (>= num (oneliner () () :int "NUM_OBJ_VAL_POSITIONS"))
+    (error "num too high"))
+
+  (oneliner ((pointer object) num) (:pointer-void :int) :int
+	    "((struct obj_data*)#0)->obj_flags.value[#1]"))
+
+(defun obj-to-object-type (obj)
+  (num-to-object-type
+   (object-field obj "obj_flags.type_flag" :int)))
+
+(defun obj-proto-class (obj)
+  (let ((class
+	 (values
+	  (intern (concatenate 'string
+			       (symbol-name (obj-to-object-type obj))
+			       "-OBJECT-PROTO")))))
+    (handler-case (and (find-class class)
+		       class)
+      (error () 'undefined-object-proto))))
+
+(defun obj-instance-class (obj)
+  (let ((class
+	 (values
+	  (intern (concatenate 'string
+			       (symbol-name (obj-to-object-type obj))
+			       "-OBJECT-INSTANCE")))))
+    (handler-case (and (find-class class)
+		       class)
+      (error () 'undefined-object-instance))))
+
+
+(defmethod object-prototype ((vnum integer))
+  (let ((rnum (obj-vnum-to-rnum vnum)))
+    (if (= 0 rnum)
+	(error 'object-prototype-not-found :vnum vnum)
+	(let ((proto
+	       (make-instance 'object-prototype :vnum vnum)))
+	  (change-class proto (obj-proto-class proto))))))
+
+(defmethod object-instance ((id integer))
+  (let ((instance
+	 (make-instance 'object-instance
+			:id id)))
+    (change-class instance (obj-instance-class instance))))

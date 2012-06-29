@@ -1,13 +1,5 @@
-;;unfortunately the current compile method does not allow automatic dependency loading.
-;;therefore we load util.lisp upon detecting that a compile is happening.
-;;this allows compilation at compile- and runtime
-(eval-when (:compile-toplevel)
-  (unless (boundp '*started*)
-    (load "util.lisp")))
-
+(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
 (in-package :4d)
-
-(ffi:clines "#include \"lisp-internal.h\"")
 
 (defclass zone ()
   ((znum :type :integer :reader znum :initarg :znum)

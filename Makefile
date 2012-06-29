@@ -13,11 +13,9 @@ LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 SRCFILES := $(wildcard *.cpp)
 OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
 ifeq ($(ECL),1)
-	LISPFILES := functions.lisp util.lisp init.lisp hooks.lisp helpers.lisp command.lisp script.lisp character.lisp world.lisp zones.lisp object.lisp clans.lisp build-tools.lisp cowsay.lisp
-	LISPOBJS := $(patsubst %.lisp,%.obj,$(LISPFILES))
 	MYFLAGS += -DECL=1 $(shell ecl-config --cflags)
 	LIBS += $(shell ecl-config --ldflags)
-	OBJFILES += lib4d-lisp.a
+	OBJFILES += lisp/lib4d-lisp.a
 endif
 
 #flags for profiling (see hacker.doc for more information)
@@ -49,15 +47,12 @@ $%.o: %.cpp
 	echo compiling $< >>lisp-output.txt
 	ecl -q -s -o $@ -compile $< >>lisp-output.txt
 
-lib4d-lisp.a: $(LISPOBJS)
-	(for f in $(LISPOBJS);do echo $$f;done)|ecl -shell make-4d-lisp >>lisp-output.txt
-
-lisp/lib4d-lisp.a: $(BINDIR)/circle
-	cd lisp;rm lisp/lib4d-lisp.a;$(BINDIR)/circle --shell build.lisp
+lisp/lib4d-lisp.a: force-look
+	cd lisp;ecl -shell build >>lisp-output.txt
 
 clean:
 	rm -f *.o depend
-	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a lisp-output.txt
+	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a lisp/*.fas lisp/*.c lisp/*.o lisp/lisp-output.txt
 
 # Dependencies for the object files (automagically generated with
 # gcc -MM)
