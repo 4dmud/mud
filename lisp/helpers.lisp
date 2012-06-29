@@ -1,6 +1,3 @@
-(defpackage :4d
-  (:use :cl)
-  (:export mud-log eval-string))
 (in-package :4d)
 
 (defvar *current-character*)
