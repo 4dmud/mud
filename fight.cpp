@@ -775,6 +775,9 @@ int size_dice_wep ( Character *ch, short dual )
 			d_add += 2;
 		if ( AFF_FLAGGED ( ch, AFF_BESERK ) )
 			d_add += 2;
+		if ( AFF_FLAGGED(ch, AFF_BESERK) && (GET_CLASS(ch) == CLASS_WARRIOR))
+			d_add += 2;
+
 		if ( GET_SPEED ( ch ) != 0 )
 			d_add += GET_SPEED ( ch ) /100;
 
@@ -1393,6 +1396,9 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 			damage -= damage/3;
 
+		    if ((GET_CLASS(vict) == CLASS_WARRIOR) && (damage > 0))
+			damage -= damage/10;
+
 			vict->Send ( "You were braced against the damage!\r\n" );
 		}
 	}
@@ -1790,6 +1796,10 @@ int accuracy_tot ( Character *attacker )
 	accuracy_roll += calc_thaco;
 	if ( AFF_FLAGGED ( attacker, AFF_BESERK ) ) /* Char has gone Beserk      */
 		accuracy_roll += 10;
+
+	if ( AFF_FLAGGED(attacker, AFF_BESERK) && (GET_CLASS(attacker) == CLASS_WARRIOR))
+		accuracy_roll += 10;
+
 	if ( GET_SUB ( attacker, SUB_LOYALATTACK ) )
 		accuracy_roll += 50;
 
