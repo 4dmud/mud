@@ -221,7 +221,7 @@
       (error "Please give a name."))
   (dolist (p (sort (players) #'(lambda (x y)
 				 (string< (name x) (name y)))))
-    (if (and (> (length (name p))
+    (if (and (>= (length (name p))
 		(length name))
 	     (string= (string-upcase name)
 		      (string-upcase (subseq (name p) 0 (length name)))))

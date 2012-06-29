@@ -54,6 +54,21 @@
 (defmethod title ((room room))
   (oneliner ((vnum room)) (:int) :cstring "world_vnum[#0]->name"))
 
+(defmethod characters ((room room))
+  (loop with character = (oneliner ((vnum room)) (:int)
+				       :pointer-void "world_vnum[#0]->people")
+     until (ffi:null-pointer-p character)
+     collect (ptr-to-character character)
+     do (setf character (oneliner (character) (:pointer-void) :pointer-void "((Character*)#0)->next_in_room"))))
+
+(defmethod objects ((room room))
+  (loop with object = (oneliner ((vnum room)) (:int)
+				       :pointer-void "world_vnum[#0]->contents")
+     until (ffi:null-pointer-p object)
+     collect (ptr-to-object-instance object)
+     do (setf object (oneliner (object) (:pointer-void) :pointer-void "((struct obj_data*)#0)->next_content"))))
+
+
 (defmethod zone-of ((room room))
   (declare (type room room))
   (let* ((rnum (oneliner ((vnum room)) (:int) :int

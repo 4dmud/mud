@@ -25,6 +25,7 @@
 (defmethod name ((object obj))
   (object-field object "name" :cstring))
 
+
 (defmethod short-description ((object obj))
   (object-field object "short_description" :cstring))
 
@@ -36,7 +37,8 @@
 	    "obj_index[#0].vnum"))
 
 (defmethod vnum ((object object-instance))
-  (object-field object "item_number" :int))
+  (obj-rnum-to-vnum
+   (object-field object "item_number" :int)))
 
 (defun obj-vnum-to-rnum (vnum)
   (oneliner (vnum) (:int) :int
@@ -61,6 +63,9 @@
 	(error 'object-prototype-not-found :vnum vnum)
 	(make-instance 'object-prototype :vnum vnum))))
 
+(defmethod object-prototype ((object object-instance))
+  (object-field object "was_vnum" :int))
+
 (defun object-prototype-by-rnum (rnum)
   (make-instance 'object-prototype
 		 :vnum (obj-rnum-to-vnum rnum)))
@@ -71,6 +76,7 @@
 		       (push (make-instance 'object-instance :id id) objects))) (:function) :void
 "for (olt_it ob = object_list.begin();ob != object_list.end(); ob++)
 cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
+    (break)
     (reverse objects)))
 
 (defmethod triggers ((object object-prototype))
@@ -91,3 +97,8 @@ cl_funcall(2, #0, MAKE_FIXNUM(GET_ID(ob->second)));")
   (let ((ptr (object-field object "script" :pointer-void)))
     (unless (ffi:null-pointer-p ptr)
       ptr)))
+
+(defmethod ptr-to-object-instance (ptr)
+  (make-instance 'object-instance
+		 :id (oneliner (ptr) (:pointer-void) :int
+			       "((struct obj_data *)#0)->id")))
