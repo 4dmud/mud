@@ -99,6 +99,9 @@
 (defmethod mobile-prototype ((mobile mobile))
   (mobile-prototype (vnum mobile)))
 
+(defmethod prototype ((mobile mobile))
+  (mobile-prototype mobile))
+
 (defclass player (mobile) ())
 
 (defmethod print-object ((player player) s)

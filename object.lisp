@@ -66,6 +66,9 @@
 (defmethod object-prototype ((object object-instance))
   (object-prototype (vnum object)))
 
+(defmethod prototype ((object object-instance))
+  (object-prototype object))
+
 (defun object-prototype-by-rnum (rnum)
   (make-instance 'object-prototype
 		 :vnum (obj-rnum-to-vnum rnum)))
