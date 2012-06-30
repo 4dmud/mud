@@ -1,6 +1,4 @@
 ;;new file cause object.lisp was getting a little bit full. Here's where all the different types of objects go to play.
-(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
-
 (in-package :4d)
 
 (defun num-to-object-type (num)
@@ -25,8 +23,8 @@
 
      ,@(mapcar #'(lambda (vn)
 		   (destructuring-bind (num (name) &body body) vn
-		     `(defmethod ,name ((,name ,class))
-			(let ((,name (object-val ,name ,num)))
+		     `(defmethod ,name ((,class ,class))
+			(let ((,name (object-val ,class ,num)))
 			  ,name
 			  ,@body))))
 	       value-names))))
@@ -82,4 +80,17 @@
      (handler-case 
 	 (elt #(:pine :oak :willow :dogwood :ironwood :fir :maple :elder :elm)
 	      tree-type)
-       (error () :undefined))))
+       (error () :undefined)))
+  (4 (log-prototype)
+     (let ((vnum
+	    (cond ((and (/= 0 log-prototype)
+			(ignore-errors (object-prototype log-prototype)))
+		   log-prototype)
+		  ((and (>= (vnum tree-object) 52730)
+			(<= (vnum tree-object) 52749))
+		   (+ 20 (vnum tree-object)))
+		  ((= -1 (vnum tree-object))
+		   (+ 52750 (object-val tree-object 2))))))
+       (and vnum
+	    (object-prototype vnum))))
+  (5 (log-amount)))
