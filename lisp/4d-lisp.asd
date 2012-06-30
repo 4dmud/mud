@@ -16,5 +16,5 @@
 		 (:file object-types :depends-on ("packages" "util"))
 		 (:file clans :depends-on ("packages" "util"))
 		 (:file build-tools :depends-on ("packages" "command" "util"))
-		 (:file cowsay :depends-on ("packages" "command" "util"))))
-		 
+		 (:file cowsay :depends-on ("packages" "command" "util")))
+    :depends-on ("alexandria"))
