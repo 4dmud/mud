@@ -9,4 +9,4 @@
 (asdf:initialize-source-registry '(:source-registry :ignore-inherited-configuration (:tree #.(merge-pathnames #P"libraries/" (ext:getcwd)))))
 
 ;;build the library, then rename it. The static library built here will also include all third-party libraries.
-(rename-file (first (asdf:make-build :4d-lisp :init-name "init_4d_lisp" :type :lib :monolithic t)) "lib4d-lisp.a")
+(rename-file (first (asdf:make-build :4d-lisp :init-name "init_4d_lisp" :type :lib :monolithic t)) "lib4d-lisp.a" :if-exists :supersede)
