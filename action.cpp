@@ -152,7 +152,7 @@ ACTION(thing_lumberjack)
       to_char = "With a crackle of broken twigs and an earthshattering BOOM! The tree hits the ground.";
       *num = 0;
       /*
-       [52750] a heavy pine log                         
+       16. [52750] a heavy pine log                         
        17. [52751] a heavy oak log                          
        18. [52752] a heavy willow log                       
        19. [52753] a dogwood log                            
