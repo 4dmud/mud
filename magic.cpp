@@ -76,15 +76,37 @@ void set_room_on_fire(Room *room);
 int mag_savingthrow ( Character *ch, int type, int modifier )
 {
 	/* NPCs use warrior tables according to some book */
+	/* Sorry, this is silly and it makes mobs higher than level 50 super immune to spell effects
+	   due to immortal protection code.  Changing this. -- Graham */
 	int class_sav = CLASS_WARRIOR;
 	int save;
 	type = IRANGE ( 0, type, 4 );
 	if ( !ch )
 		return TRUE;
 	if ( !IS_NPC ( ch ) )
+	{
 		class_sav = GET_CLASS ( ch );
+		save = saving_throws ( class_sav, type, GET_LEVEL ( ch ) );
+	}
+	else
+	{
+		if ( GET_LEVEL ( ch )  < 140 )
+		{
+			if ( MOB_TIER ( ch ) < 1 )
+				save = 20;
+			else if ( MOB_TIER ( ch ) < 2 )
+				save = 15;
+			else if ( MOB_TIER ( ch ) < 3 )
+				save = 10;
+			else if ( MOB_TIER ( ch ) < 4 )
+				save = 5;
+			else
+				save = 1;
+		}
+		else
+			save = -100; // Pretty much ensures 1% chance for uber level mobs
+	}
 
-	save = saving_throws ( class_sav, type, GET_LEVEL ( ch ) );
 	save += GET_SAVE ( ch, type );
 	save += modifier;
 
@@ -474,12 +496,23 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
 	switch ( spellnum )
 	{
-		case SPELL_INFERNO:
-		case SPELL_BURNING_HANDS:
-			if ( number ( 1, 50 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
-			        && !mag_savingthrow ( victim, savetype, 0 ) )
+		case SPELL_ACID_HOLD:
+			if ( number ( 1, 30 ) <= level 
+				&& !mag_savingthrow ( victim, savetype, 1 ) )
 			{
-				af[0].expire = HOURS_TO_EXPIRE ( 3 );
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
+				af[0].bitvector = AFF_ACIDED;
+				accum_duration =TRUE;
+				to_vict = "You skin start burning from acid.";
+				to_room = "$n suffers from acid burns.";
+			}
+			break;
+
+		case SPELL_BURNING_HANDS:
+			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
+			        && !mag_savingthrow ( victim, savetype, 1 ) )
+			{
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
 				af[0].bitvector = AFF_BURNING;
 				accum_duration =TRUE;
 				to_vict = "You start burning.";
@@ -488,21 +521,27 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_CHILL_TOUCH:
-			af[0].location = APPLY_STR;
-			if ( mag_savingthrow ( victim, savetype, 0 ) )
-				af[0].expire = HOURS_TO_EXPIRE ( 1 );
-			else
-				af[0].expire = HOURS_TO_EXPIRE ( 4 );
+			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_COLD )
+			        && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
+			        && !mag_savingthrow ( victim, savetype, 1 ) )
+			{
+				af[0].location = APPLY_DEX;
+				if ( mag_savingthrow ( victim, savetype, 5 ) )
+					af[0].expire = HOURS_TO_EXPIRE ( 1 );
+				else
+					af[0].expire = HOURS_TO_EXPIRE ( 4 );
+	
+				af[0].modifier = -2;
+				af[1].bitvector = AFF_PROCRASTINATE;
+				af[1].location = APPLY_SPEED;
+				af[1].modifier = FTOI ( -15 * staff );
+				af[1].expire = af[0].expire;
 
-			af[0].modifier = FTOI ( -4 * staff );
-			af[1].bitvector = AFF_PROCRASTINATE;
-			af[1].location = APPLY_SPEED;
-			af[1].modifier = FTOI ( -75 * staff );
-			af[1].expire = af[0].expire;
-
-
-			accum_duration = TRUE;
-			to_vict = "You feel your strength wither!";
+				accum_duration = FALSE;
+				accum_affect = TRUE;
+				to_vict = "You feel your strength wither!";
+				to_room = "$n's movements have dulled.";
+			}
 			break;
 
 		case SPELL_ABSOLVE:
@@ -525,7 +564,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 		case SPELL_ENERGY_DRAIN:
 			af[0].location = APPLY_HITROLL;
-			af[0].modifier = -5;
+			af[0].modifier = FTOI ( -3 * staff );
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else
@@ -533,11 +572,11 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
 
 			af[1].location = APPLY_REGEN_MOVE;
-			af[1].modifier = -35;
+			af[1].modifier = FTOI ( -20 * staff );
 			if ( OBJ_INNATE )
 				af[1].expire = -2;
 			else
-				af[1].expire = HOURS_TO_EXPIRE ( 24 );
+				af[1].expire = HOURS_TO_EXPIRE ( 24*staff );
 
 
 			accum_duration =FALSE;
@@ -568,21 +607,21 @@ void mag_affects ( int level, Character *ch, Character *victim,
 		case SPELL_BLINDNESS:
 		case SPELL_COLOUR_SPRAY:
 			if ( MOB_FLAGGED ( victim, MOB_NOBLIND )
-			        || mag_savingthrow ( victim, savetype, 0 ) )
+			        || mag_savingthrow ( victim, savetype, FTOI ( staff ) ) )
 			{
 				if ( ch )
-					ch->Send ( "You fail.\r\n" );
+					ch->Send ( "You fail to blind $n.\r\n" );
 				return;
 			}
 
 			af[0].location = APPLY_HITROLL;
 			af[0].modifier = -10;
-			af[0].expire = HOURS_TO_EXPIRE ( 2 );
+			af[0].expire = HOURS_TO_EXPIRE ( 3 );
 			af[0].bitvector = AFF_BLIND;
 
 			af[1].location = APPLY_AC;
 			af[1].modifier = 40;
-			af[1].expire = HOURS_TO_EXPIRE ( 2 );
+			af[1].expire = HOURS_TO_EXPIRE ( 3 );
 			af[1].bitvector = AFF_BLIND;
 
 			af[2].location = APPLY_REGEN_HIT;
@@ -596,7 +635,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 
 
 		case SPELL_CURSE:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, ( 2 + FTOI ( 2 * staff ) ) ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -617,8 +656,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[2].expire = HOURS_TO_EXPIRE ( 3 );
 			af[2].bitvector = AFF_CURSE;
 
-			accum_duration =TRUE;
-			accum_affect = TRUE;
+			accum_duration =FALSE;
+			accum_affect = FALSE;
 			to_room = "$n briefly glows red!";
 			to_vict = "You feel very uncomfortable.";
 			break;
@@ -638,9 +677,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			if ( OBJ_INNATE )
 				af[0].expire = 1; //we don't want this on innate
 			else
-				af[0].expire = HOURS_TO_EXPIRE (12 + level );		
+				af[0].expire = HOURS_TO_EXPIRE ( 6 );		
                         af[0].location = APPLY_REGEN_MANA;
-                        af[0].modifier = 25;
+                        af[0].modifier = 100;
 			af[0].bitvector = AFF_MANA_REGEN;
 			accum_duration = FALSE;
 			accum_affect = FALSE;
@@ -686,7 +725,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_HOLD_PERSON:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 5 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -699,7 +738,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_PARALYZE:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 10 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -708,6 +747,10 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].modifier = -40;
 			af[0].expire = HOURS_TO_EXPIRE ( 4 );
 			af[0].bitvector = AFF_HOLD;
+			af[1].location = APPLY_SPEED;
+			af[1].modifier = -200;
+			af[1].expire = HOURS_TO_EXPIRE ( 4 );
+			af[1].bitvector = AFF_HOLD;
 			to_vict = "You are paralyzed.";
 			to_room = "$n is paralyzed!";
 			break;
@@ -740,7 +783,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_POISON:
-			if ( !IS_NPC ( victim ) && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( !IS_NPC ( victim ) && mag_savingthrow ( victim, savetype, 2 ) )
 			{
 				if ( ch )
 					ch->Send ( "%s", CONFIG_NOEFFECT );
@@ -756,7 +799,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_POISON_2:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 3 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -771,7 +814,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_POISON_3:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 4 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -786,7 +829,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_POISON_4:
-			if ( ch && mag_savingthrow ( victim, savetype, 0 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 5 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
@@ -833,7 +876,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 				return;
 			if ( MOB_FLAGGED ( victim, MOB_NOSLEEP ) )
 				return;
-			if ( mag_savingthrow ( victim, savetype, 0 ) )
+			if ( mag_savingthrow ( victim, savetype, 20 ) )
 				return;
 
 			af[0].expire = HOURS_TO_EXPIRE ( 4 + ( chlevel / 4 ) );
@@ -860,7 +903,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			else
 				af[1].expire = HOURS_TO_EXPIRE ( 24 + chcha );
 			af[1].location = APPLY_SAVING_SPELL;
-			af[1].modifier = -8;
+			af[1].modifier = -4 + FTOI( -3 * staff );
 
 			accum_duration =FALSE;
 			to_vict = "You feel your skin as tough as steel.";
@@ -889,7 +932,6 @@ void mag_affects ( int level, Character *ch, Character *victim,
 				af[0].expire = HOURS_TO_EXPIRE ( ( chlevel / 2 ) + 4 );
 
 			af[0].modifier = ( ( 1 + ( level > 18 ) + ( level > 40 ) ) );
-			;
 			af[0].location = APPLY_STR;
 			af[0].bitvector = AFF_HOLY_STRENGTH;
 
@@ -942,7 +984,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			if ( speed_update ( victim ) > 400 && m_user )
 			{
 				af[1].bitvector = AFF_BLUR;
-				af[1].modifier = 1;
+				af[1].modifier = FTOI(staff);
 				af[1].expire = af[0].expire;
 				af[1].location = APPLY_DEX;
 			}
@@ -997,24 +1039,50 @@ void mag_affects ( int level, Character *ch, Character *victim,
                     break;
 
 		case SPELL_CONE_OF_COLD:
-		case SPELL_FROST_ARROW:
-		case SPELL_HAIL_STORM:
 			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_COLD )
 			        && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
-			        && !mag_savingthrow ( victim, savetype, 0 ) )
+			        && !mag_savingthrow ( victim, savetype, 3 ) )
 			{
+				af[0].location = APPLY_DEX;
+				if ( mag_savingthrow ( victim, savetype, 10 ) )
+					af[0].expire = HOURS_TO_EXPIRE ( 1 );
+				else
+					af[0].expire = HOURS_TO_EXPIRE ( 4 );
+	
+				af[0].modifier = -2 - FTOI ( staff );
 				af[0].expire = HOURS_TO_EXPIRE ( 2 );
 				af[0].bitvector = AFF_FREEZING;
-				accum_duration =TRUE;
+				accum_duration = FALSE;
+				accum_affect = TRUE;
 				to_vict = "You are consumed with coldness.";
 				to_room = "$n starts shivering.";
 			}
 			break;
 
-		case SPELL_ACID_ARROW:
-			if ( number ( 1, 30 ) <= level
-			        && !mag_savingthrow ( victim, savetype, 0 ) )
+		case SPELL_FROST_ARROW:
+			if ( !AFF_FLAGGED ( victim, AFF_PROT_COLD ) && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
+			        && !mag_savingthrow ( victim, savetype, ( 4 + FTOI ( 2 * staff ) ) ) )
 			{
+				af[0].location = APPLY_DEX;
+				if ( mag_savingthrow ( victim, savetype, 10 ) )
+					af[0].expire = HOURS_TO_EXPIRE ( 1 );
+				else
+					af[0].expire = HOURS_TO_EXPIRE ( 4 );
+	
+				af[0].modifier = -4 - FTOI ( staff );
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
+				af[0].bitvector = AFF_FREEZING;
+				accum_duration =TRUE;
+				to_vict = "The frost arrow encases you in ice.";
+				to_room = "$n is encased in ice by an arrow of ice.";
+			}
+			break;
+
+		case SPELL_ACID_ARROW:
+			if ( !mag_savingthrow ( victim, savetype, ( 2 + FTOI ( 2 * staff ) ) ) )
+			{
+				af[0].location = APPLY_AC;
+				af[0].modifier = FTOI ( 10 * staff);
 				af[0].expire = HOURS_TO_EXPIRE ( 3 );
 				af[0].bitvector = AFF_ACIDED;
 				accum_duration =TRUE;
@@ -1024,14 +1092,61 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_FLAME_ARROW:
-			if ( number ( 1, 30 ) <= level && !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
-			        && !mag_savingthrow ( victim, savetype, 0 ) )
+			if ( !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
+			        && !mag_savingthrow ( victim, savetype, ( 3 + FTOI ( 2 * staff ) ) ) )
 			{
 				af[0].expire = HOURS_TO_EXPIRE ( 3 );
 				af[0].bitvector = AFF_BURNING;
 				accum_duration =TRUE;
 				to_vict = "The flame arrow sets you on fire.";
 				to_room = "$n is hit by a flame arrow and starts burning.";
+			}
+			break;
+
+		case SPELL_HAIL_STORM:
+			if ( !AFF_FLAGGED ( victim, AFF_PROT_COLD ) && !MOB_FLAGGED ( victim, MOB_NOFREEZE )
+			        && !mag_savingthrow ( victim, savetype, ( 3 + FTOI ( staff ) ) ) )
+			{
+				af[0].location = APPLY_DEX;
+				if ( mag_savingthrow ( victim, savetype, 10 ) )
+					af[0].expire = HOURS_TO_EXPIRE ( 1 );
+				else
+					af[0].expire = HOURS_TO_EXPIRE ( 4 );
+	
+				af[0].modifier = -2 - FTOI ( staff );
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
+				af[0].bitvector = AFF_FREEZING;
+				accum_duration = FALSE;
+				accum_affect = TRUE;
+				to_vict = "You've been enveloped in hail and ice.";
+				to_room = "$n has been turned into a icy popsicle.";
+			}
+			break;
+
+		case SPELL_ACIDBURST:
+			if ( !mag_savingthrow ( victim, savetype, ( 1 + FTOI ( staff ) ) ) )
+			{
+				af[0].location = APPLY_AC;
+				af[0].modifier = FTOI ( 5 * staff);
+				af[0].expire = HOURS_TO_EXPIRE ( 3 );
+				af[0].bitvector = AFF_ACIDED;
+				accum_duration =TRUE;
+				to_vict = "You've been drenched in acid.";
+				to_room = "$n is drenched by a burst of acid.";
+			}
+			break;
+
+		case SPELL_INFERNO:
+			if ( !AFF_FLAGGED ( victim, AFF_PROT_FIRE )
+			        && !mag_savingthrow ( victim, savetype, ( 2 + FTOI ( staff ) ) ) )
+			{
+				af[0].location = APPLY_STR;
+				af[0].modifier = FTOI ( -2 * staff );
+				af[0].expire = HOURS_TO_EXPIRE ( 3 );
+				af[0].bitvector = AFF_BURNING;
+				accum_duration =FALSE;
+				to_vict = "You have been set ablaze!";
+				to_room = "$n starts burning fiercely.";
 			}
 			break;
 
@@ -1257,6 +1372,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			else
 				af[0].expire = HOURS_TO_EXPIRE ( 24 );
 			af[0].bitvector = AFF_NUMB_MIND;
+			af[0].location = APPLY_CHA;
+			af[0].modifier = FTOI ( -(5*staff) );
 
 			accum_duration =FALSE;
 			to_vict = "Your thoughts slow.";
@@ -1345,7 +1462,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 		case SPELL_CORRUPT_ARMOR:
 			af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
 			af[0].location = APPLY_AC;
-			af[0].modifier = 25;
+			af[0].modifier = FTOI ( 20 * staff);
 			af[0].bitvector = AFF_CORRUPTED;
 			accum_duration =FALSE;
 			to_vict = "Your armor starts rotting.";
@@ -1354,7 +1471,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 		case SPELL_WEAKEN:
 			af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
 			af[0].location = APPLY_STR;
-			af[0].modifier = -6;
+			af[0].modifier = FTOI ( -(4 * staff));
 			af[0].bitvector = AFF_WEAKENED;
 
 			accum_duration =FALSE;

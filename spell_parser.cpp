@@ -1839,12 +1839,12 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_DETECT_INVIS_OTHER, "detect invisible", 20 ,
 	         10 , 2, POS_STANDING, TAR_CHAR_ROOM,
-	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
+	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 0,
                  "Your eyes stop tingling." );
 
 	spello ( SPELL_MANA_REGEN, "mana regen", 20,
 		 10, 2, POS_STANDING, TAR_CHAR_ROOM,
-		FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
+		FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 0,
 		 "The blessings of Kellindil stop flowing through you and you return to normal mana regeneration." );
 
 	spello ( SPELL_DETECT_MAGIC, "detect magic", 20 , 10 , 2,
@@ -1912,7 +1912,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_HEARTSQUEEZE, "heart squeeze", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 7, 0, "" );
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 42, 0, "" );
 
 	spello ( SPELL_FACEMELT, "facemelt", 70 , 60 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
@@ -1920,14 +1920,14 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_ELECTRIC_BLAST, "electric blast", 140 , 125 , 3,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 15, 0, "" );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 38, 0, "" );
 
 	// Changing the delay in Inferno to a shorter delay - Prom
 	// Also removing directional and shortening delay again 
 	// Changed TAR_IGNORE | TAR_AREA_DIR to TAR_IGNORE and delay of 10 -- Prom
 	spello ( SPELL_INFERNO, "inferno", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 18, 0, "" );
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS | MAG_AFFECTS, 10,
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 36, 0, "" );
 
 
 	spello ( SPELL_WATER_TO_WINE, "water to wine", 150 ,
@@ -2079,7 +2079,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_ANTIDOTE_2, "antidote 2", 80 , 16 , 8,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 34, 1, "" );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 34, 0, "" );
 
 	spello ( SPELL_ANTIDOTE_3, "antidote 3", 160 , 32 , 16,
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
@@ -2123,7 +2123,7 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 43, 1, "" );
 
 	spello ( SPELL_METEOR_SHOWER, "meteor shower", 60 , 40 , 2,
-	         POS_STANDING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 42, 0, "" );
 
 	spello ( SPELL_STONESKIN, "stoneskin", 35 , 15 , 3,
@@ -2312,7 +2312,7 @@ void mag_assign_spells ( void )
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 3, 1,
                  "You lose your sense of anticipation." );
 
-	spello ( SPELL_MANA_BLAST, "mana blast", 900 , 450 , 30,
+	spello ( SPELL_MANA_BLAST, "mana blast", 1500 , 450 , 30,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 50, 0 , "");
 
@@ -2345,15 +2345,15 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_FROST_ARROW, "frost arrow", 40 , 25 , 2,
 	         POS_FIGHTING, TAR_AREA_DIR | TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE,
-	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 50, 0, "" );
+	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 22, 0, "" );
 
 	spello ( SPELL_HAIL_STORM, "hail storm", 140 , 125 , 3,
 	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
-	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 36, 0, "" );
+	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 49, 0, "" );
 
 	spello ( SPELL_EXORCISE, "exorcise", 30 , 20 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
-	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 19, 1, "" );
+	         0, TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 19, 0, "" );
 
 	spello ( SPELL_HOLY_JUDGEMENT, "holy judgement", 100 , 80 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
@@ -2800,7 +2800,7 @@ int elemental_type ( int spell )
 			retval = ELEM_FIRE;
 			break;
 		case SPELL_HEARTSQUEEZE:
-			retval = ELEM_AIR;
+			retval = ELEM_DEATH;
 			break;
 		case SPELL_FACEMELT:
 			retval = ELEM_FIRE;

@@ -1428,7 +1428,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_FORTIFY_MIND,     MAG | ESP );
 	assign_class ( SPELL_HASTE,          MAG | ESP );
 	assign_class ( SPELL_KNOCK,          PRI );
-	assign_class ( SPELL_DEMONSHRIEK,      ESP | PRI );
+	assign_class ( SPELL_DEMONSHRIEK,      ESP );
 	assign_class ( SPELL_SHIELD_ICE,      MAG | PRI | ESP | RAN );
 	assign_class ( SPELL_CLONE,            ESP | PRI );
 	//assign_class ( SPELL_MINOR_IDENTIFY,   ESP | GYP | PRI );
@@ -1573,8 +1573,10 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_EVIL_EYE,        ESP );
 	assign_class ( SKILL_THRUST,	      RAN );
 	assign_class ( SKILL_SLIT,	      GYP );
-	assign_class ( SPELL_ACID_HOLD,	      ESP | MAG);
-	assign_class ( SPELL_ACIDBURST,      ESP);
+	assign_class ( SPELL_ACID_HOLD,	      ESP | MAG );
+	assign_class ( SPELL_ACIDBURST,      ESP );
+	assign_class ( SPELL_FROST_ARROW,      MAG | PRI );
+	assign_class ( SPELL_HAIL_STORM,      MAG );
 }
 
 
