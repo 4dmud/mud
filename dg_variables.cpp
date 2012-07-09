@@ -2014,7 +2014,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					else if ( !strcasecmp ( field, "contained_by" ) )
 					{
-						if ( o->in_obj=NULL )
+						if ( o->in_obj!=NULL )
 						        snprintf ( str, slen,"%c%ld",UID_CHAR, GET_ID(o) );
 						else
 							strcpy ( str, "" );
