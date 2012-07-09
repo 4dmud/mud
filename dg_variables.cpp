@@ -2014,8 +2014,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					else if ( !strcasecmp ( field, "contained_by" ) )
 					{
-						if ( o->in_obj!=NULL )
-							snprintf ( str, slen,"%c%ld",UID_CHAR, ( long ) o->in_obj );
+						if ( o->in_obj=NULL )
+						        snprintf ( str, slen,"%c%ld",UID_CHAR, GET_ID(o) );
 						else
 							strcpy ( str, "" );
 					}
@@ -2125,7 +2125,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp ( field, "is_inobj" ) )
 					{
 						if ( o->in_obj!=NULL )
-							snprintf ( str, slen,"%c%ld",UID_CHAR, ( long ) o->in_obj );
+						        snprintf ( str, slen,"%c%ld",UID_CHAR, GET_ID(o) );
 						else
 							strcpy ( str, "" );
 					}
