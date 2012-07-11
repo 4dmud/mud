@@ -171,8 +171,44 @@ ACTION(thing_lumberjack)
        32. [52766] a heavy yew log                          
        33. [52767] a heavy aspen log                        
        34. [52768] a heavy alder log                        
-       35. [52769] a heavy birch log                        
-       
+       35. [52769] a heavy birch log   
+                     
+           New logs from Molly -- Prom
+	   [52770] a reserve log
+	   [52771] an olive log
+	   [52772] a heavy cypress log
+	   [52773] a heavy cedar log 
+	   [52774] a heavy plane log
+	   [52775] a carob log
+	   [52776] an almond log 
+	   [52777] a cherry tree log
+	   [52778] a heavy apple tree log 
+	   [52779] a pear tree log
+	   [52780] a heavy plum tree log
+	   [52781] an orange tree log
+	   [52782] an apricot tree log
+	   [52783] a mulberry tree log
+
+	   New trees from Molly -- Prom
+           [52711] the Judas tree   
+	   [52712] the olive tree
+           [52713] the cypress tree   
+           [52714] the cedar tree     
+           [52715] the plane tree
+           [52716] the carob tree 
+           [52717] the almond tree
+           [52718] the cherry tree   
+	   [52719] the cherry tree    
+	   [52720] the cherry tree    
+	   [52721] the apple tree     
+	   [52722] the apple tree     
+	   [52723] the apple tree     
+	   [52724] the pear tree      
+	   [52725] the pear tree      
+	   [52726] the pear tree      
+  	   [52727] the plum tree      
+	   [52728] the plum tree      
+	   [52729] the plum tree            
        81. [52730] the pine tree                            
        82. [52731] the oak tree                             
        83. [52732] the willow tree                          
@@ -198,9 +234,11 @@ ACTION(thing_lumberjack)
       {
         lognum = GET_OBJ_VAL(obj, 4);
       }
-      if (GET_OBJ_VNUM(obj) >= 52730 && GET_OBJ_VNUM(obj) <= 52749)
+      // Changing this from 52730 to 52711 since things changed
+      // And changing the + 20 to + 38 since we have more logs too. -> Prom
+      if (GET_OBJ_VNUM(obj) >= 52711 && GET_OBJ_VNUM(obj) <= 52749)
       {
-        lognum = GET_OBJ_VNUM(obj) + 20;
+        lognum = GET_OBJ_VNUM(obj) + 38;
       }
       else if (GET_OBJ_VNUM(obj) == NOTHING)
       {
