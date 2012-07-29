@@ -610,7 +610,9 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			        || mag_savingthrow ( victim, savetype, FTOI ( staff ) ) )
 			{
 				if ( ch )
-					ch->Send ( "You fail to blind $n.\r\n" );
+				//Changing this from ch>Send to act --> Prom
+				//	ch->Send ( "You fail to blind $n.\r\n" );
+				act ( "You fail to blind $N.", FALSE, ch, 0, victim, TO_CHAR );
 				return;
 			}
 
