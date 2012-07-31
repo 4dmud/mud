@@ -237,7 +237,7 @@ ACTION(thing_lumberjack)
       // Changing this from 52730 to 52711 since things changed
       // And changing the + 20 to + 38 since we have more logs too. -> Prom
       // Undoing my changes since it is causing problems with logs -> Prom
-      if (GET_OBJ_VNUM(obj) >= 52711 && GET_OBJ_VNUM(obj) <= 52749)
+      if (GET_OBJ_VNUM(obj) >= 52730 && GET_OBJ_VNUM(obj) <= 52749)
       {
         lognum = GET_OBJ_VNUM(obj) + 20;
       }
