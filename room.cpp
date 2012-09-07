@@ -74,6 +74,7 @@ Room::Room() {
     people = NULL;   /* List of NPC / PC in room             */
     affects = NULL;
     ores = NULL;
+    q_description = NULL;
 }
 Room::~Room() {
     // Adding this per Horus
