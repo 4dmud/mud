@@ -116,6 +116,7 @@ void make_manifest ( Character *ch,struct obj_data *obj );
 ASKILL ( skill_manipulate );
 ASPELL ( spell_control_weather );
 ASPELL ( spell_call_lightning );
+ASKILL ( skill_sharpen );
 extern struct stave_stat_table stave_table[9];
 
 Character *find_char ( long n );
@@ -1189,6 +1190,11 @@ ACMD ( do_fell )
 }
 
 
+ASKILL ( skill_sharpen )
+{
+	ch->Send ("This is a WIP skill don't use yet! \r \n" );
+	return SKILL_SHARPEN;
+}
 
 
 ASKILL ( skill_manipulate )

@@ -1577,6 +1577,7 @@ void init_spell_levels ( void )
 	assign_class ( SPELL_ACIDBURST,      ESP );
 	assign_class ( SPELL_FROST_ARROW,      MAG | PRI );
 	assign_class ( SPELL_HAIL_STORM,      MAG );
+	assign_class ( SKILL_SHARPEN,	      HUN | THI | WAR );
 }
 
 

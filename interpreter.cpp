@@ -977,6 +977,7 @@ const command_info cmd_info[] =
 	{ "scribe"   , "scri" , POS_STANDING, do_skills   , 1, SKILL_SCRIBE, 0 },
 	{ "scalp"    , "scalp"    , POS_STANDING, do_skills    , 1, SKILL_SCALP, 0 },
 	{ "scan"     , "scan" , POS_STANDING, do_skills     , 1, SKILL_SCAN, 0 },
+	{ "sharpen"  , "shar", POS_STANDING, do_skills, 1, SKILL_SHARPEN, 0 },
 	{ "slip"     , "sli" , POS_STANDING, do_skills     , 1, SKILL_SLIP, 0 },
 	{ "snare"    , "sna"  , POS_FIGHTING, do_skills    , 1, SKILL_SNARE, 0 },
 	{ "sneak"    , "snea"     , POS_STANDING, do_skills    , 1, SKILL_SNEAK, 0 },

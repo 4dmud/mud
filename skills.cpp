@@ -146,6 +146,7 @@ ASKILL ( skill_martial_arts );
 ASKILL ( skill_slip );
 ASKILL ( skill_slit );
 ASKILL ( skill_thrust );
+ASKILL ( skill_sharpen );
 
 ACMD ( do_skills );
 
@@ -221,8 +222,8 @@ void assign_skills ( void )
 	skillo ( SKILL_FORAGE, "forage", TAR_IGNORE, SK_NONE, NO_FIRST,
 	         NO_SECOND, NO_TIER, 28 ,1, "");
 
-  skillo(SKILL_BACKSTAB, "backstab", TAR_CHAR_ROOM | TAR_NOT_SELF,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 5 ,1, "");
+        skillo( SKILL_BACKSTAB, "backstab", TAR_CHAR_ROOM | TAR_NOT_SELF,
+                SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 5 ,1, "");
 
 	skillo ( SKILL_DISARM, "disarm", TAR_CHAR_ROOM | TAR_NOT_SELF |
 	         TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, SKILL_MELEE, NO_SECOND, 2, 9 ,1, "");
@@ -230,90 +231,71 @@ void assign_skills ( void )
 	skillo ( SKILL_SMASH, "smash", TAR_CHAR_ROOM | TAR_NOT_SELF |
 	         TAR_FIGHT_VICT,  SK_VIOLENT | SK_NEED_WEAPON, SKILL_MELEE, NO_SECOND, 3, 40 ,0, "");
 
-	skillo ( SKILL_BASH, "bash",
-	         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+	skillo ( SKILL_BASH, "bash", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
 	         SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 45 ,1, "");
 
-	skillo ( SKILL_HIDE, "hide", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 1, 8 ,1, 
+	skillo ( SKILL_HIDE, "hide", TAR_CHAR_ROOM | TAR_SELF_ONLY,SK_NONE, NO_FIRST, NO_SECOND, 1, 8 ,1, 
                  "");
 
-  skillo(SKILL_KICK, "kick",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT, SKILL_HANDTOHAND, NO_SECOND, 1, 2 ,1, "");
+        skillo ( SKILL_KICK, "kick", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                SK_VIOLENT, SKILL_HANDTOHAND, NO_SECOND, 1, 2 ,1, "");
 
-  skillo(SKILL_TRAMPLE, "trample",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 18, 0, "");
+        skillo ( SKILL_TRAMPLE, "trample", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 18, 0, "");
 
-  skillo(SKILL_JOUST, "joust",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 29, 0, "");
+        skillo ( SKILL_JOUST, "joust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 29, 0, "");
 
 	skillo ( SKILL_PICK_LOCK, "pick lock", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 49 ,1, "");
 
 	skillo ( SKILL_RESCUE, "rescue", TAR_CHAR_ROOM | TAR_NOT_SELF,
 	         SK_NONE, NO_FIRST, NO_SECOND, NO_TIER, 27 ,1, "");
 
-  skillo(SKILL_SNEAK, "sneak", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-         SK_NONE, NO_FIRST, NO_SECOND, 1, 8, 1, 
-         "You are no longer feeling sneaky.");
+        skillo( SKILL_SNEAK, "sneak", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 1, 8, 1, 
+                "You are no longer feeling sneaky.");
 
-  skillo(SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, 1, 1, 1, "");
+        skillo ( SKILL_STEAL, "steal", TAR_IGNORE, SK_VIOLENT, NO_FIRST,NO_SECOND, 1, 1, 1, "");
 
 	skillo ( SKILL_TRACK, "track", TAR_CHAR_WORLD | TAR_NOT_SELF,
 	         SK_NONE, NO_FIRST, NO_SECOND, 1, 27 ,1, "");
 
-  skillo(SKILL_GRAPPLE, "grapple",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT, SKILL_HANDTOHAND, SKILL_SECOND_ATTACK, 4, 17, 0, "");
+        skillo ( SKILL_GRAPPLE, "grapple", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                 SK_VIOLENT, SKILL_HANDTOHAND, SKILL_SECOND_ATTACK, 4, 17, 0, "");
 
-  skillo(SKILL_DODGE, "dodge", TAR_IGNORE,
-         SK_NONE, SKILL_MELEE, NO_SECOND, 3, 4, 0, "");
+        skillo ( SKILL_DODGE, "dodge", TAR_IGNORE, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 4, 0, "");
 
-  skillo(SKILL_PHASE, "phase", TAR_IGNORE,
-         SK_NONE, NO_FIRST, NO_SECOND, 3, 17, 0, "");
+        skillo ( SKILL_PHASE, "phase", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 3, 17, 0, "");
 
-  skillo(SKILL_BLACKJACK, "blackjack",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 27, 1,"");
+        skillo ( SKILL_BLACKJACK, "blackjack", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 1, 27, 1,"");
 
-  skillo(SKILL_CHARGE, "charge",
-         TAR_IGNORE, SK_VIOLENT, SKILL_SECOND_ATTACK, NO_SECOND, 3, 26, 0, "");
+        skillo ( SKILL_CHARGE, "charge", TAR_IGNORE, SK_VIOLENT, SKILL_SECOND_ATTACK, NO_SECOND, 3, 26, 0, "");
 
-	skillo ( SKILL_GRIP, "grip", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 1, 49 , 1,
+	skillo ( SKILL_GRIP, "grip", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 1, 49 , 1,
                  "Your grip loosens.");
 
-  skillo(SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF,
-         SK_NONE, SKILL_MELEE, NO_SECOND, 3, 20, 0, "");
+        skillo ( SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 20, 0, "");
 
-	skillo ( SKILL_FOCUS, "focus", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 2, 24 ,1,
+	skillo ( SKILL_FOCUS, "focus", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 2, 24 ,1,
                  "You lose your focus.");
 
 	skillo ( SKILL_HOLY_STRENGTH, "holy strength",   TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND,2, 5 ,1, "");
 
-  skillo(SKILL_BESERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-         SK_NONE, SKILL_MELEE, NO_SECOND, 3, 8, 0, 
-         "You calm down from your berserker rage.");
+        skillo ( SKILL_BESERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 8, 0, 
+                 "You calm down from your berserker rage.");
 
-	skillo ( SKILL_MEDITATE, "meditate", TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 2, 30 ,1,
-         "You no longer have the patience to meditate.");
+	skillo ( SKILL_MEDITATE, "meditate", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 2, 30 ,1,
+                 "You no longer have the patience to meditate.");
 
-	skillo ( SKILL_HYPERACTIVITY, "hyperactivity",  TAR_CHAR_ROOM | TAR_SELF_ONLY,
-	         SK_NONE, NO_FIRST, NO_SECOND, 4, 36 ,0,
-         "Your hyperactivity returns to normal.");
+	skillo ( SKILL_HYPERACTIVITY, "hyperactivity",  TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 4, 36 ,0,
+                 "Your hyperactivity returns to normal.");
 
-	skillo ( SKILL_MARTIAL_ARTS, "martial arts", TAR_CHAR_ROOM |
-	         TAR_SELF_ONLY,   SK_NONE, NO_FIRST, NO_SECOND, 4, 26 ,0,
-          "You relax your martial stance.");
+	skillo ( SKILL_MARTIAL_ARTS, "martial arts", TAR_CHAR_ROOM | TAR_SELF_ONLY,   SK_NONE, NO_FIRST, NO_SECOND, 4, 26 ,0,
+                 "You relax your martial stance.");
 
-	skillo ( SKILL_TRUE_STRIKE, "true strike", TAR_CHAR_ROOM |
-	         TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 3, 48 ,0,
-        "Your intensity for true strike has returned to normal.");
+	skillo ( SKILL_TRUE_STRIKE, "true strike", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 3, 48 ,0,
+                 "Your intensity for true strike has returned to normal.");
 
 	skillo ( SKILL_FORTIFY, "fortify", TAR_CHAR_ROOM | TAR_SELF_ONLY,
 	         SK_NONE, NO_FIRST, NO_SECOND, 3, 11 ,0,
@@ -326,17 +308,14 @@ void assign_skills ( void )
 	         TAR_SELF_ONLY,     SK_NONE, NO_FIRST, NO_SECOND, 4, 29 ,0,
         "You slow down the whirr of your blades.");
 
-  skillo(SKILL_CLEAVE, "cleave",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_GRIP, 4, 12, 0, "");
+  	skillo ( SKILL_CLEAVE, "cleave", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, 
+		SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_GRIP, 4, 12, 0, "");
 
-  skillo(SKILL_BEHEAD, "behead",
-         TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
-         SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_FACE, 4, 12, 0, "");
+        skillo ( SKILL_BEHEAD, "behead", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
+                 SK_VIOLENT | SK_NEED_WEAPON, SKILL_LONGARM, SKILL_FACE, 4, 12, 0, "");
 
-	skillo ( SKILL_BRACE, "brace", TAR_IGNORE,
-	         SK_NONE, NO_FIRST, NO_SECOND, 1, 40 ,0,
-        "You no longer brace for damage.");
+	skillo ( SKILL_BRACE, "brace", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 1, 40 ,0,
+                 "You no longer brace for damage.");
 
 	skillo ( SKILL_FLANK, "flank" ,TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,  SK_VIOLENT |
  		SK_NEED_WEAPON, NO_FIRST, NO_SECOND, 3, 48 ,0, "");
@@ -344,22 +323,24 @@ void assign_skills ( void )
 	skillo ( SKILL_SLIT, "slit", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                  SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, NO_SECOND, 4, 12, 0, "");
 
-	skillo (SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, 
+	skillo ( SKILL_THRUST, "thrust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, 
 		SK_VIOLENT | SK_NEED_WEAPON, SKILL_HANDTOHAND, SKILL_LONGARM, 4, 12, 0, "");
+        
+	skillo ( SKILL_SHARPEN, "sharpen", TAR_IGNORE, SK_NONE, NO_FIRST, NO_SECOND, 3, 3, 0, "");
 
-  skillo_static(SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
-  skillo_static(SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8, 1);
-  skillo_static(SKILL_SLING, "sling", NO_FIRST, NO_SECOND, NO_TIER,12, 1);
-  skillo_static(SKILL_CROSSBOW, "crossbow", NO_FIRST, NO_SECOND,NO_TIER, 20, 1);
-  skillo_static(SKILL_THROW, "throw", NO_FIRST, NO_SECOND, NO_TIER, 22, 1);
-  skillo_static(SKILL_DUAL, "dual", NO_FIRST, NO_SECOND, 1, 27, 1);
-  skillo_static(SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 1, 1, 0);
-  skillo_static(SKILL_TRAP_AWARE, "trap aware", NO_FIRST, NO_SECOND,3, 5, 0);
-  skillo_static(SKILL_PARRY, "parry", SKILL_HANDTOHAND, NO_SECOND, 1, 30, 0);
-  /*mord */
-  skillo_static(SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, 1, 24, 1);
-  skillo_static(SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14, 1);
-  skillo_static(SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,1, 1, 1);
+  	skillo_static ( SKILL_RIDING, "riding", NO_FIRST, NO_SECOND, NO_TIER,3, 1);
+  	skillo_static ( SKILL_BOW, "bow", NO_FIRST, NO_SECOND, NO_TIER,8, 1);
+  	skillo_static ( SKILL_SLING, "sling", NO_FIRST, NO_SECOND, NO_TIER,12, 1);
+        skillo_static(SKILL_CROSSBOW, "crossbow", NO_FIRST, NO_SECOND,NO_TIER, 20, 1);
+  	skillo_static(SKILL_THROW, "throw", NO_FIRST, NO_SECOND, NO_TIER, 22, 1);
+  	skillo_static(SKILL_DUAL, "dual", NO_FIRST, NO_SECOND, 1, 27, 1);
+  	skillo_static(SKILL_FIREARM, "firearm", NO_FIRST, NO_SECOND, 1, 1, 0);
+  	skillo_static(SKILL_TRAP_AWARE, "trap aware", NO_FIRST, NO_SECOND,3, 5, 0);
+  	skillo_static(SKILL_PARRY, "parry", SKILL_HANDTOHAND, NO_SECOND, 1, 30, 0);
+  	/*mord */
+  	skillo_static(SKILL_DRUNK, "drunk", NO_FIRST, NO_SECOND, 1, 24, 1);
+  	skillo_static(SKILL_MOUNTED_COMBAT, "mounted combat", SKILL_RIDING, NO_SECOND, 2, 14, 1);
+  	skillo_static(SKILL_HANDTOHAND, "hand-to-hand", NO_FIRST, NO_SECOND,1, 1, 1);
 
 	skillo_static ( SKILL_MELEE, "melee", NO_FIRST, NO_SECOND, 1, 1 ,1);
 
@@ -665,6 +646,9 @@ ACMD ( do_skills )
 					break;
 				case SKILL_THRUST:
 					CALL_SKILL ( skill_thrust );
+					break;
+				case SKILL_SHARPEN:
+					CALL_SKILL ( skill_sharpen );
 					break;
 
 				default:
