@@ -39,3 +39,14 @@
   (ffi:c-inline (player-ptr) (:pointer-void) :void
 		"save_char_vars((Character*)#0);"
 		:side-effects t))
+
+(defun room-get-description (room-ptr)
+  (ffi:c-inline (room-ptr) (:pointer-void) :cstring
+		"((Room*)#0)->GetDescription()"
+		:one-liner t
+		:side-effects nil))
+		
+
+(defun command-interpeter (ch-ptr command)
+  (ffi:c-inline (ch-ptr command) (:pointer-void :cstring) :void
+		"command_interpreter ((Character *)#0, #1);"))

@@ -1,4 +1,5 @@
-(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
+;;(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
+(ffi:clines "#include \"../lisp-internal.h\"")
 (in-package :4d)
 
 (defclass zone ()
@@ -43,8 +44,33 @@
 (defmethod print-object ((room room) s)
   (format s "#<room ~d: ~a>" (vnum room) (title room)))
 
+(defmacro room-field (room field type)
+  `(oneliner ((vnum ,room))
+	     (:int)
+	     ,type
+	     ,(format nil "world_vnum[#0]->~a" field)))
+
+(defmethod pointer ((room room))
+   (oneliner ((vnum room))
+	     (:int)
+	     :pointer-void
+	     "world_vnum[#0]"))
+
+;; properties of room
 (defmethod title ((room room))
-  (oneliner ((vnum room)) (:int) :cstring "world_vnum[#0]->name"))
+  (room-field room "name" :cstring))
+
+(defmethod smell ((room room))
+  (room-field room "smell" :cstring))
+
+(defmethod sound ((room room))
+  (room-field room "listen" :cstring))
+
+
+(defmethod description ((room room))
+  (4d-internal::room-get-description (pointer room)))
+
+
 
 (defmethod characters ((room room))
   (loop with character = (oneliner ((vnum room)) (:int)
@@ -113,3 +139,44 @@
 		       "SCRIPT(world_vnum[#0])")))
     (unless (ffi:null-pointer-p ptr)
       ptr)))
+
+(defclass exit ()
+  ((room :initarg :room)
+   (direction :initarg :direction :reader direction)))
+
+(defconstant +directions+ '(:north :east :south :west :up :down))
+
+(defmethod exits ((room room))
+  (let (result)
+    (loop for dir in +directions+
+	 nconc (alexandria:when-let ((exit (exit room dir)))
+				       (list exit)))))
+	    
+(defmethod exit ((room room) direction)
+  (let ((dir-num (position direction +directions+)))
+    (unless dir-num
+      (error "~s is not a valid direction" direction))
+    
+    (if (oneliner ((pointer room) dir-num) (:pointer-void :int) :bool
+		  "((Room*)#0)->dir_option[#1] == NULL")
+	nil
+	(make-instance 'exit
+		       :room room
+		       :direction direction))))
+
+(defmethod exit-from ((exit exit))
+  (slot-value exit 'room))
+
+(defmethod exit-to ((exit exit))
+  (with-slots (room direction) exit
+    (room
+     (oneliner ((pointer room) (position direction +directions+))
+	       (:pointer-void :int)
+	       :int
+	       "((Room*)#0)->dir_option[#1]->to_room->number"))))
+
+(defmethod print-object ((exit exit) s)
+  (format s "#<exit ~s to room ~d, ~a>"
+	  (direction exit)
+	  (vnum (exit-to exit))
+	  (title (exit-to exit))))

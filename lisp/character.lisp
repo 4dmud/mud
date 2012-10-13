@@ -1,5 +1,5 @@
-(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
-
+;;(ffi:clines #.(format nil "#include \"~a\"" (asdf:system-relative-pathname :4d-lisp "../lisp-internal.h")))
+(ffi:clines "#include \"../lisp-internal.h\"")
 (defpackage :4d
   (:use :cl)
   (:shadow room))
@@ -236,3 +236,15 @@
        
 (defmethod contents ((mobile mobile))
   (inventory mobile))
+
+(defun force (character command)
+  (4d-internal::command-interpeter (pointer character) command))
+
+(defmethod afk-message ((player player))
+  (oneliner ((pointer player)) (:pointer-void) :cstring "AFK_MSG ( (Character*)#0 )"))
+
+(defmethod set-afk-message ((player player) message)
+  (ffi:c-inline ((pointer player) message) (:pointer-void :cstring) :cstring
+		"AFK_MSG ((Character *)#0)=strdup(#1);"))
+
+(defsetf afk-message set-afk-message)
