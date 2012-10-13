@@ -1103,7 +1103,7 @@ void command_interpreter ( Character *ch, char *argument )
 		return;
 
 	if ( argument && *argument )
-		strcpy ( last_command, argument );
+	        strncpy ( last_command, argument, MAX_STRING_LENGTH-1);
 	else
 		strcpy ( last_command, "none" );
 
