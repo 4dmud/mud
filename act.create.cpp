@@ -701,6 +701,12 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	   tree_names[GET_OBJ_VAL(o, 2)], o->short_description);
 	act("$n sings a focus staff from $p!", FALSE, ch, o, 0, TO_ROOM);*/
 	v0 = GET_OBJ_VAL ( o, 0 );
+
+       /* V1 is critical to this formula, and yet there's no fucking documentation on it. Let's fix that.
+     
+	Went through 5 files searching what value 1 is of the object from make_focus is through thing_singwood but then I got lazy. If someone else catches this, please
+	look into it and let me know if you find anything. - Once
+       */
 	v1 = MIN ( GET_OBJ_VAL ( o, 1 ), 8 );
 	v2 = MIN ( GET_OBJ_VAL ( o, 2 ), 8 );
 	v3 = GET_OBJ_VAL ( o, 3 );
@@ -751,7 +757,7 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	GET_OBJ_COST ( final_focus ) = GET_LEVEL ( ch ) * 500;
 	GET_OBJ_WEIGHT ( final_focus ) = 3;
 
-	GET_OBJ_RENT ( final_focus ) = number(100+(v1*number(7,10)), 240+(MIN(REMORTS(ch)/2, 50)));
+	GET_OBJ_RENT ( final_focus ) = number(120+(v1*number(7,10)), 240+(MIN(REMORTS(ch)/2, 50)));
 
         if (v2 == 0)
         SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ELEC_FOCUS);
