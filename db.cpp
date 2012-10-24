@@ -5681,7 +5681,7 @@ Descriptor *next;
                                   r->character->Send( "A new artifact sends ripples across the %s Era. ",  dimension_types[zone_table[GET_ROOM_ZONE(world_vnum[location])].dimension]);
             //                      if ((GET_DETECTOR(r->character) == 1) && (TRADEPOINTS(r->character) >= 100))  {
      	//Commenting out TP Cost to Arti Detector for Now	 TRADEPOINTS(r->character) -= 100;
-                                  r->character->Send( "[%s]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name, TRADEPOINTS(r->character));
+                                  r->character->Send( "[%s]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name);
 //           }
 				  r->character->Send( "\r\n");
 
