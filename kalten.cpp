@@ -611,6 +611,8 @@ int check_dam_affects ( Character *ch )
 	}
 	if ( !MOB_FLAGGED ( ch, MOB_NOPOISON ) )
 	{
+
+		if (!AFF_FLAGGED( ch, AFF_POISON_PAUSE)) {
 		if ( AFF_FLAGGED ( ch, AFF_POISON_1 ) )
 		{
 			if ( damage ( ch, ch, FTOI ( 20 + ( GET_MAX_HIT ( ch ) * 0.0001 ) ), SPELL_POISON ) == -1 )
@@ -650,7 +652,7 @@ int check_dam_affects ( Character *ch )
 
 			alter_mana ( ch, MIN(GET_MANA(ch)/8, FTOI ( ( GET_MAX_MANA ( ch ) /6.0 ) +2 ) ));
 			alter_move ( ch, MIN(GET_MOVE(ch)/8,FTOI ( ( GET_MAX_MOVE ( ch ) /6.0 ) +2 ) ));
-
+                  }
 		}
 	}
 
