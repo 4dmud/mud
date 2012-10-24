@@ -617,8 +617,8 @@ int check_dam_affects ( Character *ch )
 			{
 				return -1;
 			}
-			alter_mana ( ch, FTOI ( GET_MANA ( ch ) /25.0 ) );
-			alter_move ( ch, FTOI ( GET_MOVE ( ch ) /25.0 ) );
+			alter_mana ( ch, MIN(GET_MANA(ch)/20, FTOI ( GET_MAX_MANA ( ch ) /25.0 ) ));
+			alter_move ( ch, MIN(GET_MOVE(ch)/20, FTOI ( GET_MAX_MOVE ( ch ) /25.0 ) ));
 
 		}
 
@@ -629,8 +629,8 @@ int check_dam_affects ( Character *ch )
 			{
 				return -1;
 			}
-			alter_mana ( ch, FTOI ( GET_MANA ( ch ) /16.0 ) );
-			alter_move ( ch, FTOI ( GET_MOVE ( ch ) /16.0 ) );
+			alter_mana ( ch, MIN(GET_MANA(ch)/15, FTOI ( GET_MAX_MANA ( ch ) /16.0 ) ));
+			alter_move ( ch, MIN(GET_MOVE(ch)/15,  FTOI ( GET_MAX_MOVE ( ch ) /16.0 ) ));
 		}
 
 		if ( AFF_FLAGGED ( ch, AFF_POISON_3 ) )
@@ -638,8 +638,8 @@ int check_dam_affects ( Character *ch )
 			if ( damage ( ch, ch, FTOI ( 150 + ( GET_MAX_HIT ( ch ) * 0.0003 ) ), SPELL_POISON ) == -1 )
 				return -1;
 
-			alter_mana ( ch, FTOI ( GET_MANA ( ch ) /8.0 ) );
-			alter_move ( ch, FTOI ( GET_MOVE ( ch ) /8.0 ) );
+			alter_mana ( ch, MIN(GET_MANA(ch)/10,  FTOI ( GET_MAX_MANA ( ch ) /8.0 ) ));
+			alter_move ( ch, MIN(GET_MOVE(ch)/10, FTOI ( GET_MAX_MOVE ( ch ) /8.0 ) ));
 
 		}
 
@@ -648,8 +648,8 @@ int check_dam_affects ( Character *ch )
 			if ( damage ( ch, ch, FTOI ( 200 + (GET_MAX_HIT ( ch ) * 0.0004 ) ), SPELL_POISON ) == -1 )
 				return -1;
 
-			alter_mana ( ch, FTOI ( ( GET_MANA ( ch ) /6.0 ) +2 ) );
-			alter_move ( ch, FTOI ( ( GET_MOVE ( ch ) /6.0 ) +2 ) );
+			alter_mana ( ch, MIN(GET_MANA(ch)/8, FTOI ( ( GET_MAX_MANA ( ch ) /6.0 ) +2 ) ));
+			alter_move ( ch, MIN(GET_MOVE(ch)/8,FTOI ( ( GET_MAX_MOVE ( ch ) /6.0 ) +2 ) ));
 
 		}
 	}
