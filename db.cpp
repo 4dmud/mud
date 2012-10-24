@@ -5679,10 +5679,10 @@ Descriptor *next;
                                   if (!r->connected && r->character &&
                                   !PLR_FLAGGED(r->character, PLR_WRITING) && obj_index[object].qic) {
                                   r->character->Send( "A new artifact sends ripples across the %s Era. ",  dimension_types[zone_table[GET_ROOM_ZONE(world_vnum[location])].dimension]);
-                                  if ((GET_DETECTOR(r->character) == 1) && (TRADEPOINTS(r->character) >= 100))  {
-     				  TRADEPOINTS(r->character) -= 100;
-                                  r->character->Send( "[%s] [%d TP Left]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name, TRADEPOINTS(r->character));
-           }
+            //                      if ((GET_DETECTOR(r->character) == 1) && (TRADEPOINTS(r->character) >= 100))  {
+     	//Commenting out TP Cost to Arti Detector for Now	 TRADEPOINTS(r->character) -= 100;
+                                  r->character->Send( "[%s]", zone_table[GET_ROOM_ZONE(world_vnum[location])].name, TRADEPOINTS(r->character));
+//           }
 				  r->character->Send( "\r\n");
 
       }
