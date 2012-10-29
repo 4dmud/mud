@@ -2361,6 +2361,13 @@ ASKILL ( skill_push )
 			*ch << "You can't push anybody while they are lying on the ground";
 			return 0;
 		}
+
+		if (GET_ROOM_VNUM(IN_ROOM(victim)) == 3001)
+		{
+			ch->Send ( "You can't push in recall!\r\n");
+			return 0;
+		}
+
 		if ( GET_POS ( victim ) == POS_FIGHTING )
 		{
 			ch->Send ( "No! You can't push %s while fighting!\r\n", HSSH ( ch ) );
