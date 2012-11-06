@@ -3423,7 +3423,13 @@ void send_to_all(const char *messg, ...) {
     }
 }
 
+void send_to_mortals(const char *messg, ...) {
+	//Descriptor *1;
+	//va_list args;
 
+	// This doesn't do anything yet. 
+	// Todo by Prometheus
+}
 
 
 void send_to_outdoor(const char *messg, ...) {

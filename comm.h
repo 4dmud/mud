@@ -15,6 +15,7 @@
 size_t new_send_to_char ( Character *ch, const char *messg, ... ) __attribute__ ( ( format ( printf, 2, 3 ) ) );
 size_t send_to_fusion ( Character *ch, const char *messg, ... ) __attribute__ ( ( format ( printf, 2, 3 ) ) );
 void	send_to_all ( const char *messg, ... ) __attribute__ ( ( format ( printf, 1, 2 ) ) );
+void	send_to_mortals ( const char *messg, ... ) __attribute__ ( ( format ( printf, 1, 2 ) ) );
 void	send_to_arena ( const char *messg, ... ) __attribute__ ( ( format ( printf, 1, 2 ) ) );
 void send_to_char ( const char *messg, Character *ch );
 void	send_to_range ( room_vnum start, room_vnum finish, const char *messg, ... ) __attribute__ ( ( format ( printf, 3, 4 ) ) );
