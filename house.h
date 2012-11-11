@@ -1,5 +1,5 @@
 #define MAX_HOUSES	100
-// this is going to get changed soon from 10 to x by Once or Prom
+// this is going to get changed soon from 10 to something by Once or Prom
 //Prom
 #define MAX_GUESTS	10
 
