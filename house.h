@@ -1,4 +1,6 @@
 #define MAX_HOUSES	100
+// this is going to get changed soon from 10 to x by Once or Prom
+//Prom
 #define MAX_GUESTS	10
 
 #define HOUSE_PRIVATE	0
