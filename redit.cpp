@@ -567,7 +567,7 @@ void redit_disp_menu(Descriptor *d)
                   "%sH%s) Smell        :\r\n%s%s"
                   "%sI%s) Listen       :\r\n%s%s"
                   "%sJ%s) Mine         : %sNum: %d Level: %d Tool: %s\r\n"
-                  "%sR%s) Descriptions : Quests flagged - %s%s\r\n"
+//                "%sR%s) Descriptions : Quests flagged - %s%s\r\n"
 
                   /*---end-------------------------------------*/
                   "%sS%s) Script       : %s%s\r\n"
@@ -619,7 +619,7 @@ void redit_disp_menu(Descriptor *d)
                   grn, nrm, cyn, room->smell,/* smell */
                   grn, nrm, cyn, room->listen,/* listen */
                   grn, nrm, cyn, room->mine.num, room->mine.dif, room->mine.num == -1 ? "None" : room->mine.tool == TOOL_SHOVEL ? "Shovel" : "Pickaxe",
-                  grn, nrm, yel, room->q_description ? "SET" : "NOT SET",
+//                grn, nrm, yel, room->q_description ? "SET" : "NOT SET",
                   grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
 //                  grn, nrm,/*delete*/
                   grn, nrm /*quit*/
@@ -848,6 +848,7 @@ void redit_parse(Descriptor *d, char *arg)
       d->Output( "Room deleting is disabled!\r\n");
       redit_disp_menu(d);
       break;
+      /*
     case 'r':
     case 'R':
 // Quest room descriptions 
@@ -861,6 +862,7 @@ void redit_parse(Descriptor *d, char *arg)
       OLC_QDESC(d) = OLC_ROOM(d)->q_description;
       redit_disp_questdesc_menu(d);
       break;
+      */
     case 's':
     case 'S':
       OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
