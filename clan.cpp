@@ -536,12 +536,42 @@ void do_clan_retire (Character *ch, char *arg)
 
 }
 
+struct no_such_clan : exception{};
+
+void remove_from_clan (Character *ch) {
+  int clan_num;
+  if ((clan_num = find_clan_by_id(GET_CLAN(ch))) < 0) {
+    throw no_such_clan();
+  }
+
+  clan[clan_num].members--;
+  clan[clan_num].power -= GET_LEVEL ( ch );
+  remove_clan_member ( GET_NAME ( ch ), clan_num );
+  GET_CLAN ( ch ) = 0;
+  GET_CLAN_RANK ( ch ) = 0;
+  REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_RETIRED);
+
+  ch->save();
+}
+
+void make_outcast (Character *ch) {
+  struct affected_type af;
+
+  af.type = SPELL_RESERVE;
+  af.expire = 60*24*14;  // two RL weeks 
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = AFF_OUTCAST;
+  affect_to_char(ch, &af);
+
+  ch->save();
+}
+
 void do_clan_leave (Character *ch, char *arg)
 {
   struct obj_data *obj;
   bool found = FALSE;
   int clan_num;
-  struct affected_type af;
 
   if (!*arg || str_cmp(arg, "yes")) {
       ch->Send("You must type <clan leave yes> to confirm you want to leave.\r\n");
@@ -565,20 +595,9 @@ void do_clan_leave (Character *ch, char *arg)
       return;
   }
 
-  clan[clan_num].members--;
-  clan[clan_num].power -= GET_LEVEL ( ch );
-  remove_clan_member ( GET_NAME ( ch ), clan_num );
-  GET_CLAN ( ch ) = 0;
-  GET_CLAN_RANK ( ch ) = 0;
-  REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_RETIRED);
+  remove_from_clan(ch);
+  make_outcast(ch);
 
-  af.type = SPELL_RESERVE;
-  af.expire = 60*24*14;  // two RL weeks 
-  af.modifier = 0;
-  af.location = APPLY_NONE;
-  af.bitvector = AFF_OUTCAST;
-  affect_to_char(ch, &af);
-  ch->save();
   ch->Send("You have now left the clan!\r\n");
 
 }
@@ -588,7 +607,6 @@ void do_clan_expel ( Character *ch, char *arg, int type )
   Descriptor *d = NULL;
   int clan_num = 0;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-  struct affected_type af;
 
   two_arguments(arg, buf, buf2);
 
@@ -657,20 +675,13 @@ void do_clan_expel ( Character *ch, char *arg, int type )
           ch->Send("Format: clan expel <player name> <outcast/noflag>\r\n");
           return;
       }
-      clan[clan_num].members--;
-      clan[clan_num].power -= GET_LEVEL ( vict );
-      remove_clan_member ( GET_NAME ( vict ), clan_num );
-      GET_CLAN ( vict ) = 0;
-      GET_CLAN_RANK ( vict ) = 0;
+
+      remove_from_clan(vict);
+
       if (!str_cmp(buf2, "outcast")) {
-          af.type = SPELL_OUTCAST;
-          af.expire = 10;  // two RL weeks 
-          af.modifier = 0;
-          af.location = APPLY_NONE;
-          af.bitvector = AFF_OUTCAST;
-          SET_BIT_AR(AFF_FLAGS(vict), AFF_OUTCAST);
-          affect_to_char(vict, &af);
+	make_outcast(vict);
       }
+
       act("You have kicked $N out of your clan!", FALSE, ch, 0, vict, TO_CHAR);
       if (d)
           vict->Send("You've been kicked out of your clan!\r\n");
