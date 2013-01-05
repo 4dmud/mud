@@ -532,7 +532,7 @@ const command_info cmd_info[] =
 	{ "cast"     , "c"    , POS_SITTING , do_cast     , 1, 0, 0 },
 	{ "calender"     , "cal"    , POS_DEAD , do_calender     , 1, 0, 0 },
 	{ "cedit"    , "cedit"   , POS_DEAD    , do_oasis    , LVL_SEN, SCMD_OASIS_CEDIT, WIZ_IMPL_GRP },
-	{ "chaos"    , "chaos", POS_DEAD    , do_chaos    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
+	{ "chaos"    , "chaos", POS_DEAD    , do_chaos    , 1, 0, 0 },
 	{ "check"    , "che"   , POS_STANDING, do_not_here , 1, 0, 0 },
         { "check sky", "check" , POS_STANDING, do_check_sky, 1, 0, 0 },
 	{ "changes"  , "cha"   , POS_DEAD, do_changes , 1, 0, 0 },

@@ -526,6 +526,7 @@ void set_skill ( Character *ch, int skill, int amount );
 #define PRF_FLAGGED(ch, flag) (IS_SET_AR(PRF_FLAGS(ch), (flag)))
 #define CMD_FLAGGED(ch, flag) (IS_SET(CMD_FLAGS(ch), (flag)))
 #define CMD_FLAGGED2(ch, flag) (IS_SET(CMD_FLAGS2(ch), (flag)))
+#define WIZ_TRUSTED(ch, flag) (CMD_FLAGGED(ch,flag) || CMD_FLAGGED2(ch,flag))
 #define ROOM_FLAGGED(loc, flag) (IS_SET_AR(ROOM_FLAGS(loc), (flag)))
 #define ZONE_FLAGGED(loc, flag) (IS_SET(ZONE_FLAGS(loc), (flag)))
 #define SECTOR(loc) ((loc)->sector_type)

@@ -196,6 +196,14 @@ ACMD ( do_chaos )
 
 	/* Usage: chaos lo hi start_delay cost/lev length */
 
+	if (!(GET_LEVEL(ch) == LVL_IMPL)
+	    && !(GET_LEVEL(ch) >= LVL_IMMORT && WIZ_TRUSTED(ch, WIZ_IMM2_GRP))
+	    && !PLR_FLAGGED(ch, PLR_HERO)) {
+	  ch->Send ( "Only heroes and immortals can do this.\r\n");
+	  return;
+	}
+	  
+
 	if ( in_arena != ARENA_OFF )
 	{
 		ch->Send ( "There is an arena running already.\r\n" );
