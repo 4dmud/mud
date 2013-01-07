@@ -5622,8 +5622,14 @@ int perform_set ( Character *ch, Character *vict, int mode,
             i = 9;
         else if (isname(val_arg, "Galliano"))
             i = 10;
+	else if (isname(val_arg, "Savages"))
+	    i = 11;
         else if (!strcmp(val_arg, "none"))
             i = 0;
+	else {
+	  ch->Send ( "There is no group with that name.\r\n" );
+	  return 0;
+	}
         GET_RP_GROUP(vict) = i;
         break;
     case 74:

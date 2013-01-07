@@ -407,6 +407,7 @@ const char *rp_group_names[] =
         "{cWAlderisio{c0",
         "{cWFearless{c0",
         "{cLGalliano{c0",
+	"{cRS{cra{cRv{cra{cRg{cre{cRs{c0",
 	"\n"
 };
 /* (Note: strings for class definitions in class.c instead of here) */
