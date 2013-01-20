@@ -28,7 +28,9 @@ ACMD(do_string)
     return;
   }
 
-  if (!(obj = get_obj_vis(ch, buf, NULL)))
+  
+
+  if (!(obj = get_obj_in_list_vis(ch, buf, NULL,ch->carrying)))
   {
     send_to_char("No such object around.\r\n", ch);
     return;
