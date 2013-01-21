@@ -1478,6 +1478,27 @@ void resume_timer(struct obj_data* object) {
   }
 }
 
+inline Room* artifact_room(struct obj_data* object) {
+  Room* room = IN_ROOM(object);
+  if (!room)
+    room = IN_ROOM(object->in_obj);
+
+  return room;
+}
+
+void artifact_to_artisave(struct obj_data* object) {
+  // save that artifact and make sure the timer doesn't run
+  pause_timer(object);
+  save_artifacts(artifact_room(object));
+}
+
+void artifact_from_artisave(struct obj_data* object) {
+  //remove from save list and make timer run again
+  resume_timer(object);
+  save_artifacts(artifact_room(object));
+}
+
+
 /* put an object in a room */
 void obj_to_room ( struct obj_data *object, room_rnum room )
 {
@@ -1499,15 +1520,10 @@ void obj_to_room ( struct obj_data *object, room_rnum room )
 			             room->name );
 		}
 
-		if ( IS_OBJ_STAT ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
-		  // save that artifact and make sure the timer doesn't run
-		  pause_timer(object);
-		  save_artifacts(IN_ROOM(object));
-		}
-
+		if ( IS_OBJ_STAT ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
+		  artifact_to_artisave(object);
 	}
 }
-
 
 /* Take an object from a room */
 void obj_from_room ( struct obj_data *object )
@@ -1538,11 +1554,8 @@ void obj_from_room ( struct obj_data *object )
 	if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[GET_OBJ_RNUM ( object ) ].qic )
 		new_mudlog ( CMP, LVL_SEN, TRUE, "%s from room %s.", object->short_description, IN_ROOM ( object )->name );
 
-	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE)) {
-	  //remove from save list and make timer run again
-	  resume_timer(object);
-	  save_artifacts(IN_ROOM(object));
-	}
+	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
+	  artifact_from_artisave(object);
 
 	IN_ROOM ( object ) = NULL;
 	object->next_content = NULL;
@@ -1573,6 +1586,10 @@ void obj_to_obj ( struct obj_data *obj, struct obj_data *obj_to )
 	GET_OBJ_WEIGHT ( tmp_obj ) += GET_OBJ_WEIGHT ( obj );
 	if ( tmp_obj->carried_by )
 		IS_CARRYING_W ( tmp_obj->carried_by ) += GET_OBJ_WEIGHT ( obj );
+
+	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
+	  artifact_to_artisave(obj);
+
 }
 
 
@@ -1602,6 +1619,10 @@ int obj_from_obj ( struct obj_data *obj )
 
 	if ( IN_ROOM ( obj ) != NULL && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
 		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+
+
+	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
+	  artifact_from_artisave(obj);
 
 	obj->in_obj = NULL;
 	obj->next_content = NULL;

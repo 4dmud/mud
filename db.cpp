@@ -8383,6 +8383,7 @@ mob_vnum DeleteMobIndex ( mob_vnum vn )
 	return NOBODY;
 }
 
+int load_objects_to_room(room_rnum rnum, FILE *fl);
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate);
 void load_artifact_file (char* name) {
   room_vnum vnum = atol(name);
@@ -8394,14 +8395,15 @@ void load_artifact_file (char* name) {
   log ("Loading artifacts for room %s", room->name);
   FILE* fd = fopen(name, "r");
 
-  
+  load_objects_to_room(room,fd);
+  /*  
   struct obj_data *obj = NULL;
   int location;
   while ((obj = read_one_item(fd, obj, &location))) {
     obj_to_room(obj,room);
     obj = NULL;
   }
-
+  */
   fclose(fd);
   log ("Done reading artifact file %s", name);
 }
@@ -8435,20 +8437,36 @@ void load_saved_artifacts () {
 }
 
 int save_one_item( OBJ_DATA *obj,FILE *fl, int locate);
+
+void save_artifacts (FILE* fd,struct obj_data *container) {
+  for (struct obj_data *obj = container->contains;obj;obj = obj->next_content)
+    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT))
+      save_one_item(obj, fd, -1);
+}
+
+
 void save_artifacts (Room* room) {
   if (!ROOM_FLAGGED(room, ROOM_ARTISAVE))
+    return;
+
+  if(!boot_time)
     return;
 
   char cwd[1024];
   getcwd(cwd, sizeof(cwd));
   chdir(ARTI_DIR);
 
-  char filename[10]; //hopefully no room will be created with an 11-digit zone num..
+  char filename[20]; //hopefully no room will be created with an 15-digit zone num..
   snprintf(filename, sizeof(filename), "%d.arti", room->number);
   FILE* fd = fopen(filename, "w");
-  for (struct obj_data *obj = room->contents;obj;obj = obj->next_content)
-    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT))
-      save_one_item(obj, fd, room->number);
+  for (struct obj_data *obj = room->contents;obj;obj = obj->next_content) {
+    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT)) {
+      if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
+	save_artifacts(fd, obj);
+      
+      save_one_item(obj, fd, 0);
+    }
+  }
   
   fclose(fd);
   chdir(cwd);
