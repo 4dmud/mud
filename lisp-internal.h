@@ -34,3 +34,4 @@ extern struct index_data **trig_index;
 extern unsigned int top_of_trigt;
 
 extern obj_rnum top_of_objt;
+extern PlayerIndex pi;
