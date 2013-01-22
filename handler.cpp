@@ -1554,7 +1554,7 @@ void obj_from_room ( struct obj_data *object )
 	if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[GET_OBJ_RNUM ( object ) ].qic )
 		new_mudlog ( CMP, LVL_SEN, TRUE, "%s from room %s.", object->short_description, IN_ROOM ( object )->name );
 
-	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
+	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && IN_ROOM(object) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
 	  artifact_from_artisave(object);
 
 	IN_ROOM ( object ) = NULL;
@@ -1621,7 +1621,7 @@ int obj_from_obj ( struct obj_data *obj )
 		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
 
 
-	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
+	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
 	  artifact_from_artisave(obj);
 
 	obj->in_obj = NULL;
