@@ -1286,7 +1286,7 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 	else
 	{
 
-		if ( affected_by_spell ( ch, SKILL_SNARE ) && GET_SKILL(ch, SKILL_SNARE) > 5)
+		if ( affected_by_spell ( ch, SKILL_SNARE ))
 		{
                         for (af = ch->affected; af; af = af->next) 
                             if (af->type == SKILL_SNARE) break;
