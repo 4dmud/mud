@@ -451,18 +451,20 @@ ACMD ( do_flee )
 	void halt_fighting ( Character *ch );
         struct affected_type *af;
 
+	WAIT_STATE(ch, 1 RL_SEC);
+
 	if ( affected_by_spell ( ch, SKILL_SNARE ) )
 	{
-	// Horus code fix. I will see if I can
-	// find my old code fix I had
-	//Prometheus
-            for (af = ch->affected; af; af = af->next)
-              if (af->type == SKILL_SNARE) break;
 
-	    i = total_chance(ch, SKILL_TRAP_AWARE) - af->modifier + GET_LEVEL(ch);
-	    if(GET_SKILL (ch, SKILL_TRAP_AWARE) < 5 || (number(1, 110) > i  && number(1,100) < 95)) {
-		ch->Send ( "You have been snared and can't flee.\r\n" );
-		return;
+        	for (af = ch->affected; af; af = af->next)
+                	if (af->type == SKILL_SNARE) break;
+
+		i = total_chance(ch, SKILL_TRAP_AWARE) - af->modifier + GET_LEVEL(ch);
+	    	if(total_chance(ch, SKILL_TRAP_AWARE) < 5 && (number(1,100) > i)) 
+                {
+			ch->Send ( "You have been snared and can't flee.\r\n" );
+			WAIT_STATE(ch, 1 RL_SEC);
+                	return;
 		}
 	}
 
@@ -473,7 +475,6 @@ ACMD ( do_flee )
 	}
 	if ( !number ( 0, 4 ) && IS_NPC ( ch ) )
 		return;
-
 	for ( i = 0; i < 6; i++ )
 	{
 		attempt = number ( 0, NUM_OF_DIRS - 1 ); /* Select a random direction */
@@ -483,28 +484,39 @@ ACMD ( do_flee )
 			act ( "$n panics, and attempts to flee!", TRUE, ch, 0, 0,  TO_ROOM );
 			was_fighting = FIGHTING ( ch );
 
-			if ( do_simple_move ( ch, attempt, TRUE ) )
+                        if ( do_simple_move ( ch, attempt, TRUE ) )
 			{
-				if ( was_fighting && !DEAD ( was_fighting ) )
-				{
-					stop_fighting ( was_fighting );
-				}
 				stop_fighting ( ch );
 
+				if (IS_AFFECTED(ch, AFF_SNARE))
+                        	{
+                                	ch->Send("You break free from your snare!\r\n");
+                                	affect_from_char(ch, SKILL_SNARE);
+					WAIT_STATE(ch, 1 RL_SEC);
+					return;
+                        	}
 
-				ch->Send ( "You flee head over heels.\r\n" );
-				// Added per Horus
-				if (IS_AFFECTED(ch, AFF_SNARE)) {
-				affect_from_char(ch, SKILL_SNARE);
-				ch->Send("You break free from your snare!\r\n");
-				}
-				if ( was_fighting && !DEAD ( was_fighting ) && !IS_NPC ( ch ) && IS_NPC ( was_fighting ) &&
-				        ! ( GET_LEVEL ( ch ) <= 20 && REMORTS ( ch ) == 0 ) )
+
+		        	else if ( was_fighting && !DEAD ( was_fighting ) )
 				{
-					loss = FTOI ( IRANGE ( 0, GET_EXP ( was_fighting ) * 0.15, CONFIG_MAX_EXP_LOSS * 5 ) );
-					ch->Send ( "[You lose %d exp]\r\n", loss );
-					gain_exp ( ch, -loss );
+					stop_fighting ( was_fighting );
+					ch->Send ( "You flee head over heels.\r\n" );
+
+					 if (!IS_NPC ( ch )
+                                              && IS_NPC ( was_fighting )
+                                              && ! ( GET_LEVEL ( ch ) <= 20
+                                              	    && REMORTS ( ch ) == 0 ) )
+                                	{
+                                       		loss = FTOI ( IRANGE ( 0, GET_EXP ( was_fighting ) * 0.15, CONFIG_MAX_EXP_LOSS * 5 ) );
+                                        	ch->Send ( "[You lose %d exp]\r\n", loss );
+                                        	gain_exp ( ch, -loss );
+                                        }
+					 stop_fighting ( was_fighting );
+					
+					WAIT_STATE(ch, 1 RL_SEC);
+					return;
 				}
+
 			}
 			else
 			{

@@ -4077,7 +4077,8 @@ void perform_mortal_where ( Character *ch, char *arg )
                                 continue;
                         found = -1;
                         for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-                                if ( !strcmp(zone_table[real_zone(cl->zone)].name, zone_table[IN_ROOM ( ch )->zone].name ) )
+                               // if ( !strcmp(zone_table[real_zone(cl->zone)].name, zone_table[IN_ROOM ( ch )->zone].name ) )
+                                if ((real_zone(cl->zone) == IN_ROOM ( ch )->zone))
                                         found = clan_num;
                                 continue;
                         }

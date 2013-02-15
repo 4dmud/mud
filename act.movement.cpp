@@ -1290,7 +1290,7 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 		{
                         for (af = ch->affected; af; af = af->next) 
                             if (af->type == SKILL_SNARE) break;
-                        chance = GET_LEVEL(ch) - af->modifier + total_chance(ch, SKILL_TRAP_AWARE);
+                        chance = GET_LEVEL(ch) - af->modifier - 10 + total_chance(ch, SKILL_TRAP_AWARE);
 			ch->Send ( "You struggle " );
 			if ( number ( 1, 110 ) < chance || number(1, 100) < 6 )
 			{

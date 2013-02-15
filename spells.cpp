@@ -130,7 +130,7 @@ ASPELL(spell_midas_touch) {
     // Chaning number(1,201) -> number 1,181) --> Prom
     if ((!IS_NPC(ch) && (number(1, 201) < total_chance(ch, SPELL_MIDAS_TOUCH)))) {
         af.type = SPELL_MIDAS_TOUCH;
-        af.expire = HOURS_TO_EXPIRE( 1 + ((GET_LEVEL(ch)) / 8));
+        af.expire = HOURS_TO_EXPIRE( 1 );//Changed to 1  for shorter duration
         af.modifier = -200;
         af.location = APPLY_SPEED;
         af.bitvector = AFF_HOLD;
