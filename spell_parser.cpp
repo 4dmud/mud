@@ -1936,7 +1936,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_MIDAS_TOUCH, "midas touch", 150 ,
 	         100 , 10, POS_FIGHTING, TAR_CHAR_ROOM| TAR_FIGHT_VICT| TAR_NOT_SELF,
-	         FALSE, MAG_MANUAL, 30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0, "" );
+	         FALSE, MAG_MANUAL, 75, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 4, 0, "" );
 
 
 	spello ( SPELL_GROUP_HEAL, "group heal", 80 , 40 , 5,

@@ -128,7 +128,8 @@ ASPELL(spell_midas_touch) {
     /* charmed mobs not allowed to do this */
     // Going to be tweaking this spell chance some
     // Chaning number(1,201) -> number 1,181) --> Prom
-    if ((!IS_NPC(ch) && (number(1, 201) < total_chance(ch, SPELL_MIDAS_TOUCH)))) {
+    // Increased chance due to lower timer and affect time --> Xer
+    if ((!IS_NPC(ch) && (number(1, 125) < total_chance(ch, SPELL_MIDAS_TOUCH)))) {
         af.type = SPELL_MIDAS_TOUCH;
         af.expire = HOURS_TO_EXPIRE( 1 );//Changed to 1  for shorter duration
         af.modifier = -200;
