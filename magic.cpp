@@ -1460,6 +1460,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			accum_duration =FALSE;
 			to_vict = "You gag and start clawing at the air around your neck.";
 			to_room = "$n gags and starts clawing at the air around $s neck.";
+			start_fighting (victim, ch);
 			break;
 		case SPELL_CORRUPT_ARMOR:
 			af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
