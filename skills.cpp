@@ -1307,7 +1307,7 @@ ASKILL ( skill_disarm )
 		yesno = 1;
 	}
 	start_fighting ( vict, ch );
-	GET_WAIT_STATE ( ch ) += ( 3 RL_SEC );
+	GET_WAIT_STATE ( ch ) += ( 1 RL_SEC );
 	return ( yesno ? SKILL_DISARM : 0 );
 }
 
