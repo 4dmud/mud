@@ -949,6 +949,7 @@ ASKILL ( skill_sneak )
 		affect_from_char ( ch, SKILL_SNEAK );
 		*ch << "Okay, you stop sneaking.\r\n";
 	}
+
 	else
 	{
 		if ( use_stamina ( ch, 10 ) < 0 )
