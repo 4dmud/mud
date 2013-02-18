@@ -1021,6 +1021,14 @@ ACMD(do_comm) {
     struct comm_data * com;
     int i;
     skip_spaces(&argument);
+
+        if (is_abbrev(argument, "wiznet") && 
+	(PLR_FLAGGED (ch, PLR_HERO) ||GET_LEVEL(ch) < LVL_HERO))
+			{
+		ch->Send("Sorry but you are not immortal enough!");
+		return;
+		}
+
     if (IS_NPC(ch)) {
         ch->Send( "Not mobs sorry!");
         return;

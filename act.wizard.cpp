@@ -413,6 +413,7 @@ obj_data* find_corpse(Character* ch);
 int automeld ( OBJ_DATA *corpse );
 void restore_all_corpses();
 /* local functions */
+void add_to_comm(const char *type, const char *text);
 int spell_price ( struct obj_data *obj, int val );
 void show_door_errors ( Character *ch );
 C_FUNC ( delete_player );
@@ -3840,7 +3841,8 @@ ACMD ( do_wiznet )
 	delete_doubledollar ( argument );
 
 // Removed the hero ability of hearing wiznet - Prometheus
-	if ( PLR_FLAGGED ( ch,PLR_IMM_MORT ) || ( ( GET_LEVEL ( ch ) > LVL_HERO || GET_ORIG_LEV ( ch ) > LVL_HERO ) && ( CMD_FLAGGED ( ch, WIZ_IMM1_GRP ) || CMD_FLAGGED2 ( ch, WIZ_IMM1_GRP ) ) ) )
+	if ( PLR_FLAGGED ( ch,PLR_IMM_MORT ) || ( ( GET_LEVEL ( ch ) > LVL_HERO || GET_ORIG_LEV ( ch ) > LVL_HERO )
+	     && ( CMD_FLAGGED ( ch, WIZ_IMM1_GRP ) || CMD_FLAGGED2 ( ch, WIZ_IMM1_GRP ) ) ) )
 	{
 		if ( !*argument )
 		{
@@ -3955,6 +3957,10 @@ ACMD ( do_wiznet )
 			           argument );
 			snprintf ( buf2, sizeof ( buf2 ), "Someone: %s%s\r\n", emote ? "<--- " : "", argument );
 		}
+
+    snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), "wiznet", argument, KNRM);
+    //comlog("%s", buf1);
+    add_to_comm( "wiznet", buf1);
 
 		for ( d = descriptor_list; d; d = d->next )
 		{
