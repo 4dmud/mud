@@ -899,6 +899,17 @@ void start_fighting ( Character* ch, Character* vict )
 	long vict_id = -1;
 
 	/*to stop recursion*/
+	if ( AFF_FLAGGED ( ch, AFF_SNEAK ))
+        {
+                affect_from_char ( ch, SKILL_SNEAK );
+                *ch << "You come out of concealment and attack!\r\n";
+        }
+	if (AFF_FLAGGED ( vict, AFF_SNEAK))
+	{
+		affect_from_char ( vict, SKILL_SNEAK);
+		*vict <<"You've been spotted!\r\n";
+	}
+
 	if ( !ch || !vict )
 		return;
 #if defined(EXP_GAIN_SYSTEM_1)

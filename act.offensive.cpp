@@ -192,11 +192,6 @@ ACMD ( do_hit )
 					if ( !FIGHTING ( ch ) )
 					{
 						start_fighting ( ch, vict );
-						if ( AFF_FLAGGED ( ch, AFF_SNEAK ) )
-        					{
-                					affect_from_char ( ch, SKILL_SNEAK );
-                					*ch << "You can't sneak in combat!\r\n";
-        					}
 					}
 					else
 					{
@@ -260,11 +255,6 @@ ACMD ( do_hit )
 		send_not_to_spam ( "{cg$n engages in combat with $N.{c0", ch, vict, NULL, 1 );
 		ch->Send ( "You engage in combat with %s!\r\n", GET_NAME ( vict ) );
 		start_fighting ( ch, vict );
-		if ( AFF_FLAGGED ( ch, AFF_SNEAK ) )
-        		{
-                	affect_from_char ( ch, SKILL_SNEAK );
-                	*ch << "You can't sneak in combat! Sorry!\r\n";
-        		}
 	}
 	else
 		ch->Send ( "You do the best you can!\r\n" );
