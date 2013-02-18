@@ -1454,7 +1454,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else
-				af[0].expire = HOURS_TO_EXPIRE ( 3 );
+				af[0].expire = HOURS_TO_EXPIRE ( 2 );
 			af[0].bitvector = AFF_SUFFOCATING;
 
 			accum_duration =FALSE;
