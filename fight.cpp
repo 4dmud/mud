@@ -6800,7 +6800,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 	underwater = IS_IN_WATER ( IN_ROOM ( vict ) );
 	raining = ( sky == SKY_RAINING || sky == SKY_LIGHTNING );
 	sunny = ( sky == SKY_CLOUDLESS && IS_DAY );
-	sky == SKY_LIGHTNING;
+	stormy = sky == SKY_LIGHTNING;
 
 	ch->Send("{cg(");
 	switch ( type )
