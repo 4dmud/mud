@@ -428,8 +428,10 @@ ACMD ( do_convey )
 		// Changed this to fixed value
 		// Since code isn't getting value.
 		//gain_exp ( ch, amount * mob_stats[30].exp );
-		gain_exp (ch, amount * 1100000);
+		int gain = amount * 1100000;
+		gain_exp (ch, gain);
 		TRADEPOINTS ( ch ) -= amount;
+		new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s conveyed %lld tradepoints to %d xp. (%d tradepoints remaining)",  GET_NAME ( ch ), amount, gain, TRADEPOINTS(ch));
 
 	}
 	else

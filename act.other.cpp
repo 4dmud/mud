@@ -283,31 +283,27 @@ ACMD(do_ethos)
    if (!str_cmp(arg1, "good")) {
    ch->Send( "You dream of being a knight in shining armor as you set your ethos as {cWGood{cn.\r\n");
    GET_ETHOS(ch) = 1;
-   TRADEPOINTS(ch) -= ethos_cost;
-   return; 
    }
   
-   if (!str_cmp(arg1, "evil")) {
+   else if (!str_cmp(arg1, "evil")) {
    ch->Send( "You dream of murdering kittens as you set your ethos as {cREvil{cn.\r\n");
    GET_ETHOS(ch) = 3;
-   TRADEPOINTS(ch) -= ethos_cost;
-   return;
    }
-   if (!str_cmp(arg1, "neutral")) {
+   else if (!str_cmp(arg1, "neutral")) {
    ch->Send( "You contemplate existence as you set your ethos as {cBNeutral{cn.\r\n");
    GET_ETHOS(ch) = 2;
-   TRADEPOINTS(ch) -= ethos_cost;
-   return;
    }
-   if (!str_cmp(arg1, "apathy")) {
+   else if (!str_cmp(arg1, "apathy")) {
    ch->Send( "You realize you don't care about ethos...or anything else for that matter.\r\n");
    GET_ETHOS(ch) = 0;
-   TRADEPOINTS(ch) -= ethos_cost;
-   return;
+   }
+   else {
+     ch->Send( "What do you wish to set your Ethos as? Good or Evil?\r\n");
+     return;
    }
 
-   ch->Send( "What do you wish to set your Ethos as? Good or Evil?\r\n");
-   return;
+   TRADEPOINTS(ch) -= ethos_cost;
+   new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to change ethos. (%d remaining)",  GET_NAME ( ch ), ethos_cost, TRADEPOINTS(ch));
 }
 
 ACMD(do_trade)

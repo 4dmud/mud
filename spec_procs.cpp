@@ -340,7 +340,9 @@ SPECIAL(antidt)
           ch->Send("You do not have enough tradepoints for a full protection.\r\n");
           return 1;
         }
-        TRADEPOINTS(ch) -= calc_tp(ch, 0);
+	int tradepoint_loss = calc_tp(ch, 0);
+        TRADEPOINTS(ch) -= tradepoint_loss;
+	new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy full death trap protection. (%d remaining)",  GET_NAME ( ch ), tradepoint_loss, TRADEPOINTS(ch));
 
         SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
         act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
@@ -367,7 +369,9 @@ SPECIAL(antidt)
            return 1;
         }
  
-        TRADEPOINTS(ch) -= calc_tp(ch, 0)/10;
+	int tradepoint_loss = calc_tp(ch, 0)/10;
+        TRADEPOINTS(ch) -= tradepoint_loss;
+	  new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy death trap item protection for object %d, %s. (%d tradepoints remaining)",  GET_NAME ( ch ), tradepoint_loss, GET_OBJ_VNUM(obj), obj->short_description, TRADEPOINTS(ch));
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
         return 1;
