@@ -3959,7 +3959,6 @@ ACMD ( do_wiznet )
 		}
 
     snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), "wiznet", argument, KNRM);
-    //comlog("%s", buf1);
     add_to_comm( "wiznet", buf1);
 
 		for ( d = descriptor_list; d; d = d->next )

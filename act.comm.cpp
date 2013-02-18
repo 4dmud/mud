@@ -819,7 +819,7 @@ ACMD(do_tell) {
         ch->Send( "%s", CONFIG_NOPERSON);
     else if (PRF_FLAGGED(ch, PRF_AFK))
         send_to_char("Impossible...you are afk.\r\n", ch);
-    else if (is_ignoring(vict, ch) && (GET_LEVEL(ch) <= LVL_GOD))
+    else  if (is_ignoring(vict, ch) && (GET_LEVEL(ch) <= LVL_GOD))
         act("$E's ignoring you.", FALSE, ch, 0, vict, TO_CHAR);
     else if (is_tell_ok(ch, vict))
         perform_tell(ch, vict, buf2);
@@ -1022,12 +1022,12 @@ ACMD(do_comm) {
     int i;
     skip_spaces(&argument);
 
-        if (is_abbrev(argument, "wiznet") && 
-	(PLR_FLAGGED (ch, PLR_HERO) ||GET_LEVEL(ch) < LVL_HERO))
-			{
-		ch->Send("Sorry but you are not immortal enough!");
-		return;
-		}
+    if (is_abbrev(argument, "wiznet") 
+	&& (PLR_FLAGGED (ch, PLR_HERO) ||GET_LEVEL(ch) < LVL_HERO))
+	{
+	ch->Send("Sorry, but you are not immortal enough!");
+	return;
+	}
 
     if (IS_NPC(ch)) {
         ch->Send( "Not mobs sorry!");
