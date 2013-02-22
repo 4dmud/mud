@@ -50,3 +50,8 @@
 (defun command-interpeter (ch-ptr command)
   (ffi:c-inline (ch-ptr command) (:pointer-void :cstring) :void
 		"command_interpreter ((Character *)#0, #1);"))
+
+(defun c-game-loop-fn (data)
+    (ffi:c-inline (data) (:pointer-void) :void
+		"game_loop_fn((struct game_loop_data*) #0);"
+		:side-effects t))

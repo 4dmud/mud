@@ -35,6 +35,7 @@
 #include "improved-edit.h"
 #include "descriptor.h"
 #include "strutil.h"
+#include "lisp.h"
 
 extern const char *MENU;
 
@@ -2230,7 +2231,7 @@ int enter_player_game ( Descriptor *d )
 		new_mudlog ( NRM, GET_LEVEL ( ch ), TRUE, "  -- with %d items in locker", count_locker ( ch ) );
 
 
-	  for (j = 0; j < NUM_WEARS; j++)
+	for (j = 0; j < NUM_WEARS; j++)
   	{
   	  if (GET_EQ(ch, j) == NULL)
   	    continue;
@@ -2242,7 +2243,7 @@ int enter_player_game ( Descriptor *d )
        		ch->Send ( "A piece of expired equipment disintegrates into nothingness.\r\n");
 	 	crumble_obj(ch, GET_EQ(ch,j));  
                }
-  }
+	}
 
 
 
@@ -2392,6 +2393,10 @@ int enter_player_game ( Descriptor *d )
 
         MXPSendTag( d, "<VERSION>" ); //@TODO:PROTOCOL
         // MCCPBegin( d ); //@TODO:PROTOCOL
+
+#if ECL
+	player_login_event(ch);
+#endif
 
 	return load_result;
 }

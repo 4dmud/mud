@@ -25,6 +25,7 @@
 #include "fight.h"
 #include "damage.h"
 #include "descriptor.h"
+#include "lisp.h"
 /* local vars */
 int extractions_pending = 0;
 int obj_extractions_pending = 0;
@@ -2290,9 +2291,13 @@ void extract_char_final ( Character *ch )
 
 
  */
-#if 1
+
 void extract_char ( Character *ch, int e_now )
 {
+#if ECL
+	if (!IS_NPC(ch))
+	    player_logout_event(ch);
+#endif
 	if ( DEAD ( ch ) )
 	{
 		if ( IN_ROOM ( ch ) )
@@ -2310,13 +2315,13 @@ void extract_char ( Character *ch, int e_now )
 	}
 	else
 		SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_NOTDEADYET );
+		
 
 	extractions_pending++;
 
 	if ( e_now == 1 )
 		extract_pending_chars ();
 }
-#endif
 
 /*
  * I'm not particularly pleased with the MOB/PLR
