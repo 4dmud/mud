@@ -3933,7 +3933,7 @@ struct cmdlist_element *find_done ( struct cmdlist_element *cl )
 	if ( !cl || ! ( cl->next ) )
 		return cl;
 
-	for ( c = cl->next; c->next; c = c->next )
+	for ( c = cl->next; c && c->next; c = c->next )
 	{
 		for ( p = c->cmd; *p && isspace ( *p ); p++ )
 			;
