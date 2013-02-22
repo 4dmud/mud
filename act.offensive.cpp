@@ -452,7 +452,12 @@ ACMD ( do_flee )
         struct affected_type *af;
 
 	WAIT_STATE(ch, 1 RL_SEC);
-
+	if ( AFF_FLAGGED ( ch, AFF_HOLD) )
+	{
+		ch->Send ( "You are being held in place and can't flee.\r\n");
+		return;
+	}
+	
 	if ( affected_by_spell ( ch, SKILL_SNARE ) )
 	{
 

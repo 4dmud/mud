@@ -1023,7 +1023,7 @@ ACMD(do_comm) {
     skip_spaces(&argument);
 
     if (is_abbrev(argument, "wiznet") 
-	&& (PLR_FLAGGED (ch, PLR_HERO) ||GET_LEVEL(ch) < LVL_HERO))
+	&& (!PLR_FLAGGED (ch, PLR_IMM_MORT) && GET_LEVEL(ch) < LVL_HERO))
 	{
 	ch->Send("Sorry, but you are not immortal enough!");
 	return;

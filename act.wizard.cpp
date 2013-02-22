@@ -3958,9 +3958,6 @@ ACMD ( do_wiznet )
 			snprintf ( buf2, sizeof ( buf2 ), "Someone: %s%s\r\n", emote ? "<--- " : "", argument );
 		}
 
-    snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), "wiznet", argument, KNRM);
-    add_to_comm( "wiznet", buf1);
-
 		for ( d = descriptor_list; d; d = d->next )
 		{
 			if ( ( STATE ( d ) == CON_PLAYING ) && ( ( ( GET_ORIG_LEV ( d->character ) ? GET_ORIG_LEV ( d->character ) : GET_LEVEL ( d->character ) ) >= level ) || ((PLR_FLAGGED ( d->character, PLR_IMM_MORT ) && level == LVL_GOD)) )
@@ -3978,6 +3975,9 @@ ACMD ( do_wiznet )
 				d->Output ( "%s", CCNRM ( d->character, C_NRM ) );
 			}
 		}
+
+		snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), "wiznet", argument, KNRM);
+    		add_to_comm( "wiznet", buf1);
 
 		if ( PRF_FLAGGED ( ch, PRF_NOREPEAT ) )
 			ch->Send ( "%s", CONFIG_OK );
