@@ -7,7 +7,8 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
+#ifndef COMM_H
+#define COMM_H
 #define NUM_RESERVED_DESCS	8
 
 #define COPYOVER_FILE "copyover.dat"
@@ -88,3 +89,15 @@ void mccp_off(Descriptor *d);
 typedef RETSIGTYPE sigfunc ( int );
 
 
+
+struct game_loop_data {
+  socket_t s_mother_desc;
+  fd_set input_set, output_set, exc_set, null_set;
+  struct timeval last_time, opt_time, process_time, temp_time;
+  struct timeval before_sleep, now, timeout;
+  char comm[MAX_STRING_LENGTH];
+  Descriptor *d, *next_d;
+  int missed_pulses, maxdesc, aliased;
+};
+void game_loop_fn(struct game_loop_data* data);
+#endif
