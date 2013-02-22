@@ -41,6 +41,10 @@
 (defclass room (entity)
   ((vnum :type :integer :reader vnum :initarg :vnum)))
 
+(defun ptr-to-room (room-pointer)
+  (room (oneliner (room-pointer) (:pointer-void) :int
+		  "GET_ROOM_VNUM((Room*)#0)")))
+
 (defmethod print-object ((room room) s)
   (format s "#<room ~d: ~a>" (vnum room) (title room)))
 
