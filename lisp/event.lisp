@@ -17,6 +17,51 @@
 (define-condition player-login (player-condition) ())
 (define-condition player-logout (player-condition) ())
 
+(defvar *toplevel-handlers* nil)
+
+(defun build-toplevel-handler-fn ()
+  (eval `(lambda (fn &rest arguments)
+	   (handler-bind ,(mapcar #'(lambda (entry)
+				      (destructuring-bind (condition function) entry
+					`(,condition (function ,function))))
+				  *toplevel-handlers*)
+			 (apply fn arguments)))))
+
+(defvar *toplevel-handler-fn* (build-toplevel-handler-fn))
+
+(defun rebuild-toplevel-handler-fn ()
+  (setf *toplevel-handler-fn* (build-toplevel-handler-fn)))
+
+(defun handler-binding-equal? (condition handler)
+  (lambda (entry)
+    (destructuring-bind (c h) entry
+      (and (eq c condition)
+	   (eq h handler)))))
+
+(defun add-toplevel-handler (condition handler)
+  (declare (type (symbol condition handler)))
+  (symbol-function handler) ;;errors if there's no function
+  (when (find-if (handler-binding-equal? condition handler)
+		 *toplevel-handlers*)
+    (error "handler already set."))
+  
+  (push (list condition handler)
+	*toplevel-handlers*)
+
+  (rebuild-toplevel-handler-fn))
+
+(defun clear-toplevel-handlers ()
+  (setf *toplevel-handlers* nil)
+  
+  (rebuild-toplevel-handler-fn))
+
+(defun remove-toplevel-handler (condition handler)
+  (setf *toplevel-handlers*
+	(delete-if (handler-binding-equal? condition handler)
+		   *toplevel-handlers*))
+
+  (rebuild-toplevel-handler-fn))
+
 (defun game-loop-fn (data)
-  (4d-internal::c-game-loop-fn data))
+  (funcall *toplevel-handler-fn* #'4d-internal::c-game-loop-fn data))
 
