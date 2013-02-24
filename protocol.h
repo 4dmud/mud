@@ -25,8 +25,8 @@ class Descriptor;
 
 #define SNIPPET_VERSION                2 /* Helpful for debugging */
 
-#define MAX_PROTOCOL_BUFFER            2048
-#define MAX_VARIABLE_LENGTH            2048
+#define MAX_PROTOCOL_BUFFER            MAX_RAW_INPUT_LENGTH
+#define MAX_VARIABLE_LENGTH            MAX_RAW_INPUT_LENGTH
 #define MAX_OUTPUT_BUFFER              8192
 
 #define TELOPT_SEND                    1

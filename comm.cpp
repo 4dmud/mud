@@ -2816,6 +2816,7 @@ int Descriptor::process_input() {
     /* first, find the point where we left off reading data */
     buf_length = strlen(inbuf);
     read_point = inbuf + buf_length;
+    *read_point = '\0';
     space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
     do {
@@ -2827,7 +2828,7 @@ int Descriptor::process_input() {
 /*@TODO:PROTOCOL
         bytes_read = perform_socket_read(descriptor, read_point, space_left);
 */
-        bytes_read = perform_socket_read(descriptor, read_buf, MAX_PROTOCOL_BUFFER );
+        bytes_read = perform_socket_read(descriptor, read_buf, space_left - 1);
         if ( bytes_read >= 0 )
         {
             read_buf[bytes_read] = '\0';
@@ -2854,138 +2855,14 @@ int Descriptor::process_input() {
             nl_pos = ptr;
         */
 
-        for (ptr = read_point, nl_pos = NULL; *ptr && !nl_pos; ptr++) {
-            /*
-             * Search for an "Interpret As Command" marker. Note that we still
-             * have an ostrich attitude to all other IAC markers.  At least now
-             * they won't show up in the users' input streams. -gg 2/28/99
-             */
-            if (*(unsigned char *)ptr == IAC) {
-
-                //log("IAC found");
-                //if (*(unsigned char *)(ptr+1) == DO)
-                //log("DO found");
-                //else if (*(unsigned char *)(ptr+1) == DONT)
-                //log("DONT found");
-
-                //if (*(unsigned char *)(ptr+2) == COMPRESS2)
-                //log("COMPRESS found");
-                //else if (*(unsigned char *)(ptr+2) == EOR)
-                //log("END-OF-RECORD found");
-
-#if 0 //TODO:PROTOCOL: No longer needed.
-#if defined(HAVE_ZLIB)
-                if (memcmp (ptr, do_sig2, strlen ((const char *)do_sig2)) == 0) {
-                    telnet_capable = 1;
-                    //log("MCCP found on");
-                    toggle_compression(this);
-                    comp->state = 2;
-                    comp->compression = 2;
-                    memmove (ptr, &ptr [strlen (do_sig2)], strlen (&ptr [strlen (do_sig2)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, do_sig, strlen (do_sig)) == 0) {
-                    telnet_capable = 1;
-                    //log("MCCP found on");
-                    toggle_compression(this);
-                    comp->state = 2;
-                    comp->compression = 1;
-                    memmove (ptr, &ptr [strlen (do_sig)], strlen (&ptr [strlen (do_sig)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, dont_sig, strlen (dont_sig)) == 0) {
-                    telnet_capable = 1;
-                    //log("MCCP found off");
-                    comp->state = 0;
-                    comp->compression = 1;
-                    memmove (ptr, &ptr [strlen (dont_sig)], strlen (&ptr [strlen (dont_sig)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, dont_sig2, strlen (dont_sig2)) == 0) {
-                    telnet_capable = 1;
-                    //log("MCCP found off");
-                    comp->state = 0;
-                    comp->compression = 2;
-                    memmove (ptr, &ptr [strlen (dont_sig2)], strlen (&ptr [strlen (dont_sig2)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-#endif
-                if (memcmp (ptr, do_eor, strlen ((const char *)do_eor)) == 0) {
-                    telnet_capable = 0;
-                    eor = 1;
-                    //log("eor found");
-                    memmove (ptr, &ptr [strlen ((const char *)do_eor)], strlen (&ptr [strlen ((const char *)do_eor)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, do_ga, strlen ((const char *)do_ga)) == 0) {
-                    telnet_capable = 1;
-                    //log("eor found");
-                    memmove (ptr, &ptr [strlen ((const char *)do_ga)], strlen (&ptr [strlen ((const char *)do_ga)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, do_ech, strlen ((const char *)do_ech)) == 0) {
-                    telnet_capable = 1;
-                    /** wanna do something with this? **/
-                    //log("do echo found");
-                    memmove (ptr, &ptr [strlen ((const char *)do_ech)], strlen (&ptr [strlen ((const char *)do_ech)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                }
-                if (memcmp (ptr, do_mxp_str, strlen ((const char *)do_mxp_str)) == 0) {
-                    telnet_capable = 1;
-                    turn_on_mxp ();
-                    /* remove string from input buffer */
-                    memmove (ptr, &ptr [strlen ((const char *)do_mxp_str)], strlen (&ptr [strlen ((const char *)do_mxp_str)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                } /* end of turning on MXP */
-                else if (memcmp (ptr, dont_mxp_str, strlen ((const char *)dont_mxp_str)) == 0) {
-                    telnet_capable = 1;
-                    mxp = FALSE;
-                    /* remove string from input buffer */
-                    memmove (ptr, &ptr [strlen ((const char *)dont_mxp_str)], strlen (&ptr [strlen ((const char *)dont_mxp_str)]) + 1);
-                    ptr--; /* adjust to allow for discarded bytes */
-                } /* end of turning off MXP */
-#endif //TODO:PROTOCOL No longer needed.
-
-                /*
-                 * Convert the IAC string so that it is filtered out. This
-                 * should, in theory, leave the 'U' from the compression
-                 * handshake but in my testing it didn't show up... -gg 3/21/99
-                 *
-                while (*ptr < 0)
-                  *ptr++ = '\0';
-
-                 //If this was everything, pretend we had nothing. 
-                if (ISNEWL(*ptr))
-                  *ptr++ = '\0';
-                */
-            } else if (ISNEWL(*ptr))
-                nl_pos = ptr;
-        }
-        read_point += bytes_read;
-        space_left -= bytes_read;
-
-        /*
-         * on some systems such as AIX, POSIX-standard nonblocking I/O is broken,
-         * causing the MUD to hang when it encounters input not terminated by a
-         * newline.  This was causing hangs at the Password: prompt, for example.
-         * I attempt to compensate by always returning after the _first_ read, instead
-         * of looping forever until a read returns -1.  This simulates non-blocking
-         * I/O because the result is we never call read unless we know from select()
-         * that data is ready (process_input is only called if select indicates that
-         * this descriptor is in the read set).  JE 2/23/95.
-         */
-#if !defined(POSIX_NONBLOCK_BROKEN)
-
-    } while (nl_pos == NULL);
-#else
-
     }
     while (0)
         ;
 
+    nl_pos = strchr(inbuf, '\n');
+
     if (nl_pos == NULL)
         return (0);
-#endif /* POSIX_NONBLOCK_BROKEN */
 
     /*
      * okay, at this point we have at least one newline in the string; now we
