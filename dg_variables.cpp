@@ -1819,7 +1819,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							int addition = atoi ( subfield );
 							TRADEPOINTS ( c ) += addition;
-							new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s %s %d tradepoints from trigger %d, %s. (%d)",  GET_NAME (c), (addition>0?"gained":"lost"), (addition>0?addition:-addition), GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), TRADEPOINTS(c));
+							new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( c ) ), TRUE, "[TRADEPOINTS] %s %s %d tradepoints from trigger %d, %s. (%d)",  GET_NAME (c), (addition>0?"gained":"lost"), (addition>0?addition:-addition), GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), TRADEPOINTS(c));
 						}
 						snprintf ( str, slen, "%d", TRADEPOINTS ( c ) );
 					}
