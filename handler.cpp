@@ -1807,6 +1807,8 @@ void extract_obj ( struct obj_data *obj )
 	}
 	obj->carried_by = NULL;
 	obj->next_content = NULL;
+	obj->extracted = 1;
+
 	obj_data_to_pool ( obj );
 
 }

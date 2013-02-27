@@ -3671,7 +3671,12 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 						wld_command_interpreter ( ( Room * ) go, cmd );
 						break;
 				}
-				if ( dg_owner_purged )
+				if ( dg_owner_purged || 
+#if DRIVER_USES_UNION
+				     (type == OBJ_TRIGGER && sdd->o->extracted))
+#else
+				     (type == (*(obj_data**)go_adress)->extracted))
+#endif
 				{
 					depth--;
 					if ( type == OBJ_TRIGGER )

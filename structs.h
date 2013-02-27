@@ -1575,7 +1575,7 @@ struct obj_data {
     struct ident_list *idents;
     struct vehicle_attachment_data *attachment;   /* attachments for vehicle */
     Character *following;    /* for floating discs, carts, etc */
-
+    char extracted;
    
 };
 
