@@ -1925,7 +1925,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	list_obj_resets ( j, ch );
 
 	/* check the object for a script */
-	if ( GET_LEVEL ( ch ) >= LVL_CREAT /* || is_name(GET_NAME(ch), zone_table[(real_zone(vnum))].builders)*/ )
+	if ( GET_LEVEL ( ch ) >= LVL_CRT /* || is_name(GET_NAME(ch), zone_table[(real_zone(vnum))].builders)*/ )
 		do_sstat_object ( ch, j );
 }
 
