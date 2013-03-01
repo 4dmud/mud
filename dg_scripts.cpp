@@ -3675,7 +3675,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 #if DRIVER_USES_UNION
 				     (type == OBJ_TRIGGER && sdd->o->extracted))
 #else
-				     (type == (*(obj_data**)go_adress)->extracted))
+				     (type == OBJ_TRIGGER && (*(obj_data**)go_adress)->extracted))
 #endif
 				{
 					depth--;
