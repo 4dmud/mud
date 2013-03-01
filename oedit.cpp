@@ -879,6 +879,9 @@ void oedit_disp_val5_menu ( Descriptor *d )
                 case ITEM_VEHICLE2:
                         d->Output("It costs 1 fuel per room in space to move.\r\nMax Fuel: " );
                         break;
+	        case ITEM_WEAPON:
+		        d->Output("Weapon length: ");
+			break;
 		default:
 			oedit_disp_menu ( d );
 	}
