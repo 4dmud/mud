@@ -1475,8 +1475,9 @@ void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
 	struct room_direction_data *back = 0;
 	char buf[MAX_INPUT_LENGTH];
 	size_t len = 0;
-
-	len += snprintf ( buf, sizeof ( buf ), "$n %ss ", cmd_door[scmd] );
+	
+	if ( scmd != SCMD_PICK)
+		len += snprintf ( buf, sizeof ( buf ), "$n %ss ", cmd_door[scmd] );
 	if ( !obj && ( ( other_room = EXIT ( ch, door )->to_room ) != NULL ) )
 		if ( ( back = other_room->dir_option[rev_dir[door]] ) != NULL )
 			if ( back->to_room != IN_ROOM ( ch ) )
