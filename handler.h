@@ -17,6 +17,8 @@ bool affected_by_spell(Character *ch, int type);
 void affect_join(Character *ch, struct affected_type *af,
                  bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
 
+int affect_time_left(Character *ch, sh_int type);
+
 void remove_all_normal_affects(Character *ch);
 /* utility */
 const char *money_desc(gold_int amount);

@@ -729,6 +729,16 @@ void affect_join ( Character *ch, struct affected_type *af,
 		affect_to_char ( ch, af );
 }
 
+int affect_time_left (Character *ch, sh_int type) {
+  struct affected_type *affect;
+  for ( affect = ch->affected; affect; affect = affect->next) {
+    if (affect->type == type)
+      return time_to_sec(affect->expire);
+  }
+
+  return -1;
+}
+
 int move_char_to ( Character *ch, room_rnum room )
 {
 	room_rnum cur;
