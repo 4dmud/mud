@@ -243,9 +243,6 @@ void assign_skills ( void )
         skillo ( SKILL_TRAMPLE, "trample", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                 SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 18, 0, "");
 
-	// skillo ( SPELL_RADIATED, "radiation", TAR_IGNORE,
-        //        SK_VIOLENT, NO_FIRST, NO_SECOND, 4, 51, 1, "You no longer feel the affects of radiation.");
-
         skillo ( SKILL_JOUST, "joust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                 SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 29, 0, "");
 
@@ -804,6 +801,7 @@ ASKILL ( skill_bash )
 	if ( GET_POS ( vict ) == POS_SITTING )
 	{
 		ch->Send ( "They are already down and your bash goes right over them!!\r\n" );
+		vict->Send ( "$n tries to bash you while you're sitting, but falls over!\r\n");
 		fe_deal_damage ( ch, vict, 0, SKILL_BASH );
 		GET_POS ( ch ) = POS_SITTING;
 		GET_WAIT_STATE ( ch ) += 2 RL_SEC;
@@ -843,7 +841,7 @@ ASKILL ( skill_bash )
 		 */
 
 		skill_attack ( ch, vict, SKILL_BASH, TRUE );
-
+		//vict->Send ("$n sends you sprawling with a powerful bash!\r\n");
 		return SKILL_BASH;
 	}
 }
