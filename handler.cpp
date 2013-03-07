@@ -438,9 +438,6 @@ void affect_modify ( Character *ch, sbyte loc, int mod,
 			AFF_SPEED ( ch ) += mod;
 			break;
 
-//		case APPLY_SAVING_IRRADIATION:
-//                	GET_SAVE ( ch, SAVING_IRRADIATION ) += mod;
-//                    	break;
 
 		default:
 			log ( "SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).",

@@ -1471,28 +1471,6 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_vict = "Your armor starts rotting.";
 			to_room = "$n's armor starts rotting.";
 			break;
-		/*case SPELL_RADIATED:
-			af[0].expire = HOURS_TO_EXPIRE ( 0.5 );
-                        af[0].location = APPLY_CON;
-                        af[0].modifier = -2;
-                        af[0].bitvector = AFF_MUTATED;
-                        accum_duration =FALSE;
-                        to_vict = "You mutate due to radiation exposure.";
-                        to_room = "$n mutates due to radiation exposure.";
-			break;
-		case SPELL_MUTATED:
-                        af[0].expire = HOURS_TO_EXPIRE ( 0.5 );
-                        af[0].location = APPLY_CON;
-                        af[0].modifier = -4;
-                        af[0].bitvector = AFF_MUTATED;
-			af[1].expire = HOURS_TO_EXPIRE ( 0.5 );
-                        af[1].location = APPLY_CON;
-                        af[1].modifier = -4;
-                        af[1].bitvector = AFF_MUTATED;
-                        accum_duration =FALSE;
-                        to_vict = "You mutate due to radiation exposure.";
-                        to_room = "$n mutates due to radiation exposure.";
-                        break;*/
 
 		case SPELL_WEAKEN:
 			af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
