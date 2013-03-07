@@ -7624,7 +7624,23 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case ELEM_FIRE:
 			if ( affected_by_spell ( ch, SPELL_MIND_FIRE ) )
-			{	dam += 0.25;  ch->Send("+MindFire "); }
+			{
+				if (affected_by_spell ( ch, SPELL_MUTATED))
+				{
+				dam += 0.50;
+				ch->Send("+Mutated MindFire ");
+				}
+				else
+				{
+				dam += 0.25;
+				ch->Send("+MindFire ");
+				}
+			}
+			if (affected_by_spell ( ch, SPELL_MUTATED))
+			{
+			dam += 0.25;
+			ch->Send("Mutated ");
+			}
 			break;
 		case ELEM_ICE:
 			if ( affected_by_spell ( ch, SPELL_MIND_ICE ) )

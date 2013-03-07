@@ -212,7 +212,7 @@ void assign_skills ( void )
 
 	skillo ( SKILL_POISON_WEAPON, "poison weapon", TAR_IGNORE,
 	         SK_NONE, NO_FIRST, NO_SECOND, 3, 5 ,0, "");
-
+	
 	skillo ( SKILL_RETREAT, "retreat", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 2, 12 ,1, "");
 
 	skillo ( SKILL_FILET, "filet", TAR_IGNORE, SK_NONE, NO_FIRST,NO_SECOND, 1, 14 ,1, "");
@@ -242,6 +242,9 @@ void assign_skills ( void )
 
         skillo ( SKILL_TRAMPLE, "trample", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                 SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 18, 0, "");
+
+	// skillo ( SPELL_RADIATED, "radiation", TAR_IGNORE,
+        //        SK_VIOLENT, NO_FIRST, NO_SECOND, 4, 51, 1, "You no longer feel the affects of radiation.");
 
         skillo ( SKILL_JOUST, "joust", TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT,
                 SK_VIOLENT, SKILL_HANDTOHAND, SKILL_MOUNTED_COMBAT, 3, 29, 0, "");

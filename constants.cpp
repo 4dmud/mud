@@ -862,6 +862,9 @@ const char *affected_bits[] =
 	"Prom's stuff",
 	"Prom's stuff",
 	"Mana Regen",
+	"POISON-PAUSE",
+	"MUTATED",
+	"RADIATED",
         "\n"
 };
 
@@ -1412,6 +1415,7 @@ const char *item_types[] =
 	"crafting gem",
 	"template",
 	"crafting base",
+	"radiation_proof",
 	"\n"
 };
 

@@ -1314,6 +1314,19 @@ bool Character::SunProtected()
 	return FALSE;
 }
 
+bool Character::RadiationProof()
+{
+        if ( !IS_NPC ( this ) && GET_LEVEL ( this ) >= LVL_IMPL )
+                return TRUE;
+
+        for ( sh_int i = 0; i < NUM_WEARS; i++ )
+                if ( HAS_BODY ( this, i ) && GET_EQ ( this, i ) &&
+                        GET_OBJ_TYPE ( GET_EQ ( this, i ) ) == ITEM_RADIATION_PROOF )
+                        return TRUE;
+
+        return FALSE;
+}
+
 bool Character::WaterBreathing()
 {
 	if ( !IS_NPC ( this ) && GET_RACE ( this ) == RACE_MARTIAN )

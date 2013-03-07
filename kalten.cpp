@@ -733,7 +733,8 @@ int check_dam_affects ( Character *ch )
 void sector_update ( void )
 {
 	Character *i, *next_char;
-
+	struct affected_type af;
+	
 	for ( i = character_list; i != NULL; i = next_char )
 	{
 		next_char = i->next;
@@ -759,6 +760,51 @@ void sector_update ( void )
 			        check_time() && !i->SunProtected() )
 				if ( damage ( i, i, number ( 1, 10 ), TYPE_DESERT ) == -1 )
 					continue;
+			if ( ROOM_FLAGGED ( i->in_room, ROOM_IRRADIATED )
+    			        && !i->RadiationProof() )
+			{
+                                if (affect_time_left(i, SPELL_RADIATED) >= 550)
+ 	                        {
+					affect_from_char( i, SPELL_RADIATED);
+                                	i->Send("Due to extreme levels of radiation exposure, you mutate.\r\n");
+                               		af.type = SPELL_MUTATED;
+                                	af.expire = HOURS_TO_EXPIRE(10);
+                                	af.location = APPLY_CON;
+                                	af.modifier = -3;
+                                        af.bitvector = AFF_MUTATED;
+                                        alter_mana ( i, MIN(GET_MANA(i)/10, FTOI ( GET_MAX_MANA ( i ) /12.5 ) ));
+                                        alter_stamina ( i, MIN(GET_STAMINA(i)/20, FTOI ( GET_MAX_STAMINA ( i ) /25.0 ) ));
+					alter_move ( i, MIN(GET_MOVE(i)/10, FTOI ( GET_MAX_MOVE ( i ) /12.5 ) ));
+                                        affect_join( i, &af , true, false, false, false);
+                                        if ( damage ( i, i, number ( 10, 25 ), TYPE_RADIATION ) == -1 )
+                                        {
+                                                i->Send("You become too mutated and die!\r\n");
+                                                continue;
+                                        }
+				}
+				else
+				{
+					if (5 > number(1,25))
+					{
+				        	i->Send("You feel the affects of radiation!\r\n");
+						af.type = SPELL_RADIATED;
+                                        	af.expire = HOURS_TO_EXPIRE (1);
+                                        	af.location = APPLY_CON;
+                                        	af.modifier = -1;
+                                        	af.bitvector = AFF_RADIATED;
+                        			alter_stamina ( i, MIN(GET_STAMINA(i)/20, FTOI ( GET_MAX_STAMINA ( i ) /25.0 ) ));
+                        			alter_move ( i, MIN(GET_MOVE(i)/20, FTOI ( GET_MAX_MOVE ( i ) /25.0 ) ));
+						affect_join( i, &af , true, false, false, false);
+ 						if ( damage ( i, i, number ( 10, 25 ), TYPE_RADIATION ) == -1 )
+						{
+   							i->Send("You have died from radiation poisoning!\r\n");
+   							continue;
+ 						}
+					}
+				}
+				continue;
+
+			}
 			if ( GET_POS ( i ) <= POS_STUNNED )
 				update_pos ( i );
 		}

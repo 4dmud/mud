@@ -144,6 +144,7 @@ public:
     bool SpaceProtected();
     bool SunProtected();
     bool WaterBreathing();
+    bool RadiationProof();
     Character *NextFightingMe();
 	inline bool MountHere() {return (char_specials.riding && char_specials.riding->in_room == in_room);}
 	inline bool RiderHere() {return (char_specials.ridden_by && char_specials.ridden_by->in_room == in_room);}

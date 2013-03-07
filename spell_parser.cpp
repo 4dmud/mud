@@ -2085,6 +2085,14 @@ void mag_assign_spells ( void )
 	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 34, 0, "" );
 
+	spello ( SPELL_CURE_RADIATION, "radiation cure", 160 , 32 , 16,
+                 POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
+                 TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 34, 0, "" );
+
+	spello ( SPELL_CURE_MUTATION, "mutation cure", 160 , 32 , 16,
+                 POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_UNAFFECTS, 0,
+                 TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 34, 0, "" );
+
 	spello ( SPELL_SENSE_LIFE, "sense life", 20 , 10 , 2,
 	         POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
 	         140, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 41, 1,
@@ -2359,6 +2367,13 @@ void mag_assign_spells ( void )
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE,
 	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 36, 0, "" );
 
+	spello ( SPELL_RADIATED, "radiation sickness", 100 , 80 , 2,
+                 POS_STANDING, TAR_IGNORE | TAR_CHAR_ROOM, TRUE, MAG_DAMAGE | MAG_ROOM_AFFECTS,
+                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 1, "Your radiation sickness has passed." );
+
+        spello ( SPELL_MUTATED, "mutated", 100 , 80 , 2,
+                 POS_STANDING, TAR_IGNORE | TAR_CHAR_ROOM, TRUE, MAG_DAMAGE | MAG_ROOM_AFFECTS,
+                 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 51, 1, "You lose your mutations." );
 
 	/* NON-castable spells should appear here */
 	spello_system ( SPELL_IDENTIFY, "identify", 0, 0, 0, POS_RESTING,
@@ -2415,6 +2430,7 @@ void mag_assign_spells ( void )
                  TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
 	spello_system ( SPELL_BOWEL, "embowel", 0, 0, 0, 0,
                  TAR_SELF_ONLY, FALSE, MAG_POINTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 0, 0, 0, "" );
+	
 	/*
 	 * Declaration of skills - this actually doesn't do anything except
 	 * set it up so that immortals can use these skills by default.  The
@@ -2843,6 +2859,12 @@ int elemental_type ( int spell )
 			break;
 		case SPELL_HOLY_JUDGEMENT:
 			retval = ELEM_SPIRIT;
+			break;
+		case SPELL_RADIATED:
+			retval = ELEM_FIRE;
+			break;
+		case SPELL_MUTATED:
+			retval = ELEM_FIRE;
 			break;
 		case SPELL_POLYMORPH:
 			retval = ELEM_SPIRIT;

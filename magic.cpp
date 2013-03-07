@@ -1471,6 +1471,29 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			to_vict = "Your armor starts rotting.";
 			to_room = "$n's armor starts rotting.";
 			break;
+		/*case SPELL_RADIATED:
+			af[0].expire = HOURS_TO_EXPIRE ( 0.5 );
+                        af[0].location = APPLY_CON;
+                        af[0].modifier = -2;
+                        af[0].bitvector = AFF_MUTATED;
+                        accum_duration =FALSE;
+                        to_vict = "You mutate due to radiation exposure.";
+                        to_room = "$n mutates due to radiation exposure.";
+			break;
+		case SPELL_MUTATED:
+                        af[0].expire = HOURS_TO_EXPIRE ( 0.5 );
+                        af[0].location = APPLY_CON;
+                        af[0].modifier = -4;
+                        af[0].bitvector = AFF_MUTATED;
+			af[1].expire = HOURS_TO_EXPIRE ( 0.5 );
+                        af[1].location = APPLY_CON;
+                        af[1].modifier = -4;
+                        af[1].bitvector = AFF_MUTATED;
+                        accum_duration =FALSE;
+                        to_vict = "You mutate due to radiation exposure.";
+                        to_room = "$n mutates due to radiation exposure.";
+                        break;*/
+
 		case SPELL_WEAKEN:
 			af[0].expire = HOURS_TO_EXPIRE ( 24 + chcha );
 			af[0].location = APPLY_STR;
@@ -2241,6 +2264,18 @@ void mag_unaffects ( int level, Character *ch,
 			to_room = "There's a momentary gleam in $n's eyes.";
 			affect_from_char ( victim, SPELL_COLOUR_SPRAY );
 			break;
+		case SPELL_CURE_RADIATION:
+			spell = SPELL_RADIATED;
+			to_vict = "Your radiation sickness is cured!";
+			to_room = "$n's radiation sickness is cured!";
+			affect_from_char (victim, AFF_RADIATED);
+			break;
+		case SPELL_CURE_MUTATION:
+			spell = SPELL_MUTATED;
+                        to_vict = "Your mutations are cured!";
+                        to_room = "$n's mutations are cured!";
+			affect_from_char ( victim, AFF_MUTATED);
+			break; 
 		case SPELL_ANTIDOTE_1:
 			spell = SPELL_POISON;
 			to_vict = "A warm feeling runs through your body!";

@@ -772,7 +772,9 @@ class Room;
 #define AFF_DISEMBOWEL	      96 // Disembowel affect for thrust? --> Prom 
 #define AFF_MANA_REGEN        97
 #define AFF_POISON_PAUSE      98
-#define MAX_AFF_APPLY         99
+#define AFF_MUTATED	      99
+#define AFF_RADIATED	      100
+#define MAX_AFF_APPLY         101
 
 
 #define IS_POISONED(ch) (AFF_FLAGGED(ch, AFF_POISON_1) || AFF_FLAGGED(ch, AFF_POISON_2) \
@@ -1065,6 +1067,7 @@ class Room;
 #define ITEM_SPACEBIKE          85
 #define ITEM_VEHICLE2           86 /* Horus new vehicle code */
 #define ITEM_TEMPLATE		87
+#define ITEM_RADIATION_PROOF	90
 
 #define VIAL_NONE      		-1
 #define VIAL_HITP   		0
