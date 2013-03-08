@@ -7627,8 +7627,8 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			{
 				if (affected_by_spell ( ch, SPELL_MUTATED))
 				{
-				dam += 0.50;
-				ch->Send("+Mutated MindFire ");
+				dam += 0.75;
+				ch->Send("+Mutated +MindFire ");
 				}
 				else
 				{
@@ -7636,10 +7636,10 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				ch->Send("+MindFire ");
 				}
 			}
-			if (affected_by_spell ( ch, SPELL_MUTATED))
+			else if (affected_by_spell ( ch, SPELL_MUTATED))
 			{
 			dam += 0.25;
-			ch->Send("Mutated ");
+			ch->Send("+Mutated ");
 			}
 			break;
 		case ELEM_ICE:
@@ -7648,8 +7648,25 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			break;
 		case ELEM_ELEC:
 			if ( affected_by_spell ( ch, SPELL_MIND_ELEC ) )
-			{	dam += 0.25; ch->Send("+MindElec "); }
-			break;
+			{
+                                if (affected_by_spell ( ch, SPELL_MUTATED))
+                                {
+                                dam += 0.50;
+                                ch->Send("+Mutated +MindElec ");
+                                }
+                                else
+                                {
+                                dam += 0.25;
+                                ch->Send("+MindElec ");
+                                }
+			}
+                        else if (affected_by_spell ( ch, SPELL_MUTATED))
+                        {
+                        dam += 0.25;
+                        ch->Send("+Mutated ");
+                        }
+                        break;
+
 		case ELEM_WATER:
 			if ( affected_by_spell ( ch, SPELL_MIND_WATER ) )
 			{	dam += 0.25;  ch->Send("+MindWater "); }

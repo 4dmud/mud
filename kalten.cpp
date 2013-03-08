@@ -763,14 +763,18 @@ void sector_update ( void )
 			if ( ROOM_FLAGGED ( i->in_room, ROOM_IRRADIATED )
     			        && !i->RadiationProof() )
 			{
+		        int radhit, muthit;
+        		radhit = GET_MAX_HIT( i ) / 15;
+        		muthit = GET_MAX_HIT( i ) / 10;
+
                                 if (affect_time_left(i, SPELL_RADIATED) >= 550)
  	                        {
 					affect_from_char( i, SPELL_RADIATED);
-                                	i->Send("Due to extreme levels of radiation exposure, you mutate.\r\n");
+                                	i->Send("Due to excessive radiation exposure, you mutate.\r\n");
                                		af.type = SPELL_MUTATED;
                                 	af.expire = HOURS_TO_EXPIRE(10);
-                                	af.location = APPLY_CON;
-                                	af.modifier = -3;
+                                	af.location = APPLY_HIT;
+                                	af.modifier = -muthit;
                                         af.bitvector = AFF_MUTATED;
                                         alter_mana ( i, MIN(GET_MANA(i)/10, FTOI ( GET_MAX_MANA ( i ) /12.5 ) ));
                                         alter_stamina ( i, MIN(GET_STAMINA(i)/20, FTOI ( GET_MAX_STAMINA ( i ) /25.0 ) ));
@@ -784,13 +788,13 @@ void sector_update ( void )
 				}
 				else
 				{
-					if (5 > number(1,25))
+					if (3 > number(1,10))
 					{
-				        	i->Send("You feel the affects of radiation!\r\n");
+				        	i->Send("Radiation permeates throughout the room, tingling your skin!\r\n");
 						af.type = SPELL_RADIATED;
                                         	af.expire = HOURS_TO_EXPIRE (1);
-                                        	af.location = APPLY_CON;
-                                        	af.modifier = -1;
+                                        	af.location = APPLY_HIT;
+                                        	af.modifier = -radhit;
                                         	af.bitvector = AFF_RADIATED;
                         			alter_stamina ( i, MIN(GET_STAMINA(i)/20, FTOI ( GET_MAX_STAMINA ( i ) /25.0 ) ));
                         			alter_move ( i, MIN(GET_MOVE(i)/20, FTOI ( GET_MAX_MOVE ( i ) /25.0 ) ));
