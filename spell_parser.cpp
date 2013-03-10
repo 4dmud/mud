@@ -1837,7 +1837,7 @@ void mag_assign_spells ( void )
 	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 1,
                  "Your eyes stop tingling." );
 
-	spello ( SPELL_DETECT_INVIS_OTHER, "detect invisible", 20 ,
+	spello ( SPELL_DETECT_INVIS_OTHER, "see invis", 20 ,
 	         10 , 2, POS_STANDING, TAR_CHAR_ROOM,
 	       FALSE, MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 1, 15, 0,
                  "Your eyes stop tingling." );
@@ -2356,7 +2356,7 @@ void mag_assign_spells ( void )
 	         MAG_DAMAGE | MAG_AFFECTS, 0, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 22, 0, "" );
 
 	spello ( SPELL_HAIL_STORM, "hail storm", 140 , 125 , 3,
-	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 10,
+	         POS_FIGHTING, TAR_IGNORE, TRUE, MAG_AREAS, 7,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 49, 0, "" );
 
 	spello ( SPELL_EXORCISE, "exorcise", 30 , 20 , 2,

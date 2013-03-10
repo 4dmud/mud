@@ -7562,12 +7562,12 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 		case  SPELL_HAIL_STORM:
 			if ( inside )
 				return 0.0;
-			else if ( cold )
-			{	dam = 2.0; ch->Send("+Cold "); }
+			else if ( stormy )
+			{	dam = 4.0; ch->Send("+Stormy "); }
 			else if ( hot )
 			{	dam = 0.1; ch->Send("-Hot "); }
 			else
-				dam = 1.4;
+				dam = 2.0;
 
 			if ( affected_by_spell ( ch, SPELL_MIND_ICE ))
 			{
@@ -7578,16 +7578,16 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			{	dam *= 0.5; ch->Send("-ElementClash "); }
 
 			if ( night && !inside)
-			{	ch->Send("+Night "); dam += 0.8; }
+			{	ch->Send("+Night "); dam += 0.5; }
 			else if ( day && !inside)
-			{	ch->Send("-Day "); dam *= 0.5; }
+			{	ch->Send("-Day "); dam -= 0.5; }
 			else if ( !inside)
-			{	ch->Send("+Twilight "); dam += 0.1; }
+			{	ch->Send("+Twilight "); dam += 0.6; }
 
 			if ( sunny && !inside)
 			{	ch->Send("-Cloudless "); dam *= 0.01; }
-			else if ( stormy && !inside )
-			{	ch->Send("+Stormy "); dam += 0.4; }
+			else if ( cold && !inside )
+			{	ch->Send("+Cold "); dam += 0.4; }
 
 			if ( affected_by_spell ( vict, SPELL_PROT_FIRE) )
 			{	dam *= 0.25; ch->Send("-VictProtection "); }
