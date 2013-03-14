@@ -8,7 +8,7 @@ ECL = 1
 CC = g++
 
 # Any special flags you want to pass to the compiler
-MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -O0 -ggdb -fno-inline
+MYFLAGS = -Wall -Wno-sign-compare -Wunused -Wformat -O0 -ggdb3 -fno-inline
 LIBS = -lz -lpthread -lnsl -lm -lc -lcrypt
 SRCFILES := $(wildcard *.cpp)
 OBJFILES := $(patsubst %.cpp,%.o,$(SRCFILES))
