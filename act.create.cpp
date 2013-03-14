@@ -1141,9 +1141,7 @@ ACMD ( do_fell )
 		return;
 	}
 
-	// Going to remove the !axe to see if lubmerjack will work now -- Prom
-	//if ( !axe || GET_OBJ_TYPE ( axe ) != ITEM_AXE )
-	if (GET_OBJ_TYPE ( axe ) != ITEM_AXE )
+	if (!axe || GET_OBJ_TYPE ( axe ) != ITEM_AXE )
 	{
 		ch->Send ( "You can't chop trees without a good axe!\r\n" );
 		return;
