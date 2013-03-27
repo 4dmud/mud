@@ -945,7 +945,7 @@ void start_fighting ( Character* ch, Character* vict )
 
 	vict_id = GET_ID ( victim );
 
-	if ( GET_POS ( ch ) > POS_STUNNED && GET_FIGHT_EVENT ( ch ) == NULL )
+	if ( GET_POS ( ch ) > POS_STUNNED && FIGHTING ( ch ) == NULL )
 	{
 
 		if ( FIGHTING ( victim ) )
