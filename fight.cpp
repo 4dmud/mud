@@ -2282,6 +2282,9 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 
 		dam = FTOI ( dam * ( GET_SKILLMULTI ( ch ) = skill_type_multi ( ch, vict, type ) ) );
 
+		// Make sure skills/spells actually do damage so that the right messages will be shown
+		if ( dam < 10 ) dam = 10;
+
 		damage_ret = fe_solo_damage ( ch, vict, dam, type ); //change this in future?
 	}
 	if ( damage_ret != -1 )
