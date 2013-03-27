@@ -1522,6 +1522,11 @@ ACMD ( do_get )
 	char *from = NULL;
 
 	skip_spaces ( &argument );
+	if ( *argument == '\0' )
+	{
+		ch->Send ( "Get what?\n" );
+		return;
+	}
 	if ( begins_with_number ( argument ) )
 		argument = any_one_arg ( argument, num );
 	from = str_until ( argument, "from", arg1, sizeof ( arg1 ) );
@@ -1548,13 +1553,6 @@ ACMD ( do_get )
 	if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
 	{
 		ch->Send ( "Your arms are already full!\r\n" );
-		return;
-	}
-
-	// get
-	if ( !*arg1 )
-	{
-		ch->Send ( "Get what?\r\n" );
 		return;
 	}
 
