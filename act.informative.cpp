@@ -1889,7 +1889,7 @@ ACMD ( do_examine )
 		examine_on = FALSE;
 		look_at_target ( ch, tempsave );  /* strcpy: OK */
 		examine_on = TRUE;
-		if ( GET_OBJ_INNATE ( tmp_object ) != TYPE_UNDEFINED && affected_by_spell ( ch, SPELL_DETECT_MAGIC ) )
+		if ( GET_OBJ_INNATE ( tmp_object ) && affected_by_spell ( ch, SPELL_DETECT_MAGIC ) )
 			*ch << "\r\nYou sense that this item is further embued with the spell "<<  skill_name ( GET_OBJ_INNATE ( tmp_object ) ) << ".\r\n";
 		if ( ( GET_OBJ_TYPE ( tmp_object ) == ITEM_DRINKCON ) ||
 		        ( GET_OBJ_TYPE ( tmp_object ) == ITEM_FOUNTAIN ) ||
