@@ -53,6 +53,8 @@ lisp/lib4d-lisp.a: force-look
 clean:
 	rm -f *.o depend
 	rm -f *.obj *.fas *.eclh *.data lisp/lib4d-lisp.a lisp/*.fas lisp/*.c lisp/*.o lisp/lisp-output.txt
+	find ./ -name \*.o -exec rm {} \;
+	find ./ -name \*.fas -exec rm {} \;
 
 # Dependencies for the object files (automagically generated with
 # gcc -MM)
