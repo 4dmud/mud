@@ -5062,7 +5062,7 @@ ACMD ( do_toggle )
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_KEEPTITLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOIC ) ),
 	    ctypes[COLOUR_LEV ( ch ) ],
-	    ONOFF ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ),
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_MAIL ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOCTALK ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_AFKTELL ) ),
