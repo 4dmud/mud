@@ -1528,8 +1528,9 @@ ACMD ( do_gen_tog )
 		{   "You will NOT automaticly agree to group people when they request to follow.\r\n",
 		    "You will automaticly agree to group people when they request to follow.\r\n"},
 		{"You will no longer see players' full titles.\r\n",
-		 "You can now see players' full titles.\r\n"}
-
+		 "You can now see players' full titles.\r\n"},
+		{"You will now see graphics.\r\n",
+		 "You will no longer see graphics.\r\n"}
 
 	};
 
@@ -1722,6 +1723,9 @@ ACMD ( do_gen_tog )
 			break;
 		case SCMD_NOTITLE1:
 			result = PRF_TOG_CHK ( ch, PRF_NOTITLE );
+			break;
+		case SCMD_NOGRAPHICS:
+			result = PRF_TOG_CHK ( ch, PRF_NOGRAPHICS );
 			break;
 		default:
 			log ( "SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd );
