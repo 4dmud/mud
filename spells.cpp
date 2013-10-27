@@ -692,7 +692,7 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
     if (strncmp(buf, "NOBITS", 6))
         ch->Send( "{cyIt is {cc%s{c0\r\n", buf);
 
-    ch->Send( "{cyIts weight is {cC%d{cy and its valued at {cC%lld{cy coins",
+    ch->Send( "{cyIts weight is {cC%d{cy and it's valued at {cC%lld{cy coins",
               GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj));
     if (GET_OBJ_LEVEL(obj))
         ch->Send( ", and its Min-level is {cC%d{c0\r\n" ,GET_OBJ_LEVEL(obj));
@@ -1354,6 +1354,8 @@ ASPELL(spell_recharge) {
 
 ASPELL(spell_knock) {
     int cnt = 0, i, ret_door = 0;
+    Room* other_room;
+	
     if (!obj) {
 
         for (i = 0; i < NUM_OF_DIRS; i++) {
@@ -1372,22 +1374,23 @@ ASPELL(spell_knock) {
             if (EXIT(ch, i)->to_room == NULL)
                 continue;
             /** and from that way **/
-            if (EXIT(ch, rev_dir[i]) &&
-                    IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_ISDOOR) &&
-                    !IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_PICKPROOF) &&
-                    EXIT(ch, rev_dir[i])->to_room != NULL)
+            other_room = EXIT(ch, i)->to_room;
+	    if (EXIT2(other_room, rev_dir[i]) &&
+                    IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_ISDOOR) &&
+                    !IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+                    EXIT2(other_room, rev_dir[i])->to_room != NULL)
                 ret_door = 1;
             /** lets make it so they can only open doors that are on the inside **/
 
             cnt++;
             send_to_room(IN_ROOM(ch), "The exit %s bursts open under the force of some ethereal hand.\n", dirs[i]);
             send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some ethereal hand.\n", dirs[rev_dir[i]]);
-            if (ret_door && IS_SET(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED))
-                TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_LOCKED);
+            if (ret_door && IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED))
+                TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED);
             if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
                 TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_LOCKED);
             if (ret_door)
-                TOGGLE_BIT(EXIT(ch, rev_dir[i])->exit_info, EX_CLOSED);
+                TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_CLOSED);
             TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_CLOSED);
         }
 
@@ -1399,7 +1402,7 @@ ASPELL(spell_knock) {
             ch->Send( "You can't cast knock on %s\r\n", obj->short_description);
         } else if (!OBJVAL_FLAGGED(obj, CONT_CLOSEABLE) || !OBJVAL_FLAGGED(obj, CONT_CLOSED)) {
             ch->Send( "%s is wide open!\r\n", obj->short_description);
-        } else if (!OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {
+        } else if (OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {
             ch->Send( "%s resists your magic.\r\n", obj->short_description);
         } else if (total_chance(ch, SPELL_KNOCK) > number(1, 130)) {
             if (OBJVAL_FLAGGED(obj, CONT_LOCKED))

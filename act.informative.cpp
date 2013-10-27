@@ -443,7 +443,7 @@ void show_affect_to_char ( Character *i, Character *ch )
 		      TO_VICT );
 
 	if ( AFF_FLAGGED ( i, AFF_FREEZING ) && !AFF_FLAGGED ( i, AFF_PROT_COLD ) )
-		act ( MXPTAG ( "affect lightskyblue" ) "...$e in stuck inside a huge glacier!"MXPTAG ( "/affect " ),
+		act ( MXPTAG ( "affect lightskyblue" ) "...$e is stuck inside a huge glacier!"MXPTAG ( "/affect " ),
 		      FALSE, i, 0, ch, TO_VICT );
 	if ( PLR_FLAGGED ( i, PLR_FROZEN ) )
 		act ( MXPTAG ( "affect paleturquoise" ) "...$e's stuck inside a huge iceburg!"MXPTAG ( "/affect " ),
