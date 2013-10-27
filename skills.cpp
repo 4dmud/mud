@@ -1700,7 +1700,7 @@ ASKILL ( skill_grapple )
 	{
 		act ( "You grapple with $N, but slip and $E falls on you!", FALSE, ch, 0, vict, TO_CHAR );
 		act ( "$n grapples with $N, but slips and $E falls on $m!", FALSE, ch, 0, vict, TO_NOTVICT );
-		act ( "$n trys to grapple you, but slips and you fall on $m!", FALSE, ch, 0, vict, TO_VICT );
+		act ( "$n tries to grapple you, but slips and you fall on $m!", FALSE, ch, 0, vict, TO_VICT );
 		damage ( ch, ch, GET_WEIGHT ( vict ), TYPE_UNDEFINED );
 		return 0;
 	}

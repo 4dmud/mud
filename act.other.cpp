@@ -2053,7 +2053,7 @@ const char *msgs[][2] =
 	{"You make a nice hole while digging up a lot of dirt.\r\n",
 	 "$n digs a hole and goes about $s business.\r\n"},
 
-	{"You seem to be hitting alot of roots when you dig.\r\n",
+	{"You seem to be hitting a lot of roots when you dig.\r\n",
 	 "$n look like $e is trying to dig up a tree!\r\n"},
 
 	{"You dig up more clay than dirt here.\r\n",
