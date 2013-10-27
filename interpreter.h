@@ -193,7 +193,8 @@ struct alias_data {
 #define SCMD_FISHTALLY  48
 #define SCMD_NOTELEPORT 49
 #define SCMD_AUTOGROUP  50
-#define SCMD_NOTITLE1    51
+#define SCMD_NOTITLE1   51
+#define SCMD_NOGRAPHICS 52
 
 /* do_wizutil */
 #define SCMD_REROLL	0

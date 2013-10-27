@@ -196,8 +196,8 @@ const char *how_good ( int percent )
 char * how_good_perc ( Character *ch, int perc )
 {
 	static char  perc_buf[80];
-	if ( GET_INT ( ch ) < 22 )
-		return ( char * ) how_good ( perc );
+	//if ( GET_INT ( ch ) < 22 && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	//	return ( char * ) how_good ( perc );
 	sprintf ( perc_buf, "%-3d%%", perc );
 	return perc_buf;
 
@@ -257,7 +257,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	}
 	else
 	{
-		snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s in green:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills" );
+		snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "with a * in front" : "in green" );
 		DYN_RESIZE ( buf );
 	}
 
@@ -294,7 +294,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				sprintf ( buf, "%-3d)", i );
 				DYN_RESIZE ( buf );
 			}
-			sprintf ( buf, " \x1B[1;31m%-28s  \x1B[0m[%s] ", sub_name ( i ), ( ( sub > 0 ) ? how_good_perc ( ch, sub ) : unlearnedsub ) );
+			sprintf ( buf, "%s\x1B[1;31m%-28s  \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ", sub_name ( i ), ( ( sub > 0 ) ? how_good_perc ( ch, sub ) : unlearnedsub ) );
 			DYN_RESIZE ( buf );
 
 
@@ -335,7 +335,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				}
 
 
-				sprintf ( buf, " %s%-20s     \x1B[0m[%s] ",
+				sprintf ( buf, "%s%s%-20s     \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ",
 				          ( ! ( IS_SPELL_CAST(i) ) ? "\x1B[32m" : "\x1B[33m" ),
 				          skill_name ( i ), how_good_perc ( ch, total_chance ( ch, i ) ) );
 				DYN_RESIZE ( buf );

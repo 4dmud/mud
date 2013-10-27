@@ -707,6 +707,7 @@ const command_info cmd_info[] =
 	{ "nobrag" , "nobr"  , POS_DEAD    , do_gen_tog  , 0, SCMD_NOBRAG, 0 },
 	{ "noctalk" , "noct" , POS_DEAD    , do_gen_tog  , 0, SCMD_NOCTALK, 0 },
 	{ "nogossip" , "nogo"     , POS_DEAD    , do_gen_tog  , 0, SCMD_NOGOSSIP, 0 },
+	{ "nographics", "nographics", POS_DEAD  , do_gen_tog  , 1, SCMD_NOGRAPHICS, 0 },
 	{ "nograts"  , "nogr"     , POS_DEAD    , do_gen_tog  , 0, SCMD_NOGRATZ, 0 },
 	{ "nohassle" , "noh" , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOHASSLE, WIZ_IMM1_GRP },
 	{ "noic"     , "noi"  , POS_DEAD    , do_gen_tog  , 0, SCMD_NOIC, 0 },

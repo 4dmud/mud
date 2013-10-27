@@ -713,6 +713,7 @@ void list_one_char ( Character *i, Character *ch )
 {
 	struct obj_data *chair = NULL;
 	int wizinvis = FALSE;
+	char tier_string[] = "T0.";
 
 	static const char *positions[] =
 	{
@@ -751,8 +752,14 @@ void list_one_char ( Character *i, Character *ch )
 			return;
 		}
 	}
-	ch->Send ( "%s%s", TIER_COLOUR_LIST ( ( IS_NPC ( i ) ? MOB_TIER ( i ) : current_class_is_tier_num ( i ) ) ) , CBCYN ( ch, C_NRM ) );
 
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{  
+	   tier_string[1] += ( IS_NPC ( i ) ? MOB_TIER ( i ) : current_class_is_tier_num ( i ) );
+	   ch->Send ( "%s%s", tier_string, CBCYN ( ch, C_NRM ) );
+	}
+	else ch->Send ( "%s%s", TIER_COLOUR_LIST ( ( IS_NPC ( i ) ? MOB_TIER ( i ) : current_class_is_tier_num ( i ) ) ) , CBCYN ( ch, C_NRM ) );
+ 
 	if ( AFF_FLAGGED ( i, AFF_POLY_TOAD ) )
 	{
 		*ch << "A slimy toad stands here looking vaguely like " << GET_NAME ( i ) << ".\r\n";
@@ -1463,9 +1470,11 @@ void list_scanned_chars ( Character *list, Character *ch,
 		"far off to the"
 	};
 
-	Character *i;
-	int count = 0, count2 = 0;
+	Character *i, *j;
+	int count = 0, count2 = 0, unique_mob_count = 0, counter, counter2;
 	room_rnum is_in;
+	vector<int> mob_count;
+	bool mob_seen;
 
 	if ( !list )
 		return;
@@ -1473,14 +1482,35 @@ void list_scanned_chars ( Character *list, Character *ch,
 	   (i.e., "You see x, x, y, and z." with commas, "and", etc.) */
 	is_in = IN_ROOM ( ch );
 	IN_ROOM ( ch ) = IN_ROOM ( list );
-	for ( i = list; i; i = i->next_in_room )
+	for ( i = list, counter = 0; i; i = i->next_in_room, counter++ )
 	{
+		if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			mob_count.push_back(0);
 
 		/* put any other conditions for scanning someone in this if statement -
 		   i.e., if (CAN_SEE(ch, i) && condition2 && condition3) or whatever */
 		if ( ! ( MOB_FLAGGED ( i, MOB_WIZINVIS ) || ( i->player.long_descr && i->player.long_descr[0] == '{' && strlen ( i->player.long_descr ) <= 3 ) ) && CAN_SEE ( ch, i ) )
+		{
 			count++;
-
+			if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			{
+				mob_seen = false;
+				for ( j = list, counter2 = 0; counter2 < counter; j = j->next_in_room, counter2++ )
+				{
+					if ( !str_cmp ( GET_NAME (j), GET_NAME (i) ) )
+					{ 
+						mob_count[ counter2 ]++; 
+						mob_seen = true; 
+						break; 
+					}	
+				}
+				if ( !mob_seen )
+				{
+					mob_count[ counter ] = 1;
+					unique_mob_count++;  
+				}
+			}
+		}
 	}
 
 	if ( !count )
@@ -1489,7 +1519,7 @@ void list_scanned_chars ( Character *list, Character *ch,
 		return;
 	}
 
-	for ( i = list; i; i = i->next_in_room )
+	for ( i = list, counter = 0; i; i = i->next_in_room, counter++ )
 	{
 
 		/* make sure to add changes to the if statement above to this one also, using
@@ -1499,19 +1529,33 @@ void list_scanned_chars ( Character *list, Character *ch,
 			continue;
 		if ( !CAN_SEE ( ch, i ) )
 			continue;
+		if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) && !mob_count [ counter ] )
+			continue;
 		if ( !count2++ )
 			*ch << "You see " << GET_NAME ( i );
 		else
 			*ch << GET_NAME ( i );
+		if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ) 
+		{
+			if ( mob_count [ counter ] > 1 )
+				ch->Send ( " (%d)", mob_count [ counter ] );
+			if ( --unique_mob_count > 1 )
+				ch->Send ( ", " );
+			else if ( unique_mob_count == 1 )
+				ch->Send ( " and " );
+			else
+			{
+				ch->Send ( " %s %s.\r\n", how_far[distance], dirs[door] );
+				break;
+			}	
+			continue;
+		}
 		if ( --count > 1 )
 			ch->Send ( ", " );
 		else if ( count == 1 )
 			ch->Send ( " and " );
 		else
-		{
 			ch->Send ( " %s %s.\r\n", how_far[distance], dirs[door] );
-
-		}
 	}
 	IN_ROOM ( ch ) = is_in;
 }
@@ -1621,7 +1665,8 @@ void look_in_obj ( Character *ch, char *arg, struct obj_data *item )
 						break;
 				}
 				container_disp ( ch, obj );
-				*ch << "-------------------------\r\n";
+				if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )				
+					*ch << "-------------------------\r\n";
 				list_obj_to_char ( obj->contains, ch, SHOW_OBJ_SHORT, TRUE );
 			}
 		}
@@ -1996,6 +2041,19 @@ ACMD ( do_gold )
 	commafmt ( goldbank, sizeof ( goldbank ), ch->Gold ( 0, GOLD_BANK ) );
 	commafmt ( goldtot, sizeof ( goldtot ), ch->Gold ( 0, GOLD_HAND ) + ch->Gold ( 0, GOLD_BANK ) );
 
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{
+	   ch->Send ( "\r\n{cc4 DIMENSIONS FINANCIAL SERVICES{c0\r\n" );
+ 	   ch->Send ( "{ccGold in Bank{cW: [{cy%19s{cW]{c0\r\n", goldbank );
+	   ch->Send ( "{ccGold Carried{cW: [{cy%19s{cW]{c0\r\n", goldhand );
+	   ch->Send ( "{ccTotal Balance{cW: [{cy%19s{cW]{c0\r\n", goldtot );
+	   ch->Send ( "{ccTokens on file{cW: %5d brass, %5d bronze, %5d silver, %5d gold.{c0\r\n",
+	           GET_BRASS_TOKEN_COUNT ( ch ), GET_BRONZE_TOKEN_COUNT ( ch ),
+	           GET_SILVER_TOKEN_COUNT ( ch ), GET_GOLD_TOKEN_COUNT ( ch ) );
+	   ch->Send ( "{ccTradepoints{cW: %5d{c0\r\n", TRADEPOINTS ( ch ) );
+	   ch->Send ( "{ccTotal Deeds{cW: %5d{c0\r\n", GET_DEED_COUNT( ch ) );
+	   return;
+	}
 
 	ch->Send ( "\r\n{cY        _       {cc            4 DIMENSIONS FINANCIAL SERVICES{c0\r\n" );
 	ch->Send ( "{cY  _    |-|  _   {cw-------------------------------------------{c0\r\n" );
@@ -2368,6 +2426,96 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 		len = snprintf ( webs, sizeof ( webs ), " " );
 	}
 
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{
+	ch->Send ( "{cwName:{cc %-16s{cw Level: {cy%2d {cw%-29s\r\n",
+	           GET_NAME ( ch ),GET_LEVEL ( ch ), primary_class ( ch, blank ) );
+	ch->Send (
+	    "{cwRace:{cc %-9s        {cwAlign: {cc%-5d {cw%-29s\r\n",
+	    race_name ( ch ),  GET_ALIGNMENT ( ch ), secondary_class ( ch, blank ) );
+
+	ch->Send (
+	    "{cwSex:{cy %-7s       {cwPractices: {cc%-6d {cw%-29s\r\n",
+	    ( GET_SEX ( ch ) == SEX_MALE ? "Male" : ( GET_SEX ( ch ) ? "Female" :  "Neutral" ) ),
+	    GET_PRACTICES ( ch ), tertary_class ( ch, blank ) );
+
+	ch->Send (
+	    "{cwClan: {cy%-17s {cwRank: {cc%-2d {cw%-29s\r\n",
+	    ( ( !GET_CLAN ( ch ) ) ? "<none>" : clan[find_clan_by_id ( GET_CLAN ( ch ) ) ].name ),
+	    GET_CLAN_RANK ( ch ), quatry_class ( ch, blank ) );
+
+	ch->Send (
+	    "{cwHit  Points: [{cc%6d{cw][{cc%6d{cw] Speed: [{cc%6d{cw] AC: [{cc%4d{cw]\r\n"
+	    "{cwMana Points: [{cc%6d{cw][{cc%6d{cw] Hitroll: [{cc%4d{cw] Dam-Bonus: [{cc%4d{cw]\r\n"
+	    "{cwMove Points: [{cc%6d{cw][{cc%6d{cw] Accuracy: [{cy%4d{cw] Evasion: [{cy%4d{cw]{c0\r\n",
+	    GET_HIT ( ch ), GET_MAX_HIT ( ch ),speed_update ( ch ),ch->compute_armor_class(),
+	    GET_MANA ( ch ), GET_MAX_MANA ( ch ), GET_HITROLL ( ch ),   is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ),
+	    GET_MOVE ( ch ), GET_MAX_MOVE ( ch ), accuracy_tot ( ch ), evasion_tot ( ch ) );
+
+	if ( IS_PK ( ch ) )
+		ch->Send ( "{cwPKwin: [{cc%6d{cw] PKloss: [{cc%6d{cw] PK-Points: [{cc%6d{cw]\r\n",
+		           GET_PK_CNT ( ch ), GET_PK_RIP ( ch ), GET_PK_POINTS ( ch ) );
+
+	ch->Send (
+	    "{cwKills: [{cc%6d{cw] Deaths: [{cc%6d{cw] Deathtraps: [{cc%4d{cw]\r\n",
+	    GET_KILL_CNT ( ch ), GET_RIP_CNT ( ch ), GET_DT_CNT ( ch ) );
+	if ( *webp || *webs )
+		ch->Send ( "{cC%-30s {cC%-30s{cw\r\n", webp,  webs );
+	if ( ( staff || wep_num > 1 ) && GET_EQ ( ch, WEAR_SHIELD ) && *shld )
+		ch->Send ( "              {cC%30s{cg                   {cw\r\n", shld );
+	if ( GET_EQ ( ch, WEAR_WIELD ) &&
+	        ( GET_OBJ_TYPE ( GET_EQ ( ch, WEAR_WIELD ) ) == ITEM_SHOVEL ||
+	          GET_OBJ_TYPE ( GET_EQ ( ch, WEAR_WIELD ) ) == ITEM_PICKAXE ) )
+		ch->Send (
+		    "{cC[Mining] {cwSpeed: {cc%3d {cwBonus: {cc%3d {cwProtection: {cc%3d {cwStealth: {cc%3d\r\n",
+		    MINE_SPEED ( ch ), MINE_BONUS ( ch ), MINE_DAMAGE ( ch ), MINE_STEALTH ( ch ) );
+
+	ch->Send ( "{cwSTR: {cy%2d{cw/{cy%-3d {cwINT: {cy%-2d {cwWIS: {cy%-2d {cwCON: {cy%-2d {cwDEX: {cy%-2d {cwCHA: {cy%-2d\r\n", 
+	    GET_STR ( ch ), GET_ADD ( ch ), GET_INT ( ch ), GET_WIS ( ch ),
+	    GET_CON ( ch ),GET_DEX ( ch ), GET_CHA ( ch ) );
+
+	ch->Send ( "{cwHunger: [{cy%3d%%{cw] Thirst: [{cy%3d%%{cw] Intoxication: [{cy%3d%%{cw]\r\n",
+	    GET_COND ( ch,
+	               FULL ) ==
+	    -1 ? 0 : 100 - ( ( GET_COND ( ch, FULL ) * 100 ) / 48 ),
+	    GET_COND ( ch,
+	               THIRST ) ==
+	    -1 ? 0 : 100 - ( ( GET_COND ( ch, THIRST ) * 100 ) / 48 ),
+	    GET_COND ( ch,
+	               DRUNK ) ==
+	    -1 ? 0 : ( ( GET_COND ( ch, DRUNK ) * 100 ) / 48 ) );
+
+	if ( GET_LEVEL ( ch ) < LVL_HERO )
+	{
+		char exphave[50], expneed[50];
+		commafmt ( exphave, sizeof ( exphave ),GET_EXP ( ch ) );
+		commafmt ( expneed, sizeof ( expneed ),exp_needed ( ch ) );
+		ch->Send (
+		    "{cwExp. Total: {cy%-15s {cgNeeded To Level: {cC%-15s\r\n",
+		    exphave, exp_needed ( ch ) > 0 ? expneed : "No More" );
+		if ( GET_LEVEL ( ch ) >= 60 )
+		{
+			commafmt ( exphave, sizeof ( exphave ),GET_GROUP_EXP ( ch ) );
+			commafmt ( expneed, sizeof ( expneed ),group_exp_needed ( ch ) );
+			ch->Send ( "{cwGroup Pts: {cy%-15s {cgNeeded To Level: {cC%-15s\r\n",
+			           exphave, group_exp_needed ( ch ) > 0 ? expneed : "No More" );
+		}
+
+	}
+
+
+
+	playing_time = *real_time_passed ( ( time ( 0 ) - ch->player.time.logon ) +
+	                                   ch->player.time.played, 0 );
+	ch->Send (
+	    "{cwAge: {cy%-3d {cwYou have been playing for [{cy%3d{cw] day%s and [{cy%2d{cw] hour%-s\r\n",
+	    GET_AGE ( ch ),
+	    playing_time.day, playing_time.day == 1 ? "" : "s",
+	    playing_time.hours,
+	    playing_time.hours == 1 ? " " : "s" );
+	}
+	else // PRF_NOGRAPHICS == OFF
+	{
 	/* yikes, nasty hack job here testing for a player name but hey... -mord */
 	if ( !str_cmp ( "thotter", GET_NAME ( ch ) ) )
 		ch->Send (
@@ -2476,6 +2624,8 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 	    playing_time.hours == 1 ? " " : "s" );
 	ch->Send (
 	    "{cg-------------------------------------------------------------------------{c0\r\n" );
+	}
+
 	if ( GET_RP_GROUP ( ch ) )
 		ch->Send ( "Your RP group is: %s\r\n", rp_group_names[GET_RP_GROUP ( ch ) ] );
 	if ( GET_LEVEL ( ch ) >= LVL_HERO )
@@ -4869,7 +5019,7 @@ ACMD ( do_toggle )
 	    "     IC Channel: %-3s\r\n"
 	    "    Color Level: %-8s"
 	    "  NoBattlespam: %-3s     "
-	    "  NoMail Prompt: %-3s\r\n"
+	    " NoMail Prompt: %-3s \r\n"
 	    "        NOCTalk: %-3s    "
 	    "        AFKTELL: %-3s    "
 	    "        MoveMsg: %-3s\r\n"
@@ -4888,7 +5038,8 @@ ACMD ( do_toggle )
 	    "         NOGATE: %-3s    "
 	    "      FishTally: %-3s    "
 	    "     NOTELEPORT: %-3s\r\n"
-	    " NoDisplayTitle: %-3s    ",
+	    " NoDisplayTitle: %-3s    "
+	    "     NoGraphics: %-3s\r\n",
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_DISPHP ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_BRIEF ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_SUMMONABLE ) ),
@@ -4911,7 +5062,7 @@ ACMD ( do_toggle )
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_KEEPTITLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOIC ) ),
 	    ctypes[COLOUR_LEV ( ch ) ],
-	    ONOFF ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ),
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_BATTLESPAM ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_MAIL ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOCTALK ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_AFKTELL ) ),
@@ -4935,7 +5086,8 @@ ACMD ( do_toggle )
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_GATEABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
-	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE) )
+	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) ),
+	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
 	    );
 
 }
@@ -5286,6 +5438,48 @@ ACMD ( do_worth )
 	for ( i = 0; i < NUM_CLASSES; i++ )
 		if ( GET_MASTERY ( ch, i ) )
 			len += snprintf ( buf+len, sizeof ( buf ) - len, "%c ", UPPER ( *pc_class_types[i] ) );
+
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{
+	   ch->Send ( "\r\n"
+		      "{cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
+	              "{cwNatural Accuracy Rating: {cg%-3d{cy         \r\n"
+	              "{cwNatural Evasion Rating: {cg%-3d{cy         \r\n"
+	              "{cwRegenerating per mud hour: {cyHp:{cc%-3d {cyMa:{cc%-3d {cyMv:{cc%-3d {cySt:{cc%-3d{cy\r\n"
+	              "{cwHead And Neck Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwUpper Left Body Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwUpper Right Body Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwTorso Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwLower Left Body Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwLower Right Body Armor: {cL%%%-3d{cy        \r\n"
+	              "{cwCoolness: {cg%-3d{cy       \r\n"
+	              "{cwAward Points: {cg%-3d{cw Ethos: {cg%-3s{cy   \r\n"
+	              "{cwStamina: {cC%d/%d{cw Detector: {cg%-3s{cy \r\n"
+                      "{cwMastered Classes: {cg%s{cy\r\n"
+	              "{cwElemental Weakness: {cr%s{cy\r\n"
+	              "{cwElemental Strength: {cc%s{cy\r\n",
+	              REMORTS ( ch ),
+	              GET_REMORT ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT ( ch ) ],
+	              GET_REMORT_TWO ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_TWO ( ch ) ],
+	              GET_REMORT_THREE ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_THREE ( ch ) ],
+	              GET_PERM_ACCURACY ( ch ),
+	              GET_PERM_EVASION ( ch ),
+	      	      hit_gain ( ch ), mana_gain ( ch ), move_gain ( ch ), stamina_gain ( ch ),
+ 		      chance_hit_part ( ch, PART_HEAD ),
+	              chance_hit_part ( ch, PART_LEFT_ARM ),
+	              chance_hit_part ( ch, PART_RIGHT_ARM ),
+	              chance_hit_part ( ch, PART_TORSO ),
+	              chance_hit_part ( ch, PART_LEFT_LEG ),
+	              chance_hit_part ( ch, PART_LEFT_LEG ),
+	              GET_COOLNESS ( ch ),
+	              update_award ( ch ), *ethos,
+	              GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
+                      buf,
+	              print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),
+	              print_elemental ( GET_CLASS ( ch ), FALSE, buf2, sizeof ( buf2 ) ) 
+		    );
+	   return;
+	}
 
 	ch->Send ( "\r\n{cy"
 	           "O=====================================================================O\r\n"
@@ -5700,7 +5894,7 @@ void container_disp ( Character *ch,OBJ_DATA * obj )
 	if ( max >= percent )
 	{
 		percent = ( int ) ( ( percent*100.0f ) / ( float ) max );
-		ch->Send ( "[%s] - max %d\r\n", how_good ( percent ), max );
+		ch->Send ( "%3d%% - max %d\r\n", percent, max );		
 	}
 
 }
