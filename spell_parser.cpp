@@ -1165,7 +1165,7 @@ ACMD ( do_cast )
 	s = strtok ( NULL, "'" );
 	if ( s == NULL )
 	{
-		ch->Send ( "Spell names must be enclosed in the Holy Magic Symbols: '\r\n" );
+		ch->Send ( "Spell names must be enclosed in the Holy Magic Symbols: ''\r\n" );
 		return;
 	}
 	t = strtok ( NULL, "\0" );
@@ -1237,7 +1237,8 @@ ACMD ( do_cast )
 		/* the start of finding the target
 		 * If they typed a target, see if we can find them*/
 
-		if ( IS_SET ( SINFO.targets, TAR_IGNORE ) && !IS_SET ( SINFO.targets, TAR_AREA_DIR ) )
+		if ( IS_SET ( SINFO.targets, TAR_IGNORE ) && !( IS_SET ( SINFO.targets, TAR_AREA_DIR ) || 
+		     						IS_SET ( SINFO.targets, TAR_OBJ_INV ) )) 
 		{
 			/* if no target wanted */
 			target = TRUE;
@@ -1342,6 +1343,9 @@ ACMD ( do_cast )
 				tch = ch;
 				target = TRUE;
 			}
+
+			if ( !target && IS_SET (SINFO.targets, TAR_IGNORE ) )
+				target = TRUE; // for spells that work with and without a target
 
 			if ( !target )
 			{
