@@ -465,7 +465,7 @@ ACMD ( do_flee )
                 	if (af->type == SKILL_SNARE) break;
 
 		i = total_chance(ch, SKILL_TRAP_AWARE) - af->modifier + GET_LEVEL(ch);
-	    	if(total_chance(ch, SKILL_TRAP_AWARE) < 5 && (number(1,100) > i)) 
+	    	if(total_chance(ch, SKILL_TRAP_AWARE) < 5 && (number(1,100) > i) || IS_NPC ( ch )) 
                 {
 			ch->Send ( "You have been snared and can't flee.\r\n" );
 			WAIT_STATE(ch, 1 RL_SEC);
