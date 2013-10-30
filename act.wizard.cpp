@@ -6551,12 +6551,21 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
   
 }
 
+bool Comparefunc ( pair < int, string > a, pair < int, string > b )
+{
+	return a.first > b.first;
+}
+
 ACMD ( do_statlist )
 {
 	char arg1[MAX_INPUT_LENGTH];
 	char arg2[MAX_INPUT_LENGTH];
 	char buf[MAX_INPUT_LENGTH];
-	int aff = 0, pos = -1, nr, count = 0, object, size = 0;
+	char line[MAX_INPUT_LENGTH];
+	char s[MAX_INPUT_LENGTH];
+	int aff = 0, pos = -1, nr, count = 0, object, size = 0, i;
+	string arg2_string, linestring;
+	vector < pair < int, string > > pairs;
 
 	DYN_DEFINE;
 	*buf = 0;
@@ -6564,6 +6573,7 @@ ACMD ( do_statlist )
 	*buf = '\0';
 
 	argument = two_arguments ( argument, arg1, arg2 );
+	arg2_string = arg2;
 
 	if ( !*arg1 )
 	{
@@ -6595,10 +6605,11 @@ ACMD ( do_statlist )
 			if ( is_abbrev ( arg2, wear_bits[pos] ) )
 				break;
 
-		if ( *wear_bits[pos] == '\n' )
+		if ( arg2_string != "all" && *wear_bits[pos] == '\n' )
 		{
 			send_to_char ( "Unrecognized position, options are:", ch );
 			olc_list_flags ( ch, wear_bits );
+			ch->Send ("{cg31{c0) ALL\r\n");
 			return;
 		}
 	}
@@ -6606,6 +6617,7 @@ ACMD ( do_statlist )
 	{
 		send_to_char ( "Unrecognized position, options are:", ch );
 		olc_list_flags ( ch, wear_bits );
+		ch->Send ("{cg31{c0) ALL\r\n");
 		return;
 	}
 	DYN_CREATE;
@@ -6614,7 +6626,7 @@ ACMD ( do_statlist )
 	for ( object = 0; object <= top_of_objt; object++ )
 	{
 
-		if ( pos != -1 && !CAN_WEAR ( &obj_proto[object], pos ) )
+		if ( arg2_string != "all" && pos != -1 && !CAN_WEAR ( &obj_proto[object], pos ) )
 			continue;
 
 		for ( nr = 0; nr < MAX_OBJ_AFFECT; nr++ )
@@ -6622,50 +6634,52 @@ ACMD ( do_statlist )
 			if ( obj_proto[object].affected[nr].location == aff )
 			{
 				count++;
-				snprintf ( buf, sizeof ( buf ),  "[%7d] ", obj_index[object].vnum );
-				DYN_RESIZE ( buf );
-				snprintf ( buf, sizeof ( buf ),  "Modifys %s by [",
-				           apply_types[aff] );
-				DYN_RESIZE ( buf );
+				*line = '\0';
+				snprintf ( s, sizeof ( s ),  "[%7d] ", obj_index[object].vnum );
+				strcat ( line, s );
+				snprintf ( s, sizeof ( s ),  "Modifies %s by [", apply_types[aff] );
+				strcat ( line, s );
 				size = obj_proto[object].affected[nr].modifier;
 				if ( size < 0 )
-					snprintf ( buf, sizeof ( buf ), "{cb%d{c0", size );
+					snprintf ( s, sizeof ( s ), "{cb%d{c0", size );
 				else
 				{
 					switch ( size )
 					{
 						case 0:
-							snprintf ( buf, sizeof ( buf ), "{cr0{c0" );
+							snprintf ( s, sizeof ( s ), "{cr0{c0" );
 							break;
 						case 1:
-							snprintf ( buf, sizeof ( buf ), "{cy1{c0" );
+							snprintf ( s, sizeof ( s ), "{cy1{c0" );
 							break;
 						case 2:
-							snprintf ( buf, sizeof ( buf ), "{cg2{c0" );
+							snprintf ( s, sizeof ( s ), "{cg2{c0" );
 							break;
 						case 3:
-							snprintf ( buf, sizeof ( buf ), "{cG3{c0" );
+							snprintf ( s, sizeof ( s ), "{cG3{c0" );
 							break;
 						case 4:
-							snprintf ( buf, sizeof ( buf ), "{cC4{c0" );
+							snprintf ( s, sizeof ( s ), "{cC4{c0" );
 							break;
 						default:
-							snprintf ( buf, sizeof ( buf ), "{cW%d{c0", size );
+							snprintf ( s, sizeof ( s ), "{cW%d{c0", size );
 							break;
 					}
 
 				}
-				DYN_RESIZE ( buf );
+				strcat ( line, s );
 
-				snprintf ( buf, sizeof ( buf ), "] %s - ",
-				           obj_proto[object].short_description );
-				DYN_RESIZE ( buf );
+				snprintf ( s, sizeof ( s ), "] %s - ", obj_proto[object].short_description );
+				strcat ( line, s );
 				sprintbitarray ( obj_proto[object].obj_flags.wear_flags,
-				                 wear_bits, TW_ARRAY_MAX, buf, sizeof ( buf ) );
-				DYN_RESIZE ( buf );
+				                 wear_bits, TW_ARRAY_MAX, s, sizeof ( s ) );
+				strcat ( line, s );
 
-				snprintf ( buf, sizeof ( buf ), "\r\n" );
-				DYN_RESIZE ( buf );
+				snprintf ( s, sizeof ( s ), "\r\n" );
+				strcat ( line, s );
+
+				linestring = line;
+				pairs.push_back ( make_pair ( size, linestring ) );
 			}
 
 		}
@@ -6675,6 +6689,15 @@ ACMD ( do_statlist )
 	{
 		snprintf ( buf, sizeof ( buf ), "No items that affect that stat.\r\n" );
 		DYN_RESIZE ( buf );
+	}
+	else
+	{
+		sort ( pairs.begin(), pairs.end(), Comparefunc );
+		for ( i=0; i < count; i++ )
+		{
+			snprintf ( buf, sizeof ( buf ), pairs[i].second.c_str() );
+			DYN_RESIZE ( buf );
+		}
 	}
 
 	page_string ( ch->desc, dynbuf, DYN_BUFFER );
@@ -6729,7 +6752,7 @@ ACMD ( do_osnoop )
 					continue;
 				count++;
 				ch->Send ( "[%7d] ", obj_index[object].vnum );
-				ch->Send ( "Modifys %s by [",
+				ch->Send ( "Modifies %s by [",
 				           apply_types[aff] );
 
 				if ( size < 0 )
