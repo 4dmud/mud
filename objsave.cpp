@@ -95,6 +95,7 @@ void remove_corpse_from_list(OBJ_DATA *corpse);
 void add_identifier(struct obj_data *obj, long id);
 void free_identifier(struct obj_data *obj);
 int has_identifier(struct obj_data *obj, long id);
+void pause_timer(struct obj_data* object);
 
 #define NEW_CORPSE_FILE LIB_MISC"new_corpse.save"
 
@@ -1470,6 +1471,8 @@ int load_objects_to_room(room_rnum rnum, FILE *fl)
       generate_weapon(temp);
       obj_to_room(temp, rnum);
       relocate_obj(rnum, NULL, temp, locate, cont_row);
+      if ( IS_OBJ_STAT (temp, ITEM_ARTIFACT))
+         pause_timer(temp); 		
       check_timer(temp);
     }
   }
