@@ -680,15 +680,15 @@ void Character::default_char()
 	real_abils.con 				= 0;
 	real_abils.cha 				= 0;
 	//GET_SPEED(this) = 0;
-	GET_HIT ( this ) 			= 25;
-	GET_MAX_HIT ( this ) 			= 25;
-	GET_MANA ( this ) 			= 100;
-	GET_MAX_MANA ( this ) 			= 100;
+	GET_HIT ( this ) 			= 100;
+	GET_MAX_HIT ( this ) 			= 100;
+	GET_MANA ( this ) 			= 1000;
+	GET_MAX_MANA ( this ) 			= 1000;
 	// Tweaking these base values to 
 	// Give newbies more base movement. 50 to 750
 	//Prometheus
-	GET_MOVE ( this ) 			= 750;
-	GET_MAX_MOVE ( this ) 			= 750;
+	GET_MOVE ( this ) 			= 1000;
+	GET_MAX_MOVE ( this ) 			= 1000;
 	// Increasing Stamina for newbies as well from 100 to 125
 	// Prom
 	GET_STAMINA ( this ) 			= 125;

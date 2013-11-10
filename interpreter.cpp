@@ -2289,20 +2289,14 @@ int enter_player_game ( Descriptor *d )
 		//Lantern
 		if ( ( obj = read_object ( 3365, VIRTUAL ) ) != NULL )
 			perform_wear ( ch, obj, WEAR_LIGHT );
-		//Seekers Feather
-		if ( ( obj = read_object ( 12918, VIRTUAL ) ) != NULL )
-			obj_to_char ( obj, ch );
-		//Note
-		if ( ( obj = read_object ( 12922, VIRTUAL ) ) != NULL )
-			obj_to_char ( obj, ch );
-		//Mini-quest leaflet
-		if ( ( obj = read_object ( 12992, VIRTUAL ) ) != NULL )
-			obj_to_char ( obj, ch );
 
-		for (sh_int potion_count = 0; potion_count < 3; potion_count++)  {
+		//Seeker's Clan Crest
+		if ( ( obj  = read_object ( 17010, VIRTUAL ) ) != NULL )
+                        perform_wear ( ch, obj, WEAR_CREST );
+
+		//Healing Potion
 		if (( obj = read_object ( 12913, VIRTUAL)) != NULL) 
  			obj_to_char(obj, ch);
-               }
 
 		switch ( GET_CLASS ( ch ) )
 		{

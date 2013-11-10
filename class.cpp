@@ -1039,7 +1039,9 @@ void do_start ( Character * ch )
 	ch->points.max_hit = 10;
 
 	//Another test -> Prom
-	GET_MAX_MOVE(ch) = 250;
+	GET_MAX_MOVE(ch) = 1000;
+	GET_MAX_MANA(ch) = 1000;
+	GET_MAX_HIT(ch) = 100;
 
 	advance_level ( ch );
 

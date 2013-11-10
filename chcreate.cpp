@@ -603,14 +603,14 @@ void readvanceplayer ( Character *ch )
 {
 	gold_int cur_exp = GET_EXP ( ch );
 
-	GET_HIT ( ch ) 			= 25;
-	GET_MAX_HIT ( ch ) 		= 25;
-	GET_MANA ( ch ) 		= 100;
-	GET_MAX_MANA ( ch ) 		= 100;
+	GET_HIT ( ch ) 			= 100;
+	GET_MAX_HIT ( ch ) 		= 100;
+	GET_MANA ( ch ) 		= 1000;
+	GET_MAX_MANA ( ch ) 		= 1000;
 	// Going to change these volues from 50 to 500 for GET_MOVE
 	// and GET_MAX_MOVE -> Prometheus
-	GET_MOVE ( ch ) 		= 50;
-	GET_MAX_MOVE ( ch ) 		= 500;
+	GET_MOVE ( ch ) 		= 1000;
+	GET_MAX_MOVE ( ch ) 		= 1000;
 	GET_STAMINA ( ch ) 		= 100;
 	GET_MAX_STAMINA ( ch ) 		= 100;
 	GET_LEVEL ( ch ) 		= 1;

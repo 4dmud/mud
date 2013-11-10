@@ -2007,7 +2007,6 @@ void death_room ( Character *ch )
 {
 	struct hunter_data *hunt = NULL, *hnext;
 
-
 	if ( IS_NPC ( ch ) )
 	{
 		extract_char ( ch );
@@ -2071,6 +2070,7 @@ void death_room ( Character *ch )
 	ch->check_regen_rates();
 	ch->save();
 	LOOK ( ch );
+
 
 }
 void free_hunter_list ( void )
