@@ -5034,7 +5034,7 @@ ACMD ( do_toggle )
 	    "      PageWidth: %-3d\r\n"
 	    "          Aggro: %-3s    "
 	    "       PageWrap: %-3s    "
-	    "          Brags: %-3s\r\n"
+	    "         NoBrag: %-3s\r\n"
 	    "         NOGATE: %-3s    "
 	    "      FishTally: %-3s    "
 	    "     NOTELEPORT: %-3s\r\n"
@@ -5082,7 +5082,7 @@ ACMD ( do_toggle )
 	    PAGEWIDTH ( ch ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_AGGRO ) ),
 	    YESNO ( PRF_FLAGGED ( ch, PRF_PAGEWRAP ) ),
-	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOBRAG ) ),
+	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOBRAG ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_GATEABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
@@ -5881,9 +5881,13 @@ void container_disp ( Character *ch,OBJ_DATA * obj )
 {
 
 	int max, percent = 0;
+	obj_data* temp;
 	if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
 	{
-		percent = GET_OBJ_WEIGHT ( obj );
+		for ( temp = obj->contains; temp; temp = temp->next_content )
+		{
+			percent += GET_OBJ_WEIGHT ( temp );
+		}
 		max = GET_OBJ_VAL ( obj, 0 );
 	}
 	else

@@ -1399,7 +1399,7 @@ ASPELL(spell_knock) {
         }
     } else {
         if (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) {
-            ch->Send( "You can't cast knock on %s\r\n", obj->short_description);
+            ch->Send( "You can't cast knock on %s.\r\n", obj->short_description);
         } else if (!OBJVAL_FLAGGED(obj, CONT_CLOSEABLE) || !OBJVAL_FLAGGED(obj, CONT_CLOSED)) {
             ch->Send( "%s is wide open!\r\n", obj->short_description);
         } else if (OBJVAL_FLAGGED(obj, CONT_PICKPROOF)) {

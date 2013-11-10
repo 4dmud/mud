@@ -2360,7 +2360,7 @@ ASKILL ( skill_push )
 		strcpy ( todir, dirs[to] );
 		if ( GET_POS ( victim ) <= POS_SITTING )
 		{
-			*ch << "You can't push anybody while they are lying on the ground";
+			*ch << "You can't push anybody while they are lying on the ground.";
 			return 0;
 		}
 
@@ -2381,7 +2381,7 @@ ASKILL ( skill_push )
 		act ( "$n is trying to push $N.", FALSE, ch, 0, vict, TO_NOTVICT );
 		if ( !CAN_GO ( victim, to ) )
 		{
-			ch->Send ( "Can't push %s there\r\n", HMHR ( ch ) );
+			ch->Send ( "Can't push %s there.\r\n", HMHR ( ch ) );
 		}
 		else if ( GET_LEVEL ( victim ) >= LVL_GOD
 		          && GET_LEVEL ( ch ) != LVL_IMPL )
