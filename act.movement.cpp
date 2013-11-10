@@ -2773,7 +2773,7 @@ ASKILL ( skill_blackjack )
 	chance += total_chance ( ch, SKILL_BLACKJACK );
 	chance += ( GET_LEVEL ( ch ) - ( GET_LEVEL ( vict ) /2 ) );
 
-	if ( !GET_EQ ( ch, WEAR_HEAD ) )
+	if ( GET_EQ ( vict, WEAR_HEAD ) )
 		chance -= 10;
 
 	if ( number ( 1, 101 ) < chance )
