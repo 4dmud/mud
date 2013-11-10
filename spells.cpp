@@ -673,8 +673,10 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
        000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
        000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
      */
-    ch->Send(
-        "----------------------------------------------------------------------\r\n");
+    if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
+	ch->Send ( "\r\n" );
+    else
+	ch->Send( "----------------------------------------------------------------------\r\n" );
     sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
     ch->Send( "{cc%s{cy is a type of {cc%s{cy made from {cc%s{c0\r\n",
               buf2, buf, material_name(GET_OBJ_MATERIAL(obj)));
@@ -754,6 +756,15 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         break;
     case ITEM_WEAPON:
 
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{
+		ch->Send ( "{cyWanted Weapon Balance: {cg%d\r\n"
+			   "{cyActual Weapon Balance: {cg%d\r\n",	
+			   perf_balance(GET_WEP_TYPE(obj)),
+                           GET_WEP_BALANCE(obj)
+			 );
+	}
+ 	else
         ch->Send( "{cyWanted Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n"
                   "{cyActual Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n",
                   balance_display(perf_balance(GET_WEP_TYPE(obj))),
@@ -777,8 +788,21 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         att[5] = weapon_type_mod(w_type, PART_LOWER_RIGHT);
 
         total = (att[0] +att[1] +att[2] +att[3] +att[4] +att[5]);
-
-        ch->Send(
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
+    	{
+		ch->Send(
+			"\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
+           		"Head: {cR%2d%%{cc\r\n"
+			"Upper Left: {cR%2d%%{cc\r\n"
+           		"Upper Right: {cR%2d%%{cc\r\n"
+           		"Torso: {cR%2d%%{cc\r\n"
+           		"Lower Left: {cR%2d%%{cc\r\n"
+           		"Lower Right: {cR%2d%%{c0\r\n",
+            		(int)((att[0]*100)/total) , (int)((att[1]*100)/total), (int)((att[2]*100)/total),
+		        (int)((att[3]*100)/total), (int)((att[4]*100)/total), (int)((att[5]*100)/total)
+		);
+	}
+        else ch->Send(
             "\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
             "                (Head)\r\n"
             "                ({cR%2d%%{cc)\r\n"
@@ -791,9 +815,6 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
             (int)((att[0]*100)/total) , (int)((att[1]*100)/total), (int)((att[2]*100)/total),
             (int)((att[3]*100)/total), (int)((att[4]*100)/total), (int)((att[5]*100)/total)
         );
-
-
-
 
         break;
     case ITEM_ARMOR:
@@ -835,8 +856,8 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         break;
     }
 
-    ch->Send(
-        "----------------------------------------------------------------------\r\n");
+    if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
+	ch->Send( "----------------------------------------------------------------------\r\n" );
 
 }
 
