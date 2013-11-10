@@ -2210,14 +2210,16 @@ ACMD ( do_dig_ground )
 	if ( msgs[IN_ROOM ( ch )->sector_type][0] != NULL )
 		*ch << msgs[IN_ROOM ( ch )->sector_type][0];
 
+	// Removing the wait state, don't spam the room when digging is unsuccessful
 	if ( msgs[IN_ROOM ( ch )->sector_type][1] != NULL )
-		act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL,       NULL, TO_ROOM );
+		; // act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM );
 	else
 		return;
-
+	
+	
 	/* set a wait state */
 
-	WAIT_STATE ( ch, 4 RL_SEC );
+	//WAIT_STATE ( ch, 4 RL_SEC );
 
 
 	/*

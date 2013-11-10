@@ -2082,7 +2082,7 @@ ASKILL ( skill_martial_arts )
 	sbyte percent;
 	int i;
 
-	WAIT_STATE ( ch, 3 RL_SEC );
+	//WAIT_STATE ( ch, 3 RL_SEC );
 	if ( AFF_FLAGGED ( ch, AFF_MARTIAL_ARTS ) )
 	{
 		affect_from_char ( ch, SKILL_MARTIAL_ARTS );
@@ -2129,7 +2129,7 @@ ASKILL ( skill_martial_arts )
 			af[1].type = SKILL_MARTIAL_ARTS;
 			affect_to_char ( ch, &af[1] );
 		}
-		WAIT_STATE ( ch, 2 RL_SEC );
+		//WAIT_STATE ( ch, 2 RL_SEC );
 		return SKILL_MARTIAL_ARTS;
 	}
 }
