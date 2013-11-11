@@ -742,10 +742,16 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	new_descr->description = str_dup ( buf2 );
 	new_descr->next = NULL;
 	final_focus->ex_description = new_descr;
-	if ( number ( 0, 400 - ( GET_CHA ( ch ) + total_chance ( ch, SKILL_SING_WOOD ) ) ) )
+	if (GET_LEVEL ( ch ) < LVL_HERO)  
+	{
+        if ( number ( 0, 400 - ( GET_CHA ( ch ) + total_chance ( ch, SKILL_SING_WOOD ))))
 		GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MINOR;
 	else
 		GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
+	}
+	else
+                GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
+
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_FOCUS );
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_TAKE );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_HUM );
