@@ -5895,12 +5895,11 @@ void container_disp ( Character *ch,OBJ_DATA * obj )
 		percent = GET_OBJ_VAL ( obj, 1 );
 		max = GET_OBJ_VAL ( obj, 0 );
 	}
+	if ( max == 0 )
+		return;
 	if ( max >= percent )
 	{
-		if ( max == 0 )
-			percent = 0;
-		else 
-			percent = ( int ) ( ( percent*100.0f ) / ( float ) max );
+		percent = ( int ) ( ( percent*100.0f ) / ( float ) max );
 		ch->Send ( "%3d%% - max %d\r\n", percent, max );		
 	}
 
