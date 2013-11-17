@@ -740,7 +740,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_PARALYZE:
-			if ( ch && mag_savingthrow ( victim, savetype, 10 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 20 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;

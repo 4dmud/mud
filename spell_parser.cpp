@@ -2155,7 +2155,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_PARALYZE, "paralyze", 100 , 65 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
-	         300, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 29, 0,
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 4, 29, 0,
                  "You regain control of your muscles!" );
 
 	spello ( SPELL_HOLY_WORD, "holy word", 25 , 15 , 3,
