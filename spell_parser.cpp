@@ -2150,7 +2150,7 @@ void mag_assign_spells ( void )
 
 	spello ( SPELL_HOLD_PERSON, "hold person", 70 , 40 , 2,
 	         POS_FIGHTING, TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
-	         120, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16, 0,
+	         10, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 16, 0,
                  "You are freed of your bindings!" );
 
 	spello ( SPELL_PARALYZE, "paralyze", 100 , 65 , 2,

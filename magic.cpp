@@ -727,7 +727,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_HOLD_PERSON:
-			if ( ch && mag_savingthrow ( victim, savetype, 5 ) )
+			if ( ch && mag_savingthrow ( victim, savetype, 15 ) )
 			{
 				ch->Send ( "%s", CONFIG_NOEFFECT );
 				return;
