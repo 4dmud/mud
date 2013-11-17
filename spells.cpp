@@ -556,7 +556,7 @@ ASPELL(spell_charm) {
 }
 
 ASPELL(spell_psi_panic) {
-    if (mag_savingthrow(victim, SAVING_PARA, 0) || GET_LEVEL(victim) > number(0, 100)) {
+    if (mag_savingthrow(victim, SAVING_PARA, 20) || GET_LEVEL(victim) > number(0, 100)) {
         act("$N leers at you in contempt!\r\n", FALSE, ch, 0, victim, TO_CHAR);
         act("You leer at $n in contempt!\r\n", FALSE, ch, 0, victim, TO_VICT);
     } else {
