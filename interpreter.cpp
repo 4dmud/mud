@@ -858,8 +858,8 @@ const command_info cmd_info[] =
 	{ "split"    , "spl" , POS_SITTING , do_split    , 1, 0, 0 },
 	{ "stand"    , "st"  , POS_RESTING , do_stand    , 0, 0, 0 },
 	{ "stat"     , "stat"     , POS_DEAD    , do_stat     , LVL_IMMORT, 0, WIZ_IMM3_GRP },
-	{ "statlist" , "statl", POS_DEAD    , do_statlist , LVL_SEN, 0, WIZ_IMPL_GRP },
-	{ "statinnate"  , "statin" , POS_DEAD    , do_statinnate   , LVL_SEN, 0, WIZ_IMPL_GRP },
+	{ "statlist" , "statl", POS_DEAD    , do_statlist , LVL_SEN, 0, WIZ_IMM3_GRP },
+	{ "statinnate"  , "statin" , POS_DEAD    , do_statinnate   , LVL_SEN, 0, WIZ_IMM3_GRP },
 	{ "string"   , "str"  , POS_DEAD    , do_string   , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 	{ "struggle" , "stru" , POS_STANDING, do_struggle , 0, 0, 0 },
 	{ "swap"     , "swap" , POS_DEAD    , do_swap     , 0, 0, 0 },
@@ -893,7 +893,7 @@ const command_info cmd_info[] =
 	{ "unaffect" , "una" , POS_DEAD    , do_wizutil  , LVL_IMMORT, SCMD_UNAFFECT, WIZ_HEAL_GRP },
 	//	{ "unhitch"      , "unhitch"   , POS_STANDING, do_unhitch      , 0, 0, 0 },
 	{ "unregister" , "unreg"  , POS_STANDING, do_register , 0, SCMD_UNREGISTER, 0 },
-
+        { "unsilence"  , "unsilence"     , POS_DEAD    , do_heroutil  , 0, SCMD_UNSILENCE, 0 },
 	{ "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
 	{ "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
 	{ "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
@@ -2269,8 +2269,9 @@ int enter_player_game ( Descriptor *d )
 		do_start ( ch );
 		d->Output ( "\r\n%s", CONFIG_START_MESSG );
 		if ( GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_ESPER )
+                send_to_all("{cY%s has just joined 4Dimensions!\r\n{cn", GET_NAME(ch));
 			d->Output ( "\r\n{cgRemember that as a magic capable class, you don't need to wield\r\n"
-			            "any weapon at all, your own raw magic is enough in any battle.{c0\r\n\r\n" );
+			            "any weapon, your own raw magic with an orb or staff is enough in any battle.{c0\r\n\r\n" );
 
 		PAGEWIDTH ( ch ) = 80;
 		PAGEHEIGHT ( ch ) = 40;

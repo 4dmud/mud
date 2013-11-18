@@ -4100,7 +4100,9 @@ ACMD ( do_heroutil )
 				}
 				new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "(GC) %s un-frozen by %s.", GET_NAME ( vict ), GET_NAME ( ch ) );
 				if ( !affected_by_spell ( vict, SPELL_IMMFREEZE ) )
+					{
 					REMOVE_BIT_AR ( PLR_FLAGS ( vict ), PLR_FROZEN );
+					}
 				else
 					affect_from_char ( vict, SPELL_IMMFREEZE );
 
@@ -4108,6 +4110,8 @@ ACMD ( do_heroutil )
 				ch->Send ( "Thawed.\r\n" );
 				act ( "A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM );
 				break;
+
+
 			case SCMD_SILENCE:
 				if ( ch == vict )
 				{
@@ -4127,7 +4131,7 @@ ACMD ( do_heroutil )
 				}
 				if ( silence_affect ( ch, vict, argument ) )
 				{
-					act ( "A yellow light centers around $n's voicebox - $e has been silenced!", FALSE, vict, 0, 0, TO_ROOM );
+					act ( "Yellow chains of light wrap around $n's voicebox - $e has been silenced!", FALSE, vict, 0, 0, TO_ROOM );
 					new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "(HC) %s Silenced by %s.", GET_NAME ( vict ), GET_NAME ( ch ) );
 				}
 				else
@@ -4136,7 +4140,27 @@ ACMD ( do_heroutil )
 					new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "(HC) %s attempted to be silenced by %s.", GET_NAME ( vict ), GET_NAME ( ch ) );
 				}
 				break;
+
+                        case SCMD_UNSILENCE:
+                                if ( !PLR_FLAGGED ( vict, PLR_COVENTRY ) )
+                                {
+                                        ch->Send ( "Sorry, your victim is not silenced.\r\n" );
+                                        return;
+                                }
+                                new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "(GC) %s un-silenced by %s.", GET_NAME ( vict ), GET_NAME ( ch ) );
+                                if ( !affected_by_spell ( vict, SPELL_SILENCED ) )
+                                        {
+                                        REMOVE_BIT_AR ( PLR_FLAGS ( vict ), PLR_COVENTRY);
+                                        }
+                                else
+                                        affect_from_char ( vict, SPELL_SILENCED);
+
+                                vict->Send ( "The yellow chains of light loosen from around your neck and disappear!\r\nYou regain your voice, this time watch what you say.\r\n" );
+                                ch->Send ( "Unsilenced.\r\n" );
+                                act ( "Yellow chains loosen and disappear from the neck of  $n!", FALSE, vict, 0, 0, TO_ROOM );
+                                break;
 				break;
+
 			default:
 				log ( "SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__ );
 				break;
@@ -5137,15 +5161,15 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			           GET_NAME ( vict ) );
 			break;
 		case 4:
-			vict->points.max_hit = RANGE ( 1, 100000 );
+			vict->points.max_hit = RANGE ( 1, 1000000 );
 			vict->affect_total();  /* affect_total() handles regen updates */
 			break;
 		case 5:
-			vict->points.max_mana = RANGE ( 1, 100000 );
+			vict->points.max_mana = RANGE ( 1, 1000000 );
 			vict->affect_total();  /* affect_total() handles regen updates */
 			break;
 		case 6:
-			vict->points.max_move = RANGE ( 1, 100000 );
+			vict->points.max_move = RANGE ( 1, 1000000 );
 			vict->affect_total();  /* affect_total() handles regen updates */
 			break;
 		case 7:

@@ -205,8 +205,8 @@ struct alias_data {
 #define SCMD_THAW	5
 #define SCMD_UNAFFECT	6
 #define SCMD_ZDELETE	7
-
 #define SCMD_SILENCE    8
+#define SCMD_UNSILENCE  9
 
 /*do_register (for pk) */
 #define SCMD_REGISTER    0

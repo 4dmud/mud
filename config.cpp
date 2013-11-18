@@ -417,7 +417,7 @@ const char *START_MESSG =
     "Welcome.  This is your new 4 Dimensions character!  You can now earn gold,\r\n"
     "gain experience, find weapons and equipment, and much more -- while\r\n"
     "meeting people from around the world!\r\n\r\n"
-    "{cYType HELP to see a list of help topics\r\n\r\n";
+    "{cYType HELP WELCOME to get started!\r\n\r\n";
 
 /****************************************************************************/
 /****************************************************************************/
