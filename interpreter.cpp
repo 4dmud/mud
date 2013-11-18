@@ -2269,7 +2269,7 @@ int enter_player_game ( Descriptor *d )
 		do_start ( ch );
 		d->Output ( "\r\n%s", CONFIG_START_MESSG );
 		if ( GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_ESPER )
-                send_to_all("{cY%s has just joined 4Dimensions!\r\n{cn", GET_NAME(ch));
+                send_to_all("{cY%s has joined 4Dimensions!\r\n{cn", GET_NAME(ch));
 			d->Output ( "\r\n{cgRemember that as a magic capable class, you don't need to wield\r\n"
 			            "any weapon, your own raw magic with an orb or staff is enough in any battle.{c0\r\n\r\n" );
 
