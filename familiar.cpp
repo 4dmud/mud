@@ -267,7 +267,7 @@ void parse_caster_commands(Character *ch) {
     }
 }
 void parse_rogue_commands(Character *ch) {
-    find_usable_weapon(ch);
+    //find_usable_weapon(ch);
     Character *vict,  *master = ((!ch->master || (!HERE(ch->master, ch))) ? ch : (number(0, 1) ? ch->master : ch));
     find_usable_weapon(ch);
 
@@ -319,10 +319,10 @@ void parse_rogue_commands(Character *ch) {
 	    if (GET_POS(master) == POS_SITTING)
 		return;
 
-            act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
-            act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
+            act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, vict, TO_VICT);
+            act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, vict, TO_NOTVICT);
+            set_fighting(ch, vict);            
             GET_POS(vict) = POS_SITTING;
-            set_fighting(ch, vict);
             return;
         case 1:
             if (GET_EQ(ch, WEAR_WIELD))
