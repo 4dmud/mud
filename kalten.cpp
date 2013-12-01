@@ -520,6 +520,7 @@ ACMD ( do_reload )
 	struct obj_data *weapon;
 	struct obj_data *ammo;
 	struct obj_data *ammo_next;
+	int bullets_in_gun, gun_can_hold, bullets_in_ammo, bullets;
 
 	if ( IS_NPC ( ch ) )
 		return;
@@ -547,25 +548,33 @@ ACMD ( do_reload )
 
 	if ( !ammo )
 	{
-		*ch << "You do not have ammo for this weapon.\r\n";
+		*ch << "You do not have the right ammo for this weapon.\r\n";
 		return;
 	}
 
-	if ( GET_OBJ_VAL ( weapon, 2 ) >= GET_OBJ_VAL ( weapon, 1 ) )
+	bullets_in_gun = GET_OBJ_VAL ( weapon, 2 );
+	gun_can_hold = GET_OBJ_VAL ( weapon, 1 );
+
+	if ( bullets_in_gun >= gun_can_hold )
 	{
+		weapon->obj_flags.value [2] = weapon->obj_flags.value [1]; // shouldn't have more bullets than max in gun
 		ch->Send ( "%s is fully loaded.\r\n", weapon->short_description );
 		return;
 	}
+
+	bullets_in_ammo = GET_OBJ_VAL ( ammo, 0 );
+	bullets = min ( gun_can_hold - bullets_in_gun, bullets_in_ammo );
+	weapon->obj_flags.value [2] += bullets;
+	ammo->obj_flags.value [0] -= bullets;
+
+	if ( bullets == 1 )
+		ch->Send ( "You load %s with one shot.\r\n", weapon->short_description );
 	else
-		GET_OBJ_VAL ( weapon, 2 ) = GET_OBJ_VAL ( weapon, 2 ) + 1;
-
-	act ( "You get $p.", FALSE, ch, ammo, weapon, TO_CHAR );
-	act ( "$n gets $p.", FALSE, ch, ammo, weapon, TO_ROOM );
-
-	act ( "You load $P with $p.", FALSE, ch, ammo, weapon, TO_CHAR );
+		ch->Send ( "You load %s with %d shots.\r\n", weapon->short_description, bullets );
 	act ( "$n loads $P with $p.", FALSE, ch, ammo, weapon, TO_ROOM );
-
-	extract_obj ( ammo );
+	
+	if ( ammo->obj_flags.value [0] == 0 )
+		extract_obj ( ammo );
 	return;
 }
 

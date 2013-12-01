@@ -578,12 +578,10 @@ ACMD ( do_shoot )
 		}
 
 	}
-	else
-		holding = GET_EQ ( ch, WEAR_HOLD );
 
 	if ( !holding || holding < 0 )
 	{
-		ch->Send ( "Snap Its Broken! It probably has the wrong kinda ammo in it.\r\n" );
+		ch->Send ( "Snap it's broken! It probably has the wrong kinda ammo in it.\r\n" );
 		return;
 	}
 
@@ -600,9 +598,7 @@ ACMD ( do_shoot )
 		range = wielding->obj_flags.value[0];
 	else
 	{
-		send_to_char
-		( "You should wield a ranged weapon and hold a projectile!\r\n",
-		  ch );
+		ch->Send ( "You should wield a ranged weapon and hold a projectile!\r\n" );
 		return;
 	}
 
@@ -621,9 +617,9 @@ ACMD ( do_shoot )
 		return;
 	}
 
-	if ( IS_DARK ( ch->in_room ) )
+	if ( IS_DARK ( ch->in_room ) && !CAN_SEE_IN_DARK ( ch ) )
 	{
-		ch->Send ( "You can't see that far.\r\n" );
+		ch->Send( "You can't see a thing!\r\n" );
 		return;
 	}
 

@@ -164,7 +164,7 @@ int damage ( Character *ch, Character *victim, int dam,
 	int npc = IS_NPC ( victim );
 
 
-	if ( !IS_NPC ( ch ) && GET_LEVEL ( victim ) >=LVL_IMMORT && ( dam > 0 ) )
+	if ( !IS_NPC ( victim ) && GET_LEVEL ( victim ) >= LVL_IMMORT && ( dam > 0 ) )
 	{
 		victim->Send ( "Being the cool immortal you are, you sidestep a trap,\r\n"
 		               "obviously placed to kill you.\r\n" );

@@ -1773,6 +1773,15 @@ void look_at_target ( Character *ch, char *arg )
 			        && ++i == fnum )
 			{
 				*ch << desc;
+				if ( GET_OBJ_TYPE ( GET_EQ ( ch, j ) ) == ITEM_GUN )
+				{
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 0 )
+						ch->Send ( "It is unloaded.\r\n" );
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 1 )
+						ch->Send ( "It has one shot left.\r\n" );
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) > 1 )
+						ch->Send ( "It has %d shots left.\r\n", GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) );
+				}
 				found = TRUE;
 			}
 
@@ -1784,6 +1793,24 @@ void look_at_target ( Character *ch, char *arg )
 			        && ++i == fnum )
 			{
 				*ch << desc;
+				if ( GET_OBJ_TYPE ( obj ) == ITEM_GUN )
+				{
+					if ( GET_OBJ_VAL ( obj, 2 ) == 0 )
+						ch->Send ( "It is unloaded.\r\n" );
+					if ( GET_OBJ_VAL ( obj, 2 ) == 1 )
+						ch->Send ( "It has one shot left.\r\n" );
+					if ( GET_OBJ_VAL ( obj, 2 ) > 1 )
+						ch->Send ( "It has %d shots left.\r\n", GET_OBJ_VAL ( obj, 2 ) );
+				}
+				if ( GET_OBJ_TYPE ( obj ) == ITEM_AMMO )
+				{
+					if ( GET_OBJ_VAL ( obj, 0 ) == 0 )
+						ch->Send ( "Bah, these are blanks.\r\n" );
+					if ( GET_OBJ_VAL ( obj, 0 ) == 1 )
+						ch->Send ( "You can take one shot with this.\r\n" );
+					if ( GET_OBJ_VAL ( obj, 0 ) > 1 )
+						ch->Send ( "You can take %d shots with this.\r\n", GET_OBJ_VAL ( obj, 0 ) );
+				}
 				found = TRUE;
 			}
 	}
