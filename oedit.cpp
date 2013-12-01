@@ -609,14 +609,16 @@ void oedit_disp_val1_menu ( Descriptor *d )
 		case ITEM_CROSSBOW:
 		case ITEM_SLING:
 		case ITEM_GUN:
-			d->Output ( "Range (1 - 3) = " );
+			d->Output ( "Range (1 - 3) : " );
 			break;
 		case ITEM_ROCK:
 		case ITEM_BOLT:
 		case ITEM_ARROW:
 		case ITEM_THROW:
-		case ITEM_AMMO:
 			oedit_disp_val2_menu ( d );
+			break;
+		case ITEM_AMMO:
+			d->Output ( "Number of bullets : " );
 			break;
 		case ITEM_SCROLL:
 		case ITEM_WAND:
@@ -785,6 +787,9 @@ void oedit_disp_val3_menu ( Descriptor *d )
 		case ITEM_WAND:
 		case ITEM_STAFF:
 			d->Output ( "Number of charges remaining : " );
+			break;
+		case ITEM_GUN:
+			d->Output ( "Number of bullets : " );
 			break;
 		case ITEM_ROCK:
 		case ITEM_BOLT:
