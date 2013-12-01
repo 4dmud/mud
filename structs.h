@@ -2448,7 +2448,7 @@ struct mob_special_data {
     sbyte default_pos;         /* Default position for NPC                 */
     memory_rec *memory;       /* List of attackers to remember            */
     sbyte damnodice;      /* The number of damage dice's              */
-    sbyte damsizedice;         /* The size of the damage dice's            */
+    int damsizedice;         /* The size of the damage dice's            */
     int race;            /* The mobs race - seperate from PC's       */
     int type;            /* The type of animal ... bird, cat, dog??? */
     bool pregnant;       /* Is the mob pregnant                      */
