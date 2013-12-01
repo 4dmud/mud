@@ -1177,12 +1177,12 @@ ACMD ( do_use )
 				        ( mag_item =
 				              get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
 				{
-					*ch << "You don't seem to have " << AN ( arg ) << " "  << arg << "\r\n";
+					*ch << "You don't seem to have " << AN ( arg ) << " "  << arg << ".\r\n";
 					return;
 				}
 				break;
 			case SCMD_USE:
-				*ch << "You don't seem to be holding " << AN ( arg ) << " " << arg << "\r\n";
+				*ch << "You don't seem to be holding " << AN ( arg ) << " " << arg << ".\r\n";
 				return;
 			default:
 				log ( "SYSERR: Unknown subcmd %d passed to do_use.", subcmd );
