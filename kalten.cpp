@@ -575,7 +575,6 @@ ACMD ( do_reload )
 	
 	if ( ammo->obj_flags.value [0] == 0 )
 		extract_obj ( ammo );
-	return;
 }
 
 
