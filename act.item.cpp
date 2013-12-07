@@ -4285,6 +4285,10 @@ ACMD ( do_pull )
 				ch->Send ( "You pull the pin, the grenade is activated!\r\n" );
 				SET_BIT_AR ( GET_OBJ_EXTRA ( GET_EQ ( ch, WEAR_WIELD ) ),
 				             ITEM_LIVE_GRENADE );
+				if ( IS_PK ( ch ) )
+					GET_EQ ( ch, WEAR_WIELD )->obj_flags.value[3] = 1;
+				else
+					GET_EQ ( ch, WEAR_WIELD )->obj_flags.value[3] = 0;
 			}
 			else
 				ch->Send ( "That's NOT a grenade!\r\n" );

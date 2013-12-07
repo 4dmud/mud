@@ -6351,8 +6351,9 @@ void tick_grenade ( void )
 								return;  /* -je, 7/7/92 */
 							}
 
-							/* You can't damage an immortal! */
-							if ( IS_NPC ( tch ) || ( GET_LEVEL ( tch ) < 58 ) )
+							/* Only damage mobs, players in arena, or PK */
+							if ( IS_NPC ( tch ) || ROOM_FLAGGED ( IN_ROOM( tch ), ROOM_ARENA )
+								|| ( IS_PK ( tch ) && i->obj_flags.value[3] ) )	
 							{
 								act ( "$n is blasted!", TRUE, tch, 0, 0,
 								      TO_ROOM );
@@ -6363,6 +6364,7 @@ void tick_grenade ( void )
 								else
 									damage ( tch, tch, dam, TYPE_UNDEFINED );
 							}
+							else tch->Send ( "You duck and manage to avoid the blast!\r\n" );
 
 						}
 						/* ok hit all the people now get rid of the grenade and
@@ -6370,7 +6372,6 @@ void tick_grenade ( void )
 
 						extract_obj ( i );
 						return;
-						;
 					}
 				}      /* end else stmt that took care of explosions */
 			}             /* end if stmt that took care of live grenades */
