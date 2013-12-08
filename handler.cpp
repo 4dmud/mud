@@ -1851,6 +1851,9 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	}
 	else if ( IN_ROOM ( obj ) != NULL )    /* In a room */
 	{
+		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_ARTISAVE ) ) 
+			log ( "SYSERR: Arti %s crumbled in artisave room %d", obj->name, IN_ROOM ( obj )->number );
+
 		if ( IN_ROOM ( obj )->people )
 		{
 			act ( "A quivering horde of maggots consumes $p.",
@@ -1898,6 +1901,9 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	}
 	else if ( obj->in_obj )            /* In an object */
 	{
+		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
+			log ( "SYSERR: Arti %s crumbled in artisave container in room %d ", obj->name, IN_ROOM ( obj->in_obj )->number );
+
 		for ( loop = obj->contains; loop; loop = obj->contains )
 		{
 			obj_from_obj ( loop );
