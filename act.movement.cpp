@@ -1111,8 +1111,6 @@ void hit_death_trap ( Character *ch )
                 /* Player has full protection */
                 if (PLR_FLAGGED(ch, PLR_ANTI_DT)) {
 		    REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_ANTI_DT );
-		    if ( !IS_NPC ( ch ) )
-		    	GET_DT_CNT ( ch ) += 1;
                     raw_kill(ch, NULL);
                     return;
                 }
