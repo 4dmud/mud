@@ -373,6 +373,7 @@ SPECIAL(antidt)
         TRADEPOINTS(ch) -= tradepoint_loss;
 	  new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy death trap item protection for object %d, %s. (%d tradepoints remaining)",  GET_NAME ( ch ), tradepoint_loss, GET_OBJ_VNUM(obj), obj->short_description, TRADEPOINTS(ch));
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+        obj->owner = GET_IDNUM ( ch );
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
         return 1;
     }
@@ -417,6 +418,7 @@ SPECIAL(antidt)
           }
           find_tokens(ch, BRONZE_TOKEN, calc_tp(ch, 1));
           SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
+          obj->owner = GET_IDNUM ( ch );
           act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
           return 1;
       }

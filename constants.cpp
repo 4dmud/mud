@@ -631,6 +631,7 @@ const char *player_bits[] =
 	"RPL",
         "IMM",
         "JESTER",
+        "CTHULYTE",
         "ALDERISIO",
         "BITCH",
         "RIDDLER",
