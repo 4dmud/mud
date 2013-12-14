@@ -695,6 +695,16 @@ void oedit_disp_val1_menu ( Descriptor *d )
 		case ITEM_TREE:
 			oedit_disp_val5_menu ( d );
 			break;
+		case ITEM_FOCUS_MINOR:
+		case ITEM_FOCUS_MAJOR:
+			d->Output ( "Multi (orb) = value / 700, it will be between 1.05 and 1.50\r\n" 
+                                    "Multi (orbstaff) = value / 1000, no limits for this multi.\r\n"
+				    "The multi is doubled if it's a major focus.\r\n"
+				    "If an extra flag like air_focus is set, then the elemental\r\n"
+				    "bonus will be Cost/Day / 100.\r\n\r\n"	
+				    "If you're making a staff, you can enter any value.\r\n"	
+                                    "Value:" );
+			break;
 		default:
 			oedit_disp_menu ( d );
 	}
@@ -764,6 +774,10 @@ void oedit_disp_val2_menu ( Descriptor *d )
 		case ITEM_PORTAL_HURDLE:
 			d->Output ( "Vnum of room : " );
 			break;
+		case ITEM_FOCUS_MINOR:
+		case ITEM_FOCUS_MAJOR:
+			oedit_disp_val3_menu ( d );
+			break;
 		default:
 			oedit_disp_menu ( d );
 	}
@@ -826,6 +840,10 @@ void oedit_disp_val3_menu ( Descriptor *d )
 		case ITEM_SPACEBIKE:
 			d->Output ( "It costs 1 fuel per room in space to move.\r\nCurrent Fuel:" );
 			break;
+		case ITEM_FOCUS_MINOR:
+		case ITEM_FOCUS_MAJOR:
+			d->Output ( "Kind of focus ( 1 = staff, 2 = orb, 3 = orbstaff ):" );
+			break;
 		default:
 			oedit_disp_menu ( d );
 	}
@@ -864,6 +882,16 @@ void oedit_disp_val4_menu ( Descriptor *d )
                         break;
 		case ITEM_SPACEBIKE:
 			d->Output ( "It costs 1 fuel per room in space to move.\r\nMax Fuel:" );
+			break;
+		case ITEM_FOCUS_MINOR:
+		case ITEM_FOCUS_MAJOR:
+			d->Output ( "Multi (staff) = value / 10000 + num_casting / 100 + 6 * level / 1000\r\n"
+				    "where num_casting is the number of casting classes + 1.\r\n"
+				    "The multi will be between 1.55 and 2.15, and is doubled if it's a\r\n"
+				    "major focus. If an extra flag like air_focus is set, then the\r\n"
+				    "elemental bonus will be Cost/Day / 100.\r\n\r\n"
+				    "If you're not making a staff, you can enter any value.\r\n"
+				    "Value:" );
 			break;
 		default:
 			oedit_disp_menu ( d );
