@@ -1201,6 +1201,9 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
   for (sindex = 0; sindex <= top_shop; sindex++)
     if (GET_MOB_VNUM(victim) == SHOP_KEEPER(sindex) && !SHOP_KILL_CHARS(sindex))
     {
+      if ( ch == NULL )
+	return FALSE;	
+
       char buf[MAX_INPUT_LENGTH];
 
       snprintf(buf, sizeof(buf), "%s %s", GET_NAME(ch), MSG_CANT_KILL_KEEPER);
