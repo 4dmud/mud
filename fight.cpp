@@ -6047,10 +6047,10 @@ void miss_missile ( Character *ch, Character *tch,
 
 
 		snprintf ( buf, sizeof ( buf ),
-		           "An $p flies in from the %s and hits the ground!",
+		           "A $p flies in from the %s and hits the ground!",
 		           dirs[rev_dir[dir]] );
-		act ( buf, FALSE, tch, 0, missile, TO_ROOM );
-		act ( buf, FALSE, tch, 0, missile, TO_CHAR );
+		act ( buf, FALSE, tch, missile, 0, TO_ROOM );
+		act ( buf, FALSE, tch, missile, 0, TO_CHAR );
 		snprintf ( buf, sizeof ( buf ), "Your $p narrowly misses $N. Bah!" );
 		act ( buf, FALSE, ch, missile, tch, TO_CHAR );
 	}
@@ -6158,6 +6158,17 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
 				return;
 			}
 
+			// can_fight needs to know it's a directional attack
+			GET_SPELL_DIR ( ch ) = 1;
+
+			if ( !can_fight ( ch, vict, FALSE ) )
+			{
+				ch->Send ( "You can't do that to them!\r\n" );
+				GET_SPELL_DIR ( ch ) = NOWHERE;
+				return;
+			}
+			GET_SPELL_DIR ( ch ) = NOWHERE;
+
 			/*its a gun, has ammo inside it, create the item */
 #if 0
 			if ( GET_OBJ_TYPE ( missile ) == ITEM_GUN )
@@ -6210,29 +6221,19 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
 			if ( shot == TRUE && !MOB_FLAGGED ( vict, MOB_NOSHOOT ) )
 			{
 				strike_missile ( ch, vict, missile, dir, attacktype );
-				if ( ( number ( 0, 1 ) ) || ( attacktype == SKILL_THROW ) )
-				{
-					if ( attacktype == SKILL_FIREARM )
-						obj_to_char ( missile, vict );
-					else
-						obj_to_char ( unequip_char ( ch, pos ), vict );
-				}
-				else if ( attacktype != SKILL_FIREARM )
+				if ( attacktype != SKILL_FIREARM )
 					extract_obj ( unequip_char ( ch, pos ) );
+				else // remove a bullet from the gun
+					GET_EQ ( ch, WEAR_WIELD )->obj_flags.value[2]--;
 			}
 			else
 			{
-				/* ok missed so move missile into new room */
+				/* ok missed so move missile into new room, unless it's a bullet */
 				miss_missile ( ch, vict, missile, dir, attacktype );
-				if ( ( !number ( 0, 2 ) ) || ( attacktype == SKILL_THROW ) )
-				{
-					if ( attacktype == SKILL_FIREARM )
-						obj_to_room ( missile, IN_ROOM ( vict ) );
-					else
-						obj_to_room ( unequip_char ( ch, pos ), IN_ROOM ( vict ) );
-				}
-				else if ( attacktype != SKILL_FIREARM )
-					extract_obj ( unequip_char ( ch, pos ) );
+				if ( attacktype != SKILL_FIREARM )
+					obj_to_room ( unequip_char ( ch, pos ), IN_ROOM ( vict ) );
+				else // remove a bullet from the gun
+					GET_EQ ( ch, WEAR_WIELD )->obj_flags.value[2]--;
 			}
 
 			/* either way mob remembers */

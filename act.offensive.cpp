@@ -640,8 +640,6 @@ ACMD ( do_shoot )
 	if ( range < 1 )
 		range = 1;
 
-	wielding->obj_flags.value[2] = wielding->obj_flags.value[2] - 1;
-
 	fire_missile ( ch, arg1, holding, WEAR_HOLD, range, dir );
 
 }
