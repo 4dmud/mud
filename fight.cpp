@@ -6353,8 +6353,9 @@ void tick_grenade ( void )
 							}
 
 							/* Only damage mobs, players in arena, or PK */
-							if ( IS_NPC ( tch ) || ROOM_FLAGGED ( IN_ROOM( tch ), ROOM_ARENA )
-								|| ( IS_PK ( tch ) && i->obj_flags.value[3] ) )	
+							if ( ( IS_NPC ( tch ) && ok_damage_shopkeeper ( NULL, tch ) ) ||
+								ROOM_FLAGGED ( IN_ROOM( tch ), ROOM_ARENA ) ||
+								( IS_PK ( tch ) && i->obj_flags.value[3] ) )	
 							{
 								act ( "$n is blasted!", TRUE, tch, 0, 0,
 								      TO_ROOM );
