@@ -2810,8 +2810,8 @@ ASKILL ( skill_blackjack )
 
 ACMD ( do_speedwalk )
 {
-	int dir, r;
-
+	int dir, r, dist;
+	string dist_str = "";
 
 	SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_SPEEDWALK );
 	act ( "$n starts speedwalking.", TRUE, ch, 0, 0, TO_ROOM );
@@ -2819,8 +2819,14 @@ ACMD ( do_speedwalk )
 
 	for ( r = 1; *argument && r; argument++ )
 	{
-		while ( *argument == ' ' )
-			++argument;
+		if ( *argument == ' ' )
+			continue;
+
+		if ( *argument >= '0' && *argument <= '9' )
+		{
+			dist_str += *argument;
+			continue;
+		}
 
 		switch ( *argument )
 		{
@@ -2856,7 +2862,13 @@ ACMD ( do_speedwalk )
 				return;
 		}
 
-		r = perform_move ( ch, dir, 1 );
+		dist = atoi ( dist_str.c_str() );
+		if ( dist == 0 )
+			dist = 1;
+		dist_str = "";
+
+		for ( ; dist && r; dist-- )
+			r = perform_move ( ch, dir, 1 );
 		//if (r && *(argument + 1))
 		//send_to_char("\r\n", ch);
 	}
