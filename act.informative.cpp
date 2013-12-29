@@ -2780,7 +2780,7 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 		ch->Send ( "You are summonable by other players.\r\n" );
 	if ( PRF_FLAGGED ( ch, PRF_GATEABLE ) )
 		ch->Send ( "You are gateable by other players.\r\n" );
-	if ( PRF_FLAGGED ( ch, PRF_GATEABLE ) )
+	if ( PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) )
 		ch->Send ( "You are teleportable.\r\n" );
 	if ( AFF_FLAGGED ( ch, AFF_PROT_FIRE ) )
 		ch->Send ( "You are protected against fire.\r\n" );

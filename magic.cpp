@@ -2503,7 +2503,10 @@ void mag_creations ( int level, Character *ch, int spellnum, char *tar_str )
       GET_OBJ_VAL(tobj, 3) = val3;
   }
 
-  obj_to_room ( tobj, IN_ROOM(ch) );
+  if ( spellnum == SPELL_CREATE_FOOD )
+      obj_to_char ( tobj, ch );
+  else
+      obj_to_room ( tobj, IN_ROOM(ch) );
   act ( to_room, FALSE, ch, tobj, 0, TO_ROOM );
   act ( to_char, FALSE, ch, tobj, 0, TO_CHAR );
   load_otrigger ( tobj );
