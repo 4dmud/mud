@@ -2644,11 +2644,12 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 	                                   ch->player.time.played, 0 );
 	ch->Send (
 	    "{cg| |-------------------------------------------------------------------| |\r\n"
-	    "| | {cwAge: {cy%-3d{cg  --  {cwYou have been playing for [{cy%3d{cw] day%s and [{cy%2d{cw] hour%-s{cg | |\r\n",
+	    "| | {cwAge: {cy%-3d{cg  --  {cwYou have been playing for [{cy%3d{cw] day%s and [{cy%2d{cw] hour%s%s{cg | |\r\n",
 	    GET_AGE ( ch ),
 	    playing_time.day, playing_time.day == 1 ? "" : "s",
 	    playing_time.hours,
-	    playing_time.hours == 1 ? " " : "s" );
+	    playing_time.hours == 1 ? " " : "s",
+	    playing_time.day == 1 ? " " : "" );
 	ch->Send (
 	    "{cg-------------------------------------------------------------------------{c0\r\n" );
 	}
