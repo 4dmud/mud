@@ -63,6 +63,8 @@
 # include <sys/ioctl.h>
 #endif
 
+#include <sys/resource.h>
+
 #define RUNNING_IDENT 0
 
 #ifdef HAVE_ARPA_TELNET_H
