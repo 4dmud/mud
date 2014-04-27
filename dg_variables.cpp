@@ -318,6 +318,23 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
 }
 
 
+void dg_varexists (struct script_data *script, char *subfield, char *str, size_t slen) {
+  struct trig_var_data *vdt;
+  snprintf ( str, slen, "0" );
+  if ( script )
+    {
+      for ( vdt = script->global_vars; vdt; vdt = vdt->next )
+	{
+	  if ( !strcasecmp ( vdt->name.c_str(), subfield ) )
+	    break;
+	}
+      if ( vdt )
+	snprintf ( str, slen, "1" );
+      else
+	snprintf ( str, slen, "0" );
+    }
+}
+
 
 void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         int type, char *var, char *field, char *subfield, char *str, size_t slen )
@@ -1828,20 +1845,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					if ( !strcasecmp ( field, "varexists" ) )
 					{
-						struct trig_var_data *vdt;
-						snprintf ( str, slen, "0" );
-						if ( SCRIPT ( c ) )
-						{
-							for ( vdt = SCRIPT ( c )->global_vars; vdt; vdt = vdt->next )
-							{
-								if ( !strcasecmp ( vdt->name.c_str(), subfield ) )
-									break;
-							}
-							if ( vdt )
-								snprintf ( str, slen, "1" );
-							else
-								snprintf ( str, slen, "0" );
-						}
+					  dg_varexists(SCRIPT(c),subfield, str, slen);
 					}
 					else if ( !strcasecmp ( field, "vnum" ) )
 					{
@@ -2221,7 +2225,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					break;
 				case 'v':
-					if ( !strcasecmp ( field, "vnum" ) )
+					if ( !strcasecmp ( field, "varexists" ) )
+					{
+					  dg_varexists(SCRIPT(o),subfield, str, slen);
+					}
+					else if ( !strcasecmp ( field, "vnum" ) )
 					{
 						if ( subfield && *subfield )
 						{
@@ -2570,7 +2578,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					break;
 				case 'v':
 
-					if ( !strcasecmp ( field, "vnum" ) )
+					if ( !strcasecmp ( field, "varexists" ) )
+					{
+					  dg_varexists(SCRIPT(r),subfield, str, slen);
+					}
+					else if ( !strcasecmp ( field, "vnum" ) )
 					{
 						if ( subfield && *subfield )
 							snprintf ( str, slen, "%d", ( int ) ( r->number == atoi ( subfield ) ) );
