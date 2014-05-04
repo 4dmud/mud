@@ -2214,7 +2214,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					else if ( !strcasecmp ( field, "timer" ) )
 					{
-						if ( is_number ( subfield ) )
+						if ( subfield && *subfield && is_number ( subfield ) )
 						{
 							if ( atoi ( subfield ) >= -1 )
 							{
