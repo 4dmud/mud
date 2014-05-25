@@ -5588,7 +5588,7 @@ ACMD ( do_affects )
 		for ( aff = ch->affected; aff; aff = aff->next )
 		{
 			if ( aff->expire == -2 )
-				ch->Send ( "SPL: (  {cPinnate{c0  ) %s%-21s%s ",
+				ch->Send ( "SPL: (  {cPinnate{c0  )  %s%-21s%s ",
 				           CCCYN ( ch, C_NRM ), skill_name ( aff->type ),
 				           CCNRM ( ch, C_NRM ) );
 			else
@@ -5602,7 +5602,7 @@ ACMD ( do_affects )
 			}
 			if ( aff->modifier )
 			{
-				ch->Send ( "%+d to %s", aff->modifier,
+				ch->Send ( " %+d to %s", aff->modifier,
 				           apply_types[ ( int ) aff->location] );
 			}
 			if ( aff->bitvector )
