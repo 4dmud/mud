@@ -579,12 +579,13 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 			return FALSE;
 		}
 	}
+	/* Key hoarding isn't a problem anymore. Unrentable items may be saved as well.
 	if ( ( Crash_is_unrentable ( obj ) && !IS_NPC ( ch ) ) || AFF_FLAGGED ( ch, AFF_CHARM ) )
 	{
 		ch->Send ( "You can't leave that here, it is too precious!\r\n" );
 		return FALSE;
 	}
-
+	*/
 	if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) )
 	{
 		ch->Send ( "You can't put things in player corpses.\r\n" );
