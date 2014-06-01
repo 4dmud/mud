@@ -2426,6 +2426,76 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							*str = '\0';
 					}
 					break;
+				case 'f':
+
+					if ( !strcasecmp ( field, "flag" ) ) 
+					{
+						if ( !subfield || !*subfield )
+						{
+							*str = '\0';
+							script_log ( "Trigger: %s, VNum %d. no room flag specified",
+					             		GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+						}
+						else if ( !strcasecmp ( subfield, "death" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_DEATH ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else if ( !strcasecmp ( subfield, "godroom" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_GODROOM ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else if ( !strcasecmp ( subfield, "house" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_HOUSE ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else if ( !strcasecmp ( subfield, "nomob" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_NOMOB ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else if ( !strcasecmp ( subfield, "peaceful" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_PEACEFUL ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else if ( !strcasecmp ( subfield, "roleplay" ) )
+						{
+							if ( ROOM_FLAGGED ( r, ROOM_ROLEPLAY ) )
+								snprintf ( str, slen, "1" );
+							else
+								snprintf ( str, slen, "0" );				
+						} 
+						else 
+						{
+							*str = '\0';
+							script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'",
+					             		GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield );
+						}
+					}
+					break;
+				case 'h':
+
+					if (!strcasecmp ( field, "has_script" ) )
+					{
+						if ( r->script != NULL )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+					break;
 				case 'i':
 
 					if ( !strcasecmp ( field, "id" ) )
