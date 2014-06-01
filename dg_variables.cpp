@@ -2776,12 +2776,11 @@ void var_subst ( void *go, struct script_data *sc, trig_data *trig,
 
 	strlcpy ( tmp, line, sizeof ( tmp ) );
 	p = tmp;
-	subfield_p = subfield;
-
 
 	while ( *p && ( left > 0 ) )
 	{
 
+		subfield_p = subfield;
 
 		/* copy until we find the first % */
 		while ( *p && ( *p != '%' ) && ( left > 0 ) )
