@@ -341,6 +341,7 @@ int command_mtrigger(Character * actor, char *cmd, char *argument) {
     Character *ch, *ch_next;
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
+    char argument_original[MAX_INPUT_LENGTH];
     char *remove_percentage(char *string);
 
     /* prevent people we like from becoming trapped :P */
@@ -369,6 +370,7 @@ int command_mtrigger(Character * actor, char *cmd, char *argument) {
                         !strn_cmp(GET_TRIG_ARG(t), cmd,
                                   strlen(GET_TRIG_ARG(t)))) {
 
+                    strcpy ( argument_original, argument );
                     ADD_UID_VAR(buf, t, actor, "actor", 0);
                     skip_spaces(&argument);
 
@@ -379,6 +381,9 @@ int command_mtrigger(Character * actor, char *cmd, char *argument) {
 
                     if (script_driver(&ch, t, MOB_TRIGGER, TRIG_NEW))
                         return 1;
+
+                    // There was a return 0: restore the original argument
+                    strcpy ( argument, argument_original );
                 }
             }
         }
@@ -782,6 +787,7 @@ int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
               char *argument, int type) {
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
+    char argument_original[MAX_INPUT_LENGTH];
     char *remove_percentage(char *string);
 
     if (obj && SCRIPT_CHECK(obj, OTRIG_COMMAND))
@@ -799,6 +805,7 @@ int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
                     (*GET_TRIG_ARG(t) == '*' ||
                      !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t))))) {
 
+                strcpy ( argument_original, argument );
                 ADD_UID_VAR(buf, t, actor, "actor", 0);
                 skip_spaces(&argument);
                 add_var(&GET_TRIG_VARS(t), "arg", remove_percentage(argument), 0);
@@ -809,6 +816,9 @@ int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
 
                 if (script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW))
                     return 1;
+
+                // There was a return 0: restore the original argument
+                strcpy ( argument, argument_original );
             }
         }
 
@@ -1364,6 +1374,7 @@ int command_wtrigger(Character * actor, char *cmd, char *argument) {
     Room *room;
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
+    char argument_original[MAX_INPUT_LENGTH];
     char *remove_percentage(char *string);
 
     /* prevent people we like from becoming trapped :P */
@@ -1389,14 +1400,18 @@ int command_wtrigger(Character * actor, char *cmd, char *argument) {
         if (*GET_TRIG_ARG(t) == '*' ||
                 !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t)))) {
 
+            strcpy ( argument_original, argument );
             ADD_UID_VAR(buf, t, actor, "actor", 0);
             skip_spaces(&argument);
             add_var(&GET_TRIG_VARS(t), "arg", remove_percentage(argument), 0);
             skip_spaces(&cmd);
             add_var(&GET_TRIG_VARS(t), "cmd", cmd, 0);
 
+            if ( script_driver(&room, t, WLD_TRIGGER, TRIG_NEW) )
+                return 1;
 
-            return script_driver(&room, t, WLD_TRIGGER, TRIG_NEW);
+            // There was a return 0: restore the original argument
+            strcpy ( argument, argument_original );
         }
     }
 

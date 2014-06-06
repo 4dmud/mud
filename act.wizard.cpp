@@ -7517,6 +7517,9 @@ int search_one_trig ( int stype, struct trig_data *trig, char *buf, size_t len, 
 			n++;
 			if ( hilite ( phrase, c->cmd, strtmp2, sizeof ( strtmp2 ) ) )
 			{
+				if ( strlen ( strtmp2 ) >= len - nlen - 100 )
+					return found; // prevent possible buffer overflow
+
 				count = snprintf ( buf + nlen, len - nlen, "      %s[BODY]%s Line %3d: %s%s\r\n",YEL, REM, n, strtmp2, REM );
 				if ( count >= 0 )
 					nlen += count;

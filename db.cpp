@@ -5160,10 +5160,22 @@ int store_to_char ( const char *name, Character *ch )
 				else if ( !strcmp ( tag, "Con " ) )
 					ch->real_abils.con = num;
 				else if ( !strcmp ( tag, "Clan" ) )
-					GET_CLAN ( ch ) = num;
+				{
+					if ( find_clan_by_id ( num ) == -1 )
+						GET_CLAN ( ch ) = 0;
+					else GET_CLAN ( ch ) = num;
+				}
 				else if ( !strcmp ( tag, "ClRk" ) )
 				{
-					GET_CLAN_RANK ( ch ) = ( *pvti ).rank < 0 ? ( *pvti ).rank : num;
+					//GET_CLAN_RANK ( ch ) = ( *pvti ).rank < 0 ? ( *pvti ).rank : num;
+					if ( GET_CLAN ( ch ) == 0 || num < 1 )
+						GET_CLAN_RANK ( ch ) = 0;
+					else
+					{
+						if ( num > clan[ find_clan_by_id ( GET_CLAN ( ch ) )].ranks )
+							GET_CLAN_RANK ( ch ) = 0;
+						else GET_CLAN_RANK ( ch ) = num;
+					}
 				}
 				else if ( !strcmp ( tag, "Clns" ) )
 				{

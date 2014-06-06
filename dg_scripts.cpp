@@ -3461,12 +3461,12 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 		if ( *p == '*' )		/* comment */
 			continue;
 
-		var_subst ( go, sc, trig, type, p, cmd, sizeof ( cmd ) );
+		//var_subst ( go, sc, trig, type, p, cmd, sizeof ( cmd ) );
 		if ( ( ( brac = check_braces ( p ) ) != 0 ) &&
 		        ( !strn_cmp ( "elseif ", p, 7 ) || !strn_cmp ( "else", p, 4 ) || !strn_cmp ( "else if ", p, 8 ) ||
 		          !strn_cmp ( p, "if ", 3 ) || !strn_cmp ( "while ", p, 6 ) || !strn_cmp ( "switch ", p, 7 ) ||
-		          !strn_cmp ( cmd, "extract ", 8 ) || !strn_cmp ( "case", p, 4 ) || !strn_cmp ( cmd, "eval ", 5 ) ||
-		          !strn_cmp ( cmd, "nop ", 4 ) || !strn_cmp ( cmd, "set ", 4 ) ) )
+		          !strn_cmp ( p, "extract ", 8 ) || !strn_cmp ( "case", p, 4 ) || !strn_cmp ( p, "eval ", 5 ) ||
+		          !strn_cmp ( p, "nop ", 4 ) || !strn_cmp ( p, "set ", 4 ) ) )
 		{
 			script_log ( "Unmatched %s bracket in trigger %d!", brac < 0 ? "right" : "left", GET_TRIG_VNUM ( trig ) );
 		}
@@ -3577,7 +3577,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 		else
 		{
 
-			//            var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
+			var_subst(go, sc, trig, type, p, cmd, sizeof(cmd));
 
 			/** dg_script functions **/
 			if ( !strn_cmp ( cmd, "function ", 9 ) )
