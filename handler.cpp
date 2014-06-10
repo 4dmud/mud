@@ -1816,11 +1816,13 @@ void extract_obj ( struct obj_data *obj )
 		new_mudlog ( CMP, LVL_SEN, FALSE, "%s purged", obj->short_description );
 		purge_qic ( GET_OBJ_RNUM ( obj ) );
 	}
+if (obj != NULL) {
 	obj->carried_by = NULL;
 	obj->next_content = NULL;
 	obj->extracted = 1;
 
 	obj_data_to_pool ( obj );
+}
 
 }
 

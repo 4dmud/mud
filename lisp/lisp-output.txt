@@ -1555,3 +1555,7 @@
 ;;; Loading #P"/usr/local/lib/ecl-12.5.1/cmp.fas"
 ;;; Loading "/home/game/mud/6000/src/lisp/4d-lisp.asd"
 ;;; Loading "/home/game/mud/6000/src/lisp/libraries/alexandria/alexandria.asd"
+;;; Loading #P"/usr/local/lib/ecl-12.5.1/asdf.fas"
+;;; Loading #P"/usr/local/lib/ecl-12.5.1/cmp.fas"
+;;; Loading "/home/game/mud/6000/src/lisp/4d-lisp.asd"
+;;; Loading "/home/game/mud/6000/src/lisp/libraries/alexandria/alexandria.asd"
