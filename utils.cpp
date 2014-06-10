@@ -356,6 +356,8 @@ void free_commlist ( struct comm_data *c )
 		free ( c->type );
 	if ( c->text )
 		free ( c->text );
+	if ( c->time_s )
+		free ( c->time_s );
 	free ( c );
 
 }
@@ -364,11 +366,18 @@ void add_to_comm ( const char *type, const char *text )
 {
 	struct comm_data *com, *tmp;
 	int i;
+	time_t ct = time ( 0 );
+	char *time_s = asctime ( localtime ( &ct ) );
+	char tmstr[30];
+	time_s[strlen ( time_s ) - 1] = '\0';
+	snprintf(tmstr, 30, "%-15.15s :: ", time_s);
+	
 	if ( type && text )
 	{
 		CREATE ( com, struct comm_data, 1 );
 		com->type = strdup ( type );
 		com->text = strdup ( text );
+		com->time_s = strdup ( tmstr );
 		com->next = comlist;
 		comlist = com;
 		for ( i = 0, tmp = comlist;tmp;i++, tmp = tmp->next )

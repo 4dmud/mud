@@ -1043,7 +1043,7 @@ ACMD(do_comm) {
     }
     for (com = comlist, i = 0; com && i < 15; com = com->next) {
         if (is_abbrev(argument, com->type))
-            ch->Send( "%2d: %s\r\n",i++, com->text);
+            ch->Send( "%s%s\r\n",com->time_s, com->text);
     }
 
     if (i == 0)
