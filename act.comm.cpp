@@ -1019,7 +1019,7 @@ ACMD(do_write) {
 
 ACMD(do_comm) {
     struct comm_data * com;
-    int i;
+    int i = 0;
     skip_spaces(&argument);
 
     if (is_abbrev(argument, "wiznet") 
@@ -1041,7 +1041,7 @@ ACMD(do_comm) {
         ch->Send( "Sorry, but you aren't heroic enough!");
         return;
     }
-    for (com = comlist, i = 0; com && i < 15; com = com->next) {
+    for (com = comlist, i = 0; com && i++ < 20; com = com->next) {
         if (is_abbrev(argument, com->type))
             ch->Send( "%s%s\r\n",com->time_s, com->text);
     }

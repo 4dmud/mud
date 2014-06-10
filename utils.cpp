@@ -370,7 +370,7 @@ void add_to_comm ( const char *type, const char *text )
 	char *time_s = asctime ( localtime ( &ct ) );
 	char tmstr[30];
 	time_s[strlen ( time_s ) - 1] = '\0';
-	snprintf(tmstr, 30, "%-15.15s :: ", time_s);
+	snprintf(tmstr, 30, "%-19.19s :: ", time_s);
 	
 	if ( type && text )
 	{
