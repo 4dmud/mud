@@ -5614,14 +5614,14 @@ ACMD ( do_affects )
 				           ( minsec/60 ?   "min"   : "sec" ),
 				           CCCYN ( ch, C_NRM ), skill_name ( aff->type ), CCNRM ( ch, C_NRM ) );
 			}
-			if ( aff->modifier )
+			if ( aff->modifier && aff->location )
 			{
 				ch->Send ( " %+d to %s", aff->modifier,
 				           apply_types[ ( int ) aff->location] );
 			}
 			if ( aff->bitvector )
 			{
-				if ( aff->modifier )
+				if ( aff->modifier && aff->location )
 					ch->Send ( ", sets " );
 				else
 					ch->Send ( " sets " );
