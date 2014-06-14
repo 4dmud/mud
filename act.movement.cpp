@@ -2870,8 +2870,7 @@ ASKILL ( skill_snare )
 		// Changed this from 3 to 5. If this is too affecting
 		// it can be changed back. Prom
 		af.expire = HOURS_TO_EXPIRE ( 5 );
-		//af.modifier = GET_LEVEL(ch) + IS_NPC(ch) ? GET_LEVEL(ch) / 2: GET_SKILL(ch, SKILL_SNARE);
-		af.modifier = 0;
+		af.modifier = GET_LEVEL(ch) + IS_NPC(ch) ? GET_LEVEL(ch) / 2: GET_SKILL(ch, SKILL_SNARE);
 		af.location = APPLY_NONE;
 		af.bitvector = AFF_SNARE;
 
