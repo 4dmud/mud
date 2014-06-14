@@ -4,6 +4,11 @@
 #ECL?
 ECL = 1
 
+#if ECL is set, check if it is actually there
+ifeq ($(ECL),1)
+	ECL = $(shell ./detect_ecl.sh)
+endif
+
 # C compiler to use
 CC = g++
 

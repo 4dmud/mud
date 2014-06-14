@@ -62,6 +62,6 @@
 
   (rebuild-toplevel-handler-fn))
 
-(defun game-loop-fn (data)
-  (funcall *toplevel-handler-fn* #'4d-internal::c-game-loop-fn data))
+;(defun game-loop-fn (data)
+;  (funcall *toplevel-handler-fn* #'4d-internal::c-game-loop-fn data))
 

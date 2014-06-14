@@ -3029,6 +3029,7 @@ struct zone_list_data {
 struct comm_data {
     char * type;
     char * text;
+    char * time_s;
     struct comm_data * next;
 };
 

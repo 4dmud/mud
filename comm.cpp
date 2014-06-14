@@ -1148,16 +1148,44 @@ void *process_io(void *loopstate) {
 #endif
 
 void game_loop_fn(struct game_loop_data* data) {
-{
+}
+
+/*
+ * game_loop contains the main loop which drives the entire MUD.  It
+ * cycles once every 0.10 seconds and is responsible for accepting new
+ * new connections, polling existing connections for input, dequeueing
+ * output and sending it out to players, and calling "heartbeat" functions
+ * such as mobile_activity().
+ */
+void game_loop(socket_t s_mother_desc) {
+  fd_set input_set, output_set, exc_set, null_set;
+  struct timeval last_time, opt_time, process_time, temp_time;
+  struct timeval before_sleep, now, timeout;
+  char comm[MAX_STRING_LENGTH];
+  Descriptor *d, *next_d;
+  int missed_pulses, maxdesc, aliased;
+  /* initialize various time values */
+  missed_pulses = 0;
+  null_time.tv_sec = 0;
+  null_time.tv_usec = 0;
+  opt_time.tv_usec = OPT_USEC;
+  opt_time.tv_sec = 0;
+  FD_ZERO(&null_set);
+
+  gettimeofday(&last_time, (struct timezone *) 0);
+
+
+    /* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
+    while (!circle_shutdown) {
         /* Sleep if we don't have any connections */
         if (descriptor_list == NULL) {
             log("No connections.  Going to sleep.");
             alarm(0); //Disable watchdog.
             clearAllZones();
             make_who2html();
-            FD_ZERO(&data->input_set);
-            FD_SET(data->s_mother_desc, &data->input_set);
-            if (select(data->s_mother_desc + 1, &data->input_set, (fd_set *) 0, (fd_set *) 0, NULL) < 0) {
+            FD_ZERO(&input_set);
+            FD_SET(s_mother_desc, &input_set);
+            if (select(s_mother_desc + 1, &input_set, (fd_set *) 0, (fd_set *) 0, NULL) < 0) {
                 if (errno == EINTR)
                     log("Waking up to process signal.");
                 else
@@ -1165,33 +1193,33 @@ void game_loop_fn(struct game_loop_data* data) {
             } else {
                 log("New connection.  Waking up.");
             }
-            gettimeofday(&data->last_time, (struct timezone *) 0);
+            gettimeofday(&last_time, (struct timezone *) 0);
         }
         alarm(WATCHDOG); //Set watchdog. This alarm should reset before it expires. If this does not happen, the mud is frozen.
         /* Set up the input, output, and exception sets for select(). */
-        FD_ZERO(&data->input_set);
-        FD_ZERO(&data->output_set);
-        FD_ZERO(&data->exc_set);
-        FD_SET(data->s_mother_desc, &data->input_set);
+        FD_ZERO(&input_set);
+        FD_ZERO(&output_set);
+        FD_ZERO(&exc_set);
+        FD_SET(s_mother_desc, &input_set);
 
-        data->maxdesc = mother_desc;
+        maxdesc = mother_desc;
 
         if (id_serv_socket > 0) {
-            FD_SET(id_serv_socket, &data->input_set);
-            data->maxdesc = MAX(data->maxdesc, id_serv_socket);
+            FD_SET(id_serv_socket, &input_set);
+            maxdesc = MAX(maxdesc, id_serv_socket);
         }
 
 	Descriptor *d, *next_d;
         for (d = descriptor_list; d; d = next_d) {
 #ifndef CIRCLE_WINDOWS
-            if (d->descriptor > data->maxdesc)
-                data->maxdesc = d->descriptor;
+            if (d->descriptor > maxdesc)
+                maxdesc = d->descriptor;
 #endif
 
             next_d = d->next;
-            FD_SET(d->descriptor, &data->input_set);
-            FD_SET(d->descriptor, &data->output_set);
-            FD_SET(d->descriptor, &data->exc_set);
+            FD_SET(d->descriptor, &input_set);
+            FD_SET(d->descriptor, &output_set);
+            FD_SET(d->descriptor, &exc_set);
         }
 
         /*
@@ -1201,60 +1229,60 @@ void game_loop_fn(struct game_loop_data* data) {
          * calculate how long we took processing the previous iteration.
          */
 
-        gettimeofday(&data->before_sleep, (struct timezone *) 0);     /* current time */
-        timediff(&data->process_time, &data->before_sleep, &data->last_time);
+        gettimeofday(&before_sleep, (struct timezone *) 0);     /* current time */
+        timediff(&process_time, &before_sleep, &last_time);
 
         /*
          * If we were asleep for more than one pass, count missed pulses and sleep
          * until we're resynchronized with the next upcoming pulse.
          */
-        if (data->process_time.tv_sec == 0 && data->process_time.tv_usec < OPT_USEC) {
-            data->missed_pulses = 0;
+        if (process_time.tv_sec == 0 && process_time.tv_usec < OPT_USEC) {
+            missed_pulses = 0;
         } else {
-            data->missed_pulses = data->process_time.tv_sec * PASSES_PER_SEC;
-            data->missed_pulses += data->process_time.tv_usec / OPT_USEC;
-            data->process_time.tv_sec = 0;
-            data->process_time.tv_usec = data->process_time.tv_usec % OPT_USEC;
+            missed_pulses = process_time.tv_sec * PASSES_PER_SEC;
+            missed_pulses += process_time.tv_usec / OPT_USEC;
+            process_time.tv_sec = 0;
+            process_time.tv_usec = process_time.tv_usec % OPT_USEC;
         }
 
         /* Calculate the time we should wake up */
-        timediff(&data->temp_time, &data->opt_time, &data->process_time);
-        timeadd(&data->last_time, &data->before_sleep, &data->temp_time);
+        timediff(&temp_time, &opt_time, &process_time);
+        timeadd(&last_time, &before_sleep, &temp_time);
 
         /* Now keep sleeping until that time has come */
-        gettimeofday(&data->now, (struct timezone *) 0);
-        timediff(&data->timeout, &data->last_time, &data->now);
+        gettimeofday(&now, (struct timezone *) 0);
+        timediff(&timeout, &last_time, &now);
 
         /* Go to sleep */
         do {
-            circle_sleep(&data->timeout);
-            gettimeofday(&data->now, (struct timezone *) 0);
-            timediff(&data->timeout, &data->last_time, &data->now);
-        } while (data->timeout.tv_usec || data->timeout.tv_sec);
+            circle_sleep(&timeout);
+            gettimeofday(&now, (struct timezone *) 0);
+            timediff(&timeout, &last_time, &now);
+        } while (timeout.tv_usec || timeout.tv_sec);
 
         /* Poll (without blocking) for new input, output, and exceptions */
         if (select
-                (data->maxdesc + 1, &data->input_set, &data->output_set, &data->exc_set,
+                (maxdesc + 1, &input_set, &output_set, &exc_set,
                  &null_time) < 0) {
             perror("SYSERR: Select poll");
             return;
         }
         /* If there are new connections waiting, accept them. */
-        if (FD_ISSET(data->s_mother_desc, &data->input_set))
-            d = d->new_descriptor(data->s_mother_desc, FALSE);
+        if (FD_ISSET(s_mother_desc, &input_set))
+            d = d->new_descriptor(s_mother_desc, FALSE);
 #if RUNNING_IDENT
         /* check for a reply from the ident process */
-        if ((id_serv_socket > 0) && FD_ISSET(id_serv_socket, &data->input_set))
+        if ((id_serv_socket > 0) && FD_ISSET(id_serv_socket, &input_set))
             get_lookup_reply();
 #endif
 
         /* Kick out the freaky folks in the exception set and marked for close */
         for (d = descriptor_list; d; d = next_d) {
             next_d = d->next;
-            if (d->close_me || STATE(d) == CON_CLOSE || FD_ISSET(d->descriptor, &data->exc_set)) {
+            if (d->close_me || STATE(d) == CON_CLOSE || FD_ISSET(d->descriptor, &exc_set)) {
 
-                FD_CLR(d->descriptor, &data->input_set);
-                FD_CLR(d->descriptor, &data->output_set);
+                FD_CLR(d->descriptor, &input_set);
+                FD_CLR(d->descriptor, &output_set);
                 delete d;
 
             }
@@ -1262,7 +1290,7 @@ void game_loop_fn(struct game_loop_data* data) {
             /* Process descriptors with input pending */
             for (d = descriptor_list; d; d = next_d) {
                 next_d = d->next;
-                if (FD_ISSET(d->descriptor, &data->input_set))
+                if (FD_ISSET(d->descriptor, &input_set))
                     if (d->process_input() < 0)
                         delete d;
             }
@@ -1285,7 +1313,7 @@ void game_loop_fn(struct game_loop_data* data) {
                         continue;
                 }
 
-                if (!get_from_q(&d->input, data->comm, &data->aliased))
+                if (!get_from_q(&d->input, comm, &aliased))
                     continue;
 
                 if (d->character) {
@@ -1305,17 +1333,17 @@ void game_loop_fn(struct game_loop_data* data) {
                 d->has_prompt = FALSE;
 
                 if (d->showstr_count) /* Reading something w/ pager */
-                    show_string(d, data->comm);
+                    show_string(d, comm);
                 else if (d->str)        /* Writing boards, mail, etc. */
-                    string_add(d, data->comm);
+                    string_add(d, comm);
                 else if (STATE(d) != CON_PLAYING) /* In menus, etc. */
-                    nanny(d, data->comm);
+                    nanny(d, comm);
                 else {        /* else: we're playing normally. */
-                    if (data->aliased)     /* To prevent recursive aliases. */
+                    if (aliased)     /* To prevent recursive aliases. */
                         d->has_prompt = TRUE;    /* To get newline before next cmd output. */
-                    else if (perform_alias(d, data->comm, sizeof(data->comm))) /* Run it through aliasing system */
-                        get_from_q(&d->input, data->comm, &data->aliased);
-                    command_interpreter(d->character, data->comm);  /* Send it to interpreter */
+                    else if (perform_alias(d, comm, sizeof(comm))) /* Run it through aliasing system */
+                        get_from_q(&d->input, comm, &aliased);
+                    command_interpreter(d->character, comm);  /* Send it to interpreter */
                 }
             }
         }
@@ -1323,7 +1351,7 @@ void game_loop_fn(struct game_loop_data* data) {
         /* Send queued output out to the operating system (ultimately to user). */
         for (d = descriptor_list; d; d = next_d) {
             next_d = d->next;
-            if (d->pending_output() && FD_ISSET(d->descriptor, &data->output_set)) {
+            if (d->pending_output() && FD_ISSET(d->descriptor, &output_set)) {
                 /* Output for this player is ready */
                 if (process_output(d) >= 0)
                     d->has_prompt = 1;
@@ -1351,23 +1379,23 @@ void game_loop_fn(struct game_loop_data* data) {
          * missed any pulses, or make up for lost time if we missed a few
          * pulses by sleeping for too long.
          */
-        data->missed_pulses++;
+        missed_pulses++;
 
-        if (data->missed_pulses <= 0) {
-            log("SYSERR: **BAD** MISSED_PULSES NONPOSITIVE (%d), TIME GOING BACKWARDS!!", data->missed_pulses);
-            data->missed_pulses = 1;
+        if (missed_pulses <= 0) {
+            log("SYSERR: **BAD** MISSED_PULSES NONPOSITIVE (%d), TIME GOING BACKWARDS!!", missed_pulses);
+            missed_pulses = 1;
         }
 
         /* If we missed more than 5 seconds worth of pulses, just do 5 secs */
-        if (data->missed_pulses > (10 RL_SEC)) {
+        if (missed_pulses > (10 RL_SEC)) {
             log("SYSERR: Missed %d seconds worth of pulses.",
-                data->missed_pulses / PASSES_PER_SEC);
-            data->missed_pulses = 5 RL_SEC;
+                missed_pulses / PASSES_PER_SEC);
+            missed_pulses = 5 RL_SEC;
         }
 
         //hb.start();
         /* Now execute the  functions */
-        while (data->missed_pulses--)
+        while (missed_pulses--)
             heartbeat(++pulse);
 
 
@@ -1388,39 +1416,6 @@ void game_loop_fn(struct game_loop_data* data) {
 #ifdef CIRCLE_UNIX
         /* Update tics for deadlock protection (UNIX only) */
         tics_passed++;
-#endif
-	
- }
-}
-
-
-/*
- * game_loop contains the main loop which drives the entire MUD.  It
- * cycles once every 0.10 seconds and is responsible for accepting new
- * new connections, polling existing connections for input, dequeueing
- * output and sending it out to players, and calling "heartbeat" functions
- * such as mobile_activity().
- */
-void game_loop(socket_t s_mother_desc) {
-  struct game_loop_data data;
-  data.s_mother_desc = s_mother_desc;
-  /* initialize various time values */
-  data.missed_pulses = 0;
-  null_time.tv_sec = 0;
-  null_time.tv_usec = 0;
-  data.opt_time.tv_usec = OPT_USEC;
-  data.opt_time.tv_sec = 0;
-  FD_ZERO(&data.null_set);
-
-  gettimeofday(&data.last_time, (struct timezone *) 0);
-
-
-    /* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
-    while (!circle_shutdown) {
-#if ECL
-      lisp_game_loop_fn(&data);
-#else
-      game_loop_fn(&data);
 #endif
     }
 }

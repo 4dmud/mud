@@ -1422,7 +1422,7 @@ void free_note_list ( NOTE_DATA *note, int type )
 
 void free_note ( NOTE_DATA *note, int type )
 {
-	NOTE_DATA *temp = NULL, *list = NULL;
+	NOTE_DATA *temp = NULL, **list = NULL;
 
 	if ( !note )
 		return;
@@ -1430,19 +1430,19 @@ void free_note ( NOTE_DATA *note, int type )
 	switch ( type )
 	{
 		case NOTE_NOTE:
-			list = note_list;
+			list = &note_list;
 			break;
 		case NOTE_IDEA:
-			list = idea_list;
+			list = &idea_list;
 			break;
 		case NOTE_PENALTY:
-			list = penalty_list;
+			list = &penalty_list;
 			break;
 		case NOTE_CHANGES:
-			list = changes_list;
+			list = &changes_list;
 			break;
 		case NOTE_NEWS:
-			list = news_list;
+			list = &news_list;
 			break;
 	}
 
@@ -1454,7 +1454,7 @@ void free_note ( NOTE_DATA *note, int type )
 
 	if ( list )
 	{
-		REMOVE_FROM_LIST ( note, list, next );
+		REMOVE_FROM_LIST ( note, *list, next );
 	}
 	free ( note );
 	note = NULL;
