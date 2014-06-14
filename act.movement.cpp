@@ -215,8 +215,8 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	char local_buf[MAX_INPUT_LENGTH];
 	char buf2[MAX_INPUT_LENGTH];
 	struct obj_data *bike = NULL;
-	/*    Character *herd, *next;
-	    bool FOUND = FALSE;*/
+	Character *herd, *next;
+	bool FOUND = FALSE;
 
 	if ( !IN_ROOM ( ch ) )
 		return 0;
@@ -746,9 +746,8 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 
 	message_type = REST_MOVE;
 
-	/*if (MOB_FLAGGED(ch, MOB_HERD))
-	act("The entire herd follows the leader.", TRUE, ch, 0, 0,
-	 TO_ROOM);*/
+	if ( MOB_FLAGGED(ch, MOB_HERD_CATTLE) || MOB_FLAGGED(ch, MOB_HERD_SHEEP) || MOB_FLAGGED(ch, MOB_HERD_HORSE) )
+		act("The entire herd follows the leader.", TRUE, ch, 0, 0, TO_ROOM);
 
 	if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
 		bike = SITTING ( ch );
@@ -985,20 +984,25 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 
 	}
 
-	/*if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_HERD)) {
-	for (herd = was_in->people; herd; herd = next) {
-	 next = herd->next_in_room;
-	 if (MOB_FLAGGED(herd, MOB_HERD)) {
-	FOUND = TRUE;
-	char_from_room(herd);
-	char_to_room(herd, was_in->dir_option[dir]->to_room);
-	// log("%s is a herd animal.", GET_NAME(herd));
-	 }
+	if ( IS_NPC(ch) && ( MOB_FLAGGED(ch, MOB_HERD_CATTLE) || MOB_FLAGGED(ch, MOB_HERD_SHEEP) || 
+			     MOB_FLAGGED(ch, MOB_HERD_HORSE) )) 
+	{
+		for (herd = was_in->people; herd; herd = next) 
+		{
+			next = herd->next_in_room;
+			if ( (MOB_FLAGGED(herd, MOB_HERD_CATTLE) && MOB_FLAGGED(ch, MOB_HERD_CATTLE)) ||
+			     (MOB_FLAGGED(herd, MOB_HERD_SHEEP) && MOB_FLAGGED(ch, MOB_HERD_SHEEP)) ||
+			     (MOB_FLAGGED(herd, MOB_HERD_HORSE) && MOB_FLAGGED(ch, MOB_HERD_HORSE)) ) 
+			{
+				FOUND = TRUE;
+				char_from_room(herd);
+				char_to_room(herd, was_in->dir_option[dir]->to_room);
+				//log("%s is a herd animal.", GET_NAME(herd));
+			}
+		}
+		if (FOUND)
+			act("A herd has arrived, following the leader.", TRUE, ch, 0, NULL, TO_ROOM);
 	}
-	if (FOUND)
-	 act("A herd has arrived, following the leader.", TRUE, ch, 0,
-	NULL, TO_ROOM);
-	} */
 
 
 
@@ -1196,6 +1200,21 @@ int can_pass_fence ( Character *ch, int dir )
 	int chance, type = 0;
 	char fencebuf[100];
 
+	// Mobs and players shouldn't pass fences
+
+	if ( EXIT_FLAGGED ( EXIT ( ch, dir ), EX_FENCE_WIRE ) )
+	{
+		ch->Send ( "You walk up to the fence.\r\n" );
+		return 0;
+	}
+	
+	if ( EXIT_FLAGGED ( EXIT ( ch, dir ), EX_FENCE_GATE_CLOSED ) )
+	{
+		ch->Send ( "You walk up to the closed gate.\r\n" );
+		return 0;
+	}
+
+	return 1;
 
 	if ( EXIT_FLAGGED ( EXIT ( ch, dir ), EX_FENCE_GATE_OPEN ) )
 	{
@@ -1257,7 +1276,7 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 {
 	room_rnum was_in;
 	struct follow_type *k, *next;
-	Character *mob;
+	//Character *mob;
         struct affected_type *af;
         int chance;
 
@@ -1280,7 +1299,7 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 	}
 	else if ( !can_pass_fence ( ch, dir ) )
 	{
-		/* can go through fence*/
+		return 0;
 
 	}
 	else
@@ -1320,14 +1339,14 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 				perform_move ( k->follower, dir, 1 );
 			}
 		}
-
-		for ( mob = was_in->people; mob; mob = mob->next_in_room )
+		// A herd is already moved in do_simple_move
+		/*for ( mob = was_in->people; mob; mob = mob->next_in_room )
 		{
 			//log("%s is in the room, checking if it is part of a herd.", GET_NAME(mob));
 			if ( MOB_FLAGGED ( mob, MOB_HERD ) && GET_POS ( mob ) >= POS_STANDING )
 				perform_move ( mob, dir, 1 );
 		}
-
+		*/
 		return ( 1 );
 	}
 	return ( 0 );
@@ -1645,7 +1664,8 @@ ACMD ( do_gen_door )
 #define FTYPE_WOOD  6
 #define FTYPE_MESH  7
 #define GATE_USE_MSG "GATE <OPEN|CLOSE|BUILD|REMOVE> <direction>\r\n"
-#define FENCE_USE_MSG "FENCE <BUILD|REMOVE> <WIRE|TIMBER|MESH> <direction>\r\n"
+//#define FENCE_USE_MSG "FENCE <BUILD|REMOVE> <WIRE|TIMBER|MESH> <direction>\r\n"
+#define FENCE_USE_MSG "FENCE <BUILD|REMOVE> <direction>\r\n"
 
 int parse_fence_type ( char arg )
 {
@@ -1692,6 +1712,12 @@ ACMD ( do_fence )
 	char bfsort[MAX_INPUT_LENGTH];
 	char bfbuf[MAX_INPUT_LENGTH];
 	char *adir, *type, *fsort, *fbuf;
+	Room *other_room = NULL;
+	bool room_has_gatepost;
+	struct obj_data *obj;
+	obj_rnum gatepost_rnum = real_object ( 52863 );
+	obj_rnum wire_rnum = real_object ( 52910 );
+	zone_rnum zone_allowed = real_zone ( 526 );
 
 	adir = badir;
 	type = btype;
@@ -1699,7 +1725,7 @@ ACMD ( do_fence )
 	fbuf = bfbuf;
 
 	/* check if the room we are in is a PASTURE type */
-
+	/* Changed this to only using (wire) fences in zone 526. Players and mobs can't pass fences */
 
 	fbuf = one_argument ( argument, type );
 	skip_spaces ( &type );
@@ -1708,13 +1734,13 @@ ACMD ( do_fence )
 	   check what kind of command it is and split the buffer up -- mord
 	*/
 
-	if ( subcmd == SCMD_GATE )
+	//if ( subcmd == SCMD_GATE )
 		adir = fbuf;
-	else
+	/*else
 	{
 		adir = ( one_argument ( fbuf, fsort ) );
 		skip_spaces ( &fsort );
-	}
+	}*/
 
 	skip_spaces ( &adir );
 
@@ -1726,10 +1752,17 @@ ACMD ( do_fence )
 	}
 	else
 	{
-		/* make sure the type the typed is valid, hash check */
+		/* make sure the type they typed is valid, hash check */
 		if ( ( t = parse_fence_type ( *type ) ) == 0 )
 		{
 			ch->Send ( "%s", ( subcmd == SCMD_GATE ? GATE_USE_MSG : FENCE_USE_MSG ) );
+			return;
+		}
+
+		/* can't open or close a fence */
+		if ( subcmd == SCMD_FENCE && ( t == FTYPE_OPEN || t == FTYPE_CLOSE ) )
+		{
+			ch->Send ( FENCE_USE_MSG );
 			return;
 		}
 
@@ -1737,27 +1770,154 @@ ACMD ( do_fence )
 		dir = search_block ( adir, dirs, FALSE );
 		if ( dir == NOWHERE )
 		{
-			ch->Send ( "Valid Directions Are: North, South, East, West, Up, and Down.\r\n" );
+			ch->Send ( "Valid directions are: North, South, East, West, Up, and Down.\r\n" );
 			return;
 		}
+
 		/* make sure the sort of fence they want is valid*/
-		if ( subcmd == SCMD_FENCE )
+		/*if ( subcmd == SCMD_FENCE )
 		{
 			if ( ( t = parse_fence_sort ( *fsort ) ) == 0 )
 			{
 				ch->Send ( "%s",  FENCE_USE_MSG );
 				return;
 			}
+		}*/
+	}
+
+	if ( EXIT( ch, dir ) )
+		other_room = EXIT(ch, dir)->to_room;
+	else
+	{
+		ch->Send ( "There is nothing in that direction.\r\n" );
+		return;
+	}
+
+	if ( t == FTYPE_OPEN )
+	{
+		if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN ) )
+			ch->Send ( "The gate is already open.\r\n" );
+
+		else if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED ) )
+		{
+			ch->Send ( "You open the gate.\r\n" );
+			TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED );
+			TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN );
+			if ( other_room != NULL )
+			{
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_OPEN );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_CLOSED );
+			}
+		}
+
+		else ch->Send ( "There is no gate %s.\r\n", dirs [ dir ] );
+	}
+
+	else if ( t == FTYPE_CLOSE )
+	{
+		if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED ) )
+			ch->Send ( "The gate is already closed.\r\n" );
+
+		else if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN ) )
+		{
+			ch->Send ( "You close the gate.\r\n" );
+			TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED );
+			TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN );
+			if ( other_room != NULL )
+			{
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_OPEN );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_CLOSED );
+			}
+		}
+
+		else ch->Send ( "There is no gate %s.\r\n", dirs [ dir ] );
+	}
+
+	else if ( t == FTYPE_REMOVE )
+	{
+		if ( subcmd == SCMD_FENCE )
+		{
+			if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE ) )
+			{
+				TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_WIRE );
+				ch->Send ( "You remove the fence %s.\r\n", dirs[ dir ] );
+			}
+			else ch->Send ( "There is no fence %s.\r\n", dirs[ dir ] );
+		}
+
+		else if ( subcmd == SCMD_GATE )
+		{
+			if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN ) )
+			{
+				TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_OPEN );
+				ch->Send ( "You remove the gate %s.\r\n", dirs[ dir ] );
+			}
+			else if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED ) )
+			{
+				TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_CLOSED );
+				ch->Send ( "You remove the gate %s.\r\n", dirs[ dir ] );
+			}
+			else ch->Send ( "There is no gate %s.\r\n", dirs[ dir ] );
 		}
 	}
 
-	/* now check, that the exit on the oposite side of this exit
-	   exists.
-	*/
+	else if ( t == FTYPE_BUILD )
+	{
+		if ( GET_ROOM_ZONE ( ch->in_room ) != zone_allowed )
+			ch->Send ( "You can't build here, you should keep moving the herd on.\r\n" );
 
+		else if ( subcmd == SCMD_FENCE && ( !GET_EQ ( ch, WEAR_HOLD ) || GET_EQ ( ch, WEAR_HOLD )->item_number != wire_rnum ) )
+			ch->Send ( "You need to hold a roll of barbed wire first.\r\n" );
 
-	/* now check */
+		else if ( other_room == NULL )
+			ch->Send ( "There is nothing on the other side in that direction!\r\n" );
 
+		else if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN ) ||
+			  IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED ) ||
+			  IS_SET ( EXIT( ch, dir )->exit_info, EX_ISDOOR ) )
+			ch->Send ( "There is a doorway %s already.\r\n", dirs[ dir ] );
+
+		else if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE ) )
+			ch->Send ( "There is already a fence %s.\r\n", dirs[ dir ] );
+
+		else if ( subcmd == SCMD_FENCE )
+		{
+			TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE );
+			TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_WIRE );
+			ch->Send ( "You build a fence %s.\r\n", dirs[ dir ] );
+		}
+
+		else if ( subcmd == SCMD_GATE )
+		{
+			room_has_gatepost = FALSE;
+			for ( obj = (ch->in_room)->contents; obj; obj = obj->next_content )
+			{
+				if ( obj->item_number == gatepost_rnum )
+				{
+					obj_from_room ( obj );
+					room_has_gatepost = TRUE;
+					break;
+				}
+			}
+
+			if ( !room_has_gatepost )
+				ch->Send ( "You need to drop a gatepost first.\r\n" );
+			else
+			{
+				TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN );
+				TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_GATE_OPEN );
+				if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE ) )
+				{
+					TOGGLE_BIT ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE );
+					TOGGLE_BIT ( EXIT2( other_room, rev_dir[ dir ] )->exit_info, EX_FENCE_WIRE );
+				}
+				ch->Send ( "You build a gate %s.\r\n", dirs[ dir ] );
+			}
+		}
+	}
 }
 
 int followers_to_master ( Character *ch, room_rnum was_in )

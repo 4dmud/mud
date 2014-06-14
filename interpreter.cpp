@@ -178,6 +178,7 @@ ACMD ( do_energize );
 ACMD ( do_exit );
 ACMD ( do_exits );
 ACMD ( do_feel );
+ACMD ( do_fence );
 ACMD ( do_file );
 ACMD ( do_finger );
 ACMD ( do_fixskills );
@@ -597,6 +598,7 @@ const command_info cmd_info[] =
 
 	{ "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
 	{ "feel"     , "feel" , POS_RESTING , do_feel     , 0, 0, 0 },
+	{ "fence"    , "fence", POS_STANDING, do_fence    , 0, SCMD_FENCE, 0 },
 	{ "file"     , "file" , POS_SLEEPING, do_file     , LVL_HERO, 0, 0 },
 	{ "fill"     , "fil" , POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
 	{ "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
@@ -616,7 +618,7 @@ const command_info cmd_info[] =
 	{ "forge"    , "for" , POS_SITTING , do_assemble , 0, SUB_FORGE , 0},
 	{ "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 
-
+	{ "gate"     , "gate", POS_STANDING, do_fence    , 0, SCMD_GATE, 0 },
 	{ "get"      , "g"   , POS_RESTING , do_get      , 0, 0, 0 },
 	{ "gecho"    , "gech"     , POS_DEAD    , do_gecho    , LVL_IMMORT, 0, WIZ_QUEST_GRP },
 	{ "give"     , "giv" , POS_RESTING , do_give     , 0, 0, 0 },

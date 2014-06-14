@@ -597,7 +597,7 @@ class Room;
 #define MOB_ELEM_WATER   	34
 #define MOB_ELEM_FIRE    	35
 #define MOB_ELEM_EARTH   	36
-#define MOB_HERD     	 	37
+#define MOB_HERD_CATTLE	 	37
 #define MOB_SWIMS        	38
 #define MOB_WIZINVIS     	39
 #define MOB_STAY_SECTOR  	40
@@ -605,6 +605,9 @@ class Room;
 #define MOB_POSTMASTER   	42
 #define MOB_QUEST        	43
 #define MOB_TRAINER      	44
+#define MOB_BOSS      		45
+#define MOB_HERD_SHEEP	 	46
+#define MOB_HERD_HORSE	 	47
 
 /* Preference flags: used by Character.player_specials.pref           */
 #define PRF_BRIEF       	0     /* Room descs won't normally be shown        */

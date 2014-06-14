@@ -1336,6 +1336,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 	void update_mxp_map ( Character *ch );
 	*tbuf = '\0';
 	char buf[MAX_INPUT_LENGTH];
+	int dir;
 	if ( VEHICLE_ROOM == NULL )
 		view_room = IN_ROOM ( ch );
 	else
@@ -1440,6 +1441,19 @@ void look_at_room ( Character *ch, int ignore_brief )
 		}
 
 		ch->Send ( "%s", CCNRM ( ch, C_NRM ) );
+	}
+
+	/* list fences and gates */
+	for ( dir = 0; dir < NUM_OF_DIRS; dir++ )
+	{
+		if ( !EXIT ( ch, dir ) )
+			continue;
+		if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_WIRE ) )
+			ch->Send ( " There is a fence %s.\r\n", dirs[ dir ] );
+		if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_OPEN ) )
+			ch->Send ( " There is an open gate in the fence leading %s.\r\n", dirs[ dir ] );
+		if ( IS_SET ( EXIT( ch, dir )->exit_info, EX_FENCE_GATE_CLOSED ) )
+			ch->Send ( " There is a closed gate in the fence %s.\r\n", dirs[ dir ] );
 	}
 
 	/* now list characters & objects */

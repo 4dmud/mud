@@ -686,7 +686,7 @@ const char *action_bits[] =
 	"WATER",
 	"FIRE",
 	"EARTH",
-	"HERD",
+	"HERD_CATTLE",
 	"SWIMS",
 	"WIZINVIS",
 	"STAY_SECTOR",
@@ -695,6 +695,8 @@ const char *action_bits[] =
 	"QUESTMOB",
 	"TRAINER",
 	"BOSS",
+	"HERD_SHEEP",
+	"HERD_HORSE",	
 	"\n"
 };
 
