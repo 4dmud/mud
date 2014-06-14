@@ -6475,6 +6475,7 @@ void olc_list_flags ( Character *ch, const char *apply_stuff[] )
 		           ! ( ++columns % 2 ) ? "\r\n" : "" );
 		counter++;
 	}
+	ch->Send ( "{cg%2d{c0) Weapon\r\n", counter );
 }
 
 ACMD ( do_statinnate )
@@ -6540,23 +6541,57 @@ ACMD ( do_statinnate )
 
 }
 
+inline bool Comparefunc ( pair < int, string > a, pair < int, string > b )
+{
+	return a.first > b.first;
+}
+
 void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
 {
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int die_num, die_size, object, count = 0;
+  int die_num, die_size, object, sort_by_dice, i, count = 0;
+  string line;
+  vector < pair < int, string > > pairs;
   DYN_DEFINE;
 
+  if ( !strcmp ( arg1, "first" ) || !strcmp ( arg1, "last" ) )
+  {
+	if ( !strcmp ( arg1, "first" ) )
+		sort_by_dice = 1;
+	else sort_by_dice = 2;	
+  	
+	DYN_CREATE;
+	*dynbuf = 0;
+  	for ( object = 0; object <= top_of_objt; object++ ) {
+      		if ( GET_OBJ_TYPE(&obj_proto[object]) != ITEM_WEAPON ) 
+			continue;
+      		snprintf ( buf, sizeof(buf), "%6d %s %dd%d\r\n", obj_index[object].vnum, obj_proto[object].short_description, GET_OBJ_VAL ( &obj_proto[object], 1 ), GET_OBJ_VAL ( &obj_proto[object], 2 ) );
+      		pairs.push_back ( make_pair ( GET_OBJ_VAL ( &obj_proto[object], sort_by_dice ), string ( buf ) ) );
+  	}
+	sort ( pairs.begin(), pairs.end(), Comparefunc );
+
+	for ( i=0; i < pairs.size(); i++ )
+	{
+		snprintf ( buf, sizeof ( buf ), pairs[i].second.c_str() );
+		DYN_RESIZE ( buf );
+	}
+	page_string ( ch->desc, dynbuf, DYN_BUFFER );	
+
+	return;
+  }
+	
   one_argument(argument, arg2);
 
   if (!*arg1 || !*arg2 || !is_number(arg1) || !is_number(arg2)) {
-      ch->Send("Format: statlist weapon <num of die> <size of die> %s %s\r\n", arg1, arg2);
+      ch->Send ( "Format: statlist weapon <num of die> <size of die> %s %s\r\n", arg1, arg2 );
+      ch->Send ( "Format: statlist weapon <first|last>\r\n" );
       return;
   }
 
   die_num = atoi(arg1);
   die_size = atoi(arg2);
-  ch->Send(buf, "Weapons with %dd%d :\r\n", die_num, die_size);
+  ch->Send("Weapons with %dd%d :\r\n", die_num, die_size);
  
   DYN_CREATE;
   *dynbuf = 0;
@@ -6573,11 +6608,6 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
   else
       page_string(ch->desc, dynbuf, DYN_BUFFER);
   
-}
-
-inline bool Comparefunc ( pair < int, string > a, pair < int, string > b )
-{
-	return a.first > b.first;
 }
 
 ACMD ( do_statlist )
