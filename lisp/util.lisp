@@ -53,3 +53,6 @@
 		   (oneliner (,',accessor) (,',accessor-type) ,type
 			     ,(format nil ,c-accessor (or ref (string-downcase (symbol-name field))))))))
      ,@body))
+
+(defun mud-log (&rest args)
+  (apply #'4d-internal:mud-log args))
