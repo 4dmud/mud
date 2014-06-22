@@ -118,7 +118,7 @@ void perform_assist ( Character *ch, Character *helpee )
 		act ( "But nobody is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR );
 	else if ( !CAN_SEE ( ch, opponent ) )
 		act ( "You can't see who is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR );
-	else if ( !CONFIG_PK_ALLOWED && !IS_NPC ( opponent ) && !arena_ok ( ch, opponent ) )
+	else if ( !IS_NPC ( ch ) && !CONFIG_PK_ALLOWED && !IS_NPC ( opponent ) && !arena_ok ( ch, opponent ) )
 		/* prevent accidental pkill */
 		act ( "Use 'murder' if you really want to attack $N.", FALSE, ch, 0, opponent, TO_CHAR );
 	else
