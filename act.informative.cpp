@@ -1466,9 +1466,12 @@ void look_at_room ( Character *ch, int ignore_brief )
 	if ( ch->desc && ch->desc->mxp )
 		update_mxp_map ( ch );
 
-	if ( KILL_ALL_ENABLED && PRF_FLAGGED ( ch, PRF_AGGRO ) && view_room == IN_ROOM ( ch ) )
+	if ( KILL_ALL_ENABLED && PRF_FLAGGED ( ch, PRF_AGGRO ) && view_room == IN_ROOM ( ch ))
 	{
-		command_interpreter ( ch, ( char * ) "kill all" );
+	    // This needs to be in an array instead of being defined as a constant.
+	    // This is because command_interpreter might try to modify.
+	    char temp[] = "kill all";
+	    command_interpreter ( ch, temp );
 	}
 }
 
