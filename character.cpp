@@ -1206,6 +1206,10 @@ void Character::free_char_strings()
 		free ( player.title );      /* PC / NPC's title                     */
 		player.title = NULL;
 	}
+	free(player.custom_leave);
+	free(player.custom_arrive);
+	player.custom_leave=NULL;
+	player.custom_arrive=NULL;
 }
 
 void Character::init_char_strings()
@@ -1215,6 +1219,8 @@ void Character::init_char_strings()
 	player.long_descr  = NULL;         /* for 'look'                           */
 	player.description  = NULL;        /* Extra descriptions                   */
 	player.title = NULL;         /* PC / NPC's title                     */
+	player.custom_arrive = NULL;
+	player.custom_leave = NULL;
 }
 bool Character::zone_empty()
 {

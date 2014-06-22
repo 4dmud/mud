@@ -253,6 +253,14 @@ int copy_mobile_strings ( Character *t, Character *f )
 		t->player.long_descr = strdup ( f->player.long_descr );
 	if ( f->player.description )
 		t->player.description = strdup ( f->player.description );
+	if ( f->player.custom_arrive )
+	        t->player.custom_arrive = strdup ( f->player.custom_arrive );
+	else
+	        t->player.custom_arrive = NULL;
+	if ( f->player.custom_leave )
+	        t->player.custom_leave = strdup ( f->player.custom_leave );
+	else
+	        t->player.custom_leave = NULL;
 
 
 	return TRUE;
@@ -270,6 +278,15 @@ int update_mobile_strings ( Character *t, Character *f )
 		t->player.long_descr = f->player.long_descr;
 	if ( f->player.description )
 		t->player.description = f->player.description;
+	if ( f->player.custom_arrive )
+	        t->player.custom_arrive = f->player.custom_arrive;
+	else
+	        t->player.custom_arrive = NULL;
+	if ( f->player.custom_leave )
+	        t->player.custom_leave = f->player.custom_leave;
+	else
+	        t->player.custom_leave = NULL;
+
 	return TRUE;
 }
 
@@ -444,6 +461,10 @@ int write_mobile_espec ( mob_vnum mvnum, Character *mob, FILE *fd )
 		fprintf ( fd, "Skin: %d\n", MOB_SKIN ( mob ) );
 	if ( MOB_OWNER ( mob ) != -1 )
 		fprintf ( fd, "Owner: %ld\n", MOB_OWNER ( mob ) );
+	if ( GET_CUSTOM_ARRIVE_MSG (mob))
+		fprintf ( fd, "Arrive: %s\n", GET_CUSTOM_ARRIVE_MSG ( mob ) );
+	if ( GET_CUSTOM_LEAVE_MSG (mob))
+		fprintf ( fd, "Leave: %s\n", GET_CUSTOM_LEAVE_MSG ( mob ) );
 	fputs ( "E\n", fd );
 	return TRUE;
 }

@@ -612,6 +612,10 @@ int has_body ( Character *ch, int flag );
 #define GET_LEVEL(ch)   ((ch)->player.level)
 #define GET_PASSWD(ch)	((ch)->player.passwd)
 
+#define GET_CUSTOM_LEAVE_MSG(ch) ((ch)->player.custom_leave)
+#define GET_CUSTOM_ARRIVE_MSG(ch) ((ch)->player.custom_arrive)
+
+
 /*
  * I wonder if this definition of GET_REAL_LEVEL should be the definition
  * of GET_LEVEL?  JE
