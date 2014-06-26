@@ -519,9 +519,13 @@ struct obj_data *get_purchase_obj(Character *ch, char *arg,
                                         Character *keeper, int shop_nr, int msg)
 {
   char name[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
   struct obj_data *obj;
 
-  one_argument(arg, name);
+  two_arguments ( arg, name, arg2 );
+  if ( *arg2 )
+	strcpy ( name, arg2 );
+
   do
   {
     if (*name == '#' || is_number(name))
