@@ -27,6 +27,7 @@
 #include "fight.h"
 #include "descriptor.h"
 
+
 /*-------------------------------------------------------------------*/
 
 /*
@@ -807,6 +808,8 @@ void medit_disp_menu ( Descriptor *d )
 	    "%sP%s) Mob Progs : %s%s\r\n"
 #endif
 	    "%sS%s) Script    : %s%-9s      %sY%s) Owner     : %s%s\r\n"
+	    "%sP%s) Arrive    : %s%s\r\n"
+	    "%sZ%s) Leave     : %s%s\r\n"
 	    "%sQ%s) Quit\r\n"
 	    "Enter choice : ",
 
@@ -827,6 +830,8 @@ void medit_disp_menu ( Descriptor *d )
 #endif
 	    grn, nrm, cyn, OLC_SCRIPT ( d ) ?"Set.":"Not Set.",
 	    grn, nrm, cyn, pi.NameById ( MOB_OWNER ( mob ) ),
+	    grn, nrm, cyn, GET_CUSTOM_ARRIVE_MSG ( mob ),
+	    grn, nrm, cyn, GET_CUSTOM_LEAVE_MSG ( mob ),
 	    grn, nrm
 	);
 
@@ -1089,6 +1094,16 @@ void medit_parse ( Descriptor *d, char *arg )
 					OLC_MODE ( d ) = MEDIT_OWNER;
 					medit_disp_mob_owner ( d );
 					return;
+				case 'p':
+				case 'P':
+					OLC_MODE ( d ) = MEDIT_ARRIVE;
+					i=-1;
+					break;
+				case 'z':
+				case 'Z':
+					OLC_MODE ( d ) = MEDIT_LEAVE;
+					i=-1;
+					break;
 				default:
 					medit_disp_menu ( d );
 					return;
@@ -1524,6 +1539,21 @@ void medit_parse ( Descriptor *d, char *arg )
 				}
 			}
 			break;
+	        case MEDIT_ARRIVE:
+		        free(GET_CUSTOM_ARRIVE_MSG(OLC_MOB(d)));
+			if (strlen(arg) == 0)
+			    GET_CUSTOM_ARRIVE_MSG(OLC_MOB(d)) = NULL;
+			else
+			    GET_CUSTOM_ARRIVE_MSG(OLC_MOB(d)) = delete_doubledollar(strdup(arg));
+			break;
+	        case MEDIT_LEAVE:
+		        free(GET_CUSTOM_LEAVE_MSG(OLC_MOB(d)));
+			if (strlen(arg) == 0)
+			    GET_CUSTOM_LEAVE_MSG(OLC_MOB(d)) = NULL;
+			else
+			    GET_CUSTOM_LEAVE_MSG(OLC_MOB(d)) = delete_doubledollar(strdup(arg));
+			break;
+		    
 			/*-------------------------------------------------------------------*/
 		default:
 			/*

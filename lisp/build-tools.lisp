@@ -101,5 +101,6 @@
 		      (vnum (mobile-of reset))
 		      (name (mobile-of reset)))))))
     (trigger-not-found (e) (format t "No trigger with vnum ~d.~%" (vnum e)))
-    (error (e) (format t "usage: find trigger vnum~%~a~%" e))))
-		     
+    (error (e)
+      (mud-log "error in find-trigger: ~a~%" e)
+      (format t "usage: find trigger vnum~%~a~%" e))))

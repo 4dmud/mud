@@ -1861,7 +1861,8 @@ struct char_player_data {
     long partner;        /* id of Romance Partner     (was char pointer, but meh, why bother with the freeing?)         */
     int ticks_left;      /* Timer variable                       */
     struct clan_deed_data deeds;
-
+    char *custom_leave;
+    char *custom_arrive;
 };
 
 
