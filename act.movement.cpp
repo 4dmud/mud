@@ -197,6 +197,31 @@ int move_cost ( Character *ch, int dir )
 	return need_movement;
 }
 
+void create_custom_move_message (char* buf, int buf_size, const char* templ, const char* direction){
+    const char* s;
+    char tmp[3];
+    tmp[2]=0;
+    int i=0;
+    for (;;) {
+        if (*templ == '$') {
+            if (*(templ+1)=='d')
+		s = direction;
+	    else {
+		strncpy(tmp, templ, 2);
+		s=tmp;
+	    }
+	    
+	    templ+=2;
+	    strncpy(buf+i, s, buf_size-i);
+	    i+=strlen(s);
+	} else if (i >= buf_size || !(buf[i++] = *(templ++))) { //null-terminated
+	    break;
+	}
+    }
+
+    buf[buf_size-1]='\0'; //null-terminate for sure
+}
+
 /* do_simple_move assumes
  *    1. That there is no master and no followers.
  *    2. That the direction exists.
@@ -645,8 +670,10 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		else
 			len = snprintf ( local_buf + len, sizeof ( local_buf ) - len, "." );
 
+		if ( GET_CUSTOM_LEAVE_MSG(ch) )
+		    create_custom_move_message(buf2, sizeof(buf2), GET_CUSTOM_LEAVE_MSG(ch), dirs[dir]);
 
-		if ( AFF_FLAGGED ( ( ch ), AFF_FLY ) )
+		else if ( AFF_FLAGGED ( ( ch ), AFF_FLY ) )
 			snprintf ( buf2, sizeof ( buf2 ), "$n flies %s%s", dirs[dir], local_buf );
 		else if ( IS_NPC ( ch ) && MOB_FLAGGED ( ch, MOB_SWIMS ) )
 			snprintf ( buf2, sizeof ( buf2 ), "$n swims %s%s", dirs[dir], local_buf );
@@ -930,6 +957,10 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		{
 			if ( ch->hitched )
 				act ( "$n has arrived pulling $p.", TRUE, ch, ch->hitched, 0, TO_ROOM );
+			else if (GET_CUSTOM_ARRIVE_MSG(ch)) {
+			        create_custom_move_message(buf2, sizeof(buf2), GET_CUSTOM_ARRIVE_MSG(ch), dirs[rev_dir[dir]]);
+				act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+			}
 			else
 				act ( "$n has arrived.", TRUE, ch, 0, 0, TO_ROOM );
 		}

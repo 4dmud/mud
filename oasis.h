@@ -372,6 +372,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_NPC_FLAGS			5
 #define MEDIT_AFF_FLAGS			6
 #define MEDIT_CONFIRM_SAVESTRING	7
+#define MEDIT_ARRIVE                    8
+#define MEDIT_LEAVE                     9
 /*
  * Numerical responses.
  */

@@ -2451,6 +2451,15 @@ void interpret_espec ( const char *keyword, const char *value, Character *mob, i
 		RANGE ( -1, ( int ) pi.TopIdNum );
 		mob->mob_specials.skin = num_arg;
 	}
+	CASE ( "Leave" )
+	{
+	    GET_CUSTOM_LEAVE_MSG(mob) = strdup(value);
+	}
+
+	CASE ( "Arrive" )
+	{
+	    GET_CUSTOM_ARRIVE_MSG(mob) = strdup(value);
+	}
 
 	if ( !matched )
 	{

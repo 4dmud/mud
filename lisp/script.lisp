@@ -27,7 +27,7 @@
      do
        (cond ((= vnum (vnum trig))
 	      (return trig))
-	     ((= top bot)
+	     ((<= top bot)
 	      (error 'trigger-not-found :vnum vnum))
 	     ((< vnum (vnum trig))
 	      (setf top (1- rnum)))
