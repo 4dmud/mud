@@ -1255,11 +1255,11 @@ int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_
 int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
 {
   obj_vnum nr;
-  obj_rnum rn;
+  //obj_rnum rn;
   char buf[MAX_STRING_LENGTH] = "";
   int i;
 
-  rn = GET_OBJ_RNUM(obj);
+  //rn = GET_OBJ_RNUM(obj);
 
   fprintf(fl, "#%d OBJ\n", (nr = GET_OBJ_VNUM(obj)));
   if (nr == NOTHING || IS_UNIQUE(obj))
@@ -1374,13 +1374,13 @@ void read_extra_descs(FILE *fl, OBJ_DATA *temp)
 {
   struct extra_descr_data *new_descr;
   char line[READ_SIZE], buf2[MAX_INPUT_LENGTH];
-  int k, j, zwei;
+  int zwei;
   FILE *tf = fl;
 
   temp->ex_description = NULL;
 
   get_line(fl, line);
-  for (k = j = zwei = 0; !zwei && !feof(fl);)
+  for (zwei = 0; !zwei && !feof(fl);)
   {
     switch (*line)
     {
@@ -1411,12 +1411,12 @@ void read_object_affects(FILE *fl, OBJ_DATA *temp)
 {
   FILE *tf = fl;
   char line[READ_SIZE];
-  int k, j, zwei;
+  int  j, zwei;
   int t[2];
 
 
   get_line(fl, line);
-  for (k = j = zwei = 0; !zwei && !feof(fl);)
+  for (j = zwei = 0; !zwei && !feof(fl);)
   {
     switch (*line)
     {
@@ -1690,11 +1690,11 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   char buf[MAX_INPUT_LENGTH];
   char line[READ_SIZE] = "";
   char tag[READ_SIZE] = "";
-  int num;
+  //int num;
   int t[4];
   int orig_timer = -1;
   int orig_expir = -1;
-  int dup_strings = FALSE;
+  //int dup_strings = FALSE;
   struct ident_list *tmp_idents = NULL;
   int tmp_wep_bal;
 
@@ -1738,13 +1738,13 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       obj_index[nrr].qic->items--;
     }
 
-    dup_strings = TRUE;
+    //dup_strings = TRUE;
   }
   get_line(fl, line);
   while (!feof(fl) && strcmp(line, "@END"))
   {
     tag_read(tag, line);
-    num = atoi(line);
+    //num = atoi(line);
     switch (LOWER(*tag))
     {
     case 'a':
@@ -1979,11 +1979,11 @@ int load_char_objects_to_char_old(Character *ch, FILE * fl)
 {
 
   //FILE *fl;
-  int t[20], danger, zwei = 0;     //,num_of_days, cost;
+  int t[20], zwei = 0;     //,num_of_days, cost;
   int orig_rent_code;
   char line[1024];
   OBJ_DATA *temp;
-  int locate = 0, j, nr, k, num_objs = 0;
+  int locate = 0, j, nr, num_objs = 0;
   struct obj_data *cont_row[MAX_BAG_ROW];
   struct extra_descr_data *new_descr;
   int rentcode, timed, netcost, gold, account, nitems;
@@ -2172,7 +2172,7 @@ int load_char_objects_to_char_old(Character *ch, FILE * fl)
         temp->ex_description = NULL;
 
         get_line(fl, line);
-        for (k = j = zwei = 0; !zwei && !feof(fl);)
+        for (j = zwei = 0; !zwei && !feof(fl);)
         {
           switch (*line)
           {
@@ -2190,7 +2190,7 @@ int load_char_objects_to_char_old(Character *ch, FILE * fl)
             if (j >= MAX_OBJ_AFFECT)
             {
               log("Too many object affectations in loading rent file");
-              danger = 1;
+              //danger = 1;
             }
             get_line(fl, line);
             sscanf(line, "%d %d", t, t + 1);

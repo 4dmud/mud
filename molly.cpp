@@ -21,7 +21,8 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 
 ACMD(do_smell)
 {
-  int bits, found = FALSE, j,fnum;
+  //int bits;
+  int found = FALSE, j,fnum;
   Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH],arg2[MAX_STRING_LENGTH];
@@ -42,7 +43,7 @@ ACMD(do_smell)
     send_to_char("Smell what?\r\n", ch);
     return;
   }
-  bits =
+  //bits =
     generic_find(arg2,
                  FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
                  FIND_CHAR_ROOM, ch, &found_char, &found_obj);
@@ -116,7 +117,8 @@ ACMD(do_smell)
 
 ACMD(do_taste)
 {
-  int bits, found = FALSE, j,fnum;
+  //int bits, 
+  int found = FALSE, j,fnum;
   Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
@@ -138,7 +140,7 @@ ACMD(do_taste)
     send_to_char("Taste what?\r\n", ch);
     return;
   }
-  bits =
+  //bits =
     generic_find(arg,
                  FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
                  FIND_CHAR_ROOM, ch, &found_char, &found_obj);
@@ -204,7 +206,8 @@ ACMD(do_taste)
 
 ACMD(do_feel)
 {
-  int bits, found = FALSE, j, fnum;
+  //int bits;
+  int found = FALSE, j, fnum;
   Character *found_char = NULL;
   struct obj_data *obj = NULL, *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
@@ -227,7 +230,7 @@ ACMD(do_feel)
     return;
   }
 
-  bits =
+  //bits =
     generic_find(arg,
                  FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
                  FIND_CHAR_ROOM, ch, &found_char, &found_obj);

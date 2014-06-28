@@ -3112,7 +3112,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	long uid, context;
+	long uid;
+	//, context;
 	Room *room;
 	Character *mob;
 	obj_data *obj;
@@ -3150,8 +3151,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	else if ( ( mob = find_char ( uid ) ) )
 	{
 		sc_remote = SCRIPT ( mob );
-		if ( !IS_NPC ( mob ) )
-			context = 0;
+		/*if ( !IS_NPC ( mob ) )
+			context = 0;*/
 	}
 	else if ( ( obj = find_obj ( uid ) ) )
 	{
@@ -3364,8 +3365,8 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 	struct cmdlist_element *temp;
 	unsigned long loops = 0;
 	void *go = NULL;
-	int tvnum = -1;
-	tvnum = GET_TRIG_VNUM ( trig );
+	//int tvnum = -1;
+	/*tvnum = GET_TRIG_VNUM ( trig );*/
 
 
 	void obj_command_interpreter ( obj_data * obj, char *argument );

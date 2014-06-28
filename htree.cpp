@@ -130,13 +130,13 @@ return NOTHING;
 
 void htree_test(void)
 {
-  int i, n, l = 0;
+  int i;
   struct timeval start, finish;
   float t1, t2;
 return;
   gettimeofday(&start, NULL);
   for (i = 0; i < HTREE_TEST_CYCLES; i++) {
-    n = number(1, top_of_world);
+    number(1, top_of_world);
     //l = real_mobil(world[n].number);
   }
   gettimeofday(&finish, NULL);
@@ -148,8 +148,8 @@ return;
        ((float)start.tv_sec + ((float)start.tv_usec) / 1000000);
   gettimeofday(&start, NULL);
   for (i = 0; i < HTREE_TEST_CYCLES; i++) {
-    n = number(1, top_of_world);
-l = 0;//    l = real_room(world[n].number);
+     number(1, top_of_world);
+//    l = real_room(world[n].number);
   }
   gettimeofday(&finish, NULL);
   if (start.tv_usec > finish.tv_usec) {

@@ -521,7 +521,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 	char to_new[MAX_INPUT_LENGTH];
 	char to_one[MAX_INPUT_LENGTH];
 	//    NOTE_DATA *prev;
-	NOTE_DATA **list;
+	//NOTE_DATA **list;
 	char *to_list;
 	int type;
 
@@ -548,7 +548,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 		}
 	}
 	/* nuke the whole note */
-
+/*
 	switch ( pnote->type )
 	{
 		default:
@@ -569,6 +569,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 			list = &changes_list;
 			break;
 	}
+	*/
 
 #if 0
 	/*

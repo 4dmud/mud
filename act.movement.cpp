@@ -1740,7 +1740,7 @@ ACMD ( do_fence )
 	int dir, t;
 	char btype[MAX_INPUT_LENGTH];
 	char badir[MAX_INPUT_LENGTH];
-	char bfsort[MAX_INPUT_LENGTH];
+	//char bfsort[MAX_INPUT_LENGTH];
 	char bfbuf[MAX_INPUT_LENGTH];
 	char *adir, *type, *fbuf;
 	//char *fsort;

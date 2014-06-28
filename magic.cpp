@@ -2156,14 +2156,14 @@ void mag_points ( int level, Character *ch, Character *victim,
                   int spellnum, int savetype )
 {
 	int hit = 0, move = 0, mana = 0, stam = 0, spell_lvl = 0;
-	int good = 1, evil = 1;
+	//int good = 1, evil = 1;
 	int multi = 1;
 
 	if ( ch && level == GET_LEVEL ( ch ) )
 	{
 		/*now thats a nasty hack*/
-		good = IS_GOOD ( ch );
-		evil = IS_EVIL ( ch );
+		//good = IS_GOOD ( ch );
+		//evil = IS_EVIL ( ch );
 		if ( ch != victim )
 			multi = 2;
 	}

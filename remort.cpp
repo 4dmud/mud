@@ -243,7 +243,7 @@ int highest_tier ( Character *ch )
 {
 	/* returns dominant class */
 	int count = 0, chclass;
-	int temp = 0, counter = 0;
+	int counter = 0;
 
 	if ( IS_NPC ( ch ) )
 		return MOB_TIER ( ch );
@@ -262,7 +262,6 @@ int highest_tier ( Character *ch )
 		if ( count > counter )
 		{
 			counter = count;
-			temp = chclass;
 		}
 		count = 0;
 	}
