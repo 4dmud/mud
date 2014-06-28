@@ -3474,6 +3474,7 @@ ACMD ( do_who )
 	char buf[MAX_STRING_LENGTH];
 	char arg[MAX_STRING_LENGTH];
 	char buf1[MAX_STRING_LENGTH];
+	std::stringstream out;
 	extern int max_players;
 	Character *sort_desc[max_players];
 	int num_desc = 0, j;
@@ -3481,7 +3482,6 @@ ACMD ( do_who )
 	int seperate = 0;
 	size_t len = 0;
 	time_t nw = time ( 0 );
-	DYN_DEFINE;
 	*buf = 0;
 	/*
 	-T-Lv-Rac-Class-PK-RP-S--
@@ -3491,9 +3491,10 @@ ACMD ( do_who )
 	int low = 0, high = LVL_IMPL, showclass = 0, showrace = 0;
 	bool who_room = FALSE, who_zone = FALSE, who_quest = 0;
 	bool noimm = FALSE, nomort = FALSE;
-	bool sort_login = FALSE, sort_race = FALSE, sort_class = FALSE;
+	bool sort_login = FALSE, sort_race = FALSE, sort_class = FALSE, readout_who = FALSE;
 
 	int Wizards = 0, Mortals = 0;
+	int tWizards = 0, tMortals = 0;
 	size_t i;
 
 	const char *WizLevels_male[LVL_IMPL - ( LVL_HERO - 1 ) ] =
@@ -3590,6 +3591,10 @@ ACMD ( do_who )
 					noimm = TRUE;
 					strcpy ( buf, buf1 );
 					break;
+				case 'b':
+					readout_who = TRUE;
+					strcpy ( buf, buf1 );
+					break;
 				default:
 					*ch << WHO_USAGE;
 					return;
@@ -3602,8 +3607,7 @@ ACMD ( do_who )
 			return;
 		}
 	}                 /* end while (parser) */
-	DYN_CREATE;
-	*dynbuf = '\0';
+	
 
 	for ( j = 0; j < max_players; j++ )
 		sort_desc[j] = NULL;
@@ -3656,6 +3660,10 @@ ACMD ( do_who )
 
 			sort_desc[num_desc] = wch;
 			num_desc++;
+			if ( GET_LEVEL ( wch ) >= LVL_HERO )
+			  tWizards++;
+			else
+			  tMortals++;
 		}
 		seperate++;
 	}
@@ -3679,38 +3687,52 @@ ACMD ( do_who )
 		if ( !ib && GET_LEVEL ( wch ) >= LVL_IMMORT )
 		{
 			ib = 1;
-			DYN_RESIZE ( Imm_buf );
+			if (readout_who)
+			  out << "The Immortals online are: ";
+			else
+			out << Imm_buf;
 		}
 		if ( !mb && GET_LEVEL ( wch ) < LVL_IMMORT )
 		{
 			mb = 1;
-			DYN_RESIZE ( Mort_buf );
+			if (readout_who) 
+			  out << "The Mortals online are: ";
+			else
+			out << Mort_buf;
 		}
 
 
 
-		if ( GET_LEVEL ( wch ) >= LVL_HERO && ( GET_SEX ( wch ) != SEX_FEMALE ) )
+		if ( GET_LEVEL ( wch ) >= LVL_HERO )
 		{
-			snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",  CCYEL ( ch, C_SPR ),
-			           center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_male[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
-			           ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
-			           ( PRETITLE ( wch ) == NULL ? "" : " " ),
-			           GET_NAME ( wch ), GET_TITLE ( wch ) );
-			Wizards++;
-		}
-		else if ( GET_LEVEL ( wch ) >= LVL_HERO )
-		{
-			snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s", CCYEL ( ch, C_SPR ),
-			           center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_female[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
-			           ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
-			           ( PRETITLE ( wch ) == NULL ? "" : " " ),
-			           GET_NAME ( wch ), GET_TITLE ( wch ) );
-			Wizards++;
+		  if (readout_who) {
+		    snprintf ( buf, sizeof ( buf ), MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ,  GET_NAME ( wch ));
+		    } else {
+		      if ( GET_SEX ( wch ) != SEX_FEMALE ) {
+			  snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",  CCYEL ( ch, C_SPR ),
+				    center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_male[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
+				    ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
+				    ( PRETITLE ( wch ) == NULL ? "" : " " ),
+				    GET_NAME ( wch ), GET_TITLE ( wch ) );
+		    
+		      } else {
+				snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s", CCYEL ( ch, C_SPR ),
+					  center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_female[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
+					  ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
+					  ( PRETITLE ( wch ) == NULL ? "" : " " ),
+					  GET_NAME ( wch ), GET_TITLE ( wch ) );
+				
+			}
+		  }
+		  Wizards++;
+		  
 		}
 		else
 		{
-
-			if ( AFF_FLAGGED ( wch, AFF_POLY_TOAD ) )
+			if (readout_who) {
+			  snprintf ( buf, sizeof ( buf ), MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ),  GET_NAME ( wch ));
+			}
+			else if ( AFF_FLAGGED ( wch, AFF_POLY_TOAD ) )
 			{
 				snprintf ( buf, sizeof ( buf ), "[--------TOAD--------] A slimy toad looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
 			}
@@ -3768,15 +3790,16 @@ ACMD ( do_who )
 					           ( PLR_FLAGGED ( wch, PLR_ROLEPLAYER ) ? "{cgRP{c0" : "{cg--{c0" ),     //is RP or not? dark green
 					           ( ( GET_SEX ( wch ) == SEX_FEMALE ) ? "F" : ( GET_SEX ( wch ) == SEX_MALE ) ? "M" : "N" ),
 					           ( GET_REMORT ( wch ) != -1 ? "  " : " *" ),
-					           GET_NAME ( wch ) ); //has a star if hasnt remorted
+					           GET_NAME ( wch ) ); //they have a star if they haven't yet remorted
 				}
 			}
 			Mortals++;
 
 		}
 		len = 0;
-		DYN_RESIZE ( buf );
-
+		/**put the formatted line into the output buffer -mord **/
+		out << buf;
+if (!readout_who) {
 		if ( ( GET_LEVEL ( wch ) < LVL_HERO ) && GET_CLAN ( wch ) )       /*added ' leader' to the clan name, gave it round brackets and light cyan colour that wont bleed a imms title */
 		{
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " %s(" MXPTAG ( "em" ) "%s%s%s%s" MXPTAG ( "/em" ) ")",
@@ -3892,21 +3915,45 @@ ACMD ( do_who )
 			if ( PRF_FLAGGED ( wch, PRF_BUILDWALK ) )
 				len += snprintf ( buf + len, sizeof ( buf ) - len, " (Buildwalking)" );
 		}
-
 		len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
-		DYN_RESIZE ( buf );
+} else if (readout_who) {
+  
+		  if ( GET_LEVEL ( wch ) >= LVL_HERO ) {
+		    if (tWizards > 1 && (tWizards-1) == Wizards)
+		      len += snprintf ( buf + len, sizeof ( buf ) - len, " and " );
+		    else if (Wizards < tWizards)
+				len += snprintf ( buf + len, sizeof ( buf ) - len, ", " ); 
+		    else
+		      len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
+		  } else   {
+		    if (tMortals > 1 && (tMortals-1) == Mortals)
+		      len += snprintf ( buf + len, sizeof ( buf ) - len, " and " );
+		    else if (Mortals < tMortals)
+				len += snprintf ( buf + len, sizeof ( buf ) - len, ", " );		    
+		    else
+		      len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
+		  } 
+		  
+		} 
+		
+		/** put the current formatted line into the output buffer - mord **/
+		out << buf;
 	}                 /* end of for */
-	len = 0;
-	strcpy ( buf, "\r\n" );
-	DYN_RESIZE ( buf );
+	
+	/** put the current formatted line into the output buffer, and make a new line - mord **/
+	out << buf << endl;
+	/** clear the line buffer ready to use again -mord**/
 	*buf = '\0';
+	len = 0;
+	
 	if ( ( Wizards + Mortals ) == 0 )
 	{
 		len += snprintf ( buf + len, sizeof ( buf ) - len, "No immortals or mortals are currently visible to you.\r\n" );
 
 	}
-	else
+	else if (!readout_who)
 	{
+	  
 		if ( Wizards )
 		{
 			len += snprintf ( buf + len, sizeof ( buf ) - len, "There %s %d visible immortal%s%s",
@@ -3929,6 +3976,7 @@ ACMD ( do_who )
 		boot_high = Wizards + Mortals;
 	len += snprintf ( buf + len, sizeof ( buf ) - len, "There is a boot time high of %d player%s.\r\n",
 	                  boot_high, ( boot_high == 1 ? "" : "s" ) );
+	if (!readout_who) {
 	len += snprintf ( buf + len, sizeof (buf) - len, "The latest PK champion is {cR%s{cn.\r\n", 
                           CHAMPION  <= 0 ? "Nobody yet" :  LAST_PK); // Name of the Champion
 
@@ -3948,15 +3996,10 @@ ACMD ( do_who )
 		     }
 	len += snprintf ( buf + len, sizeof (buf) - len, "The best clan currently is {cR%s{cn with {cC%d{cn deeds. \r\n", 
 			clan[highest_clan].name, winner_amt);
-
-
-
-
-
-
-	len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
-	DYN_RESIZE ( buf );
-	page_string ( ch->desc, dynbuf, DYN_BUFFER );
+	}
+	/** pass the last line buffer into the string - mord **/
+	out << buf << endl;
+	page_string ( ch->desc, out );
 }
 
 #define USERS_FORMAT \
