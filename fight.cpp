@@ -2814,11 +2814,11 @@ int fe_after_damage ( Character* ch, Character* vict,
 	char local_buf[100] = "";
 	int partial = 0;
 	//int dam_exp = 0;
-	Character *victnext;
-	int sweeping;
+	//Character *victnext;
+	//int sweeping;
 
-	victnext = NULL;
-	sweeping = FALSE;
+	//victnext = NULL;
+	//sweeping = FALSE;
 
 	if ( IS_NPC ( vict ) && ( vict->master || vict->followers ) )
 		if ( followers_assisting ( vict ) == 0 )
@@ -5521,14 +5521,14 @@ void die ( Character *ch, Character *killer )
 	else
 	{
 		struct dam_from_list * t;
-		long idnum;
+		//long idnum;
 		short counter=0;
                 char displayexp[50];
 		Character *temp = NULL;
-		if ( killer )
+		/*if ( killer )
 			idnum = GET_IDNUM ( killer );
 		else
-			idnum = -1;
+			idnum = -1;*/
 
 		change_alignment ( killer, ch );
 
@@ -6796,15 +6796,16 @@ void combat_skill ( Character *ch )
 #define HPLEFT(vict) ((GET_HIT(vict)*100)/GET_MAX_HIT(vict))
 float skill_type_multi ( Character *ch, Character *vict, int type )
 {
-	int m_user = FALSE, chclass = TYPE_UNDEFINED;
-	int chcha = 1, tier = 1;
+	//int m_user = FALSE, chclass = TYPE_UNDEFINED;
+	//int chcha = 1,
+	int tier = 1;
 	int good = FALSE, evil = FALSE;
 	float dam = 1.0;
 	int inside, hot, cold, underwater, sky, raining, day, night, sunny, stormy;
 	// Main Magic users line below.
-	m_user = ( IS_MAGE ( ch ) || IS_ESPER ( ch ) || IS_PRIEST ( ch ) || IS_NPC ( ch ) );
-	chclass = GET_CLASS ( ch );
-	chcha = GET_CHA ( ch );
+	//m_user = ( IS_MAGE ( ch ) || IS_ESPER ( ch ) || IS_PRIEST ( ch ) || IS_NPC ( ch ) );
+	//chclass = GET_CLASS ( ch );
+	//chcha = GET_CHA ( ch );
 	tier = current_class_is_tier_num ( ch );
 	good = IS_GOOD ( ch );
 	evil = IS_EVIL ( ch );

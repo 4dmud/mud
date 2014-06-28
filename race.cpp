@@ -127,25 +127,25 @@ const char *race_menu =
 
 
 /* body standard 21 parts */
-#define BODY_STANDARD (BODY_LIGHT|BODY_BODY|BODY_HEAD|BODY_LEGS|BODY_FEET| \
+#define BODY_STANDARD static_cast<long long unsigned int>(BODY_LIGHT|BODY_BODY|BODY_HEAD|BODY_LEGS|BODY_FEET| \
                        BODY_HANDS|BODY_ARMS|BODY_FOCUS|BODY_ABOUT|BODY_WIELD|BODY_WIELD_2| \
                        BODY_SHIELD|BODY_FINGER_R|BODY_FINGER_L|BODY_EYES|BODY_FACE| \
                        BODY_HOLD|BODY_EAR_R|BODY_EAR_L|BODY_WRIST_R|BODY_WRIST_L| \
                        BODY_NECK_1|BODY_WAIST)
 
-#define HUMANOID   	(BODY_STANDARD|BODY_HIPS|BODY_ANKLE_R|BODY_ANKLE_L)
+#define HUMANOID   	static_cast<long long unsigned int>(BODY_STANDARD|BODY_HIPS|BODY_ANKLE_R|BODY_ANKLE_L)
 
-#define FAUN    	(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_HORNS)
+#define FAUN    	static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_HORNS)
 
-#define CENTAUR         (BODY_STANDARD|BODY_TAIL|BODY_LEGS_2|BODY_FEET_2)
+#define CENTAUR         static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_LEGS_2|BODY_FEET_2)
 
-#define MARTIAN         (BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L|BODY_ANTENNA)
+#define MARTIAN         static_cast<long long unsigned int>(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L|BODY_ANTENNA)
 
-#define SWOLF           (BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_NECK_2)
+#define SWOLF           static_cast<long long unsigned int>(BODY_STANDARD|BODY_TAIL|BODY_HIPS|BODY_NECK_2)
 
 
 
-#define DEFAULT    	(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L)
+#define DEFAULT    	static_cast<long long unsigned int>(BODY_STANDARD|BODY_ANKLE_R|BODY_ANKLE_L)
 
 //  Player race structure
 

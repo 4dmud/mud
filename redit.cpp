@@ -42,14 +42,15 @@ extern Descriptor *descriptor_list;
 
 ACMD(do_oasis_redit)
 {
-  char *buf3;
+  //char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   int num = NOWHERE, save = 0;
   Descriptor *d;
 
   /* Parse any arguments. */
-  buf3 = two_arguments(argument, buf1, buf2);
+  //buf3 = 
+  two_arguments(argument, buf1, buf2);
 
   if (!*buf1)
     num = GET_ROOM_VNUM(IN_ROOM(ch));

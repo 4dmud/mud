@@ -3984,7 +3984,7 @@ ACMD ( do_remove )
 C_FUNC ( pull_object )
 {
 	struct obj_data *obj;
-	room_rnum rm;
+	//room_rnum rm;
 	int dir = 0;
 	obj = find_obj ( d->character->pulling );
 	d->character->pulling = -1;
@@ -4041,7 +4041,7 @@ C_FUNC ( pull_object )
 	  }
 	*/
 
-	rm = EXIT ( d->character, dir )->to_room;
+	//rm = EXIT ( d->character, dir )->to_room;
 	if ( do_simple_move ( d->character, dir, FALSE ) )
 	{
 		do_simple_obj_move ( obj,dir, d->character );

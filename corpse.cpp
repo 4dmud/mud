@@ -265,8 +265,8 @@ void load_corpses(void) {
 
     FILE *fp;
     char line[256];
-    int t[20], danger, zwei = 0;
-    int j, k, nr, num_objs = 0;
+    int t[20], zwei = 0;
+    int j, nr, num_objs = 0;
     struct obj_data *temp = NULL, *obj = NULL, *next_obj = NULL;
     struct extra_descr_data *new_descr;
     char buf2[MAX_INPUT_LENGTH];
@@ -410,7 +410,7 @@ void load_corpses(void) {
                 }
 
                 get_line(fp, line);
-                for (k = j = zwei = 0; !zwei && !feof(fp);) {
+                for (j = zwei = 0; !zwei && !feof(fp);) {
                     switch (*line) {
                     case 'E':
                         CREATE(new_descr, struct extra_descr_data, 1);
@@ -425,7 +425,7 @@ void load_corpses(void) {
                     case 'A':
                         if (j >= MAX_OBJ_AFFECT) {
                             log("SYSERR: Too many object affectations in loading rent file");
-                            danger = 1;
+                            
                         }
                         get_line(fp, line);
                         sscanf(line, "%d %d", t, t + 1);

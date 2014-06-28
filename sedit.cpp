@@ -58,14 +58,15 @@ ACMD(do_oasis_sedit)
   int num = NOWHERE, save = 0;
   shop_rnum real_num;
   Descriptor *d;
-  char *buf3;
+  //char *buf3;
   char buf1[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
   
   /****************************************************************************/
   /** Parse any arguments.                                                   **/
   /****************************************************************************/
-  buf3 = two_arguments(argument, buf1, buf2);
+  //buf3 = 
+  two_arguments(argument, buf1, buf2);
   
   if (!*buf1) {
     ch->Send( "Specify a shop VNUM to edit.\r\n");
@@ -398,10 +399,10 @@ void sedit_no_trade_menu(Descriptor *d)
 
 void sedit_types_menu(Descriptor *d)
 {
-  struct shop_data *shop;
+  //struct shop_data *shop;
   int i, count = 0;
 
-  shop = OLC_SHOP(d);
+  //shop = OLC_SHOP(d);
   get_char_colours(d->character);
 
   clear_screen(d);

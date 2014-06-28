@@ -122,8 +122,8 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 	struct obj_data *obj = NULL;	// kalten
 	struct obj_data *tmp, *next;	// kalten
 	struct obj_data *cont_row[MAX_CONT_ROW];	// kalten
-	int t[20], danger, zwei = 0;	// kalten
-	int locate = 0, j, nr, k;	// kalten
+	int t[20], zwei = 0;	// kalten
+	int locate = 0, j, nr;	// kalten
 	struct extra_descr_data *new_descr;	// kalten
 	char buf2[MAX_INPUT_LENGTH];
 	int retval = 0;
@@ -283,7 +283,7 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 				}
 
 				get_line ( fl, line );
-				for ( k = j = zwei = 0; !zwei && !feof ( fl ); )
+				for ( j = zwei = 0; !zwei && !feof ( fl ); )
 				{
 					switch ( *line )
 					{
@@ -301,7 +301,7 @@ int old_house_load ( room_rnum rnum, FILE *fl )
 							if ( j >= MAX_OBJ_AFFECT )
 							{
 								log ( "Too many object affections in loading house file" );
-								danger = 1;
+								//danger = 1;
 							}
 							get_line ( fl, line );
 							sscanf ( line, "%d %d", t, t + 1 );
@@ -979,7 +979,7 @@ ACMD ( do_house )
 	else if ( GET_IDNUM ( ch ) != house_control[i].owner && GET_LEVEL ( ch ) < LVL_SEN )
 		send_to_char ( "Only the primary owner can set guests or expand the house.\r\n", ch );
 	else if ( !str_cmp ( arg, "expand" ) )
-		house_expand_house ( ch, i );
+		house_expand_house ( ch, NULL );
 	else if ( ( id = pi.IdByName ( arg ) ) < 0 )
 		send_to_char ( "No such player.\r\n", ch );
 	else if ( id == GET_IDNUM ( ch ) )
@@ -1080,9 +1080,9 @@ C_FUNC( house_expand_house_callback ) {
 	}
 }
 
-void house_expand_house ( Character *ch, int i )
+void house_expand_house ( Character *ch, void *i )
 {
-	line_input ( ch->desc, "[For one gold token, you'll expand 200 more storage space. Continue? (Type: Y | N )", house_expand_house_callback, (void *) i);
+	line_input ( ch->desc, "[For one gold token, you'll expand 200 more storage space. Continue? (Type: Y | N )", house_expand_house_callback,  i);
 }
 
 void hcontrol_expand_house ( Character *ch, char *argument )

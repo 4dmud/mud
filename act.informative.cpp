@@ -2290,14 +2290,14 @@ ACMD ( do_score )
 {
 	struct time_info_data playing_time;
 
-	char *gld, goldy[50], *gld2, goldy2[50];
+	//char goldy[50], goldy2[50];
 	char *blank, blankbuf[100];
 
 	int class_damroll ( Character *ch );
 	char webp[250];
 	char webs[250], shld[250];
 	int primin = 0, primax = 0, secmin = 0, secmax = 0;
-	int len, wep_num = 0;
+	int wep_num = 0;
 	float staff = 0.0;
 	float shortmulti = 1.0;
 	//  float damspeed = (DAM_SPEED_MULTI(ch));
@@ -2305,8 +2305,7 @@ ACMD ( do_score )
 	int remorts = MIN(REMORTS(ch), 50);
 bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_MAGE || GET_CLASS ( ch ) == CLASS_ESPER || has_staff ( ch );
 
-	gld = goldy;
-	gld2 = goldy2;
+	
 	blank = blankbuf;
 
 	if ( IS_NPC ( ch ) )
@@ -2339,7 +2338,7 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 	}
 
 	if ( ( blocking = MIN ( 50, FTOI ( ( AFF_FLAGGED ( ch, AFF_SHIELD_STATIC ) ? 2.5f*apply_ac ( ch, WEAR_SHIELD ) : apply_ac ( ch, WEAR_SHIELD ) ) ) ) ) )
-		len = snprintf ( shld, sizeof ( shld ), "Shield Block Chance: %2.2f%%", blocking );
+		snprintf ( shld, sizeof ( shld ), "Shield Block Chance: %2.2f%%", blocking );
 	else
 		strcpy ( shld, "  " );
 
@@ -2405,22 +2404,22 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 		}
 
 
-		len = snprintf ( webp, sizeof ( webp ), "Primary Weapon: %4d to %-4d", primin, primax );
+		snprintf ( webp, sizeof ( webp ), "Primary Weapon: %4d to %-4d", primin, primax );
 		if ( wep_num == 2 )
-			len = snprintf ( webs, sizeof ( webs ), "Secondary Weapon: %4d to %-4d", secmin, secmax );
+			snprintf ( webs, sizeof ( webs ), "Secondary Weapon: %4d to %-4d", secmin, secmax );
 		else if ( blocking )
-			len = snprintf ( webs, sizeof ( webs ), "%s", shld );
+			snprintf ( webs, sizeof ( webs ), "%s", shld );
 		else
-			len = snprintf ( webs, sizeof ( webs ), " " );
+			snprintf ( webs, sizeof ( webs ), " " );
 	}
 	else if ( is_casting )
 	{
 		if ( ( staff = has_staff ( ch ) ) != 0.0f )
-			len = snprintf ( webs, sizeof ( webs ), " Focus Multiplier:  %3.2f", staff );
+			snprintf ( webs, sizeof ( webs ), " Focus Multiplier:  %3.2f", staff );
 		else if ( blocking )
-			len = snprintf ( webs, sizeof ( webs ), "%s", shld );
+			snprintf ( webs, sizeof ( webs ), "%s", shld );
 		else
-			len = snprintf ( webs, sizeof ( webs ), " " );
+			snprintf ( webs, sizeof ( webs ), " " );
 		primin = spell_size_dice ( ch );
 		primin += caster_damroll ( ch );
 		primax = ( spell_size_dice ( ch ) + ( spell_size_dice ( ch ) *spell_num_dice ( ch ) ) );
@@ -2459,12 +2458,12 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 			primin += primin/5;
 		}
 
-		len = snprintf ( webp, sizeof ( webp ), "Magic Damage: %4d to %-4d", primin, primax );
+		snprintf ( webp, sizeof ( webp ), "Magic Damage: %4d to %-4d", primin, primax );
 	}
 	else
 	{
-		len = snprintf ( webp, sizeof ( webp ), " " );
-		len = snprintf ( webs, sizeof ( webs ), " " );
+		snprintf ( webp, sizeof ( webp ), " " );
+		snprintf ( webs, sizeof ( webs ), " " );
 	}
 
 	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
@@ -3138,9 +3137,9 @@ void display_help_list ( Descriptor *d, char *keywords )
 	unsigned int i, cnt = 0;
 	char buf[MAX_STRING_LENGTH];
 	char buf1[1024];
-	size_t len = 0;
+	//size_t len = 0;
 	strcpy ( buf, "  Help files similar\r\n---------------------------------------\r\n" );
-	len = strlen ( buf );
+	//len = strlen ( buf );
 
 	for ( i=0;i<top_of_helpt;i++ )
 	{
@@ -5293,7 +5292,7 @@ ACMD ( do_commands )
 
 ACMD ( do_prereq )
 {
-	int chclass, level, i, found, skill_num;
+	int level, i,skill_num;
 	char msg1[MAX_STRING_LENGTH], msg2[MAX_STRING_LENGTH];
 	size_t len = 0;
 	// char msg[MAX_STRING_LENGTH];
@@ -5305,13 +5304,13 @@ ACMD ( do_prereq )
 
 	if ( !*argument )
 	{
-		chclass = GET_CLASS ( ch );
+		
 		send_to_char
 		( "Min Level: Skill/Spell Name        First Requirement         Second Requirement\r\n",
 		  ch );
 		for ( level = 1; level < LVL_IMMORT; level++ )
 		{
-			found = FALSE;
+			//found = FALSE;
 			len += snprintf ( msg1 + len, sizeof ( msg1 ) - len, "Level %3d:\r\n", level );
 			for ( i = 1; i < MAX_SKILLS + 1; i++ )
 			{
@@ -5320,7 +5319,7 @@ ACMD ( do_prereq )
 					if ( spell_info[i].first_prereq !=
 					        TYPE_UNDEFINED )
 					{
-						found = TRUE;
+						
 						len += snprintf ( msg1 + len, sizeof ( msg1 ) - len,
 						                  "            %-20s : ",
 						                  spell_info[i].name );

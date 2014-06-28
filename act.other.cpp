@@ -1745,7 +1745,7 @@ ACMD ( do_gen_tog )
 ACMD ( do_file )
 {
 	FILE *req_file;
-	int cur_line = 0, num_lines = 0, req_lines = 0, i, j;
+	int cur_line = 0, num_lines = 0, req_lines = 0, i;
 	int l;
 	char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], line[READ_SIZE];
 	char buf[MAX_STRING_LENGTH];
@@ -1782,7 +1782,7 @@ ACMD ( do_file )
 	{
 		ch->Send (
 		    "USAGE: file <option> <num lines>\r\n\r\nFile options:\r\n" );
-		for ( j = 0, i = 1; fields[i].level; i++ )
+		for ( i = 1; fields[i].level; i++ )
 			if ( fields[i].level <= GET_LEVEL ( ch ) )
 				ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(),
 				           fields[i].file.c_str() );

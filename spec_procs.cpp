@@ -1488,7 +1488,7 @@ SPECIAL ( cleric )
  */
 ACMD ( do_recover )
 {
-	int num = 0, found = 0;
+	int found = 0;
 	gold_int amt;
 	struct obj_data *obj = NULL;
 	int remorts = MIN(REMORTS(ch), 50);
@@ -1518,7 +1518,7 @@ ACMD ( do_recover )
 		return;
 	}
 	/* search the world for the corpse, if it still exists */
-	for ( num = 0, temp = corpse_list; temp; temp = tnext )
+	for ( temp = corpse_list; temp; temp = tnext )
 	{
 		tnext = temp->next;
 		obj = temp->corpse;

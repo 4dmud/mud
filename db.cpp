@@ -5769,8 +5769,9 @@ void Character::SaveKillList()
 */
 void kill_ems ( char *str )
 {
-	char *ptr1, *ptr2, *tmp;
-	tmp = str;
+	char *ptr1, *ptr2;
+	//char *tmp;
+	//tmp = str;
 	ptr1 = str;
 	ptr2 = str;
 

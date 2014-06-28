@@ -1711,7 +1711,8 @@ ACMD ( do_fence )
 	char badir[MAX_INPUT_LENGTH];
 	char bfsort[MAX_INPUT_LENGTH];
 	char bfbuf[MAX_INPUT_LENGTH];
-	char *adir, *type, *fsort, *fbuf;
+	char *adir, *type, *fbuf;
+	//char *fsort;
 	Room *other_room = NULL;
 	bool room_has_gatepost;
 	struct obj_data *obj;
@@ -1721,7 +1722,7 @@ ACMD ( do_fence )
 
 	adir = badir;
 	type = btype;
-	fsort = bfsort;
+	//fsort = bfsort;
 	fbuf = bfbuf;
 
 	/* check if the room we are in is a PASTURE type */

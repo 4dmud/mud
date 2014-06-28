@@ -52,7 +52,7 @@ ACTION ( thing_call_lightning )
 {
 	const char *to_char = NULL;
 	const char *to_room = NULL;
-	const char *to_room_miss = NULL;
+	//const char *to_room_miss = NULL;
 	Character *tch = NULL, *rndm = NULL;
 	int count = 0;
 	float multi = 0;
@@ -66,7 +66,7 @@ ACTION ( thing_call_lightning )
 
 
 	/* No random char found */
-	to_room_miss = "A bolt of lightning scorches the earth nearby. BOOM!";
+	//to_room_miss = "A bolt of lightning scorches the earth nearby. BOOM!";
 
 	/* Choose a random victim */
 	if ( ch && IN_ROOM ( ch ) == room )

@@ -681,14 +681,14 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	struct obj_data *final_focus;
 	struct extra_descr_data *new_descr;
 	int can_make = TRUE, num2 = number ( 0, 16 );
-	int v0, v1, v2, v3;
-	char *msg, *msgroom, msgbuf[MAX_INPUT_LENGTH],  msgroombuf[MAX_INPUT_LENGTH];
+	int v1, v2;
+	//int v0
+	//int v3
+	//char *msg, *msgroom;
+	//char *msgbuf[MAX_INPUT_LENGTH],  msgroombuf[MAX_INPUT_LENGTH];
 	char buf2[MAX_INPUT_LENGTH];
 
-	msg = msgbuf;
-	msgroom = msgroombuf;
-
-
+	
 	if ( can_make == FALSE )
 	{
 		ch->Send ( "That item cannot be made into a focus.\r\n" );
@@ -699,8 +699,8 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	   LANA(age_desc_staff[GET_OBJ_VAL(o, 1)]),
 	   age_desc_staff[GET_OBJ_VAL(o, 1)], random_desc[num2],
 	   tree_names[GET_OBJ_VAL(o, 2)], o->short_description);
-	act("$n sings a focus staff from $p!", FALSE, ch, o, 0, TO_ROOM);*/
-	v0 = GET_OBJ_VAL ( o, 0 );
+	act("$n sings a focus staff from $p!", FALSE, ch, o, 0, TO_ROOM);
+	v0 = GET_OBJ_VAL ( o, 0 );*/
 
        /* V1 is critical to this formula, and yet there's no fucking documentation on it. Let's fix that.
      
@@ -709,7 +709,7 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
        */
 	v1 = MIN ( GET_OBJ_VAL ( o, 1 ), 8 );
 	v2 = MIN ( GET_OBJ_VAL ( o, 2 ), 8 );
-	v3 = GET_OBJ_VAL ( o, 3 );
+	//v3 = GET_OBJ_VAL ( o, 3 );
 	extract_obj ( o );
 	create_trees();
 
@@ -810,13 +810,15 @@ ASKILL ( skill_sing_wood )
 {
 	struct obj_data *o = NULL;
 	char tree_name[MAX_INPUT_LENGTH];
-	char *temp1;
-	int type, found = FALSE;
+	//char *temp1;
+	//int type; 
+	int found = FALSE;
 	struct message_event_obj *msg = NULL;
 
 	skip_spaces ( &argument );
-	temp1 = one_argument ( argument, tree_name );
-	type = SKILL_SING_WOOD;
+	//temp1 = 
+	one_argument ( argument, tree_name );
+	//type = SKILL_SING_WOOD;
 
 	/* sanity check */
 	if ( !*tree_name )
@@ -1135,7 +1137,7 @@ ACMD ( do_fell )
 {
 	struct obj_data *o = NULL;
 	char tree_name[MAX_INPUT_LENGTH];
-	char *temp1;
+	//char *temp1;
 	int found = FALSE;
 	struct message_event_obj *msg = NULL;
 
@@ -1153,7 +1155,8 @@ ACMD ( do_fell )
 		return;
 	}
 	skip_spaces ( &argument );
-	temp1 = one_argument ( argument, tree_name );
+	//temp1 = 
+	one_argument ( argument, tree_name );
 
 	/* sanity check */
 	if ( !*tree_name )
