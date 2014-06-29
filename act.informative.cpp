@@ -3916,6 +3916,7 @@ if (!readout_who) {
 				len += snprintf ( buf + len, sizeof ( buf ) - len, " (Buildwalking)" );
 		}
 		len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
+		*buf = '\0';
 } else if (readout_who) {
   
 		  if ( GET_LEVEL ( wch ) >= LVL_HERO ) {
@@ -3938,6 +3939,7 @@ if (!readout_who) {
 		
 		/** put the current formatted line into the output buffer - mord **/
 		out << buf;
+		
 	}                 /* end of for */
 	
 	/** put the current formatted line into the output buffer, and make a new line - mord **/
