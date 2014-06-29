@@ -2,7 +2,7 @@
 # Clean-up provided by seqwith.
 
 #ECL?
-ECL = 0
+ECL = 1
 
 #if ECL is set, check if it is actually there
 ifeq ($(ECL),1)

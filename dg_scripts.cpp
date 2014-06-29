@@ -3194,6 +3194,16 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 }
 
+void delete_trailing_spaces(char* string) {
+    if (!string || !*string) //null or empty string passed
+	return;
+    int end = strlen(string);
+    
+    while (--end >= 0 && string[end] == ' ');
+    string[end+1]='\0';
+}
+	
+    
 
 /*
  * makes a local variable into a global variable
@@ -3208,6 +3218,7 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
 
 	//any_one_arg ( var, arg1 );
 	skip_spaces(&var);
+	delete_trailing_spaces(var);
 
 	if ( !*var )
 	{
