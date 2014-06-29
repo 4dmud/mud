@@ -3938,6 +3938,7 @@ if (!readout_who) {
 		
 		/** put the current formatted line into the output buffer - mord **/
 		out << buf;
+		*buf = '\0';
 	}                 /* end of for */
 	
 	/** put the current formatted line into the output buffer, and make a new line - mord **/
