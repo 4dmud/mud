@@ -3933,11 +3933,7 @@ if (!readout_who) {
 		    else
 		      len += snprintf ( buf + len, sizeof ( buf ) - len, "\r\n" );
 		  } 
-		  
 		} 
-		
-		/** put the current formatted line into the output buffer - mord **/
-		out << buf;
 	}                 /* end of for */
 	
 	/** put the current formatted line into the output buffer, and make a new line - mord **/
