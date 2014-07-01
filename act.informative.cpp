@@ -3462,6 +3462,7 @@ string WHO_USAGE (
     "  -o = show in order of login\r\n"
     "  -p = show in order of class\r\n"
     "  -j = show in order of race\r\n"
+    "  -b = show just player names in human readable format. Suitable for screen readers.\r\n"
     "\r\n" );
 
 ACMD ( do_who )
@@ -3499,28 +3500,28 @@ ACMD ( do_who )
 
 	const char *WizLevels_male[LVL_IMPL - ( LVL_HERO - 1 ) ] =
 	{
-		"        Hero        ",
-		"        Deity       ",
-		"       Builder      ",
-		"-      Creator     -",
-		"*      Senior      *",
-		"**   Implementor  **"
+		"         Hero        ",
+		"         Deity       ",
+		"        Builder      ",
+		"-       Creator     -",
+		"*       Senior      *",
+		"**   Implementor   **"
 	};
 
 	const char *WizLevels_female[LVL_IMPL - ( LVL_HERO - 1 ) ] =
 	{
-		"        Hero        ",
-		"        Deity       ",
-		"       Builder      ",
-		"-      Creator     -",
-		"*      Senior      *",
-		"**   Implementor  **"
+		"        Hero         ",
+		"        Deity        ",
+		"       Builder       ",
+		"-      Creator      -",
+		"*      Senior       *",
+		"**   Implementor   **"
 	};
 	const char *Imm_buf = "\r\n    =Immortals online=\r\n"
 	                      "-------------------------\r\n";
 	const char *Mort_buf = "\r\n"
 	                       "    =Mortals online=\r\n"
-	                       "-T-Lv-Rac-Cls-PK-RP-S--\r\n";
+	                       "-T-Lv-Rac-Cls-PK-RP-S--H-\r\n";
 
 
 
@@ -3709,14 +3710,14 @@ ACMD ( do_who )
 		    snprintf ( buf, sizeof ( buf ), MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ,  GET_NAME ( wch ));
 		    } else {
 		      if ( GET_SEX ( wch ) != SEX_FEMALE ) {
-			  snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",  CCYEL ( ch, C_SPR ),
+			  snprintf ( buf, sizeof ( buf ), "%s[%23s]  %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",  CCYEL ( ch, C_SPR ),
 				    center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_male[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
 				    ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
 				    ( PRETITLE ( wch ) == NULL ? "" : " " ),
 				    GET_NAME ( wch ), GET_TITLE ( wch ) );
 		    
 		      } else {
-				snprintf ( buf, sizeof ( buf ), "%s[%20s] %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s", CCYEL ( ch, C_SPR ),
+				snprintf ( buf, sizeof ( buf ), "%s[%23s]  %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s", CCYEL ( ch, C_SPR ),
 					  center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_female[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
 					  ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
 					  ( PRETITLE ( wch ) == NULL ? "" : " " ),
@@ -3734,46 +3735,47 @@ ACMD ( do_who )
 			}
 			else if ( AFF_FLAGGED ( wch, AFF_POLY_TOAD ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[--------TOAD--------] A slimy toad looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
+				snprintf ( buf, sizeof ( buf ), "[----------TOAD---------] A slimy toad looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
 			}
 			else     if ( AFF_FLAGGED ( wch, AFF_POLY_WOLF ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[--------WOLF--------] A grey wolf looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".", GET_NAME ( wch ) );
+				snprintf ( buf, sizeof ( buf ), "[----------WOLF---------] A grey wolf looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".", GET_NAME ( wch ) );
 			}
 			else     if ( AFF_FLAGGED ( wch, AFF_POLY_BOAR ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[--------BOAR--------] A frisky boar looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".", GET_NAME ( wch ) );
+				snprintf ( buf, sizeof ( buf ), "[----------BOAR---------] A frisky boar looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".", GET_NAME ( wch ) );
 			}
 			else     if ( AFF_FLAGGED ( wch, AFF_POLY_BEAR ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[--------BEAR--------] A shaggy bear looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
+				snprintf ( buf, sizeof ( buf ), "[----------BEAR---------] A shaggy bear looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
 			}
 			else     if ( AFF_FLAGGED ( wch, AFF_POLY_LION ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[--------LION--------] A black lion looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
+				snprintf ( buf, sizeof ( buf ), "[----------LION---------] A black lion looking vaguely like " MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) ".",  GET_NAME ( wch ) );
 			}
 			else     if ( get_sub_status ( wch, SUB_SHADOWCLOAK ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[-------SHADOWS------] A swirling tower of shadows." );
+				snprintf ( buf, sizeof ( buf ), "[---------SHADOWS-------] A swirling tower of shadows." );
 			}
 			else     if ( get_sub_status ( wch, SUB_CLOAK ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[-------CLOAKED------] A cloaked figure." );
+				snprintf ( buf, sizeof ( buf ), "[---------CLOAKED-------] A cloaked figure." );
 			}
 			else     if ( get_sub_status ( wch, SUB_MASK ) )
 			{
-				snprintf ( buf, sizeof ( buf ), "[-------MASKED-------] A masked figure." );
+				snprintf ( buf, sizeof ( buf ), "[---------MASKED--------] A masked figure." );
 			}
 			else
 			{
 				if ( PRF_FLAGGED ( ch, PRF_NOTITLE ) )
 				{
-					snprintf ( buf, sizeof ( buf ), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s%s{c0%s%s{c0" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",
+					snprintf ( buf, sizeof ( buf ), "[%s%d{c0 %2d %s {cy%-3s %s %s %s  %s]{cW%s%s{c0%s%s{c0" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",
 					           TIER_COLOUR_WHO ( current_class_is_tier_num ( wch ) ),
 					           current_class_is_tier_num ( wch ), GET_LEVEL ( wch ), RACE_ABBR ( wch ), CLASS_ABBR ( wch ),
 					           ( PLR_FLAGGED ( wch, PLR_PK ) ? "{crPK{c0" : "{cr--{c0" ),   //is PK or not? bold red
 					           ( PLR_FLAGGED ( wch, PLR_ROLEPLAYER ) ? "{cgRP{c0" : "{cg--{c0" ),     //is RP or not? dark green
 					           ( ( GET_SEX ( wch ) == SEX_FEMALE ) ? "F" : ( GET_SEX ( wch ) == SEX_MALE ) ? "M" : "N" ),
+						   PLR_FLAGGED ( wch, PLR_NEWBIE_HLPR ) ? "{cgH{c0" : "{cg-{c0",
 					           ( wch->desc && ( ( nw - 60 ) < wch->desc->login_time ) ) ? "{cy>{cW" : " ",
 					           ( GET_REMORT ( wch ) != -1 ? " " : "*" ),
 					           ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
@@ -3783,12 +3785,13 @@ ACMD ( do_who )
 				}
 				else
 				{
-					snprintf ( buf, sizeof ( buf ), "[%s%d{c0 %2d %s {cy%-3s %s %s %s]{cW%s{c0" MXPTAG ( "B" ) "%-20s" MXPTAG ( "/B" ) ,
+					snprintf ( buf, sizeof ( buf ), "[%s%d{c0 %2d %s {cy%-3s %s %s %s  %s]{cW%s{c0" MXPTAG ( "B" ) "%-15s" MXPTAG ( "/B" ) ,
 					           TIER_COLOUR_WHO ( current_class_is_tier_num ( wch ) ),
 					           current_class_is_tier_num ( wch ),GET_LEVEL ( wch ), RACE_ABBR ( wch ), CLASS_ABBR ( wch ),
 					           ( PLR_FLAGGED ( wch, PLR_PK ) ? "{crPK{c0" : "{cr--{c0" ),   //is PK or not? bold red
 					           ( PLR_FLAGGED ( wch, PLR_ROLEPLAYER ) ? "{cgRP{c0" : "{cg--{c0" ),     //is RP or not? dark green
 					           ( ( GET_SEX ( wch ) == SEX_FEMALE ) ? "F" : ( GET_SEX ( wch ) == SEX_MALE ) ? "M" : "N" ),
+						   PLR_FLAGGED ( wch, PLR_NEWBIE_HLPR ) ? "{cgH{c0" : "{cg-{c0",
 					           ( GET_REMORT ( wch ) != -1 ? "  " : " *" ),
 					           GET_NAME ( wch ) ); //they have a star if they haven't yet remorted
 				}
@@ -3813,8 +3816,8 @@ if (!readout_who) {
 		if ( AFF_FLAGGED ( wch, AFF_OUTCAST ) )
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sOutcast%s)", CCRED ( ch, C_NRM ), CCNRM ( ch, C_NRM ) ) ;  
 
-		if ( PLR_FLAGGED ( wch, PLR_NEWBIE_HLPR ) )
-			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sHelper%s)", CCGRN ( ch, C_NRM ), ( ( GET_LEVEL ( wch ) >= LVL_HERO ) ? CCYEL ( ch, C_NRM ) : CCNRM ( ch, C_NRM ) ) );   //not displaying helper flag yet
+		if ( PLR_FLAGGED ( wch, PLR_NEWBIE_HLPR ) && ( GET_LEVEL ( wch ) >= LVL_HERO ))
+			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sHelper%s)", CCGRN ( ch, C_NRM ),  CCYEL ( ch, C_NRM ) );   //not displaying helper flag yet
 		if ( PLR_FLAGGED ( wch, PLR_RP_LEADER ) )
 			len += snprintf ( buf + len, sizeof ( buf ) - len, " (%sRPL%s)", CCGRN ( ch, C_NRM ), ( ( GET_LEVEL ( wch ) >= LVL_HERO ) ? CCYEL ( ch, C_NRM ) : CCNRM ( ch, C_NRM ) ) ); //not displaying helper flag yet
 		if ( GET_INVIS_LEV ( wch ) )
