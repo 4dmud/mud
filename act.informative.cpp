@@ -4003,7 +4003,7 @@ if (!readout_who) {
 	}
 	/** pass the last line buffer into the string - mord **/
 	out << buf << endl;
-	page_string ( ch->desc, out );
+	*ch << out.str();
 }
 
 #define USERS_FORMAT \
