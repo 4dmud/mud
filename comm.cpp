@@ -337,10 +337,10 @@ void z_free(void *opaque, void *address) {
  *  It uses the equally arbitrary COMPRESS2 option 86,
  *  It properly terminates the subnegotiation sequence.
  */
-#define TELOPT_COMPRESS         85
-#define TELOPT_COMPRESS2        86
-#define COMPRESS        	85
-#define COMPRESS2       	86
+#define TELOPT_COMPRESS         static_cast<const char>(85)
+#define TELOPT_COMPRESS2        static_cast<const char>(86)
+#define COMPRESS        	static_cast<const char>(85)
+#define COMPRESS2       	static_cast<const char>(86)
 
 /* first compression neg. string */
 static const char compress_offer[] = {
@@ -351,28 +351,28 @@ static const char compress_offer[] = {
                                      };
 
 static const char will_sig[] = {
-                                   IAC, WILL, TELOPT_COMPRESS, 0
+                                   static_cast<const char>(IAC), static_cast<const char>(WILL), TELOPT_COMPRESS, 0
                                };
 static const char do_sig[] = {
-                                 IAC, DO, TELOPT_COMPRESS, 0
+                                 static_cast<const char>(IAC), static_cast<const char>(DO), TELOPT_COMPRESS, 0
                              };
 static const char dont_sig[] = {
-                                   IAC, DONT, TELOPT_COMPRESS, 0
+                                   static_cast<const char>(IAC), static_cast<const char>(DONT), TELOPT_COMPRESS, 0
                                };
 static const char on_sig[] = {
-                                 IAC, SB, TELOPT_COMPRESS, WILL, SE, 0
+                                 static_cast<const char>(IAC), static_cast<const char>(SB), TELOPT_COMPRESS, static_cast<const char>(WILL), static_cast<const char>(SE), 0
                              };
 static const char will_sig2[] = {
-                                    IAC, WILL, TELOPT_COMPRESS2, 0
+                                    static_cast<const char>(IAC), static_cast<const char>(WILL), TELOPT_COMPRESS2, 0
                                 };
 static const char do_sig2[] = {
-                                  IAC, DO, TELOPT_COMPRESS2, 0
+                                  static_cast<const char>(IAC), static_cast<const char>(DO), TELOPT_COMPRESS2, 0
                               };
 static const char dont_sig2[] = {
-                                    IAC, DONT, TELOPT_COMPRESS2, 0
+                                    static_cast<const char>(IAC), static_cast<const char>(DONT), TELOPT_COMPRESS2, 0
                                 };
 static const char on_sig2[] = {
-                                  IAC, SB, TELOPT_COMPRESS2, IAC, SE, 0
+                                  static_cast<const char>(IAC), static_cast<const char>(SB), TELOPT_COMPRESS2, static_cast<const char>(IAC), static_cast<const char>(SE), static_cast<const char>(0)
                               };
 
 #endif
@@ -1162,7 +1162,7 @@ void game_loop(socket_t s_mother_desc) {
   struct timeval last_time, opt_time, process_time, temp_time;
   struct timeval before_sleep, now, timeout;
   char comm[MAX_STRING_LENGTH];
-  Descriptor *d, *next_d;
+  //Descriptor *d, *next_d;
   int missed_pulses, maxdesc, aliased;
   /* initialize various time values */
   missed_pulses = 0;
@@ -2734,10 +2734,10 @@ int toggle_compression(Descriptor *t) {
     }
 
     CREATE(t->comp->stream, z_stream, 1);
-    t->comp->stream->next_in = NULL;
-    t->comp->stream->avail_in = NULL;
-    t->comp->stream->next_out = NULL;
-    t->comp->stream->avail_out = NULL;
+    t->comp->stream->next_in = 0;
+    t->comp->stream->avail_in = 0;
+    t->comp->stream->next_out = 0;
+    t->comp->stream->avail_out = 0;
     t->comp->stream->zalloc = z_alloc;
     t->comp->stream->zfree = z_free;
     t->comp->stream->opaque = Z_NULL;
@@ -4151,15 +4151,14 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
     char out_buf[MAX_INPUT_LENGTH + 1] = "";
     char ptemp[MAX_PROMPT_LENGTH * 5] = "";
     register unsigned int inpos = 0, outpos = 0;
-    Descriptor *d = NULL;
+    
     time_t ct = time(0);
     bool def = FALSE;
     int count = 0, mhp= 0;
     gold_int expe;
     size_t len = 0, psize;
 
-    if (ch && ch->desc)
-        d = ch->desc;
+    
     char **msg;
 
     if (!FIGHTING(ch))

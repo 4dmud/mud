@@ -1312,7 +1312,7 @@ static void Negotiate( descriptor_t *apDescriptor )
 
 static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProtocol )
 {
-   bool_t bResult = true;
+   //bool_t bResult = true;
    protocol_t *pProtocol = apDescriptor->pProtocol;
 
    switch ( aProtocol )
@@ -1341,8 +1341,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
                Negotiate(apDescriptor);
             }
          }
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+            //bResult = false;
          break;
 
       case (char)TELOPT_NAWS:
@@ -1350,8 +1350,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
             pProtocol->bNAWS = true;
          else if ( aCmd == (char)WONT )
             pProtocol->bNAWS = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+            //bResult = false;
          break;
 
       case (char)TELOPT_CHARSET:
@@ -1363,8 +1363,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
          }
          else if ( aCmd == (char)WONT )
             pProtocol->bCHARSET = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+           // bResult = false;
          break;
 
       case (char)TELOPT_MSDP:
@@ -1377,8 +1377,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
          }
          else if ( aCmd == (char)DONT )
             pProtocol->bMSDP = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+            //bResult = false;
          break;
 
       case (char)TELOPT_MSSP:
@@ -1386,8 +1386,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
             SendMSSP( apDescriptor );
          else if ( aCmd == (char)DONT )
             ; /* Do nothing. */
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+            //bResult = false;
          break;
 
       case (char)TELOPT_MCCP:
@@ -1403,8 +1403,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
                mccp_off( apDescriptor );
             }
          }
-         else // Anything else is invalid.
-            bResult = false;
+         //else // Anything else is invalid.
+            //bResult = false;
          break;
 
       case (char)TELOPT_MSP:
@@ -1412,8 +1412,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
             pProtocol->bMSP = true;
          else if ( aCmd == (char)DONT )
             pProtocol->bMSP = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+           // bResult = false;
          break;
 
       case (char)TELOPT_MXP:
@@ -1430,8 +1430,8 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
          }
          else if ( aCmd == (char)WONT )
             pProtocol->bMXP = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+           // bResult = false;
          break;
 
       case (char)TELOPT_ATCP:
@@ -1455,12 +1455,12 @@ static void PerformHandshake( descriptor_t *apDescriptor, char aCmd, char aProto
          }
          else if ( aCmd == (char)WONT )
             pProtocol->bATCP = false;
-         else /* Anything else is invalid. */
-            bResult = false;
+         //else /* Anything else is invalid. */
+            //bResult = false;
          break;
 
-      default:
-         bResult = false;
+      default:break;
+         //bResult = false;
    }
 }
 
@@ -1735,7 +1735,7 @@ static void ExecuteMSDPPair( descriptor_t *apDescriptor, const char *apVariable,
          else if ( MatchString(apValue, "VARIABLES") || 
             MatchString(apValue, "REPORTABLE_VARIABLES") )
          {
-            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? MSDP_VAL : ' ', '\0' };
+            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? static_cast<const char>(MSDP_VAL) : ' ', '\0' };
             char MSDPCommands[MAX_OUTPUT_BUFFER] = { '\0' };
             int i; /* Loop counter */
 
@@ -1759,7 +1759,7 @@ static void ExecuteMSDPPair( descriptor_t *apDescriptor, const char *apVariable,
          }
          else if ( MatchString(apValue, "CONFIGURABLE_VARIABLES") )
          {
-            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? MSDP_VAL : ' ', '\0' };
+            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? static_cast<const char>(MSDP_VAL) : ' ', '\0' };
             char MSDPCommands[MAX_OUTPUT_BUFFER] = { '\0' };
             int i; /* Loop counter */
 
@@ -1783,7 +1783,7 @@ static void ExecuteMSDPPair( descriptor_t *apDescriptor, const char *apVariable,
          }
          else if ( MatchString(apValue, "GUI_VARIABLES") )
          {
-            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? MSDP_VAL : ' ', '\0' };
+            const char Separator[] = { apDescriptor->pProtocol->bMSDP ? static_cast<const char>(MSDP_VAL) : ' ', '\0' };
             char MSDPCommands[MAX_OUTPUT_BUFFER] = { '\0' };
             int i; /* Loop counter */
 

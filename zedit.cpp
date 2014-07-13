@@ -474,11 +474,11 @@ void zedit_disp_menu(Descriptor *d)
 {
   int subcmd = 0,  counter = 0;
   char buf1[MAX_STRING_LENGTH];
-  room_rnum room;
+  //room_rnum room;
 
   get_char_colours(d->character);
   clear_screen(d);
-  room = real_room(OLC_NUM(d));
+  //room = real_room(OLC_NUM(d));
   
 sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
   /*

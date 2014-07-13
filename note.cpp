@@ -521,7 +521,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 	char to_new[MAX_INPUT_LENGTH];
 	char to_one[MAX_INPUT_LENGTH];
 	//    NOTE_DATA *prev;
-	NOTE_DATA **list;
+	//NOTE_DATA **list;
 	char *to_list;
 	int type;
 
@@ -548,7 +548,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 		}
 	}
 	/* nuke the whole note */
-
+/*
 	switch ( pnote->type )
 	{
 		default:
@@ -569,6 +569,7 @@ void note_remove ( Character *ch, NOTE_DATA *pnote, bool del )
 			list = &changes_list;
 			break;
 	}
+	*/
 
 #if 0
 	/*
@@ -853,16 +854,21 @@ void parse_note ( Character *ch, char *argument, int type )
 	if ( is_abbrev ( arg, "list" ) )
 	{
 		vnum = 0;
+		std::stringstream nline;
+		char nbuf[MAX_INPUT_LENGTH];
 		for ( pnote = *list; pnote != NULL; pnote = pnote->next )
 		{
 			if ( is_note_to ( ch, pnote ) )
 			{
-				ch->Send ( "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\r\n",
+				snprintf(nbuf, MAX_INPUT_LENGTH,  "{cw[{cy%3d{cG%s{cw] %-13s: {cc%s{c0\r\n",
 				           vnum, hide_note ( ch,pnote ) ? " " : "N",
 				           pnote->sender, pnote->subject );
 				vnum++;
+				nline << nbuf;
 			}
+			
 		}
+		page_string(ch->desc, nline);
 		if ( !vnum )
 		{
 			switch ( type )

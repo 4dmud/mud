@@ -73,11 +73,11 @@ void add_event2(int delay, EVENT2(*func), void *causer, void *victim,
 void clean_events2(void *pointer)
 {
     struct event_info2 *temp, *prox;
-    struct event_info2 *previous;
+    //struct event_info2 *previous;
 
     if (in_event_handler)
 	log("SYSERR: Trying to remove events inside the handler. Attempting to continue.");
-    previous = NULL;
+    //previous = NULL;
     for (temp = pending_events; temp; temp = prox) {
 	prox = temp->next;
 	if (temp->causer == pointer || temp->victim == pointer ||

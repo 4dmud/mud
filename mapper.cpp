@@ -329,13 +329,12 @@ int get_line( char *desc, int max_len )
 void show_map( Character *ch, int mxp/*, char *text */)
 {
   char buf[MAX_STRING_LENGTH * 2];
-  int x, y, pos, sec, sect = 0;
+  int x, y, sec, sect = 0;
   // char *p;
   //bool alldesc = FALSE; /* Has desc been fully displayed? */
 
   //if ( !text ) alldesc = TRUE;
 
-  pos = 0;
   // p = text;
   buf[0] = '\0';
   if (mxp)

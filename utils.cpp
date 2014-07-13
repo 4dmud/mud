@@ -957,7 +957,8 @@ int get_line ( FILE *fl, char *buf )
 
 const char *get_dirname ( char *filename, size_t len, char oname, int mode )
 {
-	const char *prefix, *middle, *suffix;
+	const char *prefix, *middle;
+	//, *suffix;
 
 	if ( oname == '\0' )
 		return NULL;
@@ -966,40 +967,40 @@ const char *get_dirname ( char *filename, size_t len, char oname, int mode )
 	{
 		case CRASH_FILE:
 			prefix = LIB_PLROBJS;
-			suffix = SUF_OBJS;
+			///suffix = SUF_OBJS;
 			break;
 		case ETEXT_FILE:
 			prefix = LIB_PLRTEXT;
-			suffix = SUF_TEXT;
+			///suffix = SUF_TEXT;
 			break;
 		case ALIAS_FILE:
 			prefix = LIB_PLRALIAS;
-			suffix = SUF_ALIAS;
+			///suffix = SUF_ALIAS;
 			break;
 		case POOF_FILE:
 			prefix = LIB_PLRPOOFS;
-			suffix = SUF_POOFS;
+			///suffix = SUF_POOFS;
 			break;
 		case NEW_OBJ_FILES:
 			prefix = LIB_PLROBJS;
-			suffix = "new";
+			///suffix = "new";
 			break;
 		case SCRIPT_VARS_FILE:
 			prefix = LIB_PLRVARS;
-			suffix = SUF_MEM;
+			///suffix = SUF_MEM;
 			break;
 		case ASCII_OBJ_FILES:
 			prefix = LIB_PLROBJS;
-			suffix = "anew";
+			///suffix = "anew";
 			break;
 		case LOCKER_FILES:
 			prefix = LIB_PLROBJS;
-			suffix = "locker";
+			///suffix = "locker";
 			break;
 		case IGNORE_FILE:
 			prefix = LIB_PLRALIAS;
 			// Changed this from "ignore" to SUF_IGNORE - PROM
-			suffix = SUF_IGNORE;
+			///suffix = SUF_IGNORE;
 			break;
 		default:
 			return NULL;

@@ -260,14 +260,15 @@ void list_vehicles(Character *ch)
 
 ACMD(do_oasis_vedit)
 {
-  char *buf3;
+  //char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   int number = NOWHERE, add = FALSE, rem = FALSE;
   Descriptor *d;
 
   /* Parse any arguments. */
-  buf3 = two_arguments(argument, buf1, buf2);
+  //buf3 = 
+  two_arguments(argument, buf1, buf2);
 
   if (!*buf1)
   {

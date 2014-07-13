@@ -218,7 +218,7 @@ bool can_teach_skill ( Character *mob, int i )
 
 void list_skills ( Character *ch, int skillspell, Character *mob )
 {
-	int i, sortpos, h = 0, imm, ending, sub;
+	int i, sortpos, h = 0, ending, sub;
 	int count= 0;
 	char buf[MAX_INPUT_LENGTH];
 	DYN_DEFINE;
@@ -240,7 +240,7 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 	}
 	DYN_CREATE;
 	*dynbuf = 0;
-	imm = -1;
+	
 
 	if ( mob == NULL )
 	{

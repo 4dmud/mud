@@ -51,14 +51,15 @@ ACMD ( do_oasis_oedit )
 {
 	int num = NOWHERE, save = 0, real_num;
 	Descriptor *d;
-	char *buf3;
+	//char *buf3;
 	char buf1[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
 
 	/****************************************************************************/
 	/** Parse any arguments.                                                   **/
 	/****************************************************************************/
-	buf3 = two_arguments ( argument, buf1, buf2 );
+	//buf3 = 
+	two_arguments ( argument, buf1, buf2 );
 
 	/****************************************************************************/
 	/** If there aren't any arguments...well...they can't modify nothing now   **/

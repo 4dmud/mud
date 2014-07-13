@@ -197,7 +197,8 @@ ACMD(do_rdig)
 
 ACMD(do_room_copy)
 {
-   Room *room_src, *room_dst;
+   //Room *room_src;
+   Room *room_dst;
    int  j, buf_num;
    room_rnum room_num;
    zone_rnum dst_zone;
@@ -228,7 +229,7 @@ ACMD(do_room_copy)
    }
    
    
-   room_src = IN_ROOM(ch);
+   //room_src = IN_ROOM(ch);
    room_dst = new Room();
 
    room_dst->zone = dst_zone;

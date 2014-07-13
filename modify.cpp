@@ -35,9 +35,9 @@ void show_string ( Descriptor *d, char *input );
 /* local functions */
 void smash_tilde ( char *str );
 ACMD ( do_skillset );
-char *next_page ( char *str, int length,int width );
+const char *next_page ( const char *str, int length,int width );
 int count_pages ( char *str, int length,int width );
-void paginate_string ( char *str, Descriptor *d );
+void paginate_string ( const char *str, Descriptor *d );
 void playing_string_cleanup ( Descriptor *d, int action );
 void exdesc_string_cleanup ( Descriptor *d, int action );
 void trigedit_string_cleanup ( Descriptor *d, int terminator );
@@ -582,7 +582,7 @@ ACMD ( do_subskillset )
 /* Traverse down the string until the begining of the next page has been
  * reached.  Return NULL if this is the last page of the string.
  */
-char *next_page ( char *str, PageSize &ps )
+const char *next_page ( const char *str, PageSize &ps )
 {
 	int col = 1, line = 1, spec_code = FALSE;
 
@@ -628,7 +628,7 @@ char *next_page ( char *str, PageSize &ps )
 
 
 /* Function that returns the number of pages in the string. */
-int count_pages ( char *str, PageSize &ps )
+int count_pages ( const char *str, PageSize &ps )
 {
 	int pages;
 
@@ -642,7 +642,7 @@ int count_pages ( char *str, PageSize &ps )
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string ( char *str, Descriptor *d )
+void paginate_string ( const char *str, Descriptor *d )
 {
 	int i;
 	PageSize ps = PageSize();
@@ -693,7 +693,7 @@ void page_string ( Descriptor *d, char *str, int keep_internal )
 	}
 
 	d->showstr_count = count_pages ( str, ps );
-	CREATE ( d->showstr_vector, char *, d->showstr_count );
+	CREATE ( d->showstr_vector, const char *, d->showstr_count );
 
 	if ( keep_internal )
 	{
@@ -709,6 +709,36 @@ void page_string ( Descriptor *d, char *str, int keep_internal )
 		unlock_desc ( d );
 		paginate_string ( str, d );
 	}
+	show_string ( d, actbuf );
+}
+
+/** Page string for c++ strings - mord */
+void page_string ( Descriptor *d, std::stringstream &str )
+{
+	char actbuf[MAX_INPUT_LENGTH] = "";
+	PageSize ps = PageSize();
+	string sbuf = str.str();
+	if ( !d )
+	{
+		return;
+	}
+
+	if ( sbuf.length()==0 )
+		return;
+
+	lock_desc ( d );
+
+	if ( d->character )
+	{
+		ps.l = PAGEHEIGHT ( d->character );
+		ps.w = PAGEWIDTH ( d->character );
+	}
+
+	d->showstr_count = count_pages ( sbuf.c_str(), ps );
+	CREATE ( d->showstr_vector, const char *, d->showstr_count );
+	unlock_desc ( d );
+	paginate_string ( sbuf.c_str(), d );
+	
 	show_string ( d, actbuf );
 }
 

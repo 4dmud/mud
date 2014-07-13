@@ -65,7 +65,9 @@ int	write_to_descriptor ( socket_t desc, const char *txt, struct compr *comp );
 void write_to_q ( const char *txt, struct txt_q *queue, int aliased );
 size_t write_to_output ( Descriptor *d, const char *txt, ... ) __attribute__ ( ( format ( printf, 2, 3 ) ) );
 size_t vwrite_to_output ( Descriptor *d, const char *format, va_list args );
+void paginate_string ( const char *str, Descriptor *d ); //mord??
 void page_string ( Descriptor *d, char *str, int keep_internal );
+void page_string ( Descriptor *d, std::stringstream &str);
 void string_add ( Descriptor *d, char *str );
 void string_write ( Descriptor *d, char **txt, size_t len, long mailto, void *data );
 void string_write ( Descriptor *d, string *writeto, size_t len, long mailto, void *data );

@@ -1014,7 +1014,7 @@ ASKILL ( skill_hide )
 ASKILL ( skill_steal )
 {
 	char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
-	int percent, gold, eq_pos, pcsteal = 0, ohoh = 0;
+	int percent, gold, eq_pos,  ohoh = 0;
 
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
 	{
@@ -1054,8 +1054,8 @@ ASKILL ( skill_steal )
 	if ( GET_POS ( vict ) < POS_SLEEPING )
 		percent = -1;        /* ALWAYS SUCCESS, unless heavy object. */
 
-	if ( !IS_NPC ( vict ) && IS_PK ( vict ) && !IS_NPC ( ch ) && IS_PK ( ch ) )
-		pcsteal = 1;
+	/* if ( !IS_NPC ( vict ) && IS_PK ( vict ) && !IS_NPC ( ch ) && IS_PK ( ch ) )
+		pcsteal = 1; */
 
 	if ( !AWAKE ( vict ) ) /* Easier to steal from sleeping people. */
 		percent -= 50;
@@ -1380,7 +1380,7 @@ ASKILL ( skill_smash )
 
 ASKILL ( skill_trample )
 {
-	int chance = 0, dam = 0;
+	int chance = 0;
 	int average_damage ( Character *ch );
 	char buf[MAX_STRING_LENGTH];
 	if ( ! ( RIDING ( ch ) || GET_RACE ( ch ) == RACE_CENTAUR ) )
@@ -1394,10 +1394,11 @@ ASKILL ( skill_trample )
 		return 0;
 	}
 
-	if ( RIDING ( ch ) )
+	/*if ( RIDING ( ch ) )
 		dam = GET_LEVEL ( RIDING ( ch ) );
 	else
 		dam = GET_LEVEL ( ch );
+	*/
 
 	chance = total_chance ( ch, SKILL_TRAMPLE );
 

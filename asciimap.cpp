@@ -307,9 +307,8 @@ ACMD ( do_map )
 {
 	int size = 0, center, x, y, min, max;
 	room_rnum was_in;
-	char arg1[10];
 	struct obj_data *viewport, *vehicle;
-	arg1[0] = 0;
+	//arg1[0] = 0;
 	//one_argument(argument, arg1);
 	//size = atoi(arg1);
 	size = URANGE ( 10, size, MAX_MAP );

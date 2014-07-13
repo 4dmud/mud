@@ -248,7 +248,7 @@ void set_race ( Character *ch, int race );
 
 /* external functions */
 void name_to_drinkcon ( struct obj_data *obj, int type );
-void paginate_string ( char *str, Descriptor *d ); //mord??
+void paginate_string ( const char *str, Descriptor *d ); //mord??
 struct time_info_data *mud_time_passed ( time_t t2, time_t t1 );
 void load_messages ( void );
 void weather_and_time ( int mode );
@@ -5778,8 +5778,9 @@ void Character::SaveKillList()
 */
 void kill_ems ( char *str )
 {
-	char *ptr1, *ptr2, *tmp;
-	tmp = str;
+	char *ptr1, *ptr2;
+	//char *tmp;
+	//tmp = str;
 	ptr1 = str;
 	ptr2 = str;
 

@@ -4554,7 +4554,7 @@ void show_last_logons ( Character *ch, int days, bool fix )
 ACMD ( do_show )
 {
 	int i, j, k, l, con;   /* i, j, k to specifics? */
-	size_t len, nlen;
+	
 	zone_rnum zrn = NOWHERE;
 	zone_vnum zvn = NOWHERE;
 	sbyte self = FALSE;
@@ -4682,10 +4682,9 @@ ACMD ( do_show )
 			{
 				DYN_CREATE;
 				*dynbuf = 0;
-				for ( len = zrn = 0; zrn <= top_of_zone_table; zrn++ )
+				for (  zrn = 0; zrn <= top_of_zone_table; zrn++ )
 				{
-					nlen =
-					    print_zone_to_buf ( buf, sizeof ( buf ), zrn, 0 );
+					print_zone_to_buf ( buf, sizeof ( buf ), zrn, 0 );
 					DYN_RESIZE ( buf );
 				}
 			}
@@ -4909,7 +4908,7 @@ ACMD ( do_show )
 				ch->Send ( "A name would help.\r\n" );
 				return;
 			}
-			for ( len = zrn = 0; zrn <= top_of_zone_table; zrn++ )
+			for ( zrn = 0; zrn <= top_of_zone_table; zrn++ )
 			{
 
 
@@ -4929,7 +4928,7 @@ ACMD ( do_show )
 		case 15:
 			i = 0;
 			strcpy ( value, GET_NAME ( ch ) );
-			for ( len = zrn = 0; zrn <= top_of_zone_table; zrn++ )
+			for ( zrn = 0; zrn <= top_of_zone_table; zrn++ )
 			{
 
 
@@ -6313,7 +6312,7 @@ void do_connections ( Character *ch, char *arg )
 {
 	int zone_num;
 	int j, i, k;
-	int start_room;
+	//int start_room;
 	char tbuf[MAX_STRING_LENGTH];
 	char buf[MAX_INPUT_LENGTH];
 	DYN_DEFINE;
@@ -6340,7 +6339,7 @@ void do_connections ( Character *ch, char *arg )
 	*dynbuf = 0;
 	if ( zone_num >= 0 && zone_num <= top_of_zone_table )
 	{
-		start_room = zone_table[zone_num].number * 100;
+		//start_room = zone_table[zone_num].number * 100;
 		snprintf ( tbuf, sizeof ( tbuf ), "Connections from %-30.30s\r\n"
 		           "--------------------------------------------------------------------------------\r\n",
 		           zone_table[zone_num].name );

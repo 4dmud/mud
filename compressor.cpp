@@ -138,7 +138,7 @@ unsigned char * Compressor::inf(unsigned char *source, size_t &dest) {
     int ret = Z_OK;
     read_to = 0;
     r_len = 0;
-    int have;
+    //int have;
     cur_size = 0;
     last_size = 0;
     if (!source)
@@ -179,7 +179,7 @@ unsigned char * Compressor::inf(unsigned char *source, size_t &dest) {
                 (void)inflateReset(&istrm);
                 return NULL;
             }
-            have = CHUNK - istrm.avail_out;
+            //have = CHUNK - istrm.avail_out;
             last_size = cur_size;
             cur_size += istrm.total_out;
             //tmp = (unsigned char*)realloc(tmp, cur_size * sizeof(unsigned char));

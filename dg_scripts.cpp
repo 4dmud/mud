@@ -3003,7 +3003,8 @@ ACMD ( do_vdelete )
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
-	long uid, context;
+	long uid;
+	//context;
 	Room *room;
 	Character *mob;
 	obj_data *obj;
@@ -3017,7 +3018,7 @@ ACMD ( do_vdelete )
 
 	if ( !*buf || !*buf2 )
 	{
-		ch->Send ( "Usage: vdelete <variablename> <id>\r\n" );
+		ch->Send ( "Usage: vdelete { <variablename>  | * all } <id>\r\n" );
 		return;
 	}
 
@@ -3038,8 +3039,8 @@ ACMD ( do_vdelete )
 	else if ( ( mob = find_char ( uid ) ) )
 	{
 		sc_remote = SCRIPT ( mob );
-		if ( !IS_NPC ( mob ) )
-			context = 0;
+		//if ( !IS_NPC ( mob ) )
+		//	context = 0;
 	}
 	else if ( ( obj = find_obj ( uid ) ) )
 	{
@@ -3062,6 +3063,17 @@ ACMD ( do_vdelete )
 		return;
 	}
 
+	  if (*var == '*' || is_abbrev(var, "all")) {
+    struct trig_var_data *vd_next;
+    for (vd = sc_remote->global_vars; vd; vd = vd_next) {
+      vd_next = vd->next;
+      delete vd;
+    }
+    sc_remote->global_vars = NULL;
+    ch->Send ("All variables deleted from that id.\r\n");
+    return;
+  }
+	
 	/* find the global */
 	for ( vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next )
 		if ( !strcasecmp ( vd->name.c_str(), var ) )
@@ -3100,7 +3112,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	long uid, context;
+	long uid;
+	//, context;
 	Room *room;
 	Character *mob;
 	obj_data *obj;
@@ -3138,8 +3151,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	else if ( ( mob = find_char ( uid ) ) )
 	{
 		sc_remote = SCRIPT ( mob );
-		if ( !IS_NPC ( mob ) )
-			context = 0;
+		/*if ( !IS_NPC ( mob ) )
+			context = 0;*/
 	}
 	else if ( ( obj = find_obj ( uid ) ) )
 	{
@@ -3181,6 +3194,16 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 }
 
+void delete_trailing_spaces(char* string) {
+    if (!string || !*string) //null or empty string passed
+	return;
+    int end = strlen(string);
+    
+    while (--end >= 0 && string[end] == ' ');
+    string[end+1]='\0';
+}
+	
+    
 
 /*
  * makes a local variable into a global variable
@@ -3190,12 +3213,14 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
 {
 	struct trig_var_data *vd;
 	char arg[MAX_INPUT_LENGTH], *var;
-	char arg1[MAX_INPUT_LENGTH];
+	//char arg1[MAX_INPUT_LENGTH];
 	var = any_one_arg ( cmd, arg );
 
-	any_one_arg ( var, arg1 );
+	//any_one_arg ( var, arg1 );
+	skip_spaces(&var);
+	delete_trailing_spaces(var);
 
-	if ( !*arg1 )
+	if ( !*var )
 	{
 		script_log ( "Trigger: %s, VNum %d. global w/o an arg: '%s'",
 		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
@@ -3203,13 +3228,13 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
 	}
 
 	for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
-		if ( !strcasecmp ( vd->name.c_str(), arg1 ) )
+		if ( !strcasecmp ( vd->name.c_str(), var ) )
 			break;
 
 	if ( !vd )
 	{
 		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in global call",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), arg1 );
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), var );
 		return;
 	}
 
@@ -3236,6 +3261,38 @@ void process_context ( struct script_data *sc, trig_data * trig, char *cmd )
 
 	sc->context = atol ( var );
 }
+
+void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
+{
+	char buf[MAX_INPUT_LENGTH];
+	char buf2[MAX_INPUT_LENGTH];
+	char *buf3 = NULL;
+	char to[128];
+	int num = 0;
+
+	buf3 = any_one_arg ( cmd, buf );
+	half_chop ( buf3, buf2, buf );
+	strcpy ( to, buf2 );
+
+	num = atoi ( buf );
+	if ( num < 1 )
+	{
+		script_log ( "extract number < 1!" );
+		return;
+	}
+
+	half_chop ( buf, buf3, buf2 );
+
+	while ( num > 0 )
+	{
+		half_chop ( buf2, buf, buf2 );
+		num--;
+	}
+
+	add_var ( &GET_TRIG_VARS ( trig ), to, buf, sc ? sc->context : 0 );
+}
+
+
 /*
   Thanks to Jamie Nelson for 4 dimensions for this addition
 
@@ -3285,35 +3342,6 @@ void dg_letter_value ( struct script_data *sc, trig_data *trig, char *cmd )
 	add_var ( &GET_TRIG_VARS ( trig ), varname, junk, sc->context );
 }
 
-void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
-{
-	char buf[MAX_INPUT_LENGTH];
-	char buf2[MAX_INPUT_LENGTH];
-	char *buf3 = NULL;
-	char to[128];
-	int num = 0;
-
-	buf3 = any_one_arg ( cmd, buf );
-	half_chop ( buf3, buf2, buf );
-	strcpy ( to, buf2 );
-
-	num = atoi ( buf );
-	if ( num < 1 )
-	{
-		script_log ( "extract number < 1!" );
-		return;
-	}
-
-	half_chop ( buf, buf3, buf2 );
-
-	while ( num > 0 )
-	{
-		half_chop ( buf2, buf, buf2 );
-		num--;
-	}
-
-	add_var ( &GET_TRIG_VARS ( trig ), to, buf, sc ? sc->context : 0 );
-}
 
 
 /*  This is the core driver for scripts. */
@@ -3348,8 +3376,8 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 	struct cmdlist_element *temp;
 	unsigned long loops = 0;
 	void *go = NULL;
-	int tvnum = -1;
-	tvnum = GET_TRIG_VNUM ( trig );
+	//int tvnum = -1;
+	/*tvnum = GET_TRIG_VNUM ( trig );*/
 
 
 	void obj_command_interpreter ( obj_data * obj, char *argument );
