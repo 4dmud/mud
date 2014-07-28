@@ -138,7 +138,14 @@ void mobile_activity ( void )
 			               || ( EXIT ( ch, door )->to_room->zone ==
 			                    IN_ROOM ( ch )->zone ) ) )
 			{
-				perform_move ( ch, door, 1 );
+				if ( MOB_FLAGGED ( ch, MOB_HERD_CATTLE ) || MOB_FLAGGED ( ch, MOB_HERD_SHEEP ) ||
+				     MOB_FLAGGED ( ch, MOB_HERD_HORSE ) ) 
+				{
+					/* Herds should move slower */
+					if ( !number ( 0, 2 ) )
+						perform_move ( ch, door, 1 );
+				}
+				else perform_move ( ch, door, 1 );
 			}
 		}
 

@@ -1021,6 +1021,8 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		for (herd = was_in->people; herd; herd = next) 
 		{
 			next = herd->next_in_room;
+			if ( FIGHTING ( herd ) || !AWAKE ( herd ) )
+				continue;
 			if ( (MOB_FLAGGED(herd, MOB_HERD_CATTLE) && MOB_FLAGGED(ch, MOB_HERD_CATTLE)) ||
 			     (MOB_FLAGGED(herd, MOB_HERD_SHEEP) && MOB_FLAGGED(ch, MOB_HERD_SHEEP)) ||
 			     (MOB_FLAGGED(herd, MOB_HERD_HORSE) && MOB_FLAGGED(ch, MOB_HERD_HORSE)) ) 
