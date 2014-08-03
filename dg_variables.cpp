@@ -1273,6 +1273,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							}
 						}
 					}
+					else if ( !strcasecmp ( field, "is_herd_cattle" ) )
+						snprintf ( str, slen, "%d", MOB_FLAGGED ( c, MOB_HERD_CATTLE ) );
+					else if ( !strcasecmp ( field, "is_herd_horse" ) )
+						snprintf ( str, slen, "%d", MOB_FLAGGED ( c, MOB_HERD_HORSE ) );
+					else if ( !strcasecmp ( field, "is_herd_sheep" ) )
+						snprintf ( str, slen, "%d", MOB_FLAGGED ( c, MOB_HERD_SHEEP ) );
 					else if ( !strcasecmp ( field, "is_pc" ) )
 						snprintf ( str, slen, "%d", !IS_NPC ( c ) );
 					else if ( !strcasecmp ( field, "is_pk" ) )
