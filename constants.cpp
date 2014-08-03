@@ -760,6 +760,9 @@ const char *preference_bits[] =
 	"NOTELEPORT",
 	"AUTOGROUP",
         "RETIRED",   // 55
+	"NOTITLE",
+	"DEEDMASTER",
+	"NOGRAPHICS",
 	"\n"
 };
 
