@@ -299,7 +299,8 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	}
 	if ( !IS_IMM ( ch ) )
 	{
-		if ( ( ZONE_FLAGGED ( IN_ROOM ( ch )->zone, ZONE_CLOSED ) ) )
+		if ( ZONE_FLAGGED ( EXIT ( ch, dir )->to_room->zone, ZONE_CLOSED ) &&
+		    !ZONE_FLAGGED ( IN_ROOM ( ch )->zone, ZONE_CLOSED ) )
 		{
 			ch->Send ( "That area isn't open yet. Try back later.\r\n" );
 			return ( 0 );
