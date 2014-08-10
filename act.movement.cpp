@@ -774,7 +774,7 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 
 	message_type = REST_MOVE;
 
-	if ( MOB_FLAGGED(ch, MOB_HERD_CATTLE) || MOB_FLAGGED(ch, MOB_HERD_SHEEP) || MOB_FLAGGED(ch, MOB_HERD_HORSE) )
+	if ( IS_HERD ( ch ) )
 		act("The entire herd follows the leader.", TRUE, ch, 0, 0, TO_ROOM);
 
 	if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
@@ -1016,23 +1016,20 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 
 	}
 
-	if ( IS_NPC(ch) && ( MOB_FLAGGED(ch, MOB_HERD_CATTLE) || MOB_FLAGGED(ch, MOB_HERD_SHEEP) || 
-			     MOB_FLAGGED(ch, MOB_HERD_HORSE) )) 
+	if ( IS_HERD ( ch ) || ( riding && IS_HERD ( RIDING ( ch ) ) ) )
 	{
 		for (herd = was_in->people; herd; herd = next) 
 		{
 			next = herd->next_in_room;
-			if ( FIGHTING ( herd ) || !AWAKE ( herd ) )
+			if ( !IS_HERD ( herd ) || FIGHTING ( herd ) || !AWAKE ( herd ) || RIDDEN_BY ( herd ) )
 				continue;
-			if ( (MOB_FLAGGED(herd, MOB_HERD_CATTLE) && MOB_FLAGGED(ch, MOB_HERD_CATTLE)) ||
-			     (MOB_FLAGGED(herd, MOB_HERD_SHEEP) && MOB_FLAGGED(ch, MOB_HERD_SHEEP)) ||
-			     (MOB_FLAGGED(herd, MOB_HERD_HORSE) && MOB_FLAGGED(ch, MOB_HERD_HORSE)) ) 
-			{
-				FOUND = TRUE;
-				char_from_room(herd);
-				char_to_room(herd, was_in->dir_option[dir]->to_room);
-				//log("%s is a herd animal.", GET_NAME(herd));
-			}
+			// Chance of an animal not following the herd: 5%
+			if ( number ( 1, 100 ) <= 5 )
+				continue;
+			FOUND = TRUE;
+			char_from_room(herd);
+			char_to_room(herd, was_in->dir_option[dir]->to_room);
+			//log("%s is a herd animal.", GET_NAME(herd));
 		}
 		if (FOUND)
 			act("A herd has arrived, following the leader.", TRUE, ch, 0, NULL, TO_ROOM);
