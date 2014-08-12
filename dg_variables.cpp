@@ -2246,45 +2246,21 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							snprintf ( str, slen, "%d", GET_OBJ_VNUM ( o ) );
 						}
 					}
-					else if ( !strcasecmp ( field, "val0" ) )
+					else if ( !strncasecmp ( field, "val", 3 ) )
 					{
-						if ( subfield && *subfield && is_number ( subfield ) )
+						string numstr = string ( field ).substr ( 3 );
+						if ( is_number ( numstr.c_str() ) )
 						{
-							GET_OBJ_VAL ( o, 0 ) = atoi ( subfield );
+							int num = atoi ( numstr.c_str() );
+							if ( num >= 0 && num < NUM_OBJ_VAL_POSITIONS )
+							{
+								if ( subfield && *subfield && is_number ( subfield ) )
+								{
+									GET_OBJ_VAL ( o, num ) = atoi ( subfield );
+								}
+								snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, num ) );
+							}
 						}
-						snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, 0 ) );
-					}
-					else if ( !strcasecmp ( field, "val1" ) )
-					{
-						if ( subfield && *subfield && is_number ( subfield ) )
-						{
-							GET_OBJ_VAL ( o, 1 ) = atoi ( subfield );
-						}
-						snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, 1 ) );
-					}
-					else if ( !strcasecmp ( field, "val2" ) )
-					{
-						if ( subfield && *subfield && is_number ( subfield ) )
-						{
-							GET_OBJ_VAL ( o, 2 ) = atoi ( subfield );
-						}
-						snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, 2 ) );
-					}
-					else if ( !strcasecmp ( field, "val3" ) )
-					{
-						if ( subfield && *subfield && is_number ( subfield ) )
-						{
-							GET_OBJ_VAL ( o, 3 ) = atoi ( subfield );
-						}
-						snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, 3 ) );
-					}
-					else if ( !strcasecmp ( field, "val4" ) )
-					{
-						if ( subfield && *subfield && is_number ( subfield ) )
-						{
-							GET_OBJ_VAL ( o, 4 ) = atoi ( subfield );
-						}
-						snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, 4 ) );
 					}
 					break;
 				case 'w':
