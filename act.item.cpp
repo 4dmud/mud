@@ -1097,6 +1097,12 @@ bool perform_get_from_container ( Character *ch, struct obj_data *obj,
 		return FALSE;
 	}
 
+	if ( ! ( CAN_WEAR ( obj, ITEM_WEAR_TAKE ) ) )
+	{
+		act ( "$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR );
+		return FALSE;
+	}
+
 	if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
 	{
 		act ( "$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR );
