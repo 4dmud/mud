@@ -58,10 +58,10 @@ void add_var ( struct trig_var_data **var_list,const char *name,const char *valu
 		return;
 	}
 
-	for ( vd = *var_list; vd && strcasecmp ( vd->name.c_str(), name ); vd = vd->next )
+	for ( vd = *var_list; vd && (( vd->context && vd->context != id ) || strcasecmp ( vd->name.c_str(), name )); vd = vd->next )
 		;
 
-	if ( vd && ( !vd->context || vd->context==id ) )
+	if ( vd )
 	{
 		vd->value.erase();
 	}
@@ -87,10 +87,10 @@ void add_var ( struct trig_var_data **var_list, string &name, string value, long
 		return;
 	}
 
-	for ( vd = *var_list; vd && strcasecmp ( vd->name.c_str(), name.c_str() ); vd = vd->next )
+	for ( vd = *var_list; vd && (( vd->context && vd->context != id ) || strcasecmp ( vd->name.c_str(), name.c_str() )); vd = vd->next )
 		;
 
-	if ( vd && ( !vd->context || vd->context==id ) )
+	if ( vd )
 	{
 		vd->value.erase();
 	}
@@ -1900,7 +1900,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				if ( SCRIPT ( c ) )
 				{
 					for ( vd = ( SCRIPT ( c ) )->global_vars; vd; vd = vd->next )
-						if ( !strcasecmp ( vd->name.c_str(), field ) )
+						if ( ( !SCRIPT ( c )->context || SCRIPT ( c )->context == vd->context ) && !strcasecmp ( vd->name.c_str(), field ) )
 							break;
 					if ( vd )
 						snprintf ( str, slen, "%s", vd->value.c_str() );
@@ -2286,7 +2286,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				if ( SCRIPT ( o ) )   /* check for global var */
 				{
 					for ( vd = ( SCRIPT ( o ) )->global_vars; vd; vd = vd->next )
-						if ( !strcasecmp ( vd->name.c_str(), field ) )
+						if ( ( !SCRIPT ( o )->context || SCRIPT ( o )->context == vd->context ) && !strcasecmp ( vd->name.c_str(), field ) )
 							break;
 					if ( vd )
 						snprintf ( str, slen, "%s", vd->value.c_str() );
@@ -2696,7 +2696,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				if ( SCRIPT ( r ) )   /* check for global var */
 				{
 					for ( vd = ( SCRIPT ( r ) )->global_vars; vd; vd = vd->next )
-						if ( !strcasecmp ( vd->name.c_str(), field ) )
+						if ( ( !SCRIPT ( r )->context || SCRIPT ( r )->context == vd->context ) && !strcasecmp ( vd->name.c_str(), field ) )
 							break;
 					if ( vd )
 						snprintf ( str, slen, "%s", vd->value.c_str() );
