@@ -4185,8 +4185,7 @@ Character *find_char_by_uid_in_lookup_table ( long uid )
 		if ( ch->second == NULL )
 			return NULL;
 		if ( DEAD ( ( ch->second ) ) )
-			log ( "find_char_by_uid_in_lookup_table : character is flagged to be extracted" );
-
+			log ( "find_char_by_uid_in_lookup_table : character %s in room %d is flagged to be extracted", ch->second->player.name, ch->second->in_room->number );
 
 		return ( ch->second );
 	}
