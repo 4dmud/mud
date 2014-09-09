@@ -2366,7 +2366,7 @@ void process_wait ( void *go, trig_data *trig, int type, char *cmd,
 	{
 		if ( sscanf ( arg, "%ld %c", &when, &c ) == 2 )
 		{
-			if ( c == 't' )
+			if ( c == 't' || c == 'T' )
 				when *= PULSES_PER_MUD_HOUR;
 			else if ( c == 's' )
 				when *= PASSES_PER_SEC;
