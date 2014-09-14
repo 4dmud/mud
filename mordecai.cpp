@@ -424,11 +424,11 @@ ACMD ( do_convey )
 			ch->Send ( "You can't afford that action.\r\n" );
 			return;
 		}
-		ch->Send ( "You convey tradepoints for exp \r\nat the rate of 1 tradepoint per level 30 mob's exp equivilent.\r\n" );
+		ch->Send ( "You convey tradepoints for exp \r\nat the rate of 1 tradepoint per level 40 mob's exp equivalent.\r\n" );
 		// Changed this to fixed value
 		// Since code isn't getting value.
 		//gain_exp ( ch, amount * mob_stats[30].exp );
-		int gain = amount * 1100000;
+		gold_int gain = amount * 1100000;
 		gain_exp (ch, gain);
 		TRADEPOINTS ( ch ) -= amount;
 		new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s conveyed %lld tradepoints to %d xp. (%d tradepoints remaining)",  GET_NAME ( ch ), amount, gain, TRADEPOINTS(ch));
