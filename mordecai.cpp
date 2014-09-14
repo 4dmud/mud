@@ -431,7 +431,7 @@ ACMD ( do_convey )
 		gold_int gain = amount * 1100000;
 		gain_exp (ch, gain);
 		TRADEPOINTS ( ch ) -= amount;
-		new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s conveyed %lld tradepoints to %d xp. (%d tradepoints remaining)",  GET_NAME ( ch ), amount, gain, TRADEPOINTS(ch));
+		new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s conveyed %lld tradepoints to %lld xp. (%d tradepoints remaining)",  GET_NAME ( ch ), amount, gain, TRADEPOINTS(ch));
 
 	}
 	else
