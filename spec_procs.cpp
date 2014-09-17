@@ -322,10 +322,10 @@ bool check_owner(Character *ch, struct obj_data *obj)
 
 SPECIAL(antidt)
 {
-  struct obj_data *obj;
+  struct obj_data *obj, *obj_in;
   int tokens;
 
-  if (argument[0] == ' ')
+  while (argument[0] == ' ')
     argument++;
   if (CMD_IS("trade")) {
     if (argument[0] == '\0') {
@@ -336,6 +336,10 @@ SPECIAL(antidt)
     }
 
     if (!str_cmp(argument, "full")) {
+        if (IS_SET_AR(PLR_FLAGS(ch), PLR_ANTI_DT)) {
+          ch->Send("You already have full protection!\r\n");
+          return 1;
+        }
         if (TRADEPOINTS(ch) < calc_tp(ch, 0)) {
           ch->Send("You do not have enough tradepoints for a full protection.\r\n");
           return 1;
@@ -359,6 +363,11 @@ SPECIAL(antidt)
           return 1;
         }
 
+        if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
+            ch->Send("You have already protected %s.\r\n", obj->short_description);
+            return 1;
+        }
+
         if (TRADEPOINTS(ch) < calc_tp(ch, 0)/10) {
           ch->Send("You do not have enough tradepoints to protect your item.\r\n");
           return 1;
@@ -373,7 +382,6 @@ SPECIAL(antidt)
         TRADEPOINTS(ch) -= tradepoint_loss;
 	  new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy death trap item protection for object %d, %s. (%d tradepoints remaining)",  GET_NAME ( ch ), tradepoint_loss, GET_OBJ_VNUM(obj), obj->short_description, TRADEPOINTS(ch));
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
-        obj->owner = GET_IDNUM ( ch );
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
         return 1;
     }
@@ -387,6 +395,10 @@ SPECIAL(antidt)
       }
    
       if (!str_cmp(argument, "full")) {
+          if (IS_SET_AR(PLR_FLAGS(ch), PLR_ANTI_DT)) {
+            ch->Send("You already have full protection!\r\n");
+            return 1;
+          }
           tokens = find_tokens(ch, SILVER_TOKEN, 0);
               if (tokens < calc_tp(ch, 1)) {
                   ch->Send("You do not have enough silver tokens!\r\n");
@@ -407,6 +419,10 @@ SPECIAL(antidt)
               ch->Send("You cannot protect tokens.\r\n");
               return 1;
           }
+          if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT)) {
+              ch->Send("You have already protected %s.\r\n", obj->short_description);
+              return 1;
+          }
           tokens = find_tokens(ch, BRONZE_TOKEN, 0);
           if (tokens < calc_tp(ch, 1)) {
               ch->Send("You do not have enough bronze tokens!\r\n");
@@ -418,7 +434,6 @@ SPECIAL(antidt)
           }
           find_tokens(ch, BRONZE_TOKEN, calc_tp(ch, 1));
           SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
-          obj->owner = GET_IDNUM ( ch );
           act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
           return 1;
       }
@@ -426,6 +441,38 @@ SPECIAL(antidt)
   else if (CMD_IS("list")) {
       ch->Send("For full protection, you need %d tradepoints or %d silver tokens.\r\n", calc_tp(ch, 0), calc_tp(ch, 1));
       ch->Send("For each item protection, you need %d tradepoints or %d bronze tokens.\r\n", calc_tp(ch, 0)/10, calc_tp(ch, 1));
+      ch->Send("Currently, you %shave full protection.\r\n", IS_SET_AR(PLR_FLAGS(ch), PLR_ANTI_DT) ? "" : "do not ");
+      ch->Send("The following of your items are protected:\r\n");
+      bool none = TRUE;
+      for (obj = ch->carrying; obj; obj = obj->next_content) {
+          if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && check_owner(ch, obj)) {
+             ch->Send("%s\r\n", obj->short_description);
+             none = FALSE;
+          }
+          for (obj_in = obj->contains; obj_in; obj_in = obj_in->next_content) {
+              if (IS_SET_AR(GET_OBJ_EXTRA(obj_in), ITEM_ANTI_DT) && check_owner(ch, obj_in)) {
+                 ch->Send("%s\r\n", obj_in->short_description);
+                 none = FALSE;
+              }
+          }
+      }
+      for (int i = 0; i < NUM_WEARS; i++) {
+          obj = ch->equipment[i];
+          if (!obj) 
+             continue;
+          if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && check_owner(ch, obj)) {
+             ch->Send("%s\r\n", obj->short_description);
+             none = FALSE;
+          }
+          for (obj_in = obj->contains; obj_in; obj_in = obj_in->next_content) {
+              if (IS_SET_AR(GET_OBJ_EXTRA(obj_in), ITEM_ANTI_DT) && check_owner(ch, obj_in)) {
+                 ch->Send("%s\r\n", obj_in->short_description);
+                 none = FALSE;
+              }
+          }
+      }
+      if (none)
+         ch->Send("None.\r\n");
       return 1;
   }
 
