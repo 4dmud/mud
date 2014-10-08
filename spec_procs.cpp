@@ -125,7 +125,7 @@
 #include "damage.h"
 #include "fight.h"
 #include "descriptor.h"
-
+#include "strutil.h"
 
 /*   external vars  */
 extern struct corpse_list_data *corpse_list;
@@ -2448,4 +2448,194 @@ SPECIAL(slave_collar)
   return FALSE;
 }
 
+void remote_rank ( Character* ch, int hof_rank, int middleman_vnum )
+{
+	// remote the hof rank to the Middleman
+	struct trig_var_data *vd = NULL;
+	Character *mob;
+	stringstream ss;
 
+	for ( mob = ch->in_room->people; mob; mob = mob->next )
+	{
+		if ( mob->vnum == middleman_vnum && SCRIPT ( mob ))
+			for ( vd = ( SCRIPT ( mob ) )->global_vars; vd; vd = vd->next )
+			{
+				if ( vd->name == "hof_rank" )
+				{
+					ss << hof_rank;
+					vd->value = ss.str();
+					return;
+				}
+			}
+	}
+}
+
+/* Add a new entry to middleman.hof if it's faster, maximum of 10 entries per quest type
+   or show the entries of the quest type to the player
+*/
+SPECIAL ( middleman_hof )
+{
+	ifstream fin;
+	ofstream fout;
+	string filename = string (LIB_ETC) + "middleman.hof";
+	vector<string> lines;
+	string line, new_line, quest_type, player, s, arg = Trim ( string(argument) );
+	int minutes, seconds, month, day, year, minutes_old, seconds_old;
+	int middleman_vnum = 10300, c = 0;
+	stringstream ss;
+	bool added_to_hof = FALSE, quest_type_seen = FALSE;
+	char buf[MAX_STRING_LENGTH];
+
+	if ( ch->vnum == middleman_vnum && !strcmp ( cmd_arg, "middleman_hof" ))
+	{
+		// parse the argument
+		ss.str ( arg );
+		ss >> quest_type >> s >> minutes >> seconds;
+
+		// open the file, create it if it doesn't exist
+		fin.open ( filename.c_str() );
+		if ( !fin.is_open() )
+		{
+			fout.open ( filename.c_str() );
+			fout.close();
+			fin.open ( filename.c_str() );
+		}
+
+		// add new entry if it's faster
+		while ( fin.good() )
+		{
+			getline ( fin, line );
+			if ( line == "" )
+			{
+				if ( !quest_type_seen )
+				{
+					lines.push_back ( arg );
+					remote_rank ( ch, 1, middleman_vnum );
+				}
+				else if ( !added_to_hof && c < 10 )
+				{
+					lines.push_back ( arg );
+					remote_rank ( ch, c+1, middleman_vnum );
+				}
+				break;
+			}
+			if ( quest_type != line.substr( 0, 6 ) )
+			{
+				if ( !added_to_hof && quest_type_seen && c < 10 )
+				{
+					lines.push_back ( arg );
+					remote_rank ( ch, c+1, middleman_vnum );
+					added_to_hof = TRUE;
+				}
+				lines.push_back ( line );
+				continue;
+			}
+			if ( added_to_hof )
+			{
+				if ( c < 10 )
+				{
+					lines.push_back( line );
+					c++;
+				}
+				continue;
+			}
+			quest_type_seen = TRUE;
+			ss.clear();
+			ss.str ( line );
+			ss >> s >> s >> minutes_old >> seconds_old;
+			if ( minutes < minutes_old || ( minutes == minutes_old && seconds < seconds_old ))
+			{
+				lines.push_back( arg );
+				c++;
+				remote_rank ( ch, c, middleman_vnum );
+				if ( c < 10 )
+				{
+					lines.push_back( line );
+					c++;
+				}
+				added_to_hof = TRUE;
+			}
+			else if ( c < 10 )
+			{
+				lines.push_back( line );
+				c++;
+			}
+		}
+		fin.close();
+
+		// write HoF
+		fout.open ( filename.c_str() );
+		if ( !fout.is_open() )
+		{
+			log ( "SYSERR: can't write to file %s", filename.c_str() );
+			return 0;
+		}
+		for ( uint i = 0; i < lines.size(); i++ )
+			fout << lines[ i ] << endl;
+		fout.close();
+		return 1;
+	}
+
+	else if ( !IS_NPC ( ch ) && CMD_IS ( "look" ) && arg != "" )
+	{
+		if ( arg.substr( 1, 5 ) != "_easy" && arg.substr( 1, 5 ) != "_hard" )
+			return 0;
+
+		fin.open ( filename.c_str() );
+		if ( !fin.is_open() )
+		{
+			log ( "SYSERR: can't open %s", filename.c_str() );
+			return 0;
+		}
+
+                // read HoF and get the largest player name length
+		c = 0;
+		while ( !fin.eof() )
+		{
+			getline ( fin, line );
+			if ( arg == line.substr( 0, 6 ))
+			{
+				lines.push_back( line );
+				ss.clear();
+				ss.str ( line );
+				ss >> s >> player;
+				if ( player.length() > c )
+				c = player.length();
+			}
+		}
+		fin.close();
+
+		// show HoF
+		if ( lines.size() )
+		{
+			DYN_DEFINE;
+			*buf = '\0';
+			DYN_CREATE;
+			*dynbuf = 0;
+			line = "{cyHall of Fame of ";
+			if ( arg == "a_easy" )
+				line += "The Assassin (easy){c0\r\n\r\n";
+			else if ( arg == "a_hard" )
+				line += "The Assassin (hard){c0\r\n\r\n";
+			s = "    Player  ";
+			s.insert( s.length(), c > 6 ? c - 6 : 0, ' ' );
+			s += "Time  Month Day Year\r\n";
+			line += s;
+			line.insert( line.length(), s.length() - 2, '-' );
+			line += "\r\n";
+			strcpy ( buf, line.c_str() );
+			DYN_RESIZE( buf );
+			for ( uint i = 0; i < lines.size(); i++ )
+			{
+				ss.clear();
+				ss.str ( lines[ i ] );
+				ss >> s >> player >> minutes >> seconds >> month >> day >> year;
+				snprintf( buf, sizeof( buf ), "%d. %s%-*s  %02d:%02d   %02d  %02d  %d\r\n", i + 1, i < 9 ? " " : "", c > 6 ? c : 6, player.c_str(), minutes, seconds, month, day, year);
+				DYN_RESIZE( buf );
+			}
+			page_string ( ch->desc, dynbuf, DYN_BUFFER );
+		}
+		return 1;
+	}
+	return 0;
+}

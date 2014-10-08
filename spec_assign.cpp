@@ -48,6 +48,7 @@ SPECIAL(high_dice);
 SPECIAL(janitor);
 SPECIAL(magic_user);
 SPECIAL(mayor);
+SPECIAL(middleman_hof);
 SPECIAL(pet_shops);
 SPECIAL(postmaster);
 SPECIAL(puff);
@@ -299,6 +300,7 @@ void assign_mobiles(void)
     // mobs with level 3 poison
     ASSIGNMOB(8148, snake);
 
+    ASSIGNMOB(10300, middleman_hof);
 }
 
 
