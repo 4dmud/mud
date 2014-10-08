@@ -2064,8 +2064,8 @@ void look_around ( Character *ch )
 	if ( !*zonename )
 		return;
 	len = strlen ( zonename );
-	for ( x = 0; x < len; x++ )
-		if ( zonename[x] == '-' )
+	for ( x = 1; x < len; x++ )
+		if ( zonename[x] == '-' && zonename[x-1] == ' ' )
 		{
 			zonename[x] = '\0';
 			break;

@@ -943,8 +943,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							snprintf ( str, slen,"1" );
 					}
 					else if ( !strcasecmp ( field, "class_tier" ) )
+					{
+						if ( subfield && *subfield && IS_NPC ( c ) )
+						{
+							MOB_TIER ( c ) = IRANGE ( 0, atoi ( subfield), 4 );
+						}
 						snprintf ( str, slen, "%d", current_class_is_tier_num ( c ) );
 
+					}
 					else if ( !strcasecmp ( field, "clan" ) ) 
                                         {
                                                 if ( subfield && *subfield ) 
@@ -1292,6 +1298,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", PLR_FLAGGED ( c, PLR_ROLEPLAYER ) );
 					else if ( !strcasecmp ( field, "is_rpl" ) )
 						snprintf ( str, slen, "%d", PLR_FLAGGED ( c, PLR_RP_LEADER ) );
+					else if ( !strcasecmp ( field, "is_wizinvis" ) )
+						snprintf ( str, slen, "%d", MOB_FLAGGED ( c, MOB_WIZINVIS ) );
 					else if ( !strcasecmp ( field, "id" ) )
 						snprintf ( str, slen, "%ld", GET_ID ( c ) );
 					else if ( !strcasecmp ( field, "int" ) )
@@ -1403,7 +1411,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'l':
 
 					if ( !strcasecmp ( field, "level" ) )
+					{
+						if ( subfield && *subfield && IS_NPC ( c ) )
+						{
+							GET_LEVEL ( c ) = IRANGE ( 1, atoi ( subfield ), 150 );
+						}
 						snprintf ( str, slen, "%d", GET_LEVEL ( c ) );
+					}
 					else if ( !strcasecmp ( field, "longdesc" ) )
 						snprintf ( str, slen, "%s", GET_LDESC ( c ) );
 					break;
@@ -2689,7 +2703,25 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					}/* end of switch*/
 					break;
-			}
+				case 'z':
+					if ( !strcasecmp ( field, "zonename" ) )
+					{
+						if ( real_room ( r->number) != NULL )
+						{
+							snprintf ( str, slen, "%s", zone_table[r->zone].name );
+							int len = strlen ( str );
+							for ( int x = 1; x < len; x++ )
+								if ( str[x] == '-' && str[x-1] == ' ' )
+								{
+									str[x] = '\0';
+									break;
+								}
+						}
+						else
+							*str = '\0';
+					}
+					break;
+			} /* end of switch*/
 
 			if ( *str == '\x1' ) /* no match in switch */
 			{
