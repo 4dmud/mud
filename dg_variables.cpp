@@ -600,6 +600,18 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 				}
 			}
+			else if ( !strcasecmp ( var, "mod" ) )
+			{
+				if ( !field || !*field || !subfield || !*subfield || !is_number (field) || !is_number (subfield) )
+				{
+					script_log ( "Trigger: %s, VNum %d, mod.x(y) - illegal syntax", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+					strcpy ( str, "0" );
+				}
+				else if ( atoi ( field ) < 0 || atoi ( subfield ) <= 0 )
+					strcpy ( str, "0" );
+				else
+					snprintf ( str, slen, "%d", atoi ( field ) % atoi ( subfield ) );
+			}
 			else if ( !strcasecmp ( var, "people" ) )
 			{
 				snprintf ( str, slen, "%d", ( ( num = atoi ( field ) ) > 0 ) ? trgvar_in_room ( num ) : 0 );

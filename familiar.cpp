@@ -311,7 +311,7 @@ void parse_rogue_commands(Character *ch) {
         }
     }
 
-    if ((vict = parse_aggressive(ch)) != NULL) {
+    if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && (vict = parse_aggressive(ch)) != NULL) {
         if (GET_POS(ch) < POS_FIGHTING)
             return;
         switch (number(0, GET_LEVEL(ch)/20)) {
