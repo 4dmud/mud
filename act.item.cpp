@@ -900,7 +900,12 @@ int count_magic_items ( Character *ch )
 bool can_take_obj ( Character *ch, struct obj_data *obj )
 {
 //	int i;
-	if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
+	if ( ! ( CAN_WEAR ( obj, ITEM_WEAR_TAKE ) ) )
+	{
+		act ( "$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR );
+		return FALSE;
+	}
+	else if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
 	{
 		act ( "$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
@@ -908,11 +913,6 @@ bool can_take_obj ( Character *ch, struct obj_data *obj )
 	else if ( ( IS_CARRYING_W ( ch ) + GET_OBJ_WEIGHT ( obj ) ) > CAN_CARRY_W ( ch ) )
 	{
 		act ( "$p: you can't carry that much weight.", FALSE, ch, obj, 0, TO_CHAR );
-		return FALSE;
-	}
-	else if ( ! ( CAN_WEAR ( obj, ITEM_WEAR_TAKE ) ) )
-	{
-		act ( "$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
 	}
 	/* else if ( is_magic ( obj ) && ( i=count_magic_items ( ch ) ) >= MAX_MAGIC_ITEMS )
