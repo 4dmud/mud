@@ -1903,7 +1903,7 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	}
 	else if ( obj->in_obj )            /* In an object */
 	{
-		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
+		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM ( obj->in_obj ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
 			log ( "SYSERR: Arti %s crumbled in artisave container in room %d ", obj->name, IN_ROOM ( obj->in_obj )->number );
 
 		for ( loop = obj->contains; loop; loop = obj->contains )
