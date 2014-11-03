@@ -1175,13 +1175,24 @@ void medit_parse ( Descriptor *d, char *arg )
 				break;
 			else if ( i <= NUM_MOB_FLAGS )
 			{
-				switch ( i )
+				switch ( i - 1 )
 				{
 					case MOB_AGGRESSIVE:
 						if ( !IS_SET_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGRESSIVE ) )
 						{
 							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOCHARM );
 							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOSUMMON );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_GOOD );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_EVIL );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_MALE );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_FEMALE );
+							SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_SEX_NEUTRAL );
+						}
+						else
+						{
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOCHARM );
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOSUMMON );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_GOOD );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_EVIL );
 							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
@@ -1200,6 +1211,15 @@ void medit_parse ( Descriptor *d, char *arg )
 							SET_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_DETECT_INVIS );
 							SET_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_SENSE_LIFE );
 							SET_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_NOTRACK );
+						}
+						else
+						{
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOCHARM );
+							REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOSUMMON );
+							REMOVE_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_INFRAVISION );
+							REMOVE_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_DETECT_INVIS );
+							REMOVE_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_SENSE_LIFE );
+							REMOVE_BIT_AR ( AFF_FLAGS ( OLC_MOB ( d ) ), AFF_NOTRACK );
 						}
 				}
 				TOGGLE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), ( i - 1 ) );
