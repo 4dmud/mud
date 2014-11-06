@@ -1476,18 +1476,28 @@ Character *get_char_num ( mob_vnum nr )
 }
 
 
-void pause_timer(struct obj_data* object) {
-  if (GET_OBJ_EXPIRE(object)) {
-    GET_OBJ_SAVED_REMAINING_EXPIRE(object) = GET_OBJ_EXPIRE(object) - time(0);
-    GET_OBJ_EXPIRE(object) = 0;
-  }
+void pause_timer ( struct obj_data* object )
+{
+	if ( GET_OBJ_EXPIRE ( object ))
+	{
+		GET_OBJ_SAVED_REMAINING_EXPIRE ( object ) = GET_OBJ_EXPIRE ( object ) - time ( 0 );
+		GET_OBJ_EXPIRE ( object ) = 0;
+		if ( GET_TIMER_EVENT ( object ) != NULL )
+		{
+			event_cancel ( GET_TIMER_EVENT ( object ));
+			GET_TIMER_EVENT ( object ) = NULL;
+		}
+	}
 }
 
-void resume_timer(struct obj_data* object) {
-  if (GET_OBJ_SAVED_REMAINING_EXPIRE(object)) {
-    GET_OBJ_EXPIRE(object) = time(0) + GET_OBJ_SAVED_REMAINING_EXPIRE(object);
-    GET_OBJ_SAVED_REMAINING_EXPIRE(object) = 0;
-  }
+void resume_timer ( struct obj_data* object )
+{
+	if ( GET_OBJ_SAVED_REMAINING_EXPIRE ( object ))
+	{
+		GET_OBJ_EXPIRE ( object ) = time ( 0 ) + GET_OBJ_SAVED_REMAINING_EXPIRE ( object );
+		GET_OBJ_SAVED_REMAINING_EXPIRE(object) = 0;
+		check_timer ( object );
+	}
 }
 
 inline Room* artifact_room(struct obj_data* object) {

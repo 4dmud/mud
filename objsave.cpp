@@ -1472,8 +1472,9 @@ int load_objects_to_room(room_rnum rnum, FILE *fl)
       obj_to_room(temp, rnum);
       relocate_obj(rnum, NULL, temp, locate, cont_row);
       if ( IS_OBJ_STAT (temp, ITEM_ARTIFACT))
-         pause_timer(temp); 		
-      check_timer(temp);
+         pause_timer(temp);
+      else
+	 check_timer(temp);
     }
   }
 
