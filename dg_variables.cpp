@@ -2377,7 +2377,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					break;
 				case 'd':
-					if ( !strcasecmp ( field, "down" ) )
+					if ( !strcasecmp ( field, "dimension" ) )
+					{
+						snprintf ( str, slen, "%s", dimension_types[ zone_table[ r->zone ].dimension ] );
+					}
+					else if ( !strcasecmp ( field, "down" ) )
 					{
 						if ( R_EXIT ( r, DOWN ) )
 						{
