@@ -4084,9 +4084,9 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 
         /* New vehicle code by Horus                     *
          * If its vehicle, load the room for the vehicle */
-        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) 
-            if (!create_vehicle_room(obj)) 
-                GET_OBJ_VAL(obj, 1) = -1;
+
+	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 )
+		create_vehicle_room ( obj );
 
 	return ( obj );
 }

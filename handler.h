@@ -53,7 +53,7 @@ void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
 int obj_from_obj(struct obj_data *obj);
 void object_list_new_owner(struct obj_data *list, Character *ch);
 
-void extract_obj(struct obj_data *obj);
+void extract_obj(struct obj_data *obj, bool show_warning = true);
 void extract_obj_q(struct obj_data *obj);
 
 /* ******* characters ********* */

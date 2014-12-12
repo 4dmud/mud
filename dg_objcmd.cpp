@@ -936,7 +936,7 @@ OCMD ( do_oat )
 	obj_command_interpreter ( object, command );
 
 	if ( object->in_room == loc )
-		extract_obj ( object );
+		extract_obj ( object, FALSE );
 }
 OCMD ( do_ocontains )
 {

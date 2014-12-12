@@ -2004,7 +2004,6 @@ ACMD ( do_enter )
 			{
 				switch ( GET_OBJ_TYPE ( obj ) )
 				{
-                                        case ITEM_VEHICLE2:
 					case ITEM_PORTAL:
 						to_room = "$n enters $p.";
 						to_char = "You enter $p.";
@@ -3159,7 +3158,7 @@ int perform_move_obj ( struct obj_data *obj, int dir, Character *ch )
 }
 
 /* do_simple_obj_move assumes
-
+16 8-1400
  *   Returns :
  *   1 : If success.
  *   0 : If fail
@@ -3170,7 +3169,10 @@ int do_simple_obj_move ( struct obj_data *obj, int dir, Character *ch )
 	Character *p;
 	void view_room_by_rnum ( Character *ch, room_rnum is_in );
 
-	switch ( SECT ( IN_ROOM ( obj ) ) )
+	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE || GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 )
+		send_to_room ( IN_ROOM ( obj ), "%s leaves %s.\r\n",obj->short_description, dirs[dir] );
+
+	else switch ( SECT ( IN_ROOM ( obj ) ) )
 	{
 		case SECT_INSIDE:
 		case SECT_CITY:
@@ -3215,7 +3217,7 @@ int do_simple_obj_move ( struct obj_data *obj, int dir, Character *ch )
 	obj_to_room ( obj, was_in->dir_option[dir]->to_room );
 	send_to_room ( IN_ROOM ( obj ), "%s has arrived.\r\n", obj->short_description );
 	/* vehicle code */
-	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE )
+	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE || GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 )
 	{
 		if ( ( was_in = real_room ( GET_OBJ_VAL ( obj, 0 ) ) ) != NULL )
 		{

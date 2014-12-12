@@ -1664,7 +1664,7 @@ void object_list_new_owner ( struct obj_data *list, Character *ch )
 }
 
 /* Extract an object from the world */
-void extract_obj ( struct obj_data *obj )
+void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 {
 
 	Character *ch, *tch, *next = NULL;
@@ -1695,9 +1695,10 @@ void extract_obj ( struct obj_data *obj )
 		item_from_locker ( obj->in_locker, obj );
 
         /* vehicle2 code by Horus */
+/*
         if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE2) 
             delete_vehicle(obj);
-
+*/
 	unhitch_item ( obj );
 
 	/* Normal extract_obj code */
@@ -1728,7 +1729,7 @@ void extract_obj ( struct obj_data *obj )
 	}
 
 	/* Purge a vehicle and leave the contents in the room -- Kalten */
-	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE && room != NULL )
+	if ( ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE || GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 ) && room != NULL )
 	{
 		if ( room->number != NOWHERE )
 		{
@@ -1746,7 +1747,10 @@ void extract_obj ( struct obj_data *obj )
 				if ( from != NULL )
 				{
 					if ( target == from )
-						new_mudlog ( NRM, LVL_GOD, FALSE, "Vehicle %d's inside room is the same as its outside room!", GET_OBJ_VNUM ( obj ) );
+					{
+						if ( show_warning )
+							new_mudlog ( NRM, LVL_GOD, FALSE, "Vehicle %d's inside room is the same as its outside room!", GET_OBJ_VNUM ( obj ) );
+					}
 					else
 					{
 						while ( from->people != NULL )

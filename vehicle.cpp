@@ -55,7 +55,7 @@ struct obj_data *find_vehicle_by_vnum(int vnum) {
     struct obj_data *i;
     for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
         i = ob->second;
-        if (GET_OBJ_TYPE(i) == ITEM_VEHICLE)
+        if ( GET_OBJ_TYPE(i) == ITEM_VEHICLE || GET_OBJ_TYPE(i) == ITEM_VEHICLE2 )
             if (GET_OBJ_VNUM(i) == vnum)
                 return (i);
     }
@@ -110,31 +110,43 @@ ACMD(do_drive) {
                                        };
     struct obj_data *vehicle, *controls;//, *vehicle_in_out; /* what is this for thotter? */
 
-    controls = get_obj_in_list_type(ITEM_V_CONTROLS,
-                                    IN_ROOM(ch)->contents);
-    if (!controls) {
-        ch->Send("ERROR!  Vehicle controls present yet not present!\r\n");
-        return;
-    }
-    vehicle = find_vehicle_by_vnum(GET_OBJ_VAL(controls, 0));
-    if (!vehicle) {
-        ch->Send("ERROR!  Vehicle has been lost somehow!\r\n");
-        return;
+    vehicle = IN_ROOM ( ch )->vehicle;
+
+    two_arguments ( argument, arg, buf2 );
+
+    if ( vehicle == NULL )
+    {
+	controls = get_obj_in_list_type ( ITEM_V_CONTROLS, IN_ROOM(ch)->contents );
+
+	if ( !controls )
+	{
+		ch->Send ( "ERROR!  Vehicle controls present yet not present!\r\n" );
+		return;
+	}
+
+	vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( controls, 0 ));
+
+	if ( !vehicle )
+	{
+		ch->Send ( "ERROR!  Vehicle has been lost somehow!\r\n" );
+		return;
+	}
+
+	if ( IS_AFFECTED ( ch, AFF_BLIND ))
+	{
+		/* Blind characters can't drive! */
+		ch->Send ( "You can't see the controls!\r\n" );
+		return;
+	}
+
+	/* Gotta give us a direction... */
+	if ( !*arg )
+	{
+		ch->Send ( "Drive which direction?\r\n" );
+		return;
+	}
     }
 
-    if (IS_AFFECTED(ch, AFF_BLIND)) {
-        /* Blind characters can't drive! */
-        ch->Send("You can't see the controls!\r\n");
-        return;
-    }
-
-  two_arguments(argument, arg, buf2);
-
-    /* Gotta give us a direction... */
-    if (!*arg) {
-        send_to_char("Drive which direction?\r\n", ch);
-        return;
-    }
     /* Disabled until it doesn't freeze the mud anymore (Thotter)
         // Driving Into another Vehicle
         if (is_abbrev(arg, "into")) {
@@ -212,66 +224,61 @@ ACMD(do_drive) {
     	return;
         } 
         */
-    else
-        for (x = 0; x < (GET_OBJ_VAL(vehicle, 1) ? PILOT_DIRS :
-                         DRIVE_DIRS); x++)
+//    else
+        for ( x = 0; x < ( GET_OBJ_VAL ( vehicle, 1 ) ? PILOT_DIRS : DRIVE_DIRS); x++ )
             /* Drive in a direction... */
-            if (is_abbrev(arg, dirParse[x].dirCmd)) {
+            if ( is_abbrev ( arg, dirParse[x].dirCmd ))
+            {
                 dir = dirParse[x].dirNum;
                 /* Ok we found the direction! */
-                if (ch == NULL || dir < 0 || dir >= NUM_OF_DIRS)
+                if ( ch == NULL || dir < 0 || dir >= NUM_OF_DIRS )
                     /* But something is invalid */
                     return;
-                else if (!EXIT(vehicle, dir) || EXIT(vehicle, dir)->to_room == NULL) {
+                else if ( !EXIT ( vehicle, dir ) || EXIT ( vehicle, dir )->to_room == NULL)
+                {
                     /* But there is no exit that way */
-                    ch->Send("Alas, you cannot go that way...\r\n");
+                    ch->Send ( "Alas, you cannot go that way...\r\n" );
                     return;
-                } else
-                    if (IS_SET(EXIT(vehicle, dir)->exit_info, EX_CLOSED)) {
-                        /* But the door is closed */
-                        if (EXIT(vehicle, dir)->keyword) {
-                            ch->Send( "The %s seems to be closed.\r\n",
-                                      fname(EXIT(vehicle, dir)->keyword));
-                        } else
-                            ch->Send("It seems to be closed.\r\n");
-                        return;
-                    } else
-                        if (!IS_SET_AR
-                                (ROOM_FLAGS(EXIT(vehicle, dir)->to_room),
-                                 ROOM_VEHICLE)) {
-                            /* But the vehicle can't go that way */
-                            ch->Send("The vehicle can't manage that terrain.\r\n");
-                            return;
-                        } else {
-                            /* But nothing!  Let's go that way! */
-                            room_rnum was_in, is_in;
+                }
+                else if ( IS_SET ( EXIT ( vehicle, dir )->exit_info, EX_CLOSED ))
+                {
+                    /* But the door is closed */
+                    if ( EXIT ( vehicle, dir )->keyword)
+                        ch->Send ( "The %s seems to be closed.\r\n", fname ( EXIT ( vehicle, dir )->keyword ));
+                    else ch->Send ( "It seems to be closed.\r\n" );
+                    return;
+                }
+                else if ( !IS_SET_AR ( ROOM_FLAGS ( EXIT ( vehicle, dir )->to_room ), ROOM_VEHICLE ))
+                {
+                    /* But the vehicle can't go that way */
+                    ch->Send ( "The vehicle can't manage that terrain.\r\n" );
+                    return;
+                }
+                else
+                {
+                    /* But nothing!  Let's go that way! */
+                    room_rnum was_in, is_in;
 
-                            send_to_room(IN_ROOM(vehicle), "%s leaves %s.\r\n",
-                                         vehicle->short_description, dirs[dir]);
+                    send_to_room ( IN_ROOM ( vehicle ), "%s leaves %s.\r\n", vehicle->short_description, dirs[dir] );
 
-                            was_in = IN_ROOM(vehicle);
-                            obj_from_room(vehicle);
-                            obj_to_room(vehicle,
-                                        was_in->dir_option[dir]->to_room);
+                    was_in = IN_ROOM ( vehicle );
+                    obj_from_room ( vehicle );
+                    obj_to_room ( vehicle, was_in->dir_option[dir]->to_room );
 
-                            is_in = vehicle->in_room;
+                    is_in = vehicle->in_room;
 
-                            for (people = IN_ROOM(ch)->people;
-                                    people != NULL; people = people->next_in_room)
-                                if (people->desc != NULL)
-                                    view_room_by_rnum(people, is_in);
+                    for (people = IN_ROOM ( ch )->people; people != NULL; people = people->next_in_room )
+                        if (people->desc != NULL)
+                            view_room_by_rnum ( people, is_in );
 
-                            send_to_room(is_in, "%s enters from the %s.\r\n",
-                                         vehicle->short_description,
-                                         dirs[rev_dir[dir]]);
+                    send_to_room ( is_in, "%s enters from the %s.\r\n", vehicle->short_description, dirs[rev_dir[dir]] );
 
-                            if (!enter_wtrigger(is_in, ch, dir))
-                                return;
+                    enter_wtrigger ( is_in, ch, dir );
 
-                            return;
-                        }
+                    return;
+                }
             }
-    ch->Send("Thats not a valid direction.\r\n");
+    ch->Send ( "That's not a valid direction.\r\n" );
     return;
 }
 
@@ -279,35 +286,36 @@ ACMD(do_drive) {
 SPECIAL(vehicle) {
     struct obj_data *obj = NULL;
     char arg[MAX_INPUT_LENGTH];
-    if (CMD_IS("enter")) {
+
+    if ( CMD_IS ( "enter" ))
+    {
         one_argument(argument, arg);
 
-        if (!*arg) {
+        if ( !*arg )
+	{
             send_to_char("Enter what?\r\n", ch);
-            return (1);
+            return 1;
         }
 
-        obj =
-            get_obj_in_list_vis(ch, arg, NULL,
-                                IN_ROOM(ch)->contents);
+        obj = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents );
 
-        if (!obj) {
-            ch->Send("Nothing by that name is here to enter!\r\n");
-            return (1);
-        } else if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE) {
-
-
-
+        if ( !obj )
+	{
+            ch->Send ( "Nothing by that name is here to enter!\r\n" );
+            return 1;
+        }
+	else if ( GET_OBJ_TYPE(obj) == ITEM_VEHICLE || GET_OBJ_TYPE(obj) == ITEM_VEHICLE2 )
+	{
             act("You climb into $o.", TRUE, ch, obj, 0, TO_CHAR);
             act("$n climbs into $o.", TRUE, ch, obj, 0, TO_ROOM);
             move_char_to(ch, real_room(GET_OBJ_VAL(obj, 0)));
             act("$n climbs in.", TRUE, ch, 0, 0, TO_ROOM);
             do_look(ch, (char *)"", 0, 0);
-            return (1);
+            return 1;
         }
         return 0;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -894,8 +902,8 @@ SPECIAL(vehicle2)
 {
   struct obj_data *vehicle;
   Room *dest;
-  struct vehicle_attachment_data *attach;
-  
+//  struct vehicle_attachment_data *attach;
+
   /* some insanity checks */
   if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
     return FALSE;
@@ -911,12 +919,13 @@ SPECIAL(vehicle2)
   }
 
   /* all of these commands depend on what attachments are made */
+/*
   if (CMD_IS("jump")) {
        attach = find_attachment(vehicle, V_ATT_HYPERJUMP);
        if (!attach) return FALSE;
        return vehicle_jump(ch, argument);
   }
-      
+*/
   return FALSE;
 }
 
@@ -939,9 +948,21 @@ int create_vehicle_room(struct obj_data *obj)
   char buf[MAX_STRING_LENGTH];
   room_vnum vnum;
   
-  vnum = find_new_vehicle_room();
-  if (vnum == -1) return 0;
+  if ( GET_OBJ_VAL ( obj, 0 ) >= 0 )
+  {
+	vroom = world_vnum[ GET_OBJ_VAL ( obj, 0 ) ];
+	vroom->vehicle = obj;
+	ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
+	ASSIGNROOM ( vroom->number, vehicle2 );
+	return 1;
+  }
 
+  vnum = find_new_vehicle_room();
+  if ( vnum == -1 )
+  {
+	log ( "SYSERR: couldn't find a new vehicle room" );
+	return 0;
+  }
   vroom = new Room();
   vroom->number = vnum; 
   vroom->vehicle = obj;
@@ -968,8 +989,9 @@ int create_vehicle_room(struct obj_data *obj)
       return 0;
   }
 
-  GET_OBJ_VAL(obj, 1) = vnum;
-  ASSIGNROOM(vnum, vehicle2);
+  GET_OBJ_VAL ( obj, 0 ) = vnum;
+  ASSIGNROOM ( vnum, vehicle2 );
+  ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
   return 1; 
 }
 

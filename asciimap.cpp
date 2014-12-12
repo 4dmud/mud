@@ -91,7 +91,7 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 	if ( show_vehicles )
 	{
 		for ( obj = room->contents; obj; obj = obj->next_content )
-			if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE )
+			if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE || GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 )
 				mapgrid[x][y] = SECT_VEHICLE;
 	}
 

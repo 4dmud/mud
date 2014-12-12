@@ -1621,7 +1621,7 @@ ACMD(do_mcollision) {
 
     for (obj = IN_ROOM(ch)->contents; obj; obj = obj_next) {
         obj_next = obj->next_content;
-        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE) {
+        if (GET_OBJ_TYPE(obj) == ITEM_VEHICLE || GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 ) {
             IN_ROOM(ch) = real_room(GET_OBJ_VAL(obj, 0));
             GET_OBJ_VAL(obj, 2) -= damage;
             if (GET_OBJ_VAL(obj, 2) <= 0) {   // blow it up
