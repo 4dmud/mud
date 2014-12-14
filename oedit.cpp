@@ -661,10 +661,8 @@ void oedit_disp_val1_menu ( Descriptor *d )
 			d->Output ( "Ticks to countdown to explosion : " );
 			break;
 		case ITEM_VEHICLE:
-			d->Output ( "Vnum of vehicle room : " );
-			break;
 		case ITEM_VEHICLE2:
-			d->Output ( "Vnum of vehicle room (enter -1 for a default room which desc will equal the extra desc) : " );
+			d->Output ( "Vnum of vehicle room : " );
 			break;
 /*
                 case ITEM_VEHICLE2:

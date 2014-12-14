@@ -945,18 +945,15 @@ room_vnum find_new_vehicle_room()
 int create_vehicle_room(struct obj_data *obj)
 {
   Room *vroom;
-  char buf[MAX_STRING_LENGTH];
-  room_vnum vnum;
+//  char buf[MAX_STRING_LENGTH];
+//  room_vnum vnum;
   
-  if ( GET_OBJ_VAL ( obj, 0 ) >= 0 )
-  {
-	vroom = world_vnum[ GET_OBJ_VAL ( obj, 0 ) ];
-	vroom->vehicle = obj;
-	ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
-	ASSIGNROOM ( vroom->number, vehicle2 );
-	return 1;
-  }
+  vroom = world_vnum[ GET_OBJ_VAL ( obj, 0 ) ];
+  vroom->vehicle = obj;
+  ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
+  ASSIGNROOM ( vroom->number, vehicle2 );
 
+/*
   vnum = find_new_vehicle_room();
   if ( vnum == -1 )
   {
@@ -992,6 +989,7 @@ int create_vehicle_room(struct obj_data *obj)
   GET_OBJ_VAL ( obj, 0 ) = vnum;
   ASSIGNROOM ( vnum, vehicle2 );
   ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
+*/
   return 1; 
 }
 
