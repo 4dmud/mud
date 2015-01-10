@@ -103,7 +103,7 @@ void script_damage ( Character *vict, int dam )
 	{
 		if ( !IS_NPC ( vict ) )
 			new_mudlog ( BRF, 0, TRUE, "%s killed by damage at %s [%d]", GET_NAME ( vict ), vict->in_room->name, vict->in_room->number );
-		die ( vict, NULL );
+		die ( vict, FIGHTING ( vict ) );
 	}
 }
 

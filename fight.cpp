@@ -5455,12 +5455,7 @@ void raw_kill ( Character *ch, Character *killer )
 	/* To make ordinary commands work in scripts.  welcor */
 	GET_POS ( ch ) = POS_STANDING;
 
-	if ( killer )
-	{
-		if ( death_mtrigger ( ch, killer ) )
-			death_cry ( ch );
-	}
-	else
+	if ( death_mtrigger ( ch, killer ) )
 		death_cry ( ch );
 
 	update_pos ( ch );
