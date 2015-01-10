@@ -2908,6 +2908,21 @@ int generic_find ( char *arg, bitvector_t bitvector, Character *ch,
 			return ( FIND_CHAR_WORLD );
 	}
 
+	if ( IS_SET ( bitvector, FIND_OBJ_ROOM ) )
+	{
+		if ( ( *tar_obj =
+		            get_obj_in_list_vis ( ch, name, &number,
+		                                  IN_ROOM ( ch )->contents ) ) != NULL )
+			return ( FIND_OBJ_ROOM );
+	}
+
+	if ( IS_SET ( bitvector, FIND_OBJ_INV ) )
+	{
+		if ( ( *tar_obj =
+		            get_obj_in_list_vis ( ch, name, &number, ch->carrying ) ) != NULL )
+			return ( FIND_OBJ_INV );
+	}
+
 	if ( IS_SET ( bitvector, FIND_OBJ_EQUIP ) )
 	{
 		for ( found = FALSE, i = 0; i < NUM_WEARS && !found; i++ )
@@ -2919,21 +2934,6 @@ int generic_find ( char *arg, bitvector_t bitvector, Character *ch,
 			}
 		if ( found )
 			return ( FIND_OBJ_EQUIP );
-	}
-
-	if ( IS_SET ( bitvector, FIND_OBJ_INV ) )
-	{
-		if ( ( *tar_obj =
-		            get_obj_in_list_vis ( ch, name, &number, ch->carrying ) ) != NULL )
-			return ( FIND_OBJ_INV );
-	}
-
-	if ( IS_SET ( bitvector, FIND_OBJ_ROOM ) )
-	{
-		if ( ( *tar_obj =
-		            get_obj_in_list_vis ( ch, name, &number,
-		                                  IN_ROOM ( ch )->contents ) ) != NULL )
-			return ( FIND_OBJ_ROOM );
 	}
 
 	if ( IS_SET ( bitvector, FIND_OBJ_WORLD ) )
