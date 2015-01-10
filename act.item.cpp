@@ -664,7 +664,7 @@ bool is_put_ok ( Character *ch, char *obj_desc, char *cont_desc, int obj_dotmode
 		return FALSE;
 	}
 
-	generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_Character, cont_data );
+	generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_Character, cont_data );
 
 	// container not found
 	if ( !cont_data || !*cont_data )
@@ -910,7 +910,8 @@ bool can_take_obj ( Character *ch, struct obj_data *obj )
 		act ( "$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
 	}
-	else if ( ( IS_CARRYING_W ( ch ) + GET_OBJ_WEIGHT ( obj ) ) > CAN_CARRY_W ( ch ) )
+	else if ( ( IN_ROOM ( obj ) || ( obj->in_obj && IN_ROOM ( obj->in_obj ) ) )
+		&& ( IS_CARRYING_W ( ch ) + GET_OBJ_WEIGHT ( obj ) > CAN_CARRY_W ( ch ) ) )
 	{
 		act ( "$p: you can't carry that much weight.", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
@@ -1265,7 +1266,7 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 
 	if ( cont_dotmode == FIND_INDIV )
 	{
-		mode = generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_char, &cont );
+		mode = generic_find ( cont_desc, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &cont );
 		if ( !cont )
 		{
 			ch->Send ( "You don't have %s %s.\r\n", AN ( cont_desc ), cont_desc );
