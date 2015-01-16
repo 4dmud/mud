@@ -4654,13 +4654,14 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
             MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
 
-            MSDPSetNumber( d, eMSDP_STR, ch->real_abils.str );
+            MSDPSetNumber( d, eMSDP_INT_PERM, ch->real_abils.intel );
+            MSDPSetNumber( d, eMSDP_WIS_PERM, ch->real_abils.wis );
+            MSDPSetNumber( d, eMSDP_CON_PERM, ch->real_abils.con );
+            MSDPSetNumber( d, eMSDP_DEX_PERM, ch->real_abils.dex );
+            MSDPSetNumber( d, eMSDP_CHA_PERM, ch->real_abils.cha );
+            MSDPSetNumber( d, eMSDP_STR_PERM, ch->real_abils.str );
             MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
-            MSDPSetNumber( d, eMSDP_INT, ch->real_abils.intel );
-            MSDPSetNumber( d, eMSDP_WIS, ch->real_abils.wis );
-            MSDPSetNumber( d, eMSDP_CON, ch->real_abils.con );
-            MSDPSetNumber( d, eMSDP_DEX, ch->real_abils.dex );
-            MSDPSetNumber( d, eMSDP_CHA, ch->real_abils.cha );
+            
 
             /* This would be better moved elsewhere */
             if ( pOpponent != NULL )

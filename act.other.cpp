@@ -543,8 +543,8 @@ int allowed_loginmsg ( Character *ch )
 	return FALSE;
 
 }
-#define MAX_LOGINMSG_LENGTH 80
-#define MAX_LOGOUTMSG_LENGTH 80
+#define MAX_LOGINMSG_LENGTH 120
+#define MAX_LOGOUTMSG_LENGTH 120
 ACMD ( do_loginmsg )
 {
 	skip_spaces ( &argument );
