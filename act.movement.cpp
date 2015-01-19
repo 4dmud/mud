@@ -1645,7 +1645,7 @@ ACMD ( do_gen_door )
 	}
 	two_arguments ( argument, type, dir );
 	if ( !generic_find
-	        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
+	        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &victim, &obj ) )
 		door = find_door ( ch, type, dir, cmd_door[subcmd] );
 
 	if ( ( obj ) || ( door >= 0 ) )
