@@ -2356,6 +2356,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 								else if ( isname ( subfield, obj->short_description ) )
 								{
 									snprintf ( str, slen, "%c%ld", UID_CHAR, GET_ID ( obj ) );	/* arg given, found */
+									return;
 								}
 
 							}
