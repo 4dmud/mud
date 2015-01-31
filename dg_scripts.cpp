@@ -2368,7 +2368,7 @@ void process_wait ( void *go, trig_data *trig, int type, char *cmd,
 		{
 			if ( c == 't' || c == 'T' )
 				when *= PULSES_PER_MUD_HOUR;
-			else if ( c == 's' )
+			else if ( c == 's' || c == 'S' )
 				when *= PASSES_PER_SEC;
 		}
 	}
