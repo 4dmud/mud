@@ -180,6 +180,7 @@ ACMD ( do_exits );
 ACMD ( do_feel );
 ACMD ( do_fence );
 ACMD ( do_file );
+ACMD ( do_findtrig );
 ACMD ( do_finger );
 ACMD ( do_fixskills );
 ACMD ( do_flee );
@@ -596,11 +597,12 @@ const command_info cmd_info[] =
 	{ "exits"    , "ex" , POS_RESTING , do_exits    , 0, 0, 0 },
 	{ "examine"  , "exa" , POS_SITTING , do_examine  , 0, 0, 0 },
 
-	{ "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
 	{ "feel"     , "feel" , POS_RESTING , do_feel     , 0, 0, 0 },
 	{ "fence"    , "fence", POS_STANDING, do_fence    , 0, SCMD_FENCE, 0 },
+	{ "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 	{ "file"     , "file" , POS_SLEEPING, do_file     , LVL_HERO, 0, 0 },
 	{ "fill"     , "fil" , POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
+	{ "findtrig" , "findt" , POS_DEAD , do_findtrig    , LVL_SEN, 0, 0 },
 	{ "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
 	{ "fire"     , "fire" , POS_SITTING, do_not_here , 0, 0, 0 },
 	{ "fixskills"   , "fixskills" , POS_SLEEPING, do_fixskills   , LVL_SEN, 0, 0 },
@@ -609,6 +611,7 @@ const command_info cmd_info[] =
 	{ "fletch"   , "fletch"   , POS_SITTING , do_assemble , 0, SUB_FLETCH, 0 },
 	{ "fly"      , "fly"  , POS_SITTING, do_drive    , 0, 0, 0 },
 	{ "follow"   , "fol" , POS_RESTING , do_follow   , 0, 0, 0 },
+	{ "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
 	{ "fuel"	 , "fue" , POS_RESTING , do_fuel   , 0, 0, 0 },
 	{ "fuse"     , "fuse"     , POS_RESTING , do_fuse   , 0, 0, 0 },
 	{ "fusion"   , "fusion"   , POS_RESTING , do_fusion   , 0, 0, 0 },
@@ -616,7 +619,6 @@ const command_info cmd_info[] =
 	{ "forest"   , "forest" , POS_DEAD    , forest_find  , LVL_IMMORT, 0, 0 },
 
 	{ "forge"    , "for" , POS_SITTING , do_assemble , 0, SUB_FORGE , 0},
-	{ "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 
 	{ "gate"     , "gate", POS_STANDING, do_fence    , 0, SCMD_GATE, 0 },
 	{ "get"      , "g"   , POS_RESTING , do_get      , 0, 0, 0 },

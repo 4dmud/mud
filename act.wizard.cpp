@@ -345,6 +345,8 @@ extern int forget_num_obj;
 extern const char *wiz_groups[];
 extern socket_t mother_desc;
 extern ush_int port;
+extern map<mob_vnum, Character *> mob_proto;
+extern struct obj_data *obj_proto;
 
 /* for chars */
 extern char *credits;
@@ -400,6 +402,7 @@ const char *simple_class_name ( Character *ch );
 int show_vars = FALSE;
 int save_all ( void );
 void print_zone ( Character *ch, zone_vnum vnum );
+void print_object_location ( int num, struct obj_data *obj, Character *ch, int recur, char *buffer );
 zone_rnum real_zone_by_thing ( room_vnum vznum ); /* added for zone_checker */
 SPECIAL ( shop_keeper );
 
@@ -6572,7 +6575,7 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
 
 	for ( i=0; i < pairs.size(); i++ )
 	{
-		snprintf ( buf, sizeof ( buf ), pairs[i].second.c_str() );
+		snprintf ( buf, sizeof ( buf ), "%s", pairs[i].second.c_str() );
 		DYN_RESIZE ( buf );
 	}
 	page_string ( ch->desc, dynbuf, DYN_BUFFER );	
@@ -6747,7 +6750,7 @@ ACMD ( do_statlist )
 		sort ( pairs.begin(), pairs.end(), Comparefunc );
 		for ( i=0; i < count; i++ )
 		{
-			snprintf ( buf, sizeof ( buf ), pairs[i].second.c_str() );
+			snprintf ( buf, sizeof ( buf ), "%s", pairs[i].second.c_str() );
 			DYN_RESIZE ( buf );
 		}
 	}
@@ -7831,3 +7834,161 @@ ACMD(do_code_update) {
 system ( "" );
 }
 
+ACMD ( do_findtrig )
+{
+	Character *c;
+	trig_data *t;
+	int trig_vnum, nr, num;
+	bool found = FALSE;
+	char buf[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
+	olt_it ob;
+	map<mob_vnum, Character *>::iterator mob_it;
+
+	one_argument ( argument, arg );
+
+	if ( !*arg || !is_number ( arg ) )
+	{
+		ch->Send ( "Usage: findtrig <vnum>\r\n" );
+		return;
+	}
+
+	trig_vnum = atoi ( arg );
+
+	if ( real_trigger ( trig_vnum ) < 0 )
+	{
+		ch->Send ( "There is no trigger with that vnum.\r\n" );
+		return;
+	}
+
+	DYN_DEFINE;
+	DYN_CREATE;
+
+	// Look for the trigger in OLC
+
+	ch->Send ( "Trigger %d is attached to:\r\n", trig_vnum );
+	ch->Send ( "--------------------------\r\n" );
+	ch->Send ( "In OLC:\r\n" );
+
+	for ( mob_it = mob_proto.begin(), num = 0; mob_it != mob_proto.end(); mob_it++ )
+	{
+		if ( mob_it->second != NULL && mob_it->second->proto_script )
+		{
+			for ( vector<int>::iterator it2 = mob_it->second->proto_script->begin(); it2 != mob_it->second->proto_script->end(); it2++ )
+			{
+				if ( *it2 == trig_vnum )
+				{
+					snprintf ( buf, sizeof ( buf ), "M%3d. [%5d] %-25s\r\n", ++num, GET_MOB_VNUM ( mob_it->second ),
+						GET_NAME ( mob_it->second ) );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+					break;
+				}
+			}
+		}
+	}
+
+	for ( int i = 1, num = 0; obj_proto[i].item_number == i; i++ )
+	{
+		if ( obj_proto[i].proto_script != NULL )
+		{
+			for ( vector<int>::iterator it2 = obj_proto[i].proto_script->begin(); it2 != obj_proto[i].proto_script->end(); it2++ )
+			{
+				if ( *it2 == trig_vnum )
+				{
+					snprintf ( buf, sizeof ( buf ), "O%3d. [%5d] %-25s\r\n", ++num, obj_index[i].vnum, obj_proto[i].name );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+					break;
+				}
+			}
+		}
+	}
+
+	for ( nr = 0, num = 0; nr <= top_of_world; nr++ )
+	{
+		if ( world_vnum[nr] && world_vnum[nr]->proto_script != NULL )
+		{
+			for ( vector<int>::iterator it2 = world_vnum[nr]->proto_script->begin(); it2 != world_vnum[nr]->proto_script->end(); it2++ )
+			{
+				if ( *it2 == trig_vnum )
+				{
+					snprintf ( buf, sizeof ( buf ), "W%3d. [%6d] {cy%-25s {cg-{cC %s{c0\r\n",
+				           ++num, GET_ROOM_VNUM ( world_vnum[nr] ), world_vnum[nr]->name, zone_table[world_vnum[nr]->zone].name );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+					break;
+				}
+			}
+		}
+	}
+
+	if ( !found )
+	{
+		snprintf ( buf, sizeof ( buf ), "Nothing.\r\n" );
+		DYN_RESIZE ( buf );
+	}
+
+	// Look for the trigger in the game
+
+	snprintf ( buf, sizeof ( buf ), "Currently in the game:\r\n" );
+	DYN_RESIZE ( buf );
+
+	found = FALSE;
+
+	for ( c = character_list, num = 0; c; c = c->next )
+	{
+		if ( SCRIPT ( c ) )
+		{
+			for ( t = TRIGGERS ( SCRIPT ( c ) ); t; t = t->next )
+			{
+				if ( GET_TRIG_VNUM ( t ) == trig_vnum )
+				{
+					snprintf ( buf, sizeof ( buf ), "M%3d. [%5d] %-25s - [%5d] %-25s\r\n", ++num, GET_MOB_VNUM ( c ),
+						   GET_NAME ( c ), GET_ROOM_VNUM ( IN_ROOM ( c ) ), IN_ROOM ( c )->name );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	for ( ob = object_list.begin(), num = 0; ob != object_list.end(); ob++ )
+	{
+		if ( SCRIPT ( ob->second ) )
+		{
+			for ( t = TRIGGERS ( SCRIPT ( ob->second ) ); t; t = t->next )
+			{
+				if ( GET_TRIG_VNUM ( t ) == trig_vnum )
+				{
+					print_object_location ( ++num, ob->second, ch, TRUE, buf );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	for ( nr = 0, num = 0; nr <= top_of_world; nr++ )
+	{
+		if ( world_vnum[nr] && SCRIPT ( world_vnum[nr] ) )
+		{
+			for ( t = TRIGGERS ( SCRIPT ( world_vnum[nr] ) ); t; t = t->next )
+			{
+				if ( GET_TRIG_VNUM ( t ) == trig_vnum )
+				{
+					snprintf ( buf, sizeof ( buf ), "W%3d. [%6d] {cy%-25s {cg-{cC %s{c0\r\n",
+				           ++num, GET_ROOM_VNUM ( world_vnum[nr] ), world_vnum[nr]->name, zone_table[world_vnum[nr]->zone].name );
+					DYN_RESIZE ( buf );
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	if ( !found )
+	{
+		snprintf ( buf, sizeof ( buf ), "Nothing.\r\n" );
+		DYN_RESIZE ( buf );
+	}
+	page_string ( ch->desc, dynbuf, DYN_BUFFER );
+}
