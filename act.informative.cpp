@@ -3009,6 +3009,7 @@ ACMD ( do_settime )
 	time = atoi ( argument );
 	time_info.hours = time;
 	ch->Send ( "Time has been set.\r\n" );
+	check_time_triggers();
 	return;
 }
 
