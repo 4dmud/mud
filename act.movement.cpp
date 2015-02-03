@@ -1748,7 +1748,8 @@ ACMD ( do_fence )
 	bool room_has_gatepost;
 	struct obj_data *obj;
 	obj_rnum gatepost_rnum = real_object ( 52863 );
-	obj_rnum wire_rnum = real_object ( 52910 );
+	obj_rnum wire1 = real_object ( 52988 );
+	obj_rnum wire2 = real_object ( 6858 );
 	zone_rnum zone_allowed = real_zone ( 526 );
 
 	adir = badir;
@@ -1901,7 +1902,8 @@ ACMD ( do_fence )
 		if ( GET_ROOM_ZONE ( ch->in_room ) != zone_allowed )
 			ch->Send ( "You can't build here, you should keep moving the herd on.\r\n" );
 
-		else if ( subcmd == SCMD_FENCE && ( !GET_EQ ( ch, WEAR_HOLD ) || GET_EQ ( ch, WEAR_HOLD )->item_number != wire_rnum ) )
+		else if ( subcmd == SCMD_FENCE && ( !GET_EQ ( ch, WEAR_HOLD ) || ( GET_EQ ( ch, WEAR_HOLD )->item_number != wire1 &&
+										   GET_EQ ( ch, WEAR_HOLD )->item_number != wire2 ) ) )
 			ch->Send ( "You need to hold a roll of barbed wire first.\r\n" );
 
 		else if ( other_room == NULL )
