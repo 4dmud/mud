@@ -227,6 +227,8 @@ ACMD ( do_hit )
 	}
 	if ( !can_fight ( ch, vict, FALSE ) )
 	{
+		if ( !ch->master || ( ch->master && ch->master != vict ) ) // message for this case already shown by can_fight
+			ch->Send ( "You can't do that to them!\r\n" );
 		return;
 	}
 
