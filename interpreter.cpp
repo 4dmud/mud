@@ -620,8 +620,8 @@ const command_info cmd_info[] =
 
 	{ "forge"    , "for" , POS_SITTING , do_assemble , 0, SUB_FORGE , 0},
 
-	{ "gate"     , "gate", POS_STANDING, do_fence    , 0, SCMD_GATE, 0 },
 	{ "get"      , "g"   , POS_RESTING , do_get      , 0, 0, 0 },
+	{ "gate"     , "gate", POS_STANDING, do_fence    , 0, SCMD_GATE, 0 },
 	{ "gecho"    , "gech"     , POS_DEAD    , do_gecho    , LVL_IMMORT, 0, WIZ_QUEST_GRP },
 	{ "give"     , "giv" , POS_RESTING , do_give     , 0, 0, 0 },
 	{ "goto"     , "got" , POS_SLEEPING, do_goto     , LVL_IMMORT, 0, WIZ_IMM1_GRP },
