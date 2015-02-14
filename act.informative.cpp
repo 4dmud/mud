@@ -1951,6 +1951,9 @@ ACMD ( do_examine )
 	struct obj_data *tmp_object;
 	char tempsave[MAX_INPUT_LENGTH];
 	char arg[MAX_STRING_LENGTH];
+	char arg2[MAX_STRING_LENGTH];
+	char *arg_copy = arg2;
+	char *desc;
 
 	one_argument ( argument, arg );
 
@@ -1961,7 +1964,6 @@ ACMD ( do_examine )
 	}
 	/* look_at_target() eats the number. */
 	strcpy ( tempsave, arg );
-
 
 	generic_find ( arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM |
 	               FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object );
@@ -1975,9 +1977,12 @@ ACMD ( do_examine )
 
 		*ch << "You examine " << tmp_object->short_description << ":\r\n";
 
-		examine_on = FALSE;
-		look_at_target ( ch, tempsave );  /* strcpy: OK */
-		examine_on = TRUE;
+		strcpy ( arg2, arg );
+		get_number ( &arg_copy );
+		if ( ( desc = find_exdesc ( arg_copy, tmp_object->ex_description ) ) != NULL )
+			page_string ( ch->desc, desc, FALSE );
+		else ch->Send ( "You see nothing special.\r\n" );
+
 		if ( GET_OBJ_INNATE ( tmp_object ) && affected_by_spell ( ch, SPELL_DETECT_MAGIC ) )
 			*ch << "\r\nYou sense that this item is further embued with the spell "<<  skill_name ( GET_OBJ_INNATE ( tmp_object ) ) << ".\r\n";
 		if ( ( GET_OBJ_TYPE ( tmp_object ) == ITEM_DRINKCON ) ||
