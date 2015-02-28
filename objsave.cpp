@@ -1687,17 +1687,18 @@ void tag_read(char *tag, char *buf)
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
   int rv;
-  obj_vnum nr, onr, nrr = 0;
+  obj_vnum nr, nrr = 0; // onr
   char buf[MAX_INPUT_LENGTH];
   char line[READ_SIZE] = "";
   char tag[READ_SIZE] = "";
   //int num;
   int t[4];
   int orig_timer = -1;
-  int orig_expir = -1;
+  //int orig_expir = -1;
   //int dup_strings = FALSE;
-  struct ident_list *tmp_idents = NULL;
-  int tmp_wep_bal;
+  //struct ident_list *tmp_idents = NULL;
+  //int tmp_wep_bal;
+  bool weight_read = FALSE;
 
   if (feof(fl))
     return NULL;
@@ -1713,7 +1714,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   if ((rv = sscanf(line, "#%d OBJ", &nr)) != 1)
     return NULL;
 
-  onr = nr;
+  //onr = nr;
   /* we have the number, check it, load obj. */
   if (nr == NOTHING)
   {  /* then it is unique */
@@ -1775,13 +1776,13 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         read_extra_descs(fl, temp);
       else if (!strcmp(tag, "Expir")) {
         GET_OBJ_EXPIRE(temp) = atol(line);
-        orig_expir = GET_OBJ_EXPIRE(temp);
+        //orig_expir = GET_OBJ_EXPIRE(temp);
       }
       else if (!strcmp(tag, "Exrem")) {
 	int remaining = atol(line);
 	if (remaining != 0) {
 	  GET_OBJ_EXPIRE(temp) = time(0) + remaining;
-	  orig_expir = GET_OBJ_EXPIRE(temp);
+	  //orig_expir = GET_OBJ_EXPIRE(temp);
 	}
       }
       break;
@@ -1807,8 +1808,8 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
           add_identifier(temp, t[0]);
         }
         while (*line != '-');
-        if (temp->idents)
-            tmp_idents = temp->idents;
+        //if (temp->idents)
+        //    tmp_idents = temp->idents;
       }
       break;
     case 'l':
@@ -1884,7 +1885,10 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       if (!strcmp(tag, "Wear"))
         sscanf(line, "%d %d %d %d", &GET_OBJ_WEAR(temp)[0], &GET_OBJ_WEAR(temp)[1],  &GET_OBJ_WEAR(temp)[2], &GET_OBJ_WEAR(temp)[3]);
       else if (!strcmp(tag, "Weight"))
+      {
         GET_OBJ_WEIGHT(temp) = atoi(line);
+        weight_read = TRUE;
+      }
       break;
 
     default:
@@ -1896,6 +1900,9 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 
     get_line(fl, line);
   }
+
+  if ( GET_OBJ_TYPE ( temp ) == ITEM_DRINKCON && !weight_read )
+	GET_OBJ_WEIGHT ( temp ) = MAX ( 0, GET_OBJ_WEIGHT ( &obj_proto[nr] ) - GET_OBJ_VAL ( &obj_proto[nr], 1 ) + GET_OBJ_VAL ( temp, 1 ) );
 
   /* Horus - all eq will be updated automatically */
 /*  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
