@@ -84,9 +84,11 @@ void generate_weapon ( OBJ_DATA *obj );
 int create_vehicle_room(struct obj_data *obj);
 void ASSIGNMOB ( mob_vnum mob, SPECIAL ( fname ) );
 void ASSIGNOBJ ( obj_vnum obj, SPECIAL ( fname ) );
+void ASSIGNROOM ( room_vnum room, SPECIAL ( fname ) );
 SPECIAL ( postmaster );
 SPECIAL ( cleric );
 SPECIAL ( bank );
+SPECIAL ( pet_shops );
 void load_saved_artifacts ();
 
 
@@ -1840,6 +1842,9 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	room_nr->contents = NULL;
 	room_nr->people = NULL;
 	room_nr->light = 0;    /* Zero light sources */
+
+	if ( ROOM_FLAGGED ( room_nr, ROOM_PETSHOP ) )
+		ASSIGNROOM ( virtual_nr, pet_shops );
 
 	for ( i = 0; i < NUM_OF_DIRS; i++ )
 		room_nr->dir_option[i] = NULL;

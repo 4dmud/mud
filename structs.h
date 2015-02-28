@@ -377,6 +377,7 @@ class Room;
 #define ROOM_BURNING         	45 /* Room is burning */
 #define ROOM_ARTISAVE           46
 #define ROOM_IRRADIATED         47
+#define ROOM_PETSHOP            48
 
 #define ZONE_OPEN        	(1 <<  0)
 #define ZONE_CLOSED      	(1 <<  1)

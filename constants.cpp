@@ -509,6 +509,7 @@ const char *room_bits[] =
         "BURNING",
 	"ARTISAVE",
 	"IRRADIATED",
+	"PETSHOP",
 	"\n"
 };
 

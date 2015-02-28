@@ -33,7 +33,7 @@
  * to adjust these numbers if you ever add more.
  */
 #define NUM_ZONE_FLAGS 		16
-#define NUM_ROOM_FLAGS 		48
+#define NUM_ROOM_FLAGS 		49
 #define NUM_ROOM_SECTORS	26
 
 
