@@ -910,7 +910,7 @@ ASUB(sub_drain_blood) {
             ch->Send( "You focus on draining blood.\r\n");
             toggle_sub_status(ch, SUB_DRAIN_BLOOD, STATUS_ON);
         } else {
-            ch->Send( "You aren't evil enough drain blood.\r\n");
+            ch->Send( "You aren't evil enough to drain blood.\r\n");
         }
     } else {
         ch->Send( "You focus on normal attacks.\r\n");

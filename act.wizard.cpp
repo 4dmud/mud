@@ -2817,7 +2817,7 @@ ACMD ( do_load )
 			ch->Send ( "There is no monster with the number %d.\r\n", num );
 			return;
 		}
-		for ( ( tnum == 0 ? tnum = 1 : tnum ) ;tnum>0; tnum-- )
+		for ( ( tnum <= 0 ? tnum = 1 : tnum ) ;tnum>0; tnum-- )
 		{
 			mob = read_mobile ( num );
 			char_to_room ( mob, IN_ROOM ( ch ) );
@@ -2843,7 +2843,7 @@ ACMD ( do_load )
 			ch->Send ( "You don't have the skill to create a new Artifact.\r\n" );
 			return;
 		}
-		for ( ( tnum == 0 ? tnum = 1 : tnum ) ;tnum>0; tnum-- )
+		for ( ( tnum <= 0 ? tnum = 1 : tnum ) ;tnum>0; tnum-- )
 		{
 			obj = read_object ( r_num, REAL );
 			if ( obj == NULL )
