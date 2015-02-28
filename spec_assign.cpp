@@ -206,8 +206,6 @@ void assign_mobiles(void)
     ASSIGNMOB(5004, magic_user);
     ASSIGNMOB(5008, magic_user);
     ASSIGNMOB(5009, magic_user);
-    ASSIGNMOB(6736, magic_user);
-    ASSIGNMOB(6746, magic_user);
     ASSIGNMOB(8117, magic_user);
     ASSIGNMOB(8118, magic_user);
     ASSIGNMOB(8119, magic_user);
@@ -387,6 +385,7 @@ void assign_rooms(void)
     ASSIGNROOM(3075, pet_shops);	// olde yorke
     ASSIGNROOM(3498, pet_shops);
     ASSIGNROOM(3612, pet_shops);	// tournament place
+    ASSIGNROOM(4893, pet_shops);        // Legend
     ASSIGNROOM(6827, pet_shops);	// tombstone
     ASSIGNROOM(7763, pet_shops);
     ASSIGNROOM(8283, pet_shops);

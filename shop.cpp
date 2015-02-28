@@ -1487,7 +1487,10 @@ void assign_the_shopkeepers(void)
     if (SHOP_KEEPER(cindex) == NOBODY)
       continue;
     if (!GetMobIndex(SHOP_KEEPER(cindex)))
+    {
+      SHOP_KEEPER ( cindex ) = NOBODY;
       continue;
+    }
 
     /* Having SHOP_FUNC() as 'shop_keeper' will cause infinite recursion. */
     if (GetMobIndex(SHOP_KEEPER(cindex))->func && GetMobIndex(SHOP_KEEPER(cindex))->func != shop_keeper)
