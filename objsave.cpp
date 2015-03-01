@@ -1901,6 +1901,9 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
     get_line(fl, line);
   }
 
+  if ( GET_OBJ_TYPE ( temp ) == ITEM_DRINKCON && !weight_read )
+	GET_OBJ_WEIGHT ( temp ) = MAX ( 0, GET_OBJ_WEIGHT ( &obj_proto[nrr] ) - GET_OBJ_VAL ( &obj_proto[nrr], 1 ) + GET_OBJ_VAL ( temp, 1 ) );
+
   /* Horus - all eq will be updated automatically */
 /*  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
       ubyte dt_save = 0;
