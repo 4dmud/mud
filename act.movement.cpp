@@ -1023,9 +1023,16 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 			next = herd->next_in_room;
 			if ( !IS_HERD ( herd ) || GET_POS ( herd ) != POS_STANDING || RIDDEN_BY ( herd ) )
 				continue;
+
 			// Chance of an animal not following the herd: 5%
 			if ( number ( 1, 100 ) <= 5 )
 				continue;
+
+			if ( riding && !SAME_HERD ( RIDING ( ch ), herd ) )
+				continue;
+			if ( !riding && !SAME_HERD ( ch, herd ) )
+				continue;
+
 			FOUND = TRUE;
 			char_from_room(herd);
 			char_to_room(herd, was_in->dir_option[dir]->to_room);

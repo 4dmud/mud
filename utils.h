@@ -822,6 +822,10 @@ void make_wholist ( void );
 #define IS_HERD(ch)		(IS_NPC(ch) && (MOB_FLAGGED(ch, MOB_HERD_CATTLE) || \
 						MOB_FLAGGED(ch, MOB_HERD_SHEEP) || \
 						MOB_FLAGGED(ch, MOB_HERD_HORSE)))
+#define SAME_HERD(ch1, ch2)     (IS_NPC(ch1) && IS_NPC(ch2) && \
+				((MOB_FLAGGED(ch1, MOB_HERD_CATTLE) && MOB_FLAGGED(ch2, MOB_HERD_CATTLE)) || \
+				 (MOB_FLAGGED(ch1, MOB_HERD_SHEEP) && MOB_FLAGGED(ch2, MOB_HERD_SHEEP)) || \
+				 (MOB_FLAGGED(ch1, MOB_HERD_HORSE) && MOB_FLAGGED(ch2, MOB_HERD_HORSE))))
 #define GET_MTYPE(ch)		((ch)->mob_specials.type)
 #define IS_MOB_PREG(ch)		((ch)->mob_specials.pregnant)
 #define DUE_DATE(ch)		((ch)->mob_specials.due_date)
