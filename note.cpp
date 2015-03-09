@@ -854,7 +854,8 @@ void parse_note ( Character *ch, char *argument, int type )
 	if ( is_abbrev ( arg, "list" ) )
 	{
 		vnum = 0;
-		std::stringstream nline;
+		DYN_DEFINE;
+		DYN_CREATE;
 		char nbuf[MAX_INPUT_LENGTH];
 		for ( pnote = *list; pnote != NULL; pnote = pnote->next )
 		{
@@ -864,11 +865,11 @@ void parse_note ( Character *ch, char *argument, int type )
 				           vnum, hide_note ( ch,pnote ) ? " " : "N",
 				           pnote->sender, pnote->subject );
 				vnum++;
-				nline << nbuf;
+				DYN_RESIZE ( nbuf );
 			}
 			
 		}
-		page_string(ch->desc, nline);
+		page_string(ch->desc, dynbuf, DYN_BUFFER);
 		if ( !vnum )
 		{
 			switch ( type )
