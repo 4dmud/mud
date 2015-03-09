@@ -3012,7 +3012,7 @@ ACMD ( do_speedwalk )
 
 	for ( r = 1; *argument && r; argument++ )
 	{
-		if ( *argument == ' ' )
+		if ( *argument == ' ' || *argument == ',' )
 			continue;
 
 		if ( *argument >= '0' && *argument <= '9' )
