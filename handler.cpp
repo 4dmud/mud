@@ -2043,7 +2043,7 @@ void death_room ( Character *ch )
 	if ( RIDING ( ch ) || RIDDEN_BY ( ch ) )
 		dismount_char ( ch );
 
-	stop_fusion ( ch );
+	//stop_fusion ( ch );
 
 	/** leave people grouped when they die **/
 	/*if (ch->followers || ch->master)

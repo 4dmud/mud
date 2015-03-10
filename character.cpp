@@ -416,7 +416,6 @@ void Character::reset()
 	DIE_TIME ( this )            = 0;
 	REMOVE_BIT_AR ( PLR_FLAGS ( this ), PLR_DYING );
 	ATK_CHANCE ( this )          = 3;
-	FUSED_TO ( this )            = NULL;
 	GET_SKILLMULTI ( this )      = 0.0;
 	followers                 = NULL;
 	master                    = NULL;
@@ -776,7 +775,8 @@ void Character::default_char()
 	sweep_damage 				= 0;
 	pulling 				= NOBODY;
 	on_task 				= 0;
-	fused_to 				= 0;
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+		fuses[i] = NULL;
 	init_char_strings();
 }
 

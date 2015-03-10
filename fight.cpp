@@ -336,6 +336,13 @@ void brag ( Character *ch, Character *victim );
 int get_pidx_from_name ( Character *ch );
 void arena_kill ( Character *ch );
 void diag_char_to_char ( Character *i, Character *ch );
+bool is_fused ( Character *ch );
+int fused_speed ( Character *ch );
+int fused_AC ( Character *ch );
+int fused_hitroll ( Character *ch );
+int fused_dambonus ( Character *ch );
+int fused_accuracy ( Character *ch );
+int fused_evasion ( Character *ch );
 
 /* local functions */
 void delay_die ( Character *ch, Character *killer );
@@ -639,11 +646,14 @@ int spell_size_dice ( Character *ch )
 			return 1;
 			break;
 	}
-	if ( GET_SPEED ( ch ) != 0 )
-		sdice += GET_SPEED ( ch ) /100;
-	return MAX ( 0, ( ( int ) sdice ) );
 
+	if ( is_fused ( ch ) )
+		sdice += fused_speed ( ch ) / 100;
+	else sdice += GET_SPEED ( ch ) / 100;
+
+	return MAX ( 0, ( ( int ) sdice ) );
 }
+
 int spell_num_dice ( Character *ch )
 {
 
@@ -774,8 +784,9 @@ int size_dice_wep ( Character *ch, short dual )
 			d_add += 2;
 		if ( AFF_FLAGGED ( ch, AFF_BESERK ) )
 			d_add += 2;
-		if ( GET_SPEED ( ch ) != 0 )
-			d_add += GET_SPEED ( ch ) /100;
+		if ( is_fused ( ch ) )
+			d_add += fused_speed ( ch ) / 100;
+		else d_add += GET_SPEED ( ch ) /100;
 
 
 		if ( RIDING ( ch ) && HERE ( ch, RIDING ( ch ) ) )
@@ -870,11 +881,15 @@ int average_damage ( Character *ch )
 		switch ( find_fe_type ( ch ) )
 		{
 			case FE_TYPE_SPELL:
-				dam = caster_damroll ( ch );
+				if ( is_fused ( ch ) )
+					dam = fused_dambonus ( ch );
+				else dam = caster_damroll ( ch );
 				dam += 0.5 * ( ( ( spell_size_dice ( ch ) +1 ) ) * spell_num_dice ( ch ) );
 				break;
 			default:
-				dam = fighter_damroll ( ch ) * 0.75;
+				if ( is_fused ( ch ) )
+					dam = fused_dambonus ( ch ) * 0.75;
+				else dam = fighter_damroll ( ch ) * 0.75;
 				dam += 0.5 * ( ( ( size_dice_wep ( ch, WEAPON_PRIM_AFF ) +1 ) ) * num_dice_wep ( ch, WEAPON_PRIM_AFF ) );
 				break;
 		}
@@ -1284,7 +1299,13 @@ void skill_attack ( Character *ch, Character *vict, int skill, int pass )
 
 int calc_fight_speed ( Character* ch )
 {
-	float to_ret = ( speed_update ( ch ) );
+	float to_ret;
+
+	if ( is_fused ( ch ) )
+		to_ret = fused_speed ( ch );
+	else
+		to_ret = speed_update ( ch );
+
 	if ( IS_NPC ( ch ) )
 		to_ret += ( number ( GET_LEVEL ( ch ), GET_LEVEL ( ch ) * 5 ) );
 	else if ( total_chance ( ch, SKILL_MELEE ) > number ( 0, 101 ) )
@@ -1639,10 +1660,15 @@ int attack_roll ( Character *attacker, Character *vict, int type )
 	if ( !AWAKE ( vict ) )
 		return ( ATK_CHANCE ( attacker ) = 3 );
 
-	evasion_roll = evasion_tot ( vict );
+	if ( is_fused ( vict ) )
+		evasion_roll = fused_evasion ( vict );
+	else evasion_roll = evasion_tot ( vict );
 	if ( !CAN_SEE ( vict, attacker ) && evasion_roll )
 		evasion_roll /= 2;
-	accuracy_roll = accuracy_tot ( attacker );
+
+	if ( is_fused ( attacker ) )
+		accuracy_roll = fused_accuracy ( attacker );
+	else accuracy_roll = accuracy_tot ( attacker );
 
 	totalchance = FTOI ( ( ( evasion_roll * 100.0 ) / ( accuracy_roll + evasion_roll ) ) );
 
@@ -2128,7 +2154,9 @@ int melee_type_dam ( Character *ch, Character *vict, int attack_chance, int weps
 	else
 		dam += dice ( ch->mob_specials.damnodice,ch->mob_specials.damsizedice );
 
-	dam += fighter_damroll ( ch );
+	if ( is_fused ( ch ) )
+		dam += fused_dambonus ( ch );
+	else dam += fighter_damroll ( ch );
 
 	dam = FTOI ( dam * atk_chance_multi ( attack_chance ) );
 
@@ -2269,8 +2297,9 @@ int fe_special_hit ( Character* ch, Character* vict, int type )
 			if ( IS_NPC ( ch ) )
 				dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
 
-
-			dam += caster_damroll ( ch );
+			if ( is_fused ( ch ) )
+				dam += fused_dambonus ( ch );
+			else dam += caster_damroll ( ch );
 
 			if ( has_staff_multi ( ch, type ) > 0 )
 				dam = FTOI ( dam * has_staff_multi ( ch, type ) );
@@ -2318,7 +2347,9 @@ int fe_spell_hit ( Character* ch, Character* vict, int type )
 		if ( IS_NPC ( ch ) )
 			dam += dice ( ch->mob_specials.damnodice, ch->mob_specials.damsizedice );
 
-		dam += caster_damroll ( ch );
+		if ( is_fused ( ch ) )
+			dam += fused_dambonus ( ch );
+		else dam += caster_damroll ( ch );
 
 		dam = FTOI ( dam * has_staff_multi ( ch, type ) );
 
@@ -4270,7 +4301,11 @@ int chance_hit_part ( Character *ch, int part )
 	float l_l = 1;
 	float l_r = 1;
 	float total = 0;
-	float ac_tot = ( float ) ( 200 - ( ch->compute_armor_class() + 100 ) ) *2;
+	int AC;
+	if ( is_fused ( ch ) )
+		AC = fused_AC ( ch );
+	else AC = ch->compute_armor_class();
+	float ac_tot = ( float ) ( 200 - ( AC + 100 ) ) *2;
 
 	/* this can be sped up alot in future but for now
 	   we will just go through this each time it gets called.

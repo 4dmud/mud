@@ -134,14 +134,14 @@
 
 
 
-const char * fusion_locations[] =
+const char * fuse_locations[] =
 {
-	"Top Center ",
-	"Top Left   ",
-	"Top Right  ",
-	"Center     ",
-	"Lower Left ",
-	"Lower Right",
+	"TopCenter",
+	"TopLeft",
+	"TopRight",
+	"Center",
+	"LowerLeft",
+	"LowerRight",
 	""
 };
 

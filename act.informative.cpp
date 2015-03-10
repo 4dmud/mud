@@ -70,7 +70,7 @@ extern const char *class_abbrevs[];
 extern const char *race_abbrevs[];
 extern const char *moon_types[];
 extern const char *season_types[];
-
+extern const char *fuse_locations[];
 
 /* global */
 
@@ -116,6 +116,9 @@ void show_obj_to_char ( struct obj_data *object, Character *ch,
 void list_obj_to_char ( struct obj_data *list, Character *ch,
                         int mode, int show );
 void show_obj_modifiers ( struct obj_data *obj, Character *ch );
+bool is_fused ( Character *ch );
+int fused_accuracy ( Character *ch );
+int fused_evasion ( Character *ch );
 ACMD ( do_look );
 ACMD ( do_examine );
 ACMD ( do_gold );
@@ -4702,7 +4705,7 @@ int arena_ok ( Character *ch, Character *victim );
 ACMD ( do_consider )
 {
 	Character *victim;
-	int diff, diff2, diff3;
+	int diff, diff2, diff3, evasion_tot_ch, evasion_tot_vict, accuracy_tot_ch, accuracy_tot_vict;
 	//  char buf[MAX_INPUT_LENGTH];
 	skip_spaces ( &argument );
 
@@ -4808,12 +4811,34 @@ ACMD ( do_consider )
 	diff = IRANGE ( 0, ( ( speed_update ( victim ) +1000 ) /250 ), 7 );
 	act ( speed_consider[diff], FALSE, ch, 0, victim, TO_CHAR );
 
+	if ( is_fused ( ch ) )
+	{
+		evasion_tot_ch = fused_evasion ( ch );
+		accuracy_tot_ch = fused_accuracy ( ch );
+	}
+	else
+	{
+		evasion_tot_ch = evasion_tot ( ch );
+		accuracy_tot_ch = accuracy_tot ( ch );
+	}
+
+	if ( is_fused ( victim ) )
+	{
+		evasion_tot_vict = fused_evasion ( victim );
+		accuracy_tot_vict = fused_accuracy ( victim );
+	}
+	else
+	{
+		evasion_tot_vict = evasion_tot ( victim );
+		accuracy_tot_vict = accuracy_tot ( victim );
+	}
+
 	ch->Send ( "%s would land about %.1f%% of %s attacks on you.\r\n",
 		   // Changing the sex check to HSHR(victim) instead of 
 		   //GET_SEX ( victim ) == SEX_MALE ? "his" : "her" -- Prom
-	           GET_NAME ( victim ),100 - ( float ) ( ( evasion_tot ( ch ) *100 ) / ( evasion_tot ( ch ) + accuracy_tot ( victim ) ) ), HSHR(victim) );
+	           GET_NAME ( victim ), 100 - ( float ) ( ( evasion_tot_ch * 100.0 ) / ( evasion_tot_ch + accuracy_tot_vict ) ), HSHR ( victim ) );
 	ch->Send ( "You would land about %.1f%% of your attacks on %s.\r\n",
-	           100- ( float ) ( ( evasion_tot ( victim ) *100 ) / ( evasion_tot ( victim ) + accuracy_tot ( ch ) ) ), GET_NAME ( victim ) );
+	           100- ( float ) ( ( evasion_tot_vict * 100.0 ) / ( evasion_tot_vict + accuracy_tot_ch ) ), GET_NAME ( victim ) );
 
 	diff3 = GET_HIT ( victim );
 	diff2 = 0;
@@ -4827,91 +4852,308 @@ ACMD ( do_consider )
 
 }
 
-int count_followers ( struct follow_type *f )
-{
-	int cnt = 0;
-	if ( !f )
-		return cnt;
-
-	if ( f->next )
-		cnt += count_followers ( f->next );
-
-	return cnt + 1;
-}
-void add_fusion ( Character *ch, Character *fuse, int loc )
-{
-	if ( !ch || !fuse )
-		return;
-	if ( FUSE_LOC ( ch, loc ) == fuse )
-		return;
-	if ( FUSE_LOC ( ch, loc ) )
-	{
-		log ( "FUSEERR: add_fusion trying to add %s to %s's fusion but %s was already there.",
-		      GET_NAME ( fuse ), GET_NAME ( ch ), GET_NAME ( FUSE_LOC ( ch, loc ) ) );
-		return;
-	}
-
-	FUSE_LOC ( ch, loc ) = fuse;
-	FUSED_TO ( fuse ) = ch;
-
-}
-
-ACMD ( do_fuse )
-{
-	int i = 0;
-	struct follow_type *f;
-	if ( FUSED_TO ( ch ) )
-	{
-		ch->Send ( "You are already fused. Huzzah!\r\n" );
-		return;
-	}
-	//Character *tmpfuse;
-	int nf = count_followers ( ch->followers );
-	switch ( nf )
-	{
-		default:
-			ch->Send ( "You need EXACTLY 5 followers to form a fused unit, not %d like you have.\r\n", nf );
-			return;
-		case 0:
-			ch->Send ( "You have NO followers, let alone 5 which you need to fuse!\r\n" );
-			return;
-		case 5:
-			ch->Send ( "You fuse and form the %s", fusion_locations[i] );
-			add_fusion ( ch, ch, i++ );
-			f = ch->followers;
-			do
-			{
-				f->follower->Send ( "You fuse and form the %s", fusion_locations[i] );
-				add_fusion ( ch, f->follower, i++ );
-				f = f->next;
-			}
-			while ( f != NULL );
-			break;
-	}
-
-
-
-
-
-}
-
-
-
-void stop_fusion ( Character *ch )
+bool is_fused ( Character *ch )
 {
 	int i;
 
+	if ( IS_NPC ( ch ) )
+		return FALSE;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+		if ( FUSE_LOC ( ch, i ) && FUSE_LOC ( ch, i ) != ch && IN_ROOM ( ch ) == IN_ROOM ( FUSE_LOC ( ch, i ) ) )
+			return TRUE;
+
+	return FALSE;
+}
+
+int fused_speed ( Character *ch )
+{
+	int speed = 0, i;
+	Character *tmp_ch;
 
 	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
 	{
 
-		if ( !FUSE_LOC ( ch, i ) )
-			continue;
-
-		FUSED_TO ( FUSE_LOC ( ch, i ) ) = NULL;
-
-		FUSE_LOC ( ch, i ) = NULL;
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 0 || i == 4 )
+				speed += 2 * GET_SPEED ( tmp_ch );
+			else
+				speed += GET_SPEED ( tmp_ch );
+		}
 	}
+
+	return MIN ( 1000, speed / TOP_FUSE_LOCATION );
+}
+
+int fused_AC ( Character *ch )
+{
+	int AC = 0, i;
+	Character *tmp_ch;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 3 || i == 5 )
+				AC += 2 * tmp_ch->compute_armor_class();
+			else
+				AC += tmp_ch->compute_armor_class();
+		}
+	}
+
+	return IRANGE ( -100, AC / TOP_FUSE_LOCATION, 100 );
+}
+
+int fused_hitroll ( Character *ch )
+{
+	int hitroll = 0, i;
+	Character *tmp_ch;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 2 || i == 5 )
+				hitroll += 2 * GET_HITROLL ( tmp_ch );
+			else
+				hitroll += GET_HITROLL ( tmp_ch );
+		}
+	}
+
+	return hitroll / TOP_FUSE_LOCATION;
+}
+
+int fused_dambonus ( Character *ch )
+{
+	int dambonus = 0, i;
+	Character *tmp_ch;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 0 || i == 3 )
+				dambonus += 2 * ( ( IS_CASTER ( GET_CLASS ( tmp_ch ) ) || has_staff ( tmp_ch ) ) ? caster_damroll ( tmp_ch ) : fighter_damroll ( tmp_ch ) );
+			else
+				dambonus += ( IS_CASTER ( GET_CLASS ( tmp_ch ) ) || has_staff ( tmp_ch ) ) ? caster_damroll ( tmp_ch ) : fighter_damroll ( tmp_ch );
+		}
+	}
+
+	return dambonus / TOP_FUSE_LOCATION;
+}
+
+int fused_accuracy ( Character *ch )
+{
+	int accuracy = 0, i;
+	Character *tmp_ch;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 1 || i == 4 )
+				accuracy += 2 * accuracy_tot ( tmp_ch );
+			else
+				accuracy += accuracy_tot ( tmp_ch );
+		}
+	}
+
+	return accuracy / TOP_FUSE_LOCATION;
+}
+
+int fused_evasion ( Character *ch )
+{
+	int evasion = 0, i;
+	Character *tmp_ch;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		tmp_ch = FUSE_LOC ( ch, i );
+		if ( tmp_ch && IN_ROOM ( ch ) == IN_ROOM ( tmp_ch ) )
+		{
+			if ( i == 1 || i == 2 )
+				evasion += 2 * evasion_tot ( tmp_ch );
+			else
+				evasion += evasion_tot ( tmp_ch );
+		}
+	}
+
+	return evasion / TOP_FUSE_LOCATION;
+}
+
+ACMD ( do_fuse )
+{
+	char buf[MAX_INPUT_LENGTH];
+	int i;
+	Character *tmp_ch;
+	follow_type *f;
+	bool no_fuse_members_here = TRUE;
+
+	if ( IS_NPC ( ch ) )
+		return;
+
+	one_argument ( argument, buf );
+
+	// Show fused stats
+	if ( !*buf )
+	{
+		for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+		{
+			tmp_ch = FUSE_LOC ( ch, i );
+			if ( tmp_ch && tmp_ch != ch && IN_ROOM ( tmp_ch ) == IN_ROOM ( ch ) )
+			{
+				no_fuse_members_here = FALSE;
+				break;
+			}
+		}
+
+		speed_update ( ch );
+
+		if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			ch->Send ( "Fuse stats:\r\n"
+				   "TopCenter(dr+sp): %s\r\n"
+				   "TopLeft(ev+acc): %s\r\n"
+				   "TopRight(hr+ev): %s\r\n"
+				   "Center(AC+dr): %s\r\n"
+				   "LowerLeft(sp+acc): %s\r\n"
+				   "LowerRight(AC+hr): %s\r\n"
+				   "Speed: %d AC: %d\r\n"
+				   "Hitroll: %d Dam-bonus: %d\r\n"
+				   "Accuracy: %d Evasion: %d\r\n",
+		  FUSE_LOC ( ch, 0 ) && IN_ROOM ( FUSE_LOC ( ch, 0 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 0 ) ) : "empty",
+		  FUSE_LOC ( ch, 1 ) && IN_ROOM ( FUSE_LOC ( ch, 1 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 1 ) ) : "empty",
+		  FUSE_LOC ( ch, 2 ) && IN_ROOM ( FUSE_LOC ( ch, 2 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 2 ) ) : "empty",
+		  FUSE_LOC ( ch, 3 ) && IN_ROOM ( FUSE_LOC ( ch, 3 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 3 ) ) : "empty",
+		  FUSE_LOC ( ch, 4 ) && IN_ROOM ( FUSE_LOC ( ch, 4 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 4 ) ) : "empty",
+		  FUSE_LOC ( ch, 5 ) && IN_ROOM ( FUSE_LOC ( ch, 5 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 5 ) ) : "empty",
+		  fused_speed ( ch ), fused_AC ( ch ),
+		  fused_hitroll ( ch ), fused_dambonus ( ch ),
+		  fused_accuracy ( ch ), fused_evasion ( ch ) );
+		else ch->Send ( "{cg(*)----------------{cwFuse Stats{cg------------------(*)\r\n"
+				"| |                  {cgTopCenter(dr+sp)          {cg| |\r\n"
+				"| |                  {cy%-26s{cg| |\r\n"
+				"| | TopLeft(ev+acc)            TopRight(hr+ev) | |\r\n"
+				"| | {cy%-21s%21s {cg| |\r\n"
+				"| |                  Center(AC+dr)             | |\r\n"
+				"| |                  {cy%-26s{cg| |\r\n"
+				"| | LowerLeft(sp+acc)        LowerRight(AC+hr) | |\r\n"
+				"| | {cy%-21s%21s {cg| |\r\n"
+				"| |--------------------------------------------| |\r\n"
+				"| |      {cwSpeed: [{cc%4d{cw]           AC: [{cc%4d{cw]    {cg| |\r\n"
+				"| |    {cwHitroll: [{cc%4d{cw]    Dam-Bonus: [{cc%4d{cw]    {cg| |\r\n"
+				"| |   {cwAccuracy: [{cc%4d{cw]      Evasion: [{cc%4d{cw]    {cg| |\r\n"
+				"--------------------------------------------------{c0\r\n",
+		  FUSE_LOC ( ch, 0 ) && IN_ROOM ( FUSE_LOC ( ch, 0 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 0 ) ) : "empty",
+		  FUSE_LOC ( ch, 1 ) && IN_ROOM ( FUSE_LOC ( ch, 1 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 1 ) ) : "empty",
+		  FUSE_LOC ( ch, 2 ) && IN_ROOM ( FUSE_LOC ( ch, 2 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 2 ) ) : "empty",
+		  FUSE_LOC ( ch, 3 ) && IN_ROOM ( FUSE_LOC ( ch, 3 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 3 ) ) : "empty",
+		  FUSE_LOC ( ch, 4 ) && IN_ROOM ( FUSE_LOC ( ch, 4 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 4 ) ) : "empty",
+		  FUSE_LOC ( ch, 5 ) && IN_ROOM ( FUSE_LOC ( ch, 5 ) ) == IN_ROOM ( ch ) ? GET_NAME ( FUSE_LOC ( ch, 5 ) ) : "empty",
+		  fused_speed ( ch ), fused_AC ( ch ),
+		  fused_hitroll ( ch ), fused_dambonus ( ch ),
+		  fused_accuracy ( ch ), fused_evasion ( ch ) );
+
+		if ( no_fuse_members_here )
+			ch->Send ( "NOTE: These stats do not apply since other fuse members aren't here.\r\n" );
+
+		return;
+	}
+
+	// Add fuse location
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+	{
+		if ( !strcasecmp ( buf, fuse_locations[i] ) )
+		{
+			if ( FUSE_LOC ( ch, i ) == ch )
+				FUSE_LOC ( ch, i ) = NULL;
+			else FUSE_LOC ( ch, i ) = ch;
+
+			if ( FUSE_LOC ( ch, i ) )
+				ch->Send ( "You fuse with the %s.\r\n", fuse_locations[i] );
+			else ch->Send ( "You stop fusing with the %s.\r\n", fuse_locations[i] );
+
+			if ( MASTER ( ch ) )
+			{
+				tmp_ch = MASTER ( ch );
+				FUSE_LOC ( tmp_ch, i ) = FUSE_LOC ( ch, i );
+				if ( FUSE_LOC ( ch, i ) )
+					tmp_ch->Send ( "%s fuses with the %s.\r\n", GET_NAME ( ch ), fuse_locations[i] );
+				else tmp_ch->Send ( "%s stops fusing with the %s.\r\n", GET_NAME ( ch ), fuse_locations[i] );
+			}
+			else tmp_ch = ch;
+
+			for ( f = tmp_ch->followers; f; f = f->next )
+			{
+				if ( f->follower == ch )
+					continue;
+				FUSE_LOC ( f->follower, i ) = FUSE_LOC ( ch, i );
+				if ( FUSE_LOC ( ch, i ) )
+					(f->follower)->Send ( "%s fuses with the %s.\r\n", GET_NAME ( ch ), fuse_locations[i] );
+				else (f->follower)->Send ( "%s stops fusing with the %s.\r\n", GET_NAME ( ch ), fuse_locations[i] );
+			}
+			return;
+		}
+	}
+
+	ch->Send ( "Unknown fuse location, choose one from: topcenter, topleft, topright, center, lowerleft, lowerright.\r\n" );
+}
+
+void stop_fusion ( Character *ch )
+{
+	int i;
+	Character *tmp_ch;
+	follow_type *f;
+	bool was_fused = FALSE;
+
+	if ( IS_NPC ( ch ) )
+		return;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+		FUSE_LOC ( ch, i ) = NULL;
+		if ( FUSE_LOC ( ch, i ) )
+		{
+			was_fused = TRUE;
+			FUSE_LOC ( ch, i ) = NULL;
+		}
+
+	if ( !was_fused )
+		return;
+
+	if ( MASTER ( ch ) )
+	{
+		tmp_ch = MASTER ( ch );
+		for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+			if ( FUSE_LOC ( tmp_ch, i ) == ch )
+				FUSE_LOC ( tmp_ch, i ) = NULL;
+		tmp_ch->Send ( "%s has left the fusion.\r\n", GET_NAME ( ch ) );
+	}
+	else tmp_ch = ch;
+
+	for ( f = tmp_ch->followers; f; f = f->next )
+	{
+		if ( f->follower == ch )
+			continue;
+		for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+			if ( FUSE_LOC ( f->follower, i ) == ch )
+				FUSE_LOC ( f->follower, i ) = NULL;
+		(f->follower)->Send ( "%s has left the fusion.\r\n", GET_NAME ( ch ) );
+	}
+}
+
+void enter_fusion ( Character *ch, Character *leader )
+{
+	int i;
+
+	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
+		FUSE_LOC ( ch, i ) = FUSE_LOC ( leader, i );
+
+	return;
 }
 
 /*
@@ -4948,49 +5190,6 @@ Although, this feature may not be in the final copy of this feature, as the sayi
 too many chef's spoil the broth.
 
 */
-
-ACMD ( do_fusion )
-{
-	char arg[MAX_INPUT_LENGTH];
-	char arg2[MAX_INPUT_LENGTH];
-	Character *fuse = FUSED_TO ( ch );
-	int i;
-
-	argument = two_arguments ( argument, arg, arg2 );
-
-	if ( !*arg )
-	{
-		/*list fusions */
-
-		if ( fuse == NULL )
-		{
-			ch->Send ( "Not fused at all.\r\n" );
-			return;
-		}
-		ch->Send ( "{cRFusion location stats -----{c0\r\n" );
-		for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
-		{
-			if ( !FUSE_LOC ( fuse, i ) )
-				ch->Send ( "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n", fusion_locations[i], "EMPTY", 0, 0, 0, 0 );
-			else
-			{
-				ch->Send ( "%s - (%20s) Damaged: %3d%% -- [Dam %4d ][Speed %4d ][Armor %3d ]\r\n",
-				           fusion_locations[i],
-				           GET_NAME ( FUSE_LOC ( fuse, i ) ),
-				           ( ( GET_HIT ( FUSE_LOC ( fuse, i ) ) *100 ) /GET_MAX_HIT ( FUSE_LOC ( fuse, i ) ) ),
-				           GET_DAMROLL ( FUSE_LOC ( fuse, i ) ),
-				           speed_update ( FUSE_LOC ( fuse, i ) ), 0 );
-
-			}
-		}
-
-
-	}
-	else
-		ch->Send ( "You can't get information on that fusion location yet.\r\n" );
-
-
-}
 
 ACMD ( do_diagnose )
 {

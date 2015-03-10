@@ -59,7 +59,8 @@ int perform_grapple ( Character *ch, int dir, int need_specials_check,
 int perform_charge ( Character *ch, Character *vict );
 int skill_cost ( int h, int m, int v, Character *ch );
 void view_room_by_rnum ( Character *ch, room_rnum is_in );
-
+bool is_fused ( Character *ch );
+int fused_AC ( Character *ch );
 
 #define TIER (ch ? current_class_is_tier_num(ch) : 1)
 
@@ -921,15 +922,18 @@ ASKILL ( skill_rescue )
 
 ASKILL ( skill_kick )
 {
+	int percent, prob, AC;
 
-	int percent, prob;
 	if ( use_stamina ( ch, 5 ) < 0 )
 	{
 		*ch << "You are far too exhausted!";
 		return 0;
 	}
 	/* 101% is a complete failure */
-	percent = ( ( 10 - ( vict->compute_armor_class() / 10 ) ) * 2 ) + number ( 1, 70 );
+	if ( is_fused ( vict ) )
+		AC = fused_AC ( vict );
+	else AC = vict->compute_armor_class();
+	percent = ( ( 10 - ( AC / 10 ) ) * 2 ) + number ( 1, 70 );
 	prob = total_chance ( ch, SKILL_KICK );
 	WAIT_STATE ( ch, FTOI ( 1.5 RL_SEC ) );
 

@@ -26,6 +26,10 @@
 extern struct time_data time_info;
 extern struct track_data track_fights;
 
+/* external functions */
+void stop_fusion ( Character *ch );
+void enter_fusion ( Character *ch, Character *leader );
+
 /* local functions */
 struct time_info_data *real_time_passed ( time_t t2, time_t t1 );
 struct time_info_data *mud_time_passed ( time_t t2, time_t t1 );
@@ -828,6 +832,7 @@ void stop_follower ( Character *ch )
 		act ( "You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR );
 		act ( "$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT );
 		act ( "$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT );
+		stop_fusion ( ch );
 	}
 
 	if ( ch->master->followers->follower == ch )  /* Head of follower-list? */
@@ -907,6 +912,8 @@ int even_group ( Character *ch );
 		core_dump();
 		return;
 	}
+
+	enter_fusion ( ch, leader );
 
 	ch->master = leader;
 

@@ -614,7 +614,6 @@ const command_info cmd_info[] =
 	{ "force"    , "for" , POS_SLEEPING, do_force    , LVL_IMMORT, 0, WIZ_SEN_GRP },
 	{ "fuel"	 , "fue" , POS_RESTING , do_fuel   , 0, 0, 0 },
 	{ "fuse"     , "fuse"     , POS_RESTING , do_fuse   , 0, 0, 0 },
-	{ "fusion"   , "fusion"   , POS_RESTING , do_fusion   , 0, 0, 0 },
 	{ "freeze"   , "free" , POS_DEAD    , do_heroutil  , 0, SCMD_FREEZE, 0 },
 	{ "forest"   , "forest" , POS_DEAD    , forest_find  , LVL_IMMORT, 0, 0 },
 

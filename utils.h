@@ -767,7 +767,6 @@ int check_mail ( Character *ch );
 #define GET_ATTACK_POS(ch)      ((ch)->attack_location)
 #define CONCEALMENT(ch) 	((ch)->concealment)
 #define FUSE_LOC(ch, loc)       ((ch)->fuses[(loc)])
-#define FUSED_TO(ch)            ((ch)->fused_to)
 //Thotts
 #define GET_CSNP_LVL(ch)	(SPECIALS(ch)->saved.ctellsnoop)
 

@@ -68,7 +68,6 @@ public:
     struct obj_data *char_eq[NUM_WEARS];
     bool IsNaked;
     Character *fuses[TOP_FUSE_LOCATION];
-    Character *fused_to;
     struct obj_data *hitched;
     time_t last_move;
     int sweep_damage;

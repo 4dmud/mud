@@ -1525,33 +1525,6 @@ size_t new_send_to_char(Character *ch, const char *messg, ...) {
     return 0;
 }
 
-size_t send_to_fusion(Character *ch, const char *messg, ...) {
-    if (FUSED_TO(ch) && messg && *messg) {
-        size_t left = 0;
-        va_list args;
-        int i = 0;
-        Character *fuse, *tmpfuse;
-
-        fuse = (FUSED_TO(ch));
-        tmpfuse = fuse;
-        for (i = 0; i < TOP_FUSE_LOCATION; i++) {
-            tmpfuse = FUSE_LOC(fuse, i);
-            if (tmpfuse && tmpfuse->desc) {
-                va_start(args, messg);
-                left = tmpfuse->desc->vwrite_to_output(messg, args);
-                va_end(args);
-            }
-
-
-        }
-        return left;
-    }
-    return 0;
-}
-
-
-
-
 
 /* ******************************************************************
 *  general utility stuff (for local use)                            *
