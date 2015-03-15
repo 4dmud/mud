@@ -158,6 +158,9 @@ void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
   int roomx = 0, roomy = 0;
   struct room_direction_data *pExit;
 
+  if ( x < 0 || y < 0 || x > MAPX || y > MAPY )
+     return;
+
   /* Setup this coord as a room */
   snprintf(amap[x][y].tegn, 3, "%d", SECTOR(pRoom));
   /*

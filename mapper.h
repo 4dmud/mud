@@ -3,7 +3,7 @@
 #define MAPX     10
 #define MAPY     12
 /* You can change MAXDEPTH to 1 if the diagonal directions are confusing */
-#define MAXDEPTH  2
+#define MAXDEPTH  1000 // show all rooms that fit
 #define MDIS(num)  ((sect + (num)) <= NUM_ROOM_SECTORS)
 #define BOUNDARY(x, y) (((x) < 0) || ((y) < 0) || ((x) > MAPX) || ((y) > MAPY))
 
@@ -58,7 +58,7 @@ static struct map_bit_data {
 {"'", "{cr", "Badlands"    },//SECT_BADLANDS
 {"+", "{cy", "Rail"        },//SECT_RAIL
 
-{".", "{cl", "Unknown"     } //NUM_ROOM_SECTORS
+{"?", "{cl", "Unknown"     } //NUM_ROOM_SECTORS
     };
 
 

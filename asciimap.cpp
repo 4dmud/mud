@@ -95,9 +95,12 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 				mapgrid[x][y] = SECT_VEHICLE;
 	}
 
-	/* Otherwise we get a nasty crash */
-	if ( !IS_SET_AR ( IN_ROOM ( ch )->room_flags, ROOM_WILDERNESS ) )
+	if ( ( x < min ) || ( y < min ) || ( x > max ) || ( y > max ) )
 		return;
+
+	/* Otherwise we get a nasty crash */
+//	if ( !IS_SET_AR ( IN_ROOM ( ch )->room_flags, ROOM_WILDERNESS ) )
+//		return;
 
 	for ( door = 0; door < MAX_MAP_DIR; door++ )
 	{
@@ -105,8 +108,6 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 		        ( pexit->to_room > 0 ) &&
 		        ( !IS_SET ( pexit->exit_info, EX_CLOSED ) ) )
 		{
-			if ( ( x < min ) || ( y < min ) || ( x > max ) || ( y > max ) )
-				return;
 			prospect_room = pexit->to_room;
 
 			/* one way into area OR maze */
@@ -199,7 +200,7 @@ void ShowMap ( Character *ch, int min, int max )
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
+							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl?{cn" );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
@@ -208,7 +209,7 @@ void ShowMap ( Character *ch, int min, int max )
 					len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len," " );
 				}
 				else
-		{
+				{
 					switch ( mapgrid[x][y] )
 					{
 						case NUM_ROOM_SECTORS:
@@ -241,7 +242,7 @@ void ShowMap ( Character *ch, int min, int max )
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"%s%s", map_bit[mapgrid[x][y]].colour, map_bit[mapgrid[x][y]].bit );
 							break;
 						case ( NUM_ROOM_SECTORS + 1 ) :
-							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl.{cn" );
+							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cl?{cn" );
 							break;
 						default:
 							len += snprintf ( mapdisp + len, sizeof ( mapdisp ) - len,"{cR*" );
@@ -305,23 +306,22 @@ void ShowRoom ( Character *ch, int min, int max )
  */
 ACMD ( do_map )
 {
-	int size = 0, center, x, y, min, max;
-	room_rnum was_in;
+	int size = 0, center, x, y, min, max, i;
+	room_rnum was_in, r;
 	struct obj_data *viewport, *vehicle;
-	//arg1[0] = 0;
-	//one_argument(argument, arg1);
-	//size = atoi(arg1);
-	size = URANGE ( 10, size, MAX_MAP );
+	char buf[MAX_INPUT_LENGTH];
+	struct room_direction_data *pexit;
 
-	center = MAX_MAP / 2;
-
-	min = MAX_MAP / 2 - size / 2;
-	max = MAX_MAP / 2 + size / 2;
+	if ( IS_DARK ( IN_ROOM ( ch ) ) && !CAN_SEE_IN_DARK ( ch ) )
+	{
+		ch->Send ( "{cbThe wilderness is pitch black at night... {cx\r\n" );
+		return;
+	}
 
 	was_in = IN_ROOM ( ch );
 
-	viewport =
-	    get_obj_in_list_type ( ITEM_V_WINDOW, IN_ROOM ( ch )->contents );
+	viewport = get_obj_in_list_type ( ITEM_V_WINDOW, was_in->contents );
+
 	if ( viewport )
 	{
 		vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( viewport, 0 ) );
@@ -332,15 +332,85 @@ ACMD ( do_map )
 		}
 		IN_ROOM ( ch ) = IN_ROOM ( vehicle );
 	}
-        else if (IN_ROOM(ch)->vehicle)
-            IN_ROOM(ch) = IN_ROOM(IN_ROOM(ch)->vehicle);
+        else if ( IN_ROOM ( ch )->vehicle )
+            IN_ROOM ( ch ) = IN_ROOM ( IN_ROOM ( ch )->vehicle );
+
+	//arg1[0] = 0;
+	//one_argument(argument, arg1);
+	//size = atoi(arg1);
+	size = URANGE ( 10, size, MAX_MAP );
+
+	center = MAX_MAP / 2;
+
+	min = MAX_MAP / 2 - size / 2;
+	max = MAX_MAP / 2 + size / 2;
 
 	for ( x = 0; x < MAX_MAP; ++x )
 		for ( y = 0; y < MAX_MAP; ++y )
 			mapgrid[x][y] = NUM_ROOM_SECTORS;
 
 	/* starts the mapping with the center room */
-	MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, true );
+	MapArea ( IN_ROOM ( ch ), ch, center, center, min, max, true );
+
+	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	{
+		size = atoi ( argument );
+		if ( size < 1 || size > 5 )
+			size = 4;
+		r = was_in;
+		parse_room_name ( r, buf, sizeof ( buf ) );
+		ch->Send ( "%s: %s\r\n", buf, map_bit[mapgrid[center][center]].name );
+
+		if ( mapgrid[center - 1][center] < NUM_ROOM_SECTORS )
+		{
+			ch->Send ( "North: %s", map_bit[mapgrid[center - 1][center]].name );
+			for ( i = 2; i <= size && mapgrid[center - i][center] < NUM_ROOM_SECTORS; i++ )
+				ch->Send ( ", %s", map_bit[mapgrid[center - i][center]].name );
+			ch->Send ( "\r\n" );
+		}
+		if ( mapgrid[center][center + 1] < NUM_ROOM_SECTORS )
+		{
+			ch->Send ( "East: %s", map_bit[mapgrid[center][center + 1]].name );
+			for ( i = 2; i <= size && mapgrid[center][center + i] < NUM_ROOM_SECTORS; i++ )
+				ch->Send ( ", %s", map_bit[mapgrid[center][center + i]].name );
+			ch->Send ( "\r\n" );
+		}
+		if ( mapgrid[center + 1][center] < NUM_ROOM_SECTORS )
+		{
+			ch->Send ( "South: %s", map_bit[mapgrid[center + 1][center]].name );
+			for ( i = 2; i <= size && mapgrid[center + i][center] < NUM_ROOM_SECTORS; i++ )
+				ch->Send ( ", %s", map_bit[mapgrid[center + i][center]].name );
+			ch->Send ( "\r\n" );
+		}
+		if ( mapgrid[center][center - 1] < NUM_ROOM_SECTORS )
+		{
+			ch->Send ( "West: %s", map_bit[mapgrid[center][center - 1]].name );
+			for ( i = 2; i <= size && mapgrid[center][center - i] < NUM_ROOM_SECTORS; i++ )
+				ch->Send ( ", %s", map_bit[mapgrid[center][center - i]].name );
+			ch->Send ( "\r\n" );
+		}
+
+		if ( ( pexit = IN_ROOM ( ch )->dir_option[4] ) != NULL && ( r = pexit->to_room ) != NULL && !IS_SET ( pexit->exit_info, EX_CLOSED ) )
+			ch->Send ( "Up: %s\r\n", map_bit[ r->sector_type ].name );
+
+		if ( ( pexit = IN_ROOM ( ch )->dir_option[5] ) != NULL && ( r = pexit->to_room ) != NULL && !IS_SET ( pexit->exit_info, EX_CLOSED ) )
+			ch->Send ( "Down: %s\r\n", map_bit[ r->sector_type ].name );
+
+		if ( mapgrid[center - 1][center - 1] < NUM_ROOM_SECTORS )
+			ch->Send ( "Northwest: %s\r\n", map_bit[mapgrid[center - 1][center - 1]].name );
+
+		if ( mapgrid[center - 1][center + 1] < NUM_ROOM_SECTORS )
+			ch->Send ( "Northeast: %s\r\n", map_bit[mapgrid[center - 1][center + 1]].name );
+
+		if ( mapgrid[center + 1][center + 1] < NUM_ROOM_SECTORS )
+			ch->Send ( "Southeast: %s\r\n", map_bit[mapgrid[center + 1][center + 1]].name );
+
+		if ( mapgrid[center + 1][center - 1] < NUM_ROOM_SECTORS )
+			ch->Send ( "Southwest: %s\r\n", map_bit[mapgrid[center + 1][center - 1]].name );
+
+		IN_ROOM ( ch ) = was_in;
+		return;
+	}
 
 	/* marks the center, where ch is */
 	mapgrid[center][center] = NUM_ROOM_SECTORS + 2;	/* can be any number above NUM_ROOM_SECTORS+1 */
@@ -358,20 +428,11 @@ ACMD ( do_map )
 		IN_ROOM ( ch ) = was_in;
 		return;
 	}
-	if ( IS_DARK ( IN_ROOM ( ch ) ) && !CAN_SEE_IN_DARK ( ch ) )
-	{
-		send_to_char
-		( "{cbThe wilderness is pitch black at night... {cx\r\n",
-		  ch );
-		IN_ROOM ( ch ) = was_in;
-		return;
-	}
-	else
-	{
-		ShowRoom ( ch, min, max + 1 );
-		IN_ROOM ( ch ) = was_in;
-		return;
-	}
+
+	ShowRoom ( ch, min, max + 1 );
+	IN_ROOM ( ch ) = was_in;
+	return;
+
 //    }
 	/* mortals not in city, enter or inside will always get a ShowRoom */
 	/* unnecesary to have a seperate command for gods. besides, it crashes the mud.
@@ -387,7 +448,4 @@ ACMD ( do_map )
 		return;
 	    }
 	    */
-	ch->Send ( "What??\r\n" );
-	IN_ROOM ( ch ) = was_in;
-	return;
 }

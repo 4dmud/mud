@@ -1512,8 +1512,8 @@ ACMD ( do_gen_tog )
 		 "BUSY flag is now on.\r\n"},
 		{"Aggro mode disabled.\r\n",
 		 "Aggro mode enabled.\r\n"},
-		{"Nobrag on.\r\n",
-		 "Nobrag off.\r\n"},
+		{"Nobrag off.\r\n",
+		 "Nobrag on.\r\n"},
 		{"You are now safe from gating by other players.\r\n",
 		"You may now be gated to by other players.\r\n"      },
 		// Flipped these messages -> Prom
