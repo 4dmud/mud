@@ -2280,7 +2280,7 @@ int enter_player_game ( Descriptor *d )
 		PAGEHEIGHT ( ch ) = 40;
 		GET_MAX_STAMINA ( ch ) = 100;
 		SET_BIT_AR ( AFF_FLAGS ( ch ), AFF_GROUP );
-		SET_BIT_AR ( PRF_FLAGS ( ch ), PRF_NOGOSS );
+		//SET_BIT_AR ( PRF_FLAGS ( ch ), PRF_NOGOSS );
 		ch->LoadKillList();
 		LOOK ( ch );
 

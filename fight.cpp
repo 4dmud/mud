@@ -1465,7 +1465,8 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 	if ( AFF_FLAGGED ( vict, AFF_SANCTUARY ) )
 	{
-		if ( GET_CLASS ( ch ) == CLASS_WARRIOR && ( GET_SUB ( ch, SUB_REPEL_SANC ) > number ( 0, 150 ) ) )
+		if ( ( GET_CLASS ( ch ) == CLASS_WARRIOR || GET_MASTERY ( ch, CLASS_WARRIOR ) ) &&
+			( GET_SUB ( ch, SUB_REPEL_SANC ) > number ( 0, 150 ) ) )
 		{
 			act ( "$n moves in past your white aura!", FALSE, ch, 0, vict, TO_VICT );
 			act ( "You move in past $N's white aura!", FALSE, ch, 0, vict, TO_CHAR );
