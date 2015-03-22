@@ -4855,15 +4855,20 @@ ACMD ( do_consider )
 bool is_fused ( Character *ch )
 {
 	int i;
+	bool fused_self = FALSE, fused_other = FALSE;
 
 	if ( IS_NPC ( ch ) )
 		return FALSE;
 
 	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
-		if ( FUSE_LOC ( ch, i ) && FUSE_LOC ( ch, i ) != ch && IN_ROOM ( ch ) == IN_ROOM ( FUSE_LOC ( ch, i ) ) )
-			return TRUE;
+		if ( FUSE_LOC ( ch, i ) == ch )
+			fused_self = TRUE;
+		else if ( FUSE_LOC ( ch, i ) && FUSE_LOC ( ch, i ) != ch && IN_ROOM ( ch ) == IN_ROOM ( FUSE_LOC ( ch, i ) ) )
+			fused_other = TRUE;
 
-	return FALSE;
+	if ( fused_self && fused_other )
+		return TRUE;
+	else return FALSE;
 }
 
 int fused_speed ( Character *ch )
@@ -4993,7 +4998,6 @@ ACMD ( do_fuse )
 	int i;
 	Character *tmp_ch;
 	follow_type *f;
-	bool no_fuse_members_here = TRUE;
 
 	if ( IS_NPC ( ch ) )
 		return;
@@ -5003,16 +5007,6 @@ ACMD ( do_fuse )
 	// Show fused stats
 	if ( !*buf )
 	{
-		for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
-		{
-			tmp_ch = FUSE_LOC ( ch, i );
-			if ( tmp_ch && tmp_ch != ch && IN_ROOM ( tmp_ch ) == IN_ROOM ( ch ) )
-			{
-				no_fuse_members_here = FALSE;
-				break;
-			}
-		}
-
 		speed_update ( ch );
 
 		if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
@@ -5059,8 +5053,8 @@ ACMD ( do_fuse )
 		  fused_hitroll ( ch ), fused_dambonus ( ch ),
 		  fused_accuracy ( ch ), fused_evasion ( ch ) );
 
-		if ( no_fuse_members_here )
-			ch->Send ( "NOTE: These stats do not apply since other fuse members aren't here.\r\n" );
+		if ( !is_fused ( ch ) )
+			ch->Send ( "NOTE: These stats do not apply since less than two fuse members are here.\r\n" );
 
 		return;
 	}
