@@ -364,7 +364,7 @@ void hedit_parse(Descriptor *d, char *arg) {
         default:
             d->Output( "Invalid choice!\r\n"
                        "Do you wish to edit the '%s' help entry? ",
-                       soc_mess_list[OLC_ZNUM(d)].command);
+                       help_table[OLC_ZNUM(d)].keywords);
             break;
         }
         return;

@@ -312,7 +312,7 @@ ACMD(do_trade)
   int i;
   struct obj_data *obj;
 
-  if (GET_ID(ch) != 26606)
+  //if (GET_ID(ch) != 26606)
       return;
 
   argument = one_argument(argument, arg1);
