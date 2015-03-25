@@ -768,7 +768,7 @@ void sector_update ( void )
 			        check_time() && !i->SunProtected() )
 				if ( damage ( i, i, number ( 1, 10 ), TYPE_DESERT ) == -1 )
 					continue;
-			if ( ROOM_FLAGGED ( i->in_room, ROOM_IRRADIATED )
+			if ( i->in_room && ROOM_FLAGGED ( i->in_room, ROOM_IRRADIATED )
     			        && !i->RadiationProof() )
 			{
 		        int radhit, muthit;
