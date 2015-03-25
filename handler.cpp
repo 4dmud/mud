@@ -2896,18 +2896,6 @@ int generic_find ( char *arg, bitvector_t bitvector, Character *ch,
 	if ( ! ( number = get_number ( &name ) ) )
 		return ( 0 );
 
-	if ( IS_SET ( bitvector, FIND_CHAR_ROOM ) )    /* Find person in room */
-	{
-		if ( ( *tar_ch = get_char_room_vis ( ch, name, &number ) ) != NULL )
-			return ( FIND_CHAR_ROOM );
-	}
-
-	if ( IS_SET ( bitvector, FIND_CHAR_WORLD ) )
-	{
-		if ( ( *tar_ch = get_char_world_vis ( ch, name, &number ) ) != NULL )
-			return ( FIND_CHAR_WORLD );
-	}
-
 	if ( IS_SET ( bitvector, FIND_OBJ_INV ) )
 	{
 		if ( ( *tar_obj =
@@ -2921,6 +2909,18 @@ int generic_find ( char *arg, bitvector_t bitvector, Character *ch,
 		            get_obj_in_list_vis ( ch, name, &number,
 		                                  IN_ROOM ( ch )->contents ) ) != NULL )
 			return ( FIND_OBJ_ROOM );
+	}
+
+	if ( IS_SET ( bitvector, FIND_CHAR_ROOM ) )    /* Find person in room */
+	{
+		if ( ( *tar_ch = get_char_room_vis ( ch, name, &number ) ) != NULL )
+			return ( FIND_CHAR_ROOM );
+	}
+
+	if ( IS_SET ( bitvector, FIND_CHAR_WORLD ) )
+	{
+		if ( ( *tar_ch = get_char_world_vis ( ch, name, &number ) ) != NULL )
+			return ( FIND_CHAR_WORLD );
 	}
 
 	if ( IS_SET ( bitvector, FIND_OBJ_EQUIP ) )

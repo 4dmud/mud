@@ -1756,54 +1756,12 @@ void look_at_target ( Character *ch, char *arg )
 	bits = generic_find ( arg,FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
 	                      FIND_CHAR_ROOM, ch, &found_char, &found_obj );
 
-	/* Is the target a character? */
-	if ( found_char != NULL )
-	{
-		look_at_char ( found_char, ch );
-		if ( ch != found_char )
-		{
-			if ( CAN_SEE ( found_char, ch ) )
-				act ( "$n looks at you.", TRUE, ch, 0, found_char, TO_VICT );
-			act ( "$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT );
-		}
-		return;
-	}
-
 	/* Strip off "number." from 2.foo and friends. */
 	if ( ! ( fnum = get_number ( &arg ) ) )
 	{
 		*ch << "Look at what?\r\n";
 		return;
 	}
-
-	/* Does the argument match an extra desc in the room? */
-	if ( ( desc =
-	            find_exdesc ( arg, IN_ROOM ( ch )->ex_description ) ) != NULL
-	        && ++i == fnum )
-	{
-		page_string ( ch->desc, desc, FALSE );
-		return;
-	}
-
-	/* Does the argument match an extra desc in the char's equipment? */
-	for ( j = 0; j < NUM_WEARS && !found; j++ )
-		if ( GET_EQ ( ch, j ) && CAN_SEE_OBJ ( ch, GET_EQ ( ch, j ) ) )
-			if ( ( desc =
-			            find_exdesc ( arg, GET_EQ ( ch, j )->ex_description ) ) != NULL
-			        && ++i == fnum )
-			{
-				*ch << desc;
-				if ( GET_OBJ_TYPE ( GET_EQ ( ch, j ) ) == ITEM_GUN )
-				{
-					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 0 )
-						ch->Send ( "It is unloaded.\r\n" );
-					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 1 )
-						ch->Send ( "It has one shot left.\r\n" );
-					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) > 1 )
-						ch->Send ( "It has %d shots left.\r\n", GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) );
-				}
-				found = TRUE;
-			}
 
 	/* Does the argument match an extra desc in the char's inventory? */
 	for ( obj = ch->carrying; obj && !found; obj = obj->next_content )
@@ -1835,6 +1793,19 @@ void look_at_target ( Character *ch, char *arg )
 			}
 	}
 
+	/* Is the target a character? */
+	if ( found_char != NULL )
+	{
+		look_at_char ( found_char, ch );
+		if ( ch != found_char )
+		{
+			if ( CAN_SEE ( found_char, ch ) )
+				act ( "$n looks at you.", TRUE, ch, 0, found_char, TO_VICT );
+			act ( "$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT );
+		}
+		return;
+	}
+
 	/* Does the argument match an extra desc of an object in the room? */
 	for ( obj = IN_ROOM ( ch )->contents; obj && !found;
 	        obj = obj->next_content )
@@ -1843,6 +1814,35 @@ void look_at_target ( Character *ch, char *arg )
 			        && ++i == fnum )
 			{
 				*ch << desc;
+				found = TRUE;
+			}
+
+	/* Does the argument match an extra desc in the room? */
+	if ( ( desc =
+	            find_exdesc ( arg, IN_ROOM ( ch )->ex_description ) ) != NULL
+	        && ++i == fnum )
+	{
+		page_string ( ch->desc, desc, FALSE );
+		return;
+	}
+
+	/* Does the argument match an extra desc in the char's equipment? */
+	for ( j = 0; j < NUM_WEARS && !found; j++ )
+		if ( GET_EQ ( ch, j ) && CAN_SEE_OBJ ( ch, GET_EQ ( ch, j ) ) )
+			if ( ( desc =
+			            find_exdesc ( arg, GET_EQ ( ch, j )->ex_description ) ) != NULL
+			        && ++i == fnum )
+			{
+				*ch << desc;
+				if ( GET_OBJ_TYPE ( GET_EQ ( ch, j ) ) == ITEM_GUN )
+				{
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 0 )
+						ch->Send ( "It is unloaded.\r\n" );
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) == 1 )
+						ch->Send ( "It has one shot left.\r\n" );
+					if ( GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) > 1 )
+						ch->Send ( "It has %d shots left.\r\n", GET_OBJ_VAL ( GET_EQ ( ch, j ), 2 ) );
+				}
 				found = TRUE;
 			}
 
