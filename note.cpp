@@ -443,50 +443,50 @@ bool is_note_to ( Character *ch, NOTE_DATA *pnote )
 	if ( !str_cmp ( GET_NAME ( ch ), pnote->sender ) )
 		return TRUE;
 
-	if ( isname ( "all", pnote->to_list ) )
+	if ( is_name ( "all", pnote->to_list ) )
 		return TRUE;
 
 	if ( IS_IMMORTAL ( ch ) &&
-	        ( is_name ( "immortal", pnote->to_list ) || ( isname ( "imm", pnote->to_list ) ) ) )
+	        ( is_name ( "immortal", pnote->to_list ) || ( is_name ( "imm", pnote->to_list ) ) ) )
 		return TRUE;
 
-	if ( IS_ADMIN ( ch )  && isname ( "admin", pnote->to_list ) )
+	if ( IS_ADMIN ( ch )  && is_name ( "admin", pnote->to_list ) )
 		return TRUE;
 
-	if ( GET_CLAN ( ch ) && isname ( clan_name ( find_clan_by_id ( GET_CLAN ( ch ) ) ),pnote->to_list ) )
+	if ( GET_CLAN ( ch ) && is_name ( clan_name ( find_clan_by_id ( GET_CLAN ( ch ) ) ), pnote->to_list ) )
 		return TRUE;
 
-	if ( PLR_FLAGGED ( ch, PLR_HERO ) && ( isname ( "hero", pnote->to_list ) || isname ( "heros", pnote->to_list ) ) )
+	if ( PLR_FLAGGED ( ch, PLR_HERO ) && ( is_name ( "hero", pnote->to_list ) || is_name ( "heros", pnote->to_list ) ) )
 		return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_RP_LEADER ) && isname ( "rpl", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_RP_LEADER ) && is_name ( "rpl", pnote->to_list ) )
 		return TRUE;
 
 // Temp remove this. Prometheus
-//	if ( PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) && isname ( "rp", pnote->to_list ) )
+//	if ( PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) && is_name ( "rp", pnote->to_list ) )
 //		return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_PK ) && isname ( "pk", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_PK ) && is_name ( "pk", pnote->to_list ) )
 		return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_NEWBIE_HLPR ) && isname ( "helper", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_NEWBIE_HLPR ) && is_name ( "helper", pnote->to_list ) )
 		return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_JESTER ) && isname ( "jester", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_JESTER ) && is_name ( "jester", pnote->to_list ) )
                 return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_CTHULYTE ) && isname ( "cthulyte", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_CTHULYTE ) && is_name ( "cthulyte", pnote->to_list ) )
                 return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_ALDERISIO ) && isname ( "alderisio", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_ALDERISIO ) && is_name ( "alderisio", pnote->to_list ) )
                 return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_BITCH ) && isname ( "bitch", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_BITCH ) && is_name ( "bitch", pnote->to_list ) )
                 return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_RIDDLER ) && isname ( "riddler", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_RIDDLER ) && is_name ( "riddler", pnote->to_list ) )
                 return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_LOLTHYTE ) && isname ( "lolthyte", pnote->to_list ) )
+	if ( PLR_FLAGGED ( ch, PLR_LOLTHYTE ) && is_name ( "lolthyte", pnote->to_list ) )
                 return TRUE;
-        if ( PLR_FLAGGED ( ch, PLR_FEARLESS ) && isname ( "fearless", pnote->to_list ) )
+        if ( PLR_FLAGGED ( ch, PLR_FEARLESS ) && is_name ( "fearless", pnote->to_list ) )
                 return TRUE;
-        if ( PLR_FLAGGED ( ch, PLR_GALLIANO ) && isname ( "galliano", pnote->to_list ) )
+        if ( PLR_FLAGGED ( ch, PLR_GALLIANO ) && is_name ( "galliano", pnote->to_list ) )
                 return TRUE;
-	if ( isname ( GET_NAME ( ch ), pnote->to_list ) )
+	if ( is_name ( GET_NAME ( ch ), pnote->to_list ) )
 		return TRUE;
-	if ( isname ( list_account_names ( ch ).c_str(), pnote->to_list ) )
+	if ( is_name ( list_account_names ( ch ).c_str(), pnote->to_list ) )
 		return TRUE;
 
 	return FALSE;
