@@ -2876,7 +2876,7 @@ int Descriptor::process_input() {
         if (snoop_by)
             snoop_by->Output("%% %s\r\n", tmp);
         failed_subst = 0;
-        if (*tmp == '-' && *(tmp + 1) == '-')
+        if ( *tmp == '-' && *(tmp + 1) == '-' && STATE ( this ) == CON_PLAYING )
             flush_queues();
         else if (*tmp == '!' && !(*(tmp + 1)))   /* Redo last command. */
             strcpy(tmp, last_input);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */

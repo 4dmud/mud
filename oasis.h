@@ -76,10 +76,10 @@ const int MAX_ROOM_NAME	= 75;
 const int MAX_MOB_NAME	= 50;
 const int MAX_OBJ_NAME	= 50;
 const int MAX_ROOM_DESC	= 2048;
-const int MAX_EXIT_DESC	= 256;
-const int MAX_EXTRA_DESC  = 512;
+const int MAX_EXIT_DESC	= 1024;
+const int MAX_EXTRA_DESC  = 1024;
 const int MAX_MOB_DESC	= 1024;
-const int MAX_OBJ_DESC	= 512;
+const int MAX_OBJ_DESC	= 1024;
 const int MAX_DUPLICATES  = 2000;  /* when loading in zedit */
 
 /* arbitrary limits - roll your own */
