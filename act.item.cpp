@@ -3656,7 +3656,7 @@ ACMD ( do_wear )
 	arg2 = str_until ( argument, "on", arg1, sizeof ( arg1 ) );
 
 
-	if ( !*arg1 )
+	if ( !*argument )
 	{
 		*ch << "Wear what?\r\n";
 		return;
