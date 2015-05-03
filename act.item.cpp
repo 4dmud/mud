@@ -905,6 +905,13 @@ bool can_take_obj ( Character *ch, struct obj_data *obj )
 		act ( "$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
 	}
+	else if ( OBJ_SAT_IN_BY ( obj ) != NULL )
+	{
+		if ( OBJ_SAT_IN_BY ( obj ) == ch )
+			ch->Send ( "Maybe you should get on your feet first?\r\n" );
+		else ch->Send ( "You can't take that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
+		return FALSE;
+	}
 	else if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
 	{
 		act ( "$p: you can't carry that many items.", FALSE, ch, obj, 0, TO_CHAR );

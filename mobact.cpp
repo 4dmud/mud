@@ -33,6 +33,7 @@ void hunt_victim ( Character *ch );
 void parse_mob_commands ( Character *ch );
 Character * parse_aggressive ( Character *ch );
 int valid_perc ( Character *ch );
+bool can_take_obj(Character *ch, struct obj_data *obj);
 
 /* local functions */
 void mobile_activity ( void );
@@ -107,7 +108,7 @@ void mobile_activity ( void )
 				best_obj = NULL;
 				for ( obj = IN_ROOM ( ch )->contents; obj;
 				        obj = obj->next_content )
-					if ( CAN_GET_OBJ ( ch, obj ) && GET_OBJ_COST ( obj ) > max && ( ! ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) ) ) )
+					if ( CAN_GET_OBJ ( ch, obj ) && can_take_obj ( ch, obj ) && GET_OBJ_COST ( obj ) > max && ( ! ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) ) ) )
 					{
 						best_obj = obj;
 						max = GET_OBJ_COST ( obj );

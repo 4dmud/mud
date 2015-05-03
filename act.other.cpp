@@ -1884,6 +1884,11 @@ ACMD ( do_sac )
 		*ch << "You can't sacrifice that.\r\n";
 		return;
 	}
+	if ( OBJ_SAT_IN_BY ( obj ) != NULL )
+	{
+		ch->Send ( "You can't sacrifice that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
+		return;
+	}
 	// seems as if everything checks out eh? ok now do it
 	act ( "$n sacrifices $p.", FALSE, ch, obj, 0, TO_ROOM );
 	act ( "You sacrifice $p to your god.\r\nYou have been rewarded by your deity.\r\n", FALSE, ch, obj, 0, TO_CHAR );

@@ -232,6 +232,7 @@ void show_obj_to_char ( struct obj_data *obj, Character *ch,
 					else
 						ch->Send ( "You are mounted upon %s.", obj->short_description );
 				}
+				else ch->Send ( "%s", obj->description );
 			}
 
 			break;

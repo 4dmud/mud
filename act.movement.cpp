@@ -2696,8 +2696,8 @@ ASKILL ( skill_mount )
 			NEXT_SITTING ( ch ) = NULL;
 			GET_OBJ_VAL ( obj, 1 ) += 1;
 
-			act ( "You mount $p", TRUE, ch, obj, NULL, TO_CHAR );
-			act ( "$n mounts $p", TRUE, ch, obj, NULL, TO_ROOM );
+			act ( "You mount $p.", TRUE, ch, obj, NULL, TO_CHAR );
+			act ( "$n mounts $p.", TRUE, ch, obj, NULL, TO_ROOM );
 			return 0;
 		}
 		if ( !vict )
