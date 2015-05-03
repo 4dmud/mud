@@ -348,6 +348,8 @@ int command_mtrigger(Character * actor, char *cmd, char *argument) {
     if (!valid_dg_target(actor, FALSE))
         return 0;
 
+    if ( IN_ROOM ( actor ) == NULL )
+        return 0;
 
     for (ch = IN_ROOM(actor)->people; ch; ch = ch_next) {
         ch_next = ch->next_in_room;
