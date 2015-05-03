@@ -7901,7 +7901,7 @@ ACMD ( do_findtrig )
 			{
 				if ( *it2 == trig_vnum )
 				{
-					snprintf ( buf, sizeof ( buf ), "O%3d. [%5d] %-25s\r\n", ++num, obj_index[i].vnum, obj_proto[i].name );
+					snprintf ( buf, sizeof ( buf ), "O%3d. [%5d] %-25s\r\n", ++num, obj_index[i].vnum, obj_proto[i].short_description );
 					DYN_RESIZE ( buf );
 					found = TRUE;
 					break;
