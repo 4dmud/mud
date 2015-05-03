@@ -1625,19 +1625,15 @@ ACMD(do_mcollision) {
             IN_ROOM(ch) = real_room(GET_OBJ_VAL(obj, 0));
             GET_OBJ_VAL(obj, 2) -= damage;
             if (GET_OBJ_VAL(obj, 2) <= 0) {   // blow it up
-                //act("As the $p collides with $n, it explodes.",
-                //    FALSE, ch, obj, NULL, TO_ROOM);
+                act("As the $p collides with $n, it explodes.", FALSE, ch, obj, NULL, TO_ROOM);
                 IN_ROOM(ch) = was_in;
-                act("As $p collides with $n, it explodes.",
-                    FALSE, ch, obj, NULL, TO_ROOM);
-
+                act("As $p collides with $n, it explodes.", FALSE, ch, obj, NULL, TO_ROOM);
                 extract_obj(obj);
                 return;
             } else {
                 act("$n collides with the ship, causing damage to the hull.", FALSE, ch, obj, NULL, TO_ROOM);
                 IN_ROOM(ch) = was_in;
-                act("$n collides with $p, causing some damage to $p.",
-                    FALSE, ch, obj, NULL, TO_ROOM);
+                act("$n collides with $p, causing some damage to $p.", FALSE, ch, obj, NULL, TO_ROOM);
                 return;
             }
         }
