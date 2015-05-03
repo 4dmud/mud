@@ -380,10 +380,6 @@ public:
 }
 ;
 /** genzon.c - at the bottom - Mord**/
-/** zone vector compare **/
-bool operator< (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
-bool operator> (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
-bool operator== (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b);
 /** Zone compare **/
 bool operator< (const Zone &a,const Zone &b);
 bool operator> (const Zone &a,const Zone &b);

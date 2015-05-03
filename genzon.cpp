@@ -584,16 +584,6 @@ void delete_command(Zone *zone, int pos) {
 
 /*-------------------------------------------------------------------*/
 /*--------------Zone Comparison utilitys-----------------------------*/
-/** zone vector compare **/
-bool operator< (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b) {
-    return ((*a).number < (*b).number);
-}
-bool operator> (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b) {
-    return ((*a).number > (*b).number);
-}
-bool operator== (const vector<Zone>::iterator &a,const  vector<Zone>::iterator &b) {
-    return ((*a).number == (*b).number);
-}
 /** Zone compare **/
 bool operator< (const Zone &a,const Zone &b) {
     return (a.number < b.number);
