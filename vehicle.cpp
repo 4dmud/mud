@@ -331,6 +331,11 @@ SPECIAL(vehicle_controls) {
 SPECIAL(vehicle_hatch) {
     struct obj_data *hatch, *v;
     if (CMD_IS("leave")) {
+	if ( GET_POS ( ch ) != POS_STANDING )
+	{
+		ch->Send ( "Maybe you should get on your feet first?\r\n" );
+		return 1;
+	}
         hatch =
             get_obj_in_list_type(ITEM_V_HATCH,
                                  IN_ROOM(ch)->contents);
