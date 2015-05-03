@@ -7276,7 +7276,13 @@ ACMD ( do_decrypt )
 	char arg1[256], arg2[256];
 	argument = one_arg ( argument, arg1 );
 	argument = one_arg ( argument, arg2 );
-	//argument = two_arguments(argument, arg1, arg2);
+
+	if ( strlen ( arg1 ) < 2 || strlen ( arg2 ) < 2 )
+	{
+		ch->Send ( "Usage: decrypt <arg1> <arg2>\r\n" );
+		return;
+	}
+
 	ch->Send ( "Arg1: %s Arg2: %s\r\n", arg1, arg2 );
 	ch->Send ( "1: %s - %s - %d\r\n", CRYPT ( arg1, arg2 ), CRYPT ( arg1,CRYPT ( arg1, arg2 ) ),!strncmp ( CRYPT ( arg1, arg2 ), arg2, MAX_PWD_LENGTH ) );
 	ch->Send ( "2: %s - %s - %d\r\n", CRYPT ( arg2, arg1 ), CRYPT ( arg1,CRYPT ( arg2, arg1 ) ),!strncmp ( CRYPT ( arg2, arg1 ), arg1, MAX_PWD_LENGTH ) );
