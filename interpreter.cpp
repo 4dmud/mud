@@ -180,7 +180,6 @@ ACMD ( do_exits );
 ACMD ( do_feel );
 ACMD ( do_fence );
 ACMD ( do_file );
-ACMD ( do_findtrig );
 ACMD ( do_finger );
 ACMD ( do_fixskills );
 ACMD ( do_flee );
@@ -275,6 +274,7 @@ ACMD ( do_saveall );
 ACMD ( do_say );
 ACMD ( do_score );
 ACMD ( do_search );
+ACMD ( do_searchtrig );
 ACMD ( do_send );
 ACMD ( do_set );
 ACMD ( do_setqic );
@@ -602,7 +602,6 @@ const command_info cmd_info[] =
 	{ "fightmsg"   , "fightmsg" , POS_DEAD    , do_fightmsg  , LVL_IMMORT, 0, 0 },
 	{ "file"     , "file" , POS_SLEEPING, do_file     , LVL_HERO, 0, 0 },
 	{ "fill"     , "fil" , POS_STANDING, do_pour     , 0, SCMD_FILL, 0 },
-	{ "findtrig" , "findt" , POS_DEAD , do_findtrig    , LVL_SEN, 0, 0 },
 	{ "finger"   , "fing" , POS_SLEEPING, do_finger   , 0, 0, 0 },
 	{ "fire"     , "fire" , POS_SITTING, do_not_here , 0, 0, 0 },
 	{ "fixskills"   , "fixskills" , POS_SLEEPING, do_fixskills   , LVL_SEN, 0, 0 },
@@ -826,6 +825,7 @@ const command_info cmd_info[] =
 	{ "saveall"  , "savea", POS_SLEEPING, do_saveall  , LVL_IMMORT, 0, WIZ_OLC_GRP },
 	{ "score"    , "sco" , POS_DEAD    , do_score    , 0, 0, 0 },
 	{ "search"   , "sea"  , POS_STANDING, do_search   , 0, 0, 0 },
+	{ "searchtrig" , "searcht" , POS_DEAD , do_searchtrig    , LVL_SEN, 0, 0 },
 	{ "skills"   , "skills"  , POS_DEAD, do_prac_spells   , 0, 0, 0 },
 	{ "skin"   , "skin"  , POS_STANDING, do_skin   , 0, 0, 0 },
 	{ "spells"   , "spells"  , POS_DEAD, do_prac_skills   , 0, 0, 0 },

@@ -712,7 +712,7 @@ strlcpy(tempstr, obj->short_description, sizeof(tempstr));
   }
   if (bought==0){
      char buf[MAX_INPUT_LENGTH];
-     snprintf(buf, sizeof(buf), "%s You can't even carry it!", GET_NAME(ch));
+     snprintf(buf, sizeof(buf), "%s You've got too many magical items already!", GET_NAME(ch));
      do_tell(keeper, buf, cmd_tell, 0);
      return;
   }

@@ -7840,7 +7840,7 @@ ACMD(do_code_update) {
 system ( "" );
 }
 
-ACMD ( do_findtrig )
+ACMD ( do_searchtrig )
 {
 	Character *c;
 	trig_data *t;
@@ -7854,7 +7854,7 @@ ACMD ( do_findtrig )
 
 	if ( !*arg || !is_number ( arg ) )
 	{
-		ch->Send ( "Usage: findtrig <vnum>\r\n" );
+		ch->Send ( "Usage: searchtrig <vnum>\r\n" );
 		return;
 	}
 
