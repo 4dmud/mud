@@ -57,6 +57,9 @@
 #include "oasis.h"
 #include "mapper.h"
 
+void MapArea ( room_rnum room, Character *ch, int x, int y, int min, int max, bool show_vehicles, bool two_way_connection );
+room_rnum visible_room ( room_rnum r, int door, bool *two_way_connection );
+
 /* The map itself */
 struct map_type amap[MAPX + 1][MAPY + 1];
 
@@ -132,7 +135,8 @@ void clear_room( int x, int y )
     get_exit_dir( dir, &exitx, &exity, x, y );
 
     /* If coord is valid, clear it */
-    if ( !BOUNDARY( exitx, exity ) ) clear_coord( exitx, exity );
+    if ( !BOUNDARY( exitx, exity ) )
+      clear_coord( exitx, exity );
   }
 }
 
@@ -149,69 +153,44 @@ struct room_direction_data *get_exit(room_rnum  pRoom,int door )
   else
     return pRoom->dir_option[door];
 }
+
 /* This function is recursive, ie it calls itself */
-void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
+void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth, bool two_way_connection)
 {
   static char map_chars [11] = "|-|-UD/\\\\/";
   int door;
   int exitx = 0, exity = 0;
   int roomx = 0, roomy = 0;
-  struct room_direction_data *pExit;
+  room_rnum room_to;
+  bool two_way;
 
   if ( x < 0 || y < 0 || x > MAPX || y > MAPY )
      return;
 
   /* Setup this coord as a room */
   snprintf(amap[x][y].tegn, 3, "%d", SECTOR(pRoom));
-  /*
-    switch(SECTOR(pRoom))
-    {
-    case SECT_CITY:
-    case SECT_INSIDE:
-      amap[x][y].tegn = 'O';
-      break;
-    case SECT_FIELD:
-    case SECT_FOREST:
-    case SECT_HILLS:
-      amap[x][y].tegn = '*';
-      break;
-    case SECT_MOUNTAIN:
-      amap[x][y].tegn = '@';
-      break;
-    case SECT_WATER_SWIM:
-    case SECT_WATER_NOSWIM:
-      amap[x][y].tegn = '=';
-      break;
-    case SECT_FLYING:
-      amap[x][y].tegn = '~';
-      break;
-    case SECT_DESERT:
-      amap[x][y].tegn = '+';
-      break;
-    default:
-      amap[x][y].tegn = 'O';
-      break;
-    }*/
   amap[x][y].vnum = pRoom->number;
   amap[x][y].depth = depth;
   amap[x][y].can_see = room_is_dark( pRoom ) && affected_by_spell(ch, SPELL_INFRAVISION);
 
+  /* Don't go beyond one-way connections */
+  if ( two_way_connection == FALSE )
+    return;
+
   /* Limit recursion */
-  if ( depth > MAXDEPTH ) return;
+  if ( depth > MAXDEPTH )
+    return;
 
   /* This room is done, deal with it's exits */
-  for( door = 0; door < 10; door++ )
+  for( door = 0; door < NUM_OF_DIRS; door++ )
   {
-    /* Skip if there is no exit in this direction */
-    if ( ( pExit = get_exit( pRoom, door ) ) == NULL )
-      continue;
-    if (EXIT_FLAGGED(pExit, EX_HIDDEN))
-      continue;
-    if (EXIT_FLAGGED(pExit, EX_CLOSED))
+    /* Skip up and down until I can figure out a good way to display it */
+    if (door == UP || door == DOWN)
       continue;
 
-    /* Skip up and down until I can figure out a good way to display it */
-    if (door == 4 || door == 5)
+    room_to = visible_room ( pRoom, door, &two_way );
+
+    if ( room_to == NULL )
       continue;
 
     /* Get the coords for the next exit and room in this direction */
@@ -219,42 +198,28 @@ void map_exits(Character *ch, room_rnum pRoom, int x, int y, int depth)
     get_exit_dir( door, &roomx, &roomy, exitx, exity );
 
     /* Skip if coords fall outside map */
-    if ( BOUNDARY( exitx, exity ) || BOUNDARY( roomx, roomy )) continue;
-
-    /* Skip if there is no room beyond this exit */
-    if ( pExit->to_room == NULL ) continue;
-
-    /* Ensure there are no clashes with previously defined rooms */
-    if ( ( amap[roomx][roomy].vnum != 0 ) &&
-         ( amap[roomx][roomy].vnum != pExit->to_room->number ))
-    {
-      /* Use the new room if the depth is higher */
-      if ( amap[roomx][roomy].depth <= depth ) continue;
-
-      /* It is so clear the old room */
-      clear_room( roomx, roomy );
-    }
+    if ( BOUNDARY( exitx, exity ) || BOUNDARY( roomx, roomy ))
+      continue;
 
     /* No exits at MAXDEPTH */
-    if ( depth == MAXDEPTH ) continue;
+    if ( depth == MAXDEPTH )
+      continue;
 
     /* No need for exits that are already mapped */
-    if ( amap[exitx][exity].depth > 0 ) continue;
+    if ( amap[exitx][exity].depth > 0 )
+      continue;
 
     /* Fill in exit */
     amap[exitx][exity].depth = depth;
-    amap[exitx][exity].vnum = pExit->to_room->number;
+    amap[exitx][exity].vnum = room_to->number;
     amap[exitx][exity].tegn[0] = map_chars[door];
     amap[exitx][exity].tegn[1] = '\0';
 
-
     /* More to do? If so we recurse */
-    if ( ( depth < MAXDEPTH ) &&
-         ( ( amap[roomx][roomy].vnum == pExit->to_room->number ) ||
-           ( amap[roomx][roomy].vnum == 0 ) ) )
+    if ( amap[roomx][roomy].vnum == 0 )
     {
       /* Depth increases by one each time */
-      map_exits( ch, pExit->to_room, roomx, roomy, depth + 1 );
+      map_exits( ch, room_to, roomx, roomy, depth + 1, two_way );
     }
   }
 }
@@ -329,16 +294,11 @@ int get_line( char *desc, int max_len )
 }
 #endif
 /* Display the map to the player */
-void show_map( Character *ch, int mxp/*, char *text */)
+void show_map( Character *ch, int mxp)
 {
   char buf[MAX_STRING_LENGTH * 2];
   int x, y, sec, sect = 0;
-  // char *p;
-  //bool alldesc = FALSE; /* Has desc been fully displayed? */
 
-  //if ( !text ) alldesc = TRUE;
-
-  // p = text;
   buf[0] = '\0';
   if (mxp)
     ch->Send( "%s", MXPTAG("FRAME Map REDIRECT"));
@@ -350,7 +310,6 @@ void show_map( Character *ch, int mxp/*, char *text */)
   {
 
     strlcpy( buf, " {cy|{c0", sizeof(buf) );
-
 
     for( x = 0; x <= MAPX; x++ )
     {
@@ -526,7 +485,7 @@ void draw_map( Character *ch)
   amap[x][y].depth = 0;
 
   /* Generate the map */
-  map_exits( ch, ch->in_room, x, y, 0 );
+  map_exits( ch, ch->in_room, x, y, 0, TRUE );
 
   /* Current position should be a "X" */
   amap[x][y].tegn[0] = 'X';
@@ -543,8 +502,6 @@ void draw_map( Character *ch)
 //together from the old map code and it works, but the whole thing could really 
 //use a redesign and cleanup.
 
-void MapArea ( room_rnum room, Character *ch, int x, int y, int min, int max, bool show_vehicles );
-
 /* Clear, generate and store the map in an MSDP variable */
 char *msdp_map( Character *ch )
 {
@@ -555,7 +512,7 @@ char *msdp_map( Character *ch )
 
   #define MAX_MAP 72
 
-  if ( IS_SET_AR( IN_ROOM(ch)->room_flags, ROOM_WILDERNESS ) )
+  if ( ROOM_FLAGGED ( IN_ROOM(ch), ROOM_WILDERNESS ) )
   {
     int size = 10; // URANGE ( 10, 0, MAX_MAP );
     int center = MAX_MAP/2;
@@ -568,7 +525,7 @@ char *msdp_map( Character *ch )
         mapgrid[x][y] = NUM_ROOM_SECTORS;
 
     /* starts the mapping with the center room */
-    MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, false );
+    MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, FALSE, TRUE );
 
     for( x = min; x <= max; x++ )
     {
@@ -602,7 +559,7 @@ char *msdp_map( Character *ch )
   amap[x][y].depth = 0;
 
   /* Generate the map */
-  map_exits( ch, ch->in_room, x, y, 0 );
+  map_exits( ch, ch->in_room, x, y, 0, TRUE );
 
   /* Store the map */
   strcat(buf, "X X X X X X X X X X X");
@@ -653,7 +610,7 @@ void update_mxp_map(Character *ch)
   amap[x][y].depth = 0;
 
   /* Generate the map */
-  map_exits( ch, ch->in_room, x, y, 0 );
+  map_exits( ch, ch->in_room, x, y, 0, TRUE );
 
   /* Current position should be a "X" */
   amap[x][y].tegn[0] = 'X';

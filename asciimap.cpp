@@ -76,13 +76,14 @@ int offsets[4][2] = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
 
 
 /* visible_room returns the displayable room where you end up when you go into the
-   direction door from room r if it's a valid two-way connection */
+   direction door from room r */
 
-room_rnum visible_room ( room_rnum r, int door )
+room_rnum visible_room ( room_rnum r, int door, bool* two_way_connection )
 {
 	struct room_direction_data *pexit;
 	room_rnum room_to;
 
+	*two_way_connection = FALSE;
 	pexit = r->dir_option[ door ];
 
 	if ( pexit == NULL || IS_SET ( pexit->exit_info, EX_CLOSED ) || IS_SET ( pexit->exit_info, EX_HIDDEN ) )
@@ -90,25 +91,25 @@ room_rnum visible_room ( room_rnum r, int door )
 
 	room_to = pexit->to_room;
 
-	if ( room_to == NULL || IS_SET_AR ( room_to->room_flags, ROOM_NOVIEW ) )
+	if ( room_to == NULL || room_to == r ||  ROOM_FLAGGED ( room_to, ROOM_NOVIEW ) )
 		return NULL;
 
 	pexit = room_to->dir_option[ rev_dir [ door ]];
 
-	if ( pexit == NULL || IS_SET ( pexit->exit_info, EX_CLOSED ) || IS_SET ( pexit->exit_info, EX_HIDDEN ) ||
-		pexit->to_room != r || pexit->to_room == room_to )
-		return NULL;
+	if ( pexit != NULL && !IS_SET ( pexit->exit_info, EX_CLOSED ) && !IS_SET ( pexit->exit_info, EX_HIDDEN ) && pexit->to_room == r )
+		*two_way_connection = TRUE;
 
 	return room_to;
 }
 
 /* Heavily modified - Edward */
 void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
-               int max, bool show_vehicles )
+               int max, bool show_vehicles, bool two_way_connection )
 {
 	room_rnum prospect_room;
 	struct obj_data *obj;
 	int door;
+	bool two_way;
 
 	if ( ( x < min ) || ( y < min ) || ( x > max ) || ( y > max ) )
 		return;
@@ -124,13 +125,13 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 				mapgrid[x][y] = SECT_VEHICLE;
 	}
 
-	/* Otherwise we get a nasty crash */
-//	if ( !IS_SET_AR ( IN_ROOM ( ch )->room_flags, ROOM_WILDERNESS ) )
-//		return;
+	/* Don't go beyond one-way connections */
+	if ( two_way_connection == FALSE )
+		return;
 
 	for ( door = 0; door < MAX_MAP_DIR; door++ )
 	{
-		prospect_room = visible_room ( room, door );
+		prospect_room = visible_room ( room, door, &two_way );
 
 		if ( prospect_room == NULL )
 			continue;
@@ -138,7 +139,7 @@ void MapArea ( room_rnum room, Character *ch, int x, int y, int min,
 		if ( mapgrid[x + offsets[door][0]][y + offsets[door][1]] == NUM_ROOM_SECTORS )
 		{
 			MapArea ( prospect_room, ch, x + offsets[door][0],
-			          y + offsets[door][1], min, max, show_vehicles );
+			          y + offsets[door][1], min, max, show_vehicles, two_way );
 		}
 	}
 }
@@ -311,6 +312,7 @@ ACMD ( do_map )
 	room_rnum was_in, r;
 	struct obj_data *viewport, *vehicle;
 	char buf[MAX_INPUT_LENGTH];
+	bool two_way;
 
 	if ( IS_DARK ( IN_ROOM ( ch ) ) && !CAN_SEE_IN_DARK ( ch ) )
 	{
@@ -335,7 +337,7 @@ ACMD ( do_map )
         else if ( IN_ROOM ( ch )->vehicle )
             IN_ROOM ( ch ) = IN_ROOM ( IN_ROOM ( ch )->vehicle );
 
-	if ( !IS_SET_AR ( IN_ROOM ( ch )->room_flags, ROOM_WILDERNESS ) && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_WILDERNESS ) && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
 	{
 #if defined(MINI_MAP)
 		mini_map ( ch );
@@ -347,10 +349,6 @@ ACMD ( do_map )
 		return;
 	}
 
-
-	//arg1[0] = 0;
-	//one_argument(argument, arg1);
-	//size = atoi(arg1);
 	size = URANGE ( 10, size, MAX_MAP );
 
 	center = MAX_MAP / 2;
@@ -363,18 +361,18 @@ ACMD ( do_map )
 			mapgrid[x][y] = NUM_ROOM_SECTORS;
 
 	/* starts the mapping with the center room */
-	MapArea ( IN_ROOM ( ch ), ch, center, center, min, max, true );
+	MapArea ( IN_ROOM ( ch ), ch, center, center, min, max, TRUE, TRUE );
 
 	/* make sure the rooms e,s,w are correct */
-	r = visible_room ( IN_ROOM ( ch ), EAST );
+	r = visible_room ( IN_ROOM ( ch ), EAST, &two_way );
 	if ( r != NULL )
 		mapgrid[x][y+1] = r->sector_type;
 
-	r = visible_room ( IN_ROOM ( ch ), SOUTH );
+	r = visible_room ( IN_ROOM ( ch ), SOUTH, &two_way );
 	if ( r != NULL )
 		mapgrid[x+1][y] = r->sector_type;
 
-	r = visible_room ( IN_ROOM ( ch ), WEST );
+	r = visible_room ( IN_ROOM ( ch ), WEST, &two_way );
 	if ( r != NULL )
 		mapgrid[x][y-1] = r->sector_type;
 
@@ -417,11 +415,11 @@ ACMD ( do_map )
 			ch->Send ( "\r\n" );
 		}
 
-		r = visible_room ( IN_ROOM ( ch ), UP );
+		r = visible_room ( IN_ROOM ( ch ), UP, &two_way );
 		if ( r != NULL )
 			ch->Send ( "Up: %s\r\n", map_bit[ r->sector_type ].name );
 
-		r = visible_room ( IN_ROOM ( ch ), DOWN );
+		r = visible_room ( IN_ROOM ( ch ), DOWN, &two_way );
 		if ( r != NULL )
 			ch->Send ( "Down: %s\r\n", map_bit[ r->sector_type ].name );
 
