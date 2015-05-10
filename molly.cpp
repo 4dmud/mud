@@ -21,13 +21,13 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 
 ACMD(do_smell)
 {
-  //int bits;
-  int found = FALSE, j,fnum;
+  int fnum;
   Character *found_char = NULL;
-  struct obj_data *obj = NULL, *found_obj = NULL;
+  struct obj_data *found_obj = NULL;
   char arg[MAX_STRING_LENGTH],arg2[MAX_STRING_LENGTH];
   char *arg1;
-  arg1=arg;
+
+  arg1 = arg;
   if (!ch->desc)
     return;
 
@@ -43,88 +43,38 @@ ACMD(do_smell)
     send_to_char("Smell what?\r\n", ch);
     return;
   }
-  //bits =
-    generic_find(arg2,
-                 FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
-                 FIND_CHAR_ROOM, ch, &found_char, &found_obj);
 
-  /* characters */
-//  if (found_char != NULL)
-//  
-//    if (ch != found_char)
-//      if (CAN_SEE(found_char, ch)) {
- //          act("You lean in close to $N and take a deep breath. Mmmmm ...", FALSE, ch, 0, found_char, TO_CHAR);
-//           act("$n leans in close and takes a deep breath..", FALSE,
-//               ch, 0, found_char, TO_VICT);
-//           act("$n smells $N.", FALSE, ch, 0, found_char, TO_NOTVICT);
-//           return;
-//      }
+  generic_find ( arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
+                       FIND_CHAR_ROOM, ch, &found_char, &found_obj );
 
-    for(found_char=IN_ROOM(ch)->people;found_char;found_char=found_char->next_in_room)
-       if(CAN_SEE(found_char, ch) && isname(arg, GET_NAME(found_char))) 
-          if(--fnum==0){
-             act("You lean in close to $N and take a deep breath. Mmmmm ...", FALSE, ch, 0, found_char, TO_CHAR);
-           act("$n leans in close and takes a deep breath..", FALSE,
-               ch, 0, found_char, TO_VICT);
-           act("$n smells $N.", FALSE, ch, 0, found_char, TO_NOTVICT);
-           found = TRUE;
-          }
-  /* worn equipment */
-  for (j = 0; j < NUM_WEARS && !found; j++)
-    if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-      if (isname(arg, GET_EQ(ch, j)->name))
-        if(--fnum==0){
-           if (GET_EQ(ch, j)->smell != NULL)
-               send_to_char(GET_EQ(ch, j)->smell, ch);
-           else
-               send_to_char("You smell nothing special.\n",ch);
-           found = TRUE;
-        }
+  if ( found_obj != NULL )
+  {
+    if ( found_obj->smell != NULL )
+      ch->Send ( "%s\r\n", found_obj->smell );
+        else
+      ch->Send ( "You smell nothing special.\r\n" );
+  }
+
+  else if ( found_char != NULL )
+  {
+    act ( "You lean in close to $N and take a deep breath. Mmmmm ...", FALSE, ch, 0, found_char, TO_CHAR );
+    act ( "$n leans in close and takes a deep breath..", FALSE, ch, 0, found_char, TO_VICT );
+    act ( "$n smells $N.", FALSE, ch, 0, found_char, TO_NOTVICT );
+  }
   
+  else ch->Send ( "You do not see that here.\r\n" );
 
-  /* carried equipment */
-  for (obj = ch->carrying; obj && !found; obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, (obj)->name))
-        if(--fnum==0){
-           if (obj->smell != NULL)
-             send_to_char((obj)->smell, ch);
-           else
-             send_to_char("You smell nothing special.\n",ch);
-           found = TRUE;
-          
-        }
-  
-
-  /* equipment in room */
-  for (obj = IN_ROOM(ch)->contents; obj && !found;
-       obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, obj->name))
-        if(--fnum==0){
-           if (obj->smell != NULL)
-             send_to_char(obj->smell, ch);
-           else
-             send_to_char("You smell nothing special.\n",ch);
-           found = TRUE;
-          
-        }
-  
-
-  if (!found)
-    send_to_char("You do not see that here.\r\n", ch);
 }
 
 ACMD(do_taste)
 {
-  //int bits, 
-  int found = FALSE, j,fnum;
+  int fnum;
   Character *found_char = NULL;
-  struct obj_data *obj = NULL, *found_obj = NULL;
+  struct obj_data *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
   char *arg1;
 
-  arg1=arg;
+  arg1 = arg;
   if (!ch->desc)
     return;
 
@@ -140,79 +90,31 @@ ACMD(do_taste)
     send_to_char("Taste what?\r\n", ch);
     return;
   }
-  //bits =
-    generic_find(arg,
-                 FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
-                 FIND_CHAR_ROOM, ch, &found_char, &found_obj);
 
-  /* characters
-     if (found_char != NULL) {
-     if (ch != found_char) {
-     if (CAN_SEE(found_char, ch)) {
-     act("You lean in close to $N and take a deep breath. Mmmmm ...", FALSE,
-     ch, 0, found_char, TO_CHAR);
-     act("$n leans in close and takes a deep breath..", FALSE, ch, 0,
-     found_char, TO_VICT);
-     act("$n smells $N.", FALSE, ch, 0, found_char, TO_NOTVICT);
-     }
-     }
-     return;
-     }
-   */
+  generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
+                    FIND_CHAR_ROOM, ch, &found_char, &found_obj );
 
-  /* worn equipment */
-  for (j = 0; j < NUM_WEARS && !found; j++)
-    if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-      if (isname(arg, GET_EQ(ch, j)->name))
-        if(--fnum==0){
-          if (GET_EQ(ch, j)->taste != NULL)
-             send_to_char(GET_EQ(ch, j)->taste, ch);
-          else
-             send_to_char("You taste nothing special.",ch);
-          found = TRUE;
-        }
-  
+  if ( found_obj != NULL )
+  {
+    if ( found_obj->taste != NULL )
+      ch->Send ( "%s\r\n", found_obj->taste );
+        else
+      ch->Send ( "You taste nothing special.\r\n" );
+  }
 
-  /* carried equipment */
-  for (obj = ch->carrying; obj && !found; obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, (obj)->name))
-        if(--fnum==0){
-           if (obj->taste != NULL)
-             send_to_char((obj)->taste, ch);
-           else
-             send_to_char("You taste nothing special.",ch);
-           found = TRUE;
-        }
-  
+  else ch->Send ( "You do not see that here.\r\n" );
 
-  /* equipment in room */
-  for (obj = IN_ROOM(ch)->contents; obj && !found;
-       obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, obj->name))
-        if(--fnum==0){
-           if (obj->taste != NULL)
-             send_to_char(obj->taste, ch);
-           else
-             send_to_char("You taste nothing special.",ch);
-           found = TRUE;
-        }
-  
-
-  if (!found)
-    send_to_char("You do not see that here.\r\n", ch);
 }
 
 ACMD(do_feel)
 {
-  //int bits;
-  int found = FALSE, j, fnum;
+  int fnum;
   Character *found_char = NULL;
-  struct obj_data *obj = NULL, *found_obj = NULL;
+  struct obj_data *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
   char *arg1;
-  arg1=arg;
+
+  arg1 = arg;
   if (!ch->desc)
     return;
 
@@ -230,50 +132,19 @@ ACMD(do_feel)
     return;
   }
 
-  //bits =
-    generic_find(arg,
-                 FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
-                 FIND_CHAR_ROOM, ch, &found_char, &found_obj);
+  generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
+                    FIND_CHAR_ROOM, ch, &found_char, &found_obj );
 
-  /* worn equipment */
-  for (j = 0; j < NUM_WEARS && !found; j++)
-    if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-      if (isname(arg, GET_EQ(ch, j)->name))
-        if(--fnum==0){
-           if (GET_EQ(ch, j)->feel != NULL)
-             send_to_char(GET_EQ(ch, j)->feel, ch);
-           else
-             send_to_char("You feel nothing special.",ch);
-           found = TRUE;
-        }
+  if ( found_obj != NULL )
+  {
+    if ( found_obj->feel != NULL )
+      ch->Send ( "%s\r\n", found_obj->feel );
+        else
+      ch->Send ( "You feel nothing special.\r\n" );
+  }
 
-  /* carried equipment */
-  for (obj = ch->carrying; obj && !found; obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, (obj)->name))
-        if(--fnum==0){
-          if (obj->feel != NULL)
-             send_to_char((obj)->feel, ch);
-          else
-             send_to_char("You feel nothing special.",ch);
-          found = TRUE;
-        }
+  else ch->Send ( "You do not see that here.\r\n" );
 
-  /* equipment in room */
-  for (obj = IN_ROOM(ch)->contents; obj && !found;
-       obj = obj->next_content)
-    if (CAN_SEE_OBJ(ch, obj))
-      if (isname(arg, obj->name))
-        if(--fnum==0){
-           if (obj->feel != NULL)
-             send_to_char(obj->feel, ch);
-           else
-             send_to_char("You feel nothing special.",ch);
-          found = TRUE;
-        }
-
-  if (!found)
-    send_to_char("You do not see that here.\r\n", ch);
 }
 
 ACMD(do_listen)
