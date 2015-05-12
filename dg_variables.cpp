@@ -35,12 +35,15 @@
 long long gold_data ( int type, long long amount );
 int genpreg ( void );
 extern const char *pc_class_types[];
+extern const char * colour_names[];
+extern const char * quality_names[];
 extern struct time_info_data time_info;
 void die ( Character *ch, Character *killer );
 int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
 int bodypartname ( char *bpn );
 void zap_char ( Character *victim );
+
 /* Utility functions */
 
 /*
@@ -1957,10 +1960,26 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 			{
 				case 'c':
 					if ( !strcasecmp ( field, "carried_by" ) )
+					{
 						if ( o->carried_by )
 							snprintf ( str, slen, "%c%ld", UID_CHAR, GET_ID ( o->carried_by ) );
 						else
 							strcpy ( str, "" );
+					}
+					else if ( !strcasecmp ( field, "colour_value" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_COLOUR ( o ) );
+						else
+						{
+							num = atoi ( subfield );
+							if ( num <= 0 || num >= NUM_OF_COLOURS )
+								script_log ( "Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
+							else GET_OBJ_COLOUR ( o ) = num;
+							strcpy ( str, "" );
+						}
+					}
+
 					else if ( !strcasecmp ( field, "cost" ) )
 						snprintf ( str, slen, "%lld", GET_OBJ_COST ( o ) );
 
@@ -2086,6 +2105,21 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 						snprintf ( str, slen, "%d", dest );
 					}
+
+					else if ( !strcasecmp ( field, "dyecount" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_DYECOUNT ( o ) );
+						else
+						{
+							num = atoi ( subfield );
+							if ( num < 0 )
+								script_log ( "Trigger %d: tried to set a negative dyecount", GET_TRIG_VNUM ( trig ) );
+							else GET_OBJ_DYECOUNT ( o ) = num;
+							strcpy ( str, "" );
+						}
+					}
+
 					break;
 				case 'h':
 					if ( !strcasecmp ( field, "has_pos" ) )
@@ -2168,6 +2202,22 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 
 					break;
+				case 'm':
+					if ( !strcasecmp ( field, "material_value" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_MATERIAL ( o ) );
+						else
+						{
+							num = atoi ( subfield );
+							if ( !is_number ( subfield ) || num < 0 || num >= NUM_MATERIAL_TYPES )
+								script_log ( "Trigger %d: material type out of range", GET_TRIG_VNUM ( trig ) );
+							else GET_OBJ_MATERIAL ( o ) = num;
+							strcpy ( str, "" );
+						}
+					}
+
+					break;
 				case 'n':
 
 					if ( !strcasecmp ( field, "name" ) )
@@ -2223,6 +2273,22 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 
 					break;
+				case 'q':
+					if ( !strcasecmp ( field, "quality_value" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_QUALITY ( o ) );
+						else
+						{
+							num = atoi ( subfield );
+							if ( num <= 0 || num >= NUM_OF_QUALITIES )
+								script_log ( "Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
+							else GET_OBJ_QUALITY ( o ) = num;
+							strcpy ( str, "" );
+						}
+					}
+
+					break;
 				case 'r':
 					if ( !strcasecmp ( field, "room" ) )
 					{
@@ -2236,7 +2302,145 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					break;
 				case 's':
-					if ( !strcasecmp ( field, "shortdesc" ) )
+					if ( !strcasecmp ( field, "set_colour_name" ) )
+					{
+						bool colour_set = FALSE;
+						string desc = string ( o->short_description );
+						string new_colour = string ( colour_names [ GET_OBJ_COLOUR ( o ) ] );
+						uint pos = 0;
+
+						for ( int i = 1; i < NUM_OF_COLOURS; i++ )
+							if ( ( pos = desc.find ( colour_names[i] ) ) != string::npos )
+							{
+								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+									continue;
+								if ( i != GET_OBJ_COLOUR ( o ) )
+									desc.replace ( pos, strlen ( colour_names[i] ), new_colour );
+								colour_set = TRUE;
+								break;
+							}
+
+						if ( colour_set )
+						{
+							if ( pos < 4 )
+							{
+								if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_colour.c_str() ), "an" ) )
+									desc.insert ( 1, "n" );
+								else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_colour.c_str() ), "a" ) )
+									desc.erase ( 1, 1 );
+							}
+						}
+						else
+						{
+							if ( tolower ( desc.substr ( 0, 2 ) ) == "a " )
+							{
+								pos = 2;
+								if ( !strcmp ( AN ( new_colour.c_str() ), "an" ) )
+								{
+									desc.insert ( 1, "n" );
+									pos++;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " )
+							{
+								pos = 3;
+								if ( !strcmp ( AN ( new_colour.c_str() ), "a" ) )
+								{
+									desc.erase ( 1, 1 );
+									pos--;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 4 ) ) == "the " )
+								pos = 4;
+							else if ( tolower ( desc.substr ( 0, 5 ) ) == "some " )
+								pos = 5;
+							else pos = 0;
+
+							desc.insert ( pos, new_colour + " " );
+						}
+
+						if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_OF_COLOURS )
+						{
+							if ( IS_UNIQUE ( o ) )
+								free_string ( &o->short_description );
+							else
+								SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+
+							o->short_description = strdup ( desc.c_str() );
+						}
+						strcpy ( str, "" );
+					}
+
+					else if ( !strcasecmp ( field, "set_quality_name" ) )
+					{
+						bool quality_set = FALSE;
+						string desc = string ( o->short_description );
+						string new_quality = string ( quality_names [ GET_OBJ_QUALITY ( o ) ] );
+						uint pos = 0;
+
+						for ( int i = 1; i < NUM_OF_QUALITIES; i++ )
+							if ( ( pos = desc.find ( quality_names[i] ) ) != string::npos )
+							{
+								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+									continue;
+								if ( i != GET_OBJ_QUALITY ( o ) )
+									desc.replace ( pos, strlen ( quality_names[i] ), new_quality );
+								quality_set = TRUE;
+								break;
+							}
+
+						if ( quality_set )
+						{
+							if ( pos < 4 )
+							{
+								if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_quality.c_str() ), "an" ) )
+									desc.insert ( 1, "n" );
+								else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_quality.c_str() ), "a" ) )
+									desc.erase ( 1, 1 );
+							}
+						}
+						else
+						{
+							if ( tolower ( desc.substr ( 0, 2 ) ) == "a " )
+							{
+								pos = 2;
+								if ( !strcmp ( AN ( new_quality.c_str() ), "an" ) )
+								{
+									desc.insert ( 1, "n" );
+									pos++;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " )
+							{
+								pos = 3;
+								if ( !strcmp ( AN ( new_quality.c_str() ), "a" ) )
+								{
+									desc.erase ( 1, 1 );
+									pos--;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 4 ) ) == "the " )
+								pos = 4;
+							else if ( tolower ( desc.substr ( 0, 5 ) ) == "some " )
+								pos = 5;
+							else pos = 0;
+
+							desc.insert ( pos, new_quality + " " );
+						}
+
+						if ( GET_OBJ_QUALITY ( o ) > 0 && GET_OBJ_QUALITY ( o ) < NUM_OF_QUALITIES )
+						{
+							if ( IS_UNIQUE ( o ) )
+								free_string ( &o->short_description );
+							else
+								SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+
+							o->short_description = strdup ( desc.c_str() );
+						}
+						strcpy ( str, "" );
+					}
+
+					else if ( !strcasecmp ( field, "shortdesc" ) )
 						snprintf ( str, slen,"%s", o->short_description );
 
 					break;

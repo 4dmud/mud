@@ -1333,6 +1333,8 @@ class Room;
 /* Builders that have access to the saveall command */
 #define LVL_BUILDER LVL_BLD
 
+#define NUM_OF_QUALITIES   8   /* used with quality_names[] */
+#define NUM_OF_COLOURS     12  /* used with colour_names[] */
 #define NUM_OF_DIRS 6    /* number of directions in a room (nsewud) */
 #define MAGIC_NUMBER     (0x06)    /* Arbitrary number that won't be in a string */
 
@@ -1384,7 +1386,7 @@ class Room;
 #define MAX_CMD_LENGTH          32768 /* 32k */
 #define NUM_NOTE_TYPES          5
 #define TOP_FUSE_LOCATION       6
-#define NUM_MATERIAL_TYPES      21
+#define NUM_MATERIAL_TYPES      95
 #define NUM_ELEM_TYPES          12
 #define MAX_HELPS               10000
 #define MAX_MAGIC_ITEMS         45
@@ -1514,7 +1516,7 @@ struct ident_list {
 
 /* object-related structures ******************************************/
 
-#define NUM_OBJ_VAL_POSITIONS      10
+#define NUM_OBJ_VAL_POSITIONS      11
 
 /* object flags; used in obj_data */
 struct obj_flag_data {

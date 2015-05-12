@@ -257,17 +257,17 @@ const  char *random_desc[] =
 
 const char *material_names[] =
 {
-	"base-material", /* default*/
+	"base-material", //0 /* default */
 	"glass",
 	"iron",
 	"gold",
 	"silver",
 	"copper",
 	"zinc",
-	"cromium",
+	"chromium",
 	"tungsten",
 	"carbon",
-	"coal",
+	"coal",          //10
 	"basalt",
 	"silica",
 	"diamond",
@@ -277,7 +277,7 @@ const char *material_names[] =
 	"hair",
 	"wool",
 	"wood",
-	"magic-wood",
+	"magic-wood",    //20
 	"bone",
 	"ceramic",
 	"mithril",
@@ -287,17 +287,17 @@ const char *material_names[] =
 	"glass",
 	"organic",
 	"currency",
-	"paper",
+	"paper",         //30
 	"cotton",
-	"satin",
+	"linen",
 	"silk",
 	"burlap",
-	"velvet",
+	"nylon",
 	"platinum",
 	"adamantite",
 	"onyx",
 	"ivory",
-	"brass",
+	"brass",         //40
 	"marble",
 	"bronze",
 	"pewter",
@@ -307,9 +307,81 @@ const char *material_names[] =
 	"gemstone",
 	"granite",
 	"energy",
-	"hemp",
+	"hemp",          //50
 	"crystal",
 	"earth",
+	"ebonywood",
+	"cinnamonwood",
+	"pinewood",
+	"williamsoniawood",
+	"ginkgowood",
+	"stone pinewood",
+	"sycamorewood",
+	"malduwood",     //60
+	"firwood",
+	"oakwood",
+	"willowwood",
+	"dogwood",
+	"ironwood",
+	"maplewood",
+	"elderwood",
+	"elmwood",
+	"beechwood",
+	"chestnutwood",  //70
+	"spindleberrywood",
+	"ashwood",
+	"cypresswood",
+	"juniperwood",
+	"larchwood",
+	"yewwood",
+	"aspenwood",
+	"alderwood",
+	"birchwood",
+	"Judaswood",     //80
+	"olivewood",
+	"cedarwood",
+	"planewood",
+	"carobwood",
+	"almondwood",
+	"cherrywood",
+	"applewood",
+	"pearwood",
+	"plumwood",
+	"orangewood",    //90
+	"apricotwood",
+	"mulberrywood",
+	"paloverdewood",
+	"cottonwood",    //94
+	"\n"
+};
+
+const char * colour_names[] =
+{
+	"none",          //0
+	"white",
+	"black",
+	"red",
+	"yellow",
+	"blue",
+	"green",
+	"orange",
+	"violet",
+	"emerald",
+	"firecoloured",  //10
+	"purple",        //11
+	"\n"
+};
+
+const char * quality_names[] =
+{
+	"none",          //0
+	"horrible",
+	"crappy",
+	"average",
+	"decent",
+	"good",
+	"excellent",
+	"magnificent",   //7
 	"\n"
 };
 
