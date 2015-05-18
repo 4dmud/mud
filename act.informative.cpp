@@ -165,7 +165,6 @@ const char *class_group_name ( Character *ch );
 /* local globals */
 int *cmd_sort_info;
 bool examine_on = FALSE;
-int class_disp_done = -1;
 
 /* For show_obj_to_char 'mode'.    /-- arbitrary */
 #define SHOW_OBJ_LONG         0
@@ -2144,7 +2143,7 @@ ACMD ( do_tiername )
 }
 
 #define TIER (current_class_is_tier_num(ch))
-#define TIER_FORMAT "[ %s%2s%s - %s%-12s%s - %s%.1d%s ]"
+#define TIER_FORMAT "[ %d. %s%2s%s - %s%-12s%s - %s%.1d%s ]"
 
 
 
@@ -2152,15 +2151,15 @@ char * primary_class ( Character *ch, char * blank )
 {
 	sh_int t = TIER, cl = GET_CLASS ( ch );
 	size_t len;
-	colour_space = 1;
+
 	//t = (GET_CLASS_TIER(ch) ? tier_level(ch, t) : 0);
 	if ( PLR_FLAGGED ( ch, PLR_NEEDS_CLASS ) )
-		len = sprintf ( blank,  TIER_FORMAT,
+		len = sprintf ( blank,  TIER_FORMAT, 1,
 		                CCYEL ( ch,_clrlevel ( ch ) ), CLASS_ABBR ( ch ),CCWHT ( ch,_clrlevel ( ch ) ),
 		                CCCYN ( ch,_clrlevel ( ch ) ), class_group_name ( ch ),CCWHT ( ch,_clrlevel ( ch ) ),
 		                CCYEL ( ch,_clrlevel ( ch ) ),t,CCWHT ( ch,_clrlevel ( ch ) ) );
 	else
-		len = sprintf ( blank,  TIER_FORMAT,
+		len = sprintf ( blank,  TIER_FORMAT, 1,
 		                CCYEL ( ch,_clrlevel ( ch ) ), CLASS_ABBR ( ch ),CCWHT ( ch,_clrlevel ( ch ) ),
 		                CCCYN ( ch,_clrlevel ( ch ) ),grand_master ( ch ) ? "Grand Master" :class_name[cl].name[t],CCWHT ( ch,_clrlevel ( ch ) ),
 		                CCYEL ( ch,_clrlevel ( ch ) ),t,CCWHT ( ch,_clrlevel ( ch ) ) );
@@ -2171,27 +2170,16 @@ char * primary_class ( Character *ch, char * blank )
 
 char * secondary_class ( Character *ch, char * blank )
 {
-	sh_int cl = GET_CLASS ( ch );
 	sh_int cl_next = -1;
 	sh_int tl = 0;
 	size_t len;
-	colour_space = 0;
-
-	if ( TIER==4 )
-		return ( char * ) "";
 
 	cl_next = GET_REMORT ( ch );
 	if ( cl_next == -1 )
-	{
-		return tertary_class ( ch, blank );
-		class_disp_done = 3;
-	}
-	tl = ( GET_REMORT_TIER ( ch ) ? tier_level ( ch, cl_next ) : 0 );
-
-	if ( tl && cl_next == cl && GET_CLASS_TIER ( ch ) )
 		return ( char * ) "";
-	colour_space = 1;
-	len = sprintf ( blank, TIER_FORMAT,
+
+	tl = ( GET_REMORT_TIER ( ch ) ? tier_level ( ch, cl_next ) : 0 );
+	len = sprintf ( blank, TIER_FORMAT, 2,
 	                CCYEL ( ch,_clrlevel ( ch ) ), class_abbrevs[cl_next],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCCYN ( ch,_clrlevel ( ch ) ),grand_master ( ch ) ? "Grand Master" :class_name[cl_next].name[tl],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCYEL ( ch,_clrlevel ( ch ) ),tl,CCWHT ( ch,_clrlevel ( ch ) ) );
@@ -2201,33 +2189,15 @@ char * secondary_class ( Character *ch, char * blank )
 
 char * tertary_class ( Character *ch, char * blank )
 {
-	sh_int t = TIER, cl = GET_CLASS ( ch ), cl_next = -1, tl = 0;
+	sh_int cl_next = -1, tl = 0;
 	size_t len;
-	colour_space = 0;
-
-	if ( t==4 )
-		return ( char * ) "";
-	if ( class_disp_done == 3 )
-	{
-		return quatry_class ( ch, blank );
-		class_disp_done = 4;
-	}
 
 	cl_next = GET_REMORT_TWO ( ch );
 	if ( cl_next == -1 )
 		return ( char * ) "";
+
 	tl = ( GET_REMORT_TWO_TIER ( ch ) ? tier_level ( ch, cl_next ) : 0 );
-	if ( tl )
-	{
-
-		if ( cl_next == cl && GET_CLASS_TIER ( ch ) )
-			return ( char * ) "";
-		if ( cl_next == GET_REMORT ( ch ) && GET_REMORT_TIER ( ch ) )
-			return ( char * ) "";
-
-	}
-	colour_space = 1;
-	len = sprintf ( blank, TIER_FORMAT,
+	len = sprintf ( blank, TIER_FORMAT, 3,
 	                CCYEL ( ch,_clrlevel ( ch ) ), class_abbrevs[cl_next],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCCYN ( ch,_clrlevel ( ch ) ),grand_master ( ch ) ? "Grand Master" :class_name[cl_next].name[tl],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCYEL ( ch,_clrlevel ( ch ) ),tl,CCWHT ( ch,_clrlevel ( ch ) ) );
@@ -2238,35 +2208,15 @@ char * tertary_class ( Character *ch, char * blank )
 
 char * quatry_class ( Character *ch, char * blank )
 {
-	sh_int t = TIER, cl = GET_CLASS ( ch ), cl_next = -1, tl = 0;
+	sh_int cl_next = -1, tl = 0;
 	size_t len;
-	colour_space = 0;
-	if ( t==4 )
-		return ( char * ) " ";
-
-	if ( class_disp_done == 4 )
-	{
-		return ( char * ) " ";
-		class_disp_done = -1;
-	}
 
 	cl_next = GET_REMORT_THREE ( ch );
 	if ( cl_next == -1 )
 		return ( char * ) " ";
+
 	tl = ( GET_REMORT_THREE_TIER ( ch ) ? tier_level ( ch, cl_next ) : 0 );
-	if ( tl )
-	{
-
-		if ( cl_next == cl && GET_CLASS_TIER ( ch ) )
-			return ( char * ) " ";
-		if ( cl_next == GET_REMORT ( ch ) && GET_REMORT_TIER ( ch ) )
-			return ( char * ) " ";
-		if ( cl_next == GET_REMORT_TWO ( ch ) && GET_REMORT_TWO_TIER ( ch ) )
-			return ( char * ) " ";
-
-	}
-	colour_space = 1;
-	len = sprintf ( blank, TIER_FORMAT,
+	len = sprintf ( blank, TIER_FORMAT, 4,
 	                CCYEL ( ch,_clrlevel ( ch ) ), class_abbrevs[cl_next],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCCYN ( ch,_clrlevel ( ch ) ), grand_master ( ch ) ? "Grand Master" : class_name[cl_next].name[tl],CCWHT ( ch,_clrlevel ( ch ) ),
 	                CCYEL ( ch,_clrlevel ( ch ) ),tl,CCWHT ( ch,_clrlevel ( ch ) ) );
@@ -2571,28 +2521,25 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 	/* yikes, nasty hack job here testing for a player name but hey... -mord */
 	if ( !str_cmp ( "thotter", GET_NAME ( ch ) ) )
 		ch->Send (
-		    "\r\n{cg(*)---[{cC{cuKing Of Pie{cg]-------------------------Class--TierName-----Tier--(*){c0\r\n" );
+		    "\r\n{cg(*)---[{cC{cuKing Of Pie{cg]---------------------Slot-Class---TierName---Tier--(*){c0\r\n" );
 	else
 		ch->Send (
-		    "\r\n{cg(*)-----------------------------------------Class--TierName-----Tier--(*){c0\r\n" );
-	ch->Send ( "{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw   %s %-29s {cg| |\r\n",
-	           GET_NAME ( ch ),GET_LEVEL ( ch ),
-	           ( colour_space ? "   " : "" ),    primary_class ( ch, blank ) );
+		    "\r\n{cg(*)-------------------------------------Slot-Class---TierName---Tier--(*){c0\r\n" );
+	ch->Send ( "{cg| |{cw Name:{cc %-16s{cw Level:{cy %2d{cw    %-29s {cg| |\r\n",
+	           GET_NAME ( ch ),GET_LEVEL ( ch ), primary_class ( ch, blank ) );
 	ch->Send (
-	    "{cg| |{cw Race:{cc %-9s{cw        {cwAlign: {cc%-5d{cw %s%-29s {cg| |\r\n",
-	    race_name ( ch ),  GET_ALIGNMENT ( ch ),
-	    ( colour_space ? "   " : "" ), secondary_class ( ch, blank ) );
+	    "{cg| |{cw Race:{cc %-9s{cw        {cwAlign: {cc%-5d{cw %-29s {cg| |\r\n",
+	    race_name ( ch ),  GET_ALIGNMENT ( ch ), secondary_class ( ch, blank ) );
 
 	ch->Send (
-	    "{cg| |  {cwSex:{cy %-7s{cw      Practices: {cc%-6d{cw%s%-29s {cg| |\r\n",
+	    "{cg| |  {cwSex:{cy %-7s{cw      Practices: {cc%-6d{cw%-29s {cg| |\r\n",
 	    ( GET_SEX ( ch ) == SEX_MALE ? "Male" : ( GET_SEX ( ch ) ? "Female" :  "Neutral" ) ),
-	    GET_PRACTICES ( ch ), ( colour_space ? "   " : "" ), tertary_class ( ch, blank ) );
+	    GET_PRACTICES ( ch ), tertary_class ( ch, blank ) );
 
 	ch->Send (
-	    "{cg| | {cwClan: {cy%-17s {cwRank: {cc%-2d{cw    %s%-29s {cg| |\r\n",
+	    "{cg| | {cwClan: {cy%-17s {cwRank: {cc%-2d{cw    %-29s {cg| |\r\n",
 	    ( ( !GET_CLAN ( ch ) ) ? "<none>" : clan[find_clan_by_id ( GET_CLAN ( ch ) ) ].name ),
-	    GET_CLAN_RANK ( ch ),
-	    ( colour_space ? "   " : "" ), quatry_class ( ch, blank ) );
+	    GET_CLAN_RANK ( ch ), quatry_class ( ch, blank ) );
 
 	ch->Send (
 	    "{cg| |-------------------------------------------------------------------| |{cw\r\n" );

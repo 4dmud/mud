@@ -85,13 +85,15 @@ void remort_char ( Character *ch )
 
 ACMD ( do_remort )
 {
-	int i = 0;
-	sbyte current, remort, rtwo;
-
+	int i = 0, slotnr;
+	sbyte current, remort, rtwo, rthree;
+	char clas[MAX_INPUT_LENGTH];
+	char slot[MAX_INPUT_LENGTH];
 
 	current = GET_CLASS ( ch );
 	remort = GET_REMORT ( ch );
 	rtwo = GET_REMORT_TWO ( ch );
+	rthree = GET_REMORT_THREE ( ch );
 
 	if ( IS_NPC ( ch ) || GET_LEVEL ( ch ) != 50 || GET_RACE ( ch ) == RACE_GLADIATOR )
 	{
@@ -107,8 +109,10 @@ ACMD ( do_remort )
 		return;
 	}
 
+	two_arguments ( argument, clas, slot );
+
 	// did they supply a valid class
-	if ( ( i = parse_class ( *argument ) ) == CLASS_UNDEFINED )
+	if ( ( i = parse_class ( *clas ) ) == CLASS_UNDEFINED )
 	{
 		ch->Send ( "That is not a valid class.\r\n" );
 		return;
@@ -119,25 +123,46 @@ ACMD ( do_remort )
 		ch->Send ( "You need more experience before you can remort.\r\n" );
 		return;
 	}
+	// did they supply a valid slot?
+	if ( rthree != -1 && ( !is_number ( slot ) || ( slotnr = atoi ( slot ) ) < 1 || slotnr > 4 ) )
+	{
+		ch->Send ( "Usage: remort <class> <slot number>. Which slot do you want to discard? They're shown on your score sheet.\r\n" );
+		return;
+	}
+
 	ch->MakeNaked();
 	remove_all_normal_affects ( ch );
 
 	/* lets make am a master of the class ifthey have done t4 already */
-	if ( current_class_is_tier_num ( ch ) == 4 )    GET_MASTERY ( ch, ( int ) GET_CLASS ( ch ) ) = TRUE;
+	if ( current_class_is_tier_num ( ch ) == 4 )
+		GET_MASTERY ( ch, ( int ) GET_CLASS ( ch ) ) = TRUE;
 
-	// shift the previous classes down the list
-	GET_REMORT_THREE ( ch ) = rtwo;
-	GET_REMORT_TWO ( ch ) = remort;
-	GET_REMORT ( ch ) = current;
-	GET_CLASS ( ch ) = i;
+	if ( rthree != -1 )
+	{
+		if ( slotnr > 3 )
+			GET_REMORT_THREE ( ch ) = rtwo;
+		if ( slotnr > 2 )
+			GET_REMORT_TWO ( ch ) = remort;
+		if ( slotnr > 1 )
+			GET_REMORT ( ch ) = current;
+		GET_CLASS ( ch ) = i;
+	}
+	else
+	{
+		// shift the previous classes down the list
+		GET_REMORT_THREE ( ch ) = rtwo;
+		GET_REMORT_TWO ( ch ) = remort;
+		GET_REMORT ( ch ) = current;
+		GET_CLASS ( ch ) = i;
 
-	//shift the tiers down the list
-	GET_CLASS_TIER ( ch ) = TRUE;
-	GET_REMORT_TIER ( ch ) = TRUE;
-	GET_REMORT_TWO_TIER ( ch ) = TRUE;
-	GET_REMORT_THREE_TIER ( ch ) = TRUE;
+		//shift the tiers down the list
+		GET_CLASS_TIER ( ch ) = TRUE;
+		GET_REMORT_TIER ( ch ) = TRUE;
+		GET_REMORT_TWO_TIER ( ch ) = TRUE;
+		GET_REMORT_THREE_TIER ( ch ) = TRUE;
+	}
+
 	// Now set the stats
-
 	remort_char ( ch );		// advance them to level 1
 	send_to_all ( "{cGREMORT: %s has just %s %s%s{c0\r\n",
 	              GET_NAME ( ch ),
