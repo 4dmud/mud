@@ -363,7 +363,7 @@ void init_mobile ( Character *mob )
  */
 void medit_save_internally ( Descriptor *d )
 {
-	//  int i;
+	bool first_mob = TRUE;
 	mob_vnum new_vnum = OLC_NUM ( d );
 	Character *mob, *pmob;
 
@@ -379,7 +379,6 @@ void medit_save_internally ( Descriptor *d )
 		return;
 	}
 	pmob = GetMobProto ( new_vnum );
-
 
 	/* Update triggers */
 	/* Free old proto list  */
@@ -400,9 +399,13 @@ void medit_save_internally ( Descriptor *d )
 		if ( SCRIPT ( mob ) )
 			extract_script ( mob, MOB_TRIGGER );
 
-		//free_proto_script(mob, MOB_TRIGGER);
+		if ( first_mob )
+		{
+			free_proto_script ( mob, MOB_TRIGGER );
+			first_mob = FALSE;
+		}
 
-		//copy_proto_script(pmob, mob, MOB_TRIGGER);
+		copy_proto_script ( pmob, mob, MOB_TRIGGER );
 		assign_triggers ( mob, MOB_TRIGGER );
 	}
 	/* end trigger update */
