@@ -24,6 +24,7 @@
 #include "regen.h"
 
 struct dgqueue *event_q = NULL;      /* the event queue */
+EVENTFUNC ( message_event );
 
 extern unsigned long pulse;
 
@@ -113,10 +114,14 @@ void event_process(void) {
         the_event->q_el = NULL;
 
         /* call event func, reenqueue event if retval > 0 */
-        if ((new_time = (the_event->func) (the_event->event_obj)) > 0)
-            the_event->q_el =
-                queue_enq(event_q, the_event, new_time + pulse);
-        else
+	if ( the_event->func == message_event )
+	    new_time = the_event->func ( the_event );
+	else
+	    new_time = the_event->func ( the_event->event_obj );
+
+        if (new_time > 0)
+	    the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
+	else
             delete the_event;
     }
 }

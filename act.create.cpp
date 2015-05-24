@@ -1003,7 +1003,8 @@ void make_manifest ( Character *ch,struct obj_data *obj )
 
 EVENTFUNC ( message_event )
 {
-	struct message_event_obj *msg = ( struct message_event_obj * ) event_obj;
+	struct event* ev = ( struct event* ) event_obj;
+	struct message_event_obj *msg = ( struct message_event_obj * ) ev->event_obj;
 	Character *vict = NULL;
 	struct obj_data *obj = NULL;
 	Room *room = msg->rm;
@@ -1026,11 +1027,11 @@ EVENTFUNC ( message_event )
 	if ( msg->msg_num == 0 )
 	{
 		log ( "Message event called with msg_num at 0!" );
-		ch->ClearMessageEvent ( (event *)msg );
+		ch->ClearMessageEvent ( ev );
 		delete msg;
 		return 0;
 	}
-	ch->ClearMessageEvent ( (event *)msg );
+	ch->ClearMessageEvent ( ev );
 
 	if ( uid == NOBODY )
 	{
@@ -1107,7 +1108,7 @@ EVENTFUNC ( message_event )
 	{
 		if ( ch )
 		{
-			ch->ClearMessageEvent ( (event *)msg );
+			ch->ClearMessageEvent ( ev );
 			delete msg;
 			if ( type == THING_SUB )
 			{
@@ -1126,7 +1127,7 @@ EVENTFUNC ( message_event )
 	}
 	else if ( msg_id != -1 )
 	{
-		ch->AddMessageEvent ( ( event * ) event_obj, msg_id );
+		ch->AddMessageEvent ( ev, msg_id );
 		return time;
 	}
 	else
