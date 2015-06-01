@@ -273,6 +273,7 @@
 
 /* extern variables */
 extern bool LS_REMOVE;
+extern map<mob_vnum, Character *> mob_proto;
 
 /* External functions */
 
@@ -4790,7 +4791,64 @@ int race_speed ( Character *ch )
 
 }
 
+void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
+{
+	uint i, pos;
+	string s;
+	map<mob_vnum, Character *>::iterator mob_it;
 
+	// Exception: [1101] the antelope squirrel is a squirrel
+	if ( strstr ( corpse->short_description, "antelope squirrel" ) != NULL )
+	{
+		for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
+			if ( !strcmp ( origin_names[ i ], "squirrel" ) )
+			{
+				GET_OBJ_ORIGIN ( obj ) = i;
+				return;
+			}
+	}
+
+	// Exception: [1128] the kangaroo rat is a rat
+	if ( strstr ( corpse->short_description, "kangaroo rat" ) != NULL )
+	{
+		for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
+			if ( !strcmp ( origin_names[ i ], "rat" ) )
+			{
+				GET_OBJ_ORIGIN ( obj ) = i;
+				return;
+			}
+	}
+
+	// Match the short_desc of the mob with a string from origin_names
+
+	s = string ( corpse->short_description );
+	transform ( s.begin(), s.end(), s.begin(), ::tolower );
+	for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
+		if ( ( pos = s.find ( origin_names[ i ], 14 ) ) != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) ) // skip "the corpse of "
+		{
+			GET_OBJ_ORIGIN ( obj ) = i;
+			return;
+		}
+
+	// No match, try the mob's namelist
+
+	for ( mob_it = mob_proto.begin(); mob_it != mob_proto.end(); mob_it++ )
+		if ( MOB_SKIN ( mob_it->second ) != GET_OBJ_VNUM ( obj ) )
+			continue;
+		else
+		{
+			s = string ( mob_it->second->player.name );
+			transform ( s.begin(), s.end(), s.begin(), ::tolower );
+			for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
+				if ( ( pos = s.find ( origin_names[ i ] ) ) != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
+				{
+					GET_OBJ_ORIGIN ( obj ) = i;
+					return;
+				}
+		}
+
+	log ( "SYSERR: Couldn't find the animal origin of %s", corpse->short_description );
+}
 
 ACMD ( do_skin )
 {
@@ -4832,6 +4890,7 @@ ACMD ( do_skin )
 	{
 		*ch << "You skillfully slice the skin from the corpse and pick it up.\r\n";
 		act ( "$n skillfully slices the skin from from the corpse and picks it up.\r\n", FALSE, ch, 0, 0, TO_ROOM );
+		set_animal_origin ( skin, obj );
 		obj_to_char ( skin, ch );
 		extract_obj ( obj );
 	}

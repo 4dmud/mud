@@ -1775,20 +1775,20 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	{
 		case ITEM_LIGHT:
 			if ( GET_OBJ_VAL ( j, 2 ) == -1 )
-				ch->Send ( "Hours left: Infinite" );
+				ch->Send ( "Hours left: Infinite\r\n" );
 			else
-				ch->Send ( "Hours left: [%d]", GET_OBJ_VAL ( j, 2 ) );
+				ch->Send ( "Hours left: [%d]\r\n", GET_OBJ_VAL ( j, 2 ) );
 			break;
 		case ITEM_SCROLL:
 		case ITEM_POTION:
-			ch->Send ( "Spells: (Level %d) %s, %s, %s", GET_OBJ_VAL ( j, 0 ),
+			ch->Send ( "Spells: (Level %d) %s, %s, %s\r\n", GET_OBJ_VAL ( j, 0 ),
 			           skill_name ( GET_OBJ_VAL ( j, 1 ) ),
 			           skill_name ( GET_OBJ_VAL ( j, 2 ) ),
 			           skill_name ( GET_OBJ_VAL ( j, 3 ) ) );
 			break;
 		case ITEM_WAND:
 		case ITEM_STAFF:
-			ch->Send ( "Spell: %s at level %d, %d (of %d) charges remaining",
+			ch->Send ( "Spell: %s at level %d, %d (of %d) charges remaining\r\n",
 			           skill_name ( GET_OBJ_VAL ( j, 3 ) ), GET_OBJ_VAL ( j, 0 ),
 			           GET_OBJ_VAL ( j, 2 ), GET_OBJ_VAL ( j, 1 ) );
 			break;
@@ -1797,11 +1797,11 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		case ITEM_BOLT:
 		case ITEM_ARROW:
 		case ITEM_AMMO:
-			ch->Send ( "Number dam dice: %d Size dam dice: %d",
+			ch->Send ( "Number dam dice: %d Size dam dice: %d\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 1 ), ( int ) GET_OBJ_VAL ( j, 2 ) );
 			break;
 		case ITEM_GRENADE:
-			ch->Send ( "Timer: %d Num dam dice: %d Size dam dice: %d",
+			ch->Send ( "Timer: %d Num dam dice: %d Size dam dice: %d\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 0 ), ( int ) GET_OBJ_VAL ( j, 1 ),
 			           ( int ) GET_OBJ_VAL ( j, 2 ) );
 			break;
@@ -1809,7 +1809,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		case ITEM_CROSSBOW:
 		case ITEM_SLING:
 		case ITEM_GUN:
-			ch->Send ( "Range    : %d  Max Ammo : %d  Cur Ammo : %d, vnum of ammo: %d",
+			ch->Send ( "Range    : %d  Max Ammo : %d  Cur Ammo : %d, vnum of ammo: %d\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 0 ), ( int ) GET_OBJ_VAL ( j, 1 ),
 			           ( int ) GET_OBJ_VAL ( j, 2 ), ( int ) GET_OBJ_VAL ( j, 3 ) );
 			break;
@@ -1825,16 +1825,16 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 			           get_weapon_evasion ( j ) );
 			break;
 		case ITEM_ARMOR:
-			ch->Send ( "AC-apply: [%d]", ( int ) GET_OBJ_VAL ( j, 0 ) );
+			ch->Send ( "AC-apply: [%d]\r\n", ( int ) GET_OBJ_VAL ( j, 0 ) );
 			break;
 		case ITEM_TRAP:
-			ch->Send ( "Spell: %d, - Hitpoints: %d - IS SET:%s",
+			ch->Send ( "Spell: %d, - Hitpoints: %d - IS SET:%s\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 0 ), ( int ) GET_OBJ_VAL ( j, 1 ), YESNO ( TRAP_IS_SET ( j ) ) );
 			break;
 		case ITEM_CONTAINER:
 			sprintbit ( ( int ) GET_OBJ_VAL ( j, 1 ), container_bits, buf2, sizeof ( buf2 ) );
 			ch->Send (
-			    "Weight capacity: %d, Lock Type: %s, Key Num: %d, Corpse: %s",
+			    "Weight capacity: %d, Lock Type: %s, Key Num: %d, Corpse: %s\r\n",
 			    ( int ) GET_OBJ_VAL ( j, 0 ), buf2, ( int ) GET_OBJ_VAL ( j, 2 ),
 			    YESNO ( ( int ) GET_OBJ_VAL ( j, 3 ) ) );
 			break;
@@ -1842,21 +1842,21 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		case ITEM_FOUNTAIN:
 			sprinttype ( ( int ) GET_OBJ_VAL ( j, 2 ), drinks, buf2, sizeof ( buf2 ) );
 			ch->Send (
-			    "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s, Casts: %s",
+			    "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s, Casts: %s\r\n",
 			    ( int ) GET_OBJ_VAL ( j, 0 ), ( int ) GET_OBJ_VAL ( j, 1 ),
 			    YESNO ( ( int ) GET_OBJ_VAL ( j, 3 ) ), buf2, skill_name ( GET_OBJ_VAL ( j, 4 ) ) );
 			break;
 		case ITEM_NOTE:
-			ch->Send ( "Tongue: %d", ( int ) GET_OBJ_VAL ( j, 0 ) );
+			ch->Send ( "Tongue: %d\r\n", ( int ) GET_OBJ_VAL ( j, 0 ) );
 			break;
 		case ITEM_KEY:
 			break;
 		case ITEM_FOOD:
-			ch->Send ( "Makes full: %d, Poisoned: %s, Casts: %s",
+			ch->Send ( "Makes full: %d, Poisoned: %s, Casts: %s\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 0 ), YESNO ( ( int ) GET_OBJ_VAL ( j, 3 ) ), skill_name ( GET_OBJ_VAL ( j, 4 ) ) );
 			break;
 		case ITEM_MONEY:
-			ch->Send ( "Coins: %lld", MONEY ( j ) );
+			ch->Send ( "Coins: %lld\r\n", MONEY ( j ) );
 			break;
 		case ITEM_FURNITURE:
 			ch->Send ( "Can hold: [%d] Num. of People in Chair: [%d]\r\n",
@@ -1867,24 +1867,76 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 			{
 				ch->Send ( "%s ", GET_NAME ( tempch ) );
 			}
+			ch->Send ( "\r\n" );
 			break;
 		case ITEM_SPACEBIKE:
 			ch->Send ( "FUEL: %d MAX: %d SITTING IN BIKE: %s\r\n",
 			           GET_FUEL ( j ), GET_MAX_FUEL ( j ), OBJ_SAT_IN_BY ( j ) ? GET_NAME ( OBJ_SAT_IN_BY ( j ) ) : "Nobody" );
 			break;
 		case ITEM_LIGHTSABRE_HILT:
-			ch->Send ( "Num Sabers: %d Number dam dice: %d Size dam dice: %d\r\nSaber Color: %s ",
+			ch->Send ( "Num Sabers: %d Number dam dice: %d Size dam dice: %d\r\nSaber Color: %s\r\n",
 			           ( int ) GET_OBJ_VAL ( j, 0 ), ( int ) GET_OBJ_VAL ( j, 1 ), ( int ) GET_OBJ_VAL ( j, 2 ),
 			           colour_option_name ( ( int ) GET_OBJ_VAL ( j, 3 ) ) );
 			break;
-
+		case ITEM_TREE:
+			ch->Send ( "Logs: " );
+			i = GET_OBJ_VAL ( j, 4 );
+			if ( i == 0 )
+				ch->Send ( "none\r\n" );
+			else ch->Send ( "%d of [%d] %s\r\n", GET_OBJ_VAL ( j, 5 ), i, real_object ( i ) == NOTHING ? "bad vnum" : obj_proto[ real_object( i )].short_description );
 		default:
-			ch->Send ( "Values 0-3: [%d] [%d] [%d] [%d]",
-			           GET_OBJ_VAL ( j, 0 ), GET_OBJ_VAL ( j, 1 ),
-			           GET_OBJ_VAL ( j, 2 ), GET_OBJ_VAL ( j, 3 ) );
 			break;
 	}
+
+	ch->Send ( "Values:" );
+	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i++ )
+		if ( GET_OBJ_VAL ( j, i ) > 0 )
+			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i ) );
 	ch->Send ( "\r\n" );
+
+	if ( GET_OBJ_COLOUR ( j ) != 0 )
+	{
+		if ( GET_OBJ_COLOUR ( j ) > 0 && GET_OBJ_COLOUR ( j ) < NUM_COLOUR_NAMES )
+			ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( j )] );
+		else ch->Send ( "Colour: out of range\r\n" );
+	}
+
+	if ( GET_OBJ_DYECOUNT ( j ) != 0 )
+		ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( j ) );
+
+	if ( GET_OBJ_ORIGIN ( j ) != 0 )
+	{
+		ch->Send ( "Origin: " );
+		if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SOFTWOOD )
+			ch->Send ( "%s, hardwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SPECIALWOOD )
+			ch->Send ( "%s, softwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_FRUITWOOD )
+			ch->Send ( "%s, specialwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_JUNKWOOD )
+			ch->Send ( "%s, fruitwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_LARGE_ANIMAL )
+			ch->Send ( "%s, junkwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_REPTILE )
+			ch->Send ( "%s, large animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SMALL_ANIMAL )
+			ch->Send ( "%s, reptile", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_NORMAL_ANIMAL )
+			ch->Send ( "%s, small animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_FURRY_ANIMAL )
+			ch->Send ( "%s, normal animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( j ) < NUM_ORIGIN_NAMES )
+			ch->Send ( "%s, furry animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
+		else ch->Send ( "out of range" );
+		ch->Send ( "\r\n" );
+	}
+
+	if ( GET_OBJ_QUALITY ( j ) != 0 )
+	{
+		if ( GET_OBJ_QUALITY ( j ) > 0 && GET_OBJ_QUALITY ( j ) < NUM_QUALITY_NAMES )
+			ch->Send ( "Quality: %s\r\n", quality_names[ GET_OBJ_QUALITY ( j )] );
+		else ch->Send ( "Quality: out of range\r\n" );
+	}
 
 	/*
 	 * I deleted the "equipment status" code from here because it seemed
@@ -2183,9 +2235,9 @@ void do_stat_character ( Character *ch, Character *k )
 		if ( IS_MOB ( k ) ) {
 			ch->Send ( ", NPC Bare Hand Dam: %dd%d\r\n",
 			           k->mob_specials.damnodice, k->mob_specials.damsizedice );
-if (!k->mob_specials.teaches_skills.empty())
-ch->Send ("It can teach these skills and spells:\r\n");
-for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
+		if (!k->mob_specials.teaches_skills.empty())
+			ch->Send ("It can teach these skills and spells:\r\n");
+		for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
 			{
 				ch->Send ( "%s[%5d] {cg%-15s{c0%s", 
 				! ( i%2 ) ? "             " : " ",
@@ -2218,7 +2270,6 @@ for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
 		ch->Send ( "Master is: %s, Followers are:",
 		           ( ( k->master ) ? GET_NAME ( k->master ) : "<none>" ) );
 
-
 		for ( fol = k->followers; fol; fol = fol->next )
 		{
 			len += ch->Send ( "%s %s", found++ ? "," : "",PERS ( fol->follower, ch ) );
@@ -2233,6 +2284,12 @@ for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
 		}
 
 		ch->Send ( "\r\n" );
+
+		if ( IS_MOB ( k ) && MOB_SKIN ( k ) !=  -1 )
+		{
+			i = real_object ( MOB_SKIN ( k ) );
+			ch->Send ( "Skin: [%d] %s\r\n", MOB_SKIN ( k ), i < 0 ? "bad vnum" : obj_proto[ i ].short_description );
+		}
 
 		/* Showing the bitvector */
 		sprintbitarray ( AFF_FLAGS ( k ), affected_bits, AF_ARRAY_MAX, buf2, sizeof ( buf2 ) );
@@ -7893,7 +7950,7 @@ ACMD ( do_searchtrig )
 		}
 	}
 
-	for ( int i = 1, num = 0; obj_proto[i].item_number == i; i++ )
+	for ( int i = 1, num = 0; i < top_of_objt; i++ )
 	{
 		if ( obj_proto[i].proto_script != NULL )
 		{

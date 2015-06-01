@@ -1293,6 +1293,18 @@ class Room;
 #define TW_ARRAY_MAX    4
 #define EF_ARRAY_MAX    4
 
+/* Origin categories, indexes into origin_names */
+#define BEGIN_OF_HARDWOOD       1
+#define BEGIN_OF_SOFTWOOD       12
+#define BEGIN_OF_SPECIALWOOD    18
+#define BEGIN_OF_FRUITWOOD      27
+#define BEGIN_OF_JUNKWOOD       33
+#define BEGIN_OF_LARGE_ANIMAL   38
+#define BEGIN_OF_REPTILE        42
+#define BEGIN_OF_SMALL_ANIMAL   51
+#define BEGIN_OF_NORMAL_ANIMAL  53
+#define BEGIN_OF_FURRY_ANIMAL   85
+
 /* Character.internal_flags (INT_XXX) ************************************/
 #define INT_MARK     (1 <<  0)
 #define INT_LOSTPREY (1 <<  1)
@@ -1333,8 +1345,6 @@ class Room;
 /* Builders that have access to the saveall command */
 #define LVL_BUILDER LVL_BLD
 
-#define NUM_OF_QUALITIES   8   /* used with quality_names[] */
-#define NUM_OF_COLOURS     12  /* used with colour_names[] */
 #define NUM_OF_DIRS 6    /* number of directions in a room (nsewud) */
 #define MAGIC_NUMBER     (0x06)    /* Arbitrary number that won't be in a string */
 
@@ -1386,11 +1396,13 @@ class Room;
 #define MAX_CMD_LENGTH          32768 /* 32k */
 #define NUM_NOTE_TYPES          5
 #define TOP_FUSE_LOCATION       6
-#define NUM_MATERIAL_TYPES      95
+#define NUM_MATERIAL_TYPES      53
 #define NUM_ELEM_TYPES          12
 #define MAX_HELPS               10000
 #define MAX_MAGIC_ITEMS         45
-
+#define NUM_COLOUR_NAMES	12
+#define NUM_QUALITY_NAMES	8
+#define NUM_ORIGIN_NAMES	125
 
 
 /*
@@ -1516,7 +1528,7 @@ struct ident_list {
 
 /* object-related structures ******************************************/
 
-#define NUM_OBJ_VAL_POSITIONS      11
+#define NUM_OBJ_VAL_POSITIONS      12
 
 /* object flags; used in obj_data */
 struct obj_flag_data {

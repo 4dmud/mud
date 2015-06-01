@@ -85,3 +85,6 @@ extern const char *AssemblyTypes[];
 extern const char *unused_spellname;
 extern const char *unused_spellmessage;
 
+extern const char *colour_names[];
+extern const char *quality_names[];
+extern const char *origin_names[];

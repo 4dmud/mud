@@ -35,8 +35,6 @@
 long long gold_data ( int type, long long amount );
 int genpreg ( void );
 extern const char *pc_class_types[];
-extern const char * colour_names[];
-extern const char * quality_names[];
 extern struct time_info_data time_info;
 void die ( Character *ch, Character *killer );
 int togglebody ( Character *ch, int flag );
@@ -1973,8 +1971,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 						{
 							num = atoi ( subfield );
-							if ( num <= 0 || num >= NUM_OF_COLOURS )
-								script_log ( "Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
+							if ( num <= 0 || num >= NUM_COLOUR_NAMES )
+								script_log ( "SCRIPT ERR: Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
 							else GET_OBJ_COLOUR ( o ) = num;
 							strcpy ( str, "" );
 						}
@@ -2122,7 +2120,88 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					break;
 				case 'h':
-					if ( !strcasecmp ( field, "has_pos" ) )
+
+					if ( !strcasecmp ( field, "has_origin_fruitwood" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_JUNKWOOD )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_furry_animal" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( o ) < NUM_ORIGIN_NAMES )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_hardwood" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SOFTWOOD )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_junkwood" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_LARGE_ANIMAL )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_large_animal" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_REPTILE )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_normal_animal" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_FURRY_ANIMAL )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_reptile" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SMALL_ANIMAL )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_small_animal" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_NORMAL_ANIMAL )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_softwood" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SPECIALWOOD )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_origin_specialwood" ) )
+					{
+						if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_FRUITWOOD )
+							snprintf ( str, slen, "1" );
+						else
+							snprintf ( str, slen, "0" );
+					}
+
+					else if ( !strcasecmp ( field, "has_pos" ) )
 					{
 						if ( subfield && *subfield )
 						{
@@ -2216,6 +2295,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							strcpy ( str, "" );
 						}
 					}
+					else if ( !strcasecmp ( field, "material_name" ) )
+					{
+						if ( GET_OBJ_MATERIAL ( o ) < 0 || GET_OBJ_MATERIAL ( o ) >= NUM_MATERIAL_TYPES )
+							GET_OBJ_MATERIAL ( o ) = 0;
+						snprintf ( str, slen, "%s", material_names[ GET_OBJ_MATERIAL ( o )] );
+					}
 
 					break;
 				case 'n':
@@ -2281,8 +2366,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 						{
 							num = atoi ( subfield );
-							if ( num <= 0 || num >= NUM_OF_QUALITIES )
-								script_log ( "Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
+							if ( num <= 0 || num >= NUM_QUALITY_NAMES )
+								script_log ( "SCRIPT ERR: Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
 							else GET_OBJ_QUALITY ( o ) = num;
 							strcpy ( str, "" );
 						}
@@ -2309,7 +2394,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						string new_colour = string ( colour_names [ GET_OBJ_COLOUR ( o ) ] );
 						uint pos = 0;
 
-						for ( int i = 1; i < NUM_OF_COLOURS; i++ )
+						for ( int i = 1; i < NUM_COLOUR_NAMES; i++ )
 							if ( ( pos = desc.find ( colour_names[i] ) ) != string::npos )
 							{
 								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
@@ -2359,7 +2444,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							desc.insert ( pos, new_colour + " " );
 						}
 
-						if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_OF_COLOURS )
+						if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_COLOUR_NAMES )
 						{
 							if ( IS_UNIQUE ( o ) )
 								free_string ( &o->short_description );
@@ -2378,7 +2463,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						string new_quality = string ( quality_names [ GET_OBJ_QUALITY ( o ) ] );
 						uint pos = 0;
 
-						for ( int i = 1; i < NUM_OF_QUALITIES; i++ )
+						for ( int i = 1; i < NUM_QUALITY_NAMES; i++ )
 							if ( ( pos = desc.find ( quality_names[i] ) ) != string::npos )
 							{
 								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
@@ -2428,7 +2513,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							desc.insert ( pos, new_quality + " " );
 						}
 
-						if ( GET_OBJ_QUALITY ( o ) > 0 && GET_OBJ_QUALITY ( o ) < NUM_OF_QUALITIES )
+						if ( GET_OBJ_QUALITY ( o ) > 0 && GET_OBJ_QUALITY ( o ) < NUM_QUALITY_NAMES )
 						{
 							if ( IS_UNIQUE ( o ) )
 								free_string ( &o->short_description );

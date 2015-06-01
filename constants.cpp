@@ -309,55 +309,13 @@ const char *material_names[] =
 	"energy",
 	"hemp",          //50
 	"crystal",
-	"earth",
-	"ebonywood",
-	"cinnamonwood",
-	"pinewood",
-	"williamsoniawood",
-	"ginkgowood",
-	"stone pinewood",
-	"sycamorewood",
-	"malduwood",     //60
-	"firwood",
-	"oakwood",
-	"willowwood",
-	"dogwood",
-	"ironwood",
-	"maplewood",
-	"elderwood",
-	"elmwood",
-	"beechwood",
-	"chestnutwood",  //70
-	"spindleberrywood",
-	"ashwood",
-	"cypresswood",
-	"juniperwood",
-	"larchwood",
-	"yewwood",
-	"aspenwood",
-	"alderwood",
-	"birchwood",
-	"Judaswood",     //80
-	"olivewood",
-	"cedarwood",
-	"planewood",
-	"carobwood",
-	"almondwood",
-	"cherrywood",
-	"applewood",
-	"pearwood",
-	"plumwood",
-	"orangewood",    //90
-	"apricotwood",
-	"mulberrywood",
-	"paloverdewood",
-	"cottonwood",    //94
+	"earth",         //52
 	"\n"
 };
 
-const char * colour_names[] =
+const char *colour_names[] =
 {
-	"none",          //0
+	"none",
 	"white",
 	"black",
 	"red",
@@ -367,22 +325,149 @@ const char * colour_names[] =
 	"orange",
 	"violet",
 	"emerald",
-	"firecoloured",  //10
-	"purple",        //11
-	"\n"
+	"firecoloured",
+	"purple"         // 11
 };
 
-const char * quality_names[] =
+const char *quality_names[] =
 {
-	"none",          //0
+	"none",
 	"horrible",
 	"crappy",
 	"average",
 	"decent",
 	"good",
 	"excellent",
-	"magnificent",   //7
-	"\n"
+	"magnificent"    // 7
+};
+
+const char *origin_names[] =
+{
+	"none",
+	"oak",		 // 1 BEGIN_OF_HARDWOOD
+	"maple",
+	"elder",
+	"elm",
+	"beech",
+	"chestnut",
+	"ash",
+	"aspen",
+	"alder",
+	"birch",         // 10
+	"plane",
+	"pine",          // 12 BEGIN_OF_SOFTWOOD
+	"sycamore",
+	"fir",
+	"cypress",
+	"larch",
+	"cedar",
+	"judas",         // 18 BEGIN_OF_SPECIALWOOD
+	"cinnamon",
+	"shadowfell",    // 20
+	"ironwood",
+	"ebony",
+	"juniper",
+	"ginkgo",
+	"yew",
+	"carob",
+	"almond",	 // 27 BEGIN_OF_FRUITWOOD
+	"cherry",
+	"apple",
+	"pear",		 // 30
+	"plum",
+	"orange",
+	"willow",        // 33 BEGIN_OF_JUNKWOOD
+	"dogwood",
+	"spindleberry",
+	"paloverde",
+	"cotton",
+	"buffalo",	 // 38 BEGIN_OF_LARGE_ANIMAL
+	"mammoth",
+	"elephant",	 // 40
+	"krelloc",
+	"python",        // 42 BEGIN_OF_REPTILE
+	"sea snake",
+	"serpent",
+	"rattlesnake",
+	"cobra",
+	"snake",
+	"crocodile",
+	"firelizard",
+	"reptile",	 // 50
+	"kid",           // 51 BEGIN_OF_SMALL_ANIMAL
+	"lamb",
+	"calf",		 // 53 BEGIN_OF_NORMAL_ANIMAL
+	"deer",
+	"stag",
+	"buck",
+	"hind",
+	"antelope",
+	"kangaroo",
+	"goat",		 // 60
+	"sow",
+	"swine",
+	"pig",
+	"elk",
+	"mare",
+	"colt",
+	"gelding",
+	"bronco",
+	"mustang",
+	"stallion",	 // 70
+	"pony",
+	"mule",
+	"donkey",
+	"steer",
+	"bull",
+	"cow",
+	"heifer",
+	"ox",
+	"oryx",
+	"ram",		 // 80
+	"ewe",
+	"horse",
+	"sheep",
+	"cattle",
+	"bear",		 // 85 BEGIN_OF_FURRY_ANIMAL
+	"leopard",
+	"mink",
+	"panther",
+	"beaver",
+	"otter",	 // 90
+	"giraffe",
+	"cheetah",
+	"weasel",
+	"bobcat",
+	"tiger",
+	"puma",
+	"coyote",
+	"chipmunk",
+	"marmot",
+	"vole",		 // 100
+	"prairie dog",
+	"muskrat",
+	"polecat",
+	"ferret",
+	"woodchuck",
+	"mole",
+	"racoon",
+	"skunk",
+	"badger",
+	"wolverine",	 // 110
+	"silverfox",
+	"rat",
+	"hare",
+	"rodent",
+	"marten",
+	"ermine",
+	"worg",
+	"lion",
+	"cougar",
+	"wolf",		 // 120
+	"rabbit",
+	"bunny",
+	"squirrel",
+	"fox"		 // 124
 };
 
 /* strings corresponding to ordinals/bitvectors in structs.h ***********/
