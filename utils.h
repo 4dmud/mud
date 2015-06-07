@@ -918,6 +918,7 @@ int current_class_is_tier_num ( Character *ch );
 #define GET_OBJ_QUALITY(obj)    GET_OBJ_VAL(obj, 8)
 #define GET_OBJ_DYECOUNT(obj)   GET_OBJ_VAL(obj, 10)
 #define GET_OBJ_ORIGIN(obj)     GET_OBJ_VAL(obj, 11)
+#define GET_OBJ_STAGE(obj)      GET_OBJ_VAL(obj, 12)
 #define GET_OBJ_WEIGHT(obj)	  ((obj)->obj_flags.weight)
 #define GET_OBJ_TIMER(obj)	  ((obj)->obj_flags.timer)
 #define GET_OBJ_SAVED_TIMER(obj)  ((obj)->obj_flags.saved_timer)

@@ -286,11 +286,16 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_SMELL_DESCRIPTION		34
 #define OEDIT_TASTE_DESCRIPTION		35
 #define OEDIT_FEEL_DESCRIPTION		36
-#define OEDIT_MATERIAL			37
+#define OEDIT_CRAFTING_COLOUR		37
 #define OEDIT_ATTACHMENT_MENU           38
 #define OEDIT_ATTACHMENT_VALUE          39
 #define OEDIT_ATTACHMENT_MAX_VALUE      40
 #define OEDIT_ATTACHMENT_TYPE           41
+#define OEDIT_CRAFTING_QUALITY		42
+#define OEDIT_CRAFTING_MATERIAL		43
+#define OEDIT_CRAFTING_DYECOUNT		44
+#define OEDIT_CRAFTING_ORIGIN		45
+#define OEDIT_CRAFTING_STAGE		46
 
 /*
  * Submodes of REDIT connectedness.

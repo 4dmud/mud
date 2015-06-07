@@ -1528,7 +1528,7 @@ struct ident_list {
 
 /* object-related structures ******************************************/
 
-#define NUM_OBJ_VAL_POSITIONS      12
+#define NUM_OBJ_VAL_POSITIONS      13
 
 /* object flags; used in obj_data */
 struct obj_flag_data {

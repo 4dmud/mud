@@ -1972,7 +1972,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							num = atoi ( subfield );
 							if ( num <= 0 || num >= NUM_COLOUR_NAMES )
-								script_log ( "SCRIPT ERR: Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
+								script_log ( "Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
 							else GET_OBJ_COLOUR ( o ) = num;
 							strcpy ( str, "" );
 						}
@@ -2367,7 +2367,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							num = atoi ( subfield );
 							if ( num <= 0 || num >= NUM_QUALITY_NAMES )
-								script_log ( "SCRIPT ERR: Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
+								script_log ( "Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
 							else GET_OBJ_QUALITY ( o ) = num;
 							strcpy ( str, "" );
 						}

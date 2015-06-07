@@ -949,18 +949,72 @@ void oedit_disp_val6_menu ( Descriptor *d )
 	}
 }
 
-void oedit_disp_material_menu ( Descriptor *d )
+void oedit_disp_crafting_colour_menu ( Descriptor *d )
 {
-	int mat, col = 0;
-	OLC_MODE ( d ) = OEDIT_VALUE_10;
+	int i, col = 0;
+	OLC_MODE ( d ) = OEDIT_CRAFTING_COLOUR;
 	get_char_colours ( d->character );
-	// clear_screen(d);
-	for ( mat = 1; mat < NUM_MATERIAL_TYPES; mat++ )
+
+	for ( i = 1; i < NUM_COLOUR_NAMES; i++ )
 	{
-		d->Output ( "%s%2d%s) %-20.20s %s", grn, mat, nrm,
-		            material_name ( mat ), ! ( ++col % 3 ) ? "\r\n" : "" );
+		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
+		            colour_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
 	}
-	d->Output ( "\r\nEnter Material type : " );
+	d->Output ( "\r\nEnter Colour value : " );
+}
+
+void oedit_disp_crafting_quality_menu ( Descriptor *d )
+{
+	int i, col = 0;
+	OLC_MODE ( d ) = OEDIT_CRAFTING_QUALITY;
+	get_char_colours ( d->character );
+
+	for ( i = 1; i < NUM_QUALITY_NAMES; i++ )
+	{
+		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
+		            quality_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
+	}
+	d->Output ( "\r\nEnter Quality value : " );
+}
+
+void oedit_disp_crafting_material_menu ( Descriptor *d )
+{
+	int i, col = 0;
+	OLC_MODE ( d ) = OEDIT_CRAFTING_MATERIAL;
+	get_char_colours ( d->character );
+
+	for ( i = 1; i < NUM_MATERIAL_TYPES; i++ )
+	{
+		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
+		            material_name ( i ), ! ( ++col % 3 ) ? "\r\n" : "" );
+	}
+	d->Output ( "\r\nEnter Material value : " );
+}
+
+void oedit_disp_crafting_dyecount_menu ( Descriptor *d )
+{
+	OLC_MODE ( d ) = OEDIT_CRAFTING_DYECOUNT;
+	d->Output ( "\r\nEnter Dyecount value : " );
+}
+
+void oedit_disp_crafting_origin_menu ( Descriptor *d )
+{
+	int i, col = 0;
+	OLC_MODE ( d ) = OEDIT_CRAFTING_ORIGIN;
+	get_char_colours ( d->character );
+
+	for ( i = 1; i < NUM_ORIGIN_NAMES; i++ )
+	{
+		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
+		            origin_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
+	}
+	d->Output ( "\r\nEnter Origin value : " );
+}
+
+void oedit_disp_crafting_stage_menu ( Descriptor *d )
+{
+	OLC_MODE ( d ) = OEDIT_CRAFTING_STAGE;
+	d->Output ( "\r\nEnter Stage value : " );
 }
 
 /*
@@ -1116,8 +1170,9 @@ void oedit_disp_menu ( Descriptor *d )
 	    "%sG%s) Smell Desc  :\r\n%s%s\r\n"
 	    "%sH%s) Taste Desc  :\r\n%s%s\r\n"
 	    "%sI%s) Feel Desc   :\r\n%s%s\r\n"
-	    "%sJ%s) Material    : %s%s\r\n"
-            "%s"
+	    "%sJ%s) Crafting    : Colour: %s%s%s   Quality: %s%s%s\r\n"
+	    "                 Material: %s%s%s   Dyecount: %s%d%s\r\n"
+	    "                 Origin: %s%s%s   Stage: %s%d\r\n"
 	    "%sM%s) Min Level   : %s%d\r\n"
 	    "%sS%s) Script      : %s%s\r\n"
 	    "%sQ%s) Quit\r\n"
@@ -1141,8 +1196,12 @@ void oedit_disp_menu ( Descriptor *d )
 	    grn, nrm, yel, ( obj->smell && *obj->smell ) ? obj->smell : "<not set>\r\n",
 	    grn, nrm, yel, ( obj->taste && *obj->taste ) ? obj->taste : "<not set>\r\n",
 	    grn, nrm, yel, ( obj->feel  && *obj->feel ) ? obj->feel  : "<not set>\r\n",
-	    grn, nrm, cyn, material_name ( GET_OBJ_VAL ( obj, 9 ) ),
-            buf3, 
+	    grn, nrm, cyn, colour_names [ GET_OBJ_VAL ( obj, 7 ) ], nrm,
+	    cyn, quality_names [ GET_OBJ_VAL ( obj, 8 ) ], nrm,
+	    cyn, material_name ( GET_OBJ_VAL ( obj, 9 ) ), nrm,
+	    cyn, GET_OBJ_VAL ( obj, 10 ), nrm,
+	    cyn, origin_names [ GET_OBJ_VAL ( obj, 11 ) ], nrm,
+	    cyn, GET_OBJ_VAL ( obj, 12 ),
 	    grn, nrm, cyn, GET_OBJ_LEVEL ( obj ),
 	    grn, nrm, cyn, OLC_SCRIPT ( d ) ? "Set." : "Not Set.",
 	    grn, nrm
@@ -1347,8 +1406,7 @@ void oedit_parse ( Descriptor *d, char *arg )
 					break;
 				case 'j':
 				case 'J':
-					oedit_disp_material_menu ( d );
-					OLC_MODE ( d ) = OEDIT_MATERIAL;
+					oedit_disp_crafting_colour_menu ( d );
 					break;
 /*
                                 case 'k':
@@ -1478,10 +1536,6 @@ void oedit_parse ( Descriptor *d, char *arg )
 
 		case OEDIT_TIMER:
 			GET_OBJ_TIMER ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), -1, MAX_OBJ_TIMER );
-			break;
-
-		case OEDIT_MATERIAL:
-			GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_MATERIAL_TYPES );
 			break;
 
 		case OEDIT_INNATE:
@@ -1905,7 +1959,36 @@ void oedit_parse ( Descriptor *d, char *arg )
 					oedit_disp_extradesc_menu ( d );
 					return;
 			}
+
+		case OEDIT_CRAFTING_COLOUR:
+			GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES );
+			oedit_disp_crafting_quality_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_QUALITY:
+			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_QUALITY_NAMES );
+			oedit_disp_crafting_material_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_MATERIAL:
+			GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_MATERIAL_TYPES );
+			oedit_disp_crafting_dyecount_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_DYECOUNT:
+			GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
+			oedit_disp_crafting_origin_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_ORIGIN:
+			GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_ORIGIN_NAMES );
+			oedit_disp_crafting_stage_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_STAGE:
+			GET_OBJ_STAGE ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
 			break;
+
 		default:
 			new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: Reached default case in oedit_parse()!" );
 			d->Output ( "Oops...\r\n" );
