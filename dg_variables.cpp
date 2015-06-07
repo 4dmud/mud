@@ -2528,6 +2528,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp ( field, "shortdesc" ) )
 						snprintf ( str, slen,"%s", o->short_description );
 
+					else if ( !strcasecmp ( field, "stage_value" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_STAGE ( o ) );
+						else GET_OBJ_STAGE ( o ) = atoi ( subfield );
+						strcpy ( str, "" );
+					}
+
 					break;
 				case 't':
 					if ( !strcasecmp ( field, "type" ) )
