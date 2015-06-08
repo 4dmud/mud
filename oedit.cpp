@@ -1107,6 +1107,7 @@ void oedit_disp_menu ( Descriptor *d )
 	char buf2[MAX_STRING_LENGTH];
         char buf3[MAX_STRING_LENGTH];
 	struct obj_data *obj;
+	int i;
 
 	obj = OLC_OBJ ( d );
 	get_char_colours ( d->character );
@@ -1163,8 +1164,26 @@ void oedit_disp_menu ( Descriptor *d )
 	    "%s9%s) Cost        : %s%lld\r\n"
 	    "%sA%s) Cost/Day    : %s%d\r\n"
 	    "%sB%s) Timer       : %s%d\r\n"
-	    "%sC%s) Values      : %s%d %d %d %d %d %d\r\n"
-	    "%sD%s) Menu --->   : %sApplies\r\n"
+	    "%sC%s) Values      : ",
+
+	    grn, nrm, cyn, buf1,
+	    grn, nrm, cyn, GET_OBJ_WEIGHT ( obj ),
+	    grn, nrm, cyn, GET_OBJ_COST ( obj ),
+	    grn, nrm, cyn, GET_OBJ_RENT ( obj ),
+	    grn, nrm, cyn, GET_OBJ_TIMER ( obj ),
+	    grn, nrm
+	);
+
+	for ( i = 0; i < 7; i++ )
+		d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
+
+	d->Output ( "\r\n               : " );
+
+	for ( i = 7; i < NUM_OBJ_VAL_POSITIONS; i++ )
+		d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
+
+	d->Output (
+	    "\r\n%sD%s) Menu --->   : %sApplies\r\n"
 	    "%sE%s) Menu --->   : %sExtra Desc\r\n"
 	    "%sF%s) Innate      : %s(%d) %s%s\r\n"
 	    "%sG%s) Smell Desc  :\r\n%s%s\r\n"
@@ -1178,18 +1197,6 @@ void oedit_disp_menu ( Descriptor *d )
 	    "%sQ%s) Quit\r\n"
 	    "Enter choice : ",
 
-	    grn, nrm, cyn, buf1,
-	    grn, nrm, cyn, GET_OBJ_WEIGHT ( obj ),
-	    grn, nrm, cyn, GET_OBJ_COST ( obj ),
-	    grn, nrm, cyn, GET_OBJ_RENT ( obj ),
-	    grn, nrm, cyn, GET_OBJ_TIMER ( obj ),
-	    grn, nrm, cyn,
-	    GET_OBJ_VAL ( obj, 0 ),
-	    GET_OBJ_VAL ( obj, 1 ),
-	    GET_OBJ_VAL ( obj, 2 ),
-	    GET_OBJ_VAL ( obj, 3 ),
-	    GET_OBJ_VAL ( obj, 4 ),
-	    GET_OBJ_VAL ( obj, 5 ),
 	    grn, nrm, cyn,
 	    grn, nrm, cyn,
 	    grn, nrm, cyn, GET_OBJ_INNATE ( obj ), skill_name ( GET_OBJ_INNATE ( obj ) ), nrm,
@@ -1959,6 +1966,7 @@ void oedit_parse ( Descriptor *d, char *arg )
 					oedit_disp_extradesc_menu ( d );
 					return;
 			}
+			break;
 
 		case OEDIT_CRAFTING_COLOUR:
 			GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES );
