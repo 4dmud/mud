@@ -1543,6 +1543,8 @@ void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
 	switch ( scmd )
 	{
 		case SCMD_OPEN:
+			if ( back && IS_SET ( back->exit_info, EX_HIDDEN ) )
+				REMOVE_BIT ( back->exit_info, EX_HIDDEN );
 		case SCMD_CLOSE:
 			OPEN_DOOR ( IN_ROOM ( ch ), obj, door );
 			if ( back )

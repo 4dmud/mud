@@ -1408,6 +1408,8 @@ ASPELL(spell_knock) {
             send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some ethereal hand.\n", dirs[rev_dir[i]]);
             if (ret_door && IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED))
                 TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED);
+            if (ret_door && IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_HIDDEN))
+                TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_HIDDEN);
             if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED))
                 TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_LOCKED);
             if (ret_door)
