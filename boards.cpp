@@ -278,7 +278,7 @@ int Board_write_message(int board_type, Character *ch, char *arg,
   *(tmstr + strlen(tmstr) - 1) = '\0';
 
   snprintf(buf2, sizeof(buf2), "(%s)", GET_NAME(ch));
-  snprintf(buf, sizeof(buf), "%6.10s %-12s :: %s", tmstr, buf2, arg);
+  snprintf(buf, sizeof(buf), "%6.10s %s %-12s :: %s", tmstr, tmstr + strlen(tmstr) - 4, buf2, arg);
   NEW_MSG_INDEX(board_type).heading = strdup(buf);
   NEW_MSG_INDEX(board_type).level = GET_LEVEL(ch);
 
