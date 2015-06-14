@@ -1388,7 +1388,7 @@ ASPELL(spell_knock) {
                 continue;
             if (!IS_SET(EXIT(ch, i)->exit_info, EX_CLOSED))
                 continue;
-            if (IS_SET(EXIT(ch, i)->exit_info, EX_PICKPROOF))
+            if (IS_SET(EXIT(ch, i)->exit_info, EX_LOCKED) && IS_SET(EXIT(ch, i)->exit_info, EX_PICKPROOF))
                 continue;
             if (IS_SET(EXIT(ch, i)->exit_info, EX_HIDDEN))
                 continue;
@@ -1398,7 +1398,8 @@ ASPELL(spell_knock) {
             other_room = EXIT(ch, i)->to_room;
 	    if (EXIT2(other_room, rev_dir[i]) &&
                     IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_ISDOOR) &&
-                    !IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+                    ! (IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+		       IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED)) &&
                     EXIT2(other_room, rev_dir[i])->to_room != NULL)
                 ret_door = 1;
             /** lets make it so they can only open doors that are on the inside **/
