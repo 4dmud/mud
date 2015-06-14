@@ -21,31 +21,23 @@ char *find_exdesc(char *word, struct extra_descr_data *list);
 
 ACMD(do_smell)
 {
-  int fnum;
   Character *found_char = NULL;
   struct obj_data *found_obj = NULL;
-  char arg[MAX_STRING_LENGTH],arg2[MAX_STRING_LENGTH];
-  char *arg1;
+  char arg[MAX_STRING_LENGTH];
 
-  arg1 = arg;
   if (!ch->desc)
     return;
 
   one_argument(argument, arg);
-  strncpy(arg2,arg,MAX_STRING_LENGTH);
+
   if (!*arg)
   {
     ch->Send( "%s", IN_ROOM(ch)->smell);
     return;
   }
-  if (!(fnum = get_number(&arg1)))
-  {
-    send_to_char("Smell what?\r\n", ch);
-    return;
-  }
 
-  generic_find ( arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
-                       FIND_CHAR_ROOM, ch, &found_char, &found_obj );
+  generic_find ( arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP |
+                      FIND_CHAR_ROOM, ch, &found_char, &found_obj );
 
   if ( found_obj != NULL )
   {
@@ -68,13 +60,10 @@ ACMD(do_smell)
 
 ACMD(do_taste)
 {
-  int fnum;
   Character *found_char = NULL;
   struct obj_data *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
-  char *arg1;
 
-  arg1 = arg;
   if (!ch->desc)
     return;
 
@@ -83,11 +72,6 @@ ACMD(do_taste)
   if (!*arg)
   {
     send_to_char("What do you want to taste?\r\n", ch);
-    return;
-  }
-  if (!(fnum = get_number(&arg1)))
-  {
-    send_to_char("Taste what?\r\n", ch);
     return;
   }
 
@@ -108,13 +92,10 @@ ACMD(do_taste)
 
 ACMD(do_feel)
 {
-  int fnum;
   Character *found_char = NULL;
   struct obj_data *found_obj = NULL;
   char arg[MAX_STRING_LENGTH];
-  char *arg1;
 
-  arg1 = arg;
   if (!ch->desc)
     return;
 
@@ -123,12 +104,6 @@ ACMD(do_feel)
   if (!*arg)
   {
     send_to_char("What do you want to feel?\r\n", ch);
-    return;
-  }
-
-  if (!(fnum = get_number(&arg1)))
-  {
-    send_to_char("Feel what?\r\n", ch);
     return;
   }
 
