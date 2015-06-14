@@ -382,32 +382,35 @@ void medit_save_internally ( Descriptor *d )
 
 	/* Update triggers */
 	/* Free old proto list  */
-	if ( pmob->proto_script &&
-	        pmob->proto_script != OLC_SCRIPT ( d ) )
-		delete pmob->proto_script;
-	pmob->proto_script = OLC_SCRIPT ( d );
+	if ( pmob->proto_script != OLC_SCRIPT ( d ) )
+	{
+		if ( pmob->proto_script )
+			delete pmob->proto_script;
+		pmob->proto_script = OLC_SCRIPT ( d );
+
+		/* this takes care of the mobs currently in-game */
+		for ( mob = character_list; mob; mob = mob->next )
+		{
+			if ( GET_MOB_VNUM ( mob ) != new_vnum )
+				continue;
+
+			/* remove any old scripts */
+			if ( SCRIPT ( mob ) )
+				extract_script ( mob, MOB_TRIGGER );
+
+			if ( mob->proto_script && first_mob )
+			{
+				delete mob->proto_script;
+				first_mob = FALSE;
+			}
+
+			mob->proto_script = pmob->proto_script;
+			assign_triggers ( mob, MOB_TRIGGER );
+		}
+	}
+
 	OLC_SCRIPT ( d ) = NULL;
 
-
-	/* this takes care of the mobs currently in-game */
-	for ( mob = character_list; mob; mob = mob->next )
-	{
-		if ( GET_MOB_VNUM ( mob ) != new_vnum )
-			continue;
-
-		/* remove any old scripts */
-		if ( SCRIPT ( mob ) )
-			extract_script ( mob, MOB_TRIGGER );
-
-		if ( first_mob )
-		{
-			free_proto_script ( mob, MOB_TRIGGER );
-			first_mob = FALSE;
-		}
-
-		copy_proto_script ( pmob, mob, MOB_TRIGGER );
-		assign_triggers ( mob, MOB_TRIGGER );
-	}
 	/* end trigger update */
 #if 0
 	if ( !i )	/* Only renumber on new mobiles. */
