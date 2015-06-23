@@ -138,11 +138,12 @@ void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
     case '^':
     case '&':
     case '*':
-	if ( *p == *(p + 1) )
-	{
-		p += 2;
-		continue;
-	}
+      if ( *p == *(p + 1) )
+      {
+         *s++ = *p++;
+         *s++ = *p++;
+         continue;
+      }
       /* get Character, move to next token */
       type[i] = *p;
       *s = '\0';
@@ -153,7 +154,12 @@ void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
       break;
 
     case '`':
-
+      if ( *p == *(p + 1) )
+      {
+         *s++ = *p++;
+         *s++ = *p++;
+         continue;
+      }
       /* get obj_data, move to next token */
       type[i] = *p;
       *s = '\0';
