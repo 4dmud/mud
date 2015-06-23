@@ -3193,6 +3193,9 @@ void var_subst ( void *go, struct script_data *sc, trig_data *trig,
 
 			find_replacement ( go, sc, trig, type, var, field, subfield, repl_str, sizeof ( repl_str ) );
 
+			if ( strlen ( repl_str ) == 0 && strstr ( line, "purge%" ) != NULL )
+				strcpy ( repl_str, "target_not_found" );
+
 			//strlcat(buf, repl_str, b_len);
 			strncat ( buf, repl_str, left );
 			len = strlen ( repl_str );

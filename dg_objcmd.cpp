@@ -473,6 +473,10 @@ OCMD ( do_opurge )
 	} /* no arg */
 //***** get_char_by_obj will parse an arg starting
 //***** with a UID char as a proper UID
+
+	if ( !strcmp ( arg, "target_not_found" ) )
+		return;
+
 	ch = get_char_by_obj ( obj, arg );
 	if ( !ch )
 	{

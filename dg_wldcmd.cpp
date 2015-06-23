@@ -550,6 +550,8 @@ WCMD(do_wpurge)
 
   if (*arg == UID_CHAR)
     ch = get_char(arg);
+  else if ( !strcmp ( arg, "target_not_found" ) )
+    return;
   else
     ch = get_char_in_room(room, arg);
   if (!ch)
