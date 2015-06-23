@@ -7873,7 +7873,7 @@ void list_mob_resets ( Character *vict, Character *ch )
 			}
 		}
 }
-
+#define ZCMD2 zone_table[zone].cmd[cmd_num]
 void list_obj_resets ( obj_data *obj, Character *ch )
 {
 	int vnum = GET_OBJ_VNUM ( obj );
@@ -7886,11 +7886,22 @@ void list_obj_resets ( obj_data *obj, Character *ch )
 			switch ( ZCMD.command )
 			{
 				case 'O':
+					if ( obj_index[ZCMD.arg1].vnum == vnum )
+						ch->Send ( "Will reset in room %d %s\r\n", ZCMD.arg3, world_vnum[ZCMD.arg3]->name );
+					break;
 				case 'G':
 				case 'E':
+					if ( obj_index[ZCMD.arg1].vnum == vnum )
+						for ( int cmd_num = cmd_no - 1; cmd_num >= 0; --cmd_num )
+							if ( ZCMD2.command == 'M' )
+							{
+								ch->Send ( "Will reset on mob %d %s\r\n", ZCMD2.arg1, GET_NAME ( mob_proto[ZCMD2.arg1] ) );
+								break;
+							}
+					break;
 				case 'P':
 					if ( obj_index[ZCMD.arg1].vnum == vnum )
-						ch->Send ( "Will reset in %d\r\n", ZCMD.arg3 );
+						ch->Send ( "Will reset in container %d %s\r\n", ZCMD.arg3, obj_proto[ZCMD.arg3].short_description );
 					break;
 			}
 		}
