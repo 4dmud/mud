@@ -881,7 +881,7 @@ void list_one_char ( Character *i, Character *ch )
 		else
 		{
 			chair = SITTING ( i );
-			ch->Send ( " is %s upon %s.",
+			ch->Send ( " is %s upon %s.", GET_OBJ_TYPE ( chair ) == ITEM_SPACEBIKE ? "mounted" :
 			           ( ( GET_POS ( i ) ==
 			               POS_SITTING ) ? "sitting" : "resting" ),
 			           ( CAN_SEE_OBJ ( ch, chair ) ? chair->
@@ -5304,7 +5304,7 @@ ACMD ( do_toggle )
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_MAIL ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOCTALK ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_AFKTELL ) ),
-	    YESNO ( !PRF_FLAGGED ( ch, PRF_MOVEMSG ) ),
+	    YESNO ( PRF_FLAGGED ( ch, PRF_MOVEMSG ) ),
 	    YESNO ( !PRF_FLAGGED ( ch, PRF_NOHERO ) ),
 	    YESNO ( !PRF_FLAGGED ( ch, PRF_NONEWBIE ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_TIME ) ),

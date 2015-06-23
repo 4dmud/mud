@@ -577,6 +577,9 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 	/****/
 	if ( ch->MountHere() )
 	{
+		if ( PRF_FLAGGED ( ch, PRF_MOVEMSG ) )
+			ch->Send ( "You ride %s.\r\n", dirs[dir] );
+
 		if ( !IS_AFFECTED ( RIDING ( ch ), AFF_SNEAK ) )
 		{
 			if ( IS_AFFECTED ( ch, AFF_SNEAK ) )
@@ -648,6 +651,13 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 				//         act(buf2, TRUE, RIDDEN_BY(ch), 0, ch, TO_NOTVICT);
 			}
 		}
+	}
+	else if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
+	{
+		if ( PRF_FLAGGED ( ch, PRF_MOVEMSG ) )
+			ch->Send ( "You ride %s.\r\n", dirs[dir] );
+		snprintf ( buf2, sizeof ( buf2 ), "$n rides $p %s.", dirs[dir] );
+		act ( buf2, TRUE, ch, SITTING ( ch ), 0, TO_ROOM );
 	}
 	else if ( !IS_AFFECTED ( ch, AFF_SNEAK ) )
 	{
@@ -953,6 +963,14 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 				}
 				LOOK ( RIDDEN_BY ( ch ) );
 			}
+		}
+		else if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
+		{
+			snprintf ( buf2, sizeof ( buf2 ), "$n arrives from %s%s, riding $p.",
+			           ( dir < UP ? "the " : "" ),
+			           ( dir == UP ? "below" : dir ==
+			             DOWN ? "above" : dirs[rev_dir[dir]] ) );
+			act ( buf2, TRUE, ch, SITTING ( ch ), 0, TO_ROOM );
 		}
 		else if ( !riding || ( riding && !same_room ) )
 		{
@@ -2253,6 +2271,11 @@ ACMD ( do_sit )
 
 			if ( found == 0 )
 			{
+				if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
+					ch->Send ( "You dismount %s.\r\n", SITTING ( ch )->short_description );
+				else if ( RIDING ( ch ) )
+					ch->Send ( "You dismount %s.\r\n", GET_NAME ( RIDING ( ch ) ) );
+				dismount_char ( ch );
 				if ( is_vehicle )
 				{
 					ch->Send ( "You sit down at %s.\r\n",vehicle_control->short_description );
@@ -2264,7 +2287,6 @@ ACMD ( do_sit )
 					send_to_char ( "You sit down.\r\n", ch );
 					act ( "$n sits down.", FALSE, ch, 0, 0, TO_ROOM );
 				}
-				dismount_char ( ch );
 				GET_POS ( ch ) = POS_SITTING;
 			}
 			else
@@ -2291,7 +2313,10 @@ ACMD ( do_sit )
 				}
 				else
 				{
-
+					if ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE )
+						ch->Send ( "You dismount %s.\r\n", SITTING ( ch )->short_description );
+					else if ( RIDING ( ch ) )
+						ch->Send ( "You dismount %s.\r\n", GET_NAME ( RIDING ( ch ) ) );
 					dismount_char ( ch );
 					if ( OBJ_SAT_IN_BY ( chair ) == NULL )
 						OBJ_SAT_IN_BY ( chair ) = ch;
@@ -2721,7 +2746,7 @@ ASKILL ( skill_mount )
 		send_to_char ( "Ehh... no.\r\n", ch );
 		return 0;
 	}
-	else if ( RIDING ( ch ) || RIDDEN_BY ( ch ) )
+	else if ( RIDING ( ch ) || RIDDEN_BY ( ch ) || ( SITTING ( ch ) && GET_OBJ_TYPE ( SITTING ( ch ) ) == ITEM_SPACEBIKE ) )
 	{
 		send_to_char ( "You are already mounted.\r\n", ch );
 		return 0;

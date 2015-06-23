@@ -3612,7 +3612,7 @@ int restrict_check(const Character *ch) {
 
     switch (message_type) {
     case REST_MOVE:
-        if (PRF_FLAGGED(ch, PRF_MOVEMSG))
+        if (!PRF_FLAGGED(ch, PRF_MOVEMSG))
             return 0;
         break;
     }
