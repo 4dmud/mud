@@ -1189,9 +1189,7 @@ void oedit_disp_menu ( Descriptor *d )
 	    "%sG%s) Smell Desc  :\r\n%s%s\r\n"
 	    "%sH%s) Taste Desc  :\r\n%s%s\r\n"
 	    "%sI%s) Feel Desc   :\r\n%s%s\r\n"
-	    "%sJ%s) Crafting    : Colour: %s%s%s   Quality: %s%s%s\r\n"
-	    "                 Material: %s%s%s   Dyecount: %s%d%s\r\n"
-	    "                 Origin: %s%s%s   Stage: %s%d\r\n"
+	    "%sJ%s) Crafting\r\n"
 	    "%sM%s) Min Level   : %s%d\r\n"
 	    "%sS%s) Script      : %s%s\r\n"
 	    "%sQ%s) Quit\r\n"
@@ -1203,12 +1201,7 @@ void oedit_disp_menu ( Descriptor *d )
 	    grn, nrm, yel, ( obj->smell && *obj->smell ) ? obj->smell : "<not set>\r\n",
 	    grn, nrm, yel, ( obj->taste && *obj->taste ) ? obj->taste : "<not set>\r\n",
 	    grn, nrm, yel, ( obj->feel  && *obj->feel ) ? obj->feel  : "<not set>\r\n",
-	    grn, nrm, cyn, colour_names [ GET_OBJ_VAL ( obj, 7 ) ], nrm,
-	    cyn, quality_names [ GET_OBJ_VAL ( obj, 8 ) ], nrm,
-	    cyn, material_name ( GET_OBJ_VAL ( obj, 9 ) ), nrm,
-	    cyn, GET_OBJ_VAL ( obj, 10 ), nrm,
-	    cyn, origin_names [ GET_OBJ_VAL ( obj, 11 ) ], nrm,
-	    cyn, GET_OBJ_VAL ( obj, 12 ),
+	    grn, nrm,
 	    grn, nrm, cyn, GET_OBJ_LEVEL ( obj ),
 	    grn, nrm, cyn, OLC_SCRIPT ( d ) ? "Set." : "Not Set.",
 	    grn, nrm
@@ -1995,6 +1988,15 @@ void oedit_parse ( Descriptor *d, char *arg )
 
 		case OEDIT_CRAFTING_STAGE:
 			GET_OBJ_STAGE ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
+			d->Output ( "%sColour: %s%s%s   Quality: %s%s%s\r\n"
+				    "Material: %s%s%s   Dyecount: %s%d%s\r\n"
+				    "Origin: %s%s%s   Stage: %s%d%s\r\n\r\n",
+				    nrm, cyn, colour_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 7 ) ], nrm,
+				    cyn, quality_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 8 ) ], nrm,
+				    cyn, material_name ( GET_OBJ_VAL ( OLC_OBJ ( d ), 9 ) ), nrm,
+				    cyn, GET_OBJ_VAL ( OLC_OBJ ( d ), 10 ), nrm,
+				    cyn, origin_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 11 ) ], nrm,
+				    cyn, GET_OBJ_VAL ( OLC_OBJ ( d ), 12 ), nrm );
 			break;
 
 		default:
