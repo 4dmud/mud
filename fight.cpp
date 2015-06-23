@@ -6033,14 +6033,28 @@ void strike_missile ( Character *ch, Character *tch,
 	if ( AFF_FLAGGED ( tch, AFF_SHIELD ) )
 		dam /= 2;
 
-	snprintf ( buf, sizeof ( buf ), "Your $p strikes $N!" );
-	act ( buf, FALSE, ch, missile, tch, TO_CHAR );
-	snprintf ( buf, sizeof ( buf ), "An $p flies in from the %s and strikes %s.",
-	           dirs[rev_dir[dir]], GET_NAME ( tch ) );
-	act ( buf, FALSE, tch, missile, NULL, TO_ROOM );
-	snprintf ( buf, sizeof ( buf ), "An $p flies in from the %s and hits YOU!",
-	           dirs[rev_dir[dir]] );
-	act ( buf, FALSE, ch, missile, tch, TO_VICT );
+	if ( attacktype == SKILL_FIREARM )
+	{
+		snprintf ( buf, sizeof ( buf ), "You hit $N!" );
+		act ( buf, FALSE, ch, missile, tch, TO_CHAR );
+		snprintf ( buf, sizeof ( buf ), "A bullet flies in from the %s and strikes %s.",
+			dirs[rev_dir[dir]], GET_NAME ( tch ) );
+		act ( buf, FALSE, tch, NULL, NULL, TO_ROOM );
+		snprintf ( buf, sizeof ( buf ), "A bullet flies in from the %s and hits YOU!",
+			dirs[rev_dir[dir]] );
+		act ( buf, FALSE, ch, NULL, tch, TO_VICT );
+	}
+	else
+	{
+		snprintf ( buf, sizeof ( buf ), "$p strikes $N!" );
+		act ( buf, FALSE, ch, missile, tch, TO_CHAR );
+		snprintf ( buf, sizeof ( buf ), "$p flies in from the %s and strikes %s.",
+			dirs[rev_dir[dir]], GET_NAME ( tch ) );
+		act ( buf, FALSE, tch, missile, NULL, TO_ROOM );
+		snprintf ( buf, sizeof ( buf ), "$p flies in from the %s and hits YOU!",
+			dirs[rev_dir[dir]] );
+		act ( buf, FALSE, ch, missile, tch, TO_VICT );
+	}
 	if ( damage ( ch, tch, dam, attacktype ) != -1 )
 		if ( IS_NPC ( tch ) && !IS_NPC ( ch ) && GET_POS ( tch ) > POS_STUNNED )
 		{
@@ -6062,21 +6076,20 @@ void miss_missile ( Character *ch, Character *tch,
                     struct obj_data *missile, int dir, int attacktype )
 {
 	char buf[MAX_INPUT_LENGTH];
-	if ( !missile )
+	if ( attacktype == SKILL_FIREARM )
 	{
-
 		snprintf ( buf, sizeof ( buf ),
-		           "a bullet flies in from the %s and hits the ground!",
+		           "A bullet flies in from the %s and narrowly misses $N!",
 		           dirs[rev_dir[dir]] );
-		act ( buf, FALSE, tch, 0, 0, TO_ROOM );
-		act ( buf, FALSE, tch, 0, 0, TO_CHAR );
-		ch->Send ( "Your bullet narrowly misses %s. BAH!",
-		           PERS ( tch, ch ) );
+		act ( buf, FALSE, tch, 0, tch, TO_ROOM );
+		snprintf ( buf, sizeof ( buf ),
+		           "A bullet flies in from the %s and narrowly misses you!",
+		           dirs[rev_dir[dir]] );
+		act ( buf, FALSE, ch, 0, tch, TO_VICT );
+		ch->Send ( "You narrowly miss %s. BAH!", PERS ( tch, ch ) );
 	}
 	else
 	{
-
-
 		snprintf ( buf, sizeof ( buf ),
 		           "A $p flies in from the %s and hits the ground!",
 		           dirs[rev_dir[dir]] );
@@ -6088,7 +6101,7 @@ void miss_missile ( Character *ch, Character *tch,
 }
 
 
-void mob_reaction ( Character *ch, Character *vict, int dir )
+void mob_reaction ( Character *ch, Character *vict, int dir, bool shot )
 {
 	if ( IS_NPC ( vict ) && !FIGHTING ( vict ) && GET_POS ( vict ) > POS_STUNNED )
 	{
@@ -6097,7 +6110,8 @@ void mob_reaction ( Character *ch, Character *vict, int dir )
 		if ( IS_SET_AR ( MOB_FLAGS ( vict ), MOB_MEMORY ) )
 		{
 			remember ( vict, ch );
-			act ( "$n bellows in pain!", FALSE, vict, 0, 0, TO_ROOM );
+			if ( shot )
+				act ( "$n bellows in pain!", FALSE, vict, 0, 0, TO_ROOM );
 			if ( GET_POS ( vict ) == POS_STANDING &&
 			        !IS_SET_AR ( MOB_FLAGS ( vict ), MOB_SENTINEL ) )
 			{
@@ -6268,7 +6282,7 @@ void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
 			}
 
 			/* either way mob remembers */
-			mob_reaction ( ch, vict, dir );
+			mob_reaction ( ch, vict, dir, shot );
 			WAIT_STATE ( ch, PULSE_VIOLENCE );
 			return;
 

@@ -44,7 +44,7 @@ void strike_missile ( Character *ch, Character *tch,
                       struct obj_data *missile, int dir, int attacktype );
 void miss_missile ( Character *ch, Character *tch,
                     struct obj_data *missile, int dir, int attacktype );
-void mob_reaction ( Character *ch, Character *vict, int dir );
+void mob_reaction ( Character *ch, Character *vict, int dir, bool shot );
 void fire_missile ( Character *ch, char arg1[MAX_INPUT_LENGTH],
                     struct obj_data *missile, int pos, int range, int dir );
 void check_killer ( Character *ch, Character *vict );
