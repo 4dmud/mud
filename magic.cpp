@@ -2087,7 +2087,7 @@ void mag_summons ( int level, Character *ch, struct obj_data *obj,
 	}
 	if ( !can_have_follower ( ch, mob_num ) )
 	{
-		ch->Send ( "Sorry, but you can't have any more then a total of \r\n"
+		ch->Send ( "Sorry, but you can't have any more than a total of \r\n"
 		           "160 levels between all of your charmed followers\r\n" );
 		return;
 	}

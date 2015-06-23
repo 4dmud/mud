@@ -1908,7 +1908,7 @@ void do_clan_bank ( Character *ch, char *arg, int action )
 
 	if ( amount > 2000000000 && action == CB_DEPOSIT )
 	{
-		ch->Send ( "You can't deposit more then 2 billion coins at a time!\r\n" );
+		ch->Send ( "You can't deposit more than 2 billion coins at a time!\r\n" );
 		return;
 	}
 

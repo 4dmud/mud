@@ -2962,7 +2962,7 @@ ACMD ( do_settime )
 
 	one_argument ( argument, buf );
 
-	time = atoi ( argument );
+	time = abs ( atoi ( argument ) );
 	time_info.hours = time;
 	ch->Send ( "Time has been set.\r\n" );
 	check_time_triggers();
@@ -4634,7 +4634,7 @@ const char * damage_consider[] =
 	"Simple : Your nickname is serial killer.",
 	"Not Too Simple : Your nickname is tough bastard.",
 	"Hard : Your nickname is lightly bruised.",
-	"Quite Hard : Your nickname is eyes bigger then your sword.",
+	"Quite Hard : Your nickname is eyes bigger than your sword.",
 	"Very Hard : Your nickname is slightly broken person.",
 	"Very Very Hard : Your nickname is has hospital insurance.",
 	"Ultra difficult : Your nickname is can afford corpse recovery.",
@@ -4681,13 +4681,13 @@ ACMD ( do_consider )
 			diff2 = ( GET_MAX_MANA ( ch ) - GET_MAX_MANA ( victim ) );
 			diff3 = ( GET_DAMROLL ( ch ) - GET_DAMROLL ( victim ) );
 			if ( diff <= -400 )
-				ch->Send ( "They are WAY tougher then you, uh ohh.\r\n" );
+				ch->Send ( "They are WAY tougher than you, uh ohh.\r\n" );
 			else if ( diff <= -200 )
-				ch->Send ( "They are quite reasonably tougher then you.\r\n" );
+				ch->Send ( "They are quite reasonably tougher than you.\r\n" );
 			else if ( diff <= -100 )
-				ch->Send ( "They are moderately tougher then you.\r\n" );
+				ch->Send ( "They are moderately tougher than you.\r\n" );
 			else if ( diff < -10 )
-				ch->Send ( "They are a bit tougher then you.\r\n" );
+				ch->Send ( "They are a bit tougher than you.\r\n" );
 			else if ( diff >= ( -10 ) && diff <= 10 )
 				ch->Send ( "They are as tough as you!\r\n" );
 			else if ( diff <= ( 100 ) )
@@ -4695,14 +4695,14 @@ ACMD ( do_consider )
 			else if ( diff <= ( 200 ) )
 				ch->Send ( "They are tough but not up to your standard.\r\n" );
 			else if ( diff <= ( 400 ) )
-				ch->Send ( "You are way tougher then they are.\r\n" );
+				ch->Send ( "You are way tougher than they are.\r\n" );
 			else if ( diff > 400 )
 				ch->Send ( "Is it even worth fighting for?\r\n" );
 
 			if ( diff2 <= -5000 )
 				ch->Send ( "Comparing your magical energy is like comparing a match to a super nova.\r\n" );
 			else if ( diff2 <= -2500 )
-				ch->Send ( "They have more magical ability in one finger then you have in your entire being.\r\n" );
+				ch->Send ( "They have more magical ability in one finger than you have in your entire being.\r\n" );
 			else if ( diff2 <= -1000 )
 				ch->Send ( "They have enchanting energy like you could only dream of.\r\n" );
 			else if ( diff2 < -500 )
@@ -4712,9 +4712,9 @@ ACMD ( do_consider )
 			else if ( diff2 > -100 && diff2 < 100 )
 				ch->Send ( "Your magical energys are about the same.\r\n" );
 			else if ( diff2 < 500 )
-				ch->Send ( "They have lower magical energy then you.\r\n" );
+				ch->Send ( "They have lower magical energy than you.\r\n" );
 			else if ( diff2 < 1000 )
-				ch->Send ( "They have much lower magical energy then you.\r\n" );
+				ch->Send ( "They have much lower magical energy than you.\r\n" );
 			else if ( diff2 < 2500 )
 				ch->Send ( "They have magical energy that almost reaches the knees of your magical energy.\r\n" );
 			else if ( diff2 <= 5000 )
@@ -6001,7 +6001,7 @@ ACMD ( set_perc )
 	if ( amount > ( GET_PERC ( ch ) + GET_PERC ( tch ) )-10 )
 	{
 		ch->Send (
-		    "That amount is higher then you have available to set for %s (%4.1f max).\r\n",
+		    "That amount is higher than you have available to set for %s (%4.1f max).\r\n",
 		    GET_NAME ( tch ), GET_PERC ( ch ) + GET_PERC ( tch ) - 10 );
 		return;
 	}

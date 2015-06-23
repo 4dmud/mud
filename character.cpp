@@ -955,7 +955,7 @@ void Character::save()
 {
 	if ( this == NULL )
 	{
-		log ( "SYSERR: save() recieved null ch!" );
+		log ( "SYSERR: save() received null ch!" );
 		return;
 	}
 	if ( IS_NPC ( this ) )

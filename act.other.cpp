@@ -447,6 +447,7 @@ ACMD ( do_quit )
 		     *  situation.
 		     */
 
+		write_aliases ( ch );
 		Crash_rentsave ( ch, 0 );
 
 		/* If someone is quitting in their house, let them load back here. */
@@ -554,7 +555,7 @@ ACMD ( do_loginmsg )
 		return;
 	}
 	if ( strlen ( argument ) > MAX_LOGINMSG_LENGTH )
-		ch->Send ( "Sorry, but your login message can't be longer then %d characters.\r\n",
+		ch->Send ( "Sorry, but your login message can't be longer than %d characters.\r\n",
 		           MAX_LOGINMSG_LENGTH );
 	else
 	{
@@ -577,7 +578,7 @@ ACMD ( do_logoutmsg )
 		return;
 	}
 	if ( strlen ( argument ) > MAX_LOGOUTMSG_LENGTH )
-		ch->Send ( "Sorry, but your logout message can't be longer then %d characters.\r\n",
+		ch->Send ( "Sorry, but your logout message can't be longer than %d characters.\r\n",
 		           MAX_LOGOUTMSG_LENGTH );
 	else
 	{
@@ -608,7 +609,7 @@ ACMD ( do_save )
 		 */
 		if ( ( CONFIG_AUTO_SAVE ) && GET_LEVEL ( ch ) < LVL_IMMORT )
 		{
-			ch->Send ( "Saving aliases.\r\n" );
+			ch->Send ( "Your aliases are saved when you logout.\r\n" );
 			return;
 		}
 		ch->Send ( "Saving %s and aliases.\r\n", GET_NAME ( ch ) );
@@ -1335,7 +1336,7 @@ ACMD ( do_gen_write )
 		return;
 	}
 	fprintf ( fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
-	          "<tr><td class='plrname'>%-13s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
+	          "<tr><td class='plrname'>%-13s</td><td class='date'> %6.6s</td><td class='room'> %5d</td><td class='comment'> %s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
 	          GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
 
 	fclose ( fl );
@@ -2098,7 +2099,7 @@ const char *msgs[][2] =
 	{"You can't dig the entrance up!\r\n",
 	 NULL},
 	//SECT_ATMOSPHERE         14   /* Entrance to a planet            */
-	{"You can' dig in atmosphere!\r\n",
+	{"You can't dig in atmosphere!\r\n",
 	 NULL},
 	//SECT_SUN      15   /* Into the Sun                    */
 	{"You can't dig on a sun!\r\n",

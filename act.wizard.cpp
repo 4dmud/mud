@@ -7026,12 +7026,12 @@ ACMD ( do_reward )
 
 		if ( ( pts = atoi ( arg ) ) <= 0 )
 		{
-			ch->Send ( "Invalid number. Try something more then 0.\r\n" );
+			ch->Send ( "Invalid number. Try something more than 0.\r\n" );
 			return;
 		}
 		if ( pts > update_reward ( ch ) )
 		{
-			ch->Send ( "Invalid number. Try something less then %d.\r\n", GET_REWARD ( ch ) );
+			ch->Send ( "Invalid number. Try something less than %d.\r\n", GET_REWARD ( ch ) );
 			return;
 		}
 
@@ -7129,12 +7129,12 @@ ACMD ( do_award )
 		}
 		if ( ( pts = atoi ( arg ) ) <= 0 )
 		{
-			ch->Send ( "Invalid number. Try something more then 0.\r\n" );
+			ch->Send ( "Invalid number. Try something more than 0.\r\n" );
 			return;
 		}
 		if ( pts > update_award ( ch ) )
 		{
-			ch->Send ( "Invalid number. Try something less then %d.\r\n", GET_AWARD ( ch ) );
+			ch->Send ( "Invalid number. Try something less than %d.\r\n", GET_AWARD ( ch ) );
 			return;
 		}
 

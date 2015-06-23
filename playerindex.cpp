@@ -344,7 +344,7 @@ int PlayerIndex::LoadChar(const char *name, Character *ch) {
     string chname;
 
     if (ch == NULL) {
-        new_mudlog(NRM, LVL_GOD, TRUE,"SYSERR: load_char recieved null ch!");
+        new_mudlog(NRM, LVL_GOD, TRUE,"SYSERR: load_char received null ch!");
         return -1;
     }
 

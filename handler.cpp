@@ -614,8 +614,7 @@ void affect_modify_ar ( Character *ch, sbyte loc, int mod,
 {
 	int i, j;
 
-	if ( add
-	   )
+	if ( add )
 	{
 		for ( i = 0; i < AF_ARRAY_MAX; i++ )
 			for ( j = 0; j < 32; j++ )
@@ -2322,7 +2321,7 @@ void extract_char_final ( Character *ch )
 
  put all the files back
  except the files from the world directory
- exept files taht already exist that are older then the ones in the tar
+ except files that already exist that are older than the ones in the tar
 
 
  */
@@ -2336,9 +2335,9 @@ void extract_char ( Character *ch, int e_now )
 	if ( DEAD ( ch ) )
 	{
 		if ( IN_ROOM ( ch ) )
-			log ( "Extracting char more then once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+			log ( "Extracting char more than once (vnum:%d : name:%s : room:%d)", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
 		else
-			log ( "Extracting char more then once (vnum:%d : name:%s)", GET_MOB_VNUM ( ch ), GET_NAME ( ch ) );
+			log ( "Extracting char more than once (vnum:%d : name:%s)", GET_MOB_VNUM ( ch ), GET_NAME ( ch ) );
 		return;
 	}
 

@@ -3445,7 +3445,7 @@ void send_to_range(room_vnum start, room_vnum finish, const char *messg, ...) {
     room_vnum r;
 
     if (start > finish) {
-        log("send_to_range passed start value greater then finish.");
+        log("send_to_range passed start value greater than finish.");
         return;
     }
     if (messg == NULL)
@@ -4461,7 +4461,7 @@ string wordwrap(const char *cmd, size_t width, size_t maxlen) {
     bool overf = FALSE;
     if (!cmd || !*cmd)
         return cmd;
-    /* no need to wrap the text if it is shorter then the width, just return */
+    /* no need to wrap the text if it is shorter than the width, just return */
     if (maxlen<=width)
         return cmd;
 

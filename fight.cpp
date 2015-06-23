@@ -219,7 +219,7 @@
  * Fixed some errors in copyover, added MXP
  *
  * Revision 1.15  2005/04/26 10:15:18  w4dimenscor
- * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less then level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
+ * fixed the player timeouts, so we will no longer have thousands of users that don't play and yet still slow us down. requirelents to be deleted: any seeker who hasn't logged in within 90 days and is less than level 40 will be deleted. these requirements wiped about 8000 players from our list hehe.
  *
  * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
  * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
@@ -4451,7 +4451,7 @@ char *fight_type_message ( char *str, size_t len, Character *attacker, Character
 
 	static const char * undead_msg_default[] =
 	{
-		"unholy shreaks",
+		"unholy shrieks",
 		"clawing hands",
 		"shadow breath",
 		"goring bite",
@@ -7718,7 +7718,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 	//I have no idea why the below was in, but it has been here since before
 	//I started coding here. It is pretty nasty, since it allows a player to
 	//spamcast an offensive spell at a mob, and the mob won't be able to fight
-	//back, because its wait state isn't less then or equal to 0. --Thotter
+	//back, because its wait state isn't less than or equal to 0. --Thotter
 	//
 	// It was meant to be for the ch, not vict, oops! :-P - Mord
 	GET_WAIT_STATE ( ch ) += 1 RL_SEC;

@@ -41,7 +41,7 @@
  * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
  *
  * Revision 1.54  2007/06/09 04:34:55  w4dimenscor
- * Fixed practice so that it takes money from players rather then gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
+ * Fixed practice so that it takes money from players rather than gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
  *
  * Revision 1.53  2007/06/07 11:46:10  w4dimenscor
  * Updated the assemble code to give a good message that people can't assemble, which needs to be overridden in triggers, basically it is the same as 'do_not_here'
@@ -89,7 +89,7 @@
  *
  * Revision 1.39  2006/05/15 16:16:12  w4dimenscor
  * Fixed the level you need to see undisplayed items. Some of it was equal to
- * LVL_IMMORT, some of it was higher then LVL_IMMORT. It is now all higher then
+ * LVL_IMMORT, some of it was higher than LVL_IMMORT. It is now all higher then
  * LVL_IMMORT. Fixed some other small things too.
  *
  * Revision 1.38  2006/05/15 15:45:19  w4dimenscor
@@ -100,7 +100,7 @@
  * repatching the files sinc ethe backup wipe
  *
  * Revision 1.38  2006/05/01 23:33:08  w4dimenscor
- * Changed the fuel command, so that if you need less fuel to fill your spacebike then a gem provides, the bike will only use what it needs of the gem and not purge it
+ * Changed the fuel command, so that if you need less fuel to fill your spacebike than a gem provides, the bike will only use what it needs of the gem and not purge it
  *
  * Revision 1.37  2006/05/01 23:26:27  w4dimenscor
  * Fixed the skin command so that if the animals skin is 0 or less it means that it is unskinnable. Moved anif check in do_fuel
@@ -929,7 +929,7 @@ bool can_take_obj ( Character *ch, struct obj_data *obj )
 		if ( i == MAX_MAGIC_ITEMS )
 			act ( "$p: you have 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR );
 		else
-			act ( "$p: you have more then 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR );
+			act ( "$p: you have more than 45 magic items already.", FALSE, ch, obj, 0, TO_CHAR );
 		return FALSE;
 	} */
 	return TRUE;
@@ -1609,7 +1609,7 @@ void perform_drop_gold ( Character *ch, gold_int amount,
 	else if ( ch->Gold ( 0, GOLD_HAND ) < amount )
 		ch->Send ( "You don't have that many coins!\r\n" );
 	//	else if ( amount > 2000000000 )
-	//		ch->Send ( "You can't drop more then 2 billion.\r\n" );
+	//		ch->Send ( "You can't drop more than 2 billion.\r\n" );
 	else
 	{
 		/*for the gold tally code */
@@ -2068,7 +2068,7 @@ void perform_give_gold ( Character *ch, Character *vict,
 	}
 	//	else if ( amount > 2000000000 )
 	//	{
-	//		ch->Send ( "You can't give more then 2 billion.\r\n" );
+	//		ch->Send ( "You can't give more than 2 billion.\r\n" );
 	//		return;
 	//	}
 
@@ -3266,11 +3266,11 @@ void wear_message ( Character *ch, struct obj_data *obj, int where )
 		{"$n wears $p around $s waist.",
 		 "You wear $p around your waist."},
 
-		{"$n puts $p on around $s right wrist.",
-		 "You put $p on around your right wrist."},
+		{"$n puts $p around $s right wrist.",
+		 "You put $p around your right wrist."},
 
-		{"$n puts $p on around $s left wrist.",
-		 "You put $p on around your left wrist."},
+		{"$n puts $p around $s left wrist.",
+		 "You put $p around your left wrist."},
 
 		{"$n wields $p.",
 		 "You wield $p."},
@@ -3776,9 +3776,11 @@ int where_to_worn ( int where )
 			worn = ITEM_WEAR_HEAD;
 			break;
 		case WEAR_LEGS:
+		case WEAR_LEGS_2:
 			worn = ITEM_WEAR_LEGS;
 			break;
 		case WEAR_FEET:
+		case WEAR_FEET_2:
 			worn = ITEM_WEAR_FEET;
 			break;
 		case WEAR_HANDS:
@@ -3799,6 +3801,14 @@ int where_to_worn ( int where )
 		case WEAR_WRIST_R:
 		case WEAR_WRIST_L:
 			worn = ITEM_WEAR_WRIST;
+			break;
+		case WEAR_WIELD:
+		case WEAR_WIELD_2:
+			worn = ITEM_WEAR_WIELD;
+			break;
+		case WEAR_HOLD:
+		case WEAR_LIGHT:
+			worn = ITEM_WEAR_HOLD;
 			break;
 		case WEAR_FACE:
 			worn = ITEM_WEAR_FACE;
@@ -3859,6 +3869,14 @@ int where_to_worn ( int where )
 		case WEAR_FLOATING:
 			worn = ITEM_WEAR_FLOATING;
 			break;
+		case WEAR_BACK:
+			worn = ITEM_WEAR_BACK;
+			break;
+		case WEAR_CHEST:
+			worn = ITEM_WEAR_CHEST;
+			break;
+		default:
+			log ( "SYSERR: Where_to_worn: unhandled where loc %d", where );
 	}
 	return worn;
 }
@@ -4359,7 +4377,7 @@ void compare_weapons ( Character *ch,struct obj_data *item, struct obj_data *com
 	value2 = FTOI ( ( ( comp->obj_flags.value[1]+1 ) * comp->obj_flags.value[2] * wep_multi[1] ) /2 );
 
 	ch->Send ( "      {cgYou would do %s damage with ({cRB{cg) %s ({cGA{cg).{c0\r\n",
-	           value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "than" : "then" );
+	           value2 > value1 ? "more" : value2 == value1 ? "the same" : "less", value2 == value1 ? "as" : "than" );
 }
 void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp )
 {
@@ -4368,15 +4386,15 @@ void compare_staves ( Character *ch,struct obj_data *item, struct obj_data *comp
 		return;
 	if ( staff_multi ( ch, comp ) > staff_multi ( ch, item ) )
 	{
-		ch->Send ( "      {cgYou would get a higher multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get a higher multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 	else if ( staff_multi ( ch, comp ) == staff_multi ( ch, item ) )
 	{
-		ch->Send ( "      {cgYou would get the same multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get the same multiplyer from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
 	}
 	else
 	{
-		ch->Send ( "      {cgYou would get a lower multiplyer from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get a lower multiplyer from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 }
 void compare_armor ( Character *ch,struct obj_data *item, struct obj_data *comp )
@@ -4386,11 +4404,11 @@ void compare_armor ( Character *ch,struct obj_data *item, struct obj_data *comp 
 
 	if ( GET_OBJ_VAL ( comp, 0 ) > GET_OBJ_VAL ( item, 0 ) )
 	{
-		ch->Send ( "      {cgYou would get more armor from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get more armor from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 	else if ( GET_OBJ_VAL ( comp, 0 ) == GET_OBJ_VAL ( item, 0 ) )
 	{
-		ch->Send ( "      {cgYou would get the same from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get the same from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
 	}
 	else
 	{
@@ -4405,11 +4423,11 @@ void compare_food ( Character *ch,struct obj_data *item, struct obj_data *comp )
 
 	if ( GET_OBJ_VAL ( comp, 0 ) > GET_OBJ_VAL ( item, 0 ) )
 	{
-		ch->Send ( "      {cgYou would get more food from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get more food from ({cRB{cg) than ({cGA{cg).{c0\r\n" );
 	}
 	else if ( GET_OBJ_VAL ( comp, 0 ) == GET_OBJ_VAL ( item, 0 ) )
 	{
-		ch->Send ( "      {cgYou would get the same food from ({cRB{cg) then ({cGA{cg).{c0\r\n" );
+		ch->Send ( "      {cgYou would get the same food from ({cRB{cg) as from ({cGA{cg).{c0\r\n" );
 	}
 	else
 	{
@@ -4466,7 +4484,7 @@ void compare_affects ( Character *ch, struct obj_data *item, struct obj_data *co
 		}
 
 	ch->Send ( "      {cg({cRB{cg) has %s beneficial affects %s ({cGA{cg) with a difference score of %d.{c0\r\n",
-	           points > 0 ? "more" : points ==  0 ? "the same" : "less",  points ==  0 ? "and" : "then", points );
+	           points > 0 ? "more" : points ==  0 ? "the same" : "less",  points ==  0 ? "as" : "than", points );
 
 }
 
@@ -4512,7 +4530,7 @@ ACMD ( do_compare )
 			if ( CAN_SEE_OBJ ( ch, obj2 ) && GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) && CAN_GET_OBJ ( ch, obj2 ) )
 			{
 				ch->Send ( "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[inventory]{c0\r\n",
-				           obj2->short_description, obj1->short_description );
+				           obj1->short_description, obj2->short_description );
 				switch ( GET_OBJ_TYPE ( obj1 ) )
 				{
 					case ITEM_WEAPON:
@@ -4542,7 +4560,7 @@ ACMD ( do_compare )
 				continue;
 			if ( CAN_WEAR ( obj1, where_to_worn ( it ) ) )
 			{
-				ch->Send ( "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj2->short_description,obj1->short_description, body[it] );
+				ch->Send ( "\r\n{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy) : {cc[equipment: %s]{c0\r\n", obj1->short_description,obj2->short_description, body[it] );
 				if ( GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) )
 				{
 					switch ( GET_OBJ_TYPE ( obj1 ) )
@@ -4583,7 +4601,7 @@ ACMD ( do_compare )
 				return;
 			}
 		}
-		ch->Send ( "{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy):\r\n", obj2->short_description, obj1->short_description );
+		ch->Send ( "{cyComparing %s {cy({cGA{cy) to %s {cy({cRB{cy):\r\n", obj1->short_description, obj2->short_description );
 		if ( GET_OBJ_TYPE ( obj2 ) == GET_OBJ_TYPE ( obj1 ) )
 		{
 			switch ( GET_OBJ_TYPE ( obj1 ) )

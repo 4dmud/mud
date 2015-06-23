@@ -300,11 +300,11 @@ ACMD ( do_convey )
 		            return;
 		        }
 		        if (amount < 20) {
-		            ch->Send("The amount must be greater then 20.");
+		            ch->Send("The amount must be greater than 20.");
 		            return;
 		        }
 		        if (!(amount <= 200)) {
-		            ch->Send("The amount must be less then or equal to 200.");
+		            ch->Send("The amount must be less than or equal to 200.");
 		            return;
 		        }
 		        if (GET_PRACTICES(ch) >= amount) {
@@ -351,7 +351,7 @@ ACMD ( do_convey )
 
 		if ( ! ( amount >= 4 ) )
 		{
-			ch->Send ( "The amount must be greater then 4.\r\n" );
+			ch->Send ( "The amount must be greater than 4.\r\n" );
 			return;
 		}
 		if ( amount % 4 != 0 )

@@ -1127,7 +1127,7 @@ void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
        for example if the cost is 200 hitpoints, and the percentage is 15%
        and the player has 1000 hp, the percentage hp is 150 points
        then the actual cost will be 150, because the percentage 
-       is lower then the cost value -- mordipie
+       is lower than the cost value -- mordipie
     */
     SINFO.routines = routines;
     SINFO.violent = violent;
@@ -1150,7 +1150,7 @@ void unused_sub(enum subskill_list subcmd) {
        for example if the cost is 200 hitpoints, and the percentage is 15%
        and the player has 1000 hp, the percentage hp is 150 points
        then the actual cost will be 150, because the percentage 
-       is lower then the cost value -- mordipie
+       is lower than the cost value -- mordipie
     */
     SINFO.routines = 0;
     SINFO.violent = 0;
@@ -1253,7 +1253,8 @@ ACMD(do_subdisplay) {
     *dynbuf = 0;
     for (it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) {
 
-        if ((it->second)->subskill > 0 &&  (sub_info[(it->second)->subskill].stat_type == STATUS_TYPE_ONOFF)) {
+        if ( (it->second)->subskill > 0 )
+        {
             i++;
             sprintf(buf, "{cc%22s: [{cy%3s{cc] (%11s)\r\n",
                     sub_name((it->second)->subskill), ONOFF((it->second)->status), IS_SET(sub_info[(it->second)->subskill].flags,SUB_TYPE_AUTO) ? "Uncontrolled" : "Controlled");

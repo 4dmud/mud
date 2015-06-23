@@ -109,7 +109,7 @@
  * ] - Attack points of low level mobs is now slightly higher.
  * ] - Max mob level is now 150 instead of 70.
  * ] - Magic missile's damage multiplier is now based on your percentage of mana left. (100% = 2.0 multi, 50% = 1.5 multi)
- * ] - Kick's damage is now based on how much faster you are then your opponant. (ranges from 1.3 - 2.3 multi)
+ * ] - Kick's damage is now based on how much faster you are than your opponent. (ranges from 1.3 - 2.3 multi)
  * ] - Beserker in the tier names was changes to Berserker
  * ] - Objects that supply magic have their weight based on their magic postential energy.
  * ] - Hero's, Helpers, and Imms can now use socials from afar.
@@ -2346,7 +2346,7 @@ const char *spell_wear_off_msg[] =
 	"Your aura of corruption fades.",
 	"You feel less weak.",
 	"SOULSMASH",
-	"DEMONSHREAK",
+	"DEMONSHRIEK",
 	"LIFESUCK",
 	"BURNINGSKULL",
 	"HEARTSQUEEZE",

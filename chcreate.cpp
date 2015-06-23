@@ -579,7 +579,7 @@ void ShowClassInfo ( Descriptor *d, int typ )
 		case FIGHTER:
 			d->Output ( "The FIGHTER CLASSES have overall good defence, and focus primarily on melee\r\n" );
 			d->Output ( "damage, where almost every skill they have goes towards increasing their\r\n" );
-			d->Output ( "overall damage and battle ability, rather then a sudden burst of damage\r\n" );
+			d->Output ( "overall damage and battle ability, rather than a sudden burst of damage\r\n" );
 			d->Output ( "or speed.\r\n" );
 			d->Output ( "Hunter/Warrior classes will like +damroll +hp +str items.\r\n" );
 			break;

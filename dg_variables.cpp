@@ -122,7 +122,7 @@ char *skill_percent(Character *ch, char *skill)
 
 /*
    search through all the persons items, including containers
-   and 0 if it doesnt exist, and greater then 0 if it does!
+   and 0 if it doesnt exist, and greater than 0 if it does!
    Jamie Nelson (mordecai@timespace.co.nz)
    MUD -- 4dimensions.org:6000
    Now also searches by vnum -- Welcor
@@ -3067,7 +3067,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 
 /*
- * Now automatically checks if the variable has more then one field
+ * Now automatically checks if the variable has more than one field
  * in it. And if the field returns a name or a script UID or the like
  * it can recurse.
  * If you supply a value like, %actor.int.str% it wont blow up on you

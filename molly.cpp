@@ -219,6 +219,7 @@ ACMD(do_climb)
   int percent = 0;
   int chance = 0;
   char buf[MAX_STRING_LENGTH];
+  Character *dummy = NULL;
 
   percent = number(1, 101);
   chance = 70;
@@ -232,74 +233,46 @@ ACMD(do_climb)
 
   if (*buf)
   {			/* an argument was supplied, search keyword */
-    if ((obj =
-           get_obj_in_list_vis(ch, buf, NULL,IN_ROOM(ch)->contents)))
-    {
-      if (CAN_SEE_OBJ(ch, obj))
-      {
-        if (GET_OBJ_TYPE(obj) == ITEM_CLIMBABLE)
-        {
-          if (GET_OBJ_VAL(obj, 0) != NOWHERE && VALID_ROOM_RNUM(world_vnum[GET_OBJ_VAL(obj, 0)]))
-          {
-            if (percent <= chance)
-            {
-              char_from_room(ch);
-              act("$n climbs $p.", FALSE, ch, obj, 0,
-                  TO_ROOM);
-              char_to_room(ch, world_vnum[GET_OBJ_VAL(obj, 0)]);
-              LOOK(ch);
-              act("$n has arrived.", FALSE, ch, obj, 0,TO_ROOM);
+    generic_find ( buf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &dummy, &obj );
 
-              entry_memory_mtrigger(ch);
-              greet_mtrigger(ch, -1);
-              greet_memory_mtrigger(ch);
-              enter_wtrigger(IN_ROOM(ch), ch, -1);
-            }
-            else
-            {
-              act("As you start climbing $p, you slip and fall.", FALSE, ch, obj, 0, TO_CHAR);
-              act("$n starts climbing $p but falls to the ground. That's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
-              damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
-            }
-          }
-          else if (real_room(GET_OBJ_VAL(obj, 1)) != NULL)
+    if ( obj && CAN_SEE_OBJ ( ch, obj ) )
+    {
+      if (GET_OBJ_TYPE(obj) == ITEM_CLIMBABLE)
+      {
+        if (real_room(GET_OBJ_VAL(obj, 1)) != NULL)
+        {
+          if (percent <= chance)
           {
-            if (percent <= chance)
-            {
-              char_from_room(ch);
-              act("$n climbs $p.", FALSE, ch, obj, 0,
-                  TO_ROOM);
-              char_to_room(ch,
-                           real_room(GET_OBJ_VAL(obj, 1)));
-              act("$n has arrived.", FALSE, ch, obj, 0,
-                  TO_ROOM);
-              LOOK(ch);
-              entry_memory_mtrigger(ch);
-              greet_mtrigger(ch, -1);
-              greet_memory_mtrigger(ch);
-              enter_wtrigger(IN_ROOM(ch), ch, -1);
-            }
-            else
-            {
-              act("As you start climbing $p, you slip and fall.", FALSE, ch, obj, 0, TO_CHAR);
-              act("$n starts climbing $p but falls to the ground. That's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
-              damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
-            }
+            act("$n climbs $p.", FALSE, ch, obj, 0, TO_ROOM);
+            char_from_room ( ch );
+            char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));
+            LOOK(ch);
+            act("$n has arrived.", FALSE, ch, obj, 0,TO_ROOM);
+            entry_memory_mtrigger(ch);
+            greet_mtrigger(ch, -1);
+            greet_memory_mtrigger(ch);
+            enter_wtrigger(IN_ROOM(ch), ch, -1);
+          }
+          else
+          {
+            act("As you start climbing $p, you slip and fall.", FALSE, ch, obj, 0, TO_CHAR);
+            act("$n starts climbing $p but falls to the ground. That's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
+            damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
           }
           return;
         }
-        else if(GET_OBJ_TYPE(obj) == ITEM_DESCENDABLE){
-           act("There is no $p here that you can climb.", FALSE, ch, obj, 0, TO_CHAR);
-           return;
-        }
+        log ( "SYSERR: obj vnum %d has a non-existing room to climb to", GET_OBJ_VNUM ( obj ) );
+        return;
+      }
+      else {
+        ch->Send ( "You can't climb %s.\r\n", obj->short_description );
+        return;
       }
     }
     ch->Send( "There is no %s here.\r\n", buf);
   }
   else
-  {
     send_to_char("What do you want to climb?\r\n", ch);
-  }
 }
 
 ACMD(do_descend)
@@ -307,6 +280,7 @@ ACMD(do_descend)
   struct obj_data *obj = NULL;
   int percent = 0, chance = 0;
   char buf[MAX_STRING_LENGTH];
+  Character *dummy = NULL;
 
   percent = number(1, 101);
   chance = 70;
@@ -320,76 +294,44 @@ ACMD(do_descend)
 
   if (*buf)
   {			/* an argument was supplied, search keyword */
-    if ((obj =
-           get_obj_in_list_vis(ch, buf, NULL,
-                               IN_ROOM(ch)->contents)))
-    {
-      if (CAN_SEE_OBJ(ch, obj))
+      generic_find ( buf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &dummy, &obj );
+
+      if ( obj && CAN_SEE_OBJ ( ch, obj ) )
       {
         if (GET_OBJ_TYPE(obj) == ITEM_DESCENDABLE)
         {
-          if (GET_OBJ_VAL(obj, 0) != NOWHERE && VALID_ROOM_RNUM(world_vnum[GET_OBJ_VAL(obj, 0)]))
-          {
-            if (percent <= chance )
-            {
-              char_from_room(ch);
-              act("$n descends $p.", FALSE, ch, obj, 0, TO_ROOM);
-              char_to_room(ch, world_vnum[GET_OBJ_VAL(obj, 0)]);
-              LOOK(ch);
-              act("$n has arrived.", FALSE, ch, obj, 0,TO_ROOM);
-            }
-            else
-            {
-              act("As you start descending $p, you slip and tumble down.", FALSE, ch, obj, 0, TO_CHAR);
-              char_from_room(ch);
-              char_to_room(ch, world_vnum[GET_OBJ_VAL(obj, 0)]);
-              act("$n starts descending $p but slips and tumbles down, head over heals.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
-              damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
-              LOOK(ch);
-            }
-
-            entry_memory_mtrigger(ch);
-            greet_mtrigger(ch, -1);
-            greet_memory_mtrigger(ch);
-            enter_wtrigger(IN_ROOM(ch), ch, -1);
-          }
-          else if (real_room(GET_OBJ_VAL(obj, 1)) != NULL)
+          if (real_room(GET_OBJ_VAL(obj, 1)) != NULL)
           {
             if (percent <= chance)
             {
-              char_from_room(ch);
               act("$n descends $p.", FALSE, ch, obj, 0,TO_ROOM);
+              char_from_room ( ch );
               char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));
               act("$n has arrived.", FALSE, ch, obj, 0, TO_ROOM);
               LOOK(ch);
+              entry_memory_mtrigger(ch);
+              greet_mtrigger(ch, -1);
+              greet_memory_mtrigger(ch);
+              enter_wtrigger(IN_ROOM(ch), ch, -1);
             }
             else
             {
               act("As you start descending $p, you slip and tumble down.", FALSE, ch, obj, 0, TO_CHAR);
-              char_from_room(ch);
-              char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));
-              act("$n starts descending $p but slips and tumbles down,head over heals.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
+              act("$n starts descending $p but slips and tumbles down, head over heals.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
               damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
-              LOOK(ch);
             }
-
-            entry_memory_mtrigger(ch);
-            greet_mtrigger(ch, -1);
-            greet_memory_mtrigger(ch);
-            enter_wtrigger(IN_ROOM(ch), ch, -1);
+            return;
           }
+          log ( "SYSERR: obj vnum %d has a non-existing room to descend to", GET_OBJ_VNUM ( obj ) );
           return;
         }
-        else if (GET_OBJ_TYPE(obj) == ITEM_CLIMBABLE){
-           act("There is no $p here that you can descend.", FALSE, ch, obj, 0, TO_CHAR);
+        else {
+          ch->Send ( "You can't descend %s.\r\n", obj->short_description );
           return;
-       }
+        }
       }
+      ch->Send( "There is no %s here.\r\n", buf);
     }
-    ch->Send( "There is no %s here.\r\n", buf);
-  }
-  else
-  {
-    send_to_char("What do you want to descend?\r\n", ch);
-  }
+    else
+      send_to_char("What do you want to descend?\r\n", ch);
 }

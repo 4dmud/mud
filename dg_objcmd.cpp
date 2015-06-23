@@ -259,7 +259,7 @@ OCMD ( do_olag )
 
 	if ( w > 300 )
 	{
-		obj_log ( obj,"olag: duration longer then 30 seconds outside range." );
+		obj_log ( obj,"olag: duration longer than 30 seconds outside range." );
 		return;
 	}
 

@@ -372,7 +372,7 @@ ACMD(do_mlag) {
         return;
 
     if (w > 300) {
-        mob_log(ch, "mlag: duration longer then 30 seconds outside range.");
+        mob_log(ch, "mlag: duration longer than 30 seconds outside range.");
         return;
     }
     if (w <= 0)

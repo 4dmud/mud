@@ -847,7 +847,7 @@ const command_info cmd_info[] =
 	{ "skillset" , "skillse" , POS_SLEEPING, do_skillset , LVL_IMMORT, 0, WIZ_SEN_GRP },
 	{ "skilllist" , "skillli" , POS_SLEEPING, do_skilllist , 0, 0, 0 },
 	{ "subskillset" , "subskillse" , POS_SLEEPING, do_subskillset , LVL_IMMORT, 0, WIZ_SEN_GRP },
-	{ "subdisplay" , "subdisplay" , POS_SLEEPING, do_subdisplay , LVL_IMMORT, 0, WIZ_SEN_GRP },
+	{ "subdisplay" , "subdisplay" , POS_SLEEPING, do_subdisplay , 0, 0, 0 },
 	{ "slay"     , "slay" , POS_RESTING , do_slay     , LVL_IMMORT, 0, WIZ_KILL_GRP },
 	{ "sleep"    , "sl"  , POS_SLEEPING, do_sleep    , 0, 0, 0 },
 	{ "slist"    , "sli"  , POS_SITTING , do_oasis    , LVL_BUILDER, SCMD_OASIS_SLIST, WIZ_OLC_GRP },

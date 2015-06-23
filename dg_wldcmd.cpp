@@ -162,7 +162,7 @@ WCMD(do_wlag)
 
   if (w > 300)
   {
-    wld_log(room,"wlag: duration longer then 30 seconds outside range.");
+    wld_log(room,"wlag: duration longer than 30 seconds outside range.");
     return;
   }
 

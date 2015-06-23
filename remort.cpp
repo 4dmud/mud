@@ -182,12 +182,12 @@ Okay So,
  chances of t4 being very slim.
 
  Tier 0 mobs (almost every standard mob) is now slower in battle, and mobs up to level
- 51 (instead of 47) will be less damage then 'standard'.
- mobs over level 51 do +70% more damage then standard mobs, basicly seperating
+ 51 (instead of 47) will be less damage than 'standard'.
+ mobs over level 51 do +70% more damage than standard mobs, basicly seperating
  the mobs into two groups. One for the standard player, and one for the power player.
  Keeping (or attempting to) keep the game chalanging and interesting for all.
 
- Tiered mobs are faster and do more damage and take less damage then non tiered mobs,
+ Tiered mobs are faster and do more damage and take less damage than non tiered mobs,
  but they also GIVE more exp and more gold (and possibly load exra items)
  Currently all mobs in the game have a chance of becoming tiered,
 but that will change to being only NON AGRESSIVE mobs shortly.

@@ -5009,12 +5009,12 @@ int store_to_char ( const char *name, Character *ch )
 
 	if ( ch == NULL )
 	{
-		log ( "SYSERR: store_to_char recieved null ch!" );
+		log ( "SYSERR: store_to_char received null ch!" );
 		return -1;
 	}
 	if ( !name || !*name )
 	{
-		log ( "SYSERR: store_to_char recieved null name!" );
+		log ( "SYSERR: store_to_char received null name!" );
 		return -1;
 	}
 	try
@@ -5151,7 +5151,7 @@ int store_to_char ( const char *name, Character *ch )
 				{
 					if ( num > 100 )
 					{
-						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more then 100 brass tokens. Correcting to 0.", GET_NAME ( ch ) );
+						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 brass tokens. Correcting to 0.", GET_NAME ( ch ) );
 						num = 0;
 					}
 					GET_BRASS_TOKEN_COUNT ( ch ) = num;
@@ -5160,7 +5160,7 @@ int store_to_char ( const char *name, Character *ch )
 				{
 					if ( num > 100 )
 					{
-						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more then 100 bronze tokens. Correcting to 0.", GET_NAME ( ch ) );
+						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 bronze tokens. Correcting to 0.", GET_NAME ( ch ) );
 						num = 0;
 					}
 					GET_BRONZE_TOKEN_COUNT ( ch ) = num;
@@ -5274,11 +5274,6 @@ int store_to_char ( const char *name, Character *ch )
 					GET_GOLD ( ch ) = num6;
 				if ( !strcmp ( tag, "GolT" ) )
 				{
-					if ( num > 100 )
-					{
-						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more then 100 gold tokens. Correcting to 0.", GET_NAME ( ch ) );
-						num = 0;
-					}
 					GET_GOLD_TOKEN_COUNT ( ch ) = num;
 				}
 				break;
@@ -5620,7 +5615,7 @@ int store_to_char ( const char *name, Character *ch )
 				{
 					if ( num > 100 )
 					{
-						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more then 100 silver tokens. Correcting to 0.", GET_NAME ( ch ) );
+						new_mudlog ( NRM, LVL_GOD, TRUE, "%s has more than 100 silver tokens. Correcting to 0.", GET_NAME ( ch ) );
 						num = 0;
 					}
 					GET_SILVER_TOKEN_COUNT ( ch ) = num;
@@ -6765,13 +6760,13 @@ int check_object_spell_number ( struct obj_data *obj, int val, int nr )
 	 */
 	if ( GET_OBJ_VAL ( obj, val ) < 0 )
 	{
-		log ( "SYSERR: Object #%d (%s) has out of range spell (less then 0) (%s) #%d.",
+		log ( "SYSERR: Object #%d (%s) has out of range spell (less than 0) (%s) #%d.",
 		      nr, obj->short_description, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}
 	if ( GET_OBJ_VAL ( obj, val ) > MAX_SKILLS )
 	{
-		log ( "SYSERR: Object #%d (%s) has out of range spell (bigger then %d) (%s) #%d.",
+		log ( "SYSERR: Object #%d (%s) has out of range spell (bigger than %d) (%s) #%d.",
 		      nr, obj->short_description, MAX_SKILLS, skill_name ( GET_OBJ_VAL ( obj, val ) ), GET_OBJ_VAL ( obj, val ) );
 		return ( error = TRUE );
 	}

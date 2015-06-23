@@ -33,7 +33,7 @@
  * changed all entries in the code of 'color' to 'colour', but i now regret it.
  *
  * Revision 1.23  2007/06/09 04:34:55  w4dimenscor
- * Fixed practice so that it takes money from players rather then gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
+ * Fixed practice so that it takes money from players rather than gives them money, fixed a crash bug with furniture, added 'discard' as a junk alternitive, initialised the INTERNAL(ch) variable on Character objects
  *
  * Revision 1.22  2007/06/08 10:28:23  w4dimenscor
  * added a cost of 5k x current percentage to the cost of learning skills and spells
@@ -521,7 +521,7 @@ SPECIAL(deed_box)
   two_arguments(argument, arg1, arg2);
 
   if (CMD_IS("look") && !strcmp(arg1, "box")) {
-      ch->Send("You look examine the Ultimate Deed Box\r\n");
+      ch->Send("You look at the Ultimate Deed Box.\r\n");
       ch->Send("Special Commands:\r\n");
       ch->Send("{cYdeed                - {cxlist all deeds claimed\r\n");
       ch->Send("{cYdeed clan <clan name>    - {cxlist all deeds claimed by clan\r\n");
@@ -1368,7 +1368,7 @@ SPECIAL ( bank )
 			return ( 1 );
 		}
 		if ( ch->Gold ( 0, GOLD_BANK ) + amount > 100000000 )
-			ch->Send ( "With bank accounts with more then 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
+			ch->Send ( "With bank accounts with more than 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
 		ch->Gold ( -amount, GOLD_HAND );
 		ch->Gold ( amount, GOLD_BANK );
 		ch->Send ( "You deposit %lld coins.\r\n", amount );

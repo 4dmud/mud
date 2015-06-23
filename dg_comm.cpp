@@ -138,6 +138,11 @@ void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
     case '^':
     case '&':
     case '*':
+	if ( *p == *(p + 1) )
+	{
+		p += 2;
+		continue;
+	}
       /* get Character, move to next token */
       type[i] = *p;
       *s = '\0';
