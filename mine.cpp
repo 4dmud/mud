@@ -391,6 +391,9 @@ void make_tunnel(Character *ch)
   struct room_direction_data *exit;
 
 
+  if ( IN_ROOM ( ch ) == NULL )
+    return;
+
   if (IN_ROOM(ch)->mine.dif == -1)
     level = 1;
   else

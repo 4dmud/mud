@@ -36,10 +36,13 @@ ACMD(do_rdig)
   char sdir[MAX_INPUT_LENGTH], sroom[MAX_INPUT_LENGTH], *new_room_name;
   room_vnum rvnum = NOWHERE;
   room_rnum rrnum = NULL;
-  zone_rnum zone;
+  zone_rnum zone = NOWHERE;
   int dir = 0, rawvnum;
   Descriptor *d = ch->desc; /* will save us some typing */
   
+  if ( IN_ROOM ( ch ) == NULL )
+    return;
+
   /* Grab the room's name (if available). */
   new_room_name = two_arguments(argument, sdir, sroom);
   skip_spaces(&new_room_name);
@@ -204,6 +207,9 @@ ACMD(do_room_copy)
    zone_rnum dst_zone;
    Descriptor *dsc;
    char buf[MAX_INPUT_LENGTH];
+
+   if ( IN_ROOM ( ch ) != NULL )
+     return;
      
    one_argument(argument, buf);
    
@@ -401,6 +407,8 @@ int buildwalk(Character *ch, int dir) {
   room_vnum vnum;
   room_rnum rnum;
 
+  if ( IN_ROOM ( ch ) == NULL )
+    return 0;
 
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_BUILDWALK) &&
       GET_LEVEL(ch) >= LVL_BUILDER) {

@@ -853,7 +853,7 @@ ACMD(do_mpurge) {
 
     one_argument(argument, arg);
 
-    if (!*arg) {
+    if ( !*arg && IN_ROOM ( ch ) != NULL ) {
         /* 'purge' */
         Character *vnext;
         obj_data  *obj_next;
@@ -1024,7 +1024,7 @@ ACMD(do_mteleport) {
             //mob_log(ch, "mteleport all is teleporting people to the same room as the mob teleporting them is in");
             return;
         }
-
+       if ( IN_ROOM ( ch ) != NULL )
         for (vict = IN_ROOM(ch)->people; vict; vict = next_ch) {
             next_ch = vict->next_in_room;
             if (vict == ch)
@@ -1618,6 +1618,9 @@ ACMD(do_mcollision) {
                 damage);
         return;
     }
+
+    if ( IN_ROOM ( ch ) == NULL )
+        return;
 
     was_in = IN_ROOM(ch);
 

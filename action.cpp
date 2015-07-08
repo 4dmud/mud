@@ -229,7 +229,7 @@ ACTION(thing_tunneling)
     return 0;
   }
 
-  if (!room || room->number != IN_ROOM(ch)->number || FIGHTING(ch) || GET_POS(ch) < POS_STANDING)
+  if (IN_ROOM ( ch ) && (!room || room->number != IN_ROOM(ch)->number || FIGHTING(ch) || GET_POS(ch) < POS_STANDING))
   {
     to_char = "You can't seem to concentrate on tunneling.";
     *num = 0;

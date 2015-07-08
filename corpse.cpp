@@ -553,6 +553,7 @@ ACMD(do_corpse) {
             if (GET_OBJ_VAL(temp->corpse, 0) == get_pidx_from_name(ch)) {
                 if (track) {
                 time_t diff = GET_OBJ_EXPIRE(temp->corpse) - time(0);
+                  if ( IN_ROOM ( temp->corpse ) )
                     ch->Send( "In room %s is %s - (Auto-melding in {cC%ld{c0 min and {cY%ld{c0 seconds)\r\n", IN_ROOM(temp->corpse)->name, temp->corpse->short_description,
                               diff/60, diff%60);
                 } else

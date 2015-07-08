@@ -481,6 +481,7 @@ ACMD(do_say) {
             snprintf(buf3, sizeof(buf3),  "{cg[%s]{cw %s{c0", race_name(ch), buf);
             snprintf(buf4, sizeof(buf4), "{cg[%s]{cw %s{c0", race_name(ch), buf2);
 
+           if ( IN_ROOM ( ch ) )
             for (people = IN_ROOM(ch)->people; people; people = people->next_in_room) {
                 if (people == ch)
                     continue;
@@ -509,7 +510,7 @@ ACMD(do_say) {
                 perform_act("$n whistles a flute-like tune.", ch, NULL, NULL, people);
 		else 
                 perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
-}
+                }
             }
             act(buf3, FALSE, ch, NULL, NULL, TO_CHAR);
         } else {

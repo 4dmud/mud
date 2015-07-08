@@ -166,12 +166,12 @@ ASPELL(spell_recall) {
         return;
     }
 
-    if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NORECALL)) {
+    if (IN_ROOM ( ch ) && ROOM_FLAGGED(IN_ROOM(ch), ROOM_NORECALL)) {
         ch->Send("You cannot recall from this room.\r\n");
         return;
     }
 
-    if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NORECALL)) {
+    if (IN_ROOM ( ch ) && ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NORECALL)) {
         ch->Send("You cannot recall from this zone.\r\n");
         return;
     }
@@ -203,8 +203,8 @@ ASPELL(spell_teleport) {
         return;
     }
 
-    if (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOTELEPORT_OUT) ||
-            ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOTELEPORT_OUT)) {
+    if (IN_ROOM ( ch ) && (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOTELEPORT_OUT) ||
+            ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOTELEPORT_OUT))) {
         victim->Send("A magical barrier prevents you from leaving.\r\n");
         return;
     }
@@ -274,7 +274,7 @@ ASPELL(spell_summon) {
         return;
     }
 
-    if (ZONE_FLAGGED(victim->in_room->zone, ZONE_NOSUMMON_OUT)) {
+    if (IN_ROOM ( victim ) && ZONE_FLAGGED(victim->in_room->zone, ZONE_NOSUMMON_OUT)) {
         ch->Send(
             "A magical barrier prevents you from summoning %s from that zone.\r\n",
             GET_NAME(victim));
@@ -288,7 +288,7 @@ ASPELL(spell_summon) {
         return;
     }
 
-    if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_IN)) {
+    if (IN_ROOM ( ch ) && ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_IN)) {
         ch->Send(
             "A magical barrier prevents you from summoning %s to this zone.\r\n",
             GET_NAME(victim));
@@ -302,8 +302,8 @@ ASPELL(spell_summon) {
         return;
     }
 
-    if (ZONE_FLAGGED(victim->in_room->zone, ZONE_CLOSED) ||
-        ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED)) {
+    if ((IN_ROOM ( victim ) && ZONE_FLAGGED(victim->in_room->zone, ZONE_CLOSED)) ||
+        (IN_ROOM ( ch ) && ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_CLOSED))) {
         ch->Send(
             "A magical barrier prevents you from summoning %s to this room.\r\n",
             GET_NAME(victim));
@@ -319,7 +319,7 @@ ASPELL(spell_summon) {
             return;
         }
         if (!IS_NPC(victim) && !PRF_FLAGGED(victim, PRF_SUMMONABLE) &&
-                !PLR_FLAGGED(victim, PLR_KILLER)) {
+                !PLR_FLAGGED(victim, PLR_KILLER) && IN_ROOM ( ch )) {
             ch->Send( "%s just tried to summon you to: %s.\r\n"
                       "%s failed because you have summon protection on.\r\n"
                       "Type NOSUMMON to allow other players to summon you.\r\n",
@@ -366,7 +366,7 @@ ASPELL(spell_gate) {
         return;
     }
 
-    if (ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_OUT)) {
+    if (IN_ROOM ( ch ) && ZONE_FLAGGED(IN_ROOM(ch)->zone, ZONE_NOSUMMON_OUT)) {
         ch->Send("A magical barrier prevents you from gating to %s from this zone.\r\n",
                  GET_NAME(victim));
         return;
@@ -378,7 +378,7 @@ ASPELL(spell_gate) {
         return;
     }
 
-    if (ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOSUMMON_IN)) {
+    if (IN_ROOM ( victim ) && ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOSUMMON_IN)) {
         ch->Send( "A magical barrier prevents you from gating to %s to that zone.\r\n",
                   GET_NAME(victim));
         return;
@@ -395,7 +395,7 @@ ASPELL(spell_gate) {
     }
 
     if (!PRF_FLAGGED(victim, PRF_GATEABLE) &&
-            !PLR_FLAGGED(victim, PLR_KILLER)) {
+            !PLR_FLAGGED(victim, PLR_KILLER) && IN_ROOM ( victim )) {
         victim->Send( "%s just tried to gate to you: %s.\r\n"
                       "%s failed because you have gate protection on.\r\n"
                       "Type NOGATE to allow other players to gate to you.\r\n",
@@ -1073,7 +1073,7 @@ ASPELL(spell_control_weather) {
 ASPELL(spell_call_lightning) {
     struct message_event_obj *msg = NULL;
 int times = 1;
-    if (!OUTSIDE(ch)) {
+    if (IN_ROOM ( ch ) == NULL || !OUTSIDE(ch)) {
         ch->Send( "You are unable to generate enough electrical discharge while inside.\r\n");
         return;
     }
@@ -1189,6 +1189,9 @@ ASPELL(spell_minor_identify) {
 void fchar_init_flags_room(Character *ch, int *numtargets) {
     Character *vict;
 
+    if ( IN_ROOM ( ch ) == NULL )
+        return;
+
     for (vict = IN_ROOM(ch)->people; (vict);
             vict = vict->next_in_room) {
         if (vict == ch || (!IS_NPC(ch) && GET_LEVEL(ch) >= LVL_GOD)
@@ -1205,9 +1208,13 @@ Character *fchar_next(Character *ch, int *numtargets) {
     int i;
     Character *vict;
 
+    if ( IN_ROOM ( ch ) == NULL )
+        return NULL;
+
     i = number(0, *numtargets - 1);
     if (*numtargets <= 0)
         return NULL;
+
     for (vict = IN_ROOM(ch)->people; (vict);) {
         if (i == 0) {
             SET_BIT(INTERNAL_FLAGS(vict), INT_MARK);
@@ -1224,6 +1231,9 @@ Character *fchar_next(Character *ch, int *numtargets) {
 Character *FindNext(Character *ch, Character *v[]) {
     int inx, j, k, numch;
     Character *vict;
+
+    if ( IN_ROOM ( ch ) == NULL )
+        return NULL;
 
     numch = 0;
     for (vict = IN_ROOM(ch)->people; vict; vict = vict->next_in_room) {

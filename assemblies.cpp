@@ -258,7 +258,7 @@ bool assemblyCheckComponents( long lVnum, Character *pCharacter , bool check_onl
         else {
             switch ( pAssembly->pComponents[ i ].bInRoom ) {
             case 1:
-                if( (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL ) {
+                if( IN_ROOM ( pCharacter ) && (ppComponentObjects[ i ] = get_obj_in_list_num( lRnum, IN_ROOM( pCharacter )->contents )) == NULL ) {
                 new_mudlog(CMP, LVL_GOD, TRUE, "ASSEMBLY[%ld]: %s room doesn't contain needed item (%ld)",lVnum, GET_NAME(pCharacter), pAssembly->pComponents[ i ].lVnum);
                     bOk = FALSE;
                 } else

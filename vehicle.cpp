@@ -114,7 +114,7 @@ ACMD(do_drive) {
 
     two_arguments ( argument, arg, buf2 );
 
-    if ( vehicle == NULL )
+    if ( vehicle == NULL && IN_ROOM ( ch ) != NULL )
     {
 	controls = get_obj_in_list_type ( ITEM_V_CONTROLS, IN_ROOM(ch)->contents );
 
@@ -330,7 +330,7 @@ SPECIAL(vehicle_controls) {
 
 SPECIAL(vehicle_hatch) {
     struct obj_data *hatch, *v;
-    if (CMD_IS("leave")) {
+    if (CMD_IS("leave") && IN_ROOM ( ch ) != NULL) {
 	if ( GET_POS ( ch ) != POS_STANDING )
 	{
 		ch->Send ( "Maybe you should get on your feet first?\r\n" );
@@ -367,7 +367,7 @@ SPECIAL(vehicle_window) {
     char arg[MAX_INPUT_LENGTH];
     if (CMD_IS("look")) {
         one_argument(argument, arg);
-        if (is_abbrev(arg, "out")) {
+        if (is_abbrev(arg, "out") && IN_ROOM ( ch ) != NULL) {
             viewport =
                 get_obj_in_list_type(ITEM_V_WINDOW,
                                      IN_ROOM(ch)->contents);
@@ -790,6 +790,9 @@ bool vehicle_jump(Character *ch, char *argument)
   struct vehicle2_data *vh;
   struct vehicle_attachment_data *attach;
 
+  if ( IN_ROOM ( ch ) == NULL )
+      return TRUE;
+
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
 
@@ -910,7 +913,7 @@ SPECIAL(vehicle2)
 //  struct vehicle_attachment_data *attach;
 
   /* some insanity checks */
-  if ((vehicle = IN_ROOM(ch)->vehicle) == NULL)
+  if (IN_ROOM ( ch ) == NULL || (vehicle = IN_ROOM(ch)->vehicle) == NULL)
     return FALSE;
 
   /* Look out command */

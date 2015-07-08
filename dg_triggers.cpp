@@ -179,6 +179,9 @@ void greet_memory_mtrigger(Character * actor) {
     char buf[MAX_INPUT_LENGTH];
     int command_performed = 0;
 
+    if ( IN_ROOM ( actor ) == NULL )
+        return;
+
     for (ch = IN_ROOM(actor)->people; ch; ch = ch->next_in_room) {
         if ((!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)
                 || AFF_FLAGGED(ch, AFF_CHARM)) && ch != NULL)
@@ -276,7 +279,7 @@ void entry_memory_mtrigger(Character * ch) {
     struct script_memory *mem;
     char buf[MAX_INPUT_LENGTH];
 
-    if (!SCRIPT_MEM(ch) || AFF_FLAGGED(ch, AFF_CHARM))
+    if ( !SCRIPT_MEM(ch) || AFF_FLAGGED(ch, AFF_CHARM) || IN_ROOM ( ch ) == NULL )
         return;
 
 
@@ -397,6 +400,9 @@ void speech_mtrigger(Character * actor, char *str) {
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
     char *remove_percentage(char *string);
+
+    if ( IN_ROOM ( actor ) == NULL )
+        return;
 
     for (ch = IN_ROOM(actor)->people; ch; ch = ch_next) {
         ch_next = ch->next_in_room;
@@ -653,6 +659,9 @@ int leave_mtrigger(Character * actor, int dir) {
     Character *ch;
     char buf[MAX_INPUT_LENGTH];
 
+    if ( IN_ROOM ( actor ) == NULL )
+        return 1;
+
     for (ch = IN_ROOM(actor)->people; ch; ch = ch->next_in_room) {
         if (!SCRIPT_CHECK(ch, MTRIG_LEAVE) ||
                 !AWAKE(ch) || FIGHTING(ch) || (ch == actor) ||
@@ -681,6 +690,9 @@ int door_mtrigger(Character * actor, int subcmd, int dir) {
     trig_data *t;
     Character *ch;
     char buf[MAX_INPUT_LENGTH];
+
+    if ( IN_ROOM ( actor ) == NULL )
+        return 1;
 
     for (ch = IN_ROOM(actor)->people; ch; ch = ch->next_in_room) {
         if (!SCRIPT_CHECK(ch, MTRIG_DOOR) ||
@@ -845,6 +857,9 @@ int command_otrigger(Character * actor, char *cmd, char *argument) {
         if (obj->carried_by == actor && cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN))
             return 1;
     }
+
+    if ( IN_ROOM ( actor ) == NULL )
+        return 0;
 
     for (obj = IN_ROOM(actor)->contents; obj; obj = next) {
         next = obj->next_content;
@@ -1091,6 +1106,9 @@ int speech_otrigger(Character * actor, char *str) {
     for (obj = actor->carrying; obj; obj = obj->next_content)
         if (speech_otrig(obj, actor, str, OCMD_INVEN))
             return (1);
+
+    if ( IN_ROOM ( actor ) == NULL )
+        return 0;
 
     for (obj = IN_ROOM(actor)->contents; obj;
             obj = obj->next_content)

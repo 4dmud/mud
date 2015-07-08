@@ -599,7 +599,8 @@ SPECIAL(clan_deeds)
       return FALSE;
 
   /* Check if there is a deed box here */
-  for (box = IN_ROOM(ch)->contents; box; box = box->next_content)
+  if ( IN_ROOM ( ch ) != NULL )
+    for (box = IN_ROOM(ch)->contents; box; box = box->next_content)
       if (box->item_number == 8) break;
 
   if (!box) return FALSE;  // Maybe put in a different box?

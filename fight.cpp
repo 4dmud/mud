@@ -5237,7 +5237,7 @@ void make_corpse ( Character *ch, Character *killer )
 		if ( ch->Gold ( 0, GOLD_HAND ) > 0 )
 		{
                 /* Clan deeds - lets check if the clan gets a bonus */
-                    if (IS_NPC(ch) && killer && !IS_NPC(killer)) {
+                    if (IS_NPC(ch) && killer && !IS_NPC(killer) && IN_ROOM ( ch ) != NULL) {
                         struct clan_deed_type *cl;
                         int clan_num, zone_num;
                         zone_num = zone_table[IN_ROOM(ch)->zone].number;
@@ -5423,7 +5423,7 @@ void raw_kill ( Character *ch, Character *killer )
   /* Clan deeds - count the kills in the zone */
   /* Then check if the player has a good kill/time ratio so
      they dont cheat on just idling in the zone to get the deeds */
-  if (ch && killer && !IS_NPC(killer) && IS_NPC(ch)) {
+  if (ch && killer && !IS_NPC(killer) && IS_NPC(ch) && IN_ROOM ( ch ) != NULL) {
       zone_num = zone_table[IN_ROOM(ch)->zone].number;      
 	if ((ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1)))
 	legit = 1;	
@@ -5621,7 +5621,7 @@ void die ( Character *ch, Character *killer )
 					}
 				}
 				gain_exp ( temp, exp );
-                    if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp) >= 0)) {
+                    if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp)) >= 0 && IN_ROOM ( ch ) != NULL ) {
                         struct clan_deed_type *cl;
                         int clan_num, zone_num, deeds_amt = 0, deeds_bonus = 0, deeds_total;
                         zone_num = zone_table[IN_ROOM(ch)->zone].number;
@@ -5670,7 +5670,7 @@ void die ( Character *ch, Character *killer )
 
 
 			}
-     			if (( clan_num  >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) &&(ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
+			if ( IN_ROOM ( ch ) != NULL && ( clan_num  >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) &&(ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
 
                             for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
 

@@ -32,7 +32,8 @@ ACMD(do_smell)
 
   if (!*arg)
   {
-    ch->Send( "%s", IN_ROOM(ch)->smell);
+    if ( IN_ROOM ( ch ) != NULL )
+      ch->Send( "%s", IN_ROOM(ch)->smell);
     return;
   }
 
@@ -126,7 +127,7 @@ ACMD(do_listen)
 {
   if (!ch->desc)
     return;
-  if (IN_ROOM(ch)->listen)
+  if ( IN_ROOM ( ch ) != NULL && IN_ROOM ( ch )->listen )
     ch->Send( "%s", IN_ROOM(ch)->listen);
   return;
 }
@@ -144,8 +145,7 @@ void look_above_target(Character *ch, char *arg)
     return;
   }
 
-  if ((desc =
-         find_exdesc(arg,
+  if ( IN_ROOM ( ch ) != NULL && (desc = find_exdesc(arg,
                      IN_ROOM(ch)->look_above_description)) != NULL)
   {
     page_string(ch->desc, desc, FALSE);
@@ -171,10 +171,8 @@ void look_behind_target(Character *ch, char *arg)
     return;
   }
 
-  if ((desc =
-         find_exdesc(arg,
-                     IN_ROOM(ch)->look_behind_description)) !=
-      NULL)
+  if ( IN_ROOM ( ch ) != NULL && (desc = find_exdesc(arg,
+                     IN_ROOM(ch)->look_behind_description)) != NULL)
   {
     page_string(ch->desc, desc, FALSE);
     return;
@@ -199,8 +197,7 @@ void look_under_target(Character *ch, char *arg)
     return;
   }
 
-  if ((desc =
-         find_exdesc(arg,
+  if ( IN_ROOM ( ch ) != NULL && (desc = find_exdesc(arg,
                      IN_ROOM(ch)->look_under_description)) != NULL)
   {
     page_string(ch->desc, desc, FALSE);

@@ -228,8 +228,8 @@ void hunt_victim(Character *ch) {
         remove_hunter(ch);
         return;
     }
-    if ((dir = graph.find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
-	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB)) {
+    if ( IN_ROOM ( ch ) && ((dir = graph.find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
+	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB))) {
         if (dir != BFS_ALREADY_THERE) {
 	    if (!IS_SET(INTERNAL_FLAGS(ch), INT_LOSTPREY)) {
                 snprintf(tbuf, sizeof(tbuf), "Damn! I lost %s!", HMHR(HUNTING(ch)));
