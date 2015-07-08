@@ -486,7 +486,9 @@ ACMD ( do_flee )
 	{
 		attempt = number ( 0, NUM_OF_DIRS - 1 ); /* Select a random direction */
 		if ( CAN_GO ( ch, attempt ) &&
-		        !ROOM_FLAGGED ( EXIT ( ch, attempt )->to_room, ROOM_DEATH ) )
+		        !ROOM_FLAGGED ( EXIT ( ch, attempt )->to_room, ROOM_DEATH ) &&
+			SECTOR ( EXIT ( ch, attempt )->to_room ) != SECT_SUN &&
+			SECTOR ( EXIT ( ch, attempt )->to_room ) != SECT_BLACKHOLE )
 		{
 			act ( "$n panics, and attempts to flee!", TRUE, ch, 0, 0,  TO_ROOM );
 			was_fighting = FIGHTING ( ch );

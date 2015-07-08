@@ -2035,7 +2035,7 @@ void death_room ( Character *ch )
 	}
 
 	ch->Send ( "{cYAs your last breath passes, time rolls back to just before you died\r\n"
-	           "and you find yourself transfered to a temple of healing.{c0\r\n" );
+	           "and you find yourself transferred to a temple of healing.{c0\r\n" );
 
 	GET_HIT ( ch ) = 3;
 
