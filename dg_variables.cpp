@@ -1956,6 +1956,844 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 			* ( str +1 ) = '\0';
 			switch ( LOWER ( *field ) )
 			{
+				case 'a':
+					if ( !strcasecmp ( field, "aff_str" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_STR )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_STR )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_STR;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_dex" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_DEX )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_DEX )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_DEX;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_int" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_INT )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_INT )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_INT;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_wis" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_WIS )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_WIS )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_WIS;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_con" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_CON )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_CON )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_CON;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_cha" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_CHA )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_CHA )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_CHA;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_regen_hit" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_REGEN_HIT )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_REGEN_HIT )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_REGEN_HIT;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_regen_move" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_REGEN_MOVE )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_REGEN_MOVE )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_REGEN_MOVE;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_age" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_AGE )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_AGE )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_AGE;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_maxmana" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MANA )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MANA )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MANA;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_maxhit" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_HIT )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_HIT )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_HIT;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_maxmove" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MOVE )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MOVE )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MOVE;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_regen_mana" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_REGEN_MANA )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_REGEN_MANA )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_REGEN_MANA;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_ac" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_AC )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_AC )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_AC;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_hitroll" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_HITROLL )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_HITROLL )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_HITROLL;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_damroll" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_DAMROLL )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_DAMROLL )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_DAMROLL;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_paralyze_def" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SAVING_PARA )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SAVING_PARA )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SAVING_PARA;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_rod_def" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SAVING_ROD )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SAVING_ROD )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SAVING_ROD;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_petrify_def" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SAVING_PETRI )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SAVING_PETRI )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SAVING_PETRI;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_breath_def" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SAVING_BREATH )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SAVING_BREATH )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SAVING_BREATH;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_spell_def" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SAVING_SPELL )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SAVING_SPELL )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SAVING_SPELL;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_speed" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_SPEED )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_SPEED )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_SPEED;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_coolness" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_COOLNESS )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_COOLNESS )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_COOLNESS;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_mine_speed" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MINE_SPEED )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MINE_SPEED )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MINE_SPEED;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_mine_bonus" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MINE_BONUS )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MINE_BONUS )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MINE_BONUS;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_mine_stealth" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MINE_STEALTH )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MINE_STEALTH )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MINE_STEALTH;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
+					else if ( !strcasecmp ( field, "aff_mine_protection" ) )
+					{
+						if ( !subfield || !*subfield )
+						{
+							strcpy ( str, "0" );
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( o->affected[ i ].location == APPLY_MINE_DAMAGE )
+								{
+									snprintf ( str, slen, "%d", o->affected[ i ].modifier );
+									break;
+								}
+						}
+						else
+						{
+							int x = -1;
+							for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+								if ( x < 0 && o->affected[ i ].location == APPLY_NONE )
+									x = i;
+								else if ( o->affected[ i ].location == APPLY_MINE_DAMAGE )
+								{
+									x = i;
+									break;
+								}
+							if ( x > -1 )
+							{
+								o->affected[ x ].location = APPLY_MINE_DAMAGE;
+								o->affected[ x ].modifier = atoi ( subfield );
+							}
+							strcpy ( str, "" );
+						}
+					}
 				case 'c':
 					if ( !strcasecmp ( field, "carried_by" ) )
 					{
