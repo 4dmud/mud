@@ -2272,6 +2272,17 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 							strcpy ( str, "" );
 					}
+					else if ( !strcasecmp ( field, "in_material_group" ) )
+					{
+						for ( int i = 0; i < NUM_MATERIAL_GROUPS; i++ )
+							if ( !strcasecmp ( subfield, material_group_names [ material_groups [ GET_OBJ_MATERIAL ( o ) ] ] ) )
+							{
+								strcpy ( str, "1" );
+								break;
+							}
+							else if ( i == NUM_MATERIAL_GROUPS - 1 )
+								strcpy ( str, "0" );
+					}
 					else if ( !strcasecmp ( field, "is_inobj" ) )
 					{
 						if ( o->in_obj!=NULL )

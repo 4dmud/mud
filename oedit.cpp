@@ -955,7 +955,7 @@ void oedit_disp_crafting_colour_menu ( Descriptor *d )
 	OLC_MODE ( d ) = OEDIT_CRAFTING_COLOUR;
 	get_char_colours ( d->character );
 
-	for ( i = 1; i < NUM_COLOUR_NAMES; i++ )
+	for ( i = 0; i < NUM_COLOUR_NAMES; i++ )
 	{
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            colour_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -969,7 +969,7 @@ void oedit_disp_crafting_quality_menu ( Descriptor *d )
 	OLC_MODE ( d ) = OEDIT_CRAFTING_QUALITY;
 	get_char_colours ( d->character );
 
-	for ( i = 1; i < NUM_QUALITY_NAMES; i++ )
+	for ( i = 0; i < NUM_QUALITY_NAMES; i++ )
 	{
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            quality_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -983,7 +983,7 @@ void oedit_disp_crafting_material_menu ( Descriptor *d )
 	OLC_MODE ( d ) = OEDIT_CRAFTING_MATERIAL;
 	get_char_colours ( d->character );
 
-	for ( i = 1; i < NUM_MATERIAL_TYPES; i++ )
+	for ( i = 0; i < NUM_MATERIAL_TYPES; i++ )
 	{
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            material_name ( i ), ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -1003,7 +1003,7 @@ void oedit_disp_crafting_origin_menu ( Descriptor *d )
 	OLC_MODE ( d ) = OEDIT_CRAFTING_ORIGIN;
 	get_char_colours ( d->character );
 
-	for ( i = 1; i < NUM_ORIGIN_NAMES; i++ )
+	for ( i = 0; i < NUM_ORIGIN_NAMES; i++ )
 	{
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            origin_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
@@ -1962,17 +1962,17 @@ void oedit_parse ( Descriptor *d, char *arg )
 			break;
 
 		case OEDIT_CRAFTING_COLOUR:
-			GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES );
+			GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES - 1 );
 			oedit_disp_crafting_quality_menu ( d );
 			return;
 
 		case OEDIT_CRAFTING_QUALITY:
-			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_QUALITY_NAMES );
+			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_QUALITY_NAMES - 1 );
 			oedit_disp_crafting_material_menu ( d );
 			return;
 
 		case OEDIT_CRAFTING_MATERIAL:
-			GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_MATERIAL_TYPES );
+			GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_MATERIAL_TYPES - 1 );
 			oedit_disp_crafting_dyecount_menu ( d );
 			return;
 
@@ -1982,7 +1982,7 @@ void oedit_parse ( Descriptor *d, char *arg )
 			return;
 
 		case OEDIT_CRAFTING_ORIGIN:
-			GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_ORIGIN_NAMES );
+			GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_ORIGIN_NAMES - 1 );
 			oedit_disp_crafting_stage_menu ( d );
 			return;
 

@@ -1396,7 +1396,8 @@ class Room;
 #define MAX_CMD_LENGTH          32768 /* 32k */
 #define NUM_NOTE_TYPES          5
 #define TOP_FUSE_LOCATION       6
-#define NUM_MATERIAL_TYPES      53
+#define NUM_MATERIAL_TYPES      57
+#define NUM_MATERIAL_GROUPS     7
 #define NUM_ELEM_TYPES          12
 #define MAX_HELPS               10000
 #define MAX_MAGIC_ITEMS         45

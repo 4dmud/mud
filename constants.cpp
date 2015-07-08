@@ -257,7 +257,7 @@ const  char *random_desc[] =
 
 const char *material_names[] =
 {
-	"base-material", //0 /* default */
+	"base-material", // 0, default
 	"glass",
 	"iron",
 	"gold",
@@ -267,7 +267,7 @@ const char *material_names[] =
 	"chromium",
 	"tungsten",
 	"carbon",
-	"coal",          //10
+	"coal",		 // 10
 	"basalt",
 	"silica",
 	"diamond",
@@ -277,40 +277,117 @@ const char *material_names[] =
 	"hair",
 	"wool",
 	"wood",
-	"magic-wood",    //20
-	"bone",
-	"ceramic",
+	"magic-wood",	 // 20
 	"mithril",
-	"obsidian",
 	"steel",
-	"stone",
-	"glass",
-	"organic",
-	"currency",
-	"paper",         //30
-	"cotton",
-	"linen",
-	"silk",
-	"burlap",
-	"nylon",
-	"platinum",
-	"adamantite",
-	"onyx",
-	"ivory",
-	"brass",         //40
-	"marble",
+	"brass",
 	"bronze",
 	"pewter",
+	"platinum",
+	"plasteel",
+	"ceramic",
+	"obsidian",
+	"stone",	 // 30
+	"adamantite",
+	"onyx",
+	"marble",
 	"ruby",
 	"sapphire",
 	"emerald",
 	"gemstone",
 	"granite",
-	"energy",
-	"hemp",          //50
 	"crystal",
-	"earth",         //52
+	"earth",	 // 40
+	"clay",
+	"mortar",
+	"bone",
+	"organic",
+	"ivory",
+	"horn",
+	"botanical",
+	"wool",
+	"cotton",
+	"hemp",		 // 50
+	"linen",
+	"silk",
+	"nylon",
+	"paper",
+	"currency",
+	"energy",	 // 56
 	"\n"
+};
+
+const char *material_group_names[] =
+{
+	"base-material", //0
+	"metal",
+	"stone",
+	"organic",
+	"textile",
+	"wood",
+	"other"          //6
+};
+
+/* material_group_names [ material_groups[i] ] corresponds to material_names[i] */
+const int material_groups[] =
+{
+	0, 	// base-material, base-material
+	2,	// glass, stone
+	1,	// iron, metal
+	1,	// gold, metal
+	1,	// silver, metal
+	1,	// copper, metal
+	1, 	// zinc, metal
+	1, 	// chromium, metal
+	2,	// tungsten, stone
+	2,	// carbon, stone
+	2,	// coal, stone
+	2,	// basalt, stone
+	2,	// silica, stone
+	2,	// diamond, stone
+	6,	// plastic, other
+	1,	// tin, metal
+	3,	// leather, organic
+	3,	// hair, organic
+	3,	// wool, organic
+	5,	// wood, wood
+	5,	// magic-wood, wood
+	1,	// mithril, metal
+	1,	// steel, metal
+	1,	// brass, metal
+	1,	// bronze, metal
+	1,	// pewter, metal
+	1,	// platinum, metal
+	1,	// plasteel, metal
+	2,	// ceramic, stone
+	2,	// obsidian, stone
+	2,	// stone, stone
+	2,	// adamantite, stone
+	2,	// onyx, stone
+	2,	// marble, stone
+	2,	// ruby, stone
+	2,	// sapphire, stone
+	2, 	// emerald, stone
+	2,	// gemstone, stone
+	2,	// granite, stone
+	2,	// crystal, stone
+	2,	// earth, stone
+	2,	// clay, stone
+	2,	// mortar, stone
+	3,	// bone, organic
+	3,	// organic, organic
+	3,	// ivory, organic
+	3,	// horn, organic
+	3,	// botanical, organic
+	4,	// wool, textile
+	4,	// cotton, textile
+	4,	// hemp, textile
+	4,	// linen, textile
+	4,	// silk, textile
+	4,	// nylon, textile
+	5,	// paper, wood
+	6,	// currency, other
+	6	// energy, other
 };
 
 const char *colour_names[] =
