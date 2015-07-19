@@ -1336,7 +1336,7 @@ ACMD ( do_gen_write )
 		return;
 	}
 	fprintf ( fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
-	          "<tr><td class='plrname'>%-13s</td><td class='date'> %6.6s</td><td class='room'> %5d</td><td class='comment'> %s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
+	          "<tr><td class='plrname'>%-13s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
 	          GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
 
 	fclose ( fl );
@@ -1746,11 +1746,13 @@ ACMD ( do_gen_tog )
 ACMD ( do_file )
 {
 	FILE *req_file;
-	int cur_line = 0, num_lines = 0, req_lines = 0, i;
-	int l;
-	char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], line[READ_SIZE];
+	int req_lines = 0, i;
+	int l, line_number;
+	char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
 	char buf[MAX_STRING_LENGTH];
+	char *arg3;
 	size_t len = 0;
+	vector<string> lines;
 
 	struct file_struct
 	{
@@ -1781,8 +1783,10 @@ ACMD ( do_file )
 
 	if ( !*argument )
 	{
-		ch->Send (
-		    "USAGE: file <option> <num lines>\r\n\r\nFile options:\r\n" );
+		ch->Send ( "USAGE: file <option> <num lines>\r\n"
+			   "       file <bug|typo> fixed <line number>\r\n\r\n"
+			   "File options:\r\n" );
+
 		for ( i = 1; fields[i].level; i++ )
 			if ( fields[i].level <= GET_LEVEL ( ch ) )
 				ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(),
@@ -1790,7 +1794,7 @@ ACMD ( do_file )
 		return;
 	}
 
-	two_arguments ( argument, field, value );
+	arg3 = two_arguments ( argument, field, arg2 );
 
 	for ( l = 0; * ( fields[l].cmd.c_str() ) != '\n'; l++ )
 		if ( !strncmp ( field, fields[l].cmd.c_str(), strlen ( field ) ) )
@@ -1808,11 +1812,6 @@ ACMD ( do_file )
 		return;
 	}
 
-	if ( !*value )
-		req_lines = 15;      /* default is the last 15 lines */
-	else
-		req_lines = atoi ( value );
-
 	if ( ! ( req_file = fopen ( fields[l].file.c_str(), "r" ) ) )
 	{
 		new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error opening file %s using 'file' command.",
@@ -1823,33 +1822,72 @@ ACMD ( do_file )
 	get_line ( req_file, line );
 	while ( !feof ( req_file ) )
 	{
-		num_lines++;
-		get_line ( req_file, line );
-	}
-	rewind ( req_file );
-
-	req_lines = MIN ( MIN ( req_lines, num_lines ), 150 );
-
-	buf[0] = '\0';
-
-	get_line ( req_file, line );
-	while ( !feof ( req_file ) )
-	{
-		cur_line++;
-		if ( cur_line > ( num_lines - req_lines ) )
-		{
-			ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( line ) );
-			ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof ( line ) );
-			ReplaceString ( line, "</td><td class='room'>", " - ", sizeof ( line ) );
-			ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof ( line ) );
-			ReplaceString ( line, "</td></tr></table>", " {c0", sizeof ( line ) );
-
-			len += snprintf ( buf + len, sizeof ( buf ) - len, "%s\r\n", line );
-		}
-
+		lines.push_back ( string ( line ) );
 		get_line ( req_file, line );
 	}
 	fclose ( req_file );
+
+	/* toggle (fixed) in bug or typo file */
+
+	if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
+	{
+		line_number = atoi ( arg3 );
+
+		if ( line_number < 1 || line_number > lines.size() )
+		{
+			ch->Send ( "Line number %d doesn't exist.\r\n", line_number );
+			return;
+		}
+
+		if ( lines [ line_number - 1 ].rfind ( "(fixed)" ) == lines [ line_number - 1].length() - 7 )
+			lines [ line_number - 1 ]  = lines [ line_number - 1].substr ( 0, lines [ line_number - 1 ].length() - 7 );
+		else lines [ line_number - 1 ] += "(fixed)";
+
+		strcpy ( line, lines [ line_number - 1 ].c_str() );
+		ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='room'>", " - ", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof ( line ) );
+		ReplaceString ( line, "</td></tr></table>", " {c0", sizeof ( line ) );
+		ch->Send ( "%s\r\n", line );
+
+		if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
+		{
+			new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.",
+			             fields[l].file.c_str() );
+			return;
+		}
+
+		for ( i = 0; i < lines.size(); ++i )
+		{
+			fputs ( lines[i].c_str(), req_file );
+			fputs ( "\n", req_file );
+		}
+		fclose ( req_file );
+
+		return;
+	}
+
+	if ( !*arg2 )
+		req_lines = MIN ( 15, lines.size() );      /* default is the last 15 lines */
+	else
+		req_lines = MIN ( atoi ( arg2 ), lines.size() );
+
+	buf[0] = '\0';
+
+	for ( i = lines.size() - req_lines; i < lines.size(); ++i )
+	{
+		strcpy ( line, lines[i].c_str() );
+		ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='room'>", " - ", sizeof ( line ) );
+		ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof ( line ) );
+		ReplaceString ( line, "</td></tr></table>", " {c0", sizeof ( line ) );
+
+		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" )
+			len += snprintf ( buf + len, sizeof ( buf ) - len, "%d. %s\r\n", i + 1, line );
+		else len += snprintf ( buf + len, sizeof ( buf ) - len, "%s\r\n", line );
+	}
 
 	page_string ( ch->desc, buf, 1 );
 
