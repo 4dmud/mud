@@ -369,7 +369,7 @@ void oedit_disp_colours ( Descriptor *d )
 	get_char_colours ( d->character );
 	for ( i = 0; i < MAX_COLOUR_OPTIONS; i++ )
 	{
-		d->Output ( "%s%3d%s) %s%-15s  %s%s", grn, i,nrm, cyn, colour_option_name ( i ), ( ! ( i%4 ) ? "\r\n" : " " ), nrm );
+		d->Output ( "%s%3d%s) %s%-15s  %s%s", grn, i, nrm, cyn, colour_option_name ( i ), ( ! ( i%4 ) ? "\r\n" : " " ), nrm );
 	}
 
 	d->Output ( "Enter Color Number: " );
@@ -960,7 +960,7 @@ void oedit_disp_crafting_colour_menu ( Descriptor *d )
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            colour_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
 	}
-	d->Output ( "\r\nEnter Colour value : " );
+	d->Output ( "%s\r\nEnter Colour value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
 
 void oedit_disp_crafting_quality_menu ( Descriptor *d )
@@ -974,7 +974,7 @@ void oedit_disp_crafting_quality_menu ( Descriptor *d )
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            quality_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
 	}
-	d->Output ( "\r\nEnter Quality value : " );
+	d->Output ( "%s\r\nEnter Quality value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
 
 void oedit_disp_crafting_material_menu ( Descriptor *d )
@@ -988,13 +988,13 @@ void oedit_disp_crafting_material_menu ( Descriptor *d )
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            material_name ( i ), ! ( ++col % 3 ) ? "\r\n" : "" );
 	}
-	d->Output ( "\r\nEnter Material value : " );
+	d->Output ( "%s\r\nEnter Material value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
 
 void oedit_disp_crafting_dyecount_menu ( Descriptor *d )
 {
 	OLC_MODE ( d ) = OEDIT_CRAFTING_DYECOUNT;
-	d->Output ( "\r\nEnter Dyecount value : " );
+	d->Output ( "Enter Dyecount value : " );
 }
 
 void oedit_disp_crafting_origin_menu ( Descriptor *d )
@@ -1008,13 +1008,13 @@ void oedit_disp_crafting_origin_menu ( Descriptor *d )
 		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
 		            origin_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
 	}
-	d->Output ( "\r\nEnter Origin value : " );
+	d->Output ( "%s\r\nEnter Origin value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
 
 void oedit_disp_crafting_stage_menu ( Descriptor *d )
 {
 	OLC_MODE ( d ) = OEDIT_CRAFTING_STAGE;
-	d->Output ( "\r\nEnter Stage value : " );
+	d->Output ( "Enter Stage value : " );
 }
 
 /*
@@ -1174,13 +1174,9 @@ void oedit_disp_menu ( Descriptor *d )
 	    grn, nrm
 	);
 
-	for ( i = 0; i < 7; i++ )
-		d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
-
-	d->Output ( "\r\n               : " );
-
-	for ( i = 7; i < NUM_OBJ_VAL_POSITIONS; i++ )
-		d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
+	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i++ )
+		if ( GET_OBJ_VAL ( obj, i ) != 0 )
+			d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
 
 	d->Output (
 	    "\r\n%sD%s) Menu --->   : %sApplies\r\n"

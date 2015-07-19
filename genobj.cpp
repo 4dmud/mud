@@ -286,17 +286,19 @@ int save_objects(zone_rnum zone_num)
 
       fprintf(fp,
 	      "%d %d %d %d %d %d %d %d %d\n"	      
-	      "%d %d %d %d %d %d %d %d %d %d\n"
+	      "%d %d %d %d %d %d %d %d %d %d %d %d %d\n"
 	      "%d %lld %d %d %d %d %d %d %d %d\n",
 
-GET_OBJ_TYPE(obj), GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3],
-GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3],/*row 1*/
+	      GET_OBJ_TYPE(obj), GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3],
+	      GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3], /* row 1 */
 
 	      GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), GET_OBJ_VAL(obj, 3),
 	      GET_OBJ_VAL(obj, 4), GET_OBJ_VAL(obj, 5), GET_OBJ_VAL(obj, 6), GET_OBJ_VAL(obj, 7),
-	      GET_OBJ_VAL(obj, 8), GET_OBJ_VAL(obj, 9), 
+	      GET_OBJ_VAL(obj, 8), GET_OBJ_VAL(obj, 9), GET_OBJ_VAL(obj, 10), GET_OBJ_VAL(obj, 11),
+	      GET_OBJ_VAL(obj, 12), /* row 2 */
+
 	      GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj), GET_OBJ_RENT(obj), GET_OBJ_INNATE(obj), GET_OBJ_TIMER(obj), GET_OBJ_LEVEL(obj),
-	      GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3]
+	      GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3] /* row 3 */
 	      
       );
 
