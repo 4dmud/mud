@@ -3232,6 +3232,9 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 	obj_proto[i].ex_description = NULL;
 	obj_proto[i].proto_script = NULL;
 
+	if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_BANKBOOK )
+		ASSIGNOBJ ( nr, bank );
+
 	for ( ;; )
 	{
 		if ( !get_line ( obj_f, line ) )
@@ -3316,9 +3319,6 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 				exit ( 1 );
 		}
 	}
-
-	if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_BANKBOOK )
-		ASSIGNOBJ ( nr, bank );
 }
 
 

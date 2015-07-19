@@ -3668,14 +3668,14 @@ ACMD ( do_who )
 		    } else {
 		      if ( GET_SEX ( wch ) != SEX_FEMALE ) {
 			  snprintf ( buf, sizeof ( buf ), "%s[%23s]  %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s",  CCYEL ( ch, C_SPR ),
-				    center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_male[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
+				    center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_male[GET_LEVEL ( wch ) - LVL_HERO], 23 ),
 				    ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
 				    ( PRETITLE ( wch ) == NULL ? "" : " " ),
 				    GET_NAME ( wch ), GET_TITLE ( wch ) );
 		    
 		      } else {
 				snprintf ( buf, sizeof ( buf ), "%s[%23s]  %s%s" MXPTAG ( "B" ) "%s" MXPTAG ( "/B" ) " %s", CCYEL ( ch, C_SPR ),
-					  center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_female[GET_LEVEL ( wch ) - LVL_HERO], 20 ),
+					  center_align ( IMMTITLE ( wch ) ? IMMTITLE ( wch ) : ( char * ) WizLevels_female[GET_LEVEL ( wch ) - LVL_HERO], 23 ),
 					  ( PRETITLE ( wch ) == NULL ? "" : PRETITLE ( wch ) ),
 					  ( PRETITLE ( wch ) == NULL ? "" : " " ),
 					  GET_NAME ( wch ), GET_TITLE ( wch ) );

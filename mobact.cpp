@@ -108,7 +108,7 @@ void mobile_activity ( void )
 				best_obj = NULL;
 				for ( obj = IN_ROOM ( ch )->contents; obj;
 				        obj = obj->next_content )
-					if ( CAN_GET_OBJ ( ch, obj ) && can_take_obj ( ch, obj ) && GET_OBJ_COST ( obj ) > max && ( ! ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) ) ) )
+					if ( CAN_GET_OBJ ( ch, obj ) && can_take_obj ( ch, obj ) && GET_OBJ_COST ( obj ) > max && ! IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) && get_otrigger ( obj, ch ) > 0 )
 					{
 						best_obj = obj;
 						max = GET_OBJ_COST ( obj );
