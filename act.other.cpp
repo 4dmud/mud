@@ -1869,9 +1869,9 @@ ACMD ( do_file )
 	}
 
 	if ( !*arg2 )
-		req_lines = MIN ( 15, lines.size() );      /* default is the last 15 lines */
+		req_lines = MIN ( 15, (int) lines.size() );      /* default is the last 15 lines */
 	else
-		req_lines = MIN ( atoi ( arg2 ), lines.size() );
+		req_lines = MIN ( atoi ( arg2 ), (int) lines.size() );
 
 	buf[0] = '\0';
 
