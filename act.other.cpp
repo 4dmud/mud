@@ -1746,13 +1746,15 @@ ACMD ( do_gen_tog )
 ACMD ( do_file )
 {
 	FILE *req_file;
-	int req_lines = 0, i;
+	int req_entries = 0, i;
 	int l, line_number;
 	char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char *arg3;
 	size_t len = 0;
-	vector<string> lines;
+	vector<string> entries;
+	string entry;
+	size_t pos;
 
 	struct file_struct
 	{
@@ -1822,7 +1824,20 @@ ACMD ( do_file )
 	get_line ( req_file, line );
 	while ( !feof ( req_file ) )
 	{
-		lines.push_back ( string ( line ) );
+		entry += string ( line );
+		if ( ( pos = entry.find ( "</td></tr></table>" ) ) != string::npos )
+		{
+			if ( entry.rfind ( "(fixed)" ) != string::npos )
+			{
+				entries.push_back ( entry.substr ( 0, pos + 25 ) );
+				entry = entry.substr ( pos + 25, entry.length() - 1);
+			}
+			else
+			{
+				entries.push_back ( entry.substr ( 0, pos + 18 ) );
+				entry = entry.substr ( pos + 18, entry.length() - 1);
+			}
+		}
 		get_line ( req_file, line );
 	}
 	fclose ( req_file );
@@ -1833,23 +1848,23 @@ ACMD ( do_file )
 	{
 		line_number = atoi ( arg3 );
 
-		if ( line_number < 1 || line_number > lines.size() )
+		if ( line_number < 1 || line_number > entries.size() )
 		{
 			ch->Send ( "Line number %d doesn't exist.\r\n", line_number );
 			return;
 		}
 
-		if ( lines [ line_number - 1 ].rfind ( "(fixed)" ) == lines [ line_number - 1].length() - 7 )
-			lines [ line_number - 1 ]  = lines [ line_number - 1].substr ( 0, lines [ line_number - 1 ].length() - 7 );
-		else lines [ line_number - 1 ] += "(fixed)";
+		if ( entries [ line_number - 1 ].rfind ( "(fixed)" ) == entries [ line_number - 1].length() - 7 )
+			entries [ line_number - 1 ]  = entries [ line_number - 1].substr ( 0, entries [ line_number - 1 ].length() - 7 );
+		else entries [ line_number - 1 ] += "(fixed)";
 
-		strcpy ( line, lines [ line_number - 1 ].c_str() );
-		ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='room'>", " - ", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof ( line ) );
-		ReplaceString ( line, "</td></tr></table>", " {c0", sizeof ( line ) );
-		ch->Send ( "%s\r\n", line );
+		strcpy ( buf, entries [ line_number - 1 ].c_str() );
+		ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
+		ch->Send ( "%s\r\n", buf );
 
 		if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
 		{
@@ -1858,9 +1873,9 @@ ACMD ( do_file )
 			return;
 		}
 
-		for ( i = 0; i < lines.size(); ++i )
+		for ( i = 0; i < entries.size(); ++i )
 		{
-			fputs ( lines[i].c_str(), req_file );
+			fputs ( entries[i].c_str(), req_file );
 			fputs ( "\n", req_file );
 		}
 		fclose ( req_file );
@@ -1869,27 +1884,30 @@ ACMD ( do_file )
 	}
 
 	if ( !*arg2 )
-		req_lines = MIN ( 15, (int) lines.size() );      /* default is the last 15 lines */
+		req_entries = MIN ( 10, (int) entries.size() );      /* default is the last 10 entries */
 	else
-		req_lines = MIN ( atoi ( arg2 ), (int) lines.size() );
+		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
 
-	buf[0] = '\0';
+	buf2[0] = '\0';
 
-	for ( i = lines.size() - req_lines; i < lines.size(); ++i )
+	for ( i = entries.size() - req_entries; i < entries.size(); ++i )
 	{
-		strcpy ( line, lines[i].c_str() );
-		ReplaceString ( line, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='date'>", " {cw- ", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='room'>", " - ", sizeof ( line ) );
-		ReplaceString ( line, "</td><td class='comment'>", " :{cg ", sizeof ( line ) );
-		ReplaceString ( line, "</td></tr></table>", " {c0", sizeof ( line ) );
+		strcpy ( buf, entries[i].c_str() );
+		ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+		ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
+
+		if ( len + strlen ( buf ) > sizeof ( buf2 ) - 10 )
+			break;
 
 		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" )
-			len += snprintf ( buf + len, sizeof ( buf ) - len, "%d. %s\r\n", i + 1, line );
-		else len += snprintf ( buf + len, sizeof ( buf ) - len, "%s\r\n", line );
+			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", i + 1, buf );
+		else len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
 	}
 
-	page_string ( ch->desc, buf, 1 );
+	page_string ( ch->desc, buf2, 1 );
 
 }
 
