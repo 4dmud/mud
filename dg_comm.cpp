@@ -141,7 +141,7 @@ void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
       if ( *p == *(p + 1) )
       {
          *s++ = *p++;
-         *s++ = *p++;
+         p++;
          continue;
       }
       /* get Character, move to next token */
@@ -157,7 +157,7 @@ void sub_write(char *arg, Character * ch, sbyte find_invis, int targets)
       if ( *p == *(p + 1) )
       {
          *s++ = *p++;
-         *s++ = *p++;
+         p++;
          continue;
       }
       /* get obj_data, move to next token */
