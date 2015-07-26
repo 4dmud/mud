@@ -3381,8 +3381,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					{
 						if ( !subfield || !*subfield )
 							snprintf ( str, slen, "%d", GET_OBJ_STAGE ( o ) );
-						else GET_OBJ_STAGE ( o ) = atoi ( subfield );
-						strcpy ( str, "" );
+						else
+						{
+							GET_OBJ_STAGE ( o ) = atoi ( subfield );
+							strcpy ( str, "" );
+						}
 					}
 
 					break;

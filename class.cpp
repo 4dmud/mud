@@ -1052,7 +1052,7 @@ void do_start ( Character * ch )
 
 	GET_COND ( ch, THIRST ) = 24;
 	GET_COND ( ch, FULL ) = 24;
-	GET_COND ( ch, DRUNK ) = -1;
+	GET_COND ( ch, DRUNK ) = 0;
 
 	ch->check_regen_rates();
 
