@@ -1821,31 +1821,45 @@ ACMD ( do_file )
 		return;
 	}
 
-	get_line ( req_file, line );
-	while ( !feof ( req_file ) )
+	if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
 	{
-		entry += string ( line );
-		if ( ( pos = entry.find ( "</td></tr></table>" ) ) != string::npos )
-		{
-			if ( entry.rfind ( "(fixed)" ) != string::npos )
-			{
-				entries.push_back ( entry.substr ( 0, pos + 25 ) );
-				entry = entry.substr ( pos + 25, entry.length() - 1);
-			}
-			else
-			{
-				entries.push_back ( entry.substr ( 0, pos + 18 ) );
-				entry = entry.substr ( pos + 18, entry.length() - 1);
-			}
-		}
 		get_line ( req_file, line );
+		while ( !feof ( req_file ) )
+		{
+			entry += string ( line );
+			if ( ( pos = entry.find ( "</td></tr></table>" ) ) != string::npos )
+			{
+				if ( entry.rfind ( "(fixed)" ) != string::npos )
+				{
+					entries.push_back ( entry.substr ( 0, pos + 25 ) );
+					entry = entry.substr ( pos + 25, entry.length() - 1);
+				}
+				else
+				{
+					entries.push_back ( entry.substr ( 0, pos + 18 ) );
+					entry = entry.substr ( pos + 18, entry.length() - 1);
+				}
+			}
+			get_line ( req_file, line );
+		}
+		fclose ( req_file );
 	}
-	fclose ( req_file );
+	else
+	{
+		get_line ( req_file, line );
+		while ( !feof ( req_file ) )
+		{
+			entries.push_back ( string ( line ) );
+			get_line ( req_file, line );
+		}
+		fclose ( req_file );
+	}
 
 	/* toggle (fixed) in bug or typo file */
 
 	if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
 	{
+
 		line_number = atoi ( arg3 );
 
 		if ( line_number < 1 || line_number > entries.size() )
@@ -1858,13 +1872,13 @@ ACMD ( do_file )
 			entries [ line_number - 1 ]  = entries [ line_number - 1].substr ( 0, entries [ line_number - 1 ].length() - 7 );
 		else entries [ line_number - 1 ] += "(fixed)";
 
-		strcpy ( buf, entries [ line_number - 1 ].c_str() );
+		strlcpy ( buf, entries [ line_number - 1 ].c_str(), sizeof ( buf ) );
 		ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
 		ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
 		ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
 		ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
 		ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-		ch->Send ( "%s\r\n", buf );
+		ch->Send ( "%d. %s\r\n", line_number, buf );
 
 		if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
 		{
@@ -1884,7 +1898,7 @@ ACMD ( do_file )
 	}
 
 	if ( !*arg2 )
-		req_entries = MIN ( 10, (int) entries.size() );      /* default is the last 10 entries */
+		req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
 	else
 		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
 
@@ -1892,19 +1906,22 @@ ACMD ( do_file )
 
 	for ( i = entries.size() - req_entries; i < entries.size(); ++i )
 	{
-		strcpy ( buf, entries[i].c_str() );
-		ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-
-		if ( len + strlen ( buf ) > sizeof ( buf2 ) - 10 )
+		if ( entries[i].length() + 3 >= sizeof ( buf2 ) - len )
 			break;
 
+		strlcpy ( buf, entries[i].c_str(), sizeof ( buf ) );
+
 		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" )
+		{
+			ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+			ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+			ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+			ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+			ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
 			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", i + 1, buf );
-		else len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
+		}
+		else
+			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
 	}
 
 	page_string ( ch->desc, buf2, 1 );
