@@ -4812,7 +4812,7 @@ void reset_zone ( zone_rnum zone )
 					}
 					else
 						add_var ( & ( SCRIPT ( tmob )->global_vars ), ZCMD.sarg1, ZCMD.sarg2,
-						          ZCMD.arg3 );
+						          ZCMD.arg2 );
 					last_cmd = true;
 				}
 				else if ( ZCMD.arg1==OBJ_TRIGGER && tobj )
@@ -4823,7 +4823,7 @@ void reset_zone ( zone_rnum zone )
 					}
 					else
 						add_var ( & ( SCRIPT ( tobj )->global_vars ), ZCMD.sarg1, ZCMD.sarg2,
-						          ZCMD.arg3 );
+						          ZCMD.arg2 );
 					last_cmd = true;
 				}
 				else if ( ZCMD.arg1==WLD_TRIGGER )

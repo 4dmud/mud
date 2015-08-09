@@ -487,13 +487,38 @@ void add_cmd_to_list(vector<reset_com> &list, reset_com &newcmd, int pos) {
      * Add terminator, then insert new list.
      */
     
+    vector< vector<string> > sargs( list.size() + 1, vector<string> (2) );
+
     if (pos == list.size()) {
-    reset_com rc = reset_com();
-    rc.command = 'S';
-    (*(list.end() -1)) = newcmd;
-    list.push_back(rc);
+	reset_com rc = reset_com();
+	rc.command = 'S';
+	(*(list.end() -1)) = newcmd;
+	list.push_back(rc);
     } else {
-    list.insert(list.begin() + pos, newcmd);
+	// list.insert calls ~reset_com which frees the strings
+	for ( int i = 0; i < list.size(); ++i ) {
+		if ( list[i].sarg1 )
+			sargs[ i + ( i < pos ? 0 : 1 ) ][0] = string ( list[i].sarg1 );
+		if ( list[i].sarg2 )
+			sargs[ i + ( i < pos ? 0 : 1 ) ][1] = string ( list[i].sarg2 );
+	}
+	if ( newcmd.sarg1 )
+		sargs[pos][0] = string ( newcmd.sarg1 );
+	if ( newcmd.sarg2 )
+	        sargs[pos][1] = string ( newcmd.sarg2 );
+
+	list.insert ( list.begin() + pos, newcmd );
+
+	for (int i = 0; i < list.size(); ++i ) {
+		if ( sargs[i][0].length() > 0 )
+			list[i].sarg1 = strdup ( sargs[i][0].c_str() );
+		if ( sargs[i][1].length() > 0 )
+			list[i].sarg2 = strdup ( sargs[i][1].c_str() );
+	}
+	if ( sargs[pos][0].length() > 0 )
+		newcmd.sarg1 = strdup ( sargs[pos][0].c_str() );
+	if ( sargs[pos][1].length() > 0 )
+		newcmd.sarg2 = strdup ( sargs[pos][1].c_str() );
     }
     
 }

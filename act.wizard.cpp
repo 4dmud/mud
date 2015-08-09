@@ -1480,13 +1480,12 @@ void list_zone_commands_room ( Character *ch, room_vnum rvnum )
 					               ( ( ZOCMD.arg1 == WLD_TRIGGER ) ? "room" : "????" ) ) ) );
 					break;
 				case 'V':
-					ch->Send ( "%sAssign global %s:%d to %s = %s\r\n",
+					ch->Send ( "%sAssign global %s:%s with context %d to the %s\r\n",
 					           ZOCMD.if_flag ? " then " : "",
-					           ZOCMD.sarg1, ZOCMD.arg2,
+					           ZOCMD.sarg1, ZOCMD.sarg2, ZOCMD.arg2,
 					           ( ( ZOCMD.arg1 == MOB_TRIGGER ) ? "mobile" :
 					             ( ( ZOCMD.arg1 == OBJ_TRIGGER ) ? "object" :
-					               ( ( ZOCMD.arg1 == WLD_TRIGGER ) ? "room" : "????" ) ) ),
-					           ZOCMD.sarg2 );
+					               ( ( ZOCMD.arg1 == WLD_TRIGGER ) ? "room" : "????" ) ) ) );
 					break;
 				default:
 					ch->Send ( "<Unknown Command>\r\n" );

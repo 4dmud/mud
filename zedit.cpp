@@ -588,13 +588,12 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
             ((MYCMD.arg1 == WLD_TRIGGER)? "room" : "????"))));
       break;
     case 'V':
-      d->Output( "%sAssign global %s:%d to %s = %s",
+      d->Output( "%sAssign global %s:%s with context %d to the %s",
         MYCMD.if_flag ? " then " : "",
-        MYCMD.sarg1, MYCMD.arg2,
+        MYCMD.sarg1, MYCMD.sarg2, MYCMD.arg2,
         ((MYCMD.arg1 == MOB_TRIGGER) ? "mobile" :
           ((MYCMD.arg1 == OBJ_TRIGGER) ? "object" :
-            ((MYCMD.arg1 == WLD_TRIGGER)? "room" : "????"))),
-        MYCMD.sarg2);
+            ((MYCMD.arg1 == WLD_TRIGGER)? "room" : "????"))));
       break;
  case 'B':
 	    d->Output( "%sBury %s [%s%d%s],  Max : %d",
