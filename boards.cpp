@@ -110,12 +110,16 @@ Be sure to also change NUM_OF_BOARDS in board.h
 SPECIAL(gen_board);
 int find_slot(void);
 int find_board(Character *ch);
+int board_index(struct obj_data *obj);
 void init_boards(void);
+
+/* external functions */
+char *find_exdesc ( char *word, struct extra_descr_data *list );
 
 char *msg_storage[INDEX_SIZE];
 int msg_storage_taken[INDEX_SIZE];
 int num_of_msgs[NUM_OF_BOARDS];
-int ACMD_READ, ACMD_LOOK, ACMD_EXAMINE, ACMD_WRITE, ACMD_REMOVE;
+int ACMD_READ, ACMD_WRITE, ACMD_REMOVE;
 struct board_msginfo msg_index[NUM_OF_BOARDS][MAX_BOARD_MESSAGES];
 
 
@@ -132,6 +136,19 @@ int find_slot(void)
   return (-1);
 }
 
+
+/* returns the index of obj in board_info, -1 if it's not in there */
+int board_index ( struct obj_data *obj )
+{
+	if ( !obj )
+		return -1;
+
+	for ( int i = 0; i < NUM_OF_BOARDS; ++i )
+		if ( BOARD_RNUM ( i ) == GET_OBJ_RNUM ( obj ) )
+			return i;
+
+        return -1;
+}
 
 /* search the room ch is standing in to find which board he's looking at */
 int find_board(Character *ch)
@@ -189,45 +206,83 @@ void init_boards(void)
 
 SPECIAL(gen_board)
 {
-  int board_type;
-  static int loaded = 0;
-  struct obj_data *board = (struct obj_data *) me;
+	int num, i = 0, index = -1;
+	static int loaded = 0;
+	struct obj_data *board = (struct obj_data *) me;
+	struct obj_data *obj = NULL;
+	char arg[MAX_INPUT_LENGTH];
+	char *arg_copy, *desc;
+	Character *tmp_ch;
 
-  if (!loaded)
-  {
-    init_boards();
-    loaded = 1;
-  }
-  if (!ch->desc)
-    return (0);
+	if ( !loaded )
+	{
+		init_boards();
+		loaded = 1;
+	}
 
-  ACMD_READ = find_command("read");
-  ACMD_WRITE = find_command("write");
-  ACMD_REMOVE = find_command("remove");
-  ACMD_LOOK = find_command("look");
-  ACMD_EXAMINE = find_command("examine");
+	if ( !ch->desc )
+		return 0;
 
+	skip_spaces ( &argument );
+	strlcpy ( arg, argument, sizeof ( arg ) );
+	arg_copy = arg;
 
+	if ( ! ( num = get_number ( &arg_copy ) ) )
+		return 0;
 
-  if (cmd != ACMD_WRITE && cmd != ACMD_LOOK && cmd != ACMD_EXAMINE &&
-      cmd != ACMD_READ && cmd != ACMD_REMOVE)
-    return (0);
+	if ( cmd == find_command ( "look" ) )
+	{
+		for ( obj = ch->carrying; obj; obj = obj->next_content )
+			if ( CAN_SEE_OBJ ( ch, obj ) )
+			{
+				if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
+					return 0;
+				else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
+					return Board_show_board ( index, ch, arg, board );
+			}
 
-  if ((board_type = find_board(ch)) == -1)
-  {
-    log("SYSERR:  degenerate board!  (what the hell...)");
-    return (0);
-  }
-  if (cmd == ACMD_WRITE)
-    return (Board_write_message(board_type, ch, argument, board));
-  else if (cmd == ACMD_LOOK || cmd == ACMD_EXAMINE)
-    return (Board_show_board(board_type, ch, argument, board));
-  else if (cmd == ACMD_READ)
-    return (Board_display_msg(board_type, ch, argument, board));
-  else if (cmd == ACMD_REMOVE)
-    return (Board_remove_msg(board_type, ch, argument, board));
-  else
-    return (0);
+		for ( obj = IN_ROOM ( ch )->contents; obj; obj = obj->next_content )
+			if ( CAN_SEE_OBJ ( ch, obj ) )
+			{
+				if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
+					return 0;
+				else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
+					return Board_show_board ( index, ch, arg, board );
+			}
+
+		return 0;
+	}
+
+	if ( cmd == find_command ( "examine" ) )
+	{
+		generic_find ( argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_ch, &obj );
+		if ( ( index = board_index ( obj ) ) > -1 )
+			return Board_show_board ( index, ch, arg, board );
+		else return 0;
+	}
+
+	ACMD_READ = find_command ( "read" );
+	ACMD_WRITE = find_command ( "write" );
+	ACMD_REMOVE = find_command ( "remove" );
+
+	if ( cmd == ACMD_READ || cmd == ACMD_WRITE || cmd == ACMD_REMOVE )
+	{
+		index = find_board ( ch );
+
+		if ( index == -1 )
+		{
+			log ( "SYSERR: degenerate board %d in room %d", GET_OBJ_VNUM ( board ), IN_ROOM ( ch ) ? GET_ROOM_VNUM ( IN_ROOM ( ch ) ) : -1 );
+			return 0;
+		}
+
+		if ( cmd == ACMD_READ )
+			return Board_display_msg ( index, ch, arg, board );
+		else if ( cmd == ACMD_WRITE )
+			return Board_write_message ( index, ch, arg, board );
+		else return Board_remove_msg ( index, ch, arg, board );
+	}
+
+	return 0;
 }
 
 
@@ -326,11 +381,18 @@ int Board_show_board(int board_type, Character *ch, char *arg,
     size_t len = 0;
     int nlen;
 
-    len = snprintf(buf, sizeof(buf),
+    if ( num_of_msgs[board_type] == 1 )
+	    len = snprintf(buf, sizeof(buf),
                    "This is a bulletin board.  Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
                    "You will need to look at the board to save your message.\r\n"
-                   "There are %d messages on the board.\r\n",
-                   num_of_msgs[board_type]);
+		   "There is one message on the board.\r\n" );
+    else
+	    len = snprintf(buf, sizeof(buf),
+                   "This is a bulletin board.  Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
+                   "You will need to look at the board to save your message.\r\n"
+		   "There are %d messages on the board.\r\n",
+                   num_of_msgs[board_type] );
+
 #if NEWEST_AT_TOP
     for (i = num_of_msgs[board_type] - 1; i >= 0; i--)
     {
@@ -581,7 +643,7 @@ void Board_load_board(int board_type)
   fl = fopen(FILENAME(board_type), "wb");
   fprintf(fl, "%d\n", 0);
   fclose(fl);
-  chmod(FILENAME(board_type), 666);
+  chmod(FILENAME(board_type), 0666);
   }
 
   if (!(fl = fopen(FILENAME(board_type), "rb")))
