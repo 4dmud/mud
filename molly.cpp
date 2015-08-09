@@ -300,23 +300,21 @@ ACMD(do_descend)
           if (real_room(GET_OBJ_VAL(obj, 1)) != NULL)
           {
             if (percent <= chance)
-            {
               act("$n descends $p.", FALSE, ch, obj, 0,TO_ROOM);
-              char_from_room ( ch );
-              char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));
-              act("$n has arrived.", FALSE, ch, obj, 0, TO_ROOM);
-              LOOK(ch);
-              entry_memory_mtrigger(ch);
-              greet_mtrigger(ch, -1);
-              greet_memory_mtrigger(ch);
-              enter_wtrigger(IN_ROOM(ch), ch, -1);
-            }
             else
             {
               act("As you start descending $p, you slip and tumble down.", FALSE, ch, obj, 0, TO_CHAR);
               act("$n starts descending $p but slips and tumbles down, head over heals.\r\nThat's got to hurt.", FALSE, ch, obj, 0, TO_ROOM);
               damage(ch, ch, (GET_HIT(ch) / 4), TYPE_UNDEFINED);
             }
+            char_from_room ( ch );
+            char_to_room(ch, real_room(GET_OBJ_VAL(obj, 1)));
+            act("$n has arrived.", FALSE, ch, obj, 0, TO_ROOM);
+            LOOK(ch);
+            entry_memory_mtrigger(ch);
+            greet_mtrigger(ch, -1);
+            greet_memory_mtrigger(ch);
+            enter_wtrigger(IN_ROOM(ch), ch, -1);
             return;
           }
           log ( "SYSERR: obj vnum %d has a non-existing room to descend to", GET_OBJ_VNUM ( obj ) );
