@@ -1827,22 +1827,15 @@ ACMD ( do_file )
 		while ( !feof ( req_file ) )
 		{
 			entry += string ( line );
-			if ( ( pos = entry.find ( "</td></tr></table>" ) ) != string::npos )
+			while ( ( pos = entry.find ( "<table", 1 ) ) != string::npos )
 			{
-				if ( entry.rfind ( "(fixed)" ) != string::npos )
-				{
-					entries.push_back ( entry.substr ( 0, pos + 25 ) );
-					entry = entry.substr ( pos + 25, entry.length() - 1);
-				}
-				else
-				{
-					entries.push_back ( entry.substr ( 0, pos + 18 ) );
-					entry = entry.substr ( pos + 18, entry.length() - 1);
-				}
+				entries.push_back ( entry.substr ( 0, pos ) );
+				entry = entry.substr ( pos );
 			}
 			get_line ( req_file, line );
 		}
 		fclose ( req_file );
+		entries.push_back ( entry );
 	}
 	else
 	{
@@ -1911,7 +1904,7 @@ ACMD ( do_file )
 
 		strlcpy ( buf, entries[i].c_str(), sizeof ( buf ) );
 
-		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" )
+		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
 		{
 			ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
 			ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
