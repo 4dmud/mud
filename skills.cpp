@@ -2756,12 +2756,12 @@ ASKILL ( skill_retreat )
 		*ch << "Retreat where?\r\n";
 		return 0;
 	}
-// Added this check to see if you are snared. If you
-// are snared then you shouldn't be able to retreat at all
+// Added this check to see if you are being held. If you
+// are being held then you shouldn't be able to retreat at all
 // Prometheus.
 	if ( IS_AFFECTED ( ch, AFF_HOLD ) )
 	{
-		send_to_char ( "You are stuck in a snare!\r\n", ch );
+		ch->Send ( "You are being held in place!\r\n" );
 		return 0;
 	}
 
@@ -2770,31 +2770,38 @@ ASKILL ( skill_retreat )
 
 	if ( prob <= percent )
 	{
-		if ( CAN_GO ( ch, dir ) &&
-		        !IS_SET_AR ( ROOM_FLAGS ( EXIT ( ch, dir )->to_room ), ROOM_DEATH ) )
+		if ( CAN_GO ( ch, dir ) && !IS_SET_AR ( ROOM_FLAGS ( EXIT ( ch, dir )->to_room ), ROOM_DEATH ) )
 		{
-			act ( "$n skillfully retreats from combat.", TRUE, ch, 0, 0,
-			      TO_ROOM );
-			*ch << "You skillfully retreat from combat.\r\n";
-			WAIT_STATE ( ch, 2 RL_SEC );
-			// Changing these around for snare and retreat - Prom
-			//halt_fighting(ch);
-			//do_simple_move(ch, dir, TRUE);
-			do_simple_move ( ch, dir, TRUE );
-			halt_fighting ( ch );
-			return SKILL_RETREAT;
+			act ( "$n tries to retreat from combat.", TRUE, ch, 0, 0, TO_ROOM );
+			if ( do_simple_move ( ch, dir, TRUE ) )
+			{
+				halt_fighting ( ch );
+				WAIT_STATE ( ch, 2 RL_SEC );
+				if ( affected_by_spell ( ch, SKILL_SNARE ) )
+				{
+					affect_from_char ( ch, SKILL_SNARE );
+					ch->Send ( "You break free from the snare and retreat from combat.\r\n" );
+				}
+				else ch->Send ( "You skillfully retreat from combat.\r\n" );
+				return SKILL_RETREAT;
+			}
+			else
+			{
+				ch->Send ( "You failed your attempt to retreat!\r\n" );
+				WAIT_STATE ( ch, PULSE_VIOLENCE );
+				return 0;
+			}
 		}
 		else
 		{
-			act ( "$n tries to retreat from combat but has no where to go!",
-			      TRUE, ch, 0, 0, TO_ROOM );
-			*ch << "You cannot retreat in that direction!\r\n";
+			act ( "$n tries to retreat from combat but has nowhere to go!", TRUE, ch, 0, 0, TO_ROOM );
+			ch->Send ( "You cannot retreat in that direction!\r\n" );
 			return 0;
 		}
 	}
 	else
 	{
-		*ch << "You fail your attempt to retreat!\r\n";
+		ch->Send ( "You failed your attempt to retreat!\r\n" );
 		WAIT_STATE ( ch, PULSE_VIOLENCE );
 		return 0;
 	}

@@ -2307,7 +2307,7 @@ ACMD ( do_sit )
 				}
 				else if ( GET_OBJ_VAL ( chair, 1 ) == GET_OBJ_VAL ( chair, 0 ) )
 				{
-					act ( "There is no where left to sit upon $p.", TRUE, ch,
+					act ( "There is nowhere left to sit upon $p.", TRUE, ch,
 					      chair, 0, TO_CHAR );
 					return;
 				}
