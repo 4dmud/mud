@@ -1339,9 +1339,7 @@ void remove_all_normal_affects ( Character *ch )
 	for ( aff = ch->affected;aff;aff=anext )
 	{
 		anext = aff->next;
-		if ( ch->affected->bitvector == AFF_SILENCED )
-			continue;
-		if ( ch->affected->bitvector == AFF_IMMFREEZE )
+		if ( aff->bitvector == AFF_SILENCED || aff->bitvector == AFF_IMMFREEZE )
 			continue;
 		ch->affect_remove ( aff );
 	}
