@@ -2942,7 +2942,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", dest );
 					}
 
-					else if ( !strcasecmp ( field, "dyecount" ) )
+					else if ( !strcasecmp ( field, "dyecount_value" ) )
 					{
 						if ( !subfield || !*subfield )
 							snprintf ( str, slen, "%d", GET_OBJ_DYECOUNT ( o ) );
@@ -2950,8 +2950,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						{
 							num = atoi ( subfield );
 							if ( num < 0 )
-								script_log ( "Trigger %d: tried to set a negative dyecount", GET_TRIG_VNUM ( trig ) );
-							else GET_OBJ_DYECOUNT ( o ) = num;
+								num = 0;
+							GET_OBJ_DYECOUNT ( o ) = num;
 							strcpy ( str, "" );
 						}
 					}
@@ -3215,9 +3215,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 						{
 							num = atoi ( subfield );
-							if ( num <= 0 || num >= NUM_QUALITY_NAMES )
-								script_log ( "Trigger %d: quality value out of range", GET_TRIG_VNUM ( trig ) );
-							else GET_OBJ_QUALITY ( o ) = num;
+							GET_OBJ_QUALITY ( o ) = IRANGE ( 1, num, NUM_QUALITY_NAMES - 1 );
 							strcpy ( str, "" );
 						}
 					}
