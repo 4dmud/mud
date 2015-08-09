@@ -228,12 +228,12 @@ void hedit_disp_menu(Descriptor *d) {
         "[H[J"
 #endif
         "%s1%s) Keywords    : %s%s\r\n"
-        "%s2%s) Entry       :\r\n%s%s"
+        "%s2%s) Entry       :\r\n%s\r\n"
         "%s3%s) Min Level   : %s%d\r\n"
         "%sQ%s) Quit\r\n"
         "Enter choice : ",
         grn, nrm, yel, help->keywords ? help->keywords : "None",
-        grn, nrm, yel, help->entry ? help->entry : "Empty",
+        grn, nrm, help->entry ? help->entry : "Empty",
         grn, nrm, cyn, help->min_level, grn, nrm);
 
     OLC_MODE(d) = HEDIT_MAIN_MENU;
