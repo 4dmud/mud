@@ -1031,9 +1031,7 @@ void check_time_triggers ( void )
 		{
 			sc = SCRIPT ( ch );
 
-			if ( IS_SET ( SCRIPT_TYPES ( sc ), MTRIG_TIME ) &&
-			        ( !is_empty ( IN_ROOM ( ch )->zone ) ||
-			          IS_SET ( SCRIPT_TYPES ( sc ), MTRIG_GLOBAL ) ) )
+			if ( IS_SET ( SCRIPT_TYPES ( sc ), MTRIG_TIME ) )
 				time_mtrigger ( ch );
 		}
 	}
@@ -1062,9 +1060,7 @@ void check_time_triggers ( void )
 			room = world_vnum[nr];
 			sc = SCRIPT ( room );
 
-			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_TIME ) &&
-			        ( !is_empty ( room->zone ) ||
-			          IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_GLOBAL ) ) )
+			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_TIME ) )
 				time_wtrigger ( room );
 		}
 	}
@@ -1086,9 +1082,7 @@ void script_trigger_check ( void )
 		{
 			sc = SCRIPT ( ch );
 
-			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_RANDOM ) &&
-			        ( !is_empty ( IN_ROOM ( ch )->zone ) ||
-			          IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_GLOBAL ) ) )
+			if ( IS_SET ( SCRIPT_TYPES ( sc ), MTRIG_RANDOM ) )
 				random_mtrigger ( ch );
 		}
 	}
@@ -1118,9 +1112,7 @@ void script_trigger_check ( void )
 			room = world_vnum[nr];
 			sc = SCRIPT ( room );
 
-			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_RANDOM ) &&
-			        ( !is_empty ( room->zone ) ||
-			          IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_GLOBAL ) ) )
+			if ( IS_SET ( SCRIPT_TYPES ( sc ), WTRIG_RANDOM ) )
 				random_wtrigger ( room );
 		}
 	}
