@@ -1187,14 +1187,12 @@ void hit_death_trap ( Character *ch )
                             REMOVE_BIT_AR(GET_OBJ_EXTRA(tobj), ITEM_ANTI_DT);
                         else {
                             obj_from_obj(tobj);
-                            obj_from_char(tobj);
                             extract_obj(tobj);
                         }
                     }
                     if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && obj->owner == GET_IDNUM(ch))
                         REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
                     else {
-                        obj_from_obj(obj);
                         obj_from_char(obj);
                         extract_obj(obj);
                     }
