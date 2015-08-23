@@ -366,15 +366,15 @@ ACMD ( do_map )
 	/* make sure the rooms e,s,w are correct */
 	r = visible_room ( IN_ROOM ( ch ), EAST, &two_way );
 	if ( r != NULL )
-		mapgrid[x][y+1] = r->sector_type;
+		mapgrid[center][center+1] = r->sector_type;
 
 	r = visible_room ( IN_ROOM ( ch ), SOUTH, &two_way );
 	if ( r != NULL )
-		mapgrid[x+1][y] = r->sector_type;
+		mapgrid[center+1][center] = r->sector_type;
 
 	r = visible_room ( IN_ROOM ( ch ), WEST, &two_way );
 	if ( r != NULL )
-		mapgrid[x][y-1] = r->sector_type;
+		mapgrid[center][center-1] = r->sector_type;
 
 	/* show text-based map */
 	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
