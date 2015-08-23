@@ -322,7 +322,7 @@ continue;
 }
 ACMD(do_check_sky) {
 
-  if (IN_ROOM ( ch ) != NULL && IN_ROOM(ch)->sector_type <= SECT_INSIDE) {
+  if ( IN_ROOM ( ch ) != NULL && !OUTSIDE ( ch ) ) {
       ch->Send("You cannot see the moon from here.\r\n");
       return;
   }
