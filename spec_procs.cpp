@@ -139,7 +139,7 @@ extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 void add_follower ( Character *ch, Character *leader );
 int get_pidx_from_name ( Character *ch );
 int find_door ( Character *ch, const char *type, char *dir,
-                const char *cmdname );
+                const char *cmdname, const int number );
 void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
                   int scmd );
 void play_triples ( Character *ch, Character *dealer,
@@ -1850,8 +1850,9 @@ SPECIAL ( bottle )
 
 SPECIAL ( door_down )
 {
-	int door = -1;
+	int door = -1, number;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+	char *s;
 	struct obj_data *obj = NULL;
 	Character *victim = NULL;
 	Character *mob;
@@ -1860,6 +1861,8 @@ SPECIAL ( door_down )
 	{
 		skip_spaces ( &argument );
 		two_arguments ( argument, type, dir );
+		s = type;
+		number = get_number ( &s );
 		if ( isname ( type, "trapdoor" ) )
 		{
 			// vnum = real_mobile(number(2300, 2302));
@@ -1868,7 +1871,7 @@ SPECIAL ( door_down )
 			   (or random vnums) you want it to load. */
 			if ( !generic_find
 			        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
-				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN] );
+				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
 			if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
 			{
 				do_doorcmd ( ch, obj, door, SCMD_OPEN );
@@ -1891,8 +1894,9 @@ SPECIAL ( door_down )
 
 SPECIAL ( door_down_7377 )
 {
-	int door = -1;
+	int door = -1, number;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+	char *s;
 	struct obj_data *obj = NULL;
 	Character *victim = NULL;
 	Character *mob;
@@ -1902,6 +1906,8 @@ SPECIAL ( door_down_7377 )
 	{
 		skip_spaces ( &argument );
 		two_arguments ( argument, type, dir );
+		s = type;
+		number = get_number ( &s );
 		if ( isname ( type, "lid" ) )
 		{
 			// vnum = real_mobile(number(2300, 2302));
@@ -1910,7 +1916,7 @@ SPECIAL ( door_down_7377 )
 			   (or random vnums) you want it to load. */
 			if ( !generic_find
 			        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
-				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN] );
+				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
 			if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
 			{
 				do_doorcmd ( ch, obj, door, SCMD_OPEN );

@@ -1438,10 +1438,9 @@ ACMD ( do_move )
 }
 
 
-int find_door ( Character *ch, const char *type, char *dir,
-                const char *cmdname )
+int find_door ( Character *ch, const char *type, char *dir, const char *cmdname, const int number )
 {
-	int door;
+	int door, i;
 
 	if ( *dir )            /* a direction was specified */
 	{
@@ -1480,15 +1479,15 @@ int find_door ( Character *ch, const char *type, char *dir,
 			ch->Send ( "What is it you want to %s?\r\n", cmdname );
 			return ( -1 );
 		}
+		i = number;
 		for ( door = 0; door < NUM_OF_DIRS; door++ )
-			if ( EXIT ( ch, door )
-			        && !IS_SET ( EXIT ( ch, door )->exit_info, EX_HIDDEN ) )
-				if ( EXIT ( ch, door )->keyword )
-					if ( isname ( type, EXIT ( ch, door )->keyword ) )
-						return ( door );
+			if ( EXIT ( ch, door ) && !IS_SET ( EXIT ( ch, door )->exit_info, EX_HIDDEN ) &&
+			     EXIT ( ch, door )->keyword && isname ( type, EXIT ( ch, door )->keyword ) && --i == 0 )
+				return ( door );
 
-		ch->Send ( "There doesn't seem to be %s %s here.\r\n", AN ( type ),
-		           type );
+		if ( number == 1 )
+			ch->Send ( "There doesn't seem to be %s %s here.\r\n", AN ( type ), type );
+		else ch->Send ( "There doesn't seem to be a %d.%s here.\r\n", number, type );
 		return ( -1 );
 	}
 }
@@ -1658,11 +1657,11 @@ int ok_pick ( Character *ch, obj_vnum keynum, int pickproof, int scmd )
 
 ACMD ( do_gen_door )
 {
-	int door = -1;
+	int door = -1, i, number;
 	obj_vnum keynum;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+	char *s;
 	struct obj_data *obj = NULL;
-	Character *victim = NULL;
 
 	skip_spaces ( &argument );
 	if ( !*argument )
@@ -1671,9 +1670,29 @@ ACMD ( do_gen_door )
 		return;
 	}
 	two_arguments ( argument, type, dir );
-	if ( !generic_find
-	        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &victim, &obj ) )
-		door = find_door ( ch, type, dir, cmd_door[subcmd] );
+	s = type;
+	number = get_number ( &s );
+
+	if ( *dir )
+	{
+		door = find_door ( ch, type, dir, cmd_door[subcmd], number );
+		if ( door == -1 )
+			return;
+	}
+	else
+	{
+		obj = get_obj_in_list_vis ( ch, type, &number, ch->carrying );
+
+		if ( !obj )
+			obj = get_obj_in_list_vis ( ch, type, &number, IN_ROOM ( ch )->contents );
+
+		if ( !obj )
+			for ( i = 0; i < NUM_WEARS && !obj; i++ )
+				if ( GET_EQ ( ch, i ) && isname ( type, GET_EQ ( ch, i )->name ) && --number == 0 )
+					obj = GET_EQ ( ch, i );
+		if ( !obj )
+			door = find_door ( ch, type, dir, cmd_door[subcmd], number );
+	}
 
 	if ( ( obj ) || ( door >= 0 ) )
 	{
