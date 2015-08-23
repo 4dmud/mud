@@ -1769,6 +1769,8 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	ch->Send ( ", In Locker: " );
 	ch->Send ( "%s\r\n",   j->in_locker ? GET_NAME ( j->in_locker ) : "Nobody" );
 
+	if ( GET_OBJ_INNATE ( j ) )
+		ch->Send ( "Innate: %s\r\n", skill_name ( GET_OBJ_INNATE ( j ) ) );
 
 	switch ( GET_OBJ_TYPE ( j ) )
 	{

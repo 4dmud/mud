@@ -3141,6 +3141,21 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							else if ( i == NUM_MATERIAL_GROUPS - 1 )
 								strcpy ( str, "0" );
 					}
+					else if (!strcasecmp ( field, "innate" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_INNATE ( o ) );
+						else
+						{
+							if ( is_number ( subfield ) )
+								num = atoi ( subfield );
+							else num = spell_num ( subfield );
+
+							if ( num == 0 || IS_SPELL_CAST ( num ) )
+								GET_OBJ_INNATE ( o ) = num;
+							*str = '\0';
+						}
+					}
 					else if ( !strcasecmp ( field, "is_inobj" ) )
 					{
 						if ( o->in_obj!=NULL )
