@@ -456,12 +456,32 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 		{
 			name = vd->value.c_str();
 
+			if ( *name == '\0' )
+			{
+				*str = '\0';
+				return;
+			}
+
 			switch ( type )
 			{
 				case MOB_TRIGGER:
 					ch = ( Character * ) go;
 
-					if ( ( o = get_object_in_equip ( ch, name ) ) )
+					if ( *name == UID_CHAR )
+					{
+						if ( ( c = get_char ( name ) ) )
+							;
+						else if ( ( o = get_obj ( name ) ) )
+							;
+						else if ( ( r = get_room ( name ) ) )
+							;
+						else
+						{
+							*str = '\0';
+							return;
+						}
+					}
+					else if ( ( o = get_object_in_equip ( ch, name ) ) )
 						;
 					else if ( ch->carrying && ( o = get_obj_in_list ( name, ch->carrying ) ) )
 						;
