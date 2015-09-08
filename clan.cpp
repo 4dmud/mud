@@ -92,8 +92,8 @@ void send_clan_format ( Character *ch )
 		           "   clan set plan   <clan>\r\n"
 		           "   clan set war    <clan> <clan>\r\n"
 		           "   clan set peace  <clan> <clan>\r\n"
-		           "   clan set privilege  <privilege>   <rank> <clan>\r\n"
-		           "   clan set title  <clan number> <rank> <title>\r\n"
+		           "   clan set privilege  <privilege> <rank> <clan>\r\n"
+		           "   clan set title  <clan> <rank> <title>\r\n"
 		           "   clan set board <board vnum> <clan>\r\n"
 		           "   clan set recall <vnum of recall-to room> <clan>\r\n" );
 	else
@@ -458,7 +458,7 @@ void do_clan_enroll ( Character *ch, char *arg )
 
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_ENROLL] && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -775,7 +775,7 @@ void do_clan_war ( Character *ch, char *arg )
 
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_WAR] && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -835,7 +835,7 @@ void do_clan_demote ( Character *ch, char *arg )
 
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_DEMOTE] && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -910,7 +910,7 @@ void do_clan_promote ( Character *ch, char *arg )
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_PROMOTE]
 	        && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -2073,7 +2073,7 @@ void do_clan_ranks ( Character *ch, char *arg )
 
 	if ( GET_CLAN_RANK ( ch ) != clan[clan_num].ranks && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -2179,7 +2179,7 @@ void do_clan_titles ( Character *ch, char *arg )
 		if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_PLAN])
 
 		{
-			ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+			ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 			return;
 		}
 	}
@@ -2190,16 +2190,10 @@ void do_clan_titles ( Character *ch, char *arg )
 			ch->Send ( "You do not have clan privileges.\r\n" );
 			return;
 		}
-		half_chop ( arg, arg1, arg2 );
-		strcpy ( arg, arg2 );
-		if ( !is_number ( arg1 ) )
+		half_chop ( arg, arg1, arg );
+		if ( ( clan_num = find_clan ( arg1 ) ) < 0 )
 		{
-			ch->Send ( "You need to specify a clan number.\r\n" );
-			return;
-		}
-		if ( ( clan_num = atoi ( arg1 ) ) < 0 || clan_num >= num_of_clans )
-		{
-			ch->Send ( "There is no clan with that number.\r\n" );
+			ch->Send ( "Unknown clan, see clan info.\r\n" );
 			return;
 		}
 	}
@@ -2273,7 +2267,7 @@ void do_clan_application ( Character *ch, char *arg )
 	if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_APPLEV]
 	        && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -2344,7 +2338,7 @@ void do_clan_sp ( Character *ch, char *arg, int priv )
 
 	if ( GET_CLAN_RANK ( ch ) != clan[clan_num].ranks && !immcom )
 	{
-		ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+		ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 		return;
 	}
 
@@ -2390,7 +2384,7 @@ void do_clan_plan ( Character *ch, char *arg )
 		}
 		if ( GET_CLAN_RANK ( ch ) < clan[clan_num].privilege[CP_SET_PLAN] )
 		{
-			ch->Send ( "You're not influent enough in the clan to do that!\r\n" );
+			ch->Send ( "You're not influential enough in the clan to do that!\r\n" );
 			return;
 		}
 	}
