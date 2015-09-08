@@ -3081,3 +3081,73 @@ bool is_same_command(char *arg1, char *arg2)
   return FALSE;
 
 }
+
+int positive_affect ( struct obj_affected_type *af )
+{
+	if ( af->location == APPLY_AC && af->modifier < 0 )
+		return -af->modifier;
+	if ( af->location != APPLY_AC && af->location > 0 && af->modifier > 0 )
+		return af->modifier;
+	return 0;
+}
+
+void update_affects ( struct obj_data *obj )
+{
+	int statcount = 0, orig_statcount = 0, new_statcount = 0, i, j;
+	vector<int> choose_from;
+
+	// You can only lose (or gain) positive stats, or negative AC. Every -1 AC counts as one stat.
+
+	if ( GET_OBJ_QUALITY ( obj ) < LOWEST_QUALITY )
+		return;
+
+	for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+	{
+		orig_statcount += obj->orig_affected[ i ].modifier;
+		statcount += positive_affect ( &obj->affected[ i ] );
+	}
+
+	new_statcount = ( orig_statcount + 1 ) * ( GET_OBJ_QUALITY ( obj ) / 100.0 );
+	if ( new_statcount > orig_statcount )
+		new_statcount = orig_statcount;
+
+	if ( statcount == new_statcount )
+		return;
+
+	if ( statcount > new_statcount ) // drop random positive original stat(s)
+	{
+		for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+			if ( obj->orig_affected[ i ].location > 0 )
+				choose_from.push_back( i );
+
+		while ( statcount > new_statcount )
+		{
+			j = choose_from[ number ( 0, choose_from.size() - 1 ) ];
+			if ( obj->affected[ j ].location == APPLY_AC )
+				obj->affected[ j ].modifier++;
+			else
+				obj->affected[ j ].modifier--;
+			if ( obj->affected[ j ].modifier == 0 )
+				choose_from.erase( choose_from.begin() + j );
+			statcount--;
+		}
+	}
+	else // add random positive original stat(s)
+	{
+		for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+			if ( obj->orig_affected[ i ].location > 0 && obj->orig_affected[ i ].modifier > abs ( obj->affected[ i ].modifier ) )
+				choose_from.push_back( i );
+
+		while ( statcount < new_statcount )
+		{
+			j = choose_from[ number ( 0, choose_from.size() - 1 ) ];
+			if ( obj->affected[ j ].location == APPLY_AC )
+				obj->affected[ j ].modifier--;
+			else
+				obj->affected[ j ].modifier++;
+			if ( abs ( obj->affected[ j ].modifier ) == obj->orig_affected[ j ].modifier )
+				choose_from.erase( choose_from.begin() + j );
+			statcount++;
+		}
+	}
+}

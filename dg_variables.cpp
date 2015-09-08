@@ -41,6 +41,8 @@ int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
 int bodypartname ( char *bpn );
 void zap_char ( Character *victim );
+int positive_affect ( struct obj_affected_type *af );
+void update_affects ( struct obj_data *obj );
 
 /* Utility functions */
 
@@ -3271,7 +3273,24 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					break;
 				case 'r':
-					if ( !strcasecmp ( field, "room" ) )
+					if ( !strcasecmp ( field, "repair" ) )
+					{
+						if ( subfield && *subfield && GET_OBJ_QUALITY ( o ) > LOWEST_QUALITY )
+						{
+							num = atoi ( subfield );
+							if ( num < LOWEST_QUALITY )
+								GET_OBJ_QUALITY ( o ) = LOWEST_QUALITY * 2;
+							else if ( num >= 100 )
+								GET_OBJ_QUALITY ( o ) = 100 - LOWEST_QUALITY;
+							else
+								GET_OBJ_QUALITY ( o ) = num;
+							update_affects ( o );
+							GET_OBJ_REPAIRS ( o )++;
+						}
+						*str = '\0';
+					}
+
+					else if ( !strcasecmp ( field, "room" ) )
 					{
 						room_rnum rm;
 						if ( ( rm = obj_room ( o ) ) != NULL )
@@ -3283,7 +3302,19 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					break;
 				case 's':
-					if ( !strcasecmp ( field, "set_colour_name" ) )
+					if ( !strcasecmp ( field, "save_affects" ) )
+					{
+						for ( int i = 0; i < MAX_OBJ_AFFECT; ++i )
+							if ( ( num = positive_affect ( &o->affected[ i ] ) ) > 0 )
+							{
+								o->orig_affected[ i ].location = o->affected[ i ].location;
+								o->orig_affected[ i ].modifier = num;
+							}
+						GET_OBJ_QUALITY ( o ) = 100 - LOWEST_QUALITY;
+						*str = '\0';
+					}
+
+					else if ( !strcasecmp ( field, "set_colour_name" ) )
 					{
 						bool colour_set = FALSE;
 						string desc = string ( o->short_description );

@@ -1406,7 +1406,7 @@ class Room;
 #define NUM_COLOUR_NAMES	12
 #define NUM_QUALITY_NAMES	8
 #define LOWEST_QUALITY		1e-3
-#define QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_QUALITY(obj)/100.0 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
+#define QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
 #define NUM_ORIGIN_NAMES	125
 
 
@@ -1571,6 +1571,7 @@ struct obj_data {
     int vroom;           /* for corpse saving */
     struct obj_flag_data obj_flags;     /* Object information               */
     struct obj_affected_type affected[MAX_OBJ_AFFECT]; /* affects     */
+    struct obj_affected_type orig_affected[MAX_OBJ_AFFECT]; /* original positive stats that are lost when Quality goes down */
 
     char *name;               /* Title of object :get etc.        */
     //vector<string> Names;

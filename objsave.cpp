@@ -1322,6 +1322,9 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
   fprintf(fl, "Timer: %d\n", GET_OBJ_TIMER(obj));
   fprintf(fl, "Expir: %ld\n", GET_OBJ_EXPIRE(obj));
   fprintf(fl, "Exrem: %ld\n", GET_OBJ_SAVED_REMAINING_EXPIRE(obj));
+  for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+    if ( obj->orig_affected[ i ].location > 0 )
+      fprintf(fl, "OrigAff: %d %d\n", obj->orig_affected[ i ].location, obj->orig_affected[ i ].modifier );
   return fprintf(fl, "@END\n\n");
 }
 
@@ -1686,7 +1689,7 @@ void tag_read(char *tag, char *buf)
 
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
-  int rv;
+  int rv, aff_i = 0;
   obj_vnum nr, nrr = 0; // onr
   char buf[MAX_INPUT_LENGTH];
   char line[READ_SIZE] = "";
@@ -1825,7 +1828,14 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       }
       break;
     case 'o':
-      if (!strcmp(tag, "Owner"))
+      if ( !strcmp ( tag, "OrigAff" ) )
+      {
+	sscanf ( line, "%d %d", &t[0], &t[1] );
+        temp->orig_affected[ aff_i ].location = t[0];
+        temp->orig_affected[ aff_i ].modifier = t[1];
+        aff_i++;
+      }
+      else if (!strcmp(tag, "Owner"))
         temp->owner = atol(line);
       break;
     case 'p':
