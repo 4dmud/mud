@@ -3201,6 +3201,20 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							strcpy ( str, "" );
 					}
 
+					else if (!strcasecmp  (field, "num_of_repairs" ) )
+					{
+						if ( !subfield || !*subfield )
+							snprintf ( str, slen, "%d", GET_OBJ_REPAIRS ( o ) );
+						else
+						{
+							num = atoi ( subfield );
+							if ( num < 0 )
+								script_log ( "Trigger %d: trying to set a negative number of repairs", GET_TRIG_VNUM ( trig ) );
+							else GET_OBJ_REPAIRS ( o ) = num;
+							*str = '\0';
+						}
+					}
+
 					break;
 				case 'o':
 					if ( !strcasecmp ( field, "omr" ) )

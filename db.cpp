@@ -3006,7 +3006,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 {
 	static int i = 0;
 	static char line[READ_SIZE];
-	int t[13], j = 0, retval;
+	int t[14], j = 0, retval;
 	char *tmpptr;
 	char f1[READ_SIZE], f2[READ_SIZE];
 	char f3[READ_SIZE], f4[READ_SIZE];
@@ -3124,46 +3124,14 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 		exit ( 1 );
 	}
 	if ( ( retval =
-	            sscanf ( line, "%d %d %d %d %d %d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7, t + 8, t + 9, t + 10, t + 11, t + 12 ) ) != 13 )
+	            sscanf ( line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7, t + 8, t + 9, t + 10, t + 11, t + 12, t + 13 ) ) != NUM_OBJ_VAL_POSITIONS )
 	{
-		if ( retval == 4 )
-		{
-			t[4] = 0;
-			t[5] = 0;
-			t[6] = 0;
-			t[7] = 0;
-			t[8] = 0;
-			t[9] = 0;
-			t[10] = 0;
-			t[11] = 0;
-			t[12] = 0;
-		}
-		else if ( retval == 10 )
-		{
-			t[10] = 0;
-			t[11] = 0;
-			t[12] = 0;
-		}
-		else
-		{
-			log ( "SYSERR: Format error in second numeric line (expecting 13 args, got %d), %s", retval, buf2 );
-			exit ( 1 );
-		}
+		while ( retval < NUM_OBJ_VAL_POSITIONS )
+			t[ retval++ ] = 0;
 	}
 
-	obj_proto[i].obj_flags.value[0] = t[0];
-	obj_proto[i].obj_flags.value[1] = t[1];
-	obj_proto[i].obj_flags.value[2] = t[2];
-	obj_proto[i].obj_flags.value[3] = t[3];
-	obj_proto[i].obj_flags.value[4] = t[4];
-	obj_proto[i].obj_flags.value[5] = t[5];
-	obj_proto[i].obj_flags.value[6] = t[6];
-	obj_proto[i].obj_flags.value[7] = t[7];
-	obj_proto[i].obj_flags.value[8] = t[8];
-	obj_proto[i].obj_flags.value[9] = t[9];
-	obj_proto[i].obj_flags.value[10] = t[10];
-	obj_proto[i].obj_flags.value[11] = t[11];
-	obj_proto[i].obj_flags.value[12] = t[12];
+	for ( j = 0; j < NUM_OBJ_VAL_POSITIONS; ++j )
+		obj_proto[i].obj_flags.value[ j ] = t[ j ];
 
 	if ( !get_line ( obj_f, line ) )
 	{

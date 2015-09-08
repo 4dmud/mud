@@ -1942,6 +1942,9 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	if ( GET_OBJ_STAGE ( j ) != 0 )
 		ch->Send ( "Stage: %d\r\n", GET_OBJ_STAGE ( j ) );
 
+	if ( GET_OBJ_REPAIRS ( j ) != 0 )
+		ch->Send ( "Repairs: %d\r\n", GET_OBJ_REPAIRS ( j ) );
+
 	/*
 	 * I deleted the "equipment status" code from here because it seemed
 	 * more or less useless and just takes up valuable screen space.

@@ -1017,6 +1017,12 @@ void oedit_disp_crafting_stage_menu ( Descriptor *d )
 	d->Output ( "Enter Stage value : " );
 }
 
+void oedit_disp_crafting_repairs_menu ( Descriptor *d )
+{
+	OLC_MODE ( d ) = OEDIT_CRAFTING_REPAIRS;
+	d->Output ( "Enter the number of repairs : " );
+}
+
 /*
  * Object type.
  */
@@ -1984,6 +1990,11 @@ void oedit_parse ( Descriptor *d, char *arg )
 
 		case OEDIT_CRAFTING_STAGE:
 			GET_OBJ_STAGE ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
+			oedit_disp_crafting_repairs_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_REPAIRS:
+			GET_OBJ_REPAIRS ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
 			d->Output ( "%sColour: %s%s%s   Quality: %s%s%s\r\n"
 				    "Material: %s%s%s   Dyecount: %s%d%s\r\n"
 				    "Origin: %s%s%s   Stage: %s%d%s\r\n\r\n",
