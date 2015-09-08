@@ -173,12 +173,12 @@ void assign_subskills(void) {
     /* gives a chance of avoiding sanctuary */
     subo(SUB_REPEL_SANC, "RepelSanctuary", 0, 0,
          0, POS_FIGHTING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, PROF_COMBATANT);
+         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON | SUB_TYPE_PROF, CL_TYPE_FIGHTER, PROF_COMBATANT);
 
     /* gives a chance of not dying when killed - allowing healing */
     subo(SUB_UNDYING, "Undying", 0, 0,
          0, POS_FIGHTING, 0 , PEAC,
-         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON, CL_TYPE_FIGHTER, PROF_COMBATANT);
+         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO | SUB_TYPE_DEFAULT_ON | SUB_TYPE_PROF, CL_TYPE_FIGHTER, PROF_COMBATANT);
 
     /* your ability to control living animals */
 //    subo(SUB_BRICKMAKING, "BrickMaking", 0, 0,
@@ -491,11 +491,11 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_COMBATANT);
     /*ability to ignite a lightsaber*/
-    subo(SUB_LIGHTSABER_PROF, "Lightsaber proficency", 0, 0,
+    subo(SUB_LIGHTSABER_PROF, "LightsaberProficiency", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /*ability to ignite both ends of a lightsaber*/
-    subo(SUB_LIGHTSABER_DOUBLE, "Lightsaber Double-ended", 0, 0,
+    subo(SUB_LIGHTSABER_DOUBLE, "LightsaberDouble-ended", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /* reduction in speed when fighting in ships */
@@ -610,7 +610,7 @@ void assign_subskills(void) {
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, TYPE_UNDEFINED);
 
 // Added these for Molly
-    subo(SUB_INSTRUMENT_MAKER, "Instrument maker", 0, 0,
+    subo(SUB_INSTRUMENT_MAKER, "Instrumentmaker", 0, 0,
 	0, POS_SLEEPING, 0, PEAC,
 	SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_ARTISAN);
     
@@ -646,7 +646,7 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
    
-    subo(SUB_POTION_MAKER, "Potion Maker", 0, 0,
+    subo(SUB_POTION_MAKER, "Potionmaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
 
@@ -666,7 +666,7 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLASSWORK);
 
-    subo(SUB_MIRRORMAKER, "Mirror Maker", 0, 0,
+    subo(SUB_MIRRORMAKER, "Mirrormaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLASSWORK);
 
@@ -678,16 +678,16 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
     
-    subo(SUB_SHOEMAKER, "Shoe Maker", 0, 0,
+    subo(SUB_SHOEMAKER, "Shoemaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
 
-    subo(SUB_POTION_MAKER, "Armourer", 0, 0,
+    subo(SUB_ARMOURER, "Armourer", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
 
 
-    subo(SUB_POTION_MAKER, "Glove Maker", 0, 0,
+    subo(SUB_GLOVEMAKER, "Glovemaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
 
@@ -695,7 +695,7 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
-    subo(SUB_BLACKSMITH, "Black Smith", 0, 0,
+    subo(SUB_BLACKSMITH, "Blacksmith", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
@@ -707,7 +707,7 @@ void assign_subskills(void) {
 //        0, POS_SLEEPING, 0, PEAC,
 //        SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
-    subo(SUB_WEAPONSMITH, "Weapon Smith", 0, 0,
+    subo(SUB_WEAPONSMITH, "Weaponsmith", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_METALWORK);
 
@@ -719,11 +719,11 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_STONEWORK);
 
-    subo(SUB_STONECUTTER, "Stone Cutter", 0, 0,
+    subo(SUB_STONECUTTER, "Stonecutter", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_STONEWORK);
 
-    subo(SUB_GEMCUTTER, "Gem Cutter", 0, 0,
+    subo(SUB_GEMCUTTER, "Gemcutter", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_STONEWORK);
 
@@ -759,11 +759,11 @@ void assign_subskills(void) {
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_WOODWORK);
 
-     subo(SUB_CABINETMAKER, "Cabinet maker", 0, 0,
+     subo(SUB_CABINETMAKER, "Cabinetmaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_WOODWORK);
 
-    subo(SUB_SHIPBUILDER, "Ship Builder", 0, 0,
+    subo(SUB_SHIPBUILDER, "Shipbuilder", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_WOODWORK);
 

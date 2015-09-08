@@ -562,7 +562,6 @@ const char * profession_names[] =
 	"businessman",
 	"commerce",
 	"miner",
-	"vampire",
 	"brewer",
 	"combatant",
 	"tanner",
@@ -600,11 +599,12 @@ const char * profession_names[] =
 	"stonework",
 	"textilework",
 	"woodwork",
-	"paladin",      	// Added this since it is in Proffessions.cpp
-	"werewolf",		// See above comment
-	"jedi",			// See above
-	"bravo",		// See above
-	"spacepilot",		// See Above -> Prom
+	"paladin",
+	"jedi",
+	"bravo",
+	"spacepilot",
+	"vampire",
+	"werewolf",
 	"\n"
 
 };
