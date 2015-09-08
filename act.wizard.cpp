@@ -8074,3 +8074,70 @@ ACMD ( do_searchtrig )
 	}
 	page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
+
+ACMD ( do_searchroomflags )
+{
+	char buf[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
+	set<int> flags;
+	set<int>::iterator it;
+	int i, nr, num = 0;
+	bool match;
+	vector<string> lowercase_roomflags;
+	string argstr;
+
+	for ( i = 0; i < NUM_ROOMFLAGS; ++i )
+		lowercase_roomflags.push_back ( tolower ( string ( room_bits[ i ] ) ) );
+
+	while ( *argument )
+	{
+		half_chop ( argument, arg, argument );
+
+		if ( !*arg )
+			break;
+
+		argstr = string ( arg );
+		for ( i = 0; i < lowercase_roomflags.size(); ++i )
+			if ( lowercase_roomflags[ i ].find ( argstr ) != string::npos )
+				flags.insert ( i );
+	}
+
+	if ( !flags.size() )
+	{
+		ch->Send ( "Usage: searchroomflags <flag1> <flag2> ...\r\n" );
+		return;
+	}
+
+	DYN_DEFINE;
+	DYN_CREATE;
+
+	it = flags.begin();
+	ch->Send ( "Searching for: %s", room_bits[ *it++ ] );
+	for ( ; it != flags.end(); ++it )
+		ch->Send ( ", %s", room_bits [ *it ] );
+	ch->Send ( "\r\n" );
+
+	for ( nr = 0; nr <= top_of_world; ++nr )
+	{
+		if ( world_vnum[ nr ] )
+		{
+			match = TRUE;
+			for ( it = flags.begin(); it != flags.end(); ++it )
+				if  ( !ROOM_FLAGGED ( world_vnum[ nr ], *it ) )
+				{
+					match = FALSE;
+					break;
+				}
+
+			if ( match )
+			{
+				snprintf ( buf, sizeof ( buf ), "%3d. [%6d] {cy%-25s {cg-{cC %s{c0\r\n", ++num, GET_ROOM_VNUM ( world_vnum[nr] ), world_vnum[nr]->name, zone_table[world_vnum[nr]->zone].name );
+				DYN_RESIZE ( buf );
+			}
+		}
+	}
+
+	if ( num )
+		page_string ( ch->desc, dynbuf, DYN_BUFFER );
+	else
+		ch->Send ( "Nothing found.\r\n" );
+}

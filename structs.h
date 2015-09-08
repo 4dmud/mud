@@ -327,6 +327,8 @@ class Room;
 
 #define KILL_ALL_ENABLED 	1
 
+#define NUM_ROOMFLAGS		49
+
 /* Room flags: used in Room.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define ROOM_DARK        	0    /* Dark                             */

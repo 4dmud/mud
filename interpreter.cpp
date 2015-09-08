@@ -274,6 +274,7 @@ ACMD ( do_saveall );
 ACMD ( do_say );
 ACMD ( do_score );
 ACMD ( do_search );
+ACMD ( do_searchroomflags );
 ACMD ( do_searchtrig );
 ACMD ( do_send );
 ACMD ( do_set );
@@ -825,6 +826,7 @@ const command_info cmd_info[] =
 	{ "saveall"  , "savea", POS_SLEEPING, do_saveall  , LVL_IMMORT, 0, WIZ_OLC_GRP },
 	{ "score"    , "sco" , POS_DEAD    , do_score    , 0, 0, 0 },
 	{ "search"   , "sea"  , POS_STANDING, do_search   , 0, 0, 0 },
+	{ "searchroomflags", "searchr", POS_DEAD, do_searchroomflags, LVL_SEN, 0, 0 },
 	{ "searchtrig" , "searcht" , POS_DEAD , do_searchtrig    , LVL_SEN, 0, 0 },
 	{ "skills"   , "skills"  , POS_DEAD, do_prac_spells   , 0, 0, 0 },
 	{ "skin"   , "skin"  , POS_STANDING, do_skin   , 0, 0, 0 },
