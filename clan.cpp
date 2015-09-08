@@ -1148,6 +1148,7 @@ void do_clan_info ( Character *ch, char *arg )
 		ch->Send ( "({cg%3d{c0 - {cy%-20s{c0)%s", j + 1,
 		           clan[i].rank_name[j], ( j % 2 ? "\r\n" : " " ) );
 	};
+	ch->Send ( "\r\n" );
 
 	return;
 }
@@ -2334,7 +2335,7 @@ void do_clan_sp ( Character *ch, char *arg, int priv )
 		immcom = 1;
 		half_chop ( arg, arg1, arg2 );
 		strcpy ( arg, arg1 );
-		if ( ( clan_num = find_clan ( arg1 ) ) < 0 )
+		if ( ( clan_num = find_clan ( arg2 ) ) < 0 )
 		{
 			ch->Send ( "Unknown clan.\r\n" );
 			return;
