@@ -5619,7 +5619,10 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			break;
 
 		case 61:
-			GET_CLAN ( vict ) = value;
+			if ( value != 0 && find_clan_by_id ( value ) == -1 )
+				snprintf ( buf, sizeof ( buf ), "That clan id doesn't exist, see clan info." );
+			else
+				GET_CLAN ( vict ) = value;
 			break;
 
 		case 62:
