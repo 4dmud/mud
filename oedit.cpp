@@ -965,16 +965,8 @@ void oedit_disp_crafting_colour_menu ( Descriptor *d )
 
 void oedit_disp_crafting_quality_menu ( Descriptor *d )
 {
-	int i, col = 0;
 	OLC_MODE ( d ) = OEDIT_CRAFTING_QUALITY;
-	get_char_colours ( d->character );
-
-	for ( i = 0; i < NUM_QUALITY_NAMES; i++ )
-	{
-		d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
-		            quality_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
-	}
-	d->Output ( "%s\r\nEnter Quality value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
+	d->Output ( "Enter Quality value : " );
 }
 
 void oedit_disp_crafting_material_menu ( Descriptor *d )
@@ -1969,7 +1961,7 @@ void oedit_parse ( Descriptor *d, char *arg )
 			return;
 
 		case OEDIT_CRAFTING_QUALITY:
-			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_QUALITY_NAMES - 1 );
+			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), 100 - LOWEST_QUALITY );
 			oedit_disp_crafting_material_menu ( d );
 			return;
 
@@ -1997,13 +1989,14 @@ void oedit_parse ( Descriptor *d, char *arg )
 			GET_OBJ_REPAIRS ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
 			d->Output ( "%sColour: %s%s%s   Quality: %s%s%s\r\n"
 				    "Material: %s%s%s   Dyecount: %s%d%s\r\n"
-				    "Origin: %s%s%s   Stage: %s%d%s\r\n\r\n",
-				    nrm, cyn, colour_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 7 ) ], nrm,
-				    cyn, quality_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 8 ) ], nrm,
-				    cyn, material_name ( GET_OBJ_VAL ( OLC_OBJ ( d ), 9 ) ), nrm,
-				    cyn, GET_OBJ_VAL ( OLC_OBJ ( d ), 10 ), nrm,
-				    cyn, origin_names [ GET_OBJ_VAL ( OLC_OBJ ( d ), 11 ) ], nrm,
-				    cyn, GET_OBJ_VAL ( OLC_OBJ ( d ), 12 ), nrm );
+				    "Origin: %s%s%s   Stage: %s%d%s Repairs: %s%d%s\r\n\r\n",
+				    nrm, cyn, colour_names [ GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) ], nrm,
+				    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : QUALITY_NAME ( OLC_OBJ ( d ) ), nrm,
+				    cyn, material_name ( GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) ), nrm,
+				    cyn, GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ), nrm,
+				    cyn, origin_names [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,
+				    cyn, GET_OBJ_STAGE ( OLC_OBJ ( d ) ), nrm,
+				    cyn, GET_OBJ_REPAIRS ( OLC_OBJ ( d ) ), nrm );
 			break;
 
 		default:

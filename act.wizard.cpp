@@ -1890,9 +1890,11 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	}
 
 	ch->Send ( "Values:" );
-	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i++ )
-		if ( GET_OBJ_VAL ( j, i ) != 0 )
-			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i ) );
+	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS; i++ )
+		if ( i != 8 && GET_OBJ_VAL ( j, i < 8 ? i : i - 1 ) != 0 )
+			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i < 8 ? i : i - 1 ) );
+		else if ( i == 8 && GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
+			ch->Send ( " [%d]:%.3f" ,i, GET_OBJ_QUALITY ( j ) );
 	ch->Send ( "\r\n" );
 
 	if ( GET_OBJ_COLOUR ( j ) != 0 )
@@ -1902,12 +1904,8 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		else ch->Send ( "Colour: out of range\r\n" );
 	}
 
-	if ( GET_OBJ_QUALITY ( j ) != 0 )
-	{
-		if ( GET_OBJ_QUALITY ( j ) > 0 && GET_OBJ_QUALITY ( j ) < NUM_QUALITY_NAMES )
-			ch->Send ( "Quality: %s\r\n", quality_names[ GET_OBJ_QUALITY ( j )] );
-		else ch->Send ( "Quality: out of range\r\n" );
-	}
+	if ( GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
+		ch->Send ( "Quality: %s\r\n", QUALITY_NAME ( j ) );
 
 	if ( GET_OBJ_DYECOUNT ( j ) != 0 )
 		ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( j ) );

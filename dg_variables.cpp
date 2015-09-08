@@ -3260,11 +3260,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					if ( !strcasecmp ( field, "quality_value" ) )
 					{
 						if ( !subfield || !*subfield )
-							snprintf ( str, slen, "%d", GET_OBJ_QUALITY ( o ) );
+							snprintf ( str, slen, "%.4f", GET_OBJ_QUALITY ( o ) );
 						else
 						{
-							num = atoi ( subfield );
-							GET_OBJ_QUALITY ( o ) = IRANGE ( 1, num, NUM_QUALITY_NAMES - 1 );
+							num = atof ( subfield );
+							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, num, 100 );
 							strcpy ( str, "" );
 						}
 					}
@@ -3356,7 +3356,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					{
 						bool quality_set = FALSE;
 						string desc = string ( o->short_description );
-						string new_quality = string ( quality_names [ GET_OBJ_QUALITY ( o ) ] );
+						string new_quality = string ( QUALITY_NAME ( o ) );
 						uint pos = 0;
 
 						for ( int i = 1; i < NUM_QUALITY_NAMES; i++ )
@@ -3364,8 +3364,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							{
 								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
 									continue;
-								if ( i != GET_OBJ_QUALITY ( o ) )
-									desc.replace ( pos, strlen ( quality_names[i] ), new_quality );
+								desc.replace ( pos, strlen ( quality_names[i] ), new_quality );
 								quality_set = TRUE;
 								break;
 							}
@@ -3409,15 +3408,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							desc.insert ( pos, new_quality + " " );
 						}
 
-						if ( GET_OBJ_QUALITY ( o ) > 0 && GET_OBJ_QUALITY ( o ) < NUM_QUALITY_NAMES )
-						{
-							if ( IS_UNIQUE ( o ) )
-								free_string ( &o->short_description );
-							else
-								SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+						if ( IS_UNIQUE ( o ) )
+							free_string ( &o->short_description );
+						else
+							SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
 
-							o->short_description = strdup ( desc.c_str() );
-						}
+						o->short_description = strdup ( desc.c_str() );
 						strcpy ( str, "" );
 					}
 

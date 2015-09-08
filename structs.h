@@ -1403,6 +1403,8 @@ class Room;
 #define MAX_MAGIC_ITEMS         45
 #define NUM_COLOUR_NAMES	12
 #define NUM_QUALITY_NAMES	8
+#define LOWEST_QUALITY		1e-3
+#define QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_QUALITY(obj)/100.0 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
 #define NUM_ORIGIN_NAMES	125
 
 
@@ -1529,11 +1531,13 @@ struct ident_list {
 
 /* object-related structures ******************************************/
 
-#define NUM_OBJ_VAL_POSITIONS      14
+#define NUM_OBJ_VAL_POSITIONS      13
+#define NUM_OBJ_FLOATING_VAL_POSITIONS 1
 
 /* object flags; used in obj_data */
 struct obj_flag_data {
     int value[NUM_OBJ_VAL_POSITIONS];   /* Values of the item (see list) */
+    double floating_value[NUM_OBJ_FLOATING_VAL_POSITIONS]; /* Floating values of the item */
     sbyte type_flag;      /* Type of item                  */
     int level;      /* Minimum level of object.        */
     int wear_flags[TW_ARRAY_MAX];  /* Where you can wear it         */

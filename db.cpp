@@ -3006,7 +3006,8 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 {
 	static int i = 0;
 	static char line[READ_SIZE];
-	int t[14], j = 0, retval;
+	int t[NUM_OBJ_VAL_POSITIONS], j = 0, retval;
+	double tf[NUM_OBJ_FLOATING_VAL_POSITIONS];
 	char *tmpptr;
 	char f1[READ_SIZE], f2[READ_SIZE];
 	char f3[READ_SIZE], f4[READ_SIZE];
@@ -3124,14 +3125,20 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 		exit ( 1 );
 	}
 	if ( ( retval =
-	            sscanf ( line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7, t + 8, t + 9, t + 10, t + 11, t + 12, t + 13 ) ) != NUM_OBJ_VAL_POSITIONS )
+	            sscanf ( line, "%d %d %d %d %d %d %d %d %lf %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7, tf, t + 8, t + 9, t + 10, t + 11, t + 12 ) ) != NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS )
 	{
-		while ( retval < NUM_OBJ_VAL_POSITIONS )
-			t[ retval++ ] = 0;
+		for ( j = retval; j < NUM_OBJ_VAL_POSITIONS; ++j )
+			t[ retval ] = 0;
+
+		if ( retval <= 8 )
+			tf[ 0 ] = 0;
 	}
 
 	for ( j = 0; j < NUM_OBJ_VAL_POSITIONS; ++j )
-		obj_proto[i].obj_flags.value[ j ] = t[ j ];
+		GET_OBJ_VAL ( &obj_proto[i], j ) = t[ j ];
+
+	for ( j = 0; j < NUM_OBJ_FLOATING_VAL_POSITIONS; ++j )
+		GET_OBJ_FLOATING_VAL ( &obj_proto[i], j ) = tf[ j ];
 
 	if ( !get_line ( obj_f, line ) )
 	{
