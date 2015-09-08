@@ -63,7 +63,7 @@ void unused_sub(enum subskill_list subcmd);
 
 void subo(enum subskill_list subcmd, const char *name, int stat, int cost,
           int percent, int minpos, int targets, sbyte violent, int routines,
-          int stat_type, int flags, int cl_type, int perent);
+          int stat_type, int flags, int cl_type, int parent);
 
 const char *sub_name(int num);
 int sub_number(char *name);
@@ -1125,7 +1125,7 @@ struct obj_data * revert_object(struct obj_data *hilt) {
 
 void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
           int percent, int minpos, int targets, sbyte violent, int routines,
-          int stat_type, int flags, int cl_type, int perent) {
+          int stat_type, int flags, int cl_type, int parent) {
     SINFO.min_position = minpos;		/* Position for caster   */
     SINFO.stat = sta;		/* uses hitp, mana, or move points */
     SINFO.cost = cost;		        /* the cost in units */
@@ -1141,7 +1141,7 @@ void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
     SINFO.violent = violent;
     SINFO.targets = targets;		/* See below for use with TAR_XXX  */
     SINFO.name = name; /*the name of the subskill*/
-    SINFO.perent = perent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
+    SINFO.parent = parent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
     SINFO.stat_type = stat_type;
     SINFO.flags = flags;
     SINFO.cl_type = cl_type; /*who can use this sub?*/
@@ -1164,7 +1164,7 @@ void unused_sub(enum subskill_list subcmd) {
     SINFO.violent = 0;
     SINFO.targets = 0;		/* See below for use with TAR_XXX  */
     SINFO.name = unused_subname; /*the name of the subskill*/
-    SINFO.perent = TYPE_UNDEFINED;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
+    SINFO.parent = TYPE_UNDEFINED;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
     SINFO.stat_type = STATUS_TYPE_ONOFF;
     SINFO.flags = SUB_TYPE_AUTO;
     SINFO.cl_type = 0; /*who can use this sub?*/
@@ -1174,10 +1174,10 @@ void unused_sub(enum subskill_list subcmd) {
 int total_sub_chance(Character *ch, enum subskill_list  subcmd) {
     int count = 0, total = 0, check = TRUE;
 
-    if (!IS_SET(SINFO.flags, SUB_TYPE_PROF) && SINFO.perent != TYPE_UNDEFINED) {
-        if (SAVED(ch).HasSkill(SINFO.perent)) {
+    if (!IS_SET(SINFO.flags, SUB_TYPE_PROF) && SINFO.parent != TYPE_UNDEFINED) {
+        if (SAVED(ch).HasSkill(SINFO.parent)) {
             count++;
-            total += SAVED(ch).GetSkillLearn(SINFO.perent);
+            total += SAVED(ch).GetSkillLearn(SINFO.parent);
         } else 
             check = FALSE;
     }

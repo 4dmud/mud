@@ -3805,18 +3805,18 @@ void load_help ( FILE *fl )
 
 
 #if 0
-struct help_index_element *add_to_help_index ( struct help_index_element *perent,int id, char *header, char *body )
+struct help_index_element *add_to_help_index ( struct help_index_element *parent,int id, char *header, char *body )
 {
 	struct help_index_element *el;
 
 	CREATE ( el, struct help_index_element, 1 );
-	if ( !perent )
+	if ( !parent )
 	{
-		//    create_help_core_perent(perent);
+		//    create_help_core_parent(parent);
 	}
-	el->next = perent->items;
-	perent->items = el;
-	el->perent = perent;
+	el->next = parent->items;
+	parent->items = el;
+	el->parent = parent;
 	el->items = NULL;
 	el->header = str_dup ( header );
 	el->body = str_dup ( body );

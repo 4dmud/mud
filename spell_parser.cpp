@@ -164,9 +164,9 @@
 /**************************************************************************
  * This spell parser can be greatly improved, by combining it with the
  * subskills, seperate the spells into spell headers, then make the
- * subs as the spell names, with the perent of that subskill as the spell
+ * subs as the spell names, with the parent of that subskill as the spell
  * so you would remove the spell "fireball", and add a spell called
- * "fire control", then make a subskill whos perent is "fire control"
+ * "fire control", then make a subskill whos parent is "fire control"
  * and whos name is "fireball". That way you can have unlimited subskills
  * pointing to the limited amount of current spells.
  * two ways i can think of making this work off the top of my head.

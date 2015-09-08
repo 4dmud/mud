@@ -300,14 +300,14 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 
 
 
-			if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].perent!=TYPE_UNDEFINED )
+			if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
 			{
-				sprintf ( buf, " Parent Skill: %s", skill_name ( sub_info[i].perent ) );
+				sprintf ( buf, " Parent Skill: %s", skill_name ( sub_info[i].parent ) );
 				DYN_RESIZE ( buf );
 			}
-			if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].perent!=TYPE_UNDEFINED )
+			if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
 			{
-				sprintf ( buf, " Profession: %s", profession_names[sub_info[i].perent] );
+				sprintf ( buf, " Profession: %s", profession_names[sub_info[i].parent] );
 				DYN_RESIZE ( buf );
 			}
 			sprintf ( buf, "\r\n" );

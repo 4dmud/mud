@@ -711,7 +711,7 @@ struct sub_skill_info_type {
     sbyte violent;
     int targets;		/* See below for use with TAR_XXX  */
     const char *name; /*the name of the subskill*/
-    int perent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
+    int parent;  /* is this a true subskill? if so which skill is it the child of, if not -1 */
     int stat_type;
     int flags;
     int cl_type; /*who can use this sub?*/

@@ -414,7 +414,7 @@ void do_dg_destination(void *go, struct script_data *sc, trig_data *trig,
                        int type, char *cmd);
 
 char *sub_percent(Character *ch, char *sub);
-void function_script(void *go, struct script_data *sc, trig_data *perent, int type, char *cmd);
+void function_script(void *go, struct script_data *sc, trig_data *parent, int type, char *cmd);
 
 /* Macros for scripts */
 

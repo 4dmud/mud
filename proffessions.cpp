@@ -155,7 +155,7 @@ int knows_subs_in_prof(Character *ch, int pro)
   {
     if (!IS_SET(sub_info[i].flags, SUB_TYPE_PROF))
       continue;
-    if (sub_info[i].perent == pro && GET_SUB(ch, i))
+    if (sub_info[i].parent == pro && GET_SUB(ch, i))
       count++;
   }
   return count;
@@ -168,7 +168,7 @@ int tot_subs_in_prof(int pro)
   {
     if (!IS_SET(sub_info[i].flags, SUB_TYPE_PROF))
       continue;
-    if (sub_info[i].perent == pro)
+    if (sub_info[i].parent == pro)
       count++;
   }
   return count;
@@ -182,7 +182,7 @@ void list_subs_in_prof(Character *ch,int pro)
   {
     if (!IS_SET(sub_info[i].flags, SUB_TYPE_PROF))
       continue;
-    if (sub_info[i].perent != pro)
+    if (sub_info[i].parent != pro)
       continue;
 
     if (GET_SUB(ch, i))

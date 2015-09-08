@@ -43,6 +43,7 @@ int bodypartname ( char *bpn );
 void zap_char ( Character *victim );
 int positive_affect ( struct obj_affected_type *af );
 void update_affects ( struct obj_data *obj );
+const char * prof_name(int pro);
 
 /* Utility functions */
 
@@ -1185,6 +1186,35 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 										break;
 							}
 							if ( k )
+								snprintf ( str, slen, "1" );
+						}
+					}
+					else if ( !strcasecmp ( field, "forget_subskills" ) )
+					{
+						snprintf ( str, slen, "0" );
+						if ( subfield && *subfield && !IS_NPC ( c ) )
+						{
+							bool forgotten = FALSE, loop = TRUE;
+							subs_map::iterator it;
+							num = 0;
+							while ( loop )
+							{
+								loop = FALSE;
+								it = SAVED ( c ).SubsBegin();
+								for ( int i = 0; i < num; ++i )
+									it++;
+								for ( ; it != SAVED ( c ).SubsEnd(); it++ )
+									if ( !strcasecmp ( subfield, prof_name ( sub_info[ it->first ].parent ) ) )
+									{
+										script_log ( "%s forgot sub %s", GET_NAME ( c ), sub_name ( it->first ) );
+										SAVED ( c ).DeleteSub ( it->first );
+										forgotten = TRUE;
+										loop = TRUE;
+										break;
+									}
+									else num++;
+							}
+							if ( forgotten )
 								snprintf ( str, slen, "1" );
 						}
 					}

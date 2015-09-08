@@ -1499,7 +1499,7 @@ struct help_entry_data {
     int approved;
     int last_edited_by;
 
-    struct help_category_data *category; /* its perent category */
+    struct help_category_data *category; /* its parent category */
     struct help_index_element *next; /* next in list */
 };
 
