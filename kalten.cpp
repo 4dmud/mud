@@ -1557,7 +1557,7 @@ EVENT2 ( find_nugget )
 			return;
 		}
 	}
-
+/*
 	if ( CAN_MINE_STONE ( CAUSER_CH ) )
 	{
 		if ( value <= 40 )
@@ -1598,7 +1598,7 @@ EVENT2 ( find_nugget )
 			return;
 		}
 	}
-
+*/
 }
 
 ACMD ( do_mine )
