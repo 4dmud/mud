@@ -309,10 +309,13 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		if ( ( SECT ( IN_ROOM ( ch ) ) == SECT_WATER_NOSWIM ) ||
 		        ( SECT ( EXIT ( ch, dir )->to_room ) == SECT_WATER_NOSWIM ) )
 		{
-			if ( ch->MountHere() && !RIDING ( ch )->HasBoat() )
+			if ( ch->MountHere() )
 			{
-				ch->Send ( "Your mount needs a boat to go there.\r\n" );
-				return ( 0 );
+				if ( !RIDING ( ch )->HasBoat() )
+				{
+					ch->Send ( "Your mount needs a boat to go there.\r\n" );
+					return ( 0 );
+				}
 			}
 			else if ( !ch->HasBoat() )
 			{
@@ -326,10 +329,13 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		if ( ( ( SECT ( IN_ROOM ( ch ) ) == SECT_WATER_SWIM ) ||
 		        ( SECT ( EXIT ( ch, dir )->to_room ) == SECT_WATER_SWIM ) ) )
 		{
-			if ( ch->MountHere() && RIDING ( ch )->Flying() )
+			if ( ch->MountHere() )
 			{
-				ch->Send ( "Your mount can't fly into that room!\r\n" );
-				return ( 0 );
+				if ( RIDING ( ch )->Flying() )
+				{
+					ch->Send ( "Your mount can't fly into that room!\r\n" );
+					return ( 0 );
+				}
 			}
 			else if ( ch->Flying() )
 			{
@@ -342,10 +348,13 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
 		if ( ( SECT ( IN_ROOM ( ch ) ) == SECT_FLYING ) ||
 		        ( SECT ( EXIT ( ch, dir )->to_room ) == SECT_FLYING ) )
 		{
-			if ( ch->MountHere() && !RIDING ( ch )->Flying() )
+			if ( ch->MountHere() )
 			{
-				ch->Send ( "Your mount needs to be able to fly to go there.\r\n" );
-				return ( 0 );
+				if ( !RIDING ( ch )->Flying() )
+				{
+					ch->Send ( "Your mount needs to be able to fly to go there.\r\n" );
+					return ( 0 );
+				}
 			}
 			else if ( !ch->Flying() )
 			{
