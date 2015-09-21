@@ -1600,15 +1600,17 @@ void do_clan_list ( Character *ch, char *arg )
 	else
 		i = find_clan_by_id ( GET_CLAN ( ch ) );
 
-	ch->Send ( "Members of the %s clan\r\n", clan_name ( i ) );
-	ch->Send ( "-------------------------------\r\n" );
-
-
 	if ( i==NOTHING || i > ( MAX_CLANS-1 ) )
 	{
-		ch->Send ( "You are not in a clan.\r\n" );
+		if ( GET_LEVEL ( ch ) >= LVL_SEN )
+			ch->Send ( "That clan doesn't exist.\r\n" );
+		else
+			ch->Send ( "You are not in a clan.\r\n" );
 		return;
 	}
+
+	ch->Send ( "Members of the %s clan\r\n", clan_name ( i ) );
+	ch->Send ( "-------------------------------\r\n" );
 
 	temp = clan_list[i].begin();
 	while ( temp != clan_list[i].end() )
