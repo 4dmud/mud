@@ -681,6 +681,7 @@ size_t new_sprintbit ( bitvector_t bitvector, const char *names[],
 		if ( IS_SET ( bitvector, 1 ) )
 		{
 			strlcat ( result, *names[nr] != '\n' ? names[nr] : "UNDEFINED", reslen );
+			strlcat ( result, " ", reslen );
 			/*
 			  nlen =
 			    snprintf(result + len, reslen - len, "%s ",
