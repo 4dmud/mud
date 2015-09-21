@@ -78,7 +78,7 @@ int trade_with(struct obj_data *item, int shop_nr);
 int same_obj(struct obj_data *obj1, struct obj_data *obj2);
 int shop_producing(struct obj_data *item, int shop_nr);
 int transaction_amt(char *arg);
-char *times_message(struct obj_data *obj, char *name, int num);
+void times_message(struct obj_data *obj, char *buf, size_t size, int num);
 gold_int buy_price(struct obj_data *obj, int shop_nr, Character *keeper, Character *buyer);
 gold_int sell_price(struct obj_data *obj, int shop_nr, Character *keeper, Character *seller);
 char *list_object(struct obj_data *obj, int cnt, int oindex, int shop_nr, Character *keeper, Character *seller);
@@ -440,27 +440,20 @@ int transaction_amt(char *arg)
 }
 
 
-char *times_message(struct obj_data *obj, char *name, int num)
+void times_message(struct obj_data *obj, char *buf, size_t size, int num)
 {
-  static char buf[256];
+  char object[MAX_INPUT_LENGTH];
   size_t len;
-  char *ptr;
 
-  if (obj)
-    len = strlcpy(buf, obj->short_description, sizeof(buf));
+  strlcpy ( object, obj->short_description, sizeof ( object ) );
+
+  if ( strstr ( object, "a " ) == object || strstr ( object, "an " ) == object )
+    len = snprintf ( buf, size, "%s", object );
   else
-  {
-    if ((ptr = strchr(name, '.')) == NULL)
-      ptr = name;
-    else
-      ptr++;
-    len = snprintf(buf, sizeof(buf), "%s %s", AN(ptr), ptr);
-  }
+    len = snprintf ( buf, size, "%s %s", AN ( object ), object );
 
-  if (num > 1 && len < sizeof(buf))
-    snprintf(buf + len, sizeof(buf) - len, " (x %d)", num);
-
-  return (buf);
+  if ( num > 1 )
+    snprintf ( buf + len, size - len, " (x %d)", num );
 }
 
 
@@ -600,15 +593,13 @@ gold_int sell_price(struct obj_data *obj, int shop_nr, Character *keeper, Charac
 void shopping_buy(char *arg, Character *ch, Character *keeper, int shop_nr)
 {
   char tempstr[MAX_INPUT_LENGTH] = "", tempbuf[MAX_INPUT_LENGTH];
-  struct obj_data *obj, *last_obj = NULL;
+  struct obj_data *obj, *temp_obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
-  int mcnt = 0;
-  
 
-  if (!is_ok(keeper, ch, shop_nr))
+
+  if (!is_ok(keeper, ch, shop_nr) || !ch->desc)
     return;
-if (!ch->desc)
-return;
+
   if (SHOP_SORT(shop_nr) < IS_CARRYING_N(keeper))
     sort_keeper_objs(keeper, shop_nr);
 
@@ -651,22 +642,10 @@ return;
       return;
     }
   }
-if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE && (!(CAN_WEAR(obj, ITEM_WEAR_TAKE))))
-  if (!can_take_obj(ch, obj))
-  return;
-  
-  if (is_magic(obj)) {
-  int inum = 0;
-  mcnt = count_magic_items(ch);
 
-inum = MAX_MAGIC_ITEMS - mcnt;
-if (buynum > inum)
-buynum = inum;
+  if (is_magic(obj))
+    buynum = IRANGE ( 0, buynum, MAX_MAGIC_ITEMS - count_magic_items(ch) );
 
-  if (buynum < 0)
-  buynum = 0;
-  }
-  
   /*
   if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
   {
@@ -678,50 +657,52 @@ buynum = inum;
     ch->Send( "%s: You can't carry that much weight.\r\n", fname(obj->name));
     return;
   }*/
-  while (obj && (GET_GOLD(ch) >= buy_price(obj, shop_nr, keeper, ch) || IS_GOD(ch))
+
+  temp_obj = obj;
+  while (temp_obj && (GET_GOLD(ch) >= buy_price(temp_obj, shop_nr, keeper, ch) || IS_GOD(ch))
          && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
-         && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch))
+         && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(temp_obj) <= CAN_CARRY_W(ch))
   {
     int charged;
     bought++;
      
     /* Test if producing shop ! */
-    if (shop_producing(obj, shop_nr))
-      obj = read_object(GET_OBJ_RNUM(obj), REAL);
+    if (shop_producing(temp_obj, shop_nr))
+      temp_obj = read_object(GET_OBJ_RNUM(temp_obj), REAL);
     else
     {
-      obj_from_char(obj);
+      obj_from_char(temp_obj);
       SHOP_SORT(shop_nr)--;
     }
-if (GET_OBJ_TYPE(obj) != ITEM_SPACEBIKE && ((CAN_WEAR(obj, ITEM_WEAR_TAKE))))
-    obj_to_char(obj, ch);
- else
-    obj_to_room(obj, IN_ROOM(ch));
 
-strlcpy(tempstr, obj->short_description, sizeof(tempstr));
+    obj_to_char(temp_obj, ch);
 
-    charged = buy_price(obj, shop_nr, keeper, ch);
+    strlcpy(tempstr, temp_obj->short_description, sizeof(tempstr));
+
+    charged = buy_price(temp_obj, shop_nr, keeper, ch);
     goldamt += charged;
     if (!IS_GOD(ch))
       GET_GOLD(ch) -= charged;
 
-    last_obj = obj;
-    obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
-    if (!same_obj(obj, last_obj))
+    last_obj = temp_obj;
+    temp_obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
+    if (!same_obj(temp_obj, last_obj))
       break;
   }
-  if (bought==0){
+
+  if (bought == 0) {
      char buf[MAX_INPUT_LENGTH];
      snprintf(buf, sizeof(buf), "%s You've got too many magical items already!", GET_NAME(ch));
      do_tell(keeper, buf, cmd_tell, 0);
      return;
   }
+
   if (bought < buynum)
   {
     char buf[MAX_INPUT_LENGTH];
-    if (!obj || !same_obj(last_obj, obj))
+    if (!temp_obj || !same_obj(last_obj, temp_obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
-    else if (GET_GOLD(ch) < buy_price(obj, shop_nr, keeper, ch))
+    else if (GET_GOLD(ch) < buy_price(last_obj, shop_nr, keeper, ch))
       snprintf(buf, sizeof(buf), "%s You can only afford %d.", GET_NAME(ch), bought);
     else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
       snprintf(buf, sizeof(buf), "%s You can only hold %d.", GET_NAME(ch), bought);
@@ -735,22 +716,20 @@ strlcpy(tempstr, obj->short_description, sizeof(tempstr));
   if (!IS_GOD(ch))
     GET_GOLD(keeper) += goldamt;
 
-  //strlcpy(tempstr, times_message(ch->carrying, 0, bought), sizeof(tempstr));
-
-  snprintf(tempbuf, sizeof(tempbuf), "$n buys %s.",  times_message(0, tempstr, bought));
+  times_message(obj, tempstr, sizeof(tempstr), bought);
+  snprintf(tempbuf, sizeof(tempbuf), "$n buys %s.",  tempstr);
   act(tempbuf, FALSE, ch, obj, 0, TO_ROOM);
 
   snprintf(tempbuf, sizeof(tempbuf), shop_index[shop_nr].message_buy, GET_NAME(ch), goldamt);
   do_tell(keeper, tempbuf, cmd_tell, 0);
 
-  ch->Send( "You now have %s.\r\n", times_message(0, tempstr, bought));
+  ch->Send( "You now have %s.\r\n", tempstr);
 
-  if (SHOP_USES_BANK(shop_nr))
-    if (GET_GOLD(keeper) > MAX_OUTSIDE_BANK)
-    {
-      SHOP_BANK(shop_nr) += (GET_GOLD(keeper) - MAX_OUTSIDE_BANK);
-      GET_GOLD(keeper) = MAX_OUTSIDE_BANK;
-    }
+  if (SHOP_USES_BANK(shop_nr) && GET_GOLD(keeper) > MAX_OUTSIDE_BANK)
+  {
+    SHOP_BANK(shop_nr) += (GET_GOLD(keeper) - MAX_OUTSIDE_BANK);
+    GET_GOLD(keeper) = MAX_OUTSIDE_BANK;
+  }
 }
 
 void shopping_id(char *arg, Character *ch, Character *keeper, int shop_nr)
@@ -909,7 +888,7 @@ void sort_keeper_objs(Character *keeper, int shop_nr)
 void shopping_sell(char *arg, Character *ch, Character *keeper, int shop_nr)
 {
   char tempstr[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], tempbuf[MAX_INPUT_LENGTH];
-  struct obj_data *obj;
+  struct obj_data *obj, *temp_obj;
   int sellnum, sold = 0, goldamt = 0;
 
   if (!(is_ok(keeper, ch, shop_nr)))
@@ -943,26 +922,27 @@ void shopping_sell(char *arg, Character *ch, Character *keeper, int shop_nr)
     do_tell(keeper, buf, cmd_tell, 0);
     return;
   }
-  while (obj && GET_GOLD(keeper) + SHOP_BANK(shop_nr) >= sell_price(obj, shop_nr, keeper, ch) && sold < sellnum)
+  temp_obj = obj;
+  while (temp_obj && GET_GOLD(keeper) + SHOP_BANK(shop_nr) >= sell_price(temp_obj, shop_nr, keeper, ch) && sold < sellnum)
   {
-    int charged = sell_price(obj, shop_nr, keeper, ch);
+    int charged = sell_price(temp_obj, shop_nr, keeper, ch);
 
     goldamt += charged;
     GET_GOLD(keeper) -= charged;
 
     sold++;
-    obj_from_char(obj);
-    slide_obj(obj, keeper, shop_nr);	/* Seems we don't use return value. */
-    obj = get_selling_obj(ch, name, keeper, shop_nr, FALSE);
+    obj_from_char(temp_obj);
+    slide_obj(temp_obj, keeper, shop_nr);	/* Seems we don't use return value. */
+    temp_obj = get_selling_obj(ch, name, keeper, shop_nr, FALSE);
   }
 
   if (sold < sellnum)
   {
     char buf[MAX_INPUT_LENGTH];
 
-    if (!obj)
+    if (!temp_obj)
       snprintf(buf, sizeof(buf), "%s You only have %d of those.", GET_NAME(ch), sold);
-    else if (GET_GOLD(keeper) + SHOP_BANK(shop_nr) < sell_price(obj, shop_nr, keeper, ch))
+    else if (GET_GOLD(keeper) + SHOP_BANK(shop_nr) < sell_price(temp_obj, shop_nr, keeper, ch))
       snprintf(buf, sizeof(buf), "%s I can only afford to buy %d of those.", GET_NAME(ch), sold);
     else
       snprintf(buf, sizeof(buf), "%s Something really screwy made me buy %d.", GET_NAME(ch), sold);
@@ -971,7 +951,7 @@ void shopping_sell(char *arg, Character *ch, Character *keeper, int shop_nr)
   }
   GET_GOLD(ch) += goldamt;
 
-  strlcpy(tempstr, times_message(0, name, sold), sizeof(tempstr));
+  times_message(obj, tempstr, sizeof(tempstr), sold);
   snprintf(tempbuf, sizeof(tempbuf), "$n sells %s.", tempstr);
   act(tempbuf, FALSE, ch, obj, 0, TO_ROOM);
 
