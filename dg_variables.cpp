@@ -2994,18 +2994,14 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", dest );
 					}
 
-					else if ( !strcasecmp ( field, "dyecount_value" ) )
+					else if ( !strcasecmp ( field, "dyecount" ) )
 					{
-						if ( !subfield || !*subfield )
-							snprintf ( str, slen, "%d", GET_OBJ_DYECOUNT ( o ) );
-						else
+						if ( subfield && *subfield )
 						{
 							num = atoi ( subfield );
-							if ( num < 0 )
-								num = 0;
-							GET_OBJ_DYECOUNT ( o ) = num;
-							strcpy ( str, "" );
+							GET_OBJ_DYECOUNT ( o ) = IRANGE ( 0, num, num );
 						}
+						snprintf ( str, slen, "%d", GET_OBJ_DYECOUNT ( o ) );
 					}
 
 					break;
@@ -3218,6 +3214,18 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%s", material_names[ GET_OBJ_MATERIAL ( o )] );
 					}
 
+					else if ( !strcasecmp ( field, "max_quality_value" ) )
+					{
+						if ( subfield && *subfield )
+						{
+							GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atof ( subfield ), 100 - LOWEST_QUALITY );
+							if ( GET_OBJ_QUALITY ( o ) > GET_OBJ_MAX_QUALITY ( o ) )
+								GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
+							update_affects ( o );
+						}
+						snprintf ( str, slen, "%d", (int) GET_OBJ_MAX_QUALITY ( o ) );
+					}
+
 					break;
 				case 'n':
 
@@ -3291,14 +3299,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'q':
 					if ( !strcasecmp ( field, "quality_value" ) )
 					{
-						if ( !subfield || !*subfield )
-							snprintf ( str, slen, "%.4f", GET_OBJ_QUALITY ( o ) );
-						else
-						{
-							num = atof ( subfield );
-							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, num, 100 );
-							strcpy ( str, "" );
-						}
+						if ( subfield && *subfield )
+							GET_OBJ_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atof ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
+						update_affects ( o );
+						snprintf ( str, slen, "%d", (int) GET_OBJ_QUALITY ( o ) );
 					}
 
 					break;
@@ -3310,8 +3314,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							num = atoi ( subfield );
 							if ( num < LOWEST_QUALITY )
 								GET_OBJ_QUALITY ( o ) = LOWEST_QUALITY * 2;
-							else if ( num >= 100 )
-								GET_OBJ_QUALITY ( o ) = 100 - LOWEST_QUALITY;
+							else if ( num > GET_OBJ_MAX_QUALITY ( o ) )
+								GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
 							else
 								GET_OBJ_QUALITY ( o ) = num;
 							update_affects ( o );
@@ -3528,16 +3532,35 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strncasecmp ( field, "val", 3 ) )
 					{
 						string numstr = string ( field ).substr ( 3 );
+						*str = '\0';
 						if ( is_number ( numstr.c_str() ) )
 						{
 							int num = atoi ( numstr.c_str() );
-							if ( num >= 0 && num < NUM_OBJ_VAL_POSITIONS )
+							if ( num >= 0 && num < NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS )
 							{
 								if ( subfield && *subfield && is_number ( subfield ) )
 								{
-									GET_OBJ_VAL ( o, num ) = atoi ( subfield );
+									if ( num < 8 )
+										GET_OBJ_VAL ( o, num ) = atoi ( subfield );
+									else if ( num == 8 )
+										GET_OBJ_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atoi ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
+									else if ( num < 14 )
+										GET_OBJ_VAL ( o, num - 1 ) = atoi ( subfield );
+									else if ( num == 14 )
+									{
+										GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atoi ( subfield ), 100 - LOWEST_QUALITY );
+										if ( GET_OBJ_QUALITY ( o ) > GET_OBJ_MAX_QUALITY ( o ) )
+											GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
+									}
 								}
-								snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, num ) );
+								if ( num < 8 )
+									snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, num ) );
+								else if ( num == 8 )
+									snprintf ( str, slen, "%d", (int) GET_OBJ_QUALITY ( o ) );
+								else if ( num < 14 )
+									snprintf ( str, slen, "%d", GET_OBJ_VAL ( o, num - 1 ) );
+								else if ( num == 14 )
+									snprintf ( str, slen, "%d", (int) GET_OBJ_MAX_QUALITY ( o ) );
 							}
 						}
 					}

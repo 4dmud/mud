@@ -50,6 +50,7 @@ OCMD ( do_osetval );
 OCMD ( do_oat );
 void update_timer ( struct obj_data *obj );
 void obj_command_interpreter ( obj_data *obj, char *argument );
+void update_affects ( struct obj_data *obj );
 
 struct obj_command_info
 {
@@ -895,8 +896,25 @@ OCMD ( do_osetval )
 
 	position = atoi ( arg1 );
 	new_value = atoi ( arg2 );
-	if ( position >= 0 && position < NUM_OBJ_VAL_POSITIONS )
-		GET_OBJ_VAL ( obj, position ) = new_value;
+	if ( position >= 0 && position < NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS )
+	{
+		if ( position < 8 )
+			GET_OBJ_VAL ( obj, position ) = new_value;
+		else if ( position == 8 )
+		{
+			GET_OBJ_QUALITY ( obj ) = IRANGE ( 2 * LOWEST_QUALITY, new_value, GET_OBJ_MAX_QUALITY ( obj ) );
+			update_affects ( obj );
+		}
+		else if ( position < 14 )
+			GET_OBJ_VAL ( obj, position - 1 ) = new_value;
+		else if ( position == 14 )
+		{
+			GET_OBJ_MAX_QUALITY ( obj ) = IRANGE ( 2 * LOWEST_QUALITY, new_value, 100 - LOWEST_QUALITY );
+			if ( GET_OBJ_QUALITY ( obj ) > GET_OBJ_MAX_QUALITY ( obj ) )
+				GET_OBJ_QUALITY ( obj ) = GET_OBJ_MAX_QUALITY ( obj );
+			update_affects ( obj );
+		}
+	}
 	else
 		obj_log ( obj, "osetval: position out of bounds!" );
 }

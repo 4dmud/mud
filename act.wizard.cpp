@@ -1890,11 +1890,16 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	}
 
 	ch->Send ( "Values:" );
-	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS; i++ )
-		if ( i != 8 && GET_OBJ_VAL ( j, i < 8 ? i : i - 1 ) != 0 )
-			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i < 8 ? i : i - 1 ) );
-		else if ( i == 8 && GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
-			ch->Send ( " [%d]:%.3f" ,i, GET_OBJ_QUALITY ( j ) );
+	for ( i = 0; i < 8; ++i )
+		if ( GET_OBJ_VAL ( j, i ) != 0 )
+			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i ) );
+	if ( GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
+			ch->Send ( " [8]:%.3f", GET_OBJ_QUALITY ( j ) );
+	for ( i = 8; i < 13; ++i )
+		if ( GET_OBJ_VAL ( j, i ) != 0 )
+			ch->Send ( " [%d]:%d", i + 1, GET_OBJ_VAL ( j, i ) );
+	if ( GET_OBJ_MAX_QUALITY ( j ) > LOWEST_QUALITY )
+			ch->Send ( " [14]:%.3f", GET_OBJ_MAX_QUALITY ( j ) );
 	ch->Send ( "\r\n" );
 
 	if ( GET_OBJ_COLOUR ( j ) != 0 )
@@ -1905,7 +1910,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	}
 
 	if ( GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
-		ch->Send ( "Quality: %s\r\n", QUALITY_NAME ( j ) );
+		ch->Send ( "Quality: %s (%.3f)\r\n", QUALITY_NAME ( j ), GET_OBJ_QUALITY ( j ) );
 
 	if ( GET_OBJ_DYECOUNT ( j ) != 0 )
 		ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( j ) );
@@ -1942,6 +1947,9 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 
 	if ( GET_OBJ_REPAIRS ( j ) != 0 )
 		ch->Send ( "Repairs: %d\r\n", GET_OBJ_REPAIRS ( j ) );
+
+	if ( GET_OBJ_MAX_QUALITY ( j ) > LOWEST_QUALITY )
+		ch->Send ( "Max. quality: %s (%.3f)\r\n", MAX_QUALITY_NAME ( j ), GET_OBJ_MAX_QUALITY ( j ) );
 
 	/*
 	 * I deleted the "equipment status" code from here because it seemed

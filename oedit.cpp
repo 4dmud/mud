@@ -963,6 +963,12 @@ void oedit_disp_crafting_colour_menu ( Descriptor *d )
 	d->Output ( "%s\r\nEnter Colour value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
 
+void oedit_disp_crafting_max_quality_menu ( Descriptor *d )
+{
+	OLC_MODE ( d ) = OEDIT_CRAFTING_MAX_QUALITY;
+	d->Output ( "Enter Maximum Quality value : " );
+}
+
 void oedit_disp_crafting_quality_menu ( Descriptor *d )
 {
 	OLC_MODE ( d ) = OEDIT_CRAFTING_QUALITY;
@@ -1172,9 +1178,16 @@ void oedit_disp_menu ( Descriptor *d )
 	    grn, nrm
 	);
 
-	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i++ )
+	for ( i = 0; i < 8; i++ )
 		if ( GET_OBJ_VAL ( obj, i ) != 0 )
 			d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
+	if ( GET_OBJ_QUALITY ( obj ) > LOWEST_QUALITY )
+		d->Output ( "[8]:%s%.3f%s ", cyn, GET_OBJ_QUALITY ( obj ), nrm );
+	for ( i = 9; i < 14; i++ )
+		if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
+			d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i - 1 ), nrm );
+	if ( GET_OBJ_MAX_QUALITY ( obj ) > LOWEST_QUALITY )
+		d->Output ( "[14]:%s%.3f%s ", cyn, GET_OBJ_MAX_QUALITY ( obj ), nrm );
 
 	d->Output (
 	    "\r\n%sD%s) Menu --->   : %sApplies\r\n"
@@ -1957,11 +1970,16 @@ void oedit_parse ( Descriptor *d, char *arg )
 
 		case OEDIT_CRAFTING_COLOUR:
 			GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_COLOUR_NAMES - 1 );
+			oedit_disp_crafting_max_quality_menu ( d );
+			return;
+
+		case OEDIT_CRAFTING_MAX_QUALITY:
+			GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), 100 - LOWEST_QUALITY );
 			oedit_disp_crafting_quality_menu ( d );
 			return;
 
 		case OEDIT_CRAFTING_QUALITY:
-			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), 100 - LOWEST_QUALITY );
+			GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) );
 			oedit_disp_crafting_material_menu ( d );
 			return;
 
@@ -1987,11 +2005,13 @@ void oedit_parse ( Descriptor *d, char *arg )
 
 		case OEDIT_CRAFTING_REPAIRS:
 			GET_OBJ_REPAIRS ( OLC_OBJ ( d ) ) = IRANGE ( 0, atoi ( arg ), atoi ( arg ) );
-			d->Output ( "%sColour: %s%s%s   Quality: %s%s%s\r\n"
-				    "Material: %s%s%s   Dyecount: %s%d%s\r\n"
-				    "Origin: %s%s%s   Stage: %s%d%s Repairs: %s%d%s\r\n\r\n",
+			d->Output ( "%sColour: %s%s%s   Max. Quality: %s%s (%.3f)%s\r\n"
+				    "Quality: %s%s (%.3f)%s   Material: %s%s%s\r\n"
+				    "Dyecount: %s%d%s   Origin: %s%s%s\r\n"
+					"Stage: %s%d%s Repairs: %s%d%s\r\n\r\n",
 				    nrm, cyn, colour_names [ GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) ], nrm,
-				    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : QUALITY_NAME ( OLC_OBJ ( d ) ), nrm,
+				    cyn, GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : MAX_QUALITY_NAME ( OLC_OBJ ( d ) ), GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ), nrm,
+				    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : QUALITY_NAME ( OLC_OBJ ( d ) ), GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
 				    cyn, material_name ( GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) ), nrm,
 				    cyn, GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ), nrm,
 				    cyn, origin_names [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,

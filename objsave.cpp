@@ -1310,11 +1310,17 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
   }
   fprintf(fl, "Location: %d\n", locate);
   fprintf(fl, "Values:\n");
-  for (i = 0;i < NUM_OBJ_VAL_POSITIONS;i++)
-  {
-    if (GET_OBJ_VAL(obj, i) != 0)
-      fprintf(fl, "%d %d\n", i, GET_OBJ_VAL(obj, i));
-  }
+  for ( i = 0; i < 8; ++i )
+    if ( GET_OBJ_VAL ( obj, i ) != 0 )
+      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
+  if ( GET_OBJ_QUALITY ( obj ) > LOWEST_QUALITY )
+      fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
+  for ( i = 9; i < 14; ++i )
+    if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
+      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
+  if ( GET_OBJ_MAX_QUALITY ( obj ) > LOWEST_QUALITY )
+    fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+
   fprintf(fl, "$\n");
   fprintf(fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
   fprintf(fl, "Vroom: %d\n", GET_OBJ_VROOM(obj));
@@ -1696,6 +1702,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   char tag[READ_SIZE] = "";
   //int num;
   int t[4];
+  double tf[1];
   int orig_timer = -1;
   //int orig_expir = -1;
   //int dup_strings = FALSE;
@@ -1881,14 +1888,40 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       {
         for (t[0] = 0; t[0] < NUM_OBJ_VAL_POSITIONS; t[0]++)
           GET_OBJ_VAL(temp, t[0]) = 0;
-        do
+        for (t[0] = 0; t[0] < NUM_OBJ_FLOATING_VAL_POSITIONS; t[0]++)
+          GET_OBJ_FLOATING_VAL(temp, t[0]) = 0;
+        while (TRUE)
         {
           get_line(fl, line);
-          if (sscanf(line, "%d %d", t, t + 1) != 2)
+          if (*line == '$')
             break;
-          GET_OBJ_VAL(temp, t[0]) = t[1];
+          if (sscanf(line, "%d", t) != 1)
+            continue;
+          if (t[0] < 8)
+          {
+            if (sscanf(line, "%d %d", t, t+1) != 2)
+              continue;
+            GET_OBJ_VAL(temp, t[0]) = t[1];
+          }
+          else if (t[0] == 8)
+          {
+            if (sscanf(line, "%d %lf", t, tf) != 2)
+              continue;
+            GET_OBJ_QUALITY(temp) = tf[0];
+          }
+          else if (t[0] < 14)
+          {
+            if (sscanf(line, "%d %d", t, t+1) != 2)
+              continue;
+            GET_OBJ_VAL(temp, t[0] - 1) = t[1];
+          }
+          else if (t[0] == 14)
+          {
+            if (sscanf(line, "%d %lf", t, tf) != 2)
+              continue;
+            GET_OBJ_MAX_QUALITY(temp) = tf[0];
+          }
         }
-        while (*line != '$');
       }
       break;
     case 'w':

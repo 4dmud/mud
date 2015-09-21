@@ -1407,6 +1407,7 @@ class Room;
 #define NUM_QUALITY_NAMES	8
 #define LOWEST_QUALITY		1e-3
 #define QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
+#define MAX_QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_MAX_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
 #define NUM_ORIGIN_NAMES	125
 
 
@@ -1534,7 +1535,7 @@ struct ident_list {
 /* object-related structures ******************************************/
 
 #define NUM_OBJ_VAL_POSITIONS      13
-#define NUM_OBJ_FLOATING_VAL_POSITIONS 1
+#define NUM_OBJ_FLOATING_VAL_POSITIONS 2
 
 /* object flags; used in obj_data */
 struct obj_flag_data {

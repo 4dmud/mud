@@ -3107,7 +3107,7 @@ void update_affects ( struct obj_data *obj )
 		statcount += positive_affect ( &obj->affected[ i ] );
 	}
 
-	new_statcount = ( orig_statcount + 1 ) * ( GET_OBJ_QUALITY ( obj ) / 100.0 );
+	new_statcount = ( orig_statcount + 1 ) * ( GET_OBJ_QUALITY ( obj ) / GET_OBJ_MAX_QUALITY ( obj ) );
 	if ( new_statcount > orig_statcount )
 		new_statcount = orig_statcount;
 

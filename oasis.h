@@ -297,6 +297,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_CRAFTING_ORIGIN		45
 #define OEDIT_CRAFTING_STAGE		46
 #define OEDIT_CRAFTING_REPAIRS		47
+#define OEDIT_CRAFTING_MAX_QUALITY	48
 
 /*
  * Submodes of REDIT connectedness.

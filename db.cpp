@@ -3087,8 +3087,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 	/* *** numeric data *** */
 	if ( !get_line ( obj_f, line ) )
 	{
-		log ( "SYSERR: Expecting first numeric line of %s, but file ended!",
-		      buf2 );
+		log ( "SYSERR: Expecting first numeric line of %s, but file ended!", buf2 );
 		exit ( 1 );
 	}
 
@@ -3120,19 +3119,18 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 
 	if ( !get_line ( obj_f, line ) )
 	{
-		log ( "SYSERR: Expecting second numeric line of %s, but file ended!",
-		      buf2 );
+		log ( "SYSERR: Expecting second numeric line of %s, but file ended!", buf2 );
 		exit ( 1 );
 	}
-	if ( ( retval =
-	            sscanf ( line, "%d %d %d %d %d %d %d %d %lf %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7, tf, t + 8, t + 9, t + 10, t + 11, t + 12 ) ) != NUM_OBJ_VAL_POSITIONS + NUM_OBJ_FLOATING_VAL_POSITIONS )
-	{
-		for ( j = retval; j < NUM_OBJ_VAL_POSITIONS; ++j )
-			t[ retval ] = 0;
 
-		if ( retval <= 8 )
-			tf[ 0 ] = 0;
-	}
+	for ( j = 0; j < NUM_OBJ_VAL_POSITIONS; ++j )
+		t[ j ] = 0;
+
+	for ( j = 0; j < NUM_OBJ_FLOATING_VAL_POSITIONS; ++j )
+		tf[ j ] = 0;
+
+	sscanf ( line, "%d %d %d %d %d %d %d %d %lf %d %d %d %d %d %lf", t, t + 1, t + 2, t + 3, t + 4, t + 5,
+			 t + 6, t + 7, tf, t + 8, t + 9, t + 10, t + 11, t + 12, tf + 1 );
 
 	for ( j = 0; j < NUM_OBJ_VAL_POSITIONS; ++j )
 		GET_OBJ_VAL ( &obj_proto[i], j ) = t[ j ];
@@ -3142,8 +3140,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 
 	if ( !get_line ( obj_f, line ) )
 	{
-		log ( "SYSERR: Expecting third numeric line of %s, but file ended!",
-		      buf2 );
+		log ( "SYSERR: Expecting third numeric line of %s, but file ended!", buf2 );
 		exit ( 1 );
 	}
 
@@ -3202,7 +3199,6 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 
 	strlcat ( buf2, ", after numeric constants\n"
 	          "...expecting 'E', 'A', '$', or next object number", sizeof ( buf2 ) );
-	j = 0;
 
 	obj_proto[i].ex_description = NULL;
 	obj_proto[i].proto_script = NULL;
@@ -3210,6 +3206,7 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 	if ( GET_OBJ_TYPE ( obj_proto + i ) == ITEM_BANKBOOK )
 		ASSIGNOBJ ( nr, bank );
 
+	j = 0;
 	for ( ;; )
 	{
 		if ( !get_line ( obj_f, line ) )
@@ -3219,32 +3216,31 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 		}
 		switch ( *line )
 		{
-                        /* New vehicle attachments */
-                        case 'V':
-                            struct vehicle_attachment_data *att;
-                            CREATE(att, struct vehicle_attachment_data, 1);
-		            if ( !get_line ( obj_f, line ) )
-			    {
-				log ( "SYSERR: Format error in 'A' field, %s\n"
-			      "...expecting 2 numeric constants but file ended!",
-					      buf2 );
+			/* New vehicle attachments */
+			case 'V':
+				struct vehicle_attachment_data *att;
+				CREATE(att, struct vehicle_attachment_data, 1);
+				if ( !get_line ( obj_f, line ) )
+				{
+					log ( "SYSERR: Format error in 'A' field, %s\n"
+						  "...expecting 2 numeric constants but file ended!", buf2 );
 					exit ( 1 );
-			    }
+				}
 
-			    if ( ( retval = sscanf ( line, " %d %d %d", t, t + 1, t+2 ) ) != 3 )
-			    {
-				log ( "SYSERR: Format error in 'A' field, %s\n"
-			      "...expecting 3 numeric arguments, got %d\n"
-			      "...offending line: '%s'", buf2, retval, line );
-				exit ( 1 );
-			    }
-                            att->type = t[0];
-                            att->value = t[1];
-                            att->max_value = t[2];
-                            if (obj_proto[i].attachment) 
-                                att->next = obj_proto[i].attachment;
-                            obj_proto[i].attachment = att;
-                            break;
+				if ( ( retval = sscanf ( line, " %d %d %d", t, t + 1, t+2 ) ) != 3 )
+				{
+					log ( "SYSERR: Format error in 'A' field, %s\n"
+						  "...expecting 3 numeric arguments, got %d\n"
+						  "...offending line: '%s'", buf2, retval, line );
+					exit ( 1 );
+				}
+				att->type = t[0];
+				att->value = t[1];
+				att->max_value = t[2];
+				if (obj_proto[i].attachment)
+					att->next = obj_proto[i].attachment;
+				obj_proto[i].attachment = att;
+				break;
 			case 'E':
 				CREATE ( new_descr, struct extra_descr_data, 1 );
 				if ( ( new_descr->keyword = fread_string ( obj_f, buf2 ) ) == NULL )
@@ -3257,15 +3253,13 @@ char *parse_object ( FILE * obj_f, int nr, zone_vnum zon )
 			case 'A':
 				if ( j >= MAX_OBJ_AFFECT )
 				{
-					log ( "SYSERR: Too many A fields (%d max), %s",
-					      MAX_OBJ_AFFECT, buf2 );
+					log ( "SYSERR: Too many A fields (%d max), %s", MAX_OBJ_AFFECT, buf2 );
 					exit ( 1 );
 				}
 				if ( !get_line ( obj_f, line ) )
 				{
 					log ( "SYSERR: Format error in 'A' field, %s\n"
-					      "...expecting 2 numeric constants but file ended!",
-					      buf2 );
+					      "...expecting 2 numeric constants but file ended!", buf2 );
 					exit ( 1 );
 				}
 
@@ -6604,8 +6598,10 @@ void clear_object ( struct obj_data *obj )
 	GET_TIMER_EVENT ( obj ) = NULL;
 	obj->worn_on = NOWHERE;
 	GET_OBJ_VROOM ( obj ) = NOWHERE;
-	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i ++ )
+	for ( i = 0; i < NUM_OBJ_VAL_POSITIONS; i++ )
 		GET_OBJ_VAL ( obj, i ) = 0;
+	for ( i = 0; i < NUM_OBJ_FLOATING_VAL_POSITIONS; i++ )
+		GET_OBJ_FLOATING_VAL ( obj, i ) = 0;
 	GET_OBJ_LEVEL ( obj ) = 0;
 	OBJ_SAT_IN_BY ( obj ) = NULL;
 	obj->idents = NULL;
