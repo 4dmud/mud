@@ -3120,7 +3120,7 @@ void update_affects ( struct obj_data *obj )
 			if ( obj->orig_affected[ i ].location > 0 )
 				choose_from.push_back( i );
 
-		while ( statcount > new_statcount )
+		while ( statcount > new_statcount && choose_from.size() > 0 )
 		{
 			j = choose_from[ number ( 0, choose_from.size() - 1 ) ];
 			if ( obj->affected[ j ].location == APPLY_AC )
@@ -3138,7 +3138,7 @@ void update_affects ( struct obj_data *obj )
 			if ( obj->orig_affected[ i ].location > 0 && obj->orig_affected[ i ].modifier > abs ( obj->affected[ i ].modifier ) )
 				choose_from.push_back( i );
 
-		while ( statcount < new_statcount )
+		while ( statcount < new_statcount && choose_from.size() > 0 )
 		{
 			j = choose_from[ number ( 0, choose_from.size() - 1 ) ];
 			if ( obj->affected[ j ].location == APPLY_AC )
