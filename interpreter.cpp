@@ -865,7 +865,7 @@ const command_info cmd_info[] =
 	{ "stat"     , "stat"     , POS_DEAD    , do_stat     , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 	{ "statlist" , "statl", POS_DEAD    , do_statlist , LVL_SEN, 0, WIZ_IMM3_GRP },
 	{ "statinnate"  , "statin" , POS_DEAD    , do_statinnate   , LVL_SEN, 0, WIZ_IMM3_GRP },
-	{ "string"   , "str"  , POS_DEAD    , do_string   , LVL_IMMORT, 0, WIZ_IMM3_GRP },
+	{ "string"   , "str"  , POS_DEAD    , do_string   , LVL_HERO, 0, 0 },
 	{ "struggle" , "stru" , POS_STANDING, do_struggle , 0, 0, 0 },
 	{ "swap"     , "swap" , POS_DEAD    , do_swap     , 0, 0, 0 },
 	{ "switch"   , "sw"  , POS_DEAD    , do_switch   , LVL_IMMORT, 0, WIZ_QUEST_GRP },

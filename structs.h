@@ -1387,6 +1387,7 @@ class Room;
 #define TREE_MAX                50
 #define MAX_TREE_AGE            8
 #define MAX_TREE_TYPES          9
+#define VEIN_MAX		250
 
 #define TOP_ORE_DEFINE          76
 #define MAX_COLOUR_OPTIONS      134

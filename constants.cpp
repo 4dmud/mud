@@ -145,6 +145,11 @@ const char * fuse_locations[] =
 	""
 };
 
+const char * vein_type [] =
+{
+	"vein"
+};
+
 const char * dimension_types[] =
 {
 	"General",

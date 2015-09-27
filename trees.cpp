@@ -33,6 +33,10 @@ int tree_total = 0;
 int forest_room;
 struct forest_data *forest = NULL;
 
+int vein_total = 0;
+int vein_room;
+struct vein_data *vein = NULL;
+
 //Added on to some of the values since the code is num-1(not cha) -- Prom
 struct stave_stat_table stave_table[MAX_TREE_TYPES] =
 {
