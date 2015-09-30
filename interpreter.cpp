@@ -1,4 +1,3 @@
-
 /**************************************************************************
 *   File: interpreter.c                                 Part of CircleMUD *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
@@ -624,7 +623,7 @@ const command_info cmd_info[] =
 	{ "gecho"    , "gech"     , POS_DEAD    , do_gecho    , LVL_IMMORT, 0, WIZ_QUEST_GRP },
 	{ "give"     , "giv" , POS_RESTING , do_give     , 0, 0, 0 },
 	{ "goto"     , "got" , POS_SLEEPING, do_goto     , LVL_IMMORT, 0, WIZ_IMM1_GRP },
-	{ "gold"     , "gol" , POS_RESTING , do_gold     , 0, 0, 0 },
+	{ "gold"     , "gol" , POS_SLEEPING , do_gold     , 0, 0, 0 },
 	{ "gossip"   , "gos"  , POS_SLEEPING, do_gen_comm , 0, SCMD_GOSSIP, 0 },
 	{ "."        , "."    , POS_SLEEPING, do_gen_comm , 0, SCMD_GOSSIP, 0 },
 	{ "group"    , "gro"  , POS_RESTING , do_group    , 1, 0, 0 },
@@ -1236,7 +1235,7 @@ void command_interpreter ( Character *ch, char *argument )
 				ch->Send ( "No way!  You're fighting for your life!\r\n" );
 				break;
 		}
-	else 
+	else
 	{
 		total_commands_typed++;
 		if ( !IS_NPC ( ch ) )
@@ -2247,7 +2246,7 @@ int enter_player_game ( Descriptor *d )
                  continue;
 		// Typo fix disintegates -> disintegrates --> Prom
        		ch->Send ( "A piece of expired equipment disintegrates into nothingness.\r\n");
-	 	crumble_obj(ch, GET_EQ(ch,j));  
+	 	crumble_obj(ch, GET_EQ(ch,j));
                }
 	}
 
@@ -2301,7 +2300,7 @@ int enter_player_game ( Descriptor *d )
                         perform_wear ( ch, obj, WEAR_CREST );
 
 		//Healing Potion
-		if (( obj = read_object ( 12913, VIRTUAL)) != NULL) 
+		if (( obj = read_object ( 12913, VIRTUAL)) != NULL)
  			obj_to_char(obj, ch);
 
 		switch ( GET_CLASS ( ch ) )
