@@ -424,8 +424,8 @@ int lock_desc(Descriptor *d) {
     if (!d)
         return -1;
 
-    if (d->locked)
-        log("Descriptor is being locked when it is already in a locked state.");
+//    if (d->locked)
+//        log("Descriptor is being locked when it is already in a locked state.");
 
     d->locked = TRUE;
 
@@ -436,8 +436,8 @@ int unlock_desc(Descriptor *d) {
     if (!d)
         return -1;
 
-    if (!d->locked)
-        log("Descriptor is being unlocked when it is already in an unlocked state.");
+//    if (!d->locked)
+//        log("Descriptor is being unlocked when it is already in an unlocked state.");
 
     d->locked = FALSE;
 

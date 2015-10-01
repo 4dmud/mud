@@ -540,7 +540,7 @@ ACMD ( do_subskillset )
 
 	if ( !*buf )
 	{
-		ch->Send ( "Learned value expected.\r\n" );
+		ch->Send ( "%s has learned %s to %d%%\r\n", GET_NAME ( vict ), sub_name ( skill ), GET_SUB ( vict, skill ) );
 		return;
 	}
 	value = atoi ( buf );

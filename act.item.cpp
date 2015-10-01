@@ -443,7 +443,7 @@ void spill_gold ( Character *ch )
 
 int getTypeFromSubskill ( int subskill )
 {
-
+#if 0
 	switch ( subskill )
 	{
 		case SUB_ASSEMBLE:
@@ -470,6 +470,7 @@ int getTypeFromSubskill ( int subskill )
 			return ASSM_FORGE;
 			break;
 	}
+#endif
 	return ASSM_ASSEMBLE;
 }
 

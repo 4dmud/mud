@@ -1728,7 +1728,7 @@ void mag_assign_spells ( void )
 	/* Do not change the loop above */
 
 	spello ( SPELL_VITALIZE, "vitalize", 60 , 30 , 2,
-	         POS_STANDING, TAR_CHAR_ROOM | TAR_AREA_DIR, FALSE, MAG_POINTS, 1,
+	         POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_POINTS, 1,
 	         TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0, "" );
 
 	spello ( SPELL_ABSOLVE, "absolve", 60 , 30 , 2,
