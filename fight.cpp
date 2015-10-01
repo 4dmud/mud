@@ -343,10 +343,11 @@ int fused_hitroll ( Character *ch );
 int fused_dambonus ( Character *ch );
 int fused_accuracy ( Character *ch );
 int fused_evasion ( Character *ch );
+void update_affects ( struct obj_data *obj );
 
 /* local functions */
 void delay_die ( Character *ch, Character *killer );
-int shield_check ( Character *ch, Character *vict, int type, int w_type );
+int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam = 0 );
 void make_half ( Character *ch );
 void make_head ( Character *ch );
 int class_min_strike ( Character *ch );
@@ -2401,7 +2402,7 @@ int fe_solo_damage ( Character* ch, Character* vict,
 	if ( damage == 0 ) // no damage:: lets not mess with more equations
 		return fe_after_damage ( ch, vict, damage, w_type );
 
-	if ( ( IS_WEAPON ( w_type ) || IS_SPELL_ATK ( w_type ) ) && shield_check ( ch, vict, SHIELD_BLOCK, w_type ) )
+	if ( ( IS_WEAPON ( w_type ) || IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && shield_check ( ch, vict, SHIELD_BLOCK, w_type, damage ) )
 		return fe_after_damage ( ch, vict, 0, w_type );
 
 
@@ -2827,6 +2828,70 @@ int steal_affects ( Character *ch, int dam, int w_type, Character *vict )
 
 }
 
+void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, obj_data *shield )
+{
+	obj_data *weapon, *focus, *eq;
+	vector< vector<int> > loc;
+	int area;
+
+	/* damage the weapon/focus of the attacker */
+	if ( IS_WEAPON ( w_type ) && ( weapon = GET_EQ ( ch, WEAR_WIELD ) ) != NULL && GET_OBJ_QUALITY ( weapon ) > LOWEST_QUALITY )
+	{
+		GET_OBJ_QUALITY ( weapon ) -= damage / 50000.0 * ( 1 + GET_OBJ_REPAIRS ( weapon ) / 5.0 );
+		if ( GET_OBJ_QUALITY ( weapon ) < LOWEST_QUALITY )
+			GET_OBJ_QUALITY ( weapon ) = 2 * LOWEST_QUALITY;
+		update_affects ( weapon );
+	}
+	else if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( focus = GET_EQ ( ch, WEAR_FOCUS ) ) != NULL && GET_OBJ_QUALITY ( focus ) > LOWEST_QUALITY )
+	{
+		GET_OBJ_QUALITY ( focus ) -= damage / 50000.0 * ( 1 + GET_OBJ_REPAIRS ( focus ) / 5.0 );
+		if ( GET_OBJ_QUALITY ( focus ) < LOWEST_QUALITY )
+			GET_OBJ_QUALITY ( focus ) = 2 * LOWEST_QUALITY;
+		update_affects ( focus );
+	}
+
+	/* damage vict's shield if it blocked */
+	if ( shield )
+	{
+		if ( GET_OBJ_QUALITY ( shield ) < LOWEST_QUALITY )
+			return;
+		GET_OBJ_QUALITY ( shield ) -= damage / 25000.0 * ( 1 + GET_OBJ_REPAIRS ( shield ) / 5.0 );
+		if ( GET_OBJ_QUALITY ( shield ) < LOWEST_QUALITY )
+			GET_OBJ_QUALITY ( shield ) = 2 * LOWEST_QUALITY;
+		update_affects ( shield );
+		return;
+	}
+
+	/* damage all eq of vict in the area */
+	if ( IS_WEAPON ( w_type ) )
+		area = GET_ATTACK_POS ( ch );
+	else area = number ( PART_HEAD, PART_RIGHT_LEG );
+
+	loc = { { WEAR_HEAD, WEAR_HORNS, WEAR_ANTENNA },
+			{ WEAR_FACE, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R },
+			{ WEAR_NECK_1, WEAR_NECK_2 },
+			{ WEAR_ARMS, WEAR_HANDS, WEAR_WRIST_L, WEAR_FINGER_L, WEAR_THUMB_L, WEAR_LIGHT },
+			{ WEAR_SHOULDER_L },
+			{ WEAR_ARMS, WEAR_HANDS, WEAR_WRIST_R, WEAR_FINGER_R, WEAR_THUMB_R, WEAR_HOLD },
+			{ WEAR_SHOULDER_R },
+			{ WEAR_ABOUT, WEAR_CHEST, WEAR_BODY },
+			{ WEAR_WAIST, WEAR_HIPS },
+			{ WEAR_LEGS, WEAR_FEET, WEAR_ANKLE_L, WEAR_THIGH_L, WEAR_KNEE_L },
+			{ WEAR_LEGS, WEAR_FEET_2, WEAR_ANKLE_R, WEAR_THIGH_R, WEAR_KNEE_R } };
+
+	for ( int part : loc[ area ] )
+	{
+		eq = GET_EQ ( vict, part );
+		if ( eq && GET_OBJ_QUALITY ( eq ) > LOWEST_QUALITY )
+		{
+			GET_OBJ_QUALITY ( eq ) -= damage / 10000.0 * ( 1 + GET_OBJ_REPAIRS ( eq ) / 5.0 );
+			if ( GET_OBJ_QUALITY ( eq ) < LOWEST_QUALITY )
+				GET_OBJ_QUALITY ( eq ) = 2 * LOWEST_QUALITY;
+			update_affects ( eq );
+		}
+	}
+}
+
 /* Right now this function is still really really dirty, and needs
    to be refactored some more.  None-the-less, it will always perform
    the same tasks, it just won't be as large (hopefully).  Basically
@@ -2914,6 +2979,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 
 		} */
 
+		reduce_quality ( ch, vict, partial, w_type, NULL );
 		alter_hit ( vict, partial );
 		update_pos ( vict );
 		if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
@@ -3265,7 +3331,7 @@ void poison_wep_check ( Character *ch, Character *vict, int w_type, int dam )
 
 
 
-int shield_check ( Character *ch, Character *vict, int type, int w_type )
+int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam )
 {
 	int success = FALSE;
 	struct affected_type af;
@@ -3320,6 +3386,7 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type )
 				}
 				improve_skill ( ch, SPELL_SHIELD_STATIC );
 				improve_skill ( vict, SPELL_SHIELD_STATIC );
+				reduce_quality ( NULL, NULL, dam, 0, GET_EQ ( vict, WEAR_SHIELD ) );
 			}
 			break;
 		case SHIELD_REFLECT:

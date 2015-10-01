@@ -446,46 +446,46 @@ void show_affect_to_char ( Character *i, Character *ch )
 		      TO_VICT );
 
 	if ( AFF_FLAGGED ( i, AFF_FREEZING ) && !AFF_FLAGGED ( i, AFF_PROT_COLD ) )
-		act ( MXPTAG ( "affect lightskyblue" ) "...$e is stuck inside a huge glacier!"MXPTAG ( "/affect " ),
+		act ( MXPTAG ( "affect lightskyblue" ) "...$e is stuck inside a huge glacier!" MXPTAG ( "/affect " ),
 		      FALSE, i, 0, ch, TO_VICT );
 	if ( PLR_FLAGGED ( i, PLR_FROZEN ) )
-		act ( MXPTAG ( "affect paleturquoise" ) "...$e's stuck inside a huge iceburg!"MXPTAG ( "/affect " ),
+		act ( MXPTAG ( "affect paleturquoise" ) "...$e's stuck inside a huge iceburg!" MXPTAG ( "/affect " ),
 		      FALSE, i, 0, ch, TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_ACIDED ) )
-		act ( MXPTAG ( "affect snow" ) "...$e is covered with concentrated acid!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect snow" ) "...$e is covered with concentrated acid!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_HYPERACTIVITY ) )
-		act ( MXPTAG ( "affect ivory" ) "...$e is bouncing off the walls!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect ivory" ) "...$e is bouncing off the walls!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_MIND_FIRE ) )
-		act ( MXPTAG ( "affect orange" ) "...$s eyes glow like embers!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect orange" ) "...$s eyes glow like embers!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_MIND_ICE ) )
-		act ( MXPTAG ( "affect lightcyan" ) "...$s eyes are frosted with ice!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect lightcyan" ) "...$s eyes are frosted with ice!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_MIND_WATER ) )
-		act ( MXPTAG ( "affect aquamarine" ) "...$s eyes hold the ocean!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect aquamarine" ) "...$s eyes hold the ocean!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_MIND_ELEC ) )
-		act ( MXPTAG ( "affect lavender" ) "...$s eyelashes crackle with electricity!"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect lavender" ) "...$s eyelashes crackle with electricity!" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_SHIELD_HOLY ) )
-		act ( MXPTAG ( "affect" ) "...$e is under a geas."MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect" ) "...$e is under a geas." MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_SANCTUARY ) )
-		act ( MXPTAG ( "affect oldlace" ) "...$e glows with a bright light!"MXPTAG ( "/affect " ), FALSE, i,
+		act ( MXPTAG ( "affect oldlace" ) "...$e glows with a bright light!" MXPTAG ( "/affect " ), FALSE, i,
 		      0, ch, TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_BLIND ) )
-		act ( MXPTAG ( "affect" ) "...$e is groping around blindly"MXPTAG ( "/affect " ), FALSE, i, 0, ch,
+		act ( MXPTAG ( "affect" ) "...$e is groping around blindly" MXPTAG ( "/affect " ), FALSE, i, 0, ch,
 		      TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_FIRE_SHIELD ) )
 		act ( MXPTAG ( "affect orangered" ) "...$e is surrounded by a flaming red shield!" MXPTAG ( "/affect " ),
 		      FALSE, i, 0, ch, TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_SHIELD ) )
-		act ( MXPTAG ( "affect mediumturquoise" ) "...$e is surrounded by a humming blue shield!"MXPTAG ( "/affect " ),
+		act ( MXPTAG ( "affect mediumturquoise" ) "...$e is surrounded by a humming blue shield!" MXPTAG ( "/affect " ),
 		      FALSE, i, 0, ch, TO_VICT );
 	if ( AFF_FLAGGED ( i, AFF_HASTE ) )
-		act ( MXPTAG ( "affect snow" ) "...$e is moving with unnatural speed!"MXPTAG ( "/affect " ), FALSE, i, 0,
+		act ( MXPTAG ( "affect snow" ) "...$e is moving with unnatural speed!" MXPTAG ( "/affect " ), FALSE, i, 0,
 		      ch, TO_VICT );
 }
 
@@ -5708,7 +5708,7 @@ ACMD ( do_worth )
 	              chance_hit_part ( ch, PART_RIGHT_ARM ),
 	              chance_hit_part ( ch, PART_TORSO ),
 	              chance_hit_part ( ch, PART_LEFT_LEG ),
-	              chance_hit_part ( ch, PART_LEFT_LEG ),
+	              chance_hit_part ( ch, PART_RIGHT_LEG ),
 	              GET_COOLNESS ( ch ),
 	              update_award ( ch ), *ethos,
 	              GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
@@ -5757,7 +5757,7 @@ ACMD ( do_worth )
 	           SUNNY ? sunnage[ 9] : moonage[ 9], chance_hit_part ( ch, PART_RIGHT_ARM ),
 	           SUNNY ? sunnage[10] : moonage[10], chance_hit_part ( ch, PART_TORSO ),
 	           SUNNY ? sunnage[11] : moonage[11], chance_hit_part ( ch, PART_LEFT_LEG ),
-	           SUNNY ? sunnage[12] : moonage[12], chance_hit_part ( ch, PART_LEFT_LEG ),
+	           SUNNY ? sunnage[12] : moonage[12], chance_hit_part ( ch, PART_RIGHT_LEG ),
 	           SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS ( ch ),
 	           SUNNY ? sunnage[14] : moonage[14], update_award ( ch ), *ethos,
 	           SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,

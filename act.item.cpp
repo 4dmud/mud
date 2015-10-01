@@ -4811,7 +4811,7 @@ int race_speed ( Character *ch )
 
 void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
 {
-	uint i, pos;
+	size_t i, pos;
 	string s;
 	map<mob_vnum, Character *>::iterator mob_it;
 

@@ -81,30 +81,30 @@
 #define INDEX_FILE	"index"	/* index of world files          */
 #define MINDEX_FILE	"index.mini"	/* ... and for mini-mud-mode     */
 #if 0
-#define WLD_PREFIX	LIB_WORLD"wld"SLASH	/* room definitions      */
-#define MOB_PREFIX	LIB_WORLD"mob"SLASH	/* monster prototypes    */
-#define OBJ_PREFIX	LIB_WORLD"obj"SLASH	/* object prototypes     */
-#define ZON_PREFIX	LIB_WORLD"zon"SLASH	/* zon defs & command tables */
-#define SHP_PREFIX	LIB_WORLD"shp"SLASH	/* shop definitions      */
-#define TRG_PREFIX	LIB_WORLD"trg"SLASH	/* shop definitions      */
+#define WLD_PREFIX	LIB_WORLD "wld" SLASH	/* room definitions      */
+#define MOB_PREFIX	LIB_WORLD "mob" SLASH	/* monster prototypes    */
+#define OBJ_PREFIX	LIB_WORLD "obj" SLASH	/* object prototypes     */
+#define ZON_PREFIX	LIB_WORLD "zon" SLASH	/* zon defs & command tables */
+#define SHP_PREFIX	LIB_WORLD "shp" SLASH	/* shop definitions      */
+#define TRG_PREFIX	LIB_WORLD "trg" SLASH	/* shop definitions      */
 #endif
-#define HLP_PREFIX	LIB_TEXT"help"SLASH	/* for HELP <keyword>    */
+#define HLP_PREFIX	LIB_TEXT "help" SLASH	/* for HELP <keyword>    */
 #define HELP_FILE	"help.hlp"	/* help file             */
-#define STARTUP_FILE	LIB_TEXT"startup"	/* startup screen        */
-#define CREDITS_FILE	LIB_TEXT"credits"	/* for the 'credits' command     */
-#define NEWS_FILE	LIB_TEXT"news"	/* for the 'news' command        */
-#define MOTD_FILE	LIB_TEXT"motd"	/* messages of the day / mortal  */
-#define IMOTD_FILE	LIB_TEXT"imotd"	/* messages of the day / immort  */
-#define GREETINGS_FILE	LIB_TEXT"greetings"	/* The opening screen.   */
-#define HELP_PAGE_FILE	LIB_TEXT_HELP"screen"	/* for HELP <CR>                 */
-#define INFO_FILE	LIB_TEXT"info"	/* for INFO              */
-#define WIZLIST_FILE	LIB_TEXT"wizlist"	/* for WIZLIST           */
-#define IMMLIST_FILE	LIB_TEXT"immlist"	/* for IMMLIST           */
-#define BACKGROUND_FILE	LIB_TEXT"background"	/* for the background story      */
-#define POLICIES_FILE	LIB_TEXT"policies"	/* player policies/rules         */
-#define HANDBOOK_FILE	LIB_TEXT"handbook"	/* handbook for new immorts      */
-#define CONTEXT_HELP_FILE LIB_TEXT"contexthelp"	/* context help for olc	*/
-#define VEHICLE_FILE   LIB_TEXT"vehicles"
+#define STARTUP_FILE	LIB_TEXT "startup"	/* startup screen        */
+#define CREDITS_FILE	LIB_TEXT "credits"	/* for the 'credits' command     */
+#define NEWS_FILE	LIB_TEXT "news"	/* for the 'news' command        */
+#define MOTD_FILE	LIB_TEXT "motd"	/* messages of the day / mortal  */
+#define IMOTD_FILE	LIB_TEXT "imotd"	/* messages of the day / immort  */
+#define GREETINGS_FILE	LIB_TEXT "greetings"	/* The opening screen.   */
+#define HELP_PAGE_FILE	LIB_TEXT_HELP "screen"	/* for HELP <CR>                 */
+#define INFO_FILE	LIB_TEXT "info"	/* for INFO              */
+#define WIZLIST_FILE	LIB_TEXT "wizlist"	/* for WIZLIST           */
+#define IMMLIST_FILE	LIB_TEXT "immlist"	/* for IMMLIST           */
+#define BACKGROUND_FILE	LIB_TEXT "background"	/* for the background story      */
+#define POLICIES_FILE	LIB_TEXT "policies"	/* player policies/rules         */
+#define HANDBOOK_FILE	LIB_TEXT "handbook"	/* handbook for new immorts      */
+#define CONTEXT_HELP_FILE LIB_TEXT "contexthelp"	/* context help for olc	*/
+#define VEHICLE_FILE   LIB_TEXT "vehicles"
 
 //#define IDEA_FILE     LIB_MISC"ideas"
 //#define TYPO_FILE       LIB_MISC"typos"
@@ -112,32 +112,32 @@
 #define IDEA_FILE	"/home/game/site/mud/ideas.html"
 #define TYPO_FILE	"/home/game/site/mud/typos.html"
 #define BUG_FILE	"/home/game/site/mud/bugs.html"
-#define TIME_FILE       LIB_MISC"time"	/* time file for saving time */
-#define HOST_LIST_FILE       LIB_MISC"host_list"	/* host lists file for meta server */
-#define MESS_FILE	LIB_MISC"messages"	/* damage messages               */
-#define SOCMESS_FILE_NEW	LIB_MISC"socials"	/* messgs for social acts        */
- #define SOCMESS_FILE	LIB_MISC"socials"  /* messages for social acts	*/
-#define XNAME_FILE	LIB_MISC"xnames"	/* invalid name substrings       */
-#define FOREST_FILE     LIB_MISC"forest"
-#define TP_FILE         LIB_MISC"tradepoints" /* Tradepoints File */
-#define GOLD_FILE       LIB_MISC"gold_count" /* File for tallying Gold across days */
+#define TIME_FILE       LIB_MISC "time"	/* time file for saving time */
+#define HOST_LIST_FILE       LIB_MISC "host_list"	/* host lists file for meta server */
+#define MESS_FILE	LIB_MISC "messages"	/* damage messages               */
+#define SOCMESS_FILE_NEW	LIB_MISC "socials"	/* messgs for social acts        */
+ #define SOCMESS_FILE	LIB_MISC "socials"  /* messages for social acts	*/
+#define XNAME_FILE	LIB_MISC "xnames"	/* invalid name substrings       */
+#define FOREST_FILE     LIB_MISC "forest"
+#define TP_FILE         LIB_MISC "tradepoints" /* Tradepoints File */
+#define GOLD_FILE       LIB_MISC "gold_count" /* File for tallying Gold across days */
 
 
-#define CONFIG_FILE	LIB_ETC"config"    /* OasisOLC * GAME CONFIG FL */
-#define PLAYER_FILE	LIB_ETC"players"	/* the player database           */
-#define MAIL_FILE	LIB_ETC"plrmail"	/* for the mudmail system        */
-#define NOTE_FILE       LIB_ETC"plrnotes.txt"
-#define IDEAS_FILE      LIB_ETC"plrideas.txt"
-#define NEWSNOTE_FILE       LIB_ETC"plrnews.txt"
-#define PENALTY_FILE    LIB_ETC"plrpenalty.txt"
-#define CHANGES_FILE    LIB_ETC"plrchanges.txt"
-#define BAN_FILE	LIB_ETC"badsites"	/* for the siteban system        */
-#define HCONTROL_FILE	LIB_ETC"hcontrol"	/* for the house system  */
-#define CLAN_FILE	LIB_ETC"clans"	/* clan file             */
-#define QIC_FILE	LIB_ETC"qicdb"	/* qic database          */
-#define CLAN_DIR	LIB_ETC"/clan/"
-#define CLAN_INDEX_FILE CLAN_DIR"clan_index"
-#define ASSEMBLIES_FILE LIB_ETC"assemblies" /* Assemblies engine 	*/
+#define CONFIG_FILE	LIB_ETC "config"    /* OasisOLC * GAME CONFIG FL */
+#define PLAYER_FILE	LIB_ETC "players"	/* the player database           */
+#define MAIL_FILE	LIB_ETC "plrmail"	/* for the mudmail system        */
+#define NOTE_FILE       LIB_ETC "plrnotes.txt"
+#define IDEAS_FILE      LIB_ETC "plrideas.txt"
+#define NEWSNOTE_FILE       LIB_ETC "plrnews.txt"
+#define PENALTY_FILE    LIB_ETC "plrpenalty.txt"
+#define CHANGES_FILE    LIB_ETC "plrchanges.txt"
+#define BAN_FILE	LIB_ETC "badsites"	/* for the siteban system        */
+#define HCONTROL_FILE	LIB_ETC "hcontrol"	/* for the house system  */
+#define CLAN_FILE	LIB_ETC "clans"	/* clan file             */
+#define QIC_FILE	LIB_ETC "qicdb"	/* qic database          */
+#define CLAN_DIR	LIB_ETC "/clan/"
+#define CLAN_INDEX_FILE CLAN_DIR "clan_index"
+#define ASSEMBLIES_FILE LIB_ETC "assemblies" /* Assemblies engine 	*/
 
 #define PLR_PREFIX	"pfiles"
 #define BACKUP_PREFIX	"pfiles/backup"

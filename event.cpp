@@ -19,7 +19,7 @@ void run_events2(void)
 
     in_event_handler = 1;
 
-    prev = NULL;
+    ::prev = NULL;
     for (temp = pending_events; temp; temp = prox) {
 	prox = temp->next;
 	temp->ticks_to_go--;
@@ -33,19 +33,19 @@ void run_events2(void)
 			      (long) temp->info);
 
 	    /* remove the event from the list. */
-	    if (!prev)
+	    if (!::prev)
 		pending_events = prox;
 	    else
-		prev->next = prox;
+		::prev->next = prox;
 	    free(temp);
 	} else if (temp->ticks_to_go == -1) {
-	    if (!prev)
+	    if (!::prev)
 		pending_events = prox;
 	    else
-		prev->next = prox;
+		::prev->next = prox;
 	    free(temp);
 	} else
-	    prev = temp;
+	    ::prev = temp;
     }
 
     in_event_handler = 0;
@@ -66,8 +66,8 @@ void add_event2(int delay, EVENT2(*func), void *causer, void *victim,
 
     current->next = pending_events;
     pending_events = current;
-    if (in_event_handler && !prev)
-	prev = pending_events;
+    if (in_event_handler && !::prev)
+	::prev = pending_events;
 };
 
 void clean_events2(void *pointer)

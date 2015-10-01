@@ -42,7 +42,7 @@ const char *skill_name(int num);
 char *matching_quote(char *p);
 char *str_str(char *cs, char *ct);
 extern struct time_info_data time_info;
-int is_empty ( zone_rnum zone_nr );
+int zone_is_empty ( zone_rnum zone_nr );
 
 /*
  *  General functions used by several triggers
@@ -145,7 +145,7 @@ void random_mtrigger(Character * ch) {
 
     for ( t = TRIGGERS ( SCRIPT ( ch ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, MTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) )
+	   ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) )
                 script_driver ( &ch, t, MOB_TRIGGER, TRIG_NEW );
     }
 }
@@ -517,7 +517,7 @@ void time_mtrigger(Character *ch) {
 
     for ( t = TRIGGERS ( SCRIPT ( ch ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, MTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) ) {
+	   ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) ) {
 		snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
 		add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
 		script_driver ( &ch, t, MOB_TRIGGER, TRIG_NEW );
@@ -740,7 +740,7 @@ void random_otrigger(obj_data * obj) {
 				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->worn_by ) );
 			else continue;
 
-			if ( is_empty ( zone ) )
+			if ( zone_is_empty ( zone ) )
 				continue;
 		}
                 script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
@@ -1247,7 +1247,7 @@ void time_otrigger(obj_data *obj) {
 				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->worn_by ) );
 			else continue;
 
-			if ( is_empty ( zone ) )
+			if ( zone_is_empty ( zone ) )
 				continue;
 		}
 		snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
@@ -1362,7 +1362,7 @@ void random_wtrigger(Room *room) {
 
     for ( t = TRIGGERS ( SCRIPT ( room ) ); t; t = t->next )
         if ( TRIGGER_CHECK ( t, WTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !is_empty ( GET_ROOM_ZONE ( room ) ) ) )
+	   ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( room ) ) ) )
                 script_driver ( &room, t, WLD_TRIGGER, TRIG_NEW );
 }
 
@@ -1601,7 +1601,7 @@ void time_wtrigger(Room *room) {
 
     for ( t = TRIGGERS ( SCRIPT ( room ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, WTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !is_empty ( GET_ROOM_ZONE ( room ) ) ) ) {
+	   ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( room ) ) ) ) {
 		snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
 		add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
 		script_driver ( &room, t, WLD_TRIGGER, TRIG_NEW );

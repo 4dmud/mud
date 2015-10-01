@@ -3353,7 +3353,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						bool colour_set = FALSE;
 						string desc = string ( o->short_description );
 						string new_colour = string ( colour_names [ GET_OBJ_COLOUR ( o ) ] );
-						uint pos = 0;
+						size_t pos = 0;
 
 						for ( int i = 1; i < NUM_COLOUR_NAMES; i++ )
 							if ( ( pos = desc.find ( colour_names[i] ) ) != string::npos )
@@ -3422,7 +3422,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						bool quality_set = FALSE;
 						string desc = string ( o->short_description );
 						string new_quality = string ( QUALITY_NAME ( o ) );
-						uint pos = 0;
+						size_t pos = 0;
 
 						for ( int i = 1; i < NUM_QUALITY_NAMES; i++ )
 							if ( ( pos = desc.find ( quality_names[i] ) ) != string::npos )

@@ -95,7 +95,7 @@ public:
         if (this) {
             stringstream s;
             s << i;
-            Output(s.str());
+            Output((string&)s.str());
         }
         return this;
     };

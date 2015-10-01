@@ -205,7 +205,7 @@ void assign_mobiles ( void );
 void assign_objects ( void );
 void assign_rooms ( void );
 void assign_the_shopkeepers ( void );
-int is_empty ( zone_rnum zone_nr );
+int zone_is_empty ( zone_rnum zone_nr );
 void reset_zone ( zone_rnum zone );
 int file_to_string ( const char *name, char *buf, size_t b_len );
 int file_to_string_alloc ( const char *name, char **buf );
@@ -4175,7 +4175,7 @@ void zone_update ( void )
 	/* this code is executed every 10 seconds (i.e. PULSE_ZONE) */
 	for ( update_u = reset_q.head; update_u; update_u = update_u->next )
 		if ( zone_table[update_u->zone_to_reset].reset_mode == 2 ||
-		        ( empty = is_empty ( update_u->zone_to_reset ) ) )
+		        ( empty = zone_is_empty ( update_u->zone_to_reset ) ) )
 		{
 			if ( empty && ZONE_FLAGGED ( update_u->zone_to_reset, ZONE_PURGE_EMPTY ) )
 			{
@@ -4900,7 +4900,7 @@ void reset_zone ( zone_rnum zone )
 
 
 /* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
-int is_empty ( zone_rnum zone_nr )
+int zone_is_empty ( zone_rnum zone_nr )
 {
 	Descriptor *i;
 
@@ -5007,7 +5007,7 @@ int store_to_char ( const char *name, Character *ch )
 			if ( rec_count < 5 )
 			{
 				fclose ( fl );
-#if defined(unix)
+#ifdef __unix__
 				/* decompress if .gz file exists */
 				snprintf ( filename, sizeof ( filename ), "%s/%c/%s%s", PLR_PREFIX, * ( *pvti ).name, ( *pvti ).name, ".bak.gz" );
 				if ( ( fl = fopen ( filename, "r" ) ) != NULL )

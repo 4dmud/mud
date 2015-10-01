@@ -200,7 +200,7 @@ int can_edit_zone ( Character *ch, zone_rnum zone );
 zone_rnum real_zone_by_thing ( room_vnum vznum );
 int genpreg ( void );
 
-int is_empty ( zone_rnum zone_nr );
+int zone_is_empty ( zone_rnum zone_nr );
 room_rnum find_target_room ( Character *ch, char *rawroomstr );
 /* function protos from this file */
 void process_eval ( void *go, struct script_data *sc, trig_data *trig,
