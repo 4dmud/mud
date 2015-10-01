@@ -498,6 +498,7 @@ void do_clan_enroll ( Character *ch, char *arg )
 	vict->save();
 	clan[clan_num].power += GET_LEVEL ( vict );
 	clan[clan_num].members++;
+	add_clan_member ( GET_NAME ( vict ), 1, clan_num );
 	vict->Send ( "You've been enrolled in the clan you chose!\r\n" );
 	ch->Send ( "Done.\r\n" );
 
@@ -558,7 +559,7 @@ void make_outcast (Character *ch) {
   struct affected_type af;
 
   af.type = SPELL_RESERVE;
-  af.expire = 60*24*14;  // two RL weeks 
+  af.expire = time(0) + 60*60*24*14;  // two RL weeks
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_OUTCAST;
@@ -1053,7 +1054,7 @@ void do_clan_apply ( Character *ch, char *arg )
 	}
 	if ( clan[clan_num].app_fee < 0 )
 	{
-		ch->Send ( "That clan is far to exclusive for you!!\r\n" );
+		ch->Send ( "That clan is far too exclusive for you!!\r\n" );
 		return;
 	}
 
