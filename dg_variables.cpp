@@ -2861,7 +2861,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 						{
 							num = atoi ( subfield );
-							if ( num <= 0 || num >= NUM_COLOUR_NAMES )
+							if ( num < 0 || num >= NUM_COLOUR_NAMES )
 								script_log ( "Trigger %d: colour value out of range", GET_TRIG_VNUM ( trig ) );
 							else GET_OBJ_COLOUR ( o ) = num;
 							strcpy ( str, "" );
@@ -3415,6 +3415,74 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							o->short_description = strdup ( desc.c_str() );
 						}
 						strcpy ( str, "" );
+					}
+
+					else if ( !strcasecmp ( field, "set_material_name" ) )
+					{
+						bool material_set = FALSE;
+						string desc = string ( o->short_description );
+						string new_material = string ( material_names [ GET_OBJ_MATERIAL ( o ) ] );
+						size_t pos = 0;
+
+						for ( int i = 0; i < NUM_MATERIAL_TYPES; i++ )
+							if ( ( pos = desc.find ( material_names[i] ) ) != string::npos )
+							{
+								if ( pos > 0 && desc[ pos - 1 ] != ' ' )
+									continue;
+								if ( i != GET_OBJ_MATERIAL ( o ) )
+									desc.replace ( pos, strlen ( material_names[i] ), new_material );
+								material_set = TRUE;
+								break;
+							}
+
+						if ( material_set )
+						{
+							if ( pos < 4 )
+							{
+								if ( tolower ( desc.substr ( 0, 2 ) ) == "a " && !strcmp ( AN ( new_material.c_str() ), "an" ) )
+									desc.insert ( 1, "n" );
+								else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " && !strcmp ( AN ( new_material.c_str() ), "a" ) )
+									desc.erase ( 1, 1 );
+							}
+						}
+						else
+						{
+							if ( tolower ( desc.substr ( 0, 2 ) ) == "a " )
+							{
+								pos = 2;
+								if ( !strcmp ( AN ( new_material.c_str() ), "an" ) )
+								{
+									desc.insert ( 1, "n" );
+									pos++;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 3 ) ) == "an " )
+							{
+								pos = 3;
+								if ( !strcmp ( AN ( new_material.c_str() ), "a" ) )
+								{
+									desc.erase ( 1, 1 );
+									pos--;
+								}
+							}
+							else if ( tolower ( desc.substr ( 0, 4 ) ) == "the " )
+								pos = 4;
+							else if ( tolower ( desc.substr ( 0, 15 ) ) == "some pieces of " )
+								pos = 15;
+							else if ( tolower ( desc.substr ( 0, 5 ) ) == "some " )
+								pos = 5;
+							else pos = 0;
+
+							desc.insert ( pos, new_material + " " );
+						}
+
+						if ( IS_UNIQUE ( o ) )
+							free_string ( &o->short_description );
+						else
+							SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+
+						o->short_description = strdup ( desc.c_str() );
+						*str = '\0';
 					}
 
 					else if ( !strcasecmp ( field, "set_quality_name" ) )
