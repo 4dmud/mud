@@ -337,7 +337,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch,
 		num = 0;
 
 		for ( j = list; j != i; j = j->next_content )
-			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) )
+			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
 			{
 				if ( strcmp ( j->short_description, i->short_description ) == 0 )
 					break;
@@ -350,7 +350,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch,
 
 
 		for ( j = i; j; j = j->next_content )
-			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) )
+			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
 			{
 				if ( strcmp ( j->short_description, i->short_description ) == 0 )
 					num++;
@@ -1461,7 +1461,7 @@ void look_at_room ( Character *ch, int ignore_brief )
 
 	/* now list characters & objects */
 	ch->Send ( "%s", CCYEL ( ch, C_NRM ) );
-	list_obj_to_char ( view_room->contents, ch, 0, FALSE );
+	list_obj_to_char ( view_room->contents, ch, SHOW_OBJ_LONG, FALSE );
 	ch->Send ( "%s", CBCYN ( ch, C_NRM ) );
 	list_char_to_char ( view_room->people, ch );
 	ch->Send ( "%s", CCNRM ( ch, C_NRM ) );
@@ -2865,7 +2865,7 @@ ACMD ( do_inventory )
 	    ( ( CAN_CARRY_N ( ch ) > 1 ) ? "s" : "" ),
 	    IS_CARRYING_W ( ch ), CAN_CARRY_W ( ch ) );
 
-	list_obj_to_char ( ch->carrying, ch, 1, TRUE );
+	list_obj_to_char ( ch->carrying, ch, SHOW_OBJ_SHORT, TRUE );
 }
 
 void list_damage ( Character *ch )
