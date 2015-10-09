@@ -52,46 +52,17 @@ const char * prof_name(int pro);
  * that used to be here.   -- Welcor
  */
 /* adds a variable with given name and value to trigger */
-void add_var ( struct trig_var_data **var_list,const char *name,const char *value, long id )
-{
-	struct trig_var_data *vd;
-
-	if ( strchr ( name, '.' ) )
-	{
-		log ( "add_var() : Attempt to add illegal var: %s", name );
-		return;
-	}
-
-	for ( vd = *var_list; vd && (( vd->context && vd->context != id ) || strcasecmp ( vd->name.c_str(), name )); vd = vd->next )
-		;
-
-	if ( vd )
-	{
-		vd->value.erase();
-	}
-	else
-	{
-		vd = new trig_var_data();
-		vd->name.assign ( name );
-		vd->next = *var_list;
-		if ( id != 0 )
-			vd->context = id;
-		*var_list = vd;
-	}
-	vd->value.assign ( value );
-}
-
 void add_var ( struct trig_var_data **var_list, string &name, string value, long id )
 {
 	struct trig_var_data *vd;
 
-	if ( strchr ( name.c_str(), '.' ) )
+	if ( name.find('.') != string::npos)
 	{
 		log ( "add_var() : Attempt to add illegal var: %s", name.c_str() );
 		return;
 	}
 
-	for ( vd = *var_list; vd && (( vd->context && vd->context != id ) || strcasecmp ( vd->name.c_str(), name.c_str() )); vd = vd->next )
+	for ( vd = *var_list; vd && (( vd->context && vd->context != id ) || vd->name != name); vd = vd->next )
 		;
 
 	if ( vd )
@@ -101,36 +72,20 @@ void add_var ( struct trig_var_data **var_list, string &name, string value, long
 	else if ( !vd )
 	{
 		vd = new trig_var_data();
-		vd->name.assign ( name );
+		vd->name = name;
 		vd->next = *var_list;
 		vd->context = id;
 		*var_list = vd;
 	}
-	vd->value.assign ( value );
+	vd->value = value;
 }
 
-
-/* perhaps not the best place for this, but I didn't want a new file
-char *skill_percent(Character *ch, char *skill)
+void add_var ( struct trig_var_data **var_list, char const* name, char const* value, long id )
 {
-  static char retval[16];
-  int skillnum;
-
-  skillnum = find_skill_num(skill);
-  if (skillnum<=0) return("unknown skill");
-
-  snprintf(retval, sizeof(retval), "%d", GET_SKILL(ch, skillnum));
-  return retval;
-}*/
-
-/*
-   search through all the persons items, including containers
-   and 0 if it doesnt exist, and greater than 0 if it does!
-   Jamie Nelson (mordecai@timespace.co.nz)
-   MUD -- 4dimensions.org:6000
-   Now also searches by vnum -- Welcor
-   Now returns the number of matching objects -- Welcor 02/04
-*/
+  string n = string(name);
+  string v = string(value);
+  add_var (var_list, n, v, id);
+}
 
 int item_in_list ( char *item, obj_data *list )
 {
@@ -691,7 +646,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					}
 					else if (time_info.moon == MOON_NEW_MOON){
                                                 snprintf ( str, slen, "new");
-					}	
+					}
 					else if (time_info.moon == MOON_WAXING_CRESCENT){
                                                 snprintf ( str, slen, "waxing crescent");
                                         }
@@ -976,8 +931,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 					else if ( !strcasecmp ( field, "carriedamount" ))
 					  snprintf ( str, slen, "%u", IS_CARRYING_N(c));
-					 
-				    
+
+
 					else if ( !strcasecmp ( field, "class" ) )
 						snprintf ( str, slen, "%s", simple_class_name ( c ) );
 
@@ -998,12 +953,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						snprintf ( str, slen, "%d", current_class_is_tier_num ( c ) );
 
 					}
-					else if ( !strcasecmp ( field, "clan" ) ) 
+					else if ( !strcasecmp ( field, "clan" ) )
                                         {
-                                                if ( subfield && *subfield ) 
+                                                if ( subfield && *subfield )
                                                 {
                                                    GET_CLAN ( c ) = atoi ( subfield );
-                                                }   
+                                                }
 						snprintf ( str, slen, "%d", IS_NPC ( c ) ? -1 : GET_CLAN ( c ) );
                                         }
 					else if ( !strcasecmp ( field, "clanrank" ) )
@@ -1316,10 +1271,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					    snprintf ( str, slen, "%d", GET_COND(c, FULL));
 					  }
 
-					      
 
 
-				       
+
+
 				case 'i':
 
 					if ( !strcasecmp ( field, "inventory" ) )
@@ -1500,7 +1455,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 			        case 'm':
 					if ( !strcasecmp ( field, "maxcarriedweight" ))
 					  snprintf ( str, slen, "%u", CAN_CARRY_W(c));
-				
+
 					else if ( !strcasecmp ( field, "maxcarriedamount" ))
 					  snprintf ( str, slen, "%u", CAN_CARRY_N(c));
 
@@ -3810,7 +3765,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					break;
 				case 'f':
 
-					if ( !strcasecmp ( field, "flag" ) ) 
+					if ( !strcasecmp ( field, "flag" ) )
 					{
 						if ( !subfield || !*subfield )
 						{
@@ -3823,44 +3778,44 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							if ( ROOM_FLAGGED ( r, ROOM_DEATH ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
+								snprintf ( str, slen, "0" );
+						}
 						else if ( !strcasecmp ( subfield, "godroom" ) )
 						{
 							if ( ROOM_FLAGGED ( r, ROOM_GODROOM ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
+								snprintf ( str, slen, "0" );
+						}
 						else if ( !strcasecmp ( subfield, "house" ) )
 						{
 							if ( ROOM_FLAGGED ( r, ROOM_HOUSE ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
+								snprintf ( str, slen, "0" );
+						}
 						else if ( !strcasecmp ( subfield, "nomob" ) )
 						{
 							if ( ROOM_FLAGGED ( r, ROOM_NOMOB ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
+								snprintf ( str, slen, "0" );
+						}
 						else if ( !strcasecmp ( subfield, "peaceful" ) )
 						{
 							if ( ROOM_FLAGGED ( r, ROOM_PEACEFUL ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
+								snprintf ( str, slen, "0" );
+						}
 						else if ( !strcasecmp ( subfield, "roleplay" ) )
 						{
 							if ( ROOM_FLAGGED ( r, ROOM_ROLEPLAY ) )
 								snprintf ( str, slen, "1" );
 							else
-								snprintf ( str, slen, "0" );				
-						} 
-						else 
+								snprintf ( str, slen, "0" );
+						}
+						else
 						{
 							*str = '\0';
 							script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'",
