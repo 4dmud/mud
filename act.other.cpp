@@ -1751,10 +1751,10 @@ ACMD ( do_file )
 	char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char *arg3;
-	size_t len = 0;
+	size_t pos, len = 0;
 	vector<string> entries;
 	string entry;
-	size_t pos;
+	bool show_all = FALSE;
 
 	struct file_struct
 	{
@@ -1786,7 +1786,8 @@ ACMD ( do_file )
 	if ( !*argument )
 	{
 		ch->Send ( "USAGE: file <option> <num lines>\r\n"
-			   "       file <bug|typo> fixed <line number>\r\n\r\n"
+			   "       file <bug|typo> fixed <line number>\r\n"
+			   "       file <bug|typo> [all] <num lines>\r\n\r\n"
 			   "File options:\r\n" );
 
 		for ( i = 1; fields[i].level; i++ )
@@ -1890,7 +1891,16 @@ ACMD ( do_file )
 		return;
 	}
 
-	if ( !*arg2 )
+	skip_spaces ( &arg3 );
+	if ( !strcmp ( arg2, "all" ) )
+	{
+		show_all = TRUE;
+		if ( !*arg3 )
+			req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
+		else
+			req_entries = MIN ( atoi ( arg3 ), (int) entries.size() );
+	}
+	else if ( !*arg2 )
 		req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
 	else
 		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
@@ -1899,6 +1909,9 @@ ACMD ( do_file )
 
 	for ( i = entries.size() - req_entries; i < entries.size(); ++i )
 	{
+		if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) && entries[i].find ( "(fixed)" ) != string::npos )
+			continue;
+
 		if ( entries[i].length() + 3 >= sizeof ( buf2 ) - len )
 			break;
 
