@@ -5364,58 +5364,34 @@ void sort_commands ( void )
 ACMD ( do_commandslike )
 {
 	int no, i, cmd_num;
-	int wizhelp = 0, socials = 0;
-	Character *vict = ch;
+	int socials = 0;
 	skip_spaces ( &argument );
 
 	if ( subcmd == SCMD_SOCIALS )
 		socials = 1;
-	else if ( subcmd == SCMD_WIZHELP )
-		wizhelp = 1;
 
-	ch->Send ( "The following %s%s are available to %s:\r\n",
-	           wizhelp ? "privileged " : "",
-	           socials ? "socials" : "commands",
-	           vict == ch ? "you" : GET_NAME ( vict ) );
-
-	/* cmd_num starts at 1, not 0, to remove 'RESERVED' *
-	   for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
-	   i = cmd_sort_info[cmd_num].sort_pos;
-	   if (complete_cmd_info[i].minimum_level >= 0 &&
-	   GET_LEVEL(vict) >= complete_cmd_info[i].minimum_level &&
-	   (complete_cmd_info[i].minimum_level >= LVL_HERO) == wizhelp &&
-	   (wizhelp || socials == cmd_sort_info[i].is_social)) {
-	   sprintf(buf + strlen(buf), "%-11s", complete_cmd_info[i].command);
-	   if (!(no % 7))
-	   strcat(buf, "\r\n");
-	   no++;
-	   }
-	   } */
+	ch->Send ( "The following %s are available to you:\r\n", socials ? "socials" : "commands" );
 
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for ( no = 1, cmd_num = 1; complete_cmd_info[cmd_sort_info[cmd_num]].command[0] != '\n'; cmd_num++ )
 	{
 		i = cmd_sort_info[cmd_num];
 
-		if ( complete_cmd_info[i].minimum_level < 0 || GET_LEVEL ( vict ) < complete_cmd_info[i].minimum_level )
+		if ( complete_cmd_info[i].minimum_level < 0 || GET_LEVEL ( ch ) < complete_cmd_info[i].minimum_level )
 			continue;
 
-		if ( ( complete_cmd_info[i].minimum_level >= LVL_IMMORT ) != wizhelp )
-			continue;
-
-		if ( !wizhelp && socials != ( complete_cmd_info[i].command_pointer == do_action || complete_cmd_info[i].command_pointer == do_insult ) )
+		if ( socials != ( complete_cmd_info[i].command_pointer == do_action || complete_cmd_info[i].command_pointer == do_insult ) )
 			continue;
 
 		if ( !isname ( argument,complete_cmd_info[i].command ) )
 			continue;
 
-		ch->Send ( "%-15s%s", complete_cmd_info[i].command,                no++ % 7 == 0 ? "\r\n" : "" );
+		ch->Send ( "%-15s%s", complete_cmd_info[i].command, no++ % 7 == 0 ? "\r\n" : "" );
 	}
 
 	if ( no % 7 != 1 )
 		ch->Send ( "\r\n" );
 }
-
 
 ACMD ( do_commands )
 {

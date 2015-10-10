@@ -857,6 +857,7 @@ const command_info cmd_info[] =
 	{ "smite"    , "smite", POS_DEAD    , do_smite    , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
 	{ "snoop"    , "sno" , POS_DEAD    , do_snoop    , LVL_SEN, 0, WIZ_IMPL_GRP },
 	{ "socials"  , "soc" , POS_DEAD    , do_commands , 0, SCMD_SOCIALS, 0 },
+	{ "socialslike"  , "socialsl" , POS_DEAD    , do_commandslike , 0, SCMD_SOCIALS, 0 },
 	{ "speedwalk", "sp"  , POS_STANDING, do_speedwalk    , 1, 0, 0 },
 	{ "spellinfo", "spell", POS_DEAD    , do_spellinfo    , 1, 0, 0 },
 	{ "split"    , "spl" , POS_SITTING , do_split    , 1, 0, 0 },
