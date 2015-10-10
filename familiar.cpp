@@ -293,7 +293,7 @@ void parse_rogue_commands(Character *ch) {
             case 1:
                 act("$n ducks, sidesteps and stabs you in the back!!", FALSE, ch, 0, master, TO_VICT);
                 act("$n ducks, sidesteps and stabs $M in the back!!", FALSE, ch, 0, master, TO_NOTVICT);
-                fe_solo_damage(ch, master, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), TYPE_UNDEFINED);
+                fe_solo_damage(ch, master, FTOI(dice(ch->mob_specials.damnodice,ch->mob_specials.damsizedice) * (GET_LEVEL(ch)*0.1)), MOB_BACKSTAB);
                 return;
             case 2:
             case 3:

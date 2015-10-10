@@ -2979,6 +2979,9 @@ int fe_after_damage ( Character* ch, Character* vict,
 
 		} */
 
+		if ( w_type == MOB_BACKSTAB && IS_NPC ( ch ) && !IS_NPC( vict ) )
+			partial = MIN ( partial, (int) ( 0.75 * GET_MAX_HIT ( vict ) ) );
+
 		reduce_quality ( ch, vict, partial, w_type, NULL );
 		alter_hit ( vict, partial );
 		update_pos ( vict );
@@ -3035,7 +3038,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 	  * dam_message. Otherwise, always send a dam_message.
 	  */
 
-	if ( w_type != TYPE_UNDEFINED )
+	if ( w_type != TYPE_UNDEFINED && w_type != MOB_BACKSTAB )
 	{
 		if ( IS_SPELL_CAST ( w_type ) || IS_SKILL ( w_type ) || IS_OTHERDAM ( w_type ) )
 			skill_message ( partial, ch, vict, w_type );
