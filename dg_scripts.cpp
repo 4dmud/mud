@@ -239,6 +239,7 @@ int process_return ( trig_data *trig, char *cmd );
 void process_unset ( struct script_data *sc, trig_data *trig, char *cmd );
 void process_remote ( struct script_data *sc, trig_data *trig, char *cmd );
 void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd );
+void process_restring ( script_data *sc, trig_data *trig, char *cmd );
 void process_global ( struct script_data *sc, trig_data *trig, char *cmd, long id );
 void process_context ( struct script_data *sc, trig_data *trig, char *cmd );
 
@@ -3186,6 +3187,122 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 }
 
+void process_restring ( script_data *sc, trig_data *trig, char *cmd )
+{
+	istringstream iss ( cmd );
+	string arg;
+	vector<string> args;
+	int id = 0;
+	obj_data *obj;
+
+	iss >> arg;
+	while ( iss >> arg )
+		args.push_back ( arg );
+
+	if ( args.size() < 3 )
+	{
+		script_log ( "Trigger [%d] %s, restring: missing argument in %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), cmd );
+		return;
+	}
+
+	iss.clear();
+	if ( args[0][0] == UID_CHAR )
+		iss.str ( args[0].substr ( 1, 10 ) );
+	else
+		iss.str ( args[0] );
+
+	iss >> id;
+	if ( ( obj = find_obj ( id ) ) == NULL )
+	{
+		script_log ( "Trigger [%d] %s, restring: invalid id", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ) );
+		return;
+	}
+
+	if ( args[1] == "name" )
+	{
+		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
+			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		else
+			free_string ( &obj->name );
+		arg = args[2];
+		for ( int i = 3; i < args.size(); ++i )
+			arg += " " + args[i];
+		obj->name = strdup ( arg.c_str() );
+	}
+	else if ( args[1] == "short" )
+	{
+		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
+			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		else
+			free_string ( &obj->short_description );
+		arg = args[2];
+		for ( int i = 3; i < args.size(); ++i )
+			arg += " " + args[i];
+		obj->short_description = strdup ( arg.c_str() );
+	}
+	else if ( args[1] == "long" )
+	{
+		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
+			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		else
+			free_string ( &obj->description );
+		arg = args[2];
+		arg[0] = UPPER ( arg[0] );
+		for ( int i = 3; i < args.size(); ++i )
+			arg += " " + args[i];
+		obj->description = strdup ( arg.c_str() );
+	}
+	else if ( args[1] == "extra" )
+	{
+		if ( args.size() == 3 )
+		{
+			script_log ( "Trigger [%d] %s, restring: missing argument in %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), cmd );
+			return;
+		}
+
+		arg = args[3];
+		for ( int i = 4; i < args.size(); ++i )
+			arg += " " + args[i];
+
+		extra_descr_data *ex_desc = obj->ex_description;
+		if ( ex_desc == NULL )
+		{
+			CREATE ( obj->ex_description, extra_descr_data, 1 );
+			obj->ex_description->keyword = strdup ( args[2].c_str() );
+			arg[0] = UPPER ( arg[0] );
+			obj->ex_description->description = strdup ( arg.c_str() );
+			obj->ex_description->next = NULL;
+			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+			return;
+		}
+		else for ( ; ex_desc; ex_desc = ex_desc->next )
+		{
+			if ( strstr ( ex_desc->keyword, args[2].c_str() ) )
+			{
+				if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
+					SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+				else
+					free_string ( &ex_desc->description );
+				arg[0] = UPPER ( arg[0] );
+				ex_desc->description = strdup ( arg.c_str() );
+				return;
+			}
+			else if ( ex_desc->next == NULL )
+			{
+				CREATE ( ex_desc->next, extra_descr_data, 1 );
+				ex_desc->next->keyword = strdup ( args[2].c_str() );
+				arg[0] = UPPER ( arg[0] );
+				ex_desc->next->description = strdup ( arg.c_str() );
+				ex_desc->next->next = NULL;
+				SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+				return;
+			}
+		}
+	}
+	else
+		script_log ( "Trigger [%d] %s, restring: unknown field %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), args[1].c_str() );
+}
+
 void delete_trailing_spaces(char* string) {
     if (!string || !*string) //null or empty string passed
 	return;
@@ -3651,6 +3768,9 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
 			else if ( !strn_cmp ( cmd, "rdelete ", 8 ) )
 				process_rdelete ( sc, trig, cmd );
+
+			else if ( !strn_cmp ( cmd, "restring ", 9 ) )
+				process_restring ( sc, trig, cmd );
 
 			else if ( !strn_cmp ( cmd, "return ", 7 ) )
 				ret_val = process_return ( trig, cmd );
