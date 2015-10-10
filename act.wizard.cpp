@@ -5895,7 +5895,7 @@ ACMD ( do_set )
 	Character *vict = NULL, *cbuf = NULL;
 	char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH],
 	val_arg[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-	int mode, len, player_i = 0, retval;
+	int mode, len, player_i = 0, retval, i, n;
 	char is_file = 0, is_player = 0;
 
 	half_chop ( argument, name, buf );
@@ -5918,7 +5918,17 @@ ACMD ( do_set )
 
 	if ( !*name || !*field )
 	{
-		send_to_char ( "Usage: set <victim> <field> <value>\r\n", ch );
+		ch->Send ( "Usage: set <victim> <field> <value>\r\n"
+					"Fields available to you:\r\n" );
+		for ( i = 0, n = 0; set_fields[ i ].cmd[ 0 ] != '\n'; ++i )
+			if ( GET_LEVEL ( ch ) >= set_fields[ i ].level )
+			{
+				ch->Send ( "%18s", set_fields[ i ].cmd );
+				if ( n++ % 4 == 3 )
+					ch->Send ( "\r\n" );
+			}
+		if ( n % 4 != 0 )
+			ch->Send ( "\r\n" );
 		return;
 	}
 
