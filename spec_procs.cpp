@@ -175,7 +175,7 @@ bool check_token(OBJ_DATA *obj);
 void sort_spells ( void );
 int compare_spells ( const void *x, const void *y );
 const char *how_good ( int percent );
-void list_skills ( Character *ch, int skillspell , Character *mob );
+void list_skills ( Character *ch, int skillspell , Character *mob, int levels = 0 );
 void npc_steal ( Character *ch, Character *victim );
 void sort_spell_data ( void );
 void sort_skill_data ( void );

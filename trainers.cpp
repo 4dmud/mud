@@ -216,13 +216,25 @@ bool can_teach_skill ( Character *mob, int i )
 	return FALSE;
 }
 
-void list_skills ( Character *ch, int skillspell, Character *mob )
+void list_skills ( Character *ch, int skillspell, Character *mob, int levels = 0 )
 {
-	int i, sortpos, h = 0, ending, sub;
+	int i, sortpos, h = 0, ending, sub, lvl_min = 0, lvl_max = LVL_IMPL;
 	int count= 0;
 	char buf[MAX_INPUT_LENGTH];
 	DYN_DEFINE;
 	*buf = 0;
+
+	if ( levels > 0 )
+	{
+		lvl_min = GET_LEVEL ( ch );
+		lvl_max = lvl_min + levels;
+	}
+	else if ( levels < 0 )
+	{
+		lvl_min = GET_LEVEL ( ch ) + levels;
+		lvl_max = GET_LEVEL ( ch );
+	}
+
 	if ( skillspell == 0 )
 	{
 		sortpos = start_skill +1; 
@@ -324,9 +336,12 @@ void list_skills ( Character *ch, int skillspell, Character *mob )
 				h = 1;
 			else
 				h = 0;
+
+			if ( spell_info[i].min_level < lvl_min || spell_info[i].min_level > lvl_max )
+				continue;
+
 			if ( knows_spell ( ch, i ) )
 			{
-
 
 				if ( GET_LEVEL ( ch ) == LVL_IMPL )
 				{
@@ -445,7 +460,9 @@ ACMD ( do_practice )
 	Character *mob;
 	int train_list = -1;
 	int remorts = MIN(REMORTS(ch), 50);
-        bool is_mikey = FALSE;
+	bool is_mikey = FALSE;
+	istringstream iss ( argument );
+	string arg;
 
 	if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
 		return;
@@ -475,25 +492,28 @@ ACMD ( do_practice )
 			mob_trainers.push_back ( p );
         }
 
-	if ( is_abbrev ( argument, "skills" ) )
+	iss >> arg;
+	if ( is_abbrev ( arg.c_str(), "skills" ) )
 		train_list = 0;
-	else if ( is_abbrev ( argument, "spells" ) )
+	else if ( is_abbrev ( arg.c_str(), "spells" ) )
 		train_list = 1;
-	else if ( is_abbrev ( argument, "subskills" ) )
+	else if ( is_abbrev ( arg.c_str(), "subskills" ) )
 		train_list = 2;
 
 	if ( train_list != -1 )
 	{
+		iss >> arg;
+
 		/** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
 		if ( train_list == 2 || mob_trainers.empty() )
 		{
-			list_skills ( ch, train_list, NULL );
+			list_skills ( ch, train_list, NULL, atoi ( arg.c_str() ) );
 			return;
 		}
 		else
 		{
 			for ( mti = mob_trainers.begin();mti != mob_trainers.end();mti++ )
-				list_skills ( ch, train_list, *mti );
+				list_skills ( ch, train_list, *mti, atoi ( arg.c_str() ) );
 		}
 		return;
 	}
