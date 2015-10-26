@@ -1095,13 +1095,8 @@ void script_trigger_check ( void )
 		{
 			sc = SCRIPT ( obj );
 			if ( IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_RANDOM ) )
-				tobjs[GET_ID ( obj ) ] = obj;
+				random_otrigger ( obj );
 		}
-	}
-	for ( olt_it i = tobjs.begin(); i != tobjs.end(); i++ )
-	{
-		obj = ( i->second );
-		random_otrigger ( obj );
 	}
 
 	for ( nr = 0; nr <= top_of_world; nr++ )
