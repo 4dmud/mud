@@ -3451,7 +3451,62 @@ void dg_letter_value ( struct script_data *sc, trig_data *trig, char *cmd )
 	add_var ( &GET_TRIG_VARS ( trig ), varname, junk, sc->context );
 }
 
+void insert_word ( void *go, script_data *sc, trig_data *trig, char *cmd, bool replace )
+{
+	/* cmd = insert_word <word> <position> <var> */
 
+	char argument[MAX_INPUT_LENGTH];
+	eval_expr ( strstr ( cmd, " " ), argument, sizeof ( argument ), go, sc, trig, trig->attach_type );
+
+	stringstream ss ( argument );
+	vector<string> args;
+	string arg;
+	while ( ss >> arg )
+		args.push_back ( arg );
+
+	if ( args.size() != 3 )
+	{
+		script_log ( "Trigger #%d : %s, wrong number of arguments", GET_TRIG_VNUM ( trig ), argument );
+		return;
+	}
+
+	int pos = atoi ( args[1].c_str() );
+
+	string sentence;
+	for ( trig_var_data *vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
+		if ( vd->name == args[2] )
+		{
+			sentence = vd->value;
+			break;
+		}
+
+	ss.clear();
+	ss.str ( sentence );
+	string result;
+
+	for ( int c = 1;; c++ )
+	{
+		if ( c >= pos || ss.eof() )
+		{
+			if ( pos <= 1 )
+				result = args[0];
+			else
+				result += " " + args[0];
+			if ( replace )
+				ss >> arg;
+			while ( ss >> arg )
+				result += " " + arg;
+			break;
+		}
+		ss >> arg;
+		if ( c == 1 )
+			result = arg;
+		else
+			result += " " + arg;
+	}
+
+	add_var ( &GET_TRIG_VARS ( trig ), args[2].c_str(), result.c_str(), sc->context );
+}
 
 /*  This is the core driver for scripts. */
 /*  Arguments:
@@ -3738,6 +3793,11 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			else if ( !strn_cmp ( cmd, "dg_letter ", 10 ) )
 				dg_letter_value ( sc, trig, cmd );
 
+			else if ( !strn_cmp ( cmd, "insert_word ", 12 ) )
+				insert_word ( go, sc, trig, cmd, FALSE );
+
+			else if ( !strn_cmp ( cmd, "replace_word ", 13 ) )
+				insert_word ( go, sc, trig, cmd, TRUE );
 
 			else if ( !strn_cmp ( cmd, "makeuid ", 8 ) )
 				makeuid_var ( go, sc, trig, type, cmd );

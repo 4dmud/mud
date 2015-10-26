@@ -317,7 +317,18 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
 			strcpy ( str, "0" );
 		return TRUE;
 	}
+	else if ( !str_cmp ( field, "word_count" ) )
+	{
+		stringstream ss ( vd->value );
+		string s;
+		int c = 0;
 
+		while ( ss >> s )
+			c++;
+
+		snprintf ( str, slen, "%d", c );
+		return TRUE;
+	}
 	return FALSE;
 }
 
