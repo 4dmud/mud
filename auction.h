@@ -2,6 +2,7 @@ struct auction_data {
   Character *seller;
   Character *bidder;
   struct obj_data *obj;
+  long obj_uid;
   long bid;
   int ticks;
   struct auction_data *next;

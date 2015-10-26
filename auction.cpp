@@ -43,6 +43,7 @@ bool can_auction_item(Character * ch, struct obj_data * obj);
 extern Character *character_list;
 
 void identify_object(Character *ch, OBJ_DATA *obj);
+obj_data *find_obj ( long n );
 /*
  * User tweakables.
  */
@@ -322,6 +323,7 @@ ACMD(do_auction)
     auc_add->seller = ch;
     auc_add->bid = (atoi(buf2) != 0 ? atoi(buf2) : 1);
     auc_add->obj = obj;
+    auc_add->obj_uid = GET_ID ( obj );
     auc_add->bidder = NULL;
     auc_add->next = NULL;
     if (n_auc)
@@ -383,14 +385,21 @@ void show_auction_status(Character *ch)
   int i = 1;
 
   ch->Send( "Items up for auction:\r\n");
+
+  if ( auction == NULL )
+  {
+    ch->Send( "  Nothing.\r\n");
+    return;
+  }
+
   for(auc = auction, i = 0; auc; auc = auc->next, i++)
-    if (auc->seller)
+    if ( find_obj ( auc->obj_uid ) == NULL )
+      ch->Send ( "%d. Object lost.\r\n", i );
+    else if (auc->seller)
       ch->Send( "%d. %s auctioning %s for %ld coin%sto %s.\r\n",
-    i, PERS(auc->seller, ch), auc->obj->short_description,
-    auc->bid, auc->bid == 1 ? " " : "s ",
-    auc->bidder ? GET_NAME(auc->bidder) : "no one");
-  else
-  ch->Send( "  Nothing.\r\n");
+        i, PERS(auc->seller, ch), auc->obj->short_description,
+        auc->bid, auc->bid == 1 ? " " : "s ",
+        auc->bidder ? GET_NAME(auc->bidder) : "no one");
 }
 
 int is_on_block(struct obj_data *obj)
