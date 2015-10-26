@@ -1531,7 +1531,9 @@ ACMD ( do_gen_tog )
 		{"You will no longer see players' full titles.\r\n",
 		 "You can now see players' full titles.\r\n"},
 		{"You will now see graphics.\r\n",
-		 "You will no longer see graphics.\r\n"}
+		 "You will no longer see graphics.\r\n"},
+		{"Lists are no longer reversed.\r\n",
+		 "Lists will now be reversed.\r\n"}
 
 	};
 
@@ -1727,6 +1729,9 @@ ACMD ( do_gen_tog )
 			break;
 		case SCMD_NOGRAPHICS:
 			result = PRF_TOG_CHK ( ch, PRF_NOGRAPHICS );
+			break;
+		case SCMD_REVERSELIST:
+			result = PRF_TOG_CHK ( ch, PRF_REVERSELIST );
 			break;
 		default:
 			log ( "SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd );

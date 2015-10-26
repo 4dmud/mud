@@ -805,6 +805,7 @@ const command_info cmd_info[] =
 	{ "restore"  , "resto", POS_DEAD    , do_restore  , LVL_IMMORT, 0, WIZ_HEAL_GRP },
 	{ "return"   , "ret" , POS_DEAD    , do_return   , 0, 0, 0 },
 	{ "redit"    , "redit", POS_DEAD    ,  do_oasis    , LVL_BUILDER, SCMD_OASIS_REDIT, WIZ_OLC_GRP},
+	{ "reverselist", "reversel", POS_DEAD, do_gen_tog, 0, SCMD_REVERSELIST, 0 },
 	{ "reward"     , "rewa" , POS_DEAD    , do_reward     , 0, 0, 0 },
 	{ "rinnate"  , "rinn" , POS_DEAD    , do_innate   , LVL_SEN, SCMD_RINNATE, WIZ_IMPL_GRP },
 	{ "rlist"    , "rli"  , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_RLIST, WIZ_OLC_GRP },

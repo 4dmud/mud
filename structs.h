@@ -671,7 +671,8 @@ class Room;
 #define PRF_RETIRED     	55    /* For retired clan leaders */
 #define PRF_NOTITLE    		56
 #define PRF_DEED_MASTER		57
-#define PRF_NOGRAPHICS          58
+#define PRF_NOGRAPHICS 		58
+#define PRF_REVERSELIST		59
 
 /* Descriptor flags */
 #define DESC_CANZLIB     (1 << 0)  /* Client says compression capable.   */

@@ -195,6 +195,7 @@ struct alias_data {
 #define SCMD_AUTOGROUP  50
 #define SCMD_NOTITLE1   51
 #define SCMD_NOGRAPHICS 52
+#define SCMD_REVERSELIST 53
 
 /* do_wizutil */
 #define SCMD_REROLL	0

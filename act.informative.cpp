@@ -325,12 +325,12 @@ void show_obj_modifiers ( struct obj_data *obj, Character *ch )
 
 }
 
-void list_obj_to_char ( struct obj_data *list, Character *ch,
-                        int mode, int show )
+void list_obj_to_char ( struct obj_data *list, Character *ch, int mode, int show )
 {
 	struct obj_data *i, *j;
-	bool found = FALSE;
+	bool found = FALSE, show_num = FALSE;
 	int num;
+	vector< pair<int, obj_data*> > objs;
 
 	for ( i = list; i; i = i->next_content )
 	{
@@ -362,14 +362,36 @@ void list_obj_to_char ( struct obj_data *list, Character *ch,
 		{
 			if ( ( GET_OBJ_TYPE ( i ) != ITEM_CONTAINER ) && ( GET_OBJ_TYPE ( i ) != ITEM_SPACEBIKE ) && ( num != 1 ) && ( mode!=SHOW_OBJ_LONG || !OBJ_FLAGGED ( i, ITEM_NODISPLAY ) || GET_LEVEL ( ch ) >LVL_IMMORT ) )
 			{
-				ch->Send ( "(%2i) ", num );
+				if ( !PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+					ch->Send ( "(%2i) ", num );
+				else
+					show_num = TRUE;
 			}
-			show_obj_to_char ( i, ch, mode );
+			if ( !PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+				show_obj_to_char ( i, ch, mode );
+			else
+			{
+				if ( show_num )
+					objs.push_back ( make_pair ( num, i ) );
+				else
+					objs.push_back ( make_pair ( -1, i ) );
+				show_num = FALSE;
+			}
 			found = TRUE;
 		}
 	}
 	if ( !found && show )
 		ch->Send ( " Nothing.\r\n" );
+
+	if ( found && PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+	{
+		for ( int x = objs.size() - 1; x >= 0; --x )
+		{
+			if ( objs[x].first > 1 )
+				ch->Send ( "(%2i) ", objs[x].first );
+			show_obj_to_char ( objs[x].second, ch, mode );
+		}
+	}
 }
 
 
@@ -927,6 +949,7 @@ void list_one_char ( Character *i, Character *ch )
 void list_char_to_char ( Character *list, Character *ch )
 {
 	Character *i;
+	vector< pair<Character*, bool> > chars;
 
 	for ( i = list; i; i = i->next_in_room )
 		if ( ( ch != i ) && ( i != NULL ) )
@@ -937,11 +960,30 @@ void list_char_to_char ( Character *list, Character *ch )
 				continue;
 
 			if ( CAN_SEE ( ch, i ) )
-				list_one_char ( i, ch );
+			{
+				if ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+					chars.push_back ( make_pair ( i, TRUE ) );
+				else
+					list_one_char ( i, ch );
+			}
 			else if ( IS_DARK ( IN_ROOM ( ch ) ) && !CAN_SEE_IN_DARK ( ch ) &&
 			          AFF_FLAGGED ( i, AFF_INFRAVISION ) )
-				*ch << "You see a pair of glowing red eyes looking your way.\r\n";
+			{
+				if ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+					chars.push_back ( make_pair ( i, FALSE ) );
+				else
+					ch->Send ( "You see a pair of glowing red eyes looking your way.\r\n" );
+			}
 		}
+
+	if ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
+	{
+		for ( int x = chars.size() - 1; x >= 0; --x )
+			if ( chars[x].second )
+				list_one_char ( chars[x].first, ch );
+			else
+				ch->Send ( "You see a pair of glowing red eyes looking your way.\r\n" );
+	}
 }
 
 
@@ -5277,7 +5319,8 @@ ACMD ( do_toggle )
 	    "      FishTally: %-3s    "
 	    "     NOTELEPORT: %-3s\r\n"
 	    " NoDisplayTitle: %-3s    "
-	    "     NoGraphics: %-3s\r\n",
+	    "     NoGraphics: %-3s    "
+	    "    ReverseList: %-3s\r\n",
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_DISPHP ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_BRIEF ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_SUMMONABLE ) ),
@@ -5325,7 +5368,8 @@ ACMD ( do_toggle )
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) ),
-	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ),
+	    ONOFF ( PRF_FLAGGED ( ch, PRF_REVERSELIST ) )
 	    );
 
 }
