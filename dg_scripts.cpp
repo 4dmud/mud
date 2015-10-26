@@ -2992,15 +2992,15 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 
 ACMD ( do_vdelete )
 {
-	struct trig_var_data *vd, *vd_prev=NULL;
-	struct script_data *sc_remote=NULL;
+	struct trig_var_data *vd, *vd_prev = NULL;
+	struct script_data *sc_remote = NULL;
 	char *var, *uid_p;
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	long uid;
 	//context;
-	Room *room;
-	Character *mob;
-	obj_data *obj;
+	Room *room = NULL;
+	Character *mob = NULL;
+	obj_data *obj = NULL;
 
 	argument = two_arguments ( argument, buf, buf2 );
 	var = buf;
@@ -3056,16 +3056,16 @@ ACMD ( do_vdelete )
 		return;
 	}
 
-	  if (*var == '*' || is_abbrev(var, "all")) {
-    struct trig_var_data *vd_next;
-    for (vd = sc_remote->global_vars; vd; vd = vd_next) {
-      vd_next = vd->next;
-      delete vd;
-    }
-    sc_remote->global_vars = NULL;
-    ch->Send ("All variables deleted from that id.\r\n");
-    return;
-  }
+	if (*var == '*' || is_abbrev(var, "all")) {
+		struct trig_var_data *vd_next;
+		for (vd = sc_remote->global_vars; vd; vd = vd_next) {
+			vd_next = vd->next;
+			delete vd;
+		}
+		sc_remote->global_vars = NULL;
+		ch->Send ("All variables deleted from that id.\r\n");
+		return;
+	}
 	
 	/* find the global */
 	for ( vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next )
