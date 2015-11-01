@@ -5842,6 +5842,7 @@ int perform_set ( Character *ch, Character *vict, int mode,
 
 
 	ch->Send ( "%s\r\n", CAP ( buf ) );
+	log ( "%s: %s", GET_NAME ( ch ), buf );
 	return ( 1 );
 }
 
