@@ -3202,7 +3202,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 
 	iss.clear();
 	if ( args[0][0] == UID_CHAR )
-		iss.str ( args[0].substr ( 1, 10 ) );
+		iss.str ( args[0].substr ( 1 ) );
 	else
 		iss.str ( args[0] );
 

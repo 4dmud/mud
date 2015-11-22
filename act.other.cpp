@@ -185,7 +185,7 @@ extern Character *ch_selling;
 extern const int xap_objs;
 
 /* extern procedures */
-void list_skills ( Character *ch, int skillspell, Character *mob, int levels = 0 );
+void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, string arg3 );
 void appear ( Character *ch );
 int perform_immort_vis ( Character *ch );
 SPECIAL ( shop_keeper );
@@ -674,12 +674,12 @@ ACMD ( do_not_here )
 
 ACMD ( do_prac_skills )
 {
-	list_skills ( ch, 0, NULL, atoi ( argument ) );
+	list_skills ( ch, 0, NULL, string ( argument ), "" );
 }
 
 ACMD ( do_prac_spells )
 {
-	list_skills ( ch, 1, NULL, atoi ( argument ) );
+	list_skills ( ch, 1, NULL, string ( argument ), "" );
 }
 
 
