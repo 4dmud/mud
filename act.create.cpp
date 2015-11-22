@@ -744,7 +744,7 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	final_focus->ex_description = new_descr;
 	if (GET_LEVEL ( ch ) < LVL_HERO)  
 	{
-        if ( number ( 0, 400 - ( GET_CHA ( ch ) + total_chance ( ch, SKILL_SING_WOOD ))))
+        if ( number ( 0, MAX ( 19, 219 - ( GET_CHA ( ch ) + total_chance ( ch, SKILL_SING_WOOD )))))
 		GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MINOR;
 	else
 		GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
