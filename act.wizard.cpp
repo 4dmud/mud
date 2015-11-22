@@ -6568,7 +6568,7 @@ ACMD ( do_statinnate )
 {
 	int count = 0, object,  bot=0, top=0, s = -1;
 	char buf[MAX_INPUT_LENGTH];
-	char buf1[MAX_INPUT_LENGTH];
+	string arg1, arg2;
 	DYN_DEFINE;
 	skip_spaces ( &argument );
 	if ( !*argument )
@@ -6576,18 +6576,18 @@ ACMD ( do_statinnate )
 		ch->Send ( "You must supply an argument.\r\nstatinnate <bottom vnum> <top vnum>\r\nstatinnate <name of innate>\r\n" );
 		return;
 	}
-	if ( !is_number ( argument ) )
+
+	stringstream iss ( argument );
+	iss >> arg1 >> arg2;
+
+	if ( !is_number ( arg1.c_str() ) )
 	{
-		s = spell_num ( argument );
+		s = spell_num ( arg1.c_str() );
 	}
 	else
 	{
-		two_arguments ( argument, buf, buf1 );
-		if ( is_number ( buf ) && is_number ( buf1 ) )
-		{
-			bot = atoi ( buf );
-			top = atoi ( buf1 );
-		}
+		bot = atoi ( arg1.c_str() );
+		top = atoi ( arg2.c_str() );
 	}
 	DYN_CREATE;
 	*dynbuf = 0;
