@@ -7256,6 +7256,14 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 				else
 					dam = 1.1;
 
+				if ( affected_by_spell ( ch, SPELL_MIND_FIRE ))
+				{
+					if ( affected_by_spell ( ch, SPELL_PROT_COLD ) && !(affected_by_spell ( ch, SPELL_PROT_FIRE )) )
+					{	dam += 1.0; ch->Send("+AntiCold "); }
+				}
+				else if ( affected_by_spell ( ch, SPELL_MIND_WATER ) || (affected_by_spell ( ch, SPELL_MIND_ICE )) )
+				{	dam *= 0.5; ch->Send("-ElementClash "); }
+
 				if ( hot )
 				{	dam += 0.5; ch->Send("+Hot "); }
 				else if ( cold )
