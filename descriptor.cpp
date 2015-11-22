@@ -68,7 +68,6 @@
 #include "descriptor.h"
 #include "linkedlist.h"
 
-
 extern struct txt_block *bufpool;  /* pool of large output buffers */
 extern int buf_largecount;       /* # of large buffers which exist */
 extern int buf_overflows;        /* # of overflows of output */
@@ -86,6 +85,49 @@ size_t Descriptor::Output(const char *txt, ...) {
     va_end(args);
 
     return left;
+}
+
+bool skip_char ( char c )
+{
+	return !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '\r' || c == '\n' );
+}
+
+void filter_ascii_art ( string& stxt )
+{
+	size_t i = 0,p;
+
+	/*
+	 * Ascii art: at least 6 consecutive non-alphanumeric characters
+	 * Removing 5 causes a problem with MXP
+	 * Only remove spaces if they're not leading or trailing
+     */
+
+	while ( i < stxt.length() )
+	{
+		if ( skip_char ( stxt[i] ) && stxt[i] != ' ' )
+		{
+			p = i + 1;
+			while ( p < stxt.length() && skip_char ( stxt[p] ) )
+				p++;
+
+			// keep color codes intact
+			if ( stxt[p - 1] == '{' && p < stxt.length() && stxt[p] == 'c' )
+				p--;
+
+			while ( p > i && stxt[p - 1] == ' ' )
+				p--;
+
+			if ( p - i >= 6 )
+				stxt.erase ( i, p - i );
+			else
+			{
+				if ( i == p )
+					i++;
+				else i = p;
+			}
+		}
+		else i++;
+	}
 }
 
 /* Add a new string to a player's output queue. */
@@ -185,6 +227,9 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
         buf_overflows++;
     }
 #endif
+
+	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+		filter_ascii_art ( stxt );
 
     /*
      * If we have enough space, just write to buffer and that's it! If the
@@ -504,8 +549,11 @@ size_t Descriptor::Output(string &i) {
          so this is just to make sure you have the room for this function. */
 
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
-
     }
+
+	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+		filter_ascii_art ( stxt );
+
     output += cstring(stxt).c_str();
     return output.size();
 }
@@ -523,8 +571,11 @@ size_t Descriptor::Output(string *i) {
          so this is just to make sure you have the room for this function. */
 
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
-
     }
+
+	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+		filter_ascii_art ( stxt );
+
     output += cstring(stxt).c_str();
     return output.size();
 }
@@ -542,8 +593,11 @@ size_t Descriptor::Output(stringstream &i) {
          so this is just to make sure you have the room for this function. */
 
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
-
     }
+
+	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+		filter_ascii_art ( stxt );
+
     output += cstring(stxt).c_str();
     return output.size();
   
