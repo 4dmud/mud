@@ -902,14 +902,14 @@ OCMD ( do_osetval )
 			GET_OBJ_VAL ( obj, position ) = new_value;
 		else if ( position == 8 )
 		{
-			GET_OBJ_QUALITY ( obj ) = IRANGE ( 2 * LOWEST_QUALITY, new_value, GET_OBJ_MAX_QUALITY ( obj ) );
+			GET_OBJ_QUALITY ( obj ) = IRANGE ( 0, new_value, GET_OBJ_MAX_QUALITY ( obj ) );
 			update_affects ( obj );
 		}
 		else if ( position < 14 )
 			GET_OBJ_VAL ( obj, position - 1 ) = new_value;
 		else if ( position == 14 )
 		{
-			GET_OBJ_MAX_QUALITY ( obj ) = IRANGE ( 2 * LOWEST_QUALITY, new_value, 100 - LOWEST_QUALITY );
+			GET_OBJ_MAX_QUALITY ( obj ) = IRANGE ( 0, new_value, 100 );
 			if ( GET_OBJ_QUALITY ( obj ) > GET_OBJ_MAX_QUALITY ( obj ) )
 				GET_OBJ_QUALITY ( obj ) = GET_OBJ_MAX_QUALITY ( obj );
 			update_affects ( obj );

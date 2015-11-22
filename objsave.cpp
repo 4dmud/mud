@@ -1313,12 +1313,12 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
   for ( i = 0; i < 8; ++i )
     if ( GET_OBJ_VAL ( obj, i ) != 0 )
       fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
-  if ( GET_OBJ_QUALITY ( obj ) > LOWEST_QUALITY )
+  if ( GET_OBJ_QUALITY ( obj ) > 0 )
       fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
   for ( i = 9; i < 14; ++i )
     if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
       fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
-  if ( GET_OBJ_MAX_QUALITY ( obj ) > LOWEST_QUALITY )
+  if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
     fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
 
   fprintf(fl, "$\n");

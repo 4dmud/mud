@@ -1181,12 +1181,12 @@ void oedit_disp_menu ( Descriptor *d )
 	for ( i = 0; i < 8; i++ )
 		if ( GET_OBJ_VAL ( obj, i ) != 0 )
 			d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i ), nrm );
-	if ( GET_OBJ_QUALITY ( obj ) > LOWEST_QUALITY )
+	if ( GET_OBJ_QUALITY ( obj ) > 0 )
 		d->Output ( "[8]:%s%.3f%s ", cyn, GET_OBJ_QUALITY ( obj ), nrm );
 	for ( i = 9; i < 14; i++ )
 		if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
 			d->Output ( "[%d]:%s%d%s ", i, cyn, GET_OBJ_VAL ( obj, i - 1 ), nrm );
-	if ( GET_OBJ_MAX_QUALITY ( obj ) > LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
 		d->Output ( "[14]:%s%.3f%s ", cyn, GET_OBJ_MAX_QUALITY ( obj ), nrm );
 
 	d->Output (
@@ -1974,7 +1974,7 @@ void oedit_parse ( Descriptor *d, char *arg )
 			return;
 
 		case OEDIT_CRAFTING_MAX_QUALITY:
-			GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), 100 - LOWEST_QUALITY );
+			GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) = IRANGE ( 0, atof ( arg ), 100 );
 			oedit_disp_crafting_quality_menu ( d );
 			return;
 
@@ -2010,8 +2010,8 @@ void oedit_parse ( Descriptor *d, char *arg )
 				    "Dyecount: %s%d%s   Origin: %s%s%s\r\n"
 					"Stage: %s%d%s Repairs: %s%d%s\r\n\r\n",
 				    nrm, cyn, colour_names [ GET_OBJ_COLOUR ( OLC_OBJ ( d ) ) ], nrm,
-				    cyn, GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : MAX_QUALITY_NAME ( OLC_OBJ ( d ) ), GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ), nrm,
-				    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) < LOWEST_QUALITY ? "none" : QUALITY_NAME ( OLC_OBJ ( d ) ), GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
+				    cyn, GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ) > 0 ? MAX_QUALITY_NAME ( OLC_OBJ ( d ) ) : "none", GET_OBJ_MAX_QUALITY ( OLC_OBJ ( d ) ), nrm,
+				    cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) > 0 ? QUALITY_NAME ( OLC_OBJ ( d ) ) : "none", GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
 				    cyn, material_name ( GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) ), nrm,
 				    cyn, GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ), nrm,
 				    cyn, origin_names [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,

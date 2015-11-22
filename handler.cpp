@@ -3098,7 +3098,7 @@ void update_affects ( struct obj_data *obj )
 
 	// You can only lose (or gain) positive stats, or negative AC. Every -1 AC counts as one stat.
 
-	if ( GET_OBJ_QUALITY ( obj ) < LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( obj ) < 0.1 )
 		return;
 
 	for ( i = 0; i < MAX_OBJ_AFFECT; ++i )

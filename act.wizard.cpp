@@ -1893,12 +1893,12 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	for ( i = 0; i < 8; ++i )
 		if ( GET_OBJ_VAL ( j, i ) != 0 )
 			ch->Send ( " [%d]:%d", i, GET_OBJ_VAL ( j, i ) );
-	if ( GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
 			ch->Send ( " [8]:%.3f", GET_OBJ_QUALITY ( j ) );
 	for ( i = 8; i < 13; ++i )
 		if ( GET_OBJ_VAL ( j, i ) != 0 )
 			ch->Send ( " [%d]:%d", i + 1, GET_OBJ_VAL ( j, i ) );
-	if ( GET_OBJ_MAX_QUALITY ( j ) > LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
 			ch->Send ( " [14]:%.3f", GET_OBJ_MAX_QUALITY ( j ) );
 	ch->Send ( "\r\n" );
 
@@ -1909,7 +1909,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 		else ch->Send ( "Colour: out of range\r\n" );
 	}
 
-	if ( GET_OBJ_QUALITY ( j ) > LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
 		ch->Send ( "Quality: %s (%.3f)\r\n", QUALITY_NAME ( j ), GET_OBJ_QUALITY ( j ) );
 
 	if ( GET_OBJ_DYECOUNT ( j ) != 0 )
@@ -1948,7 +1948,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 	if ( GET_OBJ_REPAIRS ( j ) != 0 )
 		ch->Send ( "Repairs: %d\r\n", GET_OBJ_REPAIRS ( j ) );
 
-	if ( GET_OBJ_MAX_QUALITY ( j ) > LOWEST_QUALITY )
+	if ( GET_OBJ_MAX_QUALITY ( j ) > 0 )
 		ch->Send ( "Max. quality: %s (%.3f)\r\n", MAX_QUALITY_NAME ( j ), GET_OBJ_MAX_QUALITY ( j ) );
 
 	/*

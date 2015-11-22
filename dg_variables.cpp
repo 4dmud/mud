@@ -3229,7 +3229,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					{
 						if ( subfield && *subfield )
 						{
-							GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atof ( subfield ), 100 - LOWEST_QUALITY );
+							GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 0, atof ( subfield ), 100 );
 							if ( GET_OBJ_QUALITY ( o ) > GET_OBJ_MAX_QUALITY ( o ) )
 								GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
 							update_affects ( o );
@@ -3311,7 +3311,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					if ( !strcasecmp ( field, "quality_value" ) )
 					{
 						if ( subfield && *subfield )
-							GET_OBJ_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atof ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
+							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, atof ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
 						update_affects ( o );
 						snprintf ( str, slen, "%d", (int) GET_OBJ_QUALITY ( o ) );
 					}
@@ -3320,17 +3320,25 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'r':
 					if ( !strcasecmp ( field, "repair" ) )
 					{
-						if ( subfield && *subfield && GET_OBJ_QUALITY ( o ) > LOWEST_QUALITY )
+						if ( subfield && *subfield )
 						{
 							num = atoi ( subfield );
-							if ( num < LOWEST_QUALITY )
-								GET_OBJ_QUALITY ( o ) = LOWEST_QUALITY * 2;
-							else if ( num > GET_OBJ_MAX_QUALITY ( o ) )
-								GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
-							else
-								GET_OBJ_QUALITY ( o ) = num;
-							update_affects ( o );
+							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, num, GET_OBJ_MAX_QUALITY ( o ) );
+							if ( GET_OBJ_TYPE ( o ) == ITEM_BODYBAG && GET_OBJ_QUALITY ( o ) >= 10 )
+							{
+								string shortdesc = string ( o->short_description );
+								size_t pos = shortdesc.find ( " is torn from use" );
+								if ( pos != string::npos )
+								{
+									if ( IS_UNIQUE ( o ) )
+										free_string ( &o->short_description );
+									else
+										SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+									o->short_description = strdup ( shortdesc.substr ( 0, pos ).c_str() );
+								}
+							}
 							GET_OBJ_REPAIRS ( o )++;
+							update_affects ( o );
 						}
 						*str = '\0';
 					}
@@ -3355,7 +3363,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 								o->orig_affected[ i ].location = o->affected[ i ].location;
 								o->orig_affected[ i ].modifier = num;
 							}
-						GET_OBJ_QUALITY ( o ) = 100 - LOWEST_QUALITY;
 						*str = '\0';
 					}
 
@@ -3622,12 +3629,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 									if ( num < 8 )
 										GET_OBJ_VAL ( o, num ) = atoi ( subfield );
 									else if ( num == 8 )
-										GET_OBJ_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atoi ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
+										GET_OBJ_QUALITY ( o ) = IRANGE ( 0, atoi ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
 									else if ( num < 14 )
 										GET_OBJ_VAL ( o, num - 1 ) = atoi ( subfield );
 									else if ( num == 14 )
 									{
-										GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 2 * LOWEST_QUALITY, atoi ( subfield ), 100 - LOWEST_QUALITY );
+										GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 0, atoi ( subfield ), 100 );
 										if ( GET_OBJ_QUALITY ( o ) > GET_OBJ_MAX_QUALITY ( o ) )
 											GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
 									}

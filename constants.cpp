@@ -413,14 +413,13 @@ const char *colour_names[] =
 
 const char *quality_names[] =
 {
-	"none",
 	"horrible",
 	"crappy",
 	"average",
 	"decent",
 	"good",
 	"excellent",
-	"magnificent"    // 7
+	"magnificent"    // 6
 };
 
 const char *origin_names[] =
@@ -1662,6 +1661,7 @@ const char *item_types[] =
 	"template",
 	"crafting base",
 	"radiation_proof",
+	"bodybag",
 	"\n"
 };
 

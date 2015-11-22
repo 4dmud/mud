@@ -423,7 +423,7 @@ struct reset_q_type {
 
 
 struct help_index_element {
-    char	*keywords;
+    char *keywords;
     char *entry;
     int min_level;
     int duplicate;

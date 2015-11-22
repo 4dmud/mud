@@ -2835,30 +2835,31 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
 	int area;
 
 	/* damage the weapon/focus of the attacker */
-	if ( IS_WEAPON ( w_type ) && ( weapon = GET_EQ ( ch, WEAR_WIELD ) ) != NULL && GET_OBJ_QUALITY ( weapon ) > LOWEST_QUALITY )
+	if ( IS_WEAPON ( w_type ) && ( weapon = GET_EQ ( ch, WEAR_WIELD ) ) != NULL && GET_OBJ_QUALITY ( weapon ) > 0 )
 	{
 		GET_OBJ_QUALITY ( weapon ) -= damage / 50000.0 * ( 1 + GET_OBJ_REPAIRS ( weapon ) / 5.0 );
-		if ( GET_OBJ_QUALITY ( weapon ) < LOWEST_QUALITY )
-			GET_OBJ_QUALITY ( weapon ) = 2 * LOWEST_QUALITY;
+		if ( GET_OBJ_QUALITY ( weapon ) < 0 )
+			GET_OBJ_QUALITY ( weapon ) = 0;
 		update_affects ( weapon );
 	}
-	else if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( focus = GET_EQ ( ch, WEAR_FOCUS ) ) != NULL && GET_OBJ_QUALITY ( focus ) > LOWEST_QUALITY )
+	else if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) && ( focus = GET_EQ ( ch, WEAR_FOCUS ) ) != NULL && GET_OBJ_QUALITY ( focus ) > 0 )
 	{
 		GET_OBJ_QUALITY ( focus ) -= damage / 50000.0 * ( 1 + GET_OBJ_REPAIRS ( focus ) / 5.0 );
-		if ( GET_OBJ_QUALITY ( focus ) < LOWEST_QUALITY )
-			GET_OBJ_QUALITY ( focus ) = 2 * LOWEST_QUALITY;
+		if ( GET_OBJ_QUALITY ( focus ) < 0 )
+			GET_OBJ_QUALITY ( focus ) = 0;
 		update_affects ( focus );
 	}
 
 	/* damage vict's shield if it blocked */
 	if ( shield )
 	{
-		if ( GET_OBJ_QUALITY ( shield ) < LOWEST_QUALITY )
-			return;
-		GET_OBJ_QUALITY ( shield ) -= damage / 25000.0 * ( 1 + GET_OBJ_REPAIRS ( shield ) / 5.0 );
-		if ( GET_OBJ_QUALITY ( shield ) < LOWEST_QUALITY )
-			GET_OBJ_QUALITY ( shield ) = 2 * LOWEST_QUALITY;
-		update_affects ( shield );
+		if ( GET_OBJ_QUALITY ( shield ) > 0 )
+		{
+			GET_OBJ_QUALITY ( shield ) -= damage / 25000.0 * ( 1 + GET_OBJ_REPAIRS ( shield ) / 5.0 );
+			if ( GET_OBJ_QUALITY ( shield ) < 0 )
+				GET_OBJ_QUALITY ( shield ) = 0;
+			update_affects ( shield );
+		}
 		return;
 	}
 
@@ -2882,11 +2883,11 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
 	for ( int part : loc[ area ] )
 	{
 		eq = GET_EQ ( vict, part );
-		if ( eq && GET_OBJ_QUALITY ( eq ) > LOWEST_QUALITY )
+		if ( eq && GET_OBJ_QUALITY ( eq ) > 0 )
 		{
 			GET_OBJ_QUALITY ( eq ) -= damage / 10000.0 * ( 1 + GET_OBJ_REPAIRS ( eq ) / 5.0 );
-			if ( GET_OBJ_QUALITY ( eq ) < LOWEST_QUALITY )
-				GET_OBJ_QUALITY ( eq ) = 2 * LOWEST_QUALITY;
+			if ( GET_OBJ_QUALITY ( eq ) < 0 )
+				GET_OBJ_QUALITY ( eq ) = 0;
 			update_affects ( eq );
 		}
 	}
@@ -5288,11 +5289,28 @@ void make_corpse ( Character *ch, Character *killer )
 		}
 
 		/* transfer character's inventory to the corpse */
+		bool use_bodybag = FALSE;
 		for ( o = ch->carrying; o != NULL; o = next_obj )
 		{
 			next_obj = o->next_content;
 			obj_from_char ( o );
 			obj_to_obj ( o, corpse );
+
+			/* subtract quality from bodybag if there is one */
+			if ( !use_bodybag && !IS_NPC ( ch ) && GET_OBJ_TYPE ( o ) == ITEM_BODYBAG && GET_OBJ_QUALITY ( o ) >= 10 )
+			{
+				GET_OBJ_QUALITY ( o ) = IRANGE ( 0, GET_OBJ_QUALITY ( o ) - 10, GET_OBJ_QUALITY ( o ) );
+				if ( GET_OBJ_QUALITY ( o ) < 10 )
+				{
+					string shortdesc = string ( o->short_description ) + " is torn from use";
+					if ( IS_UNIQUE ( o ) )
+						free_string ( &o->short_description );
+					else
+						SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+					o->short_description = strdup ( shortdesc.c_str() );
+				}
+				use_bodybag = TRUE;
+			}
 		}
 
 		/* transfer character's equipment to the corpse */
@@ -5342,7 +5360,11 @@ void make_corpse ( Character *ch, Character *killer )
 			//save_char(ch, 0);
 		}
 
-		obj_to_room ( corpse, IN_ROOM ( ch ) );
+		if ( use_bodybag )
+			obj_to_room ( corpse, world_vnum[ 1205 ] ); // put corpse in 1205. 4D Infirmary
+		else
+			obj_to_room ( corpse, IN_ROOM ( ch ) );
+
 		if ( !IS_NPC ( ch ) )
 		{
 			add_corpse_to_list ( corpse );

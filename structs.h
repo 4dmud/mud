@@ -1076,6 +1076,7 @@ class Room;
 #define ITEM_VEHICLE2           86 /* Horus new vehicle code */
 #define ITEM_TEMPLATE		87
 #define ITEM_RADIATION_PROOF	90
+#define ITEM_BODYBAG            91
 
 #define VIAL_NONE      		-1
 #define VIAL_HITP   		0
@@ -1405,12 +1406,11 @@ class Room;
 #define NUM_ELEM_TYPES          12
 #define MAX_HELPS               10000
 #define MAX_MAGIC_ITEMS         45
-#define NUM_COLOUR_NAMES	12
-#define NUM_QUALITY_NAMES	8
-#define LOWEST_QUALITY		1e-3
-#define QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
-#define MAX_QUALITY_NAME(obj)	quality_names[ (int)( GET_OBJ_MAX_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) + 1 ) ]
-#define NUM_ORIGIN_NAMES	125
+#define NUM_COLOUR_NAMES        12
+#define NUM_QUALITY_NAMES       7
+#define QUALITY_NAME(obj)       quality_names[ (int) ceil( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
+#define MAX_QUALITY_NAME(obj)   quality_names[ (int) ceil( GET_OBJ_MAX_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
+#define NUM_ORIGIN_NAMES        125
 
 
 /*

@@ -3117,31 +3117,28 @@ void display_help ( Character *ch, unsigned int i )
 		DYN_DEFINE;
 		DYN_CREATE;
 		*dynbuf = '\0';
-		DYN_RESIZE ( "----------------------------------------------------------------------------\r\n" );
+		if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			DYN_RESIZE ( "----------------------------------------------------------------------------\r\n" );
 		DYN_RESIZE ( help_table[i].keywords );
 		DYN_RESIZE ( "\r\n" );
-		DYN_RESIZE ( "----------------------------------------------------------------------------\r\n" );
+		if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			DYN_RESIZE ( "----------------------------------------------------------------------------\r\n" );
 		DYN_RESIZE ( help_table[i].entry );
+		DYN_RESIZE ( "\r\n" );
 		page_string ( ch->desc, dynbuf, DYN_BUFFER );
-		/*
-		ch->Send(
-		                   "----------------------------------------------------------------------------\r\n"
-		                   "%s\r\n"
-		                   "----------------------------------------------------------------------------\r\n"
-		                   "%s\r\n",
-		                   help_table[i].keywords, help_table[i].entry);
-		*/
 	}
 }
 
 void display_help_list ( Descriptor *d, char *keywords )
 {
-	unsigned int i, cnt = 0;
+	unsigned int i, cnt = 0, index;
 	char buf[MAX_STRING_LENGTH];
 	char buf1[1024];
-	//size_t len = 0;
-	strcpy ( buf, "  Help files similar\r\n---------------------------------------\r\n" );
-	//len = strlen ( buf );
+
+	if ( PRF_FLAGGED ( d->character, PRF_NOGRAPHICS ) )
+		strcpy ( buf, "  Help files similar\r\n---------------------------------------\r\n" );
+	else
+		strcpy ( buf, "  Help files similar\r\n" );
 
 	for ( i=0;i<top_of_helpt;i++ )
 	{
@@ -3150,45 +3147,36 @@ void display_help_list ( Descriptor *d, char *keywords )
 			snprintf ( buf1, sizeof ( buf1 ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
 			strlcat ( buf, buf1, sizeof ( buf ) );
 			cnt++;
+			index = i;
 		}
 		else if ( isname_full ( keywords, help_table[i].keywords ) )
 		{
 			snprintf ( buf1, sizeof ( buf1 ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
 			strlcat ( buf, buf1, sizeof ( buf ) );
 			cnt++;
+			index = i;
 		}
 	}
 
 	if ( cnt == 1 )
 	{
-		for ( i=0;i<top_of_helpt;i++ )
-		{
-			if ( is_number ( keywords ) && i == ( unsigned int ) atoi ( keywords ) )
-			{
-				display_help ( d->character, i );
-				return;
-			}
-			else if ( isname_full ( keywords, help_table[i].keywords ) )
-			{
-				display_help ( d->character, i );
-				return;
-			}
-		}
+		display_help ( d->character, index );
+		return;
 	}
+
 	if ( cnt == 0 )
 	{
 		d->Output ( "No help found on that topic, this has been logged please check for this help file in the future.\r\n" );
 		log ( "HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME ( d->character ), keywords );
 		return;
 	}
+
 	snprintf ( buf1, sizeof ( buf1 ),
 	           "\r\n\r\nPlease type the number of the help file to view it\r\nOr type anything else to cancel\r\nWhich Help file: " );
 	strlcat ( buf, buf1, sizeof ( buf ) );
 	page_string ( d, buf, 0 );
 	ORIG_STATE ( d ) = STATE ( d );
 	STATE ( d ) = CON_FIND_HELP;
-
-
 }
 
 ACMD ( do_help )
@@ -3273,7 +3261,8 @@ void skill_spell_help ( Character *ch, int spell )
 	if ( spell == TYPE_UNDEFINED )
 		return;
 
-	ch->Send ( "{cg----------------------------------------------------\r\n" );
+	if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+		ch->Send ( "{cg----------------------------------------------------\r\n" );
 	ch->Send ( "                Name: {cy%s{cg\r\n", skill_name ( spell ) );
 	if ( spell_info[spell].first_prereq != TYPE_UNDEFINED )
 		ch->Send ( "First Pre Requisite : {cy%s{cg\r\n", skill_name ( spell_info[spell].first_prereq ) );
@@ -3317,7 +3306,8 @@ void skill_spell_help ( Character *ch, int spell )
 
 	if ( knows_spell ( ch, spell ) )
 		ch->Send ( "{cCYou know this spell{cg\r\n" );
-	ch->Send ( "----------------------------------------------------{c0\r\n" );
+	if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+		ch->Send ( "----------------------------------------------------{c0\r\n" );
 }
 
 #if 0

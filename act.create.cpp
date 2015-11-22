@@ -867,7 +867,7 @@ ASKILL ( skill_sing_wood )
 		return 0;
 	}
 
-	ch->Send ( "You take a deap breath and clear your mind.\r\n" );
+	ch->Send ( "You take a deep breath and clear your mind.\r\n" );
 
 	msg = new message_event_obj ( ch, SKILL_SING_WOOD, THING_SKILL, 11, GET_ID ( o ), ( char * ) "" );
 	ch->AddMessageEvent(event_create ( message_event, msg, ( 1 RL_SEC ), EVENT_TYPE_MESSAGE ), ME_SINGWOOD);
