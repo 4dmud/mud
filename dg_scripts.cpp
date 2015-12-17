@@ -3010,48 +3010,67 @@ ACMD ( do_vdelete )
 
 	if ( !*buf || !*buf2 )
 	{
-		ch->Send ( "Usage: vdelete { <variablename>  | * all } <id>\r\n" );
+		ch->Send ( "Usage: vdelete < variable_name | * | all > < id | player_name >\r\n" );
 		return;
 	}
 
 
 	/* find the target script from the uid number */
-	uid = atoi ( buf2 );
-	if ( uid<=0 )
+	if ( is_number ( buf2 ) )
 	{
-		ch->Send ( "vdelete: illegal id specified.\r\n" );
-		return;
-	}
+		uid = atoi ( buf2 );
+		if ( uid<=0 )
+		{
+			ch->Send ( "vdelete: illegal id specified.\r\n" );
+			return;
+		}
 
-
-	if ( ( room = find_room ( uid ) ) )
-	{
-		sc_remote = SCRIPT ( room );
+		if ( ( room = find_room ( uid ) ) )
+		{
+			sc_remote = SCRIPT ( room );
+		}
+		else if ( ( mob = find_char ( uid ) ) )
+		{
+			sc_remote = SCRIPT ( mob );
+			//if ( !IS_NPC ( mob ) )
+			//	context = 0;
+		}
+		else if ( ( obj = find_obj ( uid ) ) )
+		{
+			sc_remote = SCRIPT ( obj );
+		}
+		else
+		{
+			ch->Send ( "vdelete: cannot resolve specified id.\r\n" );
+			return;
+		}
 	}
-	else if ( ( mob = find_char ( uid ) ) )
-	{
-		sc_remote = SCRIPT ( mob );
-		//if ( !IS_NPC ( mob ) )
-		//	context = 0;
-	}
-	else if ( ( obj = find_obj ( uid ) ) )
-	{
-		sc_remote = SCRIPT ( obj );
-	}
+	/* find the player name */
 	else
 	{
-		ch->Send ( "vdelete: cannot resolve specified id.\r\n" );
-		return;
+		if ( ( uid = pi.IdByName ( buf2 ) ) == -1 )
+		{
+			ch->Send ( "Player %s doesn't exist.\r\n", buf2 );
+			return;
+		}
+
+		if ( ! ( mob = find_char ( uid ) ) )
+		{
+			ch->Send ( "Player %s is offline.\r\n", buf2 );
+			return;
+		}
+		sc_remote = SCRIPT ( mob );
 	}
-	if ( sc_remote==NULL )
+
+	if ( !sc_remote )
 	{
-		ch->Send ( "That id represents no global variables.(1)\r\n" );
+		ch->Send ( "No script found.\r\n" );
 		return;
 	}
 
-	if ( sc_remote->global_vars==NULL )
+	if ( !sc_remote->global_vars )
 	{
-		ch->Send ( "That id represents no global variables.(2)\r\n" );
+		ch->Send ( "The script doesn't have any global variables.\r\n" );
 		return;
 	}
 
