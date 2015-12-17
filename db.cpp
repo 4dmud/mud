@@ -90,7 +90,7 @@ SPECIAL ( cleric );
 SPECIAL ( bank );
 SPECIAL ( pet_shops );
 void load_saved_artifacts ();
-
+void boot_player_shops ( string filename );
 
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
@@ -798,7 +798,7 @@ void boot_world ( void )
         LAST_PK = strdup("Nobody");
         CHAMPION = 0;
 
-	log ( "Seting mob stats..." );
+	log ( "Setting mob stats..." );
 	assign_mob_stats();
 
 	log ( "Loading mobs and generating index." );
@@ -840,7 +840,6 @@ void boot_world ( void )
 		log ( "Loading shops." );
 		index_boot ( DB_BOOT_SHP );
 	}
-
 }
 
 void free_objects()
@@ -1142,6 +1141,9 @@ void boot_db ( void )
 
 	log ( "Generating player index." );
 	pi.Build();
+
+	log ( "Loading playershops." );
+	boot_player_shops ( PLRSHOP_OWNERS_FILE );
 
 	log ( "Booting clans." );
 	init_clans();

@@ -1677,11 +1677,11 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 
 	if ( GET_ID ( obj ) == 0 )
 	{
-		log ( "extracting object that hasn't been initilised" );
+		log ( "extracting object that hasn't been initialised" );
 	}
 	if ( dead_obj.find ( GET_ID ( obj ) ) != dead_obj.end() )
 	{
-		log ( "Object %s atempted to be added to dead list twice!", obj->short_description );
+		log ( "Object %s attempted to be added to dead list twice!", obj->short_description );
 		return;
 	}
 	if ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )

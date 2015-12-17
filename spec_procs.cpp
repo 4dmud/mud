@@ -126,16 +126,21 @@
 #include "fight.h"
 #include "descriptor.h"
 #include "strutil.h"
+#include "shop.h"
 
 /*   external vars  */
 extern struct corpse_list_data *corpse_list;
 extern struct time_info_data time_info;
 extern int guild_info[][3];
 extern const char *cmd_door[];
-
+extern map < room_vnum, plrshop* > player_shop;
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
+void identify_object ( Character *ch, OBJ_DATA *obj );
+void save_player_shop ( string owner );
+void Crash_rentsave ( Character *ch, int cost );
+bool load_playershop_shopkeep ( room_vnum r, Character **shopkeep = NULL );
 void add_follower ( Character *ch, Character *leader );
 int get_pidx_from_name ( Character *ch );
 int find_door ( Character *ch, const char *type, char *dir,
@@ -168,6 +173,7 @@ void perform_wear(Character *ch, struct obj_data *obj, int where);
 ACMD ( do_drop );
 ACMD ( do_gen_door );
 ACMD ( do_say );
+ACMD ( do_tell );
 
 bool check_token(OBJ_DATA *obj);
 
@@ -2478,6 +2484,500 @@ SPECIAL(slave_collar)
       if (GET_OBJ_VAL(obj, 3) == 0) return FALSE;
       }
   return FALSE;
+}
+
+bool deduct_tokens ( Character *ch, gold_int price )
+{
+	// price of 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
+	int has_brass = GET_BRASS_TOKEN_COUNT ( ch );
+	has_brass += 5 * GET_BRONZE_TOKEN_COUNT ( ch );
+	has_brass += 50 * GET_SILVER_TOKEN_COUNT ( ch );
+	has_brass += 500 * GET_GOLD_TOKEN_COUNT ( ch );
+
+	gold_int price_brass = price % 10;
+	price /= 10;
+	price_brass += 5 * ( price % 10 );
+	price /= 10;
+	price_brass += 50 * ( price % 10 );
+	price /= 10;
+	price_brass += 500 * price;
+
+	if ( price_brass > has_brass )
+		return FALSE;
+
+	has_brass -= price_brass;
+	GET_GOLD_TOKEN_COUNT ( ch ) = has_brass / 500;
+	has_brass %= 500;
+	GET_SILVER_TOKEN_COUNT ( ch ) = has_brass / 50;
+	has_brass %= 50;
+	GET_BRONZE_TOKEN_COUNT ( ch ) = has_brass / 5;
+	has_brass %= 5;
+	GET_BRASS_TOKEN_COUNT ( ch ) = has_brass;
+	return TRUE;
+}
+
+SPECIAL ( playershop )
+{
+	int num;
+	const int imm_level = 55;
+	struct obj_data *obj = NULL;
+	room_vnum r = IN_ROOM ( ch )->number;
+	Character *shopkeep = NULL;
+
+	if ( IS_NPC ( ch ) )
+		return FALSE;
+
+	if ( load_playershop_shopkeep ( r, &shopkeep ) )
+		act ( "The shopkeep rushes in to serve another customer.\r\n", FALSE, ch, 0, 0, TO_ROOM );
+
+	vector<string> args;
+	string arg;
+	stringstream ss ( argument );
+	while ( ss >> arg )
+		args.push_back ( arg );
+
+	if ( CMD_IS ( "sell" ) )
+	{
+		if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
+		{
+			ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
+			return TRUE;
+		}
+
+		if ( args.size() < 3 )
+		{
+			ch->Send ( "Wrong number of arguments.\r\n"
+						"Usage: sell <obj name> <price> <currency>\r\n" );
+			return TRUE;
+		}
+
+		if ( !is_number ( args[1].c_str() ) )
+		{
+			ch->Send ( "Wrong price. Usage: sell <obj name> <price> <currency>\r\n" );
+			return TRUE;
+		}
+
+		if ( str_cmp ( args[2].c_str(), "g" ) && str_cmp ( args[2].c_str(), "TP" ) && str_cmp ( args[2].c_str(), "T" ) )
+		{
+			ch->Send ( "Unknown currency, use 'g' for gold, 't' for tokens, or 'tp' for tradepoints.\r\n" );
+			return TRUE;
+		}
+
+		char arg[MAX_INPUT_LENGTH];
+		strcpy ( arg, args[0].c_str() );
+		int dotmode = find_all_dots ( arg );
+		if ( dotmode == FIND_INDIV )
+		{
+			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
+			else
+			{
+				obj_from_char ( obj );
+				plrshop_item *p_item = new plrshop_item;
+				p_item->obj = obj;
+				p_item->price = abs ( atoi ( args[1].c_str() ) );
+				if ( !str_cmp ( args[2].c_str(), "g" ) )
+				{
+					p_item->currency = "g";
+					ch->Send ( "You put %s up for sale at %lld coins.\r\n", obj->short_description, p_item->price );
+				}
+				else if ( !str_cmp ( args[2].c_str(), "TP" ) )
+				{
+					p_item->currency = "TP";
+					ch->Send ( "You put %s up for sale at %lld tradepoints.\r\n", obj->short_description, p_item->price );
+				}
+				else
+				{
+					p_item->currency = "T";
+					ch->Send ( "You put %s up for sale at %lld tokens.\r\n", obj->short_description, p_item->price );
+				}
+				player_shop[r]->item.push_back ( p_item );
+				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+			}
+		}
+		else
+		{
+			if ( dotmode == FIND_ALLDOT && !*arg )
+			{
+				ch->Send ( "All of what?\r\n" );
+				return TRUE;
+			}
+
+			OBJ_DATA *next_obj;
+			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
+			else if ( !ch->carrying )
+				ch->Send ( "You don't seem to be holding anything.\r\n" );
+			else
+			{
+				int count = 0;
+				string currency;
+				if ( !str_cmp ( args[2].c_str(), "g" ) )
+					currency = "g";
+				else if ( !str_cmp ( args[2].c_str(), "TP" ) )
+					currency = "TP";
+				else
+					currency = "T";
+				for ( obj = ch->carrying; obj; obj = next_obj )
+				{
+					next_obj = obj->next_content;
+					if ( CAN_SEE_OBJ ( ch, obj ) && ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) )
+					{
+						plrshop_item *p_item = new plrshop_item;
+						p_item->obj = obj;
+						p_item->price = abs ( atoi ( args[1].c_str() ) );
+						p_item->currency = currency;
+						player_shop[r]->item.push_back ( p_item );
+						obj_from_char ( obj );
+						count++;
+					}
+				}
+				string times;
+				if ( count > 1 )
+					times = " (x" + to_string ( count ) + ")";
+				ch->Send ( "You put %s up for sale at %s %s%s.\r\n", player_shop[r]->item.back()->obj->short_description, args[1].c_str(), currency == "g" ? "coins" : currency == "T" ? "in tokens" : "tradepoints", times.c_str() );
+				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+			}
+		}
+		return TRUE;
+	}
+	else if ( is_abbrev ( cmd_arg, "cancel" ) )
+	{
+		if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
+			ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
+		else if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+			ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
+		else
+		{
+			num = atoi ( args[0].c_str() );
+			if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+				ch->Send ( "There is no item number %d.\r\n", num );
+			else if ( args.size() > 1 && !is_number ( args[1].c_str() ) )
+				ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
+			else
+			{
+				int num2 = num;
+				if ( args.size() > 1 )
+					num2 = atoi ( args[1].c_str() );
+
+				if ( num2 < num )
+					ch->Send ( "The last item number is smaller than the first.\r\n" );
+				else if ( num2 > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num2-1 ]->obj ) )
+					ch->Send ( "There is no item number %d.\r\n", num2 );
+				else
+				{
+					for ( int i = num; i <= num2; ++i )
+						if ( CAN_SEE_OBJ ( ch, player_shop[r]->item[ i-1 ]->obj ) )
+						{
+							ch->Send ( "You remove %s from your shop.\r\n", player_shop[r]->item[ i-1 ]->obj->short_description );
+							obj_to_char ( player_shop[r]->item [ i-1 ]->obj, ch );
+							delete player_shop[r]->item[ i-1 ];
+						}
+					player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1, player_shop[r]->item.begin() + num2 );
+					save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+				}
+			}
+		}
+		return TRUE;
+	}
+	else if ( CMD_IS ( "list" ) )
+	{
+		if ( player_shop[r]->item.size() == 0 )
+			ch->Send( "Currently, there is nothing for sale.\r\n");
+		else
+		{
+			DYN_DEFINE;
+			DYN_CREATE;
+			*dynbuf = 0;
+			char buf[MAX_INPUT_LENGTH];
+			DYN_RESIZE ( "{ccTo get information on any shop item, type: ID <item number>{c0\r\n" );
+			if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+			{
+				DYN_RESIZE ( " ##   Item                                                  Cost Currency\r\n"
+							"-------------------------------------------------------------------------\r\n" );
+			}
+
+			bool item_match, for_sale = FALSE;
+			for ( int i = 0; i < player_shop[r]->item.size(); ++i )
+			{
+				if ( !CAN_SEE_OBJ ( ch, player_shop[r]->item[i]->obj ) )
+					continue;
+
+				item_match = TRUE;
+				for ( auto &keyword : args )
+					if ( !strstr ( player_shop[r]->item[i]->obj->short_description, keyword.c_str() ) )
+					{
+						item_match = FALSE;
+						break;
+					}
+				if ( !item_match )
+					continue;
+
+				for_sale = TRUE;
+				snprintf ( buf, sizeof ( buf ), "{cy%3d{cg)  {cc%-53.53s{cG%11lld%3s{c0\r\n", i+1, player_shop[r]->item[i]->obj->short_description, player_shop[r]->item[i]->price, player_shop[r]->item[i]->currency.c_str() );
+				DYN_RESIZE ( buf );
+			}
+
+			if ( for_sale )
+				page_string ( ch->desc, dynbuf, DYN_BUFFER );
+			else
+				ch->Send ( "Presently, none of those are for sale.\r\n" );
+		}
+		return TRUE;
+	}
+	else if ( CMD_IS ( "identify" ) )
+	{
+		if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+		{
+			ch->Send ( "Usage: id <item number>\r\n" );
+			return TRUE;
+		}
+
+		num = atoi ( args[0].c_str() );
+		if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+			ch->Send ( "There is no item number %d.\r\n", num );
+		else
+			identify_object ( ch, player_shop[r]->item[ num-1 ]->obj );
+		return TRUE;
+	}
+	else if ( CMD_IS ( "buy" ) )
+	{
+		if ( GET_ID ( ch ) == player_shop[r]->owner_id )
+		{
+			ch->Send ( "You can remove an item by using cancel.\r\n" );
+			return TRUE;
+		}
+
+		if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+		{
+			ch->Send ( "Usage: buy <item number>\r\n" );
+			return TRUE;
+		}
+
+		num = atoi ( args[0].c_str() );
+		if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+		{
+			ch->Send ( "There is no item number %d.\r\n", num );
+			return TRUE;
+		}
+		plrshop_item *item = player_shop[r]->item[ num-1 ];
+
+		if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
+			ch->Send ( "Your hands are full.\r\n" );
+
+		else if ( GET_OBJ_WEIGHT ( item->obj ) + IS_CARRYING_W ( ch ) > CAN_CARRY_W ( ch ) )
+			ch->Send ( "You can't carry that much weight.\r\n" );
+
+		else if ( item->currency == "g" )
+		{
+			if ( item->price > GET_GOLD ( ch ) )
+				ch->Send ( "You do not have enough gold for that.\r\n" );
+			else
+			{
+				// add gold to owner's bank
+				bool owner_online = FALSE;
+				for ( Descriptor *d = descriptor_list; d; d = d->next )
+					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+					{
+						GET_BANK_GOLD ( d->character ) += item->price;
+						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld coins.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+						log ( "Playershop: %s earned %lld coins from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+						owner_online = TRUE;
+						break;
+					}
+
+				if ( !owner_online )
+				{
+					for ( int i = 0; i <= pi.TopOfTable(); i++ )
+					{
+						if ( *pi.NameByIndex ( i ) )
+						{
+							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+							{
+								Character *c = new Character ( FALSE );
+								c->loader = pi.IdByIndex ( i );
+								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+								{
+									if ( !c )
+									{
+										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+										ch->Send ( "Buying failed, please try again later.\r\n" );
+										delete c;
+										return TRUE;
+									}
+									log ( "Playershop: %s (offline) earned %lld coins from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+									c->desc = NULL;
+									char_to_room ( c, world_vnum[1200] );
+									store_to_char ( pi.NameByIndex ( i ), c );
+									GET_BANK_GOLD ( c ) += item->price;
+									char_to_store ( c );
+									c->loader = NOBODY;
+									extract_char ( c );
+								}
+								else
+									delete c;
+							}
+						}
+					}
+				}
+
+				// subtract gold from customer's on hand gold
+				GET_GOLD ( ch ) -= item->price;
+				char buf[MAX_INPUT_LENGTH];
+				snprintf ( buf, sizeof ( buf ), "%s That's %lld coins. Thanks, and come again.", GET_NAME ( ch ), item->price );
+				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+				obj_to_char ( item->obj, ch );
+				delete player_shop[r]->item[ num-1 ];
+				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+				return TRUE;
+			}
+		}
+		else if ( item->currency == "T" )
+		{
+			if ( !deduct_tokens ( ch, item->price ) )
+				ch->Send ( "You do not have enough tokens for that.\r\n" );
+			else
+			{
+				// add tokens to owner
+				bool owner_online = FALSE;
+				for ( Descriptor *d = descriptor_list; d; d = d->next )
+					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+					{
+						deduct_tokens ( d->character, -item->price );
+						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld in tokens.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+						log ( "Playershop: %s earned %lld in tokens from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+						owner_online = TRUE;
+						break;
+					}
+
+				if ( !owner_online )
+				{
+					for ( int i = 0; i <= pi.TopOfTable(); i++ )
+					{
+						if ( *pi.NameByIndex ( i ) )
+						{
+							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+							{
+								Character *c = new Character ( FALSE );
+								c->loader = pi.IdByIndex ( i );
+								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+								{
+									if ( !c )
+									{
+										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+										ch->Send ( "Buying failed, please try again later.\r\n" );
+										deduct_tokens ( ch, -item->price ); // refund
+										delete c;
+										return TRUE;
+									}
+									log ( "Playershop: %s (offline) earned %lld in tokens from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+									c->desc = NULL;
+									store_to_char ( pi.NameByIndex ( i ), c );
+									deduct_tokens ( c, -item->price );
+									pi.SetTokens ( i, GET_GOLD_TOKEN_COUNT ( c ) );
+									char_to_store ( c );
+									c->loader = NOBODY;
+									extract_char ( c );
+								}
+								else
+									delete c;
+							}
+						}
+					}
+				}
+
+				char buf[MAX_INPUT_LENGTH];
+				snprintf ( buf, sizeof ( buf ), "%s That's %lld in tokens. Thanks, and come again.", GET_NAME ( ch ), item->price );
+				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+				obj_to_char ( item->obj, ch );
+				delete player_shop[r]->item[ num-1 ];
+				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+				return TRUE;
+			}
+		}
+		else if ( item->currency == "TP" )
+		{
+			if ( item->price > TRADEPOINTS ( ch ) )
+				ch->Send ( "You do not have enough tradepoints for that.\r\n" );
+			else
+			{
+				// add tradepoints to owner
+				bool owner_online = FALSE;
+				for ( Descriptor *d = descriptor_list; d; d = d->next )
+					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+					{
+						TRADEPOINTS ( d->character ) += item->price;
+						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld TP.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+						log ( "Playershop: %s earned %lld TP from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+						owner_online = TRUE;
+						break;
+					}
+
+				if ( !owner_online )
+				{
+					for ( int i = 0; i <= pi.TopOfTable(); i++ )
+					{
+						if ( *pi.NameByIndex ( i ) )
+						{
+							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+							{
+								Character *c = new Character ( FALSE );
+								c->loader = pi.IdByIndex ( i );
+								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+								{
+									if ( !c )
+									{
+										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+										ch->Send ( "Buying failed, please try again later.\r\n" );
+										delete c;
+										return TRUE;
+									}
+									log ( "Playershop: %s (offline) earned %lld TP from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+									c->desc = NULL;
+									store_to_char ( pi.NameByIndex ( i ), c );
+									TRADEPOINTS ( c ) += item->price;
+									char_to_store ( c );
+									c->loader = NOBODY;
+									extract_char ( c );
+								}
+								else
+									delete c;
+							}
+						}
+					}
+				}
+
+				char buf[MAX_INPUT_LENGTH];
+				snprintf ( buf, sizeof ( buf ), "%s That's %lld tradepoint%s. Thanks, and come again.", GET_NAME ( ch ), item->price, item->price == 1 ? "" : "s" );
+				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+				obj_to_char ( item->obj, ch );
+				TRADEPOINTS ( ch ) -= item->price;
+				delete player_shop[r]->item[ num-1 ];
+				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+				return TRUE;
+			}
+		}
+		else
+			log ( "SYSERR: playershop item at room %d has unknown currency %s", r, player_shop[r]->item[ num-1 ]->currency.c_str() );
+
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void remote_rank ( Character* ch, int hof_rank, int middleman_vnum )

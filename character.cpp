@@ -1047,7 +1047,7 @@ Character *Character::assign ( Character *b )
 		}
 		else
 		{
-			memcpy ( player_specials, b->player_specials, sizeof ( b->player_specials ) );
+			memcpy ( player_specials, b->player_specials, sizeof ( player_special_data ) );
 		}
 	}
 

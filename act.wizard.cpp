@@ -330,6 +330,7 @@
 #include "strutil.h"
 //#include "dlib/threads.h"
 #include "compressor.h"
+#include "shop.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -347,6 +348,7 @@ extern socket_t mother_desc;
 extern ush_int port;
 extern map<mob_vnum, Character *> mob_proto;
 extern struct obj_data *obj_proto;
+extern map < room_vnum, plrshop* > player_shop;
 
 /* for chars */
 extern char *credits;
@@ -364,6 +366,9 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+SPECIAL ( playershop );
+bool load_playershop_shopkeep ( room_vnum r, Character **shopkeep = NULL );
+void save_player_shop (string owner );
 void parse_train_group(Character *ch, Character *vict,char *val_arg);
 int togglebody ( Character *ch, int flag );
 int has_body ( Character *ch, int flag );
@@ -1561,6 +1566,9 @@ void do_stat_room ( Character *ch )
 	sprintbitarray ( rm->room_flags, room_bits, RF_ARRAY_MAX, buf2, sizeof ( buf2 ) );
 	ch->Send ( "SpecProc: %s, Flags: %s\r\n",
 	           ( rm->func == NULL ) ? "None" : "Exists", buf2 );
+
+	if (rm->func == playershop )
+		ch->Send ( "Playershop owned by %s.\r\n", pi.NameById ( player_shop[ rm->number ]->owner_id ) );
 
 	ch->Send ( "Description:\r\n%s",
 	           rm->HasDesc() ? rm->GetDescription() : "  None.\r\n" );
@@ -8159,4 +8167,159 @@ ACMD ( do_searchroomflags )
 		page_string ( ch->desc, dynbuf, DYN_BUFFER );
 	else
 		ch->Send ( "Nothing found.\r\n" );
+}
+
+ACMD ( do_plrshop )
+{
+	vector<string> args;
+	string arg, name;
+	long id;
+	char shop_filename[1024];
+
+	if ( !*argument )
+	{
+		ch->Send ( "Usage:\r\n"
+					"plrshop create <player name> <room vnum> <mob vnum>\r\n"
+					"plrshop delete <room vnum>\r\n"
+					"plrshop list\r\n" );
+		return;
+	}
+
+	stringstream ss ( argument );
+	while ( ss >> arg )
+		args.push_back ( arg );
+
+	if ( is_abbrev ( args[0].c_str(), "create" ) )
+	{
+		if ( args.size() != 4 )
+		{
+			ch->Send ( "Wrong number of arguments.\r\n"
+						"Usage: plrshop create <player name> <room vnum> <mob vnum>\r\n" );
+			return;
+		}
+
+		name = args[1];
+		if ( ( id = pi.IdByName ( name.c_str() ) ) == -1 )
+		{
+			ch->Send ( "There is no player called %s.\r\n", name.c_str() );
+			return;
+		}
+
+		room_vnum r = atoi ( args[2].c_str() );
+		if ( r < 0 || r >= world_vnum.size() || world_vnum[r] == NULL )
+		{
+			ch->Send ( "There is no room with vnum %d.\r\n", r );
+			return;
+		}
+
+		if ( player_shop.find ( r ) != player_shop.end() )
+		{
+			ch->Send ( "There's already a playershop at room %d.\r\n", r );
+			return;
+		}
+
+		mob_vnum m = atoi ( args[3].c_str() );
+		if ( !MobProtoExists ( m ) )
+		{
+			ch->Send ( "There is no mob with vnum %d.\r\n", m );
+			return;
+		}
+
+		bool new_owner = TRUE;
+		for ( auto &p : player_shop )
+			if ( p.second->owner_id == id )
+			{
+				new_owner = FALSE;
+				break;
+			}
+
+		// add new owner name and shop file
+		get_filename ( name.c_str(), shop_filename, PLRSHOP_FILE );
+		ofstream file_shop;
+		if ( new_owner )
+		{
+			ofstream file_owners ( PLRSHOP_OWNERS_FILE, ios_base::app );
+			if ( file_owners.fail() )
+				log ( "SYSERR: Couldn't write to %s", PLRSHOP_OWNERS_FILE );
+			else
+			{
+				if ( file_owners.tellp() > 0 )
+					file_owners << endl;
+				file_owners << name;
+			}
+			file_owners.close();
+
+			file_shop.open ( shop_filename );
+		}
+		else
+			file_shop.open ( shop_filename, ios_base::app );
+
+		file_shop << r << endl << m << endl << "end_of_shop";
+		file_shop.close();
+
+		struct plrshop *pshop = new plrshop;
+		pshop->owner_id = id;
+		pshop->shop_room = r;
+		pshop->shopkeep = m;
+		player_shop[r] = pshop;
+		world_vnum[r]->func = playershop;
+		load_playershop_shopkeep ( r );
+
+		log ( "%s created a playershop for %s at room %d with shopkeep %d", GET_NAME ( ch ), name.c_str(), r, m );
+		ch->Send ( "You create a playershop for %s at room %d with shopkeep %d.\r\n", name.c_str(), r, m );
+	}
+	else if ( is_abbrev ( args[0].c_str(), "delete" ) )
+	{
+		if ( args.size() != 2 )
+		{
+			ch->Send ( "Wrong number of arguments.\r\n"
+						"Usage: plrshop delete <room vnum>\r\n" );
+			return;
+		}
+
+		room_vnum r = atoi ( args[1].c_str() );
+		if ( r < 0 || r >= world_vnum.size() || world_vnum[r] == NULL )
+		{
+			ch->Send ( "Room %d does not exist.\r\n", r );
+			return;
+		}
+
+		if ( player_shop.find ( r ) == player_shop.end() )
+		{
+			ch->Send ( "There is no playershop at room %d.\r\n", r );
+			return;
+		}
+
+		name = string ( pi.NameById ( player_shop[r]->owner_id ) );
+		world_vnum[r]->func = NULL;
+		for ( auto &i : player_shop[r]->item )
+			extract_obj ( i->obj );
+		delete player_shop[r];
+		player_shop.erase ( r );
+		save_player_shop ( name );
+		log ( "%s deleted %s's playershop at room %d", GET_NAME ( ch ), name.c_str(), r );
+		ch->Send ( "You delete %s's playershop at room %d.\r\n", name.c_str(), r );
+	}
+	else if ( is_abbrev ( args[0].c_str(), "list" ) )
+	{
+		DYN_DEFINE;
+		DYN_CREATE;
+		*dynbuf = 0;
+		char buf[MAX_INPUT_LENGTH];
+		int i = 1;
+		DYN_RESIZE ( "Playershops:\r\n" );
+		for ( auto &p : player_shop )
+		{
+			snprintf ( buf, sizeof ( buf ), "%d. Owner: %s, Room: [%d] %s, Shopkeep: [%d] %s\r\n", i++, pi.NameById ( p.second->owner_id ), p.second->shop_room, world_vnum[p.second->shop_room]->name, p.second->shopkeep, GET_NAME ( mob_proto[p.second->shopkeep] ) );
+			DYN_RESIZE ( buf );
+		}
+		page_string ( ch->desc, dynbuf, DYN_BUFFER );
+	}
+	else
+		ch->Send ( "Usage:\r\n"
+					"plrshop create <player name> <room vnum> <mob vnum>\r\n"
+					"plrshop delete <room vnum>\r\n"
+					"plrshop list\r\n" );
+
+	return;
 }

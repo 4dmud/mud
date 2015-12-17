@@ -8,7 +8,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-
+void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ );
 extern struct shop_data *shop_index;
 struct shop_buy_data {
     int type;
@@ -44,6 +44,23 @@ struct shop_data {
      SPECIAL(*func);		/* Secondary spec_proc for shopkeeper   */
 };
 
+struct plrshop_item {
+	obj_data* obj;
+	gold_int price; // for tokens, price 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
+	string currency; // "g" = on hand gold, "T" = tokens, "TP" = tradepoints
+};
+
+struct plrshop {
+	long owner_id;
+	mob_vnum shopkeep;
+	room_vnum shop_room;
+	vector<plrshop_item*> item;
+
+	~plrshop() {
+        for ( auto &i : item )
+            delete i;
+	}
+};
 
 #define MAX_TRADE	5	/* List maximums for compatibility      */
 #define MAX_PROD	5	/*      with shops before v3.0          */

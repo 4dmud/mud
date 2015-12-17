@@ -1732,7 +1732,7 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   }
   else if (nr < NOTHING)
   {
-    log("read_one_item : Loading item that has negitive vnum: %d", nr);
+    log("read_one_item : Loading item that has negative vnum: %d", nr);
     return NULL;
   }
   else

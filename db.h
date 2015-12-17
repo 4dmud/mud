@@ -31,6 +31,9 @@
 #define LIB_HOUSE	":house:"
 #define LIB_PLRVARS	":plrvars:"
 #define SLASH		":"
+#define LIB_PLRALIAS ":plralias:"
+#define LIB_PLRPOOFS ":plrpoofs:"
+#define LIB_PLRSHOPS ":plrshops:"
 #elif defined(CIRCLE_AMIGA) || defined(CIRCLE_UNIX) || defined(CIRCLE_WINDOWS) || defined(CIRCLE_ACORN)
 #define LIB_WORLD	"world/"
 #define LIB_TEXT	"text/"
@@ -44,6 +47,7 @@
 #define SLASH		"/"
 #define LIB_PLRALIAS    "plralias/"
 #define LIB_PLRPOOFS    "plrpoofs/"
+#define LIB_PLRSHOPS    "plrshops/"
 #else
 #error "Unknown path components."
 #endif
@@ -105,6 +109,7 @@
 #define HANDBOOK_FILE	LIB_TEXT "handbook"	/* handbook for new immorts      */
 #define CONTEXT_HELP_FILE LIB_TEXT "contexthelp"	/* context help for olc	*/
 #define VEHICLE_FILE   LIB_TEXT "vehicles"
+#define PLRSHOP_OWNERS_FILE	LIB_PLRSHOPS "playershops"
 
 //#define IDEA_FILE     LIB_MISC"ideas"
 //#define TYPO_FILE       LIB_MISC"typos"

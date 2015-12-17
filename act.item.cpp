@@ -2113,6 +2113,7 @@ ACMD ( do_give )
 	{
 		amount = atol ( arg );
 		argument = one_argument ( argument, arg );
+		skip_spaces ( &argument );
 		if ( !str_cmp ( "coins", arg ) || !str_cmp ( "coin", arg ) )
 		{
 			one_argument ( argument, arg );
@@ -2137,8 +2138,7 @@ ACMD ( do_give )
 			{
 				while ( obj && amount-- )
 				{
-					next_obj =
-					    get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
+					next_obj = get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
 					perform_give ( ch, vict, obj );
 					obj = next_obj;
 				}
@@ -2155,8 +2155,7 @@ ACMD ( do_give )
 		{
 			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
 			{
-				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ),
-				           arg );
+				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
 			}
 			else
 				perform_give ( ch, vict, obj );
@@ -2174,8 +2173,7 @@ ACMD ( do_give )
 				for ( obj = ch->carrying; obj; obj = next_obj )
 				{
 					next_obj = obj->next_content;
-					if ( CAN_SEE_OBJ ( ch, obj ) &&
-					        ( ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) ) )
+					if ( CAN_SEE_OBJ ( ch, obj ) && ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) )
 						perform_give ( ch, vict, obj );
 				}
 		}

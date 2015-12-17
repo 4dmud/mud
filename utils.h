@@ -339,6 +339,7 @@ extern const struct race_data races[NUM_RACES];
 #define IGNORE_FILE		6
 #define ASCII_OBJ_FILES         7
 #define LOCKER_FILES             8
+#define PLRSHOP_FILE	9
 
 /* breadth-first searching */
 #define BFS_ERROR		(-1)
@@ -885,7 +886,7 @@ int current_class_is_tier_num ( Character *ch );
  * If using signed types, NOTHING will catch the majority of bad accesses.
  */
 #define VALID_OBJ_RNUM(obj)	(GET_OBJ_RNUM(obj) <= top_of_objt && \
-				 GET_OBJ_RNUM(obj) != NOTHING)
+				 GET_OBJ_RNUM(obj) != NOTHING && GET_OBJ_RNUM(obj) >= 0)
 
 #define GET_OBJ_WAS(obj)  	((obj)->was_vnum)
 #define GET_OBJ_VROOM(obj)      ((obj)->vroom)

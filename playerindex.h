@@ -127,46 +127,46 @@ class PlayerIndex
 		}
 
 		/** Name **/
-		char *NameByIndex ( int &idx )
+		char *NameByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in NameByIndex" ) );
 			return player_table[idx].name;
 		}
 		/** ID **/
-		long IdByIndex ( int &idx )
+		long IdByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in IdByIndex" ) );
 			return player_table[idx].id;
 		}
-		void SetId ( int &idx, long i )
+		void SetId ( int idx, long i )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetId" ) );
 			player_table[idx].id = i;
 		}
 		/** Last **/
-		time_t LastByIndex ( int &idx )
+		time_t LastByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in LastByIndex" ) );
 			return player_table[idx].last;
 		}
-		void SetLast ( int &idx, time_t l )
+		void SetLast ( int idx, time_t l )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetLast" ) );
 			player_table[idx].last = l;
 		}
 		/** Account **/
-		long AccByIndex ( int &idx )
+		long AccByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in AccByIndex" ) );
 			return player_table[idx].account;
 		}
-		void SetAcc ( int &idx, long a )
+		void SetAcc ( int idx, long a )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetAcc" ) );
@@ -174,72 +174,72 @@ class PlayerIndex
 		}
 
 		/** Level **/
-		int LevelByIndex ( int &idx )
+		int LevelByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in LevelByIndex" ) );
 			return player_table[idx].level;
 		}
-		void SetLevel ( int &idx, int l )
+		void SetLevel ( int idx, int l )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetLevel" ) );
 			player_table[idx].level = l;
 		}
 		/** Gold **/
-		gold_int GoldByIndex ( int &idx )
+		gold_int GoldByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in GoldByIndex" ) );
 			return player_table[idx].gc_amount;
 		}
-		void SetGold ( int &idx, gold_int l )
+		void SetGold ( int idx, gold_int l )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetGold" ) );
 			player_table[idx].gc_amount = l;
 		}
 		/** Tokens **/
-		short TokensByIndex ( int &idx )
+		short TokensByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in TokensByIndex" ) );
 			return player_table[idx].gt_amount;
 		}
-		void SetTokens ( int &idx, short l )
+		void SetTokens ( int idx, short l )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetTokens" ) );
 			player_table[idx].gt_amount = l;
 		}
 		/** Rank **/
-		short RankByIndex ( int &idx )
+		short RankByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in RankByIndex" ) );
 			return player_table[idx].rank;
 		}
-		void SetRank ( int &idx, short r )
+		void SetRank ( int idx, short r )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetRank" ) );
 			player_table[idx].rank = r;
 		}
 		/** Clan **/
-		short ClanByIndex ( int &idx )
+		short ClanByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in ClanByIndex" ) );
 			return player_table[idx].clan;
 		}
-		void SetClan ( int &idx, int r )
+		void SetClan ( int idx, int r )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetClan" ) );
 			player_table[idx].clan = r;
 		}
 		/** Check for Deleted **/
-		bool DeletedByIndex ( int &idx )
+		bool DeletedByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in DeletedByIndex" ) );
@@ -253,30 +253,30 @@ class PlayerIndex
 			       IS_SET ( idx->flags, PINDEX_SELFDELETE ) ||
 			       idx->name[0] == '\0';
 		}
-		bool ValidIndex ( int &idx )
+		bool ValidIndex ( int idx )
 		{
 			return ( idx >= 0 || idx < (int)player_table.size() );
 		}
 		/** Flags **/
-		long FlagsByIndex ( int &idx )
+		long FlagsByIndex ( int idx )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in FlagsByIndex" ) );
 			return player_table[idx].flags;
 		}
-		void SetFlags ( int &idx, int f )
+		void SetFlags ( int idx, int f )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in SetFlags" ) );
 			SET_BIT ( player_table[idx].flags, f );
 		}
-		void UnsetFlags ( int &idx, int f )
+		void UnsetFlags ( int idx, int f )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in UnsetFlags" ) );
 			REMOVE_BIT ( player_table[idx].flags, f );
 		}
-		bool IsSet ( int &idx, int f )
+		bool IsSet ( int idx, int f )
 		{
 			if ( !ValidIndex ( idx ) )
 				throw ( MudException ( "Index out of range in IsSet" ) );

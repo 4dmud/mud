@@ -1105,6 +1105,10 @@ int get_filename ( const char *orig_name, char *filename, int mode )
 			prefix = LIB_PLROBJS;
 			suffix = "locker";
 			break;
+		case PLRSHOP_FILE:
+			prefix = LIB_PLRSHOPS;
+			suffix = "shp";
+			break;
 		case IGNORE_FILE:
 			prefix = LIB_PLRALIAS;
 			// Changed this from "ignore" to SUF_IGNORE - PROM
