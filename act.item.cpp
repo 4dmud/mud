@@ -555,13 +555,9 @@ int perform_assemble ( obj_vnum lVnum, Character *ch, int subcmd, int cmd )
 
 bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 {
-
-
-	if ( drop_otrigger ( obj, ch ) <= 0 )
-		return FALSE;
-
 	if ( put_in_otrigger ( cont, obj, ch ) <= 0 )
 		return FALSE;
+
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) && ( !cont || ( cont && IN_ROOM ( cont ) ) ) )
 	{
 		void count_items_in_list ( struct obj_data *obj, int& total_items );

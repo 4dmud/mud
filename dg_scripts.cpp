@@ -1847,6 +1847,7 @@ void script_vlog ( const char *format, va_list args )
 	va_list argsbackup;
 	va_copy ( argsbackup,args );
 	Descriptor *i;
+	bool syslog_complete;
 
 	snprintf ( buf, sizeof ( buf ), "SCRIPT ERR: %s", format );
 
@@ -1868,7 +1869,10 @@ void script_vlog ( const char *format, va_list args )
 			continue;
 		if ( PLR_FLAGGED ( i->character, PLR_WRITING ) )
 			continue;
-		if ( NRM > ( PRF_FLAGGED ( i->character, PRF_LOG1 ) ? 1 : 0 ) + ( PRF_FLAGGED ( i->character, PRF_LOG2 ) ? 2 : 0 ) )
+		if ( ! ( CMD_FLAGS ( i->character ) & WIZ_TRIG_GRP ) )
+			continue;
+		syslog_complete = PRF_FLAGGED ( i->character, PRF_LOG1 ) && PRF_FLAGGED ( i->character, PRF_LOG2 );
+		if ( ( CMD_FLAGS ( i->character ) & WIZ_IMM3_GRP ) && !syslog_complete )
 			continue;
 
 		i->Output ( "%s%s%s", CCGRN ( i->character, C_NRM ), buf, CCNRM ( i->character, C_NRM ) );
