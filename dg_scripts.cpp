@@ -3897,6 +3897,11 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 #endif
 				{
 					depth--;
+
+					/* If it's a function trigger, set the proto depth to 0, otherwise it can't be called again */
+					if ( IS_SET ( GET_TRIG_TYPE ( trig ), OTRIG_FUNCTION ) || IS_SET ( GET_TRIG_TYPE ( trig ), MTRIG_FUNCTION ) || IS_SET ( GET_TRIG_TYPE ( trig ), WTRIG_FUNCTION ) )
+						trig_index[ trig->nr ]->proto->depth = 0;
+
 					if ( type == OBJ_TRIGGER )
 #if DRIVER_USES_UNION
 
