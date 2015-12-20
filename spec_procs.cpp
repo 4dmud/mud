@@ -2666,14 +2666,14 @@ SPECIAL ( playershop )
 					ch->Send ( "There is no item number %d.\r\n", num2 );
 				else
 				{
-					for ( int i = num; i <= num2; ++i )
+					for ( int i = num2; i >= num; --i )
 						if ( CAN_SEE_OBJ ( ch, player_shop[r]->item[ i-1 ]->obj ) )
 						{
 							ch->Send ( "You remove %s from your shop.\r\n", player_shop[r]->item[ i-1 ]->obj->short_description );
 							obj_to_char ( player_shop[r]->item [ i-1 ]->obj, ch );
 							delete player_shop[r]->item[ i-1 ];
+							player_shop[r]->item.erase ( player_shop[r]->item.begin() + i-1 );
 						}
-					player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1, player_shop[r]->item.begin() + num2 );
 					save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
 				}
 			}

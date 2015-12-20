@@ -1847,6 +1847,7 @@ void boot_player_shops ( string filename )
 	while ( !feof ( file_owners ) )
 	{
 		get_line ( file_owners, line );
+
 		if ( ( id = pi.IdByName ( line ) ) == -1 )
 		{
 			log ( "SYSERR: Unknown playershop owner %s in file %s", name.c_str(), filename.c_str() );
@@ -1861,10 +1862,12 @@ void boot_player_shops ( string filename )
 			continue;
 		}
 
-		bool end_of_shop = FALSE;
-		while ( !feof ( file_shop ) && !end_of_shop )
+		while ( !feof ( file_shop ) )
 		{
 			get_line ( file_shop, line );
+			if ( !strcmp ( line, "end_of_file" ) )
+				break;
+
 			r = atoi ( line );
 			get_line ( file_shop, line );
 			m = atoi ( line );
@@ -1891,10 +1894,8 @@ void boot_player_shops ( string filename )
 			{
 				get_line ( file_shop, line );
 				if ( !strcmp ( line, "end_of_shop" ) )
-				{
-					end_of_shop = TRUE;
 					break;
-				}
+
 				p = atoll ( line );
 				get_line ( file_shop, line );
 				cur = string ( line );
@@ -1981,7 +1982,8 @@ void save_player_shop ( string owner )
 				fprintf ( file_shop, "%s\n", i->currency.c_str() );
 				save_one_item ( i->obj, file_shop, 0 );
 			}
-			fprintf ( file_shop, "end_of_shop" );
+			fprintf ( file_shop, "end_of_shop\n" );
 		}
+	fprintf ( file_shop, "end_of_file" );
 	fclose ( file_shop );
 }

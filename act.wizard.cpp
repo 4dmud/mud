@@ -8254,7 +8254,7 @@ ACMD ( do_plrshop )
 		else
 			file_shop.open ( shop_filename, ios_base::app );
 
-		file_shop << r << endl << m << endl << "end_of_shop";
+		file_shop << r << endl << m << endl << "end_of_shop" << endl << "end_of_file";
 		file_shop.close();
 
 		struct plrshop *pshop = new plrshop;
@@ -8312,6 +8312,10 @@ ACMD ( do_plrshop )
 		{
 			snprintf ( buf, sizeof ( buf ), "%d. Owner: %s, Room: [%d] %s, Shopkeep: [%d] %s\r\n", i++, pi.NameById ( p.second->owner_id ), p.second->shop_room, world_vnum[p.second->shop_room]->name, p.second->shopkeep, GET_NAME ( mob_proto[p.second->shopkeep] ) );
 			DYN_RESIZE ( buf );
+		}
+		if ( i == 1 )
+		{
+			DYN_RESIZE ( "None.\r\n" );
 		}
 		page_string ( ch->desc, dynbuf, DYN_BUFFER );
 	}
