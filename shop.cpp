@@ -1872,7 +1872,7 @@ void boot_player_shops ( string filename )
 			get_line ( file_shop, line );
 			m = atoi ( line );
 
-			if ( r < 0 || r >= world_vnum.size() || world_vnum[r] == NULL )
+			if ( !real_room ( r ) )
 			{
 				log ( "SYSERR: Illegal room vnum %d in playershop file %s", r, shop_filename );
 				return;

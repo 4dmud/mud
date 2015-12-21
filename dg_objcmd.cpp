@@ -649,10 +649,14 @@ OCMD ( do_dgoload )
 		/* special handling to make objects able to load on a person/in a container/worn etc. */
 		if ( !target || !*target )
 		{
+	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, room->number );
 			obj_to_room ( object, room );
 			load_otrigger ( object );
 			return;
 		}
+
+		/* load to char */
 		two_arguments ( target, arg1, arg2 ); /* recycling ... */
 		tch = get_char_near_obj ( obj, arg1 );
 		if ( tch )
@@ -666,19 +670,38 @@ OCMD ( do_dgoload )
 				load_otrigger ( object );
 				return;
 			}
+	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+				obj_log ( obj, "[TOKEN] %s loads %s to %s in %d", obj->short_description, object->short_description, GET_NAME ( tch ), IN_ROOM ( tch ) ? IN_ROOM ( tch )->number : -1 );
 			obj_to_char ( object, tch );
 			load_otrigger ( object );
 			return;
 		}
+
+		/* load to container */
 		cnt = get_obj_near_obj ( obj, arg1 );
 		if ( cnt && GET_OBJ_TYPE ( cnt ) == ITEM_CONTAINER )
 		{
+	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+				obj_log ( obj, "[TOKEN] %s loads %s to %s", obj->short_description, object->short_description, cnt->short_description );
 			obj_to_obj ( object, cnt );
 			load_otrigger ( object );
 			return;
 		}
-		/* neither char nor container found - just dump it in room */
-		obj_to_room ( object, room );
+
+		/* load to room */
+		Room *r = NULL;
+		if ( ( r = get_room ( arg1 ) ) != NULL )
+		{
+	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, r->number );
+			obj_to_room ( object, r );
+		}
+		else
+		{
+	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, room->number );
+			obj_to_room ( object, room );
+		}
 		load_otrigger ( object );
 	}
 

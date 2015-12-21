@@ -4647,7 +4647,7 @@ void reset_zone ( zone_rnum zone )
 					oir.insert ( obj_rid ( cmd_room,GET_ID ( tobj ) ) );
 				break;
 			case 'R':       /* rem obj from room */
-				if ( !world_vnum[ZCMD.arg1] )
+				if ( !real_room ( ZCMD.arg1 ) )
 				{
 					ZONE_ERROR ( "Zone room error" );
 					log ( "room %d doesn't exist, and zedit needs it.",ZCMD.arg1 );
@@ -4757,7 +4757,7 @@ void reset_zone ( zone_rnum zone )
 				}
 				else if ( ZCMD.arg1==WLD_TRIGGER )
 				{
-					if ( ZCMD.arg3 == NOWHERE || ZCMD.arg3>top_of_world )
+					if ( !real_room ( ZCMD.arg3 ) )
 					{
 						ZONE_ERROR ( "Invalid room number in trigger assignment" );
 					}
@@ -6613,7 +6613,7 @@ void clear_object ( struct obj_data *obj )
 	obj->proto_script = NULL;
 }
 
-/* returns the real number of the room with given virtual number */
+/* returns the room with given virtual number */
 room_rnum real_room ( room_vnum vnum )
 {
 	if ( vnum >= 0 && vnum <= HIGHEST_VNUM )

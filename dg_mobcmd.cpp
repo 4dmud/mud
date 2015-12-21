@@ -707,7 +707,7 @@ ACMD(do_mdamage) {
 
 /*
  * lets the mobile load an item or mobile.  All items
- * are loaded into inventory, unless it is NO-TAKE. 
+ * are loaded into inventory/equipment/room, unless it is NO-TAKE.
  */
 ACMD(do_mload) {
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -776,20 +776,28 @@ ACMD(do_mload) {
             add_var(&(SCRIPT(ch)->global_vars), "loaded", buf, 0);
         }
 
+        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
+            if (IN_ROOM(ch))
+                mob_log(ch, "[TOKEN] %s loads %s to room %d",  GET_NAME(ch), object->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
+        }
+
         /* special handling to make objects able to load on a person/in a container/worn etc. */
         if (!target || !*target) {
-            if (CAN_WEAR(object, ITEM_WEAR_TAKE)) {
-                if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
-                    if (IN_ROOM(ch))
-                        mob_log(ch, "[TOKEN] %s loads %s in %d",  GET_NAME(ch), object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-                }
-                obj_to_char(object, ch);
-            } else {
+            if (CAN_WEAR(object, ITEM_WEAR_TAKE))
+			{
+				if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
+					if (IN_ROOM(ch))
+						mob_log(ch, "[TOKEN] %s loads %s in %d",  GET_NAME(ch), object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+				}
+				obj_to_char(object, ch);
+			}
+            else
                 obj_to_room(object, IN_ROOM(ch));
-            }
             load_otrigger(object);
             return;
         }
+
+		/* load to char */
         two_arguments(target, arg1, arg2); /* recycling ... */
         tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
         if (tch) {
@@ -801,31 +809,45 @@ ACMD(do_mload) {
                 load_otrigger(object);
                 return;
             }
-            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
-                if (IN_ROOM(ch))
-                    mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description,GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(ch)));
-            }
-            obj_to_char(object, tch);
+			if (CAN_WEAR(object, ITEM_WEAR_TAKE))
+			{
+		        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
+					if (IN_ROOM(ch))
+						mob_log(ch, "[TOKEN] %s loads %s to %s in room %d", GET_NAME(ch), object->short_description, GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(tch)));
+			}
+            	obj_to_char(object, tch);
+			}
+			else
+				obj_to_room ( object, IN_ROOM ( tch ) );
             load_otrigger(object);
             return;
         }
+
+		/* load to container */
         cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
         if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
-            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
-                if (IN_ROOM(ch))
-                    mob_log(ch, "[TOKEN] %s loads %s to %s in %d",  GET_NAME(ch), object->short_description, cnt->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-            }
+	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+				mob_log(ch, "[TOKEN] %s loads %s to %s", GET_NAME(ch), object->short_description, cnt->short_description );
             obj_to_obj(object, cnt);
             load_otrigger(object);
             return;
         }
-        /* neither char nor container found - just dump it in room */
-        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
-            if (IN_ROOM(ch))
-                mob_log(ch, "[TOKEN] %s loads %s to room %d",  GET_NAME(ch), object->short_description,GET_ROOM_VNUM(IN_ROOM(ch)));
-        }
-        obj_to_room(object, IN_ROOM(ch));
-        load_otrigger(object);
+
+		/* load to room */
+		Room *r = NULL;
+		if ( ( r = get_room ( arg1 ) ) != NULL )
+		{
+	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+				mob_log(ch, "[TOKEN] %s loads %s to room %d", GET_NAME(ch), object->short_description, r->number );
+			obj_to_room ( object, r );
+		}
+		else
+		{
+	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+				mob_log(ch, "[TOKEN] %s loads %s to room %d", GET_NAME(ch), object->short_description, IN_ROOM ( ch )->number );
+		    obj_to_room ( object, IN_ROOM ( ch ) );
+		}
+        load_otrigger ( object );
         return;
     } else
         mob_log(ch, "mload: bad type");

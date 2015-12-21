@@ -650,12 +650,14 @@ WCMD(do_wload)
     /* special handling to make objects able to load on a person/in a container/worn etc. */
     if (!target || !*target)
     {
-      obj_to_room(object, real_room(room->number));
+      obj_to_room(object, room);
       load_otrigger(object);
       return;
     }
 
     two_arguments(target, arg1, arg2); /* recycling ... */
+
+	/* load to char */
     tch = get_char_in_room(room, arg1);
     if (tch)
     {
@@ -672,6 +674,8 @@ WCMD(do_wload)
       load_otrigger(object);
       return;
     }
+
+	/* load to container */
     cnt = get_obj_in_room(room, arg1);
     if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER)
     {
@@ -679,8 +683,13 @@ WCMD(do_wload)
       load_otrigger(object);
       return;
     }
-    /* neither char nor container found - just dump it in room */
-    obj_to_room(object, real_room(room->number));
+
+	/* load to room */
+	Room *r = NULL;
+	if ( ( r = get_room ( arg1 ) ) != NULL )
+		obj_to_room ( object, r );
+	else
+	    obj_to_room(object, room);
     load_otrigger(object);
     return;
   }

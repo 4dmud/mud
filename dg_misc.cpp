@@ -345,7 +345,7 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
 	}
 	if ( !strcasecmp ( dest, "all" ) )
 		all = TRUE;
-	else if ( atoi ( dest ) == -1 || ( ( loc = world_vnum[atoi ( dest ) ] ) ) == NULL )
+	else if ( !is_number ( dest ) || ( loc = real_room ( atoi ( dest ) ) ) == NULL )
 	{
 		script_log ( "Trigger: %s, VNum %d. dg_dest: invalid target room!",
 		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );

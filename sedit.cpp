@@ -794,11 +794,11 @@ void sedit_parse(Descriptor *d, char *arg)
     sedit_products_menu(d);
     return;
   case SEDIT_NEW_ROOM:
-    if ((i = atoi(arg)) != -1)
-      if (world_vnum[i] == NULL) {
-	d->Output( "That room does not exist, try again : ");
-	return;
-      }
+    if ( !is_number ( arg ) || !real_room ( atoi ( arg ) ) )
+	{
+		d->Output( "That room does not exist, try again : ");
+		return;
+    }
     if (i >= 0)
       add_to_int_list2(&(S_ROOMS(OLC_SHOP(d))), world_vnum[atoi(arg)]);
     sedit_rooms_menu(d);

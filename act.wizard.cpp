@@ -8206,7 +8206,7 @@ ACMD ( do_plrshop )
 		}
 
 		room_vnum r = atoi ( args[2].c_str() );
-		if ( r < 0 || r >= world_vnum.size() || world_vnum[r] == NULL )
+		if ( !is_number ( args[2].c_str() ) || !real_room ( r ) )
 		{
 			ch->Send ( "There is no room with vnum %d.\r\n", r );
 			return;
@@ -8278,7 +8278,7 @@ ACMD ( do_plrshop )
 		}
 
 		room_vnum r = atoi ( args[1].c_str() );
-		if ( r < 0 || r >= world_vnum.size() || world_vnum[r] == NULL )
+		if ( !is_number ( args[1].c_str() ) || !real_room ( r ) )
 		{
 			ch->Send ( "Room %d does not exist.\r\n", r );
 			return;

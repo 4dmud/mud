@@ -94,10 +94,10 @@ void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname))
 
 void ASSIGNROOM(room_vnum room, SPECIAL(fname))
 {
-    if (world_vnum[room] != NULL)
-	world_vnum[room]->func = fname;
+    if ( real_room ( room ) )
+		world_vnum[room]->func = fname;
     else if (!mini_mud)
-	log("SYSERR: Attempt to assign spec to non-existant room #%d", room);
+		log("SYSERR: Attempt to assign spec to non-existant room #%d", room);
 }
 
 
