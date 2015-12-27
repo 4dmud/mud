@@ -831,14 +831,12 @@ switch (obj->Names.size()) {
 /* finds room by id or vnum.  returns NULL if not found */
 room_rnum get_room ( const char *name )
 {
-	room_rnum nr;
-
 	if ( *name == UID_CHAR )
 		return find_room ( atoi ( name + 1 ) );
-	else if ( ( nr = real_room ( atoi ( name ) ) ) == NULL )
+	else if ( !is_number ( name ) )
 		return NULL;
 	else
-		return nr;
+		return real_room ( atoi ( name ) );
 }
 
 

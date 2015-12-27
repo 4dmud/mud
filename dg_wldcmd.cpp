@@ -638,7 +638,7 @@ WCMD(do_wload)
     object = read_object(num, VIRTUAL);
     if (object == NULL)
     {
-      wld_log(room, "wload: bad object vnum");
+      wld_log ( room, "wload: bad object vnum %d", num );
       return;
     }
     if (SCRIPT(room))
@@ -650,6 +650,8 @@ WCMD(do_wload)
     /* special handling to make objects able to load on a person/in a container/worn etc. */
     if (!target || !*target)
     {
+      if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+          wld_log ( room, "[TOKEN] loads %s", object->short_description );
       obj_to_room(object, room);
       load_otrigger(object);
       return;
@@ -658,27 +660,26 @@ WCMD(do_wload)
     two_arguments(target, arg1, arg2); /* recycling ... */
 
 	/* load to char */
-    tch = get_char_in_room(room, arg1);
+    tch = ( *arg1 == UID_CHAR ) ? get_char ( arg1 ) : get_char_room ( arg1, NULL, room );
     if (tch)
     {
-      if (*arg2 &&
-          (pos = find_eq_pos_script(arg2)) >= 0 &&
-          !GET_EQ(tch, pos) &&
-          can_wear_on_pos(object, pos))
-      {
+      if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+          wld_log ( room, "[TOKEN] loads %s to %s", object->short_description, GET_NAME ( tch ) );
+
+      if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos))
         equip_char(tch, object, pos);
-        load_otrigger(object);
-        return;
-      }
-      obj_to_char(object, tch);
+      else
+        obj_to_char(object, tch);
       load_otrigger(object);
       return;
     }
 
 	/* load to container */
-    cnt = get_obj_in_room(room, arg1);
+    cnt = ( *arg1 == UID_CHAR ) ? get_obj ( arg1 ) : get_obj_in_list ( arg1, room->contents );
     if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER)
     {
+      if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+          wld_log ( room, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
       obj_to_obj(object, cnt);
       load_otrigger(object);
       return;
@@ -687,15 +688,25 @@ WCMD(do_wload)
 	/* load to room */
 	Room *r = NULL;
 	if ( ( r = get_room ( arg1 ) ) != NULL )
+	{
+		if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+			wld_log ( room, "[TOKEN] loads %s to room %d", object->short_description, GET_ROOM_VNUM ( r ) );
 		obj_to_room ( object, r );
+		load_otrigger(object);
+	}
 	else
-	    obj_to_room(object, room);
-    load_otrigger(object);
+	{
+		if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+			wld_log ( room, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+		else
+			wld_log ( room, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+		extract_obj ( object );
+	}
     return;
   }
 
   else
-    wld_log(room, "wload: bad type");
+    wld_log ( room, "wload: bad type %s", argument );
 }
 
 WCMD(do_wdamage)

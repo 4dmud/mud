@@ -1977,6 +1977,9 @@ ACMD ( do_sac )
 	// seems as if everything checks out eh? ok now do it
 	act ( "$n sacrifices $p.", FALSE, ch, obj, 0, TO_ROOM );
 	act ( "You sacrifice $p to your god.\r\nYou have been rewarded by your deity.\r\n", FALSE, ch, obj, 0, TO_CHAR );
+	if ( GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
+		if ( IN_ROOM ( ch ) )
+			new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TOKEN] %s sacs %s in room %d",  GET_NAME ( ch ), obj->short_description, GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
 	if ( GET_MOVE ( ch ) < GET_MAX_MOVE ( ch ) )
 		alter_move ( ch, -2 );
 	else

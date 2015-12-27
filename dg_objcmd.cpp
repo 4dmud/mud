@@ -637,7 +637,7 @@ OCMD ( do_dgoload )
 	{
 		if ( ( object = read_object ( num, VIRTUAL ) ) == NULL )
 		{
-			obj_log ( obj, "oload: bad object vnum" );
+			obj_log ( obj, "oload: bad object vnum %d", num );
 			return;
 		}
 		if ( SCRIPT ( obj ) )   // it _should_ have, but it might be detached.
@@ -650,7 +650,7 @@ OCMD ( do_dgoload )
 		if ( !target || !*target )
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, room->number );
+				obj_log ( obj, "[TOKEN] loads %s to room %d", object->short_description, room->number );
 			obj_to_room ( object, room );
 			load_otrigger ( object );
 			return;
@@ -661,52 +661,51 @@ OCMD ( do_dgoload )
 		tch = get_char_near_obj ( obj, arg1 );
 		if ( tch )
 		{
-			if ( *arg2 &&
-			        ( pos = find_eq_pos_script ( arg2 ) ) >= 0 &&
-			        !GET_EQ ( tch, pos ) &&
-			        can_wear_on_pos ( object, pos ) )
+			if ( *arg2 && ( pos = find_eq_pos_script ( arg2 ) ) >= 0 && !GET_EQ ( tch, pos ) && can_wear_on_pos ( object, pos ) )
 			{
 				equip_char ( tch, object, pos );
 				load_otrigger ( object );
 				return;
 			}
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] %s loads %s to %s in %d", obj->short_description, object->short_description, GET_NAME ( tch ), IN_ROOM ( tch ) ? IN_ROOM ( tch )->number : -1 );
+				obj_log ( obj, "[TOKEN] loads %s to %s in %d", object->short_description, GET_NAME ( tch ), IN_ROOM ( tch ) ? IN_ROOM ( tch )->number : -1 );
 			obj_to_char ( object, tch );
 			load_otrigger ( object );
 			return;
 		}
 
 		/* load to container */
-		cnt = get_obj_near_obj ( obj, arg1 );
+		cnt = ( *arg1 == UID_CHAR ) ? get_obj ( arg1 ) : get_obj_in_list ( arg1, room->contents );
 		if ( cnt && GET_OBJ_TYPE ( cnt ) == ITEM_CONTAINER )
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] %s loads %s to %s", obj->short_description, object->short_description, cnt->short_description );
+				obj_log ( obj, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
 			obj_to_obj ( object, cnt );
 			load_otrigger ( object );
 			return;
 		}
 
 		/* load to room */
-		Room *r = NULL;
-		if ( ( r = get_room ( arg1 ) ) != NULL )
+		Room *r = get_room ( arg1 );
+		if ( r )
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, r->number );
+				obj_log ( obj, "[TOKEN] loads %s to room %d", object->short_description, r->number );
 			obj_to_room ( object, r );
+			load_otrigger ( object );
 		}
 		else
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] %s loads %s to room %d", obj->short_description, object->short_description, room->number );
-			obj_to_room ( object, room );
+				obj_log ( obj, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+			else
+				obj_log ( obj, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+			extract_obj ( object );
 		}
-		load_otrigger ( object );
 	}
 
 	else
-		obj_log ( obj, "oload: bad type" );
+		obj_log ( obj, "oload: bad type %s", argument );
 
 }
 

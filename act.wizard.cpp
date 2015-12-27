@@ -2939,7 +2939,7 @@ ACMD ( do_load )
 		act ( "$n has created $p!", FALSE, ch, obj, 0, TO_ROOM );
 		act ( "You create $p.", FALSE, ch, obj, 0, TO_CHAR );
 		load_otrigger ( obj );
-		log ( "%s loaded %s", GET_NAME ( ch ), obj->name );
+		log ( "%s loaded [%d] %s", GET_NAME ( ch ), GET_OBJ_VNUM ( obj ), obj->short_description );
 
 	}
 	else
