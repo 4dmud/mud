@@ -7933,7 +7933,7 @@ void list_obj_resets ( obj_data *obj, Character *ch )
 					break;
 				case 'P':
 					if ( obj_index[ZCMD.arg1].vnum == vnum )
-						ch->Send ( "Will reset in container %d %s\r\n", ZCMD.arg3, obj_proto[ZCMD.arg3].short_description );
+						ch->Send ( "Will reset in container %d %s\r\n", obj_index[ZCMD.arg3].vnum, obj_proto[ZCMD.arg3].short_description );
 					break;
 			}
 		}

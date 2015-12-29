@@ -1751,15 +1751,13 @@ ACMD ( do_gen_tog )
 ACMD ( do_file )
 {
 	FILE *req_file;
-	int req_entries = 0, i;
-	int l, line_number;
+	int i, l, line_number;
 	char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char *arg3;
 	size_t pos, len = 0;
 	vector<string> entries;
 	string entry;
-	bool show_all = FALSE;
 
 	struct file_struct
 	{
@@ -1896,6 +1894,8 @@ ACMD ( do_file )
 		return;
 	}
 
+	bool show_all = FALSE;
+	int req_entries = 0;
 	skip_spaces ( &arg3 );
 	if ( !strcmp ( arg2, "all" ) )
 	{
@@ -1910,17 +1910,25 @@ ACMD ( do_file )
 	else
 		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
 
-	buf2[0] = '\0';
-
-	for ( i = entries.size() - req_entries; i < entries.size(); ++i )
+	/* if not all entries are shown, skip the ones with "(fixed)" in them */
+	vector<int> entries_to_show;
+	for ( i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
 	{
 		if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) && entries[i].find ( "(fixed)" ) != string::npos )
 			continue;
 
-		if ( entries[i].length() + 3 >= sizeof ( buf2 ) - len )
+		entries_to_show.push_back ( i );
+		req_entries--;
+	}
+
+	/* strip the tags from the entries and page them */
+	buf2[0] = '\0';
+	for ( i = entries_to_show.size() - 1; i >= 0; --i )
+	{
+		if ( entries[ entries_to_show[i] ].length() + 3 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
 			break;
 
-		strlcpy ( buf, entries[i].c_str(), sizeof ( buf ) );
+		strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );
 
 		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
 		{
@@ -1929,7 +1937,7 @@ ACMD ( do_file )
 			ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
 			ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
 			ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", i + 1, buf );
+			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
 		}
 		else
 			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
