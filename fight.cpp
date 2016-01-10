@@ -2907,8 +2907,7 @@ void reduce_quality ( Character *ch, Character *vict, int damage, int w_type, ob
 int fe_after_damage ( Character* ch, Character* vict,
                       int dam, int w_type )
 {
-	gold_int local_gold = 0;
-	int bonus_gold = 0;
+	gold_int local_gold = 0, bonus_gold = 0;
 	char local_buf[100] = "";
 	int partial = 0;
 	//int dam_exp = 0;
@@ -3175,7 +3174,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 			{
 				//mob_rnum mrn = real_mobile(GET_MOB_VNUM(vict));
 				if ( MobProtoExists ( GET_MOB_VNUM ( vict ) ) )
-					bonus_gold = ( int ) ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( vict ) ) ) * 0.25 )/number(1, 10);
+					bonus_gold = ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( vict ) ) ) * 0.25 )/number(1, 10);
 
 				ch->Gold ( bonus_gold, GOLD_HAND );
 				if ( !number ( 0, 200 ) )
@@ -3204,7 +3203,7 @@ int fe_after_damage ( Character* ch, Character* vict,
 				do_get ( ch, ( char * ) "coin corpse", 0, 0 );
 
 			if ( bonus_gold )
-				ch->Send ( "{cbYou pillage the corpse and find an extra %d coins!{c0\r\n",  bonus_gold );
+				ch->Send ( "{cbYou pillage the corpse and find an extra %lld coins!{c0\r\n",  bonus_gold );
 
 			if ( PRF_FLAGGED ( ch, PRF_AUTOLOOT ) )
 				do_get ( ch, ( char * ) "all corpse", 0, 0 );

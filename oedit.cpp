@@ -585,7 +585,7 @@ void oedit_disp_spells_menu ( Descriptor *d )
 
 	for ( counter = 0; counter < NUM_SPELLS; counter++ )
 	{
-		if ( strcmp ( skill_name ( counter ), "!UNUSED!" ) )
+		if ( !IS_SKILL ( counter ) && strcmp ( skill_name ( counter ), "!UNUSED!" ) )
 			d->Output ( "%s%2d%s) %s%-20.20s %s", grn, counter, nrm, yel,
 			            skill_name ( counter ), ! ( ++columns % 3 ) ? "\r\n" : "" );
 	}
@@ -1600,8 +1600,13 @@ void oedit_parse ( Descriptor *d, char *arg )
 				case ITEM_ANTIDOTE_3:
 					if ( num == 0 || num == -1 )
 						GET_OBJ_VAL ( OLC_OBJ ( d ), 1 ) = -1;
+					else if ( num < 0 || num > MAX_SKILLS || IS_SKILL ( num ) || !strcmp ( skill_name ( num ), "!UNUSED!" ) )
+					{
+						d->Output ( "Illegal spell number.\r\nEnter spell choice (-1 for none) :\r\n" );
+						return;
+					}
 					else
-						GET_OBJ_VAL ( OLC_OBJ ( d ), 1 ) = LIMIT ( num, 1, NUM_SPELLS-1 );
+						GET_OBJ_VAL ( OLC_OBJ ( d ), 1 ) = num;
 
 					oedit_disp_val3_menu ( d );
 					break;
@@ -1651,6 +1656,11 @@ void oedit_parse ( Descriptor *d, char *arg )
 						oedit_disp_val4_menu ( d );
 						return;
 					}
+					if ( num < 0 || num > MAX_SKILLS || IS_SKILL ( num ) || !strcmp ( skill_name ( num ), "!UNUSED!" ) )
+					{
+						d->Output ( "Illegal spell number.\r\nEnter spell choice (-1 for none) :\r\n" );
+						return;
+					}
 					min_val = 1;
 					max_val = NUM_SPELLS - 1;
 					break;
@@ -1697,11 +1707,27 @@ void oedit_parse ( Descriptor *d, char *arg )
 						oedit_disp_menu ( d );
 						return;
 					}
+					if ( num < 0 || num > MAX_SKILLS || IS_SKILL ( num ) || !strcmp ( skill_name ( num ), "!UNUSED!" ) )
+					{
+						d->Output ( "Illegal spell number.\r\nEnter spell choice (-1 for none) :\r\n" );
+						return;
+					}
 					min_val = 1;
 					max_val = NUM_SPELLS - 1;
 					break;
 				case ITEM_WAND:
 				case ITEM_STAFF:
+					if ( num == 0 || num == -1 )
+					{
+						GET_OBJ_VAL ( OLC_OBJ ( d ), 3 ) = -1;
+						oedit_disp_menu ( d );
+						return;
+					}
+					if ( num < 0 || num > MAX_SKILLS || IS_SKILL ( num ) || !strcmp ( skill_name ( num ), "!UNUSED!" ) )
+					{
+						d->Output ( "Illegal spell number.\r\nEnter spell choice (-1 for none) :\r\n" );
+						return;
+					}
 					min_val = 1;
 					max_val = NUM_SPELLS - 1;
 					break;

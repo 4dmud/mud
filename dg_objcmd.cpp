@@ -23,7 +23,8 @@
 #include "db.h"
 #include "constants.h"
 
-
+int can_fight ( Character *ch, Character *vict, int silent );
+void start_fighting_delay ( Character *ch, Character *vict );
 void die ( Character *ch, Character *killer );
 int real_zone ( int number );
 zone_rnum real_zone_by_thing ( room_vnum vznum );
@@ -744,7 +745,8 @@ OCMD ( do_odamage )
 {
 	char name[MAX_INPUT_LENGTH], amount[MAX_INPUT_LENGTH];
 	int dam = 0;
-	Character *ch;
+	Character *ch = NULL;
+	Character *vict = NULL;
 
 //    if (obj->worn_by)
 //      strcpy(name, GET_NAME(obj->worn_by));
@@ -763,10 +765,15 @@ OCMD ( do_odamage )
 		return;
 	}
 
+	if ( obj->worn_by )
+		ch = obj->worn_by;
+	else if ( obj->carried_by )
+		ch = obj->carried_by;
+
 	dam = atoi ( amount );
 	if ( !str_cmp ( "all", name ) )
 	{
-		Character *tvict, *vict;
+		Character *tvict;
 		room_rnum rm;
 		if ( ( rm = obj_room ( obj ) ) == NULL )
 			return;
@@ -778,6 +785,11 @@ OCMD ( do_odamage )
 
 			if ( !IS_NPC ( vict ) )
 			{
+				if ( ch && can_fight ( ch, vict, TRUE ) )
+				{
+					start_fighting_delay ( ch, vict );
+					FIGHTING ( vict ) = ch;
+				}
 				script_damage ( vict, dam );
 			}
 			if ( !DEAD ( vict ) )
@@ -787,14 +799,20 @@ OCMD ( do_odamage )
 		}
 		return;
 	}
-	ch = get_char_by_obj ( obj, name );
+	vict = get_char_by_obj ( obj, name );
 
-	if ( !ch )
+	if ( !vict )
 	{
 		obj_log ( obj, "odamage: target not found" );
 		return;
 	}
-	script_damage ( ch, dam );
+
+	if ( ch && can_fight ( ch, vict, TRUE ) )
+	{
+		start_fighting_delay ( ch, vict );
+		FIGHTING ( vict ) = ch;
+	}
+	script_damage ( vict, dam );
 }
 
 

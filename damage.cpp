@@ -28,6 +28,7 @@ struct aff_dam_event_list
 ACMD ( do_sac );
 ACMD ( do_get );
 ACMD ( do_split );
+void kill_points(Character *ch, Character *vict);
 void aff_damage ( Character *ch, int dam, long interval, int recurse,
                   int ( *event_fun ) ( int, Character* ) );
 EVENTFUNC ( affdam_event );
@@ -103,7 +104,50 @@ void script_damage ( Character *vict, int dam )
 	{
 		if ( !IS_NPC ( vict ) )
 			new_mudlog ( BRF, 0, TRUE, "%s killed by damage at %s [%d]", GET_NAME ( vict ), vict->in_room->name, vict->in_room->number );
-		die ( vict, FIGHTING ( vict ) );
+
+		gold_int local_gold = GET_GOLD ( vict );
+		Character *ch = FIGHTING ( vict );
+		if ( ch )
+			kill_points ( ch, vict );
+		die ( vict, ch );
+
+		if ( ch && !IS_NPC ( ch ) && IS_NPC ( vict ) )
+		{
+			char local_buf[100];
+			gold_int gld = GET_GOLD ( ch );
+			snprintf ( local_buf, sizeof ( local_buf ), "%lld", local_gold );
+
+			if ( PRF_FLAGGED ( ch, PRF_AUTOGOLD ) && local_gold > 0 )
+				do_get ( ch, ( char * ) "coin corpse", 0, 0 );
+
+			if ( IS_NPC ( vict ) && HERE ( vict, ch ) && GET_SUB ( ch, SUB_PILLAGE ) > number ( 1, 101 ) )
+			{
+				gold_int bonus_gold = 0;
+				if ( MobProtoExists ( GET_MOB_VNUM ( vict ) ) )
+					bonus_gold = ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( vict ) ) ) * 0.25 )/number(1, 10);
+
+				if ( bonus_gold )
+				{
+					ch->Gold ( bonus_gold, GOLD_HAND );
+					ch->Send ( "{cbYou pillage the corpse and find an extra %lld coins!{c0\r\n",  bonus_gold );
+				}
+
+				if ( !number ( 0, 200 ) )
+					improve_sub ( ch, SUB_PILLAGE, 1 );
+			}
+
+			if ( PRF_FLAGGED ( ch, PRF_AUTOLOOT ) )
+				do_get ( ch, ( char * ) "all corpse", 0, 0 );
+
+			if ( PRF_FLAGGED ( ch, PRF_AUTOSAC ) )
+				do_sac ( ch, ( char * ) "corpse", 0, 0 );
+
+			if ( IS_AFFECTED ( ch, AFF_GROUP ) && local_gold > 0 &&
+			        PRF_FLAGGED ( ch, PRF_AUTOSPLIT ) &&
+			        ( PRF_FLAGGED ( ch, PRF_AUTOLOOT ) || PRF_FLAGGED ( ch, PRF_AUTOGOLD ) ) &&
+			        gld < GET_GOLD ( ch ) )
+				do_split ( ch, local_buf, 0, 0 );
+		}
 	}
 }
 
@@ -157,8 +201,7 @@ int room_affect_damage ( Character *ch, Character *vict, int dam )
  *   = 0  No damage.
  *   > 0  How much damage done.
  */
-int damage ( Character *ch, Character *victim, int dam,
-             int attacktype )
+int damage ( Character *ch, Character *victim, int dam, int attacktype )
 {
 	gold_int local_gold = GET_GOLD ( victim );
 	int npc = IS_NPC ( victim );
@@ -179,7 +222,7 @@ int damage ( Character *ch, Character *victim, int dam,
 	damage_vict ( victim, dam );
 	if ( IS_NPC ( victim ) && dam > 0 )
 	{
-		if ( IS_NPC ( ch ) )
+		if ( !ch || IS_NPC ( ch ) )
 			damage_count ( victim, -1, dam );
 		else
 			damage_count ( victim, GET_IDNUM ( ch ), dam );
@@ -191,11 +234,13 @@ int damage ( Character *ch, Character *victim, int dam,
 		if ( !IS_NPC ( victim ) )
 			new_mudlog ( BRF, 0, TRUE, "%s killed by %s at %s [%d]",
 			             GET_NAME ( victim ), ch ? GET_NAME ( ch ) : "damage", victim->in_room->name, victim->in_room->number );
-		//if (ch && !SELF(victim, ch) && !ROOM_FLAGGED(IN_ROOM(ch), ROOM_ARENA))
-		//group_gain(ch, victim);
 
+		ch = FIGHTING ( victim ); // in case ch == victim (suffocate)
+		if ( ch )
+			kill_points ( ch, victim );
 		die ( victim, ch );
-		if ( ch && !SELF ( ch, victim ) && !IS_NPC ( ch ) && npc )
+
+		if ( ch && !IS_NPC ( ch ) && npc )
 		{
 			char local_buf[100];
 			gold_int gld = GET_GOLD ( ch );
@@ -203,6 +248,22 @@ int damage ( Character *ch, Character *victim, int dam,
 
 			if ( PRF_FLAGGED ( ch, PRF_AUTOGOLD ) && local_gold > 0 )
 				do_get ( ch, ( char * ) "coin corpse", 0, 0 );
+
+			if ( IS_NPC ( victim ) && HERE ( victim, ch ) && GET_SUB ( ch, SUB_PILLAGE ) > number ( 1, 101 ) )
+			{
+				gold_int bonus_gold = 0;
+				if ( MobProtoExists ( GET_MOB_VNUM ( victim ) ) )
+					bonus_gold = ( GET_GOLD ( GetMobProto ( GET_MOB_VNUM ( victim ) ) ) * 0.25 )/number(1, 10);
+
+				if ( bonus_gold )
+				{
+					ch->Gold ( bonus_gold, GOLD_HAND );
+					ch->Send ( "{cbYou pillage the corpse and find an extra %lld coins!{c0\r\n",  bonus_gold );
+				}
+
+				if ( !number ( 0, 200 ) )
+					improve_sub ( ch, SUB_PILLAGE, 1 );
+			}
 
 			if ( PRF_FLAGGED ( ch, PRF_AUTOLOOT ) )
 				do_get ( ch, ( char * ) "all corpse", 0, 0 );

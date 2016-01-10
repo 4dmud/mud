@@ -149,6 +149,23 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !caster )
 	{
+		if ( type == OBJ_TRIGGER )
+		{
+			obj_data *obj = (obj_data *) go;
+			if ( obj->in_obj )
+				obj = obj->in_obj;
+
+			if ( obj->carried_by )
+			{
+				call_magic ( obj->carried_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
+				return;
+			}
+			if ( obj->worn_by )
+			{
+				call_magic ( obj->worn_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
+				return;
+			}
+		}
 		caster = read_mobile ( DG_CASTER_PROXY );
 		if ( !caster )
 		{

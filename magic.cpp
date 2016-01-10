@@ -798,6 +798,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].bitvector = AFF_POISON_1;
 			to_vict = "You feel very sick.";
 			to_room = "$n gets violently ill!";
+			start_fighting_delay ( victim, ch );
 			break;
 
 		case SPELL_POISON_2:
@@ -813,6 +814,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].bitvector = AFF_POISON_2;
 			to_vict = "You feel very sick.";
 			to_room = "$n gets violently ill!";
+			start_fighting_delay ( victim, ch );
 			break;
 
 		case SPELL_POISON_3:
@@ -828,6 +830,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].bitvector = AFF_POISON_3;
 			to_vict = "You feel very sick.";
 			to_room = "$n gets violently ill!";
+			start_fighting_delay ( victim, ch );
 			break;
 
 		case SPELL_POISON_4:
@@ -843,6 +846,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			af[0].bitvector = AFF_POISON_4;
 			to_vict = "You feel very sick.";
 			to_room = "$n gets violently ill!";
+			start_fighting_delay ( victim, ch );
 			break;
 
 		case SPELL_PROT_FROM_EVIL:

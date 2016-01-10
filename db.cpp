@@ -4436,12 +4436,11 @@ void reset_zone ( zone_rnum zone )
 							if ( obj && lqc )
 							{
 								obj_to_room ( obj, world_vnum[ZCMD.arg3] );
-		                                                ripple_detect(cmd_room, ZCMD.arg1);
+								ripple_detect ( cmd_room, ZCMD.arg1 );
 								if ( load_otrigger ( obj ) == -1 )
 									obj = NULL;
 								tobj = obj;
 								last_cmd = obj ? true : false;
-
 							}
 							else
 							{
@@ -4454,7 +4453,6 @@ void reset_zone ( zone_rnum zone )
 								} else
 								last_cmd = false; 
 							}
-
 						}
 						else
 							last_cmd = false;

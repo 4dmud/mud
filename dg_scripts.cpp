@@ -847,6 +847,7 @@ room_rnum get_room ( const char *name )
 Character *get_char_by_obj ( obj_data * obj,const char *name )
 {
 	Character *ch;
+	room_rnum r = NULL;
 
 	if ( *name == UID_CHAR )
 	{
@@ -867,8 +868,8 @@ Character *get_char_by_obj ( obj_data * obj,const char *name )
 		        valid_dg_target ( obj->worn_by, TRUE ) )
 			return obj->worn_by;
 
-		if ( IN_ROOM ( obj ) )
-			for ( ch = IN_ROOM ( obj )->people; ch; ch = ch->next_in_room )
+		if ( ( r = obj_room ( obj ) ) != NULL )
+			for ( ch = r->people; ch; ch = ch->next_in_room )
 				if ( isname ( name, ch->player.name ) && valid_dg_target ( ch, TRUE ) )
 					return ch;
 
@@ -883,6 +884,7 @@ Character *get_char_by_obj ( obj_data * obj,const char *name )
 Character *get_char_by_obj ( obj_data * obj,char *name )
 {
 	Character *ch;
+	room_rnum r = NULL;
 
 	if ( *name == UID_CHAR )
 	{
@@ -903,8 +905,8 @@ Character *get_char_by_obj ( obj_data * obj,char *name )
 		        valid_dg_target ( obj->worn_by, TRUE ) )
 			return obj->worn_by;
 
-		if ( IN_ROOM ( obj ) )
-			for ( ch = IN_ROOM ( obj )->people; ch; ch = ch->next_in_room )
+		if ( ( r = obj_room ( obj ) ) != NULL )
+			for ( ch = r->people; ch; ch = ch->next_in_room )
 				if ( isname ( name, ch->player.name ) && valid_dg_target ( ch, TRUE ) )
 					return ch;
 

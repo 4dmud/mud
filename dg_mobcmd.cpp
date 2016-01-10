@@ -676,6 +676,11 @@ ACMD(do_mdamage) {
             mob_log(ch, "mdamage: victim (%s) does not exist", name);
             return;
         }
+        if ( ch && can_fight ( ch, vict, TRUE ) )
+        {
+            start_fighting_delay ( ch, vict );
+            FIGHTING ( vict ) = ch;
+        }
         script_damage(vict,dam);
     } else if (!str_cmp("all", name)) {
         Character *tvict;
@@ -684,12 +689,16 @@ ACMD(do_mdamage) {
         /**TODO: I hate this loop, because it is possable that on the extraction
                  of a mob or player after damage, it could wipe the next char.
           **/
-        for (vict = IN_ROOM(ch)->people;vict;vict = tvict) {
-
-            if (ch != vict) {
-                if (!IS_NPC(vict)) {
-                    script_damage(vict, dam);
+        for (vict = IN_ROOM(ch)->people;vict;vict = tvict)
+        {
+            if (ch != vict)
+            {
+                if ( ch && can_fight ( ch, vict, TRUE ) )
+                {
+                    start_fighting_delay ( ch, vict );
+                    FIGHTING ( vict ) = ch;
                 }
+                script_damage(vict, dam);
             }
             if (!DEAD(vict))
                 tvict = vict->next_in_room;
@@ -700,8 +709,14 @@ ACMD(do_mdamage) {
     } else if (!(vict = get_char_room_vis(ch, name, NULL))) {
         mob_log(ch, "mdamage: victim (%s) does not exist (in this room)", name);
         return;
-    } else
+    } else {
+        if ( ch && can_fight ( ch, vict, TRUE ) )
+        {
+            start_fighting_delay ( ch, vict );
+            FIGHTING ( vict ) = ch;
+        }
         script_damage(vict, dam);
+    }
 }
 
 
