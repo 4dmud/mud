@@ -384,6 +384,7 @@ void Character::clear()
 	HUNT_COUNT ( this ) = 0;
 	hitched = NULL;
 	GET_ATTACK_POS ( this ) = TYPE_UNDEFINED;
+	ATK_CHANCE ( this ) = number ( 0, 3 );
 	has_note[0] = -1;
 	has_note[1] = -1;
 	has_note[2] = -1;
@@ -399,9 +400,7 @@ void Character::clear()
 	GET_AC ( this ) = 100;
 	points.max_mana = 100;
 	IsNaked = false;
-
 	CMD_FLAGS2 ( this ) = 0;
-
 }
 
 /* clear some of the the working variables of a char */
@@ -409,13 +408,14 @@ void Character::reset()
 {
 	int i;
 
+	player.deeds.zone = 0;
 	for ( i = 0; i < NUM_WEARS; i++ )
 		GET_EQ ( this, i ) = NULL;
 	for ( i = 0; i < TOP_FUSE_LOCATION; i++ )
 		FUSE_LOC ( this, i ) = NULL;
 	DIE_TIME ( this )            = 0;
 	REMOVE_BIT_AR ( PLR_FLAGS ( this ), PLR_DYING );
-	ATK_CHANCE ( this )          = 3;
+	ATK_CHANCE ( this )          = number ( 0, 3 );
 	GET_SKILLMULTI ( this )      = 0.0;
 	followers                 = NULL;
 	master                    = NULL;
@@ -470,8 +470,6 @@ void Character::reset()
 		GET_MAX_STAMINA ( this ) = 1;
 	check_regen_rates(); /* start regening points */
 	GET_LAST_TELL ( this ) = NOBODY;
-
-
 }
 
 /*
@@ -623,6 +621,7 @@ void Character::default_char()
 	next 				= NULL;
 	script 				= NULL;
 	affected 			= NULL;
+	ATK_CHANCE ( this ) = number ( 0, 3 );
 	GET_SEX ( this ) 		= SEX_MALE;
 	GET_CLASS ( this ) 		= CLASS_WARRIOR;
 	GET_LEVEL ( this ) 		= 0;
@@ -1494,6 +1493,7 @@ bool Character::CancelMessageEvent ( struct event *ev )
 			{
 				event_cancel ( ( *it).second );
 				message_event.erase ( it );
+				break;
 			}
 		}
 
@@ -1510,6 +1510,7 @@ bool Character::ClearMessageEvent ( struct event *ev )
 			if ( ( *it).second == ev )
 			{
 				message_event.erase ( it );
+				break;
 			}
 		}
 

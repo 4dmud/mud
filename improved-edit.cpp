@@ -639,12 +639,11 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all, un
   }
 
   if (i <= 0) {
-  free(replace_buffer);
+    free(replace_buffer);
     return 0;
-   }else {
-    RECREATE(*string, char, strlen(replace_buffer) + 3);
-    strcpy(*string, replace_buffer);
   }
+  RECREATE(*string, char, strlen(replace_buffer) + 3);
+  strcpy(*string, replace_buffer);
   free(replace_buffer);
   return i;
 }

@@ -497,6 +497,7 @@ void remove_corpse_from_list(OBJ_DATA *corpse) {
         if (tcorpse->corpse == corpse) {
             REMOVE_FROM_LIST(tcorpse, corpse_list, next);
             free(tcorpse);
+            tcorpse = NULL;
             return;
         }
         tcorpse = tcorpse->next;
@@ -511,6 +512,7 @@ void free_corpse_list(struct corpse_list_data *cor) {
         free_corpse_list(cor->next);
 
     free(cor);
+    cor = NULL;
 }
 
 void do_show_corpses(Character *ch) {

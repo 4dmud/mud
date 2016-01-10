@@ -632,6 +632,7 @@ void free_assemblies(void) {
     }
 
     free(g_pAssemblyTable);
+    g_pAssemblyTable = NULL;
 }
 
 #undef __ASSEMBLIES_C__

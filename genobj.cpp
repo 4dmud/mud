@@ -397,19 +397,40 @@ void free_object_strings_proto(struct obj_data *obj)
 {
   int robj_num = GET_OBJ_RNUM(obj);
   if ( obj->name && obj->name != obj_proto[robj_num].name)
+  {
     free(obj->name);
+    obj->name = NULL;
+  }
   if ( obj->description && obj->description != obj_proto[robj_num].description)
+  {
     free(obj->description);
+    obj->description = NULL;
+  }
   if (obj->short_description && obj->short_description != obj_proto[robj_num].short_description)
+  {
     free(obj->short_description);
- if ( obj->action_description  && obj->action_description != obj_proto[robj_num].action_description)
+    obj->short_description = NULL;
+  }
+  if ( obj->action_description  && obj->action_description != obj_proto[robj_num].action_description)
+  {
     free(obj->action_description);
-if (obj->smell  && obj->smell != obj_proto[robj_num].smell)
+    obj->action_description = NULL;
+  }
+  if (obj->smell  && obj->smell != obj_proto[robj_num].smell)
+  {
     free(obj->smell);
-if (obj->taste && obj->taste != obj_proto[robj_num].taste)
+    obj->smell = NULL;
+  }
+  if (obj->taste && obj->taste != obj_proto[robj_num].taste)
+  {
     free(obj->taste);
-if (obj->feel && obj->feel != obj_proto[robj_num].feel)
+    obj->taste = NULL;
+  }
+  if (obj->feel && obj->feel != obj_proto[robj_num].feel)
+  {
     free(obj->feel);
+    obj->feel = NULL;
+  }
   if (obj->ex_description) {
     struct extra_descr_data *thised, *plist, *next_one; /* O(horrible) */
     int ok_key, ok_desc, ok_item;
@@ -424,9 +445,15 @@ if (obj->feel && obj->feel != obj_proto[robj_num].feel)
           ok_item = 0;
       }
       if (thised->keyword && ok_key)
+      {
         free(thised->keyword);
+        thised->keyword = NULL;
+      }
       if (thised->description && ok_desc)
+      {
         free(thised->description);
+        thised->description = NULL;
+      }
       if (ok_item)
         free(thised);
     }
@@ -469,11 +496,10 @@ static int copy_object_main(struct obj_data *to, struct obj_data *from, int free
 }
 
 const char *material_name(int type) {
-if (type < 0 || type > NUM_MATERIAL_TYPES)
-return "Etherial";
+	if (type < 0 || type > NUM_MATERIAL_TYPES)
+		return "Etherial";
 
-return material_names[type];
-
+	return material_names[type];
 }
 
 

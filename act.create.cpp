@@ -991,7 +991,7 @@ EVENTFUNC ( message_event )
 	struct obj_data *obj = NULL;
 	Room *room = msg->rm;
 	long time = 0;
-        int freq = 1 RL_SEC;
+	int freq = 1 RL_SEC;
 
 	long uid = msg->id;
 	Character *ch = msg->ch;
@@ -1107,7 +1107,6 @@ EVENTFUNC ( message_event )
 	{
 		if ( ch )
 		{
-			ch->ClearMessageEvent ( ev );
 			delete msg;
 			if ( type == THING_SUB )
 			{

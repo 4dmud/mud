@@ -434,7 +434,7 @@ void free_help(struct help_index_element *help) {
     free_string(&help->keywords);
     free_string(&help->entry);
     free(help);
-
+    help = NULL;
     //memset(help, 0, (sizeof(struct help_index_element)));
 
 }

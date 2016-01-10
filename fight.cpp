@@ -5512,11 +5512,11 @@ void death_cry ( Character *ch )
 
 void raw_kill ( Character *ch, Character *killer )
 {
-  float ct = 0;
-  struct obj_data *obj;
-  char buf[256];
-  int zone_num;
-  int legit = 0;
+	float ct = 0;
+	struct obj_data *obj;
+	char buf[256];
+	int zone_num;
+	int legit = 0;
 
 	if ( !ch || DEAD ( ch ) )
 		return;
@@ -5524,69 +5524,52 @@ void raw_kill ( Character *ch, Character *killer )
   /* Clan deeds - count the kills in the zone */
   /* Then check if the player has a good kill/time ratio so
      they dont cheat on just idling in the zone to get the deeds */
-  if (ch && killer && !IS_NPC(killer) && IS_NPC(ch) && IN_ROOM ( ch ) != NULL) {
-      zone_num = zone_table[IN_ROOM(ch)->zone].number;      
-	if ((ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1)))
-	legit = 1;	
+	if (ch && killer && !IS_NPC(killer) && IS_NPC(ch) && IN_ROOM ( ch ) != NULL) {
+		zone_num = zone_table[IN_ROOM(ch)->zone].number;
+		if ((ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1)))
+			legit = 1;
 
+		if (legit == 1) {
+			killer->player.deeds.kills++;
+			ct = (time(0) - killer->player.deeds.time_in)/300.00;
+			ct = (float)killer->player.deeds.kills/ct;
+			struct clan_deed_type *cl;
+			int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
+			for ( clan_num = 0; clan_num <= num_of_clans; ++clan_num ) {
+				for (cl = clan[clan_num].deeds; cl; cl = cl->next)
+					deeds_amt++;
+				if (deeds_amt > winner_amt) {
+					highest_clan = clan_num;
+					winner_amt = deeds_amt;
+				}
+				deeds_amt = 0;
+			}
 
-     
-	 if (legit == 1)  {
-          killer->player.deeds.kills++;
-	
-          ct = (time(0) - killer->player.deeds.time_in)/300.00;
-          ct = (float)killer->player.deeds.kills/ct;
-          /* Reset timers and kills since they idled */
-/*          if (ct < 25) {
-              killer->player.deeds.time_in = time(0);
-              killer->player.deeds.kills = 0;
-          }   */
+			/* Now lets check percentage chance for deed to load */
+			/* Percentage chance increases every 15 minutes      */
+			ct = (time(0) - killer->player.deeds.time_in)/900.00;
+			ct += 0;     // Always 1 percentage chance anyway
+			if (GET_CLAN(killer) != highest_clan)
+				ct += 9;
+			ct += (killer->player.deeds.kills)/7;
 
-
-                        struct clan_deed_type *cl;
-                        int clan_num, deeds_amt = 0, winner_amt = 0, highest_clan = 0;
-                        clan_num = 0;
-                        while ((clan_num >= 0) &&  (clan_num <= num_of_clans)) {
-                              for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-                                deeds_amt += 1;
-                        }
-                        if (deeds_amt > winner_amt) {
-                        highest_clan = clan_num;
-                        winner_amt = deeds_amt;
-                        }
-                        deeds_amt = 0;
-                        clan_num += 1;
-                     }
-
-          /* Now lets check percentage chance for deed to load */
-          /* Percentage chance increases every 15 minutes      */
-          ct = (time(0) - killer->player.deeds.time_in)/900.00;
-          ct += 0;     // Always 1 percentage chance anyway
-          if (GET_CLAN(killer) != highest_clan) {
-	  ct += 9;
-          }
-	  ct += (killer->player.deeds.kills)/7;
-
-	//	killer->Send("Count = %d, kills = %d, time = %d\r\n", (int)ct, (int)killer->player.deeds.kills, (int)((time(0) - killer->player.deeds.time_in)/900.00));
-
-
-          if (number(0, 100) < (int)ct) {
-              obj = read_object(7, VIRTUAL);
-              sprintf(buf, "Clan deed for %s", zone_table[IN_ROOM(killer)->zone].name);
-              obj->short_description = strdup(buf);
-              sprintf(buf, "Clan deed for %s is lying here!\r\n", zone_table[IN_ROOM(killer)->zone].name);
-              obj->description = strdup(buf);
-              GET_OBJ_VAL(obj, 0) = zone_num;
-              GET_OBJ_TIMER(obj) = 50;
-              SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-	      check_timer(obj);
-              obj_to_char(obj, killer);
-              load_otrigger(obj);
-              killer->player.deeds.kills = -100;
-	      killer->Send("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));  
-	  }
-      }
-  }
+			if (number(0, 100) < (int)ct) {
+				obj = read_object(7, VIRTUAL);
+				sprintf(buf, "Clan deed for %s", zone_table[IN_ROOM(killer)->zone].name);
+				obj->short_description = strdup(buf);
+				sprintf(buf, "Clan deed for %s is lying here!\r\n", zone_table[IN_ROOM(killer)->zone].name);
+				obj->description = strdup(buf);
+				GET_OBJ_VAL(obj, 0) = zone_num;
+				GET_OBJ_TIMER(obj) = 50;
+				SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+				check_timer(obj);
+				obj_to_char(obj, killer);
+				load_otrigger(obj);
+				killer->player.deeds.kills = -100;
+				killer->Send("{cY%s just won the deed for %s for %s!\r\n{cn",GET_NAME(killer), zone_table[IN_ROOM(killer)->zone].name,  clan_name ( find_clan_by_id ( GET_CLAN ( killer ) )));
+			}
+		}
+	}
 
 	remove_all_normal_affects ( ch );
 	/* To make ordinary commands work in scripts.  welcor */

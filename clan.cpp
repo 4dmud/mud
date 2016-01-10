@@ -1237,8 +1237,7 @@ void clan_to_store ( int i )
 	FILE *fl;
 	char outname[40], buf[MAX_STRING_LENGTH];
 	int thing = 0;
-        struct clan_deed_type *cl;
-
+	struct clan_deed_type *cl;
 
 	snprintf ( outname, sizeof ( outname ), "%s/clan.%d", CLAN_DIR, i );
 	if ( ! ( fl = fopen ( outname, "w" ) ) )
@@ -1246,7 +1245,6 @@ void clan_to_store ( int i )
 		new_mudlog ( NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open clan file %s for write",outname );
 		return;
 	}
-
 
 	fprintf ( fl, "Name: %s\n", clan[i].name );
 	fprintf ( fl, "Id  : %d\n", clan[i].id );
@@ -1259,24 +1257,24 @@ void clan_to_store ( int i )
 	fprintf ( fl, "-1: none\n" );
 
 //	fprintf ( fl, "Tres: %lld\n", clan[i].treasure );
-        fprintf ( fl, "Coin: %lld\n", clan[i].treasury.coins);
-        fprintf ( fl, "Gold: %d\n", clan[i].treasury.gold);
-        fprintf ( fl, "Silv: %d\n", clan[i].treasury.silver);
-        fprintf ( fl, "Bron: %d\n", clan[i].treasury.bronze);
+	fprintf ( fl, "Coin: %lld\n", clan[i].treasury.coins);
+	fprintf ( fl, "Gold: %d\n", clan[i].treasury.gold);
+	fprintf ( fl, "Silv: %d\n", clan[i].treasury.silver);
+	fprintf ( fl, "Bron: %d\n", clan[i].treasury.bronze);
 	fprintf ( fl, "Memb: %d\n", clan[i].members );
 	fprintf ( fl, "Powr: %d\n", clan[i].power );
 	fprintf ( fl, "Appf: %lld\n", clan[i].app_fee );
 	fprintf ( fl, "Dues: %lld\n", clan[i].dues );
 	fprintf ( fl, "Reca: %d\n", clan[i].recall );
 	fprintf ( fl, "Bord: %d\n", clan[i].board );
-        for (cl = clan[i].deeds; cl; cl = cl->next) {
-            fprintf(fl, "Deed: %d\n", cl->zone);
-            buf[0] = '\0';
-	    strcpy ( buf, cl->name );
-	    strip_cr ( buf );
-	    smash_tilde ( buf );
-	    fprintf ( fl, "%s\n", buf );
-        }
+	for (cl = clan[i].deeds; cl; cl = cl->next) {
+		fprintf(fl, "Deed: %d\n", cl->zone);
+		buf[0] = '\0';
+		strcpy ( buf, cl->name );
+		strip_cr ( buf );
+		smash_tilde ( buf );
+		fprintf ( fl, "%s\n", buf );
+	}
 	fprintf ( fl, "Spel:\n" );
 	for ( thing = 0; thing < MAX_CLAN_SPELLS; thing++ )
 		fprintf ( fl, "%d %d\n", thing, clan[i].spells[thing] );
@@ -1384,16 +1382,16 @@ int store_to_clan ( int i )
 					strcpy ( clan[i].description, tmpd );
 					free_string ( &tmpd );
 				}
-                                else if (!strcmp(tag, "Deed")) {
-                                    struct clan_deed_type *cl;
-                                    CREATE(cl, struct clan_deed_type, 1);
-                                    cl->zone = num;
-                                //    cl->name = strdup("unknown");
-                                    get_line(fl, line);
-                                    cl->name = strdup(line);
-                                    cl->next = clan[i].deeds;
-                                    clan[i].deeds = cl;
-                                }
+				else if (!strcmp(tag, "Deed"))
+				{
+					struct clan_deed_type *cl;
+					CREATE(cl, struct clan_deed_type, 1);
+					cl->zone = num;
+					get_line(fl, line);
+					cl->name = strdup(line);
+					cl->next = clan[i].deeds;
+					clan[i].deeds = cl;
+				}
 				else if ( !strcmp ( tag, "Dues" ) )
 					clan[i].dues = num;
 				break;
@@ -2693,6 +2691,23 @@ void free_clan_lists ( void )
 	for ( i = 0; i < num_of_clans; i++ )
 		free_clan_list ( clan_list[i] );
 
+	/* free clan deeds */
+	struct clan_deed_type *d, *tmp;
+	for ( auto &cl : clan )
+	{
+		d = cl.deeds;
+		while ( d )
+		{
+			tmp = d->next;
+			if ( d->name )
+			{
+				free ( d->name );
+				d->name = NULL;
+			}
+			free ( d );
+			d = tmp;
+		}
+	}
 }
 
 

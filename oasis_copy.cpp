@@ -410,15 +410,14 @@ int buildwalk(Character *ch, int dir) {
   if ( IN_ROOM ( ch ) == NULL )
     return 0;
 
-  if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_BUILDWALK) &&
-      GET_LEVEL(ch) >= LVL_BUILDER) {
+  if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_BUILDWALK) && GET_LEVEL(ch) >= LVL_BUILDER) {
  
     get_char_colours(ch);
 
     if (!can_edit_zone(ch, IN_ROOM(ch)->zone)) {
       ch->Send( "You do not have build permissions in this zone.\r\n");
     } else if ((vnum = redit_find_new_vnum(IN_ROOM(ch)->zone)) == NOWHERE)
-    ch->Send( "No free vnums are available in this zone!\r\n");
+        ch->Send( "No free vnums are available in this zone!\r\n");
     else {
       Descriptor *d = ch->desc;
       /*
@@ -428,7 +427,7 @@ int buildwalk(Character *ch, int dir) {
       if (d->olc) {
         new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: buildwalk(): Player already had olc structure.");
         free(d->olc);
-  }
+      }
     
       CREATE(d->olc, struct oasis_olc_data, 1);
       OLC_ZNUM(d) = IN_ROOM(ch)->zone;
@@ -448,18 +447,18 @@ int buildwalk(Character *ch, int dir) {
       redit_save_internally(d);
       OLC_VAL(d) = 0;
 
-  /* Link rooms */
-  rnum = real_room(vnum);
-  CREATE(EXIT(ch, dir), struct room_direction_data, 1);
-  EXIT(ch, dir)->to_room = rnum;
-  CREATE(rnum->dir_option[rev_dir[dir]], struct room_direction_data, 1);
-  rnum->dir_option[rev_dir[dir]]->to_room = IN_ROOM(ch);
+      /* Link rooms */
+      rnum = real_room(vnum);
+      CREATE(EXIT(ch, dir), struct room_direction_data, 1);
+      EXIT(ch, dir)->to_room = rnum;
+      CREATE(rnum->dir_option[rev_dir[dir]], struct room_direction_data, 1);
+      rnum->dir_option[rev_dir[dir]]->to_room = IN_ROOM(ch);
 
-  /* Memory cleanup */
-  ch->Send( "%sRoom #%d created by BuildWalk.%s\r\n", yel, vnum, nrm);
-  cleanup_olc(d, CLEANUP_STRUCTS);
-  return(1);
-  }
+      /* Memory cleanup */
+      ch->Send( "%sRoom #%d created by BuildWalk.%s\r\n", yel, vnum, nrm);
+      cleanup_olc(d, CLEANUP_STRUCTS);
+      return(1);
+    }
   }
   return 0;
 }

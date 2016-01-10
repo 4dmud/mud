@@ -76,6 +76,7 @@ int free_strings(void *data, int type)
             free(room->dir_option[i]->keyword);
           
           free(room->dir_option[i]);
+          room->dir_option[i] = NULL;
         }
       }
       
@@ -89,31 +90,58 @@ int free_strings(void *data, int type)
       config = (struct config_data *) data;
       
       if (config->play.OK)
+      {
         free(config->play.OK);
+        config->play.OK = NULL;
+      }
         
       if (config->play.NOPERSON)
+      {
         free(config->play.NOPERSON);
+        config->play.NOPERSON = NULL;
+      }
         
       if (config->play.NOEFFECT)
+      {
         free(config->play.NOEFFECT);
+        config->play.NOEFFECT = NULL;
+      }
       
       if (config->operation.DFLT_IP)
+      {
         free(config->operation.DFLT_IP);
+        config->operation.DFLT_IP = NULL;
+      }
         
       if (config->operation.DFLT_DIR)
+      {
         free(config->operation.DFLT_DIR);
+        config->operation.DFLT_DIR = NULL;
+      }
         
       if (config->operation.LOGNAME)
+      {
         free(config->operation.LOGNAME);
+        config->operation.LOGNAME = NULL;
+      }
         
       if (config->operation.MENU)
+      {
         free(config->operation.MENU);
+        config->operation.MENU = NULL;
+      }
         
       if (config->operation.WELC_MESSG)
+      {
         free(config->operation.WELC_MESSG);
+        config->operation.WELC_MESSG = NULL;
+      }
         
       if (config->operation.START_MESSG)
+      {
         free(config->operation.START_MESSG);
+        config->operation.START_MESSG = NULL;
+      }
       
       return (TRUE);
     

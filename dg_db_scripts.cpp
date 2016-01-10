@@ -193,20 +193,23 @@ void dg_read_trigger(FILE *fp, void *proto, int type) {
     case MOB_TRIGGER:
         mob = (Character *)proto;
         if (mob->proto_script == NULL)
-        mob->proto_script = new vector<int>(1, vnum);
+            mob->proto_script = new vector<int>(1, vnum);
         else
-        mob->proto_script->push_back(vnum);
+            mob->proto_script->push_back(vnum);
         break;
     case WLD_TRIGGER:
         room = (Room *)proto;
         if (room->proto_script == NULL)
-        room->proto_script = new vector<int>(1, vnum);
+            room->proto_script = new vector<int>(1, vnum);
         else
-        room->proto_script->push_back(vnum);
+            room->proto_script->push_back(vnum);
 
         if (room != NULL && rnum != NOTHING) {
             if (!(room->script))
+			{
                 CREATE(room->script, struct script_data, 1);
+                room->script->function_trig = -1;
+			}
             add_trigger(SCRIPT(room), read_trigger(rnum), -1);
         } else {
             new_mudlog(BRF, LVL_BUILDER, TRUE,
@@ -266,7 +269,10 @@ void assign_triggers(void *i, int type) {
                            (*mob->proto_script)[tr], mob->vnum);
             } else {
                 if (!SCRIPT(mob))
+				{
                     CREATE(SCRIPT(mob), struct script_data, 1);
+                    SCRIPT(mob)->function_trig = -1;
+				}
                 add_trigger(SCRIPT(mob), read_trigger(rnum), -1);
             }
         }
@@ -282,7 +288,10 @@ void assign_triggers(void *i, int type) {
                     (*obj->proto_script)[tr], obj_index[obj->item_number].vnum);
             } else {
                 if (!SCRIPT(obj))
+				{
                     CREATE(SCRIPT(obj), struct script_data, 1);
+                    SCRIPT(obj)->function_trig = -1;
+				}
                 add_trigger(SCRIPT(obj), read_trigger(rnum), -1);
             }
         }
@@ -306,6 +315,7 @@ void assign_triggers(void *i, int type) {
                     SCRIPT(room)->types = 0;
                     SCRIPT(room)->context = 0;
                     SCRIPT(room)->next = NULL;
+                    SCRIPT(room)->function_trig = -1;
                 }
                 add_trigger(SCRIPT(room), read_trigger(rnum), -1);
             }

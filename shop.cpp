@@ -27,6 +27,7 @@
 #include "descriptor.h"
 
 map < room_vnum, plrshop* > player_shop;
+map < long, Room* > obj_in_plrshop;
 
 /* External variables */
 extern struct time_info_data time_info;
@@ -1908,6 +1909,7 @@ void boot_player_shops ( string filename )
 				shop_item->currency = cur;
 
 				pshop->item.push_back ( shop_item );
+				obj_in_plrshop[ GET_ID ( item ) ] = world_vnum[r];
 			}
 
 			world_vnum[r]->func = playershop;
@@ -1986,4 +1988,14 @@ void save_player_shop ( string owner )
 		}
 	fprintf ( file_shop, "end_of_file" );
 	fclose ( file_shop );
+}
+
+void free_player_shops()
+{
+	for ( auto &p : player_shop )
+	{
+		for ( auto &i : p.second->item )
+			extract_obj ( i->obj );
+		delete p.second;
+	}
 }

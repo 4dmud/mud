@@ -294,7 +294,10 @@ void assedit_parse(Descriptor *d, char *arg)
       d->Output( "\r\nSaving all assemblies\r\n");
       assemblySaveAssemblies();
       if (pTComponents)
+      {
         free(pTComponents);
+        pTComponents = NULL;
+      }
       if (OLC_ASSEDIT(d)->pComponents)
         free(OLC_ASSEDIT(d)->pComponents);
       free(OLC_ASSEDIT(d));

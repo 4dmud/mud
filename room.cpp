@@ -90,12 +90,11 @@ Room::~Room() {
         free_proto_script(this, WLD_TRIGGER);
     
     // Added per Horus
-    for (tmp = ores; tmp; tmp = tmp_next) {
-	tmp_next = tmp->next;
-	free(tmp);
+	for (tmp = ores; tmp; tmp = tmp_next) {
+		tmp_next = tmp->next;
+		free(tmp);
 	}
 	ores = NULL;
-
 }
 
 int Room::free_room_strings() {
@@ -244,7 +243,10 @@ void Room::FreeDescription() {
 void Room::AssignTempDesc() {
     if (t_description) {
         if (description)
+        {
             free(description);
+            description = NULL;
+        }
         //description = t_description;
         if (DescID != -1)
             compressor.DeleteId(DescID);

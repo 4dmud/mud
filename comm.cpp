@@ -300,7 +300,8 @@ void *z_alloc(void *opaque, uInt items, uInt size) {
 }
 
 void z_free(void *opaque, void *address) {
-    return free(address);
+    free(address);
+    address = NULL;
 }
 #endif /* HAVE_ZLIB_H */
 
@@ -456,18 +457,18 @@ int main(int argc, char **argv) {
       ecl_init_module(OBJNULL, init_4d_lisp);
 
       if (argc == 3) {
-	const_string = "(handler-case (load \"%s\") (error (e) (format t \"error: ~a~%\" e)))";
-	int es_size = strlen(const_string) + strlen(argv[2]);
-	char* eval_string = (char *)malloc(es_size);
-	snprintf(eval_string, es_size, const_string, argv[2]);
-	cl_safe_eval(c_string_to_object(eval_string), Cnil, Cnil);
-	free(eval_string);
-
+        const_string = "(handler-case (load \"%s\") (error (e) (format t \"error: ~a~%\" e)))";
+        int es_size = strlen(const_string) + strlen(argv[2]);
+        char* eval_string = (char *)malloc(es_size);
+        snprintf(eval_string, es_size, const_string, argv[2]);
+        cl_safe_eval(c_string_to_object(eval_string), Cnil, Cnil);
+        free(eval_string);
+        eval_string = NULL;
       }
       else {
-	printf("No file argument detected. starting interactive repl.\n");
-	const_string = "(handler-case (loop (write-string \"> \") (princ (eval (read))) (terpri)) (error (e) (format t \"error: ~a~%\" e)))";
-	cl_safe_eval(c_string_to_object(const_string), Cnil, Cnil);
+        printf("No file argument detected. starting interactive repl.\n");
+        const_string = "(handler-case (loop (write-string \"> \") (princ (eval (read))) (terpri)) (error (e) (format t \"error: ~a~%\" e)))";
+        cl_safe_eval(c_string_to_object(const_string), Cnil, Cnil);
       }
 
       cl_shutdown();
@@ -665,6 +666,7 @@ int main(int argc, char **argv) {
         Board_clear_all();        /* boards.c */
 	log("boards freed.");
         free(cmd_sort_info); /* act.informative.c */
+        cmd_sort_info = NULL;
 	log("commands sort info freed.");
         free_command_list();        /* act.informative.c */
 	log("command list freed");
@@ -691,6 +693,7 @@ int main(int argc, char **argv) {
     }
     /* probably should free the entire config here.. */
     free(CONFIG_CONFFILE);
+    CONFIG_CONFFILE = NULL;
 
     log("Done.");
     return (0);
@@ -1885,6 +1888,7 @@ void free_bufpool_recu(struct txt_block *k) {
         free(k->text);
 
     free(k);
+    k = NULL;
 }
 
 void free_bufpool(void) {
@@ -3101,6 +3105,7 @@ RETSIGTYPE reap(int sig) {
 }
 
 RETSIGTYPE checkpointing(int sig) {
+return;
     if (!tics_passed) {
         log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
         abort();
@@ -3840,6 +3845,7 @@ void *zlib_alloc(void *opaque, unsigned int items, unsigned int size) {
 
 void zlib_free(void *opaque, void *address) {
     free(address);
+    address = NULL;
 }
 
 #endif
@@ -4583,6 +4589,9 @@ void mccp_off(Descriptor *d) {
         free(d->comp->stream);
         free(d->comp->buff_out);
         free(d->comp->buff_in);
+        d->comp->stream = NULL;
+        d->comp->buff_out = NULL;
+        d->comp->buff_in = NULL;
     }
 #endif /* HAVE_ZLIB_H */
 

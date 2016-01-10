@@ -342,6 +342,7 @@ void thefree_social_messages ( void )
 		free_action ( &soc_mess_list[ac] );
 
 	free ( soc_mess_list );
+	soc_mess_list = NULL;
 }
 /* this function adds in the loaded socials and assigns them a command # */
 void create_command_list ( void )
@@ -462,7 +463,7 @@ void free_social_messages ( void )
 		free_action ( mess );
 	}
 	free ( soc_mess_list );
-
+	soc_mess_list = NULL;
 }
 
 void free_action ( struct social_messg *mess )
@@ -483,6 +484,7 @@ void free_action ( struct social_messg *mess )
 	if ( mess->char_obj_found ) free ( mess->char_obj_found );
 	if ( mess->others_obj_found ) free ( mess->others_obj_found );
 	memset ( mess, 0, sizeof ( struct social_messg ) );
+	mess = NULL;
 }
 
 int find_action ( int cmd )

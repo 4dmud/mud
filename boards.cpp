@@ -639,11 +639,11 @@ void Board_load_board(int board_type)
   char *tmp1, *tmp2;
   
   if (!fileExists(FILENAME(board_type))) {
-  log("Board file %s doesn't exist, creating now.", FILENAME(board_type));
-  fl = fopen(FILENAME(board_type), "wb");
-  fprintf(fl, "%d\n", 0);
-  fclose(fl);
-  chmod(FILENAME(board_type), 0666);
+    log("Board file %s doesn't exist, creating now.", FILENAME(board_type));
+    fl = fopen(FILENAME(board_type), "wb");
+    fprintf(fl, "%d\n", 0);
+    fclose(fl);
+    chmod(FILENAME(board_type), 0666);
   }
 
   if (!(fl = fopen(FILENAME(board_type), "rb")))
@@ -653,10 +653,10 @@ void Board_load_board(int board_type)
     return;
   }
   fread(&(num_of_msgs[board_type]), sizeof(int), 1, fl);
-  if (num_of_msgs[board_type] < 1
-      || num_of_msgs[board_type] > MAX_BOARD_MESSAGES)
+  if (num_of_msgs[board_type] < 1 || num_of_msgs[board_type] > MAX_BOARD_MESSAGES)
   {
     log("SYSERR: Board file %d corrupt.  Resetting.", board_type);
+    fclose(fl);
     Board_reset_board(board_type);
     return;
   }
@@ -666,6 +666,7 @@ void Board_load_board(int board_type)
     if ((len1 = msg_index[board_type][i].heading_len) <= 0)
     {
       log("SYSERR: Board file %d corrupt!  Resetting.", board_type);
+      fclose(fl);
       Board_reset_board(board_type);
       return;
     }
@@ -675,8 +676,8 @@ void Board_load_board(int board_type)
 
     if ((MSG_SLOTNUM(board_type, i) = find_slot()) == -1)
     {
-      log("SYSERR: Out of slots booting board %d!  Resetting...",
-          board_type);
+      log("SYSERR: Out of slots booting board %d!  Resetting...", board_type);
+      fclose(fl);
       Board_reset_board(board_type);
       return;
     }

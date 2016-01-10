@@ -334,6 +334,7 @@ int delete_room(room_rnum rnum)
   {
     world_vnum[room->number] = NULL;
     free(room);
+    room = NULL;
   }
   /*
    * Now we actually move the rooms down.

@@ -2306,17 +2306,13 @@ void name_to_drinkcon ( struct obj_data *obj, int type )
 {
 	char *new_name;
 	return;
-	if ( !obj
-	        || ( GET_OBJ_TYPE ( obj ) != ITEM_DRINKCON
-	             && GET_OBJ_TYPE ( obj ) != ITEM_FOUNTAIN ) )
+	if ( !obj || ( GET_OBJ_TYPE ( obj ) != ITEM_DRINKCON && GET_OBJ_TYPE ( obj ) != ITEM_FOUNTAIN ) )
 		return;
 
-	CREATE ( new_name, char,
-	         strlen ( obj->name ) + strlen ( drinknames[type] ) + 2 );
+	CREATE ( new_name, char, strlen ( obj->name ) + strlen ( drinknames[type] ) + 2 );
 	sprintf ( new_name,  "%s %s", obj->name, drinknames[type] ); /* sprintf: OK */
 
-	if ( GET_OBJ_RNUM ( obj ) == NOTHING
-	        || obj->name != obj_proto[GET_OBJ_RNUM ( obj ) ].name )
+	if ( GET_OBJ_RNUM ( obj ) == NOTHING || obj->name != obj_proto[GET_OBJ_RNUM ( obj ) ].name )
 		free ( obj->name );
 
 	obj->name = new_name;

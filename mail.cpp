@@ -440,54 +440,50 @@ char *read_delete(long recipient)
     char *from, *to;
     size_t string_size;
 
-    if (recipient < 0) {
-	log("SYSERR: Mail system -- non-fatal error #6. (recipient: %ld)",
-	    recipient);
-	return (NULL);
-    }
-    if (!(mail_pointer = find_char_in_index(recipient))) {
-	log("SYSERR: Mail system -- post office spec_proc error?  Error #7. (invalid character in index)");
-	return (NULL);
-    }
-    if (!(position_pointer = mail_pointer->list_start)) {
-	log("SYSERR: Mail system -- non-fatal error #8. (invalid position pointer %p)", position_pointer);
-	return (NULL);
-    }
-    if (!(position_pointer->next)) {	/* just 1 entry in list. */
-	mail_address = position_pointer->position;
-	free(position_pointer);
-
-	/* now free up the actual name entry */
-	if (mail_index == mail_pointer) {	/* name is 1st in list */
-	    mail_index = mail_pointer->next;
-	    free(mail_pointer);
-	} else {
-	    /* find entry before the one we're going to del */
-	    for (prev_mail = mail_index;
-		 prev_mail->next != mail_pointer;
-		 prev_mail = prev_mail->next);
-	    prev_mail->next = mail_pointer->next;
-	    free(mail_pointer);
+	if (recipient < 0) {
+		log("SYSERR: Mail system -- non-fatal error #6. (recipient: %ld)", recipient);
+		return (NULL);
 	}
-    } else {
-	/* move to next-to-last record */
-	while (position_pointer->next->next)
-	    position_pointer = position_pointer->next;
-	mail_address = position_pointer->next->position;
-	free(position_pointer->next);
-	position_pointer->next = NULL;
-    }
+	if (!(mail_pointer = find_char_in_index(recipient))) {
+		log("SYSERR: Mail system -- post office spec_proc error?  Error #7. (invalid character in index)");
+		return (NULL);
+	}
+	if (!(position_pointer = mail_pointer->list_start)) {
+		log("SYSERR: Mail system -- non-fatal error #8. (invalid position pointer %p)", position_pointer);
+		return (NULL);
+	}
+	if (!(position_pointer->next)) {	/* just 1 entry in list. */
+		mail_address = position_pointer->position;
+		free(position_pointer);
+
+		/* now free up the actual name entry */
+		if (mail_index == mail_pointer) {	/* name is 1st in list */
+			mail_index = mail_pointer->next;
+			free(mail_pointer);
+		} else {
+			/* find entry before the one we're going to del */
+			for (prev_mail = mail_index; prev_mail->next != mail_pointer; prev_mail = prev_mail->next);
+			prev_mail->next = mail_pointer->next;
+			free(mail_pointer);
+		}
+	} else {
+		/* move to next-to-last record */
+		while (position_pointer->next->next)
+			position_pointer = position_pointer->next;
+		mail_address = position_pointer->next->position;
+		free(position_pointer->next);
+		position_pointer->next = NULL;
+	}
 
     /* ok, now lets do some readin'! */
     read_from_file(&header, BLOCK_SIZE, mail_address);
 
-    if (header.block_type != HEADER_BLOCK) {
-	log("SYSERR: Oh dear. (Header block %ld != %d)", header.block_type,
-	    HEADER_BLOCK);
-	no_mail = TRUE;
-	log("SYSERR: Mail system disabled!  -- Error #9. (Invalid header block.)");
-	return (NULL);
-    }
+	if (header.block_type != HEADER_BLOCK) {
+		log("SYSERR: Oh dear. (Header block %ld != %d)", header.block_type, HEADER_BLOCK);
+		no_mail = TRUE;
+		log("SYSERR: Mail system disabled!  -- Error #9. (Invalid header block.)");
+		return (NULL);
+	}
     tmstr = asctime(localtime(&header.header_data.mail_time));
     *(tmstr + strlen(tmstr) - 1) = '\0';
 
@@ -512,20 +508,18 @@ char *read_delete(long recipient)
     write_to_file(&header, BLOCK_SIZE, mail_address);
     push_free_list(mail_address);
 
-    while (following_block != LAST_BLOCK) {
-	read_from_file(&data, BLOCK_SIZE, following_block);
-
-	string_size =
-	    (sizeof(char) * (strlen(message) + strlen(data.txt) + 1));
-	RECREATE(message, char, string_size);
-	strcat(message, data.txt);
-	message[string_size - 1] = '\0';
-	mail_address = following_block;
-	following_block = data.block_type;
-	data.block_type = DELETED_BLOCK;
-	write_to_file(&data, BLOCK_SIZE, mail_address);
-	push_free_list(mail_address);
-    }
+	while (following_block != LAST_BLOCK) {
+		read_from_file(&data, BLOCK_SIZE, following_block);
+		string_size = (sizeof(char) * (strlen(message) + strlen(data.txt) + 1));
+		RECREATE(message, char, string_size);
+		strcat(message, data.txt);
+		message[string_size - 1] = '\0';
+		mail_address = following_block;
+		following_block = data.block_type;
+		data.block_type = DELETED_BLOCK;
+		write_to_file(&data, BLOCK_SIZE, mail_address);
+		push_free_list(mail_address);
+	}
 
     return (message);
 }

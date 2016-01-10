@@ -26,6 +26,8 @@
 #include "damage.h"
 #include "descriptor.h"
 #include "lisp.h"
+#include "shop.h"
+
 /* local vars */
 int extractions_pending = 0;
 int obj_extractions_pending = 0;
@@ -34,6 +36,8 @@ bool LS_REMOVE = 0;
 /* external vars */
 extern const char *MENU;
 struct hunter_data *hunter_list = NULL;
+extern map < room_vnum, plrshop* > player_shop;
+extern map < long, Room* > obj_in_plrshop;
 
 /* local functions */
 void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod,
@@ -46,6 +50,7 @@ void update_char_objects ( Character *ch );
 
 
 /* external functions */
+void save_player_shop (string owner );
 void unhitch_item ( struct obj_data *obj );
 void unhitch_mob ( Character *ch );
 void check_timer ( obj_data *obj );
@@ -1698,6 +1703,20 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 */
 	unhitch_item ( obj );
 
+	/* remove obj from playershop */
+	if ( obj_in_plrshop.find ( GET_ID ( obj ) ) != obj_in_plrshop.end() )
+	{
+		room_vnum r = GET_ROOM_VNUM ( obj_in_plrshop[ GET_ID ( obj ) ] );
+		int i = 0;
+		for ( ; i < player_shop[r]->item.size() && player_shop[r]->item[i]->obj != obj; ++i ) {}
+		if ( i < player_shop[r]->item.size() )
+		{
+			delete player_shop[r]->item[i];
+			player_shop[r]->item.erase ( player_shop[r]->item.begin() + i );
+		}
+		save_player_shop ( pi.NameById ( player_shop[r]->owner_id ) );
+	}
+
 	/* Normal extract_obj code */
 	if ( obj->worn_by != NULL )
 		if ( unequip_char ( obj->worn_by, obj->worn_on ) != obj )
@@ -1812,7 +1831,14 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 	OBJ_SAT_IN_BY ( obj ) = NULL;
 
 	if ( SCRIPT ( obj ) )
+	{
+		/* Set the proto depth of a running function trigger to zero so it can be called again */
+		struct script_data *sc = SCRIPT ( obj );
+		if ( sc && sc->function_trig != -1 )
+			trig_index[ sc->function_trig ]->proto->depth = 0;
+
 		extract_script ( obj, OBJ_TRIGGER );
+	}
 
 	if ( GET_OBJ_RNUM ( obj ) == NOTHING || obj->proto_script != obj_proto[GET_OBJ_RNUM ( obj ) ].proto_script )
 		free_proto_script ( obj, OBJ_TRIGGER );
@@ -1827,13 +1853,14 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 		new_mudlog ( CMP, LVL_SEN, FALSE, "%s purged", obj->short_description );
 		purge_qic ( GET_OBJ_RNUM ( obj ) );
 	}
-if (obj != NULL) {
-	obj->carried_by = NULL;
-	obj->next_content = NULL;
-	obj->extracted = 1;
 
-	obj_data_to_pool ( obj );
-}
+	if (obj != NULL) {
+		obj->carried_by = NULL;
+		obj->next_content = NULL;
+		obj->extracted = 1;
+
+		obj_data_to_pool ( obj );
+	}
 
 }
 
@@ -2237,7 +2264,7 @@ void extract_char_final ( Character *ch )
 			GET_POINTS_EVENT ( ch, i ) = NULL;
 		}
 	/* cancel message updates */
-//HORUS	ch->ClearMessageEvents();
+	ch->ClearMessageEvents();
 	/* cancel the task */
 	stop_task ( ch );
 	if ( SCRIPT ( ch ) )
@@ -2342,6 +2369,11 @@ void extract_char ( Character *ch, int e_now )
 
 	if ( IS_NPC ( ch ) )
 	{
+		/* Set the proto depth of a running function trigger to zero so it can be called again */
+		struct script_data *sc = SCRIPT ( ch );
+		if ( sc && sc->function_trig != -1 )
+			trig_index[ sc->function_trig ]->proto->depth = 0;
+
 		SET_BIT_AR ( MOB_FLAGS ( ch ), MOB_NOTDEADYET );
 		extract_linked_mob ( ch );
 	}

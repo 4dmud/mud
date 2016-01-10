@@ -1202,6 +1202,7 @@ void redit_parse(Descriptor *d, char *arg)
          */
         REMOVE_FROM_LIST(OLC_DESC(d), OLC_ROOM(d)->ex_description, next);
         free(OLC_DESC(d));
+        OLC_DESC(d) = NULL;
       }
       break;
     case 1:
@@ -1277,6 +1278,7 @@ void redit_parse(Descriptor *d, char *arg)
          */
         REMOVE_FROM_LIST(OLC_LUDESC(d), OLC_ROOM(d)->look_under_description, next);
         free(OLC_LUDESC(d));
+        OLC_LUDESC(d) = NULL;
       }
       break;
     case 1:
@@ -1426,6 +1428,7 @@ void redit_parse(Descriptor *d, char *arg)
          */
         REMOVE_FROM_LIST(OLC_LADESC(d), OLC_ROOM(d)->look_above_description, next);
         free(OLC_LADESC(d));
+        OLC_LADESC(d) = NULL;
       }
       break;
     case 1:

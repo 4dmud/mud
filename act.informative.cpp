@@ -4516,6 +4516,7 @@ void perform_immort_where ( Character *ch, char *arg )
 			if ( dynbuf )
 				;
 			free ( dynbuf );
+			dynbuf = NULL;
 			ch->Send ( "Couldn't find any such thing.\r\n" );
 		}
 		else

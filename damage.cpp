@@ -71,6 +71,7 @@ void damage_count_free_one ( struct dam_from_list * t )
 		damage_count_free_one ( t->next );
 
 	free ( t );
+	t = NULL;
 }
 void damage_count_free ( Character *vict )
 {
@@ -398,7 +399,9 @@ void remove_affdam_event ( int idnum )
 	}
 
 	oneback = current;
-	if ( current ) current = current->next;
+	if ( current )
+		current = current->next;
+
 	while ( current )
 	{
 		if ( current->id == idnum )

@@ -386,6 +386,7 @@ void free_shop(struct shop_data *shop)
   free(S_ROOMS(shop));
   free(S_PRODUCTS(shop));
   free(shop);
+  shop = NULL;
 }
 
 /*-------------------------------------------------------------------*/

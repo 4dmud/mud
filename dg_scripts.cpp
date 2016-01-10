@@ -1024,7 +1024,6 @@ void check_time_triggers ( void )
 	Room *room=NULL;
 	int nr;
 	struct script_data *sc;
-	obj_list_type tobjs;
 
 	for ( ch = character_list; ch; ch = ch->next )
 	{
@@ -1040,18 +1039,13 @@ void check_time_triggers ( void )
 	for ( olt_it i = object_list.begin(); i != object_list.end(); i++ )
 	{
 		obj = ( i->second );
-		if ( SCRIPT ( obj ) )
+		if ( !obj->extracted && SCRIPT ( obj ) )
 		{
 			sc = SCRIPT ( obj );
 
 			if ( IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_TIME ) )
-				tobjs[GET_ID ( obj ) ] = obj;
+				time_otrigger ( obj );
 		}
-	}
-	for ( olt_it i = tobjs.begin(); i != tobjs.end(); i++ )
-	{
-		obj = ( i->second );
-		time_otrigger ( obj );
 	}
 
 	for ( nr = 0; nr <= top_of_world; nr++ )
@@ -1075,7 +1069,6 @@ void script_trigger_check ( void )
 	Room *room=NULL;
 	int nr;
 	struct script_data *sc;
-	obj_list_type tobjs;
 
 	for ( ch = character_list; ch; ch = ch->next )
 	{
@@ -1091,7 +1084,7 @@ void script_trigger_check ( void )
 	for ( olt_it i = object_list.begin(); i != object_list.end(); i++ )
 	{
 		obj = ( i->second );
-		if ( SCRIPT ( obj ) )
+		if ( !obj->extracted && SCRIPT ( obj ) )
 		{
 			sc = SCRIPT ( obj );
 			if ( IS_SET ( SCRIPT_TYPES ( sc ), OTRIG_RANDOM ) )
@@ -1168,7 +1161,8 @@ EVENTFUNC ( trig_wait_event )
 	}
 #endif
 
-	script_driver ( &go, trig, type, TRIG_RESTART );
+	if ( go )
+		script_driver ( &go, trig, type, TRIG_RESTART );
 
 	/* Do not reenqueue */
 	return 0;
@@ -1475,7 +1469,10 @@ ACMD ( do_attach )
 		}
 
 		if ( !SCRIPT ( victim ) )
+		{
 			CREATE ( SCRIPT ( victim ), struct script_data, 1 );
+			SCRIPT ( victim )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( victim ), trig, loc );
 
 		ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
@@ -1520,7 +1517,10 @@ ACMD ( do_attach )
 		}
 
 		if ( !SCRIPT ( object ) )
+		{
 			CREATE ( SCRIPT ( object ), struct script_data, 1 );
+			SCRIPT ( object )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( object ), trig, loc );
 
 		ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
@@ -1562,7 +1562,10 @@ ACMD ( do_attach )
 		room = rnum;
 
 		if ( !SCRIPT ( room ) )
+		{
 			CREATE ( SCRIPT ( room ), struct script_data, 1 );
+			SCRIPT ( room )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( room ), trig, loc );
 
 		ch->Send ( "Trigger %d (%s) attached to room %d.\r\n",
@@ -2532,7 +2535,10 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 			return;
 		}
 		if ( !SCRIPT ( c ) )
+		{
 			CREATE ( SCRIPT ( c ), struct script_data, 1 );
+			SCRIPT ( c )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( c ), newtrig, -1 );
 		return;
 	}
@@ -2540,7 +2546,10 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	if ( o )
 	{
 		if ( !SCRIPT ( o ) )
+		{
 			CREATE ( SCRIPT ( o ), struct script_data, 1 );
+			SCRIPT ( o )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( o ), newtrig, -1 );
 		return;
 	}
@@ -2548,7 +2557,10 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	if ( r )
 	{
 		if ( !SCRIPT ( r ) )
+		{
 			CREATE ( SCRIPT ( r ), struct script_data, 1 );
+			SCRIPT ( r )->function_trig = -1;
+		}
 		add_trigger ( SCRIPT ( r ), newtrig, -1 );
 		return;
 	}
@@ -2861,6 +2873,7 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
 		add_var ( &GET_TRIG_VARS ( t ), vd->name.c_str(), vd->value.c_str(), vd->context );
 
 	t->parent = parent;
+	sc->function_trig = GET_TRIG_RNUM ( t );
 	script_driver ( &go, t, type, TRIG_NEW );
 }
 /** end of dg_scripts scriptable functions **/
@@ -3919,10 +3932,6 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 				{
 					depth--;
 
-					/* If it's a function trigger, set the proto depth to 0, otherwise it can't be called again */
-					if ( IS_SET ( GET_TRIG_TYPE ( trig ), OTRIG_FUNCTION ) || IS_SET ( GET_TRIG_TYPE ( trig ), MTRIG_FUNCTION ) || IS_SET ( GET_TRIG_TYPE ( trig ), WTRIG_FUNCTION ) )
-						trig_index[ trig->nr ]->proto->depth = 0;
-
 					if ( type == OBJ_TRIGGER )
 #if DRIVER_USES_UNION
 
@@ -4234,6 +4243,7 @@ void read_saved_vars ( Character *ch )
 	/* We need to do this first, because later calls to 'remote' will need */
 	/* a script already assigned. */
 	CREATE ( SCRIPT ( ch ), struct script_data, 1 );
+	SCRIPT ( ch )->function_trig = -1;
 
 	/* find the file that holds the saved variables and open it*/
 	get_filename ( GET_NAME ( ch ), fn, SCRIPT_VARS_FILE );
@@ -4260,8 +4270,7 @@ void read_saved_vars ( Character *ch )
 			add_var ( & ( SCRIPT ( ch )->global_vars ), varname, temp, context );
 			free ( p ); /* plug memory hole */
 		}
-	}
-	while ( !feof ( file ) );
+	} while ( !feof ( file ) );
 
 	/* close the file and return */
 	fclose ( file );

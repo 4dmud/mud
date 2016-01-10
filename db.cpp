@@ -249,6 +249,8 @@ void set_race ( Character *ch, int race );
 
 
 /* external functions */
+void free_skill_prototypes();
+void free_player_shops();
 void name_to_drinkcon ( struct obj_data *obj, int type );
 void paginate_string ( const char *str, Descriptor *d ); //mord??
 struct time_info_data *mud_time_passed ( time_t t2, time_t t1 );
@@ -320,6 +322,7 @@ int check_dir ( char *dirname )
 				if ( eps[cnt]->d_name[strlen ( eps[cnt]->d_name )-1] == '~' )
 				{
 					free ( eps[cnt] );
+					eps[cnt] = NULL;
 					continue;
 				}
 				if ( strstr ( eps[cnt]->d_name, ".zon" ) )
@@ -336,6 +339,7 @@ int check_dir ( char *dirname )
 					wld = TRUE;
 			}
 			free ( eps[cnt] );
+			eps[cnt] = NULL;
 		}
 		if ( !zon )
 			log ( "Directory %s is missing its .zon file", dirname );
@@ -795,8 +799,8 @@ void boot_world ( void )
 	//log("Checking start rooms.");
 	//check_start_rooms();
 	log ( "Resetting PK Leader." );
-        LAST_PK = strdup("Nobody");
-        CHAMPION = 0;
+	LAST_PK = strdup("Nobody");
+	CHAMPION = 0;
 
 	log ( "Setting mob stats..." );
 	assign_mob_stats();
@@ -896,6 +900,7 @@ void free_zone_list ( struct zone_list_data *z )
 	if ( z->next )
 		free_zone_list ( z->next );
 	free ( z );
+	z = NULL;
 }
 
 /* Free the world, in a memory allocation sense. */
@@ -903,8 +908,11 @@ void destroy_db ( void )
 {
 
 	unsigned int cnt;
-	//    vector<Character>::iterator it;
 
+	log ( "Free skill prototypes" );
+	free_skill_prototypes();
+	log ( "Free playershops" );
+	free_player_shops();
 	log ( "Free Hunter List" );
 	free_hunter_list();
 	log ( "Freeing the memory of the database." );
@@ -913,9 +921,9 @@ void destroy_db ( void )
 	free_characters ( character_list );
 	log ( "Free corpse list" );
 	free_corpse_list ( corpse_list );
-log("Clearing Names Maps");
-mobNames.Clear();
-objNames.Clear();
+	log("Clearing Names Maps");
+	mobNames.Clear();
+	objNames.Clear();
 	/* Active Objects */
 	log ( "Freeing Objects." );
 	free_objects();
@@ -926,7 +934,7 @@ objNames.Clear();
 	log ( "Freeing Assemblies." );
 	free_assemblies();
 
-	log ( "Free Clan Lists" );
+	log ( "Free Clan Lists and Deeds" );
 	free_clan_lists();
 	/* Rooms */
 	log ( "Freeing rooms." );
@@ -948,12 +956,45 @@ objNames.Clear();
 	}
 #endif
 
-	for_each ( world_vnum.begin(), world_vnum.end(), DeleteObject() );
+	struct q_descr_data *q_desc, *q_tmp;
+	for ( auto &r : world_vnum )
+	{
+		if ( r )
+		{
+			q_desc = r->q_description;
+			while ( q_desc )
+			{
+				if ( q_desc->description )
+				{
+					free ( q_desc->description );
+					q_desc->description = NULL;
+				}
+				if ( q_desc->flag )
+				{
+					free ( q_desc->flag );
+					q_desc->flag = NULL;
+				}
+				q_tmp = q_desc->next;
+				free ( q_desc );
+				q_desc = q_tmp;
+			}
+			delete r;
+		}
+	}
 	top_of_world = 0;
 	/* Objects */
+	struct vehicle_attachment_data *att, *tmp;
 	for ( cnt = 0; cnt <= top_of_objt; cnt++ )
 	{
 		free_object_strings ( obj_proto + cnt );
+
+		att = (obj_proto + cnt )->attachment;
+		while ( att )
+		{
+			tmp = att->next;
+			free ( att );
+			att = tmp;
+		}
 
 		if ( obj_index[cnt].qic )
 			delete obj_index[cnt].qic;
@@ -962,9 +1003,10 @@ objNames.Clear();
 		free_proto_script ( &obj_proto[cnt], OBJ_TRIGGER );
 	}
 
-
 	free ( obj_proto );
+	obj_proto = NULL;
 	free ( obj_index );
+	obj_index = NULL;
 	//    htree_free(obj_htree);
 
 	/* Mobiles */
@@ -1075,8 +1117,10 @@ objNames.Clear();
 			free_trigger ( trig_index[cnt]->proto );
 		}
 		free ( trig_index[cnt] );
+		trig_index[cnt] = NULL;
 	}
 	free ( trig_index );
+	trig_index = NULL;
 
 	/* Events */
 	event_free_all();
@@ -1084,7 +1128,11 @@ objNames.Clear();
 	/* context sensitive help system */
 	free_context_help();
 
-
+	if ( LAST_PK )
+	{
+		free ( LAST_PK );
+		LAST_PK = NULL;
+	}
 }
 
 
@@ -1280,6 +1328,7 @@ void free_extra_descriptions ( struct extra_descr_data *edesc )
 		free ( edesc->keyword );
 		free ( edesc->description );
 		free ( edesc );
+		edesc = NULL;
 	}
 }
 
@@ -1758,7 +1807,7 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	int t[10], i;
 	char line[256], flags[128], flags2[128], flags3[128], flags4[128];
 	struct extra_descr_data *new_descr;
-        struct q_descr_data *new_q_descr;
+	struct q_descr_data *new_q_descr;
 	struct forest_data *new_forest = NULL;
 	char buf2[MAX_INPUT_LENGTH];
 	char letter;
@@ -1855,8 +1904,8 @@ void parse_room ( FILE * fl, int virtual_nr, zone_vnum zon )
 	room_nr->look_above_description = NULL;
 	room_nr->look_behind_description = NULL;
 	room_nr->look_under_description = NULL;
-        room_nr->n_description = NULL;
-        room_nr->q_description = NULL;
+	room_nr->n_description = NULL;
+	room_nr->q_description = NULL;
 
 	for ( ;; )
 	{
@@ -2030,6 +2079,7 @@ void free_forests ( struct forest_data *this_forest )
 		free_forests ( this_forest->next );
 
 	free ( this_forest );
+	this_forest = NULL;
 }
 
 /* read direction data */
@@ -4207,6 +4257,7 @@ void zone_update ( void )
 			}
 
 			free ( update_u );
+			update_u = NULL;
 			break;
 		}
 }
@@ -4728,14 +4779,20 @@ void reset_zone ( zone_rnum zone )
 				if ( ZCMD.arg1==MOB_TRIGGER && tmob )
 				{
 					if ( !SCRIPT ( tmob ) )
+					{
 						CREATE ( SCRIPT ( tmob ), struct script_data, 1 );
+						SCRIPT ( tmob )->function_trig = -1;
+					}
 					add_trigger ( SCRIPT ( tmob ), read_trigger ( ZCMD.arg2 ), -1 );
 					last_cmd = true;
 				}
 				else if ( ZCMD.arg1==OBJ_TRIGGER && tobj )
 				{
 					if ( !SCRIPT ( tobj ) )
+					{
 						CREATE ( SCRIPT ( tobj ), struct script_data, 1 );
+						SCRIPT ( tobj )->function_trig = -1;
+					}
 					add_trigger ( SCRIPT ( tobj ), read_trigger ( ZCMD.arg2 ), -1 );
 					last_cmd = true;
 				}
@@ -4746,7 +4803,10 @@ void reset_zone ( zone_rnum zone )
 						ZONE_ERROR ( "Invalid room number in trigger assignment" );
 					}
 					if ( !world_vnum[ZCMD.arg3]->script )
+					{
 						CREATE ( world_vnum[ZCMD.arg3]->script, struct script_data, 1 );
+						world_vnum[ZCMD.arg3]->script->function_trig = -1;
+					}
 					add_trigger ( world_vnum[ZCMD.arg3]->script, read_trigger ( ZCMD.arg2 ), -1 );
 					last_cmd = true;
 				}
@@ -6382,6 +6442,7 @@ void free_followers ( struct follow_type *k )
 
 	k->follower = NULL;
 	free ( k );
+	k = NULL;
 }
 
 void free_mob_memory ( memory_rec *k )
@@ -6393,6 +6454,7 @@ void free_mob_memory ( memory_rec *k )
 		free_mob_memory ( k->next );
 
 	free ( k );
+	k = NULL;
 }
 
 // delayed version of free obj
@@ -6469,6 +6531,11 @@ void free_obj ( struct obj_data *obj, int extracted )
 	objNames.remNamelist(GET_ID(obj));
 	removeFromObjLookupTable ( GET_ID ( obj ) );
 	object_list.erase ( GET_ID ( obj ) );
+	if ( obj->attachment )
+	{
+		free ( obj->attachment );
+		obj->attachment = NULL;
+	}
 	free ( obj );
 	obj = NULL;
 }
@@ -8411,17 +8478,18 @@ void load_saved_artifacts () {
     while ((ep = readdir (dp))) {
       int pos = strlen(ep->d_name) - 5;
       if (strcmp(ep->d_name+pos,".arti"))
-	continue;
+        continue;
 
       if (stat(ep->d_name, &st_buf)) {
-	log ( "Error reading artifact file %s: %s", ep->d_name, strerror(errno));
-	continue;
+        log ( "Error reading artifact file %s: %s", ep->d_name, strerror(errno));
+        continue;
       }
       if (S_ISREG(st_buf.st_mode))
-	load_artifact_file(ep->d_name);
+        load_artifact_file(ep->d_name);
     }
     chdir(cwd);
   }
+  closedir(dp);
 }
 
 int save_one_item( OBJ_DATA *obj,FILE *fl, int locate);

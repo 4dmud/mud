@@ -134,6 +134,7 @@ extern struct time_info_data time_info;
 extern int guild_info[][3];
 extern const char *cmd_door[];
 extern map < room_vnum, plrshop* > player_shop;
+extern map < long, Room* > obj_in_plrshop;
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
@@ -2572,6 +2573,12 @@ SPECIAL ( playershop )
 				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
 			else
 			{
+				if ( obj->contains )
+				{
+					ch->Send ( "You should empty it first.\r\n" );
+					return TRUE;
+				}
+				obj_in_plrshop[ GET_ID ( obj ) ] = world_vnum[r];
 				obj_from_char ( obj );
 				plrshop_item *p_item = new plrshop_item;
 				p_item->obj = obj;
@@ -2623,6 +2630,7 @@ SPECIAL ( playershop )
 					next_obj = obj->next_content;
 					if ( CAN_SEE_OBJ ( ch, obj ) && ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) )
 					{
+                        obj_in_plrshop[ GET_ID ( obj ) ] = world_vnum[r];
 						plrshop_item *p_item = new plrshop_item;
 						p_item->obj = obj;
 						p_item->price = abs ( atoi ( args[1].c_str() ) );
@@ -2671,6 +2679,7 @@ SPECIAL ( playershop )
 						{
 							ch->Send ( "You remove %s from your shop.\r\n", player_shop[r]->item[ i-1 ]->obj->short_description );
 							obj_to_char ( player_shop[r]->item [ i-1 ]->obj, ch );
+                            obj_in_plrshop.erase ( GET_ID ( player_shop[r]->item [ i-1 ]->obj ) );
 							delete player_shop[r]->item[ i-1 ];
 							player_shop[r]->item.erase ( player_shop[r]->item.begin() + i-1 );
 						}
@@ -2830,6 +2839,7 @@ SPECIAL ( playershop )
 				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
 				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
 				obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
 				delete player_shop[r]->item[ num-1 ];
 				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
 				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
@@ -2898,6 +2908,7 @@ SPECIAL ( playershop )
 				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
 				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
 				obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
 				delete player_shop[r]->item[ num-1 ];
 				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
 				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
@@ -2964,6 +2975,7 @@ SPECIAL ( playershop )
 				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
 				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
 				obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
 				TRADEPOINTS ( ch ) -= item->price;
 				delete player_shop[r]->item[ num-1 ];
 				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );

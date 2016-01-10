@@ -151,24 +151,15 @@ struct cmdlist_element {
 };
 
 struct trig_var_data {
-    //char *name;			/* name of variable  */
-    //char *value;		/* value of variable */
-    string name;
-    string value;
+    string name;		/* name of variable  */
+    string value;		/* value of variable */
     long context;		/* 0: global context */
 
     struct trig_var_data *next;
     trig_var_data() {
-        //name = NULL;
-        //value = NULL;
         context = 0;
     }
-    ~trig_var_data() {
-        //if (name)
-        //    delete[] name;
-        //if (value)
-        //   delete[] value;
-    }
+    ~trig_var_data() {}
 };
 
 /* structure for triggers */
@@ -202,8 +193,12 @@ struct script_data {
     struct trig_var_data *global_vars;	/* list of global variables   */
     ubyte purged;		/* script is set to be purged */
     long context;		/* current context for statics */
-
+    trig_rnum function_trig;	/* rnum of the currently running function trigger */
     struct script_data *next;	/* used for purged_scripts    */
+
+	script_data() {
+		function_trig = -1;
+	}
 };
 
 /* The event data for the wait command */

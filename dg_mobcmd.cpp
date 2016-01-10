@@ -901,7 +901,7 @@ ACMD(do_mpurge) {
     if (*arg == UID_CHAR)
         victim = get_char(arg);
     else if ( !strcmp ( arg, "target_not_found" ) )
-	return;
+       return;
     else
         victim = get_char_room_vis(ch, arg, NULL);
 

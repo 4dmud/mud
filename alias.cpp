@@ -111,6 +111,7 @@ read_alias_error:
   if (t2->alias)
     free(t2->alias);
   free(t2);
+  t2 = NULL;
   if (prev)
     prev->next = NULL;
   fclose(file);

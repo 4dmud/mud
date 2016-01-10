@@ -349,6 +349,7 @@ ACMD(do_oasis_vedit)
   {
     new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: do_oasis_vedit: Player already had olc structure.");
     free(d->olc);
+    d->olc = NULL;
   }
 
   if (rem)

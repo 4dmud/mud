@@ -148,6 +148,7 @@ void extract_script(void *thing, int type) {
 #endif
     if (sc == NULL)
         return;
+
     for (trig = TRIGGERS(sc); trig; trig = next_trig) {
         next_trig = trig->next;
         extract_trigger(trig);

@@ -289,10 +289,10 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
   }
 
 
-if (OLC_SCRIPT(d)) {
-delete OLC_SCRIPT(d);
-OLC_SCRIPT(d) = NULL;
-}
+  if (OLC_SCRIPT(d)) {
+    delete OLC_SCRIPT(d);
+    OLC_SCRIPT(d) = NULL;
+  }
 
   /*. Check for aedit stuff -- M. Scott */
   if (OLC_ACTION(d))
@@ -304,6 +304,7 @@ OLC_SCRIPT(d) = NULL;
       break;
     case CLEANUP_STRUCTS:
       free(OLC_ACTION(d));
+      OLC_ACTION(d) = NULL;
       break;
     default:
       /* Caller has screwed up */
@@ -320,6 +321,7 @@ OLC_SCRIPT(d) = NULL;
       break;
     case CLEANUP_STRUCTS:
       free(OLC_HELP(d));
+      OLC_HELP(d) = NULL;
       break;
     default:
       /* Caller has screwed up */

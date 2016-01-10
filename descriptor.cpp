@@ -190,6 +190,7 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
 
     stxt = string( txt );
     free( txt );
+    txt = NULL;
     /* work out how much we need to expand/contract it */
     /*size_mxp = count_mxp_tags(mxp, txt, size);
     if (size_mxp < 0)
@@ -419,14 +420,20 @@ Descriptor::~Descriptor() {
     /* Clear the command history. */
     if (this->history) {
         for (unsigned int cnt = 0; cnt < HISTORY_SIZE; cnt++)
-            if (this->history[cnt])
+            if (this->history[cnt]) {
                 free(this->history[cnt]);
+                this->history[cnt] = NULL;
+            }
     }
 
-    if (this->showstr_head)
+    if (this->showstr_head) {
         free(this->showstr_head);
-    if (this->showstr_count)
+        this->showstr_head = NULL;
+    }
+    if (this->showstr_count) {
         free(this->showstr_vector);
+        this->showstr_vector = NULL;
+    }
 
     /*. Kill any OLC stuff .*/
     switch (this->connected) {

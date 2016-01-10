@@ -416,6 +416,7 @@ int is_on_block(struct obj_data *obj)
 void free_auction(struct auction_data *auc)
 {
   free(auc);
+  auc = NULL;
 }
 
 Character *get_char_auc(char *name)

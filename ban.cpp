@@ -256,6 +256,7 @@ ACMD ( do_unban )
 	             GET_NAME ( ch ), ban_types[ban_node->type], ban_node->site );
 
 	free ( ban_node );
+	ban_node = NULL;
 	write_ban_list();
 }
 
@@ -268,7 +269,6 @@ void free_ban_list ( void )
 
 void free_all_ban ( struct ban_list_element *ban_node )
 {
-
 	if ( !ban_node )
 		return;
 
@@ -276,8 +276,7 @@ void free_all_ban ( struct ban_list_element *ban_node )
 		free_all_ban ( ban_node->next );
 
 	free ( ban_node );
-
-
+	ban_node = NULL;
 }
 
 

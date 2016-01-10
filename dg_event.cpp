@@ -119,10 +119,10 @@ void event_process(void) {
 	else
 	    new_time = the_event->func ( the_event->event_obj );
 
-        if (new_time > 0)
-	    the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
+	if (new_time > 0)
+		the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
 	else
-            delete the_event;
+		delete the_event;
     }
 }
 

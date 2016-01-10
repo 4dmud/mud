@@ -429,6 +429,8 @@ void trigedit_save(Descriptor *d) {
 
         free(proto->arglist);
         free(proto->name);
+        proto->arglist = NULL;
+        proto->name = NULL;
 
         /* Recompile the command list from the new script */
         s = OLC_STORAGE(d);

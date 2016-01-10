@@ -2588,31 +2588,34 @@ struct compr {
 
     z_streamp stream;
 #endif /* HAVE_ZLIB_H */
- compr() {
-state = 0;
-compression = 0;
+    compr() {
+      state = 0;
+      compression = 0;
 #ifdef HAVE_ZLIB_H
-    buff_out = NULL;
-    total_out = 0; /* size of input buffer */
-    size_out = 0; /* size of data in output buffer */
+      buff_out = NULL;
+      total_out = 0; /* size of input buffer */
+      size_out = 0; /* size of data in output buffer */
 
-    buff_in = NULL;
-    total_in = 0; /* size of input buffer */
-    size_in = 0; /* size of data in input buffer */
-    stream = NULL;
+      buff_in = NULL;
+      total_in = 0; /* size of input buffer */
+      size_in = 0; /* size of data in input buffer */
+      stream = NULL;
 #endif /* HAVE_ZLIB_H */
-}
-~compr() {
+    }
+    ~compr() {
     /* free compression structures */
 #ifdef HAVE_ZLIB_H
-    if (stream) {
+      if (stream) {
         deflateEnd(stream);
         free(stream);
         free(buff_out);
         free(buff_in);
-    }
+        stream = NULL;
+        buff_out = NULL;
+        buff_in = NULL;
+      }
 #endif /* HAVE_ZLIB_H */
-}
+    }
 };
 
 
@@ -2876,7 +2879,7 @@ struct ore_info_data {
 /*event objects */
 struct message_event_obj {
     Character* ch;
-Room* rm;
+    Room* rm;
     int skill;
     int type; //0 = skill-spell : 1 = subskill
     int msg_num; // iterative number for what part of the skill it is in
@@ -2892,14 +2895,11 @@ Room* rm;
         msg_num = m;
         id = i;
         strlcpy(args, a, sizeof(args));
- 	rm = r;
-
+        rm = r;
     }
 
     ~message_event_obj() {}
-
-}
-;
+};
 
 /* Horus - things that affect rooms */
 struct room_affects_data {
