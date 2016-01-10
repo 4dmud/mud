@@ -1642,8 +1642,6 @@ int perform_mag_direction ( int level, room_rnum room, Character *ch, Character 
 			break;
 	}
 
-#define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
-
 	if ( room == IN_ROOM ( ch ) )
 	{
 		sprintf ( format, "%s %s emerges from $N and strikes you!", CANA ( skill_name ( spellnum ) ),skill_name ( spellnum ) );

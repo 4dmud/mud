@@ -388,26 +388,13 @@ struct alias_data {
  *
  * that was dumb.  it shouldn't be symmetrical.  JE 5/1/95
  * 
- * returnss 1 if arg1 is an abbreviation of arg2
+ * returns 1 if arg1 is an abbreviation of arg2
  */
 inline int is_abbrev(const char *arg1, const char *arg2) {
-    register int c;
     if (!*arg1)
-        return (0);
-    if (LOWER(*arg1) != LOWER(*arg2))
-        return (0);
-    if (strlen(arg1) > strlen(arg2))
-	    return 0;
+        return 0;
 
-    if (!strncasecmp(arg1+1, arg2+1, strlen(arg2+1)))
+    if (!strncasecmp(arg1, arg2, strlen(arg1)))
         return 1;
-
-    for (c = 0; *arg1 && *arg2; arg1++, arg2++, c++)
-        if (LOWER(*arg1) != LOWER(*arg2))
-            return (0);
-
-    if (!*arg1 && c > 1)
-        return (1);
-    else
-        return (0);
+    return 0;
 }

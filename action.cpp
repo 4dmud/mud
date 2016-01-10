@@ -19,8 +19,6 @@
 #include "action.h"
 #include "strutil.h"
 
-#define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
-#define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
 #define TIER (current_class_is_tier_num(ch))
 
 

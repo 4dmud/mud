@@ -443,7 +443,7 @@ ACMD ( do_teleport );
 ACMD ( do_vnum );
 void do_stat_room ( Character *ch );
 void do_stat_object ( Character *ch, struct obj_data *j );
-void do_stat_character ( Character *ch, Character *k );
+void do_stat_character ( Character *ch, Character *k, char *var = NULL );
 void list_destinations ( struct travel_point_data *travel_list, Character *ch );
 ACMD ( do_stat );
 ACMD ( do_shutdown );
@@ -2006,7 +2006,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 }
 
 
-void do_stat_character ( Character *ch, Character *k )
+void do_stat_character ( Character *ch, Character *k, char* var )
 {
 	int i, i2, found = 0;
 	struct obj_data *j;
@@ -2396,7 +2396,7 @@ void do_stat_character ( Character *ch, Character *k )
 			*dynbuf=0;
 			snprintf ( buffer,MAX_INPUT_LENGTH,"Global Variables for %s:\r\n", GET_NAME ( k ) );
 			DYN_RESIZE ( buffer );
-			//        ch->Send( "Global Variables for %s:\r\n", GET_NAME(k));
+			bool var_found = FALSE;
 
 			/* currently, variable context for players is always 0, so it is */
 			/* not displayed here. in the future, this might change */
@@ -2405,23 +2405,28 @@ void do_stat_character ( Character *ch, Character *k )
 			{
 				if ( tv->value[0] == UID_CHAR )
 				{
-					find_uid_name ( tv->value, uname, sizeof ( uname ) );
-					snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name.c_str(),
-					           uname );
-					DYN_RESIZE ( buffer );
-					//            ch->Send( "    %40s:  [UID]: %20s\r\n", tv->name,
-					//                             uname);
+					if ( !*var || is_abbrev ( var, tv->name.c_str() ) )
+					{
+						find_uid_name ( tv->value, uname, sizeof ( uname ) );
+						snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name.c_str(), uname );
+						DYN_RESIZE ( buffer );
+						var_found = TRUE;
+					}
 				}
 				else
 				{
-					snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name.c_str(),
-					           tv->value.c_str() );
-					DYN_RESIZE ( buffer );
-					//           ch->Send( "    %40s:  %20s\r\n", tv->name,
-					//                            tv->value);
+					if ( !*var || is_abbrev ( var, tv->name.c_str() ) )
+					{
+						snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name.c_str(), tv->value.c_str() );
+						DYN_RESIZE ( buffer );
+						var_found = TRUE;
+					}
 				}
 			}
-			page_string ( ch->desc, dynbuf, DYN_BUFFER );
+			if ( var_found )
+				page_string ( ch->desc, dynbuf, DYN_BUFFER );
+			else
+				ch->Send ( "%s doesn't have a variable called %s.\r\n", GET_NAME ( k ), var );
 		}
 	}
 
@@ -2957,22 +2962,24 @@ ACMD ( do_vstat )
 	mob_rnum r_num;        /* or obj_rnum ... */
 	char buf[MAX_INPUT_LENGTH];
 	char buf2[MAX_INPUT_LENGTH];
+	char *arg = NULL;
 
-	two_arguments ( argument, buf, buf2 );
+	arg = two_arguments ( argument, buf, buf2 );
+	skip_spaces ( &arg );
 
 	if ( !*buf || !*buf2 )
 	{
 		send_to_char ( "Usage: vstat {{ obj | mob } <number>\r\n"
-		               "Or:    vstat player <name>  (this displays variables)\r\n", ch );
+		               "Or:    vstat player <name>  (this displays variables)\r\n"
+		               "       vstat player <name> <var> (shows matches only)\r\n", ch );
 		return;
 	}
 	if ( is_abbrev ( buf, "player" ) )
 	{
-		if ( ( mob =
-		            get_player_vis ( ch, buf2, NULL, FIND_CHAR_WORLD ) ) != NULL )
+		if ( ( mob = get_player_vis ( ch, buf2, NULL, FIND_CHAR_WORLD ) ) != NULL )
 		{
 			show_vars = TRUE;
-			do_stat_character ( ch, mob );
+			do_stat_character ( ch, mob, arg );
 			show_vars = FALSE;
 		}
 		else
