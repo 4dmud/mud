@@ -2567,25 +2567,15 @@ ACMD ( do_stat )
 		char *name = buf1;
 		int num = get_number ( &name );
 
-		if ( ( object =
-		            get_obj_in_equip_vis ( ch, name, &num,
-		                                   ch->equipment ) ) != NULL )
+		if ( ( object = get_obj_in_equip_vis ( ch, name, &num, ch->equipment ) ) != NULL )
 			do_stat_object ( ch, object );
-		else if ( ( object =
-		                get_obj_in_list_vis ( ch, name, &num,
-		                                      ch->carrying ) ) != NULL )
+		else if ( ( object = get_obj_in_list_vis ( ch, name, &num, ch->carrying ) ) != NULL )
 			do_stat_object ( ch, object );
-		else if ( ( victim =
-		                get_char_vis ( ch, name, &num, FIND_CHAR_ROOM ) ) != NULL )
+		else if ( ( victim = get_char_vis ( ch, name, &num, FIND_CHAR_ROOM ) ) != NULL )
 			do_stat_character ( ch, victim );
-		else if ( ( object =
-		                get_obj_in_list_vis ( ch, name, &num,
-		                                      IN_ROOM ( ch )->contents ) ) !=
-		          NULL )
+		else if ( ( object = get_obj_in_list_vis ( ch, name, &num, IN_ROOM ( ch )->contents ) ) != NULL )
 			do_stat_object ( ch, object );
-		else if ( ( victim =
-		                get_char_vis ( ch, name, &num,
-		                               FIND_CHAR_WORLD ) ) != NULL )
+		else if ( ( victim = get_char_vis ( ch, name, &num, FIND_CHAR_WORLD ) ) != NULL )
 			do_stat_character ( ch, victim );
 		else if ( ( object = get_obj_vis ( ch, name, &num ) ) != NULL )
 			do_stat_object ( ch, object );
@@ -3005,6 +2995,13 @@ ACMD ( do_vstat )
 	}
 	else if ( is_abbrev ( buf, "obj" ) )
 	{
+		if ( !is_number ( buf2 ) )
+		{
+			ch->Send ( "Usage: vstat {{ obj | mob } <number>\r\n"
+		               "Or:    vstat player <name>  (this displays variables)\r\n"
+		               "       vstat player <name> <var> (shows matches only)\r\n" );
+			return;
+		}
 		if ( ( r_num = real_object ( num ) ) < 0 )
 		{
 			ch->Send ( "There is no object with the number %d.\r\n", num );
@@ -6593,7 +6590,7 @@ ACMD ( do_statinnate )
 {
 	int count = 0, object,  bot=0, top=0, s = -1;
 	char buf[MAX_INPUT_LENGTH];
-	string arg1, arg2;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	DYN_DEFINE;
 	skip_spaces ( &argument );
 	if ( !*argument )
@@ -6602,17 +6599,21 @@ ACMD ( do_statinnate )
 		return;
 	}
 
-	stringstream iss ( argument );
-	iss >> arg1 >> arg2;
+	two_arguments ( argument, arg1, arg2 );
 
-	if ( !is_number ( arg1.c_str() ) )
+	if ( !is_number ( arg1 ) )
 	{
-		s = spell_num ( arg1.c_str() );
+		s = spell_num ( argument );
+		if ( s == TYPE_UNDEFINED )
+		{
+			ch->Send ( "Unknown spell %s.\r\n", argument );
+			return;
+		}
 	}
 	else
 	{
-		bot = atoi ( arg1.c_str() );
-		top = atoi ( arg2.c_str() );
+		bot = atoi ( arg1 );
+		top = atoi ( arg2 );
 	}
 	DYN_CREATE;
 	*dynbuf = 0;

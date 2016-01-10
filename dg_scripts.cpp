@@ -3320,6 +3320,27 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		script_log ( "Trigger [%d] %s, restring: unknown field %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), args[1].c_str() );
 }
 
+void process_playeruid ( script_data *sc, trig_data *trig, char *cmd )
+{
+	char varname[MAX_INPUT_LENGTH], junk[MAX_INPUT_LENGTH];
+	char *playername;
+
+	playername = two_arguments ( cmd, junk, varname );
+	skip_spaces ( &playername );
+
+	for ( Descriptor *d = descriptor_list; d; d = d->next )
+	{
+		if ( !IS_PLAYING ( d ) )
+			continue;
+		if ( strcasecmp ( playername, d->character->player.name ) )
+			continue;
+		string value = string ( 1, UID_CHAR ) + to_string ( GET_ID ( d->character ) );
+		add_var ( &GET_TRIG_VARS ( trig ), varname, value.c_str(), sc ? sc->context : 0 );
+		return;
+	}
+	add_var ( &GET_TRIG_VARS ( trig ), varname, "", sc ? sc->context : 0 );
+}
+
 void delete_trailing_spaces(char* string) {
     if (!string || !*string) //null or empty string passed
 	return;
@@ -3334,8 +3355,7 @@ void delete_trailing_spaces(char* string) {
 /*
  * makes a local variable into a global variable
  */
-void process_global ( struct script_data *sc, trig_data * trig, char *cmd,
-                      long id )
+void process_global ( struct script_data *sc, trig_data * trig, char *cmd, long id )
 {
 	struct trig_var_data *vd;
 	char arg[MAX_INPUT_LENGTH], *var;
@@ -3874,6 +3894,8 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			else if ( !strn_cmp ( cmd, "version", 7 ) )
 				mudlog ( DG_SCRIPT_VERSION, NRM, LVL_GOD, TRUE );
 
+			else if ( !strn_cmp ( cmd, "playeruid", 9 ) )
+				process_playeruid ( sc, trig, cmd );
 			else
 			{
 				switch ( type )
