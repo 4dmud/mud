@@ -2377,7 +2377,7 @@ ASKILL ( skill_push )
 
 		if ( GET_POS ( victim ) == POS_FIGHTING )
 		{
-			ch->Send ( "No! You can't push %s while fighting!\r\n", HSSH ( ch ) );
+			ch->Send ( "No! You can't push %s while fighting!\r\n", HSSH ( vict ) );
 			return 0;
 		}
 		sprintf ( buf, "$n is trying to push you %s!", todir );
@@ -2386,7 +2386,7 @@ ASKILL ( skill_push )
 		act ( "$n is trying to push $N.", FALSE, ch, 0, vict, TO_NOTVICT );
 		if ( !CAN_GO ( victim, to ) )
 		{
-			ch->Send ( "Can't push %s there.\r\n", HMHR ( ch ) );
+			ch->Send ( "Can't push %s there.\r\n", HMHR ( vict ) );
 		}
 		else if ( GET_LEVEL ( victim ) >= LVL_GOD
 		          && GET_LEVEL ( ch ) != LVL_IMPL )

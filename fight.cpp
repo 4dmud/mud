@@ -3365,7 +3365,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 			af.bitvector = AFF_FROZEN;
 			af.type = SPELL_DG_AFFECT;
 			affect_to_char ( ch, &af );
-			improve_skill ( ch, SPELL_SHIELD_ICE );
+			if ( knows_spell ( ch, SPELL_SHIELD_ICE ) )
+				improve_skill ( ch, SPELL_SHIELD_ICE );
 			improve_skill ( vict, SPELL_SHIELD_ICE );
 		}
 	}
@@ -3388,7 +3389,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 					act ( "$N blocks your attack with $S shield!", FALSE, ch, 0, vict, TO_CHAR );
 					act ( "You block $n's attack with your shield!", FALSE, ch, 0, vict, TO_VICT );
 				}
-				improve_skill ( ch, SPELL_SHIELD_STATIC );
+				if ( knows_spell ( ch, SPELL_SHIELD_STATIC ) )
+					improve_skill ( ch, SPELL_SHIELD_STATIC );
 				improve_skill ( vict, SPELL_SHIELD_STATIC );
 				reduce_quality ( NULL, NULL, dam, 0, GET_EQ ( vict, WEAR_SHIELD ) );
 			}
@@ -3398,7 +3400,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 			{
 				act ( "$N scorches you with $S fire shield.", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You scorch $n with your fire shield.", FALSE, ch, 0, vict, TO_VICT );
-				improve_skill ( ch, SPELL_FIRE_SHIELD );
+				if ( knows_spell ( ch, SPELL_FIRE_SHIELD ) )
+					improve_skill ( ch, SPELL_FIRE_SHIELD );
 				improve_skill ( vict, SPELL_FIRE_SHIELD );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
@@ -3406,7 +3409,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 			{
 				act ( "You are shredded by $N's whirling barrier of thorns!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You shred $n with your whirling barrier of thorns!", FALSE, ch, 0, vict, TO_VICT );
-				improve_skill ( ch, SPELL_SHIELD_THORN );
+				if ( knows_spell ( ch, SPELL_SHIELD_THORN ) )
+					improve_skill ( ch, SPELL_SHIELD_THORN );
 				improve_skill ( vict, SPELL_SHIELD_THORN );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
@@ -3414,7 +3418,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 			{
 				act ( "$N's mirror shield reflects your magic back at you!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "You bounce $n's magic right back at $m!", FALSE, ch, 0, vict, TO_VICT );
-				improve_skill ( ch, SPELL_SHIELD_MIRROR );
+				if ( knows_spell ( ch, SPELL_SHIELD_MIRROR ) )
+					improve_skill ( ch, SPELL_SHIELD_MIRROR );
 				improve_skill ( vict, SPELL_SHIELD_MIRROR );
 				return damage ( vict, ch, global_dam, TYPE_UNDEFINED );
 			}
@@ -3426,7 +3431,8 @@ int shield_check ( Character *ch, Character *vict, int type, int w_type, int dam
 				act ( "A golden light moves $N out of your reach!", FALSE, ch, 0, vict, TO_CHAR );
 				act ( "A golden light moves you out of $n's reach!", FALSE, ch, 0, vict, TO_VICT );
 				success = TRUE;
-				improve_skill ( ch, SPELL_SHIELD_HOLY );
+				if ( knows_spell ( ch, SPELL_SHIELD_HOLY ) )
+					improve_skill ( ch, SPELL_SHIELD_HOLY );
 				improve_skill ( vict, SPELL_SHIELD_HOLY );
 			}
 
