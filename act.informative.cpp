@@ -3265,9 +3265,9 @@ void skill_spell_help ( Character *ch, int spell )
 		ch->Send ( "{cg----------------------------------------------------\r\n" );
 	ch->Send ( "                Name: {cy%s{cg\r\n", skill_name ( spell ) );
 	if ( spell_info[spell].first_prereq != TYPE_UNDEFINED )
-		ch->Send ( "First Pre Requisite : {cy%s{cg\r\n", skill_name ( spell_info[spell].first_prereq ) );
+		ch->Send ( "First Prerequisite : {cy%s{cg\r\n", skill_name ( spell_info[spell].first_prereq ) );
 	if ( spell_info[spell].second_prereq != TYPE_UNDEFINED )
-		ch->Send ( "Second Pre Requisite: {cy%s{cg\r\n", skill_name ( spell_info[spell].second_prereq ) );
+		ch->Send ( "Second Prerequisite: {cy%s{cg\r\n", skill_name ( spell_info[spell].second_prereq ) );
 	ch->Send ( "Tier: {cc%d{cg     Level: {cc%2d{cg    \r\n"
 	           "MinPosition: {cy%s{cg   Elemental Type: {cy%s{cg\r\n\r\n",
 	           spell_info[spell].tier, spell_info[spell].min_level, position_types[ ( int ) spell_info[spell].min_position],

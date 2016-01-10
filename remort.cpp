@@ -112,9 +112,13 @@ ACMD ( do_remort )
 	two_arguments ( argument, clas, slot );
 
 	// did they supply a valid class
-	if ( ( i = parse_class ( *clas ) ) == CLASS_UNDEFINED )
+	for ( i = 0; i < NUM_CLASSES; ++i )
+		if ( !strcasecmp ( clas, pc_class_types[i] ) )
+			break;
+
+	if ( i == NUM_CLASSES )
 	{
-		ch->Send ( "That is not a valid class.\r\n" );
+		ch->Send ( "You can't remort to %s.\r\n", clas );
 		return;
 	}
 	// do they have the experience

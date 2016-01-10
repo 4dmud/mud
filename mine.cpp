@@ -63,7 +63,7 @@ ASUB(sub_tunneling)
   {
     if (pri == NULL)
     {
-      ch->Send( "You can't mine with out a tool!\r\n");
+      ch->Send( "You can't mine without a tool!\r\n");
       return SUB_UNDEFINED;
     }
 
@@ -79,7 +79,7 @@ ASUB(sub_tunneling)
 
     if (pri == NULL)
     {
-      ch->Send( "You can't mine with out a tool!\r\n");
+      ch->Send( "You can't mine without a tool!\r\n");
       return SUB_UNDEFINED;
     }
 

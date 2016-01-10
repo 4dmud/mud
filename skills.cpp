@@ -275,7 +275,7 @@ void assign_skills ( void )
 	skillo ( SKILL_GRIP, "grip", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 1, 49 , 1,
                  "Your grip loosens.");
 
-        skillo ( SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 20, 0, "");
+        skillo ( SKILL_FACE, "face", TAR_CHAR_ROOM | TAR_NOT_SELF, SK_NONE, NO_FIRST, NO_SECOND, 3, 20, 0, "");
 
 	skillo ( SKILL_FOCUS, "focus", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 2, 24 ,1,
                  "You lose your focus.");
