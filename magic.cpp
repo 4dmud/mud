@@ -924,24 +924,20 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_STRENGTH:
-			if ( GET_ADD ( victim ) == 100 )
-				return;
-
 			af[0].type = SPELL_STRENGTH;
 			if ( OBJ_INNATE )
 				af[0].expire = -2;
 			else
 				af[0].expire = HOURS_TO_EXPIRE ( ( chlevel / 2 ) + 4 );
 
-			af[0].modifier = ( ( 1 + ( level > 18 ) + ( level > 40 ) ) );
+			if ( GET_ADD ( victim ) < 100 )
+				af[0].modifier = ( ( 1 + ( level > 18 ) + ( level > 40 ) ) );
 			af[0].location = APPLY_STR;
 			af[0].bitvector = AFF_HOLY_STRENGTH;
-
-
-
-			accum_duration =FALSE;
+			accum_duration = FALSE;
 			accum_affect = TRUE;
-			to_vict = "You feel stronger!";
+			if ( GET_ADD ( victim ) < 100 )
+				to_vict = "You feel stronger!";
 			break;
 
 		case SPELL_SENSE_LIFE:

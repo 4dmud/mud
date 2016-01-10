@@ -1595,6 +1595,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						else
 							*str = '\0';
 					}
+					else if ( !strcasecmp ( field, "nographics" ) )
+					{
+						if ( PRF_FLAGGED ( c, PRF_NOGRAPHICS ) )
+							strcpy ( str, "1" );
+						else
+							strcpy ( str, "0" );
+					}
 					break;
 				case 'o':
 					if ( !strcasecmp ( field, "omr" ) )
