@@ -297,7 +297,7 @@ ACMD ( do_slay )
 		}
 		else if ( !str_cmp ( arg2, "xwife" ) && GET_LEVEL ( ch ) == LVL_IMPL )
 		{
-			act ( "You whip out the rotting leg of Colin's x-wife and beat $N\r\n" "to death with it!.", FALSE, ch, NULL, vict, TO_CHAR );
+			act ( "You whip out the rotting leg of Colin's x-wife and beat $N\r\n" "to death with it!", FALSE, ch, NULL, vict, TO_CHAR );
 			act ( "$n pulls out the rotting leg of Colin's x-wife and beats $N\r\n" "to death with it!", FALSE, ch, NULL, vict, TO_VICT );
 			act ( "$n pulls out the rotting leg of Colin's x-wife and beats $N\r\n" "to death with it!", FALSE, ch, NULL, vict, TO_NOTVICT );
 		}
@@ -336,7 +336,7 @@ ACMD ( do_slay )
 		{
 			act ( "Leaping upon $N with bared fangs, you tear open $S throat\r\n"
 			      "and toss the corpse to the ground.", FALSE, ch, NULL, vict, TO_CHAR );
-			act ( "In a heartbead, $n rips $s fangs through your throat!\r\n"
+			act ( "In a heartbeat, $n rips $s fangs through your throat!\r\n"
 			      "Your blood sprays and pours to the ground as your life ends...",
 			      FALSE, ch, NULL, vict, TO_VICT );
 			act ( "Leaping suddenly, $n sinks $s fangs into $N's throat.  As blood\r\n"

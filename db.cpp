@@ -4495,11 +4495,7 @@ void reset_zone ( zone_rnum zone )
 						if ( load_otrigger ( obj ) == -1 )
 							obj = NULL;
 						tobj = obj;
-
 						last_cmd = obj ? true : false;
-
-
-
 					}
 					else
 					{
@@ -4535,18 +4531,12 @@ void reset_zone ( zone_rnum zone )
 					if ( obj && lqc )
 					{
 						obj_to_char ( obj, mob );
-                                                ripple_detect(cmd_room, ZCMD.arg1);
+						ripple_detect ( cmd_room, ZCMD.arg1 );
 						if ( load_otrigger ( obj ) == -1 )
 							obj = NULL;
 
-
-
 						tobj = obj;
-
 						last_cmd = obj ? true : false;
-
-
-
 					}
 					else
 					{
@@ -4588,19 +4578,15 @@ void reset_zone ( zone_rnum zone )
 						obj = read_object ( ZCMD.arg1, REAL );
 						if ( obj && lqc )
 						{
-
-                                                ripple_detect(cmd_room, ZCMD.arg1);
-	
-
-						IN_ROOM ( obj ) = IN_ROOM ( mob );
+							ripple_detect ( cmd_room, ZCMD.arg1 );
+							IN_ROOM ( obj ) = IN_ROOM ( mob );
 							if ( load_otrigger ( obj ) == -1 )
 								obj = NULL;
-							if ( obj && ( ret = wear_otrigger ( obj, mob, ZCMD.arg3 ) ) > 0 )
+							if ( obj && ( ret = wear_otrigger ( obj, mob, ZCMD.arg3 ) ) > 0 && !obj->extracted )
 							{
 								IN_ROOM ( obj ) = NULL;
 								if ( equip_char ( mob, obj, ZCMD.arg3 ) )
 								{
-
 									last_cmd = true;
 									tobj = obj;
 								}
@@ -4614,7 +4600,7 @@ void reset_zone ( zone_rnum zone )
 									}
 								}
 							}
-							else if ( obj && ret == 0 )
+							else if ( obj && ret == 0 && !obj->extracted )
 							{
 								obj_to_char ( obj, mob );
 								tobj = obj;
@@ -4840,7 +4826,6 @@ void reset_zone ( zone_rnum zone )
 								if ( obj )
 									SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
 
-
 								last_cmd = obj ? true : false;
 							}
 							else
@@ -4857,7 +4842,6 @@ void reset_zone ( zone_rnum zone )
 						}
 						else
 							last_cmd = false;
-
 					}
 					else
 					{

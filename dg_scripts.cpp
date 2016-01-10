@@ -1065,7 +1065,7 @@ void check_time_triggers ( void )
 	}
 }
 
-/* checks every PLUSE_SCRIPT for random triggers */
+/* checks every PULSE_DG_SCRIPT for random triggers */
 void script_trigger_check ( void )
 {
 	Character *ch;

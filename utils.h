@@ -15,8 +15,8 @@
 /* new define for quick check */
 #define DEAD(ch) (PLR_FLAGGED((ch), PLR_NOTDEADYET) || MOB_FLAGGED((ch), MOB_NOTDEADYET))
 
-#define LANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "an" : "a")
-#define CANA(string) (strchr("aeiouyAEIOUY", string[0]) ? "An" : "A")
+#define LANA(string) (strchr("aeiouAEIOU", string[0]) ? "an" : "a")
+#define CANA(string) (strchr("aeiouAEIOU", string[0]) ? "An" : "A")
 // make a string on-the-fly
 
 extern FILE *logfile;
