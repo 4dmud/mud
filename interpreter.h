@@ -176,7 +176,7 @@ struct alias_data {
 #define SCMD_MOVEMSG    31
 #define SCMD_MOUNTABLE  32
 #define SCMD_NOHERO	33
-#define SCMD_PTIME	34
+#define SCMD_SHOW_COLOUR_CODE	34
 #define SCMD_AUTOSAC    35
 #define SCMD_CLS        36
 #define SCMD_BUILDWALK  37

@@ -1491,8 +1491,8 @@ ACMD ( do_gen_tog )
 		 "You are mountable\r\n"},
 		{"You Hero channel is now On.\r\n",
 		 "The Hero channel is now Off.\r\n"},
-		{"You put time on your prompt.\r\n",
-		 "You take time off your prompt.\r\n"},
+		{"Colour codes will be parsed.\r\n",
+		 "You will now see colour codes.\r\n"},
 		{"You will not automatically sacrifice corpses.\r\n",
 		 "You will now auto-sacrifice corpses.\r\n"},
 		{"Will no longer clear screen in OLC.\r\n",
@@ -1659,8 +1659,8 @@ ACMD ( do_gen_tog )
 		case SCMD_NONEWBIE:
 			result = PRF_TOG_CHK ( ch, PRF_NONEWBIE );
 			break;
-		case SCMD_PTIME:
-			result = PRF_TOG_CHK ( ch, PRF_TIME );
+		case SCMD_SHOW_COLOUR_CODE:
+			result = PRF_TOG_CHK ( ch, PRF_SHOW_COLOUR_CODE );
 			break;
 		case SCMD_AUTOSAC:
 			result = PRF_TOG_CHK ( ch, PRF_AUTOSAC );

@@ -725,6 +725,7 @@ void random_otrigger(obj_data * obj) {
     trig_data *t;
     zone_rnum zone;
     obj_data *ob = obj;
+	Room *r = NULL;
 
     for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
 	if ( TRIGGER_CHECK ( t, OTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) ) {
@@ -732,13 +733,10 @@ void random_otrigger(obj_data * obj) {
 			if ( obj->in_obj )
 				ob = obj->in_obj;
 
-			if ( IN_ROOM ( ob ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob ) );
-			else if ( ob->carried_by && IN_ROOM ( ob->carried_by ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->carried_by ) );
-			else if ( ob->worn_by && IN_ROOM ( ob->worn_by ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->worn_by ) );
-			else continue;
+			r = obj_room ( ob );
+			if ( !r )
+				continue;
+			zone = GET_ROOM_ZONE ( r );
 
 			if ( zone_is_empty ( zone ) )
 				continue;
@@ -1232,6 +1230,7 @@ void time_otrigger(obj_data *obj) {
     char buf[MAX_INPUT_LENGTH];
     zone_rnum zone;
     obj_data *ob = obj;
+	Room *r = NULL;
 
     for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, OTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) ) {
@@ -1239,13 +1238,10 @@ void time_otrigger(obj_data *obj) {
 			if ( obj->in_obj )
 				ob = obj->in_obj;
 
-			if ( IN_ROOM ( ob ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob ) );
-			else if ( ob->carried_by && IN_ROOM ( ob->carried_by ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->carried_by ) );
-			else if ( ob->worn_by && IN_ROOM ( ob->worn_by ) )
-				zone = GET_ROOM_ZONE ( IN_ROOM ( ob->worn_by ) );
-			else continue;
+			r = obj_room ( ob );
+			if ( !r )
+				continue;
+			zone = GET_ROOM_ZONE ( r );
 
 			if ( zone_is_empty ( zone ) )
 				continue;

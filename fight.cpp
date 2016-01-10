@@ -2984,7 +2984,11 @@ int fe_after_damage ( Character* ch, Character* vict,
 			partial = MIN ( partial, (int) ( 0.75 * GET_MAX_HIT ( vict ) ) );
 
 		reduce_quality ( ch, vict, partial, w_type, NULL );
+
 		alter_hit ( vict, partial );
+		if ( w_type == SPELL_LIFESUCK )
+			alter_hit ( ch, -partial * 0.05 );
+
 		update_pos ( vict );
 		if ( !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_ARENA ) )
 		{

@@ -237,7 +237,10 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
      */
     //  if (bufspace > size) {
     //output += string(cstring(stxt).c_str());
-    output += cstring(stxt).c_str();
+	if ( character && !PRF_FLAGGED ( character, PRF_SHOW_COLOUR_CODE ) )
+	    output += cstring(stxt).c_str();
+	else
+		output += stxt;
     //  strcpy(output + bufptr, txt); /* strcpy: OK (size checked above) */
     //bufspace -= size;
     //     bufptr += size;

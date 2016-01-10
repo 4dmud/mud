@@ -1660,8 +1660,7 @@ ACMD ( do_detach )
 
 	if ( !*arg1 || !*arg2 )
 	{
-		ch->Send ( "Usage: detach [ mob | object | room ] {{ target } {{ trigger |"
-		           " 'all' }\r\n" );
+		ch->Send ( "Usage: detach [ mob | object | room ] {{ target } {{ trigger | 'all' }\r\n" );
 		return;
 	}
 

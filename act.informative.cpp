@@ -859,7 +859,7 @@ void list_one_char ( Character *i, Character *ch )
 			ch->Send ( "{cY@ {cC%s%s%s%s%s%s%s%s",
 			           ( PRETITLE ( i ) == NULL ? "{cC" : PRETITLE ( i ) ), ( PRETITLE ( i ) == NULL ? "{cC" : " " ) ,
             CBCYN(ch, C_NRM), GET_NAME ( i ), CBCYN ( ch, C_NRM ), 
-        (GET_TITLE(i) == NULL ? "" : " "), GET_TITLE(i), CBCYN ( ch, C_NRM ) );
+        (*GET_TITLE(i) ? " " : ""), GET_TITLE(i), CBCYN ( ch, C_NRM ) );
 		else
 			ch->Send ( "%s%s%s",
 			           CBCYN ( ch, C_NRM ), i->player.name,
@@ -2514,7 +2514,7 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 		    "{cC[Mining] {cwSpeed: {cc%3d {cwBonus: {cc%3d {cwProtection: {cc%3d {cwStealth: {cc%3d\r\n",
 		    MINE_SPEED ( ch ), MINE_BONUS ( ch ), MINE_DAMAGE ( ch ), MINE_STEALTH ( ch ) );
 
-	ch->Send ( "{cwSTR: {cy%2d{cw/{cy%-3d {cwINT: {cy%-2d {cwWIS: {cy%-2d {cwCON: {cy%-2d {cwDEX: {cy%-2d {cwCHA: {cy%-2d\r\n", 
+	ch->Send ( "{cwSTR: {cy%2d{cw/{cy%-3d {cwINT: {cy%-2d {cwWIS: {cy%-2d {cwCON: {cy%-2d {cwDEX: {cy%-2d {cwCHA: {cy%-3d\r\n",
 	    GET_STR ( ch ), GET_ADD ( ch ), GET_INT ( ch ), GET_WIS ( ch ),
 	    GET_CON ( ch ),GET_DEX ( ch ), GET_CHA ( ch ) );
 
@@ -2616,7 +2616,7 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 
 	ch->Send (
 	    "{cg| |-------------------------------------------------------------------| |\r\n"
-	    "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-2d{cg   | |\r\n",
+	    "| |   {cwSTR: {cy%2d{cw/{cy%-3d{cw   INT: {cy%-2d{cw   WIS: {cy%-2d{cw   CON: {cy%-2d{cw   DEX: {cy%-2d{cw   CHA: {cy%-3d{cg  | |\r\n",
 	    GET_STR ( ch ), GET_ADD ( ch ), GET_INT ( ch ), GET_WIS ( ch ),
 	    GET_CON ( ch ),GET_DEX ( ch ), GET_CHA ( ch ) );
 
@@ -5295,7 +5295,7 @@ ACMD ( do_toggle )
 	    "        MoveMsg: %-3s\r\n"
 	    "   Hero Channel: %-3s    "
 	    " Newbie Channel: %-3s    "
-	    "   Time Display: %-3s\r\n"
+	    "See Colour Code: %-3s\r\n"
 	    "        Autosac: %-3s    "
 	    " No-OOC Channel: %-3s    "
 	    "      Mountable: %-3s\r\n"
@@ -5340,7 +5340,7 @@ ACMD ( do_toggle )
 	    YESNO ( PRF_FLAGGED ( ch, PRF_MOVEMSG ) ),
 	    YESNO ( !PRF_FLAGGED ( ch, PRF_NOHERO ) ),
 	    YESNO ( !PRF_FLAGGED ( ch, PRF_NONEWBIE ) ),
-	    ONOFF ( PRF_FLAGGED ( ch, PRF_TIME ) ),
+	    YESNO ( PRF_FLAGGED ( ch, PRF_SHOW_COLOUR_CODE ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_AUTOSAC ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_OOC ) ),
 	    YESNO ( PRF_FLAGGED ( ch, PRF_MOUNTABLE ) ),

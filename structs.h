@@ -651,7 +651,7 @@ class Room;
 #define PRF_MOVEMSG     	35      /* toggle to turn on seeing movement messages */
 #define PRF_MOUNTABLE   	36
 #define PRF_NOHERO      	37
-#define PRF_TIME        	38
+#define PRF_SHOW_COLOUR_CODE 38
 #define PRF_AUTOSAC     	39
 #define PRF_DISPAUTO    	40 /* Show prompt HP, MP, MV when < 25%. */
 #define PRF_CLS         	41 /* Clear screen in OLC                */

@@ -81,7 +81,7 @@ void obj_log ( obj_data *obj, const char *format, ... )
 	va_end ( args );
 }
 
-/* returns the real room number that the object or object's carrier is in */
+/* returns the room that the object or object's carrier is in */
 room_rnum obj_room ( obj_data * obj )
 {
 	if ( IN_ROOM ( obj ) != NULL )
