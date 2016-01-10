@@ -133,6 +133,8 @@ ACMD ( do_remort )
 	ch->MakeNaked();
 	remove_all_normal_affects ( ch );
 
+	bool already_gm = grand_master ( ch );
+
 	/* lets make am a master of the class ifthey have done t4 already */
 	if ( current_class_is_tier_num ( ch ) == 4 )
 		GET_MASTERY ( ch, ( int ) GET_CLASS ( ch ) ) = TRUE;
@@ -169,6 +171,8 @@ ACMD ( do_remort )
 	              ( ( current == i ) ? "specialized further in" : "remorted to" ),
 	              simple_class_name ( ch ),
 	              ( grand_master ( ch ) ? " Grand Master!" : "!" ) );
+	if ( !already_gm && grand_master ( ch ) )
+		send_to_all ( "{cY%s has become a Grand Master!{c0\r\n", GET_NAME ( ch ) );
 	log ( "REMORT: %s has just remorted to %s", GET_NAME ( ch ), simple_class_name ( ch ) );
 	ch->Send ( "Enjoy being %s.\r\n", simple_class_name ( ch ) );
 	ch->MakeClothed();

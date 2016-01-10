@@ -4041,9 +4041,16 @@ ACMD ( do_wiznet )
 		}
 		else
 		{
-			snprintf ( buf1, sizeof ( buf1 ), "%s: %s%s\r\n", GET_NAME ( ch ), emote ? "<--- " : "",
-			           argument );
-			snprintf ( buf2, sizeof ( buf2 ), "Someone: %s%s\r\n", emote ? "<--- " : "", argument );
+			if ( emote )
+			{
+				snprintf ( buf1, sizeof ( buf1 ), "wiznet: %s %s\r\n", GET_NAME ( ch ), argument );
+				snprintf ( buf2, sizeof ( buf2 ), "wiznet: Someone %s\r\n", argument );
+			}
+			else
+			{
+				snprintf ( buf1, sizeof ( buf1 ), "%s wiznets: %s\r\n", GET_NAME ( ch ), argument );
+				snprintf ( buf2, sizeof ( buf2 ), "Someone wiznets: %s\r\n", argument );
+			}
 		}
 
 		for ( d = descriptor_list; d; d = d->next )
@@ -4064,8 +4071,11 @@ ACMD ( do_wiznet )
 			}
 		}
 
-		snprintf(buf1, sizeof(buf1), "%s%s %ss, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), "wiznet", argument, KNRM);
-    		add_to_comm( "wiznet", buf1);
+		if ( emote )
+			snprintf(buf1, sizeof(buf1), "%s%s wiznets, '%s %s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), GET_NAME (ch), argument, KNRM);
+		else
+			snprintf(buf1, sizeof(buf1), "%s%s wiznets, '%s'%s", KCYN, GET_INVIS_LEV(ch) ? "Someone" : GET_NAME(ch), argument, KNRM);
+		add_to_comm( "wiznet", buf1);
 
 		if ( PRF_FLAGGED ( ch, PRF_NOREPEAT ) )
 			ch->Send ( "%s", CONFIG_OK );
