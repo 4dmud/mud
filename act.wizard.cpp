@@ -331,6 +331,8 @@
 //#include "dlib/threads.h"
 #include "compressor.h"
 #include "shop.h"
+#include "action.h"
+#include "dg_event.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -366,6 +368,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+EVENTFUNC ( message_event );
 SPECIAL ( playershop );
 bool load_playershop_shopkeep ( room_vnum r, Character **shopkeep = NULL );
 void save_player_shop (string owner );
@@ -3137,12 +3140,28 @@ ACMD ( do_syslog )
 	ch->Send ( "Your syslog is now %s.\r\n", logtypes[tp] );
 }
 
+ACMD ( do_copyover )
+{
+	for ( Descriptor *d = descriptor_list; d; d = d->next )
+		if ( d->character->HasMessageEvent ( ME_COPYOVER ) )
+		{
+			d->character->CancelMessageEvent ( ME_COPYOVER );
+			send_to_all ( "{cyCopyover cancelled.{c0\r\n" );
+			log ( "%s cancelled the copyover.", GET_NAME ( ch ) );
+			return;
+		}
+
+	struct message_event_obj *msg = new message_event_obj ( ch, 0, THING_COPYOVER, 11, NOBODY, ( char * ) "" );
+	ch->AddMessageEvent ( event_create ( message_event, msg, 0, EVENT_TYPE_MESSAGE ), ME_COPYOVER );
+	log ( "%s initiated a copyover.", GET_NAME ( ch ) );
+}
+
 extern int mother_desc;
 extern FILE *player_fl;
 #define EXE_FILE "bin/circle" /* maybe use argv[0] but it's not reliable */
 
 /* (c) 1996-97 Erwin S. Andreasen <erwin@pip.dknet.dk> */
-ACMD ( do_copyover )
+void copyover ( Character *ch )
 {
 	FILE *fp;
 	Descriptor *d, *d_next;
@@ -3179,10 +3198,10 @@ ACMD ( do_copyover )
 			char client_name[MAX_INPUT_LENGTH];
 			char client_version[MAX_INPUT_LENGTH];
 
-                        strcpy( client_name, d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString );
-                        strcpy( client_version, d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString );
+			strcpy( client_name, d->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString );
+			strcpy( client_version, d->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString );
 
-                        // Make sure there are no spaces.
+			// Make sure there are no spaces.
 
 			int i; // Loop counter.
 			for ( i = 0; client_name[i] != '\0'; ++i )

@@ -128,6 +128,7 @@ int curr_balance ( OBJ_DATA *wep );
 int save_forest ( void );
 
 /* extern procedures */
+void copyover ( Character* ch );
 int mag_manacost ( Character *ch, int spellnum );
 void improve_skill ( Character *ch, int skill );
 ACTION ( thing_lumberjack );
@@ -810,15 +811,11 @@ ASKILL ( skill_sing_wood )
 {
 	struct obj_data *o = NULL;
 	char tree_name[MAX_INPUT_LENGTH];
-	//char *temp1;
-	//int type; 
 	int found = FALSE;
 	struct message_event_obj *msg = NULL;
 
 	skip_spaces ( &argument );
-	//temp1 = 
 	one_argument ( argument, tree_name );
-	//type = SKILL_SING_WOOD;
 
 	/* sanity check */
 	if ( !*tree_name )
@@ -827,20 +824,7 @@ ASKILL ( skill_sing_wood )
 		return 0;
 	}
 
-	/*
-	    for (obj = ch->carrying; obj && (!found); obj = next_obj) {
-		next_obj = obj->next_content;
-		if (obj == NULL)
-		    return;
-		else if (!(o = get_obj_in_list_vis(ch, tree_name,NULL,ch->carrying)))
-	 
-		    continue;
-		else
-		    found = TRUE;
-	    }
-	*/
-	if ( ( o =
-	            get_obj_in_list_vis ( ch, tree_name, 0,IN_ROOM ( ch )->contents ) ) == NULL )
+	if ( ( o = get_obj_in_list_vis ( ch, tree_name, 0,IN_ROOM ( ch )->contents ) ) == NULL )
 	{
 		ch->Send ( "The tree you need is not here.\r\n" );
 		return 0;
@@ -872,8 +856,6 @@ ASKILL ( skill_sing_wood )
 	msg = new message_event_obj ( ch, SKILL_SING_WOOD, THING_SKILL, 11, GET_ID ( o ), ( char * ) "" );
 	ch->AddMessageEvent(event_create ( message_event, msg, ( 1 RL_SEC ), EVENT_TYPE_MESSAGE ), ME_SINGWOOD);
 	return SKILL_SING_WOOD;
-
-
 }
 
 ASKILL ( skill_manifest )
@@ -1099,6 +1081,23 @@ EVENTFUNC ( message_event )
 				msg_id = ME_TUNNELING;
 				break;
 		}
+	}
+	else if ( type == THING_COPYOVER )
+	{
+		if ( msg->msg_num == 1 )
+		{
+			delete msg;
+			copyover ( ch );
+		}
+
+		if ( msg->msg_num == 11 )
+			send_to_all ( "{cyCopyover in %d seconds. Don't forget to pick up your stuff from the ground!{c0\r\n", msg->msg_num - 1 );
+		else
+			send_to_all ( "{cyCopyover in %d seconds.{c0\r\n", msg->msg_num - 1 );
+
+		msg->msg_num--;
+		time = 2 RL_SEC;
+		msg_id = ME_COPYOVER;
 	}
 	else
 	{

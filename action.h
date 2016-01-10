@@ -17,3 +17,4 @@ extern struct syllable syls[];
 #define ME_PICK_LOCK 7
 #define ME_CONTROL_WEATHER 8
 #define ME_MANIFEST 9
+#define ME_COPYOVER 10

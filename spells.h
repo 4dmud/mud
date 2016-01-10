@@ -613,7 +613,7 @@ enum spell_list {
 
 #define THING_SKILL 0
 #define THING_SUB   1
-
+#define THING_COPYOVER 2
 
 #define SAVING_PARA   0
 #define SAVING_ROD    1
