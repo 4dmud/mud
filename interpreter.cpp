@@ -891,7 +891,7 @@ const command_info cmd_info[] =
 	{ "trackthru", "tra"  , POS_DEAD    , do_gen_tog  , LVL_SEN, SCMD_TRACK, WIZ_IMPL_GRP },
 	{ "topgold"    , "top"    , POS_DEAD    , do_topgold   , LVL_IMMORT, 0, 0 },
 	{ "transfer" , "tran"     , POS_SLEEPING, do_trans    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
-	{ "tsearch"    , "tsea" , POS_DEAD    , do_search_triggers    , LVL_SEN, 0, 0},
+	{ "tsearch"    , "tsea" , POS_DEAD    , do_search_triggers    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 	{ "trigedit" , "trig"     , POS_DEAD    , do_oasis      , LVL_BUILDER, SCMD_OASIS_TRIGEDIT, WIZ_TRIG_GRP },
 	{ "trust"    , "trus" , POS_DEAD    , do_trust    , LVL_SEN, 0, WIZ_IMPL_GRP },
 	{ "typo"     , "typ" , POS_DEAD    , do_gen_write, 0, SCMD_TYPO, 0 },
