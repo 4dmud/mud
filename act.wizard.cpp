@@ -1,5 +1,3 @@
-
-
 /* ************************************************************************
 *   File: act.wizard.c                                  Part of CircleMUD *
 *  Usage: Player-level god commands and other goodies                     *
@@ -2263,12 +2261,12 @@ void do_stat_character ( Character *ch, Character *k, char* var )
 			ch->Send ("It can teach these skills and spells:\r\n");
 		for ( i = 0; i < k->mob_specials.teaches_skills.size();i++ )
 			{
-				ch->Send ( "%s[%5d] {cg%-15s{c0%s", 
+				ch->Send ( "%s[%5d] {cg%-15s{c0%s",
 				! ( i%2 ) ? "             " : " ",
-				k->mob_specials.teaches_skills[i], 
-				skill_name ( k->mob_specials.teaches_skills[i] ), 
+				k->mob_specials.teaches_skills[i],
+				skill_name ( k->mob_specials.teaches_skills[i] ),
 				! ( i%2 ) ? " " : "\r\n" );
-				
+
 			}
 			ch->Send ( "%s" , !( i%2 ) ? "" : "\r\n" );
 }
@@ -2723,7 +2721,7 @@ ACMD ( do_snoop )
 
 	argument = one_argument ( argument, arg );
         one_argument(argument, arg2);
-        
+
 
 	if ( !*arg )
 		stop_snooping ( ch );
@@ -2755,7 +2753,7 @@ ACMD ( do_snoop )
                 if (GET_LEVEL(ch) < LVL_IMPL || !str_cmp(arg2, "yes")) {
                     sprintf(buf, "%s wishes to snoop you: Allow? (Type: Y | N)", GET_NAME(ch));
                     victim->loader = GET_IDNUM(ch);
-                    line_input(victim->desc, buf, allow_snoop, NULL); 
+                    line_input(victim->desc, buf, allow_snoop, NULL);
 		    ch->Send ( "%s", CONFIG_OK );
                     return;
                 }
@@ -3214,7 +3212,7 @@ void copyover ( Character *ch )
 				if ( client_version[i] == ' ' )
 					client_version[i] = '_';
 			}
-                           
+
 			room_rnum rm = GET_WAS_IN ( d->character ) ? GET_WAS_IN ( d->character ) : IN_ROOM ( d->character );
 			fprintf ( fp, "%d %s %s %d %s %s %s\n", d->descriptor, GET_NAME ( och ), d->host.c_str(), rm->number, client_name, client_version, CopyoverGet(d) );
 
@@ -4668,7 +4666,7 @@ void show_last_logons ( Character *ch, int days, bool fix )
 ACMD ( do_show )
 {
 	int i, j, k, l, con;   /* i, j, k to specifics? */
-	
+
 	zone_rnum zrn = NOWHERE;
 	zone_vnum zvn = NOWHERE;
 	sbyte self = FALSE;
@@ -5100,81 +5098,81 @@ struct set_struct
 	const char pcnpc;
 	const char type;
 }
-set_fields[] =
-{
+    set_fields[] =
+    {
 	{"brief", LVL_GOD, PC, BINARY}, /* 0 */
 	{"invstart", LVL_GOD, PC, BINARY},   /* 1 */
-	{"title", LVL_GOD, PC, MISC}, 
-	{"nosummon", LVL_GRGOD, PC, BINARY}, 
-	{"maxhit", LVL_GRGOD, BOTH, NUMBER}, 
+	{"title", LVL_GOD, PC, MISC},
+	{"nosummon", LVL_GRGOD, PC, BINARY},
+	{"maxhit", LVL_GRGOD, BOTH, NUMBER},
 	{"maxmana", LVL_GRGOD, BOTH, NUMBER},     /* 5 */
-	{"maxmove", LVL_GRGOD, BOTH, NUMBER}, 
-	{"hit", LVL_GRGOD, BOTH, NUMBER}, 
-	{"mana", LVL_GRGOD, BOTH, NUMBER}, 
-	{"move", LVL_GRGOD, BOTH, NUMBER}, 
+	{"maxmove", LVL_GRGOD, BOTH, NUMBER},
+	{"hit", LVL_GRGOD, BOTH, NUMBER},
+	{"mana", LVL_GRGOD, BOTH, NUMBER},
+	{"move", LVL_GRGOD, BOTH, NUMBER},
 	{"align", LVL_GOD, BOTH, NUMBER},    /* 10 */
-	{"str", LVL_GRGOD, BOTH, NUMBER}, 
-	{"stradd", LVL_GRGOD, BOTH, NUMBER}, 
-	{"int", LVL_GRGOD, BOTH, NUMBER}, 
-	{"wis", LVL_GRGOD, BOTH, NUMBER}, 
+	{"str", LVL_GRGOD, BOTH, NUMBER},
+	{"stradd", LVL_GRGOD, BOTH, NUMBER},
+	{"int", LVL_GRGOD, BOTH, NUMBER},
+	{"wis", LVL_GRGOD, BOTH, NUMBER},
 	{"dex", LVL_GRGOD, BOTH, NUMBER},    /* 15 */
-	{"con", LVL_GRGOD, BOTH, NUMBER}, 
-	{"cha", LVL_GRGOD, BOTH, NUMBER}, 
-	{"ac", LVL_GRGOD, BOTH, NUMBER}, 
-	{"gold", LVL_GOD, BOTH, NUMBER}, 
+	{"con", LVL_GRGOD, BOTH, NUMBER},
+	{"cha", LVL_GRGOD, BOTH, NUMBER},
+	{"ac", LVL_GRGOD, BOTH, NUMBER},
+	{"gold", LVL_GOD, BOTH, NUMBER},
 	{"bank", LVL_GOD, PC, NUMBER},  /* 20 */
-	{"exp", LVL_GRGOD, BOTH, NUMBER}, 
-	{"hitroll", LVL_GRGOD, BOTH, NUMBER}, 
-	{"damroll", LVL_GRGOD, BOTH, NUMBER}, 
+	{"exp", LVL_GRGOD, BOTH, NUMBER},
+	{"hitroll", LVL_GRGOD, BOTH, NUMBER},
+	{"damroll", LVL_GRGOD, BOTH, NUMBER},
 	{"invis", LVL_IMPL, PC, NUMBER}, \
 	{"nohassle", LVL_GRGOD, PC, BINARY}, /* 25 */
-	{"frozen", LVL_FREEZE, PC, BINARY}, 
-	{"practices", LVL_GRGOD, PC, NUMBER}, 
-	{"lessons", LVL_GRGOD, PC, NUMBER}, 
-	{"drunk", LVL_GRGOD, BOTH, MISC}, 
+	{"frozen", LVL_FREEZE, PC, BINARY},
+	{"practices", LVL_GRGOD, PC, NUMBER},
+	{"lessons", LVL_GRGOD, PC, NUMBER},
+	{"drunk", LVL_GRGOD, BOTH, MISC},
 	{"hunger", LVL_GRGOD, BOTH, MISC},   /* 30 */
-	{"thirst", LVL_GRGOD, BOTH, MISC}, 
-	{"killer", LVL_GOD, PC, BINARY}, 
-	{"thief", LVL_GOD, PC, BINARY}, 
-	{"level", LVL_IMPL, BOTH, NUMBER}, 
+	{"thirst", LVL_GRGOD, BOTH, MISC},
+	{"killer", LVL_GOD, PC, BINARY},
+	{"thief", LVL_GOD, PC, BINARY},
+	{"level", LVL_IMPL, BOTH, NUMBER},
 	{"room", LVL_IMPL, BOTH, NUMBER},    /* 35 */
-	{"roomflag", LVL_GRGOD, PC, BINARY}, 
-	{"siteok", LVL_GRGOD, PC, BINARY}, 
-	{"deleted", LVL_IMPL, PC, BINARY}, 
-	{"class", LVL_GRGOD, BOTH, MISC}, 
+	{"roomflag", LVL_GRGOD, PC, BINARY},
+	{"siteok", LVL_GRGOD, PC, BINARY},
+	{"deleted", LVL_IMPL, PC, BINARY},
+	{"class", LVL_GRGOD, BOTH, MISC},
 	{"nowizlist", LVL_GOD, PC, BINARY},  /* 40 */
-	{"quest", LVL_GOD, PC, BINARY}, 
-	{"loadroom", LVL_GRGOD, PC, MISC}, 
-	{"colour", LVL_GOD, PC, BINARY}, 
-	{"idnum", LVL_IMPL, PC, NUMBER}, 
+	{"quest", LVL_GOD, PC, BINARY},
+	{"loadroom", LVL_GRGOD, PC, MISC},
+	{"colour", LVL_GOD, PC, BINARY},
+	{"idnum", LVL_IMPL, PC, NUMBER},
 	{"passwd", LVL_IMPL, PC, MISC}, /* 45 */
-	{"nodelete", LVL_GOD, PC, BINARY}, 
-	{"sex", LVL_GRGOD, BOTH, MISC}, 
-	{"age", LVL_GRGOD, BOTH, NUMBER}, 
-	{"remort", LVL_IMPL, PC, MISC}, 
+	{"nodelete", LVL_GOD, PC, BINARY},
+	{"sex", LVL_GRGOD, BOTH, MISC},
+	{"age", LVL_GRGOD, BOTH, NUMBER},
+	{"remort", LVL_IMPL, PC, MISC},
 	{"rtwo", LVL_IMPL, PC, MISC},   /* 50 */
-	{"rthree", LVL_IMPL, PC, MISC}, 
-	{"race", LVL_GRGOD, BOTH, MISC}, 
-	{"pregnant", LVL_IMPL, PC, NUMBER}, 
-	{"breakup", LVL_SEN, PC, MISC}, 
+	{"rthree", LVL_IMPL, PC, MISC},
+	{"race", LVL_GRGOD, BOTH, MISC},
+	{"pregnant", LVL_IMPL, PC, NUMBER},
+	{"breakup", LVL_SEN, PC, MISC},
 	{"rp", LVL_SEN, PC, BINARY},    /* 55 */
-	{"pk", LVL_SEN, PC, BINARY}, 
-	{"brasst", LVL_SEN, PC, NUMBER}, 
-	{"bronzet", LVL_SEN, PC, NUMBER}, 
-	{"silvert", LVL_SEN, PC, NUMBER}, 
+	{"pk", LVL_SEN, PC, BINARY},
+	{"brasst", LVL_SEN, PC, NUMBER},
+	{"bronzet", LVL_SEN, PC, NUMBER},
+	{"silvert", LVL_SEN, PC, NUMBER},
 	{"goldt", LVL_SEN, PC, NUMBER}, /* 60 */
-	{"clan", LVL_SEN, PC, NUMBER}, 
-	{"rank", LVL_SEN, PC, NUMBER}, 
-	{"height", LVL_GOD, BOTH, NUMBER}, 
-	{"weight", LVL_GOD, BOTH, NUMBER}, 
+	{"clan", LVL_SEN, PC, NUMBER},
+	{"rank", LVL_SEN, PC, NUMBER},
+	{"height", LVL_GOD, BOTH, NUMBER},
+	{"weight", LVL_GOD, BOTH, NUMBER},
 	{"helper", LVL_SEN, PC, BINARY},     /* 65 */
-	{"spec01", LVL_SEN, PC, BINARY}, 
-	{"spec02", LVL_SEN, PC, BINARY}, 
-	{"spec03", LVL_SEN, PC, BINARY}, 
+	{"spec01", LVL_SEN, PC, BINARY},
+	{"spec02", LVL_SEN, PC, BINARY},
+	{"spec03", LVL_SEN, PC, BINARY},
 	{"spec04", LVL_SEN, PC, BINARY},     /* 69 */
 	{"speed", LVL_SEN, BOTH, NUMBER},
 	{"coventry", LVL_SEN, PC, BINARY},
-	{"pretitle", LVL_SEN, PC, MISC},
+	{"pretitle", LVL_CRT, PC, MISC},
 	{"rpgroup", LVL_SEN, PC, MISC},
 	{ "olc", LVL_IMPL, PC,  MISC },
 	{ "hero", LVL_SEN,  PC,  BINARY }, /* 75 */
@@ -5190,7 +5188,7 @@ set_fields[] =
         {"ethos", LVL_SEN, PC, NUMBER},
 	{"automeld", LVL_CRT, PC, NUMBER},
 	{   "\n", 0, BOTH, MISC}
-};
+    };
 
 int perform_set ( Character *ch, Character *vict, int mode,
                   char *val_arg )
@@ -5544,7 +5542,7 @@ int perform_set ( Character *ch, Character *vict, int mode,
 			 * NOTE: May not display the exact age specified due to the integer
 			 * division used elsewhere in the code.  Seems to only happen for
 			 * some values below the starting age (17) anyway. -gg 5/27/98
-			 * 
+			 *
 			 * NOTE2: new code which doesn't care about this -Thotter
 			 */
 			//vict->player.time.birth =
@@ -6354,7 +6352,7 @@ int check_potion_price ( struct obj_data *obj )
 int spell_weight ( struct obj_data *obj, int val )
 {
   int i;
- 
+
   i = GET_OBJ_VAL(obj, val);
 
   if ( i == -1 ) /* i.e.: no spell */
@@ -6368,7 +6366,7 @@ int spell_weight ( struct obj_data *obj, int val )
 		return 0;
 	if ( i >= MAX_SKILLS )
 		return 0;
-	if ( spell_info[i].type != 1) 
+	if ( spell_info[i].type != 1)
 		return 0;
 
 	switch ( GET_OBJ_VAL ( obj, val ) )
@@ -6690,12 +6688,12 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
   {
 	if ( !strcmp ( arg1, "first" ) )
 		sort_by_dice = 1;
-	else sort_by_dice = 2;	
-  	
+	else sort_by_dice = 2;
+
 	DYN_CREATE;
 	*dynbuf = 0;
   	for ( object = 0; object <= top_of_objt; object++ ) {
-      		if ( GET_OBJ_TYPE(&obj_proto[object]) != ITEM_WEAPON ) 
+      		if ( GET_OBJ_TYPE(&obj_proto[object]) != ITEM_WEAPON )
 			continue;
       		snprintf ( buf, sizeof(buf), "%6d %s %dd%d\r\n", obj_index[object].vnum, obj_proto[object].short_description, GET_OBJ_VAL ( &obj_proto[object], 1 ), GET_OBJ_VAL ( &obj_proto[object], 2 ) );
       		pairs.push_back ( make_pair ( GET_OBJ_VAL ( &obj_proto[object], sort_by_dice ), string ( buf ) ) );
@@ -6707,11 +6705,11 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
 		snprintf ( buf, sizeof ( buf ), "%s", pairs[i].second.c_str() );
 		DYN_RESIZE ( buf );
 	}
-	page_string ( ch->desc, dynbuf, DYN_BUFFER );	
+	page_string ( ch->desc, dynbuf, DYN_BUFFER );
 
 	return;
   }
-	
+
   one_argument(argument, arg2);
 
   if (!*arg1 || !*arg2 || !is_number(arg1) || !is_number(arg2)) {
@@ -6723,7 +6721,7 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
   die_num = atoi(arg1);
   die_size = atoi(arg2);
   ch->Send("Weapons with %dd%d :\r\n", die_num, die_size);
- 
+
   DYN_CREATE;
   *dynbuf = 0;
   for ( object = 0; object <= top_of_objt; object++ ) {
@@ -6738,7 +6736,7 @@ void do_statlist_weaponsearch(Character *ch, char *arg1, char *argument)
       ch->Send("No weapons with that dam dice.\r\n");
   else
       page_string(ch->desc, dynbuf, DYN_BUFFER);
-  
+
 }
 
 ACMD ( do_statlist )
