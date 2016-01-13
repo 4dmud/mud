@@ -151,7 +151,6 @@ string & Descriptor::convert_mxp_tags (const int bMXP, stringstream &ssrc)
   int srclen = ssrc.str().length();
   static string dest, src;
   size_t ps;
-
   
   dest.erase();
 
@@ -160,10 +159,6 @@ string & Descriptor::convert_mxp_tags (const int bMXP, stringstream &ssrc)
   if (srclen == 0)
     return src;
 
-    
-  
-  
-  
   for (ps = 0; srclen > 0; ps++, srclen--)
   {
     c = src[ps];
@@ -263,12 +258,10 @@ string & Descriptor::convert_mxp_tags (const int bMXP, string &src)
   static string dest("");
   size_t ps;
 
-
   dest.erase();
   
   if (srclen == 0)
     return src;
-  
   
   for (ps = 0; srclen > 0; ps++, srclen--)
   {

@@ -1487,14 +1487,15 @@ bool Character::CancelMessageEvent ( struct event *ev )
 	if ( message_event.size() > 0 )
 	{
 		map<int, struct event *>::iterator it;
-		for ( it = message_event.begin(); it != message_event.end(); it++ )
+		for ( it = message_event.begin(); it != message_event.end(); )
 		{
-			if ( ( *it).second == ev )
+			if ( it->second == ev )
 			{
-				event_cancel ( ( *it).second );
-				message_event.erase ( it );
-				break;
+				event_cancel ( it->second );
+				it = message_event.erase ( it );
 			}
+			else
+				it++;
 		}
 
 	}
@@ -1505,24 +1506,18 @@ bool Character::ClearMessageEvent ( struct event *ev )
 	if ( message_event.size() > 0 )
 	{
 		map<int, struct event *>::iterator it;
-		for ( it = message_event.begin(); it != message_event.end(); it++ )
+		for ( it = message_event.begin(); it != message_event.end(); )
 		{
-			if ( ( *it).second == ev )
-			{
-				message_event.erase ( it );
-				break;
-			}
+			if ( it->second == ev )
+				it = message_event.erase ( it );
+			else
+				it++;
 		}
-
 	}
 	return true;
 }
 bool Character::HasMessageEvent ( int msg_id )
 {
-	map<int, struct event *>::iterator it;
-	it = message_event.find ( msg_id );
-	if ( it == message_event.end() )
-		return false;
-	return true;
+	return ( message_event.find ( msg_id ) != message_event.end() );
 }
 

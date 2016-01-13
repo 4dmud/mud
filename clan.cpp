@@ -2643,34 +2643,33 @@ void add_clan_member ( const char * name, int rank, int cln )
 
 void remove_clan_member ( const char * name, int cln )
 {
-	vector<clan_list_data>::iterator find;
 	if ( clan_list[cln].size() == 0 || !name || !*name )
 		return;
-	find = clan_list[cln].begin();
+
+	vector<clan_list_data>::iterator find = clan_list[cln].begin();
 	while ( find != clan_list[cln].end() )
 	{
-		if ( !str_cmp ( ( *find ).name, name ) )
+		if ( !str_cmp ( find->name, name ) )
 		{
-			free ( ( *find ).name );
-			clan_list[cln].erase ( find );
-			remove_clan_member ( name, cln ); /* recursive, to avoid missmatched iterators */
-			return;
+			free ( find->name );
+			find = clan_list[cln].erase ( find );
 		}
-		find++;
+		else
+			find++;
 	}
 
 }
 
 void update_clan_member ( const char * name, int rank, int cln )
 {
-	vector<clan_list_data>::iterator find;
 	if ( clan_list[cln].size() == 0 || !name || !*name )
 		return;
-	find = clan_list[cln].begin();
+
+	vector<clan_list_data>::iterator find = clan_list[cln].begin();
 	while ( find != clan_list[cln].end() )
 	{
-		if ( !str_cmp ( ( *find ).name, name ) )
-			( *find ).rank = rank;
+		if ( !str_cmp ( find->name, name ) )
+			find->rank = rank;
 		find++;
 	}
 
@@ -2680,8 +2679,8 @@ void free_clan_list ( vector<clan_list_data> &find )
 {
 	for ( vector<clan_list_data>::iterator it = find.begin(); it != find.end(); it++ )
 	{
-		free ( ( *it ).name );
-		( *it ).name = NULL;
+		free ( it->name );
+		it->name = NULL;
 	}
 }
 

@@ -848,37 +848,28 @@ void boot_world ( void )
 
 void free_objects()
 {
-	vector<long> ex_list;
 	if ( object_list.empty() )
 		return;
-	/** Find all items that need extracting **/
-	for ( olt_it ob = object_list.begin(); ob != object_list.end(); ob++ )
-		ex_list.push_back ( GET_ID ( ( ob->second ) ) );
-	/** extract them now **/
-	for ( vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++ )
-	{
-		if ( object_list.find ( *v ) != object_list.end() )
-			free_obj ( object_list[ ( *v ) ], TRUE );
-		if ( dead_obj.find ( *v ) != dead_obj.end() )
-			dead_obj.erase ( *v );
-	}
 
-	object_list.clear();
+	/** Find all items that need extracting **/
+	vector<long> ex_list;
+	for ( const auto &ob : object_list )
+		ex_list.push_back ( ob.first );
+
+	/** extract them now **/
+	for ( const auto &i : ex_list )
+		free_obj ( object_list[ i ], TRUE );
+
+	dead_obj.clear();
 }
+
 void free_pending_objects()
 {
-	vector<long> ex_list;
 	if ( dead_obj.empty() )
 		return;
-	for ( olt_it o = dead_obj.begin();o != dead_obj.end();o++ )
-		ex_list.push_back ( GET_ID ( ( o->second ) ) );
-	for ( vector<long>::iterator v = ex_list.begin();v!= ex_list.end();v++ )
-	{
-		if ( dead_obj.find ( *v ) != dead_obj.end() )
-			free_obj ( dead_obj[ ( *v ) ], TRUE );
-		if ( object_list.find ( *v ) != object_list.end() )
-			object_list.erase ( *v );
-	}
+
+	for ( auto &ob : dead_obj )
+		free_obj ( ob.second, TRUE );
 
 	dead_obj.clear();
 }

@@ -41,9 +41,7 @@ void NameIndexer::remNamelist ( long id )
 	while ( nlt_it != nlt.end() )
 	{
 		if ( nlt_it->second == id )
-		{
-			nlt.erase ( nlt_it++ );
-		}
+			nlt_it = nlt.erase ( nlt_it );
 		else
 			++nlt_it;
 	}
