@@ -32,6 +32,7 @@
 
 /* External variables and functions */
 
+char *str_udup(const char *txt);
 long long gold_data ( int type, long long amount );
 int genpreg ( void );
 extern const char *pc_class_types[];
@@ -3292,11 +3293,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 								size_t pos = shortdesc.find ( " is torn from use" );
 								if ( pos != string::npos )
 								{
-									if ( IS_UNIQUE ( o ) )
-										free_string ( &o->short_description );
-									else
-										SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
-									o->short_description = strdup ( shortdesc.substr ( 0, pos ).c_str() );
+									SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+									if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+										free ( o->short_description );
+									o->short_description = str_udup ( shortdesc.substr ( 0, pos ).c_str() );
 								}
 							}
 							GET_OBJ_REPAIRS ( o )++;
@@ -3387,12 +3387,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
 						if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_COLOUR_NAMES )
 						{
-							if ( IS_UNIQUE ( o ) )
-								free_string ( &o->short_description );
-							else
-								SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
-
-							o->short_description = strdup ( desc.c_str() );
+							SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+							if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+								free ( o->short_description );
+							o->short_description = str_udup ( desc.c_str() );
 						}
 						strcpy ( str, "" );
 					}
@@ -3456,12 +3454,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							desc.insert ( pos, new_material + " " );
 						}
 
-						if ( IS_UNIQUE ( o ) )
-							free_string ( &o->short_description );
-						else
-							SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
-
-						o->short_description = strdup ( desc.c_str() );
+						SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+						if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+							free ( o->short_description );
+						o->short_description = str_udup ( desc.c_str() );
 						*str = '\0';
 					}
 
@@ -3521,12 +3517,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 							desc.insert ( pos, new_quality + " " );
 						}
 
-						if ( IS_UNIQUE ( o ) )
-							free_string ( &o->short_description );
-						else
-							SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
-
-						o->short_description = strdup ( desc.c_str() );
+						SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+						if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+							free ( o->short_description );
+						o->short_description = str_udup ( desc.c_str() );
 						strcpy ( str, "" );
 					}
 

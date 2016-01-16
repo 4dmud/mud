@@ -10,6 +10,8 @@
 #include "constants.h"
 #include "oasis.h"
 
+char *str_udup(const char *txt);
+
 ACMD(do_string)
 {
   struct obj_data *obj;
@@ -37,74 +39,58 @@ ACMD(do_string)
 
   if (!strcmp("name", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    else
-      free_string(&obj->name);
-    obj->name = strdup(buf2);
+    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+    if ( obj->name && obj->name != obj_proto[ GET_OBJ_RNUM ( obj )].name )
+      free ( obj->name );
+    obj->name = str_udup ( buf2 );
   }
   else if (!str_cmp("short", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    else
-      free_string(&obj->short_description);
-    obj->short_description = strdup(buf2);
+    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+    if ( obj->short_description && obj->short_description != obj_proto[ GET_OBJ_RNUM ( obj )].short_description )
+      free ( obj->short_description );
+    obj->short_description = str_udup ( buf2 );
   }
   else if (!str_cmp("long", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    else
-      free_string(&obj->description);
-    obj->description = strdup(buf2);
+    SET_BIT_AR ( GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE );
+    if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
+      free ( obj->description );
+    obj->description = str_udup ( buf2 );
   }
   else if (!str_cmp("weight", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_WEIGHT(obj) = atoi(buf2);
   }
   else if (!str_cmp("cost", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_COST(obj) = atoi(buf2);
   }
   else if (!str_cmp("rent", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_RENT(obj) = atoi(buf2);
   }
   else if (!str_cmp("timer", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    GET_OBJ_RENT(obj) = atoi(buf2);
+    GET_OBJ_TIMER(obj) = atoi(buf2);
   }
   else if (!str_cmp("v0", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_VAL(obj, 0) = atoi(buf2);
   }
   else if (!str_cmp("v1", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_VAL(obj, 1) = atoi(buf2);
   }
   else if (!str_cmp("v2", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_VAL(obj, 2) = atoi(buf2);
   }
   else if (!str_cmp("v3", buf1))
   {
-    if (!IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
-      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_VAL(obj, 3) = atoi(buf2);
   }
   else

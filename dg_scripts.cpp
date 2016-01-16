@@ -183,6 +183,7 @@ extern unsigned long pulse;
 extern struct time_info_data time_info;
 
 /* external functions */
+char *str_udup(const char *txt);
 void view_room_by_rnum ( Character *ch, room_rnum is_in );
 void free_varlist ( struct trig_var_data *vd );
 void extract_trigger ( struct trig_data *trig );
@@ -3250,37 +3251,34 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 
 	if ( args[1] == "name" )
 	{
-		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
-			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		else
-			free_string ( &obj->name );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		if ( obj->name && obj->name != obj_proto[ GET_OBJ_RNUM ( obj )].name )
+			free ( obj->name );
 		arg = args[2];
 		for ( int i = 3; i < args.size(); ++i )
 			arg += " " + args[i];
-		obj->name = strdup ( arg.c_str() );
+		obj->name = str_udup ( arg.c_str() );
 	}
 	else if ( args[1] == "short" )
 	{
-		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
-			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		else
-			free_string ( &obj->short_description );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		if ( obj->short_description && obj->short_description != obj_proto[ GET_OBJ_RNUM ( obj )].short_description )
+			free ( obj->short_description );
 		arg = args[2];
 		for ( int i = 3; i < args.size(); ++i )
 			arg += " " + args[i];
-		obj->short_description = strdup ( arg.c_str() );
+		obj->short_description = str_udup ( arg.c_str() );
 	}
 	else if ( args[1] == "long" )
 	{
-		if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
-			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		else
-			free_string ( &obj->description );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
+			free ( obj->description );
 		arg = args[2];
 		arg[0] = UPPER ( arg[0] );
 		for ( int i = 3; i < args.size(); ++i )
 			arg += " " + args[i];
-		obj->description = strdup ( arg.c_str() );
+		obj->description = str_udup ( arg.c_str() );
 	}
 	else if ( args[1] == "extra" )
 	{
@@ -3294,37 +3292,40 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		for ( int i = 4; i < args.size(); ++i )
 			arg += " " + args[i];
 
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		extra_descr_data *ex_desc = obj->ex_description;
 		if ( ex_desc == NULL )
 		{
 			CREATE ( obj->ex_description, extra_descr_data, 1 );
-			obj->ex_description->keyword = strdup ( args[2].c_str() );
+			obj->ex_description->keyword = str_udup ( args[2].c_str() );
 			arg[0] = UPPER ( arg[0] );
-			obj->ex_description->description = strdup ( arg.c_str() );
+			obj->ex_description->description = str_udup ( arg.c_str() );
 			obj->ex_description->next = NULL;
-			SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 			return;
 		}
 		else for ( ; ex_desc; ex_desc = ex_desc->next )
 		{
 			if ( strstr ( ex_desc->keyword, args[2].c_str() ) )
 			{
-				if ( !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE ) )
-					SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-				else
-					free_string ( &ex_desc->description );
+				extra_descr_data *ex_proto = obj_proto[ GET_OBJ_RNUM ( obj ) ].ex_description;
+				for ( ; ex_proto; ex_proto = ex_proto->next )
+					if ( strstr ( ex_proto->keyword, args[2].c_str() ) )
+					{
+						if ( ex_desc->description && ex_desc->description != ex_proto->description )
+							free ( ex_desc->description );
+						break;
+					}
 				arg[0] = UPPER ( arg[0] );
-				ex_desc->description = strdup ( arg.c_str() );
+				ex_desc->description = str_udup ( arg.c_str() );
 				return;
 			}
 			else if ( ex_desc->next == NULL )
 			{
 				CREATE ( ex_desc->next, extra_descr_data, 1 );
-				ex_desc->next->keyword = strdup ( args[2].c_str() );
+				ex_desc->next->keyword = str_udup ( args[2].c_str() );
 				arg[0] = UPPER ( arg[0] );
-				ex_desc->next->description = strdup ( arg.c_str() );
+				ex_desc->next->description = str_udup ( arg.c_str() );
 				ex_desc->next->next = NULL;
-				SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 				return;
 			}
 		}

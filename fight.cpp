@@ -319,6 +319,7 @@ int skill_roll ( Character *ch, int skill_num );
 ACMD ( do_sac );
 
 /* External procedures */
+char *str_udup(const char *txt);
 void spill_gold ( Character *ch );
 void add_corpse_to_list ( OBJ_DATA *corpse );
 void dismount_char ( Character *ch );
@@ -5312,11 +5313,10 @@ void make_corpse ( Character *ch, Character *killer )
 				if ( GET_OBJ_QUALITY ( o ) < 10 )
 				{
 					string shortdesc = string ( o->short_description ) + " is torn from use";
-					if ( IS_UNIQUE ( o ) )
-						free_string ( &o->short_description );
-					else
-						SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
-					o->short_description = strdup ( shortdesc.c_str() );
+					SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+					if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
+						free ( o->short_description );
+					o->short_description = str_udup ( shortdesc.c_str() );
 				}
 				use_bodybag = TRUE;
 			}
