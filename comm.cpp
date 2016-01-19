@@ -475,7 +475,7 @@ int main(int argc, char **argv) {
       exit(0);
     }
 
-       
+
 #endif
 
     /****************************************************************************/
@@ -840,7 +840,7 @@ void init_game(ush_int s_port) {
 #if ECL
     // start lisp
     boot_lisp(start_argc, start_argv);
-    
+
     ecl_init_module(OBJNULL, init_4d_lisp);
     //read_VV(OBJNULL, init_lib_4D_LISP);
     cl_safe_eval(c_string_to_object("(handler-case (4d::init) (error (e) (format t \"error: ~a~%\" e)))"), Cnil, Cnil);
@@ -1145,7 +1145,7 @@ void *process_io(void *loopstate) {
         }
 
     } while (loopstate == NULL);    /* We're a thread if loopstate == NULL */
-    
+
     return NULL;
 }
 #endif
@@ -1415,7 +1415,7 @@ void game_loop(socket_t s_mother_desc) {
             circle_restrict = 0;
             num_invalid = 0;
         }
-	
+
 #ifdef CIRCLE_UNIX
         /* Update tics for deadlock protection (UNIX only) */
         tics_passed++;
@@ -1458,7 +1458,7 @@ void heartbeat(int heart_pulse) {
         tick_grenade();
     }
 
-    if (!(heart_pulse % (PULSE_MOBILE))) 
+    if (!(heart_pulse % (PULSE_MOBILE)))
         mobile_activity();
 
     if (!(heart_pulse % PULSE_AUCTION))
@@ -2037,7 +2037,7 @@ static void get_lookup_reply(void) {
                 /* STATE(d) = CON_GET_NAME;
 
 
-                //Log new connections - probably unnecessary, but you may want it 
+                //Log new connections - probably unnecessary, but you may want it
                 new_mudlog( CMP, LVL_GOD, FALSE,"New connection from [%s]", d->host);
                 */
 
@@ -2124,8 +2124,8 @@ void add_ip_to_host_list(string &host_ip, string &host, time_t date) {
     host_list[thi->host_ip] = thi;
 }
 bool check_for_ip(string &ip_add, string &host) {
-	std::map<string, meta_host_data *>::iterator it;    
-    
+	std::map<string, meta_host_data *>::iterator it;
+
     if ((it = host_list.find(ip_add)) == host_list.end())
 	    return false;
     host = it->second->host;
@@ -2177,7 +2177,7 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
     /* create a new descriptor */
     newd = new Descriptor();
     if (!copyover) {
-	   
+
         /* find the numeric site address */
 	    //strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
 	    newd->host_ip = (char *)inet_ntoa(peer.sin_addr);
@@ -2905,11 +2905,14 @@ int Descriptor::process_input() {
                 strcpy(last_input, tmp);     /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
         } else {
             strcpy(last_input, tmp);  /* strcpy: OK (by mutual MAX_INPUT_LENGTH) */
-            if (history[history_pos])
-                free(history[history_pos]);    /* Clear the old line. */
-            history[history_pos] = strdup(tmp);   /* Save the new. */
-            if (++history_pos >= HISTORY_SIZE)  /* Wrap to top. */
-                history_pos = 0;
+            if (STATE (this ) == CON_PLAYING) {
+                // Only log history of normal commands, not menus, notes or login
+                if (history[history_pos])
+                    free(history[history_pos]);    /* Clear the old line. */
+                history[history_pos] = strdup(tmp);   /* Save the new. */
+                if (++history_pos >= HISTORY_SIZE)  /* Wrap to top. */
+                    history_pos = 0;
+            }
         }
 
         if (!failed_subst)
@@ -3142,7 +3145,7 @@ RETSIGTYPE watchdog(void) {
         open("FROZEN", O_CREAT | O_RDWR, 0600);
         abort(); //dump core.
 }
-    
+
 
 #endif                   /* CIRCLE_UNIX */
 
@@ -3187,8 +3190,8 @@ void signal_setup(void) {
     struct itimerval itime;
     struct timeval interval;
 
-    //I disabled the SIGSEGV signal catching. It actually prevented 
-    //core-dumps from happening. The telling which command was typed 
+    //I disabled the SIGSEGV signal catching. It actually prevented
+    //core-dumps from happening. The telling which command was typed
     //last can also be done in the script, if there is a core available.
 
 //  my_signal(SIGSEGV, (sigfunc *)core_dump_on_crash);
@@ -3283,7 +3286,7 @@ void send_to_mortals(const char *messg, ...) {
 	//Descriptor *1;
 	//va_list args;
 
-	// This doesn't do anything yet. 
+	// This doesn't do anything yet.
 	// Todo by Prometheus
 }
 
@@ -3644,7 +3647,7 @@ void act(const char *str, int hide_invisible, Character *ch,
 
     /*
      * Warning: the following TO_SLEEP code is a hack.
-     * 
+     *
      * I wanted to be able to tell act to deliver a message regardless of sleep
      * without adding an additional argument.  TO_SLEEP is 128 (a single bit
      * high up).  It's ONLY legal to combine TO_SLEEP with one other TO_x
@@ -3746,7 +3749,7 @@ void setup_log(const char *filename, int fd) {
 
 int open_logfile(const char *filename, FILE * stderr_fp) {
     const char* mode = "w";
-    if (fCopyOver) 
+    if (fCopyOver)
 	mode = "a";
 
     if (stderr_fp)         /* freopen() the descriptor. */
@@ -3855,8 +3858,8 @@ void send_to_prf(char *messg, Character *nosend, int prf_flags) {
   register Descriptor *i;
   register Character *ch;
   int to_sleeping = 1;
-  
- 
+
+
   for (i = descriptor_list; i; i = i->next)
     if (!i->connected &&
         (ch = (i->character ? i->character : i->original)) != nosend &&
@@ -4019,7 +4022,7 @@ void make_wholist(void) {
                     ch->char_specials.timer * SECS_PER_MUD_HOUR /
                     SECS_PER_REAL_MIN);
         }
-    } 
+    }
 for (d = descriptor_list; d; d = d->next) {
         if (!IS_PLAYING(d))
             continue;
@@ -4129,14 +4132,14 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
     char out_buf[MAX_INPUT_LENGTH + 1] = "";
     char ptemp[MAX_PROMPT_LENGTH * 5] = "";
     register unsigned int inpos = 0, outpos = 0;
-    
+
     time_t ct = time(0);
     bool def = FALSE;
     int count = 0, mhp= 0;
     gold_int expe;
     size_t len = 0, psize;
 
-    
+
     char **msg;
 
     if (!FIGHTING(ch))
@@ -4449,9 +4452,9 @@ char * parse_prompt(Character *ch, char *str, size_t lenn) {
    cmd = the text to be wrapped.
    width = the width to wrap cmd at.
    maxlen = the sizeof(cmd)
-   
+
    This function returns the modified (cmd)
-   
+
    By Jamie Nelson
    Mordecai@xtra.co.nz
 */
@@ -4624,15 +4627,15 @@ void msdp_update( void )
             ++PlayerCount;
 
             bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
-               GET_CLASS( ch ) == CLASS_MAGE || 
+               GET_CLASS( ch ) == CLASS_MAGE ||
                GET_CLASS( ch ) == CLASS_ESPER || has_staff( ch );
 
             MSDPSetString( d, eMSDP_CHARACTER_NAME, GET_NAME(ch) );
             MSDPSetNumber( d, eMSDP_ALIGNMENT, GET_ALIGNMENT(ch) );
             MSDPSetNumber( d, eMSDP_EXPERIENCE, GET_EXP(ch) );
-            MSDPSetNumber( d, eMSDP_EXPERIENCE_MAX, level_exp ( 
-               GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1, 
-               current_class_is_tier_num ( ch ), 
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_MAX, level_exp (
+               GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1,
+               current_class_is_tier_num ( ch ),
                MIN ( REMORTS ( ch ), 50 ) ) );
             MSDPSetNumber( d, eMSDP_EXPERIENCE_TNL, exp_needed(ch) );
 
@@ -4669,7 +4672,7 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_CHA_PERM, ch->real_abils.cha );
             MSDPSetNumber( d, eMSDP_STR_PERM, ch->real_abils.str );
             MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
-            
+
 
             /* This would be better moved elsewhere */
             if ( pOpponent != NULL )
@@ -4703,7 +4706,7 @@ void msdp_update( void )
                 for ( aff = ch->affected; aff != NULL; aff = aff->next )
                 {
                     int minsec = time_to_sec(aff->expire+1);
-                    sprintf( skill_buf, "001,1,%s,%d", 
+                    sprintf( skill_buf, "001,1,%s,%d",
                         skill_name(aff->type), minsec >= 0 ? minsec : -1 );
 
                     if ( buf[0] != '\0' )
