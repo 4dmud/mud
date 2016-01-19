@@ -8,6 +8,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <time.h>
 #include "config.h"
 #include "sysdep.h"
 
@@ -375,7 +376,7 @@ void add_to_comm ( const char *type, const char *text )
 	char tmstr[30];
 	time_s[strlen ( time_s ) - 1] = '\0';
 	snprintf(tmstr, 30, "%-19.19s :: ", time_s);
-	
+
 	if ( type && text )
 	{
 		CREATE ( com, struct comm_data, 1 );
