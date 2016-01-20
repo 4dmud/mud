@@ -203,6 +203,9 @@
 /* Define if you have the <fcntl.h> header file.  */
 #define HAVE_FCNTL_H 1
 
+/* Define if you have the <sys/resource.h> header file.  */
+#define HAVE_SYS_RESOURCE_H 1
+
 /* Define if you have the <limits.h> header file.  */
 #define HAVE_LIMITS_H 1
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
@@ -317,7 +320,7 @@
 #define CIRCLE_UNIX 1
 
 /* Define if the system is capable of using crypt() to encrypt.  */
-#define CIRCLE_CRYPT 1 
+#define CIRCLE_CRYPT 1
 /* Version number of package */
 #define VERSION "@PACKAGE_VERSION@"
 
