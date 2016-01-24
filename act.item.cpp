@@ -4895,7 +4895,7 @@ ACMD ( do_skin )
 		return;
 	}
 
-	if ( OBJ_FLAGGED ( obj, ITEM_NPC_CORPSE ) )
+	if ( !OBJ_FLAGGED ( obj, ITEM_NPC_CORPSE ) )
 	{
 		*ch << "The skin from that would fall apart too fast.\r\n";
 		return;
