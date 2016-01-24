@@ -1963,10 +1963,7 @@ ACMD ( do_sac )
 		return;
 	}
 	// if it's not in the room, we ain't gonna sac it
-	if ( !
-	        ( obj =
-	              get_obj_in_list_vis ( ch, arg, NULL,
-	                                    IN_ROOM ( ch )->contents ) ) )
+	if ( !( obj = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents ) ) )
 	{
 		*ch << "There is nothing like that here. Try again.\r\n";
 		return;
@@ -1980,6 +1977,11 @@ ACMD ( do_sac )
 	if ( OBJ_SAT_IN_BY ( obj ) != NULL )
 	{
 		ch->Send ( "You can't sacrifice that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
+		return;
+	}
+	if ( OBJ_FLAGGED ( obj, ITEM_NO_LOOT ) && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
+	{
+		ch->Send ( "You can't sacrifice that, it doesn't belong to you.\r\n" );
 		return;
 	}
 	// seems as if everything checks out eh? ok now do it

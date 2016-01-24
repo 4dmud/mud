@@ -1794,6 +1794,7 @@ const char *extra_bits[] =
 	"death-focus",
 	"mind-focus",
 	"no-loot",
+	"no-sac",
 	"\n"
 };
 
