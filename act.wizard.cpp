@@ -366,6 +366,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+void crashproof_objects_save_all();
 EVENTFUNC ( message_event );
 SPECIAL ( playershop );
 bool load_playershop_shopkeep ( room_vnum r, Character **shopkeep = NULL );
@@ -2636,7 +2637,6 @@ ACMD ( do_account )
 ACMD ( do_shutdown )
 {
 	char arg[MAX_INPUT_LENGTH];
-	Descriptor *d;
 	if ( subcmd != SCMD_SHUTDOWN )
 	{
 		send_to_char ( "If you want to shut something down, say so!\r\n",
@@ -2645,8 +2645,10 @@ ACMD ( do_shutdown )
 	}
 	one_argument ( argument, arg );
 
-	//saving all zones
-	save_all();
+	save_all(); // save all zones
+	Crash_save_all(); // save all players
+	House_save_all(); // save all houses
+	crashproof_objects_save_all(); // save all crashproof rooms
 
 	if ( !*arg )
 	{
@@ -2684,14 +2686,6 @@ ACMD ( do_shutdown )
 	}
 	else
 		send_to_char ( "Unknown shutdown option.\r\n", ch );
-
-	for ( d = descriptor_list; d; d = d->next )
-	{
-		if ( d->character )
-			d->character->save();
-	}
-	Crash_save_all();
-
 }
 
 
@@ -3179,7 +3173,10 @@ void copyover ( Character *ch )
 	restore_all_corpses();
 
 	alarm(0);
-	save_all(); //done
+	save_all(); // save all zones
+	House_save_all(); // save all houses
+	crashproof_objects_save_all(); // save all crashproof rooms
+
 	/* For each playing descriptor, save its state */
 	for ( d = descriptor_list; d; d = d_next )
 	{
