@@ -1164,6 +1164,7 @@ class Room;
 #define ITEM_SPIRIT_FOCUS     74
 #define ITEM_DEATH_FOCUS      75
 #define ITEM_MIND_FOCUS	      76
+#define ITEM_NO_LOOT          77
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0  /* No effect                    */

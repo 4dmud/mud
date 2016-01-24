@@ -221,7 +221,7 @@ ACMD(do_skin)
       ch->Send( "You are exhausted!");
       return;
     }
-    pc = IS_OBJ_STAT(obj, ITEM_PC_CORPSE);
+    pc = OBJ_FLAGGED(obj, ITEM_PC_CORPSE);
 
     act("You slice the hide from $p.", FALSE, ch, obj, NULL, TO_CHAR);
     act("$n slices the hide from $p.", FALSE, ch, obj, NULL, TO_ROOM);
@@ -267,7 +267,7 @@ ACMD(do_skin)
   }
 
   /*short_desc is +14, then all the way to 0
-  IS_OBJ_STAT(obj, ITEM_NPC_CORPSE)
+  OBJ_FLAGGED(obj, ITEM_NPC_CORPSE)
   PC_CORPSE
   */
   return;

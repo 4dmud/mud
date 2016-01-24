@@ -1972,7 +1972,7 @@ ACMD ( do_sac )
 		return;
 	}
 	// nifty, got the object in the room, now check its flags
-	if ( !CAN_WEAR ( obj, ITEM_WEAR_TAKE ) || IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )
+	if ( !CAN_WEAR ( obj, ITEM_WEAR_TAKE ) || OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 	{
 		*ch << "You can't sacrifice that.\r\n";
 		return;

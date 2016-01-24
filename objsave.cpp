@@ -639,9 +639,9 @@ void auto_equip(Character *ch, struct obj_data *obj, int locate)
       {
         /* check ch's alignment to prevent $M from being zapped
            through auto-equip */
-        if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL)
+        if ((OBJ_FLAGGED(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_NEUTRAL)
              && IS_NEUTRAL(ch)))
           locate = 0;
         else
@@ -741,7 +741,7 @@ int Crash_is_unrentable(struct obj_data *obj)
   if (GET_OBJ_TYPE(obj) == ITEM_KEY && OBJ_FLAGGED(obj, ITEM_KEYSTAY))
     return 0;
 
-  if (IS_OBJ_STAT(obj, ITEM_NORENT) || GET_OBJ_TYPE(obj) == ITEM_KEY)
+  if (OBJ_FLAGGED(obj, ITEM_NORENT) || GET_OBJ_TYPE(obj) == ITEM_KEY)
     return 1;
 
   return 0;
@@ -1480,7 +1480,7 @@ int load_objects_to_room(room_rnum rnum, FILE *fl)
       generate_weapon(temp);
       obj_to_room(temp, rnum);
       relocate_obj(rnum, NULL, temp, locate, cont_row);
-      if ( IS_OBJ_STAT (temp, ITEM_ARTIFACT))
+      if ( OBJ_FLAGGED (temp, ITEM_ARTIFACT))
          pause_timer(temp);
       else
 	 check_timer(temp);
@@ -1516,7 +1516,7 @@ void new_load_corpses(void)
     {
       num_objs++;
       /* Check if our object is a corpse */
-      if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE))
+      if (OBJ_FLAGGED(temp, ITEM_PC_CORPSE))
       {   /* scan our temp room for objects */
         add_corpse_to_list(temp);
         for (obj = rnum->contents; obj; obj = next_obj)

@@ -171,7 +171,7 @@ int old_write_corpse(FILE * fp, struct obj_data *obj, int locate) {
 
 
 
-    if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE))) {
+    if (!(OBJ_FLAGGED(obj, ITEM_UNIQUE_SAVE))) {
         return 1;
     }
     fprintf(fp,
@@ -450,7 +450,7 @@ void load_corpses(void) {
                 num_objs++;
                 /* Check if our object is a corpse */
                 /* scan our temp room for objects */
-                if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE)) {
+                if (OBJ_FLAGGED(temp, ITEM_PC_CORPSE)) {
                     add_corpse_to_list(temp);
                     for (obj = world_vnum[1202]->contents; obj;
                             obj = next_obj) {
@@ -478,7 +478,7 @@ void load_corpses(void) {
 
 void add_corpse_to_list(OBJ_DATA *corpse) {
     struct corpse_list_data *temp = NULL;
-    if (!corpse || !IS_OBJ_STAT(corpse, ITEM_PC_CORPSE))
+    if (!corpse || !OBJ_FLAGGED(corpse, ITEM_PC_CORPSE))
         return;
     log("Adding %s to save list", corpse->short_description);
     check_timer(corpse);

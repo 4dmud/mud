@@ -1903,7 +1903,7 @@ ASKILL ( skill_scalp )
 			ch->Send ( "You rip off the scalp of... nothing really! Fear your stupidity!\r\n" );
 			return 0;
 		}
-		if ( IS_OBJ_STAT ( obj, ITEM_BEHEADED_CORPSE ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_BEHEADED_CORPSE ) )
 		{
 			ch->Send ( "That corpse doesn't have a head to scalp...\r\n" );
 			return 0;
@@ -1924,7 +1924,7 @@ ASKILL ( skill_scalp )
 			*ch << "You are far too exhausted!";
 			return 0;
 		}
-		pc = IS_OBJ_STAT ( obj, ITEM_PC_CORPSE );
+		pc = OBJ_FLAGGED ( obj, ITEM_PC_CORPSE );
 
 		act ( "You slice the scalp from $p.", FALSE, ch, obj, NULL, TO_CHAR );
 		act ( "$n slices the scalp from $p.", FALSE, ch, obj, NULL, TO_ROOM );
@@ -1985,7 +1985,7 @@ ASKILL ( skill_scalp )
 	}
 
 	/*short_desc is +14, then all the way to 0
-	IS_OBJ_STAT(obj, ITEM_NPC_CORPSE)
+	OBJ_FLAGGED(obj, ITEM_NPC_CORPSE)
 	PC_CORPSE
 	*/
 	return 0;
@@ -2608,16 +2608,16 @@ ASKILL ( skill_poison_weapon )
 		*ch << "That item is not a weapon.\r\n";
 		return 0;
 	}
-	if ( IS_OBJ_STAT ( obj, ITEM_POISONED_1 ) ||
-	        IS_OBJ_STAT ( obj, ITEM_POISONED_2 ) ||
-	        IS_OBJ_STAT ( obj, ITEM_POISONED_3 ) ||
-	        IS_OBJ_STAT ( obj, ITEM_POISONED_4 ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_POISONED_1 ) ||
+	        OBJ_FLAGGED ( obj, ITEM_POISONED_2 ) ||
+	        OBJ_FLAGGED ( obj, ITEM_POISONED_3 ) ||
+	        OBJ_FLAGGED ( obj, ITEM_POISONED_4 ) )
 	{
 		*ch << "That weapon is already poisoned.\r\n";
 		return 0;
 	}
 	// Added a check for Tinker / Magic here Prometheus
-	if ( IS_OBJ_STAT ( obj, ITEM_TINKERED ) || IS_OBJ_STAT ( obj, ITEM_MAGIC ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_TINKERED ) || OBJ_FLAGGED ( obj, ITEM_MAGIC ) )
 	{
 		ch->Send ( "The weapon is imbued with magical powers beyond your grasp.\r\n"
 		           "You can not further affect its form.\r\n" );
@@ -2710,10 +2710,10 @@ ASKILL ( skill_poison_weapon )
 	// Prometheus. Old is 10 + GET_LEVEL(ch)
 	GET_OBJ_TIMER ( obj ) = 6000 + GET_LEVEL ( ch );
 
-	if ( IS_OBJ_STAT ( obj, ITEM_BLESS ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_BLESS ) )
 		GET_OBJ_TIMER ( obj ) *= 2;
 
-	if ( IS_OBJ_STAT ( obj, ITEM_MAGIC ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_MAGIC ) )
 		GET_OBJ_TIMER ( obj ) *= 2;
 
 	/* WHAT?  All of that, just for that one bit?  How lame. ;) */
@@ -2831,9 +2831,9 @@ ASKILL ( skill_filet )
 		return 0;
 	}
 
-	if ( !IS_OBJ_STAT ( obj, ITEM_NPC_CORPSE ) )
+	if ( !OBJ_FLAGGED ( obj, ITEM_NPC_CORPSE ) )
 	{
-		if ( !IS_OBJ_STAT ( obj, ITEM_EDIBLE ) )
+		if ( !OBJ_FLAGGED ( obj, ITEM_EDIBLE ) )
 		{
 			*ch << "You can't make a filet out of that.\r\n";
 			return 0;

@@ -2329,7 +2329,7 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 	switch ( spellnum )
 	{
 		case SPELL_BLESS:
-			if ( !IS_OBJ_STAT ( obj, ITEM_BLESS ) &&
+			if ( !OBJ_FLAGGED ( obj, ITEM_BLESS ) &&
 			        ( GET_OBJ_WEIGHT ( obj ) <= 5 * GET_LEVEL ( ch ) ) )
 			{
 				SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BLESS );
@@ -2337,7 +2337,7 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 			}
 			break;
 		case SPELL_CURSE:
-			if ( !IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+			if ( !OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 			{
 				SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_NODROP );
 				if ( GET_OBJ_TYPE ( obj ) == ITEM_WEAPON )
@@ -2346,7 +2346,7 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 			}
 			break;
 		case SPELL_INVISIBLE:
-			if ( !IS_OBJ_STAT ( obj, ITEM_NOINVIS | ITEM_INVISIBLE ) )
+			if ( !OBJ_FLAGGED ( obj, ITEM_NOINVIS | ITEM_INVISIBLE ) )
 			{
 				SET_BIT_AR ( obj->obj_flags.extra_flags, ITEM_INVISIBLE );
 				to_char = "$p vanishes.";
@@ -2366,7 +2366,7 @@ void mag_alter_objs ( int level, Character *ch, struct obj_data *obj,
 			}
 			break;
 		case SPELL_REMOVE_CURSE:
-			if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+			if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 			{
 				REMOVE_BIT_AR ( obj->obj_flags.extra_flags, ITEM_NODROP );
 				if ( GET_OBJ_TYPE ( obj ) == ITEM_WEAPON )

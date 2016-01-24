@@ -6190,7 +6190,8 @@ ACMD ( do_own )
 
 	if ( ! ( obj = get_obj_in_list_vis ( ch, what, NULL, ch->carrying ) ) )
 	{
-		ch->Send ( "You don't seem to have any %ss.\r\n", what );
+		ch->Send ( "You don't seem to have a %s.\r\n", what );
+		return;
 	}
 	if ( !is_number ( owner ) )
 	{
@@ -6205,10 +6206,14 @@ ACMD ( do_own )
 		return;
 	}
 
+	if ( pi.NameById ( idnum ) == NULL )
+	{
+		ch->Send ( "There is no player with ID %ld.\r\n", idnum );
+		return;
+	}
+
 	ch->Send ( "Setting %s's owner to %s.\r\n", obj->short_description, pi.NameById ( idnum ) );
 	obj->owner = idnum;
-
-
 }
 
 ACMD ( do_hackinvis )

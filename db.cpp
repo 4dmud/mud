@@ -4129,7 +4129,7 @@ bool ZonePurgeObject ( olt_it ob, int zone )
 	        && ( ( obj )->in_room->zone == zone )
 	        && ( !IS_SET_AR ( ( obj )->in_room->room_flags, ROOM_HOUSE ) )
 	        && ( !IS_SET_AR ( ( obj )->in_room->room_flags, ROOM_HOUSE_CRASH ) )
-	        && ( !IS_OBJ_STAT ( ( obj ), ITEM_PC_CORPSE ) ) )
+	        && ( !OBJ_FLAGGED ( ( obj ), ITEM_PC_CORPSE ) ) )
 		return true;
 	else
 		return false;
@@ -6900,7 +6900,7 @@ int my_obj_save_to_disk ( FILE * fp, struct obj_data *obj, int locate )
 		  GET_OBJ_TIMER ( obj), // make sure the right timer is saved
 		  GET_OBJ_INNATE ( obj ) );
 
-	if ( ! ( IS_OBJ_STAT ( obj, ITEM_UNIQUE_SAVE ) ) )
+	if ( ! ( OBJ_FLAGGED ( obj, ITEM_UNIQUE_SAVE ) ) )
 	{
 		return 1;
 	}
@@ -8487,7 +8487,7 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate);
 
 void save_artifacts (FILE* fd,struct obj_data *container) {
   for (struct obj_data *obj = container->contains;obj;obj = obj->next_content)
-    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT))
+    if (OBJ_FLAGGED(obj, ITEM_ARTIFACT))
       save_one_item(obj, fd, -1);
 }
 
@@ -8507,7 +8507,7 @@ void save_artifacts (Room* room) {
   snprintf(filename, sizeof(filename), "%d.arti", room->number);
   FILE* fd = fopen(filename, "w");
   for (struct obj_data *obj = room->contents;obj;obj = obj->next_content) {
-    if (IS_OBJ_STAT(obj, ITEM_ARTIFACT)) {
+    if (OBJ_FLAGGED(obj, ITEM_ARTIFACT)) {
       if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
 	save_artifacts(fd, obj);
       

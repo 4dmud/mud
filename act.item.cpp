@@ -584,12 +584,12 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 		return FALSE;
 	}
 	*/
-	if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) )
+	if ( OBJ_FLAGGED ( cont, ITEM_PC_CORPSE ) )
 	{
 		ch->Send ( "You can't put things in player corpses.\r\n" );
 		return FALSE;
 	}
-	if ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 	{
 		ch->Send ( "You can't put player corpses in things.\r\n" );
 		return FALSE;
@@ -622,7 +622,7 @@ bool perform_put ( Character *ch, struct obj_data *obj, struct obj_data *cont )
 		act ( "$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM );
 
 	/* Yes, I realize this is strange until we have auto-equip on rent. -gg */
-	if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) && !IS_OBJ_STAT ( cont, ITEM_NODROP ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) && !OBJ_FLAGGED ( cont, ITEM_NODROP ) )
 	{
 		SET_BIT_AR ( GET_OBJ_EXTRA ( cont ), ITEM_NODROP );
 		act ( "You get a strange feeling as you put $p in $P.", FALSE, ch, obj, cont, TO_CHAR );
@@ -975,7 +975,7 @@ ACMD ( do_meld )
 		ch->Send ( "You don't see %s %s here.\r\n", AN ( arg ), arg );
 		return;
 	}
-	if ( !IS_OBJ_STAT ( corpse, ITEM_PC_CORPSE ) )
+	if ( !OBJ_FLAGGED ( corpse, ITEM_PC_CORPSE ) )
 	{
 		ch->Send ( "You can't meld with that, it's not a player corpse!\r\n" );
 		return ;
@@ -1022,7 +1022,7 @@ int automeld ( struct obj_data *obj )
 	int i;
 	if ( !obj )
 		return 0;
-	if ( !IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )
+	if ( !OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 		return 0;
 
 	if ( ( ch = find_char ( GET_OBJ_VAL ( obj, 0 ) ) ) != NULL )
@@ -1143,7 +1143,7 @@ bool perform_get_from_container ( Character *ch, struct obj_data *obj,
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
 		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_HOUSE_CRASH );
 	get_check_money ( ch, obj );
-	if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) && GET_OBJ_VAL ( cont, 6 ) != 0 )
+	if ( OBJ_FLAGGED ( cont, ITEM_PC_CORPSE ) && GET_OBJ_VAL ( cont, 6 ) != 0 )
 		save_corpses();
 	return TRUE;
 }
@@ -1161,7 +1161,7 @@ void get_from_container ( Character *ch, struct obj_data *cont,
 		act ( "$p is closed.", FALSE, ch, cont, 0, TO_CHAR );
 		return;
 	}
-	if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) )
+	if ( OBJ_FLAGGED ( cont, ITEM_PC_CORPSE ) )
 		if ( ( long ) GET_OBJ_VAL ( cont, 0 ) == GET_IDNUM ( ch ) )
 		{
 			perform_meld ( ch, cont );
@@ -1187,8 +1187,7 @@ void get_from_container ( Character *ch, struct obj_data *cont,
 		}
 		wearall = 0;
 
-		if ( processed_get_counter > 1 ||
-		        ( processed_get_counter == 1 && failed_get_counter > 0 ) )
+		if ( processed_get_counter > 1 || ( processed_get_counter == 1 && failed_get_counter > 0 ) )
 		{
 			snprintf ( buf, sizeof ( buf ), "You get %d %s%s from $p.", processed_get_counter, obj_desc, ( processed_get_counter > 1 ) ? "s" : "" );
 			act ( buf, FALSE, ch, cont, 0, TO_CHAR );
@@ -1210,8 +1209,7 @@ void get_from_container ( Character *ch, struct obj_data *cont,
 		for ( obj = cont->contains; obj; obj = next_obj )
 		{
 			next_obj = obj->next_content;
-			if ( CAN_SEE_OBJ ( ch, obj ) &&
-			        ( obj_dotmode == FIND_ALL || isname_full ( obj_desc, obj->name ) ) )
+			if ( CAN_SEE_OBJ ( ch, obj ) && ( obj_dotmode == FIND_ALL || isname_full ( obj_desc, obj->name ) ) )
 			{
 				perform_get_from_container ( ch, obj, cont, mode ) ? processed_get_counter++ : failed_get_counter++;
 			}
@@ -1259,7 +1257,7 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 	Character *tmp_char;
 	int amount = 1;
 	char *obj_desc, *cont_desc;
-
+	const int imm_level = 55;
 
 	amount = atoi ( num );
 	obj_desc = arg2;
@@ -1268,6 +1266,7 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 
 	cont_dotmode = find_all_dots ( cont_desc );
 	obj_dotmode = find_all_dots ( obj_desc );
+	bool cannot_loot = ( IS_NPC ( ch ) || GET_LEVEL ( ch ) < imm_level );
 
 	if ( cont_dotmode == FIND_INDIV )
 	{
@@ -1282,19 +1281,24 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 			act ( "$p is not a container.", FALSE, ch, cont, 0, TO_CHAR );
 			return;
 		}
-		if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) && GET_OBJ_VAL ( cont, 0 ) == GET_IDNUM ( ch ) )
+		if ( OBJ_FLAGGED ( cont, ITEM_PC_CORPSE ) && GET_OBJ_VAL ( cont, 0 ) == GET_IDNUM ( ch ) )
 		{
 			ch->Send ( "You can't take things from your corpse.\r\n"
 			           "Use: meld corpse\r\n" );
 			return;
 		}
-		if ( IS_OBJ_STAT ( cont, ITEM_PC_CORPSE ) )
+		if ( OBJ_FLAGGED ( cont, ITEM_PC_CORPSE ) )
 		{
-			if ( IS_NPC ( ch ) || GET_OBJ_VAL ( cont, 6 ) == 0 || !IS_PK ( ch ) || !IS_OBJ_STAT ( cont, ITEM_PK_CORPSE ) )
+			if ( IS_NPC ( ch ) || GET_OBJ_VAL ( cont, 6 ) == 0 || !IS_PK ( ch ) || !OBJ_FLAGGED ( cont, ITEM_PK_CORPSE ) )
 			{
 				ch->Send ( "You can't take things from that player's corpse.\r\n" );
 				return;
 			}
+		}
+		if ( OBJ_FLAGGED ( cont, ITEM_NO_LOOT ) && cannot_loot && cont->owner > 0 && cont->owner != GET_ID ( ch ) )
+		{
+			ch->Send ( "You can't take anything from %s, it doesn't belong to you.\r\n", cont->short_description );
+			return;
 		}
 	}
 	else if ( cont_dotmode == FIND_ALLDOT && !*cont_desc )
@@ -1312,14 +1316,15 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 		wearall = 1;
 		for ( cont = ch->carrying; cont; cont = cont->next_content )
 		{
-			if ( CAN_SEE_OBJ ( ch, cont )
-			        && ( cont_dotmode == FIND_ALL
-			             || isname ( cont_desc, cont->name ) ) )
+			if ( CAN_SEE_OBJ ( ch, cont ) && ( cont_dotmode == FIND_ALL || isname ( cont_desc, cont->name ) ) )
 			{
 				if ( GET_OBJ_TYPE ( cont ) == ITEM_CONTAINER )
 				{
 					found = 1;
-					get_from_container ( ch, cont, obj_dotmode, obj_desc, FIND_OBJ_INV, amount );
+					if ( OBJ_FLAGGED ( cont, ITEM_NO_LOOT ) && cannot_loot && cont->owner > 0 && cont->owner != GET_ID ( ch ) )
+						ch->Send ( "You can't take anything from %s, it doesn't belong to you.\r\n", cont->short_description );
+					else
+						get_from_container ( ch, cont, obj_dotmode, obj_desc, FIND_OBJ_INV, amount );
 				}
 				else if ( cont_dotmode == FIND_ALLDOT )
 				{
@@ -1331,16 +1336,17 @@ void perform_get ( Character *ch, char *num, char *arg2, char *arg3 )
 		for ( cont = IN_ROOM ( ch )->contents; cont; cont = cont->next_content )
 		{
 			if ( ( ( CAN_SEE_OBJ ( ch, cont )
-			         && !IS_SET_AR ( GET_OBJ_EXTRA ( cont ), ITEM_HIDDEN )
-			         && !OBJ_FLAGGED ( cont, ITEM_NODISPLAY ) )
-			        || GET_LEVEL ( ch ) >=LVL_IMMORT )
-			        && ( cont_dotmode == FIND_ALL
-			             || isname ( cont_desc, cont->name ) ) )
+					&& !IS_SET_AR ( GET_OBJ_EXTRA ( cont ), ITEM_HIDDEN )
+					&& !OBJ_FLAGGED ( cont, ITEM_NODISPLAY ) ) || GET_LEVEL ( ch ) >= LVL_IMMORT )
+					&& ( cont_dotmode == FIND_ALL || isname ( cont_desc, cont->name ) ) )
 			{
 				if ( GET_OBJ_TYPE ( cont ) == ITEM_CONTAINER )
 				{
 					found = 1;
-					get_from_container ( ch, cont, obj_dotmode, obj_desc, FIND_OBJ_ROOM, amount );
+					if ( OBJ_FLAGGED ( cont, ITEM_NO_LOOT ) && cannot_loot && cont->owner > 0 && cont->owner != GET_ID ( ch ) )
+						ch->Send ( "You can't take anything from %s, it doesn't belong to you.\r\n", cont->short_description );
+					else
+						get_from_container ( ch, cont, obj_dotmode, obj_desc, FIND_OBJ_ROOM, amount );
 				}
 				else if ( cont_dotmode == FIND_ALLDOT )
 				{
@@ -1384,7 +1390,7 @@ bool perform_get_from_room ( Character *ch, struct obj_data *obj )
 		}
 
 		get_check_money ( ch, obj );
-		if ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 		{
 			remove_corpse_from_list ( obj );
 			save_corpses();
@@ -1403,8 +1409,10 @@ void get_from_room ( Character *ch, char *obj_desc, int howmany )
 	struct obj_data *obj, *next_obj;
 	int dotmode, processed_get_counter = 0, failed_get_counter = 0;
 	char buf[MAX_INPUT_LENGTH];
+	const int imm_level = 55;
 
 	dotmode = find_all_dots ( obj_desc );
+	bool cannot_loot = ( IS_NPC ( ch ) || GET_LEVEL ( ch ) < imm_level );
 
 	if ( dotmode == FIND_INDIV )
 	{
@@ -1419,7 +1427,13 @@ void get_from_room ( Character *ch, char *obj_desc, int howmany )
 			while ( obj && howmany )
 			{
 				next_obj = obj->next_content;
-				perform_get_from_room ( ch, obj ) ? processed_get_counter++ : failed_get_counter++;
+				if ( OBJ_FLAGGED ( obj, ITEM_NO_LOOT ) && cannot_loot && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
+				{
+					ch->Send ( "You can't take %s, it doesn't belong to you.\r\n", obj->short_description );
+					failed_get_counter++;
+				}
+				else
+					perform_get_from_room ( ch, obj ) ? processed_get_counter++ : failed_get_counter++;
 				obj = get_obj_in_list_vis ( ch, obj_desc, NULL, next_obj );
 				howmany--;
 			}
@@ -1457,10 +1471,16 @@ void get_from_room ( Character *ch, char *obj_desc, int howmany )
 			next_obj = obj->next_content;
 			if ( CAN_SEE_OBJ ( ch, obj )
 			        && !IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_HIDDEN )
-			        && ( !OBJ_FLAGGED ( obj, ITEM_NODISPLAY ) || GET_LEVEL ( ch ) >LVL_IMMORT )
+			        && ( !OBJ_FLAGGED ( obj, ITEM_NODISPLAY ) || GET_LEVEL ( ch ) > LVL_IMMORT )
 			        && ( dotmode == FIND_ALL || isname ( obj_desc, obj->name ) ) )
 			{
-				perform_get_from_room ( ch, obj ) ? processed_get_counter++ : failed_get_counter++;
+				if ( OBJ_FLAGGED ( obj, ITEM_NO_LOOT ) && cannot_loot && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
+				{
+					ch->Send ( "You can't take %s, it doesn't belong to you.\r\n", obj->short_description );
+					failed_get_counter++;
+				}
+				else
+					perform_get_from_room ( ch, obj ) ? processed_get_counter++ : failed_get_counter++;
 			}
 		}
 		wearall = 0;
@@ -1698,7 +1718,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 	if ( ( mode == SCMD_DROP ) && !drop_wtrigger ( obj, ch ) )
 		return ( 0 );
 
-	if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 	{
 		snprintf ( buf, sizeof ( buf ), "You can't %s $p, it must be CURSED!", sname );
 		act ( buf, FALSE, ch, obj, 0, TO_CHAR );
@@ -1738,7 +1758,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 	}
 	obj_from_char ( obj );
 
-	if ( ( mode == SCMD_DONATE ) && IS_OBJ_STAT ( obj, ITEM_NODONATE ) )
+	if ( ( mode == SCMD_DONATE ) && OBJ_FLAGGED ( obj, ITEM_NODONATE ) )
 		mode = SCMD_JUNK;
 
 	switch ( mode )
@@ -1751,7 +1771,7 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 
 			}
 			obj_to_room ( obj, IN_ROOM ( ch ) );
-			if ( IS_OBJ_STAT ( obj, ITEM_MELT_DROP ) )
+			if ( OBJ_FLAGGED ( obj, ITEM_MELT_DROP ) )
 			{
 				if ( !slipping )
 					act ( "$p dissolves into smoke.", FALSE, 0, obj, 0, TO_ROOM );
@@ -1867,7 +1887,7 @@ ACMD ( do_drop )
 	}
 	else if ( is_number ( arg ) )
 	{
-  	        multi = atoi (arg);
+		multi = atoi (arg);
 		multig = atol ( arg );
 		one_argument ( argument, arg );
 		if ( !str_cmp ( "coins", arg ) || !str_cmp ( "coin", arg ) )
@@ -1986,7 +2006,7 @@ void perform_give ( Character *ch, Character *vict,
 		return;
 	if ( receive_mtrigger ( vict, ch, obj ) <= 0 )
 		return;
-	if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 	{
 		act ( "You can't let go of $p!!  Yeech!", FALSE, ch, obj, 0,
 		      TO_CHAR );
@@ -2699,7 +2719,7 @@ ACMD ( do_analyze )
 	{
 		ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
 		return;
-	}	
+	}
 	if (OBJ_FLAGGED(item, ITEM_NORENT) || OBJ_FLAGGED(item, ITEM_ARTIFACT))
      {
 		ch->Send ( "You can not analyze that.\r\n");
@@ -2719,7 +2739,7 @@ ACMD ( do_analyze )
 			SET_BIT_AR ( GET_OBJ_EXTRA ( item2 ), ITEM_NORENT);
 	   for (i = 0; i < MAX_OBJ_AFFECT; i++) {
         if ((item->affected[i].location != APPLY_NONE) &&
-                (item->affected[i].modifier != 0)) { 
+                (item->affected[i].modifier != 0)) {
 	item2->affected[i].location = item->affected[i].location;
 	item2->affected[i].modifier = item->affected[i].modifier;
      }
@@ -3913,7 +3933,7 @@ void perform_remove ( Character *ch, int pos )
 
 	if ( ! ( obj = GET_EQ ( ch, pos ) ) )
 		log ( "SYSERR: perform_remove: bad pos %d passed.", pos );
-	else if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+	else if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 		act ( "You can't remove $p, it must be CURSED!", FALSE, ch, obj, 0,
 		      TO_CHAR );
 	else if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
@@ -4666,11 +4686,10 @@ int speed_update ( Character *ch )
 				var = -200;
 
 		}
-		if (REMORTS(ch) == 0) 
-                speed += 200;
-                else
-           	speed += var;
-
+		if (REMORTS(ch) == 0)
+			speed += 200;
+		else
+			speed += var;
 
 		if ( RIDING ( ch ) && HERE ( RIDING ( ch ), ch ) && total_chance ( ch, SKILL_MOUNTED_COMBAT ) )
 			speed += 25 + ( total_chance ( ch, SKILL_MOUNTED_COMBAT ) /3 );
@@ -4877,7 +4896,7 @@ ACMD ( do_skin )
 		return;
 	}
 
-	if ( !IS_OBJ_STAT ( obj, ITEM_NPC_CORPSE ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_NPC_CORPSE ) )
 	{
 		*ch << "The skin from that would fall apart too fast.\r\n";
 		return;

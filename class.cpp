@@ -1357,16 +1357,16 @@ ACMD ( do_dam_dice )
  */
 int invalid_class ( Character *ch, struct obj_data *obj )
 {
-	if ( ( IS_OBJ_STAT ( obj, ITEM_ANTI_MAGE )    && IS_MAGE ( ch ) )    ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_PRIEST )  && IS_PRIEST ( ch ) )  ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_WARRIOR ) && IS_WARRIOR ( ch ) ) ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_THIEF )   && IS_THIEF ( ch ) )   ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_GYPSY )   && IS_GYPSY ( ch ) )   ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_HUNTER )  && IS_HUNTER ( ch ) )  ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_RANGER )  && IS_RANGER ( ch ) )  ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_ESPER )   && IS_ESPER ( ch ) )   ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_MALE )    && GET_SEX ( ch ) == SEX_MALE ) ||
-	        ( IS_OBJ_STAT ( obj, ITEM_ANTI_FEMALE )  && GET_SEX ( ch ) == SEX_FEMALE ) )
+	if ( ( OBJ_FLAGGED ( obj, ITEM_ANTI_MAGE )    && IS_MAGE ( ch ) )    ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_PRIEST )  && IS_PRIEST ( ch ) )  ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_WARRIOR ) && IS_WARRIOR ( ch ) ) ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_THIEF )   && IS_THIEF ( ch ) )   ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_GYPSY )   && IS_GYPSY ( ch ) )   ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_HUNTER )  && IS_HUNTER ( ch ) )  ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_RANGER )  && IS_RANGER ( ch ) )  ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_ESPER )   && IS_ESPER ( ch ) )   ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_MALE )    && GET_SEX ( ch ) == SEX_MALE ) ||
+	        ( OBJ_FLAGGED ( obj, ITEM_ANTI_FEMALE )  && GET_SEX ( ch ) == SEX_FEMALE ) )
 		return ( 1 );
 	else
 		return ( 0 );

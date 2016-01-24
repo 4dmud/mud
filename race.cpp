@@ -276,14 +276,14 @@ long find_race_bitvector(char arg) {
 }
 */
 int invalid_race(Character *ch, struct obj_data *obj) {
-    if ((IS_OBJ_STAT(obj, ITEM_ANTI_FAUN) && IS_FAUN(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_CENTAUR) && IS_CENTAUR(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_DWARF) && IS_DWARF(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_ELF) && IS_ELF(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_INDIAN) && IS_INDIAN(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_GRINGO) && IS_GRINGO(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_MARTIAN) && IS_MARTIAN(ch)) ||
-            (IS_OBJ_STAT(obj, ITEM_ANTI_SPACE_WOLF) && IS_SPACE_WOLF(ch)))
+    if ((OBJ_FLAGGED(obj, ITEM_ANTI_FAUN) && IS_FAUN(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_CENTAUR) && IS_CENTAUR(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_DWARF) && IS_DWARF(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_ELF) && IS_ELF(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_INDIAN) && IS_INDIAN(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_GRINGO) && IS_GRINGO(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_MARTIAN) && IS_MARTIAN(ch)) ||
+            (OBJ_FLAGGED(obj, ITEM_ANTI_SPACE_WOLF) && IS_SPACE_WOLF(ch)))
         return (1);
     else
         return (0);

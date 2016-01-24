@@ -1109,7 +1109,7 @@ SPECIAL ( fido )
 
 	for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
 	{
-		if ( IS_CORPSE ( i ) &&  ! ( IS_OBJ_STAT ( i, ITEM_PC_CORPSE ) ) )
+		if ( IS_CORPSE ( i ) &&  ! ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
 		{
 			act ( "$n savagely devours a corpse.", FALSE, ch, 0, 0, TO_ROOM );
 			for ( temp = i->contains; temp; temp = next_obj )
@@ -1140,7 +1140,7 @@ SPECIAL ( janitor )
 			continue;
 		if ( GET_OBJ_TYPE ( i ) != ITEM_DRINKCON && GET_OBJ_COST ( i ) >= 15 )
 			continue;
-		if ( ( IS_OBJ_STAT ( i, ITEM_PC_CORPSE ) ) )
+		if ( ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
 			continue;
 		act ( "$n picks up some trash.", FALSE, ch, 0, 0, TO_ROOM );
 		obj_from_room ( i );

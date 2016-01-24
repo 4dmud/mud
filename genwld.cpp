@@ -58,7 +58,7 @@ room_rnum add_room(Room *room)
     //pause timers if the artisave flag is added
     if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
       for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
+	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
 	  pause_timer(obj);
       save_artifacts(room);
     }
@@ -73,7 +73,7 @@ room_rnum add_room(Room *room)
       log("deleting %s, from dir %s", filename, cwd);
       remove(filename);
       for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (IS_OBJ_STAT (obj, ITEM_ARTIFACT))
+	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
 	  resume_timer(obj);
     }
 

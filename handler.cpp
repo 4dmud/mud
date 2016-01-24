@@ -1151,7 +1151,7 @@ int apply_ac ( Character *ch, int eq_pos )
 
 	if ( ! ( GET_OBJ_TYPE ( GET_EQ ( ch, eq_pos ) ) == ITEM_ARMOR ) )
 	{
-		if ( IS_OBJ_STAT ( GET_EQ ( ch, eq_pos ), ITEM_NODROP ) )
+		if ( OBJ_FLAGGED ( GET_EQ ( ch, eq_pos ), ITEM_NODROP ) )
 			return -5;
 		else
 			return ( 0 );
@@ -1174,7 +1174,7 @@ int apply_ac ( Character *ch, int eq_pos )
 			break;               /* all others 10% */
 	}
 
-	if ( IS_OBJ_STAT ( GET_EQ ( ch, eq_pos ), ITEM_NODROP ) )
+	if ( OBJ_FLAGGED ( GET_EQ ( ch, eq_pos ), ITEM_NODROP ) )
 		return - ( abs ( factor * GET_OBJ_VAL ( GET_EQ ( ch, eq_pos ), 0 ) ) );
 	else
 		return ( factor * GET_OBJ_VAL ( GET_EQ ( ch, eq_pos ), 0 ) );
@@ -1182,15 +1182,15 @@ int apply_ac ( Character *ch, int eq_pos )
 
 int invalid_align ( Character *ch, struct obj_data *obj )
 {
-	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_EVIL ) && IS_EVIL ( ch ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_ANTI_EVIL ) && IS_EVIL ( ch ) )
 		return TRUE;
-	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_GOOD ) && IS_GOOD ( ch ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_ANTI_GOOD ) && IS_GOOD ( ch ) )
 		return TRUE;
-	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_NEUTRAL ) && IS_NEUTRAL ( ch ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_ANTI_NEUTRAL ) && IS_NEUTRAL ( ch ) )
 		return TRUE;
-	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_FEMALE ) && GET_SEX ( ch ) == SEX_FEMALE )
+	if ( OBJ_FLAGGED ( obj, ITEM_ANTI_FEMALE ) && GET_SEX ( ch ) == SEX_FEMALE )
 		return TRUE;
-	if ( IS_OBJ_STAT ( obj, ITEM_ANTI_MALE ) && GET_SEX ( ch ) == SEX_MALE )
+	if ( OBJ_FLAGGED ( obj, ITEM_ANTI_MALE ) && GET_SEX ( ch ) == SEX_MALE )
 		return TRUE;
 	return FALSE;
 }
@@ -1544,7 +1544,7 @@ void obj_to_room ( struct obj_data *object, room_rnum room )
 			             room->name );
 		}
 
-		if ( IS_OBJ_STAT ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
+		if ( OBJ_FLAGGED ( object, ITEM_ARTIFACT ) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
 		  artifact_to_artisave(object);
 	}
 }
@@ -1560,7 +1560,7 @@ void obj_from_room ( struct obj_data *object )
 		return;
 	}
 
-	if ( IS_OBJ_STAT ( object, ITEM_PC_CORPSE ) )
+	if ( OBJ_FLAGGED ( object, ITEM_PC_CORPSE ) )
 	{
 		remove_corpse_from_list ( object );
 		REMOVE_BIT_AR ( GET_OBJ_EXTRA ( object ), ITEM_PC_CORPSE );
@@ -1578,7 +1578,7 @@ void obj_from_room ( struct obj_data *object )
 	if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[GET_OBJ_RNUM ( object ) ].qic )
 		new_mudlog ( CMP, LVL_SEN, TRUE, "%s from room %s.", object->short_description, IN_ROOM ( object )->name );
 
-	if ( IS_OBJ_STAT (object, ITEM_ARTIFACT) && IN_ROOM(object) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
+	if ( OBJ_FLAGGED (object, ITEM_ARTIFACT) && IN_ROOM(object) && ROOM_FLAGGED(IN_ROOM(object), ROOM_ARTISAVE))
 	  artifact_from_artisave(object);
 
 	IN_ROOM ( object ) = NULL;
@@ -1611,7 +1611,7 @@ void obj_to_obj ( struct obj_data *obj, struct obj_data *obj_to )
 	if ( tmp_obj->carried_by )
 		IS_CARRYING_W ( tmp_obj->carried_by ) += GET_OBJ_WEIGHT ( obj );
 
-	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
+	if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
 	  artifact_to_artisave(obj);
 
 }
@@ -1645,7 +1645,7 @@ int obj_from_obj ( struct obj_data *obj )
 		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
 
 
-	if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
+	if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
 	  artifact_from_artisave(obj);
 
 	obj->in_obj = NULL;
@@ -1689,7 +1689,7 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
 		log ( "Object %s attempted to be added to dead list twice!", obj->short_description );
 		return;
 	}
-	if ( IS_OBJ_STAT ( obj, ITEM_PC_CORPSE ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 	{
 		save_corpses();
 	}
@@ -1891,7 +1891,7 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	}
 	else if ( IN_ROOM ( obj ) != NULL )    /* In a room */
 	{
-		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_ARTISAVE ) ) 
+		if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_ARTISAVE ) )
 			log ( "SYSERR: Arti %s crumbled in artisave room %d", obj->name, IN_ROOM ( obj )->number );
 
 		if ( IN_ROOM ( obj )->people )
@@ -1941,7 +1941,7 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	}
 	else if ( obj->in_obj )            /* In an object */
 	{
-		if ( IS_OBJ_STAT ( obj, ITEM_ARTIFACT ) && IN_ROOM ( obj->in_obj ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM ( obj->in_obj ) && ROOM_FLAGGED ( IN_ROOM ( obj->in_obj ), ROOM_ARTISAVE ) )
 			log ( "SYSERR: Arti %s crumbled in artisave container in room %d ", obj->name, IN_ROOM ( obj->in_obj )->number );
 
 		for ( loop = obj->contains; loop; loop = obj->contains )

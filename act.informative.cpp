@@ -300,26 +300,26 @@ void show_obj_to_char ( struct obj_data *obj, Character *ch,
 
 void show_obj_modifiers ( struct obj_data *obj, Character *ch )
 {
-	if ( IS_OBJ_STAT ( obj, ITEM_BURIED ) && CAN_SEE_OBJ ( ch, obj ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_BURIED ) && CAN_SEE_OBJ ( ch, obj ) )
 		ch->Send ( " (buried)" );
 	if ( OBJ_FLAGGED ( obj, ITEM_NODISPLAY ) && GET_LEVEL ( ch ) >= LVL_IMMORT )
 		ch->Send ( " (!display)" );
 
 	if ( PRF_FLAGGED ( ch, PRF_BATTLESPAM ) )
 	{
-		if ( IS_OBJ_STAT ( obj, ITEM_INVISIBLE ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_INVISIBLE ) )
 			ch->Send ( " ...it is invisible" );
-		if ( IS_OBJ_STAT ( obj, ITEM_BLESS )
+		if ( OBJ_FLAGGED ( obj, ITEM_BLESS )
 		        && AFF_FLAGGED ( ch, AFF_DETECT_ALIGN ) )
 			ch->Send ( " ...it has a holy aura" );  // dark cyan
-		if ( IS_OBJ_STAT ( obj, ITEM_MAGIC )
+		if ( OBJ_FLAGGED ( obj, ITEM_MAGIC )
 		        && AFF_FLAGGED ( ch, AFF_DETECT_MAGIC ) )
 			ch->Send ( " ...it sparkles with magic" ); // dark yellow
-		if ( IS_OBJ_STAT ( obj, ITEM_GLOW ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_GLOW ) )
 			ch->Send ( " ...it is glowing with an inner light" );  //dark yellow
-		if ( IS_OBJ_STAT ( obj, ITEM_HUM ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_HUM ) )
 			ch->Send ( " ...it is humming with energy" );   //dark cyan
-		if ( IS_OBJ_STAT ( obj, ITEM_NODROP ) )
+		if ( OBJ_FLAGGED ( obj, ITEM_NODROP ) )
 			ch->Send ( " ...it has a dull red aura" ); //dark cyan
 	}
 
