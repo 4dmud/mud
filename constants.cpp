@@ -748,6 +748,7 @@ const char *room_bits[] =
 	"ARTISAVE",
 	"IRRADIATED",
 	"PETSHOP",
+	"CRASHPROOF",
 	"\n"
 };
 
@@ -1795,6 +1796,7 @@ const char *extra_bits[] =
 	"mind-focus",
 	"no-loot",
 	"no-sac",
+	"crashproof",
 	"\n"
 };
 

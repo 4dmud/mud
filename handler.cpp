@@ -1537,6 +1537,9 @@ void obj_to_room ( struct obj_data *object, room_rnum room )
 		object->worn_by = NULL;
 		if ( ROOM_FLAGGED ( room, ROOM_HOUSE ) )
 			SET_BIT_AR ( ROOM_FLAGS ( room ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( object, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( room ), ROOM_CRASHPROOF );
+
 		if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[ ( int ) GET_OBJ_RNUM ( object ) ].qic )
 		{
 			new_mudlog ( CMP, LVL_SEN, TRUE, "%s, vnum: %d, to room %s.",
@@ -1568,11 +1571,12 @@ void obj_from_room ( struct obj_data *object )
 		save_corpses();
 	}
 
-	REMOVE_FROM_LIST ( object, IN_ROOM ( object )->contents,
-	                   next_content );
+	REMOVE_FROM_LIST ( object, IN_ROOM ( object )->contents, next_content );
 
 	if ( ROOM_FLAGGED ( IN_ROOM ( object ), ROOM_HOUSE ) )
 		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( object ) ), ROOM_HOUSE_CRASH );
+	else if ( OBJ_FLAGGED ( object, ITEM_CRASHPROOF ) )
+		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( object ) ), ROOM_CRASHPROOF );
 
 	/*can remove this section to clean up the code*/
 	if ( GET_OBJ_RNUM ( object ) != NOTHING && obj_index[GET_OBJ_RNUM ( object ) ].qic )
@@ -1596,8 +1600,21 @@ void obj_to_obj ( struct obj_data *obj, struct obj_data *obj_to )
 		log ( "SYSERR: NULL object (%s)(%p) or same source (%p) and target (%p) obj passed to obj_to_obj.", obj->short_description, obj, obj, obj_to );
 		return;
 	}
-	if ( IN_ROOM ( obj ) != NULL && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
-		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+	if ( IN_ROOM ( obj ) )
+	{
+		if ( ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_CRASHPROOF );
+	}
+
+	if ( IN_ROOM ( obj_to ) )
+	{
+		if ( ROOM_FLAGGED ( IN_ROOM ( obj_to ), ROOM_HOUSE ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj_to ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj_to, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj_to ) ), ROOM_CRASHPROOF );
+	}
 
 	obj->next_content = obj_to->contains;
 	obj_to->contains = obj;
@@ -1641,9 +1658,21 @@ int obj_from_obj ( struct obj_data *obj )
 	if ( temp->carried_by )
 		IS_CARRYING_W ( temp->carried_by ) -= GET_OBJ_WEIGHT ( obj );
 
-	if ( IN_ROOM ( obj ) != NULL && ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
-		SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+	if ( IN_ROOM ( obj ) != NULL )
+	{
+		if ( ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_CRASHPROOF );
+	}
 
+	if ( IN_ROOM ( obj_from ) != NULL )
+	{
+		if ( ROOM_FLAGGED ( IN_ROOM ( obj_from ), ROOM_HOUSE ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj_from ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj_from, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj_from ) ), ROOM_CRASHPROOF );
+	}
 
 	if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) && IN_ROOM(obj->in_obj) && ROOM_FLAGGED(IN_ROOM(obj->in_obj), ROOM_ARTISAVE))
 	  artifact_from_artisave(obj);
@@ -1870,8 +1899,12 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
 	int index;
 
 	if ( IN_ROOM ( obj ) != NULL )
+	{
 		if ( ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) )
-			SET_BIT_AR ( IN_ROOM ( obj )->room_flags, ROOM_HOUSE_CRASH );
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( obj ) ), ROOM_CRASHPROOF );
+	}
 
 	if ( GET_OBJ_TYPE ( obj ) == ITEM_PORTAL )    /* If it is a portal */
 	{

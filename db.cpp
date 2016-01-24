@@ -249,6 +249,7 @@ void set_race ( Character *ch, int race );
 
 
 /* external functions */
+void load_crashproof_objects();
 void free_skill_prototypes();
 void free_player_shops();
 void name_to_drinkcon ( struct obj_data *obj, int type );
@@ -1247,6 +1248,10 @@ void boot_db ( void )
 		log ( "Booting houses." );
 		House_boot();
 	}
+
+	log ( "Loading crashproof objects." );
+	load_crashproof_objects();
+
 	//moved here so that they show up
 	log ( "Loading fight messages." );
 	load_messages();
@@ -1260,8 +1265,6 @@ void boot_db ( void )
 	}
 
 	reset_q.head = reset_q.tail = NULL;
-
-
 
 	boot_time = time ( 0 );
 
@@ -4129,7 +4132,8 @@ bool ZonePurgeObject ( olt_it ob, int zone )
 	        && ( ( obj )->in_room->zone == zone )
 	        && ( !IS_SET_AR ( ( obj )->in_room->room_flags, ROOM_HOUSE ) )
 	        && ( !IS_SET_AR ( ( obj )->in_room->room_flags, ROOM_HOUSE_CRASH ) )
-	        && ( !OBJ_FLAGGED ( ( obj ), ITEM_PC_CORPSE ) ) )
+	        && ( !OBJ_FLAGGED ( ( obj ), ITEM_PC_CORPSE ) )
+	        && ( !IN_ROOM ( obj ) || !OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) ) )
 		return true;
 	else
 		return false;
@@ -8454,6 +8458,59 @@ void load_artifact_file (char* name) {
   log ("Done reading artifact file %s", name);
 }
 
+void load_crashproof_file ( char *name )
+{
+	room_vnum vnum = atoi ( name );
+	if ( !real_room ( vnum ) )
+	{
+		log ( "Illegal crashproof file %s", name );
+		return;
+	}
+
+	FILE *fl = fopen ( name, "r" );
+
+	if ( !fl )
+	{
+		log ( "Couldn't open crashproof file %s", name );
+		return;
+	}
+
+	Room *room = world_vnum[ vnum ];
+	log ( "Loading crashproof objects for room [%d] %s", vnum, room->name );
+	load_objects_to_room ( room, fl );
+	fclose ( fl );
+}
+
+void load_crashproof_objects()
+{
+	DIR *dp;
+	struct dirent *ep;
+	struct stat st_buf;
+
+	dp = opendir ( LIB_CRASHPROOF );
+	if ( !dp )
+	{
+		mkdir ( LIB_CRASHPROOF, 0777 );
+		dp = opendir ( LIB_CRASHPROOF );
+	}
+
+	char cwd[1024];
+	getcwd ( cwd, sizeof ( cwd ) );
+	chdir ( LIB_CRASHPROOF );
+	while ( ( ep = readdir ( dp ) ) )
+	{
+		if ( stat ( ep->d_name, &st_buf ) )
+		{
+			log ( "Error reading crashproof file %s: %s", ep->d_name, strerror ( errno ) );
+			continue;
+		}
+		if ( S_ISREG ( st_buf.st_mode ) )
+			load_crashproof_file ( ep->d_name );
+	}
+	closedir ( dp );
+	chdir ( cwd );
+}
+
 void load_saved_artifacts () {
   DIR *dp;
   struct dirent *ep;
@@ -8509,8 +8566,7 @@ void save_artifacts (Room* room) {
   for (struct obj_data *obj = room->contents;obj;obj = obj->next_content) {
     if (OBJ_FLAGGED(obj, ITEM_ARTIFACT)) {
       if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER)
-	save_artifacts(fd, obj);
-      
+        save_artifacts(fd, obj);
       save_one_item(obj, fd, 0);
     }
   }

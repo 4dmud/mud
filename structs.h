@@ -327,7 +327,7 @@ class Room;
 
 #define KILL_ALL_ENABLED 	1
 
-#define NUM_ROOMFLAGS		49
+#define NUM_ROOMFLAGS		50
 
 /* Room flags: used in Room.room_flags */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
@@ -380,6 +380,7 @@ class Room;
 #define ROOM_ARTISAVE           46
 #define ROOM_IRRADIATED         47
 #define ROOM_PETSHOP            48
+#define ROOM_CRASHPROOF         49 /* Save items flagged ITEM_CRASHPROOF */
 
 #define ZONE_OPEN        	(1 <<  0)
 #define ZONE_CLOSED      	(1 <<  1)
@@ -1164,8 +1165,9 @@ class Room;
 #define ITEM_SPIRIT_FOCUS     74
 #define ITEM_DEATH_FOCUS      75
 #define ITEM_MIND_FOCUS	      76
-#define ITEM_NO_LOOT          77
-#define ITEM_NO_SAC           78
+#define ITEM_NO_LOOT          77 /* Only the owner can take it/take things from it */
+#define ITEM_NO_SAC           78 /* Only the owner can sac it */
+#define ITEM_CRASHPROOF       79 /* Saved if dropped, including contents */
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0  /* No effect                    */

@@ -185,6 +185,7 @@ extern Character *ch_selling;
 extern const int xap_objs;
 
 /* extern procedures */
+void save_crashproof_room ( Room *room );
 void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, string arg3 );
 void appear ( Character *ch );
 int perform_immort_vis ( Character *ch );
@@ -620,6 +621,8 @@ ACMD ( do_save )
 	Crash_crashsave ( ch );
 	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE_CRASH ) )
 		House_crashsave ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+	else if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_CRASHPROOF ) )
+		save_crashproof_room ( IN_ROOM ( ch ) );
 }
 
 void list_rprooms_to_char ( Character *ch )

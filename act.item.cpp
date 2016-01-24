@@ -1398,6 +1398,8 @@ bool perform_get_from_room ( Character *ch, struct obj_data *obj )
 
 		if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
 			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_HOUSE_CRASH );
+		else if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+			SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_CRASHPROOF );
 		return TRUE;
 	}
 	return FALSE;
@@ -1706,8 +1708,7 @@ void perform_drop_gold ( Character *ch, gold_int amount,
 #define VANISH(mode) ((mode == SCMD_DONATE || mode == SCMD_JUNK) ? \
                       "  It vanishes in a puff of smoke!" : "")
 
-int perform_drop ( Character *ch, struct obj_data *obj,
-                   sbyte mode, const char *sname, Room *  RDR )
+int perform_drop ( Character *ch, struct obj_data *obj, sbyte mode, const char *sname, Room *RDR )
 {
 	int value;
 	char buf[MAX_INPUT_LENGTH];
@@ -1778,6 +1779,8 @@ int perform_drop ( Character *ch, struct obj_data *obj,
 				act ( "$p dissolves into smoke.", FALSE, 0, obj, 0, TO_CHAR );
 				extract_obj ( obj );
 			}
+			else if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
+				SET_BIT_AR ( ROOM_FLAGS ( IN_ROOM ( ch ) ), ROOM_CRASHPROOF );
 			return ( 0 );
 		case SCMD_DONATE:
 			if ( GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
@@ -1908,8 +1911,7 @@ ACMD ( do_drop )
 			{
 				do
 				{
-					next_obj =
-					    get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
+					next_obj = get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
 					amount += perform_drop ( ch, obj, mode, sname, RDR );
 					obj = next_obj;
 				}
@@ -1921,8 +1923,7 @@ ACMD ( do_drop )
 		dotmode = find_all_dots ( arg );
 
 		/* Can't junk or donate all */
-		if ( ( dotmode == FIND_ALL )
-		        && ( subcmd == SCMD_JUNK || subcmd == SCMD_DONATE ) )
+		if ( ( dotmode == FIND_ALL ) && ( subcmd == SCMD_JUNK || subcmd == SCMD_DONATE ) )
 		{
 			if ( subcmd == SCMD_JUNK )
 				ch->Send ( "Go to the dump if you want to junk EVERYTHING!\r\n" );
@@ -1966,8 +1967,7 @@ ACMD ( do_drop )
 
 			while ( obj )
 			{
-				next_obj =
-				    get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
+				next_obj = get_obj_in_list_vis ( ch, arg, NULL, obj->next_content );
 				amount += perform_drop ( ch, obj, mode, sname, RDR );
 				obj = next_obj;
 			}
@@ -1977,8 +1977,7 @@ ACMD ( do_drop )
 		{
 			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
 			{
-				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ),
-				           arg );
+				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
 			}
 			else
 				amount += perform_drop ( ch, obj, mode, sname, RDR );

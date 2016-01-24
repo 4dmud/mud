@@ -1334,6 +1334,95 @@ int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
   return fprintf(fl, "@END\n\n");
 }
 
+/* restore weight of containers after save_crashproof_objects changed them for saving */
+void crashproof_restore_weight ( obj_data *obj )
+{
+	if ( obj )
+	{
+		crashproof_restore_weight ( obj->contains );
+		crashproof_restore_weight ( obj->next_content );
+		if ( obj->in_obj && OBJ_FLAGGED ( obj->in_obj, ITEM_CRASHPROOF ) )
+			GET_OBJ_WEIGHT ( obj->in_obj ) += GET_OBJ_WEIGHT ( obj );
+	}
+}
+
+int save_crashproof_objects ( FILE *fl, obj_data *obj, int locate )
+{
+	if ( !obj )
+		return 0;
+
+	save_crashproof_objects ( fl, obj->next_content, locate );
+
+	/* Save objects inside crashproof containers */
+	if ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+		save_crashproof_objects ( fl, obj->contains, MIN ( 0, locate ) - 1 );
+
+	/* Save crashproof objects in the room */
+	if ( !locate && !OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) )
+		return 0;
+
+	int result;
+	if ( save_new_style )
+		result = save_one_item ( obj, fl, locate );
+	else
+		result = my_obj_save_to_disk ( fl, obj, locate );
+	if ( !result )
+		return -1;
+
+	for ( obj_data *tmp = obj->in_obj; tmp; tmp = tmp->in_obj )
+		GET_OBJ_WEIGHT ( tmp ) -= GET_OBJ_WEIGHT ( obj );
+
+	return 1;
+}
+
+void save_crashproof_room ( Room *room )
+{
+	FILE *fl = NULL;
+	int result;
+	string tmpfile = string ( LIB_CRASHPROOF ) + to_string ( GET_ROOM_VNUM ( room ) ) + ".tmp";
+
+	if ( !( fl = fopen ( tmpfile.c_str(), "w" ) ) )
+	{
+		log ( "Couldn't create crashproof file %s", tmpfile.c_str() );
+		return;
+	}
+
+	result = save_crashproof_objects ( fl, room->contents, 0 );
+	if ( result == -1 )
+	{
+		fclose ( fl );
+		if ( remove ( tmpfile.c_str() ) == -1 )
+			new_mudlog(NRM, LVL_GOD, TRUE, "Unable to remove temp file: %s", tmpfile.c_str() );
+		return;
+	}
+	fclose ( fl );
+
+	crashproof_restore_weight ( room->contents );
+	REMOVE_BIT_AR ( ROOM_FLAGS ( room ), ROOM_CRASHPROOF );
+	string filename = string ( LIB_CRASHPROOF ) + to_string ( GET_ROOM_VNUM ( room ) );
+
+	if ( result == 1 )
+	{
+		if ( rename ( tmpfile.c_str(), filename.c_str() ) == -1 )
+			new_mudlog ( NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", filename.c_str() );
+	}
+	else
+	{
+		if ( remove ( tmpfile.c_str() ) == -1)
+			new_mudlog(NRM, LVL_GOD, TRUE, "Unable to remove temp file: %s", tmpfile.c_str() );
+		remove ( filename.c_str() );
+	}
+
+	return;
+}
+
+void crashproof_objects_save_all()
+{
+	for ( auto &r : world_vnum )
+		if ( r && ROOM_FLAGGED ( r, ROOM_CRASHPROOF ) )
+			save_crashproof_room ( r );
+}
+
 int write_object_affects(FILE *fl, OBJ_DATA *obj)
 {
   int i;

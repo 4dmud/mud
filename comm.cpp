@@ -240,6 +240,7 @@ void free_command_list(void);
 //void free_help(struct help_index_element *help);
 
 /* extern fcnts */
+void crashproof_objects_save_all();
 void check_for_dead(void);
 void extract_pending_chars(void);
 #if 0
@@ -1435,6 +1436,7 @@ void heartbeat(int heart_pulse) {
             mins_since_crashsave = 0;
             Crash_save_all();
             House_save_all();
+            crashproof_objects_save_all();
         }
     }
 
