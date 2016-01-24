@@ -1927,8 +1927,15 @@ int is_num ( char *arg )
 #else
 int is_num ( char *num )
 {
-	while ( *num && ( isdigit ( *num ) || *num == '-' ) )
+	if ( !*num )
+		return 0;
+
+	if ( *num == '-' )
 		num++;
+
+	while ( *num && isdigit ( *num ) )
+		num++;
+
 	if ( !*num || isspace ( *num ) )
 		return 1;
 	return 0;
@@ -4410,13 +4417,13 @@ Character *find_char_by_uid_in_lookup_table ( long uid )
 	{
 		if ( ch->second == NULL )
 			return NULL;
-		if ( DEAD ( ( ch->second ) ) )
-			log ( "find_char_by_uid_in_lookup_table : character %s in room %d is flagged to be extracted", ch->second->player.name, ch->second->in_room->number );
+		//if ( DEAD ( ( ch->second ) ) )
+		//	log ( "find_char_by_uid_in_lookup_table : character %s in room %d is flagged to be extracted", ch->second->player.name, ch->second->in_room->number );
 
 		return ( ch->second );
 	}
 
-	log ( "find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid );
+	//log ( "find_char_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid );
 
 	return NULL;
 #endif

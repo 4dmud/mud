@@ -3209,8 +3209,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					else if ( !strcasecmp ( field, "next_in_list" ) )
 					{
 						if ( o->next_content )
-							snprintf ( str, slen, "%c%ld", UID_CHAR,
-							           GET_ID ( o->next_content ) );
+							snprintf ( str, slen, "%c%ld", UID_CHAR, GET_ID ( o->next_content ) );
 						else
 							strcpy ( str, "" );
 					}
@@ -3233,6 +3232,23 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 				case 'o':
 					if ( !strcasecmp ( field, "omr" ) )
 						snprintf ( str, slen, "%s","object" );
+
+					else if ( !strcasecmp ( field, "owned_by" ) )
+					{
+						if ( subfield && *subfield )
+						{
+							long x = atol ( subfield );
+							if ( !is_number ( subfield ) )
+								script_log ( "Trigger %d: passing %s to owned_by", GET_TRIG_VNUM ( trig ), subfield );
+							else if ( pi.NameById ( x ) )
+								o->owner = x;
+							else
+								script_log ( "Trigger %d: passing invalid id %ld to owned_by", GET_TRIG_VNUM ( trig ), x );
+							*str = '\0';
+						}
+						else
+							snprintf ( str, slen, "%ld", o->owner );
+					}
 					break;
 
 				case 'p':

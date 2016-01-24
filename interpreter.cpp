@@ -1514,11 +1514,14 @@ int search_block ( char *arg, const char **list, int exact )
 
 int is_number ( const char *str )
 {
+	if ( !*str )
+		return 0;
+
 	while ( *str )
 		if ( !isdigit ( * ( str++ ) ) )
-			return ( 0 );
+			return 0;
 
-	return ( 1 );
+	return 1;
 }
 
 /*
