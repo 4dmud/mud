@@ -10,7 +10,9 @@
 #include "constants.h"
 #include "oasis.h"
 
+/* external functions */
 char *str_udup(const char *txt);
+void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
 
 ACMD(do_string)
 {
@@ -57,6 +59,50 @@ ACMD(do_string)
     if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
       free ( obj->description );
     obj->description = str_udup ( buf2 );
+  }
+  else if (!str_cmp("extra", buf1))
+  {
+	half_chop ( buf2, buf1, buf2 );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+	bool ex_was_proto = FALSE;
+	if ( obj->ex_description == obj_proto[ GET_OBJ_RNUM ( obj )].ex_description )
+	{
+		copy_ex_descriptions ( &obj->ex_description, obj_proto[ GET_OBJ_RNUM ( obj )].ex_description );
+		ex_was_proto = TRUE;
+	}
+
+	extra_descr_data *ex_desc = obj->ex_description;
+	if ( ex_desc == NULL )
+	{
+		CREATE ( ex_desc, extra_descr_data, 1 );
+		ex_desc->keyword = str_udup ( buf1 );
+		ex_desc->description = str_udup ( buf2 );
+		ex_desc->next = NULL;
+	}
+	else if ( ex_desc->keyword == NULL )
+	{
+		ex_desc->keyword = str_udup ( buf1 );
+		ex_desc->description = str_udup ( buf2 );
+		ex_desc->next = NULL;
+	}
+	else for ( ; ex_desc; ex_desc = ex_desc->next )
+	{
+		if ( strstr ( ex_desc->keyword, buf1 ) )
+		{
+			if ( !ex_was_proto )
+				free_string ( &ex_desc->description );
+			ex_desc->description = str_udup ( buf2 );
+			break;
+		}
+		else if ( ex_desc->next == NULL )
+		{
+			CREATE ( ex_desc->next, extra_descr_data, 1 );
+			ex_desc->next->keyword = str_udup ( buf1 );
+			ex_desc->next->description = str_udup ( buf2 );
+			ex_desc->next->next = NULL;
+			break;
+		}
+	}
   }
   else if (!str_cmp("weight", buf1))
   {

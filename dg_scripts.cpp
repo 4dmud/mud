@@ -183,6 +183,7 @@ extern unsigned long pulse;
 extern struct time_info_data time_info;
 
 /* external functions */
+void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
 char *str_udup(const char *txt);
 void view_room_by_rnum ( Character *ch, room_rnum is_in );
 void free_varlist ( struct trig_var_data *vd );
@@ -3298,42 +3299,46 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		arg = args[3];
 		for ( int i = 4; i < args.size(); ++i )
 			arg += " " + args[i];
+		arg[0] = UPPER ( arg[0] );
 
 		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+		bool ex_was_proto = FALSE;
+		if ( obj->ex_description == obj_proto[ GET_OBJ_RNUM ( obj )].ex_description )
+		{
+			copy_ex_descriptions ( &obj->ex_description, obj_proto[ GET_OBJ_RNUM ( obj )].ex_description );
+			ex_was_proto = TRUE;
+		}
+
 		extra_descr_data *ex_desc = obj->ex_description;
 		if ( ex_desc == NULL )
 		{
 			CREATE ( obj->ex_description, extra_descr_data, 1 );
 			obj->ex_description->keyword = str_udup ( args[2].c_str() );
-			arg[0] = UPPER ( arg[0] );
 			obj->ex_description->description = str_udup ( arg.c_str() );
 			obj->ex_description->next = NULL;
-			return;
+		}
+		else if ( ex_desc->keyword == NULL )
+		{
+			ex_desc->keyword = str_udup ( args[2].c_str() );
+			ex_desc->description = str_udup ( arg.c_str() );
+			ex_desc->next = NULL;
 		}
 		else for ( ; ex_desc; ex_desc = ex_desc->next )
 		{
 			if ( strstr ( ex_desc->keyword, args[2].c_str() ) )
 			{
-				extra_descr_data *ex_proto = obj_proto[ GET_OBJ_RNUM ( obj ) ].ex_description;
-				for ( ; ex_proto; ex_proto = ex_proto->next )
-					if ( strstr ( ex_proto->keyword, args[2].c_str() ) )
-					{
-						if ( ex_desc->description && ex_desc->description != ex_proto->description )
-							free ( ex_desc->description );
-						break;
-					}
-				arg[0] = UPPER ( arg[0] );
+				if ( !ex_was_proto )
+					free_string ( &ex_desc->description );
 				ex_desc->description = str_udup ( arg.c_str() );
-				return;
+				break;
 			}
 			else if ( ex_desc->next == NULL )
 			{
 				CREATE ( ex_desc->next, extra_descr_data, 1 );
 				ex_desc->next->keyword = str_udup ( args[2].c_str() );
-				arg[0] = UPPER ( arg[0] );
 				ex_desc->next->description = str_udup ( arg.c_str() );
 				ex_desc->next->next = NULL;
-				return;
+				break;
 			}
 		}
 	}
