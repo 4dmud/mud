@@ -2506,7 +2506,7 @@ ACMD ( do_wake )
 	if ( AFF_FLAGGED ( ch, AFF_SLEEP ) )
 		send_to_char ( "You can't wake up!\r\n", ch );
 	else if ( AFF_FLAGGED ( ch, AFF_SWEET_DREAMS ) )
-		ch->Send ( "You are in a far to happy slumber.\r\n" );
+		ch->Send ( "You are in a far too happy slumber.\r\n" );
 	else if ( GET_POS ( ch ) > POS_SLEEPING )
 		send_to_char ( "You are already awake...\r\n", ch );
 	else

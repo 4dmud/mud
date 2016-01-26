@@ -2018,7 +2018,7 @@ void eval_op ( char *op, char *lhs, char *rhs, char *result, size_t r_len, void 
 		if ( is_num ( lhs ) && is_num ( rhs ) )
 			snprintf ( result,r_len, "%d", atoi ( lhs ) >= atoi ( rhs ) );
 		else
-			snprintf ( result,r_len, "%d", strcmp ( lhs, rhs ) <= 0 );
+			snprintf ( result,r_len, "%d", strcmp ( lhs, rhs ) >= 0 );
 	}
 	else if ( !strcmp ( "<", op ) )
 	{

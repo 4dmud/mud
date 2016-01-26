@@ -2733,10 +2733,10 @@ const char *wiz_groups[] =
 	"Sen",
 	"Tele",
 	"Trig",
-	"marry",
-	"goto",
-	"globalEdit",
-	"hedit",
+	"Marry",
+	"Goto",
+	"Global",
+	"Hedit",
 	"Imm3",
 	"\n"
 };
