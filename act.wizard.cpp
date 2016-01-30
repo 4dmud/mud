@@ -5151,7 +5151,7 @@ struct set_struct
 	{"rthree", LVL_IMPL, PC, MISC},
 	{"race", LVL_GRGOD, BOTH, MISC},
 	{"pregnant", LVL_IMPL, PC, NUMBER},
-	{"breakup", LVL_SEN, PC, MISC},
+	{"breakup", LVL_CRT, PC, MISC},
 	{"rp", LVL_SEN, PC, BINARY},    /* 55 */
 	{"pk", LVL_SEN, PC, BINARY},
 	{"brasst", LVL_SEN, PC, NUMBER},
