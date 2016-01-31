@@ -441,7 +441,8 @@ OCMD ( do_otransform )
 }
 
 
-/* purge all objects an npcs in room, or specified object or mob */
+/* purge all objects and npcs in room, or specified object or mob */
+/* don't purge objects in a house, crashproof objects in a room, or player corpses */
 OCMD ( do_opurge )
 {
 	char arg[MAX_INPUT_LENGTH];
@@ -463,10 +464,13 @@ OCMD ( do_opurge )
 					extract_char ( ch );
 			}
 
+			if ( ROOM_FLAGGED ( rm, ROOM_HOUSE ) )
+				return;
+
 			for ( o = rm->contents; o; o = next_obj )
 			{
 				next_obj = o->next_content;
-				if ( o != obj )
+				if ( o != obj && !OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
 					extract_obj ( o );
 			}
 		}
@@ -484,9 +488,9 @@ OCMD ( do_opurge )
 	{
 //***** so will get_obj_by_obj!
 		o = get_obj_by_obj ( obj, arg );
-		if ( o )
+		if ( o && !( IN_ROOM ( o ) && ( OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) || ROOM_FLAGGED ( IN_ROOM ( o ), ROOM_HOUSE ) ) ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
 		{
-			if ( o==obj )
+			if ( o == obj )
 				dg_owner_purged = 1;
 			extract_obj ( o );
 		}
