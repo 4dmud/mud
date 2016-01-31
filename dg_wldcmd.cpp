@@ -672,6 +672,17 @@ WCMD(do_wload)
 
       if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos))
         equip_char(tch, object, pos);
+      else if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+      {
+        if ( IN_ROOM ( tch ) )
+            obj_to_room ( object, IN_ROOM ( tch ) );
+        else
+        {
+          wld_log ( room, "couldn't load %s to null room", object->short_description );
+          extract_obj ( object );
+          return;
+        }
+      }
       else
         obj_to_char(object, tch);
       load_otrigger(object);
@@ -684,7 +695,20 @@ WCMD(do_wload)
     {
       if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
           wld_log ( room, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
-      obj_to_obj(object, cnt);
+      if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+      {
+        Room *r = obj_room ( cnt );
+        if ( r )
+          obj_to_room ( object, r );
+        else
+        {
+          wld_log ( room, "couldn't load %s to null room", object->short_description );
+          extract_obj ( object );
+          return;
+        }
+      }
+      else
+        obj_to_obj(object, cnt);
       load_otrigger(object);
       return;
     }
@@ -701,9 +725,9 @@ WCMD(do_wload)
 	else
 	{
 		if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-			wld_log ( room, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+			wld_log ( room, "[TOKEN] loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
 		else
-			wld_log ( room, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+			wld_log ( room, "loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
 		extract_obj ( object );
 	}
     return;

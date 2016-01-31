@@ -663,7 +663,7 @@ OCMD ( do_dgoload )
 
 		/* load to char */
 		two_arguments ( target, arg1, arg2 ); /* recycling ... */
-		tch = get_char_near_obj ( obj, arg1 );
+		tch = ( *arg1 == UID_CHAR ) ? get_char ( arg1 ) : get_char_near_obj ( obj, arg1 );
 		if ( tch )
 		{
 			if ( *arg2 && ( pos = find_eq_pos_script ( arg2 ) ) >= 0 && !GET_EQ ( tch, pos ) && can_wear_on_pos ( object, pos ) )
@@ -674,7 +674,19 @@ OCMD ( do_dgoload )
 			}
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
 				obj_log ( obj, "[TOKEN] loads %s to %s in %d", object->short_description, GET_NAME ( tch ), IN_ROOM ( tch ) ? IN_ROOM ( tch )->number : -1 );
-			obj_to_char ( object, tch );
+			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+			{
+				if ( IN_ROOM ( tch ) )
+					obj_to_room ( object, IN_ROOM ( tch ) );
+				else
+				{
+					obj_log ( obj, "couldn't load %s to room because %s wasn't in one", object->short_description, GET_NAME ( tch ) );
+					extract_obj ( object );
+					return;
+				}
+			}
+			else
+				obj_to_char ( object, tch );
 			load_otrigger ( object );
 			return;
 		}
@@ -685,7 +697,20 @@ OCMD ( do_dgoload )
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
 				obj_log ( obj, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
-			obj_to_obj ( object, cnt );
+			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+			{
+				Room *r = obj_room ( cnt );
+				if ( r )
+					obj_to_room ( object, r );
+				else
+				{
+					obj_log ( obj, "couldn't load %s to null room", object->short_description );
+					extract_obj ( object );
+					return;
+				}
+			}
+			else
+				obj_to_obj ( object, cnt );
 			load_otrigger ( object );
 			return;
 		}
@@ -702,9 +727,9 @@ OCMD ( do_dgoload )
 		else
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+				obj_log ( obj, "[TOKEN] loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
 			else
-				obj_log ( obj, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+				obj_log ( obj, "loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
 			extract_obj ( object );
 		}
 	}

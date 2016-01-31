@@ -797,7 +797,19 @@ ACMD(do_mload) {
 				if (IN_ROOM(ch))
 					mob_log(ch, "[TOKEN] loads %s in %d", object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
 			}
-            obj_to_char(object, ch);
+            if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+            {
+                if ( IN_ROOM ( ch ) )
+                    obj_to_room ( object, IN_ROOM ( ch ) );
+                else
+                {
+                    mob_log ( ch, "couldn't load %s to null room", object->short_description );
+                    extract_obj ( object );
+                    return;
+                }
+            }
+            else
+                obj_to_char(object, ch);
             load_otrigger(object);
             return;
         }
@@ -816,7 +828,19 @@ ACMD(do_mload) {
                 if (IN_ROOM(tch))
                     mob_log(ch, "[TOKEN] loads %s to %s in room %d", object->short_description, GET_NAME(tch), GET_ROOM_VNUM(IN_ROOM(tch)));
             }
-            obj_to_char(object, tch);
+            if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+            {
+                if ( IN_ROOM ( tch ) )
+                    obj_to_room ( object, IN_ROOM ( tch ) );
+                else
+                {
+                    mob_log ( ch, "couldn't load %s to room because %s wasn't in one", object->short_description, GET_NAME ( tch ) );
+                    extract_obj ( object );
+                    return;
+                }
+            }
+            else
+                obj_to_char(object, tch);
             load_otrigger(object);
             return;
         }
@@ -826,7 +850,20 @@ ACMD(do_mload) {
         if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
 	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
 				mob_log(ch, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
-            obj_to_obj(object, cnt);
+            if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+            {
+                Room *r = obj_room ( cnt );
+                if ( r )
+                    obj_to_room ( object, r );
+                else
+                {
+                    mob_log ( ch, "couldn't load %s to null room", object->short_description );
+                    extract_obj ( object );
+                    return;
+                }
+            }
+            else
+                obj_to_obj(object, cnt);
             load_otrigger(object);
             return;
         }
@@ -836,9 +873,9 @@ ACMD(do_mload) {
 		if ( r == NULL )
 		{
 	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-				mob_log(ch, "[TOKEN] loads %s in room %d but couldn't find target %s, purging.", object->short_description, IN_ROOM ( ch )->number, arg1 );
+				mob_log(ch, "[TOKEN] loads %s in room %d but couldn't find target %s, extracting object", object->short_description, IN_ROOM ( ch )->number, arg1 );
 			else
-				mob_log(ch, "loads [%d] %s in room %d but couldn't find target %s, purging.", GET_OBJ_VNUM ( object ), object->short_description, IN_ROOM ( ch )->number, arg1 );
+				mob_log(ch, "loads [%d] %s in room %d but couldn't find target %s, extracting object", GET_OBJ_VNUM ( object ), object->short_description, IN_ROOM ( ch )->number, arg1 );
 		    extract_obj ( object );
 		}
 		else
