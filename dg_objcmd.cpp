@@ -441,8 +441,7 @@ OCMD ( do_otransform )
 }
 
 
-/* purge all objects and npcs in room, or specified object or mob */
-/* don't purge objects in a house, crashproof objects in a room, or player corpses */
+/* purge all objects an npcs in room, or specified object or mob */
 OCMD ( do_opurge )
 {
 	char arg[MAX_INPUT_LENGTH];
@@ -464,13 +463,10 @@ OCMD ( do_opurge )
 					extract_char ( ch );
 			}
 
-			if ( ROOM_FLAGGED ( rm, ROOM_HOUSE ) )
-				return;
-
 			for ( o = rm->contents; o; o = next_obj )
 			{
 				next_obj = o->next_content;
-				if ( o != obj && !OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
+				if ( o != obj )
 					extract_obj ( o );
 			}
 		}
@@ -488,9 +484,9 @@ OCMD ( do_opurge )
 	{
 //***** so will get_obj_by_obj!
 		o = get_obj_by_obj ( obj, arg );
-		if ( o && !( IN_ROOM ( o ) && ( OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) || ROOM_FLAGGED ( IN_ROOM ( o ), ROOM_HOUSE ) ) ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
+		if ( o )
 		{
-			if ( o == obj )
+			if ( o==obj )
 				dg_owner_purged = 1;
 			extract_obj ( o );
 		}
@@ -663,7 +659,7 @@ OCMD ( do_dgoload )
 
 		/* load to char */
 		two_arguments ( target, arg1, arg2 ); /* recycling ... */
-		tch = ( *arg1 == UID_CHAR ) ? get_char ( arg1 ) : get_char_near_obj ( obj, arg1 );
+		tch = get_char_near_obj ( obj, arg1 );
 		if ( tch )
 		{
 			if ( *arg2 && ( pos = find_eq_pos_script ( arg2 ) ) >= 0 && !GET_EQ ( tch, pos ) && can_wear_on_pos ( object, pos ) )
@@ -674,19 +670,7 @@ OCMD ( do_dgoload )
 			}
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
 				obj_log ( obj, "[TOKEN] loads %s to %s in %d", object->short_description, GET_NAME ( tch ), IN_ROOM ( tch ) ? IN_ROOM ( tch )->number : -1 );
-			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
-			{
-				if ( IN_ROOM ( tch ) )
-					obj_to_room ( object, IN_ROOM ( tch ) );
-				else
-				{
-					obj_log ( obj, "couldn't load %s to room because %s wasn't in one", object->short_description, GET_NAME ( tch ) );
-					extract_obj ( object );
-					return;
-				}
-			}
-			else
-				obj_to_char ( object, tch );
+			obj_to_char ( object, tch );
 			load_otrigger ( object );
 			return;
 		}
@@ -697,20 +681,7 @@ OCMD ( do_dgoload )
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
 				obj_log ( obj, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
-			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
-			{
-				Room *r = obj_room ( cnt );
-				if ( r )
-					obj_to_room ( object, r );
-				else
-				{
-					obj_log ( obj, "couldn't load %s to null room", object->short_description );
-					extract_obj ( object );
-					return;
-				}
-			}
-			else
-				obj_to_obj ( object, cnt );
+			obj_to_obj ( object, cnt );
 			load_otrigger ( object );
 			return;
 		}
@@ -727,9 +698,9 @@ OCMD ( do_dgoload )
 		else
 		{
 	        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-				obj_log ( obj, "[TOKEN] loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
+				obj_log ( obj, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
 			else
-				obj_log ( obj, "loads %s, but target %s couldn't be found, extracting object", object->short_description, arg1 );
+				obj_log ( obj, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
 			extract_obj ( object );
 		}
 	}

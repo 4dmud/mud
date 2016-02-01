@@ -1982,7 +1982,7 @@ ACMD ( do_sac )
 		ch->Send ( "You can't sacrifice that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
 		return;
 	}
-	if ( OBJ_FLAGGED ( obj, ITEM_NO_SAC ) && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
+	if ( OBJ_FLAGGED ( obj, ITEM_NO_LOOT ) && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
 	{
 		ch->Send ( "You can't sacrifice that, it doesn't belong to you.\r\n" );
 		return;

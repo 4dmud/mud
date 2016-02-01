@@ -934,6 +934,7 @@ int current_class_is_tier_num ( Character *ch );
     obj_index[GET_OBJ_RNUM(obj)].vnum : NOTHING)
 #define GET_OBJ_INNATE(obj)     ((obj)->obj_flags.obj_innate)
 
+#define IS_ROOM_STAT(room, stat) (IS_SET_AR(room->room_flags, stat))
 #define IS_CORPSE(obj)		(GET_OBJ_TYPE(obj) == ITEM_CONTAINER && \
 					GET_OBJ_VAL((obj), 3) == 1 && \
 				(OBJ_FLAGGED(obj, ITEM_PC_CORPSE) || \
