@@ -520,7 +520,8 @@ WCMD(do_wforce)
 
 
 
-/* purge all objects an npcs in room, or specified object or mob */
+/* purge all objects and npcs in room, or specified object or mob */
+/* don't purge objects in a house, crashproof objects in a room, or player corpses */
 WCMD(do_wpurge)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -539,10 +540,14 @@ WCMD(do_wpurge)
         extract_char(ch);
     }
 
+    if ( ROOM_FLAGGED ( room, ROOM_HOUSE ) )
+      return;
+
     for (obj = room->contents; obj; obj = next_obj )
     {
       next_obj = obj->next_content;
-      extract_obj(obj);
+      if ( !OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) && !OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
+        extract_obj(obj);
     }
 
     return;
@@ -560,10 +565,9 @@ WCMD(do_wpurge)
       obj = get_obj(arg);
     else
       obj = get_obj_in_room(room, arg);
-    if (obj)
-    {
+
+    if ( obj && !( IN_ROOM ( obj ) && ( OBJ_FLAGGED ( obj, ITEM_CRASHPROOF ) || ROOM_FLAGGED ( IN_ROOM ( obj ), ROOM_HOUSE ) ) ) && !OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
       extract_obj(obj);
-    }
     else
       wld_log(room, "wpurge: bad argument");
 
