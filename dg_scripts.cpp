@@ -3257,10 +3257,11 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		return;
 	}
 
+	obj_rnum rn = GET_OBJ_RNUM ( obj );
 	if ( args[1] == "name" )
 	{
 		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		if ( obj->name && obj->name != obj_proto[ GET_OBJ_RNUM ( obj )].name )
+		if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
 			free ( obj->name );
 		arg = args[2];
 		for ( int i = 3; i < args.size(); ++i )
@@ -3270,7 +3271,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	else if ( args[1] == "short" )
 	{
 		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		if ( obj->short_description && obj->short_description != obj_proto[ GET_OBJ_RNUM ( obj )].short_description )
+		if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
 			free ( obj->short_description );
 		arg = args[2];
 		for ( int i = 3; i < args.size(); ++i )
@@ -3280,7 +3281,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	else if ( args[1] == "long" )
 	{
 		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-		if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
+		if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
 			free ( obj->description );
 		arg = args[2];
 		arg[0] = UPPER ( arg[0] );
@@ -3303,9 +3304,9 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 
 		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		bool ex_was_proto = FALSE;
-		if ( obj->ex_description == obj_proto[ GET_OBJ_RNUM ( obj )].ex_description )
+		if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
 		{
-			copy_ex_descriptions ( &obj->ex_description, obj_proto[ GET_OBJ_RNUM ( obj )].ex_description );
+			copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
 			ex_was_proto = TRUE;
 		}
 

@@ -39,24 +39,25 @@ ACMD(do_string)
     return;
   }
 
+  obj_rnum rn = GET_OBJ_RNUM ( obj );
   if (!strcmp("name", buf1))
   {
     SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-    if ( obj->name && obj->name != obj_proto[ GET_OBJ_RNUM ( obj )].name )
+    if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
       free ( obj->name );
     obj->name = str_udup ( buf2 );
   }
   else if (!str_cmp("short", buf1))
   {
     SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-    if ( obj->short_description && obj->short_description != obj_proto[ GET_OBJ_RNUM ( obj )].short_description )
+    if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
       free ( obj->short_description );
     obj->short_description = str_udup ( buf2 );
   }
   else if (!str_cmp("long", buf1))
   {
     SET_BIT_AR ( GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE );
-    if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
+    if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
       free ( obj->description );
     obj->description = str_udup ( buf2 );
   }
@@ -65,9 +66,9 @@ ACMD(do_string)
 	half_chop ( buf2, buf1, buf2 );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 	bool ex_was_proto = FALSE;
-	if ( obj->ex_description == obj_proto[ GET_OBJ_RNUM ( obj )].ex_description )
+	if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
 	{
-		copy_ex_descriptions ( &obj->ex_description, obj_proto[ GET_OBJ_RNUM ( obj )].ex_description );
+		copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
 		ex_was_proto = TRUE;
 	}
 
