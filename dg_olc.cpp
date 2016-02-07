@@ -218,6 +218,7 @@ void trigedit_disp_menu(Descriptor *d) {
 
     clear_screen(d);
 
+	d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
     d->Output(
         "Trigger Editor [%s%d%s]\r\n\r\n"
         "%s1)%s Name         : %s%s\r\n"

@@ -547,6 +547,7 @@ void redit_disp_menu(Descriptor *d)
   room = OLC_ROOM(d);
   sprintbitarray(room->room_flags, room_bits, RF_ARRAY_MAX, buf1, sizeof(buf1));
   sprinttype(room->sector_type, sector_types, buf2, sizeof(buf2));
+  d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
   d->Output(
                   "-- Room number : [%s%d%s]   Room zone: [%s%d%s]\r\n"
                   "%s1%s) Name         : %s%s\r\n"

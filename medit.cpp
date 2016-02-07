@@ -768,6 +768,7 @@ void medit_disp_menu ( Descriptor *d )
 	get_char_colours ( d->character );
 	clear_screen ( d );
 
+	d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
 	d->Output (
 	    "-- Mob Number:  [%s%d%s]\r\n"
 	    "%s1%s) Sex: %s%-7.7s%s	         %s2%s) Alias: %s%s\r\n"

@@ -1126,6 +1126,7 @@ void oedit_disp_menu ( Descriptor *d )
 */
             sprintf(buf3, "  ");
 
+	d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
 	d->Output (
 	    "-- Item number : [%s%d%s]\r\n"
 	    "%s1%s) Namelist : %s%s\r\n"
