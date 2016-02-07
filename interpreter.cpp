@@ -553,6 +553,7 @@ const command_info cmd_info[] =
 	{ "corpse"   , "cor" , POS_DEAD    , do_corpse    , 0, 0, 0 },
 	{ "color"    , "col" , POS_DEAD    , do_colour    , 0, 0, 0 },
 	{ "colour"   , "colour"   , POS_DEAD    , do_colour    , 0, 0, 0 },
+	{ "colorcode", "colorc", POS_DEAD, do_gen_tog, 0, SCMD_SHOW_COLOUR_CODE, 0 },
 	{ "colourcode", "colourc", POS_DEAD, do_gen_tog, 0, SCMD_SHOW_COLOUR_CODE, 0 },
 	{ "\"" , "\""   , POS_DEAD    , do_comm , 0, 0, 0 },
 	{ "commands" , "comm"     , POS_DEAD    , do_commands , 0, SCMD_COMMANDS, 0 },

@@ -1795,7 +1795,6 @@ void mag_masses ( int level, Character *ch, int spellnum,
 	}
 }
 
-
 /*
  * Every spell that affects an area (room) runs through here.  These are
  * generally offensive spells.  This calls mag_damage to do the actual
@@ -1912,6 +1911,7 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 		 * The skips: 1: the caster
 		 *            2: immortals
 		 *            3: if no pk on this mud, skips over all players
+		 *               if pk-ers are grouped, don't make them fight each other
 		 *            4: pets (charmed NPCs)
 		 */
 		if ( count++ >= rounds )
@@ -1921,6 +1921,28 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 		if ( !IS_NPC ( tch ) && GET_LEVEL ( tch ) >= LVL_GOD )
 			continue;
 		if ( !can_fight ( ch, tch, FALSE ) )
+			continue;
+		bool grouped_with_pk = FALSE;
+		if ( IS_PK ( ch ) )
+		{
+			if ( IS_PK ( tch ) )
+			{
+				for ( follow_type *f = ch->followers; f; f = f->next )
+					if ( f->follower == tch )
+					{
+						grouped_with_pk = TRUE;
+						break;
+					}
+				if ( ch->master )
+					for ( follow_type *f = ch->master->followers; f; f = f->next )
+						if ( f->follower == tch )
+						{
+							grouped_with_pk = TRUE;
+							break;
+						}
+			}
+		}
+		if ( grouped_with_pk )
 			continue;
 		if ( !IS_NPC ( ch ) && IS_NPC ( tch ) && AFF_FLAGGED ( tch, AFF_CHARM ) )
 			continue;
