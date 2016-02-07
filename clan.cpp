@@ -68,11 +68,11 @@ void send_clan_format ( Character *ch )
 	int c, r;
 
 	ch->Send ( "Clan commands available to you:\r\n"
-	           "   clan who\r\n"
-	           "   clan status\r\n"
-	           "   clan list\r\n" 
-                   "   clan info <clan>\r\n" 
-                   "   clan leave\r\n");
+	               "   clan who\r\n"
+	               "   clan status\r\n"
+	               "   clan list\r\n"
+	               "   clan info <clan>\r\n"
+	               "   clan leave\r\n");
 	if ( GET_LEVEL ( ch ) >= LVL_CLAN_GOD )
 		ch->Send ( "   clan create     <leader> <clan name>\r\n"
 		           "   clan destroy    <clan>\r\n"
@@ -80,11 +80,11 @@ void send_clan_format ( Character *ch )
 		           "   clan expel      <player> <clan>\r\n"
 		           "   clan promote    <player> <clan>\r\n"
 		           "   clan demote     <player> <clan>\r\n"
-                           "   clan retire     <yes>\r\n"
+	               "   clan retire     <yes>\r\n"
 		           "   clan withdraw   <amount> <clan>\r\n"
-                           "   clan withdraw   <gold/silver/bronze> <amount> <clan>\r\n"
+	               "   clan withdraw   <gold/silver/bronze> <amount> <clan>\r\n"
 		           "   clan deposit    <amount> <clan>\r\n"
-                           "   clan deposit    <gold/silver/bronze> <amount> <clan>\r\n"
+	               "   clan deposit    <gold/silver/bronze> <amount> <clan>\r\n"
 		           "   clan set ranks  <rank>   <clan>\r\n"
 		           "   clan set appfee <amount> <clan>\r\n"
 		           "   clan set dues   <amount> <clan>\r\n"
@@ -105,11 +105,11 @@ void send_clan_format ( Character *ch )
 		if ( c >= 0 )
 		{
 			ch->Send ( "   clan deposit    <amount>\r\n" );
-                        ch->Send ( "   clan deposit    <gold/silver/bronze> <amount>\r\n");
+			ch->Send ( "   clan deposit    <gold/silver/bronze> <amount>\r\n");
 			if ( r >= clan[c].privilege[CP_WITHDRAW] ) {
 				ch->Send ( "   clan withdraw   <amount>\r\n" );
-                                ch->Send ( "   clan withdraw   <gold/silver/bronze> <amount>\r\n");
-                        }
+				ch->Send ( "   clan withdraw   <gold/silver/bronze> <amount>\r\n");
+			}
 			if ( r >= clan[c].privilege[CP_ENROLL] )
 				ch->Send ( "   clan enroll     <player>\r\n" );
 			if ( r >= clan[c].privilege[CP_EXPEL] )
@@ -132,7 +132,6 @@ void send_clan_format ( Character *ch )
 				ch->Send ( "   clan set ranks  <rank>\r\n"
 				           "   clan set title  <rank> <title>\r\n"
 				           "   clan set privilege  <privilege> <rank>\r\n" );
-
 		}
 	}
 }

@@ -1405,39 +1405,31 @@ ACMD(do_ctell) {
     Descriptor *i;
     int minlev = 1, c = 0;
     char level_string[128] = "";
+	char clan_name[MAX_STRING_LENGTH];
 
     skip_spaces(&argument);
     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
         return;
     /*
      * The syntax of ctell for imms is different then for morts
-     * mort: ctell <bla bla bla>    imms: ctell <clan_num> <bla bla bla>
+     * mort: ctell <bla bla bla>    imms: ctell <clan> <bla bla bla>
      * Imms cannot actually see ctells but they can send them
      *
      */
     if (GET_LEVEL(ch) >= LVL_GOD) {
-        c=-1;
-        if(!isdigit(*argument) && !(*argument=='-')) {
-            *ch << "Please specify the clannumber.\r\n";
+        half_chop ( argument, clan_name, argument );
+        c = find_clan ( clan_name );
+        if ( c == -1 )
+        {
+            ch->Send ( "There is no clan with that name.\r\n" );
             return;
         }
-        c = atoi (argument);
-        if ((c < 0) || ((unsigned int)c >= clan.size())) {
-            *ch << "There is no clan with that number.\r\n";
-            return;
-        } else {
-            while ((*argument != ' ') && (*argument != '\0'))
-                argument++;
-            while (*argument == ' ')
-                argument++;
-        }
-
-    } else
-
-        if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0) {
+    }
+    else if ((c = find_clan_by_id(GET_CLAN(ch))) == -1 || GET_CLAN_RANK(ch) == 0) {
             *ch << "You're not part of a clan.\r\n";
             return;
         }
+
     if (PRF_FLAGGED(ch, PRF_NOCTALK)) {
         *ch << "You can now hear you clan again.\r\n";
         REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_NOCTALK);

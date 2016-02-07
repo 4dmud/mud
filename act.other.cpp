@@ -1792,6 +1792,7 @@ ACMD ( do_file )
 	if ( !*argument )
 	{
 		ch->Send ( "USAGE: file <option> <num lines>\r\n"
+			   "       file <option> search <search phrase>\r\n"
 			   "       file <bug|typo> fixed <line number>\r\n"
 			   "       file <bug|typo> [all] <num lines>\r\n\r\n"
 			   "File options:\r\n" );
@@ -1855,6 +1856,24 @@ ACMD ( do_file )
 		fclose ( req_file );
 	}
 
+	if ( !strcmp ( arg2, "search" ) )
+	{
+		string text = "";
+		int len = strlen ( arg3 );
+		for ( auto &e : entries )
+			if ( search ( e.begin(), e.end(), arg3, arg3 + len, [](char c1, char c2) { return toupper ( c1 ) == toupper ( c2 ); } ) != e.end() )
+				text += "\r\n" + e;
+
+		if ( text == "" )
+			ch->Send ( "No matches found.\r\n" );
+		else
+		{
+			text += "\r\n";
+			page_string ( ch->desc, (char*) text.c_str(), 1 );
+		}
+		return;
+	}
+
 	/* toggle (fixed) in bug or typo file */
 
 	if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
@@ -1882,8 +1901,7 @@ ACMD ( do_file )
 
 		if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
 		{
-			new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.",
-			             fields[l].file.c_str() );
+			new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.", fields[l].file.c_str() );
 			return;
 		}
 
@@ -1910,6 +1928,11 @@ ACMD ( do_file )
 	}
 	else if ( !*arg2 )
 		req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
+	else if ( !is_number ( arg2 ) )
+	{
+		ch->Send ( "Usage error: expected a number, but got %s.\r\n", arg2 );
+		return;
+	}
 	else
 		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
 
