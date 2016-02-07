@@ -2146,8 +2146,8 @@ ACMD ( do_enter )
 							if ( RIDDEN_BY ( ch ) && IN_ROOM ( RIDDEN_BY ( ch ) ) == was_in )
 							{
 								move_char_to ( RIDDEN_BY ( ch ), IN_ROOM ( ch ) );
-								act ( "$N rides through on you.", FALSE, RIDDEN_BY ( ch ), 0, ch, TO_CHAR );
-								act ( "You ride through on $n.", FALSE, RIDDEN_BY ( ch ), 0, ch, TO_VICT );
+								act ( "$n rides through on you.", FALSE, RIDDEN_BY ( ch ), 0, ch, TO_VICT );
+								act ( "You ride through on $N.", FALSE, RIDDEN_BY ( ch ), 0, ch, TO_CHAR );
 								LOOK ( RIDDEN_BY ( ch ) );
 							}
 							followers_to_master ( ch, was_in );
