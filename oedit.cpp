@@ -838,15 +838,6 @@ void oedit_disp_val3_menu ( Descriptor *d )
                         d->Output("Shield (1 - weakest, 100 - toughest) : ");
                         break;
 */
-		case ITEM_CLIMBABLE:
-		case ITEM_DESCENDABLE:
-		case ITEM_PORTAL:
-		case ITEM_PORTAL_BUSH:
-		case ITEM_PORTAL_WATER:
-		case ITEM_PORTAL_HOLE:
-		case ITEM_PORTAL_HURDLE:
-			d->Output ( "Timer, -1 for infinite : " );
-			break;
 		case ITEM_SPACEBIKE:
 			d->Output ( "It costs 1 fuel per room in space to move.\r\nCurrent Fuel:" );
 			break;
