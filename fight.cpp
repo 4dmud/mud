@@ -319,6 +319,7 @@ int skill_roll ( Character *ch, int skill_num );
 ACMD ( do_sac );
 
 /* External procedures */
+void add_event2 ( int delay, EVENT2(*func), void *causer, void *victim, void *info );
 char *str_udup(const char *txt);
 void spill_gold ( Character *ch );
 void add_corpse_to_list ( OBJ_DATA *corpse );
@@ -5196,6 +5197,33 @@ void stop_fighting ( Character* ch )
 	return;
 }
 
+EVENT2 ( deliver_bodybag )
+{
+	obj_data *corpse = ( obj_data* ) causer;
+	Room *room = ( Room* ) victim;
+
+	if ( !corpse )
+	{
+		new_mudlog ( CMP, LVL_GOD, TRUE, "SYSERR: a bodybag is empty!" );
+		return;
+	}
+
+	for ( Descriptor *d = descriptor_list; d; d = d->next )
+		if ( STATE (d ) == CON_PLAYING && d->character && IN_ROOM ( d->character ) == room )
+			d->character->Send ( "A rescue team arrives, puts the corpse into a bodybag and heads for the\r\nemergency room.\r\n" );
+
+	obj_from_room ( corpse );
+	obj_to_room ( corpse, world_vnum[ 1205 ] ); // move corpse to The Emergency Room
+	REMOVE_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NPC_CORPSE );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_PC_CORPSE );
+	add_corpse_to_list ( corpse );
+	save_corpses();
+
+	for ( Descriptor *d = descriptor_list; d; d = d->next )
+		if ( STATE (d ) == CON_PLAYING && d->character && IN_ROOM ( d->character ) == world_vnum[ 1205 ] )
+			d->character->Send ( "A rescue team arrives, removes a corpse from a bodybag, and rushes out to\r\nanother job.\r\n" );
+}
+
 void make_corpse ( Character *ch, Character *killer )
 {
 	struct obj_data *corpse = NULL, *o, *next_obj;
@@ -5370,9 +5398,9 @@ void make_corpse ( Character *ch, Character *killer )
 		}
 
 		if ( use_bodybag )
-			obj_to_room ( corpse, world_vnum[ 1205 ] ); // put corpse in 1205. 4D Infirmary
-		else
-			obj_to_room ( corpse, IN_ROOM ( ch ) );
+			add_event2 ( 10, deliver_bodybag, corpse, IN_ROOM ( ch ), 0 );
+
+		obj_to_room ( corpse, IN_ROOM ( ch ) );
 
 		if ( !IS_NPC ( ch ) )
 		{
