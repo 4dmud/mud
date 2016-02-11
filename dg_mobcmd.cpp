@@ -792,15 +792,18 @@ ACMD(do_mload) {
         }
 
         /* special handling to make objects able to load on a person/in a container/worn etc. */
-        if (!target || !*target) {
+		if (!target || !*target) {
 			if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
 				if (IN_ROOM(ch))
 					mob_log(ch, "[TOKEN] loads %s in %d", object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
 			}
-            obj_to_char(object, ch);
-            load_otrigger(object);
-            return;
-        }
+			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+				obj_to_room ( object, IN_ROOM ( ch ) );
+			else
+				obj_to_char ( object, ch );
+			load_otrigger(object);
+			return;
+		}
 
 		/* load to char */
         two_arguments(target, arg1, arg2); /* recycling ... */
