@@ -445,8 +445,8 @@ void affect_modify ( Character *ch, sbyte loc, int mod,
 
 
 		default:
-			log ( "SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).",
-			      loc, __FILE__ );
+			log ( "SYSERR: Unknown apply adjust %d attempt for [%d] %s by %s",
+			      loc, GET_MOB_VNUM ( ch ), GET_NAME ( ch ), __func__ );
 			break;
 
 	}                 /* switch */
@@ -455,7 +455,6 @@ void affect_modify ( Character *ch, sbyte loc, int mod,
 
 void aff_apply_modify ( Character *ch, sbyte loc, int mod, char *msg )
 {
-
 
 	switch ( loc )
 	{
@@ -589,8 +588,8 @@ void aff_apply_modify ( Character *ch, sbyte loc, int mod, char *msg )
 			break;
 
 		default:
-			log ( "SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).",
-			      loc, __FILE__ );
+			log ( "SYSERR: Unknown apply adjust %d attempt for [%d] %s by %s",
+			      loc, GET_MOB_VNUM ( ch ), GET_NAME ( ch ), __func__ );
 			break;
 
 	}                 /* switch */
