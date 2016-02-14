@@ -1094,7 +1094,54 @@ int times = 1;
 // Remarking this spell out till we can figure out what is wrong -- Prom
 
 ASPELL(spell_minor_identify) {
-	ch->Send( "Try this spell later. \r\n" );
+	ch->Send ( "\r\n" );
+	if ( GET_OBJ_MAX_QUALITY ( obj ) == 0 )
+		ch->Send ( "Max. Quality: 0\r\n" );
+	else
+	{
+		ch->Send ( "Quality: %s (%.2f%%)\r\n", QUALITY_NAME ( obj ), GET_OBJ_QUALITY ( obj ) );
+		ch->Send ( "Max. Quality: %.2f%%\r\n", GET_OBJ_MAX_QUALITY ( obj ) );
+		ch->Send ( "Number of repairs: %d\r\n", GET_OBJ_REPAIRS ( obj ) );
+	}
+
+	ch->Send ( "Material: %s\r\n", material_name ( GET_OBJ_MATERIAL ( obj ) ) );
+	ch->Send ( "Material group: %s\r\n", material_group_names [ material_groups [ GET_OBJ_MATERIAL ( obj ) ] ] );
+
+	ch->Send ( "Origin: " );
+	if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SOFTWOOD )
+		ch->Send ( "%s, hardwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SPECIALWOOD )
+		ch->Send ( "%s, softwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FRUITWOOD )
+		ch->Send ( "%s, specialwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_JUNKWOOD )
+		ch->Send ( "%s, fruitwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_LARGE_ANIMAL )
+		ch->Send ( "%s, junkwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_REPTILE )
+		ch->Send ( "%s, large animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SMALL_ANIMAL )
+		ch->Send ( "%s, reptile", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_NORMAL_ANIMAL )
+		ch->Send ( "%s, small animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FURRY_ANIMAL )
+		ch->Send ( "%s, normal animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( obj ) < NUM_ORIGIN_NAMES )
+		ch->Send ( "%s, furry animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+	else if ( GET_OBJ_ORIGIN ( obj ) == 0 )
+		ch->Send ( "none" );
+	else ch->Send ( "out of range" );
+
+	ch->Send ( "\r\n" );
+	if ( GET_OBJ_COLOUR ( obj ) > 0 && GET_OBJ_COLOUR ( obj ) < NUM_COLOUR_NAMES )
+		ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( obj )] );
+	else if ( GET_OBJ_COLOUR ( obj ) == 0 )
+		ch->Send ( "Colour: none\r\n" );
+	else ch->Send ( "Colour: out of range\r\n" );
+
+	ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( obj ) );
+	ch->Send ( "Stage: %d\r\n", GET_OBJ_STAGE ( obj ) );
+
 //    const char *min_id[] = {
 //                         "It would bring %s if you sold it!\r\n",    /* NONE */
 //                         "your physique!\r\n",   /* STR */

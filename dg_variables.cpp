@@ -3290,8 +3290,10 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 					if ( !strcasecmp ( field, "quality_value" ) )
 					{
 						if ( subfield && *subfield )
+						{
 							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, atof ( subfield ), GET_OBJ_MAX_QUALITY ( o ) );
-						update_affects ( o );
+							update_affects ( o );
+						}
 						snprintf ( str, slen, "%d", (int) GET_OBJ_QUALITY ( o ) );
 					}
 
