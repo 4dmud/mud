@@ -488,11 +488,15 @@ OCMD ( do_opurge )
 	{
 //***** so will get_obj_by_obj!
 		o = get_obj_by_obj ( obj, arg );
-		if ( o && !( IN_ROOM ( o ) && ( OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) || ROOM_FLAGGED ( IN_ROOM ( o ), ROOM_HOUSE ) ) ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
+		if ( o )
 		{
 			if ( o == obj )
+			{
 				dg_owner_purged = 1;
-			extract_obj ( o );
+				extract_obj ( o );
+			}
+			else if ( !( IN_ROOM ( o ) && ( OBJ_FLAGGED ( o, ITEM_CRASHPROOF ) || ROOM_FLAGGED ( IN_ROOM ( o ), ROOM_HOUSE ) ) ) && !OBJ_FLAGGED ( o, ITEM_PC_CORPSE ) )
+				extract_obj ( o );
 		}
 		else
 			obj_log ( obj, "opurge: bad argument" );
