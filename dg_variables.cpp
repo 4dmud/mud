@@ -3304,7 +3304,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 						if ( subfield && *subfield )
 						{
 							num = atoi ( subfield );
-							GET_OBJ_QUALITY ( o ) = IRANGE ( 0, num, GET_OBJ_MAX_QUALITY ( o ) );
+							GET_OBJ_MAX_QUALITY ( o ) = IRANGE ( 0, num, GET_OBJ_MAX_QUALITY ( o ) );
+							GET_OBJ_QUALITY ( o ) = GET_OBJ_MAX_QUALITY ( o );
 							if ( GET_OBJ_TYPE ( o ) == ITEM_BODYBAG && GET_OBJ_QUALITY ( o ) >= 10 )
 							{
 								string shortdesc = string ( o->short_description );
