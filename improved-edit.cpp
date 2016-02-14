@@ -86,7 +86,10 @@ int improved_editor_execute(Descriptor *d, char *str)
     parse_action(PARSE_REPLACE, actions, d);
     break;
   case 's':
-    return STRINGADD_SAVE;
+    if ( format_script ( d ) )
+      return STRINGADD_SAVE;
+    else
+      return STRINGADD_OK;
   default:
     d->Output( "Invalid option.\r\n");
     break;

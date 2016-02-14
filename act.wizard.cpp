@@ -1232,6 +1232,12 @@ ACMD ( do_goto )
 	if ( ( location = find_target_room ( ch, argument ) ) < 0 )
 		return;
 
+	if ( location == IN_ROOM ( ch ) )
+	{
+		ch->Send ( "You're already there.\r\n" );
+		return;
+	}
+
 	if ( POOFOUT ( ch ) )
 		snprintf ( buf, sizeof ( buf ), "%s", POOFOUT ( ch ) );
 	else
