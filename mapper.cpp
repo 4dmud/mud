@@ -517,7 +517,7 @@ void draw_map( Character *ch)
 
       /* Skip if coords fall outside map */
       if ( BOUNDARY ( exitx, exity ) || BOUNDARY ( roomx, roomy ) )
-        continue;
+        break;
 
       snprintf ( amap[roomx][roomy].tegn, 3, "%d", SECTOR ( r ) );
       x = roomx;
