@@ -28,8 +28,8 @@ struct auction_data *auction;
 void free_auction(struct auction_data *auc);
 void auction_forfeit(Character *mob);
 void auction_reset(void);
-int is_on_block(struct obj_data *obj);
-struct obj_data *check_obj(Character *ch, struct obj_data *obj);
+bool is_on_block(struct obj_data *obj);
+struct obj_data *check_obj(Character *ch, long obj_id);
 Character *check_ch(Character *ch);
 void show_auction_status(Character *ch);
 ACMD(do_gen_comm);
@@ -58,7 +58,7 @@ int valid_auction(struct auction_data *ac)
     return FALSE;
   if (check_ch(ac->seller) == NULL)
     return FALSE;
-  if (check_obj(ac->seller, ac->obj) == NULL)
+  if (check_obj(ac->seller, ac->obj_uid) == NULL)
     return FALSE;
   return TRUE;     /* Auction is ok to go. */
 }
@@ -90,7 +90,7 @@ void auction_update(void)
     auction_reset();
     return;
   /* Seller's object? */
-  } else if (!check_obj(auction->seller, auction->obj)) {
+  } else if (!check_obj(auction->seller, auction->obj_uid)) {
     auction_forfeit(mob);
     return;
   /* Make sure bidder exists */
@@ -141,7 +141,7 @@ void auction_update(void)
 
     /* Make sure object exists */
     
-    if ((auction->obj = check_obj(auction->seller, auction->obj))) {
+    if ((auction->obj = check_obj(auction->seller, auction->obj_uid))) {
       if (auction->bidder->Gold(0, GOLD_HAND) < auction->bid) {
         act("You cannot afford to buy the $p from $N. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_CHAR);
         act("$n cannot afford to buy the $p from you. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_VICT);
@@ -281,7 +281,7 @@ ACMD(do_auction)
   Character *mob = get_char_auc((char *)AUC_MOB);
   struct auction_data *auc_add;
   char buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
-  int i = 0;
+  int i = 1;
 
   two_arguments(argument, buf1, buf2);
   if(GET_RACE(ch) == RACE_GLADIATOR) {
@@ -328,11 +328,12 @@ ACMD(do_auction)
     auc_add->next = NULL;
     if (n_auc)
       n_auc->next = auc_add;
-    else
+    else {
       auction = auc_add;     /* Making the list. */
+      i = 0;
+    }
     if (i)
-    ch->Send( "Auction noted, currently %d item%sahead of yours.\r\n",
-    i, i == 1 ? " " : "s ");
+      ch->Send( "Auction noted, currently %d item%sahead of yours.\r\n", i, i == 1 ? " " : "s ");
     else
       ch->Send( "Auction noted.\r\n");
   }
@@ -347,12 +348,12 @@ void auction_reset(void)
   auction->bid = 0;
 }
 
-struct obj_data *check_obj(Character *ch, struct obj_data *obj)
+struct obj_data *check_obj ( Character *ch, long obj_id )
 {
   struct obj_data *ch_obj;
 
-  for (ch_obj = ch->carrying; ch_obj; ch_obj = ch_obj->next_content)
-    if (ch_obj->item_number == obj->item_number)
+  for ( ch_obj = ch->carrying; ch_obj; ch_obj = ch_obj->next_content )
+    if ( GET_ID ( ch_obj ) == obj_id )
       return ch_obj;
 
   return NULL;
@@ -371,12 +372,12 @@ void auction_forfeit(Character *mob)
   auction->seller->Send("A small daemon pops in, takes some gold, and taunts you.\r\n" );
   act("A small daemon pops in, takes some gold from $n, and sticks its tongue out at $m.",
     FALSE, auction->seller, auction->obj, 0, TO_ROOM);
-    // New code from Fizban changed by Prometheus
-    if (GET_GOLD(auction->seller) >= auction->bid)
-	GET_GOLD(auction->seller) -= auction->bid;
-    else
-        GET_GOLD(auction->seller) = 0;  
-	auction_reset();
+  // New code from Fizban changed by Prometheus
+  if (GET_GOLD(auction->seller) >= auction->bid)
+	  GET_GOLD(auction->seller) -= auction->bid;
+  else
+      GET_GOLD(auction->seller) = 0;
+  auction_reset();
 }
 
 void show_auction_status(Character *ch)
@@ -402,15 +403,15 @@ void show_auction_status(Character *ch)
         auc->bidder ? GET_NAME(auc->bidder) : "no one");
 }
 
-int is_on_block(struct obj_data *obj)
+bool is_on_block(struct obj_data *obj)
 {
   struct auction_data *auc;
 
   for(auc = auction; auc; auc = auc->next)
     if (auc->obj == obj)
-      return 1;
+      return TRUE;
 
-  return 0;
+  return FALSE;
 }
 
 void free_auction(struct auction_data *auc)
