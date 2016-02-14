@@ -363,18 +363,41 @@ ACMD ( do_map )
 	/* starts the mapping with the center room */
 	MapArea ( IN_ROOM ( ch ), ch, center, center, min, max, TRUE, TRUE );
 
-	/* make sure the rooms e,s,w are correct */
+	/* make sure the rooms in the cardinal directions are correct */
+	y = center;
+	x = center + 1;
 	r = visible_room ( IN_ROOM ( ch ), EAST, &two_way );
-	if ( r != NULL )
-		mapgrid[center][center+1] = r->sector_type;
+	while ( r != NULL && x < MAX_MAP )
+	{
+		mapgrid[y][x++] = r->sector_type;
+		r = visible_room ( r, EAST, &two_way );
+	}
 
-	r = visible_room ( IN_ROOM ( ch ), SOUTH, &two_way );
-	if ( r != NULL )
-		mapgrid[center+1][center] = r->sector_type;
-
+	x = center - 1;
 	r = visible_room ( IN_ROOM ( ch ), WEST, &two_way );
-	if ( r != NULL )
-		mapgrid[center][center-1] = r->sector_type;
+	while ( r != NULL && x >= 0 )
+	{
+		mapgrid[y][x--] = r->sector_type;
+		r = visible_room ( r, WEST, &two_way );
+	}
+
+	y = center - 1;
+	x = center;
+	r = visible_room ( IN_ROOM ( ch ), NORTH, &two_way );
+	while ( r != NULL && y < MAX_MAP )
+	{
+		mapgrid[y--][x] = r->sector_type;
+		r = visible_room ( r, NORTH, &two_way );
+	}
+
+	y = center + 1;
+	x = center;
+	r = visible_room ( IN_ROOM ( ch ), SOUTH, &two_way );
+	while ( r != NULL && y < MAX_MAP )
+	{
+		mapgrid[y++][x] = r->sector_type;
+		r = visible_room ( r, SOUTH, &two_way );
+	}
 
 	/* show text-based map */
 	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )

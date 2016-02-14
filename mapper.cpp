@@ -491,8 +491,41 @@ void draw_map( Character *ch)
   amap[x][y].tegn[0] = 'X';
   amap[x][y].tegn[1] = '\0';
 
-  /* Send the map */
+  /* Make sure the symbols in the cardinal directions are correct */
+  Room *r;
+  int exitx, exity, roomx, roomy;
+  bool two_way;
+  for( int door = 0; door < NUM_OF_DIRS; door++ )
+  {
+    if (door == UP || door == DOWN)
+      continue;
 
+    r = IN_ROOM ( ch );
+    x = MAPX / 2;
+    y = MAPY / 2;
+
+    while ( TRUE )
+    {
+      r = visible_room ( r, door, &two_way );
+
+      if ( r == NULL )
+        break;
+
+      /* Get the coords for the next exit and room in this direction */
+      get_exit_dir ( door, &exitx, &exity, x, y );
+      get_exit_dir ( door, &roomx, &roomy, exitx, exity );
+
+      /* Skip if coords fall outside map */
+      if ( BOUNDARY ( exitx, exity ) || BOUNDARY ( roomx, roomy ) )
+        continue;
+
+      snprintf ( amap[roomx][roomy].tegn, 3, "%d", SECTOR ( r ) );
+      x = roomx;
+      y = roomy;
+    }
+  }
+
+  /* Send the map */
   show_map(ch, FALSE);
 }
 
