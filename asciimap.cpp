@@ -384,14 +384,13 @@ ACMD ( do_map )
 	y = center - 1;
 	x = center;
 	r = visible_room ( IN_ROOM ( ch ), NORTH, &two_way );
-	while ( r != NULL && y < MAX_MAP )
+	while ( r != NULL && y >= 0 )
 	{
 		mapgrid[y--][x] = r->sector_type;
 		r = visible_room ( r, NORTH, &two_way );
 	}
 
 	y = center + 1;
-	x = center;
 	r = visible_room ( IN_ROOM ( ch ), SOUTH, &two_way );
 	while ( r != NULL && y < MAX_MAP )
 	{
