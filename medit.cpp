@@ -1422,26 +1422,26 @@ void medit_parse ( Descriptor *d, char *arg )
 			break;
 
 		case MEDIT_LEVEL:
-			GET_LEVEL ( OLC_MOB ( d ) ) = LIMIT ( i, 1, MAX_MOB_LEVELS - 1 );
-			GET_HITROLL ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].hitroll;
-			GET_DAMROLL ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].dam_bonus;
-			GET_NDD ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].dam_dice;
-			GET_SDD ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].dam_sides;
-			GET_HIT ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].hp_dice;
-			GET_MANA ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].hp_sides;
-			GET_MOVE ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].hp_bonus;
-			GET_AC ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS- 1 ) ].ac;
-			GET_EXP ( OLC_MOB ( d ) ) = mob_stats[IRANGE ( 1,atoi ( arg ), MAX_MOB_LEVELS - 1 ) ].exp;
+			i = IRANGE ( 1, i, MAX_MOB_LEVELS - 1 );
+			GET_LEVEL ( OLC_MOB ( d ) ) = i;
+			GET_HITROLL ( OLC_MOB ( d ) ) = mob_stats[i].hitroll;
+			GET_DAMROLL ( OLC_MOB ( d ) ) = mob_stats[i].dam_bonus;
+			GET_NDD ( OLC_MOB ( d ) ) = mob_stats[i].dam_dice;
+			GET_SDD ( OLC_MOB ( d ) ) = mob_stats[i].dam_sides;
+			GET_HIT ( OLC_MOB ( d ) ) = mob_stats[i].hp_dice;
+			GET_MANA ( OLC_MOB ( d ) ) = mob_stats[i].hp_sides;
+			GET_MOVE ( OLC_MOB ( d ) ) = mob_stats[i].hp_bonus;
+			GET_AC ( OLC_MOB ( d ) ) = mob_stats[i].ac;
+			GET_EXP ( OLC_MOB ( d ) ) = mob_stats[i].exp;
 			if ( GET_MRACE ( OLC_MOB ( d ) ) == MOB_RACE_ANIMAL || GET_MRACE ( OLC_MOB ( d ) ) == MOB_RACE_EXOTIC )
 				GET_GOLD ( OLC_MOB ( d ) ) = 0;
 			else
-				GET_GOLD ( OLC_MOB ( d ) ) = ( mob_stats[atoi ( arg ) ].gold / 2 );
+				GET_GOLD ( OLC_MOB ( d ) ) = ( mob_stats[i].gold / 2 );
 			break;
 		case MEDIT_ALIGNMENT:
 			GET_ALIGNMENT ( OLC_MOB ( d ) ) = LIMIT ( i, -1000, 1000 );
 			break;
 		case MEDIT_RACE:
-			i = 0;
 			i = GET_LEVEL ( OLC_MOB ( d ) );
 			GET_MRACE ( OLC_MOB ( d ) ) = MAX ( 0, MIN ( 3, atoi ( arg ) ) );
 			if ( GET_MRACE ( OLC_MOB ( d ) ) == MOB_RACE_ANIMAL || GET_MRACE ( OLC_MOB ( d ) ) == MOB_RACE_EXOTIC )
