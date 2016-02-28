@@ -176,7 +176,7 @@ struct trig_data {
     int depth;			/* depth into nest ifs/whiles/etc  */
     int loops;			/* loop iteration counter          */
     struct event *wait_event;	/* event to pause the trigger      */
-    ubyte purged;		/* trigger is set to be purged     */
+    bool remove_me; /* remove trigger when it finishes */
     struct trig_var_data *var_list;	/* list of local vars for trigger  */
     /** for script functions **/
     struct trig_data *parent; /* this is the trigger that is running this script */

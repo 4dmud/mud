@@ -25,6 +25,7 @@
 /* prototype externally defined functions */
 //extern const char *trig_types[], *otrig_types[], *wtrig_types[];
 zone_rnum real_zone_by_thing(room_vnum vznum);
+int remove_trigger ( struct script_data *sc, char *name );
 /*locals*/
 void trigedit_disp_menu(Descriptor *d);
 void trigedit_disp_types(Descriptor *d);
@@ -484,7 +485,7 @@ void trigedit_save(Descriptor *d) {
                 }
 
                 live_trig->cmdlist = proto->cmdlist;
-                live_trig->curr_state = live_trig->cmdlist;
+                live_trig->curr_state = NULL;
                 live_trig->trigger_type = proto->trigger_type;
                 live_trig->attach_type = proto->attach_type;
                 live_trig->narg = proto->narg;
@@ -963,4 +964,50 @@ int format_script(Descriptor *d) {
     free(sc);
 
     return TRUE;
+}
+
+void update_live_triggers ( vector<int> &ops, vector<int> &nps, script_data **sc )
+{
+	// remove triggers that were in the old proto script, but not in the new
+	if ( *sc && ops.size() > 0 )
+	{
+		for ( const auto &i : ops )
+			if ( find ( nps.begin(), nps.end(), i ) == nps.end() )
+			{
+				for ( trig_data *t = TRIGGERS ( *sc ); t; t = t->next )
+					// remove running triggers when they're done
+					if ( GET_TRIG_VNUM ( t ) == i )
+					{
+						if ( t->curr_state )
+							t->remove_me = TRUE;
+						else
+							remove_trigger ( *sc, (char*) to_string ( i ).c_str() );
+						break;
+					}
+			}
+	}
+
+	// add triggers that weren't in the old proto script, but are in the new
+	if ( nps.size() > 0 )
+	{
+		for ( const auto &i : nps )
+			if ( find ( ops.begin(), ops.end(), i ) == ops.end() )
+			{
+				bool has_trig = FALSE;
+				if ( *sc )
+				{
+					for ( trig_data *t = TRIGGERS ( *sc ); t; t = t->next )
+						if ( GET_TRIG_VNUM ( t ) == i )
+						{
+							has_trig = TRUE;
+							break;
+						}
+				}
+				else
+					CREATE ( *sc, script_data, 1 );
+
+				if ( !has_trig )
+					add_trigger ( *sc, read_trigger ( real_trigger ( i ) ), 0 );
+			}
+	}
 }

@@ -70,8 +70,8 @@
  * Limit information.
  */
 
- 
- 
+
+
 const int MAX_ROOM_NAME	= 75;
 const int MAX_MOB_NAME	= 50;
 const int MAX_OBJ_NAME	= 50;
@@ -162,8 +162,8 @@ struct oasis_olc_data {
   struct trig_data *trig;
   struct vehicle_data *vehicle;
   int script_mode;
-  int trigger_position;          
-  int item_type;                 
+  int trigger_position;
+  int item_type;
   vector<int> *script; /* for assigning triggers in [r|o|m]edit*/
 
   struct assembly_data *OlcAssembly; /* used for 'assedit'         */
@@ -457,7 +457,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define SEDIT_SHOP_FLAGS		35
 #define SEDIT_NOTRADE			36
 
-/* 
+/*
  * Submodes of CEDIT connectedness.
  */
 #define CEDIT_MAIN_MENU			0
@@ -578,7 +578,7 @@ void hedit_setup_existing(Descriptor *d, int rnum);
 void hedit_save_to_disk(Descriptor *d);
 int  hedit_find_entry(char *keyword);
 void hedit_save_internally(Descriptor *d);
- 
+
 void medit_free_mobile(Character *mob);
 void medit_setup_new(Descriptor *d);
 void medit_setup_existing(Descriptor *d, int rmob_num);

@@ -70,7 +70,6 @@ struct obj_data *make_tree ( int v0, int v1, int v2 )
 
 	GET_OBJ_TYPE ( final_tree ) = ITEM_TREE;
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_tree ), ITEM_GLOW );
-	//SET_BIT_AR(GET_OBJ_EXTRA(final_tree), ITEM_UNIQUE_SAVE);
 	if ( v0 )         //time of creation
 		GET_OBJ_VAL ( final_tree, 0 ) = v0;
 	else

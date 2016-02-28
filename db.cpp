@@ -1311,21 +1311,6 @@ void reset_time ( void )
 	      time_info.day, time_info.month, time_info.year );
 }
 
-void free_extra_descriptions ( struct extra_descr_data *edesc )
-{
-	struct extra_descr_data *enext;
-
-	for ( ; edesc; edesc = enext )
-	{
-		enext = edesc->next;
-
-		free ( edesc->keyword );
-		free ( edesc->description );
-		free ( edesc );
-		edesc = NULL;
-	}
-}
-
 /* Write the time in 'when' to the MUD-time file. */
 void save_mud_time ( struct time_info_data *when )
 {
@@ -4103,9 +4088,8 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 
 	obj = create_obj ( i );
 
-	if ( obj_index[i].qic )  {
+	if ( obj_index[i].qic )
  		log ( "%s created", obj->short_description );
-  } 
 
 	obj_index[i].number++;
 	generate_weapon ( obj );
@@ -4113,9 +4097,9 @@ struct obj_data *read_object ( obj_vnum nr, int type )                  /* and o
 	assign_triggers ( obj, OBJ_TRIGGER );
 	objNames.addNamelist(obj->name, GET_ID(obj));
 
-        /* New vehicle code by Horus                     *
-         * If its vehicle, load the room for the vehicle */
-
+	/* New vehicle code by Horus
+	 * If it's a vehicle2, load the room for the vehicle
+	 */
 	if ( GET_OBJ_TYPE ( obj ) == ITEM_VEHICLE2 )
 		create_vehicle_room ( obj );
 
@@ -6904,10 +6888,11 @@ int my_obj_save_to_disk ( FILE * fp, struct obj_data *obj, int locate )
 		  GET_OBJ_TIMER ( obj), // make sure the right timer is saved
 		  GET_OBJ_INNATE ( obj ) );
 
-	if ( ! ( OBJ_FLAGGED ( obj, ITEM_UNIQUE_SAVE ) ) )
+	if ( ! ( OBJ_FLAGGED ( obj, ITEM_UNIQUE_SHORTDESC ) ) )
 	{
 		return 1;
 	}
+
 	fprintf ( fp,
 	          "XAP\n"
 	          "%s~\n"
@@ -6983,7 +6968,7 @@ int read_xap_objects ( FILE * fl, Character *ch )
 			{
 				temp = create_obj();
 				temp->item_number = NOTHING;
-				SET_BIT_AR ( GET_OBJ_EXTRA ( temp ), ITEM_UNIQUE_SAVE );
+				SET_BIT_AR ( GET_OBJ_EXTRA ( temp ), ITEM_UNIQUE_SHORTDESC );
 			}
 			else if ( nr < 0 )
 			{

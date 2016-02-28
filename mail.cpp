@@ -660,7 +660,6 @@ void postmaster_receive_mail(Character *ch,
 		("Mail system error - please report.  Error #11.\r\n");
 
 	/* so it saves */
-	SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
 	SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NO_LOCATE);
 
 

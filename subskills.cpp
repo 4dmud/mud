@@ -981,7 +981,6 @@ ACMD(do_ignite) {
     GET_OBJ_WAS(sabre) = GET_OBJ_VNUM(hilt);
     GET_OBJ_TYPE(sabre) = ITEM_WEAPON;
     SET_BIT_AR(GET_OBJ_EXTRA(sabre), ITEM_HUM);
-    SET_BIT_AR(GET_OBJ_EXTRA(sabre), ITEM_UNIQUE_SAVE);
     SET_BIT_AR(GET_OBJ_EXTRA(sabre), ITEM_LIGHTSABRE);
     GET_OBJ_VAL(sabre, 0) = GET_OBJ_VNUM(hilt);
     GET_OBJ_VAL(sabre, 1) = GET_OBJ_VAL(hilt, 1);

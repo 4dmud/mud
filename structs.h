@@ -1123,7 +1123,7 @@ class Room;
 #define ITEM_PC_CORPSE        32   /* Item is a players corpse         */
 #define ITEM_NPC_CORPSE       33   /* Item is a NPC corpse             */
 #define ITEM_ARTIFACT         34   /* Item is an Artifact - QIC        */
-#define   ITEM_UNIQUE_SAVE    35   /* Item is unique                   */
+#define ITEM_UNIQUE_SHORTDESC 35   /* Item's shortdesc is unique       */
 #define ITEM_NO_LOCATE        36   /* Item can't be located with spell */
 #define ITEM_HIDDEN           37   /* Item is hidden                   */
 #define ITEM_POISONED_1       38   /* Item has been poisoned           */
@@ -1609,7 +1609,7 @@ struct obj_data {
     long owner;
     obj_vnum skin; /* for if it is a corpse */
     struct travel_point_data *travel_list;
-    struct ident_list *idents;
+    struct ident_list *idents; /* ids of players who identified this object */
     struct vehicle_attachment_data *attachment;   /* attachments for vehicle */
     Character *following;    /* for floating discs, carts, etc */
     char extracted;

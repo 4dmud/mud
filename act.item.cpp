@@ -3184,7 +3184,6 @@ OBJ_DATA * create_vial ( void )
 	vial = create_obj ( NOTHING );
 
 	GET_OBJ_TYPE ( vial ) = ITEM_VIAL;
-	SET_BIT_AR ( GET_OBJ_EXTRA ( vial ), ITEM_UNIQUE_SAVE );
 	GET_OBJ_VAL ( vial, 0 ) = type;
 	GET_OBJ_VAL ( vial, 1 ) = number ( 0, size );
 	GET_OBJ_VAL ( vial, 2 ) = size;
@@ -3216,12 +3215,9 @@ void update_timer ( struct obj_data *obj )
 	if ( GET_TIMER_EVENT ( obj ) == NULL ||
 	        ( t < event_time ( GET_TIMER_EVENT ( obj ) ) ) )
 	{
-
 		/* take off old event, create updated event */
 		if ( GET_TIMER_EVENT ( obj ) != NULL )
 			event_cancel ( GET_TIMER_EVENT ( obj ) );
-		else
-			GET_TIMER_EVENT ( obj ) = NULL;
 
 		tmr = new timer_event_data ( obj );
 		GET_TIMER_EVENT ( obj ) = event_create ( timer_event, tmr, t, EVENT_TYPE_TIMER );

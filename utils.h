@@ -75,7 +75,7 @@ struct room_affected_type *is_room_affected(Room *rm, int type);
 #define divide_2(a)  (a>>1)
 #define mult_2(a)     (a<<1)
 
-#define IS_UNIQUE(obj) (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE))
+#define IS_UNIQUE(obj) (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SHORTDESC))
 
 #define IS_ELEMENTAL(ch) ((MOB_FLAGGED(ch, MOB_ELEM_EARTH)|| (MOB_FLAGGED(ch, MOB_ELEM_AIR))||(MOB_FLAGGED(ch, MOB_ELEM_WATER))||(MOB_FLAGGED(ch, MOB_ELEM_FIRE))))
 
@@ -534,7 +534,6 @@ void set_skill ( Character *ch, int skill, int amount );
 int has_body ( Character *ch, int flag );
 #define HAS_BODY(ch, flag) (has_body(ch, flag))
 #define EXIT_FLAGGED(exit, flag) (IS_SET((exit)->exit_info, (flag)))
-#define OBJAFF_FLAGGED(obj, flag) (IS_SET(GET_OBJ_AFFECT(obj), (flag)))
 #define OBJVAL_FLAGGED(obj, flag) (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define OBJWEAR_FLAGGED(obj, flag) (IS_SET_AR((obj)->obj_flags.wear_flags, (flag)))
 #define OBJ_FLAGGED(obj, flag) (IS_SET_AR(GET_OBJ_EXTRA(obj), (flag)))
@@ -925,7 +924,6 @@ int current_class_is_tier_num ( Character *ch );
 #define GET_OBJ_MAX_QUALITY(obj)    GET_OBJ_FLOATING_VAL(obj, 1)
 #define GET_OBJ_WEIGHT(obj)	  ((obj)->obj_flags.weight)
 #define GET_OBJ_TIMER(obj)	  ((obj)->obj_flags.timer)
-#define GET_OBJ_SAVED_TIMER(obj)  ((obj)->obj_flags.saved_timer)
 #define GET_OBJ_EXPIRE(obj)	  ((obj)->obj_flags.expire)
 #define GET_OBJ_SAVED_REMAINING_EXPIRE(obj)	  ((obj)->obj_flags.saved_remaining_expire)
 #define GET_TIMER_EVENT(obj)    ((obj)->obj_flags.timer_event)
@@ -1162,10 +1160,6 @@ typedef unsigned short int UWORD;	/* 16bit unsigned */
 typedef signed long int LWORD;	/* 32bit signed */
 typedef unsigned long int ULWORD;	/* 32bit unsigned */
 typedef unsigned long int FLAG;	/* 32bit unsigned */
-
-#define GET_OBJ_AFFECT(obj)     ((obj)->obj_flags.bitvector)
-#define OBJAFF_FLAGGED(obj, flag) (IS_SET(GET_OBJ_AFFECT(obj), (flag)))
-
 
 #define FOCUS_STAFF 1
 #define FOCUS_ORB   2

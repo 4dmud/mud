@@ -1252,86 +1252,94 @@ int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_
 }
 
 
-int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
+int save_one_item ( OBJ_DATA *obj, FILE *fl, int locate )
 {
-  obj_vnum nr;
-  //obj_rnum rn;
-  char buf[MAX_STRING_LENGTH] = "";
-  int i;
+	obj_vnum nr = GET_OBJ_VNUM ( obj );
+	obj_rnum rn = GET_OBJ_RNUM ( obj );
+	char buf[MAX_STRING_LENGTH] = "";
+	int i;
 
-  //rn = GET_OBJ_RNUM(obj);
+	fprintf ( fl, "#%d OBJ\n", nr );
+    if ( obj->name && ( nr == NOTHING || obj->name != obj_proto[rn].name ) )
+		fprintf ( fl, "Name: %s\n", obj->name );
+	if ( obj->description && ( nr == NOTHING || obj->description != obj_proto[rn].description ) )
+		fprintf ( fl, "Description:\n%s~\n", remove_cr ( obj->description, buf, sizeof ( buf ) ) );
+	if ( obj->short_description && ( nr == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
+		fprintf ( fl, "Short:\n%s~\n", remove_cr ( obj->short_description, buf, sizeof ( buf ) ) );
+	if ( obj->action_description && ( nr == NOTHING || obj->action_description != obj_proto[rn].action_description ) )
+		fprintf ( fl, "ActionD:\n%s~\n", remove_cr ( obj->action_description, buf, sizeof ( buf ) ) );
+	if ( obj->smell && ( nr == NOTHING || obj->smell != obj_proto[rn].smell ) )
+		fprintf ( fl, "Smell:\n%s~\n",remove_cr ( obj->smell, buf, sizeof ( buf ) ) );
+	if ( obj->taste && ( nr == NOTHING || obj->taste != obj_proto[rn].taste ) )
+		fprintf ( fl, "Taste:\n%s~\n", remove_cr ( obj->taste, buf, sizeof ( buf ) ) );
+	if ( obj->feel && ( nr == NOTHING || obj->feel != obj_proto[rn].feel ) )
+		fprintf ( fl, "Feel:\n%s~\n", remove_cr ( obj->feel, buf, sizeof ( buf ) ) );
 
-  fprintf(fl, "#%d OBJ\n", (nr = GET_OBJ_VNUM(obj)));
-  if (nr == NOTHING || IS_UNIQUE(obj))
-  {
-    if (obj->name)
-      fprintf(fl, "Name: %s\n", obj->name);
-    if (obj->description)
-      fprintf(fl, "Description:\n%s~\n", remove_cr(obj->description, buf, sizeof(buf)));
-    if (obj->short_description )
-      fprintf(fl, "Short:\n%s~\n", remove_cr(obj->short_description, buf, sizeof(buf)));
-    if (obj->action_description)
-      fprintf(fl, "ActionD:\n%s~\n", remove_cr(obj->action_description, buf, sizeof(buf)));
-    if (obj->smell)
-      fprintf(fl, "Smell:\n%s~\n",remove_cr(obj->smell, buf, sizeof(buf)));
-    if (obj->taste)
-      fprintf(fl, "Taste:\n%s~\n", remove_cr(obj->taste, buf, sizeof(buf)));
-    if (obj->feel)
-      fprintf(fl, "Feel:\n%s~\n", remove_cr(obj->feel, buf, sizeof(buf)));
+	if ( write_extra_descs ( fl, obj ) < 0 )
+		return -1;
 
-    if (obj->ex_description)
-    {
-      fprintf(fl, "ExDescr:\n");
-      if (write_extra_descs(fl, obj) < 0)
-        return -1;
-    }
+	if ( nr == NOTHING || GET_OBJ_TYPE ( obj ) != GET_OBJ_TYPE ( &obj_proto[rn] ) )
+		fprintf ( fl, "Type: %d\n", GET_OBJ_TYPE ( obj ) );
+	if ( nr == NOTHING || GET_OBJ_WEIGHT ( obj ) != GET_OBJ_WEIGHT ( &obj_proto[rn] ) )
+		fprintf ( fl, "Weight: %d\n", GET_OBJ_WEIGHT ( obj ) );
+	if ( nr == NOTHING || GET_OBJ_COST ( obj ) != GET_OBJ_COST ( &obj_proto[rn] ) )
+		fprintf ( fl, "Cost: %lld\n", GET_OBJ_COST ( obj ) );
+	if ( nr == NOTHING || GET_OBJ_RENT ( obj ) != GET_OBJ_RENT ( &obj_proto[rn] ) )
+		fprintf ( fl, "Rent: %d\n", GET_OBJ_RENT ( obj ) );
+	if ( nr == NOTHING || GET_OBJ_INNATE ( obj ) != GET_OBJ_INNATE ( &obj_proto[rn] ) )
+		fprintf ( fl, "Innate: %d\n", GET_OBJ_INNATE ( obj ) );
+	if ( nr == NOTHING || GET_OBJ_LEVEL ( obj ) != GET_OBJ_LEVEL ( &obj_proto[rn] ) )
+		fprintf ( fl, "Level: %d\n", GET_OBJ_LEVEL ( obj ) );
 
-    fprintf(fl, "Type: %d\n", GET_OBJ_TYPE(obj));
-    fprintf(fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3]);
-    fprintf(fl, "Weight: %d\n", GET_OBJ_WEIGHT(obj));
-    fprintf(fl, "Cost: %lld\n", GET_OBJ_COST(obj));
-    fprintf(fl, "Rent: %d\n", GET_OBJ_RENT(obj));
-    fprintf(fl, "Innate: %d\n", GET_OBJ_INNATE(obj));
-    fprintf(fl, "Level: %d\n", GET_OBJ_LEVEL(obj));
-    fprintf(fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3]);
-    fprintf(fl, "Affects:\n");
-    if (write_object_affects(fl, obj) < 0)
-      return -1;
-  }
-  if (obj->idents)
-  {
-    struct ident_list *iden;
-    fprintf(fl, "Idents:\n");
+	fprintf ( fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR ( obj )[0], GET_OBJ_WEAR ( obj )[1], GET_OBJ_WEAR ( obj )[2], GET_OBJ_WEAR ( obj )[3] );
+	fprintf ( fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM ( obj )[0], GET_OBJ_PERM ( obj )[1], GET_OBJ_PERM ( obj )[2], GET_OBJ_PERM ( obj )[3] );
+	fprintf ( fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA ( obj )[0], GET_OBJ_EXTRA ( obj )[1], GET_OBJ_EXTRA ( obj )[2], GET_OBJ_EXTRA ( obj )[3] );
 
-    for (iden = obj->idents;iden;iden=iden->next)
-      fprintf(fl, "%ld\n", iden->id);
+	if ( write_object_affects ( fl, obj ) < 0 )
+		return -1;
 
-    fprintf(fl, "%d\n", -1);
-  }
-  fprintf(fl, "Location: %d\n", locate);
-  fprintf(fl, "Values:\n");
-  for ( i = 0; i < 8; ++i )
-    if ( GET_OBJ_VAL ( obj, i ) != 0 )
-      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
-  if ( GET_OBJ_QUALITY ( obj ) > 0 )
-      fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
-  for ( i = 9; i < 14; ++i )
-    if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
-      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
-  if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
-    fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+	if ( obj->idents )
+	{
+		struct ident_list *iden;
+		fprintf ( fl, "Idents:\n" );
 
-  fprintf(fl, "$\n");
-  fprintf(fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
-  fprintf(fl, "Vroom: %d\n", GET_OBJ_VROOM(obj));
-  fprintf(fl, "Owner: %ld\n", obj->owner);
-  fprintf(fl, "Timer: %d\n", GET_OBJ_TIMER(obj));
-  fprintf(fl, "Expir: %ld\n", GET_OBJ_EXPIRE(obj));
-  fprintf(fl, "Exrem: %ld\n", GET_OBJ_SAVED_REMAINING_EXPIRE(obj));
-  for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
-    if ( obj->orig_affected[ i ].location > 0 )
-      fprintf(fl, "OrigAff: %d %d\n", obj->orig_affected[ i ].location, obj->orig_affected[ i ].modifier );
-  return fprintf(fl, "@END\n\n");
+		for ( iden = obj->idents; iden; iden = iden->next )
+			fprintf ( fl, "%ld\n", iden->id );
+
+		fprintf(fl, "%d\n", -1);
+	}
+	fprintf ( fl, "Location: %d\n", locate );
+
+	// Save the obj values that differ from the prototype
+	fprintf ( fl, "Values:\n" );
+	for ( i = 0; i < 7; ++i )
+		if ( nr == NOTHING || GET_OBJ_VAL ( obj, i ) != GET_OBJ_VAL ( &obj_proto[rn], i ) )
+			fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
+
+	// Always save the nonzero crafting obj values
+	if ( GET_OBJ_VAL ( obj, 7 ) != 0 )
+		fprintf ( fl, "7 %d\n", GET_OBJ_VAL ( obj, 7 ) );
+	if ( GET_OBJ_QUALITY ( obj ) > 0 )
+		fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
+	for ( i = 9; i < 14; ++i )
+		if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
+			fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
+	if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+		fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+	fprintf(fl, "$\n");
+
+	if ( nr == NOTHING || GET_OBJ_VROOM ( obj ) != GET_OBJ_VROOM ( &obj_proto[rn] ) )
+		fprintf ( fl, "Vroom: %d\n", GET_OBJ_VROOM ( obj ) );
+	if ( obj->owner > 0 )
+		fprintf ( fl, "Owner: %ld\n", obj->owner );
+	if ( nr == NOTHING || GET_OBJ_TIMER ( obj ) != GET_OBJ_TIMER ( &obj_proto[rn] ) )
+		fprintf ( fl, "Timer: %d\n", GET_OBJ_TIMER ( obj ) );
+	fprintf ( fl, "Expir: %ld\n", GET_OBJ_EXPIRE ( obj ) );
+	fprintf ( fl, "Exrem: %ld\n", GET_OBJ_SAVED_REMAINING_EXPIRE ( obj ) );
+	for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+		if ( obj->orig_affected[ i ].location > 0 )
+			fprintf ( fl, "OrigAff: %d %d\n", obj->orig_affected[ i ].location, obj->orig_affected[ i ].modifier );
+	return fprintf ( fl, "@END\n\n" );
 }
 
 /* restore weight of containers after save_crashproof_objects changed them for saving */
@@ -1425,19 +1433,49 @@ void crashproof_objects_save_all()
 
 int write_object_affects(FILE *fl, OBJ_DATA *obj)
 {
-  int i;
-  for (i = 0; i < MAX_OBJ_AFFECT; i++)
-  {
-    if (obj->affected[i].modifier)
-      fprintf(fl, "A\n"
-              "%d %d\n", obj->affected[i].location, obj->affected[i].modifier);
-  }
-  return fprintf(fl, "$\n");
+	obj_rnum rn = GET_OBJ_RNUM ( obj );
+	bool wrote_header = FALSE;
+
+	/* Only write affects that are different from the prototype */
+	for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+	{
+		if ( obj->affected[i].modifier )
+		{
+			bool write_affect = TRUE;
+			if ( rn != NOTHING )
+			{
+				for ( int j = 0; j < MAX_OBJ_AFFECT; j++ )
+					if ( obj_proto[rn].affected[j].location == obj->affected[i].location )
+					{
+						if ( obj_proto[rn].affected[j].modifier == obj->affected[i].modifier )
+							write_affect = FALSE;
+						break;
+					}
+			}
+
+			if ( write_affect )
+			{
+				if ( !wrote_header )
+				{
+					fprintf ( fl, "Affects:\n" );
+					wrote_header = TRUE;
+				}
+				fprintf ( fl, "A\n%d %d\n", obj->affected[i].location, obj->affected[i].modifier );
+			}
+		}
+	}
+
+	if ( wrote_header )
+		return fprintf ( fl, "$\n" );
+	else
+		return 0;
 }
 
 int write_extra_descs(FILE *fl, OBJ_DATA *obj)
 {
-  struct extra_descr_data *ex_desc;
+  struct extra_descr_data *ex_desc, *ex_proto;
+  obj_rnum rn = GET_OBJ_RNUM ( obj );
+  bool wrote_header = FALSE;
 
   for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next)
   {
@@ -1449,9 +1487,35 @@ int write_extra_descs(FILE *fl, OBJ_DATA *obj)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: save_one_item: Corrupt ex_desc!");
       continue;
     }
-    write_extra_desc(fl, ex_desc);
+
+    /* Only write descs that are different from the prototype */
+    bool write_ex = TRUE;
+    if ( rn != NOTHING )
+    {
+        for ( ex_proto = obj_proto[rn].ex_description; ex_proto; ex_proto = ex_proto->next )
+            if ( !strcmp ( ex_proto->keyword, ex_desc->keyword ) )
+            {
+                if ( !strcmp ( ex_proto->description, ex_desc->description ) )
+                    write_ex = FALSE;
+                break;
+            }
+    }
+
+    if ( write_ex )
+    {
+        if ( !wrote_header )
+        {
+            fprintf ( fl, "ExDescr:\n" );
+            wrote_header = TRUE;
+        }
+        write_extra_desc ( fl, ex_desc );
+    }
   }
-  return fprintf(fl, "$\n");
+
+  if ( wrote_header )
+      return fprintf ( fl, "$\n" );
+  else
+     return 0;
 }
 
 int write_extra_desc(FILE *fl, struct extra_descr_data *ex_desc)
@@ -1470,12 +1534,11 @@ char *remove_cr(char *str, char *buf, size_t len)
 }
 void read_extra_descs(FILE *fl, OBJ_DATA *temp)
 {
-  struct extra_descr_data *new_descr;
+  struct extra_descr_data *new_descr, *ex_proto, *ex_temp;
   char line[READ_SIZE], buf2[MAX_INPUT_LENGTH];
   int zwei;
   FILE *tf = fl;
-
-  temp->ex_description = NULL;
+  obj_rnum rn = GET_OBJ_RNUM ( temp );
 
   get_line(fl, line);
   for (zwei = 0; !zwei && !feof(fl);)
@@ -1483,6 +1546,8 @@ void read_extra_descs(FILE *fl, OBJ_DATA *temp)
     switch (*line)
     {
     case 'E':
+      if ( rn != NOTHING && temp->ex_description == obj_proto[rn].ex_description )
+        temp->ex_description = NULL;
       CREATE(new_descr, struct extra_descr_data, 1);
       if ((new_descr->keyword = fread_string(fl, buf2)) == NULL)
         new_descr->keyword = strdup("Undefined");
@@ -1504,24 +1569,56 @@ void read_extra_descs(FILE *fl, OBJ_DATA *temp)
     }
   }
   fl = tf;
+
+  if ( rn == NOTHING || temp->ex_description == obj_proto[rn].ex_description )
+    return;
+
+  // add the proto extra descs with unique keywords
+  for ( ex_proto = obj_proto[rn].ex_description; ex_proto; ex_proto = ex_proto->next )
+    for ( ex_temp = temp->ex_description; ex_temp; ex_temp = ex_temp->next )
+    {
+      if ( !strcmp ( ex_proto->keyword, ex_temp->keyword ) )
+        break;
+      if ( ex_temp->next == NULL )
+      {
+        CREATE ( ex_temp->next, struct extra_descr_data, 1 );
+        ex_temp->next->keyword = strdup ( ex_proto->keyword );
+        ex_temp->next->description = strdup ( ex_proto->description );
+        ex_temp->next->next = NULL;
+        break;
+      }
+    }
 }
 void read_object_affects(FILE *fl, OBJ_DATA *temp)
 {
   FILE *tf = fl;
   char line[READ_SIZE];
-  int  j, zwei;
+  int j = 0, zwei;
   int t[2];
 
+  /* add proto affects */
+  obj_rnum rn = GET_OBJ_RNUM ( temp );
+  if ( rn != NOTHING )
+  {
+      for ( int i = 0; i < MAX_OBJ_AFFECT && j < MAX_OBJ_AFFECT; ++i )
+          if ( obj_proto[rn].affected[i].modifier )
+          {
+              temp->affected[j].location = obj_proto[rn].affected[i].location;
+              temp->affected[j].modifier = obj_proto[rn].affected[i].modifier;
+              j++;
+          }
+  }
 
+  /* read unique affects */
   get_line(fl, line);
-  for (j = zwei = 0; !zwei && !feof(fl);)
+  for (zwei = 0; !zwei && !feof(fl);)
   {
     switch (*line)
     {
     case 'A':
       if (j >= MAX_OBJ_AFFECT)
       {
-        log("Too many object affectations in loading rent file");
+        log ( "SYSERR: Too many object affects in loading rent file for [%d] %s", GET_OBJ_VNUM ( temp ), temp->short_description );
         break;
       }
       get_line(fl, line);
@@ -1785,18 +1882,13 @@ void tag_read(char *tag, char *buf)
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
   int rv, aff_i = 0;
-  obj_vnum nr, nrr = 0; // onr
+  obj_vnum nr, nrr = 0;
   char buf[MAX_INPUT_LENGTH];
   char line[READ_SIZE] = "";
   char tag[READ_SIZE] = "";
-  //int num;
   int t[4];
   double tf[1];
   int orig_timer = -1;
-  //int orig_expir = -1;
-  //int dup_strings = FALSE;
-  //struct ident_list *tmp_idents = NULL;
-  //int tmp_wep_bal;
   bool weight_read = FALSE;
 
   if (feof(fl))
@@ -1813,7 +1905,6 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   if ((rv = sscanf(line, "#%d OBJ", &nr)) != 1)
     return NULL;
 
-  //onr = nr;
   /* we have the number, check it, load obj. */
   if (nr == NOTHING)
   {  /* then it is unique */
@@ -1838,14 +1929,12 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       /*already added from scan rent*/
       obj_index[nrr].qic->items--;
     }
-
-    //dup_strings = TRUE;
   }
+
   get_line(fl, line);
   while (!feof(fl) && strcmp(line, "@END"))
   {
     tag_read(tag, line);
-    //num = atoi(line);
     switch (LOWER(*tag))
     {
     case 'a':
@@ -1873,16 +1962,12 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         sscanf(line, "%d %d %d %d", &GET_OBJ_EXTRA(temp)[0], &GET_OBJ_EXTRA(temp)[1],  &GET_OBJ_EXTRA(temp)[2], &GET_OBJ_EXTRA(temp)[3]);
       else if (!strcmp(tag, "ExDescr"))
         read_extra_descs(fl, temp);
-      else if (!strcmp(tag, "Expir")) {
+      else if (!strcmp(tag, "Expir"))
         GET_OBJ_EXPIRE(temp) = atol(line);
-        //orig_expir = GET_OBJ_EXPIRE(temp);
-      }
       else if (!strcmp(tag, "Exrem")) {
-	int remaining = atol(line);
-	if (remaining != 0) {
-	  GET_OBJ_EXPIRE(temp) = time(0) + remaining;
-	  //orig_expir = GET_OBJ_EXPIRE(temp);
-	}
+        int remaining = atol(line);
+        if (remaining != 0)
+          GET_OBJ_EXPIRE(temp) = time(0) + remaining;
       }
       break;
     case 'f':
@@ -1919,14 +2004,12 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
       break;
     case 'n':
       if (!strcmp(tag, "Name"))
-      {
         temp->name = strdup(line);
-      }
       break;
     case 'o':
       if ( !strcmp ( tag, "OrigAff" ) )
       {
-	sscanf ( line, "%d %d", &t[0], &t[1] );
+        sscanf ( line, "%d %d", &t[0], &t[1] );
         temp->orig_affected[ aff_i ].location = t[0];
         temp->orig_affected[ aff_i ].modifier = t[1];
         aff_i++;
@@ -1975,10 +2058,6 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
         GET_OBJ_VROOM(temp) = atoi(line);
       else if (!strcmp(tag, "Values"))
       {
-        for (t[0] = 0; t[0] < NUM_OBJ_VAL_POSITIONS; t[0]++)
-          GET_OBJ_VAL(temp, t[0]) = 0;
-        for (t[0] = 0; t[0] < NUM_OBJ_FLOATING_VAL_POSITIONS; t[0]++)
-          GET_OBJ_FLOATING_VAL(temp, t[0]) = 0;
         while (TRUE)
         {
           get_line(fl, line);
@@ -2036,8 +2115,14 @@ struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
   if ( GET_OBJ_TYPE ( temp ) == ITEM_DRINKCON && !weight_read )
 	GET_OBJ_WEIGHT ( temp ) = MAX ( 0, GET_OBJ_WEIGHT ( &obj_proto[nrr] ) - GET_OBJ_VAL ( &obj_proto[nrr], 1 ) + GET_OBJ_VAL ( temp, 1 ) );
 
+  /* list_obj_to_char needs to know if the shortdesc is unique */
+  if ( strcmp ( temp->short_description, obj_proto[nrr].short_description ) )
+    SET_BIT_AR ( GET_OBJ_EXTRA ( temp ), ITEM_UNIQUE_SHORTDESC );
+  else
+    REMOVE_BIT_AR ( GET_OBJ_EXTRA ( temp ), ITEM_UNIQUE_SHORTDESC );
+
   /* Horus - all eq will be updated automatically */
-/*  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
+/*  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SHORTDESC) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
       ubyte dt_save = 0;
       if (IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_ANTI_DT))
           dt_save = 1;

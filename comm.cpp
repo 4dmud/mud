@@ -3110,6 +3110,7 @@ RETSIGTYPE reap(int sig) {
 }
 
 RETSIGTYPE checkpointing(int sig) {
+return;
     if (!tics_passed) {
         log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
         abort();

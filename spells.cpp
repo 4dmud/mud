@@ -914,7 +914,6 @@ ASPELL(spell_enchant_weapon) {
             return;
 
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
 
     obj->affected[0].location = APPLY_HITROLL;
     obj->affected[0].modifier = (sbyte)((current_class_is_tier_num(ch) * 0.5) + (level >= 18));
@@ -988,7 +987,6 @@ ASPELL(spell_remove_alignment) {
             return;
         }
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
         if (number(0, 120) < total_chance(ch, SPELL_REMOVE_ALIGNMENT)) {
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_GOOD);
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_EVIL);
@@ -1021,7 +1019,6 @@ ASPELL(spell_enchant_armor) {
         return;
     }
 
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
     if (number(0, 120) < total_chance(ch, SPELL_ENCHANT_ARMOR)) {
         GET_OBJ_VAL(obj, 0) *= 2;

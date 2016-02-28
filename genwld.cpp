@@ -40,57 +40,48 @@ room_rnum add_room(Room *room)
     return NULL;
   }
 
-  if ((i = room->number) != NOWHERE && world_vnum[i])
+  if ((i = room->number) != NOWHERE && real_room ( i ))
   {
-	 // log("Room Desc 1: %s", room->GetDescription());
-    if (SCRIPT(world_vnum[i]))
-      extract_script(world_vnum[i], WLD_TRIGGER);
+    if ( world_vnum[i]->proto_script )
+      free_proto_script ( world_vnum[i], WLD_TRIGGER );
 
-
-    /** save the new string **/
-    //world_vnum[i]->t_description = strdup(room->GetDescription());
-    
-    //log("Room Desc 2: %s", room->GetDescription());
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
-    world_vnum[i]->free_room_strings();
+	SCRIPT ( room ) = SCRIPT ( world_vnum[i] );
 
     //pause timers if the artisave flag is added
-    if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
-      for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
-	  pause_timer(obj);
+    if ( !ROOM_FLAGGED ( world_vnum[i], ROOM_ARTISAVE ) && ROOM_FLAGGED ( room, ROOM_ARTISAVE ) ) {
+      for ( struct obj_data* obj = room->contents; obj; obj = obj->next_content )
+        if ( OBJ_FLAGGED ( obj, ITEM_ARTIFACT ) )
+          pause_timer ( obj );
       save_artifacts(room);
     }
 
     //remove arti save file if the artisave flag is removed, and restart timers
-    if (ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && !ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
+    if ( ROOM_FLAGGED ( world_vnum[i], ROOM_ARTISAVE ) && !ROOM_FLAGGED ( room, ROOM_ARTISAVE ) ) {
       char filename[70];
       char cwd[1024];
       getcwd(cwd, sizeof(cwd));
-
       snprintf(filename, 70, "%s%d.arti", ARTI_DIR, room->number);
       log("deleting %s, from dir %s", filename, cwd);
       remove(filename);
-      for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
-	  resume_timer(obj);
+      for ( struct obj_data* obj = room->contents; obj; obj = obj->next_content )
+        if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
+          resume_timer(obj);
     }
 
-
+    world_vnum[i]->free_room_strings();
     *world_vnum[i] = *room;
     world_vnum[i]->SetDesc(-1);
     world_vnum[i]->mine = room->mine;
     world_vnum[i]->copy_room_strings(room);
-    //log("Room Desc 4: %s", room->GetDescription());
-    //log("Room Desc 5: %s", world_vnum[i]->GetDescription());
     add_to_save_list(zone_table[room->zone].number, SL_WLD);
     log("GenOLC: add_room: Updated existing room #%d.", i);
     return world_vnum[i];
   }
 
   //  RECREATE(world, Room, top_of_world + 2);
-  top_of_world = MAX(room->number, top_of_world);
+  top_of_world = MAX ( room->number, top_of_world );
 #if 0
 
   for (i = top_of_world; i > 0; i--)
@@ -125,8 +116,8 @@ room_rnum add_room(Room *room)
 
   log("GenOLC: add_room: Added room %d at index #%d.", room->number, found);
 #endif
-  world_vnum[room->number]=room;
-  found=(unsigned long)(room);
+  world_vnum[room->number] = room;
+  found = (unsigned long) room;
   log("GenOLC: add_room: Added room %d at address %lu.", room->number, found);
 
 
@@ -183,7 +174,7 @@ room_rnum add_room(Room *room)
   add_to_save_list(zone_table[room->zone].number, SL_WLD);
 
   /*
-   * Return what array entry we placed the new room in.
+   * Return the new room.
    */
   return world_vnum[room->number];
 }
