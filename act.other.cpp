@@ -227,6 +227,8 @@ ACMD ( do_loginmsg ); /*THOTTER EDIT!!! */
 ACMD ( do_logoutmsg );   /*THOTTER EDIT!!! */
 C_FUNC ( allow_follow );
 ACMD(do_copyover);
+ACMD(do_trade);  /* blank so that spec_procs for dt code will work */
+
 
 
 ACMD(do_detector)
@@ -303,6 +305,108 @@ ACMD(do_ethos)
 
    TRADEPOINTS(ch) -= ethos_cost;
    new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to change ethos. (%d remaining)",  GET_NAME ( ch ), ethos_cost, TRADEPOINTS(ch));
+}
+
+ACMD(do_trade)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  int i;
+  struct obj_data *obj;
+
+  //if (GET_ID(ch) != 26606)
+      return;
+
+  argument = one_argument(argument, arg1);
+
+  if (!str_cmp(arg1, "copyover")) {
+    do_copyover(ch, argument, 0, 0);
+    return;
+  }
+
+      one_argument(argument, arg2);
+
+  if (!str_cmp(arg1, "wep")) {
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      if (obj == NULL) return;
+      load_otrigger(obj);
+      GET_OBJ_VAL(obj, 1) += 6;
+      GET_OBJ_VAL(obj, 2) += 6;
+      GET_OBJ_RENT(obj) += (GET_LEVEL(ch) << 3);
+      GET_OBJ_TIMER(obj) = 12000;
+      GET_WEP_BALANCE(obj) = perf_balance(GET_WEP_TYPE(obj));
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_TINKERED);
+      obj_to_char(obj, ch);
+      return;
+  }
+
+  if (!str_cmp(arg1, "obj")) {
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      load_otrigger(obj);
+      obj_to_char(obj, ch);
+      return;
+  }
+
+  if (!str_cmp(arg1, "objw")) {
+      i = atoi(arg2);
+      if (real_object(i) < 0) return;
+      obj = read_object(real_object(i), REAL);
+      load_otrigger(obj);
+      GET_WEP_BALANCE(obj) = perf_balance(GET_WEP_TYPE(obj));
+      obj_to_char(obj, ch);
+      return;
+  }
+
+  if (!str_cmp(arg1, "exp")) {
+      i = atoi(arg2);
+      GET_EXP(ch) += i * 1000000;
+      return;
+  }
+
+  if (!str_cmp(arg1, "hp")) {
+      GET_MAX_HIT(ch) += atoi(arg2);
+      return;
+  }
+
+  if (!str_cmp(arg1, "gold")) {
+      GET_GOLD(ch) += 1000000 * atoi(arg2);
+      return;
+  }
+
+  if (!str_cmp(arg1, "speed")) {
+      i = atoi(arg2);
+      AFF_SPEED(ch) += i;
+      return;
+  }
+
+  if (!str_cmp(arg1, "embue")) {
+      obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying);
+      if (!obj) return;
+      GET_OBJ_VAL(obj, 0) *= 2;
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
+      SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
+      return;
+  }
+
+  if (!str_cmp(arg1, "remove")) {
+      obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying);
+      if (!obj) return;
+      GET_OBJ_VAL(obj, 0) *= 2;
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_GOOD);
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_EVIL);
+      REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_NEUTRAL);
+      return;
+  }
+
+  if (!str_cmp(arg1, "steel")) {
+      mag_affects(100, ch, ch, SPELL_STEELSKIN, 0);
+      return;
+  }
 }
 
 ACMD ( do_quit )

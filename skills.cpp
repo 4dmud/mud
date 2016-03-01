@@ -1976,6 +1976,7 @@ ASKILL ( skill_scalp )
 
 		SET_BIT_AR ( GET_OBJ_WEAR ( scalp ), ITEM_WEAR_HOLD );
 		SET_BIT_AR ( GET_OBJ_WEAR ( scalp ), ITEM_WEAR_TAKE );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( scalp ), ITEM_UNIQUE_SAVE );
 		GET_OBJ_WEIGHT ( scalp ) = 3;
 		GET_OBJ_RENT ( scalp ) = 0;
 		obj_to_char ( scalp, ch );

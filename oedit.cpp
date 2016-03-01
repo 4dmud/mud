@@ -38,7 +38,6 @@ extern const char *attachment_types[];
 /*------------------------------------------------------------------------*/
 extern zone_rnum real_zone_by_thing ( room_vnum vznum );
 void oedit_disp_val5_menu ( Descriptor *d );
-void update_live_triggers ( vector<int> &ops, vector<int> &nps, script_data **sc );
 /*
  * Handy macros.
  */
@@ -276,45 +275,50 @@ void oedit_setup_existing ( Descriptor *d, int real_num )
 
 void oedit_save_internally ( Descriptor *d )
 {
-	obj_rnum robj_num = real_object ( OLC_NUM ( d ) );
+	int i;
+	obj_rnum robj_num;
 	Descriptor *dsc;
 	struct obj_data *obj;
+	obj_list_type tobjs;
 
-	vector<int> ops; // old proto script, the original is destroyed by add_object
-	if ( robj_num != NOTHING && obj_proto[ robj_num ].proto_script )
-		ops = *( obj_proto[ robj_num ].proto_script );
+	i = ( real_object ( OLC_NUM ( d ) ) == NOTHING );
 
 	if ( ( robj_num = add_object ( OLC_OBJ ( d ), OLC_NUM ( d ) ) ) == NOTHING )
 	{
-		log ( "SYSERR: oedit_save_internally: add_object failed for [%d] %s", OLC_NUM ( d ), OLC_OBJ ( d )->short_description );
+		log ( "oedit_save_internally: add_object failed." );
 		return;
 	}
+	/* Update triggers : */
+	/* Free old proto list  */
+	if ( obj_proto[robj_num].proto_script &&
+	        obj_proto[robj_num].proto_script != OLC_SCRIPT ( d ) )
+		free_proto_script ( obj_proto[robj_num].proto_script, OBJ_TRIGGER );
 
-	/* Update proto script */
-	free_proto_script ( &obj_proto[ robj_num ], OBJ_TRIGGER );
-	if ( OLC_SCRIPT ( d ) )
-		obj_proto[ robj_num ].proto_script = new vector<int> ( OLC_SCRIPT ( d )->begin(), OLC_SCRIPT ( d )->end() );
+	obj_proto[robj_num].proto_script = OLC_SCRIPT ( d );
+	OLC_SCRIPT ( d ) = NULL;
 
-	vector<int> nps; // new proto script
-	if ( obj_proto[ robj_num ].proto_script )
-		nps = *( obj_proto[ robj_num ].proto_script );
-
-	/* Update triggers of existing objects */
-	for ( auto &ol : object_list )
+	/* this takes care of the objects currently in-game */
+	for ( olt_it ij = object_list.begin(); ij != object_list.end(); ij++ )
 	{
-		obj = ol.second;
-		if ( obj->item_number != robj_num || obj->extracted )
+		obj = ( ij->second );
+		if ( obj->item_number != robj_num )
 			continue;
-
-		update_live_triggers ( ops, nps, &SCRIPT ( obj ) );
-
-		if ( SCRIPT ( obj ) && !TRIGGERS ( SCRIPT ( obj ) ) )
-			extract_script ( obj, OBJ_TRIGGER );
-
-		copy_proto_script ( &obj_proto[ robj_num ], obj, OBJ_TRIGGER );
+		tobjs[GET_ID ( obj ) ] = obj;
 	}
+	for ( olt_it ij = tobjs.begin(); ij != tobjs.end(); ij++ )
+	{
+		obj = ( ij->second );
+		/* remove any old scripts */
+		if ( SCRIPT ( obj ) )
+			extract_script ( obj, OBJ_TRIGGER );
+		if ( obj->proto_script != obj_proto[robj_num].proto_script )
+			free_proto_script ( obj, OBJ_TRIGGER );
+		copy_proto_script ( &obj_proto[robj_num], obj, OBJ_TRIGGER );
+		assign_triggers ( obj, OBJ_TRIGGER );
+	}
+	/* end trigger update */
 
-	if ( real_object ( OLC_NUM ( d ) ) != NOTHING )	/* If it's not a new object, don't renumber. */
+	if ( !i )	/* If it's not a new object, don't renumber. */
 		return;
 
 	/*
@@ -322,7 +326,7 @@ void oedit_save_internally ( Descriptor *d )
 	 */
 	for ( dsc = descriptor_list; dsc; dsc = dsc->next )
 		if ( STATE ( dsc ) == CON_SEDIT )
-			for ( int i = 0; S_PRODUCT ( OLC_SHOP ( dsc ), i ) != NOTHING; i++ )
+			for ( i = 0; S_PRODUCT ( OLC_SHOP ( dsc ), i ) != NOTHING; i++ )
 				if ( S_PRODUCT ( OLC_SHOP ( dsc ), i ) >= robj_num )
 					S_PRODUCT ( OLC_SHOP ( dsc ), i ) ++;
 
@@ -330,7 +334,7 @@ void oedit_save_internally ( Descriptor *d )
 	/* Update other people in zedit too. From: C.Raehl 4/27/99 */
 	for ( dsc = descriptor_list; dsc; dsc = dsc->next )
 		if ( STATE ( dsc ) == CON_ZEDIT )
-			for ( int i = 0; OLC_ZONE ( dsc )->cmd[i].command != 'S'; i++ )
+			for ( i = 0; OLC_ZONE ( dsc )->cmd[i].command != 'S'; i++ )
 				switch ( OLC_ZONE ( dsc )->cmd[i].command )
 				{
 					case 'P':
@@ -1838,22 +1842,6 @@ void oedit_parse ( Descriptor *d, char *arg )
 		case OEDIT_EXTRADESC_KEY:
 			if ( genolc_checkstring ( d, arg ) )
 			{
-				// make sure any of the words in the keyword don't exist already
-				string word;
-				stringstream ss_arg;
-				for ( extra_descr_data *ex_desc = OLC_OBJ ( d )->ex_description; ex_desc; ex_desc = ex_desc->next )
-				{
-					if ( ex_desc == OLC_DESC ( d ) )
-						continue;
-					ss_arg.clear();
-					ss_arg.str ( arg );
-					while ( ss_arg >> word )
-						if ( strstr ( ex_desc->keyword, word.c_str() ) )
-						{
-							d->character->Send ( "The word %s is already a keyword.\r\n", word.c_str() );
-							return;
-						}
-				}
 				if ( OLC_DESC ( d )->keyword )
 					free ( OLC_DESC ( d )->keyword );
 				OLC_DESC ( d )->keyword = str_udup ( arg );

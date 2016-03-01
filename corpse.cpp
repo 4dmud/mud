@@ -169,10 +169,11 @@ int old_write_corpse(FILE * fp, struct obj_data *obj, int locate) {
             GET_OBJ_EXTRA(obj)[2],
             GET_OBJ_EXTRA(obj)[3], GET_OBJ_TIMER(obj), GET_OBJ_INNATE(obj), GET_OBJ_VROOM(obj));
 
-    if (!(OBJ_FLAGGED(obj, ITEM_UNIQUE_SHORTDESC))) {
+
+
+    if (!(OBJ_FLAGGED(obj, ITEM_UNIQUE_SAVE))) {
         return 1;
     }
-
     fprintf(fp,
             "XAP\n"
             "%s~\n"

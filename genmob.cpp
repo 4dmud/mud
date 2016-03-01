@@ -96,9 +96,6 @@ mob_vnum add_mobile ( Character *mob, mob_vnum vnum )
 		pmob = GetMobProto ( vnum );
 	if ( pmob != NULL )
 	{
-		/* Free the proto script */
-		free_proto_script ( pmob, MOB_TRIGGER );
-
 		/* Copy over the mobile and free() the old strings. */
 		copy_mobile ( pmob, mob );
 

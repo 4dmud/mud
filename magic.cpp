@@ -35,6 +35,7 @@ void skill_attack ( Character *ch, Character *vict, int skill, int pass );
 void start_fighting_delay ( Character *vict, Character *ch );
 sbyte saving_throws ( int class_num, int type, int level );  /* class.c */
 void clearMemory ( Character *ch );
+void weight_change_object ( struct obj_data *obj, int weight );
 void add_follower ( Character *ch, Character *leader );
 int arena_ok ( Character *ch, Character *victim );
 void change_alignment ( Character *ch, Character *victim );

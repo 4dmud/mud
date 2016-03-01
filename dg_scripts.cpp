@@ -1475,24 +1475,10 @@ ACMD ( do_attach )
 			CREATE ( SCRIPT ( victim ), struct script_data, 1 );
 			SCRIPT ( victim )->function_trig = -1;
 		}
+		add_trigger ( SCRIPT ( victim ), trig, loc );
 
-		bool has_trig = FALSE;
-		for ( trig_data *t = TRIGGERS ( SCRIPT ( victim ) ); t; t = t->next )
-			if ( GET_TRIG_VNUM ( t ) == tn )
-			{
-				has_trig = TRUE;
-				break;
-			}
-
-		if ( has_trig )
-			ch->Send ( "It already has trigger %d.\r\n", tn );
-		else
-		{
-			add_trigger ( SCRIPT ( victim ), trig, loc );
-
-			ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
+		ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
 		           tn, GET_TRIG_NAME ( trig ), GET_SHORT ( victim ), GET_MOB_VNUM ( victim ) );
-		}
 	}
 	else if ( is_abbrev ( arg, "object" ) || is_abbrev ( arg, "otr" ) )
 	{
@@ -1537,27 +1523,13 @@ ACMD ( do_attach )
 			CREATE ( SCRIPT ( object ), struct script_data, 1 );
 			SCRIPT ( object )->function_trig = -1;
 		}
+		add_trigger ( SCRIPT ( object ), trig, loc );
 
-		bool has_trig = FALSE;
-		for ( trig_data *t = TRIGGERS ( SCRIPT ( object ) ); t; t = t->next )
-			if ( GET_TRIG_VNUM ( t ) == tn )
-			{
-				has_trig = TRUE;
-				break;
-			}
-
-		if ( has_trig )
-			ch->Send ( "It already has trigger %d.\r\n", tn );
-		else
-		{
-			add_trigger ( SCRIPT ( object ), trig, loc );
-
-			ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
+		ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
 		           tn, GET_TRIG_NAME ( trig ),
 		           ( object->short_description ?
 		             object->short_description : object->name ),
 		           GET_OBJ_VNUM ( object ) );
-		}
 	}
 	else if ( is_abbrev ( arg, "room" ) || is_abbrev ( arg, "wtr" ) )
 	{
@@ -2555,16 +2527,14 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	}
 
 	/* locate and load the trigger specified */
-	int trig_v = atoi ( trignum_s );
-	trignum = real_trigger ( trig_v );
-	if ( trignum == NOTHING || ! ( newtrig = read_trigger ( trignum ) ) )
+	trignum = real_trigger ( atoi ( trignum_s ) );
+	if ( trignum == NOTHING || ! ( newtrig=read_trigger ( trignum ) ) )
 	{
 		script_log ( "Trigger: %s, VNum %d. attach invalid trigger: '%s'",
 		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), trignum_s );
 		return;
 	}
 
-	bool has_trig = FALSE;
 	if ( c )
 	{
 		if ( !IS_NPC ( c ) )
@@ -2578,16 +2548,7 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 			CREATE ( SCRIPT ( c ), struct script_data, 1 );
 			SCRIPT ( c )->function_trig = -1;
 		}
-
-		for ( trig_data *t = TRIGGERS ( SCRIPT ( c ) ); t; t = t->next )
-			if ( GET_TRIG_VNUM ( t ) == trig_v )
-			{
-				has_trig = TRUE;
-				break;
-			}
-
-		if ( !has_trig )
-			add_trigger ( SCRIPT ( c ), newtrig, -1 );
+		add_trigger ( SCRIPT ( c ), newtrig, -1 );
 		return;
 	}
 
@@ -2598,16 +2559,7 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 			CREATE ( SCRIPT ( o ), struct script_data, 1 );
 			SCRIPT ( o )->function_trig = -1;
 		}
-
-		for ( trig_data *t = TRIGGERS ( SCRIPT ( o ) ); t; t = t->next )
-			if ( GET_TRIG_VNUM ( t ) == trig_v )
-			{
-				has_trig = TRUE;
-				break;
-			}
-
-		if ( !has_trig )
-			add_trigger ( SCRIPT ( o ), newtrig, -1 );
+		add_trigger ( SCRIPT ( o ), newtrig, -1 );
 		return;
 	}
 
@@ -2618,16 +2570,7 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 			CREATE ( SCRIPT ( r ), struct script_data, 1 );
 			SCRIPT ( r )->function_trig = -1;
 		}
-
-		for ( trig_data *t = TRIGGERS ( SCRIPT ( r ) ); t; t = t->next )
-			if ( GET_TRIG_VNUM ( t ) == trig_v )
-			{
-				has_trig = TRUE;
-				break;
-			}
-
-		if ( !has_trig )
-			add_trigger ( SCRIPT ( r ), newtrig, -1 );
+		add_trigger ( SCRIPT ( r ), newtrig, -1 );
 		return;
 	}
 
@@ -3317,6 +3260,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	obj_rnum rn = GET_OBJ_RNUM ( obj );
 	if ( args[1] == "name" )
 	{
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
 			free ( obj->name );
 		arg = args[2];
@@ -3326,7 +3270,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	}
 	else if ( args[1] == "short" )
 	{
-		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SHORTDESC );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
 			free ( obj->short_description );
 		arg = args[2];
@@ -3336,6 +3280,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	}
 	else if ( args[1] == "long" )
 	{
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
 			free ( obj->description );
 		arg = args[2];
@@ -3355,9 +3300,9 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		arg = args[3];
 		for ( int i = 4; i < args.size(); ++i )
 			arg += " " + args[i];
-		arg += "\r\n\r\n";
 		arg[0] = UPPER ( arg[0] );
 
+		SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 		bool ex_was_proto = FALSE;
 		if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
 		{
@@ -4030,30 +3975,20 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			break;
 	}
 
-	depth--;
 	/** if you have a parent, let the parent continue on where you left off **/
-	if ( sc )
+	if ( trig->parent && sc )
 	{
-		trig_data *parent = trig->parent;
-		if ( parent )
-		{
-			struct trig_var_data *vd = NULL;
-			for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
-				add_var ( &GET_TRIG_VARS ( parent ), vd->name, vd->value, vd->context );
-		}
-		free_varlist ( GET_TRIG_VARS ( trig ) );
-		GET_TRIG_VARS ( trig ) = NULL;
-		GET_TRIG_DEPTH ( trig ) = 0;
-		if ( trig->remove_me )
-		{
-			remove_trigger ( sc, (char*) (to_string ( GET_TRIG_VNUM ( trig ) ) ).c_str() );
-			if ( !TRIGGERS ( sc ) )
-				extract_script ( go, type );
-		}
-		if ( sc && parent )
-			script_driver ( &go, parent, type, TRIG_RESTART );
+		struct trig_var_data *vd = NULL;
+		for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
+			add_var ( &GET_TRIG_VARS ( trig->parent ), vd->name, vd->value, vd->context );
 	}
-
+	if ( sc )
+		free_varlist ( GET_TRIG_VARS ( trig ) );
+	GET_TRIG_VARS ( trig ) = NULL;
+	GET_TRIG_DEPTH ( trig ) = 0;
+	depth--;
+	if ( trig->parent )
+		script_driver ( &go, trig->parent, type, TRIG_RESTART );
 	return ret_val;
 }
 

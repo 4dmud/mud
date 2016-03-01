@@ -5288,6 +5288,7 @@ void make_corpse ( Character *ch, Character *killer )
 		/* Corpse saving stuff */
 		SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NOSELL );
 		SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NORENT );
+		SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_UNIQUE_SAVE );
 
 		if ( MOB_FLAGGED ( ch, MOB_EDIBLE ) )
 			SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_EDIBLE );
@@ -5340,7 +5341,7 @@ void make_corpse ( Character *ch, Character *killer )
 				if ( GET_OBJ_QUALITY ( o ) < 10 )
 				{
 					string shortdesc = string ( o->short_description ) + " is torn from use";
-					SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
+					SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
 					if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
 						free ( o->short_description );
 					o->short_description = str_udup ( shortdesc.c_str() );
@@ -5383,6 +5384,7 @@ void make_corpse ( Character *ch, Character *killer )
 			{
 				spill_gold ( ch );
 				money = create_money ( ch->Gold ( 0, GOLD_HAND ) );
+				SET_BIT_AR ( GET_OBJ_EXTRA ( money ), ITEM_UNIQUE_SAVE );
 				obj_to_obj ( money, corpse );
 			}
 			ch->Gold ( -ch->Gold ( 0, GOLD_HAND ), GOLD_HAND );
@@ -5422,6 +5424,7 @@ void make_head ( Character *ch )
 	corpse = create_obj ( NOTHING );
 	corpse->name = str_dup ( "head" );
 
+
 	snprintf ( buf2, sizeof ( buf2 ), "The head of %s rolls around here.", GET_NAME ( ch ) );
 	corpse->description = str_dup ( buf2 );
 
@@ -5443,6 +5446,7 @@ void make_head ( Character *ch )
 	GET_OBJ_VAL ( corpse, 0 ) = 1;
 	GET_OBJ_VAL ( corpse, 3 ) = 1;
 
+
 	GET_OBJ_WEIGHT ( corpse ) = 25;
 
 	GET_OBJ_RENT ( corpse ) = 100000;
@@ -5450,6 +5454,7 @@ void make_head ( Character *ch )
 	/* Corpse saving stuff */
 	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NOSELL );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NORENT );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_UNIQUE_SAVE );
 
 	obj_to_room ( corpse, IN_ROOM ( ch ) );
 }
@@ -5465,6 +5470,7 @@ void make_half ( Character *ch )
 
 	corpse = create_obj ( NOTHING );
 	corpse->name = str_dup ( "half other" );
+
 
 	snprintf ( buf2, sizeof ( buf2 ), "The other half of %s's corpse is lying here.", GET_NAME ( ch ) );
 	corpse->description = str_dup ( buf2 );
@@ -5487,12 +5493,14 @@ void make_half ( Character *ch )
 	GET_OBJ_VAL ( corpse, 0 ) = 1;
 	GET_OBJ_VAL ( corpse, 3 ) = 1;
 
+
 	GET_OBJ_WEIGHT ( corpse ) = 25;
 
 	GET_OBJ_RENT ( corpse ) = 100000;
 
 	/* Corpse saving stuff */
 	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NOSELL );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_UNIQUE_SAVE );
 
 	obj_to_room ( corpse, IN_ROOM ( ch ) );
 }
@@ -5581,7 +5589,7 @@ void raw_kill ( Character *ch, Character *killer )
 				obj->description = strdup(buf);
 				GET_OBJ_VAL(obj, 0) = zone_num;
 				GET_OBJ_TIMER(obj) = 50;
-				SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SHORTDESC);
+				SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
 				check_timer(obj);
 				obj_to_char(obj, killer);
 				load_otrigger(obj);

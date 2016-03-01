@@ -337,7 +337,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch, int mode, int show
 		num = 0;
 
 		for ( j = list; j != i; j = j->next_content )
-			if ( j->item_number == NOTHING || IS_UNIQUE ( j ) || IS_UNIQUE ( i ) )
+			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
 			{
 				if ( strcmp ( j->short_description, i->short_description ) == 0 )
 					break;
@@ -350,7 +350,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch, int mode, int show
 
 
 		for ( j = i; j; j = j->next_content )
-			if ( j->item_number == NOTHING || IS_UNIQUE ( j ) || IS_UNIQUE ( i ) )
+			if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
 			{
 				if ( strcmp ( j->short_description, i->short_description ) == 0 )
 					num++;

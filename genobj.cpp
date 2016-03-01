@@ -19,8 +19,7 @@
 #include "constants.h"
 //#include "htree.h"
 
-int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object);
-void update_extra_descs ( obj_data *obj, obj_data *old_proto, obj_data *old_proto_descs, obj_data *new_proto );
+static int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object);
 void purge_qic(int rnum);
 
 extern struct board_info_type board_info[];
@@ -29,34 +28,15 @@ obj_rnum add_object(struct obj_data *newobj, obj_vnum ovnum)
 {
   int found = NOTHING;
   zone_rnum rznum = real_zone_by_thing(ovnum);
-  obj_data *old_proto, *old_proto_descs;
-  obj_rnum rn;
 
   /*
    * Write object to internal tables.
    */
-  if ((rn = real_object(ovnum)) != NOTHING) {
-    // Old_proto has the same desc pointers as the old prototype
-    CREATE ( old_proto, obj_data, 1 );
-    *old_proto = obj_proto[ rn ];
-
-    // Old_proto_descs has the same descs as the old prototype
-    CREATE ( old_proto_descs, obj_data, 1 );
-    copy_object ( old_proto_descs, &obj_proto[ rn ] );
-
-    // Update the old prototype to the new prototype
-	if ( obj_proto[ rn ].proto_script )
-		free_proto_script ( &obj_proto[ rn ], OBJ_TRIGGER );
-    copy_object ( &obj_proto[ rn ], newobj );
-
-    // Update existing objects
-    update_objects ( old_proto, old_proto_descs, &obj_proto[ rn ] );
-
-    free ( old_proto );
-    free_object_strings ( old_proto_descs );
-    free ( old_proto_descs );
-    add_to_save_list ( zone_table[rznum].number, SL_OBJ );
-    return rn;
+  if ((newobj->item_number = real_object(ovnum)) != NOTHING) {
+    copy_object(&obj_proto[newobj->item_number], newobj);
+    update_objects(&obj_proto[newobj->item_number]);
+    add_to_save_list(zone_table[rznum].number, SL_OBJ);
+    return newobj->item_number;
   }
 
   found = insert_object(newobj, ovnum);
@@ -68,126 +48,42 @@ obj_rnum add_object(struct obj_data *newobj, obj_vnum ovnum)
 /* ------------------------------------------------------------------------------------------------------------------------------ */
 
 /*
- * Only update the variables of existing objects to the
- * new prototype if they were equal to the old prototype
+ * Fix all existing objects to have these values.
+ * We need to run through each and every object currently in the
+ * game to see which ones are pointing to this prototype.
+ * if object is pointing to this prototype, then we need to replace it
+ * with the new one.
  */
-void update_objects ( obj_data *old_proto, obj_data *old_proto_descs, obj_data *new_proto )
+int update_objects(struct obj_data *refobj)
 {
-	struct obj_data *obj;
-	int weight;
+  struct obj_data *obj, swap;
+  int count = 0;
 
-	for ( auto &ol : object_list )
-	{
-		obj = ol.second;
-		if ( GET_OBJ_RNUM ( obj ) != GET_OBJ_RNUM ( new_proto ) )
-			continue;
+  for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
+	  obj = (ob->second);
+    if (obj->item_number != refobj->item_number)
+      continue;
 
-		/* type */
-		if ( GET_OBJ_TYPE ( obj ) == GET_OBJ_TYPE ( old_proto ) )
-			GET_OBJ_TYPE ( obj ) = GET_OBJ_TYPE ( new_proto );
+    count++;
 
-		/* level */
-		if ( GET_OBJ_LEVEL ( obj ) == GET_OBJ_LEVEL ( old_proto ) )
-			GET_OBJ_LEVEL ( obj ) = GET_OBJ_LEVEL ( new_proto );
+    /* Update the existing object but save a copy for private information. */
+    swap = *obj;
+    *obj = *refobj;
 
-		/* wear flags */
-		for ( int i = 0; i < TW_ARRAY_MAX; ++i )
-			if ( GET_OBJ_WEAR ( obj )[i] == GET_OBJ_WEAR ( old_proto )[i] )
-				GET_OBJ_WEAR ( obj )[i] = GET_OBJ_WEAR ( new_proto )[i];
+    /* Copy game-time dependent variables over. */
+    GET_ID(obj) = GET_ID(&swap);
+    IN_ROOM(obj) = swap.in_room;
+    obj->carried_by = swap.carried_by;
+    obj->in_locker = swap.in_locker;
+    obj->worn_by = swap.worn_by;
+    obj->worn_on = swap.worn_on;
+    obj->in_obj = swap.in_obj;
+    obj->contains = swap.contains;
+    obj->next_content = swap.next_content;
+    obj->sitting_here = swap.sitting_here;
+  }
 
-		/* extra flags */
-		for ( int i = 0; i < EF_ARRAY_MAX; ++i )
-			if ( GET_OBJ_EXTRA ( obj )[i] == GET_OBJ_EXTRA ( old_proto )[i] )
-				GET_OBJ_EXTRA ( obj )[i] = GET_OBJ_EXTRA ( new_proto )[i];
-
-		/* weight */
-		if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER )
-		{
-			weight = GET_OBJ_WEIGHT ( obj );
-			for ( obj_data *o = obj->contains; o; o = o->next_content )
-				weight -= GET_OBJ_WEIGHT ( o );
-
-			if ( weight == GET_OBJ_WEIGHT ( old_proto ) )
-				GET_OBJ_WEIGHT ( obj ) += GET_OBJ_WEIGHT ( new_proto ) - weight;
-		}
-		else if ( GET_OBJ_TYPE ( obj ) == ITEM_DRINKCON || GET_OBJ_TYPE ( obj ) == ITEM_FOUNTAIN )
-		{
-			if ( GET_OBJ_WEIGHT ( obj ) - GET_OBJ_VAL ( obj, 1 ) == GET_OBJ_WEIGHT ( old_proto ) - GET_OBJ_VAL ( old_proto, 1 ) )
-				GET_OBJ_WEIGHT ( obj ) = GET_OBJ_WEIGHT ( new_proto );
-		}
-		else if ( GET_OBJ_WEIGHT ( obj ) == GET_OBJ_WEIGHT ( old_proto ) )
-			GET_OBJ_WEIGHT ( obj ) = GET_OBJ_WEIGHT ( new_proto );
-
-		/* obj values, keep the crafting ones */
-		for ( int i = 0; i <= 6; ++i )
-			if ( GET_OBJ_VAL ( obj, i ) == GET_OBJ_VAL ( old_proto, i ) )
-				GET_OBJ_VAL ( obj, i ) = GET_OBJ_VAL ( new_proto, i );
-
-		/* cost */
-		if ( GET_OBJ_COST ( obj ) == GET_OBJ_COST ( old_proto ) )
-			GET_OBJ_COST ( obj ) = GET_OBJ_COST ( new_proto );
-
-		/* cost per day */
-		if ( GET_OBJ_RENT ( obj ) == GET_OBJ_RENT ( old_proto ) )
-			GET_OBJ_RENT ( obj ) = GET_OBJ_RENT ( new_proto );
-
-		/* timer */
-		if ( GET_OBJ_TIMER ( obj ) == GET_OBJ_TIMER ( old_proto ) )
-			GET_OBJ_TIMER ( obj ) = GET_OBJ_TIMER ( new_proto );
-
-		/* perm */
-		for ( int i = 0; i < AF_ARRAY_MAX; ++i )
-			if ( GET_OBJ_PERM ( obj )[i] == GET_OBJ_PERM ( old_proto )[i] )
-				GET_OBJ_PERM ( obj )[i] = GET_OBJ_PERM ( new_proto )[i];
-
-		/* innate */
-		if ( GET_OBJ_INNATE ( obj ) == GET_OBJ_INNATE ( old_proto ) )
-			GET_OBJ_INNATE ( obj ) = GET_OBJ_INNATE ( new_proto );
-
-		/* affects
-		 * don't update if the obj was crafted
-		 * only update if the affects were equal to the old prototype
-		 */
-		if ( GET_OBJ_MAX_QUALITY ( obj ) < 0.001 )
-		{
-			bool equal_affects = TRUE;
-			for ( int i = 0; i < MAX_OBJ_AFFECT; ++i )
-				if ( obj->affected[ i ].modifier != old_proto->affected[ i ].modifier
-					|| obj->affected[ i ].location != old_proto->affected[ i ].location )
-					equal_affects = FALSE;
-
-			if ( equal_affects )
-				for ( int i = 0; i < MAX_OBJ_AFFECT; ++i )
-				{
-					obj->affected[ i ].location = new_proto->affected[ i ].location;
-					obj->affected[ i ].modifier = new_proto->affected[ i ].modifier;
-				}
-		}
-
-		/* descs */
-		if ( obj->name == old_proto->name )
-			obj->name = new_proto->name;
-
-		if ( obj->description == old_proto->description )
-			obj->description = new_proto->description;
-
-		if ( obj->smell == old_proto->smell )
-			obj->smell = new_proto->smell;
-
-		if ( obj->taste == old_proto->taste )
-			obj->taste = new_proto->taste;
-
-		if ( obj->feel == old_proto->feel )
-			obj->feel = new_proto->feel;
-
-		if ( obj->short_description == old_proto->short_description )
-			obj->short_description = new_proto->short_description;
-
-		if ( obj->action_description == old_proto->action_description )
-			obj->action_description = new_proto->action_description;
-
-		update_extra_descs ( obj, old_proto, old_proto_descs, new_proto );
-	}
+  return count;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------ */
@@ -460,81 +356,6 @@ int save_objects(zone_rnum zone_num)
   return TRUE;
 }
 
-void update_extra_descs ( obj_data *obj, obj_data *old_proto, obj_data *old_proto_descs, obj_data *new_proto )
-{
-	if ( obj->ex_description == old_proto->ex_description )
-	{
-		obj->ex_description = new_proto->ex_description;
-		return;
-	}
-
-	/*
-	 * desc and keyword of new proto matches old proto -> do nothing
-	 * desc of new proto matches, but keyword doesn't -> update keyword if it matched old proto
-	 * keyword of new proto matches, but desc doesn't -> update desc if it matched old proto
-	 * desc and keyword don't match -> add ex desc if obj doesn't have the keyword
-	 */
-	extra_descr_data *obj_ex, *old_proto_ex, *new_proto_ex = new_proto->ex_description;
-	for ( ; new_proto_ex; new_proto_ex = new_proto_ex->next )
-	{
-		bool handled = FALSE;
-		for ( old_proto_ex = old_proto_descs->ex_description; old_proto_ex; old_proto_ex = old_proto_ex->next )
-		{
-			bool keyword_match = !strcmp ( new_proto_ex->keyword, old_proto_ex->keyword );
-			bool desc_match = !strcmp ( new_proto_ex->description, old_proto_ex->description );
-			if ( keyword_match && desc_match )
-			{
-				handled = TRUE;
-				break;
-			}
-			else if ( !keyword_match && desc_match )
-			{
-				for ( obj_ex = obj->ex_description; obj_ex; obj_ex = obj_ex->next )
-					if ( !strcmp ( obj_ex->keyword, old_proto_ex->keyword ) && !strcmp ( obj_ex->description, old_proto_ex->description ) )
-					{
-						free_string ( &obj_ex->keyword );
-						obj_ex->keyword = str_udup ( new_proto_ex->keyword );
-						break;
-					}
-				handled = TRUE;
-				break;
-			}
-			else if ( keyword_match && !desc_match )
-			{
-				for ( obj_ex = obj->ex_description; obj_ex; obj_ex = obj_ex->next )
-					if ( !strcmp ( obj_ex->keyword, new_proto_ex->keyword ) && !strcmp ( obj_ex->description, old_proto_ex->description ) )
-					{
-						free_string ( &obj_ex->description );
-						obj_ex->description = str_udup ( new_proto_ex->description );
-						break;
-					}
-				handled = TRUE;
-				break;
-			}
-		}
-
-		if ( !handled )
-		{
-			bool keyword_match = FALSE;
-			for ( obj_ex = obj->ex_description; obj_ex; obj_ex = obj_ex->next )
-				if ( !strcmp ( obj_ex->keyword, new_proto_ex->keyword ) )
-				{
-					keyword_match = TRUE;
-					break;
-				}
-			if ( !keyword_match )
-			{
-				extra_descr_data *new_ex;
-				CREATE ( new_ex, extra_descr_data, 1 );
-				new_ex->keyword = str_udup ( new_proto_ex->keyword );
-				new_ex->description = str_udup ( new_proto_ex->description );
-				new_ex->next = obj->ex_description;
-				obj->ex_description = new_ex;
-			}
-		}
-	}
-}
-
 /*
  * Free all, unconditionally.
  */
@@ -610,8 +431,34 @@ void free_object_strings_proto(struct obj_data *obj)
     free(obj->feel);
     obj->feel = NULL;
   }
-  if (obj->ex_description != obj_proto[robj_num].ex_description)
-    free_ex_descriptions ( obj->ex_description );
+  if (obj->ex_description) {
+    struct extra_descr_data *thised, *plist, *next_one; /* O(horrible) */
+    int ok_key, ok_desc, ok_item;
+    for (thised = obj->ex_description; thised; thised = next_one) {
+      next_one = thised->next;
+      for (ok_item = ok_key = ok_desc = 1, plist = obj_proto[robj_num].ex_description; plist; plist = plist->next) {
+        if (plist->keyword == thised->keyword)
+          ok_key = 0;
+        if (plist->description == thised->description)
+          ok_desc = 0;
+        if (plist == thised)
+          ok_item = 0;
+      }
+      if (thised->keyword && ok_key)
+      {
+        free(thised->keyword);
+        thised->keyword = NULL;
+      }
+      if (thised->description && ok_desc)
+      {
+        free(thised->description);
+        thised->description = NULL;
+      }
+      if (ok_item)
+        free(thised);
+    }
+  
+  }
 }
 
 void copy_object_strings(struct obj_data *to, struct obj_data *from)
@@ -641,7 +488,7 @@ int copy_object_preserve(struct obj_data *to, struct obj_data *from)
   return copy_object_main(to, from, FALSE);
 }
 
-int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object)
+static int copy_object_main(struct obj_data *to, struct obj_data *from, int free_object)
 {
   *to = *from;
   copy_object_strings(to, from);

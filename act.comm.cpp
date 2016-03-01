@@ -1014,6 +1014,7 @@ ACMD(do_write) {
         act("$n begins to jot down a note.", TRUE, ch, 0, 0, TO_ROOM);
         send_editor_help(ch->desc);
         string_write(ch->desc, &paper->action_description, MAX_NOTE_LENGTH, 0, backstr);
+        SET_BIT_AR(GET_OBJ_EXTRA(paper), ITEM_UNIQUE_SAVE);
     }
 }
 

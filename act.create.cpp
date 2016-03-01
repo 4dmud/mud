@@ -279,6 +279,7 @@ void make_potion ( Character *ch, int potion,
 	GET_OBJ_TYPE ( final_potion ) = ITEM_POTION;
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_potion ), ITEM_WEAR_TAKE );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_potion ), ITEM_NORENT );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( final_potion ), ITEM_UNIQUE_SAVE );
 	GET_OBJ_VAL ( final_potion, 0 ) = GET_LEVEL ( ch );
 	GET_OBJ_VAL ( final_potion, 1 ) = potion;
 	GET_OBJ_VAL ( final_potion, 2 ) = -1;
@@ -461,6 +462,7 @@ void make_scroll ( Character *ch, int scroll, struct obj_data *paper )
 	GET_OBJ_TYPE ( final_scroll ) = ITEM_SCROLL;
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_scroll ), ITEM_WEAR_TAKE );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_scroll ), ITEM_NORENT );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( final_scroll ), ITEM_UNIQUE_SAVE );
 	GET_OBJ_VAL ( final_scroll, 0 ) = GET_LEVEL ( ch );
 	GET_OBJ_VAL ( final_scroll, 1 ) = scroll;
 	GET_OBJ_VAL ( final_scroll, 2 ) = -1;
@@ -754,6 +756,7 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_FOCUS );
 	SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_TAKE );
 	SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_HUM );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE );
 	GET_OBJ_VAL ( final_focus, 0 ) = ( v1+1 );
 	GET_OBJ_VAL ( final_focus, 1 ) = v2;
 	GET_OBJ_VAL ( final_focus, 2 ) = FOCUS_STAFF;
@@ -949,6 +952,10 @@ void make_manifest ( Character *ch,struct obj_data *obj )
 	new_descr->description = str_dup ( buf2 );
 	new_descr->next = NULL;
 	final_focus->ex_description = new_descr;
+
+
+	if ( !IS_SET_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE ) )
+		SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE );
 
 	GET_OBJ_WEIGHT ( final_focus ) =  12;
 	GET_OBJ_TIMER ( final_focus ) = ( 420 - GET_LEVEL ( ch ) * TIER ) * 10;
@@ -1244,6 +1251,7 @@ ASKILL ( skill_manipulate )
 		return 0;
 	}
 	obj_from_char ( o );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
 	GET_OBJ_WEIGHT ( o ) += 10;
 	obj_to_char ( o, ch );
 	if ( total_chance ( ch, SKILL_MANIPULATE ) < number ( 0, 101 ) )

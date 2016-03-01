@@ -42,43 +42,29 @@ ACMD(do_string)
   obj_rnum rn = GET_OBJ_RNUM ( obj );
   if (!strcmp("name", buf1))
   {
-<<<<<<< HEAD
     SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
     if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
-=======
-    if ( obj->name && obj->name != obj_proto[ GET_OBJ_RNUM ( obj )].name )
->>>>>>> 5ce6160... oedit update
       free ( obj->name );
     obj->name = str_udup ( buf2 );
   }
   else if (!str_cmp("short", buf1))
   {
-<<<<<<< HEAD
     SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
     if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
-=======
-    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SHORTDESC );
-    if ( obj->short_description && obj->short_description != obj_proto[ GET_OBJ_RNUM ( obj )].short_description )
->>>>>>> 5ce6160... oedit update
       free ( obj->short_description );
     obj->short_description = str_udup ( buf2 );
   }
   else if (!str_cmp("long", buf1))
   {
-<<<<<<< HEAD
     SET_BIT_AR ( GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE );
     if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
-=======
-    if ( obj->description && obj->description != obj_proto[ GET_OBJ_RNUM ( obj )].description )
->>>>>>> 5ce6160... oedit update
       free ( obj->description );
     obj->description = str_udup ( buf2 );
   }
   else if (!str_cmp("extra", buf1))
   {
 	half_chop ( buf2, buf1, buf2 );
-	buf2[0] = UPPER ( buf2[0] );
-	snprintf ( buf2, sizeof ( buf2 ), "%s", (string ( buf2 ) + "\r\n\r\n").c_str() );
+	SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
 	bool ex_was_proto = FALSE;
 	if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
 	{
@@ -121,17 +107,17 @@ ACMD(do_string)
   }
   else if (!str_cmp("weight", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SHORTDESC);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_WEIGHT(obj) = atoi(buf2);
   }
   else if (!str_cmp("cost", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SHORTDESC);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_COST(obj) = atoi(buf2);
   }
   else if (!str_cmp("rent", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SHORTDESC);
+    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_RENT(obj) = atoi(buf2);
   }
   else if (!str_cmp("timer", buf1))
