@@ -86,7 +86,7 @@ int improved_editor_execute(Descriptor *d, char *str)
     parse_action(PARSE_REPLACE, actions, d);
     break;
   case 's':
-    if ( format_script ( d ) )
+    if ( STATE ( d ) != CON_TRIGEDIT || format_script ( d ) )
       return STRINGADD_SAVE;
     else
       return STRINGADD_OK;
