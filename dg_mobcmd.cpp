@@ -387,7 +387,7 @@ ACMD(do_mlag) {
 
 /*
  * lets the mobile destroy an object in its inventory
- * it can also destroy a worn object and it can destroy 
+ * it can also destroy a worn object and it can destroy
  * items using all.xxxxx or just plain all of them
  */
 ACMD(do_mjunk) {
@@ -1406,7 +1406,7 @@ ACMD(do_mtransform) {
             }
 
             if (keep_hp) {
-                GET_HIT(m) = GET_HIT(m);
+                GET_HIT(m) = GET_HIT(ch);
                 GET_MAX_HIT(m) = GET_MAX_HIT(ch);
                 GET_EXP(m) = GET_EXP(ch);
             }
