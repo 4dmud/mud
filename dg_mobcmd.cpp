@@ -1330,7 +1330,6 @@ ACMD(do_mtransform) {
     Character *m;//, tmpmob, *tm;
     obj_data *obj[NUM_WEARS];
     struct hunter_data *hunt = NULL, *hnext;
-//    mob_rnum new_rnum;//this_rnum = GET_MOB_RNUM(ch), new_rnum;
     int keep_hp = 1;       /* new mob keeps the old mob's hp/max hp/exp */
     int pos;
     mob_vnum mvnum = 0;
@@ -1410,69 +1409,13 @@ ACMD(do_mtransform) {
                 GET_MAX_HIT(m) = GET_MAX_HIT(ch);
                 GET_EXP(m) = GET_EXP(ch);
             }
-#if 0
-            //tmpmob = *m;
-            //tm = &tmpmob;
-            /*memcpy(&tmpmob, m, sizeof(*m));
-            //rryan: we need to copy the strings so we don't end up free'ing the prototypes later
-            if(m->player.name.size() > 0)
-              tmpmob.player.name = m->player.name;
-            if(m->player.title->size() > 0)
-              tmpmob.player.title = m->player.title;
-            if(m->player.short_descr.size() > 0)
-              tmpmob.player.short_descr = m->player.short_descr;
-            if(m->player.long_descr.size() > 0)
-              tmpmob.player.long_descr = m->player.long_descr;
-            if(m->player.description.size() > 0)
-              tmpmob.player.description = m->player.description; */
-            tm->id = ch->id;
-            /** affected gets brought over automaticly in the assign above */
-            tm->affected = ch->affected;
-            tm->carrying = ch->carrying;
-            SITTING(tm) = SITTING(ch);
-            tm->hitched = ch->hitched;
-            tm->proto_script = ch->proto_script;
-            tm->script = ch->script;
-            tm->memory = ch->memory;
-            tm->next_in_room = ch->next_in_room;
-            tm->next = ch->next;
-            tm->next_fighting = ch->next_fighting;
-            tm->followers = ch->followers;
-            tm->master = ch->master;
-            tm->mob_specials = ch->mob_specials;
-            GET_FIGHT_EVENT(tm) = GET_FIGHT_EVENT(ch);
-            GET_MESSAGE_EVENT(tm) = GET_MESSAGE_EVENT(ch);
-
-            for (int i = 0; i < 4; i++)
-                GET_POINTS_EVENT(tm, i) = GET_POINTS_EVENT(ch, i);
-
-            GET_WAS_IN(tm) = GET_WAS_IN(ch);
-            if (keep_hp) {
-                GET_HIT(tm) = GET_HIT(ch);
-                GET_MAX_HIT(tm) = GET_MAX_HIT(ch);
-                GET_EXP(tm) = GET_EXP(ch);
-            }
-            GET_GOLD(tm) = GET_GOLD(ch);
-            GET_POS(tm) = GET_POS(ch);
-            IS_CARRYING_W(tm) = IS_CARRYING_W(ch);
-            IS_CARRYING_N(tm) = IS_CARRYING_N(ch);
-            FIGHTING(tm) = FIGHTING(ch);
-            HUNTING(tm) = HUNTING(ch);
-            RIDING(tm) = RIDING(ch);
-            RIDDEN_BY(tm) = RIDDEN_BY(ch);
-            MOB_TIER(tm) = MOB_TIER(ch);
-#endif
 
             ch->assign(m);
-            //memcpy(ch, tm, sizeof(*ch));
-
-            //    *ch = tmpmob;
 
             for (pos = 0; pos < NUM_WEARS; pos++) {
                 if (obj[pos])
                     equip_char(ch, obj[pos], pos);
             }
-            //ch->nr = new_rnum;
             GET_FIGHT_EVENT(m) = NULL;
 	    ch->message_event.clear();
             for (int i = 0; i < 4; i++)
@@ -1482,7 +1425,6 @@ ACMD(do_mtransform) {
             /* mtransforming into self, so lets just */
             if (keep_hp)
                 GET_HIT(ch) = GET_MAX_HIT(ch);
-
         }
     }
 }
