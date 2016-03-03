@@ -682,7 +682,7 @@ void Character::default_char()
 	GET_MAX_HIT ( this ) 			= 100;
 	GET_MANA ( this ) 			= 1000;
 	GET_MAX_MANA ( this ) 			= 1000;
-	// Tweaking these base values to 
+	// Tweaking these base values to
 	// Give newbies more base movement. 50 to 750
 	//Prometheus
 	GET_MOVE ( this ) 			= 1000;
@@ -1142,6 +1142,9 @@ Character *Character::assign ( Character *b )
 	//struct travel_point_data *travel_list;
 	if ( mp && chch )
 		log ( "mob names: %s, and %s", mp->player.name, chch->player.name );
+
+	// do this last, so it doesn't affect the update
+	vnum = b->vnum;
 	return this;
 
 }
@@ -1520,4 +1523,3 @@ bool Character::HasMessageEvent ( int msg_id )
 {
 	return ( message_event.find ( msg_id ) != message_event.end() );
 }
-
