@@ -1145,6 +1145,7 @@ Character *Character::assign ( Character *b )
 
 	// do this last, so it doesn't affect the update
 	vnum = b->vnum;
+	proto_script = GetMobProto ( vnum )->proto_script;
 	return this;
 
 }
