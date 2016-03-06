@@ -3938,9 +3938,10 @@ void brag(Character *ch, Character *vict) {
 
     if (ch == vict)
         return;
-    //  if (IS_NPC(ch))
-    // snprintf(buf, sizeof(buf), "Someone brags, '%s'", brag[number(0, 53)]);
-    // else
+
+	if ( IS_NPC ( ch ) )
+		ch->mob_specials.bragged_about.push_back ( GET_ID ( vict ) );
+
     snprintf(buf, sizeof(buf), "%s brags, '%s' ({cW%d%%{cr)", GET_NAME(ch),  bragmsg[number(0, 53)], (int)((float)GET_HIT(ch)/(float)GET_MAX_HIT(ch)*100));
 
     for (i = descriptor_list; i; i = next) {

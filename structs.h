@@ -2494,7 +2494,7 @@ struct mob_special_data {
     struct combine_data *join_list;
     Character *head_join;
     vector<int> teaches_skills;
-
+    vector<long> bragged_about; /* ids of the players the mob bragged about killing */
     int damage_taken; /* This is the total damage that this mob has taken before they died */
     struct dam_from_list *dam_list; /* this is a list of the id nums of people who have attacked this mob */
 };

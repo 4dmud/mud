@@ -3185,6 +3185,8 @@ int fe_after_damage ( Character* ch, Character* vict,
 #endif
 			local_gold = vict->Gold ( 0, GOLD_HAND );
 			snprintf ( local_buf, sizeof ( local_buf ), "%lld", local_gold );
+			if ( !IS_NPC ( ch ) && vict->mob_specials.bragged_about.size() > 0 && find ( vict->mob_specials.bragged_about.begin(), vict->mob_specials.bragged_about.end(), GET_ID ( ch ) ) != vict->mob_specials.bragged_about.end() )
+				brag ( ch, vict );
 		}
 
 		kill_points ( ch, vict );
