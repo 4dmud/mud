@@ -100,7 +100,19 @@ void filter_ascii_art ( string& stxt )
 	 * Ascii art: at least 6 consecutive non-alphanumeric characters
 	 * Removing 5 causes a problem with MXP
 	 * Only remove spaces if they're not leading or trailing
+	 * Don't filter communication
      */
+
+	vector<string> comm { "auction", "congrat", "gossip", "holler", "newbie", "ooc", "say", "shout", "tell", "whisper", "wiznet" };
+	bool filter = TRUE;
+	for ( const auto &s : comm )
+		if ( stxt.find ( s ) != string::npos )
+		{
+			filter = FALSE;
+			break;
+		}
+	if ( !filter )
+		return;
 
 	while ( i < stxt.length() )
 	{
