@@ -1832,7 +1832,7 @@ void mag_areas ( int level, Character *ch, int spellnum, int savetype )
 			to_char =
 			    "You gesture and release electrical energy all around you!";
 			to_room =
-			    "$n gesture and release electrical energy all around $m!";
+			    "$n gestures and releases electrical energy all around $m!";
 			break;
 		case  SPELL_INFERNO:
 			to_char =

@@ -758,29 +758,40 @@ int call_magic ( Character *caster, Character *cvict,
  * For reference, object values 0-3:
  * staff  - [0]     level     [1] max charges     [2] num charges     [3] spell num
  * wand   - [0]     level     [1] max charges     [2] num charges     [3] spell num
- * scroll - [0]     level     [1] spell num  [2] spell num  [3] spell num
- * potion - [0] level    [1] spell num  [2] spell num  [3] spell num
+ * scroll - [0]     level     [1] spell num       [2] spell num       [3] spell num
+ * potion - [0]     level     [1] spell num       [2] spell num       [3] spell num
  *
  * Staves and wands will default to level 14 if the level is not specified;
  * the DikuMUD format did not specify staff and wand levels in the world
  * files (this is a CircleMUD enhancement).
  */
 
-void mag_objectmagic ( Character *ch, struct obj_data *obj,
-                       char *argument )
+void mag_objectmagic ( Character *ch, struct obj_data *obj, char *argument )
 {
-	int i, k;
+	int i, k = 0;
 	Character *tch = NULL;//, *next_tch;
 	struct obj_data *tobj = NULL;
 	char arg[MAX_INPUT_LENGTH];
 
 	//Make sure that there is no spell direction set
-	GET_SPELL_DIR ( ch ) =NOWHERE;
+	GET_SPELL_DIR ( ch ) = NOWHERE;
 
 	one_argument ( argument, arg );
 
-	k = generic_find ( arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM |
-	                   FIND_OBJ_EQUIP, ch, &tch, &tobj );
+	for ( i = 1; i <= 3; ++i )
+	{
+		if ( i < 3 && ( GET_OBJ_TYPE ( obj ) == ITEM_STAFF || GET_OBJ_TYPE ( obj ) == ITEM_WAND ) )
+			continue;
+		if ( GET_OBJ_VAL ( obj, i ) > 0 )
+		{
+			if ( GET_OBJ_VAL ( obj, i ) == SPELL_GATE || GET_OBJ_VAL ( obj, i ) == SPELL_SUMMON )
+				k = generic_find ( arg, FIND_CHAR_WORLD, ch, &tch, &tobj );
+			break;
+		}
+	}
+
+	if ( !k )
+		k = generic_find ( arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tch, &tobj );
 
 	if ( use_stamina ( ch, 3 ) < 0 )
 	{
@@ -793,13 +804,11 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 	{
 #if 1
 		case ITEM_STAFF:
-			act ( "You tap $p three times on the ground.", FALSE, ch, obj, 0,
-			      TO_CHAR );
+			act ( "You tap $p three times on the ground.", FALSE, ch, obj, 0, TO_CHAR );
 			if ( obj->action_description )
 				act ( obj->action_description, FALSE, ch, obj, 0, TO_ROOM );
 			else
-				act ( "$n taps $p three times on the ground.", FALSE, ch, obj, 0,
-				      TO_ROOM );
+				act ( "$n taps $p three times on the ground.", FALSE, ch, obj, 0, TO_ROOM );
 
 			if ( GET_OBJ_VAL ( obj, 2 ) <= 0 )
 			{
@@ -811,8 +820,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 				GET_OBJ_VAL ( obj, 2 )--;
 				WAIT_STATE ( ch, PULSE_VIOLENCE );
 				/* Level to cast spell at. */
-				k = GET_OBJ_VAL ( obj, 0 ) ? GET_OBJ_VAL ( obj,
-				        0 ) : DEFAULT_STAFF_LVL;
+				k = GET_OBJ_VAL ( obj, 0 ) ? GET_OBJ_VAL ( obj, 0 ) : DEFAULT_STAFF_LVL;
 
 				/*
 				 * Problem : Area/mass spells on staves can cause crashes.
@@ -820,15 +828,12 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 				 * Problem : People like that behavior.
 				 * Solution: We special case the area/mass spells here.
 				 */
-				if ( HAS_SPELL_ROUTINE
-				        ( GET_OBJ_VAL ( obj, 3 ), MAG_MASSES | MAG_AREAS ) )
+				if ( HAS_SPELL_ROUTINE ( GET_OBJ_VAL ( obj, 3 ), MAG_MASSES | MAG_AREAS ) )
 				{
-					for ( i = 0, tch = IN_ROOM ( ch )->people; tch;
-					        tch = tch->next_in_room )
+					for ( i = 0, tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
 						i++;
 					while ( i-- > 0 )
-						call_magic ( ch, NULL, NULL, 0, GET_OBJ_VAL ( obj, 3 ), k,
-						             CAST_STAFF );
+						call_magic ( ch, NULL, NULL, 0, GET_OBJ_VAL ( obj, 3 ), k, CAST_STAFF );
 				}
 				else
 				{
@@ -837,8 +842,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 					{
 						next_tch = tch->next_in_room;
 						if ( ch != tch )
-							call_magic ( ch, tch, NULL, 0, GET_OBJ_VAL ( obj, 3 ),
-							             k, CAST_STAFF );
+							call_magic ( ch, tch, NULL, 0, GET_OBJ_VAL ( obj, 3 ), k, CAST_STAFF );
 					}
 				}
 			}
@@ -849,38 +853,40 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 #endif
 
 		case ITEM_WAND:
-			if ( k == FIND_CHAR_ROOM )
+			if ( k == FIND_CHAR_WORLD )
+			{
+				act ( "You point $p in the direction of $N.", FALSE, ch, obj, tch, TO_CHAR );
+				if ( obj->action_description )
+					act ( obj->action_description, FALSE, ch, obj, tch, TO_ROOM );
+				else
+					act ( "$n points $p in the direction of $N.", TRUE, ch, obj, tch, TO_ROOM );
+			}
+			else if ( k == FIND_CHAR_ROOM )
 			{
 				if ( tch == ch )
 				{
-					act ( "You point $p at yourself.", FALSE, ch, obj, 0,
-					      TO_CHAR );
+					act ( "You point $p at yourself.", FALSE, ch, obj, 0, TO_CHAR );
 					act ( "$n points $p at $mself.", FALSE, ch, obj, 0, TO_ROOM );
 				}
 				else
 				{
 					act ( "You point $p at $N.", FALSE, ch, obj, tch, TO_CHAR );
 					if ( obj->action_description )
-						act ( obj->action_description, FALSE, ch, obj, tch,
-						      TO_ROOM );
+						act ( obj->action_description, FALSE, ch, obj, tch, TO_ROOM );
 					else
-						act ( "$n points $p at $N.", TRUE, ch, obj, tch,
-						      TO_ROOM );
+						act ( "$n points $p at $N.", TRUE, ch, obj, tch, TO_ROOM );
 				}
 			}
 			else if ( tobj != NULL )
 			{
 				act ( "You point $p at $P.", FALSE, ch, obj, tobj, TO_CHAR );
 				if ( obj->action_description )
-					act ( obj->action_description, FALSE, ch, obj, tobj,
-					      TO_ROOM );
+					act ( obj->action_description, FALSE, ch, obj, tobj, TO_ROOM );
 				else
 					act ( "$n points $p at $P.", TRUE, ch, obj, tobj, TO_ROOM );
 			}
 			else
-				if ( IS_SET
-				        ( spell_info[GET_OBJ_VAL ( obj, 3 ) ].routines,
-				          MAG_AREAS | MAG_MASSES ) )
+				if ( IS_SET ( spell_info[GET_OBJ_VAL ( obj, 3 ) ].routines, MAG_AREAS | MAG_MASSES ) )
 				{
 					/* Wands with area spells don't need to be pointed. */
 					act ( "You point $p outward.", FALSE, ch, obj, NULL, TO_CHAR );
@@ -888,8 +894,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 				}
 				else
 				{
-					act ( "At what should $p be pointed?", FALSE, ch, obj, NULL,
-					      TO_CHAR );
+					act ( "At what should $p be pointed?", FALSE, ch, obj, NULL, TO_CHAR );
 					return;
 				}
 
@@ -902,11 +907,9 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 			GET_OBJ_VAL ( obj, 2 )--;
 			WAIT_STATE ( ch, 1 RL_SEC );
 			if ( GET_OBJ_VAL ( obj, 0 ) )
-				call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, 3 ),
-				             GET_OBJ_VAL ( obj, 0 ), CAST_WAND );
+				call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, 3 ), GET_OBJ_VAL ( obj, 0 ), CAST_WAND );
 			else
-				call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, 3 ),
-				             DEFAULT_WAND_LVL, CAST_WAND );
+				call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, 3 ), DEFAULT_WAND_LVL, CAST_WAND );
 			if ( FIGHTING ( ch ) && tch && ( !FIGHTING ( tch ) || tch==ch ) )
 				stop_fighting ( ch );
 			check_potion_weight ( obj );
@@ -916,8 +919,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 			{
 				if ( !k )
 				{
-					act ( "There is nothing to here to affect with $p.", FALSE,
-					      ch, obj, NULL, TO_CHAR );
+					act ( "There is nothing to here to affect with $p.", FALSE, ch, obj, NULL, TO_CHAR );
 					return;
 				}
 			}
@@ -930,12 +932,9 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 			else
 				act ( "$n recites $p.", FALSE, ch, obj, NULL, TO_ROOM );
 
-
-
 			WAIT_STATE ( ch, 1 RL_SEC );
 			for ( i = 1; i <= 3; i++ )
-				if ( call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, i ),
-				                  GET_OBJ_VAL ( obj, 0 ), CAST_SCROLL ) <= 0 )
+				if ( call_magic ( ch, tch, tobj, 0, GET_OBJ_VAL ( obj, i ), GET_OBJ_VAL ( obj, 0 ), CAST_SCROLL ) <= 0 )
 					break;
 			if ( obj != NULL )
 			{
@@ -968,8 +967,7 @@ void mag_objectmagic ( Character *ch, struct obj_data *obj,
 			if ( GET_OBJ_TYPE ( obj ) == ITEM_POTION )
 			{
 				for ( i = 1; i <= 3; i++ )
-					if ( call_magic ( ch, ch, NULL, 0, GET_OBJ_VAL ( obj, i ),
-					                  GET_OBJ_VAL ( obj, 0 ), CAST_POTION ) <= 0 )
+					if ( call_magic ( ch, ch, NULL, 0, GET_OBJ_VAL ( obj, i ), GET_OBJ_VAL ( obj, 0 ), CAST_POTION ) <= 0 )
 						;
 			}
 			else

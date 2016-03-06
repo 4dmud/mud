@@ -402,7 +402,7 @@ void make_scroll ( Character *ch, int scroll, struct obj_data *paper )
 
 	if ( can_make == FALSE )
 	{
-		ch->Send ( "That spell cannot be scribed into a scroll.\r\n" );
+		ch->Send ( "You do not possess the elemental strength needed for that spell.\r\n" );
 		return;
 	}
 
@@ -475,9 +475,9 @@ void make_scroll ( Character *ch, int scroll, struct obj_data *paper )
 	obj_to_char ( final_scroll, ch );
 }
 
-int blank_scroll ( struct obj_data *obj )
+bool blank_scroll ( struct obj_data *obj )
 {
-	return GET_OBJ_VAL ( obj, 0 ) > 0 || GET_OBJ_VAL ( obj, 1 ) > 0 || GET_OBJ_VAL ( obj, 2 ) > 0 ||GET_OBJ_VAL ( obj, 3 ) > 0;
+	return GET_OBJ_VAL ( obj, 1 ) <= 0 && GET_OBJ_VAL ( obj, 2 ) <= 0 && GET_OBJ_VAL ( obj, 3 ) <= 0;
 }
 
 ASKILL ( skill_scribe )
@@ -522,20 +522,21 @@ ASKILL ( skill_scribe )
 		next_obj = obj->next_content;
 		if ( obj == NULL )
 			return 0;
-		else if ( ! ( paper = get_obj_in_list_vis ( ch, paper_name, NULL,
-		                      ch->carrying ) ) )
+		else if ( ! ( paper = get_obj_in_list_vis ( ch, paper_name, NULL, ch->carrying ) ) )
 			continue;
 		else
 			found = TRUE;
 	}
-	if ( found && ( GET_OBJ_TYPE ( paper ) != ITEM_SCROLL || !blank_scroll ( paper ) ) )
-	{
-		ch->Send ( "You can't write on that!\r\n" );
-		return 0;
-	}
+
 	if ( found == FALSE )
 	{
 		ch->Send ( "You don't have %s in your inventory!\r\n",  paper_name );
+		return 0;
+	}
+
+	if ( GET_OBJ_TYPE ( paper ) != ITEM_SCROLL || !blank_scroll ( paper ) )
+	{
+		ch->Send ( "You can't write on that!\r\n" );
 		return 0;
 	}
 
