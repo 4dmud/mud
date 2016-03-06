@@ -2057,6 +2057,13 @@ Character *give_find_vict ( Character *ch, char *arg )
 		*ch << "To who?\r\n";
 		return ( NULL );
 	}
+	else if ( *arg == UID_CHAR )
+	{
+		vict = get_char ( arg );
+		if ( vict && !get_char_vis ( ch, GET_NAME ( vict ), NULL, FIND_CHAR_ROOM ) )
+			return NULL;
+		return vict;
+	}
 	else if ( ! ( vict = get_char_vis ( ch, arg, NULL, FIND_CHAR_ROOM ) ) )
 	{
 		*ch <<  CONFIG_NOPERSON;
@@ -2172,7 +2179,16 @@ ACMD ( do_give )
 		dotmode = find_all_dots ( arg );
 		if ( dotmode == FIND_INDIV )
 		{
-			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+			if ( *arg == UID_CHAR )
+			{
+				obj = get_obj ( arg );
+				if ( obj && !( get_obj_in_list_vis ( ch, GET_OBJ_NAME ( obj ), NULL, ch->carrying ) ) )
+					obj = NULL;
+			}
+			else
+				obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying );
+
+			if ( !obj )
 			{
 				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
 			}
