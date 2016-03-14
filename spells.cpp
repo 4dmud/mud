@@ -1094,6 +1094,18 @@ int times = 1;
 // Remarking this spell out till we can figure out what is wrong -- Prom
 
 ASPELL(spell_minor_identify) {
+	if ( victim )
+	{
+		identify_character ( ch, victim );
+		return;
+	}
+
+	if ( obj == nullptr )
+	{
+		log ( "SYSERR: no target for minor identify" );
+		return;
+	}
+
 	ch->Send ( "\r\n" );
 	if ( GET_OBJ_MAX_QUALITY ( obj ) == 0 )
 		ch->Send ( "Max. Quality: 0\r\n" );
