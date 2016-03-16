@@ -4296,25 +4296,21 @@ void perform_mortal_where ( Character *ch, char *arg )
 {
 	register Character *i;
 	register Descriptor *d;
-        struct clan_deed_type *cl;
-        int found = -1, clan_num;
+	struct clan_deed_type *cl;
+	int found = -1, clan_num;
 	
-        if ( !*arg )
+	if ( !*arg )
 	{
 		ch->Send ( "Players in your Zone [%s]\r\n--------------------\r\n", zone_table[IN_ROOM ( ch )->zone].name );
-                for (clan_num = 0; clan_num < num_of_clans; clan_num++ ) {
-                        if (!clan[clan_num].deeds || found > -1)
-                                continue;
-                        found = -1;
-                        for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-                               // if ( !strcmp(zone_table[real_zone(cl->zone)].name, zone_table[IN_ROOM ( ch )->zone].name ) )
-                                if ((real_zone(cl->zone) == IN_ROOM ( ch )->zone))
-                                        found = clan_num;
-                                continue;
-                        }
-                }
-                        ch->Send ( "This zone is currently controlled by %s{cx. \r\n", (found > -1) ? clan[found].name   : "no clan");
-			ch->Send ( "You have %d tracked kills in this zone at the moment. \r\n", ch->player.deeds.kills);
+		for ( clan_num = 0; clan_num < num_of_clans && found == -1; clan_num++ ) {
+			for ( cl = clan[clan_num].deeds; cl; cl = cl->next )
+				if ( real_zone ( cl->zone ) == IN_ROOM ( ch )->zone ) {
+					found = clan_num;
+					break;
+				}
+		}
+		ch->Send ( "This zone is currently controlled by %s{cx. \r\n", (found > -1) ? clan[found].name   : "no clan");
+		ch->Send ( "You have %d tracked kills in this zone at the moment. \r\n", ch->player.deeds.kills);
 
 		for ( d = descriptor_list; d; d = d->next )
 		{
@@ -4332,8 +4328,7 @@ void perform_mortal_where ( Character *ch, char *arg )
 				continue;
 			if ( get_sub_status ( i, SUB_MASK ) )
 				continue;
-			ch->Send ( "{cg%-20s{cw - {cc%s{c0\r\n", GET_NAME ( i ),
-			           IN_ROOM ( i )->name );
+			ch->Send ( "{cg%-20s{cw - {cc%s{c0\r\n", GET_NAME ( i ), IN_ROOM ( i )->name );
 		}
 	}
 	else              /* print only FIRST char, not all. */
@@ -4342,13 +4337,11 @@ void perform_mortal_where ( Character *ch, char *arg )
 		{
 			if ( i->in_room == NULL || i == ch )
 				continue;
-			if ( !CAN_SEE ( ch, i )
-			        || i->in_room->zone != IN_ROOM ( ch )->zone )
+			if ( !CAN_SEE ( ch, i ) || i->in_room->zone != IN_ROOM ( ch )->zone )
 				continue;
 			if ( !isname_full ( arg, i->player.name ) )
 				continue;
-			ch->Send ( "{cg%-25s{cw - {cc%s{c0\r\n", GET_NAME ( i ),
-			           IN_ROOM ( i )->name );
+			ch->Send ( "{cg%-25s{cw - {cc%s{c0\r\n", GET_NAME ( i ), IN_ROOM ( i )->name );
 			return;
 		}
 		ch->Send ( "No-one around by that name.\r\n" );

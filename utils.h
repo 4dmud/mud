@@ -978,11 +978,10 @@ int current_class_is_tier_num ( Character *ch );
 #define SELF(sub, obj)  ((sub) == (obj))
 #define HERE(sub, obj)  (IN_ROOM((sub))==IN_ROOM((obj)))
 #define LOOK(ch)        look_at_room(ch, 0);
-#define SEE_HELPER(sub, obj) (!IS_NPC(sub) && !IS_NPC(obj) && REMORTS(sub) == 0 && PLR_FLAGGED(obj, PLR_NEWBIE_HLPR))
+#define SEE_HELPER(sub, obj) (!IS_NPC(sub) && REMORTS(sub) == 0 && PLR_FLAGGED(obj, PLR_NEWBIE_HLPR))
 /* Can subject see character "obj"? */
 #define CAN_SEE(sub, obj) (SELF(sub, obj) || SEE_HELPER(sub, obj) || \
-   (((GET_REAL_LEVEL(sub) >= (IS_NPC(obj) ? 0 : GET_INVIS_LEV(obj))) || (!IS_NPC(sub) && PLR_FLAGGED(sub, PLR_HERO) && (IS_NPC(obj) || GET_INVIS_LEV(obj) == LVL_HERO))) && \
-   IMM_CAN_SEE(sub, obj)))
+  (IMM_CAN_SEE(sub, obj) && (GET_REAL_LEVEL(sub) >= (IS_NPC(obj) ? (MOB_FLAGGED(obj, MOB_WIZINVIS) ? LVL_GOD : 0) : GET_INVIS_LEV(obj)))))
 
 /* End of CAN_SEE */
 
