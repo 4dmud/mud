@@ -5300,7 +5300,7 @@ ACMD ( do_toggle )
 	    "       PageWrap: %-3s    "
 	    "         NoBrag: %-3s\r\n"
 	    "         NOGATE: %-3s    "
-	    "      FishTally: %-3s    "
+	    "     NoDeedSpam: %-3s    "
 	    "     NOTELEPORT: %-3s\r\n"
 	    " NoDisplayTitle: %-3s    "
 	    "     NoGraphics: %-3s    "
@@ -5349,7 +5349,7 @@ ACMD ( do_toggle )
 	    YESNO ( PRF_FLAGGED ( ch, PRF_PAGEWRAP ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOBRAG ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_GATEABLE ) ),
-	    ONOFF ( !PRF_FLAGGED ( ch, PRF_FISHPROMPT ) ),
+	    ONOFF ( PRF_FLAGGED ( ch, PRF_NODEEDSPAM ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_TELEPORTABLE ) ),
 	    ONOFF ( !PRF_FLAGGED ( ch, PRF_NOTITLE ) ),
 	    ONOFF ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ),
@@ -5357,12 +5357,6 @@ ACMD ( do_toggle )
 	    );
 
 }
-
-
-/*struct sort_struct {
-  int sort_pos;
-  byte is_social;
-} *cmd_sort_info = NULL;*/
 
 int num_of_cmds;
 

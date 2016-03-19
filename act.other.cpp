@@ -1323,8 +1323,7 @@ ACMD ( do_gen_tog )
 	const char *tog_messages[][2] =
 	{
 		{"You are now safe from summoning by other players.\r\n",
-			"You may now be summoned by other players.\r\n"
-		},
+		 "You may now be summoned by other players.\r\n"},
 		{"Nohassle disabled.\r\n",
 		 "Nohassle enabled.\r\n"},
 		{"Brief mode off.\r\n",
@@ -1422,19 +1421,18 @@ ACMD ( do_gen_tog )
 		// "You are now safe from gating by other players.\r\n"    },
 		{"You are not roleplaying anymore.\r\n",
 		 "You are now roleplaying.\r\n"},
-		{"You will no longer see a tally of how many fish you have caught.\r\n",
-		 "You will now see a tally of how many fish you have caught.\r\n"},
+		{"You will now see people claiming deeds.\r\n",
+		 "You no longer see people claiming deeds.\r\n"},
 		{"You can now no longer have the teleport spell cast on you.\r\n",
 		 "You can now have the teleport spell cast on you.\r\n"},
-		{   "You will NOT automatically agree to group people when they request to follow.\r\n",
-		    "You will automatically agree to group people when they request to follow.\r\n"},
+		{"You will NOT automatically agree to group people when they request to follow.\r\n",
+		 "You will automatically agree to group people when they request to follow.\r\n"},
 		{"You will no longer see players' full titles.\r\n",
 		 "You can now see players' full titles.\r\n"},
 		{"You will now see graphics.\r\n",
 		 "You will no longer see graphics.\r\n"},
 		{"Lists are no longer reversed.\r\n",
 		 "Lists will now be reversed.\r\n"}
-
 	};
 
 
@@ -1621,8 +1619,8 @@ ACMD ( do_gen_tog )
 		case SCMD_NOBRAG:
 			result = PRF_TOG_CHK ( ch, PRF_NOBRAG );
 			break;
-		case SCMD_FISHTALLY:
-			result = PRF_TOG_CHK ( ch, PRF_FISHPROMPT );
+		case SCMD_NODEEDSPAM:
+			result = PRF_TOG_CHK ( ch, PRF_NODEEDSPAM );
 			break;
 		case SCMD_NOTITLE1:
 			result = PRF_TOG_CHK ( ch, PRF_NOTITLE );

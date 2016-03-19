@@ -983,7 +983,7 @@ const char *preference_bits[] =
 	"MOUNTABLE",
 	"!HERO",
 	"T1",
-        "AUTOSAC",
+	"AUTOSAC",
 	"D_AUTO",   // 40
 	"CLS",
 	"BLDWLK",
@@ -996,13 +996,14 @@ const char *preference_bits[] =
 	"!BRAG",
 	"GATE",      // 50
 	"RP",
-	"FISHTALLY",
+	"NODEEDSPAM",
 	"NOTELEPORT",
 	"AUTOGROUP",
-        "RETIRED",   // 55
+	"RETIRED",   // 55
 	"NOTITLE",
 	"DEEDMASTER",
 	"NOGRAPHICS",
+	"REVERSELIST",
 	"\n"
 };
 

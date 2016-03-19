@@ -666,7 +666,7 @@ class Room;
 #define PRF_NOBRAG      	49
 #define PRF_GATEABLE    	50
 #define PRF_RP          	51    /* Player is roleplaying */
-#define PRF_FISHPROMPT  	52
+#define PRF_NODEEDSPAM    	52
 #define PRF_TELEPORTABLE  	53
 #define PRF_AUTOGROUP   	54
 #define PRF_RETIRED     	55    /* For retired clan leaders */
