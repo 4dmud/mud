@@ -1520,7 +1520,7 @@ void init_spell_levels ( void )
 	assign_class ( SKILL_HIDE,         THI | RAN | HUN );
 	assign_class ( SKILL_SLING,        ALL_ROGUE | ALL_FIGHTER );
 	assign_class ( SKILL_TRACK,        ALL_ROGUE | HUN );
-	assign_class ( SKILL_SNARE,        GYP | HUN | THI );
+	assign_class ( SKILL_SNARE,        HUN | ALL_ROGUE );
 	assign_class ( SKILL_TRAP_AWARE,   THI | HUN );
 	assign_class ( SKILL_CROSSBOW,          ALL_ROGUE | ALL_FIGHTER );
 	assign_class ( SKILL_DISARM,       THI | ALL_FIGHTER );
