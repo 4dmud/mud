@@ -445,14 +445,14 @@ void zedit_disp_flag_menu(Descriptor *d)
     char buf1[MAX_INPUT_LENGTH];
 
     get_char_colours(d->character);
-    // clear_screen(d);
+
     for (counter = 0; counter < NUM_ZONE_FLAGS; counter++) {
-	d->Output( "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
-		zone_bits[counter], !(++columns % 2) ? "\r\n" : "");
+        d->Output( "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
+        zone_bits[counter], !(++columns % 2) ? "\r\n" : "");
     }
     sprintbit(OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
     d->Output( "\r\nZone flags: %s%s%s\r\n"
-	    "Enter zone flags, 0 to quit : ", cyn, buf1, nrm);
+        "Enter zone flags, 0 to quit : ", cyn, buf1, nrm);
     OLC_MODE(d) = ZEDIT_ZONE_FLAGS;
 }
 void zedit_disp_dimension_menu(Descriptor *d) {
@@ -474,13 +474,11 @@ void zedit_disp_menu(Descriptor *d)
 {
   int subcmd = 0,  counter = 0;
   char buf1[MAX_STRING_LENGTH];
-  //room_rnum room;
 
   get_char_colours(d->character);
   clear_screen(d);
-  //room = real_room(OLC_NUM(d));
   
-sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
+  sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
   /*
    * Menu header  
    */
@@ -488,7 +486,7 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
 	  "Room number: %s%d%s		Room zone: %s%d\r\n"
 	  "%s1%s) Builders       : %s%s\r\n"
 	  "%sZ%s) Zone name      : %s%s\r\n"
-    "%sX%s) Dimension      : %s%s\r\n"
+	  "%sX%s) Dimension      : %s%s\r\n"
 	  "%sL%s) Lifespan       : %s%d minutes\r\n"
 	  "%sB%s) Bottom of zone : %s%d\r\n"
 	  "%sT%s) Top of zone    : %s%d\r\n"
@@ -500,16 +498,13 @@ sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
 	  cyn, zone_table[OLC_ZNUM(d)].number,
 	  grn, nrm, yel, OLC_ZONE(d)->builders ? OLC_ZONE(d)->builders : "None.",
 	  grn, nrm, yel, OLC_ZONE(d)->name ? OLC_ZONE(d)->name : "<NONE!>",
-    grn, nrm, yel, dimension_types[OLC_ZONE(d)->dimension],
+	  grn, nrm, yel, dimension_types[OLC_ZONE(d)->dimension],
 	  grn, nrm, yel, OLC_ZONE(d)->lifespan,
 	  grn, nrm, yel, OLC_ZONE(d)->bot,
 	  grn, nrm, yel, OLC_ZONE(d)->top,
-	  grn, nrm,
-          yel,
-          OLC_ZONE(d)->reset_mode ? ((OLC_ZONE(d)->reset_mode == 1) ? "Reset when no players are in zone." : "Normal reset.") : "Never reset",
-          nrm,
-	   grn, nrm, yel, buf1,
-	   nrm
+	  grn, nrm, yel,
+	  OLC_ZONE(d)->reset_mode ? ((OLC_ZONE(d)->reset_mode == 1) ? "Reset when no players are in zone." : "Normal reset.") : "Never reset",
+	  nrm, grn, nrm, yel, buf1, nrm
 	  );
 
   /*
@@ -1381,19 +1376,24 @@ void zedit_parse(Descriptor *d, char *arg)
     OLC_ZONE(d)->number = 1;
     zedit_disp_menu(d);
     break;
-case ZEDIT_ZONE_FLAGS:
+  case ZEDIT_ZONE_FLAGS:
 
 	num = atoi(arg);
 	if ((num > NUM_ZONE_FLAGS)) {
-	    d->Output("That is not a valid choice!\r\n");
-	    zedit_disp_flag_menu(d);
+		d->Output("That is not a valid choice!\r\n");
+		zedit_disp_flag_menu(d);
 	} else if (num == 0) {
-	    zedit_disp_menu(d);
-	    break;
+		zedit_disp_menu(d);
+		break;
 	} else {
-	    TOGGLE_BIT(OLC_ZONE(d)->zone_flags, 1 << (num - 1));
-	    OLC_ZONE(d)->number = 1;
-	    zedit_disp_flag_menu(d);
+		int flag = 1 << ( num - 1 );
+		if ( flag == ZONE_OPEN && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED ) )
+			TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED );
+		else if ( flag == ZONE_CLOSED && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN ) )
+			TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN );
+		TOGGLE_BIT ( OLC_ZONE(d)->zone_flags, flag );
+		OLC_ZONE(d)->number = 1;
+		zedit_disp_flag_menu(d);
 	}
 	return;
 
