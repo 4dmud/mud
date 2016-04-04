@@ -330,13 +330,13 @@ return 0;
     case 8:
       if (obj)
       {
-        to_char = "You hold $p out infront of you.";
-        to_room = "$n hold $s hands out infront of $mself.";
+        to_char = "You hold $p out in front of you.";
+        to_room = "$n hold $s hands out in front of $mself.";
       }
       else
       {
-        to_char = "You hold your hands out infront of you.";
-        to_room = "$n holds $s hands out infront of $mself.";
+        to_char = "You hold your hands out in front of you.";
+        to_room = "$n holds $s hands out in front of $mself.";
       }
       zone_table[i].pressure -= GET_INT(ch) + dice(2, 10);
       weather_change(i);
@@ -429,13 +429,13 @@ return 0;
     case 8:
       if (obj)
       {
-        to_char = "You hold $p out infront of you.";
-        to_room = "$n hold $s hands out infront of $mself.";
+        to_char = "You hold $p out in front of you.";
+        to_room = "$n hold $s hands out in front of $mself.";
       }
       else
       {
-        to_char = "You hold your hands out infront of you.";
-        to_room = "$n holds $s hands out infront of $mself.";
+        to_char = "You hold your hands out in front of you.";
+        to_room = "$n holds $s hands out in front of $mself.";
       }
       zone_table[i].pressure += GET_INT(ch) + dice(2, 10);
       weather_change(i);
