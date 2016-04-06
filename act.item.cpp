@@ -3385,8 +3385,8 @@ void wear_message ( Character *ch, struct obj_data *obj, int where )
 
 	if ( GET_EQ ( ch, WEAR_FOCUS ) && where == WEAR_SHIELD )
 	{
-		act ( "$n concentrates and $p floats up infront of $m.", TRUE, ch, obj, 0, TO_ROOM );
-		act ( "You concentrate and $p floats up infront of you.", FALSE, ch, obj, 0, TO_CHAR );
+		act ( "$n concentrates and $p floats up in front of $m.", TRUE, ch, obj, 0, TO_ROOM );
+		act ( "You concentrate and $p floats up in front of you.", FALSE, ch, obj, 0, TO_CHAR );
 	}
 	else
 	{
