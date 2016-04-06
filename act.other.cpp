@@ -1846,7 +1846,7 @@ ACMD ( do_file )
 	buf2[0] = '\0';
 	for ( i = entries_to_show.size() - 1; i >= 0; --i )
 	{
-		if ( entries[ entries_to_show[i] ].length() + 3 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
+		if ( entries[ entries_to_show[i] ].length() + 10 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
 			break;
 
 		strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );

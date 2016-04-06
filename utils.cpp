@@ -639,9 +639,9 @@ void sprintbitarray ( int bitvector[], const char *names[], int maxar,
 				{
 					strlcat ( result, "UNDEFINED ", r_len );
 				}
-				if ( *names[ ( teller * 32 ) + nr] == '\n' )
-					found = TRUE;
 			}
+			if ( *names[ ( teller * 32 ) + nr] == '\n' )
+				found = TRUE;
 		}
 
 	if ( !*result )
