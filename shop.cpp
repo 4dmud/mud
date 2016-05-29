@@ -463,8 +463,7 @@ void times_message(struct obj_data *obj, char *buf, size_t size, int num)
 }
 
 
-struct obj_data *get_slide_obj_vis(Character *ch, char *name,
-                                         struct obj_data *list)
+struct obj_data *get_slide_obj_vis(Character *ch, Character *keeper, char *name, struct obj_data *list)
 {
   struct obj_data *i, *last_match = NULL;
   int j, num;
@@ -478,19 +477,20 @@ struct obj_data *get_slide_obj_vis(Character *ch, char *name,
 
   for (i = list, j = 1; i && (j <= num); i = i->next_content)
     if (isname(tmp, i->name))
-      if (CAN_SEE_OBJ(ch, i) && !same_obj(last_match, i))
+    {
+      if ((CAN_SEE_OBJ(ch, i) || (MOB_FLAGGED(keeper, MOB_WIZINVIS) && CUSTOMER_CAN_SEE_OBJ(ch, i))) && !same_obj(last_match, i))
       {
         if (j == num)
           return (i);
         last_match = i;
         j++;
       }
+    }
   return (NULL);
 }
 
 
-struct obj_data *get_hash_obj_vis(Character *ch, char *name,
-                                        struct obj_data *list)
+struct obj_data *get_hash_obj_vis(Character *ch, Character *keeper, char *name, struct obj_data *list)
 {
   struct obj_data *loop, *last_obj = NULL;
   int qindex;
@@ -503,13 +503,15 @@ struct obj_data *get_hash_obj_vis(Character *ch, char *name,
     return (NULL);
 
   for (loop = list; loop; loop = loop->next_content)
-    if (CAN_SEE_OBJ(ch, loop) && GET_OBJ_COST(loop) > 0)
+    if (GET_OBJ_COST(loop) > 0 && (CAN_SEE_OBJ(ch, loop) || (MOB_FLAGGED(keeper, MOB_WIZINVIS) && CUSTOMER_CAN_SEE_OBJ(ch, loop))))
+    {
       if (!same_obj(last_obj, loop))
       {
         if (--qindex == 0)
           return (loop);
         last_obj = loop;
       }
+    }
   return (NULL);
 }
 
@@ -528,9 +530,9 @@ struct obj_data *get_purchase_obj(Character *ch, char *arg,
   do
   {
     if (*name == '#' || is_number(name))
-      obj = get_hash_obj_vis(ch, name, keeper->carrying);
+      obj = get_hash_obj_vis(ch, keeper, name, keeper->carrying);
     else
-      obj = get_slide_obj_vis(ch, name, keeper->carrying);
+      obj = get_slide_obj_vis(ch, keeper, name, keeper->carrying);
     if (!obj)
     {
       if (msg)
@@ -1059,7 +1061,7 @@ void shopping_list(char *arg, Character *ch, Character *keeper, int shop_nr)
                 "-------------------------------------------------------------------------\r\n", sizeof(buf));
   if (keeper->carrying)
     for (obj = keeper->carrying; obj; obj = obj->next_content)
-      if (CAN_SEE_OBJ(ch, obj) && GET_OBJ_COST(obj) > 0)
+      if (GET_OBJ_COST(obj) > 0 && (CAN_SEE_OBJ(ch, obj) || (MOB_FLAGGED(keeper, MOB_WIZINVIS) && CUSTOMER_CAN_SEE_OBJ(ch, obj))))
       {
         if (!last_obj)
         {
@@ -1181,7 +1183,7 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
 {
   int sindex;
 
-  if (!IS_MOB(victim) || mob_index[GET_MOB_VNUM(victim)]->func != shop_keeper)
+  if (GET_MOB_SPEC(victim) != shop_keeper)
     return (TRUE);
 
   /* Prevent "invincible" shopkeepers if they're charmed. */

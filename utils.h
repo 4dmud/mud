@@ -1000,6 +1000,10 @@ int current_class_is_tier_num ( Character *ch );
 #define CAN_SEE_OBJ(sub, obj) \
    (((MORT_CAN_SEE_OBJ(sub, obj) || GET_OBJ_TYPE(obj) == ITEM_LIGHT)&& !IS_BURIED(obj)) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
+/* Customers don't have to see a wizinvis shopkeep */
+#define CUSTOMER_CAN_SEE_OBJ(sub, obj) \
+   ((((LIGHT_OK(sub) && INVIS_OK_OBJ(sub, obj)) || GET_OBJ_TYPE(obj) == ITEM_LIGHT)&& !IS_BURIED(obj)) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+
 #define CAN_CARRY_OBJ(ch,obj)  \
    (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) &&   \
     ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
