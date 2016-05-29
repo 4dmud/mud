@@ -3266,7 +3266,7 @@ void copyover ( Character *ch )
 	/* Ugh, seems it is expected we are 1 step above lib - this may be dangerous! */
 	chdir ( ".." );
 	execl ( EXE_FILE, "circle", buf2, buf, ( char * ) NULL );
-	alarm(60);
+	alarm(3);
 
 	/* Failed - sucessful exec will not return */
 	perror ( "do_copyover: execl" );

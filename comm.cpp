@@ -28,6 +28,7 @@
 #include "config.h"
 #include "sysdep.h"
 #include "protocol.h" //@TODO:PROTOCOL
+#include "execinfo.h"
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
 # include <mcheck.h>
@@ -111,7 +112,7 @@
 #define INVALID_SOCKET -1
 #endif
 
-#define WATCHDOG 120
+#define WATCHDOG 3
 
 void delete_descriptor_list();
 /* externs */
@@ -3142,10 +3143,34 @@ RETSIGTYPE core_dump_on_crash(void) {
 }
 
 //If we ever get in this function, it means the mud has hanged for more than 60 seconds. This function creates a file called "FROZEN" in the directory where the mud runs in and then aborts, which should  dump a core for further inspection.
+int consecutive_lags = 0;
+uint64_t last_alarm = 0;
 RETSIGTYPE watchdog(void) {
+	if (consecutive_lags == 20)
+	{
         log("FROZEN! Last command typed: %s", last_command);
         open("FROZEN", O_CREAT | O_RDWR, 0600);
         abort(); //dump core.
+	}
+
+	uint64_t t = time(nullptr);
+	if (t - last_alarm < 2)
+		consecutive_lags++;
+	else
+		consecutive_lags = 1;
+	last_alarm = t;
+
+	// log stack trace to find the lag source
+	void *buf[50];
+	int stack_size = backtrace(buf, 50);
+	char **stack = backtrace_symbols(buf, stack_size);
+	if (stack)
+	{
+		log("Lagged for more than 3 seconds. Stack trace:");
+		for (int i = 0; i < stack_size; ++i)
+			log(stack[i]);
+	}
+	alarm(3);
 }
 
 
