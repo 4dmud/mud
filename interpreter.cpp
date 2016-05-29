@@ -890,6 +890,7 @@ const command_info cmd_info[] =
 	{ "tiername"     , "tierna"    , POS_DEAD    , do_tiername     , 0, 0, 0 },
 	{ "toggle"   , "tog" , POS_DEAD    , do_toggle   , 0, 0, 0 },
 	{ "trackthru", "tra"  , POS_DEAD    , do_gen_tog  , LVL_SEN, SCMD_TRACK, WIZ_IMPL_GRP },
+	{ "trade"    , "trade", POS_DEAD    , do_not_here, 0, 0, 0 },
 	{ "topgold"    , "top"    , POS_DEAD    , do_topgold   , LVL_IMMORT, 0, 0 },
 	{ "transfer" , "tran"     , POS_SLEEPING, do_trans    , LVL_IMMORT, 0, WIZ_IMM2_GRP },
 	{ "tsearch"    , "tsea" , POS_DEAD    , do_search_triggers    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
