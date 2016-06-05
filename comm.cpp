@@ -3154,7 +3154,7 @@ RETSIGTYPE watchdog(void) {
 	}
 
 	uint64_t t = time(nullptr);
-	if (t - last_alarm < 2)
+	if (t - last_alarm <= WATCHDOG + 1)
 		consecutive_lags++;
 	else
 		consecutive_lags = 1;
@@ -3166,11 +3166,12 @@ RETSIGTYPE watchdog(void) {
 	char **stack = backtrace_symbols(buf, stack_size);
 	if (stack)
 	{
-		log("Lagged for more than 3 seconds. Stack trace:");
+		log("Lagged for more than %d seconds. Stack trace:", WATCHDOG);
 		for (int i = 0; i < stack_size; ++i)
 			log(stack[i]);
 	}
-	alarm(3);
+	free(stack);
+	alarm(WATCHDOG);
 }
 
 
