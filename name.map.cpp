@@ -40,7 +40,7 @@ void NameIndexer::addNamelist ( const char * namelist, long id )
 
 void NameIndexer::remNamelist ( long id )
 {
-	if ( nlt.empty() )
+	if ( id < 0 || nlt.empty() )
 		return;
 
 	if ( this == &objNames )
@@ -49,6 +49,9 @@ void NameIndexer::remNamelist ( long id )
 		strlcpy ( newlistbuf, GET_NAME ( find_char_by_uid_in_lookup_table ( id ) ), sizeof ( newlistbuf ) );
 
 	char *curtok, *newlist = newlistbuf;
+	if ( !*newlist )
+		return;
+
 	for ( curtok = strsep ( &newlist, WHITESPACE ); curtok; curtok = strsep ( &newlist, WHITESPACE ) )
 	{
 		auto range = nlt.equal_range ( string ( curtok ) );
