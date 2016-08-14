@@ -3168,7 +3168,7 @@ RETSIGTYPE watchdog(void) {
 	{
 		log("Lagged for more than %d seconds. Stack trace:", WATCHDOG);
 		for (int i = 0; i < stack_size; ++i)
-			log(stack[i]);
+			log("%s", stack[i]);
 	}
 	free(stack);
 	alarm(WATCHDOG);
@@ -3897,8 +3897,10 @@ void send_to_prf(char *messg, Character *nosend, int prf_flags) {
 */
 
 void brag(Character *ch, Character *vict) {
-    /* Npc taunts slayed player characters.  Text goes out through gossip
-       channel.  Muerte - Telnet://betterbox.net:4000                     */
+    /* Npc taunts slayed player characters, or player brags about killing a
+       mob that bragged about killing themselves earlier.
+       Text goes out through gossip channel.
+       Muerte - Telnet://betterbox.net:4000                               */
 
     Descriptor *i;
     Descriptor *next;
@@ -3966,13 +3968,16 @@ void brag(Character *ch, Character *vict) {
         return;
 
 	if ( IS_NPC ( ch ) )
-		ch->mob_specials.bragged_about.push_back ( GET_ID ( vict ) );
+	{
+		if ( ch->mob_specials.bragged_about.size() == 0 || find ( ch->mob_specials.bragged_about.begin(), ch->mob_specials.bragged_about.end(), GET_ID ( vict ) ) == ch->mob_specials.bragged_about.end() )
+			ch->mob_specials.bragged_about.push_back ( GET_ID ( vict ) );
+	}
 
     snprintf(buf, sizeof(buf), "%s brags, '%s' ({cW%d%%{cr)", GET_NAME(ch),  bragmsg[number(0, 53)], (int)((float)GET_HIT(ch)/(float)GET_MAX_HIT(ch)*100));
 
     for (i = descriptor_list; i; i = next) {
         next = i->next;
-        if (!i->connected && i != ch->desc && i->character &&
+        if (!i->connected && i->character &&
                 !PRF_FLAGGED(i->character, PRF_NOBRAG) &&
                 !PLR_FLAGGED(i->character, PLR_WRITING) &&
                 !ROOM_FLAGGED(i->character->in_room, ROOM_SOUNDPROOF)) {

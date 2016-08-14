@@ -3163,9 +3163,6 @@ int fe_after_damage ( Character* ch, Character* vict,
 			new_mudlog ( BRF, LVL_GOD, TRUE, "%s killed by %s at %s [%d]", GET_NAME ( vict ),
 			             GET_NAME ( ch ), IN_ROOM ( vict )->name, GET_ROOM_VNUM ( IN_ROOM ( vict ) ) );
 
-			if ( GET_MRACE ( ch ) == 0 )
-				brag ( ch, vict );
-
 			//            if (MOB_FLAGGED(ch, MOB_MEMORY))
 			forget ( ch, vict );
 		}
@@ -3185,8 +3182,6 @@ int fe_after_damage ( Character* ch, Character* vict,
 #endif
 			local_gold = vict->Gold ( 0, GOLD_HAND );
 			snprintf ( local_buf, sizeof ( local_buf ), "%lld", local_gold );
-			if ( !IS_NPC ( ch ) && vict->mob_specials.bragged_about.size() > 0 && find ( vict->mob_specials.bragged_about.begin(), vict->mob_specials.bragged_about.end(), GET_ID ( ch ) ) != vict->mob_specials.bragged_about.end() )
-				brag ( ch, vict );
 		}
 
 		kill_points ( ch, vict );
@@ -5551,10 +5546,18 @@ void raw_kill ( Character *ch, Character *killer )
 	if ( !ch || DEAD ( ch ) )
 		return;
 
+	// killer brags when it's a humanoid mob and ch is a player
+	if ( killer && !IS_NPC ( ch ) && IS_NPC ( killer ) && GET_MRACE ( killer ) == MOB_RACE_HUMANOID )
+		brag ( killer, ch );
+
+	// killer brags when ch bragged about killing killer before
+	else if ( killer && !IS_NPC ( killer ) && IS_NPC ( ch ) && ch->mob_specials.bragged_about.size() > 0 && find ( ch->mob_specials.bragged_about.begin(), ch->mob_specials.bragged_about.end(), GET_ID ( killer ) ) != ch->mob_specials.bragged_about.end() )
+		brag ( killer, ch );
+
   /* Clan deeds - count the kills in the zone */
   /* Then check if the player has a good kill/time ratio so
      they dont cheat on just idling in the zone to get the deeds */
-	if (ch && killer && !IS_NPC(killer) && IS_NPC(ch) && IN_ROOM ( ch ) != NULL) {
+	if (killer && !IS_NPC(killer) && IS_NPC(ch) && IN_ROOM ( ch ) != NULL) {
 		zone_num = zone_table[IN_ROOM(ch)->zone].number;
 		if ((ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) && (ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1)))
 			legit = 1;
@@ -5666,14 +5669,9 @@ void die ( Character *ch, Character *killer )
 	else
 	{
 		struct dam_from_list * t;
-		//long idnum;
 		short counter=0;
-                char displayexp[50];
+		char displayexp[50];
 		Character *temp = NULL;
-		/*if ( killer )
-			idnum = GET_IDNUM ( killer );
-		else
-			idnum = -1;*/
 
 		change_alignment ( killer, ch );
 
@@ -5735,68 +5733,55 @@ void die ( Character *ch, Character *killer )
 					}
 				}
 				gain_exp ( temp, exp );
-                    if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp)) >= 0 && IN_ROOM ( ch ) != NULL ) {
-                        struct clan_deed_type *cl;
-                        int clan_num, zone_num, deeds_amt = 0, deeds_bonus = 0, deeds_total;
-                        zone_num = zone_table[IN_ROOM(ch)->zone].number;
-                        clan_num = find_clan_by_id(GET_CLAN(temp));
-			if (clan_num >= 0) {
-			      for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-                                deeds_amt += 1;
-			} 
+				if (IS_NPC(ch) && !IS_NPC(temp) && find_clan_by_id(GET_CLAN(temp)) >= 0 && IN_ROOM ( ch ) != NULL ) {
+					struct clan_deed_type *cl;
+					int clan_num, zone_num, deeds_amt = 0, deeds_bonus = 0, deeds_total;
+					zone_num = zone_table[IN_ROOM(ch)->zone].number;
+					clan_num = find_clan_by_id(GET_CLAN(temp));
+					if (clan_num >= 0) {
+						for (cl = clan[clan_num].deeds; cl; cl = cl->next)
+							deeds_amt += 1;
 
-			if (deeds_amt > 0) {
-			if (deeds_amt < 30){
-			deeds_bonus = (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100));
-			deeds_total = MIN(15, deeds_amt);
-		}
-			if (deeds_amt > 29){
-			deeds_bonus = (int)((float)exp*((float)MIN(25, deeds_amt)/(float)100));
-			deeds_total = 25;
-		}
+						if (deeds_amt > 0) {
+							if (deeds_amt < 30) {
+								deeds_bonus = (int)((float)exp*((float)MIN(15, deeds_amt)/(float)100));
+								deeds_total = MIN(15, deeds_amt);
+							}
+							else if (deeds_amt > 99) {
+								deeds_bonus = (int)((float)exp*((float)MIN(85, deeds_amt)/(float)100));
+								deeds_total = 85;
+							}
+							else if (deeds_amt > 59) {
+								deeds_bonus = (int)((float)exp*((float)MIN(55, deeds_amt)/(float)100));
+								deeds_total = 55;
+							}
+							else if (deeds_amt > 49) {
+								deeds_bonus = (int)((float)exp*((float)MIN(45, deeds_amt)/(float)100));
+								deeds_total = 45;
+							}
+							else if (deeds_amt > 39) {
+								deeds_bonus = (int)((float)exp*((float)MIN(35, deeds_amt)/(float)100));
+								deeds_total = 35;
+							}
+							else if (deeds_amt > 29) {
+								deeds_bonus = (int)((float)exp*((float)MIN(25, deeds_amt)/(float)100));
+								deeds_total = 25;
+							}
+							temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", deeds_total, deeds_bonus, deeds_amt);
+							gain_exp(temp, deeds_bonus);
+						}
+					}
+					if ( IN_ROOM ( ch ) != NULL && ( clan_num  >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) &&(ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
 
-			if (deeds_amt > 39){
-			deeds_bonus = (int)((float)exp*((float)MIN(35, deeds_amt)/(float)100));
-			deeds_total = 35;
-		}
-			if (deeds_amt > 49){
-			deeds_bonus = (int)((float)exp*((float)MIN(45, deeds_amt)/(float)100));
-			deeds_total = 45;
-		}
-			if (deeds_amt > 59){
-			deeds_bonus = (int)((float)exp*((float)MIN(55, deeds_amt)/(float)100));
-			deeds_total = 55;
-		}	
-
-			if (deeds_amt > 99){
-			deeds_bonus = (int)((float)exp*((float)MIN(85, deeds_amt)/(float)100));
-			deeds_total = 85;
-
-		}	  temp->Send("Your clan grants you a bonus of %d%% exp (%d total) due to your deeds. [%d total]\r\n", deeds_total, deeds_bonus, deeds_amt);
-			  gain_exp(temp, deeds_bonus);
-                         }
-
-
-
-
-
-
-
-
-			}
-			if ( IN_ROOM ( ch ) != NULL && ( clan_num  >= 0) && (ch->vnum > (zone_table[IN_ROOM(ch)->zone].bot - 1)) &&(ch->vnum < (zone_table[IN_ROOM(ch)->zone].top + 1))) {
-
-                            for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
-
-                                if (is_same_zone(cl->zone, zone_num)) {
-                                    gain_exp(temp, exp/10);
-                                    temp->Send("Clan Deed Bonus XP: %lld.\r\n", exp/10);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
+						for (cl = clan[clan_num].deeds; cl; cl = cl->next) {
+							if (is_same_zone(cl->zone, zone_num)) {
+								gain_exp(temp, exp/10);
+								temp->Send("Clan Deed Bonus XP: %lld.\r\n", exp/10);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 
