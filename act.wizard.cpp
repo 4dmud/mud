@@ -3028,43 +3028,35 @@ ACMD ( do_purge )
 
 	one_argument ( argument, buf );
 
-	if ( *buf ) {            /* argument supplied. destroy single object
-                                                                                                                                                                 * or char */
+	if ( *buf ) {            /* argument supplied. destroy single object or char */
 		if ( ( vict = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
 		{
-			if ( !IS_NPC ( vict ) && ( GET_LEVEL ( ch ) <= GET_LEVEL ( vict ) ) )
+			if ( !IS_NPC ( vict ) )
 			{
-				ch->Send ( "Fuuuuuuuuu!\r\n" );
+				ch->Send ( "You can't purge a player!\r\n" );
 				return;
 			}
 			act ( "$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT );
-
-			if ( !IS_NPC ( vict ) )
-			{
-				new_mudlog ( BRF, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "(GC) %s has purged %s.", GET_NAME ( ch ), GET_NAME ( vict ) );
-				if ( vict->desc )
-				{
-					STATE ( vict->desc ) = CON_CLOSE;
-					vict->desc->character = NULL;
-					vict->desc = NULL;
-				}
-			}
 			extract_char ( vict );
+			ch->Send ( "%s", CONFIG_OK );
 		}
 		else
-			if ( ( obj =
-			            get_obj_in_list_vis ( ch, buf, NULL, IN_ROOM ( ch )->contents ) ) != NULL )
+			if ( ( obj = get_obj_in_list_vis ( ch, buf, NULL, IN_ROOM ( ch )->contents ) ) != NULL )
 			{
-				act ( "$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM );
-				extract_obj ( obj );
+				if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
+					ch->Send ( "You can't purge player corpses.\r\n" );
+				else
+				{
+					act ( "$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM );
+					extract_obj ( obj );
+					ch->Send ( "%s", CONFIG_OK );
+				}
 			}
 			else
 			{
 				send_to_char ( "Nothing here by that name.\r\n", ch );
 				return;
 			}
-
-		ch->Send ( "%s", CONFIG_OK );
 	}
 	else              /* no argument. clean out the room */
 	{
@@ -3081,7 +3073,8 @@ ACMD ( do_purge )
 		for ( obj = IN_ROOM ( ch )->contents; obj; obj = next_o )
 		{
 			next_o = obj->next_content;
-			extract_obj ( obj );
+			if ( !OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
+				extract_obj ( obj );
 		}
 	}
 	save_corpses();

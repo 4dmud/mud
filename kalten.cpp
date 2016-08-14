@@ -1234,10 +1234,15 @@ ACMD ( do_blowup )
 	}
 
 	/* target isn't in the room or can't be seen */
-	if ( !
-	        ( target =get_obj_in_list_vis ( ch, arg, NULL,IN_ROOM ( ch )->contents ) ) )
+	if ( !( target = get_obj_in_list_vis ( ch, arg, NULL,IN_ROOM ( ch )->contents ) ) )
 	{
 		send_to_char ( "What is that?\r\n", ch );
+		return;
+	}
+
+	if ( OBJ_FLAGGED ( target, ITEM_PC_CORPSE ) )
+	{
+		ch->Send ( "You can't blowup player corpses.\r\n" );
 		return;
 	}
 
