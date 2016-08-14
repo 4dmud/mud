@@ -1256,7 +1256,7 @@ void advance_level ( Character * ch , bool silent )
 
 /*
  * This simply calculates the backstab multiplier based on a character's
- * level.  This used to be an array, but was changed to be a function so
+ * hp level.  This used to be an array, but was changed to be a function so
  * that it would be easier to add more levels to your MUD.  This doesn't
  * really create a big performance hit because it's not used very often.
  */
@@ -1314,15 +1314,15 @@ float cleave_mult ( int level, int tier )
 	switch ( tier )
 	{
 		default:
-			return 1.1f + ( level < 10 );
+			return 1.1f + ( level > 50 );
 		case 1:
-			return 1.55f + ( level < 10 );
+			return 1.55f + ( level > 50 );
 		case 2:
-			return 1.7f + ( level < 10 );
+			return 1.7f + ( level > 50 );
 		case 3:
-			return 1.9f + ( level < 10 );
+			return 1.9f + ( level > 50 );
 		case 4:
-			return 2.0f + ( level < 10 );
+			return 2.0f + ( level > 50 );
 	}
 }
 

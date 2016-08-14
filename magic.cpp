@@ -2208,6 +2208,9 @@ void mag_points ( int level, Character *ch, Character *victim,
 			break;
 		case SPELL_HEAL:
 			hit = 100 + dice ( spell_lvl / 2, spell_lvl ) + number ( spell_lvl, spell_lvl*2 );
+			// Deduct 33% if a priest cast it on self
+			if ( GET_CLASS ( ch ) == CLASS_PRIEST && ch == victim )
+				hit *= 0.66;
 			victim->Send ( "A warm feeling floods your body.\r\n" );
 			break;
 		case SPELL_LIFE_TRANSFER:

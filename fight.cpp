@@ -6998,16 +6998,7 @@ float skill_type_multi ( Character *ch, Character *vict, int type )
 			return slit_mult ( HPLEFT ( vict ), tier ) + ( total_chance ( ch, SKILL_SLIT ) / 100.0f );
 		case SKILL_KICK:
 		{
-			float spd = GET_SPEED ( ch ) - GET_SPEED ( vict );
-			if (spd < 0) {
-				dam = 0.2;
-			}
-			else {
-				spd *= 0.001;
-				spd += 1.3;
-
-				dam = spd;
-			}
+			dam = 1.3 + ( GET_SPEED ( ch ) - GET_SPEED ( vict ) )  * 0.001;
 			return dam;
 			break;
 		}
