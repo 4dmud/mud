@@ -51,7 +51,7 @@ int num_casting ( Character *ch );
 
 void remort_char ( Character *ch )
 {
-	int remorts = MIN(REMORTS(ch), 50);
+	int remorts = REMORTS ( ch );
 	GET_LEVEL ( ch ) = 1;
 	GET_EXP ( ch ) = 1;
 	GET_GROUP_EXP ( ch ) = 1;
