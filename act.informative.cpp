@@ -3006,6 +3006,18 @@ ACMD ( do_settime )
 
 	time = abs ( atoi ( argument ) );
 	time_info.hours = time;
+
+	if ( time_info.hours <= 4 )
+		sunlight = SUN_DARK;
+	else if ( time_info.hours == 5 )
+		sunlight = SUN_RISE;
+	else if ( time_info.hours <= 20 )
+		sunlight = SUN_LIGHT;
+	else if ( time_info.hours == 21 )
+		sunlight = SUN_SET;
+	else
+		sunlight = SUN_DARK;
+
 	ch->Send ( "Time has been set.\r\n" );
 	check_time_triggers();
 	return;
