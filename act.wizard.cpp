@@ -3025,11 +3025,14 @@ ACMD ( do_purge )
 	Character *vict, *next_v;
 	struct obj_data *obj, *next_o;
 	char buf[MAX_INPUT_LENGTH];
+	char *arg = buf;
+	int num = 0;
 
 	one_argument ( argument, buf );
+	num = get_number ( &arg );
 
 	if ( *buf ) {            /* argument supplied. destroy single object or char */
-		if ( ( vict = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
+		if ( ( vict = get_char_vis ( ch, buf, &num, FIND_CHAR_ROOM ) ) )
 		{
 			if ( !IS_NPC ( vict ) )
 			{
@@ -3041,7 +3044,7 @@ ACMD ( do_purge )
 			ch->Send ( "%s", CONFIG_OK );
 		}
 		else
-			if ( ( obj = get_obj_in_list_vis ( ch, buf, NULL, IN_ROOM ( ch )->contents ) ) != NULL )
+			if ( ( obj = get_obj_in_list_vis ( ch, buf, &num, IN_ROOM ( ch )->contents ) ) != NULL )
 			{
 				if ( OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
 					ch->Send ( "You can't purge player corpses.\r\n" );
