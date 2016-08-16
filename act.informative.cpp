@@ -460,12 +460,13 @@ void show_affect_to_char ( Character *i, Character *ch )
 		act ( "\x1B[1;31m...$e is in flames!\x1B[0m", FALSE, i, 0, ch,
 		      TO_VICT );
 
-	if ( AFF_FLAGGED ( i, AFF_FLY ) && GET_ALIGNMENT ( i ) <0 )
-		act ( "...$e has enormous sooty black wings!", FALSE, i, 0, ch,
-		      TO_VICT );
-	else  if ( !IS_NPC ( i ) && AFF_FLAGGED ( i, AFF_FLY ) && GET_ALIGNMENT ( i ) >=0 )
-		act ( "...$e has enormous silky white wings!", FALSE, i, 0, ch,
-		      TO_VICT );
+	if ( !IS_NPC ( i ) && AFF_FLAGGED ( i, AFF_FLY ) )
+	{
+		if ( GET_ALIGNMENT ( i ) < 0 )
+			act ( "...$e has enormous sooty black wings!", FALSE, i, 0, ch, TO_VICT );
+		else
+			act ( "...$e has enormous silky white wings!", FALSE, i, 0, ch, TO_VICT );
+	}
 
 	if ( AFF_FLAGGED ( i, AFF_FREEZING ) && !AFF_FLAGGED ( i, AFF_PROT_COLD ) )
 		act ( MXPTAG ( "affect lightskyblue" ) "...$e is stuck inside a huge glacier!" MXPTAG ( "/affect " ),
