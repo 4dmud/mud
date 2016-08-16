@@ -3029,7 +3029,7 @@ ASKILL ( skill_blackjack )
 	if ( GET_EQ ( vict, WEAR_HEAD ) )
 		chance -= 10;
 
-	if ( number ( 1, 101 ) < chance )
+	if ( !MOB_FLAGGED ( vict, MOB_NOSLEEP ) && number ( 1, 101 ) < chance )
 	{
 		act ( "You whack $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_CHAR );
 		act ( "$n whacks $N over the head with a heavy looking sack. Ouch.", FALSE, ch, 0, vict, TO_NOTVICT );

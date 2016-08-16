@@ -1344,6 +1344,8 @@ void mag_affects ( int level, Character *ch, Character *victim,
 			break;
 
 		case SPELL_SWEET_DREAMS:
+			if ( MOB_FLAGGED ( victim, MOB_NOSLEEP ) )
+				return;
 			if ( ch && number ( 1, 25 ) > GET_INT ( ch ) )
 			{
 				ch->Send ( "You slip and draw the wrong rune!\r\n" );
