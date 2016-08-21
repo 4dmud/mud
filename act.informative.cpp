@@ -1764,7 +1764,12 @@ char *find_exdesc ( char *word, struct extra_descr_data *list )
 
 	for ( i = list; i; i = i->next )
 		if ( isname ( word, i->keyword ) )
-			return ( i->description );
+		{
+			if ( i->description )
+				return i->description;
+			else
+				return (char*) "Undefined";
+		}
 
 	return ( NULL );
 }
@@ -1810,10 +1815,13 @@ void look_at_target ( Character *ch, char *arg )
 	for ( obj = ch->carrying; obj && !found; obj = obj->next_content )
 	{
 		if ( CAN_SEE_OBJ ( ch, obj ) )
-			if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL
-			        && ++i == fnum )
+			if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == fnum )
 			{
-				*ch << desc;
+				if ( !strcmp ( desc, "Undefined" ) )
+					ch->Send ( "You see nothing special.\r\n" );
+				else
+					ch->Send ( "%s", desc );
+
 				if ( GET_OBJ_TYPE ( obj ) == ITEM_GUN )
 				{
 					if ( GET_OBJ_VAL ( obj, 2 ) == 0 )
@@ -1823,7 +1831,7 @@ void look_at_target ( Character *ch, char *arg )
 					else if ( GET_OBJ_VAL ( obj, 2 ) > 1 )
 						ch->Send ( "It has %d shots left.\r\n", GET_OBJ_VAL ( obj, 2 ) );
 				}
-				if ( GET_OBJ_TYPE ( obj ) == ITEM_AMMO )
+				else if ( GET_OBJ_TYPE ( obj ) == ITEM_AMMO )
 				{
 					if ( GET_OBJ_VAL ( obj, 0 ) == 0 )
 						ch->Send ( "Bah, these are blanks.\r\n" );
