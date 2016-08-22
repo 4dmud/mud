@@ -196,8 +196,6 @@ int find_sub_num ( char *name );
 /*hm...mord*/
 const char *simple_class_name ( Character *ch );
 const char *race_name ( Character *ch );
-int find_mob_in_room ( room_vnum vnum,int mnum );
-int find_obj_in_room ( room_vnum vnum, int onum );
 int can_edit_zone ( Character *ch, zone_rnum zone );
 zone_rnum real_zone_by_thing ( room_vnum vznum );
 int genpreg ( void );
@@ -311,43 +309,6 @@ int trgvar_in_room ( room_vnum vnum )
 
 	for ( ch = rnum->people; ch != NULL; ch = ch->next_in_room )
 		i++;
-
-	return i;
-}
-int find_obj_in_room ( room_vnum vnum, int onum )
-{
-	room_rnum rnum = real_room ( vnum );
-	int i = 0;
-	obj_data *obj;
-
-	if ( rnum == NULL )
-	{
-		script_log ( "findobj.vnum(ovnum): world[rnum] does not exist" );
-		return ( -1 );
-	}
-
-	for ( obj = rnum->contents; obj != NULL; obj = obj->next_content )
-		if ( GET_OBJ_VNUM ( obj ) == onum )
-			i++;
-
-	return i;
-}
-
-int find_mob_in_room ( room_vnum vnum,int mnum )
-{
-	room_rnum rnum = real_room ( vnum );
-	int i = 0;
-	Character *ch;
-
-	if ( rnum == NULL )
-	{
-		script_log ( "people.vnum: world[rnum] does not exist" );
-		return ( -1 );
-	}
-
-	for ( ch = rnum->people; ch != NULL; ch = ch->next_in_room )
-		if ( GET_MOB_VNUM ( ch ) == mnum )
-			i++;
 
 	return i;
 }
@@ -2244,7 +2205,7 @@ struct cmdlist_element *find_end ( trig_data *trig, struct cmdlist_element *cl )
 
 	if ( ! ( cl->next ) )
 	{
-		script_log ( "Trigger VNum %d has 'if' without 'end'.", GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger VNum %d has 'if' without 'end'. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 		return cl;
 	}
 
@@ -2259,7 +2220,7 @@ struct cmdlist_element *find_end ( trig_data *trig, struct cmdlist_element *cl )
 			return c;
 		if ( !c->next )   //rryan: this is the last line, we didn't find an end
 		{
-			script_log ( "Trigger VNum %d has 'if' without 'end'.", GET_TRIG_VNUM ( trig ) );
+			script_log ( "Trigger VNum %d has 'if' without 'end'. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 			return c;
 		}
 	}
@@ -2267,7 +2228,7 @@ struct cmdlist_element *find_end ( trig_data *trig, struct cmdlist_element *cl )
 	for ( p = c->cmd; *p && isspace ( *p ); p++ )
 		; /* skip spaces */
 	if ( strn_cmp ( "end", p, 3 ) )
-		script_log ( "Trigger VNum %d has 'if' without 'end'.", GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger VNum %d has 'if' without 'end'. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 	return c;
 }
 
@@ -2312,7 +2273,7 @@ struct cmdlist_element *find_else_end ( trig_data *trig,
 
 		if ( !c->next )   //rryan: this is the last line, return
 		{
-			script_log ( "Trigger VNum %d has 'if' without 'end'.", GET_TRIG_VNUM ( trig ) );
+			script_log ( "Trigger VNum %d has 'if' without 'end'. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 			return c;
 		}
 	}
@@ -2320,7 +2281,7 @@ struct cmdlist_element *find_else_end ( trig_data *trig,
 	for ( p = c->cmd; *p && isspace ( *p ); p++ )
 		; /* skip spaces */
 	if ( strn_cmp ( "end", p, 3 ) )
-		script_log ( "Trigger VNum %d has 'if' without 'end'.",GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger VNum %d has 'if' without 'end'. Line %d: %s",GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 	return c;
 }
 
@@ -2339,8 +2300,8 @@ void process_wait ( void *go, trig_data *trig, int type, char *cmd,
 
 	if ( !*arg )
 	{
-		script_log ( "Trigger: %s, VNum %d. wait w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cl->cmd );
+		script_log ( "Trigger: %s, VNum %d. wait w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cl->cmd );
 		return;
 	}
 
@@ -2394,8 +2355,8 @@ void process_set ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( !*name )
 	{
-		script_log ( "Trigger: %s, VNum %d. set w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. set w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2419,8 +2380,8 @@ void process_eval ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !*name )
 	{
-		script_log ( "Trigger: %s, VNum %d. eval w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. eval w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2442,29 +2403,29 @@ void process_peek ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !*arg )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a char: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a char. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	else if ( !*room_v )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a room to peek into: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_peek w/o a room to peek into. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
 	//eval_expr ( room_v, result, sizeof ( result ), go, sc, trig, type );
 	if ( ( r = real_room ( atoi ( room_v ) ) ) == NULL )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_peek given an invalid room: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_peek given an invalid room. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	//eval_expr ( arg, result, sizeof ( result ), go, sc, trig, type );
 	if ( ( c = get_char ( arg ) ) == NULL )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_peek can't find the char to show the room to: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_peek can't find the char to show the room to. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2490,15 +2451,15 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !*trignum_s )
 	{
-		script_log ( "Trigger: %s, VNum %d. attach w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. attach w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
 	if ( !id_p || !*id_p || atoi ( id_p ) ==0 )
 	{
-		script_log ( "Trigger: %s, VNum %d. attach invalid id arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. attach invalid id arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2506,8 +2467,8 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	eval_expr ( id_p, result, sizeof ( result ), go, sc, trig, type );
 	if ( ! ( id = atoi ( result ) ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. attach invalid id arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. attach invalid id arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	c = find_char ( id );
@@ -2519,8 +2480,8 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 			r = find_room ( id );
 			if ( !r )
 			{
-				script_log ( "Trigger: %s, VNum %d. attach invalid id arg: '%s'",
-				             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+				script_log ( "Trigger: %s, VNum %d. attach invalid id arg. Line %d: %s",
+				             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 				return;
 			}
 		}
@@ -2530,8 +2491,8 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	trignum = real_trigger ( atoi ( trignum_s ) );
 	if ( trignum == NOTHING || ! ( newtrig=read_trigger ( trignum ) ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. attach invalid trigger: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), trignum_s );
+		script_log ( "Trigger: %s, VNum %d. attach invalid trigger: '%s'. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), trignum_s, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2539,8 +2500,8 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
 	{
 		if ( !IS_NPC ( c ) )
 		{
-			script_log ( "Trigger: %s, VNum %d. attach invalid target: '%s'",
-			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_NAME ( c ) );
+			script_log ( "Trigger: %s, VNum %d. attach invalid target: '%s'. Line %d: %s",
+			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_NAME ( c ), GET_TRIG_LINE_NR ( trig ), cmd );
 			return;
 		}
 		if ( !SCRIPT ( c ) )
@@ -2594,15 +2555,15 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !*trignum_s )
 	{
-		script_log ( "Trigger: %s, VNum %d. detach w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. detach w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
 	if ( !id_p || !*id_p || atoi ( id_p ) ==0 )
 	{
-		script_log ( "Trigger: %s, VNum %d. detach invalid id arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. detach invalid id arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2610,8 +2571,8 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
 	eval_expr ( id_p, result, sizeof ( result ), go, sc, trig, type );
 	if ( ! ( id = atoi ( result ) ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. detach invalid id arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. detach invalid id arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	c = find_char ( id );
@@ -2623,8 +2584,8 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
 			r = find_room ( id );
 			if ( !r )
 			{
-				script_log ( "Trigger: %s, VNum %d. detach invalid id arg: '%s'",
-				             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+				script_log ( "Trigger: %s, VNum %d. detach invalid id arg. Line %d: %s",
+				             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 				return;
 			}
 		}
@@ -2714,16 +2675,16 @@ void makeuid_var ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !*varname )
 	{
-		script_log ( "Trigger: %s, VNum %d. makeuid w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. makeuid w/o an arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 
 		return;
 	}
 
 	if ( !*arg )
 	{
-		script_log ( "Trigger: %s, VNum %d. makeuid invalid id arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. makeuid invalid id arg. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2738,8 +2699,8 @@ void makeuid_var ( void *go, struct script_data *sc, trig_data *trig,
 	{
 		if ( !*name )
 		{
-			script_log ( "Trigger: %s, VNum %d. makeuid needs name: '%s'",
-			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+			script_log ( "Trigger: %s, VNum %d. makeuid needs name. Line %d: %s",
+			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 			return;
 		}
 
@@ -2802,8 +2763,8 @@ void makeuid_var ( void *go, struct script_data *sc, trig_data *trig,
 		}
 		else
 		{
-			script_log ( "Trigger: %s, VNum %d. makeuid syntax error: '%s'",
-			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+			script_log ( "Trigger: %s, VNum %d. makeuid syntax error. Line %d: %s",
+			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 
 			return;
 		}
@@ -2834,7 +2795,7 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
 	skip_spaces ( &cmd );
 	if ( !*buf || !is_number ( buf ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. calling function without a valid vnum!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ) );
+		script_log ( "Trigger: %s, VNum %d. calling function without a valid vnum! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), GET_TRIG_LINE_NR ( parent ), cmd );
 		return;
 	}
 	vnum = atoi ( buf );
@@ -2842,12 +2803,12 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
 
 	if ( !t )
 	{
-		script_log ( "Trigger: %s, VNum %d. calling function %d when function doesn't exist!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum );
+		script_log ( "Trigger: %s, VNum %d. calling function %d when function doesn't exist! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
 		return;
 	}
 	if ( t->attach_type != type )
 	{
-		script_log ( "Trigger: %s, VNum %d. calling function trigger of different attach type (%d)!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum );
+		script_log ( "Trigger: %s, VNum %d. calling function trigger of different attach type (%d)! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
 		return;
 	}
 	/** i can't remember what this bit is for?? **/
@@ -2856,21 +2817,21 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
 		case OBJ_TRIGGER:
 			if ( !TRIGGER_CHECK ( t, OTRIG_FUNCTION ) )
 			{
-				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum );
+				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
 				return;
 			}
 			break;
 		case MOB_TRIGGER:
 			if ( !TRIGGER_CHECK ( t, MTRIG_FUNCTION ) )
 			{
-				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum );
+				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
 				return;
 			}
 			break;
 		case WLD_TRIGGER:
 			if ( !TRIGGER_CHECK ( t, WTRIG_FUNCTION ) )
 			{
-				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d!",GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum );
+				script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
 				return;
 			}
 			break;
@@ -2903,7 +2864,7 @@ void process_unset ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( !*var )
 	{
-		script_log ( "Trigger: %s, VNum %d. unset w/o an arg: '%s'", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. unset w/o an arg. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2937,8 +2898,8 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( !*buf || !*buf2 )
 	{
-		script_log ( "Trigger: %s, VNum %d. remote: invalid arguments '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. remote: invalid arguments in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2955,8 +2916,8 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( !vd )
 	{
-		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in remote call",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf );
+		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in remote call. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2964,8 +2925,8 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 	uid = atoi ( buf2 );
 	if ( uid<=0 )
 	{
-		script_log ( "Trigger: %s, VNum %d. remote: illegal uid '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf2 );
+		script_log ( "Trigger: %s, VNum %d. remote: illegal uid '%s' in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf2, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -2989,8 +2950,8 @@ void process_remote ( struct script_data *sc, trig_data *trig, char *cmd )
 	}
 	else
 	{
-		script_log ( "Trigger: %s, VNum %d. remote: uid '%ld' invalid",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), uid );
+		script_log ( "Trigger: %s, VNum %d. remote: uid '%ld' invalid in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), uid, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3160,8 +3121,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( !*buf || !*buf2 )
 	{
-		script_log ( "Trigger: %s, VNum %d. rdelete: invalid arguments '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. rdelete: invalid arguments in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3170,8 +3131,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	uid = atoi ( buf2 );
 	if ( uid<=0 )
 	{
-		script_log ( "Trigger: %s, VNum %d. rdelete: illegal uid '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf2 );
+		script_log ( "Trigger: %s, VNum %d. rdelete: illegal uid '%s' in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), buf2, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3192,8 +3153,8 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 	}
 	else
 	{
-		script_log ( "Trigger: %s, VNum %d. remote: uid '%ld' invalid",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), uid );
+		script_log ( "Trigger: %s, VNum %d. remote: uid '%ld' invalid in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), uid, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3240,7 +3201,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 
 	if ( args.size() < 3 )
 	{
-		script_log ( "Trigger [%d] %s, restring: missing argument in %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), cmd );
+		script_log ( "Trigger [%d] %s, restring: missing argument in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3253,7 +3214,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	iss >> id;
 	if ( ( obj = find_obj ( id ) ) == NULL )
 	{
-		script_log ( "Trigger [%d] %s, restring: invalid id", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ) );
+		script_log ( "Trigger [%d] %s, restring: invalid id in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3293,7 +3254,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 	{
 		if ( args.size() == 3 )
 		{
-			script_log ( "Trigger [%d] %s, restring: missing argument in %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), cmd );
+			script_log ( "Trigger [%d] %s, restring: missing argument in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 			return;
 		}
 
@@ -3344,7 +3305,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 		}
 	}
 	else
-		script_log ( "Trigger [%d] %s, restring: unknown field %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), args[1].c_str() );
+		script_log ( "Trigger [%d] %s, restring: unknown field %s in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), args[1].c_str(), GET_TRIG_LINE_NR ( trig ), cmd );
 }
 
 void process_playeruid ( script_data *sc, trig_data *trig, char *cmd )
@@ -3395,8 +3356,8 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd, long 
 
 	if ( !*var )
 	{
-		script_log ( "Trigger: %s, VNum %d. global w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. global w/o an arg in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3406,8 +3367,8 @@ void process_global ( struct script_data *sc, trig_data * trig, char *cmd, long 
 
 	if ( !vd )
 	{
-		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in global call",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), var );
+		script_log ( "Trigger: %s, VNum %d. local var '%s' not found in global call in line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), var, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3427,8 +3388,8 @@ void process_context ( struct script_data *sc, trig_data * trig, char *cmd )
 
 	if ( !*var )
 	{
-		script_log ( "Trigger: %s, VNum %d. context w/o an arg: '%s'",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. context w/o an arg in line %d: '%s'",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3450,7 +3411,8 @@ void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
 	num = atoi ( buf );
 	if ( num < 1 )
 	{
-		script_log ( "extract number < 1!" );
+		script_log ( "Trigger: %s, VNum %d. extract number < 1! Line %d: %s",
+			GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3500,13 +3462,15 @@ void dg_letter_value ( struct script_data *sc, trig_data *trig, char *cmd )
 
 	if ( num < 1 )
 	{
-		script_log ( "Trigger #%d : dg_letter number < 1!", GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_letter number < 1! Line %d: %s",
+			GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
 	if ( num > strlen ( string ) )
 	{
-		script_log ( "Trigger #%d : dg_letter number > strlen!", GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_letter number > strlen! Line %d: %s",
+			GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3530,7 +3494,8 @@ void insert_word ( void *go, script_data *sc, trig_data *trig, char *cmd, bool r
 
 	if ( args.size() != 3 )
 	{
-		script_log ( "Trigger #%d : %s, wrong number of arguments", GET_TRIG_VNUM ( trig ), argument );
+		script_log ( "Trigger: %s, VNum %d. insert_word: wrong number of arguments '%s' in line %d: %s",
+			GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), argument, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -3695,20 +3660,18 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 	{
 		GET_TRIG_DEPTH ( trig ) = 1;
 		GET_TRIG_LOOPS ( trig ) = 0;
+		trig->curr_state = trig->cmdlist;
 		sc->context = 0;
 	}
 
 	dg_owner_purged = 0;
 
-	for ( cl = ( mode == TRIG_NEW ) ? trig->cmdlist : trig->curr_state;
-	        cl && GET_TRIG_DEPTH ( trig ); cl = cl ? cl->next : NULL )
+	for ( cl = trig->curr_state; cl && GET_TRIG_DEPTH ( trig ); cl = cl ? cl->next : NULL )
 	{
-
+		trig->curr_state = cl;
 		if ( !cl || !cl->cmd || !strcmp ( cl->cmd, "" ) )
 		{
-			script_log (
-			    "Trigger: %s, VNum %d. has no command",
-			    GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+			script_log ( "Trigger: %s, VNum %d. has no command", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
 			continue;
 		}
 		for ( p = cl->cmd; *p && isspace ( *p ); p++ )
@@ -3724,7 +3687,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 		          !strn_cmp ( p, "extract ", 8 ) || !strn_cmp ( "case", p, 4 ) || !strn_cmp ( p, "eval ", 5 ) ||
 		          !strn_cmp ( p, "nop ", 4 ) || !strn_cmp ( p, "set ", 4 ) ) )
 		{
-			script_log ( "Unmatched %s bracket in trigger %d!", brac < 0 ? "right" : "left", GET_TRIG_VNUM ( trig ) );
+			script_log ( "Unmatched %s bracket in trigger %d! Line %d: %s", brac < 0 ? "right" : "left", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), p );
 		}
 		else if ( !strn_cmp ( p, "if ", 3 ) )
 		{
@@ -3740,8 +3703,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			 */
 			if ( GET_TRIG_DEPTH ( trig ) == 1 )
 			{
-				script_log ( "Trigger VNum %d has 'else' without 'if'.",
-				             GET_TRIG_VNUM ( trig ) );
+				script_log ( "Trigger VNum %d has 'else' without 'if' in line %d.", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
 				continue;
 			}
 			cl = find_end ( trig, cl );
@@ -3752,8 +3714,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			temp = find_done ( cl );
 			if ( !temp )
 			{
-				script_log ( "Trigger VNum %d has 'while' without 'done'.",
-				             GET_TRIG_VNUM ( trig ) );
+				script_log ( "Trigger VNum %d has 'while' without 'done' in line %d.", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
 				return ret_val;
 			}
 			if ( process_if ( p + 6, go, sc, trig, type ) )
@@ -3777,8 +3738,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 			 */
 			if ( GET_TRIG_DEPTH ( trig ) == 1 )
 			{
-				script_log ( "Trigger VNum %d has 'end' without 'if'.",
-				             GET_TRIG_VNUM ( trig ) );
+				script_log ( "Trigger VNum %d has 'end' without 'if' in line %d.", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
 				continue;
 			}
 			GET_TRIG_DEPTH ( trig )--;
@@ -4598,7 +4558,7 @@ int process_return ( trig_data *trig, char *cmd )
 
 	if ( !*arg2 )
 	{
-		script_log ( "Trigger: %s, VNum %d. return w/o an arg: '%s'", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), cmd );
+		script_log ( "Trigger: %s, VNum %d. return w/o an arg in line %d", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
 		return 1;
 	}
 	return ( int ) atoi ( arg2 );

@@ -70,9 +70,11 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     CREATE(trig->cmdlist, struct cmdlist_element, 1);
     trig->cmdlist->cmd = strdup(strtok(s, "\n\r"));
     cle = trig->cmdlist;
+    cle->line_nr = 1;
 
     while ((s = strtok(NULL, "\n\r"))) {
         CREATE(cle->next, struct cmdlist_element, 1);
+        cle->next->line_nr = cle->line_nr + 1;
         cle = cle->next;
         cle->cmd = strdup(s);
     }
@@ -120,7 +122,6 @@ void trig_data_init(trig_data * this_data) {
     this_data->wait_event = NULL;
     this_data->purged = FALSE;
     this_data->var_list = NULL;
-
     this_data->next = NULL;
 }
 
@@ -143,6 +144,8 @@ void trig_data_copy(trig_data * this_data, const trig_data * trg) {
     }
     this_data->trigger_type = trg->trigger_type;
     this_data->cmdlist = trg->cmdlist;
+    if (this_data->cmdlist)
+        this_data->cmdlist->line_nr = 1;
     this_data->narg = trg->narg;
     if (trg->arglist)
         this_data->arglist = str_dup(trg->arglist);

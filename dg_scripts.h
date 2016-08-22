@@ -146,6 +146,7 @@
 /* one line of the trigger */
 struct cmdlist_element {
     char *cmd;			/* one line of a trigger */
+    int line_nr;
     struct cmdlist_element *original;
     struct cmdlist_element *next;
 };
@@ -427,6 +428,7 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
 #define GET_TRIG_WAIT(t)	  ((t)->wait_event)
 #define GET_TRIG_DEPTH(t)         ((t)->depth)
 #define GET_TRIG_LOOPS(t)         ((t)->loops)
+#define GET_TRIG_LINE_NR(t)       ((t)->curr_state ? (t)->curr_state->line_nr : 1)
 
 /* player id's: 0 to MOB_ID_BASE - 1            */
 /* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */

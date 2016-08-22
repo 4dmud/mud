@@ -437,6 +437,7 @@ void trigedit_save(Descriptor *d) {
         s = OLC_STORAGE(d);
 
         CREATE(trig->cmdlist, struct cmdlist_element, 1);
+        trig->cmdlist->line_nr = 1;
         if (s) {
             char *t = strtok(s, "\r\n"); /* strtok returns NULL if s is "\r\n" */
             if (t)
@@ -446,13 +447,14 @@ void trigedit_save(Descriptor *d) {
             cmd = trig->cmdlist;
             while ((s = strtok(NULL, "\r\n"))) {
                 CREATE(cmd->next, struct cmdlist_element, 1);
+                cmd->next->line_nr = cmd->line_nr + 1;
                 cmd = cmd->next;
                 cmd->cmd = strdup(s);
             }
         } else
             trig->cmdlist->cmd = strdup("* No Script");
 
-        /* make the prorotype look like what we have */
+        /* make the prototype look like what we have */
         trig_data_copy(proto, trig);
 
         /* go through the mud and replace existing triggers         */
@@ -485,6 +487,7 @@ void trigedit_save(Descriptor *d) {
 
                 live_trig->cmdlist = proto->cmdlist;
                 live_trig->curr_state = live_trig->cmdlist;
+                live_trig->curr_state->line_nr = 1;
                 live_trig->trigger_type = proto->trigger_type;
                 live_trig->attach_type = proto->attach_type;
                 live_trig->narg = proto->narg;
@@ -503,6 +506,7 @@ void trigedit_save(Descriptor *d) {
         s = OLC_STORAGE(d);
 
         CREATE(trig->cmdlist, struct cmdlist_element, 1);
+        trig->cmdlist->line_nr = 1;
         if (s) {
             /* strtok returns NULL if s is "\r\n" */
             char *t = strtok(s, "\r\n");
@@ -511,6 +515,7 @@ void trigedit_save(Descriptor *d) {
 
             while ((s = strtok(NULL, "\r\n"))) {
                 CREATE(cmd->next, struct cmdlist_element, 1);
+                cmd->next->line_nr = cmd->line_nr + 1;
                 cmd = cmd->next;
                 cmd->cmd = strdup(s);
             }

@@ -61,12 +61,14 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 			caster_room = dg_room_of_obj ( ( struct obj_data * ) go );
 			if ( !caster_room )
 			{
-				script_log ( "dg_do_cast: unknown room for object-caster!" );
+				script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown room for object-caster! Line %d: %s",
+					GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
 				return;
 			}
 			break;
 		default:
-			script_log ( "dg_do_cast: unknown trigger type!" );
+			script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown trigger type! Line %d: %s",
+				GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
 			return;
 	}
 	strcpy ( orig_cmd, cmd );
@@ -74,15 +76,15 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 	s = strtok ( cmd, "'" );
 	if ( s == NULL )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name.",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
 		return;
 	}
 	s = strtok ( NULL, "'" );
 	if ( s == NULL )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name in `'s.",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name in `'s. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
 		return;
 	}
 	t = strtok ( NULL, "\0" );
@@ -91,8 +93,8 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 	spellnum = find_skill_num ( s );
 	if ( !IS_SPELL_CAST(spellnum) )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (%s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (Line %d: %s)",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
 		return;
 	}
 
@@ -128,22 +130,22 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 
 		if ( !target )
 		{
-			script_log ( "Trigger: %s, VNum %d. dg_cast: target not found (%s)",
-			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );
+			script_log ( "Trigger: %s, VNum %d. dg_cast: target not found (Line %d: %s)",
+			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
 			return;
 		}
 	}
 
 	if ( IS_SET ( SINFO.routines, MAG_GROUPS ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: group spells not permitted (%s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_cast: group spells not permitted (Line %d: %s)",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
 		return;
 	}
 	if ( IS_SET ( SINFO.targets, TAR_AREA_DIR ) )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: directional spells not permitted (%s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), orig_cmd );
+		script_log ( "Trigger: %s, VNum %d. dg_cast: directional spells not permitted (Line %d: %s)",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
 		return;
 	}
 
@@ -169,7 +171,8 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 		caster = read_mobile ( DG_CASTER_PROXY );
 		if ( !caster )
 		{
-			script_log ( "dg_cast: Cannot load the caster mob!" );
+			script_log ( "Trigger: %s, VNum %d. dg_cast: Cannot load the caster mob! (Line %d: %s)", 
+				GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
 			return;
 		}
 		caster->free_non_proto_strings();
@@ -224,8 +227,8 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
 	/* make sure all parameters are present */
 	if ( !*charname || !*property || !*value_p || !*duration_p )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -233,8 +236,8 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
 	duration = atoi ( duration_p );
 	if ( duration <= 0 )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: need positive duration!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_affect: need positive duration! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -266,8 +269,8 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
 
 	if ( !type ) /* property not found */
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: unknown property '%s'!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property );
+		script_log ( "Trigger: %s, VNum %d. dg_affect: unknown property '%s'! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property, GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -276,8 +279,8 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
 	ch = get_char ( charname );
 	if ( !ch )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	if ( !str_cmp ( value_p, "off" ) )
@@ -356,16 +359,16 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
 	/* make sure all parameters are present */
 	if ( !*addrem || !*dest || !*name )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest (add/remove) <room vnum/ALL> <target>",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_dest (add/remove) <room vnum/ALL> <target>. Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	if ( !strcasecmp ( dest, "all" ) )
 		all = TRUE;
 	else if ( !is_number ( dest ) || ( loc = real_room ( atoi ( dest ) ) ) == NULL )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: invalid target room!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_dest: invalid target room! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
@@ -377,15 +380,15 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
 		= FALSE;
 	else
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: need to specify add or remove for second argument!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_dest: need to specify add or remove for second argument! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 
 	if ( all && add )
 	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: can only use ALL with remove!",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
+		script_log ( "Trigger: %s, VNum %d. dg_dest: can only use ALL with remove! Line %d: %s",
+		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
 		return;
 	}
 	/* locate target */
