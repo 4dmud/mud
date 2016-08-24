@@ -798,7 +798,7 @@ ACTION(thing_juggle)
       act("$n watches in horror as $s balls mysteriously disappear into thin air.\r\n"
           "Maybe the Imms weren't as impressed as some others.", FALSE, ch, 0, 0, TO_ROOM);
     case 3:
-      ch->Send( "You loose concentration and drop the balls everywhere!!\r\n");
+      ch->Send( "You lose concentration and drop the balls everywhere!!\r\n");
       act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
       break;
     }
@@ -1131,7 +1131,7 @@ ACTION(thing_throttle)
       has_weapon(ch) || GET_EQ(ch, WEAR_FOCUS) || GET_EQ(ch, WEAR_SHIELD)  ||
       ((number(0, 101) - (2* GET_DEX(ch))) > total_chance(ch, SKILL_STRANGLE)))
   {
-    ch->Send( "You loose focus and stop strangling.\r\n");
+    ch->Send( "You lose focus and stop strangling.\r\n");
     act("$n relaxes his grip.\r\n", FALSE, ch, 0, 0, TO_ROOM);
     start_fighting(vict, ch);
     *num = 0;
