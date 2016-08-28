@@ -786,20 +786,23 @@ ACTION(thing_juggle)
           "at you till you give up and put your balls away.", FALSE, ch, 0 , 0, TO_CHAR);
       act("Some of the gathered crowd lose interest in the same routine and start booing\r\n"
           "at $n till $e gives up and put $s balls away.", FALSE, ch, 0 , 0, TO_ROOM);
+      break;
     case 1:
       act("Someone coughs and causes you to lose concentration. \r\nBalls are scattered everywhere.",
           FALSE, ch, 0, 0, TO_CHAR);
       act("Someone coughs and causes $n to lose concentration. \r\nBalls are scattered everywhere.",
           FALSE, ch, 0, 0, TO_ROOM);
+      break;
 
     case 2:
       act("You watch in horror as your balls mysteriously disappear into thin air.\r\n"
           "Maybe the Imms weren't as impressed as some others.", FALSE, ch, 0, 0, TO_CHAR);
       act("$n watches in horror as $s balls mysteriously disappear into thin air.\r\n"
           "Maybe the Imms weren't as impressed as some others.", FALSE, ch, 0, 0, TO_ROOM);
+      break;
     case 3:
       ch->Send( "You lose concentration and drop the balls everywhere!!\r\n");
-      act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
+      act("$n loses concentration and drops the balls everywhere!!\r", FALSE, ch, 0, 0, TO_ROOM);
       break;
     }
     *num = 0;
