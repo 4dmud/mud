@@ -2054,7 +2054,7 @@ Character *give_find_vict ( Character *ch, char *arg )
 
 	if ( !*arg )
 	{
-		*ch << "To who?\r\n";
+		*ch << "To whom?\r\n";
 		return ( NULL );
 	}
 	else if ( *arg == UID_CHAR )
@@ -2134,7 +2134,7 @@ ACMD ( do_give )
 	argument = one_argument ( argument, arg );
 
 	if ( !*arg )
-		ch->Send ( "Give what to who?\r\n" );
+		ch->Send ( "Give what to whom?\r\n" );
 	else if ( is_number ( arg ) )
 	{
 		amount = atol ( arg );
