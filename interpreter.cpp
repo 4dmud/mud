@@ -907,7 +907,7 @@ const command_info cmd_info[] =
         { "unsilence"  , "unsilence"     , POS_DEAD    , do_heroutil  , 0, SCMD_UNSILENCE, 0 },
 	{ "uptime"   , "upt" , POS_DEAD    , do_date     , LVL_IMMORT, SCMD_UPTIME, WIZ_IMM2_GRP },
 	{ "use"      , "us"  , POS_SITTING , do_use      , 1, SCMD_USE, 0 },
-	{ "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_IMM3_GRP },
+	{ "users"    , "user"     , POS_DEAD    , do_users    , LVL_IMMORT, 0, WIZ_BAN_GRP },
 	{ "clients"  , "client"   , POS_DEAD    , do_clients  , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
 	{ "value"    , "val" , POS_STANDING, do_not_here , 0, 0, 0 },
