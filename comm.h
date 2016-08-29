@@ -9,6 +9,7 @@
 ************************************************************************ */
 #ifndef COMM_H
 #define COMM_H
+
 #define NUM_RESERVED_DESCS	8
 
 #define COPYOVER_FILE "copyover.dat"

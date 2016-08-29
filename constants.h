@@ -1,3 +1,5 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 extern const char *body[];
 extern const int wear_order_index[];	/* RG 6/28/98 */
@@ -90,3 +92,5 @@ extern const char *unused_spellmessage;
 extern const char *colour_names[];
 extern const char *quality_names[];
 extern const char *origin_names[];
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef AUCTION_H
+#define AUCTION_H
 struct auction_data {
   Character *seller;
   Character *bidder;
@@ -25,3 +27,4 @@ struct auction_data {
 void auction_update(void);
 Character *get_char_auc(char *name);
 
+#endif

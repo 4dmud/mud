@@ -7,6 +7,9 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
+
 #define READ_SIZE 256
 
 #define ACMD(name)  \
@@ -387,7 +390,7 @@ struct alias_data {
  * (now works symmetrically -- JE 7/25/94)
  *
  * that was dumb.  it shouldn't be symmetrical.  JE 5/1/95
- * 
+ *
  * returns 1 if arg1 is an abbreviation of arg2
  */
 inline int is_abbrev(const char *arg1, const char *arg2) {
@@ -398,3 +401,5 @@ inline int is_abbrev(const char *arg1, const char *arg2) {
         return 1;
     return 0;
 }
+
+#endif

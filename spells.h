@@ -2,65 +2,15 @@
  * ************************************************************************
  * File: spells.h                                      Part of CircleMUD *
  * Usage: header file: constants and fn prototypes for spell system       * *
- * 
+ *
  * All rights reserved.  See license.doc for complete information.        * *
- * 
+ *
  * Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
- * CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               * 
+ * CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
  ***********************************************************************
  */
-/*
-* $Log: spells.h,v $
-* Revision 1.14  2007/06/10 02:18:40  w4dimenscor
-* changed all entries in the code of 'color' to 'colour', but i now regret it.
-*
-* Revision 1.13  2006/08/25 10:22:44  w4dimenscor
-* added command to fix peoples skills back to the practiced amount they were at
-*
-* Revision 1.12  2006/08/18 11:09:59  w4dimenscor
-* updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
-*
-* Revision 1.11  2006/08/17 10:53:49  w4dimenscor
-* moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
-*
-* Revision 1.10  2006/05/21 11:02:27  w4dimenscor
-* converted game from being C code to C++
-* to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
-*
-* Revision 1.9  2006/04/21 12:46:45  w4dimenscor
-* Fixed gcc 4.1 compile time errors. Game will now compile in GCC4
-*
-* Revision 1.8  2006/02/17 22:19:54  w4dimenscor
-* Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
-*
-* Revision 1.7  2006/01/23 05:23:19  w4dimenscor
-* sorry self. another. _can't remember the changes_ entry
-*
-* Revision 1.6  2005/08/07 04:12:39  w4dimenscor
-* Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
-*
-* Revision 1.5  2005/03/17 12:42:13  w4dimenscor
-* Added skill smash
-*
-* Revision 1.4  2005/02/25 05:02:46  w4dimenscor
-* added new commands and a few little changes - i forget what eek
-*
-* Revision 1.3  2005/02/04 20:46:11  w4dimenscor
-* Many changes - i couldn't connect to this for a while
-*
-* Revision 1.2  2004/11/20 02:33:25  w4dimenscor
-* updated and cleaned up the script system
-*
-* Revision 1.1.1.1  2004/11/12 02:16:55  w4dimenscor
-* Initial clean submission of 4Dimensions src code
-*
-* Revision 1.38  2004/09/04 03:46:51  molly
-* made it so only one cost for recovering corpses, and skillist is sorted
-*
-* Revision 1.36  2004/08/15 01:12:31  molly
-* aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
-*
-*/
+#ifndef SPELLS_H
+#define SPELLS_H
 
 #define DEFAULT_STAFF_LVL	12
 #define DEFAULT_WAND_LVL	12
@@ -266,7 +216,7 @@ enum spell_list {
     SPELL_WATER_TO_WINE,
     SPELL_MIDAS_TOUCH,//127
     SPELL_POLYMORPH,
-    SPELL_DARKNESS, 
+    SPELL_DARKNESS,
     SPELL_RESERVE,   // SYSTEM STUFF
     SKILL_BACKSTAB, // 131
     SKILL_BASH,
@@ -338,12 +288,12 @@ enum spell_list {
     SKILL_LONGARM,
     SKILL_CLEAVE,//199
     SKILL_SMASH,  // 200
-    SPELL_IDENTIFY, 
-    SPELL_FIRE_BREATH,  
-    SPELL_GAS_BREATH, 
-    SPELL_FROST_BREATH, 
-    SPELL_ACID_BREATH,  
-    SPELL_LIGHTNING_BREATH, 
+    SPELL_IDENTIFY,
+    SPELL_FIRE_BREATH,
+    SPELL_GAS_BREATH,
+    SPELL_FROST_BREATH,
+    SPELL_ACID_BREATH,
+    SPELL_LIGHTNING_BREATH,
     SPELL_BURN,
     SPELL_FREEZE,
     SPELL_ACID,            // 209
@@ -429,28 +379,28 @@ enum spell_list {
     SPARE289,
     SPARE290,
     SPARE291,
-    TYPE_RADIATION, 
-    SPELL_SILENCED , 
+    TYPE_RADIATION,
+    SPELL_SILENCED ,
     SPELL_IMMFREEZE,
     SPELL_DG_AFFECT,
     TYPE_UNDERWATER,
-    TYPE_SPACE,	
+    TYPE_SPACE,
     TYPE_DESERT,
-    SPELL_OUTCAST, 
+    SPELL_OUTCAST,
     /* 300 - 399 are reserved for attack types only */
     TYPE_HIT,    /* 300 */
-    TYPE_STING, 
-    TYPE_WHIP,  
-    TYPE_SLASH, 
-    TYPE_BITE,  
+    TYPE_STING,
+    TYPE_WHIP,
+    TYPE_SLASH,
+    TYPE_BITE,
     TYPE_BLUDGEON,  /* 305 */
-    TYPE_CRUSH,    
-    TYPE_POUND,   
-    TYPE_CLAW,   
-    TYPE_MAUL,  
+    TYPE_CRUSH,
+    TYPE_POUND,
+    TYPE_CLAW,
+    TYPE_MAUL,
     TYPE_THRASH,  /* 310 */
-    TYPE_PIERCE,  
-    TYPE_BLAST,	
+    TYPE_PIERCE,
+    TYPE_BLAST,
     TYPE_PUNCH,
     TYPE_STAB,
     TYPE_KICK,  /* 315 */
@@ -459,10 +409,10 @@ enum spell_list {
     TYPE_ATK_SPARK,
     TYPE_ATK_PULSE,
     TYPE_ATK_BEAM,   /* 320 */
-    TYPE_ATK_SPEAR,		
-    TYPE_ATK_BOLT,	
+    TYPE_ATK_SPEAR,
+    TYPE_ATK_BOLT,
     TYPE_ATK_BLAST,
-    TYPE_ATK_BURST,			
+    TYPE_ATK_BURST,
     TYPE_ATK_DISCHARGE,	 /* 325 */
     TYPE_ATK_ERUPTION,
     TYPE_ATK_TORRENT,
@@ -701,10 +651,10 @@ struct sub_skill_info_type {
     int cost;		        /* the cost in units */
     int percentage;		/* the cost in percentage */
     /*
-       where actual cost is the lower of the two, percentage or cost 
+       where actual cost is the lower of the two, percentage or cost
        for example if the cost is 200 hitpoints, and the percentage is 15%
        and the player has 1000 hp, the percentage hp is 150 points
-       then the actual cost will be 150, because the percentage 
+       then the actual cost will be 150, because the percentage
        is lower then the cost value -- mordipie
     */
     int routines;
@@ -730,14 +680,14 @@ struct spell_class_type {
 };
 /*
  * Possible Targets:
- * 
+ *
  * bit 0 : IGNORE TARGET bit 1 : PC/NPC in room bit 2 : PC/NPC in world bit 3 :
  * Object held bit 4 : Object in inventory bit 5 : Object in room bit 6 :
  * Object in world bit 7 : If fighting, and no argument, select tar_char as
  * self bit 8 : If fighting, and no argument, select tar_char as victim
  * (fighting) bit 9 : If no argument, select self, if argument check that it
  * IS self.
- * 
+ *
  */
 
 #define SPELL_TYPE_SPELL   0
@@ -871,7 +821,7 @@ struct sub_node_type {
 
 struct head_node_type {
   int skill_num;
-  struct skill_prereq_type *prereqs; 
+  struct skill_prereq_type *prereqs;
   struct sub_node_type *branches;
 };
 
@@ -880,3 +830,4 @@ struct root_node_type {
   struct root_node_type *next;
 };
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef TREES_H
+#define TREES_H
+
 //Forest and Trees
 int save_forest(void);
 int load_forest(void);
@@ -33,3 +36,4 @@ extern int vein_room;
 #define MAX_TREE_TYPES 9
 #define MAX_VEIN_TYPE 1
 
+#endif

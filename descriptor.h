@@ -9,6 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 
+#ifndef DESCRIPTOR_H
+#define DESCRIPTOR_H
+
 
 #include "col_string.h"
 #include "protocol.h"
@@ -105,3 +108,5 @@ public:
     string cstr;
     string stxt;
 };
+
+#endif

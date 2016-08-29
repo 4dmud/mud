@@ -1,6 +1,11 @@
 /* src/config.h.  Generated automatically by configure.  */
 /* src/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
+// Note by thotter: While apparently this file is auto-generated, I very much
+// doubt this has been done in years. Therefore I'm making direct edits anyway.
+#ifndef CONF_H
+#define CONF_H
+
 /* Define to empty if the keyword does not work.  */
 /* #undef const */
 
@@ -309,7 +314,7 @@
 /* #undef NEED_STRICMP_PROTO */
 
 /* Check for a prototype to strlcpy. */
- #define NEED_STRLCPY_PROTO 
+ #define NEED_STRLCPY_PROTO
 
 /* Check for a prototype to strncasecmp. */
 /* #undef NEED_STRNCASECMP_PROTO */
@@ -331,3 +336,5 @@
 
 /* Check for a prototype to write. */
 /* #undef NEED_WRITE_PROTO */
+
+#endif

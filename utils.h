@@ -1,4 +1,3 @@
-
 /* ************************************************************************
 *   File: utils.h                                       Part of CircleMUD *
 *  Usage: header file: utility macros and prototypes of utility funcs     *
@@ -8,7 +7,8 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hoins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
+#ifndef UTILS_H
+#define UTILS_H
 
 /* external declarations and prototypes **********************************/
 
@@ -417,7 +417,7 @@ inline char *str_dup ( const char *source )
 #define DYN_CREATE \
      dynbuf_size = MAX_STRING_LENGTH; \
      CREATE(dynbuf, char, dynbuf_size); \
- 
+
 
 #define DYN_RESIZE(sbuf) \
      if (strlen(dynbuf) + strlen((sbuf)) >= dynbuf_size) { \
@@ -445,7 +445,7 @@ inline char *str_dup ( const char *source )
       if (temp)				\
          temp->next = (item)->next;	\
    }					\
- 
+
 /* Horus macro */
 #define ADD_TO_LIST(item, head)    \
    if ((head)) {                   \
@@ -455,7 +455,7 @@ inline char *str_dup ( const char *source )
    else                            \
       head = item;                 \
 
-      
+
 int get_sub(Character *ch, int i);
 void improve_sub ( Character *ch, enum subskill_list sub, int amount );
 
@@ -1284,3 +1284,5 @@ int fileExists ( char * fileName );
 #define FTOI(f) ((int)((f)))
 
 #define MONEY(obj) ((gold_int)MAX((gold_int)GET_OBJ_VAL(obj,0), GET_OBJ_COST(obj)))
+
+#endif

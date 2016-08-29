@@ -4,6 +4,8 @@
  * Copyright 1996 by Harvey Gilpin					*
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
+#ifndef OASIS_H
+#define OASIS_H
 
 #define _OASISOLC	0x206   /* 2.0.6 */
 /*
@@ -70,8 +72,8 @@
  * Limit information.
  */
 
- 
- 
+
+
 const int MAX_ROOM_NAME	= 75;
 const int MAX_MOB_NAME	= 50;
 const int MAX_OBJ_NAME	= 50;
@@ -162,8 +164,8 @@ struct oasis_olc_data {
   struct trig_data *trig;
   struct vehicle_data *vehicle;
   int script_mode;
-  int trigger_position;          
-  int item_type;                 
+  int trigger_position;
+  int item_type;
   vector<int> *script; /* for assigning triggers in [r|o|m]edit*/
 
   struct assembly_data *OlcAssembly; /* used for 'assedit'         */
@@ -457,7 +459,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define SEDIT_SHOP_FLAGS		35
 #define SEDIT_NOTRADE			36
 
-/* 
+/*
  * Submodes of CEDIT connectedness.
  */
 #define CEDIT_MAIN_MENU			0
@@ -545,7 +547,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define ASSEDIT_EDIT_TYPES              7
 #define ASSEDIT_EDIT_TRIGGER            8
 
-#ifndef __GENOLC_C__
+//#ifndef __GENOLC_C__
 
 /*
  * Prototypes to keep.
@@ -578,7 +580,7 @@ void hedit_setup_existing(Descriptor *d, int rnum);
 void hedit_save_to_disk(Descriptor *d);
 int  hedit_find_entry(char *keyword);
 void hedit_save_internally(Descriptor *d);
- 
+
 void medit_free_mobile(Character *mob);
 void medit_setup_new(Descriptor *d);
 void medit_setup_existing(Descriptor *d, int rmob_num);
@@ -848,4 +850,4 @@ void trigedit_setup_existing(Descriptor *d, int rtrg_num);
 void trigedit_setup_new(Descriptor *d);
 ACMD(do_oasis_trigedit);
 
-#endif // ifndef __GENOLC_C__
+#endif

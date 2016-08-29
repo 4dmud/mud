@@ -1,3 +1,5 @@
+#ifndef REGEN_H
+#define REGEN_H
 
 /* Player point types for events */
 #define REGEN_HIT      0
@@ -25,3 +27,5 @@ type = t;
 
   ~regen_event_obj() {}
 };
+
+#endif

@@ -7,6 +7,8 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+#ifndef SHOP_H
+#define SHOP_H
 
 void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ );
 extern struct shop_data *shop_index;
@@ -186,3 +188,5 @@ struct stack_data {
 #define MSG_CANT_KILL_KEEPER	"Get out of here before I call the guards!"
 #define MSG_NO_SELL_KILLER      "I don't trade with KILLERS!"
 #define MSG_NO_SELL_THIEF	"I don't trade with THIEVES!"
+
+#endif

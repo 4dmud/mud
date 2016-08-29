@@ -1,3 +1,6 @@
+#ifndef HOUSE_H
+#define HOUSE_H
+
 #define MAX_HOUSES	100
 // this is going to get changed soon from 10 to something by Once or Prom
 //Prom
@@ -37,3 +40,5 @@ void House_list_guests(Character *ch, int i, int quiet);
 void house_expand_house(Character *ch, void *i);
 void hcontrol_expand_house(Character *ch, char *argument);
 void House_info ( Character *ch, int i, int quiet );
+
+#endif

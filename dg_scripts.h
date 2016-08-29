@@ -9,6 +9,9 @@
 *  $Revision: 1.16 $
 **************************************************************************/
 
+#ifndef DG_SCRIPTS_H
+#define DG_SCRIPTS_H
+
 #define DG_SCRIPT_VERSION "DG Scripts 1.0.14"
 
 #define SCRIPT_ERROR_CODE     -9999999   /* this shouldn't happen too often */
@@ -134,7 +137,7 @@
 
 /*
  * These are slightly off of PULSE_MOBILE so
- * everything isnt happening at the same time 
+ * everything isnt happening at the same time
  */
 #define PULSE_DG_SCRIPT         (13 RL_SEC)
 
@@ -465,3 +468,4 @@ obj_data *get_obj_near_obj(obj_data * obj, char *name);
 Character *get_char_in_room(Room * room, char *name);
 Character *get_char_near_obj(obj_data * obj, char *name);
 
+#endif

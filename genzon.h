@@ -3,6 +3,8 @@
  * Copyright 1996 by Harvey Gilpin					*
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
+#ifndef GENZON_H
+#define GENZON_H
 
 zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, const char **error);
 void create_world_index(int znum, const char *type);
@@ -16,3 +18,5 @@ zone_rnum real_zone(zone_vnum vznum);
 zone_rnum real_zone_by_thing(room_vnum vznum);
 
 /* Make delete_zone() */
+
+#endif

@@ -6,8 +6,8 @@
  * 1999 MAY 07 gdavis/azrael@laker.net Initial implementation.         *
  * ******************************************************************** */
 
-#if !defined( __ASSEMBLIES_H__ )
-#define __ASSEMBLIES_H__
+#ifndef ASSEMBLIES_H
+#define ASSEMBLIES_H
 
 /* ******************************************************************** *
  * Preprocessor constants.                                             *
@@ -92,4 +92,3 @@ int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd);
 /* ******************************************************************** */
 
 #endif
-

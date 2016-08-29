@@ -4,6 +4,9 @@
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
 
+#ifndef GENMOB_H
+#define GENMOB_H
+
 int delete_mobile(mob_rnum);
 int copy_mobile(Character *to, Character *from);
 int add_mobile(Character *, mob_vnum);
@@ -25,3 +28,4 @@ extern struct mob_stat_table mob_stats[MAX_MOB_LEVELS];
 #define GET_DDESC(mob)	((mob)->player.description)
 #define GET_ATTACK(mob)	((mob)->mob_specials.attack_type)
 
+#endif

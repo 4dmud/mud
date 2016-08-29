@@ -1,3 +1,5 @@
+#ifndef SUBSKILLS_H
+#define SUBSKILLS_H
 
 /* these are subskills  - mord*/
 enum subskill_list {
@@ -256,5 +258,4 @@ struct sub_list {
 #define SUB_TYPE_DEFAULT_ON     (1 << 4)
 #define SUB_TYPE_PROF		(1 << 5)
 
-
-
+#endif

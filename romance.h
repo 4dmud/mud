@@ -1,7 +1,7 @@
 //
 // C++ Interface: romance
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -10,6 +10,9 @@
 //
 //
 /* Romance Module Defines */
+#ifndef ROMANCE_H
+#define ROMANCE_H
+
 #define SAME_SEX_ALLOWED FALSE     /* True/False */
 
 /* MatingMod Defines */
@@ -35,3 +38,5 @@
 
 char * romance_status(Character *ch);
 char * baby_status(Character *i, char * buf, size_t len);
+
+#endif

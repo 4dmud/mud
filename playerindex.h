@@ -10,6 +10,9 @@
 //
 //
 /* external ascii pfile vars */
+#ifndef PLAYERINDEX_H
+#define PLAYERINDEX_H
+
 extern int pfile_backup_minlevel;
 extern int backup_wiped_pfiles;
 extern struct pclean_criteria_data pclean_criteria[];
@@ -331,7 +334,4 @@ struct nameSort
 extern PlayerIndex pi;
 #define player_table  (pi.player_table)
 
-
-
-
-
+#endif

@@ -1,6 +1,11 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+// Note by thotter: While apparently this file is auto-generated, I very much
+// doubt this has been done in years. Therefore I'm making direct edits anyway.
+#ifndef CONFIG_H
+#define CONFIG_H
+
 /* Define to 1 if the `closedir' function returns void instead of `int'. */
 /* #undef CLOSEDIR_VOID */
 
@@ -354,3 +359,5 @@
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
+
+#endif

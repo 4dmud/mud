@@ -1,7 +1,7 @@
 //
 // C++ Interface: trainers
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai4d@gmail.com>, (C) 2008
@@ -9,6 +9,8 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#ifndef TRAINERS_H
+#define TRAINERS_H
 
 void improveallsubs ( Character *ch );
 int mag_manacost ( Character *ch, int spellnum );
@@ -44,3 +46,5 @@ extern int prac_params[4][NUM_CLASSES];
 #define ALL_TIER_TWO 2
 #define ALL_TIER_THREE 3
 #define ALL_TIER_FOUR 4
+
+#endif

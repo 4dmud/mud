@@ -1,3 +1,6 @@
+#ifndef CLAN_H
+#define CLAN_H
+
 #define MAX_CLANS	 20
 #define LVL_CLAN_GOD	 LVL_GOD
 #define DEFAULT_APP_LVL	 8
@@ -21,7 +24,7 @@
 #define CM_APPFEE 2
 
 #define CB_DEPOSIT  1
-#define CB_WITHDRAW 2 
+#define CB_WITHDRAW 2
 #define MAX_CLAN_SPELLS 5
 #define NUM_CLAN_PRIVILEGE 20  /* Max clan privileges */
 #define NUM_AT_CLAN_WAR 4
@@ -97,3 +100,4 @@ struct clan_data_type {
     int at_war[NUM_AT_CLAN_WAR];
 };
 
+#endif

@@ -1,7 +1,7 @@
 //
 // C++ Interface: compressor
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai4d@gmail.com>, (C) 2007
@@ -9,6 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+#ifndef COMPRESSOR_H
+#define COMPRESSOR_H
 
 #define CHUNK 16384
 struct compress_map_data {
@@ -18,7 +21,7 @@ struct compress_map_data {
  time_t last_accessed;
  size_t length;
  int copies;
- 
+
  compress_map_data() {
 	 saved = NULL;
 	 inflated = NULL;
@@ -36,7 +39,7 @@ struct compress_map_data {
 		 free(saved);
 	 saved = NULL;
  }
- 
+
 };
 
 class Compressor {
@@ -58,7 +61,7 @@ class Compressor {
 			istrm.opaque = Z_NULL;
 			istrm.avail_in = 0;
 			istrm.next_in = Z_NULL;
-			
+
 			dstrm.zalloc = Z_NULL;
 			dstrm.zfree = Z_NULL;
 			dstrm.opaque = Z_NULL;//Z_DEFAULT_COMPRESSION
@@ -71,7 +74,7 @@ class Compressor {
 			/* clean up and return */
 			(void)deflateEnd(&dstrm);
 			(void)inflateEnd(&istrm);
-			
+
 			for (std::map<long, compress_map_data *>::iterator z = zmap.begin();z != zmap.end();z++)
 				delete z->second;
 			zmap.clear();
@@ -95,14 +98,16 @@ class Compressor {
 		unsigned char in[CHUNK];
 		unsigned char out[CHUNK];
 		unsigned char *ctr;
-		int cur_size; 
+		int cur_size;
 		int last_size;
 		int read_to;
 		size_t r_len;
 		int bigs;
 		int smalls;
-		
-			
+
+
 };
 
 extern Compressor compressor;
+
+#endif

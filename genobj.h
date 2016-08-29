@@ -5,6 +5,9 @@
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
 
+#ifndef GENOBJ_H
+#define GENOBJ_H
+
 void copy_object_strings(struct obj_data *to, struct obj_data *from);
 void free_object_strings(struct obj_data *obj);
 void free_object_strings_proto(struct obj_data *obj);
@@ -16,3 +19,5 @@ obj_rnum adjust_objects(obj_rnum refpt);
 obj_rnum index_object(struct obj_data *obj, obj_vnum ovnum, obj_rnum ornum);
 int update_objects(struct obj_data *refobj);
 obj_rnum add_object(struct obj_data *, obj_vnum ovnum);
+
+#endif

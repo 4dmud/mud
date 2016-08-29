@@ -1,7 +1,7 @@
 //
 // C++ Interface: colour
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -9,6 +9,10 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+#ifndef COLOR_H
+#define COLOR_H
+
 #define CNUL  ""
 
 /*             Plain Colours            has the CNRM before it to reset color!*/
@@ -52,3 +56,5 @@
 //                UNDER,FLASH};
 //we'll use a switch so we can use letters
 #define MAX_COLOURS 26
+
+#endif

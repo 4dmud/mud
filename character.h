@@ -9,12 +9,16 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+#ifndef CHARACTER_H
+#define CHARACTER_H
+
 int number(int from, int to);
 float number(float from, float to);
 void free_join_list(struct combine_data *list);
 #define MAKE_STRING(msg) \
    (((ostringstream&) (ostringstream() << boolalpha << msg)).str())
-   
+
 class Character {
 public:
     //mob_rnum nr;         /* Mob's rnum                    */
@@ -96,7 +100,7 @@ public:
     void init_char_strings();
     void free_char_strings();
     void free_non_proto_strings();
-    
+
 
     void affect_total();
     void default_char();
@@ -161,3 +165,4 @@ private:
     stringstream *send_string;
 
 };
+#endif

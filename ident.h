@@ -1,5 +1,5 @@
-#ifndef __IDENT_H__
-#define __IDENT_H__
+#ifndef IDENT_H
+#define IDENT_H
 /********************************************************************
  *
  *  File    : ident.h
@@ -29,7 +29,7 @@ struct message
   char               host[256];
   char               user[256];
 };
- 
+
 #define MSG_ERROR -1
 #define MSG_NOP    0  /* don't do anything */
 #define MSG_IDENT  1  /* lookup hostname and username for a user */
@@ -46,4 +46,4 @@ extern int id_serv_socket;
 
 /*******************************************************************/
 
-#endif /* __IDENT_H__ */
+#endif

@@ -3,6 +3,9 @@
  * If do not wish to use the improved editor, put #if 0 below, otherwise
  * you should leave the setting at #if 1.
  */
+#ifndef IMPROVED_EDIT_H
+#define IMPROVED_EDIT_H
+
 #define CONFIG_IMPROVED_EDITOR	1
 
 #define using_improved_editor	CONFIG_IMPROVED_EDITOR
@@ -35,3 +38,5 @@ void send_editor_help(Descriptor *d);
 
 /* Settings for formatter. */
 #define FORMAT_INDENT	(1 << 0)
+
+#endif

@@ -1,7 +1,7 @@
 //
 // C++ Interface: calender
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -10,6 +10,8 @@
 //
 //
 
+#ifndef CALENDER_H
+#define CALENDER_H
 
 const char *date_event_type[] = {
     "Double Exp Day",
@@ -25,3 +27,4 @@ struct date_event_data {
   int year;
   struct date_event_data *next;
 };
+#endif

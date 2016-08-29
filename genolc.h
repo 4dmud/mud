@@ -4,6 +4,8 @@
  * Copyright 1996 by Harvey Gilpin					*
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
+#ifndef GENOLC_H
+#define GENOLC_H
 
 #if !defined(_CIRCLEMUD) || !defined(CIRCLEMUD_VERSION)
 # error "This version of GenOLC only supports CircleMUD 3.0 bpl15 or later."
@@ -62,3 +64,5 @@ extern int top_shop_offset;
 #define ZCMD(zon, cmds)	zone_table[(zon)].cmd[(cmds)]
 
 #define LIMIT(var, low, high)	MIN(high, MAX(var, low))
+
+#endif

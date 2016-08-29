@@ -1,3 +1,6 @@
+#ifndef LISP_INTERNAL_H
+#define LISP_INTERNAL_H
+
 #include "config.h"
 #include "sysdep.h"
 
@@ -36,3 +39,5 @@ extern unsigned int top_of_trigt;
 
 extern obj_rnum top_of_objt;
 extern PlayerIndex pi;
+
+#endif

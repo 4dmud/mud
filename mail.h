@@ -8,6 +8,9 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#ifndef MAIL_H
+#define MAIL_H
+
 /******* MUD MAIL SYSTEM HEADER FILE *********************
  ***     written by Jeremy Elson (jelson@cs.jhu.edu)   ***
  ********************************************************/
@@ -106,3 +109,5 @@ struct mail_index_type_d {
 };
 
 typedef struct mail_index_type_d mail_index_type;
+
+#endif

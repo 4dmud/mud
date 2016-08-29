@@ -7,6 +7,8 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+#ifndef SCREEN_H
+#define SCREEN_H
 
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
@@ -64,3 +66,5 @@
 #define QWHT CCWHT(ch,C_SPR)
 
 #define C_CLR "\x1B[H\x1B[J"
+
+#endif

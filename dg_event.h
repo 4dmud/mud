@@ -10,6 +10,8 @@
 *                   Moved struct event definition to events.c.            *
 ************************************************************************ */
 
+#ifndef DG_EVENT_H
+#define DG_EVENT_H
 
 /*
 ** how often will heartbeat() call the 'wait' event function?
@@ -123,3 +125,5 @@ long queue_key(struct dgqueue *q);
 long queue_elmt_key(struct q_element *qe);
 void queue_free(struct dgqueue *q);
 bool event_is_queued(struct event *event);
+
+#endif

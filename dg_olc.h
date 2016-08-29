@@ -3,6 +3,10 @@
 ** dg-scripts onto a CircleMUD that already has dg-scripts (as released
 ** by Mark Heilpern on 1/1/98) implemented.
 */
+
+#ifndef DG_OLC_H
+#define DG_OLC_H
+
 #include "dg_scripts.h"
 
 
@@ -67,3 +71,4 @@ void dg_olc_script_copy(Descriptor *d);
 void dg_script_menu(Descriptor *d);
 int dg_script_edit_parse(Descriptor *d, char *arg);
 
+#endif

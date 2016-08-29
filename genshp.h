@@ -3,6 +3,8 @@
  * Copyright 1996 by Harvey Gilpin					*
  * Copyright 1997-2001 by George Greer (greerga@circlemud.org)		*
  ************************************************************************/
+#ifndef GENSHP_H
+#define GENSHP_H
 
 void copy_shop(struct shop_data *tshop, struct shop_data *fshop, int free_old_strings);
 void copy_list(int **tlist, int *flist);
@@ -56,3 +58,5 @@ shop_rnum real_shop(shop_vnum vnum);
 #define S_NOBUY(i)		((i)->do_not_buy)
 #define S_BUY(i)		((i)->message_buy)
 #define S_SELL(i)		((i)->message_sell)
+
+#endif

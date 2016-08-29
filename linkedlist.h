@@ -1,7 +1,7 @@
 //
 // C++ Implementation: linkedlist
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -9,6 +9,8 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 #include <iterator>
 
 
@@ -25,7 +27,7 @@ class List
 	Node* m_head;
 public:
 
-	class iterator 
+	class iterator
 		: public std::iterator<std::forward_iterator_tag, T>
 	{
 		Node* m_rep;
@@ -36,32 +38,32 @@ public:
 		inline iterator(Node* x=0):m_rep(x){}
 		inline iterator(const iterator& x):m_rep(x.m_rep) {}
 		inline iterator& operator=(const iterator& x)
-		{ 
-			m_rep=x.m_rep; return *this; 
+		{
+			m_rep=x.m_rep; return *this;
 		}
 		inline iterator& operator++()
-		{ 
-			m_rep = m_rep->m_next; return *this; 
+		{
+			m_rep = m_rep->m_next; return *this;
 		}
 		inline iterator operator++(int)
-		{ 
-			iterator tmp(*this); m_rep = m_rep->m_next; return tmp; 
+		{
+			iterator tmp(*this); m_rep = m_rep->m_next; return tmp;
 		}
 		inline T& operator*() const { return m_rep->m_data; }
 		inline T* operator->() const { return m_rep; }
 		inline bool operator==(const iterator& x) const
 		{
-			return m_rep == x.m_rep; 
-		}	
+			return m_rep == x.m_rep;
+		}
 		inline bool operator!=(const iterator& x) const
 		{
-			return m_rep != x.m_rep; 
-		}	
+			return m_rep != x.m_rep;
+		}
 
 	};
 
-	class const_iterator 
-		: public std::iterator<std::forward_iterator_tag, const T> 
+	class const_iterator
+		: public std::iterator<std::forward_iterator_tag, const T>
 	{
 		const Node* m_rep;
 	public:
@@ -72,30 +74,30 @@ public:
 		inline const_iterator(const const_iterator& x):m_rep(x.m_rep) {}
 		inline const_iterator(const iterator& x):m_rep(x.m_rep){}
 		inline const_iterator& operator=(const const_iterator& x)
-		{ 
-			m_rep=x.m_rep; return *this; 
+		{
+			m_rep=x.m_rep; return *this;
 		}
 		inline const_iterator& operator=(const iterator& x)
-		{ 
-			m_rep=x.m_rep; return *this; 
-		}		
+		{
+			m_rep=x.m_rep; return *this;
+		}
 		inline const_iterator& operator++()
-		{ 
-			m_rep = m_rep->m_next; return *this; 
+		{
+			m_rep = m_rep->m_next; return *this;
 		}
 		inline const_iterator operator++(int)
-		{ 
-			const_iterator tmp(*this); m_rep = m_rep->m_next; return tmp; 
+		{
+			const_iterator tmp(*this); m_rep = m_rep->m_next; return tmp;
 		}
 		inline T& operator*() const { return m_rep->m_data; }
 		inline T* operator->() const { return m_rep; }
 		inline bool operator==(const const_iterator& x) const
 		{
-			return m_rep == x.m_rep; 
+			return m_rep == x.m_rep;
 		}
 		inline bool operator!=(const const_iterator& x) const
 		{
-			return m_rep != x.m_rep; 
+			return m_rep != x.m_rep;
 		}
 
 
@@ -169,7 +171,7 @@ public:
 	void erase_after (iterator& x)
 	{
 		Node* tmp = x.m_rep->m_next;
-		if (x.m_rep->m_next) 
+		if (x.m_rep->m_next)
 			x.m_rep->m_next = x.m_rep->m_next->m_next;
 		delete tmp;
 	}
@@ -180,3 +182,5 @@ public:
 		x.m_rep->m_next = tmp;
 	}
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
 /**************************************************************************
 *   File: structs.h                                     Part of CircleMUD *
 *  Usage: header file for central structures and contstants               *
@@ -7,239 +9,6 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-/*
- * $Log: structs.h,v $
- * Revision 1.66  2007/11/18 06:50:41  w4dimenscor
- * Fixed the bug where you could dig up any buried object in the mud. Removed all threadding from the code to stop the freezes.
- *
- * Revision 1.65  2007/11/14 22:51:25  w4dimenscor
- * Added cedit options to set double exp day and to set the room where gladiators go to after dying.
- * --Thotter
- *
- * Revision 1.64  2007/11/14 21:39:41  w4dimenscor
- * Added the Gladiator race for the gladiatorpits.
- * --Matthijs
- *
- * Revision 1.63  2007/08/23 20:41:29  w4dimenscor
- * - Created a new MudException class, so that we can try and throw and catch errors.
- * - Fixed room description editing in OLC so that it works with the new system.
- * - Removed called to ident.c from the code
- * - changed the hostname values on descriptors and characters from char arrays to strings.
- *
- * Revision 1.62  2007/08/19 01:06:11  w4dimenscor
- * - Changed the playerindex to be a c++ object with search functions.
- * - changed the room descriptions to be searched from a MAP index, and
- * added Get and Set methods for room descriptions.
- * - changed the zone reset so that it doesnt search the entire object list
- * to find the object to PUT things into.
- * - rewrote other parts of the zone reset function, to make it give correct errors.
- * - rewrote the parts of the code to do with loading and searching for directorys and files.
- * - added a new dlib library.
- *
- * Revision 1.61  2007/06/14 23:55:39  w4dimenscor
- * Timers now work offline, keys can't be put in houses along with non-rent items. and the timers on items are run from the event system instead of 'ticks'
- *
- * Revision 1.60  2007/06/10 08:18:13  w4dimenscor
- * added new body parts CHEST and BACK
- *
- * Revision 1.59  2007/06/10 02:18:40  w4dimenscor
- * changed all entries in the code of 'color' to 'colour', but i now regret it.
- *
- * Revision 1.58  2007/05/24 20:25:16  w4dimenscor
- * lots of hunt changes. Should all work now.
- *
- * Revision 1.57  2006/09/06 12:02:41  w4dimenscor
- * Have stopped the crashing and erroring in OLC in my port, however, i am still finding memory leaks.
- *
- * Revision 1.56  2006/08/31 10:39:17  w4dimenscor
- * Fixe dthe crash bug in medit. and also changed the mob proto list. there is still a memory leak in medit, which is being fixed now
- *
- * Revision 1.55  2006/08/26 08:28:47  w4dimenscor
- * Fixed the saving of skills and subskills finally
- *
- * Revision 1.54  2006/08/25 06:39:43  w4dimenscor
- * fixed the way skills would be deleted when you quit
- *
- * Revision 1.53  2006/08/23 11:37:33  w4dimenscor
- * Adjustments to the SkillsSpells Functions in char specials
- *
- * Revision 1.52  2006/08/23 10:34:14  w4dimenscor
- * Fixes for KillList Crash
- *
- * Revision 1.51  2006/08/23 09:01:27  w4dimenscor
- * Changed some of the std::vectors to std::map, killlist, and the lookup tables for id nums
- *
- * Revision 1.50  2006/08/20 12:12:33  w4dimenscor
- * Changed the lookup table buckets to use sorted vectors. exciting. Also changed ignore list to use vectors, and fixed the valgrind error with the sort algorithm. Also sped up top gold command
- *
- * Revision 1.49  2006/08/19 00:09:37  w4dimenscor
- * found more issues with uninitialised values. Hopefully fixed them. gah
- *
- * Revision 1.48  2006/08/18 11:09:59  w4dimenscor
- * updated some clan functions to use vectors instead of malloccing memory, and also sorted clan lists and updated their layout
- *
- * Revision 1.47  2006/08/18 09:55:31  w4dimenscor
- * Fixed the wizlist so it didnt have a memory leak, ran fast, and actually worked
- *
- * Revision 1.46  2006/08/17 10:53:49  w4dimenscor
- * moved the subs and skills from the char class to the player specials struct, converted them to vectors, and made them sorted.
- *
- * Revision 1.45  2006/08/13 09:08:51  w4dimenscor
- * Removed the mtransform flags
- *
- * Revision 1.44  2006/08/13 06:26:55  w4dimenscor
- * New branch created, most arrays in game converted to vectors, and the way new zones are created, many conversions of structs to classes
- *
- * Revision 1.43  2006/07/15 12:53:12  w4dimenscor
- * Tweaked mtransform further and it should work fine now.
- *
- * Revision 1.42  2006/07/14 19:06:09  w4dimenscor
- * Fixed mtransform!
- *
- * Revision 1.41  2006/06/21 09:28:58  w4dimenscor
- * Added the ability for Mortals of imms to listen to the wizchat. it is a
- * flag with the name wizmort, so set player wizmort on should do the
- * trick.
- *
- * Revision 1.40  2006/06/19 06:25:40  w4dimenscor
- * Changed the player saved mount feature so that all players can load mounts from houses
- *
- * Revision 1.39  2006/06/16 10:54:51  w4dimenscor
- * Moved several functions in fight.c into the Character object. Also removed all occurances of send_to_char from skills.c
- *
- * Revision 1.38  2006/06/16 06:28:35  w4dimenscor
- * converted the functions to load fight messages to C++ streams
- *
- * Revision 1.37  2006/06/11 10:10:11  w4dimenscor
- * Created the ability to use characters as a stream, so that you can do things like: *ch << "You have " << GET_HIT(ch) << "hp.\r\n";
- *
- * Revision 1.36  2006/05/30 09:14:20  w4dimenscor
- * rewrote the color code, process_output, and vwrite_to_output so that they use strings and have better buffer checks
- *
- * Revision 1.35  2006/05/22 10:50:49  w4dimenscor
- * Created 3 new files, mxp.cpp, mxp.h and descriptor.cpp
- * struct descriptor_data has been converted to class Descriptor
- *
- * Revision 1.34  2006/05/21 11:02:27  w4dimenscor
- * converted game from being C code to C++
- * to use new_send_to_char(ch, 'blah') now, you use ch->Send('Blah')
- *
- * Revision 1.33  2006/05/01 11:29:26  w4dimenscor
- * I wrote a typo checker that automaticly corrects typos in the comm channels. I have also been fixing shadowed variables. There may be residual issues with it.
- *
- * Revision 1.32  2006/03/22 22:18:23  w4dimenscor
- * Socials now work with a number (lick 2.flag) and ctell snooping is now a toggle for imps (csnoop).
- *
- * Revision 1.31  2006/03/22 20:27:20  w4dimenscor
- * Changed all references to attack and defence and changed them to be accuracy and evasion, which more closely explains their role. Fixed up some errors in the defence roll part where the addition of dex to defence was backwards, lowering defence instead of adding to it the more dex you had (now called evasion).
- * Completed the autogroup toggle to work as expected (still untested though)
- * For your evasion rating, i added some more points based on level and tier.
- *
- * Revision 1.30  2006/03/13 19:07:40  w4dimenscor
- * Added a toggle for autogroup so you don't type Y to accept people in your group, and a commandthat lets you split involvement evenly, involve even
- *
- * Revision 1.29  2006/03/06 09:38:28  w4dimenscor
- * Changed it so that you can clan expel people who are offline and in another room
- *
- * Revision 1.28  2006/02/17 22:19:54  w4dimenscor
- * Fixed error for ubuntu that doesnt like empty array declarations, moved ice shield to a better place and fixed its messages, added auto auction fixes, allowed mounts to gain exp properly
- *
- * Revision 1.27  2006/01/23 05:23:19  w4dimenscor
- * sorry self. another. _cant remember the changes_ entry
- *
- * Revision 1.26  2005/11/30 18:47:12  w4dimenscor
- * changed slightly some gains you get from remorts
- *
- * Revision 1.25  2005/11/19 06:18:39  w4dimenscor
- * Fixed many bugs, and added features
- *
- * Revision 1.24  2005/11/01 18:43:38  w4dimenscor
- * Tradepoints have been added to players and saved, compare command has been updated, the login accounts thing works again, and when you can't see your attacker your attacker you get half defense points
- *
- * Revision 1.23  2005/10/23 13:53:30  w4dimenscor
- * Added thotters login/logout message concept
- *
- * Revision 1.22  2005/09/24 08:52:33  w4dimenscor
- * finished the assemblies code
- *
- * Revision 1.21  2005/09/24 07:11:51  w4dimenscor
- * Added the ability to SKIN mobs, and the ability to add skin to mobs in olc, added ability to set what log a tree ill make and how many it will make
- *
- * Revision 1.20  2005/09/16 10:20:10  w4dimenscor
- * Added a snippet for making the obj and mob list hashed for fast lookups, i fixed a bug in the mccp and mxp protocols, added to objects the ability to remember who has ID'd them before so that when that person examines the item, they 'remember' what the stats are
- *
- * Revision 1.19  2005/08/28 10:00:54  w4dimenscor
- * added RPL flag, RPL note group
- *
- * Revision 1.18  2005/08/14 02:27:13  w4dimenscor
- * added shiftable objects flag for the pull command, added to dg_variables ability to SET object values from variables, hopefully fixed issue where triggers would be removed from rooms after editing.
- *
- * Revision 1.17  2005/08/07 04:12:39  w4dimenscor
- * Manu changes and command have been made, sorry for the lack of description. Main changes include command landscape, fixes to helpfile stuff, subskill fixes
- *
- * Revision 1.16  2005/06/21 08:53:40  w4dimenscor
- * added in better help finder and help editor, a la mordecai
- *
- * Revision 1.15  2005/05/28 05:52:14  w4dimenscor
- * Fixed some errors in copyover, added MXP
- *
- * Revision 1.14  2005/04/23 12:18:13  w4dimenscor
- * Fixed some buffer read errors in the fread_string function, also fixed (temp) an index search issue for real_trigger()
- *
- * Revision 1.13  2005/03/23 15:23:13  w4dimenscor
- * Added toggle rp. roleplaying toggle is shown on:
- * - who list
- * - ooc
- * - room description of char
- * - tell
- * - prompt
- *
- * Revision 1.12  2005/02/25 07:33:47  w4dimenscor
- * reformatted some code, fixed up coventry to ignore socials
- *
- * Revision 1.11  2005/02/25 05:02:46  w4dimenscor
- * added new commands and a few little changes - i forget what eek
- *
- * Revision 1.10  2005/02/22 15:38:23  w4dimenscor
- * set kill_all_enabled to 1
- *
- * Revision 1.9  2005/02/09 09:23:44  w4dimenscor
- * added new code for using olc to create new mine shafts, and cleaned up the tsearch command, fixed a bug where there is no description in the log if the game crashes because a zone file is wanting to remove  a item from a room using zedit, but the room doesnt exist, and fixed an exp bug in flee
- *
- * Revision 1.8  2005/02/04 20:46:11  w4dimenscor
- * Many changes - i couldn't connect to this for a while
- *
- * Revision 1.7  2004/12/17 07:13:20  w4dimenscor
- * A few little updates.
- *
- * Revision 1.6  2004/12/07 09:31:26  w4dimenscor
- * Trees modularized, fix added to message event
- *
- * Revision 1.5  2004/12/05 09:46:52  w4dimenscor
- * fixed mtransform, fixed format in clan tell, and added limit on magic items carried, and lowered weight of magic items, and increased cost
- *
- * Revision 1.4  2004/12/04 07:42:36  w4dimenscor
- * fixed the locker bug, and the format error in clan tells, and a few other cleanups
- *
- * Revision 1.3  2004/11/20 04:43:17  w4dimenscor
- * Added more combat messages and disabled aggro and kill all for the moment
- *
- * Revision 1.2  2004/11/17 14:19:46  w4dimenscor
- * added Aggro mode to attack everything in sight and 'kill all' command
- *
- * Revision 1.1.1.1  2004/11/12 02:15:41  w4dimenscor
- * Initial clean submission of 4Dimensions src code
- *
- * Revision 1.77  2004/09/18 04:42:47  molly
- * cleared up some memory leaks again, possibly fixed the QIC miscounts
- *
- * Revision 1.70  2004/08/22 00:50:48  molly
- * removed all the origional help code, added the start of the xml reader.
- *
- * Revision 1.69  2004/08/15 01:12:31  molly
- * aqdded logging to several files, fixed error in the setting of immtitles. fixed typo in busy
- *
- */
 #include <netinet/in.h>
 #include <string>
 /*
@@ -772,13 +541,13 @@ class Room;
 #define AFF_POLY_TOAD         87
 #define AFF_IMMFREEZE         88
 #define AFF_SILENCED          89
-#define AFF_SNARE	      90	
+#define AFF_SNARE	      90
 #define AFF_OUTCAST           91
 #define AFF_RESIST_FIRE       92
 #define AFF_RESIST_COLD       93
 #define AFF_RESIST_ELEC       94
 #define AFF_BLEEDING	      95 // Bleeding affect for slit --> Prom
-#define AFF_DISEMBOWEL	      96 // Disembowel affect for thrust? --> Prom 
+#define AFF_DISEMBOWEL	      96 // Disembowel affect for thrust? --> Prom
 #define AFF_MANA_REGEN        97
 #define AFF_POISON_PAUSE      98
 #define AFF_MUTATED	      99
@@ -1613,7 +1382,7 @@ struct obj_data {
     struct vehicle_attachment_data *attachment;   /* attachments for vehicle */
     Character *following;    /* for floating discs, carts, etc */
     char extracted;
-   
+
 };
 
 /* ======================================================================= */
@@ -1664,8 +1433,8 @@ struct qic_data {
 /*******************************************/
 /* New vehicle related structures by Horus */
 /*******************************************/
-/* type - action type, either fire, jump etc 
-   stage - what tick they are at 
+/* type - action type, either fire, jump etc
+   stage - what tick they are at
    value - data value
 *******************************************/
 
@@ -1763,7 +1532,7 @@ public:
     char *tmp_description;     /* temp day description */
     long GetDesc();
     void SetDesc(long id);
-    
+
     struct q_descr_data *q_description;
 
     char *smell;         /* smell description                    */
@@ -2514,7 +2283,7 @@ struct affected_type {
 };
 
 struct room_affected_type {
-    Room *room; 
+    Room *room;
     sh_int type;         /* The type of spell that caused this      */
     sh_int duration;          /* For how long its effects will last      */
     int value;
@@ -2912,16 +2681,16 @@ struct room_affects_data {
     int timer;
 
 };
-  
+
 
 
 /*
  * Config structs
- * 
+ *
  */
 
 /*
-* The game configuration structure used for configurating the game play 
+* The game configuration structure used for configurating the game play
 * variables.
 */
 struct game_data {
@@ -2943,7 +2712,7 @@ struct game_data {
     int immort_level_ok;    /* Automatically level mortals to imm?  */
     int double_exp;	    /* Is it double experience time?		*/
     long pk_champion;         /* The current Champion */
-    
+
     char *LAST_PK_WIN;       /* Last Player to win in PK */
     char *OK;               /* When player receives 'Okay.' text.       */
     char *NOPERSON;         /* 'No-one by that name here.'    */
@@ -2967,7 +2736,7 @@ struct crash_save_data {
 
 
 /*
- * The room numbers. 
+ * The room numbers.
  */
 struct room_numbers {
     room_vnum mortal_start_room;   /* vnum of room that mortals enter at.  */
@@ -3075,7 +2844,7 @@ fir       mana      2500 1 in 20   1
 maple     int       5    1 in 10   3
 elder     mana      1500 1 in 10   1
 elm       hp        400  1 in 5    2
- 
+
 **/
 struct stave_stat_table {
     int affect;
@@ -3141,3 +2910,4 @@ struct skill_proto_data {
     struct skill_proto_data *next;
 };
 
+#endif

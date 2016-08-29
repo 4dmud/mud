@@ -1,3 +1,6 @@
+#ifndef KALTEN_H
+#define KALTEN_H
+
 #define CAN_MINE(ch)    ( ROOM_FLAGGED(IN_ROOM(ch), ROOM_GOLD_DEPOSIT) || \
                           ROOM_FLAGGED(IN_ROOM(ch), ROOM_SILVER_DEPOSIT) || \
                           ROOM_FLAGGED(IN_ROOM(ch), ROOM_COPPER_DEPOSIT) || \
@@ -17,3 +20,5 @@
 #define CAN_MINE_PLASTONIUM(ch) ROOM_FLAGGED(IN_ROOM(ch), ROOM_PLASTONIUM_DEPOSIT)
 
 #define GET_MOB_PREG(ch)	ch->mob_specials.pregnant
+
+#endif

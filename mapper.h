@@ -1,4 +1,6 @@
 /* Defines for ASCII Automapper */
+#ifndef MAPPER_H
+#define MAPPER_H
 
 #define MAPX     10
 #define MAPY     12
@@ -31,26 +33,26 @@ static struct map_bit_data {
     char colour[5];
     char name[15];
     } map_bit[] = {
-{"H", "{cW", "Inside"      },//SECT_INSIDE         
-{"#", "{cW", "City"        },//SECT_CITY           
-{"\"", "{cG", "Field"      },//SECT_FIELD          
-{"@", "{cg", "Forest"      },//SECT_FOREST         
-{"^", "{cG", "Hills"       },//SECT_HILLS          
-{"^", "{cy", "Mountain"    },//SECT_MOUNTAIN       
-{"=", "{cc", "Water-Swim"  },//SECT_WATER_SWIM     
-{"=", "{cb", "Water-Boat"  },//SECT_WATER_NOSWIM   
-{"~", "{cb", "Underwater"  },//SECT_UNDERWATER	    
-{"%", "{cC", "Flying"      },//SECT_FLYING         
-{"~", "{cY", "Desert"      },//SECT_DESERT         
-{".", "{cW", "Space"       },//SECT_SPACE	
-{"-", "{cY", "Road"        },//SECT_ROAD	
-{"@", "{cY", "Entrance"    },//SECT_ENTRANCE	
-{"@", "{cC", "Atmosphere"  },//SECT_ATMOSPHERE 
-{"*", "{cY", "Sun"         },//SECT_SUN	
-{"0", "{cL", "Blackhole"   },//SECT_BLACKHOLE	
-{"<", "{cM", "Vehicle"     },//SECT_VEHICLE	
+{"H", "{cW", "Inside"      },//SECT_INSIDE
+{"#", "{cW", "City"        },//SECT_CITY
+{"\"", "{cG", "Field"      },//SECT_FIELD
+{"@", "{cg", "Forest"      },//SECT_FOREST
+{"^", "{cG", "Hills"       },//SECT_HILLS
+{"^", "{cy", "Mountain"    },//SECT_MOUNTAIN
+{"=", "{cc", "Water-Swim"  },//SECT_WATER_SWIM
+{"=", "{cb", "Water-Boat"  },//SECT_WATER_NOSWIM
+{"~", "{cb", "Underwater"  },//SECT_UNDERWATER
+{"%", "{cC", "Flying"      },//SECT_FLYING
+{"~", "{cY", "Desert"      },//SECT_DESERT
+{".", "{cW", "Space"       },//SECT_SPACE
+{"-", "{cY", "Road"        },//SECT_ROAD
+{"@", "{cY", "Entrance"    },//SECT_ENTRANCE
+{"@", "{cC", "Atmosphere"  },//SECT_ATMOSPHERE
+{"*", "{cY", "Sun"         },//SECT_SUN
+{"0", "{cL", "Blackhole"   },//SECT_BLACKHOLE
+{"<", "{cM", "Vehicle"     },//SECT_VEHICLE
 {"\"", "{cg", "Swamp"      },//SECT_SWAMP
-{";", "{cL", "Reef"        },//SECT_REEF  
+{";", "{cL", "Reef"        },//SECT_REEF
 {"D", "{cR", "DeathTrap"   },//SECT_TUNDRA
 {"o", "{cW", "Snow"        },//SECT_SNOW
 {":", "{cC", "Ice"         },//SECT_ICE
@@ -61,4 +63,4 @@ static struct map_bit_data {
 {"?", "{cl", "Unknown"     } //NUM_ROOM_SECTORS
     };
 
-
+#endif

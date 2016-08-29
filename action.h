@@ -1,3 +1,5 @@
+#ifndef ACTION_H
+#define ACTION_H
 /* struct for syls */
 struct syllable
 {
@@ -18,3 +20,4 @@ extern struct syllable syls[];
 #define ME_CONTROL_WEATHER 8
 #define ME_MANIFEST 9
 #define ME_COPYOVER 10
+#endif

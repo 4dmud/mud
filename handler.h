@@ -7,6 +7,8 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+#ifndef HANDLER_H
+#define HANDLER_H
 
 /* handling the affected-structures */
 void affect_modify(Character *ch, sbyte loc, int mod,
@@ -144,3 +146,4 @@ int lock_desc(Descriptor *d);
 int unlock_desc(Descriptor *d);
 int is_locked(Descriptor *d);
 
+#endif

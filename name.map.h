@@ -9,6 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#ifndef NAME_MAP_H
+#define NAME_MAP_H
+
 class NameIndexer
 {
 		multimap<string, long> nlt; /*name lookup table */
@@ -25,3 +28,5 @@ class NameIndexer
 };
 extern NameIndexer mobNames;
 extern NameIndexer objNames;
+
+#endif

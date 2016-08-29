@@ -2,13 +2,15 @@
  * ************************************************************************
  * File: db.h                                          Part of CircleMUD *
  * Usage: header file for database handling                               * *
- * 
+ *
  * All rights reserved.  See license.doc for complete information.        * *
- * 
+ *
  * Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
- * CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               * 
+ * CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
  ***********************************************************************
  */
+#ifndef DB_H
+#define DB_H
 
 /* arbitrary constants used by index_boot() (must be unique) */
 #define DB_BOOT_WLD	0
@@ -547,3 +549,4 @@ mob_vnum DeleteMobIndex(mob_vnum vn);
 
 #include "playerindex.h"
 
+#endif

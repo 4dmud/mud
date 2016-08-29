@@ -1,4 +1,5 @@
-
+#ifndef FIGHT_H
+#define FIGHT_H
 
 int apply_ac(Character *ch, int eq_pos);
 int modify_dam(int dam, Character *ch, Character *vict , int w_type);
@@ -20,7 +21,7 @@ void forget(Character *ch, Character *victim);
 void remember(Character *ch, Character *victim);
 int skill_message(int dam, Character *ch, Character *vict,
                   int attacktype);
-                  
+
 void start_fighting_delay(Character *vict, Character *ch);
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) <= TYPE_GORE))
@@ -36,19 +37,19 @@ void start_fighting_delay(Character *vict, Character *ch);
 #define IS_TOP_CENTER(pos)  ((pos) == WEAR_NECK_1 ||(pos) == WEAR_NECK_2 ||(pos) == WEAR_HEAD || (pos) == WEAR_FACE \
                           || (pos) == WEAR_EYES || (pos) == WEAR_EAR_R ||(pos) == WEAR_EAR_L || (pos) == WEAR_HORNS || \
 			  (pos) == WEAR_ANTENNA )
-			  
+
 #define IS_TOP_LEFT(pos)    ((pos) == WEAR_FINGER_L  || (pos) == WEAR_HANDS ||(pos) == WEAR_ARMS \
                           || (pos) == WEAR_SHIELD  ||(pos) == WEAR_WRIST_L ||(pos) == WEAR_ABOUT)
-			  
+
 #define IS_TOP_RIGHT(pos)   ((pos) == WEAR_FINGER_R || (pos) == WEAR_HANDS ||(pos) == WEAR_ARMS \
                           || (pos) == WEAR_WRIST_R || (pos) == WEAR_HOLD || (pos) == WEAR_ABOUT)
-			  
+
 #define IS_CENTER(pos)      ((pos) == WEAR_NECK_1 ||(pos) == WEAR_NECK_2 ||(pos) == WEAR_BODY || (pos) == WEAR_SHIELD \
                           || (pos) == WEAR_ABOUT || (pos) == WEAR_WAIST ||(pos) == WEAR_TAIL )
-			  
+
 #define IS_LOWER_LEFT(pos)  ((pos) == WEAR_LEGS ||(pos) == WEAR_FEET ||(pos) == WEAR_LEGS_2 || (pos) == WEAR_FEET_2 \
                           || (pos) == WEAR_ABOUT || (pos) == WEAR_ANKLE_L ||(pos) == WEAR_TAIL )
-			  
+
 #define IS_LOWER_RIGHT(pos) ((pos) == WEAR_LEGS ||(pos) == WEAR_FEET ||(pos) == WEAR_LEGS_2 || (pos) == WEAR_FEET_2 \
                           || (pos) == WEAR_ABOUT || (pos) == WEAR_ANKLE_R ||(pos) == WEAR_TAIL )
 
@@ -158,7 +159,7 @@ extern struct weapon_type_data weapon_type_info[MAX_WEAPON_TYPES];
 
 
 /*
-"Standard" "Knife" "Dagger" "Shortsword" "Longsword" "Katana" "Rapier" "Cutlass" "Broadsword" "Half-Axe" "Double-Axe" "War-Hammer" "Mace" "Shortstaff" "Staff" "Whip" 
+"Standard" "Knife" "Dagger" "Shortsword" "Longsword" "Katana" "Rapier" "Cutlass" "Broadsword" "Half-Axe" "Double-Axe" "War-Hammer" "Mace" "Shortstaff" "Staff" "Whip"
 */
 /* fight.c protos -mord */
 #define ATTACK_MAGIC 1
@@ -194,3 +195,5 @@ struct attack_hit_type
 
 
 extern struct attack_hit_type attack_hit_text[];
+
+#endif
