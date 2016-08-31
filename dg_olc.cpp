@@ -897,8 +897,9 @@ int format_script(Descriptor *d) {
             free(sc);
             return FALSE;
         }
-        if (!strncasecmp(t, "if ", 3) ||
-                !strncasecmp(t, "switch ", 7)) {
+        if (!strncasecmp(t, "if ", 3))
+            indent_next = TRUE;
+        else if (!strncasecmp(t, "switch ", 7)) {
             indent_next = TRUE;
             first_case = TRUE;
             in_switch = TRUE;
