@@ -2891,6 +2891,11 @@ ACMD ( do_load )
 			ch->Send ( "There is no monster with the number %d.\r\n", num );
 			return;
 		}
+		if ( tnum > 1000 )
+		{
+			ch->Send ( "You can only load up to 1000 mobs.\r\n" );
+			return;
+		}
 		for ( ( tnum <= 0 ? tnum = 1 : tnum ) ;tnum>0; tnum-- )
 		{
 			mob = read_mobile ( num );
@@ -2910,7 +2915,11 @@ ACMD ( do_load )
 			ch->Send ( "There is no object with the number %d.\r\n",num );
 			return;
 		}
-
+		if ( tnum > 1000 )
+		{
+			ch->Send ( "You can only load up to 1000 objects.\r\n" );
+			return;
+		}
 		/* Are we allowed to load QIC? */
 		if ( obj_index[r_num].qic != NULL && GET_LEVEL ( ch ) < LVL_IMPL )
 		{
