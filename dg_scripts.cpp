@@ -3066,7 +3066,7 @@ ACMD ( do_vdelete )
 		ch->Send ("All variables deleted from that id.\r\n");
 		return;
 	}
-	
+
 	/* find the global */
 	for ( vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next )
 		if ( !strcasecmp ( vd->name.c_str(), var ) )
@@ -3333,12 +3333,12 @@ void delete_trailing_spaces(char* string) {
     if (!string || !*string) //null or empty string passed
 	return;
     int end = strlen(string);
-    
+
     while (--end >= 0 && string[end] == ' ');
     string[end+1]='\0';
 }
-	
-    
+
+
 
 /*
  * makes a local variable into a global variable
@@ -3608,7 +3608,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 		   caller is load_mtrigger or load_otrigger
 		   if it is one of these, we must make sure the script
 		   is not just reloaded on the next mob
-		   
+
 		   We make the calling code decide how to handle it, so it doesn't
 		   get totally removed unless it's a load_xtrigger().
 		 */
@@ -3897,7 +3897,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 						wld_command_interpreter ( ( Room * ) go, cmd );
 						break;
 				}
-				if ( dg_owner_purged || 
+				if ( dg_owner_purged ||
 #if DRIVER_USES_UNION
 				     (type == OBJ_TRIGGER && sdd->o->extracted))
 #else
@@ -4563,5 +4563,3 @@ int process_return ( trig_data *trig, char *cmd )
 	}
 	return ( int ) atoi ( arg2 );
 }
-
-

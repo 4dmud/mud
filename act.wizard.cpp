@@ -331,6 +331,7 @@
 #include "shop.h"
 #include "action.h"
 #include "dg_event.h"
+#include "dg_scripts.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -8374,4 +8375,37 @@ ACMD ( do_plrshop )
 					"plrshop list\r\n" );
 
 	return;
+}
+
+ACMD(do_vset) {
+    const char* usage = "Usage: vset <player> <variable> <value>\r\n";
+    char player_name[MAX_INPUT_LENGTH], variable[MAX_INPUT_LENGTH], *value;
+    Character* player;
+
+    if ( !*argument )
+    {
+        ch->Send ( usage);
+        return;
+    }
+
+    skip_spaces(&argument);
+    value = two_arguments(argument, player_name, variable);
+    skip_spaces(&value);
+
+    if (!*player_name || !*variable || !*value) {
+        ch->Send ( usage );
+        return;
+    }
+
+    if ((player =  get_player_vis( ch, player_name, NULL, FIND_CHAR_WORLD )) == NULL) {
+        ch->Send("Player %s not found.\r\n", player_name);
+        return;
+    }
+
+    add_var(&SCRIPT(player)->global_vars, variable, value, 0);
+
+    save_char_vars(player);
+
+    ch->Send("Variable set.\r\n");
+
 }
