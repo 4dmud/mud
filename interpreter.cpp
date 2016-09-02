@@ -387,6 +387,7 @@ ACMD ( do_mzrecho );
 ACMD ( do_mzreset );
 ACMD ( do_tlist );
 ACMD ( do_tstat );
+ACMD ( do_vset );
 ACMD ( do_vdelete );
 ACMD ( do_mlag );
 ACMD ( do_mrecho );
@@ -1043,6 +1044,7 @@ const command_info cmd_info[] =
 	{ "mzreset"  , "mzreset"      , POS_DEAD    , do_mzreset  , 0, 0, 0 },
 	{ "tlist"    , "tli"         , POS_DEAD    , do_oasis    , LVL_IMMORT, SCMD_OASIS_TLIST, WIZ_TRIG_GRP },
 	{ "tstat"    , "tst"         , POS_DEAD    , do_tstat    , LVL_IMMORT, 0, WIZ_TRIG_GRP },
+	{ "vset"     , "vset"         , POS_DEAD    , do_vset  , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 	{ "vdelete"  , "vdel"         , POS_DEAD    , do_vdelete  , LVL_IMMORT, 0, WIZ_IMM3_GRP },
 
 	/* Romance Module Command List */
