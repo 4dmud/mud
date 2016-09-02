@@ -331,6 +331,7 @@
 #include "shop.h"
 #include "action.h"
 #include "dg_event.h"
+#include "dg_scripts.h"
 
 /*   external vars  */
 extern int TEMP_LOAD_CHAR;
@@ -8378,8 +8379,7 @@ ACMD ( do_plrshop )
 
 ACMD(do_vset) {
     const char* usage = "Usage: vset <player> <variable> <value>\r\n";
-    char player_name[MAX_INPUT_LENGTH], variable[MAX_INPUT_LENGTH];
-    char* value;
+    char player_name[MAX_INPUT_LENGTH], variable[MAX_INPUT_LENGTH], *value;
     Character* player;
 
     if ( !*argument )
@@ -8390,6 +8390,7 @@ ACMD(do_vset) {
 
     skip_spaces(&argument);
     value = two_arguments(argument, player_name, variable);
+    skip_spaces(&value);
 
     if (!*player_name || !*variable || !*value) {
         ch->Send ( usage );
@@ -8401,26 +8402,7 @@ ACMD(do_vset) {
         return;
     }
 
-    script_data* sc = SCRIPT(player);
-
-    trig_var_data *var;
-    for (var = sc->global_vars;var != NULL;var = var->next) {
-        if(var->name == variable) {
-            var->value = value;
-            break;
-        }
-    }
-
-    if (var == NULL) {
-        // didn't find the variable, lets make a new one.
-        trig_var_data *newvar = new trig_var_data();
-        newvar->name = variable;
-        newvar->value = value;
-        newvar->next = sc->global_vars;
-        newvar->context = 0; // player var, so always 0
-
-        sc->global_vars = newvar;
-    }
+    add_var(&SCRIPT(player)->global_vars, variable, value, 0);
 
     save_char_vars(player);
 
