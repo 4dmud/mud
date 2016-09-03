@@ -112,6 +112,7 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_EXPERIENCE,       "EXPERIENCE",       NUMBER_READ_ONLY }, 
    { eMSDP_EXPERIENCE_MAX,   "EXPERIENCE_MAX",   NUMBER_READ_ONLY }, 
    { eMSDP_EXPERIENCE_TNL,   "EXPERIENCE_TNL",   NUMBER_READ_ONLY }, 
+   { eMSDP_EXPERIENCE_LAST,  "EXPERIENCE_LAST",  NUMBER_READ_ONLY }, 
    { eMSDP_HEALTH,           "HEALTH",           NUMBER_READ_ONLY }, 
    { eMSDP_HEALTH_MAX,       "HEALTH_MAX",       NUMBER_READ_ONLY }, 
    { eMSDP_LEVEL,            "LEVEL",            NUMBER_READ_ONLY }, 
@@ -141,6 +142,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_DEX_PERM,         "DEX_PERM",         NUMBER_READ_ONLY }, 
    { eMSDP_CON_PERM,         "CON_PERM",         NUMBER_READ_ONLY }, 
    { eMSDP_CHA_PERM,         "CHA_PERM",         NUMBER_READ_ONLY }, 
+   { eMSDP_STAMINA,          "STAMINA",          NUMBER_READ_ONLY },
+   { eMSDP_STAMINA_MAX,      "STAMINA_MAX",      NUMBER_READ_ONLY },
 
    /* Combat */
    { eMSDP_OPPONENT_HEALTH,  "OPPONENT_HEALTH",  NUMBER_READ_ONLY }, 

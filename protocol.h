@@ -91,6 +91,7 @@ typedef enum
    eMSDP_EXPERIENCE, 
    eMSDP_EXPERIENCE_MAX, 
    eMSDP_EXPERIENCE_TNL, 
+   eMSDP_EXPERIENCE_LAST, 
    eMSDP_HEALTH, 
    eMSDP_HEALTH_MAX, 
    eMSDP_LEVEL, 
@@ -120,6 +121,8 @@ typedef enum
    eMSDP_DEX_PERM, 
    eMSDP_CON_PERM, 
    eMSDP_CHA_PERM, 
+   eMSDP_STAMINA,
+   eMSDP_STAMINA_MAX,
 
    /* Combat */
    eMSDP_OPPONENT_HEALTH, 
