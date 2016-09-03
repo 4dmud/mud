@@ -120,6 +120,8 @@ typedef enum
    eMSDP_DEX_PERM, 
    eMSDP_CON_PERM, 
    eMSDP_CHA_PERM, 
+   eMSDP_STAMINA,
+   eMSDP_STAMINA_MAX,
 
    /* Combat */
    eMSDP_OPPONENT_HEALTH, 

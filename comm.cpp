@@ -4698,6 +4698,8 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_CON, GET_CON(ch) );
             MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
             MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
+            MSDPSetNumber( d, eMSDP_STAMINA, GET_STAMINA(ch) );
+            MSDPSetNumber( d, eMSDP_STAMINA_MAX, GET_MAX_STAMINA(ch) );
 
             MSDPSetNumber( d, eMSDP_INT_PERM, ch->real_abils.intel );
             MSDPSetNumber( d, eMSDP_WIS_PERM, ch->real_abils.wis );
