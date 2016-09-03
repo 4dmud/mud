@@ -4672,6 +4672,10 @@ void msdp_update( void )
                current_class_is_tier_num ( ch ),
                MIN ( REMORTS ( ch ), 50 ) ) );
             MSDPSetNumber( d, eMSDP_EXPERIENCE_TNL, exp_needed(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_LAST, level_exp (
+               GET_CLASS ( ch ), GET_LEVEL ( ch ),
+               current_class_is_tier_num ( ch ),
+               MIN ( REMORTS ( ch ), 50 ) ) );
 
             MSDPSetNumber( d, eMSDP_HEALTH, GET_HIT(ch) );
             MSDPSetNumber( d, eMSDP_HEALTH_MAX, GET_MAX_HIT(ch) );
