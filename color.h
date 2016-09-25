@@ -25,6 +25,7 @@
 #define CCYN  "\x1B[0;0m\x1B[36m"  /* &c */
 #define CWHT  "\x1B[0;0m\x1B[37m"  /* &w */
 #define CBLK  "\x1B[0;0m\x1B[30m"  /* &l */
+#define CORA  "\x1B[0;0m\x1B[38;5;172m" /* &o */
 
 /*              Bold Colors            */
 #define BRED  "\x1B[1;31m"    /* &R */
@@ -35,6 +36,7 @@
 #define BCYN  "\x1B[1;36m"    /* &C */
 #define BWHT  "\x1B[1;37m"    /* &W */
 #define BBLK  "\x1B[1;30m"    /* &L */
+#define BORA  "\x1B[1;38;5;214m" /* &O */
 
 /*             Backgrounds             */
 #define BKRED  "\x1B[41m"     /* &e */
@@ -45,6 +47,7 @@
 #define BKCYN  "\x1B[46m"     /* &f */
 #define BKWHT  "\x1B[47m"     /* &h */
 #define BKBLK  "\x1B[40m"     /* &i */
+#define BKORA  "\x1B[48;5;172m"
 
 /*         Underline, Flashing         */
 #define UNDER  "\x1B[4m" /* &U */

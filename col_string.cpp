@@ -115,6 +115,9 @@ string cstring::c_str() {
                 case 'l':
                     tmp += CBLK;
                     break;
+                case 'o':
+                    tmp += CORA;
+                    break;
                 case 'R':
                     tmp += BRED;
                     break;
@@ -139,6 +142,9 @@ string cstring::c_str() {
                     break;
                 case 'L':
                     tmp += BBLK;
+                    break;
+                case 'O':
+                    tmp += BORA;
                     break;
                 case 'u':
                 case 'U':
@@ -179,6 +185,9 @@ string cstring::c_str() {
                     break;
                 case 'l':
                     tmp += BKBLK;
+                    break;
+                case 'o':
+                    tmp += BKORA;
                     break;
                 case 'u':
                 case 'U':
