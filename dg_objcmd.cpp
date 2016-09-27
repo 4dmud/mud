@@ -790,20 +790,20 @@ OCMD ( do_odamage )
 		  **/
 		for ( vict = rm->people;vict;vict = tvict )
 		{
+			if ( !DEAD ( vict ) )
+				tvict = vict->next_in_room;
+			else
+				tvict = NULL;
 
 			if ( !IS_NPC ( vict ) )
 			{
-				if ( ch && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
+				if ( ch && ch != vict && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
 				{
 					start_fighting_delay ( ch, vict );
 					FIGHTING ( vict ) = ch;
 				}
 				script_damage ( vict, dam );
 			}
-			if ( vict && !DEAD ( vict ) )
-				tvict = vict->next_in_room;
-			else
-				tvict = NULL;
 		}
 		return;
 	}
@@ -815,7 +815,7 @@ OCMD ( do_odamage )
 		return;
 	}
 
-	if ( ch && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
+	if ( ch && ch != vict && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
 	{
 		start_fighting_delay ( ch, vict );
 		FIGHTING ( vict ) = ch;

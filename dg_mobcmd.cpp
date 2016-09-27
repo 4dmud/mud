@@ -676,7 +676,7 @@ ACMD(do_mdamage) {
             mob_log(ch, "mdamage: victim (%s) does not exist", name);
             return;
         }
-        if ( ch && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
+        if ( ch && ch != vict && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
         {
             start_fighting_delay ( ch, vict );
             FIGHTING ( vict ) = ch;
@@ -691,6 +691,11 @@ ACMD(do_mdamage) {
           **/
         for (vict = IN_ROOM(ch)->people;vict;vict = tvict)
         {
+            if ( vict && !DEAD(vict) )
+                tvict = vict->next_in_room;
+            else
+                tvict = NULL;
+
             if (ch != vict)
             {
                 if ( ch && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
@@ -700,17 +705,13 @@ ACMD(do_mdamage) {
                 }
                 script_damage(vict, dam);
             }
-            if ( vict && !DEAD(vict) )
-                tvict = vict->next_in_room;
-            else
-                tvict = NULL;
         }
         return;
     } else if (!(vict = get_char_room_vis(ch, name, NULL))) {
         mob_log(ch, "mdamage: victim (%s) does not exist (in this room)", name);
         return;
     } else {
-        if ( ch && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
+        if ( ch && ch != vict && !IS_NPC ( ch ) && can_fight ( ch, vict, TRUE ) )
         {
             start_fighting_delay ( ch, vict );
             FIGHTING ( vict ) = ch;

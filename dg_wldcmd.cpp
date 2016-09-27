@@ -740,15 +740,13 @@ WCMD(do_wdamage)
       **/
     for (vict = room->people;vict;vict = tvict)
     {
+        if (!DEAD(vict))
+            tvict = vict->next_in_room;
+        else
+            tvict = NULL;
 
         if (!IS_NPC(vict))
-        {
-          script_damage(vict, dam);
-        }
-      if (!DEAD(vict))
-        tvict = vict->next_in_room;
-      else
-        tvict = NULL;
+            script_damage(vict, dam);
     }
     return;
   }
