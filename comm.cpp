@@ -3172,13 +3172,8 @@ RETSIGTYPE watchdog(void) {
 		    string st = string(stack[i]);
             auto pos1 = st.find( '[' );
             auto pos2 = st.find( ']' );
-            if ( pos2 - pos1 == 9 ) // [0x123456]
-            {
-                string addr = st.substr( pos1+1, pos2-pos1-1 );
-                system(("addr2line -e ../bin/circle -fp --demangle "+addr+" >> ../log/syslog").c_str());
-            }
-            else
-                log("%s", stack[i]);
+            string addr = st.substr( pos1+1, pos2-pos1-1 );
+            system(("addr2line -e ../bin/circle -fp --demangle "+addr+" >> ../log/syslog").c_str());
         }
         free(stack);
 	}
