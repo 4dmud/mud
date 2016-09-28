@@ -3168,9 +3168,20 @@ RETSIGTYPE watchdog(void) {
 	{
 		log("Lagged for more than %d seconds. Stack trace:", WATCHDOG);
 		for (int i = 0; i < stack_size; ++i)
-			log("%s", stack[i]);
+		{
+		    string st = string(stack[i]);
+            auto pos1 = st.find( '[' );
+            auto pos2 = st.find( ']' );
+            if ( pos2 - pos1 == 9 ) // [0x123456]
+            {
+                string addr = st.substr( pos1+1, pos2-pos1-1 );
+                system(("addr2line -e ../bin/circle -fp --demangle "+addr+" >> ../log/syslog").c_str());
+            }
+            else
+                log("%s", stack[i]);
+        }
+        free(stack);
 	}
-	free(stack);
 	alarm(WATCHDOG);
 }
 
