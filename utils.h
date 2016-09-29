@@ -103,10 +103,10 @@ struct room_affected_type *is_room_affected(Room *rm, int type);
 
 enum
 {
-	eItemNothing,   /* item is not readily accessible */
-	eItemGet,     /* item on ground */
-	eItemDrop,    /* item in inventory */
-	eItemBid     /* auction item */
+    eItemNothing,   /* item is not readily accessible */
+    eItemGet,     /* item on ground */
+    eItemDrop,    /* item in inventory */
+    eItemBid     /* auction item */
 };
 
 /*replace parts of strings*/
@@ -126,9 +126,9 @@ void    *sortl ( void *list, void * ( *getnext ) ( void * ),
 
 typedef struct list_struct
 {
-	struct list_struct *next;
-	char *key;
-	/* other stuff */
+    struct list_struct *next;
+    char *key;
+    /* other stuff */
 }
 list;
 
@@ -221,51 +221,51 @@ unsigned long circle_random ( void );
 
 inline gold_int MIN ( gold_int a, gold_int b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline gold_int MAX ( gold_int a, gold_int b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 inline int MIN ( int a, int b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline int MAX ( int a, int b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 inline float MIN ( float a, float b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline float MAX ( float a, float b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 inline double MIN ( double a, double b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline double MAX ( double a, double b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 inline unsigned int MIN ( unsigned int a, unsigned int b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline unsigned int MAX ( unsigned int a, unsigned int b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 inline long MIN ( long a, long b )
 {
-	return ( a < b ? a : b );
+    return ( a < b ? a : b );
 }
 inline long MAX ( long a, long b )
 {
-	return ( a > b ? a : b );
+    return ( a > b ? a : b );
 }
 
 
@@ -317,7 +317,7 @@ extern const struct race_data races[NUM_RACES];
                         STATE(d) == CON_ZEDIT || STATE(d) == CON_SEDIT ||       \
                         STATE(d) == CON_CEDIT || STATE(d) == CON_PLAYING ||     \
                         STATE(d) == CON_AEDIT || STATE(d) == CON_TRIGEDIT ||    \
-			STATE(d) == CON_LINE_INPUT || STATE(d) == CON_HEDIT)
+            STATE(d) == CON_LINE_INPUT || STATE(d) == CON_HEDIT)
 
 
 /* various constants *****************************************************/
@@ -380,30 +380,30 @@ extern const struct race_data races[NUM_RACES];
 
 inline char *CAP ( char *txt )
 {
-	*txt = UPPER ( *txt );
-	return ( txt );
+    *txt = UPPER ( *txt );
+    return ( txt );
 }
 
 /* memory utils **********************************************************/
 #define CREATE(result, type, number)  do {\
-	if ((number) * sizeof(type) <= 0)	\
-		log("SYSERR: Zero bytes or less requested at %s:%d.", __FILE__, __LINE__);	\
-	if (!((result) = (type *) calloc ((number), sizeof(type))))	\
-		{ perror("SYSERR: calloc failure"); abort(); } } while(0)
+    if ((number) * sizeof(type) <= 0)	\
+        log("SYSERR: Zero bytes or less requested at %s:%d.", __FILE__, __LINE__);	\
+    if (!((result) = (type *) calloc ((number), sizeof(type))))	\
+        { perror("SYSERR: calloc failure"); abort(); } } while(0)
 
 #define RECREATE(result,type,number) do {\
   if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
-		{ perror("SYSERR: realloc failure"); abort(); } } while(0)
+        { perror("SYSERR: realloc failure"); abort(); } } while(0)
 
 
 
 /* Create a duplicate of a string */
 inline char *str_dup ( const char *source )
 {
-	char *new_z = NULL;
+    char *new_z = NULL;
 
-	CREATE ( new_z, char, strlen ( source ) + 1 );
-	return ( strcpy ( new_z, source ) );
+    CREATE ( new_z, char, strlen ( source ) + 1 );
+    return ( strcpy ( new_z, source ) );
 }
 
 /* Dynamic string buffer macros. */
@@ -441,7 +441,7 @@ inline char *str_dup ( const char *source )
    else {				\
       temp = head;			\
       while (temp && (temp->next != (item))) \
-	 temp = temp->next;		\
+     temp = temp->next;		\
       if (temp)				\
          temp->next = (item)->next;	\
    }					\
@@ -495,7 +495,7 @@ void set_skill ( Character *ch, int skill, int amount );
 #if 0
 /* Subtle bug in the '#var', but works well for now. */
 #define CHECK_PLAYER_SPECIAL(ch, var) \
-	(*(((ch)->player_specials == &dummy_mob) ? (log("SYSERR: Mob using '"#var"' at %s:%d.", __FILE__, __LINE__), &(var)) : &(var)))
+    (*(((ch)->player_specials == &dummy_mob) ? (log("SYSERR: Mob using '"#var"' at %s:%d.", __FILE__, __LINE__), &(var)) : &(var)))
 #else
 #define CHECK_PLAYER_SPECIAL(ch, var)	(var)
 #endif
@@ -548,9 +548,9 @@ int has_body ( Character *ch, int flag );
 #define IS_AFFECTED(ch, skill) (AFF_FLAGGED((ch), (skill)))
 
 #define PLR_TOG_CHK(ch,flag) ((TOGGLE_BIT_AR(PLR_FLAGS(ch), (flag))) && \
-				  (IS_SET_AR(PLR_FLAGS(ch), (flag))))
+                  (IS_SET_AR(PLR_FLAGS(ch), (flag))))
 #define PRF_TOG_CHK(ch,flag) ((TOGGLE_BIT_AR(PRF_FLAGS(ch), (flag))) && \
-				  (IS_SET_AR(PRF_FLAGS(ch), (flag))))
+                  (IS_SET_AR(PRF_FLAGS(ch), (flag))))
 
 #define INTERNAL_FLAGS(ch)	((ch)->internal_flags)
 
@@ -562,7 +562,7 @@ int has_body ( Character *ch, int flag );
 
 
 #define SECT(room)	(VALID_ROOM_RNUM(room) ? \
-				(room)->sector_type : SECT_INSIDE)
+                (room)->sector_type : SECT_INSIDE)
 
 #define IS_DARK(room) room_is_dark((room))
 
@@ -571,7 +571,7 @@ int has_body ( Character *ch, int flag );
                           ( ( SECT(room) != SECT_INSIDE && \
                               SECT(room) != SECT_CITY ) && \
                             (sunlight == SUN_SET || \
-			     sunlight == SUN_DARK)) ) )
+                 sunlight == SUN_DARK)) ) )
 
 #define IS_LIGHT(room)  (!IS_DARK(room))
 
@@ -592,19 +592,19 @@ int has_body ( Character *ch, int flag );
 
 #define GET_PC_NAME(ch)	((ch)->player.name)
 #define GET_NAME(ch)    (IS_NPC(ch) ? \
-			 (ch)->player.short_descr : GET_PC_NAME(ch))
+             (ch)->player.short_descr : GET_PC_NAME(ch))
 #define GET_TITLE(ch)   ((ch)->player.title)
 
 #define TOROOM(room, dir) (room->dir_option[dir] ? \
-			    room->dir_option[dir]->to_room : NULL)
+                room->dir_option[dir]->to_room : NULL)
 #if 0
 #define GET_PC_NAME_S(ch)	(*(ch)->player.name)
 #define GET_PC_NAME_SP(ch)	((ch)->player.name)
 
 #define GET_NAME(ch)    (IS_NPC(ch) ? \
-			 *(ch)->player.short_descr : GET_PC_NAME_S(ch))
+             *(ch)->player.short_descr : GET_PC_NAME_S(ch))
 #define GET_NAME_SP(ch)    (IS_NPC(ch) ? \
-			 (ch)->player.short_descr : GET_PC_NAME_SP(ch))
+             (ch)->player.short_descr : GET_PC_NAME_SP(ch))
 
 #define GET_TITLE_S(ch)   (*(ch)->player.title)
 #define GET_TITLE_SP(ch)   ((ch)->player.title)
@@ -820,12 +820,12 @@ void make_wholist ( void );
 #define IS_ANIMAL(ch)		(IS_NPC(ch) && (GET_MRACE(ch) == MOB_RACE_ANIMAL))
 #define IS_EXOTIC(ch)		(IS_NPC(ch) && (GET_MRACE(ch) == MOB_RACE_EXOTIC))
 #define IS_HERD(ch)		(IS_NPC(ch) && (MOB_FLAGGED(ch, MOB_HERD_CATTLE) || \
-						MOB_FLAGGED(ch, MOB_HERD_SHEEP) || \
-						MOB_FLAGGED(ch, MOB_HERD_HORSE)))
+                        MOB_FLAGGED(ch, MOB_HERD_SHEEP) || \
+                        MOB_FLAGGED(ch, MOB_HERD_HORSE)))
 #define SAME_HERD(ch1, ch2)     (IS_NPC(ch1) && IS_NPC(ch2) && \
-				((MOB_FLAGGED(ch1, MOB_HERD_CATTLE) && MOB_FLAGGED(ch2, MOB_HERD_CATTLE)) || \
-				 (MOB_FLAGGED(ch1, MOB_HERD_SHEEP) && MOB_FLAGGED(ch2, MOB_HERD_SHEEP)) || \
-				 (MOB_FLAGGED(ch1, MOB_HERD_HORSE) && MOB_FLAGGED(ch2, MOB_HERD_HORSE))))
+                ((MOB_FLAGGED(ch1, MOB_HERD_CATTLE) && MOB_FLAGGED(ch2, MOB_HERD_CATTLE)) || \
+                 (MOB_FLAGGED(ch1, MOB_HERD_SHEEP) && MOB_FLAGGED(ch2, MOB_HERD_SHEEP)) || \
+                 (MOB_FLAGGED(ch1, MOB_HERD_HORSE) && MOB_FLAGGED(ch2, MOB_HERD_HORSE))))
 #define GET_MTYPE(ch)		((ch)->mob_specials.type)
 #define IS_MOB_PREG(ch)		((ch)->mob_specials.pregnant)
 #define DUE_DATE(ch)		((ch)->mob_specials.due_date)
@@ -886,7 +886,7 @@ int current_class_is_tier_num ( Character *ch );
  * If using signed types, NOTHING will catch the majority of bad accesses.
  */
 #define VALID_OBJ_RNUM(obj)	(GET_OBJ_RNUM(obj) <= top_of_objt && \
-				 GET_OBJ_RNUM(obj) != NOTHING && GET_OBJ_RNUM(obj) >= 0)
+                 GET_OBJ_RNUM(obj) != NOTHING && GET_OBJ_RNUM(obj) >= 0)
 
 #define GET_OBJ_WAS(obj)  	((obj)->was_vnum)
 #define GET_OBJ_VROOM(obj)      ((obj)->vroom)
@@ -935,12 +935,12 @@ int current_class_is_tier_num ( Character *ch );
 #define GET_OBJ_INNATE(obj)     ((obj)->obj_flags.obj_innate)
 
 #define IS_CORPSE(obj)		(GET_OBJ_TYPE(obj) == ITEM_CONTAINER && \
-					GET_OBJ_VAL((obj), 3) == 1 && \
-				(OBJ_FLAGGED(obj, ITEM_PC_CORPSE) || \
-				 OBJ_FLAGGED(obj, ITEM_NPC_CORPSE)))
+                    GET_OBJ_VAL((obj), 3) == 1 && \
+                (OBJ_FLAGGED(obj, ITEM_PC_CORPSE) || \
+                 OBJ_FLAGGED(obj, ITEM_NPC_CORPSE)))
 
 #define GET_OBJ_SPEC(obj) (VALID_OBJ_RNUM(obj) ? \
-	(obj_index[(obj)->item_number].func) : NULL)
+    (obj_index[(obj)->item_number].func) : NULL)
 
 #define CAN_WEAR(obj, part) (IS_SET_AR((obj)->obj_flags.wear_flags, (part)))
 
@@ -951,7 +951,7 @@ int current_class_is_tier_num ( Character *ch );
  * than 3.0pl13, you would use: #if _CIRCLEMUD > CIRCLEMUD_VERSION(3,0,13)
  */
 #define CIRCLEMUD_VERSION(major, minor, patchlevel) \
-	(((major) << 16) + ((minor) << 8) + (patchlevel))
+    (((major) << 16) + ((minor) << 8) + (patchlevel))
 
 #define HSHR(ch) (GET_SEX(ch) ? (GET_SEX(ch)==SEX_MALE ? "his":"her") :"its")
 #define HSSH(ch) (GET_SEX(ch) ? (GET_SEX(ch)==SEX_MALE ? "he" :"she") : "it")
@@ -1017,10 +1017,10 @@ const char * hidden_name ( Character *ch );
 
 
 #define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
-	(obj)->short_description  : "something")
+    (obj)->short_description  : "something")
 
 #define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
-	fname((obj)->name) : "something")
+    fname((obj)->name) : "something")
 
 
 #define EXIT(ch, door)  (IN_ROOM(ch)->dir_option[door])
@@ -1034,8 +1034,8 @@ extern room_rnum VEHICLE_ROOM;
                        !IS_SET(EXIT2(roomnum,door)->exit_info, EX_CLOSED))
 
 #define CAN_GO(ch, door) (EXIT(ch,door) && \
-			 (EXIT(ch,door)->to_room != NULL) && \
-			 !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+             (EXIT(ch,door)->to_room != NULL) && \
+             !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 const char *get_class_abbrev ( Character *ch );
 #define CLASS_ABBR(ch) (IS_NPC(ch) ? "---" : get_class_abbrev(ch))
@@ -1059,15 +1059,15 @@ const char *get_class_abbrev ( Character *ch );
                                 (GET_CLASS(ch) == CLASS_ESPER))
 
 #define IS_FAUN(ch)		(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_FAUN))
+                (GET_RACE(ch) == RACE_FAUN))
 #define IS_CENTAUR(ch)		(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_CENTAUR))
+                (GET_RACE(ch) == RACE_CENTAUR))
 #define IS_DWARF(ch)		(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_DWARF))
+                (GET_RACE(ch) == RACE_DWARF))
 #define IS_ELF(ch)		(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_ELF))
+                (GET_RACE(ch) == RACE_ELF))
 #define IS_INDIAN(ch)		(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_INDIAN))
+                (GET_RACE(ch) == RACE_INDIAN))
 #define IS_GRINGO(ch)           (!IS_NPC(ch) && \
                                 (GET_RACE(ch) == RACE_GRINGO))
 #define IS_MARTIAN(ch)           (!IS_NPC(ch) && \
@@ -1075,7 +1075,7 @@ const char *get_class_abbrev ( Character *ch );
 #define IS_SPACE_WOLF(ch)       (!IS_NPC(ch) && \
                                 (GET_RACE(ch) == RACE_SPACE_WOLF))
 #define IS_GLADIATOR(ch)	(!IS_NPC(ch) && \
-				(GET_RACE(ch) == RACE_GLADIATOR))
+                (GET_RACE(ch) == RACE_GLADIATOR))
 char *print_weather ( room_rnum room, char *buf, size_t len );
 #define OUTSIDE(ch) (!(ROOM_FLAGGED((ch)->in_room, ROOM_INDOORS)||SECT((ch)->in_room)==SECT_INSIDE) )
 #define IS_DAY (sunlight == SUN_LIGHT)
@@ -1128,8 +1128,8 @@ char *print_weather ( room_rnum room, char *buf, size_t len );
 #endif
 
 #define SENDOK(ch)	(((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && \
-			(to_sleeping || AWAKE(ch)) && \
-			!PLR_FLAGGED((ch), PLR_WRITING))
+            (to_sleeping || AWAKE(ch)) && \
+            !PLR_FLAGGED((ch), PLR_WRITING))
 
 #define GET_REMORT(ch) 		    ((ch)->player.was_class)
 #define GET_REMORT_TWO(ch) 	    ((ch)->player.was_class1)

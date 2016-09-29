@@ -638,8 +638,8 @@ int main(int argc, char **argv) {
     } else {
         log("Running game on port %d.", port);
 #if ECL
-	start_argc = argc;
-	start_argv = argv;
+    start_argc = argc;
+    start_argv = argv;
 #endif
         init_game(port);
     }
@@ -650,44 +650,44 @@ int main(int argc, char **argv) {
     if (!scheck) {
         log("Clearing other memory.");
         free_bufpool();             /* comm.c */
-	log("Buf pool freed.");
+    log("Buf pool freed.");
         free_all_notes();           /*note.c*/
-	log("Notes freed.");
+    log("Notes freed.");
         free_social_messages();     /* act.social.c */
-	log("Socials freed.");
+    log("Socials freed.");
         pi.FreeSelf(); /* db.c */
-	log("Playerindex freed.");
+    log("Playerindex freed.");
         free_messages();          /* fight.c */
-	log("Fight messages freed.");
+    log("Fight messages freed.");
         clear_free_list();        /* mail.c */
-	log("clear free list - mail.");
+    log("clear free list - mail.");
         free_mail_index();          /* mail.c */
-	log("clear mail index.");
+    log("clear mail index.");
         free_text_files();        /* db.c */
-	log("text files freed.");
+    log("text files freed.");
         Board_clear_all();        /* boards.c */
-	log("boards freed.");
+    log("boards freed.");
         free(cmd_sort_info); /* act.informative.c */
         cmd_sort_info = NULL;
-	log("commands sort info freed.");
+    log("commands sort info freed.");
         free_command_list();        /* act.informative.c */
-	log("command list freed");
+    log("command list freed");
         the_free_help();          /* db.c */
-	log("help freed.");
+    log("help freed.");
         Free_Invalid_List(); /* ban.c */
-	log("invalid names list freed.");
+    log("invalid names list freed.");
         free_ban_list();          /* ban.c*/
-	log("ban list freed.");
+    log("ban list freed.");
         free_host_list();
-	log("host cache freed.");
+    log("host cache freed.");
         free_strings(&config_info, OASIS_CFG); /* oasis_delete.c */
-	log("config freed.");
+    log("config freed.");
         free_vehicles();
-	log("vehicles freed.");
+    log("vehicles freed.");
         free_commlist(comlist);
-	log("communication chatter freed.");
+    log("communication chatter freed.");
         free_mine_shafts();
-	log("mines freed.");
+    log("mines freed.");
         if (comfile)
             fclose(comfile);
 
@@ -762,8 +762,8 @@ void copyover_recover(void) {
         descriptor_list = d;
 #endif
 
-	MSDPSetString( d, eMSDP_CLIENT_ID, client_name );
-	MSDPSetString( d, eMSDP_CLIENT_VERSION, client_version );
+    MSDPSetString( d, eMSDP_CLIENT_ID, client_name );
+    MSDPSetString( d, eMSDP_CLIENT_VERSION, client_version );
         CopyoverSet( d, protocol_data );
 
         d->host = host;
@@ -1214,7 +1214,7 @@ void game_loop(socket_t s_mother_desc) {
             maxdesc = MAX(maxdesc, id_serv_socket);
         }
 
-	Descriptor *d, *next_d;
+    Descriptor *d, *next_d;
         for (d = descriptor_list; d; d = next_d) {
 #ifndef CIRCLE_WINDOWS
             if (d->descriptor > maxdesc)
@@ -1500,7 +1500,7 @@ void heartbeat(int heart_pulse) {
 
     if (!(heart_pulse % (5 * 60 * PASSES_PER_SEC))) {
         record_usage();
-	compressor.cleanInflated();
+    compressor.cleanInflated();
     }
 
     if (!(heart_pulse % (SECS_PER_MUD_DAY * PASSES_PER_SEC)))
@@ -2057,12 +2057,12 @@ static void get_lookup_reply(void) {
 
 #endif
 void free_host_list() {
-	std::map<string, meta_host_data *>::iterator it;
-	for (it = host_list.begin();it != host_list.end();it++) {
-		delete it->second;
-		it->second = NULL;
-	}
-	host_list.clear();
+    std::map<string, meta_host_data *>::iterator it;
+    for (it = host_list.begin();it != host_list.end();it++) {
+        delete it->second;
+        it->second = NULL;
+    }
+    host_list.clear();
 }
 void save_host_list(void) {
     FILE *fl;
@@ -2072,8 +2072,8 @@ void save_host_list(void) {
         return;
     std::map<string, meta_host_data *>::iterator it;
     for (it = host_list.begin();it != host_list.end();it++) {
-	    thi = it->second;
-	    fprintf(fl, "%s %s %ld\n", thi->host_ip.c_str(), thi->host.c_str(), thi->date);
+        thi = it->second;
+        fprintf(fl, "%s %s %ld\n", thi->host_ip.c_str(), thi->host.c_str(), thi->date);
     }
     fprintf(fl, "~\n");
     fclose(fl);
@@ -2101,11 +2101,11 @@ void load_host_list(void) {
                 fclose(fl);
                 return;
             }
-	    if (date > expire_date) {
-		    hst = host;
-		    hstip = host_ip;
+        if (date > expire_date) {
+            hst = host;
+            hstip = host_ip;
                 add_ip_to_host_list(hstip, hst, date);
-	    }
+        }
         }
         get_line(fl, line);
     }
@@ -2123,18 +2123,18 @@ void add_ip_to_host_list(string &host_ip, string &host, time_t date) {
     thi->host = host;
     thi->date = date;
     if (host_list.find(thi->host_ip) != host_list.end())
-	    delete host_list[thi->host_ip];
+        delete host_list[thi->host_ip];
     host_list[thi->host_ip] = thi;
 }
 bool check_for_ip(string &ip_add, string &host) {
-	std::map<string, meta_host_data *>::iterator it;
+    std::map<string, meta_host_data *>::iterator it;
 
     if ((it = host_list.find(ip_add)) == host_list.end())
-	    return false;
+        return false;
     host = it->second->host;
     if (it->second->host == ip_add) {
-	    it->second->date = time(0);
-	    save_host_list();
+        it->second->date = time(0);
+        save_host_list();
     }
     return true;
 }
@@ -2182,35 +2182,35 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
     if (!copyover) {
 
         /* find the numeric site address */
-	    //strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
-	    newd->host_ip = (char *)inet_ntoa(peer.sin_addr);
+        //strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
+        newd->host_ip = (char *)inet_ntoa(peer.sin_addr);
 
         /* find the sitename */
-	    if (!check_for_ip(newd->host_ip, newd->host)) {
+        if (!check_for_ip(newd->host_ip, newd->host)) {
 
             if (!(from = gethostbyaddr((char *) &peer.sin_addr,
                                        sizeof(peer.sin_addr), AF_INET))) {
                 perror("SYSERR: gethostbyaddr");
 
                 /* find the numeric site address */
-		//strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
-		newd->host = newd->host_ip;
+        //strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
+        newd->host = newd->host_ip;
 
             } else {
-		    //strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
-		    newd->host = from->h_name;
+            //strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
+            newd->host = from->h_name;
 
             }
             add_ip_to_host_list(newd->host_ip, newd->host, time(0));
             save_host_list();
 
         } else { //check_for_ip
-		log("Meta Host Used: %s found.", newd->host.c_str());
+        log("Meta Host Used: %s found.", newd->host.c_str());
         }
 
-	if (isbanned((char *)newd->host.c_str()) == BAN_ALL) {
+    if (isbanned((char *)newd->host.c_str()) == BAN_ALL) {
             CLOSE_SOCKET(desc);
-	    new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host.c_str());
+        new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host.c_str());
             delete newd;
             return (NULL);
         }
@@ -2220,7 +2220,7 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
         /* Write something, and check if it goes error-free */
         if (write_to_descriptor(desc,GREETINGS, NULL) == 0) {
             close(desc);  /* nope */
-	    delete newd;
+        delete newd;
             return NULL;
         }
     }
@@ -3146,38 +3146,38 @@ RETSIGTYPE core_dump_on_crash(void) {
 int consecutive_lags = 0;
 uint64_t last_alarm = 0;
 RETSIGTYPE watchdog(void) {
-	if (consecutive_lags == 20)
-	{
+    if (consecutive_lags == 20)
+    {
         log("FROZEN! Last command typed: %s", last_command);
         open("FROZEN", O_CREAT | O_RDWR, 0600);
         abort(); //dump core.
-	}
+    }
 
-	uint64_t t = time(nullptr);
-	if (t - last_alarm <= WATCHDOG + 1)
-		consecutive_lags++;
-	else
-		consecutive_lags = 1;
-	last_alarm = t;
+    uint64_t t = time(nullptr);
+    if (t - last_alarm <= WATCHDOG + 1)
+        consecutive_lags++;
+    else
+        consecutive_lags = 1;
+    last_alarm = t;
 
-	// log stack trace to find the lag source
-	void *buf[50];
-	int stack_size = backtrace(buf, 50);
-	char **stack = backtrace_symbols(buf, stack_size);
-	if (stack)
-	{
-		log("Lagged for more than %d seconds. Stack trace:", WATCHDOG);
-		for (int i = 0; i < stack_size; ++i)
-		{
-		    string st = string(stack[i]);
+    // log stack trace to find the lag source
+    void *buf[50];
+    int stack_size = backtrace(buf, 50);
+    char **stack = backtrace_symbols(buf, stack_size);
+    if (stack)
+    {
+        log("Lagged for more than %d seconds. Stack trace:", WATCHDOG);
+        for (int i = 0; i < stack_size; ++i)
+        {
+            string st = string(stack[i]);
             auto pos1 = st.find( '[' );
             auto pos2 = st.find( ']' );
             string addr = st.substr( pos1+1, pos2-pos1-1 );
             system(("addr2line -e ../bin/circle -fp --demangle "+addr+" >> ../log/syslog").c_str());
         }
         free(stack);
-	}
-	alarm(WATCHDOG);
+    }
+    alarm(WATCHDOG);
 }
 
 
@@ -3317,11 +3317,11 @@ void send_to_all(const char *messg, ...) {
 }
 
 void send_to_mortals(const char *messg, ...) {
-	//Descriptor *1;
-	//va_list args;
+    //Descriptor *1;
+    //va_list args;
 
-	// This doesn't do anything yet.
-	// Todo by Prometheus
+    // This doesn't do anything yet.
+    // Todo by Prometheus
 }
 
 
@@ -3784,7 +3784,7 @@ void setup_log(const char *filename, int fd) {
 int open_logfile(const char *filename, FILE * stderr_fp) {
     const char* mode = "w";
     if (fCopyOver)
-	mode = "a";
+    mode = "a";
 
     if (stderr_fp)         /* freopen() the descriptor. */
         logfile = freopen(filename, mode, stderr_fp);
@@ -3973,11 +3973,11 @@ void brag(Character *ch, Character *vict) {
     if (ch == vict)
         return;
 
-	if ( IS_NPC ( ch ) )
-	{
-		if ( ch->mob_specials.bragged_about.size() == 0 || find ( ch->mob_specials.bragged_about.begin(), ch->mob_specials.bragged_about.end(), GET_ID ( vict ) ) == ch->mob_specials.bragged_about.end() )
-			ch->mob_specials.bragged_about.push_back ( GET_ID ( vict ) );
-	}
+    if ( IS_NPC ( ch ) )
+    {
+        if ( ch->mob_specials.bragged_about.size() == 0 || find ( ch->mob_specials.bragged_about.begin(), ch->mob_specials.bragged_about.end(), GET_ID ( vict ) ) == ch->mob_specials.bragged_about.end() )
+            ch->mob_specials.bragged_about.push_back ( GET_ID ( vict ) );
+    }
 
     snprintf(buf, sizeof(buf), "%s brags, '%s' ({cW%d%%{cr)", GET_NAME(ch),  bragmsg[number(0, 53)], (int)((float)GET_HIT(ch)/(float)GET_MAX_HIT(ch)*100));
 

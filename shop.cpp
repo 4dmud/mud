@@ -525,7 +525,7 @@ struct obj_data *get_purchase_obj(Character *ch, char *arg,
 
   two_arguments ( arg, name, arg2 );
   if ( *arg2 )
-	strcpy ( name, arg2 );
+    strcpy ( name, arg2 );
 
   do
   {
@@ -673,7 +673,7 @@ void shopping_buy(char *arg, Character *ch, Character *keeper, int shop_nr)
   {
     int charged;
     bought++;
-     
+
     /* Test if producing shop ! */
     if (shop_producing(temp_obj, shop_nr))
       temp_obj = read_object(GET_OBJ_RNUM(temp_obj), REAL);
@@ -1194,7 +1194,7 @@ int ok_damage_shopkeeper(Character *ch, Character *victim)
     if (GET_MOB_VNUM(victim) == SHOP_KEEPER(sindex) && !SHOP_KILL_CHARS(sindex))
     {
       if ( ch == NULL )
-	return FALSE;	
+    return FALSE;
 
       char buf[MAX_INPUT_LENGTH];
 
@@ -1800,204 +1800,204 @@ int count_shops(shop_vnum low, shop_vnum high)
 
 bool load_playershop_shopkeep ( room_vnum r, Character **shopkeep = NULL )
 {
-	if ( player_shop.find ( r ) == player_shop.end() )
-	{
-		log ( "SYSERR: No playershop in room %d passed to load_playershop_shopkeep", r );
-		return 0;
-	}
+    if ( player_shop.find ( r ) == player_shop.end() )
+    {
+        log ( "SYSERR: No playershop in room %d passed to load_playershop_shopkeep", r );
+        return 0;
+    }
 
-	// if the shopkeep isn't in the room, load it and make it sentinel
-	mob_vnum m = player_shop[r]->shopkeep;
-	Character *mob;
-	for ( mob = world_vnum[r]->people; mob; mob = mob->next_in_room )
-		if ( GET_MOB_VNUM ( mob ) == m )
-		{
-			SET_BIT_AR ( MOB_FLAGS ( mob ), MOB_SENTINEL );
-			if ( shopkeep )
-				*shopkeep = mob;
-			return FALSE;
-		}
+    // if the shopkeep isn't in the room, load it and make it sentinel
+    mob_vnum m = player_shop[r]->shopkeep;
+    Character *mob;
+    for ( mob = world_vnum[r]->people; mob; mob = mob->next_in_room )
+        if ( GET_MOB_VNUM ( mob ) == m )
+        {
+            SET_BIT_AR ( MOB_FLAGS ( mob ), MOB_SENTINEL );
+            if ( shopkeep )
+                *shopkeep = mob;
+            return FALSE;
+        }
 
-	mob = read_mobile ( m );
-	SET_BIT_AR ( MOB_FLAGS ( mob ), MOB_SENTINEL );
-	char_to_room ( mob, world_vnum[r] );
-	if ( shopkeep )
-		*shopkeep = mob;
-	return TRUE;
+    mob = read_mobile ( m );
+    SET_BIT_AR ( MOB_FLAGS ( mob ), MOB_SENTINEL );
+    char_to_room ( mob, world_vnum[r] );
+    if ( shopkeep )
+        *shopkeep = mob;
+    return TRUE;
 }
 
 void boot_player_shops ( string filename )
 {
-	FILE *file_owners = fopen ( filename.c_str(), "r" );
-	FILE *file_shop;
-	string name, cur;
-	room_vnum r;
-	mob_vnum m;
-	int location;
-	gold_int p;
-	long id;
-	struct plrshop *pshop = NULL;
-	struct plrshop_item *shop_item = NULL;
-	struct obj_data *item = NULL;
-	char line[READ_SIZE], shop_filename[1024];
+    FILE *file_owners = fopen ( filename.c_str(), "r" );
+    FILE *file_shop;
+    string name, cur;
+    room_vnum r;
+    mob_vnum m;
+    int location;
+    gold_int p;
+    long id;
+    struct plrshop *pshop = NULL;
+    struct plrshop_item *shop_item = NULL;
+    struct obj_data *item = NULL;
+    char line[READ_SIZE], shop_filename[1024];
 
-	if ( !file_owners )
-	{
-		log ( "SYSERR: Couldn't read playershop owners file %s", filename.c_str() );
-		return;
-	}
+    if ( !file_owners )
+    {
+        log ( "SYSERR: Couldn't read playershop owners file %s", filename.c_str() );
+        return;
+    }
 
-	while ( !feof ( file_owners ) )
-	{
-		get_line ( file_owners, line );
+    while ( !feof ( file_owners ) )
+    {
+        get_line ( file_owners, line );
 
-		if ( ( id = pi.IdByName ( line ) ) == -1 )
-		{
-			log ( "SYSERR: Unknown playershop owner %s in file %s", name.c_str(), filename.c_str() );
-			continue;
-		}
+        if ( ( id = pi.IdByName ( line ) ) == -1 )
+        {
+            log ( "SYSERR: Unknown playershop owner %s in file %s", name.c_str(), filename.c_str() );
+            continue;
+        }
 
-		get_filename ( line, shop_filename, PLRSHOP_FILE );
-		file_shop = fopen ( shop_filename, "r" );
-		if ( !file_shop )
-		{
-			log ( "SYSERR: Couldn't read playershop file %s", shop_filename );
-			continue;
-		}
+        get_filename ( line, shop_filename, PLRSHOP_FILE );
+        file_shop = fopen ( shop_filename, "r" );
+        if ( !file_shop )
+        {
+            log ( "SYSERR: Couldn't read playershop file %s", shop_filename );
+            continue;
+        }
 
-		while ( !feof ( file_shop ) )
-		{
-			get_line ( file_shop, line );
-			if ( !strcmp ( line, "end_of_file" ) )
-				break;
+        while ( !feof ( file_shop ) )
+        {
+            get_line ( file_shop, line );
+            if ( !strcmp ( line, "end_of_file" ) )
+                break;
 
-			r = atoi ( line );
-			get_line ( file_shop, line );
-			m = atoi ( line );
+            r = atoi ( line );
+            get_line ( file_shop, line );
+            m = atoi ( line );
 
-			if ( !real_room ( r ) )
-			{
-				log ( "SYSERR: Illegal room vnum %d in playershop file %s", r, shop_filename );
-				return;
-			}
+            if ( !real_room ( r ) )
+            {
+                log ( "SYSERR: Illegal room vnum %d in playershop file %s", r, shop_filename );
+                return;
+            }
 
-			if ( !MobProtoExists ( m ) )
-			{
-				log ( "SYSERR: Illegal mob vnum %d in playershop file %s", m, shop_filename );
-				return;
-			}
+            if ( !MobProtoExists ( m ) )
+            {
+                log ( "SYSERR: Illegal mob vnum %d in playershop file %s", m, shop_filename );
+                return;
+            }
 
-			pshop = new plrshop;
-			pshop->owner_id = id;
-			pshop->shop_room = r;
-			pshop->shopkeep = m;
+            pshop = new plrshop;
+            pshop->owner_id = id;
+            pshop->shop_room = r;
+            pshop->shopkeep = m;
 
-			// read objects
-			while ( !feof ( file_shop ) )
-			{
-				get_line ( file_shop, line );
-				if ( !strcmp ( line, "end_of_shop" ) )
-					break;
+            // read objects
+            while ( !feof ( file_shop ) )
+            {
+                get_line ( file_shop, line );
+                if ( !strcmp ( line, "end_of_shop" ) )
+                    break;
 
-				p = atoll ( line );
-				get_line ( file_shop, line );
-				cur = string ( line );
+                p = atoll ( line );
+                get_line ( file_shop, line );
+                cur = string ( line );
 
-				item = read_one_item ( file_shop, item, &location );
+                item = read_one_item ( file_shop, item, &location );
 
-				shop_item = new plrshop_item;
-				shop_item->obj = item;
-				shop_item->price = p;
-				shop_item->currency = cur;
+                shop_item = new plrshop_item;
+                shop_item->obj = item;
+                shop_item->price = p;
+                shop_item->currency = cur;
 
-				pshop->item.push_back ( shop_item );
-				obj_in_plrshop[ GET_ID ( item ) ] = world_vnum[r];
-			}
+                pshop->item.push_back ( shop_item );
+                obj_in_plrshop[ GET_ID ( item ) ] = world_vnum[r];
+            }
 
-			world_vnum[r]->func = playershop;
-			player_shop[r] = pshop;
-			load_playershop_shopkeep ( r );
-		}
-		fclose ( file_shop );
-	}
-	fclose ( file_owners );
+            world_vnum[r]->func = playershop;
+            player_shop[r] = pshop;
+            load_playershop_shopkeep ( r );
+        }
+        fclose ( file_shop );
+    }
+    fclose ( file_owners );
 }
 
 void save_player_shop ( string owner )
 {
-	long id = pi.IdByName ( owner.c_str() );
+    long id = pi.IdByName ( owner.c_str() );
 
-	if ( id == -1 )
-	{
-		log ( "SYSERR: Nonexisting player named %s passed to save_player_shop", owner.c_str() );
-		return;
-	}
+    if ( id == -1 )
+    {
+        log ( "SYSERR: Nonexisting player named %s passed to save_player_shop", owner.c_str() );
+        return;
+    }
 
-	bool has_playershop = FALSE;
-	for ( auto &p : player_shop )
-		if ( p.second->owner_id == id )
-		{
-			has_playershop = TRUE;
-			break;
-		}
+    bool has_playershop = FALSE;
+    for ( auto &p : player_shop )
+        if ( p.second->owner_id == id )
+        {
+            has_playershop = TRUE;
+            break;
+        }
 
-	char shop_filename[1024];
-	get_filename ( owner.c_str(), shop_filename, PLRSHOP_FILE );
+    char shop_filename[1024];
+    get_filename ( owner.c_str(), shop_filename, PLRSHOP_FILE );
 
-	if ( !has_playershop )
-	{
-		// remove the shop file
-		remove ( shop_filename );
+    if ( !has_playershop )
+    {
+        // remove the shop file
+        remove ( shop_filename );
 
-		// remove the owner from the owners list
-		vector<string> owners;
-		string name;
-		ifstream read_file_owners ( PLRSHOP_OWNERS_FILE );
-		while ( read_file_owners >> name )
-			if ( name != owner )
-				owners.push_back ( name );
-		read_file_owners.close();
+        // remove the owner from the owners list
+        vector<string> owners;
+        string name;
+        ifstream read_file_owners ( PLRSHOP_OWNERS_FILE );
+        while ( read_file_owners >> name )
+            if ( name != owner )
+                owners.push_back ( name );
+        read_file_owners.close();
 
-		ofstream write_file_owners ( PLRSHOP_OWNERS_FILE );
-		for ( auto &name : owners )
-			write_file_owners << name;
-		write_file_owners.close();
+        ofstream write_file_owners ( PLRSHOP_OWNERS_FILE );
+        for ( auto &name : owners )
+            write_file_owners << name;
+        write_file_owners.close();
 
-		return;
-	}
+        return;
+    }
 
-	// save shop file
-	FILE *file_shop = fopen ( shop_filename, "w" );
+    // save shop file
+    FILE *file_shop = fopen ( shop_filename, "w" );
 
-	if ( !file_shop )
-	{
-		log ( "SYSERR: Couldn't write to playershop file %s", shop_filename );
-		return;
-	}
+    if ( !file_shop )
+    {
+        log ( "SYSERR: Couldn't write to playershop file %s", shop_filename );
+        return;
+    }
 
-	for ( auto &p : player_shop )
-		if ( p.second->owner_id == id )
-		{
-			fprintf ( file_shop, "%d\n", p.second->shop_room );
-			fprintf ( file_shop, "%d\n", p.second->shopkeep );
-			for ( auto &i : p.second->item )
-			{
-				fprintf ( file_shop, "%lld\n", i->price );
-				fprintf ( file_shop, "%s\n", i->currency.c_str() );
-				save_one_item ( i->obj, file_shop, 0 );
-			}
-			fprintf ( file_shop, "end_of_shop\n" );
-		}
-	fprintf ( file_shop, "end_of_file" );
-	fclose ( file_shop );
+    for ( auto &p : player_shop )
+        if ( p.second->owner_id == id )
+        {
+            fprintf ( file_shop, "%d\n", p.second->shop_room );
+            fprintf ( file_shop, "%d\n", p.second->shopkeep );
+            for ( auto &i : p.second->item )
+            {
+                fprintf ( file_shop, "%lld\n", i->price );
+                fprintf ( file_shop, "%s\n", i->currency.c_str() );
+                save_one_item ( i->obj, file_shop, 0 );
+            }
+            fprintf ( file_shop, "end_of_shop\n" );
+        }
+    fprintf ( file_shop, "end_of_file" );
+    fclose ( file_shop );
 }
 
 void free_player_shops()
 {
-	for ( auto &p : player_shop )
-	{
-		for ( auto &i : p.second->item )
-			extract_obj ( i->obj );
-		delete p.second;
-	}
+    for ( auto &p : player_shop )
+    {
+        for ( auto &i : p.second->item )
+            extract_obj ( i->obj );
+        delete p.second;
+    }
 }

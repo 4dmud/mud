@@ -44,18 +44,18 @@ void write_aliases(Character *ch)
     int repllen = strlen(temp->replacement) - 1;
 
     fprintf(file, "%d\n%s\n"	/* Alias */
-		  "%d\n%s\n"	/* Replacement */
-		  "%d\n",	/* Type */
-		aliaslen, temp->alias,
-		repllen, temp->replacement + 1,
-		temp->type);
+          "%d\n%s\n"	/* Replacement */
+          "%d\n",	/* Type */
+        aliaslen, temp->alias,
+        repllen, temp->replacement + 1,
+        temp->type);
   }
-  
+
   fclose(file);
 }
 
 void read_aliases(Character *ch)
-{   
+{
   FILE *file;
   char xbuf[MAX_STRING_LENGTH];
   struct alias_data *t2, *prev = NULL;
@@ -70,9 +70,9 @@ void read_aliases(Character *ch)
     }
     return;
   }
- 
+
   CREATE(GET_ALIASES(ch), struct alias_data, 1);
-  t2 = GET_ALIASES(ch); 
+  t2 = GET_ALIASES(ch);
 
   for (;;) {
     /* Read the aliased command. */
@@ -88,13 +88,13 @@ void read_aliases(Character *ch)
 
     *xbuf = ' ';		/* Doesn't need terminated, fgets() will. */
     fgets(xbuf + 1, length + 1, file);
-    t2->replacement = strdup(xbuf); 
+    t2->replacement = strdup(xbuf);
 
     /* Figure out the alias type. */
     if (fscanf(file, "%d\n", &length) != 1)
       goto read_alias_error;
 
-    t2->type = length; 
+    t2->type = length;
 
     if (feof(file))
       break;
@@ -102,8 +102,8 @@ void read_aliases(Character *ch)
     CREATE(t2->next, struct alias_data, 1);
     prev = t2;
     t2 = t2->next;
-  }; 
-  
+  };
+
   fclose(file);
   return;
 
@@ -115,7 +115,7 @@ read_alias_error:
   if (prev)
     prev->next = NULL;
   fclose(file);
-} 
+}
 
 void delete_aliases(const char *charname)
 {

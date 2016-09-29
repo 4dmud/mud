@@ -64,7 +64,7 @@
 #if !defined(TRUE)
 #define TRUE  (!FALSE)
 #endif
- 
+
 
 /*
  * If you want mortals to level up to immortal once they have enough
@@ -83,9 +83,9 @@ int immort_level_ok = 0;
  * However, if you decide you want to have an all-out knock-down drag-out
  * PK Mud, just set pk_allowed to YES - and anything goes.
  */
- 
- 
- 
+
+
+
 int pk_allowed = NO;
 
 /* is playerthieving allowed? */
@@ -330,7 +330,7 @@ int max_bad_pws = 3;
 int siteok_everyone = TRUE;
 
 /*
- * Some nameservers are very slow and cause the game to lag terribly every 
+ * Some nameservers are very slow and cause the game to lag terribly every
  * time someone logs in.  The lag is caused by the gethostbyaddr() function
  * which is responsible for resolving numeric IP addresses to alphabetic names.
  * Sometimes, nameservers can be so slow that the incredible lag caused by
@@ -358,28 +358,28 @@ int nameserver_is_slow = YES;
   * This option supercedes the nameserver_is_slow option.
   */
  int lookup_hostname = YES;
- 
+
  /*
   * Shall we try to look up all connection users username?
-  * If use_external_lookup_process is set to FALSE, then the 
+  * If use_external_lookup_process is set to FALSE, then the
   * mud might lag for considerable amount of time.
   */
  int lookup_username = YES;
- 
+
  /*
   * Shall we use an external process to resolve hostnames
   * and lookup usernames?
   */
  int use_external_lookup_process = YES;
- 
- 
+
+
 /*
  * Will changes save automaticaly in OLC ?
  */
 int auto_save_olc = 1;
 
 /*
- * if you wish to enable Aedit, set this to 1 
+ * if you wish to enable Aedit, set this to 1
  * This will make the mud look for a file called socials.new,
  * which is in a different format than the stock socials file.
  */

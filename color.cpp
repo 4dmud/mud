@@ -4,7 +4,7 @@
  **  Handles embedded colour codes.  This is a stripped-down version of my   **
  **  colour routine.  Certain options are not present (like "remembering"    **
  **  colours) so that additional player data won't be needed.                **
- **									    **	
+ **									    **
  ** 			                	(C)opyright 1997 M.C. Lewis **
  *****************************************************************************/
 /*
@@ -40,7 +40,7 @@
    fg colours, you can specify fg and bg in any order, i.e., /cW/bb or
    /bb/cW.  When using NORMAL fg colours, you should specify the fg colour
    FIRST, since the ANSI code will turn off the current background colour.
-   That is, /cw/bb will be normal white text on blue background, but 
+   That is, /cw/bb will be normal white text on blue background, but
    /bb/cw will just be normal white text WITHOUT background. */
 
 /* e-mail:   mc2@geocities.com */
@@ -70,7 +70,7 @@
 #define COL_CYAN 	"\x1B[0;36m"
 #define COL_WHITE 	"\x1B[0;37m"
 #define COL_FG_OFF	"\x1B[38m"	/* works on normal terminals but not
-					   colour_xterms */
+                       colour_xterms */
 
 /* The bold or extended ANSI colours */
 #define COL_E_BLACK	"\x1B[1;30m"	/* /cl */
@@ -110,7 +110,7 @@
    add in K/k for black, which some people prefer since black is "KEY"
    as in CMYK. */
 
-		   /* Measurements *//* Not implemented this version */
+           /* Measurements *//* Not implemented this version */
 #define M_FOOT	"foot"
 #define M_FEET	"feet"
 #define M_cm	"centimeter"
@@ -140,10 +140,10 @@ int already_proc(char *buf)
     unsigned int i;
 
     for (i = 0; i < sizeof(buf); i++) {
-	if (buf[i] == SPEC_CHAR) {
-	    basic_mud_log("Already_proc called");
-	    return 1;
-	}
+    if (buf[i] == SPEC_CHAR) {
+        basic_mud_log("Already_proc called");
+        return 1;
+    }
     }
     return 0;
 }
@@ -171,14 +171,14 @@ const char *COLOURLIST[] = {
 #define LAST_COLOUR 37
 
 #define BUFSPACE	12*1024	/* This should be equal to LARGE_BUFSIZE
-				   in structs.h */
+                   in structs.h */
 
 #define BUFSIZE MAX_STRING_LENGTH - 1
 //BUFSPACE-1
 
 
 #define START_CHAR '{'		/* a forward slash followed by c or C or b
-				   and a number */
+                   and a number */
 
 /******* You can change START_CHAR to whatever you wish, like '^' *******/
 
@@ -187,8 +187,8 @@ int count_chars(const char *txt, char character)
     int i, cnt = 0;
 
     for (i = 0; txt[i]; i++)
-	if (txt[i] == character)
-	    cnt++;
+    if (txt[i] == character)
+        cnt++;
 
     return cnt ? cnt : i;
 }
@@ -200,22 +200,22 @@ char *out_buf = NULL, insert_text[10];
     int remaining, colour = -2;
     register int i;
     size_t b_len;
-    
-    
+
+
     if (*inbuf == '\0' || inbuf == NULL)
-	return;			/* if first char is null */
+    return;			/* if first char is null */
 
     *insert_text = '\0';
     i = count_chars(inbuf, START_CHAR);
-    if (i <= 0) 
+    if (i <= 0)
       return;
 
 b_len = i * 5 + strlen(inbuf) + 2;
    out_buf = (char *) alloca(b_len);	/* no ansi-escape code is larger
-								   than 5 bytes so a 5 * times
-								   the '{' appears + strlen(inbuf)
-								   + 1 character big buffer
-								   should be enough */
+                                   than 5 bytes so a 5 * times
+                                   the '{' appears + strlen(inbuf)
+                                   + 1 character big buffer
+                                   should be enough */
 
     /* If colour level is 1 (sparse), then character will get cursor controls
        only.  If colour level is 2, character will get colour codes only.  If
@@ -228,188 +228,188 @@ b_len = i * 5 + strlen(inbuf) + 2;
 
 
     while (inbuf[inpos] != '\0') {
-	remaining = strlen(inbuf) - inpos;
+    remaining = strlen(inbuf) - inpos;
        *insert_text = '\0';
-	if (remaining > 2) {
-	    if (inbuf[inpos] == START_CHAR) {
-		
-		switch (inbuf[inpos + 1]) {
-		case START_CHAR:	/* just a slash */
-		    *insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    inpos += 2;
-		    break;
-		case 'C':
-		case 'c':	/* foreground colour */
-		    switch (inbuf[inpos + 2]) {
-		    case 'l':
-			colour = 2;
-			break;
-		    case 'L':
-			colour = 11;
-			break;
-		    case 'r':
-			colour = 3;
-			break;
-		    case 'R':
-			colour = 12;
-			break;
-		    case 'g':
-			colour = 4;
-			break;
-		    case 'G':
-			colour = 13;
-			break;
-		    case 'y':
-			colour = 5;
-			break;
-		    case 'Y':
-			colour = 14;
-			break;
-		    case 'b':
-			colour = 6;
-			break;
-		    case 'B':
-			colour = 15;
-			break;
-		    case 'm':
-		    case 'p':
-			colour = 7;
-			break;
-		    case 'M':
-		    case 'P':
-			colour = 16;
-			break;
-		    case 'c':
-			colour = 8;
-			break;
-		    case 'C':
-			colour = 17;
-			break;
-		    case 'w':
-			colour = 9;
-			break;
-		    case 'W':
-			colour = 18;
-			break;
-		    case 'O':
-		    case 'o':
-			colour = 10;
-			break;
-		    case 'U':
-		    case 'u':
-			colour = 35;
-			break;
-		    case 'F':
-		    case 'f':
-			colour = 36;
-			break;
-		    case 'V':
-		    case 'v':
-			colour = 37;
-			break;
+    if (remaining > 2) {
+        if (inbuf[inpos] == START_CHAR) {
 
-		    case 'x':
-		    case '0':
-			colour = 0;
-			break;
-		    default:
-			colour = 1;	/* no change */
-			*insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    inpos += 1;
-		    }
+        switch (inbuf[inpos + 1]) {
+        case START_CHAR:	/* just a slash */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            inpos += 2;
+            break;
+        case 'C':
+        case 'c':	/* foreground colour */
+            switch (inbuf[inpos + 2]) {
+            case 'l':
+            colour = 2;
+            break;
+            case 'L':
+            colour = 11;
+            break;
+            case 'r':
+            colour = 3;
+            break;
+            case 'R':
+            colour = 12;
+            break;
+            case 'g':
+            colour = 4;
+            break;
+            case 'G':
+            colour = 13;
+            break;
+            case 'y':
+            colour = 5;
+            break;
+            case 'Y':
+            colour = 14;
+            break;
+            case 'b':
+            colour = 6;
+            break;
+            case 'B':
+            colour = 15;
+            break;
+            case 'm':
+            case 'p':
+            colour = 7;
+            break;
+            case 'M':
+            case 'P':
+            colour = 16;
+            break;
+            case 'c':
+            colour = 8;
+            break;
+            case 'C':
+            colour = 17;
+            break;
+            case 'w':
+            colour = 9;
+            break;
+            case 'W':
+            colour = 18;
+            break;
+            case 'O':
+            case 'o':
+            colour = 10;
+            break;
+            case 'U':
+            case 'u':
+            colour = 35;
+            break;
+            case 'F':
+            case 'f':
+            colour = 36;
+            break;
+            case 'V':
+            case 'v':
+            colour = 37;
+            break;
 
-		   if (colour != 1)
-		          inpos += 3;
-		        
-			
+            case 'x':
+            case '0':
+            colour = 0;
+            break;
+            default:
+            colour = 1;	/* no change */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            inpos += 1;
+            }
 
-		    break;
-		case 'B':
-		case 'b':	/* background colour */
-		    switch (inbuf[inpos + 2]) {
-		    case 'l':
-			colour = 20;
-			break;
-		    case 'r':
-			colour = 21;
-			break;
-		    case 'g':
-			colour = 22;
-			break;
-		    case 'y':
-			colour = 23;
-			break;
-		    case 'b':
-			colour = 24;
-			break;
-		    case 'm':
-		    case 'p':
-			colour = 25;
-			break;
-		    case 'c':
-			colour = 26;
-			break;
-		    case 'w':
-			colour = 27;
-			break;
-		    case 'o':
-			colour = 0;
-			break;
-		    default:
-			colour = 1;	/* no change */
-			*insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    inpos += 1;
-		    }
+           if (colour != 1)
+                  inpos += 3;
 
-		    
 
-		    if (colour != 1)
-		          inpos += 3;
-			
-		    break;
 
-		
+            break;
+        case 'B':
+        case 'b':	/* background colour */
+            switch (inbuf[inpos + 2]) {
+            case 'l':
+            colour = 20;
+            break;
+            case 'r':
+            colour = 21;
+            break;
+            case 'g':
+            colour = 22;
+            break;
+            case 'y':
+            colour = 23;
+            break;
+            case 'b':
+            colour = 24;
+            break;
+            case 'm':
+            case 'p':
+            colour = 25;
+            break;
+            case 'c':
+            colour = 26;
+            break;
+            case 'w':
+            colour = 27;
+            break;
+            case 'o':
+            colour = 0;
+            break;
+            default:
+            colour = 1;	/* no change */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            inpos += 1;
+            }
 
-		default:
-		    inpos += 1;
-		    *insert_text = START_CHAR;
-		    insert_text[1] = '\0';
 
-		}		/* switch */
 
-		out_buf[outpos] = '\0';
-		outpos = strlcat(out_buf, insert_text, b_len);
+            if (colour != 1)
+                  inpos += 3;
+
+            break;
+
+
+
+        default:
+            inpos += 1;
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+
+        }		/* switch */
+
+        out_buf[outpos] = '\0';
+        outpos = strlcat(out_buf, insert_text, b_len);
 #if 0
-		if ((strlen(out_buf) + strlen(insert_text)) < b_len) {
-		    /* don't overfill buffer */
-		    if (insert_text != NULL) {
-			out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
-			strcat(out_buf, insert_text);
-			outpos = strlen(out_buf);
-		    }
-		}
+        if ((strlen(out_buf) + strlen(insert_text)) < b_len) {
+            /* don't overfill buffer */
+            if (insert_text != NULL) {
+            out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
+            strcat(out_buf, insert_text);
+            outpos = strlen(out_buf);
+            }
+        }
 #endif
 
-	    } /* if char is '/' (START_CHAR) */
-	    else {
-		if (outpos < b_len) {
-		    out_buf[outpos] = inbuf[inpos];
-		    inpos++;
-		    outpos++;
-		}
-	    }
+        } /* if char is '/' (START_CHAR) */
+        else {
+        if (outpos < b_len) {
+            out_buf[outpos] = inbuf[inpos];
+            inpos++;
+            outpos++;
+        }
+        }
 
-	} /* if remaining > 2 */
-	else {
-	    if (outpos < b_len) {
-		out_buf[outpos] = inbuf[inpos];
-		inpos++;
-		outpos++;
-	    }
-	}
+    } /* if remaining > 2 */
+    else {
+        if (outpos < b_len) {
+        out_buf[outpos] = inbuf[inpos];
+        inpos++;
+        outpos++;
+        }
+    }
 
 
     }				/* while */
@@ -431,18 +431,18 @@ size_t proc_colour(char *inbuf, int colour_lvl, size_t len)
     size_t b_len;
 
     if ( inbuf == NULL || *inbuf == '\0' )
-	return 0;			/* if first char is null */
+    return 0;			/* if first char is null */
 
     i = count_chars(inbuf, START_CHAR);
       if (i <= 0)
       return (-i);
-    
+
 b_len = i * 5 + strlen(inbuf) + 1;
     out_buf = (char *) alloca(b_len);	/* no ansi-escape code is larger
-								   than 5 bytes so a 5 * times
-								   the '{' appears + strlen(inbuf)
-								   + 1 character big buffer
-								   should be enough */
+                                   than 5 bytes so a 5 * times
+                                   the '{' appears + strlen(inbuf)
+                                   + 1 character big buffer
+                                   should be enough */
 
     /* If colour level is 1 (sparse), then character will get cursor controls
        only.  If colour level is 2, character will get colour codes only.  If
@@ -454,194 +454,194 @@ b_len = i * 5 + strlen(inbuf) + 1;
 
 
     while (inbuf[inpos] != '\0') {
-	remaining = strlen(inbuf) - inpos;
+    remaining = strlen(inbuf) - inpos;
 //*insert_text = '\0';
-	if (remaining > 0) {
-	
-	    if (inbuf[inpos] == START_CHAR) {
-		insert_text[0] = '\0';
-		switch (inbuf[inpos + 1]) {
-		case START_CHAR:	/* just a slash */
-		    *insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    inpos += 2;
-		    break;
-		case 'C':
-		case 'c':	/* foreground colour */
-		    switch (inbuf[inpos + 2]) {
-		    case 'l':
-			colour = 2;
-			break;
-		    case 'L':
-			colour = 11;
-			break;
-		    case 'r':
-			colour = 3;
-			break;
-		    case 'R':
-			colour = 12;
-			break;
-		    case 'g':
-			colour = 4;
-			break;
-		    case 'G':
-			colour = 13;
-			break;
-		    case 'y':
-			colour = 5;
-			break;
-		    case 'Y':
-			colour = 14;
-			break;
-		    case 'b':
-			colour = 6;
-			break;
-		    case 'B':
-			colour = 15;
-			break;
-		    case 'm':
-		    case 'p':
-			colour = 7;
-			break;
-		    case 'M':
-		    case 'P':
-			colour = 16;
-			break;
-		    case 'c':
-			colour = 8;
-			break;
-		    case 'C':
-			colour = 17;
-			break;
-		    case 'w':
-			colour = 9;
-			break;
-		    case 'W':
-			colour = 18;
-			break;
-		    case 'O':
-		    case 'o':
-			colour = 10;
-			break;
-		    case 'U':
-		    case 'u':
-			colour = 35;
-			break;
-		    case 'F':
-		    case 'f':
-			colour = 36;
-			break;
-		    case 'V':
-		    case 'v':
-			colour = 37;
-			break;
+    if (remaining > 0) {
 
-		    case 'x':
-		    case '0':
-			colour = 0;
-			break;
-		    default:
-			colour = 1;	/* no change */
-			*insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    }
+        if (inbuf[inpos] == START_CHAR) {
+        insert_text[0] = '\0';
+        switch (inbuf[inpos + 1]) {
+        case START_CHAR:	/* just a slash */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            inpos += 2;
+            break;
+        case 'C':
+        case 'c':	/* foreground colour */
+            switch (inbuf[inpos + 2]) {
+            case 'l':
+            colour = 2;
+            break;
+            case 'L':
+            colour = 11;
+            break;
+            case 'r':
+            colour = 3;
+            break;
+            case 'R':
+            colour = 12;
+            break;
+            case 'g':
+            colour = 4;
+            break;
+            case 'G':
+            colour = 13;
+            break;
+            case 'y':
+            colour = 5;
+            break;
+            case 'Y':
+            colour = 14;
+            break;
+            case 'b':
+            colour = 6;
+            break;
+            case 'B':
+            colour = 15;
+            break;
+            case 'm':
+            case 'p':
+            colour = 7;
+            break;
+            case 'M':
+            case 'P':
+            colour = 16;
+            break;
+            case 'c':
+            colour = 8;
+            break;
+            case 'C':
+            colour = 17;
+            break;
+            case 'w':
+            colour = 9;
+            break;
+            case 'W':
+            colour = 18;
+            break;
+            case 'O':
+            case 'o':
+            colour = 10;
+            break;
+            case 'U':
+            case 'u':
+            colour = 35;
+            break;
+            case 'F':
+            case 'f':
+            colour = 36;
+            break;
+            case 'V':
+            case 'v':
+            colour = 37;
+            break;
 
-		    if (colour != current_colour)
-			if (has_colour)
-			    strcpy(insert_text, COLOURLIST[colour]);
-			if (colour != 1)
-		          inpos += 3;
-		        else
-			inpos += 1;
-		    current_colour = colour;
-		    break;
-		case 'B':
-		case 'b':	/* background colour */
-		    switch (inbuf[inpos + 2]) {
-		    case 'l':
-			colour = 20;
-			break;
-		    case 'r':
-			colour = 21;
-			break;
-		    case 'g':
-			colour = 22;
-			break;
-		    case 'y':
-			colour = 23;
-			break;
-		    case 'b':
-			colour = 24;
-			break;
-		    case 'm':
-		    case 'p':
-			colour = 25;
-			break;
-		    case 'c':
-			colour = 26;
-			break;
-		    case 'w':
-			colour = 27;
-			break;
-		    case 'o':
-			colour = 0;
-			break;
-		    default:
-			colour = 1;	/* no change */
-			*insert_text = START_CHAR;
-		    insert_text[1] = '\0';
-		    }
+            case 'x':
+            case '0':
+            colour = 0;
+            break;
+            default:
+            colour = 1;	/* no change */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            }
 
-		    if (colour != current_colour)
-			if (has_colour)
-			    strcpy(insert_text, COLOURLIST[colour]);
+            if (colour != current_colour)
+            if (has_colour)
+                strcpy(insert_text, COLOURLIST[colour]);
+            if (colour != 1)
+                  inpos += 3;
+                else
+            inpos += 1;
+            current_colour = colour;
+            break;
+        case 'B':
+        case 'b':	/* background colour */
+            switch (inbuf[inpos + 2]) {
+            case 'l':
+            colour = 20;
+            break;
+            case 'r':
+            colour = 21;
+            break;
+            case 'g':
+            colour = 22;
+            break;
+            case 'y':
+            colour = 23;
+            break;
+            case 'b':
+            colour = 24;
+            break;
+            case 'm':
+            case 'p':
+            colour = 25;
+            break;
+            case 'c':
+            colour = 26;
+            break;
+            case 'w':
+            colour = 27;
+            break;
+            case 'o':
+            colour = 0;
+            break;
+            default:
+            colour = 1;	/* no change */
+            *insert_text = START_CHAR;
+            insert_text[1] = '\0';
+            }
+
+            if (colour != current_colour)
+            if (has_colour)
+                strcpy(insert_text, COLOURLIST[colour]);
                     if (colour != 1)
-		    inpos += 3;
-		        else
-			inpos += 1;
-		    current_colour = colour;
-		    break;
+            inpos += 3;
+                else
+            inpos += 1;
+            current_colour = colour;
+            break;
 
-		
-		default:
-		    insert_text[0] = START_CHAR;
-		    insert_text[1] = '\0';
-		    inpos += 1;
 
-		}		/* switch */
+        default:
+            insert_text[0] = START_CHAR;
+            insert_text[1] = '\0';
+            inpos += 1;
 
-		//if (colour_lvl == 0)
-		    out_buf[outpos] = '\0';
-		    outpos = strlcat(out_buf, insert_text, b_len);
+        }		/* switch */
+
+        //if (colour_lvl == 0)
+            out_buf[outpos] = '\0';
+            outpos = strlcat(out_buf, insert_text, b_len);
 #if 0
-		if ((strlen(out_buf) + strlen(insert_text)) < len - 1) {
-		    /* don't overfill buffer */
-		    if (*insert_text != '\0') {
-			out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
-			strcat(out_buf, insert_text);
-			outpos = strlen(out_buf);
-		    }
-		}
-		#endif
-		
+        if ((strlen(out_buf) + strlen(insert_text)) < len - 1) {
+            /* don't overfill buffer */
+            if (*insert_text != '\0') {
+            out_buf[outpos] = '\0';	/* so strcat is not confused by whatever out_buf WAS */
+            strcat(out_buf, insert_text);
+            outpos = strlen(out_buf);
+            }
+        }
+        #endif
 
-	    } /* if char is '/' (START_CHAR) */
-	    else {
-		if (outpos < len - 1) {
-		    out_buf[outpos] = inbuf[inpos];
-		    inpos++;
-		    outpos++;
-		}
-	    }
 
-	} /* if remaining > 2 */
-	else {
-	    if (outpos < len - 1) {
-		out_buf[outpos] = inbuf[inpos];
-		inpos++;
-		outpos++;
-	    }
-	}
+        } /* if char is '/' (START_CHAR) */
+        else {
+        if (outpos < len - 1) {
+            out_buf[outpos] = inbuf[inpos];
+            inpos++;
+            outpos++;
+        }
+        }
+
+    } /* if remaining > 2 */
+    else {
+        if (outpos < len - 1) {
+        out_buf[outpos] = inbuf[inpos];
+        inpos++;
+        outpos++;
+        }
+    }
 
 
     }				/* while */
@@ -649,6 +649,6 @@ b_len = i * 5 + strlen(inbuf) + 1;
 
     out_buf[outpos] = '\0';
     strlcpy(inbuf, out_buf, len);
-    
+
     return outpos;
 }

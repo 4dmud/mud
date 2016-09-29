@@ -279,11 +279,11 @@ void qic_scan_rent(void) {
         }
 
     for (i = 0; i < pi.Size(); i++) {
-	    if (pi.DeletedByIndex(i))
+        if (pi.DeletedByIndex(i))
             continue;
         timeout = 120;
         timeout *= SECS_PER_REAL_DAY;
-	if ((tm - pi.LastByIndex(i)) < timeout)
+    if ((tm - pi.LastByIndex(i)) < timeout)
             scan_char_objects_qic(pi.NameByIndex(i), pi.IdByIndex(i)); //objsave.c
     }
 }

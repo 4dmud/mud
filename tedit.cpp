@@ -47,7 +47,7 @@ void tedit_string_cleanup(Descriptor *d, int terminator)
         strip_cr(*d->str);
         fputs(*d->str, fl);
       }
-      
+
       unlock_desc(d);
       fclose(fl);
       new_mudlog(CMP, LVL_GOD, TRUE, "OLC: %s saves '%s'.", GET_NAME(d->character), storage);
@@ -55,7 +55,7 @@ void tedit_string_cleanup(Descriptor *d, int terminator)
     }
     break;
   case STRINGADD_ABORT:
-    
+
     d->Output( "Edit aborted.\r\n");
     act("$n stops editing some scrolls.", TRUE, d->character, 0, 0, TO_ROOM);
     break;
@@ -74,7 +74,7 @@ ACMD(do_tedit)
   int l, i = 0;
   char field[MAX_INPUT_LENGTH];
   char *backstr = NULL;
-   
+
   struct {
     const char *cmd;
     char level;
@@ -82,31 +82,31 @@ ACMD(do_tedit)
     int  size;
     const char *filename;
   } fields[] = {
-	/* edit the lvls to your own needs */
-	{ (char *)"credits",	LVL_IMPL,	&credits,	2400,	CREDITS_FILE},
-	{ (char *)"news",	LVL_GRGOD,	&news,		8192,	NEWS_FILE},
-	{ (char *)"motd",	LVL_GRGOD,	&motd,		2400,	MOTD_FILE},
-	{ (char *)"imotd",	LVL_IMPL,	&imotd,		2400,	IMOTD_FILE},
-	{ (char *)"help",       LVL_GRGOD,	&help,		2400,	HELP_PAGE_FILE},
-	{ (char *)"info",	LVL_GRGOD,	&info,		8192,	INFO_FILE},
-	{ (char *)"background",	LVL_IMPL,	&background,	8192,	BACKGROUND_FILE},
-	{ (char *)"handbook",   LVL_IMPL,	&handbook,	8192,   HANDBOOK_FILE},
-	{ (char *)"policies",	LVL_IMPL,	&policies,	8192,	POLICIES_FILE},
-	{ (char *)"\n",		0,		NULL,		0,	NULL }
+    /* edit the lvls to your own needs */
+    { (char *)"credits",	LVL_IMPL,	&credits,	2400,	CREDITS_FILE},
+    { (char *)"news",	LVL_GRGOD,	&news,		8192,	NEWS_FILE},
+    { (char *)"motd",	LVL_GRGOD,	&motd,		2400,	MOTD_FILE},
+    { (char *)"imotd",	LVL_IMPL,	&imotd,		2400,	IMOTD_FILE},
+    { (char *)"help",       LVL_GRGOD,	&help,		2400,	HELP_PAGE_FILE},
+    { (char *)"info",	LVL_GRGOD,	&info,		8192,	INFO_FILE},
+    { (char *)"background",	LVL_IMPL,	&background,	8192,	BACKGROUND_FILE},
+    { (char *)"handbook",   LVL_IMPL,	&handbook,	8192,   HANDBOOK_FILE},
+    { (char *)"policies",	LVL_IMPL,	&policies,	8192,	POLICIES_FILE},
+    { (char *)"\n",		0,		NULL,		0,	NULL }
   };
 
   if (ch->desc == NULL)
     return;
-   
+
   one_argument(argument, field);
 
   if (!*field) {
     ch->Send( "Files available to be edited:\r\n");
     for (l = 0; *fields[l].cmd != '\n'; l++) {
       if (GET_LEVEL(ch) >= fields[l].level) {
-	ch->Send( "%-11.11s ", fields[l].cmd);
-	if (!(++i % 7))
-	  ch->Send( "\r\n");
+    ch->Send( "%-11.11s ", fields[l].cmd);
+    if (!(++i % 7))
+      ch->Send( "\r\n");
       }
     }
     if (i % 7)
@@ -118,12 +118,12 @@ ACMD(do_tedit)
   for (l = 0; *(fields[l].cmd) != '\n'; l++)
     if (!strncmp(field, fields[l].cmd, strlen(field)))
       break;
-   
+
   if (*fields[l].cmd == '\n') {
     ch->Send( "Invalid text editor option.\r\n");
     return;
   }
-   
+
   if (GET_LEVEL(ch) < fields[l].level) {
     ch->Send( "You are not godly enough for that!\r\n");
     return;
@@ -139,7 +139,7 @@ ACMD(do_tedit)
     free(ch->desc->olc);
   }
   CREATE(ch->desc->olc, struct oasis_olc_data, 1);
-  
+
   if (*fields[l].buffer) {
     ch->Send( "%s", *fields[l].buffer);
     backstr = strdup(*fields[l].buffer);

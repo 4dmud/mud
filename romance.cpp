@@ -1,7 +1,7 @@
 /*
 *  C Implementation: romance
 *
-* Description: 
+* Description:
 *
 *
 * Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -42,7 +42,7 @@ void namesave(Character *ch, Character *vict)
 {
   /* Saves the names in PARTNER() */
   /* Now we're set! Save it! */
-  
+
   if (!IS_NPC(ch)) SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
   if (!IS_NPC(vict)) SET_BIT_AR(PLR_FLAGS(vict), PLR_CRASH);
 }
@@ -76,7 +76,7 @@ ACMD(do_askout)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH];
-  
+
   one_argument(argument, arg);
   if (!*arg)
   {       /* What, ask no one out? */
@@ -89,7 +89,7 @@ ACMD(do_askout)
     ch->Send( "%s", CONFIG_NOPERSON);
     return;
   }
-  
+
   if (ROMANCE(ch) != 0)
   {  /* Are you already involved? */
     send_to_char("Sorry, you're already romantically involved!\r\n",
@@ -203,7 +203,7 @@ ACMD(do_accept)
         act("$n agrees to date $N!\r\n", TRUE, ch, 0, victim,
             TO_NOTVICT);
         /* We've notified them, now change the variables. */
-        
+
         PARTNER(ch) = GET_IDNUM(victim);
         PARTNER(victim) = GET_IDNUM(ch);
         ROMANCE(ch) = 1;
@@ -223,7 +223,7 @@ ACMD(do_accept)
         act("$n agrees to marry $N!\r\n", TRUE, ch, 0, victim,
             TO_NOTVICT);
         /* We've done the notification, now change the variables. */
-        
+
         PARTNER(ch) = GET_IDNUM(victim);
         PARTNER(victim) = GET_IDNUM(ch);
         ROMANCE(ch) = 2;
@@ -337,7 +337,7 @@ ACMD(do_propose)
   /* To propose to someone. */
   Character *victim;
   char arg[MAX_INPUT_LENGTH];
-  
+
   switch (ROMANCE(ch))
   {
   default:
@@ -360,12 +360,12 @@ ACMD(do_propose)
     ch->Send( "But you're already proposing!\r\n");
     return;
   }
-  
+
   if (ROMANCE(ch) == ASKING)
   {  /*Asking someone out? */
     ch->Send( "But you're asking someone else!\r\n");
     return;
-    
+
   }
   else
   {            /* Okay, YOU pass... */
@@ -500,7 +500,7 @@ ACMD(do_breakup)
           break;
       }
 
-  if (!d) 
+  if (!d)
   {
       victim = new Character(FALSE);
       if (store_to_char(arg, victim) == -1) {
@@ -541,21 +541,21 @@ ACMD(do_breakup)
       else if (ROMANCE(victim) == 3)
           ch->Send( "But they're married to %s, not you!\r\n",
                        pi.NameById(PARTNER(victim)));
-      else 
+      else
           ch->Send( "But %s isn't involved with you!\r\n",
                        GET_NAME(victim));
       if (!d) delete(victim);
       return;
   }
-      
+
   /* Okay, they're involved and with you... */
   /* Now we break them up! How FUN! */
-  if (ROMANCE(ch) == 1 || ROMANCE(ch) == 4) 
+  if (ROMANCE(ch) == 1 || ROMANCE(ch) == 4)
   {
       /* For dating */
       act("You inform $N that you will no longer date $M!\r\n",
             TRUE, ch, 0, victim, TO_CHAR);
-      if (d) 
+      if (d)
           victim->Send("%s dumps you, tearing your heart out in the process!\r\n", GET_NAME(ch));
       act("$n sends $s relationship with $N to Splitsville!\r\n",
             TRUE, ch, 0, victim, TO_NOTVICT);
@@ -756,7 +756,7 @@ ACMD(do_marry)
 ACMD(do_divorce)
 {
   Character *victim;
-  
+
   char arg[MAX_INPUT_LENGTH];
   /* First, standard checks: Are you in a relationship? */
   if (ROMANCE(ch) != 3)
@@ -875,7 +875,7 @@ int crashcheck_alpha(Character *ch, Character *vict)
 ACMD(do_seduce)
 {
   Character *victim;
-  
+
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
 
@@ -887,7 +887,7 @@ ACMD(do_seduce)
   victim = get_char_room_vis(ch, arg, NULL);
   if (PREG(ch) < 0)
   {
-    
+
     if (!*arg)
     {          /* Mate with noone? */
       send_to_char("Whom do you want to mate with?\r\n", ch);
@@ -975,10 +975,10 @@ ACMD(do_seduce)
 ACMD(do_consent)
 {
   Character *victim;
-  
+
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
-  
+
   if (!*arg)
   {       /* Break up with noone? */
     send_to_char("Whom do you want to mate with?\r\n", ch);
@@ -1013,7 +1013,7 @@ ACMD(do_consent)
        ch);
     return;
   }
-  
+
   if (GET_SEX(victim) == SEX_MALE)
   {
     send_to_char("You need a female partner to mate with.\r\n", ch);
@@ -1052,7 +1052,7 @@ ACMD(do_consent)
       victim, TO_NOTVICT);
   PREG(victim) = genpreg();   /* Generate a pregnancy time */
   /* All set. */
-  
+
 }
 
 /* Deny fatherhood */
@@ -1094,7 +1094,7 @@ ACMD(do_deny)
        ch);
     return;
   }
-  
+
   else if (GET_SEX(victim) == SEX_MALE)
   {
     send_to_char("You can only mate with females...\r\n", ch);
@@ -1133,7 +1133,7 @@ int genpreg(void)
 void symptoms(Character *ch)
 {
   struct obj_data *obj;
-  
+
   int contract = 0;
   if ((PREG(ch) < (MONTHS_5)) && (PREG(ch) > 0))
   {
@@ -1196,7 +1196,7 @@ void symptoms(Character *ch)
     send_to_all("A large, white stork flies high above you!\r\n");
     act("You are whisked away to a nearby hospital, and return moments later, carrying your new child!\r\n", TRUE, ch, 0, 0, TO_CHAR);
     act("$n is whisked away in an ambulance, and quickly returns, baby in hand.\r\n", TRUE, ch, 0, 0, TO_ROOM);
-    
+
     obj = read_object(number(5, 6), VIRTUAL);
     if (obj)
     obj_to_char(obj, ch);
@@ -1247,7 +1247,7 @@ ACMD(do_abort)
     ch->Send( "But %s isn't pregnant!\r\n", GET_NAME(victim));
     return;
   }
-  
+
   if (crashcheck_alpha(victim, ch) == 1)
   {
     return;
@@ -1263,7 +1263,7 @@ ACMD(do_abort)
     act("You make a mystical gesture towards $N's abdomen.\r\nIt shrinks back to normal.\r\n", TRUE, ch, 0, victim, TO_CHAR);
     act("$n makes a mystical gesture towards your abdomen.\r\nAfter a moment of pain, it shrinks back to normal.\r\n", TRUE, ch, 0, victim, TO_VICT);
     act("$n makes a mystical gesture towards $N's abdomen.\r\nIt shrinks back to normal.\r\n", TRUE, ch, 0, victim, TO_NOTVICT);
- 
+
   }
   PREG(victim) = NOT_PREG;
 }
@@ -1339,7 +1339,7 @@ char * baby_status(Character *i, char * buf, size_t len)
   /* MatingMod Addition - Essential! */
   if ((PREG(i) > NOT_PREG) && !IS_NPC(i))
   {
-    
+
     if (PREG(i) < 7)
       snprintf(buf, len, "%s %s giving birth!\r\n", GET_NAME(i), "is");
     else if (PREG(i) < (MONTHS_2)) // Customize these messages, if you want.

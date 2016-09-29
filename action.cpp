@@ -55,19 +55,19 @@ ACTION(thing_tunneling);
 
 void set_tree_origin ( struct obj_data *obj, struct obj_data *tree )
 {
-	uint i, j = 0;
-	string s = tolower ( string ( tree->short_description ) );
+    uint i, j = 0;
+    string s = tolower ( string ( tree->short_description ) );
 
-	for ( i = BEGIN_OF_HARDWOOD; i < BEGIN_OF_LARGE_ANIMAL; i++ )
-		if ( s.find ( origin_names[ i ] ) != string::npos )
-		{
-			j = i;
-			break;
-		}
+    for ( i = BEGIN_OF_HARDWOOD; i < BEGIN_OF_LARGE_ANIMAL; i++ )
+        if ( s.find ( origin_names[ i ] ) != string::npos )
+        {
+            j = i;
+            break;
+        }
 
-	if ( j > 0 )
-		GET_OBJ_ORIGIN ( obj ) = j;
-	else log ( "Couldn't set the tree origin for vnum %d, %s", GET_OBJ_VNUM ( tree ), tree->short_description );
+    if ( j > 0 )
+        GET_OBJ_ORIGIN ( obj ) = j;
+    else log ( "Couldn't set the tree origin for vnum %d, %s", GET_OBJ_VNUM ( tree ), tree->short_description );
 }
 
 ACTION(thing_lumberjack)
@@ -180,10 +180,10 @@ ACTION(thing_lumberjack)
 
       for (; logs > 0; logs--)
         if ((object = read_object( lognum, VIRTUAL)) != NULL)
-	{
-	  set_tree_origin ( object, obj );
+    {
+      set_tree_origin ( object, obj );
           obj_to_room(object, IN_ROOM(ch));
-	}
+    }
 
       if (obj != NULL)
       {
@@ -1287,7 +1287,7 @@ ASUB(sub_tumble)
   }
   else
     act("You start to juggle a few coloured balls.", FALSE, ch, 0, 0, TO_CHAR);
-  
+
   toggle_sub_status(ch, SUB_JUGGLE, STATUS_ON);
 
   msg = new message_event_obj(ch, SUB_JUGGLE, THING_SUB,(vict == NULL ? number(1, 4) : number(5, 8)),(vict != NULL ? GET_ID(vict) : NOBODY), (char *)"");

@@ -79,14 +79,14 @@ unsigned char * Compressor::def(unsigned char *source, size_t &dest) {
             dstrm.avail_out = CHUNK;
             dstrm.next_out = out;
             ret = deflate(&dstrm, flush);   /* no bad return value */
-	    //basic_mud_log(zerr(ret));
+        //basic_mud_log(zerr(ret));
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
             //have = CHUNK - dstrm.avail_out;
             last_size = cur_size;
             cur_size += dstrm.total_out;
-	    //basic_mud_log("Avail In: %d In size: %d Out Size: %d Ret: %s",dstrm.avail_in, read_to, cur_size * sizeof(unsigned char), zerr(ret));
+        //basic_mud_log("Avail In: %d In size: %d Out Size: %d Ret: %s",dstrm.avail_in, read_to, cur_size * sizeof(unsigned char), zerr(ret));
             /* if (buf_tmp == NULL)
-              
+
              else
               buf_tmp = (unsigned char*)realloc(buf_tmp, (cur_size * sizeof(unsigned char)));
              if (buf_tmp == NULL) {
@@ -96,17 +96,17 @@ unsigned char * Compressor::def(unsigned char *source, size_t &dest) {
             //strncpy((char *)buf_tmp + (last_size-1), (char *)out, dstrm.total_out+1);
             o_s.append((const char*)out);
             /*
-            	if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-            	(void)deflateEnd(&strm);
-            	return Z_ERRNO;
+                if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+                (void)deflateEnd(&strm);
+                return Z_ERRNO;
             }*/
         } while (dstrm.avail_out == 0);
-	if (dstrm.avail_in != 0) {
-		//deflateReset(&dstrm);
-		//basic_mud_log("Cur_size: %d os.size(): %d", cur_size, o_s.size());
-		throw MudException("Can't parse the compression 1.");
+    if (dstrm.avail_in != 0) {
+        //deflateReset(&dstrm);
+        //basic_mud_log("Cur_size: %d os.size(): %d", cur_size, o_s.size());
+        throw MudException("Can't parse the compression 1.");
     }
-	// assert(dstrm.avail_in == 0);     /* all input will be used */
+    // assert(dstrm.avail_in == 0);     /* all input will be used */
 
         /* done when last data in file processed */
     } while (flush != Z_FINISH);
@@ -114,8 +114,8 @@ unsigned char * Compressor::def(unsigned char *source, size_t &dest) {
     assert(ret == Z_STREAM_END);        /* stream will be complete */
    // basic_mud_log("Cur_size: %d os.size(): %d", cur_size, o_s.size());
     if (cur_size != o_s.size()) {
-	   // deflateReset(&dstrm);
-	    basic_mud_log(zerr(ret));
+       // deflateReset(&dstrm);
+        basic_mud_log(zerr(ret));
         throw MudException("Can't parse the compression 2.");
 }
     //tmp = (unsigned char*)malloc(cur_size+1);
@@ -187,8 +187,8 @@ unsigned char * Compressor::inf(unsigned char *source, size_t &dest) {
             out[cur_size+1] = '\0';
             o_s.append((char *)out);
             /*if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-            	(void)inflateEnd(&strm);
-            	return Z_ERRNO;
+                (void)inflateEnd(&strm);
+                return Z_ERRNO;
             }*/
         } while (istrm.avail_out == 0);
 
@@ -312,7 +312,7 @@ long Compressor::CompressToId(const char *_in, long i, bool comp) {
         } catch (MudException &e) {
             cmps->parsed = false;
             cmps->saved = (unsigned char*)strdup(_in);
-	    
+
         }
     }
 

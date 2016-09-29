@@ -98,7 +98,7 @@ struct htree_node *htree_find_node(struct htree_node *root, IDXTYPE index)
 {
   struct htree_node *tmp;
   int i;
-  
+
   tmp = root;
   while (index) {
     i = index & HTREE_NODE_MASK;

@@ -153,7 +153,7 @@ void add_to_int_list(int **list, int newi)
 /*-------------------------------------------------------------------*/
 
 /*
- * Copy a -1 terminated (in the type field) shop_buy_data 
+ * Copy a -1 terminated (in the type field) shop_buy_data
  * array list.
  */
 void copy_type_list(struct shop_buy_data **tlist, struct shop_buy_data *flist)
@@ -391,7 +391,7 @@ void free_shop(struct shop_data *shop)
 
 /*-------------------------------------------------------------------*/
 
-/* returns the real number of the shop with given virtual number 
+/* returns the real number of the shop with given virtual number
  *
  * We take so good care to keep it sorted - let's use it :) - Welcor
  */
@@ -549,7 +549,7 @@ int save_shops(zone_rnum zone_num)
        * Save the products.
        */
       for (j = 0; S_PRODUCT(shop, j) != NOTHING; j++)
-	fprintf(shop_file, "%d\n", obj_index[S_PRODUCT(shop, j)].vnum);
+    fprintf(shop_file, "%d\n", obj_index[S_PRODUCT(shop, j)].vnum);
       fprintf(shop_file, "-1\n");
 
       /*
@@ -563,13 +563,13 @@ int save_shops(zone_rnum zone_num)
       /*
        * Save the buy types and namelists.
        */
-      for (j = 0;S_BUYTYPE(shop, j) != NOTHING; j++) 
-        fprintf(shop_file, "%d%s\n", 
+      for (j = 0;S_BUYTYPE(shop, j) != NOTHING; j++)
+        fprintf(shop_file, "%d%s\n",
                 S_BUYTYPE(shop, j),
-		S_BUYWORD(shop, j) ? S_BUYWORD(shop, j) : "");
+        S_BUYWORD(shop, j) ? S_BUYWORD(shop, j) : "");
       fprintf(shop_file, "-1\n");
 
-      
+
 /* Not allowed to use Ascii in shopfile anymore (bpl21)
       sprintascii(buf1, S_BITVECTOR(shop));
       sprintascii(buf2, S_NOTRADE(shop));
@@ -580,47 +580,47 @@ int save_shops(zone_rnum zone_num)
        * Added some small'n'silly defaults as sanity checks.
        */
       fprintf(shop_file,
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%d\n"
-	      "%ld\n"
-	      "%d\n"
-	      "%d\n",
-	      S_NOITEM1(shop) ? S_NOITEM1(shop) : "%s Ke?!",
-	      S_NOITEM2(shop) ? S_NOITEM2(shop) : "%s Ke?!",
-	      S_NOBUY(shop) ? S_NOBUY(shop) : "%s Ke?!",
-	      S_NOCASH1(shop) ? S_NOCASH1(shop) : "%s Ke?!",
-	      S_NOCASH2(shop) ? S_NOCASH2(shop) : "%s Ke?!",
-	      S_BUY(shop) ? S_BUY(shop) : "%s Ke?! %d?",
-	      S_SELL(shop) ? S_SELL(shop) : "%s Ke?! %d?",
-	      S_BROKE_TEMPER(shop),
-	      S_BITVECTOR(shop),
-	      S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop),
-	      S_NOTRADE(shop)
-	      );
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%d\n"
+          "%ld\n"
+          "%d\n"
+          "%d\n",
+          S_NOITEM1(shop) ? S_NOITEM1(shop) : "%s Ke?!",
+          S_NOITEM2(shop) ? S_NOITEM2(shop) : "%s Ke?!",
+          S_NOBUY(shop) ? S_NOBUY(shop) : "%s Ke?!",
+          S_NOCASH1(shop) ? S_NOCASH1(shop) : "%s Ke?!",
+          S_NOCASH2(shop) ? S_NOCASH2(shop) : "%s Ke?!",
+          S_BUY(shop) ? S_BUY(shop) : "%s Ke?! %d?",
+          S_SELL(shop) ? S_SELL(shop) : "%s Ke?! %d?",
+          S_BROKE_TEMPER(shop),
+          S_BITVECTOR(shop),
+          S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop),
+          S_NOTRADE(shop)
+          );
 
       /*
        * Save the rooms.
        */
-      for (j = 0;S_ROOM(shop, j) != NULL; j++) 
+      for (j = 0;S_ROOM(shop, j) != NULL; j++)
         fprintf(shop_file, "%d\n", S_ROOM(shop, j)->number);
       fprintf(shop_file, "-1\n");
 
       /*
-       * Save open/closing times 
+       * Save open/closing times
        */
       fprintf(shop_file, "%d\n%d\n%d\n%d\n", S_OPEN1(shop), S_CLOSE1(shop),
-		S_OPEN2(shop), S_CLOSE2(shop));
+        S_OPEN2(shop), S_CLOSE2(shop));
     }
   }
   fprintf(shop_file, "$~\n");
   fclose(shop_file);
-  
+
   snprintf(oldname, sizeof(oldname), "%s/%d/%d.shp", LIB_WORLD, zone_table[zone_num].number, zone_table[zone_num].number);
   remove(oldname);
   rename(fname, oldname);

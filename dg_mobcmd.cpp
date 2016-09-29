@@ -793,20 +793,20 @@ ACMD(do_mload) {
         }
 
         /* special handling to make objects able to load on a person/in a container/worn etc. */
-		if (!target || !*target) {
-			if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
-				if (IN_ROOM(ch))
-					mob_log(ch, "[TOKEN] loads %s in %d", object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
-			}
-			if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
-				obj_to_room ( object, IN_ROOM ( ch ) );
-			else
-				obj_to_char ( object, ch );
-			load_otrigger(object);
-			return;
-		}
+        if (!target || !*target) {
+            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312) {
+                if (IN_ROOM(ch))
+                    mob_log(ch, "[TOKEN] loads %s in %d", object->short_description, GET_ROOM_VNUM(IN_ROOM(ch)));
+            }
+            if ( !CAN_WEAR ( object, ITEM_WEAR_TAKE ) )
+                obj_to_room ( object, IN_ROOM ( ch ) );
+            else
+                obj_to_char ( object, ch );
+            load_otrigger(object);
+            return;
+        }
 
-		/* load to char */
+        /* load to char */
         two_arguments(target, arg1, arg2); /* recycling ... */
         tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
         if (tch) {
@@ -825,33 +825,33 @@ ACMD(do_mload) {
             return;
         }
 
-		/* load to container */
+        /* load to container */
         cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
         if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
-	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-				mob_log(ch, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
+            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+                mob_log(ch, "[TOKEN] loads %s to %s", object->short_description, cnt->short_description );
             obj_to_obj(object, cnt);
             load_otrigger(object);
             return;
         }
 
-		/* load to room */
-		Room *r = get_room ( arg1 );
-		if ( r == NULL )
-		{
-	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-				mob_log(ch, "[TOKEN] loads %s in room %d but couldn't find target %s, purging.", object->short_description, IN_ROOM ( ch )->number, arg1 );
-			else
-				mob_log(ch, "loads [%d] %s in room %d but couldn't find target %s, purging.", GET_OBJ_VNUM ( object ), object->short_description, IN_ROOM ( ch )->number, arg1 );
-		    extract_obj ( object );
-		}
-		else
-		{
-	        if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
-				mob_log(ch, "[TOKEN] loads %s to room %d", object->short_description, r->number );
-			obj_to_room ( object, r );
-			load_otrigger ( object );
-		}
+        /* load to room */
+        Room *r = get_room ( arg1 );
+        if ( r == NULL )
+        {
+            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+                mob_log(ch, "[TOKEN] loads %s in room %d but couldn't find target %s, purging.", object->short_description, IN_ROOM ( ch )->number, arg1 );
+            else
+                mob_log(ch, "loads [%d] %s in room %d but couldn't find target %s, purging.", GET_OBJ_VNUM ( object ), object->short_description, IN_ROOM ( ch )->number, arg1 );
+            extract_obj ( object );
+        }
+        else
+        {
+            if (GET_OBJ_VNUM(object) >= 3300 && GET_OBJ_VNUM(object) <= 3312)
+                mob_log(ch, "[TOKEN] loads %s to room %d", object->short_description, r->number );
+            obj_to_room ( object, r );
+            load_otrigger ( object );
+        }
         return;
     } else
         mob_log(ch, "bad argument to mload: %s", argument );
@@ -1418,7 +1418,7 @@ ACMD(do_mtransform) {
                     equip_char(ch, obj[pos], pos);
             }
             GET_FIGHT_EVENT(m) = NULL;
-	    ch->message_event.clear();
+        ch->message_event.clear();
             for (int i = 0; i < 4; i++)
                 GET_POINTS_EVENT(m, i) = NULL;
             extract_char(m);

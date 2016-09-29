@@ -10,37 +10,37 @@
 
 
 /* FEATURES & INSTALLATION INSTRUCTIONS ***********************************
- 
+
 This board code has many improvements over the infamously buggy standard
 Diku board code.  Features include:
- 
+
 - Arbitrary number of boards handled by one set of generalized routines.
   Adding a new board is as easy as adding another entry to an array.
 - Safe removal of messages while other messages are being written.
 - Does not allow messages to be removed by someone of a level less than
   the poster's level.
- 
- 
+
+
 TO ADD A NEW BOARD, simply follow our easy 4-step program:
- 
+
 1 - Create a new board object in the object files
- 
+
 2 - Increase the NUM_OF_BOARDS constant in boards.h
- 
+
 3 - Add a new line to the board_info array below.  The fields, in order, are:
- 
-	Board's virtual number.
-	Min level one must be to look at this board or read messages on it.
-	Min level one must be to post a message to the board.
-	Min level one must be to remove other people's messages from this
-		board (but you can always remove your own message).
-	Filename of this board, in quotes.
-	Last field must always be 0.
- 
+
+    Board's virtual number.
+    Min level one must be to look at this board or read messages on it.
+    Min level one must be to post a message to the board.
+    Min level one must be to remove other people's messages from this
+        board (but you can always remove your own message).
+    Filename of this board, in quotes.
+    Last field must always be 0.
+
 4 - In spec_assign.c, find the section which assigns the special procedure
     gen_board to the other bulletin boards, and add your new one in a
     similar fashion.
- 
+
 */
 
 
@@ -140,12 +140,12 @@ int find_slot(void)
 /* returns the index of obj in board_info, -1 if it's not in there */
 int board_index ( struct obj_data *obj )
 {
-	if ( !obj )
-		return -1;
+    if ( !obj )
+        return -1;
 
-	for ( int i = 0; i < NUM_OF_BOARDS; ++i )
-		if ( BOARD_RNUM ( i ) == GET_OBJ_RNUM ( obj ) )
-			return i;
+    for ( int i = 0; i < NUM_OF_BOARDS; ++i )
+        if ( BOARD_RNUM ( i ) == GET_OBJ_RNUM ( obj ) )
+            return i;
 
         return -1;
 }
@@ -206,83 +206,83 @@ void init_boards(void)
 
 SPECIAL(gen_board)
 {
-	int num, i = 0, index = -1;
-	static int loaded = 0;
-	struct obj_data *board = (struct obj_data *) me;
-	struct obj_data *obj = NULL;
-	char arg[MAX_INPUT_LENGTH];
-	char *arg_copy, *desc;
-	Character *tmp_ch;
+    int num, i = 0, index = -1;
+    static int loaded = 0;
+    struct obj_data *board = (struct obj_data *) me;
+    struct obj_data *obj = NULL;
+    char arg[MAX_INPUT_LENGTH];
+    char *arg_copy, *desc;
+    Character *tmp_ch;
 
-	if ( !loaded )
-	{
-		init_boards();
-		loaded = 1;
-	}
+    if ( !loaded )
+    {
+        init_boards();
+        loaded = 1;
+    }
 
-	if ( !ch->desc )
-		return 0;
+    if ( !ch->desc )
+        return 0;
 
-	skip_spaces ( &argument );
-	strlcpy ( arg, argument, sizeof ( arg ) );
-	arg_copy = arg;
+    skip_spaces ( &argument );
+    strlcpy ( arg, argument, sizeof ( arg ) );
+    arg_copy = arg;
 
-	if ( ! ( num = get_number ( &arg_copy ) ) )
-		return 0;
+    if ( ! ( num = get_number ( &arg_copy ) ) )
+        return 0;
 
-	if ( cmd == find_command ( "look" ) )
-	{
-		for ( obj = ch->carrying; obj; obj = obj->next_content )
-			if ( CAN_SEE_OBJ ( ch, obj ) )
-			{
-				if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
-					return 0;
-				else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
-					return Board_show_board ( index, ch, arg, board );
-			}
+    if ( cmd == find_command ( "look" ) )
+    {
+        for ( obj = ch->carrying; obj; obj = obj->next_content )
+            if ( CAN_SEE_OBJ ( ch, obj ) )
+            {
+                if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
+                    return 0;
+                else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
+                    return Board_show_board ( index, ch, arg, board );
+            }
 
-		for ( obj = IN_ROOM ( ch )->contents; obj; obj = obj->next_content )
-			if ( CAN_SEE_OBJ ( ch, obj ) )
-			{
-				if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
-					return 0;
-				else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
-					return Board_show_board ( index, ch, arg, board );
-			}
+        for ( obj = IN_ROOM ( ch )->contents; obj; obj = obj->next_content )
+            if ( CAN_SEE_OBJ ( ch, obj ) )
+            {
+                if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == num )
+                    return 0;
+                else if ( ( index = board_index ( obj ) ) > -1 && ++i == num )
+                    return Board_show_board ( index, ch, arg, board );
+            }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	if ( cmd == find_command ( "examine" ) )
-	{
-		generic_find ( argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_ch, &obj );
-		if ( ( index = board_index ( obj ) ) > -1 )
-			return Board_show_board ( index, ch, arg, board );
-		else return 0;
-	}
+    if ( cmd == find_command ( "examine" ) )
+    {
+        generic_find ( argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &tmp_ch, &obj );
+        if ( ( index = board_index ( obj ) ) > -1 )
+            return Board_show_board ( index, ch, arg, board );
+        else return 0;
+    }
 
-	ACMD_READ = find_command ( "read" );
-	ACMD_WRITE = find_command ( "write" );
-	ACMD_REMOVE = find_command ( "remove" );
+    ACMD_READ = find_command ( "read" );
+    ACMD_WRITE = find_command ( "write" );
+    ACMD_REMOVE = find_command ( "remove" );
 
-	if ( cmd == ACMD_READ || cmd == ACMD_WRITE || cmd == ACMD_REMOVE )
-	{
-		index = find_board ( ch );
+    if ( cmd == ACMD_READ || cmd == ACMD_WRITE || cmd == ACMD_REMOVE )
+    {
+        index = find_board ( ch );
 
-		if ( index == -1 )
-		{
-			log ( "SYSERR: degenerate board %d in room %d", GET_OBJ_VNUM ( board ), IN_ROOM ( ch ) ? GET_ROOM_VNUM ( IN_ROOM ( ch ) ) : -1 );
-			return 0;
-		}
+        if ( index == -1 )
+        {
+            log ( "SYSERR: degenerate board %d in room %d", GET_OBJ_VNUM ( board ), IN_ROOM ( ch ) ? GET_ROOM_VNUM ( IN_ROOM ( ch ) ) : -1 );
+            return 0;
+        }
 
-		if ( cmd == ACMD_READ )
-			return Board_display_msg ( index, ch, arg, board );
-		else if ( cmd == ACMD_WRITE )
-			return Board_write_message ( index, ch, arg, board );
-		else return Board_remove_msg ( index, ch, arg, board );
-	}
+        if ( cmd == ACMD_READ )
+            return Board_display_msg ( index, ch, arg, board );
+        else if ( cmd == ACMD_WRITE )
+            return Board_write_message ( index, ch, arg, board );
+        else return Board_remove_msg ( index, ch, arg, board );
+    }
 
-	return 0;
+    return 0;
 }
 
 
@@ -382,15 +382,15 @@ int Board_show_board(int board_type, Character *ch, char *arg,
     int nlen;
 
     if ( num_of_msgs[board_type] == 1 )
-	    len = snprintf(buf, sizeof(buf),
+        len = snprintf(buf, sizeof(buf),
                    "This is a bulletin board.  Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
                    "You will need to look at the board to save your message.\r\n"
-		   "There is one message on the board.\r\n" );
+           "There is one message on the board.\r\n" );
     else
-	    len = snprintf(buf, sizeof(buf),
+        len = snprintf(buf, sizeof(buf),
                    "This is a bulletin board.  Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
                    "You will need to look at the board to save your message.\r\n"
-		   "There are %d messages on the board.\r\n",
+           "There are %d messages on the board.\r\n",
                    num_of_msgs[board_type] );
 
 #if NEWEST_AT_TOP
@@ -538,7 +538,7 @@ int Board_remove_msg(int board_type, Character *ch, char *arg,
   if (fail && (GET_CLAN_RANK(ch) == clan[id].ranks && GET_OBJ_VNUM(board) == clan[id].board))
   fail = FALSE;
   }
-      
+
  if (fail)
   {
     ch->Send( "You are not holy enough to remove other people's messages.\r\n");
@@ -637,7 +637,7 @@ void Board_load_board(int board_type)
   FILE *fl;
   int i, len1, len2;
   char *tmp1, *tmp2;
-  
+
   if (!fileExists(FILENAME(board_type))) {
     log("Board file %s doesn't exist, creating now.", FILENAME(board_type));
     fl = fopen(FILENAME(board_type), "wb");
@@ -733,15 +733,15 @@ void Board_reset_board(int board_type)
 void Board_reset_board(int board_type)
 {
     int i;
- 
+
     for (i = 0; i < MAX_BOARD_MESSAGES; i++) {
-	if (MSG_HEADING(board_type, i))
-	    free(MSG_HEADING(board_type, i));
-	if (msg_storage[MSG_SLOTNUM(board_type, i)])
-	    free(msg_storage[MSG_SLOTNUM(board_type, i)]);
-	msg_storage_taken[MSG_SLOTNUM(board_type, i)] = 0;
-	memset((char *) &(msg_index[board_type][i]), 0, sizeof(struct board_msginfo));
-	msg_index[board_type][i].slot_num = -1;
+    if (MSG_HEADING(board_type, i))
+        free(MSG_HEADING(board_type, i));
+    if (msg_storage[MSG_SLOTNUM(board_type, i)])
+        free(msg_storage[MSG_SLOTNUM(board_type, i)]);
+    msg_storage_taken[MSG_SLOTNUM(board_type, i)] = 0;
+    memset((char *) &(msg_index[board_type][i]), 0, sizeof(struct board_msginfo));
+    msg_index[board_type][i].slot_num = -1;
     }
     num_of_msgs[board_type] = 0;
     remove(FILENAME(board_type));

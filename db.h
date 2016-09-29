@@ -269,8 +269,8 @@ struct reset_com {
      * door * 'T': Trigger command   *
      */
     char SetCommand(char c) {
-	command = c;
-	return command;
+    command = c;
+    return command;
     }
     reset_com() :
             command(0),
@@ -314,7 +314,7 @@ public:
     int sky;			/* How is the sky                         */
 
     char *builders;		/* for OLC.  OBuild like extention,   *
-                      				 * part of OLC+                       */
+                                       * part of OLC+                       */
 
     long zone_flags;		/* Zone Flags                     */
     int idle_time;		/* How long has it been idle      */

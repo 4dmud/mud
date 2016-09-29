@@ -234,12 +234,12 @@ WCMD(do_wsend)
 /*int real_zone(int number)
 {
   int counter;
-      
+
   for (counter = 0; counter <= top_of_zone_table; counter++)
     if ((number >= (zone_table[counter].number * 100)) &&
-	(number <= (zone_table[counter].top)))
+    (number <= (zone_table[counter].top)))
       return counter;
- 
+
   return -1;
 }*/
 
@@ -663,7 +663,7 @@ WCMD(do_wload)
 
     two_arguments(target, arg1, arg2); /* recycling ... */
 
-	/* load to char */
+    /* load to char */
     tch = ( *arg1 == UID_CHAR ) ? get_char ( arg1 ) : get_char_room ( arg1, NULL, room );
     if (tch)
     {
@@ -678,7 +678,7 @@ WCMD(do_wload)
       return;
     }
 
-	/* load to container */
+    /* load to container */
     cnt = ( *arg1 == UID_CHAR ) ? get_obj ( arg1 ) : get_obj_in_list ( arg1, room->contents );
     if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER)
     {
@@ -689,23 +689,23 @@ WCMD(do_wload)
       return;
     }
 
-	/* load to room */
-	Room *r = NULL;
-	if ( ( r = get_room ( arg1 ) ) != NULL )
-	{
-		if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-			wld_log ( room, "[TOKEN] loads %s to room %d", object->short_description, GET_ROOM_VNUM ( r ) );
-		obj_to_room ( object, r );
-		load_otrigger(object);
-	}
-	else
-	{
-		if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
-			wld_log ( room, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
-		else
-			wld_log ( room, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
-		extract_obj ( object );
-	}
+    /* load to room */
+    Room *r = NULL;
+    if ( ( r = get_room ( arg1 ) ) != NULL )
+    {
+        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+            wld_log ( room, "[TOKEN] loads %s to room %d", object->short_description, GET_ROOM_VNUM ( r ) );
+        obj_to_room ( object, r );
+        load_otrigger(object);
+    }
+    else
+    {
+        if ( GET_OBJ_VNUM ( object ) >= 3300 && GET_OBJ_VNUM ( object ) <= 3312 )
+            wld_log ( room, "[TOKEN] loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+        else
+            wld_log ( room, "loads %s, but target %s couldn't be found, purging.", object->short_description, arg1 );
+        extract_obj ( object );
+    }
     return;
   }
 
@@ -729,7 +729,7 @@ WCMD(do_wdamage)
   }
 
   dam = atoi(amount);
-  
+
   if (!str_cmp("all", name))
   {
     Character *tvict, *vict;
@@ -750,7 +750,7 @@ WCMD(do_wdamage)
     }
     return;
   }
-  
+
   ch = get_char_by_room(room, name);
 
   if (!ch)

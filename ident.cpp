@@ -67,10 +67,10 @@ int id_init(void)
 
   /*till further fixes stop it leaving running children when it crashes.*/
   return 0;
-  
+
 #ifdef CIRCLE_WINDOWS
   fprintf(stderr, "The hostname/username lookup service only works on " \
-	  "UNIX systems!\n");
+      "UNIX systems!\n");
   log("   Ident service not started!");
   return 0;
 #endif /* CIRCLE_WINDOWS */
@@ -213,29 +213,29 @@ static void id_mainloop(void)
       memset(msg.user, 0, 256);
 
       if (msg.type == MSG_NOP)
-	;
+    ;
       else if (msg.type == MSG_QUIT)
       {
-	write(id_child_socket, &msg, sizeof(msg));
-	close(id_child_socket);
-	exit(0);
+    write(id_child_socket, &msg, sizeof(msg));
+    close(id_child_socket);
+    exit(0);
       }
       else if (msg.type == MSG_IDENT)
       {
-	/* get the hostname */
-	if ((str = id_lookup_hostname(msg.addr)) != NULL)
-	  strcpy(msg.host, str);
-	/* get the username */
-	if ((str = id_lookup_username(msg.addr)) != NULL)
-	  strcpy(msg.user, str);
+    /* get the hostname */
+    if ((str = id_lookup_hostname(msg.addr)) != NULL)
+      strcpy(msg.host, str);
+    /* get the username */
+    if ((str = id_lookup_username(msg.addr)) != NULL)
+      strcpy(msg.user, str);
 
-	msg.type = MSG_IDREP;
+    msg.type = MSG_IDREP;
       }
       else
       {
-	log("SYSERR: id_mainloop(): msg.type = %d\n", msg.type);
-	msg.type = MSG_ERROR;
-	exit(0);
+    log("SYSERR: id_mainloop(): msg.type = %d\n", msg.type);
+    msg.type = MSG_ERROR;
+    exit(0);
       }
 
       /* now reply on the message */
@@ -333,7 +333,7 @@ static char *id_lookup_username(struct sockaddr_in sa)
              mtype, otype, username);
 
       if (!strcmp(mtype, "USERID"))
-	return username;
+    return username;
       else
         return NULL;
     }

@@ -78,11 +78,11 @@ void add_corpse_to_list(OBJ_DATA *corpse);
 void remove_corpse_from_list(OBJ_DATA *corpse);
 
 obj_data* find_corpse(Character* ch) {
-	for (struct corpse_list_data* ce = corpse_list;ce != NULL;ce = ce->next) 
-		if (GET_OBJ_VAL(ce->corpse, 0) == get_pidx_from_name(ch))
-			return ce->corpse;
+    for (struct corpse_list_data* ce = corpse_list;ce != NULL;ce = ce->next)
+        if (GET_OBJ_VAL(ce->corpse, 0) == get_pidx_from_name(ch))
+            return ce->corpse;
 
-	return NULL;
+    return NULL;
 }
 
 int corpse_save(struct obj_data *obj, FILE * fp, int location,
@@ -101,8 +101,8 @@ int corpse_save(struct obj_data *obj, FILE * fp, int location,
            room. obj->next_content points to the rooms contents
            the first time this function is called from save_corpses
            hence we avoid going down there otherwise we will save
-           the rooms contents as well as the corpses contents in the 
-           corpse.save file. 
+           the rooms contents as well as the corpses contents in the
+           corpse.save file.
          */
 
         if (recurse_this_tree != FALSE) {
@@ -361,7 +361,7 @@ void load_corpses(void) {
             get_line(fp, line);
             /* read line check for xap. */
             if (!strcasecmp("XAP", line)) {	/* then this is a Xap Obj, requires
-                						   special care */
+                                           special care */
                 if ((temp->name = fread_string(fp, buf2)) == NULL) {
                     temp->name = strdup("undefined");
                 }
@@ -425,7 +425,7 @@ void load_corpses(void) {
                     case 'A':
                         if (j >= MAX_OBJ_AFFECT) {
                             log("SYSERR: Too many object affectations in loading rent file");
-                            
+
                         }
                         get_line(fp, line);
                         sscanf(line, "%d %d", t, t + 1);
@@ -609,15 +609,15 @@ ACMD(do_corpse) {
 
 Character *find_char_by_uid_in_lookup_table ( long uid ); //this is from dg_scripts.cpp
 void restore_all_corpses() {
-	corpse_list_data* next = NULL;
-	for (struct corpse_list_data* ce = corpse_list;ce;ce=next) {
-		next = ce->next;
-		if (ce->corpse) {
-			int id = GET_OBJ_VAL(ce->corpse,0);
-			automeld(ce->corpse);
-			Character* ch = find_char_by_uid_in_lookup_table(id);
-			if (ch && ch->desc)
-				write_to_descriptor(ch->desc->descriptor, "You meld in a sudden flash of light!\r\n", ch->desc->comp);
-		}
-	}
+    corpse_list_data* next = NULL;
+    for (struct corpse_list_data* ce = corpse_list;ce;ce=next) {
+        next = ce->next;
+        if (ce->corpse) {
+            int id = GET_OBJ_VAL(ce->corpse,0);
+            automeld(ce->corpse);
+            Character* ch = find_char_by_uid_in_lookup_table(id);
+            if (ch && ch->desc)
+                write_to_descriptor(ch->desc->descriptor, "You meld in a sudden flash of light!\r\n", ch->desc->comp);
+        }
+    }
 }

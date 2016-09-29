@@ -145,10 +145,10 @@ void random_mtrigger(Character * ch) {
 
     for ( t = TRIGGERS ( SCRIPT ( ch ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, MTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) ) {
+       ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) ) {
                 script_driver ( &ch, t, MOB_TRIGGER, TRIG_NEW );
                 if ( !ch || DEAD ( ch ) )
-					return;
+                    return;
         }
     }
 }
@@ -247,7 +247,7 @@ int greet_mtrigger(Character * actor, int dir) {
         return FALSE;
 
     for (ch = IN_ROOM(actor)->people; ch; ch = ch_next) {
-        ch_next = ch->next_in_room; 
+        ch_next = ch->next_in_room;
         if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) ||
                 !AWAKE(ch) || FIGHTING(ch) || (ch == actor) ||
                 AFF_FLAGGED(ch, AFF_CHARM))
@@ -278,7 +278,7 @@ int greet_mtrigger(Character * actor, int dir) {
     return final;
 }
 /**
- 
+
 **/
 
 void entry_memory_mtrigger(Character * ch) {
@@ -516,13 +516,13 @@ void time_mtrigger(Character *ch) {
     for ( t = TRIGGERS ( SCRIPT ( ch ) ); t; t = t->next ) {
         if ( TRIGGER_CHECK ( t, MTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) &&
            ( TRIGGER_CHECK ( t, MTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( IN_ROOM ( ch ) ) ) ) ) {
-			snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
-			add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
-			script_driver ( &ch, t, MOB_TRIGGER, TRIG_NEW );
-			if ( !ch || DEAD(ch) )
-				return;
-		}
-	}
+            snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
+            add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
+            script_driver ( &ch, t, MOB_TRIGGER, TRIG_NEW );
+            if ( !ch || DEAD(ch) )
+                return;
+        }
+    }
 }
 
 
@@ -715,25 +715,25 @@ int door_mtrigger(Character * actor, int subcmd, int dir) {
 void random_otrigger(obj_data * obj) {
     trig_data *t;
     zone_rnum zone;
-	Room *r = NULL;
+    Room *r = NULL;
 
-	for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
-		if ( TRIGGER_CHECK ( t, OTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) ) {
-			if ( !TRIGGER_CHECK ( t, OTRIG_GLOBAL ) ) {
-				r = obj_room ( obj );
-				if ( !r )
-					continue;
-				zone = GET_ROOM_ZONE ( r );
+    for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
+        if ( TRIGGER_CHECK ( t, OTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) ) {
+            if ( !TRIGGER_CHECK ( t, OTRIG_GLOBAL ) ) {
+                r = obj_room ( obj );
+                if ( !r )
+                    continue;
+                zone = GET_ROOM_ZONE ( r );
 
-				if ( zone_is_empty ( zone ) )
-					continue;
-			}
-			script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+                if ( zone_is_empty ( zone ) )
+                    continue;
+            }
+            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
 
-			if ( !obj || obj->extracted )
-				return;
-		}
-	}
+            if ( !obj || obj->extracted )
+                return;
+        }
+    }
 }
 
 
@@ -821,8 +821,8 @@ int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
                 if (script_driver(&obj, t, OBJ_TRIGGER, TRIG_NEW))
                     return 1;
 
-				if ( !obj || obj->extracted )
-					return 1;
+                if ( !obj || obj->extracted )
+                    return 1;
             }
         }
 
@@ -1099,7 +1099,7 @@ int speech_otrigger(Character * actor, char *str) {
         return 0;
 
     for (obj = IN_ROOM(actor)->contents; obj; obj = next) {
-        next = obj->next_content; 
+        next = obj->next_content;
         if (speech_otrig(obj, actor, str, OCMD_ROOM))
             return (1);
     }
@@ -1147,7 +1147,7 @@ int assemble_otrigger(obj_vnum lVnum, Character *ch, int subcmd, int cmd) {
         log( "SYSERR: NULL assemble_otrigger(): Invalid 'lVnum' #%d.", lVnum );
         return (FALSE);
     }
-   
+
 
 
     //ADD_UID_VAR(buf, t, ch, "actor", 0);
@@ -1214,23 +1214,23 @@ void time_otrigger(obj_data *obj) {
     zone_rnum zone;
     Room *r = NULL;
 
-	for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
-		if ( TRIGGER_CHECK ( t, OTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) ) {
-			if ( !TRIGGER_CHECK ( t, OTRIG_GLOBAL ) ) {
-				r = obj_room ( obj );
-				if ( !r )
-					continue;
-				zone = GET_ROOM_ZONE ( r );
+    for ( t = TRIGGERS ( SCRIPT ( obj ) ); t; t = t->next ) {
+        if ( TRIGGER_CHECK ( t, OTRIG_TIME ) && time_info.hours == GET_TRIG_NARG ( t ) ) {
+            if ( !TRIGGER_CHECK ( t, OTRIG_GLOBAL ) ) {
+                r = obj_room ( obj );
+                if ( !r )
+                    continue;
+                zone = GET_ROOM_ZONE ( r );
 
-				if ( zone_is_empty ( zone ) )
-					continue;
-			}
-			snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
-			add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
-			script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
-			if ( !obj || obj->extracted )
-				return;
-		}
+                if ( zone_is_empty ( zone ) )
+                    continue;
+            }
+            snprintf ( buf, sizeof ( buf ), "%d", time_info.hours );
+            add_var ( &GET_TRIG_VARS ( t ), "time", buf, 0 );
+            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+            if ( !obj || obj->extracted )
+                return;
+        }
     }
 }
 
@@ -1335,7 +1335,7 @@ void random_wtrigger(Room *room) {
 
     for ( t = TRIGGERS ( SCRIPT ( room ) ); t; t = t->next )
         if ( TRIGGER_CHECK ( t, WTRIG_RANDOM ) && number ( 1, 100 ) <= GET_TRIG_NARG ( t ) &&
-	   ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( room ) ) ) )
+       ( TRIGGER_CHECK ( t, WTRIG_GLOBAL ) || !zone_is_empty ( GET_ROOM_ZONE ( room ) ) ) )
                 script_driver ( &room, t, WLD_TRIGGER, TRIG_NEW );
 }
 

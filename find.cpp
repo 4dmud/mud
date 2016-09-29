@@ -1,7 +1,7 @@
 //
 // C++ Implementation: find
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -22,7 +22,7 @@
 #include "find.h"
 
 tPlayerList playerlist;
-// returns a lower case version of the string 
+// returns a lower case version of the string
 /*string tolower (const string & s)
   {
 string d = s;
@@ -33,7 +33,7 @@ string d = s;
 // returns true if strings are EQUAL
 struct ciEqualTo : binary_function <string, string, bool>
   {
-  struct compare_equal 
+  struct compare_equal
     : public binary_function <unsigned char, unsigned char,bool>
     {
     bool operator() (const unsigned char& c1, const unsigned char& c2) const
@@ -43,7 +43,7 @@ struct ciEqualTo : binary_function <string, string, bool>
   bool operator() (const string & s1, const string & s2) const
     {
     pair <string::const_iterator, string::const_iterator> result =
-      mismatch (s1.begin (), s1.end (), s2.begin (), compare_equal ()); 
+      mismatch (s1.begin (), s1.end (), s2.begin (), compare_equal ());
 
     // match if both at end
     return result.first == s1.end () && result.second == s2.end ();
@@ -67,9 +67,9 @@ struct findCharacterName
     {
     if (IS_NPC(p))
     return ciStringEqual (p->player.short_descr, name);
-    else 
+    else
     return ciStringEqual (p->player.name, name);
-    } // end of operator()  
+    } // end of operator()
 };  // end of findPlayerName
 
 Character * FindPlayer (const string & name)
@@ -81,5 +81,5 @@ Character * FindPlayer (const string & name)
     return NULL;
   else
     return *i;
-  
+
 } /* end of FindPlayer */

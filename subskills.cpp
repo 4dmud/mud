@@ -194,26 +194,26 @@ void assign_subskills(void) {
          0, POS_STANDING, 0 , VIOL,
          SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_CMD, CL_TYPE_NONE, SKILL_STRANGLE);
     /*
-     MASK 
-    - This hides the name of the user in the long desc, making the room message: 
-     'A masked figure is standing here' instead of the usual 'Playername is standing 
+     MASK
+    - This hides the name of the user in the long desc, making the room message:
+     'A masked figure is standing here' instead of the usual 'Playername is standing
      here'.
-     In any action the masked person would show as 'The masked figure' for instance 
+     In any action the masked person would show as 'The masked figure' for instance
      'The masked figure says,'...  or 'The mask figures coughs conspicioualy.'
     - In the WHO list the player shows up only as 'A masked figure'.
     - The player has to actually WEAR a mask for the skill to work.
-    - While mask is toggled, this person cannot be attacked unless someone guesses who 
-     it is, and types in the right, FULL name. 'Murder Once' would work, but not 
+    - While mask is toggled, this person cannot be attacked unless someone guesses who
+     it is, and types in the right, FULL name. 'Murder Once' would work, but not
      'murder o'
-    - Attacking or being attacked immediately breaks MASK. If possible with the message 
-     'You rip the mask from Playername's face.' or 'Playername sheds the mask with a 
+    - Attacking or being attacked immediately breaks MASK. If possible with the message
+     'You rip the mask from Playername's face.' or 'Playername sheds the mask with a
      diabolic laugh.'
      */
     subo(SUB_MASK, "Mask", 0, 0,
          0, POS_STANDING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, SKILL_HIDE);
     /*
-    CLOAK 
+    CLOAK
     - This adds HIDING to MASK, so the cloaked person only can be seen sense_life on.
      The long desc (to these with sense_life) would say 'A cloaked figure is hiding here.'
      (Otherwise it works the same as MASK).
@@ -224,8 +224,8 @@ void assign_subskills(void) {
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD, CL_TYPE_NONE, SKILL_HIDE);
     /*
     SHADOWCLOAK
-    - This adds invisibility, to MASK and CLOAK. People with both sense_life and 
-     detect_invis on would see: 'The shadows loom deep in one corner of the room'. 
+    - This adds invisibility, to MASK and CLOAK. People with both sense_life and
+     detect_invis on would see: 'The shadows loom deep in one corner of the room'.
     - In the WHO list the player shows up as 'An invisible lurcher'.
     */
     subo(SUB_SHADOWCLOAK, "ShadowCloak", 0, 0,
@@ -355,7 +355,7 @@ void assign_subskills(void) {
          10, POS_FIGHTING, TAR_FIGHT_SELF, PEAC,
          SK_VIOLENT,STATUS_TYPE_ONOFF, SUB_TYPE_AUTO | SUB_TYPE_PROF, CL_TYPE_NONE, PROF_JEDI);
     /*causes an affect on self when full moon*/
-    subo(SUB_LYCAN, "Lycanthropy", 0, 0, 0, POS_SLEEPING, 0 , 
+    subo(SUB_LYCAN, "Lycanthropy", 0, 0, 0, POS_SLEEPING, 0 ,
          PEAC,SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_AFFLICTION_WEREWOLF);
 
     /*causes an affect on self when fighting*/
@@ -577,9 +577,9 @@ void assign_subskills(void) {
 
 // Added these for Molly
     subo(SUB_INSTRUMENT_MAKER, "Instrumentmaker", 0, 0,
-	0, POS_SLEEPING, 0, PEAC,
-	SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_ARTISAN);
-    
+    0, POS_SLEEPING, 0, PEAC,
+    SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_ARTISAN);
+
     subo(SUB_PAINTER, "Painter", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_ARTISAN);
@@ -599,19 +599,19 @@ void assign_subskills(void) {
     subo(SUB_ALCHEMIST, "Alchemist", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
-    
+
     subo(SUB_BREWER, "Brewer", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
-    
+
     subo(SUB_DISTILLER, "Distiller", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
-    
+
     subo(SUB_PERFUMER, "Perfumer", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
-   
+
     subo(SUB_POTION_MAKER, "Potionmaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_BREWER);
@@ -627,7 +627,7 @@ void assign_subskills(void) {
     subo(SUB_MARVER, "Marver", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLASSWORK);
-    
+
     subo(SUB_MAESTRO, "Maestro", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_GLASSWORK);
@@ -643,7 +643,7 @@ void assign_subskills(void) {
     subo(SUB_FURRIER, "Furrier", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
-    
+
     subo(SUB_SHOEMAKER, "Shoemaker", 0, 0,
         0, POS_SLEEPING, 0, PEAC,
         SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_LEATHERWORK);
@@ -898,7 +898,7 @@ ASUB(sub_drain_blood) {
 
 ASUB(sub_sweep_attack) {
     /** carry the leftover damage from the attack onto the next
-        available mob in the room 
+        available mob in the room
         Your skill level in this defines how much new damage you
         add to the attack.
     **/
@@ -1005,7 +1005,7 @@ ACMD(do_ignite) {
     /*
     remove_from_lookup_table(GET_ID(sabre));
     remove_from_lookup_table(GET_ID(hilt));
-    sabre->id = hilt->id;			// used by DG triggers              
+    sabre->id = hilt->id;			// used by DG triggers
     add_to_lookup_table(GET_ID(sabre), (void *) sabre);
     hilt->id = 0;
     sabre->proto_script = hilt->proto_script;
@@ -1097,10 +1097,10 @@ void subo(enum subskill_list subcmd, const char *name, int sta, int cost,
     SINFO.cost = cost;		        /* the cost in units */
     SINFO.percentage = percent;		/* the cost in percentage */
     /*
-       where actual cost is the lower of the two, percentage or cost 
+       where actual cost is the lower of the two, percentage or cost
        for example if the cost is 200 hitpoints, and the percentage is 15%
        and the player has 1000 hp, the percentage hp is 150 points
-       then the actual cost will be 150, because the percentage 
+       then the actual cost will be 150, because the percentage
        is lower than the cost value -- mordipie
     */
     SINFO.routines = routines;
@@ -1120,10 +1120,10 @@ void unused_sub(enum subskill_list subcmd) {
     SINFO.cost = 0;		        /* the cost in units */
     SINFO.percentage = 0;		/* the cost in percentage */
     /*
-       where actual cost is the lower of the two, percentage or cost 
+       where actual cost is the lower of the two, percentage or cost
        for example if the cost is 200 hitpoints, and the percentage is 15%
        and the player has 1000 hp, the percentage hp is 150 points
-       then the actual cost will be 150, because the percentage 
+       then the actual cost will be 150, because the percentage
        is lower than the cost value -- mordipie
     */
     SINFO.routines = 0;
@@ -1144,7 +1144,7 @@ int total_sub_chance(Character *ch, enum subskill_list  subcmd) {
         if (SAVED(ch).HasSkill(SINFO.parent)) {
             count++;
             total += SAVED(ch).GetSkillLearn(SINFO.parent);
-        } else 
+        } else
             check = FALSE;
     }
 
@@ -1166,14 +1166,14 @@ void improveallsubs(Character *ch) {
 /* valgrind throws an error when sort reaches cockfighting for some reason. when adding entries one by one*/
 void improve_sub(Character *ch, subskill_list sub, int amount) {
 
-    if (IS_NPC(ch) && sub < 99 ) { 
+    if (IS_NPC(ch) && sub < 99 ) {
 // 	I removed the above line for some odd reason. Putting it back in -> Prom
 //	if (IS_NPC(ch)) {
         MOB_SUBSKILL(ch) = sub;
-    	return;
-	}
-	log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), SAVED(ch).UpdateSubLearn(sub, amount), sub_name(sub));
-    	SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+        return;
+    }
+    log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), SAVED(ch).UpdateSubLearn(sub, amount), sub_name(sub));
+        SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
 }
 
 
@@ -1253,7 +1253,7 @@ int default_on(enum subskill_list &sub) {
 }
 
 void reset_default_status(Character *ch) {
-    for (subs_map::iterator it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++) 
+    for (subs_map::iterator it = SAVED(ch).SubsBegin();it != SAVED(ch).SubsEnd();it++)
         (it->second)->status = (enum sub_status_toggle)default_on((it->second)->subskill);
 }
 

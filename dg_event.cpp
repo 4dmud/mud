@@ -114,15 +114,15 @@ void event_process(void) {
         the_event->q_el = NULL;
 
         /* call event func, reenqueue event if retval > 0 */
-	if ( the_event->func == message_event )
-	    new_time = the_event->func ( the_event );
-	else
-	    new_time = the_event->func ( the_event->event_obj );
+    if ( the_event->func == message_event )
+        new_time = the_event->func ( the_event );
+    else
+        new_time = the_event->func ( the_event->event_obj );
 
-	if (new_time > 0)
-		the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
-	else
-		delete the_event;
+    if (new_time > 0)
+        the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
+    else
+        delete the_event;
     }
 }
 
@@ -163,8 +163,8 @@ void event_free_all(void) {
                 delete (struct wait_event_data *)the_event->event_obj;
                 break;
             case EVENT_TYPE_TIMER:
-				delete (struct timer_event_data *)the_event->event_obj;
-				break;
+                delete (struct timer_event_data *)the_event->event_obj;
+                break;
             default:
                 free(the_event->event_obj);
                 break;

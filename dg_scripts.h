@@ -143,7 +143,7 @@
 
 
 #define MAX_SCRIPT_DEPTH      10	/* maximum depth triggers can \
-					   recurse into each other */
+                       recurse into each other */
 
 
 /* one line of the trigger */
@@ -200,9 +200,9 @@ struct script_data {
     trig_rnum function_trig;	/* rnum of the currently running function trigger */
     struct script_data *next;	/* used for purged_scripts    */
 
-	script_data() {
-		function_trig = -1;
-	}
+    script_data() {
+        function_trig = -1;
+    }
 };
 
 /* The event data for the wait command */
@@ -450,12 +450,12 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
 
 
 #define SCRIPT_CHECK(go, type)   (SCRIPT(go) && \
-				  IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
+                  IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
 #define TRIGGER_CHECK(t, type)   (IS_SET(GET_TRIG_TYPE(t), type) && \
-				  !GET_TRIG_DEPTH(t))
+                  !GET_TRIG_DEPTH(t))
 
 #define ADD_UID_VAR(buf, trig, go, name, context) do { \
-		         sprintf(buf, "%c%ld", UID_CHAR, GET_ID(go)); \
+                 sprintf(buf, "%c%ld", UID_CHAR, GET_ID(go)); \
                          add_var(&GET_TRIG_VARS(trig), name, buf, context); }   while (0)
 
 #define DRIVER_USES_UNION 0

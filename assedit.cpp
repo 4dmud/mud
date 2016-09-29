@@ -125,7 +125,7 @@ ACMD (do_assedit)
     zr = atoi(buf);
       d = ch->desc;
       CREATE (d->olc, struct oasis_olc_data, 1);
-      
+
       OLC_ZNUM(d) = real_zone_by_thing(zr);
     if (OLC_ZNUM(d) == NOWHERE) {
         ch->Send( "Sorry, there is no zone for that number!\r\n");

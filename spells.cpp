@@ -673,10 +673,10 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
        000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
        000 to your ooooooooooooooooo, 000 to your ooooooooooooooooo
      */
-    if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
-	ch->Send ( "\r\n" );
+    if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+    ch->Send ( "\r\n" );
     else
-	ch->Send( "----------------------------------------------------------------------\r\n" );
+    ch->Send( "----------------------------------------------------------------------\r\n" );
     sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
     ch->Send( "{cc%s{cy is a type of {cc%s{cy made from {cc%s{c0\r\n",
               buf2, buf, material_name(GET_OBJ_MATERIAL(obj)));
@@ -756,15 +756,15 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         break;
     case ITEM_WEAPON:
 
-	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
-	{
-		ch->Send ( "{cyWanted Weapon Balance: {cg%d\r\n"
-			   "{cyActual Weapon Balance: {cg%d\r\n",	
-			   perf_balance(GET_WEP_TYPE(obj)),
+    if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+    {
+        ch->Send ( "{cyWanted Weapon Balance: {cg%d\r\n"
+               "{cyActual Weapon Balance: {cg%d\r\n",
+               perf_balance(GET_WEP_TYPE(obj)),
                            GET_WEP_BALANCE(obj)
-			 );
-	}
- 	else
+             );
+    }
+     else
         ch->Send( "{cyWanted Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n"
                   "{cyActual Weapon Balance: {cg(base){cc-%s-{cg(tip)\r\n",
                   balance_display(perf_balance(GET_WEP_TYPE(obj))),
@@ -788,20 +788,20 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         att[5] = weapon_type_mod(w_type, PART_LOWER_RIGHT);
 
         total = (att[0] +att[1] +att[2] +att[3] +att[4] +att[5]);
-	if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
-    	{
-		ch->Send(
-			"\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
-           		"Head: {cR%2d%%{cc\r\n"
-			"Upper Left: {cR%2d%%{cc\r\n"
-           		"Upper Right: {cR%2d%%{cc\r\n"
-           		"Torso: {cR%2d%%{cc\r\n"
-           		"Lower Left: {cR%2d%%{cc\r\n"
-           		"Lower Right: {cR%2d%%{c0\r\n",
-            		(int)((att[0]*100)/total) , (int)((att[1]*100)/total), (int)((att[2]*100)/total),
-		        (int)((att[3]*100)/total), (int)((att[4]*100)/total), (int)((att[5]*100)/total)
-		);
-	}
+    if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+        {
+        ch->Send(
+            "\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
+                   "Head: {cR%2d%%{cc\r\n"
+            "Upper Left: {cR%2d%%{cc\r\n"
+                   "Upper Right: {cR%2d%%{cc\r\n"
+                   "Torso: {cR%2d%%{cc\r\n"
+                   "Lower Left: {cR%2d%%{cc\r\n"
+                   "Lower Right: {cR%2d%%{c0\r\n",
+                    (int)((att[0]*100)/total) , (int)((att[1]*100)/total), (int)((att[2]*100)/total),
+                (int)((att[3]*100)/total), (int)((att[4]*100)/total), (int)((att[5]*100)/total)
+        );
+    }
         else ch->Send(
             "\r\n{cyThis weapon gives a chance of landing attacks to{cc\r\n"
             "                (Head)\r\n"
@@ -837,14 +837,14 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
             return;
         }
         ch->Send("gives a multiplier of %f", staff_multi(ch, obj));
-        if ( IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_FIRE_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ICE_FOCUS ) || 
-        IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) || 
+        if ( IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_FIRE_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ICE_FOCUS ) ||
+        IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_EARTH_FOCUS ) ||
         IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_WATER_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_ELEC_FOCUS ) ||
-	IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_AIR_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_SPIRIT_FOCUS )  ||
-	IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_DEATH_FOCUS ) )  {
-	ch->Send(" with an elemental bonus of %f", float(((float)GET_OBJ_RENT(obj)/(float)100.0)));
+    IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_AIR_FOCUS ) || IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_SPIRIT_FOCUS )  ||
+    IS_SET_AR ( GET_OBJ_EXTRA ( obj ), ITEM_DEATH_FOCUS ) )  {
+    ch->Send(" with an elemental bonus of %f", float(((float)GET_OBJ_RENT(obj)/(float)100.0)));
          }
- 
+
         ch->Send("\r\n");
         break;
     case ITEM_LIGHTSABRE_HILT:
@@ -856,8 +856,8 @@ void identify_object(Character *ch, OBJ_DATA *obj) {
         break;
     }
 
-    if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )	
-	ch->Send( "----------------------------------------------------------------------\r\n" );
+    if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+    ch->Send( "----------------------------------------------------------------------\r\n" );
 
 }
 
@@ -974,7 +974,7 @@ ASPELL(spell_remove_alignment) {
             GET_ALIGNMENT(victim) = 0;
             act("$N vibrates then becomes dull.", FALSE, ch, 0, victim, TO_ROOM);
             act("You vibrate then become dull.", FALSE, ch, 0, victim, TO_VICT);
-	    zap_char(victim);
+        zap_char(victim);
         } else {
             act("$N smiles but nothing happens.", FALSE, ch, 0, victim, TO_ROOM);
             act("You feel a tingle in a happy place, but nothing happens.", FALSE, ch, 0, victim, TO_VICT);
@@ -1085,7 +1085,7 @@ int times = 1;
     // Tweaking this to see if I can reduce how potent it is. --> Prom
     // /10 changed to /15
     times += total_chance(ch, SPELL_CALL_LIGHTNING)/15;
-    
+
     msg = new message_event_obj(ch, SPELL_CALL_LIGHTNING, THING_SKILL, times, ROOM_ID_BASE + IN_ROOM(ch)->number);
     ch->AddMessageEvent(event_create(message_event, msg, 0, EVENT_TYPE_MESSAGE), ME_CALL_LIGHTNING);
     return;
@@ -1094,65 +1094,65 @@ int times = 1;
 // Remarking this spell out till we can figure out what is wrong -- Prom
 
 ASPELL(spell_minor_identify) {
-	if ( victim )
-	{
-		identify_character ( ch, victim );
-		return;
-	}
+    if ( victim )
+    {
+        identify_character ( ch, victim );
+        return;
+    }
 
-	if ( obj == nullptr )
-	{
-		log ( "SYSERR: no target for minor identify" );
-		return;
-	}
+    if ( obj == nullptr )
+    {
+        log ( "SYSERR: no target for minor identify" );
+        return;
+    }
 
-	ch->Send ( "\r\n" );
-	if ( GET_OBJ_MAX_QUALITY ( obj ) == 0 )
-		ch->Send ( "Max. Quality: 0\r\n" );
-	else
-	{
-		ch->Send ( "Quality: %s (%.2f%%)\r\n", QUALITY_NAME ( obj ), GET_OBJ_QUALITY ( obj ) );
-		ch->Send ( "Max. Quality: %.2f%%\r\n", GET_OBJ_MAX_QUALITY ( obj ) );
-		ch->Send ( "Number of repairs: %d\r\n", GET_OBJ_REPAIRS ( obj ) );
-	}
+    ch->Send ( "\r\n" );
+    if ( GET_OBJ_MAX_QUALITY ( obj ) == 0 )
+        ch->Send ( "Max. Quality: 0\r\n" );
+    else
+    {
+        ch->Send ( "Quality: %s (%.2f%%)\r\n", QUALITY_NAME ( obj ), GET_OBJ_QUALITY ( obj ) );
+        ch->Send ( "Max. Quality: %.2f%%\r\n", GET_OBJ_MAX_QUALITY ( obj ) );
+        ch->Send ( "Number of repairs: %d\r\n", GET_OBJ_REPAIRS ( obj ) );
+    }
 
-	ch->Send ( "Material: %s\r\n", material_name ( GET_OBJ_MATERIAL ( obj ) ) );
-	ch->Send ( "Material group: %s\r\n", material_group_names [ material_groups [ GET_OBJ_MATERIAL ( obj ) ] ] );
+    ch->Send ( "Material: %s\r\n", material_name ( GET_OBJ_MATERIAL ( obj ) ) );
+    ch->Send ( "Material group: %s\r\n", material_group_names [ material_groups [ GET_OBJ_MATERIAL ( obj ) ] ] );
 
-	ch->Send ( "Origin: " );
-	if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SOFTWOOD )
-		ch->Send ( "%s, hardwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SPECIALWOOD )
-		ch->Send ( "%s, softwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FRUITWOOD )
-		ch->Send ( "%s, specialwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_JUNKWOOD )
-		ch->Send ( "%s, fruitwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_LARGE_ANIMAL )
-		ch->Send ( "%s, junkwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_REPTILE )
-		ch->Send ( "%s, large animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SMALL_ANIMAL )
-		ch->Send ( "%s, reptile", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_NORMAL_ANIMAL )
-		ch->Send ( "%s, small animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FURRY_ANIMAL )
-		ch->Send ( "%s, normal animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( obj ) < NUM_ORIGIN_NAMES )
-		ch->Send ( "%s, furry animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
-	else if ( GET_OBJ_ORIGIN ( obj ) == 0 )
-		ch->Send ( "none" );
-	else ch->Send ( "out of range" );
+    ch->Send ( "Origin: " );
+    if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SOFTWOOD )
+        ch->Send ( "%s, hardwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SPECIALWOOD )
+        ch->Send ( "%s, softwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FRUITWOOD )
+        ch->Send ( "%s, specialwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_JUNKWOOD )
+        ch->Send ( "%s, fruitwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_LARGE_ANIMAL )
+        ch->Send ( "%s, junkwood", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_REPTILE )
+        ch->Send ( "%s, large animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_SMALL_ANIMAL )
+        ch->Send ( "%s, reptile", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_NORMAL_ANIMAL )
+        ch->Send ( "%s, small animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( obj ) < BEGIN_OF_FURRY_ANIMAL )
+        ch->Send ( "%s, normal animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( obj ) < NUM_ORIGIN_NAMES )
+        ch->Send ( "%s, furry animal", origin_names[ GET_OBJ_ORIGIN ( obj )] );
+    else if ( GET_OBJ_ORIGIN ( obj ) == 0 )
+        ch->Send ( "none" );
+    else ch->Send ( "out of range" );
 
-	ch->Send ( "\r\n" );
-	if ( GET_OBJ_COLOUR ( obj ) > 0 && GET_OBJ_COLOUR ( obj ) < NUM_COLOUR_NAMES )
-		ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( obj )] );
-	else if ( GET_OBJ_COLOUR ( obj ) == 0 )
-		ch->Send ( "Colour: none\r\n" );
-	else ch->Send ( "Colour: out of range\r\n" );
+    ch->Send ( "\r\n" );
+    if ( GET_OBJ_COLOUR ( obj ) > 0 && GET_OBJ_COLOUR ( obj ) < NUM_COLOUR_NAMES )
+        ch->Send ( "Colour: %s\r\n", colour_names[ GET_OBJ_COLOUR ( obj )] );
+    else if ( GET_OBJ_COLOUR ( obj ) == 0 )
+        ch->Send ( "Colour: none\r\n" );
+    else ch->Send ( "Colour: out of range\r\n" );
 
-	ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( obj ) );
-	ch->Send ( "Stage: %d\r\n", GET_OBJ_STAGE ( obj ) );
+    ch->Send ( "Dyecount: %d\r\n", GET_OBJ_DYECOUNT ( obj ) );
+    ch->Send ( "Stage: %d\r\n", GET_OBJ_STAGE ( obj ) );
 
 //    const char *min_id[] = {
 //                         "It would bring %s if you sold it!\r\n",    /* NONE */
@@ -1353,9 +1353,9 @@ ASPELL(spell_chain_lightning) {
             v[0], 0, ch, TO_CHAR);
         act("$n's chain lightning strikes $N with full power!", FALSE, ch,
             0, v[0], TO_NOTVICT);
-        // Going to tweaking the damage formula - Prom 
-	// dam = dice(7, 8 + GET_LEVEL(ch) / 9) + 8;
-	dam = dice(6, 8 + GET_LEVEL(ch) / 9) + 8;
+        // Going to tweaking the damage formula - Prom
+    // dam = dice(7, 8 + GET_LEVEL(ch) / 9) + 8;
+    dam = dice(6, 8 + GET_LEVEL(ch) / 9) + 8;
         if (mag_savingthrow(v[0], 1, 0))
             dam = dam / 2;
         damage(ch, v[0], dam, TYPE_UNDEFINED);
@@ -1445,7 +1445,7 @@ ASPELL(spell_recharge) {
 ASPELL(spell_knock) {
     int cnt = 0, i, ret_door = 0;
     Room* other_room;
-	
+
     if (!obj) {
 
         for (i = 0; i < NUM_OF_DIRS; i++) {
@@ -1465,10 +1465,10 @@ ASPELL(spell_knock) {
                 continue;
             /** and from that way **/
             other_room = EXIT(ch, i)->to_room;
-	    if (EXIT2(other_room, rev_dir[i]) &&
+        if (EXIT2(other_room, rev_dir[i]) &&
                     IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_ISDOOR) &&
                     ! (IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
-		       IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED)) &&
+               IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED)) &&
                     EXIT2(other_room, rev_dir[i])->to_room != NULL)
                 ret_door = 1;
             /** lets make it so they can only open doors that are on the inside **/

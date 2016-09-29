@@ -50,7 +50,7 @@ void sedit_save_to_disk(int num)
 }
 
 /*-------------------------------------------------------------------*\
-  utility functions 
+  utility functions
 \*-------------------------------------------------------------------*/
 
 ACMD(do_oasis_sedit)
@@ -61,13 +61,13 @@ ACMD(do_oasis_sedit)
   //char *buf3;
   char buf1[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
-  
+
   /****************************************************************************/
   /** Parse any arguments.                                                   **/
   /****************************************************************************/
-  //buf3 = 
+  //buf3 =
   two_arguments(argument, buf1, buf2);
-  
+
   if (!*buf1) {
     ch->Send( "Specify a shop VNUM to edit.\r\n");
     return;
@@ -76,32 +76,32 @@ ACMD(do_oasis_sedit)
       ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
-    
+
     save = TRUE;
-    
+
     if (is_number(buf2))
       num = atoi(buf2);
     else if (GET_OLC_ZONE(ch) > 0) {
       zone_rnum zlok;
-      
+
       if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
         num = NOWHERE;
       else
         num = zone_table[zlok].Bot();
     }
-    
+
     if (num == NOWHERE) {
       ch->Send( "Save which zone?\r\n");
       return;
     }
   }
-  
+
   /****************************************************************************/
   /** If a numeric argument was given, get it.                               **/
   /****************************************************************************/
   if (num == NOWHERE)
     num = atoi(buf1);
-  
+
   /****************************************************************************/
   /** Check that the shop isn't already being edited.                        **/
   /****************************************************************************/
@@ -114,12 +114,12 @@ ACMD(do_oasis_sedit)
       }
     }
   }
-  
+
   /****************************************************************************/
   /** Point d to the builder's descriptor.                                   **/
   /****************************************************************************/
   d = ch->desc;
-  
+
   /****************************************************************************/
   /** Give the descriptor an OLC structure.                                  **/
   /****************************************************************************/
@@ -128,9 +128,9 @@ ACMD(do_oasis_sedit)
       "SYSERR: do_oasis_sedit: Player already had olc structure.");
     free(d->olc);
   }
-  
+
   CREATE(d->olc, struct oasis_olc_data, 1);
-  
+
   /****************************************************************************/
   /** Find the zone.                                                         **/
   /****************************************************************************/
@@ -141,13 +141,13 @@ ACMD(do_oasis_sedit)
     d->olc = NULL;
     return;
   }
-  
+
   /****************************************************************************/
   /** Everyone but IMPLs can only edit zones they have been assigned.        **/
   /****************************************************************************/
   if (!can_edit_zone(ch, OLC_ZNUM(d))) {
     ch->Send( "You do not have permission to edit this zone.\r\n");
-    
+
     /**************************************************************************/
     /** Free the OLC structure.                                              **/
     /**************************************************************************/
@@ -155,19 +155,19 @@ ACMD(do_oasis_sedit)
     d->olc = NULL;
     return;
   }
-  
+
   if (save) {
     ch->Send( "Saving all shops in zone %d.\r\n",
       zone_table[OLC_ZNUM(d)].number);
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
       "OLC: %s saves shop info for zone %d.",
       GET_NAME(ch), zone_table[OLC_ZNUM(d)].number);
-    
+
     /**************************************************************************/
     /** Save the shops to the shop file.                                     **/
     /**************************************************************************/
     save_shops(OLC_ZNUM(d));
-    
+
     /**************************************************************************/
     /** Free the OLC structure.                                              **/
     /**************************************************************************/
@@ -175,19 +175,19 @@ ACMD(do_oasis_sedit)
     d->olc = NULL;
     return;
   }
-  
+
   OLC_NUM(d) = num;
-  
+
   if ((real_num = real_shop(num)) != NOTHING)
     sedit_setup_existing(d, real_num);
   else
     sedit_setup_new(d);
-  
+
   STATE(d) = CON_SEDIT;
-  
+
   act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
   SET_BIT_AR(PLR_FLAGS(ch), PLR_WRITING);
-  
+
   new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s starts editing zone %d allowed zone %d",
     GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
@@ -253,7 +253,7 @@ void sedit_setup_existing(Descriptor *d, int rshop_num)
 }
 
 /**************************************************************************
- Menu functions 
+ Menu functions
  **************************************************************************/
 
 void sedit_products_menu(Descriptor *d)
@@ -268,14 +268,14 @@ void sedit_products_menu(Descriptor *d)
   d->Output( "##     VNUM     Product\r\n");
   for (i = 0; S_PRODUCT(shop, i) != NOTHING; i++) {
     d->Output( "%2d - [%s%5d%s] - %s%s%s\r\n", i,
-	    cyn, obj_index[S_PRODUCT(shop, i)].vnum, nrm,
-	    yel, obj_proto[S_PRODUCT(shop, i)].short_description, nrm);
+        cyn, obj_index[S_PRODUCT(shop, i)].vnum, nrm,
+        yel, obj_proto[S_PRODUCT(shop, i)].short_description, nrm);
   }
   d->Output( "\r\n"
-	  "%sA%s) Add a new product.\r\n"
-	  "%sD%s) Delete a product.\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter choice : ", grn, nrm, grn, nrm, grn, nrm);
+      "%sA%s) Add a new product.\r\n"
+      "%sD%s) Delete a product.\r\n"
+      "%sQ%s) Quit\r\n"
+      "Enter choice : ", grn, nrm, grn, nrm, grn, nrm);
 
   OLC_MODE(d) = SEDIT_PRODUCTS_MENU;
 }
@@ -293,14 +293,14 @@ void sedit_compact_rooms_menu(Descriptor *d)
   clear_screen(d);
   for (i = 0; S_ROOM(shop, i) != NULL; i++) {
     d->Output( "%2d - [%s%5d%s]  | %s", i, cyn, S_ROOM(shop, i)->number, nrm,
-			!(++count % 5) ? "\r\n" : "");
+            !(++count % 5) ? "\r\n" : "");
   }
   d->Output( "\r\n"
-	  "%sA%s) Add a new room.\r\n"
-	  "%sD%s) Delete a room.\r\n"
-	  "%sL%s) Long display.\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter choice : ", grn, nrm, grn, nrm, grn, nrm, grn, nrm);
+      "%sA%s) Add a new room.\r\n"
+      "%sD%s) Delete a room.\r\n"
+      "%sL%s) Long display.\r\n"
+      "%sQ%s) Quit\r\n"
+      "Enter choice : ", grn, nrm, grn, nrm, grn, nrm, grn, nrm);
 
   OLC_MODE(d) = SEDIT_ROOMS_MENU;
 }
@@ -319,14 +319,14 @@ void sedit_rooms_menu(Descriptor *d)
   d->Output( "##     VNUM     Room\r\n\r\n");
   for (i = 0; S_ROOM(shop, i) != NULL; i++) {
     d->Output( "%2d - [%s%5d%s] - %s%s%s\r\n", i, cyn, S_ROOM(shop, i)->number, nrm,
-	    yel, S_ROOM(shop, i)->name, nrm);
+        yel, S_ROOM(shop, i)->name, nrm);
   }
   d->Output( "\r\n"
-	  "%sA%s) Add a new room.\r\n"
-	  "%sD%s) Delete a room.\r\n"
-	  "%sC%s) Compact Display.\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter choice : ", grn, nrm, grn, nrm, grn, nrm, grn, nrm);
+      "%sA%s) Add a new room.\r\n"
+      "%sD%s) Delete a room.\r\n"
+      "%sC%s) Compact Display.\r\n"
+      "%sQ%s) Quit\r\n"
+      "Enter choice : ", grn, nrm, grn, nrm, grn, nrm, grn, nrm);
 
   OLC_MODE(d) = SEDIT_ROOMS_MENU;
 }
@@ -345,14 +345,14 @@ void sedit_namelist_menu(Descriptor *d)
   d->Output( "##              Type   Namelist\r\n\r\n");
   for (i = 0; S_BUYTYPE(shop, i) != NOTHING; i++) {
     d->Output( "%2d - %s%15s%s - %s%s%s\r\n", i, cyn,
-		item_types[S_BUYTYPE(shop, i)], nrm, yel,
-		S_BUYWORD(shop, i) ? S_BUYWORD(shop, i) : "<None>", nrm);
+        item_types[S_BUYTYPE(shop, i)], nrm, yel,
+        S_BUYWORD(shop, i) ? S_BUYWORD(shop, i) : "<None>", nrm);
   }
   d->Output( "\r\n"
-	  "%sA%s) Add a new entry.\r\n"
-	  "%sD%s) Delete an entry.\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter choice : ", grn, nrm, grn, nrm, grn, nrm);
+      "%sA%s) Add a new entry.\r\n"
+      "%sD%s) Delete an entry.\r\n"
+      "%sQ%s) Quit\r\n"
+      "Enter choice : ", grn, nrm, grn, nrm, grn, nrm);
 
   OLC_MODE(d) = SEDIT_NAMELIST_MENU;
 }
@@ -368,11 +368,11 @@ void sedit_shop_flags_menu(Descriptor *d)
   clear_screen(d);
   for (i = 0; i < NUM_SHOP_FLAGS; i++) {
     d->Output( "%s%2d%s) %-20.20s   %s", grn, i + 1, nrm, shop_bits[i],
-		!(++count % 2) ? "\r\n" : "");
+        !(++count % 2) ? "\r\n" : "");
   }
   new_sprintbit(S_BITVECTOR(OLC_SHOP(d)), shop_bits, bits, sizeof(bits));
   d->Output( "\r\nCurrent Shop Flags : %s%s%s\r\nEnter choice : ",
-		cyn, bits, nrm);
+        cyn, bits, nrm);
   OLC_MODE(d) = SEDIT_SHOP_FLAGS;
 }
 
@@ -387,11 +387,11 @@ void sedit_no_trade_menu(Descriptor *d)
   clear_screen(d);
   for (i = 0; i < NUM_TRADERS; i++) {
     d->Output( "%s%2d%s) %-20.20s   %s", grn, i + 1, nrm, trade_letters[i],
-		!(++count % 2) ? "\r\n" : "");
+        !(++count % 2) ? "\r\n" : "");
   }
   new_sprintbit(S_NOTRADE(OLC_SHOP(d)), trade_letters, bits, sizeof(bits));
   d->Output( "\r\nCurrently won't trade with: %s%s%s\r\n"
-	  "Enter choice : ", cyn, bits, nrm);
+      "Enter choice : ", cyn, bits, nrm);
   OLC_MODE(d) = SEDIT_NOTRADE;
 }
 
@@ -408,7 +408,7 @@ void sedit_types_menu(Descriptor *d)
   clear_screen(d);
   for (i = 0; i < NUM_ITEM_TYPES; i++) {
     d->Output( "%s%2d%s) %s%-20s%s  %s", grn, i, nrm, cyn, item_types[i],
-		nrm, !(++count % 3) ? "\r\n" : "");
+        nrm, !(++count % 3) ? "\r\n" : "");
   }
   d->Output( "%sEnter choice : ", nrm);
   OLC_MODE(d) = SEDIT_TYPE_MENU;
@@ -432,45 +432,45 @@ void sedit_disp_menu(Descriptor *d)
   new_sprintbit(S_NOTRADE(shop), trade_letters, buf1, sizeof(buf1));
   new_sprintbit(S_BITVECTOR(shop), shop_bits, buf2, sizeof(buf2));
   d->Output(
-	  "-- Shop Number : [%s%d%s]\r\n"
-	  "%s0%s) Keeper      : [%s%d%s] %s%s\r\n"
+      "-- Shop Number : [%s%d%s]\r\n"
+      "%s0%s) Keeper      : [%s%d%s] %s%s\r\n"
           "%s1%s) Open 1      : %s%4d%s          %s2%s) Close 1     : %s%4d\r\n"
           "%s3%s) Open 2      : %s%4d%s          %s4%s) Close 2     : %s%4d\r\n"
-	  "%s5%s) Sell rate   : %s%1.2f%s          %s6%s) Buy rate    : %s%1.2f\r\n"
-	  "%s7%s) Keeper no item : %s%s\r\n"
-	  "%s8%s) Player no item : %s%s\r\n"
-	  "%s9%s) Keeper no cash : %s%s\r\n"
-	  "%sA%s) Player no cash : %s%s\r\n"
-	  "%sB%s) Keeper no buy  : %s%s\r\n"
-	  "%sC%s) Buy sucess     : %s%s\r\n"
-	  "%sD%s) Sell sucess    : %s%s\r\n"
-	  "%sE%s) No Trade With  : %s%s\r\n"
-	  "%sF%s) Shop flags     : %s%s\r\n"
-	  "%sR%s) Rooms Menu\r\n"
-	  "%sP%s) Products Menu\r\n"
-	  "%sT%s) Accept Types Menu\r\n"
-	  "%sQ%s) Quit\r\n"
-	  "Enter Choice : ",
+      "%s5%s) Sell rate   : %s%1.2f%s          %s6%s) Buy rate    : %s%1.2f\r\n"
+      "%s7%s) Keeper no item : %s%s\r\n"
+      "%s8%s) Player no item : %s%s\r\n"
+      "%s9%s) Keeper no cash : %s%s\r\n"
+      "%sA%s) Player no cash : %s%s\r\n"
+      "%sB%s) Keeper no buy  : %s%s\r\n"
+      "%sC%s) Buy sucess     : %s%s\r\n"
+      "%sD%s) Sell sucess    : %s%s\r\n"
+      "%sE%s) No Trade With  : %s%s\r\n"
+      "%sF%s) Shop flags     : %s%s\r\n"
+      "%sR%s) Rooms Menu\r\n"
+      "%sP%s) Products Menu\r\n"
+      "%sT%s) Accept Types Menu\r\n"
+      "%sQ%s) Quit\r\n"
+      "Enter Choice : ",
 
-	  cyn, OLC_NUM(d), nrm,
-	  grn, nrm, cyn, S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop),
-	  nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : GetMobProto(S_KEEPER(shop))->player.short_descr,
-	  grn, nrm, cyn, S_OPEN1(shop), nrm,
-	  grn, nrm, cyn, S_CLOSE1(shop),
-	  grn, nrm, cyn, S_OPEN2(shop), nrm,
-	  grn, nrm, cyn, S_CLOSE2(shop),
-	  grn, nrm, cyn, S_BUYPROFIT(shop), nrm,
-	  grn, nrm, cyn, S_SELLPROFIT(shop),
-	  grn, nrm, yel, S_NOITEM1(shop),
-	  grn, nrm, yel, S_NOITEM2(shop),
-	  grn, nrm, yel, S_NOCASH1(shop),
-	  grn, nrm, yel, S_NOCASH2(shop),
-	  grn, nrm, yel, S_NOBUY(shop),
-	  grn, nrm, yel, S_BUY(shop),
-	  grn, nrm, yel, S_SELL(shop),
-	  grn, nrm, cyn, buf1,
-	  grn, nrm, cyn, buf2,
-	  grn, nrm, grn, nrm, grn, nrm, grn, nrm
+      cyn, OLC_NUM(d), nrm,
+      grn, nrm, cyn, S_KEEPER(shop) == NOBODY ? -1 : S_KEEPER(shop),
+      nrm, yel, S_KEEPER(shop) == NOBODY ? "None" : GetMobProto(S_KEEPER(shop))->player.short_descr,
+      grn, nrm, cyn, S_OPEN1(shop), nrm,
+      grn, nrm, cyn, S_CLOSE1(shop),
+      grn, nrm, cyn, S_OPEN2(shop), nrm,
+      grn, nrm, cyn, S_CLOSE2(shop),
+      grn, nrm, cyn, S_BUYPROFIT(shop), nrm,
+      grn, nrm, cyn, S_SELLPROFIT(shop),
+      grn, nrm, yel, S_NOITEM1(shop),
+      grn, nrm, yel, S_NOITEM2(shop),
+      grn, nrm, yel, S_NOCASH1(shop),
+      grn, nrm, yel, S_NOCASH2(shop),
+      grn, nrm, yel, S_NOBUY(shop),
+      grn, nrm, yel, S_BUY(shop),
+      grn, nrm, yel, S_SELL(shop),
+      grn, nrm, cyn, buf1,
+      grn, nrm, cyn, buf2,
+      grn, nrm, grn, nrm, grn, nrm, grn, nrm
   );
 
   OLC_MODE(d) = SEDIT_MAIN_MENU;
@@ -500,8 +500,8 @@ void sedit_parse(Descriptor *d, char *arg)
       new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE,
         "OLC: %s edits shop %d", GET_NAME(d->character), OLC_NUM(d));
       if (CONFIG_OLC_SAVE) {
-	sedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
-	d->Output( "Shop saved to disk.\r\n");
+    sedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+    d->Output( "Shop saved to disk.\r\n");
       } else
         d->Output( "Shop saved to memory.\r\n");
       cleanup_olc(d, CLEANUP_STRUCTS);
@@ -523,10 +523,10 @@ void sedit_parse(Descriptor *d, char *arg)
     case 'q':
     case 'Q':
       if (OLC_VAL(d)) {		/* Anything been changed? */
-	d->Output( "Do you wish to save the changes to the shop? (y/n) : ");
-	OLC_MODE(d) = SEDIT_CONFIRM_SAVESTRING;
+    d->Output( "Do you wish to save the changes to the shop? (y/n) : ");
+    OLC_MODE(d) = SEDIT_CONFIRM_SAVESTRING;
       } else
-	cleanup_olc(d, CLEANUP_ALL);
+    cleanup_olc(d, CLEANUP_ALL);
       return;
     case '0':
       OLC_MODE(d) = SEDIT_KEEPER;
@@ -738,8 +738,8 @@ void sedit_parse(Descriptor *d, char *arg)
     i = atoi(arg);
     if (i != -1)
       if (!MobProtoExists(i)) {
-	d->Output( "That mobile does not exist, try again : ");
-	return;
+    d->Output( "That mobile does not exist, try again : ");
+    return;
       }
     S_KEEPER(OLC_SHOP(d)) = i;
     if (i == -1)
@@ -782,8 +782,8 @@ void sedit_parse(Descriptor *d, char *arg)
     i = atoi(arg);
     if (i != -1)
       if ((i = real_object(i)) == NOTHING) {
-	d->Output( "That object does not exist, try again : ");
-	return;
+    d->Output( "That object does not exist, try again : ");
+    return;
       }
     if (i > 0)
       add_to_int_list(&(S_PRODUCTS(OLC_SHOP(d))), i);
@@ -795,9 +795,9 @@ void sedit_parse(Descriptor *d, char *arg)
     return;
   case SEDIT_NEW_ROOM:
     if ( !is_number ( arg ) || !real_room ( atoi ( arg ) ) )
-	{
-		d->Output( "That room does not exist, try again : ");
-		return;
+    {
+        d->Output( "That room does not exist, try again : ");
+        return;
     }
     if (i >= 0)
       add_to_int_list2(&(S_ROOMS(OLC_SHOP(d))), world_vnum[atoi(arg)]);
@@ -836,7 +836,7 @@ void sedit_parse(Descriptor *d, char *arg)
 /*-------------------------------------------------------------------*/
 
 /*
- * END OF CASE 
+ * END OF CASE
  * If we get here, we have probably changed something, and now want to
  * return to main menu.  Use OLC_VAL as a 'has changed' flag.
  */

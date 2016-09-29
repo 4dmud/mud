@@ -24,7 +24,7 @@ Dragon age and modifyers
 Age_name
 Age_modifyer *as a number*
 size  *no real use, possible descriptive
-Look_descrip 
+Look_descrip
 bite_damage (add age_mod plus strenth)
 claw_damage (always 2 attacks) (add half age_mod *round up*)
 wing_damage (add age_mod)

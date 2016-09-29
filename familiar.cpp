@@ -72,7 +72,7 @@ void parse_mob_commands(Character *ch) {
             /*
             if (GET_MOB_WAIT(ch) == 0 && FIGHTING(ch) && !FIGHTING(ch->master)) {
             GET_MOB_WAIT(ch) += 3 RL_SEC;
-            GET_POS(ch) = POS_SITTING;     
+            GET_POS(ch) = POS_SITTING;
             }*/
         }
     } else
@@ -283,8 +283,8 @@ void parse_rogue_commands(Character *ch) {
         if (number(0, 200) <= GET_LEVEL(ch)) {
             switch (number(0, GET_LEVEL(ch)/20)) {
             case 0:
-		if (GET_POS(master) == POS_SITTING)
-		    return;
+        if (GET_POS(master) == POS_SITTING)
+            return;
 
                 act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, master, TO_VICT);
                 act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, master, TO_NOTVICT);
@@ -316,12 +316,12 @@ void parse_rogue_commands(Character *ch) {
             return;
         switch (number(0, GET_LEVEL(ch)/20)) {
         case 0:
-	    if (GET_POS(master) == POS_SITTING)
-		return;
+        if (GET_POS(master) == POS_SITTING)
+        return;
 
             act("$n knocks your feet out from under you and you hit the ground hard!!", FALSE, ch, 0, vict, TO_VICT);
             act("$n knocks $N's feet out from under $M and $E hits the ground hard!!", FALSE, ch, 0, vict, TO_NOTVICT);
-            set_fighting(ch, vict);            
+            set_fighting(ch, vict);
             GET_POS(vict) = POS_SITTING;
             return;
         case 1:

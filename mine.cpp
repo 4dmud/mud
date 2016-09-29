@@ -142,7 +142,7 @@ ASUB(sub_tunneling)
     ch->Send( "You are tunneling!\r\n");
     return  SUB_UNDEFINED;
   }
- 
+
 /*
   if (rm == NULL)
   {
@@ -223,13 +223,13 @@ int check_mine_traps(Character *ch)
     dam = (FTOI( dam * ((float)(100.0 - MAX(0, MINE_DAMAGE(ch)))/100.0)));
 
   return mine_damage(ch, dam);
-  
+
 }
 /*
   newroom = 54000+number(1,180);
       if (number(0, 110) < MINE_BONUS(ch))
        newroom += 20;
- 
+
        if ((%newroom.name%/=rock)|| (%newroom.name%/=sand)|| (%newroom.name%/=earth))
          set yes_go_up 1
         elseif ((%newroom.name%/=stone)||(%newroom.name%/=mine)|| (%newroom.name%/=soft)|| (%newroom.name%/=hard))
@@ -432,7 +432,7 @@ void make_tunnel(Character *ch)
     return;
 
   /* Horus - checking if the zone is closed */
-  if (ZONE_FLAGGED(rnew->zone, ZONE_CLOSED)) 
+  if (ZONE_FLAGGED(rnew->zone, ZONE_CLOSED))
     return;
 
   if (W_EXIT(rnew, rev_dir[MINE_DIR(ch)]))

@@ -30,7 +30,7 @@ room_rnum add_room(Room *room)
 {
   //  Character *tch;
   //  struct obj_data *tobj;
-  int i; 
+  int i;
   unsigned long found = FALSE;
   //  room_rnum i;
 
@@ -42,14 +42,14 @@ room_rnum add_room(Room *room)
 
   if ((i = room->number) != NOWHERE && world_vnum[i])
   {
-	 // log("Room Desc 1: %s", room->GetDescription());
+     // log("Room Desc 1: %s", room->GetDescription());
     if (SCRIPT(world_vnum[i]))
       extract_script(world_vnum[i], WLD_TRIGGER);
 
 
     /** save the new string **/
     //world_vnum[i]->t_description = strdup(room->GetDescription());
-    
+
     //log("Room Desc 2: %s", room->GetDescription());
     room->contents = world_vnum[i]->contents;
     room->people = world_vnum[i]->people;
@@ -58,8 +58,8 @@ room_rnum add_room(Room *room)
     //pause timers if the artisave flag is added
     if (!ROOM_FLAGGED(world_vnum[i], ROOM_ARTISAVE) && ROOM_FLAGGED(room, ROOM_ARTISAVE)) {
       for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
-	  pause_timer(obj);
+    if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
+      pause_timer(obj);
       save_artifacts(room);
     }
 
@@ -73,8 +73,8 @@ room_rnum add_room(Room *room)
       log("deleting %s, from dir %s", filename, cwd);
       remove(filename);
       for(struct obj_data* obj = room->contents;obj;obj = obj->next_content)
-	if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
-	  resume_timer(obj);
+    if (OBJ_FLAGGED (obj, ITEM_ARTIFACT))
+      resume_timer(obj);
     }
 
 
@@ -410,7 +410,7 @@ int save_rooms(zone_rnum rzone)
       */
       strlcpy(buf2,
              room->smell ? room->
-			     smell : "You smell nothing special.\n", sizeof(buf2)-1);
+                 smell : "You smell nothing special.\n", sizeof(buf2)-1);
       strip_cr(buf2);
 
       /*
@@ -418,7 +418,7 @@ int save_rooms(zone_rnum rzone)
        */
       strlcpy(buf3,
              room->listen ? room->
-			     listen : "You hear nothing special.\n", sizeof(buf3)-1);
+                 listen : "You hear nothing special.\n", sizeof(buf3)-1);
       strip_cr(buf3);
 
       /*
@@ -488,7 +488,7 @@ int save_rooms(zone_rnum rzone)
 
         }
       }
-    
+
       if (room->n_description)
       {
           strlcpy(buf, room->n_description, sizeof(buf));
@@ -511,7 +511,7 @@ int save_rooms(zone_rnum rzone)
       if (room->q_description) {
         for (q_descr = room->q_description; q_descr; q_descr = q_descr_next) {
           q_descr_next = q_descr->next;
-          if (!q_descr->flag || !q_descr->description) continue; 
+          if (!q_descr->flag || !q_descr->description) continue;
           strlcpy(buf, q_descr->flag, sizeof(buf));
           strip_cr(buf);
           strlcpy(buf1, q_descr->description, sizeof(buf1));
@@ -519,7 +519,7 @@ int save_rooms(zone_rnum rzone)
           fprintf(sf, "Q\n"
                       "%i\n"
                       "%s~\n"
-                      "%s~\n", 
+                      "%s~\n",
                       q_descr->type, buf, buf1);
         }
       }

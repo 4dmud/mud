@@ -235,7 +235,7 @@ ACMD(do_detector)
   char arg1[MAX_INPUT_LENGTH];
 
   argument = one_argument(argument, arg1);
- 
+
   if (!*arg1) {
   ch->Send( "How would you like to set your detector? High or Low?\r\n");
   return;
@@ -246,7 +246,7 @@ ACMD(do_detector)
   GET_DETECTOR(ch) = 1;
   return;
   }
-  if (!str_cmp(arg1, "low")) { 
+  if (!str_cmp(arg1, "low")) {
   ch->Send( "You turn your Artifact Detector to {crLow{cn.\r\n");
   GET_DETECTOR(ch) = 0;
   return;
@@ -273,7 +273,7 @@ ACMD(do_ethos)
 
    if (GET_ETHOS(ch) > 0)
    ethos_cost = 15;
- 
+
 
    if ((TRADEPOINTS(ch) < ethos_cost)) {
    ch->Send( "You do not have enough tradepoints to switch your Ethos.\r\n");
@@ -284,7 +284,7 @@ ACMD(do_ethos)
    ch->Send( "You dream of being a knight in shining armor as you set your ethos as {cWGood{cn.\r\n");
    GET_ETHOS(ch) = 1;
    }
-  
+
    else if (!str_cmp(arg1, "evil")) {
    ch->Send( "You dream of murdering kittens as you set your ethos as {cREvil{cn.\r\n");
    GET_ETHOS(ch) = 3;
@@ -308,370 +308,370 @@ ACMD(do_ethos)
 
 ACMD ( do_quit )
 {
-	if ( IS_NPC ( ch ) || !ch->desc )
-		return;
+    if ( IS_NPC ( ch ) || !ch->desc )
+        return;
 
-	if ( subcmd != SCMD_QUIT && GET_LEVEL ( ch ) < LVL_HERO )
-		ch->Send ( "You have to type quit--no less, to quit!\r\n" );
-	else if ( GET_POS ( ch ) == POS_FIGHTING )
-		ch->Send ( "No way!  You're fighting for your life!\r\n" );
-	else if ( GET_POS ( ch ) < POS_STUNNED )
-	{
-		ch->Send ( "You die before your time...\r\n" );
-		die ( ch, NULL );
-	}
-	else
-	{
-		if ( IN_ROOM ( ch ) != NULL && GET_LEVEL ( ch ) < LVL_GOD )
-		{
-			SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_LOADROOM );
-			GET_LOADROOM ( ch ) = GET_ROOM_VNUM ( IN_ROOM ( ch ) );
-		}
+    if ( subcmd != SCMD_QUIT && GET_LEVEL ( ch ) < LVL_HERO )
+        ch->Send ( "You have to type quit--no less, to quit!\r\n" );
+    else if ( GET_POS ( ch ) == POS_FIGHTING )
+        ch->Send ( "No way!  You're fighting for your life!\r\n" );
+    else if ( GET_POS ( ch ) < POS_STUNNED )
+    {
+        ch->Send ( "You die before your time...\r\n" );
+        die ( ch, NULL );
+    }
+    else
+    {
+        if ( IN_ROOM ( ch ) != NULL && GET_LEVEL ( ch ) < LVL_GOD )
+        {
+            SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_LOADROOM );
+            GET_LOADROOM ( ch ) = GET_ROOM_VNUM ( IN_ROOM ( ch ) );
+        }
 
-		if ( !GET_INVIS_LEV ( ch ) )
-		{
-			if ( GET_LOGOUTMSG ( ch ) ==NULL )                                       /*Thotter edit */
-				act ( "$n has left the game.", TRUE, ch, 0, 0, TO_ROOM );           /*Thotter edit*/
-			else
-				send_to_room ( IN_ROOM ( ch ), "%s\r\n",  GET_LOGOUTMSG ( ch ) );
+        if ( !GET_INVIS_LEV ( ch ) )
+        {
+            if ( GET_LOGOUTMSG ( ch ) ==NULL )                                       /*Thotter edit */
+                act ( "$n has left the game.", TRUE, ch, 0, 0, TO_ROOM );           /*Thotter edit*/
+            else
+                send_to_room ( IN_ROOM ( ch ), "%s\r\n",  GET_LOGOUTMSG ( ch ) );
 
-		}
-		new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "%s has quit the game [%s].", GET_NAME ( ch ), ch->desc->host.c_str() );
-		ch->Send ( "Goodbye, %s.. Come back soon!\r\n", GET_NAME ( ch ) );
+        }
+        new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "%s has quit the game [%s].", GET_NAME ( ch ), ch->desc->host.c_str() );
+        ch->Send ( "Goodbye, %s.. Come back soon!\r\n", GET_NAME ( ch ) );
 
-		/*  We used to check here for duping attempts, but we may as well
-		     *  do it right in extract_char(), since there is no check if a
-		     *  player rents out and it can leave them in an equally screwy
-		     *  situation.
-		     */
+        /*  We used to check here for duping attempts, but we may as well
+             *  do it right in extract_char(), since there is no check if a
+             *  player rents out and it can leave them in an equally screwy
+             *  situation.
+             */
 
-		write_aliases ( ch );
-		Crash_rentsave ( ch, 0 );
+        write_aliases ( ch );
+        Crash_rentsave ( ch, 0 );
 
-		/* If someone is quitting in their house, let them load back here. */
-		if ( !PLR_FLAGGED ( ch, PLR_LOADROOM ) && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
-			GET_LOADROOM ( ch ) = GET_ROOM_VNUM ( IN_ROOM ( ch ) );
+        /* If someone is quitting in their house, let them load back here. */
+        if ( !PLR_FLAGGED ( ch, PLR_LOADROOM ) && ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE ) )
+            GET_LOADROOM ( ch ) = GET_ROOM_VNUM ( IN_ROOM ( ch ) );
 
-		extract_char ( ch );      /* Char is saved before extracting. */
-		make_wholist();
-	}
+        extract_char ( ch );      /* Char is saved before extracting. */
+        make_wholist();
+    }
 }
 
 ACMD ( do_ground )
 {
-	int landed = FALSE, i;
-	struct obj_data *obj;
-	if ( affected_by_spell ( ch, SPELL_FLIGHT ) )
-	{
-		affect_from_char ( ch, SPELL_FLIGHT );
-		landed = TRUE;
-	}
+    int landed = FALSE, i;
+    struct obj_data *obj;
+    if ( affected_by_spell ( ch, SPELL_FLIGHT ) )
+    {
+        affect_from_char ( ch, SPELL_FLIGHT );
+        landed = TRUE;
+    }
 
-	for ( i = 0; i < NUM_WEARS; i++ )
-	{
-		if ( HAS_BODY ( ch, i ) && ( GET_EQ ( ch, i ) ) &&
-		        ( GET_OBJ_TYPE ( GET_EQ ( ch, i ) ) == ITEM_WINGS ) )
-		{
-			obj = unequip_char ( ch, i );
-			obj_to_char ( obj, ch );
-			act ( "$n detaches $p from $s body.", FALSE, ch, obj, NULL, TO_ROOM );
-			act ( "You detach $p from your body.", FALSE, ch, obj, NULL, TO_CHAR );
-			landed = TRUE;
-		}
-	}
+    for ( i = 0; i < NUM_WEARS; i++ )
+    {
+        if ( HAS_BODY ( ch, i ) && ( GET_EQ ( ch, i ) ) &&
+                ( GET_OBJ_TYPE ( GET_EQ ( ch, i ) ) == ITEM_WINGS ) )
+        {
+            obj = unequip_char ( ch, i );
+            obj_to_char ( obj, ch );
+            act ( "$n detaches $p from $s body.", FALSE, ch, obj, NULL, TO_ROOM );
+            act ( "You detach $p from your body.", FALSE, ch, obj, NULL, TO_CHAR );
+            landed = TRUE;
+        }
+    }
 
-	if ( landed == TRUE )
-	{
-		act ( "You find yourself grounded firmly again.", FALSE, ch, NULL, NULL, TO_CHAR );
-		act ( "$n kisses the ground seeming happy to be back on it.", FALSE, ch, NULL, NULL, TO_ROOM );
-	}
-	else
-	{
-		act ( "You seem to be on the ground already!", FALSE, ch, NULL, NULL, TO_CHAR );
-	}
+    if ( landed == TRUE )
+    {
+        act ( "You find yourself grounded firmly again.", FALSE, ch, NULL, NULL, TO_CHAR );
+        act ( "$n kisses the ground seeming happy to be back on it.", FALSE, ch, NULL, NULL, TO_ROOM );
+    }
+    else
+    {
+        act ( "You seem to be on the ground already!", FALSE, ch, NULL, NULL, TO_CHAR );
+    }
 }
 
 ACMD ( do_die )
 {
-	if ( IS_NPC ( ch ) || !ch->desc )
-		return;
-	if ( PLR_FLAGGED ( ch, PLR_DYING ) )
-	{
-		ch->Send ( "See you next lifetime...\r\n" );
-		raw_kill ( ch, NULL );
-	}
-	else
-	{
-		ch->Send ( "You are far too healthy! Get deader!\r\n" );
-	}
+    if ( IS_NPC ( ch ) || !ch->desc )
+        return;
+    if ( PLR_FLAGGED ( ch, PLR_DYING ) )
+    {
+        ch->Send ( "See you next lifetime...\r\n" );
+        raw_kill ( ch, NULL );
+    }
+    else
+    {
+        ch->Send ( "You are far too healthy! Get deader!\r\n" );
+    }
 }
 
 void check_for_dead ( void )
 {
-	Descriptor *d, *next_d;
-	time_t curr = time ( 0 );
-	for ( d = descriptor_list; d; d = next_d )
-	{
-		next_d = d->next;
-		if ( !IS_PLAYING ( d ) )
-			continue;
-		if ( !PLR_FLAGGED ( d->character, PLR_DYING ) )
-			continue;
-		if ( DIE_TIME ( d->character ) < ( curr - 60 ) )
-			die ( d->character, NULL );
-	}
+    Descriptor *d, *next_d;
+    time_t curr = time ( 0 );
+    for ( d = descriptor_list; d; d = next_d )
+    {
+        next_d = d->next;
+        if ( !IS_PLAYING ( d ) )
+            continue;
+        if ( !PLR_FLAGGED ( d->character, PLR_DYING ) )
+            continue;
+        if ( DIE_TIME ( d->character ) < ( curr - 60 ) )
+            die ( d->character, NULL );
+    }
 }
 
 int allowed_loginmsg ( Character *ch )
 {
-	if ( GET_LEVEL ( ch ) > LVL_HERO )
-		return TRUE;
+    if ( GET_LEVEL ( ch ) > LVL_HERO )
+        return TRUE;
 
-	if ( !PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) )
-		return FALSE;
+    if ( !PLR_FLAGGED ( ch, PLR_ROLEPLAYER ) )
+        return FALSE;
 
-	if ( PLR_FLAGGED ( ch, PLR_HERO ) )
-		return TRUE;
-	if ( PLR_FLAGGED ( ch, PLR_RP_LEADER ) )
-		return TRUE;
+    if ( PLR_FLAGGED ( ch, PLR_HERO ) )
+        return TRUE;
+    if ( PLR_FLAGGED ( ch, PLR_RP_LEADER ) )
+        return TRUE;
 
-	if ( GET_AWARD ( ch ) >= 250 )
-		return TRUE;
+    if ( GET_AWARD ( ch ) >= 250 )
+        return TRUE;
 
-	return FALSE;
+    return FALSE;
 
 }
 #define MAX_LOGINMSG_LENGTH 120
 #define MAX_LOGOUTMSG_LENGTH 120
 ACMD ( do_loginmsg )
 {
-	skip_spaces ( &argument );
-	delete_doubledollar ( argument );
-	if ( !allowed_loginmsg ( ch ) )
-	{
-		ch->Send ( "Sorry, but you don't deserve a logout message yet.\r\n" );
-		return;
-	}
-	if ( strlen ( argument ) > MAX_LOGINMSG_LENGTH )
-		ch->Send ( "Sorry, but your login message can't be longer than %d characters.\r\n",
-		           MAX_LOGINMSG_LENGTH );
-	else
-	{
-		set_loginmsg ( ch, argument );
-		if ( GET_LOGINMSG ( ch ) ==NULL )
-			ch->Send ( "Ok, you don't have a login message anymore.\r\n" );
-		else
-			ch->Send ( "Your new loginmsg is: %s\r\n", GET_LOGINMSG ( ch ) );
-	}
-	return;
+    skip_spaces ( &argument );
+    delete_doubledollar ( argument );
+    if ( !allowed_loginmsg ( ch ) )
+    {
+        ch->Send ( "Sorry, but you don't deserve a logout message yet.\r\n" );
+        return;
+    }
+    if ( strlen ( argument ) > MAX_LOGINMSG_LENGTH )
+        ch->Send ( "Sorry, but your login message can't be longer than %d characters.\r\n",
+                   MAX_LOGINMSG_LENGTH );
+    else
+    {
+        set_loginmsg ( ch, argument );
+        if ( GET_LOGINMSG ( ch ) ==NULL )
+            ch->Send ( "Ok, you don't have a login message anymore.\r\n" );
+        else
+            ch->Send ( "Your new loginmsg is: %s\r\n", GET_LOGINMSG ( ch ) );
+    }
+    return;
 }
 
 ACMD ( do_logoutmsg )
 {
-	skip_spaces ( &argument );
-	delete_doubledollar ( argument );
-	if ( !allowed_loginmsg ( ch ) )
-	{
-		ch->Send ( "Sorry, but you don't deserve a logout message yet.\r\n" );
-		return;
-	}
-	if ( strlen ( argument ) > MAX_LOGOUTMSG_LENGTH )
-		ch->Send ( "Sorry, but your logout message can't be longer than %d characters.\r\n",
-		           MAX_LOGOUTMSG_LENGTH );
-	else
-	{
-		set_logoutmsg ( ch, argument );
-		if ( GET_LOGOUTMSG ( ch ) ==NULL )
-			ch->Send ( "Ok, you don't have a logout message anymore.\r\n" );
-		else
-			ch->Send ( "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG ( ch ) );
-	}
-	return;
+    skip_spaces ( &argument );
+    delete_doubledollar ( argument );
+    if ( !allowed_loginmsg ( ch ) )
+    {
+        ch->Send ( "Sorry, but you don't deserve a logout message yet.\r\n" );
+        return;
+    }
+    if ( strlen ( argument ) > MAX_LOGOUTMSG_LENGTH )
+        ch->Send ( "Sorry, but your logout message can't be longer than %d characters.\r\n",
+                   MAX_LOGOUTMSG_LENGTH );
+    else
+    {
+        set_logoutmsg ( ch, argument );
+        if ( GET_LOGOUTMSG ( ch ) ==NULL )
+            ch->Send ( "Ok, you don't have a logout message anymore.\r\n" );
+        else
+            ch->Send ( "Your new logoutmsg is: %s\r\n", GET_LOGOUTMSG ( ch ) );
+    }
+    return;
 }
 
 
 ACMD ( do_save )
 {
-	if ( IS_NPC ( ch ) || !ch->desc )
-		return;
+    if ( IS_NPC ( ch ) || !ch->desc )
+        return;
 
-	/* Only tell the char we're saving if they actually typed "save" */
-	if ( cmd )
-	{
-		/*
-		 * This prevents item duplication by two PC's using coordinated saves
-		 * (or one PC with a house) and system crashes. Note that houses are
-		 * still automatically saved without this enabled. This code assumes
-		 * that guest immortals aren't trustworthy. If you've disabled guest
-		 * immortal advances from mortality, you may want < instead of <=.
-		 */
-		if ( ( CONFIG_AUTO_SAVE ) && GET_LEVEL ( ch ) < LVL_IMMORT )
-		{
-			ch->Send ( "Your aliases are saved when you logout.\r\n" );
-			return;
-		}
-		ch->Send ( "Saving %s and aliases.\r\n", GET_NAME ( ch ) );
-	}
+    /* Only tell the char we're saving if they actually typed "save" */
+    if ( cmd )
+    {
+        /*
+         * This prevents item duplication by two PC's using coordinated saves
+         * (or one PC with a house) and system crashes. Note that houses are
+         * still automatically saved without this enabled. This code assumes
+         * that guest immortals aren't trustworthy. If you've disabled guest
+         * immortal advances from mortality, you may want < instead of <=.
+         */
+        if ( ( CONFIG_AUTO_SAVE ) && GET_LEVEL ( ch ) < LVL_IMMORT )
+        {
+            ch->Send ( "Your aliases are saved when you logout.\r\n" );
+            return;
+        }
+        ch->Send ( "Saving %s and aliases.\r\n", GET_NAME ( ch ) );
+    }
 
-	write_aliases ( ch );
-	ch->save();
-	Crash_crashsave ( ch );
-	if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE_CRASH ) )
-		House_crashsave ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
-	else if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_CRASHPROOF ) )
-		save_crashproof_room ( IN_ROOM ( ch ) );
+    write_aliases ( ch );
+    ch->save();
+    Crash_crashsave ( ch );
+    if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_HOUSE_CRASH ) )
+        House_crashsave ( GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+    else if ( ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_CRASHPROOF ) )
+        save_crashproof_room ( IN_ROOM ( ch ) );
 }
 
 void list_rprooms_to_char ( Character *ch )
 {}
 void list_kills_to_char ( Character *ch )
 {
-	char line[MAX_INPUT_LENGTH];
-	char *first, *last;
-	Character *pmob = NULL;
-	int found = 0;
-	if ( SPECIALS ( ch )->KillsCount() == 0 )
-	{
-		ch->Send ( "You have no recorded kills.\r\n" );
-		return;
-	}
+    char line[MAX_INPUT_LENGTH];
+    char *first, *last;
+    Character *pmob = NULL;
+    int found = 0;
+    if ( SPECIALS ( ch )->KillsCount() == 0 )
+    {
+        ch->Send ( "You have no recorded kills.\r\n" );
+        return;
+    }
 
-	DYN_DEFINE;
-	DYN_CREATE;
-	for ( kill_map::iterator it = SPECIALS ( ch )->KillsBegin();it != SPECIALS ( ch )->KillsEnd();it++ )
-	{
-		if ( ( it->second )->vnum == NOBODY )
-			continue;
+    DYN_DEFINE;
+    DYN_CREATE;
+    for ( kill_map::iterator it = SPECIALS ( ch )->KillsBegin();it != SPECIALS ( ch )->KillsEnd();it++ )
+    {
+        if ( ( it->second )->vnum == NOBODY )
+            continue;
 
-		if ( MobProtoExists ( ( it->second )->vnum ) )
-		{
-			pmob = GetMobProto ( ( it->second )->vnum );
-			first = asctime ( localtime ( & ( it->second )->first ) );
-			first += 4;
-			//*(first + strlen(first) - 2) = '\0';
-			last = asctime ( localtime ( & ( it->second )->last ) );
-			last += 4;
-			//*(last + 11 ) = '\0';
-			snprintf ( line, sizeof ( line ), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", ( it->second )->count, pmob->player.short_descr, GET_LEVEL ( pmob ),  last );
-			DYN_RESIZE ( line );
-			found++;
-		}
-	}
+        if ( MobProtoExists ( ( it->second )->vnum ) )
+        {
+            pmob = GetMobProto ( ( it->second )->vnum );
+            first = asctime ( localtime ( & ( it->second )->first ) );
+            first += 4;
+            //*(first + strlen(first) - 2) = '\0';
+            last = asctime ( localtime ( & ( it->second )->last ) );
+            last += 4;
+            //*(last + 11 ) = '\0';
+            snprintf ( line, sizeof ( line ), "(%5dx) %-30.30s - Lev: %d Last:%-20.20s\r\n", ( it->second )->count, pmob->player.short_descr, GET_LEVEL ( pmob ),  last );
+            DYN_RESIZE ( line );
+            found++;
+        }
+    }
 
-	page_string ( ch->desc, dynbuf, DYN_BUFFER );
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 ACMD ( do_killlist )
 {
-	list_kills_to_char ( ch );
+    list_kills_to_char ( ch );
 }
 
 /* generic function for commands which are normally overridden by
    special procedures - i.e., shop commands, mail commands, etc. */
 ACMD ( do_not_here )
 {
-	ch->Send ( "Sorry, but you cannot do that here!\r\n" );
+    ch->Send ( "Sorry, but you cannot do that here!\r\n" );
 }
 
 ACMD ( do_prac_skills )
 {
-	list_skills ( ch, 0, NULL, string ( argument ), "" );
+    list_skills ( ch, 0, NULL, string ( argument ), "" );
 }
 
 ACMD ( do_prac_spells )
 {
-	list_skills ( ch, 1, NULL, string ( argument ), "" );
+    list_skills ( ch, 1, NULL, string ( argument ), "" );
 }
 
 
 
 ACMD ( do_visible )
 {
-	if ( GET_LEVEL ( ch ) >= LVL_GOD )
-	{
-		perform_immort_vis ( ch );
-		return;
-	}
+    if ( GET_LEVEL ( ch ) >= LVL_GOD )
+    {
+        perform_immort_vis ( ch );
+        return;
+    }
 
-	if ( AFF_FLAGGED ( ch, AFF_INVISIBLE ) )
-	{
-		ch->appear();
-		*ch << "You break the spell of invisibility.\r\n";
-	}
-	else
-		*ch << "You are already visible.\r\n";
+    if ( AFF_FLAGGED ( ch, AFF_INVISIBLE ) )
+    {
+        ch->appear();
+        *ch << "You break the spell of invisibility.\r\n";
+    }
+    else
+        *ch << "You are already visible.\r\n";
 }
 
 
 
 ACMD ( do_title )
 {
-	skip_spaces ( &argument );
-	delete_doubledollar ( argument );
+    skip_spaces ( &argument );
+    delete_doubledollar ( argument );
 
-	if ( IS_NPC ( ch ) )
-		*ch << "Your title is fine... go away.\r\n";
-	else if ( PLR_FLAGGED ( ch, PLR_NOTITLE ) )
-		*ch << "You can't title yourself -- you shouldn't have abused it!\r\n";
-	else if ( GET_RACE ( ch ) == RACE_GLADIATOR )
-		*ch << "Your current title is just fine.\r\n";
-	else if ( strstr ( argument, "(" ) || strstr ( argument, ")" ) )
-		*ch << "Titles can't contain the ( or ) characters.\r\n";
-	else if ( strlen ( argument ) > MAX_TITLE_LENGTH )
-	{
-		ch->Send ( "Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH );
-	}
-	else
-	{
-		set_title ( ch, argument );
-		ch->Send ( "Okay, you're now %s %s.\r\n", GET_NAME ( ch ), GET_TITLE ( ch ) );
-	}
+    if ( IS_NPC ( ch ) )
+        *ch << "Your title is fine... go away.\r\n";
+    else if ( PLR_FLAGGED ( ch, PLR_NOTITLE ) )
+        *ch << "You can't title yourself -- you shouldn't have abused it!\r\n";
+    else if ( GET_RACE ( ch ) == RACE_GLADIATOR )
+        *ch << "Your current title is just fine.\r\n";
+    else if ( strstr ( argument, "(" ) || strstr ( argument, ")" ) )
+        *ch << "Titles can't contain the ( or ) characters.\r\n";
+    else if ( strlen ( argument ) > MAX_TITLE_LENGTH )
+    {
+        ch->Send ( "Sorry, titles can't be longer than %d characters.\r\n", MAX_TITLE_LENGTH );
+    }
+    else
+    {
+        set_title ( ch, argument );
+        ch->Send ( "Okay, you're now %s %s.\r\n", GET_NAME ( ch ), GET_TITLE ( ch ) );
+    }
 }
 
 
 int perform_group ( Character *ch, Character *vict )
 {
 
-	if ( !CAN_SEE ( ch, vict ) )
-		return ( 0 );
+    if ( !CAN_SEE ( ch, vict ) )
+        return ( 0 );
 
-	if ( vict->master == ch )
-		return ( 0 );
+    if ( vict->master == ch )
+        return ( 0 );
 
-	if ( ch->master == vict )
-		stop_follower ( ch );
+    if ( ch->master == vict )
+        stop_follower ( ch );
 
-	if ( !IS_NPC ( ch ) )
-		SET_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
-	else
-		REMOVE_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
+    if ( !IS_NPC ( ch ) )
+        SET_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
+    else
+        REMOVE_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
 
-	add_follower ( vict, ch );
+    add_follower ( vict, ch );
 
-	SET_BIT_AR ( AFF_FLAGS ( ch ), AFF_GROUP );
-	total_perc ( ch );
-	if ( ch != vict )
-		act ( "$N is now a member of your group.", FALSE, ch, 0, vict,  TO_CHAR );
-	act ( "You are now a member of $n's group.", FALSE, ch, 0, vict, TO_VICT );
-	act ( "$N is now a member of $n's group.", FALSE, ch, 0, vict,TO_NOTVICT );
-	return ( 1 );
+    SET_BIT_AR ( AFF_FLAGS ( ch ), AFF_GROUP );
+    total_perc ( ch );
+    if ( ch != vict )
+        act ( "$N is now a member of your group.", FALSE, ch, 0, vict,  TO_CHAR );
+    act ( "You are now a member of $n's group.", FALSE, ch, 0, vict, TO_VICT );
+    act ( "$N is now a member of $n's group.", FALSE, ch, 0, vict,TO_NOTVICT );
+    return ( 1 );
 }
 
 C_FUNC ( allow_follow )
 {
-	Character *tch = find_char ( d->character->loader );
-	if ( !tch )
-	{
-		d->Output ( "%s isn't in the game any longer.\r\n", pi.NameById ( d->character->loader ) );
-		return;
-	}
-	if ( 'Y' == toupper ( *arg ) )
-		perform_group ( d->character, tch );
-	else
-	{
-		d->Output ( "You disallow %s to join your group.\r\n", pi.NameById ( d->character->loader ) );
-		*tch << GET_NAME ( d->character ) << " disallows you to join " << HSHR ( d->character ) << " group.\r\n";
-	}
-	d->character->loader = -1;
+    Character *tch = find_char ( d->character->loader );
+    if ( !tch )
+    {
+        d->Output ( "%s isn't in the game any longer.\r\n", pi.NameById ( d->character->loader ) );
+        return;
+    }
+    if ( 'Y' == toupper ( *arg ) )
+        perform_group ( d->character, tch );
+    else
+    {
+        d->Output ( "You disallow %s to join your group.\r\n", pi.NameById ( d->character->loader ) );
+        *tch << GET_NAME ( d->character ) << " disallows you to join " << HSHR ( d->character ) << " group.\r\n";
+    }
+    d->character->loader = -1;
 }
 
 void perform_snoop(Character *ch, Character *vict)
@@ -689,7 +689,7 @@ void perform_snoop(Character *ch, Character *vict)
 
   ch->desc->snooping = vict->desc;
   vict->desc->snoop_by = ch->desc;
-  
+
 }
 
 C_FUNC(allow_snoop)
@@ -714,212 +714,212 @@ C_FUNC(allow_snoop)
 
 void print_group ( Character *ch )
 {
-	Character *k;
-	struct follow_type *f;
-	char buf[MAX_INPUT_LENGTH];
+    Character *k;
+    struct follow_type *f;
+    char buf[MAX_INPUT_LENGTH];
 
-	if ( !AFF_FLAGGED ( ch, AFF_GROUP ) )
-		ch->Send ( "But you are not the member of a group!\r\n" );
-	else
-	{
-		ch->Send ( "Your group consists of:\r\n" );
+    if ( !AFF_FLAGGED ( ch, AFF_GROUP ) )
+        ch->Send ( "But you are not the member of a group!\r\n" );
+    else
+    {
+        ch->Send ( "Your group consists of:\r\n" );
 
-		k = ( ch->master ? ch->master : ch );
+        k = ( ch->master ? ch->master : ch );
 
-		if ( AFF_FLAGGED ( k, AFF_GROUP ) )
-		{
-			if ( GET_LEVEL ( k ) <LVL_IMMORT )
-			{
-				snprintf ( buf, sizeof ( buf ),
-				           "{cw[{cgTNL %15lld{cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{cw :: Leader{c0",
-				           exp_needed ( k ),
-				           GET_HIT ( k ), GET_MANA ( k ), GET_MOVE ( k ),
-				           current_class_is_tier_num ( k ), GET_PERC ( k ),
-				           GET_LEVEL ( k ), CLASS_ABBR ( k ) );
-				act ( buf, FALSE, ch, 0, k, TO_CHAR );
-			}
-			else
-			{
-				snprintf ( buf, sizeof ( buf ),
-				           "{cw[{cg    * IMMORTAL *   {cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{cw :: Leader{c0",
-				           GET_HIT ( k ), GET_MANA ( k ), GET_MOVE ( k ),
-				           current_class_is_tier_num ( k ), GET_PERC ( k ),
-				           GET_LEVEL ( k ), CLASS_ABBR ( k ) );
-				act ( buf, FALSE, ch, 0, k, TO_CHAR );
-			}
+        if ( AFF_FLAGGED ( k, AFF_GROUP ) )
+        {
+            if ( GET_LEVEL ( k ) <LVL_IMMORT )
+            {
+                snprintf ( buf, sizeof ( buf ),
+                           "{cw[{cgTNL %15lld{cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{cw :: Leader{c0",
+                           exp_needed ( k ),
+                           GET_HIT ( k ), GET_MANA ( k ), GET_MOVE ( k ),
+                           current_class_is_tier_num ( k ), GET_PERC ( k ),
+                           GET_LEVEL ( k ), CLASS_ABBR ( k ) );
+                act ( buf, FALSE, ch, 0, k, TO_CHAR );
+            }
+            else
+            {
+                snprintf ( buf, sizeof ( buf ),
+                           "{cw[{cg    * IMMORTAL *   {cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{cw :: Leader{c0",
+                           GET_HIT ( k ), GET_MANA ( k ), GET_MOVE ( k ),
+                           current_class_is_tier_num ( k ), GET_PERC ( k ),
+                           GET_LEVEL ( k ), CLASS_ABBR ( k ) );
+                act ( buf, FALSE, ch, 0, k, TO_CHAR );
+            }
 
-		}
-		else
-		{
-			ch->Send ( "No group.\r\n" );
-			return;
-		}
+        }
+        else
+        {
+            ch->Send ( "No group.\r\n" );
+            return;
+        }
 
-		for ( f = k->followers; f; f = f->next )
-		{
-			if ( !AFF_FLAGGED ( f->follower, AFF_GROUP ) )
-				continue;
-			if ( !IS_NPC ( f->follower ) )
-			{
-				if ( GET_LEVEL ( f->follower ) < LVL_IMMORT )
-				{
-					snprintf ( buf, sizeof ( buf ),
-					           "{cw[{cgTNL %15lld{cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cy$N{c0",
-					           exp_needed ( f->follower ), GET_HIT ( f->follower ),
-					           GET_MANA ( f->follower ), GET_MOVE ( f->follower ),
-					           current_class_is_tier_num ( f->follower ),
-					           GET_PERC ( f->follower ), GET_LEVEL ( f->follower ),
-					           CLASS_ABBR ( f->follower ) );
+        for ( f = k->followers; f; f = f->next )
+        {
+            if ( !AFF_FLAGGED ( f->follower, AFF_GROUP ) )
+                continue;
+            if ( !IS_NPC ( f->follower ) )
+            {
+                if ( GET_LEVEL ( f->follower ) < LVL_IMMORT )
+                {
+                    snprintf ( buf, sizeof ( buf ),
+                               "{cw[{cgTNL %15lld{cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cy$N{c0",
+                               exp_needed ( f->follower ), GET_HIT ( f->follower ),
+                               GET_MANA ( f->follower ), GET_MOVE ( f->follower ),
+                               current_class_is_tier_num ( f->follower ),
+                               GET_PERC ( f->follower ), GET_LEVEL ( f->follower ),
+                               CLASS_ABBR ( f->follower ) );
 
-				}
-				else
-				{
-					snprintf ( buf, sizeof ( buf ),
-					           "{cw[{cg    * IMMORTAL *   {cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{c0",
-					           GET_HIT ( f->follower ), GET_MANA ( f->follower ), GET_MOVE ( f->follower ),
-					           current_class_is_tier_num ( f->follower ), GET_PERC ( f->follower ),
-					           GET_LEVEL ( f->follower ), CLASS_ABBR ( f->follower ) );
-				}
-			}
-			else
-			{
-				snprintf ( buf, sizeof ( buf ),
-				           "{cw                     [{cy%5dH %5dM %5dV %dT ({cC%4.1f%%{cy)I{cw] [{cg%2d %s{cw] {cg$N{c0",
-				           GET_HIT ( f->follower ), GET_MANA ( f->follower ),
-				           GET_MOVE ( f->follower ),current_class_is_tier_num ( f->follower ), GET_PERC ( f->follower ),
-				           GET_LEVEL ( f->follower ),
-				           CLASS_ABBR ( f->follower ) );
-			}
-			act ( buf, FALSE, ch, 0, f->follower, TO_CHAR );
-		}
-	}
+                }
+                else
+                {
+                    snprintf ( buf, sizeof ( buf ),
+                               "{cw[{cg    * IMMORTAL *   {cw][{cc%5dH %5dM %5dV %dT ({cC%4.1f%%{cc)I{cw] [{cg%2d %s{cw] {cC$N{c0",
+                               GET_HIT ( f->follower ), GET_MANA ( f->follower ), GET_MOVE ( f->follower ),
+                               current_class_is_tier_num ( f->follower ), GET_PERC ( f->follower ),
+                               GET_LEVEL ( f->follower ), CLASS_ABBR ( f->follower ) );
+                }
+            }
+            else
+            {
+                snprintf ( buf, sizeof ( buf ),
+                           "{cw                     [{cy%5dH %5dM %5dV %dT ({cC%4.1f%%{cy)I{cw] [{cg%2d %s{cw] {cg$N{c0",
+                           GET_HIT ( f->follower ), GET_MANA ( f->follower ),
+                           GET_MOVE ( f->follower ),current_class_is_tier_num ( f->follower ), GET_PERC ( f->follower ),
+                           GET_LEVEL ( f->follower ),
+                           CLASS_ABBR ( f->follower ) );
+            }
+            act ( buf, FALSE, ch, 0, f->follower, TO_CHAR );
+        }
+    }
 }
 
 
 
 ACMD ( do_group )
 {
-	Character *vict;
-	struct follow_type *f;
-	int found;
-	char buf[MAX_INPUT_LENGTH];
+    Character *vict;
+    struct follow_type *f;
+    int found;
+    char buf[MAX_INPUT_LENGTH];
 
-	one_argument ( argument, buf );
-
-
-	total_perc ( ch );
-	print_group ( ch );
-	return;
+    one_argument ( argument, buf );
 
 
-	//-----edited out----
+    total_perc ( ch );
+    print_group ( ch );
+    return;
 
-	if ( ch->master )
-	{
-		act ( "You can not enroll group members without being head of a group.", FALSE, ch, 0, 0, TO_CHAR );
-		return;
-	}
 
-	if ( !str_cmp ( buf, "all" ) )
-	{
-		//perform_group(ch, ch);
-		for ( found = 0, f = ch->followers; f; f = f->next )
-		{
-			if ( !IS_NPC ( f->follower ) && ( f->follower != ch ) )
-				found += perform_group ( ch, f->follower );
-		}
-		if ( !found )
-			*ch << "Everyone following you is already in your group.\r\n";
-		return;
-	}
+    //-----edited out----
 
-	if ( ! ( vict = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
-		*ch << CONFIG_NOPERSON;
-	else if ( ( vict->master != ch ) && ( vict != ch ) )
-		act ( "$N must follow you to enter your group.", FALSE, ch, 0, vict,
-		      TO_CHAR );
-	else
-	{
-		if ( !AFF_FLAGGED ( vict, AFF_GROUP ) && !IS_NPC ( ch ) )
-			perform_group ( ch, vict );
-		else
-		{
-			if ( ch != vict )
-				act ( "$N is no longer a member of your group.", FALSE, ch,
-				      0, vict, TO_CHAR );
-			stop_follower ( vict );
-			act ( "You have been kicked out of $n's group!", FALSE, ch, 0,
-			      vict, TO_VICT );
-			act ( "$N has been kicked out of $n's group!", FALSE, ch, 0,
-			      vict, TO_NOTVICT );
-			REMOVE_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
+    if ( ch->master )
+    {
+        act ( "You can not enroll group members without being head of a group.", FALSE, ch, 0, 0, TO_CHAR );
+        return;
+    }
 
-		}
-	}
+    if ( !str_cmp ( buf, "all" ) )
+    {
+        //perform_group(ch, ch);
+        for ( found = 0, f = ch->followers; f; f = f->next )
+        {
+            if ( !IS_NPC ( f->follower ) && ( f->follower != ch ) )
+                found += perform_group ( ch, f->follower );
+        }
+        if ( !found )
+            *ch << "Everyone following you is already in your group.\r\n";
+        return;
+    }
+
+    if ( ! ( vict = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
+        *ch << CONFIG_NOPERSON;
+    else if ( ( vict->master != ch ) && ( vict != ch ) )
+        act ( "$N must follow you to enter your group.", FALSE, ch, 0, vict,
+              TO_CHAR );
+    else
+    {
+        if ( !AFF_FLAGGED ( vict, AFF_GROUP ) && !IS_NPC ( ch ) )
+            perform_group ( ch, vict );
+        else
+        {
+            if ( ch != vict )
+                act ( "$N is no longer a member of your group.", FALSE, ch,
+                      0, vict, TO_CHAR );
+            stop_follower ( vict );
+            act ( "You have been kicked out of $n's group!", FALSE, ch, 0,
+                  vict, TO_VICT );
+            act ( "$N has been kicked out of $n's group!", FALSE, ch, 0,
+                  vict, TO_NOTVICT );
+            REMOVE_BIT_AR ( AFF_FLAGS ( vict ), AFF_GROUP );
+
+        }
+    }
 }
 
 
 
 ACMD ( do_ungroup )
 {
-	struct follow_type *f, *next_fol;
-	Character *tch;
+    struct follow_type *f, *next_fol;
+    Character *tch;
 
-	char buf[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
 
-	one_argument ( argument, buf );
+    one_argument ( argument, buf );
 
-	if ( !*buf )
-	{
-		if ( ch->master || ! ( AFF_FLAGGED ( ch, AFF_GROUP ) ) )
-		{
-			*ch << "But you lead no group!\r\n";
-			return;
-		}
-		for ( f = ch->followers; f; f = next_fol )
-		{
-			next_fol = f->next;
-			//if (AFF_FLAGGED(f->follower, AFF_GROUP))
-			//{
-			REMOVE_BIT_AR ( AFF_FLAGS ( f->follower ), AFF_GROUP );
-			*f->follower << GET_NAME ( ch ) << " has disbanded the group.\r\n";
-			//if (!AFF_FLAGGED(f->follower, AFF_CHARM))
-			stop_follower ( f->follower );
-			//}
-		}
+    if ( !*buf )
+    {
+        if ( ch->master || ! ( AFF_FLAGGED ( ch, AFF_GROUP ) ) )
+        {
+            *ch << "But you lead no group!\r\n";
+            return;
+        }
+        for ( f = ch->followers; f; f = next_fol )
+        {
+            next_fol = f->next;
+            //if (AFF_FLAGGED(f->follower, AFF_GROUP))
+            //{
+            REMOVE_BIT_AR ( AFF_FLAGS ( f->follower ), AFF_GROUP );
+            *f->follower << GET_NAME ( ch ) << " has disbanded the group.\r\n";
+            //if (!AFF_FLAGGED(f->follower, AFF_CHARM))
+            stop_follower ( f->follower );
+            //}
+        }
 
-		REMOVE_BIT_AR ( AFF_FLAGS ( ch ), AFF_GROUP );
-		*ch << "You disband the group.\r\n";
-		return;
-	}
-	if ( ! ( tch = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
-	{
-		*ch << "There is no such person!\r\n";
-		return;
-	}
-	if ( tch->master != ch )
-	{
-		*ch << "That person is not following you!\r\n";
-		return;
-	}
+        REMOVE_BIT_AR ( AFF_FLAGS ( ch ), AFF_GROUP );
+        *ch << "You disband the group.\r\n";
+        return;
+    }
+    if ( ! ( tch = get_char_vis ( ch, buf, NULL, FIND_CHAR_ROOM ) ) )
+    {
+        *ch << "There is no such person!\r\n";
+        return;
+    }
+    if ( tch->master != ch )
+    {
+        *ch << "That person is not following you!\r\n";
+        return;
+    }
 
-	if ( !AFF_FLAGGED ( tch, AFF_GROUP ) )
-	{
-		*ch << "That person isn't in your group.\r\n";
-		return;
-	}
+    if ( !AFF_FLAGGED ( tch, AFF_GROUP ) )
+    {
+        *ch << "That person isn't in your group.\r\n";
+        return;
+    }
 
-	REMOVE_BIT_AR ( AFF_FLAGS ( tch ), AFF_GROUP );
+    REMOVE_BIT_AR ( AFF_FLAGS ( tch ), AFF_GROUP );
 
-	act ( "$N is no longer a member of your group.", FALSE, ch, 0, tch,
-	      TO_CHAR );
-	act ( "You have been kicked out of $n's group!", FALSE, ch, 0, tch,
-	      TO_VICT );
-	act ( "$N has been kicked out of $n's group!", FALSE, ch, 0, tch,
-	      TO_NOTVICT );
+    act ( "$N is no longer a member of your group.", FALSE, ch, 0, tch,
+          TO_CHAR );
+    act ( "You have been kicked out of $n's group!", FALSE, ch, 0, tch,
+          TO_VICT );
+    act ( "$N has been kicked out of $n's group!", FALSE, ch, 0, tch,
+          TO_NOTVICT );
 
-	if ( !AFF_FLAGGED ( tch, AFF_CHARM ) )
-		stop_follower ( tch );
+    if ( !AFF_FLAGGED ( tch, AFF_CHARM ) )
+        stop_follower ( tch );
 }
 
 
@@ -927,26 +927,26 @@ ACMD ( do_ungroup )
 
 ACMD ( do_report )
 {
-	char buf[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
 
-	sprintf ( buf, "$n reports: %d/%dH, %d/%dM, %d/%dV\r\n",
-	           GET_HIT ( ch ), GET_MAX_HIT ( ch ),
-	           GET_MANA ( ch ), GET_MAX_MANA ( ch ),
-	           GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
+    sprintf ( buf, "$n reports: %d/%dH, %d/%dM, %d/%dV\r\n",
+               GET_HIT ( ch ), GET_MAX_HIT ( ch ),
+               GET_MANA ( ch ), GET_MAX_MANA ( ch ),
+               GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
 
-	CAP ( buf );
-	if ( IS_NPC ( ch ) && ch->master )
-	{
-		act ( buf, FALSE, ch, 0, ch->master, TO_VICT );
-		return;
-	}
+    CAP ( buf );
+    if ( IS_NPC ( ch ) && ch->master )
+    {
+        act ( buf, FALSE, ch, 0, ch->master, TO_VICT );
+        return;
+    }
 
-	act ( buf, FALSE, ch, 0, 0, TO_ROOM );
-	sprintf ( buf, "You report: %d/%dH, %d/%dM, %d/%dV\r\n",
-	           GET_HIT ( ch ), GET_MAX_HIT ( ch ),
-	           GET_MANA ( ch ), GET_MAX_MANA ( ch ),
-	           GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
-	*ch << buf;
+    act ( buf, FALSE, ch, 0, 0, TO_ROOM );
+    sprintf ( buf, "You report: %d/%dH, %d/%dM, %d/%dV\r\n",
+               GET_HIT ( ch ), GET_MAX_HIT ( ch ),
+               GET_MANA ( ch ), GET_MAX_MANA ( ch ),
+               GET_MOVE ( ch ), GET_MAX_MOVE ( ch ) );
+    *ch << buf;
 }
 
 
@@ -954,99 +954,99 @@ ACMD ( do_report )
 
 ACMD ( do_split )
 {
-	gold_int amount, num, share, rest;
-	Character *k;
-	struct follow_type *f;
+    gold_int amount, num, share, rest;
+    Character *k;
+    struct follow_type *f;
 
-	char buf[MAX_INPUT_LENGTH];
-	size_t len = 0;
+    char buf[MAX_INPUT_LENGTH];
+    size_t len = 0;
 
-	if ( IS_NPC ( ch ) )
-		return;
+    if ( IS_NPC ( ch ) )
+        return;
 
-	one_argument ( argument, buf );
+    one_argument ( argument, buf );
 
-	if ( is_number ( buf ) )
-	{
-		amount = atol ( buf );
-		if ( amount <= 1 )
-		{
-			*ch << "Sorry, you can't do that.\r\n";
-			return;
-		}
-		if ( amount > ch->Gold ( 0, GOLD_HAND ) )
-		{
-			*ch << "You don't seem to have that much gold to split.\r\n";
-			return;
-		}
-		k = ( ch->master ? ch->master : ch );
+    if ( is_number ( buf ) )
+    {
+        amount = atol ( buf );
+        if ( amount <= 1 )
+        {
+            *ch << "Sorry, you can't do that.\r\n";
+            return;
+        }
+        if ( amount > ch->Gold ( 0, GOLD_HAND ) )
+        {
+            *ch << "You don't seem to have that much gold to split.\r\n";
+            return;
+        }
+        k = ( ch->master ? ch->master : ch );
 
-		if ( AFF_FLAGGED ( k, AFF_GROUP ) && ( k->in_room == IN_ROOM ( ch ) ) )
-			num = 1;
-		else
-			num = 0;
+        if ( AFF_FLAGGED ( k, AFF_GROUP ) && ( k->in_room == IN_ROOM ( ch ) ) )
+            num = 1;
+        else
+            num = 0;
 
-		for ( f = k->followers; f; f = f->next )
-			if ( AFF_FLAGGED ( f->follower, AFF_GROUP ) &&
-			        ( !IS_NPC ( f->follower ) ) &&
-			        ( f->follower->in_room == IN_ROOM ( ch ) ) )
-				num++;
+        for ( f = k->followers; f; f = f->next )
+            if ( AFF_FLAGGED ( f->follower, AFF_GROUP ) &&
+                    ( !IS_NPC ( f->follower ) ) &&
+                    ( f->follower->in_room == IN_ROOM ( ch ) ) )
+                num++;
 
-		if ( num && AFF_FLAGGED ( ch, AFF_GROUP ) )
-		{
-			share = amount / num;
-			rest = amount % num;
-		}
-		else
-		{
-			*ch << "With whom do you wish to share your gold?\r\n";
-			return;
-		}
+        if ( num && AFF_FLAGGED ( ch, AFF_GROUP ) )
+        {
+            share = amount / num;
+            rest = amount % num;
+        }
+        else
+        {
+            *ch << "With whom do you wish to share your gold?\r\n";
+            return;
+        }
 
-		ch->Gold ( - ( share * ( num - 1 ) ), GOLD_HAND );
+        ch->Gold ( - ( share * ( num - 1 ) ), GOLD_HAND );
 
-		len += snprintf ( buf + len, sizeof ( buf ) - len, "%s splits %lld coins; you receive %lld.\r\n",
-		                  GET_NAME ( ch ), amount, share );
-		if ( rest )
-		{
-			len += snprintf ( buf + len, sizeof ( buf ) - len,
-			                  "%lld coin%s %s not splitable, so %s "
-			                  "keeps the money.\r\n", rest, ( rest == 1 ) ? "" : "s",
-			                  ( rest == 1 ) ? "was" : "were", GET_NAME ( ch ) );
-		}
-		if ( AFF_FLAGGED ( k, AFF_GROUP ) && ( k->in_room == IN_ROOM ( ch ) )
-		        && ! ( IS_NPC ( k ) ) && k != ch )
-		{
-			k->Gold ( share, GOLD_HAND );
-			*k << buf;
-		}
-		for ( f = k->followers; f; f = f->next )
-		{
-			if ( AFF_FLAGGED ( f->follower, AFF_GROUP ) &&
-			        ( !IS_NPC ( f->follower ) ) &&
-			        ( f->follower->in_room == IN_ROOM ( ch ) ) &&
-			        f->follower != ch )
-			{
-				f->follower->Gold ( share, GOLD_HAND );
-				*f->follower << buf;
-			}
-		}
-		if ( num )
-		{
-			*ch << "You split " << amount << " coins among " << num << " members -- " << share << " coins each.\r\n";
-			if ( rest )
-			{
-				ch->Send ( "%lld coin%s%s not splitable, so you keep the money.\r\n", rest, ( rest == 1 ) ? "" : "s", ( rest == 1 ) ? " was" : " were" );
+        len += snprintf ( buf + len, sizeof ( buf ) - len, "%s splits %lld coins; you receive %lld.\r\n",
+                          GET_NAME ( ch ), amount, share );
+        if ( rest )
+        {
+            len += snprintf ( buf + len, sizeof ( buf ) - len,
+                              "%lld coin%s %s not splitable, so %s "
+                              "keeps the money.\r\n", rest, ( rest == 1 ) ? "" : "s",
+                              ( rest == 1 ) ? "was" : "were", GET_NAME ( ch ) );
+        }
+        if ( AFF_FLAGGED ( k, AFF_GROUP ) && ( k->in_room == IN_ROOM ( ch ) )
+                && ! ( IS_NPC ( k ) ) && k != ch )
+        {
+            k->Gold ( share, GOLD_HAND );
+            *k << buf;
+        }
+        for ( f = k->followers; f; f = f->next )
+        {
+            if ( AFF_FLAGGED ( f->follower, AFF_GROUP ) &&
+                    ( !IS_NPC ( f->follower ) ) &&
+                    ( f->follower->in_room == IN_ROOM ( ch ) ) &&
+                    f->follower != ch )
+            {
+                f->follower->Gold ( share, GOLD_HAND );
+                *f->follower << buf;
+            }
+        }
+        if ( num )
+        {
+            *ch << "You split " << amount << " coins among " << num << " members -- " << share << " coins each.\r\n";
+            if ( rest )
+            {
+                ch->Send ( "%lld coin%s%s not splitable, so you keep the money.\r\n", rest, ( rest == 1 ) ? "" : "s", ( rest == 1 ) ? " was" : " were" );
 
-				ch->Gold ( rest, GOLD_HAND );
-			}
-		}
-	}
-	else
-	{
-		*ch << "How many coins do you wish to split with your group?\r\n";
-		return;
-	}
+                ch->Gold ( rest, GOLD_HAND );
+            }
+        }
+    }
+    else
+    {
+        *ch << "How many coins do you wish to split with your group?\r\n";
+        return;
+    }
 
 }
 
@@ -1055,259 +1055,259 @@ ACMD ( do_split )
 
 ACMD ( do_use )
 {
-	struct obj_data *mag_item;
+    struct obj_data *mag_item;
 
-	char buf[MAX_INPUT_LENGTH];
-	char arg[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
+    char arg[MAX_INPUT_LENGTH];
 
-	half_chop ( argument, arg, buf );
-	if ( !*arg )
-	{
-		*ch << "What do you want to " << CMD_NAME << "?\r\n";
-		return;
-	}
-	mag_item = GET_EQ ( ch, WEAR_HOLD );
+    half_chop ( argument, arg, buf );
+    if ( !*arg )
+    {
+        *ch << "What do you want to " << CMD_NAME << "?\r\n";
+        return;
+    }
+    mag_item = GET_EQ ( ch, WEAR_HOLD );
 
-	if ( !mag_item || !isname ( arg, mag_item->name ) )
-	{
-		switch ( subcmd )
-		{
-			case SCMD_RECITE:
-			case SCMD_QUAFF:
-				if ( !
-				        ( mag_item =
-				              get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
-				{
-					*ch << "You don't seem to have " << AN ( arg ) << " "  << arg << ".\r\n";
-					return;
-				}
-				break;
-			case SCMD_USE:
-				*ch << "You don't seem to be holding " << AN ( arg ) << " " << arg << ".\r\n";
-				return;
-			default:
-				log ( "SYSERR: Unknown subcmd %d passed to do_use.", subcmd );
-				return;
-		}
-	}
-	switch ( subcmd )
-	{
-		case SCMD_QUAFF:
-			if ( GET_OBJ_TYPE ( mag_item ) != ITEM_POTION &&
-			        GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_1 &&
-			        GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_2 &&
-			        GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_3 )
-			{
-				*ch << "You can only quaff potions.\r\n";
-				return;
-			}
-			break;
-		case SCMD_RECITE:
-			if ( GET_OBJ_TYPE ( mag_item ) != ITEM_SCROLL )
-			{
-				*ch << "You can only recite scrolls.\r\n";
-				return;
-			}
-			break;
-		case SCMD_USE:
-			if ( ( GET_OBJ_TYPE ( mag_item ) != ITEM_WAND ) &&
-			        ( GET_OBJ_TYPE ( mag_item ) != ITEM_STAFF ) )
-			{
-				*ch << "You can't seem to figure out how to use it.\r\n";
-				return;
-			}
-			break;
-	}
+    if ( !mag_item || !isname ( arg, mag_item->name ) )
+    {
+        switch ( subcmd )
+        {
+            case SCMD_RECITE:
+            case SCMD_QUAFF:
+                if ( !
+                        ( mag_item =
+                              get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+                {
+                    *ch << "You don't seem to have " << AN ( arg ) << " "  << arg << ".\r\n";
+                    return;
+                }
+                break;
+            case SCMD_USE:
+                *ch << "You don't seem to be holding " << AN ( arg ) << " " << arg << ".\r\n";
+                return;
+            default:
+                log ( "SYSERR: Unknown subcmd %d passed to do_use.", subcmd );
+                return;
+        }
+    }
+    switch ( subcmd )
+    {
+        case SCMD_QUAFF:
+            if ( GET_OBJ_TYPE ( mag_item ) != ITEM_POTION &&
+                    GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_1 &&
+                    GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_2 &&
+                    GET_OBJ_TYPE ( mag_item ) != ITEM_ANTIDOTE_3 )
+            {
+                *ch << "You can only quaff potions.\r\n";
+                return;
+            }
+            break;
+        case SCMD_RECITE:
+            if ( GET_OBJ_TYPE ( mag_item ) != ITEM_SCROLL )
+            {
+                *ch << "You can only recite scrolls.\r\n";
+                return;
+            }
+            break;
+        case SCMD_USE:
+            if ( ( GET_OBJ_TYPE ( mag_item ) != ITEM_WAND ) &&
+                    ( GET_OBJ_TYPE ( mag_item ) != ITEM_STAFF ) )
+            {
+                *ch << "You can't seem to figure out how to use it.\r\n";
+                return;
+            }
+            break;
+    }
 
-	mag_objectmagic ( ch, mag_item, buf );
+    mag_objectmagic ( ch, mag_item, buf );
 }
 
 
 
 ACMD ( do_wimpy )
 {
-	int wimp_lev;
-	char arg[MAX_INPUT_LENGTH];
+    int wimp_lev;
+    char arg[MAX_INPUT_LENGTH];
 
-	/* 'wimp_level' is a player_special. -gg 2/25/98 */
-	if ( IS_NPC ( ch ) )
-		return;
+    /* 'wimp_level' is a player_special. -gg 2/25/98 */
+    if ( IS_NPC ( ch ) )
+        return;
 
-	one_argument ( argument, arg );
+    one_argument ( argument, arg );
 
-	if ( !*arg )
-	{
-		if ( GET_WIMP_LEV ( ch ) )
-		{
-			*ch << "Your current wimp level is " << GET_WIMP_LEV ( ch ) << " hit points.\r\n";
-			return;
-		}
-		else
-		{
-			*ch << "At the moment, you're not a wimp.  (sure, sure...)\r\n";
-			return;
-		}
-	}
-	if ( isdigit ( *arg ) )
-	{
-		if ( ( wimp_lev = atoi ( arg ) ) != 0 )
-		{
-			if ( wimp_lev < 0 )
-				*ch << "Heh, heh, heh.. we are jolly funny today, eh?\r\n";
-			else if ( wimp_lev > GET_MAX_HIT ( ch ) )
-				*ch << "That doesn't make much sense, now does it?\r\n";
-			else if ( wimp_lev > ( GET_MAX_HIT ( ch ) / 2 ) )
-				*ch << "You can't set your wimp level above half your hit points.\r\n";
-			else
-			{
-				ch->Send (
-				    "Okay, you'll wimp out if you drop below %d hit points.\r\n",
-				    wimp_lev );
-				GET_WIMP_LEV ( ch ) = wimp_lev;
-			}
-		}
-		else
-		{
-			*ch << "Okay, you'll now tough out fights to the bitter end.\r\n";
-			GET_WIMP_LEV ( ch ) = 0;
-		}
-	}
-	else
-		*ch << "Specify at how many hit points you want to wimp out at.  (0 to disable)\r\n";
+    if ( !*arg )
+    {
+        if ( GET_WIMP_LEV ( ch ) )
+        {
+            *ch << "Your current wimp level is " << GET_WIMP_LEV ( ch ) << " hit points.\r\n";
+            return;
+        }
+        else
+        {
+            *ch << "At the moment, you're not a wimp.  (sure, sure...)\r\n";
+            return;
+        }
+    }
+    if ( isdigit ( *arg ) )
+    {
+        if ( ( wimp_lev = atoi ( arg ) ) != 0 )
+        {
+            if ( wimp_lev < 0 )
+                *ch << "Heh, heh, heh.. we are jolly funny today, eh?\r\n";
+            else if ( wimp_lev > GET_MAX_HIT ( ch ) )
+                *ch << "That doesn't make much sense, now does it?\r\n";
+            else if ( wimp_lev > ( GET_MAX_HIT ( ch ) / 2 ) )
+                *ch << "You can't set your wimp level above half your hit points.\r\n";
+            else
+            {
+                ch->Send (
+                    "Okay, you'll wimp out if you drop below %d hit points.\r\n",
+                    wimp_lev );
+                GET_WIMP_LEV ( ch ) = wimp_lev;
+            }
+        }
+        else
+        {
+            *ch << "Okay, you'll now tough out fights to the bitter end.\r\n";
+            GET_WIMP_LEV ( ch ) = 0;
+        }
+    }
+    else
+        *ch << "Specify at how many hit points you want to wimp out at.  (0 to disable)\r\n";
 }
 
 
 ACMD ( do_gen_write )
 {
-	FILE *fl;
-	char *tmp;
-	const char *filename;
-	struct stat fbuf;
-	time_t ct;
+    FILE *fl;
+    char *tmp;
+    const char *filename;
+    struct stat fbuf;
+    time_t ct;
 
-	switch ( subcmd )
-	{
-		case SCMD_BUG:
-			filename = BUG_FILE;
-			break;
-		case SCMD_TYPO:
-			filename = TYPO_FILE;
-			break;
-		case SCMD_IDEA:
-			filename = IDEA_FILE;
-			break;
-		default:
-			return;
-	}
+    switch ( subcmd )
+    {
+        case SCMD_BUG:
+            filename = BUG_FILE;
+            break;
+        case SCMD_TYPO:
+            filename = TYPO_FILE;
+            break;
+        case SCMD_IDEA:
+            filename = IDEA_FILE;
+            break;
+        default:
+            return;
+    }
 
-	ct = time ( 0 );
-	tmp = asctime ( localtime ( &ct ) );
+    ct = time ( 0 );
+    tmp = asctime ( localtime ( &ct ) );
 
-	if ( IS_NPC ( ch ) )
-	{
-		*ch << "Monsters can't have ideas - Go away.\r\n";
-		return;
-	}
+    if ( IS_NPC ( ch ) )
+    {
+        *ch << "Monsters can't have ideas - Go away.\r\n";
+        return;
+    }
 
-	skip_spaces ( &argument );
-	delete_doubledollar ( argument );
+    skip_spaces ( &argument );
+    delete_doubledollar ( argument );
 
-	if ( !*argument )
-	{
-		*ch << "That must be a mistake...\r\n";
-		return;
-	}
-	new_mudlog ( CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME ( ch ), CMD_NAME, GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
+    if ( !*argument )
+    {
+        *ch << "That must be a mistake...\r\n";
+        return;
+    }
+    new_mudlog ( CMP, LVL_GOD, FALSE, "%s %s (%d): %s", GET_NAME ( ch ), CMD_NAME, GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
 
-	if ( stat ( filename, &fbuf ) < 0 )
-	{
-		perror ( "SYSERR: Can't stat() file" );
-		return;
-	}
-	if ( fbuf.st_size >= CONFIG_MAX_FILESIZE )
-	{
-		*ch << "Sorry, the file is full right now.. try again later.\r\n";
-		return;
-	}
-	if ( ! ( fl = fopen ( filename, "a" ) ) )
-	{
-		perror ( "SYSERR: do_gen_write" );
-		*ch << "Could not open the file.  Sorry.\r\n";
-		return;
-	}
-	fprintf ( fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
-	          "<tr><td class='plrname'>%-13s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
-	          GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
+    if ( stat ( filename, &fbuf ) < 0 )
+    {
+        perror ( "SYSERR: Can't stat() file" );
+        return;
+    }
+    if ( fbuf.st_size >= CONFIG_MAX_FILESIZE )
+    {
+        *ch << "Sorry, the file is full right now.. try again later.\r\n";
+        return;
+    }
+    if ( ! ( fl = fopen ( filename, "a" ) ) )
+    {
+        perror ( "SYSERR: do_gen_write" );
+        *ch << "Could not open the file.  Sorry.\r\n";
+        return;
+    }
+    fprintf ( fl, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'>"
+              "<tr><td class='plrname'>%-13s</td><td class='date'>%6.6s</td><td class='room'>%5d</td><td class='comment'>%s</td></tr></table>\n", GET_NAME ( ch ), ( tmp + 4 ),
+              GET_ROOM_VNUM ( IN_ROOM ( ch ) ), argument );
 
-	fclose ( fl );
-	/*new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);*/
-	ch->Send ( "Okay.  Thanks!\r\n" );
+    fclose ( fl );
+    /*new_mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "%-8s (%6.6s) [%5d] %s\n", GET_NAME(ch), (tmp + 4),             GET_ROOM_VNUM(IN_ROOM(ch)), argument);*/
+    ch->Send ( "Okay.  Thanks!\r\n" );
 }
 
 void parse_afk ( Character *ch, char *argument )
 {
-	char *def = ( char * ) "Away From Keyboard";
-	char **msg;
-	char buf[MAX_INPUT_LENGTH];
+    char *def = ( char * ) "Away From Keyboard";
+    char **msg;
+    char buf[MAX_INPUT_LENGTH];
 
-	msg = & ( AFK_MSG ( ch ) );
+    msg = & ( AFK_MSG ( ch ) );
 
-	if ( argument != NULL )
-	{
-		skip_spaces ( &argument );
-		if ( strlen ( argument ) > 79 )
-		{
-			ch->Send ( "Your afk message must be shorter than 80 characters.\r\n" );
-			return;
-		}
-		if ( *msg )
-			free ( *msg );
-		*msg = str_dup ( ( !argument || !*argument ) ? def : argument );
-		snprintf ( buf, sizeof ( buf ), "$n has gone AFK: %s", AFK_MSG ( ch ) );
-		act ( buf, TRUE, ch, 0, 0, TO_ROOM );
-		ch->Send ( "AFK: %s\r\n", AFK_MSG ( ch ) );
-	}
-	else
-	{
-		if ( *msg )
-			free ( *msg );
-		*msg = NULL;
-		act ( "$n has come back from AFK.", TRUE, ch, 0, 0, TO_ROOM );
-	}
+    if ( argument != NULL )
+    {
+        skip_spaces ( &argument );
+        if ( strlen ( argument ) > 79 )
+        {
+            ch->Send ( "Your afk message must be shorter than 80 characters.\r\n" );
+            return;
+        }
+        if ( *msg )
+            free ( *msg );
+        *msg = str_dup ( ( !argument || !*argument ) ? def : argument );
+        snprintf ( buf, sizeof ( buf ), "$n has gone AFK: %s", AFK_MSG ( ch ) );
+        act ( buf, TRUE, ch, 0, 0, TO_ROOM );
+        ch->Send ( "AFK: %s\r\n", AFK_MSG ( ch ) );
+    }
+    else
+    {
+        if ( *msg )
+            free ( *msg );
+        *msg = NULL;
+        act ( "$n has come back from AFK.", TRUE, ch, 0, 0, TO_ROOM );
+    }
 
 
 }
 
 void parse_busy ( Character *ch, char *argument )
 {
-	char *def = ( char * ) "Do not disturb.";
-	char **msg;
-	char buf[MAX_INPUT_LENGTH];
+    char *def = ( char * ) "Do not disturb.";
+    char **msg;
+    char buf[MAX_INPUT_LENGTH];
 
-	msg = & ( BUSY_MSG ( ch ) );
+    msg = & ( BUSY_MSG ( ch ) );
 
-	if ( argument != NULL )
-	{
-		skip_spaces ( &argument );
-		if ( strlen ( argument ) > 79 )
-		{
-			ch->Send ( "Your busy message must be shorter than 80 characters.\r\n" );
-			return;
-		}
-		if ( *msg )
-			free ( *msg );
-		*msg = str_dup ( ( !argument || !*argument ) ? def : argument );
-		snprintf ( buf, sizeof ( buf ), "$n has gone BUSY: %s", *msg );
-		act ( buf, TRUE, ch, 0, 0, TO_ROOM );
-		ch->Send ( "BUSY: %s\r\n", BUSY_MSG ( ch ) );
-	}
-	else
-	{
-		if ( *msg )
-			free ( *msg );
-		*msg = NULL;
-		act ( "$n has come back from being BUSY.", TRUE, ch, 0, 0, TO_ROOM );
-	}
+    if ( argument != NULL )
+    {
+        skip_spaces ( &argument );
+        if ( strlen ( argument ) > 79 )
+        {
+            ch->Send ( "Your busy message must be shorter than 80 characters.\r\n" );
+            return;
+        }
+        if ( *msg )
+            free ( *msg );
+        *msg = str_dup ( ( !argument || !*argument ) ? def : argument );
+        snprintf ( buf, sizeof ( buf ), "$n has gone BUSY: %s", *msg );
+        act ( buf, TRUE, ch, 0, 0, TO_ROOM );
+        ch->Send ( "BUSY: %s\r\n", BUSY_MSG ( ch ) );
+    }
+    else
+    {
+        if ( *msg )
+            free ( *msg );
+        *msg = NULL;
+        act ( "$n has come back from being BUSY.", TRUE, ch, 0, 0, TO_ROOM );
+    }
 
 
 }
@@ -1318,688 +1318,688 @@ void parse_busy ( Character *ch, char *argument )
 
 ACMD ( do_gen_tog )
 {
-	long result;
+    long result;
 
-	const char *tog_messages[][2] =
-	{
-		{"You are now safe from summoning by other players.\r\n",
-		 "You may now be summoned by other players.\r\n"},
-		{"Nohassle disabled.\r\n",
-		 "Nohassle enabled.\r\n"},
-		{"Brief mode off.\r\n",
-		 "Brief mode on.\r\n"},
-		{"Compact mode off.\r\n",
-		 "Compact mode on.\r\n"},
-		{"You can now hear tells.\r\n",
-		 "You are now deaf to tells.\r\n"},
-		{"You can now hear auctions.\r\n",
-		 "You are now deaf to auctions.\r\n"},
-		{"You can now hear shouts.\r\n",
-		 "You are now deaf to shouts.\r\n"},
-		{"You can now hear gossip.\r\n",
-		 "You are now deaf to gossip.\r\n"},
-		{"You can now hear the congratulation messages.\r\n",
-		 "You are now deaf to the congratulation messages.\r\n"},
-		{"You can now hear the Wiz-channel.\r\n",
-		 "You are now deaf to the Wiz-channel.\r\n"},
-		{"You are no longer part of the Quest.\r\n",
-		 "Okay, you are part of the Quest!\r\n"},
-		{"You will no longer see the room flags.\r\n",
-		 "You will now see the room flags.\r\n"},
-		{"You will now have your communication repeated.\r\n",
-		 "You will no longer have your communication repeated.\r\n"},
-		{"HolyLight mode off.\r\n",
-		 "HolyLight mode on.\r\n"},
-		{"Nameserver_is_slow changed to NO; IP addresses will now be resolved.\r\n",
-		 "Nameserver_is_slow changed to YES; sitenames will no longer be resolved.\r\n"},
-		{"Autoexits disabled.\r\n",
-		 "Autoexits enabled.\r\n"},
-		{"AFK flag is now off.\r\n",
-		 "AFK flag is now on.\r\n"},
-		{"AutoSplit disabled.\r\n",
-		 "AutoSplit enabled.\r\n"},
-		{"AutoLooting disabled.\r\n",
-		 "AutoLooting enabled.\r\n"},
-		{"You will no longer AutoAssist.\r\n",
-		 "You will now AutoAssist.\r\n"},
-		{"Autogold disabled.\r\n",
-		 "Autogold enabled.\r\n"},
-		{"You will no longer see arena messages.\r\n",
-		 "You will now see arena messages.\r\n"},
-		{"Ascii objects turned off.\r\n",
-		 "Ascii objects turned on.\r\n"},
-		{"You will no longer keep your title after levelling.\r\n",
-		 "You will now keep your title after levelling.\r\n"},
-		{"You can now hear the IC channel.\r\n",
-		 "You are now deaf to the IC channel.\r\n"},
-		{"Will no longer track through doors.\r\n",
-		 "Will now track through doors.\r\n"},
-		{"You will now hear the newbie channel.\r\n",
-		 "You will no longer hear the newbie channel.\r\n"},
-		{"You will no longer see battle spam when not fighting.\r\n",
-		 "You will now see battle spam when not fighting.\r\n"},
-		{"You will no longer see a message when you receive mail.\r\n",
-		 "You will now see a message when you receive mail.\r\n"},
-		{"You can now hear your clan.\r\n",
-		 "You will no longer hear your clan.\r\n"},
-		{"You will no longer hear tells when afk.\r\n",
-		 "You will now hear tells when afk.\r\n"},
-		{"You will no longer see movement messages.\r\n",
-		 "You will now see movement messages.\r\n"},
-		{"You are unmountable now.\r\n",
-		 "You are mountable.\r\n"},
-		{"You Hero channel is now On.\r\n",
-		 "The Hero channel is now Off.\r\n"},
-		{"Colour codes will be parsed.\r\n",
-		 "You will now see colour codes.\r\n"},
-		{"You will not automatically sacrifice corpses.\r\n",
-		 "You will now auto-sacrifice corpses.\r\n"},
-		{"Will no longer clear screen in OLC.\r\n",
-		 "Will now clear screen in OLC.\r\n"},
-		{"Buildwalk Off.\r\n",
-		 "Buildwalk On.\r\n"},
-		{"Compression disabled.\r\n",
-		 "Compression enabled.\r\n"},
-		{"Compression will not be enabled automatically.\r\n",
-		 "Compression will be automatically enabled if your client supports it.\r\n"},
-		{"You enable the ooc channel.\r\n",
-		 "You disable the ooc channel.\r\n"},
-		{"You turn off page wrapping.\r\n",
-		 "You turn on page wrapping.\r\n"},
-		{"You unlock your replier.\r\n",
-		 "You lock your replier.\r\n"},
-		{"BUSY flag is now off.\r\n",
-		 "BUSY flag is now on.\r\n"},
-		{"Aggro mode disabled.\r\n",
-		 "Aggro mode enabled.\r\n"},
-		{"Nobrag off.\r\n",
-		 "Nobrag on.\r\n"},
-		{"You are now safe from gating by other players.\r\n",
-		"You may now be gated to by other players.\r\n"      },
-		// Flipped these messages -> Prom
-		//{"You may now be gated to by other players.\r\n",
-		// "You are now safe from gating by other players.\r\n"    },
-		{"You are not roleplaying anymore.\r\n",
-		 "You are now roleplaying.\r\n"},
-		{"You will now see people claiming deeds.\r\n",
-		 "You no longer see people claiming deeds.\r\n"},
-		{"You can now no longer have the teleport spell cast on you.\r\n",
-		 "You can now have the teleport spell cast on you.\r\n"},
-		{"You will NOT automatically agree to group people when they request to follow.\r\n",
-		 "You will automatically agree to group people when they request to follow.\r\n"},
-		{"You will no longer see players' full titles.\r\n",
-		 "You can now see players' full titles.\r\n"},
-		{"You will now see graphics.\r\n",
-		 "You will no longer see graphics.\r\n"},
-		{"Lists are no longer reversed.\r\n",
-		 "Lists will now be reversed.\r\n"}
-	};
+    const char *tog_messages[][2] =
+    {
+        {"You are now safe from summoning by other players.\r\n",
+         "You may now be summoned by other players.\r\n"},
+        {"Nohassle disabled.\r\n",
+         "Nohassle enabled.\r\n"},
+        {"Brief mode off.\r\n",
+         "Brief mode on.\r\n"},
+        {"Compact mode off.\r\n",
+         "Compact mode on.\r\n"},
+        {"You can now hear tells.\r\n",
+         "You are now deaf to tells.\r\n"},
+        {"You can now hear auctions.\r\n",
+         "You are now deaf to auctions.\r\n"},
+        {"You can now hear shouts.\r\n",
+         "You are now deaf to shouts.\r\n"},
+        {"You can now hear gossip.\r\n",
+         "You are now deaf to gossip.\r\n"},
+        {"You can now hear the congratulation messages.\r\n",
+         "You are now deaf to the congratulation messages.\r\n"},
+        {"You can now hear the Wiz-channel.\r\n",
+         "You are now deaf to the Wiz-channel.\r\n"},
+        {"You are no longer part of the Quest.\r\n",
+         "Okay, you are part of the Quest!\r\n"},
+        {"You will no longer see the room flags.\r\n",
+         "You will now see the room flags.\r\n"},
+        {"You will now have your communication repeated.\r\n",
+         "You will no longer have your communication repeated.\r\n"},
+        {"HolyLight mode off.\r\n",
+         "HolyLight mode on.\r\n"},
+        {"Nameserver_is_slow changed to NO; IP addresses will now be resolved.\r\n",
+         "Nameserver_is_slow changed to YES; sitenames will no longer be resolved.\r\n"},
+        {"Autoexits disabled.\r\n",
+         "Autoexits enabled.\r\n"},
+        {"AFK flag is now off.\r\n",
+         "AFK flag is now on.\r\n"},
+        {"AutoSplit disabled.\r\n",
+         "AutoSplit enabled.\r\n"},
+        {"AutoLooting disabled.\r\n",
+         "AutoLooting enabled.\r\n"},
+        {"You will no longer AutoAssist.\r\n",
+         "You will now AutoAssist.\r\n"},
+        {"Autogold disabled.\r\n",
+         "Autogold enabled.\r\n"},
+        {"You will no longer see arena messages.\r\n",
+         "You will now see arena messages.\r\n"},
+        {"Ascii objects turned off.\r\n",
+         "Ascii objects turned on.\r\n"},
+        {"You will no longer keep your title after levelling.\r\n",
+         "You will now keep your title after levelling.\r\n"},
+        {"You can now hear the IC channel.\r\n",
+         "You are now deaf to the IC channel.\r\n"},
+        {"Will no longer track through doors.\r\n",
+         "Will now track through doors.\r\n"},
+        {"You will now hear the newbie channel.\r\n",
+         "You will no longer hear the newbie channel.\r\n"},
+        {"You will no longer see battle spam when not fighting.\r\n",
+         "You will now see battle spam when not fighting.\r\n"},
+        {"You will no longer see a message when you receive mail.\r\n",
+         "You will now see a message when you receive mail.\r\n"},
+        {"You can now hear your clan.\r\n",
+         "You will no longer hear your clan.\r\n"},
+        {"You will no longer hear tells when afk.\r\n",
+         "You will now hear tells when afk.\r\n"},
+        {"You will no longer see movement messages.\r\n",
+         "You will now see movement messages.\r\n"},
+        {"You are unmountable now.\r\n",
+         "You are mountable.\r\n"},
+        {"You Hero channel is now On.\r\n",
+         "The Hero channel is now Off.\r\n"},
+        {"Colour codes will be parsed.\r\n",
+         "You will now see colour codes.\r\n"},
+        {"You will not automatically sacrifice corpses.\r\n",
+         "You will now auto-sacrifice corpses.\r\n"},
+        {"Will no longer clear screen in OLC.\r\n",
+         "Will now clear screen in OLC.\r\n"},
+        {"Buildwalk Off.\r\n",
+         "Buildwalk On.\r\n"},
+        {"Compression disabled.\r\n",
+         "Compression enabled.\r\n"},
+        {"Compression will not be enabled automatically.\r\n",
+         "Compression will be automatically enabled if your client supports it.\r\n"},
+        {"You enable the ooc channel.\r\n",
+         "You disable the ooc channel.\r\n"},
+        {"You turn off page wrapping.\r\n",
+         "You turn on page wrapping.\r\n"},
+        {"You unlock your replier.\r\n",
+         "You lock your replier.\r\n"},
+        {"BUSY flag is now off.\r\n",
+         "BUSY flag is now on.\r\n"},
+        {"Aggro mode disabled.\r\n",
+         "Aggro mode enabled.\r\n"},
+        {"Nobrag off.\r\n",
+         "Nobrag on.\r\n"},
+        {"You are now safe from gating by other players.\r\n",
+        "You may now be gated to by other players.\r\n"      },
+        // Flipped these messages -> Prom
+        //{"You may now be gated to by other players.\r\n",
+        // "You are now safe from gating by other players.\r\n"    },
+        {"You are not roleplaying anymore.\r\n",
+         "You are now roleplaying.\r\n"},
+        {"You will now see people claiming deeds.\r\n",
+         "You no longer see people claiming deeds.\r\n"},
+        {"You can now no longer have the teleport spell cast on you.\r\n",
+         "You can now have the teleport spell cast on you.\r\n"},
+        {"You will NOT automatically agree to group people when they request to follow.\r\n",
+         "You will automatically agree to group people when they request to follow.\r\n"},
+        {"You will no longer see players' full titles.\r\n",
+         "You can now see players' full titles.\r\n"},
+        {"You will now see graphics.\r\n",
+         "You will no longer see graphics.\r\n"},
+        {"Lists are no longer reversed.\r\n",
+         "Lists will now be reversed.\r\n"}
+    };
 
 
-	if ( IS_NPC ( ch ) )
-		return;
+    if ( IS_NPC ( ch ) )
+        return;
 
-	switch ( subcmd )
-	{
-		case SCMD_NOSUMMON:
-			result = PRF_TOG_CHK ( ch, PRF_SUMMONABLE );
-			break;
-		case SCMD_NOHASSLE:
-			result = PRF_TOG_CHK ( ch, PRF_NOHASSLE );
-			break;
-		case SCMD_BRIEF:
-			result = PRF_TOG_CHK ( ch, PRF_BRIEF );
-			break;
-		case SCMD_COMPACT:
-			result = PRF_TOG_CHK ( ch, PRF_COMPACT );
-			break;
-		case SCMD_NOTELL:
-			result = PRF_TOG_CHK ( ch, PRF_NOTELL );
-			break;
-		case SCMD_NOAUCTION:
-			result = PRF_TOG_CHK ( ch, PRF_NOAUCT );
-			break;
-		case SCMD_DEAF:
-			result = PRF_TOG_CHK ( ch, PRF_DEAF );
-			break;
-		case SCMD_NOGOSSIP:
-			result = PRF_TOG_CHK ( ch, PRF_NOGOSS );
-			break;
-		case SCMD_NOGRATZ:
-			result = PRF_TOG_CHK ( ch, PRF_NOGRATZ );
-			break;
-		case SCMD_NOWIZ:
-			if ( PLR_FLAGGED ( ch,PLR_IMM_MORT ) || ( GET_LEVEL ( ch ) >LVL_HERO+1 && ( CMD_FLAGGED ( ch, WIZ_IMM1_GRP ) || CMD_FLAGGED2 ( ch, WIZ_IMM1_GRP ) ) ) )
-				result = PRF_TOG_CHK ( ch, PRF_NOWIZ );
-			else
-			{
-				ch->Send ( "Huh?!?\r\n" );
-				result = -1;
-			}
-			break;
-		case SCMD_QUEST:
-			result = PRF_TOG_CHK ( ch, PRF_QUEST );
-			break;
-		case SCMD_ROOMFLAGS:
-			result = PRF_TOG_CHK ( ch, PRF_ROOMFLAGS );
-			break;
-		case SCMD_NOREPEAT:
-			result = PRF_TOG_CHK ( ch, PRF_NOREPEAT );
-			break;
-		case SCMD_HOLYLIGHT:
-			result = PRF_TOG_CHK ( ch, PRF_HOLYLIGHT );
-			break;
-		case SCMD_SLOWNS:
-			result = ( CONFIG_NS_IS_SLOW = !CONFIG_NS_IS_SLOW );
-			break;
-		case SCMD_AUTOEXIT:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOEXIT );
-			break;
-		case SCMD_AFK:
-			result = PRF_TOG_CHK ( ch, PRF_AFK );
-			if ( PRF_FLAGGED ( ch, PRF_AFK ) )
-				parse_afk ( ch, argument );
-			else
-				parse_afk ( ch, NULL );
-			break;
-		case SCMD_RP:
-			result = PRF_TOG_CHK ( ch, PRF_RP );
-			break;
-		case SCMD_AGGRO:
-			result = PRF_TOG_CHK ( ch, PRF_AGGRO );
-			break;
-		case SCMD_BUSY:
-			result = PRF_TOG_CHK ( ch, PRF_BUSY );
-			if ( PRF_FLAGGED ( ch, PRF_BUSY ) )
-				parse_busy ( ch, argument );
-			else
-				parse_busy ( ch, NULL );
-			break;
-		case SCMD_AUTOSPLIT:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOSPLIT );
-			break;
-		case SCMD_AUTOLOOT:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOLOOT );
-			break;
-		case SCMD_AUTOASSIST:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOASSIST );
-			break;
-		case SCMD_AUTOGOLD:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOGOLD );
-			break;
-		case SCMD_ARENA:
-			result = PRF_TOG_CHK ( ch, PRF_ARENA );
-			break;
-		case SCMD_KEEPTITLE:
-			result = PRF_TOG_CHK ( ch, PRF_KEEPTITLE );
-			break;
-		case SCMD_NOIC:
-			result = PRF_TOG_CHK ( ch, PRF_NOIC );
-			break;
-		case SCMD_BATTLESPAM:
-			result = PRF_TOG_CHK ( ch, PRF_BATTLESPAM );
-			break;
-		case SCMD_MAIL:
-			result = PRF_TOG_CHK ( ch, PRF_MAIL );
-			break;
-		case SCMD_NOCTALK:
-			result = PRF_TOG_CHK ( ch, PRF_NOCTALK );
-			break;
-		case SCMD_AFKTELL:
-			result = PRF_TOG_CHK ( ch, PRF_AFKTELL );
-			break;
-		case SCMD_MOVEMSG:
-			result = PRF_TOG_CHK ( ch, PRF_MOVEMSG );
-			break;
-		case SCMD_NOHERO:
-			result = PRF_TOG_CHK ( ch, PRF_NOHERO );
-			break;
-		case SCMD_NONEWBIE:
-			result = PRF_TOG_CHK ( ch, PRF_NONEWBIE );
-			break;
-		case SCMD_SHOW_COLOUR_CODE:
-			result = PRF_TOG_CHK ( ch, PRF_SHOW_COLOUR_CODE );
-			break;
-		case SCMD_AUTOSAC:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOSAC );
-			break;
-		case SCMD_MOUNTABLE:
-			result = PRF_TOG_CHK ( ch, PRF_MOUNTABLE );
-			break;
-		case SCMD_TRACK:
-			result = ( CONFIG_TRACK_T_DOORS = !CONFIG_TRACK_T_DOORS );
-			break;
-		case SCMD_CLS:
-			result = PRF_TOG_CHK ( ch, PRF_CLS );
-			break;
-		case SCMD_NOGATE:
-			result = PRF_TOG_CHK ( ch, PRF_GATEABLE );
-			break;
-		case SCMD_NOTELEPORT:
-			if ( IS_PK ( ch ) )
-				ch->Send ( "As a PKer, the teleport toggle will not work vs other PK players.\r\n" );
-			result = PRF_TOG_CHK ( ch, PRF_TELEPORTABLE );
-			break;
-		case SCMD_AUTOGROUP:
-			result = PRF_TOG_CHK ( ch, PRF_AUTOGROUP );
-			break;
-		case SCMD_BUILDWALK:
-			if ( GET_LEVEL ( ch ) < LVL_BUILDER )
-			{
-				ch->Send ( "Builders only, sorry.\r\n" );
-				return;
-			}
-			result = PRF_TOG_CHK ( ch, PRF_BUILDWALK );
-			if ( PRF_FLAGGED ( ch, PRF_BUILDWALK ) )
-				new_mudlog ( CMP, GET_LEVEL ( ch ), TRUE,
-				             "OLC: %s turned buildwalk on. Allowed zone %d", GET_NAME ( ch ), GET_OLC_ZONE ( ch ) );
-			else
-				new_mudlog ( CMP, GET_LEVEL ( ch ), TRUE,
-				             "OLC: %s turned buildwalk off. Allowed zone %d", GET_NAME ( ch ), GET_OLC_ZONE ( ch ) );
-			break;
+    switch ( subcmd )
+    {
+        case SCMD_NOSUMMON:
+            result = PRF_TOG_CHK ( ch, PRF_SUMMONABLE );
+            break;
+        case SCMD_NOHASSLE:
+            result = PRF_TOG_CHK ( ch, PRF_NOHASSLE );
+            break;
+        case SCMD_BRIEF:
+            result = PRF_TOG_CHK ( ch, PRF_BRIEF );
+            break;
+        case SCMD_COMPACT:
+            result = PRF_TOG_CHK ( ch, PRF_COMPACT );
+            break;
+        case SCMD_NOTELL:
+            result = PRF_TOG_CHK ( ch, PRF_NOTELL );
+            break;
+        case SCMD_NOAUCTION:
+            result = PRF_TOG_CHK ( ch, PRF_NOAUCT );
+            break;
+        case SCMD_DEAF:
+            result = PRF_TOG_CHK ( ch, PRF_DEAF );
+            break;
+        case SCMD_NOGOSSIP:
+            result = PRF_TOG_CHK ( ch, PRF_NOGOSS );
+            break;
+        case SCMD_NOGRATZ:
+            result = PRF_TOG_CHK ( ch, PRF_NOGRATZ );
+            break;
+        case SCMD_NOWIZ:
+            if ( PLR_FLAGGED ( ch,PLR_IMM_MORT ) || ( GET_LEVEL ( ch ) >LVL_HERO+1 && ( CMD_FLAGGED ( ch, WIZ_IMM1_GRP ) || CMD_FLAGGED2 ( ch, WIZ_IMM1_GRP ) ) ) )
+                result = PRF_TOG_CHK ( ch, PRF_NOWIZ );
+            else
+            {
+                ch->Send ( "Huh?!?\r\n" );
+                result = -1;
+            }
+            break;
+        case SCMD_QUEST:
+            result = PRF_TOG_CHK ( ch, PRF_QUEST );
+            break;
+        case SCMD_ROOMFLAGS:
+            result = PRF_TOG_CHK ( ch, PRF_ROOMFLAGS );
+            break;
+        case SCMD_NOREPEAT:
+            result = PRF_TOG_CHK ( ch, PRF_NOREPEAT );
+            break;
+        case SCMD_HOLYLIGHT:
+            result = PRF_TOG_CHK ( ch, PRF_HOLYLIGHT );
+            break;
+        case SCMD_SLOWNS:
+            result = ( CONFIG_NS_IS_SLOW = !CONFIG_NS_IS_SLOW );
+            break;
+        case SCMD_AUTOEXIT:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOEXIT );
+            break;
+        case SCMD_AFK:
+            result = PRF_TOG_CHK ( ch, PRF_AFK );
+            if ( PRF_FLAGGED ( ch, PRF_AFK ) )
+                parse_afk ( ch, argument );
+            else
+                parse_afk ( ch, NULL );
+            break;
+        case SCMD_RP:
+            result = PRF_TOG_CHK ( ch, PRF_RP );
+            break;
+        case SCMD_AGGRO:
+            result = PRF_TOG_CHK ( ch, PRF_AGGRO );
+            break;
+        case SCMD_BUSY:
+            result = PRF_TOG_CHK ( ch, PRF_BUSY );
+            if ( PRF_FLAGGED ( ch, PRF_BUSY ) )
+                parse_busy ( ch, argument );
+            else
+                parse_busy ( ch, NULL );
+            break;
+        case SCMD_AUTOSPLIT:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOSPLIT );
+            break;
+        case SCMD_AUTOLOOT:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOLOOT );
+            break;
+        case SCMD_AUTOASSIST:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOASSIST );
+            break;
+        case SCMD_AUTOGOLD:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOGOLD );
+            break;
+        case SCMD_ARENA:
+            result = PRF_TOG_CHK ( ch, PRF_ARENA );
+            break;
+        case SCMD_KEEPTITLE:
+            result = PRF_TOG_CHK ( ch, PRF_KEEPTITLE );
+            break;
+        case SCMD_NOIC:
+            result = PRF_TOG_CHK ( ch, PRF_NOIC );
+            break;
+        case SCMD_BATTLESPAM:
+            result = PRF_TOG_CHK ( ch, PRF_BATTLESPAM );
+            break;
+        case SCMD_MAIL:
+            result = PRF_TOG_CHK ( ch, PRF_MAIL );
+            break;
+        case SCMD_NOCTALK:
+            result = PRF_TOG_CHK ( ch, PRF_NOCTALK );
+            break;
+        case SCMD_AFKTELL:
+            result = PRF_TOG_CHK ( ch, PRF_AFKTELL );
+            break;
+        case SCMD_MOVEMSG:
+            result = PRF_TOG_CHK ( ch, PRF_MOVEMSG );
+            break;
+        case SCMD_NOHERO:
+            result = PRF_TOG_CHK ( ch, PRF_NOHERO );
+            break;
+        case SCMD_NONEWBIE:
+            result = PRF_TOG_CHK ( ch, PRF_NONEWBIE );
+            break;
+        case SCMD_SHOW_COLOUR_CODE:
+            result = PRF_TOG_CHK ( ch, PRF_SHOW_COLOUR_CODE );
+            break;
+        case SCMD_AUTOSAC:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOSAC );
+            break;
+        case SCMD_MOUNTABLE:
+            result = PRF_TOG_CHK ( ch, PRF_MOUNTABLE );
+            break;
+        case SCMD_TRACK:
+            result = ( CONFIG_TRACK_T_DOORS = !CONFIG_TRACK_T_DOORS );
+            break;
+        case SCMD_CLS:
+            result = PRF_TOG_CHK ( ch, PRF_CLS );
+            break;
+        case SCMD_NOGATE:
+            result = PRF_TOG_CHK ( ch, PRF_GATEABLE );
+            break;
+        case SCMD_NOTELEPORT:
+            if ( IS_PK ( ch ) )
+                ch->Send ( "As a PKer, the teleport toggle will not work vs other PK players.\r\n" );
+            result = PRF_TOG_CHK ( ch, PRF_TELEPORTABLE );
+            break;
+        case SCMD_AUTOGROUP:
+            result = PRF_TOG_CHK ( ch, PRF_AUTOGROUP );
+            break;
+        case SCMD_BUILDWALK:
+            if ( GET_LEVEL ( ch ) < LVL_BUILDER )
+            {
+                ch->Send ( "Builders only, sorry.\r\n" );
+                return;
+            }
+            result = PRF_TOG_CHK ( ch, PRF_BUILDWALK );
+            if ( PRF_FLAGGED ( ch, PRF_BUILDWALK ) )
+                new_mudlog ( CMP, GET_LEVEL ( ch ), TRUE,
+                             "OLC: %s turned buildwalk on. Allowed zone %d", GET_NAME ( ch ), GET_OLC_ZONE ( ch ) );
+            else
+                new_mudlog ( CMP, GET_LEVEL ( ch ), TRUE,
+                             "OLC: %s turned buildwalk off. Allowed zone %d", GET_NAME ( ch ), GET_OLC_ZONE ( ch ) );
+            break;
 #if defined(HAVE_ZLIB)
-		case SCMD_AUTOZLIB:
-			result = PRF_TOG_CHK ( ch, PRF_NOCOMPRESS );
-			break;
+        case SCMD_AUTOZLIB:
+            result = PRF_TOG_CHK ( ch, PRF_NOCOMPRESS );
+            break;
 #else
-		case SCMD_COMPRESS:
-		case SCMD_AUTOZLIB:
-			*ch << "Compression not supported.\r\n";
-			return;
+        case SCMD_COMPRESS:
+        case SCMD_AUTOZLIB:
+            *ch << "Compression not supported.\r\n";
+            return;
 #endif
-		case SCMD_NOOOC:
-			result = PRF_TOG_CHK ( ch, PRF_OOC );
-			break;
-		case SCMD_PAGEWRAP:
-			result = PRF_TOG_CHK ( ch, PRF_PAGEWRAP );
-			break;
-		case SCMD_REPLYLOCK:
-			result = PRF_TOG_CHK ( ch, PRF_REPLYLOCK );
-			break;
-		case SCMD_NOBRAG:
-			result = PRF_TOG_CHK ( ch, PRF_NOBRAG );
-			break;
-		case SCMD_NODEEDSPAM:
-			result = PRF_TOG_CHK ( ch, PRF_NODEEDSPAM );
-			break;
-		case SCMD_NOTITLE1:
-			result = PRF_TOG_CHK ( ch, PRF_NOTITLE );
-			break;
-		case SCMD_NOGRAPHICS:
-			result = PRF_TOG_CHK ( ch, PRF_NOGRAPHICS );
-			break;
-		case SCMD_REVERSELIST:
-			result = PRF_TOG_CHK ( ch, PRF_REVERSELIST );
-			break;
-		default:
-			log ( "SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd );
-			return;
-	}
-	if ( result!=-1 )
-	{
-		if ( result )
-			ch->Send ( "%s", tog_messages[subcmd][TOG_ON] );
-		else
-			ch->Send ( "%s", tog_messages[subcmd][TOG_OFF] );
-	}
-	return;
+        case SCMD_NOOOC:
+            result = PRF_TOG_CHK ( ch, PRF_OOC );
+            break;
+        case SCMD_PAGEWRAP:
+            result = PRF_TOG_CHK ( ch, PRF_PAGEWRAP );
+            break;
+        case SCMD_REPLYLOCK:
+            result = PRF_TOG_CHK ( ch, PRF_REPLYLOCK );
+            break;
+        case SCMD_NOBRAG:
+            result = PRF_TOG_CHK ( ch, PRF_NOBRAG );
+            break;
+        case SCMD_NODEEDSPAM:
+            result = PRF_TOG_CHK ( ch, PRF_NODEEDSPAM );
+            break;
+        case SCMD_NOTITLE1:
+            result = PRF_TOG_CHK ( ch, PRF_NOTITLE );
+            break;
+        case SCMD_NOGRAPHICS:
+            result = PRF_TOG_CHK ( ch, PRF_NOGRAPHICS );
+            break;
+        case SCMD_REVERSELIST:
+            result = PRF_TOG_CHK ( ch, PRF_REVERSELIST );
+            break;
+        default:
+            log ( "SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd );
+            return;
+    }
+    if ( result!=-1 )
+    {
+        if ( result )
+            ch->Send ( "%s", tog_messages[subcmd][TOG_ON] );
+        else
+            ch->Send ( "%s", tog_messages[subcmd][TOG_OFF] );
+    }
+    return;
 }
 
 
 ACMD ( do_file )
 {
-	FILE *req_file;
-	int i, l, line_number;
-	char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	char *arg3;
-	size_t pos, len = 0;
-	vector<string> entries;
-	string entry;
+    FILE *req_file;
+    int i, l, line_number;
+    char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
+    char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+    char *arg3;
+    size_t pos, len = 0;
+    vector<string> entries;
+    string entry;
 
-	struct file_struct
-	{
-		string cmd;
-		char level;
-		string file;
-	}
-	fields[] =
-	{
-		{"none",  55,  "Does Nothing"      },
-		{"bug",        54,  BUG_FILE       },
-		{"typo",  54,  TYPO_FILE      },
-		{"ideas",      55,  IDEA_FILE      },
-		{"xnames",     55,  "../lib/misc/xnames"     },
-		{"levels",     55,  "../log/levels"          },
-		{"rip",        55,  "../log/rip"        },
-		{"dt",         55,  "../log/dts"        },
-		{"help",  54,  "../log/missing-help"    },
-		{"comlog",     54,  "../log/comlog"          },
-		{"errors",     55,  "../log/errors"          },
-		{"godcmds",    55,  "../log/godcmds"    },
-		{"syslog",     55,  "../log/syslog"          },
-		{"crash",      55,  "../syslog.CRASH"   },
-		{"\n",         0,   "\n"           }
-	};
+    struct file_struct
+    {
+        string cmd;
+        char level;
+        string file;
+    }
+    fields[] =
+    {
+        {"none",  55,  "Does Nothing"      },
+        {"bug",        54,  BUG_FILE       },
+        {"typo",  54,  TYPO_FILE      },
+        {"ideas",      55,  IDEA_FILE      },
+        {"xnames",     55,  "../lib/misc/xnames"     },
+        {"levels",     55,  "../log/levels"          },
+        {"rip",        55,  "../log/rip"        },
+        {"dt",         55,  "../log/dts"        },
+        {"help",  54,  "../log/missing-help"    },
+        {"comlog",     54,  "../log/comlog"          },
+        {"errors",     55,  "../log/errors"          },
+        {"godcmds",    55,  "../log/godcmds"    },
+        {"syslog",     55,  "../log/syslog"          },
+        {"crash",      55,  "../syslog.CRASH"   },
+        {"\n",         0,   "\n"           }
+    };
 
-	skip_spaces ( &argument );
+    skip_spaces ( &argument );
 
-	if ( !*argument )
-	{
-		ch->Send ( "USAGE: file <option> <num lines>\r\n"
-			   "       file <option> search <search phrase>\r\n"
-			   "       file <bug|typo> fixed <line number>\r\n"
-			   "       file <bug|typo> [all] <num lines>\r\n\r\n"
-			   "File options:\r\n" );
+    if ( !*argument )
+    {
+        ch->Send ( "USAGE: file <option> <num lines>\r\n"
+               "       file <option> search <search phrase>\r\n"
+               "       file <bug|typo> fixed <line number>\r\n"
+               "       file <bug|typo> [all] <num lines>\r\n\r\n"
+               "File options:\r\n" );
 
-		for ( i = 1; fields[i].level; i++ )
-			if ( fields[i].level <= GET_LEVEL ( ch ) )
-				ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(),
-				           fields[i].file.c_str() );
-		return;
-	}
+        for ( i = 1; fields[i].level; i++ )
+            if ( fields[i].level <= GET_LEVEL ( ch ) )
+                ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(),
+                           fields[i].file.c_str() );
+        return;
+    }
 
-	arg3 = two_arguments ( argument, field, arg2 );
+    arg3 = two_arguments ( argument, field, arg2 );
 
-	for ( l = 0; * ( fields[l].cmd.c_str() ) != '\n'; l++ )
-		if ( !strncmp ( field, fields[l].cmd.c_str(), strlen ( field ) ) )
-			break;
+    for ( l = 0; * ( fields[l].cmd.c_str() ) != '\n'; l++ )
+        if ( !strncmp ( field, fields[l].cmd.c_str(), strlen ( field ) ) )
+            break;
 
-	if ( * ( fields[l].cmd.c_str() ) == '\n' )
-	{
-		*ch << "That is not a valid option!\r\n";
-		return;
-	}
+    if ( * ( fields[l].cmd.c_str() ) == '\n' )
+    {
+        *ch << "That is not a valid option!\r\n";
+        return;
+    }
 
-	if ( GET_LEVEL ( ch ) < fields[l].level )
-	{
-		*ch << "You are not godly enough to view that file!\r\n";
-		return;
-	}
+    if ( GET_LEVEL ( ch ) < fields[l].level )
+    {
+        *ch << "You are not godly enough to view that file!\r\n";
+        return;
+    }
 
-	if ( ! ( req_file = fopen ( fields[l].file.c_str(), "r" ) ) )
-	{
-		new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error opening file %s using 'file' command.",
-		             fields[l].file.c_str() );
-		return;
-	}
+    if ( ! ( req_file = fopen ( fields[l].file.c_str(), "r" ) ) )
+    {
+        new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error opening file %s using 'file' command.",
+                     fields[l].file.c_str() );
+        return;
+    }
 
-	if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
-	{
-		get_line ( req_file, line );
-		while ( !feof ( req_file ) )
-		{
-			entry += string ( line );
-			while ( ( pos = entry.find ( "<table", 1 ) ) != string::npos )
-			{
-				entries.push_back ( entry.substr ( 0, pos ) );
-				entry = entry.substr ( pos );
-			}
-			get_line ( req_file, line );
-		}
-		fclose ( req_file );
-		entries.push_back ( entry );
-	}
-	else
-	{
-		get_line ( req_file, line );
-		while ( !feof ( req_file ) )
-		{
-			entries.push_back ( string ( line ) );
-			get_line ( req_file, line );
-		}
-		fclose ( req_file );
-	}
+    if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
+    {
+        get_line ( req_file, line );
+        while ( !feof ( req_file ) )
+        {
+            entry += string ( line );
+            while ( ( pos = entry.find ( "<table", 1 ) ) != string::npos )
+            {
+                entries.push_back ( entry.substr ( 0, pos ) );
+                entry = entry.substr ( pos );
+            }
+            get_line ( req_file, line );
+        }
+        fclose ( req_file );
+        entries.push_back ( entry );
+    }
+    else
+    {
+        get_line ( req_file, line );
+        while ( !feof ( req_file ) )
+        {
+            entries.push_back ( string ( line ) );
+            get_line ( req_file, line );
+        }
+        fclose ( req_file );
+    }
 
-	if ( !strcmp ( arg2, "search" ) )
-	{
-		string text = "";
-		int len = strlen ( arg3 );
-		for ( auto &e : entries )
-			if ( search ( e.begin(), e.end(), arg3, arg3 + len, [](char c1, char c2) { return toupper ( c1 ) == toupper ( c2 ); } ) != e.end() )
-				text += "\r\n" + e;
+    if ( !strcmp ( arg2, "search" ) )
+    {
+        string text = "";
+        int len = strlen ( arg3 );
+        for ( auto &e : entries )
+            if ( search ( e.begin(), e.end(), arg3, arg3 + len, [](char c1, char c2) { return toupper ( c1 ) == toupper ( c2 ); } ) != e.end() )
+                text += "\r\n" + e;
 
-		if ( text == "" )
-			ch->Send ( "No matches found.\r\n" );
-		else
-		{
-			text += "\r\n";
-			page_string ( ch->desc, (char*) text.c_str(), 1 );
-		}
-		return;
-	}
+        if ( text == "" )
+            ch->Send ( "No matches found.\r\n" );
+        else
+        {
+            text += "\r\n";
+            page_string ( ch->desc, (char*) text.c_str(), 1 );
+        }
+        return;
+    }
 
-	/* toggle (fixed) in bug or typo file */
+    /* toggle (fixed) in bug or typo file */
 
-	if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
-	{
+    if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
+    {
 
-		line_number = atoi ( arg3 );
+        line_number = atoi ( arg3 );
 
-		if ( line_number < 1 || line_number > entries.size() )
-		{
-			ch->Send ( "Line number %d doesn't exist.\r\n", line_number );
-			return;
-		}
+        if ( line_number < 1 || line_number > entries.size() )
+        {
+            ch->Send ( "Line number %d doesn't exist.\r\n", line_number );
+            return;
+        }
 
-		if ( entries [ line_number - 1 ].rfind ( "(fixed)" ) == entries [ line_number - 1].length() - 7 )
-			entries [ line_number - 1 ]  = entries [ line_number - 1].substr ( 0, entries [ line_number - 1 ].length() - 7 );
-		else entries [ line_number - 1 ] += "(fixed)";
+        if ( entries [ line_number - 1 ].rfind ( "(fixed)" ) == entries [ line_number - 1].length() - 7 )
+            entries [ line_number - 1 ]  = entries [ line_number - 1].substr ( 0, entries [ line_number - 1 ].length() - 7 );
+        else entries [ line_number - 1 ] += "(fixed)";
 
-		strlcpy ( buf, entries [ line_number - 1 ].c_str(), sizeof ( buf ) );
-		ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
-		ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-		ch->Send ( "%d. %s\r\n", line_number, buf );
+        strlcpy ( buf, entries [ line_number - 1 ].c_str(), sizeof ( buf ) );
+        ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+        ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+        ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+        ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+        ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
+        ch->Send ( "%d. %s\r\n", line_number, buf );
 
-		if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
-		{
-			new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.", fields[l].file.c_str() );
-			return;
-		}
+        if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
+        {
+            new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error writing to file %s.", fields[l].file.c_str() );
+            return;
+        }
 
-		for ( i = 0; i < entries.size(); ++i )
-		{
-			fputs ( entries[i].c_str(), req_file );
-			fputs ( "\n", req_file );
-		}
-		fclose ( req_file );
+        for ( i = 0; i < entries.size(); ++i )
+        {
+            fputs ( entries[i].c_str(), req_file );
+            fputs ( "\n", req_file );
+        }
+        fclose ( req_file );
 
-		return;
-	}
+        return;
+    }
 
-	bool show_all = FALSE;
-	int req_entries = 0;
-	skip_spaces ( &arg3 );
-	if ( !strcmp ( arg2, "all" ) )
-	{
-		show_all = TRUE;
-		if ( !*arg3 )
-			req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
-		else
-			req_entries = MIN ( atoi ( arg3 ), (int) entries.size() );
-	}
-	else if ( !*arg2 )
-		req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
-	else if ( !is_number ( arg2 ) )
-	{
-		ch->Send ( "Usage error: expected a number, but got %s.\r\n", arg2 );
-		return;
-	}
-	else
-		req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
+    bool show_all = FALSE;
+    int req_entries = 0;
+    skip_spaces ( &arg3 );
+    if ( !strcmp ( arg2, "all" ) )
+    {
+        show_all = TRUE;
+        if ( !*arg3 )
+            req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
+        else
+            req_entries = MIN ( atoi ( arg3 ), (int) entries.size() );
+    }
+    else if ( !*arg2 )
+        req_entries = MIN ( 15, (int) entries.size() );      /* default is the last 15 entries */
+    else if ( !is_number ( arg2 ) )
+    {
+        ch->Send ( "Usage error: expected a number, but got %s.\r\n", arg2 );
+        return;
+    }
+    else
+        req_entries = MIN ( atoi ( arg2 ), (int) entries.size() );
 
-	/* if not all entries are shown, skip the ones with "(fixed)" in them */
-	vector<int> entries_to_show;
-	for ( i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
-	{
-		if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) && entries[i].find ( "(fixed)" ) != string::npos )
-			continue;
+    /* if not all entries are shown, skip the ones with "(fixed)" in them */
+    vector<int> entries_to_show;
+    for ( i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
+    {
+        if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) && entries[i].find ( "(fixed)" ) != string::npos )
+            continue;
 
-		entries_to_show.push_back ( i );
-		req_entries--;
-	}
+        entries_to_show.push_back ( i );
+        req_entries--;
+    }
 
-	/* strip the tags from the entries and page them */
-	buf2[0] = '\0';
-	for ( i = entries_to_show.size() - 1; i >= 0; --i )
-	{
-		if ( entries[ entries_to_show[i] ].length() + 10 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
-			break;
+    /* strip the tags from the entries and page them */
+    buf2[0] = '\0';
+    for ( i = entries_to_show.size() - 1; i >= 0; --i )
+    {
+        if ( entries[ entries_to_show[i] ].length() + 10 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
+            break;
 
-		strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );
+        strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );
 
-		if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
-		{
-			ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
-			ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
-			ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
-			ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
-			ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
-		}
-		else
-			len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
-	}
+        if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
+        {
+            ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+            ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+            ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+            ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+            ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
+            len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
+        }
+        else
+            len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
+    }
 
-	page_string ( ch->desc, buf2, 1 );
+    page_string ( ch->desc, buf2, 1 );
 
 }
 
 
 ACMD ( do_sac )
 {
-	struct obj_data *obj;
-	char arg[MAX_INPUT_LENGTH];
+    struct obj_data *obj;
+    char arg[MAX_INPUT_LENGTH];
 
-	one_argument ( argument, arg );
+    one_argument ( argument, arg );
 
-	// note, I like to take care of no arg and wrong args up front, not
-	// at the end of a function, lets get the wrongness out of the way :)
-	if ( !*arg )
-	{
-		*ch << "OK, but what do you want to sacrifice?\r\n";
-		return;
-	}
-	// if it's not in the room, we ain't gonna sac it
-	if ( !( obj = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents ) ) )
-	{
-		*ch << "There is nothing like that here. Try again.\r\n";
-		return;
-	}
-	// nifty, got the object in the room, now check its flags
-	if ( !CAN_WEAR ( obj, ITEM_WEAR_TAKE ) || OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
-	{
-		*ch << "You can't sacrifice that.\r\n";
-		return;
-	}
-	if ( OBJ_SAT_IN_BY ( obj ) != NULL )
-	{
-		ch->Send ( "You can't sacrifice that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
-		return;
-	}
-	if ( OBJ_FLAGGED ( obj, ITEM_NO_SAC ) && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
-	{
-		ch->Send ( "You can't sacrifice that, it doesn't belong to you.\r\n" );
-		return;
-	}
-	// seems as if everything checks out eh? ok now do it
-	act ( "$n sacrifices $p.", FALSE, ch, obj, 0, TO_ROOM );
-	act ( "You sacrifice $p to your god.\r\nYou have been rewarded by your deity.\r\n", FALSE, ch, obj, 0, TO_CHAR );
-	if ( GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
-		if ( IN_ROOM ( ch ) )
-			new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TOKEN] %s sacs %s in room %d",  GET_NAME ( ch ), obj->short_description, GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
-	if ( GET_MOVE ( ch ) < GET_MAX_MOVE ( ch ) )
-		alter_move ( ch, -2 );
-	else
-		alter_mana ( ch, -5 );
-	extract_obj ( obj );
+    // note, I like to take care of no arg and wrong args up front, not
+    // at the end of a function, lets get the wrongness out of the way :)
+    if ( !*arg )
+    {
+        *ch << "OK, but what do you want to sacrifice?\r\n";
+        return;
+    }
+    // if it's not in the room, we ain't gonna sac it
+    if ( !( obj = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents ) ) )
+    {
+        *ch << "There is nothing like that here. Try again.\r\n";
+        return;
+    }
+    // nifty, got the object in the room, now check its flags
+    if ( !CAN_WEAR ( obj, ITEM_WEAR_TAKE ) || OBJ_FLAGGED ( obj, ITEM_PC_CORPSE ) )
+    {
+        *ch << "You can't sacrifice that.\r\n";
+        return;
+    }
+    if ( OBJ_SAT_IN_BY ( obj ) != NULL )
+    {
+        ch->Send ( "You can't sacrifice that, %s is sitting on it.\r\n", GET_NAME ( OBJ_SAT_IN_BY ( obj ) ) );
+        return;
+    }
+    if ( OBJ_FLAGGED ( obj, ITEM_NO_SAC ) && obj->owner > 0 && obj->owner != GET_ID ( ch ) )
+    {
+        ch->Send ( "You can't sacrifice that, it doesn't belong to you.\r\n" );
+        return;
+    }
+    // seems as if everything checks out eh? ok now do it
+    act ( "$n sacrifices $p.", FALSE, ch, obj, 0, TO_ROOM );
+    act ( "You sacrifice $p to your god.\r\nYou have been rewarded by your deity.\r\n", FALSE, ch, obj, 0, TO_CHAR );
+    if ( GET_OBJ_VNUM ( obj ) >= 3300 && GET_OBJ_VNUM ( obj ) <= 3312 )
+        if ( IN_ROOM ( ch ) )
+            new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TOKEN] %s sacs %s in room %d",  GET_NAME ( ch ), obj->short_description, GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+    if ( GET_MOVE ( ch ) < GET_MAX_MOVE ( ch ) )
+        alter_move ( ch, -2 );
+    else
+        alter_mana ( ch, -5 );
+    extract_obj ( obj );
 }
 #if 0
 void write_aliases ( Character *ch )
 {
-	FILE *file;
-	char fn[127], buf1[MAX_STRING_LENGTH *2], *buf;
-	struct alias_data *temp;
-	int length;
+    FILE *file;
+    char fn[127], buf1[MAX_STRING_LENGTH *2], *buf;
+    struct alias_data *temp;
+    int length;
 
-	get_filename ( GET_NAME ( ch ), fn, ALIAS_FILE );
-	unlink ( fn );
-	if ( !GET_ALIASES ( ch ) )
-		return;
+    get_filename ( GET_NAME ( ch ), fn, ALIAS_FILE );
+    unlink ( fn );
+    if ( !GET_ALIASES ( ch ) )
+        return;
 
-	file = fopen ( fn, "wt" );
+    file = fopen ( fn, "wt" );
 
-	temp = GET_ALIASES ( ch );
+    temp = GET_ALIASES ( ch );
 
-	while ( temp )
-	{
-		length = strlen ( temp->alias );
-		if ( length <= 250 )
-		{
-			fprintf ( file, "%d\n", length );
-			fprintf ( file, "%s\n", temp->alias );
-			snprintf ( buf1, sizeof ( buf1 ), "%s", temp->replacement );
-			buf = buf1;
-			while ( *++buf == ' ' );
-			length = strlen ( buf );
-			fprintf ( file, "%d\n", length );
-			fprintf ( file, "%s\n", buf );
-			fprintf ( file, "%d\n", temp->type );
-			temp = temp->next;
+    while ( temp )
+    {
+        length = strlen ( temp->alias );
+        if ( length <= 250 )
+        {
+            fprintf ( file, "%d\n", length );
+            fprintf ( file, "%s\n", temp->alias );
+            snprintf ( buf1, sizeof ( buf1 ), "%s", temp->replacement );
+            buf = buf1;
+            while ( *++buf == ' ' );
+            length = strlen ( buf );
+            fprintf ( file, "%d\n", length );
+            fprintf ( file, "%s\n", buf );
+            fprintf ( file, "%d\n", temp->type );
+            temp = temp->next;
 
-		}
+        }
 
-	}
-	fclose ( file );
+    }
+    fclose ( file );
 }
 
 void read_aliases ( Character *ch )
 {
-	FILE *file;
-	char fn[256];
-	struct alias_data *t2;
-	int length = 0;
-	char temp_buf[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+    FILE *file;
+    char fn[256];
+    struct alias_data *t2;
+    int length = 0;
+    char temp_buf[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 
-	get_filename ( GET_NAME ( ch ), fn, ALIAS_FILE );
+    get_filename ( GET_NAME ( ch ), fn, ALIAS_FILE );
 
-	file = fopen ( fn, "r" );
+    file = fopen ( fn, "r" );
 
-	if ( !file )
-		return;
+    if ( !file )
+        return;
 
-	CREATE ( GET_ALIASES ( ch ), struct alias_data, 1 );
-	t2 = GET_ALIASES ( ch );
-	do
-	{
-		fscanf ( file, "%d\n", &length );
-		fgets ( buf, length + 1, file );
-		t2->alias = strdup ( buf );
-		fscanf ( file, "%d\n", &length );
+    CREATE ( GET_ALIASES ( ch ), struct alias_data, 1 );
+    t2 = GET_ALIASES ( ch );
+    do
+    {
+        fscanf ( file, "%d\n", &length );
+        fgets ( buf, length + 1, file );
+        t2->alias = strdup ( buf );
+        fscanf ( file, "%d\n", &length );
 
-		fgets ( buf, length + 1, file );
+        fgets ( buf, length + 1, file );
 
-		strcpy ( temp_buf, " " );
-		if ( length < MAX_INPUT_LENGTH )
-		{
-			strcat ( temp_buf, buf );
-		}
-		t2->replacement = strdup ( temp_buf );
+        strcpy ( temp_buf, " " );
+        if ( length < MAX_INPUT_LENGTH )
+        {
+            strcat ( temp_buf, buf );
+        }
+        t2->replacement = strdup ( temp_buf );
 
-		fscanf ( file, "%d\n", &length );
-		t2->type = length;
-		if ( !feof ( file ) )
-		{
-			CREATE ( t2->next, struct alias_data, 1 );
-			t2 = t2->next;
-		}
-	}
-	while ( !feof ( file ) );
+        fscanf ( file, "%d\n", &length );
+        t2->type = length;
+        if ( !feof ( file ) )
+        {
+            CREATE ( t2->next, struct alias_data, 1 );
+            t2 = t2->next;
+        }
+    }
+    while ( !feof ( file ) );
 
-	fclose ( file );
+    fclose ( file );
 }
 #endif
 
@@ -2071,241 +2071,241 @@ void read_poofs(Character *ch)
 **********************************************************************/
 const char *msgs[][2] =
 {
-	{"You start to break some floor boards when you dig.\r\n",
-		"$n starts to break some floor boards as $e starts digging.\r\n"
-	},
+    {"You start to break some floor boards when you dig.\r\n",
+        "$n starts to break some floor boards as $e starts digging.\r\n"
+    },
 
-	{"You wonder if this is a good place after all, with all the gravel.\r\n",
-	 "$n breaks a sweat digging up all the gravel here.\r\n"},
+    {"You wonder if this is a good place after all, with all the gravel.\r\n",
+     "$n breaks a sweat digging up all the gravel here.\r\n"},
 
-	{"You make a nice hole while digging up a lot of dirt.\r\n",
-	 "$n digs a hole and goes about $s business.\r\n"},
+    {"You make a nice hole while digging up a lot of dirt.\r\n",
+     "$n digs a hole and goes about $s business.\r\n"},
 
-	{"You seem to be hitting a lot of roots when you dig.\r\n",
-	 "$n look like $e is trying to dig up a tree!\r\n"},
+    {"You seem to be hitting a lot of roots when you dig.\r\n",
+     "$n look like $e is trying to dig up a tree!\r\n"},
 
-	{"You dig up more clay than dirt here.\r\n",
-	 "$n seems to be digging up alot of clay.\r\n"},
+    {"You dig up more clay than dirt here.\r\n",
+     "$n seems to be digging up alot of clay.\r\n"},
 
-	{"You start to chip away at the rock here.\r\n",
-	 "$n bangs away at the side of the mountain.\r\n"},
+    {"You start to chip away at the rock here.\r\n",
+     "$n bangs away at the side of the mountain.\r\n"},
 
-	{"You can't dig in the water!\r\n",
-	 NULL},
+    {"You can't dig in the water!\r\n",
+     NULL},
 
-	{"You can't dig in the water!\r\n",
-	 NULL},
+    {"You can't dig in the water!\r\n",
+     NULL},
 
-	{"You can't dig in the water!\r\n",
-	 NULL},
+    {"You can't dig in the water!\r\n",
+     NULL},
 
-	{"You can't dig up air!\r\n",
-	 NULL},
+    {"You can't dig up air!\r\n",
+     NULL},
 
-	{"You start moving sand out of the way.\r\n",
-	 "$n starts moving sand out of the way.\r\n"},
+    {"You start moving sand out of the way.\r\n",
+     "$n starts moving sand out of the way.\r\n"},
 
 
 
-	//SECT_SPACE         11   /* In outer space                  */
-	{"You can't dig in space!\r\n",
-	 NULL},
-	//SECT_ROAD          12   /* On a Road                       */
-	{"You can't dig the road up!\r\n",
-	 NULL},
-	//SECT_ENTRANCE      13   /* Entrance to a zone              */
-	{"You can't dig the entrance up!\r\n",
-	 NULL},
-	//SECT_ATMOSPHERE         14   /* Entrance to a planet            */
-	{"You can't dig in atmosphere!\r\n",
-	 NULL},
-	//SECT_SUN      15   /* Into the Sun                    */
-	{"You can't dig on a sun!\r\n",
-	 NULL},
-	//SECT_BLACKHOLE          16   /* Into a Black Hole               */
-	{"You can't dig in a black hole!\r\n",
-	 NULL},
-	//SECT_VEHICLE       17   /* Internal use only               */
-	{"You can't dig here!\r\n",
-	 NULL},
-	//SECT_SWAMP         18
-	{"You start moving reeds and flies out of the way.\r\n",
-	 "$n starts moving reeds and flies out of the way.\r\n"},
-	//SECT_REEF               19
-	{"You start moving coral and fish out of the way.\r\n",
-	 "$n starts moving coral and fish out of the way.\r\n"},
-	// SECT_TUNDRA          20
-	{"You start moving snow and dry grass out of the way.\r\n",
-	 "$n starts moving snow and dry grass out of the way.\r\n"},
-	//SECT_SNOW          21
-	{"You start moving snow out of the way.\r\n",
-	 "$n starts moving snow out of the way.\r\n"},
-	//SECT_ICE      22
-	{"You start hacking ice out of the way.\r\n",
-	 "$n starts hacking out of the way.\r\n"},
-	//SECT_PRAIRIE 23
-	{"You start moving dry grass and rodents out of the way.\r\n",
-	 "$n starts moving dry grass and rodents out of the way.\r\n"},
-	//SECT_BADLANDS 24
-	{"You start moving glowing rocks out of the way.\r\n",
-	 "$n starts moving glowing rocks out of the way.\r\n"},
+    //SECT_SPACE         11   /* In outer space                  */
+    {"You can't dig in space!\r\n",
+     NULL},
+    //SECT_ROAD          12   /* On a Road                       */
+    {"You can't dig the road up!\r\n",
+     NULL},
+    //SECT_ENTRANCE      13   /* Entrance to a zone              */
+    {"You can't dig the entrance up!\r\n",
+     NULL},
+    //SECT_ATMOSPHERE         14   /* Entrance to a planet            */
+    {"You can't dig in atmosphere!\r\n",
+     NULL},
+    //SECT_SUN      15   /* Into the Sun                    */
+    {"You can't dig on a sun!\r\n",
+     NULL},
+    //SECT_BLACKHOLE          16   /* Into a Black Hole               */
+    {"You can't dig in a black hole!\r\n",
+     NULL},
+    //SECT_VEHICLE       17   /* Internal use only               */
+    {"You can't dig here!\r\n",
+     NULL},
+    //SECT_SWAMP         18
+    {"You start moving reeds and flies out of the way.\r\n",
+     "$n starts moving reeds and flies out of the way.\r\n"},
+    //SECT_REEF               19
+    {"You start moving coral and fish out of the way.\r\n",
+     "$n starts moving coral and fish out of the way.\r\n"},
+    // SECT_TUNDRA          20
+    {"You start moving snow and dry grass out of the way.\r\n",
+     "$n starts moving snow and dry grass out of the way.\r\n"},
+    //SECT_SNOW          21
+    {"You start moving snow out of the way.\r\n",
+     "$n starts moving snow out of the way.\r\n"},
+    //SECT_ICE      22
+    {"You start hacking ice out of the way.\r\n",
+     "$n starts hacking out of the way.\r\n"},
+    //SECT_PRAIRIE 23
+    {"You start moving dry grass and rodents out of the way.\r\n",
+     "$n starts moving dry grass and rodents out of the way.\r\n"},
+    //SECT_BADLANDS 24
+    {"You start moving glowing rocks out of the way.\r\n",
+     "$n starts moving glowing rocks out of the way.\r\n"},
 /* Not sure why this is done like this compared to the others -Prom */
 /* #define SECT_RAIL     25 */
-	//SECT_RAIL 25
-	{"You start moving huge metal rails out of the way.\r\n",
-	 "$n starts moving huge metal rails out of the way.\r\n"},
+    //SECT_RAIL 25
+    {"You start moving huge metal rails out of the way.\r\n",
+     "$n starts moving huge metal rails out of the way.\r\n"},
 
-	/* always keep this as the last message */
+    /* always keep this as the last message */
 
-	{"If you see this please tell a god.\r\n", NULL}
+    {"If you see this please tell a god.\r\n", NULL}
 };
 
 
 ACMD ( do_bury )
 {
-	struct obj_data *obj;
-	char arg[MAX_INPUT_LENGTH];
-	char buf[MAX_INPUT_LENGTH];
+    struct obj_data *obj;
+    char arg[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH];
 
-	half_chop ( argument, arg, buf );
+    half_chop ( argument, arg, buf );
 
-	if ( !*arg )
-	{
-		ch->Send ( "What do you want to %s?\r\n", CMD_NAME );
-		return;
-	}
+    if ( !*arg )
+    {
+        ch->Send ( "What do you want to %s?\r\n", CMD_NAME );
+        return;
+    }
 
-	if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
-	{
-		ch->Send ( "You don't have %s %s.\r\n", AN ( arg ), arg );
-		return;
-	}
-
-
-	/*
-	 ** find the sector types that you don't want people
-	 ** to be able to dig or bury in.
-	 */
-
-	/* display the messages if available */
-
-	if ( msgs[IN_ROOM ( ch )->sector_type][0] != NULL )
-		*ch << msgs[IN_ROOM ( ch )->sector_type][0];
-
-	if ( msgs[IN_ROOM ( ch )->sector_type][1] != NULL )
-		act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL,NULL, TO_ROOM );
-	else
-		return;
+    if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+    {
+        ch->Send ( "You don't have %s %s.\r\n", AN ( arg ), arg );
+        return;
+    }
 
 
-	/* set a wait state */
+    /*
+     ** find the sector types that you don't want people
+     ** to be able to dig or bury in.
+     */
 
-	WAIT_STATE ( ch, 10 RL_SEC );
+    /* display the messages if available */
+
+    if ( msgs[IN_ROOM ( ch )->sector_type][0] != NULL )
+        *ch << msgs[IN_ROOM ( ch )->sector_type][0];
+
+    if ( msgs[IN_ROOM ( ch )->sector_type][1] != NULL )
+        act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL,NULL, TO_ROOM );
+    else
+        return;
 
 
-	act ( "You bury $a $o here.\r\n", TRUE, ch, obj, NULL, TO_CHAR );
-	act ( "$n buries $a $o here.\r\n", TRUE, ch, obj, NULL, TO_ROOM );
+    /* set a wait state */
 
-	obj_from_char ( obj );
-	SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
-	obj_to_room ( obj, IN_ROOM ( ch ) );
+    WAIT_STATE ( ch, 10 RL_SEC );
+
+
+    act ( "You bury $a $o here.\r\n", TRUE, ch, obj, NULL, TO_CHAR );
+    act ( "$n buries $a $o here.\r\n", TRUE, ch, obj, NULL, TO_ROOM );
+
+    obj_from_char ( obj );
+    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
+    obj_to_room ( obj, IN_ROOM ( ch ) );
 };
 ACMD ( do_delay )
 {
-	int n;
-	skip_spaces ( &argument );
-	n = atoi ( argument );
-	if ( n > 0 && n < 300 )
-		WAIT_STATE ( ch, n RL_SEC );
+    int n;
+    skip_spaces ( &argument );
+    n = atoi ( argument );
+    if ( n > 0 && n < 300 )
+        WAIT_STATE ( ch, n RL_SEC );
 }
 
 ACMD ( do_dig_ground )
 {
-	struct obj_data *obj;
-	int chance = 1;
+    struct obj_data *obj;
+    int chance = 1;
 
-	/*
-	 ** find the sector types that you don't want people
-	 ** to be able to dig or bury in.
-	 */
+    /*
+     ** find the sector types that you don't want people
+     ** to be able to dig or bury in.
+     */
 
-	/* display the messages if available */
+    /* display the messages if available */
 
-	if ( msgs[IN_ROOM ( ch )->sector_type][0] != NULL )
-		*ch << msgs[IN_ROOM ( ch )->sector_type][0];
+    if ( msgs[IN_ROOM ( ch )->sector_type][0] != NULL )
+        *ch << msgs[IN_ROOM ( ch )->sector_type][0];
 
-	// Removing the wait state, don't spam the room when digging is unsuccessful
-	if ( msgs[IN_ROOM ( ch )->sector_type][1] != NULL )
-		; // act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM );
-	else
-		return;
-	
-	
-	/* set a wait state */
-
-	//WAIT_STATE ( ch, 4 RL_SEC );
+    // Removing the wait state, don't spam the room when digging is unsuccessful
+    if ( msgs[IN_ROOM ( ch )->sector_type][1] != NULL )
+        ; // act ( msgs[IN_ROOM ( ch )->sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM );
+    else
+        return;
 
 
-	/*
-	 ** search for an object in the room that has a ITEM_BURIED flag
-	 */
+    /* set a wait state */
 
-	obj = IN_ROOM ( ch )->contents;
-	while ( obj != NULL )
-	{
-		if ( IS_BURIED ( obj ) )
-		{
+    //WAIT_STATE ( ch, 4 RL_SEC );
 
 
-			chance += ( GET_INT ( ch ) >= 17 );
+    /*
+     ** search for an object in the room that has a ITEM_BURIED flag
+     */
 
-			if ( ( number ( 1, 6 ) <= chance ) )
-			{
-				/* Remove the buried bit so the player can see it. */
-				REMOVE_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
-				act ( "You found $a $o buried here.\r\n", TRUE, ch, obj,
-				      NULL, TO_CHAR );
-				act ( "$n has found $a $o buried here.\r\n", TRUE, ch, obj,
-				      NULL, TO_ROOM );
-				obj_from_room ( obj );
-				obj_to_char ( obj, ch );
-				return;
-			}
-		}
-		/* go to the next obj in room*/
-		obj = obj->next_content;
-	}
-	/* if the player didn't find anything */
-	*ch << "Sorry! You didn't find anything.\r\n";
+    obj = IN_ROOM ( ch )->contents;
+    while ( obj != NULL )
+    {
+        if ( IS_BURIED ( obj ) )
+        {
+
+
+            chance += ( GET_INT ( ch ) >= 17 );
+
+            if ( ( number ( 1, 6 ) <= chance ) )
+            {
+                /* Remove the buried bit so the player can see it. */
+                REMOVE_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_BURIED );
+                act ( "You found $a $o buried here.\r\n", TRUE, ch, obj,
+                      NULL, TO_CHAR );
+                act ( "$n has found $a $o buried here.\r\n", TRUE, ch, obj,
+                      NULL, TO_ROOM );
+                obj_from_room ( obj );
+                obj_to_char ( obj, ch );
+                return;
+            }
+        }
+        /* go to the next obj in room*/
+        obj = obj->next_content;
+    }
+    /* if the player didn't find anything */
+    *ch << "Sorry! You didn't find anything.\r\n";
 }
 
 ACMD ( do_pageheight )
 {
-	int num;
-	skip_spaces ( &argument );
-	num = atoi ( argument );
-	if ( num < 5 || num > 75 )
-	{
-		ch->Send ( "Please keep the page height between 5 and 75 lines.\r\n" );
-		return;
-	}
-	ch->Send ( "You set your page height to %d, default is 25\r\n", num );
-	PAGEHEIGHT ( ch ) = num;
-	ch->save();
+    int num;
+    skip_spaces ( &argument );
+    num = atoi ( argument );
+    if ( num < 5 || num > 75 )
+    {
+        ch->Send ( "Please keep the page height between 5 and 75 lines.\r\n" );
+        return;
+    }
+    ch->Send ( "You set your page height to %d, default is 25\r\n", num );
+    PAGEHEIGHT ( ch ) = num;
+    ch->save();
 }
 ACMD ( do_pagewidth )
 {
-	int num;
-	skip_spaces ( &argument );
-	num = atoi ( argument );
-	if ( num < 20 || num > 200 )
-	{
-		ch->Send ( "Please keep the page width between 20 and 200 characters.\r\n" );
-		return;
-	}
-	ch->Send ( "You set your page width to %d, default is 80\r\n", num );
-	PAGEWIDTH ( ch ) = num;
-	ch->save();
+    int num;
+    skip_spaces ( &argument );
+    num = atoi ( argument );
+    if ( num < 20 || num > 200 )
+    {
+        ch->Send ( "Please keep the page width between 20 and 200 characters.\r\n" );
+        return;
+    }
+    ch->Send ( "You set your page width to %d, default is 80\r\n", num );
+    PAGEWIDTH ( ch ) = num;
+    ch->save();
 }
 
 // System use only!!!

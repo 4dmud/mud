@@ -21,7 +21,7 @@ const char *race_abbrevs[] = {
                                  "Gri",
                                  "Mar",
                                  "SWf",
-				 "Gla",	
+                 "Gla",
                                  "Wrm",
                                  "Tod",
                                  "Bor",
@@ -39,7 +39,7 @@ const char *pc_race_types[] = {
                                   "Gringo",
                                   "Martian",
                                   "Spacewolf",
-				  "Gladiator",
+                  "Gladiator",
                                   "Toad",
                                   "Boar",
                                   "Wolf",
@@ -161,7 +161,7 @@ const struct race_data races[NUM_RACES] = {
                 RACE_GRINGO, HUMANOID}, {
                 RACE_MARTIAN, MARTIAN}, {
                 RACE_SPACE_WOLF, SWOLF}, {
-		RACE_GLADIATOR, HUMANOID}
+        RACE_GLADIATOR, HUMANOID}
         };
 
 
@@ -194,7 +194,7 @@ void set_race(Character *ch, int race) {
 
 int parse_race(char* arg, bool consider_gladiator) {
     if(!arg || !*arg)
-	return RACE_UNDEFINED;
+    return RACE_UNDEFINED;
 
     switch (LOWER(*arg)) {
     case 'f':
@@ -213,12 +213,12 @@ int parse_race(char* arg, bool consider_gladiator) {
         return RACE_INDIAN;
         break;
     case 'g':
-	if(!consider_gladiator || strlen(arg) == 1 || LOWER(*(arg+1)) == 'r')
+    if(!consider_gladiator || strlen(arg) == 1 || LOWER(*(arg+1)) == 'r')
             return RACE_GRINGO;
-	else if(LOWER(*(arg+1)) == 'l')
-	    return RACE_GLADIATOR;
-	else
-	    return RACE_UNDEFINED;
+    else if(LOWER(*(arg+1)) == 'l')
+        return RACE_GLADIATOR;
+    else
+        return RACE_UNDEFINED;
         break;
     case 'm':
         return RACE_MARTIAN;
@@ -261,7 +261,7 @@ ACMD(do_race) {
 
 /*
 long find_race_bitvector(char arg) {
-  
+
   switch (arg) {
     case '1': return (1 << RACE_FAUN);
     case '2': return (1 << RACE_CENTAUR);

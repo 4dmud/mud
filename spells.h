@@ -19,11 +19,11 @@
 
 
 #define CLASS(ch, i) ((i) == 0 ? GET_CLASS(ch) : (i) == 1 ? GET_REMORT(ch) : \
-		     (i) == 2 ? GET_REMORT_TWO(ch) : GET_REMORT_THREE(ch))
+             (i) == 2 ? GET_REMORT_TWO(ch) : GET_REMORT_THREE(ch))
 
 #define HAS_CLASS(ch, i) (CLASS((ch), (i)) |= GET_CLASS(ch))
 #define CLASS_SKILL(ch, i, skl ) 	(HAS_CLASS((ch), (i)) && \
-	(LVL_IMMORT -1) >= spell_info[(skl)].min_level[CLASS((ch), (i))])
+    (LVL_IMMORT -1) >= spell_info[(skl)].min_level[CLASS((ch), (i))])
 
 
 #define MAX_SPELL_AFFECTS 5	/* change if more needed */
@@ -595,11 +595,11 @@ int magic_distance(Character *ch, int spellnum, int dir, Character *victim);
 struct spell_info_type {
     sbyte min_position;		/* Position for caster   */
     int mana_min;		/* Min amount of mana used by a spell
-      				 * (highest lev) */
+                       * (highest lev) */
     int mana_max;		/* Max amount of mana used by a spell
-      				 * (lowest lev) */
+                       * (lowest lev) */
     int mana_change;		/* Change in mana used by spell from
-      				 * lev to lev */
+                       * lev to lev */
 
     int min_level;
     int routines;
@@ -607,9 +607,9 @@ struct spell_info_type {
     int targets;		/* See below for use with TAR_XXX  */
     const char *name;
     int first_prereq;	/* prerequisite
-      					 * skill/spell one */
+                           * skill/spell one */
     int second_prereq;	/* prerequisite
-      					 * skill/spell two */
+                           * skill/spell two */
     int tier;
     int wait;
     int classes;
@@ -620,11 +620,11 @@ struct spell_info_type {
     spell_info_type() {
     min_position = 0;		/* Position for caster   */
     mana_min = 0;		/* Min amount of mana used by a spell
-      				 * (highest lev) */
+                       * (highest lev) */
     mana_max = 0;		/* Max amount of mana used by a spell
-      				 * (lowest lev) */
+                       * (lowest lev) */
     mana_change = 0;		/* Change in mana used by spell from
-      				 * lev to lev */
+                       * lev to lev */
 
     min_level = 0;
     routines = 0;
@@ -702,7 +702,7 @@ struct spell_class_type {
 
 #define ASPELL(spellname) \
 void	spellname(int level, Character *ch, \
-		  Character *victim, struct obj_data *obj, char *strarg)
+          Character *victim, struct obj_data *obj, char *strarg)
 
 #define MANUAL_SPELL(spellname)	spellname(level, caster, cvict, ovict, tar_str);
 

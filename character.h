@@ -149,9 +149,9 @@ public:
     bool WaterBreathing();
     bool RadiationProof();
     Character *NextFightingMe();
-	inline bool MountHere() {return (char_specials.riding && char_specials.riding->in_room == in_room);}
-	inline bool RiderHere() {return (char_specials.ridden_by && char_specials.ridden_by->in_room == in_room);}
-	inline bool MasterHere() {return (master && master->in_room == in_room);}
+    inline bool MountHere() {return (char_specials.riding && char_specials.riding->in_room == in_room);}
+    inline bool RiderHere() {return (char_specials.ridden_by && char_specials.ridden_by->in_room == in_room);}
+    inline bool MasterHere() {return (master && master->in_room == in_room);}
     bool canHuntChar(Character *vict);
     void MakeNaked();
     void MakeClothed();

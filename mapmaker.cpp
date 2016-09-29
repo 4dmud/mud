@@ -56,12 +56,12 @@ char *ZColor( int z0)
     return buf;
   }
   t1 = z0 % 10;
-  
+
   if (t1 < 0) {
   inv = "{cV";
   t1 *= -1;
   }
-  
+
   switch (t1)
   {
   case 0:

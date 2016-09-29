@@ -209,10 +209,10 @@ void dg_read_trigger(FILE *fp, void *proto, int type) {
 
         if (room != NULL && rnum != NOTHING) {
             if (!(room->script))
-			{
+            {
                 CREATE(room->script, struct script_data, 1);
                 room->script->function_trig = -1;
-			}
+            }
             add_trigger(SCRIPT(room), read_trigger(rnum), -1);
         } else {
             new_mudlog(BRF, LVL_BUILDER, TRUE,
@@ -272,10 +272,10 @@ void assign_triggers(void *i, int type) {
                            (*mob->proto_script)[tr], mob->vnum);
             } else {
                 if (!SCRIPT(mob))
-				{
+                {
                     CREATE(SCRIPT(mob), struct script_data, 1);
                     SCRIPT(mob)->function_trig = -1;
-				}
+                }
                 add_trigger(SCRIPT(mob), read_trigger(rnum), -1);
             }
         }
@@ -291,10 +291,10 @@ void assign_triggers(void *i, int type) {
                     (*obj->proto_script)[tr], obj_index[obj->item_number].vnum);
             } else {
                 if (!SCRIPT(obj))
-				{
+                {
                     CREATE(SCRIPT(obj), struct script_data, 1);
                     SCRIPT(obj)->function_trig = -1;
-				}
+                }
                 add_trigger(SCRIPT(obj), read_trigger(rnum), -1);
             }
         }

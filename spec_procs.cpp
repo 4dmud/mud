@@ -158,7 +158,7 @@ void play_seven ( Character *ch, Character *dealer,
 void play_craps ( Character *ch, Character *dealer, int bet );
 struct obj_data *find_vehicle_by_vnum ( int vnum );
 struct obj_data *get_obj_in_list_type ( int type,
-			                                        struct obj_data *list );
+                                                    struct obj_data *list );
 void explosion_messages ( room_rnum room, int damage, struct obj_data *target );
 void set_race ( Character *ch, int race );
 int has_class ( Character *ch, int chclass );
@@ -284,47 +284,47 @@ int calc_tp ( Character *ch )
 
 bool deduct_tokens ( Character *ch, bool full_protection )
 {
-	int price_brass, player_brass;
+    int price_brass, player_brass;
 
-	if ( full_protection )
-	{
-		if ( REMORTS ( ch ) == 0 )
-			price_brass = 25;
-		else if ( REMORTS ( ch ) <= 4 )
-			price_brass = 125;
-		else if ( REMORTS ( ch ) <= 10 )
-			price_brass = 250;
-		else
-			price_brass = 375;
-	}
-	else
-	{
-		if ( REMORTS ( ch ) == 0 )
-			price_brass = 2;
-		else if ( REMORTS ( ch ) <= 4 )
-			price_brass = 10;
-		else if ( REMORTS ( ch ) <= 10 )
-			price_brass = 25;
-		else
-			price_brass = 35;
-	}
+    if ( full_protection )
+    {
+        if ( REMORTS ( ch ) == 0 )
+            price_brass = 25;
+        else if ( REMORTS ( ch ) <= 4 )
+            price_brass = 125;
+        else if ( REMORTS ( ch ) <= 10 )
+            price_brass = 250;
+        else
+            price_brass = 375;
+    }
+    else
+    {
+        if ( REMORTS ( ch ) == 0 )
+            price_brass = 2;
+        else if ( REMORTS ( ch ) <= 4 )
+            price_brass = 10;
+        else if ( REMORTS ( ch ) <= 10 )
+            price_brass = 25;
+        else
+            price_brass = 35;
+    }
 
-	player_brass = GET_BRASS_TOKEN_COUNT ( ch ) + 5 * GET_BRONZE_TOKEN_COUNT ( ch ) + 50 * GET_SILVER_TOKEN_COUNT ( ch ) +
-		       500 * GET_GOLD_TOKEN_COUNT ( ch );
+    player_brass = GET_BRASS_TOKEN_COUNT ( ch ) + 5 * GET_BRONZE_TOKEN_COUNT ( ch ) + 50 * GET_SILVER_TOKEN_COUNT ( ch ) +
+               500 * GET_GOLD_TOKEN_COUNT ( ch );
 
-	if ( player_brass < price_brass )
-		return FALSE;
+    if ( player_brass < price_brass )
+        return FALSE;
 
-	player_brass -= price_brass;
-	GET_GOLD_TOKEN_COUNT ( ch ) = player_brass / 500;
-	player_brass -= 500 * GET_GOLD_TOKEN_COUNT ( ch );
-	GET_SILVER_TOKEN_COUNT ( ch ) = player_brass / 50;
-	player_brass -= 50 * GET_SILVER_TOKEN_COUNT ( ch );
-	GET_BRONZE_TOKEN_COUNT ( ch ) = player_brass / 5;
-	player_brass -= 5 * GET_BRONZE_TOKEN_COUNT ( ch );
-	GET_BRASS_TOKEN_COUNT ( ch ) = player_brass;
+    player_brass -= price_brass;
+    GET_GOLD_TOKEN_COUNT ( ch ) = player_brass / 500;
+    player_brass -= 500 * GET_GOLD_TOKEN_COUNT ( ch );
+    GET_SILVER_TOKEN_COUNT ( ch ) = player_brass / 50;
+    player_brass -= 50 * GET_SILVER_TOKEN_COUNT ( ch );
+    GET_BRONZE_TOKEN_COUNT ( ch ) = player_brass / 5;
+    player_brass -= 5 * GET_BRONZE_TOKEN_COUNT ( ch );
+    GET_BRASS_TOKEN_COUNT ( ch ) = player_brass;
 
-	return TRUE;
+    return TRUE;
 }
 
 int find_tokens(Character *ch, int type, int take)
@@ -384,9 +384,9 @@ SPECIAL(antidt)
           ch->Send("You do not have enough tradepoints for a full protection.\r\n");
           return 1;
         }
-	int tradepoint_loss = calc_tp(ch);
+    int tradepoint_loss = calc_tp(ch);
         TRADEPOINTS(ch) -= tradepoint_loss;
-	new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy full death trap protection. (%d remaining)",  GET_NAME ( ch ), tradepoint_loss, TRADEPOINTS(ch));
+    new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy full death trap protection. (%d remaining)",  GET_NAME ( ch ), tradepoint_loss, TRADEPOINTS(ch));
 
         SET_BIT_AR(PLR_FLAGS(ch), PLR_ANTI_DT);
         act("An aura of protection surrounds you!", FALSE, ch, 0, 0, TO_CHAR);
@@ -412,15 +412,15 @@ SPECIAL(antidt)
           ch->Send("You do not have enough tradepoints to protect your item.\r\n");
           return 1;
         }
-     
+
         if (!check_owner(ch, obj)) {
            act("You are not the original owner of $p!", FALSE, ch, obj, 0, TO_CHAR);
            return 1;
         }
- 
-	int tradepoint_loss = calc_tp(ch)/10;
+
+    int tradepoint_loss = calc_tp(ch)/10;
         TRADEPOINTS(ch) -= tradepoint_loss;
-	  new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy death trap item protection for object %d, %s. (%d tradepoints remaining)",  GET_NAME ( ch ), tradepoint_loss, GET_OBJ_VNUM(obj), obj->short_description, TRADEPOINTS(ch));
+      new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "[TRADEPOINTS] %s used %d tradepoints to buy death trap item protection for object %d, %s. (%d tradepoints remaining)",  GET_NAME ( ch ), tradepoint_loss, GET_OBJ_VNUM(obj), obj->short_description, TRADEPOINTS(ch));
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT);
         act("$p briefly glows bright red.", FALSE, ch, obj, 0, TO_CHAR);
         return 1;
@@ -433,7 +433,7 @@ SPECIAL(antidt)
           ch->Send("buy <item name>\r\n");
           return 1;
       }
-   
+
       if (!str_cmp(argument, "full")) {
           if (IS_SET_AR(PLR_FLAGS(ch), PLR_ANTI_DT)) {
             ch->Send("You already have full protection!\r\n");
@@ -453,7 +453,7 @@ SPECIAL(antidt)
           if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
               ch->Send("You do not seem to be carrying any %s.\r\n", argument);
               return 1;
-          }  
+          }
           if (check_token(obj)) {
               ch->Send("You cannot protect tokens.\r\n");
               return 1;
@@ -492,7 +492,7 @@ SPECIAL(antidt)
       }
       for (int i = 0; i < NUM_WEARS; i++) {
           obj = ch->equipment[i];
-          if (!obj) 
+          if (!obj)
              continue;
           if (IS_SET_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_DT) && check_owner(ch, obj)) {
              ch->Send("%s\r\n", obj->short_description);
@@ -509,13 +509,13 @@ SPECIAL(antidt)
   }
 
   return 0;
-  
+
 
 }
 
 /* Clan deed boxes in each clan hall are fakes. They are just there so
    this spec_proc can run, transferring the PC to room 5 and make them
-   look at the real box.                            
+   look at the real box.
 */
 SPECIAL(deed_box)
 {
@@ -569,19 +569,19 @@ SPECIAL(deed_box)
 
           snprintf(buf, sizeof(buf), "{cYClan: %s{cx\r\n", clan[i].name);
           DYN_RESIZE(buf);
-	  count = 0; 
+      count = 0;
      }
       for (cl = clan[i].deeds; cl; cl = cl->next) {
-	  count += 1;
-          if (arg1[0] != '\0' && !strcmp(arg1, "player") && 
+      count += 1;
+          if (arg1[0] != '\0' && !strcmp(arg1, "player") &&
           strncasecmp(cl->name, arg2, sizeof(arg2))) continue;
           snprintf(buf, sizeof(buf), "{cM%-40s  {cYClaimed by: %s{cx  \r\n", zone_table[real_zone(cl->zone)].name, cl->name);
           DYN_RESIZE(buf);
       }
-	if (count > 0 && strcmp(arg1, "player")) {
+    if (count > 0 && strcmp(arg1, "player")) {
          snprintf(buf, sizeof(buf), "Total: %d\r\n", count);
-	 DYN_RESIZE(buf);
-	}
+     DYN_RESIZE(buf);
+    }
   }
 
   page_string(ch->desc, dynbuf, DYN_BUFFER);
@@ -624,14 +624,14 @@ SPECIAL(clan_deeds)
           return TRUE;
       }
   }
-          
+
   /* Assume the clan does not have this deed, lets put the deed */
   /* in the box and give the clan the bonuses.                  */
   CREATE(cd, struct clan_deed_type, 1);
   cd->zone = GET_OBJ_VAL(deed, 0);
   cd->name = strdup(GET_NAME(ch));
   cd->next = clan[i].deeds;
-  clan[i].deeds = cd;  
+  clan[i].deeds = cd;
 
   for (j = 0; j < num_of_clans; j++) {
       if (j == i) continue;
@@ -715,140 +715,140 @@ SPECIAL(clan_deeds)
 
 SPECIAL ( dump )
 {
-	struct obj_data *k;
-	gold_int value = 0;
+    struct obj_data *k;
+    gold_int value = 0;
 
-	for ( k = IN_ROOM ( ch )->contents; k;
-	        k = IN_ROOM ( ch )->contents )
-	{
-		act ( "$p vanishes in a puff of smoke!", FALSE, 0, k, 0, TO_ROOM );
-		obj_from_room ( k );
-		extract_obj ( k );
-	}
+    for ( k = IN_ROOM ( ch )->contents; k;
+            k = IN_ROOM ( ch )->contents )
+    {
+        act ( "$p vanishes in a puff of smoke!", FALSE, 0, k, 0, TO_ROOM );
+        obj_from_room ( k );
+        extract_obj ( k );
+    }
 
-	if ( !CMD_IS ( "drop" ) )
-		return ( 0 );
+    if ( !CMD_IS ( "drop" ) )
+        return ( 0 );
 
-	do_drop ( ch, argument, cmd, 0 );
+    do_drop ( ch, argument, cmd, 0 );
 
-	for ( k = IN_ROOM ( ch )->contents; k;
-	        k = IN_ROOM ( ch )->contents )
-	{
-		act ( "$p vanishes in a puff of smoke!", FALSE, 0, k, 0, TO_ROOM );
-		value += MAX ( 1, (int)MIN ( (gold_int)50, GET_OBJ_COST ( k ) / 10 ) );
-		obj_from_room ( k );
-		extract_obj ( k );
-	}
+    for ( k = IN_ROOM ( ch )->contents; k;
+            k = IN_ROOM ( ch )->contents )
+    {
+        act ( "$p vanishes in a puff of smoke!", FALSE, 0, k, 0, TO_ROOM );
+        value += MAX ( 1, (int)MIN ( (gold_int)50, GET_OBJ_COST ( k ) / 10 ) );
+        obj_from_room ( k );
+        extract_obj ( k );
+    }
 
-	if ( value )
-	{
-		*ch << "You are awarded for outstanding performance.\r\n";
-		act ( "$n has been awarded for being a good citizen.", TRUE, ch, 0, 0, TO_ROOM );
+    if ( value )
+    {
+        *ch << "You are awarded for outstanding performance.\r\n";
+        act ( "$n has been awarded for being a good citizen.", TRUE, ch, 0, 0, TO_ROOM );
 
-		if ( GET_LEVEL ( ch ) < 3 )
-			gain_exp ( ch, value );
-		else
-			ch->Gold ( value, GOLD_HAND );
-	}
-	return ( 1 );
+        if ( GET_LEVEL ( ch ) < 3 )
+            gain_exp ( ch, value );
+        else
+            ch->Gold ( value, GOLD_HAND );
+    }
+    return ( 1 );
 }
 
 
 SPECIAL ( mayor )
 {
-	const char open_path[] =
-	    "W3a3003b33000c111d0d111Oe333333Oe22c222112212111a1S.";
-	const char close_path[] =
-	    "W3a3003b33000c111d0d111CE333333CE22c222112212111a1S.";
+    const char open_path[] =
+        "W3a3003b33000c111d0d111Oe333333Oe22c222112212111a1S.";
+    const char close_path[] =
+        "W3a3003b33000c111d0d111CE333333CE22c222112212111a1S.";
 
-	static const char *path = NULL;
-	static int mindex;
-	static bool move = FALSE;
+    static const char *path = NULL;
+    static int mindex;
+    static bool move = FALSE;
 
-	if ( !move )
-	{
-		if ( time_info.hours == 6 )
-		{
-			move = TRUE;
-			path = open_path;
-			mindex = 0;
-		}
-		else if ( time_info.hours == 20 )
-		{
-			move = TRUE;
-			path = close_path;
-			mindex = 0;
-		}
-	}
-	if ( cmd || !move || ( GET_POS ( ch ) < POS_SLEEPING ) ||
-	        ( GET_POS ( ch ) == POS_FIGHTING ) )
-		return ( FALSE );
+    if ( !move )
+    {
+        if ( time_info.hours == 6 )
+        {
+            move = TRUE;
+            path = open_path;
+            mindex = 0;
+        }
+        else if ( time_info.hours == 20 )
+        {
+            move = TRUE;
+            path = close_path;
+            mindex = 0;
+        }
+    }
+    if ( cmd || !move || ( GET_POS ( ch ) < POS_SLEEPING ) ||
+            ( GET_POS ( ch ) == POS_FIGHTING ) )
+        return ( FALSE );
 
-	switch ( path[mindex] )
-	{
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-			perform_move ( ch, path[mindex] - '0', 1 );
-			break;
+    switch ( path[mindex] )
+    {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+            perform_move ( ch, path[mindex] - '0', 1 );
+            break;
 
-		case 'W':
-			GET_POS ( ch ) = POS_STANDING;
-			act ( "$n awakens and groans loudly.", FALSE, ch, 0, 0, TO_ROOM );
-			break;
+        case 'W':
+            GET_POS ( ch ) = POS_STANDING;
+            act ( "$n awakens and groans loudly.", FALSE, ch, 0, 0, TO_ROOM );
+            break;
 
-		case 'S':
-			GET_POS ( ch ) = POS_SLEEPING;
-			act ( "$n lies down and instantly falls asleep.", FALSE, ch, 0, 0,
-			      TO_ROOM );
-			break;
+        case 'S':
+            GET_POS ( ch ) = POS_SLEEPING;
+            act ( "$n lies down and instantly falls asleep.", FALSE, ch, 0, 0,
+                  TO_ROOM );
+            break;
 
-		case 'a':
-			act ( "$n says 'Hello Honey!'", FALSE, ch, 0, 0, TO_ROOM );
-			act ( "$n smirks.", FALSE, ch, 0, 0, TO_ROOM );
-			break;
+        case 'a':
+            act ( "$n says 'Hello Honey!'", FALSE, ch, 0, 0, TO_ROOM );
+            act ( "$n smirks.", FALSE, ch, 0, 0, TO_ROOM );
+            break;
 
-		case 'b':
-			act ( "$n says 'What a view!  I must get something done about that dump!'", FALSE, ch, 0, 0, TO_ROOM );
-			break;
+        case 'b':
+            act ( "$n says 'What a view!  I must get something done about that dump!'", FALSE, ch, 0, 0, TO_ROOM );
+            break;
 
-		case 'c':
-			act ( "$n says 'Vandals!  Youngsters nowadays have no respect for anything!'", FALSE, ch, 0, 0, TO_ROOM );
-			break;
+        case 'c':
+            act ( "$n says 'Vandals!  Youngsters nowadays have no respect for anything!'", FALSE, ch, 0, 0, TO_ROOM );
+            break;
 
-		case 'd':
-			act ( "$n says 'Good day, citizens!'", FALSE, ch, 0, 0, TO_ROOM );
-			break;
+        case 'd':
+            act ( "$n says 'Good day, citizens!'", FALSE, ch, 0, 0, TO_ROOM );
+            break;
 
-		case 'e':
-			act ( "$n says 'I hereby declare the bazaar open!'", FALSE, ch, 0, 0,
-			      TO_ROOM );
-			break;
+        case 'e':
+            act ( "$n says 'I hereby declare the bazaar open!'", FALSE, ch, 0, 0,
+                  TO_ROOM );
+            break;
 
-		case 'E':
-			act ( "$n says 'I hereby declare Midgaard closed!'", FALSE, ch, 0, 0,
-			      TO_ROOM );
-			break;
+        case 'E':
+            act ( "$n says 'I hereby declare Midgaard closed!'", FALSE, ch, 0, 0,
+                  TO_ROOM );
+            break;
 
-		case 'O':
-			do_gen_door ( ch, ( char * ) "gate", 0, SCMD_UNLOCK );
-			do_gen_door ( ch, ( char * ) "gate", 0, SCMD_OPEN );
-			break;
+        case 'O':
+            do_gen_door ( ch, ( char * ) "gate", 0, SCMD_UNLOCK );
+            do_gen_door ( ch, ( char * ) "gate", 0, SCMD_OPEN );
+            break;
 
-		case 'C':
-			do_gen_door ( ch, ( char * ) "gate", 0, SCMD_CLOSE );
-			do_gen_door ( ch, ( char * ) "gate", 0, SCMD_LOCK );
-			break;
+        case 'C':
+            do_gen_door ( ch, ( char * ) "gate", 0, SCMD_CLOSE );
+            do_gen_door ( ch, ( char * ) "gate", 0, SCMD_LOCK );
+            break;
 
-		case '.':
-			move = FALSE;
-			break;
+        case '.':
+            move = FALSE;
+            break;
 
-	}
+    }
 
-	mindex++;
-	return ( FALSE );
+    mindex++;
+    return ( FALSE );
 }
 
 
@@ -859,182 +859,182 @@ SPECIAL ( mayor )
 
 void npc_steal ( Character *ch, Character *victim )
 {
-	gold_int gold;
+    gold_int gold;
 
-	if ( IS_NPC ( victim ) )
-		return;
-	if ( GET_LEVEL ( victim ) >= LVL_IMMORT )
-		return;
+    if ( IS_NPC ( victim ) )
+        return;
+    if ( GET_LEVEL ( victim ) >= LVL_IMMORT )
+        return;
 
-	if ( AWAKE ( victim ) && ( number ( 0, GET_LEVEL ( ch ) ) == 0 ) )
-	{
-		act ( "You discover that $n has $s hands in your wallet.", FALSE, ch,
-		      0, victim, TO_VICT );
-		act ( "$n tries to steal gold from $N.", TRUE, ch, 0, victim,
-		      TO_NOTVICT );
-	}
-	else
-	{
-		/* Steal some gold coins */
-		gold = ( ( victim->Gold ( 0, GOLD_HAND ) * number ( 1, 10 ) ) / 100 );
-		if ( gold > 0 )
-		{
-			ch->Gold ( gold, GOLD_HAND );
-			victim->Gold ( -gold, GOLD_HAND );
-		}
-	}
+    if ( AWAKE ( victim ) && ( number ( 0, GET_LEVEL ( ch ) ) == 0 ) )
+    {
+        act ( "You discover that $n has $s hands in your wallet.", FALSE, ch,
+              0, victim, TO_VICT );
+        act ( "$n tries to steal gold from $N.", TRUE, ch, 0, victim,
+              TO_NOTVICT );
+    }
+    else
+    {
+        /* Steal some gold coins */
+        gold = ( ( victim->Gold ( 0, GOLD_HAND ) * number ( 1, 10 ) ) / 100 );
+        if ( gold > 0 )
+        {
+            ch->Gold ( gold, GOLD_HAND );
+            victim->Gold ( -gold, GOLD_HAND );
+        }
+    }
 }
 
 SPECIAL ( spider )
 {
-	if ( cmd )
-		return ( FALSE );
+    if ( cmd )
+        return ( FALSE );
 
-	if ( GET_POS ( ch ) != POS_FIGHTING )
-		return ( FALSE );
+    if ( GET_POS ( ch ) != POS_FIGHTING )
+        return ( FALSE );
 
-	if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
-	        ( number ( 0, 60 - GET_LEVEL ( ch ) ) == 0 ) )
-	{
-		act ( "$n bites $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
-		act ( "$n bites you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
-		call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON, GET_LEVEL ( ch ),
-		             CAST_SPELL );
-		return ( TRUE );
-	}
-	return ( FALSE );
+    if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
+            ( number ( 0, 60 - GET_LEVEL ( ch ) ) == 0 ) )
+    {
+        act ( "$n bites $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
+        act ( "$n bites you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
+        call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON, GET_LEVEL ( ch ),
+                     CAST_SPELL );
+        return ( TRUE );
+    }
+    return ( FALSE );
 }
 
 SPECIAL ( scorpion )
 {
-	if ( cmd )
-		return ( FALSE );
+    if ( cmd )
+        return ( FALSE );
 
-	if ( GET_POS ( ch ) != POS_FIGHTING )
-		return ( FALSE );
+    if ( GET_POS ( ch ) != POS_FIGHTING )
+        return ( FALSE );
 
-	if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
-	        ( number ( 0, 62 - GET_LEVEL ( ch ) ) == 0 ) )
-	{
-		act ( "$n stings $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
-		act ( "$n stings you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
-		call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON_2, GET_LEVEL ( ch ),
-		             CAST_SPELL );
-		return ( TRUE );
-	}
-	return ( FALSE );
+    if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
+            ( number ( 0, 62 - GET_LEVEL ( ch ) ) == 0 ) )
+    {
+        act ( "$n stings $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
+        act ( "$n stings you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
+        call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON_2, GET_LEVEL ( ch ),
+                     CAST_SPELL );
+        return ( TRUE );
+    }
+    return ( FALSE );
 }
 
 SPECIAL ( snake )
 {
-	if ( cmd )
-		return ( FALSE );
+    if ( cmd )
+        return ( FALSE );
 
-	if ( GET_POS ( ch ) != POS_FIGHTING )
-		return ( FALSE );
+    if ( GET_POS ( ch ) != POS_FIGHTING )
+        return ( FALSE );
 
-	if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
-	        ( number ( 0, 62 - GET_LEVEL ( ch ) ) == 0 ) )
-	{
-		act ( "$n bites $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
-		act ( "$n bites you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
-		call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON_3, GET_LEVEL ( ch ),
-		             CAST_SPELL );
-		return ( TRUE );
-	}
-	return ( FALSE );
+    if ( FIGHTING ( ch ) && ( FIGHTING ( ch )->in_room == IN_ROOM ( ch ) ) &&
+            ( number ( 0, 62 - GET_LEVEL ( ch ) ) == 0 ) )
+    {
+        act ( "$n bites $N!", 1, ch, 0, FIGHTING ( ch ), TO_NOTVICT );
+        act ( "$n bites you!", 1, ch, 0, FIGHTING ( ch ), TO_VICT );
+        call_magic ( ch, FIGHTING ( ch ), 0, 0, SPELL_POISON_3, GET_LEVEL ( ch ),
+                     CAST_SPELL );
+        return ( TRUE );
+    }
+    return ( FALSE );
 }
 
 SPECIAL ( thief )
 {
-	Character *cons;
+    Character *cons;
 
-	if ( cmd )
-		return ( FALSE );
+    if ( cmd )
+        return ( FALSE );
 
-	if ( GET_POS ( ch ) != POS_STANDING )
-		return ( FALSE );
+    if ( GET_POS ( ch ) != POS_STANDING )
+        return ( FALSE );
 
-	for ( cons = IN_ROOM ( ch )->people; cons; cons = cons->next_in_room )
-		if ( !IS_NPC ( cons ) && ( GET_LEVEL ( cons ) < LVL_IMMORT )
-		        && ( !number ( 0, 4 ) ) )
-		{
-			npc_steal ( ch, cons );
-			return ( TRUE );
-		}
-	return ( FALSE );
+    for ( cons = IN_ROOM ( ch )->people; cons; cons = cons->next_in_room )
+        if ( !IS_NPC ( cons ) && ( GET_LEVEL ( cons ) < LVL_IMMORT )
+                && ( !number ( 0, 4 ) ) )
+        {
+            npc_steal ( ch, cons );
+            return ( TRUE );
+        }
+    return ( FALSE );
 }
 
 
 SPECIAL ( magic_user )
 {
-	Character *vict;
+    Character *vict;
 
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return ( FALSE );
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return ( FALSE );
 
-	/* pseudo-randomly choose someone in the room who is fighting me */
-	for ( vict = IN_ROOM ( ch )->people; vict; vict = vict->next_in_room )
-		if ( FIGHTING ( vict ) == ch && !number ( 0, 4 ) )
-			break;
+    /* pseudo-randomly choose someone in the room who is fighting me */
+    for ( vict = IN_ROOM ( ch )->people; vict; vict = vict->next_in_room )
+        if ( FIGHTING ( vict ) == ch && !number ( 0, 4 ) )
+            break;
 
-	/* if I didn't pick any of those, then just slam the guy I'm fighting */
-	if ( vict == NULL && IN_ROOM ( FIGHTING ( ch ) ) == IN_ROOM ( ch ) )
-		vict = FIGHTING ( ch );
+    /* if I didn't pick any of those, then just slam the guy I'm fighting */
+    if ( vict == NULL && IN_ROOM ( FIGHTING ( ch ) ) == IN_ROOM ( ch ) )
+        vict = FIGHTING ( ch );
 
-	/* Hm...didn't pick anyone...I'll wait a round. */
-	if ( vict == NULL )
-		return ( TRUE );
+    /* Hm...didn't pick anyone...I'll wait a round. */
+    if ( vict == NULL )
+        return ( TRUE );
 
-	if ( ( GET_LEVEL ( ch ) > 13 ) && ( number ( 0, 10 ) == 0 ) )
-		cast_spell ( ch, vict, NULL, 0, SPELL_SLEEP );
+    if ( ( GET_LEVEL ( ch ) > 13 ) && ( number ( 0, 10 ) == 0 ) )
+        cast_spell ( ch, vict, NULL, 0, SPELL_SLEEP );
 
-	if ( ( GET_LEVEL ( ch ) > 7 ) && ( number ( 0, 8 ) == 0 ) )
-		cast_spell ( ch, vict, NULL, 0, SPELL_BLINDNESS );
+    if ( ( GET_LEVEL ( ch ) > 7 ) && ( number ( 0, 8 ) == 0 ) )
+        cast_spell ( ch, vict, NULL, 0, SPELL_BLINDNESS );
 
-	if ( ( GET_LEVEL ( ch ) > 12 ) && ( number ( 0, 12 ) == 0 ) )
-	{
-		if ( IS_EVIL ( ch ) )
-			cast_spell ( ch, vict, NULL, 0, SPELL_ENERGY_DRAIN );
-		else if ( IS_GOOD ( ch ) )
-			cast_spell ( ch, vict, NULL, 0, SPELL_DISPEL_EVIL );
-	}
-	if ( number ( 0, 4 ) )
-		return ( TRUE );
+    if ( ( GET_LEVEL ( ch ) > 12 ) && ( number ( 0, 12 ) == 0 ) )
+    {
+        if ( IS_EVIL ( ch ) )
+            cast_spell ( ch, vict, NULL, 0, SPELL_ENERGY_DRAIN );
+        else if ( IS_GOOD ( ch ) )
+            cast_spell ( ch, vict, NULL, 0, SPELL_DISPEL_EVIL );
+    }
+    if ( number ( 0, 4 ) )
+        return ( TRUE );
 
-	switch ( GET_LEVEL ( ch ) )
-	{
-		case 4:
-		case 5:
-			cast_spell ( ch, vict, NULL, 0, SPELL_MAGIC_MISSILE );
-			break;
-		case 6:
-		case 7:
-			cast_spell ( ch, vict, NULL, 0, SPELL_CHILL_TOUCH );
-			break;
-		case 8:
-		case 9:
-			cast_spell ( ch, vict, NULL, 0, SPELL_BURNING_HANDS );
-			break;
-		case 10:
-		case 11:
-			cast_spell ( ch, vict, NULL, 0, SPELL_SHOCKING_GRASP );
-			break;
-		case 12:
-		case 13:
-			cast_spell ( ch, vict, NULL, 0, SPELL_LIGHTNING_BOLT );
-			break;
-		case 14:
-		case 15:
-		case 16:
-		case 17:
-			cast_spell ( ch, vict, NULL, 0, SPELL_COLOUR_SPRAY );
-			break;
-		default:
-			cast_spell ( ch, vict, NULL, 0, SPELL_FIREBALL );
-			break;
-	}
-	return ( TRUE );
+    switch ( GET_LEVEL ( ch ) )
+    {
+        case 4:
+        case 5:
+            cast_spell ( ch, vict, NULL, 0, SPELL_MAGIC_MISSILE );
+            break;
+        case 6:
+        case 7:
+            cast_spell ( ch, vict, NULL, 0, SPELL_CHILL_TOUCH );
+            break;
+        case 8:
+        case 9:
+            cast_spell ( ch, vict, NULL, 0, SPELL_BURNING_HANDS );
+            break;
+        case 10:
+        case 11:
+            cast_spell ( ch, vict, NULL, 0, SPELL_SHOCKING_GRASP );
+            break;
+        case 12:
+        case 13:
+            cast_spell ( ch, vict, NULL, 0, SPELL_LIGHTNING_BOLT );
+            break;
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+            cast_spell ( ch, vict, NULL, 0, SPELL_COLOUR_SPRAY );
+            break;
+        default:
+            cast_spell ( ch, vict, NULL, 0, SPELL_FIREBALL );
+            break;
+    }
+    return ( TRUE );
 
 }
 
@@ -1045,58 +1045,58 @@ SPECIAL ( magic_user )
 
 SPECIAL ( guild_guard )
 {
-	int i;
-	Character *guard = ( Character * ) me;
-	const char *buf = "$N blocks every attempt you make to get past.";
-	const char *buf2 = "$N blocks every attempt $n makes to get past.";
+    int i;
+    Character *guard = ( Character * ) me;
+    const char *buf = "$N blocks every attempt you make to get past.";
+    const char *buf2 = "$N blocks every attempt $n makes to get past.";
 
-	if ( !IS_MOVE ( cmd ) || AFF_FLAGGED ( guard, AFF_BLIND ) )
-		return ( FALSE );
+    if ( !IS_MOVE ( cmd ) || AFF_FLAGGED ( guard, AFF_BLIND ) )
+        return ( FALSE );
 
-	if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
-		return ( FALSE );
+    if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
+        return ( FALSE );
 
-	for ( i = 0; guild_info[i][0] != -1; i++ )
-	{
-		if ( ( IS_NPC ( ch ) || GET_CLASS ( ch ) != guild_info[i][0] ) &&
-		        GET_ROOM_VNUM ( IN_ROOM ( ch ) ) == guild_info[i][1] &&
-		        cmd == guild_info[i][2] )
-		{
-			act ( buf, FALSE, ch, 0, guard, TO_CHAR );
-			act ( buf2, FALSE, ch, 0, guard, TO_ROOM );
-			return ( TRUE );
-		}
-	}
+    for ( i = 0; guild_info[i][0] != -1; i++ )
+    {
+        if ( ( IS_NPC ( ch ) || GET_CLASS ( ch ) != guild_info[i][0] ) &&
+                GET_ROOM_VNUM ( IN_ROOM ( ch ) ) == guild_info[i][1] &&
+                cmd == guild_info[i][2] )
+        {
+            act ( buf, FALSE, ch, 0, guard, TO_CHAR );
+            act ( buf2, FALSE, ch, 0, guard, TO_ROOM );
+            return ( TRUE );
+        }
+    }
 
-	return ( FALSE );
+    return ( FALSE );
 }
 
 
 
 SPECIAL ( puff )
 {
-	if ( cmd )
-		return ( 0 );
+    if ( cmd )
+        return ( 0 );
 
-	return 0;
+    return 0;
 
-	switch ( number ( 0, 60 ) )
-	{
-		case 0:
-			do_say ( ch, ( char * ) "My god!  Its full of stars!", 0, 0 );
-			return ( 1 );
-		case 1:
-			do_say ( ch, ( char * ) "Howd all those fish get up here?", 0, 0 );
-			return ( 1 );
-		case 2:
-			do_say ( ch, ( char * ) "Im a very female dragon.", 0, 0 );
-			return ( 1 );
-		case 3:
-			do_say ( ch, ( char * ) "Ive got a peaceful, easy feeling.", 0, 0 );
-			return ( 1 );
-		default:
-			return ( 0 );
-	}
+    switch ( number ( 0, 60 ) )
+    {
+        case 0:
+            do_say ( ch, ( char * ) "My god!  Its full of stars!", 0, 0 );
+            return ( 1 );
+        case 1:
+            do_say ( ch, ( char * ) "Howd all those fish get up here?", 0, 0 );
+            return ( 1 );
+        case 2:
+            do_say ( ch, ( char * ) "Im a very female dragon.", 0, 0 );
+            return ( 1 );
+        case 3:
+            do_say ( ch, ( char * ) "Ive got a peaceful, easy feeling.", 0, 0 );
+            return ( 1 );
+        default:
+            return ( 0 );
+    }
 }
 
 
@@ -1104,109 +1104,109 @@ SPECIAL ( puff )
 SPECIAL ( fido )
 {
 
-	struct obj_data *i, *temp, *next_obj;
+    struct obj_data *i, *temp, *next_obj;
 
-	if ( cmd || !AWAKE ( ch ) )
-		return ( FALSE );
+    if ( cmd || !AWAKE ( ch ) )
+        return ( FALSE );
 
-	for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
-	{
-		if ( IS_CORPSE ( i ) &&  ! ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
-		{
-			act ( "$n savagely devours a corpse.", FALSE, ch, 0, 0, TO_ROOM );
-			for ( temp = i->contains; temp; temp = next_obj )
-			{
-				next_obj = temp->next_content;
-				obj_from_obj ( temp );
-				obj_to_room ( temp, IN_ROOM ( ch ) );
-			}
-			extract_obj ( i );
-			return ( TRUE );
-		}
-	}
-	return ( FALSE );
+    for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
+    {
+        if ( IS_CORPSE ( i ) &&  ! ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
+        {
+            act ( "$n savagely devours a corpse.", FALSE, ch, 0, 0, TO_ROOM );
+            for ( temp = i->contains; temp; temp = next_obj )
+            {
+                next_obj = temp->next_content;
+                obj_from_obj ( temp );
+                obj_to_room ( temp, IN_ROOM ( ch ) );
+            }
+            extract_obj ( i );
+            return ( TRUE );
+        }
+    }
+    return ( FALSE );
 }
 
 
 
 SPECIAL ( janitor )
 {
-	struct obj_data *i;
+    struct obj_data *i;
 
-	if ( cmd || !AWAKE ( ch ) )
-		return ( FALSE );
+    if ( cmd || !AWAKE ( ch ) )
+        return ( FALSE );
 
-	for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
-	{
-		if ( !CAN_WEAR ( i, ITEM_WEAR_TAKE ) )
-			continue;
-		if ( GET_OBJ_TYPE ( i ) != ITEM_DRINKCON && GET_OBJ_COST ( i ) >= 15 )
-			continue;
-		if ( ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
-			continue;
-		act ( "$n picks up some trash.", FALSE, ch, 0, 0, TO_ROOM );
-		obj_from_room ( i );
-		obj_to_char ( i, ch );
-		return ( TRUE );
-	}
+    for ( i = IN_ROOM ( ch )->contents; i; i = i->next_content )
+    {
+        if ( !CAN_WEAR ( i, ITEM_WEAR_TAKE ) )
+            continue;
+        if ( GET_OBJ_TYPE ( i ) != ITEM_DRINKCON && GET_OBJ_COST ( i ) >= 15 )
+            continue;
+        if ( ( OBJ_FLAGGED ( i, ITEM_PC_CORPSE ) ) )
+            continue;
+        act ( "$n picks up some trash.", FALSE, ch, 0, 0, TO_ROOM );
+        obj_from_room ( i );
+        obj_to_char ( i, ch );
+        return ( TRUE );
+    }
 
-	return ( FALSE );
+    return ( FALSE );
 }
 
 
 SPECIAL ( cityguard )
 {
-	Character *tch, *evil;
-	int max_evil;
+    Character *tch, *evil;
+    int max_evil;
 
-	if ( cmd || !AWAKE ( ch ) || FIGHTING ( ch ) )
-		return ( FALSE );
+    if ( cmd || !AWAKE ( ch ) || FIGHTING ( ch ) )
+        return ( FALSE );
 
-	max_evil = 1000;
-	evil = 0;
+    max_evil = 1000;
+    evil = 0;
 
-	for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
-	{
-		if ( !IS_NPC ( tch ) && CAN_SEE ( ch, tch )
-		        && PLR_FLAGGED ( tch, PLR_KILLER ) )
-		{
-			act ( "$n screams 'HEY!!!  You're one of those PLAYER KILLERS!!!!!!'", FALSE, ch, 0, 0, TO_ROOM );
-			start_fighting ( ch, tch );
-			return ( TRUE );
-		}
-	}
+    for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
+    {
+        if ( !IS_NPC ( tch ) && CAN_SEE ( ch, tch )
+                && PLR_FLAGGED ( tch, PLR_KILLER ) )
+        {
+            act ( "$n screams 'HEY!!!  You're one of those PLAYER KILLERS!!!!!!'", FALSE, ch, 0, 0, TO_ROOM );
+            start_fighting ( ch, tch );
+            return ( TRUE );
+        }
+    }
 
-	for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
-	{
-		if ( !IS_NPC ( tch ) && CAN_SEE ( ch, tch )
-		        && PLR_FLAGGED ( tch, PLR_THIEF ) )
-		{
-			act ( "$n screams 'HEY!!!  You're one of those PLAYER THIEVES!!!!!!'", FALSE, ch, 0, 0, TO_ROOM );
-			start_fighting ( ch, tch );
-			return ( TRUE );
-		}
-	}
+    for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
+    {
+        if ( !IS_NPC ( tch ) && CAN_SEE ( ch, tch )
+                && PLR_FLAGGED ( tch, PLR_THIEF ) )
+        {
+            act ( "$n screams 'HEY!!!  You're one of those PLAYER THIEVES!!!!!!'", FALSE, ch, 0, 0, TO_ROOM );
+            start_fighting ( ch, tch );
+            return ( TRUE );
+        }
+    }
 
-	for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
-	{
-		if ( CAN_SEE ( ch, tch ) && FIGHTING ( tch ) )
-		{
-			if ( ( GET_ALIGNMENT ( tch ) < max_evil ) &&
-			        ( IS_NPC ( tch ) || IS_NPC ( FIGHTING ( tch ) ) ) )
-			{
-				max_evil = GET_ALIGNMENT ( tch );
-				evil = tch;
-			}
-		}
-	}
+    for ( tch = IN_ROOM ( ch )->people; tch; tch = tch->next_in_room )
+    {
+        if ( CAN_SEE ( ch, tch ) && FIGHTING ( tch ) )
+        {
+            if ( ( GET_ALIGNMENT ( tch ) < max_evil ) &&
+                    ( IS_NPC ( tch ) || IS_NPC ( FIGHTING ( tch ) ) ) )
+            {
+                max_evil = GET_ALIGNMENT ( tch );
+                evil = tch;
+            }
+        }
+    }
 
-	if ( evil && ( GET_ALIGNMENT ( FIGHTING ( evil ) ) >= 0 ) )
-	{
-		act ( "$n screams 'PROTECT THE INNOCENT!  BANZAI!  CHARGE!  ARARARAGGGHH!'", FALSE, ch, 0, 0, TO_ROOM );
-		start_fighting ( ch, evil );
-		return ( TRUE );
-	}
-	return ( FALSE );
+    if ( evil && ( GET_ALIGNMENT ( FIGHTING ( evil ) ) >= 0 ) )
+    {
+        act ( "$n screams 'PROTECT THE INNOCENT!  BANZAI!  CHARGE!  ARARARAGGGHH!'", FALSE, ch, 0, 0, TO_ROOM );
+        start_fighting ( ch, evil );
+        return ( TRUE );
+    }
+    return ( FALSE );
 }
 
 
@@ -1215,125 +1215,125 @@ SPECIAL ( cityguard )
 
 SPECIAL ( pet_shops )
 {
-	char buf[MAX_INPUT_LENGTH], pet_name[256];
-	room_rnum pet_room;
-	Character *pet, *k, *tch;
-	int num_of_pets = 0;
-	const char *simple_class_name ( Character *ch );
-	const char *race_name ( Character *ch );
+    char buf[MAX_INPUT_LENGTH], pet_name[256];
+    room_rnum pet_room;
+    Character *pet, *k, *tch;
+    int num_of_pets = 0;
+    const char *simple_class_name ( Character *ch );
+    const char *race_name ( Character *ch );
 
 
-	struct follow_type *f, *f_next;
+    struct follow_type *f, *f_next;
 
 
-	pet_room = world_vnum[IN_ROOM ( ch )->number + 1];
-	if ( pet_room == NULL )
-		return 0;
+    pet_room = world_vnum[IN_ROOM ( ch )->number + 1];
+    if ( pet_room == NULL )
+        return 0;
 
-	if ( CMD_IS ( "list" ) )
-	{
-		*ch << "To buy a pet and name it, use: \r\n";
-		*ch << "buy <pet> <the name you give it>\r\n";
-		*ch << "Available pets are:\r\n";
-		for ( pet = pet_room->people; pet; pet = pet->next_in_room )
-		{
-			if ( IS_NPC ( pet ) )
-			{
-				ch->Send ( "%8lld - %-20s (Class: %s, Race: %s)\r\n", PET_PRICE ( pet ),
-				           GET_NAME ( pet ), simple_class_name ( pet ), race_name ( pet ) );
-			}
-		}
-		return ( TRUE );
-	}
-	else if ( CMD_IS ( "buy" ) )
-	{
+    if ( CMD_IS ( "list" ) )
+    {
+        *ch << "To buy a pet and name it, use: \r\n";
+        *ch << "buy <pet> <the name you give it>\r\n";
+        *ch << "Available pets are:\r\n";
+        for ( pet = pet_room->people; pet; pet = pet->next_in_room )
+        {
+            if ( IS_NPC ( pet ) )
+            {
+                ch->Send ( "%8lld - %-20s (Class: %s, Race: %s)\r\n", PET_PRICE ( pet ),
+                           GET_NAME ( pet ), simple_class_name ( pet ), race_name ( pet ) );
+            }
+        }
+        return ( TRUE );
+    }
+    else if ( CMD_IS ( "buy" ) )
+    {
 
-		if ( IS_NPC ( ch ) )
-		{
-			*ch << "You are a mob: No pets for you!";
-			return ( TRUE );
-		}
+        if ( IS_NPC ( ch ) )
+        {
+            *ch << "You are a mob: No pets for you!";
+            return ( TRUE );
+        }
 
-		two_arguments ( argument, buf, pet_name );
+        two_arguments ( argument, buf, pet_name );
 
-		if ( ! ( pet = get_char_room ( buf, NULL, pet_room ) ) )
-		{
-			*ch << "There is no such pet!\r\n";
-			return ( TRUE );
-		}
-		if ( ch->master != NULL )
-			k = ch->master;
-		else
-			k = ch;
-		for ( f = k->followers; f; f = f_next )
-		{
-			f_next = f->next;
-			tch = f->follower;
-			if ( !AFF_FLAGGED ( tch, AFF_CHARM ) )
-				continue;
-			num_of_pets++;
-		}
-		if ( num_of_pets > MAX_PETS )
-		{
-			*ch << "You already have the maximum number of that kind of pet.\r\n";
-			return ( TRUE );
-		}
-		if ( ch->Gold ( 0, GOLD_HAND ) < PET_PRICE ( pet ) )
-		{
-			*ch << "You don't have enough gold!\r\n";
-			return ( TRUE );
-		}
-		if ( !can_have_follower ( ch, pet ) )
-		{
-			*ch << "You can't control that many charmed followers!\r\n";
-			return TRUE;
-		}
-		ch->Gold ( -PET_PRICE ( pet ), GOLD_HAND );
+        if ( ! ( pet = get_char_room ( buf, NULL, pet_room ) ) )
+        {
+            *ch << "There is no such pet!\r\n";
+            return ( TRUE );
+        }
+        if ( ch->master != NULL )
+            k = ch->master;
+        else
+            k = ch;
+        for ( f = k->followers; f; f = f_next )
+        {
+            f_next = f->next;
+            tch = f->follower;
+            if ( !AFF_FLAGGED ( tch, AFF_CHARM ) )
+                continue;
+            num_of_pets++;
+        }
+        if ( num_of_pets > MAX_PETS )
+        {
+            *ch << "You already have the maximum number of that kind of pet.\r\n";
+            return ( TRUE );
+        }
+        if ( ch->Gold ( 0, GOLD_HAND ) < PET_PRICE ( pet ) )
+        {
+            *ch << "You don't have enough gold!\r\n";
+            return ( TRUE );
+        }
+        if ( !can_have_follower ( ch, pet ) )
+        {
+            *ch << "You can't control that many charmed followers!\r\n";
+            return TRUE;
+        }
+        ch->Gold ( -PET_PRICE ( pet ), GOLD_HAND );
 
-		pet = read_mobile ( GET_MOB_VNUM ( pet ) );
-		GET_EXP ( pet ) = 0;
-		SET_BIT_AR ( AFF_FLAGS ( pet ), AFF_CHARM );
-		pet->Gold ( -GET_GOLD ( pet ), GOLD_HAND );
+        pet = read_mobile ( GET_MOB_VNUM ( pet ) );
+        GET_EXP ( pet ) = 0;
+        SET_BIT_AR ( AFF_FLAGS ( pet ), AFF_CHARM );
+        pet->Gold ( -GET_GOLD ( pet ), GOLD_HAND );
 
 
-		if ( *pet_name )
-		{
-			snprintf ( buf, sizeof ( buf ), "%s %s", pet->player.name, pet_name );
-			/* free(pet->player.name); don't free the prototype! */
-			pet->player.name = strdup ( buf );
+        if ( *pet_name )
+        {
+            snprintf ( buf, sizeof ( buf ), "%s %s", pet->player.name, pet_name );
+            /* free(pet->player.name); don't free the prototype! */
+            pet->player.name = strdup ( buf );
 
-			snprintf ( buf, sizeof ( buf ),
-			           "%sA small sign on a chain around the neck says 'My name is %s.'\r\n",
-			           pet->player.description, pet_name );
-			/* free(pet->player.description); don't free the prototype! */
-			pet->player.description = strdup ( buf );
+            snprintf ( buf, sizeof ( buf ),
+                       "%sA small sign on a chain around the neck says 'My name is %s.'\r\n",
+                       pet->player.description, pet_name );
+            /* free(pet->player.description); don't free the prototype! */
+            pet->player.description = strdup ( buf );
 
-			snprintf ( buf, sizeof ( buf ), "%s named %s owned by %s stands here.\r\n",
-			           pet->player.short_descr, pet_name, GET_NAME ( ch ) );
-			pet->player.long_descr = strdup ( buf );
-		}
-		else
-		{
-			snprintf ( buf, sizeof ( buf ), "%s owned by %s stands here.\r\n",
-			           pet->player.short_descr, GET_NAME ( ch ) );
-			pet->player.long_descr = strdup ( buf );
-		}
-		char_to_room ( pet, IN_ROOM ( ch ) );
-		add_follower ( pet, ch );
-		SET_BIT_AR ( AFF_FLAGS ( pet ), AFF_GROUP );
-		load_mtrigger ( pet );
+            snprintf ( buf, sizeof ( buf ), "%s named %s owned by %s stands here.\r\n",
+                       pet->player.short_descr, pet_name, GET_NAME ( ch ) );
+            pet->player.long_descr = strdup ( buf );
+        }
+        else
+        {
+            snprintf ( buf, sizeof ( buf ), "%s owned by %s stands here.\r\n",
+                       pet->player.short_descr, GET_NAME ( ch ) );
+            pet->player.long_descr = strdup ( buf );
+        }
+        char_to_room ( pet, IN_ROOM ( ch ) );
+        add_follower ( pet, ch );
+        SET_BIT_AR ( AFF_FLAGS ( pet ), AFF_GROUP );
+        load_mtrigger ( pet );
 
-		/* Be certain that pets can't get/carry/use/wield/wear items */
-		GET_GOLD ( pet ) = 0;
-		GET_EXP ( pet ) = 0;
+        /* Be certain that pets can't get/carry/use/wield/wear items */
+        GET_GOLD ( pet ) = 0;
+        GET_EXP ( pet ) = 0;
 
-		*ch << "May you enjoy your pet.\r\n";
-		act ( "$n buys $N as a pet.", FALSE, ch, 0, pet, TO_ROOM );
+        *ch << "May you enjoy your pet.\r\n";
+        act ( "$n buys $N as a pet.", FALSE, ch, 0, pet, TO_ROOM );
 
-		return ( 1 );
-	}
-	/* All commands except list and buy */
-	return ( 0 );
+        return ( 1 );
+    }
+    /* All commands except list and buy */
+    return ( 0 );
 }
 
 
@@ -1344,82 +1344,82 @@ SPECIAL ( pet_shops )
 
 SPECIAL ( bank )
 {
-	gold_int amount = 0;
-	int all = !strcmp ( argument, "all" );
+    gold_int amount = 0;
+    int all = !strcmp ( argument, "all" );
 
-	if ( CMD_IS ( "balance" ) )
-	{
-		if ( GET_BANK_GOLD ( ch ) > 0 )
-			ch->Send ( "Your current balance is %lld coins.\r\n",GET_BANK_GOLD ( ch ) );
-		else
-			ch->Send ( "You currently have no money deposited.\r\n" );
-		return ( 1 );
-	}
-	else if ( CMD_IS ( "deposit" ) )
-	{
-		if ( !all )
-		{
-			if ( atoll ( argument ) <= 0 )
-			{
-				*ch << "How much do you want to deposit?\r\n";
-				return ( 1 );
+    if ( CMD_IS ( "balance" ) )
+    {
+        if ( GET_BANK_GOLD ( ch ) > 0 )
+            ch->Send ( "Your current balance is %lld coins.\r\n",GET_BANK_GOLD ( ch ) );
+        else
+            ch->Send ( "You currently have no money deposited.\r\n" );
+        return ( 1 );
+    }
+    else if ( CMD_IS ( "deposit" ) )
+    {
+        if ( !all )
+        {
+            if ( atoll ( argument ) <= 0 )
+            {
+                *ch << "How much do you want to deposit?\r\n";
+                return ( 1 );
 
-			}
-			else
-				amount = atoll ( argument );
-		}
-		else
-			amount = ch->Gold ( 0, GOLD_HAND );
+            }
+            else
+                amount = atoll ( argument );
+        }
+        else
+            amount = ch->Gold ( 0, GOLD_HAND );
 
-		if ( ch->Gold ( 0, GOLD_HAND ) < amount )
-		{
-			*ch << "You don't have that many coins!\r\n";
-			return ( 1 );
-		}
-		if ( ch->Gold ( 0, GOLD_BANK ) + amount > 100000000 )
-			ch->Send ( "With bank accounts with more than 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
-		ch->Gold ( -amount, GOLD_HAND );
-		ch->Gold ( amount, GOLD_BANK );
-		ch->Send ( "You deposit %lld coins.\r\n", amount );
-		act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
-		return ( 1 );
-	}
-	else if ( CMD_IS ( "withdraw" ) )
-	{
-		if ( !all )
-		{
-			if ( ( amount = atoll ( argument ) ) <= 0 )
-			{
-				*ch << "How much do you want to withdraw?\r\n";
-				return ( 1 );
-			}
-		}
-		else
-			amount = ch->Gold ( 0, GOLD_BANK );
-		if ( ch->Gold ( 0, GOLD_BANK ) < amount )
-		{
-			*ch << "You don't have that many coins deposited!\r\n";
-			return ( 1 );
-		}
-		if ( ch->Gold ( 0, GOLD_BANK ) > 100000000 )
-		{
-			ch->Send ( "Because of your huge bank investment, and the untimely withdraw,\r\n"
-			           "You are charged bank fees summing to 10 percent of the amount.\r\n" );
-			if ( ( ch->Gold ( 0, GOLD_BANK )- ( amount + 1 ) ) < ( amount/10 ) )
-			{
-				ch->Send ( "Which you can't afford. Please withdraw a smaller amount.\r\n" );
-				return ( 1 );
-			}
-			ch->Gold ( - ( ( amount/10 ) +1 ), GOLD_BANK );
-		}
-		ch->Gold ( amount, GOLD_HAND );
-		ch->Gold ( -amount, GOLD_BANK );
-		ch->Send ( "You withdraw %lld coins.\r\n", amount );
-		act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
-		return ( 1 );
-	}
-	else
-		return ( 0 );
+        if ( ch->Gold ( 0, GOLD_HAND ) < amount )
+        {
+            *ch << "You don't have that many coins!\r\n";
+            return ( 1 );
+        }
+        if ( ch->Gold ( 0, GOLD_BANK ) + amount > 100000000 )
+            ch->Send ( "With bank accounts with more than 100mil a 10 percent fee is charged on withdrawal. Thank you.\r\n" );
+        ch->Gold ( -amount, GOLD_HAND );
+        ch->Gold ( amount, GOLD_BANK );
+        ch->Send ( "You deposit %lld coins.\r\n", amount );
+        act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
+        return ( 1 );
+    }
+    else if ( CMD_IS ( "withdraw" ) )
+    {
+        if ( !all )
+        {
+            if ( ( amount = atoll ( argument ) ) <= 0 )
+            {
+                *ch << "How much do you want to withdraw?\r\n";
+                return ( 1 );
+            }
+        }
+        else
+            amount = ch->Gold ( 0, GOLD_BANK );
+        if ( ch->Gold ( 0, GOLD_BANK ) < amount )
+        {
+            *ch << "You don't have that many coins deposited!\r\n";
+            return ( 1 );
+        }
+        if ( ch->Gold ( 0, GOLD_BANK ) > 100000000 )
+        {
+            ch->Send ( "Because of your huge bank investment, and the untimely withdraw,\r\n"
+                       "You are charged bank fees summing to 10 percent of the amount.\r\n" );
+            if ( ( ch->Gold ( 0, GOLD_BANK )- ( amount + 1 ) ) < ( amount/10 ) )
+            {
+                ch->Send ( "Which you can't afford. Please withdraw a smaller amount.\r\n" );
+                return ( 1 );
+            }
+            ch->Gold ( - ( ( amount/10 ) +1 ), GOLD_BANK );
+        }
+        ch->Gold ( amount, GOLD_HAND );
+        ch->Gold ( -amount, GOLD_BANK );
+        ch->Send ( "You withdraw %lld coins.\r\n", amount );
+        act ( "$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM );
+        return ( 1 );
+    }
+    else
+        return ( 0 );
 }
 
 /* This special procedure makes a mob into a 'rent-a-cleric', who sells spells
@@ -1429,140 +1429,140 @@ SPECIAL ( bank )
 */
 SPECIAL ( cleric )
 {
-	int i;
-	char buf[MAX_STRING_LENGTH];
-	Character *vict;
-	struct price_info
-	{
-		short int number;
-		char name[25];
-		gold_int price;
-	}
-	prices[] =
-	{
-		/* Spell Num (defined)      Name shown        Price  */
- 		{
-		      SPELL_VITALIZE, "vitalize", 500}, {
-			SPELL_DETECT_INVIS_OTHER, "detect invis", 2500}, {
-			SPELL_ARMOR, "armor", 5000}, {
-			SPELL_BLESS, "bless", 5000}, {
-			SPELL_MANA_REGEN, "mana regen", 5000}, {
-			SPELL_ANTIDOTE_1, "remove poison", 5000}, {
-			SPELL_CURE_BLIND, "cure blindness", 5000}, {
-			SPELL_CURE_CRITIC, "critic", 7000},
-		{SPELL_SANCTUARY, "sanctuary", 3500},
-		{SPELL_HEAL, "heal", 10000},
-		{SPELL_SHIELD, "shield", 500000},
-		{SPELL_STONESKIN, "stoneskin", 1000000},
-		/* The next line must be last, add new spells above. */
-		{-1, "\r\n", 0}
-	};
+    int i;
+    char buf[MAX_STRING_LENGTH];
+    Character *vict;
+    struct price_info
+    {
+        short int number;
+        char name[25];
+        gold_int price;
+    }
+    prices[] =
+    {
+        /* Spell Num (defined)      Name shown        Price  */
+         {
+              SPELL_VITALIZE, "vitalize", 500}, {
+            SPELL_DETECT_INVIS_OTHER, "detect invis", 2500}, {
+            SPELL_ARMOR, "armor", 5000}, {
+            SPELL_BLESS, "bless", 5000}, {
+            SPELL_MANA_REGEN, "mana regen", 5000}, {
+            SPELL_ANTIDOTE_1, "remove poison", 5000}, {
+            SPELL_CURE_BLIND, "cure blindness", 5000}, {
+            SPELL_CURE_CRITIC, "critic", 7000},
+        {SPELL_SANCTUARY, "sanctuary", 3500},
+        {SPELL_HEAL, "heal", 10000},
+        {SPELL_SHIELD, "shield", 500000},
+        {SPELL_STONESKIN, "stoneskin", 1000000},
+        /* The next line must be last, add new spells above. */
+        {-1, "\r\n", 0}
+    };
 
-	/* NOTE:  In interpreter.c, you must define a command called 'heal' for this
-	   spec_proc to work.  Just define it as do_not_here, and the mob will take
-	   care of the rest.  (If you don't know what this means, look in interpreter.c
-	   for a clue.)
-	*/
+    /* NOTE:  In interpreter.c, you must define a command called 'heal' for this
+       spec_proc to work.  Just define it as do_not_here, and the mob will take
+       care of the rest.  (If you don't know what this means, look in interpreter.c
+       for a clue.)
+    */
 
-	if ( CMD_IS ( "heal" ) )
-	{
-		argument = one_argument ( argument, buf );
+    if ( CMD_IS ( "heal" ) )
+    {
+        argument = one_argument ( argument, buf );
 
-		if ( GET_POS ( ch ) == POS_FIGHTING )
-			return TRUE;
+        if ( GET_POS ( ch ) == POS_FIGHTING )
+            return TRUE;
 
-		if ( *buf )
-		{
-			for ( i = 0; prices[i].number > SPELL_RESERVED_DBC; i++ )
-			{
-				if ( is_abbrev ( buf, prices[i].name ) )
-				{
-					if ( ch->Gold ( 0, GOLD_HAND ) < prices[i].price )
-					{
-						act ( "$n tells you, 'You don't have enough gold for that spell!'", FALSE, ( Character * ) me, 0, ch, TO_VICT );
-						return TRUE;
-					}
-					else
-					{
+        if ( *buf )
+        {
+            for ( i = 0; prices[i].number > SPELL_RESERVED_DBC; i++ )
+            {
+                if ( is_abbrev ( buf, prices[i].name ) )
+                {
+                    if ( ch->Gold ( 0, GOLD_HAND ) < prices[i].price )
+                    {
+                        act ( "$n tells you, 'You don't have enough gold for that spell!'", FALSE, ( Character * ) me, 0, ch, TO_VICT );
+                        return TRUE;
+                    }
+                    else
+                    {
 
-						act ( "$N gives $n some money.",  FALSE, ( Character * ) me, 0, ch, TO_NOTVICT );
-						ch->Send ( "You give %s %lld coins.\r\n", GET_NAME ( ( Character * ) me ), prices[i].price );
-						ch->Gold ( -prices[i].price, GOLD_HAND );
-						( ( Character * ) me )->Gold ( prices[i].price, GOLD_HAND );
-						cast_spell ( ( Character * ) me, ch, NULL, 0, prices[i].number );
-						return TRUE;
+                        act ( "$N gives $n some money.",  FALSE, ( Character * ) me, 0, ch, TO_NOTVICT );
+                        ch->Send ( "You give %s %lld coins.\r\n", GET_NAME ( ( Character * ) me ), prices[i].price );
+                        ch->Gold ( -prices[i].price, GOLD_HAND );
+                        ( ( Character * ) me )->Gold ( prices[i].price, GOLD_HAND );
+                        cast_spell ( ( Character * ) me, ch, NULL, 0, prices[i].number );
+                        return TRUE;
 
-					}
-				}
-			}
-			act ( "$n tells you, 'I do not know of that spell!"
-			      "  Type 'heal' for a list.'", FALSE,
-			      ( Character * ) me, 0, ch, TO_VICT );
+                    }
+                }
+            }
+            act ( "$n tells you, 'I do not know of that spell!"
+                  "  Type 'heal' for a list.'", FALSE,
+                  ( Character * ) me, 0, ch, TO_VICT );
 
-			return TRUE;
-		}
-		else
-		{
-			act ( "$n tells you, 'Here is a listing of the prices for my services.'", FALSE, ( Character * ) me, 0, ch, TO_VICT );
-			for ( i = 0; prices[i].number > SPELL_RESERVED_DBC; i++ )
-			{
-				ch->Send ( "{cc%-15s {cg- {cy%lld{c0\r\n", prices[i].name, prices[i].price );
-			}
-			return TRUE;
-		}
-	}
+            return TRUE;
+        }
+        else
+        {
+            act ( "$n tells you, 'Here is a listing of the prices for my services.'", FALSE, ( Character * ) me, 0, ch, TO_VICT );
+            for ( i = 0; prices[i].number > SPELL_RESERVED_DBC; i++ )
+            {
+                ch->Send ( "{cc%-15s {cg- {cy%lld{c0\r\n", prices[i].name, prices[i].price );
+            }
+            return TRUE;
+        }
+    }
 
-	if ( cmd )
-		return FALSE;
+    if ( cmd )
+        return FALSE;
 
-	/* pseudo-randomly choose someone in the room */
-	for ( vict = IN_ROOM ( ch )->people; vict; vict = vict->next_in_room )
-		if ( !number ( 0, 3 ) )
-			break;
+    /* pseudo-randomly choose someone in the room */
+    for ( vict = IN_ROOM ( ch )->people; vict; vict = vict->next_in_room )
+        if ( !number ( 0, 3 ) )
+            break;
 
-	/* change the level at the end of the next line to control free spells */
-	if ( vict == NULL || IS_NPC ( vict ) || ( GET_LEVEL ( vict ) > 10 ) )
-		return FALSE;
+    /* change the level at the end of the next line to control free spells */
+    if ( vict == NULL || IS_NPC ( vict ) || ( GET_LEVEL ( vict ) > 10 ) )
+        return FALSE;
 
-	switch ( number ( 1, GET_LEVEL ( vict ) ) )
-	{
-		case 1:
-			cast_spell ( ch, vict, NULL, 0, SPELL_CURE_LIGHT );
-			break;
-		case 2:
-			cast_spell ( ch, vict, NULL, 0, SPELL_BLESS );
-			break;
-		case 3:
-			cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
-			break;
-		case 4:
-			cast_spell ( ch, vict, NULL, 0, SPELL_CURE_LIGHT );
-			break;
-		case 5:
-			cast_spell ( ch, vict, NULL, 0, SPELL_BLESS );
-			break;
-		case 6:
-			cast_spell ( ch, vict, NULL, 0, SPELL_CURE_CRITIC );
-			break;
-		case 7:
-			cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
-			break;
-		case 8:
-			cast_spell ( ch, vict, NULL, 0, SPELL_CURE_CRITIC );
-			break;
-		case 9:
-			cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
-			break;
-		case 10:
-			/* special wacky thing, your mileage may vary */
-			act ( "$n utters the words, 'energizer'.", TRUE, ch, 0, vict, TO_ROOM );
-			act ( "You feel invigorated!", FALSE, ch, 0, vict, TO_VICT );
-			alter_move ( ch,
-			             -MIN ( GET_MAX_MOVE ( vict ),
-			                    MAX ( ( GET_MOVE ( vict ) + 10 ), number ( 50, 200 ) ) ) );
-			break;
-	}
-	return TRUE;
+    switch ( number ( 1, GET_LEVEL ( vict ) ) )
+    {
+        case 1:
+            cast_spell ( ch, vict, NULL, 0, SPELL_CURE_LIGHT );
+            break;
+        case 2:
+            cast_spell ( ch, vict, NULL, 0, SPELL_BLESS );
+            break;
+        case 3:
+            cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
+            break;
+        case 4:
+            cast_spell ( ch, vict, NULL, 0, SPELL_CURE_LIGHT );
+            break;
+        case 5:
+            cast_spell ( ch, vict, NULL, 0, SPELL_BLESS );
+            break;
+        case 6:
+            cast_spell ( ch, vict, NULL, 0, SPELL_CURE_CRITIC );
+            break;
+        case 7:
+            cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
+            break;
+        case 8:
+            cast_spell ( ch, vict, NULL, 0, SPELL_CURE_CRITIC );
+            break;
+        case 9:
+            cast_spell ( ch, vict, NULL, 0, SPELL_ARMOR );
+            break;
+        case 10:
+            /* special wacky thing, your mileage may vary */
+            act ( "$n utters the words, 'energizer'.", TRUE, ch, 0, vict, TO_ROOM );
+            act ( "You feel invigorated!", FALSE, ch, 0, vict, TO_VICT );
+            alter_move ( ch,
+                         -MIN ( GET_MAX_MOVE ( vict ),
+                                MAX ( ( GET_MOVE ( vict ) + 10 ), number ( 50, 200 ) ) ) );
+            break;
+    }
+    return TRUE;
 }
 
 /* corpse recovery utility
@@ -1570,877 +1570,877 @@ SPECIAL ( cleric )
  */
 ACMD ( do_recover )
 {
-	int found = 0;
-	gold_int amt;
-	struct obj_data *obj = NULL;
-	int remorts = MIN(REMORTS(ch), 50);
-	void perform_meld ( Character *ch, OBJ_DATA *corpse );
+    int found = 0;
+    gold_int amt;
+    struct obj_data *obj = NULL;
+    int remorts = MIN(REMORTS(ch), 50);
+    void perform_meld ( Character *ch, OBJ_DATA *corpse );
 
-	struct corpse_list_data *temp = NULL, *tnext;
+    struct corpse_list_data *temp = NULL, *tnext;
 
-	/* check to see if the character is at the altar */
-	if ( IN_ROOM ( ch )->number != 3083 )
-	{
-		*ch << "You can only recover in the crypt east and down from the Recall Point!\r\n";
-		return;
-	}
-
-
-	/* determine the cost per recovery */
-	if ( GET_LEVEL ( ch ) <= 20 )
-		amt = 100000;
-	else
-		amt = GET_LEVEL ( ch ) * 50000;
-
-	amt += remorts * 500000;
-	/* charge the character */
-	if ( ch->Gold ( 0, GOLD_BANK ) < amt )
-	{
-		*ch << "Your bank account can not afford this service!\r\n";
-		return;
-	}
-	/* search the world for the corpse, if it still exists */
-	for ( temp = corpse_list; temp; temp = tnext )
-	{
-		tnext = temp->next;
-		obj = temp->corpse;
-
-		if ( GET_OBJ_VAL ( obj, 0 ) != get_pidx_from_name ( ch ) )
-			continue;
-		if ( !obj->contains )
-		{
-			ch->Send ( "An empty corpse is found. Not Recovered. Removed From List.\r\n" );
-			remove_corpse_from_list ( obj );
-			continue;
-		}
-		else if ( obj->carried_by )
-		{
-			ch->Send ( "Your corpse was found being carried by %s and can't be recovered.\r\n", GET_NAME ( obj->carried_by ) );
-			continue;
-			remove_corpse_from_list ( obj );
-		}
-		if ( IN_ROOM ( obj ) == NULL )
-			continue;
+    /* check to see if the character is at the altar */
+    if ( IN_ROOM ( ch )->number != 3083 )
+    {
+        *ch << "You can only recover in the crypt east and down from the Recall Point!\r\n";
+        return;
+    }
 
 
-		found = 1;
+    /* determine the cost per recovery */
+    if ( GET_LEVEL ( ch ) <= 20 )
+        amt = 100000;
+    else
+        amt = GET_LEVEL ( ch ) * 50000;
 
-		obj_from_room ( obj );
-		obj_to_room ( obj, IN_ROOM ( ch ) );
-		perform_meld ( ch, obj );
-	}
+    amt += remorts * 500000;
+    /* charge the character */
+    if ( ch->Gold ( 0, GOLD_BANK ) < amt )
+    {
+        *ch << "Your bank account can not afford this service!\r\n";
+        return;
+    }
+    /* search the world for the corpse, if it still exists */
+    for ( temp = corpse_list; temp; temp = tnext )
+    {
+        tnext = temp->next;
+        obj = temp->corpse;
 
-	if ( !found )
-		*ch << "Your corpse can not be found. Sorry!\r\n";
-	else
-	{
+        if ( GET_OBJ_VAL ( obj, 0 ) != get_pidx_from_name ( ch ) )
+            continue;
+        if ( !obj->contains )
+        {
+            ch->Send ( "An empty corpse is found. Not Recovered. Removed From List.\r\n" );
+            remove_corpse_from_list ( obj );
+            continue;
+        }
+        else if ( obj->carried_by )
+        {
+            ch->Send ( "Your corpse was found being carried by %s and can't be recovered.\r\n", GET_NAME ( obj->carried_by ) );
+            continue;
+            remove_corpse_from_list ( obj );
+        }
+        if ( IN_ROOM ( obj ) == NULL )
+            continue;
 
-		ch->Send ( "You are charged %lld gold for the recovery.\r\n",amt );
-		ch->Gold ( -amt, GOLD_BANK );
-	}
+
+        found = 1;
+
+        obj_from_room ( obj );
+        obj_to_room ( obj, IN_ROOM ( ch ) );
+        perform_meld ( ch, obj );
+    }
+
+    if ( !found )
+        *ch << "Your corpse can not be found. Sorry!\r\n";
+    else
+    {
+
+        ch->Send ( "You are charged %lld gold for the recovery.\r\n",amt );
+        ch->Gold ( -amt, GOLD_BANK );
+    }
 }
 
 SPECIAL ( guard_white )
 {
-	char buf[MAX_STRING_LENGTH];
-	Character *victim;
-	Character *ech;
-	char *crime;
-	int max_evil;
+    char buf[MAX_STRING_LENGTH];
+    Character *victim;
+    Character *ech;
+    char *crime;
+    int max_evil;
 
-	if ( GET_POS ( ch ) < POS_SLEEPING || FIGHTING ( ch ) != NULL || !IS_NPC ( ch ) )
-		return FALSE;
+    if ( GET_POS ( ch ) < POS_SLEEPING || FIGHTING ( ch ) != NULL || !IS_NPC ( ch ) )
+        return FALSE;
 
-	max_evil = 300;
-	ech = NULL;
-	crime = ( char * ) "";
+    max_evil = 300;
+    ech = NULL;
+    crime = ( char * ) "";
 
-	for ( victim = IN_ROOM ( ch )->people; victim != NULL;
-	        victim = victim->next_in_room )
-	{
-		if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_KILLER ) )
-		{
-			crime = ( char * ) "KILLER";
-			break;
-		}
+    for ( victim = IN_ROOM ( ch )->people; victim != NULL;
+            victim = victim->next_in_room )
+    {
+        if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_KILLER ) )
+        {
+            crime = ( char * ) "KILLER";
+            break;
+        }
 
-		if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_THIEF ) )
-		{
-			crime = ( char * ) "THIEF";
-			break;
-		}
+        if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_THIEF ) )
+        {
+            crime = ( char * ) "THIEF";
+            break;
+        }
 
-		if ( FIGHTING ( victim ) != NULL
-		        && FIGHTING ( victim ) != ch
-		        && GET_ALIGNMENT ( victim ) < max_evil )
-		{
-			max_evil = GET_ALIGNMENT ( victim );
-			ech = victim;
-		}
-	}
+        if ( FIGHTING ( victim ) != NULL
+                && FIGHTING ( victim ) != ch
+                && GET_ALIGNMENT ( victim ) < max_evil )
+        {
+            max_evil = GET_ALIGNMENT ( victim );
+            ech = victim;
+        }
+    }
 
-	if ( victim != NULL )
-	{
-		snprintf ( buf, sizeof ( buf ), "%s is a %s!  How DARE you come to the Temple!!!!",
-		           GET_NAME ( victim ), crime );
-		do_say ( ch, buf, 0, 0 );
-		start_fighting ( ch, victim );
-		return TRUE;
-	}
+    if ( victim != NULL )
+    {
+        snprintf ( buf, sizeof ( buf ), "%s is a %s!  How DARE you come to the Temple!!!!",
+                   GET_NAME ( victim ), crime );
+        do_say ( ch, buf, 0, 0 );
+        start_fighting ( ch, victim );
+        return TRUE;
+    }
 
-	if ( ech != NULL )
-	{
-		act ( "$n screams ' Now you DIE you Bastard!!!!",
-		      FALSE, ch, NULL, NULL, TO_ROOM );
-		start_fighting ( ch, ech );
-		return TRUE;
-	}
+    if ( ech != NULL )
+    {
+        act ( "$n screams ' Now you DIE you Bastard!!!!",
+              FALSE, ch, NULL, NULL, TO_ROOM );
+        start_fighting ( ch, ech );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( guard_black )
 {
-	char buf[MAX_STRING_LENGTH];
-	Character *victim;
-	Character *ech;
-	char *crime;
-	int max_good;
+    char buf[MAX_STRING_LENGTH];
+    Character *victim;
+    Character *ech;
+    char *crime;
+    int max_good;
 
-	if ( GET_POS ( ch ) < POS_SLEEPING || FIGHTING ( ch ) != NULL || !IS_NPC ( ch ) )
-		return FALSE;
+    if ( GET_POS ( ch ) < POS_SLEEPING || FIGHTING ( ch ) != NULL || !IS_NPC ( ch ) )
+        return FALSE;
 
-	max_good = -300;
-	ech = NULL;
-	crime = ( char * ) "";
+    max_good = -300;
+    ech = NULL;
+    crime = ( char * ) "";
 
-	for ( victim = IN_ROOM ( ch )->people; victim != NULL;
-	        victim = victim->next_in_room )
-	{
-		if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_KILLER ) )
-		{
-			crime = ( char * ) "KILLER";
-			break;
-		}
+    for ( victim = IN_ROOM ( ch )->people; victim != NULL;
+            victim = victim->next_in_room )
+    {
+        if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_KILLER ) )
+        {
+            crime = ( char * ) "KILLER";
+            break;
+        }
 
-		if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_THIEF ) )
-		{
-			crime = ( char * ) "THIEF";
-			break;
-		}
+        if ( !IS_NPC ( victim ) && PLR_FLAGGED ( victim, PLR_THIEF ) )
+        {
+            crime = ( char * ) "THIEF";
+            break;
+        }
 
-		if ( FIGHTING ( victim ) != NULL
-		        && FIGHTING ( victim ) != ch
-		        && GET_ALIGNMENT ( victim ) < max_good )
-		{
-			max_good = GET_ALIGNMENT ( victim );
-			ech = victim;
-		}
-	}
+        if ( FIGHTING ( victim ) != NULL
+                && FIGHTING ( victim ) != ch
+                && GET_ALIGNMENT ( victim ) < max_good )
+        {
+            max_good = GET_ALIGNMENT ( victim );
+            ech = victim;
+        }
+    }
 
-	if ( victim != NULL )
-	{
-		snprintf ( buf, sizeof ( buf ), "%s is a %s!  How DARE you come to the Temple!!!!",
-		           GET_NAME ( victim ), crime );
-		do_say ( ch, buf, 0, 0 );
-		start_fighting ( ch, victim );
-		return TRUE;
-	}
+    if ( victim != NULL )
+    {
+        snprintf ( buf, sizeof ( buf ), "%s is a %s!  How DARE you come to the Temple!!!!",
+                   GET_NAME ( victim ), crime );
+        do_say ( ch, buf, 0, 0 );
+        start_fighting ( ch, victim );
+        return TRUE;
+    }
 
-	if ( ech != NULL )
-	{
-		act ( "$n screams ' Now you DIE you Bastard!!!!",
-		      FALSE, ch, NULL, NULL, TO_ROOM );
-		start_fighting ( ch, ech );
-		return TRUE;
-	}
+    if ( ech != NULL )
+    {
+        act ( "$n screams ' Now you DIE you Bastard!!!!",
+              FALSE, ch, NULL, NULL, TO_ROOM );
+        start_fighting ( ch, ech );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( bottle )
 {
-	struct obj_data *obj = ( struct obj_data * ) me;
-	Character *mob;
-	ACMD ( do_hit );
+    struct obj_data *obj = ( struct obj_data * ) me;
+    Character *mob;
+    ACMD ( do_hit );
 
-	if ( CMD_IS ( "open" ) )
-	{
-		skip_spaces ( &argument );
-		if ( isname ( argument, obj->name ) && CAN_SEE_OBJ ( ch, obj )
-		        && GET_OBJ_VAL ( obj, 1 ) != 0 )
-		{
-			if ( GET_OBJ_VNUM ( obj ) == 216 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;	// open the object
-				mob = read_mobile ( 204 );
-				act ( "As you open the bottle, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR );
-				act ( "As $n opens the bottle, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM );
-				act ( "Going into a blood frenzy, $E attacks you!",
-				      FALSE, ch, 0, mob, TO_CHAR );
-				act ( "Going into a blood frenzy, $E attacks $m!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
-				GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
-				return TRUE;
-			}
-			else if ( GET_OBJ_VNUM ( obj ) == 1144 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
-				mob = read_mobile ( 1163 );
-				act ( "$N crawls out of the box and stings your hand!",
-				      FALSE, ch, 0, mob, TO_CHAR );
-				act ( "$N crawls out of the box and stings $n on the hand.",
-				      FALSE, ch, 0, mob, TO_ROOM );
-				GET_POS ( ch ) = POS_SITTING;
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );
-				return TRUE;
-			}
-			else if ( GET_OBJ_VNUM ( obj ) == 7563 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
-				mob = read_mobile ( 7557 );
-				act ( "$N crawls out of the box and stings your hand!",
-				      FALSE, ch, 0, mob, TO_CHAR );
-				act ( "$N crawls out of the box and stings $n on the hand.",
-				      FALSE, ch, 0, mob, TO_ROOM );
-				GET_POS ( ch ) = POS_SITTING;
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );
-				return TRUE;
-			}
-			else if ( GET_OBJ_VNUM ( obj ) == 1144 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
-				mob = read_mobile ( 1163 );
-				act ( "$N crawls out of the box and stings your hand!",
-				      FALSE, ch, 0, mob, TO_CHAR );
-				act ( "$N crawls out of the box and stings $n on the hand.",
-				      FALSE, ch, 0, mob, TO_ROOM );
-				GET_POS ( ch ) = POS_SITTING;
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );
-				return TRUE;
-			}
-			else if ( GET_OBJ_VNUM ( obj ) == 11245 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;
-				mob = read_mobile ( 11229 );
-				act ( "The vault guard rushes into the room, with his great long sword, ready to strike.", FALSE, ch, 0, mob, TO_ROOM );
-				act ( "The vault guard rushes into the room, with his great long sword, ready to attack you.", FALSE, ch, 0, mob, TO_VICT );
-				GET_POS ( ch ) = POS_SITTING;
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );
-				return TRUE;
-			}
-			else if ( GET_OBJ_VNUM ( obj ) == 11244 )
-			{
-				GET_OBJ_VAL ( obj, 1 ) = 0;
-				mob = read_mobile ( 11096 );
-				act ( "The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_VICT );
-				act ( "The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_ROOM );
-				GET_POS ( ch ) = POS_SITTING;
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );
-				return TRUE;
-			}
-		}
-	}
-	return FALSE;
+    if ( CMD_IS ( "open" ) )
+    {
+        skip_spaces ( &argument );
+        if ( isname ( argument, obj->name ) && CAN_SEE_OBJ ( ch, obj )
+                && GET_OBJ_VAL ( obj, 1 ) != 0 )
+        {
+            if ( GET_OBJ_VNUM ( obj ) == 216 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;	// open the object
+                mob = read_mobile ( 204 );
+                act ( "As you open the bottle, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR );
+                act ( "As $n opens the bottle, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM );
+                act ( "Going into a blood frenzy, $E attacks you!",
+                      FALSE, ch, 0, mob, TO_CHAR );
+                act ( "Going into a blood frenzy, $E attacks $m!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
+                GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
+                return TRUE;
+            }
+            else if ( GET_OBJ_VNUM ( obj ) == 1144 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
+                mob = read_mobile ( 1163 );
+                act ( "$N crawls out of the box and stings your hand!",
+                      FALSE, ch, 0, mob, TO_CHAR );
+                act ( "$N crawls out of the box and stings $n on the hand.",
+                      FALSE, ch, 0, mob, TO_ROOM );
+                GET_POS ( ch ) = POS_SITTING;
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );
+                return TRUE;
+            }
+            else if ( GET_OBJ_VNUM ( obj ) == 7563 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
+                mob = read_mobile ( 7557 );
+                act ( "$N crawls out of the box and stings your hand!",
+                      FALSE, ch, 0, mob, TO_CHAR );
+                act ( "$N crawls out of the box and stings $n on the hand.",
+                      FALSE, ch, 0, mob, TO_ROOM );
+                GET_POS ( ch ) = POS_SITTING;
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );
+                return TRUE;
+            }
+            else if ( GET_OBJ_VNUM ( obj ) == 1144 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;	// open the bottle
+                mob = read_mobile ( 1163 );
+                act ( "$N crawls out of the box and stings your hand!",
+                      FALSE, ch, 0, mob, TO_CHAR );
+                act ( "$N crawls out of the box and stings $n on the hand.",
+                      FALSE, ch, 0, mob, TO_ROOM );
+                GET_POS ( ch ) = POS_SITTING;
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );
+                return TRUE;
+            }
+            else if ( GET_OBJ_VNUM ( obj ) == 11245 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;
+                mob = read_mobile ( 11229 );
+                act ( "The vault guard rushes into the room, with his great long sword, ready to strike.", FALSE, ch, 0, mob, TO_ROOM );
+                act ( "The vault guard rushes into the room, with his great long sword, ready to attack you.", FALSE, ch, 0, mob, TO_VICT );
+                GET_POS ( ch ) = POS_SITTING;
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );
+                return TRUE;
+            }
+            else if ( GET_OBJ_VNUM ( obj ) == 11244 )
+            {
+                GET_OBJ_VAL ( obj, 1 ) = 0;
+                mob = read_mobile ( 11096 );
+                act ( "The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_VICT );
+                act ( "The ghost of the fallen warrior emerges from hell to seek his revenge!", FALSE, ch, 0, mob, TO_ROOM );
+                GET_POS ( ch ) = POS_SITTING;
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 SPECIAL ( door_down )
 {
-	int door = -1, number;
-	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-	char *s;
-	struct obj_data *obj = NULL;
-	Character *victim = NULL;
-	Character *mob;
+    int door = -1, number;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    char *s;
+    struct obj_data *obj = NULL;
+    Character *victim = NULL;
+    Character *mob;
 
-	if ( CMD_IS ( "open" ) )
-	{
-		skip_spaces ( &argument );
-		two_arguments ( argument, type, dir );
-		s = type;
-		number = get_number ( &s );
-		if ( isname ( type, "trapdoor" ) )
-		{
-			// vnum = real_mobile(number(2300, 2302));
-			/* This is just to have it random pick between the three vampires
-			   using their vnums. You should probably change it to the vnum
-			   (or random vnums) you want it to load. */
-			if ( !generic_find
-			        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
-				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
-			if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
-			{
-				do_doorcmd ( ch, obj, door, SCMD_OPEN );
-				mob = read_mobile ( 204 );
-				act ( "As you open the trapdoor, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR );
-				act ( "As $n opens the trapdoor, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM );
-				act ( "Going into a blood frenzy, $E attacks you!", FALSE,
-				      ch, 0, mob, TO_CHAR );
-				act ( "Going into a blood frenzy, $E attacks $m!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
-				GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
-				return TRUE;
-			}
-		}
-	}
-	return FALSE;
+    if ( CMD_IS ( "open" ) )
+    {
+        skip_spaces ( &argument );
+        two_arguments ( argument, type, dir );
+        s = type;
+        number = get_number ( &s );
+        if ( isname ( type, "trapdoor" ) )
+        {
+            // vnum = real_mobile(number(2300, 2302));
+            /* This is just to have it random pick between the three vampires
+               using their vnums. You should probably change it to the vnum
+               (or random vnums) you want it to load. */
+            if ( !generic_find
+                    ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
+                door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
+            if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
+            {
+                do_doorcmd ( ch, obj, door, SCMD_OPEN );
+                mob = read_mobile ( 204 );
+                act ( "As you open the trapdoor, $N jumps out and begins biting you!", FALSE, ch, 0, mob, TO_CHAR );
+                act ( "As $n opens the trapdoor, $N jumps out and begins biting $m!", FALSE, ch, 0, mob, TO_ROOM );
+                act ( "Going into a blood frenzy, $E attacks you!", FALSE,
+                      ch, 0, mob, TO_CHAR );
+                act ( "Going into a blood frenzy, $E attacks $m!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
+                GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 SPECIAL ( door_down_7377 )
 {
-	int door = -1, number;
-	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-	char *s;
-	struct obj_data *obj = NULL;
-	Character *victim = NULL;
-	Character *mob;
+    int door = -1, number;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    char *s;
+    struct obj_data *obj = NULL;
+    Character *victim = NULL;
+    Character *mob;
 
 
-	if ( CMD_IS ( "open" ) )
-	{
-		skip_spaces ( &argument );
-		two_arguments ( argument, type, dir );
-		s = type;
-		number = get_number ( &s );
-		if ( isname ( type, "lid" ) )
-		{
-			// vnum = real_mobile(number(2300, 2302));
-			/* This is just to have it random pick between the three vampires
-			   using their vnums. You should probably change it to the vnum
-			   (or random vnums) you want it to load. */
-			if ( !generic_find
-			        ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
-				door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
-			if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
-			{
-				do_doorcmd ( ch, obj, door, SCMD_OPEN );
-				mob = read_mobile ( 7376 );
-				act ( "A green, slimy THING slithers out of the toilet and bites off your... whatever!", FALSE, ch, 0, mob, TO_CHAR );
-				act ( "As $n opens the lid, a green, slimy THING slithers out of the toilet and bites $m. Ouch!", FALSE, ch, 0, mob, TO_ROOM );
-				act ( "You feel {cWDIMINISHED!{c0", FALSE, ch, 0, mob,
-				      TO_CHAR );
-				act ( "$n seems to have diminished!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
-				GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
-				char_to_room ( mob, IN_ROOM ( ch ) );
-				start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
-				return TRUE;
-			}
-		}
-	}
-	return FALSE;
+    if ( CMD_IS ( "open" ) )
+    {
+        skip_spaces ( &argument );
+        two_arguments ( argument, type, dir );
+        s = type;
+        number = get_number ( &s );
+        if ( isname ( type, "lid" ) )
+        {
+            // vnum = real_mobile(number(2300, 2302));
+            /* This is just to have it random pick between the three vampires
+               using their vnums. You should probably change it to the vnum
+               (or random vnums) you want it to load. */
+            if ( !generic_find
+                    ( type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj ) )
+                door = find_door ( ch, type, dir, cmd_door[SCMD_OPEN], number );
+            if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
+            {
+                do_doorcmd ( ch, obj, door, SCMD_OPEN );
+                mob = read_mobile ( 7376 );
+                act ( "A green, slimy THING slithers out of the toilet and bites off your... whatever!", FALSE, ch, 0, mob, TO_CHAR );
+                act ( "As $n opens the lid, a green, slimy THING slithers out of the toilet and bites $m. Ouch!", FALSE, ch, 0, mob, TO_ROOM );
+                act ( "You feel {cWDIMINISHED!{c0", FALSE, ch, 0, mob,
+                      TO_CHAR );
+                act ( "$n seems to have diminished!", FALSE, ch, 0, mob, TO_ROOM );	/* Ahh, flavor text. */
+                GET_POS ( ch ) = POS_SITTING;	/* Bash, essentially. */
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );	/* Please allow 2 to 3 tics for delivery. */
+                char_to_room ( mob, IN_ROOM ( ch ) );
+                start_fighting ( mob, ch );	// Start the mob fighting the player. Hiiiiyyaaa! */
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 
 SPECIAL ( triples )
 {
-	int bet;
-	char buf[256], buf2[10];
-	Character *mob = ( Character * ) me;
+    int bet;
+    char buf[256], buf2[10];
+    Character *mob = ( Character * ) me;
 
-	if ( CMD_IS ( "bet" ) )
-	{
-		two_arguments ( argument, buf, buf2 );
+    if ( CMD_IS ( "bet" ) )
+    {
+        two_arguments ( argument, buf, buf2 );
 
-		if ( !*buf || !*buf2 )
-		{
-			*ch << "bet <upper|lower|triple> <amt>.\r\n";
-			return TRUE;
-		}
+        if ( !*buf || !*buf2 )
+        {
+            *ch << "bet <upper|lower|triple> <amt>.\r\n";
+            return TRUE;
+        }
 
-		bet = atoi ( buf2 );
-		play_triples ( ch, mob, buf, bet );
-		return TRUE;
-	}
+        bet = atoi ( buf2 );
+        play_triples ( ch, mob, buf, bet );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( slots )
 {
-	if ( CMD_IS ( "pull" ) )
-	{
-		play_slots ( ch );
-		return TRUE;
-	}
+    if ( CMD_IS ( "pull" ) )
+    {
+        play_slots ( ch );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( high_dice )
 {
-	int bet;
-	char buf[MAX_INPUT_LENGTH];
-	char buf2[MAX_INPUT_LENGTH];
-	Character *mob = ( Character * ) me;
+    int bet;
+    char buf[MAX_INPUT_LENGTH];
+    char buf2[MAX_INPUT_LENGTH];
+    Character *mob = ( Character * ) me;
 
-	if ( CMD_IS ( "bet" ) )
-	{
-		two_arguments ( argument, buf, buf2 );
+    if ( CMD_IS ( "bet" ) )
+    {
+        two_arguments ( argument, buf, buf2 );
 
-		if ( !*buf )
-		{
-			*ch << "bet <amt>.\r\n";
-			return TRUE;
-		}
+        if ( !*buf )
+        {
+            *ch << "bet <amt>.\r\n";
+            return TRUE;
+        }
 
-		bet = atoi ( buf );
-		play_high_dice ( ch, mob, bet );
-		return TRUE;
-	}
+        bet = atoi ( buf );
+        play_high_dice ( ch, mob, bet );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( seven )
 {
-	int bet;
-	char buf[MAX_INPUT_LENGTH];
-	char buf2[MAX_INPUT_LENGTH];
-	;
-	Character *mob = ( Character * ) me;
+    int bet;
+    char buf[MAX_INPUT_LENGTH];
+    char buf2[MAX_INPUT_LENGTH];
+    ;
+    Character *mob = ( Character * ) me;
 
-	if ( CMD_IS ( "bet" ) )
-	{
-		two_arguments ( argument, buf, buf2 );
+    if ( CMD_IS ( "bet" ) )
+    {
+        two_arguments ( argument, buf, buf2 );
 
-		if ( !*buf || !*buf2 )
-		{
-			*ch << "bet <over|under|seven> <amt>.\r\n";
-			return TRUE;
-		}
+        if ( !*buf || !*buf2 )
+        {
+            *ch << "bet <over|under|seven> <amt>.\r\n";
+            return TRUE;
+        }
 
-		bet = atoi ( buf2 );
-		play_seven ( ch, mob, buf, bet );
-		return TRUE;
-	}
+        bet = atoi ( buf2 );
+        play_seven ( ch, mob, buf, bet );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 SPECIAL ( craps )
 {
-	int bet;
-	char buf[MAX_INPUT_LENGTH];
-	Character *mob = ( Character * ) me;
+    int bet;
+    char buf[MAX_INPUT_LENGTH];
+    Character *mob = ( Character * ) me;
 
-	if ( CMD_IS ( "bet" ) )
-	{
-		one_argument ( argument, buf );
+    if ( CMD_IS ( "bet" ) )
+    {
+        one_argument ( argument, buf );
 
-		if ( !*buf )
-		{
-			*ch << "bet <amt>.\r\n";
-			return TRUE;
-		}
+        if ( !*buf )
+        {
+            *ch << "bet <amt>.\r\n";
+            return TRUE;
+        }
 
-		bet = atoi ( buf );
-		play_craps ( ch, mob, bet );
-		return TRUE;
-	}
+        bet = atoi ( buf );
+        play_craps ( ch, mob, bet );
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 /* Dragon's breath procedures */
 SPECIAL ( dragon_fire )
 {
-	Character *dragon = ( Character * ) me;
+    Character *dragon = ( Character * ) me;
 
-	/* I don't know what 'cmd' is but we never do anything if we don't breathe
-	 * fire unless we're fighting.
-	 */
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return FALSE;
+    /* I don't know what 'cmd' is but we never do anything if we don't breathe
+     * fire unless we're fighting.
+     */
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return FALSE;
 
-	/* Only breathe fire 20% of the time */
-	if ( number ( 0, 4 ) )
-		return FALSE;
+    /* Only breathe fire 20% of the time */
+    if ( number ( 0, 4 ) )
+        return FALSE;
 
-	/* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
-	 * breath so we could have tougher dragons.  Right now, it does damage
-	 * equal to a fireball in all cases.
-	 */
-	/* call_magic(ch, NULL, NULL, SPELL_FIRE_BREATH, 0, CAST_BREATH); */
-	damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),SPELL_FIRE_BREATH );
+    /* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
+     * breath so we could have tougher dragons.  Right now, it does damage
+     * equal to a fireball in all cases.
+     */
+    /* call_magic(ch, NULL, NULL, SPELL_FIRE_BREATH, 0, CAST_BREATH); */
+    damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),SPELL_FIRE_BREATH );
 
-	/* If you use the damage call, you don't need the spell, but if you use
-	 * the spell, you should add the no_magic room information below.
-	 */
-	return TRUE;
+    /* If you use the damage call, you don't need the spell, but if you use
+     * the spell, you should add the no_magic room information below.
+     */
+    return TRUE;
 
 }
 
 
 SPECIAL ( dragon_gas )
 {
-	Character *dragon = ( Character * ) me;
+    Character *dragon = ( Character * ) me;
 
-	/* I don't know what 'cmd' is but we never do anything if we don't breathe
-	 * gas unless we're fighting.
-	 */
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return FALSE;
+    /* I don't know what 'cmd' is but we never do anything if we don't breathe
+     * gas unless we're fighting.
+     */
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return FALSE;
 
-	/* Only breathe gas 20% of the time */
-	if ( number ( 0, 4 ) )
-		return FALSE;
+    /* Only breathe gas 20% of the time */
+    if ( number ( 0, 4 ) )
+        return FALSE;
 
-	/* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
-	 * breath so we could have tougher dragons.  Right now, it does damage
-	 * equal to a fireball in all cases.
-	 */
-	/* call_magic(ch, NULL, NULL, SPELL_GAS_BREATH, 0, CAST_BREATH); */
-	damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
-	         SPELL_GAS_BREATH );
+    /* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
+     * breath so we could have tougher dragons.  Right now, it does damage
+     * equal to a fireball in all cases.
+     */
+    /* call_magic(ch, NULL, NULL, SPELL_GAS_BREATH, 0, CAST_BREATH); */
+    damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
+             SPELL_GAS_BREATH );
 
-	/* If you use the damage call, you don't need the spell, but if you use
-	 * the spell, you should add the no_magic room information below.
-	 */
+    /* If you use the damage call, you don't need the spell, but if you use
+     * the spell, you should add the no_magic room information below.
+     */
 
-	return TRUE;
+    return TRUE;
 
 }
 
 
 SPECIAL ( dragon_frost )
 {
-	Character *dragon = ( Character * ) me;
+    Character *dragon = ( Character * ) me;
 
-	/* I don't know what 'cmd' is but we never do anything if we don't breathe
-	 * frost unless we're fighting.
-	 */
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return FALSE;
+    /* I don't know what 'cmd' is but we never do anything if we don't breathe
+     * frost unless we're fighting.
+     */
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return FALSE;
 
-	/* Only breathe frost 20% of the time */
-	if ( number ( 0, 4 ) )
-		return FALSE;
+    /* Only breathe frost 20% of the time */
+    if ( number ( 0, 4 ) )
+        return FALSE;
 
-	/* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
-	 * breath so we could have tougher dragons.  Right now, it does damage
-	 * equal to a fireball in all cases.
-	 */
-	/* call_magic(ch, NULL, NULL, SPELL_FROST_BREATH, 0, CAST_BREATH); */
-	damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
-	         SPELL_FROST_BREATH );
-	/* If you use the damage call, you don't need the spell, but if you use
-	 * the spell, you should add the no_magic room information below.
-	 */
+    /* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
+     * breath so we could have tougher dragons.  Right now, it does damage
+     * equal to a fireball in all cases.
+     */
+    /* call_magic(ch, NULL, NULL, SPELL_FROST_BREATH, 0, CAST_BREATH); */
+    damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
+             SPELL_FROST_BREATH );
+    /* If you use the damage call, you don't need the spell, but if you use
+     * the spell, you should add the no_magic room information below.
+     */
 
-	return TRUE;
+    return TRUE;
 
 }
 
 
 SPECIAL ( dragon_acid )
 {
-	Character *dragon = ( Character * ) me;
+    Character *dragon = ( Character * ) me;
 
-	/* I don't know what 'cmd' is but we never do anything if we don't breathe
-	 * acid unless we're fighting.
-	 */
+    /* I don't know what 'cmd' is but we never do anything if we don't breathe
+     * acid unless we're fighting.
+     */
 
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return FALSE;
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return FALSE;
 
-	/* Only breathe acid 20% of the time */
-	if ( number ( 0, 4 ) )
-		return FALSE;
+    /* Only breathe acid 20% of the time */
+    if ( number ( 0, 4 ) )
+        return FALSE;
 
-	/* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
-	 * breath so we could have tougher dragons.  Right now, it does damage
-	 * equal to a fireball in all cases.
-	 */
-	/* call_magic(ch, NULL, NULL, SPELL_ACID_BREATH, 0, CAST_BREATH); */
-	damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
-	         SPELL_ACID_BREATH );
+    /* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
+     * breath so we could have tougher dragons.  Right now, it does damage
+     * equal to a fireball in all cases.
+     */
+    /* call_magic(ch, NULL, NULL, SPELL_ACID_BREATH, 0, CAST_BREATH); */
+    damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
+             SPELL_ACID_BREATH );
 
-	/* If you use the damage call, you don't need the spell, but if you use
-	 * the spell, you should add the no_magic room information below.
-	 */
-	return TRUE;
+    /* If you use the damage call, you don't need the spell, but if you use
+     * the spell, you should add the no_magic room information below.
+     */
+    return TRUE;
 }
 
 SPECIAL ( dragon_lightning )
 {
-	Character *dragon = ( Character * ) me;
+    Character *dragon = ( Character * ) me;
 
-	/* I don't know what 'cmd' is but we never do anything if we don't breathe
-	 * lightning unless we're fighting.
-	 */
-	if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
-		return FALSE;
+    /* I don't know what 'cmd' is but we never do anything if we don't breathe
+     * lightning unless we're fighting.
+     */
+    if ( cmd || GET_POS ( ch ) != POS_FIGHTING )
+        return FALSE;
 
-	/* Only breathe lightning 20% of the time */
-	if ( number ( 0, 4 ) )
-		return FALSE;
+    /* Only breathe lightning 20% of the time */
+    if ( number ( 0, 4 ) )
+        return FALSE;
 
-	/* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
-	 * breath so we could have tougher dragons.  Right now, it does damage
-	 * equal to a fireball in all cases.
-	 */
-	/* call_magic(ch, NULL, NULL, SPELL_LIGHTNING_BREATH, 0, CAST_BREATH); */
-	damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
-	         SPELL_LIGHTNING_BREATH );
+    /* We could actually pass GET_LEVEL(ch) instead of 0 for the level of the
+     * breath so we could have tougher dragons.  Right now, it does damage
+     * equal to a fireball in all cases.
+     */
+    /* call_magic(ch, NULL, NULL, SPELL_LIGHTNING_BREATH, 0, CAST_BREATH); */
+    damage ( dragon, FIGHTING ( dragon ), dice ( GET_LEVEL ( dragon ), GET_LEVEL ( dragon ) ),
+             SPELL_LIGHTNING_BREATH );
 
-	/* If you use the damage call, you don't need the spell, but if you use
-	 * the spell, you should add the no_magic room information below.
-	 */
-	return TRUE;
+    /* If you use the damage call, you don't need the spell, but if you use
+     * the spell, you should add the no_magic room information below.
+     */
+    return TRUE;
 }
 
 /* Stuff I have coded -- kalten */
 SPECIAL ( fire )
 {
-	struct obj_data *target, *viewport, *vehicle;
-	bool found = FALSE;
-	int dir;
-	room_rnum room, nextroom;
-	int distance;
-	room_rnum was_in;
-	int range = 5;
-	int dam = 0, percent, chance = 100;
-	char arg1[MAX_INPUT_LENGTH];	/* target */
-	char arg2[MAX_INPUT_LENGTH];	/* direction */
+    struct obj_data *target, *viewport, *vehicle;
+    bool found = FALSE;
+    int dir;
+    room_rnum room, nextroom;
+    int distance;
+    room_rnum was_in;
+    int range = 5;
+    int dam = 0, percent, chance = 100;
+    char arg1[MAX_INPUT_LENGTH];	/* target */
+    char arg2[MAX_INPUT_LENGTH];	/* direction */
 
-	if ( !CMD_IS ( "fire" ) )
-		return ( 0 );
+    if ( !CMD_IS ( "fire" ) )
+        return ( 0 );
 
-	/* since inside a vehicle, need to save the room they were in */
-	was_in = IN_ROOM ( ch );
+    /* since inside a vehicle, need to save the room they were in */
+    was_in = IN_ROOM ( ch );
 
-	/* now, find the room the vehicle is in and put the character there */
-	viewport =
-	    get_obj_in_list_type ( ITEM_V_WINDOW, IN_ROOM ( ch )->contents );
-	if ( viewport )
-	{
-		vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( viewport, 0 ) );
-		IN_ROOM ( ch ) = vehicle->in_room;
-	}
+    /* now, find the room the vehicle is in and put the character there */
+    viewport =
+        get_obj_in_list_type ( ITEM_V_WINDOW, IN_ROOM ( ch )->contents );
+    if ( viewport )
+    {
+        vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( viewport, 0 ) );
+        IN_ROOM ( ch ) = vehicle->in_room;
+    }
 
-	room = IN_ROOM ( ch );
+    room = IN_ROOM ( ch );
 
-	two_arguments ( argument, arg1, arg2 );
+    two_arguments ( argument, arg1, arg2 );
 
-	/* can they even fire that way */
-	if ( ( dir = search_block ( arg2, dirs, FALSE ) ) < 0 )
-	{
-		*ch << "What direction?\r\n";
-		IN_ROOM ( ch ) = was_in;
-		return ( 1 );
-	}
+    /* can they even fire that way */
+    if ( ( dir = search_block ( arg2, dirs, FALSE ) ) < 0 )
+    {
+        *ch << "What direction?\r\n";
+        IN_ROOM ( ch ) = was_in;
+        return ( 1 );
+    }
 
-	/* can't go that way */
-	if ( !CAN_GO ( ch, dir ) )
-	{
-		*ch << "Something blocks the way!\r\n";
-		IN_ROOM ( ch ) = was_in;
-		return ( 1 );
-	}
+    /* can't go that way */
+    if ( !CAN_GO ( ch, dir ) )
+    {
+        *ch << "Something blocks the way!\r\n";
+        IN_ROOM ( ch ) = was_in;
+        return ( 1 );
+    }
 
-	/* now that you can go that way, find the next room */
-	if ( CAN_GO2 ( room, dir ) )
-		nextroom = EXIT2 ( room, dir )->to_room;
-	else
-		nextroom = NULL;
+    /* now that you can go that way, find the next room */
+    if ( CAN_GO2 ( room, dir ) )
+        nextroom = EXIT2 ( room, dir )->to_room;
+    else
+        nextroom = NULL;
 
-	/* now, find the target */
-	for ( distance = 1; ( ( nextroom != NULL ) && ( distance <= range ) );
-	        distance++ )
-	{
-		/* search for the target in the room */
-		for ( target = nextroom->contents; target;
-		        target = target->next_content )
-		{
-			if ( ( isname ( arg1, GET_OBJ_NAME ( target ) ) )
-			        && ( CAN_SEE_OBJ ( ch, target ) ) )
-			{
-				found = TRUE;
-				break;
-			}
-		}
-		/* we have a target now */
-		if ( found )
-		{
-			percent = number ( 0, 101 );
-			chance /= distance;
-			if ( percent < chance )  	/* the closer the ship is, the better chance of hitting it */
-			{
-				if ( ( dam = number ( 0, 2 ) ) > 0 )
-				{
-					/* damage the vehicle */
-					GET_OBJ_VAL ( target, 2 ) -= dam;
-					/* check to see if it should blow up now */
-					if ( GET_OBJ_VAL ( target, 2 ) <= 0 )
-					{
-						/* Blow it up */
-						IN_ROOM ( ch ) = was_in;
-						act ( "The $p was blown up.", FALSE, ch, target,
-						      NULL, TO_CHAR );
-						act ( "$n blows up the $p.", TRUE, ch, target, NULL,
-						      TO_ROOM );
-						Room *explosion_room = IN_ROOM ( target );
-						extract_obj ( target );
-						send_to_room ( explosion_room, "The ship bursts at the seams from the powerful strike.\r\n" );
-						return ( 1 );
-					}
-					else  	/* needs more damage */
-					{
-						IN_ROOM ( ch ) = was_in;
-						act ( "Your missile strikes the $p.", FALSE, ch,
-						      target, NULL, TO_CHAR );
-						act ( "$n's missile strikes the $p.", TRUE, ch,
-						      target, NULL, TO_ROOM );
-						explosion_messages ( real_room
-						                     ( GET_OBJ_VAL ( target, 0 ) ),
-						                     dam, target );
-						WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-						return ( 1 );
-					}
-				}
-				else  	/* didn't do any damage */
-				{
-					IN_ROOM ( ch ) = was_in;
-					act ( "The missile misses the $p.", FALSE, ch, target,
-					      NULL, TO_CHAR );
-					act ( "$n misses the $p.", TRUE, ch, target, NULL,
-					      TO_ROOM );
-					explosion_messages ( real_room ( GET_OBJ_VAL ( target, 0 ) ),
-					                     dam, target );
-					WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-					return ( 1 );
-				}
-			}
-			else  		/* missed it completely */
-			{
-				IN_ROOM ( ch ) = was_in;
-				act ( "The missile misses the $p.", FALSE, ch, target, NULL,
-				      TO_CHAR );
-				act ( "$n misses the $p.", TRUE, ch, target, NULL, TO_ROOM );
-				explosion_messages ( real_room ( GET_OBJ_VAL ( target, 0 ) ),
-				                     dam, target );
-				WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
-				return ( 1 );
-			}
-		}
+    /* now, find the target */
+    for ( distance = 1; ( ( nextroom != NULL ) && ( distance <= range ) );
+            distance++ )
+    {
+        /* search for the target in the room */
+        for ( target = nextroom->contents; target;
+                target = target->next_content )
+        {
+            if ( ( isname ( arg1, GET_OBJ_NAME ( target ) ) )
+                    && ( CAN_SEE_OBJ ( ch, target ) ) )
+            {
+                found = TRUE;
+                break;
+            }
+        }
+        /* we have a target now */
+        if ( found )
+        {
+            percent = number ( 0, 101 );
+            chance /= distance;
+            if ( percent < chance )  	/* the closer the ship is, the better chance of hitting it */
+            {
+                if ( ( dam = number ( 0, 2 ) ) > 0 )
+                {
+                    /* damage the vehicle */
+                    GET_OBJ_VAL ( target, 2 ) -= dam;
+                    /* check to see if it should blow up now */
+                    if ( GET_OBJ_VAL ( target, 2 ) <= 0 )
+                    {
+                        /* Blow it up */
+                        IN_ROOM ( ch ) = was_in;
+                        act ( "The $p was blown up.", FALSE, ch, target,
+                              NULL, TO_CHAR );
+                        act ( "$n blows up the $p.", TRUE, ch, target, NULL,
+                              TO_ROOM );
+                        Room *explosion_room = IN_ROOM ( target );
+                        extract_obj ( target );
+                        send_to_room ( explosion_room, "The ship bursts at the seams from the powerful strike.\r\n" );
+                        return ( 1 );
+                    }
+                    else  	/* needs more damage */
+                    {
+                        IN_ROOM ( ch ) = was_in;
+                        act ( "Your missile strikes the $p.", FALSE, ch,
+                              target, NULL, TO_CHAR );
+                        act ( "$n's missile strikes the $p.", TRUE, ch,
+                              target, NULL, TO_ROOM );
+                        explosion_messages ( real_room
+                                             ( GET_OBJ_VAL ( target, 0 ) ),
+                                             dam, target );
+                        WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                        return ( 1 );
+                    }
+                }
+                else  	/* didn't do any damage */
+                {
+                    IN_ROOM ( ch ) = was_in;
+                    act ( "The missile misses the $p.", FALSE, ch, target,
+                          NULL, TO_CHAR );
+                    act ( "$n misses the $p.", TRUE, ch, target, NULL,
+                          TO_ROOM );
+                    explosion_messages ( real_room ( GET_OBJ_VAL ( target, 0 ) ),
+                                         dam, target );
+                    WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                    return ( 1 );
+                }
+            }
+            else  		/* missed it completely */
+            {
+                IN_ROOM ( ch ) = was_in;
+                act ( "The missile misses the $p.", FALSE, ch, target, NULL,
+                      TO_CHAR );
+                act ( "$n misses the $p.", TRUE, ch, target, NULL, TO_ROOM );
+                explosion_messages ( real_room ( GET_OBJ_VAL ( target, 0 ) ),
+                                     dam, target );
+                WAIT_STATE ( ch, PULSE_VIOLENCE * 2 );
+                return ( 1 );
+            }
+        }
 
-		/* target wasnt in the room, move to next room */
-		room = nextroom;
-		if ( CAN_GO2 ( room, dir ) )
-			nextroom = EXIT2 ( room, dir )->to_room;
-		else
-			nextroom = NULL;
-	}
+        /* target wasnt in the room, move to next room */
+        room = nextroom;
+        if ( CAN_GO2 ( room, dir ) )
+            nextroom = EXIT2 ( room, dir )->to_room;
+        else
+            nextroom = NULL;
+    }
 
-	*ch << "Cant find your target!\r\n";
-	IN_ROOM ( ch ) = was_in;
-	return ( 1 );
+    *ch << "Cant find your target!\r\n";
+    IN_ROOM ( ch ) = was_in;
+    return ( 1 );
 }
 
 SPECIAL ( radar )
 {
-	Character *i;
-	struct obj_data *viewport, *vehicle;
-	room_rnum was_in,is_in;
-	int dir, dis, maxdis, found = 0;
+    Character *i;
+    struct obj_data *viewport, *vehicle;
+    room_rnum was_in,is_in;
+    int dir, dis, maxdis, found = 0;
 
-	const char *distance[] =
-	{
-		"right here",
-		"immediately ",
-		"nearby ",
-		"a ways ",
-		"far ",
-		"very far ",
-		"extremely far ",
-		"impossibly far ",
-	};
+    const char *distance[] =
+    {
+        "right here",
+        "immediately ",
+        "nearby ",
+        "a ways ",
+        "far ",
+        "very far ",
+        "extremely far ",
+        "impossibly far ",
+    };
 
-	if ( !CMD_IS ( "radar" ) )
-		return ( 0 );
+    if ( !CMD_IS ( "radar" ) )
+        return ( 0 );
 
-	if ( IS_AFFECTED ( ch, AFF_BLIND ) )
-	{
-		*ch << "You can't see anything, you're blind!";
-		return ( 1 );
-	}
+    if ( IS_AFFECTED ( ch, AFF_BLIND ) )
+    {
+        *ch << "You can't see anything, you're blind!";
+        return ( 1 );
+    }
 
-	/* since inside a vehicle, need to save the room they were in */
-	is_in = was_in = IN_ROOM ( ch );
+    /* since inside a vehicle, need to save the room they were in */
+    is_in = was_in = IN_ROOM ( ch );
 
-	/* now, find the room the vehicle is in and put the character there */
-	viewport =
-	    get_obj_in_list_type ( ITEM_V_WINDOW, IN_ROOM ( ch )->contents );
-	if ( viewport )
-	{
-		if ( ( vehicle =
-		            find_vehicle_by_vnum ( GET_OBJ_VAL ( viewport, 0 ) ) ) != NULL )
-			is_in = vehicle->in_room;
-		else
-			return ( 0 );
-	}
+    /* now, find the room the vehicle is in and put the character there */
+    viewport =
+        get_obj_in_list_type ( ITEM_V_WINDOW, IN_ROOM ( ch )->contents );
+    if ( viewport )
+    {
+        if ( ( vehicle =
+                    find_vehicle_by_vnum ( GET_OBJ_VAL ( viewport, 0 ) ) ) != NULL )
+            is_in = vehicle->in_room;
+        else
+            return ( 0 );
+    }
 
-	if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
-		maxdis = 7;
-	else
-		maxdis = 5;
+    if ( GET_LEVEL ( ch ) >= LVL_IMMORT )
+        maxdis = 7;
+    else
+        maxdis = 5;
 
-	IN_ROOM ( ch ) = was_in;
-	*ch << "You begin watching the radar screen and see:\r\n";
-	act ( "$n begins watching the radar screen.", TRUE, ch, 0, 0, TO_ROOM );
+    IN_ROOM ( ch ) = was_in;
+    *ch << "You begin watching the radar screen and see:\r\n";
+    act ( "$n begins watching the radar screen.", TRUE, ch, 0, 0, TO_ROOM );
 
-	for ( dir = 0; dir < NUM_OF_DIRS; dir++ )
-	{
-		IN_ROOM ( ch ) = is_in;
-		for ( dis = 0; dis <= maxdis; dis++ )
-		{
-			if ( ( ( dis == 0 ) && ( dir == 0 ) ) || ( dis > 0 ) )
-			{
-				for ( i = IN_ROOM ( ch )->people; i; i = i->next_in_room )
-				{
-					if ( ( ! ( ( ch == i ) && ( dis == 0 ) ) ) && CAN_SEE ( ch, i ) )
-					{
-						ch->Send ( "%33s: %s%s%s%s", GET_NAME ( i ),
-						           distance[dis], ( ( dis > 0 )
-						                            && ( dir <
-						                                 ( NUM_OF_DIRS -
-						                                   2 ) ) ) ? "to the " : "",
-						           ( dis > 0 ) ? dirs[dir] : "", ( ( dis > 0 )
-						                                           && ( dir >
-						                                                ( NUM_OF_DIRS
-						                                                  -
-						                                                  3 ) ) ) ?
-						           "wards" : "" );
-						found++;
-					}
-				}
-			}
-			if ( !CAN_GO ( ch, dir )
-			        || ( IN_ROOM ( ch )->dir_option[dir]->to_room == is_in ) )
-				break;
-			else
-				IN_ROOM ( ch ) = IN_ROOM ( ch )->dir_option[dir]->to_room;
-		}
-	}
-	if ( found == 0 )
-		*ch << "Nobody anywhere near you.";
-	IN_ROOM ( ch ) = was_in;
-	return ( 1 ); /** this function doesnt updatethe zones num_players value, watch for this if getting fancy - mord**/
+    for ( dir = 0; dir < NUM_OF_DIRS; dir++ )
+    {
+        IN_ROOM ( ch ) = is_in;
+        for ( dis = 0; dis <= maxdis; dis++ )
+        {
+            if ( ( ( dis == 0 ) && ( dir == 0 ) ) || ( dis > 0 ) )
+            {
+                for ( i = IN_ROOM ( ch )->people; i; i = i->next_in_room )
+                {
+                    if ( ( ! ( ( ch == i ) && ( dis == 0 ) ) ) && CAN_SEE ( ch, i ) )
+                    {
+                        ch->Send ( "%33s: %s%s%s%s", GET_NAME ( i ),
+                                   distance[dis], ( ( dis > 0 )
+                                                    && ( dir <
+                                                         ( NUM_OF_DIRS -
+                                                           2 ) ) ) ? "to the " : "",
+                                   ( dis > 0 ) ? dirs[dir] : "", ( ( dis > 0 )
+                                                                   && ( dir >
+                                                                        ( NUM_OF_DIRS
+                                                                          -
+                                                                          3 ) ) ) ?
+                                   "wards" : "" );
+                        found++;
+                    }
+                }
+            }
+            if ( !CAN_GO ( ch, dir )
+                    || ( IN_ROOM ( ch )->dir_option[dir]->to_room == is_in ) )
+                break;
+            else
+                IN_ROOM ( ch ) = IN_ROOM ( ch )->dir_option[dir]->to_room;
+        }
+    }
+    if ( found == 0 )
+        *ch << "Nobody anywhere near you.";
+    IN_ROOM ( ch ) = was_in;
+    return ( 1 ); /** this function doesnt updatethe zones num_players value, watch for this if getting fancy - mord**/
 }
 
 /* Slave collar for the Saints Clan
@@ -2463,7 +2463,7 @@ SPECIAL(slave_collar)
       if (GET_OBJ_VAL(obj, 1) == 0 || GET_OBJ_VAL(obj, 2) != GET_IDNUM(ch)) {
           ch->Send("This collar needs to be RESET before you can submit to it.\r\n");
           return TRUE;
-      }     
+      }
       GET_OBJ_VAL(obj, 2) = GET_IDNUM(ch);
       act("$n has submitted to the slave collar.", FALSE, ch, NULL, NULL, TO_ROOM);
       ch->Send("You have submitted to the slave collar!\r\n");
@@ -2481,7 +2481,7 @@ SPECIAL(slave_collar)
       perform_wear(ch, obj, WEAR_NECK_1);
       return TRUE;
   }
-  else if (GET_EQ(ch, WEAR_NECK_1) == obj && (CMD_IS("north") || 
+  else if (GET_EQ(ch, WEAR_NECK_1) == obj && (CMD_IS("north") ||
   CMD_IS("south") || CMD_IS("west") || CMD_IS("east") || CMD_IS("up") ||
   CMD_IS("down"))) {
       if (GET_OBJ_VAL(obj, 3) == 0) return FALSE;
@@ -2491,529 +2491,529 @@ SPECIAL(slave_collar)
 
 bool deduct_tokens ( Character *ch, gold_int price )
 {
-	// price of 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
-	int has_brass = GET_BRASS_TOKEN_COUNT ( ch );
-	has_brass += 5 * GET_BRONZE_TOKEN_COUNT ( ch );
-	has_brass += 50 * GET_SILVER_TOKEN_COUNT ( ch );
-	has_brass += 500 * GET_GOLD_TOKEN_COUNT ( ch );
+    // price of 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
+    int has_brass = GET_BRASS_TOKEN_COUNT ( ch );
+    has_brass += 5 * GET_BRONZE_TOKEN_COUNT ( ch );
+    has_brass += 50 * GET_SILVER_TOKEN_COUNT ( ch );
+    has_brass += 500 * GET_GOLD_TOKEN_COUNT ( ch );
 
-	gold_int price_brass = price % 10;
-	price /= 10;
-	price_brass += 5 * ( price % 10 );
-	price /= 10;
-	price_brass += 50 * ( price % 10 );
-	price /= 10;
-	price_brass += 500 * price;
+    gold_int price_brass = price % 10;
+    price /= 10;
+    price_brass += 5 * ( price % 10 );
+    price /= 10;
+    price_brass += 50 * ( price % 10 );
+    price /= 10;
+    price_brass += 500 * price;
 
-	if ( price_brass > has_brass )
-		return FALSE;
+    if ( price_brass > has_brass )
+        return FALSE;
 
-	has_brass -= price_brass;
-	GET_GOLD_TOKEN_COUNT ( ch ) = has_brass / 500;
-	has_brass %= 500;
-	GET_SILVER_TOKEN_COUNT ( ch ) = has_brass / 50;
-	has_brass %= 50;
-	GET_BRONZE_TOKEN_COUNT ( ch ) = has_brass / 5;
-	has_brass %= 5;
-	GET_BRASS_TOKEN_COUNT ( ch ) = has_brass;
-	return TRUE;
+    has_brass -= price_brass;
+    GET_GOLD_TOKEN_COUNT ( ch ) = has_brass / 500;
+    has_brass %= 500;
+    GET_SILVER_TOKEN_COUNT ( ch ) = has_brass / 50;
+    has_brass %= 50;
+    GET_BRONZE_TOKEN_COUNT ( ch ) = has_brass / 5;
+    has_brass %= 5;
+    GET_BRASS_TOKEN_COUNT ( ch ) = has_brass;
+    return TRUE;
 }
 
 SPECIAL ( playershop )
 {
-	int num;
-	const int imm_level = 55;
-	struct obj_data *obj = NULL;
-	room_vnum r = IN_ROOM ( ch )->number;
-	Character *shopkeep = NULL;
+    int num;
+    const int imm_level = 55;
+    struct obj_data *obj = NULL;
+    room_vnum r = IN_ROOM ( ch )->number;
+    Character *shopkeep = NULL;
 
-	if ( IS_NPC ( ch ) )
-		return FALSE;
+    if ( IS_NPC ( ch ) )
+        return FALSE;
 
-	if ( load_playershop_shopkeep ( r, &shopkeep ) )
-		act ( "The shopkeep rushes in to serve another customer.\r\n", FALSE, ch, 0, 0, TO_ROOM );
+    if ( load_playershop_shopkeep ( r, &shopkeep ) )
+        act ( "The shopkeep rushes in to serve another customer.\r\n", FALSE, ch, 0, 0, TO_ROOM );
 
-	vector<string> args;
-	string arg;
-	stringstream ss ( argument );
-	while ( ss >> arg )
-		args.push_back ( arg );
+    vector<string> args;
+    string arg;
+    stringstream ss ( argument );
+    while ( ss >> arg )
+        args.push_back ( arg );
 
-	if ( CMD_IS ( "sell" ) )
-	{
-		if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
-		{
-			ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
-			return TRUE;
-		}
+    if ( CMD_IS ( "sell" ) )
+    {
+        if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
+        {
+            ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
+            return TRUE;
+        }
 
-		if ( args.size() < 3 )
-		{
-			ch->Send ( "Wrong number of arguments.\r\n"
-						"Usage: sell <obj name> <price> <currency>\r\n" );
-			return TRUE;
-		}
+        if ( args.size() < 3 )
+        {
+            ch->Send ( "Wrong number of arguments.\r\n"
+                        "Usage: sell <obj name> <price> <currency>\r\n" );
+            return TRUE;
+        }
 
-		if ( !is_number ( args[1].c_str() ) )
-		{
-			ch->Send ( "Wrong price. Usage: sell <obj name> <price> <currency>\r\n" );
-			return TRUE;
-		}
+        if ( !is_number ( args[1].c_str() ) )
+        {
+            ch->Send ( "Wrong price. Usage: sell <obj name> <price> <currency>\r\n" );
+            return TRUE;
+        }
 
-		if ( str_cmp ( args[2].c_str(), "g" ) && str_cmp ( args[2].c_str(), "TP" ) && str_cmp ( args[2].c_str(), "T" ) )
-		{
-			ch->Send ( "Unknown currency, use 'g' for gold, 't' for tokens, or 'tp' for tradepoints.\r\n" );
-			return TRUE;
-		}
+        if ( str_cmp ( args[2].c_str(), "g" ) && str_cmp ( args[2].c_str(), "TP" ) && str_cmp ( args[2].c_str(), "T" ) )
+        {
+            ch->Send ( "Unknown currency, use 'g' for gold, 't' for tokens, or 'tp' for tradepoints.\r\n" );
+            return TRUE;
+        }
 
-		char arg[MAX_INPUT_LENGTH];
-		strcpy ( arg, args[0].c_str() );
-		int dotmode = find_all_dots ( arg );
-		if ( dotmode == FIND_INDIV )
-		{
-			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
-				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
-			else
-			{
-				if ( obj->contains )
-				{
-					ch->Send ( "You should empty it first.\r\n" );
-					return TRUE;
-				}
-				obj_in_plrshop[ GET_ID ( obj ) ] = world_vnum[r];
-				obj_from_char ( obj );
-				plrshop_item *p_item = new plrshop_item;
-				p_item->obj = obj;
-				p_item->price = abs ( atoi ( args[1].c_str() ) );
-				if ( !str_cmp ( args[2].c_str(), "g" ) )
-				{
-					p_item->currency = "g";
-					ch->Send ( "You put %s up for sale at %lld coins.\r\n", obj->short_description, p_item->price );
-				}
-				else if ( !str_cmp ( args[2].c_str(), "TP" ) )
-				{
-					p_item->currency = "TP";
-					ch->Send ( "You put %s up for sale at %lld tradepoints.\r\n", obj->short_description, p_item->price );
-				}
-				else
-				{
-					p_item->currency = "T";
-					ch->Send ( "You put %s up for sale at %lld tokens.\r\n", obj->short_description, p_item->price );
-				}
-				player_shop[r]->item.push_back ( p_item );
-				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-			}
-		}
-		else
-		{
-			if ( dotmode == FIND_ALLDOT && !*arg )
-			{
-				ch->Send ( "All of what?\r\n" );
-				return TRUE;
-			}
+        char arg[MAX_INPUT_LENGTH];
+        strcpy ( arg, args[0].c_str() );
+        int dotmode = find_all_dots ( arg );
+        if ( dotmode == FIND_INDIV )
+        {
+            if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+                ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
+            else
+            {
+                if ( obj->contains )
+                {
+                    ch->Send ( "You should empty it first.\r\n" );
+                    return TRUE;
+                }
+                obj_in_plrshop[ GET_ID ( obj ) ] = world_vnum[r];
+                obj_from_char ( obj );
+                plrshop_item *p_item = new plrshop_item;
+                p_item->obj = obj;
+                p_item->price = abs ( atoi ( args[1].c_str() ) );
+                if ( !str_cmp ( args[2].c_str(), "g" ) )
+                {
+                    p_item->currency = "g";
+                    ch->Send ( "You put %s up for sale at %lld coins.\r\n", obj->short_description, p_item->price );
+                }
+                else if ( !str_cmp ( args[2].c_str(), "TP" ) )
+                {
+                    p_item->currency = "TP";
+                    ch->Send ( "You put %s up for sale at %lld tradepoints.\r\n", obj->short_description, p_item->price );
+                }
+                else
+                {
+                    p_item->currency = "T";
+                    ch->Send ( "You put %s up for sale at %lld tokens.\r\n", obj->short_description, p_item->price );
+                }
+                player_shop[r]->item.push_back ( p_item );
+                save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+            }
+        }
+        else
+        {
+            if ( dotmode == FIND_ALLDOT && !*arg )
+            {
+                ch->Send ( "All of what?\r\n" );
+                return TRUE;
+            }
 
-			OBJ_DATA *next_obj;
-			if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
-				ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
-			else if ( !ch->carrying )
-				ch->Send ( "You don't seem to be holding anything.\r\n" );
-			else
-			{
-				int count = 0;
-				string currency;
-				if ( !str_cmp ( args[2].c_str(), "g" ) )
-					currency = "g";
-				else if ( !str_cmp ( args[2].c_str(), "TP" ) )
-					currency = "TP";
-				else
-					currency = "T";
-				for ( obj = ch->carrying; obj; obj = next_obj )
-				{
-					next_obj = obj->next_content;
-					if ( CAN_SEE_OBJ ( ch, obj ) && ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) )
-					{
+            OBJ_DATA *next_obj;
+            if ( ! ( obj = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+                ch->Send ( "You don't seem to have %s %s.\r\n", AN ( arg ), arg );
+            else if ( !ch->carrying )
+                ch->Send ( "You don't seem to be holding anything.\r\n" );
+            else
+            {
+                int count = 0;
+                string currency;
+                if ( !str_cmp ( args[2].c_str(), "g" ) )
+                    currency = "g";
+                else if ( !str_cmp ( args[2].c_str(), "TP" ) )
+                    currency = "TP";
+                else
+                    currency = "T";
+                for ( obj = ch->carrying; obj; obj = next_obj )
+                {
+                    next_obj = obj->next_content;
+                    if ( CAN_SEE_OBJ ( ch, obj ) && ( dotmode == FIND_ALL || isname ( arg, obj->name ) ) )
+                    {
                         obj_in_plrshop[ GET_ID ( obj ) ] = world_vnum[r];
-						plrshop_item *p_item = new plrshop_item;
-						p_item->obj = obj;
-						p_item->price = abs ( atoi ( args[1].c_str() ) );
-						p_item->currency = currency;
-						player_shop[r]->item.push_back ( p_item );
-						obj_from_char ( obj );
-						count++;
-					}
-				}
-				string times;
-				if ( count > 1 )
-					times = " (x" + to_string ( count ) + ")";
-				ch->Send ( "You put %s up for sale at %s %s%s.\r\n", player_shop[r]->item.back()->obj->short_description, args[1].c_str(), currency == "g" ? "coins" : currency == "T" ? "in tokens" : "tradepoints", times.c_str() );
-				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-			}
-		}
-		return TRUE;
-	}
-	else if ( is_abbrev ( cmd_arg, "cancel" ) )
-	{
-		if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
-			ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
-		else if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
-			ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
-		else
-		{
-			num = atoi ( args[0].c_str() );
-			if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
-				ch->Send ( "There is no item number %d.\r\n", num );
-			else if ( args.size() > 1 && !is_number ( args[1].c_str() ) )
-				ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
-			else
-			{
-				int num2 = num;
-				if ( args.size() > 1 )
-					num2 = atoi ( args[1].c_str() );
+                        plrshop_item *p_item = new plrshop_item;
+                        p_item->obj = obj;
+                        p_item->price = abs ( atoi ( args[1].c_str() ) );
+                        p_item->currency = currency;
+                        player_shop[r]->item.push_back ( p_item );
+                        obj_from_char ( obj );
+                        count++;
+                    }
+                }
+                string times;
+                if ( count > 1 )
+                    times = " (x" + to_string ( count ) + ")";
+                ch->Send ( "You put %s up for sale at %s %s%s.\r\n", player_shop[r]->item.back()->obj->short_description, args[1].c_str(), currency == "g" ? "coins" : currency == "T" ? "in tokens" : "tradepoints", times.c_str() );
+                save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+            }
+        }
+        return TRUE;
+    }
+    else if ( is_abbrev ( cmd_arg, "cancel" ) )
+    {
+        if ( GET_LEVEL ( ch ) < imm_level && GET_ID ( ch ) != player_shop[r]->owner_id )
+            ch->Send ( "You can't do that here, this isn't your shop!\r\n" );
+        else if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+            ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
+        else
+        {
+            num = atoi ( args[0].c_str() );
+            if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+                ch->Send ( "There is no item number %d.\r\n", num );
+            else if ( args.size() > 1 && !is_number ( args[1].c_str() ) )
+                ch->Send ( "Usage: cancel <item number> [<item number last>]\r\n" );
+            else
+            {
+                int num2 = num;
+                if ( args.size() > 1 )
+                    num2 = atoi ( args[1].c_str() );
 
-				if ( num2 < num )
-					ch->Send ( "The last item number is smaller than the first.\r\n" );
-				else if ( num2 > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num2-1 ]->obj ) )
-					ch->Send ( "There is no item number %d.\r\n", num2 );
-				else
-				{
-					for ( int i = num2; i >= num; --i )
-						if ( CAN_SEE_OBJ ( ch, player_shop[r]->item[ i-1 ]->obj ) )
-						{
-							ch->Send ( "You remove %s from your shop.\r\n", player_shop[r]->item[ i-1 ]->obj->short_description );
-							obj_to_char ( player_shop[r]->item [ i-1 ]->obj, ch );
-							obj_in_plrshop.erase ( GET_ID ( player_shop[r]->item [ i-1 ]->obj ) );
-							delete player_shop[r]->item[ i-1 ];
-							player_shop[r]->item.erase ( player_shop[r]->item.begin() + i-1 );
-						}
-					save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-				}
-			}
-		}
-		return TRUE;
-	}
-	else if ( CMD_IS ( "list" ) )
-	{
-		if ( player_shop[r]->item.size() == 0 )
-			ch->Send( "Currently, there is nothing for sale.\r\n");
-		else
-		{
-			DYN_DEFINE;
-			DYN_CREATE;
-			*dynbuf = 0;
-			char buf[MAX_INPUT_LENGTH];
-			DYN_RESIZE ( "{ccTo get information on any shop item, type: ID <item number>{c0\r\n" );
-			if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
-			{
-				DYN_RESIZE ( " ##   Item                                                  Cost Currency\r\n"
-							"-------------------------------------------------------------------------\r\n" );
-			}
+                if ( num2 < num )
+                    ch->Send ( "The last item number is smaller than the first.\r\n" );
+                else if ( num2 > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num2-1 ]->obj ) )
+                    ch->Send ( "There is no item number %d.\r\n", num2 );
+                else
+                {
+                    for ( int i = num2; i >= num; --i )
+                        if ( CAN_SEE_OBJ ( ch, player_shop[r]->item[ i-1 ]->obj ) )
+                        {
+                            ch->Send ( "You remove %s from your shop.\r\n", player_shop[r]->item[ i-1 ]->obj->short_description );
+                            obj_to_char ( player_shop[r]->item [ i-1 ]->obj, ch );
+                            obj_in_plrshop.erase ( GET_ID ( player_shop[r]->item [ i-1 ]->obj ) );
+                            delete player_shop[r]->item[ i-1 ];
+                            player_shop[r]->item.erase ( player_shop[r]->item.begin() + i-1 );
+                        }
+                    save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+                }
+            }
+        }
+        return TRUE;
+    }
+    else if ( CMD_IS ( "list" ) )
+    {
+        if ( player_shop[r]->item.size() == 0 )
+            ch->Send( "Currently, there is nothing for sale.\r\n");
+        else
+        {
+            DYN_DEFINE;
+            DYN_CREATE;
+            *dynbuf = 0;
+            char buf[MAX_INPUT_LENGTH];
+            DYN_RESIZE ( "{ccTo get information on any shop item, type: ID <item number>{c0\r\n" );
+            if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+            {
+                DYN_RESIZE ( " ##   Item                                                  Cost Currency\r\n"
+                            "-------------------------------------------------------------------------\r\n" );
+            }
 
-			bool item_match, for_sale = FALSE;
-			for ( int i = 0; i < player_shop[r]->item.size(); ++i )
-			{
-				if ( !CAN_SEE_OBJ ( ch, player_shop[r]->item[i]->obj ) )
-					continue;
+            bool item_match, for_sale = FALSE;
+            for ( int i = 0; i < player_shop[r]->item.size(); ++i )
+            {
+                if ( !CAN_SEE_OBJ ( ch, player_shop[r]->item[i]->obj ) )
+                    continue;
 
-				item_match = TRUE;
-				for ( auto &keyword : args )
-					if ( !strstr ( player_shop[r]->item[i]->obj->short_description, keyword.c_str() ) )
-					{
-						item_match = FALSE;
-						break;
-					}
-				if ( !item_match )
-					continue;
+                item_match = TRUE;
+                for ( auto &keyword : args )
+                    if ( !strstr ( player_shop[r]->item[i]->obj->short_description, keyword.c_str() ) )
+                    {
+                        item_match = FALSE;
+                        break;
+                    }
+                if ( !item_match )
+                    continue;
 
-				for_sale = TRUE;
-				snprintf ( buf, sizeof ( buf ), "{cy%3d{cg)  {cc%-53.53s{cG%11lld%3s{c0\r\n", i+1, player_shop[r]->item[i]->obj->short_description, player_shop[r]->item[i]->price, player_shop[r]->item[i]->currency.c_str() );
-				DYN_RESIZE ( buf );
-			}
+                for_sale = TRUE;
+                snprintf ( buf, sizeof ( buf ), "{cy%3d{cg)  {cc%-53.53s{cG%11lld%3s{c0\r\n", i+1, player_shop[r]->item[i]->obj->short_description, player_shop[r]->item[i]->price, player_shop[r]->item[i]->currency.c_str() );
+                DYN_RESIZE ( buf );
+            }
 
-			if ( for_sale )
-				page_string ( ch->desc, dynbuf, DYN_BUFFER );
-			else
-				ch->Send ( "Presently, none of those are for sale.\r\n" );
-		}
-		return TRUE;
-	}
-	else if ( CMD_IS ( "identify" ) )
-	{
-		if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
-		{
-			ch->Send ( "Usage: id <item number>\r\n" );
-			return TRUE;
-		}
+            if ( for_sale )
+                page_string ( ch->desc, dynbuf, DYN_BUFFER );
+            else
+                ch->Send ( "Presently, none of those are for sale.\r\n" );
+        }
+        return TRUE;
+    }
+    else if ( CMD_IS ( "identify" ) )
+    {
+        if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+        {
+            ch->Send ( "Usage: id <item number>\r\n" );
+            return TRUE;
+        }
 
-		num = atoi ( args[0].c_str() );
-		if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
-			ch->Send ( "There is no item number %d.\r\n", num );
-		else
-			identify_object ( ch, player_shop[r]->item[ num-1 ]->obj );
-		return TRUE;
-	}
-	else if ( CMD_IS ( "buy" ) )
-	{
-		if ( GET_ID ( ch ) == player_shop[r]->owner_id )
-		{
-			ch->Send ( "You can remove an item by using cancel.\r\n" );
-			return TRUE;
-		}
+        num = atoi ( args[0].c_str() );
+        if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+            ch->Send ( "There is no item number %d.\r\n", num );
+        else
+            identify_object ( ch, player_shop[r]->item[ num-1 ]->obj );
+        return TRUE;
+    }
+    else if ( CMD_IS ( "buy" ) )
+    {
+        if ( GET_ID ( ch ) == player_shop[r]->owner_id )
+        {
+            ch->Send ( "You can remove an item by using cancel.\r\n" );
+            return TRUE;
+        }
 
-		if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
-		{
-			ch->Send ( "Usage: buy <item number>\r\n" );
-			return TRUE;
-		}
+        if ( args.size() == 0 || !is_number ( args[0].c_str() ) )
+        {
+            ch->Send ( "Usage: buy <item number>\r\n" );
+            return TRUE;
+        }
 
-		num = atoi ( args[0].c_str() );
-		if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
-		{
-			ch->Send ( "There is no item number %d.\r\n", num );
-			return TRUE;
-		}
-		plrshop_item *item = player_shop[r]->item[ num-1 ];
+        num = atoi ( args[0].c_str() );
+        if ( num <= 0 || num > player_shop[r]->item.size() || !CAN_SEE_OBJ ( ch, player_shop[r]->item[ num-1 ]->obj ) )
+        {
+            ch->Send ( "There is no item number %d.\r\n", num );
+            return TRUE;
+        }
+        plrshop_item *item = player_shop[r]->item[ num-1 ];
 
-		if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
-			ch->Send ( "Your hands are full.\r\n" );
+        if ( IS_CARRYING_N ( ch ) >= CAN_CARRY_N ( ch ) )
+            ch->Send ( "Your hands are full.\r\n" );
 
-		else if ( GET_OBJ_WEIGHT ( item->obj ) + IS_CARRYING_W ( ch ) > CAN_CARRY_W ( ch ) )
-			ch->Send ( "You can't carry that much weight.\r\n" );
+        else if ( GET_OBJ_WEIGHT ( item->obj ) + IS_CARRYING_W ( ch ) > CAN_CARRY_W ( ch ) )
+            ch->Send ( "You can't carry that much weight.\r\n" );
 
-		else if ( item->currency == "g" )
-		{
-			if ( item->price > GET_GOLD ( ch ) )
-				ch->Send ( "You do not have enough gold for that.\r\n" );
-			else
-			{
-				// add gold to owner's bank
-				bool owner_online = FALSE;
-				for ( Descriptor *d = descriptor_list; d; d = d->next )
-					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
-					{
-						GET_BANK_GOLD ( d->character ) += item->price;
-						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld coins.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
-						log ( "Playershop: %s earned %lld coins from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
-						owner_online = TRUE;
-						break;
-					}
+        else if ( item->currency == "g" )
+        {
+            if ( item->price > GET_GOLD ( ch ) )
+                ch->Send ( "You do not have enough gold for that.\r\n" );
+            else
+            {
+                // add gold to owner's bank
+                bool owner_online = FALSE;
+                for ( Descriptor *d = descriptor_list; d; d = d->next )
+                    if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+                    {
+                        GET_BANK_GOLD ( d->character ) += item->price;
+                        d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld coins.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+                        log ( "Playershop: %s earned %lld coins from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                        SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+                        owner_online = TRUE;
+                        break;
+                    }
 
-				if ( !owner_online )
-				{
-					for ( int i = 0; i <= pi.TopOfTable(); i++ )
-					{
-						if ( *pi.NameByIndex ( i ) )
-						{
-							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
-							{
-								Character *c = new Character ( FALSE );
-								c->loader = pi.IdByIndex ( i );
-								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
-								{
-									if ( !c )
-									{
-										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
-										ch->Send ( "Buying failed, please try again later.\r\n" );
-										delete c;
-										return TRUE;
-									}
-									log ( "Playershop: %s (offline) earned %lld coins from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-									c->desc = NULL;
-									char_to_room ( c, world_vnum[1200] );
-									store_to_char ( pi.NameByIndex ( i ), c );
-									GET_BANK_GOLD ( c ) += item->price;
-									char_to_store ( c );
-									c->loader = NOBODY;
-									extract_char ( c );
-								}
-								else
-									delete c;
-							}
-						}
-					}
-				}
+                if ( !owner_online )
+                {
+                    for ( int i = 0; i <= pi.TopOfTable(); i++ )
+                    {
+                        if ( *pi.NameByIndex ( i ) )
+                        {
+                            if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+                            {
+                                Character *c = new Character ( FALSE );
+                                c->loader = pi.IdByIndex ( i );
+                                if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+                                {
+                                    if ( !c )
+                                    {
+                                        log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+                                        ch->Send ( "Buying failed, please try again later.\r\n" );
+                                        delete c;
+                                        return TRUE;
+                                    }
+                                    log ( "Playershop: %s (offline) earned %lld coins from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                                    c->desc = NULL;
+                                    char_to_room ( c, world_vnum[1200] );
+                                    store_to_char ( pi.NameByIndex ( i ), c );
+                                    GET_BANK_GOLD ( c ) += item->price;
+                                    char_to_store ( c );
+                                    c->loader = NOBODY;
+                                    extract_char ( c );
+                                }
+                                else
+                                    delete c;
+                            }
+                        }
+                    }
+                }
 
-				// subtract gold from customer's on hand gold
-				GET_GOLD ( ch ) -= item->price;
-				char buf[MAX_INPUT_LENGTH];
-				snprintf ( buf, sizeof ( buf ), "%s That's %lld coins. Thanks, and come again.", GET_NAME ( ch ), item->price );
-				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
-				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
-				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
-				obj_to_char ( item->obj, ch );
-				obj_in_plrshop.erase ( GET_ID ( item->obj ) );
-				delete player_shop[r]->item[ num-1 ];
-				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
-				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
-				return TRUE;
-			}
-		}
-		else if ( item->currency == "T" )
-		{
-			if ( !deduct_tokens ( ch, item->price ) )
-				ch->Send ( "You do not have enough tokens for that.\r\n" );
-			else
-			{
-				// add tokens to owner
-				bool owner_online = FALSE;
-				for ( Descriptor *d = descriptor_list; d; d = d->next )
-					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
-					{
-						deduct_tokens ( d->character, -item->price );
-						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld in tokens.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
-						log ( "Playershop: %s earned %lld in tokens from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
-						owner_online = TRUE;
-						break;
-					}
+                // subtract gold from customer's on hand gold
+                GET_GOLD ( ch ) -= item->price;
+                char buf[MAX_INPUT_LENGTH];
+                snprintf ( buf, sizeof ( buf ), "%s That's %lld coins. Thanks, and come again.", GET_NAME ( ch ), item->price );
+                do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+                ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+                act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+                obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
+                delete player_shop[r]->item[ num-1 ];
+                player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+                save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+                SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+                return TRUE;
+            }
+        }
+        else if ( item->currency == "T" )
+        {
+            if ( !deduct_tokens ( ch, item->price ) )
+                ch->Send ( "You do not have enough tokens for that.\r\n" );
+            else
+            {
+                // add tokens to owner
+                bool owner_online = FALSE;
+                for ( Descriptor *d = descriptor_list; d; d = d->next )
+                    if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+                    {
+                        deduct_tokens ( d->character, -item->price );
+                        d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld in tokens.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+                        log ( "Playershop: %s earned %lld in tokens from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                        SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+                        owner_online = TRUE;
+                        break;
+                    }
 
-				if ( !owner_online )
-				{
-					for ( int i = 0; i <= pi.TopOfTable(); i++ )
-					{
-						if ( *pi.NameByIndex ( i ) )
-						{
-							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
-							{
-								Character *c = new Character ( FALSE );
-								c->loader = pi.IdByIndex ( i );
-								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
-								{
-									if ( !c )
-									{
-										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
-										ch->Send ( "Buying failed, please try again later.\r\n" );
-										deduct_tokens ( ch, -item->price ); // refund
-										delete c;
-										return TRUE;
-									}
-									log ( "Playershop: %s (offline) earned %lld in tokens from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-									c->desc = NULL;
-									store_to_char ( pi.NameByIndex ( i ), c );
-									deduct_tokens ( c, -item->price );
-									pi.SetTokens ( i, GET_GOLD_TOKEN_COUNT ( c ) );
-									char_to_store ( c );
-									c->loader = NOBODY;
-									extract_char ( c );
-								}
-								else
-									delete c;
-							}
-						}
-					}
-				}
+                if ( !owner_online )
+                {
+                    for ( int i = 0; i <= pi.TopOfTable(); i++ )
+                    {
+                        if ( *pi.NameByIndex ( i ) )
+                        {
+                            if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+                            {
+                                Character *c = new Character ( FALSE );
+                                c->loader = pi.IdByIndex ( i );
+                                if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+                                {
+                                    if ( !c )
+                                    {
+                                        log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+                                        ch->Send ( "Buying failed, please try again later.\r\n" );
+                                        deduct_tokens ( ch, -item->price ); // refund
+                                        delete c;
+                                        return TRUE;
+                                    }
+                                    log ( "Playershop: %s (offline) earned %lld in tokens from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                                    c->desc = NULL;
+                                    store_to_char ( pi.NameByIndex ( i ), c );
+                                    deduct_tokens ( c, -item->price );
+                                    pi.SetTokens ( i, GET_GOLD_TOKEN_COUNT ( c ) );
+                                    char_to_store ( c );
+                                    c->loader = NOBODY;
+                                    extract_char ( c );
+                                }
+                                else
+                                    delete c;
+                            }
+                        }
+                    }
+                }
 
-				char buf[MAX_INPUT_LENGTH];
-				snprintf ( buf, sizeof ( buf ), "%s That's %lld in tokens. Thanks, and come again.", GET_NAME ( ch ), item->price );
-				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
-				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
-				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
-				obj_to_char ( item->obj, ch );
-				obj_in_plrshop.erase ( GET_ID ( item->obj ) );
-				delete player_shop[r]->item[ num-1 ];
-				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
-				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
-				return TRUE;
-			}
-		}
-		else if ( item->currency == "TP" )
-		{
-			if ( item->price > TRADEPOINTS ( ch ) )
-				ch->Send ( "You do not have enough tradepoints for that.\r\n" );
-			else
-			{
-				// add tradepoints to owner
-				bool owner_online = FALSE;
-				for ( Descriptor *d = descriptor_list; d; d = d->next )
-					if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
-					{
-						TRADEPOINTS ( d->character ) += item->price;
-						d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld TP.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
-						log ( "Playershop: %s earned %lld TP from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-						SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
-						owner_online = TRUE;
-						break;
-					}
+                char buf[MAX_INPUT_LENGTH];
+                snprintf ( buf, sizeof ( buf ), "%s That's %lld in tokens. Thanks, and come again.", GET_NAME ( ch ), item->price );
+                do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+                ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+                act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+                obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
+                delete player_shop[r]->item[ num-1 ];
+                player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+                save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+                SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+                return TRUE;
+            }
+        }
+        else if ( item->currency == "TP" )
+        {
+            if ( item->price > TRADEPOINTS ( ch ) )
+                ch->Send ( "You do not have enough tradepoints for that.\r\n" );
+            else
+            {
+                // add tradepoints to owner
+                bool owner_online = FALSE;
+                for ( Descriptor *d = descriptor_list; d; d = d->next )
+                    if ( d->character && GET_ID ( d->character ) == player_shop[r]->owner_id )
+                    {
+                        TRADEPOINTS ( d->character ) += item->price;
+                        d->character->Send ( "{cy[PLAYERSHOP]{c0 %s just bought %s for %lld TP.\r\n", GET_NAME ( ch ), item->obj->short_description, item->price );
+                        log ( "Playershop: %s earned %lld TP from selling %s to %s", GET_NAME ( d->character ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                        SET_BIT_AR ( PLR_FLAGS ( d->character ), PLR_CRASH );
+                        owner_online = TRUE;
+                        break;
+                    }
 
-				if ( !owner_online )
-				{
-					for ( int i = 0; i <= pi.TopOfTable(); i++ )
-					{
-						if ( *pi.NameByIndex ( i ) )
-						{
-							if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
-							{
-								Character *c = new Character ( FALSE );
-								c->loader = pi.IdByIndex ( i );
-								if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
-								{
-									if ( !c )
-									{
-										log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
-										ch->Send ( "Buying failed, please try again later.\r\n" );
-										delete c;
-										return TRUE;
-									}
-									log ( "Playershop: %s (offline) earned %lld TP from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
-									c->desc = NULL;
-									store_to_char ( pi.NameByIndex ( i ), c );
-									TRADEPOINTS ( c ) += item->price;
-									char_to_store ( c );
-									c->loader = NOBODY;
-									extract_char ( c );
-								}
-								else
-									delete c;
-							}
-						}
-					}
-				}
+                if ( !owner_online )
+                {
+                    for ( int i = 0; i <= pi.TopOfTable(); i++ )
+                    {
+                        if ( *pi.NameByIndex ( i ) )
+                        {
+                            if ( pi.IdByIndex ( i ) == player_shop[r]->owner_id )
+                            {
+                                Character *c = new Character ( FALSE );
+                                c->loader = pi.IdByIndex ( i );
+                                if ( pi.LoadChar ( pi.NameByIndex ( i ), c ) > -1 )
+                                {
+                                    if ( !c )
+                                    {
+                                        log ( "SYSERR: Playershop buy, couldn't load offline owner %s", pi.NameByIndex ( i ) );
+                                        ch->Send ( "Buying failed, please try again later.\r\n" );
+                                        delete c;
+                                        return TRUE;
+                                    }
+                                    log ( "Playershop: %s (offline) earned %lld TP from selling %s to %s", pi.NameByIndex ( i ), item->price, item->obj->short_description, GET_NAME ( ch ) );
+                                    c->desc = NULL;
+                                    store_to_char ( pi.NameByIndex ( i ), c );
+                                    TRADEPOINTS ( c ) += item->price;
+                                    char_to_store ( c );
+                                    c->loader = NOBODY;
+                                    extract_char ( c );
+                                }
+                                else
+                                    delete c;
+                            }
+                        }
+                    }
+                }
 
-				char buf[MAX_INPUT_LENGTH];
-				snprintf ( buf, sizeof ( buf ), "%s That's %lld tradepoint%s. Thanks, and come again.", GET_NAME ( ch ), item->price, item->price == 1 ? "" : "s" );
-				do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
-				ch->Send ( "You now have %s.\r\n", item->obj->short_description );
-				act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
-				obj_to_char ( item->obj, ch );
-				obj_in_plrshop.erase ( GET_ID ( item->obj ) );
-				TRADEPOINTS ( ch ) -= item->price;
-				delete player_shop[r]->item[ num-1 ];
-				player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
-				save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
-				SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
-				return TRUE;
-			}
-		}
-		else
-			log ( "SYSERR: playershop item at room %d has unknown currency %s", r, player_shop[r]->item[ num-1 ]->currency.c_str() );
+                char buf[MAX_INPUT_LENGTH];
+                snprintf ( buf, sizeof ( buf ), "%s That's %lld tradepoint%s. Thanks, and come again.", GET_NAME ( ch ), item->price, item->price == 1 ? "" : "s" );
+                do_tell ( shopkeep, buf, find_command ( "tell" ), 0 );
+                ch->Send ( "You now have %s.\r\n", item->obj->short_description );
+                act ( "$n buys $p.", FALSE, ch, item->obj, 0, TO_NOTVICT );
+                obj_to_char ( item->obj, ch );
+                obj_in_plrshop.erase ( GET_ID ( item->obj ) );
+                TRADEPOINTS ( ch ) -= item->price;
+                delete player_shop[r]->item[ num-1 ];
+                player_shop[r]->item.erase ( player_shop[r]->item.begin() + num-1 );
+                save_player_shop ( string ( pi.NameById ( player_shop[r]->owner_id ) ) );
+                SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+                return TRUE;
+            }
+        }
+        else
+            log ( "SYSERR: playershop item at room %d has unknown currency %s", r, player_shop[r]->item[ num-1 ]->currency.c_str() );
 
-		return TRUE;
-	}
-	return FALSE;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 void remote_rank ( Character* ch, int hof_rank, int middleman_vnum )
 {
-	// remote the hof rank to the Middleman
-	struct trig_var_data *vd = NULL;
-	Character *mob;
-	stringstream ss;
+    // remote the hof rank to the Middleman
+    struct trig_var_data *vd = NULL;
+    Character *mob;
+    stringstream ss;
 
-	for ( mob = ch->in_room->people; mob; mob = mob->next )
-	{
-		if ( mob->vnum == middleman_vnum && SCRIPT ( mob ))
-			for ( vd = ( SCRIPT ( mob ) )->global_vars; vd; vd = vd->next )
-			{
-				if ( vd->name == "hof_rank" )
-				{
-					ss << hof_rank;
-					vd->value = ss.str();
-					return;
-				}
-			}
-	}
+    for ( mob = ch->in_room->people; mob; mob = mob->next )
+    {
+        if ( mob->vnum == middleman_vnum && SCRIPT ( mob ))
+            for ( vd = ( SCRIPT ( mob ) )->global_vars; vd; vd = vd->next )
+            {
+                if ( vd->name == "hof_rank" )
+                {
+                    ss << hof_rank;
+                    vd->value = ss.str();
+                    return;
+                }
+            }
+    }
 }
 
 /* Add a new entry to middleman.hof if it's faster, maximum of 10 entries per quest type
@@ -3021,167 +3021,167 @@ void remote_rank ( Character* ch, int hof_rank, int middleman_vnum )
 */
 SPECIAL ( middleman_hof )
 {
-	ifstream fin;
-	ofstream fout;
-	string filename = string (LIB_ETC) + "middleman.hof";
-	vector<string> lines;
-	string line, new_line, quest_type, player, s, arg = Trim ( string(argument) );
-	int minutes, seconds, month, day, year, minutes_old, seconds_old;
-	int middleman_vnum = 10300, c = 0;
-	stringstream ss;
-	bool added_to_hof = FALSE, quest_type_seen = FALSE;
-	char buf[MAX_STRING_LENGTH];
+    ifstream fin;
+    ofstream fout;
+    string filename = string (LIB_ETC) + "middleman.hof";
+    vector<string> lines;
+    string line, new_line, quest_type, player, s, arg = Trim ( string(argument) );
+    int minutes, seconds, month, day, year, minutes_old, seconds_old;
+    int middleman_vnum = 10300, c = 0;
+    stringstream ss;
+    bool added_to_hof = FALSE, quest_type_seen = FALSE;
+    char buf[MAX_STRING_LENGTH];
 
-	if ( ch->vnum == middleman_vnum && !strcmp ( cmd_arg, "middleman_hof" ))
-	{
-		// parse the argument
-		ss.str ( arg );
-		ss >> quest_type >> s >> minutes >> seconds;
+    if ( ch->vnum == middleman_vnum && !strcmp ( cmd_arg, "middleman_hof" ))
+    {
+        // parse the argument
+        ss.str ( arg );
+        ss >> quest_type >> s >> minutes >> seconds;
 
-		// open the file, create it if it doesn't exist
-		fin.open ( filename.c_str() );
-		if ( !fin.is_open() )
-		{
-			fout.open ( filename.c_str() );
-			fout.close();
-			fin.open ( filename.c_str() );
-		}
+        // open the file, create it if it doesn't exist
+        fin.open ( filename.c_str() );
+        if ( !fin.is_open() )
+        {
+            fout.open ( filename.c_str() );
+            fout.close();
+            fin.open ( filename.c_str() );
+        }
 
-		// add new entry if it's faster
-		while ( fin.good() )
-		{
-			getline ( fin, line );
-			if ( line == "" )
-			{
-				if ( !quest_type_seen )
-				{
-					lines.push_back ( arg );
-					remote_rank ( ch, 1, middleman_vnum );
-				}
-				else if ( !added_to_hof && c < 10 )
-				{
-					lines.push_back ( arg );
-					remote_rank ( ch, c+1, middleman_vnum );
-				}
-				break;
-			}
-			if ( quest_type != line.substr( 0, 6 ) )
-			{
-				if ( !added_to_hof && quest_type_seen && c < 10 )
-				{
-					lines.push_back ( arg );
-					remote_rank ( ch, c+1, middleman_vnum );
-					added_to_hof = TRUE;
-				}
-				lines.push_back ( line );
-				continue;
-			}
-			if ( added_to_hof )
-			{
-				if ( c < 10 )
-				{
-					lines.push_back( line );
-					c++;
-				}
-				continue;
-			}
-			quest_type_seen = TRUE;
-			ss.clear();
-			ss.str ( line );
-			ss >> s >> s >> minutes_old >> seconds_old;
-			if ( minutes < minutes_old || ( minutes == minutes_old && seconds < seconds_old ))
-			{
-				lines.push_back( arg );
-				c++;
-				remote_rank ( ch, c, middleman_vnum );
-				if ( c < 10 )
-				{
-					lines.push_back( line );
-					c++;
-				}
-				added_to_hof = TRUE;
-			}
-			else if ( c < 10 )
-			{
-				lines.push_back( line );
-				c++;
-			}
-		}
-		fin.close();
+        // add new entry if it's faster
+        while ( fin.good() )
+        {
+            getline ( fin, line );
+            if ( line == "" )
+            {
+                if ( !quest_type_seen )
+                {
+                    lines.push_back ( arg );
+                    remote_rank ( ch, 1, middleman_vnum );
+                }
+                else if ( !added_to_hof && c < 10 )
+                {
+                    lines.push_back ( arg );
+                    remote_rank ( ch, c+1, middleman_vnum );
+                }
+                break;
+            }
+            if ( quest_type != line.substr( 0, 6 ) )
+            {
+                if ( !added_to_hof && quest_type_seen && c < 10 )
+                {
+                    lines.push_back ( arg );
+                    remote_rank ( ch, c+1, middleman_vnum );
+                    added_to_hof = TRUE;
+                }
+                lines.push_back ( line );
+                continue;
+            }
+            if ( added_to_hof )
+            {
+                if ( c < 10 )
+                {
+                    lines.push_back( line );
+                    c++;
+                }
+                continue;
+            }
+            quest_type_seen = TRUE;
+            ss.clear();
+            ss.str ( line );
+            ss >> s >> s >> minutes_old >> seconds_old;
+            if ( minutes < minutes_old || ( minutes == minutes_old && seconds < seconds_old ))
+            {
+                lines.push_back( arg );
+                c++;
+                remote_rank ( ch, c, middleman_vnum );
+                if ( c < 10 )
+                {
+                    lines.push_back( line );
+                    c++;
+                }
+                added_to_hof = TRUE;
+            }
+            else if ( c < 10 )
+            {
+                lines.push_back( line );
+                c++;
+            }
+        }
+        fin.close();
 
-		// write HoF
-		fout.open ( filename.c_str() );
-		if ( !fout.is_open() )
-		{
-			log ( "SYSERR: can't write to file %s", filename.c_str() );
-			return 0;
-		}
-		for ( uint i = 0; i < lines.size(); i++ )
-			fout << lines[ i ] << endl;
-		fout.close();
-		return 1;
-	}
+        // write HoF
+        fout.open ( filename.c_str() );
+        if ( !fout.is_open() )
+        {
+            log ( "SYSERR: can't write to file %s", filename.c_str() );
+            return 0;
+        }
+        for ( uint i = 0; i < lines.size(); i++ )
+            fout << lines[ i ] << endl;
+        fout.close();
+        return 1;
+    }
 
-	else if ( !IS_NPC ( ch ) && CMD_IS ( "look" ) && arg != "" )
-	{
-		if ( arg.substr( 1, 5 ) != "_easy" && arg.substr( 1, 5 ) != "_hard" )
-			return 0;
+    else if ( !IS_NPC ( ch ) && CMD_IS ( "look" ) && arg != "" )
+    {
+        if ( arg.substr( 1, 5 ) != "_easy" && arg.substr( 1, 5 ) != "_hard" )
+            return 0;
 
-		fin.open ( filename.c_str() );
-		if ( !fin.is_open() )
-		{
-			log ( "SYSERR: can't open %s", filename.c_str() );
-			return 0;
-		}
+        fin.open ( filename.c_str() );
+        if ( !fin.is_open() )
+        {
+            log ( "SYSERR: can't open %s", filename.c_str() );
+            return 0;
+        }
 
                 // read HoF and get the largest player name length
-		c = 0;
-		while ( !fin.eof() )
-		{
-			getline ( fin, line );
-			if ( arg == line.substr( 0, 6 ))
-			{
-				lines.push_back( line );
-				ss.clear();
-				ss.str ( line );
-				ss >> s >> player;
-				if ( player.length() > c )
-				c = player.length();
-			}
-		}
-		fin.close();
+        c = 0;
+        while ( !fin.eof() )
+        {
+            getline ( fin, line );
+            if ( arg == line.substr( 0, 6 ))
+            {
+                lines.push_back( line );
+                ss.clear();
+                ss.str ( line );
+                ss >> s >> player;
+                if ( player.length() > c )
+                c = player.length();
+            }
+        }
+        fin.close();
 
-		// show HoF
-		if ( lines.size() )
-		{
-			DYN_DEFINE;
-			*buf = '\0';
-			DYN_CREATE;
-			*dynbuf = 0;
-			line = "{cyHall of Fame of ";
-			if ( arg == "a_easy" )
-				line += "The Assassin (easy){c0\r\n\r\n";
-			else if ( arg == "a_hard" )
-				line += "The Assassin (hard){c0\r\n\r\n";
-			s = "    Player  ";
-			s.insert( s.length(), c > 6 ? c - 6 : 0, ' ' );
-			s += "Time  Month Day Year\r\n";
-			line += s;
-			line.insert( line.length(), s.length() - 2, '-' );
-			line += "\r\n";
-			strcpy ( buf, line.c_str() );
-			DYN_RESIZE( buf );
-			for ( uint i = 0; i < lines.size(); i++ )
-			{
-				ss.clear();
-				ss.str ( lines[ i ] );
-				ss >> s >> player >> minutes >> seconds >> month >> day >> year;
-				snprintf( buf, sizeof( buf ), "%d. %s%-*s  %02d:%02d   %02d  %02d  %d\r\n", i + 1, i < 9 ? " " : "", c > 6 ? c : 6, player.c_str(), minutes, seconds, month, day, year);
-				DYN_RESIZE( buf );
-			}
-			page_string ( ch->desc, dynbuf, DYN_BUFFER );
-		}
-		return 1;
-	}
-	return 0;
+        // show HoF
+        if ( lines.size() )
+        {
+            DYN_DEFINE;
+            *buf = '\0';
+            DYN_CREATE;
+            *dynbuf = 0;
+            line = "{cyHall of Fame of ";
+            if ( arg == "a_easy" )
+                line += "The Assassin (easy){c0\r\n\r\n";
+            else if ( arg == "a_hard" )
+                line += "The Assassin (hard){c0\r\n\r\n";
+            s = "    Player  ";
+            s.insert( s.length(), c > 6 ? c - 6 : 0, ' ' );
+            s += "Time  Month Day Year\r\n";
+            line += s;
+            line.insert( line.length(), s.length() - 2, '-' );
+            line += "\r\n";
+            strcpy ( buf, line.c_str() );
+            DYN_RESIZE( buf );
+            for ( uint i = 0; i < lines.size(); i++ )
+            {
+                ss.clear();
+                ss.str ( lines[ i ] );
+                ss >> s >> player >> minutes >> seconds >> month >> day >> year;
+                snprintf( buf, sizeof( buf ), "%d. %s%-*s  %02d:%02d   %02d  %02d  %d\r\n", i + 1, i < 9 ? " " : "", c > 6 ? c : 6, player.c_str(), minutes, seconds, month, day, year);
+                DYN_RESIZE( buf );
+            }
+            page_string ( ch->desc, dynbuf, DYN_BUFFER );
+        }
+        return 1;
+    }
+    return 0;
 }

@@ -47,21 +47,21 @@ struct shop_data {
 };
 
 struct plrshop_item {
-	obj_data* obj;
-	gold_int price; // for tokens, price 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
-	string currency; // "g" = on hand gold, "T" = tokens, "TP" = tradepoints
+    obj_data* obj;
+    gold_int price; // for tokens, price 10234 means 10 gold, 2 silver, 3 bronze, 4 brass
+    string currency; // "g" = on hand gold, "T" = tokens, "TP" = tradepoints
 };
 
 struct plrshop {
-	long owner_id;
-	mob_vnum shopkeep;
-	room_vnum shop_room;
-	vector<plrshop_item*> item;
+    long owner_id;
+    mob_vnum shopkeep;
+    room_vnum shop_room;
+    vector<plrshop_item*> item;
 
-	~plrshop() {
+    ~plrshop() {
         for ( auto &i : item )
             delete i;
-	}
+    }
 };
 
 #define MAX_TRADE	5	/* List maximums for compatibility      */

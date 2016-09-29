@@ -19,33 +19,33 @@ void run_events2(void)
 
     in_event_handler = 1;
 
-	::prev = NULL;
-	for (temp = pending_events; temp; temp = prox) {
-		prox = temp->next;
-		temp->ticks_to_go--;
-		if (temp->ticks_to_go == 0) {
+    ::prev = NULL;
+    for (temp = pending_events; temp; temp = prox) {
+        prox = temp->next;
+        temp->ticks_to_go--;
+        if (temp->ticks_to_go == 0) {
 
-			/* run the event */
-			if (!temp->func)
-				log("SYSERR: Attempting to run a NULL event. Ignoring");
-			else
-				(temp->func) (temp->causer, temp->victim, (long) temp->info);
+            /* run the event */
+            if (!temp->func)
+                log("SYSERR: Attempting to run a NULL event. Ignoring");
+            else
+                (temp->func) (temp->causer, temp->victim, (long) temp->info);
 
-			/* remove the event from the list. */
-			if (!::prev)
-				pending_events = prox;
-			else
-				::prev->next = prox;
-			free(temp);
-		} else if (temp->ticks_to_go == -1) {
-			if (!::prev)
-				pending_events = prox;
-			else
-				::prev->next = prox;
-			free(temp);
-		} else
-			::prev = temp;
-	}
+            /* remove the event from the list. */
+            if (!::prev)
+                pending_events = prox;
+            else
+                ::prev->next = prox;
+            free(temp);
+        } else if (temp->ticks_to_go == -1) {
+            if (!::prev)
+                pending_events = prox;
+            else
+                ::prev->next = prox;
+            free(temp);
+        } else
+            ::prev = temp;
+    }
 
     in_event_handler = 0;
 };
@@ -70,15 +70,15 @@ void add_event2(int delay, EVENT2(*func), void *causer, void *victim, void *info
 
 void clean_events2(void *pointer)
 {
-	struct event_info2 *temp, *prox;
+    struct event_info2 *temp, *prox;
     //struct event_info2 *previous;
 
-	if (in_event_handler)
-		log("SYSERR: Trying to remove events inside the handler. Attempting to continue.");
+    if (in_event_handler)
+        log("SYSERR: Trying to remove events inside the handler. Attempting to continue.");
     //previous = NULL;
     for (temp = pending_events; temp; temp = prox) {
-		prox = temp->next;
-		if (temp->causer == pointer || temp->victim == pointer || (void *) (temp->func) == pointer)
-			temp->ticks_to_go = 0;
-	}
+        prox = temp->next;
+        if (temp->causer == pointer || temp->victim == pointer || (void *) (temp->func) == pointer)
+            temp->ticks_to_go = 0;
+    }
 };

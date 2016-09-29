@@ -79,7 +79,7 @@ Room::Room() {
 Room::~Room() {
     // Adding this per Horus
     struct room_ores *tmp, *tmp_next;
-    
+
     free_room_strings();
 
     /* free any assigned scripts */
@@ -88,13 +88,13 @@ Room::~Room() {
     /* free script proto list */
     if (proto_script)
         free_proto_script(this, WLD_TRIGGER);
-    
+
     // Added per Horus
-	for (tmp = ores; tmp; tmp = tmp_next) {
-		tmp_next = tmp->next;
-		free(tmp);
-	}
-	ores = NULL;
+    for (tmp = ores; tmp; tmp = tmp_next) {
+        tmp_next = tmp->next;
+        free(tmp);
+    }
+    ores = NULL;
 }
 
 int Room::free_room_strings() {
@@ -170,7 +170,7 @@ int Room::copy_room_strings(Room *source) {
     /** this should be done way nicer, but hey! - Mord **/
     t_description = strdup(source->GetDescription());
     AssignTempDesc();
-    
+
     if (source->n_description)
         n_description = strdup(source->n_description);
 

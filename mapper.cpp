@@ -531,8 +531,8 @@ void draw_map( Character *ch)
 
 
 
-//@TODO:KAVIR: This should be rewritten, it's not very nice.  It's cobbled 
-//together from the old map code and it works, but the whole thing could really 
+//@TODO:KAVIR: This should be rewritten, it's not very nice.  It's cobbled
+//together from the old map code and it works, but the whole thing could really
 //use a redesign and cleanup.
 
 /* Clear, generate and store the map in an MSDP variable */
@@ -610,7 +610,7 @@ char *msdp_map( Character *ch )
     }
   }
   strcat(buf, " X X X X X X X X X X X");
-  
+
   IN_ROOM(ch) = was_in;
   return buf;
 }

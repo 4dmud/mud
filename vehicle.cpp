@@ -116,113 +116,113 @@ ACMD(do_drive) {
 
     if ( vehicle == NULL && IN_ROOM ( ch ) != NULL )
     {
-	controls = get_obj_in_list_type ( ITEM_V_CONTROLS, IN_ROOM(ch)->contents );
+    controls = get_obj_in_list_type ( ITEM_V_CONTROLS, IN_ROOM(ch)->contents );
 
-	if ( !controls )
-	{
-		ch->Send ( "ERROR!  Vehicle controls present yet not present!\r\n" );
-		return;
-	}
+    if ( !controls )
+    {
+        ch->Send ( "ERROR!  Vehicle controls present yet not present!\r\n" );
+        return;
+    }
 
-	vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( controls, 0 ));
+    vehicle = find_vehicle_by_vnum ( GET_OBJ_VAL ( controls, 0 ));
 
-	if ( !vehicle )
-	{
-		ch->Send ( "ERROR!  Vehicle has been lost somehow!\r\n" );
-		return;
-	}
+    if ( !vehicle )
+    {
+        ch->Send ( "ERROR!  Vehicle has been lost somehow!\r\n" );
+        return;
+    }
 
-	if ( IS_AFFECTED ( ch, AFF_BLIND ))
-	{
-		/* Blind characters can't drive! */
-		ch->Send ( "You can't see the controls!\r\n" );
-		return;
-	}
+    if ( IS_AFFECTED ( ch, AFF_BLIND ))
+    {
+        /* Blind characters can't drive! */
+        ch->Send ( "You can't see the controls!\r\n" );
+        return;
+    }
 
-	/* Gotta give us a direction... */
-	if ( !*arg )
-	{
-		ch->Send ( "Drive which direction?\r\n" );
-		return;
-	}
+    /* Gotta give us a direction... */
+    if ( !*arg )
+    {
+        ch->Send ( "Drive which direction?\r\n" );
+        return;
+    }
     }
 
     /* Disabled until it doesn't freeze the mud anymore (Thotter)
         // Driving Into another Vehicle
         if (is_abbrev(arg, "into")) {
-    	room_rnum was_in, is_in, is_going_to;
-     
-    	if (!*buf2) {
-    	    send_to_char("Drive into what?\r\n", ch);
-    	    return;
-    	}
-     
-    	vehicle_in_out = get_obj_in_list_vis(ch, buf2, NULL,vehicle->in_room->contents);
-    	if (!vehicle_in_out) {
-    	    send_to_char("Nothing here by that name!\r\n", ch);
-    	    return;
-    	}
-     
-    	if (GET_OBJ_TYPE(vehicle_in_out) != ITEM_VEHICLE) {
-    	    send_to_char("Thats not a vehicle.\r\n", ch);
-    	    return;
-    	}
-     
-    	is_going_to = real_room(GET_OBJ_VAL(vehicle_in_out, 0));
-     
-    	if (!IS_SET_AR(ROOM_FLAGS(is_going_to), ROOM_VEHICLE)) {
-    	    send_to_char("That vehicle can't carry other vehicles.", ch);
-    	    return;
-    	}
-     
-    	send_to_room(IN_ROOM(vehicle), "%s enters %s.\r\n", vehicle->short_description,
-    		vehicle_in_out->short_description);
-     
-    	was_in = vehicle->in_room;
-    	obj_from_room(vehicle);
-    	obj_to_room(vehicle, is_going_to);
-     
-    	is_in = vehicle->in_room;
-     
-    	if (ch->desc != NULL)
-    	    view_room_by_rnum(ch, is_in);
-     
-    	send_to_room(IN_ROOM(vehicle), "%s enters.\r\n", vehicle->short_description);
-     
-     
-    	return;
+        room_rnum was_in, is_in, is_going_to;
+
+        if (!*buf2) {
+            send_to_char("Drive into what?\r\n", ch);
+            return;
+        }
+
+        vehicle_in_out = get_obj_in_list_vis(ch, buf2, NULL,vehicle->in_room->contents);
+        if (!vehicle_in_out) {
+            send_to_char("Nothing here by that name!\r\n", ch);
+            return;
+        }
+
+        if (GET_OBJ_TYPE(vehicle_in_out) != ITEM_VEHICLE) {
+            send_to_char("Thats not a vehicle.\r\n", ch);
+            return;
+        }
+
+        is_going_to = real_room(GET_OBJ_VAL(vehicle_in_out, 0));
+
+        if (!IS_SET_AR(ROOM_FLAGS(is_going_to), ROOM_VEHICLE)) {
+            send_to_char("That vehicle can't carry other vehicles.", ch);
+            return;
+        }
+
+        send_to_room(IN_ROOM(vehicle), "%s enters %s.\r\n", vehicle->short_description,
+            vehicle_in_out->short_description);
+
+        was_in = vehicle->in_room;
+        obj_from_room(vehicle);
+        obj_to_room(vehicle, is_going_to);
+
+        is_in = vehicle->in_room;
+
+        if (ch->desc != NULL)
+            view_room_by_rnum(ch, is_in);
+
+        send_to_room(IN_ROOM(vehicle), "%s enters.\r\n", vehicle->short_description);
+
+
+        return;
         } else if (is_abbrev(arg, "out")) {
-    	struct obj_data *hatch;
-     
-    	hatch = get_obj_in_list_type(ITEM_V_HATCH,
-    				     vehicle->in_room->contents);
-    	if (!hatch) {
-    	    send_to_char("Nowhere to drive out of.\r\n", ch);
-    	    return;
-    	}
-     
-    	vehicle_in_out = find_vehicle_by_vnum(GET_OBJ_VAL(hatch, 0));
-    	if (!vehicle_in_out) {
-    	    send_to_char
-    		("ERROR!  Vehicle to drive out of doesn't exist!\r\n", ch);
-    	    return;
-    	}
-     
-    	send_to_room(IN_ROOM(vehicle), "%s exits %s.\r\n", vehicle->short_description,
-    		vehicle_in_out->short_description);
-     
-    	obj_from_room(vehicle);
-    	obj_to_room(vehicle, vehicle_in_out->in_room);
-     
-    	if (ch->desc != NULL)
-    	    view_room_by_rnum(ch, vehicle->in_room);
-     
-    	send_to_room(IN_ROOM(vehicle), "%s drives out of %s.\r\n",
-    		vehicle->short_description,
-    		vehicle_in_out->short_description);
-     
-    	return;
-        } 
+        struct obj_data *hatch;
+
+        hatch = get_obj_in_list_type(ITEM_V_HATCH,
+                         vehicle->in_room->contents);
+        if (!hatch) {
+            send_to_char("Nowhere to drive out of.\r\n", ch);
+            return;
+        }
+
+        vehicle_in_out = find_vehicle_by_vnum(GET_OBJ_VAL(hatch, 0));
+        if (!vehicle_in_out) {
+            send_to_char
+            ("ERROR!  Vehicle to drive out of doesn't exist!\r\n", ch);
+            return;
+        }
+
+        send_to_room(IN_ROOM(vehicle), "%s exits %s.\r\n", vehicle->short_description,
+            vehicle_in_out->short_description);
+
+        obj_from_room(vehicle);
+        obj_to_room(vehicle, vehicle_in_out->in_room);
+
+        if (ch->desc != NULL)
+            view_room_by_rnum(ch, vehicle->in_room);
+
+        send_to_room(IN_ROOM(vehicle), "%s drives out of %s.\r\n",
+            vehicle->short_description,
+            vehicle_in_out->short_description);
+
+        return;
+        }
         */
 //    else
         for ( x = 0; x < ( GET_OBJ_VAL ( vehicle, 1 ) ? PILOT_DIRS : DRIVE_DIRS); x++ )
@@ -292,7 +292,7 @@ SPECIAL(vehicle) {
         one_argument(argument, arg);
 
         if ( !*arg )
-	{
+    {
             send_to_char("Enter what?\r\n", ch);
             return 1;
         }
@@ -300,12 +300,12 @@ SPECIAL(vehicle) {
         obj = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents );
 
         if ( !obj )
-	{
+    {
             ch->Send ( "Nothing by that name is here to enter!\r\n" );
             return 1;
         }
-	else if ( GET_OBJ_TYPE(obj) == ITEM_VEHICLE || GET_OBJ_TYPE(obj) == ITEM_VEHICLE2 )
-	{
+    else if ( GET_OBJ_TYPE(obj) == ITEM_VEHICLE || GET_OBJ_TYPE(obj) == ITEM_VEHICLE2 )
+    {
             act("You climb into $o.", TRUE, ch, obj, 0, TO_CHAR);
             act("$n climbs into $o.", TRUE, ch, obj, 0, TO_ROOM);
             move_char_to(ch, real_room(GET_OBJ_VAL(obj, 0)));
@@ -331,11 +331,11 @@ SPECIAL(vehicle_controls) {
 SPECIAL(vehicle_hatch) {
     struct obj_data *hatch, *v;
     if (CMD_IS("leave") && IN_ROOM ( ch ) != NULL) {
-	if ( GET_POS ( ch ) != POS_STANDING )
-	{
-		ch->Send ( "Maybe you should get on your feet first?\r\n" );
-		return 1;
-	}
+    if ( GET_POS ( ch ) != POS_STANDING )
+    {
+        ch->Send ( "Maybe you should get on your feet first?\r\n" );
+        return 1;
+    }
         hatch =
             get_obj_in_list_type(ITEM_V_HATCH,
                                  IN_ROOM(ch)->contents);
@@ -673,8 +673,8 @@ void assign_vehicles(void) {
 * New Vehicle code by Horus  *********************************
 *************************************************************/
 
-#define UPPER_V_ROOM      55999 
-#define LOWER_V_ROOM      55501 
+#define UPPER_V_ROOM      55999
+#define LOWER_V_ROOM      55501
 #define ZONE_V_ROOM       555
 
 /* For space jumping */
@@ -720,7 +720,7 @@ void process_v_jump(struct vehicle2_data *vh)
   char buf[MAX_STRING_LENGTH];
 
   dir = graph.find_first_step(vh->vehicle->in_room, vh->dest);
-  if (dir == BFS_ERROR || dir == BFS_ALREADY_THERE || 
+  if (dir == BFS_ERROR || dir == BFS_ALREADY_THERE ||
       dir == BFS_NO_PATH) {
       log("Weird problem with vehicle queue.\r\n");
       REMOVE_FROM_LIST(vh, vehicle_queue, next);
@@ -728,8 +728,8 @@ void process_v_jump(struct vehicle2_data *vh)
       return;
       }
 
-  dest = vh->vehicle->in_room->dir_option[dir]->to_room; 
-          
+  dest = vh->vehicle->in_room->dir_option[dir]->to_room;
+
   /* Lets move the vehicle */
   obj_from_room(vh->vehicle);
   obj_to_room(vh->vehicle, dest);
@@ -840,7 +840,7 @@ bool vehicle_jump(Character *ch, char *argument)
       ch->Send("You are in a strange location - you cannot jump from here.\r\n");
       return TRUE;
   }
- 
+
   /* only MAIN_SPACE has a 50x50 grid */
   if (sector != MAIN_SPACE) {
       if (xord > 10 || yord > 10) {
@@ -853,7 +853,7 @@ bool vehicle_jump(Character *ch, char *argument)
       if (xord > 50 || yord > 50) {
           ch->Send("Your x and y coordinates must be 50 or less.\r\n");
           return TRUE;
-      }   
+      }
       multi = 50;
   }
 
@@ -882,7 +882,7 @@ bool vehicle_jump(Character *ch, char *argument)
     vh->stage -= attach->value;
 
   /* Vehicle speed shouldnt be quicker than 1, so set to fastest speed */
-  if (vh->stage <= 0) 
+  if (vh->stage <= 0)
       vh->stage = 1;
   vh->value = vh->stage;
   ADD_TO_LIST(vh, vehicle_queue);
@@ -923,7 +923,7 @@ SPECIAL(vehicle2)
           return FALSE;
       dest = vehicle->in_room;
       view_room_by_rnum(ch, dest);
-      return TRUE; 
+      return TRUE;
   }
 
   /* all of these commands depend on what attachments are made */
@@ -955,7 +955,7 @@ int create_vehicle_room(struct obj_data *obj)
   Room *vroom;
 //  char buf[MAX_STRING_LENGTH];
 //  room_vnum vnum;
-  
+
   vroom = world_vnum[ GET_OBJ_VAL ( obj, 0 ) ];
   vroom->vehicle = obj;
   ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
@@ -965,11 +965,11 @@ int create_vehicle_room(struct obj_data *obj)
   vnum = find_new_vehicle_room();
   if ( vnum == -1 )
   {
-	log ( "SYSERR: couldn't find a new vehicle room" );
-	return 0;
+    log ( "SYSERR: couldn't find a new vehicle room" );
+    return 0;
   }
   vroom = new Room();
-  vroom->number = vnum; 
+  vroom->number = vnum;
   vroom->vehicle = obj;
   if (obj->ex_description) {
       vroom->name = strdup(obj->ex_description->keyword);
@@ -979,8 +979,8 @@ int create_vehicle_room(struct obj_data *obj)
       sprintf(buf, "Inside %s", obj->short_description);
       vroom->name = strdup(buf);
       vroom->SetDescription("It is very plain and boring in here.\r\n");
-  } 
- 
+  }
+
   vroom->zone = real_zone(555);
   vroom->smell = strdup("You smell nothing interesting.\r\n");
   vroom->listen = strdup("You hear the hum of the engines.\r\n");
@@ -998,7 +998,7 @@ int create_vehicle_room(struct obj_data *obj)
   ASSIGNROOM ( vnum, vehicle2 );
   ASSIGNOBJ ( GET_OBJ_VNUM ( obj ), vehicle );
 */
-  return 1; 
+  return 1;
 }
 
 void delete_vehicle(struct obj_data *obj)

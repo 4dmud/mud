@@ -84,13 +84,13 @@ string FindAndReplace
 }   // end of FindAndReplace
 
 char *ChToLower(char *c) {
-	if (!c)
-		return c;
-	else {
-	int n = strlen(c);
-	for (int i = 0;i < n;i++)
-	if( 'A'<=c[i] && c[i]<='Z' )
-		c[i] = c[i]+'a'-'A';
-	}
-	return c;
+    if (!c)
+        return c;
+    else {
+    int n = strlen(c);
+    for (int i = 0;i < n;i++)
+    if( 'A'<=c[i] && c[i]<='Z' )
+        c[i] = c[i]+'a'-'A';
+    }
+    return c;
 }

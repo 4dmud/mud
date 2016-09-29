@@ -1,7 +1,7 @@
 //
 // C++ Implementation: descriptor
 //
-// Description: 
+// Description:
 //
 //
 // Author: Jamie Nelson <mordecai@xtra.co.nz>, (C) 2006
@@ -72,13 +72,13 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
   int count = 0;
   int bInTag = FALSE;
   int bInEntity = FALSE;
-  
+
   for (p = txt, count = 0;
        length > 0;
        p++, length--)
   {
     c = *p;
-    
+
     if (bInTag)  /* in a tag, eg. <send> */
     {
       if (!bMXP)
@@ -95,7 +95,7 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
     } /* end of being inside a tag */
     else switch (c)
     {
-      
+
     case MXP_BEGc:
       bInTag = TRUE;
       if (!bMXP)
@@ -103,18 +103,18 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
       else
         count += 4;  /* allow for ESC [1z */
       break;
-      
+
     case MXP_ENDc:   /* shouldn't get this case */
       if (!bMXP)
         count--;     /* not output if not MXP */
       break;
-      
+
     case MXP_AMPc:
       bInEntity = TRUE;
       if (!bMXP)
         count--;     /* not output if not MXP */
       break;
-      
+
     default:
       if (bMXP)
       {
@@ -124,21 +124,21 @@ int Descriptor::count_mxp_tags (const int bMXP, const char *txt, int length)
         case '>':       /* > becomes &gt; */
           count += 3;
           break;
-          
+
         case '&':
           count += 4;    /* & becomes &amp; */
           break;
-          
+
         case '"':        /* " becomes &quot; */
           count += 5;
           break;
-          
+
         } /* end of inner switch */
       }   /* end of MXP enabled */
     } /* end of switch on character */
-    
+
   }   /* end of counting special characters */
-  
+
   return count;
 } /* end of count_mxp_tags */
 
@@ -151,11 +151,11 @@ string & Descriptor::convert_mxp_tags (const int bMXP, stringstream &ssrc)
   int srclen = ssrc.str().length();
   static string dest, src;
   size_t ps;
-  
+
   dest.erase();
 
   src = ssrc.str();
-  
+
   if (srclen == 0)
     return src;
 
@@ -196,18 +196,18 @@ string & Descriptor::convert_mxp_tags (const int bMXP, stringstream &ssrc)
           dest += "<";
         }
         break;
-        
+
       case MXP_ENDc:    /* shouldn't get this case */
         if (bMXP)
           dest += ">";
         break;
-        
+
       case MXP_AMPc:
         bInEntity = TRUE;
         if (bMXP)
           dest += "&";
         break;
-        
+
       default:
         if (bMXP)
         {
@@ -216,34 +216,34 @@ string & Descriptor::convert_mxp_tags (const int bMXP, stringstream &ssrc)
           case '<':
             dest += "&lt;";
             break;
-            
+
           case '>':
             dest += "&gt;";
             break;
-            
+
           case '&':
             dest += "&amp;";
             break;
-            
+
           case '"':
             dest += "&quot;";
             break;
-            
+
           default:
             dest += c;
             break;  /* end of default */
-            
+
           } /* end of inner switch */
-          
+
         }
         else
           //*pd++ = c;  /* not MXP - just copy character */
           dest += c;
         break;
-        
+
       } /* end of switch on character */
     } /*end of else */
-    
+
   }   /* end of converting special characters */
   //*pd = 0;
 
@@ -259,10 +259,10 @@ string & Descriptor::convert_mxp_tags (const int bMXP, string &src)
   size_t ps;
 
   dest.erase();
-  
+
   if (srclen == 0)
     return src;
-  
+
   for (ps = 0; srclen > 0; ps++, srclen--)
   {
     c = src[ps];
@@ -300,18 +300,18 @@ string & Descriptor::convert_mxp_tags (const int bMXP, string &src)
           dest += "<";
         }
         break;
-        
+
       case MXP_ENDc:    /* shouldn't get this case */
         if (bMXP)
           dest += ">";
         break;
-        
+
       case MXP_AMPc:
         bInEntity = TRUE;
         if (bMXP)
           dest += "&";
         break;
-        
+
       default:
         if (bMXP)
         {
@@ -320,34 +320,34 @@ string & Descriptor::convert_mxp_tags (const int bMXP, string &src)
           case '<':
             dest += "&lt;";
             break;
-            
+
           case '>':
             dest += "&gt;";
             break;
-            
+
           case '&':
             dest += "&amp;";
             break;
-            
+
           case '"':
             dest += "&quot;";
             break;
-            
+
           default:
             dest += c;
             break;  /* end of default */
-            
+
           } /* end of inner switch */
-          
+
         }
         else
           //*pd++ = c;  /* not MXP - just copy character */
           dest += c;
         break;
-        
+
       } /* end of switch on character */
     } /*end of else */
-    
+
   }   /* end of converting special characters */
   //*pd = 0;
 
@@ -373,11 +373,11 @@ void Descriptor::turn_on_mxp ()
   this->Output( "%s", MXPTAG("!ELEMENT affect '<C &col;>' ATT='col=whitesmoke'"));
   this->Output( "%s", MXPTAG("!ELEMENT LookAt '<send href=\"look at &at;\">'"));
   this->Output( "%s", MXPTAG("!ELEMENT Read '<send href=\"read at &at;\">'"));
-  
+
 #if 0
   /* Room description tag */
   this->Output( "%s", MXPTAG ("!ELEMENT rdesc '<p>' FLAG=RoomDesc"));
-  
+
   /* Get an item tag (for things on the ground) */
   this->Output( "%s",
                    MXPTAG("!ELEMENT GroundItem \"<send href='"
@@ -415,16 +415,16 @@ void Descriptor::turn_on_mxp ()
     "ATT='name desc'"));
 #endif
   /* Player tag (for who lists, tells etc.) */
-  
+
   /* List an item tag (for things in a shop) */
   //this->Output( "%s", MXPTAG("GAUGE HP Max=XHP Caption='Hp:' Color='red'"));
   //this->Output( "%s", MXPTAG("GAUGE MANA Max=XMANA Caption='Mn:' Color='cyan'"));
   //this->Output( "%s", MXPTAG("GAUGE MOVE Max=XMOVE Caption='Mv:' Color='green'"));
   //this->Output( "%s", MXPTAG("GAUGE STAM Max=XSTAM Caption='St:' Color='white'"));
   //this->Output( "%s", MXPTAG("FRAME Name='Map' Left='-20c' Top='0' Width='20c' Height='20c'"));
-  
-  
-  
+
+
+
 } /* end of turn_on_mxp */
 
 
@@ -442,13 +442,13 @@ char * Descriptor::send_mxp_status()
     mana = GET_MANA(this->character);
     move = GET_MOVE(this->character);
     stam = GET_STAMINA(this->character);
-    
+
     mhp = GET_MAX_HIT(this->character);
     mmana = GET_MAX_MANA(this->character);
     mmove = GET_MAX_MOVE(this->character);
     mstam = GET_MAX_STAMINA(this->character);
   }
-  
+
   len = snprintf(mxpstat, sizeof(mxpstat), "%s", MXPMODE(6));
   len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY hp '%d'>" "<!ENTITY xhp '%d'>",hp,mhp);
   len = snprintf(mxpstat + len, sizeof(mxpstat) - len, "<!ENTITY mana '%d'>" "<!ENTITY xmana '%d'>",mana,mmana);

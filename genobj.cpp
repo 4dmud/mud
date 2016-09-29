@@ -60,7 +60,7 @@ int update_objects(struct obj_data *refobj)
   int count = 0;
 
   for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++) {
-	  obj = (ob->second);
+      obj = (ob->second);
     if (obj->item_number != refobj->item_number)
       continue;
 
@@ -107,7 +107,7 @@ obj_rnum adjust_objects(obj_rnum refpt)
    * Renumber live objects.
    */
   for (olt_it ob = object_list.begin(); ob != object_list.end(); ob++)
-	  GET_OBJ_RNUM((ob->second)) += (GET_OBJ_RNUM((ob->second)) >= refpt);
+      GET_OBJ_RNUM((ob->second)) += (GET_OBJ_RNUM((ob->second)) >= refpt);
 
   /*
    * Renumber zone table.
@@ -241,102 +241,102 @@ int save_objects(zone_rnum zone_num)
   for (counter = zone_table[zone_num].Bot(); counter <= zone_table[zone_num].top; counter++) {
     if ((realcounter = real_object(counter)) != NOTHING) {
       if ((obj = &obj_proto[realcounter])->action_description) {
-	strncpy(buf, obj->action_description, sizeof(buf) - 1);
-	strip_cr(buf);
+    strncpy(buf, obj->action_description, sizeof(buf) - 1);
+    strip_cr(buf);
       } else
-	*buf = '\0';
-	if (obj && (obj)->smell) {
-		strncpy(smell, obj->smell, sizeof(smell) - 1);
-		strip_cr(smell);
-	    } else
-		*smell = '\0';
-	    if (obj && (obj)->taste) {
-		strncpy(taste, obj->taste, sizeof(taste) - 1);
-		strip_cr(taste);
-	    } else
-		*taste = '\0';
-	    if (obj && (obj)->feel) {
-		strncpy(feel, obj->feel, sizeof(feel) - 1);
-		strip_cr(feel);
-	    } else
-		*feel = '\0';
+    *buf = '\0';
+    if (obj && (obj)->smell) {
+        strncpy(smell, obj->smell, sizeof(smell) - 1);
+        strip_cr(smell);
+        } else
+        *smell = '\0';
+        if (obj && (obj)->taste) {
+        strncpy(taste, obj->taste, sizeof(taste) - 1);
+        strip_cr(taste);
+        } else
+        *taste = '\0';
+        if (obj && (obj)->feel) {
+        strncpy(feel, obj->feel, sizeof(feel) - 1);
+        strip_cr(feel);
+        } else
+        *feel = '\0';
 
       fprintf(fp,
-	      "#%d\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n"
-	      "%s~\n",
+          "#%d\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n"
+          "%s~\n",
 
-	      GET_OBJ_VNUM(obj),
-	      (obj->name && *obj->name) ? obj->name : "undefined",
-	      (obj->short_description && *obj->short_description) ? obj->short_description : "undefined",
-	      (obj->description && *obj->description) ?	obj->description : "undefined",
-	      buf, 
-	      smell, 
-	      taste, 
-	      feel);
+          GET_OBJ_VNUM(obj),
+          (obj->name && *obj->name) ? obj->name : "undefined",
+          (obj->short_description && *obj->short_description) ? obj->short_description : "undefined",
+          (obj->description && *obj->description) ?	obj->description : "undefined",
+          buf,
+          smell,
+          taste,
+          feel);
 
       //sprintascii(buf, GET_OBJ_EXTRA(obj));
       //sprintascii(bit1, GET_OBJ_WEAR(obj));
       //sprintascii(bit2, GET_OBJ_PERM(obj));
 
       fprintf(fp,
-	      "%d %d %d %d %d %d %d %d %d\n"
-	      "%d %d %d %d %d %d %d %d %lf %d %d %d %d %d %lf\n"
-	      "%d %lld %d %d %d %d %d %d %d %d\n",
+          "%d %d %d %d %d %d %d %d %d\n"
+          "%d %d %d %d %d %d %d %d %lf %d %d %d %d %d %lf\n"
+          "%d %lld %d %d %d %d %d %d %d %d\n",
 
-	      GET_OBJ_TYPE(obj), GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3],
-	      GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3], /* row 1 */
+          GET_OBJ_TYPE(obj), GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3],
+          GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3], /* row 1 */
 
-	      GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), GET_OBJ_VAL(obj, 3),
-	      GET_OBJ_VAL(obj, 4), GET_OBJ_VAL(obj, 5), GET_OBJ_VAL(obj, 6), GET_OBJ_VAL(obj, 7),
-	      GET_OBJ_FLOATING_VAL(obj, 0), GET_OBJ_VAL(obj, 8), GET_OBJ_VAL(obj, 9), GET_OBJ_VAL(obj, 10),
-	      GET_OBJ_VAL(obj, 11), GET_OBJ_VAL(obj, 12), GET_OBJ_FLOATING_VAL(obj, 1), /* row 2 */
+          GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), GET_OBJ_VAL(obj, 3),
+          GET_OBJ_VAL(obj, 4), GET_OBJ_VAL(obj, 5), GET_OBJ_VAL(obj, 6), GET_OBJ_VAL(obj, 7),
+          GET_OBJ_FLOATING_VAL(obj, 0), GET_OBJ_VAL(obj, 8), GET_OBJ_VAL(obj, 9), GET_OBJ_VAL(obj, 10),
+          GET_OBJ_VAL(obj, 11), GET_OBJ_VAL(obj, 12), GET_OBJ_FLOATING_VAL(obj, 1), /* row 2 */
 
-	      GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj), GET_OBJ_RENT(obj), GET_OBJ_INNATE(obj), GET_OBJ_TIMER(obj), GET_OBJ_LEVEL(obj),
-	      GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3] /* row 3 */
-	      
+          GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj), GET_OBJ_RENT(obj), GET_OBJ_INNATE(obj), GET_OBJ_TIMER(obj), GET_OBJ_LEVEL(obj),
+          GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3] /* row 3 */
+
       );
 
       /*
-       * Do we have script(s) attached ? 
+       * Do we have script(s) attached ?
        */
       script_save_to_disk(fp, obj, OBJ_TRIGGER);
-      
+
       /*
-       * Do we have extra descriptions? 
+       * Do we have extra descriptions?
        */
       if (obj->ex_description) {	/* Yes, save them too. */
-	for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {
-	  /*
-	   * Sanity check to prevent nasty protection faults.
-	   */
-	  if (!ex_desc->keyword || !ex_desc->description || !*ex_desc->keyword || !*ex_desc->description) {
-	    new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: OLC: oedit_save_to_disk: Corrupt ex_desc!");
-	    continue;
-	  }
-	  strncpy(buf, ex_desc->description, sizeof(buf) - 1);
-	  strip_cr(buf);
-	  fprintf(fp, "E\n"
-		  "%s~\n"
-		  "%s~\n", ex_desc->keyword, buf);
-	}
+    for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {
+      /*
+       * Sanity check to prevent nasty protection faults.
+       */
+      if (!ex_desc->keyword || !ex_desc->description || !*ex_desc->keyword || !*ex_desc->description) {
+        new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: OLC: oedit_save_to_disk: Corrupt ex_desc!");
+        continue;
+      }
+      strncpy(buf, ex_desc->description, sizeof(buf) - 1);
+      strip_cr(buf);
+      fprintf(fp, "E\n"
+          "%s~\n"
+          "%s~\n", ex_desc->keyword, buf);
+    }
       }
       /*
-       * Do we have affects? 
+       * Do we have affects?
        */
       for (counter2 = 0; counter2 < MAX_OBJ_AFFECT; counter2++)
-	if (obj->affected[counter2].modifier)
-	  fprintf(fp, "A\n"
-		  "%d %d\n", obj->affected[counter2].location,
-		  obj->affected[counter2].modifier);
+    if (obj->affected[counter2].modifier)
+      fprintf(fp, "A\n"
+          "%d %d\n", obj->affected[counter2].location,
+          obj->affected[counter2].modifier);
 
       /* New vehicle attachments */
-      for (att = obj->attachment; att; att = att->next) 
+      for (att = obj->attachment; att; att = att->next)
           fprintf(fp, "V\n"
                       "%d %d %d\n", att->type, att->value, att->max_value);
     }
@@ -457,7 +457,7 @@ void free_object_strings_proto(struct obj_data *obj)
       if (ok_item)
         free(thised);
     }
-  
+
   }
 }
 
@@ -496,10 +496,10 @@ static int copy_object_main(struct obj_data *to, struct obj_data *from, int free
 }
 
 const char *material_name(int type) {
-	if (type < 0 || type > NUM_MATERIAL_TYPES)
-		return "Etherial";
+    if (type < 0 || type > NUM_MATERIAL_TYPES)
+        return "Etherial";
 
-	return material_names[type];
+    return material_names[type];
 }
 
 

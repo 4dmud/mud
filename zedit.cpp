@@ -52,12 +52,12 @@ ACMD(do_oasis_zedit)
   char *buf3;
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  
+
   /****************************************************************************/
   /** Parse any arguments.                                                   **/
   /****************************************************************************/
   buf3 = two_arguments(argument, buf1, buf2);
-  
+
   /****************************************************************************/
   /** If no argument was given, use the zone the builder is standing in.     **/
   /****************************************************************************/
@@ -66,18 +66,18 @@ ACMD(do_oasis_zedit)
   else if (!isdigit(*buf1)) {
     if (str_cmp("save", buf1) == 0) {
       save = TRUE;
-      
+
       if (is_number(buf2))
         number = atoi(buf2);
       else if (GET_OLC_ZONE(ch) > 0) {
         zone_rnum zlok;
-        
+
         if ((zlok = real_zone(GET_OLC_ZONE(ch))) == NOWHERE)
           number = NOWHERE;
         else
           number = zone_table[zlok].Bot();
       }
-      
+
       if (number == NOWHERE) {
         ch->Send( "Save which zone?\r\n");
         return;
@@ -88,38 +88,38 @@ ACMD(do_oasis_zedit)
       else {
         char sbot[MAX_INPUT_LENGTH], stop[MAX_INPUT_LENGTH];
         room_vnum bottom, top;
-        
+
         two_arguments(buf3, sbot, stop);
-        
+
         number = atoi(buf2);
         if (number < 0)
           number = NOWHERE;
         bottom = atoi(sbot);
         top = atoi(stop);
-        
+
         /**********************************************************************/
         /** Setup the new zone (displays the menu to the builder).           **/
         /**********************************************************************/
         zedit_new_zone(ch, number, bottom, top);
       }
-      
+
       /************************************************************************/
       /** Done now, exit the function.                                       **/
       /************************************************************************/
       return;
-      
+
     } else {
       ch->Send( "Yikes!  Stop that, someone will get hurt!\r\n");
       return;
     }
   }
-  
+
   /****************************************************************************/
   /** If a numeric argumentwas given, retrieve it.                           **/
   /****************************************************************************/
   if (number == NOWHERE)
     number = atoi(buf1);
-  
+
   /****************************************************************************/
   /** Check that nobody is currently editing this zone.                      **/
   /****************************************************************************/
@@ -132,12 +132,12 @@ ACMD(do_oasis_zedit)
       }
     }
   }
-  
+
   /****************************************************************************/
   /** Store the builder's descriptor in d.                                   **/
   /****************************************************************************/
   d = ch->desc;
-  
+
   /****************************************************************************/
   /** Give the builder's descriptor an OLC structure.                        **/
   /****************************************************************************/
@@ -146,16 +146,16 @@ ACMD(do_oasis_zedit)
       "had olc structure.");
     free(d->olc);
   }
-  
+
   CREATE(d->olc, struct oasis_olc_data, 1);
-  
+
   /****************************************************************************/
   /** Find the zone.                                                         **/
   /****************************************************************************/
   OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
   if (OLC_ZNUM(d) == NOWHERE) {
     ch->Send( "Sorry, there is no zone for that number!\r\n");
-    
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -163,7 +163,7 @@ ACMD(do_oasis_zedit)
     d->olc = NULL;
     return;
   }
-  
+
   /****************************************************************************/
   /** Everyone but IMPLs can only edit zones they have been assigned.        **/
   /****************************************************************************/
@@ -176,7 +176,7 @@ ACMD(do_oasis_zedit)
     d->olc = NULL;
     return;
   }
-  
+
   /****************************************************************************/
   /** If we need to save, then save the zone.                                **/
   /****************************************************************************/
@@ -186,12 +186,12 @@ ACMD(do_oasis_zedit)
     new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
       "OLC: %s saves zone information for zone %d.", GET_NAME(ch),
       zone_table[OLC_ZNUM(d)].number);
-    
+
     /**************************************************************************/
     /** Save the zone information to the zone file.                          **/
     /**************************************************************************/
     save_zone(OLC_ZNUM(d));
-    
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -199,12 +199,12 @@ ACMD(do_oasis_zedit)
     d->olc = NULL;
     return;
   }
-  
+
   OLC_NUM(d) = number;
-  
+
   if ((real_num = real_room(number)) == NULL) {
     d->Output( "That room does not exist.\r\n");
-    
+
     /**************************************************************************/
     /** Free the descriptor's OLC structure.                                 **/
     /**************************************************************************/
@@ -215,10 +215,10 @@ ACMD(do_oasis_zedit)
 
   zedit_setup(d, real_num);
   STATE(d) = CON_ZEDIT;
-  
+
   act("$n starts using OLC.", TRUE, d->character, 0, 0, TO_ROOM);
   SET_BIT_AR(PLR_FLAGS(ch), PLR_WRITING);
-  
+
   new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s starts editing zone %d allowed zone %d",
     GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
@@ -230,7 +230,7 @@ void zedit_setup(Descriptor *d, room_rnum room_num)
   room_rnum cmd_room = NULL;
 
   /*
-   * Allocate one scratch zone structure.  
+   * Allocate one scratch zone structure.
    */
   zone = new Zone();
 
@@ -243,11 +243,11 @@ void zedit_setup(Descriptor *d, room_rnum room_num)
   zone->lifespan = zone_table[OLC_ZNUM(d)].lifespan;
   zone->bot = zone_table[OLC_ZNUM(d)].bot;
   zone->top = zone_table[OLC_ZNUM(d)].top;
-  zone->reset_mode = zone_table[OLC_ZNUM(d)].reset_mode;  
+  zone->reset_mode = zone_table[OLC_ZNUM(d)].reset_mode;
   zone->zone_flags = zone_table[OLC_ZNUM(d)].zone_flags;
   zone->dimension  = zone_table[OLC_ZNUM(d)].dimension;
   /*
-   * The remaining fields are used as a 'has been modified' flag  
+   * The remaining fields are used as a 'has been modified' flag
    */
   zone->number = 0;	/* Header information has changed.	*/
   zone->age = 0;	/* The commands have changed.		*/
@@ -340,8 +340,8 @@ void zedit_new_zone(Character *ch, zone_vnum vzone_num, room_vnum bottom, room_v
 void zedit_save_internally(Descriptor *d)
 {
   int	mobloaded = FALSE,
-	objloaded = FALSE,
-	subcmd;
+    objloaded = FALSE,
+    subcmd;
   room_rnum room_num = real_room(OLC_NUM(d));
 
   if (room_num == NULL) {
@@ -352,7 +352,7 @@ void zedit_save_internally(Descriptor *d)
   remove_room_zone_commands(OLC_ZNUM(d), room_num);
 
   /*
-   * Now add all the entries in the players descriptor list  
+   * Now add all the entries in the players descriptor list
    */
   for (subcmd = 0; MYCMD.command != 'S'; subcmd++) {
     /*
@@ -367,11 +367,11 @@ void zedit_save_internally(Descriptor *d)
     switch (MYCMD.command) {
       /* Possible fail cases. */
       case 'G':
-      case 'E':        
+      case 'E':
         if (mobloaded) {
-	objloaded = TRUE;
+    objloaded = TRUE;
           break;
-	  }
+      }
         d->Output( "Equip/Give command not saved since no mob was loaded first.\r\n");
         continue;
       case 'P':
@@ -394,12 +394,12 @@ void zedit_save_internally(Descriptor *d)
   }
 
   /*
-   * Finally, if zone headers have been changed, copy over  
+   * Finally, if zone headers have been changed, copy over
    */
   if (OLC_ZONE(d)->number) {
     free(zone_table[OLC_ZNUM(d)].name);
     free(zone_table[OLC_ZNUM(d)].builders);
-    
+
     zone_table[OLC_ZNUM(d)].name = strdup(OLC_ZONE(d)->name);
     zone_table[OLC_ZNUM(d)].builders = strdup(OLC_ZONE(d)->builders);
     zone_table[OLC_ZNUM(d)].bot = OLC_ZONE(d)->bot;
@@ -422,7 +422,7 @@ void zedit_save_to_disk(int zone)
 /*-------------------------------------------------------------------*/
 
 /*
- * Error check user input and then setup change  
+ * Error check user input and then setup change
  */
 int start_change_command(Descriptor *d, int pos)
 {
@@ -437,7 +437,7 @@ int start_change_command(Descriptor *d, int pos)
 }
 
 /**************************************************************************
- Menu functions 
+ Menu functions
  **************************************************************************/
 void zedit_disp_flag_menu(Descriptor *d)
 {
@@ -460,15 +460,15 @@ void zedit_disp_dimension_menu(Descriptor *d) {
        int counter, columns = 0;
     get_char_colours(d->character);
     for (counter = 0; counter <= D_PRE_HIST; counter++) {
-	d->Output( "%s%2d%s) %-20.20s %s", grn, counter, nrm,
-		dimension_types[counter], !(++columns % 2) ? "\r\n" : "");
+    d->Output( "%s%2d%s) %-20.20s %s", grn, counter, nrm,
+        dimension_types[counter], !(++columns % 2) ? "\r\n" : "");
     }
     d->Output( "Enter Dimension: ");
     OLC_MODE(d) = ZEDIT_DIMENSION;
   }
 
 /*
- * the main menu 
+ * the main menu
  */
 void zedit_disp_menu(Descriptor *d)
 {
@@ -477,35 +477,35 @@ void zedit_disp_menu(Descriptor *d)
 
   get_char_colours(d->character);
   clear_screen(d);
-  
+
   sprintbit((long) OLC_ZONE(d)->zone_flags, zone_bits, buf1, sizeof(buf1));
   /*
-   * Menu header  
+   * Menu header
    */
   d->Output(
-	  "Room number: %s%d%s		Room zone: %s%d\r\n"
-	  "%s1%s) Builders       : %s%s\r\n"
-	  "%sZ%s) Zone name      : %s%s\r\n"
-	  "%sX%s) Dimension      : %s%s\r\n"
-	  "%sL%s) Lifespan       : %s%d minutes\r\n"
-	  "%sB%s) Bottom of zone : %s%d\r\n"
-	  "%sT%s) Top of zone    : %s%d\r\n"
-	  "%sR%s) Reset Mode     : %s%s%s\r\n"
-	  "%sF%s) Zone Flags     : %s%s%s\r\n"
-	  "[Command list]\r\n",
+      "Room number: %s%d%s		Room zone: %s%d\r\n"
+      "%s1%s) Builders       : %s%s\r\n"
+      "%sZ%s) Zone name      : %s%s\r\n"
+      "%sX%s) Dimension      : %s%s\r\n"
+      "%sL%s) Lifespan       : %s%d minutes\r\n"
+      "%sB%s) Bottom of zone : %s%d\r\n"
+      "%sT%s) Top of zone    : %s%d\r\n"
+      "%sR%s) Reset Mode     : %s%s%s\r\n"
+      "%sF%s) Zone Flags     : %s%s%s\r\n"
+      "[Command list]\r\n",
 
-	  cyn, OLC_NUM(d), nrm,
-	  cyn, zone_table[OLC_ZNUM(d)].number,
-	  grn, nrm, yel, OLC_ZONE(d)->builders ? OLC_ZONE(d)->builders : "None.",
-	  grn, nrm, yel, OLC_ZONE(d)->name ? OLC_ZONE(d)->name : "<NONE!>",
-	  grn, nrm, yel, dimension_types[OLC_ZONE(d)->dimension],
-	  grn, nrm, yel, OLC_ZONE(d)->lifespan,
-	  grn, nrm, yel, OLC_ZONE(d)->bot,
-	  grn, nrm, yel, OLC_ZONE(d)->top,
-	  grn, nrm, yel,
-	  OLC_ZONE(d)->reset_mode ? ((OLC_ZONE(d)->reset_mode == 1) ? "Reset when no players are in zone." : "Normal reset.") : "Never reset",
-	  nrm, grn, nrm, yel, buf1, nrm
-	  );
+      cyn, OLC_NUM(d), nrm,
+      cyn, zone_table[OLC_ZNUM(d)].number,
+      grn, nrm, yel, OLC_ZONE(d)->builders ? OLC_ZONE(d)->builders : "None.",
+      grn, nrm, yel, OLC_ZONE(d)->name ? OLC_ZONE(d)->name : "<NONE!>",
+      grn, nrm, yel, dimension_types[OLC_ZONE(d)->dimension],
+      grn, nrm, yel, OLC_ZONE(d)->lifespan,
+      grn, nrm, yel, OLC_ZONE(d)->bot,
+      grn, nrm, yel, OLC_ZONE(d)->top,
+      grn, nrm, yel,
+      OLC_ZONE(d)->reset_mode ? ((OLC_ZONE(d)->reset_mode == 1) ? "Reset when no players are in zone." : "Normal reset.") : "Never reset",
+      nrm, grn, nrm, yel, buf1, nrm
+      );
 
   /*
    * Print the commands for this room into display buffer.
@@ -525,58 +525,58 @@ void zedit_disp_menu(Descriptor *d)
       break;
     case 'G':
       d->Output( "%sGive it %s [%s%d%s], Max : %d",
-	      MYCMD.if_flag ? " then " : "",
-	      obj_proto[MYCMD.arg1].short_description,
-	      cyn, obj_index[MYCMD.arg1].vnum, yel,
-	      MYCMD.arg2
-	      );
+          MYCMD.if_flag ? " then " : "",
+          obj_proto[MYCMD.arg1].short_description,
+          cyn, obj_index[MYCMD.arg1].vnum, yel,
+          MYCMD.arg2
+          );
       break;
     case 'O':
       d->Output( "%sLoad %s [%s%d%s], Max : %d",
-	      MYCMD.if_flag ? " then " : "",
-	      obj_proto[MYCMD.arg1].short_description,
-	      cyn, obj_index[MYCMD.arg1].vnum, yel,
-	      MYCMD.arg2
-	      );
+          MYCMD.if_flag ? " then " : "",
+          obj_proto[MYCMD.arg1].short_description,
+          cyn, obj_index[MYCMD.arg1].vnum, yel,
+          MYCMD.arg2
+          );
       break;
     case 'E':
       d->Output( "%sEquip with %s [%s%d%s], %s, Max : %d",
-	      MYCMD.if_flag ? " then " : "",
-	      obj_proto[MYCMD.arg1].short_description,
-	      cyn, obj_index[MYCMD.arg1].vnum, yel,
-	      equipment_types[MYCMD.arg3],
-	      MYCMD.arg2
-	      );
+          MYCMD.if_flag ? " then " : "",
+          obj_proto[MYCMD.arg1].short_description,
+          cyn, obj_index[MYCMD.arg1].vnum, yel,
+          equipment_types[MYCMD.arg3],
+          MYCMD.arg2
+          );
       break;
     case 'P':
       d->Output( "%sPut %s [%s%d%s] in %s [%s%d%s], Max : %d",
-	      MYCMD.if_flag ? " then " : "",
-	      obj_proto[MYCMD.arg1].short_description,
-	      cyn, obj_index[MYCMD.arg1].vnum, yel,
-	      obj_proto[MYCMD.arg3].short_description,
-	      cyn, obj_index[MYCMD.arg3].vnum, yel,
-	      MYCMD.arg2
-	      );
+          MYCMD.if_flag ? " then " : "",
+          obj_proto[MYCMD.arg1].short_description,
+          cyn, obj_index[MYCMD.arg1].vnum, yel,
+          obj_proto[MYCMD.arg3].short_description,
+          cyn, obj_index[MYCMD.arg3].vnum, yel,
+          MYCMD.arg2
+          );
       break;
     case 'R':
       d->Output( "%sRemove %s [%s%d%s] from room.",
-	      MYCMD.if_flag ? " then " : "",
-	      obj_proto[MYCMD.arg2].short_description,
-	      cyn, obj_index[MYCMD.arg2].vnum, yel
-	      );
+          MYCMD.if_flag ? " then " : "",
+          obj_proto[MYCMD.arg2].short_description,
+          cyn, obj_index[MYCMD.arg2].vnum, yel
+          );
       break;
     case 'D':
       d->Output( "%sSet door %s as %s.",
-	      MYCMD.if_flag ? " then " : "",
-	      dirs[MYCMD.arg2],
-	      //MYCMD.arg3 ? ((MYCMD.arg3 == 1) ? "closed" : "locked") : "open"
-	      door_stat[MYCMD.arg3]
-	      );
+          MYCMD.if_flag ? " then " : "",
+          dirs[MYCMD.arg2],
+          //MYCMD.arg3 ? ((MYCMD.arg3 == 1) ? "closed" : "locked") : "open"
+          door_stat[MYCMD.arg3]
+          );
       break;
     case 'T':
       d->Output( "%sAttach trigger %s%s%s [%s%d%s] to %s",
         MYCMD.if_flag ? " then " : "",
-        cyn, trig_index[MYCMD.arg2]->proto->name, yel, 
+        cyn, trig_index[MYCMD.arg2]->proto->name, yel,
         cyn, trig_index[MYCMD.arg2]->vnum, yel,
         ((MYCMD.arg1 == MOB_TRIGGER) ? "mobile" :
           ((MYCMD.arg1 == OBJ_TRIGGER) ? "object" :
@@ -591,11 +591,11 @@ void zedit_disp_menu(Descriptor *d)
             ((MYCMD.arg1 == WLD_TRIGGER)? "room" : "????"))));
       break;
  case 'B':
-	    d->Output( "%sBury %s [%s%d%s],  Max : %d",
-		    MYCMD.if_flag ? " then " : "",
-		    obj_proto[MYCMD.arg1].short_description,
-		    cyn, obj_index[MYCMD.arg1].vnum, yel, MYCMD.arg2);
-	    break;
+        d->Output( "%sBury %s [%s%d%s],  Max : %d",
+            MYCMD.if_flag ? " then " : "",
+            obj_proto[MYCMD.arg1].short_description,
+            cyn, obj_index[MYCMD.arg1].vnum, yel, MYCMD.arg2);
+        break;
     default:
       d->Output( "<Unknown Command>");
       break;
@@ -604,16 +604,16 @@ void zedit_disp_menu(Descriptor *d)
     subcmd++;
   }
   /*
-   * Finish off menu  
+   * Finish off menu
    */
    d->Output(
-	  "%s%d - <END OF LIST>\r\n"
-	  "%sN%s) Insert new command.\r\n"
-	  "%sE%s) Edit a command.\r\n"
-	  "%sD%s) Delete a command.\r\n"
-	  "%sQ%s) Quit\r\nEnter your choice : ",
-	  nrm, counter, grn, nrm, grn, nrm, grn, nrm, grn, nrm
-	  );
+      "%s%d - <END OF LIST>\r\n"
+      "%sN%s) Insert new command.\r\n"
+      "%sE%s) Edit a command.\r\n"
+      "%sD%s) Delete a command.\r\n"
+      "%sQ%s) Quit\r\nEnter your choice : ",
+      nrm, counter, grn, nrm, grn, nrm, grn, nrm, grn, nrm
+      );
 
   OLC_MODE(d) = ZEDIT_MAIN_MENU;
 }
@@ -621,24 +621,24 @@ void zedit_disp_menu(Descriptor *d)
 /*-------------------------------------------------------------------*/
 
 /*
- * Print the command type menu and setup response catch. 
+ * Print the command type menu and setup response catch.
  */
 void zedit_disp_comtype(Descriptor *d)
 {
   get_char_colours(d->character);
   clear_screen(d);
   d->Output(
-	"\r\n"
-	"%sM%s) Load Mobile to room             %sO%s) Load Object to room\r\n"
-	"%sE%s) Equip mobile with object        %sG%s) Give an object to a mobile\r\n"
-	"%sP%s) Put object in another object    %sD%s) Open/Close/Lock a Door\r\n"
-	"%sR%s) Remove an object from the room\r\n"
-	"%sT%s) Assign a trigger                %sV%s) Set a global variable\r\n"
-	"\r\n"
-	"What sort of command will this be? : ",
-	grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm,
-	grn, nrm, grn, nrm, grn, nrm, grn, nrm
-	);
+    "\r\n"
+    "%sM%s) Load Mobile to room             %sO%s) Load Object to room\r\n"
+    "%sE%s) Equip mobile with object        %sG%s) Give an object to a mobile\r\n"
+    "%sP%s) Put object in another object    %sD%s) Open/Close/Lock a Door\r\n"
+    "%sR%s) Remove an object from the room\r\n"
+    "%sT%s) Assign a trigger                %sV%s) Set a global variable\r\n"
+    "\r\n"
+    "What sort of command will this be? : ",
+    grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm,
+    grn, nrm, grn, nrm, grn, nrm, grn, nrm
+    );
   OLC_MODE(d) = ZEDIT_COMMAND_TYPE;
 }
 
@@ -646,7 +646,7 @@ void zedit_disp_comtype(Descriptor *d)
 
 /*
  * Print the appropriate message for the command type for arg1 and set
- * up the input catch clause  
+ * up the input catch clause
  */
 void zedit_disp_arg1(Descriptor *d)
 {
@@ -667,7 +667,7 @@ void zedit_disp_arg1(Descriptor *d)
   case 'D':
   case 'R':
     /*
-     * Arg1 for these is the room number, skip to arg2  
+     * Arg1 for these is the room number, skip to arg2
      */
     OLC_CMD(d).arg1 = world_vnum[OLC_NUM(d)]->number;
     zedit_disp_arg2(d);
@@ -751,12 +751,12 @@ void zedit_disp_arg3(Descriptor *d)
   case 'E':
     while (*equipment_types[i] != '\n') {
       d->Output( "%2d) %26.26s %2d) %26.26s\r\n", i,
-	   equipment_types[i], i + 1, (*equipment_types[i + 1] != '\n') ?
-	      equipment_types[i + 1] : "");
+       equipment_types[i], i + 1, (*equipment_types[i + 1] != '\n') ?
+          equipment_types[i + 1] : "");
       if (*equipment_types[i + 1] != '\n')
-	i += 2;
+    i += 2;
       else
-	break;
+    break;
     }
     d->Output( "Location to equip : ");
     break;
@@ -764,14 +764,14 @@ void zedit_disp_arg3(Descriptor *d)
     d->Output( "Virtual number of the container : ");
     break;
   case 'D':
-	d->Output(
-	             "0)  Door open\r\n"
-		     "1)  Door closed\r\n"
-		     "2)  Door locked\r\n"
-		     "3)  Door closed, hidden\r\n"
-		     "4)  Door closed, hidden, locked\r\n"
-		     "Enter state of the door : ");
-	break;
+    d->Output(
+                 "0)  Door open\r\n"
+             "1)  Door closed\r\n"
+             "2)  Door locked\r\n"
+             "3)  Door closed, hidden\r\n"
+             "4)  Door closed, hidden, locked\r\n"
+             "Enter state of the door : ");
+    break;
   case 'V':
   case 'T':
   case 'M':
@@ -811,13 +811,13 @@ void zedit_parse(Descriptor *d, char *arg)
        */
       zedit_save_internally(d);
       if (CONFIG_OLC_SAVE) {
-	d->Output( "Saving zone info to disk.\r\n");
-	zedit_save_to_disk(OLC_ZNUM(d));
+    d->Output( "Saving zone info to disk.\r\n");
+    zedit_save_to_disk(OLC_ZNUM(d));
       } else
         d->Output( "Saving zone info in memory.\r\n");
 
       new_mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE,
-	"OLC: %s edits zone info for room %d.", GET_NAME(d->character), OLC_NUM(d));
+    "OLC: %s edits zone info for room %d.", GET_NAME(d->character), OLC_NUM(d));
       /* FALL THROUGH */
     case 'n':
     case 'N':
@@ -837,11 +837,11 @@ void zedit_parse(Descriptor *d, char *arg)
     case 'q':
     case 'Q':
       if (OLC_ZONE(d)->age || OLC_ZONE(d)->number) {
-	d->Output( "Do you wish to save the changes to the zone info? (y/n) : ");
-	OLC_MODE(d) = ZEDIT_CONFIRM_SAVESTRING;
+    d->Output( "Do you wish to save the changes to the zone info? (y/n) : ");
+    OLC_MODE(d) = ZEDIT_CONFIRM_SAVESTRING;
       } else {
-	d->Output( "No changes made.\r\n");
-	cleanup_olc(d, CLEANUP_ALL);
+    d->Output( "No changes made.\r\n");
+    cleanup_olc(d, CLEANUP_ALL);
       }
       break;
     case 'n':
@@ -852,10 +852,10 @@ void zedit_parse(Descriptor *d, char *arg)
       if (OLC_ZONE(d)->cmd[0].command == 'S') {
         /* first command */
         if (new_command(OLC_ZONE(d), 0) && start_change_command(d, 0)) {
-	  zedit_disp_comtype(d);
-	  OLC_ZONE(d)->age = 1;
+      zedit_disp_comtype(d);
+      OLC_ZONE(d)->age = 1;
           break;
-	}
+    }
       }
       d->Output( "What number in the list should the new command be? : ");
       OLC_MODE(d) = ZEDIT_NEW_ENTRY;
@@ -902,10 +902,10 @@ void zedit_parse(Descriptor *d, char *arg)
        * Edit bottom of zone.
        */
       if (GET_LEVEL(d->character) < LVL_IMPL)
-	zedit_disp_menu(d);
+    zedit_disp_menu(d);
       else {
-	d->Output( "Enter new bottom of zone : ");
-	OLC_MODE(d) = ZEDIT_ZONE_BOT;
+    d->Output( "Enter new bottom of zone : ");
+    OLC_MODE(d) = ZEDIT_ZONE_BOT;
       }
       break;
 #endif
@@ -915,10 +915,10 @@ void zedit_parse(Descriptor *d, char *arg)
        * Edit top of zone.
        */
       if (GET_LEVEL(d->character) < LVL_IMPL)
-	zedit_disp_menu(d);
+    zedit_disp_menu(d);
       else {
-	d->Output( "Enter new top of zone : ");
-	OLC_MODE(d) = ZEDIT_ZONE_TOP;
+    d->Output( "Enter new top of zone : ");
+    OLC_MODE(d) = ZEDIT_ZONE_TOP;
       }
       break;
     case 'l':
@@ -935,16 +935,16 @@ void zedit_parse(Descriptor *d, char *arg)
        * Edit zone reset mode.
        */
       d->Output( "\r\n"
-		"0) Never reset\r\n"
-		"1) Reset only when no players in zone\r\n"
-		"2) Normal reset\r\n"
-		"Enter new zone reset type : ");
+        "0) Never reset\r\n"
+        "1) Reset only when no players in zone\r\n"
+        "2) Normal reset\r\n"
+        "Enter new zone reset type : ");
       OLC_MODE(d) = ZEDIT_ZONE_RESET;
       break;
-      	case 'f':
-	case 'F':
-	    zedit_disp_flag_menu(d);
-	    break;
+          case 'f':
+    case 'F':
+        zedit_disp_flag_menu(d);
+        break;
     default:
       zedit_disp_menu(d);
       break;
@@ -960,8 +960,8 @@ void zedit_parse(Descriptor *d, char *arg)
     pos = atoi(arg);
     if (isdigit(*arg) && new_command(OLC_ZONE(d), pos)) {
       if (start_change_command(d, pos)) {
-	zedit_disp_comtype(d);
-	OLC_ZONE(d)->age = 1;
+    zedit_disp_comtype(d);
+    OLC_ZONE(d)->age = 1;
       }
     } else
       zedit_disp_menu(d);
@@ -986,13 +986,13 @@ void zedit_parse(Descriptor *d, char *arg)
      * Parse the input for which line to edit, and goto next quiz.
      */
     /*
-     *  Abort edit, and return to main menu 
+     *  Abort edit, and return to main menu
      * - idea from Mark Garringer zizazat@hotmail.com
      */
-    if (toupper(*arg) == 'A') { 
-      if (OLC_CMD(d).command == 'N') { 
+    if (toupper(*arg) == 'A') {
+      if (OLC_CMD(d).command == 'N') {
         OLC_CMD(d).command = '*';
-      } 
+      }
       zedit_disp_menu(d);
       break;
     }
@@ -1020,12 +1020,12 @@ void zedit_parse(Descriptor *d, char *arg)
           OLC_CMD(d).if_flag = 1;
           zedit_disp_arg1(d);
         } else {
-	d->Output( "Is this command dependent on the success of the previous one? (y/n)\r\n");
-	OLC_MODE(d) = ZEDIT_IF_FLAG;
-	}
+    d->Output( "Is this command dependent on the success of the previous one? (y/n)\r\n");
+    OLC_MODE(d) = ZEDIT_IF_FLAG;
+    }
       } else {	/* 'if-flag' not appropriate. */
-	OLC_CMD(d).if_flag = 0;
-	zedit_disp_arg1(d);
+    OLC_CMD(d).if_flag = 0;
+    zedit_disp_arg1(d);
       }
     }
     break;
@@ -1052,29 +1052,29 @@ void zedit_parse(Descriptor *d, char *arg)
     break;
 /*-------------------------------------------------------------------*/
     case ZEDIT_PROB:
-	/*
-	 *       Which command to change loadchance for? :/
-	 */
+    /*
+     *       Which command to change loadchance for? :/
+     */
 
-	pos = atoi(arg);
-	if (isdigit(*arg) && start_change_command(d, pos)) {
-	    OLC_MODE(d) = ZEDIT_PROB2;
-	    OLC_ZONE(d)->age = 1;
-	    d->Output("Chance of loading (0-100) : ");
-	    break;
-	} else
-	    d->Output("Invalid choice.\r\n");
-	zedit_disp_menu(d);
-	break;
+    pos = atoi(arg);
+    if (isdigit(*arg) && start_change_command(d, pos)) {
+        OLC_MODE(d) = ZEDIT_PROB2;
+        OLC_ZONE(d)->age = 1;
+        d->Output("Chance of loading (0-100) : ");
+        break;
+    } else
+        d->Output("Invalid choice.\r\n");
+    zedit_disp_menu(d);
+    break;
 /*-------------------------------------------------------------------*/
     case ZEDIT_PROB2:
-	/*
-	 *       Change the loadchance
-	 */
-	OLC_CMD(d).arg4 = MAX(0, MIN(100, atoi(arg)));
-	OLC_MODE(d) = ZEDIT_MAIN_MENU;
-	zedit_disp_menu(d);
-	break;
+    /*
+     *       Change the loadchance
+     */
+    OLC_CMD(d).arg4 = MAX(0, MIN(100, atoi(arg)));
+    OLC_MODE(d) = ZEDIT_MAIN_MENU;
+    zedit_disp_menu(d);
+    break;
 
 /*-------------------------------------------------------------------*/
   case ZEDIT_ARG1:
@@ -1089,20 +1089,20 @@ void zedit_parse(Descriptor *d, char *arg)
     case 'M':
     pos = atoi(arg);
       if (MobProtoExists(pos)) {
-	OLC_CMD(d).arg1 = pos;
-	zedit_disp_arg2(d);
+    OLC_CMD(d).arg1 = pos;
+    zedit_disp_arg2(d);
       } else
-	d->Output( "That mobile does not exist, try again : ");
+    d->Output( "That mobile does not exist, try again : ");
       break;
     case 'O':
     case 'P':
     case 'E':
     case 'G':
       if ((pos = real_object(atoi(arg))) != NOTHING) {
-	OLC_CMD(d).arg1 = pos;
-	zedit_disp_arg2(d);
+    OLC_CMD(d).arg1 = pos;
+    zedit_disp_arg2(d);
       } else
-	d->Output( "That object does not exist, try again : ");
+    d->Output( "That object does not exist, try again : ");
       break;
     case 'T':
     case 'V':
@@ -1160,7 +1160,7 @@ void zedit_parse(Descriptor *d, char *arg)
     case 'T':
       if (real_trigger(atoi(arg)) != NOTHING) {
         OLC_CMD(d).arg2 = real_trigger(atoi(arg)); /* trigger */
-        OLC_CMD(d).arg3 = world_vnum[OLC_NUM(d)]->number;   
+        OLC_CMD(d).arg3 = world_vnum[OLC_NUM(d)]->number;
         zedit_disp_menu(d);
       } else
         d->Output( "That trigger does not exist, try again : ");
@@ -1171,18 +1171,18 @@ void zedit_parse(Descriptor *d, char *arg)
        * Count directions.
        */
       if (pos < 0 || pos > NUM_OF_DIRS)
-	d->Output( "Try again : ");
+    d->Output( "Try again : ");
       else {
-	OLC_CMD(d).arg2 = pos;
-	zedit_disp_arg3(d);
+    OLC_CMD(d).arg2 = pos;
+    zedit_disp_arg3(d);
       }
       break;
     case 'R':
       if ((pos = real_object(atoi(arg))) != NOTHING) {
-	OLC_CMD(d).arg2 = pos;
-	zedit_disp_menu(d);
+    OLC_CMD(d).arg2 = pos;
+    zedit_disp_menu(d);
       } else
-	d->Output( "That object does not exist, try again : ");
+    d->Output( "That object does not exist, try again : ");
       break;
     default:
       /*
@@ -1212,28 +1212,28 @@ void zedit_parse(Descriptor *d, char *arg)
        * more reliable.
        */
       while (*equipment_types[i] != '\n')
-	i++;
+    i++;
       if (pos < 0 || pos > i)
-	d->Output( "Try again : ");
+    d->Output( "Try again : ");
       else {
-	OLC_CMD(d).arg3 = pos;
-	zedit_disp_menu(d);
+    OLC_CMD(d).arg3 = pos;
+    zedit_disp_menu(d);
       }
       break;
     case 'P':
       if ((pos = real_object(atoi(arg))) != NOTHING) {
-	OLC_CMD(d).arg3 = pos;
-	zedit_disp_menu(d);
+    OLC_CMD(d).arg3 = pos;
+    zedit_disp_menu(d);
       } else
-	d->Output( "That object does not exist, try again : ");
+    d->Output( "That object does not exist, try again : ");
       break;
     case 'D':
       pos = atoi(arg);
       if (pos < 0 || pos > 4)
-	d->Output( "Try again : ");
+    d->Output( "Try again : ");
       else {
-	OLC_CMD(d).arg3 = pos;
-	zedit_disp_menu(d);
+    OLC_CMD(d).arg3 = pos;
+    zedit_disp_menu(d);
       }
       break;
     case 'M':
@@ -1303,7 +1303,7 @@ void zedit_parse(Descriptor *d, char *arg)
     }
     zedit_disp_menu(d);
     break;
-  
+
 /*-------------------------------------------------------------------*/
   case ZEDIT_ZONE_RESET:
     /*
@@ -1378,26 +1378,26 @@ void zedit_parse(Descriptor *d, char *arg)
     break;
   case ZEDIT_ZONE_FLAGS:
 
-	num = atoi(arg);
-	if ((num > NUM_ZONE_FLAGS)) {
-		d->Output("That is not a valid choice!\r\n");
-		zedit_disp_flag_menu(d);
-	} else if (num == 0) {
-		zedit_disp_menu(d);
-		break;
-	} else {
-		int flag = 1 << ( num - 1 );
-		if ( flag == ZONE_OPEN && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED ) )
-			TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED );
-		else if ( flag == ZONE_CLOSED && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN ) )
-			TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN );
-		TOGGLE_BIT ( OLC_ZONE(d)->zone_flags, flag );
-		OLC_ZONE(d)->number = 1;
-		zedit_disp_flag_menu(d);
-	}
-	return;
+    num = atoi(arg);
+    if ((num > NUM_ZONE_FLAGS)) {
+        d->Output("That is not a valid choice!\r\n");
+        zedit_disp_flag_menu(d);
+    } else if (num == 0) {
+        zedit_disp_menu(d);
+        break;
+    } else {
+        int flag = 1 << ( num - 1 );
+        if ( flag == ZONE_OPEN && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED ) )
+            TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_CLOSED );
+        else if ( flag == ZONE_CLOSED && IS_SET ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN ) )
+            TOGGLE_BIT ( OLC_ZONE ( d )->zone_flags, ZONE_OPEN );
+        TOGGLE_BIT ( OLC_ZONE(d)->zone_flags, flag );
+        OLC_ZONE(d)->number = 1;
+        zedit_disp_flag_menu(d);
+    }
+    return;
 
-	break;
+    break;
 /*-------------------------------------------------------------------*/
   default:
     /*

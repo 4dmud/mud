@@ -1570,9 +1570,9 @@ public:
     bool HasDesc();
     Room();
     ~Room();
-	private:
-		char *description;        /* Shown when entered                   */
-		long DescID;
+    private:
+        char *description;        /* Shown when entered                   */
+        long DescID;
 #ifdef HAVE_ZLIB_H
     Bytef *buff_out;
     int total_out; /* size of input buffer */
@@ -2178,7 +2178,7 @@ public:
         newbie_status = 0;
         help  = NULL;
         kills.clear();
-	age = -1;
+    age = -1;
 
     }
     kill_map::iterator KillsBegin() {

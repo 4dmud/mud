@@ -213,7 +213,7 @@ zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, 
     zd->builders = NULL;
     log("Deleting Temporary Zone Structure");
     delete zd;
-    
+
     //add_to_save_list(vzone_num, SL_ZON);
     return vzone_num;
 }
@@ -287,7 +287,7 @@ int Zone::write_zone() {
     }
     fl << "@Version: " << 2 << "\n";	//version is now 2 - mord
     /*
-     * Print zone header to file	
+     * Print zone header to file
      */
     fl << "#" << (this->number) << "\n";
     if (this->name && *this->name)
@@ -486,41 +486,41 @@ void add_cmd_to_list(vector<reset_com> &list, reset_com &newcmd, int pos) {
     /*
      * Add terminator, then insert new list.
      */
-    
+
     vector< vector<string> > sargs( list.size() + 1, vector<string> (2) );
 
     if (pos == list.size()) {
-	reset_com rc = reset_com();
-	rc.command = 'S';
-	(*(list.end() -1)) = newcmd;
-	list.push_back(rc);
+    reset_com rc = reset_com();
+    rc.command = 'S';
+    (*(list.end() -1)) = newcmd;
+    list.push_back(rc);
     } else {
-	// list.insert calls ~reset_com which frees the strings
-	for ( int i = 0; i < list.size(); ++i ) {
-		if ( list[i].sarg1 )
-			sargs[ i + ( i < pos ? 0 : 1 ) ][0] = string ( list[i].sarg1 );
-		if ( list[i].sarg2 )
-			sargs[ i + ( i < pos ? 0 : 1 ) ][1] = string ( list[i].sarg2 );
-	}
-	if ( newcmd.sarg1 )
-		sargs[pos][0] = string ( newcmd.sarg1 );
-	if ( newcmd.sarg2 )
-	        sargs[pos][1] = string ( newcmd.sarg2 );
-
-	list.insert ( list.begin() + pos, newcmd );
-
-	for (int i = 0; i < list.size(); ++i ) {
-		if ( sargs[i][0].length() > 0 )
-			list[i].sarg1 = strdup ( sargs[i][0].c_str() );
-		if ( sargs[i][1].length() > 0 )
-			list[i].sarg2 = strdup ( sargs[i][1].c_str() );
-	}
-	if ( sargs[pos][0].length() > 0 )
-		newcmd.sarg1 = strdup ( sargs[pos][0].c_str() );
-	if ( sargs[pos][1].length() > 0 )
-		newcmd.sarg2 = strdup ( sargs[pos][1].c_str() );
+    // list.insert calls ~reset_com which frees the strings
+    for ( int i = 0; i < list.size(); ++i ) {
+        if ( list[i].sarg1 )
+            sargs[ i + ( i < pos ? 0 : 1 ) ][0] = string ( list[i].sarg1 );
+        if ( list[i].sarg2 )
+            sargs[ i + ( i < pos ? 0 : 1 ) ][1] = string ( list[i].sarg2 );
     }
-    
+    if ( newcmd.sarg1 )
+        sargs[pos][0] = string ( newcmd.sarg1 );
+    if ( newcmd.sarg2 )
+            sargs[pos][1] = string ( newcmd.sarg2 );
+
+    list.insert ( list.begin() + pos, newcmd );
+
+    for (int i = 0; i < list.size(); ++i ) {
+        if ( sargs[i][0].length() > 0 )
+            list[i].sarg1 = strdup ( sargs[i][0].c_str() );
+        if ( sargs[i][1].length() > 0 )
+            list[i].sarg2 = strdup ( sargs[i][1].c_str() );
+    }
+    if ( sargs[pos][0].length() > 0 )
+        newcmd.sarg1 = strdup ( sargs[pos][0].c_str() );
+    if ( sargs[pos][1].length() > 0 )
+        newcmd.sarg2 = strdup ( sargs[pos][1].c_str() );
+    }
+
 }
 
 /*-------------------------------------------------------------------*/
@@ -538,7 +538,7 @@ list.erase(list.begin() + pos);
     struct reset_com *newlist;
 
     /*
-     * Count number of commands (not including terminator)  
+     * Count number of commands (not including terminator)
      */
     count = count_commands(*list);
 
@@ -568,11 +568,11 @@ list.erase(list.begin() + pos);
 /*-------------------------------------------------------------------*/
 
 /*
- * Error check user input and then add new (blank) command  
+ * Error check user input and then add new (blank) command
  */
 int new_command(Zone *zone, int pos) {
     /*
-     * Error check to ensure users hasn't given too large an index  
+     * Error check to ensure users hasn't given too large an index
      */
 
     if (pos < 0 || pos >= zone->cmd.size())
@@ -580,7 +580,7 @@ int new_command(Zone *zone, int pos) {
 
     reset_com new_com = reset_com();
     /*
-     * Ok, let's add a new (blank) command 
+     * Ok, let's add a new (blank) command
      */
     new_com.command = 'N';
     add_cmd_to_list(zone->cmd, new_com, pos);
@@ -590,19 +590,19 @@ int new_command(Zone *zone, int pos) {
 /*-------------------------------------------------------------------*/
 
 /*
- * Error check user input and then remove command  
+ * Error check user input and then remove command
  */
 void delete_command(Zone *zone, int pos) {
 //    int subcmd = 0;
 
     /*
-     * Error check to ensure users hasn't given too large an index  
+     * Error check to ensure users hasn't given too large an index
      */
     if (pos < 0 || pos >= zone->cmd.size())
         return;
 
     /*
-     * Ok, let's zap it  
+     * Ok, let's zap it
      */
     remove_cmd_from_list(zone->cmd, pos);
 }

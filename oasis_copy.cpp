@@ -39,14 +39,14 @@ ACMD(do_rdig)
   zone_rnum zone = NOWHERE;
   int dir = 0, rawvnum;
   Descriptor *d = ch->desc; /* will save us some typing */
-  
+
   if ( IN_ROOM ( ch ) == NULL )
     return;
 
   /* Grab the room's name (if available). */
   new_room_name = two_arguments(argument, sdir, sroom);
   skip_spaces(&new_room_name);
-  
+
   /* Can't dig if we don't know where to go. */
   if (!*sdir || !*sroom) {
     ch->Send( "Format: rdig <direction> <room> [<new room name>]- to create an exit\r\n"
@@ -59,7 +59,7 @@ ACMD(do_rdig)
     rvnum = NOWHERE;
   else
     rvnum = (room_vnum)rawvnum;
-  rrnum = real_room(rvnum);  
+  rrnum = real_room(rvnum);
   dir = search_block(sdir, dirs, FALSE);
   zone = IN_ROOM(ch)->zone;
 
@@ -73,7 +73,7 @@ ACMD(do_rdig)
     return;
   }
   /*
-   * Lets not allow digging to limbo. 
+   * Lets not allow digging to limbo.
    * After all, it'd just get us more errors on 'show errors'
    */
   if (rvnum == 0) {
@@ -81,7 +81,7 @@ ACMD(do_rdig)
    return;
   }
   /*
-   * target room == -1 removes the exit 
+   * target room == -1 removes the exit
    */
   if (rvnum == NOTHING) {
     if (W_EXIT(IN_ROOM(ch), dir)) {
@@ -99,17 +99,17 @@ ACMD(do_rdig)
     ch->Send( "There is no exit to the %s.\r\n"
                      "No exit removed.\r\n", dirs[dir]);
     return;
-  }  
+  }
   /*
-   * Can't dig in a direction, if it's already a door. 
+   * Can't dig in a direction, if it's already a door.
    */
   if (W_EXIT(IN_ROOM(ch), dir)) {
       ch->Send( "There already is an exit to the %s.\r\n", dirs[dir]);
       return;
   }
-  
+
   /* Make sure that the builder has access to the zone he's linking to. */
-  zone = real_zone_by_thing(rvnum);  
+  zone = real_zone_by_thing(rvnum);
   if (zone == NOWHERE) {
     ch->Send( "You cannot link to a non-existing zone!\r\n");
     return;
@@ -119,7 +119,7 @@ ACMD(do_rdig)
     return;
   }
   /*
-   * Now we know the builder is allowed to make the link 
+   * Now we know the builder is allowed to make the link
    */
   /* If the room doesn't exist, create it.*/
   if (rrnum == NULL) {
@@ -135,38 +135,38 @@ ACMD(do_rdig)
     OLC_ZNUM(d) = zone;
     OLC_NUM(d) = rvnum;
     OLC_ROOM(d) = new Room();
-    
-    
+
+
     /* Copy the room's name. */
     if (*new_room_name)
      OLC_ROOM(d)->name = strdup(new_room_name);
     else
      OLC_ROOM(d)->name = strdup("An unfinished room");
-    
+
     /* Copy the room's description.*/
     OLC_ROOM(d)->SetDescription("You are in an unfinished room.\r\n");
     OLC_ROOM(d)->zone = OLC_ZNUM(d);
     OLC_ROOM(d)->number = NOWHERE;
-    
+
     OLC_ROOM(d)->smell = strdup("You smell nothing interesting.\r\n");
     OLC_ROOM(d)->listen = strdup("You hear nothing that attracts your attention.\r\n");
     OLC_ROOM(d)->look_under_description = NULL;
     OLC_ROOM(d)->look_above_description = NULL;
     OLC_ROOM(d)->look_behind_description = NULL;
     OLC_ROOM(d)->ex_description = NULL;
-    
-    
+
+
     /*
      * Save the new room to memory.
      * redit_save_internally handles adding the room in the right place, etc.
      */
     redit_save_internally(d);
     OLC_VAL(d) = 0;
-    
+
     ch->Send( "New room (%d) created.\r\n", rvnum);
     cleanup_olc(d, CLEANUP_STRUCTS);
-    /* 
-     * update rrnum to the correct room rnum after adding the room 
+    /*
+     * update rrnum to the correct room rnum after adding the room
      */
     rrnum = world_vnum[rvnum];
   }
@@ -179,14 +179,14 @@ ACMD(do_rdig)
   W_EXIT(IN_ROOM(ch), dir)->keyword = NULL;
   W_EXIT(IN_ROOM(ch), dir)->to_room = rrnum;
   add_to_save_list(zone_table[IN_ROOM(ch)->zone].number, SL_WLD);
-  
-  ch->Send( "You make an exit %s to room %d (%s).\r\n", 
+
+  ch->Send( "You make an exit %s to room %d (%s).\r\n",
                    dirs[dir], rvnum, rrnum->name);
 
-  /* 
-   * check if we can dig from there to here. 
+  /*
+   * check if we can dig from there to here.
    */
-  if (W_EXIT(rrnum, rev_dir[dir])) 
+  if (W_EXIT(rrnum, rev_dir[dir]))
     ch->Send( "Can not rdig from %d to here. The target room already has an exit to the %s.\r\n",
                      rvnum, dirs[rev_dir[dir]]);
   else {
@@ -210,14 +210,14 @@ ACMD(do_room_copy)
 
    if ( IN_ROOM ( ch ) != NULL )
      return;
-     
+
    one_argument(argument, buf);
-   
+
    if (!*buf) {
      ch->Send( "Usage: rclone <target room>\r\n");
      return;
    }
-   
+
    if (real_room((buf_num = atoi(buf))) != NULL) {
      ch->Send( "That room already exist!\r\n");
      return;
@@ -227,24 +227,24 @@ ACMD(do_room_copy)
      ch->Send( "Sorry, there is no zone for that number!\r\n");
      return;
    }
-    
+
    if (!can_edit_zone(ch, dst_zone) ||
        !can_edit_zone(ch, IN_ROOM(ch)->zone) ) {
      ch->Send( "You may only copy rooms within your designated zone(s)!\r\n");
      return;
    }
-   
-   
+
+
    //room_src = IN_ROOM(ch);
    room_dst = new Room();
 
    room_dst->zone = dst_zone;
- 
+
    /*
    * Allocate space for all strings.
    */
    ch->Send( "Cloning room....\r\n");
-   
+
    room_dst->name = str_udup(IN_ROOM(ch)->name);
    room_dst->SetDescription(IN_ROOM(ch)->GetDescription());
    room_dst->smell = strdup(IN_ROOM(ch)->smell);
@@ -254,11 +254,11 @@ ACMD(do_room_copy)
    room_dst->room_flags[1] = ROOM_FLAGS(IN_ROOM(ch))[1];
    room_dst->room_flags[2] = ROOM_FLAGS(IN_ROOM(ch))[2];
    room_dst->room_flags[3] = ROOM_FLAGS(IN_ROOM(ch))[3];
-   
+
   /*
    * Extra descriptions, if necessary.
    */
-  
+
   ch->Send( "Cloning extra descriptions....\r\n");
   if (IN_ROOM(ch)->ex_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
@@ -269,17 +269,17 @@ ACMD(do_room_copy)
       temp->keyword = strdup(tdesc->keyword);
       temp->description = strdup(tdesc->description);
       if (tdesc->next) {
-	CREATE(temp2, struct extra_descr_data, 1);
-	temp->next = temp2;
-	temp = temp2;
+    CREATE(temp2, struct extra_descr_data, 1);
+    temp->next = temp2;
+    temp = temp2;
       } else
-	temp->next = NULL;
+    temp->next = NULL;
     }
   }
     /*
    * Extra descriptions, if necessary.
    */
-  
+
   ch->Send( "Cloning look under descriptions....\r\n");
   if (IN_ROOM(ch)->look_under_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
@@ -290,17 +290,17 @@ ACMD(do_room_copy)
       temp->keyword = strdup(tdesc->keyword);
       temp->description = strdup(tdesc->description);
       if (tdesc->next) {
-	CREATE(temp2, struct extra_descr_data, 1);
-	temp->next = temp2;
-	temp = temp2;
+    CREATE(temp2, struct extra_descr_data, 1);
+    temp->next = temp2;
+    temp = temp2;
       } else
-	temp->next = NULL;
+    temp->next = NULL;
     }
   }
     /*
    * Extra descriptions, if necessary.
    */
-  
+
   ch->Send( "Cloning look behind descriptions....\r\n");
   if (IN_ROOM(ch)->look_behind_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
@@ -311,17 +311,17 @@ ACMD(do_room_copy)
       temp->keyword = strdup(tdesc->keyword);
       temp->description = strdup(tdesc->description);
       if (tdesc->next) {
-	CREATE(temp2, struct extra_descr_data, 1);
-	temp->next = temp2;
-	temp = temp2;
+    CREATE(temp2, struct extra_descr_data, 1);
+    temp->next = temp2;
+    temp = temp2;
       } else
-	temp->next = NULL;
+    temp->next = NULL;
     }
   }
     /*
    * Extra descriptions, if necessary.
    */
-  
+
   ch->Send( "Cloning look above descriptions....\r\n");
   if (IN_ROOM(ch)->look_above_description) {
     struct extra_descr_data *tdesc, *temp, *temp2;
@@ -332,18 +332,18 @@ ACMD(do_room_copy)
       temp->keyword = strdup(tdesc->keyword);
       temp->description = strdup(tdesc->description);
       if (tdesc->next) {
-	CREATE(temp2, struct extra_descr_data, 1);
-	temp->next = temp2;
-	temp = temp2;
+    CREATE(temp2, struct extra_descr_data, 1);
+    temp->next = temp2;
+    temp = temp2;
       } else
-	temp->next = NULL;
+    temp->next = NULL;
     }
   }
    /*
     * Now save the room in the right place:
-    */ 
+    */
   ch->Send( "Saving new room...\r\n");
-    
+
   if ((room_num = add_room(room_dst)) == NULL) {
     ch->Send( "Something went wrong...\r\n");
     log("SYSERR: do_room_copy: Something failed!");
@@ -395,7 +395,7 @@ room_vnum redit_find_new_vnum(zone_rnum zone)
       return(NOWHERE);
     if (!world_vnum[vnum] /*&& world_vnum[vnum]->number > vnum */)
       break;
-    vnum++; 
+    vnum++;
   }
   return(vnum);
 
@@ -411,7 +411,7 @@ int buildwalk(Character *ch, int dir) {
     return 0;
 
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_BUILDWALK) && GET_LEVEL(ch) >= LVL_BUILDER) {
- 
+
     get_char_colours(ch);
 
     if (!can_edit_zone(ch, IN_ROOM(ch)->zone)) {
@@ -428,7 +428,7 @@ int buildwalk(Character *ch, int dir) {
         new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: buildwalk(): Player already had olc structure.");
         free(d->olc);
       }
-    
+
       CREATE(d->olc, struct oasis_olc_data, 1);
       OLC_ZNUM(d) = IN_ROOM(ch)->zone;
       OLC_NUM(d) = vnum;

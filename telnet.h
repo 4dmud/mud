@@ -75,7 +75,7 @@ extern char *telcmds[];
 #define	TELCMD_FIRST	xEOF
 #define	TELCMD_LAST	IAC
 #define	TELCMD_OK(x)	((unsigned int)(x) <= TELCMD_LAST && \
-			 (unsigned int)(x) >= TELCMD_FIRST)
+             (unsigned int)(x) >= TELCMD_FIRST)
 #define	TELCMD(x)	telcmds[(x)-TELCMD_FIRST]
 
 /* telnet options */
@@ -205,8 +205,8 @@ char *telopts[NTELOPTS + 1] = {
  * list of names if SLC_NAMES is not defined.
  */
 #define	SLC_NAMELIST	"0", "SYNCH", "BRK", "IP", "AO", "AYT", "EOR", \
-			"ABORT", "EOF", "SUSP", "EC", "EL", "EW", "RP", \
-			"LNEXT", "XON", "XOFF", "FORW1", "FORW2", 0,
+            "ABORT", "EOF", "SUSP", "EC", "EL", "EW", "RP", \
+            "LNEXT", "XON", "XOFF", "FORW1", "FORW2", 0,
 #ifdef	SLC_NAMES
 char *slc_names[] = {
     SLC_NAMELIST

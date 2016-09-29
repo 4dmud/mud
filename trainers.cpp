@@ -78,88 +78,88 @@ int end_sub = 0;
 
 int compare_spells ( const void *x, const void *y )
 {
-	int a = * ( const int * ) x, b = * ( const int * ) y;
+    int a = * ( const int * ) x, b = * ( const int * ) y;
 
-	//if spells match, sort in number order
-	int result = strcmp ( skill_name ( a ), skill_name ( b ) );
-	if (result)
-	  return result;
-	else
-	  return b - a;
+    //if spells match, sort in number order
+    int result = strcmp ( skill_name ( a ), skill_name ( b ) );
+    if (result)
+      return result;
+    else
+      return b - a;
 }
 int compare_sub ( const void *x, const void *y )
 {
-	int a = * ( const int * ) x, b = * ( const int * ) y;
+    int a = * ( const int * ) x, b = * ( const int * ) y;
 
-	return strcmp ( sub_name ( a ), sub_name ( b ) );
+    return strcmp ( sub_name ( a ), sub_name ( b ) );
 }
 
 void sort_all_spell_data ( void )
 {
-	int a;
+    int a;
 
-	/* initialize array, avoiding reserved. */
-	for ( a = 0; a < MAX_SKILLS; a++ )
-		spell_sorted_info[a] = a;
+    /* initialize array, avoiding reserved. */
+    for ( a = 0; a < MAX_SKILLS; a++ )
+        spell_sorted_info[a] = a;
 
-	qsort ( spell_sorted_info, MAX_SKILLS, sizeof ( int ), compare_spells );
+    qsort ( spell_sorted_info, MAX_SKILLS, sizeof ( int ), compare_spells );
 }
 
 void sort_sub_data ( void )
 {
-	int a;
+    int a;
 
-	/* initialize array, avoiding reserved. */
-	for ( a = 1; a < TOP_SUB_DEFINE; a++ )
-		sub_sort_data[a] = a;
+    /* initialize array, avoiding reserved. */
+    for ( a = 1; a < TOP_SUB_DEFINE; a++ )
+        sub_sort_data[a] = a;
 
-	qsort ( &sub_sort_data[0], TOP_SUB_DEFINE, sizeof ( int ), compare_sub );
+    qsort ( &sub_sort_data[0], TOP_SUB_DEFINE, sizeof ( int ), compare_sub );
 }
 void sort_spell_data ( void )
 {
-	int a, b = 0;
+    int a, b = 0;
 
-	/* initialize array, avoiding reserved. */
-	for ( a = 1; a <= MAX_SKILLS; a++ )
+    /* initialize array, avoiding reserved. */
+    for ( a = 1; a <= MAX_SKILLS; a++ )
           if (IS_SPELL_CAST(a))
-		spell_sort_data[++b] = a;
+        spell_sort_data[++b] = a;
         start_skill = b;
-	qsort ( &spell_sort_data[0], b + 1, sizeof ( int ), compare_spells );
+    qsort ( &spell_sort_data[0], b + 1, sizeof ( int ), compare_spells );
 }
 void sort_skill_data ( void )
 {
-	int a, b = 0;
+    int a, b = 0;
 
-	/* initialize array, avoiding reserved. */
-	for ( a = 1; a <= MAX_SKILLS; a++ )
+    /* initialize array, avoiding reserved. */
+    for ( a = 1; a <= MAX_SKILLS; a++ )
           if (IS_SKILL(a))
-		skill_sort_data[++b] = a;
+        skill_sort_data[++b] = a;
 
-	qsort ( &skill_sort_data[0], b +1, sizeof ( int ), compare_spells );
+    qsort ( &skill_sort_data[0], b +1, sizeof ( int ), compare_spells );
 }
 
 
 void sort_spells ( void )
 {
-	int a, b = 1;
+    int a, b = 1;
 
-	sort_skill_data();
-	sort_spell_data();
-	sort_sub_data();
-	sort_all_spell_data();
+    sort_skill_data();
+    sort_spell_data();
+    sort_sub_data();
+    sort_all_spell_data();
 
-	/* initialize array, avoiding reserved. */
-	for ( a = 1; a <= start_skill; a++) 
-		spell_sort_info[a] = spell_sort_data[a];
+    /* initialize array, avoiding reserved. */
+    for ( a = 1; a <= start_skill; a++)
+        spell_sort_info[a] = spell_sort_data[a];
 
 
-	for ( ; skill_sort_data[b] != 0; a++, b++ )
-		spell_sort_info[a] = skill_sort_data[b];
+    for ( ; skill_sort_data[b] != 0; a++, b++ )
+        spell_sort_info[a] = skill_sort_data[b];
 
         start_sub = a;
 
-	for ( b = 0; b < TOP_SUB_DEFINE; a++, b++ )
-		spell_sort_info[a] = sub_sort_data[b];
+    for ( b = 0; b < TOP_SUB_DEFINE; a++, b++ )
+        spell_sort_info[a] = sub_sort_data[b];
 
         end_sub = a;
 
@@ -167,457 +167,457 @@ void sort_spells ( void )
 
 const char *how_good ( int percent )
 {
-	if ( percent < 0 )
-		return " (error)";
-	if ( percent == 0 )
-		return "\x1B[0m----------\x1B[0m";
-	if ( percent <= 10 )
-		return "\x1B[0m#---------\x1B[0m";
-	if ( percent <= 20 )
-		return "\x1B[32m##\x1B[0m--------\x1B[0m";
-	if ( percent <= 30 )
-		return "\x1B[32m###\x1B[0m-------\x1B[0m";
-	if ( percent <= 40 )
-		return "\x1B[33m####\x1B[0m------\x1B[0m";
-	if ( percent <= 50 )
-		return "\x1B[33m#####\x1B[0m-----\x1B[0m";
-	if ( percent <= 60 )
-		return "\x1B[34m######\x1B[0m----\x1B[0m";
-	if ( percent <= 70 )
-		return "\x1B[34m#######\x1B[0m---\x1B[0m";
-	if ( percent <= 80 )
-		return "\x1B[35m########\x1B[0m--\x1B[0m";
-	if ( percent <= 90 )
-		return "\x1B[35m#########\x1B[0m-\x1B[0m";
+    if ( percent < 0 )
+        return " (error)";
+    if ( percent == 0 )
+        return "\x1B[0m----------\x1B[0m";
+    if ( percent <= 10 )
+        return "\x1B[0m#---------\x1B[0m";
+    if ( percent <= 20 )
+        return "\x1B[32m##\x1B[0m--------\x1B[0m";
+    if ( percent <= 30 )
+        return "\x1B[32m###\x1B[0m-------\x1B[0m";
+    if ( percent <= 40 )
+        return "\x1B[33m####\x1B[0m------\x1B[0m";
+    if ( percent <= 50 )
+        return "\x1B[33m#####\x1B[0m-----\x1B[0m";
+    if ( percent <= 60 )
+        return "\x1B[34m######\x1B[0m----\x1B[0m";
+    if ( percent <= 70 )
+        return "\x1B[34m#######\x1B[0m---\x1B[0m";
+    if ( percent <= 80 )
+        return "\x1B[35m########\x1B[0m--\x1B[0m";
+    if ( percent <= 90 )
+        return "\x1B[35m#########\x1B[0m-\x1B[0m";
 
-	return "\x1B[36m##########\x1B[0m";
+    return "\x1B[36m##########\x1B[0m";
 }
 
 char * how_good_perc ( Character *ch, int perc )
 {
-	static char  perc_buf[80];
-	//if ( GET_INT ( ch ) < 22 && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
-	//	return ( char * ) how_good ( perc );
-	sprintf ( perc_buf, "%-3d%%", perc );
-	return perc_buf;
+    static char  perc_buf[80];
+    //if ( GET_INT ( ch ) < 22 && !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
+    //	return ( char * ) how_good ( perc );
+    sprintf ( perc_buf, "%-3d%%", perc );
+    return perc_buf;
 
 }
 
 bool can_teach_skill ( Character *mob, int i )
 {
-	if ( IS_NPC ( mob ) && !mob->mob_specials.teaches_skills.empty() )
-	{
-		for ( int h = 0; h < mob->mob_specials.teaches_skills.size();h++ )
-		{
-			if ( mob->mob_specials.teaches_skills.at ( h ) == i )
-				return TRUE;
-		}
-	}
-	return FALSE;
+    if ( IS_NPC ( mob ) && !mob->mob_specials.teaches_skills.empty() )
+    {
+        for ( int h = 0; h < mob->mob_specials.teaches_skills.size();h++ )
+        {
+            if ( mob->mob_specials.teaches_skills.at ( h ) == i )
+                return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 void list_skills ( Character *ch, int skillspell, Character *mob, string arg2, string arg3 )
 {
-	int i, sortpos, h = 0, ending, sub, lvl_min = 0, lvl_max = LVL_IMPL, levels;
-	int count= 0;
-	char buf[MAX_INPUT_LENGTH];
-	DYN_DEFINE;
-	*buf = 0;
+    int i, sortpos, h = 0, ending, sub, lvl_min = 0, lvl_max = LVL_IMPL, levels;
+    int count= 0;
+    char buf[MAX_INPUT_LENGTH];
+    DYN_DEFINE;
+    *buf = 0;
 
-	levels = atoi ( arg2.c_str() );
+    levels = atoi ( arg2.c_str() );
 
-	if ( levels > 0 )
-	{
-		lvl_min = GET_LEVEL ( ch );
-		lvl_max = lvl_min + levels;
-	}
-	else if ( levels < 0 )
-	{
-		lvl_min = GET_LEVEL ( ch ) + levels;
-		lvl_max = GET_LEVEL ( ch );
-	}
+    if ( levels > 0 )
+    {
+        lvl_min = GET_LEVEL ( ch );
+        lvl_max = lvl_min + levels;
+    }
+    else if ( levels < 0 )
+    {
+        lvl_min = GET_LEVEL ( ch ) + levels;
+        lvl_max = GET_LEVEL ( ch );
+    }
 
-	if ( skillspell == 0 )
-	{
-		sortpos = start_skill +1; 
-		ending = start_sub - 1;
-	}
-	else if ( skillspell == 1 )
-	{
-		sortpos = 1;
-		ending = start_skill;
-	}
-	else
-	{
-		sortpos = start_sub;
-		ending = end_sub;
-	}
-	DYN_CREATE;
-	*dynbuf = 0;
-	
-
-	if ( mob == NULL )
-	{
-		if ( GET_PRACTICES ( ch ) <= 0 )
-			strcpy ( buf, "You have no practice sessions remaining.\r\n" );
-		else
-			sprintf ( buf, "You have %d practice session%s remaining.\r\n",
-			          GET_PRACTICES ( ch ), ( GET_PRACTICES ( ch ) == 1 ? "" : "s" ) );
-		if ( skillspell < 2 )
-			sprintf ( buf + strlen ( buf ), "You have the following %s:\r\n",skillspell == 1 ? "spells" : "skills" );
-		else
-			sprintf ( buf + strlen ( buf ), "You have the following extra abilities:\r\n" );
-		DYN_RESIZE ( buf );
-	}
-	else
-	{
-		snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "with a * in front" : "in green" );
-		DYN_RESIZE ( buf );
-	}
-
-	for ( ; sortpos <= ending; sortpos++ )
-	{
-		i = spell_sort_info[sortpos];
-		if ( skillspell < 2 && mob && !mob->mob_specials.teaches_skills.empty() )
-		{
-			if ( !can_teach_skill ( mob, i ) )
-				continue;
-		}
-
-		if ( skillspell > 1 )
-		{
-			if ( i==0 )
-				continue;
-			if ( i==TOP_SUB_DEFINE )
-				continue;
-			sub = GET_SUB ( ch, i );
-
-			/*if (sub < 1)
-			continue;*/
-
-			if ( GET_LEVEL ( ch ) > LVL_IMMORT )
-			{
-				improveallsubs ( ch );
-				sub = 100;
-			}
-			if ( sub == 0 )
-				continue;
-			count++;
-			if ( GET_LEVEL ( ch ) > LVL_IMMORT )
-			{
-				sprintf ( buf, "%-3d)", i );
-				DYN_RESIZE ( buf );
-			}
-			sprintf ( buf, "%s\x1B[1;31m%-28s  \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ", sub_name ( i ), ( ( sub > 0 ) ? how_good_perc ( ch, sub ) : unlearnedsub ) );
-			DYN_RESIZE ( buf );
+    if ( skillspell == 0 )
+    {
+        sortpos = start_skill +1;
+        ending = start_sub - 1;
+    }
+    else if ( skillspell == 1 )
+    {
+        sortpos = 1;
+        ending = start_skill;
+    }
+    else
+    {
+        sortpos = start_sub;
+        ending = end_sub;
+    }
+    DYN_CREATE;
+    *dynbuf = 0;
 
 
+    if ( mob == NULL )
+    {
+        if ( GET_PRACTICES ( ch ) <= 0 )
+            strcpy ( buf, "You have no practice sessions remaining.\r\n" );
+        else
+            sprintf ( buf, "You have %d practice session%s remaining.\r\n",
+                      GET_PRACTICES ( ch ), ( GET_PRACTICES ( ch ) == 1 ? "" : "s" ) );
+        if ( skillspell < 2 )
+            sprintf ( buf + strlen ( buf ), "You have the following %s:\r\n",skillspell == 1 ? "spells" : "skills" );
+        else
+            sprintf ( buf + strlen ( buf ), "You have the following extra abilities:\r\n" );
+        DYN_RESIZE ( buf );
+    }
+    else
+    {
+        snprintf ( buf, sizeof ( buf ), "%s can teach you the following %s %s:\r\n", GET_NAME ( mob ), skillspell == 1 ? "spells" : "skills", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "with a * in front" : "in green" );
+        DYN_RESIZE ( buf );
+    }
 
+    for ( ; sortpos <= ending; sortpos++ )
+    {
+        i = spell_sort_info[sortpos];
+        if ( skillspell < 2 && mob && !mob->mob_specials.teaches_skills.empty() )
+        {
+            if ( !can_teach_skill ( mob, i ) )
+                continue;
+        }
 
-			if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
-			{
-				sprintf ( buf, " Parent Skill: %s", skill_name ( sub_info[i].parent ) );
-				DYN_RESIZE ( buf );
-			}
-			if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
-			{
-				sprintf ( buf, " Profession: %s", profession_names[sub_info[i].parent] );
-				DYN_RESIZE ( buf );
-			}
-			sprintf ( buf, "\r\n" );
-			DYN_RESIZE ( buf );
-		}
-		else
-		{
+        if ( skillspell > 1 )
+        {
+            if ( i==0 )
+                continue;
+            if ( i==TOP_SUB_DEFINE )
+                continue;
+            sub = GET_SUB ( ch, i );
 
-			if ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
-			        && ( SECOND_PRE ( i ) != TYPE_UNDEFINED ) )
-				h = 2;
-			else if ( ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
-			            && ( SECOND_PRE ( i ) == TYPE_UNDEFINED ) ) )
-				h = 1;
-			else
-				h = 0;
+            /*if (sub < 1)
+            continue;*/
 
-			if ( spell_info[i].min_level < lvl_min || spell_info[i].min_level > lvl_max )
-				continue;
-
-			if ( knows_spell ( ch, i ) )
-			{
-
-				if ( GET_LEVEL ( ch ) == LVL_IMPL )
-				{
-					sprintf ( buf, "%-3d)", i );
-					DYN_RESIZE ( buf );
-				}
-
-
-				sprintf ( buf, "%s%s%-20s     \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ",
-				          ( ! ( IS_SPELL_CAST(i) ) ? "\x1B[32m" : "\x1B[33m" ),
-				          skill_name ( i ), how_good_perc ( ch, total_chance ( ch, i ) ) );
-				DYN_RESIZE ( buf );
-
-				sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
-				DYN_RESIZE ( buf );
+            if ( GET_LEVEL ( ch ) > LVL_IMMORT )
+            {
+                improveallsubs ( ch );
+                sub = 100;
+            }
+            if ( sub == 0 )
+                continue;
+            count++;
+            if ( GET_LEVEL ( ch ) > LVL_IMMORT )
+            {
+                sprintf ( buf, "%-3d)", i );
+                DYN_RESIZE ( buf );
+            }
+            sprintf ( buf, "%s\x1B[1;31m%-28s  \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ", sub_name ( i ), ( ( sub > 0 ) ? how_good_perc ( ch, sub ) : unlearnedsub ) );
+            DYN_RESIZE ( buf );
 
 
 
-				if ( skillspell == 1 )
-				{
-					sprintf ( buf, "[Mana:%-4d]\x1B[0m",
-					          mag_manacost ( ch, i ) );
-					DYN_RESIZE ( buf );
-				}
-				if ( skillspell == 1 && elemental_type ( i ) != ELEM_NONE )
-				{
-					snprintf ( buf, sizeof ( buf ), "[{cp%-11s{c0]", elemental_types[elemental_type ( i ) ] );
-					DYN_RESIZE ( buf );
-				}
 
-				if ( spell_info[i].wait )
-				{
-					sprintf ( buf, "[Delay of %3d sec]",spell_info[i].wait );
-					DYN_RESIZE ( buf );
-				}
+            if ( !IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
+            {
+                sprintf ( buf, " Parent Skill: %s", skill_name ( sub_info[i].parent ) );
+                DYN_RESIZE ( buf );
+            }
+            if ( IS_SET ( sub_info[i].flags, SUB_TYPE_PROF ) && sub_info[i].parent!=TYPE_UNDEFINED )
+            {
+                sprintf ( buf, " Profession: %s", profession_names[sub_info[i].parent] );
+                DYN_RESIZE ( buf );
+            }
+            sprintf ( buf, "\r\n" );
+            DYN_RESIZE ( buf );
+        }
+        else
+        {
 
-				if ( GET_SPELL_WAIT ( ch, i ) )
-				{
-					sprintf ( buf, "[%d seconds till recast]",
-					          GET_SPELL_WAIT ( ch, i ) );
-					DYN_RESIZE ( buf );
-				}
+            if ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
+                    && ( SECOND_PRE ( i ) != TYPE_UNDEFINED ) )
+                h = 2;
+            else if ( ( ( FIRST_PRE ( i ) != TYPE_UNDEFINED )
+                        && ( SECOND_PRE ( i ) == TYPE_UNDEFINED ) ) )
+                h = 1;
+            else
+                h = 0;
 
-				if ( h == 1 )
-				{
-					sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m",
-					          skill_name ( FIRST_PRE ( i ) ) );
-					DYN_RESIZE ( buf );
-				}
-				else if ( h == 2 )
-				{
-					sprintf ( buf,
-					          "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
-					          skill_name ( FIRST_PRE ( i ) ),
-					          skill_name ( SECOND_PRE ( i ) ) );
-					DYN_RESIZE ( buf );
-				}
+            if ( spell_info[i].min_level < lvl_min || spell_info[i].min_level > lvl_max )
+                continue;
 
-				sprintf ( buf, "\r\n" );
-				DYN_RESIZE ( buf );
-				count++;
+            if ( knows_spell ( ch, i ) )
+            {
 
-				/*if (!(GET_LEVEL(ch) >= LVL_IMMORT))
-				break;*/
-			}
-			else if ( mob )
-			{
-				if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) && arg2 != "all" && arg3 != "all" )
-					continue;
-
-				sprintf ( buf, "{cr %-20s{c0                  ", skill_name ( i ) );
-				DYN_RESIZE ( buf );
-				sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
-				DYN_RESIZE ( buf );
-				if ( skillspell == 1 && elemental_type ( i ) != ELEM_NONE )
-				{
-					snprintf ( buf, sizeof ( buf ), "[{cp%-11s{c0]", elemental_types[elemental_type ( i ) ] );
-					DYN_RESIZE ( buf );
-				}
-				if ( h == 1 )
-				{
-					sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m",
-					          skill_name ( FIRST_PRE ( i ) ) );
-					DYN_RESIZE ( buf );
-				}
-				else if ( h == 2 )
-				{
-					sprintf ( buf,
-					          "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
-					          skill_name ( FIRST_PRE ( i ) ),
-					          skill_name ( SECOND_PRE ( i ) ) );
-					DYN_RESIZE ( buf );
-				}
-
-				sprintf ( buf, "\r\n" );
-				DYN_RESIZE ( buf );
-
-			}
+                if ( GET_LEVEL ( ch ) == LVL_IMPL )
+                {
+                    sprintf ( buf, "%-3d)", i );
+                    DYN_RESIZE ( buf );
+                }
 
 
-		}
-	}
-	if ( count == 0 )
-	{
-		sprintf ( buf, "You don't know any!\r\n" );
-		DYN_RESIZE ( buf );
-	}
+                sprintf ( buf, "%s%s%-20s     \x1B[0m[%s] ", PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) ? "*" : " ",
+                          ( ! ( IS_SPELL_CAST(i) ) ? "\x1B[32m" : "\x1B[33m" ),
+                          skill_name ( i ), how_good_perc ( ch, total_chance ( ch, i ) ) );
+                DYN_RESIZE ( buf );
 
-	page_string ( ch->desc, dynbuf, DYN_BUFFER );
+                sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
+                DYN_RESIZE ( buf );
+
+
+
+                if ( skillspell == 1 )
+                {
+                    sprintf ( buf, "[Mana:%-4d]\x1B[0m",
+                              mag_manacost ( ch, i ) );
+                    DYN_RESIZE ( buf );
+                }
+                if ( skillspell == 1 && elemental_type ( i ) != ELEM_NONE )
+                {
+                    snprintf ( buf, sizeof ( buf ), "[{cp%-11s{c0]", elemental_types[elemental_type ( i ) ] );
+                    DYN_RESIZE ( buf );
+                }
+
+                if ( spell_info[i].wait )
+                {
+                    sprintf ( buf, "[Delay of %3d sec]",spell_info[i].wait );
+                    DYN_RESIZE ( buf );
+                }
+
+                if ( GET_SPELL_WAIT ( ch, i ) )
+                {
+                    sprintf ( buf, "[%d seconds till recast]",
+                              GET_SPELL_WAIT ( ch, i ) );
+                    DYN_RESIZE ( buf );
+                }
+
+                if ( h == 1 )
+                {
+                    sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m",
+                              skill_name ( FIRST_PRE ( i ) ) );
+                    DYN_RESIZE ( buf );
+                }
+                else if ( h == 2 )
+                {
+                    sprintf ( buf,
+                              "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
+                              skill_name ( FIRST_PRE ( i ) ),
+                              skill_name ( SECOND_PRE ( i ) ) );
+                    DYN_RESIZE ( buf );
+                }
+
+                sprintf ( buf, "\r\n" );
+                DYN_RESIZE ( buf );
+                count++;
+
+                /*if (!(GET_LEVEL(ch) >= LVL_IMMORT))
+                break;*/
+            }
+            else if ( mob )
+            {
+                if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) && arg2 != "all" && arg3 != "all" )
+                    continue;
+
+                sprintf ( buf, "{cr %-20s{c0                  ", skill_name ( i ) );
+                DYN_RESIZE ( buf );
+                sprintf ( buf, "[L:%2d T:%d]",spell_info[i].min_level, spell_info[i].tier );
+                DYN_RESIZE ( buf );
+                if ( skillspell == 1 && elemental_type ( i ) != ELEM_NONE )
+                {
+                    snprintf ( buf, sizeof ( buf ), "[{cp%-11s{c0]", elemental_types[elemental_type ( i ) ] );
+                    DYN_RESIZE ( buf );
+                }
+                if ( h == 1 )
+                {
+                    sprintf ( buf, "\x1B[1;34m  Requires: %s \x1B[0;0m",
+                              skill_name ( FIRST_PRE ( i ) ) );
+                    DYN_RESIZE ( buf );
+                }
+                else if ( h == 2 )
+                {
+                    sprintf ( buf,
+                              "\x1B[1;34m  Requires: %s and %s \x1B[0;0m",
+                              skill_name ( FIRST_PRE ( i ) ),
+                              skill_name ( SECOND_PRE ( i ) ) );
+                    DYN_RESIZE ( buf );
+                }
+
+                sprintf ( buf, "\r\n" );
+                DYN_RESIZE ( buf );
+
+            }
+
+
+        }
+    }
+    if ( count == 0 )
+    {
+        sprintf ( buf, "You don't know any!\r\n" );
+        DYN_RESIZE ( buf );
+    }
+
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 ACMD ( do_practice )
 {
-	int skill_num, percent, learned, pp;
-	gold_int cig  = 0;
-	vector<Character *> mob_trainers;
-	vector<Character *>::iterator mti;
-	Character *mob;
-	int train_list = -1;
-	int remorts = MIN(REMORTS(ch), 50);
-	bool is_mikey = FALSE;
-	istringstream iss ( argument );
-	string arg;
-	vector<string> args;
+    int skill_num, percent, learned, pp;
+    gold_int cig  = 0;
+    vector<Character *> mob_trainers;
+    vector<Character *>::iterator mti;
+    Character *mob;
+    int train_list = -1;
+    int remorts = MIN(REMORTS(ch), 50);
+    bool is_mikey = FALSE;
+    istringstream iss ( argument );
+    string arg;
+    vector<string> args;
 
-	if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
-		return;
+    if ( IS_NPC ( ch ) || !IN_ROOM ( ch ) )
+        return;
 
-	skip_spaces ( &argument );
+    skip_spaces ( &argument );
 
-	if ( !*argument )
-	{
-		ch->Send ( "You have {cW%d{c0 practice sessions remaining.\r\n\r\n", GET_PRACTICES ( ch ) );
-		ch->Send ( "To View Skills Or Spells Either Type:\r\n" );
-		ch->Send ( "{cCpractice skills{c0 or type {cCpractice spells{c0\r\n\r\n" );
-		ch->Send ( "To view any other abilities you may have (subskills, clan skills, etc) type:\r\n" );
-		ch->Send ( "{cCpractice subs{c0\r\n\r\n" );
-		ch->Send ( "Otherwise to get better in that skill or spell try:\r\n" );
-		ch->Send ( "{ccpractice <skill/spell name>{c0\r\n" );
-		ch->Send ( "{ccFor example: {cCpractice magic missile{c0\r\n" );
-		ch->Send ( "{cG[NOTE: You can practice with your skills and spells at a guildmaster]{c0\r\n" );
+    if ( !*argument )
+    {
+        ch->Send ( "You have {cW%d{c0 practice sessions remaining.\r\n\r\n", GET_PRACTICES ( ch ) );
+        ch->Send ( "To View Skills Or Spells Either Type:\r\n" );
+        ch->Send ( "{cCpractice skills{c0 or type {cCpractice spells{c0\r\n\r\n" );
+        ch->Send ( "To view any other abilities you may have (subskills, clan skills, etc) type:\r\n" );
+        ch->Send ( "{cCpractice subs{c0\r\n\r\n" );
+        ch->Send ( "Otherwise to get better in that skill or spell try:\r\n" );
+        ch->Send ( "{ccpractice <skill/spell name>{c0\r\n" );
+        ch->Send ( "{ccFor example: {cCpractice magic missile{c0\r\n" );
+        ch->Send ( "{cG[NOTE: You can practice with your skills and spells at a guildmaster]{c0\r\n" );
 
-		return;
-	}
+        return;
+    }
 
-	for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room ) {
+    for ( Character *p = IN_ROOM ( ch )->people; p != NULL;p = p->next_in_room ) {
                 // Going to try to remark this out and see if Mikey gets wierd or not
-		// Prom
-		//if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
-		if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
-			mob_trainers.push_back ( p );
+        // Prom
+        //if (GET_MOB_VNUM(p) == 3007) is_mikey = TRUE;
+        if ( IS_NPC ( p ) && !p->mob_specials.teaches_skills.empty() )
+            mob_trainers.push_back ( p );
         }
 
-	while ( iss >> arg )
-		args.push_back ( arg );
-	while ( args.size() < 3 )
-		args.push_back ( "" );
+    while ( iss >> arg )
+        args.push_back ( arg );
+    while ( args.size() < 3 )
+        args.push_back ( "" );
 
-	if ( is_abbrev ( args[0].c_str(), "skills" ) )
-		train_list = 0;
-	else if ( is_abbrev ( args[0].c_str(), "spells" ) )
-		train_list = 1;
-	else if ( is_abbrev ( args[0].c_str(), "subskills" ) )
-		train_list = 2;
+    if ( is_abbrev ( args[0].c_str(), "skills" ) )
+        train_list = 0;
+    else if ( is_abbrev ( args[0].c_str(), "spells" ) )
+        train_list = 1;
+    else if ( is_abbrev ( args[0].c_str(), "subskills" ) )
+        train_list = 2;
 
-	if ( train_list != -1 )
-	{
-		/** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
-		if ( train_list == 2 || mob_trainers.empty() )
-		{
-			list_skills ( ch, train_list, NULL, "", "" );
-			return;
-		}
-		else
-		{
-			for ( mti = mob_trainers.begin();mti != mob_trainers.end();mti++ )
-				list_skills ( ch, train_list, *mti, args[1], args[2] );
-		}
-		return;
-	}
+    if ( train_list != -1 )
+    {
+        /** In the future, perhaps have it so that mobs can teach subskills too? - Mord **/
+        if ( train_list == 2 || mob_trainers.empty() )
+        {
+            list_skills ( ch, train_list, NULL, "", "" );
+            return;
+        }
+        else
+        {
+            for ( mti = mob_trainers.begin();mti != mob_trainers.end();mti++ )
+                list_skills ( ch, train_list, *mti, args[1], args[2] );
+        }
+        return;
+    }
 
-	learned = IRANGE ( 30, ( 20* ( TIERNUM ) ), 80 );
-	skill_num = find_skill_num ( argument );
+    learned = IRANGE ( 30, ( 20* ( TIERNUM ) ), 80 );
+    skill_num = find_skill_num ( argument );
 
-	if ( mob_trainers.empty() )
-	{
-		ch->Send ( "You can't train that here, there are no trainers available." );
-		return;
-	}
-	else if ( mob_trainers.size() == 1 )
-	{
-		mob = mob_trainers[0];
-		if ((is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey &&  !can_teach_skill ( mob, skill_num ) ))
-		{
-			act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob, TO_CHAR );
-			return;
-		}
-	}
-	else
-	{
-		bool can = false;
-		for ( mti = mob_trainers.begin();can == false && mti != mob_trainers.end();mti++ )
-			if ( can_teach_skill ( *mti, skill_num ) )
-				can = true;
-		if ( (is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey && can == false ))
-		{
-			act ( "Nobody here is skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, NULL, TO_CHAR );
-			return;
-		}
-	}
-	if ( skill_num < 1 ||
-	        !knows_spell ( ch, skill_num ) )
-	{
-		ch->Send ( "You do not know of that %s.\r\n", SPLSKL ( ch ) );
-		return;
-	}
-	else if ( GET_SKILL ( ch, skill_num ) >= learned )
-	{
-		*ch << "You can't train that skill any further for now, come back when you remort.\r\n";
-		return;
-	}
-	else if ( GET_PRACTICES ( ch ) <= 0 )
-	{
-		*ch << "You do not seem to be able to practice now.\r\n";
-		return ;
-	}
+    if ( mob_trainers.empty() )
+    {
+        ch->Send ( "You can't train that here, there are no trainers available." );
+        return;
+    }
+    else if ( mob_trainers.size() == 1 )
+    {
+        mob = mob_trainers[0];
+        if ((is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey &&  !can_teach_skill ( mob, skill_num ) ))
+        {
+            act ( "$N says 'I'm not skilled in that.  You must find someone else to teach you it.'", FALSE, ch, 0, mob, TO_CHAR );
+            return;
+        }
+    }
+    else
+    {
+        bool can = false;
+        for ( mti = mob_trainers.begin();can == false && mti != mob_trainers.end();mti++ )
+            if ( can_teach_skill ( *mti, skill_num ) )
+                can = true;
+        if ( (is_mikey && GET_SKILL(ch, skill_num) < 2) || (!is_mikey && can == false ))
+        {
+            act ( "Nobody here is skilled in that.  You must find someone else to teach you it.", FALSE, ch, 0, NULL, TO_CHAR );
+            return;
+        }
+    }
+    if ( skill_num < 1 ||
+            !knows_spell ( ch, skill_num ) )
+    {
+        ch->Send ( "You do not know of that %s.\r\n", SPLSKL ( ch ) );
+        return;
+    }
+    else if ( GET_SKILL ( ch, skill_num ) >= learned )
+    {
+        *ch << "You can't train that skill any further for now, come back when you remort.\r\n";
+        return;
+    }
+    else if ( GET_PRACTICES ( ch ) <= 0 )
+    {
+        *ch << "You do not seem to be able to practice now.\r\n";
+        return ;
+    }
 
-	//pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
-	pp = MAX ( 2, ( ( GET_INT ( ch ) + GET_WIS ( ch ) - 20 ) *40+5 ) /240 + 2 );
+    //pp = MIN(MAXGAIN(ch), MAX(MINGAIN(ch), int_app[GET_INT(ch)].learn));
+    pp = MAX ( 2, ( ( GET_INT ( ch ) + GET_WIS ( ch ) - 20 ) *40+5 ) /240 + 2 );
 
-	percent = GET_SKILL ( ch, skill_num );
-	/* Cost In Gold */
-	cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
-	if ( remorts > 2 && ch->Gold ( 0, GOLD_HAND ) < cig )
-	{
-		ch->Send ( "You need at least %lld gold coins to pay for practicing that.\r\n", cig );
-		return;
-	}
-	percent += pp;
+    percent = GET_SKILL ( ch, skill_num );
+    /* Cost In Gold */
+    cig = ( ( percent*4000 ) + ( remorts * 1000 ) + ( GET_LEVEL ( ch ) * 1000 * current_class_is_tier_num ( ch ) ) + ( spell_info[skill_num].min_level * 1000 ) ) * pp;
+    if ( remorts > 2 && ch->Gold ( 0, GOLD_HAND ) < cig )
+    {
+        ch->Send ( "You need at least %lld gold coins to pay for practicing that.\r\n", cig );
+        return;
+    }
+    percent += pp;
 
 
-	SET_SKILL ( ch, skill_num, MIN ( learned, percent ) );
-	if ( REMORTS ( ch ) > 2 )
-	{
-		ch->Gold ( -cig, GOLD_HAND );
-		ch->Send ( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL ( ch,skill_num ) );
-	}
-	else
-	{
-		ch->Send ( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL ( ch,skill_num ) );
-	}
-	GET_PRACTICES ( ch )--;
+    SET_SKILL ( ch, skill_num, MIN ( learned, percent ) );
+    if ( REMORTS ( ch ) > 2 )
+    {
+        ch->Gold ( -cig, GOLD_HAND );
+        ch->Send ( "You pay %lld gold and a practice point to train your skill to %d%%.\r\n", cig, GET_SKILL ( ch,skill_num ) );
+    }
+    else
+    {
+        ch->Send ( "You pay a practice point and train your skill up to %d%%.\r\n", GET_SKILL ( ch,skill_num ) );
+    }
+    GET_PRACTICES ( ch )--;
 
-	if ( GET_SKILL ( ch, skill_num ) >= learned )
-		*ch << "You cannot train that any further for now. \r\nAlthough it may improve through use.\r\n";
+    if ( GET_SKILL ( ch, skill_num ) >= learned )
+        *ch << "You cannot train that any further for now. \r\nAlthough it may improve through use.\r\n";
 
-	return;
+    return;
 }
 
 void parse_train_group ( Character *ch, Character *vict, char *val_arg )
 {
-	char arg1[MAX_INPUT_LENGTH];
-	char arg2[MAX_INPUT_LENGTH];
-	int t = 0, c = 0, res = 0;
-	two_arguments ( val_arg, arg1, arg2 );
-	if ( !*arg1 || !*arg2 )
-	{
-		ch->Send ( "You must provide two values, the TIER NUMBER (or 0 for all), and the CLASS name.\r\neg: set <trainer name> 1 priest\r\nThis would give the trainer you specified all of the tier 1 priest skills and spells to train.\r\n" );
-		return;
-	}
-	t = atoi ( arg1 );
-	c = parse_class ( *arg2 );
-	res = assign_group_trains ( vict, t, c );
-	ch->Send ( "You assign %d skills to %s.\r\n", res, GET_NAME ( vict ) );
+    char arg1[MAX_INPUT_LENGTH];
+    char arg2[MAX_INPUT_LENGTH];
+    int t = 0, c = 0, res = 0;
+    two_arguments ( val_arg, arg1, arg2 );
+    if ( !*arg1 || !*arg2 )
+    {
+        ch->Send ( "You must provide two values, the TIER NUMBER (or 0 for all), and the CLASS name.\r\neg: set <trainer name> 1 priest\r\nThis would give the trainer you specified all of the tier 1 priest skills and spells to train.\r\n" );
+        return;
+    }
+    t = atoi ( arg1 );
+    c = parse_class ( *arg2 );
+    res = assign_group_trains ( vict, t, c );
+    ch->Send ( "You assign %d skills to %s.\r\n", res, GET_NAME ( vict ) );
 }
 
 /*
@@ -627,59 +627,59 @@ This only ADDS skills, not sets them.
 */
 int assign_group_trains ( Character *mob, int group, int filter )
 {
-	int assigned = 0;
-	int ss = TYPE_UNDEFINED;
-	Character *proto;
-	mob_vnum mvn;
-	if ( mob == NULL )
-		return 0;
-	mvn = GET_MOB_VNUM ( mob );
-	proto = GetMobProto ( mvn );
-	if ( proto == NULL )
-		return 0;
+    int assigned = 0;
+    int ss = TYPE_UNDEFINED;
+    Character *proto;
+    mob_vnum mvn;
+    if ( mob == NULL )
+        return 0;
+    mvn = GET_MOB_VNUM ( mob );
+    proto = GetMobProto ( mvn );
+    if ( proto == NULL )
+        return 0;
 
-	for ( int a = 1; a <= MAX_SKILLS; a++ )
-	{
-		ss = spell_sort_info[a];
-		if ( IS_SET ( spell_info[ss].classes, ( 1 << filter ) ) )
-		{
-			switch ( group )
-			{
-				default:
-					break;
-				case ALL_TIER_ONE:
-					if ( spell_info[ss].tier > 1 )
-						continue;
-					break;
-				case ALL_TIER_TWO:
-					if ( spell_info[ss].tier != 2 )
-						continue;
-					break;
-				case ALL_TIER_THREE:
-					if ( spell_info[ss].tier != 3 )
-						continue;
-					break;
-				case ALL_TIER_FOUR:
-					if ( spell_info[ss].tier != 4 )
-						continue;
-					break;
-			}
-			if ( ss != TYPE_UNDEFINED && !can_teach_skill ( proto, ss ) )
-			{
-				proto->mob_specials.teaches_skills.push_back ( ss );
-				assigned++;
-			}
-		}
-	}
-	if ( assigned > 0 )
-	{
-		medit_save_to_disk ( zone_table[real_zone_by_thing ( mvn ) ].number );
-		for ( mob = character_list; mob; mob = mob->next )
-		{
-			if ( mvn != GET_MOB_VNUM ( mob ) )
-				continue;
-			mob->mob_specials.teaches_skills = proto->mob_specials.teaches_skills;
-		}
-	}
-	return assigned;
+    for ( int a = 1; a <= MAX_SKILLS; a++ )
+    {
+        ss = spell_sort_info[a];
+        if ( IS_SET ( spell_info[ss].classes, ( 1 << filter ) ) )
+        {
+            switch ( group )
+            {
+                default:
+                    break;
+                case ALL_TIER_ONE:
+                    if ( spell_info[ss].tier > 1 )
+                        continue;
+                    break;
+                case ALL_TIER_TWO:
+                    if ( spell_info[ss].tier != 2 )
+                        continue;
+                    break;
+                case ALL_TIER_THREE:
+                    if ( spell_info[ss].tier != 3 )
+                        continue;
+                    break;
+                case ALL_TIER_FOUR:
+                    if ( spell_info[ss].tier != 4 )
+                        continue;
+                    break;
+            }
+            if ( ss != TYPE_UNDEFINED && !can_teach_skill ( proto, ss ) )
+            {
+                proto->mob_specials.teaches_skills.push_back ( ss );
+                assigned++;
+            }
+        }
+    }
+    if ( assigned > 0 )
+    {
+        medit_save_to_disk ( zone_table[real_zone_by_thing ( mvn ) ].number );
+        for ( mob = character_list; mob; mob = mob->next )
+        {
+            if ( mvn != GET_MOB_VNUM ( mob ) )
+                continue;
+            mob->mob_specials.teaches_skills = proto->mob_specials.teaches_skills;
+        }
+    }
+    return assigned;
 }

@@ -9,24 +9,24 @@
 /*
 Circle 3.0 Event Based Regeneration Patch 1.0
 =============================================
- 
+
 First release, 9 March 1998
- 
+
 This patch implements event based regeneration for CircleMUD.  This makes it
 so each point type (hit, mana, or move) is regenerated one point at a time,
 rather than having one big jump once per tick.  The rate of regeneration is
 still the same with this patch, it just does it gradually in order to make
 the game run "smoother" and to defeat people with tick counters who sleep
 right before the tick.
- 
+
 This patch does not add as much processor overhead as one might think at
 first glance.  Stock CircleMUD recalculates the regeneration of every
 character in the game (mobs and players) once per tick.  This patch changes
 regeneration so only the characters whose points are less than their maximum
 are checked.  Even with multiple checks per tick, if most characters are at
 their full point level, the over head could be lower than with stock Circle.
- 
- 
+
+
 Installation
 ------------
    1.  Install DG Events (version 1.1 or later), following the instructions
@@ -38,85 +38,85 @@ Installation
    5.  If your mud has been modified, see the "Using" section below and make
        any necessary changes.
    5.  Recompile your MUD.
- 
+
   The patch is based on Circle 3.0 pl12, so you might have to do some patching
   by hand if you have modified your source or are using it on a different
   version.  This has only been testing on Linux, but hopefully will work on
   all systems unmodified.  Please let me know if you have to make any changes
   for it to work on your system.
- 
- 
+
+
 Using
 -----
   Stock CircleMUD allows a character's points to be altered by directly
   manipulating the points variable, such as by setting GET_HIT(ch) or
   ch->points.hit.  When you use this patch, any changes must be done using
   the functions:
- 
+
       void alter_hit(Character *ch, int amount);
       void alter_mana(Character *ch, int amount);
       void alter_move(Character *ch, int amount);
- 
+
   The first argument is the character to alter.  The second argument is
   the number of points to subtract from the points.  To add points, use
   a negative amount.  If the points variable must be manipulated directly,
   call the appropriate alter function with amount of 0 to make sure there
   are the proper regeneration events.  Remember to do this when increasing
   the maximum value also.
- 
+
   Another function is provided to update regeneration on all three points
   types:
- 
+
       void Character::check_regen_rates();
- 
+
   This will make sure that any point category below maximum has an event
   to regenerate it.  It also will recalculate the regeneration rate if
   the rate has been increased.  It should be called whenever there is a
   significan't change in regeneration rates, or if you want to check that all
   three points types have the proper regen events.
- 
- 
+
+
 Possible Problems
 -----------------
   If the mud fails to compile with this patch due to errors like:
- 
+
     fight.o(.text+0xaf8): undefined reference to `alter_hit'
     handler.o(.text+0x0bc): undefined reference to `check_regen_rates'
- 
+
   then you did not properly update your Makefile, either by rerunning
   configure, or copying over the Makefile.win to Makefile.  regen.o
   must be added to OBJFILES in order for it to compile properly.
- 
+
   If you get an error compiling about undefined references to the functions
   event_create, event_time, and event_cancel, you did not properly install
   the dgevents patch.  Refer to the documentation with that package to
   check your installation.
- 
- 
+
+
   If a player stops regenerating properly, you probably forgot to use an
   alter_xxx() call and instead manipulated the variable directly.  You
   need to track down where this occurred and use the alter_xxx() or
   check_regen_rates().
- 
- 
+
+
   Warning:  Once you get used to event based regen, it is hard playing on
   a mud using ticks.
- 
- 
+
+
 Location
 --------
   The latest version of this regen patch should be available from the
   CircleMUD ftp site (ftp://ftp.circlemud.org/pub/CircleMUD/contrib/code).
   The DG Events patch can be found in the same location, named dgevents.
- 
- 
+
+
 If you find a problem with this package, please email me.
- 
- 
+
+
 Eric Green
 ejg3@cornell.edu
 http://www.imaxx.net/~thrytis
- 
+
 */
 
 #include "config.h"

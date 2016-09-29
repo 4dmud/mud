@@ -24,9 +24,9 @@ int assign_group_trains ( Character *mob, int group, int filter );
 const char *unlearnedsub = "Undiscovered SubSkill";
 const char *prac_types[] =
 {
-	"spell",
-	"skill",
-	"subskill"
+    "spell",
+    "skill",
+    "subskill"
 };
 /* actual prac_params are in class.c */
 extern int prac_params[4][NUM_CLASSES];

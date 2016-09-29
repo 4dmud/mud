@@ -75,35 +75,35 @@ int wep_hands(OBJ_DATA *wep);
 
 ACMD ( do_swap )
 {
-	obj_data *w1 = GET_EQ ( ch, WEAR_WIELD );
-	obj_data *w2 = GET_EQ ( ch, WEAR_WIELD_2 );
+    obj_data *w1 = GET_EQ ( ch, WEAR_WIELD );
+    obj_data *w2 = GET_EQ ( ch, WEAR_WIELD_2 );
 
-	if ( w1 == NULL || w2 == NULL )
+    if ( w1 == NULL || w2 == NULL )
 {
-		ch->Send ( "You are not dual wielding weapons!\r\n" );
-		return;
-	}
+        ch->Send ( "You are not dual wielding weapons!\r\n" );
+        return;
+    }
 
 
-	if ( ( ( GET_OBJ_TYPE ( w1 ) != ITEM_WEAPON )
-	        || ( GET_OBJ_TYPE ( w2 ) != ITEM_WEAPON ) ) )
-	{
-		ch->Send ( "You are not dual wielding WEAPONS.\r\n" );
-		return;
-	}
-	if ( wep_hands ( w1 ) == 2 ) {
-		ch->Send("You can't swap a two-handed weapon to your offhand.\r\n");
-		return;
-	}
+    if ( ( ( GET_OBJ_TYPE ( w1 ) != ITEM_WEAPON )
+            || ( GET_OBJ_TYPE ( w2 ) != ITEM_WEAPON ) ) )
+    {
+        ch->Send ( "You are not dual wielding WEAPONS.\r\n" );
+        return;
+    }
+    if ( wep_hands ( w1 ) == 2 ) {
+        ch->Send("You can't swap a two-handed weapon to your offhand.\r\n");
+        return;
+    }
 
-	w1 = unequip_char ( ch, WEAR_WIELD );
-	w2 = unequip_char ( ch, WEAR_WIELD_2 );
-	equip_char ( ch, w1, WEAR_WIELD_2 );
-	equip_char ( ch, w2, WEAR_WIELD );
+    w1 = unequip_char ( ch, WEAR_WIELD );
+    w2 = unequip_char ( ch, WEAR_WIELD_2 );
+    equip_char ( ch, w1, WEAR_WIELD_2 );
+    equip_char ( ch, w2, WEAR_WIELD );
 
-	act ( "You swap hands using $p and $P.", FALSE, ch, w1, w2,  TO_CHAR );
-	act ( "$n swaps hands using $p and $P.", TRUE, ch, w1, w2,   TO_ROOM );
-	return;
+    act ( "You swap hands using $p and $P.", FALSE, ch, w1, w2,  TO_CHAR );
+    act ( "$n swaps hands using $p and $P.", TRUE, ch, w1, w2,   TO_ROOM );
+    return;
 }
 
 

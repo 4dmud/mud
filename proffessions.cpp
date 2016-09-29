@@ -35,7 +35,7 @@ static int prof_group_data[] = {
                                  PGRP_MISC, //PROF_BUSINESS,
                                  PGRP_MISC, //PROF_COMMERCE,
                                  PGRP_STONEWORKER, //PROF_MINER,
-				 PGRP_FERMENTER, //PROF_BREWER,
+                 PGRP_FERMENTER, //PROF_BREWER,
                                  PGRP_COMBAT, //PROF_COMBATANT,
                                  PGRP_LEATHERWORKER, //PROF_TANNER,
                                  PGRP_WOODWORKER, //PROF_MILLER,
@@ -65,18 +65,18 @@ static int prof_group_data[] = {
                                  PGRP_STONEWORKER, //PROF_MASON,
                                  PGRP_STONEWORKER, //PROF_MIRRORMAKER,
                                  PGRP_STONEWORKER, //PROF_CONTRACTOR,
-				 PGRP_ARTIST, // PROF_ARTISAN,
-				 PGRP_GLASSWORKER, //PROF_GLASSWORK,
-				 PGRP_METALWORKER, //PROF_METALWORK,
-				 PGRP_STONEWORKER, // PROF_STONEWORK,
-				 PGRP_TEXTILEWORKER, // PROF_TEXTILEWORK,
-				 PGRP_WOODWORKER, // PROF_WOODWORK,
+                 PGRP_ARTIST, // PROF_ARTISAN,
+                 PGRP_GLASSWORKER, //PROF_GLASSWORK,
+                 PGRP_METALWORKER, //PROF_METALWORK,
+                 PGRP_STONEWORKER, // PROF_STONEWORK,
+                 PGRP_TEXTILEWORKER, // PROF_TEXTILEWORK,
+                 PGRP_WOODWORKER, // PROF_WOODWORK,
                                  PGRP_MISC, //PROF_PALADIN,
-               			 PGRP_MISC, //PROF_JEDI,
-				 PGRP_MISC, //PROF_BRAVO,
-				 PGRP_MISC, //PROF_SPACEPILOT,
-	                         PGRP_AFFLICTION, //PROF_AFFLICATION_VAMPIRE,
-				 PGRP_AFFLICTION //PROF_AFFLICTION_WEREWOLF
+                            PGRP_MISC, //PROF_JEDI,
+                 PGRP_MISC, //PROF_BRAVO,
+                 PGRP_MISC, //PROF_SPACEPILOT,
+                             PGRP_AFFLICTION, //PROF_AFFLICATION_VAMPIRE,
+                 PGRP_AFFLICTION //PROF_AFFLICTION_WEREWOLF
                                };
 
 const char * prof_name(int pro)

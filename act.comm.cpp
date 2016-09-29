@@ -492,23 +492,23 @@ ACMD(do_say) {
                 if (GET_RACE(ch) == GET_RACE(people))
                     perform_act(buf4, ch, NULL, NULL, people);
                 else {
-		if (GET_RACE(ch) == RACE_CENTAUR)
-		  perform_act("$n communicates in a series of neighs and whinnies.", ch, NULL, NULL, people);
+        if (GET_RACE(ch) == RACE_CENTAUR)
+          perform_act("$n communicates in a series of neighs and whinnies.", ch, NULL, NULL, people);
                 else if (GET_RACE(ch) == RACE_ELF)
                  perform_act("$n chimes in with a sing-song statement in an ancient language.", ch, NULL, NULL, people);
-		else if (GET_RACE(ch) == RACE_DWARF)
+        else if (GET_RACE(ch) == RACE_DWARF)
                  perform_act("$n grunts a bunch of gutteral noises which make no sense to you.", ch, NULL, NULL, people);
-		else if (GET_RACE(ch) == RACE_GRINGO)
-		 perform_act(buf4, ch, NULL, NULL, people);
-		else if (GET_RACE(ch) == RACE_INDIAN)
-		perform_act("$n sings hymns to the sky and uses ancient hand signals.", ch, NULL, NULL, people);
-		else if ( GET_RACE(ch) == RACE_SPACE_WOLF)
+        else if (GET_RACE(ch) == RACE_GRINGO)
+         perform_act(buf4, ch, NULL, NULL, people);
+        else if (GET_RACE(ch) == RACE_INDIAN)
+        perform_act("$n sings hymns to the sky and uses ancient hand signals.", ch, NULL, NULL, people);
+        else if ( GET_RACE(ch) == RACE_SPACE_WOLF)
                 perform_act("$n barks loudly.", ch, NULL, NULL, people);
-		else if ( GET_RACE(ch) == RACE_MARTIAN)
+        else if ( GET_RACE(ch) == RACE_MARTIAN)
                 perform_act("$n's antennas begin to glow brightly.", ch, NULL, NULL, people);
-		else if ( GET_RACE(ch) == RACE_FAUN)
+        else if ( GET_RACE(ch) == RACE_FAUN)
                 perform_act("$n whistles a flute-like tune.", ch, NULL, NULL, people);
-		else 
+        else
                 perform_act("$n chitters in a language that you can't quite understand.", ch, NULL, NULL, people);
                 }
             }
@@ -1023,12 +1023,12 @@ ACMD(do_comm) {
     int i = 0;
     skip_spaces(&argument);
 
-    if (is_abbrev(argument, "wiznet") 
-	&& (!PLR_FLAGGED (ch, PLR_IMM_MORT) && GET_LEVEL(ch) < LVL_HERO))
-	{
-	ch->Send("Sorry, but you are not immortal enough!");
-	return;
-	}
+    if (is_abbrev(argument, "wiznet")
+    && (!PLR_FLAGGED (ch, PLR_IMM_MORT) && GET_LEVEL(ch) < LVL_HERO))
+    {
+    ch->Send("Sorry, but you are not immortal enough!");
+    return;
+    }
 
     if (IS_NPC(ch)) {
         ch->Send( "Not mobs sorry!");
@@ -1289,7 +1289,7 @@ ACMD(do_gen_comm) {
         if (PRF_FLAGGED(ch, PRF_NOREPEAT))
             ch->Send( "%s", CONFIG_OK);
         else
-	    snprintf(buf, sizeof(buf), "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], colour_on, argument, CCNRM(ch, C_CMP));
+        snprintf(buf, sizeof(buf), "%s%sYou %s%s{c0%s, '%s'%s\r\n", COLOUR_LEV(ch) >= C_CMP ? colour_on : "", PRF_FLAGGED(ch, PRF_RP) ? "[RP] " : "", subcmd == SCMD_OOC ? "{cL" : "", com_msgs[subcmd][1], colour_on, argument, CCNRM(ch, C_CMP));
             ch->Send("%s", buf);
 
         if (!PLR_FLAGGED(ch, PLR_COVENTRY)) {
@@ -1330,8 +1330,8 @@ ACMD(do_gen_comm) {
                 continue;
 
             if (COLOUR_LEV(i->character) >= C_NRM)
-	      i->Output("%s",colour_on);
-	    i->character->Send(buf, (!CAN_SEE(i->character, ch) ?  "Someone" :  hidden_name(ch)), argument);
+          i->Output("%s",colour_on);
+        i->character->Send(buf, (!CAN_SEE(i->character, ch) ?  "Someone" :  hidden_name(ch)), argument);
             if (COLOUR_LEV(i->character) >= C_NRM)
                 i->Output(KNRM);
         }
@@ -1405,7 +1405,7 @@ ACMD(do_ctell) {
     Descriptor *i;
     int minlev = 1, c = 0;
     char level_string[128] = "";
-	char clan_name[MAX_STRING_LENGTH];
+    char clan_name[MAX_STRING_LENGTH];
 
     skip_spaces(&argument);
     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))

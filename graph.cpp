@@ -49,14 +49,14 @@ int Graph::VALID_EDGE(room_rnum x, int y,bool honour_notrack) {
 }
 
 void Graph::bfs_enqueue(room_rnum room, int dir) {
-	struct bfs_queue_struct *curr = new bfs_queue_struct(room, dir);
+    struct bfs_queue_struct *curr = new bfs_queue_struct(room, dir);
 
     if (queue_tail) {
         queue_tail->next = curr;
         queue_tail = curr;
     } else
         queue_head = queue_tail = curr;
-    
+
 }
 
 
@@ -72,12 +72,12 @@ void Graph::bfs_dequeue(void) {
 
 
 void Graph::bfs_clear_queue(void) {
-	/*std::list <bfs_queue_struct *>::iterator it;
-	for (it = bfs_queue.begin();it != bfs_queue.end();it++) {
-		delete (*it);
-		*it = NULL;
-	}
-	bfs_queue.clear();*/
+    /*std::list <bfs_queue_struct *>::iterator it;
+    for (it = bfs_queue.begin();it != bfs_queue.end();it++) {
+        delete (*it);
+        *it = NULL;
+    }
+    bfs_queue.clear();*/
     while (queue_head)
        bfs_dequeue();
 }
@@ -92,8 +92,8 @@ void Graph::bfs_clear_queue(void) {
  */
 int Graph::find_first_step(room_rnum src, room_rnum target,bool honour_notrack) {
     int curr_dir;
-    if (!src || !target) {	    
-	    return (BFS_ERROR);
+    if (!src || !target) {
+        return (BFS_ERROR);
     }
 
     if (src->number < 0 || src->number > top_of_world || target->number < 0
@@ -104,7 +104,7 @@ int Graph::find_first_step(room_rnum src, room_rnum target,bool honour_notrack) 
     if (src == target)
         return (BFS_ALREADY_THERE);
 
-    /* clear marks first, some OLC systems will save the mark. */ 
+    /* clear marks first, some OLC systems will save the mark. */
     for (int curr_room = 0; curr_room <= top_of_world; curr_room++)
         if (world_vnum[curr_room])
     UNMARK(world_vnum[curr_room]);
@@ -229,22 +229,22 @@ void hunt_victim(Character *ch) {
         return;
     }
     if ( IN_ROOM ( ch ) && ((dir = graph.find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)),false)) < 0 || dir > 5 ||
-	ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB))) {
+    ROOM_FLAGGED(IN_ROOM(ch)->dir_option[dir]->to_room, ROOM_NOMOB))) {
         if (dir != BFS_ALREADY_THERE) {
-	    if (!IS_SET(INTERNAL_FLAGS(ch), INT_LOSTPREY)) {
+        if (!IS_SET(INTERNAL_FLAGS(ch), INT_LOSTPREY)) {
                 snprintf(tbuf, sizeof(tbuf), "Damn! I lost %s!", HMHR(HUNTING(ch)));
                 do_say(ch, tbuf, 0, 0);
-	        //now that the world knows that, we don't have to repeat it all the time.
-		//Continue hunting though.
-	        SET_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
-	    }
+            //now that the world knows that, we don't have to repeat it all the time.
+        //Continue hunting though.
+            SET_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
+        }
         } else {
             HUNTING(ch) = NULL;
             remove_hunter(ch);
         }
     } else {
         if (IN_ROOM(ch) && HUNTING(ch) && IN_ROOM(HUNTING(ch)) && IN_ROOM(HUNTING(ch))->zone == IN_ROOM(ch)->zone) {
-	    REMOVE_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
+        REMOVE_BIT(INTERNAL_FLAGS(ch), INT_LOSTPREY);
             switch (number(0, 20)) {
             case 0:
                 HUNTING(ch)->Send("You sense something nearby, coming for you.\r\n");

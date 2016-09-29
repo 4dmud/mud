@@ -30,13 +30,13 @@ void start_fighting_delay(Character *vict, Character *ch);
 #define IS_SKILL(tt) (((tt) >= 0) && ((tt) < MAX_SKILLS) && (spell_info[tt].type == 2))
 #define IS_SUBSKILL(type) (((type) > TYPE_SUFFERING) && ((type) < (TOP_SUB_DEFINE + TYPE_SUFFERING)))
 #define IS_OTHERDAM(type) (((type) == TYPE_SUFFERING) || (((type) >= SPELL_BURN) && ((type) <= SPELL_ACID)) \
-			|| (((type)>= TYPE_UNDERWATER) && ((type) <= TYPE_DESERT)))
+            || (((type)>= TYPE_UNDERWATER) && ((type) <= TYPE_DESERT)))
 
 
 
 #define IS_TOP_CENTER(pos)  ((pos) == WEAR_NECK_1 ||(pos) == WEAR_NECK_2 ||(pos) == WEAR_HEAD || (pos) == WEAR_FACE \
                           || (pos) == WEAR_EYES || (pos) == WEAR_EAR_R ||(pos) == WEAR_EAR_L || (pos) == WEAR_HORNS || \
-			  (pos) == WEAR_ANTENNA )
+              (pos) == WEAR_ANTENNA )
 
 #define IS_TOP_LEFT(pos)    ((pos) == WEAR_FINGER_L  || (pos) == WEAR_HANDS ||(pos) == WEAR_ARMS \
                           || (pos) == WEAR_SHIELD  ||(pos) == WEAR_WRIST_L ||(pos) == WEAR_ABOUT)

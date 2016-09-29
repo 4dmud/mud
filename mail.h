@@ -72,7 +72,7 @@ struct header_data_type {
 
 /* size of the data part of a header block */
 #define HEADER_BLOCK_DATASIZE \
-	(BLOCK_SIZE - sizeof(long) - sizeof(struct header_data_type) - sizeof(char))
+    (BLOCK_SIZE - sizeof(long) - sizeof(struct header_data_type) - sizeof(char))
 
 /* size of the data part of a data block */
 #define DATA_BLOCK_DATASIZE (BLOCK_SIZE - sizeof(long) - sizeof(char))
@@ -88,7 +88,7 @@ struct header_block_type_d {
 
 struct data_block_type_d {
     long block_type;		/* -1 if header block, -2 if last data block
-				   in mail, otherwise a link to the next */
+                   in mail, otherwise a link to the next */
     char txt[DATA_BLOCK_DATASIZE + 1];	/* actual text plus 1 for null      */
 };
 

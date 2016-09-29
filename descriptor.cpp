@@ -89,57 +89,57 @@ size_t Descriptor::Output(const char *txt, ...) {
 
 bool skip_char ( char c )
 {
-	return !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '\r' || c == '\n' );
+    return !( ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c >= '0' && c <= '9' ) || c == '\r' || c == '\n' );
 }
 
 void filter_ascii_art ( string& stxt )
 {
-	size_t i = 0,p;
+    size_t i = 0,p;
 
-	/*
-	 * Ascii art: at least 6 consecutive non-alphanumeric characters
-	 * Removing 5 causes a problem with MXP
-	 * Only remove spaces if they're not leading or trailing
-	 * Don't filter communication
+    /*
+     * Ascii art: at least 6 consecutive non-alphanumeric characters
+     * Removing 5 causes a problem with MXP
+     * Only remove spaces if they're not leading or trailing
+     * Don't filter communication
      */
 
-	vector<string> comm { "auction", "congrat", "gossip", "holler", "newbie", "ooc", "say", "shout", "tell", "whisper", "wiznet" };
-	bool filter = TRUE;
-	for ( const auto &s : comm )
-		if ( stxt.find ( s ) != string::npos )
-		{
-			filter = FALSE;
-			break;
-		}
-	if ( !filter )
-		return;
+    vector<string> comm { "auction", "congrat", "gossip", "holler", "newbie", "ooc", "say", "shout", "tell", "whisper", "wiznet" };
+    bool filter = TRUE;
+    for ( const auto &s : comm )
+        if ( stxt.find ( s ) != string::npos )
+        {
+            filter = FALSE;
+            break;
+        }
+    if ( !filter )
+        return;
 
-	while ( i < stxt.length() )
-	{
-		if ( skip_char ( stxt[i] ) && stxt[i] != ' ' )
-		{
-			p = i + 1;
-			while ( p < stxt.length() && skip_char ( stxt[p] ) )
-				p++;
+    while ( i < stxt.length() )
+    {
+        if ( skip_char ( stxt[i] ) && stxt[i] != ' ' )
+        {
+            p = i + 1;
+            while ( p < stxt.length() && skip_char ( stxt[p] ) )
+                p++;
 
-			// keep color codes intact
-			if ( stxt[p - 1] == '{' && p < stxt.length() && stxt[p] == 'c' )
-				p--;
+            // keep color codes intact
+            if ( stxt[p - 1] == '{' && p < stxt.length() && stxt[p] == 'c' )
+                p--;
 
-			while ( p > i && stxt[p - 1] == ' ' )
-				p--;
+            while ( p > i && stxt[p - 1] == ' ' )
+                p--;
 
-			if ( p - i >= 6 )
-				stxt.erase ( i, p - i );
-			else
-			{
-				if ( i == p )
-					i++;
-				else i = p;
-			}
-		}
-		else i++;
-	}
+            if ( p - i >= 6 )
+                stxt.erase ( i, p - i );
+            else
+            {
+                if ( i == p )
+                    i++;
+                else i = p;
+            }
+        }
+        else i++;
+    }
 }
 
 /* Add a new string to a player's output queue. */
@@ -179,17 +179,17 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
 
     /** too big for buffer! Overflow! lets reallocate! - Mord **/
     while (size == -1 || size >= (int)len) {
-	args=args_bak;
+    args=args_bak;
         // Try a bigger size
-	if(size >= (int)len){
-		txt = (char *)realloc(txt, size+1);
-		len = size+1;
-	}
-	//backwards compatibility. vsnprintf doesn't return -1 in C99
-	else {
-	        len *= 2;
-	        txt = (char *)realloc(txt, len);
-	}
+    if(size >= (int)len){
+        txt = (char *)realloc(txt, size+1);
+        len = size+1;
+    }
+    //backwards compatibility. vsnprintf doesn't return -1 in C99
+    else {
+            len *= 2;
+            txt = (char *)realloc(txt, len);
+    }
         //strlcpy(tmp, txt, len);
         //free( txt );
         //txt = tmp;
@@ -241,8 +241,8 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
     }
 #endif
 
-	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
-		filter_ascii_art ( stxt );
+    if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+        filter_ascii_art ( stxt );
 
     /*
      * If we have enough space, just write to buffer and that's it! If the
@@ -250,10 +250,10 @@ size_t Descriptor::vwrite_to_output(const char *format, va_list args) {
      */
     //  if (bufspace > size) {
     //output += string(cstring(stxt).c_str());
-	if ( character && !PRF_FLAGGED ( character, PRF_SHOW_COLOUR_CODE ) )
-	    output += cstring(stxt).c_str();
-	else
-		output += stxt;
+    if ( character && !PRF_FLAGGED ( character, PRF_SHOW_COLOUR_CODE ) )
+        output += cstring(stxt).c_str();
+    else
+        output += stxt;
     //  strcpy(output + bufptr, txt); /* strcpy: OK (size checked above) */
     //bufspace -= size;
     //     bufptr += size;
@@ -407,7 +407,7 @@ Descriptor::~Descriptor() {
             this->str = NULL;
         } else if (this->backstr && !IS_NPC(this->character) && !PLR_FLAGGED(this->character, PLR_WRITING)) {
                  /* editing description ... not olc */
-                 
+
             free(this->backstr);
             this->backstr = NULL;
         }
@@ -573,8 +573,8 @@ size_t Descriptor::Output(string &i) {
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
     }
 
-	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
-		filter_ascii_art ( stxt );
+    if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+        filter_ascii_art ( stxt );
 
     output += cstring(stxt).c_str();
     return output.size();
@@ -595,8 +595,8 @@ size_t Descriptor::Output(string *i) {
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
     }
 
-	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
-		filter_ascii_art ( stxt );
+    if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+        filter_ascii_art ( stxt );
 
     output += cstring(stxt).c_str();
     return output.size();
@@ -617,11 +617,11 @@ size_t Descriptor::Output(stringstream &i) {
         stxt = wordwrap(stxt.c_str(), PAGEWIDTH(character), wraplen); //size checked above
     }
 
-	if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
-		filter_ascii_art ( stxt );
+    if ( character && PRF_FLAGGED ( character, PRF_NOGRAPHICS ) )
+        filter_ascii_art ( stxt );
 
     output += cstring(stxt).c_str();
     return output.size();
-  
+
 }
 

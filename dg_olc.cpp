@@ -34,7 +34,7 @@ void trigedit_string_cleanup(Descriptor *d, int terminator);
 int format_script(Descriptor *d);
 
 /* ***********************************************************************
- * trigedit 
+ * trigedit
  * ***********************************************************************/
 
 ACMD(do_oasis_trigedit) {
@@ -53,7 +53,7 @@ ACMD(do_oasis_trigedit) {
     number = atoi(argument);
 
     /*
-     * Check that it isn't already being edited. 
+     * Check that it isn't already being edited.
      */
     for (d = descriptor_list; d; d = d->next) {
         if (STATE(d) == CON_TRIGEDIT) {
@@ -99,7 +99,7 @@ ACMD(do_oasis_trigedit) {
     OLC_NUM(d) = number;
 
     /*
-     *  If this is a new trigger, setup a new one, 
+     *  If this is a new trigger, setup a new one,
      *  otherwise, setup the a copy of the existing trigger
      */
     if ((real_num = real_trigger(number)) == NOTHING)
@@ -218,7 +218,7 @@ void trigedit_disp_menu(Descriptor *d) {
 
     clear_screen(d);
 
-	d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
+    d->Output ( "{cyDon't forget to turn colourcode on when you're going to copy-paste.{c0\r\n\r\n" );
     d->Output(
         "Trigger Editor [%s%d%s]\r\n\r\n"
         "%s1)%s Name         : %s%s\r\n"
@@ -410,7 +410,7 @@ void trigedit_save(Descriptor *d) {
     trig_data *live_trig;
     struct cmdlist_element *cmd, *next_cmd;
     struct index_data **new_index;
-    
+
     Descriptor *dsc;
     FILE *trig_file;
     int zone;
@@ -731,18 +731,18 @@ int dg_script_edit_parse(Descriptor *d, char *arg) {
             /* this was buggy.
                First we created a copy of a thing, but maintained pointers to scripts,
                then if we altered the scripts, we freed the pointers and added new ones
-               to the OLC_THING. If we then chose _NOT_ to save the changes, the 
+               to the OLC_THING. If we then chose _NOT_ to save the changes, the
                pointers in the original thing pointed to garbage. If we saved changes
                the pointers were updated correctly.
-               
+
                Solution:
                Here we just point the working copies to the new proto_scripts
                We only update the original when choosing to save internally,
                then free the unused memory there.
 
                Welcor
-                 
-               Thanks to 
+
+               Thanks to
                Jeremy Stanley - fungi@yuggoth.org and
                Torgny Bjers - artovil@arcanerealms.org
                for the bug report.
@@ -753,7 +753,7 @@ int dg_script_edit_parse(Descriptor *d, char *arg) {
                OLC_OBJ(d), etc.. are initalized with proto_script = NULL;
                On save, the saved copy is updated with OLC_SCRIPT(d) as new proto_script (freeing the old one).
                On quit/nosave, OLC_SCRIPT is free()'d, and the prototype not touched.
-               
+
             */
             return 0;
         case 'n':

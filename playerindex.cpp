@@ -246,7 +246,7 @@ long PlayerIndex::TableIndexByName(const char *name) {
     string s;
     ss << "Name " << name << " not found in player index.";
     s = ss.str();
-    throw MudException(s);   
+    throw MudException(s);
 }
 
 long PlayerIndex::TableIndexById(long &id) {
@@ -391,7 +391,7 @@ int PlayerIndex::create_entry(const char *name) {
     } else {
         try {
             pos = TableIndexByName(name);
-	} catch (MudException &e) {  /* new name */
+    } catch (MudException &e) {  /* new name */
             pos = top_of_p_table;
             new_entry = TRUE;
         }

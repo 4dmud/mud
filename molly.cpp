@@ -54,7 +54,7 @@ ACMD(do_smell)
     act ( "$n leans in close and takes a deep breath..", FALSE, ch, 0, found_char, TO_VICT );
     act ( "$n smells $N.", FALSE, ch, 0, found_char, TO_NOTVICT );
   }
-  
+
   else ch->Send ( "You do not see that here.\r\n" );
 
 }
@@ -223,7 +223,7 @@ ACMD(do_climb)
 
   if (GET_CLASS(ch) == CLASS_THIEF)
     chance = 75;
-  
+
   chance += GET_DEX(ch);
 
   one_argument(argument, buf);
@@ -284,7 +284,7 @@ ACMD(do_descend)
 
   if (GET_CLASS(ch) == CLASS_THIEF)
     chance = 75;
-  
+
   chance += GET_DEX(ch);
 
   one_argument(argument, buf);

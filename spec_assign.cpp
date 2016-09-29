@@ -77,9 +77,9 @@ void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname));
 void ASSIGNMOB(mob_vnum mob, SPECIAL(fname))
 {
     if (MobIndexExists(mob))
-	mob_index[mob]->func = fname;
+    mob_index[mob]->func = fname;
     else if (!mini_mud)
-	log("SYSERR: Attempt to assign spec to non-existant mob #%d", mob);
+    log("SYSERR: Attempt to assign spec to non-existant mob #%d", mob);
 }
 
 void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname))
@@ -87,17 +87,17 @@ void ASSIGNOBJ(obj_vnum obj, SPECIAL(fname))
     obj_rnum rnum;
 
     if ((rnum = real_object(obj)) >= 0)
-	obj_index[rnum].func = fname;
+    obj_index[rnum].func = fname;
     else if (!mini_mud)
-	log("SYSERR: Attempt to assign spec to non-existant obj #%d", obj);
+    log("SYSERR: Attempt to assign spec to non-existant obj #%d", obj);
 }
 
 void ASSIGNROOM(room_vnum room, SPECIAL(fname))
 {
     if ( real_room ( room ) )
-		world_vnum[room]->func = fname;
+        world_vnum[room]->func = fname;
     else if (!mini_mud)
-		log("SYSERR: Attempt to assign spec to non-existant room #%d", room);
+        log("SYSERR: Attempt to assign spec to non-existant room #%d", room);
 }
 
 
@@ -132,13 +132,13 @@ void assign_mobiles(void)
     ASSIGNMOB(2938, cleric);	// new clan
     ASSIGNMOB(3047, cleric);	// olde yorke
     ASSIGNMOB(3051, cleric);	// cardinal
-    ASSIGNMOB(3644, cleric);	// tournament place 
+    ASSIGNMOB(3644, cleric);	// tournament place
     ASSIGNMOB(6132, cleric);	// sherwood
-    ASSIGNMOB(6736, cleric);	// prairie 
+    ASSIGNMOB(6736, cleric);	// prairie
     ASSIGNMOB(6867, cleric);	// tombstone
     ASSIGNMOB(7723, cleric);
     ASSIGNMOB(8136, cleric);	// seshet priest
-    ASSIGNMOB(9202, cleric);	// robber baron II 
+    ASSIGNMOB(9202, cleric);	// robber baron II
     ASSIGNMOB(9410, cleric);	// chaos hq
     ASSIGNMOB(10002, cleric);
     ASSIGNMOB(10400, cleric);
@@ -156,7 +156,7 @@ void assign_mobiles(void)
     ASSIGNMOB(1826, receptionist);
     ASSIGNMOB(1840, receptionist);
     ASSIGNMOB(1863, receptionist);
-    ASSIGNMOB(2176, receptionist);	// Crete 
+    ASSIGNMOB(2176, receptionist);	// Crete
     ASSIGNMOB(2320, receptionist);	// Green Fen
     ASSIGNMOB(2321, receptionist);	// Green Fen
     ASSIGNMOB(2330, receptionist);	// Green Fen
@@ -343,7 +343,7 @@ void assign_objects(void)
     ASSIGNOBJ(10233, gen_board);
     ASSIGNOBJ(26708, gen_board);	/* board for the gladiator school */
     ASSIGNOBJ(28799, gen_board);	// Vampire elder board
-    
+
 #endif
 
     ASSIGNOBJ(216, bottle);
@@ -429,7 +429,7 @@ void assign_rooms(void)
     ASSIGNROOM(62667, dump);
 
     if (CONFIG_DTS_ARE_DUMPS)
-	for (i = 0; i <= top_of_world; i++)
-	    if (world_vnum[i] && ROOM_FLAGGED(world_vnum[i], ROOM_DEATH))
-		world_vnum[i]->func = dump;
+    for (i = 0; i <= top_of_world; i++)
+        if (world_vnum[i] && ROOM_FLAGGED(world_vnum[i], ROOM_DEATH))
+        world_vnum[i]->func = dump;
 }

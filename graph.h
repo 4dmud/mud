@@ -19,37 +19,37 @@
 #define IS_CLOSED(x, y) (EXIT_FLAGGED((x)->dir_option[(y)], EX_CLOSED))
 
 class Graph {
-	public:
+    public:
 
-		/* Local functions */
-		int VALID_EDGE(room_rnum x, int y,bool honour_notrack);
-		void bfs_enqueue(room_rnum room, int dir);
-		void bfs_dequeue(void);
-		void bfs_clear_queue(void);
-		int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
+        /* Local functions */
+        int VALID_EDGE(room_rnum x, int y,bool honour_notrack);
+        void bfs_enqueue(room_rnum room, int dir);
+        void bfs_dequeue(void);
+        void bfs_clear_queue(void);
+        int find_first_step(room_rnum src, room_rnum target,bool honour_notrack=false);
 
-		Graph() {
-			queue_head = NULL;
-			queue_tail = NULL;
+        Graph() {
+            queue_head = NULL;
+            queue_tail = NULL;
 
-		}
-		~Graph() {
-			bfs_clear_queue();
-		}
+        }
+        ~Graph() {
+            bfs_clear_queue();
+        }
 
-	private:
+    private:
 vector <room_vnum> tracked;
 
 struct bfs_queue_struct {
-	room_rnum room;
-	char dir;
-	bfs_queue_struct *next;
+    room_rnum room;
+    char dir;
+    bfs_queue_struct *next;
 
-	bfs_queue_struct(room_rnum r, char d) {
-		room = r;
-		dir = d;
-		next = NULL;
-	}
+    bfs_queue_struct(room_rnum r, char d) {
+        room = r;
+        dir = d;
+        next = NULL;
+    }
 };
 //std::list <bfs_queue_struct *> bfs_queue;
 //std::list <bfs_queue_struct *>::iterator qit;

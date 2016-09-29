@@ -46,7 +46,7 @@ olc_scmd_info[] = {
                     { "action",   CON_AEDIT },
                     { "trigger",  CON_TRIGEDIT },
                     { "help", CON_HEDIT},
-		    { "vehicle", CON_VEDIT },
+            { "vehicle", CON_VEDIT },
                     { "\n",	-1	  }
                   };
 
@@ -71,7 +71,7 @@ void clear_screen(Descriptor *d)
 /*
  * Exported ACMD do_oasis function.
  *
- * This function is the OLC interface.  It deals with all the 
+ * This function is the OLC interface.  It deals with all the
  * generic OLC stuff, then passes control to the sub-olc sections.
  *
  * UPDATE:
@@ -92,11 +92,11 @@ ACMD(do_oasis)
   /*
    * Prevent forcing people in OLC to edit other stuff.
    * 'force' just lets command_interpreter() handle the input,
-   * regardless of the state of the victim. 
-   * This can wreck havoc if people are i OLC already 
+   * regardless of the state of the victim.
+   * This can wreck havoc if people are i OLC already
    * - ie. their input should have been redirected by nanny(), and
    * never get to command_interpreter().
-   * -- Welcor 09/03 
+   * -- Welcor 09/03
    * - thanks to Mark Garringer (zizazat@hotmail.com) for the bug report.
    */
   if (STATE(ch->desc) != CON_PLAYING)
@@ -174,12 +174,12 @@ ACMD(do_oasis)
 }
 
 /*------------------------------------------------------------*\
- Exported utilities 
+ Exported utilities
 \*------------------------------------------------------------*/
 
 /*
  * Set the colour string pointers for that which this char will
- * see at color level NRM.  Changing the entries here will change 
+ * see at color level NRM.  Changing the entries here will change
  * the colour scheme throughout the OLC.
  */
 void get_char_colours(Character *ch)
@@ -229,7 +229,7 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
       break;
     }
   }
-  
+
   if (OLC_VEHICLE(d)!=NULL) {
   free(OLC_VEHICLE(d));
   OLC_VEHICLE(d) = NULL;

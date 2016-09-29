@@ -140,7 +140,7 @@ void auction_update(void)
       do_gen_comm(mob, buf2, 0, SCMD_AUCTION);
 
     /* Make sure object exists */
-    
+
     if ((auction->obj = check_obj(auction->seller, auction->obj_uid))) {
       if (auction->bidder->Gold(0, GOLD_HAND) < auction->bid) {
         act("You cannot afford to buy the $p from $N. Auction Canceled.", FALSE, auction->seller, auction->obj, auction->bidder, TO_CHAR);
@@ -162,7 +162,7 @@ void auction_update(void)
          FALSE, auction->seller, auction->obj, auction->bidder,
          TO_NOTVICT);
       else {
-	// Changing the wording of the message to make more sense (from - to) --> Prom
+    // Changing the wording of the message to make more sense (from - to) --> Prom
         act("A small daemon pops in, takes $p and gives some gold to $n, and leaves.",
          FALSE, auction->seller, auction->obj, auction->bidder,
          TO_ROOM);
@@ -190,7 +190,7 @@ ACMD(do_bid)
     ch->Send( "Nothing has been auctioned!\r\n");
     return;
   }
-  
+
   two_arguments(argument, buf, buf1);
   bid = atoi(buf);
   if (*buf1) {
@@ -285,8 +285,8 @@ ACMD(do_auction)
 
   two_arguments(argument, buf1, buf2);
   if(GET_RACE(ch) == RACE_GLADIATOR) {
-	  ch->Send( "You have no time to auction, you must fight!\r\n" );
-	  return;
+      ch->Send( "You have no time to auction, you must fight!\r\n" );
+      return;
   }
 
   if (!*buf1) {
@@ -374,7 +374,7 @@ void auction_forfeit(Character *mob)
     FALSE, auction->seller, auction->obj, 0, TO_ROOM);
   // New code from Fizban changed by Prometheus
   if (GET_GOLD(auction->seller) >= auction->bid)
-	  GET_GOLD(auction->seller) -= auction->bid;
+      GET_GOLD(auction->seller) -= auction->bid;
   else
       GET_GOLD(auction->seller) = 0;
   auction_reset();

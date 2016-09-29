@@ -187,7 +187,7 @@ int find_context_trigedit(Descriptor *d)
 {
   switch (OLC_MODE(d)) {
     case TRIGEDIT_MAIN_MENU:         return CONTEXT_TRIGEDIT_MAIN_MENU;
-    case TRIGEDIT_TRIGTYPE:          return CONTEXT_TRIGEDIT_TRIGTYPE; 
+    case TRIGEDIT_TRIGTYPE:          return CONTEXT_TRIGEDIT_TRIGTYPE;
     case TRIGEDIT_CONFIRM_SAVESTRING:return CONTEXT_TRIGEDIT_CONFIRM_SAVESTRING;
     case TRIGEDIT_NAME:              return CONTEXT_TRIGEDIT_NAME;
     case TRIGEDIT_INTENDED:          return CONTEXT_TRIGEDIT_INTENDED;
@@ -202,9 +202,9 @@ int find_context_trigedit(Descriptor *d)
 int find_context_script_edit(Descriptor *d)
 {
   switch (OLC_SCRIPT_EDIT_MODE(d)) {
-    case SCRIPT_MAIN_MENU:  return CONTEXT_SCRIPT_MAIN_MENU;	
+    case SCRIPT_MAIN_MENU:  return CONTEXT_SCRIPT_MAIN_MENU;
     case SCRIPT_NEW_TRIGGER:return CONTEXT_SCRIPT_NEW_TRIGGER;
-    case SCRIPT_DEL_TRIGGER:return CONTEXT_SCRIPT_DEL_TRIGGER;     
+    case SCRIPT_DEL_TRIGGER:return CONTEXT_SCRIPT_DEL_TRIGGER;
     default:                return NOTHING;
   }
 }
@@ -250,8 +250,8 @@ void boot_context_help(void) {
   /* init to 'no help' string */
   for (i=0;i < NUM_CONTEXTS;i++)
       context_help_list[i] = NO_HELP;
-  
-  if (!fl) { 
+
+  if (!fl) {
     log("No context help found : %s", strerror(errno));
     return;
   }
@@ -260,7 +260,7 @@ void boot_context_help(void) {
       if ((context_help_list[num] = fread_string(fl, "Context sensitive help")) == NULL)
         context_help_list[num] = strdup("Undefined");
   }
-  
+
   fclose(fl);
 }
 

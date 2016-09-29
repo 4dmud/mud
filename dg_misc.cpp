@@ -40,163 +40,163 @@ void die ( Character *ch, Character * killer );
 void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
                   int type, char *cmd )
 {
-	Character *caster = NULL;
-	Character *tch = NULL;
-	struct obj_data *tobj = NULL;
-	Room *caster_room = NULL;
-	char *s, *t;
-	int spellnum, target = 0;
-	char buf2[MAX_INPUT_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
+    Character *caster = NULL;
+    Character *tch = NULL;
+    struct obj_data *tobj = NULL;
+    Room *caster_room = NULL;
+    char *s, *t;
+    int spellnum, target = 0;
+    char buf2[MAX_INPUT_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
 
-	/* need to get the caster or the room of the temporary caster */
-	switch ( type )
-	{
-		case MOB_TRIGGER:
-			caster = ( Character * ) go;
-			break;
-		case WLD_TRIGGER:
-			caster_room = ( Room * ) go;
-			break;
-		case OBJ_TRIGGER:
-			caster_room = dg_room_of_obj ( ( struct obj_data * ) go );
-			if ( !caster_room )
-			{
-				script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown room for object-caster! Line %d: %s",
-					GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-				return;
-			}
-			break;
-		default:
-			script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown trigger type! Line %d: %s",
-				GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-			return;
-	}
-	strcpy ( orig_cmd, cmd );
-	/* get: blank, spell name, target name */
-	s = strtok ( cmd, "'" );
-	if ( s == NULL )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name. Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-		return;
-	}
-	s = strtok ( NULL, "'" );
-	if ( s == NULL )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name in `'s. Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-		return;
-	}
-	t = strtok ( NULL, "\0" );
+    /* need to get the caster or the room of the temporary caster */
+    switch ( type )
+    {
+        case MOB_TRIGGER:
+            caster = ( Character * ) go;
+            break;
+        case WLD_TRIGGER:
+            caster_room = ( Room * ) go;
+            break;
+        case OBJ_TRIGGER:
+            caster_room = dg_room_of_obj ( ( struct obj_data * ) go );
+            if ( !caster_room )
+            {
+                script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown room for object-caster! Line %d: %s",
+                    GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                return;
+            }
+            break;
+        default:
+            script_log ( "Trigger: %s, VNum %d. dg_do_cast: unknown trigger type! Line %d: %s",
+                GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+            return;
+    }
+    strcpy ( orig_cmd, cmd );
+    /* get: blank, spell name, target name */
+    s = strtok ( cmd, "'" );
+    if ( s == NULL )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name. Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+        return;
+    }
+    s = strtok ( NULL, "'" );
+    if ( s == NULL )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_cast needs spell name in `'s. Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+        return;
+    }
+    t = strtok ( NULL, "\0" );
 
-	/* spellnum = search_block(s, spells, 0); */
-	spellnum = find_skill_num ( s );
-	if ( !IS_SPELL_CAST(spellnum) )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (Line %d: %s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
-		return;
-	}
+    /* spellnum = search_block(s, spells, 0); */
+    spellnum = find_skill_num ( s );
+    if ( !IS_SPELL_CAST(spellnum) )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_cast: invalid spell name (Line %d: %s)",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
+        return;
+    }
 
-	/* Find the target */
-	if ( t != NULL )
-	{
-		one_argument ( strcpy ( buf2, t ), t );
-		skip_spaces ( &t );
-	}
-	if ( IS_SET ( SINFO.targets, TAR_IGNORE ) )
-	{
-		target = TRUE;
-	}
-	else if ( t != NULL && *t )
-	{
-		if ( !target &&
-		        ( IS_SET ( SINFO.targets, TAR_CHAR_ROOM ) ||
-		          IS_SET ( SINFO.targets, TAR_CHAR_WORLD ) ) )
-		{
-			if ( ( tch = get_char ( t ) ) != NULL )
-				target = TRUE;
-		}
+    /* Find the target */
+    if ( t != NULL )
+    {
+        one_argument ( strcpy ( buf2, t ), t );
+        skip_spaces ( &t );
+    }
+    if ( IS_SET ( SINFO.targets, TAR_IGNORE ) )
+    {
+        target = TRUE;
+    }
+    else if ( t != NULL && *t )
+    {
+        if ( !target &&
+                ( IS_SET ( SINFO.targets, TAR_CHAR_ROOM ) ||
+                  IS_SET ( SINFO.targets, TAR_CHAR_WORLD ) ) )
+        {
+            if ( ( tch = get_char ( t ) ) != NULL )
+                target = TRUE;
+        }
 
-		if ( !target &&
-		        ( IS_SET ( SINFO.targets, TAR_OBJ_INV ) ||
-		          IS_SET ( SINFO.targets, TAR_OBJ_EQUIP ) ||
-		          IS_SET ( SINFO.targets, TAR_OBJ_ROOM ) ||
-		          IS_SET ( SINFO.targets, TAR_OBJ_WORLD ) ) )
-		{
-			if ( ( tobj = get_obj ( t ) ) != NULL )
-				target = TRUE;
-		}
+        if ( !target &&
+                ( IS_SET ( SINFO.targets, TAR_OBJ_INV ) ||
+                  IS_SET ( SINFO.targets, TAR_OBJ_EQUIP ) ||
+                  IS_SET ( SINFO.targets, TAR_OBJ_ROOM ) ||
+                  IS_SET ( SINFO.targets, TAR_OBJ_WORLD ) ) )
+        {
+            if ( ( tobj = get_obj ( t ) ) != NULL )
+                target = TRUE;
+        }
 
-		if ( !target )
-		{
-			script_log ( "Trigger: %s, VNum %d. dg_cast: target not found (Line %d: %s)",
-			             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
-			return;
-		}
-	}
+        if ( !target )
+        {
+            script_log ( "Trigger: %s, VNum %d. dg_cast: target not found (Line %d: %s)",
+                         GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
+            return;
+        }
+    }
 
-	if ( IS_SET ( SINFO.routines, MAG_GROUPS ) )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: group spells not permitted (Line %d: %s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
-		return;
-	}
-	if ( IS_SET ( SINFO.targets, TAR_AREA_DIR ) )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_cast: directional spells not permitted (Line %d: %s)",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
-		return;
-	}
+    if ( IS_SET ( SINFO.routines, MAG_GROUPS ) )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_cast: group spells not permitted (Line %d: %s)",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
+        return;
+    }
+    if ( IS_SET ( SINFO.targets, TAR_AREA_DIR ) )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_cast: directional spells not permitted (Line %d: %s)",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
+        return;
+    }
 
-	if ( !caster )
-	{
-		if ( type == OBJ_TRIGGER )
-		{
-			obj_data *obj = (obj_data *) go;
-			if ( obj->in_obj )
-				obj = obj->in_obj;
+    if ( !caster )
+    {
+        if ( type == OBJ_TRIGGER )
+        {
+            obj_data *obj = (obj_data *) go;
+            if ( obj->in_obj )
+                obj = obj->in_obj;
 
-			if ( obj->carried_by )
-			{
-				call_magic ( obj->carried_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
-				return;
-			}
-			if ( obj->worn_by )
-			{
-				call_magic ( obj->worn_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
-				return;
-			}
-		}
-		caster = read_mobile ( DG_CASTER_PROXY );
-		if ( !caster )
-		{
-			script_log ( "Trigger: %s, VNum %d. dg_cast: Cannot load the caster mob! (Line %d: %s)", 
-				GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
-			return;
-		}
-		caster->free_non_proto_strings();
-		/* set the caster's name to that of the object, or the gods.... */
-		if ( type==OBJ_TRIGGER )
-		{
-			caster->player.short_descr = strdup ( ( ( struct obj_data * ) go )->short_description );
-		}
-		else if ( type==WLD_TRIGGER )
-		{
-			caster->player.short_descr = strdup ( "The gods" );
-		}
-		char_to_room ( caster, caster_room );
-		/*
-		caster->next_in_room = caster_room->people;
-		caster_room->people = caster;
-		caster->in_room = real_room(caster_room->number);
-		*/
-		call_magic ( caster, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
-		caster->free_non_proto_strings();
-		extract_char ( caster );
-	}
-	else
-		call_magic ( caster, tch, tobj, ( char * ) "", spellnum, GET_LEVEL ( caster ), CAST_SPELL );
+            if ( obj->carried_by )
+            {
+                call_magic ( obj->carried_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
+                return;
+            }
+            if ( obj->worn_by )
+            {
+                call_magic ( obj->worn_by, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
+                return;
+            }
+        }
+        caster = read_mobile ( DG_CASTER_PROXY );
+        if ( !caster )
+        {
+            script_log ( "Trigger: %s, VNum %d. dg_cast: Cannot load the caster mob! (Line %d: %s)",
+                GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), orig_cmd );
+            return;
+        }
+        caster->free_non_proto_strings();
+        /* set the caster's name to that of the object, or the gods.... */
+        if ( type==OBJ_TRIGGER )
+        {
+            caster->player.short_descr = strdup ( ( ( struct obj_data * ) go )->short_description );
+        }
+        else if ( type==WLD_TRIGGER )
+        {
+            caster->player.short_descr = strdup ( "The gods" );
+        }
+        char_to_room ( caster, caster_room );
+        /*
+        caster->next_in_room = caster_room->people;
+        caster_room->people = caster;
+        caster->in_room = real_room(caster_room->number);
+        */
+        call_magic ( caster, tch, tobj, ( char * ) "", spellnum, DG_SPELL_LEVEL, CAST_SPELL );
+        caster->free_non_proto_strings();
+        extract_char ( caster );
+    }
+    else
+        call_magic ( caster, tch, tobj, ( char * ) "", spellnum, GET_LEVEL ( caster ), CAST_SPELL );
 }
 
 
@@ -210,101 +210,101 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
                     int script_type, char *cmd )
 {
-	Character *ch = NULL;
-	int value=0, duration=0;
-	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
-	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
-	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
-	int i=0, type=0;
-	struct affected_type af;
+    Character *ch = NULL;
+    int value=0, duration=0;
+    char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
+    char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
+    char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+    int i=0, type=0;
+    struct affected_type af;
 
 
-	half_chop ( cmd, junk, cmd );
-	half_chop ( cmd, charname, cmd );
-	half_chop ( cmd, property, cmd );
-	half_chop ( cmd, value_p, duration_p );
+    half_chop ( cmd, junk, cmd );
+    half_chop ( cmd, charname, cmd );
+    half_chop ( cmd, property, cmd );
+    half_chop ( cmd, value_p, duration_p );
 
-	/* make sure all parameters are present */
-	if ( !*charname || !*property || !*value_p || !*duration_p )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>. Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
+    /* make sure all parameters are present */
+    if ( !*charname || !*property || !*value_p || !*duration_p )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>. Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
 
-	value = atoi ( value_p );
-	duration = atoi ( duration_p );
-	if ( duration <= 0 )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: need positive duration! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
+    value = atoi ( value_p );
+    duration = atoi ( duration_p );
+    if ( duration <= 0 )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_affect: need positive duration! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
 
-	/* find the property -- first search apply_types */
-	i = 0;
-	while ( str_cmp ( apply_types[i], "\n" ) )
-	{
-		if ( !str_cmp ( apply_types[i], property ) )
-		{
-			type=APPLY_TYPE;
-			break;
-		}
-		i++;
-	}
+    /* find the property -- first search apply_types */
+    i = 0;
+    while ( str_cmp ( apply_types[i], "\n" ) )
+    {
+        if ( !str_cmp ( apply_types[i], property ) )
+        {
+            type=APPLY_TYPE;
+            break;
+        }
+        i++;
+    }
 
-	if ( !type ) /* search affect_types now */
-	{
-		i = 0;
-		while ( str_cmp ( affected_bits[i], "\n" ) )
-		{
-			if ( !str_cmp ( affected_bits[i], property ) )
-			{
-				type=AFFECT_TYPE;
-				break;
-			}
-			i++;
-		}
-	}
+    if ( !type ) /* search affect_types now */
+    {
+        i = 0;
+        while ( str_cmp ( affected_bits[i], "\n" ) )
+        {
+            if ( !str_cmp ( affected_bits[i], property ) )
+            {
+                type=AFFECT_TYPE;
+                break;
+            }
+            i++;
+        }
+    }
 
-	if ( !type ) /* property not found */
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: unknown property '%s'! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property, GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
+    if ( !type ) /* property not found */
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_affect: unknown property '%s'! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property, GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
 
 
-	/* locate the target */
-	ch = get_char ( charname );
-	if ( !ch )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
-	if ( !str_cmp ( value_p, "off" ) )
-	{
-		affect_from_char ( ch, SPELL_DG_AFFECT );
-		return;
-	}
+    /* locate the target */
+    ch = get_char ( charname );
+    if ( !ch )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+    if ( !str_cmp ( value_p, "off" ) )
+    {
+        affect_from_char ( ch, SPELL_DG_AFFECT );
+        return;
+    }
 
-	/* add the affect */
-	af.type = SPELL_DG_AFFECT;
-	af.expire = sec_to_time ( duration );
+    /* add the affect */
+    af.type = SPELL_DG_AFFECT;
+    af.expire = sec_to_time ( duration );
         af.modifier = value;
-	if ( type == APPLY_TYPE )
-	{
-		af.location = ( i );
-		af.bitvector = 0;
-	}
-	else
-	{
-		af.location = 0;
-		af.bitvector = ( 1<< ( i-1 ) );
-	}
+    if ( type == APPLY_TYPE )
+    {
+        af.location = ( i );
+        af.bitvector = 0;
+    }
+    else
+    {
+        af.location = 0;
+        af.bitvector = ( 1<< ( i-1 ) );
+    }
 
-	affect_to_char ( ch, &af );
+    affect_to_char ( ch, &af );
 }
 
 
@@ -316,20 +316,20 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
  */
 int valid_dg_target ( Character *ch, int allow_gods )
 {
-	if ( !ch )
-		return FALSE;
-	else if ( IS_NPC ( ch ) )
-		return TRUE;		/* all npcs are allowed as targets */
-	else if ( GET_LEVEL ( ch ) < LVL_IMMORT )
-		return TRUE;		/* as well as all mortals */
-	else if ( !allow_gods && GET_LEVEL ( ch ) >= LVL_IMMORT )
-		return FALSE;		/* but not always the highest gods */
-	else if ( !PRF_FLAGGED ( ch, PRF_NOHASSLE )
-	          && GET_INVIS_LEV ( ch ) < LVL_IMMORT )
-		return TRUE;		/* the ones in between as allowed as long as they're visible,
-    				 * and have no-hassle off.   */
-	else
-		return FALSE;		/* The rest are gods with nohassle on... */
+    if ( !ch )
+        return FALSE;
+    else if ( IS_NPC ( ch ) )
+        return TRUE;		/* all npcs are allowed as targets */
+    else if ( GET_LEVEL ( ch ) < LVL_IMMORT )
+        return TRUE;		/* as well as all mortals */
+    else if ( !allow_gods && GET_LEVEL ( ch ) >= LVL_IMMORT )
+        return FALSE;		/* but not always the highest gods */
+    else if ( !PRF_FLAGGED ( ch, PRF_NOHASSLE )
+              && GET_INVIS_LEV ( ch ) < LVL_IMMORT )
+        return TRUE;		/* the ones in between as allowed as long as they're visible,
+                     * and have no-hassle off.   */
+    else
+        return FALSE;		/* The rest are gods with nohassle on... */
 }
 
 /* Add or remove a destination for a mob or an object              *
@@ -340,109 +340,109 @@ int valid_dg_target ( Character *ch, int allow_gods )
 void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
                          int script_type, char *cmd )
 {
-	Character *ch = NULL, *c = NULL;
-	obj_data *obj = NULL, *o = NULL;
-	Room *room = NULL;
-	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
-	char addrem[MAX_INPUT_LENGTH], dest[MAX_INPUT_LENGTH];
-	char name[MAX_INPUT_LENGTH];
-	room_rnum loc = NULL;
-	int all = FALSE;
-	int add
-	= 0;
+    Character *ch = NULL, *c = NULL;
+    obj_data *obj = NULL, *o = NULL;
+    Room *room = NULL;
+    char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
+    char addrem[MAX_INPUT_LENGTH], dest[MAX_INPUT_LENGTH];
+    char name[MAX_INPUT_LENGTH];
+    room_rnum loc = NULL;
+    int all = FALSE;
+    int add
+    = 0;
 
-	half_chop ( cmd, junk, cmd );
-	half_chop ( cmd, addrem, cmd );
-	half_chop ( cmd, dest, cmd );
-	half_chop ( cmd, name, cmd );
+    half_chop ( cmd, junk, cmd );
+    half_chop ( cmd, addrem, cmd );
+    half_chop ( cmd, dest, cmd );
+    half_chop ( cmd, name, cmd );
 
-	/* make sure all parameters are present */
-	if ( !*addrem || !*dest || !*name )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest (add/remove) <room vnum/ALL> <target>. Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
-	if ( !strcasecmp ( dest, "all" ) )
-		all = TRUE;
-	else if ( !is_number ( dest ) || ( loc = real_room ( atoi ( dest ) ) ) == NULL )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: invalid target room! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
+    /* make sure all parameters are present */
+    if ( !*addrem || !*dest || !*name )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_dest (add/remove) <room vnum/ALL> <target>. Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+    if ( !strcasecmp ( dest, "all" ) )
+        all = TRUE;
+    else if ( !is_number ( dest ) || ( loc = real_room ( atoi ( dest ) ) ) == NULL )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_dest: invalid target room! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
 
-	if ( !strcmp ( addrem, "add" ) )
-		add
-		= TRUE;
-	else if ( !strcmp ( addrem, "remove" ) )
-		add
-		= FALSE;
-	else
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: need to specify add or remove for second argument! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
+    if ( !strcmp ( addrem, "add" ) )
+        add
+        = TRUE;
+    else if ( !strcmp ( addrem, "remove" ) )
+        add
+        = FALSE;
+    else
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_dest: need to specify add or remove for second argument! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
 
-	if ( all && add )
-	{
-		script_log ( "Trigger: %s, VNum %d. dg_dest: can only use ALL with remove! Line %d: %s",
-		             GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
-		return;
-	}
-	/* locate target */
-	switch ( script_type )
-	{
-		case MOB_TRIGGER:
-			ch = ( Character * ) go;
-			if ( !strcmp ( name, "self" ) )
-				c = ch;
-			else if ( ( o = get_object_in_equip ( ch, name ) ) )
-				;
-			else if ( ( o = get_obj_in_list ( name, ch->carrying ) ) )
-				;
-			else if ( ( c = get_char_room ( name, NULL, IN_ROOM ( ch ) ) ) )
-				;
-			else if ( ( o = get_obj_in_list ( name,IN_ROOM ( ch )->contents ) ) )
-				;
-			else if ( ( c = get_char ( name ) ) )
-				;
-			else if ( ( o = get_obj ( name ) ) ) {}
+    if ( all && add )
+    {
+        script_log ( "Trigger: %s, VNum %d. dg_dest: can only use ALL with remove! Line %d: %s",
+                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+    /* locate target */
+    switch ( script_type )
+    {
+        case MOB_TRIGGER:
+            ch = ( Character * ) go;
+            if ( !strcmp ( name, "self" ) )
+                c = ch;
+            else if ( ( o = get_object_in_equip ( ch, name ) ) )
+                ;
+            else if ( ( o = get_obj_in_list ( name, ch->carrying ) ) )
+                ;
+            else if ( ( c = get_char_room ( name, NULL, IN_ROOM ( ch ) ) ) )
+                ;
+            else if ( ( o = get_obj_in_list ( name,IN_ROOM ( ch )->contents ) ) )
+                ;
+            else if ( ( c = get_char ( name ) ) )
+                ;
+            else if ( ( o = get_obj ( name ) ) ) {}
 
-			break;
-		case OBJ_TRIGGER:
-			obj = ( obj_data * ) go;
-			if ( !strcmp ( name, "self" ) )
-				o = obj;
-			else if ( ( c = get_char_by_obj ( obj, name ) ) )
-				;
-			else if ( ( o = get_obj_by_obj ( obj, name ) ) ) {}
-			break;
-		case WLD_TRIGGER:
-			room = ( Room * ) go;
-			if ( ( c = get_char_by_room ( room, name ) ) )
-				;
-			else if ( ( o = get_obj_by_room ( room, name ) ) ) {}
-			break;
-	}
-	if ( c )
-	{
-		if ( add
-		   )
-			add_travel_point_by_pointer ( &TRAVEL_LIST ( c ), loc->number );
-		else
-			remove_travel_point_by_dest ( &TRAVEL_LIST ( c ), loc->number );
-	}
-	else if ( o )
-	{
-		if ( add
-		   )
-			add_travel_point_by_pointer ( &TRAVEL_LIST ( o ), loc->number );
-		else
-			remove_travel_point_by_dest ( &TRAVEL_LIST ( o ), loc->number );
-	}
+            break;
+        case OBJ_TRIGGER:
+            obj = ( obj_data * ) go;
+            if ( !strcmp ( name, "self" ) )
+                o = obj;
+            else if ( ( c = get_char_by_obj ( obj, name ) ) )
+                ;
+            else if ( ( o = get_obj_by_obj ( obj, name ) ) ) {}
+            break;
+        case WLD_TRIGGER:
+            room = ( Room * ) go;
+            if ( ( c = get_char_by_room ( room, name ) ) )
+                ;
+            else if ( ( o = get_obj_by_room ( room, name ) ) ) {}
+            break;
+    }
+    if ( c )
+    {
+        if ( add
+           )
+            add_travel_point_by_pointer ( &TRAVEL_LIST ( c ), loc->number );
+        else
+            remove_travel_point_by_dest ( &TRAVEL_LIST ( c ), loc->number );
+    }
+    else if ( o )
+    {
+        if ( add
+           )
+            add_travel_point_by_pointer ( &TRAVEL_LIST ( o ), loc->number );
+        else
+            remove_travel_point_by_dest ( &TRAVEL_LIST ( o ), loc->number );
+    }
 
-	return;
+    return;
 }
 

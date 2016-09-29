@@ -73,7 +73,7 @@ struct vehicle_data *temp;
 #endif
 for (temp = v;temp;temp = temp->next) {
 cnt++;
-    
+
   fprintf(fl, "@vehicle %d\n", cnt);
   fprintf(fl, "%d :Vehicle\n",    temp->vehicle);
   fprintf(fl, "%d :Controls\n",   temp->controls);
@@ -155,7 +155,7 @@ void load_vehicles(void)
           break;
         default:
           log("Error in vehicle file (%s): tag: %d - vehicle %d", VEHICLE_FILE, part, num);
-	  fclose(fl);
+      fclose(fl);
           exit(1);
           return;
         }
@@ -164,7 +164,7 @@ void load_vehicles(void)
       if (part != 4)
       {
         log("Error in vehicle file (%s): Vehicle number %d", VEHICLE_FILE, num);
-	fclose(fl);
+    fclose(fl);
         exit(1);
         return;
       }
@@ -267,7 +267,7 @@ ACMD(do_oasis_vedit)
   Descriptor *d;
 
   /* Parse any arguments. */
-  //buf3 = 
+  //buf3 =
   two_arguments(argument, buf1, buf2);
 
   if (!*buf1)

@@ -49,7 +49,7 @@ ACMD(do_oasis_redit)
   Descriptor *d;
 
   /* Parse any arguments. */
-  //buf3 = 
+  //buf3 =
   two_arguments(argument, buf1, buf2);
 
   if (!*buf1)
@@ -174,7 +174,7 @@ void redit_init_room(Descriptor* d) {
 
   OLC_ROOM(d)->number = NOWHERE;
   OLC_ROOM(d)->proto_script = NULL;
-  
+
   OLC_ROOM(d)->mine.num = -1;
   OLC_ROOM(d)->mine.dif = -1;
   OLC_ROOM(d)->mine.tool = 0;
@@ -304,7 +304,7 @@ void redit_save_to_disk(zone_vnum zone_num)
 
 
 /**************************************************************************
- Menu functions 
+ Menu functions
  **************************************************************************/
 void redit_disp_mine_menu(Descriptor *d)
 {
@@ -442,13 +442,13 @@ void redit_disp_exit_menu(Descriptor *d)
 {
   char door_buf[24];
   /*
-   * if exit doesn't exist, alloc/create it 
+   * if exit doesn't exist, alloc/create it
    */
   if (OLC_EXIT(d) == NULL)
     CREATE(OLC_EXIT(d), struct room_direction_data, 1);
 
   /*
-   * Weird door handling! 
+   * Weird door handling!
    */
   if (IS_SET(OLC_EXIT(d)->exit_info, EX_ISDOOR))
   {
@@ -580,7 +580,7 @@ void redit_disp_menu(Descriptor *d)
                   cyn, OLC_NUM(d), nrm,
                   cyn, zone_table[OLC_ZNUM(d)].number, nrm,
                   grn, nrm, yel, room->name,
-		  grn, nrm, yel, room->GetDescription(),
+          grn, nrm, yel, room->GetDescription(),
                   grn, nrm, cyn, buf1,
                   grn, nrm, cyn, buf2,
                   grn, nrm, cyn,
@@ -659,7 +659,7 @@ void redit_parse(Descriptor *d, char *arg)
       else
         d->Output( "Room saved to memory.\r\n");
       /*
-       * Do NOT free strings! Just the room structure. 
+       * Do NOT free strings! Just the room structure.
        */
       /* okay free strings now - mord */
       OLC_ROOM(d)->free_room_strings();
@@ -670,7 +670,7 @@ void redit_parse(Descriptor *d, char *arg)
       /*
        * Free everything up, including strings, etc.
        */
-	    OLC_ROOM(d)->free_room_strings();
+        OLC_ROOM(d)->free_room_strings();
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:
@@ -704,11 +704,11 @@ void redit_parse(Descriptor *d, char *arg)
 
       if (OLC_ROOM(d)->HasDesc())
       {
-	      d->Output( "%s", OLC_ROOM(d)->GetDescription());
-	      oldtext = strdup(OLC_ROOM(d)->GetDescription());
+          d->Output( "%s", OLC_ROOM(d)->GetDescription());
+          oldtext = strdup(OLC_ROOM(d)->GetDescription());
       }
       if (OLC_ROOM(d)->t_description)
-	      free(OLC_ROOM(d)->t_description);
+          free(OLC_ROOM(d)->t_description);
       OLC_ROOM(d)->t_description = strdup(OLC_ROOM(d)->GetDescription());
       string_write(d, &OLC_ROOM(d)->t_description, MAX_ROOM_DESC, 0, oldtext);
       OLC_VAL(d) = 1;
@@ -766,8 +766,8 @@ void redit_parse(Descriptor *d, char *arg)
 
       if (OLC_ROOM(d)->n_description)
       {
-	      d->Output( "%s", OLC_ROOM(d)->n_description); 
-	      oldtext = strdup(OLC_ROOM(d)->n_description);
+          d->Output( "%s", OLC_ROOM(d)->n_description);
+          oldtext = strdup(OLC_ROOM(d)->n_description);
       }
       string_write(d, &OLC_ROOM(d)->n_description, MAX_ROOM_DESC, 0, oldtext);
       OLC_VAL(d) = 1;
@@ -853,9 +853,9 @@ void redit_parse(Descriptor *d, char *arg)
       /*
     case 'r':
     case 'R':
-// Quest room descriptions 
+// Quest room descriptions
       if (!OLC_ROOM(d)->q_description) {
-          CREATE(OLC_ROOM(d)->q_description, struct q_descr_data, 1);  
+          CREATE(OLC_ROOM(d)->q_description, struct q_descr_data, 1);
           OLC_ROOM(d)->q_description->next = NULL;
           OLC_ROOM(d)->q_description->type = 0;
           OLC_ROOM(d)->q_description->flag = NULL;
@@ -1032,7 +1032,7 @@ void redit_parse(Descriptor *d, char *arg)
           break;
       case '1':
           OLC_MODE(d) = REDIT_QUEST_TYPE;
-          redit_disp_questtype_menu(d); 
+          redit_disp_questtype_menu(d);
           return;
       case '2':
           clear_screen(d);
@@ -1041,8 +1041,8 @@ void redit_parse(Descriptor *d, char *arg)
 
           if (OLC_QDESC(d)->flag)
           {
-	      d->Output( "%s", OLC_QDESC(d)->flag); 
-	      oldtext = strdup(OLC_QDESC(d)->flag);
+          d->Output( "%s", OLC_QDESC(d)->flag);
+          oldtext = strdup(OLC_QDESC(d)->flag);
           }
           string_write(d, &OLC_QDESC(d)->flag, MAX_ROOM_DESC, 0, oldtext);
           OLC_VAL(d) = 1;
@@ -1054,8 +1054,8 @@ void redit_parse(Descriptor *d, char *arg)
 
           if (OLC_QDESC(d)->description)
           {
-	      d->Output( "%s", OLC_QDESC(d)->description); 
-	      oldtext = strdup(OLC_QDESC(d)->description);
+          d->Output( "%s", OLC_QDESC(d)->description);
+          oldtext = strdup(OLC_QDESC(d)->description);
           }
           string_write(d, &OLC_QDESC(d)->description, MAX_ROOM_DESC, 0, oldtext);
           OLC_VAL(d) = 1;
@@ -1520,12 +1520,12 @@ void redit_string_cleanup(Descriptor *d, int terminator)
   case REDIT_SMELL:
   case REDIT_N_DESCRIPTION:
   case REDIT_LISTEN:
-	  redit_disp_menu(d);
-	  break;
+      redit_disp_menu(d);
+      break;
   case REDIT_DESC:
-	  if (STRINGADD_SAVE == terminator) 
-		  OLC_ROOM(d)->AssignTempDesc();		  
-	  redit_disp_menu(d);
+      if (STRINGADD_SAVE == terminator)
+          OLC_ROOM(d)->AssignTempDesc();
+      redit_disp_menu(d);
     break;
   case REDIT_EXIT_DESCRIPTION:
     redit_disp_exit_menu(d);
