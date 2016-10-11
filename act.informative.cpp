@@ -3154,26 +3154,30 @@ void display_help_list ( Descriptor *d, char *keywords )
 {
     unsigned int i, cnt = 0, index;
     char buf[MAX_STRING_LENGTH];
-    char buf1[1024];
 
-    if ( PRF_FLAGGED ( d->character, PRF_NOGRAPHICS ) )
-        strcpy ( buf, "  Help files similar\r\n---------------------------------------\r\n" );
-    else
-        strcpy ( buf, "  Help files similar\r\n" );
+    DYN_DEFINE;
+    DYN_CREATE;
+    strcpy ( buf, "  Help files similar\r\n" );
+    DYN_RESIZE ( buf );
+    if ( !PRF_FLAGGED ( d->character, PRF_NOGRAPHICS ) )
+    {
+        strcpy ( buf, "---------------------------------------\r\n" );
+        DYN_RESIZE ( buf );
+    }
 
-    for ( i=0;i<top_of_helpt;i++ )
+    for ( i=0; i <= top_of_helpt; i++ )
     {
         if ( is_number ( keywords ) && i == ( unsigned int ) atoi ( keywords ) )
         {
-            snprintf ( buf1, sizeof ( buf1 ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
-            strlcat ( buf, buf1, sizeof ( buf ) );
+            snprintf ( buf, sizeof ( buf ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
+            DYN_RESIZE ( buf );
             cnt++;
             index = i;
         }
         else if ( isname_full ( keywords, help_table[i].keywords ) )
         {
-            snprintf ( buf1, sizeof ( buf1 ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
-            strlcat ( buf, buf1, sizeof ( buf ) );
+            snprintf ( buf, sizeof ( buf ), "{cW%-5d{cg){cy %s{c0\r\n", i, help_table[i].keywords );
+            DYN_RESIZE ( buf );
             cnt++;
             index = i;
         }
@@ -3181,6 +3185,8 @@ void display_help_list ( Descriptor *d, char *keywords )
 
     if ( cnt == 1 )
     {
+        free ( dynbuf );
+        dynbuf = nullptr;
         display_help ( d->character, index );
         return;
     }
@@ -3192,10 +3198,9 @@ void display_help_list ( Descriptor *d, char *keywords )
         return;
     }
 
-    snprintf ( buf1, sizeof ( buf1 ),
-               "\r\n\r\nPlease type the number of the help file to view it\r\nOr type anything else to cancel\r\nWhich Help file: " );
-    strlcat ( buf, buf1, sizeof ( buf ) );
-    page_string ( d, buf, 0 );
+    snprintf ( buf, sizeof ( buf ), "\r\n\r\nPlease type the number of the help file to view it\r\nOr type anything else to cancel\r\nWhich Help file: " );
+    DYN_RESIZE ( buf );
+    page_string ( d, dynbuf, DYN_BUFFER );
     ORIG_STATE ( d ) = STATE ( d );
     STATE ( d ) = CON_FIND_HELP;
 }

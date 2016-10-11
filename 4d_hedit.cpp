@@ -458,7 +458,7 @@ void sort_help(void) {
 int hedit_find_entry(char *keyword) {
     int i;
 
-    for (i = 0; i < top_of_helpt; i++)
+    for (i = 0; i <= top_of_helpt; i++)
         if (isname(keyword, help_table[i].keywords))
             return i;
 
