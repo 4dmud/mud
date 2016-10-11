@@ -367,6 +367,7 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+trig_data *find_trigger ( script_data *sc, trig_vnum vnum );
 void crashproof_objects_save_all();
 EVENTFUNC ( message_event );
 SPECIAL ( playershop );
@@ -2354,7 +2355,7 @@ void do_stat_character ( Character *ch, Character *k, char* var )
         }
         list_destinations ( TRAVEL_LIST ( k ), ch );
         list_mob_resets ( k, ch );
-        ch->Send ( "To see global variables: type\r\nvstat player <name>\r\n" );
+        ch->Send ( "To see global variables: type vstat player <name>\r\n" );
         if ( GET_LEVEL ( ch ) == LVL_IMPL && k->desc )
         {
             int m, cnt = 0;
@@ -7995,7 +7996,6 @@ system ( "" );
 ACMD ( do_searchtrig )
 {
     Character *c;
-    trig_data *t;
     int trig_vnum, nr, num;
     bool found = FALSE;
     char buf[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
@@ -8025,7 +8025,7 @@ ACMD ( do_searchtrig )
 
     ch->Send ( "Trigger %d is attached to:\r\n", trig_vnum );
     ch->Send ( "--------------------------\r\n" );
-    ch->Send ( "In OLC:\r\n" );
+    ch->Send ( "Prototype:\r\n" );
 
     for ( mob_it = mob_proto.begin(), num = 0; mob_it != mob_proto.end(); mob_it++ )
     {
@@ -8095,51 +8095,33 @@ ACMD ( do_searchtrig )
 
     for ( c = character_list, num = 0; c; c = c->next )
     {
-        if ( SCRIPT ( c ) )
+        if ( find_trigger ( SCRIPT ( c ), trig_vnum ) )
         {
-            for ( t = TRIGGERS ( SCRIPT ( c ) ); t; t = t->next )
-            {
-                if ( GET_TRIG_VNUM ( t ) == trig_vnum )
-                {
-                    snprintf ( buf, sizeof ( buf ), "M%3d. [%5d] %-25s - [%5d] %-25s\r\n", ++num, GET_MOB_VNUM ( c ),
-                           GET_NAME ( c ), GET_ROOM_VNUM ( IN_ROOM ( c ) ), IN_ROOM ( c )->name );
-                    DYN_RESIZE ( buf );
-                    found = TRUE;
-                }
-            }
+            snprintf ( buf, sizeof ( buf ), "M%3d. [%5d] %-25s - [%5d] %-25s\r\n", ++num, GET_MOB_VNUM ( c ),
+                GET_NAME ( c ), GET_ROOM_VNUM ( IN_ROOM ( c ) ), IN_ROOM ( c )->name );
+            DYN_RESIZE ( buf );
+            found = TRUE;
         }
     }
 
     for ( ob = object_list.begin(), num = 0; ob != object_list.end(); ob++ )
     {
-        if ( SCRIPT ( ob->second ) )
+        if ( find_trigger ( SCRIPT ( ob->second ), trig_vnum ) )
         {
-            for ( t = TRIGGERS ( SCRIPT ( ob->second ) ); t; t = t->next )
-            {
-                if ( GET_TRIG_VNUM ( t ) == trig_vnum )
-                {
-                    print_object_location ( ++num, ob->second, ch, TRUE, buf );
-                    DYN_RESIZE ( buf );
-                    found = TRUE;
-                }
-            }
+            print_object_location ( ++num, ob->second, ch, TRUE, buf );
+            DYN_RESIZE ( buf );
+            found = TRUE;
         }
     }
 
     for ( nr = 0, num = 0; nr <= top_of_world; nr++ )
     {
-        if ( world_vnum[nr] && SCRIPT ( world_vnum[nr] ) )
+        if ( world_vnum[nr] && find_trigger ( SCRIPT ( world_vnum[nr] ), trig_vnum ) )
         {
-            for ( t = TRIGGERS ( SCRIPT ( world_vnum[nr] ) ); t; t = t->next )
-            {
-                if ( GET_TRIG_VNUM ( t ) == trig_vnum )
-                {
-                    snprintf ( buf, sizeof ( buf ), "W%3d. [%6d] {cy%-25s {cg-{cC %s{c0\r\n",
-                           ++num, GET_ROOM_VNUM ( world_vnum[nr] ), world_vnum[nr]->name, zone_table[world_vnum[nr]->zone].name );
-                    DYN_RESIZE ( buf );
-                    found = TRUE;
-                }
-            }
+            snprintf ( buf, sizeof ( buf ), "W%3d. [%6d] {cy%-25s {cg-{cC %s{c0\r\n",
+               ++num, GET_ROOM_VNUM ( world_vnum[nr] ), world_vnum[nr]->name, zone_table[world_vnum[nr]->zone].name );
+            DYN_RESIZE ( buf );
+            found = TRUE;
         }
     }
 

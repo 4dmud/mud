@@ -26,6 +26,7 @@
 #include "dg_olc.h"
 #include "descriptor.h"
 
+void free_cmdlist ( trig_data *trig );
 const char *nrm, *grn, *cyn, *yel;
 
 /******************************************************************************/
@@ -212,11 +213,8 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
     switch (cleanup_type)
     {
     case CLEANUP_ALL:
-      /* free(OLC_SCRIPT(d)) equivalent */
-      //delete OLC_ROOM(d);
       delete OLC_SCRIPT(d);
-      OLC_SCRIPT(d)=NULL;
-      break;
+      OLC_SCRIPT(d) = NULL; // fall through
     case CLEANUP_STRUCTS:
       delete OLC_ROOM(d);
       OLC_ROOM(d) = NULL;

@@ -36,6 +36,7 @@ extern struct board_info_type board_info[];
 extern const char *attachment_types[];
 
 /*------------------------------------------------------------------------*/
+extern void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type );
 extern zone_rnum real_zone_by_thing ( room_vnum vznum );
 void oedit_disp_val5_menu ( Descriptor *d );
 /*
@@ -275,50 +276,41 @@ void oedit_setup_existing ( Descriptor *d, int real_num )
 
 void oedit_save_internally ( Descriptor *d )
 {
-    int i;
-    obj_rnum robj_num;
+    obj_rnum robj_num = real_object ( OLC_NUM ( d ) );
     Descriptor *dsc;
     struct obj_data *obj;
-    obj_list_type tobjs;
 
-    i = ( real_object ( OLC_NUM ( d ) ) == NOTHING );
+    vector<int> ops; // old proto script, the original is destroyed by add_object
+    if ( robj_num != NOTHING && obj_proto[ robj_num ].proto_script )
+        ops = *( obj_proto[ robj_num ].proto_script );
 
     if ( ( robj_num = add_object ( OLC_OBJ ( d ), OLC_NUM ( d ) ) ) == NOTHING )
     {
-        log ( "oedit_save_internally: add_object failed." );
+        log ( "SYSERR: oedit_save_internally: add_object failed for [%d] %s", OLC_NUM ( d ), OLC_OBJ ( d )->short_description );
         return;
     }
-    /* Update triggers : */
-    /* Free old proto list  */
-    if ( obj_proto[robj_num].proto_script &&
-            obj_proto[robj_num].proto_script != OLC_SCRIPT ( d ) )
-        free_proto_script ( obj_proto[robj_num].proto_script, OBJ_TRIGGER );
 
-    obj_proto[robj_num].proto_script = OLC_SCRIPT ( d );
-    OLC_SCRIPT ( d ) = NULL;
+    /* Update proto script */
+    free_proto_script ( &obj_proto[ robj_num ], OBJ_TRIGGER );
+    if ( OLC_SCRIPT ( d ) )
+        obj_proto[ robj_num ].proto_script = new vector<int> ( OLC_SCRIPT ( d )->begin(), OLC_SCRIPT ( d )->end() );
 
-    /* this takes care of the objects currently in-game */
-    for ( olt_it ij = object_list.begin(); ij != object_list.end(); ij++ )
+    vector<int> nps; // new proto script
+    if ( obj_proto[ robj_num ].proto_script )
+        nps = *( obj_proto[ robj_num ].proto_script );
+
+    /* Update triggers of existing objects */
+    for ( auto &ol : object_list )
     {
-        obj = ( ij->second );
-        if ( obj->item_number != robj_num )
+        obj = ol.second;
+        if ( obj->item_number != robj_num || obj->extracted )
             continue;
-        tobjs[GET_ID ( obj ) ] = obj;
-    }
-    for ( olt_it ij = tobjs.begin(); ij != tobjs.end(); ij++ )
-    {
-        obj = ( ij->second );
-        /* remove any old scripts */
-        if ( SCRIPT ( obj ) )
-            extract_script ( obj, OBJ_TRIGGER );
-        if ( obj->proto_script != obj_proto[robj_num].proto_script )
-            free_proto_script ( obj, OBJ_TRIGGER );
-        copy_proto_script ( &obj_proto[robj_num], obj, OBJ_TRIGGER );
-        assign_triggers ( obj, OBJ_TRIGGER );
-    }
-    /* end trigger update */
 
-    if ( !i )	/* If it's not a new object, don't renumber. */
+        update_script ( ops, nps, obj, OBJ_TRIGGER );
+        copy_proto_script ( &obj_proto[ robj_num ], obj, OBJ_TRIGGER );
+    }
+
+    if ( real_object ( OLC_NUM ( d ) ) != NOTHING )	/* If it's not a new object, don't renumber. */
         return;
 
     /*
@@ -326,15 +318,14 @@ void oedit_save_internally ( Descriptor *d )
      */
     for ( dsc = descriptor_list; dsc; dsc = dsc->next )
         if ( STATE ( dsc ) == CON_SEDIT )
-            for ( i = 0; S_PRODUCT ( OLC_SHOP ( dsc ), i ) != NOTHING; i++ )
+            for ( int i = 0; S_PRODUCT ( OLC_SHOP ( dsc ), i ) != NOTHING; i++ )
                 if ( S_PRODUCT ( OLC_SHOP ( dsc ), i ) >= robj_num )
                     S_PRODUCT ( OLC_SHOP ( dsc ), i ) ++;
-
 
     /* Update other people in zedit too. From: C.Raehl 4/27/99 */
     for ( dsc = descriptor_list; dsc; dsc = dsc->next )
         if ( STATE ( dsc ) == CON_ZEDIT )
-            for ( i = 0; OLC_ZONE ( dsc )->cmd[i].command != 'S'; i++ )
+            for ( int i = 0; OLC_ZONE ( dsc )->cmd[i].command != 'S'; i++ )
                 switch ( OLC_ZONE ( dsc )->cmd[i].command )
                 {
                     case 'P':

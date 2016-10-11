@@ -426,9 +426,8 @@ void Crash_listrent(Character *ch,const char *name)
 
         obj = read_object(nr, VIRTUAL);
         if (obj) {
-        sprintf(buf, "%s[%5d] (%5dau) %-20s\r\n", buf,
-                nr, GET_OBJ_RENT(obj), obj->short_description);
-        free_obj(obj, FALSE);
+            sprintf(buf + strlen(buf), "[%5d] (%5dau) %-20s\r\n", nr, GET_OBJ_RENT(obj), obj->short_description);
+            free_obj(obj, FALSE);
         }
 
       }
@@ -452,8 +451,7 @@ void Crash_listrent(Character *ch,const char *name)
         sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3,
                t + 4);
         /* great we got it all, make the buf */
-        sprintf(buf, "%s[%5d] (%5dau) %-20s\r\n", buf,
-                nr, t[4], sdesc);
+        sprintf(buf + strlen(buf), "[%5d] (%5dau) %-20s\r\n", nr, t[4], sdesc);
         /* best of all, we don't care if there's descs, or stuff.. */
         /* since we're only doing operations on lines beginning in # */
         /* i suppose you don't want to make exdescs start with # .:) */

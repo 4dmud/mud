@@ -71,6 +71,7 @@ int update_objects(struct obj_data *refobj)
     *obj = *refobj;
 
     /* Copy game-time dependent variables over. */
+    SCRIPT(obj) = SCRIPT(&swap);
     GET_ID(obj) = GET_ID(&swap);
     IN_ROOM(obj) = swap.in_room;
     obj->carried_by = swap.carried_by;

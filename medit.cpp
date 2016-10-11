@@ -43,6 +43,7 @@ float mob_hitpoint_multi ( int chclass );
 /*
  * External function prototypes/
  */
+void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type );
 void smash_tilde ( char *str );
 const char * race_name ( Character *ch );
 const char *simple_class_name ( Character *ch );
@@ -363,13 +364,16 @@ void init_mobile ( Character *mob )
  */
 void medit_save_internally ( Descriptor *d )
 {
-    bool first_mob = TRUE;
     mob_vnum new_vnum = OLC_NUM ( d );
     Character *mob, *pmob;
 
     //Copied from parse_simple_mob.
     OLC_MOB ( d )->points.max_hit = ( dice ( mob_stats[GET_LEVEL ( OLC_MOB ( d ) ) ].hp_dice, mob_stats[GET_LEVEL ( OLC_MOB ( d ) ) ].hp_sides ) + mob_stats[GET_LEVEL ( OLC_MOB ( d ) ) ].hp_bonus );
     OLC_MOB ( d )->points.hit = OLC_MOB ( d )->points.max_hit;
+
+    vector<int> ops; // old proto script, the original is destroyed by add_mobile
+    if ( MobProtoExists ( new_vnum ) && GetMobProto ( new_vnum )->proto_script )
+        ops = *( GetMobProto ( new_vnum )->proto_script );
 
     add_mobile ( OLC_MOB ( d ), new_vnum );
 
@@ -382,36 +386,27 @@ void medit_save_internally ( Descriptor *d )
 
     /* Update triggers */
     /* Free old proto list  */
-    if ( pmob->proto_script != OLC_SCRIPT ( d ) )
-    {
-        if ( pmob->proto_script )
-            delete pmob->proto_script;
-        pmob->proto_script = OLC_SCRIPT ( d );
-
-        /* this takes care of the mobs currently in-game */
-        for ( mob = character_list; mob; mob = mob->next )
-        {
-            if ( GET_MOB_VNUM ( mob ) != new_vnum )
-                continue;
-
-            /* remove any old scripts */
-            if ( SCRIPT ( mob ) )
-                extract_script ( mob, MOB_TRIGGER );
-
-            if ( mob->proto_script && first_mob )
-            {
-                delete mob->proto_script;
-                first_mob = FALSE;
-            }
-
-            mob->proto_script = pmob->proto_script;
-            assign_triggers ( mob, MOB_TRIGGER );
-        }
-    }
-
+    free_proto_script ( pmob, MOB_TRIGGER );
+    OLC_MOB ( d )->proto_script = OLC_SCRIPT ( d );
+    copy_proto_script ( OLC_MOB ( d ), pmob, MOB_TRIGGER );
     OLC_SCRIPT ( d ) = NULL;
 
+    vector<int> nps; // new proto script
+    if ( pmob->proto_script )
+        nps = *( pmob->proto_script );
+
+    /* this takes care of the mobs currently in-game */
+    for ( mob = character_list; mob; mob = mob->next )
+    {
+        if ( GET_MOB_VNUM ( mob ) != new_vnum )
+            continue;
+
+        update_script ( ops, nps, mob, MOB_TRIGGER );
+        mob->proto_script = pmob->proto_script;
+    }
+
     /* end trigger update */
+
 #if 0
     if ( !i )	/* Only renumber on new mobiles. */
         return;

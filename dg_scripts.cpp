@@ -183,11 +183,13 @@ extern unsigned long pulse;
 extern struct time_info_data time_info;
 
 /* external functions */
+script_data* create_script();
+void set_script_types ( script_data *sc );
+void free_cmdlist ( trig_data *trig );
 void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
 char *str_udup(const char *txt);
 void view_room_by_rnum ( Character *ch, room_rnum is_in );
 void free_varlist ( struct trig_var_data *vd );
-void extract_trigger ( struct trig_data *trig );
 int eval_lhs_op_rhs ( char *expr, char *result, size_t r_len,void *go,
                       struct script_data *sc, trig_data * trig, int type );
 //int find_eq_pos_script(Character *ch, char *arg);
@@ -211,7 +213,7 @@ void process_eval ( void *go, struct script_data *sc, trig_data *trig,
 /* Local functions not used elsewhere */
 void do_stat_trigger ( Character *ch, trig_data *trig );
 void script_stat ( Character *ch, struct script_data *sc );
-int remove_trigger ( struct script_data *sc, char *name );
+int remove_trigger ( void *thing, trig_data *trig, int type );
 int is_num ( char *arg );
 void eval_op ( char *op, char *lhs, char *rhs, char *result, size_t r_len, void *go,
                struct script_data *sc, trig_data *trig );
@@ -1364,24 +1366,35 @@ void add_trigger ( struct script_data *sc, trig_data *t, int loc )
         i->next = t;
     }
 
-    SCRIPT_TYPES ( sc ) |= GET_TRIG_TYPE ( t );
+    set_script_types ( sc );
 
     t->next_in_world = trigger_list;
     trigger_list = t;
 }
 
+trig_data *find_trigger ( script_data *sc, trig_vnum vnum )
+{
+    if ( sc == nullptr )
+        return nullptr;
 
+    for ( auto trig = TRIGGERS ( sc ); trig; trig = trig->next )
+        if ( GET_TRIG_VNUM ( trig ) == vnum )
+            return trig;
+
+    return nullptr;
+}
 
 ACMD ( do_attach )
 {
     Character *victim;
     obj_data *object;
     Room *room;
-    trig_data *trig;
+    trig_data *trig_to_add;
     char targ_name[MAX_INPUT_LENGTH], trig_name[MAX_INPUT_LENGTH];
     char loc_name[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
     int loc, tn, rn, num_arg;
     room_rnum rnum;
+    trig_data *has_trig = nullptr;
 
     argument = two_arguments ( argument, arg, trig_name );
     two_arguments ( argument, targ_name, loc_name );
@@ -1401,7 +1414,7 @@ ACMD ( do_attach )
         victim = get_char_vis ( ch, targ_name, NULL, FIND_CHAR_WORLD );
         if ( !victim ) /* search room for one with this vnum */
         {
-            for ( victim = IN_ROOM ( ch )->people;victim;victim=victim->next_in_room )
+            for ( victim = IN_ROOM ( ch )->people; victim; victim = victim->next_in_room )
                 if ( GET_MOB_VNUM ( victim ) == num_arg )
                     break;
 
@@ -1425,34 +1438,36 @@ ACMD ( do_attach )
 
         /* have a valid mob, now get trigger */
         rn = real_trigger ( tn );
-        if ( ( rn == NOTHING ) || ! ( trig = read_trigger ( rn ) ) )
+        if ( ( rn == NOTHING ) || ! ( trig_to_add = read_trigger ( rn ) ) )
         {
             ch->Send ( "That trigger does not exist.\r\n" );
             return;
         }
 
         if ( !SCRIPT ( victim ) )
-        {
-            CREATE ( SCRIPT ( victim ), struct script_data, 1 );
-            SCRIPT ( victim )->function_trig = -1;
-        }
-        add_trigger ( SCRIPT ( victim ), trig, loc );
+            SCRIPT ( victim ) = create_script();
 
-        ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
-                   tn, GET_TRIG_NAME ( trig ), GET_SHORT ( victim ), GET_MOB_VNUM ( victim ) );
+        has_trig = find_trigger ( SCRIPT ( victim ), tn );
+        if ( !has_trig )
+        {
+            add_trigger ( SCRIPT ( victim ), trig_to_add, loc );
+
+            ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
+                tn, GET_TRIG_NAME ( trig_to_add ), GET_SHORT ( victim ), GET_MOB_VNUM ( victim ) );
+        }
     }
     else if ( is_abbrev ( arg, "object" ) || is_abbrev ( arg, "otr" ) )
     {
         object = get_obj_vis ( ch, targ_name, NULL );
         if ( !object ) /* search room for one with this vnum */
         {
-            for ( object = IN_ROOM ( ch )->contents;object;object=object->next_content )
+            for ( object = IN_ROOM ( ch )->contents; object; object = object->next_content )
                 if ( GET_OBJ_VNUM ( object ) == num_arg )
                     break;
 
             if ( !object ) /* search inventory for one with this vnum */
             {
-                for ( object = ch->carrying;object;object=object->next_content )
+                for ( object = ch->carrying; object; object = object->next_content )
                     if ( GET_OBJ_VNUM ( object ) == num_arg )
                         break;
 
@@ -1473,24 +1488,25 @@ ACMD ( do_attach )
 #endif
         /* have a valid obj, now get trigger */
         rn = real_trigger ( tn );
-        if ( ( rn == NOTHING ) || ! ( trig = read_trigger ( rn ) ) )
+        if ( ( rn == NOTHING ) || ! ( trig_to_add = read_trigger ( rn ) ) )
         {
             ch->Send ( "That trigger does not exist.\r\n" );
             return;
         }
 
         if ( !SCRIPT ( object ) )
-        {
-            CREATE ( SCRIPT ( object ), struct script_data, 1 );
-            SCRIPT ( object )->function_trig = -1;
-        }
-        add_trigger ( SCRIPT ( object ), trig, loc );
+            SCRIPT ( object ) = create_script();
 
-        ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
-                   tn, GET_TRIG_NAME ( trig ),
-                   ( object->short_description ?
-                     object->short_description : object->name ),
-                   GET_OBJ_VNUM ( object ) );
+        has_trig = find_trigger ( SCRIPT ( object ), tn );
+        if ( !has_trig )
+        {
+            add_trigger ( SCRIPT ( object ), trig_to_add, loc );
+
+            ch->Send ( "Trigger %d (%s) attached to %s [%d].\r\n",
+                tn, GET_TRIG_NAME ( trig_to_add ),
+                object->short_description ? object->short_description : object->name,
+                GET_OBJ_VNUM ( object ) );
+        }
     }
     else if ( is_abbrev ( arg, "room" ) || is_abbrev ( arg, "wtr" ) )
     {
@@ -1516,7 +1532,7 @@ ACMD ( do_attach )
 #endif
         /* have a valid room, now get trigger */
         rn = real_trigger ( tn );
-        if ( ( rn == NOTHING ) || ! ( trig = read_trigger ( rn ) ) )
+        if ( ( rn == NOTHING ) || ! ( trig_to_add = read_trigger ( rn ) ) )
         {
             ch->Send ( "That trigger does not exist.\r\n" );
             return;
@@ -1525,37 +1541,37 @@ ACMD ( do_attach )
         room = rnum;
 
         if ( !SCRIPT ( room ) )
-        {
-            CREATE ( SCRIPT ( room ), struct script_data, 1 );
-            SCRIPT ( room )->function_trig = -1;
-        }
-        add_trigger ( SCRIPT ( room ), trig, loc );
+            SCRIPT ( room ) = create_script();
 
-        ch->Send ( "Trigger %d (%s) attached to room %d.\r\n",
-                   tn, GET_TRIG_NAME ( trig ), rnum->number );
+        has_trig = find_trigger ( SCRIPT ( room ), tn );
+        if ( !has_trig )
+        {
+            add_trigger ( SCRIPT ( room ), trig_to_add, loc );
+
+            ch->Send ( "Trigger %d (%s) attached to room %d.\r\n",
+                tn, GET_TRIG_NAME ( trig_to_add ), rnum->number );
+        }
     }
     else
         ch->Send ( "Please specify 'mob', 'obj', or 'room'.\r\n" );
+
+    if ( has_trig )
+    {
+        ch->Send ( "It already has trigger %d.\r\n", tn );
+        free_trigger ( trig_to_add );
+    }
 }
 
-
 /*
- *  removes the trigger specified by name, and the script of o if
- *  it removes the last trigger.  name can either be a number, or
- *  a 'silly' name for the trigger, including things like 2.beggar-death.
- *  returns 0 if did not find the trigger, otherwise 1.  If it matters,
- *  you might need to check to see if all the triggers were removed after
- *  this function returns, in order to remove the script.
+ *  finds a trigger specified by name, which can either be a number, or
+ *  a 'silly' name including things like 2.beggar-death.
  */
-int remove_trigger ( struct script_data *sc, char *name )
+trig_data *get_trigger ( script_data *sc, char *name )
 {
-    trig_data *i, *j;
-    int num = 0, string = FALSE, n;
+    trig_data *t = nullptr;
     char *cname;
-
-
-    if ( !sc )
-        return 0;
+    int num = 0, n;
+    bool string = FALSE;
 
     if ( ( cname = strstr ( name, "." ) ) || ( !isdigit ( *name ) ) )
     {
@@ -1570,11 +1586,11 @@ int remove_trigger ( struct script_data *sc, char *name )
     else
         num = atoi ( name );
 
-    for ( n = 0, j = NULL, i = TRIGGERS ( sc ); i; j = i, i = i->next )
+    for ( n = 0, t = TRIGGERS ( sc ); t; t = t->next )
     {
         if ( string )
         {
-            if ( isname ( name, GET_TRIG_NAME ( i ) ) )
+            if ( isname ( name, GET_TRIG_NAME ( t ) ) )
                 if ( ++n >= num )
                     break;
         }
@@ -1584,34 +1600,61 @@ int remove_trigger ( struct script_data *sc, char *name )
         /* is found. originally the number was position-only */
         else if ( ++n >= num )
             break;
-        else if ( trig_index[i->nr]->vnum == num )
+        else if ( trig_index[t->nr]->vnum == num )
+            break;
+    }
+    return t;
+}
+
+/*
+ *  Removes the trigger, plus the script if it removes the last trigger.
+ *  Returns 0 if the trigger doesn't exist,
+ *          1 if the trigger was removed,
+ *      and 2 if the script was extracted as well.
+ */
+int remove_trigger ( void *thing, trig_data *trig, int type )
+{
+    script_data *sc = nullptr;
+    switch ( type )
+    {
+        case MOB_TRIGGER:
+            sc = SCRIPT ( ( Character * ) thing );
+            break;
+        case OBJ_TRIGGER:
+            sc = SCRIPT ( ( obj_data * ) thing );
+            break;
+        case WLD_TRIGGER:
+            sc = SCRIPT ( ( Room * ) thing );
             break;
     }
 
-    if ( i )
-    {
-        if ( j )
-        {
-            j->next = i->next;
-            extract_trigger ( i );
-        }
-
-        /* this was the first trigger */
-        else
-        {
-            TRIGGERS ( sc ) = i->next;
-            extract_trigger ( i );
-        }
-
-        /* update the script type bitvector */
-        SCRIPT_TYPES ( sc ) = 0;
-        for ( i = TRIGGERS ( sc ); i; i = i->next )
-            SCRIPT_TYPES ( sc ) |= GET_TRIG_TYPE ( i );
-
-        return 1;
-    }
-    else
+    if ( !sc || !trig )
         return 0;
+
+    if ( trig != TRIGGERS ( sc ) )
+    {
+        trig_data *j = TRIGGERS ( sc );
+        for ( ; j && j->next != trig; j = j->next )
+            ;
+        j->next = trig->next;
+        extract_trigger ( trig );
+    }
+    else /* this was the first trigger */
+    {
+        TRIGGERS ( sc ) = trig->next;
+        extract_trigger ( trig );
+    }
+
+    /* update the script type bitvector */
+    set_script_types ( sc );
+
+    if ( !TRIGGERS ( sc ) )
+    {
+        extract_script ( thing, type );
+        return 2;
+    }
+
+    return 1;
 }
 
 ACMD ( do_detach )
@@ -1650,19 +1693,37 @@ ACMD ( do_detach )
             ch->Send ( "This room does not have any triggers.\r\n" );
         else if ( !strcasecmp ( arg2, "all" ) )
         {
-            extract_script ( room, WLD_TRIGGER );
-            ch->Send ( "All triggers removed from room.\r\n" );
-        }
-        else if ( remove_trigger ( SCRIPT ( room ), arg2 ) )
-        {
-            ch->Send ( "Trigger removed.\r\n" );
-            if ( !TRIGGERS ( SCRIPT ( room ) ) )
+            bool running = FALSE;
+            for ( trig_data *t_next, *t = TRIGGERS ( SCRIPT ( room ) ); t; t = t_next )
             {
-                extract_script ( room, WLD_TRIGGER );
+                t_next = t->next;
+                if ( t->curr_state )
+                {
+                    t->remove_me = TRUE;
+                    running = TRUE;
+                }
+                else
+                    remove_trigger ( room, t, WLD_TRIGGER );
             }
+
+            if ( running )
+                ch->Send ( "Some triggers on the room are running, they will be removed when they're done.\r\n" );
+            else
+                ch->Send ( "All triggers removed from room.\r\n" );
         }
         else
-            ch->Send ( "That trigger was not found.\r\n" );
+        {
+            trig_data *t = get_trigger ( SCRIPT ( room ), arg2 );
+            if ( t && t->curr_state )
+            {
+                t->remove_me = TRUE;
+                ch->Send ( "That trigger is running, it will be removed once it's finished.\r\n" );
+            }
+            else if ( remove_trigger ( room, t, WLD_TRIGGER ) )
+                ch->Send ( "Trigger removed.\r\n" );
+            else
+                ch->Send ( "That trigger was not found.\r\n" );
+        }
     }
     else
     {
@@ -1753,19 +1814,37 @@ ACMD ( do_detach )
 #endif
             else if ( trigger && !strcasecmp ( trigger, "all" ) )
             {
-                extract_script ( victim, MOB_TRIGGER );
-                ch->Send ( "All triggers removed from %s.\r\n", GET_SHORT ( victim ) );
-            }
-            else if ( trigger && remove_trigger ( SCRIPT ( victim ), trigger ) )
-            {
-                ch->Send ( "Trigger removed.\r\n" );
-                if ( !TRIGGERS ( SCRIPT ( victim ) ) )
+                bool running = FALSE;
+                for ( trig_data *t_next, *t = TRIGGERS ( SCRIPT ( victim ) ); t; t = t_next )
                 {
-                    extract_script ( victim, MOB_TRIGGER );
+                    t_next = t->next;
+                    if ( t->curr_state )
+                    {
+                        t->remove_me = TRUE;
+                        running = TRUE;
+                    }
+                    else
+                        remove_trigger ( victim, t, MOB_TRIGGER );
                 }
+
+                if ( running )
+                    ch->Send ( "Some triggers on the mob are running, they will be removed when they're done.\r\n" );
+                else
+                    ch->Send ( "All triggers removed from %s.\r\n", GET_SHORT ( victim ) );
             }
             else
-                ch->Send ( "That trigger was not found.\r\n" );
+            {
+                trig_data *t = get_trigger ( SCRIPT ( victim ), trigger );
+                if ( t && t->curr_state )
+                {
+                    t->remove_me = TRUE;
+                    ch->Send ( "That trigger is running, it will be removed once it's finished.\r\n" );
+                }
+                else if ( remove_trigger ( victim, t, MOB_TRIGGER ) )
+                    ch->Send ( "Trigger removed.\r\n" );
+                else
+                    ch->Send ( "That trigger was not found.\r\n" );
+            }
         }
         else if ( object )
         {
@@ -1782,21 +1861,38 @@ ACMD ( do_detach )
 #endif
             else if ( trigger && !strcasecmp ( trigger, "all" ) )
             {
-                extract_script ( object, OBJ_TRIGGER );
-                ch->Send ( "All triggers removed from %s.\r\n",
-                           object->short_description ? object->short_description :
-                           object->name );
-            }
-            else if ( remove_trigger ( SCRIPT ( object ), trigger ) )
-            {
-                ch->Send ( "Trigger removed.\r\n" );
-                if ( !TRIGGERS ( SCRIPT ( object ) ) )
+                bool running = FALSE;
+                for ( trig_data *t_next, *t = TRIGGERS ( SCRIPT ( object ) ); t; t = t_next )
                 {
-                    extract_script ( object, OBJ_TRIGGER );
+                    t_next = t->next;
+                    if ( t->curr_state )
+                    {
+                        t->remove_me = TRUE;
+                        running = TRUE;
+                    }
+                    else
+                        remove_trigger ( object, t, OBJ_TRIGGER );
                 }
+
+                if ( running )
+                    ch->Send ( "Some triggers on the object are running, they will be removed when they're done.\r\n" );
+                else
+                    ch->Send ( "All triggers removed from %s.\r\n",
+                        object->short_description ? object->short_description : object->name );
             }
             else
-                ch->Send ( "That trigger was not found.\r\n" );
+            {
+                trig_data *t = get_trigger ( SCRIPT ( object ), trigger );
+                if ( t && t->curr_state )
+                {
+                    t->remove_me = TRUE;
+                    ch->Send ( "That trigger is running, it will be removed once it's finished.\r\n" );
+                }
+                else if ( remove_trigger ( object, t, OBJ_TRIGGER ) )
+                    ch->Send ( "Trigger removed.\r\n" );
+                else
+                    ch->Send ( "That trigger was not found.\r\n" );
+            }
         }
     }
 }
@@ -2287,8 +2383,7 @@ struct cmdlist_element *find_else_end ( trig_data *trig,
 
 
 /* processes any 'wait' commands in a trigger */
-void process_wait ( void *go, trig_data *trig, int type, char *cmd,
-                    struct cmdlist_element *cl )
+void process_wait ( void *go, trig_data *trig, int type, char *cmd, struct cmdlist_element *cl )
 {
     char buf[MAX_INPUT_LENGTH] = "", *arg;
     struct wait_event_data *wait_event_obj;
@@ -2435,15 +2530,14 @@ void process_peek ( void *go, struct script_data *sc, trig_data *trig,
 
 
 /* script attaching a trigger to something */
-void process_attach ( void *go, struct script_data *sc, trig_data *trig,
-                      int type, char *cmd )
+void process_attach ( void *go, struct script_data *sc, trig_data *trig, int type, char *cmd )
 {
     char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
     char result[MAX_INPUT_LENGTH], *id_p;
-    trig_data *newtrig;
-    Character *c=NULL;
-    obj_data *o=NULL;
-    Room *r=NULL;
+    trig_data *trig_to_add;
+    Character *c = nullptr;
+    obj_data *o = nullptr;
+    Room *r = nullptr;
     long trignum, id;
 
     id_p = two_arguments ( cmd, arg, trignum_s );
@@ -2488,53 +2582,62 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig,
     }
 
     /* locate and load the trigger specified */
-    trignum = real_trigger ( atoi ( trignum_s ) );
-    if ( trignum == NOTHING || ! ( newtrig=read_trigger ( trignum ) ) )
+    int trig_v = atoi ( trignum_s );
+    trignum = real_trigger ( trig_v );
+    if ( trignum == NOTHING || ! ( trig_to_add = read_trigger ( trignum ) ) )
     {
         script_log ( "Trigger: %s, VNum %d. attach invalid trigger: '%s'. Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), trignum_s, GET_TRIG_LINE_NR ( trig ), cmd );
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), trignum_s, GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
+    trig_data *has_trig = nullptr;
     if ( c )
     {
         if ( !IS_NPC ( c ) )
         {
             script_log ( "Trigger: %s, VNum %d. attach invalid target: '%s'. Line %d: %s",
-                         GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_NAME ( c ), GET_TRIG_LINE_NR ( trig ), cmd );
+                GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_NAME ( c ), GET_TRIG_LINE_NR ( trig ), cmd );
+            free_trigger ( trig_to_add );
             return;
         }
-        if ( !SCRIPT ( c ) )
+
+        if ( SCRIPT ( c ) )
         {
-            CREATE ( SCRIPT ( c ), struct script_data, 1 );
-            SCRIPT ( c )->function_trig = -1;
+            has_trig = find_trigger ( SCRIPT ( c ), trig_v );
+            if ( !has_trig )
+                add_trigger ( SCRIPT ( c ), trig_to_add, -1 );
         }
-        add_trigger ( SCRIPT ( c ), newtrig, -1 );
-        return;
+        else
+            SCRIPT ( c ) = create_script();
     }
 
-    if ( o )
+    else if ( o )
     {
-        if ( !SCRIPT ( o ) )
+        if ( SCRIPT ( o ) )
         {
-            CREATE ( SCRIPT ( o ), struct script_data, 1 );
-            SCRIPT ( o )->function_trig = -1;
+            has_trig = find_trigger ( SCRIPT ( o ), trig_v );
+            if ( !has_trig )
+                add_trigger ( SCRIPT ( o ), trig_to_add, -1 );
         }
-        add_trigger ( SCRIPT ( o ), newtrig, -1 );
-        return;
+        else
+            SCRIPT ( o ) = create_script();
     }
 
-    if ( r )
+    else if ( r )
     {
-        if ( !SCRIPT ( r ) )
+        if ( SCRIPT ( r ) )
         {
-            CREATE ( SCRIPT ( r ), struct script_data, 1 );
-            SCRIPT ( r )->function_trig = -1;
+            has_trig = find_trigger ( SCRIPT ( r ), trig_v );
+            if ( !has_trig )
+                add_trigger ( SCRIPT ( r ), trig_to_add, -1 );
         }
-        add_trigger ( SCRIPT ( r ), newtrig, -1 );
-        return;
+        else
+            SCRIPT ( r ) = create_script();
     }
 
+    if ( has_trig )
+        free_trigger ( trig_to_add );
 }
 
 
@@ -2545,10 +2648,11 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
 {
     char arg[MAX_INPUT_LENGTH], trignum_s[MAX_INPUT_LENGTH];
     char result[MAX_INPUT_LENGTH], *id_p;
-    Character *c=NULL;
-    obj_data *o=NULL;
-    Room *r=NULL;
+    Character *c = nullptr;
+    obj_data *o = nullptr;
+    Room *r = nullptr;
     long id;
+    trig_data *t, *t_next;
 
     id_p = two_arguments ( cmd, arg, trignum_s );
     skip_spaces ( &id_p );
@@ -2596,15 +2700,24 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
     {
         if ( !strcmp ( trignum_s, "all" ) )
         {
-            extract_script ( c, MOB_TRIGGER );
+            for ( t = TRIGGERS ( SCRIPT ( c ) ); t; t = t_next )
+            {
+                t_next = t->next;
+                if ( t->curr_state )
+                    t->remove_me = TRUE;
+                else
+                    remove_trigger ( c, t, type );
+            }
             return;
         }
-        if ( remove_trigger ( SCRIPT ( c ), trignum_s ) )
+
+        auto t = find_trigger ( SCRIPT ( c ), atoi ( trignum_s ) );
+        if ( t )
         {
-            if ( !TRIGGERS ( SCRIPT ( c ) ) )
-            {
-                extract_script ( c, MOB_TRIGGER );
-            }
+            if ( t->curr_state )
+                t->remove_me = TRUE;
+            else
+                remove_trigger ( c, t, type );
         }
         return;
     }
@@ -2613,15 +2726,24 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
     {
         if ( !strcmp ( trignum_s, "all" ) )
         {
-            extract_script ( o, OBJ_TRIGGER );
+            for ( t = TRIGGERS ( SCRIPT ( o ) ); t; t = t_next )
+            {
+                t_next = t->next;
+                if ( t->curr_state )
+                    t->remove_me = TRUE;
+                else
+                    remove_trigger ( o, t, type );
+            }
             return;
         }
-        if ( remove_trigger ( SCRIPT ( o ), trignum_s ) )
+
+        auto t = find_trigger ( SCRIPT ( o ), atoi ( trignum_s ) );
+        if ( t )
         {
-            if ( !TRIGGERS ( SCRIPT ( o ) ) )
-            {
-                extract_script ( o, OBJ_TRIGGER );
-            }
+            if ( t->curr_state )
+                t->remove_me = TRUE;
+            else
+                remove_trigger ( o, t, type );
         }
         return;
     }
@@ -2630,19 +2752,27 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
     {
         if ( !strcmp ( trignum_s, "all" ) )
         {
-            extract_script ( r, WLD_TRIGGER );
+            for ( t = TRIGGERS ( SCRIPT ( r ) ); t; t = t_next )
+            {
+                t_next = t->next;
+                if ( t->curr_state )
+                    t->remove_me = TRUE;
+                else
+                    remove_trigger ( r, t, type );
+            }
             return;
         }
-        if ( remove_trigger ( SCRIPT ( r ), trignum_s ) )
+
+        auto t = find_trigger ( SCRIPT ( r ), atoi ( trignum_s ) );
+        if ( t )
         {
-            if ( !TRIGGERS ( SCRIPT ( r ) ) )
-            {
-                extract_script ( r, WLD_TRIGGER );
-            }
+            if ( t->curr_state )
+                t->remove_me = TRUE;
+            else
+                remove_trigger ( r, t, type );
         }
         return;
     }
-
 }
 
 room_rnum dg_room_of_obj ( struct obj_data *obj )
@@ -2773,17 +2903,20 @@ void makeuid_var ( void *go, struct script_data *sc, trig_data *trig,
         add_var ( &GET_TRIG_VARS ( trig ), varname, uid, sc ? sc->context : 0 );
 }
 
-/** dg_scripts scriptable functions **/
-trig_data *get_trig_proto_by_vnum ( trig_vnum vnum )
+// When a trigger stops running, reset its variables so it can be called again
+void reset_trigger ( trig_data *trig )
 {
-    unsigned int i;
-    for ( i = 0; i < top_of_trigt; i++ )
+    if ( GET_TRIG_VARS ( trig ) )
     {
-        if ( trig_index[i]->vnum == vnum )
-            return ( trig_data * ) trig_index[i]->proto;
+        free_varlist ( GET_TRIG_VARS ( trig ) );
+        GET_TRIG_VARS ( trig ) = nullptr;
     }
-    return NULL;
+    GET_TRIG_DEPTH ( trig ) = 0;
+    GET_TRIG_LINE_NR ( trig ) = 0;
+    GET_TRIG_LOOPS ( trig ) = 0;
+    trig->curr_state = nullptr;
 }
+
 void function_script ( void *go, struct script_data *sc, trig_data *parent, int type, char *cmd )
 {
     trig_data *t;
@@ -2793,22 +2926,31 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
     cmd = any_one_arg ( cmd, buf ); /* remove 'function ' */
     cmd = any_one_arg ( cmd, buf ); /* vnum in buf, cmd is rest. */
     skip_spaces ( &cmd );
+
     if ( !*buf || !is_number ( buf ) )
     {
-        script_log ( "Trigger: %s, VNum %d. calling function without a valid vnum! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), GET_TRIG_LINE_NR ( parent ), cmd );
+        script_log ( "Trigger: %s, VNum %d. calling function without a valid vnum! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), GET_TRIG_LINE_NR ( parent ) );
+        reset_trigger ( parent ); // the parent is not resumed
         return;
     }
+
     vnum = atoi ( buf );
-    t = get_trig_proto_by_vnum ( vnum );
+    t = read_trigger ( real_trigger ( vnum ) );
 
     if ( !t )
     {
-        script_log ( "Trigger: %s, VNum %d. calling function %d when function doesn't exist! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
+        script_log ( "Trigger: %s, VNum %d. calling function %d when function doesn't exist! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+        reset_trigger ( parent ); // the parent is not resumed
         return;
     }
+
+    add_trigger ( sc, t, -1 ); // it's removed when it finishes in script_driver, or when the owner is purged
+
     if ( t->attach_type != type )
     {
-        script_log ( "Trigger: %s, VNum %d. calling function trigger of different attach type (%d)! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
+        script_log ( "Trigger: %s, VNum %d. calling function trigger of different attach type (%d)! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+        reset_trigger ( parent ); // the parent is not resumed
+        remove_trigger ( go, t, type );
         return;
     }
     /** i can't remember what this bit is for?? **/
@@ -2817,21 +2959,27 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
         case OBJ_TRIGGER:
             if ( !TRIGGER_CHECK ( t, OTRIG_FUNCTION ) )
             {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
+                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+                reset_trigger ( parent ); // the parent is not resumed
+                remove_trigger ( go, t, type );
                 return;
             }
             break;
         case MOB_TRIGGER:
             if ( !TRIGGER_CHECK ( t, MTRIG_FUNCTION ) )
             {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
+                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+                reset_trigger ( parent ); // the parent is not resumed
+                remove_trigger ( go, t, type );
                 return;
             }
             break;
         case WLD_TRIGGER:
             if ( !TRIGGER_CHECK ( t, WTRIG_FUNCTION ) )
             {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d: %s", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ), cmd );
+                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+                reset_trigger ( parent ); // the parent is not resumed
+                remove_trigger ( go, t, type );
                 return;
             }
             break;
@@ -2843,7 +2991,6 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
         add_var ( &GET_TRIG_VARS ( t ), vd->name.c_str(), vd->value.c_str(), vd->context );
 
     t->parent = parent;
-    sc->function_trig = GET_TRIG_RNUM ( t );
     script_driver ( &go, t, type, TRIG_NEW );
 }
 /** end of dg_scripts scriptable functions **/
@@ -3569,9 +3716,6 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
     struct cmdlist_element *temp;
     unsigned long loops = 0;
     void *go = NULL;
-    //int tvnum = -1;
-    /*tvnum = GET_TRIG_VNUM ( trig );*/
-
 
     void obj_command_interpreter ( obj_data * obj, char *argument );
     void wld_command_interpreter ( Room *room, char *argument );
@@ -3669,11 +3813,14 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
     for ( cl = trig->curr_state; cl && GET_TRIG_DEPTH ( trig ); cl = cl ? cl->next : NULL )
     {
         trig->curr_state = cl;
+        GET_TRIG_LINE_NR ( trig ) = cl->line_nr;
+
         if ( !cl || !cl->cmd || !strcmp ( cl->cmd, "" ) )
         {
             script_log ( "Trigger: %s, VNum %d. has no command", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ) );
             continue;
         }
+
         for ( p = cl->cmd; *p && isspace ( *p ); p++ )
             ;
 
@@ -3745,7 +3892,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
         }
         else if ( !strn_cmp ( "done", p, 4 ) )
         {
-            /* in in a while loop, cl->origional is nonnull*/
+            /* in a while loop, cl->original is non-null */
             if ( cl->original )
             {
                 char *orig_cmd = cl->original->cmd;
@@ -3922,33 +4069,58 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
         }
     }
-    switch ( type ) /* the script may have been detached */
+
+    depth--;
+    if ( sc )
     {
-        case MOB_TRIGGER:
-            sc = SCRIPT ( ( Character * ) go );
-            break;
-        case OBJ_TRIGGER:
-            sc = SCRIPT ( ( obj_data * ) go );
-            break;
-        case WLD_TRIGGER:
-            sc = SCRIPT ( ( Room * ) go );
-            break;
+        trig_data *parent = trig->parent;
+        if ( parent )
+        {
+            for ( trig_var_data *vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
+                add_var ( &GET_TRIG_VARS ( parent ), vd->name, vd->value, vd->context );
+
+            remove_trigger ( go, trig, type ); // remove the function trigger
+            script_driver ( &go, parent, type, TRIG_RESTART ); // continue with the parent
+        }
+        else
+        {
+            reset_trigger ( trig );
+
+            if ( trig->remove_me )
+            {
+                // the trigger was removed in OLC while it was running, or detached: remove it now
+                remove_trigger ( go, trig, type );
+            }
+            else if ( trig->update_me )
+            {
+                // the trigger was updated in trigedit while it was running: update it now
+                trig_rnum rnum = trig->nr;
+                free_cmdlist ( trig );
+
+                if ( remove_trigger ( go, trig, type ) == 2 )
+                {
+                    // the script was removed as well, add a new one
+                    switch ( type )
+                    {
+                        case MOB_TRIGGER:
+                            SCRIPT ( ( Character * ) go ) = create_script();
+                            sc = SCRIPT ( ( Character * ) go );
+                            break;
+                        case OBJ_TRIGGER:
+                            SCRIPT ( ( obj_data * ) go ) = create_script();
+                            sc = SCRIPT ( ( obj_data * ) go );
+                            break;
+                        case WLD_TRIGGER:
+                            SCRIPT ( ( Room * ) go ) = create_script();
+                            sc = SCRIPT ( ( Room * ) go );
+                            break;
+                    }
+                }
+                add_trigger ( sc, read_trigger ( rnum ), -1 );
+            }
+        }
     }
 
-    /** if you have a parent, let the parent continue on where you left off **/
-    if ( trig->parent && sc )
-    {
-        struct trig_var_data *vd = NULL;
-        for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
-            add_var ( &GET_TRIG_VARS ( trig->parent ), vd->name, vd->value, vd->context );
-    }
-    if ( sc )
-        free_varlist ( GET_TRIG_VARS ( trig ) );
-    GET_TRIG_VARS ( trig ) = NULL;
-    GET_TRIG_DEPTH ( trig ) = 0;
-    depth--;
-    if ( trig->parent )
-        script_driver ( &go, trig->parent, type, TRIG_RESTART );
     return ret_val;
 }
 
@@ -4216,8 +4388,7 @@ void read_saved_vars ( Character *ch )
     /* create the space for the script structure which holds the vars */
     /* We need to do this first, because later calls to 'remote' will need */
     /* a script already assigned. */
-    CREATE ( SCRIPT ( ch ), struct script_data, 1 );
-    SCRIPT ( ch )->function_trig = -1;
+    SCRIPT ( ch ) = create_script();
 
     /* find the file that holds the saved variables and open it*/
     get_filename ( GET_NAME ( ch ), fn, SCRIPT_VARS_FILE );

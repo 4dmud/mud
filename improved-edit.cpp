@@ -102,7 +102,7 @@ int improved_editor_execute(Descriptor *d, char *str)
  */
 void parse_action(int command, char *string, Descriptor *d)
 {
-  int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
+  int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low = 0, line_high = 0, j = 0;
   unsigned int total_len;
   char *s, *t, temp;
   char buf[MAX_STRING_LENGTH];
@@ -335,7 +335,7 @@ void parse_action(int command, char *string, Descriptor *d)
     s++;
     temp = *s;
     *s = '\0';
-    sprintf(buf, "%s%4d:\r\n", buf, (i - 1));
+    sprintf(buf + strlen(buf), "%4d:\r\n", (i - 1));
     strcat(buf, t);
     *s = temp;
     t = s;

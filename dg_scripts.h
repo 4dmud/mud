@@ -169,8 +169,8 @@ struct trig_var_data {
 /* structure for triggers */
 struct trig_data {
     int nr;			/* trigger's rnum                  */
+    int line_nr;    /* copy of cmdlist->line_nr, needed in OLC */
     sbyte attach_type;		/* mob/obj/wld intentions          */
-    sbyte data_type;		/* type of game_data for trig      */
     char *name;			/* name of trigger                 */
     long trigger_type;		/* type of trigger (for bitvector) */
     struct cmdlist_element *cmdlist;	/* top of command list             */
@@ -181,6 +181,8 @@ struct trig_data {
     int loops;			/* loop iteration counter          */
     struct event *wait_event;	/* event to pause the trigger      */
     ubyte purged;		/* trigger is set to be purged     */
+    bool remove_me;     /* trigger was removed in olc while running */
+    bool update_me;     /* trigger was changed in trigedit while running */
     struct trig_var_data *var_list;	/* list of local vars for trigger  */
     /** for script functions **/
     struct trig_data *parent; /* this is the trigger that is running this script */
@@ -197,12 +199,7 @@ struct script_data {
     struct trig_var_data *global_vars;	/* list of global variables   */
     ubyte purged;		/* script is set to be purged */
     long context;		/* current context for statics */
-    trig_rnum function_trig;	/* rnum of the currently running function trigger */
     struct script_data *next;	/* used for purged_scripts    */
-
-    script_data() {
-        function_trig = -1;
-    }
 };
 
 /* The event data for the wait command */
@@ -424,14 +421,13 @@ void function_script(void *go, struct script_data *sc, trig_data *parent, int ty
 #define GET_TRIG_RNUM(t)          ((t)->nr)
 #define GET_TRIG_VNUM(t)	  (trig_index[(t)->nr]->vnum)
 #define GET_TRIG_TYPE(t)          ((t)->trigger_type)
-#define GET_TRIG_DATA_TYPE(t)	  ((t)->data_type)
 #define GET_TRIG_NARG(t)          ((t)->narg)
 #define GET_TRIG_ARG(t)           ((t)->arglist)
 #define GET_TRIG_VARS(t)	  ((t)->var_list)
 #define GET_TRIG_WAIT(t)	  ((t)->wait_event)
 #define GET_TRIG_DEPTH(t)         ((t)->depth)
 #define GET_TRIG_LOOPS(t)         ((t)->loops)
-#define GET_TRIG_LINE_NR(t)       ((t)->curr_state ? (t)->curr_state->line_nr : 1)
+#define GET_TRIG_LINE_NR(t)       ((t)->line_nr)
 
 /* player id's: 0 to MOB_ID_BASE - 1            */
 /* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */

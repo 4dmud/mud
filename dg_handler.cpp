@@ -12,15 +12,8 @@
 #include "dg_event.h"
 #include "constants.h"
 
-/* frees memory associated with var
-void free_var_el(struct trig_var_data *var)
-{
-  if (var->name)
-    free(var->name);
-  if (var->value)
-    free(var->value);
-  free(var);
-} */
+void free_cmdlist ( trig_data *trig );
+
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
     struct trig_var_data *i, *j;
@@ -29,7 +22,6 @@ void free_varlist(struct trig_var_data *vd) {
         j = i;
         i = i->next;
         delete j;
-        //free_var_el(j);
     }
 }
 
@@ -62,14 +54,13 @@ int remove_var(struct trig_var_data **var_list,const char *name) {
 /*
  * Return memory used by a trigger
  * The command list is free'd when changed and when
- * shutting down.
+ * shutting down, unless it's flagged to be updated.
  */
 void free_trigger(struct trig_data *trig) {
-    /* threw this in for minor consistance in names with the rest of circle */
-    if (trig->name)
+    if (trig->name) {
         free(trig->name);
-    trig->name = NULL;
-
+        trig->name = NULL;
+    }
     if (trig->arglist) {
         free(trig->arglist);
         trig->arglist = NULL;
@@ -82,6 +73,9 @@ void free_trigger(struct trig_data *trig) {
         event_cancel(GET_TRIG_WAIT(trig));
     GET_TRIG_WAIT(trig) = NULL;
 
+    if (trig->update_me) // cmdlist is different from proto
+        free_cmdlist (trig);
+
     free(trig);
 }
 
@@ -89,11 +83,6 @@ void free_trigger(struct trig_data *trig) {
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(struct trig_data *trig) {
     struct trig_data *temp;
-
-    if (GET_TRIG_WAIT(trig)) {
-        event_cancel(GET_TRIG_WAIT(trig));
-        GET_TRIG_WAIT(trig) = NULL;
-    }
 
     trig_index[trig->nr]->number--;
 

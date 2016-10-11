@@ -322,6 +322,9 @@ void Character::freeself()
 
         delete player_specials;
     }
+    else if ( IS_MOB ( this ) )
+        free_non_proto_strings(); // for transformed mobs
+
     if ( !IS_NPC ( this ) || proto || !MobProtoExists ( vnum ) )
     {
 
@@ -353,7 +356,6 @@ void Character::freeself()
 
     if ( send_string != NULL )
         delete send_string;
-
 
     if ( desc )
         desc->character = NULL;

@@ -3138,7 +3138,6 @@ int fe_after_damage ( Character* ch, Character* vict,
             if ( ( GET_HIT ( vict ) << 2 ) < GET_MAX_HIT ( vict ) && !AFF_FLAGGED ( vict, AFF_CHARM ) &&
                     MOB_FLAGGED ( vict, MOB_WIMPY ) && ! ( AFF_FLAGGED ( vict, AFF_HOLD ) && ( number ( 1,4 ) != 3 ) ) )
                 do_flee ( vict, NULL, 0, 0 );
-
         }
         else if ( GET_WIMP_LEV ( vict ) && GET_HIT ( vict ) < GET_WIMP_LEV ( vict ) && GET_HIT ( vict ) > 0 )
             do_flee ( vict, NULL, 0, 0 );

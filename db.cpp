@@ -249,6 +249,8 @@ void set_race ( Character *ch, int race );
 
 
 /* external functions */
+script_data* create_script();
+void free_cmdlist ( trig_data *trig );
 void load_crashproof_objects();
 void free_skill_prototypes();
 void free_player_shops();
@@ -1093,19 +1095,7 @@ void destroy_db ( void )
         {
             /* make sure to nuke the command list (memory leak) */
             /* free_trigger() doesn't free the command list */
-            if ( trig_index[cnt]->proto->cmdlist )
-            {
-                struct cmdlist_element *i, *j;
-                i = trig_index[cnt]->proto->cmdlist;
-                while ( i )
-                {
-                    j = i->next;
-                    if ( i->cmd )
-                        free ( i->cmd );
-                    free ( i );
-                    i = j;
-                }
-            }
+            free_cmdlist ( trig_index[cnt]->proto );
             free_trigger ( trig_index[cnt]->proto );
         }
         free ( trig_index[cnt] );
@@ -4774,20 +4764,14 @@ void reset_zone ( zone_rnum zone )
                 if ( ZCMD.arg1==MOB_TRIGGER && tmob )
                 {
                     if ( !SCRIPT ( tmob ) )
-                    {
-                        CREATE ( SCRIPT ( tmob ), struct script_data, 1 );
-                        SCRIPT ( tmob )->function_trig = -1;
-                    }
+                        SCRIPT ( tmob ) = create_script();
                     add_trigger ( SCRIPT ( tmob ), read_trigger ( ZCMD.arg2 ), -1 );
                     last_cmd = true;
                 }
                 else if ( ZCMD.arg1==OBJ_TRIGGER && tobj )
                 {
                     if ( !SCRIPT ( tobj ) )
-                    {
-                        CREATE ( SCRIPT ( tobj ), struct script_data, 1 );
-                        SCRIPT ( tobj )->function_trig = -1;
-                    }
+                        SCRIPT ( tobj ) = create_script();
                     add_trigger ( SCRIPT ( tobj ), read_trigger ( ZCMD.arg2 ), -1 );
                     last_cmd = true;
                 }
@@ -4797,12 +4781,10 @@ void reset_zone ( zone_rnum zone )
                     {
                         ZONE_ERROR ( "Invalid room number in trigger assignment" );
                     }
-                    if ( !world_vnum[ZCMD.arg3]->script )
-                    {
-                        CREATE ( world_vnum[ZCMD.arg3]->script, struct script_data, 1 );
-                        world_vnum[ZCMD.arg3]->script->function_trig = -1;
-                    }
-                    add_trigger ( world_vnum[ZCMD.arg3]->script, read_trigger ( ZCMD.arg2 ), -1 );
+
+                    if ( !SCRIPT ( world_vnum[ZCMD.arg3] ) )
+                        SCRIPT ( world_vnum[ZCMD.arg3] ) = create_script();
+                    add_trigger ( SCRIPT ( world_vnum[ZCMD.arg3] ), read_trigger ( ZCMD.arg2 ), -1 );
                     last_cmd = true;
                 }
 

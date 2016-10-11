@@ -25,6 +25,10 @@
 /* prototype externally defined functions */
 //extern const char *trig_types[], *otrig_types[], *wtrig_types[];
 zone_rnum real_zone_by_thing(room_vnum vznum);
+script_data* create_script();
+void set_script_types ( script_data *sc );
+trig_data *find_trigger ( script_data *sc, trig_vnum vnum );
+
 /*locals*/
 void trigedit_disp_menu(Descriptor *d);
 void trigedit_disp_types(Descriptor *d);
@@ -32,6 +36,7 @@ void trigedit_save(Descriptor *d);
 void trigedit_create_index(int znum, char *type);
 void trigedit_string_cleanup(Descriptor *d, int terminator);
 int format_script(Descriptor *d);
+int remove_trigger ( void *thing, trig_data *trig, int type );
 
 /* ***********************************************************************
  * trigedit
@@ -116,7 +121,7 @@ ACMD(do_oasis_trigedit) {
                GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
 
-/* called when a mob or object is being saved to disk, so its script can */
+/* called when a mob, room or object is being saved to disk, so its script can */
 /* be saved */
 void script_save_to_disk(FILE *fp, void *item, int type) {
     vector<int> *it;
@@ -396,8 +401,50 @@ void trigedit_parse(Descriptor *d, char *arg) {
     trigedit_disp_menu(d);
 }
 
+void free_cmdlist ( trig_data *trig )
+{
+    cmdlist_element *cl = trig->cmdlist;
+    cmdlist_element *cl_next;
 
+    while ( cl != nullptr )
+    {
+        cl_next = cl->next;
+        if ( cl->cmd )
+            free ( cl->cmd );
+        free ( cl );
+        cl = cl_next;
+    }
+    trig->cmdlist = nullptr;
+}
 
+void copy_cmdlist ( const trig_data *source, trig_data *dest )
+{
+    if ( source->cmdlist == nullptr )
+        return;
+
+    cmdlist_element *cl_source = source->cmdlist;
+    cmdlist_element *cl, *cl_dest;
+    bool is_head = TRUE;
+    int line_nr = 1;
+
+    while ( cl_source != nullptr )
+    {
+        CREATE ( cl, struct cmdlist_element, 1 );
+        cl->cmd = str_udup ( cl_source->cmd );
+        cl->line_nr = line_nr++;
+
+        if ( is_head )
+        {
+            dest->cmdlist = cl;
+            is_head = FALSE;
+        }
+        else
+            cl_dest->next = cl;
+
+        cl_dest = cl;
+        cl_source = cl_source->next;
+    }
+}
 
 /* save the zone's triggers to internal memory and to disk */
 void trigedit_save(Descriptor *d) {
@@ -408,7 +455,7 @@ void trigedit_save(Descriptor *d) {
     trig_data *proto;
     trig_data *trig = OLC_TRIG(d);
     trig_data *live_trig;
-    struct cmdlist_element *cmd, *next_cmd;
+    struct cmdlist_element *cmd;
     struct index_data **new_index;
 
     Descriptor *dsc;
@@ -420,16 +467,20 @@ void trigedit_save(Descriptor *d) {
 
     if ((rnum = real_trigger(OLC_NUM(d))) != NOTHING) {
         proto = trig_index[rnum]->proto;
-        for (cmd = proto->cmdlist; cmd; cmd = next_cmd) {
-            next_cmd = cmd->next;
-            if (cmd->cmd)
-                free(cmd->cmd);
-            free(cmd);
-        }
 
+        // save the old proto
+        trig_data *old_proto;
+        CREATE ( old_proto, trig_data, 1 );
+        old_proto->arglist = str_udup ( proto->arglist );
+        old_proto->name = str_udup ( proto->name );
+        copy_cmdlist ( proto, old_proto );
 
-        free(proto->arglist);
-        free(proto->name);
+        // free the old proto
+        free_cmdlist ( proto );
+        if ( proto->arglist )
+            free ( proto->arglist );
+        if ( proto->name )
+            free ( proto->name );
         proto->arglist = NULL;
         proto->name = NULL;
 
@@ -457,46 +508,107 @@ void trigedit_save(Descriptor *d) {
         /* make the prototype look like what we have */
         trig_data_copy(proto, trig);
 
-        /* go through the mud and replace existing triggers         */
+        /* go through the mud and replace existing triggers */
         live_trig = trigger_list;
         while (live_trig) {
             if (GET_TRIG_RNUM(live_trig) == rnum) {
-                if (live_trig->arglist) {
-                    free(live_trig->arglist);
-                    live_trig->arglist = NULL;
-                }
-                if (live_trig->name) {
-                    free(live_trig->name);
-                    live_trig->name = NULL;
+                if ( GET_TRIG_LINE_NR ( live_trig ) > 0 )
+                {
+                    // trigger is running: restore it, it will be updated when it's finished
+                    live_trig->update_me = TRUE;
+
+                    if ( live_trig->name )
+                        free ( live_trig->name );
+                    live_trig->name = nullptr;
+                    if ( old_proto->name )
+                        live_trig->name = str_dup ( old_proto->name );
+
+                    if ( live_trig->arglist )
+                        free ( live_trig->arglist );
+                    live_trig->arglist = nullptr;
+                    if ( old_proto->arglist )
+                        live_trig->arglist = str_dup ( old_proto->arglist );
+
+                    copy_cmdlist ( old_proto, live_trig );
+                    live_trig->curr_state = live_trig->cmdlist;
+                    for ( int i = 1; i < GET_TRIG_LINE_NR ( live_trig ) && live_trig->curr_state; ++i )
+                        live_trig->curr_state = live_trig->curr_state->next;
+
+                    live_trig = live_trig->next_in_world;
+                    continue;
                 }
 
-                if (proto->arglist)
-                    live_trig->arglist = strdup(proto->arglist);
-                if (proto->name)
-                    live_trig->name = strdup(proto->name);
+                // trigger is not running: update it now
+                if ( live_trig->arglist )
+                    free ( live_trig->arglist );
+                if ( proto->arglist )
+                    live_trig->arglist = str_dup ( proto->arglist );
+                else
+                    live_trig->arglist = str_dup ( "" );
 
-                /* anything could have happened so we don't want to keep these */
-                if (GET_TRIG_WAIT(live_trig)) {
-                    event_cancel(GET_TRIG_WAIT(live_trig));
-                    GET_TRIG_WAIT(live_trig)=NULL;
-                }
-                if (live_trig->var_list) {
-                    free_varlist(live_trig->var_list);
-                    live_trig->var_list=NULL;
+                if ( live_trig->name )
+                    free ( live_trig->name );
+                if ( proto->name )
+                    live_trig->name = str_dup ( proto->name );
+                else
+                    live_trig->name = str_dup ( "" );
+
+                if ( live_trig->var_list ) {
+                    free_varlist ( live_trig->var_list );
+                    live_trig->var_list = nullptr;
                 }
 
                 live_trig->cmdlist = proto->cmdlist;
-                live_trig->curr_state = live_trig->cmdlist;
-                live_trig->curr_state->line_nr = 1;
+                live_trig->curr_state = nullptr;
                 live_trig->trigger_type = proto->trigger_type;
                 live_trig->attach_type = proto->attach_type;
                 live_trig->narg = proto->narg;
-                live_trig->data_type = proto->data_type;
                 live_trig->depth = 0;
             }
 
             live_trig = live_trig->next_in_world;
         }
+
+        /* need to update the script type of all scripts that have
+           the trigger if the trigger type changed
+        */
+        if ( GET_TRIG_TYPE ( old_proto ) != GET_TRIG_TYPE ( proto ) )
+        {
+            trig_vnum vnum = OLC_NUM ( d );
+            // rooms
+            for ( auto &r : world_vnum )
+                if ( r && SCRIPT ( r ) )
+                {
+                    auto t = find_trigger ( SCRIPT ( r ), vnum );
+                    if ( !t || t->update_me )
+                        continue;
+                    set_script_types ( SCRIPT ( r ) );
+                }
+
+            // objects
+            for ( auto &o : object_list )
+                if ( o.second && SCRIPT ( o.second ) )
+                {
+                    auto t = find_trigger ( SCRIPT ( o.second ), vnum );
+                    if ( !t || t->update_me )
+                        continue;
+                    set_script_types ( SCRIPT ( o.second ) );
+                }
+
+            // mobs
+            for ( auto c = character_list; c; c = c->next )
+                if ( SCRIPT ( c ) )
+                {
+                    auto t = find_trigger ( SCRIPT ( c ), vnum );
+                    if ( !t || t->update_me )
+                        continue;
+                    set_script_types ( SCRIPT ( c ) );
+                }
+        }
+
+        free_cmdlist ( old_proto );
+        free_trigger ( old_proto );
+
     } else {
         /* this is a new trigger */
         CREATE(new_index, struct index_data *, top_of_trigt + 2);
@@ -979,4 +1091,72 @@ int format_script(Descriptor *d) {
     free(sc);
 
     return TRUE;
+}
+
+void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type )
+{
+    script_data *sc = nullptr;
+    switch ( type )
+    {
+        case MOB_TRIGGER:
+            sc = SCRIPT ( ( Character * ) thing );
+            break;
+        case OBJ_TRIGGER:
+            sc = SCRIPT ( ( obj_data * ) thing );
+            break;
+        case WLD_TRIGGER:
+            sc = SCRIPT ( ( Room * ) thing );
+            break;
+        default:
+            log ( "SYSERR: unknown script type %d passed to update_script", type );
+            return;
+    }
+
+    // remove triggers that were in the old proto script, but not in the new
+    if ( sc && ops.size() > 0 )
+    {
+        for ( const auto &i : ops )
+            if ( find ( nps.begin(), nps.end(), i ) == nps.end() )
+            {
+                auto t = find_trigger ( sc, i );
+                if ( t )
+                {
+                    if ( t->curr_state )
+                        t->remove_me = TRUE; // remove running triggers when they're done
+                    else
+                        remove_trigger ( thing, t, type );
+                }
+            }
+    }
+
+    // add triggers that weren't in the old proto script, but are in the new
+    if ( nps.size() > 0 )
+    {
+        for ( const auto &i : nps )
+            if ( find ( ops.begin(), ops.end(), i ) == ops.end() )
+            {
+                if ( !sc )
+                {
+                    sc = create_script();
+                    switch ( type )
+                    {
+                        case MOB_TRIGGER:
+                            SCRIPT ( ( Character * ) thing ) = sc;
+                            break;
+                        case OBJ_TRIGGER:
+                            SCRIPT ( ( obj_data * ) thing ) = sc;
+                            break;
+                        case WLD_TRIGGER:
+                            SCRIPT ( ( Room * ) thing ) = sc;
+                            break;
+                    }
+                }
+
+                auto t = find_trigger ( sc, i );
+                if ( !t )
+                    add_trigger ( sc, read_trigger ( real_trigger ( i ) ), -1 );
+            }
+    }
+
+    set_script_types ( sc );
 }

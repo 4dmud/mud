@@ -312,9 +312,7 @@ int is_name ( const char *str, const char *namelist )
 
 
 
-void affect_modify ( Character *ch, sbyte loc, int mod,
-                     bitvector_t bitv, bool add
-                   )
+void affect_modify ( Character *ch, sbyte loc, int mod, bitvector_t bitv, bool add )
 {
 
     if ( loc < 0 )
@@ -612,9 +610,7 @@ void affect_modify(Character * ch, byte loc, sbyte mod,
 
 
 
-void affect_modify_ar ( Character *ch, sbyte loc, int mod,
-                        int bitv[], bool add
-                      )
+void affect_modify_ar ( Character *ch, sbyte loc, int mod, int bitv[], bool add )
 {
     int i, j;
 
@@ -1041,8 +1037,6 @@ void char_to_room ( Character *ch, room_rnum room )
 /* give an object to a char   */
 void obj_to_char ( struct obj_data *object, Character *ch )
 {
-
-
     if ( object && ch )
     {
         object->next_content = ch->carrying;
@@ -1070,16 +1064,13 @@ void obj_to_char ( struct obj_data *object, Character *ch )
             }
 
             new_mudlog ( CMP, MAX ( LVL_SEN, GET_INVIS_LEV ( ch ) ), TRUE, "%s to character %s (Owner: %s)",
-                         object->short_description, GET_NAME ( ch ), object->owner == 0 ? "nobody" : pi.NameById ( object->owner ) );
-
+                object->short_description, GET_NAME ( ch ), object->owner == 0 ? "nobody" : pi.NameById ( object->owner ) );
         }
 #endif
 
-
     }
     else
-        log ( "SYSERR: NULL or dead obj (%p) or char (%p) passed to obj_to_char.",
-              object, ch );
+        log ( "SYSERR: NULL or dead obj (%p) or char (%p) passed to obj_to_char.", object, ch );
 }
 
 
@@ -1284,24 +1275,21 @@ struct obj_data *unequip_char ( Character *ch, int pos )
     if ( ch == NULL )
         log ( "Null ch passed to unequip_char" );
 
-
     if ( ( pos < 0 || pos >= NUM_WEARS ) )
     {
         log ( "Pos %d outside position range of %d - %d passed to unequip_char", pos, 0, NUM_WEARS );
-        core_dump();
-        return ( NULL );
+        return NULL;
     }
+
     if ( GET_EQ ( ch, pos ) == NULL )
     {
         log ( "unequip_char asked to remove a position already unequipped!" );
         return NULL;
     }
+
     obj = GET_EQ ( ch, pos );
-
-
     obj->worn_by = NULL;
     obj->worn_on = -1;
-
 
     if ( GET_OBJ_TYPE ( obj ) == ITEM_ARMOR )
         GET_AC ( ch ) += apply_ac ( ch, pos );
@@ -1859,14 +1847,7 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
     OBJ_SAT_IN_BY ( obj ) = NULL;
 
     if ( SCRIPT ( obj ) )
-    {
-        /* Set the proto depth of a running function trigger to zero so it can be called again */
-        struct script_data *sc = SCRIPT ( obj );
-        if ( sc && sc->function_trig != -1 )
-            trig_index[ sc->function_trig ]->proto->depth = 0;
-
         extract_script ( obj, OBJ_TRIGGER );
-    }
 
     if ( GET_OBJ_RNUM ( obj ) == NOTHING || obj->proto_script != obj_proto[GET_OBJ_RNUM ( obj ) ].proto_script )
         free_proto_script ( obj, OBJ_TRIGGER );
@@ -1960,8 +1941,8 @@ void crumble_obj ( Character *ch, struct obj_data *obj )
                 if ( GET_EQ ( ch, index ) == obj )
                 {
                     obj = unequip_char ( ch, index );
-                    act ( "$p decays in your hands.", FALSE, ch, obj, 0,              TO_CHAR );
-                    act ( "$p decays in $n's hands.", FALSE, ch, obj, 0,              TO_ROOM );
+                    act ( "$p decays in your hands.", FALSE, ch, obj, 0, TO_CHAR );
+                    act ( "$p decays in $n's hands.", FALSE, ch, obj, 0, TO_ROOM );
                     obj_from_char(obj); // Once's fix for decaying items
                 }
         }
@@ -2401,11 +2382,6 @@ void extract_char ( Character *ch, int e_now )
 
     if ( IS_NPC ( ch ) )
     {
-        /* Set the proto depth of a running function trigger to zero so it can be called again */
-        struct script_data *sc = SCRIPT ( ch );
-        if ( sc && sc->function_trig != -1 )
-            trig_index[ sc->function_trig ]->proto->depth = 0;
-
         SET_BIT_AR ( MOB_FLAGS ( ch ), MOB_NOTDEADYET );
         extract_linked_mob ( ch );
     }
@@ -2480,8 +2456,7 @@ void extract_pending_chars ( void )
 
 
 
-Character *get_player_vis ( Character *ch, char *name,
-                            int *number, int inroom )
+Character *get_player_vis ( Character *ch, char *name, int *number, int inroom )
 {
     Character *i;
     Descriptor *d;
@@ -2541,8 +2516,7 @@ Character *get_player_vis ( Character *ch, char *name,
 }
 
 
-Character *get_player_room ( room_rnum room, char *name, int *number,
-                             int inroom )
+Character *get_player_room ( room_rnum room, char *name, int *number, int inroom )
 {
     Descriptor *i;
     Character *ch;
@@ -2602,8 +2576,7 @@ Character *get_room_vis ( room_rnum room, char *name, int *number,Character *ch 
     return ( NULL );
 }
 
-Character *get_char_room_vis ( Character *ch, char *name,
-                               int *number )
+Character *get_char_room_vis ( Character *ch, char *name, int *number )
 {
     Character *i;
     int num = 1;
@@ -2637,8 +2610,7 @@ Character *get_char_room_vis ( Character *ch, char *name,
 
 
 
-Character *get_char_world_vis ( Character *ch, char *name,
-                                int *number )
+Character *get_char_world_vis ( Character *ch, char *name, int *number )
 {
     Character *i;
     int num;
@@ -2675,8 +2647,7 @@ Character *get_char_world_vis ( Character *ch, char *name,
 }
 
 
-Character *get_char_vis ( Character *ch, char *name,
-                          int *number, int where )
+Character *get_char_vis ( Character *ch, char *name, int *number, int where )
 {
     if ( where == FIND_CHAR_ROOM )
         return get_char_room_vis ( ch, name, number );
@@ -2688,8 +2659,7 @@ Character *get_char_vis ( Character *ch, char *name,
 
 
 
-struct obj_data *get_obj_in_list_vis ( Character *ch, char *name,
-                                                   int *number, struct obj_data *list )
+struct obj_data *get_obj_in_list_vis ( Character *ch, char *name, int *number, struct obj_data *list )
 {
     struct obj_data *i;
     int num;
@@ -2751,9 +2721,7 @@ struct obj_data *get_obj_vis ( Character *ch, char *name, int *number )
 }
 
 
-struct obj_data *get_obj_in_equip_vis ( Character *ch, char *arg,
-                                                    int *number,
-                                                    struct obj_data *equipment[] )
+struct obj_data *get_obj_in_equip_vis ( Character *ch, char *arg, int *number, struct obj_data *equipment[] )
 {
     int j, num;
 

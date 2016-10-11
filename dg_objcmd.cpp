@@ -56,8 +56,7 @@ void update_affects ( struct obj_data *obj );
 struct obj_command_info
 {
     const char *command;
-    void ( *command_pointer ) ( obj_data * obj, char *argument, int cmd,
-                                int subcmd );
+    void ( *command_pointer ) ( obj_data * obj, char *argument, int cmd, int subcmd );
     int subcmd;
 };
 
@@ -158,13 +157,11 @@ OCMD ( do_oecho )
 
     if ( !*argument )
         obj_log ( obj, "oecho called with no args" );
-
     else if ( ( room = obj_room ( obj ) ) != NULL )
     {
         if ( room->people )
             sub_write ( argument, room->people, TRUE,TO_ROOM | TO_CHAR );
     }
-
     else
         obj_log ( obj, "oecho called by object in NOWHERE" );
 }
@@ -195,9 +192,7 @@ OCMD ( do_oforce )
                 next_ch = ch->next_in_room;
 
                 if ( valid_dg_target ( ch, FALSE ) )
-                {
                     command_interpreter ( ch, line );
-                }
             }
         }
     }
@@ -206,12 +201,9 @@ OCMD ( do_oforce )
     {
         if ( ( ch = get_char_by_obj ( obj, arg1 ) ) )
         {
-                if ( IS_NPC(ch) || GET_LEVEL ( ch ) < LVL_IMMORT )
-            {
+            if ( IS_NPC(ch) || GET_LEVEL ( ch ) < LVL_IMMORT )
                 command_interpreter ( ch, line );
-            }
         }
-
         else
             obj_log ( obj, "oforce: no target found" );
     }
@@ -248,8 +240,6 @@ OCMD ( do_olag )
         return;
     }
 
-
-
     if ( !IS_NPC ( victim ) && PRF_FLAGGED ( victim, PRF_NOHASSLE ) )
     {
         obj_log ( obj, "olag: target has nohassle on" );
@@ -261,11 +251,9 @@ OCMD ( do_olag )
 
     if ( w > 300 )
     {
-        obj_log ( obj,"olag: duration longer than 30 seconds outside range." );
+        obj_log ( obj, "olag: duration longer than 30 seconds, outside range" );
         return;
     }
-
-
 
     w = FTOI ( ( w RL_SEC ) *0.1 );
 
@@ -283,10 +271,8 @@ OCMD ( do_ozoneecho )
 
     if ( !*room_number || !*msg )
         obj_log ( obj, "ozoneecho called with too few args" );
-
     else if ( ( zone = real_zone ( atoi ( room_number ) ) ) == NOWHERE )
         obj_log ( obj, "ozoneecho called for nonexistant zone" );
-
     else
     {
         sprintf ( buf, "%s\r\n", msg );
@@ -328,9 +314,7 @@ OCMD ( do_osend )
                 sub_write ( msg, ch, TRUE, TO_ROOM );
             }
             else
-            {
                 obj_log ( obj, "calling oechoaround when %s is in nowhere", GET_NAME ( ch ) );
-            }
         }
     }
 
@@ -407,6 +391,13 @@ OCMD ( do_otransform )
             obj_log ( obj, "otransform: bad object vnum" );
             return;
         }
+
+        if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER && GET_OBJ_TYPE ( o ) != ITEM_CONTAINER )
+        {
+            obj_log ( obj, "otransform: trying to transform a container to non-container [%d]", GET_OBJ_VNUM ( o ) );
+            return;
+        }
+
         objid = GET_ID ( o );
 
         if ( obj->worn_by )
@@ -506,7 +497,7 @@ OCMD ( do_opurge )
 
     if ( !IS_NPC ( ch ) )
     {
-        obj_log ( obj, "opurge: purging a PC" );
+        obj_log ( obj, "opurge: trying to purge a PC" );
         return;
     }
 
@@ -630,7 +621,6 @@ OCMD ( do_dgoload )
         {
             obj_log ( obj, "oload: bad mob vnum" );
             return;
-
         }
         char_to_room ( mob, rnum );
         load_mtrigger ( mob );
@@ -715,7 +705,6 @@ OCMD ( do_dgoload )
 
     else
         obj_log ( obj, "oload: bad type %s", argument );
-
 }
 
 OCMD ( do_oasound )
@@ -755,9 +744,6 @@ OCMD ( do_odamage )
     int dam = 0;
     Character *ch = NULL;
     Character *vict = NULL;
-
-//    if (obj->worn_by)
-//      strcpy(name, GET_NAME(obj->worn_by));
 
     two_arguments ( argument, name, amount );
 
@@ -935,8 +921,7 @@ OCMD ( do_osetval )
     int position, new_value;
 
     two_arguments ( argument, arg1, arg2 );
-    if ( !*arg1 || !*arg2 ||
-            !is_number ( arg1 ) || !is_number ( arg2 ) )
+    if ( !*arg1 || !*arg2 || !is_number ( arg1 ) || !is_number ( arg2 ) )
     {
         obj_log ( obj, "osetval: bad syntax" );
         return;
@@ -964,7 +949,7 @@ OCMD ( do_osetval )
         }
     }
     else
-        obj_log ( obj, "osetval: position out of bounds!" );
+        obj_log ( obj, "osetval: position out of bounds" );
 }
 
 OCMD ( do_oat )
@@ -1008,6 +993,7 @@ OCMD ( do_oat )
     if ( object->in_room == loc )
         extract_obj ( object, FALSE );
 }
+
 OCMD ( do_ocontains )
 {
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
@@ -1058,16 +1044,15 @@ OCMD ( do_ozecho )
 
     if ( !*zone_name || !*msg )
         obj_log ( obj, "ozoneecho called with too few args" );
-
     else if ( ( zone = real_zone ( atoi ( zone_name ) ) ) < 0 )
         obj_log ( obj, "ozoneecho called for nonexistant zone" );
-
     else
     {
         sprintf ( buf, "%s\r\n", msg );
         send_to_zone ( buf, zone );
     }
 }
+
 /* prints the message to everyone in the range of numbers */
 OCMD ( do_orecho )
 {
@@ -1078,7 +1063,7 @@ OCMD ( do_orecho )
     skip_spaces ( &msg );
 
     if ( !*msg || !*start || !*finish )
-        obj_log ( obj, "mrecho called with too few args" );
+         obj_log ( obj, "mrecho called with too few args" );
     else
         send_to_range ( atoi ( start ), atoi ( finish ), "%s\r\n", msg );
 
@@ -1097,11 +1082,8 @@ OCMD ( do_ozrecho )
 
     if ( !*zone_name || !*msg || !*strlower || !*strupper )
         obj_log ( obj, "ozrecho called with too few args" );
-
-
     else if ( ( zone = real_zone ( atoi ( zone_name ) ) ) < 0 )
         obj_log ( obj, "ozrecho called for nonexistant zone" );
-
     else
     {
         lower_vnum = atoi ( strlower );

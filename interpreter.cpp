@@ -1865,7 +1865,6 @@ int perform_dupe_check ( Descriptor *d )
         else if ( k->character && same_account && k->original )
         {
             /* Character taking over their own body, while an immortal was switched to it. */
-
             do_return ( k->character, NULL, 0, 0 );
         }
         else if ( k->character && same_account )

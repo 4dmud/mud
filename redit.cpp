@@ -33,6 +33,7 @@ extern const char *sector_types[];
 extern const char *exit_bits[];
 extern Descriptor *descriptor_list;
 
+void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type );
 /*------------------------------------------------------------------------*/
 
 
@@ -226,8 +227,9 @@ void redit_setup_existing(Descriptor *d, room_vnum v_num)
 void redit_save_internally(Descriptor *d)
 {
   int j,  new_room = FALSE;
-  room_rnum room_num;
+  room_rnum room;
   Descriptor *dsc;
+  vector<int> ops;
 
   if (OLC_ROOM(d)->number == NOWHERE)
   {
@@ -235,27 +237,36 @@ void redit_save_internally(Descriptor *d)
     OLC_ROOM(d)->number = OLC_NUM(d);
     world_vnum[OLC_ROOM(d)->number] = new Room();
   }
+  else // save old proto script, it's destroyed by add_room
+  {
+    if ( world_vnum[ OLC_NUM ( d ) ]->proto_script )
+      ops = *( world_vnum[ OLC_NUM ( d ) ]->proto_script );
+  }
+
   /* FIXME: Why is this not set elsewhere? */
   OLC_ROOM(d)->zone = OLC_ZNUM(d);
 
-  if ((room_num = add_room(OLC_ROOM(d))) == NULL)
+  if ((room = add_room(OLC_ROOM(d))) == NULL)
   {
     d->Output( "Something went wrong...\r\n");
-    log("SYSERR: redit_save_internally: Something failed! (%d)", room_num->number);
+    log("SYSERR: redit_save_internally: Something failed! (%d)", OLC_ROOM(d)->number);
     return;
   }
-  /* Update triggers */
-  /* Free old proto list */
-  if (GET_ROOM_VNUM(room_num) != NOWHERE && world_vnum[GET_ROOM_VNUM(room_num)] &&
-      world_vnum[GET_ROOM_VNUM(room_num)]->proto_script != room_num->proto_script)
-    if (room_num->proto_script && room_num->proto_script != OLC_SCRIPT(d))
-      free_proto_script(room_num, WLD_TRIGGER);
-  room_num->proto_script = OLC_SCRIPT(d);
-  assign_triggers(room_num, WLD_TRIGGER);
-  OLC_SCRIPT(d) = NULL;
-  /* end trigger update */
 
-  REMOVE_BIT_AR(ROOM_FLAGS(room_num), ROOM_BFS_MARK);
+  /* Update triggers */
+  OLC_ROOM ( d )->proto_script = NULL;
+  OLC_ROOM ( d )->script = NULL;
+  room->proto_script = NULL;
+  if ( OLC_SCRIPT ( d ) )
+    room->proto_script = new vector<int> ( OLC_SCRIPT ( d )->begin(), OLC_SCRIPT ( d )->end() );
+
+  vector<int> nps; // new proto script
+  if ( OLC_SCRIPT ( d ) )
+    nps = *( OLC_SCRIPT ( d ) );
+
+  update_script ( ops, nps, room, WLD_TRIGGER );
+
+  REMOVE_BIT_AR(ROOM_FLAGS(room), ROOM_BFS_MARK);
   /* Don't adjust numbers on a room update. */
   if (!new_room)
     return;
@@ -275,13 +286,13 @@ void redit_save_internally(Descriptor *d)
         case 'M':
         case 'T':
         case 'V':
-          OLC_ZONE(dsc)->cmd[j].arg3 += (OLC_ZONE(dsc)->cmd[j].arg3 >= room_num->number);
+          OLC_ZONE(dsc)->cmd[j].arg3 += (OLC_ZONE(dsc)->cmd[j].arg3 >= room->number);
           break;
         case 'D':
-          OLC_ZONE(dsc)->cmd[j].arg2 += (OLC_ZONE(dsc)->cmd[j].arg2 >= room_num->number);
+          OLC_ZONE(dsc)->cmd[j].arg2 += (OLC_ZONE(dsc)->cmd[j].arg2 >= room->number);
           /* Fall through */
         case 'R':
-          OLC_ZONE(dsc)->cmd[j].arg1 += (OLC_ZONE(dsc)->cmd[j].arg1 >= room_num->number);
+          OLC_ZONE(dsc)->cmd[j].arg1 += (OLC_ZONE(dsc)->cmd[j].arg1 >= room->number);
           break;
         }
     }/* else if (STATE(dsc) == CON_REDIT) {
@@ -670,7 +681,8 @@ void redit_parse(Descriptor *d, char *arg)
       /*
        * Free everything up, including strings, etc.
        */
-        OLC_ROOM(d)->free_room_strings();
+      OLC_ROOM(d)->free_room_strings();
+      OLC_ROOM(d)->proto_script = NULL; // don't destroy the original with the room
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:

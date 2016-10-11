@@ -26,8 +26,22 @@
 #include "constants.h"
 #include "oasis.h"
 
+script_data* create_script()
+{
+    script_data *sc;
+    CREATE ( sc, struct script_data, 1 );
+    return sc;
+}
 
+void set_script_types ( script_data *sc )
+{
+    if ( sc == nullptr )
+        return;
 
+    SCRIPT_TYPES ( sc ) = 0;
+    for ( trig_data *t = TRIGGERS ( sc ); t; t = t->next )
+        SCRIPT_TYPES ( sc ) |= GET_TRIG_TYPE ( t );
+}
 
 void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     int t[2], k, attach_type;
@@ -111,18 +125,20 @@ trig_data *read_trigger(unsigned int nr) {
 
 void trig_data_init(trig_data * this_data) {
     this_data->nr = NOTHING;
-    this_data->data_type = 0;
-    this_data->name = NULL;
+    this_data->line_nr = 0;
+    this_data->name = nullptr;
     this_data->trigger_type = 0;
-    this_data->cmdlist = NULL;
-    this_data->curr_state = NULL;
+    this_data->cmdlist = nullptr;
+    this_data->curr_state = nullptr;
     this_data->narg = 0;
-    this_data->arglist = NULL;
+    this_data->arglist = nullptr;
     this_data->depth = 0;
-    this_data->wait_event = NULL;
+    this_data->wait_event = nullptr;
     this_data->purged = FALSE;
-    this_data->var_list = NULL;
-    this_data->next = NULL;
+    this_data->var_list = nullptr;
+    this_data->remove_me = FALSE;
+    this_data->update_me = FALSE;
+    this_data->next = nullptr;
 }
 
 
@@ -135,7 +151,6 @@ void trig_data_copy(trig_data * this_data, const trig_data * trg) {
 
     this_data->nr = trg->nr;
     this_data->attach_type = trg->attach_type;
-    this_data->data_type = trg->data_type;
     if (trg->name)
         this_data->name = str_dup(trg->name);
     else {
@@ -144,8 +159,6 @@ void trig_data_copy(trig_data * this_data, const trig_data * trg) {
     }
     this_data->trigger_type = trg->trigger_type;
     this_data->cmdlist = trg->cmdlist;
-    if (this_data->cmdlist)
-        this_data->cmdlist->line_nr = 1;
     this_data->narg = trg->narg;
     if (trg->arglist)
         this_data->arglist = str_dup(trg->arglist);
@@ -208,11 +221,8 @@ void dg_read_trigger(FILE *fp, void *proto, int type) {
             room->proto_script->push_back(vnum);
 
         if (room != NULL && rnum != NOTHING) {
-            if (!(room->script))
-            {
-                CREATE(room->script, struct script_data, 1);
-                room->script->function_trig = -1;
-            }
+            if ( !SCRIPT(room) )
+                SCRIPT(room) = create_script();
             add_trigger(SCRIPT(room), read_trigger(rnum), -1);
         } else {
             new_mudlog(BRF, LVL_BUILDER, TRUE,
@@ -272,10 +282,7 @@ void assign_triggers(void *i, int type) {
                            (*mob->proto_script)[tr], mob->vnum);
             } else {
                 if (!SCRIPT(mob))
-                {
-                    CREATE(SCRIPT(mob), struct script_data, 1);
-                    SCRIPT(mob)->function_trig = -1;
-                }
+                    SCRIPT(mob) = create_script();
                 add_trigger(SCRIPT(mob), read_trigger(rnum), -1);
             }
         }
@@ -291,10 +298,7 @@ void assign_triggers(void *i, int type) {
                     (*obj->proto_script)[tr], obj_index[obj->item_number].vnum);
             } else {
                 if (!SCRIPT(obj))
-                {
-                    CREATE(SCRIPT(obj), struct script_data, 1);
-                    SCRIPT(obj)->function_trig = -1;
-                }
+                    SCRIPT(obj) = create_script();
                 add_trigger(SCRIPT(obj), read_trigger(rnum), -1);
             }
         }
@@ -310,16 +314,8 @@ void assign_triggers(void *i, int type) {
                            "SYSERR: trigger #%d non-existant, for room #%d",
                            (*room->proto_script)[tr], room->number);
             } else {
-                if (!SCRIPT(room)) {
-                    CREATE(SCRIPT(room), struct script_data, 1);
-                    SCRIPT(room)->trig_list = NULL;
-                    SCRIPT(room)->global_vars = NULL;
-                    SCRIPT(room)->purged = 0;
-                    SCRIPT(room)->types = 0;
-                    SCRIPT(room)->context = 0;
-                    SCRIPT(room)->next = NULL;
-                    SCRIPT(room)->function_trig = -1;
-                }
+                if (!SCRIPT(room))
+                    SCRIPT(room) = create_script();
                 add_trigger(SCRIPT(room), read_trigger(rnum), -1);
             }
         }
