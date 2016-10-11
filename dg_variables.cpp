@@ -157,22 +157,19 @@ int char_has_item ( char *item, Character *ch )
 Function that puts the word number 'n' from a string in to outstr, where first word is 1
 - Mordecai from http://4Dimensions.org
 **/
-const char * wordat ( const char *str, int n )
+string wordat ( const string &str, int n )
 {
-    char *newlist;
-    char *curtok;
-    static char newlistbuf[MAX_INPUT_LENGTH];
+    string word;
+    stringstream ss ( str );
+    int i = 0;
 
-    if ( !str || !*str || n <= 0 )
-        return "";
+    while ( ss >> word )
+    {
+        i++;
+        if ( i == n )
+            return word;
+    }
 
-    strlcpy ( newlistbuf, str, sizeof ( newlistbuf ) );
-    newlist = newlistbuf;
-    for ( curtok = strsep ( &newlist, WHITESPACE ); curtok && n; n--, curtok = strsep ( &newlist, WHITESPACE ) )
-        if ( curtok && n == 1 )
-        {
-            return curtok;
-        }
     return "";
 }
 
@@ -246,8 +243,8 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
     }
     else if ( !str_cmp ( field, "wordat" ) )              /* wordat       */
     {
-        int c = atoi ( subfield );
-        snprintf ( str, slen, "%s", wordat ( vd->value.c_str(), c ) );
+        string word = wordat ( vd->value, atoi ( subfield ) );
+        snprintf ( str, slen, "%s", word.c_str() );
         return TRUE;
     }
     else if ( !str_cmp ( field, "mudcommand" ) )
