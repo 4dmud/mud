@@ -38,11 +38,10 @@ extern const char *MENU;
 struct hunter_data *hunter_list = NULL;
 extern map < room_vnum, plrshop* > player_shop;
 extern map < long, Room* > obj_in_plrshop;
+extern map<trig_data*, TrigDebug> script_debug;
 
 /* local functions */
-void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod,
-                        int bitv[], bool add
-                      );
+void affect_modify_ar ( Character *ch, sbyte loc, sbyte mod, int bitv[], bool add );
 int apply_ac ( Character *ch, int eq_pos );
 //void update_object(struct obj_data *obj, int use);
 void update_object ( Character *ch, struct obj_data *obj, int use, time_t timenow );
@@ -50,6 +49,7 @@ void update_char_objects ( Character *ch );
 
 
 /* external functions */
+EVENTFUNC ( trig_wait_event );
 void save_player_shop (string owner );
 void unhitch_item ( struct obj_data *obj );
 void unhitch_mob ( Character *ch );
@@ -2290,6 +2290,45 @@ void extract_char_final ( Character *ch )
         {
             GET_ALIASES ( ch ) = ( GET_ALIASES ( ch ) )->next;
             free_alias ( a );
+        }
+
+        // Was the character debugging?
+        if ( GET_LEVEL ( ch ) >= LVL_BUILDER )
+        {
+            for ( auto it = script_debug.begin(); it != script_debug.end(); )
+            {
+                auto trig = it->first;
+                auto it_ch = find ( it->second.chs.begin(), it->second.chs.end(), ch );
+                if ( it_ch != it->second.chs.end() )
+                {
+                    for ( const auto &Ch : it->second.chs )
+                    if ( Ch != ch && Ch )
+                        Ch->Send ( "{cy[DBG]{c0 %s stops debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+                    it->second.chs.erase ( it_ch );
+                }
+
+                if ( it->second.chs.size() == 0 )
+                {
+                    // resume the trigger if it's at a breakpoint
+                    if ( GET_TRIG_WAIT ( trig ) )
+                    {
+                        auto &bps = it->second.breakpoints;
+                        for ( auto it_bp = bps.begin(); it_bp != bps.end(); it_bp++ )
+                        {
+                            if ( it_bp->line_nr == GET_TRIG_LINE_NR ( trig ) )
+                            {
+                                event_cancel ( GET_TRIG_WAIT ( trig ) );
+                                auto wait_event_obj = new wait_event_data ( trig, it->second.thing, it->second.type );
+                                GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+                                break;
+                            }
+                        }
+                    }
+                    it = script_debug.erase ( it );
+                }
+                else
+                    it++;
+            }
         }
     }
     remove_hunter ( ch );

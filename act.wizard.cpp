@@ -405,7 +405,7 @@ int can_edit_zone ( Character *ch, int number );
 int real_zone ( int number );
 long long gold_data ( int type, long long amount );
 void olc_list_flags ( Character *ch, const char *apply_stuff[] );
-
+bool has_trigger ( script_data *sc, trig_vnum vnum );
 const char * race_name ( Character *ch );
 const char *simple_class_name ( Character *ch );
 int show_vars = FALSE;
@@ -8366,7 +8366,7 @@ ACMD(do_vset) {
 
     if ( !*argument )
     {
-        ch->Send ( usage);
+        ch->Send ( "%s", usage );
         return;
     }
 
@@ -8375,7 +8375,7 @@ ACMD(do_vset) {
     skip_spaces(&value);
 
     if (!*player_name || !*variable || !*value) {
-        ch->Send ( usage );
+        ch->Send ( "%s", usage );
         return;
     }
 

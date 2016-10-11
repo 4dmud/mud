@@ -487,6 +487,14 @@ int is_abbrev2 ( const char *arg1, const char *arg2 )
         return ( *arg1-*arg2 );
 }
 
+bool is_abbrev3 ( const string &s1, const string &s2 )
+{
+    return s1.length() <= s2.length() && equal ( s1.begin(), s1.end(), s2.begin(),
+        []( char a, char b ) {
+            return tolower ( a ) == tolower ( b );
+        });
+}
+
 int spell_num ( const char *name )
 {
     int bot, top, mid;

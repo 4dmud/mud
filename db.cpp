@@ -106,6 +106,7 @@ struct help_category_data *help_categories;
 int TEMP_LOAD_CHAR = FALSE;
 
 extern struct mob_stat_table mob_stats[];
+extern map<trig_data*, TrigDebug> script_debug;
 
 vector <Room *> world_vnum; /* index table for room file   */
 NameIndexer mobNames;
@@ -903,6 +904,7 @@ void destroy_db ( void )
 
     unsigned int cnt;
 
+    script_debug.clear();
     log ( "Free skill prototypes" );
     free_skill_prototypes();
     log ( "Free playershops" );

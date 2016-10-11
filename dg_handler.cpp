@@ -13,6 +13,7 @@
 #include "constants.h"
 
 void free_cmdlist ( trig_data *trig );
+extern map<trig_data*, TrigDebug> script_debug;
 
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
@@ -57,6 +58,17 @@ int remove_var(struct trig_var_data **var_list,const char *name) {
  * shutting down, unless it's flagged to be updated.
  */
 void free_trigger(struct trig_data *trig) {
+    // is this trigger being debugged?
+    for ( auto it = script_debug.begin(); it != script_debug.end(); ++it )
+        if ( it->first == trig )
+        {
+            for ( auto ch : it->second.chs )
+                if ( ch )
+                    ch->Send ( "{cy[DBG]{c0 Trigger %d you were debugging was destroyed.\r\n", GET_TRIG_VNUM ( trig ) );
+            script_debug.erase ( it );
+            break;
+        }
+
     if (trig->name) {
         free(trig->name);
         trig->name = NULL;

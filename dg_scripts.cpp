@@ -201,7 +201,7 @@ const char *race_name ( Character *ch );
 int can_edit_zone ( Character *ch, zone_rnum zone );
 zone_rnum real_zone_by_thing ( room_vnum vznum );
 int genpreg ( void );
-
+bool is_abbrev3 ( const string &s1, const string &s2 );
 int zone_is_empty ( zone_rnum zone_nr );
 room_rnum find_target_room ( Character *ch, char *rawroomstr );
 /* function protos from this file */
@@ -261,6 +261,7 @@ ACMD ( do_vdelete );
 ACMD ( do_tstat );
 const char errorbuf[MAX_STRING_LENGTH] = "\0";
 char *zero = ( char * ) "0";
+map<trig_data*, TrigDebug> script_debug;
 
 /* Return pointer to first occurrence of string ct in */
 /* cs, or NULL if not present.  Case insensitive */
@@ -3821,6 +3822,37 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
             continue;
         }
 
+        auto debug = script_debug.find ( trig );
+        if ( debug != script_debug.end() )
+        {
+            auto &bps = debug->second.breakpoints;
+            for ( auto it = bps.begin(); it != bps.end(); ++it )
+                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) )
+                {
+                    // do we need to break here?
+                    if ( !it->stop )
+                    {
+                        it->stop = TRUE;
+                        break;
+                    }
+
+                    // we're at a breakpoint, remove it if it's a stepping breakpoint
+                    if ( it->stepping )
+                        bps.erase ( it );
+
+                    // tell the debuggers
+                    for ( const auto &ch : script_debug[ trig ].chs )
+                        ch->Send ( "{cy[DBG]{c0 Trigger %d breaks at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+
+                    // put the trigger in a wait state for a long time
+                    long when = 1e6 * PASSES_PER_SEC;
+                    wait_event_data *wait_event_obj = new wait_event_data ( trig, go, type );
+                    GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, when, EVENT_TYPE_TRIG );
+                    depth--;
+                    return ret_val;
+                }
+        }
+
         for ( p = cl->cmd; *p && isspace ( *p ); p++ )
             ;
 
@@ -4269,6 +4301,845 @@ ACMD ( do_tstat )
     }
     else
         send_to_char ( "Usage: tstat <vnum>\r\n", ch );
+}
+
+// Show the breakpoints of a trigger debugged by ch to ch
+void dbg_list_breakpoints ( Character *ch, const pair<trig_data *, TrigDebug> &debug )
+{
+    if ( debug.second.breakpoints.size() == 0 )
+    {
+        ch->Send ( "  Breakpoints: none\r\n" );
+        return;
+    }
+
+    char buf[MAX_INPUT_LENGTH];
+    DYN_DEFINE;
+    DYN_CREATE;
+    int bp_i = 0;
+    cmdlist_element *cl = debug.first->cmdlist;
+    for ( ; bp_i < debug.second.breakpoints.size() && cl; cl = cl->next )
+        if ( cl->line_nr == debug.second.breakpoints[ bp_i ].line_nr )
+        {
+            snprintf ( buf, sizeof ( buf ), "    Line %d: %s\r\n", cl->line_nr, cl->cmd );
+            DYN_RESIZE ( buf );
+            bp_i++;
+        }
+
+    ch->Send ( "  Breakpoints:\r\n" );
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
+}
+
+// Show the variables of a trigger debugged by ch to ch
+void dbg_list_variables ( Character *ch, const pair<trig_data *, TrigDebug> &debug )
+{
+    DYN_DEFINE;
+    DYN_CREATE;
+    char buf[MAX_INPUT_LENGTH];
+
+    trig_var_data *vd = GET_TRIG_VARS ( debug.first );
+    if ( !vd )
+        ch->Send ( "  Local variables: none\r\n" );
+    else
+    {
+        ch->Send ( "  Local variables:\r\n" );
+        for ( ; vd; vd = vd->next )
+        {
+            if ( vd->context == 0 )
+                snprintf ( buf, sizeof ( buf ), "    %s = %s\r\n", vd->name.c_str(), vd->value.c_str() );
+            else
+                snprintf ( buf, sizeof ( buf ), "    %s = %s, context: %ld\r\n",
+                    vd->name.c_str(), vd->value.c_str(), vd->context );
+            DYN_RESIZE ( buf );
+        }
+    }
+
+    switch ( debug.second.type )
+    {
+        case MOB_TRIGGER:
+            vd = SCRIPT ( (Character*) debug.second.thing )->global_vars;
+            break;
+        case OBJ_TRIGGER:
+            vd = SCRIPT ( (obj_data*) debug.second.thing )->global_vars;
+            break;
+        case WLD_TRIGGER:
+            vd = SCRIPT ( (Room*) debug.second.thing )->global_vars;
+            break;
+        default:
+        {
+            log ( "SYSERR: script_debug entry has unknown type %d", debug.second.type );
+            return;
+        }
+    }
+
+    if ( !vd )
+    {
+        snprintf ( buf, sizeof ( buf ), "%s\r\n", "  Global variables: none" );
+        DYN_RESIZE ( buf );
+    }
+    else
+    {
+        snprintf ( buf, sizeof ( buf ), "%s\r\n", "  Global variables:" );
+        DYN_RESIZE ( buf );
+        for ( ; vd; vd = vd->next )
+        {
+            if ( vd->context == 0 )
+                snprintf ( buf, sizeof ( buf ), "    %s = %s\r\n", vd->name.c_str(), vd->value.c_str() );
+            else
+                snprintf ( buf, sizeof ( buf ), "    %s = %s, context: %ld\r\n", vd->name.c_str(), vd->value.c_str(), vd->context );
+            DYN_RESIZE ( buf );
+        }
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
+}
+
+// Return the number of triggers ch is debugging
+int dbg_trigger_count ( Character *ch )
+{
+    int i = 0;
+    for ( const auto &debug : script_debug )
+        if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) != debug.second.chs.end() )
+            i++;
+    return i;
+}
+
+// Return the line at line_nr
+char *dbg_line ( trig_data *trig, int line_nr )
+{
+    for ( auto cl = trig->cmdlist; cl; cl = cl->next )
+        if ( cl->line_nr == line_nr )
+            return cl->cmd;
+    return (char*) "";
+}
+
+ACMD ( do_dbg )
+{
+    Character *mob = nullptr;
+    obj_data *obj = nullptr;
+    Room *room = nullptr;
+    trig_data *trig = nullptr;
+    char buf[MAX_INPUT_LENGTH];
+    DYN_DEFINE;
+    string s = string ( argument );
+    stringstream ss ( s );
+    string arg;
+    vector<string> args;
+
+    while ( ss >> arg )
+        args.push_back ( arg );
+
+    if ( args.size() == 0 )
+    {
+        ch->Send ( "Usage: see help debug.\r\n" );
+        return;
+    }
+    else if ( is_abbrev3 ( args[0], "mob" ) )
+    {
+        if ( args.size() < 3 || !is_number ( args[2].c_str() ) )
+        {
+            ch->Send ( "Usage: dbg mob <name> <trig_vnum>\r\n" );
+            return;
+        }
+
+        generic_find ( (char*) args[1].c_str(), FIND_CHAR_ROOM, ch, &mob, &obj );
+        if ( !mob )
+        {
+            ch->Send ( "There's no mob named %s here.\r\n", args[1].c_str() );
+            return;
+        }
+
+        trig_vnum vnum = stoi ( args[2] );
+        if ( real_trigger ( vnum ) < 0 )
+        {
+            ch->Send ( "Trigger %d doesn't exist.\r\n", vnum );
+            return;
+        }
+
+        if ( SCRIPT ( mob ) )
+            for ( trig = TRIGGERS ( SCRIPT ( mob ) ); trig; trig = trig->next )
+                if ( GET_TRIG_VNUM ( trig ) == vnum )
+                    break;
+
+        if ( trig == nullptr )
+        {
+            ch->Send ( "That mob doesn't have trigger %d.\r\n", vnum );
+            return;
+        }
+
+        auto debug = script_debug.find ( trig );
+        if ( debug != script_debug.end() )
+        {
+            if ( find ( debug->second.chs.begin(), debug->second.chs.end(), ch ) != debug->second.chs.end() )
+            {
+                ch->Send ( "You are already debugging this trigger.\r\n" );
+                return;
+            }
+
+            for ( const auto &Ch : debug->second.chs )
+                Ch->Send ( "{cy[DBG]{c0 %s starts debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            debug->second.chs.push_back ( ch );
+        }
+        else
+            script_debug[ trig ] = TrigDebug ( mob, MOB_TRIGGER, vector<Character*> { ch }, vector<Breakpoint> {} );
+
+        ch->Send ( "{cy[DBG]{c0 You start debugging trigger %d on %s.\r\n", vnum, GET_NAME ( mob ) );
+    }
+    else if ( is_abbrev3 ( args[0], "obj" ) )
+    {
+        if ( args.size() < 3 || !is_number ( args[2].c_str() ) )
+        {
+            ch->Send ( "Usage: dbg obj <name> <trig_vnum>\r\n" );
+            return;
+        }
+
+        generic_find ( (char*) args[1].c_str(), FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &mob, &obj );
+        if ( !obj )
+        {
+            ch->Send ( "There's no object named %s here.\r\n", args[1].c_str() );
+            return;
+        }
+
+        trig_vnum vnum = stoi ( args[2] );
+        if ( real_trigger ( vnum ) < 0 )
+        {
+            ch->Send ( "Trigger %d doesn't exist.\r\n", vnum );
+            return;
+        }
+
+        if ( SCRIPT ( obj ) )
+            for ( trig = TRIGGERS ( SCRIPT ( obj ) ); trig; trig = trig->next )
+                if ( GET_TRIG_VNUM ( trig ) == vnum )
+                    break;
+
+        if ( trig == nullptr )
+        {
+            ch->Send ( "That object doesn't have trigger %d.\r\n", vnum );
+            return;
+        }
+
+        auto debug = script_debug.find ( trig );
+        if ( debug != script_debug.end() )
+        {
+            if ( find ( debug->second.chs.begin(), debug->second.chs.end(), ch ) != debug->second.chs.end() )
+            {
+                ch->Send ( "You are already debugging this trigger.\r\n" );
+                return;
+            }
+
+            for ( const auto &Ch : debug->second.chs )
+                Ch->Send ( "{cy[DBG]{c0 %s starts debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            debug->second.chs.push_back ( ch );
+        }
+        else
+            script_debug[ trig ] = TrigDebug ( obj, OBJ_TRIGGER, vector<Character*> { ch }, vector<Breakpoint> {} );
+
+        ch->Send ( "{cy[DBG]{c0 You start debugging trigger %d on %s.\r\n", vnum, obj->short_description );
+    }
+    else if ( is_abbrev3 ( args[0], "room" ) )
+    {
+        if ( args.size() < 2 || !is_number ( args[1].c_str() ) )
+        {
+            ch->Send ( "Usage: dbg room <trig_vnum>\r\n" );
+            return;
+        }
+
+
+        trig_vnum vnum = stoi ( args[1] );
+        if ( real_trigger ( vnum ) < 0 )
+        {
+            ch->Send ( "Trigger %d doesn't exist.\r\n", vnum );
+            return;
+        }
+
+        room = IN_ROOM ( ch );
+        if ( SCRIPT ( room ) )
+            for ( trig = TRIGGERS ( SCRIPT ( room ) ); trig; trig = trig->next )
+                if ( GET_TRIG_VNUM ( trig ) == vnum )
+                    break;
+
+        if ( trig == nullptr )
+        {
+            ch->Send ( "The room doesn't have trigger %d.\r\n", vnum );
+            return;
+        }
+
+        auto debug = script_debug.find ( trig );
+        if ( debug != script_debug.end() )
+        {
+            if ( find ( debug->second.chs.begin(), debug->second.chs.end(), ch ) != debug->second.chs.end() )
+            {
+                ch->Send ( "You are already debugging this trigger.\r\n" );
+                return;
+            }
+
+            for ( const auto &Ch : debug->second.chs )
+                Ch->Send ( "{cy[DBG]{c0 %s starts debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            debug->second.chs.push_back ( ch );
+        }
+        else
+            script_debug[ trig ] = TrigDebug ( room, WLD_TRIGGER, vector<Character*> { ch }, vector<Breakpoint> {} );
+
+        ch->Send ( "{cy[DBG]{c0 You start debugging trigger %d on %s.\r\n", vnum, room->name );
+    }
+    else if ( is_abbrev3 ( args[0], "info" ) )
+    {
+        /* dbg info: show general info about which triggers are being debugged and on what
+           dbg info <num>: show more detailed info on a specific trigger
+           If only debugging one trigger then 'dbg info' does 'dbg info 1'.
+        */
+
+        int trigger_count = dbg_trigger_count ( ch ), num = 0, k = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're currently not debugging any triggers.\r\n" );
+            return;
+        }
+
+        bool show_breakpoints = TRUE, show_variables = TRUE;
+        if ( args.size() > 1 )
+        {
+            if ( is_number ( args[1].c_str() ) )
+            {
+                num = stoi ( args[1] );
+                k = 0;
+            }
+            else if ( trigger_count > 1 )
+            {
+                ch->Send ( "Usage: dbg info [<num>] [breakpoints|variables]\r\n" );
+                return;
+            }
+
+            if ( args.size() > 2-k )
+            {
+                if ( is_abbrev3 ( args[2-k], "breakpoints" ) )
+                    show_variables = FALSE;
+                else if ( is_abbrev3 ( args[2-k], "variables" ) )
+                    show_breakpoints = FALSE;
+                else
+                {
+                    ch->Send ( "Usage: dbg info [<num>] [breakpoints|variables]\r\n" );
+                    return;
+                }
+            }
+        }
+
+        if ( args.size() == 1 && trigger_count > 1 )
+            DYN_CREATE;
+
+        for ( const auto &debug : script_debug )
+        {
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+                continue;
+
+            i++;
+            if ( num > 0 )
+            {
+                if ( num > i )
+                    continue;
+                if ( num < i )
+                    break;
+            }
+
+            switch ( debug.second.type )
+            {
+                case MOB_TRIGGER:
+                    mob = (Character*) debug.second.thing;
+                    if ( args.size() > 1 || trigger_count == 1 )
+                    {
+                        ch->Send ( "{cy[DBG]{c0 Info about %d. Trigger [%d] on mob [%ld] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ID ( mob ), GET_NAME ( mob ) );
+
+                        if ( GET_TRIG_WAIT ( debug.first ) )
+                            ch->Send ( "  Wait %ld, line %d: %s\r\n", event_time ( GET_TRIG_WAIT ( debug.first ) ), GET_TRIG_LINE_NR ( debug.first ), debug.first->curr_state->cmd );
+                        else
+                            ch->Send ( "  Not running.\r\n" );
+
+                        if ( show_breakpoints )
+                            dbg_list_breakpoints ( ch, debug );
+
+                        if ( show_variables )
+                            dbg_list_variables ( ch, debug );
+                    }
+                    else
+                    {
+                        snprintf ( buf, sizeof ( buf ), "%d. [%d] on mob [%ld] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ID ( mob ), GET_NAME ( mob ) );
+                        DYN_RESIZE ( buf );
+                    }
+                    break;
+                case OBJ_TRIGGER:
+                    obj = (obj_data*) debug.second.thing;
+                    if ( args.size() > 1 || trigger_count == 1 )
+                    {
+                        ch->Send ( "{cy[DBG]{c0 Info about %d. Trigger [%d] on obj [%ld] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ID ( obj ), obj->short_description );
+
+                        if ( GET_TRIG_WAIT ( debug.first ) )
+                            ch->Send ( "  Wait %ld, line %d: %s\r\n", event_time ( GET_TRIG_WAIT ( debug.first ) ), GET_TRIG_LINE_NR ( debug.first ), debug.first->curr_state->cmd );
+                        else
+                            ch->Send ( "  Not running.\r\n" );
+
+                        if ( show_breakpoints )
+                            dbg_list_breakpoints ( ch, debug );
+
+                        if ( show_variables )
+                            dbg_list_variables ( ch, debug );
+                    }
+                    else
+                    {
+                        snprintf ( buf, sizeof ( buf ), "%d. [%d] on obj [%ld] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ID ( obj ), obj->short_description );
+                        DYN_RESIZE ( buf );
+                    }
+                    break;
+                case WLD_TRIGGER:
+                    room = (Room*) debug.second.thing;
+                    if ( args.size() > 1 || trigger_count == 1 )
+                    {
+                        ch->Send ( "{cy[DBG]{c0 Info about %d. Trigger [%d] on room [%d] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ROOM_VNUM ( room ), room->name );
+
+                        if ( GET_TRIG_WAIT ( debug.first ) )
+                            ch->Send ( "  Wait %ld, line %d: %s\r\n", event_time ( GET_TRIG_WAIT ( debug.first ) ), GET_TRIG_LINE_NR ( debug.first ), debug.first->curr_state->cmd );
+                        else
+                            ch->Send ( "  Not running.\r\n" );
+
+                        if ( show_breakpoints )
+                            dbg_list_breakpoints ( ch, debug );
+
+                        if ( show_variables )
+                            dbg_list_variables ( ch, debug );
+                    }
+                    else
+                    {
+                        snprintf ( buf, sizeof ( buf ), "%d. [%d] on room [%d] %s\r\n",
+                            i, GET_TRIG_VNUM ( debug.first ), GET_ROOM_VNUM ( room ), room->name );
+                        DYN_RESIZE ( buf );
+                    }
+                    break;
+                default:
+                {
+                    log ( "SYSERR: script_debug entry has unknown type %d", debug.second.type );
+                    return;
+                }
+            }
+        }
+
+        if ( num > i )
+            ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+        else if ( args.size() == 1 && trigger_count > 1 )
+        {
+            ch->Send ( "{cy[DBG]{c0 You are debugging the following triggers:\r\n" );
+            page_string ( ch->desc, dynbuf, DYN_BUFFER );
+        }
+    }
+    else if ( is_abbrev3 ( args[0], "continue" ) )
+    {
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 )
+        {
+            if ( args.size() == 1 || !is_number ( args[1].c_str() ) )
+            {
+                ch->Send ( "Usage: dbg continue [<num>]\r\n" );
+                return;
+            }
+            num = stoi ( args[1] );
+        }
+
+        for ( auto &debug : script_debug )
+        {
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+                continue;
+
+            i++;
+            if ( i < num )
+                continue;
+
+            trig = debug.first;
+            if ( !trig->curr_state )
+            {
+                ch->Send ( "Trigger %d isn't running.\r\n", GET_TRIG_VNUM ( trig ) );
+                return;
+            }
+
+            // if there's a breakpoint here, turn it off so it won't break
+            vector<Breakpoint> &bps = debug.second.breakpoints;
+            for ( auto it = bps.begin(); it != bps.end(); ++it )
+                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) && !it->stepping )
+                {
+                    it->stop = FALSE;
+                    break;
+                }
+
+            // delete the old wait and add a new wait with duration zero
+            event_cancel ( GET_TRIG_WAIT ( trig ) );
+            auto wait_event_obj = new wait_event_data ( trig, debug.second.thing, debug.second.type );
+            GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+
+            for ( const auto &Ch : debug.second.chs )
+                if ( Ch == ch )
+                    Ch->Send ( "{cy[DBG]{c0 Continuing trigger %d.\r\n", GET_TRIG_VNUM ( trig ) );
+                else
+                    Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: continue.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            return;
+        }
+
+        ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else if ( is_abbrev3 ( args[0], "next" ) )
+    {
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 )
+        {
+            if ( args.size() == 1 || !is_number ( args[1].c_str() ) )
+            {
+                ch->Send ( "Usage: dbg next [<num>]\r\n" );
+                return;
+            }
+            num = stoi ( args[1] );
+        }
+
+        for ( auto &debug : script_debug )
+        {
+            i++;
+            if ( i < num )
+                continue;
+
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+                continue;
+
+            trig = debug.first;
+            if ( !trig->curr_state )
+            {
+                ch->Send ( "Trigger %d isn't running.\r\n", GET_TRIG_VNUM ( trig ) );
+                return;
+            }
+
+            // if there's a breakpoint here, turn it off so it won't break
+            vector<Breakpoint> &bps = debug.second.breakpoints;
+            for ( auto it = bps.begin(); it != bps.end(); ++it )
+                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) && !it->stepping )
+                {
+                    it->stop = FALSE;
+                    break;
+                }
+
+            // delete the old wait and add a new wait with duration zero
+            event_cancel ( GET_TRIG_WAIT ( trig ) );
+            auto wait_event_obj = new wait_event_data ( trig, debug.second.thing, debug.second.type );
+            GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+
+            // add a stepping breakpoint for the next line
+            if ( trig->curr_state->next )
+            {
+                bool bp_exists = FALSE;
+                for ( auto it = bps.begin(); it != bps.end(); ++it )
+                    if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) + 1 )
+                    {
+                        bp_exists = TRUE;
+                        break;
+                    }
+
+                if ( !bp_exists )
+                {
+                    bps.push_back ( Breakpoint ( GET_TRIG_LINE_NR ( trig ) + 1, TRUE ) );
+                    sort ( bps.begin(), bps.end(), []( Breakpoint &a, Breakpoint &b ) {
+                            return a.line_nr < b.line_nr; });
+                }
+
+                for ( const auto &Ch : debug.second.chs )
+                    if ( Ch != ch )
+                        Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: next.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            }
+            else
+                for ( const auto &Ch : debug.second.chs )
+                    if ( Ch == ch )
+                        Ch->Send ( "{cy[DBG]{c0 Trigger %d: stepping over the last line.\r\n", GET_TRIG_VNUM ( trig ) );
+                    else
+                        Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: stepping over the last line.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            return;
+        }
+
+        ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else if ( is_abbrev3 ( args[0], "set" ) )
+    {
+        /* dbg set [<num>] breakpoint <line_nr>: set a breakpoint at line line_nr
+           dbg set [<num>] variable <name> <value>: set variable name = value
+           If only debugging one trigger then 'dbg set' does 'dbg set 1'.
+        */
+
+        if ( args.size() < 3 )
+        {
+            ch->Send ( "Usage: dbg set [<num>] breakpoint <line_nr>\r\n"
+                       "       dbg set [<num>] variable <name> <value>\r\n" );
+            return;
+        }
+
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, k = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 && !is_number ( args[1].c_str() ) )
+        {
+            ch->Send ( "Usage: dbg set [<num>] breakpoint <line_nr>\r\n"
+                       "       dbg set [<num>] variable <name> <value>\r\n" );
+            return;
+        }
+
+        if ( is_number ( args[1].c_str() ) )
+        {
+            num = stoi ( args[1] );
+            k = 0;
+        }
+
+        for ( auto &debug : script_debug )
+        {
+            i++;
+            if ( i < num )
+                continue;
+
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+                continue;
+
+            if ( is_abbrev3 ( args[2-k], "breakpoint" ) )
+            {
+                if ( args.size() < 4-k || !is_number ( args[3-k].c_str() ) )
+                {
+                    ch->Send ( "Usage: dbg set [<num>] breakpoint <line_nr>\r\n" );
+                    return;
+                }
+
+                int line_nr = stoi ( args[3-k] );
+                vector<Breakpoint> &bps = debug.second.breakpoints;
+                trig = debug.first;
+                for ( auto it = bps.begin(); it != bps.end(); ++it )
+                    if ( it->line_nr == line_nr )
+                    {
+                        char *line = dbg_line ( trig, line_nr );
+                        if ( it->stepping )
+                        {
+                            // turn the stepping breakpoint into a normal one
+                            it->stepping = FALSE;
+                            for ( const auto &Ch : debug.second.chs )
+                                if ( Ch == ch )
+                                    Ch->Send ( "{cy[DBG]{c0 Trigger %d: breakpoint set at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), line_nr, line );
+                                else
+                                    Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: breakpoint set at line %d: %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), line_nr, line );
+                            return;
+                        }
+
+                        // breakpoint already exists, remove it
+                        bps.erase ( it );
+                        for ( const auto &Ch : debug.second.chs )
+                            if ( Ch == ch )
+                                Ch->Send ( "{cy[DBG]{c0 Trigger %d: removed breakpoint at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), line_nr, line );
+                            else
+                                Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: removed breakpoint at line %d: %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), line_nr, line );
+                        return;
+                    }
+
+                // add breakpoint at line_nr
+                bps.push_back ( Breakpoint ( line_nr, FALSE ) );
+                sort ( bps.begin(), bps.end(), []( Breakpoint &a, Breakpoint &b ) {
+                        return a.line_nr < b.line_nr; });
+                char *line = dbg_line ( trig, line_nr );
+                for ( const auto &Ch : debug.second.chs )
+                    if ( Ch == ch )
+                        Ch->Send ( "{cy[DBG]{c0 Trigger %d: breakpoint set at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), line_nr, line );
+                    else
+                        Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: breakpoint set at line %d: %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), line_nr, line );
+            }
+            else if ( is_abbrev3 ( args[2-k], "variable" ) )
+            {
+                if ( args.size() < 4-k )
+                {
+                    ch->Send ( "Usage: dbg set [<num>] variable <name> <value>\r\n" );
+                    return;
+                }
+
+                string var = args[3-k];
+                trig = debug.first;
+                trig_var_data *vd = GET_TRIG_VARS ( trig );
+
+                // check local variables
+                for ( ; vd; vd = vd->next )
+                    if ( var == vd->name )
+                    {
+                        string value;
+                        if ( args.size() > 4-k )
+                        {
+                            value = args[4-k];
+                            for ( int i = 5-k; i < args.size(); ++i )
+                                value += " " + args[i];
+                        }
+                        vd->value = value;
+                        for ( const auto &Ch : debug.second.chs )
+                            if ( Ch == ch )
+                                Ch->Send ( "{cy[DBG]{c0 Trigger %d: set var %s = %s\r\n", GET_TRIG_VNUM ( trig ), var.c_str(), value.c_str() );
+                            else
+                                Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: set var %s = %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), var.c_str(), value.c_str() );
+                        return;
+                    }
+
+                // check global variables
+                switch ( debug.second.type )
+                {
+                    case MOB_TRIGGER:
+                        vd = SCRIPT ( (Character*) debug.second.thing )->global_vars;
+                        break;
+                    case OBJ_TRIGGER:
+                        vd = SCRIPT ( (obj_data*) debug.second.thing )->global_vars;
+                        break;
+                    case WLD_TRIGGER:
+                        vd = SCRIPT ( (Room*) debug.second.thing )->global_vars;
+                        break;
+                    default:
+                    {
+                        log ( "SYSERR: script_debug entry has unknown type %d", debug.second.type );
+                        return;
+                    }
+                }
+
+                for ( ; vd; vd = vd->next )
+                    if ( var == vd->name )
+                    {
+                        string value;
+                        if ( args.size() > 4-k )
+                        {
+                            value = args[4-k];
+                            for ( int i = 5-k; i < args.size(); ++i )
+                                value += " " + args[i];
+                        }
+                        vd->value = value;
+                        for ( const auto &Ch : debug.second.chs )
+                            if ( Ch == ch )
+                                Ch->Send ( "{cy[DBG]{c0 Trigger %d: set var %s = %s\r\n", GET_TRIG_VNUM ( trig ), var.c_str(), value.c_str() );
+                            else
+                                Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: set var %s = %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), var.c_str(), value.c_str() );
+                        return;
+                    }
+
+                ch->Send ( "There's no variable called %s.\r\n", var.c_str() );
+            }
+            else
+                ch->Send ( "Usage: dbg set [<num>] breakpoint <line_nr>\r\n"
+                           "       dbg set [<num>] variable <name> <value>\r\n" );
+            return;
+        }
+
+        ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else if ( is_abbrev3 ( args[0], "list" ) )
+    {
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 )
+        {
+            if ( args.size() == 1 || !is_number ( args[1].c_str() ) )
+            {
+                ch->Send ( "Usage: dbg list [<num>]\r\n" );
+                return;
+            }
+            num = stoi ( args[1] );
+        }
+
+        for ( const auto &debug : script_debug )
+        {
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) != debug.second.chs.end() )
+            {
+                i++;
+                if ( i < num )
+                    continue;
+
+                ch->Send ( "{cy[DBG]{c0 Trigger %d:\r\n", GET_TRIG_VNUM ( debug.first ) );
+                DYN_CREATE;
+                for ( auto cl = debug.first->cmdlist; cl; cl = cl->next )
+                {
+                    snprintf ( buf, sizeof ( buf ), "  %d. %s\r\n", cl->line_nr, cl->cmd );
+                    DYN_RESIZE ( buf );
+                }
+                page_string ( ch->desc, dynbuf, DYN_BUFFER );
+                return;
+            }
+        }
+
+        ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else if ( is_abbrev3 ( args[0], "delete" ) )
+    {
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 )
+        {
+            if ( args.size() == 1 || !is_number ( args[1].c_str() ) )
+            {
+                ch->Send ( "Usage: dbg list [<num>]\r\n" );
+                return;
+            }
+            num = stoi ( args[1] );
+        }
+
+        for ( auto it = script_debug.begin(); it != script_debug.end(); it++ )
+        {
+            if ( find ( it->second.chs.begin(), it->second.chs.end(), ch ) == it->second.chs.end() )
+                continue;
+
+            i++;
+            if ( i < num )
+                continue;
+
+            // resume the trigger if it's at a breakpoint
+            auto trig = it->first;
+            if ( GET_TRIG_WAIT ( trig ) )
+            {
+                auto &bps = it->second.breakpoints;
+                for ( auto it_bp = bps.begin(); it_bp != bps.end(); it_bp++ )
+                {
+                    if ( it_bp->line_nr == GET_TRIG_LINE_NR ( trig ) )
+                    {
+                        event_cancel ( GET_TRIG_WAIT ( trig ) );
+                        auto wait_event_obj = new wait_event_data ( trig, it->second.thing, it->second.type );
+                        GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+                        break;
+                    }
+                }
+                it = script_debug.erase ( it );
+            }
+
+            for ( const auto &Ch : it->second.chs )
+                if ( Ch == ch )
+                    Ch->Send ( "{cy[DBG]{c0 You stop debugging %d. Trigger %d.\r\n", num, GET_TRIG_VNUM ( trig ) );
+                else
+                    Ch->Send ( "{cy[DBG]{c0 %s stops debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            script_debug.erase ( it );
+            break;
+        }
+
+        if ( num != i )
+            ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else
+        ch->Send ( "Usage: see help debug.\r\n" );
 }
 
 /*

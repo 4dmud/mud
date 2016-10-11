@@ -359,6 +359,7 @@ ACMD ( mate_toggle );
 
 /* DG Script ACMD's */
 ACMD ( do_attach );
+ACMD ( do_dbg );
 ACMD ( do_detach );
 ACMD ( do_masound );
 ACMD ( do_mat );
@@ -571,6 +572,7 @@ const command_info cmd_info[] =
 
     { "date"     , "da"  , POS_DEAD    , do_date     , 0, SCMD_DATE, 0 },
     { "damdice"  , "dam" , POS_DEAD    , do_dam_dice , 0, 0, 0 },
+    { "dbg"      , "dbg" , POS_DEAD    , do_dbg      , LVL_BUILDER, 0, WIZ_TRIG_GRP },
     { "dc"       , "dc"  , POS_DEAD    , do_dc       , LVL_IMMORT, 0, WIZ_DSPLN_GRP },
     { "decrypt"       , "decrypt"  , POS_DEAD    , do_decrypt       , LVL_SEN, 0, WIZ_IMPL_GRP },
     { "deleteplayer"   , "deleteplayer"  , POS_RESTING , do_deleteplayer   , LVL_SEN, 0, WIZ_IMPL_GRP },

@@ -227,6 +227,32 @@ struct script_memory {
     char *cmd;			/* command, or NULL for generic */
     struct script_memory *next;
 };
+
+/* Script debugger classes */
+
+class Breakpoint {
+    public:
+    int line_nr;
+    bool stop;     // stop at this breakpoint
+    bool stepping; /* if true then this is a temporary breakpoint because we're
+                      stepping through the trigger */
+
+    Breakpoint() {};
+    Breakpoint(int num, bool step, bool hold = true): line_nr(num), stop(hold), stepping(step) {};
+};
+
+class TrigDebug {
+    public:
+    void *thing;             // the mob/obj/room the trigger is on
+    int type;                // for casting thing to mob/obj/room
+    vector<Character*> chs;  // the imms debugging this trigger
+    vector<Breakpoint> breakpoints;
+
+    TrigDebug() {};
+    TrigDebug(void *go, int tp, vector<Character*> ch, vector<Breakpoint> bp):
+        thing(go), type(tp), chs(ch), breakpoints(bp) {};
+};
+
 /* from dg_objcmd.c */
 room_rnum obj_room(obj_data *obj);
 
