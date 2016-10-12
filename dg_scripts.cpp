@@ -2263,6 +2263,21 @@ int eval_lhs_op_rhs ( char *expr, char *result, size_t r_len, void *go, struct s
                 p = tokens[j] + strlen ( ops[i] );
 
                 eval_expr ( line, lhr, sizeof ( lhr ), go, sc, trig, type );
+
+                // short-circuit &&
+                if ( !strcmp ( ops[i], "&&" ) && *lhr == '0' )
+                {
+                    E_FALSE;
+                    return 1;
+                }
+
+                // short-circuit ||
+                if ( !strcmp ( ops[i], "||" ) && *lhr == '1' )
+                {
+                    E_TRUE;
+                    return 1;
+                }
+
                 eval_expr ( p, rhr, sizeof ( rhr ), go, sc, trig, type );
                 eval_op ( ( char * ) ops[i], lhr, rhr, result, r_len, go, sc, trig );
                 return 1;
