@@ -4825,11 +4825,11 @@ ACMD ( do_dbg )
 
         for ( auto &debug : script_debug )
         {
-            i++;
-            if ( i < num )
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
                 continue;
 
-            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+            i++;
+            if ( i < num )
                 continue;
 
             trig = debug.first;
@@ -4921,11 +4921,11 @@ ACMD ( do_dbg )
 
         for ( auto &debug : script_debug )
         {
-            i++;
-            if ( i < num )
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
                 continue;
 
-            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+            i++;
+            if ( i < num )
                 continue;
 
             if ( is_abbrev3 ( args[2-k], "breakpoint" ) )

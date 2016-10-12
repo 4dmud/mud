@@ -405,7 +405,6 @@ int can_edit_zone ( Character *ch, int number );
 int real_zone ( int number );
 long long gold_data ( int type, long long amount );
 void olc_list_flags ( Character *ch, const char *apply_stuff[] );
-bool has_trigger ( script_data *sc, trig_vnum vnum );
 const char * race_name ( Character *ch );
 const char *simple_class_name ( Character *ch );
 int show_vars = FALSE;
