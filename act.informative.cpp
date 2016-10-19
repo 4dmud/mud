@@ -1147,20 +1147,20 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
     if ( !strncmp ( in_room->name, "Room #", 6 ) || !strcmp ( in_room->name, "An unfinished room" ) )
         switch ( SECT ( in_room ) )
         {
-            case SECT_SPACE:
-                snprintf ( bufptr, len, "Outer Space" );
+            case SECT_INSIDE:
+                snprintf ( bufptr, len, "The Wilderness" );
                 break;
-            case SECT_FOREST:
-                snprintf ( bufptr, len, "Within A Forest" );
+            case SECT_CITY:
+                snprintf ( bufptr, len, "Within A City" );
                 break;
             case SECT_FIELD:
                 snprintf ( bufptr, len, "In An Open Field" );
                 break;
+            case SECT_FOREST:
+                snprintf ( bufptr, len, "Within A Forest" );
+                break;
             case SECT_HILLS:
                 snprintf ( bufptr, len, "On A Hill" );
-                break;
-            case SECT_ROAD:
-                snprintf ( bufptr, len, "On A Road" );
                 break;
             case SECT_MOUNTAIN:
                 snprintf ( bufptr, len, "Climbing A Mountain{cx" );
@@ -1171,17 +1171,20 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
             case SECT_WATER_NOSWIM:
                 snprintf ( bufptr, len, "Adrift In Deep Water" );
                 break;
-            case SECT_INSIDE:
-                snprintf ( bufptr, len, "The Wilderness" );
-                break;
-            case SECT_CITY:
-                snprintf ( bufptr, len, "Within A City" );
+            case SECT_UNDERWATER:
+                snprintf ( bufptr, len, "Underwater" );
                 break;
             case SECT_FLYING:
                 snprintf ( bufptr, len, "Floating In The Air" );
                 break;
-            case SECT_UNDERWATER:
-                snprintf ( bufptr, len, "Underwater" );
+            case SECT_DESERT:
+                snprintf ( bufptr, len, "The Desert" );
+                break;
+            case SECT_SPACE:
+                snprintf ( bufptr, len, "Outer Space" );
+                break;
+            case SECT_ROAD:
+                snprintf ( bufptr, len, "On A Road" );
                 break;
             case SECT_ENTRANCE:
                 snprintf ( bufptr, len, "An Entrance" );
@@ -1194,9 +1197,6 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
                 break;
             case SECT_BLACKHOLE:
                 snprintf ( bufptr, len, "A Black Hole" );
-                break;
-            case SECT_ICE:
-                snprintf ( bufptr, len, "Surrounded By Ice" );
                 break;
             case SECT_VEHICLE:
                 snprintf ( bufptr, len, "Driving" );
@@ -1214,6 +1214,12 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len )
                 break;
             case SECT_SNOW:
                 snprintf ( bufptr, len, "Snowy Terrain" );
+                break;
+            case SECT_ICE:
+                snprintf ( bufptr, len, "Surrounded By Ice" );
+                break;
+            case SECT_PRAIRIE:
+                snprintf ( bufptr, len, "On The Prairie" );
                 break;
             case SECT_BADLANDS:
                 snprintf ( bufptr, len, "Badlands" );
@@ -1237,29 +1243,30 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
             compares ( "wilderness", in_room->GetDescription() ) )
         switch ( SECT ( in_room ) )
         {
-            case SECT_SPACE:
+            case SECT_INSIDE:
                 snprintf ( bufptr, len,
-                           "Darkness surrounds you.  In the distance, you can make out dim points of\r\n"
-                           "of light, possibly distant suns in far off galaxies.\r\n" );
+                           "Not much to see here. The last occupants weren't very tidy. Trash is\r\n"
+                           "strewn all over the place.\r\n" );
                 break;
-            case SECT_FOREST:
+            case SECT_CITY:
                 snprintf ( bufptr, len,
-                           "Trees of all different kinds surround the path you are travelling.\r\n" );
+                           "The smell of sewage permeates the air as you move through the place.\r\n"
+                           "Dogs are fighting over food scraps in the alleyways.\r\n" );
                 break;
             case SECT_FIELD:
                 snprintf ( bufptr, len,
-                           "All around you is knee high grass. When the wind blows, the grass sways\r\n"
-                           "making you think of waves on the ocean.\r\n" );
+                           "Fresh green grass covers the ground. In spring the grass is sprinkled\r\n"
+                           "with wildflowers.\r\n" );
+                break;
+            case SECT_FOREST:
+                snprintf ( bufptr, len,
+                           "Trees of many different kinds surround you in all directions. And the\r\n"
+                           "canopy overhead leaves the ground in constant shade.\r\n" );
                 break;
             case SECT_HILLS:
                 snprintf ( bufptr, len,
-                           "Walking up and down the hills is making you tired.  Luckily the ground\r\n"
+                           "Walking up and down the hills is rather tiresome.  Luckily the ground\r\n"
                            "is pretty hard, providing you with solid footing.\r\n" );
-                break;
-            case SECT_ROAD:
-                snprintf ( bufptr, len,
-                           "As you travel along the road, you begin to wonder if it actually leads\r\n"
-                           "anywhere.\r\n" );
                 break;
             case SECT_MOUNTAIN:
                 snprintf ( bufptr, len,
@@ -1276,25 +1283,30 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
                            "The water is very deep here and very cold making travel by anything other\r\n"
                            "than a ship impossible.\r\n" );
                 break;
-            case SECT_INSIDE:
-                snprintf ( bufptr, len,
-                           "Not much to see here.  The last occupants weren't very tidy.  Trash is\r\n"
-                           "strewn all over the place.\r\n" );
-                break;
-            case SECT_CITY:
-                snprintf ( bufptr, len,
-                           "The smell of sewage permeates the air as you move through the place.\r\n "
-                           "Dogs are fighting over food scraps in the alleyways.\r\n" );
-                break;
-            case SECT_FLYING:
-                snprintf ( bufptr, len,
-                           "Being light on your feet, you fly about a foot above the ground. Hope\r\n"
-                           "there are no low branches to knock you out of the air.\r\n" );
-                break;
             case SECT_UNDERWATER:
                 snprintf ( bufptr, len,
                            "It's rather peaceful under the water. Every now and then you can feel\r\n"
                            "the currents pushing against you.\r\n" );
+                break;
+            case SECT_FLYING:
+                snprintf ( bufptr, len,
+                           "Being light on your feet, you fly about a foot above the ground. Hopefully\r\n"
+                           "there are no low branches to knock you out of the air.\r\n" );
+                break;
+            case SECT_DESERT:
+                snprintf ( bufptr, len,
+                           "The terrain is extremely dry, and very few plants are able to strike root\r\n"
+                           "and survive in the hot sand.\r\n" );
+                break;
+            case SECT_SPACE:
+                snprintf ( bufptr, len,
+                           "Darkness surrounds you. In the distance, you can make out dim points of\r\n"
+                           "light, possibly distant suns in far off galaxies.\r\n" );
+                break;
+            case SECT_ROAD:
+                snprintf ( bufptr, len,
+                           "The road goes ever on and on, until you begin to wonder if it actually\r\n"
+                           "leads anywhere.\r\n" );
                 break;
             case SECT_ENTRANCE:
                 snprintf ( bufptr, len,
@@ -1304,66 +1316,61 @@ void parse_room_description ( room_rnum in_room, char *bufptr, size_t len )
             case SECT_ATMOSPHERE:
                 snprintf ( bufptr, len,
                            "Air surrounds you and you can feel the gravity from the planet below too.\r\n"
-                           "Again the world has an up and down, you are not weightless any more.\r\n" );
+                           "Again the world has an up and down, you are not weightless anymore.\r\n" );
                 break;
             case SECT_SUN:
                 snprintf ( bufptr, len,
-                           "The immense heat emerging from the fusion of the sun burns your ship to\r\n"
-                           "cinders in a spilt second.  Nothing can survive this scorching heat.\r\n" );
+                           "The immense heat from the fusion of the sun burns your ship to cinders.\r\n"
+                           "Nothing can survive this scorching heat.\r\n" );
                 break;
             case SECT_BLACKHOLE:
-                snprintf ( bufptr, len, "No light escapes from here, infact nothing escapes. Ever." );
+                snprintf ( bufptr, len,
+                           "No light escapes from here, in fact nothing escapes. Ever.\r\n" );
                 break;
             case SECT_VEHICLE:
                 snprintf ( bufptr, len,
-                           "This is a Vehicle\r\n" );
+                           "You are in a vehicle, which means that you can drive it in any direction you\r\n"
+                           "choose. It will be easier if you sit down.\r\n" );
                 break;
             case SECT_SWAMP:
                 snprintf ( bufptr, len,
-                           "Tufts of coarse sedge and higher reed alternate with patches of sleek mud.\r\n"
-                           "Here and there are pools of deeper water, dark and slimy with algae.\r\n" );
+                           "Tufts of sedge and higher reed alternate with patches of sleek mud. Here and\r\n"
+                           "there are pools of deeper water, dark and slimy with algae.\r\n" );
                 break;
             case SECT_REEF:
                 snprintf ( bufptr, len,
-                           "The waves are breaking over some submerged rocks closed to the surface. In\r\n"
-                           "the swirling, white foam you get glimpses of sharp-toothed, jagged rocks.\r\n" );
+                           "The waves are breaking over some submerged rocks close to the surface. In\r\n"
+                           "the swirling foam you get glimpses of sharp-toothed, jagged rocks.\r\n" );
                 break;
             case SECT_DEATHTRAP:
                 snprintf ( bufptr, len,
-                       "This is a Death trap!\r\n" );
-
-// Remarked this out and Adding one for DT above this. -> Prom
-//			case SECT_TUNDRA:
-//				snprintf ( bufptr, len,
-//				           "This hard land of permanently frozen subsoil is almost barren, but not quite.\r\n"
-//				           "Only the hardiest of lifeforms can survive here. Sometimes the freezing\r\n"
-//				           "temperatures of the night cracks the land and offers a place for lichens,\r\n"
-//				           "mosses, and even an occasional shrub that becomes stunted by the bitter cold,\r\n"
-//				           "manages to spring to life here.\r\n" );
-//				break;
+                           "This is a deathtrap, which means that you are now dead. Hopefully you paid\r\n"
+                           "your DT insurance.\r\n" );
+                break;
             case SECT_SNOW:
                 snprintf ( bufptr, len,
-                           "The landscape would be boring if not for the higher drifts of snow that have\r\n"
-                           "built up in places. It's too deep to dig down and find out what is under there\r\n"
-                           "to know what the snow has built up around. Most likely it's just more snow.\r\n"
-                           "It's easy to get lost in the monotony of white.\r\n" );
+                           "The landscape is monotonously white. The snow is too deep to dig down and\r\n"
+                           "find out what lies below. Most likely it's just more snow.\r\n" );
                 break;
             case SECT_ICE:
                 snprintf ( bufptr, len,
-                           "Sheets of treacherously slippery ice sparkle like jewels during the day.\r\n"
-                           "Sometimes jagged blocks of expanded ice surge up through cracks and break the\r\n"
-                           "otherwise monotonous surroundings. During the day the ice can be blinding,\r\n"
-                           "the night is no better as the temperatures drastically fall.\r\n" );
+                           "The treacherously slippery ice surface sparkles like jewels during the day.\r\n"
+                           "Some jagged blocks of expanded ice break the monotonous surroundings.\r\n" );
+                break;
+            case SECT_PRAIRIE:
+                snprintf ( bufptr, len,
+                           "Knee-high, yellowish grass surrounds you. When the wind blows, the grass\r\n"
+                           "sways, making you think of waves on the ocean.\r\n" );
                 break;
             case SECT_BADLANDS:
                 snprintf ( bufptr, len,
-                       "Dry terrian where softer sedimentary rocks and clay-rich \r\n"
-                       "soils have been erroded by water and wind. \r\n");
+                           "The terrain is extremely barren, mostly gravel and bedrock remain, after the\r\n"
+                           "softer sedimentary soils have been eroded by water and wind.\r\n");
                 break;
             case SECT_RAIL:
                 snprintf ( bufptr, len,
-                       "Two parralel rails track through the land forming \r\n"
-                       "a system of transportation.\r\n");
+                           "Two parralel rails track run through the landscape, forming a system of\r\n"
+                           "transportation by train.\r\n");
                 break;
             default:
                 snprintf ( bufptr, len,

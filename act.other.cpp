@@ -2134,9 +2134,9 @@ const char *msgs[][2] =
     //SECT_REEF               19
     {"You start moving coral and fish out of the way.\r\n",
      "$n starts moving coral and fish out of the way.\r\n"},
-    // SECT_TUNDRA          20
-    {"You start moving snow and dry grass out of the way.\r\n",
-     "$n starts moving snow and dry grass out of the way.\r\n"},
+    // SECT_DEATHTRAP         20
+    {"You can't dig here!\r\n",
+     NULL},
     //SECT_SNOW          21
     {"You start moving snow out of the way.\r\n",
      "$n starts moving snow out of the way.\r\n"},
@@ -2149,8 +2149,6 @@ const char *msgs[][2] =
     //SECT_BADLANDS 24
     {"You start moving glowing rocks out of the way.\r\n",
      "$n starts moving glowing rocks out of the way.\r\n"},
-/* Not sure why this is done like this compared to the others -Prom */
-/* #define SECT_RAIL     25 */
     //SECT_RAIL 25
     {"You start moving huge metal rails out of the way.\r\n",
      "$n starts moving huge metal rails out of the way.\r\n"},

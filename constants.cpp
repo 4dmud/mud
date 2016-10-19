@@ -2590,12 +2590,12 @@ const int movement_loss[] =
     1,                   /*Vehicle*/
     6,                   /*swamp*/
     5,                   /*reef*/
-    5,                   /*tundra*/
+    50,                  /*deathtrap*/
     8,                   /*snow*/
     4,                   /*ice*/
-    2,                   /*praierie*/
-    7,                  /*badlands*/
-    6,                  /*rail*/
+    2,                   /*prairie*/
+    7,                   /*badlands*/
+    6,                   /*rail*/
     0
 
 };
