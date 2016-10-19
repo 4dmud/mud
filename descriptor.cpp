@@ -11,7 +11,6 @@
 //
 #include "config.h"
 #include "sysdep.h"
-#include "protocol.h" // @TODO:PROTOCOL
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
 # include <mcheck.h>

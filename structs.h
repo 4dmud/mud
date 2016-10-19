@@ -1681,7 +1681,7 @@ struct char_ability_data {
 /* Char's points.  Used in char_file_u *DO*NOT*CHANGE* */
 struct char_point_data {
     int mana;
-    int max_mana;        /* Max mana for PC/NPC                        */
+    int max_mana;        /* Max mana for PC/NPC                     */
     int hit;
     int max_hit;         /* Max hit for PC/NPC                      */
     int move;
@@ -1689,7 +1689,7 @@ struct char_point_data {
 
     sh_int armor;        /* Internal -100..100, external -10..10 AC */
     gold_int gold;       /* Money carried                           */
-    gold_int bank_gold;       /* Gold the char has in a bank account     */
+    gold_int bank_gold;  /* Gold the char has in a bank account     */
     gold_int exp;        /* The experience of the player            */
     gold_int group_exp;
 

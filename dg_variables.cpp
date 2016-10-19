@@ -1074,8 +1074,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     {
                         if ( subfield && *subfield )
                         {
-                            log ( "INFO: %s just gained %d exp from script vnum %d.", GET_NAME ( c ),atoi ( subfield ), GET_TRIG_VNUM ( trig ) );
-                            gold_int addition = MIN ( atoi ( subfield ), 100000000 );	/* level_exp(GET_CLASS(c), GET_LEVEL(c) + 1, current_class_is_tier_num(c)) - GET_EXP(c) -1); //removed by mord */
+                            gold_int addition = min ( atoll ( subfield ), 100000000LL );
+                            log ( "INFO: %s just gained %lld exp from script vnum %d.", GET_NAME ( c ), addition, GET_TRIG_VNUM ( trig ) );
                             gain_exp ( c, addition );
                         }
                         snprintf ( str, slen, "%lld", GET_EXP ( c ) );
@@ -1199,7 +1199,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     {
                         if ( subfield && *subfield )
                         {
-                            gold_int addition = atoi ( subfield );
+                            gold_int addition = atoll ( subfield );
                             c->Gold ( addition, GOLD_HAND );
                             if ( addition > 0 )
                                 gold_data ( DG_GOLD_OUT, addition );

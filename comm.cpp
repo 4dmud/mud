@@ -27,7 +27,6 @@
 
 #include "config.h"
 #include "sysdep.h"
-#include "protocol.h" //@TODO:PROTOCOL
 #include "execinfo.h"
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
@@ -762,8 +761,8 @@ void copyover_recover(void) {
         descriptor_list = d;
 #endif
 
-    MSDPSetString( d, eMSDP_CLIENT_ID, client_name );
-    MSDPSetString( d, eMSDP_CLIENT_VERSION, client_version );
+        MSDPSetString( d, eMSDP_CLIENT_ID, client_name );
+        MSDPSetString( d, eMSDP_CLIENT_VERSION, client_version );
         CopyoverSet( d, protocol_data );
 
         d->host = host;
@@ -805,11 +804,7 @@ void copyover_recover(void) {
             d->connected = CON_PLAYING;
             GET_LOADROOM(d->character) = saved_loadroom;
             enter_player_game(d);
-
-
-
         }
-
     }
 
     fclose(fp);
@@ -2220,7 +2215,7 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
         /* Write something, and check if it goes error-free */
         if (write_to_descriptor(desc,GREETINGS, NULL) == 0) {
             close(desc);  /* nope */
-        delete newd;
+            delete newd;
             return NULL;
         }
     }
@@ -4643,133 +4638,3 @@ void mccp_off(Descriptor *d) {
 #include "dlib/dir_nav/dir_nav_kernel_2.cpp"
 //#include "dlib/linker/linker_kernel_1.cpp"
 
-
-
-//@TODO:PROTOCOL: You may want to move this elsewhere.
-
-int fighter_damroll ( Character *ch );
-int caster_damroll ( Character *ch );
-const char *simple_class_name ( Character *ch );
-char *msdp_map (Character *ch);
-const char *skill_name(int num);
-
-void msdp_update( void )
-{
-    Descriptor *d;
-    int PlayerCount = 0;
-
-    for (d = descriptor_list; d; d = d->next)
-    {
-        Character *ch = d->character;
-        if ( ch && !IS_NPC(ch) && d->connected == CON_PLAYING )
-        {
-            Character *pOpponent = FIGHTING(ch);
-            ++PlayerCount;
-
-            bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
-               GET_CLASS( ch ) == CLASS_MAGE ||
-               GET_CLASS( ch ) == CLASS_ESPER || has_staff( ch );
-
-            MSDPSetString( d, eMSDP_CHARACTER_NAME, GET_NAME(ch) );
-            MSDPSetNumber( d, eMSDP_ALIGNMENT, GET_ALIGNMENT(ch) );
-            MSDPSetNumber( d, eMSDP_EXPERIENCE, GET_EXP(ch) );
-            MSDPSetNumber( d, eMSDP_EXPERIENCE_MAX, level_exp (
-               GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1,
-               current_class_is_tier_num ( ch ),
-               MIN ( REMORTS ( ch ), 50 ) ) );
-            MSDPSetNumber( d, eMSDP_EXPERIENCE_TNL, exp_needed(ch) );
-            MSDPSetNumber( d, eMSDP_EXPERIENCE_LAST, level_exp (
-               GET_CLASS ( ch ), GET_LEVEL ( ch ),
-               current_class_is_tier_num ( ch ),
-               MIN ( REMORTS ( ch ), 50 ) ) );
-
-            MSDPSetNumber( d, eMSDP_HEALTH, GET_HIT(ch) );
-            MSDPSetNumber( d, eMSDP_HEALTH_MAX, GET_MAX_HIT(ch) );
-            MSDPSetNumber( d, eMSDP_LEVEL, GET_LEVEL(ch) );
-
-            MSDPSetString( d, eMSDP_RACE, race_name(ch) );
-            MSDPSetString( d, eMSDP_CLASS, simple_class_name(ch) );
-
-            MSDPSetNumber( d, eMSDP_MANA, GET_MANA(ch) );
-            MSDPSetNumber( d, eMSDP_MANA_MAX, GET_MAX_MANA(ch) );
-            MSDPSetNumber( d, eMSDP_WIMPY, GET_WIMP_LEV(ch) );
-            MSDPSetNumber( d, eMSDP_PRACTICE, GET_PRACTICES(ch) );
-            MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
-            MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );
-            MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch) );
-            MSDPSetNumber( d, eMSDP_HITROLL, GET_HITROLL(ch) );
-            MSDPSetNumber( d, eMSDP_DAMROLL, is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ) );
-            MSDPSetNumber( d, eMSDP_AC, ch->compute_armor_class() );
-
-            MSDPSetNumber( d, eMSDP_STR, GET_STR(ch) );
-            MSDPSetNumber( d, eMSDP_STR_ADD, GET_ADD(ch) );
-            MSDPSetNumber( d, eMSDP_INT, GET_INT(ch) );
-            MSDPSetNumber( d, eMSDP_WIS, GET_WIS(ch) );
-            MSDPSetNumber( d, eMSDP_CON, GET_CON(ch) );
-            MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
-            MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
-            MSDPSetNumber( d, eMSDP_STAMINA, GET_STAMINA(ch) );
-            MSDPSetNumber( d, eMSDP_STAMINA_MAX, GET_MAX_STAMINA(ch) );
-
-            MSDPSetNumber( d, eMSDP_INT_PERM, ch->real_abils.intel );
-            MSDPSetNumber( d, eMSDP_WIS_PERM, ch->real_abils.wis );
-            MSDPSetNumber( d, eMSDP_CON_PERM, ch->real_abils.con );
-            MSDPSetNumber( d, eMSDP_DEX_PERM, ch->real_abils.dex );
-            MSDPSetNumber( d, eMSDP_CHA_PERM, ch->real_abils.cha );
-            MSDPSetNumber( d, eMSDP_STR_PERM, ch->real_abils.str );
-            MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
-
-
-            /* This would be better moved elsewhere */
-            if ( pOpponent != NULL )
-            {
-                int hit_points = (GET_HIT(pOpponent) * 100) / GET_MAX_HIT(pOpponent);
-                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, hit_points );
-                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH_MAX, 100 );
-                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, GET_LEVEL(pOpponent) );
-                MSDPSetString( d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch) );
-            }
-            else /* Clear the values */
-            {
-                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, 0 );
-                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, 0 );
-                MSDPSetString( d, eMSDP_OPPONENT_NAME, "" );
-            }
-
-            Room *pRoom = ch->in_room;
-            if ( pRoom && pRoom->number != d->pProtocol->LastRoomVnum )
-            {
-                d->pProtocol->LastRoomVnum = pRoom->number;
-                MSDPSetString( d, eMSDP_LOCATION_MAP, msdp_map(ch) );
-            }
-
-            char buf[MAX_STRING_LENGTH] = {'\0'};
-            if ( ch->affected )
-            {
-                char skill_buf[MAX_STRING_LENGTH];
-                struct affected_type *aff;
-
-                for ( aff = ch->affected; aff != NULL; aff = aff->next )
-                {
-                    int minsec = time_to_sec(aff->expire+1);
-                    sprintf( skill_buf, "001,1,%s,%d",
-                        skill_name(aff->type), minsec >= 0 ? minsec : -1 );
-
-                    if ( buf[0] != '\0' )
-                        strcat( buf, "\a" );
-
-                    strcat( buf, skill_buf );
-                }
-            }
-            MSDPSetString( d, eMSDP_AFFECTS, buf );
-
-            MSDPUpdate( d );
-        }
-
-        /* Ideally this should be called once at startup, and again whenever
-         * someone leaves or joins the mud.  But this works, and it keeps the
-         * snippet simple.  Optimise as you see fit.
-         */
-        MSSPSetPlayers( PlayerCount );
-    }
-}

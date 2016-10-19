@@ -2108,39 +2108,41 @@ char *scan_zone_mobs ( zone_rnum zone_nr, char *buf, size_t len )
     return buf;
 }
 
-void look_around ( Character *ch )
+string get_zonename ( const Character *ch )
 {
-
-    char zonename[MAX_INPUT_LENGTH];
-    size_t len, x;
-
-    if ( IN_ROOM ( ch ) == NULL )
-    {
-        return;
-    }
-    if ( IN_ROOM ( ch )->zone < 0 )
-    {
-        return;
-    }
+    if ( IN_ROOM ( ch ) == nullptr || IN_ROOM ( ch )->zone < 0 )
+        return "";
 
     if ( !zone_table[IN_ROOM ( ch )->zone].name || !*zone_table[IN_ROOM ( ch )->zone].name )
-        return;
+        return "";
 
-    strlcpy ( zonename, zone_table[IN_ROOM ( ch )->zone].name, sizeof ( zonename ) );
-    if ( !*zonename )
-        return;
-    len = strlen ( zonename );
-    for ( x = 1; x < len; x++ )
-        if ( zonename[x] == '-' && zonename[x-1] == ' ' )
+    string zonename = string ( zone_table[IN_ROOM ( ch )->zone].name );
+
+    // don't include the name of the builder
+    for ( int i = 1; i < zonename.length(); i++ )
+        if ( zonename[i] == '-' && zonename[i-1] == ' ' )
         {
-            zonename[x] = '\0';
+            zonename = zonename.substr ( 0, i-1 );
             break;
         }
 
+    return zonename;
+}
+
+void look_around ( Character *ch )
+{
+    string zonename = get_zonename ( ch );
+    if ( zonename == "" )
+    {
+        ch->Send ( "You are nowhere!?\r\n" );
+        return;
+    }
+
     if ( zone_table[IN_ROOM ( ch )->zone].dimension )
         ch->Send ( "\r\n{cRYou are in the %s dimension.{c0", dimension_types[zone_table[IN_ROOM ( ch )->zone].dimension] );
-    ch->Send ( "\r\n{cyYou are in %s{c0\r\n", zonename );
-    ch->Send ( "{cc%s{C0\r\n", scan_zone_mobs ( IN_ROOM ( ch )->zone, zonename, sizeof ( zonename ) ) );
+    ch->Send ( "\r\n{cyYou are in %s{c0\r\n", zonename.c_str() );
+    char buf[MAX_STRING_LENGTH];
+    ch->Send ( "{cc%s{C0\r\n", scan_zone_mobs ( IN_ROOM ( ch )->zone, buf, sizeof ( buf ) ) );
 }
 
 ACMD ( do_gold )
@@ -3200,6 +3202,8 @@ void display_help_list ( Descriptor *d, char *keywords )
 
     if ( cnt == 0 )
     {
+        free ( dynbuf );
+        dynbuf = nullptr;
         d->Output ( "No help found on that topic, this has been logged please check for this help file in the future.\r\n" );
         log ( "HELP: %s tried to find help on the word %s, but nothing available.", GET_NAME ( d->character ), keywords );
         return;

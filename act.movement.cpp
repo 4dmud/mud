@@ -46,6 +46,8 @@ void hit_death_trap ( Character *ch );
 void raw_kill ( Character *ch, Character * vict );
 ACMD ( do_drive );
 int even_group ( Character *ch );
+char *msdp_map ( Character *ch );
+string msdp_exits ( const Character *ch );
 
 /* MatingMod Defines */
 #define NINE_MONTHS     6000  /* 6000 realtime minutes TO GO */
@@ -1512,7 +1514,17 @@ int has_key ( Character *ch, obj_vnum key )
     return ( 0 );
 }
 
-
+// When a door is opened or closed, update the MSDP map and exits for the players in the room
+void update_MSDP_map ( Room* room )
+{
+    for ( auto ch = room->people; ch; ch = ch->next )
+        if ( ch->desc && ch->desc->connected == CON_PLAYING )
+        {
+            MSDPSetString ( ch->desc, eMSDP_LOCATION_MAP, msdp_map ( ch ) );
+            string exits = msdp_exits ( ch );
+            MSDPSetString( ch->desc, eMSDP_ROOM_EXITS, exits.c_str() );
+        }
+}
 
 #define NEED_OPEN   (1 << 0)
 #define NEED_CLOSED (1 << 1)
@@ -1546,8 +1558,7 @@ const int flags_door[] =
           (TOGGLE_BIT(GET_OBJ_VAL(obj, 1), CONT_LOCKED)) :\
           (TOGGLE_BIT(EXITN(room, door)->exit_info, EX_LOCKED)))
 
-void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
-                  int scmd )
+void do_doorcmd ( Character *ch, struct obj_data *obj, int door, int scmd )
 {
     room_rnum other_room = NULL;
     struct room_direction_data *back = 0;
@@ -1571,6 +1582,7 @@ void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
             if ( back )
                 OPEN_DOOR ( other_room, obj, rev_dir[door] );
             ch->Send ( "%s", CONFIG_OK );
+            update_MSDP_map ( IN_ROOM ( ch ) );
             break;
         case SCMD_UNLOCK:
         case SCMD_LOCK:
@@ -1595,8 +1607,7 @@ void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
     len += snprintf ( buf + len, sizeof ( buf ) - len, "%s%s.", ( ( obj ) ? "" : "the " ),
                       ( obj ) ? "$p" : ( EXIT ( ch, door )->keyword ? "$F" : "door" ) );
     if ( ! ( obj ) || ( obj->in_room != NULL ) )
-        act ( buf, FALSE, ch, obj, obj ? 0 : EXIT ( ch, door )->keyword,
-              TO_ROOM );
+        act ( buf, FALSE, ch, obj, obj ? 0 : EXIT ( ch, door )->keyword, TO_ROOM );
 
     /* Notify the other room */
     if ( ( scmd == SCMD_OPEN || scmd == SCMD_CLOSE ) && back )
@@ -1606,10 +1617,9 @@ void do_doorcmd ( Character *ch, struct obj_data *obj, int door,
                    cmd_door[scmd], ( scmd == SCMD_CLOSE ) ? "d" : "ed" );
         if ( EXIT ( ch, door )->to_room->people )
         {
-            act ( buf, FALSE, EXIT ( ch, door )->to_room->people, 0, 0,
-                  TO_ROOM );
-            act ( buf, FALSE, EXIT ( ch, door )->to_room->people, 0, 0,
-                  TO_CHAR );
+            act ( buf, FALSE, EXIT ( ch, door )->to_room->people, 0, 0, TO_ROOM );
+            act ( buf, FALSE, EXIT ( ch, door )->to_room->people, 0, 0, TO_CHAR );
+            update_MSDP_map ( EXIT ( ch,door )->to_room );
         }
     }
 }

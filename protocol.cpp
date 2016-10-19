@@ -31,6 +31,16 @@
 
 #include "protocol.h"
 
+extern struct time_info_data time_info;
+
+const char *simple_class_name ( Character *ch );
+int fighter_damroll ( Character *ch );
+int caster_damroll ( Character *ch );
+void parse_room_name ( room_rnum in_room, char *bufptr, size_t len );
+string get_zonename ( const Character *ch );
+char *msdp_map ( Character *ch );
+const char *skill_name ( int num );
+
 /******************************************************************************
  The following section is for Diku/Merc derivatives.  Replace as needed.
  ******************************************************************************/
@@ -142,8 +152,11 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_DEX_PERM,         "DEX_PERM",         NUMBER_READ_ONLY },
    { eMSDP_CON_PERM,         "CON_PERM",         NUMBER_READ_ONLY },
    { eMSDP_CHA_PERM,         "CHA_PERM",         NUMBER_READ_ONLY },
+   { eMSDP_SPEED,            "SPEED",            NUMBER_READ_ONLY },
    { eMSDP_STAMINA,          "STAMINA",          NUMBER_READ_ONLY },
    { eMSDP_STAMINA_MAX,      "STAMINA_MAX",      NUMBER_READ_ONLY },
+   { eMSDP_ACCURACY,         "ACCURACY",         NUMBER_READ_ONLY },
+   { eMSDP_EVASION,          "EVASION",          NUMBER_READ_ONLY },
 
    /* Combat */
    { eMSDP_OPPONENT_HEALTH,  "OPPONENT_HEALTH",  NUMBER_READ_ONLY },
@@ -1008,14 +1021,14 @@ void MSDPSend( descriptor_t *apDescriptor, variable_t aMSDP )
       {
          if ( pProtocol->bMSDP )
          {
-            sprintf( MSDPBuffer, "%c%c%c%c%s%c%d%c%c",
+            sprintf( MSDPBuffer, "%c%c%c%c%s%c%lld%c%c",
                IAC, SB, TELOPT_MSDP, MSDP_VAR,
                VariableNameTable[aMSDP].pName, MSDP_VAL,
                pProtocol->pVariables[aMSDP]->ValueInt, IAC, SE );
          }
          else if ( pProtocol->bATCP )
          {
-            sprintf( MSDPBuffer, "%c%c%cMSDP.%s %d%c%c",
+            sprintf( MSDPBuffer, "%c%c%cMSDP.%s %lld%c%c",
                IAC, SB, TELOPT_ATCP,
                VariableNameTable[aMSDP].pName,
                pProtocol->pVariables[aMSDP]->ValueInt, IAC, SE );
@@ -1075,7 +1088,7 @@ void MSDPSendPair( descriptor_t *apDescriptor, const char *apVariable, const cha
    }
 }
 
-void MSDPSetNumber( descriptor_t *apDescriptor, variable_t aMSDP, int aValue )
+void MSDPSetNumber( descriptor_t *apDescriptor, variable_t aMSDP, gold_int aValue )
 {
    protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
 
@@ -1108,6 +1121,177 @@ void MSDPSetString( descriptor_t *apDescriptor, variable_t aMSDP, const char *ap
          }
       }
    }
+}
+
+string msdp_exits ( const Character *ch )
+{
+    string exits;
+    for ( int door = 0; door < NUM_OF_DIRS; door++ )
+    {
+        if ( !EXIT ( ch, door ) || !EXIT ( ch, door )->to_room )
+            continue;
+
+        if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_HIDDEN ) && !IS_IMM ( ch ) )
+            continue;
+
+        if ( EXIT_FLAGGED ( EXIT ( ch, door ), EX_CLOSED ) )
+        {
+            if ( IS_IMM ( ch ) )
+            {
+                exits += "x";
+                exits.back() = toupper ( *dirs[door] );
+            }
+        }
+        else
+        {
+            exits += "x";
+            exits.back() = *dirs[door];
+        }
+    }
+    return exits;
+}
+
+void msdp_update( void )
+{
+    Descriptor *d;
+    int PlayerCount = 0;
+
+    for (d = descriptor_list; d; d = d->next)
+    {
+        Character *ch = d->character;
+        if ( ch && !IS_NPC(ch) && d->connected == CON_PLAYING )
+        {
+            Character *pOpponent = FIGHTING(ch);
+            ++PlayerCount;
+
+            MSDPSetNumber ( d, eMSDP_WORLD_TIME, time_info.hours );
+
+            bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
+               GET_CLASS( ch ) == CLASS_MAGE ||
+               GET_CLASS( ch ) == CLASS_ESPER || has_staff( ch );
+
+            MSDPSetString( d, eMSDP_CHARACTER_NAME, GET_NAME(ch) );
+            MSDPSetNumber( d, eMSDP_ALIGNMENT, GET_ALIGNMENT(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE, GET_EXP(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_MAX, level_exp (
+               GET_CLASS ( ch ), GET_LEVEL ( ch ) + 1,
+               current_class_is_tier_num ( ch ),
+               MIN ( REMORTS ( ch ), 50 ) ) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_TNL, exp_needed(ch) );
+            MSDPSetNumber( d, eMSDP_EXPERIENCE_LAST, level_exp (
+               GET_CLASS ( ch ), GET_LEVEL ( ch ),
+               current_class_is_tier_num ( ch ),
+               MIN ( REMORTS ( ch ), 50 ) ) );
+
+            MSDPSetNumber( d, eMSDP_HEALTH, GET_HIT(ch) );
+            MSDPSetNumber( d, eMSDP_HEALTH_MAX, GET_MAX_HIT(ch) );
+            MSDPSetNumber( d, eMSDP_LEVEL, GET_LEVEL(ch) );
+
+            MSDPSetString( d, eMSDP_RACE, race_name(ch) );
+            MSDPSetString( d, eMSDP_CLASS, simple_class_name(ch) );
+
+            MSDPSetNumber( d, eMSDP_MANA, GET_MANA(ch) );
+            MSDPSetNumber( d, eMSDP_MANA_MAX, GET_MAX_MANA(ch) );
+            MSDPSetNumber( d, eMSDP_WIMPY, GET_WIMP_LEV(ch) );
+            MSDPSetNumber( d, eMSDP_PRACTICE, GET_PRACTICES(ch) );
+            MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
+            MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );
+            MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch) );
+            MSDPSetNumber( d, eMSDP_HITROLL, GET_HITROLL(ch) );
+            MSDPSetNumber( d, eMSDP_DAMROLL, is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ) );
+            MSDPSetNumber( d, eMSDP_AC, ch->compute_armor_class() );
+
+            MSDPSetNumber( d, eMSDP_STR, GET_STR(ch) );
+            MSDPSetNumber( d, eMSDP_STR_ADD, GET_ADD(ch) );
+            MSDPSetNumber( d, eMSDP_INT, GET_INT(ch) );
+            MSDPSetNumber( d, eMSDP_WIS, GET_WIS(ch) );
+            MSDPSetNumber( d, eMSDP_CON, GET_CON(ch) );
+            MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
+            MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
+            MSDPSetNumber( d, eMSDP_SPEED, GET_SPEED ( ch ) );
+            MSDPSetNumber( d, eMSDP_STAMINA, GET_STAMINA(ch) );
+            MSDPSetNumber( d, eMSDP_STAMINA_MAX, GET_MAX_STAMINA(ch) );
+            MSDPSetNumber( d, eMSDP_ACCURACY, GET_PERM_ACCURACY ( ch ) );
+            MSDPSetNumber( d, eMSDP_EVASION, GET_PERM_EVASION ( ch ) );
+
+            MSDPSetNumber( d, eMSDP_INT_PERM, ch->real_abils.intel );
+            MSDPSetNumber( d, eMSDP_WIS_PERM, ch->real_abils.wis );
+            MSDPSetNumber( d, eMSDP_CON_PERM, ch->real_abils.con );
+            MSDPSetNumber( d, eMSDP_DEX_PERM, ch->real_abils.dex );
+            MSDPSetNumber( d, eMSDP_CHA_PERM, ch->real_abils.cha );
+            MSDPSetNumber( d, eMSDP_STR_PERM, ch->real_abils.str );
+            MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
+
+
+            /* This would be better moved elsewhere */
+            if ( pOpponent != NULL )
+            {
+                int hit_points = (GET_HIT(pOpponent) * 100) / GET_MAX_HIT(pOpponent);
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, hit_points );
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH_MAX, 100 );
+                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, GET_LEVEL(pOpponent) );
+                MSDPSetString( d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch) );
+            }
+            else /* Clear the values */
+            {
+                MSDPSetNumber( d, eMSDP_OPPONENT_HEALTH, 0 );
+                MSDPSetNumber( d, eMSDP_OPPONENT_LEVEL, 0 );
+                MSDPSetString( d, eMSDP_OPPONENT_NAME, "" );
+            }
+
+            Room *pRoom = ch->in_room;
+            if ( pRoom )
+            {
+                char buf[MAX_INPUT_LENGTH];
+                parse_room_name ( pRoom, buf, sizeof ( buf ) );
+                MSDPSetString ( d, eMSDP_ROOM_NAME, buf );
+                MSDPSetString ( d, eMSDP_AREA_NAME, get_zonename ( ch ).c_str() );
+
+                if ( pRoom->number != d->pProtocol->LastRoomVnum )
+                {
+                    d->pProtocol->LastRoomVnum = pRoom->number;
+                    MSDPSetString( d, eMSDP_LOCATION_MAP, msdp_map(ch) );
+                    string exits = msdp_exits ( ch );
+                    MSDPSetString( d, eMSDP_ROOM_EXITS, exits.c_str() );
+                }
+            }
+            else
+            {
+                MSDPSetString ( d, eMSDP_ROOM_NAME, "" );
+                MSDPSetString ( d, eMSDP_AREA_NAME, "" );
+                MSDPSetString ( d, eMSDP_LOCATION_MAP, "" );
+                MSDPSetString ( d, eMSDP_ROOM_EXITS, "" );
+            }
+
+            char buf[MAX_STRING_LENGTH] = {'\0'};
+            if ( ch->affected )
+            {
+                char skill_buf[MAX_STRING_LENGTH];
+                struct affected_type *aff;
+
+                for ( aff = ch->affected; aff != NULL; aff = aff->next )
+                {
+                    int minsec = time_to_sec(aff->expire+1);
+                    sprintf( skill_buf, "001,1,%s,%d",
+                        skill_name(aff->type), minsec >= 0 ? minsec : -1 );
+
+                    if ( buf[0] != '\0' )
+                        strcat( buf, "\a" );
+
+                    strcat( buf, skill_buf );
+                }
+            }
+            MSDPSetString( d, eMSDP_AFFECTS, buf );
+
+            MSDPUpdate( d );
+        }
+
+        /* Ideally this should be called once at startup, and again whenever
+         * someone leaves or joins the mud.  But this works, and it keeps the
+         * snippet simple.  Optimise as you see fit.
+         */
+        MSSPSetPlayers( PlayerCount );
+    }
 }
 
 /******************************************************************************

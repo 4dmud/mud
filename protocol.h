@@ -121,8 +121,11 @@ typedef enum
    eMSDP_DEX_PERM,
    eMSDP_CON_PERM,
    eMSDP_CHA_PERM,
+   eMSDP_SPEED,
    eMSDP_STAMINA,
    eMSDP_STAMINA_MAX,
+   eMSDP_ACCURACY,
+   eMSDP_EVASION,
 
    /* Combat */
    eMSDP_OPPONENT_HEALTH,
@@ -134,7 +137,7 @@ typedef enum
    eMSDP_AREA_NAME,
    eMSDP_ROOM_EXITS,
    eMSDP_ROOM_NAME,
-//   eMSDP_ROOM_VNUM,
+//   eMSDP_ROOM_VNUM,  // giving this would make mazes too easy
    eMSDP_LOCATION_MAP,
    eMSDP_WORLD_TIME,
 
@@ -181,7 +184,7 @@ typedef struct
 {
    bool_t       bReport;       /* Is this variable being reported? */
    bool_t       bDirty;        /* Does this variable need to be sent again? */
-   int          ValueInt;      /* The numeric value of the variable */
+   long long    ValueInt;      /* The numeric value of the variable */
    char        *pValueString;  /* The string value of the variable */
 } MSDP_t;
 
@@ -375,7 +378,7 @@ void MSDPSendPair( descriptor_t *apDescriptor, const char *apVariable, const cha
  *
  * You can also this function for bools, chars, enums, short ints, etc.
  */
-void MSDPSetNumber( descriptor_t *apDescriptor, variable_t aMSDP, int aValue );
+void MSDPSetNumber( descriptor_t *apDescriptor, variable_t aMSDP, long long aValue );
 
 /* Function: MSDPSetString
  *
