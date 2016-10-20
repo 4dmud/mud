@@ -1351,13 +1351,11 @@ int enter_wtrigger(Room *room, Character * actor, int dir) {
         if (TRIGGER_CHECK(t, WTRIG_ENTER) &&
                 (number(1, 100) <= GET_TRIG_NARG(t))) {
 
-            if (dir>=0 && dir < NUM_OF_DIRS)
-                add_var(&GET_TRIG_VARS(t), "direction",
-                        (char *) dirs[rev_dir[dir]], 0);
+            if (dir >= 0 && dir < NUM_OF_DIRS)
+                add_var(&GET_TRIG_VARS(t), "direction", (char *) dirs[rev_dir[dir]], 0);
             else
                 add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
             ADD_UID_VAR(buf, t, actor, "actor", 0);
-
 
             return script_driver(&room, t, WLD_TRIGGER, TRIG_NEW);
         }

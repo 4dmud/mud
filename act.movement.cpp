@@ -326,26 +326,6 @@ int do_simple_move ( Character *ch, int dir, int need_specials_check )
             }
         }
 
-
-        /* if this room or the one we're going to needs a boat, check for one */
-        if ( ( ( SECT ( IN_ROOM ( ch ) ) == SECT_WATER_SWIM ) ||
-                ( SECT ( EXIT ( ch, dir )->to_room ) == SECT_WATER_SWIM ) ) )
-        {
-            if ( ch->MountHere() )
-            {
-                if ( RIDING ( ch )->Flying() )
-                {
-                    ch->Send ( "Your mount can't fly into that room!\r\n" );
-                    return ( 0 );
-                }
-            }
-            else if ( ch->Flying() )
-            {
-                ch->Send ( "You can't fly into that room!\r\n" );
-                return 0;
-            }
-        }
-
         /* if this room or the one we're going to is in the air, are we flying? */
         if ( ( SECT ( IN_ROOM ( ch ) ) == SECT_FLYING ) ||
                 ( SECT ( EXIT ( ch, dir )->to_room ) == SECT_FLYING ) )

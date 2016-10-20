@@ -2178,9 +2178,13 @@ int enter_player_game ( Descriptor *d )
     // if (!valid_id_num( GET_ID(ch)))
     //    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
     GET_ID ( ch ) = GET_IDNUM ( ch );
+    auto it_old_ch = ch_lookup_table.find ( GET_ID ( ch ) );
+    if ( it_old_ch != ch_lookup_table.end() )
+    {
+        // there's an old character that wasn't deleted
+        delete *it_old_ch;
+    }
     addChToLookupTable ( GET_IDNUM ( ch ), ch );
-
-
 
     if ( PLR_FLAGGED ( ch, PLR_INVSTART ) )
         GET_INVIS_LEV ( ch ) = GET_LEVEL ( ch );
