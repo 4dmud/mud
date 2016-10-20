@@ -37,7 +37,7 @@
 #include "lisp.h"
 
 extern const char *MENU;
-
+extern map<long, Character *> ch_lookup_table;
 
 extern char *motd;
 extern char *imotd;
@@ -2182,7 +2182,7 @@ int enter_player_game ( Descriptor *d )
     if ( it_old_ch != ch_lookup_table.end() )
     {
         // there's an old character that wasn't deleted
-        delete *it_old_ch;
+        delete it_old_ch->second;
     }
     addChToLookupTable ( GET_IDNUM ( ch ), ch );
 
