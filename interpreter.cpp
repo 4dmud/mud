@@ -2179,10 +2179,12 @@ int enter_player_game ( Descriptor *d )
     //    log("Error %s id being assigned already exists(%ld)!", GET_NAME(ch), GET_IDNUM(ch));
     GET_ID ( ch ) = GET_IDNUM ( ch );
     auto it_old_ch = ch_lookup_table.find ( GET_ID ( ch ) );
-    if ( it_old_ch != ch_lookup_table.end() )
+    if ( it_old_ch != ch_lookup_table.end() && it_old_ch->second != ch )
     {
         // there's an old character that wasn't deleted
+        log ( "SYSERR: Deleting %s's old char that was still in the game.", GET_NAME ( ch ) );
         delete it_old_ch->second;
+        removeFromChLookupTable ( GET_ID ( ch ) );
     }
     addChToLookupTable ( GET_IDNUM ( ch ), ch );
 
