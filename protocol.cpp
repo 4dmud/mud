@@ -40,6 +40,15 @@ void parse_room_name ( room_rnum in_room, char *bufptr, size_t len );
 string get_zonename ( const Character *ch );
 char *msdp_map ( Character *ch );
 const char *skill_name ( int num );
+bool is_fused ( Character *ch );
+int fused_speed ( Character *ch );
+int fused_AC ( Character *ch );
+int fused_hitroll ( Character *ch );
+int fused_dambonus ( Character *ch );
+int fused_accuracy ( Character *ch );
+int fused_evasion ( Character *ch );
+int accuracy_tot ( Character *ch );
+int evasion_tot ( Character *ch );
 
 /******************************************************************************
  The following section is for Diku/Merc derivatives.  Replace as needed.
@@ -152,6 +161,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_DEX_PERM,         "DEX_PERM",         NUMBER_READ_ONLY },
    { eMSDP_CON_PERM,         "CON_PERM",         NUMBER_READ_ONLY },
    { eMSDP_CHA_PERM,         "CHA_PERM",         NUMBER_READ_ONLY },
+   { eMSDP_ACCURACY_PERM,    "ACCURACY_PERM",    NUMBER_READ_ONLY },
+   { eMSDP_EVASION_PERM,     "EVASION_PERM",     NUMBER_READ_ONLY },
    { eMSDP_SPEED,            "SPEED",            NUMBER_READ_ONLY },
    { eMSDP_STAMINA,          "STAMINA",          NUMBER_READ_ONLY },
    { eMSDP_STAMINA_MAX,      "STAMINA_MAX",      NUMBER_READ_ONLY },
@@ -1197,9 +1208,25 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
             MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );
             MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch) );
-            MSDPSetNumber( d, eMSDP_HITROLL, GET_HITROLL(ch) );
-            MSDPSetNumber( d, eMSDP_DAMROLL, is_casting ? caster_damroll ( ch ) : fighter_damroll( ch ) );
-            MSDPSetNumber( d, eMSDP_AC, ch->compute_armor_class() );
+
+            if ( is_fused ( ch ) )
+            {
+                MSDPSetNumber( d, eMSDP_HITROLL, fused_hitroll ( ch ) );
+                MSDPSetNumber( d, eMSDP_DAMROLL, fused_dambonus ( ch ) );
+                MSDPSetNumber( d, eMSDP_AC, fused_AC ( ch ) );
+                MSDPSetNumber( d, eMSDP_ACCURACY, fused_accuracy ( ch ) );
+                MSDPSetNumber( d, eMSDP_EVASION, fused_evasion ( ch ) );
+                MSDPSetNumber( d, eMSDP_SPEED, fused_speed ( ch ) );
+            }
+            else
+            {
+                MSDPSetNumber( d, eMSDP_HITROLL, GET_HITROLL ( ch ) );
+                MSDPSetNumber( d, eMSDP_DAMROLL, is_casting ? caster_damroll ( ch ) : fighter_damroll ( ch ) );
+                MSDPSetNumber( d, eMSDP_AC, ch->compute_armor_class() );
+                MSDPSetNumber( d, eMSDP_ACCURACY, accuracy_tot ( ch ) );
+                MSDPSetNumber( d, eMSDP_EVASION, evasion_tot ( ch ) );
+                MSDPSetNumber( d, eMSDP_SPEED, GET_SPEED ( ch ) );
+            }
 
             MSDPSetNumber( d, eMSDP_STR, GET_STR(ch) );
             MSDPSetNumber( d, eMSDP_STR_ADD, GET_ADD(ch) );
@@ -1208,11 +1235,8 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_CON, GET_CON(ch) );
             MSDPSetNumber( d, eMSDP_DEX, GET_DEX(ch) );
             MSDPSetNumber( d, eMSDP_CHA, GET_CHA(ch) );
-            MSDPSetNumber( d, eMSDP_SPEED, GET_SPEED ( ch ) );
             MSDPSetNumber( d, eMSDP_STAMINA, GET_STAMINA(ch) );
             MSDPSetNumber( d, eMSDP_STAMINA_MAX, GET_MAX_STAMINA(ch) );
-            MSDPSetNumber( d, eMSDP_ACCURACY, GET_PERM_ACCURACY ( ch ) );
-            MSDPSetNumber( d, eMSDP_EVASION, GET_PERM_EVASION ( ch ) );
 
             MSDPSetNumber( d, eMSDP_INT_PERM, ch->real_abils.intel );
             MSDPSetNumber( d, eMSDP_WIS_PERM, ch->real_abils.wis );
@@ -1221,7 +1245,8 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_CHA_PERM, ch->real_abils.cha );
             MSDPSetNumber( d, eMSDP_STR_PERM, ch->real_abils.str );
             MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
-
+            MSDPSetNumber( d, eMSDP_ACCURACY_PERM, GET_PERM_ACCURACY ( ch ) );
+            MSDPSetNumber( d, eMSDP_EVASION_PERM, GET_PERM_EVASION ( ch ) );
 
             /* This would be better moved elsewhere */
             if ( pOpponent != NULL )
