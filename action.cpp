@@ -1368,11 +1368,11 @@ ACTION(thing_tumble)
     return 0;
   }
 
-
+  // this if statement is for strangle, but thing_tumble isn't used atm
   if (!IS_STUCK(vict) || !skill_cost(0, 0, 50, ch) ||  (number(0, 110) - GET_DEX(ch) > total_chance(ch, SKILL_STRANGLE)))
   {
-    ch->Send( "You loose focus and stop strangling!!\r\n");
-    act("$n looses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
+    ch->Send( "You lose focus and drop the balls everywhere!\r\n" );
+    act("$n loses concentration and drops the balls everywhere!!\r\n", FALSE, ch, 0, 0, TO_ROOM);
     *num = 0;
     return 0;
   }

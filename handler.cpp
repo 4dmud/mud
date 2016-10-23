@@ -989,7 +989,7 @@ void char_to_room ( Character *ch, room_rnum room )
                 room->light++;
 
     if ( !IS_NPC ( ch ) )
-        zone_table[IN_ROOM ( ch )->zone].num_players--;
+        zone_table[IN_ROOM ( ch )->zone].num_players++;
 
     /* Stop fighting now, if we left. */
     if ( FIGHTING ( ch ) && IN_ROOM ( ch ) != IN_ROOM ( FIGHTING ( ch ) ) )

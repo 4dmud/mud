@@ -498,7 +498,7 @@ static int copy_object_main(struct obj_data *to, struct obj_data *from, int free
 
 const char *material_name(int type) {
     if (type < 0 || type > NUM_MATERIAL_TYPES)
-        return "Etherial";
+        return "Ethereal";
 
     return material_names[type];
 }

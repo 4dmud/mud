@@ -1232,7 +1232,7 @@ bool Character::zone_empty()
     if ( in_room == NULL )
         return TRUE;
 
-    return zone_table[GET_ROOM_ZONE ( in_room ) ].num_players > 0;
+    return zone_table[GET_ROOM_ZONE ( in_room ) ].num_players == 0;
 }
 bool Character::CanMove()
 {

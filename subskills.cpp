@@ -511,7 +511,7 @@ void assign_subskills(void) {
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_ONOFF, SUB_TYPE_AUTO| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_COMBATANT);
     /* find where a undergound spring is */
-    subo(SUB_DEVINE_WATER, "DevineWater", 0, 0,
+    subo(SUB_DIVINE_WATER, "DivineWater", 0, 0,
          0, POS_SLEEPING, 0 , PEAC,
          SK_NONE, STATUS_TYPE_TRAINABLE, SUB_TYPE_CMD| SUB_TYPE_PROF, CL_TYPE_NONE, PROF_WOODSMAN);
     /* create a well to tap into an underground spring */
