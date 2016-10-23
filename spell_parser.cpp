@@ -1148,13 +1148,10 @@ ACMD ( do_cast )
 
     Character *tch = NULL;//, *victim = NULL;
     struct obj_data *tobj = NULL;
-    char *s, *t, abuf[MAX_INPUT_LENGTH], *a;
+    char *s, *t, t_copy[MAX_INPUT_LENGTH], abuf[MAX_INPUT_LENGTH], *a;
     int mana, spellnum, i, target = 0, dir = NOWHERE;
 
     a = abuf;
-
-
-
 
     if ( IS_NPC ( ch ) && IS_AFFECTED ( ch, AFF_CHARM ) )
         return;
@@ -1185,9 +1182,6 @@ ACMD ( do_cast )
         return;
     }
 
-
-
-
     if ( !IS_NPC ( ch ) && total_chance ( ch, spellnum ) == 0 )
     {
         ch->Send ( "You are unfamiliar with that spell.\r\n" );
@@ -1208,9 +1202,6 @@ ACMD ( do_cast )
 
     GET_WAIT_STATE ( ch ) += ( 1 RL_SEC );
 
-
-    //	ch->Send ( "With the new system this spell would cost %d stamina.\r\n", SINFO.min_level * SINFO.tier / 2 + 1);
-
     /* Find the target */
     if ( t != NULL )
     {
@@ -1223,7 +1214,6 @@ ACMD ( do_cast )
         if ( *arg )
             dir = search_block ( arg, dirs, FALSE );
     }
-    //ch->Send( "a is %s, dir is %s, t is %s\r\n", a, dirs[dir], t);
 
     /*Special case Locate Object*/
     if ( spellnum == SPELL_LOCATE_OBJECT )
@@ -1257,28 +1247,37 @@ ACMD ( do_cast )
         }
         else if ( t != NULL && *t )
         {
-
-
-            /* if target needed and a target was surplied */
+            /* if target needed and a target was supplied */
 
             if ( !target && ( IS_SET ( SINFO.targets, TAR_CHAR_ROOM ) ) )
-                if ( ( tch = get_char_vis ( ch, t, NULL, FIND_CHAR_ROOM ) ) != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tch = get_char_vis ( ch, t_copy, NULL, FIND_CHAR_ROOM ) ) != NULL )
                     target = TRUE;
+            }
 
             if ( !target && IS_SET ( SINFO.targets, TAR_CHAR_WORLD ) )
-                if ( ( tch = get_char_vis ( ch, t, NULL, FIND_CHAR_WORLD ) ) != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tch = get_char_vis ( ch, t_copy, NULL, FIND_CHAR_WORLD ) ) != NULL )
                     target = TRUE;
+            }
 
             if ( !target && IS_SET ( SINFO.targets, TAR_OBJ_INV ) )
-                if ( ( tobj =
-                            get_obj_in_list_vis ( ch, t, NULL, ch->carrying ) ) != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tobj = get_obj_in_list_vis ( ch, t_copy, NULL, ch->carrying ) ) != NULL )
                     target = TRUE;
+            }
 
             if ( !target && IS_SET ( SINFO.targets, TAR_OBJ_EQUIP ) )
             {
+                strcpy ( t_copy, t );
+                char *s = t_copy;
+                get_number ( &s ); // strip the number for is_name_full
                 for ( i = 0; !target && i < NUM_WEARS; i++ )
                     if ( HAS_BODY ( ch, i ) && GET_EQ ( ch, i )
-                            && isname_full ( t, GET_EQ ( ch, i )->name ) )
+                            && isname_full ( t_copy, GET_EQ ( ch, i )->name ) )
                     {
                         tobj = GET_EQ ( ch, i );
                         target = TRUE;
@@ -1286,14 +1285,18 @@ ACMD ( do_cast )
             }
 
             if ( !target && IS_SET ( SINFO.targets, TAR_OBJ_ROOM ) )
-                if ( ( tobj =
-                            get_obj_in_list_vis ( ch, t, NULL,
-                                                  IN_ROOM ( ch )->contents ) ) != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tobj = get_obj_in_list_vis ( ch, t_copy, NULL, IN_ROOM ( ch )->contents ) ) != NULL )
                     target = TRUE;
+            }
 
             if ( !target && IS_SET ( SINFO.targets, TAR_OBJ_WORLD ) )
-                if ( ( tobj = get_obj_vis ( ch, t, NULL ) ) != NULL )
+            {
+                strcpy ( t_copy, t );
+                if ( ( tobj = get_obj_vis ( ch, t_copy, NULL ) ) != NULL )
                     target = TRUE;
+            }
 
             /*New case: TAR_AREA_DIR targets someone, in a direction, or just a direction.
                can be used for door spells. Can be used for far sight spells.
@@ -1322,11 +1325,9 @@ ACMD ( do_cast )
 
             if ( !target && IS_SET ( SINFO.targets, TAR_AREA_ROOM ) )
             {
-                //tch = IN_ROOM(ch)->people;
                 tch = ch;
                 target = TRUE;
             }
-
         }
         else                 /* if target string is empty */
         {
@@ -1370,14 +1371,6 @@ ACMD ( do_cast )
         return;
     }
 
-    /*if (dir == NOWHERE && (t != NULL && *t)
-    && IS_SET(SINFO.targets, TAR_AREA_DIR) && sp_dist)
-    if ((dir = search_block(t, dirs, FALSE)) != NOWHERE) {
-     tch = NULL;
-     GET_SPELL_DIR(ch) = dir;
-     target = TRUE;
-    }*/
-    //ch->Send( "target is %d\r\n", target);
     if ( !target )
     {
         send_to_char ( "Cannot find the target of your spell!\r\n", ch );
@@ -1401,7 +1394,6 @@ ACMD ( do_cast )
     /* You throw the dice and take your chances.. 101% is total failure */
     if ( number ( 0, 101 ) > ( total_chance ( ch, spellnum ) ) )
     {
-
         if ( !tch || !skill_message ( 0, ch, tch, spellnum ) )
             GET_SPELL_DIR ( ch ) = NOWHERE;
 
@@ -1437,6 +1429,7 @@ ACMD ( do_cast )
             start_fighting_delay ( tch, ch );
     }
 }
+
 int grand_master ( Character *ch )
 {
     int i, m = 0;
