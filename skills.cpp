@@ -1850,10 +1850,10 @@ ASKILL ( skill_fortify )
     struct affected_type af;
     sbyte percent;
 
-    if ( AFF_FLAGGED ( ch, AFF_FORTIFY_BODY ) )
+    if ( affected_by_spell ( ch, SKILL_FORTIFY ) )
     {
         affect_from_char ( ch, SKILL_FORTIFY );
-        *ch << "Okay, you stop fortifying your body.\r\n";
+        ch->Send ( "Okay, you stop fortifying your body.\r\n" );
         return 0;
     }
     else
