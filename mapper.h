@@ -2,8 +2,8 @@
 #ifndef MAPPER_H
 #define MAPPER_H
 
-#define MAPX     10
-#define MAPY     12
+#define MAPX     12 // rows:    0..MAPX
+#define MAPY     10 // columns: 0..MAPY
 /* You can change MAXDEPTH to 1 if the diagonal directions are confusing */
 #define MAXDEPTH  1000 // show all rooms that fit
 #define MDIS(num)  ((sect + (num)) <= NUM_ROOM_SECTORS)

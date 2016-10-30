@@ -57,11 +57,11 @@
 #include "oasis.h"
 #include "mapper.h"
 
-void MapArea ( room_rnum room, Character *ch, int x, int y, int min, int max, bool show_vehicles, bool two_way_connection );
+void draw_wilderness_map ( Character *ch );
 room_rnum visible_room ( room_rnum r, int door, bool *two_way_connection );
 
 /* The map itself */
-struct map_type amap[MAPX + 1][MAPY + 1];
+struct map_type amap[MAPX + 1][MAPY + 1]; // amap[x][y], x = row, y = column
 
 /* Take care of some repetitive code for later */
 void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
@@ -70,28 +70,28 @@ void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
   switch( dir )
   {
   case 0: /* North */
-    *x = xorig;
-    *y = yorig - 1;
-    break;
-  case 1: /* East */
-    *x = xorig + 1;
+    *x = xorig - 1;
     *y = yorig;
     break;
-  case 2: /* South */
+  case 1: /* East */
     *x = xorig;
     *y = yorig + 1;
     break;
-  case 3: /* West */
-    *x = xorig - 1;
+  case 2: /* South */
+    *x = xorig + 1;
     *y = yorig;
+    break;
+  case 3: /* West */
+    *x = xorig;
+    *y = yorig - 1;
     break;
   case 4: /* UP */
     break;
   case 5: /* DOWN */
     break;
   case 6: /* NE */
-    *x = xorig + 1;
-    *y = yorig - 1;
+    *x = xorig - 1;
+    *y = yorig + 1;
     break;
   case 7: /* NW */
     *x = xorig - 1;
@@ -102,8 +102,8 @@ void get_exit_dir( int dir, int *x, int *y, int xorig, int yorig )
     *y = yorig + 1;
     break;
   case 9: /* SW */
-    *x = xorig - 1;
-    *y = yorig + 1;
+    *x = xorig + 1;
+    *y = yorig - 1;
     break;
   default:
     *x = -1;
@@ -266,33 +266,7 @@ void reformat_desc( char *desc , size_t len)
   /* Copy to desc */
   strlcpy(desc, buf, len);
 }
-#if 0
-int get_line( char *desc, int max_len )
-{
-  int i, j = 0;
 
-  /* Return if it's short enough for one line */
-  if ( (int)strlen( desc ) <= max_len ) return 0;
-
-  /* Calculate end point in string without colour */
-  for( i = 0; i <= (int)strlen( desc ); i++ )
-  {
-    /* Here you need to skip your colour sequences */
-    j++;
-
-    if ( j > max_len ) break;
-  }
-
-  /* End point is now in i, find the nearest space */
-  for( j = i; j > 0; j-- )
-  {
-    if ( desc[j] == ' ' ) break;
-  }
-
-  /* There could be a problem if there are no spaces on the line */
-  return j + 1;
-}
-#endif
 /* Display the map to the player */
 void show_map( Character *ch, int mxp)
 {
@@ -305,13 +279,17 @@ void show_map( Character *ch, int mxp)
 
   ch->Send( "\n\r {cy+-----------+{cw\n\r");
 
+  // mark the center, where ch is
+  amap[MAPX / 2][MAPY / 2].tegn[0] = 'X';
+  amap[MAPX / 2][MAPY / 2].tegn[1] = '\0';
+
   /* Write out the main map area with text */
-  for( y = 0; y <= MAPY; y++ )
+  for( x = 0; x <= MAPX; x++ )
   {
 
     strlcpy( buf, " {cy|{c0", sizeof(buf) );
 
-    for( x = 0; x <= MAPX; x++ )
+    for( y = 0; y <= MAPY; y++ )
     {
       switch(*amap[x][y].tegn)
       {
@@ -367,7 +345,6 @@ void show_map( Character *ch, int mxp)
         }
       }
     }
-    //strlcat( buf, "\r\n ", sizeof(buf) );
 
     if (!mxp)
     {
@@ -382,100 +359,26 @@ void show_map( Character *ch, int mxp)
     {
       ch->Send( "%s {cy|{c0\r\n", buf);
     }
-
-    //if (y == 0 && IS_PLR_FLAG( ch, PLR_AUTOEXIT))  /* the autoexits */
-    //{
-    //    sprintf(buf + strlen( buf ), "%s", get_exits(ch));
-    //    continue;
-    //}
-
-    /* Add the text, if necessary */
-    /*if ( !alldesc )
-    {
-     pos = get_line( p, 63 );
-     if ( pos > 0 )
-     {
-          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-          strncat( buf, p, pos );
-          p += pos;
-     }
-     else
-     {
-          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-          mudstrlcat( buf, p, MSL );
-          alldesc = TRUE;
-     }
-    }
-    mudstrlcat( buf, "\n\r", MSL );*/
   }
 
   /* Finish off map area */
   ch->Send( " {cy+-----------+{c0\r\n");
   if (mxp)
     ch->Send( "%s", MXPTAG("FRAME _previous REDIRECT"));
-  /*if ( !alldesc )
-  {
-     pos = get_line( p, 63 );
-     if ( pos > 0 )
-     {
-          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-          strncat( buf, p, pos );
-          p += pos;
-     }
-     else
-     {
-          mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-          mudstrlcat( buf, p, MSL );
-          alldesc = TRUE;
-     }
-  }
-  */
-
-  /* Deal with any leftover text */
-#if 0
-  if ( !alldesc )
-  {
-    do
-    {
-      /* Note the number - no map to detract from width */
-      pos = get_line( p, 78 );
-      if ( pos > 0 )
-      {
-        mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-        strncat( buf, p, pos );
-        p += pos;
-      }
-      else
-      {
-        mudstrlcat( buf, colour_str(AT_RMDESC, ch), MSL);
-        mudstrlcat( buf, p, MSL );
-        alldesc = TRUE;
-      }
-    }
-    while( !alldesc );
-  }
-#endif
-
 }
 
-/* Clear, generate and display the map */
+/* Clear and generate the map */
 void draw_map( Character *ch)
 {
   int x, y;
   static char buf[MAX_STRING_LENGTH];
+  char map_chars [11] = "|-|-UD/\\\\/";
   *buf = 0;
-  //strlcpy( buf, desc, len);
-  /* Remove undesirable characters */
-  //reformat_desc( buf );
 
   /* Clear map */
   for( y = 0; y <= MAPY; y++ )
-  {
     for( x = 0; x <= MAPX; x++ )
-    {
       clear_coord( x, y );
-    }
-  }
 
   /* Start with players pos at centre of map */
   x = MAPX / 2;
@@ -486,10 +389,6 @@ void draw_map( Character *ch)
 
   /* Generate the map */
   map_exits( ch, ch->in_room, x, y, 0, TRUE );
-
-  /* Current position should be a "X" */
-  amap[x][y].tegn[0] = 'X';
-  amap[x][y].tegn[1] = '\0';
 
   /* Make sure the symbols in the cardinal directions are correct */
   Room *r;
@@ -507,12 +406,21 @@ void draw_map( Character *ch)
     while ( TRUE )
     {
       r = visible_room ( r, door, &two_way );
+      /* Get the coords for the next exit */
+      get_exit_dir ( door, &exitx, &exity, x, y );
 
       if ( r == NULL )
+      {
+        // Remove a possible exit
+        if ( !BOUNDARY ( exitx, exity ) )
+        {
+          amap[exitx][exity].tegn[0] = ' ';
+          amap[exitx][exity].tegn[1] = '\0';
+        }
         break;
+      }
 
-      /* Get the coords for the next exit and room in this direction */
-      get_exit_dir ( door, &exitx, &exity, x, y );
+      /* Get the coords for the next room in this direction */
       get_exit_dir ( door, &roomx, &roomy, exitx, exity );
 
       /* Skip if coords fall outside map */
@@ -520,20 +428,20 @@ void draw_map( Character *ch)
         break;
 
       snprintf ( amap[roomx][roomy].tegn, 3, "%d", SECTOR ( r ) );
+
+      // Add the connection to make sure it's there
+      amap[exitx][exity].tegn[0] = map_chars[door];
+      amap[exitx][exity].tegn[1] = '\0';
+
       x = roomx;
       y = roomy;
     }
   }
-
-  /* Send the map */
-  show_map(ch, FALSE);
 }
-
-
 
 //@TODO:KAVIR: This should be rewritten, it's not very nice.  It's cobbled
 //together from the old map code and it works, but the whole thing could really
-//use a redesign and cleanup.
+//use a redesign and cleanup. (done by Rynald)
 
 /* Clear, generate and store the map in an MSDP variable */
 char *msdp_map( Character *ch )
@@ -547,18 +455,12 @@ char *msdp_map( Character *ch )
 
   if ( ROOM_FLAGGED ( IN_ROOM(ch), ROOM_WILDERNESS ) )
   {
-    int size = 10; // URANGE ( 10, 0, MAX_MAP );
-    int center = MAX_MAP/2;
+    draw_wilderness_map ( ch );
+
+    extern int mapgrid[MAX_MAP][MAX_MAP];
+    int size = URANGE ( 10, 0, MAX_MAP );
     int min = MAX_MAP / 2 - size / 2;
     int max = MAX_MAP / 2 + size / 2;
-    extern int mapgrid[MAX_MAP][MAX_MAP];
-
-    for ( x = 0; x < MAX_MAP; ++x )
-      for ( y = 0; y < MAX_MAP; ++y )
-        mapgrid[x][y] = NUM_ROOM_SECTORS;
-
-    /* starts the mapping with the center room */
-    MapArea ( IN_ROOM ( ch ), ch, center, center, min - 1, max - 1, FALSE, TRUE );
 
     for( x = min; x <= max; x++ )
     {
@@ -573,32 +475,17 @@ char *msdp_map( Character *ch )
         strcat( buf, num_buf );
       }
     }
-    IN_ROOM(ch) = was_in;
+    IN_ROOM ( ch ) = was_in;
     return buf;
   }
 
-  /* Clear map */
-  for( y = 0; y <= MAPY; y++ )
-  {
-    for( x = 0; x <= MAPX; x++ )
-      clear_coord( x, y );
-  }
-
-  /* Start with players pos at centre of map */
-  x = MAPX / 2;
-  y = MAPY / 2;
-
-  amap[x][y].vnum = ch->in_room->number;
-  amap[x][y].depth = 0;
-
-  /* Generate the map */
-  map_exits( ch, ch->in_room, x, y, 0, TRUE );
+  draw_map ( ch );
 
   /* Store the map */
   strcat(buf, "X X X X X X X X X X X");
-  for( y = 2; y <= MAPY-2; y++ )
+  for( x = 0; x <= MAPX; x++ )
   {
-    for( x = 0; x <= MAPX; x++ )
+    for( y = 0; y <= MAPY; y++ )
     {
       if ( buf[0] != '\0' )
          strcat( buf, " " );
@@ -611,9 +498,10 @@ char *msdp_map( Character *ch )
   }
   strcat(buf, " X X X X X X X X X X X");
 
-  IN_ROOM(ch) = was_in;
+  IN_ROOM ( ch ) = was_in;
   return buf;
 }
+
 void update_mxp_map(Character *ch)
 {
   int x, y;
@@ -622,18 +510,11 @@ void update_mxp_map(Character *ch)
 
   /** need to add support to detect if the client supports this **/
   return;
-  //strlcpy( buf, desc, len);
-  /* Remove undesirable characters */
-  //reformat_desc( buf );
 
   /* Clear map */
   for( y = 0; y <= MAPY; y++ )
-  {
     for( x = 0; x <= MAPX; x++ )
-    {
       clear_coord( x, y );
-    }
-  }
 
   /* Start with players pos at centre of map */
   x = MAPX / 2;

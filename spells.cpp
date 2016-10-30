@@ -32,6 +32,7 @@ extern int mini_mud;
 ACMD(do_flee);
 EVENTFUNC(message_event);
 
+void update_MSDP_map ( Room* room );
 void check_timer(obj_data *obj);
 int wep_hands(OBJ_DATA *wep);
 void dismount_char(Character *ch);
@@ -1465,17 +1466,19 @@ ASPELL(spell_knock) {
                 continue;
             /** and from that way **/
             other_room = EXIT(ch, i)->to_room;
-        if (EXIT2(other_room, rev_dir[i]) &&
-                    IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_ISDOOR) &&
-                    ! (IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
-               IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED)) &&
-                    EXIT2(other_room, rev_dir[i])->to_room != NULL)
-                ret_door = 1;
+
             /** lets make it so they can only open doors that are on the inside **/
+            if (EXIT2(other_room, rev_dir[i]) &&
+                IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_ISDOOR) &&
+                ! (IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_PICKPROOF) &&
+                IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED)) &&
+                EXIT2(other_room, rev_dir[i])->to_room != NULL)
+            ret_door = 1;
 
             cnt++;
             send_to_room(IN_ROOM(ch), "The exit %s bursts open under the force of some ethereal hand.\n", dirs[i]);
             send_to_room(EXIT(ch, i)->to_room, "The exit %s bursts open under the force of some ethereal hand.\n", dirs[rev_dir[i]]);
+
             if (ret_door && IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED))
                 TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_LOCKED);
             if (ret_door && IS_SET(EXIT2(other_room, rev_dir[i])->exit_info, EX_HIDDEN))
@@ -1485,11 +1488,14 @@ ASPELL(spell_knock) {
             if (ret_door)
                 TOGGLE_BIT(EXIT2(other_room, rev_dir[i])->exit_info, EX_CLOSED);
             TOGGLE_BIT(EXIT(ch, i)->exit_info, EX_CLOSED);
+            update_MSDP_map ( EXIT ( ch, i)->to_room );
         }
 
         if (cnt == 0) {
             ch->Send( "The room grows chilly, but nothing seems to happen.\r\n");
         }
+        else
+            update_MSDP_map ( IN_ROOM ( ch ) );
     } else {
         if (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) {
             ch->Send( "You can't cast knock on %s.\r\n", obj->short_description);
