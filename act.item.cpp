@@ -1617,8 +1617,7 @@ ACMD ( do_get )
 }
 
 
-void perform_drop_gold ( Character *ch, gold_int amount,
-                         sbyte mode, Room *  RDR )
+void perform_drop_gold ( Character *ch, gold_int amount, sbyte mode, Room *RDR )
 {
     struct obj_data *obj;
     char buf[MAX_INPUT_LENGTH];
@@ -1627,8 +1626,6 @@ void perform_drop_gold ( Character *ch, gold_int amount,
         ch->Send ( "Heh heh heh.. we are jolly funny today, eh?\r\n" );
     else if ( ch->Gold ( 0, GOLD_HAND ) < amount )
         ch->Send ( "You don't have that many coins!\r\n" );
-    //	else if ( amount > 2000000000 )
-    //		ch->Send ( "You can't drop more than 2 billion.\r\n" );
     else
     {
         /*for the gold tally code */
@@ -1636,15 +1633,13 @@ void perform_drop_gold ( Character *ch, gold_int amount,
 
         if ( mode != SCMD_JUNK )
         {
-            WAIT_STATE ( ch, PULSE_VIOLENCE );   /* to prevent coin-bombing */
             obj = create_money ( amount );
             if ( mode == SCMD_DONATE )
             {
                 ch->Send ( "You throw some gold into the air where it disappears in a puff of smoke!\r\n" );
                 act ( "$n throws some gold into the air where it disappears in a puff of smoke!", FALSE, ch, 0, 0, TO_ROOM );
                 obj_to_room ( obj, RDR );
-                act ( "$p suddenly appears in a puff of orange smoke!", 0, 0,
-                      obj, 0, TO_ROOM );
+                act ( "$p suddenly appears in a puff of orange smoke!", 0, 0, obj, 0, TO_ROOM );
             }
             else if ( mode == SCMD_SPILL )
             {
@@ -1653,8 +1648,7 @@ void perform_drop_gold ( Character *ch, gold_int amount,
                 snprintf ( buf, sizeof ( buf ), "$n's gold spills all over the ground!" );
                 act ( buf, TRUE, ch, 0, 0, TO_ROOM );
                 ch->Gold ( -amount, GOLD_HAND );
-                for ( i = number ( 1, amount ); amount > 0;
-                        i = number ( 1, amount ) )
+                for ( i = number ( 1, amount ); amount > 0; i = number ( 1, amount ) )
                 {
                     if ( j < 10 )
                     {

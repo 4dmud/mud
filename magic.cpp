@@ -696,7 +696,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
                                 af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
                         af[0].bitvector = AFF_DETECT_INVIS;
                         accum_duration =FALSE;
-                        to_vict = "You start to see things that never use to be there.";
+                        to_vict = "You start to see things that never used to be there.";
                         break;
 
             case SPELL_DETECT_INVIS_OTHER:
@@ -706,7 +706,7 @@ void mag_affects ( int level, Character *ch, Character *victim,
                 af[0].expire = HOURS_TO_EXPIRE ( 12 + level );
             af[0].bitvector = AFF_DETECT_INVIS;
             accum_duration =FALSE;
-            to_vict = "You start to see things that never use to be there.";
+            to_vict = "You start to see things that never used to be there.";
             break;
 
         case SPELL_DETECT_MAGIC:
