@@ -244,15 +244,10 @@ struct skill_proto_data *skill_prototypes;
  * ample slots for skills.
  */
 
-
-
-
-
-
 struct syllable syls[] =
 {
-    {" ", " "
-    },
+    {" ", " "},
+    {"al", "pyr"},
     {"ar", "alma"},
     {"ate", "mi"},
     {"cau", "tau"},
@@ -272,18 +267,17 @@ struct syllable syls[] =
     {"move", "sido"},
     {"ness", "lacri"},
     {"ning", "illa"},
+    {"ol", "nela"},
     {"per", "duda"},
     {"ra", "gru"},
     {"re", "candus"},
+    {"slee", "nef"},
+    {"sl", "gat"},
     {"son", "nk"},
     {"tect", "infra"},
     {"tri", "cula"},
     {"ven", "nofo"},
     {"word of", "inset"},
-    {"slee", "nef"},
-    {"sl", "gat"},
-    {"ol", "nela"},
-    {"al", "pyr"},
     {"a", "i"}, {"b", "v"}, {"c", "q"}, {"d", "m"}, {"e", "o"}, {"f", "y"},
     {"g", "t"},
     {"h", "p"}, {"i", "u"}, {"j", "y"}, {"k", "t"}, {"l", "r"}, {"m", "w"},
@@ -293,10 +287,6 @@ struct syllable syls[] =
     {"v", "z"}, {"w", "x"}, {"x", "n"}, {"y", "l"}, {"z", "k"}, {"", ""}
 };
 
-
-
-
-
 int mag_manacost ( Character *ch, int spellnum )
 {
     return FTOI ( ( MAX ( SINFO.mana_max - ( SINFO.mana_change *
@@ -305,29 +295,38 @@ int mag_manacost ( Character *ch, int spellnum )
                           SINFO.mana_min ) ) * ( 1.4 + ( -resist_elem ( ch, elemental_type ( spellnum ) ) *0.01 ) ) );
 }
 
-
-/* say_spell erodes buf, buf1, buf2 */
-
-void say_spell ( Character *ch, int spellnum, Character *tch,
-                 struct obj_data *tobj )
+void say_spell ( Character *ch, int spellnum, Character *tch, struct obj_data *tobj )
 {
     struct obj_data *focus = GET_EQ ( ch, WEAR_FOCUS );
-    char lbuf[256], buf[256], buf1[256], buf2[256]; /* FIXME */
+    char lbuf[MAX_INPUT_LENGTH], lbuf2[MAX_INPUT_LENGTH];
+    char buf[MAX_INPUT_LENGTH], buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
     const char *format;
-
     Character *i;
-    int j, ofs = 0;
+    int j, ofs = 0, len = 0;
 
     *buf = '\0';
     strlcpy ( lbuf, skill_name ( spellnum ), sizeof ( lbuf ) );
 
-    while ( lbuf[ofs] )
+    // replace any digits with words, for 'antidote 1' for example
+    vector<string> number {"zero","one","two","three","four","five","six","seven","eight","nine"};
+    string lbuf_str = string ( lbuf );
+
+    for ( j = 0; j < lbuf_str.length(); ++j )
+        if ( lbuf_str[j] >= '0' && lbuf_str[j] <= '9' )
+            lbuf_str.replace ( j, 1, number[ lbuf_str[j] - '0' ] );
+
+    snprintf ( lbuf2, sizeof lbuf2, "%s", lbuf_str.c_str() );
+
+    while ( lbuf2[ofs] )
     {
         for ( j = 0; * ( syls[j].org ); j++ )
         {
-            if ( !strncmp ( syls[j].org, lbuf + ofs, strlen ( syls[j].org ) ) )
+            if ( !strncmp ( syls[j].org, lbuf2 + ofs, strlen ( syls[j].org ) ) )
             {
-                strcat ( buf, syls[j].news ); /* strcat: BAD */
+                int n = snprintf ( buf + len, sizeof buf - len, "%s", syls[j].news );
+                if ( n < 0 )
+                    break;
+                len += n;
                 ofs += strlen ( syls[j].org );
                 break;
             }
@@ -335,11 +334,10 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
         /* i.e., we didn't find a match in syls[] */
         if ( !*syls[j].org )
         {
-            log ( "No entry in syllable table for substring of '%s'", lbuf );
+            log ( "SYSERR: No entry in syllable table for substring of '%s'", lbuf );
             ofs++;
         }
     }
-
 
     if ( tch != NULL && IN_ROOM ( tch ) == IN_ROOM ( ch ) )
     {
@@ -354,11 +352,9 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
         else
         {
             if ( focus )
-                format =
-                    "$n draws the runes of %s in the air with $s focus and sends them at $N.";
+                format = "$n draws the runes of %s in the air with $s focus and sends them at $N.";
             else
-                format =
-                    "$n draws the runes of %s in the air and sends them at $N.";
+                format = "$n draws the runes of %s in the air and sends them at $N.";
         }
 
     }
@@ -380,10 +376,7 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
     }
 
     if ( GET_SPELL_DIR ( ch ) != NOWHERE )
-    {
         format = "$n focuses $s energy and sends the runes of %s %s.";
-    }
-
 
     if ( GET_SPELL_DIR ( ch ) != NOWHERE )
     {
@@ -393,10 +386,8 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
     }
     else
     {
-
         snprintf ( buf1, sizeof ( buf1 ), format, skill_name ( spellnum ) );
         snprintf ( buf2, sizeof ( buf2 ), format, buf );
-
     }
 
     for ( i = IN_ROOM ( ch )->people; i; i = i->next_in_room )
@@ -415,16 +406,14 @@ void say_spell ( Character *ch, int spellnum, Character *tch,
         {
             snprintf ( buf1, sizeof ( buf1 ),
                        "$n draws the runes of %s in the air with %s and sends them at you.",
-                       GET_CLASS ( ch ) ==
-                       GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf,
+                       GET_CLASS ( ch ) == GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf,
                        focus->short_description );
         }
         else
         {
             snprintf ( buf1, sizeof ( buf1 ),
                        "$n draws the runes of %s in the air and sends them at you.",
-                       GET_CLASS ( ch ) ==
-                       GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf );
+                       GET_CLASS ( ch ) == GET_CLASS ( tch ) ? skill_name ( spellnum ) : buf );
         }
         act ( buf1, FALSE, ch, NULL, tch, TO_VICT );
     }
