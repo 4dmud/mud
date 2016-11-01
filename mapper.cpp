@@ -483,7 +483,7 @@ char *msdp_map( Character *ch )
 
   /* Store the map */
   strcat(buf, "X X X X X X X X X X X");
-  for( x = 0; x <= MAPX; x++ )
+  for( x = 2; x <= MAPX-2; x++ )
   {
     for( y = 0; y <= MAPY; y++ )
     {
