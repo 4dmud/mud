@@ -172,10 +172,7 @@ void redit_init_room(Descriptor* d) {
   OLC_ROOM(d) = new Room();
   OLC_ROOM(d)->n_description = NULL;
   OLC_ROOM(d)->q_description = NULL;
-
   OLC_ROOM(d)->number = NOWHERE;
-  OLC_ROOM(d)->proto_script = NULL;
-
   OLC_ROOM(d)->mine.num = -1;
   OLC_ROOM(d)->mine.dif = -1;
   OLC_ROOM(d)->mine.tool = 0;
@@ -219,6 +216,11 @@ void redit_setup_existing(Descriptor *d, room_vnum v_num)
   OLC_ROOM(d)->people = NULL;
 
   dg_olc_script_copy(d);
+  /*
+   * The proto_script of the new room must be different from the prototype
+   * or it may be freed by cleanup_olc later on.
+   */
+  OLC_ROOM(d)->proto_script = NULL;
   redit_disp_menu(d);
 }
 
@@ -682,7 +684,6 @@ void redit_parse(Descriptor *d, char *arg)
        * Free everything up, including strings, etc.
        */
       OLC_ROOM(d)->free_room_strings();
-      OLC_ROOM(d)->proto_script = NULL; // don't destroy the original with the room
       cleanup_olc(d, CLEANUP_ALL);
       break;
     default:
