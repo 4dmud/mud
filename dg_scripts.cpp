@@ -2927,6 +2927,13 @@ void reset_trigger ( trig_data *trig )
         free_varlist ( GET_TRIG_VARS ( trig ) );
         GET_TRIG_VARS ( trig ) = nullptr;
     }
+
+    if ( GET_TRIG_WAIT ( trig ) )
+    {
+        event_cancel ( GET_TRIG_WAIT ( trig ) );
+        GET_TRIG_WAIT ( trig ) = nullptr;
+    }
+
     GET_TRIG_DEPTH ( trig ) = 0;
     GET_TRIG_LINE_NR ( trig ) = 0;
     GET_TRIG_LOOPS ( trig ) = 0;
@@ -3909,6 +3916,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
             if ( !temp )
             {
                 script_log ( "Trigger VNum %d has 'while' without 'done' in line %d.", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
+                reset_trigger ( trig );
                 return ret_val;
             }
             if ( process_if ( p + 6, go, sc, trig, type ) )
@@ -3933,6 +3941,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
             if ( GET_TRIG_DEPTH ( trig ) == 1 )
             {
                 script_log ( "Trigger VNum %d has 'end' without 'if' in line %d.", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ) );
+                reset_trigger ( trig );
                 continue;
             }
             GET_TRIG_DEPTH ( trig )--;
@@ -5229,7 +5238,11 @@ struct cmdlist_element *find_done ( struct cmdlist_element *cl )
             ;
 
         if ( !strn_cmp ( "while ", p, 6 ) || !strn_cmp ( "switch ", p, 7 ) )
+        {
             c = find_done ( c );
+            if ( !c )
+                return c;
+        }
         else if ( !strn_cmp ( "done", p, 3 ) )
             return c;
     }
