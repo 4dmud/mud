@@ -1661,8 +1661,9 @@ void oedit_parse ( Descriptor *d, char *arg )
                     min_val = 0;
                     max_val = NUM_LIQ_TYPES - 1;
                     break;
+                case ITEM_CONTAINER:
                 case ITEM_KEY:
-                    min_val = 0;
+                    min_val = -1;
                     max_val = 999999;
                     break;
                 case ITEM_VEHICLE:
