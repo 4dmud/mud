@@ -375,6 +375,10 @@ int command_mtrigger(Character * actor, char *cmd, char *argument) {
                     continue;
                 }
 
+                // let 'return' work for atlev-ed imms so they won't be trapped
+                if ( GET_ORIG_LEV ( actor ) > 0 && isname ( cmd, "return" ) )
+                    return 0;
+
                 if (*GET_TRIG_ARG(t) == '*' ||
                         !strn_cmp(GET_TRIG_ARG(t), cmd,
                                   strlen(GET_TRIG_ARG(t)))) {
@@ -788,8 +792,7 @@ int get_otrigger(obj_data * obj, Character * actor) {
 }
 
 /* checks for command trigger on specific object. assumes obj has cmd trig */
-int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
-              char *argument, int type) {
+int cmd_otrig(obj_data * obj, Character * actor, char *cmd, char *argument, int type) {
     trig_data *t;
     char buf[MAX_INPUT_LENGTH];
     char *remove_percentage(char *string);
@@ -802,9 +805,13 @@ int cmd_otrig(obj_data * obj, Character * actor, char *cmd,
 
             if (IS_SET(GET_TRIG_NARG(t), type) && (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t))) {
                 new_mudlog(NRM, LVL_BUILDER, TRUE, "SYSERR: O-Command Trigger #%d has no text argument!",
-                           +          GET_TRIG_VNUM(t));
+                    GET_TRIG_VNUM(t));
                 continue;
             }
+
+            // let 'return' work for atlev-ed imms so they won't be trapped
+            if ( GET_ORIG_LEV ( actor ) > 0 && isname ( cmd, "return" ) )
+                return 0;
 
             if (IS_SET(GET_TRIG_NARG(t), type) &&
                     (*GET_TRIG_ARG(t) == '*' ||
@@ -1389,6 +1396,10 @@ int command_wtrigger(Character * actor, char *cmd, char *argument) {
             mudlog(buf, NRM, LVL_BUILDER, TRUE);
             continue;
         }
+
+        // let 'return' work for atlev-ed imms so they won't be trapped
+        if ( GET_ORIG_LEV ( actor ) > 0 && isname ( cmd, "return" ) )
+            return 0;
 
         if (*GET_TRIG_ARG(t) == '*' || !strn_cmp(GET_TRIG_ARG(t), cmd, strlen(GET_TRIG_ARG(t)))) {
             argument_copy = string ( argument );
