@@ -505,10 +505,6 @@ void note_attach ( Character *ch, int type )
 
     pnote->next		= NULL;
     pnote->sender	= str_dup ( GET_NAME ( ch ) );
-    pnote->date		= str_dup ( "" );
-    pnote->to_list	= str_dup ( "" );
-    pnote->subject	= str_dup ( "" );
-    pnote->text		= str_dup ( "" );
     pnote->type		= type;
     ch->pnote		= pnote;
     return;

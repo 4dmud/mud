@@ -682,7 +682,11 @@ void page_string ( Descriptor *d, char *str, int keep_internal )
     }
 
     if ( !str || !*str )
+    {
+        if ( keep_internal == DYN_BUFFER )
+            free ( str );
         return;
+    }
 
     lock_desc ( d );
 

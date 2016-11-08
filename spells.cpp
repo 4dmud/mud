@@ -915,7 +915,6 @@ ASPELL(spell_enchant_weapon) {
             return;
 
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
 
     obj->affected[0].location = APPLY_HITROLL;
     obj->affected[0].modifier = (sbyte)((current_class_is_tier_num(ch) * 0.5) + (level >= 18));
@@ -942,11 +941,9 @@ ASPELL(spell_detect_poison) {
                 ch->Send("You feel healthy.\r\n");
         } else {
             if (AFF_FLAGGED(victim, AFF_POISON_1))
-                act("You sense that $E is poisoned.", FALSE, ch, 0, victim,
-                    TO_CHAR);
+                act("You sense that $E is poisoned.", FALSE, ch, 0, victim, TO_CHAR);
             else
-                act("You sense that $E is healthy.", FALSE, ch, 0, victim,
-                    TO_CHAR);
+                act("You sense that $E is healthy.", FALSE, ch, 0, victim, TO_CHAR);
         }
     }
 
@@ -956,11 +953,9 @@ ASPELL(spell_detect_poison) {
         case ITEM_FOUNTAIN:
         case ITEM_FOOD:
             if (GET_OBJ_VAL(obj, 3))
-                act("You sense that $p has been contaminated.", FALSE, ch,
-                    obj, 0, TO_CHAR);
+                act("You sense that $p has been contaminated.", FALSE, ch, obj, 0, TO_CHAR);
             else
-                act("You sense that $p is safe for consumption.", FALSE,
-                    ch, obj, 0, TO_CHAR);
+                act("You sense that $p is safe for consumption.", FALSE, ch, obj, 0, TO_CHAR);
             break;
         default:
             ch->Send("You sense that it should not be consumed.\r\n");
@@ -989,29 +984,22 @@ ASPELL(spell_remove_alignment) {
             return;
         }
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
         if (number(0, 120) < total_chance(ch, SPELL_REMOVE_ALIGNMENT)) {
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_GOOD);
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_EVIL);
             REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_ANTI_NEUTRAL);
-            act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL,
-                TO_CHAR);
-            act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL,
-                TO_ROOM);
+            act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL, TO_CHAR);
+            act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL, TO_ROOM);
             return;
         }
 
         SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
         obj->obj_flags.wear_flags[0] = 1;   /* Useless   */
         GET_OBJ_COST(obj) = 0;    /* Worthless */
-        act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
-            TO_CHAR);
-        act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
-            TO_ROOM);
-
+        act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL, TO_CHAR);
+        act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL, TO_ROOM);
         return;
     }
-
 }
 
 ASPELL(spell_enchant_armor) {
@@ -1022,26 +1010,19 @@ ASPELL(spell_enchant_armor) {
         return;
     }
 
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
     if (number(0, 120) < total_chance(ch, SPELL_ENCHANT_ARMOR)) {
         GET_OBJ_VAL(obj, 0) *= 2;
-        act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL,
-            TO_CHAR);
-        act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL,
-            TO_ROOM);
+        act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL, TO_CHAR);
+        act("$p hums briefly, then lies quiet.", FALSE, ch, obj, NULL, TO_ROOM);
         return;
     }
 
     GET_OBJ_TYPE(obj) = ITEM_WORN;
     GET_OBJ_COST(obj) = 0; /* Worthless */
-    act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
-        TO_CHAR);
-    act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL,
-        TO_ROOM);
-
+    act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL, TO_CHAR);
+    act("$p blazes brightly, then turns grey.", FALSE, ch, obj, NULL, TO_ROOM);
     return;
-
 }
 
 

@@ -167,8 +167,7 @@ char *get_spell_name ( char *argument )
     return s;
 }
 
-void make_potion ( Character *ch, int potion,
-                   struct obj_data *container )
+void make_potion ( Character *ch, int potion, struct obj_data *container )
 {
     struct obj_data *final_potion;
     struct extra_descr_data *new_descr;
@@ -234,7 +233,7 @@ void make_potion ( Character *ch, int potion,
     else if ( ( number ( 1, 3 ) == 3 ) && ( GET_LEVEL ( ch ) < LVL_HERO ) )
     {
         ch->Send ( "As you begin mixing the potion, it violently explodes!\r\n" );
-        act ( "$n begins to mix a potion, but it suddenly explodes!",        FALSE, ch, 0, 0, TO_ROOM );
+        act ( "$n begins to mix a potion, but it suddenly explodes!", FALSE, ch, 0, 0, TO_ROOM );
         extract_obj ( container );
         dam = number ( 15, mag_manacost ( ch, potion ) * 2 );
         damage ( ch, ch, dam, TYPE_UNDEFINED );
@@ -279,7 +278,6 @@ void make_potion ( Character *ch, int potion,
     GET_OBJ_TYPE ( final_potion ) = ITEM_POTION;
     SET_BIT_AR ( GET_OBJ_WEAR ( final_potion ), ITEM_WEAR_TAKE );
     SET_BIT_AR ( GET_OBJ_EXTRA ( final_potion ), ITEM_NORENT );
-    SET_BIT_AR ( GET_OBJ_EXTRA ( final_potion ), ITEM_UNIQUE_SAVE );
     GET_OBJ_VAL ( final_potion, 0 ) = GET_LEVEL ( ch );
     GET_OBJ_VAL ( final_potion, 1 ) = potion;
     GET_OBJ_VAL ( final_potion, 2 ) = -1;
@@ -296,11 +294,10 @@ void make_potion ( Character *ch, int potion,
 ASKILL ( skill_brew )
 {
     struct obj_data *container = NULL;
-    struct obj_data *next_obj;
     char bottle_name[MAX_INPUT_LENGTH];
     char spell_name[MAX_INPUT_LENGTH];
     char *temp1, *temp2;
-    int potion, found = FALSE;
+    int potion;
 
     if ( !knows_spell ( ch, SKILL_BREW ) )
     {
@@ -309,8 +306,6 @@ ASKILL ( skill_brew )
     }
 
     temp1 = one_argument ( argument, bottle_name );
-
-
 
     /* sanity check */
     if ( temp1 )
@@ -331,27 +326,17 @@ ASKILL ( skill_brew )
         return 0;
     }
 
+    container = get_obj_in_list_vis ( ch, bottle_name, NULL, ch->carrying );
 
-    for ( obj = ch->carrying; obj; obj = next_obj )
+    if ( !container )
     {
-        next_obj = obj->next_content;
-        if ( obj == NULL )
-            return 0;
-        else if ( ! ( container = get_obj_in_list_vis ( ch, bottle_name, NULL,
-                                  ch->carrying ) ) )
-            continue;
-        else
-            found = TRUE;
-    }
-    if ( found != FALSE && ( GET_OBJ_VNUM ( container ) != 3044 ) )
-    {
-        ch->Send ( "You don't have the proper container!\r\n" );
+        ch->Send ( "You don't have %s in your inventory!\r\n", bottle_name );
         return 0;
     }
-    if ( found == FALSE )
+
+    if ( GET_OBJ_VNUM ( container ) != 3044 )
     {
-        ch->Send ( "You don't have %s in your inventory!\r\n",
-                   bottle_name );
+        ch->Send ( "You don't have the proper container!\r\n" );
         return 0;
     }
 
@@ -393,8 +378,7 @@ void make_scroll ( Character *ch, int scroll, struct obj_data *paper )
 
     /* add a case statement here for prohibited spells */
 
-    /* Modify this list to suit which spells you
-     * want to be able to mix. */
+    /* Modify this list to suit which spells you want to be able to mix. */
     if ( IS_SET ( class_elem_strength ( GET_CLASS ( ch ) ), ( 1 << elemental_type ( scroll ) ) ) )
         can_make = TRUE;
     else
@@ -462,7 +446,6 @@ void make_scroll ( Character *ch, int scroll, struct obj_data *paper )
     GET_OBJ_TYPE ( final_scroll ) = ITEM_SCROLL;
     SET_BIT_AR ( GET_OBJ_WEAR ( final_scroll ), ITEM_WEAR_TAKE );
     SET_BIT_AR ( GET_OBJ_EXTRA ( final_scroll ), ITEM_NORENT );
-    SET_BIT_AR ( GET_OBJ_EXTRA ( final_scroll ), ITEM_UNIQUE_SAVE );
     GET_OBJ_VAL ( final_scroll, 0 ) = GET_LEVEL ( ch );
     GET_OBJ_VAL ( final_scroll, 1 ) = scroll;
     GET_OBJ_VAL ( final_scroll, 2 ) = -1;
@@ -682,20 +665,9 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
 {
     struct obj_data *final_focus;
     struct extra_descr_data *new_descr;
-    int can_make = TRUE, num2 = number ( 0, 16 );
+    int num2 = number ( 0, 16 );
     int v1, v2;
-    //int v0
-    //int v3
-    //char *msg, *msgroom;
-    //char *msgbuf[MAX_INPUT_LENGTH],  msgroombuf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
-
-
-    if ( can_make == FALSE )
-    {
-        ch->Send ( "That item cannot be made into a focus.\r\n" );
-        return;
-    }
 
     /*ch->Send( "You sing %s %s %s %s focus staff from %s.\r\n",
        LANA(age_desc_staff[GET_OBJ_VAL(o, 1)]),
@@ -711,25 +683,19 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
        */
     v1 = MIN ( GET_OBJ_VAL ( o, 1 ), 8 );
     v2 = MIN ( GET_OBJ_VAL ( o, 2 ), 8 );
-    //v3 = GET_OBJ_VAL ( o, 3 );
     extract_obj ( o );
     create_trees();
 
     final_focus = create_obj ( NOTHING );
 
-    if ( final_focus->name )
-        free ( final_focus->name );
-    snprintf ( buf2, sizeof ( buf2 ), " %s %s focus staff", age_desc_staff[v1],
-               tree_names[v2] );
+    snprintf ( buf2, sizeof ( buf2 ), " %s %s focus staff", age_desc_staff[v1], tree_names[v2] );
     final_focus->name = str_dup ( buf2 );
-    if ( final_focus->description )
-        free ( final_focus->description );
+
     snprintf ( buf2, sizeof ( buf2 ), "%s %s %s %s staff lies here.",
                CANA ( age_desc_staff[v1] ), age_desc_staff[v1],
                random_desc[num2], tree_names[v2] );
     final_focus->description = str_dup ( buf2 );
-    if ( final_focus->short_description )
-        free ( final_focus->short_description );
+
     snprintf ( buf2, sizeof ( buf2 ), "%s %s %s %s staff",
                LANA ( age_desc_staff[v1] ), age_desc_staff[v1],
                random_desc[num2], tree_names[v2] );
@@ -744,53 +710,58 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
     new_descr->description = str_dup ( buf2 );
     new_descr->next = NULL;
     final_focus->ex_description = new_descr;
+
     if (GET_LEVEL ( ch ) < LVL_HERO)
     {
         if ( number ( 0, MAX ( 19, 219 - ( GET_CHA ( ch ) + total_chance ( ch, SKILL_SING_WOOD )))))
-        GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MINOR;
-    else
-        GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
+            GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MINOR;
+        else
+            GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
     }
     else
-                GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
+        GET_OBJ_TYPE ( final_focus ) = ITEM_FOCUS_MAJOR;
 
     SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_FOCUS );
     SET_BIT_AR ( GET_OBJ_WEAR ( final_focus ), ITEM_WEAR_TAKE );
     SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_HUM );
-    SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE );
     GET_OBJ_VAL ( final_focus, 0 ) = ( v1+1 );
     GET_OBJ_VAL ( final_focus, 1 ) = v2;
     GET_OBJ_VAL ( final_focus, 2 ) = FOCUS_STAFF;
     GET_OBJ_VAL ( final_focus, 3 ) = GET_LEVEL ( ch ) *TIER*2000;
     GET_OBJ_COST ( final_focus ) = GET_LEVEL ( ch ) * 500;
     GET_OBJ_WEIGHT ( final_focus ) = 3;
-
     GET_OBJ_RENT ( final_focus ) = number(120+(v1*number(7,10)), 240+(MIN(REMORTS(ch)/2, 50)));
 
-        if (v2 == 0)
-        SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ELEC_FOCUS);
-        if (v2 == 1)
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus),  ITEM_FIRE_FOCUS);
-        if (v2 == 2)
-    SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_WATER_FOCUS);
-    if (v2 == 3)
-    SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS);
-    if (v2 == 4)
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_EARTH_FOCUS);
-    if (v2 == 5)
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS);
-    if (v2 == 6)
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_DEATH_FOCUS);
-    if (v2 == 7) {
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_SPIRIT_FOCUS);
-    SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_MIND_FOCUS);  }
-    if (v2 == 8)
-        SET_BIT_AR(GET_OBJ_EXTRA (final_focus), ITEM_ICE_FOCUS);
-
-
-
-
-
+    switch ( v2 )
+    {
+        case 0:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ELEC_FOCUS );
+            break;
+        case 1:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_FIRE_FOCUS );
+            break;
+        case 2:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_WATER_FOCUS );
+            break;
+        case 3:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS );
+            break;
+        case 4:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_EARTH_FOCUS );
+            break;
+        case 5:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS );
+            break;
+        case 6:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_DEATH_FOCUS );
+            break;
+        case 7:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_SPIRIT_FOCUS );
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_MIND_FOCUS );
+            break;
+        case 8:
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ICE_FOCUS );
+    }
 
     GET_OBJ_TIMER ( final_focus ) = GET_LEVEL ( ch ) * 300;
     /** new affect addition - mord (from discussion with Azreal)**/
@@ -798,13 +769,11 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
     {
         final_focus->affected[0].location = stave_table[v2].affect;
         final_focus->affected[0].modifier =
-     stave_table[v2].max  * ( v1 - stave_table[v2].start ) /
-    ( 9 - stave_table[v2].start );
+            stave_table[v2].max  * ( v1 - stave_table[v2].start ) / ( 9 - stave_table[v2].start );
     }
     obj_to_char ( final_focus, ch );
     if ( type == SKILL_SING_WOOD )
         improve_skill ( ch, SKILL_SING_WOOD );
-
 }
 
 
@@ -914,7 +883,6 @@ ASKILL ( skill_manifest )
 
 void make_manifest ( Character *ch,struct obj_data *obj )
 {
-
     char buf[MAX_STRING_LENGTH];
     struct obj_data *final_focus;
     struct extra_descr_data *new_descr;
@@ -932,31 +900,20 @@ void make_manifest ( Character *ch,struct obj_data *obj )
 
     GET_OBJ_INNATE ( final_focus ) = GET_OBJ_INNATE ( obj );
     snprintf ( buf, sizeof ( buf ),  "%s orb", obj->name );
-    if ( final_focus->name )
-        free ( final_focus->name );
     final_focus->name = strdup ( buf );
 
     snprintf ( buf, sizeof ( buf ), "a shimmering orb with %s inside", obj->short_description );
-    if ( final_focus->description )
-        free ( final_focus->description );
     final_focus->description = strdup ( buf );
-
-    if ( final_focus->short_description )
-        free ( final_focus->short_description );
     final_focus->short_description = strdup ( buf );
 
     /* extra description coolness! */
     CREATE ( new_descr, struct extra_descr_data, 1 );
     new_descr->keyword = str_dup ( final_focus->name );
     snprintf ( buf2, sizeof ( buf2 ), "It's cool to the touch. \r\n"
-               "It appears to have a tiny %s inside.",obj->short_description );
+               "It appears to have a tiny %s inside.", obj->short_description );
     new_descr->description = str_dup ( buf2 );
     new_descr->next = NULL;
     final_focus->ex_description = new_descr;
-
-
-    if ( !IS_SET_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE ) )
-        SET_BIT_AR ( GET_OBJ_EXTRA ( final_focus ), ITEM_UNIQUE_SAVE );
 
     GET_OBJ_WEIGHT ( final_focus ) =  12;
     GET_OBJ_TIMER ( final_focus ) = ( 420 - GET_LEVEL ( ch ) * TIER ) * 10;
@@ -1223,8 +1180,8 @@ ASKILL ( skill_manipulate )
         return 0;
     }
 
-    if ( ( o =
-                get_obj_in_list_vis ( ch, arg, 0, ch->carrying ) ) == NULL )
+    o = get_obj_in_list_vis ( ch, arg, 0, ch->carrying );
+    if ( !o )
     {
         ch->Send ( "The weapon must be in your inventory.\r\n" );
         return 0;
@@ -1252,13 +1209,11 @@ ASKILL ( skill_manipulate )
         return 0;
     }
     obj_from_char ( o );
-    SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
     GET_OBJ_WEIGHT ( o ) += 10;
     obj_to_char ( o, ch );
     if ( total_chance ( ch, SKILL_MANIPULATE ) < number ( 0, 101 ) )
     {
         GET_WEP_BALANCE ( o ) = number ( 0, 100 );
-
         ch->Send ( "Your concentration slips and you throw the balance in randomly!\r\n" );
     }
     else

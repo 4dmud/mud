@@ -81,7 +81,7 @@ int Crash_clean_qic(FILE * fl, char *name);
 char *remove_cr(char *str, char *buf, size_t len);
 int write_extra_desc(FILE *fl, struct extra_descr_data *ex_desc);
 int write_extra_descs(FILE *fl, OBJ_DATA *obj);
-int write_object_affects(FILE *fl, OBJ_DATA *obj);
+void write_object_affects(FILE *fl, OBJ_DATA *obj);
 int load_char_objects_to_char_old(Character *ch, FILE *fl);
 int load_char_objects_to_char(Character *ch, FILE *fl);
 struct obj_data *read_one_item(FILE *fl, OBJ_DATA *temp, int *locate);
@@ -1250,86 +1250,219 @@ int relocate_obj(room_rnum rnum, Character *ch, OBJ_DATA *temp, int locate, OBJ_
 }
 
 
-int save_one_item( OBJ_DATA *obj,FILE *fl, int locate)
+int save_one_item ( OBJ_DATA *obj, FILE *fl, int locate )
 {
-  obj_vnum nr;
-  //obj_rnum rn;
-  char buf[MAX_STRING_LENGTH] = "";
-  int i;
+    obj_vnum nr = GET_OBJ_VNUM ( obj );
+    obj_rnum nrr = GET_OBJ_RNUM ( obj );
+    char buf[MAX_STRING_LENGTH] = "";
+    int i;
 
-  //rn = GET_OBJ_RNUM(obj);
-
-  fprintf(fl, "#%d OBJ\n", (nr = GET_OBJ_VNUM(obj)));
-  if (nr == NOTHING || IS_UNIQUE(obj))
-  {
-    if (obj->name)
-      fprintf(fl, "Name: %s\n", obj->name);
-    if (obj->description)
-      fprintf(fl, "Description:\n%s~\n", remove_cr(obj->description, buf, sizeof(buf)));
-    if (obj->short_description )
-      fprintf(fl, "Short:\n%s~\n", remove_cr(obj->short_description, buf, sizeof(buf)));
-    if (obj->action_description)
-      fprintf(fl, "ActionD:\n%s~\n", remove_cr(obj->action_description, buf, sizeof(buf)));
-    if (obj->smell)
-      fprintf(fl, "Smell:\n%s~\n",remove_cr(obj->smell, buf, sizeof(buf)));
-    if (obj->taste)
-      fprintf(fl, "Taste:\n%s~\n", remove_cr(obj->taste, buf, sizeof(buf)));
-    if (obj->feel)
-      fprintf(fl, "Feel:\n%s~\n", remove_cr(obj->feel, buf, sizeof(buf)));
-
-    if (obj->ex_description)
+    fprintf ( fl, "#%d OBJ\n", nr );
+    if ( nr == NOTHING )
     {
-      fprintf(fl, "ExDescr:\n");
-      if (write_extra_descs(fl, obj) < 0)
-        return -1;
+        if ( obj->name )
+            fprintf ( fl, "Name: %s\n", obj->name );
+        if ( obj->description )
+            fprintf ( fl, "Description:\n%s~\n", remove_cr ( obj->description, buf, sizeof buf ) );
+        if ( obj->short_description )
+            fprintf ( fl, "Short:\n%s~\n", remove_cr ( obj->short_description, buf, sizeof buf ) );
+        if ( obj->action_description )
+            fprintf ( fl, "ActionD:\n%s~\n", remove_cr ( obj->action_description, buf, sizeof buf ) );
+        if ( obj->smell )
+            fprintf ( fl, "Smell:\n%s~\n",remove_cr ( obj->smell, buf, sizeof buf ) );
+        if ( obj->taste )
+            fprintf ( fl, "Taste:\n%s~\n", remove_cr ( obj->taste, buf, sizeof buf ) );
+        if ( obj->feel )
+            fprintf ( fl, "Feel:\n%s~\n", remove_cr ( obj->feel, buf, sizeof buf ) );
+
+        if ( obj->ex_description )
+        {
+            fprintf ( fl, "ExDescr:\n" );
+            if ( write_extra_descs ( fl, obj ) < 0 )
+                return -1;
+        }
+
+        fprintf ( fl, "Type: %d\n", GET_OBJ_TYPE ( obj ) );
+        fprintf ( fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3] );
+        fprintf ( fl, "Weight: %d\n", GET_OBJ_WEIGHT ( obj ) );
+        fprintf ( fl, "Cost: %lld\n", GET_OBJ_COST ( obj ) );
+        fprintf ( fl, "Rent: %d\n", GET_OBJ_RENT ( obj ) );
+        fprintf ( fl, "Innate: %d\n", GET_OBJ_INNATE ( obj ) );
+        fprintf ( fl, "Level: %d\n", GET_OBJ_LEVEL ( obj ) );
+        fprintf ( fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3] );
+
+        bool wrote_header = FALSE;
+        for ( i = 0; i < 8; ++i )
+            if ( GET_OBJ_VAL ( obj, i ) != 0 )
+            {
+                if ( !wrote_header )
+                {
+                    fprintf ( fl, "Values:\n" );
+                    wrote_header = TRUE;
+                }
+                fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
+            }
+        if ( GET_OBJ_QUALITY ( obj ) > 0 )
+        {
+            if ( !wrote_header )
+            {
+                fprintf ( fl, "Values:\n" );
+                wrote_header = TRUE;
+            }
+            fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
+        }
+        for ( i = 9; i < 14; ++i )
+            if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
+            {
+                if ( !wrote_header )
+                {
+                    fprintf ( fl, "Values:\n" );
+                    wrote_header = TRUE;
+                }
+                fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
+            }
+        if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+        {
+            if ( !wrote_header )
+            {
+                fprintf ( fl, "Values:\n" );
+                wrote_header = TRUE;
+            }
+            fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+        }
+        if  ( wrote_header )
+            fprintf ( fl, "$\n" );
+
+        if ( GET_OBJ_TIMER ( obj ) > 0 )
+            fprintf ( fl, "Timer: %d\n", GET_OBJ_TIMER ( obj ) );
+    }
+    else
+    {
+        if ( obj->name && ( !obj_proto[nrr].name || strcmp ( obj->name, obj_proto[nrr].name ) ) )
+            fprintf ( fl, "Name: %s\n", obj->name );
+        if ( obj->description && ( !obj_proto[nrr].description || strcmp ( obj->description, obj_proto[nrr].description ) ) )
+            fprintf ( fl, "Description:\n%s~\n", remove_cr ( obj->description, buf, sizeof buf ) );
+        if ( IS_UNIQUE ( obj ) )
+            fprintf ( fl, "Short:\n%s~\n", remove_cr ( obj->short_description, buf, sizeof buf ) );
+        if ( obj->action_description && ( !obj_proto[nrr].action_description || strcmp ( obj->action_description, obj_proto[nrr].action_description ) ) )
+            fprintf ( fl, "ActionD:\n%s~\n", remove_cr ( obj->action_description, buf, sizeof buf ) );
+        if ( obj->smell && ( !obj_proto[nrr].smell || strcmp ( obj->smell, obj_proto[nrr].smell ) ) )
+            fprintf ( fl, "Smell:\n%s~\n",remove_cr ( obj->smell, buf, sizeof buf ) );
+        if ( obj->taste && ( !obj_proto[nrr].taste || strcmp ( obj->taste, obj_proto[nrr].taste ) ) )
+            fprintf ( fl, "Taste:\n%s~\n", remove_cr ( obj->taste, buf, sizeof buf ) );
+        if ( obj->feel && ( !obj_proto[nrr].feel || strcmp ( obj->feel, obj_proto[nrr].feel ) ) )
+            fprintf ( fl, "Feel:\n%s~\n", remove_cr ( obj->feel, buf, sizeof buf ) );
+
+        if ( obj->ex_description != obj_proto[nrr].ex_description )
+        {
+            fprintf ( fl, "ExDescr:\n" );
+            if ( write_extra_descs ( fl, obj ) < 0 )
+                return -1;
+        }
+
+        if ( GET_OBJ_TYPE ( obj ) != GET_OBJ_TYPE ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Type: %d\n", GET_OBJ_TYPE ( obj ) );
+        if ( GET_OBJ_WEAR ( obj )[0] != GET_OBJ_WEAR ( &obj_proto[nrr] )[0] ||
+            GET_OBJ_WEAR ( obj )[1] != GET_OBJ_WEAR ( &obj_proto[nrr] )[1] ||
+            GET_OBJ_WEAR ( obj )[2] != GET_OBJ_WEAR ( &obj_proto[nrr] )[2] ||
+            GET_OBJ_WEAR ( obj )[3] != GET_OBJ_WEAR ( &obj_proto[nrr] )[3] )
+            fprintf ( fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3] );
+        if ( GET_OBJ_WEIGHT ( obj ) != GET_OBJ_WEIGHT ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Weight: %d\n", GET_OBJ_WEIGHT ( obj ) );
+        if ( GET_OBJ_COST ( obj ) != GET_OBJ_COST ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Cost: %lld\n", GET_OBJ_COST ( obj ) );
+        if ( GET_OBJ_RENT ( obj ) != GET_OBJ_RENT ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Rent: %d\n", GET_OBJ_RENT ( obj ) );
+        if ( GET_OBJ_INNATE ( obj ) != GET_OBJ_INNATE ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Innate: %d\n", GET_OBJ_INNATE ( obj ) );
+        if  (GET_OBJ_LEVEL ( obj ) != GET_OBJ_LEVEL ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Level: %d\n", GET_OBJ_LEVEL ( obj ) );
+        if ( GET_OBJ_PERM ( obj )[0] != GET_OBJ_PERM ( &obj_proto[nrr] )[0] ||
+            GET_OBJ_PERM ( obj )[1] != GET_OBJ_PERM ( &obj_proto[nrr] )[1] ||
+            GET_OBJ_PERM ( obj )[2] != GET_OBJ_PERM ( &obj_proto[nrr] )[2] ||
+            GET_OBJ_PERM ( obj )[3] != GET_OBJ_PERM ( &obj_proto[nrr] )[3] )
+            fprintf ( fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3] );
+
+        bool wrote_header = FALSE;
+        for ( i = 0; i < 8; ++i )
+            if ( GET_OBJ_VAL ( obj, i ) != GET_OBJ_VAL ( &obj_proto[nrr], i ) )
+            {
+                if ( !wrote_header )
+                {
+                    fprintf ( fl, "Values:\n" );
+                    wrote_header = TRUE;
+                }
+                fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
+            }
+        if ( GET_OBJ_QUALITY ( obj ) > 0 )
+        {
+            if ( !wrote_header )
+            {
+                fprintf ( fl, "Values:\n" );
+                wrote_header = TRUE;
+            }
+            fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
+        }
+        for ( i = 9; i < 14; ++i )
+            if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
+            {
+                if ( !wrote_header )
+                {
+                    fprintf ( fl, "Values:\n" );
+                    wrote_header = TRUE;
+                }
+                fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
+            }
+        if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
+        {
+            if ( !wrote_header )
+            {
+                fprintf ( fl, "Values:\n" );
+                wrote_header = TRUE;
+            }
+            fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+        }
+        if ( wrote_header )
+            fprintf ( fl, "$\n" );
+
+        if ( GET_OBJ_TIMER ( obj ) != GET_OBJ_TIMER ( &obj_proto[nrr] ) )
+            fprintf ( fl, "Timer: %d\n", GET_OBJ_TIMER ( obj ) );
     }
 
-    fprintf(fl, "Type: %d\n", GET_OBJ_TYPE(obj));
-    fprintf(fl, "Wear: %d %d %d %d\n", GET_OBJ_WEAR(obj)[0], GET_OBJ_WEAR(obj)[1],  GET_OBJ_WEAR(obj)[2], GET_OBJ_WEAR(obj)[3]);
-    fprintf(fl, "Weight: %d\n", GET_OBJ_WEIGHT(obj));
-    fprintf(fl, "Cost: %lld\n", GET_OBJ_COST(obj));
-    fprintf(fl, "Rent: %d\n", GET_OBJ_RENT(obj));
-    fprintf(fl, "Innate: %d\n", GET_OBJ_INNATE(obj));
-    fprintf(fl, "Level: %d\n", GET_OBJ_LEVEL(obj));
-    fprintf(fl, "Perm: %d %d %d %d\n", GET_OBJ_PERM(obj)[0], GET_OBJ_PERM(obj)[1], GET_OBJ_PERM(obj)[2], GET_OBJ_PERM(obj)[3]);
-    fprintf(fl, "Affects:\n");
-    if (write_object_affects(fl, obj) < 0)
-      return -1;
-  }
-  if (obj->idents)
-  {
-    struct ident_list *iden;
-    fprintf(fl, "Idents:\n");
+    write_object_affects ( fl, obj );
 
-    for (iden = obj->idents;iden;iden=iden->next)
-      fprintf(fl, "%ld\n", iden->id);
+    if ( obj->idents )
+    {
+        fprintf ( fl, "Idents:\n" );
 
-    fprintf(fl, "%d\n", -1);
-  }
-  fprintf(fl, "Location: %d\n", locate);
-  fprintf(fl, "Values:\n");
-  for ( i = 0; i < 8; ++i )
-    if ( GET_OBJ_VAL ( obj, i ) != 0 )
-      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i ) );
-  if ( GET_OBJ_QUALITY ( obj ) > 0 )
-      fprintf ( fl, "8 %lf\n", GET_OBJ_QUALITY ( obj ) );
-  for ( i = 9; i < 14; ++i )
-    if ( GET_OBJ_VAL ( obj, i - 1 ) != 0 )
-      fprintf ( fl, "%d %d\n", i, GET_OBJ_VAL ( obj, i - 1 ) );
-  if ( GET_OBJ_MAX_QUALITY ( obj ) > 0 )
-    fprintf ( fl, "14 %lf\n", GET_OBJ_MAX_QUALITY ( obj ) );
+        for ( ident_list *iden = obj->idents; iden; iden = iden->next )
+            fprintf ( fl, "%ld\n", iden->id );
 
-  fprintf(fl, "$\n");
-  fprintf(fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
-  fprintf(fl, "Vroom: %d\n", GET_OBJ_VROOM(obj));
-  fprintf(fl, "Owner: %ld\n", obj->owner);
-  fprintf(fl, "Timer: %d\n", GET_OBJ_TIMER(obj));
-  fprintf(fl, "Expir: %ld\n", GET_OBJ_EXPIRE(obj));
-  fprintf(fl, "Exrem: %ld\n", GET_OBJ_SAVED_REMAINING_EXPIRE(obj));
-  for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
-    if ( obj->orig_affected[ i ].location > 0 )
-      fprintf(fl, "OrigAff: %d %d\n", obj->orig_affected[ i ].location, obj->orig_affected[ i ].modifier );
-  return fprintf(fl, "@END\n\n");
+        fprintf ( fl, "%d\n", -1 );
+    }
+
+    fprintf ( fl, "Location: %d\n", locate );
+
+    if ( nrr == NOTHING )
+        fprintf ( fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
+    else if ( GET_OBJ_EXTRA ( obj )[0] != GET_OBJ_EXTRA ( &obj_proto[nrr] )[0] ||
+            GET_OBJ_EXTRA ( obj )[1] != GET_OBJ_EXTRA ( &obj_proto[nrr] )[1] ||
+            GET_OBJ_EXTRA ( obj )[2] != GET_OBJ_EXTRA ( &obj_proto[nrr] )[2] ||
+            GET_OBJ_EXTRA ( obj )[3] != GET_OBJ_EXTRA ( &obj_proto[nrr] )[3] )
+            fprintf ( fl, "Extra: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1],  GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
+
+    if ( GET_OBJ_VROOM ( obj ) > 0 )
+        fprintf ( fl, "Vroom: %d\n", GET_OBJ_VROOM ( obj ) );
+    if ( obj->owner > 0 )
+        fprintf ( fl, "Owner: %ld\n", obj->owner );
+    if ( GET_OBJ_EXPIRE ( obj ) > 0 )
+        fprintf ( fl, "Expir: %ld\n", GET_OBJ_EXPIRE ( obj ) );
+    if ( GET_OBJ_SAVED_REMAINING_EXPIRE ( obj ) > 0 )
+        fprintf ( fl, "Exrem: %ld\n", GET_OBJ_SAVED_REMAINING_EXPIRE ( obj ) );
+    for ( i = 0; i < MAX_OBJ_AFFECT; ++i )
+        if ( obj->orig_affected[ i ].location > 0 )
+            fprintf ( fl, "OrigAff: %d %d\n", obj->orig_affected[ i ].location, obj->orig_affected[ i ].modifier );
+    return fprintf ( fl, "@END\n\n" );
 }
 
 /* restore weight of containers after save_crashproof_objects changed them for saving */
@@ -1421,16 +1554,23 @@ void crashproof_objects_save_all()
             save_crashproof_room ( r );
 }
 
-int write_object_affects(FILE *fl, OBJ_DATA *obj)
+void write_object_affects(FILE *fl, OBJ_DATA *obj)
 {
-  int i;
-  for (i = 0; i < MAX_OBJ_AFFECT; i++)
-  {
-    if (obj->affected[i].modifier)
-      fprintf(fl, "A\n"
-              "%d %d\n", obj->affected[i].location, obj->affected[i].modifier);
-  }
-  return fprintf(fl, "$\n");
+    bool wrote_header = FALSE;
+    for ( int i = 0; i < MAX_OBJ_AFFECT; i++ )
+        if ( obj->affected[i].modifier )
+        {
+            if ( !wrote_header )
+            {
+                fprintf ( fl, "Affects:\n" );
+                wrote_header = TRUE;
+            }
+            fprintf(fl, "A\n"
+              "%d %d\n", obj->affected[i].location, obj->affected[i].modifier );
+        }
+
+    if ( wrote_header )
+        fprintf ( fl, "$\n" );
 }
 
 int write_extra_descs(FILE *fl, OBJ_DATA *obj)
@@ -1782,285 +1922,312 @@ void tag_read(char *tag, char *buf)
 
 struct obj_data * read_one_item(FILE *fl, OBJ_DATA *temp, int *locate)
 {
-  int rv, aff_i = 0;
-  obj_vnum nr, nrr = 0; // onr
-  char buf[MAX_INPUT_LENGTH];
-  char line[READ_SIZE] = "";
-  char tag[READ_SIZE] = "";
-  //int num;
-  int t[4];
-  double tf[1];
-  int orig_timer = -1;
-  //int orig_expir = -1;
-  //int dup_strings = FALSE;
-  //struct ident_list *tmp_idents = NULL;
-  //int tmp_wep_bal;
-  bool weight_read = FALSE;
+    int aff_i = 0;
+    obj_vnum nr, nrr = 0;
+    char buf[MAX_INPUT_LENGTH];
+    char line[READ_SIZE] = "";
+    char tag[READ_SIZE] = "";
+    int t[4];
+    double tf[1];
+    int orig_timer = -1;
+    bool weight_read = FALSE;
 
-  if (feof(fl))
-    return NULL;
-
-  do
-  {
-    get_line(fl, line);
-  }
-  while (!feof(fl) && *line != '#');
-
-  if (feof(fl))
-    return NULL;
-  if ((rv = sscanf(line, "#%d OBJ", &nr)) != 1)
-    return NULL;
-
-  //onr = nr;
-  /* we have the number, check it, load obj. */
-  if (nr == NOTHING)
-  {  /* then it is unique */
-    temp = create_obj(NOTHING);
-  }
-  else if (nr < NOTHING)
-  {
-    log("read_one_item : Loading item that has negative vnum: %d", nr);
-    return NULL;
-  }
-  else
-  {
-    temp = read_object(nr, VIRTUAL);
-
-    if (nr >= 999999 || !temp)
-    {
+    if ( feof ( fl ) )
       return NULL;
-    }
-    nrr = real_object(nr);
-    if (nrr != NOTHING && obj_index[nrr].qic != NULL)
+
+    do
     {
-      /*already added from scan rent*/
-      obj_index[nrr].qic->items--;
-    }
+        get_line ( fl, line );
+    } while ( !feof ( fl ) && *line != '#' );
 
-    //dup_strings = TRUE;
-  }
-  get_line(fl, line);
-  while (!feof(fl) && strcmp(line, "@END"))
-  {
-    tag_read(tag, line);
-    //num = atoi(line);
-    switch (LOWER(*tag))
+    if ( feof ( fl ) )
+        return NULL;
+
+    if ( sscanf ( line, "#%d OBJ", &nr ) != 1)
+        return NULL;
+
+    /* we have the number, check it, load obj. */
+    if ( nr == NOTHING )
+    {  /* then it is unique */
+        temp = create_obj ( NOTHING );
+    }
+    else if ( nr < NOTHING )
     {
-    case 'a':
-      if (!strcmp(tag, "ActionD"))
-      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->action_description = fread_string(fl, buf)) == NULL)
-          temp->action_description = strdup("Undefined");
-      }
-      else if (!strcmp(tag, "Affects"))
-        read_object_affects(fl, temp);
-      break;
-    case 'c':
-      if (!strcmp(tag, "Cost"))
-        GET_OBJ_COST(temp) = atoi(line);
-      break;
-    case 'd':
-      if (!strcmp(tag, "Description"))
-      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->description = fread_string(fl, buf)) == NULL)
-          temp->description = strdup("Undefined");
-      }
-      break;
-    case 'e':
-      if (!strcmp(tag, "Extra"))
-        sscanf(line, "%d %d %d %d", &GET_OBJ_EXTRA(temp)[0], &GET_OBJ_EXTRA(temp)[1],  &GET_OBJ_EXTRA(temp)[2], &GET_OBJ_EXTRA(temp)[3]);
-      else if (!strcmp(tag, "ExDescr"))
-        read_extra_descs(fl, temp);
-      else if (!strcmp(tag, "Expir")) {
-        GET_OBJ_EXPIRE(temp) = atol(line);
-        //orig_expir = GET_OBJ_EXPIRE(temp);
-      }
-      else if (!strcmp(tag, "Exrem")) {
-    int remaining = atol(line);
-    if (remaining != 0) {
-      GET_OBJ_EXPIRE(temp) = time(0) + remaining;
-      //orig_expir = GET_OBJ_EXPIRE(temp);
+        log ( "SYSERR read_one_item : Loading item that has negative vnum: %d", nr );
+        return NULL;
     }
-      }
-      break;
-    case 'f':
-      if (!strcmp(tag, "Feel"))
-      {snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->feel = fread_string(fl, buf)) == NULL)
-          temp->feel = strdup("Undefined");
-      }
-      break;
-    case 'i':
-      if (!strcmp(tag, "Innate"))
-        GET_OBJ_INNATE(temp) = atoi(line);
-      if (!strcmp(tag, "Idents"))
-      {
-        do
-        {
-          get_line(fl, line);
-          if (sscanf(line, "%d", t) != 1)
-            break;
-          if (t[0] == -1)
-            break;
-          add_identifier(temp, t[0]);
-        }
-        while (*line != '-');
-        //if (temp->idents)
-        //    tmp_idents = temp->idents;
-      }
-      break;
-    case 'l':
-      if (!strcmp(tag, "Level"))
-        GET_OBJ_LEVEL(temp) = atoi(line);
-      else if (!strcmp(tag, "Location"))
-        *locate = atoi(line);
-      break;
-    case 'n':
-      if (!strcmp(tag, "Name"))
-      {
-        temp->name = strdup(line);
-      }
-      break;
-    case 'o':
-      if ( !strcmp ( tag, "OrigAff" ) )
-      {
-    sscanf ( line, "%d %d", &t[0], &t[1] );
-        temp->orig_affected[ aff_i ].location = t[0];
-        temp->orig_affected[ aff_i ].modifier = t[1];
-        aff_i++;
-      }
-      else if (!strcmp(tag, "Owner"))
-        temp->owner = atol(line);
-      break;
-    case 'p':
-      if (!strcmp(tag, "Perm"))
-        sscanf(line, "%d %d %d %d", &GET_OBJ_PERM(temp)[0], &GET_OBJ_PERM(temp)[1],  &GET_OBJ_PERM(temp)[2], &GET_OBJ_PERM(temp)[3]);
-      break;
-    case 'r':
-      if (!strcmp(tag, "Rent"))
-        GET_OBJ_RENT(temp) = atoi(line);
-      break;
-    case 's':
-      if (!strcmp(tag, "Short"))
-      {
-      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->short_description = fread_string(fl, buf)) == NULL)
-          temp->short_description = strdup("Undefined");
-      }
-      else if (!strcmp(tag, "Smell"))
-      {
-      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->smell = fread_string(fl, buf)) == NULL)
-          temp->smell = strdup("Undefined");
-      }
-      break;
-    case 't':
-      if (!strcmp(tag, "Timer")) {
-        orig_timer = atoi(line);
-        GET_OBJ_TIMER(temp) = orig_timer;
-      }
-      else if (!strcmp(tag, "Type"))
-        GET_OBJ_TYPE(temp) = atoi(line);
-      else if (!strcmp(tag, "Taste"))
-      {
-      snprintf(buf, sizeof(buf), "%s on object %d, in read one item (%s)",tag,  nr, line);
-        if ((temp->taste = fread_string(fl, buf)) == NULL)
-          temp->taste = strdup("Undefined");
-      }
-      break;
-    case 'v':
-      if (!strcmp(tag, "Vroom"))
-        GET_OBJ_VROOM(temp) = atoi(line);
-      else if (!strcmp(tag, "Values"))
-      {
-        for (t[0] = 0; t[0] < NUM_OBJ_VAL_POSITIONS; t[0]++)
-          GET_OBJ_VAL(temp, t[0]) = 0;
-        for (t[0] = 0; t[0] < NUM_OBJ_FLOATING_VAL_POSITIONS; t[0]++)
-          GET_OBJ_FLOATING_VAL(temp, t[0]) = 0;
-        while (TRUE)
-        {
-          get_line(fl, line);
-          if (*line == '$')
-            break;
-          if (sscanf(line, "%d", t) != 1)
-            continue;
-          if (t[0] < 8)
-          {
-            if (sscanf(line, "%d %d", t, t+1) != 2)
-              continue;
-            GET_OBJ_VAL(temp, t[0]) = t[1];
-          }
-          else if (t[0] == 8)
-          {
-            if (sscanf(line, "%d %lf", t, tf) != 2)
-              continue;
-            GET_OBJ_QUALITY(temp) = tf[0];
-          }
-          else if (t[0] < 14)
-          {
-            if (sscanf(line, "%d %d", t, t+1) != 2)
-              continue;
-            GET_OBJ_VAL(temp, t[0] - 1) = t[1];
-          }
-          else if (t[0] == 14)
-          {
-            if (sscanf(line, "%d %lf", t, tf) != 2)
-              continue;
-            GET_OBJ_MAX_QUALITY(temp) = tf[0];
-          }
-        }
-      }
-      break;
-    case 'w':
-      if (!strcmp(tag, "Wear"))
-        sscanf(line, "%d %d %d %d", &GET_OBJ_WEAR(temp)[0], &GET_OBJ_WEAR(temp)[1],  &GET_OBJ_WEAR(temp)[2], &GET_OBJ_WEAR(temp)[3]);
-      else if (!strcmp(tag, "Weight"))
-      {
-        GET_OBJ_WEIGHT(temp) = atoi(line);
-        weight_read = TRUE;
-      }
-      break;
+    else
+    {
+        temp = read_object ( nr, VIRTUAL );
+        if ( nr >= 999999 || !temp )
+          return NULL;
 
-    default:
-      log("read_one_item: unknown tag (%s) line (%s).", tag, line);
-
-      break;
+        nrr = real_object ( nr );
+        if ( nrr != NOTHING && obj_index[nrr].qic != NULL)
+        {
+            /*already added from scan rent*/
+            obj_index[nrr].qic->items--;
+        }
     }
 
+    get_line ( fl, line );
+    while ( !feof ( fl ) && strcmp ( line, "@END" ) )
+    {
+        tag_read ( tag, line );
+        switch ( LOWER ( *tag ) )
+        {
+            case 'a':
+                if ( !strcmp ( tag, "ActionD" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->action_description = fread_string ( fl, buf );
+                    if ( temp->action_description == NULL )
+                        temp->action_description = strdup ( "Undefined" );
+                }
+                else if ( !strcmp ( tag, "Affects" ) )
+                    read_object_affects ( fl, temp );
+                break;
+            case 'c':
+                if ( !strcmp ( tag, "Cost" ) )
+                    GET_OBJ_COST ( temp ) = atoi ( line );
+                break;
+            case 'd':
+                if ( !strcmp ( tag, "Description" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->description = fread_string ( fl, buf );
+                    if ( temp->description == NULL )
+                        temp->description = strdup ( "Undefined" );
+                }
+                break;
+            case 'e':
+                if ( !strcmp ( tag, "Extra" ) )
+                    sscanf(line, "%d %d %d %d", &GET_OBJ_EXTRA(temp)[0], &GET_OBJ_EXTRA(temp)[1],  &GET_OBJ_EXTRA(temp)[2], &GET_OBJ_EXTRA(temp)[3] );
+                else if ( !strcmp ( tag, "ExDescr" ) )
+                    read_extra_descs ( fl, temp );
+                else if ( !strcmp ( tag, "Expir" ) )
+                    GET_OBJ_EXPIRE ( temp ) = atol ( line );
+                else if ( !strcmp ( tag, "Exrem" ) )
+                {
+                    long remaining = atol ( line );
+                    if ( remaining != 0 )
+                        GET_OBJ_EXPIRE ( temp ) = time(0) + remaining;
+                }
+                break;
+            case 'f':
+                if ( !strcmp ( tag, "Feel" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->feel = fread_string ( fl, buf );
+                    if ( temp->feel == NULL )
+                        temp->feel = strdup ( "Undefined" );
+                }
+                break;
+            case 'i':
+                if ( !strcmp ( tag, "Innate" ) )
+                    GET_OBJ_INNATE ( temp ) = atoi ( line );
+                else if ( !strcmp ( tag, "Idents" ) )
+                {
+                    do
+                    {
+                        get_line ( fl, line );
+                        if ( sscanf ( line, "%d", t ) != 1 )
+                            break;
+                        if ( t[0] == -1 )
+                            break;
+                        add_identifier ( temp, t[0] );
+                    } while ( *line != '-' );
+                }
+                break;
+            case 'l':
+                if ( !strcmp ( tag, "Level" ) )
+                    GET_OBJ_LEVEL ( temp ) = atoi ( line );
+                else if ( !strcmp ( tag, "Location" ) )
+                    *locate = atoi ( line );
+                break;
+            case 'n':
+                if ( !strcmp ( tag, "Name" ) )
+                    temp->name = strdup ( line );
+                break;
+            case 'o':
+                if ( !strcmp ( tag, "OrigAff" ) )
+                {
+                    sscanf ( line, "%d %d", &t[0], &t[1] );
+                    temp->orig_affected[ aff_i ].location = t[0];
+                    temp->orig_affected[ aff_i ].modifier = t[1];
+                    aff_i++;
+                }
+                else if ( !strcmp ( tag, "Owner" ) )
+                    temp->owner = atol ( line );
+                break;
+            case 'p':
+                if ( !strcmp ( tag, "Perm" ) )
+                    sscanf ( line, "%d %d %d %d", &GET_OBJ_PERM(temp)[0], &GET_OBJ_PERM(temp)[1],  &GET_OBJ_PERM(temp)[2], &GET_OBJ_PERM(temp)[3] );
+                break;
+            case 'r':
+                if ( !strcmp ( tag, "Rent" ) )
+                    GET_OBJ_RENT ( temp ) = atoi ( line );
+                break;
+            case 's':
+                if ( !strcmp ( tag, "Short" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->short_description = fread_string ( fl, buf );
+                    if ( temp->short_description == NULL )
+                        temp->short_description = strdup ( "Undefined" );
+                }
+                else if ( !strcmp ( tag, "Smell" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->smell = fread_string ( fl, buf );
+                    if ( temp->smell == NULL )
+                        temp->smell = strdup ( "Undefined" );
+                }
+                break;
+            case 't':
+                if ( !strcmp ( tag, "Timer" ) )
+                {
+                    orig_timer = atoi ( line );
+                    GET_OBJ_TIMER ( temp ) = orig_timer;
+                }
+                else if ( !strcmp ( tag, "Type" ) )
+                    GET_OBJ_TYPE ( temp ) = atoi ( line );
+                else if ( !strcmp ( tag, "Taste" ) )
+                {
+                    snprintf ( buf, sizeof buf, "%s on object %d, in read one item (%s)", tag, nr, line );
+                    temp->taste = fread_string ( fl, buf );
+                    if ( temp->taste == NULL)
+                        temp->taste = strdup ( "Undefined" );
+                }
+                break;
+            case 'v':
+                if ( !strcmp ( tag, "Vroom" ) )
+                    GET_OBJ_VROOM ( temp ) = atoi ( line );
+                else if ( !strcmp ( tag, "Values" ) )
+                {
+                    while (TRUE)
+                    {
+                        get_line ( fl, line );
+                        if ( *line == '$' )
+                            break;
+                        if ( sscanf ( line, "%d", t ) != 1 )
+                            continue;
+                        if ( t[0] < 8 )
+                        {
+                            if ( sscanf ( line, "%d %d", t, t+1 ) != 2 )
+                                continue;
+                            GET_OBJ_VAL ( temp, t[0] ) = t[1];
+                        }
+                        else if ( t[0] == 8 )
+                        {
+                            if ( sscanf ( line, "%d %lf", t, tf ) != 2 )
+                                continue;
+                            GET_OBJ_QUALITY ( temp ) = tf[0];
+                        }
+                        else if ( t[0] < 14 )
+                        {
+                            if ( sscanf ( line, "%d %d", t, t+1 ) != 2 )
+                                continue;
+                            GET_OBJ_VAL ( temp, t[0] - 1 ) = t[1];
+                        }
+                        else if ( t[0] == 14 )
+                        {
+                            if ( sscanf ( line, "%d %lf", t, tf ) != 2 )
+                                continue;
+                            GET_OBJ_MAX_QUALITY ( temp ) = tf[0];
+                        }
+                    }
+                }
+                break;
+            case 'w':
+                if ( !strcmp ( tag, "Wear" ) )
+                    sscanf ( line, "%d %d %d %d", &GET_OBJ_WEAR(temp)[0], &GET_OBJ_WEAR(temp)[1],  &GET_OBJ_WEAR(temp)[2], &GET_OBJ_WEAR(temp)[3] );
+                else if ( !strcmp(tag, "Weight" ) )
+                {
+                    GET_OBJ_WEIGHT ( temp ) = atoi ( line );
+                    weight_read = TRUE;
+                }
+                break;
 
-    get_line(fl, line);
-  }
+            default:
+                log ( "read_one_item: unknown tag (%s) line (%s).", tag, line );
+                break;
+        }
+        get_line ( fl, line );
+    }
 
-  if ( GET_OBJ_TYPE ( temp ) == ITEM_DRINKCON && !weight_read )
-    GET_OBJ_WEIGHT ( temp ) = MAX ( 0, GET_OBJ_WEIGHT ( &obj_proto[nrr] ) - GET_OBJ_VAL ( &obj_proto[nrr], 1 ) + GET_OBJ_VAL ( temp, 1 ) );
+    if ( GET_OBJ_TYPE ( temp ) == ITEM_DRINKCON && !weight_read && nrr != NOTHING )
+        GET_OBJ_WEIGHT ( temp ) = MAX ( 0, GET_OBJ_WEIGHT ( &obj_proto[nrr] ) - GET_OBJ_VAL ( &obj_proto[nrr], 1 ) + GET_OBJ_VAL ( temp, 1 ) );
 
-  /* Horus - all eq will be updated automatically */
-/*  if (nr > NOTHING && ((!IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_UNIQUE_SAVE) && !IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_TINKERED)) || isname_full("perz", temp->name) ))  {
-      ubyte dt_save = 0;
-      if (IS_SET_AR(GET_OBJ_EXTRA(temp), ITEM_ANTI_DT))
-          dt_save = 1;
-
-      if (tmp_idents)
-          temp->idents = NULL;
-      tmp_wep_bal = GET_OBJ_VAL(temp, 5);
-      free_obj(temp, FALSE);
-      temp = NULL;
-      temp = read_object(onr, VIRTUAL);
-      if (tmp_idents)
-          temp->idents = tmp_idents;
-      if (orig_timer != -1)
-          GET_OBJ_TIMER(temp) = orig_timer;
-      if (orig_expir != -1)
-          GET_OBJ_EXPIRE(temp) = orig_expir;
-      if (GET_OBJ_TYPE(temp) == ITEM_WEAPON)
-          GET_OBJ_VAL(temp, 5) = tmp_wep_bal;
-
-      if (dt_save)
-      SET_BIT_AR(GET_OBJ_EXTRA(temp), ITEM_ANTI_DT);
-
-  }
-*/
-  return temp;
+    /*
+     * Unique objects used to be saved like objects with vnum NOTHING: all
+     * descs were saved, whether they were equal to the prototype or not.
+     * Objects are now called unique if they have a unique shortdesc.
+     */
+    if ( IS_UNIQUE ( temp ) && nrr != NOTHING )
+    {
+        if ( temp->name && obj_proto[nrr].name &&
+            temp->name != obj_proto[nrr].name &&
+            !strcmp ( temp->name, obj_proto[nrr].name ) )
+        {
+            free ( temp->name );
+            temp->name = obj_proto[nrr].name;
+        }
+        if ( temp->description && obj_proto[nrr].description &&
+            temp->description != obj_proto[nrr].description &&
+            !strcmp ( temp->description, obj_proto[nrr].description ) )
+        {
+            free ( temp->description );
+            temp->description = obj_proto[nrr].description;
+        }
+        if ( temp->smell && obj_proto[nrr].smell &&
+            temp->smell != obj_proto[nrr].smell &&
+            !strcmp ( temp->smell, obj_proto[nrr].smell ) )
+        {
+            free ( temp->smell );
+            temp->smell = obj_proto[nrr].smell;
+        }
+        if ( temp->taste && obj_proto[nrr].taste &&
+            temp->taste != obj_proto[nrr].taste &&
+            !strcmp ( temp->taste, obj_proto[nrr].taste ) )
+        {
+            free ( temp->taste );
+            temp->taste = obj_proto[nrr].taste;
+        }
+        if ( temp->feel && obj_proto[nrr].feel &&
+            temp->feel != obj_proto[nrr].feel &&
+            !strcmp ( temp->feel, obj_proto[nrr].feel ) )
+        {
+            free ( temp->feel );
+            temp->feel = obj_proto[nrr].feel;
+        }
+        if ( temp->short_description && obj_proto[nrr].short_description &&
+            temp->short_description != obj_proto[nrr].short_description &&
+            !strcmp ( temp->short_description, obj_proto[nrr].short_description ) )
+        {
+            free ( temp->short_description );
+            temp->short_description = obj_proto[nrr].short_description;
+            REMOVE_BIT_AR ( GET_OBJ_EXTRA ( temp ), ITEM_UNIQUE_SHORTDESC );
+        }
+        if ( temp->action_description && obj_proto[nrr].action_description &&
+            temp->action_description != obj_proto[nrr].action_description &&
+            !strcmp ( temp->action_description, obj_proto[nrr].action_description ) )
+        {
+            free ( temp->action_description );
+            temp->action_description = obj_proto[nrr].action_description;
+        }
+        if ( temp->ex_description && obj_proto[nrr].ex_description &&
+            temp->ex_description != obj_proto[nrr].ex_description &&
+            temp->ex_description->keyword && temp->ex_description->description &&
+            obj_proto[nrr].ex_description->keyword && obj_proto[nrr].ex_description->description &&
+            !strcmp ( temp->ex_description->keyword, obj_proto[nrr].ex_description->keyword ) &&
+            !strcmp ( temp->ex_description->description, obj_proto[nrr].ex_description->description ) )
+        {
+            free_ex_descriptions ( temp->ex_description );
+            temp->ex_description = obj_proto[nrr].ex_description;
+        }
+    }
+    return temp;
 }
 
 int Crash_load_xapobjs(Character *ch)

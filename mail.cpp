@@ -622,53 +622,46 @@ void postmaster_check_mail(Character *ch, Character *mailman,
 }
 
 
-void postmaster_receive_mail(Character *ch,
-                 Character *mailman, int cmd, char *arg)
+void postmaster_receive_mail (Character *ch, Character *mailman, int cmd, char *arg)
 {
     char buf[256];
     int y;
     struct obj_data *obj;
-     HAS_MAIL(ch) = -1;
+
+    HAS_MAIL(ch) = -1;
     if (!has_mail(GET_IDNUM(ch))) {
-    sprintf(buf,
-        "$n tells you, 'Sorry, you don't have any mail waiting.'");
-    act(buf, FALSE, mailman, 0, ch, TO_VICT);
-    return;
+        sprintf(buf, "$n tells you, 'Sorry, you don't have any mail waiting.'");
+        act(buf, FALSE, mailman, 0, ch, TO_VICT);
+        return;
     }
+
     while (has_mail(GET_IDNUM(ch))) {
-    obj = create_obj(NOTHING);
-    obj->name = str_dup("mail paper letter");
-    obj->short_description = str_dup("a piece of mail");
-    obj->description =
-        str_dup("Someone has left a piece of mail here.");
+        obj = create_obj(NOTHING);
+        obj->name = str_dup("mail paper letter");
+        obj->short_description = str_dup("a piece of mail");
+        obj->description = str_dup("Someone has left a piece of mail here.");
 
-    GET_OBJ_TYPE(obj) = ITEM_NOTE;
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NOSELL);
-    for (y = 0; y < TW_ARRAY_MAX; y++)
-        obj->obj_flags.wear_flags[y] = 0;
-    SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
-    SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_HOLD);
-    GET_OBJ_WEIGHT(obj) = 1;
-    GET_OBJ_COST(obj) = 30;
-    GET_OBJ_RENT(obj) = 10;
-    GET_OBJ_TIMER(obj) = -1;
-    obj->action_description = read_delete(GET_IDNUM(ch));
+        GET_OBJ_TYPE(obj) = ITEM_NOTE;
+        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NOSELL);
+        for (y = 0; y < TW_ARRAY_MAX; y++)
+            obj->obj_flags.wear_flags[y] = 0;
+        SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+        SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_HOLD);
+        GET_OBJ_WEIGHT(obj) = 1;
+        GET_OBJ_COST(obj) = 30;
+        GET_OBJ_RENT(obj) = 10;
+        GET_OBJ_TIMER(obj) = -1;
+        obj->action_description = read_delete(GET_IDNUM(ch));
 
-    if (obj->action_description == NULL)
-        obj->action_description =
-        str_dup
-        ("Mail system error - please report.  Error #11.\r\n");
+        if (obj->action_description == NULL)
+            obj->action_description = str_dup ("Mail system error - please report.  Error #11.\r\n");
 
-    /* so it saves */
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NO_LOCATE);
+        /* so it saves */
+        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NO_LOCATE);
 
+        obj_to_char(obj, ch);
 
-    obj_to_char(obj, ch);
-
-    act("$n gives you a piece of mail.", FALSE, mailman, 0, ch,
-        TO_VICT);
-    act("$N gives $n a piece of mail.", FALSE, ch, 0, mailman,
-        TO_ROOM);
+        act("$n gives you a piece of mail.", FALSE, mailman, 0, ch, TO_VICT);
+        act("$N gives $n a piece of mail.", FALSE, ch, 0, mailman, TO_ROOM);
     }
 }

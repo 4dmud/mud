@@ -3309,7 +3309,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                                 size_t pos = shortdesc.find ( " is torn from use" );
                                 if ( pos != string::npos )
                                 {
-                                    SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+                                    SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
                                     if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
                                         free ( o->short_description );
                                     o->short_description = str_udup ( shortdesc.substr ( 0, pos ).c_str() );
@@ -3403,7 +3403,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                         if ( GET_OBJ_COLOUR ( o ) > 0 && GET_OBJ_COLOUR ( o ) < NUM_COLOUR_NAMES )
                         {
-                            SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+                            SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
                             if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
                                 free ( o->short_description );
                             o->short_description = str_udup ( desc.c_str() );
@@ -3470,7 +3470,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             desc.insert ( pos, new_material + " " );
                         }
 
-                        SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+                        SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
                         if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
                             free ( o->short_description );
                         o->short_description = str_udup ( desc.c_str() );
@@ -3533,7 +3533,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             desc.insert ( pos, new_quality + " " );
                         }
 
-                        SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SAVE );
+                        SET_BIT_AR ( GET_OBJ_EXTRA ( o ), ITEM_UNIQUE_SHORTDESC );
                         if ( o->short_description && o->short_description != obj_proto[ GET_OBJ_RNUM ( o ) ].short_description )
                             free ( o->short_description );
                         o->short_description = str_udup ( desc.c_str() );

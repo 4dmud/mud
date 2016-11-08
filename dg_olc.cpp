@@ -1123,8 +1123,12 @@ void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type )
                 {
                     if ( t->curr_state )
                         t->remove_me = TRUE; // remove running triggers when they're done
-                    else
-                        remove_trigger ( thing, t, type );
+                    else if ( remove_trigger ( thing, t, type ) == 2 )
+                    {
+                        // the script was removed as well
+                        sc = nullptr;
+                        break;
+                    }
                 }
             }
     }
@@ -1152,8 +1156,7 @@ void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type )
                     }
                 }
 
-                auto t = find_trigger ( sc, i );
-                if ( !t )
+                if ( !find_trigger ( sc, i ) )
                     add_trigger ( sc, read_trigger ( real_trigger ( i ) ), -1 );
             }
     }

@@ -171,7 +171,7 @@ int old_write_corpse(FILE * fp, struct obj_data *obj, int locate) {
 
 
 
-    if (!(OBJ_FLAGGED(obj, ITEM_UNIQUE_SAVE))) {
+    if (!(OBJ_FLAGGED(obj, ITEM_UNIQUE_SHORTDESC))) {
         return 1;
     }
     fprintf(fp,

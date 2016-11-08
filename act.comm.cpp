@@ -925,9 +925,7 @@ ACMD(do_spec_comm) {
 ACMD(do_write) {
     struct obj_data *paper, *pen = NULL;
     char *papername, *penname;
-
     char buf2[MAX_INPUT_LENGTH],buf1[MAX_INPUT_LENGTH];
-
 
     papername = buf1;
     penname = buf2;
@@ -938,44 +936,36 @@ ACMD(do_write) {
         return;
 
     if (!*papername) {		/* nothing was delivered */
-        send_to_char
-        ("Write?  With what?  ON what?  What are you trying to do?!?\r\n",
-         ch);
+        ch->Send ( "Write?  With what?  ON what?  What are you trying to do?!?\r\n" );
         return;
     }
     if (*penname) {		/* there were two arguments */
-        if (!
-                (paper =
-                     get_obj_in_list_vis(ch, papername, NULL, ch->carrying))) {
+        paper = get_obj_in_list_vis(ch, papername, NULL, ch->carrying);
+        if ( !paper ) {
             ch->Send( "You have no %s.\r\n", papername);
-
             return;
         }
-        if (!(pen = get_obj_in_list_vis(ch, penname, NULL, ch->carrying))) {
+        pen = get_obj_in_list_vis(ch, penname, NULL, ch->carrying);
+        if ( !pen ) {
             ch->Send( "You have no %s.\r\n", penname);
             return;
         }
     } else {			/* there was one arg.. let's see what we can find */
-        if (!
-                (paper =
-                     get_obj_in_list_vis(ch, papername, NULL, ch->carrying))) {
-            ch->Send( "There is no %s in your inventory.\r\n",
-                      papername);
+        paper = get_obj_in_list_vis(ch, papername, NULL, ch->carrying);
+        if ( !paper ) {
+            ch->Send( "There is no %s in your inventory.\r\n", papername );
             return;
         }
         if (GET_OBJ_TYPE(paper) == ITEM_PEN) {	/* oops, a pen.. */
             pen = paper;
             paper = NULL;
         } else if (GET_OBJ_TYPE(paper) != ITEM_NOTE) {
-            send_to_char("That thing has nothing to do with writing.\r\n",
-                         ch);
+            ch->Send ( "That thing has nothing to do with writing.\r\n" );
             return;
         }
         /* One object was found.. now for the other one. */
         if (!GET_EQ(ch, WEAR_HOLD)) {
-            ch->Send( "You can't write with %s %s alone.\r\n",
-                      AN(papername), papername);
-
+            ch->Send( "You can't write with %s %s alone.\r\n", AN(papername), papername);
             return;
         }
         if (PLR_FLAGGED(ch, PLR_COVENTRY)) {
@@ -983,8 +973,7 @@ ACMD(do_write) {
             return;
         }
         if (!CAN_SEE_OBJ(ch, GET_EQ(ch, WEAR_HOLD))) {
-            send_to_char
-            ("The stuff in your hand is invisible!  Yeech!!\r\n", ch);
+            ch->Send ( "The stuff in your hand is invisible!  Yeech!!\r\n" );
             return;
         }
         if (pen)
@@ -998,11 +987,10 @@ ACMD(do_write) {
         act("$p is no good for writing with.", FALSE, ch, pen, 0, TO_CHAR);
     else if (GET_OBJ_TYPE(paper) != ITEM_NOTE)
         act("You can't write on $p.", FALSE, ch, paper, 0, TO_CHAR);
-
     else {
         char *backstr = NULL;
 
-        /* Something on it, display it as that's in input buffer. */
+        /* Something on it, display it in editor. */
         if (paper->action_description) {
             backstr = strdup(paper->action_description);
             ch->Send( "There's something written on it already:\r\n");
@@ -1014,7 +1002,6 @@ ACMD(do_write) {
         act("$n begins to jot down a note.", TRUE, ch, 0, 0, TO_ROOM);
         send_editor_help(ch->desc);
         string_write(ch->desc, &paper->action_description, MAX_NOTE_LENGTH, 0, backstr);
-        SET_BIT_AR(GET_OBJ_EXTRA(paper), ITEM_UNIQUE_SAVE);
     }
 }
 

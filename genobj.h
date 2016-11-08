@@ -17,7 +17,7 @@ int save_objects(zone_rnum vznum);
 obj_rnum insert_object(struct obj_data *obj, obj_vnum ovnum);
 obj_rnum adjust_objects(obj_rnum refpt);
 obj_rnum index_object(struct obj_data *obj, obj_vnum ovnum, obj_rnum ornum);
-int update_objects(struct obj_data *refobj);
+void update_objects(struct obj_data *old_proto, struct obj_data *old_proto_descs, struct obj_data *new_proto);
 obj_rnum add_object(struct obj_data *, obj_vnum ovnum);
 
 #endif

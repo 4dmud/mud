@@ -194,8 +194,6 @@ char *fread_string(FILE * fl, const char *error);
 string *fread_string_s(FILE *fl, const char *error);
 void save_mud_time(struct time_info_data *when);
 //mord ? ?
-void free_extra_descriptions(struct extra_descr_data *edesc);
-//mord ? ?
 void free_text_files(void);
 //mord ? ?
 zone_rnum real_zone(zone_vnum vnum);

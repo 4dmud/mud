@@ -183,6 +183,7 @@ extern unsigned long pulse;
 extern struct time_info_data time_info;
 
 /* external functions */
+int edit_extra_desc ( obj_data *obj, const char *keyword, const char *description );
 script_data* create_script();
 void set_script_types ( script_data *sc );
 void free_cmdlist ( trig_data *trig );
@@ -3359,6 +3360,7 @@ void process_rdelete ( struct script_data *sc, trig_data *trig, char *cmd )
 
 void process_restring ( script_data *sc, trig_data *trig, char *cmd )
 {
+    // Usage: restring <id> <field> <args>
     istringstream iss ( cmd );
     string arg;
     vector<string> args;
@@ -3382,7 +3384,8 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
         iss.str ( args[0] );
 
     iss >> id;
-    if ( ( obj = find_obj ( id ) ) == NULL )
+    obj = find_obj ( id );
+    if ( obj == NULL )
     {
         script_log ( "Trigger [%d] %s, restring: invalid id in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
@@ -3391,7 +3394,6 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
     obj_rnum rn = GET_OBJ_RNUM ( obj );
     if ( args[1] == "name" )
     {
-        SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
         if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
             free ( obj->name );
         arg = args[2];
@@ -3401,7 +3403,7 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
     }
     else if ( args[1] == "short" )
     {
-        SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+        SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SHORTDESC );
         if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
             free ( obj->short_description );
         arg = args[2];
@@ -3411,7 +3413,6 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
     }
     else if ( args[1] == "long" )
     {
-        SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
         if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
             free ( obj->description );
         arg = args[2];
@@ -3422,57 +3423,47 @@ void process_restring ( script_data *sc, trig_data *trig, char *cmd )
     }
     else if ( args[1] == "extra" )
     {
+        // Usage: restring <id> extra '<keywords>' <description>
         if ( args.size() == 3 )
         {
             script_log ( "Trigger [%d] %s, restring: missing argument in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
             return;
         }
 
-        arg = args[3];
-        for ( int i = 4; i < args.size(); ++i )
-            arg += " " + args[i];
-        arg[0] = UPPER ( arg[0] );
-
-        SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-        bool ex_was_proto = FALSE;
-        if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
+        int symbol_count = 0, i = 3;
+        string keywords = args[2];
+        if ( keywords[0] == '\'' )
         {
-            copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
-            ex_was_proto = TRUE;
+            symbol_count++;
+            keywords = keywords.substr ( 1 );
+        }
+        if ( keywords.back() == '\'' )
+        {
+            symbol_count++;
+            keywords = keywords.substr ( 0, keywords.length()-1 );
+        }
+        for ( ; i < args.size() && symbol_count < 2; ++i )
+        {
+            keywords += " " + args[i];
+            if ( keywords.back() == '\'' )
+                symbol_count++;
+        }
+        if ( symbol_count != 2 )
+        {
+            script_log ( "Trigger [%d] %s, restring extra: missing symbols in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+            return;
         }
 
-        extra_descr_data *ex_desc = obj->ex_description;
-        if ( ex_desc == NULL )
-        {
-            CREATE ( obj->ex_description, extra_descr_data, 1 );
-            obj->ex_description->keyword = str_udup ( args[2].c_str() );
-            obj->ex_description->description = str_udup ( arg.c_str() );
-            obj->ex_description->next = NULL;
-        }
-        else if ( ex_desc->keyword == NULL )
-        {
-            ex_desc->keyword = str_udup ( args[2].c_str() );
-            ex_desc->description = str_udup ( arg.c_str() );
-            ex_desc->next = NULL;
-        }
-        else for ( ; ex_desc; ex_desc = ex_desc->next )
-        {
-            if ( strstr ( ex_desc->keyword, args[2].c_str() ) )
-            {
-                if ( !ex_was_proto )
-                    free_string ( &ex_desc->description );
-                ex_desc->description = str_udup ( arg.c_str() );
-                break;
-            }
-            else if ( ex_desc->next == NULL )
-            {
-                CREATE ( ex_desc->next, extra_descr_data, 1 );
-                ex_desc->next->keyword = str_udup ( args[2].c_str() );
-                ex_desc->next->description = str_udup ( arg.c_str() );
-                ex_desc->next->next = NULL;
-                break;
-            }
-        }
+        string desc;
+        if ( i < args.size() )
+            desc = args[i];
+        while ( ++i < args.size() )
+            desc += " " + args[i];
+        desc[0] = UPPER ( desc[0] );
+
+        int result = edit_extra_desc ( obj, keywords.c_str(), desc.c_str() );
+        if ( result == 1 )
+            script_log ( "Trigger [%d] %s, restring: couldn't change ex_desc because one of the keywords already exists in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
     }
     else
         script_log ( "Trigger [%d] %s, restring: unknown field %s in line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), args[1].c_str(), GET_TRIG_LINE_NR ( trig ), cmd );

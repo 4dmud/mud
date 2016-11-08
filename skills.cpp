@@ -1916,12 +1916,11 @@ ASKILL ( skill_scalp )
         else
         {
             act ( "$p has already been scalped.", FALSE, ch, obj, NULL, TO_CHAR );
-
             return 0;
         }
         if ( use_stamina ( ch, 80 ) < 0 )
         {
-            *ch << "You are far too exhausted!";
+            ch->Send ( "You are far too exhausted!" );
             return 0;
         }
         pc = OBJ_FLAGGED ( obj, ITEM_PC_CORPSE );
@@ -1938,18 +1937,15 @@ ASKILL ( skill_scalp )
         snprintf ( buf1, sizeof ( buf1 ), "The scalpless corpse of %s is lying here.", scalpa );
         if ( pc ) {
             snprintf ( buf2, sizeof ( buf2 ), "The scalp of %s lies here.", scalpa );
-        scalp->affected[0].location = APPLY_REGEN_MOVE;
-        scalp->affected[0].modifier = ((sbyte)(MIN(20+number(0, 10), (number(0, (GET_OBJ_VAL(obj, 1)/2))))));  //levels
+            scalp->affected[0].location = APPLY_REGEN_MOVE;
+            scalp->affected[0].modifier = ((sbyte)(MIN(20+number(0, 10), (number(0, (GET_OBJ_VAL(obj, 1)/2))))));  //levels
 
             scalp->affected[1].location = APPLY_SPEED;
-        scalp->affected[1].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3))))))); // Remorts
+            scalp->affected[1].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3))))))); // Remorts
 
-        scalp->affected[2].location = APPLY_COOLNESS;
-        scalp->affected[2].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3)))))));   // Remorts
-
+            scalp->affected[2].location = APPLY_COOLNESS;
+            scalp->affected[2].modifier = ((sbyte)(MIN(100, (number(GET_OBJ_VAL(obj, 4)/number(2, 4), (GET_OBJ_VAL(obj, 4)/number(1, 3)))))));   // Remorts
         }
-
-
         else
             snprintf ( buf2, sizeof ( buf2 ), "The tattered scalp of %s lies here.", scalpa );
 
@@ -1972,24 +1968,16 @@ ASKILL ( skill_scalp )
         new_descr->description = str_dup ( buf2 );
         new_descr->next = NULL;
         scalp->ex_description = new_descr;
-        GET_OBJ_TYPE ( scalp ) = ITEM_TREASURE;
 
+        GET_OBJ_TYPE ( scalp ) = ITEM_TREASURE;
         SET_BIT_AR ( GET_OBJ_WEAR ( scalp ), ITEM_WEAR_HOLD );
         SET_BIT_AR ( GET_OBJ_WEAR ( scalp ), ITEM_WEAR_TAKE );
-        SET_BIT_AR ( GET_OBJ_EXTRA ( scalp ), ITEM_UNIQUE_SAVE );
         GET_OBJ_WEIGHT ( scalp ) = 3;
         GET_OBJ_RENT ( scalp ) = 0;
         obj_to_char ( scalp, ch );
         return SKILL_SCALP;
-
     }
-
-    /*short_desc is +14, then all the way to 0
-    OBJ_FLAGGED(obj, ITEM_NPC_CORPSE)
-    PC_CORPSE
-    */
     return 0;
-
 }
 
 ASKILL ( skill_blade_dance )

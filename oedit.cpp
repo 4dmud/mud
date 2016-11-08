@@ -39,6 +39,7 @@ extern const char *attachment_types[];
 extern void update_script ( vector<int> &ops, vector<int> &nps, void *thing, int type );
 extern zone_rnum real_zone_by_thing ( room_vnum vznum );
 void oedit_disp_val5_menu ( Descriptor *d );
+int isname ( const char *str, const char *namelist );
 /*
  * Handy macros.
  */
@@ -1834,8 +1835,25 @@ void oedit_parse ( Descriptor *d, char *arg )
         case OEDIT_EXTRADESC_KEY:
             if ( genolc_checkstring ( d, arg ) )
             {
+                // make sure any of the words in the keyword don't exist already
+                string arg_str = string ( arg ), word;
                 if ( OLC_DESC ( d )->keyword )
+                {
+                    for ( extra_descr_data *ed = OLC_OBJ ( d )->ex_description; ed; ed = ed->next )
+                    {
+                        if ( !ed->keyword || !strcmp ( ed->keyword, OLC_DESC ( d )->keyword ) )
+                            continue;
+
+                        istringstream iss ( arg_str );
+                        while ( iss >> word )
+                            if ( isname ( word.c_str(), ed->keyword ) )
+                            {
+                                d->character->Send ( "Keyword %s already exists.\r\n", word.c_str() );
+                                return;
+                            }
+                    }
                     free ( OLC_DESC ( d )->keyword );
+                }
                 OLC_DESC ( d )->keyword = str_udup ( arg );
             }
             oedit_disp_extradesc_menu ( d );

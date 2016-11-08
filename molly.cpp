@@ -17,7 +17,7 @@
 
 
 /* external functions */
-char *find_exdesc(char *word, struct extra_descr_data *list);
+char *find_exdesc(const char *word, struct extra_descr_data *list);
 
 ACMD(do_smell)
 {

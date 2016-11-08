@@ -373,7 +373,7 @@ OCMD ( do_otransform )
 {
     char arg[MAX_INPUT_LENGTH];
     obj_data *o, tmpobj;
-    Character *wearer = NULL;
+    Character *wearer = nullptr, *carrier = nullptr;
     int pos = 0;
     long objid = 0;
 
@@ -395,6 +395,7 @@ OCMD ( do_otransform )
         if ( GET_OBJ_TYPE ( obj ) == ITEM_CONTAINER && GET_OBJ_TYPE ( o ) != ITEM_CONTAINER )
         {
             obj_log ( obj, "otransform: trying to transform a container to non-container [%d]", GET_OBJ_VNUM ( o ) );
+            extract_obj ( o );
             return;
         }
 
@@ -405,6 +406,11 @@ OCMD ( do_otransform )
             pos = obj->worn_on;
             wearer = obj->worn_by;
             unequip_char ( obj->worn_by, pos );
+        }
+        else if ( obj->carried_by )
+        {
+            carrier = obj->carried_by;
+            obj_from_char ( obj );
         }
 
         /* move new obj info over to old object and delete new obj */
@@ -424,8 +430,14 @@ OCMD ( do_otransform )
 
         if ( wearer )
         {
-            equip_char ( wearer, obj, pos );
+            if ( can_wear_on_pos ( obj, pos ) )
+                equip_char ( wearer, obj, pos );
+            else
+                obj_to_char ( obj, wearer );
         }
+        else if ( carrier )
+            obj_to_char ( obj, carrier );
+
         GET_ID ( o ) = objid;
         extract_obj ( o );
     }

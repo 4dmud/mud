@@ -892,7 +892,7 @@ class Room;
 #define ITEM_PC_CORPSE        32   /* Item is a players corpse         */
 #define ITEM_NPC_CORPSE       33   /* Item is a NPC corpse             */
 #define ITEM_ARTIFACT         34   /* Item is an Artifact - QIC        */
-#define   ITEM_UNIQUE_SAVE    35   /* Item is unique                   */
+#define ITEM_UNIQUE_SHORTDESC 35   /* Item's shortdesc is different from prototype */
 #define ITEM_NO_LOCATE        36   /* Item can't be located with spell */
 #define ITEM_HIDDEN           37   /* Item is hidden                   */
 #define ITEM_POISONED_1       38   /* Item has been poisoned           */
@@ -1350,7 +1350,6 @@ struct obj_data {
     struct obj_affected_type orig_affected[MAX_OBJ_AFFECT]; /* original positive stats that are lost when Quality goes down */
 
     char *name;               /* Title of object :get etc.        */
-    //vector<string> Names;
     char *description;        /* When in room                     */
     char *smell;         /* The objects smell                */
     char *taste;         /* The objects taste                */
@@ -1372,17 +1371,15 @@ struct obj_data {
     struct script_data *script;    /* script info for the object       */
 
     struct obj_data *next_content; /* For 'contains' lists             */
-    //struct obj_data *next;    /* For the object list              */
     Character *sitting_here;  /* Who is sitting in it (null if none)   */
     obj_vnum was_vnum;  /* object is child of object proto with that vnum */
     long owner;
     obj_vnum skin; /* for if it is a corpse */
     struct travel_point_data *travel_list;
-    struct ident_list *idents;
+    struct ident_list *idents; /* ids of players who identified this object */
     struct vehicle_attachment_data *attachment;   /* attachments for vehicle */
     Character *following;    /* for floating discs, carts, etc */
     char extracted;
-
 };
 
 /* ======================================================================= */

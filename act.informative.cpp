@@ -150,7 +150,7 @@ void do_auto_exits ( Character *ch );
 ACMD ( do_exits );
 void look_in_direction ( Character *ch, int dir );
 void look_in_obj ( Character *ch, char *arg, struct obj_data *item );
-char *find_exdesc ( char *word, struct extra_descr_data *list );
+char *find_exdesc ( const char *word, struct extra_descr_data *list );
 void look_at_target ( Character *ch, char *arg );
 void look_above_target ( Character *ch, char *arg );
 void look_behind_target ( Character *ch, char *arg );
@@ -337,7 +337,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch, int mode, int show
         num = 0;
 
         for ( j = list; j != i; j = j->next_content )
-            if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
+            if ( j->item_number == NOTHING || IS_UNIQUE ( j ) || IS_UNIQUE ( i ) )
             {
                 if ( strcmp ( j->short_description, i->short_description ) == 0 )
                     break;
@@ -350,7 +350,7 @@ void list_obj_to_char ( struct obj_data *list, Character *ch, int mode, int show
 
 
         for ( j = i; j; j = j->next_content )
-            if ( j->item_number == NOTHING || IS_SET_AR ( GET_OBJ_EXTRA ( j ), ITEM_UNIQUE_SAVE ) || IS_SET_AR ( GET_OBJ_EXTRA ( i ), ITEM_UNIQUE_SAVE ) )
+            if ( j->item_number == NOTHING || IS_UNIQUE ( j ) || IS_UNIQUE ( i ) )
             {
                 if ( strcmp ( j->short_description, i->short_description ) == 0 )
                     num++;
@@ -1765,7 +1765,7 @@ void look_in_obj ( Character *ch, char *arg, struct obj_data *item )
 
 
 
-char *find_exdesc ( char *word, struct extra_descr_data *list )
+char *find_exdesc ( const char *word, struct extra_descr_data *list )
 {
     struct extra_descr_data *i;
 
@@ -1822,7 +1822,9 @@ void look_at_target ( Character *ch, char *arg )
     for ( obj = ch->carrying; obj && !found; obj = obj->next_content )
     {
         if ( CAN_SEE_OBJ ( ch, obj ) )
-            if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL && ++i == fnum )
+        {
+            desc = find_exdesc ( arg, obj->ex_description );
+            if ( desc != NULL && ++i == fnum )
             {
                 if ( !strcmp ( desc, "Undefined" ) )
                     ch->Send ( "You see nothing special.\r\n" );
@@ -1849,6 +1851,7 @@ void look_at_target ( Character *ch, char *arg )
                 }
                 found = TRUE;
             }
+        }
     }
 
     /* Is the target a character? */
@@ -1865,20 +1868,20 @@ void look_at_target ( Character *ch, char *arg )
     }
 
     /* Does the argument match an extra desc of an object in the room? */
-    for ( obj = IN_ROOM ( ch )->contents; obj && !found;
-            obj = obj->next_content )
+    for ( obj = IN_ROOM ( ch )->contents; obj && !found; obj = obj->next_content )
         if ( CAN_SEE_OBJ ( ch, obj ) )
-            if ( ( desc = find_exdesc ( arg, obj->ex_description ) ) != NULL
-                    && ++i == fnum )
+        {
+            desc = find_exdesc ( arg, obj->ex_description );
+            if ( desc != NULL && ++i == fnum )
             {
                 *ch << desc;
                 found = TRUE;
             }
+        }
 
     /* Does the argument match an extra desc in the room? */
-    if ( ( desc =
-                find_exdesc ( arg, IN_ROOM ( ch )->ex_description ) ) != NULL
-            && ++i == fnum )
+    desc = find_exdesc ( arg, IN_ROOM ( ch )->ex_description );
+    if ( desc != NULL && ++i == fnum )
     {
         page_string ( ch->desc, desc, FALSE );
         return;
@@ -1887,9 +1890,9 @@ void look_at_target ( Character *ch, char *arg )
     /* Does the argument match an extra desc in the char's equipment? */
     for ( j = 0; j < NUM_WEARS && !found; j++ )
         if ( GET_EQ ( ch, j ) && CAN_SEE_OBJ ( ch, GET_EQ ( ch, j ) ) )
-            if ( ( desc =
-                        find_exdesc ( arg, GET_EQ ( ch, j )->ex_description ) ) != NULL
-                    && ++i == fnum )
+        {
+            desc = find_exdesc ( arg, GET_EQ ( ch, j )->ex_description );
+            if ( desc != NULL && ++i == fnum )
             {
                 *ch << desc;
                 if ( GET_OBJ_TYPE ( GET_EQ ( ch, j ) ) == ITEM_GUN )
@@ -1903,6 +1906,7 @@ void look_at_target ( Character *ch, char *arg )
                 }
                 found = TRUE;
             }
+        }
 
     /* If an object was found back in generic_find */
     if ( bits )
@@ -2029,8 +2033,6 @@ ACMD ( do_examine )
     generic_find ( arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM |
                    FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object );
 
-
-
     if ( tmp_object )
     {
         int has_identifier ( struct obj_data *obj, long id );
@@ -2040,7 +2042,8 @@ ACMD ( do_examine )
 
         strcpy ( arg2, arg );
         get_number ( &arg_copy );
-        if ( ( desc = find_exdesc ( arg_copy, tmp_object->ex_description ) ) != NULL )
+        desc = find_exdesc ( arg_copy, tmp_object->ex_description );
+        if ( desc )
             page_string ( ch->desc, desc, FALSE );
         else ch->Send ( "You see nothing special.\r\n" );
 

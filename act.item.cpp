@@ -289,7 +289,7 @@ void improve_skill ( Character *ch, int skill );
 int has_weapon ( Character *ch );
 int get_weapon_speed ( OBJ_DATA *wep );
 int wep_hands ( OBJ_DATA *wep );
-char *find_exdesc ( char *word, struct extra_descr_data *list );
+char *find_exdesc ( const char *word, struct extra_descr_data *list );
 int house_capacity ( room_vnum house );
 int find_house ( room_vnum vnum );
 void crumble_obj ( Character *ch, OBJ_DATA *obj );
@@ -2368,12 +2368,12 @@ ACMD ( do_drink )
         ch->Send ( "Drink from what?\r\n" );
         return;
     }
-    if ( ! ( temp = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying ) ) )
+
+    temp = get_obj_in_list_vis ( ch, arg, NULL, ch->carrying );
+    if ( !temp )
     {
-        if ( !
-                ( temp =
-                      get_obj_in_list_vis ( ch, arg, NULL,
-                                            IN_ROOM ( ch )->contents ) ) )
+        temp = get_obj_in_list_vis ( ch, arg, NULL, IN_ROOM ( ch )->contents );
+        if ( !temp )
         {
             ch->Send ( "You can't find it!\r\n" );
             return;
@@ -2436,12 +2436,11 @@ ACMD ( do_drink )
     }
     else
     {
-        if ( ( GET_COND ( ch, DRUNK ) > ( 5+ ( total_chance ( ch, SKILL_DRUNK ) / 4 ) ) ) && ( GET_COND ( ch, THIRST ) > 0 ) )
+        if ( ( GET_COND ( ch, DRUNK ) > ( 5 + ( total_chance ( ch, SKILL_DRUNK ) / 4 ) ) ) && ( GET_COND ( ch, THIRST ) > 0 ) )
         {
             /* The pig is drunk */
             ch->Send ( "You can't seem to get close enough to your mouth.\r\n" );
-            act ( "$n tries to drink but misses $s mouth!", TRUE, ch, 0, 0,
-                  TO_ROOM );
+            act ( "$n tries to drink but misses $s mouth!", TRUE, ch, 0, 0, TO_ROOM );
             return;
         }
         if ( ( GET_COND ( ch, FULL ) > 47 ) && ( GET_COND ( ch, THIRST ) > 0 ) )
@@ -3194,7 +3193,6 @@ OBJ_DATA * create_vial ( void )
     vial = create_obj ( NOTHING );
 
     GET_OBJ_TYPE ( vial ) = ITEM_VIAL;
-    SET_BIT_AR ( GET_OBJ_EXTRA ( vial ), ITEM_UNIQUE_SAVE );
     GET_OBJ_VAL ( vial, 0 ) = type;
     GET_OBJ_VAL ( vial, 1 ) = number ( 0, size );
     GET_OBJ_VAL ( vial, 2 ) = size;
@@ -3226,12 +3224,9 @@ void update_timer ( struct obj_data *obj )
     if ( GET_TIMER_EVENT ( obj ) == NULL ||
             ( t < event_time ( GET_TIMER_EVENT ( obj ) ) ) )
     {
-
         /* take off old event, create updated event */
         if ( GET_TIMER_EVENT ( obj ) != NULL )
             event_cancel ( GET_TIMER_EVENT ( obj ) );
-        else
-            GET_TIMER_EVENT ( obj ) = NULL;
 
         tmr = new timer_event_data ( obj );
         GET_TIMER_EVENT ( obj ) = event_create ( timer_event, tmr, t, EVENT_TYPE_TIMER );

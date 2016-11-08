@@ -13,6 +13,58 @@
 /* external functions */
 char *str_udup(const char *txt);
 void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
+char *find_exdesc ( const char *word, struct extra_descr_data *list );
+
+int edit_extra_desc ( obj_data *obj, const char *keyword, const char *description )
+{
+    /*
+     * Returns 0: success
+     *         1: a word in the keyword already exists
+     *         2: the keyword and description already exist
+     *
+     * If there was an edit, it will be put in the head because read_one_item
+     * compares the head with the prototype.
+     */
+
+    // If the keyword matches, replace the description if it's different
+    int rn = real_object ( GET_OBJ_VNUM ( obj ) );
+    for ( extra_descr_data *ed = obj->ex_description, *prev = nullptr; ed; prev = ed, ed = ed->next )
+        if ( !strcmp ( keyword, ed->keyword ) )
+        {
+            if ( !strcmp ( description, ed->description ) )
+                return 2;
+
+            if ( obj->ex_description == obj_proto[rn].ex_description )
+                copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
+
+            // Edit the ex_desc and move it to the head
+            free ( ed->description );
+            ed->description = str_udup ( description );
+            if ( prev )
+            {
+                prev->next = ed->next;
+                ed->next = obj->ex_description;
+                obj->ex_description = ed;
+            }
+            return 0;
+        }
+
+    // Check if one of the words in keyword abbreviates an existing keyword
+    string key = string ( keyword ), word;
+    istringstream iss ( key );
+    while ( iss >> word )
+        if ( find_exdesc ( word.c_str(), obj->ex_description ) )
+            return 1;
+
+    // Add the new ex_desc at the head
+    extra_descr_data *ex_new;
+    CREATE ( ex_new, struct extra_descr_data, 1 );
+    ex_new->keyword = str_udup ( keyword );
+    ex_new->description = str_udup ( description );
+    ex_new->next = obj->ex_description;
+    obj->ex_description = ex_new;
+    return 0;
+}
 
 ACMD(do_string)
 {
@@ -24,100 +76,74 @@ ACMD(do_string)
   half_chop(argument, buf, argument);
   half_chop(argument, buf1, buf2);
 
-
   if (!*buf || !*buf1 || !*buf2)
   {
-    send_to_char("Usage: string <obj> <field> <value>\r\n", ch);
+    ch->Send ( "Usage: string <obj> <field> <value>\r\n"
+               "       string <obj> extra '<keywords>' <description>\r\n" );
     return;
   }
 
-
-
-  if (!(obj = get_obj_in_list_vis(ch, buf, NULL,ch->carrying)))
+  obj = get_obj_in_list_vis(ch, buf, NULL,ch->carrying);
+  if ( !obj )
   {
-    send_to_char("No such object around.\r\n", ch);
+    ch->Send ( "No such object around.\r\n" );
     return;
   }
 
   obj_rnum rn = GET_OBJ_RNUM ( obj );
   if (!strcmp("name", buf1))
   {
-    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
     if ( obj->name && ( rn == NOTHING || obj->name != obj_proto[rn].name ) )
       free ( obj->name );
     obj->name = str_udup ( buf2 );
   }
   else if (!str_cmp("short", buf1))
   {
-    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
+    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SHORTDESC );
     if ( obj->short_description && ( rn == NOTHING || obj->short_description != obj_proto[rn].short_description ) )
       free ( obj->short_description );
     obj->short_description = str_udup ( buf2 );
   }
   else if (!str_cmp("long", buf1))
   {
-    SET_BIT_AR ( GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE );
     if ( obj->description && ( rn == NOTHING || obj->description != obj_proto[rn].description ) )
       free ( obj->description );
     obj->description = str_udup ( buf2 );
   }
   else if (!str_cmp("extra", buf1))
   {
-    half_chop ( buf2, buf1, buf2 );
-    SET_BIT_AR ( GET_OBJ_EXTRA ( obj ), ITEM_UNIQUE_SAVE );
-    bool ex_was_proto = FALSE;
-    if ( rn != NOTHING && obj->ex_description == obj_proto[rn].ex_description )
+    string arg = string ( buf2 );
+    size_t pos = arg.find ( "'", 1 );
+    if ( arg[0] != '\'' || pos == string::npos )
     {
-        copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
-        ex_was_proto = TRUE;
+        ch->Send ( "Usage: string <obj> extra '<keywords>' <description>\r\n" );
+        return;
     }
 
-    extra_descr_data *ex_desc = obj->ex_description;
-    if ( ex_desc == NULL )
+    string keywords = arg.substr ( 1, pos-1 );
+    string desc = arg.substr ( pos+2 );
+    int result = edit_extra_desc ( obj, keywords.c_str(), desc.c_str() );
+    if ( result == 1 )
     {
-        CREATE ( ex_desc, extra_descr_data, 1 );
-        ex_desc->keyword = str_udup ( buf1 );
-        ex_desc->description = str_udup ( buf2 );
-        ex_desc->next = NULL;
+        ch->Send ( "One of the keywords already exists.\r\n" );
+        return;
     }
-    else if ( ex_desc->keyword == NULL )
+    else if ( result == 2 )
     {
-        ex_desc->keyword = str_udup ( buf1 );
-        ex_desc->description = str_udup ( buf2 );
-        ex_desc->next = NULL;
-    }
-    else for ( ; ex_desc; ex_desc = ex_desc->next )
-    {
-        if ( strstr ( ex_desc->keyword, buf1 ) )
-        {
-            if ( !ex_was_proto )
-                free_string ( &ex_desc->description );
-            ex_desc->description = str_udup ( buf2 );
-            break;
-        }
-        else if ( ex_desc->next == NULL )
-        {
-            CREATE ( ex_desc->next, extra_descr_data, 1 );
-            ex_desc->next->keyword = str_udup ( buf1 );
-            ex_desc->next->description = str_udup ( buf2 );
-            ex_desc->next->next = NULL;
-            break;
-        }
+        ch->Send ( "This extra description already exists.\r\n" );
+        return;
     }
   }
   else if (!str_cmp("weight", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_WEIGHT(obj) = atoi(buf2);
   }
   else if (!str_cmp("cost", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_COST(obj) = atoi(buf2);
   }
   else if (!str_cmp("rent", buf1))
   {
-    SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_UNIQUE_SAVE);
     GET_OBJ_RENT(obj) = atoi(buf2);
   }
   else if (!str_cmp("timer", buf1))
@@ -141,9 +167,9 @@ ACMD(do_string)
     GET_OBJ_VAL(obj, 3) = atoi(buf2);
   }
   else
-    send_to_char("You can't set that field.\r\n", ch);
+    ch->Send ( "You can't set that field.\r\n" );
 
-  send_to_char("Ok.\r\n", ch);
+  ch->Send ( "Ok.\r\n" );
   return;
 }
 

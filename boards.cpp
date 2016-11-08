@@ -114,7 +114,7 @@ int board_index(struct obj_data *obj);
 void init_boards(void);
 
 /* external functions */
-char *find_exdesc ( char *word, struct extra_descr_data *list );
+char *find_exdesc ( const char *word, struct extra_descr_data *list );
 
 char *msg_storage[INDEX_SIZE];
 int msg_storage_taken[INDEX_SIZE];
