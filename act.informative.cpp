@@ -1879,14 +1879,6 @@ void look_at_target ( Character *ch, char *arg )
             }
         }
 
-    /* Does the argument match an extra desc in the room? */
-    desc = find_exdesc ( arg, IN_ROOM ( ch )->ex_description );
-    if ( desc != NULL && ++i == fnum )
-    {
-        page_string ( ch->desc, desc, FALSE );
-        return;
-    }
-
     /* Does the argument match an extra desc in the char's equipment? */
     for ( j = 0; j < NUM_WEARS && !found; j++ )
         if ( GET_EQ ( ch, j ) && CAN_SEE_OBJ ( ch, GET_EQ ( ch, j ) ) )
@@ -1916,11 +1908,20 @@ void look_at_target ( Character *ch, char *arg )
         else
         {
             show_obj_modifiers ( found_obj, ch );
-            *ch << "\r\n";
+            ch->Send ( "\r\n" );
         }
+        return;
     }
-    else if ( !found )
-        *ch << "You do not see that here.\r\n";
+
+    /* Does the argument match an extra desc in the room? */
+    desc = find_exdesc ( arg, IN_ROOM ( ch )->ex_description );
+    if ( desc != NULL && ++i == fnum )
+    {
+        page_string ( ch->desc, desc, FALSE );
+        return;
+    }
+
+    ch->Send ( "You do not see that here.\r\n" );
 }
 
 
