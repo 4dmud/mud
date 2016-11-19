@@ -32,6 +32,7 @@
 #include "protocol.h"
 
 extern struct time_info_data time_info;
+extern const char *moon_types[];
 
 const char *simple_class_name ( Character *ch );
 int fighter_damroll ( Character *ch );
@@ -182,6 +183,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
 // { eMSDP_ROOM_VNUM,        "ROOM_VNUM",        NUMBER_READ_ONLY },
    { eMSDP_LOCATION_MAP,     "LOCATION_MAP",     STRING_READ_ONLY },
    { eMSDP_WORLD_TIME,       "WORLD_TIME",       NUMBER_READ_ONLY },
+   { eMSDP_MOON_PHASE,       "MOON_PHASE",       STRING_READ_ONLY },
+   { eMSDP_WHO,              "WHO",              STRING_READ_ONLY },
 
    /* Configurable variables */
    { eMSDP_CLIENT_ID,        "CLIENT_ID",        STRING_WRITE_ONCE(1,40) },
@@ -1176,6 +1179,27 @@ void msdp_update( void )
             ++PlayerCount;
 
             MSDPSetNumber ( d, eMSDP_WORLD_TIME, time_info.hours );
+            MSDPSetString ( d, eMSDP_MOON_PHASE, moon_types[time_info.moon] );
+
+            string wholist;
+            for ( Descriptor *desc = descriptor_list; desc; desc = desc->next )
+            {
+                if ( !IS_PLAYING ( desc ) )
+                    continue;
+
+                Character *wch = desc->character;
+                if ( desc->original )
+                    wch = desc->original;
+
+                if ( !wch || !CAN_SEE ( ch, wch ) )
+                    continue;
+
+                if ( wholist == "" )
+                    wholist = string ( GET_NAME ( wch ) );
+                else
+                    wholist += " " + string ( GET_NAME ( wch ) );
+            }
+            MSDPSetString ( d, eMSDP_WHO, wholist.c_str() );
 
             bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
                GET_CLASS( ch ) == CLASS_MAGE ||

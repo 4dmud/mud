@@ -142,6 +142,8 @@ typedef enum
 //   eMSDP_ROOM_VNUM,  // giving this would make mazes too easy
    eMSDP_LOCATION_MAP,
    eMSDP_WORLD_TIME,
+   eMSDP_MOON_PHASE,
+   eMSDP_WHO,
 
    /* Configuration */
    eMSDP_CLIENT_ID,
