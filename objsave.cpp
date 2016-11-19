@@ -1532,17 +1532,8 @@ void save_crashproof_room ( Room *room )
     REMOVE_BIT_AR ( ROOM_FLAGS ( room ), ROOM_CRASHPROOF );
     string filename = string ( LIB_CRASHPROOF ) + to_string ( GET_ROOM_VNUM ( room ) );
 
-    if ( result == 1 )
-    {
-        if ( rename ( tmpfile.c_str(), filename.c_str() ) == -1 )
-            new_mudlog ( NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", filename.c_str() );
-    }
-    else
-    {
-        if ( remove ( tmpfile.c_str() ) == -1)
-            new_mudlog(NRM, LVL_GOD, TRUE, "Unable to remove temp file: %s", tmpfile.c_str() );
-        remove ( filename.c_str() );
-    }
+    if ( rename ( tmpfile.c_str(), filename.c_str() ) == -1 )
+        new_mudlog ( NRM, LVL_GOD, TRUE, "Major error (no disk space) can't save file: %s", filename.c_str() );
 
     return;
 }
