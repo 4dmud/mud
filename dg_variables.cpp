@@ -3876,7 +3876,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     {
                         room_rnum room_id = real_room ( r->number );
                         if ( room_id != NULL )
-                            snprintf ( str, slen, "%ld", ( long ) room_id + ROOM_ID_BASE );	/* added by welcor */
+                            snprintf ( str, slen, "%ld", ( long ) r->number + ROOM_ID_BASE );	/* added by welcor */
                         else
                             *str = '\0';
 

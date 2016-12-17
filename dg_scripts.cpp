@@ -1199,26 +1199,32 @@ void find_uid_name ( char *uid, char *name, size_t nlen )
 {
     Character *ch;
     obj_data *obj;
+    Room *room;
 
     if ( ( ch = get_char ( uid ) ) )
-        snprintf ( name, nlen, "%s", ch->player.name );
+        snprintf ( name, nlen, "%s (uid of %s)", uid, GET_NAME ( ch ) );
     else if ( ( obj = get_obj ( uid ) ) )
-        snprintf ( name, nlen, "%s", obj->name );
+        snprintf ( name, nlen, "%s (uid of %s)", uid, obj->short_description );
+    else if ( ( room = get_room ( uid ) ) )
+        snprintf ( name, nlen, "%s (uid of %s)", uid, room->name );
     else
-        snprintf ( name, nlen, "uid = %s, (not found)", uid + 1 );
+        snprintf ( name, nlen, "%s", uid );
 }
 /* find the name of what the uid points to */
 void find_uid_name ( string &uid, char *name, size_t nlen )
 {
     Character *ch;
     obj_data *obj;
+    Room *room;
 
     if ( ( ch = get_char ( uid.c_str() ) ) )
-        snprintf ( name, nlen, "%s", ch->player.name );
-    else if ( ( obj = get_obj ( ( char * ) uid.c_str() ) ) )
-        snprintf ( name, nlen, "%s", obj->name );
+        snprintf ( name, nlen, "%s (uid of %s)", uid.c_str(), GET_NAME ( ch ) );
+    else if ( ( obj = get_obj ( uid.c_str() ) ) )
+        snprintf ( name, nlen, "%s (uid of %s)", uid.c_str(), obj->short_description );
+    else if ( ( room = get_room ( uid.c_str() ) ) )
+        snprintf ( name, nlen, "%s (uid of %s)", uid.c_str(), room->name );
     else
-        snprintf ( name, nlen, "uid = %s, (not found)", uid.c_str() + 1 );
+        snprintf ( name, nlen, "%s", uid.c_str() );
 }
 
 
