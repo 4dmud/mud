@@ -1920,8 +1920,8 @@ void look_at_target ( Character *ch, char *arg )
         page_string ( ch->desc, desc, FALSE );
         return;
     }
-
-    ch->Send ( "You do not see that here.\r\n" );
+    else if ( !found )
+        ch->Send ( "You do not see that here.\r\n" );
 }
 
 
