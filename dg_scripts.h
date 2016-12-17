@@ -234,17 +234,16 @@ class Breakpoint {
     public:
     int line_nr;
     bool stop;     // stop at this breakpoint
-    bool stepping; /* if true then this is a temporary breakpoint because we're
-                      stepping through the trigger */
 
     Breakpoint() {};
-    Breakpoint(int num, bool step, bool hold = true): line_nr(num), stop(hold), stepping(step) {};
+    Breakpoint(int num, bool hold = true): line_nr(num), stop(hold) {};
 };
 
 class TrigDebug {
     public:
     void *thing;             // the mob/obj/room the trigger is on
     int type;                // for casting thing to mob/obj/room
+    bool stepping;           // we're stepping through the trigger with 'dbg next'
     vector<Character*> chs;  // the imms debugging this trigger
     vector<Breakpoint> breakpoints;
 

@@ -539,7 +539,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
             {
                 if ( !field || !*field || !subfield || !*subfield )
                 {
-                    script_log ( "Trigger: %s, VNum %d. findmob.vnum(mvnum) - illegal syntax. Line %d: %s",
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d. findmob.vnum(mvnum) - illegal syntax. Line %d: %s",
                         GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     strcpy ( str, "0" );
                 }
@@ -550,7 +551,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     if ( rrnum == NULL )
                     {
-                        script_log ( "Trigger: %s, VNum %d. findmob.vnum(ovnum): No room with vnum %d. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), atoi ( field ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                            script_log ( "Trigger: %s, VNum %d. findmob.vnum(ovnum): No room with vnum %d. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), atoi ( field ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         strcpy ( str, "0" );
                     }
                     else
@@ -570,7 +572,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
             {
                 if ( !field || !*field || !subfield || !*subfield )
                 {
-                    script_log ( "Trigger: %s, VNum %d. findobj.vnum(ovnum) - illegal syntax. Line %d: %s",
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d. findobj.vnum(ovnum) - illegal syntax. Line %d: %s",
                         GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     strcpy ( str, "0" );
                 }
@@ -580,7 +583,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     if ( rrnum == NULL )
                     {
-                        script_log ( "Trigger: %s, VNum %d. findobj.vnum(ovnum): No room with vnum %d. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), atoi ( field ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                            script_log ( "Trigger: %s, VNum %d. findobj.vnum(ovnum): No room with vnum %d. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), atoi ( field ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         strcpy ( str, "0" );
                     }
                     else
@@ -594,7 +598,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
             {
                 if ( !field || !*field || !subfield || !*subfield || !is_number (field) || !is_number (subfield) )
                 {
-                    script_log ( "Trigger: %s, VNum %d, mod.x(y) - illegal syntax. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d, mod.x(y) - illegal syntax. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     strcpy ( str, "0" );
                 }
                 else if ( atoi ( field ) < 0 || atoi ( subfield ) <= 0 )
@@ -770,7 +775,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     }
                     else
                     {
-                        script_log ( "Trigger: %s, VNum %d. assemble.exists called without a subfield. Line %d: %s",GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                            script_log ( "Trigger: %s, VNum %d. assemble.exists called without a subfield. Line %d: %s",GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         snprintf ( str, slen, "0" );
                     }
                 }
@@ -880,7 +886,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             else if ( ( pObject = read_object ( lVnum, VIRTUAL ) ) == NULL )
                             {
                                 snprintf ( str, slen, "0" );
-                                script_log ( "Trigger: %s, VNum %d. assemble vnum '%d' for '%s' doesnt exist. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), lVnum, subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. assemble vnum '%d' for '%s' doesnt exist. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), lVnum, subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                                 snprintf ( str, slen, "0" );
                             }
                             else
@@ -1479,7 +1486,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             else
                             {
                                 GET_MANA ( c ) = 0;
-                                script_log ( "Trigger: %s, VNum %d. attempt to set mana to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. attempt to set mana to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                             }
                             alter_mana ( c,0 );
 
@@ -1495,8 +1503,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                                 GET_MOVE ( c ) = newmove;
                             else
                             {
-                                GET_MOVE ( c ) =0;
-                                script_log ( "Trigger: %s, VNum %d. attempt to set movepoints to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                                GET_MOVE ( c ) = 0;
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. attempt to set movepoints to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                             }
                             alter_move ( c, 0 );
                         }
@@ -1797,10 +1806,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                                 GET_STAMINA ( c ) = newstamina;
                             else
                             {
-                                GET_STAMINA ( c ) =0;
-                                script_log ( "Trigger: %s, VNum %d. attempt to set movepoints to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                                GET_STAMINA ( c ) = 0;
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. attempt to set movepoints to a negative number. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                             }
-                            alter_stamina ( c,0 );
+                            alter_stamina ( c, 0 );
                         }
                         snprintf ( str, slen, "%d", GET_STAMINA ( c ) );
                     }
@@ -1959,13 +1969,15 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     else
                     {
                         *str = '\0';
-                        script_log ( "Trigger: %s, VNum %d. unknown char field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                            script_log ( "Trigger: %s, VNum %d. unknown char field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     }
                 }
                 else
                 {
                     *str = '\0';
-                    script_log ( "Trigger: %s, VNum %d. unknown char field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d. unknown char field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                 }
             }
         } /* if (c) ...*/
@@ -2833,8 +2845,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         {
                             num = atoi ( subfield );
                             if ( num < 0 || num >= NUM_COLOUR_NAMES )
-                                script_log ( "Trigger %d: colour value out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            else GET_OBJ_COLOUR ( o ) = num;
+                            {
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger %d: colour value out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
+                            else
+                                GET_OBJ_COLOUR ( o ) = num;
                             strcpy ( str, "" );
                         }
                     }
@@ -3173,8 +3189,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         {
                             num = atoi ( subfield );
                             if ( !is_number ( subfield ) || num < 0 || num >= NUM_MATERIAL_TYPES )
-                                script_log ( "Trigger %d: material type out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            else GET_OBJ_MATERIAL ( o ) = num;
+                            {
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger %d: material type out of range. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
+                            else
+                                GET_OBJ_MATERIAL ( o ) = num;
                             strcpy ( str, "" );
                         }
                     }
@@ -3219,8 +3239,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         {
                             num = atoi ( subfield );
                             if ( num < 0 )
-                                script_log ( "Trigger %d: trying to set a negative number of repairs. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
-                            else GET_OBJ_REPAIRS ( o ) = num;
+                            {
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger %d: trying to set a negative number of repairs. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
+                            else
+                                GET_OBJ_REPAIRS ( o ) = num;
                             *str = '\0';
                         }
                     }
@@ -3236,10 +3260,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         {
                             long x = atol ( subfield );
                             if ( !is_number ( subfield ) )
-                                script_log ( "Trigger %d: passing %s to owned_by. Line %d: %s", GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            {
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger %d: passing %s to owned_by. Line %d: %s", GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                             else if ( pi.NameById ( x ) )
                                 o->owner = x;
-                            else
+                            else if ( trig->curr_state )
                                 script_log ( "Trigger %d: passing invalid id %ld to owned_by. Line %d: %s", GET_TRIG_VNUM ( trig ), x, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                             *str = '\0';
                         }
@@ -3653,13 +3680,15 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     else
                     {
                         *str = '\0';
-                        script_log ( "Trigger: %s, VNum %d, type: %d. unknown object field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                            script_log ( "Trigger: %s, VNum %d, type: %d. unknown object field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     }
                 }
                 else
                 {
                     *str = '\0';
-                    script_log ( "Trigger: %s, VNum %d, type: %d. unknown object field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d, type: %d. unknown object field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                 }
             }
         } /* if (o) ... */
@@ -3778,7 +3807,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         if ( !subfield || !*subfield )
                         {
                             *str = '\0';
-                            script_log ( "Trigger: %s, VNum %d. no room flag specified. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            if ( trig->curr_state )
+                                script_log ( "Trigger: %s, VNum %d. no room flag specified. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         }
                         else if ( !strcasecmp ( subfield, "death" ) )
                         {
@@ -3825,7 +3855,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         else
                         {
                             *str = '\0';
-                            script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            if ( trig->curr_state )
+                                script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         }
                     }
                     break;
@@ -4082,13 +4113,15 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     else
                     {
                         *str = '\0';
-                        script_log ( "Trigger: %s, VNum %d, type: %d. unknown room field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                        if ( trig->curr_state )
+                           script_log ( "Trigger: %s, VNum %d, type: %d. unknown room field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                     }
                 }
                 else
                 {
                     *str = '\0';
-                    script_log ( "Trigger: %s, VNum %d, type: %d. unknown room field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                    if ( trig->curr_state )
+                        script_log ( "Trigger: %s, VNum %d, type: %d. unknown room field: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), type, field, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                 }
             }
         }

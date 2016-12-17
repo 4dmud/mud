@@ -2620,37 +2620,34 @@ void process_attach ( void *go, struct script_data *sc, trig_data *trig, int typ
         }
 
         if ( SCRIPT ( c ) )
-        {
             has_trig = find_trigger ( SCRIPT ( c ), trig_v );
-            if ( !has_trig )
-                add_trigger ( SCRIPT ( c ), trig_to_add, -1 );
-        }
         else
             SCRIPT ( c ) = create_script();
+
+        if ( !has_trig )
+            add_trigger ( SCRIPT ( c ), trig_to_add, -1 );
     }
 
     else if ( o )
     {
         if ( SCRIPT ( o ) )
-        {
             has_trig = find_trigger ( SCRIPT ( o ), trig_v );
-            if ( !has_trig )
-                add_trigger ( SCRIPT ( o ), trig_to_add, -1 );
-        }
         else
             SCRIPT ( o ) = create_script();
+
+        if ( !has_trig )
+            add_trigger ( SCRIPT ( o ), trig_to_add, -1 );
     }
 
     else if ( r )
     {
         if ( SCRIPT ( r ) )
-        {
             has_trig = find_trigger ( SCRIPT ( r ), trig_v );
-            if ( !has_trig )
-                add_trigger ( SCRIPT ( r ), trig_to_add, -1 );
-        }
         else
             SCRIPT ( r ) = create_script();
+
+        if ( !has_trig )
+            add_trigger ( SCRIPT ( r ), trig_to_add, -1 );
     }
 
     if ( has_trig )
@@ -2723,7 +2720,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
                 if ( t->curr_state )
                     t->remove_me = TRUE;
                 else
-                    remove_trigger ( c, t, type );
+                    remove_trigger ( c, t, MOB_TRIGGER );
             }
             return;
         }
@@ -2734,7 +2731,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
             if ( t->curr_state )
                 t->remove_me = TRUE;
             else
-                remove_trigger ( c, t, type );
+                remove_trigger ( c, t, MOB_TRIGGER );
         }
         return;
     }
@@ -2749,7 +2746,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
                 if ( t->curr_state )
                     t->remove_me = TRUE;
                 else
-                    remove_trigger ( o, t, type );
+                    remove_trigger ( o, t, OBJ_TRIGGER );
             }
             return;
         }
@@ -2760,7 +2757,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
             if ( t->curr_state )
                 t->remove_me = TRUE;
             else
-                remove_trigger ( o, t, type );
+                remove_trigger ( o, t, OBJ_TRIGGER );
         }
         return;
     }
@@ -2775,7 +2772,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
                 if ( t->curr_state )
                     t->remove_me = TRUE;
                 else
-                    remove_trigger ( r, t, type );
+                    remove_trigger ( r, t, WLD_TRIGGER );
             }
             return;
         }
@@ -2786,7 +2783,7 @@ void process_detach ( void *go, struct script_data *sc, trig_data *trig,
             if ( t->curr_state )
                 t->remove_me = TRUE;
             else
-                remove_trigger ( r, t, type );
+                remove_trigger ( r, t, WLD_TRIGGER );
         }
         return;
     }
@@ -3824,6 +3821,14 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
     dg_owner_purged = 0;
 
+    // get breakpoints
+    vector<Breakpoint> *bps = nullptr;
+    auto debug = script_debug.find ( trig );
+    if ( debug != script_debug.end() )
+        bps = &debug->second.breakpoints;
+
+    bool first_line_to_execute = TRUE;
+
     for ( cl = trig->curr_state; cl && GET_TRIG_DEPTH ( trig ); cl = cl ? cl->next : NULL )
     {
         trig->curr_state = cl;
@@ -3835,11 +3840,9 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
             continue;
         }
 
-        auto debug = script_debug.find ( trig );
-        if ( debug != script_debug.end() )
+        if ( bps )
         {
-            auto &bps = debug->second.breakpoints;
-            for ( auto it = bps.begin(); it != bps.end(); ++it )
+            for ( auto it = bps->begin(); it != bps->end(); ++it )
                 if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) )
                 {
                     // do we need to break here?
@@ -3848,10 +3851,6 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
                         it->stop = TRUE;
                         break;
                     }
-
-                    // we're at a breakpoint, remove it if it's a stepping breakpoint
-                    if ( it->stepping )
-                        bps.erase ( it );
 
                     // tell the debuggers
                     for ( const auto &ch : script_debug[ trig ].chs )
@@ -3866,13 +3865,27 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
                 }
         }
 
+        // only execute one line if we're stepping
+        if ( first_line_to_execute )
+            first_line_to_execute = FALSE;
+        else if ( debug != script_debug.end() && debug->second.stepping )
+        {
+            for ( const auto &ch : script_debug[ trig ].chs )
+                ch->Send ( "{cy[DBG]{c0 Trigger %d breaks at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+
+            long when = 1e6 * PASSES_PER_SEC;
+            wait_event_data *wait_event_obj = new wait_event_data ( trig, go, type );
+            GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, when, EVENT_TYPE_TRIG );
+            depth--;
+            return ret_val;
+        }
+
         for ( p = cl->cmd; *p && isspace ( *p ); p++ )
             ;
 
         if ( *p == '*' )		/* comment */
             continue;
 
-        //var_subst ( go, sc, trig, type, p, cmd, sizeof ( cmd ) );
         if ( ( ( brac = check_braces ( p ) ) != 0 ) &&
                 ( !strn_cmp ( "elseif ", p, 7 ) || !strn_cmp ( "else", p, 4 ) || !strn_cmp ( "else if ", p, 8 ) ||
                   !strn_cmp ( p, "if ", 3 ) || !strn_cmp ( "while ", p, 6 ) || !strn_cmp ( "switch ", p, 7 ) ||
@@ -4116,6 +4129,10 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
         }
     }
+
+    // remove stepping so the trigger will run normally the next time
+    if  (debug != script_debug.end() )
+        debug->second.stepping = FALSE;
 
     depth--;
     if ( sc )
@@ -4424,6 +4441,14 @@ char *dbg_line ( trig_data *trig, int line_nr )
         if ( cl->line_nr == line_nr )
             return cl->cmd;
     return (char*) "";
+}
+
+void resume_trigger ( trig_data *trig, void *thing, int type )
+{
+    // delete the old wait and add a new wait with duration zero
+    event_cancel ( GET_TRIG_WAIT ( trig ) );
+    auto wait_event_obj = new wait_event_data ( trig, thing, type );
+    GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
 }
 
 ACMD ( do_dbg )
@@ -4782,18 +4807,16 @@ ACMD ( do_dbg )
             }
 
             // if there's a breakpoint here, turn it off so it won't break
+            debug.second.stepping = FALSE;
             vector<Breakpoint> &bps = debug.second.breakpoints;
             for ( auto it = bps.begin(); it != bps.end(); ++it )
-                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) && !it->stepping )
+                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) )
                 {
                     it->stop = FALSE;
                     break;
                 }
 
-            // delete the old wait and add a new wait with duration zero
-            event_cancel ( GET_TRIG_WAIT ( trig ) );
-            auto wait_event_obj = new wait_event_data ( trig, debug.second.thing, debug.second.type );
-            GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+            resume_trigger ( trig, debug.second.thing, debug.second.type );
 
             for ( const auto &Ch : debug.second.chs )
                 if ( Ch == ch )
@@ -4840,51 +4863,87 @@ ACMD ( do_dbg )
             }
 
             // if there's a breakpoint here, turn it off so it won't break
+            debug.second.stepping = TRUE;
             vector<Breakpoint> &bps = debug.second.breakpoints;
             for ( auto it = bps.begin(); it != bps.end(); ++it )
-                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) && !it->stepping )
+                if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) )
                 {
                     it->stop = FALSE;
                     break;
                 }
 
-            // delete the old wait and add a new wait with duration zero
-            event_cancel ( GET_TRIG_WAIT ( trig ) );
-            auto wait_event_obj = new wait_event_data ( trig, debug.second.thing, debug.second.type );
-            GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+            resume_trigger ( trig, debug.second.thing, debug.second.type );
 
-            // add a stepping breakpoint for the next line
-            if ( trig->curr_state->next )
-            {
-                bool bp_exists = FALSE;
-                for ( auto it = bps.begin(); it != bps.end(); ++it )
-                    if ( it->line_nr == GET_TRIG_LINE_NR ( trig ) + 1 )
-                    {
-                        bp_exists = TRUE;
-                        break;
-                    }
-
-                if ( !bp_exists )
-                {
-                    bps.push_back ( Breakpoint ( GET_TRIG_LINE_NR ( trig ) + 1, TRUE ) );
-                    sort ( bps.begin(), bps.end(), []( Breakpoint &a, Breakpoint &b ) {
-                            return a.line_nr < b.line_nr; });
-                }
-
-                for ( const auto &Ch : debug.second.chs )
-                    if ( Ch != ch )
-                        Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: next.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
-            }
-            else
-                for ( const auto &Ch : debug.second.chs )
-                    if ( Ch == ch )
-                        Ch->Send ( "{cy[DBG]{c0 Trigger %d: stepping over the last line.\r\n", GET_TRIG_VNUM ( trig ) );
-                    else
-                        Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: stepping over the last line.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+            for ( const auto &Ch : debug.second.chs )
+                if ( Ch != ch )
+                    Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: next.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
             return;
         }
 
         ch->Send ( "You're only debugging %d trigger%s.\r\n", trigger_count, trigger_count > 1 ? "s" : "" );
+    }
+    else if ( is_abbrev3 ( args[0], "print" ) )
+    {
+        if ( args.size() == 1 )
+        {
+            ch->Send ( "Usage: dbg print [<num>] <expr>\r\n" );
+            return;
+        }
+
+        int trigger_count = dbg_trigger_count ( ch ), num = 1, i = 0;
+        if ( trigger_count == 0 )
+        {
+            ch->Send ( "You're not debugging any triggers.\r\n" );
+            return;
+        }
+        else if ( trigger_count > 1 )
+        {
+            if ( !is_number ( args[1].c_str() ) )
+            {
+                ch->Send ( "Usage: dbg print <num> <expr>\r\n" );
+                return;
+            }
+        }
+
+        if ( is_number ( args[1].c_str() ) )
+            num = stoi ( args[1] );
+
+        string expr = args.back();
+
+        for ( auto &debug : script_debug )
+        {
+            if ( find ( debug.second.chs.begin(), debug.second.chs.end(), ch ) == debug.second.chs.end() )
+                continue;
+
+            i++;
+            if ( i < num )
+                continue;
+
+            trig = debug.first;
+            void *thing = debug.second.thing;
+            script_data *sc = nullptr;
+            switch ( debug.second.type )
+            {
+                case MOB_TRIGGER:
+                    sc = SCRIPT ( (Character*) thing );
+                    break;
+                case OBJ_TRIGGER:
+                    sc = SCRIPT ( (obj_data*) thing );
+                    break;
+                case WLD_TRIGGER:
+                    sc = SCRIPT ( (Room*) thing );
+                    break;
+                default:
+                {
+                    log ( "SYSERR: script_debug entry has unknown type %d", debug.second.type );
+                    return;
+                }
+            }
+            char result[MAX_INPUT_LENGTH];
+            var_subst ( thing, sc, trig, debug.second.type, (char*) expr.c_str(), result, sizeof result );
+            ch->Send ( "{cy[DBG]{c0 %s = %s\r\n", expr.c_str(), result );
+            return;
+        }
     }
     else if ( is_abbrev3 ( args[0], "set" ) )
     {
@@ -4942,21 +5001,9 @@ ACMD ( do_dbg )
                 for ( auto it = bps.begin(); it != bps.end(); ++it )
                     if ( it->line_nr == line_nr )
                     {
-                        char *line = dbg_line ( trig, line_nr );
-                        if ( it->stepping )
-                        {
-                            // turn the stepping breakpoint into a normal one
-                            it->stepping = FALSE;
-                            for ( const auto &Ch : debug.second.chs )
-                                if ( Ch == ch )
-                                    Ch->Send ( "{cy[DBG]{c0 Trigger %d: breakpoint set at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), line_nr, line );
-                                else
-                                    Ch->Send ( "{cy[DBG]{c0 [%s] Trigger %d: breakpoint set at line %d: %s\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ), line_nr, line );
-                            return;
-                        }
-
                         // breakpoint already exists, remove it
                         bps.erase ( it );
+                        char *line = dbg_line ( trig, line_nr );
                         for ( const auto &Ch : debug.second.chs )
                             if ( Ch == ch )
                                 Ch->Send ( "{cy[DBG]{c0 Trigger %d: removed breakpoint at line %d: %s\r\n", GET_TRIG_VNUM ( trig ), line_nr, line );
@@ -4966,7 +5013,7 @@ ACMD ( do_dbg )
                     }
 
                 // add breakpoint at line_nr
-                bps.push_back ( Breakpoint ( line_nr, FALSE ) );
+                bps.push_back ( Breakpoint ( line_nr ) );
                 sort ( bps.begin(), bps.end(), []( Breakpoint &a, Breakpoint &b ) {
                         return a.line_nr < b.line_nr; });
                 char *line = dbg_line ( trig, line_nr );
@@ -5108,7 +5155,7 @@ ACMD ( do_dbg )
         {
             if ( args.size() == 1 || !is_number ( args[1].c_str() ) )
             {
-                ch->Send ( "Usage: dbg list [<num>]\r\n" );
+                ch->Send ( "Usage: dbg delete [<num>]\r\n" );
                 return;
             }
             num = stoi ( args[1] );
@@ -5116,38 +5163,45 @@ ACMD ( do_dbg )
 
         for ( auto it = script_debug.begin(); it != script_debug.end(); it++ )
         {
-            if ( find ( it->second.chs.begin(), it->second.chs.end(), ch ) == it->second.chs.end() )
+            auto it_debugger = find ( it->second.chs.begin(), it->second.chs.end(), ch );
+            if ( it_debugger == it->second.chs.end() )
                 continue;
 
             i++;
             if ( i < num )
                 continue;
 
-            // resume the trigger if it's at a breakpoint
             auto trig = it->first;
-            if ( GET_TRIG_WAIT ( trig ) )
-            {
-                auto &bps = it->second.breakpoints;
-                for ( auto it_bp = bps.begin(); it_bp != bps.end(); it_bp++ )
-                {
-                    if ( it_bp->line_nr == GET_TRIG_LINE_NR ( trig ) )
-                    {
-                        event_cancel ( GET_TRIG_WAIT ( trig ) );
-                        auto wait_event_obj = new wait_event_data ( trig, it->second.thing, it->second.type );
-                        GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
-                        break;
-                    }
-                }
-                it = script_debug.erase ( it );
-            }
-
             for ( const auto &Ch : it->second.chs )
                 if ( Ch == ch )
                     Ch->Send ( "{cy[DBG]{c0 You stop debugging %d. Trigger %d.\r\n", num, GET_TRIG_VNUM ( trig ) );
                 else
                     Ch->Send ( "{cy[DBG]{c0 %s stops debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
-            script_debug.erase ( it );
-            break;
+
+            // resume the trigger if it's at a breakpoint and there's only one debugger
+            if ( GET_TRIG_WAIT ( trig ) && it->second.chs.size() == 1 )
+            {
+                if ( it->second.stepping )
+                    resume_trigger ( trig, it->second.thing, it->second.type );
+                else
+                {
+                    auto &bps = it->second.breakpoints;
+                    for ( auto it_bp = bps.begin(); it_bp != bps.end(); it_bp++ )
+                        if ( it_bp->line_nr == GET_TRIG_LINE_NR ( trig ) )
+                        {
+                            resume_trigger ( trig, it->second.thing, it->second.type );
+                            break;
+                        }
+                }
+            }
+
+            if ( it->second.chs.size() > 1 )
+                // remove the debugger
+                it->second.chs.erase ( it_debugger );
+            else
+                // stop debugging the trigger
+                script_debug.erase ( it );
+            return;
         }
 
         if ( num != i )

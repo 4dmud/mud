@@ -49,6 +49,7 @@ void update_char_objects ( Character *ch );
 
 
 /* external functions */
+void resume_trigger ( trig_data *trig, void *thing, int type );
 EVENTFUNC ( trig_wait_event );
 void save_player_shop (string owner );
 void unhitch_item ( struct obj_data *obj );
@@ -2302,24 +2303,24 @@ void extract_char_final ( Character *ch )
                 if ( it_ch != it->second.chs.end() )
                 {
                     for ( const auto &Ch : it->second.chs )
-                    if ( Ch != ch && Ch )
-                        Ch->Send ( "{cy[DBG]{c0 %s stops debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
+                        if ( Ch != ch && Ch )
+                            Ch->Send ( "{cy[DBG]{c0 %s stops debugging trigger %d.\r\n", GET_NAME ( ch ), GET_TRIG_VNUM ( trig ) );
                     it->second.chs.erase ( it_ch );
                 }
 
-                if ( it->second.chs.size() == 0 )
+                // resume the trigger if it's at a breakpoint and there are no debuggers left
+                if ( GET_TRIG_WAIT ( trig ) && it->second.chs.size() == 0 )
                 {
-                    // resume the trigger if it's at a breakpoint
-                    if ( GET_TRIG_WAIT ( trig ) )
+                    if ( it->second.stepping )
+                        resume_trigger ( trig, it->second.thing, it->second.type );
+                    else
                     {
                         auto &bps = it->second.breakpoints;
                         for ( auto it_bp = bps.begin(); it_bp != bps.end(); it_bp++ )
                         {
                             if ( it_bp->line_nr == GET_TRIG_LINE_NR ( trig ) )
                             {
-                                event_cancel ( GET_TRIG_WAIT ( trig ) );
-                                auto wait_event_obj = new wait_event_data ( trig, it->second.thing, it->second.type );
-                                GET_TRIG_WAIT ( trig ) = event_create ( trig_wait_event, wait_event_obj, 0, EVENT_TYPE_TRIG );
+                                resume_trigger ( trig, it->second.thing, it->second.type );
                                 break;
                             }
                         }
