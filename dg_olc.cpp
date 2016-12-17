@@ -989,8 +989,8 @@ int format_script(Descriptor *d) {
     char nsc[MAX_CMD_LENGTH], *t, line[READ_SIZE];
     char *sc;
     size_t len = 0, nlen = 0, llen = 0, brac = 0;
-    int indent = 0, i, line_num = 0;
-    bool indent_next = FALSE, found_case = FALSE, found_while = FALSE, first_case = FALSE, in_switch = FALSE;
+    int indent = 0, i, line_num = 0, while_count = 0;
+    bool indent_next = FALSE, found_case = FALSE, first_case = FALSE, in_switch = FALSE;
 
     if (!d->str || !*d->str)
         return FALSE;
@@ -1002,9 +1002,11 @@ int format_script(Descriptor *d) {
     while (t) {
         line_num++;
         skip_spaces(&t);
-        if (( (brac = check_braces(t)) != 0) &&(!strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4) || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3)
-                                                || !strn_cmp("while ", t, 6) || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8)
-                                                || !strn_cmp("case ", t, 5) || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4))) {
+        brac = check_braces(t);
+        if ( brac != 0 && ( !strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4)
+            || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3) || !strn_cmp("while ", t, 6)
+            || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8) || !strn_cmp("case ", t, 5)
+            || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4))) {
             d->Output( "Unmatched %s bracket (line %d)!\r\n", brac < 0 ? "right" : "left", line_num);
             free(sc);
             return FALSE;
@@ -1016,7 +1018,7 @@ int format_script(Descriptor *d) {
             first_case = TRUE;
             in_switch = TRUE;
         } else if (!strncasecmp(t, "while ", 6)) {
-            found_while = TRUE;
+            while_count++;
             indent_next = TRUE;
         } else if (!strncasecmp(t, "end", 3) ||
                    !strncasecmp(t, "done", 4)) {
@@ -1031,6 +1033,8 @@ int format_script(Descriptor *d) {
                 in_switch = FALSE;
                 indent--;
             }
+            else if ( !strncasecmp ( t, "done", 4 ) )
+                while_count--;
         } else if (!strncasecmp(t, "else", 4)) {
             if (!indent) {
                 d->Output( "Unmatched 'else' (line %d)!\r\n", line_num);
@@ -1053,13 +1057,12 @@ int format_script(Descriptor *d) {
             else
                 indent--;
         } else if (!strncasecmp(t, "break", 5)) {
-            if ((!found_case && !found_while) || !indent ) {
+            if ((!found_case && !while_count) || !indent ) {
                 d->Output( "Break not in case or while (line %d)!\r\n", line_num);
                 free(sc);
                 return FALSE;
             }
             found_case = FALSE;
-            found_while = FALSE;
         }
 
         *line = '\0';
