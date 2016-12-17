@@ -127,6 +127,7 @@
 #include "descriptor.h"
 #include "strutil.h"
 #include "shop.h"
+#include "genmob.h"
 
 /*   external vars  */
 extern struct corpse_list_data *corpse_list;
@@ -138,6 +139,7 @@ extern map < long, Room* > obj_in_plrshop;
 extern struct sub_skill_info_type sub_info[TOP_SUB_DEFINE];
 
 /* extern functions */
+void copy_ex_descriptions ( struct extra_descr_data **to, struct extra_descr_data *from );
 void identify_object ( Character *ch, OBJ_DATA *obj );
 void save_player_shop ( string owner );
 void Crash_rentsave ( Character *ch, int cost );
@@ -2994,192 +2996,455 @@ SPECIAL ( playershop )
     return FALSE;
 }
 
-void remote_rank ( Character* ch, int hof_rank, int middleman_vnum )
+// Return a mob with vnum 1-70000, not wizinvis and without colours in the shortdesc
+const Character *random_mob ()
 {
-    // remote the hof rank to the Middleman
-    struct trig_var_data *vd = NULL;
-    Character *mob;
-    stringstream ss;
-
-    for ( mob = ch->in_room->people; mob; mob = mob->next )
+    for ( int i = 0; i < 1000; ++i )
     {
-        if ( mob->vnum == middleman_vnum && SCRIPT ( mob ))
-            for ( vd = ( SCRIPT ( mob ) )->global_vars; vd; vd = vd->next )
-            {
-                if ( vd->name == "hof_rank" )
-                {
-                    ss << hof_rank;
-                    vd->value = ss.str();
-                    return;
-                }
-            }
+        const Character *random_mob = GetMobProto ( number ( 1, 70000 ) );
+        if ( !random_mob || MOB_FLAGGED ( random_mob, MOB_WIZINVIS ) )
+            continue;
+
+        string shortdesc = string ( GET_SDESC ( random_mob ) );
+        if ( shortdesc.find ( "{c" ) != string::npos )
+            continue;
+
+        return random_mob;
+    }
+    log ( "SYSERR: middleman couldn't find a random mob" );
+    return nullptr;
+}
+
+// Return an obj with vnum 1-70000, not undisplayed and without colours in the shortdesc
+const obj_data *random_obj ()
+{
+    for ( int i = 0; i < 1000; ++i )
+    {
+        int rnum = real_object ( number ( 1, 70000 ) );
+        if ( rnum == NOTHING || OBJ_FLAGGED ( &obj_proto[ rnum ], ITEM_NODISPLAY ) )
+            continue;
+
+        string shortdesc = string ( obj_proto[ rnum ].short_description );
+        if ( shortdesc.find ( "{c" ) != string::npos )
+            continue;
+
+        return &obj_proto[ rnum ];
+    }
+    log ( "SYSERR: middleman couldn't find a random obj" );
+    return nullptr;
+}
+
+void read_hof ( vector<string> &hof )
+{
+    string filename = string (LIB_ETC) + "middleman.hof";
+    fstream f ( filename );
+    if ( !f.good() )
+    {
+        // the file doesn't exist, create the empty hof
+        vector<string> quest {"easy caretaker","hard caretaker","easy collector","hard collector"
+            ,"easy postman","hard postman","easy team","hard team","chain"};
+        ofstream fout ( filename );
+        fout << quest[0] << endl << "$";
+        for ( int i = 1; i < quest.size(); ++i )
+            fout << endl << quest[i] << endl << "$";
+        fout.close();
+        f.open ( filename );
+    }
+    if ( !f.good() )
+    {
+        log ( "SYSERR: read_hof couldn't open %s", filename.c_str() );
+        return;
+    }
+
+    string line;
+    while ( f.good() )
+    {
+        getline ( f, line );
+        hof.push_back ( line );
     }
 }
 
-/* Add a new entry to middleman.hof if it's faster, maximum of 10 entries per quest type
-   or show the entries of the quest type to the player
-*/
-SPECIAL ( middleman_hof )
+SPECIAL ( middleman )
 {
-    ifstream fin;
-    ofstream fout;
     string filename = string (LIB_ETC) + "middleman.hof";
-    vector<string> lines;
-    string line, new_line, quest_type, player, s, arg = Trim ( string(argument) );
-    int minutes, seconds, month, day, year, minutes_old, seconds_old;
-    int middleman_vnum = 10300, c = 0;
-    stringstream ss;
-    bool added_to_hof = FALSE, quest_type_seen = FALSE;
-    char buf[MAX_STRING_LENGTH];
+    string arg = Trim ( string ( argument ) );
+    const int middleman_vnum = 10300;
+    istringstream ss;
 
-    if ( ch->vnum == middleman_vnum && !strcmp ( cmd_arg, "middleman_hof" ))
+    if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_random_room" ) )
     {
-        // parse the argument
+        // syntax: middleman_random_room <zone> <zone_size>
+        // add the global variable random_room
+        // the room must have at least one exit and not be a DT, RP, godroom, !mob or house
+        int zone, zone_size;
         ss.str ( arg );
-        ss >> quest_type >> s >> minutes >> seconds;
+        ss >> zone >> zone_size;
 
-        // open the file, create it if it doesn't exist
-        fin.open ( filename.c_str() );
-        if ( !fin.is_open() )
+        for ( int i = 0; i < 1000; ++i )
         {
-            fout.open ( filename.c_str() );
-            fout.close();
-            fin.open ( filename.c_str() );
-        }
+            Room *r = real_room ( zone * 100 + number ( 1, zone_size ) - 1 );
 
-        // add new entry if it's faster
-        while ( fin.good() )
-        {
-            getline ( fin, line );
-            if ( line == "" )
-            {
-                if ( !quest_type_seen )
-                {
-                    lines.push_back ( arg );
-                    remote_rank ( ch, 1, middleman_vnum );
-                }
-                else if ( !added_to_hof && c < 10 )
-                {
-                    lines.push_back ( arg );
-                    remote_rank ( ch, c+1, middleman_vnum );
-                }
-                break;
-            }
-            if ( quest_type != line.substr( 0, 6 ) )
-            {
-                if ( !added_to_hof && quest_type_seen && c < 10 )
-                {
-                    lines.push_back ( arg );
-                    remote_rank ( ch, c+1, middleman_vnum );
-                    added_to_hof = TRUE;
-                }
-                lines.push_back ( line );
+            if ( !r || ROOM_FLAGGED ( r, ROOM_DEATH ) || ROOM_FLAGGED ( r, ROOM_GODROOM )
+                    || ROOM_FLAGGED ( r, ROOM_HOUSE ) || ROOM_FLAGGED ( r, ROOM_NOMOB )
+                    || ROOM_FLAGGED ( r, ROOM_ROLEPLAY ) )
                 continue;
-            }
-            if ( added_to_hof )
-            {
-                if ( c < 10 )
-                {
-                    lines.push_back( line );
-                    c++;
-                }
-                continue;
-            }
-            quest_type_seen = TRUE;
-            ss.clear();
-            ss.str ( line );
-            ss >> s >> s >> minutes_old >> seconds_old;
-            if ( minutes < minutes_old || ( minutes == minutes_old && seconds < seconds_old ))
-            {
-                lines.push_back( arg );
-                c++;
-                remote_rank ( ch, c, middleman_vnum );
-                if ( c < 10 )
-                {
-                    lines.push_back( line );
-                    c++;
-                }
-                added_to_hof = TRUE;
-            }
-            else if ( c < 10 )
-            {
-                lines.push_back( line );
-                c++;
-            }
-        }
-        fin.close();
 
-        // write HoF
-        fout.open ( filename.c_str() );
-        if ( !fout.is_open() )
-        {
-            log ( "SYSERR: can't write to file %s", filename.c_str() );
-            return 0;
+            if ( !R_EXIT ( r, NORTH ) && !R_EXIT ( r, SOUTH ) && !R_EXIT ( r, EAST )
+                    && !R_EXIT ( r, WEST ) && !R_EXIT ( r, UP ) && !R_EXIT ( r, DOWN ) )
+                continue;
+
+            string name = "random_room";
+            string value = to_string ( GET_ROOM_VNUM ( r ) );
+            add_var ( &SCRIPT ( ch )->global_vars, name, value, 0 );
+            return 1;
         }
-        for ( uint i = 0; i < lines.size(); i++ )
-            fout << lines[ i ] << endl;
-        fout.close();
+        log ( "SYSERR: middleman couldn't find a random room" );
         return 1;
     }
-
-    else if ( !IS_NPC ( ch ) && CMD_IS ( "look" ) && arg != "" )
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_mob_descs" ) )
     {
-        if ( arg.substr( 1, 5 ) != "_easy" && arg.substr( 1, 5 ) != "_hard" )
-            return 0;
+        // syntax: middleman_mob_descs <mob>
+        ss.str ( arg );
+        string m;
+        ss >> m;
+        Character *mob = get_char ( m.c_str() );
+        if ( !mob )
+            return 1;
 
-        fin.open ( filename.c_str() );
-        if ( !fin.is_open() )
-        {
-            log ( "SYSERR: can't open %s", filename.c_str() );
-            return 0;
-        }
+        // put the descs of a random mob that isn't wizinvis on the mob
+        const Character *rnd_mob = random_mob();
+        if ( !rnd_mob )
+            return 1;
 
-                // read HoF and get the largest player name length
-        c = 0;
-        while ( !fin.eof() )
-        {
-            getline ( fin, line );
-            if ( arg == line.substr( 0, 6 ))
+        GET_ALIAS ( mob ) = str_dup ( GET_ALIAS ( rnd_mob ) );
+        GET_LDESC ( mob ) = str_dup ( GET_LDESC ( rnd_mob ) );
+        GET_DDESC ( mob ) = str_dup ( GET_DDESC ( rnd_mob ) );
+        GET_SDESC ( mob ) = str_dup ( GET_SDESC ( rnd_mob ) );
+        GET_SEX ( mob ) = GET_SEX ( rnd_mob );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_obj_descs" ) )
+    {
+        // syntax: middleman_mob_descs <obj>
+        ss.str ( arg );
+        string o;
+        ss >> o;
+        obj_data *obj = get_obj ( o.c_str() );
+        if ( !obj )
+            return 1;
+
+        // put the descs of a random object that isn't undisplayed on the obj
+        const obj_data *rnd_obj = random_obj();
+        if ( !rnd_obj )
+            return 1;
+
+        obj->name = str_dup ( rnd_obj->name );
+        obj->description = str_dup ( rnd_obj->description );
+        obj->short_description = str_dup ( rnd_obj->short_description );
+        copy_ex_descriptions ( &obj->ex_description, rnd_obj->ex_description );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_random_msg" ) )
+    {
+        // add the global variable random_msg = <random mob> <verb> <random obj>
+        const Character *rnd_mob = random_mob();
+        if ( !rnd_mob )
+            return 1;
+
+        const obj_data *rnd_obj = random_obj();
+        if ( !rnd_obj )
+            return 1;
+
+        vector<string> verb {"ate","expects","paints","saw","hunts","craves","discards","needs"
+            ,"destroys","develops","sacrifices","carried","drew","throws","dropped","hugs"};
+        string name = "random_msg";
+        string value = string ( GET_SHORT ( rnd_mob ) );
+        value += " " + verb[ number ( 1, verb.size() ) - 1] + " ";
+        value += string ( rnd_obj->short_description );
+        add_var ( &SCRIPT ( ch )->global_vars, name, value, 0 );
+        return 1;
+    }
+    else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_hof" ) )
+    {
+        // syntax: middleman_hof <quest obj>
+        obj_data *quest = get_obj ( arg.c_str() );
+        if ( !quest || !SCRIPT ( quest ) )
+            return 1;
+
+        string quest_type, questor, questor2;
+        long long started = 0;
+        int new_length = 0, chain_time = 0;
+        for ( trig_var_data *vd = SCRIPT ( quest )->global_vars; vd; vd = vd->next )
+            if ( vd->name == "quest_type" )
+                quest_type = vd->value;
+            else if ( vd->name == "questor" )
             {
-                lines.push_back( line );
+                Character *c = get_char ( vd->value.c_str() );
+                if ( c )
+                    questor = string ( GET_NAME ( c ) );
+                else
+                    questor = vd->value;
+            }
+            else if ( vd->name == "questor2" )
+            {
+                Character *c = get_char ( vd->value.c_str() );
+                if ( c )
+                    questor2 = string ( GET_NAME ( c ) );
+                else
+                    questor2 = vd->value;
+            }
+            else if ( vd->name == "started" )
+                started = stoll ( vd->value );
+            else if ( vd->name == "targets_done" )
+                new_length = stoi ( vd->value );
+            else if ( vd->name == "chain_time" )
+                chain_time = stoi ( vd->value );
+
+        // add new entry if it's faster (or if the length is larger for chain quests)
+        // format of a HoF entry on file: <name> <seconds> <date> [<name>] [<length>]
+        vector<string> HoF;
+        read_hof ( HoF );
+        bool found_quest = FALSE;
+        int i_start = 0, i_end = 0, i_insert = 0, i_hof = 0;
+        string s, name1, name2;
+        int seconds, length, new_seconds = time ( nullptr ) - started + chain_time;
+        for ( int i = 0; i < HoF.size(); ++i )
+        {
+            if ( found_quest )
+            {
+                if ( HoF[i] == "$" )
+                {
+                    i_end = i;
+                    break;
+                }
+
                 ss.clear();
-                ss.str ( line );
-                ss >> s >> player;
-                if ( player.length() > c )
-                c = player.length();
+                ss.str ( HoF[i] );
+                ss >> name1 >> seconds >> s;
+                if ( quest_type == "chain" )
+                {
+                    if ( name1 == questor )
+                        i_hof = i;
+
+                    ss >> length;
+                    if ( i_insert == 0 && ( new_length > length || ( new_length == length
+                        && new_seconds < seconds ) ) )
+                        i_insert = i;
+                }
+                else if ( quest_type.find ( "team" ) != string::npos )
+                {
+                    ss >> name2;
+                    if ( ( name1 == questor && name2 == questor2 )
+                        || ( name1 == questor2 && name2 == questor ) )
+                        i_hof = i;
+
+                    if  ( i_insert == 0 && new_seconds < seconds )
+                        i_insert = i;
+                }
+                else
+                {
+                    if ( name1 == questor )
+                        i_hof = i;
+
+                    if  ( i_insert == 0 && new_seconds < seconds )
+                        i_insert = i;
+                }
+            }
+            else if ( HoF[i] == quest_type )
+            {
+                i_start = i;
+                found_quest = TRUE;
             }
         }
-        fin.close();
 
-        // show HoF
-        if ( lines.size() )
+        if ( !found_quest )
         {
-            DYN_DEFINE;
-            *buf = '\0';
-            DYN_CREATE;
-            *dynbuf = 0;
-            line = "{cyHall of Fame of ";
-            if ( arg == "a_easy" )
-                line += "The Assassin (easy){c0\r\n\r\n";
-            else if ( arg == "a_hard" )
-                line += "The Assassin (hard){c0\r\n\r\n";
-            s = "    Player  ";
-            s.insert( s.length(), c > 6 ? c - 6 : 0, ' ' );
-            s += "Time  Month Day Year\r\n";
-            line += s;
-            line.insert( line.length(), s.length() - 2, '-' );
-            line += "\r\n";
-            strcpy ( buf, line.c_str() );
-            DYN_RESIZE( buf );
-            for ( uint i = 0; i < lines.size(); i++ )
+            log ( "SYSERR: middleman_hof couldn't match quest '%s'", quest_type.c_str() );
+            return 1;
+        }
+
+        if ( i_end - i_start == 1 )
+            i_insert = i_end; // hof is empty
+        else if ( i_insert == 0 && i_end - i_start < 11 )
+            i_insert = i_end; // add to the bottom
+
+        // only replace if it's an improvement
+        if ( i_insert > 0 && i_hof > 0 && i_insert > i_hof )
+            i_insert = 0;
+
+        // add the global variable hofrank: -1: no improvement
+        //                                   1: new record
+        //                                   2: newly ranked
+        if ( i_insert > 0 )
+        {
+            string date = to_string ( time ( nullptr ) );
+            string entry = questor + " " + to_string ( new_seconds ) + " " + date;
+
+            if ( quest_type == "chain" )
+                entry += " " + to_string ( new_length );
+            else if ( quest_type.find ( "team" ) != string::npos )
+                entry += " " + questor2;
+            HoF.insert ( HoF.begin() + i_insert, entry );
+            int entries = i_end - i_start;
+
+            // only one entry per questor(s)
+            if ( i_hof > 0 )
+            {
+                if ( i_insert <= i_hof )
+                    HoF.erase ( HoF.begin() + i_hof + 1 );
+                else
+                    HoF.erase ( HoF.begin() + i_hof );
+                entries--;
+
+                add_var ( &SCRIPT ( quest )->global_vars, "hofrank", "1", 0 );
+            }
+            else
+                add_var ( &SCRIPT ( quest )->global_vars, "hofrank", "2", 0 );
+
+            // keep 10 entries per quest: erase number 11
+            if ( entries > 10 )
+                HoF.erase ( HoF.begin() + i_end );
+
+            // write HoF
+            ofstream fout ( filename.c_str() );
+            if ( !fout.is_open() )
+            {
+                log ( "SYSERR: middleman_hof can't write to file %s", filename.c_str() );
+                return 1;
+            }
+            for ( int i = 0; i < HoF.size(); i++ )
+            {
+                fout << HoF[i];
+                if ( i < HoF.size() - 1 )
+                    fout << endl;
+            }
+            fout.close();
+        }
+        else
+            add_var ( &SCRIPT ( quest )->global_vars, "hofrank", "-1", 0 );
+
+        return 1;
+    }
+    else if ( ch && !IS_NPC ( ch ) && ( CMD_IS ( "look" ) || CMD_IS ( "read" ) ) && arg != "" )
+    {
+        // parse quest_type which looks like "easy/hard caretaker/collector/postman/team", or "chain"
+        string quest_type, s;
+        ss.str ( arg );
+        ss >> quest_type;
+        if ( quest_type != "easy" && quest_type != "hard" && quest_type != "chain" )
+            return 0;
+        if ( quest_type != "chain" )
+        {
+            ss >> s;
+            if ( s != "caretaker" && s != "collector" && s != "team" && s != "postman" )
+                return 0;
+            quest_type += " " + s;
+        }
+
+        // find the longest name length and speed for formatting purposes
+        // format of a HoF entry on file: <name> <seconds> <date>
+        // a team entry ends with <name2>, a chain entry ends with <length>
+        // "$" signals end of quest
+        vector<string> HoF;
+        read_hof ( HoF );
+        int max_len = 0, i_start = 0, i_end = 0, seconds, max_seconds = 0;
+        string name1, name2;
+        for ( int i = 0; i < HoF.size(); ++i )
+        {
+            if ( i_start > 0 )
+            {
+                if ( HoF[i] == "$" )
+                {
+                    i_end = i;
+                    break;
+                }
+
+                ss.clear();
+                ss.str ( HoF[i] );
+                ss >> name1 >> seconds;
+                max_seconds = max ( max_seconds, seconds );
+                if ( quest_type.find ( "team" ) != string::npos )
+                {
+                    ss >> s >> name2;
+                    max_len = max ( max_len, int(name1.length() + name2.length()) );
+                }
+                else
+                    max_len = max ( max_len, int(name1.length()) );
+            }
+            else if ( HoF[i] == quest_type )
+                i_start = i + 1;
+        }
+        if ( !i_start )
+            return 0;
+
+        // show the HoF
+        int max_hours = max_seconds / 3600;
+        int speed_len = 5; // speed: "12:34"
+        if ( max_hours > 0 )
+            speed_len += 2 + log10 ( max_hours ); // speed: "1:23:45"
+        int name_len = max ( max_len, 4 );
+        bool hof_empty = ( i_end == i_start );
+        if ( quest_type == "chain" )
+        {
+            ch->Send ( "{cyHall of Fame: the chain{c0\r\n\r\n" );
+            ch->Send ( "%-*s  Length  %-*s  Date\r\n", name_len, "Name", speed_len, "Speed" );
+            ch->Send ( "%s\r\n", string ( hof_empty ? 25 : name_len + speed_len + 23, '-' ).c_str() );
+        }
+        else if ( quest_type.find ( "team" ) != string::npos )
+        {
+            ch->Send ( "{cyHall of Fame: %s{c0\r\n\r\n", quest_type.c_str() );
+            ch->Send ( "%-*s  %-*s  Date\r\n", hof_empty ? 4 : name_len + 3, "Team", speed_len, "Speed" );
+            ch->Send ( "%s\r\n", string ( hof_empty ? 17 : name_len + speed_len + 18, '-' ).c_str() );
+        }
+        else
+        {
+            ch->Send ( "{cyHall of Fame: %s{c0\r\n\r\n", quest_type.c_str() );
+            ch->Send ( "%-*s  %-*s  Date\r\n", name_len, "Name", speed_len, "Speed" );
+            ch->Send ( "%s\r\n", string ( hof_empty ? 17 : name_len + speed_len + 15, '-' ).c_str() );
+        }
+
+        time_t date;
+        string month;
+        char speed[10];
+        int hours, minutes, length, day, year;
+        for ( int i = i_start; i < i_end; ++i )
+        {
+            ss.clear();
+            ss.str ( HoF[i] );
+            ss >> name1 >> seconds >> date;
+
+            hours = seconds / 3600;
+            minutes = ( seconds % 3600 ) / 60;
+            seconds %= 60;
+            if ( hours > 0 )
+                snprintf ( speed, sizeof speed, "%d:%02d:%02d", hours, minutes, seconds );
+            else
+                snprintf ( speed, sizeof speed, "%02d:%02d", minutes, seconds );
+
+            if ( quest_type == "chain" )
+            {
+                ss >> length;
+                ss.clear();
+                ss.str ( string ( asctime ( localtime ( &date ) ) ) );
+                ss >> s >> month >> day >> s >> year;
+                ch->Send ( "%-*s  %-6d  %-*s  %s %2d %d\r\n", name_len, name1.c_str(), length, speed_len, speed, month.c_str(), day, year );
+            }
+            else if ( quest_type.find ( "team" ) != string::npos )
+            {
+                ss >> name2;
+                string name = name1 + " & " + name2;
+                ss.clear();
+                ss.str ( string ( asctime ( localtime ( &date ) ) ) );
+                ss >> s >> month >> day >> s >> year;
+                ch->Send ( "%-*s  %-*s  %s %2d %d\r\n", name_len + 3, name.c_str(), speed_len, speed, month.c_str(), day, year );
+            }
+            else
             {
                 ss.clear();
-                ss.str ( lines[ i ] );
-                ss >> s >> player >> minutes >> seconds >> month >> day >> year;
-                snprintf( buf, sizeof( buf ), "%d. %s%-*s  %02d:%02d   %02d  %02d  %d\r\n", i + 1, i < 9 ? " " : "", c > 6 ? c : 6, player.c_str(), minutes, seconds, month, day, year);
-                DYN_RESIZE( buf );
+                ss.str ( string ( asctime ( localtime ( &date ) ) ) );
+                ss >> s >> month >> day >> s >> year;
+                ch->Send ( "%-*s  %-*s  %s %2d %d\r\n", name_len, name1.c_str(), speed_len, speed, month.c_str(), day, year );
             }
-            page_string ( ch->desc, dynbuf, DYN_BUFFER );
         }
         return 1;
     }

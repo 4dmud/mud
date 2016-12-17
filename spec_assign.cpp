@@ -48,7 +48,7 @@ SPECIAL(high_dice);
 SPECIAL(janitor);
 SPECIAL(magic_user);
 SPECIAL(mayor);
-SPECIAL(middleman_hof);
+SPECIAL(middleman);
 SPECIAL(pet_shops);
 SPECIAL(postmaster);
 SPECIAL(puff);
@@ -298,7 +298,7 @@ void assign_mobiles(void)
     // mobs with level 3 poison
     ASSIGNMOB(8148, snake);
 
-    ASSIGNMOB(10300, middleman_hof);
+    ASSIGNMOB(10300, middleman);
 }
 
 
@@ -312,7 +312,7 @@ void assign_objects(void)
     ASSIGNOBJ(7, clan_deeds);
     ASSIGNOBJ(590, gen_board);	/* board in mud school */
     ASSIGNOBJ(1315, gen_board);	/* board in sicilian hq */
-  ASSIGNOBJ(1360, gen_board);  /* board in sicilian hq 2*/
+    ASSIGNOBJ(1360, gen_board);  /* board in sicilian hq 2*/
     ASSIGNOBJ(2917, gen_board);	/* board in viking head quarters */
     ASSIGNOBJ(2999, gen_board);	/* table round */
     ASSIGNOBJ(3079, gen_board);	/* board for rp */

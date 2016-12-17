@@ -4091,7 +4091,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             for ( int x = 1; x < len; x++ )
                                 if ( str[x] == '-' && str[x-1] == ' ' )
                                 {
-                                    str[x] = '\0';
+                                    str[x-1] = '\0';
                                     break;
                                 }
                         }
