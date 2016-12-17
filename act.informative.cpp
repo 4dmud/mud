@@ -2778,7 +2778,10 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
                 ch->Send ( "You are fighting thin air.\r\n" );
             break;
         case POS_STANDING:
-            ch->Send ( "You are standing.\r\n" );
+            if ( RIDING ( ch ) )
+                ch->Send ( "You are riding %s.\r\n", GET_NAME ( RIDING ( ch ) ) );
+            else
+                ch->Send ( "You are standing.\r\n" );
             break;
         default:
             ch->Send ( "You are floating.\r\n" );
