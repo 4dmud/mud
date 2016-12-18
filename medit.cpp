@@ -1184,23 +1184,11 @@ void medit_parse ( Descriptor *d, char *arg )
                         {
                             SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOCHARM );
                             SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOSUMMON );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_GOOD );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_EVIL );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_MALE );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_FEMALE );
-                            SET_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_SEX_NEUTRAL );
                         }
                         else
                         {
                             REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOCHARM );
                             REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_NOSUMMON );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_GOOD );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_EVIL );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_NEUTRAL );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_MALE );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_FEMALE );
-                            REMOVE_BIT_AR ( MOB_FLAGS ( OLC_MOB ( d ) ), MOB_AGGR_SEX_NEUTRAL );
                         }
 
                         break;

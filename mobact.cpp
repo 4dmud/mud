@@ -150,21 +150,21 @@ void mobile_activity ( void )
         }
 
         /* Aggressive Mobs */
-                if (MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_FEMALE) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_MALE) ||
-                    MOB_FLAGGED(ch, MOB_AGGR_SEX_NEUTRAL))
-
+        if (MOB_FLAGGED(ch, MOB_AGGRESSIVE) ||
+            MOB_FLAGGED(ch, MOB_AGGR_EVIL) ||
+            MOB_FLAGGED(ch, MOB_AGGR_GOOD) ||
+            MOB_FLAGGED(ch, MOB_AGGR_NEUTRAL) ||
+            MOB_FLAGGED(ch, MOB_AGGR_FEMALE) ||
+            MOB_FLAGGED(ch, MOB_AGGR_MALE) ||
+            MOB_FLAGGED(ch, MOB_AGGR_SEX_NEUTRAL))
         {
             found = FALSE;
             Character *vnext;
             for ( vict = IN_ROOM ( ch )->people; vict && !found; vict = vnext )
             {
                 vnext = vict->next_in_room;
-                                if (vict == ch) continue;
+                if ( vict == ch )
+                    continue;
                 if ( AggroTo ( ch, vict ) )
                 {
                     start_fighting ( ch, vict );
@@ -311,6 +311,7 @@ void clearMemory ( Character *ch )
 
     MEMORY ( ch ) = NULL;
 }
+
 bool AggroTo ( Character *ch, Character *vict )
 {
     if ( SELF ( vict, ch ) )
@@ -327,16 +328,16 @@ bool AggroTo ( Character *ch, Character *vict )
         return false;
     if ( valid_perc ( vict ) == 0 )
         return false;
-        if (( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
-            ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
-            || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
-            return true;
-        if (( MOB_FLAGGED ( ch, MOB_AGGR_MALE) && IS_MALE ( vict ) ) ||
+    if ( MOB_FLAGGED ( ch, MOB_AGGRESSIVE ) )
+        return true;
+    if (( MOB_FLAGGED ( ch, MOB_AGGR_EVIL ) && IS_EVIL ( vict ) ) ||
+        ( MOB_FLAGGED ( ch, MOB_AGGR_NEUTRAL ) && IS_NEUTRAL ( vict ) )
+        || ( MOB_FLAGGED ( ch, MOB_AGGR_GOOD ) && IS_GOOD ( vict ) ) )
+        return true;
+    if (( MOB_FLAGGED ( ch, MOB_AGGR_MALE) && IS_MALE ( vict ) ) ||
         ( MOB_FLAGGED ( ch, MOB_AGGR_FEMALE) && IS_FEMALE ( vict ) ) ||
         ( MOB_FLAGGED ( ch, MOB_AGGR_SEX_NEUTRAL) && IS_SEX_NEUTRAL ( vict ) ) )
         return true;
-        if (MOB_FLAGGED(ch, MOB_AGGRESSIVE)) return true;
-
 
     return false;
 }
