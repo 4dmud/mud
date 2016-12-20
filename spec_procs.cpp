@@ -3002,7 +3002,7 @@ const Character *random_mob ()
     for ( int i = 0; i < 1000; ++i )
     {
         const Character *random_mob = GetMobProto ( number ( 1, 70000 ) );
-        if ( !random_mob || MOB_FLAGGED ( random_mob, MOB_WIZINVIS ) )
+        if ( !random_mob || MOB_FLAGGED ( random_mob, MOB_WIZINVIS ) || ( GET_LDESC ( random_mob ) && GET_LDESC ( random_mob )[0] == '{' && strlen ( GET_LDESC ( random_mob ) ) <= 3 ) )
             continue;
 
         string shortdesc = string ( GET_SDESC ( random_mob ) );
