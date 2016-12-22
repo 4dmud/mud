@@ -12,7 +12,7 @@
 #define MUD_NAME "4Dimensions"
 
 // Replace this with your own!
-#define MUDLET_PACKAGE "2\nhttp://www.godwars2.org/download/mudlet/4D_GUI.mpackage"
+#define MUDLET_PACKAGE "2\nhttp://dodgy.website/4d/bucksgui.xml"
 
 #define descriptor_t Descriptor
 //typedef class Descriptor descriptor_t;
