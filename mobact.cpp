@@ -28,6 +28,7 @@
 /* external structs */
 extern int no_specials;
 
+SPECIAL(shop_keeper);
 ACMD ( do_get );
 void hunt_victim ( Character *ch );
 void parse_mob_commands ( Character *ch );
@@ -198,8 +199,7 @@ void mobile_activity ( void )
         }
 
         /* Helper Mobs */
-        if ( MOB_FLAGGED ( ch, MOB_HELPER )
-                && ( !AFF_FLAGGED ( ch, AFF_BLIND | AFF_CHARM ) || RIDDEN_BY ( ch ) ) )
+        if ( MOB_FLAGGED ( ch, MOB_HELPER ) && ( !AFF_FLAGGED ( ch, AFF_BLIND | AFF_CHARM ) || RIDDEN_BY ( ch ) ) )
         {
             found = FALSE;
             for ( vict = IN_ROOM ( ch )->people; vict && !found;
@@ -217,6 +217,11 @@ void mobile_activity ( void )
                     continue;
                 if ( IS_GOOD ( ch ) && IS_GOOD ( FIGHTING ( vict ) ) )
                     continue;
+                if ( GET_MOB_SPEC ( ch ) == shop_keeper )
+                {
+                    log ( "SYSERR: [%d] %s is an assisting shopkeep", GET_MOB_VNUM ( ch ), GET_NAME ( ch ) );
+                    continue;
+                }
 
                 act ( "$n jumps to the aid of $N!", FALSE, ch, 0, vict, TO_ROOM );
                 start_fighting ( ch, FIGHTING ( vict ) );

@@ -79,9 +79,7 @@ ACMD ( do_assist )
 
     if ( FIGHTING ( ch ) )
     {
-        send_to_char
-        ( "You're already fighting!  How can you assist someone else?\r\n",
-          ch );
+        ch->Send ( "You're already fighting! How can you assist someone else?\r\n" );
         return;
     }
     one_argument ( argument, arg );
@@ -98,14 +96,13 @@ ACMD ( do_assist )
 
 void perform_assist ( Character *ch, Character *helpee )
 {
-    Character  *opponent;
-
-
     if ( FIGHTING ( ch ) )
         return;
+
     /*
      * Hit the same enemy the person you're helping is.
      */
+    Character  *opponent;
     if ( FIGHTING ( helpee ) )
         opponent = FIGHTING ( helpee );
     else
