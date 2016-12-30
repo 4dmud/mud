@@ -1709,8 +1709,7 @@ int perform_mag_direction ( int level, room_rnum room, Character *ch, Character 
  * is the one you should change to add new group spells.
  */
 
-void perform_mag_groups ( int level, Character *ch,
-                          Character *tch, int spellnum, int savetype )
+void perform_mag_groups ( int level, Character *ch, Character *tch, int spellnum, int savetype )
 {
     switch ( spellnum )
     {
@@ -1725,7 +1724,6 @@ void perform_mag_groups ( int level, Character *ch,
             break;
         case SPELL_GROUP_RECALL:
             spell_recall ( level, ch, tch, NULL, 0 );
-            break;
     }
 }
 
@@ -1742,8 +1740,7 @@ void perform_mag_groups ( int level, Character *ch,
  * mag_groups -- just add a new case to perform_mag_groups.
  */
 
-void mag_groups ( int level, Character *ch, int spellnum,
-                  int savetype )
+void mag_groups ( int level, Character *ch, int spellnum, int savetype )
 {
     Character *tch, *k;
     struct follow_type *f, *f_next;
@@ -1781,8 +1778,7 @@ void mag_groups ( int level, Character *ch, int spellnum,
  * No spells of this class currently implemented as of Circle 3.0.
  */
 
-void mag_masses ( int level, Character *ch, int spellnum,
-                  int savetype )
+void mag_masses ( int level, Character *ch, int spellnum, int savetype )
 {
     Character *tch, *tch_next;
 

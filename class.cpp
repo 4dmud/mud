@@ -1447,6 +1447,7 @@ void init_spell_levels ( void )
     assign_class ( SPELL_SHIELD_MANA,      ALL_CASTERS );
     assign_class ( SPELL_MANA_TRANSFER,    ALL_CASTERS );
     assign_class ( SPELL_TELEPORT,            ALL_CASTERS );
+    assign_class ( SPELL_GROUP_TELEPORT,      ALL_CASTERS );
     assign_class ( SPELL_RECHARGE,            ALL_CASTERS );
     assign_class ( SPELL_HOLD_PERSON,      ESP );
     assign_class ( SPELL_WATER_ELEMENTAL,  PRI | ESP);

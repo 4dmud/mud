@@ -704,6 +704,9 @@ int call_magic ( Character *caster, Character *cvict,
             case SPELL_TELEPORT:
                 MANUAL_SPELL ( spell_teleport );
                 break;
+            case SPELL_GROUP_TELEPORT:
+                spell_teleport ( level, caster, caster, NULL, (char*) "group" );
+                break;
             case SPELL_GATE:
                 MANUAL_SPELL ( spell_gate );
                 break;
@@ -2036,6 +2039,10 @@ void mag_assign_spells ( void )
              POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, 0,
              TYPE_UNDEFINED, TYPE_UNDEFINED, 2, 10, 1, "" );
 
+    spello ( SPELL_GROUP_TELEPORT, "group teleport", 100, 75, 3,
+             POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, 0,
+             SPELL_TELEPORT, TYPE_UNDEFINED, 2, 42, 1, "" );
+
     spello ( SPELL_WATERWALK, "waterwalk", 80 , 20 , 2,
              POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_AFFECTS, 0,
              TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 15, 0,
@@ -2442,6 +2449,9 @@ int elemental_type ( int spell )
             retval = ELEM_EARTH;
             break;
         case SPELL_TELEPORT:
+            retval = ELEM_MIND;
+            break;
+        case SPELL_GROUP_TELEPORT:
             retval = ELEM_MIND;
             break;
         case SPELL_BLINDNESS:

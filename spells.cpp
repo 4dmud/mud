@@ -193,74 +193,134 @@ ASPELL(spell_recall) {
 }
 
 
-ASPELL(spell_teleport) {
-    room_rnum to_room;
-
-    if (victim == NULL)
+ASPELL ( spell_teleport )
+{
+    if ( victim == NULL )
         return;
 
-    if (IS_IMM(victim) || IS_NPC(victim)) {
-        ch->Send("That's not such a good idea.\r\n");
-        return;
-    }
-
-    if (IN_ROOM ( ch ) && (ROOM_FLAGGED(IN_ROOM(victim), ROOM_NOTELEPORT_OUT) ||
-            ZONE_FLAGGED(IN_ROOM(victim)->zone, ZONE_NOTELEPORT_OUT))) {
-        victim->Send("A magical barrier prevents you from leaving.\r\n");
-        return;
-    }
-    if (!SELF(ch, victim) && !IS_NPC(ch) && ((!PRF_FLAGGED(victim, PRF_TELEPORTABLE) &&
-            !PLR_FLAGGED(victim, PLR_KILLER)) || both_pk(ch,victim))) {
-        victim->Send( "%s just tried to cast teleport on you but\r\n"
-                      "%s failed because you have teleport protection on.\r\n"
-                      "Type NOTELEPORT to allow the spell to work.\r\n",
-                      GET_NAME(ch),
-                      HSSH(ch));
-
-        ch->Send( "You failed the teleport spell because %s has teleport protection on.\r\n",
-                  GET_NAME(victim));
-
-
-        new_mudlog( BRF, LVL_GOD, TRUE, "%s failed casting teleport on %s",
-                    GET_NAME(ch), GET_NAME(victim));
+    if ( IS_IMM ( victim ) || IS_NPC ( victim ) ) {
+        ch->Send ( "That's not such a good idea.\r\n" );
         return;
     }
 
-    /*possible infinite loop here*/
+    Room *in_room = IN_ROOM ( victim );
+    if ( in_room && ( ROOM_FLAGGED ( in_room, ROOM_NOTELEPORT_OUT) ||
+            ZONE_FLAGGED ( in_room->zone, ZONE_NOTELEPORT_OUT ) ) )
+    {
+        victim->Send ( "A magical barrier prevents you from leaving.\r\n" );
+        return;
+    }
+
+    Room *to_room;
     int cnt = 0;
     do {
         cnt ++;
-        to_room = world_vnum[number(0, top_of_world)];
-        if (cnt > top_of_world) {
-            log("Error with teleport, can't find destination room");
+        to_room = world_vnum[ number ( 0, top_of_world ) ];
+        if ( cnt > top_of_world )
+        {
+            log ( "SYSERR: teleport couldn't find destination room");
             return;
         }
-    } while (!to_room || ROOM_FLAGGED(to_room, ROOM_PRIVATE) ||
-             ROOM_FLAGGED(to_room, ROOM_GODROOM) ||
-             ROOM_FLAGGED(to_room, ROOM_ROLEPLAY) ||
-             ROOM_FLAGGED(to_room, ROOM_HOUSE) ||
-             ROOM_FLAGGED(to_room, ROOM_DEATH) ||
-             ROOM_FLAGGED(to_room, ROOM_NOTELEPORT_IN) ||
-             ZONE_FLAGGED(to_room->zone, ZONE_NOTELEPORT_IN) ||
-             ZONE_FLAGGED(to_room->zone, ZONE_CLOSED));
-    if (RIDING(victim) && HERE(RIDING(victim), victim)) {
-        act("$n and $N slowly fade out of existence and are gone.",  FALSE, victim, 0, RIDING(victim), TO_ROOM);
-        move_char_to(RIDING(victim), to_room);
-    } else {
-        act("$n slowly fades out of existence and is gone.",  FALSE, victim, 0, 0, TO_ROOM);
-        dismount_char(victim);
+    } while ( !to_room || ROOM_FLAGGED ( to_room, ROOM_PRIVATE ) ||
+        ROOM_FLAGGED ( to_room, ROOM_GODROOM ) ||
+        ROOM_FLAGGED ( to_room, ROOM_ROLEPLAY ) ||
+        ROOM_FLAGGED ( to_room, ROOM_HOUSE ) ||
+        ROOM_FLAGGED ( to_room, ROOM_DEATH ) ||
+        ROOM_FLAGGED ( to_room, ROOM_NOTELEPORT_IN ) ||
+        ZONE_FLAGGED ( to_room->zone, ZONE_NOTELEPORT_IN ) ||
+        ZONE_FLAGGED ( to_room->zone, ZONE_CLOSED ) );
+
+    if ( !SELF ( ch, victim ) && !IS_NPC ( ch ) && ( ( !PRF_FLAGGED ( victim, PRF_TELEPORTABLE ) &&
+            !PLR_FLAGGED ( victim, PLR_KILLER )) || both_pk ( ch, victim ) ) )
+    {
+        victim->Send ( "%s just tried to cast teleport on you but\r\n"
+            "%s failed because you have teleport protection on.\r\n"
+            "Type NOTELEPORT to allow the spell to work.\r\n", GET_NAME ( ch ), HSSH ( ch ) );
+        ch->Send ( "You failed the teleport spell because %s has teleport protection on.\r\n", GET_NAME ( victim ) );
+        new_mudlog ( BRF, LVL_GOD, TRUE, "%s failed casting teleport on %s", GET_NAME ( ch ), GET_NAME ( victim ) );
+        return;
     }
-    move_char_to(victim, to_room);
-    if (RIDING(victim) && HERE(RIDING(victim), victim)) {
-        act("$n and $N slowly fade into existence.", FALSE, victim, 0, RIDING(victim), TO_ROOM);
-        look_at_room(RIDING(victim), 0);
-    } else
-        act("$n slowly fades into existence.", FALSE, victim, 0, 0, TO_ROOM);
-    look_at_room(victim, 0);
-    entry_memory_mtrigger(victim);
-    greet_mtrigger(victim, -1);
-    greet_memory_mtrigger(victim);
-    enter_wtrigger(IN_ROOM(victim), victim, -1);
+
+    // move the group of the victim except for the master
+    if ( strarg && !strcmp ( strarg, "group" ) )
+    {
+        Character *master = victim->master ? victim->master : victim;
+        follow_type *f, *f_next;
+        for ( f = master->followers; f; f = f_next )
+        {
+            f_next = f->next;
+            Character *c = f->follower;
+            if ( IN_ROOM ( c ) != in_room )
+                continue;
+
+            if ( !PRF_FLAGGED ( c, PRF_TELEPORTABLE ) )
+            {
+                c->Send( "%s just tried to cast teleport on you but\r\n"
+                    "%s failed because you have teleport protection on.\r\n"
+                    "Type NOTELEPORT to allow the spell to work.\r\n",
+                    GET_NAME ( ch ),
+                    HSSH ( ch ) );
+                ch->Send ( "You failed the teleport spell because %s has teleport protection on.\r\n", GET_NAME ( victim ) );
+                continue;
+            }
+
+            if ( RIDING ( c ) && HERE ( RIDING ( c ), c ) )
+            {
+                act ( "$n and $N slowly fade out of existence and are gone.", FALSE, c, 0, RIDING ( c ), TO_ROOM );
+                move_char_to ( RIDING ( c ), to_room );
+            }
+            else
+            {
+                act ( "$n slowly fades out of existence and is gone.",  FALSE, c, 0, 0, TO_ROOM );
+                dismount_char ( c );
+            }
+            move_char_to ( c, to_room );
+
+            if ( RIDING ( c ) && HERE ( RIDING ( c ), c ) )
+            {
+                act ( "$n and $N slowly fade into existence.", FALSE, c, 0, RIDING ( c ), TO_ROOM );
+                look_at_room ( RIDING ( c ), 0 );
+            }
+            else
+                act ( "$n slowly fades into existence.", FALSE, c, 0, 0, TO_ROOM );
+
+            look_at_room ( c, 0 );
+            entry_memory_mtrigger ( c );
+            greet_mtrigger ( c, -1 );
+            greet_memory_mtrigger ( c );
+            enter_wtrigger ( IN_ROOM ( c ), c, -1 );
+        }
+
+        if ( victim->master )
+            victim = victim->master;
+    }
+
+    // move the victim (or master)
+    if ( RIDING ( victim ) && HERE ( RIDING ( victim ), victim ) )
+    {
+        act ( "$n and $N slowly fade out of existence and are gone.", FALSE, victim, 0, RIDING ( victim ), TO_ROOM );
+        move_char_to ( RIDING ( victim ), to_room );
+    }
+    else
+    {
+        act ( "$n slowly fades out of existence and is gone.",  FALSE, victim, 0, 0, TO_ROOM );
+        dismount_char ( victim );
+    }
+    move_char_to ( victim, to_room );
+
+    if ( RIDING ( victim ) && HERE ( RIDING ( victim ), victim ) )
+    {
+        act ( "$n and $N slowly fade into existence.", FALSE, victim, 0, RIDING ( victim ), TO_ROOM );
+        look_at_room ( RIDING ( victim ), 0 );
+    }
+    else
+        act ( "$n slowly fades into existence.", FALSE, victim, 0, 0, TO_ROOM );
+
+    look_at_room ( victim, 0 );
+    entry_memory_mtrigger ( victim );
+    greet_mtrigger ( victim, -1 );
+    greet_memory_mtrigger ( victim );
+    enter_wtrigger ( IN_ROOM ( victim ), victim, -1 );
 
 }
 
