@@ -867,8 +867,8 @@ bool vehicle_jump(Character *ch, char *argument)
   }
 
   if (!IN_ROOM(ch)->vehicle) {
-      log("SYSERR: Room is not part of a vehicle");
-      ch->Send("This room isnt part of a vehicle. Please bug this error.\r\n");
+      log ( "SYSERR: Room %d is not part of a vehicle", GET_ROOM_VNUM ( IN_ROOM ( ch ) ) );
+      ch->Send ( "This room isn't part of a vehicle. Please bug this error.\r\n" );
       return TRUE;
   }
   CREATE(vh, struct vehicle2_data, 1);
@@ -1009,7 +1009,7 @@ void delete_vehicle(struct obj_data *obj)
 
   /* What the? This vehicle does not have a room associated with it */
   if ((vroom = real_room(GET_OBJ_VAL(obj, 1))) == NULL) {
-      log("SYSERR: vehicle2 does not have a room");
+      log ( "SYSERR: vehicle2 [%d] %s does not have a room", GET_OBJ_VNUM ( obj ), obj->short_description );
       return;
   }
 

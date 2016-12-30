@@ -1059,7 +1059,7 @@ EVENTFUNC ( message_event )
     }
     else
     {
-        log ( "SYSERR: unknown type passed to message event" );
+        log ( "SYSERR: unknown type %d passed to message event", type );
     }
     if ( time == 0 || msg->msg_num == 0 || ( --msg->msg_num ) <= 0 )
     {

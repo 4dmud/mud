@@ -5541,7 +5541,7 @@ struct obj_data *find_obj_by_uid_in_lookup_table ( long uid )
     obj_map::iterator o = obj_lookup_table.find ( uid );
     if ( o == obj_lookup_table.end() )
     {
-        log ( "find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid );
+        //log ( "find_obj_by_uid_in_lookup_table : No entity with number %ld in lookup table", uid );
         return NULL;
     }
     else

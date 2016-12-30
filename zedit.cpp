@@ -681,8 +681,8 @@ void zedit_disp_arg1(Descriptor *d)
     /*
      * We should never get here.
      */
-    cleanup_olc(d, CLEANUP_ALL);
-    new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg1(): Help!");
+    cleanup_olc ( d, CLEANUP_ALL );
+    new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg1(): unknown command %c", OLC_CMD(d).command );
     d->Output( "Oops...\r\n");
     return;
   }
@@ -727,9 +727,9 @@ void zedit_disp_arg2(Descriptor *d)
     /*
      * We should never get here, but just in case...
      */
-    cleanup_olc(d, CLEANUP_ALL);
-    new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg2(): Help!");
-    d->Output( "Oops...\r\n");
+    cleanup_olc ( d, CLEANUP_ALL );
+    new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg2(): unknown command %c", OLC_CMD(d).command );
+    d->Output ( "Oops...\r\n" );
     return;
   }
   OLC_MODE(d) = ZEDIT_ARG2;
@@ -783,9 +783,9 @@ void zedit_disp_arg3(Descriptor *d)
     /*
      * We should never get here, just in case.
      */
-    cleanup_olc(d, CLEANUP_ALL);
-    new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg3(): Help!");
-    d->Output( "Oops...\r\n");
+    cleanup_olc ( d, CLEANUP_ALL );
+    new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_disp_arg3(): unknown command %c", OLC_CMD(d).command );
+    d->Output ( "Oops...\r\n" );
     return;
   }
   OLC_MODE(d) = ZEDIT_ARG3;
@@ -1119,9 +1119,9 @@ void zedit_parse(Descriptor *d, char *arg)
       /*
        * We should never get here.
        */
-      cleanup_olc(d, CLEANUP_ALL);
-      new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG1: Ack!");
-      d->Output( "Oops...\r\n");
+      cleanup_olc ( d, CLEANUP_ALL );
+      new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG1: unknown command %c", OLC_CMD(d).command );
+      d->Output ( "Oops...\r\n" );
       break;
     }
     break;
@@ -1188,9 +1188,9 @@ void zedit_parse(Descriptor *d, char *arg)
       /*
        * We should never get here, but just in case...
        */
-      cleanup_olc(d, CLEANUP_ALL);
-      new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG2: Ack!");
-      d->Output( "Oops...\r\n");
+      cleanup_olc ( d, CLEANUP_ALL );
+      new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG2: unknown command %c", OLC_CMD(d).command );
+      d->Output ( "Oops...\r\n" );
       break;
     }
     break;
@@ -1246,9 +1246,9 @@ void zedit_parse(Descriptor *d, char *arg)
       /*
        * We should never get here, but just in case...
        */
-      cleanup_olc(d, CLEANUP_ALL);
-      new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG3: Ack!");
-      d->Output( "Oops...\r\n");
+      cleanup_olc ( d, CLEANUP_ALL );
+      new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: zedit_parse(): case ARG3: unknown command %c", OLC_CMD(d).command );
+      d->Output ( "Oops...\r\n" );
       break;
     }
     break;

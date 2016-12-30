@@ -419,29 +419,28 @@ int save_objects(zone_rnum zone_num)
        * Do we have extra descriptions?
        */
       if (obj->ex_description) {	/* Yes, save them too. */
-    for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {
-      /*
-       * Sanity check to prevent nasty protection faults.
-       */
-      if (!ex_desc->keyword || !ex_desc->description || !*ex_desc->keyword || !*ex_desc->description) {
-        new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: OLC: oedit_save_to_disk: Corrupt ex_desc!");
-        continue;
-      }
-      strncpy(buf, ex_desc->description, sizeof(buf) - 1);
-      strip_cr(buf);
-      fprintf(fp, "E\n"
-          "%s~\n"
-          "%s~\n", ex_desc->keyword, buf);
-    }
+          for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {
+          /*
+           * Sanity check to prevent nasty protection faults.
+           */
+              if (!ex_desc->keyword || !ex_desc->description || !*ex_desc->keyword || !*ex_desc->description) {
+                  new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: OLC: oedit_save_to_disk: Corrupt ex_desc!");
+                  continue;
+              }
+              strncpy(buf, ex_desc->description, sizeof(buf) - 1);
+              strip_cr(buf);
+              fprintf(fp, "E\n"
+                          "%s~\n"
+                          "%s~\n", ex_desc->keyword, buf);
+          }
       }
       /*
        * Do we have affects?
        */
       for (counter2 = 0; counter2 < MAX_OBJ_AFFECT; counter2++)
-    if (obj->affected[counter2].modifier)
-      fprintf(fp, "A\n"
-          "%d %d\n", obj->affected[counter2].location,
-          obj->affected[counter2].modifier);
+          if (obj->affected[counter2].modifier)
+              fprintf(fp, "A\n"
+                          "%d %d\n", obj->affected[counter2].location, obj->affected[counter2].modifier);
 
       /* New vehicle attachments */
       for (att = obj->attachment; att; att = att->next)

@@ -91,6 +91,7 @@ extern const char *unused_spellmessage;
 
 extern const char *colour_names[];
 extern const char *quality_names[];
-extern const char *origin_names[];
+extern const char *origins[];
+extern const vector< vector<string> > origin_names;
 
 #endif

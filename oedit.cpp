@@ -984,10 +984,10 @@ void oedit_disp_crafting_origin_menu ( Descriptor *d )
     OLC_MODE ( d ) = OEDIT_CRAFTING_ORIGIN;
     get_char_colours ( d->character );
 
-    for ( i = 0; i < NUM_ORIGIN_NAMES; i++ )
+    for ( i = 0; i < origin_names.size(); i++ )
     {
         d->Output ( "%s%2d%s) %-20.20s %s", grn, i, nrm,
-                    origin_names [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
+                    origins [ i ], ! ( ++col % 3 ) ? "\r\n" : "" );
     }
     d->Output ( "%s\r\nEnter Origin value : ", ( col % 3 == 2 ) ? "\r\n" : "" );
 }
@@ -2022,7 +2022,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             return;
 
         case OEDIT_CRAFTING_ORIGIN:
-            GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, NUM_ORIGIN_NAMES - 1 );
+            GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, origin_names.size() - 1 );
             oedit_disp_crafting_stage_menu ( d );
             return;
 
@@ -2042,7 +2042,7 @@ void oedit_parse ( Descriptor *d, char *arg )
                     cyn, GET_OBJ_QUALITY ( OLC_OBJ ( d ) ) > 0 ? QUALITY_NAME ( OLC_OBJ ( d ) ) : "none", GET_OBJ_QUALITY ( OLC_OBJ ( d ) ), nrm,
                     cyn, material_name ( GET_OBJ_MATERIAL ( OLC_OBJ ( d ) ) ), nrm,
                     cyn, GET_OBJ_DYECOUNT ( OLC_OBJ ( d ) ), nrm,
-                    cyn, origin_names [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,
+                    cyn, origins [ GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) ], nrm,
                     cyn, GET_OBJ_STAGE ( OLC_OBJ ( d ) ), nrm,
                     cyn, GET_OBJ_REPAIRS ( OLC_OBJ ( d ) ), nrm );
             break;

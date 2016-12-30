@@ -1934,29 +1934,13 @@ void do_stat_object ( Character *ch, struct obj_data *j )
 
     if ( GET_OBJ_ORIGIN ( j ) != 0 )
     {
-        ch->Send ( "Origin: " );
-        if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SOFTWOOD )
-            ch->Send ( "%s, hardwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SPECIALWOOD )
-            ch->Send ( "%s, softwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_FRUITWOOD )
-            ch->Send ( "%s, specialwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_JUNKWOOD )
-            ch->Send ( "%s, fruitwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_LARGE_ANIMAL )
-            ch->Send ( "%s, junkwood", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_REPTILE )
-            ch->Send ( "%s, large animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_SMALL_ANIMAL )
-            ch->Send ( "%s, reptile", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_NORMAL_ANIMAL )
-            ch->Send ( "%s, small animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( j ) < BEGIN_OF_FURRY_ANIMAL )
-            ch->Send ( "%s, normal animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else if ( GET_OBJ_ORIGIN ( j ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( j ) < NUM_ORIGIN_NAMES )
-            ch->Send ( "%s, furry animal", origin_names[ GET_OBJ_ORIGIN ( j )] );
-        else ch->Send ( "out of range" );
-        ch->Send ( "\r\n" );
+        if ( GET_OBJ_ORIGIN ( j ) < 0 || GET_OBJ_ORIGIN ( j ) >= origin_names.size() )
+        {
+            log ( "SYSERR: obj origin of [%d] %s was %d", GET_OBJ_VNUM ( j ), j->short_description, GET_OBJ_ORIGIN ( j ) );
+            GET_OBJ_ORIGIN ( j ) = 0;
+        }
+        else
+            ch->Send ( "Origin: %s\r\n", origins[ GET_OBJ_ORIGIN ( j ) ] );
     }
 
     if ( GET_OBJ_STAGE ( j ) != 0 )

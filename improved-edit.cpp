@@ -482,7 +482,7 @@ void parse_action(int command, char *string, Descriptor *d)
     break;
   default:
     d->Output( "Invalid option.\r\n");
-    new_mudlog(BRF, LVL_IMPL, TRUE, "SYSERR: invalid command passed to parse_action");
+    new_mudlog( BRF, LVL_IMPL, TRUE, "SYSERR: invalid command '%d %s' passed to parse_action", command, string );
     return;
   }
 }

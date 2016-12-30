@@ -819,19 +819,19 @@ void char_from_chair ( Character *ch )
         return;
     }
 
-        for (firstch = tempch; firstch; firstch = nextch)
+    for (firstch = tempch; firstch; firstch = nextch)
     {
-            nextch = NEXT_SITTING(firstch);
-            if (nextch && nextch == ch)
+        nextch = NEXT_SITTING(firstch);
+        if (nextch && nextch == ch)
         {
-                NEXT_SITTING(firstch) = NEXT_SITTING(ch);
-                GET_OBJ_VAL(chair, 1) -= 1;
-        found = 1;
-                break;
-            }
+            NEXT_SITTING(firstch) = NEXT_SITTING(ch);
+            GET_OBJ_VAL(chair, 1) -= 1;
+            found = 1;
+            break;
+        }
     }
     if ( found == 0 )
-        log ( "SYSERR: Char flagged as sitting, but not in chair" );
+        log ( "SYSERR: Char %s flagged as sitting, but not in chair", GET_NAME ( ch ) );
 
     SITTING ( ch ) = NULL;
     NEXT_SITTING ( ch ) = NULL;
@@ -1111,7 +1111,7 @@ int obj_from_char ( struct obj_data *object )
 
     if ( object->carried_by == NULL )
     {
-        log ( "SYSERR: Trying to remove obj from char that isn't held." );
+        log ( "SYSERR: Trying to remove obj [%d] %s from char that isn't held.", GET_OBJ_VNUM ( object ), object->short_description );
         return 0;
     }
 
@@ -1198,29 +1198,27 @@ int equip_char ( Character *ch, struct obj_data *obj, int pos )
     }
     if ( !obj )
     {
-        log ( "SYSERR: NULL obj passed to equip_char." );
+        log ( "SYSERR: NULL obj passed to equip_char %s", GET_NAME ( ch ) );
         return 0;
     }
 
     if ( GET_EQ ( ch, pos ) )
     {
-        log ( "SYSERR: Char is already equipped: %s, %s", GET_NAME ( ch ),
-              obj->short_description );
+        log ( "SYSERR: Char %s is already equipped: %s", GET_NAME ( ch ), obj->short_description );
         return 0;
     }
     if ( obj->carried_by )
     {
-        log ( "SYSERR: EQUIP: Obj is carried_by when equip." );
+        log ( "SYSERR: EQUIP: Obj [%d] is carried_by %s when equip.", GET_OBJ_VNUM ( obj ), GET_NAME ( ch ) );
         return 0;
     }
     if ( IN_ROOM ( obj ) != NULL )
     {
-        log ( "SYSERR: EQUIP: Obj is in_room when equip." );
+        log ( "SYSERR: EQUIP: Obj [%d] is in_room when equip.", GET_OBJ_VNUM ( obj ) );
         return 0;
     }
 
-    if ( invalid_align ( ch, obj ) || invalid_class ( ch, obj )
-            || invalid_race ( ch, obj ) )
+    if ( invalid_align ( ch, obj ) || invalid_class ( ch, obj ) || invalid_race ( ch, obj ) )
     {
         act ( "You are zapped by $p and instantly let go of it.", FALSE, ch, obj, 0, TO_CHAR );
         act ( "$n is zapped by $p and instantly lets go of it.", FALSE, ch, obj, 0, TO_ROOM );
@@ -1244,8 +1242,7 @@ int equip_char ( Character *ch, struct obj_data *obj, int pos )
                 IN_ROOM ( ch )->light++;
     }
     else if ( ch->loader == NOBODY )
-        log ( "SYSERR: IN_ROOM(ch) = NOWHERE when equipping char %s.",
-              GET_NAME ( ch ) );
+        log ( "SYSERR: IN_ROOM(ch) = NOWHERE when equipping char %s.", GET_NAME ( ch ) );
 
     for ( j = 0; j < MAX_OBJ_AFFECT; j++ )
         affect_modify_ar ( ch, obj->affected[j].location,
@@ -1629,7 +1626,10 @@ int obj_from_obj ( struct obj_data *obj )
 
     if ( !obj || !obj->in_obj )
     {
-        log ( "SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__ );
+        if ( obj )
+            log ( "SYSERR: obj_from_obj: [%d] %s isn't in a container", GET_OBJ_VNUM ( obj ), obj->short_description );
+        else
+            log ( "SYSERR: obj_from_obj: NULL obj passed" );
         core_dump();
         return 0;
     }
@@ -1738,7 +1738,7 @@ void extract_obj ( struct obj_data *obj, bool show_warning /* = true */ )
     if ( obj->worn_by != NULL )
         if ( unequip_char ( obj->worn_by, obj->worn_on ) != obj )
         {
-            log ( "SYSERR: Inconsistent worn_by and worn_on pointers!!" );
+            log ( "SYSERR: Inconsistent worn_by and worn_on pointers for [%d] %s", GET_OBJ_VNUM ( obj ), obj->short_description );
             return;
         }
     if ( ( room = IN_ROOM ( obj ) ) != NULL )

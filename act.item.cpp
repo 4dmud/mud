@@ -277,6 +277,7 @@ extern map<mob_vnum, Character *> mob_proto;
 
 /* External functions */
 
+string tolower ( const string &s );
 int invalid_class ( Character *ch, struct obj_data *obj );
 int invalid_race ( Character *ch, struct obj_data *obj );
 void remove_corpse_from_list ( OBJ_DATA *corpse );
@@ -2244,7 +2245,7 @@ void weight_change_object ( struct obj_data *obj, int weight )
     }
     else
     {
-        log ( "SYSERR: Unknown attempt to subtract weight from an object." );
+        log ( "SYSERR: Unknown attempt to change weight of object [%d] %s by %d", GET_OBJ_VNUM ( obj ), obj->short_description, weight );
     }
 }
 
@@ -2279,7 +2280,7 @@ void weight_to_object ( struct obj_data *obj, int weight )
     }
     else
     {
-        log ( "SYSERR: Unknown attempt to subtract weight from an object." );
+        log ( "SYSERR: Unknown attempt to set weight of object [%d] %s to %d", GET_OBJ_VNUM ( obj ), obj->short_description, weight );
     }
 }
 
@@ -3647,7 +3648,7 @@ int find_eq_pos ( Character *ch, struct obj_data *obj, char *arg )
         char arg1[MAX_INPUT_LENGTH];
         one_argument ( arg, arg1 );
         where = search_block ( arg1, body, FALSE );
-        if ( !CAN_WEAR ( obj, where_to_worn ( where ) ) )
+        if ( where == -1 || !CAN_WEAR ( obj, where_to_worn ( where ) ) )
             return -1;
         if ( ( ( where ) < 0 ) || ( *arg == '!' ) )
         {
@@ -4825,61 +4826,63 @@ int race_speed ( Character *ch )
 
 void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
 {
-    size_t i, pos;
-    string s;
-    map<mob_vnum, Character *>::iterator mob_it;
-
     // Exception: [1101] the antelope squirrel is a squirrel
     if ( strstr ( corpse->short_description, "antelope squirrel" ) != NULL )
     {
-        for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
-            if ( !strcmp ( origin_names[ i ], "squirrel" ) )
-            {
-                GET_OBJ_ORIGIN ( obj ) = i;
-                return;
-            }
+        for ( size_t i = 1; i < origin_names.size(); i++ )
+            for ( string origin : origin_names[i] )
+                if ( origin == "squirrel" )
+                {
+                    GET_OBJ_ORIGIN ( obj ) = i;
+                    return;
+                }
     }
 
     // Exception: [1128] the kangaroo rat is a rat
     if ( strstr ( corpse->short_description, "kangaroo rat" ) != NULL )
     {
-        for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
-            if ( !strcmp ( origin_names[ i ], "rat" ) )
+        for ( size_t i = 1; i < origin_names.size(); i++ )
+            for ( string origin : origin_names[i] )
+                if ( origin == "rat" )
+                {
+                    GET_OBJ_ORIGIN ( obj ) = i;
+                    return;
+                }
+    }
+
+    // Match the mob's name with every animal origin
+
+    Character *mob = GetMobProto ( GET_OBJ_VAL ( corpse, 1 ) );
+    if ( !mob )
+        return;
+
+    string s = tolower ( string ( GET_NAME ( mob ) ) );
+    for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
+        for ( string origin : origin_names.at(i) )
+        {
+            size_t pos = s.find ( origin );
+            if ( pos != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
             {
                 GET_OBJ_ORIGIN ( obj ) = i;
                 return;
             }
-    }
-
-    // Match the short_desc of the mob with a string from origin_names
-
-    s = string ( corpse->short_description );
-    transform ( s.begin(), s.end(), s.begin(), ::tolower );
-    for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
-        if ( ( pos = s.find ( origin_names[ i ], 14 ) ) != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) ) // skip "the corpse of "
-        {
-            GET_OBJ_ORIGIN ( obj ) = i;
-            return;
         }
 
-    // No match, try the mob's namelist
+    // No match, try the mob's aliases
 
-    for ( mob_it = mob_proto.begin(); mob_it != mob_proto.end(); mob_it++ )
-        if ( MOB_SKIN ( mob_it->second ) != GET_OBJ_VNUM ( obj ) )
-            continue;
-        else
+    s = tolower ( string ( mob->player.name ) );
+    for ( size_t i = 6; i < origin_names.size(); i++ ) // skip tree origins
+        for ( string origin : origin_names[i] )
         {
-            s = string ( mob_it->second->player.name );
-            transform ( s.begin(), s.end(), s.begin(), ::tolower );
-            for ( i = BEGIN_OF_LARGE_ANIMAL; i < NUM_ORIGIN_NAMES; i++ )
-                if ( ( pos = s.find ( origin_names[ i ] ) ) != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
+            size_t pos = s.find( origin );
+            if ( pos != string::npos && ( pos == 0 || s[pos - 1] == ' ' ) )
                 {
                     GET_OBJ_ORIGIN ( obj ) = i;
                     return;
                 }
         }
 
-    log ( "SYSERR: Couldn't find the animal origin of %s", corpse->short_description );
+    log ( "SYSERR: Couldn't find the animal origin of [%d] %s", GET_MOB_VNUM ( mob ), GET_NAME ( mob ) );
 }
 
 ACMD ( do_skin )

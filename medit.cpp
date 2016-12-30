@@ -158,7 +158,7 @@ ACMD ( do_oasis_medit )
     if ( d->olc )
     {
         new_mudlog ( BRF, LVL_IMMORT, TRUE,
-                     "SYSERR: do_oasis_medit: Player already had olc structure." );
+                     "SYSERR: do_oasis_medit: Player already had olc structure.");
         free ( d->olc );
     }
 

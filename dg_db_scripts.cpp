@@ -321,8 +321,7 @@ void assign_triggers(void *i, int type) {
         }
         break;
     default:
-        new_mudlog(BRF, LVL_BUILDER, TRUE,
-                   "SYSERR: unknown type for assign_triggers()");
+        new_mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: unknown type %d for assign_triggers()", type);
         break;
     }
 }

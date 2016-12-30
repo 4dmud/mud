@@ -313,7 +313,7 @@ int Board_write_message(int board_type, Character *ch, char *arg,
   if ((NEW_MSG_INDEX(board_type).slot_num = find_slot()) == -1)
   {
     ch->Send( "The board is malfunctioning - sorry.\r\n");
-    log("SYSERR: Board: failed to find empty slot on write.");
+    log("SYSERR: Board %d in room %d: failed to find empty slot on write.", board ? GET_OBJ_VNUM ( board ) : -1, GET_ROOM_VNUM ( IN_ROOM ( ch )));
     return (1);
   }
   /* skip blanks */

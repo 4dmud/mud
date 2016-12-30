@@ -252,7 +252,7 @@ void string_add ( Descriptor *d, char *str )
                     free_string ( &d->backstr );
                     break;
                 default:
-                    log ( "SYSERR: string_add: Aborting write from unknown origin." );
+                    log ( "SYSERR: string_add: Aborting write from unknown state %d of %s", STATE ( d ), d->character ? GET_NAME ( d->character ) : "?" );
                     break;
             }
             break;

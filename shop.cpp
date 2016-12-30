@@ -335,7 +335,7 @@ int evaluate_expression(struct obj_data *obj, char *expr)
         {
           if ((temp = pop(&ops)) != OPER_OPEN_PAREN)
           {
-            log("SYSERR: Illegal parenthesis in shop keyword expression.");
+            log("SYSERR: Illegal parenthesis in shop keyword expression %s", expr);
             return (FALSE);
           }
         }
@@ -350,7 +350,7 @@ int evaluate_expression(struct obj_data *obj, char *expr)
   temp = pop(&vals);
   if (top(&vals) != -1)
   {
-    log("SYSERR: Extra operands left on shop keyword expression stack.");
+    log("SYSERR: Extra operands left on shop keyword expression stack (%s)", expr);
     return (FALSE);
   }
   return (temp);

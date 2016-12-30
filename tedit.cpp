@@ -60,7 +60,7 @@ void tedit_string_cleanup(Descriptor *d, int terminator)
     act("$n stops editing some scrolls.", TRUE, d->character, 0, 0, TO_ROOM);
     break;
   default:
-    log("SYSERR: tedit_string_cleanup: Unknown terminator status.");
+    log("SYSERR: tedit_string_cleanup: Unknown terminator status %d", terminator);
     break;
   }
 

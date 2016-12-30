@@ -1070,17 +1070,17 @@ class Room;
 #define TW_ARRAY_MAX    4
 #define EF_ARRAY_MAX    4
 
-/* Origin categories, indexes into origin_names */
-#define BEGIN_OF_HARDWOOD       1
-#define BEGIN_OF_SOFTWOOD       12
-#define BEGIN_OF_SPECIALWOOD    18
-#define BEGIN_OF_FRUITWOOD      27
-#define BEGIN_OF_JUNKWOOD       33
-#define BEGIN_OF_LARGE_ANIMAL   38
-#define BEGIN_OF_REPTILE        42
-#define BEGIN_OF_SMALL_ANIMAL   51
-#define BEGIN_OF_NORMAL_ANIMAL  53
-#define BEGIN_OF_FURRY_ANIMAL   85
+/* Origin categories, indexes into origins and origin_names */
+#define ORIGIN_HARDWOOD       1
+#define ORIGIN_SOFTWOOD       2
+#define ORIGIN_SPECIALWOOD    3
+#define ORIGIN_FRUITWOOD      4
+#define ORIGIN_JUNKWOOD       5
+#define ORIGIN_LARGE_ANIMAL   6
+#define ORIGIN_REPTILE        7
+#define ORIGIN_SMALL_ANIMAL   8
+#define ORIGIN_NORMAL_ANIMAL  9
+#define ORIGIN_FURRY_ANIMAL   10
 
 /* Character.internal_flags (INT_XXX) ************************************/
 #define INT_MARK     (1 <<  0)
@@ -1183,7 +1183,6 @@ class Room;
 #define NUM_QUALITY_NAMES       7
 #define QUALITY_NAME(obj)       quality_names[ (int) ceil( GET_OBJ_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
 #define MAX_QUALITY_NAME(obj)   quality_names[ (int) ceil( GET_OBJ_MAX_QUALITY(obj)/100 * (NUM_QUALITY_NAMES - 1) ) ]
-#define NUM_ORIGIN_NAMES        125
 
 
 /*

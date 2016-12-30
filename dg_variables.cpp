@@ -2994,93 +2994,13 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     break;
                 case 'h':
 
-                    if ( !strcasecmp ( field, "has_origin_fruitwood" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_FRUITWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_JUNKWOOD )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_furry_animal" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_FURRY_ANIMAL && GET_OBJ_ORIGIN ( o ) < NUM_ORIGIN_NAMES )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_hardwood" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_HARDWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SOFTWOOD )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_junkwood" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_JUNKWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_LARGE_ANIMAL )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_large_animal" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_LARGE_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_REPTILE )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_normal_animal" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_NORMAL_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_FURRY_ANIMAL )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_reptile" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_REPTILE && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SMALL_ANIMAL )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_small_animal" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SMALL_ANIMAL && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_NORMAL_ANIMAL )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_softwood" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SOFTWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_SPECIALWOOD )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_origin_specialwood" ) )
-                    {
-                        if ( GET_OBJ_ORIGIN ( o ) >= BEGIN_OF_SPECIALWOOD && GET_OBJ_ORIGIN ( o ) < BEGIN_OF_FRUITWOOD )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
-
-                    else if ( !strcasecmp ( field, "has_pos" ) )
+                    if ( !strcasecmp ( field, "has_pos" ) )
                     {
                         if ( subfield && *subfield )
                         {
                             int where_to_worn ( int where );
                             int where = search_block ( subfield, body, FALSE );
-                            if ( !CAN_WEAR ( o, where_to_worn ( where ) ) )
+                            if ( where == -1 || !CAN_WEAR ( o, where_to_worn ( where ) ) )
                                 snprintf ( str, slen, "0" );
                             else
                                 snprintf ( str, slen, "1" );
@@ -3272,6 +3192,15 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         }
                         else
                             snprintf ( str, slen, "%ld", o->owner );
+                    }
+                    else if ( !strcasecmp ( field, "origin" ) )
+                    {
+                        if ( GET_OBJ_ORIGIN ( o ) < 0 || GET_OBJ_ORIGIN ( o ) >= origin_names.size() )
+                        {
+                            log ( "SYSERR: obj origin of [%d] %s was out of range: %d", GET_OBJ_VNUM ( o ), o->short_description, GET_OBJ_ORIGIN ( o ) );
+                            GET_OBJ_ORIGIN ( o ) = 0;
+                        }
+                        snprintf ( str, slen, "%s", origins[ GET_OBJ_ORIGIN ( o ) ] );
                     }
                     break;
 

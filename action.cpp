@@ -55,19 +55,16 @@ ACTION(thing_tunneling);
 
 void set_tree_origin ( struct obj_data *obj, struct obj_data *tree )
 {
-    uint i, j = 0;
     string s = tolower ( string ( tree->short_description ) );
+    for ( size_t i = 1; i < origin_names.size(); ++i )
+        for ( auto origin : origin_names[i] )
+            if ( s.find ( origin ) != string::npos )
+            {
+                GET_OBJ_ORIGIN ( obj ) = i;
+                return;
+            }
 
-    for ( i = BEGIN_OF_HARDWOOD; i < BEGIN_OF_LARGE_ANIMAL; i++ )
-        if ( s.find ( origin_names[ i ] ) != string::npos )
-        {
-            j = i;
-            break;
-        }
-
-    if ( j > 0 )
-        GET_OBJ_ORIGIN ( obj ) = j;
-    else log ( "Couldn't set the tree origin for vnum %d, %s", GET_OBJ_VNUM ( tree ), tree->short_description );
+    log ( "SYSERR: Couldn't set the tree origin for [%d] %s", GET_OBJ_VNUM ( tree ), tree->short_description );
 }
 
 ACTION(thing_lumberjack)

@@ -5271,6 +5271,8 @@ void make_corpse ( Character *ch, Character *killer )
         //SET_BIT_AR(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
         SET_BIT_AR ( GET_OBJ_EXTRA ( corpse ), ITEM_NODONATE );
         GET_OBJ_VAL ( corpse, 0 ) = 0; /* You can't store stuff in a corpse */
+        if ( corpse->skin != NOTHING )
+            GET_OBJ_VAL ( corpse, 1 ) = GET_MOB_VNUM ( ch ); /* used to set skin origin */
         GET_OBJ_VAL ( corpse, 3 ) = 1; /* corpse identifier */
 
 

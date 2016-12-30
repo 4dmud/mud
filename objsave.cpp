@@ -1575,7 +1575,7 @@ int write_extra_descs(FILE *fl, OBJ_DATA *obj)
      */
     if (!ex_desc->keyword || !ex_desc->description || !*ex_desc->keyword || !*ex_desc->description)
     {
-      new_mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: save_one_item: Corrupt ex_desc!");
+      new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: save_one_item: Corrupt ex_desc for obj [%d] %s", GET_OBJ_VNUM ( obj ), obj->short_description );
       continue;
     }
     write_extra_desc(fl, ex_desc);
