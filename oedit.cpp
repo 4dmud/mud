@@ -2022,7 +2022,7 @@ void oedit_parse ( Descriptor *d, char *arg )
             return;
 
         case OEDIT_CRAFTING_ORIGIN:
-            GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, origin_names.size() - 1 );
+            GET_OBJ_ORIGIN ( OLC_OBJ ( d ) ) = LIMIT ( atoi ( arg ), 0, (int) origin_names.size() - 1 );
             oedit_disp_crafting_stage_menu ( d );
             return;
 
