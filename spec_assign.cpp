@@ -398,7 +398,6 @@ void assign_rooms(void)
 
     ASSIGNROOM(4, antidt);
 
-    ASSIGNROOM(280, fire);
     ASSIGNROOM(2499, fire);
     ASSIGNROOM(8200, fire);
     ASSIGNROOM(8201, fire);
@@ -421,12 +420,12 @@ void assign_rooms(void)
     ASSIGNROOM(8218, fire);
     ASSIGNROOM(8219, fire);
 
+    ASSIGNROOM(60076, dump);
     ASSIGNROOM(60743, dump);
     ASSIGNROOM(61193, dump);
     ASSIGNROOM(61319, dump);
-    ASSIGNROOM(61376, dump);
+    ASSIGNROOM(61667, dump);
     ASSIGNROOM(62214, dump);
-    ASSIGNROOM(62667, dump);
 
     if (CONFIG_DTS_ARE_DUMPS)
     for (i = 0; i <= top_of_world; i++)
