@@ -911,15 +911,11 @@ ACMD ( do_ungroup )
 
     REMOVE_BIT_AR ( AFF_FLAGS ( tch ), AFF_GROUP );
 
-    act ( "$N is no longer a member of your group.", FALSE, ch, 0, tch,
-          TO_CHAR );
-    act ( "You have been kicked out of $n's group!", FALSE, ch, 0, tch,
-          TO_VICT );
-    act ( "$N has been kicked out of $n's group!", FALSE, ch, 0, tch,
-          TO_NOTVICT );
+    act ( "$N is no longer a member of your group.", FALSE, ch, 0, tch, TO_CHAR );
+    act ( "You have been kicked out of $n's group!", FALSE, ch, 0, tch, TO_VICT );
+    act ( "$N has been kicked out of $n's group!", FALSE, ch, 0, tch, TO_NOTVICT );
 
-    if ( !AFF_FLAGGED ( tch, AFF_CHARM ) )
-        stop_follower ( tch );
+    stop_follower ( tch );
 }
 
 

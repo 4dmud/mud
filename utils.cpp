@@ -834,20 +834,18 @@ void stop_follower ( Character *ch )
         act ( "You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR );
         act ( "$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT );
         act ( "$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT );
-        stop_fusion ( ch );
     }
+
+    stop_fusion ( ch );
 
     if ( ch->master->followers->follower == ch )  /* Head of follower-list? */
     {
         k = ch->master->followers;
         ch->master->followers = k->next;
         free ( k );
-
     }
     else              /* locate follower who is not head of list */
     {
-
-
         for ( k = ch->master->followers; k && k->next ; k = ( k ? k->next : NULL ) )
         {
             if ( !k )
