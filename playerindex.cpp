@@ -351,8 +351,8 @@ int PlayerIndex::LoadChar(const char *name, Character *ch) {
     if (player_table.size() == 0)
         return -1;
 
-    for (tch = character_list;tch;tch = tch->next) {
-        if (!IS_NPC(tch) && !strcmp(GET_NAME(tch), name)) {
+    for (tch = character_list; tch; tch = tch->next) {
+        if (!IS_NPC(tch) && GET_NAME(tch) && !strcmp(GET_NAME(tch), name)) {
             log("load_char loading a character (%s) that is already in the game!", name);
         }
     }
