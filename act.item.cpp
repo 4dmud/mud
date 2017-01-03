@@ -4852,7 +4852,7 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
 
     // Match the mob's name with every animal origin
 
-    Character *mob = GetMobProto ( GET_OBJ_VAL ( corpse, 1 ) );
+    Character *mob = GetMobProto ( GET_OBJ_VAL ( corpse, 5 ) );
     if ( !mob )
         return;
 
