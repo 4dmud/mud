@@ -58,7 +58,7 @@ void echo_on ( Descriptor *d );
 void echo_off ( Descriptor *d );
 void do_start ( Character *ch );
 int special ( Character *ch, int cmd, char *arg , char *cmd_arg);
-int isbanned ( char *hostname );
+int isbanned ( char *hostname, bool is_player_name );
 void read_saved_vars ( Character *ch );
 int Valid_Name ( char *newname );
 void roll_real_abils ( Character *ch );
@@ -2024,7 +2024,7 @@ void list_current_accounts_menu ( Descriptor *d )
             d->Output ( "{cy%2d{cg)%s %-15s%s%s{c0",
                         i, pi.AccByIndex ( index ) == pi.IdByIndex ( index ) ? "!" : " " ,
                         pi.NameByIndex ( index ), ( ( i+1 ) %2 ) == 0 ? "\r\n" : "   ",
-                        isbanned ( pi.NameByIndex ( index ) ) ? "{cR(BANNED)" : "        " );
+                        isbanned ( pi.NameByIndex ( index ), TRUE ) ? "{cR(BANNED)" : "        " );
             i++;
         }
     }
@@ -2083,7 +2083,7 @@ int parse_accounts ( Descriptor *d, char *arg )
         account_manage_menu ( d );
         return 0;
     }
-    if ( isbanned ( pi.NameByIndex ( pos ) ) )
+    if ( isbanned ( pi.NameByIndex ( pos ), TRUE ) )
     {
         d->Output ( "\r\n%s is banned and you can't choose that account.\r\n", name );
         account_manage_menu ( d );
@@ -2620,7 +2620,7 @@ void nanny ( Descriptor *d, char *arg )
         case CON_NAME_CNFRM:   /* wait for conf. of new name    */
             if ( UPPER ( *arg ) == 'Y' )
             {
-                if ( isbanned ( ( char * ) d->host.c_str() ) >= BAN_NEW )
+                if ( isbanned ( ( char * ) d->host.c_str(), FALSE ) >= BAN_NEW )
                 {
                     new_mudlog ( NRM, LVL_GOD, TRUE,
                                  "Request for new char %s denied from [%s] (siteban)",
@@ -2700,7 +2700,7 @@ void nanny ( Descriptor *d, char *arg )
                 GET_BAD_PWS ( d->character ) = 0;
                 d->bad_pws = 0;
 
-                if ( isbanned ( ( char * ) d->host.c_str() ) == BAN_SELECT &&
+                if ( isbanned ( ( char * ) d->host.c_str(), FALSE ) == BAN_SELECT &&
                         !PLR_FLAGGED ( d->character, PLR_SITEOK ) )
                 {
                     d->Output ( "Sorry, this char has not been cleared for login from your site!\r\n" );

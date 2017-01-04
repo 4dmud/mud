@@ -276,7 +276,7 @@ void extract_delayed_mobs(void);
 void extract_delayed_objs(void);
 void check_auction(void);
 int real_zone(int number);
-int isbanned(char *hostname);
+int isbanned(char *hostname, bool is_player_name);
 void free_messages(void);
 void update_spell_wait(void);
 int restrict_check(const Character *ch);
@@ -2177,35 +2177,29 @@ Descriptor * Descriptor::new_descriptor(socket_t s, int copyover) {
     if (!copyover) {
 
         /* find the numeric site address */
-        //strlcpy(newd->host_ip, (char *)inet_ntoa(peer.sin_addr), HOST_LENGTH-1); /* strncpy: OK (n->host:HOST_LENGTH+1) */
         newd->host_ip = (char *)inet_ntoa(peer.sin_addr);
 
         /* find the sitename */
         if (!check_for_ip(newd->host_ip, newd->host)) {
 
-            if (!(from = gethostbyaddr((char *) &peer.sin_addr,
-                                       sizeof(peer.sin_addr), AF_INET))) {
+            if (!(from = gethostbyaddr((char *) &peer.sin_addr, sizeof peer.sin_addr, AF_INET))) {
                 perror("SYSERR: gethostbyaddr");
 
                 /* find the numeric site address */
-        //strlcpy(newd->host, newd->host_ip, HOST_LENGTH - 1);    /* strncpy: OK (n->host:HOST_LENGTH+1) */
-        newd->host = newd->host_ip;
-
-            } else {
-            //strlcpy(newd->host, from->h_name, HOST_LENGTH-1);     /* strncpy: OK (n->host:HOST_LENGTH+1) */
-            newd->host = from->h_name;
-
+                newd->host = newd->host_ip;
             }
+            else
+                newd->host = from->h_name;
+
             add_ip_to_host_list(newd->host_ip, newd->host, time(0));
             save_host_list();
-
-        } else { //check_for_ip
-        log("Meta Host Used: %s found.", newd->host.c_str());
         }
+        else // check_for_ip
+            log("Meta Host Used: %s found.", newd->host.c_str());
 
-    if (isbanned((char *)newd->host.c_str()) == BAN_ALL) {
+        if (isbanned((char *)newd->host.c_str(), FALSE) == BAN_ALL) {
             CLOSE_SOCKET(desc);
-        new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host.c_str());
+            new_mudlog(CMP, LVL_GOD, TRUE, "Connection attempt denied from [%s]", newd->host.c_str());
             delete newd;
             return (NULL);
         }

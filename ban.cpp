@@ -24,7 +24,7 @@ struct ban_list_element *ban_list = NULL;
 
 /* local functions */
 void load_banned ( void );
-int isbanned ( char *hostname );
+int isbanned ( char *hostname, bool is_player_name );
 void _write_one_node ( FILE * fp, struct ban_list_element *node );
 void write_ban_list ( void );
 ACMD ( do_ban );
@@ -59,16 +59,12 @@ void load_banned ( void )
     if ( ! ( fl = fopen ( BAN_FILE, "r" ) ) )
     {
         if ( errno != ENOENT )
-        {
-            log ( "SYSERR: Unable to open banfile '%s': %s", BAN_FILE,
-                  strerror ( errno ) );
-        }
+            log ( "SYSERR: Unable to open banfile '%s': %s", BAN_FILE, strerror ( errno ) );
         else
             log ( "   Ban file '%s' doesn't exist.", BAN_FILE );
         return;
     }
-    while ( fscanf ( fl, " %s %s %d %s ", ban_type, site_name, &date, name ) ==
-            4 )
+    while ( fscanf ( fl, " %s %s %d %s ", ban_type, site_name, &date, name ) == 4 )
     {
         CREATE ( next_node, struct ban_list_element, 1 );
         strncpy ( next_node->site, site_name, BANNED_SITE_LENGTH );
@@ -88,8 +84,7 @@ void load_banned ( void )
     fclose ( fl );
 }
 
-
-int isbanned ( char *hostname )
+int isbanned ( char *hostname, bool is_player_name )
 {
     int i;
     struct ban_list_element *banned_node;
@@ -102,12 +97,16 @@ int isbanned ( char *hostname )
     for ( nextchar = hostname; *nextchar; nextchar++ )
         *nextchar = LOWER ( *nextchar );
 
-    for ( banned_node = ban_list; banned_node;
-            banned_node = banned_node->next )
+    for ( banned_node = ban_list; banned_node; banned_node = banned_node->next )
+    {
+        // don't compare a playername with a hostname
+        if ( is_player_name && banned_node->type != BAN_NAME )
+            continue;
         if ( strstr ( hostname, banned_node->site ) )	/* if hostname is a substring */
             i = MAX ( i, banned_node->type );
+    }
 
-    return ( i );
+    return i;
 }
 
 
@@ -137,15 +136,13 @@ void write_ban_list ( void )
     return;
 }
 
-#define BAN_LIST_FORMAT "%-40.40s  %-8.8s  %-10.10s  %-16.16s\r\n"
+#define BAN_LIST_FORMAT "%-40.40s  %-6.6s  %-11.11s  %-16.16s\r\n"
 ACMD ( do_ban )
 {
     char flag[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
-    char  timestr[16];
+    char timestr[25];
     int i;
     struct ban_list_element *ban_node;
-
-
 
     if ( !*argument )
     {
@@ -155,20 +152,29 @@ ACMD ( do_ban )
             return;
         }
         ch->Send ( BAN_LIST_FORMAT,
-                   "Banned Site Name", "Ban Type", "Banned On", "Banned By" );
+                   "Banned Site or Player Name", "Type", "Banned On", "Banned By" );
         ch->Send ( BAN_LIST_FORMAT,
                    "---------------------------------",
                    "---------------------------------",
                    "---------------------------------",
                    "---------------------------------" );
 
-
         for ( ban_node = ban_list; ban_node; ban_node = ban_node->next )
         {
             if ( ban_node->date )
             {
-                strlcpy ( timestr, asctime ( localtime ( & ( ban_node->date ) ) ), 10 );
-                timestr[10] = '\0';
+                strlcpy ( timestr, asctime ( localtime ( & ( ban_node->date ) ) ), 25 );
+                timestr[25] = '\0';
+                string s_time, s = string ( timestr );
+                stringstream ss ( s );
+                ss >> s; // skip day of the week
+                ss >> s_time; // month
+                ss >> s; // day
+                s_time += " " + s;
+                ss >> s; // skip time
+                ss >> s; // year
+                s_time += " " + s;
+                strcpy ( timestr, s_time.c_str() );
             }
             else
                 strcpy ( timestr, "Unknown" );
@@ -177,10 +183,12 @@ ACMD ( do_ban )
         }
         return;
     }
-       two_arguments ( argument, flag, site );
-       if ( !*site || !*flag )
+
+    two_arguments ( argument, flag, site );
+
+    if ( !*site || !*flag )
     {
-                ch->Send( "Usage: ban {{all | select | new | name} site_name/playername\r\n" );
+        ch->Send( "Usage: ban {{all | select | new | name} site_name/playername\r\n" );
         return;
     }
     if ( !
@@ -194,9 +202,7 @@ ACMD ( do_ban )
     {
         if ( !str_cmp ( ban_node->site, site ) )
         {
-            send_to_char
-            ( "That site has already been banned -- unban it to change the ban type.\r\n",
-              ch );
+            ch->Send ( "That site has already been banned -- unban it to change the ban type.\r\n" );
             return;
         }
     }
@@ -219,7 +225,7 @@ ACMD ( do_ban )
 
     new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "%s has banned %s for %s players.", GET_NAME ( ch ), site,
                  ban_types[ban_node->type] );
-     ch->Send( "Site banned.\r\n" );
+    ch->Send( "Site banned.\r\n" );
     write_ban_list();
 }
 
@@ -292,7 +298,7 @@ int num_invalid = 0;
 
 int Valid_Name ( char *newname )
 {
-    int i, wovels = 0;
+    int i, vowels = 0;
     Descriptor *dt;
     char tempname[MAX_INPUT_LENGTH];
 
@@ -314,16 +320,16 @@ int Valid_Name ( char *newname )
             if ( GET_IDNUM ( dt->character ) == -1 )
                 return ( IS_PLAYING ( dt ) );
 
-    /* count wovels */
+    /* count vowels */
     for ( i = 0; newname[i]; i++ )
     {
         if ( strchr ( "aeiouyAEIOUY", newname[i] ) )
-            wovels++;
+            vowels++;
     }
 
 
-    /* return invalid if no wovels */
-    if ( !wovels )
+    /* return invalid if no vowels */
+    if ( !vowels )
         return ( 0 );
 
     /* return valid if list doesn't exist */
@@ -335,7 +341,7 @@ int Valid_Name ( char *newname )
     for ( i = 0; tempname[i]; i++ )
         tempname[i] = LOWER ( tempname[i] );
 
-    if ( isbanned ( tempname ) == BAN_NAME )
+    if ( isbanned ( tempname, TRUE ) == BAN_NAME )
         return ( 0 );
 
     /* Does the desired name contain a string in the invalid list? */
