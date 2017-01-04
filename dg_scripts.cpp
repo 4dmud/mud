@@ -2924,24 +2924,28 @@ void makeuid_var ( void *go, struct script_data *sc, trig_data *trig,
 }
 
 // When a trigger stops running, reset its variables so it can be called again
+// Reset the parents as well
 void reset_trigger ( trig_data *trig )
 {
-    if ( GET_TRIG_VARS ( trig ) )
+    for ( trig_data *t = trig; t; t = t->parent )
     {
-        free_varlist ( GET_TRIG_VARS ( trig ) );
-        GET_TRIG_VARS ( trig ) = nullptr;
-    }
+        if ( GET_TRIG_VARS ( t ) )
+        {
+            free_varlist ( GET_TRIG_VARS ( t ) );
+            GET_TRIG_VARS ( t ) = nullptr;
+        }
 
-    if ( GET_TRIG_WAIT ( trig ) )
-    {
-        event_cancel ( GET_TRIG_WAIT ( trig ) );
-        GET_TRIG_WAIT ( trig ) = nullptr;
-    }
+        if ( GET_TRIG_WAIT ( t ) )
+        {
+            event_cancel ( GET_TRIG_WAIT ( t ) );
+            GET_TRIG_WAIT ( t ) = nullptr;
+        }
 
-    GET_TRIG_DEPTH ( trig ) = 0;
-    GET_TRIG_LINE_NR ( trig ) = 0;
-    GET_TRIG_LOOPS ( trig ) = 0;
-    trig->curr_state = nullptr;
+        GET_TRIG_DEPTH ( t ) = 0;
+        GET_TRIG_LINE_NR ( t ) = 0;
+        GET_TRIG_LOOPS ( t ) = 0;
+        t->curr_state = nullptr;
+    }
 }
 
 void function_script ( void *go, struct script_data *sc, trig_data *parent, int type, char *cmd )
@@ -2967,6 +2971,13 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
     if ( !t )
     {
         script_log ( "Trigger: %s, VNum %d. calling function %d when function doesn't exist! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+        reset_trigger ( parent ); // the parent is not resumed
+        return;
+    }
+
+    if ( GET_TRIG_VNUM ( parent ) == vnum )
+    {
+        script_log ( "Trigger: %s, VNum %d. a function trigger is trying to call itself in line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), GET_TRIG_LINE_NR ( parent ) );
         reset_trigger ( parent ); // the parent is not resumed
         return;
     }
