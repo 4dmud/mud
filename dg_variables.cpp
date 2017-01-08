@@ -3739,53 +3739,25 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             if ( trig->curr_state )
                                 script_log ( "Trigger: %s, VNum %d. no room flag specified. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
                         }
-                        else if ( !strcasecmp ( subfield, "death" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_DEATH ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
-                        else if ( !strcasecmp ( subfield, "godroom" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_GODROOM ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
-                        else if ( !strcasecmp ( subfield, "house" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_HOUSE ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
-                        else if ( !strcasecmp ( subfield, "nomob" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_NOMOB ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
-                        else if ( !strcasecmp ( subfield, "peaceful" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_PEACEFUL ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
-                        else if ( !strcasecmp ( subfield, "roleplay" ) )
-                        {
-                            if ( ROOM_FLAGGED ( r, ROOM_ROLEPLAY ) )
-                                snprintf ( str, slen, "1" );
-                            else
-                                snprintf ( str, slen, "0" );
-                        }
                         else
                         {
-                            *str = '\0';
-                            if ( trig->curr_state )
-                                script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            bool flag_found = FALSE;
+                            for ( int i = 0; i < NUM_ROOMFLAGS; ++i )
+                                if ( !strcasecmp ( room_bits[i], subfield ) )
+                                {
+                                    if ( ROOM_FLAGGED ( r, i ) )
+                                        snprintf ( str, slen, "1" );
+                                    else
+                                        snprintf ( str, slen, "0" );
+                                    flag_found = TRUE;
+                                    break;
+                                }
+                            if ( !flag_found )
+                            {
+                                *str = '\0';
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. unknown room flag: '%s'. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                         }
                     }
                     break;

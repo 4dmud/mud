@@ -770,7 +770,7 @@ const char *room_bits[] =
     "DRAGONPORT",
     "TIN_DEPOSIT",
     "PLASTONIUM_DEPOSIT",
-        "BURNING",
+    "BURNING",
     "ARTISAVE",
     "IRRADIATED",
     "PETSHOP",
