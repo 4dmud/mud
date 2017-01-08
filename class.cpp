@@ -1554,7 +1554,7 @@ void init_spell_levels ( void )
     assign_class ( SKILL_STRANGLE,          THI );
     assign_class ( SKILL_FOCUS,        GYP | RAN );
     assign_class ( SKILL_MARTIAL_ARTS, ALL_ROGUE );
-    assign_class ( SKILL_BESERK,       ALL_FIGHTER );
+    assign_class ( SKILL_BERSERK,      ALL_FIGHTER );
     assign_class ( SKILL_TRUE_STRIKE,  WAR | RAN );
     assign_class ( SKILL_FORTIFY,      ALL_FIGHTER );
     assign_class ( SKILL_SCALP,        GYP | RAN | HUN );

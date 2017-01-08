@@ -493,7 +493,7 @@ class Room;
 #define AFF_HYPERACTIVITY     39   /* Char is hyperactivity     */
 #define AFF_FORTIFY_MIND      40   /* Char has fortified their mind - spell prot*/
 #define AFF_FORTIFY_BODY      41   /* Char has Fortified their body - damage res*/
-#define AFF_BESERK            42   /* Char has gone Beserk      */
+#define AFF_BERSERK           42   /* Char has gone Berserk      */
 #define AFF_BLADEDANCE        43   /* Char is dancing the blades */
 #define AFF_BRACE             44   /* Char is bracing against attack */
 #define AFF_HOLY_STRENGTH     45   /* Char is super strong */

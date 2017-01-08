@@ -785,7 +785,7 @@ int size_dice_wep ( Character *ch, short dual )
             d_add += 2;
         if ( AFF_FLAGGED ( ch, AFF_GRIP ) )
             d_add += 2;
-        if ( AFF_FLAGGED ( ch, AFF_BESERK ) )
+        if ( AFF_FLAGGED ( ch, AFF_BERSERK ) )
             d_add += 2;
         if ( is_fused ( ch ) )
             d_add += fused_speed ( ch ) / 100;
@@ -1492,7 +1492,7 @@ int modify_dam ( int dam, Character *ch, Character *vict , int w_type )
 
 
     if ( ( IS_SPELL_ATK ( w_type ) || IS_SPELL_CAST ( w_type ) ) &&
-            ( AFF_FLAGGED ( vict, AFF_SHIELD_MANA ) || AFF_FLAGGED ( vict, AFF_BESERK ) ) )
+            ( AFF_FLAGGED ( vict, AFF_SHIELD_MANA ) || AFF_FLAGGED ( vict, AFF_BERSERK ) ) )
         damage /= 2;
 
     if ( AFF_FLAGGED ( vict, AFF_NUMB_MIND ) )
@@ -1772,7 +1772,7 @@ int evasion_tot ( Character *vict )
         evasion_roll += ( 12 - ( 6 + dex_app[GET_DEX ( vict ) ].defensive ) ) * 10;
     if ( GET_MASTERY ( vict, CLASS_HUNTER ) )
         evasion_roll += 100;
-    if ( AFF_FLAGGED ( vict, AFF_BESERK ) ) /* Char has gone Beserk      */
+    if ( AFF_FLAGGED ( vict, AFF_BERSERK ) ) /* Char has gone Berserk */
         evasion_roll -= 30;
     if ( AFF_FLAGGED ( vict, AFF_JUDO ) ) /*fighting style - rogue*/
         evasion_roll += 15;
@@ -1828,7 +1828,7 @@ int accuracy_tot ( Character *attacker )
                              ( GET_LEVEL ( attacker ) * 2.0 ) * ( 0.5 + ( GET_LEVEL ( attacker ) >30 ) + ( GET_LEVEL ( attacker ) >40 ) +
                                                                   ( GET_LEVEL ( attacker ) >=50 ) + ( GET_LEVEL ( attacker ) >=60 ) ) : GET_PERM_ACCURACY ( attacker ) ) );
     accuracy_roll += calc_thaco;
-    if ( AFF_FLAGGED ( attacker, AFF_BESERK ) ) /* Char has gone Beserk      */
+    if ( AFF_FLAGGED ( attacker, AFF_BERSERK ) ) /* Char has gone Berserk */
         accuracy_roll += 10;
     if ( GET_SUB ( attacker, SUB_LOYALATTACK ) )
         accuracy_roll += 50;

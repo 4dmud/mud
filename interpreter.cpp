@@ -955,7 +955,7 @@ const command_info cmd_info[] =
     { "backstab" , "bac" , POS_STANDING, do_skills , 1, SKILL_BACKSTAB, 0 },
     { "bs"       , "bs"  , POS_STANDING, do_skills , 1, SKILL_BACKSTAB, 0 },
     { "bash"     , "bas" , POS_FIGHTING, do_skills     , 1, SKILL_BASH, 0 },
-    { "berserk"   , "bes" , POS_STANDING, do_skills   , 0, SKILL_BESERK, 0 },
+    { "berserk"   , "ber" , POS_STANDING, do_skills   , 0, SKILL_BERSERK, 0 },
     { "behead"    , "beh"     , POS_FIGHTING, do_skills    , 1, SKILL_BEHEAD, 0 },
     { "brace"    , "bra" , POS_STANDING, do_skills    , 1, SKILL_BRACE, 0 },
     { "blackjack", "black", POS_STANDING, do_skills, 1, SKILL_BLACKJACK, 0 },

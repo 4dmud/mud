@@ -1242,8 +1242,7 @@ void house_load_mount ( Character *ch, int i )
             }
             else
             {
-                ch->Send (
-                    "Mount is already following you, but isn't here. Transfering...\r\n" );
+                ch->Send ( "Your mount is already following you, but isn't here. Transferring...\r\n" );
                 act ( "$n appears with an implosion of glittery pink sparkles.", FALSE, tch, 0, 0, TO_ROOM );
                 move_char_to ( tch, IN_ROOM ( ch ) );
                 return;

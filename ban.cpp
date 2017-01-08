@@ -100,7 +100,8 @@ int isbanned ( char *hostname, bool is_player_name )
     for ( banned_node = ban_list; banned_node; banned_node = banned_node->next )
     {
         // don't compare a playername with a hostname
-        if ( is_player_name && banned_node->type != BAN_NAME )
+        if ( ( is_player_name && banned_node->type != BAN_NAME ) ||
+            ( !is_player_name && banned_node->type == BAN_NAME ) )
             continue;
         if ( strstr ( hostname, banned_node->site ) )	/* if hostname is a substring */
             i = MAX ( i, banned_node->type );

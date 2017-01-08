@@ -112,7 +112,7 @@ ASKILL ( skill_focus );
 ASKILL ( skill_flank );
 ASKILL ( skill_grapple );
 ASKILL ( skill_holy_strength );
-ASKILL ( skill_beserk );
+ASKILL ( skill_berserk );
 ASKILL ( skill_meditate );
 ASKILL ( skill_hyperactivity );
 ASKILL ( skill_true_strike );
@@ -283,7 +283,7 @@ void assign_skills ( void )
     skillo ( SKILL_HOLY_STRENGTH, "holy strength",   TAR_CHAR_ROOM | TAR_SELF_ONLY,
              SK_NONE, NO_FIRST, NO_SECOND,2, 5 ,1, "");
 
-        skillo ( SKILL_BESERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 8, 0,
+        skillo ( SKILL_BERSERK, "berserk", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, SKILL_MELEE, NO_SECOND, 3, 8, 0,
                  "You calm down from your berserker rage.");
 
     skillo ( SKILL_MEDITATE, "meditate", TAR_CHAR_ROOM | TAR_SELF_ONLY, SK_NONE, NO_FIRST, NO_SECOND, 2, 30 ,1,
@@ -548,8 +548,8 @@ ACMD ( do_skills )
                 case SKILL_HOLY_STRENGTH:
                     CALL_SKILL ( skill_holy_strength );
                     break;
-                case SKILL_BESERK:
-                    CALL_SKILL ( skill_beserk );
+                case SKILL_BERSERK:
+                    CALL_SKILL ( skill_berserk );
                     break;
                 case SKILL_MEDITATE:
                     CALL_SKILL ( skill_meditate );
@@ -1722,7 +1722,7 @@ ASKILL ( skill_grapple )
 
 }
 
-ASKILL ( skill_beserk )
+ASKILL ( skill_berserk )
 {
     struct affected_type af;
     sbyte percent;
@@ -1733,9 +1733,9 @@ ASKILL ( skill_beserk )
         return 0;
     }
 
-    if ( AFF_FLAGGED ( ch, AFF_BESERK ) )
+    if ( AFF_FLAGGED ( ch, AFF_BERSERK ) )
     {
-        affect_from_char ( ch, SKILL_BESERK );
+        affect_from_char ( ch, SKILL_BERSERK );
         *ch << "The red haze lifts from your vision.\r\n";
         return 0;
     }
@@ -1744,7 +1744,7 @@ ASKILL ( skill_beserk )
         percent = number ( 1, 101 ); /* 101% is a complete failure */
 
         if ( percent >
-                total_chance ( ch, SKILL_BESERK ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
+                total_chance ( ch, SKILL_BERSERK ) + dex_app_skill[GET_DEX ( ch ) ].sneak )
         {
             ch->Send ( "You stumble over your own feet.\r\n" );
             return 0;
@@ -1752,13 +1752,13 @@ ASKILL ( skill_beserk )
 
         *ch << "Your eyes grow wide and a red haze blurs your vision.\r\n";
         act ( "$n's eyes grow wide, and $e look out of control!", FALSE, ch, 0, NULL, TO_ROOM );
-        af.type = SKILL_BESERK;
+        af.type = SKILL_BERSERK;
         af.expire = HOURS_TO_EXPIRE ( GET_LEVEL ( ch ) /10+TIERNUM );
         af.modifier = 0;
         af.location = APPLY_NONE;
-        af.bitvector = AFF_BESERK;
+        af.bitvector = AFF_BERSERK;
         affect_to_char ( ch, &af );
-        return SKILL_BESERK;
+        return SKILL_BERSERK;
     }
 }
 
