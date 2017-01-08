@@ -583,9 +583,17 @@ void medit_disp_mob_race ( Descriptor *d )
 void medit_disp_mob_skin ( Descriptor *d )
 {
     obj_vnum skin = MOB_SKIN ( OLC_MOB ( d ) );
+    obj_rnum real_skin = real_object ( skin );
 
-    d->Output ( "When mob is skinned it will currently load: %d (%s)\r\n", skin ,  real_object ( skin ) != NOTHING ? "exists" : "doesn't exist yet" );
-
+    if ( skin == NOTHING )
+        d->Output ( "This mob can't be skinned currently\r\n" );
+    else if ( real_skin == NOTHING )
+        d->Output ( "When mob is skinned it will currently try to load: [%d], but it doesn't exist\r\n", skin );
+    else
+    {
+        obj_data *obj_skin = &obj_proto[ real_skin ];
+        d->Output ( "When mob is skinned it will currently load: [%d] %s\r\n", skin, obj_skin->short_description );
+    }
     d->Output ( "Enter skin vnum : " );
 }
 
@@ -1442,7 +1450,17 @@ void medit_parse ( Descriptor *d, char *arg )
             MOB_SUBSKILL ( OLC_MOB ( d ) ) = IRANGE ( -1, atoi ( arg ), TOP_SUB_DEFINE-1 );
             break;
         case MEDIT_SKIN:
-            MOB_SKIN ( OLC_MOB ( d ) ) = IRANGE ( -1, atoi ( arg ), 999999-1 );
+            i = atoi ( arg );
+            if ( i == 0 || ( i != NOTHING && real_object ( i ) == NOTHING ) )
+            {
+                d->Output ( "%s is not a valid skin vnum.\r\n\r\n", arg );
+                return;
+            }
+            if ( i == -1 )
+                d->Output ( "Skin set to -1 (none).\r\n\r\n" );
+            else
+                d->Output ( "Skin set to [%d] %s.\r\n", i, obj_proto[ real_object ( i )].short_description );
+            MOB_SKIN ( OLC_MOB ( d ) ) = i;
             break;
         case MEDIT_OWNER:
             if ( is_number ( arg ) || *arg == '-' )

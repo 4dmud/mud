@@ -250,6 +250,7 @@ void set_race ( Character *ch, int race );
 
 
 /* external functions */
+zone_rnum real_zone_by_thing ( room_vnum vznum );
 script_data* create_script();
 void free_cmdlist ( trig_data *trig );
 void load_crashproof_objects();
@@ -4022,12 +4023,19 @@ Character *read_mobile ( mob_vnum nr )
     addChToLookupTable ( GET_ID ( mob ), mob );
     mobNames.addNamelist(mob->player.name, GET_ID(mob));
 
-    //    copy_proto_script(GetMobProto(nr), mob, MOB_TRIGGER);
     assign_triggers ( mob, MOB_TRIGGER );
     mob->mob_specials.join_list = copy_proto_link ( GetMobProto ( nr )->mob_specials.join_list );
     load_links ( mob );
 
-    return ( mob );
+    if ( MOB_SKIN ( mob ) == 0 )
+    {
+        log ( "SYSERR: skin of [%d] %s is zero, setting to -1", nr, GET_NAME ( mob ) );
+        MOB_SKIN ( mob ) = -1;
+        MOB_SKIN ( GetMobProto ( nr ) ) = -1;
+        save_mobiles ( real_zone_by_thing ( nr ) );
+    }
+
+    return mob;
 }
 
 

@@ -359,8 +359,7 @@ int save_mobiles ( zone_rnum rznum )
     snprintf ( mobfname, sizeof ( mobfname ), "%s/%d/%d.new", LIB_WORLD, vznum, vznum );
     if ( ( mobfd = fopen ( mobfname, "w" ) ) == NULL )
     {
-        new_mudlog ( BRF, LVL_GOD, TRUE,
-                     "SYSERR: GenOLC: Cannot open mob file for writing." );
+        new_mudlog ( BRF, LVL_GOD, TRUE, "SYSERR: GenOLC: Cannot open mob file for writing." );
         return FALSE;
     }
 
@@ -376,8 +375,7 @@ int save_mobiles ( zone_rnum rznum )
     written = ftell ( mobfd );
     fclose ( mobfd );
     snprintf ( usedfname, sizeof ( usedfname ), "%s/%d/%d.mob", LIB_WORLD, vznum, vznum );
-    remove
-    ( usedfname );
+    remove ( usedfname );
     rename ( mobfname, usedfname );
 
     if ( in_save_list ( vznum, SL_MOB ) )
