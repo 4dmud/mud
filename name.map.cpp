@@ -46,7 +46,7 @@ void NameIndexer::remNamelist ( long id )
     if ( this == &objNames )
         strlcpy ( newlistbuf, GET_OBJ_NAME ( object_list[ id ] ), sizeof ( newlistbuf ) );
     else
-        strlcpy ( newlistbuf, GET_NAME ( find_char_by_uid_in_lookup_table ( id ) ), sizeof ( newlistbuf ) );
+        strlcpy ( newlistbuf, find_char_by_uid_in_lookup_table ( id )->player.name, sizeof ( newlistbuf ) );
 
     char *curtok, *newlist = newlistbuf;
     if ( !*newlist )

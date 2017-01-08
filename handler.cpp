@@ -27,6 +27,7 @@
 #include "descriptor.h"
 #include "lisp.h"
 #include "shop.h"
+#include "name.map.h"
 
 /* local vars */
 int extractions_pending = 0;
@@ -2362,7 +2363,10 @@ void extract_char_final ( Character *ch )
     if ( IS_NPC ( ch ) )
     {
         if ( GET_MOB_VNUM ( ch ) != NOBODY && !ch->proto )    /* prototyped */
+        {
             GetMobIndex ( GET_MOB_VNUM ( ch ) )->number--;
+            mobNames.remNamelist ( GET_ID ( ch ) );
+        }
         clearMemory ( ch );
         if ( SCRIPT ( ch ) )
             extract_script ( ch, MOB_TRIGGER );
