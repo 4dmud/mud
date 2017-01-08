@@ -1128,17 +1128,17 @@ const char *affected_bits[] =
     "IMMFREEZE",
     "SILENCED",
     "SNARE",
-        "OUTCAST",
-        "RESIST_FIRE",
-        "RESIST_COLD",
-        "RESIST_ELEC",
+    "OUTCAST",
+    "RESIST_FIRE",
+    "RESIST_COLD",
+    "RESIST_ELEC",
     "Prom's stuff",
     "Prom's stuff",
     "Mana Regen",
     "POISON-PAUSE",
     "MUTATED",
     "RADIATED",
-        "\n"
+    "\n"
 };
 
 
@@ -2003,7 +2003,6 @@ const char *apply_types[] =
     "Tunnel-Bonus",
     "Tunnel-Stealth",
     "Tunnel-Protection",
-
     "\n"
 };
 

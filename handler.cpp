@@ -659,7 +659,12 @@ void affect_to_char ( Character *ch, struct affected_type *af )
 }
 
 /* Call affect_remove with every spell of spelltype "skill" */
-void affect_from_char ( Character *ch, int type )
+// dg_affect <target> <property> off <duration> calls
+// affect_from_char ( ch, SPELL_DG_AFFECT, x ), where x is the
+// location if property is an apply, and if property is an affect
+// then x is the bitvector.
+// Without x, all SPELL_DG_AFFECT affects would be removed.
+void affect_from_char ( Character *ch, int type, int x )
 {
     struct affected_type *hjp = NULL, *next = NULL;
 
@@ -672,10 +677,15 @@ void affect_from_char ( Character *ch, int type )
             {
                 REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_FROZEN );
             }
-            if ( type == SPELL_SILENCED )
+            else if ( type == SPELL_SILENCED )
             {
                 REMOVE_BIT_AR ( PLR_FLAGS ( ch ), PLR_COVENTRY );
             }
+            else if ( type == SPELL_DG_AFFECT &&
+                ( ( hjp->location != APPLY_NONE && hjp->location != x ) ||
+                ( hjp->bitvector > 0 && hjp->bitvector != x ) ) )
+                continue;
+
             ch->affect_remove ( hjp );
         }
     }

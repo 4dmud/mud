@@ -204,7 +204,7 @@ void do_dg_cast ( void *go, struct script_data *sc, trig_data *trig,
 /* variety or APPLY_x type. APPLY_x's have an integer value for them  */
 /* while AFF_x's have boolean values. In any case, the duration MUST  */
 /* be non-zero.                                                       */
-/* usage:  apply <target> <property> <value> <duration>               */
+/* usage:  dg_affect <target> <property> <value> <duration>           */
 #define APPLY_TYPE	1
 #define AFFECT_TYPE	2
 void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
@@ -218,7 +218,6 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     int i=0, type=0;
     struct affected_type af;
 
-
     half_chop ( cmd, junk, cmd );
     half_chop ( cmd, charname, cmd );
     half_chop ( cmd, property, cmd );
@@ -228,7 +227,7 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     if ( !*charname || !*property || !*value_p || !*duration_p )
     {
         script_log ( "Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>. Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
@@ -237,7 +236,7 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     if ( duration <= 0 )
     {
         script_log ( "Trigger: %s, VNum %d. dg_affect: need positive duration! Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
@@ -247,7 +246,7 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     {
         if ( !str_cmp ( apply_types[i], property ) )
         {
-            type=APPLY_TYPE;
+            type = APPLY_TYPE;
             break;
         }
         i++;
@@ -260,7 +259,7 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
         {
             if ( !str_cmp ( affected_bits[i], property ) )
             {
-                type=AFFECT_TYPE;
+                type = AFFECT_TYPE;
                 break;
             }
             i++;
@@ -270,7 +269,7 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     if ( !type ) /* property not found */
     {
         script_log ( "Trigger: %s, VNum %d. dg_affect: unknown property '%s'! Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property, GET_TRIG_LINE_NR ( trig ), cmd );
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), property, GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
@@ -279,29 +278,29 @@ void do_dg_affect ( void *go, struct script_data *sc, trig_data *trig,
     ch = get_char ( charname );
     if ( !ch )
     {
-        script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target! Line %d: %s",
-                     GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        script_log ( "Trigger: %s, VNum %d. dg_affect: cannot locate target '%s'! Line %d: %s",
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), charname, GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
     if ( !str_cmp ( value_p, "off" ) )
     {
-        affect_from_char ( ch, SPELL_DG_AFFECT );
+        affect_from_char ( ch, SPELL_DG_AFFECT, i );
         return;
     }
 
     /* add the affect */
     af.type = SPELL_DG_AFFECT;
     af.expire = sec_to_time ( duration );
-        af.modifier = value;
+    af.modifier = value;
     if ( type == APPLY_TYPE )
     {
-        af.location = ( i );
+        af.location = i;
         af.bitvector = 0;
     }
     else
     {
         af.location = 0;
-        af.bitvector = ( 1<< ( i-1 ) );
+        af.bitvector = i;
     }
 
     affect_to_char ( ch, &af );

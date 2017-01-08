@@ -14,7 +14,7 @@
 void affect_modify(Character *ch, sbyte loc, int mod,
                    bitvector_t bitv, bool add);
 void affect_to_char(Character *ch, struct affected_type *af);
-void affect_from_char(Character *ch, int type);
+void affect_from_char(Character *ch, int type, int x = 0);
 bool affected_by_spell(Character *ch, int type);
 void affect_join(Character *ch, struct affected_type *af,
                  bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
