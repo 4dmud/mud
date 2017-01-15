@@ -6193,9 +6193,9 @@ ACMD ( do_questcheck )
 {
     if ( !*argument )
     {
-        ch->Send ( "Usage: questcheck <number> status|reset|<quest_cmd>\r\n" );
+        ch->Send ( "Usage: questcheck <number> [status|reset|<quest_cmd>]\r\n" );
         if ( IS_IMM ( ch ) )
-            ch->Send ( "       questcheck <number> debug <debug_cmd>\r\n" );
+            ch->Send ( "       questcheck <number> debug <player> <debug_cmd>\r\n" );
         return;
     }
     string arg = string ( argument );
@@ -6215,20 +6215,6 @@ ACMD ( do_questcheck )
     string command;
     ss >> command;
 
-    if ( command == "debug" && IS_IMM ( ch ) )
-    {
-        string debug_cmd;
-        ss >> debug_cmd;
-        for ( const auto &d : qc.debug )
-            if ( d.first == debug_cmd )
-            {
-                ch->Send ( "%s\r\n", d.second.c_str() );
-                return;
-            }
-        ch->Send ( "Questcard %d doesn't have debug command '%s'.\r\n", num, debug_cmd.c_str() );
-        return;
-    }
-
     // make a temporary waybread to put the function triggers on
     obj_data *obj = read_object ( 10, VIRTUAL );
     if ( !obj )
@@ -6244,23 +6230,84 @@ ACMD ( do_questcheck )
     snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
     add_var ( &( SCRIPT ( obj )->global_vars ), "actor", buf, 0 );
 
-    if ( command == "status" )
+    if ( command == "debug" && IS_IMM ( ch ) )
     {
-        for ( const auto &i : qc.order )
+        string debug_cmd, player;
+        ss >> player >> debug_cmd;
+        for ( const auto &d : qc.debug )
+            if ( d.first == debug_cmd )
+            {
+                int uid = pi.IdByName ( player.c_str() );
+                if ( uid == -1 )
+                    ch->Send ( "Player %s doesn't exist.\r\n", player.c_str() );
+                else
+                {
+                    Character *victim = find_char ( uid );
+                    if ( victim )
+                    {
+                        snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( victim ) );
+                        add_var ( &( SCRIPT ( obj )->global_vars ), "actor", buf, 0 );
+                        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[ d.second ] ) );
+                        if ( t )
+                        {
+                            add_trigger ( SCRIPT ( obj ), t, -1 );
+                            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+                        }
+                        else
+                            new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: reset tried to call a non-existing trigger", num );
+                    }
+                    else
+                        ch->Send ( "Player %s is offline.\r\n", player.c_str() );
+                }
+                extract_obj ( obj );
+                return;
+            }
+        ch->Send ( "Questcard %d doesn't have debug command '%s'.\r\n", num, debug_cmd.c_str() );
+    }
+    else if ( command == "" )
+    {
+        // Show quest description
+        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[0] ) );
+        if ( t )
         {
-            trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[i] ) );
+            add_trigger ( SCRIPT ( obj ), t, -1 );
+            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+        }
+        else
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: reset tried to call a non-existing trigger", num );
+    }
+    else if ( command == "status" )
+    {
+        // Call unqiue trigger if it exists, otherwise call the order triggers
+        if ( qc.function_triggers[6] != NOTHING )
+        {
+            trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
             if ( t )
             {
                 add_trigger ( SCRIPT ( obj ), t, -1 );
                 script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
             }
             else
-               new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: status tried to call a non-existing trigger", num );
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: reset tried to call a non-existing trigger", num );
+        }
+        else
+        {
+            for ( const auto &i : qc.order )
+            {
+                trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[i] ) );
+                if ( t )
+                {
+                    add_trigger ( SCRIPT ( obj ), t, -1 );
+                    script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+                }
+                else
+                   new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: status tried to call a non-existing trigger", num );
+            }
         }
     }
     else if ( command == "reset" )
     {
-        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
+        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[7] ) );
         if ( t )
         {
             add_trigger ( SCRIPT ( obj ), t, -1 );

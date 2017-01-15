@@ -1134,7 +1134,7 @@ void parse_questcard ( char *filename )
     string line, s, cmd;
     stringstream ss;
     questcard qc;
-    qc.function_triggers = vector<int> (7, -1);
+    qc.function_triggers = vector<int> (8, NOTHING);
     while ( f.good() )
     {
         getline ( f, line );
@@ -1149,20 +1149,22 @@ void parse_questcard ( char *filename )
             while ( ss >> s )
                 qc.questflags.push_back ( s );
         }
-        else if ( s == "Available:" )
+        else if ( s == "Description:" )
             ss >> qc.function_triggers[0];
-        else if ( s == "Completed:" )
+        else if ( s == "Available:" )
             ss >> qc.function_triggers[1];
-        else if ( s == "Traders:" )
+        else if ( s == "Completed:" )
             ss >> qc.function_triggers[2];
-        else if ( s == "Achievements:" )
+        else if ( s == "Traders:" )
             ss >> qc.function_triggers[3];
-        else if ( s == "Other:" )
+        else if ( s == "Achievements:" )
             ss >> qc.function_triggers[4];
-        else if ( s == "Unique:" )
+        else if ( s == "Other:" )
             ss >> qc.function_triggers[5];
-        else if ( s == "Reset:" )
+        else if ( s == "Unique:" )
             ss >> qc.function_triggers[6];
+        else if ( s == "Reset:" )
+            ss >> qc.function_triggers[7];
         else if ( s == "Order:" )
         {
             while ( ss >> i )
@@ -1170,18 +1172,16 @@ void parse_questcard ( char *filename )
         }
         else if ( s == "Debug:" )
         {
-            ss >> s;
-            string lines;
             while ( f.good() )
             {
                 getline ( f, line );
                 if ( line[0] == '~' )
                     break;
-                if ( line.back() != '\n' )
-                    line += '\n';
-                lines += line;
+                ss.clear();
+                ss.str ( line );
+                ss >> cmd >> i;
+                qc.debug[ cmd ] = i;
             }
-            qc.debug[ s ] = lines;
         }
         else if ( s == "Commands:" )
         {

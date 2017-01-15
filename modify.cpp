@@ -43,7 +43,6 @@ void exdesc_string_cleanup ( Descriptor *d, int action );
 void trigedit_string_cleanup ( Descriptor *d, int terminator );
 void help_string_cleanup ( Descriptor *d, int action );
 void note_string_cleanup ( Descriptor *d, int action );
-void qedit_string_cleanup ( Descriptor *d, int action );
 Character *find_char ( long n );
 
 
@@ -287,7 +286,6 @@ void string_add ( Descriptor *d, char *str )
             { CON_OEDIT  , oedit_string_cleanup },
             { CON_REDIT  , redit_string_cleanup },
             { CON_TEDIT  , tedit_string_cleanup },
-            { CON_QEDIT  , qedit_string_cleanup },
             { CON_TRIGEDIT, trigedit_string_cleanup },
             { CON_EXDESC , exdesc_string_cleanup },
             { CON_PLAYING, playing_string_cleanup },

@@ -357,7 +357,10 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
    */
 
   if ( OLC_QC ( d ) )
+  {
       free ( OLC_QC ( d ) );
+      OLC_QC ( d ) = nullptr;
+  }
 
   /*
    * Restore descriptor playing status.

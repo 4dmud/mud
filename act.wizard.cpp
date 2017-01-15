@@ -8439,7 +8439,7 @@ ACMD ( do_qstat )
     for ( int i = 0; i < qc.function_triggers.size(); ++i )
         if ( qc.function_triggers[i] == NOTHING )
         {
-            if ( i == 5 )
+            if ( i == 6 )
                 names.push_back ( "{ccusing generic trigger{c0" );
             else
                 names.push_back ( "{cc<none>{c0" );
@@ -8447,9 +8447,12 @@ ACMD ( do_qstat )
         else
         {
             int rnum = real_trigger ( qc.function_triggers[i] );
-            names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
+            if ( rnum == NOTHING )
+                names.push_back ( "{cc<none>{c0" );
+            else
+                names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
         }
-    while ( names.size() < 7 )
+    while ( names.size() < 8 )
         names.push_back ( "{cc<none>{c0" );
 
     string order = "{cc<none>{c0";
@@ -8481,6 +8484,7 @@ ACMD ( do_qstat )
         "-- Questcard number [%s%d%s]\r\n"
         "Name         : %s%s%s\r\n"
         "Questflags   : %s%s%s\r\n"
+        "Description  : [%s%d%s] %s\r\n"
         "Available    : [%s%d%s] %s\r\n"
         "Completed    : [%s%d%s] %s\r\n"
         "Traders      : [%s%d%s] %s\r\n"
@@ -8502,6 +8506,7 @@ ACMD ( do_qstat )
         cyn, qc.function_triggers[4], nrm, names[4].c_str(),
         cyn, qc.function_triggers[5], nrm, names[5].c_str(),
         cyn, qc.function_triggers[6], nrm, names[6].c_str(),
+        cyn, qc.function_triggers[7], nrm, names[7].c_str(),
         order.c_str(),
         debug.c_str(),
         commands.c_str()

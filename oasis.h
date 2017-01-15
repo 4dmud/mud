@@ -530,7 +530,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define QEDIT_ORDER                    4
 #define QEDIT_DEBUG_MENU               5
 #define QEDIT_DEBUG_COMMAND            6
-#define QEDIT_DEBUG_TEXT               7
+#define QEDIT_DEBUG_FUNCTION_TRIGGER   7
 #define QEDIT_COMMANDS_MENU            8
 #define QEDIT_COMMAND                  9
 #define QEDIT_COMMAND_FUNCTION_TRIGGER 10

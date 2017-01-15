@@ -2835,7 +2835,7 @@ struct questcard {
     vector<string> questflags;
     vector<int> function_triggers;
     vector<int> order; // order in which the function triggers get called
-    map <string, string> debug; // shown when imms do questcheck <num> debug <player_name> <cmd>
+    map <string, int> debug; // function triggers for debug commands
     map <string, int> commands; // function triggers for other questcard commands
 };
 
