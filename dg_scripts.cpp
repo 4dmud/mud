@@ -4291,44 +4291,30 @@ ACMD ( do_tlist )
 }
 
 /* returns the real number of the trigger with given virtual number */
-/** TODO: This function should be a binary search but when it runs the binary search
-the results are bad. So sequential for now. Need to find out where the list stops being sorted.
-**/
 trig_rnum real_trigger ( int vnum )
 {
-    /*
-                    int bot = 0, mid;
-                    int top = top_of_trigt - 1;
+    int bot = 0, mid;
+    int top = top_of_trigt - 1;
 
-
-                    for (;;)
-                    {
-                      mid = (bot + top) / 2;
-                      // Thanks to Derek Fisk for fixing this loop
-                      if (bot > top)
-                        return (NOTHING);
-                      if (trig_index[mid]->vnum == vnum)
-                        return (mid);
-                      if (top == 0)
-                        return (NOTHING);
-                      if (trig_index[mid]->vnum > vnum)
-                        top = mid - 1;
-                      else
-                        bot = mid + 1;
-                    }
-                  }
-
-                  */
-    int rnum;
-    for ( rnum=0; rnum < ( int ) top_of_trigt; rnum++ )
+    for (;;)
     {
-        if ( trig_index[rnum]->vnum==vnum )
-            break;
+        mid = (bot + top) / 2;
+        // Thanks to Derek Fisk for fixing this loop
+        if ( trig_index[ mid ]->vnum > vnum )
+        {
+            top = mid - 1;
+            if ( top == 0 )
+                return NOTHING;
+        }
+        else if ( trig_index[ mid ]->vnum == vnum )
+            return mid;
+        else
+        {
+            bot = mid + 1;
+            if ( bot > top )
+                return NOTHING;
+        }
     }
-
-    if ( rnum== ( int ) top_of_trigt )
-        rnum = -1;
-    return ( rnum );
 }
 
 ACMD ( do_tstat )
