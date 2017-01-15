@@ -2982,45 +2982,17 @@ void function_script ( void *go, struct script_data *sc, trig_data *parent, int 
         return;
     }
 
+    t->attach_type = type;
     add_trigger ( sc, t, -1 ); // it's removed when it finishes in script_driver, or when the owner is purged
 
-    if ( t->attach_type != type )
+    // Only need to check for MTRIG_FUNCTION, obj and room functions have the same value.
+    // Which is good, otherwise functions can't be called when attach types don't match (because of set_script_types).
+    if ( !TRIGGER_CHECK ( t, MTRIG_FUNCTION ) )
     {
-        script_log ( "Trigger: %s, VNum %d. calling function trigger of different attach type (%d)! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
+        script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
         reset_trigger ( parent ); // the parent is not resumed
         remove_trigger ( go, t, type );
         return;
-    }
-    /** i can't remember what this bit is for?? **/
-    switch ( t->attach_type )
-    {
-        case OBJ_TRIGGER:
-            if ( !TRIGGER_CHECK ( t, OTRIG_FUNCTION ) )
-            {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
-                reset_trigger ( parent ); // the parent is not resumed
-                remove_trigger ( go, t, type );
-                return;
-            }
-            break;
-        case MOB_TRIGGER:
-            if ( !TRIGGER_CHECK ( t, MTRIG_FUNCTION ) )
-            {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
-                reset_trigger ( parent ); // the parent is not resumed
-                remove_trigger ( go, t, type );
-                return;
-            }
-            break;
-        case WLD_TRIGGER:
-            if ( !TRIGGER_CHECK ( t, WTRIG_FUNCTION ) )
-            {
-                script_log ( "Trigger: %s, VNum %d. calling non function trigger %d! Line %d", GET_TRIG_NAME ( parent ), GET_TRIG_VNUM ( parent ), vnum, GET_TRIG_LINE_NR ( parent ) );
-                reset_trigger ( parent ); // the parent is not resumed
-                remove_trigger ( go, t, type );
-                return;
-            }
-            break;
     }
 
     add_var ( &GET_TRIG_VARS ( parent ), "args", cmd, 0 );
