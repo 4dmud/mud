@@ -155,6 +155,7 @@ struct oasis_olc_data {
   struct q_descr_data *q_description;
   struct vehicle_attachment_data *attachment;
   struct help_index_element *help;
+  struct questcard *quest_card;
 #if CONFIG_OASIS_MPROG           /*                          */
   int total_mprogs;              /*                          */
   struct mob_prog_data *mprog;   /*                          */
@@ -184,7 +185,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OLC_NUM(d) 	(OLC(d)->number)	/* Room/Obj VNUM.	*/
 #define OLC_VAL(d) 	(OLC(d)->value)		/* Scratch variable.	*/
 #define OLC_ZNUM(d) 	(OLC(d)->zone_num)	/* Real zone number.	*/
-
+#define OLC_QC(d)       (OLC(d)->quest_card)
 #define OLC_STORAGE(d)  (OLC(d)->storage)	/* char pointer.	*/
 #define OLC_ROOM(d) 	(OLC(d)->room)		/* Room structure.	*/
 #define OLC_OBJ(d) 	(OLC(d)->obj)		/* Object structure.	*/
@@ -519,6 +520,22 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define CEDIT_MIN_WIZLIST_LEV		53
 #define CEDIT_GLA_DEATH_ROOM		54
 
+/*
+ * Submodes of QEDIT connectedness.
+ */
+#define QEDIT_MAIN_MENU                0
+#define QEDIT_NAME                     1
+#define QEDIT_QUESTFLAGS               2
+#define QEDIT_FUNCTION_TRIGGER         3
+#define QEDIT_ORDER                    4
+#define QEDIT_DEBUG_MENU               5
+#define QEDIT_DEBUG_COMMAND            6
+#define QEDIT_DEBUG_TEXT               7
+#define QEDIT_COMMANDS_MENU            8
+#define QEDIT_COMMAND                  9
+#define QEDIT_COMMAND_FUNCTION_TRIGGER 10
+#define QEDIT_CONFIRM_SAVESTRING       11
+
 /* -------------------------------------------------------------------------- */
 #define MAX_HELP_KEYWORDS	75
 #define MAX_HELP_ENTRY		10000
@@ -566,7 +583,7 @@ ACMD(do_oasis_links);
  * Prototypes, to be moved later.
  */
  ACMD(do_oasis_list);
-
+ ACMD(do_oasis_qedit);
  ACMD(do_oasis_hedit);
  void hedit_disp_extradesc_menu(Descriptor *d);
 void hedit_disp_exit_menu(Descriptor *d);

@@ -70,6 +70,7 @@ void medit_parse ( Descriptor *d, char *arg );
 void sedit_parse ( Descriptor *d, char *arg );
 void trigedit_parse ( Descriptor *d, char *arg );
 void aedit_parse ( Descriptor *d, char *arg );
+void qedit_parse ( Descriptor *d, char *arg );
 void read_aliases ( Character *ch );
 void read_poofs ( Character *ch );
 int Crash_load ( Character *ch );
@@ -250,7 +251,10 @@ ACMD ( do_put );
 ACMD ( do_qcomm );
 ACMD ( do_qicinfo );
 ACMD ( do_qicsave );
+ACMD ( do_qlist );
 ACMD ( do_qload );
+ACMD ( do_qstat );
+ACMD ( do_questcheck );
 ACMD ( do_quit );
 ACMD ( do_race );
 ACMD ( do_rdig );
@@ -763,26 +767,30 @@ const command_info cmd_info[] =
     { "policy"   , "pol" , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES, 0 },
     { "poofin"   , "poofi", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFIN, WIZ_IMM1_GRP },
     { "poofout"  , "poofo", POS_DEAD    , do_poofset  , LVL_IMMORT, SCMD_POOFOUT, WIZ_IMM1_GRP },
-    { "potionweight"    , "potionweight"     , POS_DEAD    , do_potionweight      , LVL_SEN, SCMD_OLC_OEDIT, WIZ_OLC_GRP},
+    { "potionweight", "potionw", POS_DEAD, do_potionweight, LVL_SEN, SCMD_OLC_OEDIT, WIZ_OLC_GRP },
     { "pose"     , "pose" , POS_DEAD, do_echo     , 0, SCMD_POSE, 0 },
     { "pour"     , "pour" , POS_STANDING, do_pour     , 0, SCMD_POUR, 0 },
     { "powerplay", "pow"  , POS_DEAD    , do_powerplay, LVL_IMMORT, 0, 0},
     { "pretitle" , "pre"  , POS_DEAD    , do_pretitle, 0, 0, 0},
     { "prompt"   , "promp", POS_DEAD    , /*do_display*/ do_prompt_new  , 0, SCMD_PROMPT, 0 },
-    { "professions"   , "prof", POS_DEAD    , do_professions  , LVL_IMMORT, 0, WIZ_SEN_GRP },
+    { "professions", "prof", POS_DEAD   , do_professions  , LVL_IMMORT, 0, WIZ_SEN_GRP },
     { "practice" , "pra"  , POS_SLEEPING, do_practice , 1, 0, 0 },
     { "prereq"   , "pre"  , POS_SLEEPING, do_prereq   , 0, 0, 0 },
     { "pull"     , "pull" , POS_STANDING, do_pull , 0, 0, 0 },
-    { "pageheight"     , "pageheight" , POS_DEAD, do_pageheight , 0, 0, 0 },
-    { "pagewidth"     , "pagewidth" , POS_DEAD, do_pagewidth , 0, 0, 0 },
-    { "pagewrap"   , "pagewrap"  , POS_DEAD    , do_gen_tog  , 0, SCMD_PAGEWRAP, 0 },
+    { "pageheight", "pageheight" , POS_DEAD, do_pageheight , 0, 0, 0 },
+    { "pagewidth", "pagewidth" , POS_DEAD, do_pagewidth , 0, 0, 0 },
+    { "pagewrap" , "pagewrap"  , POS_DEAD    , do_gen_tog  , 0, SCMD_PAGEWRAP, 0 },
     { "purge"    , "pur" , POS_DEAD    , do_purge    , LVL_IMMORT, 0, WIZ_KILL_GRP },
     { "psaux"    , "psaux"   , POS_DEAD    , do_ps_aux    , LVL_BUILDER, 0 , WIZ_OLC_GRP},
 
     { "quaff"    , "q"   , POS_RESTING , do_use      , 0, SCMD_QUAFF, 0 },
     { "qecho"    , "qec" , POS_DEAD    , do_qcomm    , LVL_IMMORT, SCMD_QECHO, WIZ_QUEST_GRP },
+    { "qedit"    , "qed" , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_QEDIT, WIZ_OLC_GRP },
+    { "qlist"    , "qli" , POS_DEAD    , do_qlist    , LVL_BUILDER, 0, WIZ_OLC_GRP },
+    { "qstat"    , "qsta", POS_DEAD    , do_qstat    , LVL_BUILDER, 0, WIZ_OLC_GRP },
     { "quest"    , "que" , POS_DEAD    , do_gen_tog  , 0, SCMD_QUEST, 0 },
     { "question" , "quest", POS_DEAD    , do_gen_comm , 0, SCMD_NEWBIE2, 0 },
+    { "questcheck", "questc", POS_DEAD , do_questcheck, 0, 0, 0 },
     { "qui"      , "qui" , POS_DEAD    , do_quit     , 0, 0, 0 },
     { "quit"     , "quit"     , POS_DEAD    , do_quit     , 0, SCMD_QUIT, 0 },
     { "qsay"     , "qsay"     , POS_RESTING , do_qcomm    , 0, SCMD_QSAY, 0 },
@@ -2487,6 +2495,7 @@ void nanny ( Descriptor *d, char *arg )
         { CON_HEDIT, hedit_parse},
         { CON_VEDIT, vedit_parse},
         { CON_ASSEDIT, assedit_parse },
+        { CON_QEDIT, qedit_parse },
         { -1, NULL }
     };
 

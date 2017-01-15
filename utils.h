@@ -317,7 +317,8 @@ extern const struct race_data races[NUM_RACES];
                         STATE(d) == CON_ZEDIT || STATE(d) == CON_SEDIT ||       \
                         STATE(d) == CON_CEDIT || STATE(d) == CON_PLAYING ||     \
                         STATE(d) == CON_AEDIT || STATE(d) == CON_TRIGEDIT ||    \
-            STATE(d) == CON_LINE_INPUT || STATE(d) == CON_HEDIT)
+                        STATE(d) == CON_LINE_INPUT || STATE(d) == CON_HEDIT ||  \
+                        STATE(d) == CON_QEDIT )
 
 
 /* various constants *****************************************************/

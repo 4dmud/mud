@@ -56,6 +56,7 @@ Put <item multiple words> in <item multiple words>
 extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
+extern map <int, questcard> questcards;
 
 extern char *credits;
 extern char *news;
@@ -78,6 +79,7 @@ int boot_high = 0;
 int colour_space = 0;
 
 /* extern functions */
+script_data* create_script();
 char * mob_name_by_vnum ( mob_vnum &v );
 int highest_tier ( Character *ch );
 const char *how_good ( int percent );
@@ -3944,6 +3946,8 @@ if (!readout_who) {
                 len += snprintf ( buf + len, sizeof ( buf ) - len, " (Trigger Edit)" );
             if ( STATE ( wch->desc ) == CON_AEDIT )
                 len += snprintf ( buf + len, sizeof ( buf ) - len, " (Social Edit)" );
+            if ( STATE ( wch->desc ) == CON_QEDIT )
+                len += snprintf ( buf + len, sizeof ( buf ) - len, " (Questcard Edit)" );
             if ( d->connected == CON_CEDIT )
                 len += snprintf ( buf + len, sizeof ( buf ) - len, " (Configuration Edit)" );
             if ( d->original )
@@ -6184,6 +6188,112 @@ void container_disp ( Character *ch,OBJ_DATA * obj )
     }
 
 }
+
+ACMD ( do_questcheck )
+{
+    if ( !*argument )
+    {
+        ch->Send ( "Usage: questcheck <number> status|reset|<quest_cmd>\r\n" );
+        if ( IS_IMM ( ch ) )
+            ch->Send ( "       questcheck <number> debug <debug_cmd>\r\n" );
+        return;
+    }
+    string arg = string ( argument );
+    stringstream ss ( arg );
+
+    int num = 0;
+    ss >> num;
+    auto it = questcards.find ( num );
+
+    if ( it == questcards.end() )
+    {
+        ch->Send ( "That questcard doesn't exist.\r\n" );
+        return;
+    }
+
+    const auto qc = it->second;
+    string command;
+    ss >> command;
+
+    if ( command == "debug" && IS_IMM ( ch ) )
+    {
+        string debug_cmd;
+        ss >> debug_cmd;
+        for ( const auto &d : qc.debug )
+            if ( d.first == debug_cmd )
+            {
+                ch->Send ( "%s\r\n", d.second.c_str() );
+                return;
+            }
+        ch->Send ( "Questcard %d doesn't have debug command '%s'.\r\n", num, debug_cmd.c_str() );
+        return;
+    }
+
+    // make a temporary waybread to put the function triggers on
+    obj_data *obj = read_object ( 10, VIRTUAL );
+    if ( !obj )
+    {
+        log ( "SYSERR: questcheck couldn't create an object" );
+        return;
+    }
+
+    if ( !SCRIPT ( obj ) )
+        SCRIPT ( obj ) = create_script();
+
+    char buf[MAX_INPUT_LENGTH];
+    snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
+    add_var ( &( SCRIPT ( obj )->global_vars ), "actor", buf, 0 );
+
+    if ( command == "status" )
+    {
+        for ( const auto &i : qc.order )
+        {
+            trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[i] ) );
+            if ( t )
+            {
+                add_trigger ( SCRIPT ( obj ), t, -1 );
+                script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+            }
+            else
+               new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: status tried to call a non-existing trigger", num );
+        }
+    }
+    else if ( command == "reset" )
+    {
+        trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
+        if ( t )
+        {
+            add_trigger ( SCRIPT ( obj ), t, -1 );
+            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+        }
+        else
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: reset tried to call a non-existing trigger", num );
+    }
+    else // check commands
+    {
+        bool command_found = FALSE;
+        for ( const auto &c : qc.commands )
+        {
+            if ( c.first == command )
+            {
+                command_found = TRUE;
+                trig_data *t = read_trigger ( real_trigger ( c.second ) );
+                if ( t )
+                {
+                    add_trigger ( SCRIPT ( obj ), t, -1 );
+                    script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+                }
+                else
+                    new_mudlog ( BRF, LVL_IMMORT, TRUE, "Questcard %d: command '%s' tried to call a non-existing trigger", num, command.c_str() );
+                break;
+            }
+        }
+        if ( !command_found )
+            ch->Send ( "Unknown questcheck command '%s'.\r\n", command.c_str() );
+    }
+    extract_obj ( obj );
+}
+
 /*
 ACMD(do_compresstest) {
     long id;

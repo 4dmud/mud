@@ -455,6 +455,7 @@ Descriptor::~Descriptor() {
     case CON_SEDIT:
     case CON_TEDIT:
     case CON_AEDIT:
+    case CON_QEDIT:
     case CON_TRIGEDIT:
         cleanup_olc(this, CLEANUP_ALL);
         break;

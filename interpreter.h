@@ -336,6 +336,7 @@ struct alias_data {
 #define SCMD_OASIS_HEDIT        17
 #define SCMD_OASIS_VEDIT        18
 #define SCMD_OASIS_VLIST        19
+#define SCMD_OASIS_QEDIT        20
 
 /*  do_innate  */
 #define SCMD_SINNATE    0

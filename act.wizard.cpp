@@ -350,6 +350,7 @@ extern ush_int port;
 extern map<mob_vnum, Character *> mob_proto;
 extern struct obj_data *obj_proto;
 extern map < room_vnum, plrshop* > player_shop;
+extern map <int, questcard> questcards;
 
 /* for chars */
 extern char *credits;
@@ -1645,7 +1646,7 @@ void do_stat_room ( Character *ch )
             continue;
 
         if ( rm->dir_option[i]->to_room == NULL )
-            snprintf ( buf1, sizeof ( buf1 ), " %sNONE%s", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
+            snprintf ( buf1, sizeof ( buf1 ), " %snone%s", CCCYN ( ch, C_NRM ), CCNRM ( ch, C_NRM ) );
         else
             snprintf ( buf1, sizeof ( buf1 ), "%s%5d%s", CCCYN ( ch, C_NRM ),
                        rm->dir_option[i]->to_room->number, CCNRM ( ch, C_NRM ) );
@@ -8380,4 +8381,129 @@ ACMD(do_vset) {
 
     ch->Send("Variable set.\r\n");
 
+}
+
+ACMD ( do_qlist )
+{
+    ch->Send ( "Questcards currently in the game:\r\n" );
+    ch->Send ( "---------------------------------\r\n" );
+
+    if ( questcards.size() == 0 )
+    {
+        ch->Send ( "None.\r\n" );
+        return;
+    }
+
+    char buf[MAX_STRING_LENGTH];
+    DYN_DEFINE;
+    DYN_CREATE;
+    for ( const auto &q : questcards )
+    {
+        snprintf ( buf, sizeof buf, "[{cc%d{c0] {cy%s{c0\r\n", q.first, q.second.name.c_str() );
+        DYN_RESIZE ( buf );
+    }
+
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
+}
+
+ACMD ( do_qstat )
+{
+    if ( !*argument )
+    {
+        ch->Send ( "Usage: qstat <questcard_number>\r\n" );
+        return;
+    }
+
+    char arg[MAX_INPUT_LENGTH];
+    one_argument ( argument, arg );
+    int num = atoi ( arg );
+    auto it = questcards.find ( num );
+
+    if ( it == questcards.end() )
+    {
+        ch->Send ( "That questcard doesn't exist.\r\n" );
+        return;
+    }
+
+    auto qc = it->second;
+    string qflags = "<none>";
+    if ( qc.questflags.size() > 0 )
+    {
+        qflags = "{cy" + qc.questflags[0];
+        for ( int i = 1; i < qc.questflags.size(); ++i )
+            qflags += " " + qc.questflags[i];
+        qflags += "{c0";
+    }
+
+    vector<string> names;
+    for ( int i = 0; i < qc.function_triggers.size(); ++i )
+        if ( qc.function_triggers[i] == NOTHING )
+        {
+            if ( i == 5 )
+                names.push_back ( "{ccusing generic trigger{c0" );
+            else
+                names.push_back ( "{cc<none>{c0" );
+        }
+        else
+        {
+            int rnum = real_trigger ( qc.function_triggers[i] );
+            names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
+        }
+    while ( names.size() < 7 )
+        names.push_back ( "{cc<none>{c0" );
+
+    string order = "{cc<none>{c0";
+    if ( qc.order.size() > 0 )
+    {
+        order = "{cy" + to_string ( qc.order[0] + 3 );
+        for ( int i = 1; i < qc.order.size(); ++i )
+            order += " " + to_string ( qc.order[i] + 3 );
+        order += "{c0";
+    }
+
+    string debug;
+    if ( qc.debug.size() == 0 )
+        debug = "{cc<none>{c0";
+    else
+        for ( const auto &d : qc.debug )
+            debug += "[{cy" + d.first + "{c0] ";
+
+    string commands;
+    if ( qc.commands.size() == 0 )
+        commands = "{cc<none>{c0";
+    else
+        for ( const auto &c : qc.commands )
+            commands += "[{cy" + c.first + "{c0] ";
+
+    get_char_colours ( ch );
+
+    ch->Send (
+        "-- Questcard number [%s%d%s]\r\n"
+        "Name         : %s%s%s\r\n"
+        "Questflags   : %s%s%s\r\n"
+        "Available    : [%s%d%s] %s\r\n"
+        "Completed    : [%s%d%s] %s\r\n"
+        "Traders      : [%s%d%s] %s\r\n"
+        "Achievements : [%s%d%s] %s\r\n"
+        "Other        : [%s%d%s] %s\r\n"
+        "Unique       : [%s%d%s] %s\r\n"
+        "Reset        : [%s%d%s] %s\r\n"
+        "Order        : %s\r\n"
+        "Debug        : %s\r\n"
+        "Commands     : %s\r\n",
+
+        cyn, num, nrm,
+        yel, qc.name.c_str(), nrm,
+        yel, qflags.c_str(), nrm,
+        cyn, qc.function_triggers[0], nrm, names[0].c_str(),
+        cyn, qc.function_triggers[1], nrm, names[1].c_str(),
+        cyn, qc.function_triggers[2], nrm, names[2].c_str(),
+        cyn, qc.function_triggers[3], nrm, names[3].c_str(),
+        cyn, qc.function_triggers[4], nrm, names[4].c_str(),
+        cyn, qc.function_triggers[5], nrm, names[5].c_str(),
+        cyn, qc.function_triggers[6], nrm, names[6].c_str(),
+        order.c_str(),
+        debug.c_str(),
+        commands.c_str()
+    );
 }

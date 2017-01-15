@@ -107,6 +107,7 @@ int TEMP_LOAD_CHAR = FALSE;
 
 extern struct mob_stat_table mob_stats[];
 extern map<trig_data*, TrigDebug> script_debug;
+extern map <int, questcard> questcards;
 
 vector <Room *> world_vnum; /* index table for room file   */
 NameIndexer mobNames;
@@ -1120,7 +1121,121 @@ void destroy_db ( void )
     }
 }
 
+void parse_questcard ( char *filename )
+{
+    ifstream f ( filename );
+    if ( f.bad() || !is_number ( filename ) )
+    {
+        log ( "SYSERR: couldn't parse questcard file %s", filename );
+        return;
+    }
 
+    int i;
+    string line, s, cmd;
+    stringstream ss;
+    questcard qc;
+    qc.function_triggers = vector<int> (7, -1);
+    while ( f.good() )
+    {
+        getline ( f, line );
+        ss.clear();
+        ss.str ( line );
+        ss >> s;
+
+        if ( s == "Name:" )
+            ss >> qc.name;
+        else if ( s == "Questflags:" )
+        {
+            while ( ss >> s )
+                qc.questflags.push_back ( s );
+        }
+        else if ( s == "Available:" )
+            ss >> qc.function_triggers[0];
+        else if ( s == "Completed:" )
+            ss >> qc.function_triggers[1];
+        else if ( s == "Traders:" )
+            ss >> qc.function_triggers[2];
+        else if ( s == "Achievements:" )
+            ss >> qc.function_triggers[3];
+        else if ( s == "Other:" )
+            ss >> qc.function_triggers[4];
+        else if ( s == "Unique:" )
+            ss >> qc.function_triggers[5];
+        else if ( s == "Reset:" )
+            ss >> qc.function_triggers[6];
+        else if ( s == "Order:" )
+        {
+            while ( ss >> i )
+                qc.order.push_back ( i );
+        }
+        else if ( s == "Debug:" )
+        {
+            ss >> s;
+            string lines;
+            while ( f.good() )
+            {
+                getline ( f, line );
+                if ( line[0] == '~' )
+                    break;
+                if ( line.back() != '\n' )
+                    line += '\n';
+                lines += line;
+            }
+            qc.debug[ s ] = lines;
+        }
+        else if ( s == "Commands:" )
+        {
+            while ( f.good() )
+            {
+                getline ( f, line );
+                if ( line[0] == '$' )
+                    break;
+                ss.clear();
+                ss.str ( line );
+                ss >> cmd >> i;
+                qc.commands[ cmd ] = i;
+            }
+        }
+        if ( line[0] == '$' )
+            break;
+    }
+    questcards[ atoi ( filename ) ] = qc;
+}
+
+void load_questcards()
+{
+    DIR *dp = opendir ( LIB_QUESTCARDS );
+    if ( !dp )
+    {
+        mkdir ( LIB_QUESTCARDS, 0777 );
+        dp = opendir ( LIB_QUESTCARDS );
+        if ( !dp )
+        {
+            log ( "SYSERR: couldn't open the questcards dir" );
+            return;
+        }
+    }
+
+    struct dirent *ep;
+    struct stat st_buf;
+    char cwd[1024];
+    getcwd ( cwd, sizeof cwd );
+    chdir ( LIB_QUESTCARDS );
+
+    while ( ( ep = readdir ( dp ) ) )
+    {
+        if ( stat ( ep->d_name, &st_buf ) )
+        {
+            log ( "Error reading questcard file %s: %s", ep->d_name, strerror ( errno ) );
+            continue;
+        }
+        if ( S_ISREG ( st_buf.st_mode ) )
+            parse_questcard ( ep->d_name );
+    }
+
+    closedir ( dp );
+    chdir ( cwd );
+}
 
 /* body of the booting system */
 void boot_db ( void )
@@ -1248,6 +1363,9 @@ void boot_db ( void )
     //moved here so that they show up
     log ( "Loading fight messages." );
     load_messages();
+
+    log ( "Loading questcards" );
+    load_questcards();
 
     for ( i = 0; i <= top_of_zone_table; i++ )
     {

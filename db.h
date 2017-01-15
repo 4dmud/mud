@@ -37,6 +37,7 @@
 #define LIB_PLRPOOFS ":plrpoofs:"
 #define LIB_PLRSHOPS ":plrshops:"
 #define LIB_CRASHPROOF ":crashproof:"
+#define LIB_QUESTCARDS ":questcards:"
 #elif defined(CIRCLE_AMIGA) || defined(CIRCLE_UNIX) || defined(CIRCLE_WINDOWS) || defined(CIRCLE_ACORN)
 #define LIB_WORLD	"world/"
 #define LIB_TEXT	"text/"
@@ -52,6 +53,7 @@
 #define LIB_PLRPOOFS    "plrpoofs/"
 #define LIB_PLRSHOPS    "plrshops/"
 #define LIB_CRASHPROOF  "crashproof/"
+#define LIB_QUESTCARDS  "questcards/"
 #else
 #error "Unknown path components."
 #endif

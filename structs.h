@@ -587,6 +587,7 @@ class Room;
 #define CON_AEDIT        	25     /* OLC mode - social (action) edit      */
 #define CON_TRIGEDIT       	26 /*. OLC mode - trigger edit    . */
 #define CON_HEDIT          	27
+#define CON_QEDIT           28  /* OLC mode - questcard editor     */
 #define CON_LINE_INPUT     	32 /* line input */
 #define CON_NOTE_EDIT      	35
 #define CON_IDENT          	36
@@ -2827,6 +2828,15 @@ struct comm_data {
     char * text;
     char * time_s;
     struct comm_data * next;
+};
+
+struct questcard {
+    string name;  // name of the questcard
+    vector<string> questflags;
+    vector<int> function_triggers;
+    vector<int> order; // order in which the function triggers get called
+    map <string, string> debug; // shown when imms do questcheck <num> debug <player_name> <cmd>
+    map <string, int> commands; // function triggers for other questcard commands
 };
 
 /**

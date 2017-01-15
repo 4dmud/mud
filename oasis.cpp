@@ -43,11 +43,12 @@ olc_scmd_info[] = {
                     { "zone",	CON_ZEDIT },
                     { "mobile",	CON_MEDIT },
                     { "shop",	CON_SEDIT },
-                    { "config",   CON_CEDIT },
-                    { "action",   CON_AEDIT },
-                    { "trigger",  CON_TRIGEDIT },
-                    { "help", CON_HEDIT},
-            { "vehicle", CON_VEDIT },
+                    { "config", CON_CEDIT },
+                    { "action", CON_AEDIT },
+                    { "trigger",CON_TRIGEDIT },
+                    { "help",   CON_HEDIT },
+                    { "vehicle",CON_VEDIT },
+                    { "questcard", CON_QEDIT },
                     { "\n",	-1	  }
                   };
 
@@ -163,6 +164,9 @@ ACMD(do_oasis)
     break;
   case SCMD_OASIS_HEDIT:
     do_oasis_hedit(ch, argument, cmd, subcmd);
+    break;
+  case SCMD_OASIS_QEDIT:
+    do_oasis_qedit ( ch, argument, cmd, subcmd );
     break;
 
   default:
@@ -352,6 +356,9 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
    * Therefore it should not be free'd here.
    */
 
+  if ( OLC_QC ( d ) )
+      free ( OLC_QC ( d ) );
+
   /*
    * Restore descriptor playing status.
    */
@@ -364,11 +371,13 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing the game configuration", GET_NAME(d->character));
     else if (STATE(d) == CON_TEDIT)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing text files.", GET_NAME(d->character));
-      else if (STATE(d) == CON_HEDIT)
+    else if (STATE(d) == CON_HEDIT)
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing help files.", GET_NAME(d->character));
+    else if (STATE(d) == CON_QEDIT)
+      new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing questcard %d.", GET_NAME(d->character), OLC_NUM(d));
     else if (GET_OLC_ZONE(d->character))
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing zone %d allowed zone %d", GET_NAME(d->character), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(d->character));
-      else
+    else
       new_mudlog(BRF, LVL_IMMORT, TRUE, "OLC: %s stops editing zone %d", GET_NAME(d->character), zone_table[OLC_ZNUM(d)].number);
 
     STATE(d) = CON_PLAYING;
