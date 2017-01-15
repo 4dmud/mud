@@ -23,7 +23,7 @@
 #include "descriptor.h"
 
 /* prototype externally defined functions */
-//extern const char *trig_types[], *otrig_types[], *wtrig_types[];
+int char_count ( const char* s, const char c );
 zone_rnum real_zone_by_thing(room_vnum vznum);
 script_data* create_script();
 void set_script_types ( script_data *sc );
@@ -988,8 +988,8 @@ int check_braces(char *str) {
 int format_script(Descriptor *d) {
     char nsc[MAX_CMD_LENGTH], *t, line[READ_SIZE];
     char *sc;
-    size_t len = 0, nlen = 0, llen = 0, brac = 0;
-    int indent = 0, i, line_num = 0, while_count = 0;
+    size_t len = 0, nlen = 0, llen = 0;
+    int indent = 0, i, line_num = 0, while_count = 0, brac;
     bool indent_next = FALSE, found_case = FALSE, first_case = FALSE, in_switch = FALSE;
 
     if (!d->str || !*d->str)
@@ -1003,6 +1003,7 @@ int format_script(Descriptor *d) {
         line_num++;
         skip_spaces(&t);
         brac = check_braces(t);
+
         if ( brac != 0 && ( !strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4)
             || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3) || !strn_cmp("while ", t, 6)
             || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8) || !strn_cmp("case ", t, 5)
@@ -1011,6 +1012,14 @@ int format_script(Descriptor *d) {
             free(sc);
             return FALSE;
         }
+
+        if ( char_count ( t, '%' ) % 2 == 1 )
+        {
+            d->Output ( "Uneven number of %% in line %d. %s\r\n", line_num, t );
+            free ( sc );
+            return FALSE;
+        }
+
         if (!strncasecmp(t, "if ", 3))
             indent_next = TRUE;
         else if (!strncasecmp(t, "switch ", 7)) {

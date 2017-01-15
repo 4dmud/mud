@@ -1109,7 +1109,7 @@ const char *reserved[] =
  * It makes sure you are the proper level and position to execute the command,
  * then calls the appropriate function.
  */
-void command_interpreter ( Character *ch, char *argument )
+void command_interpreter ( Character *ch, char *argument, trig_data *trig )
 {
     int cmd, length, fake_cmd;
     char *line;
@@ -1209,7 +1209,16 @@ void command_interpreter ( Character *ch, char *argument )
             return;
 
     if ( *complete_cmd_info[cmd].command == '\n' )
+    {
         ch->Send ( "Huh?!?\r\n" );
+        if ( IS_NPC ( ch ) )
+        {
+            if ( trig && trig->curr_state )
+                log ( "SYSERR: Mob [%d] %s did '%s%s'. Trigger [%d] %s, line %d: %s", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), arg, line, GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+            else
+                log ( "SYSERR: Mob [%d] %s did '%s%s'", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), arg, line );
+        }
+    }
     else if ( complete_cmd_info[cmd].command_pointer == NULL )
         ch->Send ( "Sorry, that command hasn't been implemented yet.\r\n" );
     else if ( ( complete_cmd_info[cmd].cmd_bits > 0 )
@@ -1251,8 +1260,7 @@ void command_interpreter ( Character *ch, char *argument )
         if ( !IS_NPC ( ch ) )
             total_pcommands_typed++;
         ( ( *complete_cmd_info[cmd].command_pointer ) ( ch, line, cmd,
-                complete_cmd_info[cmd].
-                subcmd ) );
+                complete_cmd_info[cmd].subcmd ) );
     }
 }
 

@@ -3737,7 +3737,6 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 {
     static int depth = 0;
     int ret_val = 1;
-    int brac = 0;
     struct cmdlist_element *cl;
     char cmd[MAX_INPUT_LENGTH], *p;
     struct script_data *sc = 0;
@@ -3747,7 +3746,6 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
     void obj_command_interpreter ( obj_data * obj, char *argument );
     void wld_command_interpreter ( Room *room, char *argument );
-    int check_braces ( char *str );
 
     if ( depth > MAX_SCRIPT_DEPTH )
     {
@@ -3903,15 +3901,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
         if ( *p == '*' )		/* comment */
             continue;
 
-        if ( ( ( brac = check_braces ( p ) ) != 0 ) &&
-                ( !strn_cmp ( "elseif ", p, 7 ) || !strn_cmp ( "else", p, 4 ) || !strn_cmp ( "else if ", p, 8 ) ||
-                  !strn_cmp ( p, "if ", 3 ) || !strn_cmp ( "while ", p, 6 ) || !strn_cmp ( "switch ", p, 7 ) ||
-                  !strn_cmp ( p, "extract ", 8 ) || !strn_cmp ( "case", p, 4 ) || !strn_cmp ( p, "eval ", 5 ) ||
-                  !strn_cmp ( p, "nop ", 4 ) || !strn_cmp ( p, "set ", 4 ) ) )
-        {
-            script_log ( "Unmatched %s bracket in trigger %d! Line %d: %s", brac < 0 ? "right" : "left", GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), p );
-        }
-        else if ( !strn_cmp ( p, "if ", 3 ) )
+        if ( !strn_cmp ( p, "if ", 3 ) )
         {
             if ( process_if ( p + 3, go, sc, trig, type ) )
                 GET_TRIG_DEPTH ( trig ) ++;
@@ -4112,7 +4102,7 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
                 switch ( type )
                 {
                     case MOB_TRIGGER:
-                        command_interpreter ( ( Character * ) go, cmd );
+                        command_interpreter ( ( Character * ) go, cmd, trig );
                         break;
                     case OBJ_TRIGGER:
                         obj_command_interpreter ( ( obj_data * ) go, cmd );

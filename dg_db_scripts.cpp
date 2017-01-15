@@ -26,6 +26,8 @@
 #include "constants.h"
 #include "oasis.h"
 
+int check_braces ( char *str );
+
 script_data* create_script()
 {
     script_data *sc;
@@ -41,6 +43,22 @@ void set_script_types ( script_data *sc )
     SCRIPT_TYPES ( sc ) = 0;
     for ( trig_data *t = TRIGGERS ( sc ); t; t = t->next )
         SCRIPT_TYPES ( sc ) |= GET_TRIG_TYPE ( t );
+}
+
+int char_count ( const char* s, const char c )
+{
+    int count = 0;
+    const char *str = s;
+
+    while ( true )
+    {
+        str = strchr ( str, c );
+        if ( !str )
+            break;
+        count++;
+        str++;
+    }
+    return count;
 }
 
 void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
@@ -86,11 +104,35 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     cle = trig->cmdlist;
     cle->line_nr = 1;
 
+    if ( char_count ( cle->cmd, '%' ) % 2 == 1 )
+        log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
+
+    int brac = check_braces ( cle->cmd );
+    if ( brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
+            || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
+            || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
+            || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
+            || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
+            || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
+        log ( "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+
     while ((s = strtok(NULL, "\n\r"))) {
         CREATE(cle->next, struct cmdlist_element, 1);
         cle->next->line_nr = cle->line_nr + 1;
         cle = cle->next;
         cle->cmd = strdup(s);
+
+        if ( char_count ( cle->cmd, '%' ) % 2 == 1 )
+            log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
+
+        brac = check_braces ( cle->cmd );
+        if ( brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
+                || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
+                || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
+                || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
+                || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
+                || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
+            log ( "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
     }
 
     free(cmds);
