@@ -153,7 +153,9 @@ ACMD ( do_oasis_qedit )
     }
 
     CREATE ( d->olc, oasis_olc_data, 1 );
-    CREATE ( OLC_QC ( d ), questcard, 1 );
+    questcard *qc;
+    CREATE ( qc, questcard, 1 );
+    OLC_QC ( d ) = qc;
     OLC_NUM ( d ) = number;
 
     auto it = questcards.find ( number );

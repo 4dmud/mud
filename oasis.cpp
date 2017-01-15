@@ -356,12 +356,6 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
    * Therefore it should not be free'd here.
    */
 
-  if ( OLC_QC ( d ) )
-  {
-      free ( OLC_QC ( d ) );
-      OLC_QC ( d ) = nullptr;
-  }
-
   /*
    * Restore descriptor playing status.
    */
@@ -386,7 +380,9 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
     STATE(d) = CON_PLAYING;
   }
 
-  free(d->olc);
+  if ( OLC_QC ( d ) )
+    free ( OLC_QC ( d ) );
+  free ( d->olc );
   d->olc = NULL;
 }
 
