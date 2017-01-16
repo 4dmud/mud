@@ -1130,7 +1130,7 @@ void parse_questcard ( char *filename )
         return;
     }
 
-    int i;
+    int i, num = atoi ( filename );
     string line, s, cmd;
     stringstream ss;
     questcard qc;
@@ -1150,21 +1150,31 @@ void parse_questcard ( char *filename )
                 qc.questflags.push_back ( s );
         }
         else if ( s == "Description:" )
-            ss >> qc.function_triggers[0];
+        {
+            while ( f.good() )
+            {
+                getline ( f, line );
+                if ( line[0] == '~' )
+                    break;
+                qc.description += line + "\n";
+            }
+            // remove the last newline
+            qc.description[ qc.description.size()-2 ] = '\0';
+        }
         else if ( s == "Available:" )
-            ss >> qc.function_triggers[1];
+            ss >> qc.function_triggers[0];
         else if ( s == "Completed:" )
-            ss >> qc.function_triggers[2];
+            ss >> qc.function_triggers[1];
         else if ( s == "Traders:" )
-            ss >> qc.function_triggers[3];
+            ss >> qc.function_triggers[2];
         else if ( s == "Achievements:" )
-            ss >> qc.function_triggers[4];
+            ss >> qc.function_triggers[3];
         else if ( s == "Other:" )
-            ss >> qc.function_triggers[5];
+            ss >> qc.function_triggers[4];
         else if ( s == "Unique:" )
-            ss >> qc.function_triggers[6];
+            ss >> qc.function_triggers[5];
         else if ( s == "Reset:" )
-            ss >> qc.function_triggers[7];
+            ss >> qc.function_triggers[6];
         else if ( s == "Order:" )
         {
             while ( ss >> i )
@@ -1199,7 +1209,9 @@ void parse_questcard ( char *filename )
         if ( line[0] == '$' )
             break;
     }
-    questcards[ atoi ( filename ) ] = qc;
+    f.close();
+
+    questcards[ num ] = qc;
 }
 
 void load_questcards()

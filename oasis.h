@@ -155,7 +155,7 @@ struct oasis_olc_data {
   struct q_descr_data *q_description;
   struct vehicle_attachment_data *attachment;
   struct help_index_element *help;
-  struct questcard *quest_card;
+  unique_ptr<questcard> quest_card;
 #if CONFIG_OASIS_MPROG           /*                          */
   int total_mprogs;              /*                          */
   struct mob_prog_data *mprog;   /*                          */
@@ -526,15 +526,16 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define QEDIT_MAIN_MENU                0
 #define QEDIT_NAME                     1
 #define QEDIT_QUESTFLAGS               2
-#define QEDIT_FUNCTION_TRIGGER         3
-#define QEDIT_ORDER                    4
-#define QEDIT_DEBUG_MENU               5
-#define QEDIT_DEBUG_COMMAND            6
-#define QEDIT_DEBUG_FUNCTION_TRIGGER   7
-#define QEDIT_COMMANDS_MENU            8
-#define QEDIT_COMMAND                  9
-#define QEDIT_COMMAND_FUNCTION_TRIGGER 10
-#define QEDIT_CONFIRM_SAVESTRING       11
+#define QEDIT_DESCRIPTION              3
+#define QEDIT_FUNCTION_TRIGGER         4
+#define QEDIT_ORDER                    5
+#define QEDIT_DEBUG_MENU               6
+#define QEDIT_DEBUG_COMMAND            7
+#define QEDIT_DEBUG_FUNCTION_TRIGGER   8
+#define QEDIT_COMMANDS_MENU            9
+#define QEDIT_COMMAND                  10
+#define QEDIT_COMMAND_FUNCTION_TRIGGER 11
+#define QEDIT_CONFIRM_SAVESTRING       12
 
 /* -------------------------------------------------------------------------- */
 #define MAX_HELP_KEYWORDS	75

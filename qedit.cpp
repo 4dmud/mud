@@ -15,7 +15,7 @@ map <int, questcard> questcards;
 
 void qedit_disp_menu ( Descriptor *d )
 {
-    auto qc = OLC_QC ( d );
+    auto qc = move ( OLC_QC ( d ) );
 
     string qflags = "{cc<none>{c0";
     if ( qc->questflags.size() > 0 )
@@ -43,15 +43,15 @@ void qedit_disp_menu ( Descriptor *d )
             else
                 names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
         }
-    while ( names.size() < 8 )
+    while ( names.size() < 7 )
         names.push_back ( "{cc<none>{c0" );
 
     string order = "{cc<none>{c0";
     if ( qc->order.size() > 0 )
     {
-        order = "{cy" + to_string ( qc->order[0] + 2 );
+        order = "{cy" + to_string ( qc->order[0] + 3 );
         for ( int i = 1; i < qc->order.size(); ++i )
-            order += " " + to_string ( qc->order[i] + 2 );
+            order += " " + to_string ( qc->order[i] + 3 );
         order += "{c0";
     }
 
@@ -77,7 +77,7 @@ void qedit_disp_menu ( Descriptor *d )
         "-- Questcard number [%s%d%s]\r\n"
         "%s0%s) Name         : %s%s\r\n"
         "%s1%s) Questflags   : %s\r\n"
-        "%s2%s) Description  : [%s%d%s] %s\r\n"
+        "%s2%s) Description\r\n"
         "%s3%s) Available    : [%s%d%s] %s\r\n"
         "%s4%s) Completed    : [%s%d%s] %s\r\n"
         "%s5%s) Traders      : [%s%d%s] %s\r\n"
@@ -94,6 +94,7 @@ void qedit_disp_menu ( Descriptor *d )
         cyn, OLC_NUM ( d ), nrm,
         grn, nrm, yel, qc->name.c_str(),
         grn, nrm, qflags.c_str(),
+        grn, nrm,
         grn, nrm, cyn, qc->function_triggers[0], nrm, names[0].c_str(),
         grn, nrm, cyn, qc->function_triggers[1], nrm, names[1].c_str(),
         grn, nrm, cyn, qc->function_triggers[2], nrm, names[2].c_str(),
@@ -101,7 +102,6 @@ void qedit_disp_menu ( Descriptor *d )
         grn, nrm, cyn, qc->function_triggers[4], nrm, names[4].c_str(),
         grn, nrm, cyn, qc->function_triggers[5], nrm, names[5].c_str(),
         grn, nrm, cyn, qc->function_triggers[6], nrm, names[6].c_str(),
-        grn, nrm, cyn, qc->function_triggers[7], nrm, names[7].c_str(),
         grn, nrm, order.c_str(),
         grn, nrm, debug.c_str(),
         grn, nrm, commands.c_str(),
@@ -109,6 +109,7 @@ void qedit_disp_menu ( Descriptor *d )
     );
 
     OLC_MODE ( d ) = QEDIT_MAIN_MENU;
+    OLC_QC ( d ) = move ( qc );
 }
 
 ACMD ( do_oasis_qedit )
@@ -147,15 +148,11 @@ ACMD ( do_oasis_qedit )
     if ( d->olc )
     {
         new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: do_oasis_qedit: %s already had olc structure.", GET_NAME ( ch ) );
-        if ( OLC_QC ( d ) )
-            free ( OLC_QC ( d ) );
         free ( d->olc );
     }
 
     CREATE ( d->olc, oasis_olc_data, 1 );
-    questcard *qc;
-    CREATE ( qc, questcard, 1 );
-    OLC_QC ( d ) = qc;
+    OLC_QC ( d ) = unique_ptr<questcard> (new questcard);
     OLC_NUM ( d ) = number;
 
     auto it = questcards.find ( number );
@@ -293,14 +290,14 @@ void save_questcard ( int num )
 
     file << "Name: "         << qc.name << endl;
     file << "Questflags: "   << qf.c_str() << endl;
-    file << "Description: "  << qc.function_triggers[0] << endl;
-    file << "Available: "    << qc.function_triggers[1] << endl;
-    file << "Completed: "    << qc.function_triggers[2] << endl;
-    file << "Traders: "      << qc.function_triggers[3] << endl;
-    file << "Achievements: " << qc.function_triggers[4] << endl;
-    file << "Other: "        << qc.function_triggers[5] << endl;
-    file << "Unique: "       << qc.function_triggers[6] << endl;
-    file << "Reset: "        << qc.function_triggers[7] << endl;
+    file << "Description: "  << endl << qc.description << "~" << endl;
+    file << "Available: "    << qc.function_triggers[0] << endl;
+    file << "Completed: "    << qc.function_triggers[1] << endl;
+    file << "Traders: "      << qc.function_triggers[2] << endl;
+    file << "Achievements: " << qc.function_triggers[3] << endl;
+    file << "Other: "        << qc.function_triggers[4] << endl;
+    file << "Unique: "       << qc.function_triggers[5] << endl;
+    file << "Reset: "        << qc.function_triggers[6] << endl;
     file << "Order: "        << order.c_str() << endl;
     if ( qc.debug.size() > 0 )
     {
@@ -340,7 +337,24 @@ void qedit_parse ( Descriptor *d, char *arg )
                     OLC_MODE ( d ) = QEDIT_QUESTFLAGS;
                     d->Output ( "Enter the questflags separated by a space:\r\n" );
                     return;
-                case '2': // fallthrough
+                case '2':
+                {
+                    OLC_MODE ( d ) = QEDIT_DESCRIPTION;
+                    send_editor_help ( d );
+                    d->Output ( "Enter the description:\r\n\r\n" );
+
+                    char *oldtext = nullptr;
+                    if ( OLC_QC ( d )->description != "" )
+                    {
+                        oldtext = strdup ( OLC_QC ( d )->description.c_str() );
+                        if ( OLC_STORAGE ( d ) )
+                            free ( OLC_STORAGE ( d ) );
+                        OLC_STORAGE ( d ) = strdup ( oldtext );
+                        d->Output ( "%s", oldtext );
+                    }
+                    string_write ( d, &OLC_STORAGE ( d ), MAX_MESSAGE_LENGTH, 0, oldtext );
+                    return;
+                }
                 case '3': // fallthrough
                 case '4': // fallthrough
                 case '5': // fallthrough
@@ -418,8 +432,8 @@ void qedit_parse ( Descriptor *d, char *arg )
                     // function trigger types on mob/room/obj all have the same value
                     d->Output ( "Trigger %d is not a funcion trigger.\r\n", vnum );
                 else if ( OLC_MODE ( d ) == QEDIT_FUNCTION_TRIGGER )
-                    // the first function trigger is option 2 in the menu
-                    OLC_QC ( d )->function_triggers[ OLC_VAL ( d ) - 2 ] = vnum;
+                    // the first function trigger is option 3 in the menu
+                    OLC_QC ( d )->function_triggers[ OLC_VAL ( d ) - 3 ] = vnum;
                 else if ( OLC_MODE ( d ) == QEDIT_DEBUG_FUNCTION_TRIGGER )
                 {
                     if ( OLC_QC ( d )->debug.size() == 0 )
@@ -473,18 +487,26 @@ void qedit_parse ( Descriptor *d, char *arg )
                 bool all_good = TRUE;
                 while ( ss >> x )
                 {
-                    if ( x < 2 || x > 7 )
+                    if ( x < 3 || x > 8 )
                     {
                         all_good = FALSE;
                         break;
                     }
                     else
-                        order.push_back ( x - 2 );
+                        order.push_back ( x - 3 );
                 }
                 if ( all_good )
+                {
                     OLC_QC ( d )->order = order;
+                    OLC_VAL ( d ) = 1;
+                }
                 else
-                    d->Output ( "Illegal order value, it must lie between 2 and 7.\r\n" );
+                    d->Output ( "Illegal order value, it must lie between 3 and 8.\r\n" );
+            }
+            else
+            {
+                OLC_QC ( d )->order.clear();
+                OLC_VAL ( d ) = 1;
             }
             break;
         case QEDIT_DEBUG_MENU:
@@ -654,5 +676,24 @@ void qedit_parse ( Descriptor *d, char *arg )
     if ( OLC_VAL ( d ) == 0 )
         OLC_VAL ( d ) = 1;
     qedit_disp_menu ( d );
+}
+
+void qedit_string_cleanup ( Descriptor *d, int terminator )
+{
+    switch ( OLC_MODE ( d ) )
+    {
+        case QEDIT_DESCRIPTION:
+            if ( OLC_STORAGE ( d ) )
+            {
+                OLC_QC ( d )->description = string ( OLC_STORAGE ( d ) );
+                free ( OLC_STORAGE ( d ) );
+                OLC_STORAGE ( d ) = nullptr;
+            }
+            OLC_VAL ( d ) = 1;
+            qedit_disp_menu ( d );
+            break;
+        default:
+            break;
+    }
 }
 

@@ -287,19 +287,19 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
 
 
 void dg_varexists (struct script_data *script, char *subfield, char *str, size_t slen) {
-  struct trig_var_data *vdt;
-  snprintf ( str, slen, "0" );
-  if ( script )
-    {
-      for ( vdt = script->global_vars; vdt; vdt = vdt->next )
-    {
-      if ( !strcasecmp ( vdt->name.c_str(), subfield ) )
-        break;
-    }
-      if ( vdt )
-    snprintf ( str, slen, "1" );
-      else
+    struct trig_var_data *vdt;
     snprintf ( str, slen, "0" );
+    if ( script )
+    {
+        for ( vdt = script->global_vars; vdt; vdt = vdt->next )
+        {
+            if ( !strcasecmp ( vdt->name.c_str(), subfield ) )
+                break;
+        }
+        if ( vdt )
+            snprintf ( str, slen, "1" );
+        else
+            snprintf ( str, slen, "0" );
     }
 }
 

@@ -8439,7 +8439,7 @@ ACMD ( do_qstat )
     for ( int i = 0; i < qc.function_triggers.size(); ++i )
         if ( qc.function_triggers[i] == NOTHING )
         {
-            if ( i == 6 )
+            if ( i == 5 )
                 names.push_back ( "{ccusing generic trigger{c0" );
             else
                 names.push_back ( "{cc<none>{c0" );
@@ -8452,7 +8452,7 @@ ACMD ( do_qstat )
             else
                 names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
         }
-    while ( names.size() < 8 )
+    while ( names.size() < 7 )
         names.push_back ( "{cc<none>{c0" );
 
     string order = "{cc<none>{c0";
@@ -8468,23 +8468,52 @@ ACMD ( do_qstat )
     if ( qc.debug.size() == 0 )
         debug = "{cc<none>{c0";
     else
+    {
+        debug = "\r\n";
         for ( const auto &d : qc.debug )
-            debug += "[{cy" + d.first + "{c0] ";
+        {
+            debug += "[{cy" + d.first + "{c0] - [{cc" + to_string ( d.second ) + "{c0] ";
+            int rnum = real_trigger ( d.second );
+            if ( rnum == NOTHING )
+                debug += "{cc<none>{c0\r\n";
+            else
+                debug += "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0\r\n";
+        }
+        // remove the last newline
+        debug[ debug.size()-2 ] = '\0';
+    }
 
     string commands;
     if ( qc.commands.size() == 0 )
         commands = "{cc<none>{c0";
     else
+    {
+        commands = "\r\n";
         for ( const auto &c : qc.commands )
-            commands += "[{cy" + c.first + "{c0] ";
+        {
+            commands += "[{cy" + c.first + "{c0] - [{cc" + to_string ( c.second ) + "{c0] ";
+            int rnum = real_trigger ( c.second );
+            if ( rnum == NOTHING )
+                commands += "{cc<none>{c0\r\n";
+            else
+                commands += "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0\r\n";
+        }
+        // remove the last newline
+        commands[ commands.size()-2 ] = '\0';
+    }
 
     get_char_colours ( ch );
 
-    ch->Send (
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = 0;
+    char buf[MAX_STRING_LENGTH];
+
+    snprintf ( buf, sizeof buf,
         "-- Questcard number [%s%d%s]\r\n"
         "Name         : %s%s%s\r\n"
         "Questflags   : %s%s%s\r\n"
-        "Description  : [%s%d%s] %s\r\n"
+        "Description  : \r\n%s%s%s\r\n"
         "Available    : [%s%d%s] %s\r\n"
         "Completed    : [%s%d%s] %s\r\n"
         "Traders      : [%s%d%s] %s\r\n"
@@ -8499,6 +8528,7 @@ ACMD ( do_qstat )
         cyn, num, nrm,
         yel, qc.name.c_str(), nrm,
         yel, qflags.c_str(), nrm,
+        yel, qc.description.c_str(), nrm,
         cyn, qc.function_triggers[0], nrm, names[0].c_str(),
         cyn, qc.function_triggers[1], nrm, names[1].c_str(),
         cyn, qc.function_triggers[2], nrm, names[2].c_str(),
@@ -8506,9 +8536,10 @@ ACMD ( do_qstat )
         cyn, qc.function_triggers[4], nrm, names[4].c_str(),
         cyn, qc.function_triggers[5], nrm, names[5].c_str(),
         cyn, qc.function_triggers[6], nrm, names[6].c_str(),
-        cyn, qc.function_triggers[7], nrm, names[7].c_str(),
         order.c_str(),
         debug.c_str(),
         commands.c_str()
     );
+    DYN_RESIZE ( buf );
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }

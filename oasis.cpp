@@ -380,8 +380,6 @@ void cleanup_olc(Descriptor *d, sbyte cleanup_type)
     STATE(d) = CON_PLAYING;
   }
 
-  if ( OLC_QC ( d ) )
-    free ( OLC_QC ( d ) );
   free ( d->olc );
   d->olc = NULL;
 }

@@ -2832,6 +2832,7 @@ struct comm_data {
 
 struct questcard {
     string name;  // name of the questcard
+    string description; // shown when you do questcheck <num>
     vector<string> questflags;
     vector<int> function_triggers;
     vector<int> order; // order in which the function triggers get called
