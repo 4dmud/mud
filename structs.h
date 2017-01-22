@@ -2830,13 +2830,18 @@ struct comm_data {
     struct comm_data * next;
 };
 
+struct questflag {
+    string name;
+    string value; // default questflag (name, value) if it's missing
+    vector<bool> resets; // the variables to set to default after questcheck reset
+};
+
 struct questcard {
     string name;  // name of the questcard
     string description; // shown when you do questcheck <num>
-    vector<string> questflags;
+    vector<questflag> questflags;
     vector<int> function_triggers;
     vector<int> order; // order in which the function triggers get called
-    map <string, int> debug; // function triggers for debug commands
     map <string, int> commands; // function triggers for other questcard commands
 };
 

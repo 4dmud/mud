@@ -4337,6 +4337,9 @@ ACMD ( do_tlist )
 /* returns the real number of the trigger with given virtual number */
 trig_rnum real_trigger ( int vnum )
 {
+    if ( vnum == NOTHING )
+        return NOTHING;
+
     int bot = 0, mid;
     int top = top_of_trigt - 1;
 

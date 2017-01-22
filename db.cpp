@@ -1134,7 +1134,8 @@ void parse_questcard ( char *filename )
     string line, s, cmd;
     stringstream ss;
     questcard qc;
-    qc.function_triggers = vector<int> (8, NOTHING);
+    qc.function_triggers = vector<int> (7, NOTHING);
+
     while ( f.good() )
     {
         getline ( f, line );
@@ -1143,11 +1144,30 @@ void parse_questcard ( char *filename )
         ss >> s;
 
         if ( s == "Name:" )
-            ss >> qc.name;
+            qc.name = line.substr ( 6 );
         else if ( s == "Questflags:" )
         {
-            while ( ss >> s )
-                qc.questflags.push_back ( s );
+            while ( f.good() )
+            {
+                getline ( f, line );
+                if ( line[0] == '~' )
+                    break;
+
+                questflag qf;
+                qf.name = line;
+                getline ( f, qf.value );
+                getline ( f, line );
+                ss.clear();
+                ss.str ( line );
+                while ( ss >> s )
+                {
+                    if ( s == "yes" )
+                        qf.resets.push_back ( TRUE );
+                    else
+                        qf.resets.push_back ( FALSE );
+                }
+                qc.questflags.push_back ( qf );
+            }
         }
         else if ( s == "Description:" )
         {
@@ -1158,8 +1178,8 @@ void parse_questcard ( char *filename )
                     break;
                 qc.description += line + "\n";
             }
-            // remove the last newline
-            qc.description[ qc.description.size()-2 ] = '\0';
+            // remove the trailing \r\n
+            qc.description = qc.description.substr ( 0, qc.description.size()-2 );
         }
         else if ( s == "Available:" )
             ss >> qc.function_triggers[0];
@@ -1173,25 +1193,12 @@ void parse_questcard ( char *filename )
             ss >> qc.function_triggers[4];
         else if ( s == "Unique:" )
             ss >> qc.function_triggers[5];
-        else if ( s == "Reset:" )
+        else if ( s == "Debug:" )
             ss >> qc.function_triggers[6];
         else if ( s == "Order:" )
         {
             while ( ss >> i )
                 qc.order.push_back ( i );
-        }
-        else if ( s == "Debug:" )
-        {
-            while ( f.good() )
-            {
-                getline ( f, line );
-                if ( line[0] == '~' )
-                    break;
-                ss.clear();
-                ss.str ( line );
-                ss >> cmd >> i;
-                qc.debug[ cmd ] = i;
-            }
         }
         else if ( s == "Commands:" )
         {

@@ -8425,62 +8425,38 @@ ACMD ( do_qstat )
         return;
     }
 
-    auto qc = it->second;
-    string qflags = "<none>";
-    if ( qc.questflags.size() > 0 )
-    {
-        qflags = "{cy" + qc.questflags[0];
-        for ( int i = 1; i < qc.questflags.size(); ++i )
-            qflags += " " + qc.questflags[i];
-        qflags += "{c0";
-    }
-
-    vector<string> names;
-    for ( int i = 0; i < qc.function_triggers.size(); ++i )
-        if ( qc.function_triggers[i] == NOTHING )
+    const auto &qc = it->second;
+    string qflags;
+    if ( qc.questflags.size() == 0 )
+        qflags = "{cc<none>{c0";
+    else
+        for ( const auto &qf : qc.questflags )
         {
-            if ( i == 5 )
-                names.push_back ( "{ccusing generic trigger{c0" );
-            else
-                names.push_back ( "{cc<none>{c0" );
+            qflags += "\r\n{cy   " + qf.name + " {c0={cy " + qf.value + "\r\n{c0   Resets:{cy ";
+            for ( const auto &b : qf.resets )
+                if ( b )
+                    qflags += "yes ";
+                else
+                    qflags += "no ";
+            qflags += "{c0";
         }
-        else
+
+    vector<string> names ( qc.function_triggers.size(), "{cc<none>{c0" );
+    for ( int i = 0; i < qc.function_triggers.size(); ++i )
+        if ( qc.function_triggers[i] != NOTHING )
         {
             int rnum = real_trigger ( qc.function_triggers[i] );
-            if ( rnum == NOTHING )
-                names.push_back ( "{cc<none>{c0" );
-            else
-                names.push_back ( "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0" );
+            if ( rnum != NOTHING )
+                names[i] = "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0";
         }
-    while ( names.size() < 7 )
-        names.push_back ( "{cc<none>{c0" );
 
     string order = "{cc<none>{c0";
     if ( qc.order.size() > 0 )
     {
-        order = "{cy" + to_string ( qc.order[0] + 3 );
-        for ( int i = 1; i < qc.order.size(); ++i )
-            order += " " + to_string ( qc.order[i] + 3 );
+        order = "{cy";
+        for ( const auto &i : qc.order )
+            order += to_string ( i + 3 ) + " ";
         order += "{c0";
-    }
-
-    string debug;
-    if ( qc.debug.size() == 0 )
-        debug = "{cc<none>{c0";
-    else
-    {
-        debug = "\r\n";
-        for ( const auto &d : qc.debug )
-        {
-            debug += "[{cy" + d.first + "{c0] - [{cc" + to_string ( d.second ) + "{c0] ";
-            int rnum = real_trigger ( d.second );
-            if ( rnum == NOTHING )
-                debug += "{cc<none>{c0\r\n";
-            else
-                debug += "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0\r\n";
-        }
-        // remove the last newline
-        debug[ debug.size()-2 ] = '\0';
     }
 
     string commands;
@@ -8488,18 +8464,15 @@ ACMD ( do_qstat )
         commands = "{cc<none>{c0";
     else
     {
-        commands = "\r\n";
         for ( const auto &c : qc.commands )
         {
-            commands += "[{cy" + c.first + "{c0] - [{cc" + to_string ( c.second ) + "{c0] ";
+            commands += "\r\n{cy   " + c.first + " {c0- [{cc" + to_string ( c.second ) + "{c0] ";
             int rnum = real_trigger ( c.second );
             if ( rnum == NOTHING )
-                commands += "{cc<none>{c0\r\n";
+                commands += "{cc<none>{c0";
             else
-                commands += "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0\r\n";
+                commands += "{cy" + string ( GET_TRIG_NAME ( trig_index[ rnum ]->proto ) ) + "{c0";
         }
-        // remove the last newline
-        commands[ commands.size()-2 ] = '\0';
     }
 
     get_char_colours ( ch );
@@ -8512,7 +8485,7 @@ ACMD ( do_qstat )
     snprintf ( buf, sizeof buf,
         "-- Questcard number [%s%d%s]\r\n"
         "Name         : %s%s%s\r\n"
-        "Questflags   : %s%s%s\r\n"
+        "Questflags   : %s\r\n"
         "Description  : \r\n%s%s%s\r\n"
         "Available    : [%s%d%s] %s\r\n"
         "Completed    : [%s%d%s] %s\r\n"
@@ -8520,14 +8493,13 @@ ACMD ( do_qstat )
         "Achievements : [%s%d%s] %s\r\n"
         "Other        : [%s%d%s] %s\r\n"
         "Unique       : [%s%d%s] %s\r\n"
-        "Reset        : [%s%d%s] %s\r\n"
+        "Debug        : [%s%d%s] %s\r\n"
         "Order        : %s\r\n"
-        "Debug        : %s\r\n"
         "Commands     : %s\r\n",
 
         cyn, num, nrm,
         yel, qc.name.c_str(), nrm,
-        yel, qflags.c_str(), nrm,
+        qflags.c_str(),
         yel, qc.description.c_str(), nrm,
         cyn, qc.function_triggers[0], nrm, names[0].c_str(),
         cyn, qc.function_triggers[1], nrm, names[1].c_str(),
@@ -8537,7 +8509,6 @@ ACMD ( do_qstat )
         cyn, qc.function_triggers[5], nrm, names[5].c_str(),
         cyn, qc.function_triggers[6], nrm, names[6].c_str(),
         order.c_str(),
-        debug.c_str(),
         commands.c_str()
     );
     DYN_RESIZE ( buf );

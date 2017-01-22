@@ -527,14 +527,14 @@ extern const char *nrm, *grn, *cyn, *yel;
  */
 #define QEDIT_MAIN_MENU                0
 #define QEDIT_NAME                     1
-#define QEDIT_QUESTFLAGS               2
-#define QEDIT_DESCRIPTION              3
-#define QEDIT_FUNCTION_TRIGGER         4
-#define QEDIT_ORDER                    5
-#define QEDIT_DEBUG_MENU               6
-#define QEDIT_DEBUG_COMMAND            7
-#define QEDIT_DEBUG_FUNCTION_TRIGGER   8
-#define QEDIT_COMMANDS_MENU            9
+#define QEDIT_QUESTFLAG_MENU           2
+#define QEDIT_QUESTFLAG_NAME           3
+#define QEDIT_QUESTFLAG_VALUE          4
+#define QEDIT_QUESTFLAG_RESETS         5
+#define QEDIT_DESCRIPTION              6
+#define QEDIT_FUNCTION_TRIGGER         7
+#define QEDIT_ORDER                    8
+#define QEDIT_COMMAND_MENU             9
 #define QEDIT_COMMAND                  10
 #define QEDIT_COMMAND_FUNCTION_TRIGGER 11
 #define QEDIT_CONFIRM_SAVESTRING       12
