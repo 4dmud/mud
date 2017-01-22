@@ -990,7 +990,7 @@ int format_script(Descriptor *d) {
     char *sc;
     size_t len = 0, nlen = 0, llen = 0;
     int indent = 0, i, line_num = 0, while_count = 0, brac;
-    bool indent_next = FALSE, found_case = FALSE, first_case = FALSE, in_switch = FALSE;
+    bool indent_next = FALSE, found_case = FALSE, first_case = FALSE, in_switch = FALSE, error = FALSE;
 
     if (!d->str || !*d->str)
         return FALSE;
@@ -1008,16 +1008,14 @@ int format_script(Descriptor *d) {
             || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3) || !strn_cmp("while ", t, 6)
             || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8) || !strn_cmp("case ", t, 5)
             || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4))) {
-            d->Output( "Unmatched %s bracket (line %d)!\r\n", brac < 0 ? "right" : "left", line_num);
-            free(sc);
-            return FALSE;
+            d->Output( "Unmatched %s bracket in line %d: %s\r\n", brac < 0 ? "right" : "left", line_num, t);
+            error = TRUE;
         }
 
         if ( char_count ( t, '%' ) % 2 == 1 )
         {
-            d->Output ( "Uneven number of %% in line %d. %s\r\n", line_num, t );
-            free ( sc );
-            return FALSE;
+            d->Output ( "Uneven number of %% in line %d: %s\r\n", line_num, t );
+            error = TRUE;
         }
 
         if (!strncasecmp(t, "if ", 3))
@@ -1032,9 +1030,8 @@ int format_script(Descriptor *d) {
         } else if (!strncasecmp(t, "end", 3) ||
                    !strncasecmp(t, "done", 4)) {
             if (!indent) {
-                d->Output( "Unmatched 'end' or 'done' (line %d)!\r\n", line_num);
-                free(sc);
-                return FALSE;
+                d->Output ( "Unmatched 'end' or 'done' in line %d: %s\r\n", line_num, t );
+                error = TRUE;
             }
             indent--;
             indent_next = FALSE;
@@ -1046,18 +1043,16 @@ int format_script(Descriptor *d) {
                 while_count--;
         } else if (!strncasecmp(t, "else", 4)) {
             if (!indent) {
-                d->Output( "Unmatched 'else' (line %d)!\r\n", line_num);
-                free(sc);
-                return FALSE;
+                d->Output ( "Unmatched 'else' in line %d: %s\r\n", line_num, t );
+                error = TRUE;
             }
             indent--;
             indent_next = TRUE;
         } else if (!strncasecmp(t, "case", 4) ||
                    !strncasecmp(t, "default", 7)) {
             if (!indent) {
-                d->Output( "Case/default outside switch (line %d)!\r\n", line_num);
-                free(sc);
-                return FALSE;
+                d->Output ( "Case/default outside switch in line %d: %s\r\n", line_num, t );
+                error = TRUE;
             }
             indent_next = TRUE;
             found_case = TRUE;
@@ -1067,9 +1062,8 @@ int format_script(Descriptor *d) {
                 indent--;
         } else if (!strncasecmp(t, "break", 5)) {
             if ((!found_case && !while_count) || !indent ) {
-                d->Output( "Break not in case or while (line %d)!\r\n", line_num);
-                free(sc);
-                return FALSE;
+                d->Output ( "Break not in case or while in line %d: %s\r\n", line_num, t );
+                error = TRUE;
             }
             found_case = FALSE;
         }
@@ -1093,6 +1087,12 @@ int format_script(Descriptor *d) {
             indent_next = FALSE;
         }
         t = strtok(NULL, "\r\n");
+    }
+
+    if ( error )
+    {
+        free ( sc );
+        return FALSE;
     }
 
     if (indent)

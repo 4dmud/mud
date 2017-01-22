@@ -90,6 +90,10 @@ int improved_editor_execute(Descriptor *d, char *str)
       return STRINGADD_SAVE;
     else
       return STRINGADD_OK;
+  case 'x':
+      if ( STATE ( d ) == CON_TRIGEDIT )
+          return STRINGADD_SAVE;
+      // fallthrough
   default:
     d->Output( "Invalid option.\r\n");
     break;
@@ -126,6 +130,8 @@ void parse_action(int command, char *string, Descriptor *d)
         "/ra 'a' 'b'-  replace all occurances of text <a> within buffer with text <b>\r\n"
         "              usage: /r[a] 'pattern' 'replacement'\r\n"
         "/s         -  saves text\r\n");
+    if ( STATE ( d ) == CON_TRIGEDIT )
+        d->Output ( "/x         -  saves trigger regardless of any errors\r\n" );
     break;
   case PARSE_FORMAT:
     if (STATE(d) == CON_TRIGEDIT) {
