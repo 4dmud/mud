@@ -3543,6 +3543,84 @@ void process_context ( struct script_data *sc, trig_data * trig, char *cmd )
     sc->context = atol ( var );
 }
 
+void purge_mob ( Character *mob )
+{
+    if ( !mob || !IS_NPC ( mob ) )
+        return;
+
+    // purge inv
+    obj_data *obj, *next_obj;
+    for ( obj = mob->carrying; obj; obj = next_obj )
+    {
+        next_obj = obj->next_content;
+        extract_obj ( obj );
+    }
+
+    // purge eq
+    for ( int i = 0; i < NUM_WEARS; ++i )
+        if ( GET_EQ ( mob, i ) )
+            extract_obj ( GET_EQ ( mob, i ) );
+
+    // purge mob
+    extract_char ( mob );
+}
+
+/* purge a mob including inventory and equipment */
+void process_purgemob ( void *thing, int type, trig_data *trig, char *cmd )
+{
+    char command[MAX_INPUT_LENGTH], *arg;
+    arg = one_argument ( cmd, command );
+    skip_spaces ( &arg );
+
+    if ( !*arg )
+    {
+        script_log ( "Trigger [%d] %s, purgemob has no argument in line %d",
+            GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ) );
+        return;
+    }
+
+    if ( !strcmp ( cmd, "target_not_found" ) )
+        return;
+
+    Character *victim = nullptr;
+    Room *room = nullptr;
+
+    if ( *arg == UID_CHAR )
+    {
+        victim = get_char ( arg );
+        if ( !victim )
+            return;
+    }
+    else if ( type == MOB_TRIGGER )
+    {
+        victim = get_char_room_vis ( (Character *) thing, arg, nullptr );
+        if ( !victim )
+            return;
+    }
+    else if ( type == OBJ_TRIGGER )
+        room = obj_room ( (obj_data *) thing );
+    else if ( type == WLD_TRIGGER )
+        room = (Room *) thing;
+    else
+    {
+        script_log ( "Trigger [%d] %s, purgemob: unknown type %d",
+            GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), type );
+        return;
+    }
+
+    if ( !victim )
+        victim = get_room_vis ( room, arg, nullptr, nullptr );
+
+    if ( victim )
+    {
+        if ( !IS_NPC ( victim ) )
+            script_log ( "Trigger [%d] %s, purgemob tried to purge a PC. Line %d: %s",
+                GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        else
+            purge_mob ( victim );
+    }
+}
+
 void extract_value ( struct script_data *sc, trig_data * trig, char *cmd )
 {
     char buf[MAX_INPUT_LENGTH];
@@ -4069,6 +4147,10 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
 
             else if ( !strn_cmp ( cmd, "playeruid", 9 ) )
                 process_playeruid ( sc, trig, cmd );
+
+            else if ( !strn_cmp ( cmd, "purgemob", 8 ) )
+                process_purgemob ( go, type, trig, cmd );
+
             else
             {
                 switch ( type )
