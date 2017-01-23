@@ -6236,8 +6236,6 @@ ACMD ( do_questcheck )
         SCRIPT ( obj ) = create_script();
 
     char buf[MAX_INPUT_LENGTH];
-    snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
-    add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
 
     if ( command == "debug" && ( IS_IMM ( ch ) || GET_ORIG_LEV ( ch ) ) )
     {
@@ -6253,7 +6251,7 @@ ACMD ( do_questcheck )
             ch->Send ( "Usage: questcheck <number> debug <player>\r\n" );
         else
         {
-            int uid = pi.IdByName ( player.c_str() );
+            long int uid = pi.IdByName ( player.c_str() );
             if ( uid == -1 )
                 ch->Send ( "Player %s doesn't exist.\r\n", player.c_str() );
             else
@@ -6264,6 +6262,8 @@ ACMD ( do_questcheck )
                     trig_data *t = read_trigger ( real_trigger ( qc.function_triggers[6] ) );
                     if ( t )
                     {
+                        snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, uid );
+                        add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
                         snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
                         add_var ( &( SCRIPT ( obj )->global_vars ), "debugger", buf, 0 );
                         add_trigger ( SCRIPT ( obj ), t, -1 );
@@ -6306,6 +6306,9 @@ ACMD ( do_questcheck )
     }
     if ( added_flag )
         save_char_vars ( ch );
+
+    snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
+    add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
 
     if ( command == "status" )
     {
