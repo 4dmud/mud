@@ -177,6 +177,10 @@ void list_rooms ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax 
         "Index VNum    Room Name                                Exits\r\n"
         "----- ------- ---------------------------------------- -----\r\n" );
 
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     for ( i = 0; i <= top_of_world; i++ )
     {
         if ( !world_vnum[i] )
@@ -187,11 +191,12 @@ void list_rooms ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax 
         {
             counter++;
 
-            ch->Send ( "%4d) [%s%-5d%s] %s%-40.40s%s %s",
+            snprintf ( buf, sizeof buf, "%4d) [%s%-5d%s] %s%-40.40s%s %s",
                        counter, QGRN, world_vnum[i]->number, QNRM,
                        QCYN, world_vnum[i]->name, QNRM,
                        world_vnum[i]->proto_script ? "[TRIG] " : ""
                      );
+            DYN_RESIZE ( buf );
 
             for ( j = 0; j < NUM_OF_DIRS; j++ )
             {
@@ -201,16 +206,24 @@ void list_rooms ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax 
                     continue;
 
                 if ( W_EXIT ( world_vnum[i], j )->to_room->zone != world_vnum[i]->zone )
-                    ch->Send ( "(%s%d%s)", QYEL, W_EXIT ( world_vnum[i], j )->to_room->number, QNRM );
+                {
+                    snprintf ( buf, sizeof buf, "(%s%d%s)", QYEL, W_EXIT ( world_vnum[i], j )->to_room->number, QNRM );
+                    DYN_RESIZE ( buf );
+                }
 
             }
 
-            ch->Send ( "\r\n" );
+            snprintf ( buf, sizeof buf, "\r\n" );
+            DYN_RESIZE ( buf );
         }
     }
 
     if ( counter == 0 )
-        ch->Send ( "No rooms found for zone #%d\r\n", zone_table[rnum].number );
+    {
+        snprintf ( buf, sizeof buf, "No rooms found for zone #%d\r\n", zone_table[rnum].number );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 /*
@@ -238,6 +251,10 @@ void list_mobiles ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vma
         "Index VNum    Mobile Name                                   Level\r\n"
         "----- ------- --------------------------------------------- -----\r\n" );
 
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     for ( i = bottom; i <= top; i++ )
     {
         if ( !MobProtoExists ( i ) )
@@ -245,18 +262,21 @@ void list_mobiles ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vma
         counter++;
         pmob = GetMobProto ( i );
 
-        ch->Send ( "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
+        snprintf ( buf, sizeof buf, "%s%4d%s) [%s%-5d%s] %s%-44.44s %s[%4d]%s%s\r\n",
                    QGRN, counter, QNRM, QGRN, i, QNRM,
                    QCYN, pmob->player.short_descr,
                    QYEL, pmob->player.level, QNRM,
                    pmob->proto_script ? " [TRIG]" : ""
                  );
-
-
+        DYN_RESIZE ( buf );
     }
 
     if ( counter == 0 )
+    {
         ch->Send ( "None found.\r\n" );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 /*
@@ -283,24 +303,33 @@ void list_objects ( Character *ch, zone_rnum rnum, room_vnum vmin, room_vnum vma
         "Index VNum    Object Name                                  Object Type\r\n"
         "----- ------- -------------------------------------------- ----------------\r\n" );
 
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     for ( i = 0; i <= top_of_objt; i++ )
     {
         if ( obj_index[i].vnum >= bottom && obj_index[i].vnum <= top )
         {
             counter++;
 
-            ch->Send ( "%s%4d%s) [%s%-5d%s] %s%-35.35s %s[%s]%s%s(%s%s%s)\r\n",
+            snprintf ( buf, sizeof buf, "%s%4d%s) [%s%-5d%s] %s%-35.35s %s[%s]%s%s(%s%s%s)\r\n",
                        QGRN, counter, QNRM, QGRN, obj_index[i].vnum, QNRM,
                        QCYN, obj_proto[i].short_description, QYEL,
                        item_types[ ( int ) obj_proto[i].obj_flags.type_flag], QNRM,
                        obj_proto[i].proto_script ? " [TRIG]" : "",
                        QYEL, material_name ( GET_OBJ_MATERIAL ( obj_proto + i ) ), QNRM
                      );
+            DYN_RESIZE ( buf );
         }
     }
 
     if ( counter == 0 )
-        ch->Send ( "None found.\r\n" );
+    {
+        snprintf ( buf, sizeof buf, "None found.\r\n" );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 
@@ -329,6 +358,10 @@ void list_shops ( Character *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax 
         "Index VNum    RNum    Keeper  Shop Room(s)\r\n"
         "----- ------- ------- ------- -----------------------------------------\r\n" );
 
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     for ( i = 0; i <= top_shop; i++ )
     {
         if ( SHOP_NUM ( i ) >= bottom && SHOP_NUM ( i ) <= top )
@@ -337,26 +370,36 @@ void list_shops ( Character *ch, zone_rnum rnum, shop_vnum vmin, shop_vnum vmax 
 
             shop = shop_index + i;
             /* the +1 is strange but fits the rest of the shop code */
-            ch->Send ( "%s%4d%s) [%s%-5d%s] [%s%-5d%s] [%s%-5d%s]",
+            snprintf ( buf, sizeof buf, "%s%4d%s) [%s%-5d%s] [%s%-5d%s] [%s%-5d%s]",
                        QGRN, counter, QNRM, QGRN, SHOP_NUM ( i ), QNRM, QGRN, i + 1, QNRM, QGRN, S_KEEPER ( shop ) == NOBODY ? -1 : S_KEEPER ( shop ), QNRM );
-
-
+            DYN_RESIZE ( buf );
 
             /* Thanks to Ken Ray (kenr86@hotmail.com) for this display fix -- Welcor*/
             for ( j = 0; SHOP_ROOM ( i, j ) != NULL; j++ )
-                ch->Send ( "%s%s[%s%-5d%s]%s",
+            {
+                snprintf ( buf, sizeof buf, "%s%s[%s%-5d%s]%s",
                            ( ( j > 0 ) && ( j % 6 == 0 ) ) ? "\r\n                      " : " ",
                            QCYN, QYEL, SHOP_ROOM ( i, j )->number, QCYN, QNRM );
+                DYN_RESIZE ( buf );
+            }
 
             if ( j == 0 )
-                ch->Send ( "%sNone.%s", QCYN, QNRM );
+            {
+                snprintf ( buf, sizeof buf, "%sNone.%s", QCYN, QNRM );
+                DYN_RESIZE ( buf );
+            }
 
-            ch->Send ( "\r\n" );
+            snprintf ( buf, sizeof buf, "\r\n" );
+            DYN_RESIZE ( buf );
         }
     }
 
     if ( counter == 0 )
-        ch->Send ( "None found.\r\n" );
+    {
+        snprintf ( buf, sizeof buf, "None found.\r\n" );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 /*
@@ -383,20 +426,29 @@ void list_zones ( Character *ch, zone_rnum rnum, zone_vnum vmin, zone_vnum vmax 
     ch->Send (
         "VNum  Zone Name                      Builder(s)\r\n"
         "----- ------------------------------ --------------------------------------\r\n" );
+
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     for ( i = 0; i <= top_of_zone_table; i++ )
     {
         if ( zone_table[i].number >= bottom && zone_table[i].number <= top )
         {
-            ch->Send ( "[%s%3d%s] %s%-30.30s %s%-1s%s\r\n",
+            snprintf ( buf, sizeof buf, "[%s%3d%s] %s%-30.30s %s%-1s%s\r\n",
                        QGRN, zone_table[i].number, QNRM, QCYN, zone_table[i].name,
                        QYEL, zone_table[i].builders ? zone_table[i].builders : "None.", QNRM );
-
+            DYN_RESIZE ( buf );
             counter++;
         }
     }
 
     if ( !counter )
-        ch->Send ( "  None found within those parameters.\r\n" );
+    {
+        snprintf ( buf, sizeof buf, "  None found within those parameters.\r\n" );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
 
@@ -510,7 +562,10 @@ void list_triggers ( Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vm
         "Index VNum    Trigger Name                        Type\r\n"
         "----- ------- -------------------------------------------------------\r\n" );
 
-
+    DYN_DEFINE;
+    DYN_CREATE;
+    *dynbuf = '\0';
+    char buf[MAX_INPUT_LENGTH];
     /** Loop through the world and find each room. **/
     for ( i = 0; i < top_of_trigt; i++ )
     {
@@ -519,28 +574,33 @@ void list_triggers ( Character *ch, zone_rnum rnum, trig_vnum vmin, trig_vnum vm
         {
             counter++;
 
-            ch->Send ( "%4d) [%s%5d%s] %s%-45.45s ",
+            snprintf ( buf, sizeof buf, "%4d) [%s%5d%s] %s%-45.45s ",
                        counter, QGRN, trig_index[i]->vnum, QNRM, QCYN, trig_index[i]->proto->name );
+            DYN_RESIZE ( buf );
 
             if ( trig_index[i]->proto->attach_type == OBJ_TRIGGER )
             {
                 new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), otrig_types, trgtypes, sizeof ( trgtypes ) );
-                ch->Send ( "obj %s%s%s\r\n", QYEL, trgtypes, QNRM );
+                snprintf ( buf, sizeof buf, "obj %s%s%s\r\n", QYEL, trgtypes, QNRM );
             }
             else if ( trig_index[i]->proto->attach_type == WLD_TRIGGER )
             {
                 new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), wtrig_types, trgtypes, sizeof ( trgtypes ) );
-                ch->Send ( "wld %s%s%s\r\n", QYEL, trgtypes, QNRM );
+                snprintf ( buf, sizeof buf, "wld %s%s%s\r\n", QYEL, trgtypes, QNRM );
             }
             else
             {
                 new_sprintbit ( GET_TRIG_TYPE ( trig_index[i]->proto ), trig_types, trgtypes, sizeof ( trgtypes ) );
-                ch->Send ( "mob %s%s%s\r\n", QYEL, trgtypes, QNRM );
+                snprintf ( buf, sizeof buf, "mob %s%s%s\r\n", QYEL, trgtypes, QNRM );
             }
-
+            DYN_RESIZE ( buf );
         }
     }
 
     if ( counter == 0 )
-        ch->Send ( "No triggers found for zone #%d\r\n", zone_table[rnum].number );
+    {
+        snprintf ( buf, sizeof buf, "No triggers found for zone #%d\r\n", zone_table[rnum].number );
+        DYN_RESIZE ( buf );
+    }
+    page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
