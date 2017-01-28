@@ -372,7 +372,7 @@ void qedit_parse ( Descriptor *d, char *arg )
                         OLC_STORAGE ( d ) = strdup ( oldtext );
                         d->Output ( "%s", oldtext );
                     }
-                    string_write ( d, &OLC_STORAGE ( d ), MAX_MESSAGE_LENGTH, 0, oldtext );
+                    string_write ( d, &OLC_STORAGE ( d ), MAX_STRING_LENGTH, 0, oldtext );
                     return;
                 }
                 case '3': // fallthrough

@@ -2397,24 +2397,18 @@ void do_stat_character ( Character *ch, Character *k, char* var )
 
             for ( tv = k->script->global_vars; tv; tv = tv->next )
             {
-                if ( tv->value[0] == UID_CHAR )
+                if ( !*var || is_abbrev ( var, tv->name.c_str() ) )
                 {
-                    if ( !*var || is_abbrev ( var, tv->name.c_str() ) )
+                    if ( tv->value[0] == UID_CHAR )
                     {
                         find_uid_name ( tv->value, uname, sizeof ( uname ) );
-                        snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  [UID]: %20s\r\n", tv->name.c_str(), uname );
-                        DYN_RESIZE ( buffer );
-                        var_found = TRUE;
+                        snprintf ( buffer,MAX_INPUT_LENGTH,"%s: {cc%s{c0\r\n", tv->name.c_str(), uname );
                     }
-                }
-                else
-                {
-                    if ( !*var || is_abbrev ( var, tv->name.c_str() ) )
-                    {
-                        snprintf ( buffer,MAX_INPUT_LENGTH,"    %40s:  %20s\r\n", tv->name.c_str(), tv->value.c_str() );
-                        DYN_RESIZE ( buffer );
-                        var_found = TRUE;
-                    }
+                    else
+                        snprintf ( buffer,MAX_INPUT_LENGTH,"%s: {cc%s{c0\r\n", tv->name.c_str(), tv->value.c_str() );
+
+                    DYN_RESIZE ( buffer );
+                    var_found = TRUE;
                 }
             }
             if ( var_found )

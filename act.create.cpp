@@ -750,14 +750,13 @@ void make_focus ( Character *ch, int type, struct obj_data *o )
             SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_EARTH_FOCUS );
             break;
         case 5:
-            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_AIR_FOCUS );
+            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_MIND_FOCUS );;
             break;
         case 6:
             SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_DEATH_FOCUS );
             break;
         case 7:
             SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_SPIRIT_FOCUS );
-            SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_MIND_FOCUS );
             break;
         case 8:
             SET_BIT_AR ( GET_OBJ_EXTRA (final_focus), ITEM_ICE_FOCUS );

@@ -3548,6 +3548,14 @@ void purge_mob ( Character *mob )
     if ( !mob || !IS_NPC ( mob ) )
         return;
 
+    // if this is the head of a segmented mob, purge the segments first
+    combine_data *segment, *next;
+    for ( segment = mob->mob_specials.join_list; segment; segment = next )
+    {
+        next = segment->next;
+        purge_mob ( segment->joined );
+    }
+
     // purge inv
     obj_data *obj, *next_obj;
     for ( obj = mob->carrying; obj; obj = next_obj )

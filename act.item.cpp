@@ -2446,7 +2446,7 @@ ACMD ( do_drink )
         }
         if ( ( GET_COND ( ch, FULL ) > 47 ) && ( GET_COND ( ch, THIRST ) > 0 ) )
         {
-            ch->Send ( "Your stomach can't contain anymore!\r\n" );
+            ch->Send ( "Your stomach can't contain any more!\r\n" );
             return;
         }
     }

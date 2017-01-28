@@ -1004,7 +1004,7 @@ int format_script(Descriptor *d) {
         skip_spaces(&t);
         brac = check_braces(t);
 
-        if ( brac != 0 && ( !strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4)
+        if ( *t != '*' && brac != 0 && ( !strn_cmp("elseif ", t, 7) || !strn_cmp("else", t, 4)
             || !strn_cmp("else if ", t, 8) || !strn_cmp(t, "if ", 3) || !strn_cmp("while ", t, 6)
             || !strn_cmp("switch ", t, 7) || !strn_cmp( "extract ",t, 8) || !strn_cmp("case ", t, 5)
             || !strn_cmp( "eval ",t, 5) || !strn_cmp( "nop ",t, 4) || !strn_cmp( "set ",t, 4))) {
@@ -1012,7 +1012,7 @@ int format_script(Descriptor *d) {
             error = TRUE;
         }
 
-        if ( char_count ( t, '%' ) % 2 == 1 )
+        if ( *t != '*' && char_count ( t, '%' ) % 2 == 1 )
         {
             d->Output ( "Uneven number of %% in line %d: %s\r\n", line_num, t );
             error = TRUE;
@@ -1089,14 +1089,17 @@ int format_script(Descriptor *d) {
         t = strtok(NULL, "\r\n");
     }
 
+    if (indent)
+    {
+        d->Output( "Unmatched if, while or switch.\r\n");
+        error = true;
+    }
+
     if ( error )
     {
         free ( sc );
         return FALSE;
     }
-
-    if (indent)
-        d->Output( "Unmatched if, while or switch ignored.\r\n");
 
     free(*d->str);
     *d->str = strdup(nsc);

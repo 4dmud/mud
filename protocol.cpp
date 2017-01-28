@@ -169,6 +169,9 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_STAMINA_MAX,      "STAMINA_MAX",      NUMBER_READ_ONLY },
    { eMSDP_ACCURACY,         "ACCURACY",         NUMBER_READ_ONLY },
    { eMSDP_EVASION,          "EVASION",          NUMBER_READ_ONLY },
+   { eMSDP_HUNGER,           "HUNGER",           NUMBER_READ_ONLY },
+   { eMSDP_THIRST,           "THIRST",           NUMBER_READ_ONLY },
+   { eMSDP_INTOXICATION,     "INTOXICATION",     NUMBER_READ_ONLY },
 
    /* Combat */
    { eMSDP_OPPONENT_HEALTH,  "OPPONENT_HEALTH",  NUMBER_READ_ONLY },
@@ -185,6 +188,7 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] =
    { eMSDP_WORLD_TIME,       "WORLD_TIME",       NUMBER_READ_ONLY },
    { eMSDP_MOON_PHASE,       "MOON_PHASE",       STRING_READ_ONLY },
    { eMSDP_WHO,              "WHO",              STRING_READ_ONLY },
+   { eMSDP_WEATHER,          "WEATHER",          STRING_READ_ONLY },
 
    /* Configurable variables */
    { eMSDP_CLIENT_ID,        "CLIENT_ID",        STRING_WRITE_ONCE(1,40) },
@@ -1178,29 +1182,6 @@ void msdp_update( void )
             Character *pOpponent = FIGHTING(ch);
             ++PlayerCount;
 
-            MSDPSetNumber ( d, eMSDP_WORLD_TIME, time_info.hours );
-            MSDPSetString ( d, eMSDP_MOON_PHASE, moon_types[time_info.moon] );
-
-            string wholist;
-            for ( Descriptor *desc = descriptor_list; desc; desc = desc->next )
-            {
-                if ( !IS_PLAYING ( desc ) )
-                    continue;
-
-                Character *wch = desc->character;
-                if ( desc->original )
-                    wch = desc->original;
-
-                if ( !wch || !CAN_SEE ( ch, wch ) )
-                    continue;
-
-                if ( wholist == "" )
-                    wholist = string ( GET_NAME ( wch ) );
-                else
-                    wholist += " " + string ( GET_NAME ( wch ) );
-            }
-            MSDPSetString ( d, eMSDP_WHO, wholist.c_str() );
-
             bool is_casting = GET_CLASS( ch ) == CLASS_PRIEST ||
                GET_CLASS( ch ) == CLASS_MAGE ||
                GET_CLASS( ch ) == CLASS_ESPER || has_staff( ch );
@@ -1271,6 +1252,9 @@ void msdp_update( void )
             MSDPSetNumber( d, eMSDP_STR_ADD_PERM, ch->real_abils.str_add );
             MSDPSetNumber( d, eMSDP_ACCURACY_PERM, GET_PERM_ACCURACY ( ch ) );
             MSDPSetNumber( d, eMSDP_EVASION_PERM, GET_PERM_EVASION ( ch ) );
+            MSDPSetNumber( d, eMSDP_HUNGER, GET_COND ( ch, FULL ) == -1 ? 0 : 100 - ( ( GET_COND ( ch, FULL ) * 100 ) / 48 ) );
+            MSDPSetNumber( d, eMSDP_THIRST, GET_COND ( ch, THIRST ) == -1 ? 0 : 100 - ( ( GET_COND ( ch, THIRST ) * 100 ) / 48 ) );
+            MSDPSetNumber( d, eMSDP_INTOXICATION, GET_COND ( ch, DRUNK ) == -1 ? 0 : ( ( GET_COND ( ch, DRUNK ) * 100 ) / 48 ) );
 
             /* This would be better moved elsewhere */
             if ( pOpponent != NULL )
@@ -1312,7 +1296,34 @@ void msdp_update( void )
                 MSDPSetString ( d, eMSDP_ROOM_EXITS, "" );
             }
 
-            char buf[MAX_STRING_LENGTH] = {'\0'};
+            MSDPSetNumber ( d, eMSDP_WORLD_TIME, time_info.hours );
+            MSDPSetString ( d, eMSDP_MOON_PHASE, moon_types[time_info.moon] );
+
+            string wholist;
+            for ( Descriptor *desc = descriptor_list; desc; desc = desc->next )
+            {
+                if ( !IS_PLAYING ( desc ) )
+                    continue;
+
+                Character *wch = desc->character;
+                if ( desc->original )
+                    wch = desc->original;
+
+                if ( !wch || !CAN_SEE ( ch, wch ) )
+                    continue;
+
+                if ( wholist == "" )
+                    wholist = string ( GET_NAME ( wch ) );
+                else
+                    wholist += " " + string ( GET_NAME ( wch ) );
+            }
+            MSDPSetString ( d, eMSDP_WHO, wholist.c_str() );
+
+            char buf[MAX_STRING_LENGTH];
+            print_weather ( IN_ROOM ( ch ), buf, sizeof buf );
+            MSDPSetString ( d, eMSDP_WEATHER, buf );
+
+            *buf = '\0';
             if ( ch->affected )
             {
                 char skill_buf[MAX_STRING_LENGTH];

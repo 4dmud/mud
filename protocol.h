@@ -128,6 +128,9 @@ typedef enum
    eMSDP_STAMINA_MAX,
    eMSDP_ACCURACY,
    eMSDP_EVASION,
+   eMSDP_HUNGER,
+   eMSDP_THIRST,
+   eMSDP_INTOXICATION,
 
    /* Combat */
    eMSDP_OPPONENT_HEALTH,
@@ -144,6 +147,7 @@ typedef enum
    eMSDP_WORLD_TIME,
    eMSDP_MOON_PHASE,
    eMSDP_WHO,
+   eMSDP_WEATHER,
 
    /* Configuration */
    eMSDP_CLIENT_ID,

@@ -104,11 +104,11 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     cle = trig->cmdlist;
     cle->line_nr = 1;
 
-    if ( char_count ( cle->cmd, '%' ) % 2 == 1 )
+    if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
         log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
 
     int brac = check_braces ( cle->cmd );
-    if ( brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
+    if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
             || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
             || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
             || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
@@ -122,11 +122,11 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
         cle = cle->next;
         cle->cmd = strdup(s);
 
-        if ( char_count ( cle->cmd, '%' ) % 2 == 1 )
+        if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
             log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
 
         brac = check_braces ( cle->cmd );
-        if ( brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
+        if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
                 || !strn_cmp ( "else if ", cle->cmd, 8 ) || !strn_cmp ( "if ", cle->cmd, 3 )
                 || !strn_cmp ( "while ", cle->cmd, 6 ) || !strn_cmp ( "switch ", cle->cmd, 7 )
                 || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )

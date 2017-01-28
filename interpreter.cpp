@@ -254,7 +254,7 @@ ACMD ( do_qicsave );
 ACMD ( do_qlist );
 ACMD ( do_qload );
 ACMD ( do_qstat );
-ACMD ( do_questcheck );
+ACMD ( do_qcheck );
 ACMD ( do_quit );
 ACMD ( do_race );
 ACMD ( do_rdig );
@@ -784,13 +784,13 @@ const command_info cmd_info[] =
     { "psaux"    , "psaux"   , POS_DEAD    , do_ps_aux    , LVL_BUILDER, 0 , WIZ_OLC_GRP},
 
     { "quaff"    , "q"   , POS_RESTING , do_use      , 0, SCMD_QUAFF, 0 },
+    { "qcheck"   , "qch" , POS_DEAD    , do_qcheck   , 0, 0, 0 },
     { "qecho"    , "qec" , POS_DEAD    , do_qcomm    , LVL_IMMORT, SCMD_QECHO, WIZ_QUEST_GRP },
     { "qedit"    , "qed" , POS_DEAD    , do_oasis    , LVL_BUILDER, SCMD_OASIS_QEDIT, WIZ_OLC_GRP },
     { "qlist"    , "qli" , POS_DEAD    , do_qlist    , 0, 0, 0 },
     { "qstat"    , "qsta", POS_DEAD    , do_qstat    , LVL_BUILDER, 0, WIZ_OLC_GRP },
     { "quest"    , "que" , POS_DEAD    , do_gen_tog  , 0, SCMD_QUEST, 0 },
     { "question" , "quest", POS_DEAD    , do_gen_comm , 0, SCMD_NEWBIE2, 0 },
-    { "questcheck", "questc", POS_DEAD , do_questcheck, 0, 0, 0 },
     { "qui"      , "qui" , POS_DEAD    , do_quit     , 0, 0, 0 },
     { "quit"     , "quit"     , POS_DEAD    , do_quit     , 0, SCMD_QUIT, 0 },
     { "qsay"     , "qsay"     , POS_RESTING , do_qcomm    , 0, SCMD_QSAY, 0 },

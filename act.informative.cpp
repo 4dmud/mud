@@ -2540,27 +2540,20 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
 
     ch->Send ( "{cwSTR: {cy%2d{cw/{cy%-3d {cwINT: {cy%-2d {cwWIS: {cy%-2d {cwCON: {cy%-2d {cwDEX: {cy%-2d {cwCHA: {cy%-3d\r\n",
         GET_STR ( ch ), GET_ADD ( ch ), GET_INT ( ch ), GET_WIS ( ch ),
-        GET_CON ( ch ),GET_DEX ( ch ), GET_CHA ( ch ) );
+        GET_CON ( ch ), GET_DEX ( ch ), GET_CHA ( ch ) );
 
     ch->Send ( "{cwHunger: [{cy%3d%%{cw] Thirst: [{cy%3d%%{cw] Intoxication: [{cy%3d%%{cw]\r\n",
-        GET_COND ( ch,
-                   FULL ) ==
-        -1 ? 0 : 100 - ( ( GET_COND ( ch, FULL ) * 100 ) / 48 ),
-        GET_COND ( ch,
-                   THIRST ) ==
-        -1 ? 0 : 100 - ( ( GET_COND ( ch, THIRST ) * 100 ) / 48 ),
-        GET_COND ( ch,
-                   DRUNK ) ==
-        -1 ? 0 : ( ( GET_COND ( ch, DRUNK ) * 100 ) / 48 ) );
+        GET_COND ( ch, FULL )   == -1 ? 0 : 100 - ( ( GET_COND ( ch, FULL ) * 100 ) / 48 ),
+        GET_COND ( ch, THIRST ) == -1 ? 0 : 100 - ( ( GET_COND ( ch, THIRST ) * 100 ) / 48 ),
+        GET_COND ( ch, DRUNK )  == -1 ? 0 : ( ( GET_COND ( ch, DRUNK ) * 100 ) / 48 ) );
 
     if ( GET_LEVEL ( ch ) < LVL_HERO )
     {
         char exphave[50], expneed[50];
         commafmt ( exphave, sizeof ( exphave ),GET_EXP ( ch ) );
         commafmt ( expneed, sizeof ( expneed ),exp_needed ( ch ) );
-        ch->Send (
-            "{cwExp. Total: {cy%-15s {cgNeeded To Level: {cC%-15s\r\n",
-            exphave, exp_needed ( ch ) > 0 ? expneed : "No More" );
+        ch->Send ( "{cwExp. Total: {cy%-15s {cgNeeded To Level: {cC%-15s\r\n",
+                    exphave, exp_needed ( ch ) > 0 ? expneed : "No More" );
         if ( GET_LEVEL ( ch ) >= 60 )
         {
             commafmt ( exphave, sizeof ( exphave ),GET_GROUP_EXP ( ch ) );
@@ -2568,10 +2561,7 @@ bool is_casting = GET_CLASS ( ch ) == CLASS_PRIEST || GET_CLASS ( ch ) == CLASS_
             ch->Send ( "{cwGroup Pts: {cy%-15s {cgNeeded To Level: {cC%-15s\r\n",
                        exphave, group_exp_needed ( ch ) > 0 ? expneed : "No More" );
         }
-
     }
-
-
 
     playing_time = *real_time_passed ( ( time ( 0 ) - ch->player.time.logon ) +
                                        ch->player.time.played, 0 );
@@ -3032,7 +3022,7 @@ ACMD ( do_settime )
     one_argument ( argument, buf );
 
     time = abs ( atoi ( argument ) );
-    time_info.hours = time;
+    time_info.hours = time % 24;
 
     if ( time_info.hours <= 4 )
         sunlight = SUN_DARK;
@@ -6189,16 +6179,16 @@ void container_disp ( Character *ch,OBJ_DATA * obj )
 
 }
 
-ACMD ( do_questcheck )
+ACMD ( do_qcheck )
 {
     if ( IS_NPC ( ch ) )
         return;
 
     if ( !*argument )
     {
-        ch->Send ( "Usage: questcheck <number> [status|reset|<command>]\r\n" );
+        ch->Send ( "Usage: qcheck <number> [status|reset|<command>]\r\n" );
         if ( IS_IMM ( ch ) )
-            ch->Send ( "       questcheck <number> debug <player>\r\n" );
+            ch->Send ( "       qcheck <number> debug <player>\r\n" );
         return;
     }
     string arg = string ( argument );
@@ -6228,7 +6218,7 @@ ACMD ( do_questcheck )
     obj_data *obj = read_object ( 10, VIRTUAL );
     if ( !obj )
     {
-        log ( "SYSERR: questcheck couldn't create an object" );
+        log ( "SYSERR: qcheck couldn't create an object" );
         return;
     }
 
@@ -6237,18 +6227,23 @@ ACMD ( do_questcheck )
 
     char buf[MAX_INPUT_LENGTH];
 
-    if ( command == "debug" && ( IS_IMM ( ch ) || GET_ORIG_LEV ( ch ) ) )
+    if ( command == "debug" && ( IS_IMM ( ch ) || GET_ORIG_LEV ( ch ) > 0 ) )
     {
-        if ( IS_IMM ( ch ) )
+        bool atleved;
+        if ( GET_ORIG_LEV ( ch ) > 0 )
+            atleved = TRUE;
+        else
         {
-            ch->Send ( "The debug trigger can only send you messages when you're atlev-ed.\r\n" );
-            return;
+            // need to atlev the imm otherwise trigger %send% won't work
+            GET_ORIG_LEV ( ch ) = GET_LEVEL ( ch );
+            GET_LEVEL ( ch ) = LVL_MAX_MORT;
+            atleved = FALSE;
         }
 
         string player;
         ss >> player;
         if ( player == "" )
-            ch->Send ( "Usage: questcheck <number> debug <player>\r\n" );
+            ch->Send ( "Usage: qcheck <number> debug <player>\r\n" );
         else
         {
             long int uid = pi.IdByName ( player.c_str() );
@@ -6276,7 +6271,13 @@ ACMD ( do_questcheck )
                    ch->Send ( "Player %s is offline.\r\n", player.c_str() );
             }
         }
+
         extract_obj ( obj );
+        if ( !atleved )
+        {
+            GET_LEVEL ( ch ) = GET_ORIG_LEV ( ch );
+            GET_ORIG_LEV ( ch ) = 0;
+        }
         return;
     }
 
@@ -6385,7 +6386,7 @@ ACMD ( do_questcheck )
             break;
         }
         if ( !command_found )
-            ch->Send ( "Unknown questcheck command '%s'.\r\n", command.c_str() );
+            ch->Send ( "Unknown qcheck command '%s'.\r\n", command.c_str() );
     }
     extract_obj ( obj );
 }

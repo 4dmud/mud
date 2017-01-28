@@ -336,36 +336,40 @@ ACMD(do_check_sky) {
 
 }
 
-char *print_weather(room_rnum room, char *buf, size_t len) {
-  if (room==NULL) {
-     *buf = '\0';
-     return buf;
-     }
-  if ((ROOM_FLAGGED(room, ROOM_INDOORS)||SECT(room)==SECT_INSIDE))
-  {
-    snprintf(buf, len, "Inside");
-    return buf;
-  }
+char *print_weather(room_rnum room, char *buf, size_t len)
+{
+    if ( !room )
+    {
+        *buf = '\0';
+        return buf;
+    }
 
-  switch (zone_table[room->zone].sky) {
-  case SKY_CLOUDLESS:
-  if (IS_DAY)
-  snprintf(buf, len, "Sunny");
-  else
-  snprintf(buf, len, "Cloudless");
-  break;
-  case SKY_CLOUDY:
-  snprintf(buf, len, "Cloudy");
-  break;
-  case SKY_RAINING:
-  snprintf(buf, len, "Raining");
-  break;
-  case SKY_LIGHTNING:
-  snprintf(buf, len, "Stormy");
-  break;
-  default:
-  *buf = '\0';
-  break;
-  }
-  return buf;
+    if ( ROOM_FLAGGED(room, ROOM_INDOORS) || SECT(room) == SECT_INSIDE )
+    {
+        snprintf(buf, len, "Inside");
+        return buf;
+    }
+
+    switch (zone_table[room->zone].sky)
+    {
+        case SKY_CLOUDLESS:
+            if (IS_DAY)
+                snprintf(buf, len, "Sunny");
+            else
+                snprintf(buf, len, "Cloudless");
+            break;
+        case SKY_CLOUDY:
+            snprintf(buf, len, "Cloudy");
+            break;
+        case SKY_RAINING:
+            snprintf(buf, len, "Raining");
+            break;
+        case SKY_LIGHTNING:
+            snprintf(buf, len, "Stormy");
+            break;
+        default:
+            *buf = '\0';
+            break;
+    }
+    return buf;
 }

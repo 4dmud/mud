@@ -578,7 +578,6 @@ ACTION(thing_manifest)
 ACTION(thing_singwood)
 {
   long time = 0;
-  //const char *to_vict = NULL;
   const char *to_char = NULL;
   const char *to_room = NULL;
 
@@ -597,7 +596,7 @@ ACTION(thing_singwood)
     *num = 0;
 
   }
-  else if ((number(1, 1010) < 13))
+  else if ( !IS_IMM ( ch ) && number(1, 1010) < 13 )
   {
     to_char = "The tree shivers and dies!\r\n";
     to_room = "The tree shivers and dies!\r\n";
