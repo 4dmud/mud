@@ -3712,38 +3712,40 @@ void dg_letter_value ( struct script_data *sc, trig_data *trig, char *cmd )
     add_var ( &GET_TRIG_VARS ( trig ), varname, junk, sc->context );
 }
 
-void insert_word ( void *go, script_data *sc, trig_data *trig, char *cmd, bool replace )
+void insert_word ( script_data *sc, trig_data *trig, char *cmd, bool replace )
 {
     /* cmd = insert_word <word> <position> <var> */
-
-    char argument[MAX_INPUT_LENGTH];
-    eval_expr ( strstr ( cmd, " " ), argument, sizeof ( argument ), go, sc, trig, trig->attach_type );
-
-    stringstream ss ( argument );
+    string input = string ( cmd );
+    stringstream ss ( input );
     vector<string> args;
     string arg;
+    ss >> arg;
     while ( ss >> arg )
         args.push_back ( arg );
 
-    if ( args.size() != 3 )
+    if ( args.size() != 3 || ( args.size() > 1 && !is_number ( args[1].c_str() ) ) )
     {
-        script_log ( "Trigger: %s, VNum %d. insert_word: wrong number of arguments '%s' in line %d: %s",
-            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), argument, GET_TRIG_LINE_NR ( trig ), cmd );
+        script_log ( "Trigger: %s, VNum %d. insert_word: wrong syntax in line %d: %s",
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
 
     int pos = atoi ( args[1].c_str() );
 
-    string sentence;
-    for ( trig_var_data *vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
+    trig_var_data *vd = nullptr;
+    for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
         if ( vd->name == args[2] )
-        {
-            sentence = vd->value;
             break;
-        }
+
+    if ( !vd )
+    {
+        // the variable doesn't exist: add it
+        add_var ( &GET_TRIG_VARS ( trig ), args[2].c_str(), args[0].c_str(), sc->context );
+        return;
+    }
 
     ss.clear();
-    ss.str ( sentence );
+    ss.str ( vd->value );
     string result;
 
     for ( int c = 1;; c++ )
@@ -3767,7 +3769,49 @@ void insert_word ( void *go, script_data *sc, trig_data *trig, char *cmd, bool r
             result += " " + arg;
     }
 
-    add_var ( &GET_TRIG_VARS ( trig ), args[2].c_str(), result.c_str(), sc->context );
+    vd->value = result;
+}
+
+void replace_letter ( trig_data *trig, char *cmd )
+{
+    // cmd = replace_letter <letter> <position> <variable>
+    string input = string ( cmd );
+    stringstream ss ( input );
+    vector<string> args;
+    string arg;
+    ss >> arg;
+    while ( ss >> arg )
+        args.push_back ( arg );
+
+    if ( args.size() != 3 || ( args.size() > 1 && !is_number ( args[1].c_str() ) ) )
+    {
+        script_log ( "Trigger: %s, VNum %d. insert_word: wrong syntax in line %d: %s",
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    trig_var_data *vd = nullptr;
+    for ( vd = GET_TRIG_VARS ( trig ); vd; vd = vd->next )
+        if ( vd->name == args[2] )
+            break;
+
+    if ( !vd )
+    {
+        script_log ( "Trigger: %s, VNum %d. insert_word: the variable doesn't exist. Line %d: %s",
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    int pos = atoi ( args[1].c_str() );
+
+    if ( pos < 1 || pos > vd->value.size() )
+    {
+        script_log ( "Trigger: %s, VNum %d. insert_word: the position is out of bounds. Line %d: %s",
+            GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
+        return;
+    }
+
+    vd->value[ pos-1 ] = args[0][0];
 }
 
 /*  This is the core driver for scripts. */
@@ -4090,10 +4134,13 @@ int script_driver ( void *go_adress, trig_data *trig, int type, int mode )
                 dg_letter_value ( sc, trig, cmd );
 
             else if ( !strn_cmp ( cmd, "insert_word ", 12 ) )
-                insert_word ( go, sc, trig, cmd, FALSE );
+                insert_word ( sc, trig, cmd, FALSE );
 
             else if ( !strn_cmp ( cmd, "replace_word ", 13 ) )
-                insert_word ( go, sc, trig, cmd, TRUE );
+                insert_word ( sc, trig, cmd, TRUE );
+
+            else if ( !strn_cmp ( cmd, "replace_letter ", 15 ) )
+                replace_letter ( trig, cmd );
 
             else if ( !strn_cmp ( cmd, "makeuid ", 8 ) )
                 makeuid_var ( go, sc, trig, type, cmd );
