@@ -7962,13 +7962,18 @@ void list_obj_resets ( obj_data *obj, Character *ch )
                         for ( int cmd_num = cmd_no - 1; cmd_num >= 0; --cmd_num )
                             if ( ZCMD2.command == 'M' )
                             {
-                                ch->Send ( "Will reset on mob %d %s\r\n", ZCMD2.arg1, GET_NAME ( mob_proto[ZCMD2.arg1] ) );
+                                ch->Send ( "Will reset on mob %d %s in room %d\r\n", ZCMD2.arg1, GET_NAME ( mob_proto[ZCMD2.arg1] ), ZCMD2.arg3 );
                                 break;
                             }
                     break;
                 case 'P':
                     if ( obj_index[ZCMD.arg1].vnum == vnum )
-                        ch->Send ( "Will reset in container %d %s\r\n", obj_index[ZCMD.arg3].vnum, obj_proto[ZCMD.arg3].short_description );
+                        for ( int cmd_num = cmd_no - 1; cmd_num >= 0; --cmd_num )
+                            if ( ZCMD2.command == 'O' && ZCMD2.arg1 == ZCMD.arg3 )
+                            {
+                                ch->Send ( "Will reset in container %d %s in room %d\r\n", obj_index[ZCMD.arg3].vnum, obj_proto[ZCMD.arg3].short_description, ZCMD2.arg3 );
+                                break;
+                            }
                     break;
             }
         }
