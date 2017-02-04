@@ -3091,13 +3091,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             *str = '\0';
                         }
                     }
-                    else if ( !strcasecmp ( field, "is_inobj" ) )
-                    {
-                        if ( o->in_obj!=NULL )
-                                snprintf ( str, slen,"%c%ld",UID_CHAR, GET_ID(o->in_obj) );
-                        else
-                            strcpy ( str, "" );
-                    }
 
                     break;
                 case 'm':
@@ -3782,13 +3775,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             *str = '\0';
 
                     }
-                    else if ( !strcasecmp ( field, "is_peaceful" ) )
-                    {
-                        if ( ROOM_FLAGGED ( r, ROOM_PEACEFUL ) )
-                            snprintf ( str, slen, "1" );
-                        else
-                            snprintf ( str, slen, "0" );
-                    }
+
                     break;
                 case 'n':
                     if ( !strcasecmp ( field, "name" ) )
@@ -3819,10 +3806,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         else
                             *str = '\0';
                     }
-                    else if ( !strcasecmp ( field, "no_teleport_in" )) {
-                      snprintf(str, slen, ROOM_FLAGGED(r, ROOM_NOTELEPORT_IN) ? "1" : "0");
-                    }
-
 
                     break;
                 case 'o':
