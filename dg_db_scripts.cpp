@@ -114,7 +114,24 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
             || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
             || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
             || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
-        log ( "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+        log ( "SYSERR: Trigger [%d] '%s'. Unmatched %s bracket in line %d: %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+
+    if ( *cle->cmd != '*' )
+    {
+        char *c = cle->cmd;
+        while ( TRUE )
+        {
+            c = strchr ( c, '=' );
+            if ( !c )
+                break;
+            if ( c != cle->cmd && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
+            {
+                log ( "SYSERR: Trigger [%d] '%s'. Single '=' should be '=='? Line %d: %s\r\n", nr, trig->name, cle->line_nr, cle->cmd );
+                break;
+            }
+            c++;
+        }
+    }
 
     while ((s = strtok(NULL, "\n\r"))) {
         CREATE(cle->next, struct cmdlist_element, 1);

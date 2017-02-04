@@ -1018,6 +1018,24 @@ int format_script(Descriptor *d) {
             error = TRUE;
         }
 
+        if ( *t != '*' )
+        {
+            char *c = t;
+            while ( TRUE )
+            {
+                c = strchr ( c, '=' );
+                if ( !c )
+                    break;
+                if ( c != t && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
+                {
+                    d->Output ( "Found a single '=', should it be '=='? Line %d: %s\r\n", line_num, t );
+                    error = TRUE;
+                    break;
+                }
+                c++;
+            }
+        }
+
         if (!strncasecmp(t, "if ", 3))
             indent_next = TRUE;
         else if (!strncasecmp(t, "switch ", 7)) {
