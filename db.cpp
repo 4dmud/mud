@@ -1178,8 +1178,8 @@ void parse_questcard ( char *filename )
                     break;
                 qc.description += line + "\n";
             }
-            // remove the trailing \r\n
-            qc.description = qc.description.substr ( 0, qc.description.size()-2 );
+            // remove the trailing '\n'
+            qc.description = qc.description.substr ( 0, qc.description.size()-1 );
         }
         else if ( s == "Available:" )
             ss >> qc.function_triggers[0];

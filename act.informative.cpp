@@ -6210,7 +6210,7 @@ ACMD ( do_qcheck )
 
     if ( command == "" )
     {
-        ch->Send ( "%s\r\n", qc.description.c_str() );
+        ch->Send ( "%s\r\n%s\r\n", qc.name.c_str(), qc.description.c_str() );
         return;
     }
 
@@ -6342,6 +6342,7 @@ ACMD ( do_qcheck )
     }
     else if ( command == "reset" )
     {
+        bool replaced = FALSE;
         for ( const auto &qf : qc.questflags )
         {
             for ( auto vdt = SCRIPT ( ch )->global_vars; vdt; vdt = vdt->next )
@@ -6357,14 +6358,20 @@ ACMD ( do_qcheck )
                     ss_qf >> var_qf;
                     ss_vdt >> var_vdt;
                     if ( b )
+                    {
                         new_value += var_qf + " ";  // replace with default
+                        replaced = TRUE;
+                    }
                     else
                         new_value += var_vdt + " "; // keep the variable
                 }
                 vdt->value = new_value;
             }
         }
-        ch->Send ( "Your questflags for questcard %d have been reset. Good luck!\r\n", num );
+        if ( replaced )
+            ch->Send ( "Your questflags for questcard %d have been reset. Good luck!\r\n", num );
+        else
+            ch->Send ( "Questcard %d doesn't reset any questflags.\r\n", num );
     }
     else // check commands
     {
@@ -6386,7 +6393,7 @@ ACMD ( do_qcheck )
             break;
         }
         if ( !command_found )
-            ch->Send ( "Unknown qcheck command '%s'.\r\n", command.c_str() );
+            ch->Send ( "Questcard %d doesn't know the command '%s'.\r\n", num, command.c_str() );
     }
     extract_obj ( obj );
 }
