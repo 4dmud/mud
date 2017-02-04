@@ -2482,6 +2482,11 @@ struct con_app_type {
     sh_int shock;
 };
 
+struct eq_pos_list
+{
+    const char *pos;
+    int where;
+};
 
 struct title_type {
     char *title_m;

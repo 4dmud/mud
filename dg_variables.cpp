@@ -913,22 +913,40 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             if ( bpn != -1 )
                                 snprintf ( str, slen, "%d", has_body ( c, bpn ) );
                             else
+                            {
                                 snprintf ( str, slen, "0" );
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. '%s' is not a body slot. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                         }
                     }
                     else if ( !strcasecmp ( field, "body" ) )
                     {
                         if ( subfield && *subfield )
                         {
+                            // toggle extra body slot
                             int bpn = bodypartname ( subfield );
+                            if ( bpn < NUM_BODY_PARTS )
+                                bpn = -1;
                             if ( bpn != -1 )
+                            {
+                                if ( has_body ( c, bpn ) && GET_EQ ( c, bpn ) )
+                                    obj_to_char ( unequip_char ( c, bpn ), c );
                                 snprintf ( str, slen, "%d", togglebody ( c, bpn ) );
+                            }
                             else
+                            {
                                 snprintf ( str, slen, "0" );
+                                if ( trig->curr_state )
+                                    script_log ( "Trigger: %s, VNum %d. '%s' is not an extra body slot. Line %d: %s", GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), subfield, GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                            }
                         }
                         else
                         {
-                            snprintf ( str, slen, "0" ); /*FIXME: Change this to be a list of the body parts */
+                            // return all body slots
+                            int len = 0;
+                            for ( int i = 0; eq_pos[i].where != -1; ++i )
+                                len += snprintf ( str + len, slen - len, "%s ", eq_pos[i].pos );
                         }
                     }
                     break;

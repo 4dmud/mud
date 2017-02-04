@@ -70,6 +70,7 @@ extern const struct dex_app_type dex_app[];
 extern const struct con_app_type con_app[];
 extern const struct int_app_type int_app[];
 extern const struct wis_app_type wis_app[];
+extern const struct eq_pos_list eq_pos[];
 extern const int rev_dir[];
 extern const int movement_loss[];
 extern const int drink_aff[][3];

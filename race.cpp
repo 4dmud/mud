@@ -7,10 +7,12 @@
 #include "spells.h"
 #include "interpreter.h"
 #include "comm.h"
+#include "constants.h"
 
 extern const char *mob_races[];
 const char * race_name(Character *ch);
 int has_body(Character *ch, int flag);
+int find_eq_pos_script(char *arg);
 
 const char *race_abbrevs[] = {
                                  "Fau",
@@ -21,7 +23,7 @@ const char *race_abbrevs[] = {
                                  "Gri",
                                  "Mar",
                                  "SWf",
-                 "Gla",
+                                 "Gla",
                                  "Wrm",
                                  "Tod",
                                  "Bor",
@@ -39,7 +41,7 @@ const char *pc_race_types[] = {
                                   "Gringo",
                                   "Martian",
                                   "Spacewolf",
-                  "Gladiator",
+                                  "Gladiator",
                                   "Toad",
                                   "Boar",
                                   "Wolf",
@@ -51,7 +53,7 @@ int has_body(Character *ch, int flag) {
     if (IS_NPC(ch))
         return TRUE;
 
-    if ((flag < NUM_BODY_PARTS) && IS_SET(races[(int)GET_RACE(ch)].body_bits, (1 << flag)))
+    if ((flag < NUM_BODY_PARTS) && IS_SET(GET_BODY(ch), 1 << flag))
         return TRUE;
 
     if ((flag >= NUM_BODY_PARTS) && IS_SET(EXTRA_BODY(ch), 1 << (flag - NUM_BODY_PARTS)))
@@ -77,12 +79,11 @@ int has_body(Character *ch, int flag) {
 #define BODY_FLOATING   (1 << 11)
 */
 int togglebody(Character *ch, int flag) {
-    return TOGGLE_BIT(EXTRA_BODY(ch), flag);
+    return TOGGLE_BIT(EXTRA_BODY(ch), 1 << (flag - NUM_BODY_PARTS));
 }
 
 int bodypartname(char *bpn) {
-int find_eq_pos_script(char *arg);
-    if (!bpn && !*bpn)
+    if ( !bpn || !*bpn )
         return -1;
     return find_eq_pos_script(bpn);
 }

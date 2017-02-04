@@ -367,62 +367,8 @@ obj_data *get_obj_in_list ( const char *name, obj_data * list )
 int find_eq_pos_script ( char *arg )
 {
     int i;
-    struct eq_pos_list
-    {
-        const char *pos;
-        int where;
-    }
-    eq_pos[] =
-    {
-        {"hold", WEAR_HOLD},
-        {"held", WEAR_HOLD},
-        {"light", WEAR_LIGHT},
-        {"wield", WEAR_WIELD},
-        {"wield2", WEAR_WIELD_2},
-        {"rfinger", WEAR_FINGER_R},
-        {"lfinger", WEAR_FINGER_L},
-        {"neck1", WEAR_NECK_1},
-        {"neck2", WEAR_NECK_2},
-        {"body", WEAR_BODY},
-        {"head", WEAR_HEAD},
-        {"legs", WEAR_LEGS},
-        {"feet", WEAR_FEET},
-        {"hands", WEAR_HANDS},
-        {"arms", WEAR_ARMS},
-        {"shield", WEAR_SHIELD},
-        {"about", WEAR_ABOUT},
-        {"waist", WEAR_WAIST},
-        {"rwrist", WEAR_WRIST_R},
-        {"lwrist", WEAR_WRIST_L},
-        {"face", WEAR_FACE},
-        {"eyes", WEAR_EYES},
-        {"hips", WEAR_HIPS},
-        {"legs2", WEAR_LEGS_2},
-        {"feet2", WEAR_FEET_2},
-        {"antenna", WEAR_ANTENNA},
-        {"tail", WEAR_TAIL},
-        {"horns", WEAR_HORNS},
-        {"focus", WEAR_FOCUS},
-        /* extra positions */
-        {"rthumb", WEAR_THUMB_R},
-        {"lthumb", WEAR_THUMB_L},
-        {"saddle", WEAR_SADDLE},
-        {"eartip", WEAR_EAR_TIP},
-        {"lshoulder", WEAR_SHOULDER_L},
-        {"rshoulder", WEAR_SHOULDER_R},
-        {"crest", WEAR_CREST},
-        {"lthigh", WEAR_THIGH_L},
-        {"rthigh", WEAR_THIGH_R},
-        {"lknee", WEAR_KNEE_L},
-        {"rknee", WEAR_KNEE_R},
-        {"floating", WEAR_FLOATING},
-        {"back", WEAR_BACK},
-        {"chest", WEAR_CHEST},
-        {"none", -1}
-    };
     if ( is_number ( arg ) && ( i = atoi ( arg ) ) >= 0 && i < NUM_WEARS )
         return i;
-
 
     for ( i = 0; eq_pos[i].where != -1; i++ )
     {
