@@ -2842,12 +2842,22 @@ struct questflag {
 };
 
 struct questcard {
+    int number;
     string name;  // name of the questcard
     string description; // shown when you do qcheck <num>
+    int difficulty; // bitvector
+    string dimension;
     vector<questflag> questflags;
     vector<int> function_triggers;
     vector<int> order; // order in which the function triggers get called
     map <string, int> commands; // function triggers for other questcard commands
+
+    questcard() {
+        name = "<none>";
+        description = "<none>";
+        dimension = "<none>";
+        function_triggers.resize( 8, NOTHING );
+    };
 };
 
 /**

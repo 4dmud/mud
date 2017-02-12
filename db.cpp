@@ -1134,7 +1134,6 @@ void parse_questcard ( char *filename )
     string line, s, cmd;
     stringstream ss;
     questcard qc;
-    qc.function_triggers = vector<int> (7, NOTHING);
 
     while ( f.good() )
     {
@@ -1150,7 +1149,7 @@ void parse_questcard ( char *filename )
             while ( f.good() )
             {
                 getline ( f, line );
-                if ( line[0] == '~' )
+                if ( line[0] == '$' || line[0] == '~' )
                     break;
 
                 questflag qf;
@@ -1171,10 +1170,11 @@ void parse_questcard ( char *filename )
         }
         else if ( s == "Description:" )
         {
+            qc.description = "";
             while ( f.good() )
             {
                 getline ( f, line );
-                if ( line[0] == '~' )
+                if ( line[0] == '$' || line[0] == '~' )
                     break;
                 qc.description += line + "\n";
             }
@@ -1195,6 +1195,8 @@ void parse_questcard ( char *filename )
             ss >> qc.function_triggers[5];
         else if ( s == "Debug:" )
             ss >> qc.function_triggers[6];
+        else if ( s == "Stats:" )
+            ss >> qc.function_triggers[7];
         else if ( s == "Order:" )
         {
             while ( ss >> i )
@@ -1205,7 +1207,7 @@ void parse_questcard ( char *filename )
             while ( f.good() )
             {
                 getline ( f, line );
-                if ( line[0] == '$' )
+                if ( line[0] == '$' || line[0] == '~' )
                     break;
                 ss.clear();
                 ss.str ( line );
@@ -1213,6 +1215,10 @@ void parse_questcard ( char *filename )
                 qc.commands[ cmd ] = i;
             }
         }
+        else if ( s == "Difficulty:" )
+            ss >> qc.difficulty;
+        else if ( s == "Dimension:" )
+            ss >> qc.dimension;
         if ( line[0] == '$' )
             break;
     }

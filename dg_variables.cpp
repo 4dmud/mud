@@ -979,21 +979,17 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     }
                     else if ( !strcasecmp ( field, "clan" ) )
-                                        {
-                                                if ( subfield && *subfield )
-                                                {
-                                                   GET_CLAN ( c ) = atoi ( subfield );
-                                                }
+                    {
+                        if ( subfield && *subfield )
+                            GET_CLAN ( c ) = atoi ( subfield );
                         snprintf ( str, slen, "%d", IS_NPC ( c ) ? -1 : GET_CLAN ( c ) );
-                                        }
+                    }
                     else if ( !strcasecmp ( field, "clanrank" ) )
-                                        {
-                                                 if ( subfield && *subfield )
-                                                 {
-                                                   GET_CLAN_RANK ( c ) = atoi ( subfield );
-                                                 }
+                    {
+                        if ( subfield && *subfield )
+                            GET_CLAN_RANK ( c ) = atoi ( subfield );
                         snprintf ( str, slen, "%d", IS_NPC ( c ) ? -1 : GET_CLAN_RANK ( c ) );
-                                        }
+                    }
                     else if ( !strcasecmp ( field, "clanname" ) )
                         snprintf ( str, slen, "%s", ( ( IS_NPC ( c ) || !GET_CLAN ( c ) ) ? "" : clan[find_clan_by_id ( GET_CLAN ( c ) ) ].name ) );
 
@@ -1296,10 +1292,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         snprintf ( str, slen, "%d", GET_COND(c, FULL));
                       }
 
-
-
-
-
+                    break;
                 case 'i':
 
                     if ( !strcasecmp ( field, "inventory" ) )
@@ -1476,8 +1469,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     }
                     else if ( !strcasecmp ( field, "longdesc" ) )
                         snprintf ( str, slen, "%s", GET_LDESC ( c ) );
+
                     break;
-                    case 'm':
+                case 'm':
                     if ( !strcasecmp ( field, "maxcarriedweight" ))
                       snprintf ( str, slen, "%u", CAN_CARRY_W(c));
 
@@ -1590,7 +1584,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         snprintf ( str, slen, "%s","mobile" );
                     break;
                 case 'p':
-                                        if ( !strcasecmp ( field, "prac" ) )
+                    if ( !strcasecmp ( field, "prac" ) )
                     {
                         if ( subfield && *subfield )
                         {
@@ -1608,7 +1602,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         snprintf ( str, slen, "%d", GET_PK_POINTS ( c ) );
                     else if ( !strcasecmp ( field, "pkkills" ) )
                         snprintf ( str, slen, "%d", GET_PK_CNT ( c ) );
-
 
                     else if ( !strcasecmp ( field, "position" ) || !strcasecmp ( field, "pos" ) )
                     {
@@ -1672,7 +1665,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     break;
                 case 'r':
-
 
                     if ( !strcasecmp ( field, "race" ) )
                         snprintf ( str, slen, "%s", race_name ( c ) );
@@ -1894,7 +1886,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                         }
                         snprintf ( str, slen, "%d", GET_SAVE ( c, SAVING_SPELL ) );
                     }
-                    break;
 
                     break;
                 case 't':
@@ -1931,7 +1922,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
                     if ( !strcasecmp ( field, "varexists" ) )
                     {
-                      dg_varexists(SCRIPT(c),subfield, str, slen);
+                        dg_varexists ( SCRIPT ( c ), subfield, str, slen );
                     }
                     else if ( !strcasecmp ( field, "vnum" ) )
                     {
@@ -2847,6 +2838,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             strcpy ( str, "" );
                         }
                     }
+
+                    break;
                 case 'c':
                     if ( !strcasecmp ( field, "carried_by" ) )
                     {
@@ -3603,11 +3596,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     break;
             } /* switch *field */
 
-
-
-
-
-
             if ( *str == '\x1' ) /* no match in switch */
             {
                 if ( SCRIPT ( o ) )   /* check for global var */
@@ -3791,7 +3779,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                             snprintf ( str, slen, "%ld", ( long ) r->number + ROOM_ID_BASE );	/* added by welcor */
                         else
                             *str = '\0';
-
                     }
 
                     break;

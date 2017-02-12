@@ -6210,7 +6210,33 @@ ACMD ( do_qcheck )
 
     if ( command == "" )
     {
-        ch->Send ( "%s\r\n%s\r\n", qc.name.c_str(), qc.description.c_str() );
+        string diff = "N/A";
+
+        int low = -1, high = -1;
+        for ( int i = 0; i < qc_difficulties.size(); ++i )
+            if ( qc.difficulty & (1 << i) )
+            {
+                if ( low == -1 )
+                {
+                    low = i;
+                    diff = qc_difficulties[i];
+                }
+                high = i;
+            }
+
+        if ( high > low )
+                diff += " - " + qc_difficulties[ high ];
+
+        ch->Send ( "{cy%s{c0\r\n"
+                   "Dimension: {cy%s{c0\r\n"
+                   "Difficulty: {cy%s{c0\r\n"
+                   "%s\r\n",
+
+                   qc.name.c_str(),
+                   qc.dimension.c_str(),
+                   diff.c_str(),
+                   qc.description.c_str()
+        );
         return;
     }
 
@@ -6393,7 +6419,7 @@ ACMD ( do_qcheck )
             break;
         }
         if ( !command_found )
-            ch->Send ( "Questcard %d doesn't know the command '%s'.\r\n", num, command.c_str() );
+            ch->Send ( "Questcard %d doesn't have the command '%s'.\r\n", num, command.c_str() );
     }
     extract_obj ( obj );
 }

@@ -537,7 +537,11 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define QEDIT_COMMAND_MENU             9
 #define QEDIT_COMMAND                  10
 #define QEDIT_COMMAND_FUNCTION_TRIGGER 11
-#define QEDIT_CONFIRM_SAVESTRING       12
+#define QEDIT_DIMENSION_MENU           12
+#define QEDIT_DIMENSION_VALUE          13
+#define QEDIT_DIFFICULTY_MENU          14
+#define QEDIT_DIFFICULTY_VALUE         15
+#define QEDIT_CONFIRM_SAVESTRING       16
 
 /* -------------------------------------------------------------------------- */
 #define MAX_HELP_KEYWORDS	75

@@ -10,6 +10,7 @@
 #include "interpreter.h"
 #include "improved-edit.h"
 #include "boards.h"
+#include "constants.h"
 
 map <int, questcard> questcards;
 
@@ -68,6 +69,27 @@ void qedit_disp_menu ( Descriptor *d )
         }
     }
 
+    string dim;
+    if ( qc->dimension == "<none>" )
+        dim = "{cc<none>{c0";
+    else
+        dim = "{cy" + qc->dimension + "{c0";
+
+    string diff;
+    for ( int i = 0; i < qc_difficulties.size(); ++i )
+        if ( qc->difficulty & (1 << i) )
+        {
+            if ( diff == "" )
+                diff = "{cy" + qc_difficulties[i];
+            else
+                diff += ", " + qc_difficulties[i];
+        }
+
+    if ( diff == "" )
+        diff = "{cc<none>{c0";
+    else
+        diff += "{c0";
+
     get_char_colours ( d->character );
     clear_screen ( d );
 
@@ -84,8 +106,11 @@ void qedit_disp_menu ( Descriptor *d )
         "%s7%s) Other        : [%s%d%s] %s\r\n"
         "%s8%s) Unique       : [%s%d%s] %s\r\n"
         "%s9%s) Debug        : [%s%d%s] %s\r\n"
-        "%sA%s) Order        : %s\r\n"
-        "%sB%s) Commands     : %s\r\n"
+        "%sA%s) Stats        : [%s%d%s] %s\r\n"
+        "%sB%s) Order        : %s\r\n"
+        "%sC%s) Commands     : %s\r\n"
+        "%sD%s) Dimension    : %s\r\n"
+        "%sE%s) Difficulty   : %s\r\n"
         "%sQ%s) Quit\r\n"
         "Enter choice:\r\n",
 
@@ -100,8 +125,11 @@ void qedit_disp_menu ( Descriptor *d )
         grn, nrm, cyn, qc->function_triggers[4], nrm, names[4].c_str(),
         grn, nrm, cyn, qc->function_triggers[5], nrm, names[5].c_str(),
         grn, nrm, cyn, qc->function_triggers[6], nrm, names[6].c_str(),
+        grn, nrm, cyn, qc->function_triggers[7], nrm, names[7].c_str(),
         grn, nrm, order.c_str(),
         grn, nrm, commands.c_str(),
+        grn, nrm, dim.c_str(),
+        grn, nrm, diff.c_str(),
         grn, nrm
     );
 
@@ -154,13 +182,6 @@ ACMD ( do_oasis_qedit )
     auto it = questcards.find ( number );
     if ( it != questcards.end() )
         *( OLC_QC ( d ) ) = it->second;
-    else
-    {
-        OLC_QC ( d )->name = "Questcard " + to_string ( number );
-        OLC_QC ( d )->function_triggers = vector<int> ( 8, NOTHING );
-    }
-    if ( OLC_QC ( d )->description == "" )
-        OLC_QC ( d )->description = "<none>";
 
     act ( "$n starts using OLC.", TRUE, ch, 0, 0, TO_ROOM );
     SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_WRITING );
@@ -263,6 +284,69 @@ void qedit_disp_questflag_menu ( Descriptor *d )
     OLC_MODE ( d ) = QEDIT_QUESTFLAG_MENU;
 }
 
+void qedit_disp_dimension_menu ( Descriptor *d )
+{
+    d->Output (
+        "%s0%s) <none>\r\n"
+        "%s1%s) Prehistoric\r\n"
+        "%s2%s) Medieval\r\n"
+        "%s3%s) OldWest\r\n"
+        "%s4%s) Future\r\n"
+        "%s5%s) Newbie\r\n"
+        "%s6%s) Multidimensional\r\n"
+        "%sQ%s) Quit\r\n"
+        "Enter choice:\r\n",
+
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm
+    );
+
+    OLC_MODE ( d ) = QEDIT_DIMENSION_MENU;
+}
+
+void qedit_disp_difficulty_menu ( Descriptor *d )
+{
+    string diff;
+    for ( int i = 0; i < qc_difficulties.size(); ++i )
+        if ( OLC_QC ( d )->difficulty & (1 << i) )
+        {
+            if ( diff == "" )
+                diff = "{cy" + qc_difficulties[i];
+            else
+                diff += ", " + qc_difficulties[i];
+        }
+
+    if ( diff == "" )
+        diff = "{cc<none>{c0";
+    else
+        diff += "{c0";
+
+    d->Output (
+        "Difficulty: %s\r\n"
+        "%s1%s) Easy\r\n"
+        "%s2%s) Medium\r\n"
+        "%s3%s) Hard\r\n"
+        "%s4%s) Very Hard\r\n"
+        "%sQ%s) Quit\r\n"
+        "Enter choice:\r\n",
+
+        diff.c_str(),
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm,
+        grn, nrm
+    );
+
+    OLC_MODE ( d ) = QEDIT_DIFFICULTY_MENU;
+}
+
 void qedit_save_internally ( Descriptor *d )
 {
     int num = OLC_NUM ( d );
@@ -322,6 +406,8 @@ void save_questcard ( int num )
         file << "Unique: "       << qc.function_triggers[5] << endl;
     if ( qc.function_triggers[6] != NOTHING )
         file << "Debug: "        << qc.function_triggers[6] << endl;
+    if ( qc.function_triggers[7] != NOTHING )
+        file << "Stats: "        << qc.function_triggers[7] << endl;
     if ( qc.order.size() > 0 )
         file << "Order: " << order.c_str() << endl;
     if ( qc.commands.size() > 0 )
@@ -329,7 +415,10 @@ void save_questcard ( int num )
         file << "Commands:\r\n";
         for ( const auto &cmd : qc.commands )
             file << cmd.first << " " << cmd.second << endl;
+        file << "~" << endl;
     }
+    file << "Dimension: " << qc.dimension << endl;
+    file << "Difficulty: " << qc.difficulty << endl;
     file << "$";
     file.close();
 }
@@ -381,20 +470,35 @@ void qedit_parse ( Descriptor *d, char *arg )
                 case '6': // fallthrough
                 case '7': // fallthrough
                 case '8': // fallthrough
-                case '9':
-                    OLC_MODE ( d ) = QEDIT_FUNCTION_TRIGGER;
-                    OLC_VAL ( d ) = atoi ( arg );
-                    i = 1;
-                    break;
+                case '9': // fallthrough
                 case 'a':
                 case 'A':
+                    OLC_MODE ( d ) = QEDIT_FUNCTION_TRIGGER;
+                    if ( *arg <= '9' )
+                        OLC_VAL ( d ) = atoi ( arg );
+                    else
+                        OLC_VAL ( d ) = 10;
+                    i = 1;
+                    break;
+                case 'b':
+                case 'B':
                     OLC_MODE ( d ) = QEDIT_ORDER;
                     d->Output ( "Enter the order in which the function triggers are called (e.g. '5 3 6'):\r\n" );
                     return;
-                case 'b':
-                case 'B':
+                case 'c':
+                case 'C':
                     OLC_VAL ( d ) = 0; // used as a commands index
                     qedit_disp_command_menu ( d );
+                    return;
+                case 'd':
+                case 'D':
+                    OLC_MODE ( d ) = QEDIT_DIMENSION_MENU;
+                    qedit_disp_dimension_menu ( d );
+                    return;
+                case 'e':
+                case 'E':
+                    OLC_MODE ( d ) = QEDIT_DIFFICULTY_MENU;
+                    qedit_disp_difficulty_menu ( d );
                     return;
                 case 'q':
                 case 'Q':
@@ -720,6 +824,68 @@ void qedit_parse ( Descriptor *d, char *arg )
                     it++;
             }
             qedit_disp_command_menu ( d );
+            return;
+        case QEDIT_DIMENSION_MENU:
+            switch ( *arg )
+            {
+                case '0':
+                    OLC_QC ( d )->dimension = "<none>";
+                    break;
+                case '1':
+                    OLC_QC ( d )->dimension = "Prehistoric";
+                    break;
+                case '2':
+                    OLC_QC ( d )->dimension = "Medieval";
+                    break;
+                case '3':
+                    OLC_QC ( d )->dimension = "OldWest";
+                    break;
+                case '4':
+                    OLC_QC ( d )->dimension = "Future";
+                    break;
+                case '5':
+                    OLC_QC ( d )->dimension = "Newbie";
+                    break;
+                case '6':
+                    OLC_QC ( d )->dimension = "Multidimensional";
+                    break;
+                case 'q':
+                case 'Q':
+                    qedit_disp_menu ( d );
+                    return;
+                default:
+                    d->Output ( "Illegal value.\r\n" );
+                    qedit_disp_dimension_menu ( d );
+                    return;
+            }
+            OLC_VAL ( d ) = 1;
+            qedit_disp_menu ( d );
+            return;
+        case QEDIT_DIFFICULTY_MENU:
+            switch ( *arg )
+            {
+                case '1':
+                    OLC_QC ( d )->difficulty ^= (1 << 0); // toggle difficulty
+                    break;
+                case '2':
+                    OLC_QC ( d )->difficulty ^= (1 << 1);
+                    break;
+                case '3':
+                    OLC_QC ( d )->difficulty ^= (1 << 2);
+                    break;
+                case '4':
+                    OLC_QC ( d )->difficulty ^= (1 << 3);
+                    break;
+                case 'q':
+                case 'Q':
+                    qedit_disp_menu ( d );
+                    return;
+                default:
+                    d->Output ( "Illegal value.\r\n" );
+                    break;
+            }
+            OLC_VAL ( d ) = 1;
+            qedit_disp_difficulty_menu ( d );
             return;
         case QEDIT_CONFIRM_SAVESTRING:
             switch ( *arg )

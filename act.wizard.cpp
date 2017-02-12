@@ -368,6 +368,8 @@ extern const char *pc_race_types[];
 
 
 /* extern functions */
+script_data* create_script();
+bool is_abbrev3 ( const string &s1, const string &s2 );
 trig_data *find_trigger ( script_data *sc, trig_vnum vnum );
 void crashproof_objects_save_all();
 EVENTFUNC ( message_event );
@@ -8384,24 +8386,162 @@ ACMD(do_vset) {
 
 ACMD ( do_qlist )
 {
-    ch->Send ( "Questcards currently in the game:\r\n" );
-    ch->Send ( "---------------------------------\r\n" );
+    struct entry {
+        int number, quests, quests_total, achievements, achievements_total, diff;
+    };
+    entry e;
+    vector<entry> list;
 
-    if ( questcards.size() == 0 )
+    // populate the list by firing every questcard's stats trigger
+    obj_data *obj = read_object ( 10, VIRTUAL );
+    if ( !obj )
+    {
+        log ( "SYSERR: qlist couldn't create an object" );
+        return;
+    }
+
+    if ( !SCRIPT ( obj ) )
+        SCRIPT ( obj ) = create_script();
+
+    char buf[MAX_STRING_LENGTH];
+    snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
+    add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
+
+    for ( const auto &qc : questcards )
+    {
+        trig_data *t = read_trigger ( real_trigger ( qc.second.function_triggers[7] ) );
+        if ( t )
+        {
+            add_trigger ( SCRIPT ( obj ), t, -1 );
+            script_driver ( &obj, t, OBJ_TRIGGER, TRIG_NEW );
+        }
+
+        e.number = qc.first;
+        e.quests = e.quests_total = e.achievements = e.achievements_total = e.diff = 0;
+        for ( int i = 0; i < qc_difficulties.size(); ++i )
+            if ( qc.second.difficulty & (1 << i) )
+            {
+                e.diff = 1 << i;
+                break;
+            }
+
+        // if a flag is found, reset it to zero for the next questcard
+        for ( auto vdt = SCRIPT ( obj )->global_vars; t && vdt; vdt = vdt->next )
+        {
+            if ( vdt->name == "quests" )
+            {
+                e.quests = atoi ( vdt->value.c_str() );
+                vdt->value = "0";
+            }
+            else if ( vdt->name == "quests_total" )
+            {
+                e.quests_total = atoi ( vdt->value.c_str() );
+                vdt->value = "0";
+            }
+            else if ( vdt->name == "achievements" )
+            {
+                e.achievements = atoi ( vdt->value.c_str() );
+                vdt->value = "0";
+            }
+            else if ( vdt->name == "achievements_total" )
+            {
+                e.achievements_total = atoi ( vdt->value.c_str() );
+                vdt->value = "0";
+            }
+        }
+
+        list.push_back ( e );
+    }
+
+    extract_obj ( obj );
+
+    string arg = string ( argument );
+    stringstream ss ( arg );
+    ss >> arg;
+
+    if ( arg == "" )
+        ; // the list is already sorted by number
+    else if ( is_abbrev3 ( arg, "dimension" ) )
+    {
+        // sort by dimension
+        sort ( list.begin(), list.end(), [] ( entry e1, entry e2 ) {
+            return questcards[ e1.number ].dimension < questcards[ e2.number ].dimension;
+        });
+    }
+    else if ( is_abbrev3 ( arg, "difficulty" ) )
+    {
+        // sort by the easiest difficulty
+        sort ( list.begin(), list.end(), [] ( entry e1, entry e2 ) {
+            return e1.diff < e2.diff;
+        });
+    }
+    else if ( is_abbrev3 ( arg, "quests" ) )
+    {
+        // sort by quests/quests_total: 1/5 < 3/4 < 2/2 < 4/4 < N/A (N/A = 0/0)
+        sort ( list.begin(), list.end(), [] ( entry e1, entry e2 ) {
+            return e1.quests_total > 0 && ( e2.quests_total == 0 ||
+                ( e2.quests_total == e2.quests && ( e1.quests < e1.quests_total || e1.quests < e2.quests ) ) ||
+                ( e2.quests_total < e2.quests && e1.quests < e1.quests_total && e1.quests < e2.quests ) );
+        });
+    }
+    else if ( is_abbrev3 ( arg, "achievements" ) )
+    {
+        // sort by achievements/achievements_total: 1/5 < 3/4 < 2/2 < 4/4 < N/A (N/A = 0/0)
+        sort ( list.begin(), list.end(), [] ( entry e1, entry e2 ) {
+            return e1.achievements_total > 0 && ( e2.achievements_total == 0 ||
+                ( e2.achievements_total == e2.achievements && ( e1.achievements < e1.achievements_total ||
+                e1.achievements < e2.achievements ) ) ||
+                ( e2.achievements_total < e2.achievements && e1.achievements < e1.achievements_total &&
+                e1.achievements < e2.achievements ) );
+        });
+    }
+    else
+    {
+        ch->Send ( "Usage: qcheck <num> dimension|difficulty|quests|achievements\r\n" );
+        return;
+    }
+
+    ch->Send ( "Questcards currently in the game:\r\n" );
+    ch->Send ( "---------------------------------                    Dim  Difficulty Quest Achi.\r\n" );
+
+    if ( questcards.size() == 0 || list.size() == 0 )
     {
         ch->Send ( "None.\r\n" );
         return;
     }
 
-    char buf[MAX_STRING_LENGTH];
     DYN_DEFINE;
     DYN_CREATE;
-    for ( const auto &q : questcards )
+
+    for ( const auto &line : list )
     {
-        snprintf ( buf, sizeof buf, "[{cc%d{c0] {cy%s{c0\r\n", q.first, q.second.name.c_str() );
+        const auto &qc = questcards[ line.number ];
+
+        string diff;
+        if ( line.diff == 0 )
+            diff = "N/A";
+        else
+            for ( int i = 0; i < qc_difficulties.size(); ++i )
+                if ( line.diff == (1 << i) )
+                {
+                    diff = qc_difficulties[i];
+                    break;
+                }
+
+        string quests = "N/A";
+        if ( line.quests_total > 0 )
+                quests = to_string ( line.quests ) + "/" + to_string ( line.quests_total );
+
+        string achievements = "N/A";
+        if ( line.achievements_total > 0 )
+            achievements = to_string ( line.achievements ) + "/" + to_string ( line.achievements_total );
+
+        snprintf ( buf, sizeof buf, "[{cc%d{c0] {cy%-48.48s{c0 %3.3s  %-9.9s  %s%-5.5s{c0 %s%-5.5s{c0\r\n",
+            line.number, qc.name.c_str(), qc.dimension.c_str(), diff.c_str(),
+            line.quests > 0 && line.quests == line.quests_total ? "{cg" : "", quests.c_str(),
+            line.achievements > 0 && line.achievements == line.achievements_total ? "{cg" : "", achievements.c_str() );
         DYN_RESIZE ( buf );
     }
-
     page_string ( ch->desc, dynbuf, DYN_BUFFER );
 }
 
@@ -8474,6 +8614,27 @@ ACMD ( do_qstat )
         }
     }
 
+    string dim;
+    if ( qc.dimension == "<none>" )
+        dim = "{cc<none>{c0";
+    else
+        dim = "{cy" + qc.dimension + "{c0";
+
+    string diff;
+    for ( int i = 0; i < qc_difficulties.size(); ++i )
+        if ( qc.difficulty & (1 << i) )
+        {
+            if ( diff == "" )
+                diff = "{cy" + qc_difficulties[i];
+            else
+                diff += ", " + qc_difficulties[i];
+        }
+
+    if ( diff == "" )
+        diff = "{cc<none>{c0";
+    else
+        diff += "{c0";
+
     get_char_colours ( ch );
 
     DYN_DEFINE;
@@ -8493,8 +8654,11 @@ ACMD ( do_qstat )
         "Other        : [%s%d%s] %s\r\n"
         "Unique       : [%s%d%s] %s\r\n"
         "Debug        : [%s%d%s] %s\r\n"
+        "Stats        : [%s%d%s] %s\r\n"
         "Order        : %s\r\n"
-        "Commands     : %s\r\n",
+        "Commands     : %s\r\n"
+        "Dimension    : %s\r\n"
+        "Difficulty   : %s\r\n",
 
         cyn, num, nrm,
         yel, qc.name.c_str(), nrm,
@@ -8507,8 +8671,11 @@ ACMD ( do_qstat )
         cyn, qc.function_triggers[4], nrm, names[4].c_str(),
         cyn, qc.function_triggers[5], nrm, names[5].c_str(),
         cyn, qc.function_triggers[6], nrm, names[6].c_str(),
+        cyn, qc.function_triggers[7], nrm, names[7].c_str(),
         order.c_str(),
-        commands.c_str()
+        commands.c_str(),
+        dim.c_str(),
+        diff.c_str()
     );
     DYN_RESIZE ( buf );
     page_string ( ch->desc, dynbuf, DYN_BUFFER );

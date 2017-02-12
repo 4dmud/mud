@@ -347,8 +347,7 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
     char name[MAX_INPUT_LENGTH];
     room_rnum loc = NULL;
     int all = FALSE;
-    int add
-    = 0;
+    int add = 0;
 
     half_chop ( cmd, junk, cmd );
     half_chop ( cmd, addrem, cmd );
@@ -372,11 +371,9 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
     }
 
     if ( !strcmp ( addrem, "add" ) )
-        add
-        = TRUE;
+        add = TRUE;
     else if ( !strcmp ( addrem, "remove" ) )
-        add
-        = FALSE;
+        add = FALSE;
     else
     {
         script_log ( "Trigger: %s, VNum %d. dg_dest: need to specify add or remove for second argument! Line %d: %s",
@@ -427,16 +424,14 @@ void do_dg_destination ( void *go, struct script_data *sc, trig_data *trig,
     }
     if ( c )
     {
-        if ( add
-           )
+        if ( add )
             add_travel_point_by_pointer ( &TRAVEL_LIST ( c ), loc->number );
         else
             remove_travel_point_by_dest ( &TRAVEL_LIST ( c ), loc->number );
     }
     else if ( o )
     {
-        if ( add
-           )
+        if ( add )
             add_travel_point_by_pointer ( &TRAVEL_LIST ( o ), loc->number );
         else
             remove_travel_point_by_dest ( &TRAVEL_LIST ( o ), loc->number );

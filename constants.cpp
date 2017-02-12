@@ -3018,4 +3018,10 @@ const char *AssemblyTypes[] =
 
 const char *unused_spellname = "!UNUSED!";   /* So we can get &unused_spellname */
 
-
+const vector<string> qc_difficulties =
+{
+    "easy",
+    "medium",
+    "hard",
+    "very hard"
+};

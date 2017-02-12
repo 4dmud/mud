@@ -2453,9 +2453,8 @@ void process_eval ( void *go, struct script_data *sc, trig_data *trig,
     add_var ( &GET_TRIG_VARS ( trig ), name, result, sc ? sc->context : 0 );
 }
 
-/* script attaching a trigger to something */
-void process_peek ( void *go, struct script_data *sc, trig_data *trig,
-                    int type, char *cmd )
+/* show a room to a char */
+void process_peek ( void *go, struct script_data *sc, trig_data *trig, int type, char *cmd )
 {
     char arg[MAX_INPUT_LENGTH], *room_v ;
     char result[MAX_INPUT_LENGTH];
@@ -2478,14 +2477,13 @@ void process_peek ( void *go, struct script_data *sc, trig_data *trig,
         return;
     }
 
-    //eval_expr ( room_v, result, sizeof ( result ), go, sc, trig, type );
     if ( ( r = real_room ( atoi ( room_v ) ) ) == NULL )
     {
         script_log ( "Trigger: %s, VNum %d. dg_peek given an invalid room. Line %d: %s",
                      GET_TRIG_NAME ( trig ), GET_TRIG_VNUM ( trig ), GET_TRIG_LINE_NR ( trig ), cmd );
         return;
     }
-    //eval_expr ( arg, result, sizeof ( result ), go, sc, trig, type );
+
     if ( ( c = get_char ( arg ) ) == NULL )
     {
         script_log ( "Trigger: %s, VNum %d. dg_peek can't find the char to show the room to. Line %d: %s",

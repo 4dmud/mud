@@ -95,4 +95,5 @@ extern const char *quality_names[];
 extern const char *origins[];
 extern const vector< vector<string> > origin_names;
 
+extern const vector<string> qc_difficulties;
 #endif
