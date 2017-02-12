@@ -8407,6 +8407,16 @@ ACMD ( do_qlist )
     snprintf ( buf, sizeof buf, "%c%ld", UID_CHAR, GET_ID ( ch ) );
     add_var ( &( SCRIPT ( obj )->global_vars ), "player", buf, 0 );
 
+    bool atleved = FALSE;
+    if ( GET_ORIG_LEV ( ch ) > 0 )
+        atleved = TRUE;
+    else if ( IS_IMM ( ch ) )
+    {
+        // need to atlev the imm otherwise trigger %send% won't work
+        GET_ORIG_LEV ( ch ) = GET_LEVEL ( ch );
+        GET_LEVEL ( ch ) = LVL_MAX_MORT;
+    }
+
     for ( const auto &qc : questcards )
     {
         trig_data *t = read_trigger ( real_trigger ( qc.second.function_triggers[7] ) );
@@ -8453,6 +8463,12 @@ ACMD ( do_qlist )
         list.push_back ( e );
     }
 
+    if ( IS_IMM ( ch ) && !atleved )
+    {
+        GET_LEVEL ( ch ) = GET_ORIG_LEV ( ch );
+        GET_ORIG_LEV ( ch ) = 0;
+    }
+
     extract_obj ( obj );
 
     string arg = string ( argument );
@@ -8497,7 +8513,7 @@ ACMD ( do_qlist )
     }
     else
     {
-        ch->Send ( "Usage: qcheck <num> dimension|difficulty|quests|achievements\r\n" );
+        ch->Send ( "Usage: qlist <num> dimension|difficulty|quests|achievements\r\n" );
         return;
     }
 
@@ -8516,6 +8532,8 @@ ACMD ( do_qlist )
     for ( const auto &line : list )
     {
         const auto &qc = questcards[ line.number ];
+
+        string num = "[{cc" + to_string ( line.number ) + "{c0]";
 
         string diff;
         if ( line.diff == 0 )
@@ -8536,8 +8554,8 @@ ACMD ( do_qlist )
         if ( line.achievements_total > 0 )
             achievements = to_string ( line.achievements ) + "/" + to_string ( line.achievements_total );
 
-        snprintf ( buf, sizeof buf, "[{cc%d{c0] {cy%-48.48s{c0 %3.3s  %-9.9s  %s%-5.5s{c0 %s%-5.5s{c0\r\n",
-            line.number, qc.name.c_str(), qc.dimension.c_str(), diff.c_str(),
+        snprintf ( buf, sizeof buf, "%-11.11s {cy%-46.46s{c0 %3.3s  %-9.9s  %s%-5.5s{c0 %s%-5.5s{c0\r\n",
+            num.c_str(), qc.name.c_str(), qc.dimension.c_str(), diff.c_str(),
             line.quests > 0 && line.quests == line.quests_total ? "{cg" : "", quests.c_str(),
             line.achievements > 0 && line.achievements == line.achievements_total ? "{cg" : "", achievements.c_str() );
         DYN_RESIZE ( buf );
