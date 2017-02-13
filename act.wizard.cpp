@@ -8513,12 +8513,12 @@ ACMD ( do_qlist )
     }
     else
     {
-        ch->Send ( "Usage: qlist <num> dimension|difficulty|quests|achievements\r\n" );
+        ch->Send ( "Usage: qlist dimension|difficulty|quests|achievements\r\n" );
         return;
     }
 
     ch->Send ( "Questcards currently in the game:\r\n" );
-    ch->Send ( "---------------------------------                    Dim  Difficulty Quest Achi.\r\n" );
+    ch->Send ( "---------------------------------                    Dim  Difficulty Quest Achi\r\n" );
 
     if ( questcards.size() == 0 || list.size() == 0 )
     {

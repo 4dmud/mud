@@ -477,6 +477,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                 case WLD_TRIGGER:
                     room = ( Room * ) go;
 
+#ifndef ACTOR_ROOM_IS_UID
+                    // treat numbers as room vnums
+                    if ( is_number ( name ) && ( r = get_room ( name ) ) )
+                        break;
+#endif
 
                     if ( ( c = get_char_by_room ( room, name ) ) )
                         ;
