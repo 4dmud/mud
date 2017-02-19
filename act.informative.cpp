@@ -5430,6 +5430,15 @@ ACMD ( do_commandslike )
     if ( subcmd == SCMD_SOCIALS )
         socials = 1;
 
+    if ( !argument || !*argument )
+    {
+        if ( socials )
+            ch->Send ( "Usage: socialslike <letter(s)>\r\n" );
+        else
+            ch->Send ( "Usage: commandslike <letter(s)>\r\n" );
+        return;
+    }
+
     ch->Send ( "The following %s are available to you:\r\n", socials ? "socials" : "commands" );
 
     /* cmd_num starts at 1, not 0, to remove 'RESERVED' */

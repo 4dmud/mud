@@ -332,7 +332,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
     /* there is no such thing as wtransform, thus the wecho below  */
     const char *transform[]      = {"mtransform ",  "otransform ",  "wecho"       };
     const char *lag[]      = {"mlag ",  "olag ",  "wlag"       };
-
+    const char *xgoto[] = { "mgoto", "oecho", "wecho" };
 
     /* X.global() will have a NULL trig */
     if ( trig )
@@ -411,6 +411,11 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                 snprintf ( str, slen, "%s", transform[type] );
             else if ( !strcasecmp ( var, "lag" ) )
                 snprintf ( str, slen, "%s", lag[type] );
+            else if ( !strcasecmp ( var, "goto" ) )
+            {
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SCRIPT ERR: Trigger [%d] %s: %%goto%% only works for mobs. Line %d: %s", GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                snprintf ( str, slen, "%s", xgoto[type] );
+            }
             else
                 *str = '\0';
         }

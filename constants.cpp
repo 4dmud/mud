@@ -1008,7 +1008,7 @@ const char *preference_bits[] =
     "MAIL_NOTICE",
     "!CTALK",
     "AFKTELL",
-    "!MOVEMSG", // 35
+    "MOVEMSG", // 35
     "MOUNTABLE",
     "!HERO",
     "T1",

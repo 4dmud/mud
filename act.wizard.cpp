@@ -8463,7 +8463,7 @@ ACMD ( do_qlist )
         list.push_back ( e );
     }
 
-    if ( IS_IMM ( ch ) && !atleved )
+    if ( GET_ORIG_LEV ( ch ) > 0 && !atleved )
     {
         GET_LEVEL ( ch ) = GET_ORIG_LEV ( ch );
         GET_ORIG_LEV ( ch ) = 0;

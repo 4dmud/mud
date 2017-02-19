@@ -611,8 +611,8 @@ ACTION(thing_singwood)
     switch (*num)
     {
     case 11:
-      to_char = "You clear your throat softly and begin to serenade in the direction of $p.";
-      to_room = "$n clears $s throat softly and begins to serenade in the direction of $p.";
+      to_char = "You clear your throat softly and begin to serenade in the direction of\r\n$p.";
+      to_room = "$n clears $s throat softly and begins to serenade in the direction of\r\n$p.";
       time = (4 RL_SEC);
       break;
     case 10:
@@ -661,11 +661,11 @@ ACTION(thing_singwood)
       time = (7 RL_SEC);
       break;
     case 1:
-      to_char = "As the light lessens, you notice the tree is gone.\r\n"
-                "In its place, a mystical staff stands as an offering to the one who serenaded it.\r\n"
+      to_char = "As the light lessens, you notice the tree is gone. In its place, a mystical\r\n"
+                "staff stands as an offering to the one who serenaded it.\r\n"
                 "You pick it up.";
-      to_room = "As the light lessens, you notice the tree is gone.\r\n"
-                "In its place, a mystical staff stands as an offering to the one who serenaded it.\r\n"
+      to_room = "As the light lessens, you notice the tree is gone. In its place, a mystical\r\n"
+                "staff stands as an offering to the one who serenaded it.\r\n"
                 "$n picks it up.";
       make_focus(ch, SKILL_SING_WOOD, obj);
       improve_skill(ch, SKILL_SING_WOOD);
