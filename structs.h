@@ -1871,19 +1871,17 @@ public:
         return subs[ss]->learn;
     }
     int UpdateSubLearn(subskill_list ss, int l) {
-        if (l > 100)
-            l = 100;
-        else if (l < 0)
-            l = 0;
         if (!HasSub(ss)) {
             subs[ss] = new sub_list();
             subs[ss]->subskill = ss;
             subs[ss]->learn = l;
         } else {
             subs[ss]->learn += l;
-            if (subs[ss]->learn >= 98)
-              subs[ss]->learn = 98;
         }
+        if ( subs[ss]->learn < 0 )
+            subs[ss]->learn = 0;
+        else if ( subs[ss]->learn > 98 )
+            subs[ss]->learn = 98;
         return subs[ss]->learn;
     }
     subs_map::iterator SubsBegin() {

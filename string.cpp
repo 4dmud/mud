@@ -57,6 +57,8 @@ int edit_extra_desc ( obj_data *obj, const char *keyword, const char *descriptio
             return 1;
 
     // Add the new ex_desc at the head
+    if ( obj->ex_description == obj_proto[rn].ex_description )
+        copy_ex_descriptions ( &obj->ex_description, obj_proto[rn].ex_description );
     extra_descr_data *ex_new;
     CREATE ( ex_new, struct extra_descr_data, 1 );
     ex_new->keyword = str_udup ( keyword );

@@ -237,8 +237,9 @@ int text_processed ( char *field, char *subfield, struct trig_var_data *vd,
     {
         int c = atoi ( subfield );
         if ( c > 0 && c <= vd->value.length() )
-            c--;
-        snprintf ( str, slen, "%c", vd->value.at ( c ) );
+            snprintf ( str, slen, "%c", vd->value.at ( c-1 ) );
+        else
+            *str = '\0';
         return TRUE;
     }
     else if ( !str_cmp ( field, "wordat" ) )              /* wordat       */
@@ -681,10 +682,8 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     if ( type == MOB_TRIGGER )
                     {
                         ch = ( Character * ) go;
-                        for ( c = IN_ROOM ( ch )->people; c;
-                                c = c->next_in_room )
-                            if ( ( c != ch ) && valid_dg_target ( c, TRUE )
-                                    && CAN_SEE ( ch, c ) )
+                        for ( c = IN_ROOM ( ch )->people; c; c = c->next_in_room )
+                            if ( ( c != ch ) && valid_dg_target ( c, TRUE ) && CAN_SEE ( ch, c ) )
                             {
                                 if ( !number ( 0, count ) )
                                     rndm = c;
@@ -1486,7 +1485,12 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     else if ( !strcasecmp ( field, "maxhitp" ) )
                         snprintf ( str, slen, "%d", GET_MAX_HIT ( c ) );
                     else if ( !strcasecmp ( field, "mid" ) )
-                        snprintf ( str, slen, "%ld", GET_ID ( MASTER ( c ) ) );
+                    {
+                        if ( MASTER ( c ) )
+                            snprintf ( str, slen, "%ld", GET_ID ( MASTER ( c ) ) );
+                        else
+                            snprintf ( str, slen, "0" );
+                    }
                     else if ( !strcasecmp ( field, "maxmana" ) )
                         snprintf ( str, slen, "%d", GET_MAX_MANA ( c ) );
                     else if ( !strcasecmp ( field, "maxmove" ) )
@@ -1907,9 +1911,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     else if ( !strcasecmp (field, "thirst" ) )
                       {
                         if ( subfield && *subfield ) {
-                          GET_COND(c, THIRST) = (char) atoi(subfield);
+                            GET_COND(c, THIRST) = (char) atoi(subfield);
                         }
-                        snprintf ( str, slen, "%d", GET_COND(c, FULL));
+                        snprintf ( str, slen, "%d", GET_COND(c, THIRST));
                       }
 
                     else if ( !strcasecmp ( field, "trade" ) )

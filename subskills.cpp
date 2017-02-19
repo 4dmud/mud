@@ -1171,8 +1171,13 @@ void improve_sub(Character *ch, subskill_list sub, int amount) {
         MOB_SUBSKILL(ch) = sub;
         return;
     }
-    log("SUBSKILL: %s achieves %d percent in a new skill %s.", GET_NAME(ch), SAVED(ch).UpdateSubLearn(sub, amount), sub_name(sub));
-        SET_BIT_AR(PLR_FLAGS(ch), PLR_CRASH);
+    SAVED(ch).UpdateSubLearn ( sub, amount );
+    SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
+
+    if ( amount > 0 )
+        log ( "SUBSKILL: %s gains %d%% in %s (%d%%).", GET_NAME ( ch ), amount, sub_name ( sub ), SAVED(ch).GetSubLearn ( sub ) );
+    else
+        log ( "SUBSKILL: %s loses %d%% in %s (%d%%).", GET_NAME ( ch ), -amount, sub_name ( sub ), SAVED(ch).GetSubLearn ( sub ) );
 }
 
 
