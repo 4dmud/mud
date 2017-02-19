@@ -3011,7 +3011,7 @@ const Character *random_mob ()
 
         return random_mob;
     }
-    log ( "SYSERR: middleman couldn't find a random mob" );
+    new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: middleman couldn't find a random mob" );
     return nullptr;
 }
 
@@ -3030,7 +3030,7 @@ const obj_data *random_obj ()
 
         return &obj_proto[ rnum ];
     }
-    log ( "SYSERR: middleman couldn't find a random obj" );
+    new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: middleman couldn't find a random obj" );
     return nullptr;
 }
 
@@ -3052,7 +3052,7 @@ void read_hof ( vector<string> &hof )
     }
     if ( !f.good() )
     {
-        log ( "SYSERR: read_hof couldn't open %s", filename.c_str() );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: read_hof couldn't open %s", filename.c_str() );
         return;
     }
 
@@ -3098,7 +3098,7 @@ SPECIAL ( middleman )
             add_var ( &SCRIPT ( ch )->global_vars, name, value, 0 );
             return 1;
         }
-        log ( "SYSERR: middleman couldn't find a random room" );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: middleman couldn't find a random room" );
         return 1;
     }
     else if ( ch && GET_MOB_VNUM ( ch ) == middleman_vnum && !strcmp ( cmd_arg, "middleman_mob_descs" ) )
@@ -3259,7 +3259,7 @@ SPECIAL ( middleman )
 
         if ( !found_quest )
         {
-            log ( "SYSERR: middleman_hof couldn't match quest '%s'", quest_type.c_str() );
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: middleman_hof couldn't match quest '%s'", quest_type.c_str() );
             return 1;
         }
 
@@ -3309,7 +3309,7 @@ SPECIAL ( middleman )
             ofstream fout ( filename.c_str() );
             if ( !fout.is_open() )
             {
-                log ( "SYSERR: middleman_hof can't write to file %s", filename.c_str() );
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: middleman_hof can't write to file %s", filename.c_str() );
                 return 1;
             }
             for ( int i = 0; i < HoF.size(); i++ )

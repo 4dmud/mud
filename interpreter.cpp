@@ -1222,7 +1222,7 @@ void command_interpreter ( Character *ch, char *argument, trig_data *trig )
         if ( IS_NPC ( ch ) )
         {
             if ( trig && trig->curr_state )
-                log ( "SYSERR: Mob [%d] %s did '%s%s'. Trigger [%d] %s, line %d: %s", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), arg, line, GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Mob [%d] %s did '%s%s'. Trigger [%d] %s, line %d: %s", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), arg, line, GET_TRIG_VNUM ( trig ), GET_TRIG_NAME ( trig ), GET_TRIG_LINE_NR ( trig ), trig->curr_state->cmd );
             else
                 log ( "SYSERR: Mob [%d] %s did '%s%s'", GET_MOB_VNUM ( ch ), GET_NAME ( ch ), arg, line );
         }

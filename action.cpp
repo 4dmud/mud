@@ -64,7 +64,7 @@ void set_tree_origin ( struct obj_data *obj, struct obj_data *tree )
                 return;
             }
 
-    log ( "SYSERR: Couldn't set the tree origin for [%d] %s", GET_OBJ_VNUM ( tree ), tree->short_description );
+    new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Couldn't set the tree origin for [%d] %s", GET_OBJ_VNUM ( tree ), tree->short_description );
 }
 
 ACTION(thing_lumberjack)

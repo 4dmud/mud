@@ -6244,7 +6244,7 @@ ACMD ( do_qcheck )
     obj_data *obj = read_object ( 10, VIRTUAL );
     if ( !obj )
     {
-        log ( "SYSERR: qcheck couldn't create an object" );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: qcheck couldn't create an object" );
         return;
     }
 

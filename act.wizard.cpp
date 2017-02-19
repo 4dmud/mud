@@ -1939,7 +1939,7 @@ void do_stat_object ( Character *ch, struct obj_data *j )
     {
         if ( GET_OBJ_ORIGIN ( j ) < 0 || GET_OBJ_ORIGIN ( j ) >= origin_names.size() )
         {
-            log ( "SYSERR: obj origin of [%d] %s was %d", GET_OBJ_VNUM ( j ), j->short_description, GET_OBJ_ORIGIN ( j ) );
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: obj origin of [%d] %s was out of range: %d", GET_OBJ_VNUM ( j ), j->short_description, GET_OBJ_ORIGIN ( j ) );
             GET_OBJ_ORIGIN ( j ) = 0;
         }
         else
@@ -8396,7 +8396,7 @@ ACMD ( do_qlist )
     obj_data *obj = read_object ( 10, VIRTUAL );
     if ( !obj )
     {
-        log ( "SYSERR: qlist couldn't create an object" );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: qlist couldn't create an object" );
         return;
     }
 

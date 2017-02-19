@@ -218,7 +218,7 @@ ASPELL ( spell_teleport )
         to_room = world_vnum[ number ( 0, top_of_world ) ];
         if ( cnt > top_of_world )
         {
-            log ( "SYSERR: teleport couldn't find destination room");
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: teleport couldn't find destination room");
             return;
         }
     } while ( !to_room || ROOM_FLAGGED ( to_room, ROOM_PRIVATE ) ||
@@ -1163,7 +1163,7 @@ ASPELL(spell_minor_identify) {
 
     if ( GET_OBJ_ORIGIN ( obj ) < 0 ||  GET_OBJ_ORIGIN ( obj ) >= origin_names.size() )
     {
-        log ( "SYSERR: obj origin of [%d] %s was %d", GET_OBJ_VNUM ( obj ), obj->short_description, GET_OBJ_ORIGIN ( obj ) );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: obj origin of [%d] %s was %d", GET_OBJ_VNUM ( obj ), obj->short_description, GET_OBJ_ORIGIN ( obj ) );
         GET_OBJ_ORIGIN ( obj ) = 0;
     }
     ch->Send ( "Origin: %s\r\n", origins[ GET_OBJ_ORIGIN ( obj ) ] );

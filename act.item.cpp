@@ -4882,7 +4882,7 @@ void set_animal_origin ( struct obj_data *obj, const struct obj_data *corpse )
                 }
         }
 
-    log ( "SYSERR: Couldn't find the animal origin of [%d] %s", GET_MOB_VNUM ( mob ), GET_NAME ( mob ) );
+    new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Couldn't find the animal origin of [%d] %s", GET_MOB_VNUM ( mob ), GET_NAME ( mob ) );
 }
 
 ACMD ( do_skin )

@@ -105,7 +105,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
     cle->line_nr = 1;
 
     if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
-        log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
 
     int brac = check_braces ( cle->cmd );
     if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
@@ -114,7 +114,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
             || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
             || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
             || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
-        log ( "SYSERR: Trigger [%d] '%s'. Unmatched %s bracket in line %d: %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s'. Unmatched %s bracket in line %d: %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
 
     if ( *cle->cmd != '*' )
     {
@@ -126,7 +126,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
                 break;
             if ( c != cle->cmd && *(c+1) != '=' && *(c-1) != '=' && *(c-1) != '!' && *(c-1) != '<' && *(c-1) != '>' && *(c-1) != '|' && *(c-1) != '/' )
             {
-                log ( "SYSERR: Trigger [%d] '%s'. Single '=' should be '=='? Line %d: %s\r\n", nr, trig->name, cle->line_nr, cle->cmd );
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s'. Single '=' should be '=='? Line %d: %s\r\n", nr, trig->name, cle->line_nr, cle->cmd );
                 break;
             }
             c++;
@@ -140,7 +140,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
         cle->cmd = strdup(s);
 
         if ( *cle->cmd != '*' && char_count ( cle->cmd, '%' ) % 2 == 1 )
-            log ( "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Uneven number of %% in line %d. %s", nr, trig->name, cle->line_nr, cle->cmd );
 
         brac = check_braces ( cle->cmd );
         if ( *cle->cmd != '*' && brac != 0 && ( !strn_cmp ( "elseif ", cle->cmd, 7 ) || !strn_cmp ( "else ", cle->cmd, 4 )
@@ -149,7 +149,7 @@ void parse_trigger(FILE *trig_f, int nr, zone_vnum zon) {
                 || !strn_cmp ( "extract ", cle->cmd, 8 ) || !strn_cmp ( "case ", cle->cmd, 5 )
                 || !strn_cmp ( "eval ", cle->cmd, 5 ) || !strn_cmp ( "nop ", cle->cmd, 4 )
                 || !strn_cmp ( "set ", cle->cmd, 4 ) ) )
-            log ( "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: Trigger [%d] '%s' Unmatched %s bracket in line %d. %s", nr, trig->name, brac < 0 ? "right" : "left", cle->line_nr, cle->cmd );
     }
 
     free(cmds);

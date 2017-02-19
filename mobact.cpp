@@ -86,7 +86,7 @@ void mobile_activity ( void )
         {
             if ( GetMobIndex ( GET_MOB_VNUM ( ch ) )->func == NULL )
             {
-                log ( "SYSERR: %s (#%d): Attempting to call non-existing mob function.", GET_NAME ( ch ), GET_MOB_VNUM ( ch ) );
+                new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: %s (#%d): Attempting to call non-existing mob spec.", GET_NAME ( ch ), GET_MOB_VNUM ( ch ) );
                 REMOVE_BIT_AR ( MOB_FLAGS ( ch ), MOB_SPEC );
             }
             else

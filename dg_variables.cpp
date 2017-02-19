@@ -3210,7 +3210,7 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                     {
                         if ( GET_OBJ_ORIGIN ( o ) < 0 || GET_OBJ_ORIGIN ( o ) >= origin_names.size() )
                         {
-                            log ( "SYSERR: obj origin of [%d] %s was out of range: %d", GET_OBJ_VNUM ( o ), o->short_description, GET_OBJ_ORIGIN ( o ) );
+                            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: obj origin of [%d] %s was out of range: %d", GET_OBJ_VNUM ( o ), o->short_description, GET_OBJ_ORIGIN ( o ) );
                             GET_OBJ_ORIGIN ( o ) = 0;
                         }
                         snprintf ( str, slen, "%s", origins[ GET_OBJ_ORIGIN ( o ) ] );
