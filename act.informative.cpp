@@ -1820,6 +1820,19 @@ void look_at_target ( Character *ch, char *arg )
         return;
     }
 
+    /* Is the target a character? */
+    if ( found_char != NULL )
+    {
+        look_at_char ( found_char, ch );
+        if ( ch != found_char )
+        {
+            if ( CAN_SEE ( found_char, ch ) )
+                act ( "$n looks at you.", TRUE, ch, 0, found_char, TO_VICT );
+            act ( "$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT );
+        }
+        return;
+    }
+
     /* Does the argument match an extra desc in the char's inventory? */
     for ( obj = ch->carrying; obj && !found; obj = obj->next_content )
     {
@@ -1854,19 +1867,6 @@ void look_at_target ( Character *ch, char *arg )
                 found = TRUE;
             }
         }
-    }
-
-    /* Is the target a character? */
-    if ( found_char != NULL )
-    {
-        look_at_char ( found_char, ch );
-        if ( ch != found_char )
-        {
-            if ( CAN_SEE ( found_char, ch ) )
-                act ( "$n looks at you.", TRUE, ch, 0, found_char, TO_VICT );
-            act ( "$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT );
-        }
-        return;
     }
 
     /* Does the argument match an extra desc of an object in the room? */
