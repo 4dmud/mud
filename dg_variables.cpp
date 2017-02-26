@@ -435,6 +435,9 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
                 return;
             }
 
+            if ( text_processed ( field, subfield, vd, str, slen ) )
+                return;
+
             switch ( type )
             {
                 case MOB_TRIGGER:
@@ -816,10 +819,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
         {
             if ( DEAD ( c ) )
                 return; //dead - please don't screw anything up!
-            else if ( text_processed ( field, subfield, vd, str, slen ) )
-                return;
-
-
 
             else if ( !strcasecmp ( field, "global" ) )  	/* get global of something else */
             {
@@ -2007,8 +2006,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
         else if ( o )
         {
-            if ( text_processed ( field, subfield, vd, str, slen ) )
-                return;
 
             *str = '\x1';
             * ( str +1 ) = '\0';
@@ -3637,8 +3634,6 @@ void find_replacement ( void *go, struct script_data *sc, trig_data * trig,
 
         else if ( r )
         {
-            if ( text_processed ( field, subfield, vd, str, slen ) )
-                return;
             *str = '\x1';
             * ( str +1 ) = '\0';
             switch ( LOWER ( *field ) )

@@ -219,7 +219,7 @@ char *sub_percent(Character *ch, char *sub) {
 
     subnum = sub_number(sub);
     if (subnum <= 0)
-        return (char *)"unknown subskill";
+        return (char *)"0";
 
     snprintf(retval, sizeof(retval), "%d", GET_SUB(ch, subnum));
     return retval;
