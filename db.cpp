@@ -145,9 +145,9 @@ struct obj_data *obj_proto;   /* prototypes for objs           */
 obj_rnum top_of_objt = 0;     /* top of object index table     */
 struct zone_list_data *zone_list = NULL;
 
-//Zone *zone_table; /* zone table                    */
 vector <Zone> zone_table;
 zone_rnum top_of_zone_table = 0;   /* top element of zone tab       */
+vector<int> explorable; /* the number of rooms per zone a player can get to */
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages     */
 
 PlayerIndex pi;
@@ -850,6 +850,38 @@ void boot_world ( void )
         log ( "Loading shops." );
         index_boot ( DB_BOOT_SHP );
     }
+
+    log ( "Counting explorable rooms" );
+    explorable.resize ( top_of_zone_table + 1 );
+    Room *room;
+    // Rooms that can't be explored are god rooms,
+    // and rooms flagged !teleport_in without a script and exits
+    for ( zone_rnum z = 0; z <= top_of_zone_table; ++z )
+    {
+        int c = 0;
+        for ( room_vnum r = zone_table[z].bot; r <= zone_table[z].top; ++r )
+        {
+            room = real_room ( r );
+            if ( !room )
+                continue;
+            if ( ROOM_FLAGGED ( room, ROOM_GODROOM ) )
+                continue;
+            if ( ROOM_FLAGGED ( room, ROOM_NOTELEPORT_IN ) && !SCRIPT ( room ) )
+            {
+                bool no_exits = TRUE;
+                for ( int door = 0; door < NUM_OF_DIRS; ++door )
+                    if ( EXIT2 ( room, door ) )
+                    {
+                        no_exits = FALSE;
+                        break;
+                    }
+                if ( no_exits )
+                    continue;
+            }
+            c++;
+        }
+        explorable[z] = c;
+    }
 }
 
 void free_objects()
@@ -1124,7 +1156,7 @@ void destroy_db ( void )
 void parse_questcard ( char *filename )
 {
     ifstream f ( filename );
-    if ( f.bad() || !is_number ( filename ) )
+    if ( !f.good() || !is_number ( filename ) )
     {
         log ( "SYSERR: couldn't parse questcard file %s", filename );
         return;
@@ -1260,6 +1292,71 @@ void load_questcards()
 
     closedir ( dp );
     chdir ( cwd );
+}
+
+void load_explored ( const Character *ch )
+{
+    SPECIALS ( ch )->explored.resize ( ( top_of_world / 32 ) + 1, 0 );
+    DIR *dp = opendir ( LIB_EXPLORED );
+
+    if ( !dp )
+    {
+        mkdir ( LIB_EXPLORED, 0777 );
+        dp = opendir ( LIB_EXPLORED );
+        if ( !dp )
+        {
+            log ( "SYSERR: couldn't open the explored dir" );
+            return;
+        }
+
+        char cwd[1024];
+        getcwd ( cwd, sizeof cwd );
+        chdir ( LIB_EXPLORED );
+        for ( char dir[] = "a"; *dir <= 'z'; (*dir)++ )
+            mkdir ( dir, 0777 );
+
+        closedir ( dp );
+        chdir ( cwd );
+        return;
+    }
+
+    closedir ( dp );
+    char filename[128], name[128];
+    snprintf ( name, sizeof name, "%s", GET_NAME ( ch ) );
+    *name = LOWER ( *name );
+    snprintf ( filename, sizeof filename, "%s%c/%s", LIB_EXPLORED, *name, name );
+    ifstream f ( filename );
+    if ( !f.good() )
+        return;
+
+    int i = 0;
+    ulong x;
+    while ( f.good() )
+    {
+        f >> x;
+        SPECIALS ( ch )->explored[ i++ ] = x;
+    }
+
+    f.close();
+}
+
+void save_explored ( const Character *ch )
+{
+    char filename[128], name[128];
+    snprintf ( name, sizeof name, "%s", GET_NAME ( ch ) );
+    *name = LOWER ( *name );
+    snprintf ( filename, sizeof filename, "%s%c/%s", LIB_EXPLORED, *name, name );
+    ofstream f ( filename );
+    if ( !f.good() )
+    {
+        new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: save_explored couldn't write to file %s", filename );
+        return;
+    }
+
+    for ( const auto &e : SPECIALS ( ch )->explored )
+        f << e.to_ulong() << " ";
+
+    f.close();
 }
 
 /* body of the booting system */

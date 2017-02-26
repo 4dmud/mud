@@ -357,7 +357,7 @@ void save_questcard ( int num )
 {
     string filename = string ( LIB_QUESTCARDS ) + to_string ( num );
     ofstream file ( filename );
-    if ( file.bad() )
+    if ( !file.good() )
     {
         new_mudlog ( BRF, LVL_BUILDER, TRUE, "SYSERR: save_questcard couldn't write to file %s", filename.c_str() );
         return;

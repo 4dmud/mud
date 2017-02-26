@@ -967,6 +967,17 @@ bool is_same_zone(int dv, int cv)
 
 }
 
+void set_explored ( Character *ch, room_vnum r )
+{
+    int bucket = r / 32;
+    int bit = r % 32;
+    if ( SPECIALS ( ch )->explored[bucket][bit] == 0 )
+    {
+        SPECIALS ( ch )->explored[bucket][bit] = 1;
+        SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_SAVE_EXPLORED );
+    }
+}
+
 /* place a character in a room */
 void char_to_room ( Character *ch, room_rnum room )
 {
@@ -1001,7 +1012,10 @@ void char_to_room ( Character *ch, room_rnum room )
                 room->light++;
 
     if ( !IS_NPC ( ch ) )
+    {
         zone_table[IN_ROOM ( ch )->zone].num_players++;
+        set_explored ( ch, GET_ROOM_VNUM ( room ) );
+    }
 
     /* Stop fighting now, if we left. */
     if ( FIGHTING ( ch ) && IN_ROOM ( ch ) != IN_ROOM ( FIGHTING ( ch ) ) )

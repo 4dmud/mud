@@ -51,6 +51,7 @@ extern int TEMP_LOAD_CHAR;
 extern char last_command[];
 
 /* external functions */
+void load_explored ( const Character* ch );
 void display_help ( Character *ch, unsigned int i );
 void send_compress_offer ( Descriptor *d );
 int delete_pobj_file ( const char *name );
@@ -2249,6 +2250,7 @@ int enter_player_game ( Descriptor *d )
     if ( GET_LEVEL ( ch ) == 0 )
         load_room = real_room ( 3081 );
 
+    load_explored ( ch );
     char_to_room ( ch, load_room );
     make_wholist();
     if ( GET_LEVEL ( ch ) >= LVL_GOD )

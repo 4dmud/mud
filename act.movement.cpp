@@ -1318,9 +1318,8 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 {
     room_rnum was_in;
     struct follow_type *k, *next;
-    //Character *mob;
-        struct affected_type *af;
-        int chance;
+    struct affected_type *af;
+    int chance;
 
     if ( ch == NULL || dir < 0 || dir >= NUM_OF_DIRS || FIGHTING ( ch ) )
         return ( 0 );
@@ -1349,9 +1348,10 @@ int perform_move ( Character *ch, int dir, int need_specials_check )
 
         if ( affected_by_spell ( ch, SKILL_SNARE ))
         {
-                        for (af = ch->affected; af; af = af->next)
-                            if (af->type == SKILL_SNARE) break;
-                        chance = GET_LEVEL(ch) - af->modifier - 10 + total_chance(ch, SKILL_TRAP_AWARE);
+            for ( af = ch->affected; af; af = af->next )
+                if ( af->type == SKILL_SNARE )
+                    break;
+            chance = GET_LEVEL(ch) - af->modifier - 10 + total_chance ( ch, SKILL_TRAP_AWARE );
             ch->Send ( "You struggle " );
             if ( number ( 1, 110 ) < chance || number(1, 100) < 6 )
             {

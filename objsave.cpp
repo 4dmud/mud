@@ -48,6 +48,7 @@ SPECIAL(receptionist);
 SPECIAL(cryogenicist);
 void write_aliases(Character *ch);
 void check_timer(obj_data *obj);
+void save_explored ( const Character* ch );
 
 /* local functions */
 struct obj_data *Obj_from_store(struct obj_file_elem object,
@@ -1096,6 +1097,11 @@ void Crash_save_all(void)
         d->character->save();
         write_aliases(d->character);
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRASH);
+      }
+      if ( PLR_FLAGGED ( d->character, PLR_SAVE_EXPLORED ) )
+      {
+        save_explored ( d->character );
+        REMOVE_BIT_AR ( PLR_FLAGS ( d->character ), PLR_SAVE_EXPLORED );
       }
     }
     unlock_desc(d);

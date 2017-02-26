@@ -57,6 +57,7 @@ extern struct help_index_element *help_table;
 extern char *help;
 extern struct time_info_data time_info;
 extern map <int, questcard> questcards;
+extern vector<int> explorable;
 
 extern char *credits;
 extern char *news;
@@ -2135,6 +2136,30 @@ string get_zonename ( const Character *ch )
     return zonename;
 }
 
+int explored_in_zone ( const Character* ch )
+{
+    // Returns the number of explored rooms in the current zone
+    if ( !IN_ROOM ( ch ) )
+        return 0;
+
+    zone_rnum z = IN_ROOM ( ch )->zone;
+    int total = 0;
+    int bucket_first = zone_table[z].bot / 32;
+    int bit_first = zone_table[z].bot % 32;
+    for ( int bit = bit_first; bit < 32; ++bit )
+        total += SPECIALS ( ch )->explored[bucket_first][bit];
+
+    int bucket_last = zone_table[z].top / 32;
+    int bit_last = zone_table[z].top % 32;
+    for ( int bit = 0; bit <= bit_last; ++bit )
+        total += SPECIALS ( ch )->explored[bucket_last][bit];
+
+    for ( int bucket = bucket_first + 1; bucket < bucket_last; ++bucket )
+        total += SPECIALS ( ch )->explored[bucket].count();
+
+    return total;
+}
+
 void look_around ( Character *ch )
 {
     string zonename = get_zonename ( ch );
@@ -2149,6 +2174,18 @@ void look_around ( Character *ch )
     ch->Send ( "\r\n{cyYou are in %s{c0\r\n", zonename.c_str() );
     char buf[MAX_STRING_LENGTH];
     ch->Send ( "{cc%s{C0\r\n", scan_zone_mobs ( IN_ROOM ( ch )->zone, buf, sizeof ( buf ) ) );
+
+    int explored = explored_in_zone ( ch );
+    int max = explorable[ IN_ROOM ( ch )->zone ];
+    if ( explored >= max )
+    {
+        if ( explored > max )
+            new_mudlog ( BRF, LVL_IMMORT, TRUE, "SYSERR: %s has explored %d rooms out of %d in zone %d. %s", GET_NAME ( ch ), explored, max, IN_ROOM ( ch )->zone, zonename.c_str() );
+
+        ch->Send ( "Explored: {cg%d/%d{c0\r\n", explored, max );
+    }
+    else
+        ch->Send ( "Explored: %d/%d\r\n", explored, max );
 }
 
 ACMD ( do_gold )
@@ -5722,10 +5759,16 @@ ACMD ( do_worth )
         if ( GET_MASTERY ( ch, i ) )
             len += snprintf ( buf+len, sizeof ( buf ) - len, "%c ", UPPER ( *pc_class_types[i] ) );
 
+    float explored_perc = 0;
+    for ( const auto &e : SPECIALS ( ch )->explored )
+        explored_perc += e.count();
+    explored_perc = ( 100 * explored_perc ) / accumulate ( explorable.begin(), explorable.end(), 0 );
+
     if ( PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
     {
        ch->Send ( "\r\n"
-              "{cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
+                  "{cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
+                  "{cwExplored: {cg%2.1f%%\r\n"
                   "{cwNatural Accuracy Rating: {cg%-3d{cy         \r\n"
                   "{cwNatural Evasion Rating: {cg%-3d{cy         \r\n"
                   "{cwRegenerating per mud hour: {cyHp:{cc%-3d {cyMa:{cc%-3d {cyMv:{cc%-3d {cySt:{cc%-3d{cy\r\n"
@@ -5738,17 +5781,18 @@ ACMD ( do_worth )
                   "{cwCoolness: {cg%-3d{cy       \r\n"
                   "{cwAward Points: {cg%-3d{cw Ethos: {cg%-3s{cy   \r\n"
                   "{cwStamina: {cC%d/%d{cw Detector: {cg%-3s{cy \r\n"
-                      "{cwMastered Classes: {cg%s{cy\r\n"
+                  "{cwMastered Classes: {cg%s{cy\r\n"
                   "{cwElemental Weakness: {cr%s{cy\r\n"
                   "{cwElemental Strength: {cc%s{cy\r\n",
                   REMORTS ( ch ),
                   GET_REMORT ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT ( ch ) ],
                   GET_REMORT_TWO ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_TWO ( ch ) ],
                   GET_REMORT_THREE ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_THREE ( ch ) ],
+                  explored_perc,
                   GET_PERM_ACCURACY ( ch ),
                   GET_PERM_EVASION ( ch ),
-                    hit_gain ( ch ), mana_gain ( ch ), move_gain ( ch ), stamina_gain ( ch ),
-               chance_hit_part ( ch, PART_HEAD ),
+                  hit_gain ( ch ), mana_gain ( ch ), move_gain ( ch ), stamina_gain ( ch ),
+                  chance_hit_part ( ch, PART_HEAD ),
                   chance_hit_part ( ch, PART_LEFT_ARM ),
                   chance_hit_part ( ch, PART_RIGHT_ARM ),
                   chance_hit_part ( ch, PART_TORSO ),
@@ -5757,7 +5801,7 @@ ACMD ( do_worth )
                   GET_COOLNESS ( ch ),
                   update_award ( ch ), *ethos,
                   GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
-                      buf,
+                  buf,
                   print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),
                   print_elemental ( GET_CLASS ( ch ), FALSE, buf2, sizeof ( buf2 ) )
             );
@@ -5766,11 +5810,11 @@ ACMD ( do_worth )
 
     ch->Send ( "\r\n{cy"
                "O=====================================================================O\r\n"
-               "|%-32s{cy|#|   {cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s      \r\n"
-               "|%-32s{cy|#|                                       \r\n"
+               "|%-32s{cy|#|   {cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s\r\n"
+               "|%-32s{cy|#|                   {cwExplored : {cg%2.1f%%{cy\r\n"
                "|%-32s{cy|#|    {cwNatural Accuracy Rating : {cg%-3d{cy         \r\n"
                "|%-32s{cy|#|    {cw Natural Evasion Rating : {cg%-3d{cy         \r\n"
-               "|%-32s{cy|#|   {cwRegenerating per mud hour:{cy          \r\n"
+               "|%-32s{cy|#|  {cwRegenerating per mud hour :{cy          \r\n"
                "|%-32s{cy|#| Hp:{cc%-3d{cy  Ma:{cc%-3d{cy  Mv:{cc%-3d{cy  St:{cc%-3d{cy        \r\n"
                "|%-32s{cy|#|=====================================O\r\n"
                "|%-32s{cy|#|      {cwHead And Neck Armor: {cL%%%-3d{cy        \r\n"
@@ -5782,16 +5826,15 @@ ACMD ( do_worth )
                "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
                "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw   | Ethos: {cg%-3s{cy   \r\n"
                "|%-32s{cy|#| {cwStamina: {cC%d/%d{cw    | Detector: {cg%-3s{cy \r\n"
-
-                   "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
-               "|%-32s{cy|#| {cw Elemental Weakness: {cr%s{cy\r\n"
-               "|%-32s{cy|#| {cw Elemental Strength: {cc%s{cy\r\n"
+               "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
+               "|%-32s{cy|#| {cwElemental Weakness: {cr%s{cy\r\n"
+               "|%-32s{cy|#| {cwElemental Strength: {cc%s{cy\r\n"
                "O=====================================================================O{c0\r\n",
                SUNNY ? sunnage[0] : moonage[0], REMORTS ( ch ),
                GET_REMORT ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT ( ch ) ],
                GET_REMORT_TWO ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_TWO ( ch ) ],
                GET_REMORT_THREE ( ch ) == -1 ? "---" : class_abbrevs[ ( int ) GET_REMORT_THREE ( ch ) ],
-               SUNNY ? sunnage[ 1] : moonage[ 1],
+               SUNNY ? sunnage[ 1] : moonage[ 1], explored_perc,
                SUNNY ? sunnage[ 2] : moonage[ 2], GET_PERM_ACCURACY ( ch ),
                SUNNY ? sunnage[ 3] : moonage[ 3], GET_PERM_EVASION ( ch ),
                SUNNY ? sunnage[ 4] : moonage[ 4],

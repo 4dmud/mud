@@ -11,6 +11,7 @@
 ************************************************************************ */
 #include <netinet/in.h>
 #include <string>
+#include <bitset>
 /*
  * Intended use of this macro is to allow external packages to work with
  * a variety of CircleMUD versions without modifications.  For instance,
@@ -289,7 +290,7 @@ class Room;
 #define PLR_KILLER  		0    /* Player is a player-killer                */
 #define PLR_THIEF   		1    /* Player is a player-thief                 */
 #define PLR_FROZEN  		2    /* Player is frozen                         */
-#define PLR_DONTSET     	3     /* Don't EVER set (ISNPC bit)               */
+#define PLR_DONTSET     	3    /* Don't EVER set (ISNPC bit)               */
 #define PLR_WRITING 		4    /* Player writing (board/mail/olc)          */
 #define PLR_MAILING 		5    /* Player is writing mail                   */
 #define PLR_CRASH   		6    /* Player needs to be crash-saved           */
@@ -302,31 +303,30 @@ class Room;
 #define PLR_NODELETE    	13   /* Player shouldn't be deleted              */
 #define PLR_INVSTART    	14   /* Player should enter game wizinvis        */
 #define PLR_CRYO    		15   /* Player is cryo-saved (purge prog)        */
-#define PLR_ROLEPLAYER  	16    /* Player is a Role Player                  */
+#define PLR_ROLEPLAYER  	16   /* Player is a Role Player                  */
 #define PLR_PK      		17   /* Player participates in PK activites      */
 #define PLR_NEWBIE_HLPR 	18   /* Player is a designated newbie helper     */
-#define PLR_NOTDEADYET  	19    /*pending extraction */
-#define PLR_COVENTRY    	20      /*player can hear and talk but noone can hear them*/
-#define PLR_CHEATER     	21      /*player is a known cheater*/
-#define PLR_SPEEDWALK   	22      /*player is speedwalking*/
-#define PLR_LOYAL   		23      /* player has selected a loyalty reward */
-#define PLR_HERO        	24      /* player is a hero type */
-#define PLR_DYING       	25      /* player is in the state of dying */
-#define PLR_RP_LEADER   	26      /* player has echo, and award commands */
-#define PLR_IMM_MORT		27	/* Player is the mortal of an immortal, and should hear wiznet*/
-#define PLR_JESTER      	28      /* Player is a rp group jester */
-#define PLR_CTHULYTE    	29      /* Player is a rp group cthulyte */
-#define PLR_ALDERISIO   	30      /* Player is in rp group alderisio */
-#define PLR_BITCH       	31      /* Player is in rp group bitch */
-#define PLR_RIDDLER     	32     /* Player is in rp group Riddler */
-#define PLR_LOLTHYTE    	33    /* Player is in rp group lolthye */
+#define PLR_NOTDEADYET  	19   /*pending extraction */
+#define PLR_COVENTRY    	20   /*player can hear and talk but noone can hear them*/
+#define PLR_CHEATER     	21   /*player is a known cheater*/
+#define PLR_SPEEDWALK   	22   /*player is speedwalking*/
+#define PLR_LOYAL   		23   /* player has selected a loyalty reward */
+#define PLR_HERO        	24   /* player is a hero type */
+#define PLR_DYING       	25   /* player is in the state of dying */
+#define PLR_RP_LEADER   	26   /* player has echo, and award commands */
+#define PLR_IMM_MORT		27   /* Player is the mortal of an immortal, and should hear wiznet*/
+#define PLR_JESTER      	28   /* Player is a rp group jester */
+#define PLR_CTHULYTE    	29   /* Player is a rp group cthulyte */
+#define PLR_ALDERISIO   	30   /* Player is in rp group alderisio */
+#define PLR_BITCH       	31   /* Player is in rp group bitch */
+#define PLR_RIDDLER     	32   /* Player is in rp group Riddler */
+#define PLR_LOLTHYTE    	33   /* Player is in rp group lolthye */
 #define PLR_FEARLESS   		34   /* Player is in rp group Fearless */
-#define PLR_GALLIANO    	35
-#define PLR_NEEDS_CLASS 	36  /* Player hasn't yet chosen their class     */
-#define PLR_NEEDS_STATS 	37  /* Player hasn't yet chosen their stats     */
-#define PLR_ANTI_DT     	38  /* Horus - has a life against DTs */
-#define PLR_TEMP1		39  // Temp player flag 1
-#define PLR_TEMP2		40  // Temp player flag 2
+#define PLR_GALLIANO    	35   /* Player is in rp group Galliano */
+#define PLR_NEEDS_CLASS 	36   /* Player hasn't yet chosen their class     */
+#define PLR_NEEDS_STATS 	37   /* Player hasn't yet chosen their stats     */
+#define PLR_ANTI_DT     	38   /* Horus - has a life against DTs */
+#define PLR_SAVE_EXPLORED   39   /* Player's explored rooms need to be saved */
 
 #define MOB_RACE_HUMANOID 	0   /* Mob carries money                    */
 #define MOB_RACE_ANIMAL   	1   /* Mob doesn't carry money              */
@@ -2133,6 +2133,7 @@ public:
     short newbie_status;
     struct help_index_element *help;
     int age; //age override
+    vector<bitset<32>> explored; /* The rooms this char has been to */
 
     player_special_data() {
         saved = player_special_data_saved();
@@ -2173,8 +2174,7 @@ public:
         newbie_status = 0;
         help  = NULL;
         kills.clear();
-    age = -1;
-
+        age = -1;
     }
     kill_map::iterator KillsBegin() {
         return kills.begin();
