@@ -1397,7 +1397,7 @@ ACMD ( do_cast )
         if ( mana > 0 )
             alter_mana ( ch, mana / 2 );
 
-        if ( SINFO.violent && tch && IS_NPC ( tch ) && HERE ( tch, ch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && !FIGHTING(tch) )
+        if ( SINFO.violent && tch && IS_NPC ( tch ) && !ROOM_FLAGGED ( IN_ROOM ( ch ), ROOM_PEACEFUL ) && can_fight ( ch, tch, TRUE ) )
             start_fighting_delay ( tch, ch );
 
     }
@@ -1764,7 +1764,7 @@ void mag_assign_spells ( void )
              TAR_CHAR_ROOM | TAR_NOT_SELF | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
              30, TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 34, 0, "" );
 
-    spello ( SPELL_CHARM, "charm", 75 , 50 , 2, POS_FIGHTING,
+    spello ( SPELL_CHARM, "charm", 75 , 50 , 2, POS_STANDING,
              TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, 0,
              TYPE_UNDEFINED, TYPE_UNDEFINED, 3, 30, 0,
                  "You feel more self-confident." );

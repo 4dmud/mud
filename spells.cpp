@@ -577,7 +577,9 @@ ASPELL(spell_charm) {
         ch->Send("Your victim resists!\r\n");
     else if (AFF_FLAGGED(ch, AFF_CHARM))
         ch->Send("You can't have any followers of your own!\r\n");
-    else if (AFF_FLAGGED(victim, AFF_CHARM) || level < GET_LEVEL(victim))
+    else if (AFF_FLAGGED(victim, AFF_CHARM))
+        ch->Send("%s has been charmed already!\r\n", GET_SEX(victim) == SEX_MALE ? "He" : GET_SEX(victim) == SEX_FEMALE ? "She" : "It");
+    else if (level < GET_LEVEL(victim))
         ch->Send("You fail.\r\n");
     /* player charming another player - no legal reason for this */
     else if ((!CONFIG_PK_ALLOWED)  && !IS_NPC(victim))
