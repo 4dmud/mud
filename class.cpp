@@ -1329,26 +1329,32 @@ float cleave_mult ( int level, int tier )
 
 ACMD ( do_dam_dice )
 {
-    int i, j;
-    char num1[10], num2[10];
-    skip_spaces ( &argument );
-    if ( *argument || argument != NULL )
+    if ( !argument || !*argument )
     {
-        two_arguments ( argument, num1, num2 );
-        i = atoi ( num1 );
-        j = atoi ( num2 );
-        ch->Send ( "%2dD%-2d avg %.1f max %3d   ", i, j,
-                   ( ( ( j + 1 ) / 2.0 ) * i ), /*avg dam*/ ( i + ( i * j ) ) /*max damn*/ );
+        ch->Send ( "Usage: damdice <num dice> <size dice>\r\n" );
         return;
     }
-    ch->Send ( "Dam Dice:\r\n" );
-    for ( i = 0; i< 10; i++ )
-        for ( j = 0; j < 10; j++ )
-            ch->Send ( "%2dD%-2d avg %.1f max %3d   %s", i, j,
-                       ( ( ( j + 1 ) / 2.0 ) * i ), //avg dam
-                       ( i + ( i * j ) ), //max damn
-                       ( i%2?"  ":" \r\n" ) );
 
+    char num1[MAX_INPUT_LENGTH], num2[MAX_INPUT_LENGTH];
+    //skip_spaces ( &argument );
+    two_arguments ( argument, num1, num2 );
+    if ( !is_number ( num1 ) || !is_number ( num2 ) )
+    {
+        ch->Send ( "Usage: damdice <num dice> <size dice>\r\n" );
+        return;
+    }
+
+    int i = atoi ( num1 );
+    int j = atoi ( num2 );
+    if ( i <= 0 || j <= 0 )
+    {
+        ch->Send ( "Damdice: the numbers need to be positive.\r\n" );
+        return;
+    }
+
+    int max = i*j;
+    float avg = i * ((j-1)/2.0 + 1);
+    ch->Send ( "%dD%d: avg %.1f, max %d\r\n", i, j, avg, max );
 }
 
 /*
