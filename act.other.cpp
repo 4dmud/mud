@@ -1647,18 +1647,17 @@ ACMD ( do_gen_tog )
     return;
 }
 
+void remove_tags ( char * buf )
+{
+    ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
+    ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
+    ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
+    ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
+    ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
+}
 
 ACMD ( do_file )
 {
-    FILE *req_file;
-    int i, l, line_number;
-    char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], line[READ_SIZE];
-    char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-    char *arg3;
-    size_t pos, len = 0;
-    vector<string> entries;
-    string entry;
-
     struct file_struct
     {
         string cmd;
@@ -1690,18 +1689,19 @@ ACMD ( do_file )
     {
         ch->Send ( "USAGE: file <option> <num lines>\r\n"
                "       file <option> search <search phrase>\r\n"
-               "       file <bug|typo> fixed <line number>\r\n"
-               "       file <bug|typo> [all] <num lines>\r\n\r\n"
+               "       file <bug|typo|syslog> fixed <line number>\r\n"
+               "       file <bug|typo|syslog> [all] <num lines>\r\n\r\n"
                "File options:\r\n" );
 
-        for ( i = 1; fields[i].level; i++ )
+        for ( int i = 1; fields[i].level; i++ )
             if ( fields[i].level <= GET_LEVEL ( ch ) )
-                ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(),
-                           fields[i].file.c_str() );
+                ch->Send ( "%-15s%s\r\n", fields[i].cmd.c_str(), fields[i].file.c_str() );
         return;
     }
 
-    arg3 = two_arguments ( argument, field, arg2 );
+    char field[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+    char *arg3 = two_arguments ( argument, field, arg2 );
+    int l;
 
     for ( l = 0; * ( fields[l].cmd.c_str() ) != '\n'; l++ )
         if ( !strncmp ( field, fields[l].cmd.c_str(), strlen ( field ) ) )
@@ -1719,6 +1719,7 @@ ACMD ( do_file )
         return;
     }
 
+    FILE *req_file;
     if ( ! ( req_file = fopen ( fields[l].file.c_str(), "r" ) ) )
     {
         new_mudlog ( NRM, MAX ( LVL_GOD, GET_INVIS_LEV ( ch ) ), TRUE, "SYSERR: Error opening file %s using 'file' command.",
@@ -1726,8 +1727,14 @@ ACMD ( do_file )
         return;
     }
 
-    if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
+    bool has_tags = ( fields[l].cmd == "bug" || fields[l].cmd == "typo" );
+    char line[READ_SIZE];
+    string entry;
+    vector<string> entries;
+
+    if ( has_tags )
     {
+        size_t pos;
         get_line ( req_file, line );
         while ( !feof ( req_file ) )
         {
@@ -1739,7 +1746,6 @@ ACMD ( do_file )
             }
             get_line ( req_file, line );
         }
-        fclose ( req_file );
         entries.push_back ( entry );
     }
     else
@@ -1750,16 +1756,30 @@ ACMD ( do_file )
             entries.push_back ( string ( line ) );
             get_line ( req_file, line );
         }
-        fclose ( req_file );
     }
+    fclose ( req_file );
 
+    char buf[MAX_STRING_LENGTH];
     if ( !strcmp ( arg2, "search" ) )
     {
         string text = "";
-        int len = strlen ( arg3 );
+        int len = strlen ( arg3 ), i = 1;
         for ( auto &e : entries )
             if ( search ( e.begin(), e.end(), arg3, arg3 + len, [](char c1, char c2) { return toupper ( c1 ) == toupper ( c2 ); } ) != e.end() )
-                text += "\r\n" + e;
+            {
+                if ( fields[l].cmd == "syslog" )
+                    text += "\r\n" + to_string ( i++ ) + ". " + e;
+                else if ( has_tags )
+                {
+                    strlcpy ( buf, e.c_str(), sizeof buf );
+                    remove_tags ( buf );
+                    text += "\r\n" + string ( buf );
+                }
+                else
+                    text += "\r\n" + e;
+            }
+            else
+                i++;
 
         if ( text == "" )
             ch->Send ( "No matches found.\r\n" );
@@ -1771,12 +1791,12 @@ ACMD ( do_file )
         return;
     }
 
-    /* toggle (fixed) in bug or typo file */
+    /* toggle (fixed) in bug, typo or syslog file */
 
-    if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) )
+    if ( !strcmp ( arg2, "fixed" ) && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" ) )
     {
 
-        line_number = atoi ( arg3 );
+        int line_number = atoi ( arg3 );
 
         if ( line_number < 1 || line_number > entries.size() )
         {
@@ -1784,17 +1804,39 @@ ACMD ( do_file )
             return;
         }
 
-        if ( entries [ line_number - 1 ].rfind ( "(fixed)" ) == entries [ line_number - 1].length() - 7 )
-            entries [ line_number - 1 ]  = entries [ line_number - 1].substr ( 0, entries [ line_number - 1 ].length() - 7 );
-        else entries [ line_number - 1 ] += "(fixed)";
+        int syslog_lines_changed = 0;
+        if ( fields[l].cmd == "syslog" )
+        {
+            // toggle (fixed) in all lines with the same content, apart from the date, which has length 19
+            bool add_fixed = entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) != "(fixed)";
+            for ( int i = 0; i < entries.size(); ++i )
+                if ( i != line_number-1 && entries[i].substr ( 19 ) == entries[ line_number-1 ].substr ( 19 ) )
+                {
+                    if ( add_fixed )
+                        entries[i] += "(fixed)";
+                    else
+                        entries[i] = entries[i].substr ( 0, entries[i].size() - 7 );
+                    syslog_lines_changed++;
+                }
+        }
 
-        strlcpy ( buf, entries [ line_number - 1 ].c_str(), sizeof ( buf ) );
-        ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
-        ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
-        ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
-        ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
-        ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-        ch->Send ( "%d. %s\r\n", line_number, buf );
+        if ( entries[ line_number-1 ].substr ( entries[ line_number-1 ].size() - 7 ) == "(fixed)" )
+            entries[ line_number-1 ]  = entries[ line_number-1 ].substr ( 0, entries[ line_number-1 ].size() - 7 );
+        else
+            entries [ line_number-1 ] += "(fixed)";
+
+        if ( fields[l].cmd == "syslog" )
+        {
+            ch->Send ( "%d. %s\r\n", line_number, entries[ line_number-1 ].c_str() );
+            if ( syslog_lines_changed > 0 )
+                ch->Send ( "Toggled %d similar line%s.\r\n", syslog_lines_changed, syslog_lines_changed > 1 ? "s" : "" );
+        }
+        else
+        {
+            strlcpy ( buf, entries[ line_number-1 ].c_str(), sizeof ( buf ) );
+            remove_tags ( buf );
+            ch->Send ( "%d. %s\r\n", line_number, buf );
+        }
 
         if ( ! ( req_file = fopen ( fields[l].file.c_str(), "w" ) ) )
         {
@@ -1802,7 +1844,7 @@ ACMD ( do_file )
             return;
         }
 
-        for ( i = 0; i < entries.size(); ++i )
+        for ( int i = 0; i < entries.size(); ++i )
         {
             fputs ( entries[i].c_str(), req_file );
             fputs ( "\n", req_file );
@@ -1835,9 +1877,9 @@ ACMD ( do_file )
 
     /* if not all entries are shown, skip the ones with "(fixed)" in them */
     vector<int> entries_to_show;
-    for ( i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
+    for ( int i = entries.size() - 1; i >= 0 && req_entries > 0; --i )
     {
-        if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" ) && entries[i].find ( "(fixed)" ) != string::npos )
+        if ( !show_all && ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" ) && entries[i].substr( entries[i].size() - 7 ) == "(fixed)" )
             continue;
 
         entries_to_show.push_back ( i );
@@ -1845,25 +1887,23 @@ ACMD ( do_file )
     }
 
     /* strip the tags from the entries and page them */
-    buf2[0] = '\0';
-    for ( i = entries_to_show.size() - 1; i >= 0; --i )
+    int len = 0;
+    char buf2[MAX_STRING_LENGTH];
+    *buf2 = '\0';
+    for ( int i = entries_to_show.size() - 1; i >= 0; --i )
     {
-        if ( entries[ entries_to_show[i] ].length() + 10 >= sizeof ( buf2 ) - len ) // prevent buffer overflow
+        if ( entries[ entries_to_show[i] ].length() + 10 >= ( sizeof buf2 ) - len ) // prevent buffer overflow
             break;
 
         strlcpy ( buf, entries[ entries_to_show[i] ].c_str(), sizeof ( buf ) );
 
-        if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "ideas" )
-        {
-            ReplaceString ( buf, "<table cellpadding=0 cellspacing=0 border=0 class='txtline'><tr><td class='plrname'>", "{cc", sizeof ( buf ) );
-            ReplaceString ( buf, "</td><td class='date'>", " {cw- ", sizeof ( buf ) );
-            ReplaceString ( buf, "</td><td class='room'>", " - ", sizeof ( buf ) );
-            ReplaceString ( buf, "</td><td class='comment'>", " :{cg ", sizeof ( buf ) );
-            ReplaceString ( buf, "</td></tr></table>", " {c0", sizeof ( buf ) );
-            len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
-        }
+        if ( has_tags )
+            remove_tags ( buf );
+
+        if ( fields[l].cmd == "bug" || fields[l].cmd == "typo" || fields[l].cmd == "syslog" )
+            len += snprintf ( buf2 + len, ( sizeof buf2 ) - len, "%d. %s\r\n{c0", entries_to_show[i] + 1, buf );
         else
-            len += snprintf ( buf2 + len, sizeof ( buf2 ) - len, "%s\r\n{c0", buf );
+            len += snprintf ( buf2 + len, ( sizeof buf2 ) - len, "%s\r\n{c0", buf );
     }
 
     page_string ( ch->desc, buf2, 1 );
