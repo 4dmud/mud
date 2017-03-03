@@ -969,6 +969,9 @@ bool is_same_zone(int dv, int cv)
 
 void set_explored ( Character *ch, room_vnum r )
 {
+    if ( !ch || SPECIALS ( ch )->explored.size() == 0 )
+        return;
+
     int bucket = r / 32;
     int bit = r % 32;
     if ( SPECIALS ( ch )->explored[bucket][bit] == 0 )
