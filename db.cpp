@@ -1330,7 +1330,7 @@ void load_explored ( const Character *ch )
 
     int i = 0;
     ulong x;
-    while ( !f.fail() && !f.eof() )
+    while ( i < SPECIALS ( ch )->explored.size() )
     {
         f >> x;
         SPECIALS ( ch )->explored[ i++ ] = x;
