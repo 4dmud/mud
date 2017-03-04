@@ -1254,7 +1254,6 @@ void parse_questcard ( char *filename )
         if ( line[0] == '$' )
             break;
     }
-    f.close();
 
     questcards[ num ] = qc;
 }
@@ -1336,8 +1335,6 @@ void load_explored ( const Character *ch )
         f >> x;
         SPECIALS ( ch )->explored[ i++ ] = x;
     }
-
-    f.close();
 }
 
 void save_explored ( const Character *ch )
@@ -1355,8 +1352,6 @@ void save_explored ( const Character *ch )
 
     for ( const auto &e : SPECIALS ( ch )->explored )
         f << e.to_ulong() << " ";
-
-    f.close();
 }
 
 /* body of the booting system */

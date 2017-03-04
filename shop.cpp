@@ -1850,6 +1850,8 @@ void boot_player_shops ( string filename )
     while ( !feof ( file_owners ) )
     {
         get_line ( file_owners, line );
+        if ( !*line )
+            break;
 
         if ( ( id = pi.IdByName ( line ) ) == -1 )
         {
