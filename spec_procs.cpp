@@ -2702,7 +2702,7 @@ SPECIAL ( playershop )
             DYN_DEFINE;
             DYN_CREATE;
             *dynbuf = 0;
-            char buf[MAX_INPUT_LENGTH];
+            char buf[MAX_STRING_LENGTH];
             DYN_RESIZE ( "{ccTo get information on any shop item, type: ID <item number>{c0\r\n" );
             if ( !PRF_FLAGGED ( ch, PRF_NOGRAPHICS ) )
             {
@@ -3005,8 +3005,7 @@ const Character *random_mob ()
         if ( !random_mob || MOB_FLAGGED ( random_mob, MOB_WIZINVIS ) || ( GET_LDESC ( random_mob ) && GET_LDESC ( random_mob )[0] == '{' && strlen ( GET_LDESC ( random_mob ) ) <= 3 ) )
             continue;
 
-        string shortdesc = string ( GET_SDESC ( random_mob ) );
-        if ( shortdesc.find ( "{c" ) != string::npos )
+        if ( strstr ( GET_SDESC ( random_mob ), "{c" ) )
             continue;
 
         return random_mob;

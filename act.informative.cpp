@@ -5699,7 +5699,7 @@ O===================================================================O
 ACMD ( do_worth )
 {
     char buf[40] = "", buf1[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
-        const char *ethos[MAX_INPUT_LENGTH], *detector[MAX_INPUT_LENGTH];
+    const char *ethos[MAX_INPUT_LENGTH], *detector[MAX_INPUT_LENGTH];
     size_t len = 0;
     int i;
     static const char *moonage[] =
@@ -5743,17 +5743,17 @@ ACMD ( do_worth )
     if ( IS_NPC ( ch ) )
         return;
 
-      *ethos = ("None.");
-        if (GET_ETHOS(ch) == 1)
-           *ethos = ("{cWGood{cn");
-        if (GET_ETHOS(ch) == 2)
-           *ethos = ("{cBNeutral{cn");
-        if (GET_ETHOS(ch) == 3)
-           *ethos = ("{cREvil{cn");
+    *ethos = ("None.");
+    if (GET_ETHOS(ch) == 1)
+        *ethos = ("{cWGood{cn");
+    if (GET_ETHOS(ch) == 2)
+        *ethos = ("{cBNeutral{cn");
+    if (GET_ETHOS(ch) == 3)
+        *ethos = ("{cREvil{cn");
 
-       *detector = ("{crLow{cn");
-        if (GET_DETECTOR(ch) == 1)
-           *detector = ("{cGHigh{cn");
+    *detector = ("{crLow{cn");
+    if (GET_DETECTOR(ch) == 1)
+        *detector = ("{cGHigh{cn");
 
     for ( i = 0; i < NUM_CLASSES; i++ )
         if ( GET_MASTERY ( ch, i ) )
@@ -5808,6 +5808,9 @@ ACMD ( do_worth )
        return;
     }
 
+    char stamina[32];
+    snprintf ( stamina, sizeof stamina, "%d/%d", GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ) );
+
     ch->Send ( "\r\n{cy"
                "O=====================================================================O\r\n"
                "|%-32s{cy|#|   {cwRemorts: {cg%-3d{cy 1:%3s 2:%3s 3:%3s\r\n"
@@ -5824,8 +5827,8 @@ ACMD ( do_worth )
                "|%-32s{cy|#|    {cwLower Left Body Armor: {cL%%%-3d{cy        \r\n"
                "|%-32s{cy|#|   {cwLower Right Body Armor: {cL%%%-3d{cy        \r\n"
                "|%-32s{cy|#|                 {cwCoolness:  {cg%-3d{cy       \r\n"
-               "|%-32s{cy|#| {cwAward Points: {cg%-3d{cw   | Ethos: {cg%-3s{cy   \r\n"
-               "|%-32s{cy|#| {cwStamina: {cC%d/%d{cw    | Detector: {cg%-3s{cy \r\n"
+               "|%-32s{cy|#| {cwAward Points: {cg%-6d{cw | Ethos: {cg%-3s{cy   \r\n"
+               "|%-32s{cy|#| {cwStamina: {cC%-11s{cw | Detector: {cg%-3s{cy \r\n"
                "|%-32s{cy|#| {cwMastered Classes: {cg%s{cy\r\n"
                "|%-32s{cy|#| {cwElemental Weakness: {cr%s{cy\r\n"
                "|%-32s{cy|#| {cwElemental Strength: {cc%s{cy\r\n"
@@ -5848,7 +5851,7 @@ ACMD ( do_worth )
                SUNNY ? sunnage[12] : moonage[12], chance_hit_part ( ch, PART_RIGHT_LEG ),
                SUNNY ? sunnage[13] : moonage[13], GET_COOLNESS ( ch ),
                SUNNY ? sunnage[14] : moonage[14], update_award ( ch ), *ethos,
-               SUNNY ? sunnage[14] : moonage[14], GET_STAMINA ( ch ), GET_MAX_STAMINA ( ch ), *detector,
+               SUNNY ? sunnage[14] : moonage[14], stamina, *detector,
                    SUNNY ? sunnage[14] : moonage[14], buf,
                SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), TRUE, buf1, sizeof ( buf1 ) ),
                SUNNY ? sunnage[14] : moonage[14], print_elemental ( GET_CLASS ( ch ), FALSE, buf2, sizeof ( buf2 ) ) );

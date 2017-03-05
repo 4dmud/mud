@@ -1445,16 +1445,15 @@ void get_from_room ( Character *ch, char *obj_desc, int howmany )
                     ( processed_get_counter == 1 && failed_get_counter > 0 ) )
             {
                 snprintf ( buf, sizeof ( buf ),
-                           "You pick up %d thing%s named %s%s off the ground.",
-                           processed_get_counter, ( processed_get_counter > 1 ) ? "s" : "", obj_desc, ( processed_get_counter > 1 ) ? "s" : "" );
+                           "You pick up %d thing%s named %s off the ground.",
+                           processed_get_counter, ( processed_get_counter > 1 ) ? "s" : "", obj_desc );
                 act ( buf, FALSE, ch, 0, 0, TO_CHAR );
                 if ( !slipping )
                 {
                     snprintf ( buf, sizeof ( buf ),
-                               "$n picks up %s thing%s named %s%s from the room.",
+                               "$n picks up %s thing%s named %s from the room.",
                                ( processed_get_counter > 1 ) ? "some" : "a",
-                               ( processed_get_counter > 1 ) ? "s" : "", obj_desc,
-                               ( processed_get_counter > 1 ) ? "s" : "" );
+                               ( processed_get_counter > 1 ) ? "s" : "", obj_desc );
                     act ( buf, FALSE, ch, 0, 0, TO_ROOM );
                 }
             }
@@ -1554,7 +1553,7 @@ ACMD ( do_get )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg3[MAX_INPUT_LENGTH] = "";
-    char num[MAX_INPUT_LENGTH] = "1";
+    char num[MAX_INPUT_LENGTH] = "";
     char *from = NULL;
 
     skip_spaces ( &argument );
@@ -1595,17 +1594,17 @@ ACMD ( do_get )
     if ( !IS_NPC ( ch ) )
         SET_BIT_AR ( PLR_FLAGS ( ch ), PLR_CRASH );
 
+    // get <number> <item>
+    if ( *num && !*arg3 )
+    {
+        get_from_room ( ch, arg1, atoi ( num ) );
+        return;
+    }
+
     // get <item>
     if ( !*arg3 || !str_cmp ( arg3, "room" ) )
     {
         get_from_room ( ch, arg1, 1 );
-        return;
-    }
-
-    // get <number> <item>
-    if ( *num && !*arg3 )
-    {
-        get_from_room ( ch, arg3, atoi ( num ) );
         return;
     }
 
